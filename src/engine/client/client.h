@@ -103,8 +103,8 @@ class CClient : public IClient, public CDemoPlayer::IListner
 	bool m_ResortServerBrowser;
 	bool m_RecordGameMessage;
 
+	//mmotee
 	bool m_ConnectedMmoServer;
-	bool m_CheckConnectedMmoServer;
 
 	int m_AckGameTick;
 	int m_CurrentRecvTick;

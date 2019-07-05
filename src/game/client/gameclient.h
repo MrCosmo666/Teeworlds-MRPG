@@ -311,6 +311,13 @@ public:
 	class CItems *m_pItems;
 	class CMapLayers *m_pMapLayersBackGround;
 	class CMapLayers *m_pMapLayersForeGround;
+
+	// mmotee thnx bla client
+	class CgSkins* m_pgSkins;
+	class CpSkins* m_ppSkins;
+	class CeSkins* m_peSkins;
+	class CcSkins* m_pcSkins;
+	class CEnSkins* m_penSkins;
 };
 
 const char *Localize(const char *pStr, const char *pContext="")

@@ -52,6 +52,13 @@
 #include "components/stats.h"
 #include "components/voting.h"
 
+//mmotee thnx bla client
+#include "components/skinscursors.h"
+#include "components/skinsemotes.h"
+#include "components/skinsgame.h"
+#include "components/skinsprojectile.h"
+#include "components/skinsentities.h"
+
 // instanciate all systems
 static CKillMessages gs_KillMessages;
 static CCamera gs_Camera;
@@ -85,6 +92,13 @@ static CMapImages gs_MapImages;
 
 static CMapLayers gs_MapLayersBackGround(CMapLayers::TYPE_BACKGROUND);
 static CMapLayers gs_MapLayersForeGround(CMapLayers::TYPE_FOREGROUND);
+
+// mmotee thnx bla client
+static CgSkins gs_gSkins;
+static CpSkins gs_pSkins;
+static CeSkins gs_eSkins;
+static CcSkins gs_cSkins;
+static CEnSkins gs_enSkins;
 
 CGameClient::CStack::CStack() { m_Num = 0; }
 void CGameClient::CStack::Add(class CComponent *pComponent) { m_paComponents[m_Num++] = pComponent; }
@@ -204,6 +218,14 @@ void CGameClient::OnConsoleInit()
 	m_pItems = &::gs_Items;
 	m_pMapLayersBackGround = &::gs_MapLayersBackGround;
 	m_pMapLayersForeGround = &::gs_MapLayersForeGround;
+
+	//mmotee client thnx bla client
+	m_pgSkins = &::gs_gSkins;
+	m_ppSkins = &::gs_pSkins;
+	m_peSkins = &::gs_eSkins;
+	m_pcSkins = &::gs_cSkins;
+	m_penSkins = &::gs_enSkins;
+
 	m_pStats = &::gs_Stats;
 
 	// make a list of all the systems, make sure to add them in the corrent render order
@@ -247,6 +269,14 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(m_pStats);
 	m_All.Add(m_pMotd);
 	m_All.Add(m_pMenus);
+
+	// mmotee thnx bla client
+	m_All.Add(m_pgSkins);
+	m_All.Add(m_ppSkins);
+	m_All.Add(m_peSkins);
+	m_All.Add(m_pcSkins);
+	m_All.Add(m_penSkins);
+
 	m_All.Add(&m_pMenus->m_Binder);
 	m_All.Add(m_pGameConsole);
 
@@ -357,6 +387,12 @@ void CGameClient::OnInit()
 	Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "gameclient", aBuf);
 
 	m_ServerMode = SERVERMODE_PURE;
+
+	// mmotee thnx bla client
+	g_pData->m_aImages[IMAGE_GAME].m_Id = m_pgSkins->Get(m_pgSkins->Find(g_Config.m_GameTexture))->m_Texture;
+	g_pData->m_aImages[IMAGE_PARTICLES].m_Id = m_ppSkins->Get(m_ppSkins->Find(g_Config.m_GameParticles))->m_Texture;
+	g_pData->m_aImages[IMAGE_EMOTICONS].m_Id = m_peSkins->Get(m_peSkins->Find(g_Config.m_GameEmoticons))->m_Texture;
+	g_pData->m_aImages[IMAGE_CURSOR].m_Id = m_pcSkins->Get(m_pcSkins->Find(g_Config.m_GameCursor))->m_Texture;
 
 	m_IsXmasDay = time_isxmasday();
 	m_IsEasterDay = time_iseasterday();
@@ -1547,6 +1583,10 @@ void CGameClient::OnPredict()
 
 void CGameClient::OnActivateEditor()
 {
+	// mmotee
+	if (m_penSkins->Find(g_Config.m_GameEntities) == -1)
+		str_copy(g_Config.m_GameEntities, "entities/entities.png", sizeof(g_Config.m_GameEntities));
+
 	OnRelease();
 }
 

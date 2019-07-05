@@ -1354,6 +1354,7 @@ if(CLIENT)
     components/menus_callback.cpp
     components/menus_demo.cpp
     components/menus_ingame.cpp
+	components/menus_mmo.cpp
     components/menus_popups.cpp
     components/menus_settings.cpp
     components/menus_start.cpp
@@ -1371,6 +1372,16 @@ if(CLIENT)
     components/scoreboard.h
     components/skins.cpp
     components/skins.h
+    components/skinsgame.cpp
+    components/skinsgame.h
+    components/skinsprojectile.cpp
+    components/skinsprojectile.h
+    components/skinsemotes.cpp
+    components/skinsemotes.h
+    components/skinscursors.cpp
+    components/skinscursors.h
+	components/skinsentities.cpp
+	components/skinsentities.h
     components/sounds.cpp
     components/sounds.h
     components/spectator.cpp

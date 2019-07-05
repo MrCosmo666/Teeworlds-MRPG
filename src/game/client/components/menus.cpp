@@ -1266,10 +1266,10 @@ void CMenus::RenderMenubar(CUIRect Rect)
 
 	if((Client()->State() == IClient::STATE_OFFLINE && m_MenuPage == PAGE_SETTINGS) || (Client()->State() == IClient::STATE_ONLINE && m_GamePage == PAGE_SETTINGS))
 	{
-		float Spacing = 3.0f;
-		float ButtonWidth = (Box.w/6.0f)-(Spacing*5.0)/6.0f;
+		float Spacing = 0.0f;
+		float ButtonWidth = (Box.w / 7.0f) - (Spacing * 5.0) / 7.0f;
 		float NotActiveAlpha = Client()->State() == IClient::STATE_ONLINE ? 0.5f : 1.0f;
-		int Corners = Client()->State() == IClient::STATE_ONLINE ? CUI::CORNER_T : CUI::CORNER_ALL;
+		int Corners = 0;
 
 		// render header background
 		if(Client()->State() == IClient::STATE_OFFLINE)

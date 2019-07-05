@@ -595,6 +595,9 @@ public:
 	}
 
 	virtual void Init();
+	//mmotee
+	virtual void ReInitEntities();
+
 	virtual void UpdateAndRender();
 	virtual bool HasUnsavedData() const { return m_Map.m_Modified; }
 

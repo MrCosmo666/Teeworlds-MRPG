@@ -4572,7 +4572,7 @@ void CEditor::Init()
 	m_CheckerTexture = Graphics()->LoadTexture("editor/checker.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
 	m_BackgroundTexture = Graphics()->LoadTexture("editor/background.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
 	m_CursorTexture = Graphics()->LoadTexture("editor/cursor.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
-	m_EntitiesTexture = Graphics()->LoadTexture("editor/entities.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_MULTI_DIMENSION);
+	m_EntitiesTexture = Graphics()->LoadTexture(g_Config.m_GameEntities, IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_MULTI_DIMENSION);
 
 	m_TilesetPicker.m_pEditor = this;
 	m_TilesetPicker.MakePalette();
@@ -4586,6 +4586,13 @@ void CEditor::Init()
 #ifdef CONF_DEBUG
 	m_pConsole->Register("map_magic", "i", CFGFLAG_CLIENT, ConMapMagic, this, "1-grass_doodads, 2-winter_main, 3-both");
 #endif
+}
+
+//mmotee
+void CEditor::ReInitEntities()
+{
+	m_EntitiesTexture = Graphics()->LoadTexture(g_Config.m_GameEntities, IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_MULTI_DIMENSION);
+	m_Map.m_pGameLayer->m_Texture = m_EntitiesTexture;
 }
 
 static const char *s_aMaps[] = {"ctf1", "ctf2", "ctf3", "ctf4", "ctf5", "ctf6", "ctf7", "ctf8", "dm1", "dm2", "dm3", "dm6", "dm7", "dm8", "dm9", "lms1"};

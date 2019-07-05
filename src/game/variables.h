@@ -36,6 +36,13 @@ MACRO_CONFIG_INT(ClShowUserId, cl_show_user_id, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_
 // mmotee
 MACRO_CONFIG_INT(ClShowMEffects, cl_mmo_effects, 0, 0, 3, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show in mmo server effects: 0=all, 1=only enchant, 2=only another items, 3= disable")
 MACRO_CONFIG_INT(ClMmoDamageInd, cl_vanilla_textdamage, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Use damage text ind. For vanila clients")
+MACRO_CONFIG_STR(GameTexture, mmo_game_texture, 24, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Gameskin texture")
+MACRO_CONFIG_STR(GameParticles, mmo_particle_texture, 24, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Particle texture")
+MACRO_CONFIG_STR(GameEmoticons, mmo_emoticons_texture, 24, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Emoticons texture")
+MACRO_CONFIG_STR(GameCursor, mmo_cursor_texture, 24, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Cursor texture")
+MACRO_CONFIG_STR(GameEntities, mmo_entities_texture, 64, "editor/entities.png", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Entities texture path")
+
+MACRO_CONFIG_INT(Texture, mmo_texture_page, 4, 0, 0, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Texture page")
 
 MACRO_CONFIG_INT(EdZoomTarget, ed_zoom_target, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Zoom to the current mouse target")
 MACRO_CONFIG_INT(EdShowkeys, ed_showkeys, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Editor shows which keys are pressed")
@@ -85,7 +92,7 @@ MACRO_CONFIG_STR(PlayerSkinEyes, player_skin_eyes, 24, "standard", CFGFLAG_CLIEN
 MACRO_CONFIG_INT(UiBrowserPage, ui_browser_page, 5, 5, 8, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Interface serverbrowser page")
 MACRO_CONFIG_INT(UiSettingsPage, ui_settings_page, 0, 0, 5, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Interface settings page")
 MACRO_CONFIG_STR(UiServerAddress, ui_server_address, 64, "localhost:8303", CFGFLAG_CLIENT|CFGFLAG_SAVE, "Interface server address")
-MACRO_CONFIG_INT(UiMousesens, ui_mousesens, 100, 5, 100000, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Mouse sensitivity for menus/editor")
+MACRO_CONFIG_INT(UiMousesens, ui_mousesens, 100, 1, 100000, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Mouse sensitivity for menus/editor")
 MACRO_CONFIG_INT(UiAutoswitchInfotab, ui_autoswitch_infotab, 1, 0, 1, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Switch to the info tab when clicking on a server")
 
 MACRO_CONFIG_INT(GfxNoclip, gfx_noclip, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Disable clipping")

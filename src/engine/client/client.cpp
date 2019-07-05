@@ -285,7 +285,6 @@ CClient::CClient() : m_DemoPlayer(&m_SnapshotDelta), m_DemoRecorder(&m_SnapshotD
 
 	// mmotee
 	m_ConnectedMmoServer = false;
-	m_CheckConnectedMmoServer = false;
 
 	// map download
 	m_aMapdownloadFilename[0] = 0;
@@ -917,6 +916,10 @@ int CClient::UnpackServerInfo(CUnpacker *pUnpacker, CServerInfo *pInfo, int *pTo
 	if(pInfo->m_MaxPlayers > MAX_PLAYERS && (str_comp(pInfo->m_aGameType, "DM") == 0 || str_comp(pInfo->m_aGameType, "TDM") == 0 || str_comp(pInfo->m_aGameType, "CTF") == 0 ||
 		str_comp(pInfo->m_aGameType, "LTS") == 0 || str_comp(pInfo->m_aGameType, "LMS") == 0))
 		return -1;
+
+	//mmotee
+	if (str_comp(pInfo->m_aGameType, "MmoTee") == 0)
+		m_ConnectedMmoServer = true;
 
 	// use short version
 	if(!pToken)
@@ -2064,6 +2067,9 @@ void CClient::Run()
 			{
 				if(!m_EditorActive)
 				{
+					// mmotee
+					m_pEditor->ReInitEntities();
+
 					GameClient()->OnActivateEditor();
 					Input()->MouseModeRelative();
 					m_EditorActive = true;
@@ -2116,26 +2122,12 @@ void CClient::Run()
 		// menu tick
 		if(State() == IClient::STATE_OFFLINE)
 		{
-			// mmotee
-			if (m_CheckConnectedMmoServer)
-			{
-				m_ConnectedMmoServer = false;
-				m_CheckConnectedMmoServer = false;
-			}
 			int64 t = time_get();
 			while(t > TickStartTime(m_CurMenuTick+1))
 				m_CurMenuTick++;
-		}
-
-		// mmo tee
-		if (State() == IClient::STATE_ONLINE && !m_CheckConnectedMmoServer)
-		{
-			CServerInfo CurrentServerInfo;
-			GetServerInfo(&CurrentServerInfo);
-			if (str_comp(CurrentServerInfo.m_aGameType, "MmoTee") == 0)
-				m_ConnectedMmoServer = true;
-
-			m_CheckConnectedMmoServer = true;
+		
+			//mmotee
+			m_ConnectedMmoServer = false;
 		}
 
 		// beNice

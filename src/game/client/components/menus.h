@@ -666,6 +666,7 @@ private:
 	// mmotee
 	void RenderSettingsMmo(CUIRect MainView);
 	void RenderSettingsMmoGeneral(CUIRect MainView, int Page);
+	void RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background);
 
 	// found in menus_settings.cpp
 	void RenderLanguageSelection(CUIRect MainView, bool Header=true);

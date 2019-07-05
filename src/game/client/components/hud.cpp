@@ -575,7 +575,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	str_format(aBuf, sizeof(aBuf), "LEVEL: %d EXP: %d/%d", pClientStats->m_Level, pClientStats->m_Exp, pClientStats->m_ExpNeed);
 
 	// Инициализация текста
-	float FontSize = 7.0f;
+	float FontSize = 5.0f;
 	TextRender()->TextOutlineColor(0.3f, 0.3f, 0.3f, 0.3f);
 	TextRender()->TextWidth(0, FontSize, aBuf, -1, -1.0);
 	TextRender()->Text(0, 10, 42, FontSize, aBuf, -1);
@@ -583,7 +583,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	// Эффекты информация
 	IntsToStr(pClientStats->m_Table, 12, aBuf);
 	bool ChangePosition = false;
-	float SizeBuf = (str_length(aBuf) * 5.0f) - (str_length(aBuf) / 1.5f);
+	float SizeBuf = (str_length(aBuf) * (FontSize/1.25f)) - (str_length(aBuf) / 2 + str_length(aBuf) / 5);
 	if (SizeBuf > 2.0)
 	{
 		TextRender()->Text(0, 10, 70, FontSize, aBuf, -1);
@@ -600,8 +600,8 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	Graphics()->BlendNormal();
 	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.16f), CUI::CORNER_ALL, 5.0f);
 
-	TextRender()->TextWidth(0, 5.3f, aBuf, -1, -1.0);
-	TextRender()->Text(0, 10, (ChangePosition ? 85.0f : 70.0f), 5.3f, aBuf, -1);
+	TextRender()->TextWidth(0, 4.6f, aBuf, -1, -1.0);
+	TextRender()->Text(0, 10, (ChangePosition ? 85.0f : 70.0f), 4.6f, aBuf, -1);
 	TextRender()->TextOutlineColor(0, 0, 0, 0.3f);
 
 	// Начало
@@ -681,13 +681,13 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 
 		float w;
 		str_format(Text, sizeof(Text), "%d", pClientStats->m_Health);
-		w = TextRender()->TextWidth(0, 8, Text, -1, -1.0);
-		TextRender()->SetCursor(&Cursor, 50, 21, 8.0f, TEXTFLAG_RENDER);
+		w = TextRender()->TextWidth(0, 6.0f, Text, -1, -1.0);
+		TextRender()->SetCursor(&Cursor, 50, 23, 6.0f, TEXTFLAG_RENDER);
 		TextRender()->TextEx(&Cursor, Text, -1);
 
 		str_format(Text, sizeof(Text), "%d", pClientStats->m_Armor);
-		w = TextRender()->TextWidth(0, 8, Text, -1, -1.0);
-		TextRender()->SetCursor(&Cursor, 93, 21, 8.0f, TEXTFLAG_RENDER);
+		w = TextRender()->TextWidth(0, 6.0f, Text, -1, -1.0);
+		TextRender()->SetCursor(&Cursor, 93, 23, 6.0f, TEXTFLAG_RENDER);
 		TextRender()->TextEx(&Cursor, Text, -1);
 	}
 }
