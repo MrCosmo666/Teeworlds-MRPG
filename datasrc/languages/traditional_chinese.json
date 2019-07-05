@@ -1,0 +1,252 @@
+{
+"authors": {
+	"modified by": [
+		"TsFreddie, 2014 (Transifex)",
+		"杜茂森, 2019 (Transifex)"
+	],
+	"originally created by": "TsFreddie"
+},
+"translated strings": [
+	{
+		"or": "Abort",
+		"tr": "中斷"
+	},
+	{
+		"or": "All",
+		"tr": "全部"
+	},
+	{
+		"or": "Are you sure that you want to quit?",
+		"tr": "確定要退出？"
+	},
+	{
+		"or": "Are you sure that you want to remove the player from your friends list?",
+		"tr": "確定要把玩家從朋友清單移除嗎？"
+	},
+	{
+		"or": "As this is the first time you launch the game, please enter your nick name below. It's recommended that you check the settings to adjust them to your liking before joining a server.",
+		"tr": "這是你第一次啟動遊戲，請在下方輸入你的暱稱\n在進入伺服器前，建議先調整設定到你喜歡的樣子"
+	},
+	{
+		"or": "Back",
+		"tr": "返回"
+	},
+	{
+		"or": "Call vote",
+		"tr": "發起投票"
+	},
+	{
+		"or": "Compatible version",
+		"tr": "相容的版本"
+	},
+	{
+		"or": "Created",
+		"tr": "已創建"
+	},
+	{
+		"or": "Delete",
+		"tr": "刪除"
+	},
+	{
+		"or": "Delete skin",
+		"tr": "刪除 skin"
+	},
+	{
+		"or": "Disconnected",
+		"tr": "斷開連線"
+	},
+	{
+		"or": "Draw!",
+		"tr": "平手!"
+	},
+	{
+		"or": "Editor",
+		"tr": "編輯器"
+	},
+	{
+		"or": "Error",
+		"tr": "錯誤"
+	},
+	{
+		"or": "Free-View",
+		"tr": "自由視角"
+	},
+	{
+		"or": "Game info",
+		"tr": "遊戲資訊"
+	},
+	{
+		"or": "Game over",
+		"tr": "遊戲結束"
+	},
+	{
+		"or": "Hammer",
+		"tr": "錘子"
+	},
+	{
+		"or": "Host address:",
+		"tr": "主機位置:"
+	},
+	{
+		"or": "Joined",
+		"tr": "加入了"
+	},
+	{
+		"or": "Jump",
+		"tr": "跳躍"
+	},
+	{
+		"or": "Laser",
+		"tr": "雷射"
+	},
+	{
+		"or": "Loading",
+		"tr": "載入中"
+	},
+	{
+		"or": "Map",
+		"tr": "地圖"
+	},
+	{
+		"or": "Maximum ping:",
+		"tr": "最大延遲:"
+	},
+	{
+		"or": "Move right",
+		"tr": "往右移動"
+	},
+	{
+		"or": "Movement",
+		"tr": "移動"
+	},
+	{
+		"or": "Mute when not active",
+		"tr": "當沒有活動時靜音"
+	},
+	{
+		"or": "Nickname",
+		"tr": "暱稱"
+	},
+	{
+		"or": "No servers match your filter criteria",
+		"tr": "沒有伺服器符合你的過濾條件"
+	},
+	{
+		"or": "Player",
+		"tr": "玩家"
+	},
+	{
+		"or": "Prev. weapon",
+		"tr": "前一個武器"
+	},
+	{
+		"or": "Reset",
+		"tr": "重置"
+	},
+	{
+		"or": "Reset filter",
+		"tr": "重置過濾條件"
+	},
+	{
+		"or": "Respawn",
+		"tr": "重生"
+	},
+	{
+		"or": "Save skin",
+		"tr": "儲存皮膚"
+	},
+	{
+		"or": "Search:",
+		"tr": "搜尋:"
+	},
+	{
+		"or": "Server info",
+		"tr": "伺服器資訊"
+	},
+	{
+		"or": "Server not full",
+		"tr": "有空位的伺服器"
+	},
+	{
+		"or": "Sound",
+		"tr": "音效"
+	},
+	{
+		"or": "Sound error",
+		"tr": "音效錯誤"
+	},
+	{
+		"or": "Spectators",
+		"tr": "觀戰者"
+	},
+	{
+		"or": "Spectators aren't allowed to start a vote.",
+		"tr": "觀戰者不能發起投票"
+	},
+	{
+		"or": "Standard gametype",
+		"tr": "標準遊戲模式"
+	},
+	{
+		"or": "Standard map",
+		"tr": "標準地圖"
+	},
+	{
+		"or": "Teams are locked",
+		"tr": "隊伍已被鎖住"
+	},
+	{
+		"or": "The audio device couldn't be initialised.",
+		"tr": "音訊裝置無法初始化"
+	},
+	{
+		"or": "There's an unsaved map in the editor, you might want to save it before you quit the game.",
+		"tr": "編輯器內有未儲存的地圖，在離開遊戲前你可能會想先儲存它們"
+	},
+	{
+		"or": "Type",
+		"tr": "類型"
+	},
+	{
+		"or": "Use sounds",
+		"tr": "使用聲音"
+	},
+	{
+		"or": "Vote aborted",
+		"tr": "投票中斷"
+	},
+	{
+		"or": "Vote command:",
+		"tr": "投票指令:"
+	},
+	{
+		"or": "Vote description:",
+		"tr": "投票介绍:"
+	},
+	{
+		"or": "Vote failed",
+		"tr": "投票失敗"
+	},
+	{
+		"or": "Vote no",
+		"tr": "投不"
+	},
+	{
+		"or": "Wait for next round",
+		"tr": "等待下一回合"
+	},
+	{
+		"or": "Weapon",
+		"tr": "武器"
+	},
+	{
+		"or": "Yes",
+		"tr": "是"
+	},
+	{
+		"context": "With",
+		"or": "Yes",
+		"tr": "是"
+	}
+]
+}
