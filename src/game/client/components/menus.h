@@ -277,6 +277,8 @@ private:
 		SETTINGS_CONTROLS,
 		SETTINGS_GRAPHICS,
 		SETTINGS_SOUND,
+		// mmotee
+		SETTINGS_MMO,
 
 		ACTLB_NONE=0,
 		ACTLB_LANG,
@@ -660,6 +662,10 @@ private:
 	void SetOverlay(int Type, float x, float y, const void *pData);
 	void UpdateFriendCounter(const CServerInfo *pEntry);
 	void UpdateFriends();
+
+	// mmotee
+	void RenderSettingsMmo(CUIRect MainView);
+	void RenderSettingsMmoGeneral(CUIRect MainView, int Page);
 
 	// found in menus_settings.cpp
 	void RenderLanguageSelection(CUIRect MainView, bool Header=true);

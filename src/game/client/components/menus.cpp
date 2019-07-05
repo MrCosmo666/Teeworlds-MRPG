@@ -1340,6 +1340,17 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			m_pClient->m_pCamera->ChangePosition(CCamera::POS_SETTINGS_SOUND);
 			g_Config.m_UiSettingsPage = SETTINGS_SOUND;
 		}
+
+		// mmotee
+		Box.VSplitLeft(Spacing, 0, &Box); // little space
+		Box.VSplitLeft(ButtonWidth, &Button, &Box);
+		static CButtonContainer s_MmoButton;
+		if (DoButton_MenuTabTop(&s_MmoButton, Localize("Mmo"), Client()->State() == IClient::STATE_OFFLINE && g_Config.m_UiSettingsPage == SETTINGS_MMO, &Button,
+			g_Config.m_UiSettingsPage == SETTINGS_MMO ? 1.0f : NotActiveAlpha, 1.0f, Corners))
+		{
+			m_pClient->m_pCamera->ChangePosition(CCamera::POS_SETTINGS_SOUND);
+			g_Config.m_UiSettingsPage = SETTINGS_MMO;
+		}
 	}
 	else if(Client()->State() == IClient::STATE_OFFLINE)
 	{

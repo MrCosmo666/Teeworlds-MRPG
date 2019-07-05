@@ -2069,6 +2069,9 @@ void CMenus::RenderSettings(CUIRect MainView)
 		RenderSettingsGraphics(MainView);
 	else if(g_Config.m_UiSettingsPage == SETTINGS_SOUND)
 		RenderSettingsSound(MainView);
+	//mmotee
+	else if (g_Config.m_UiSettingsPage == SETTINGS_MMO)
+		RenderSettingsMmo(MainView);
 
 	MainView.HSplitBottom(32.0f, 0, &MainView);
 
