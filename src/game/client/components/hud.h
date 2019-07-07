@@ -20,6 +20,7 @@ class CHud : public CComponent
 
 	// mmotee
 	void RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetObj_Character* pCharacter);
+	void RenderMmoBar(float x, float y, float Progress);
 
 	void RenderHealthAndAmmo(const CNetObj_Character *pCharacter);
 	void RenderGameTimer();

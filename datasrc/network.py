@@ -513,6 +513,7 @@ Messages = [
 	NetMessage("Cl_IsMmoServer", [
 		NetIntAny("m_Version"),
 	]),
+	NetMessage("Sv_AfterIsMmoServer", []),
 
     # mmotee equip items
     NetMessage("Sv_EquipItems", [

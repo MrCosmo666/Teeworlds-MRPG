@@ -488,7 +488,7 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 		CListboxItem Item = UiDoListboxNextItem(&s_ListBoxState, pOption);
 
 		// mmotee
-		if (Client()->MmoServer())
+		if (m_pClient->MmoServer())
 		{
 			float Alpha = UI()->MouseInside(&Item.m_Rect) ? 0.07f : 0.05f;
 			RenderTools()->DrawUIRect(&Item.m_Rect, vec4((float)pOption->m_Colored[0] / 10,

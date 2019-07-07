@@ -217,6 +217,9 @@ public:
 	float m_LastSkinChangeTime;
 	bool m_IsEasterDay;
 
+	//mmotee
+	bool m_ConnectedMmoServer;
+
 	struct CGameInfo
 	{
 		int m_GameFlags;
@@ -274,6 +277,7 @@ public:
 	static void GetPlayerLabel(char* aBuf, int BufferSize, int ClientID, const char* ClientName);
 	bool IsXmas() const;
 	bool IsEaster() const;
+	bool MmoServer()  const { return m_ConnectedMmoServer; }
 
 	//
 	void DoEnterMessage(const char *pName, int ClientID, int Team);

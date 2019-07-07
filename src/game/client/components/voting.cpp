@@ -265,7 +265,7 @@ void CVoting::OnMessage(int MsgType, void *pRawMsg)
 	else if(MsgType == NETMSGTYPE_SV_VOTEOPTIONADD)
 	{
 		CNetMsg_Sv_VoteOptionAdd *pMsg = (CNetMsg_Sv_VoteOptionAdd *)pRawMsg;
-		if (Client()->MmoServer())
+		if (m_pClient->MmoServer())
 		{
 			AddOption(pMsg->m_pDescription, vec3(pMsg->m_pColored[0], pMsg->m_pColored[1], pMsg->m_pColored[2]));
 		}

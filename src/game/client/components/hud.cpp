@@ -555,6 +555,81 @@ void CHud::RenderNinjaBar(float x, float y, float Progress)
 }
 
 // mmotee
+void CHud::RenderMmoBar(float x, float y, float Progress)
+{
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAME].m_Id);
+	Graphics()->QuadsBegin();
+
+	Progress = clamp(Progress, 0.0f, 1.0f);
+	const float EndWidth = 6.0f;
+	const float BarHeight = 14.0f;
+	const float WholeBarWidth = 124.f;
+	const float MiddleBarWidth = WholeBarWidth - (EndWidth * 2.0f);
+
+	IGraphics::CQuadItem QuadStartFull(x, y, EndWidth, BarHeight);
+	RenderTools()->SelectSprite(&g_pData->m_aSprites[SPRITE_PROGRESSBAR_LEFT]);
+	Graphics()->QuadsDrawTL(&QuadStartFull, 1);
+	x += EndWidth;
+
+	const float FullBarWidth = MiddleBarWidth * Progress;
+	const float EmptyBarWidth = MiddleBarWidth - FullBarWidth;
+
+	// full bar
+	IGraphics::CQuadItem QuadFull(x, y, FullBarWidth, BarHeight);
+
+	CDataSprite SpriteBarFull = g_pData->m_aSprites[SPRITE_PROGRESSBAR_FULL];
+	// prevent pixel puree, select only a small slice
+	if (Progress < 0.1f)
+	{
+		int spx = SpriteBarFull.m_X;
+		int spy = SpriteBarFull.m_Y;
+		float w = SpriteBarFull.m_W * 0.1f; // magic here
+		int h = SpriteBarFull.m_H;
+		int cx = SpriteBarFull.m_pSet->m_Gridx;
+		int cy = SpriteBarFull.m_pSet->m_Gridy;
+		float x1 = spx / (float)cx;
+		float x2 = (spx + w - 1 / 32.0f) / (float)cx;
+		float y1 = spy / (float)cy;
+		float y2 = (spy + h - 1 / 32.0f) / (float)cy;
+
+		Graphics()->QuadsSetSubset(x1, y1, x2, y2);
+	}
+	else
+		RenderTools()->SelectSprite(&SpriteBarFull);
+
+	Graphics()->QuadsDrawTL(&QuadFull, 1);
+
+	// empty bar
+	// select the middle portion of the sprite so we don't get edge bleeding
+	const CDataSprite SpriteBarEmpty = g_pData->m_aSprites[SPRITE_PROGRESSBAR_EMPTY];
+	{
+		float spx = SpriteBarEmpty.m_X + 0.1f;
+		float spy = SpriteBarEmpty.m_Y;
+		float w = SpriteBarEmpty.m_W * 0.5f;
+		int h = SpriteBarEmpty.m_H;
+		int cx = SpriteBarEmpty.m_pSet->m_Gridx;
+		int cy = SpriteBarEmpty.m_pSet->m_Gridy;
+		float x1 = spx / (float)cx;
+		float x2 = (spx + w - 1 / 32.0f) / (float)cx;
+		float y1 = spy / (float)cy;
+		float y2 = (spy + h - 1 / 32.0f) / (float)cy;
+
+		Graphics()->QuadsSetSubset(x1, y1, x2, y2);
+	}
+
+	IGraphics::CQuadItem QuadEmpty(x + FullBarWidth, y, EmptyBarWidth, BarHeight);
+	Graphics()->QuadsDrawTL(&QuadEmpty, 1);
+
+	x += MiddleBarWidth;
+
+	IGraphics::CQuadItem QuadEndEmpty(x, y, EndWidth, BarHeight);
+	RenderTools()->SelectSprite(&g_pData->m_aSprites[SPRITE_PROGRESSBAR_RIGHT]);
+	Graphics()->QuadsDrawTL(&QuadEndEmpty, 1);
+
+	Graphics()->QuadsEnd();
+	Graphics()->WrapNormal();
+
+}
 
 void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetObj_Character* pCharacter)
 {
@@ -562,23 +637,22 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 		return;
 
 	// Рисуем боксы
-	CUIRect Rect = { 5, 15, 128, 50.0f };
+	CUIRect Rect = { 5, 15, 128, 36.0f };
 	Graphics()->BlendNormal();
-	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.18f), CUI::CORNER_ALL, 5.0f);
+	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.18f), 0, 5.0f);
 
 	Rect = { 5, 15, 28, 25.0f };
 	Graphics()->BlendNormal();
-	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.18f), CUI::CORNER_ALL, 5.0f);
+	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.18f), 0, 5.0f);
 
-	// Текст между здоровьем
-	char aBuf[256];
-	str_format(aBuf, sizeof(aBuf), "LEVEL: %d EXP: %d/%d", pClientStats->m_Level, pClientStats->m_Exp, pClientStats->m_ExpNeed);
+	Rect = { 5, 15, 128, 25.0f };
+	Graphics()->BlendNormal();
+	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.1f, 0.1f, 0.06f), 0, 5.0f);
+
 
 	// Инициализация текста
+	char aBuf[256];
 	float FontSize = 5.0f;
-	TextRender()->TextOutlineColor(0.3f, 0.3f, 0.3f, 0.3f);
-	TextRender()->TextWidth(0, FontSize, aBuf, -1, -1.0);
-	TextRender()->Text(0, 10, 42, FontSize, aBuf, -1);
 
 	// Эффекты информация
 	IntsToStr(pClientStats->m_Table, 12, aBuf);
@@ -586,35 +660,41 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	float SizeBuf = (str_length(aBuf) * (FontSize/1.25f)) - (str_length(aBuf) / 2 + str_length(aBuf) / 5);
 	if (SizeBuf > 2.0)
 	{
-		TextRender()->Text(0, 10, 70, FontSize, aBuf, -1);
+		TextRender()->Text(0, 10, 56, FontSize, aBuf, -1);
 
-		Rect = { 5, 70, SizeBuf, 10.0f };
+		Rect = { 5, 56, SizeBuf, 9.0f };
 		Graphics()->BlendNormal();
-		RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.2f, 0.4f, 0.14f), CUI::CORNER_ALL, 5.0f);
+		RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.2f, 0.4f, 0.14f), 0, 5.0f);
 		ChangePosition = true;
 	}
 
 	// Левелинг
 	IntsToStr(pClientStats->m_Leveling, 32, aBuf);
-	Rect = { 5, (ChangePosition ? 85.0f : 70.0f), 100, 16.0f };
+	Rect = { 5, (ChangePosition ? 71.0f : 56.0f), 100, 16.0f };
 	Graphics()->BlendNormal();
-	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.16f), CUI::CORNER_ALL, 5.0f);
+	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.16f), 0, 5.0f);
 
 	TextRender()->TextWidth(0, 4.6f, aBuf, -1, -1.0);
-	TextRender()->Text(0, 10, (ChangePosition ? 85.0f : 70.0f), 4.6f, aBuf, -1);
+	TextRender()->Text(0, 10, (ChangePosition ? 71.0f : 56.0f), 4.6f, aBuf, -1);
 	TextRender()->TextOutlineColor(0, 0, 0, 0.3f);
 
 	// Начало
 	{
-		IGraphics::CQuadItem Used[2];
-
-		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
-		Graphics()->QuadsBegin();
 
 		// Exp бар
 		const int Max = pClientStats->m_ExpNeed;
-		float NinjaProgress = clamp(pClientStats->m_Exp, 0, Max) / (float)Max;
-		RenderNinjaBar(8, 50.0f, NinjaProgress);
+		float ExpProgress = clamp(pClientStats->m_Exp, 0, Max) / (float)Max;
+		RenderMmoBar(8, 39, ExpProgress);
+
+		// Текст между здоровьем
+		str_format(aBuf, sizeof(aBuf), "LEVEL: %d EXP: %d/%d", pClientStats->m_Level, pClientStats->m_Exp, pClientStats->m_ExpNeed);
+		TextRender()->TextOutlineColor(0.3f, 0.3f, 0.3f, 0.3f);
+		TextRender()->TextWidth(0, FontSize, aBuf, -1, -1.0);
+		TextRender()->Text(0, 10, 42, FontSize, aBuf, -1);
+
+		IGraphics::CQuadItem Used[2];
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+		Graphics()->QuadsBegin();
 
 		// Спрайты оружия
 		int Weapon = pCharacter->m_Weapon;
@@ -628,15 +708,13 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 		float SizeWeapon = 13.5f;
 		switch (Weapon)
 		{
-		case WEAPON_GUN: WeaponSprite = SPRITE_WEAPON_GUN_BODY, SizeWeapon = 7.71f; break;
-		case WEAPON_SHOTGUN: WeaponSprite = SPRITE_WEAPON_SHOTGUN_BODY, SizeWeapon = 5.14f; break;
-		case WEAPON_GRENADE: WeaponSprite = SPRITE_WEAPON_GRENADE_BODY, SizeWeapon = 5.14f; break;
-		case WEAPON_LASER: WeaponSprite = SPRITE_WEAPON_LASER_BODY, SizeWeapon = 7.71f; break;
+			case WEAPON_GUN: WeaponSprite = SPRITE_WEAPON_GUN_BODY, SizeWeapon = 7.71f; break;
+			case WEAPON_SHOTGUN: WeaponSprite = SPRITE_WEAPON_SHOTGUN_BODY, SizeWeapon = 5.14f; break;
+			case WEAPON_GRENADE: WeaponSprite = SPRITE_WEAPON_GRENADE_BODY, SizeWeapon = 5.14f; break;
+			case WEAPON_LASER: WeaponSprite = SPRITE_WEAPON_LASER_BODY, SizeWeapon = 7.71f; break;
 		}
 		RenderTools()->SelectSprite(WeaponSprite);
-		Used[1] = IGraphics::CQuadItem(10,
-			(Weapon == WEAPON_HAMMER || Weapon == WEAPON_NINJA) ? 20 : 30
-			, 16, SizeWeapon);
+		Used[1] = IGraphics::CQuadItem(10, (Weapon == WEAPON_HAMMER || Weapon == WEAPON_NINJA) ? 20 : 30, 16, SizeWeapon);
 		Graphics()->QuadsDrawTL(&Used[1], 1);
 
 		char Text[512];
@@ -644,16 +722,14 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 
 		// render health
 		int nbItems = pCharacter->m_Health;
-		if (nbItems > 3)
-			RenderTools()->SelectSprite(SPRITE_HEALTH_FULL);
+		if (nbItems > 3) RenderTools()->SelectSprite(SPRITE_HEALTH_FULL);
 		else RenderTools()->SelectSprite(SPRITE_HEALTH_EMPTY);
 		Array[0] = IGraphics::CQuadItem(37, 21, 12, 12);
 		Graphics()->QuadsDrawTL(Array, 1);
 
 		// render armor
 		nbItems = pCharacter->m_Armor;
-		if (nbItems > 0)
-			RenderTools()->SelectSprite(SPRITE_ARMOR_FULL);
+		if (nbItems > 0) RenderTools()->SelectSprite(SPRITE_ARMOR_FULL);
 		else RenderTools()->SelectSprite(SPRITE_ARMOR_EMPTY);
 		Array[0] = IGraphics::CQuadItem(80, 21, 12, 12);
 		Graphics()->QuadsDrawTL(Array, 1);
@@ -670,10 +746,8 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 				str_copy(type, "un", sizeof(type));
 			else if (pCharacter->m_AmmoCount == -2)
 				str_copy(type, " ", sizeof(type));
-			else if (pCharacter->m_AmmoCount <= 10 || pCharacter->m_AmmoCount >= 0)
-				str_format(type, sizeof(type), "%d", pCharacter->m_AmmoCount);
 			else
-				str_copy(type, "inf", sizeof(type));
+				str_format(type, sizeof(type), "%d", pCharacter->m_AmmoCount);
 
 			TextRender()->SetCursor(&Cursor, 6, 17.0f, 8.0f, TEXTFLAG_RENDER);
 			TextRender()->TextEx(&Cursor, type, -1);
@@ -698,7 +772,7 @@ void CHud::RenderHealthAndAmmo(const CNetObj_Character *pCharacter)
 		return;
 
 	//  mmotee
-	if(Client()->MmoServer() && pCharacter && m_pClient->m_Snap.m_pLocalStats)
+	if(m_pClient->MmoServer() && pCharacter && m_pClient->m_Snap.m_pLocalStats)
 	{
 		RenderMmoHud(m_pClient->m_Snap.m_pLocalStats, pCharacter);
 		return;

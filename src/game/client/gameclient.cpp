@@ -366,8 +366,6 @@ void CGameClient::OnInit()
 		}
 	}
 
-	m_MmoMsgSent = false;
-
 	// init all components
 	for(int i = m_All.m_Num-1; i >= 0; --i)
 		m_All.m_paComponents[i]->OnInit();
@@ -475,6 +473,10 @@ void CGameClient::OnReset()
 	m_LastGameStartTick = -1;
 	m_LastFlagCarrierRed = FLAG_MISSING;
 	m_LastFlagCarrierBlue = FLAG_MISSING;
+
+	//mmotee
+	m_ConnectedMmoServer = false;
+	m_MmoMsgSent = false;
 }
 
 void CGameClient::UpdatePositions()
@@ -926,6 +928,15 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 	else if(MsgId == NETMSGTYPE_SV_READYTOENTER)
 	{
 		Client()->EnterGame();
+
+		// send information what used client
+		if (!m_MmoMsgSent)
+		{
+			CNetMsg_Cl_IsMmoServer Msg;
+			Msg.m_Version = CLIENT_VERSION_MMO;
+			Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
+			m_MmoMsgSent = true;
+		}
 	}
 	else if (MsgId == NETMSGTYPE_SV_EMOTICON)
 	{
@@ -949,6 +960,12 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 	}
 
 	// mmotee
+	else if(MsgId == NETMSGTYPE_SV_AFTERISMMOSERVER)
+	{
+		dbg_msg("test", "Here good check");
+		m_ConnectedMmoServer = true;
+	}
+
 	else if (MsgId == NETMSGTYPE_SV_EQUIPITEMS)
 	{
 		CNetMsg_Sv_EquipItems* pMsg = (CNetMsg_Sv_EquipItems*)pRawMsg;
@@ -976,7 +993,7 @@ void CGameClient::OnShutdown()
 	for(int i = 0; i < m_All.m_Num; i++)
 		m_All.m_paComponents[i]->OnShutdown();
 }
-void CGameClient::OnEnterGame() {}
+void CGameClient::OnEnterGame() { }
 
 void CGameClient::OnGameOver()
 {
@@ -1010,7 +1027,7 @@ void CGameClient::ProcessEvents()
 		if(Item.m_Type == NETEVENTTYPE_DAMAGE)
 		{
 			CNetEvent_Damage *ev = (CNetEvent_Damage *)pData;
-			if (g_Config.m_ClMmoDamageInd || Client()->MmoServer())
+			if (g_Config.m_ClMmoDamageInd || MmoServer())
 			{
 				char aBuf[8];
 				int Damage = ev->m_HealthAmount + ev->m_ArmorAmount;
@@ -1321,15 +1338,6 @@ void CGameClient::OnNewSnapshot()
 				pClient->UpdateRenderInfo(this, ClientID, true);
 			}
 		}
-	}
-
-	// send information what used client
-	if (!m_MmoMsgSent && Client()->MmoServer() && m_Snap.m_pLocalInfo)
-	{
-		CNetMsg_Cl_IsMmoServer Msg;
-		Msg.m_Version = CLIENT_VERSION_MMO;
-		Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
-		m_MmoMsgSent = true;
 	}
 
 	// setup local pointers

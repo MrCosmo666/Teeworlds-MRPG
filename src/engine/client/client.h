@@ -103,9 +103,6 @@ class CClient : public IClient, public CDemoPlayer::IListner
 	bool m_ResortServerBrowser;
 	bool m_RecordGameMessage;
 
-	//mmotee
-	bool m_ConnectedMmoServer;
-
 	int m_AckGameTick;
 	int m_CurrentRecvTick;
 	int m_RconAuthed;
@@ -211,7 +208,6 @@ public:
 	void SendReady();
 
 	// mmotee
-	virtual bool MmoServer() const { return m_ConnectedMmoServer; }
 	virtual int ClientFPS() const;
 
 	virtual bool RconAuthed() const { return m_RconAuthed != 0; }

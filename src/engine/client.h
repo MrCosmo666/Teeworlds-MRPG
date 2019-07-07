@@ -107,7 +107,6 @@ public:
 	virtual const int *GetInput(int Tick) const = 0;
 
 	// mmotee
-	virtual bool MmoServer() const = 0;
 	virtual int ClientFPS() const = 0;
 
 	// remote console
