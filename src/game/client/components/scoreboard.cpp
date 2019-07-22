@@ -645,6 +645,10 @@ void CScoreboard::OnRender()
 	if(m_Active)
 		m_pClient->m_pMotd->Clear();
 
+	// if statboard active don't show scoreboard
+	if (m_pClient->m_pStats->IsActive())
+		return;
+
 	if(!Active())
 		return;
 

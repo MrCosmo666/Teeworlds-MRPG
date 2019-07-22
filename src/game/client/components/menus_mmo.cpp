@@ -84,7 +84,7 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 
 	if (Page == 1)
 	{
-		int NumOptions = 3;
+		int NumOptions = 4;
 		float BackgroundHeight = (float)(NumOptions + 3) * ButtonHeight + (float)NumOptions * Spacing;
 		float TotalHeight = BackgroundHeight;
 		
@@ -101,8 +101,14 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		Button.VMargin(ButtonHeight, &Button);
 
 		static int s_ButtonDmgInd = 0;
-		if (DoButton_CheckBox(&s_ButtonDmgInd, Localize("Vanila Damage Ind"), g_Config.m_ClMmoDamageInd, &Button))
+		if (DoButton_CheckBox(&s_ButtonDmgInd, Localize("Vanila Damage Ind (Vanilla)"), g_Config.m_ClMmoDamageInd, &Button))
 			g_Config.m_ClMmoDamageInd ^= 1;
+
+		MmoSet.HSplitTop(ButtonHeight, &Button, &MmoSet);
+		Button.VMargin(ButtonHeight, &Button);
+		static int s_ButtonColorVote = 0;
+		if (DoButton_CheckBox(&s_ButtonColorVote, Localize("Show Colored Vote (Mmo Server)"), g_Config.m_ClShowColoreVote, &Button))
+			g_Config.m_ClShowColoreVote ^= 1;
 	}
 
 	if (Page == 2)

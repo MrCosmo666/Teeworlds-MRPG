@@ -30,12 +30,14 @@ Equip = Enum("EQUIP", ["WINGS",
 						"SHOTGUN", 
 						"GRENADE", 
 						"RIFLE", 
-						"DISCORD", 
-						"NUMEQUIPCOUNT"])
+						"DISCORD",
+						"MINER"])
 
 MmoItems = Enum("ITEMS", ["BOX", 
 							"EXPERIENCE",
-							"MOBEYES", "PLANT"])
+							"MOBEYES", 
+							"PLANT",
+							"ORE"])
 
 RawHeader = '''
 
@@ -518,7 +520,7 @@ Messages = [
     # mmotee equip items
     NetMessage("Sv_EquipItems", [
 		NetIntRange("m_ClientID", 0, 'MAX_CLIENTS-1'),
-		NetArray(NetIntAny("m_EquipID"),  8),
-		NetArray(NetIntAny("m_EnchantItem"),  8),
+		NetArray(NetIntAny("m_EquipID"),  9),
+		NetArray(NetIntAny("m_EnchantItem"),  9),
 	]), 
 ]

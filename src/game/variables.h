@@ -36,6 +36,7 @@ MACRO_CONFIG_INT(ClShowUserId, cl_show_user_id, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_
 // mmotee
 MACRO_CONFIG_INT(ClShowMEffects, cl_mmo_effects, 0, 0, 3, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show in mmo server effects: 0=all, 1=only enchant, 2=only another items, 3= disable")
 MACRO_CONFIG_INT(ClMmoDamageInd, cl_vanilla_textdamage, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Use damage text ind. For vanila clients")
+MACRO_CONFIG_INT(ClShowColoreVote, cl_colored_votes_inmmoserver, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show colored votes in mmo server")
 MACRO_CONFIG_STR(GameTexture, mmo_game_texture, 24, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Gameskin texture")
 MACRO_CONFIG_STR(GameParticles, mmo_particle_texture, 24, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Particle texture")
 MACRO_CONFIG_STR(GameEmoticons, mmo_emoticons_texture, 24, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Emoticons texture")

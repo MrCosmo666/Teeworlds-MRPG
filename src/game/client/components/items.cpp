@@ -344,7 +344,7 @@ void CItems::RenderMmoitems(const CNetObj_MmoItems * pPrev, const CNetObj_MmoIte
 	vec2 Prev = vec2(pPrev->m_X, pPrev->m_Y);
 	vec2 Curr = vec2(pCurrent->m_X, pCurrent->m_Y);
 	vec2 Pos = mix(Prev, Curr, Client()->IntraGameTick());
-	const int c[] = { SPRITE_BOX, SPRITE_EXPERIENCE, SPRITE_MOBEYES, SPRITE_PLANT };
+	const int c[] = { SPRITE_BOX, SPRITE_EXPERIENCE, SPRITE_MOBEYES, SPRITE_PLANT, SPRITE_ORES };
 
 	if (g_Config.m_ClShowMEffects != 3 && g_Config.m_ClShowMEffects != 1)
 	{
@@ -352,6 +352,8 @@ void CItems::RenderMmoitems(const CNetObj_MmoItems * pPrev, const CNetObj_MmoIte
 			m_pClient->m_pEffects->WingsEffect(Pos, vec2(0, 0), vec4(0.2f, 0.04f, 0.04f, 0.005f));
 		if (pCurrent->m_Type == ITEMS_PLANT)
 			m_pClient->m_pEffects->WingsEffect(Pos, vec2(0, 0), vec4(0.0f, 0.04f, 0.0f, 0.015f));
+		if (pCurrent->m_Type == ITEMS_ORE)
+			m_pClient->m_pEffects->WingsEffect(Pos, vec2(0, 0), vec4(0.04f, 0.00f, 0.02f, 0.015f));
 	}
 	RenderTools()->SelectSprite(c[pCurrent->m_Type]);
 

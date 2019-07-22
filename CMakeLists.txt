@@ -305,7 +305,6 @@ find_package(SDL2)
 find_package(Threads)
 find_package(Wavpack)
 
-
 if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   find_program(CMAKE_OTOOL otool)
   find_program(DMG dmg)
@@ -1306,7 +1305,7 @@ if(CLIENT)
     serverbrowser_fav.h
     serverbrowser_filter.cpp
     serverbrowser_filter.h
-    sound.cpp
+	sound.cpp
     sound.h
     text.cpp
   )

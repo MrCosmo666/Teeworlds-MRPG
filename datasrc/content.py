@@ -582,11 +582,12 @@ container.sprites.Add(Sprite("box", set_mmogame, 0, 0, 2, 2))
 container.sprites.Add(Sprite("experience", set_mmogame, 2, 0, 2, 2))
 container.sprites.Add(Sprite("mobeyes", set_mmogame, 4, 0, 2, 2))
 container.sprites.Add(Sprite("plant", set_mmogame, 6, 0, 2, 2))
-container.sprites.Add(Sprite("mobeyesfire", set_mmogame, 0, 6, 2, 2))
 container.sprites.Add(Sprite("progressbar_left", set_mmogame, 8,0,1,2))
 container.sprites.Add(Sprite("progressbar_full", set_mmogame, 9,0,1,2))
 container.sprites.Add(Sprite("progressbar_empty", set_mmogame, 10,0,1,2))
 container.sprites.Add(Sprite("progressbar_right", set_mmogame, 11,0,1,2))
+container.sprites.Add(Sprite("ores", set_mmogame, 12, 0, 2, 2))
+container.sprites.Add(Sprite("mobeyesfire", set_mmogame, 0, 6, 2, 2))
 
 for i in range(1, 4):
 	container.sprites.Add(Sprite("mmo"+str(i), set_mmotee, i-1, 0, 1, 1))

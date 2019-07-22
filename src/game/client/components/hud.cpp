@@ -563,7 +563,7 @@ void CHud::RenderMmoBar(float x, float y, float Progress)
 	Progress = clamp(Progress, 0.0f, 1.0f);
 	const float EndWidth = 6.0f;
 	const float BarHeight = 14.0f;
-	const float WholeBarWidth = 124.f;
+	const float WholeBarWidth = 120.f;
 	const float MiddleBarWidth = WholeBarWidth - (EndWidth * 2.0f);
 
 	IGraphics::CQuadItem QuadStartFull(x, y, EndWidth, BarHeight);
@@ -649,7 +649,6 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	Graphics()->BlendNormal();
 	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.1f, 0.1f, 0.06f), 0, 5.0f);
 
-
 	// Инициализация текста
 	char aBuf[256];
 	float FontSize = 5.0f;
@@ -670,7 +669,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 
 	// Левелинг
 	IntsToStr(pClientStats->m_Leveling, 32, aBuf);
-	Rect = { 5, (ChangePosition ? 71.0f : 56.0f), 100, 16.0f };
+	Rect = { 5, (ChangePosition ? 71.0f : 56.0f), 100, 20.0f };
 	Graphics()->BlendNormal();
 	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.16f), 0, 5.0f);
 
@@ -684,13 +683,13 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 		// Exp бар
 		const int Max = pClientStats->m_ExpNeed;
 		float ExpProgress = clamp(pClientStats->m_Exp, 0, Max) / (float)Max;
-		RenderMmoBar(8, 39, ExpProgress);
+		RenderMmoBar(7, 39, ExpProgress);
 
 		// Текст между здоровьем
 		str_format(aBuf, sizeof(aBuf), "LEVEL: %d EXP: %d/%d", pClientStats->m_Level, pClientStats->m_Exp, pClientStats->m_ExpNeed);
 		TextRender()->TextOutlineColor(0.3f, 0.3f, 0.3f, 0.3f);
 		TextRender()->TextWidth(0, FontSize, aBuf, -1, -1.0);
-		TextRender()->Text(0, 10, 42, FontSize, aBuf, -1);
+		TextRender()->Text(0, 11, 42, FontSize, aBuf, -1);
 
 		IGraphics::CQuadItem Used[2];
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);

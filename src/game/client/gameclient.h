@@ -199,8 +199,8 @@ public:
 		bool m_Friend;
 
 		// mmotee
-		int m_aEquipItems[EQUIP_NUMEQUIPCOUNT];
-		int m_aEnchantItems[EQUIP_NUMEQUIPCOUNT];
+		int m_aEquipItems[NUM_EQUIPS];
+		int m_aEnchantItems[NUM_EQUIPS];
 		float m_AnimWings;
 
 		void UpdateRenderInfo(CGameClient *pGameClient, int ClientID, bool UpdateSkinInfo);
