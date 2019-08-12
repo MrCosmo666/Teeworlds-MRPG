@@ -653,6 +653,12 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	char aBuf[256];
 	float FontSize = 5.0f;
 
+	// Кординаты
+	{
+		str_format(aBuf, sizeof(aBuf), "%s. x%d, y%d", Client()->MapName(), pCharacter->m_X / 32, pCharacter->m_Y / 32);
+		TextRender()->Text(0, 2, 5, 4.5f, aBuf, -1);
+	}
+
 	// Эффекты информация
 	IntsToStr(pClientStats->m_Table, 12, aBuf);
 	bool ChangePosition = false;
@@ -679,7 +685,6 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 
 	// Начало
 	{
-
 		// Exp бар
 		const int Max = pClientStats->m_ExpNeed;
 		float ExpProgress = clamp(pClientStats->m_Exp, 0, Max) / (float)Max;

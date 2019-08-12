@@ -109,6 +109,7 @@ public:
 
 	// mmotee
 	virtual int ClientFPS() const = 0;
+	virtual const char* MapName() = 0;
 
 	// remote console
 	virtual void RconAuth(const char *pUsername, const char *pPassword) = 0;

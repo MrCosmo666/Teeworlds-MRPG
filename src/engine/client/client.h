@@ -210,6 +210,7 @@ public:
 
 	// mmotee
 	virtual int ClientFPS() const;
+	virtual const char* MapName();
 
 	virtual bool RconAuthed() const { return m_RconAuthed != 0; }
 	virtual bool UseTempRconCommands() const { return m_UseTempRconCommands != 0; }
