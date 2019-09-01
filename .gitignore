@@ -40,6 +40,7 @@ versionsrv*
 .settings
 .vs
 .vscode
+.vcxproj
 out
 cscope.files
 cscope.out
@@ -67,3 +68,5 @@ googletest-src
 install_manifest.txt
 pack_*/
 rules.ninja
+*.vcxproj
+*.filters
