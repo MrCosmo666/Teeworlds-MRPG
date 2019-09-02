@@ -1045,11 +1045,12 @@ set(EXPECTED_DATA
   ui/themes/jungle_day.map
   ui/themes/jungle_night.map
   ui/themes/none.png
+  wings/it19.png
+  wings/it20.png
+  wings/it21.png
+  wings/it22.png
   wings/it23.png
-  wings/it24.png
-  wings/it25.png
-  wings/it27.png
-  wings/it28.png
+  hammer/odinspear.png
 )
 
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/datasrc/languages/index.json)

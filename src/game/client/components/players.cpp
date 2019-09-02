@@ -327,7 +327,11 @@ void CPlayers::RenderPlayer(
 
 	// draw gun
 	{
+		if (Player.m_Weapon == WEAPON_HAMMER)
+			RenderHammer(0, &State, Position, 120, m_pClient->m_aClients[ClientID].m_aEquipItems[EQUIP_HAMMER]);
+
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+		
 		Graphics()->QuadsBegin();
 		Graphics()->QuadsSetRotation(State.GetAttach()->m_Angle*pi*2+Angle);
 
@@ -613,5 +617,25 @@ void CPlayers::OnRender()
 						);
 			}
 		}
+	}
+}
+
+void CPlayers::RenderHammer(int Sprite, CAnimState* pAnim, vec2 PlayerPos, int Size, int EquipID)
+{
+	if (EquipID == 24) 
+	{
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_ODINSPEAR].m_Id);
+		Graphics()->QuadsBegin();
+
+		vec2 p = PlayerPos + vec2(pAnim->GetAttach()->m_X, pAnim->GetAttach()->m_Y);
+		p.x -= 58;
+		p.y -= 100;
+
+		Graphics()->QuadsSetRotation(20 + pAnim->GetAttach()->m_Angle*pi * 90);
+		IGraphics::CQuadItem Quad2(p.x, p.y, 120, 120);
+		Graphics()->QuadsDrawTL(&Quad2, 1);
+		Graphics()->QuadsEnd();
+
+		m_pClient->m_pEffects->WingsEffect(vec2(PlayerPos.x + 20, PlayerPos.y - 70), vec2(0,0), vec4(0.8f, 0.3f, 0.0f, 0.2f));
 	}
 }

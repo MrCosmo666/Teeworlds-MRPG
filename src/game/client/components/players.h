@@ -22,6 +22,9 @@ class CPlayers : public CComponent
 		int ClientID
 	);
 
+	// mmotee
+	void RenderHammer(int Sprite, CAnimState* pAnim, vec2 PlayerPos, int Size, int EquipID);
+
 public:
 	virtual void OnRender();
 };
