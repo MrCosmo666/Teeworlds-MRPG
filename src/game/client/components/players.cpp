@@ -328,7 +328,7 @@ void CPlayers::RenderPlayer(
 	// draw gun
 	{
 		if (Player.m_Weapon == WEAPON_HAMMER)
-			RenderHammer(0, &State, Position, 120, m_pClient->m_aClients[ClientID].m_aEquipItems[EQUIP_HAMMER]);
+			RenderHammer(&State, Position, 120, m_pClient->m_aClients[ClientID].m_aEquipItems[EQUIP_HAMMER]);
 
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 		
@@ -620,9 +620,10 @@ void CPlayers::OnRender()
 	}
 }
 
-void CPlayers::RenderHammer(int Sprite, CAnimState* pAnim, vec2 PlayerPos, int Size, int EquipID)
+// mmotee
+void CPlayers::RenderHammer(CAnimState* pAnim, vec2 PlayerPos, int Size, int EquipID)
 {
-	if (EquipID == 24) 
+	if (EquipID == 24) // spear
 	{
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_ODINSPEAR].m_Id);
 		Graphics()->QuadsBegin();

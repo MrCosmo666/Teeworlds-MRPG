@@ -23,7 +23,7 @@ class CPlayers : public CComponent
 	);
 
 	// mmotee
-	void RenderHammer(int Sprite, CAnimState* pAnim, vec2 PlayerPos, int Size, int EquipID);
+	void RenderHammer(CAnimState* pAnim, vec2 PlayerPos, int Size, int EquipID);
 
 public:
 	virtual void OnRender();

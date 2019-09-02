@@ -33,17 +33,11 @@ CScoreboard::CScoreboard()
 
 void CScoreboard::RenderTimeDown()
 {
-	float Half = 260.0f*Graphics()->ScreenAspect();
-
 	char aTime[11];
-	char aDate[64];
-	char aComp[128];
 	time_t rawtime = time(NULL);
 	struct tm *timeinfo = localtime(&rawtime);
 	strftime(aTime, 80, "%H:%M:%S", timeinfo);
-	strftime(aDate, 80, "%d.%m.%Y", timeinfo);
-	str_format(aComp, sizeof(aComp), "%s - %s", aTime, aDate);
-	TextRender()->Text(0, Half - 8.5f, 1, 6, aComp, -1);
+	TextRender()->Text(0, 365.0f, 4.0f, 6, aTime, -1);
 }
 
 void CScoreboard::ConKeyScoreboard(IConsole::IResult *pResult, void *pUserData)
