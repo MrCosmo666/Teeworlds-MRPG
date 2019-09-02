@@ -276,25 +276,31 @@ void CPlayers::RenderPlayer(
 
 		int EquipItem = m_pClient->m_aClients[ClientID].m_aEquipItems[EQUIP_WINGS];
 		int EnchantItem = m_pClient->m_aClients[ClientID].m_aEnchantItems[EQUIP_WINGS];
-		if (g_Config.m_ClShowMEffects != 2 && EquipItem == 23 && EnchantItem >= EFFECTENCHANT)
+		if (g_Config.m_ClShowMEffects != 2 && EquipItem == 19 && EnchantItem >= EFFECTENCHANT)
 		{
 			vec4 Color = vec4(1.75f, 0.0f, 0.0f, 0.01f);
 			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
 			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
 		}
-		if (g_Config.m_ClShowMEffects != 2 && EquipItem == 25 && EnchantItem >= EFFECTENCHANT)
+		if (g_Config.m_ClShowMEffects != 2 && EquipItem == 20 && EnchantItem >= EFFECTENCHANT)
 		{
 			vec4 Color = vec4(0.2f, 0.2f, 1.75f, 0.01f);
 			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
 			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
 		}
-		if (g_Config.m_ClShowMEffects != 2 && EquipItem == 27 && EnchantItem >= EFFECTENCHANT)
+		if (g_Config.m_ClShowMEffects != 2 && EquipItem == 21 && EnchantItem >= EFFECTENCHANT)
+		{
+			vec4 Color = vec4(0.2f, 0.2f, 1.75f, 0.01f);
+			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
+			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
+		}
+		if (g_Config.m_ClShowMEffects != 2 && EquipItem == 22 && EnchantItem >= EFFECTENCHANT)
 		{
 			vec4 Color = vec4(1.0f, 1.0f, 0.0f, 0.01f);
 			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
 			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
 		}
-		if (g_Config.m_ClShowMEffects != 2 && EquipItem == 28 && EnchantItem >= EFFECTENCHANT)
+		if (g_Config.m_ClShowMEffects != 2 && EquipItem == 23 && EnchantItem >= EFFECTENCHANT)
 		{
 			vec4 Color = vec4(0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.01f);
 			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);

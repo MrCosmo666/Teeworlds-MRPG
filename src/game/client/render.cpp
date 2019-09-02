@@ -344,20 +344,20 @@ void CRenderTools::RenderPicItems(CAnimState* pAnim, int RenderNum, vec2 Dir, ve
 				// test effects
 				switch (RenderNum)
 				{
+				case 19: // items wings
+					RenderWings(pAnim, IMAGE_WINGSIT19, vec2(130, 70), Position, 200, 90);
+					break;
+				case 20: // items wings
+					RenderWings(pAnim, IMAGE_WINGSIT20, vec2(115, 60), Position);
+					break;
+				case 21: // items wings
+					RenderWings(pAnim, IMAGE_WINGSIT21, vec2(115, 64), Position);
+					break;
+				case 22: // items wings
+					RenderWings(pAnim, IMAGE_WINGSIT22, vec2(115, 74), Position);
+					break;
 				case 23: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT23, vec2(130, 70), Position, 200, 90);
-					break;
-				case 24: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT24, vec2(115, 60), Position);
-					break;
-				case 25: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT25, vec2(115, 64), Position);
-					break;
-				case 27: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT27, vec2(115, 74), Position);
-					break;
-				case 28: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT28, vec2(115, 70), Position);
+					RenderWings(pAnim, IMAGE_WINGSIT23, vec2(115, 70), Position);
 					break;
 				}
 			}
