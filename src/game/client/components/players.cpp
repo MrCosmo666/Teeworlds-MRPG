@@ -276,36 +276,7 @@ void CPlayers::RenderPlayer(
 
 		int EquipItem = m_pClient->m_aClients[ClientID].m_aEquipItems[EQUIP_WINGS];
 		int EnchantItem = m_pClient->m_aClients[ClientID].m_aEnchantItems[EQUIP_WINGS];
-		if (g_Config.m_ClShowMEffects != 2 && EquipItem == 19 && EnchantItem >= EFFECTENCHANT)
-		{
-			vec4 Color = vec4(1.75f, 0.0f, 0.0f, 0.01f);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
-		}
-		if (g_Config.m_ClShowMEffects != 2 && EquipItem == 20 && EnchantItem >= EFFECTENCHANT)
-		{
-			vec4 Color = vec4(0.2f, 0.2f, 1.75f, 0.01f);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
-		}
-		if (g_Config.m_ClShowMEffects != 2 && EquipItem == 21 && EnchantItem >= EFFECTENCHANT)
-		{
-			vec4 Color = vec4(0.2f, 0.2f, 1.75f, 0.01f);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
-		}
-		if (g_Config.m_ClShowMEffects != 2 && EquipItem == 22 && EnchantItem >= EFFECTENCHANT)
-		{
-			vec4 Color = vec4(1.0f, 1.0f, 0.0f, 0.01f);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
-		}
-		if (g_Config.m_ClShowMEffects != 2 && EquipItem == 23 && EnchantItem >= EFFECTENCHANT)
-		{
-			vec4 Color = vec4(0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.01f);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
-		}
+		RenderEffectsWings(Position, Direction, EquipItem, EnchantItem);
 		RenderTools()->RenderPicItems(&State, m_pClient->m_aClients[ClientID].m_aEquipItems[EQUIP_WINGS], Direction, Position);
 	}
 
@@ -621,6 +592,43 @@ void CPlayers::OnRender()
 }
 
 // mmotee
+void CPlayers::RenderEffectsWings(vec2 Position, vec2 Direction, int EquipItem, int Enchant)
+{
+	if (g_Config.m_ClShowMEffects != 2)
+	{
+		if (EquipItem == 19 && Enchant >= EFFECTENCHANT)
+		{
+			vec4 Color = vec4(1.75f, 0.0f, 0.0f, 0.01f);
+			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
+			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
+		}
+		if (EquipItem == 20 && Enchant >= EFFECTENCHANT)
+		{
+			vec4 Color = vec4(0.2f, 0.2f, 1.75f, 0.01f);
+			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
+			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
+		}
+		if (EquipItem == 21 && Enchant >= EFFECTENCHANT)
+		{
+			vec4 Color = vec4(0.2f, 0.2f, 1.75f, 0.01f);
+			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
+			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
+		}
+		if (EquipItem == 22 && Enchant >= EFFECTENCHANT)
+		{
+			vec4 Color = vec4(1.0f, 1.0f, 0.0f, 0.01f);
+			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
+			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
+		}
+		if (EquipItem == 23 && Enchant >= EFFECTENCHANT)
+		{
+			vec4 Color = vec4(0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.01f);
+			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
+			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
+		}
+	}
+}
+
 void CPlayers::RenderHammer(CAnimState* pAnim, vec2 PlayerPos, int Size, int EquipID)
 {
 	if (EquipID == 24) // spear
