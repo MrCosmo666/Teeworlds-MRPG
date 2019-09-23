@@ -655,7 +655,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 
 	// Кординаты
 	{
-		str_format(aBuf, sizeof(aBuf), "%s. x%d, y%d", Client()->MapName(), pCharacter->m_X / 32, pCharacter->m_Y / 32);
+		str_format(aBuf, sizeof(aBuf), "%s. x%d, y%d", Client()->GetCurrentMapName(), pCharacter->m_X / 32, pCharacter->m_Y / 32);
 		TextRender()->Text(0, 2, 5, 4.5f, aBuf, -1);
 	}
 

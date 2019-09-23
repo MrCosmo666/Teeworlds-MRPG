@@ -210,7 +210,6 @@ public:
 
 	// mmotee
 	virtual int ClientFPS() const;
-	virtual const char* MapName();
 
 	virtual bool RconAuthed() const { return m_RconAuthed != 0; }
 	virtual bool UseTempRconCommands() const { return m_UseTempRconCommands != 0; }
@@ -270,6 +269,7 @@ public:
 	void ProcessConnlessPacket(CNetChunk *pPacket);
 	void ProcessServerPacket(CNetChunk *pPacket);
 
+	const char *GetCurrentMapName() const { return m_aCurrentMap; }
 	const char *GetCurrentMapPath() const { return m_aCurrentMapPath; }
 	virtual const char *MapDownloadName() const { return m_aMapdownloadName; }
 	virtual int MapDownloadAmount() const { return m_MapdownloadAmount; }

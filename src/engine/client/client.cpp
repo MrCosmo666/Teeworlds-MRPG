@@ -358,12 +358,6 @@ void CClient::SendReady()
 	SendMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH);
 }
 
-//mmotee
-const char* CClient::MapName()
-{
-	return m_aCurrentMap;
-}
-
 void CClient::RconAuth(const char *pName, const char *pPassword)
 {
 	if(RconAuthed())

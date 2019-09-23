@@ -99,6 +99,7 @@ public:
 	virtual void EnterGame() = 0;
 
 	//
+	virtual const char* GetCurrentMapName() const = 0;
 	virtual const char *GetCurrentMapPath() const = 0;
 	virtual const char *MapDownloadName() const = 0;
 	virtual int MapDownloadAmount() const = 0;
@@ -109,7 +110,6 @@ public:
 
 	// mmotee
 	virtual int ClientFPS() const = 0;
-	virtual const char* MapName() = 0;
 
 	// remote console
 	virtual void RconAuth(const char *pUsername, const char *pPassword) = 0;

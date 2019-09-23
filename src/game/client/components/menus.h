@@ -401,6 +401,7 @@ private:
 	// for call vote
 	int m_CallvoteSelectedOption;
 	int m_CallvoteSelectedPlayer;
+	char m_aFilterString[VOTE_REASON_LENGTH];
 	char m_aCallvoteReason[VOTE_REASON_LENGTH];
 
 	// for callbacks
@@ -675,6 +676,7 @@ private:
 	void RenderHSLPicker(CUIRect Picker);
 	void RenderSkinSelection(CUIRect MainView);
 	void RenderSkinPartSelection(CUIRect MainView);
+	void RenderSkinPartPalette(CUIRect MainView);
 	void RenderSettingsGeneral(CUIRect MainView);
 	void RenderSettingsPlayer(CUIRect MainView);
 	void RenderSettingsTee(CUIRect MainView);
