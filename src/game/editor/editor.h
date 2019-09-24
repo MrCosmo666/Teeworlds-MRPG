@@ -573,6 +573,7 @@ public:
 
 		m_GuiActive = true;
 		m_ProofBorders = false;
+		m_ShowPosition = false;
 
 		m_ShowTileInfo = false;
 		m_ShowDetail = true;
@@ -706,6 +707,7 @@ public:
 	bool m_ShowMousePointer;
 	bool m_GuiActive;
 	bool m_ProofBorders;
+	bool m_ShowPosition;
 	float m_MouseDeltaX;
 	float m_MouseDeltaY;
 	float m_MouseDeltaWx;

@@ -927,6 +927,17 @@ void CEditor::DoToolbar(CUIRect ToolBar)
 		m_ShowEnvelopePreview = SHOWENV_NONE;
 	}
 
+	TB_Top.VSplitLeft(5.0f, 0, &TB_Top);
+
+	// showposition button
+	TB_Top.VSplitLeft(40.0f, &Button, &TB_Top);
+	static int s_ShowPosition = 0;
+	if (DoButton_Editor(&s_ShowPosition, "Position", m_ShowPosition, &Button, 0, "[ctrl+u] Show position and marking.") ||
+		(Input()->KeyPress(KEY_U) && (Input()->KeyIsPressed(KEY_LCTRL) || Input()->KeyIsPressed(KEY_RCTRL))))
+	{
+		m_ShowPosition = !m_ShowPosition;
+	}
+
 	TB_Top.VSplitLeft(15.0f, 0, &TB_Top);
 
 	// zoom group
@@ -2338,6 +2349,22 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 				Graphics()->SetColor(0,1,0,1);
 			}
 		}
+
+		Graphics()->LinesEnd();
+	}
+
+	if (!m_ShowTilePicker && m_ShowPosition)
+	{
+		CLayerGroup *g = m_Map.m_pGameGroup;
+		g->MapScreen();
+
+		Graphics()->TextureClear();
+		Graphics()->LinesBegin();
+
+		IGraphics::CLineItem Array[2] = {
+			IGraphics::CLineItem(m_WorldOffsetX - 15, m_WorldOffsetY, m_WorldOffsetX + 15, m_WorldOffsetY),
+			IGraphics::CLineItem(m_WorldOffsetX, m_WorldOffsetY - 15, m_WorldOffsetX, m_WorldOffsetY + 15) };
+		Graphics()->LinesDraw(Array, 2);
 
 		Graphics()->LinesEnd();
 	}
@@ -4210,7 +4237,17 @@ void CEditor::RenderMenubar(CUIRect MenuBar)
 	str_format(aBuf, sizeof(aBuf), "File: %s", m_aFileName);
 	UI()->DoLabel(&MenuBar, aBuf, 10.0f, CUI::ALIGN_LEFT);
 
-	str_format(aBuf, sizeof(aBuf), "Z: %i, A: %.1f, G: %i", m_ZoomLevel, m_AnimateSpeed, m_GridFactor);
+	vec2 MousePos = vec2(UI()->MouseX(), UI()->MouseY());
+	vec2 MPOS = vec2(m_WorldOffsetX, m_WorldOffsetY) + MousePos;
+
+	if(m_ShowPosition)
+		str_format(aBuf, sizeof(aBuf), "X: %i(%0.f), Y: %i(%0.f) Z: %i, A: %.1f, G: %i ", 
+			(int)m_WorldOffsetX / 32, m_WorldOffsetX, 
+			(int)m_WorldOffsetY / 32, m_WorldOffsetY,
+			m_ZoomLevel, m_AnimateSpeed, m_GridFactor);
+	else
+		str_format(aBuf, sizeof(aBuf), "Z: %i, A: %.1f, G: %i", m_ZoomLevel, m_AnimateSpeed, m_GridFactor);
+
 	UI()->DoLabel(&Info, aBuf, 10.0f, CUI::ALIGN_RIGHT);
 
 	// Exit editor button
