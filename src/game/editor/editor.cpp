@@ -4243,11 +4243,14 @@ void CEditor::Render()
 	RenderBackground(View, m_CheckerTexture, 32.0f, 1.0f);
 
 	CUIRect MenuBar, CModeBar, ToolBar, StatusBar, EnvelopeEditor, ToolBox;
+	ToolBar.Margin(0.0f, &ToolBar);
+	ToolBox.Margin(0.0f, &ToolBox);
+	EnvelopeEditor.Margin(0.0f, &EnvelopeEditor);
+
 	m_ShowTilePicker = Input()->KeyIsPressed(KEY_SPACE) != 0 && m_Dialog == DIALOG_NONE;
 
 	if(m_GuiActive)
 	{
-
 		View.HSplitTop(16.0f, &MenuBar, &View);
 		View.HSplitTop(53.0f, &ToolBar, &View);
 		View.VSplitLeft(100.0f, &ToolBox, &View);
@@ -4327,7 +4330,7 @@ void CEditor::Render()
 	}
 
 
-	if(m_Mode == MODE_LAYERS)
+	if (m_Mode == MODE_LAYERS)
 		RenderLayers(ToolBox, ToolBar, View);
 	else if(m_Mode == MODE_IMAGES)
 		RenderImages(ToolBox, ToolBar, View);
