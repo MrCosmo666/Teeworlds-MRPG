@@ -1,5 +1,6 @@
 #include <base/color.h>
 
+#include <engine/storage.h>
 #include <engine/shared/config.h>
 #include <engine/textrender.h>
 #include <engine/graphics.h>
@@ -145,6 +146,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 	else if (s_ControlPage == 2) g_Config.m_Texture = 2;
 	else if (s_ControlPage == 3) g_Config.m_Texture = 3;
 	else if (s_ControlPage == 4) g_Config.m_Texture = 4;
+	else if (s_ControlPage == 5) g_Config.m_Texture = 5;
 
 	// render game menu backgrounds
 	float ButtonHeight = 20.0f;
@@ -158,29 +160,34 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 
 	// tab bar
 	{
-		TabBar.VSplitLeft(TabBar.w / 5, &Button, &TabBar);
+		TabBar.VSplitLeft(TabBar.w / 6, &Button, &TabBar);
 		static CButtonContainer s_Button0;
 		if (DoButton_MenuTab(&s_Button0, Localize("Gameskin"), s_ControlPage == 0, &Button, 0))
 			s_ControlPage = 0;
 
-		TabBar.VSplitLeft(TabBar.w / 4, &Button, &TabBar);
+		TabBar.VSplitLeft(TabBar.w / 5, &Button, &TabBar);
 		static CButtonContainer s_Button1;
 		if (DoButton_MenuTab(&s_Button1, Localize("Emoticons"), s_ControlPage == 1, &Button, 0))
 			s_ControlPage = 1;
 
-		TabBar.VSplitLeft(TabBar.w / 3, &Button, &TabBar);
+		TabBar.VSplitLeft(TabBar.w / 4, &Button, &TabBar);
 		static CButtonContainer s_Button2;
 		if (DoButton_MenuTab(&s_Button2, Localize("Cursor"), s_ControlPage == 2, &Button, 0))
 			s_ControlPage = 2;
 
-		TabBar.VSplitLeft(TabBar.w / 2, &Button, &TabBar);
+		TabBar.VSplitLeft(TabBar.w / 3, &Button, &TabBar);
 		static CButtonContainer s_Button3;
 		if (DoButton_MenuTab(&s_Button3, Localize("Particles"), s_ControlPage == 3, &Button, 0))
 			s_ControlPage = 3;
 
+		TabBar.VSplitLeft(TabBar.w / 2, &Button, &TabBar);
 		static CButtonContainer s_Button4;
-		if (DoButton_MenuTab(&s_Button4, Localize("Entities"), s_ControlPage == 4, &TabBar, 0))
+		if (DoButton_MenuTab(&s_Button4, Localize("Entities"), s_ControlPage == 4, &Button, 0))
 			s_ControlPage = 4;
+
+		static CButtonContainer s_Button5;
+		if (DoButton_MenuTab(&s_Button5, Localize("Fonts"), s_ControlPage == 5, &TabBar, 0))
+			s_ControlPage = 5;
 	}
 
 	if (g_Config.m_Texture == 0)
@@ -483,5 +490,90 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 				mem_copy(g_Config.m_GameEntities, s_paSkinList[NewSelected]->m_aName, sizeof(g_Config.m_GameEntities));
 		}
 		OldSelected = NewSelected;
+	}
+	else if (g_Config.m_Texture == 5)
+	{
+		RenderFontSelection(MainView);
+	}
+}
+
+class CFontFile
+{
+public:
+	CFontFile() {}
+	CFontFile(const char *n, const char *f) : m_Name(n), m_FileName(f) {}
+
+	string m_Name;
+	string m_FileName;
+	bool operator<(const CFontFile &Other) { return m_Name < Other.m_Name; }
+};
+
+int GatherFonts(const char *pFileName, int IsDir, int Type, void *pUser)
+{
+	const int PathLength = str_length(pFileName);
+	if (IsDir || PathLength <= 4 || pFileName[PathLength - 4] != '.' || str_comp_nocase(pFileName + PathLength - 3, "ttf") || pFileName[0] == '.')
+		return 0;
+
+	sorted_array<CFontFile> &Fonts = *((sorted_array<CFontFile> *)pUser);
+	char aNiceName[128];
+	str_copy(aNiceName, pFileName, PathLength - 3);
+	aNiceName[0] = str_uppercase(aNiceName[0]);	// check if the font was already added	
+
+	for (int i = 0; i < Fonts.size(); i++)
+		if (!str_comp(Fonts[i].m_Name, aNiceName))
+			return 0;
+
+	Fonts.add(CFontFile(aNiceName, pFileName));
+	return 0;
+}
+
+void CMenus::RenderFontSelection(CUIRect MainView)
+{
+	static CListBoxState s_FontList;
+	static int s_SelectedFont = 0;
+	static sorted_array<CFontFile> s_Fonts;
+	static float s_ScrollValue = 0;
+
+	if (s_Fonts.size() == 0)
+	{
+		Storage()->ListDirectory(IStorage::TYPE_ALL, "fonts", GatherFonts, &s_Fonts);
+		for (int i = 0; i < s_Fonts.size(); i++)
+			if (str_comp(s_Fonts[i].m_FileName, g_Config.m_ClFontfile) == 0)
+			{
+				s_SelectedFont = i;
+				break;
+			}
+	}
+
+	int OldSelectedFont = s_SelectedFont;
+	static float s_Fade[2] = { 0 };
+	UiDoListboxHeader(&s_FontList, &MainView, Localize(""), 20.0f, 2.0f);
+	UiDoListboxStart(&s_FontList, &s_Fade[0], 20.0f, Localize("Fonts"), s_Fonts.size(), 1, s_SelectedFont);
+	for (sorted_array<CFontFile>::range r = s_Fonts.all(); !r.empty(); r.pop_front())
+	{
+		CListboxItem Item = UiDoListboxNextItem(&s_FontList, &r.front());
+		if (Item.m_Visible)
+		{
+			Item.m_Rect.VMargin(5.0f, &Item.m_Rect);
+			Item.m_Rect.y += 2.0f;
+			UI()->DoLabel(&Item.m_Rect, r.front().m_Name, Item.m_Rect.h*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
+		}
+	
+	}
+
+	s_SelectedFont = UiDoListboxEnd(&s_FontList, 0);
+	if (OldSelectedFont != s_SelectedFont)
+	{
+		str_copy(g_Config.m_ClFontfile, s_Fonts[s_SelectedFont].m_FileName, sizeof(g_Config.m_ClFontfile));
+		char aRelFontPath[512];
+
+		str_format(aRelFontPath, sizeof(aRelFontPath), "fonts/%s", g_Config.m_ClFontfile);
+		char aFontPath[512];
+
+		IOHANDLE File = Storage()->OpenFile(aRelFontPath, IOFLAG_READ, IStorage::TYPE_ALL, aFontPath, sizeof(aFontPath));
+		if (File)
+			io_close(File);
+
+		TextRender()->SetDefaultFont(TextRender()->LoadFont(aFontPath));
 	}
 }

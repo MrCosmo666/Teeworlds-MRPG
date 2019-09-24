@@ -39,8 +39,8 @@ class ITextRender : public IInterface
 public:
 	virtual void SetCursor(CTextCursor *pCursor, float x, float y, float FontSize, int Flags) = 0;
 
-	virtual int LoadFont(const char *pFilename) = 0;
-
+	virtual CFont *LoadFont(const char *pFilename) = 0;
+	virtual void SetDefaultFont(CFont *pFont) = 0;
 	//
 	virtual void TextEx(CTextCursor *pCursor, const char *pText, int Length) = 0;
 	virtual void TextDeferredRenderEx(CTextCursor *pCursor, const char *pText, int Length,

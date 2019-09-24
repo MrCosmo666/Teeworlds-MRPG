@@ -666,6 +666,7 @@ private:
 	void UpdateFriends();
 
 	// mmotee
+	void RenderFontSelection(CUIRect MainView);
 	void RenderSettingsMmo(CUIRect MainView);
 	void RenderSettingsMmoGeneral(CUIRect MainView, int Page);
 	void RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background);

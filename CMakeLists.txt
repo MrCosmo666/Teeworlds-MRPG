@@ -895,7 +895,12 @@ set(EXPECTED_DATA
   emoticons/Updated_Emoctions_v01.png
   emoticons/White_Marta.png
   emoticons.png
+  fonts/arial.ttf
   fonts/DejaVuSans.ttf
+  fonts/CoreSans.ttf
+  fonts/comic.ttf
+  fonts/Cuprum-Bold-Italic.ttf
+  fonts/stylo.ttf
   gameskins/ACLANGAMESKIN.png
   gameskins/bamgameskin.png
   gameskins/dark_mirror.png

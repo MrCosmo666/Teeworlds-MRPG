@@ -464,28 +464,32 @@ public:
 	}
 
 
-	virtual int LoadFont(const char *pFilename)
+	virtual CFont *LoadFont(const char *pFilename)
 	{
 		CFont *pFont = (CFont *)mem_alloc(sizeof(CFont), 1);
-
+		
+		mem_free(m_pDefaultFont);
 		mem_zero(pFont, sizeof(*pFont));
 		str_copy(pFont->m_aFilename, pFilename, sizeof(pFont->m_aFilename));
 
 		if(FT_New_Face(m_FTLibrary, pFont->m_aFilename, 0, &pFont->m_FtFace))
 		{
 			mem_free(pFont);
-			return -1;
+			return NULL;
 		}
 
 		for(unsigned i = 0; i < NUM_FONT_SIZES; i++)
 			pFont->m_aSizes[i].m_FontSize = -1;
 
 		dbg_msg("textrender", "loaded pFont from '%s'", pFilename);
-		m_pDefaultFont = pFont;
-
-		return 0;
+		return (CFont *)pFont;
 	}
 
+	virtual void SetDefaultFont(CFont *pFont)
+	{
+		dbg_msg("textrender", "default pFont set %p", pFont);
+		m_pDefaultFont = pFont;
+	}
 
 	virtual void SetCursor(CTextCursor *pCursor, float x, float y, float FontSize, int Flags)
 	{
