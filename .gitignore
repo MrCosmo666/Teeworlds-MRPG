@@ -70,3 +70,8 @@ pack_*/
 rules.ninja
 *.vcxproj
 *.filters
+*.tlog
+*.obj
+*.lib
+*.user
+*.log

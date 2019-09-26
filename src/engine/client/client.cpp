@@ -762,13 +762,13 @@ const char *CClient::LoadMap(const char *pName, const char *pFilename, const SHA
 
 	SetState(IClient::STATE_LOADING);
 
-	if(!m_pMap->Load(pFilename))
+	if (!m_pMap->Load(pFilename))
 	{
 		str_format(aErrorMsg, sizeof(aErrorMsg), "map '%s' not found", pFilename);
 		return aErrorMsg;
 	}
 
-	if(pWantedSha256 && m_pMap->Sha256() != *pWantedSha256)
+	if (pWantedSha256 && m_pMap->Sha256() != *pWantedSha256)
 	{
 		char aSha256[SHA256_MAXSTRSIZE];
 		char aWantedSha256[SHA256_MAXSTRSIZE];
@@ -781,7 +781,7 @@ const char *CClient::LoadMap(const char *pName, const char *pFilename, const SHA
 	}
 
 	// get the crc of the map
-	if(m_pMap->Crc() != WantedCrc)
+	if (m_pMap->Crc() != WantedCrc)
 	{
 		str_format(aErrorMsg, sizeof(aErrorMsg), "map differs from the server. %08x != %08x", m_pMap->Crc(), WantedCrc);
 		m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "client", aErrorMsg);
@@ -827,7 +827,7 @@ const char *CClient::LoadMapSearch(const char *pMapName, const SHA256_DIGEST *pW
 	char aBuf[512];
 	char aWanted[SHA256_MAXSTRSIZE + 16];
 	aWanted[0] = 0;
-	if(pWantedSha256)
+	if (pWantedSha256)
 	{
 		char aWantedSha256[SHA256_MAXSTRSIZE];
 		sha256_str(*pWantedSha256, aWantedSha256, sizeof(aWantedSha256));
@@ -840,28 +840,28 @@ const char *CClient::LoadMapSearch(const char *pMapName, const SHA256_DIGEST *pW
 	// try the normal maps folder
 	str_format(aBuf, sizeof(aBuf), "maps/%s.map", pMapName);
 	pError = LoadMap(pMapName, aBuf, pWantedSha256, WantedCrc);
-	if(!pError)
+	if (!pError)
 		return pError;
 
 	// try the downloaded maps
 	FormatMapDownloadFilename(pMapName, pWantedSha256, WantedCrc, aBuf, sizeof(aBuf));
 	pError = LoadMap(pMapName, aBuf, pWantedSha256, WantedCrc);
-	if(!pError)
+	if (!pError)
 		return pError;
 
 	// backward compatibility with old names
-	if(pWantedSha256)
+	if (pWantedSha256)
 	{
 		FormatMapDownloadFilename(pMapName, 0, WantedCrc, aBuf, sizeof(aBuf));
 		pError = LoadMap(pMapName, aBuf, 0, WantedCrc);
-		if(!pError)
+		if (!pError)
 			return pError;
 	}
 
 	// search for the map within subfolders
 	char aFilename[128];
 	str_format(aFilename, sizeof(aFilename), "%s.map", pMapName);
-	if(Storage()->FindFile(aFilename, "maps", IStorage::TYPE_ALL, aBuf, sizeof(aBuf)))
+	if (Storage()->FindFile(aFilename, "maps", IStorage::TYPE_ALL, aBuf, sizeof(aBuf)))
 		pError = LoadMap(pMapName, aBuf, pWantedSha256, WantedCrc);
 
 	return pError;
