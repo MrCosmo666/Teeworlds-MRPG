@@ -511,8 +511,8 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 
 		if(Item.m_Visible)
 		{			
-			if (m_pClient->MmoServer() && (pOption->m_Colored[0] >= 60 || pOption->m_Colored[1] >= 60 || pOption->m_Colored[2] >= 60))
-				TextRender()->TextOutlineColor(1.1f, 1.1f, 1.1f, 0.3f);
+			if (m_pClient->MmoServer() && (pOption->m_Colored[0] >= 30 || pOption->m_Colored[1] >= 30 || pOption->m_Colored[2] >= 30))
+				TextRender()->TextOutlineColor(0.7f, 0.7f, 0.7f, 0.3f);
 
 			Item.m_Rect.VMargin(5.0f, &Item.m_Rect);
 			Item.m_Rect.y += 2.0f;
