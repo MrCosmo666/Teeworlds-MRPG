@@ -67,7 +67,7 @@ void CEnSkins::OnInit()
 	str_format(DefaultSkin.m_aName, sizeof(DefaultSkin.m_aName), "editor/entities.png");
 	if (g_Config.m_Debug)
 	{
-		str_format(aBuf, sizeof(aBuf), "load default entities", DefaultSkin.m_aName);
+		str_format(aBuf, sizeof(aBuf), "load default entities %s", DefaultSkin.m_aName);
 		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
 	}
 	m_aSkins.add(DefaultSkin);

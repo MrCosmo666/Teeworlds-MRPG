@@ -67,7 +67,7 @@ void CpSkins::OnInit()
 	str_format(DefaultSkin.m_aName, sizeof(DefaultSkin.m_aName), "!default");
 	if (g_Config.m_Debug)
 	{
-		str_format(aBuf, sizeof(aBuf), "load default particles", DefaultSkin.m_aName);
+		str_format(aBuf, sizeof(aBuf), "load default particles %s", DefaultSkin.m_aName);
 		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
 	}
 	m_aSkins.add(DefaultSkin);

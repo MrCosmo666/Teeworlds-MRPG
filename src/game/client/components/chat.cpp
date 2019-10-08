@@ -5,7 +5,7 @@
 #include <engine/graphics.h>
 #include <engine/textrender.h>
 #include <engine/keys.h>
-# include < engine/serverbrowser.h>
+#include <engine/serverbrowser.h>
 #include <engine/shared/config.h>
 
 #include <generated/protocol.h>

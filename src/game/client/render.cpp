@@ -330,7 +330,6 @@ void CRenderTools::DrawUIRect4(const CUIRect *r, vec4 ColorTopLeft, vec4 ColorTo
 // mmotee
 void CRenderTools::RenderPicItems(CAnimState* pAnim, int RenderNum, vec2 Dir, vec2 Pos)
 {
-	vec2 Direction = Dir;
 	vec2 Position = Pos;
 
 	// first pass we draw the outline

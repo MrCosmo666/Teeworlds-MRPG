@@ -149,9 +149,6 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 	else if (s_ControlPage == 5) g_Config.m_Texture = 5;
 
 	// render game menu backgrounds
-	float ButtonHeight = 20.0f;
-	float Spacing = 2.0f;
-	float BackgroundHeight = 2.0f * ButtonHeight + Spacing;
 	MainView.HSplitTop(50.0f, 0, &MainView);
 	MainView.HSplitBottom(80.0f, &MainView, 0);
 	MainView.HSplitTop(20.0f, &TabBar, &MainView);
@@ -532,7 +529,6 @@ void CMenus::RenderFontSelection(CUIRect MainView)
 	static CListBoxState s_FontList;
 	static int s_SelectedFont = 0;
 	static sorted_array<CFontFile> s_Fonts;
-	static float s_ScrollValue = 0;
 
 	if (s_Fonts.size() == 0)
 	{

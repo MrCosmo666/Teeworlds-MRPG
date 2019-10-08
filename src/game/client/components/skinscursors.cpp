@@ -66,7 +66,7 @@ void CcSkins::OnInit()
 	str_format(DefaultSkin.m_aName, sizeof(DefaultSkin.m_aName), "!default");
 	if (g_Config.m_Debug)
 	{
-		str_format(aBuf, sizeof(aBuf), "load default cursor", DefaultSkin.m_aName);
+		str_format(aBuf, sizeof(aBuf), "load default cursor %s", DefaultSkin.m_aName);
 		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
 	}
 	m_aSkins.add(DefaultSkin);
