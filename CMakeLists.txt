@@ -612,6 +612,9 @@ set(EXPECTED_DATA
   audio/wp_shotty_fire-01.wv
   audio/wp_shotty_fire-02.wv
   audio/wp_shotty_fire-03.wv
+  audio/wp_sword_attack-01.wv
+  audio/wp_sword_attack-02.wv
+  audio/wp_sword_attack-03.wv
   audio/wp_switch-01.wv
   audio/wp_switch-02.wv
   audio/wp_switch-03.wv
@@ -1103,6 +1106,7 @@ set(EXPECTED_DATA
   wings/it22.png
   wings/it23.png
   hammer/odinspear.png
+  hammer/aztecsword.png
 )
 
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/datasrc/languages/index.json)

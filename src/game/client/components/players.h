@@ -24,7 +24,7 @@ class CPlayers : public CComponent
 
 	// mmotee
 	void RenderEffectsWings(vec2 Position, vec2 Direction, int EquipItem, int Enchant);
-	void RenderHammer(CAnimState* pAnim, vec2 PlayerPos, int Size, int EquipID);
+	bool RenderHammer(CAnimState* pAnim, const CNetObj_Character pPlayerChar, float Angle, vec2 Position, int EquipID);
 
 public:
 	virtual void OnRender();
