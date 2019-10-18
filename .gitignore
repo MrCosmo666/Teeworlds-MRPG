@@ -20,7 +20,7 @@ map_resave*
 map_version*
 
 packetgen*
-teeworlds*
+
 !teeworlds.manifest
 !teeworlds.rc
 teeworlds_srv*
@@ -66,7 +66,6 @@ rules.ninja
 *.filters
 *.tlog
 *.obj
-*.lib
 *.user
 *.log
 MinSizeRel/mastersrv.exe
