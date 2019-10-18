@@ -306,6 +306,7 @@ endif()
 find_package(ZLIB)
 find_package(Crypto)
 find_package(OwnFreetype)
+find_package(Curl)
 find_package(Git)
 find_package(GTest)
 find_package(Pnglite)
@@ -345,6 +346,7 @@ function(show_dependency_status OUTPUT_NAME NAME)
   endif()
 endfunction()
 
+show_dependency_status("Curl" CURL)
 if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   show_dependency_status("Dmg tools" DMGTOOLS)
 endif()
@@ -359,6 +361,9 @@ show_dependency_status("SDL2" SDL2)
 show_dependency_status("Wavpack" WAVPACK)
 show_dependency_status("Zlib" ZLIB)
 
+if(CLIENT AND NOT(CURL_FOUND))
+  message(SEND_ERROR "You must install Curl to compile Teeworlds")
+endif()
 if(NOT(PYTHONINTERP_FOUND))
   message(SEND_ERROR "You must install Python to compile Teeworlds")
 endif()
@@ -1140,6 +1145,7 @@ foreach(datafile ${DATA})
   file(COPY ${datafile} DESTINATION ${DESTINATION})
 endforeach()
 set(COPY_FILES
+  ${CURL_COPY_FILES}
   ${FREETYPE_COPY_FILES}
   ${SDL2_COPY_FILES}
 )
@@ -1480,6 +1486,7 @@ if(CLIENT)
   # Libraries
   set(LIBS_CLIENT
     ${LIBS}
+    ${CURL_LIBRARIES}
     ${FREETYPE_LIBRARIES}
     ${PNGLITE_LIBRARIES}
     ${SDL2_LIBRARIES}
@@ -1511,6 +1518,7 @@ if(CLIENT)
   target_link_libraries(${TARGET_CLIENT} ${LIBS_CLIENT})
 
   target_include_directories(${TARGET_CLIENT} PRIVATE
+	${CURL_INCLUDE_DIRS}
     ${FREETYPE_INCLUDE_DIRS}
     ${PNGLITE_INCLUDE_DIRS}
     ${SDL2_INCLUDE_DIRS}
@@ -2046,6 +2054,10 @@ foreach(target ${TARGETS_LINK})
   if(TARGET_OS STREQUAL "mac")
     target_link_libraries(${target} -stdlib=libc++)
     target_link_libraries(${target} -mmacosx-version-min=10.7)
+    # Fixes: Undefined symbols for architecture x86_64:
+    #   "___isOSVersionAtLeast", referenced from:
+    #       _singleipconnect in libcurl.a(libcurl_la-connect.o)
+    target_link_libraries(${target} -Wl,-undefined -Wl,dynamic_lookup)
   endif()
   if((MINGW OR TARGET_OS STREQUAL "linux") AND PREFER_BUNDLED_LIBS)
     # Statically link the standard libraries with on MinGW/Linux so we don't
