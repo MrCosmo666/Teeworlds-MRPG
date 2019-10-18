@@ -157,12 +157,12 @@ const NETADDR *CServerBrowserFavorites::UpdateFavorites()
 	NETADDR *pResult = 0;
 
 	// check if hostname lookup for favourites is done
-	if(m_FavLookup.m_Active && m_FavLookup.m_HostLookup.m_Job.Status() == CJob::STATE_DONE)
+	if(m_FavLookup.m_Active && m_FavLookup.m_HostLookup.Status() == IJob::STATE_DONE)
 	{
 		// check if favourite has not been removed in the meanwhile
 		if(m_FavLookup.m_FavoriteIndex != -1)
 		{
-			if(m_FavLookup.m_HostLookup.m_Job.Result() == 0)
+			if(m_FavLookup.m_HostLookup.m_Result == 0)
 			{
 				CFavoriteServer *pEntry = FindFavoriteByAddr(m_FavLookup.m_HostLookup.m_Addr, 0);
 				if(pEntry)
@@ -220,7 +220,7 @@ const NETADDR *CServerBrowserFavorites::UpdateFavorites()
 		{
 			if(m_aFavoriteServers[i].m_State <= FAVSTATE_LOOKUPCHECK)
 			{
-				m_pEngine->HostLookup(&m_FavLookup.m_HostLookup, m_aFavoriteServers[i].m_aHostname, m_pNetClient->NetType());
+				CHostLookup(m_aFavoriteServers[i].m_aHostname, m_pNetClient->NetType());
 				m_FavLookup.m_FavoriteIndex = i;
 				--m_FavLookup.m_LookupCount;
 				m_FavLookup.m_Active = true;

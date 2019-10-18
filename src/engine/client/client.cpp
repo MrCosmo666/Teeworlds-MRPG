@@ -1720,14 +1720,14 @@ void CClient::VersionUpdate()
 {
 	if(m_VersionInfo.m_State == CVersionInfo::STATE_INIT)
 	{
-		Engine()->HostLookup(&m_VersionInfo.m_VersionServeraddr, g_Config.m_ClVersionServer, m_ContactClient.NetType());
+		CHostLookup(g_Config.m_ClVersionServer, m_ContactClient.NetType());
 		m_VersionInfo.m_State = CVersionInfo::STATE_START;
 	}
 	else if(m_VersionInfo.m_State == CVersionInfo::STATE_START)
 	{
-		if(m_VersionInfo.m_VersionServeraddr.m_Job.Status() == CJob::STATE_DONE)
+		if(m_VersionInfo.m_VersionServeraddr.Status() == IJob::STATE_DONE)
 		{
-			if(m_VersionInfo.m_VersionServeraddr.m_Job.Result() == 0)
+			if(m_VersionInfo.m_VersionServeraddr.m_Result == 0)
 			{
 				CNetChunk Packet;
 
@@ -2561,7 +2561,7 @@ int main(int argc, const char **argv) // ignore_convention
 
 	// create the components
 	int FlagMask = CFGFLAG_CLIENT;
-	IEngine *pEngine = CreateEngine("Teeworlds");
+	IEngine *pEngine = CreateEngine("Teeworlds", false, 1);
 	IConsole *pConsole = CreateConsole(FlagMask);
 	IStorage *pStorage = CreateStorage("Teeworlds", IStorage::STORAGETYPE_CLIENT, argc, argv); // ignore_convention
 	IConfig *pConfig = CreateConfig();

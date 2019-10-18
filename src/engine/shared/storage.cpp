@@ -24,7 +24,8 @@ public:
 	char m_aUserDir[MAX_PATH_LENGTH];
 	char m_aCurrentDir[MAX_PATH_LENGTH];
 	char m_aAppDir[MAX_PATH_LENGTH];
-	
+	char m_aBinarydir[MAX_PATH_LENGTH];
+
 	CStorage()
 	{
 		mem_zero(m_aaStoragePaths, sizeof(m_aaStoragePaths));
@@ -237,6 +238,7 @@ public:
 		if(fs_is_dir("data/mapres"))
 		{
 			str_copy(m_aDataDir, "data", sizeof(m_aDataDir));
+			str_copy(m_aBinarydir, "", sizeof(m_aBinarydir));
 			return;
 		}
 
@@ -244,8 +246,14 @@ public:
 		if(fs_is_dir(DATA_DIR "/mapres"))
 		{
 			str_copy(m_aDataDir, DATA_DIR, sizeof(m_aDataDir));
+#if defined(BINARY_DIR)
+			str_copy(m_aBinarydir, BINARY_DIR, sizeof(m_aBinarydir));
+#else
+			str_copy(m_aBinarydir, DATA_DIR "/..", sizeof(m_aBinarydir));
+#endif
 			return;
 		}
+
 
 		// 3) check for usable path in argv[0]
 		{
@@ -254,10 +262,16 @@ public:
 			str_format(m_aDataDir, sizeof(m_aDataDir), "%s/data", aBaseDir);
 			str_append(aBaseDir, "/data/mapres", sizeof(aBaseDir));
 
-			if(fs_is_dir(aBaseDir))
+			if (fs_is_dir(aBaseDir))
+			{
+				str_format(m_aDataDir, sizeof(m_aDataDir), "%s/data", m_aBinarydir);
 				return;
+			}
 			else
+			{
 				m_aDataDir[0] = 0;
+				m_aBinarydir[0] = 0;
+			}
 		}
 
 	#if defined(CONF_FAMILY_UNIX)
@@ -281,6 +295,7 @@ public:
 				str_format(aBuf, sizeof(aBuf), "%s/mapres", aDirs[i]);
 				if(fs_is_dir(aBuf))
 				{
+					str_copy(m_aBinarydir, aDirs[i], sizeof(m_aBinarydir));
 					str_copy(m_aDataDir, aDirs[i], sizeof(m_aDataDir));
 					return;
 				}
@@ -501,6 +516,17 @@ public:
 		return !fs_remove(GetPath(Type, pFilename, aBuffer, sizeof(aBuffer)));
 	}
 
+	virtual bool RemoveBinaryFile(const char *pFilename)
+	{
+		char aBuffer[MAX_PATH_LENGTH];
+		GetBinaryPath(pFilename, aBuffer, sizeof(aBuffer));
+
+		bool success = !fs_remove(aBuffer);
+		if (!success)
+			dbg_msg("storage", "failed to remove: %s", aBuffer);
+		return success;
+	}
+
 	virtual bool RenameFile(const char* pOldFilename, const char* pNewFilename, int Type)
 	{
 		if(Type < 0 || Type >= m_NumPaths)
@@ -508,6 +534,22 @@ public:
 		char aOldBuffer[MAX_PATH_LENGTH];
 		char aNewBuffer[MAX_PATH_LENGTH];
 		return !fs_rename(GetPath(Type, pOldFilename, aOldBuffer, sizeof(aOldBuffer)), GetPath(Type, pNewFilename, aNewBuffer, sizeof (aNewBuffer)));
+	}
+
+	virtual bool RenameBinaryFile(const char *pOldFilename, const char *pNewFilename)
+	{
+		char aOldBuffer[MAX_PATH_LENGTH];
+		char aNewBuffer[MAX_PATH_LENGTH];
+		GetBinaryPath(pOldFilename, aOldBuffer, sizeof(aOldBuffer));
+		GetBinaryPath(pNewFilename, aNewBuffer, sizeof(aNewBuffer));
+
+		if (fs_makedir_rec_for(aNewBuffer) < 0)
+			dbg_msg("storage", "cannot create folder for: %s", aNewBuffer);
+
+		bool success = !fs_rename(aOldBuffer, aNewBuffer);
+		if (!success)
+			dbg_msg("storage", "failed to rename: %s -> %s", aOldBuffer, aNewBuffer);
+		return success;
 	}
 
 	virtual bool CreateFolder(const char *pFoldername, int Type)
@@ -559,6 +601,12 @@ public:
 		*pCrc = Crc;
 		*pSize = Size;
 		return true;
+	}
+
+	virtual const char* GetBinaryPath(const char *pDir, char *pBuffer, unsigned BufferSize)
+	{
+		str_format(pBuffer, BufferSize, "%s%s%s", m_aBinarydir, !m_aBinarydir[0] ? "" : "/", pDir);
+		return pBuffer;
 	}
 
 	static IStorage *Create(const char *pApplicationName, int StorageType, int NumArgs, const char **ppArguments)

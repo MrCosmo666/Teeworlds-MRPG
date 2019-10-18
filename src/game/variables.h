@@ -41,8 +41,12 @@ MACRO_CONFIG_STR(GameParticles, mmo_particle_texture, 24, "default", CFGFLAG_CLI
 MACRO_CONFIG_STR(GameEmoticons, mmo_emoticons_texture, 24, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Emoticons texture")
 MACRO_CONFIG_STR(GameCursor, mmo_cursor_texture, 24, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Cursor texture")
 MACRO_CONFIG_STR(GameEntities, mmo_entities_texture, 64, "editor/entities.png", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Entities texture path")
-
 MACRO_CONFIG_INT(Texture, mmo_texture_page, 4, 0, 0, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Texture page")
+
+// curl http download
+MACRO_CONFIG_INT(ClHTTPConnectTimeoutMs, cl_http_connect_timeout_ms, 2000, 0, 100000, CFGFLAG_CLIENT | CFGFLAG_SAVE, "HTTP downloads: timeout for the connect phase in milliseconds (0 to disable)")
+MACRO_CONFIG_INT(ClHTTPLowSpeedLimit, cl_http_low_speed_limit, 500, 0, 100000, CFGFLAG_CLIENT | CFGFLAG_SAVE, "HTTP downloads: Set low speed limit in bytes per second (0 to disable)")
+MACRO_CONFIG_INT(ClHTTPLowSpeedTime, cl_http_low_speed_time, 5, 0, 100000, CFGFLAG_CLIENT | CFGFLAG_SAVE, "HTTP downloads: Set low speed limit time period (0 to disable)")
 
 MACRO_CONFIG_INT(EdZoomTarget, ed_zoom_target, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Zoom to the current mouse target")
 MACRO_CONFIG_INT(EdShowkeys, ed_showkeys, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Editor shows which keys are pressed")

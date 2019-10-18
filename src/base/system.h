@@ -374,9 +374,9 @@ void thread_sleep(int milliseconds);
 	Parameters:
 		threadfunc - Entry point for the new thread.
 		user - Pointer to pass to the thread.
-
+		name - name describing the use of the thread
 */
-void *thread_init(void (*threadfunc)(void *), void *user);
+void *thread_init(void(*threadfunc)(void *), void *user, const char *name);
 
 /*
 	Function: thread_wait
@@ -431,22 +431,22 @@ void lock_unlock(LOCK lock);
 
 
 /* Group: Semaphores */
-
-#if !defined(CONF_PLATFORM_MACOSX)
-	#if defined(CONF_FAMILY_UNIX)
-		#include <semaphore.h>
-		typedef sem_t SEMAPHORE;
-	#elif defined(CONF_FAMILY_WINDOWS)
-		typedef void* SEMAPHORE;
-	#else
-		#error missing sempahore implementation
-	#endif
-
-	void semaphore_init(SEMAPHORE *sem);
-	void semaphore_wait(SEMAPHORE *sem);
-	void semaphore_signal(SEMAPHORE *sem);
-	void semaphore_destroy(SEMAPHORE *sem);
+#if defined(CONF_FAMILY_WINDOWS)
+typedef void* SEMAPHORE;
+#elif defined(CONF_PLATFORM_MACOSX)
+#include <semaphore.h>
+typedef sem_t* SEMAPHORE;
+#elif defined(CONF_FAMILY_UNIX)
+#include <semaphore.h>
+typedef sem_t SEMAPHORE;
+#else
+#error not implemented on this platform
 #endif
+
+void sphore_init(SEMAPHORE *sem);
+void sphore_wait(SEMAPHORE *sem);
+void sphore_signal(SEMAPHORE *sem);
+void sphore_destroy(SEMAPHORE *sem);
 
 /* Group: Timer */
 #ifdef __GNUC__
@@ -1208,6 +1208,16 @@ void fs_listdir(const char *dir, FS_LISTDIR_CALLBACK cb, int type, void *user);
 		in a failure if b or a does not exist.
 */
 int fs_makedir(const char *path);
+
+/*
+	Function: fs_makedir_rec_for
+		Recursively create directories for a file
+	Parameters:
+		path - File for which to create directories
+	Returns:
+		Returns 0 on success. Negative value on failure.
+*/
+int fs_makedir_rec_for(const char *path);
 
 /*
 	Function: fs_makedir_recursive

@@ -20,7 +20,6 @@ map_resave*
 map_version*
 
 packetgen*
-
 !teeworlds.manifest
 !teeworlds.rc
 teeworlds_srv*

@@ -306,6 +306,8 @@ endif()
 find_package(ZLIB)
 find_package(Crypto)
 find_package(OwnFreetype)
+find_package(Opus)
+find_package(Opusfile)
 find_package(Curl)
 find_package(Git)
 find_package(GTest)
@@ -355,6 +357,8 @@ if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   show_dependency_status("Hdiutil" HDIUTIL)
 endif()
 show_dependency_status("OpenSSL Crypto" CRYPTO)
+show_dependency_status("Opus" OPUS)
+show_dependency_status("Opusfile" OPUSFILE)
 show_dependency_status("Pnglite" PNGLITE)
 show_dependency_status("PythonInterp" PYTHONINTERP)
 show_dependency_status("SDL2" SDL2)
@@ -370,6 +374,12 @@ endif()
 
 if(CLIENT AND NOT(FREETYPE_FOUND))
   message(SEND_ERROR "You must install Freetype to compile the Teeworlds client")
+endif()
+if(CLIENT AND NOT(OPUS_FOUND))
+  message(SEND_ERROR "You must install Opus to compile the Teeworlds client")
+endif()
+if(CLIENT AND NOT(OPUSFILE_FOUND))
+  message(SEND_ERROR "You must install Opusfile to compile the Teeworlds client")
 endif()
 if(CLIENT AND NOT(SDL2_FOUND))
   message(SEND_ERROR "You must install SDL2 to compile the Teeworlds client")
@@ -1147,6 +1157,7 @@ endforeach()
 set(COPY_FILES
   ${CURL_COPY_FILES}
   ${FREETYPE_COPY_FILES}
+  ${OPUSFILE_COPY_FILES}
   ${SDL2_COPY_FILES}
 )
 file(COPY ${COPY_FILES} DESTINATION .)
@@ -1360,6 +1371,8 @@ if(CLIENT)
     graphics_threaded.h
     input.cpp
     input.h
+	http.cpp
+	http.h
     keynames.h
     serverbrowser.cpp
     serverbrowser.h
@@ -1491,6 +1504,11 @@ if(CLIENT)
     ${PNGLITE_LIBRARIES}
     ${SDL2_LIBRARIES}
     ${WAVPACK_LIBRARIES}
+
+    # Order of these three is important.
+    ${OPUSFILE_LIBRARIES}
+    ${OPUS_LIBRARIES}
+
     ${PLATFORM_CLIENT_LIBS}
   )
 
@@ -1520,6 +1538,8 @@ if(CLIENT)
   target_include_directories(${TARGET_CLIENT} PRIVATE
 	${CURL_INCLUDE_DIRS}
     ${FREETYPE_INCLUDE_DIRS}
+    ${OPUSFILE_INCLUDE_DIRS}
+    ${OPUS_INCLUDE_DIRS}
     ${PNGLITE_INCLUDE_DIRS}
     ${SDL2_INCLUDE_DIRS}
     ${WAVPACK_INCLUDE_DIRS}
