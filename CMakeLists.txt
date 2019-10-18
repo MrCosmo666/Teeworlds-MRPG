@@ -1272,6 +1272,7 @@ set_src(ENGINE_INTERFACE GLOB src/engine
   sound.h
   storage.h
   textrender.h
+  updater.h
 )
 set_src(ENGINE_SHARED GLOB src/engine/shared
   compression.cpp
@@ -1384,6 +1385,8 @@ if(CLIENT)
 	sound.cpp
     sound.h
     text.cpp
+	updater.cpp
+	updater.h
   )
   set_src(GAME_CLIENT GLOB_RECURSE src/game/client
 	animstate.cpp

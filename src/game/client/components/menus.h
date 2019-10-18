@@ -378,6 +378,7 @@ private:
 	bool m_NeedRestartPlayer;
 	bool m_NeedRestartGraphics;
 	bool m_NeedRestartSound;
+	bool m_NeedRestartUpdate;
 	int m_TeePartSelected;
 	char m_aSaveSkinName[24];
 

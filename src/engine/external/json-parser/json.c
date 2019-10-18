@@ -118,9 +118,6 @@ static int new_value (json_state * state,
       {
          case json_array:
 
-            if (value->u.array.length == 0)
-               break;
-
             if (! (value->u.array.values = (json_value **) json_alloc
                (state, value->u.array.length * sizeof (json_value *), 0)) )
             {
@@ -132,12 +129,9 @@ static int new_value (json_state * state,
 
          case json_object:
 
-            if (value->u.object.length == 0)
-               break;
-
             values_size = sizeof (*value->u.object.values) * value->u.object.length;
 
-            if (! (value->u.object.values = (json_object_entry *) json_alloc
+            if (! ((*(void **) &value->u.object.values) = json_alloc
                   (state, values_size + ((unsigned long) value->u.object.values), 0)) )
             {
                return 0;
@@ -297,7 +291,7 @@ json_value * json_parse_ex (json_settings * settings,
                   case 't':  string_add ('\t');  break;
                   case 'u':
 
-                    if (end - state.ptr <= 4 || 
+                    if (end - state.ptr < 4 || 
                         (uc_b1 = hex_value (*++ state.ptr)) == 0xFF ||
                         (uc_b2 = hex_value (*++ state.ptr)) == 0xFF ||
                         (uc_b3 = hex_value (*++ state.ptr)) == 0xFF ||
@@ -314,7 +308,7 @@ json_value * json_parse_ex (json_settings * settings,
                     if ((uchar & 0xF800) == 0xD800) {
                         json_uchar uchar2;
                         
-                        if (end - state.ptr <= 6 || (*++ state.ptr) != '\\' || (*++ state.ptr) != 'u' ||
+                        if (end - state.ptr < 6 || (*++ state.ptr) != '\\' || (*++ state.ptr) != 'u' ||
                             (uc_b1 = hex_value (*++ state.ptr)) == 0xFF ||
                             (uc_b2 = hex_value (*++ state.ptr)) == 0xFF ||
                             (uc_b3 = hex_value (*++ state.ptr)) == 0xFF ||
@@ -1009,3 +1003,41 @@ void json_value_free (json_value * value)
    json_value_free_ex (&settings, value);
 }
 
+/* DDNet additions */
+const struct _json_value *json_object_get (const json_value * object, const char * index)
+{
+   unsigned int i;
+
+   if (object->type != json_object)
+      return &json_value_none;
+
+   for (i = 0; i < object->u.object.length; ++ i)
+      if (!strcmp (object->u.object.values [i].name, index))
+         return object->u.object.values [i].value;
+
+   return &json_value_none;
+}
+
+const struct _json_value *json_array_get (const json_value * array, int index)
+{
+   if (array->type != json_array || index >= (int)array->u.array.length)
+      return &json_value_none;
+
+   return array->u.array.values[index];
+}
+
+int json_array_length (const json_value * array) {
+   return array->u.array.length;
+}
+
+const char * json_string_get (const json_value * string) {
+   return string->u.string.ptr;
+}
+
+int json_int_get (const json_value * integer) {
+   return integer->u.integer;
+}
+
+int json_boolean_get(const json_value * boolean) {
+   return boolean->u.boolean != 0;
+}

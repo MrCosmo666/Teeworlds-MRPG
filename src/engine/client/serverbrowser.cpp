@@ -74,6 +74,57 @@ CServerBrowser::CServerBrowser()
 	m_ActServerlistType = 0;
 	m_BroadcastTime = 0;
 	m_MasterRefreshTime = 0;
+	m_pDDNetInfo = 0;
+}
+
+CServerBrowser::~CServerBrowser()
+{
+	if (m_pDDNetInfo)
+		json_value_free(m_pDDNetInfo);
+}
+
+//mmotee
+void CServerBrowser::LoadDDNetInfoJson()
+{
+	IStorage *pStorage = Kernel()->RequestInterface<IStorage>();
+	IOHANDLE File = pStorage->OpenFile(DDNET_INFO, IOFLAG_READ, IStorage::TYPE_SAVE);
+
+	if (!File)
+		return;
+
+	const int Length = io_length(File);
+	if (Length <= 0)
+	{
+		io_close(File);
+		return;
+	}
+
+	char *pBuf = (char *)malloc(Length);
+	pBuf[0] = '\0';
+
+	io_read(File, pBuf, Length);
+	io_close(File);
+
+	if (m_pDDNetInfo)
+		json_value_free(m_pDDNetInfo);
+
+	m_pDDNetInfo = json_parse(pBuf, Length);
+
+	free(pBuf);
+
+	if (m_pDDNetInfo && m_pDDNetInfo->type != json_object)
+	{
+		json_value_free(m_pDDNetInfo);
+		m_pDDNetInfo = 0;
+	}
+}
+
+
+const json_value *CServerBrowser::LoadDDNetInfo()
+{
+	LoadDDNetInfoJson();
+
+	return m_pDDNetInfo;
 }
 
 void CServerBrowser::Init(class CNetClient *pNetClient, const char *pNetVersion)

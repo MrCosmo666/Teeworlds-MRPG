@@ -11,6 +11,7 @@
 #include <engine/serverbrowser.h>
 #include <engine/storage.h>
 #include <engine/textrender.h>
+#include <engine/updater.h>
 #include <engine/shared/config.h>
 #include <engine/client/contacts.h>
 
@@ -2118,9 +2119,49 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 	RenderTools()->DrawUIRect4(&MainView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), CUI::CORNER_T, 5.0f);
 
 	// back to main menu
-	CUIRect Button;
+	CUIRect Button, Label;
 	MainView.HSplitTop(25.0f, &MainView, 0);
 	MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
+
+	bool NeedUpdate = str_comp(Client()->LatestVersion(), "0");
+	char aBuf[256];
+	int State = m_pClient->Updater()->GetCurrentState();
+
+	// Update Button
+	if (NeedUpdate && State <= IUpdater::CLEAN)
+	{
+		str_format(aBuf, sizeof(aBuf), Localize("DDNet %s is available:"), Client()->LatestVersion());
+		MainView.VSplitLeft(TextRender()->TextWidth(0, 14.0f, aBuf, -1, -1.0f) + 10.0f, &MainView, &Button);
+		Button.VSplitLeft(10.0f, &Button, 0);
+		static CButtonContainer s_ButtonUpdate;
+		if (DoButton_Menu(&s_ButtonUpdate, Localize("Update now"), 0, &Button))
+			m_pClient->Updater()->InitiateUpdate();
+	}
+	else if (State >= IUpdater::GETTING_MANIFEST && State < IUpdater::NEED_RESTART)
+		str_format(aBuf, sizeof(aBuf), Localize("Updating..."));
+	else if (State == IUpdater::NEED_RESTART)
+	{
+		str_format(aBuf, sizeof(aBuf), Localize("DDNet Client updated!"));
+		m_NeedRestartUpdate = true;
+	}
+	else
+	{
+		str_format(aBuf, sizeof(aBuf), Localize("No updates available"));
+		MainView.VSplitLeft(TextRender()->TextWidth(0, 14.0f, aBuf, -1, -1.0f) + 10.0f, &MainView, &Button);
+		Button.VSplitLeft(10.0f, &Button, 0);
+		static CButtonContainer s_ButtonUpdate;
+		if (DoButton_Menu(&s_ButtonUpdate, Localize("Check now"), 0, &Button))
+		{
+			Client()->RequestDDNetInfo();
+		}
+	}
+
+	UI()->DoLabel(&MainView, aBuf, 12.0f, CUI::ALIGN_LEFT);
+	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+/*
+	MainView.VSplitLeft(Spacing, 0, &MainView); // little space
+	MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
+
 	static CButtonContainer s_RefreshButton;
 	if(DoButton_Menu(&s_RefreshButton, Localize("Refresh"), 0, &Button) || (Input()->KeyPress(KEY_R) && (Input()->KeyIsPressed(KEY_LCTRL) || Input()->KeyIsPressed(KEY_RCTRL))))
 	{
@@ -2129,7 +2170,7 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 		else if(m_MenuPage == PAGE_LAN)
 			ServerBrowser()->Refresh(IServerBrowser::REFRESHFLAG_LAN);
 	}
-
+*/
 	MainView.VSplitLeft(Spacing, 0, &MainView); // little space
 	MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
 	static CButtonContainer s_JoinButton;

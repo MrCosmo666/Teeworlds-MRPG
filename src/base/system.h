@@ -1391,6 +1391,7 @@ int str_toint(const char *str);
 float str_tofloat(const char *str);
 int str_isspace(char c);
 char str_uppercase(char c);
+int str_isallnum(const char *str);
 unsigned str_quickhash(const char *str);
 
 /*
@@ -1508,6 +1509,21 @@ int str_utf8_encode(char *ptr, int chr);
 		- The string is treated as zero-terminated utf8 string.
 */
 int str_utf8_check(const char *str);
+
+/*
+	Function: shell_execute
+		Executes a given file.
+*/
+void shell_execute(const char *file);
+
+/*
+	Function: os_is_winxp_or_lower
+		Checks whether the program runs on Windows XP or lower.
+	Returns:
+		1 - Windows XP or lower.
+		0 - Higher Windows version, Linux, macOS, etc.
+*/
+int os_is_winxp_or_lower();
 
 /*
 	Function: secure_random_init

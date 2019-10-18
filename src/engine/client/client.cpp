@@ -23,6 +23,9 @@
 #include <engine/storage.h>
 #include <engine/textrender.h>
 
+#include <engine/client/http.h>
+#include <engine/external/json-parser/json.h>
+
 #include <engine/shared/config.h>
 #include <engine/shared/compression.h>
 #include <engine/shared/datafile.h>
@@ -40,6 +43,7 @@
 #include <mastersrv/mastersrv.h>
 #include <versionsrv/versionsrv.h>
 
+#include "updater.h"
 #include "contacts.h"
 #include "serverbrowser.h"
 #include "client.h"
@@ -294,6 +298,10 @@ CClient::CClient() : m_DemoPlayer(&m_SnapshotDelta), m_DemoRecorder(&m_SnapshotD
 	m_MapdownloadCrc = 0;
 	m_MapdownloadAmount = -1;
 	m_MapdownloadTotalsize = -1;
+
+	//mmotee
+	m_pDDNetInfoTask = NULL;
+	m_aNews[0] = '\0';
 
 	m_CurrentInput = 0;
 
@@ -735,6 +743,96 @@ void CClient::DebugRender()
 		m_GametimeMarginGraph.ScaleMax();
 		m_GametimeMarginGraph.Render(Graphics(), m_DebugFont, x, sp*5+h+sp+h+sp, w, h, "Gametime Margin");
 	}
+}
+
+//mmotee
+void CClient::ResetDDNetInfo()
+{
+	if (m_pDDNetInfoTask)
+	{
+		m_pDDNetInfoTask->Abort();
+		m_pDDNetInfoTask = NULL;
+	}
+}
+
+void CClient::FinishDDNetInfo()
+{
+	ResetDDNetInfo();
+	m_pStorage->RenameFile(DDNET_INFO_TMP, DDNET_INFO, IStorage::TYPE_SAVE);
+	LoadDDNetInfo();
+}
+
+typedef std::tuple<int, int, int> Version;
+static const Version InvalidVersion = std::make_tuple(-1, -1, -1);
+
+Version ToVersion(char *pStr)
+{
+	int version[3] = { 0, 0, 0 };
+	const char *p = strtok(pStr, ".");
+
+	for (int i = 0; i < 3 && p; ++i)
+	{
+		if (!str_isallnum(p))
+			return InvalidVersion;
+
+		version[i] = str_toint(p);
+		p = strtok(NULL, ".");
+	}
+
+	if (p)
+		return InvalidVersion;
+
+	return std::make_tuple(version[0], version[1], version[2]);
+}
+
+void CClient::LoadDDNetInfo()
+{
+	const json_value *pDDNetInfo = m_ServerBrowser.LoadDDNetInfo();
+
+	if (!pDDNetInfo)
+		return;
+
+	const json_value *pVersion = json_object_get(pDDNetInfo, "version");
+	if (pVersion->type == json_string)
+	{
+		char aNewVersionStr[64];
+		str_copy(aNewVersionStr, json_string_get(pVersion), sizeof(aNewVersionStr));
+		char aCurVersionStr[64];
+		str_copy(aCurVersionStr, GAME_RELEASE_VERSION, sizeof(aCurVersionStr));
+		if (ToVersion(aNewVersionStr) > ToVersion(aCurVersionStr))
+		{
+			str_copy(m_aVersionStr, json_string_get(pVersion), sizeof(m_aVersionStr));
+		}
+		else
+		{
+			m_aVersionStr[0] = '0';
+			m_aVersionStr[1] = '\0';
+		}
+	}
+
+	const json_value *pNews = json_object_get(pDDNetInfo, "news");
+	if (pNews->type == json_string)
+	{
+		const char *pNewsString = json_string_get(pNews);
+
+		str_copy(m_aNews, pNewsString, sizeof(m_aNews));
+	}
+}
+
+void CClient::RequestDDNetInfo()
+{
+	char aUrl[256];
+	str_copy(aUrl, "http://176.31.208.223/informa", sizeof(aUrl));
+
+	m_pDDNetInfoTask = std::make_shared<CGetFile>(Storage(), aUrl, DDNET_INFO_TMP, IStorage::TYPE_SAVE, true);
+	Engine()->AddJob(m_pDDNetInfoTask);
+}
+
+void CClient::Restart()
+{
+	char aBuf[512];
+	shell_execute(Storage()->GetBinaryPath(PLAT_CLIENT_EXEC, aBuf, sizeof aBuf));
+	Quit();
 }
 
 void CClient::Quit()
@@ -1704,6 +1802,21 @@ void CClient::Update()
 	// pump the network
 	PumpNetwork();
 
+	if (m_pDDNetInfoTask)
+	{
+		if (m_pDDNetInfoTask->State() == HTTP_DONE)
+			FinishDDNetInfo();
+		else if (m_pDDNetInfoTask->State() == HTTP_ERROR)
+		{
+			dbg_msg("ddnet-info", "download failed");
+			ResetDDNetInfo();
+		}
+		else if (m_pDDNetInfoTask->State() == HTTP_ABORTED)
+		{
+			m_pDDNetInfoTask = NULL;
+		}
+	}
+
 	// update the maser server registry
 	MasterServer()->Update();
 
@@ -1757,6 +1870,7 @@ void CClient::RegisterInterfaces()
 	Kernel()->RegisterInterface(static_cast<IServerBrowser*>(&m_ServerBrowser));
 	Kernel()->RegisterInterface(static_cast<IFriends*>(&m_Friends));
 	Kernel()->RegisterInterface(static_cast<IBlacklist*>(&m_Blacklist));
+	Kernel()->RegisterInterface(static_cast<IUpdater*>(&m_Updater));
 }
 
 void CClient::InitInterfaces()
@@ -1771,9 +1885,14 @@ void CClient::InitInterfaces()
 	m_pMap = Kernel()->RequestInterface<IEngineMap>();
 	m_pMasterServer = Kernel()->RequestInterface<IEngineMasterServer>();
 	m_pStorage = Kernel()->RequestInterface<IStorage>();
+	m_pUpdater = Kernel()->RequestInterface<IUpdater>();
 
 	//
 	m_ServerBrowser.Init(&m_ContactClient, m_pGameClient->NetVersion());
+	
+	HttpInit(m_pStorage);
+	m_Updater.Init();
+
 	m_Friends.Init();
 	m_Blacklist.Init();
 }
@@ -1980,6 +2099,8 @@ void CClient::Run()
 		// update input
 		if(Input()->Update())
 			break;	// SDL_QUIT
+
+		Updater()->Update();
 
 		// update sound
 		Sound()->Update();

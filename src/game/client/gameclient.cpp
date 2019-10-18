@@ -10,6 +10,7 @@
 #include <engine/storage.h>
 #include <engine/sound.h>
 #include <engine/serverbrowser.h>
+#include <engine/updater.h>
 #include <engine/shared/demo.h>
 #include <engine/shared/config.h>
 
@@ -196,6 +197,7 @@ void CGameClient::OnConsoleInit()
 	m_pEditor = Kernel()->RequestInterface<IEditor>();
 	m_pFriends = Kernel()->RequestInterface<IFriends>();
 	m_pBlacklist = Kernel()->RequestInterface<IBlacklist>();
+	m_pUpdater = Kernel()->RequestInterface<IUpdater>();
 
 	// setup pointers
 	m_pBinds = &::gs_Binds;

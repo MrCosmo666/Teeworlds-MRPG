@@ -31,6 +31,7 @@ protected:
 
 	int m_GameTickSpeed;
 public:
+	char m_aNews[3000];
 
 	class CSnapItem
 	{
@@ -110,6 +111,9 @@ public:
 
 	// mmotee
 	virtual int ClientFPS() const = 0;
+	virtual void RequestDDNetInfo() = 0;
+	virtual bool EditorHasUnsavedData() = 0;
+	virtual void Restart() = 0;
 
 	// remote console
 	virtual void RconAuth(const char *pUsername, const char *pPassword) = 0;

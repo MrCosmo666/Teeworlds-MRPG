@@ -30,9 +30,10 @@
 	#if defined(CONF_PLATFORM_MACOSX)
 		#include <Carbon/Carbon.h>
 	#endif
-
 #elif defined(CONF_FAMILY_WINDOWS)
 	#define WIN32_LEAN_AND_MEAN
+	#undef _WIN32_WINNT
+	#define _WIN32_WINNT 0x0501 /* required for mingw to get getaddrinfo to work */
 	#include <windows.h>
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
@@ -40,6 +41,7 @@
 	#include <direct.h>
 	#include <errno.h>
 	#include <process.h>
+	#include <shellapi.h>
 	#include <wincrypt.h>
 #else
 	#error NOT IMPLEMENTED
@@ -2277,6 +2279,17 @@ char str_uppercase(char c)
 	return c;
 }
 
+int str_isallnum(const char *str)
+{
+	while (*str)
+	{
+		if (!(*str >= '0' && *str <= '9'))
+			return 0;
+		str++;
+	}
+	return 1;
+}
+
 int str_toint(const char *str) { return atoi(str); }
 float str_tofloat(const char *str) { return atof(str); }
 
@@ -2484,6 +2497,37 @@ unsigned str_quickhash(const char *str)
 	for(; *str; str++)
 		hash = ((hash << 5) + hash) + (*str); /* hash * 33 + c */
 	return hash;
+}
+
+void shell_execute(const char *file)
+{
+#if defined(CONF_FAMILY_WINDOWS)
+	ShellExecute(NULL, NULL, file, NULL, NULL, SW_SHOWDEFAULT);
+#elif defined(CONF_FAMILY_UNIX)
+	char *argv[2];
+	pid_t pid;
+	argv[0] = (char*)file;
+	argv[1] = NULL;
+	pid = fork();
+	if (!pid)
+		execv(file, argv);
+#endif
+}
+
+int os_is_winxp_or_lower(unsigned int major, unsigned int minor)
+{
+#if defined(CONF_FAMILY_WINDOWS)
+	static const DWORD WINXP_MAJOR = 5;
+	static const DWORD WINXP_MINOR = 1;
+	OSVERSIONINFO ver;
+	mem_zero(&ver, sizeof(OSVERSIONINFO));
+	ver.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+	GetVersionEx(&ver);
+	return ver.dwMajorVersion < WINXP_MAJOR
+		|| (ver.dwMajorVersion == WINXP_MAJOR && ver.dwMinorVersion <= WINXP_MINOR);
+#else
+	return 0;
+#endif
 }
 
 struct SECURE_RANDOM_DATA

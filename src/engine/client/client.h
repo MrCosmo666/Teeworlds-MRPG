@@ -4,6 +4,7 @@
 #define ENGINE_CLIENT_CLIENT_H
 
 #include <base/hash.h>
+#include <engine/client/http.h>
 
 class CGraph
 {
@@ -64,6 +65,7 @@ class CClient : public IClient, public CDemoPlayer::IListner
 	IEngineMap *m_pMap;
 	IConsole *m_pConsole;
 	IStorage *m_pStorage;
+	IUpdater *m_pUpdater;
 	IEngineMasterServer *m_pMasterServer;
 
 	enum
@@ -77,6 +79,7 @@ class CClient : public IClient, public CDemoPlayer::IListner
 	class CDemoPlayer m_DemoPlayer;
 	class CDemoRecorder m_DemoRecorder;
 	class CServerBrowser m_ServerBrowser;
+	class CUpdater m_Updater;
 	class CFriends m_Friends;
 	class CBlacklist m_Blacklist;
 	class CMapChecker m_MapChecker;
@@ -137,6 +140,9 @@ class CClient : public IClient, public CDemoPlayer::IListner
 	int m_MapdownloadCrc;
 	int m_MapdownloadAmount;
 	int m_MapdownloadTotalsize;
+
+	//mmotee
+	std::shared_ptr<CGetFile> m_pDDNetInfoTask;
 
 	// time
 	CSmoothTime m_GameTime;
@@ -199,6 +205,7 @@ public:
 	IGameClient *GameClient() { return m_pGameClient; }
 	IEngineMasterServer *MasterServer() { return m_pMasterServer; }
 	IStorage *Storage() { return m_pStorage; }
+	IUpdater *Updater() { return m_pUpdater; }
 
 	CClient();
 
@@ -211,6 +218,7 @@ public:
 
 	// mmotee
 	virtual int ClientFPS() const;
+	bool EditorHasUnsavedData() { return m_pEditor->HasUnsavedData(); }
 
 	virtual bool RconAuthed() const { return m_RconAuthed != 0; }
 	virtual bool UseTempRconCommands() const { return m_UseTempRconCommands != 0; }
@@ -258,6 +266,13 @@ public:
 
 	void Render();
 	void DebugRender();
+
+	//mmotee
+	void RequestDDNetInfo();
+	void ResetDDNetInfo();
+	void FinishDDNetInfo();
+	void LoadDDNetInfo();
+	virtual void Restart();
 
 	virtual void Quit();
 

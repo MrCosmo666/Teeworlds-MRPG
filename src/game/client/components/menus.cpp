@@ -13,6 +13,7 @@
 #include <engine/keys.h>
 #include <engine/serverbrowser.h>
 #include <engine/storage.h>
+#include <engine/updater.h>
 #include <engine/textrender.h>
 #include <engine/shared/config.h>
 
@@ -51,6 +52,7 @@ CMenus::CMenus()
 	m_NeedRestartGraphics = false;
 	m_NeedRestartSound = false;
 	m_NeedRestartPlayer = false;
+	m_NeedRestartUpdate = false;
 	m_TeePartSelected = SKINPART_BODY;
 	m_aSaveSkinName[0] = 0;
 	m_RefreshSkinSelector = true;

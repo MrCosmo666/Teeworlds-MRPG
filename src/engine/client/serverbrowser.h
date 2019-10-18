@@ -19,6 +19,8 @@ public:
 	};
 		
 	CServerBrowser();
+	~CServerBrowser();
+
 	void Init(class CNetClient *pClient, const char *pNetVersion);
 	void Set(const NETADDR &Addr, int SetType, int Token, const CServerInfo *pInfo);
 	void Update(bool ForceResort);	
@@ -29,6 +31,10 @@ public:
 	bool IsRefreshing() const { return m_pFirstReqServer != 0; }
 	bool IsRefreshingMasters() const { return m_pMasterServer->IsRefreshing(); }
 	int LoadingProgression() const;
+
+	// mmotee
+	const json_value *LoadDDNetInfo();
+	void LoadDDNetInfoJson();
 
 	int NumServers() const { return m_aServerlist[m_ActServerlistType].m_NumServers; }
 	int NumPlayers() const { return m_aServerlist[m_ActServerlistType].m_NumPlayers; }
@@ -89,6 +95,9 @@ private:
 	int m_NumRequests;
 
 	int m_NeedRefresh;
+
+	//mmotee
+	json_value *m_pDDNetInfo;
 
 	// the token is to keep server refresh separated from each other
 	int m_CurrentLanToken;
