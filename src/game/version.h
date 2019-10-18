@@ -9,7 +9,7 @@
 #define CLIENT_VERSION 0x0703
 
 #define CLIENT_VERSION_MOLD 1012
-#define CLIENT_VERSION_MMO 1015
+#define CLIENT_VERSION_MMO 1016
 
 static const char GAME_RELEASE_VERSION[8] = "0.7.3.1";
 #endif
