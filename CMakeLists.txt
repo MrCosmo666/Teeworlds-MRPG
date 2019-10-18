@@ -877,10 +877,10 @@ set(EXPECTED_DATA
 	countryflags/index.json
 	cursor/black_cursor.png
 	cursor/cursor_black_with_blue.png
+	cursor/cursor_hook.png
 	cursor/fast_move.png
 	cursor/gangstacursor.png
 	cursor/gui_cursor.png
-	cursor/hook_cursor.png
 	cursor/rush.png
 	cursor/shadow_red.png
 	deadtee.png

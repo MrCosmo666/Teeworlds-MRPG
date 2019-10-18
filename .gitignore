@@ -3,9 +3,7 @@
 /build
 /config.lua
 /objs
-/other/*/windows
 __pycache__/
-*.dll
 *.pyc
 *.pyo
 scripts/work/
