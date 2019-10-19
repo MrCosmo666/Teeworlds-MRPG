@@ -150,11 +150,16 @@ bool CUpdater::MoveFile(const char *pFile)
 	{
 		str_format(aBuf, sizeof(aBuf), "%s.old", pFile);
 		Success &= m_pStorage->RenameBinaryFile(pFile, aBuf);
+
 		str_format(aBuf, sizeof(aBuf), "update/%s", pFile);
 		Success &= m_pStorage->RenameBinaryFile(aBuf, pFile);
 	}
 	else
 	{
+		str_format(aBuf, sizeof(aBuf), "%s.old", pFile);
+		Success &= m_pStorage->RenameBinaryFile(pFile, aBuf);
+		m_pStorage->RemoveBinaryFile(aBuf);
+
 		str_format(aBuf, sizeof(aBuf), "update/%s", pFile);
 		Success &= m_pStorage->RenameBinaryFile(aBuf, pFile);
 	}
@@ -356,10 +361,8 @@ void CUpdater::CommitUpdate()
 		m_State = NEED_RESTART;
 	else
 	{
-		if(!m_IsWinXP)
-			m_pClient->Restart();
-		else
-			WinXpRestart();
+		if(!m_IsWinXP) m_pClient->Restart();
+		else WinXpRestart();
 	}
 }
 

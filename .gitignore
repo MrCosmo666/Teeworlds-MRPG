@@ -63,3 +63,4 @@ rules.ninja
 *.log
 MinSizeRel/mastersrv.exe
 MinSizeRel/versionsrv.exe
+*.code-workspace
