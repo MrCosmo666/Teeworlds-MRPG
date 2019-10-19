@@ -825,7 +825,7 @@ void CClient::RequestMmoInfo()
 	char aUrl[256];
 	str_copy(aUrl, "http://176.31.208.223/update/info", sizeof(aUrl));
 
-	m_pMmoInfoTask = std::make_shared<CGetFile>(Storage(), aUrl, MMOTEE_INFO_TMP, IStorage::TYPE_SAVE, true);
+	m_pMmoInfoTask = std::make_shared<CGetFile>(Storage(), aUrl, MMOTEE_INFO, IStorage::TYPE_SAVE, true);
 	Engine()->AddJob(m_pMmoInfoTask);
 }
 
