@@ -1436,6 +1436,7 @@ void CMenus::RenderNews(CUIRect MainView)
 	RenderTools()->DrawUIRect(&MainView, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 10.0f);
 
 	CUIRect Label;
+
 	const char *pStr = Client()->m_aNews;
 	char aLine[256];
 	while ((pStr = str_next_token(pStr, "\n", aLine, sizeof(aLine))))
@@ -1443,9 +1444,9 @@ void CMenus::RenderNews(CUIRect MainView)
 		const int Len = str_length(aLine);
 		if (Len > 0 && aLine[0] == '|' && aLine[Len - 1] == '|')
 		{
-			MainView.HSplitTop(30.0f, &Label, &MainView);
+			MainView.HSplitTop(50.0f, &Label, &MainView);
 			aLine[Len - 1] = '\0';
-			UI()->DoLabel(&Label, aLine + 1, 20.0f, CUI::ALIGN_CENTER);
+			UI()->DoLabel(&Label, aLine + 1, 30.0f, CUI::ALIGN_CENTER);
 		}
 		else
 		{

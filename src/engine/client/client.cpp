@@ -758,7 +758,6 @@ void CClient::ResetMmoInfo()
 void CClient::FinishMmoInfo()
 {
 	ResetMmoInfo();
-	m_pStorage->RenameFile(MMOTEE_INFO_TMP, MMOTEE_INFO, IStorage::TYPE_SAVE);
 	LoadMmoInfo();
 }
 
@@ -814,8 +813,6 @@ void CClient::LoadMmoInfo()
 	if (pNews->type == json_string)
 	{
 		const char *pNewsString = json_string_get(pNews);
-
-		dbg_msg("test", "%s", pNewsString);
 		str_copy(m_aNews, pNewsString, sizeof(m_aNews));
 	}
 }
