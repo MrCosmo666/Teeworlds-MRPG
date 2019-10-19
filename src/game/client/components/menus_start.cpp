@@ -40,21 +40,6 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	if(DoButton_Menu(&s_SettingsButton, Localize("Settings"), 0, &Button, g_Config.m_ClShowStartMenuImages ? "settings" : 0, CUI::CORNER_ALL, 10.0f, 0.5f) || CheckHotKey(KEY_S))
 		NewPage = PAGE_SETTINGS;
 	
-	/*TopMenu.HSplitBottom(5.0f, &TopMenu, 0); // little space
-	TopMenu.HSplitBottom(40.0f, &TopMenu, &Bottom);
-	static int s_LocalServerButton = 0;
-	if(g_Config.m_ClShowStartMenuImages)
-	{
-		if(DoButton_MenuImage(&s_LocalServerButton, Localize("Local server"), 0, &Button, "local_server", 10.0f, 0.5f))
-		{
-		}
-	}
-	else
-	{
-		if(DoButton_Menu(&s_LocalServerButton, Localize("Local server"), 0, &Button, CUI::CORNER_ALL, 10.0f, 0.5f))
-		{
-		}
-	}*/
 
 	TopMenu.HSplitBottom(5.0f, &TopMenu, 0); // little space
 	TopMenu.HSplitBottom(40.0f, &TopMenu, &Button);
@@ -101,7 +86,11 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	CUIRect Version;
 	MainView.HSplitBottom(50.0f, 0, &Version);
 	Version.VMargin(50.0f, &Version);
-	UI()->DoLabel(&Version, GAME_RELEASE_VERSION, 14.0f, CUI::ALIGN_RIGHT);
+
+	// version
+	char aBuf[32];
+	str_format(aBuf, sizeof(aBuf), "Mmo-Client %s", GAME_RELEASE_VERSION);
+	UI()->DoLabel(&Version, aBuf, 12.0f, CUI::ALIGN_RIGHT);
 
 	if(NewPage != -1)
 		SetMenuPage(NewPage);

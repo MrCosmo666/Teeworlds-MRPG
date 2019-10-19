@@ -27,9 +27,9 @@ endif()
 
 if(POLICY CMP0048)
   cmake_policy(SET CMP0048 NEW)
-  project(teeworlds VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
+  project(mmoteeworlds VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 else()
-  project(teeworlds)
+  project(mmoteeworlds)
   set(PROJECT_VERSION_MAJOR ${VERSION_MAJOR})
   set(PROJECT_VERSION_MINOR ${VERSION_MINOR})
   set(PROJECT_VERSION_PATCH ${VERSION_PATCH})
@@ -95,8 +95,8 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
   src/game/version.h
 )
 
-set(SERVER_EXECUTABLE teeworlds_srv CACHE STRING "Name of the built server executable")
-set(CLIENT_EXECUTABLE teeworlds CACHE STRING "Name of the build client executable")
+set(SERVER_EXECUTABLE mmoteeworlds_srv CACHE STRING "Name of the built server executable")
+set(CLIENT_EXECUTABLE mmoteeworlds CACHE STRING "Name of the build client executable")
 
 ########################################################################
 # Download dependencies
