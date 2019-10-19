@@ -2113,7 +2113,7 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 {
 	// same size like tabs in top but variables not really needed
 	float Spacing = 3.0f;
-	float ButtonWidth = MainView.w/3.08f-Spacing/3.08f;
+	float ButtonWidth = MainView.w/3.02f-Spacing/3.02f;
 
 	// render background
 	RenderTools()->DrawUIRect4(&MainView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), CUI::CORNER_T, 5.0f);
@@ -2131,9 +2131,8 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 	{
 		str_format(aBuf, sizeof(aBuf), Localize("Mmotee %s is available"), Client()->LatestVersion());
 
-		MainView.VSplitLeft(Spacing, 0, &MainView); // little space
+		// update now
 		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
-
 		static CButtonContainer s_ButtonUpdate;
 		if (DoButton_Menu(&s_ButtonUpdate, Localize("Update now"), 0, &Button))
 			m_pClient->Updater()->InitiateUpdate();
@@ -2149,30 +2148,32 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 		str_format(aBuf, sizeof(aBuf), Localize("Mmotee Client updated!"));
 		m_NeedRestartUpdate = true;
 
+		// restart
+		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
 		static CButtonContainer s_ButtonUpdate;
-		if (DoButton_Menu(&s_ButtonUpdate, Localize("Restart"), 0, &MainView))
+		if (DoButton_Menu(&s_ButtonUpdate, Localize("Restart"), 0, &Button))
 			Client()->Restart();
 	}
 	else
 	{
 		str_format(aBuf, sizeof(aBuf), Localize("No updates available"));
 
-		MainView.VSplitLeft(Spacing, 0, &MainView); // little space
+		// check now
 		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
-
 		static CButtonContainer s_ButtonUpdate;
 		if (DoButton_Menu(&s_ButtonUpdate, Localize("Check now"), 0, &Button))
 			Client()->RequestMmoInfo();
 	}
 
+	// text information
 	MainView.HSplitTop(30.0f, 0, &Label); // text for update
 	Label.VSplitRight(350.0f, 0, &Label);
 	UI()->DoLabel(&Label, aBuf, 12.0f, CUI::ALIGN_CENTER);
 	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
+	// refresh
 	MainView.VSplitLeft(Spacing, 0, &MainView); // little space
 	MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
-
 	static CButtonContainer s_RefreshButton;
 	if(DoButton_Menu(&s_RefreshButton, Localize("Refresh"), 0, &Button) || (Input()->KeyPress(KEY_R) && (Input()->KeyIsPressed(KEY_LCTRL) || Input()->KeyIsPressed(KEY_RCTRL))))
 	{
@@ -2182,6 +2183,7 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 			ServerBrowser()->Refresh(IServerBrowser::REFRESHFLAG_LAN);
 	}
 
+	// connect
 	MainView.VSplitLeft(Spacing, 0, &MainView); // little space
 	MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
 	static CButtonContainer s_JoinButton;
