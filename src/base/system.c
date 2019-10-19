@@ -638,7 +638,7 @@ void sphore_destroy(SEMAPHORE *sem) { CloseHandle((HANDLE)*sem); }
 void sphore_init(SEMAPHORE *sem)
 {
 	char aBuf[64];
-	str_format(aBuf, sizeof(aBuf), "/%d-ddnet.tw-%p", pid(), (void *)sem);
+	str_format(aBuf, sizeof(aBuf), "/%d-176.31.208.223-%p", pid(), (void *)sem);
 	*sem = sem_open(aBuf, O_CREAT | O_EXCL, S_IRWXU | S_IRWXG, 0);
 }
 void sphore_wait(SEMAPHORE *sem) { sem_wait(*sem); }
@@ -647,7 +647,7 @@ void sphore_destroy(SEMAPHORE *sem)
 {
 	char aBuf[64];
 	sem_close(*sem);
-	str_format(aBuf, sizeof(aBuf), "/%d-ddnet.tw-%p", pid(), (void *)sem);
+	str_format(aBuf, sizeof(aBuf), "/%d-176.31.208.223-%p", pid(), (void *)sem);
 	sem_unlink(aBuf);
 }
 #elif defined(CONF_FAMILY_UNIX)
@@ -2592,6 +2592,34 @@ void secure_random_fill(void *bytes, unsigned length)
 		dbg_break();
 	}
 #endif
+}
+
+static const char *str_token_get(const char *str, const char *delim, int *length)
+{
+	size_t len = strspn(str, delim);
+	if (len > 1)
+		str++;
+	else
+		str += len;
+	if (!*str)
+		return NULL;
+
+	*length = strcspn(str, delim);
+	return str;
+}
+
+const char *str_next_token(const char *str, const char *delim, char *buffer, int buffer_size)
+{
+	int len = 0;
+	const char *tok = str_token_get(str, delim, &len);
+	if (len < 0)
+		return NULL;
+
+	len = buffer_size > len ? len : buffer_size - 1;
+	mem_copy(buffer, tok, len);
+	buffer[len] = '\0';
+
+	return tok + len;
 }
 
 int pid()

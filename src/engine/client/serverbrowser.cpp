@@ -74,20 +74,20 @@ CServerBrowser::CServerBrowser()
 	m_ActServerlistType = 0;
 	m_BroadcastTime = 0;
 	m_MasterRefreshTime = 0;
-	m_pDDNetInfo = 0;
+	m_pMmoInfo = 0;
 }
 
 CServerBrowser::~CServerBrowser()
 {
-	if (m_pDDNetInfo)
-		json_value_free(m_pDDNetInfo);
+	if (m_pMmoInfo)
+		json_value_free(m_pMmoInfo);
 }
 
 //mmotee
-void CServerBrowser::LoadDDNetInfoJson()
+void CServerBrowser::LoadMmoInfoJson()
 {
 	IStorage *pStorage = Kernel()->RequestInterface<IStorage>();
-	IOHANDLE File = pStorage->OpenFile(DDNET_INFO, IOFLAG_READ, IStorage::TYPE_SAVE);
+	IOHANDLE File = pStorage->OpenFile(MMOTEE_INFO, IOFLAG_READ, IStorage::TYPE_SAVE);
 
 	if (!File)
 		return;
@@ -105,26 +105,24 @@ void CServerBrowser::LoadDDNetInfoJson()
 	io_read(File, pBuf, Length);
 	io_close(File);
 
-	if (m_pDDNetInfo)
-		json_value_free(m_pDDNetInfo);
+	if (m_pMmoInfo)
+		json_value_free(m_pMmoInfo);
 
-	m_pDDNetInfo = json_parse(pBuf, Length);
+	m_pMmoInfo = json_parse(pBuf, Length);
 
 	free(pBuf);
 
-	if (m_pDDNetInfo && m_pDDNetInfo->type != json_object)
+	if (m_pMmoInfo && m_pMmoInfo->type != json_object)
 	{
-		json_value_free(m_pDDNetInfo);
-		m_pDDNetInfo = 0;
+		json_value_free(m_pMmoInfo);
+		m_pMmoInfo = 0;
 	}
 }
 
-
-const json_value *CServerBrowser::LoadDDNetInfo()
+const json_value *CServerBrowser::LoadMmoInfo()
 {
-	LoadDDNetInfoJson();
-
-	return m_pDDNetInfo;
+	LoadMmoInfoJson();
+	return m_pMmoInfo;
 }
 
 void CServerBrowser::Init(class CNetClient *pNetClient, const char *pNetVersion)

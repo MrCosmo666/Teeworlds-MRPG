@@ -111,7 +111,7 @@ public:
 
 	// mmotee
 	virtual int ClientFPS() const = 0;
-	virtual void RequestDDNetInfo() = 0;
+	virtual void RequestMmoInfo() = 0;
 	virtual bool EditorHasUnsavedData() = 0;
 	virtual void Restart() = 0;
 

@@ -2113,15 +2113,14 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 {
 	// same size like tabs in top but variables not really needed
 	float Spacing = 3.0f;
-	float ButtonWidth = MainView.w/2.0f-Spacing/2.0f;
+	float ButtonWidth = MainView.w/3.08f-Spacing/3.08f;
 
 	// render background
 	RenderTools()->DrawUIRect4(&MainView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), CUI::CORNER_T, 5.0f);
 
 	// back to main menu
 	CUIRect Button, Label;
-	MainView.HSplitTop(25.0f, &MainView, 0);
-	MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
+	MainView.HSplitTop(20.0f, &MainView, 0);
 
 	bool NeedUpdate = str_comp(Client()->LatestVersion(), "0");
 	char aBuf[256];
@@ -2130,35 +2129,47 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 	// Update Button
 	if (NeedUpdate && State <= IUpdater::CLEAN)
 	{
-		str_format(aBuf, sizeof(aBuf), Localize("DDNet %s is available:"), Client()->LatestVersion());
-		MainView.VSplitLeft(TextRender()->TextWidth(0, 14.0f, aBuf, -1, -1.0f) + 10.0f, &MainView, &Button);
-		Button.VSplitLeft(10.0f, &Button, 0);
+		str_format(aBuf, sizeof(aBuf), Localize("Mmotee %s is available"), Client()->LatestVersion());
+
+		MainView.VSplitLeft(Spacing, 0, &MainView); // little space
+		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
+
 		static CButtonContainer s_ButtonUpdate;
 		if (DoButton_Menu(&s_ButtonUpdate, Localize("Update now"), 0, &Button))
 			m_pClient->Updater()->InitiateUpdate();
 	}
 	else if (State >= IUpdater::GETTING_MANIFEST && State < IUpdater::NEED_RESTART)
-		str_format(aBuf, sizeof(aBuf), Localize("Updating..."));
+	{
+		char aCurrentFile[64];
+		m_pClient->Updater()->GetCurrentFile(aCurrentFile, sizeof(aCurrentFile));
+		str_format(aBuf, sizeof(aBuf), Localize("Downloading %s"), aCurrentFile);
+	}
 	else if (State == IUpdater::NEED_RESTART)
 	{
-		str_format(aBuf, sizeof(aBuf), Localize("DDNet Client updated!"));
+		str_format(aBuf, sizeof(aBuf), Localize("Mmotee Client updated!"));
 		m_NeedRestartUpdate = true;
+
+		static CButtonContainer s_ButtonUpdate;
+		if (DoButton_Menu(&s_ButtonUpdate, Localize("Restart"), 0, &MainView))
+			Client()->Restart();
 	}
 	else
 	{
 		str_format(aBuf, sizeof(aBuf), Localize("No updates available"));
-		MainView.VSplitLeft(TextRender()->TextWidth(0, 14.0f, aBuf, -1, -1.0f) + 10.0f, &MainView, &Button);
-		Button.VSplitLeft(10.0f, &Button, 0);
+
+		MainView.VSplitLeft(Spacing, 0, &MainView); // little space
+		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
+
 		static CButtonContainer s_ButtonUpdate;
 		if (DoButton_Menu(&s_ButtonUpdate, Localize("Check now"), 0, &Button))
-		{
-			Client()->RequestDDNetInfo();
-		}
+			Client()->RequestMmoInfo();
 	}
 
-	UI()->DoLabel(&MainView, aBuf, 12.0f, CUI::ALIGN_LEFT);
+	MainView.HSplitTop(30.0f, 0, &Label); // text for update
+	Label.VSplitRight(350.0f, 0, &Label);
+	UI()->DoLabel(&Label, aBuf, 12.0f, CUI::ALIGN_CENTER);
 	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-/*
+
 	MainView.VSplitLeft(Spacing, 0, &MainView); // little space
 	MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
 
@@ -2170,7 +2181,7 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 		else if(m_MenuPage == PAGE_LAN)
 			ServerBrowser()->Refresh(IServerBrowser::REFRESHFLAG_LAN);
 	}
-*/
+
 	MainView.VSplitLeft(Spacing, 0, &MainView); // little space
 	MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
 	static CButtonContainer s_JoinButton;
@@ -2289,7 +2300,7 @@ void CMenus::RenderServerbrowser(CUIRect MainView)
 	float Spacing = 3.0f;
 	float ButtonWidth = (BottomBox.w/6.0f)-(Spacing*5.0)/6.0f;
 	BottomBox.VSplitRight(20.0f, &BottomBox, 0);
-	BottomBox.VSplitRight(ButtonWidth*2.0f+Spacing, 0, &BottomBox);
+	BottomBox.VSplitRight(ButtonWidth*3.0f+Spacing, 0, &BottomBox);
 
 	RenderServerbrowserBottomBox(BottomBox);
 

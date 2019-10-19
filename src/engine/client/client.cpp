@@ -300,7 +300,7 @@ CClient::CClient() : m_DemoPlayer(&m_SnapshotDelta), m_DemoRecorder(&m_SnapshotD
 	m_MapdownloadTotalsize = -1;
 
 	//mmotee
-	m_pDDNetInfoTask = NULL;
+	m_pMmoInfoTask = NULL;
 	m_aNews[0] = '\0';
 
 	m_CurrentInput = 0;
@@ -746,20 +746,20 @@ void CClient::DebugRender()
 }
 
 //mmotee
-void CClient::ResetDDNetInfo()
+void CClient::ResetMmoInfo()
 {
-	if (m_pDDNetInfoTask)
+	if (m_pMmoInfoTask)
 	{
-		m_pDDNetInfoTask->Abort();
-		m_pDDNetInfoTask = NULL;
+		m_pMmoInfoTask->Abort();
+		m_pMmoInfoTask = NULL;
 	}
 }
 
-void CClient::FinishDDNetInfo()
+void CClient::FinishMmoInfo()
 {
-	ResetDDNetInfo();
-	m_pStorage->RenameFile(DDNET_INFO_TMP, DDNET_INFO, IStorage::TYPE_SAVE);
-	LoadDDNetInfo();
+	ResetMmoInfo();
+	m_pStorage->RenameFile(MMOTEE_INFO_TMP, MMOTEE_INFO, IStorage::TYPE_SAVE);
+	LoadMmoInfo();
 }
 
 typedef std::tuple<int, int, int> Version;
@@ -785,14 +785,14 @@ Version ToVersion(char *pStr)
 	return std::make_tuple(version[0], version[1], version[2]);
 }
 
-void CClient::LoadDDNetInfo()
+void CClient::LoadMmoInfo()
 {
-	const json_value *pDDNetInfo = m_ServerBrowser.LoadDDNetInfo();
+	const json_value *pMmoInfo = m_ServerBrowser.LoadMmoInfo();
 
-	if (!pDDNetInfo)
+	if (!pMmoInfo)
 		return;
 
-	const json_value *pVersion = json_object_get(pDDNetInfo, "version");
+	const json_value *pVersion = json_object_get(pMmoInfo, "version");
 	if (pVersion->type == json_string)
 	{
 		char aNewVersionStr[64];
@@ -810,22 +810,23 @@ void CClient::LoadDDNetInfo()
 		}
 	}
 
-	const json_value *pNews = json_object_get(pDDNetInfo, "news");
+	const json_value *pNews = json_object_get(pMmoInfo, "news");
 	if (pNews->type == json_string)
 	{
 		const char *pNewsString = json_string_get(pNews);
 
+		dbg_msg("test", "%s", pNewsString);
 		str_copy(m_aNews, pNewsString, sizeof(m_aNews));
 	}
 }
 
-void CClient::RequestDDNetInfo()
+void CClient::RequestMmoInfo()
 {
 	char aUrl[256];
-	str_copy(aUrl, "http://176.31.208.223/informa", sizeof(aUrl));
+	str_copy(aUrl, "http://176.31.208.223/update/info", sizeof(aUrl));
 
-	m_pDDNetInfoTask = std::make_shared<CGetFile>(Storage(), aUrl, DDNET_INFO_TMP, IStorage::TYPE_SAVE, true);
-	Engine()->AddJob(m_pDDNetInfoTask);
+	m_pMmoInfoTask = std::make_shared<CGetFile>(Storage(), aUrl, MMOTEE_INFO_TMP, IStorage::TYPE_SAVE, true);
+	Engine()->AddJob(m_pMmoInfoTask);
 }
 
 void CClient::Restart()
@@ -1802,18 +1803,19 @@ void CClient::Update()
 	// pump the network
 	PumpNetwork();
 
-	if (m_pDDNetInfoTask)
+	// update mmo-client
+	if (m_pMmoInfoTask)
 	{
-		if (m_pDDNetInfoTask->State() == HTTP_DONE)
-			FinishDDNetInfo();
-		else if (m_pDDNetInfoTask->State() == HTTP_ERROR)
+		if (m_pMmoInfoTask->State() == HTTP_DONE)
+			FinishMmoInfo();
+		else if (m_pMmoInfoTask->State() == HTTP_ERROR)
 		{
-			dbg_msg("ddnet-info", "download failed");
-			ResetDDNetInfo();
+			dbg_msg("mmo-info", "download failed");
+			ResetMmoInfo();
 		}
-		else if (m_pDDNetInfoTask->State() == HTTP_ABORTED)
+		else if (m_pMmoInfoTask->State() == HTTP_ABORTED)
 		{
-			m_pDDNetInfoTask = NULL;
+			m_pMmoInfoTask = NULL;
 		}
 	}
 
@@ -2082,6 +2084,9 @@ void CClient::Run()
 
 	// process pending commands
 	m_pConsole->StoreCommands(false);
+
+	// check client update
+	RequestMmoInfo();
 
 	while (1)
 	{

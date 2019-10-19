@@ -33,8 +33,8 @@ public:
 	int LoadingProgression() const;
 
 	// mmotee
-	const json_value *LoadDDNetInfo();
-	void LoadDDNetInfoJson();
+	const json_value *LoadMmoInfo();
+	void LoadMmoInfoJson();
 
 	int NumServers() const { return m_aServerlist[m_ActServerlistType].m_NumServers; }
 	int NumPlayers() const { return m_aServerlist[m_ActServerlistType].m_NumPlayers; }
@@ -97,7 +97,7 @@ private:
 	int m_NeedRefresh;
 
 	//mmotee
-	json_value *m_pDDNetInfo;
+	json_value *m_pMmoInfo;
 
 	// the token is to keep server refresh separated from each other
 	int m_CurrentLanToken;

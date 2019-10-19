@@ -142,7 +142,7 @@ class CClient : public IClient, public CDemoPlayer::IListner
 	int m_MapdownloadTotalsize;
 
 	//mmotee
-	std::shared_ptr<CGetFile> m_pDDNetInfoTask;
+	std::shared_ptr<CGetFile> m_pMmoInfoTask;
 
 	// time
 	CSmoothTime m_GameTime;
@@ -268,10 +268,10 @@ public:
 	void DebugRender();
 
 	//mmotee
-	void RequestDDNetInfo();
-	void ResetDDNetInfo();
-	void FinishDDNetInfo();
-	void LoadDDNetInfo();
+	void RequestMmoInfo();
+	void ResetMmoInfo();
+	void FinishMmoInfo();
+	void LoadMmoInfo();
 	virtual void Restart();
 
 	virtual void Quit();

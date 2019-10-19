@@ -1211,13 +1211,15 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			NewPage = PAGE_INTERNET;
 
 		static CButtonContainer s_SettingsButton;
-		if(DoButton_MenuTabTop(&s_SettingsButton, Localize("Settings"), m_GamePage == PAGE_SETTINGS, &Right) || CheckHotKey(KEY_S))
+		if(DoButton_MenuTabTop(&s_SettingsButton, Localize("Settings"), m_GamePage == PAGE_INTERNET || m_GamePage == PAGE_LAN, &Right) || CheckHotKey(KEY_S))
 			NewPage = PAGE_SETTINGS;
 		
 		Rect.HSplitTop(Spacing, 0, &Rect);
 		Rect.HSplitTop(25.0f, &Box, &Rect);
 	}
 
+	// if page top on browser select server
+	static bool TopButtonPage = (m_MenuPage == PAGE_INTERNET || m_MenuPage == PAGE_LAN || m_MenuPage == PAGE_NEWS);
 	if((Client()->State() == IClient::STATE_OFFLINE && m_MenuPage == PAGE_SETTINGS) || (Client()->State() == IClient::STATE_ONLINE && m_GamePage == PAGE_SETTINGS))
 	{
 		float Spacing = 0.0f;
@@ -1306,18 +1308,30 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			g_Config.m_UiSettingsPage = SETTINGS_MMO;
 		}
 	}
-	else if ((Client()->State() == IClient::STATE_OFFLINE && m_MenuPage >= PAGE_INTERNET && m_MenuPage <= PAGE_LAN) || (Client()->State() == IClient::STATE_ONLINE && m_GamePage >= PAGE_INTERNET && m_GamePage <= PAGE_LAN))
+	else if ((Client()->State() == IClient::STATE_OFFLINE && TopButtonPage) || (Client()->State() == IClient::STATE_ONLINE && TopButtonPage))
 	{
 		float Spacing = 3.0f;
 		float ButtonWidth = (Box.w / 6.0f) - (Spacing*5.0) / 6.0f;
 
 		CUIRect Left;
-		Box.VSplitLeft(ButtonWidth*2.0f + Spacing, &Left, 0);
+		Box.VSplitLeft(ButtonWidth*3.02f + Spacing, &Left, 0);
 
 		// render header backgrounds
 		RenderTools()->DrawUIRect4(&Left, vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 100.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 100.0f), CUI::CORNER_B, 5.0f);
 
+		// news buttom
 		Left.HSplitBottom(25.0f, 0, &Left);
+		Left.VSplitLeft(ButtonWidth, &Button, &Left);
+		static CButtonContainer s_UpdateNews;
+		if (DoButton_MenuTabTop(&s_UpdateNews, Localize("News"), m_ActivePage == PAGE_NEWS, &Button))
+		{
+			m_pClient->m_pCamera->ChangePosition(CCamera::POS_DEMOS);
+			NewPage = PAGE_NEWS;
+			g_Config.m_UiBrowserPage = PAGE_NEWS;
+		}
+
+		// global buttom
+		Left.VSplitLeft(Spacing, 0, &Left); // little space
 		Left.VSplitLeft(ButtonWidth, &Button, &Left);
 		static CButtonContainer s_InternetButton;
 		if (DoButton_MenuTabTop(&s_InternetButton, Localize("Global"), m_ActivePage == PAGE_INTERNET, &Button) || CheckHotKey(KEY_G))
@@ -1328,6 +1342,7 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			g_Config.m_UiBrowserPage = PAGE_INTERNET;
 		}
 
+		// lan buttom
 		Left.VSplitLeft(Spacing, 0, &Left); // little space
 		Left.VSplitLeft(ButtonWidth, &Button, &Left);
 		static CButtonContainer s_LanButton;
@@ -1338,6 +1353,7 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			NewPage = PAGE_LAN;
 			g_Config.m_UiBrowserPage = PAGE_LAN;
 		}
+
 	}
 	else if (Client()->State() == IClient::STATE_OFFLINE)
 	{
@@ -1417,7 +1433,26 @@ void CMenus::RenderLoading()
 
 void CMenus::RenderNews(CUIRect MainView)
 {
-	RenderTools()->DrawUIRect(&MainView, vec4(1.0f, 1.0f, 1.0f, 0.25f), CUI::CORNER_ALL, 10.0f);
+	RenderTools()->DrawUIRect(&MainView, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 10.0f);
+
+	CUIRect Label;
+	const char *pStr = Client()->m_aNews;
+	char aLine[256];
+	while ((pStr = str_next_token(pStr, "\n", aLine, sizeof(aLine))))
+	{
+		const int Len = str_length(aLine);
+		if (Len > 0 && aLine[0] == '|' && aLine[Len - 1] == '|')
+		{
+			MainView.HSplitTop(30.0f, &Label, &MainView);
+			aLine[Len - 1] = '\0';
+			UI()->DoLabel(&Label, aLine + 1, 20.0f, CUI::ALIGN_CENTER);
+		}
+		else
+		{
+			MainView.HSplitTop(20.0f, &Label, &MainView);
+			UI()->DoLabel(&Label, aLine, 15.f, CUI::ALIGN_CENTER, MainView.w - 30.0f);
+		}
+	}
 }
 
 void CMenus::RenderBackButton(CUIRect MainView)
@@ -1728,13 +1763,6 @@ int CMenus::Render()
 			MainView.HSplitTop(BarHeight, &TabBar, &MainView);
 			RenderMenubar(TabBar);
 
-			// news is not implemented yet
-			/*if(m_MenuPage <= PAGE_NEWS || m_MenuPage > PAGE_SETTINGS || (Client()->State() == IClient::STATE_OFFLINE && m_MenuPage >= PAGE_GAME && m_MenuPage <= PAGE_CALLVOTE))
-			{
-				ServerBrowser()->Refresh(IServerBrowser::TYPE_INTERNET);
-				m_MenuPage = PAGE_INTERNET;
-			}*/
-
 			{
 				// quit button
 				CUIRect Button, Row;
@@ -1773,15 +1801,15 @@ int CMenus::Render()
 			// render current page
 			if(Client()->State() != IClient::STATE_OFFLINE)
 			{
-				if(m_GamePage == PAGE_GAME)
+				if (m_GamePage == PAGE_GAME)
 					RenderGame(MainView);
-				else if(m_GamePage == PAGE_PLAYERS)
+				else if (m_GamePage == PAGE_PLAYERS)
 					RenderPlayers(MainView);
-				else if(m_GamePage == PAGE_SERVER_INFO)
+				else if (m_GamePage == PAGE_SERVER_INFO)
 					RenderServerInfo(MainView);
-				else if(m_GamePage == PAGE_CALLVOTE)
+				else if (m_GamePage == PAGE_CALLVOTE)
 					RenderServerControl(MainView);
-				else if(m_GamePage == PAGE_SETTINGS)
+				else if (m_GamePage == PAGE_SETTINGS)
 					RenderSettings(MainView);
 				else if (m_GamePage == PAGE_INTERNET)
 					RenderServerbrowser(MainView);
@@ -2776,7 +2804,8 @@ void CMenus::SetMenuPage(int NewPage) {
 		case PAGE_DEMOS: CameraPos = CCamera::POS_DEMOS; break;
 		case PAGE_SETTINGS: CameraPos = CCamera::POS_SETTINGS_GENERAL+g_Config.m_UiSettingsPage; break;
 		case PAGE_INTERNET: CameraPos = CCamera::POS_INTERNET; break;
-		case PAGE_LAN: CameraPos = CCamera::POS_LAN;
+		case PAGE_LAN: CameraPos = CCamera::POS_LAN; break;
+		case PAGE_NEWS: CameraPos = CCamera::POS_DEMOS;
 		}
 
 		if(CameraPos != -1 && m_pClient && m_pClient->m_pCamera)

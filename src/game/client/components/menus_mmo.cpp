@@ -554,7 +554,6 @@ void CMenus::RenderFontSelection(CUIRect MainView)
 			Item.m_Rect.y += 2.0f;
 			UI()->DoLabel(&Item.m_Rect, r.front().m_Name, Item.m_Rect.h*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
 		}
-	
 	}
 
 	s_SelectedFont = UiDoListboxEnd(&s_FontList, 0);
