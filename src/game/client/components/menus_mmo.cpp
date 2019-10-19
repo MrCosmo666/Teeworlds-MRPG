@@ -36,32 +36,23 @@ void CMenus::RenderSettingsMmo(CUIRect MainView)
 	{
 		Tabbar.VSplitLeft(182.5f, &Button, &Tabbar);
 
-		static CButtonContainer s_Buttons[4] = { 0 };
-		if (DoButton_MenuTabTop(&s_Buttons[i], Tabs[i], Client()->State() == IClient::STATE_OFFLINE && s_SettingsPage == i, &Button,
-			s_SettingsPage == i ? 1.0f : 1.5f, 1.0f, 0))
+		static CButtonContainer s_Buttons[4];
+		if (DoButton_MenuTabTop(&s_Buttons[i], Tabs[i], Client()->State() == IClient::STATE_OFFLINE && s_SettingsPage == i, &Button, s_SettingsPage == i ? 1.0f : 1.5f, 1.0f, 0))
 			s_SettingsPage = i;
 	}
 
-	MainView.HSplitTop(-10.0f, &Label, &MainView);
-
-	if (s_SettingsPage == 0)
-		RenderSettingsMmoGeneral(MainView, 0);
-	else if (s_SettingsPage == 1)
-		RenderSettingsMmoGeneral(MainView, 1);
-	else if (s_SettingsPage == 2)
-		RenderSettingsMmoGeneral(MainView, 2);
-	else if (s_SettingsPage == 3)
-		RenderSettingsMmoGeneral(MainView, 3);
-
-	Label.y += 1.0f;
-	UI()->DoLabel(&Label, Tabs[s_SettingsPage], 20.0f, CUI::ALIGN_CENTER);
-	Label.y += 16.0f;
+	// space for information
+	MainView.HSplitTop(g_Config.m_JoystickSens, &MainView, &Label);
 	UI()->DoLabel(&Label, Information[s_SettingsPage], 14.0f, CUI::ALIGN_CENTER);
+
+	// draw menu pages
+	RenderSettingsMmoGeneral(MainView, s_SettingsPage);
 }
 
 void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 {
-	CUIRect Button, MmoSet, BottomView, Background, MainSave = MainView;
+	CUIRect Button;
+	RenderTools()->DrawUIRect4(&MainView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), 0, 5.0f);
 
 	// render MmoSet menu background
 	float ButtonHeight = 20.0f;
@@ -69,43 +60,21 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 
 	// visual
 	if (Page == 0)
-	{
-		int NumOptions = 3;
-		float BackgroundHeight = (float)(NumOptions + 3) * ButtonHeight + (float)NumOptions * Spacing;
-		float TotalHeight = BackgroundHeight;
-
-		// background
-		MainView.HSplitBottom(MainView.h - TotalHeight + 40.0f, &MainView, &BottomView);
-		MainView.HSplitTop(10.0f, 0, &Background);
-		MainView.HSplitTop(10.0f, 0, &MainView);
-		MainView.HSplitTop(BackgroundHeight, &MmoSet, &MainView);
-
-		RenderMmoSettingsTexture(MainSave, Background);
-	}
-
+		RenderMmoSettingsTexture(MainView, MainView);
 	if (Page == 1)
 	{
-		int NumOptions = 4;
-		float BackgroundHeight = (float)(NumOptions + 3) * ButtonHeight + (float)NumOptions * Spacing;
-		float TotalHeight = BackgroundHeight;
-		
-		// background
-		MainView.HSplitBottom(MainView.h - TotalHeight + 40.0f, &MainView, &BottomView);
-		MainView.HSplitTop(10.0f, 0, &Background);
-		RenderTools()->DrawUIRect(&Background, vec4(0.0f, 0.0f, 0.0f, 0.8f), CUI::ALIGN_CENTER, 0.0f);
-		MainView.HSplitTop(10.0f, 0, &MainView);
-		MainView.HSplitTop(BackgroundHeight, &MmoSet, &MainView);
+		MainView.HSplitTop(ButtonHeight, &Button, &MainView);
+		UI()->DoLabel(&Button, "Basic settings", 14.0f, CUI::ALIGN_CENTER);
 
-		// buttons
-		MmoSet.HSplitTop(40.0f, 0, &MmoSet);
-		MmoSet.HSplitTop(ButtonHeight, &Button, &MmoSet);
+		// vanilla damage ind
+		MainView.HSplitTop(ButtonHeight, &Button, &MainView);
 		Button.VMargin(ButtonHeight, &Button);
-
 		static int s_ButtonDmgInd = 0;
 		if (DoButton_CheckBox(&s_ButtonDmgInd, Localize("Vanila Damage Ind (Vanilla)"), g_Config.m_ClMmoDamageInd, &Button))
 			g_Config.m_ClMmoDamageInd ^= 1;
 
-		MmoSet.HSplitTop(ButtonHeight, &Button, &MmoSet);
+		// show colored
+		MainView.HSplitTop(ButtonHeight, &Button, &MainView);
 		Button.VMargin(ButtonHeight, &Button);
 		static int s_ButtonColorVote = 0;
 		if (DoButton_CheckBox(&s_ButtonColorVote, Localize("Show Colored Vote (Mmo Server)"), g_Config.m_ClShowColoreVote, &Button))
@@ -114,20 +83,11 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 
 	if (Page == 2)
 	{
-		int NumOptions = 3;
-		float BackgroundHeight = (float)(NumOptions + 3) * ButtonHeight + (float)NumOptions * Spacing;
-		float TotalHeight = BackgroundHeight;
-
-		// background
-		MainView.HSplitBottom(MainView.h - TotalHeight + 40.0f, &MainView, &BottomView);
-		MainView.HSplitTop(10.0f, 0, &Background);
-		RenderTools()->DrawUIRect(&Background, vec4(0.0f, 0.0f, 0.0f, 0.8f), CUI::ALIGN_CENTER, 0.0f);
-		MainView.HSplitTop(10.0f, 0, &MainView);
-		MainView.HSplitTop(BackgroundHeight, &MmoSet, &MainView);
+		MainView.HSplitTop(ButtonHeight, &Button, &MainView);
+		UI()->DoLabel(&Button, "General effects", 14.0f, CUI::ALIGN_CENTER);
 
 		// buttons
-		MmoSet.HSplitTop(40.0f, 0, &MmoSet);
-		MmoSet.HSplitTop(ButtonHeight, &Button, &MmoSet);
+		MainView.HSplitTop(ButtonHeight, &Button, &MainView);
 		Button.VMargin(ButtonHeight, &Button);
 
 		const char* Name[4] = { "Effects: All", "Effects: Enchant", "Effects: Items", "Effects: Disable" };
@@ -149,11 +109,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 	else if (s_ControlPage == 5) g_Config.m_Texture = 5;
 
 	// render game menu backgrounds
-	MainView.HSplitTop(50.0f, 0, &MainView);
-	MainView.HSplitBottom(80.0f, &MainView, 0);
 	MainView.HSplitTop(20.0f, &TabBar, &MainView);
-	MainView.Margin(10.0f, &MainView);
-	RenderTools()->DrawUIRect(&Background, vec4(0.0f, 0.0f, 0.0f, 0.8f), CUI::ALIGN_CENTER, 0.0f);
 
 	// tab bar
 	{
@@ -187,6 +143,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			s_ControlPage = 5;
 	}
 
+	// changer game.png
 	if (g_Config.m_Texture == 0)
 	{
 		static sorted_array<const CgSkins::CgSkin*> s_paSkinList;
@@ -198,10 +155,6 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			for (int i = 0; i < m_pClient->m_pgSkins->Num(); ++i)
 			{
 				const CgSkins::CgSkin* s = m_pClient->m_pgSkins->Get(i);
-				// no special skins
-				if (s->m_aName[0] == 'x' && s->m_aName[1] == '_')
-					continue;
-
 				s_paSkinList.add(s);
 			}
 			m_RefreshSkinSelector = false;
@@ -209,14 +162,13 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 
 		m_pSelectedSkin = 0;
 		int OldSelected = -1;
-		UiDoListboxHeader(&s_ListBoxState, &MainView, Localize(""), 20.0f, 2.0f);
+		UiDoListboxHeader(&s_ListBoxState, &MainView, Localize("Game"), 20.0f, 2.0f);
 		UiDoListboxStart(&s_ListBoxState, &m_RefreshSkinSelector, 160.0f, 0, s_paSkinList.size(), 3, OldSelected);
 
 		for (int i = 0; i < s_paSkinList.size(); ++i)
 		{
 			const CgSkins::CgSkin* s = s_paSkinList[i];
-			if (s == 0)
-				continue;
+			if (s == 0) continue;
 			if (str_comp(s->m_aName, g_Config.m_GameTexture) == 0)
 				OldSelected = i;
 
@@ -248,6 +200,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		OldSelected = NewSelected;
 	}
 
+	// changer emoticion
 	else if (g_Config.m_Texture == 1)
 	{
 		static sorted_array<const CeSkins::CeSkin*> s_paSkinList;
@@ -259,10 +212,6 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			for (int i = 0; i < m_pClient->m_peSkins->Num(); ++i)
 			{
 				const CeSkins::CeSkin* s = m_pClient->m_peSkins->Get(i);
-				// no special skins
-				if (s->m_aName[0] == 'x' && s->m_aName[1] == '_')
-					continue;
-
 				s_paSkinList.add(s);
 			}
 			m_RefreshSkinSelector = false;
@@ -270,14 +219,13 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 
 		m_pSelectedSkin = 0;
 		int OldSelected = -1;
-		UiDoListboxHeader(&s_ListBoxState, &MainView, Localize(""), 20.0f, 2.0f);
+		UiDoListboxHeader(&s_ListBoxState, &MainView, Localize("Emoticions"), 20.0f, 2.0f);
 		UiDoListboxStart(&s_ListBoxState, &m_RefreshSkinSelector, 160.0f, 0, s_paSkinList.size(), 3, OldSelected);
 
 		for (int i = 0; i < s_paSkinList.size(); ++i)
 		{
 			const CeSkins::CeSkin* s = s_paSkinList[i];
-			if (s == 0)
-				continue;
+			if (s == 0) continue;
 			if (str_comp(s->m_aName, g_Config.m_GameEmoticons) == 0)
 				OldSelected = i;
 
@@ -309,6 +257,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		OldSelected = NewSelected;
 	}
 
+	// changer cursors
 	else if (g_Config.m_Texture == 2)
 	{
 		static sorted_array<const CcSkins::CcSkin*> s_paSkinList;
@@ -320,10 +269,6 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			for (int i = 0; i < m_pClient->m_pcSkins->Num(); ++i)
 			{
 				const CcSkins::CcSkin* s = m_pClient->m_pcSkins->Get(i);
-				// no special skins
-				if (s->m_aName[0] == 'x' && s->m_aName[1] == '_')
-					continue;
-
 				s_paSkinList.add(s);
 			}
 			m_RefreshSkinSelector = false;
@@ -331,14 +276,13 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 
 		m_pSelectedSkin = 0;
 		int OldSelected = -1;
-		UiDoListboxHeader(&s_ListBoxState, &MainView, Localize(""), 20.0f, 2.0f);
+		UiDoListboxHeader(&s_ListBoxState, &MainView, Localize("Cursors"), 20.0f, 2.0f);
 		UiDoListboxStart(&s_ListBoxState, &m_RefreshSkinSelector, 160.0f, 0, s_paSkinList.size(), 3, OldSelected);
 
 		for (int i = 0; i < s_paSkinList.size(); ++i)
 		{
 			const CcSkins::CcSkin* s = s_paSkinList[i];
-			if (s == 0)
-				continue;
+			if (s == 0) continue;
 			if (str_comp(s->m_aName, g_Config.m_GameCursor) == 0)
 				OldSelected = i;
 
@@ -370,6 +314,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		OldSelected = NewSelected;
 	}
 
+	// changer particles
 	else if (g_Config.m_Texture == 3)
 	{
 		static sorted_array<const CpSkins::CpSkin*> s_paSkinList;
@@ -381,10 +326,6 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			for (int i = 0; i < m_pClient->m_ppSkins->Num(); ++i)
 			{
 				const CpSkins::CpSkin* s = m_pClient->m_ppSkins->Get(i);
-				// no special skins
-				if (s->m_aName[0] == 'x' && s->m_aName[1] == '_')
-					continue;
-
 				s_paSkinList.add(s);
 			}
 			m_RefreshSkinSelector = false;
@@ -392,14 +333,13 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 
 		m_pSelectedSkin = 0;
 		int OldSelected = -1;
-		UiDoListboxHeader(&s_ListBoxState, &MainView, Localize(""), 20.0f, 2.0f);
+		UiDoListboxHeader(&s_ListBoxState, &MainView, Localize("Particles"), 20.0f, 2.0f);
 		UiDoListboxStart(&s_ListBoxState, &m_RefreshSkinSelector, 160.0f, 0, s_paSkinList.size(), 3, OldSelected);
 
 		for (int i = 0; i < s_paSkinList.size(); ++i)
 		{
 			const CpSkins::CpSkin* s = s_paSkinList[i];
-			if (s == 0)
-				continue;
+			if (s == 0) continue;
 			if (str_comp(s->m_aName, g_Config.m_GameParticles) == 0)
 				OldSelected = i;
 
@@ -431,6 +371,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		OldSelected = NewSelected;
 	}
 
+	// changer entities
 	else if (g_Config.m_Texture == 4)
 	{
 		static sorted_array<const CEnSkins::CEnSkin*> s_paSkinList;
@@ -442,10 +383,6 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			for (int i = 0; i < m_pClient->m_penSkins->Num(); ++i)
 			{
 				const CEnSkins::CEnSkin* s = m_pClient->m_penSkins->Get(i);
-				// no special skins
-				if (s->m_aName[0] == 'x' && s->m_aName[1] == '_')
-					continue;
-
 				s_paSkinList.add(s);
 			}
 			m_RefreshSkinSelector = false;
@@ -453,7 +390,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 
 		m_pSelectedSkin = 0;
 		int OldSelected = -1;
-		UiDoListboxHeader(&s_ListBoxState, &MainView, Localize(""), 20.0f, 2.0f);
+		UiDoListboxHeader(&s_ListBoxState, &MainView, Localize("Entities"), 20.0f, 2.0f);
 		UiDoListboxStart(&s_ListBoxState, &m_RefreshSkinSelector, 160.0f, 0, s_paSkinList.size(), 3, OldSelected);
 
 		for (int i = 0; i < s_paSkinList.size(); ++i)
@@ -470,7 +407,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 				CUIRect Label;
 				Item.m_Rect.Margin(5.0f, &Item.m_Rect);
 				Item.m_Rect.HSplitBottom(10.0f, &Item.m_Rect, &Label);
-				Item.m_Rect.HSplitTop(5.0f, 0, &Item.m_Rect); // some margin from the top
+				Item.m_Rect.HSplitTop(5.0f, 0, &Item.m_Rect); // some margin from the topUiDoListboxStart(&s_FontList, &s_Fade[0], 20.0f, Localize("Fonts"), s_Fonts.size(), 1, s_SelectedFont);
 
 				Graphics()->TextureSet(s_paSkinList[i]->m_Texture);
 				Graphics()->QuadsBegin();
