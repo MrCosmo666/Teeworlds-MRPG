@@ -1370,10 +1370,10 @@ if(CLIENT)
     contacts.h
     graphics_threaded.cpp
     graphics_threaded.h
-    input.cpp
-    input.h
 	http.cpp
 	http.h
+    input.cpp
+    input.h
     keynames.h
     serverbrowser.cpp
     serverbrowser.h
