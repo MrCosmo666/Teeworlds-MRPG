@@ -6,8 +6,8 @@
 #include <map>
 #include <string>
 
-#define CLIENT_EXEC "teeworlds"
-#define SERVER_EXEC "teeworlds_srv"
+#define CLIENT_EXEC "mmoteeworlds"
+#define SERVER_EXEC "mmoteeworlds_srv"
 
 #if defined(CONF_FAMILY_WINDOWS)
 	#define PLAT_EXT ".exe"

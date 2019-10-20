@@ -493,12 +493,12 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 // item icons
 bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect)
 {
-	// форматируем в название иконки
+	// С„РѕСЂРјР°С‚РёСЂСѓРµРј РїРѕРґ РёРєРѕРЅРєСѓ РїСЂРµРґРјРµС‚Р°
 	char aNameBuf[128];
 	str_format(aNameBuf, sizeof(aNameBuf), "icon_%s", pItem);
 	str_sanitize_filename(aNameBuf);
 
-	// получаем текстуру
+	// РёС‰РёРј РёРєРѕРЅРєСѓ РїСЂРµРґРјРµС‚Р°
 	bool IconFound = false;
 	IGraphics::CTextureHandle Tex;
 	for (int i = 0; i < m_lItemIcons.size(); ++i)
@@ -511,7 +511,7 @@ bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect)
 		}
 	}
 
-	// если иконка найдена рисуем ее
+	// СЂРёСЃСѓРµРј РёРєРѕРЅРєСѓ РїСЂРµРґРјРµС‚Р°
 	if (IconFound)
 	{
 		// draw icon
@@ -520,17 +520,17 @@ bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect)
 
 		Graphics()->TextureSet(Tex);
 		Graphics()->QuadsBegin();
-		Graphics()->SetColor(0.5f, 0.5f, 0.5f, 0.2f); // pow(a, 0.75f) *
+		Graphics()->SetColor(0.8f, 0.8f, 0.8f, 0.8f); // pow(a, 0.75f) *
 		IGraphics::CQuadItem QuadItem(Icon.x, Icon.y, Icon.w, Icon.h);
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
 		Graphics()->QuadsEnd();
 	}
 
-	// возращаем результат
+	// РІРѕР·СЂР°С‰Р°РµРј СЂРµР·СѓР»СЊС‚Р°С‚
 	return IconFound;
 }
 
-// сканируем иконки и добавляем новые
+// СЃРєР°РЅРёСЂСѓРµРј РёС‰РµРј РёРєРѕРЅРєРё РїСЂРµРґРјРµС‚РѕРІ
 int CMenus::ItemIconScan(const char *pName, int IsDir, int DirType, void *pUser)
 {
 	CMenus *pSelf = (CMenus *)pUser;
@@ -547,7 +547,7 @@ int CMenus::ItemIconScan(const char *pName, int IsDir, int DirType, void *pUser)
 	char aBuf[512];
 	str_format(aBuf, sizeof(aBuf), "ui/itemicons/%s", pName);
 
-	// загружаем текстуру
+	// Р·Р°РіСЂСѓР¶Р°РµРј РёРєРѕРЅРєРё
 	CImageInfo Info;
 	if (!pSelf->Graphics()->LoadPNG(&Info, aBuf, DirType) || Info.m_Width != CItemIcon::ITEMICON_SIZE || (Info.m_Height != CItemIcon::ITEMICON_SIZE && Info.m_Height != CItemIcon::ITEMICON_OLDHEIGHT))
 	{
@@ -556,18 +556,18 @@ int CMenus::ItemIconScan(const char *pName, int IsDir, int DirType, void *pUser)
 		return 0;
 	}
 
-	// иконка загрузка
+	// РІС‹РІРѕРґРёРј РІ РєРѕРЅСЃРѕР»СЊ
 	CItemIcon ItemIcon(aItemIconName);
 	str_format(aBuf, sizeof(aBuf), "loaded item icon '%s'", aItemIconName);
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
 
-	// добавляем иконку
+	// СѓСЃС‚Р°РЅР°РІР»РёРІР°РµРј Рё РґРѕР±РѕРІР»СЏРµРј РїСЂРµРґРјРµС‚ РІ РјР°СЃСЃРёРІ
 	ItemIcon.m_IconTexture = pSelf->Graphics()->LoadTextureRaw(CItemIcon::ITEMICON_SIZE, CItemIcon::ITEMICON_SIZE, Info.m_Format, Info.m_pData, Info.m_Format, IGraphics::TEXLOAD_LINEARMIPMAPS);
 	pSelf->m_lItemIcons.add(ItemIcon);
 	return 0;
 }
 
-// рисуем контроль панель сервера
+// Р РёСЃСѓРµРј РєРѕРЅС‚СЂРѕР»СЊ РїР°РЅРµР»СЊ
 bool CMenus::RenderServerControlServer(CUIRect MainView)
 {
 	bool doCallVote = false;
@@ -577,15 +577,20 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 	UiDoListboxHeader(&s_ListBoxState, &List, Localize("Option"), 20.0f, 2.0f);
 	UiDoListboxStart(&s_ListBoxState, &s_VoteList, 20.0f, 0, m_pClient->m_pVoting->m_NumVoteOptions, 1, m_CallvoteSelectedOption, 0, true);
 
-	// инициализируем иконки
+	// РїРµСЂРІР°СЏ Р·Р°РіСЂСѓР·РєР° РёРєРѕРЅРѕРє РїСЂРµРґРјРµС‚РѕРІ
 	static bool s_Init = true;
-	if (s_Init)
+	if (m_pClient->MmoServer() && s_Init)
 	{
 		m_pClient->Storage()->ListDirectory(IStorage::TYPE_ALL, "ui/itemicons", ItemIconScan, this);
 		s_Init = false;
 	}
+	else if(!m_pClient->MmoServer())
+	{
+		pSelf->m_lItemIcons.clear();
+		s_Init = true;
+	}
 
-	// голосования
+	// СЂРёСЃСѓРµРј РіРѕР»РѕСЃРѕРІР°РЅРёСЏ
 	for(CVoteOptionClient *pOption = m_pClient->m_pVoting->m_pFirst; pOption; pOption = pOption->m_pNext)
 	{	
 		if (m_aFilterString[0] && !str_find_nocase(pOption->m_aDescription, m_aFilterString))

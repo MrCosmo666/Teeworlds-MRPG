@@ -156,9 +156,7 @@ bool CUpdater::MoveFile(const char *pFile)
 	}
 	else
 	{
-		str_format(aBuf, sizeof(aBuf), "%s.old", pFile);
-		Success &= m_pStorage->RenameBinaryFile(pFile, aBuf);
-		m_pStorage->RemoveBinaryFile(aBuf);
+		m_pStorage->RemoveBinaryFile(pFile);
 
 		str_format(aBuf, sizeof(aBuf), "update/%s", pFile);
 		Success &= m_pStorage->RenameBinaryFile(aBuf, pFile);
@@ -195,9 +193,9 @@ bool CUpdater::ReplaceClient()
 	// Replace running executable by renaming twice...
 	if(!m_IsWinXP)
 	{
-		m_pStorage->RemoveBinaryFile("teeworlds.old");
-		Success &= m_pStorage->RenameBinaryFile(PLAT_CLIENT_EXEC, "teeworlds.old");
-		Success &= m_pStorage->RenameBinaryFile("update/teeworlds.tmp", PLAT_CLIENT_EXEC);
+		m_pStorage->RemoveBinaryFile("mmoteeworlds.old");
+		Success &= m_pStorage->RenameBinaryFile(PLAT_CLIENT_EXEC, "mmoteeworlds.old");
+		Success &= m_pStorage->RenameBinaryFile("update/mmoteeworlds.tmp", PLAT_CLIENT_EXEC);
 	}
 	#if !defined(CONF_FAMILY_WINDOWS)
 		char aPath[512];
@@ -219,9 +217,9 @@ bool CUpdater::ReplaceServer()
 	bool Success = true;
 
 	//Replace running executable by renaming twice...
-	m_pStorage->RemoveBinaryFile("teeworlds_srv.old");
-	Success &= m_pStorage->RenameBinaryFile(PLAT_SERVER_EXEC, "teeworlds_srv.old");
-	Success &= m_pStorage->RenameBinaryFile("update/teeworlds_srv.tmp", PLAT_SERVER_EXEC);
+	m_pStorage->RemoveBinaryFile("mmoteeworlds_srv.old");
+	Success &= m_pStorage->RenameBinaryFile(PLAT_SERVER_EXEC, "mmoteeworlds_srv.old");
+	Success &= m_pStorage->RenameBinaryFile("update/mmoteeworlds_srv.tmp", PLAT_SERVER_EXEC);
 	#if !defined(CONF_FAMILY_WINDOWS)
 		char aPath[512];
 		m_pStorage->GetBinaryPath(PLAT_SERVER_EXEC, aPath, sizeof aPath);
@@ -331,13 +329,13 @@ void CUpdater::PerformUpdate()
 
 	if(m_ServerUpdate)
 	{
-		FetchFile(PLAT_SERVER_DOWN, "teeworlds_srv.tmp");
-		aLastFile = "teeworlds_srv.tmp";
+		FetchFile(PLAT_SERVER_DOWN, "mmoteeworlds_srv.tmp");
+		aLastFile = "mmoteeworlds_srv.tmp";
 	}
 	if(m_ClientUpdate)
 	{
-		FetchFile(PLAT_CLIENT_DOWN, "teeworlds.tmp");
-		aLastFile = "teeworlds.tmp";
+		FetchFile(PLAT_CLIENT_DOWN, "mmoteeworlds.tmp");
+		aLastFile = "mmoteeworlds.tmp";
 	}
 
 	str_copy(m_aLastFile, aLastFile, sizeof(m_aLastFile));
@@ -373,7 +371,7 @@ void CUpdater::WinXpRestart()
 		if(!bhFile)
 			return;
 		char bBuf[512];
-		str_format(bBuf, sizeof(bBuf), ":_R\r\ndel \"teeworlds.exe\"\r\nif exist \"teeworlds.exe\" goto _R\r\n:_T\r\nmove /y \"update\\teeworlds.tmp\" \"teeworlds.exe\"\r\nif not exist \"teeworlds.exe\" goto _T\r\nstart teeworlds.exe\r\ndel \"du.bat\"\r\n");
+		str_format(bBuf, sizeof(bBuf), ":_R\r\ndel \"mmoteeworlds.exe\"\r\nif exist \"mmoteeworlds.exe\" goto _R\r\n:_T\r\nmove /y \"update\\mmoteeworlds.tmp\" \"mmoteeworlds.exe\"\r\nif not exist \"mmoteeworlds.exe\" goto _T\r\nstart mmoteeworlds.exe\r\ndel \"du.bat\"\r\n");
 		io_write(bhFile, bBuf, str_length(bBuf));
 		io_close(bhFile);
 		shell_execute(aBuf);
