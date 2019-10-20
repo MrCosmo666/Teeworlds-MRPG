@@ -379,6 +379,7 @@ Messages = [
 	NetMessage("Sv_VoteOptionAdd", [
 		NetStringStrict("m_pDescription"),
 		NetArray(NetIntAny("m_pColored"), 3),
+		NetIntAny("m_pIcon"),
 	]),
 
 	NetMessage("Sv_VoteOptionRemove", [

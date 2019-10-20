@@ -24,6 +24,7 @@ struct CVoteOptionClient
 
 	// mmotee
 	int m_Colored[3];
+	int m_IconID;
 };
 
 struct CVoteOptionServer

@@ -97,7 +97,7 @@ CVoting::CVoting()
 	Clear();
 }
 
-void CVoting::AddOption(const char *pDescription, vec3 Color)
+void CVoting::AddOption(const char *pDescription, vec3 Color, int IconID)
 {
 	CVoteOptionClient *pOption;
 	if(m_pRecycleFirst)
@@ -121,6 +121,7 @@ void CVoting::AddOption(const char *pDescription, vec3 Color)
 		m_pFirst = pOption;
 
 	// mmotee
+	pOption->m_IconID = IconID; 
 	pOption->m_Colored[0] = (g_Config.m_ClShowColoreVote ? Color.x : Color.x);
 	pOption->m_Colored[1] = (g_Config.m_ClShowColoreVote ? Color.y : Color.r);
 	pOption->m_Colored[2] = (g_Config.m_ClShowColoreVote ? Color.z : Color.h);
@@ -266,13 +267,9 @@ void CVoting::OnMessage(int MsgType, void *pRawMsg)
 	{
 		CNetMsg_Sv_VoteOptionAdd *pMsg = (CNetMsg_Sv_VoteOptionAdd *)pRawMsg;
 		if (m_pClient->MmoServer())
-		{
-			AddOption(pMsg->m_pDescription, vec3(pMsg->m_pColored[0], pMsg->m_pColored[1], pMsg->m_pColored[2]));
-		}
+			AddOption(pMsg->m_pDescription, vec3(pMsg->m_pColored[0], pMsg->m_pColored[1], pMsg->m_pColored[2]), pMsg->m_pIcon);
 		else
-		{
 			AddOption(pMsg->m_pDescription);
-		}
 	}
 	else if(MsgType == NETMSGTYPE_SV_VOTEOPTIONREMOVE)
 	{

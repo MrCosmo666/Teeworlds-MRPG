@@ -355,6 +355,26 @@ private:
 	void DoGameIcon(const char *pName, const CUIRect *pRect);
 	static int GameIconScan(const char *pName, int IsDir, int DirType, void *pUser);
 
+	// item icons
+	class CItemIcon
+	{
+	public:
+		enum
+		{
+			ITEMICON_SIZE=64,
+			ITEMICON_OLDHEIGHT=192,
+		};
+		CItemIcon() {};
+		CItemIcon(const char *pName) : m_Name(pName) {}
+
+		string m_Name;
+		IGraphics::CTextureHandle m_IconTexture;
+	};
+	array<CItemIcon> m_lItemIcons;
+	bool DoItemIcon(int ItemID, CUIRect pRect);
+	static int ItemIconScan(const char *pName, int IsDir, int DirType, void *pUser);
+
+
 	int64 m_LastInput;
 
 	// loading

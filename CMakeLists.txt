@@ -1103,6 +1103,7 @@ set(EXPECTED_DATA
 	ui/icons/menu.png
 	ui/icons/sidebar.png
 	ui/icons/tools.png
+	ui/itemicons/icon7.png
 	ui/menuimages/demos.png
 	ui/menuimages/editor.png
 	ui/menuimages/local_server.png

@@ -10,6 +10,7 @@
 #include <engine/serverbrowser.h>
 #include <engine/textrender.h>
 #include <engine/shared/config.h>
+#include <engine/storage.h>
 
 #include <generated/protocol.h>
 #include <generated/client_data.h>
@@ -498,8 +499,17 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 	UiDoListboxHeader(&s_ListBoxState, &List, Localize("Option"), 20.0f, 2.0f);
 	UiDoListboxStart(&s_ListBoxState, &s_VoteList, 20.0f, 0, m_pClient->m_pVoting->m_NumVoteOptions, 1, m_CallvoteSelectedOption, 0, true);
 
-	for(CVoteOptionClient *pOption = m_pClient->m_pVoting->m_pFirst; pOption; pOption = pOption->m_pNext)
+	// инициализируем иконки
+	static bool s_Init = true;
+	if (s_Init)
 	{
+		m_pClient->Storage()->ListDirectory(IStorage::TYPE_ALL, "ui/itemicons", ItemIconScan, this);
+		s_Init = false;
+	}
+
+	// голосования
+	for(CVoteOptionClient *pOption = m_pClient->m_pVoting->m_pFirst; pOption; pOption = pOption->m_pNext)
+	{	
 		if (m_aFilterString[0] && !str_find_nocase(pOption->m_aDescription, m_aFilterString))
 			continue; // no match found
 
@@ -514,14 +524,17 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 				(float)pOption->m_Colored[2] / 10, Alpha), CUI::CORNER_ALL, 0.0f);
 		}
 		else if (UI()->MouseInside(&Item.m_Rect))
+		{
 			RenderTools()->DrawUIRect(&Item.m_Rect, vec4(0.0f, 0.0f, 0.0f, 0.15f), CUI::CORNER_ALL, 5.0f);
+		}
 
 		if(Item.m_Visible)
 		{			
 			if (m_pClient->MmoServer() && (pOption->m_Colored[0] >= 30 || pOption->m_Colored[1] >= 30 || pOption->m_Colored[2] >= 30))
 				TextRender()->TextOutlineColor(0.7f, 0.7f, 0.7f, 0.3f);
 
-			Item.m_Rect.VMargin(5.0f, &Item.m_Rect);
+			bool Icon = DoItemIcon(pOption->m_IconID, Item.m_Rect);
+			Item.m_Rect.VMargin((Icon ? 25.0f : 5.0f), &Item.m_Rect);
 			Item.m_Rect.y += 2.0f;
 			UI()->DoLabel(&Item.m_Rect, pOption->m_aDescription, Item.m_Rect.h*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
 

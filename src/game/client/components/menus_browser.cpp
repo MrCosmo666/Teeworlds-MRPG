@@ -2193,6 +2193,7 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 		m_EnterPressed = false;
 	}
 }
+
 void CMenus::DoGameIcon(const char *pName, const CUIRect *pRect)
 {
 	char aNameBuf[128];
@@ -2247,6 +2248,83 @@ int CMenus::GameIconScan(const char *pName, int IsDir, int DirType, void *pUser)
 	pSelf->m_lGameIcons.add(GameIcon);
 	if(!str_comp_nocase(aGameIconName, "mod"))
 		pSelf->m_GameIconDefault = GameIcon.m_IconTexture;
+	return 0;
+}
+
+// item icons
+bool CMenus::DoItemIcon(int ItemID, CUIRect pRect)
+{
+	// форматируем в название иконки
+	char aNameBuf[128];
+	str_format(aNameBuf, sizeof(aNameBuf), "icon%d", ItemID);
+	str_sanitize_filename(aNameBuf);
+
+	// получаем текстуру
+	bool IconFound = false;
+	IGraphics::CTextureHandle Tex;
+	for(int i = 0; i < m_lItemIcons.size(); ++i)
+	{
+		if(!str_comp_nocase(aNameBuf, m_lItemIcons[i].m_Name))
+		{
+			Tex = m_lItemIcons[i].m_IconTexture;
+			IconFound = true;
+			break;
+		}
+	}
+	dbg_msg("test", "%d", m_lItemIcons.size());
+
+	// если иконка найдена рисуем ее
+	if(IconFound)
+	{
+		// draw icon
+		CUIRect Icon = pRect;
+		Icon.VSplitLeft(20.0f, &Icon, 0);
+		
+		Graphics()->TextureSet(Tex);
+		Graphics()->QuadsBegin();
+		IGraphics::CQuadItem QuadItem(Icon.x, Icon.y, Icon.w, Icon.h);
+		Graphics()->QuadsDrawTL(&QuadItem, 1);
+		Graphics()->QuadsEnd();
+	}
+
+	// возращаем результат
+	return IconFound;
+}
+
+// сканируем иконки и добавляем новые
+int CMenus::ItemIconScan(const char *pName, int IsDir, int DirType, void *pUser)
+{
+	CMenus *pSelf = (CMenus *)pUser;
+	const char *pSuffix = str_endswith(pName, ".png");
+	if(IsDir || !pSuffix)
+	{
+		return 0;
+	}
+
+	char aItemIconName[128];
+	str_truncate(aItemIconName, sizeof(aItemIconName), pName, pSuffix - pName);
+
+	// add new game icon
+	char aBuf[512];
+	str_format(aBuf, sizeof(aBuf), "ui/itemicons/%s", pName);
+
+	// загружаем текстуру
+	CImageInfo Info;
+	if(!pSelf->Graphics()->LoadPNG(&Info, aBuf, DirType) || Info.m_Width != CItemIcon::ITEMICON_SIZE || (Info.m_Height != CItemIcon::ITEMICON_SIZE && Info.m_Height != CItemIcon::ITEMICON_OLDHEIGHT))
+	{
+		str_format(aBuf, sizeof(aBuf), "failed to load item icon '%s'", aItemIconName);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
+		return 0;
+	}
+
+	// иконка загрузка
+	CItemIcon ItemIcon(aItemIconName);
+	str_format(aBuf, sizeof(aBuf), "loaded item icon '%s'", aItemIconName);
+	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
+
+	// добавляем иконку
+	ItemIcon.m_IconTexture = pSelf->Graphics()->LoadTextureRaw(CItemIcon::ITEMICON_SIZE, CItemIcon::ITEMICON_SIZE, Info.m_Format, Info.m_pData, Info.m_Format, IGraphics::TEXLOAD_LINEARMIPMAPS);
+	pSelf->m_lItemIcons.add(ItemIcon);
 	return 0;
 }
 
