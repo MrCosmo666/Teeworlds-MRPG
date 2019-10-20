@@ -520,7 +520,7 @@ bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect)
 
 		Graphics()->TextureSet(Tex);
 		Graphics()->QuadsBegin();
-		Graphics()->SetColor(0.7f, 0.7f, 0.7f, 0.2f); // pow(a, 0.75f) *
+		Graphics()->SetColor(0.5f, 0.5f, 0.5f, 0.2f); // pow(a, 0.75f) *
 		IGraphics::CQuadItem QuadItem(Icon.x, Icon.y, Icon.w, Icon.h);
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
 		Graphics()->QuadsEnd();

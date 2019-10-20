@@ -1106,6 +1106,7 @@ set(EXPECTED_DATA
 	ui/itemicons/icon_amulet.png
 	ui/itemicons/icon_az_sword.png
 	ui/itemicons/icon_bamboo.png
+	ui/itemicons/icon_bottle.png
 	ui/itemicons/icon_bouquet_r.png
 	ui/itemicons/icon_bracelet.png
 	ui/itemicons/icon_broken_h.png
@@ -1141,6 +1142,7 @@ set(EXPECTED_DATA
 	ui/itemicons/icon_ticket.png
 	ui/itemicons/icon_token_coin.png
 	ui/itemicons/icon_tomate.png
+	ui/itemicons/icon_unknow.png
 	ui/itemicons/icon_upgr_weapon.png
 	ui/itemicons/icon_wings.png
 	ui/itemicons/icon_wool.png
