@@ -1107,6 +1107,7 @@ set(EXPECTED_DATA
 	ui/itemicons/icon_az_sword.png
 	ui/itemicons/icon_bamboo.png
 	ui/itemicons/icon_bouquet_r.png
+	ui/itemicons/icon_bracelet.png
 	ui/itemicons/icon_broken_h.png
 	ui/itemicons/icon_dark_energy.png
 	ui/itemicons/icon_deco_house.png

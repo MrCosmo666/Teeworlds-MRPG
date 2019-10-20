@@ -378,8 +378,6 @@ Messages = [
 
 	NetMessage("Sv_VoteOptionAdd", [
 		NetStringStrict("m_pDescription"),
-		NetArray(NetIntAny("m_pColored"), 3),
-		NetArray(NetIntAny("m_pIcon"), 4),
 	]),
 
 	NetMessage("Sv_VoteOptionRemove", [
@@ -523,5 +521,12 @@ Messages = [
 		NetIntRange("m_ClientID", 0, 'MAX_CLIENTS-1'),
 		NetArray(NetIntAny("m_EquipID"),  9),
 		NetArray(NetIntAny("m_EnchantItem"),  9),
-	]), 
+	]),
+    
+    # mmotee send vote client
+	NetMessage("Sv_VoteMmoOptionAdd", [
+		NetStringStrict("m_pDescription"),
+		NetArray(NetIntAny("m_pColored"), 3),
+		NetArray(NetIntAny("m_pIcon"), 4),
+	]),
 ]

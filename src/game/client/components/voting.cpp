@@ -266,14 +266,15 @@ void CVoting::OnMessage(int MsgType, void *pRawMsg)
 	else if(MsgType == NETMSGTYPE_SV_VOTEOPTIONADD)
 	{
 		CNetMsg_Sv_VoteOptionAdd *pMsg = (CNetMsg_Sv_VoteOptionAdd *)pRawMsg;
-		if (m_pClient->MmoServer())
-		{
-			char pBuf[16];
-			IntsToStr(pMsg->m_pIcon, 4, pBuf);
-			AddOption(pMsg->m_pDescription, vec3(pMsg->m_pColored[0], pMsg->m_pColored[1], pMsg->m_pColored[2]), pBuf);
-		}
-		else
-			AddOption(pMsg->m_pDescription);
+		AddOption(pMsg->m_pDescription);
+	}
+	else if (MsgType == NETMSGTYPE_SV_VOTEMMOOPTIONADD)
+	{
+		CNetMsg_Sv_VoteMmoOptionAdd *pMsg = (CNetMsg_Sv_VoteMmoOptionAdd *)pRawMsg;
+
+		char pBuf[16];
+		IntsToStr(pMsg->m_pIcon, 4, pBuf);
+		AddOption(pMsg->m_pDescription, vec3(pMsg->m_pColored[0], pMsg->m_pColored[1], pMsg->m_pColored[2]), pBuf);
 	}
 	else if(MsgType == NETMSGTYPE_SV_VOTEOPTIONREMOVE)
 	{
