@@ -1103,7 +1103,46 @@ set(EXPECTED_DATA
 	ui/icons/menu.png
 	ui/icons/sidebar.png
 	ui/icons/tools.png
-	ui/itemicons/icon7.png
+	ui/itemicons/icon_amulet.png
+	ui/itemicons/icon_az_sword.png
+	ui/itemicons/icon_bamboo.png
+	ui/itemicons/icon_bouquet_r.png
+	ui/itemicons/icon_broken_h.png
+	ui/itemicons/icon_dark_energy.png
+	ui/itemicons/icon_deco_house.png
+	ui/itemicons/icon_door_key.png
+	ui/itemicons/icon_eat.png
+	ui/itemicons/icon_gold.png
+	ui/itemicons/icon_goods.png
+	ui/itemicons/icon_grenade.png
+	ui/itemicons/icon_gun.png
+	ui/itemicons/icon_hammer.png
+	ui/itemicons/icon_horn.png
+	ui/itemicons/icon_kiwi.png
+	ui/itemicons/icon_lucky_box.png
+	ui/itemicons/icon_mantle.png
+	ui/itemicons/icon_material.png
+	ui/itemicons/icon_meat.png
+	ui/itemicons/icon_mineral.png
+	ui/itemicons/icon_mushroom.png
+	ui/itemicons/icon_paper.png
+	ui/itemicons/icon_pc_coin.png
+	ui/itemicons/icon_pickaxe.png
+	ui/itemicons/icon_potato.png
+	ui/itemicons/icon_potion_r.png
+	ui/itemicons/icon_rifle.png
+	ui/itemicons/icon_ring.png
+	ui/itemicons/icon_rose.png
+	ui/itemicons/icon_shotgun.png
+	ui/itemicons/icon_skill_point.png
+	ui/itemicons/icon_skin.png
+	ui/itemicons/icon_sp_bronek.png
+	ui/itemicons/icon_ticket.png
+	ui/itemicons/icon_token_coin.png
+	ui/itemicons/icon_tomate.png
+	ui/itemicons/icon_upgr_weapon.png
+	ui/itemicons/icon_wings.png
+	ui/itemicons/icon_wool.png
 	ui/menuimages/demos.png
 	ui/menuimages/editor.png
 	ui/menuimages/local_server.png

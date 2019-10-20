@@ -14,6 +14,6 @@
 
 	// обновления сервера
 	#define CLIENT_VERSION_MOLD 1012
-	#define CLIENT_VERSION_MMO 1016
+	#define CLIENT_VERSION_MMO 1017
 
 #endif

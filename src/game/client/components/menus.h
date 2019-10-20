@@ -371,7 +371,7 @@ private:
 		IGraphics::CTextureHandle m_IconTexture;
 	};
 	array<CItemIcon> m_lItemIcons;
-	bool DoItemIcon(int ItemID, CUIRect pRect);
+	bool DoItemIcon(const char *pItem, CUIRect pRect);
 	static int ItemIconScan(const char *pName, int IsDir, int DirType, void *pUser);
 
 

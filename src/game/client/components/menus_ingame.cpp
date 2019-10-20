@@ -490,6 +490,84 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 	EndScrollRegion(&s_ScrollRegion);
 }
 
+// item icons
+bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect)
+{
+	// форматируем в название иконки
+	char aNameBuf[128];
+	str_format(aNameBuf, sizeof(aNameBuf), "icon_%s", pItem);
+	str_sanitize_filename(aNameBuf);
+
+	// получаем текстуру
+	bool IconFound = false;
+	IGraphics::CTextureHandle Tex;
+	for (int i = 0; i < m_lItemIcons.size(); ++i)
+	{
+		if (!str_comp_nocase(aNameBuf, m_lItemIcons[i].m_Name))
+		{
+			Tex = m_lItemIcons[i].m_IconTexture;
+			IconFound = true;
+			break;
+		}
+	}
+
+	// если иконка найдена рисуем ее
+	if (IconFound)
+	{
+		// draw icon
+		CUIRect Icon = pRect;
+		Icon.VSplitLeft(20.0f, &Icon, 0);
+
+		Graphics()->TextureSet(Tex);
+		Graphics()->QuadsBegin();
+		Graphics()->SetColor(0.7f, 0.7f, 0.7f, 0.2f); // pow(a, 0.75f) *
+		IGraphics::CQuadItem QuadItem(Icon.x, Icon.y, Icon.w, Icon.h);
+		Graphics()->QuadsDrawTL(&QuadItem, 1);
+		Graphics()->QuadsEnd();
+	}
+
+	// возращаем результат
+	return IconFound;
+}
+
+// сканируем иконки и добавляем новые
+int CMenus::ItemIconScan(const char *pName, int IsDir, int DirType, void *pUser)
+{
+	CMenus *pSelf = (CMenus *)pUser;
+	const char *pSuffix = str_endswith(pName, ".png");
+	if (IsDir || !pSuffix)
+	{
+		return 0;
+	}
+
+	char aItemIconName[128];
+	str_truncate(aItemIconName, sizeof(aItemIconName), pName, pSuffix - pName);
+
+	// add new game icon
+	char aBuf[512];
+	str_format(aBuf, sizeof(aBuf), "ui/itemicons/%s", pName);
+
+	// загружаем текстуру
+	CImageInfo Info;
+	if (!pSelf->Graphics()->LoadPNG(&Info, aBuf, DirType) || Info.m_Width != CItemIcon::ITEMICON_SIZE || (Info.m_Height != CItemIcon::ITEMICON_SIZE && Info.m_Height != CItemIcon::ITEMICON_OLDHEIGHT))
+	{
+		str_format(aBuf, sizeof(aBuf), "failed to load item icon '%s'", aItemIconName);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
+		return 0;
+	}
+
+	// иконка загрузка
+	CItemIcon ItemIcon(aItemIconName);
+	str_format(aBuf, sizeof(aBuf), "loaded item icon '%s'", aItemIconName);
+	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
+
+	// добавляем иконку
+	ItemIcon.m_IconTexture = pSelf->Graphics()->LoadTextureRaw(CItemIcon::ITEMICON_SIZE, CItemIcon::ITEMICON_SIZE, Info.m_Format, Info.m_pData, Info.m_Format, IGraphics::TEXLOAD_LINEARMIPMAPS);
+	pSelf->m_lItemIcons.add(ItemIcon);
+	return 0;
+}
+
+// рисуем контроль панель сервера
 bool CMenus::RenderServerControlServer(CUIRect MainView)
 {
 	bool doCallVote = false;
@@ -533,7 +611,7 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 			if (m_pClient->MmoServer() && (pOption->m_Colored[0] >= 30 || pOption->m_Colored[1] >= 30 || pOption->m_Colored[2] >= 30))
 				TextRender()->TextOutlineColor(0.7f, 0.7f, 0.7f, 0.3f);
 
-			bool Icon = DoItemIcon(pOption->m_IconID, Item.m_Rect);
+			bool Icon = DoItemIcon(pOption->m_Icon, Item.m_Rect);
 			Item.m_Rect.VMargin((Icon ? 25.0f : 5.0f), &Item.m_Rect);
 			Item.m_Rect.y += 2.0f;
 			UI()->DoLabel(&Item.m_Rect, pOption->m_aDescription, Item.m_Rect.h*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
