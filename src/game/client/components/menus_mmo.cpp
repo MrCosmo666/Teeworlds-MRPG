@@ -42,7 +42,7 @@ void CMenus::RenderSettingsMmo(CUIRect MainView)
 	}
 
 	// space for information
-	MainView.HSplitTop(g_Config.m_JoystickSens, &MainView, &Label);
+	MainView.HSplitTop(400.0f, &MainView, &Label);
 	UI()->DoLabel(&Label, Information[s_SettingsPage], 14.0f, CUI::ALIGN_CENTER);
 
 	// draw menu pages

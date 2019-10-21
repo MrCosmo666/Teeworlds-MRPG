@@ -584,11 +584,6 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 		m_pClient->Storage()->ListDirectory(IStorage::TYPE_ALL, "ui/itemicons", ItemIconScan, this);
 		s_Init = false;
 	}
-	else if(!m_pClient->MmoServer())
-	{
-		pSelf->m_lItemIcons.clear();
-		s_Init = true;
-	}
 
 	// рисуем голосования
 	for(CVoteOptionClient *pOption = m_pClient->m_pVoting->m_pFirst; pOption; pOption = pOption->m_pNext)
