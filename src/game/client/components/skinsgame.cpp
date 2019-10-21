@@ -16,18 +16,19 @@ int CgSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 {
 	CgSkins* pSelf = (CgSkins*)pUser;
 	const char *pSuffix = str_endswith(pName, ".png");
-	if (IsDir || !pSuffix)
-		return 0;
+	if (IsDir || !pSuffix) return 0;
 
 	// имя скина и проверяем если скин является загружаемым вначале
 	char aSkinName[128];
 	str_truncate(aSkinName, sizeof(aSkinName), pName, pSuffix - pName);
 	if (str_comp(aSkinName, g_Config.m_GameTexture) == 0) return 0;
 
-	// файл скина скина
-	CImageInfo Info;
+	// расположение скина
 	char aBuf[512];
 	str_format(aBuf, sizeof(aBuf), "gameskins/%s", pName);
+
+	// загружаем файл
+	CImageInfo Info;
 	if (!pSelf->Graphics()->LoadPNG(&Info, aBuf, DirType))
 	{
 		str_format(aBuf, sizeof(aBuf), "failed to load gameskins from %s", pName);
@@ -63,12 +64,9 @@ void CgSkins::OnInit()
 	CImageInfo Info;
 	if (!Graphics()->LoadPNG(&Info, aBuf, IStorage::TYPE_ALL))
 	{
-		str_format(aBuf, sizeof(aBuf), "failed to load \"data/%s\"", aBuf);
-		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
-
 		// загружаем станадртный если ошибка с поставленым
 		if (!Graphics()->LoadPNG(&Info, "gameskins/!game.png", IStorage::TYPE_ALL))
-			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", "failed to load default \"data/gameskins/!game.png\"");
+			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", "failed to load default data/gameskins/!game.png");
 		else 
 			str_copy(g_Config.m_GameTexture, "!game", sizeof(g_Config.m_GameTexture));
 	}

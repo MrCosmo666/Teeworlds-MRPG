@@ -16,18 +16,19 @@ int CEnSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 {
 	CEnSkins* pSelf = (CEnSkins*)pUser;
 	const char *pSuffix = str_endswith(pName, ".png");
-	if (IsDir || !pSuffix)
-		return 0;
+	if (IsDir || !pSuffix) return 0;
 
 	// имя скина и проверяем если скин является загружаемым вначале
 	char aSkinName[128];
 	str_truncate(aSkinName, sizeof(aSkinName), pName, pSuffix - pName);
 	if (str_comp(aSkinName, g_Config.m_GameEntities) == 0) return 0;
 
-	// файл скина скина
-	CImageInfo Info;
+	// расположение скина
 	char aBuf[512];
 	str_format(aBuf, sizeof(aBuf), "entities/%s", pName);
+
+	// загружаем файл
+	CImageInfo Info;
 	if (!pSelf->Graphics()->LoadPNG(&Info, aBuf, DirType))
 	{
 		str_format(aBuf, sizeof(aBuf), "failed to load entities from %s", pName);
@@ -47,7 +48,7 @@ int CEnSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 void CEnSkins::IntitilizeSelectSkin()
 {
 	// сканируем скины
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "gameskins", SkinScan, this);
+	Storage()->ListDirectory(IStorage::TYPE_ALL, "entities", SkinScan, this);
 }
 
 
@@ -64,12 +65,9 @@ void CEnSkins::OnInit()
 	CImageInfo Info;
 	if (!Graphics()->LoadPNG(&Info, aBuf, IStorage::TYPE_ALL))
 	{
-		str_format(aBuf, sizeof(aBuf), "failed to load \"data/%s\"", aBuf);
-		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
-
 		// загружаем станадртный если ошибка с поставленым
 		if (!Graphics()->LoadPNG(&Info, "entities/!entities.png", IStorage::TYPE_ALL))
-			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", "failed to load default \"data/entities/!entities.png\"");
+			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", "failed to load default data/entities/!entities.png");
 		else 
 			str_copy(g_Config.m_GameEntities, "!entities", sizeof(g_Config.m_GameEntities));
 	}
