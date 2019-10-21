@@ -1621,7 +1621,7 @@ void CGameClient::OnActivateEditor()
 {
 	// mmotee
 	if (m_penSkins->Find(g_Config.m_GameEntities) == -1)
-		str_copy(g_Config.m_GameEntities, "entities/entities.png", sizeof(g_Config.m_GameEntities));
+		str_copy(g_Config.m_GameEntities, "!entities", sizeof(g_Config.m_GameEntities));
 
 	OnRelease();
 }
