@@ -193,8 +193,9 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			{
 				CUIRect Label;
 				Item.m_Rect.Margin(5.0f, &Item.m_Rect);
-				Item.m_Rect.HSplitBottom(10.0f, &Item.m_Rect, &Label);
+				Item.m_Rect.HSplitBottom(5.0f, &Item.m_Rect, &Label);
 				Item.m_Rect.HSplitTop(5.0f, 0, &Item.m_Rect); // some margin from the top
+				UI()->DoLabel(&Item.m_Rect, s->m_aName, 10.0f, CUI::ALIGN_LEFT);
 
 				Graphics()->TextureSet(s_GameSkinList[i]->m_Texture);
 				Graphics()->QuadsBegin();
@@ -264,8 +265,9 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			{
 				CUIRect Label;
 				Item.m_Rect.Margin(5.0f, &Item.m_Rect);
-				Item.m_Rect.HSplitBottom(10.0f, &Item.m_Rect, &Label);
+				Item.m_Rect.HSplitBottom(5.0f, &Item.m_Rect, &Label);
 				Item.m_Rect.HSplitTop(5.0f, 0, &Item.m_Rect); // some margin from the top
+				UI()->DoLabel(&Item.m_Rect, s->m_aName, 10.0f, CUI::ALIGN_LEFT);
 
 				Graphics()->TextureSet(s_EmoticionSkinList[i]->m_Texture);
 				Graphics()->QuadsBegin();
@@ -335,8 +337,9 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			{
 				CUIRect Label;
 				Item.m_Rect.Margin(5.0f, &Item.m_Rect);
-				Item.m_Rect.HSplitBottom(10.0f, &Item.m_Rect, &Label);
+				Item.m_Rect.HSplitBottom(5.0f, &Item.m_Rect, &Label);
 				Item.m_Rect.HSplitTop(5.0f, 0, &Item.m_Rect); // some margin from the top
+				UI()->DoLabel(&Item.m_Rect, s->m_aName, 10.0f, CUI::ALIGN_LEFT);
 
 				Graphics()->TextureSet(s_paSkinList[i]->m_Texture);
 				Graphics()->QuadsBegin();
@@ -406,8 +409,9 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			{
 				CUIRect Label;
 				Item.m_Rect.Margin(5.0f, &Item.m_Rect);
-				Item.m_Rect.HSplitBottom(10.0f, &Item.m_Rect, &Label);
+				Item.m_Rect.HSplitBottom(5.0f, &Item.m_Rect, &Label);
 				Item.m_Rect.HSplitTop(5.0f, 0, &Item.m_Rect); // some margin from the top
+				UI()->DoLabel(&Item.m_Rect, s->m_aName, 10.0f, CUI::ALIGN_LEFT);
 
 				Graphics()->TextureSet(s_ParticlesSkinList[i]->m_Texture);
 				Graphics()->QuadsBegin();
@@ -476,8 +480,9 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			{
 				CUIRect Label;
 				Item.m_Rect.Margin(5.0f, &Item.m_Rect);
-				Item.m_Rect.HSplitBottom(10.0f, &Item.m_Rect, &Label);
-				Item.m_Rect.HSplitTop(5.0f, 0, &Item.m_Rect); // some margin from the topUiDoListboxStart(&s_FontList, &s_Fade[0], 20.0f, Localize("Fonts"), s_Fonts.size(), 1, s_SelectedFont);
+				Item.m_Rect.HSplitBottom(5.0f, &Item.m_Rect, &Label);
+				Item.m_Rect.HSplitTop(5.0f, 0, &Item.m_Rect); // some margin from the top
+				UI()->DoLabel(&Item.m_Rect, s->m_aName, 10.0f, CUI::ALIGN_LEFT);
 
 				Graphics()->TextureSet(s_EntitiesSkinList[i]->m_Texture);
 				Graphics()->QuadsBegin();
@@ -517,9 +522,8 @@ public:
 
 int GatherFonts(const char *pFileName, int IsDir, int Type, void *pUser)
 {
-	const int PathLength = str_length(pFileName);
-	if (IsDir || PathLength <= 4 || pFileName[PathLength - 4] != '.' || str_comp_nocase(pFileName + PathLength - 3, "ttf") || pFileName[0] == '.')
-		return 0;
+	const char *pSuffix = str_endswith(pName, ".ttf");
+	if (IsDir || !pSuffix) return 0;
 
 	sorted_array<CFontFile> &Fonts = *((sorted_array<CFontFile> *)pUser);
 	char aNiceName[128];
@@ -544,11 +548,13 @@ void CMenus::RenderFontSelection(CUIRect MainView)
 	{
 		Storage()->ListDirectory(IStorage::TYPE_ALL, "fonts", GatherFonts, &s_Fonts);
 		for (int i = 0; i < s_Fonts.size(); i++)
+		{
 			if (str_comp(s_Fonts[i].m_FileName, g_Config.m_ClFontfile) == 0)
 			{
 				s_SelectedFont = i;
 				break;
 			}
+		}
 	}
 
 	int OldSelectedFont = s_SelectedFont;
