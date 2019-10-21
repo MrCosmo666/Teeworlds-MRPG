@@ -355,16 +355,15 @@ void CGameClient::OnInit()
 	for(int i = 0; i < NUM_NETOBJTYPES; i++)
 		Client()->SnapSetStaticsize(i, m_NetObjHandler.GetObjSize(i));
 
-	// load default font
-	static CFont *pDefaultFont = 0;
+	// загружаем шрифт
 	char aFontName[256];
+	static CFont *pDefaultFont = 0;
 	str_format(aFontName, sizeof(aFontName), "fonts/%s", g_Config.m_ClFontfile);
-	char aFilename[512];
-	IOHANDLE File = Storage()->OpenFile(aFontName, IOFLAG_READ, IStorage::TYPE_ALL, aFilename, sizeof(aFilename));
+	IOHANDLE File = Storage()->OpenFile(aFontName, IOFLAG_READ, IStorage::TYPE_ALL, aFontName, sizeof(aFontName));
 	if(File)
 	{
 		io_close(File);
-		pDefaultFont = TextRender()->LoadFont(aFilename);
+		pDefaultFont = TextRender()->LoadFont(aFontName);
 		if(!pDefaultFont)
 		{
 			char aBuf[256];
@@ -374,12 +373,12 @@ void CGameClient::OnInit()
 	}
 	else
 	{
-		// in case the config is broken
-		IOHANDLE File = Storage()->OpenFile("fonts/DejaVuSans.ttf", IOFLAG_READ, IStorage::TYPE_ALL, aFilename, sizeof(aFilename));
+		// загружаем стандартный фонт
+		IOHANDLE File = Storage()->OpenFile("fonts/DejaVuSans.ttf", IOFLAG_READ, IStorage::TYPE_ALL, aFontName, sizeof(aFontName));
 		if (File)
 		{
 			io_close(File);
-			pDefaultFont = TextRender()->LoadFont(aFilename);
+			pDefaultFont = TextRender()->LoadFont(aFontName);
 			str_copy(g_Config.m_ClFontfile, "DejaVuSans.ttf", sizeof(g_Config.m_ClFontfile));
 		}
 	}

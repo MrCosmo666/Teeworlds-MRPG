@@ -885,12 +885,12 @@ set(EXPECTED_DATA
 	countryflags/ZW.png
 	countryflags/default.png
 	countryflags/index.json
+	cursor/!gui_cursor.png
 	cursor/black_cursor.png
 	cursor/cursor_black_with_blue.png
 	cursor/cursor_hook.png
 	cursor/fast_move.png
 	cursor/gangstacursor.png
-	cursor/gui_cursor.png
 	cursor/rush.png
 	cursor/shadow_red.png
 	deadtee.png
@@ -902,10 +902,9 @@ set(EXPECTED_DATA
 	editor/background.png
 	editor/checker.png
 	editor/cursor.png
-	editor/entities.png
 	effx/mmotee.png
 	effx/teleport.png
-	emoticons.png
+	emoticons/!emoticons.png
 	emoticons/Black_Marta.png
 	emoticons/Moffels_White.png
 	emoticons/Unbenannt.png
@@ -913,6 +912,7 @@ set(EXPECTED_DATA
 	emoticons/White_Marta.png
 	emoticons/emotesforgirliz.png
 	emoticons/emoticonsym7.png
+	entities/!entities.png
 	entities/entities-mmo.png
 	fonts/CoreSans.ttf
 	fonts/Cuprum-Bold-Italic.ttf
@@ -920,7 +920,7 @@ set(EXPECTED_DATA
 	fonts/arial.ttf
 	fonts/comic.ttf
 	fonts/stylo.ttf
-	game.png
+	gameskins/!game.png
 	gameskins/ACLANGAMESKIN.png
 	gameskins/PortalToniGameskin.png
 	gameskins/SchnitzelpetersWeapons.png
@@ -1023,7 +1023,7 @@ set(EXPECTED_DATA
 	maps/lms1.map
 	maps/readme.txt
 	mmogame.png
-	particles.png
+	particles/!particles.png
 	particles/Celshaded_particles.png
 	particles/Green_Particles.png
 	particles/Made_by_Knorke_Particles.png
@@ -1092,7 +1092,6 @@ set(EXPECTED_DATA
 	ui/gametypes/mod.png
 	ui/gametypes/tdm.png
 	ui/gui_buttons.png
-	ui/gui_cursor.png
 	ui/gui_icons.png
 	ui/gui_logo.png
 	ui/icons/arrows.png

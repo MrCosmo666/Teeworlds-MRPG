@@ -24,14 +24,14 @@
 
 void CMenus::RenderSettingsMmo(CUIRect MainView)
 {
-	CUIRect Label, Button, Tabbar, BottomView;
+	CUIRect Label, Button, Tabbar;
 
 	static int s_SettingsPage = 0;
-	MainView.HSplitBottom(80.0f, &MainView, &BottomView);
+	MainView.HSplitBottom(80.0f, &MainView, 0);
 	MainView.HSplitTop(18.0f, &Tabbar, &MainView);
 
+	// рисуем меню вкладок
 	const char* Tabs[4] = { "Visual", "General", "Effects", "Credits" };
-	const char* Information[4] = { "Setting up the visual part of the client", "Setting up the general part of the client", "Setting up the effects part of the client", "Information & Credits" };
 	for (int i = 0; i < 4; i++)
 	{
 		Tabbar.VSplitLeft(182.5f, &Button, &Tabbar);
@@ -41,11 +41,14 @@ void CMenus::RenderSettingsMmo(CUIRect MainView)
 			s_SettingsPage = i;
 	}
 
-	// space for information
+	// длина фона и место для текста
 	MainView.HSplitTop(400.0f, &MainView, &Label);
+
+	// рисуем текст информации
+	const char* Information[4] = { "Setting up the visual part of the client", "Setting up the general part of the client", "Setting up the effects part of the client", "Information & Credits" };
 	UI()->DoLabel(&Label, Information[s_SettingsPage], 14.0f, CUI::ALIGN_CENTER);
 
-	// draw menu pages
+	// рисуем меню выбранной страницы
 	RenderSettingsMmoGeneral(MainView, s_SettingsPage);
 }
 
@@ -58,30 +61,42 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 	float ButtonHeight = 20.0f;
 	float Spacing = 2.0f;
 
-	// visual
+	// Визуальные настройки
 	if (Page == 0)
 		RenderMmoSettingsTexture(MainView, MainView);
-	if (Page == 1)
+	
+	// генеральные настройки
+	else if (Page == 1)
 	{
+		// базовые настройки
 		MainView.HSplitTop(ButtonHeight, &Button, &MainView);
 		UI()->DoLabel(&Button, "Basic settings", 14.0f, CUI::ALIGN_CENTER);
+	
+		// устанавливаем стороны
+		CUIRect Basic = MainView, BasicLeft, BasicRight;
+		Basic.VSplitMid(&BasicLeft, &BasicRight);
+		BasicLeft.VSplitRight(Spacing * 0.5f, &BasicLeft, 0);
+		BasicRight.VSplitLeft(Spacing * 0.5f, 0, &BasicRight);
 
+		// левая сторона
 		// vanilla damage ind
-		MainView.HSplitTop(ButtonHeight, &Button, &MainView);
-		Button.VMargin(ButtonHeight, &Button);
+		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
+		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
 		static int s_ButtonDmgInd = 0;
 		if (DoButton_CheckBox(&s_ButtonDmgInd, Localize("Vanila Damage Ind (Vanilla)"), g_Config.m_ClMmoDamageInd, &Button))
 			g_Config.m_ClMmoDamageInd ^= 1;
 
+		// правая сторона
 		// show colored
-		MainView.HSplitTop(ButtonHeight, &Button, &MainView);
-		Button.VMargin(ButtonHeight, &Button);
+		BasicRight.HSplitTop(Spacing, 0, &BasicRight);
+		BasicRight.HSplitTop(ButtonHeight, &Button, &BasicRight);
 		static int s_ButtonColorVote = 0;
 		if (DoButton_CheckBox(&s_ButtonColorVote, Localize("Show Colored Vote (Mmo Server)"), g_Config.m_ClShowColoreVote, &Button))
 			g_Config.m_ClShowColoreVote ^= 1;
 	}
 
-	if (Page == 2)
+	// эффекты настройки
+	else if (Page == 2)
 	{
 		MainView.HSplitTop(ButtonHeight, &Button, &MainView);
 		UI()->DoLabel(&Button, "General effects", 14.0f, CUI::ALIGN_CENTER);
@@ -99,80 +114,81 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 {
 	CUIRect Button, TabBar;
 
-	// render page
-	static int s_ControlPage = 0;
-	if (s_ControlPage == 0) g_Config.m_Texture = 0;
-	else if (s_ControlPage == 1) g_Config.m_Texture = 1;
-	else if (s_ControlPage == 2) g_Config.m_Texture = 2;
-	else if (s_ControlPage == 3) g_Config.m_Texture = 3;
-	else if (s_ControlPage == 4) g_Config.m_Texture = 4;
-	else if (s_ControlPage == 5) g_Config.m_Texture = 5;
+	{ // меню выбора скинов
+		MainView.HSplitTop(20.0f, &TabBar, &MainView);
 
-	// render game menu backgrounds
-	MainView.HSplitTop(20.0f, &TabBar, &MainView);
-
-	// tab bar
-	{
 		TabBar.VSplitLeft(TabBar.w / 6, &Button, &TabBar);
-		static CButtonContainer s_Button0;
-		if (DoButton_MenuTab(&s_Button0, Localize("Gameskin"), s_ControlPage == 0, &Button, 0))
-			s_ControlPage = 0;
+		static CButtonContainer s_ButtonGameSkins;
+		if (DoButton_MenuTab(&s_ButtonGameSkins, Localize("Gameskin"), g_Config.m_Texture == 0, &Button, 0))
+			g_Config.m_Texture = 0;
 
 		TabBar.VSplitLeft(TabBar.w / 5, &Button, &TabBar);
-		static CButtonContainer s_Button1;
-		if (DoButton_MenuTab(&s_Button1, Localize("Emoticons"), s_ControlPage == 1, &Button, 0))
-			s_ControlPage = 1;
+		static CButtonContainer s_ButtonEmoticons;
+		if (DoButton_MenuTab(&s_ButtonEmoticons, Localize("Emoticons"), g_Config.m_Texture == 1, &Button, 0))
+			g_Config.m_Texture = 1;
 
 		TabBar.VSplitLeft(TabBar.w / 4, &Button, &TabBar);
-		static CButtonContainer s_Button2;
-		if (DoButton_MenuTab(&s_Button2, Localize("Cursor"), s_ControlPage == 2, &Button, 0))
-			s_ControlPage = 2;
+		static CButtonContainer s_ButtonCursors;
+		if (DoButton_MenuTab(&s_ButtonCursors, Localize("Cursor"), g_Config.m_Texture == 2, &Button, 0))
+			g_Config.m_Texture = 2;
 
 		TabBar.VSplitLeft(TabBar.w / 3, &Button, &TabBar);
-		static CButtonContainer s_Button3;
-		if (DoButton_MenuTab(&s_Button3, Localize("Particles"), s_ControlPage == 3, &Button, 0))
-			s_ControlPage = 3;
+		static CButtonContainer s_ButtonParticles;
+		if (DoButton_MenuTab(&s_ButtonParticles, Localize("Particles"), g_Config.m_Texture == 3, &Button, 0))
+			g_Config.m_Texture = 3;
 
 		TabBar.VSplitLeft(TabBar.w / 2, &Button, &TabBar);
-		static CButtonContainer s_Button4;
-		if (DoButton_MenuTab(&s_Button4, Localize("Entities"), s_ControlPage == 4, &Button, 0))
-			s_ControlPage = 4;
+		static CButtonContainer s_ButtonEntities;
+		if (DoButton_MenuTab(&s_ButtonEntities, Localize("Entities"), g_Config.m_Texture == 4, &Button, 0))
+			g_Config.m_Texture = 4;
 
-		static CButtonContainer s_Button5;
-		if (DoButton_MenuTab(&s_Button5, Localize("Fonts"), s_ControlPage == 5, &TabBar, 0))
-			s_ControlPage = 5;
+		static CButtonContainer s_ButtonFonts;
+		if (DoButton_MenuTab(&s_ButtonFonts, Localize("Fonts"), g_Config.m_Texture == 5, &TabBar, 0))
+			g_Config.m_Texture = 5;
 	}
 
-	// changer game.png
+	// замена скинов game.png
 	if (g_Config.m_Texture == 0)
 	{
-		static sorted_array<const CgSkins::CgSkin*> s_paSkinList;
-		static CListBoxState s_ListBoxState;
+		// инициализация
+		static int s_Init = true;
+		if(s_Init)
+		{
+			m_pClient->m_pgSkins->IntitilizeSelectSkin();
+			s_Init = false;
+		}
+
+		// получение и вывод списков
+		static sorted_array<const CgSkins::CgSkin*> s_GameSkinList;
 		static bool m_RefreshSkinSelector = true;
 		if (m_RefreshSkinSelector)
 		{
-			s_paSkinList.clear();
+			s_GameSkinList.clear();
 			for (int i = 0; i < m_pClient->m_pgSkins->Num(); ++i)
 			{
 				const CgSkins::CgSkin* s = m_pClient->m_pgSkins->Get(i);
-				s_paSkinList.add(s);
+				s_GameSkinList.add(s);
 			}
 			m_RefreshSkinSelector = false;
 		}
 
-		m_pSelectedSkin = 0;
 		int OldSelected = -1;
+		static CListBoxState s_ListBoxState;
 		UiDoListboxHeader(&s_ListBoxState, &MainView, Localize("Game"), 20.0f, 2.0f);
-		UiDoListboxStart(&s_ListBoxState, &m_RefreshSkinSelector, 160.0f, 0, s_paSkinList.size(), 3, OldSelected);
-
-		for (int i = 0; i < s_paSkinList.size(); ++i)
+		UiDoListboxStart(&s_ListBoxState, &m_RefreshSkinSelector, 160.0f, 0, s_GameSkinList.size(), 3, OldSelected);
+		for (int i = 0; i < s_GameSkinList.size(); ++i)
 		{
-			const CgSkins::CgSkin* s = s_paSkinList[i];
-			if (s == 0) continue;
+			// если текстура равна 0 пропускаем
+			const CgSkins::CgSkin* s = s_GameSkinList[i];
+			if (s == 0) 
+				continue;
+
+			// если текстура равна выбранной текстуре то устанавливаем выбор на ней
 			if (str_comp(s->m_aName, g_Config.m_GameTexture) == 0)
 				OldSelected = i;
 
-			CListboxItem Item = UiDoListboxNextItem(&s_ListBoxState, &s_paSkinList[i], OldSelected == i);
+			// добавляем в бокс новый предмет
+			CListboxItem Item = UiDoListboxNextItem(&s_ListBoxState, &s_GameSkinList[i], OldSelected == i);
 			if (Item.m_Visible)
 			{
 				CUIRect Label;
@@ -180,7 +196,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 				Item.m_Rect.HSplitBottom(10.0f, &Item.m_Rect, &Label);
 				Item.m_Rect.HSplitTop(5.0f, 0, &Item.m_Rect); // some margin from the top
 
-				Graphics()->TextureSet(s_paSkinList[i]->m_Texture);
+				Graphics()->TextureSet(s_GameSkinList[i]->m_Texture);
 				Graphics()->QuadsBegin();
 				IGraphics::CQuadItem QuadItem(Item.m_Rect.x + Item.m_Rect.w / 2 - 120.0f, Item.m_Rect.y + Item.m_Rect.h / 2 - 60.0f, 240.0f, 120.0f);
 				Graphics()->QuadsDrawTL(&QuadItem, 1);
@@ -188,48 +204,62 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			}
 		}
 
+		// показываем новый выбор
 		const int NewSelected = UiDoListboxEnd(&s_ListBoxState, 0);
-		if (NewSelected != -1)
+		if (NewSelected != -1 && NewSelected != OldSelected)
 		{
-			if (NewSelected != OldSelected)
-			{
-				mem_copy(g_Config.m_GameTexture, s_paSkinList[NewSelected]->m_aName, sizeof(g_Config.m_GameTexture));
-				g_pData->m_aImages[IMAGE_GAME].m_Id = s_paSkinList[NewSelected]->m_Texture;
-			}
+			// устанавливаем новый скин
+			mem_copy(g_Config.m_GameTexture, s_GameSkinList[NewSelected]->m_aName, sizeof(g_Config.m_GameTexture));
+			g_pData->m_aImages[IMAGE_GAME].m_Id = s_GameSkinList[NewSelected]->m_Texture;
+
+			// старый скин ставим под новый
+			OldSelected = NewSelected;
 		}
-		OldSelected = NewSelected;
 	}
 
-	// changer emoticion
+	// замена скинов emoticion
 	else if (g_Config.m_Texture == 1)
 	{
-		static sorted_array<const CeSkins::CeSkin*> s_paSkinList;
-		static CListBoxState s_ListBoxState;
+		// инициализация
+		static int s_Init = true;
+		if(s_Init)
+		{
+			m_pClient->m_peSkins->IntitilizeSelectSkin();
+			s_Init = false;
+		}
+
+		// продолжение 
+		static sorted_array<const CeSkins::CeSkin*> s_EmoticionSkinList;
 		static bool m_RefreshSkinSelector = true;
 		if (m_RefreshSkinSelector)
 		{
-			s_paSkinList.clear();
+			s_EmoticionSkinList.clear();
 			for (int i = 0; i < m_pClient->m_peSkins->Num(); ++i)
 			{
 				const CeSkins::CeSkin* s = m_pClient->m_peSkins->Get(i);
-				s_paSkinList.add(s);
+				s_EmoticionSkinList.add(s);
 			}
 			m_RefreshSkinSelector = false;
 		}
 
-		m_pSelectedSkin = 0;
 		int OldSelected = -1;
+		static CListBoxState s_ListBoxState;
 		UiDoListboxHeader(&s_ListBoxState, &MainView, Localize("Emoticions"), 20.0f, 2.0f);
-		UiDoListboxStart(&s_ListBoxState, &m_RefreshSkinSelector, 160.0f, 0, s_paSkinList.size(), 3, OldSelected);
+		UiDoListboxStart(&s_ListBoxState, &m_RefreshSkinSelector, 160.0f, 0, s_EmoticionSkinList.size(), 3, OldSelected);
 
-		for (int i = 0; i < s_paSkinList.size(); ++i)
+		for (int i = 0; i < s_EmoticionSkinList.size(); ++i)
 		{
-			const CeSkins::CeSkin* s = s_paSkinList[i];
-			if (s == 0) continue;
+			// если текстура равна 0 пропускаем
+			const CeSkins::CeSkin* s = s_EmoticionSkinList[i];
+			if (s == 0) 
+				continue;
+
+			// если текстура равна выбранной текстуре то устанавливаем выбор на ней
 			if (str_comp(s->m_aName, g_Config.m_GameEmoticons) == 0)
 				OldSelected = i;
 
-			CListboxItem Item = UiDoListboxNextItem(&s_ListBoxState, &s_paSkinList[i], OldSelected == i);
+			// добавляем в бокс новый предмет
+			CListboxItem Item = UiDoListboxNextItem(&s_ListBoxState, &s_EmoticionSkinList[i], OldSelected == i);
 			if (Item.m_Visible)
 			{
 				CUIRect Label;
@@ -237,7 +267,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 				Item.m_Rect.HSplitBottom(10.0f, &Item.m_Rect, &Label);
 				Item.m_Rect.HSplitTop(5.0f, 0, &Item.m_Rect); // some margin from the top
 
-				Graphics()->TextureSet(s_paSkinList[i]->m_Texture);
+				Graphics()->TextureSet(s_EmoticionSkinList[i]->m_Texture);
 				Graphics()->QuadsBegin();
 				IGraphics::CQuadItem QuadItem(Item.m_Rect.x + Item.m_Rect.w / 2 - 60.0f, Item.m_Rect.y + Item.m_Rect.h / 2 - 60.0f, 120.0f, 120.0f);
 				Graphics()->QuadsDrawTL(&QuadItem, 1);
@@ -245,21 +275,31 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			}
 		}
 
+		// показываем новый выбор
 		const int NewSelected = UiDoListboxEnd(&s_ListBoxState, 0);
-		if (NewSelected != -1)
+		if (NewSelected != -1 && NewSelected != OldSelected)
 		{
-			if (NewSelected != OldSelected)
-			{
-				mem_copy(g_Config.m_GameEmoticons, s_paSkinList[NewSelected]->m_aName, sizeof(g_Config.m_GameEmoticons));
-				g_pData->m_aImages[IMAGE_EMOTICONS].m_Id = s_paSkinList[NewSelected]->m_Texture;
-			}
+			// устанавливаем новый скин
+			mem_copy(g_Config.m_GameEmoticons, s_EmoticionSkinList[NewSelected]->m_aName, sizeof(g_Config.m_GameEmoticons));
+			g_pData->m_aImages[IMAGE_EMOTICONS].m_Id = s_EmoticionSkinList[NewSelected]->m_Texture;
+
+			// старый скин ставим под новый
+			OldSelected = NewSelected;
 		}
-		OldSelected = NewSelected;
 	}
 
-	// changer cursors
+	// замена скинов cursors
 	else if (g_Config.m_Texture == 2)
 	{
+		// инициализация
+		static int s_Init = true;
+		if(s_Init)
+		{
+			m_pClient->m_pcSkins->IntitilizeSelectSkin();
+			s_Init = false;
+		}
+
+		// продолжение
 		static sorted_array<const CcSkins::CcSkin*> s_paSkinList;
 		static CListBoxState s_ListBoxState;
 		static bool m_RefreshSkinSelector = true;
@@ -274,18 +314,22 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			m_RefreshSkinSelector = false;
 		}
 
-		m_pSelectedSkin = 0;
 		int OldSelected = -1;
 		UiDoListboxHeader(&s_ListBoxState, &MainView, Localize("Cursors"), 20.0f, 2.0f);
 		UiDoListboxStart(&s_ListBoxState, &m_RefreshSkinSelector, 160.0f, 0, s_paSkinList.size(), 3, OldSelected);
 
 		for (int i = 0; i < s_paSkinList.size(); ++i)
 		{
+			// если текстура равна 0 пропускаем
 			const CcSkins::CcSkin* s = s_paSkinList[i];
-			if (s == 0) continue;
+			if (s == 0) 
+				continue;
+
+			// если текстура равна выбранной текстуре то устанавливаем выбор на ней
 			if (str_comp(s->m_aName, g_Config.m_GameCursor) == 0)
 				OldSelected = i;
 
+			// добавляем в бокс новый предмет
 			CListboxItem Item = UiDoListboxNextItem(&s_ListBoxState, &s_paSkinList[i], OldSelected == i);
 			if (Item.m_Visible)
 			{
@@ -302,48 +346,62 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			}
 		}
 
+		// показываем новый выбор
 		const int NewSelected = UiDoListboxEnd(&s_ListBoxState, 0);
-		if (NewSelected != -1)
+		if (NewSelected != -1 && NewSelected != OldSelected)
 		{
-			if (NewSelected != OldSelected)
-			{
-				mem_copy(g_Config.m_GameCursor, s_paSkinList[NewSelected]->m_aName, sizeof(g_Config.m_GameCursor));
-				g_pData->m_aImages[IMAGE_CURSOR].m_Id = s_paSkinList[NewSelected]->m_Texture;
-			}
+			// устанавливаем новый скин
+			mem_copy(g_Config.m_GameCursor, s_paSkinList[NewSelected]->m_aName, sizeof(g_Config.m_GameCursor));
+			g_pData->m_aImages[IMAGE_CURSOR].m_Id = s_paSkinList[NewSelected]->m_Texture;
+
+			// старый скин ставим под новый
+			OldSelected = NewSelected;
 		}
-		OldSelected = NewSelected;
 	}
 
-	// changer particles
+	// замена скинов particles
 	else if (g_Config.m_Texture == 3)
 	{
-		static sorted_array<const CpSkins::CpSkin*> s_paSkinList;
-		static CListBoxState s_ListBoxState;
+		// инициализация
+		static int s_Init = true;
+		if(s_Init)
+		{
+			m_pClient->m_ppSkins->IntitilizeSelectSkin();
+			s_Init = false;
+		}
+
+		// загружаем список статично чтобы не грузить постоянно его по 20 раз
+		static sorted_array<const CpSkins::CpSkin*> s_ParticlesSkinList;
 		static bool m_RefreshSkinSelector = true;
 		if (m_RefreshSkinSelector)
 		{
-			s_paSkinList.clear();
+			s_ParticlesSkinList.clear();
 			for (int i = 0; i < m_pClient->m_ppSkins->Num(); ++i)
 			{
 				const CpSkins::CpSkin* s = m_pClient->m_ppSkins->Get(i);
-				s_paSkinList.add(s);
+				s_ParticlesSkinList.add(s);
 			}
 			m_RefreshSkinSelector = false;
 		}
 
-		m_pSelectedSkin = 0;
 		int OldSelected = -1;
+		static CListBoxState s_ListBoxState;
 		UiDoListboxHeader(&s_ListBoxState, &MainView, Localize("Particles"), 20.0f, 2.0f);
-		UiDoListboxStart(&s_ListBoxState, &m_RefreshSkinSelector, 160.0f, 0, s_paSkinList.size(), 3, OldSelected);
+		UiDoListboxStart(&s_ListBoxState, &m_RefreshSkinSelector, 160.0f, 0, s_ParticlesSkinList.size(), 3, OldSelected);
 
-		for (int i = 0; i < s_paSkinList.size(); ++i)
+		for (int i = 0; i < s_ParticlesSkinList.size(); ++i)
 		{
-			const CpSkins::CpSkin* s = s_paSkinList[i];
-			if (s == 0) continue;
+			// если текстура равна 0 пропускаем
+			const CpSkins::CpSkin* s = s_ParticlesSkinList[i];
+			if (s == 0) 
+				continue;
+
+			// если текстура равна выбранной текстуре то устанавливаем выбор на ней
 			if (str_comp(s->m_aName, g_Config.m_GameParticles) == 0)
 				OldSelected = i;
 
-			CListboxItem Item = UiDoListboxNextItem(&s_ListBoxState, &s_paSkinList[i], OldSelected == i);
+			// добавляем в бокс новый предмет
+			CListboxItem Item = UiDoListboxNextItem(&s_ListBoxState, &s_ParticlesSkinList[i], OldSelected == i);
 			if (Item.m_Visible)
 			{
 				CUIRect Label;
@@ -351,7 +409,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 				Item.m_Rect.HSplitBottom(10.0f, &Item.m_Rect, &Label);
 				Item.m_Rect.HSplitTop(5.0f, 0, &Item.m_Rect); // some margin from the top
 
-				Graphics()->TextureSet(s_paSkinList[i]->m_Texture);
+				Graphics()->TextureSet(s_ParticlesSkinList[i]->m_Texture);
 				Graphics()->QuadsBegin();
 				IGraphics::CQuadItem QuadItem(Item.m_Rect.x + Item.m_Rect.w / 2 - 60.0f, Item.m_Rect.y + Item.m_Rect.h / 2 - 60.0f, 120.0f, 120.0f);
 				Graphics()->QuadsDrawTL(&QuadItem, 1);
@@ -359,49 +417,61 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			}
 		}
 
+		// показываем новый выбор
 		const int NewSelected = UiDoListboxEnd(&s_ListBoxState, 0);
-		if (NewSelected != -1)
+		if (NewSelected != -1 && NewSelected != OldSelected)
 		{
-			if (NewSelected != OldSelected)
-			{
-				mem_copy(g_Config.m_GameParticles, s_paSkinList[NewSelected]->m_aName, sizeof(g_Config.m_GameParticles));
-				g_pData->m_aImages[IMAGE_PARTICLES].m_Id = s_paSkinList[NewSelected]->m_Texture;
-			}
+			// устанавливаем новый скин
+			mem_copy(g_Config.m_GameParticles, s_ParticlesSkinList[NewSelected]->m_aName, sizeof(g_Config.m_GameParticles));
+			g_pData->m_aImages[IMAGE_PARTICLES].m_Id = s_ParticlesSkinList[NewSelected]->m_Texture;
+
+			// старый скин ставим под новый
+			OldSelected = NewSelected;
 		}
-		OldSelected = NewSelected;
 	}
 
-	// changer entities
+	// замена скинов entities
 	else if (g_Config.m_Texture == 4)
 	{
-		static sorted_array<const CEnSkins::CEnSkin*> s_paSkinList;
+		// инициализация
+		static int s_Init = true;
+		if(s_Init)
+		{
+			m_pClient->m_penSkins->IntitilizeSelectSkin();
+			s_Init = false;
+		}
+
+		static sorted_array<const CEnSkins::CEnSkin*> s_EntitiesSkinList;
 		static CListBoxState s_ListBoxState;
 		static bool m_RefreshSkinSelector = true;
 		if (m_RefreshSkinSelector)
 		{
-			s_paSkinList.clear();
+			s_EntitiesSkinList.clear();
 			for (int i = 0; i < m_pClient->m_penSkins->Num(); ++i)
 			{
 				const CEnSkins::CEnSkin* s = m_pClient->m_penSkins->Get(i);
-				s_paSkinList.add(s);
+				s_EntitiesSkinList.add(s);
 			}
 			m_RefreshSkinSelector = false;
 		}
 
-		m_pSelectedSkin = 0;
 		int OldSelected = -1;
 		UiDoListboxHeader(&s_ListBoxState, &MainView, Localize("Entities"), 20.0f, 2.0f);
-		UiDoListboxStart(&s_ListBoxState, &m_RefreshSkinSelector, 160.0f, 0, s_paSkinList.size(), 3, OldSelected);
+		UiDoListboxStart(&s_ListBoxState, &m_RefreshSkinSelector, 160.0f, 0, s_EntitiesSkinList.size(), 3, OldSelected);
 
-		for (int i = 0; i < s_paSkinList.size(); ++i)
+		for (int i = 0; i < s_EntitiesSkinList.size(); ++i)
 		{
-			const CEnSkins::CEnSkin* s = s_paSkinList[i];
+			// если текстура равна 0 пропускаем
+			const CEnSkins::CEnSkin* s = s_EntitiesSkinList[i];
 			if (s == 0)
 				continue;
+
+			// если текстура равна выбранной текстуре то устанавливаем выбор на ней
 			if (str_comp(s->m_aName, g_Config.m_GameEntities) == 0)
 				OldSelected = i;
 
-			CListboxItem Item = UiDoListboxNextItem(&s_ListBoxState, &s_paSkinList[i], OldSelected == i);
+			// добавляем в бокс новый предмет
+			CListboxItem Item = UiDoListboxNextItem(&s_ListBoxState, &s_EntitiesSkinList[i], OldSelected == i);
 			if (Item.m_Visible)
 			{
 				CUIRect Label;
@@ -409,7 +479,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 				Item.m_Rect.HSplitBottom(10.0f, &Item.m_Rect, &Label);
 				Item.m_Rect.HSplitTop(5.0f, 0, &Item.m_Rect); // some margin from the topUiDoListboxStart(&s_FontList, &s_Fade[0], 20.0f, Localize("Fonts"), s_Fonts.size(), 1, s_SelectedFont);
 
-				Graphics()->TextureSet(s_paSkinList[i]->m_Texture);
+				Graphics()->TextureSet(s_EntitiesSkinList[i]->m_Texture);
 				Graphics()->QuadsBegin();
 				IGraphics::CQuadItem QuadItem(Item.m_Rect.x + Item.m_Rect.w / 2 - 60.0f, Item.m_Rect.y + Item.m_Rect.h / 2 - 60.0f, 120.0f, 120.0f);
 				Graphics()->QuadsDrawTL(&QuadItem, 1);
@@ -417,13 +487,16 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			}
 		}
 
+		// показываем новый выбор
 		const int NewSelected = UiDoListboxEnd(&s_ListBoxState, 0);
-		if (NewSelected != -1)
+		if(NewSelected != -1 && NewSelected != OldSelected)
 		{
-			if (NewSelected != OldSelected)
-				mem_copy(g_Config.m_GameEntities, s_paSkinList[NewSelected]->m_aName, sizeof(g_Config.m_GameEntities));
+			// устанавливаем новый скин
+			mem_copy(g_Config.m_GameEntities, s_EntitiesSkinList[NewSelected]->m_aName, sizeof(g_Config.m_GameEntities));
+	
+			// старый скин ставим под новый
+			OldSelected = NewSelected;
 		}
-		OldSelected = NewSelected;
 	}
 	else if (g_Config.m_Texture == 5)
 	{

@@ -12,81 +12,89 @@
 
 #include "skinsprojectile.h"
 
+// сканируем скины
 int CpSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 {
 	CpSkins* pSelf = (CpSkins*)pUser;
-	int l = str_length(pName);
-	if (l < 4 || IsDir || str_comp(pName + l - 4, ".png") != 0)
+	const char *pSuffix = str_endswith(pName, ".png");
+	if (IsDir || !pSuffix)
 		return 0;
 
+	// имя скина и проверяем если скин является загружаемым вначале
+	char aSkinName[128];
+	str_truncate(aSkinName, sizeof(aSkinName), pName, pSuffix - pName);
+	if (str_comp(aSkinName, g_Config.m_GameParticles) == 0) return 0;
+
+	// файл скина скина
+	CImageInfo Info;
 	char aBuf[512];
 	str_format(aBuf, sizeof(aBuf), "particles/%s", pName);
-	CImageInfo Info;
 	if (!pSelf->Graphics()->LoadPNG(&Info, aBuf, DirType))
 	{
-		str_format(aBuf, sizeof(aBuf), "failed to load particles from %s", pName);
+		str_format(aBuf, sizeof(aBuf), "failed to load particles from %s", aSkinName);
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
 		return 0;
 	}
 
+	// загружаем скин и добавляем в массив
 	CpSkin Skin;
 	Skin.m_Texture = pSelf->Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
-
-	// set skin data
-	str_copy(Skin.m_aName, pName, min((int)sizeof(Skin.m_aName), l - 3));
-	if (g_Config.m_Debug)
-	{
-		str_format(aBuf, sizeof(aBuf), "load particles %s", Skin.m_aName);
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
-	}
+	str_copy(Skin.m_aName, aSkinName, sizeof(Skin.m_aName));
 	pSelf->m_aSkins.add(Skin);
-
 	return 0;
 }
 
+// инициализация всех скинов при выборе
+void CpSkins::IntitilizeSelectSkin()
+{
+	// сканируем скины
+	Storage()->ListDirectory(IStorage::TYPE_ALL, "particles", SkinScan, this);
+}
 
+// инициализация скинов
 void CpSkins::OnInit()
 {
-	// load skins
+	// очищаем весь лист скинов
 	m_aSkins.clear();
 
-	// load Default 
-	char aBuf[512];
-	str_format(aBuf, sizeof(aBuf), "particles.png");
+	// если не смогли загрузить стандартный скин
+	char aBuf[128];
+	str_format(aBuf, sizeof(aBuf), "particles/%s.png", g_Config.m_GameParticles);
+
+	// загружаем установленный
 	CImageInfo Info;
 	if (!Graphics()->LoadPNG(&Info, aBuf, IStorage::TYPE_ALL))
 	{
-		str_format(aBuf, sizeof(aBuf), "failed to load default particles");
+		str_format(aBuf, sizeof(aBuf), "failed to load \"data/%s\"", aBuf);
 		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
+
+		// загружаем станадртный если ошибка с поставленым
+		if (!Graphics()->LoadPNG(&Info, "particles/!particles.png", IStorage::TYPE_ALL))
+			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", "failed to load default \"data/particles/!particles.png\"");
+		else 
+			str_copy(g_Config.m_GameParticles, "!particles", sizeof(g_Config.m_GameParticles));
 	}
 
-	CpSkin DefaultSkin;
-	DefaultSkin.m_Texture = Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
-
-	// set Default skin data
-	str_format(DefaultSkin.m_aName, sizeof(DefaultSkin.m_aName), "!default");
-	if (g_Config.m_Debug)
-	{
-		str_format(aBuf, sizeof(aBuf), "load default particles %s", DefaultSkin.m_aName);
-		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
-	}
-	m_aSkins.add(DefaultSkin);
-
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "particles", SkinScan, this);
-
-
+	// устанавливаем текстуру
+	CpSkin StartSkin;
+	StartSkin.m_Texture = Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
+	str_copy(StartSkin.m_aName, g_Config.m_GameParticles, sizeof(StartSkin.m_aName));
+	m_aSkins.add(StartSkin);
 }
 
+// получить список скинов
 int CpSkins::Num()
 {
 	return m_aSkins.size();
 }
 
+// получить скин по индексу
 const CpSkins::CpSkin* CpSkins::Get(int Index)
 {
 	return &m_aSkins[max(0, Index % m_aSkins.size())];
 }
 
+// найти скин по имени
 int CpSkins::Find(const char* pName)
 {
 	for (int i = 0; i < m_aSkins.size(); i++)
@@ -97,11 +105,13 @@ int CpSkins::Find(const char* pName)
 	return -1;
 }
 
+// получить цвет скина в vec3
 vec3 CpSkins::GetColorV3(int v)
 {
 	return HslToRgb(vec3(((v >> 16) & 0xff) / 255.0f, ((v >> 8) & 0xff) / 255.0f, 0.5f + (v & 0xff) / 255.0f * 0.5f));
 }
 
+// получить цвет скина в vec4
 vec4 CpSkins::GetColorV4(int v)
 {
 	vec3 r = GetColorV3(v);

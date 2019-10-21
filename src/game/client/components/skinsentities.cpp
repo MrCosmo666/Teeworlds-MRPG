@@ -15,13 +15,19 @@
 int CEnSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 {
 	CEnSkins* pSelf = (CEnSkins*)pUser;
-	int l = str_length(pName);
-	if (l < 4 || IsDir || str_comp(pName + l - 4, ".png") != 0)
+	const char *pSuffix = str_endswith(pName, ".png");
+	if (IsDir || !pSuffix)
 		return 0;
 
+	// имя скина и проверяем если скин является загружаемым вначале
+	char aSkinName[128];
+	str_truncate(aSkinName, sizeof(aSkinName), pName, pSuffix - pName);
+	if (str_comp(aSkinName, g_Config.m_GameEntities) == 0) return 0;
+
+	// файл скина скина
+	CImageInfo Info;
 	char aBuf[512];
 	str_format(aBuf, sizeof(aBuf), "entities/%s", pName);
-	CImageInfo Info;
 	if (!pSelf->Graphics()->LoadPNG(&Info, aBuf, DirType))
 	{
 		str_format(aBuf, sizeof(aBuf), "failed to load entities from %s", pName);
@@ -29,52 +35,50 @@ int CEnSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 		return 0;
 	}
 
+	// загружаем скин и добавляем в массив
 	CEnSkin Skin;
 	Skin.m_Texture = pSelf->Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
-
-	// set skin data
-	str_copy(Skin.m_aName, aBuf, sizeof(Skin.m_aName));
-	if (g_Config.m_Debug)
-	{
-		str_format(aBuf, sizeof(aBuf), "load entities %s", Skin.m_aName);
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
-	}
+	str_copy(Skin.m_aName, aSkinName, sizeof(Skin.m_aName));
 	pSelf->m_aSkins.add(Skin);
-
 	return 0;
+}
+
+// инициализация всех скинов при выборе
+void CEnSkins::IntitilizeSelectSkin()
+{
+	// сканируем скины
+	Storage()->ListDirectory(IStorage::TYPE_ALL, "gameskins", SkinScan, this);
 }
 
 
 void CEnSkins::OnInit()
 {
-	// load skins
+	// очищаем весь лист скинов
 	m_aSkins.clear();
 
-	// load Default 
-	char aBuf[512];
-	str_format(aBuf, sizeof(aBuf), "editor/entities.png");
+	// если не смогли загрузить стандартный скин
+	char aBuf[128];
+	str_format(aBuf, sizeof(aBuf), "entities/%s.png", g_Config.m_GameEntities);
+
+	// загружаем установленный
 	CImageInfo Info;
 	if (!Graphics()->LoadPNG(&Info, aBuf, IStorage::TYPE_ALL))
 	{
-		str_format(aBuf, sizeof(aBuf), "failed to load default entities");
+		str_format(aBuf, sizeof(aBuf), "failed to load \"data/%s\"", aBuf);
 		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
+
+		// загружаем станадртный если ошибка с поставленым
+		if (!Graphics()->LoadPNG(&Info, "entities/!entities.png", IStorage::TYPE_ALL))
+			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", "failed to load default \"data/entities/!entities.png\"");
+		else 
+			str_copy(g_Config.m_GameEntities, "!entities", sizeof(g_Config.m_GameEntities));
 	}
 
-	CEnSkin DefaultSkin;
-	DefaultSkin.m_Texture = Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
-
-	// set Default skin data
-	str_format(DefaultSkin.m_aName, sizeof(DefaultSkin.m_aName), "editor/entities.png");
-	if (g_Config.m_Debug)
-	{
-		str_format(aBuf, sizeof(aBuf), "load default entities %s", DefaultSkin.m_aName);
-		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
-	}
-	m_aSkins.add(DefaultSkin);
-
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "entities", SkinScan, this);
-
-
+	// устанавливаем текстуру
+	CEnSkin StartSkin;
+	StartSkin.m_Texture = Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
+	str_copy(StartSkin.m_aName, g_Config.m_GameEntities, sizeof(StartSkin.m_aName));
+	m_aSkins.add(StartSkin);
 }
 
 int CEnSkins::Num()

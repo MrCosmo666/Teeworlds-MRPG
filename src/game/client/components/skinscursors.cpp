@@ -15,65 +15,69 @@
 int CcSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 {
 	CcSkins* pSelf = (CcSkins*)pUser;
-	int l = str_length(pName);
-	if (l < 4 || IsDir || str_comp(pName + l - 4, ".png") != 0)
+	const char *pSuffix = str_endswith(pName, ".png");
+	if (IsDir || !pSuffix)
 		return 0;
 
+	// имя скина и проверяем если скин является загружаемым вначале
+	char aSkinName[128];
+	str_truncate(aSkinName, sizeof(aSkinName), pName, pSuffix - pName);
+	if (str_comp(aSkinName, g_Config.m_GameCursor) == 0) return 0;
+
+	// файл скина скина
+	CImageInfo Info;
 	char aBuf[512];
 	str_format(aBuf, sizeof(aBuf), "cursor/%s", pName);
-	CImageInfo Info;
 	if (!pSelf->Graphics()->LoadPNG(&Info, aBuf, DirType))
 	{
-		str_format(aBuf, sizeof(aBuf), "failed to load cursor from %s", pName);
+		str_format(aBuf, sizeof(aBuf), "failed to load cursor %s", pName);
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
 		return 0;
 	}
 
+	// загружаем скин и добавляем в массив
 	CcSkin Skin;
 	Skin.m_Texture = pSelf->Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
-
-	// set skin data
-	str_copy(Skin.m_aName, pName, min((int)sizeof(Skin.m_aName), l - 3));
-	if (g_Config.m_Debug)
-	{
-		str_format(aBuf, sizeof(aBuf), "load cursor %s", Skin.m_aName);
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
-	}
+	str_copy(Skin.m_aName, aSkinName, sizeof(Skin.m_aName));
 	pSelf->m_aSkins.add(Skin);
-
 	return 0;
+}
+
+// инициализация всех скинов при выборе
+void CcSkins::IntitilizeSelectSkin()
+{
+	// сканируем скины
+	Storage()->ListDirectory(IStorage::TYPE_ALL, "cursor", SkinScan, this);
 }
 
 void CcSkins::OnInit()
 {
-	// load skins
+	// очищаем весь лист скинов
 	m_aSkins.clear();
 
-	// load Default 
-	char aBuf[512];
-	str_format(aBuf, sizeof(aBuf), "ui/gui_cursor.png");
+	// если не смогли загрузить стандартный скин
+	char aBuf[128];
+	str_format(aBuf, sizeof(aBuf), "cursor/%s.png", g_Config.m_GameCursor);
+
+	// загружаем установленный
 	CImageInfo Info;
 	if (!Graphics()->LoadPNG(&Info, aBuf, IStorage::TYPE_ALL))
 	{
-		str_format(aBuf, sizeof(aBuf), "failed to load default cursor");
+		str_format(aBuf, sizeof(aBuf), "failed to load \"data/%s\"", aBuf);
 		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
+
+		// загружаем станадртный если ошибка с поставленым
+		if (!Graphics()->LoadPNG(&Info, "cursor/!gui_cursor.png", IStorage::TYPE_ALL))
+			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", "failed to load default \"data/cursor/!gui_cursor.png\"");
+		else 
+			str_copy(g_Config.m_GameCursor, "!gui_cursor", sizeof(g_Config.m_GameCursor));
 	}
 
-	CcSkin DefaultSkin;
-	DefaultSkin.m_Texture = Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
-
-	// set Default skin data
-	str_format(DefaultSkin.m_aName, sizeof(DefaultSkin.m_aName), "!default");
-	if (g_Config.m_Debug)
-	{
-		str_format(aBuf, sizeof(aBuf), "load default cursor %s", DefaultSkin.m_aName);
-		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
-	}
-	m_aSkins.add(DefaultSkin);
-
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "cursor", SkinScan, this);
-
-
+	// устанавливаем текстуру
+	CcSkin StartSkin;
+	StartSkin.m_Texture = Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
+	str_copy(StartSkin.m_aName, g_Config.m_GameCursor, sizeof(StartSkin.m_aName));
+	m_aSkins.add(StartSkin);
 }
 
 int CcSkins::Num()
