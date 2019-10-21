@@ -522,19 +522,18 @@ public:
 
 int GatherFonts(const char *pFileName, int IsDir, int Type, void *pUser)
 {
-	const char *pSuffix = str_endswith(pName, ".ttf");
+	const char *pSuffix = str_endswith(pFileName, ".ttf");
 	if (IsDir || !pSuffix) return 0;
 
 	sorted_array<CFontFile> &Fonts = *((sorted_array<CFontFile> *)pUser);
-	char aNiceName[128];
-	str_copy(aNiceName, pFileName, PathLength - 3);
-	aNiceName[0] = str_uppercase(aNiceName[0]);	// check if the font was already added	
-
+	char aFontName[128];
+	str_truncate(aFontName, sizeof(aFontName), pFileName, pSuffix - pFileName);
 	for (int i = 0; i < Fonts.size(); i++)
-		if (!str_comp(Fonts[i].m_Name, aNiceName))
+	{
+		if (!str_comp(Fonts[i].m_Name, aFontName))
 			return 0;
-
-	Fonts.add(CFontFile(aNiceName, pFileName));
+	}
+	Fonts.add(CFontFile(aFontName, pFileName));
 	return 0;
 }
 
