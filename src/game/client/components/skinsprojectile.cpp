@@ -13,9 +13,9 @@
 #include "skinsprojectile.h"
 
 // сканируем скины
-int CpSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
+int CParticlesSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 {
-	CpSkins* pSelf = (CpSkins*)pUser;
+	CParticlesSkins* pSelf = (CParticlesSkins*)pUser;
 	const char *pSuffix = str_endswith(pName, ".png");
 	if (IsDir || !pSuffix) return 0;
 
@@ -38,7 +38,7 @@ int CpSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 	}
 
 	// загружаем скин и добавляем в массив
-	CpSkin Skin;
+	CParticlesSkin Skin;
 	Skin.m_Texture = pSelf->Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
 	str_copy(Skin.m_aName, aSkinName, sizeof(Skin.m_aName));
 	pSelf->m_aSkins.add(Skin);
@@ -46,17 +46,20 @@ int CpSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 }
 
 // инициализация всех скинов при выборе
-void CpSkins::IntitilizeSelectSkin()
+void CParticlesSkins::IntitilizeSelectSkin()
 {
+	m_IsLoading = true;
+
 	// сканируем скины
 	Storage()->ListDirectory(IStorage::TYPE_ALL, "particles", SkinScan, this);
 }
 
 // инициализация скинов
-void CpSkins::OnInit()
+void CParticlesSkins::OnInit()
 {
 	// очищаем весь лист скинов
 	m_aSkins.clear();
+	m_IsLoading = false;
 
 	// если не смогли загрузить стандартный скин
 	char aBuf[128];
@@ -74,26 +77,26 @@ void CpSkins::OnInit()
 	}
 
 	// устанавливаем текстуру
-	CpSkin StartSkin;
+	CParticlesSkin StartSkin;
 	StartSkin.m_Texture = Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
 	str_copy(StartSkin.m_aName, g_Config.m_GameParticles, sizeof(StartSkin.m_aName));
 	m_aSkins.add(StartSkin);
 }
 
 // получить список скинов
-int CpSkins::Num()
+int CParticlesSkins::Num()
 {
 	return m_aSkins.size();
 }
 
 // получить скин по индексу
-const CpSkins::CpSkin* CpSkins::Get(int Index)
+const CParticlesSkins::CParticlesSkin* CParticlesSkins::Get(int Index)
 {
 	return &m_aSkins[max(0, Index % m_aSkins.size())];
 }
 
 // найти скин по имени
-int CpSkins::Find(const char* pName)
+int CParticlesSkins::Find(const char* pName)
 {
 	for (int i = 0; i < m_aSkins.size(); i++)
 	{
@@ -104,13 +107,13 @@ int CpSkins::Find(const char* pName)
 }
 
 // получить цвет скина в vec3
-vec3 CpSkins::GetColorV3(int v)
+vec3 CParticlesSkins::GetColorV3(int v)
 {
 	return HslToRgb(vec3(((v >> 16) & 0xff) / 255.0f, ((v >> 8) & 0xff) / 255.0f, 0.5f + (v & 0xff) / 255.0f * 0.5f));
 }
 
 // получить цвет скина в vec4
-vec4 CpSkins::GetColorV4(int v)
+vec4 CParticlesSkins::GetColorV4(int v)
 {
 	vec3 r = GetColorV3(v);
 	return vec4(r.r, r.g, r.b, 1.0f);

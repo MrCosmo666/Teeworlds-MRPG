@@ -12,9 +12,9 @@
 
 #include "skinsentities.h"
 
-int CEnSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
+int CEntitiesSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 {
-	CEnSkins* pSelf = (CEnSkins*)pUser;
+	CEntitiesSkins* pSelf = (CEntitiesSkins*)pUser;
 	const char *pSuffix = str_endswith(pName, ".png");
 	if (IsDir || !pSuffix) return 0;
 
@@ -37,7 +37,7 @@ int CEnSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 	}
 
 	// загружаем скин и добавляем в массив
-	CEnSkin Skin;
+	CEntitiesSkin Skin;
 	Skin.m_Texture = pSelf->Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
 	str_copy(Skin.m_aName, aSkinName, sizeof(Skin.m_aName));
 	pSelf->m_aSkins.add(Skin);
@@ -45,17 +45,20 @@ int CEnSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 }
 
 // инициализация всех скинов при выборе
-void CEnSkins::IntitilizeSelectSkin()
+void CEntitiesSkins::IntitilizeSelectSkin()
 {
+	m_IsLoading = true;
+
 	// сканируем скины
 	Storage()->ListDirectory(IStorage::TYPE_ALL, "entities", SkinScan, this);
 }
 
 
-void CEnSkins::OnInit()
+void CEntitiesSkins::OnInit()
 {
 	// очищаем весь лист скинов
 	m_aSkins.clear();
+	m_IsLoading = false;
 
 	// если не смогли загрузить стандартный скин
 	char aBuf[128];
@@ -73,23 +76,23 @@ void CEnSkins::OnInit()
 	}
 
 	// устанавливаем текстуру
-	CEnSkin StartSkin;
+	CEntitiesSkin StartSkin;
 	StartSkin.m_Texture = Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
 	str_copy(StartSkin.m_aName, g_Config.m_GameEntities, sizeof(StartSkin.m_aName));
 	m_aSkins.add(StartSkin);
 }
 
-int CEnSkins::Num()
+int CEntitiesSkins::Num()
 {
 	return m_aSkins.size();
 }
 
-const CEnSkins::CEnSkin* CEnSkins::Get(int Index)
+const CEntitiesSkins::CEntitiesSkin* CEntitiesSkins::Get(int Index)
 {
 	return &m_aSkins[max(0, Index % m_aSkins.size())];
 }
 
-int CEnSkins::Find(const char* pName)
+int CEntitiesSkins::Find(const char* pName)
 {
 	for (int i = 0; i < m_aSkins.size(); i++)
 	{
@@ -99,12 +102,12 @@ int CEnSkins::Find(const char* pName)
 	return -1;
 }
 
-vec3 CEnSkins::GetColorV3(int v)
+vec3 CEntitiesSkins::GetColorV3(int v)
 {
 	return HslToRgb(vec3(((v >> 16) & 0xff) / 255.0f, ((v >> 8) & 0xff) / 255.0f, 0.5f + (v & 0xff) / 255.0f * 0.5f));
 }
 
-vec4 CEnSkins::GetColorV4(int v)
+vec4 CEntitiesSkins::GetColorV4(int v)
 {
 	vec3 r = GetColorV3(v);
 	return vec4(r.r, r.g, r.b, 1.0f);

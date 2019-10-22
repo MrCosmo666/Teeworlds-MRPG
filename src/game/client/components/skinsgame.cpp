@@ -12,9 +12,9 @@
 
 #include "skinsgame.h"
 
-int CgSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
+int CGameSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 {
-	CgSkins* pSelf = (CgSkins*)pUser;
+	CGameSkins* pSelf = (CGameSkins*)pUser;
 	const char *pSuffix = str_endswith(pName, ".png");
 	if (IsDir || !pSuffix) return 0;
 
@@ -37,7 +37,7 @@ int CgSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 	}
 
 	// загружаем скин и добавляем в массив
-	CgSkin Skin;
+	CGameSkin Skin;
 	Skin.m_Texture = pSelf->Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
 	str_copy(Skin.m_aName, aSkinName, sizeof(Skin.m_aName));
 	pSelf->m_aSkins.add(Skin);
@@ -45,16 +45,19 @@ int CgSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 }
 
 // инициализация всех скинов при выборе
-void CgSkins::IntitilizeSelectSkin()
+void CGameSkins::IntitilizeSelectSkin()
 {
+	m_IsLoading = true;
+
 	// сканируем скины
 	Storage()->ListDirectory(IStorage::TYPE_ALL, "gameskins", SkinScan, this);
 }
 
-void CgSkins::OnInit()
+void CGameSkins::OnInit()
 {
 	// очищаем весь лист скинов
 	m_aSkins.clear();
+	m_IsLoading = false;
 
 	// если не смогли загрузить стандартный скин
 	char aBuf[128];
@@ -72,23 +75,23 @@ void CgSkins::OnInit()
 	}
 
 	// устанавливаем текстуру
-	CgSkin StartSkin;
+	CGameSkin StartSkin;
 	StartSkin.m_Texture = Graphics()->LoadTextureRaw(Info.m_Width, Info.m_Height, Info.m_Format, Info.m_pData, Info.m_Format, 0);
 	str_copy(StartSkin.m_aName, g_Config.m_GameTexture, sizeof(StartSkin.m_aName));
 	m_aSkins.add(StartSkin);
 }
 
-int CgSkins::Num()
+int CGameSkins::Num()
 {
 	return m_aSkins.size();
 }
 
-const CgSkins::CgSkin* CgSkins::Get(int Index)
+const CGameSkins::CGameSkin* CGameSkins::Get(int Index)
 {
 	return &m_aSkins[max(0, Index % m_aSkins.size())];
 }
 
-int CgSkins::Find(const char* pName)
+int CGameSkins::Find(const char* pName)
 {
 	for (int i = 0; i < m_aSkins.size(); i++)
 	{
@@ -98,12 +101,12 @@ int CgSkins::Find(const char* pName)
 	return -1;
 }
 
-vec3 CgSkins::GetColorV3(int v)
+vec3 CGameSkins::GetColorV3(int v)
 {
 	return HslToRgb(vec3(((v >> 16) & 0xff) / 255.0f, ((v >> 8) & 0xff) / 255.0f, 0.5f + (v & 0xff) / 255.0f * 0.5f));
 }
 
-vec4 CgSkins::GetColorV4(int v)
+vec4 CGameSkins::GetColorV4(int v)
 {
 	vec3 r = GetColorV3(v);
 	return vec4(r.r, r.g, r.b, 1.0f);

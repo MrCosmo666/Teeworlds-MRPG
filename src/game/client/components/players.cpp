@@ -312,19 +312,19 @@ void CPlayers::RenderPlayer(
 		vec2 p;
 		if (Player.m_Weapon == WEAPON_HAMMER)
 		{
-			// завершаем поток IMAGE_GAME
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ IMAGE_GAME
 			Graphics()->QuadsEnd();
 
-			// рисуем молоток
+			// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 			bool m_RenderHammer = RenderHammer(&State, Player, Angle, Position, m_pClient->m_aClients[ClientID].m_aEquipItems[EQUIP_HAMMER]);
 			
-			// начинаем поток IMAGE_GAME
+			// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ IMAGE_GAME
 			Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 
 			Graphics()->QuadsBegin();
 			Graphics()->QuadsSetRotation(State.GetAttach()->m_Angle*pi * 2 + Angle);
 
-			// если он захочит рисовать молот
+			// пїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 			if(m_RenderHammer)
 			{
 				// normal weapons
@@ -651,7 +651,7 @@ bool CPlayers::RenderHammer(CAnimState* pAnim, const CNetObj_Character pPlayer, 
 	vec2 Direction = direction(Angle);
 	if (EquipID == 24) // spear
 	{
-		// создаем и рисуем обьект
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_ODINSPEAR].m_Id);
 		Graphics()->QuadsBegin();
 
@@ -663,17 +663,16 @@ bool CPlayers::RenderHammer(CAnimState* pAnim, const CNetObj_Character pPlayer, 
 		IGraphics::CQuadItem Quad2(p.x, p.y, 120, 120);
 		Graphics()->QuadsDrawTL(&Quad2, 1);
 
-		// завершаем поток
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		Graphics()->QuadsEnd();
 		
-		// рисуем эффект крылья
+		// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 20, Position.y - 70), vec2(0,0), vec4(0.8f, 0.3f, 0.0f, 0.2f));
 		return true;
 	}
 
 	if (EquipID == 10) // aztec sword
 	{
-		// создаем и рисуем обьект
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_AZTECSWORD].m_Id);
 		Graphics()->QuadsBegin();
 
@@ -686,11 +685,11 @@ bool CPlayers::RenderHammer(CAnimState* pAnim, const CNetObj_Character pPlayer, 
 		}
 		else Graphics()->QuadsSetRotation(-pi / 2 + (pAnim->GetAttach()->m_Angle*2)*pi * 2 );
 
-		// рисуем обьект
+		// пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 		IGraphics::CQuadItem Quad2(p.x-SizeX/2, (p.y-SizeY/2)-15, SizeX, SizeY);
 		Graphics()->QuadsDrawTL(&Quad2, 1);
 		
-		// завершаем поток
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 		Graphics()->QuadsEnd();
 		return false;
 	}

@@ -151,22 +151,18 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 	if (g_Config.m_Texture == 0)
 	{
 		// инициализация
-		static int s_Init = true;
-		if(s_Init)
-		{
-			m_pClient->m_pgSkins->IntitilizeSelectSkin();
-			s_Init = false;
-		}
+		if (!m_pClient->m_pGameSkins->IsLoading())
+			m_pClient->m_pGameSkins->IntitilizeSelectSkin();
 
 		// получение и вывод списков
-		static sorted_array<const CgSkins::CgSkin*> s_GameSkinList;
+		static sorted_array<const CGameSkins::CGameSkin*> s_GameSkinList;
 		static bool m_RefreshSkinSelector = true;
 		if (m_RefreshSkinSelector)
 		{
 			s_GameSkinList.clear();
-			for (int i = 0; i < m_pClient->m_pgSkins->Num(); ++i)
+			for (int i = 0; i < m_pClient->m_pGameSkins->Num(); ++i)
 			{
-				const CgSkins::CgSkin* s = m_pClient->m_pgSkins->Get(i);
+				const CGameSkins::CGameSkin* s = m_pClient->m_pGameSkins->Get(i);
 				s_GameSkinList.add(s);
 			}
 			m_RefreshSkinSelector = false;
@@ -179,7 +175,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		for (int i = 0; i < s_GameSkinList.size(); ++i)
 		{
 			// если текстура равна 0 пропускаем
-			const CgSkins::CgSkin* s = s_GameSkinList[i];
+			const CGameSkins::CGameSkin* s = s_GameSkinList[i];
 			if (s == 0) 
 				continue;
 
@@ -222,22 +218,18 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 	else if (g_Config.m_Texture == 1)
 	{
 		// инициализация
-		static int s_Init = true;
-		if(s_Init)
-		{
-			m_pClient->m_peSkins->IntitilizeSelectSkin();
-			s_Init = false;
-		}
+		if (!m_pClient->m_pEmoticonsSkins->IsLoading())
+			m_pClient->m_pEmoticonsSkins->IntitilizeSelectSkin();
 
 		// продолжение 
-		static sorted_array<const CeSkins::CeSkin*> s_EmoticionSkinList;
+		static sorted_array<const CEmoticonsSkins::CEmoticonsSkin*> s_EmoticionSkinList;
 		static bool m_RefreshSkinSelector = true;
 		if (m_RefreshSkinSelector)
 		{
 			s_EmoticionSkinList.clear();
-			for (int i = 0; i < m_pClient->m_peSkins->Num(); ++i)
+			for (int i = 0; i < m_pClient->m_pEmoticonsSkins->Num(); ++i)
 			{
-				const CeSkins::CeSkin* s = m_pClient->m_peSkins->Get(i);
+				const CEmoticonsSkins::CEmoticonsSkin* s = m_pClient->m_pEmoticonsSkins->Get(i);
 				s_EmoticionSkinList.add(s);
 			}
 			m_RefreshSkinSelector = false;
@@ -251,7 +243,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		for (int i = 0; i < s_EmoticionSkinList.size(); ++i)
 		{
 			// если текстура равна 0 пропускаем
-			const CeSkins::CeSkin* s = s_EmoticionSkinList[i];
+			const CEmoticonsSkins::CEmoticonsSkin* s = s_EmoticionSkinList[i];
 			if (s == 0) 
 				continue;
 
@@ -294,23 +286,19 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 	else if (g_Config.m_Texture == 2)
 	{
 		// инициализация
-		static int s_Init = true;
-		if(s_Init)
-		{
-			m_pClient->m_pcSkins->IntitilizeSelectSkin();
-			s_Init = false;
-		}
+		if (!m_pClient->m_pCursorsSkins->IsLoading())
+			m_pClient->m_pCursorsSkins->IntitilizeSelectSkin();
 
 		// продолжение
-		static sorted_array<const CcSkins::CcSkin*> s_paSkinList;
+		static sorted_array<const CCursorsSkins::CCursorsSkin*> s_paSkinList;
 		static CListBoxState s_ListBoxState;
 		static bool m_RefreshSkinSelector = true;
 		if (m_RefreshSkinSelector)
 		{
 			s_paSkinList.clear();
-			for (int i = 0; i < m_pClient->m_pcSkins->Num(); ++i)
+			for (int i = 0; i < m_pClient->m_pCursorsSkins->Num(); ++i)
 			{
-				const CcSkins::CcSkin* s = m_pClient->m_pcSkins->Get(i);
+				const CCursorsSkins::CCursorsSkin* s = m_pClient->m_pCursorsSkins->Get(i);
 				s_paSkinList.add(s);
 			}
 			m_RefreshSkinSelector = false;
@@ -323,7 +311,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		for (int i = 0; i < s_paSkinList.size(); ++i)
 		{
 			// если текстура равна 0 пропускаем
-			const CcSkins::CcSkin* s = s_paSkinList[i];
+			const CCursorsSkins::CCursorsSkin* s = s_paSkinList[i];
 			if (s == 0) 
 				continue;
 
@@ -366,22 +354,18 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 	else if (g_Config.m_Texture == 3)
 	{
 		// инициализация
-		static int s_Init = true;
-		if(s_Init)
-		{
-			m_pClient->m_ppSkins->IntitilizeSelectSkin();
-			s_Init = false;
-		}
+		if(!m_pClient->m_pParticlesSkins->IsLoading())
+			m_pClient->m_pParticlesSkins->IntitilizeSelectSkin();
 
 		// загружаем список статично чтобы не грузить постоянно его по 20 раз
-		static sorted_array<const CpSkins::CpSkin*> s_ParticlesSkinList;
+		static sorted_array<const CParticlesSkins::CParticlesSkin*> s_ParticlesSkinList;
 		static bool m_RefreshSkinSelector = true;
 		if (m_RefreshSkinSelector)
 		{
 			s_ParticlesSkinList.clear();
-			for (int i = 0; i < m_pClient->m_ppSkins->Num(); ++i)
+			for (int i = 0; i < m_pClient->m_pParticlesSkins->Num(); ++i)
 			{
-				const CpSkins::CpSkin* s = m_pClient->m_ppSkins->Get(i);
+				const CParticlesSkins::CParticlesSkin* s = m_pClient->m_pParticlesSkins->Get(i);
 				s_ParticlesSkinList.add(s);
 			}
 			m_RefreshSkinSelector = false;
@@ -395,7 +379,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		for (int i = 0; i < s_ParticlesSkinList.size(); ++i)
 		{
 			// если текстура равна 0 пропускаем
-			const CpSkins::CpSkin* s = s_ParticlesSkinList[i];
+			const CParticlesSkins::CParticlesSkin* s = s_ParticlesSkinList[i];
 			if (s == 0) 
 				continue;
 
@@ -438,22 +422,18 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 	else if (g_Config.m_Texture == 4)
 	{
 		// инициализация
-		static int s_Init = true;
-		if(s_Init)
-		{
-			m_pClient->m_penSkins->IntitilizeSelectSkin();
-			s_Init = false;
-		}
+		if(!m_pClient->m_pEntitiesSkins->IsLoading())
+			m_pClient->m_pEntitiesSkins->IntitilizeSelectSkin();
 
-		static sorted_array<const CEnSkins::CEnSkin*> s_EntitiesSkinList;
+		static sorted_array<const CEntitiesSkins::CEntitiesSkin*> s_EntitiesSkinList;
 		static CListBoxState s_ListBoxState;
 		static bool m_RefreshSkinSelector = true;
 		if (m_RefreshSkinSelector)
 		{
 			s_EntitiesSkinList.clear();
-			for (int i = 0; i < m_pClient->m_penSkins->Num(); ++i)
+			for (int i = 0; i < m_pClient->m_pEntitiesSkins->Num(); ++i)
 			{
-				const CEnSkins::CEnSkin* s = m_pClient->m_penSkins->Get(i);
+				const CEntitiesSkins::CEntitiesSkin* s = m_pClient->m_pEntitiesSkins->Get(i);
 				s_EntitiesSkinList.add(s);
 			}
 			m_RefreshSkinSelector = false;
@@ -466,7 +446,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		for (int i = 0; i < s_EntitiesSkinList.size(); ++i)
 		{
 			// если текстура равна 0 пропускаем
-			const CEnSkins::CEnSkin* s = s_EntitiesSkinList[i];
+			const CEntitiesSkins::CEntitiesSkin* s = s_EntitiesSkinList[i];
 			if (s == 0)
 				continue;
 

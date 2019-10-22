@@ -322,11 +322,11 @@ public:
 	class CMapLayers *m_pMapLayersForeGround;
 
 	// mmotee thnx bla client
-	class CgSkins* m_pgSkins;
-	class CpSkins* m_ppSkins;
-	class CeSkins* m_peSkins;
-	class CcSkins* m_pcSkins;
-	class CEnSkins* m_penSkins;
+	class CGameSkins* m_pGameSkins;
+	class CParticlesSkins* m_pParticlesSkins;
+	class CEmoticonsSkins* m_pEmoticonsSkins;
+	class CCursorsSkins* m_pCursorsSkins;
+	class CEntitiesSkins* m_pEntitiesSkins;
 };
 
 const char *Localize(const char *pStr, const char *pContext="")
