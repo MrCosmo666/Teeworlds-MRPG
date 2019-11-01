@@ -19,8 +19,8 @@ jobs:
           
       - name: Build Cmake Mmo-Clinet
         run: |
-          mkdir -p release
-          cd release
+          mkdir -p mmoclient
+          cd mmoclient
           cmake ..
           make everything
           ./mmoteeworlds shutdown
@@ -28,8 +28,8 @@ jobs:
           
       - name: Bundle Tar-gz Package
         run: |
-          mv storage.cfg release/
-          tar -cvzf mmoclient_linux-x86_64.tar.gz release/data release/mmoteeworlds release/storage.cfg
+          mv storage.cfg mmoclient/
+          tar -cvzf mmoclient_linux-x86_64.tar.gz mmoclient/data mmoclient/mmoteeworlds mmoclient/storage.cfg
 
       - name: Publish Github Release
         uses: softprops/action-gh-release@v1
@@ -49,21 +49,21 @@ jobs:
       - name: Prepare
         run: |
             git submodule update --init
-            mkdir -p release
-            cd release
+            mkdir -p mmoclient
+            cd mmoclient
             cmake -G "Visual Studio 16 2019" ..
             
       - name: Build
         run: |
-            cmake --build release --config Release --target everything
-            move release\Release\mmoteeworlds.exe  release\
-            move storage.cfg  release\
+            cmake --build mmoclient --config Release --target everything
+            move mmoclient\Release\mmoteeworlds.exe  mmoclient\
+            move storage.cfg  mmoclient\
             
       - name: Bundle Zip-Package
         run: |
-          jar -cMf mmoclient_windows32.zip release\mmoteeworlds.exe release\storage.cfg
-          jar -uf mmoclient_windows32.zip release\data release\freetype.dll release\libcurl.dll release\libogg.dll
-          jar -uf mmoclient_windows32.zip release\libopus.dll release\libopusfile.dll release\libwinpthread-1.dll release\SDL2.dll
+          jar -cMf mmoclient_windows32.zip mmoclient\mmoteeworlds.exe mmoclient\storage.cfg
+          jar -uf mmoclient_windows32.zip mmoclient\data mmoclient\freetype.dll mmoclient\libcurl.dll mmoclient\libogg.dll
+          jar -uf mmoclient_windows32.zip mmoclient\libopus.dll mmoclient\libopusfile.dll mmoclient\libwinpthread-1.dll mmoclient\SDL2.dll
 
       - name: Publish Github Release
         uses: softprops/action-gh-release@v1
