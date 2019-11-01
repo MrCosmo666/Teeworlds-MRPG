@@ -16,7 +16,6 @@ Info.plist
 
 !teeworlds.manifest
 !teeworlds.rc
-teeworlds_srv*
 testrunner
 
 
