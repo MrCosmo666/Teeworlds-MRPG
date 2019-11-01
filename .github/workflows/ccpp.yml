@@ -48,7 +48,7 @@ jobs:
             cmake .
       - name: Build
         run: |
-            make
+            cmake --config Release --target everything
             ./mmoteeworlds shutdown
       - name: Bundle Zip-Package
         run: |
