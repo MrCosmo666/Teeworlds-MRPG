@@ -26,10 +26,10 @@ jobs:
           ./mmoteeworlds shutdown
           cd ..
           
-      - name: Bundle Zip-Package
+      - name: Bundle TarGz-Package
         run: |
-          zip test_ubuntu.zip release/mmoteeworlds
-          
+          tar -cvzf mmoclient_linux-x86_64.tar.gz release/data release/mmoteeworlds storage.cfg
+
       - name: Deploy Github Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
