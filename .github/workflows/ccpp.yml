@@ -45,10 +45,12 @@ jobs:
       - name: Prepare
         run: |
             git submodule update --init
-            cmake -G "Visual Studio 16 2019" .
       - name: Build
         run: |
-            cmake --config Release
+            mkdir -p release
+            cd release
+            cmake -G "Visual Studio 16 2019" ..
+            make
       - name: Bundle Zip-Package
         run: |
             jar -cMf teeworlds_windows32.zip mmoteeworlds.exe
