@@ -62,6 +62,6 @@ jobs:
         with:
           name: Windows-latest
           files: |
-            release/mmoteeworlds-win32.zip
+            release\mmoteeworlds-win32.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
