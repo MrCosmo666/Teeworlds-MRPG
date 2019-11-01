@@ -20,7 +20,7 @@ jobs:
         run: |
           mkdir -p release
           cd release
-          env cmake ..
+          cmake ..
           make everything
           ./mmoteeworlds shutdown
           cd ..
@@ -44,17 +44,15 @@ jobs:
       - uses: actions/checkout@master
       - name: Prepare
         run: |
-          mkdir -p release
-          git submodule update --init
+
       - name: Build
         run: |
-          cd release
-          env cmake ..
-          make
-      - name: Test
-        run: |
-          ./mmoteeworlds shutdown
-          cd ..
+            mkdir -p release
+            cd release
+            cmake ..
+            make everything
+            ./mmoteeworlds shutdown
+            cd ..
       - name: Bundle Zip-Package
         run: |
           jar -cMf teeworlds_windows32.zip mmoteeworlds.exe
