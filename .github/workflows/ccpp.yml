@@ -49,7 +49,6 @@ jobs:
       - name: Build
         run: |
             cmake --config Release
-            ./mmoteeworlds shutdown
       - name: Bundle Zip-Package
         run: |
             jar -cMf teeworlds_windows32.zip mmoteeworlds.exe
