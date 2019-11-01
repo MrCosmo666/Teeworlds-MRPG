@@ -60,7 +60,7 @@ jobs:
             
       - name: Bundle Zip-Package
         run: |
-          jar -cMf mmoclient_windows32.zip -C release\Release .
+          jar -cMf mmoclient_windows32.zip -C release\Release .\release
           jar -uf mmoclient_windows32.zip release\data release\freetype.dll release\libcurl.dll release\libogg.dll
           jar -uf mmoclient_windows32.zip release\libopus.dll release\libopusfile.dll release\libwinpthread-1.dll
 
