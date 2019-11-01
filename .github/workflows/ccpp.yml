@@ -20,7 +20,7 @@ jobs:
         run: |
           mkdir -p release
           cd release
-          env CFLAGS="-Wdeclaration-after-statement -Werror" CXXFLAGS="-Werror" cmake -Werror=dev -DDOWNLOAD_GTEST=ON -DOpenGL_GL_PREFERENCE=LEGACY ..
+          env cmake ..
           make everything
           make run_tests
           ./teeworlds shutdown
