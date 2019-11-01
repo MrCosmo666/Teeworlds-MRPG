@@ -4,7 +4,7 @@
 #include <engine/shared/config.h>
 #include <engine/external/json-parser/json.h>
 
-#include <curl/curl.h>
+//#include <curl/curl.h>
 
 const unsigned long TranslationBufferSize = 4096;
 
@@ -117,12 +117,40 @@ char *UnescapeStr(char * From)
 
 void TranslateTextThreadFunc(void * Param)
 {		
-	CURL * curl = NULL;
+	//CURL * curl = NULL;
 	char * Result = NULL;
 	TranslateTextThreadData * Data = (TranslateTextThreadData *)Param;
 
 	try
 	{		
+		//curl = curl_easy_init();
+		//curl_easy_setopt(curl, CURLOPT_URL, "https://translate.yandex.net/api/v1.5/tr.json/translate");
+		//curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1);
+		//curl_easy_setopt(curl, CURLOPT_POST, 1);
+
+		//char TranslationBuffer[4096];
+		//str_format(TranslationBuffer, sizeof(TranslationBuffer), "key=%s&text=%s&lang=%s", g_Config.m_ClYandexApi, Data->Text, g_Config.m_ClTranslateLanguage);
+		//curl_easy_setopt(curl, CURLOPT_POSTFIELDS, TranslationBuffer);
+
+		//curl_easy_setopt(curl, CURLOPT_WRITEDATA, TranslationBuffer);
+		//curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteFunc);
+
+		//CURLcode curlResult = curl_easy_perform(curl);
+		//curl_easy_cleanup(curl);
+
+		//const char * TranslatedText = str_find_nocase(TranslationBuffer, "[\"");
+		//if (TranslatedText)
+		//{
+			//TranslatedText += strlen("\"[");
+			//char * TranslationEnd = (char *)str_find_nocase(TranslatedText, "\"]");
+			//if (TranslationEnd) TranslationEnd[0] = 0;
+			//Result = strdup(TranslatedText);
+		//} 
+		//else Result = strdup(Data->Text);
+
+		//Data->Translated = UnescapeStr((char *)Result);
+		//free((void *)Result);
+		//Result = NULL;
 
 		(*(Data->Callback))(Data);
 
