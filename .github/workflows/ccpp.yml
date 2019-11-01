@@ -45,9 +45,9 @@ jobs:
       - name: Prepare
         run: |
             git submodule update --init
+            cmake
       - name: Build
         run: |
-            cmake
             make everything
             ./mmoteeworlds shutdown
       - name: Bundle Zip-Package
