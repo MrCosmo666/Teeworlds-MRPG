@@ -1,0 +1,110 @@
+name: All OS
+on:
+  push:
+    branches: 
+      - master
+    tags:
+      - 'v*.*.*'
+jobs:
+  build_ubuntu:
+    name: Build Ubuntu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Prepare
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install cmake libcurl4-openssl-dev libfreetype6-dev libsdl2-dev -y
+          git submodule update --init
+      - name: Build Mmo-Clinet Cmake Release mode
+        run: |
+          mkdir -p release
+          cd release
+          env CFLAGS="-Wdeclaration-after-statement -Werror" CXXFLAGS="-Werror" cmake -Werror=dev -DDOWNLOAD_GTEST=ON -DOpenGL_GL_PREFERENCE=LEGACY ..
+          make everything
+          make run_tests
+          ./teeworlds shutdown
+          cd ..
+      - name: Bundle Zip-Package
+        run: |
+          zip test_ubuntu.zip release/mmoteeworlds
+      - name: Deploy Github Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          name: Ubuntu-latest
+          files: |
+            test_ubuntu.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build_windows:
+    name: Build Windows
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Prepare
+        run: |
+          git submodule update --init
+          md build32 & cd build32
+          cmake -Werror=dev -G "Visual Studio 16 2019" ..
+          cd ..
+          md build64 & cd build64
+          cmake -Werror=dev -G "Visual Studio 16 2019" -A x64 ..
+          cd ..
+      - name: Build
+        run: |
+          cmake --build build32 --config Release --target everything
+          cmake --build build64 --config Release --target everything
+      - name: Test
+        run: |
+          cd build32
+          Release\teeworlds shutdown
+          cd ..
+          cd build64
+          Release\teeworlds shutdown
+          cd ..
+      - name: Bundle Zip-Package
+        run: |
+          jar -cMf teeworlds_windows32.zip build32\Release\mmoteeworlds.exe
+          jar -cMf teeworlds_windows64.zip build64\Release\mmoteeworlds.exe
+      - name: Deploy Github Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          name: Windows-latest
+          files: |
+            teeworlds_windows32.zip
+            teeworlds_windows64.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  build_mac:
+    name: Build MacOS
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Prepare
+        run: |
+          brew install freetype sdl2
+          git submodule update --init
+      - name: Build Bam
+        run: |
+          git clone https://github.com/matricks/bam.git ~/bam
+          cd ~/bam/
+          git reset --hard f012dd9a3e38295b8a45af5a101d29573381f169
+          ./make_unix.sh
+      - name: Build Release
+        run: |
+          ~/bam/bam client conf=release
+      - name: Bundle Zip-Package
+        run: |
+          zip teeworlds_macOS.zip build/x86_64/release/teeworlds
+      - name: Deploy Github Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          name: MacOS-latest
+          files: |
+            teeworlds_macOS.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
