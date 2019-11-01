@@ -45,7 +45,7 @@ jobs:
       - name: Prepare
         run: |
             git submodule update --init
-            cmake
+            cmake .
       - name: Build
         run: |
             make everything
