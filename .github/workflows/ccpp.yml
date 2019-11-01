@@ -37,7 +37,7 @@ jobs:
         with:
           name: Ubuntu-latest
           files: |
-            test_ubuntu.zip
+            mmoclient_linux-x86_64.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
