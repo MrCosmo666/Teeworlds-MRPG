@@ -17,7 +17,7 @@ jobs:
           sudo apt-get install cmake libcurl4-openssl-dev libfreetype6-dev libglew-dev libogg-dev libopus-dev libopusfile-dev libpnglite-dev libsdl2-dev libwavpack-dev python -y
           git submodule update --init
           
-      - name: Build Mmo-Clinet Cmake Release mode
+      - name: Build Cmake Mmo-Clinet
         run: |
           mkdir -p release
           cd release
@@ -26,12 +26,12 @@ jobs:
           ./mmoteeworlds shutdown
           cd ..
           
-      - name: Bundle TarGz-Package
+      - name: Bundle Tar-gz Package
         run: |
           mv storage.cfg release/
           tar -cvzf mmoclient_linux-x86_64.tar.gz release/data release/mmoteeworlds release/storage.cfg
 
-      - name: Deploy Github Release
+      - name: Publish Github Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
@@ -65,7 +65,7 @@ jobs:
           jar -uf mmoclient_windows32.zip release\data release\freetype.dll release\libcurl.dll release\libogg.dll
           jar -uf mmoclient_windows32.zip release\libopus.dll release\libopusfile.dll release\libwinpthread-1.dll release\SDL2.dll
 
-      - name: Deploy Github Release
+      - name: Publish Github Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
