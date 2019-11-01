@@ -4,7 +4,7 @@ on:
     branches: 
       - master
     tags:
-      - 'v*.*.*'
+      - 'v1.0.5'
 jobs:
   build_ubuntu:
     name: Build Ubuntu
