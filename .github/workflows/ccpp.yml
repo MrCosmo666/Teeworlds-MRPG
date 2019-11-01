@@ -14,7 +14,7 @@ jobs:
       - name: Prepare
         run: |
           sudo apt-get update -y
-          sudo apt-get install cmake libcurl4-openssl-dev libfreetype6-dev libsdl2-dev -y
+          sudo apt-get install cmake libcurl4-openssl-dev libfreetype6-dev libglew-dev libogg-dev libopus-dev libopusfile-dev libpnglite-dev libsdl2-dev libwavpack-dev python -y
           git submodule update --init
       - name: Build Mmo-Clinet Cmake Release mode
         run: |
