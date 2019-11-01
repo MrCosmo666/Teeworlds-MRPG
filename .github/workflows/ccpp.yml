@@ -45,10 +45,10 @@ jobs:
       - name: Prepare
         run: |
             git submodule update --init
-            cmake .
+            cmake -G "Visual Studio 16 2019" .
       - name: Build
         run: |
-            cmake --config Release --target everything
+            cmake --config Release
             ./mmoteeworlds shutdown
       - name: Bundle Zip-Package
         run: |
