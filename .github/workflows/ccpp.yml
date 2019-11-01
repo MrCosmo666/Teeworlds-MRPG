@@ -61,7 +61,7 @@ jobs:
         run: |
           jar -cMf mmoclient_windows32.zip release\mmoteeworlds.exe
           jar -uf mmoclient_windows32.zip release\data release\freetype.dll release\libcurl.dll release\libogg.dll
-          jar -uf mmoclient_windows32.zip release\libopus.dll release\libopusfile.dll release\libwinpthread-1.dll
+          jar -uf mmoclient_windows32.zip release\libopus.dll release\libopusfile.dll release\libwinpthread-1.dll release\SDL2.dll
 
       - name: Deploy Github Release
         uses: softprops/action-gh-release@v1
