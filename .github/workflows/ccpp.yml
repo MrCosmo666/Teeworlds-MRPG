@@ -22,7 +22,6 @@ jobs:
           cd release
           env cmake ..
           make everything
-          make run_tests
           ./teeworlds shutdown
           cd ..
       - name: Bundle Zip-Package
