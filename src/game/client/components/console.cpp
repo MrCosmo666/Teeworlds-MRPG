@@ -201,11 +201,11 @@ void CGameConsole::CInstance::OnInput(IInput::CEvent Event)
 				}
 			}
 		}
-		else if(Event.m_Key == KEY_PAGEUP)
+		else if(Event.m_Key == KEY_PAGEUP || Event.m_Key == KEY_MOUSE_WHEEL_UP)
 		{
 			++m_BacklogActPage;
 		}
-		else if(Event.m_Key == KEY_PAGEDOWN)
+		else if(Event.m_Key == KEY_PAGEDOWN || Event.m_Key == KEY_MOUSE_WHEEL_DOWN)
 		{
 			--m_BacklogActPage;
 			if(m_BacklogActPage < 0)
@@ -587,7 +587,7 @@ void CGameConsole::OnRender()
 
 		// render page
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), Localize("-Page %d-"), pConsole->m_BacklogActPage+1);
+		str_format(aBuf, sizeof(aBuf), Localize("-Page %d- 'mouse wheel' or 'page up', 'page down'"), pConsole->m_BacklogActPage+1);
 		TextRender()->Text(0, 10.0f, 0.0f, FontSize, aBuf, -1.0f);
 
 		// render version

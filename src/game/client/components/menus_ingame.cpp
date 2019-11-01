@@ -491,7 +491,7 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 }
 
 // item icons
-bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect)
+bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect, float Size)
 {
 	// форматируем под иконку предмета
 	char aNameBuf[128];
@@ -521,7 +521,7 @@ bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect)
 		Graphics()->TextureSet(Tex);
 		Graphics()->QuadsBegin();
 		Graphics()->SetColor(0.8f, 0.8f, 0.8f, 0.8f); // pow(a, 0.75f) *
-		IGraphics::CQuadItem QuadItem(Icon.x, Icon.y, Icon.w, Icon.h);
+		IGraphics::CQuadItem QuadItem(Icon.x, Icon.y, Size, Size);
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
 		Graphics()->QuadsEnd();
 	}

@@ -184,7 +184,8 @@ if gen_network_source:
 
 	lines += ['bool CNetObjHandler::CheckInt(const char *pErrorMsg, int Value, int Min, int Max)']
 	lines += ['{']
-	lines += ['\tif(Value < Min || Value > Max) { m_pObjFailedOn = pErrorMsg; m_NumObjFailures++; return false; }']
+	lines += ['\tif(Value < Min) { Value = Min; }']
+	lines += ['\tif(Value > Max) { Value = Max; }']
 	lines += ['\treturn true;']
 	lines += ['}']
 	lines += ['']

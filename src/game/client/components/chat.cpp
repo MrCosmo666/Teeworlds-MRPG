@@ -219,15 +219,15 @@ bool CChat::OnInput(IInput::CEvent Event)
 		return false;
 
 	// chat history scrolling
-	if (m_Show && Event.m_Flags&IInput::FLAG_PRESS && (Event.m_Key == KEY_PAGEUP || Event.m_Key == KEY_PAGEDOWN))
+	if (m_Show && Event.m_Flags&IInput::FLAG_PRESS && (Event.m_Key == KEY_PAGEUP || Event.m_Key == KEY_PAGEDOWN || Event.m_Key == KEY_MOUSE_WHEEL_UP || Event.m_Key == KEY_MOUSE_WHEEL_DOWN))
 	{
-		if (Event.m_Key == KEY_PAGEUP)
+		if (Event.m_Key == KEY_PAGEUP || Event.m_Key == KEY_MOUSE_WHEEL_UP)
 		{
 			++m_BacklogPage;
 			if (m_BacklogPage >= MAX_CHAT_PAGES) // will be further capped during rendering
 				m_BacklogPage = MAX_CHAT_PAGES - 1;
 		}
-		else if (Event.m_Key == KEY_PAGEDOWN)
+		else if (Event.m_Key == KEY_PAGEDOWN || Event.m_Key == KEY_MOUSE_WHEEL_DOWN)
 		{
 			--m_BacklogPage;
 			if (m_BacklogPage < 0)
@@ -513,6 +513,12 @@ void CChat::OnMessage(int MsgType, void *pRawMsg)
 	}
 }
 
+void CChat::Translated(TranslateTextThreadData * Data)
+{
+	char *Text = (char *)Data->Param;
+	str_format(Text, 512, "%s", Data->Translated);
+}
+
 void CChat::AddLine(int ClientID, int Mode, const char *pLine, int TargetID)
 {
 	if(*pLine == 0 || (ClientID >= 0 && (!g_Config.m_ClShowsocial || !m_pClient->m_aClients[ClientID].m_Active || // unknown client
@@ -635,6 +641,11 @@ void CChat::AddLine(int ClientID, int Mode, const char *pLine, int TargetID)
 
 			str_format(m_aLines[m_CurrentLine].m_aName, sizeof(m_aLines[m_CurrentLine].m_aName), "%s", m_pClient->m_aClients[NameCID].m_aName);
 			str_format(m_aLines[m_CurrentLine].m_aText, sizeof(m_aLines[m_CurrentLine].m_aText), "%s", pLine);
+
+			if(str_length(g_Config.m_ClYandexApi) > 64 && (g_Config.m_ClTranslateSelf || m_pClient->m_LocalClientID != ClientID))
+			{
+				TranslateText(pLine, Translated, (void *)m_aLines[m_CurrentLine].m_aText);
+			}
 		}
 
 		char aBuf[1024];
@@ -1220,7 +1231,6 @@ void CChat::OnRender()
 										   ColorHighlightOutline.g,
 										   ColorHighlightOutline.b,
 										   ColorHighlightOutline.a);
-
 			TextRender()->TextEx(&Cursor, Line.m_aText, -1);
 		}
 		else

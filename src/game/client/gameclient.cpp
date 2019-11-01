@@ -14,6 +14,9 @@
 #include <engine/shared/demo.h>
 #include <engine/shared/config.h>
 
+#include <base/math.h>
+#include <base/vmath.h>
+
 #include <generated/protocol.h>
 #include <generated/client_data.h>
 
@@ -53,12 +56,8 @@
 #include "components/stats.h"
 #include "components/voting.h"
 
-//mmotee thnx bla client
-#include "components/skinscursors.h"
-#include "components/skinsemotes.h"
-#include "components/skinsgame.h"
-#include "components/skinsprojectile.h"
-#include "components/skinsentities.h"
+//mmotee thnx gamer client # dune
+#include "components/skinchanger.h"
 
 // instanciate all systems
 static CKillMessages gs_KillMessages;
@@ -94,12 +93,9 @@ static CMapImages gs_MapImages;
 static CMapLayers gs_MapLayersBackGround(CMapLayers::TYPE_BACKGROUND);
 static CMapLayers gs_MapLayersForeGround(CMapLayers::TYPE_FOREGROUND);
 
-// mmotee thnx bla client
-static CGameSkins gs_GameSkins;
-static CParticlesSkins gs_ParticlesSkins;
-static CEmoticonsSkins gs_EmoticonsSkins;
-static CCursorsSkins gs_CursorsSkins;
-static CEntitiesSkins gs_EntitiesSkins;
+// mmotee thnx gamer client # dune
+static CCSkinChanger gs_SkinChanger;
+
 
 CGameClient::CStack::CStack() { m_Num = 0; }
 void CGameClient::CStack::Add(class CComponent *pComponent) { m_paComponents[m_Num++] = pComponent; }
@@ -208,11 +204,8 @@ void CGameClient::OnConsoleInit()
 
 	//mmotee client loading all skins
 	m_pSkins = &::gs_Skins;
-	m_pGameSkins = &::gs_GameSkins;
-	m_pParticlesSkins = &::gs_ParticlesSkins;
-	m_pEmoticonsSkins = &::gs_EmoticonsSkins;
-	m_pCursorsSkins = &::gs_CursorsSkins;
-	m_pEntitiesSkins = &::gs_EntitiesSkins;
+	m_pSkinChanger = &::gs_SkinChanger;
+
 	
 	m_pCountryFlags = &::gs_CountryFlags;
 	m_pChat = &::gs_Chat;
@@ -233,11 +226,13 @@ void CGameClient::OnConsoleInit()
 
 	// make a list of all the systems, make sure to add them in the corrent render order
 	m_All.Add(m_pSkins);
-	m_All.Add(m_pGameSkins);
-	m_All.Add(m_pParticlesSkins);
-	m_All.Add(m_pEmoticonsSkins);
-	m_All.Add(m_pCursorsSkins);
-	m_All.Add(m_pEntitiesSkins);
+
+	m_All.Add(m_pSkinChanger);
+	m_All.Add(&m_pSkinChanger->m_GameSkins);
+	m_All.Add(&m_pSkinChanger->m_Particles);
+	m_All.Add(&m_pSkinChanger->m_Cursors);
+	m_All.Add(&m_pSkinChanger->m_Emoticons);
+	m_All.Add(&m_pSkinChanger->m_Entities);
 
 	m_All.Add(m_pCountryFlags);
 	m_All.Add(m_pMapimages);
@@ -403,11 +398,8 @@ void CGameClient::OnInit()
 
 	m_ServerMode = SERVERMODE_PURE;
 
-	// mmotee thnx bla client
-	g_pData->m_aImages[IMAGE_GAME].m_Id = m_pGameSkins->Get(m_pGameSkins->Find(g_Config.m_GameTexture))->m_Texture;
-	g_pData->m_aImages[IMAGE_PARTICLES].m_Id = m_pParticlesSkins->Get(m_pParticlesSkins->Find(g_Config.m_GameParticles))->m_Texture;
-	g_pData->m_aImages[IMAGE_EMOTICONS].m_Id = m_pEmoticonsSkins->Get(m_pEmoticonsSkins->Find(g_Config.m_GameEmoticons))->m_Texture;
-	g_pData->m_aImages[IMAGE_CURSOR].m_Id = m_pCursorsSkins->Get(m_pCursorsSkins->Find(g_Config.m_GameCursor))->m_Texture;
+	// mmotee thnx gamer clinet # dune
+	m_pSkinChanger->DelayedInit();
 
 	m_IsXmasDay = time_isxmasday();
 	m_IsEasterDay = time_iseasterday();
@@ -542,6 +534,43 @@ void CGameClient::UpdatePositions()
 		}
 	}
 }
+
+// another
+int CGameClient::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, vec2& NewPos)
+{
+	// Find other players
+	static const int ProximityRadius = 28;
+	float ClosestLen = distance(Pos0, Pos1) * 100.0f;
+	int ClosestID = -1;
+
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		CClientData cData = m_aClients[i];
+		CNetObj_Character Prev = m_Snap.m_aCharacters[i].m_Prev;
+		CNetObj_Character Player = m_Snap.m_aCharacters[i].m_Cur;
+
+		vec2 Position = mix(vec2(Prev.m_X, Prev.m_Y), vec2(Player.m_X, Player.m_Y), Client()->IntraGameTick());
+
+		if (!cData.m_Active || cData.m_Team == TEAM_SPECTATORS || m_LocalClientID == i)
+			continue;
+
+		vec2 IntersectPos = closest_point_on_line(Pos0, Pos1, Position);
+		float Len = distance(Position, IntersectPos);
+		if (Len < ProximityRadius + Radius)
+		{
+			Len = distance(Pos0, IntersectPos);
+			if (Len < ClosestLen)
+			{
+				NewPos = IntersectPos;
+				ClosestLen = Len;
+				ClosestID = i;
+			}
+		}
+	}
+
+	return ClosestID;
+}
+
 
 void CGameClient::EvolveCharacter(CNetObj_Character *pCharacter, int Tick)
 {
@@ -1618,10 +1647,9 @@ void CGameClient::OnPredict()
 
 void CGameClient::OnActivateEditor()
 {
-	// mmotee
-	if (m_pEntitiesSkins->Find(g_Config.m_GameEntities) == -1)
-		str_copy(g_Config.m_GameEntities, "!entities", sizeof(g_Config.m_GameEntities));
+	m_pEditor->ReInitEntities();
 
+	// mmotee
 	OnRelease();
 }
 

@@ -2168,9 +2168,6 @@ void CClient::Run()
 			{
 				if(!m_EditorActive)
 				{
-					// mmotee
-					m_pEditor->ReInitEntities();
-
 					GameClient()->OnActivateEditor();
 					Input()->MouseModeRelative();
 					m_EditorActive = true;

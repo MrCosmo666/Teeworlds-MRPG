@@ -42,6 +42,13 @@ MACRO_CONFIG_STR(GameEmoticons, mmo_emoticons_texture, 24, "default", CFGFLAG_CL
 MACRO_CONFIG_STR(GameCursor, mmo_cursor_texture, 24, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Cursor texture")
 MACRO_CONFIG_STR(GameEntities, mmo_entities_texture, 64, "editor/entities.png", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Entities texture path")
 MACRO_CONFIG_INT(Texture, mmo_texture_page, 4, 0, 0, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Texture page")
+MACRO_CONFIG_INT(HdColorProgress, hud_color_progress, 16455505, 0, 16777215, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Color progress bar hud")
+MACRO_CONFIG_INT(ClGBrowser, cl_gbrowser, 1, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Gamer server browser")
+
+// translate
+MACRO_CONFIG_STR(ClYandexApi, cl_ynd_translate_api, 128, "trnsl.1.1.20191030T120841Z.b7d4ae52829a8243.04a1b34b812db85a78102c644ff8d23bccda3a51", CFGFLAG_SAVE | CFGFLAG_CLIENT, "Translate Yandex API. See yandex api.")
+MACRO_CONFIG_STR(ClTranslateLanguage, cl_translate_lang, 16, "en", CFGFLAG_SAVE | CFGFLAG_CLIENT, "Translate Yandex API. See yandex api.")
+MACRO_CONFIG_INT(ClTranslateSelf, cl_translate_self, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Translate self message.")
 
 // curl http download
 MACRO_CONFIG_INT(ClHTTPConnectTimeoutMs, cl_http_connect_timeout_ms, 2000, 0, 100000, CFGFLAG_CLIENT | CFGFLAG_SAVE, "HTTP downloads: timeout for the connect phase in milliseconds (0 to disable)")
@@ -93,7 +100,7 @@ MACRO_CONFIG_STR(PlayerSkinHands, player_skin_hands, 24, "standard", CFGFLAG_CLI
 MACRO_CONFIG_STR(PlayerSkinFeet, player_skin_feet, 24, "standard", CFGFLAG_CLIENT|CFGFLAG_SAVE, "Player skin feet")
 MACRO_CONFIG_STR(PlayerSkinEyes, player_skin_eyes, 24, "standard", CFGFLAG_CLIENT|CFGFLAG_SAVE, "Player skin eyes")
 
-MACRO_CONFIG_INT(UiBrowserPage, ui_browser_page, 5, 5, 8, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Interface serverbrowser page")
+MACRO_CONFIG_INT(UiBrowserPage, ui_browser_page, 5, 5, 9, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Interface serverbrowser page")
 MACRO_CONFIG_INT(UiSettingsPage, ui_settings_page, 0, 0, 5, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Interface settings page")
 MACRO_CONFIG_STR(UiServerAddress, ui_server_address, 64, "localhost:8303", CFGFLAG_CLIENT|CFGFLAG_SAVE, "Interface server address")
 MACRO_CONFIG_INT(UiMousesens, ui_mousesens, 100, 1, 100000, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Mouse sensitivity for menus/editor")

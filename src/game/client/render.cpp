@@ -661,6 +661,7 @@ void CRenderTools::MapScreenToWorld(float CenterX, float CenterY, float Parallax
 	CenterY *= ParallaxY;
 	Width *= Zoom;
 	Height *= Zoom;
+
 	aPoints[0] = OffsetX+CenterX-Width/2;
 	aPoints[1] = OffsetY+CenterY-Height/2;
 	aPoints[2] = aPoints[0]+Width;
@@ -761,4 +762,20 @@ float CRenderTools::GetClientIdRectSize(float FontSize)
 {
 	if(!g_Config.m_ClShowUserId) return 0;
 	return 1.4f * FontSize + 0.2f * FontSize;
+}
+
+void CRenderTools::RenderMmoBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color, int Num, int Max, const char *pText)
+{
+	float Progress = clamp(Num*100.0f / (float)Max, 0.0f, 100.0f);
+	if (Progress >= 3.0f)
+	{
+		Rect.w = Progress;
+		DrawUIRect(&Rect, Color, CUI::CORNER_ALL, 2.0f);
+	}
+
+	Rect.w = 100.0f;
+	DrawUIRect(&Rect, vec4(0.5f, 0.5f, 0.5f, 0.3f), CUI::CORNER_ALL, 2.0f);
+
+	pTextRender->TextOutlineColor(0.3f, 0.3f, 0.3f, 0.3f);
+	pTextRender->Text(0, Rect.x, Rect.y-1.3f, Rect.h, pText, -1);
 }

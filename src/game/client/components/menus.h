@@ -15,6 +15,7 @@
 #include <game/client/localization.h>
 #include <game/client/ui.h>
 
+#include <game/client/components/skinchanger.h>
 #include "skins.h"
 
 
@@ -264,6 +265,7 @@ private:
 		PAGE_SERVER_INFO,
 		PAGE_CALLVOTE,
 		PAGE_INTERNET,
+		PAGE_FAVORITES,
 		PAGE_LAN,
 		PAGE_DEMOS,
 		PAGE_SETTINGS,
@@ -371,7 +373,11 @@ private:
 		IGraphics::CTextureHandle m_IconTexture;
 	};
 	array<CItemIcon> m_lItemIcons;
-	bool DoItemIcon(const char *pItem, CUIRect pRect);
+
+public:
+	bool DoItemIcon(const char *pItem, CUIRect pRect, float Size = 20.0f);
+
+private:
 	static int ItemIconScan(const char *pName, int IsDir, int DirType, void *pUser);
 
 
@@ -642,6 +648,8 @@ private:
 	void RenderMenubar(CUIRect r);
 	void RenderNews(CUIRect MainView);
 	void RenderBackButton(CUIRect MainView);
+	inline float GetListHeaderHeight() const { return ms_ListheaderHeight + (g_Config.m_ClGBrowser ? 3.0f : 0.0f); }
+	inline float GetListHeaderHeightFactor() const { return 1.0f + (g_Config.m_ClGBrowser ? (3.0f / ms_ListheaderHeight) : 0.0f); }
 
 	// found in menus_demo.cpp
 	void RenderDemoPlayer(CUIRect MainView);
@@ -665,6 +673,7 @@ private:
 	// int m_ScrollOffset;
 	void RenderServerbrowserServerList(CUIRect View);
 	void RenderServerbrowserSidebar(CUIRect View);
+	void RenderServerbrowserFilterbar(CUIRect View); // gamer only
 	void RenderServerbrowserFriendTab(CUIRect View);
 	void RenderServerbrowserFilterTab(CUIRect View);
 	void RenderServerbrowserInfoTab(CUIRect View);
@@ -691,6 +700,8 @@ private:
 	void RenderSettingsMmo(CUIRect MainView);
 	void RenderSettingsMmoGeneral(CUIRect MainView, int Page);
 	void RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background);
+	void RenderRgbSliders(CUIRect* pMainView, CUIRect* pButton, int &r, int &g, int &b, bool Enabled);
+	void RenderSettingsMmoChangerGeneric(CUIRect MainView, CCSkinChanger::CTextureEntity* pEntities, char* pConfigStr, const char* pLabel, int ItemsPerRow, float Ratio);
 
 	// found in menus_settings.cpp
 	void RenderLanguageSelection(CUIRect MainView, bool Header=true);

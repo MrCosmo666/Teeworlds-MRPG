@@ -4,6 +4,7 @@
 #define GAME_CLIENT_COMPONENTS_CHAT_H
 #include <base/system.h>
 #include <engine/shared/ringbuffer.h>
+#include <engine/e_translate.h>
 #include <game/client/component.h>
 #include <game/client/lineinput.h>
 
@@ -129,6 +130,9 @@ class CChat : public CComponent
 	static void ConWhisper(IConsole::IResult *pResult, void *pUserData);
 	static void ConChat(IConsole::IResult *pResult, void *pUserData);
 	static void ConShowChat(IConsole::IResult *pResult, void *pUserData);
+
+	// translate
+	static void Translated(TranslateTextThreadData * Data);
 
 public:
 	CChat();

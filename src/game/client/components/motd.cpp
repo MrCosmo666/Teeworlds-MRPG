@@ -4,6 +4,7 @@
 #include <engine/graphics.h>
 #include <engine/textrender.h>
 #include <engine/keys.h>
+#include <engine/e_translate.h>
 
 #include <generated/protocol.h>
 #include <generated/client_data.h>

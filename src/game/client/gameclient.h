@@ -73,6 +73,9 @@ class CGameClient : public IGameClient
 	void EvolveCharacter(CNetObj_Character *pCharacter, int Tick);
 
 public:
+	// another
+	int IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, vec2& NewPos);
+
 	IKernel *Kernel() { return IInterface::Kernel(); }
 	IEngine *Engine() const { return m_pEngine; }
 	class IGraphics *Graphics() const { return m_pGraphics; }
@@ -321,12 +324,8 @@ public:
 	class CMapLayers *m_pMapLayersBackGround;
 	class CMapLayers *m_pMapLayersForeGround;
 
-	// mmotee thnx bla client
-	class CGameSkins* m_pGameSkins;
-	class CParticlesSkins* m_pParticlesSkins;
-	class CEmoticonsSkins* m_pEmoticonsSkins;
-	class CCursorsSkins* m_pCursorsSkins;
-	class CEntitiesSkins* m_pEntitiesSkins;
+	class CCSkinChanger* m_pSkinChanger;
+
 };
 
 const char *Localize(const char *pStr, const char *pContext="")

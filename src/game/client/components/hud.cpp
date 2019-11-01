@@ -555,111 +555,35 @@ void CHud::RenderNinjaBar(float x, float y, float Progress)
 }
 
 // mmotee
-void CHud::RenderMmoBar(float x, float y, float Progress)
-{
-	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAME].m_Id);
-	Graphics()->QuadsBegin();
-
-	Progress = clamp(Progress, 0.0f, 1.0f);
-	const float EndWidth = 6.0f;
-	const float BarHeight = 14.0f;
-	const float WholeBarWidth = 120.f;
-	const float MiddleBarWidth = WholeBarWidth - (EndWidth * 2.0f);
-
-	IGraphics::CQuadItem QuadStartFull(x, y, EndWidth, BarHeight);
-	RenderTools()->SelectSprite(&g_pData->m_aSprites[SPRITE_PROGRESSBAR_LEFT]);
-	Graphics()->QuadsDrawTL(&QuadStartFull, 1);
-	x += EndWidth;
-
-	const float FullBarWidth = MiddleBarWidth * Progress;
-	const float EmptyBarWidth = MiddleBarWidth - FullBarWidth;
-
-	// full bar
-	IGraphics::CQuadItem QuadFull(x, y, FullBarWidth, BarHeight);
-
-	CDataSprite SpriteBarFull = g_pData->m_aSprites[SPRITE_PROGRESSBAR_FULL];
-	// prevent pixel puree, select only a small slice
-	if (Progress < 0.1f)
-	{
-		int spx = SpriteBarFull.m_X;
-		int spy = SpriteBarFull.m_Y;
-		float w = SpriteBarFull.m_W * 0.1f; // magic here
-		int h = SpriteBarFull.m_H;
-		int cx = SpriteBarFull.m_pSet->m_Gridx;
-		int cy = SpriteBarFull.m_pSet->m_Gridy;
-		float x1 = spx / (float)cx;
-		float x2 = (spx + w - 1 / 32.0f) / (float)cx;
-		float y1 = spy / (float)cy;
-		float y2 = (spy + h - 1 / 32.0f) / (float)cy;
-
-		Graphics()->QuadsSetSubset(x1, y1, x2, y2);
-	}
-	else
-		RenderTools()->SelectSprite(&SpriteBarFull);
-
-	Graphics()->QuadsDrawTL(&QuadFull, 1);
-
-	// empty bar
-	// select the middle portion of the sprite so we don't get edge bleeding
-	const CDataSprite SpriteBarEmpty = g_pData->m_aSprites[SPRITE_PROGRESSBAR_EMPTY];
-	{
-		float spx = SpriteBarEmpty.m_X + 0.1f;
-		float spy = SpriteBarEmpty.m_Y;
-		float w = SpriteBarEmpty.m_W * 0.5f;
-		int h = SpriteBarEmpty.m_H;
-		int cx = SpriteBarEmpty.m_pSet->m_Gridx;
-		int cy = SpriteBarEmpty.m_pSet->m_Gridy;
-		float x1 = spx / (float)cx;
-		float x2 = (spx + w - 1 / 32.0f) / (float)cx;
-		float y1 = spy / (float)cy;
-		float y2 = (spy + h - 1 / 32.0f) / (float)cy;
-
-		Graphics()->QuadsSetSubset(x1, y1, x2, y2);
-	}
-
-	IGraphics::CQuadItem QuadEmpty(x + FullBarWidth, y, EmptyBarWidth, BarHeight);
-	Graphics()->QuadsDrawTL(&QuadEmpty, 1);
-
-	x += MiddleBarWidth;
-
-	IGraphics::CQuadItem QuadEndEmpty(x, y, EndWidth, BarHeight);
-	RenderTools()->SelectSprite(&g_pData->m_aSprites[SPRITE_PROGRESSBAR_RIGHT]);
-	Graphics()->QuadsDrawTL(&QuadEndEmpty, 1);
-
-	Graphics()->QuadsEnd();
-	Graphics()->WrapNormal();
-
-}
-
 void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetObj_Character* pCharacter)
 {
 	if (!pClientStats || !pCharacter)
 		return;
 
-	// Ðèñóåì áîêñû
-	CUIRect Rect = { 5, 15, 128, 36.0f };
+	// Ñ€Ð¸ÑÑƒÐµÐ¼ Ð±Ð¾Ñ€Ð´ÑŽÑ€Ñ‹
+	CUIRect Rect = { 5, 15, 106, 36.0f };
 	Graphics()->BlendNormal();
-	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.18f), 0, 5.0f);
+	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.18f), CUI::CORNER_ALL, 5.0f);
 
 	Rect = { 5, 15, 28, 25.0f };
 	Graphics()->BlendNormal();
-	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.18f), 0, 5.0f);
+	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.18f), CUI::CORNER_ALL, 5.0f);
 
-	Rect = { 5, 15, 128, 25.0f };
+	Rect = { 5, 15, 106, 25.0f };
 	Graphics()->BlendNormal();
-	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.1f, 0.1f, 0.06f), 0, 5.0f);
+	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.1f, 0.1f, 0.06f), CUI::CORNER_ALL, 5.0f);
 
-	// Èíèöèàëèçàöèÿ òåêñòà
+	// Ð¿ÐµÑ€ÐµÐ¼ÐµÐ½Ð½Ñ‹Ðµ
 	char aBuf[256];
 	float FontSize = 5.0f;
 
-	// Êîðäèíàòû
+	// Ñ€Ð¸ÑÑƒÐµÐ¼ Ð¿Ð¾Ð·Ð¸Ñ†Ð¸ÑŽ Ð¸ Ð½Ð°Ñ…Ð¾Ð¶Ð´ÐµÐ½Ð¸Ðµ Ð¸Ð³Ñ€Ð¾ÐºÐ°
 	{
 		str_format(aBuf, sizeof(aBuf), "%s. x%d, y%d", Client()->GetCurrentMapName(), pCharacter->m_X / 32, pCharacter->m_Y / 32);
 		TextRender()->Text(0, 2, 5, 4.5f, aBuf, -1);
 	}
 
-	// Ýôôåêòû èíôîðìàöèÿ
+	// Ñ€Ð¸ÑÑƒÐµÐ¼ Ð¸Ð½Ñ„Ñƒ Ð·ÐµÐ»ÐµÐ¹ ÑÑ„Ñ„ÐµÐºÑ‚Ð¾Ð²
 	IntsToStr(pClientStats->m_Table, 12, aBuf);
 	bool ChangePosition = false;
 	float SizeBuf = (str_length(aBuf) * (FontSize/1.25f)) - (str_length(aBuf) / 2 + str_length(aBuf) / 5);
@@ -669,45 +593,45 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 
 		Rect = { 5, 56, SizeBuf, 9.0f };
 		Graphics()->BlendNormal();
-		RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.2f, 0.4f, 0.14f), 0, 5.0f);
+		RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.2f, 0.4f, 0.14f), CUI::CORNER_ALL, 3.0f);
 		ChangePosition = true;
 	}
 
-	// Ëåâåëèíã
+	// Ñ€Ð¸ÑÑƒÐµÐ¼ Ð¸Ð½Ñ„Ñƒ ÑƒÑ€Ð¾Ð²Ð½ÐµÐ¹
 	IntsToStr(pClientStats->m_Leveling, 32, aBuf);
 	Rect = { 5, (ChangePosition ? 71.0f : 56.0f), 100, 20.0f };
 	Graphics()->BlendNormal();
-	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.16f), 0, 5.0f);
+	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.16f), CUI::CORNER_ALL, 5.0f);
 
 	TextRender()->TextWidth(0, 4.6f, aBuf, -1, -1.0);
 	TextRender()->Text(0, 10, (ChangePosition ? 71.0f : 56.0f), 4.6f, aBuf, -1);
 	TextRender()->TextOutlineColor(0, 0, 0, 0.3f);
 
-	// Íà÷àëî
-	{
-		// Exp áàð
-		const int Max = pClientStats->m_ExpNeed;
-		float ExpProgress = clamp(pClientStats->m_Exp, 0, Max) / (float)Max;
-		RenderMmoBar(7, 39, ExpProgress);
 
-		// Òåêñò ìåæäó çäîðîâüåì
-		str_format(aBuf, sizeof(aBuf), "LEVEL: %d EXP: %d/%d", pClientStats->m_Level, pClientStats->m_Exp, pClientStats->m_ExpNeed);
-		TextRender()->TextOutlineColor(0.3f, 0.3f, 0.3f, 0.3f);
-		TextRender()->TextWidth(0, FontSize, aBuf, -1, -1.0);
-		TextRender()->Text(0, 11, 42, FontSize, aBuf, -1);
+	// Ñ…ÑŽÐ´
+	{
+		// Exp Ð¾Ð¿Ñ‹Ñ‚ Ð¸ Ð±Ð°Ñ€
+		str_format(aBuf, sizeof(aBuf), "Level: %d Exp: %d/%d", pClientStats->m_Level, pClientStats->m_Exp, pClientStats->m_ExpNeed);
+
+		CUIRect ExpBar = { 8.0f, 43.0f, 0.0f, 5.0f };
+		vec4 ProgressColor(
+			(g_Config.m_HdColorProgress >> 16) / 255.0f,
+			((g_Config.m_HdColorProgress >> 8) & 0xff) / 255.0f,
+			(g_Config.m_HdColorProgress & 0xff) / 255.0f, 0.8f);
+		RenderTools()->RenderMmoBar(TextRender(), ExpBar, ProgressColor, pClientStats->m_Exp, pClientStats->m_ExpNeed, aBuf);
 
 		IGraphics::CQuadItem Used[2];
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 		Graphics()->QuadsBegin();
 
-		// Ñïðàéòû îðóæèÿ
+		// Ð²Ñ‹Ð±Ñ€Ð°Ð½Ð¾Ðµ Ð¾Ñ€ÑƒÐ¶Ð¸Ðµ
 		int Weapon = pCharacter->m_Weapon;
 		RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[Weapon % NUM_WEAPONS].m_pSpriteProj);
 		Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
 		Used[0] = IGraphics::CQuadItem(23, 17.50f, 10, 10);
 		Graphics()->QuadsDrawTL(&Used[0], 1);
 
-		// Îðóæèå
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 		int WeaponSprite = SPRITE_WEAPON_HAMMER_BODY;
 		float SizeWeapon = 13.5f;
 		switch (Weapon)
@@ -735,13 +659,15 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 		nbItems = pCharacter->m_Armor;
 		if (nbItems > 0) RenderTools()->SelectSprite(SPRITE_ARMOR_FULL);
 		else RenderTools()->SelectSprite(SPRITE_ARMOR_EMPTY);
-		Array[0] = IGraphics::CQuadItem(80, 21, 12, 12);
+		Array[0] = IGraphics::CQuadItem(73, 21, 12, 12);
 		Graphics()->QuadsDrawTL(Array, 1);
 
 		Graphics()->QuadsEnd();
 		Graphics()->WrapNormal();
 
-		// Òåêñò
+//		m_pClient->m_pMenus->DoItemIcon("skill_point", Rect, 8.0f);
+
+		// ï¿½ï¿½ï¿½ï¿½ï¿½
 		CTextCursor Cursor;
 		char type[64];
 		if (Weapon != WEAPON_HAMMER && Weapon != WEAPON_NINJA)
@@ -765,7 +691,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 
 		str_format(Text, sizeof(Text), "%d", pClientStats->m_Armor);
 		w = TextRender()->TextWidth(0, 6.0f, Text, -1, -1.0);
-		TextRender()->SetCursor(&Cursor, 93, 23, 6.0f, TEXTFLAG_RENDER);
+		TextRender()->SetCursor(&Cursor, 85, 23, 6.0f, TEXTFLAG_RENDER);
 		TextRender()->TextEx(&Cursor, Text, -1);
 	}
 }

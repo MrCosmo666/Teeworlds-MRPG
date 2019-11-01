@@ -4644,7 +4644,11 @@ void CEditor::Init()
 	m_CheckerTexture = Graphics()->LoadTexture("editor/checker.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
 	m_BackgroundTexture = Graphics()->LoadTexture("editor/background.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
 	m_CursorTexture = Graphics()->LoadTexture("editor/cursor.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
-	m_EntitiesTexture = Graphics()->LoadTexture(g_Config.m_GameEntities, IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_MULTI_DIMENSION);
+
+	char aBuf[256];
+	if(g_Config.m_GameEntities[0] == '\0') str_copy(aBuf, "editor/entities.png", sizeof(aBuf));
+	else str_format(aBuf, sizeof(aBuf), "entities/%s", g_Config.m_GameEntities);
+	m_EntitiesTexture = Graphics()->LoadTexture(aBuf, IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_MULTI_DIMENSION);
 
 	m_TilesetPicker.m_pEditor = this;
 	m_TilesetPicker.MakePalette();
@@ -4663,8 +4667,9 @@ void CEditor::Init()
 //mmotee
 void CEditor::ReInitEntities()
 {
-	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "entities/%s.png", g_Config.m_GameEntities);
+	char aBuf[256];
+	if (g_Config.m_GameEntities[0] == '\0') str_copy(aBuf, "editor/entities.png", sizeof(aBuf));
+	else str_format(aBuf, sizeof(aBuf), "entities/%s", g_Config.m_GameEntities);
 	m_EntitiesTexture = Graphics()->LoadTexture(aBuf, IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_MULTI_DIMENSION);
 	m_Map.m_pGameLayer->m_Texture = m_EntitiesTexture;
 }
