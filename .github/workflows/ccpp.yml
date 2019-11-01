@@ -16,6 +16,7 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install cmake libcurl4-openssl-dev libfreetype6-dev libglew-dev libogg-dev libopus-dev libopusfile-dev libpnglite-dev libsdl2-dev libwavpack-dev python -y
           git submodule update --init
+          
       - name: Build Mmo-Clinet Cmake Release mode
         run: |
           mkdir -p release
@@ -24,16 +25,15 @@ jobs:
           make everything
           ./mmoteeworlds shutdown
           cd ..
+          
       - name: Bundle Zip-Package
         run: |
           zip test_ubuntu.zip release/mmoteeworlds
+          
       - name: Deploy Github Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          name: Ubuntu-latest
-          files: |
-            test_ubuntu.zip
+        uses: JasonEtco/upload-to-release@master
+        with: 
+          args: test_ubuntu.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -48,18 +48,18 @@ jobs:
             mkdir -p release
             cd release
             cmake -G "Visual Studio 16 2019" ..
+            
       - name: Build
         run: |
             cmake --build release --config Release --target everything
+            
       - name: Bundle Zip-Package
         run: |
             jar -cMf teeworlds_windows32.zip release\Release\mmoteeworlds.exe
+            
       - name: Deploy Github Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          name: Windows-latest
-          files: |
-            teeworlds_windows32.zip
+        uses: JasonEtco/upload-to-release@master
+        with: 
+          args: teeworlds_windows32.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
