@@ -55,8 +55,7 @@ jobs:
       - name: Build
         run: |
             cmake --build release --config Release --target everything
-            cd release
-            ls
+            mv release\Release\mmoteeworlds.exe release
             
       - name: Bundle Zip-Package
         run: |
