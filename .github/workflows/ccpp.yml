@@ -44,18 +44,15 @@ jobs:
       - uses: actions/checkout@master
       - name: Prepare
         run: |
-
+            git submodule update --init
       - name: Build
         run: |
-            mkdir -p release
-            cd release
-            cmake ..
+            cmake
             make everything
             ./mmoteeworlds shutdown
-            cd ..
       - name: Bundle Zip-Package
         run: |
-          jar -cMf teeworlds_windows32.zip mmoteeworlds.exe
+            jar -cMf teeworlds_windows32.zip mmoteeworlds.exe
       - name: Deploy Github Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
