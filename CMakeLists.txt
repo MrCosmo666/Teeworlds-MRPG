@@ -1301,8 +1301,6 @@ set_src(ENGINE_INTERFACE GLOB src/engine
   contacts.h
   demo.h
   editor.h
-  e_translate.cpp
-  e_translate.h
   engine.h
   graphics.h
   input.h
@@ -1454,6 +1452,8 @@ if(CLIENT)
 	components/damageind.h
 	components/debughud.cpp
 	components/debughud.h
+	components/e_translate.cpp
+	components/e_translate.h
 	components/effects.cpp
 	components/effects.h
 	components/emoticon.cpp
@@ -1492,10 +1492,10 @@ if(CLIENT)
 	components/players.h
 	components/scoreboard.cpp
 	components/scoreboard.h
-	components/skins.cpp
-	components/skins.h
 	components/skinchanger.cpp
 	components/skinchanger.h
+	components/skins.cpp
+	components/skins.h
 	components/sounds.cpp
 	components/sounds.h
 	components/spectator.cpp

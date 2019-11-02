@@ -4,9 +4,9 @@
 #define GAME_CLIENT_COMPONENTS_CHAT_H
 #include <base/system.h>
 #include <engine/shared/ringbuffer.h>
-#include <engine/e_translate.h>
 #include <game/client/component.h>
 #include <game/client/lineinput.h>
+#include "e_translate.h"
 
 class CChat : public CComponent
 {
