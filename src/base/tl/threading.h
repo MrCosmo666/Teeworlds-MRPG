@@ -61,13 +61,13 @@
 	#error missing atomic implementation for this compiler
 #endif
 
-class semaphore
+class semaphorewlm
 {
 	SEMAPHORE sem;
 public:
-	semaphore() { sphore_init(&sem); }
-	~semaphore() { sphore_destroy(&sem); }
-	semaphore(const semaphore&) = delete;
+	semaphorewlm() { sphore_init(&sem); }
+	~semaphorewlm() { sphore_destroy(&sem); }
+	semaphorewlm(const semaphorewlm&) = delete;
 	void wait() { sphore_wait(&sem); }
 	void signal() { sphore_signal(&sem); }
 };
