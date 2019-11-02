@@ -6,8 +6,7 @@
 #include <map>
 #include <string>
 
-#define CLIENT_EXEC "mmoteeworlds"
-#define SERVER_EXEC "mmoteeworlds_srv"
+#define CLIENT_EXEC "mmoclient"
 
 #if defined(CONF_FAMILY_WINDOWS)
 	#define PLAT_EXT ".zip"
