@@ -29,7 +29,7 @@ jobs:
       - name: Bundle Tar-gz Package
         run: |
           mv storage.cfg mmoclient/
-          tar -cvzf mmoclient_linux-x86_64.tar.gz mmoclient/data mmoclient/mmoteeworlds mmoclient/storage.cfg
+          tar -cvzf mmoclient-linux-x86_64.tar.gz mmoclient/data mmoclient/mmoteeworlds mmoclient/storage.cfg
 
       - name: Publish Github Release
         uses: softprops/action-gh-release@v1
@@ -37,7 +37,7 @@ jobs:
         with:
           name: Ubuntu-latest
           files: |
-            mmoclient_linux-x86_64.tar.gz
+            mmoclient-linux-x86_64.tar.gz
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -61,9 +61,9 @@ jobs:
             
       - name: Bundle Zip-Package
         run: |
-          jar -cMf mmoclient_windows32.zip mmoclient\mmoteeworlds.exe mmoclient\storage.cfg
-          jar -uf mmoclient_windows32.zip mmoclient\data mmoclient\freetype.dll mmoclient\libcurl.dll mmoclient\libogg.dll
-          jar -uf mmoclient_windows32.zip mmoclient\libopus.dll mmoclient\libopusfile.dll mmoclient\libwinpthread-1.dll mmoclient\SDL2.dll
+          jar -cMf mmoclient-win32.zip mmoclient\mmoteeworlds.exe mmoclient\storage.cfg
+          jar -uf mmoclient-win32.zip mmoclient\data mmoclient\freetype.dll mmoclient\libcurl.dll mmoclient\libogg.dll
+          jar -uf mmoclient-win32.zip mmoclient\libopus.dll mmoclient\libopusfile.dll mmoclient\libwinpthread-1.dll mmoclient\SDL2.dll
 
       - name: Publish Github Release
         uses: softprops/action-gh-release@v1
@@ -71,6 +71,6 @@ jobs:
         with:
           name: Windows-latest
           files: |
-            mmoclient_windows32.zip
+            mmoclient-win32.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
