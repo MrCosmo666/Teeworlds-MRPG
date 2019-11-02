@@ -1,7 +1,6 @@
 #include <base/color.h>
 
 #include <engine/storage.h>
-#include <engine/e_translate.h>
 #include <engine/shared/config.h>
 #include <engine/textrender.h>
 #include <engine/graphics.h>
@@ -17,6 +16,7 @@
 #include <game/client/components/menus.h>
 #include <game/client/components/items.h>
 #include <game/client/components/skins.h>
+#include <game/client/components/e_translate.h>
 
 void CMenus::RenderRgbSliders(CUIRect* pMainView, CUIRect* pButton, int &r, int &g, int &b, bool Enabled)
 {
