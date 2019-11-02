@@ -125,6 +125,7 @@ function GenerateMacOSXSettings(settings, conf, arch, compiler)
 	settings.cc.flags:Add("--stdlib=libc++")
 	settings.link.flags:Add("--stdlib=libc++")
 	-- this also needs the macOS min SDK version to be at least 10.7
+	settings.cc.flags_cxx:Add("-std=c++11")
 
 	settings.cc.flags:Add("-mmacosx-version-min=10.7")
 	settings.link.flags:Add("-mmacosx-version-min=10.7")
