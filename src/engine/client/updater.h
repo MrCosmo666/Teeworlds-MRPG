@@ -10,10 +10,10 @@
 #define SERVER_EXEC "mmoteeworlds_srv"
 
 #if defined(CONF_FAMILY_WINDOWS)
-	#define PLAT_EXT ".exe"
+	#define PLAT_EXT ".zip"
 	#define PLAT_NAME CONF_PLATFORM_STRING
 #elif defined(CONF_FAMILY_UNIX)
-	#define PLAT_EXT ""
+	#define PLAT_EXT ".tar.gz"
 	#if defined(CONF_ARCH_IA32)
 		#define PLAT_NAME CONF_PLATFORM_STRING "-x86"
 	#elif defined(CONF_ARCH_AMD64)
@@ -27,10 +27,7 @@
 #endif
 
 #define PLAT_CLIENT_DOWN CLIENT_EXEC "-" PLAT_NAME PLAT_EXT
-#define PLAT_SERVER_DOWN SERVER_EXEC "-" PLAT_NAME PLAT_EXT
-
 #define PLAT_CLIENT_EXEC CLIENT_EXEC PLAT_EXT
-#define PLAT_SERVER_EXEC SERVER_EXEC PLAT_EXT
 
 class CUpdater : public IUpdater
 {
@@ -50,7 +47,6 @@ class CUpdater : public IUpdater
 	char m_aLastFile[256];
 
 	bool m_ClientUpdate;
-	bool m_ServerUpdate;
 
 	std::map<std::string, bool> m_FileJobs;
 
@@ -63,8 +59,6 @@ class CUpdater : public IUpdater
 	void CommitUpdate();
 
 	bool ReplaceClient();
-	bool ReplaceServer();
-
 	void SetCurrentState(int NewState);
 
 public:

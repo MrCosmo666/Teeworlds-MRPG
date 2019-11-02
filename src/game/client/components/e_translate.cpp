@@ -132,8 +132,7 @@ void TranslateTextThreadFunc(void * Param)
 
 	curl_easy_setopt(curl, CURLOPT_WRITEDATA, TranslationBuffer);
 	curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, curlWriteFunc);
-
-	CURLcode curlResult = curl_easy_perform(curl);
+	curl_easy_perform(curl);
 	curl_easy_cleanup(curl);
 
 	const char * TranslatedText = str_find_nocase(TranslationBuffer, "[\"");

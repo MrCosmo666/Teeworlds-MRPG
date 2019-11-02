@@ -10,7 +10,7 @@
 	#define CLIENT_VERSION 0x0703
 
 	// версия клиента релиза
-	#define GAME_RELEASE_VERSION "1.0.5"
+	#define GAME_RELEASE_VERSION "1.0.6"
 
 	// весрсия под сервер
 	#define CLIENT_VERSION_MOLD 1012

@@ -193,9 +193,9 @@ bool CUpdater::ReplaceClient()
 	// Replace running executable by renaming twice...
 	if(!m_IsWinXP)
 	{
-		m_pStorage->RemoveBinaryFile("mmoteeworlds.old");
-		Success &= m_pStorage->RenameBinaryFile(PLAT_CLIENT_EXEC, "mmoteeworlds.old");
-		Success &= m_pStorage->RenameBinaryFile("update/mmoteeworlds.tmp", PLAT_CLIENT_EXEC);
+		m_pStorage->RemoveBinaryFile("mmoclient.old");
+		Success &= m_pStorage->RenameBinaryFile(PLAT_CLIENT_EXEC, "mmoclient.old");
+		Success &= m_pStorage->RenameBinaryFile("update/mmoclient.tmp", PLAT_CLIENT_EXEC);
 	}
 	#if !defined(CONF_FAMILY_WINDOWS)
 		char aPath[512];
@@ -205,29 +205,6 @@ bool CUpdater::ReplaceClient()
 		if(system(aBuf))
 		{
 			dbg_msg("updater", "ERROR: failed to set client executable bit");
-			Success &= false;
-		}
-	#endif
-	return Success;
-}
-
-bool CUpdater::ReplaceServer()
-{
-	dbg_msg("updater", "replacing " PLAT_SERVER_EXEC);
-	bool Success = true;
-
-	//Replace running executable by renaming twice...
-	m_pStorage->RemoveBinaryFile("mmoteeworlds_srv.old");
-	Success &= m_pStorage->RenameBinaryFile(PLAT_SERVER_EXEC, "mmoteeworlds_srv.old");
-	Success &= m_pStorage->RenameBinaryFile("update/mmoteeworlds_srv.tmp", PLAT_SERVER_EXEC);
-	#if !defined(CONF_FAMILY_WINDOWS)
-		char aPath[512];
-		m_pStorage->GetBinaryPath(PLAT_SERVER_EXEC, aPath, sizeof aPath);
-		char aBuf[512];
-		str_format(aBuf, sizeof aBuf, "chmod +x %s", aPath);
-		if (system(aBuf))
-		{
-			dbg_msg("updater", "ERROR: failed to set server executable bit");
 			Success &= false;
 		}
 	#endif
@@ -257,8 +234,6 @@ void CUpdater::ParseUpdate()
 			{
 				if(json_boolean_get(json_object_get(pCurrent, "client")))
 					m_ClientUpdate = true;
-				if(json_boolean_get(json_object_get(pCurrent, "server")))
-					m_ServerUpdate = true;
 				if((pTemp = json_object_get(pCurrent, "download"))->type == json_array)
 				{
 					for(int j = 0; j < json_array_length(pTemp); j++)
@@ -327,15 +302,10 @@ void CUpdater::PerformUpdate()
 			m_pStorage->RemoveBinaryFile(it->first.c_str());
 	}
 
-	if(m_ServerUpdate)
-	{
-		FetchFile(PLAT_SERVER_DOWN, "mmoteeworlds_srv.tmp");
-		aLastFile = "mmoteeworlds_srv.tmp";
-	}
 	if(m_ClientUpdate)
 	{
-		FetchFile(PLAT_CLIENT_DOWN, "mmoteeworlds.tmp");
-		aLastFile = "mmoteeworlds.tmp";
+		FetchFile(PLAT_CLIENT_DOWN, "mmoclient.tmp");
+		aLastFile = "mmoclient.tmp";
 	}
 
 	str_copy(m_aLastFile, aLastFile, sizeof(m_aLastFile));
@@ -351,29 +321,10 @@ void CUpdater::CommitUpdate()
 
 	if(m_ClientUpdate)
 		Success &= ReplaceClient();
-	if(m_ServerUpdate)
-		Success &= ReplaceServer();
 	if(!Success)
 		m_State = FAIL;
 	else if(m_pClient->State() == IClient::STATE_ONLINE || m_pClient->EditorHasUnsavedData())
 		m_State = NEED_RESTART;
 	else
-	{
-		if(!m_IsWinXP) m_pClient->Restart();
-		else WinXpRestart();
-	}
-}
-
-void CUpdater::WinXpRestart()
-{
-		char aBuf[512];
-		IOHANDLE bhFile = io_open(m_pStorage->GetBinaryPath("du.bat", aBuf, sizeof aBuf), IOFLAG_WRITE);
-		if(!bhFile)
-			return;
-		char bBuf[512];
-		str_format(bBuf, sizeof(bBuf), ":_R\r\ndel \"mmoteeworlds.exe\"\r\nif exist \"mmoteeworlds.exe\" goto _R\r\n:_T\r\nmove /y \"update\\mmoteeworlds.tmp\" \"mmoteeworlds.exe\"\r\nif not exist \"mmoteeworlds.exe\" goto _T\r\nstart mmoteeworlds.exe\r\ndel \"du.bat\"\r\n");
-		io_write(bhFile, bBuf, str_length(bBuf));
-		io_close(bhFile);
-		shell_execute(aBuf);
-		m_pClient->Quit();
+		m_State = NEED_RESTART;
 }
