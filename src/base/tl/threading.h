@@ -35,7 +35,7 @@
 #elif defined(_MSC_VER)
 	#include <intrin.h>
 
-	#define WIN32_LEAN_AND_MEAN
+	#define WIN32_LEAN_AND_MEAN 1
 	#include <windows.h>
 
 	inline unsigned atomic_inc(volatile unsigned *pValue)
@@ -61,13 +61,13 @@
 	#error missing atomic implementation for this compiler
 #endif
 
-class semaphorewlm
+class semaphore
 {
 	SEMAPHORE sem;
 public:
-	semaphorewlm() { sphore_init(&sem); }
-	~semaphorewlm() { sphore_destroy(&sem); }
-	semaphorewlm(const semaphorewlm&) = delete;
+	semaphore() { sphore_init(&sem); }
+	~semaphore() { sphore_destroy(&sem); }
+	semaphore(const semaphore&) = delete;
 	void wait() { sphore_wait(&sem); }
 	void signal() { sphore_signal(&sem); }
 };
