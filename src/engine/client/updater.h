@@ -26,7 +26,7 @@
 #endif
 
 #define PLAT_CLIENT_DOWN CLIENT_EXEC "-" PLAT_NAME PLAT_EXT
-#define PLAT_CLIENT_EXEC CLIENT_EXEC PLAT_EXT
+#define PLAT_CLIENT_EXEC CLIENT_EXEC "-updated" PLAT_EXT
 
 class CUpdater : public IUpdater
 {

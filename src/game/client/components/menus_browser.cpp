@@ -2174,9 +2174,9 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 
 	bool NeedUpdate = str_comp(Client()->LatestVersion(), "0");
 	char aBuf[256];
-	int State = m_pClient->Updater()->GetCurrentState();
 
 	// Update Button
+	int State = m_pClient->Updater()->GetCurrentState();
 	if (NeedUpdate && State <= IUpdater::CLEAN)
 	{
 		str_format(aBuf, sizeof(aBuf), Localize("Mmotee %s is available"), Client()->LatestVersion());
@@ -2195,14 +2195,14 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 	}
 	else if (State == IUpdater::NEED_RESTART)
 	{
-		str_format(aBuf, sizeof(aBuf), Localize("Mmotee Client updated!"));
+		str_format(aBuf, sizeof(aBuf), Localize("Mmotee Client updated! Archive downloading to client folder!"));
 		m_NeedRestartUpdate = true;
 
 		// restart
 		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
 		static CButtonContainer s_ButtonUpdate;
-		if (DoButton_Menu(&s_ButtonUpdate, Localize("Restart"), 0, &Button))
-			Client()->Restart();
+		if (DoButton_Menu(&s_ButtonUpdate, Localize("Client Archive"), 0, &Button))
+			Client()->OpenUpdateArchive();
 	}
 	else
 	{
@@ -2217,8 +2217,8 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 
 	// text information
 	MainView.HSplitTop(30.0f, 0, &Label); // text for update
-	Label.VSplitRight(350.0f, 0, &Label);
-	UI()->DoLabel(&Label, aBuf, 12.0f, CUI::ALIGN_CENTER);
+	Label.VSplitRight(g_Config.m_ClGBrowser ? 435.0f : 350.0f, 0, &Label);
+	UI()->DoLabel(&Label, aBuf, 11.0f, CUI::ALIGN_CENTER);
 	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// refresh

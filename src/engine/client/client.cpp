@@ -826,11 +826,10 @@ void CClient::RequestMmoInfo()
 	Engine()->AddJob(m_pMmoInfoTask);
 }
 
-void CClient::Restart()
+void CClient::OpenUpdateArchive()
 {
 	char aBuf[512];
 	shell_execute(Storage()->GetBinaryPath(PLAT_CLIENT_EXEC, aBuf, sizeof aBuf));
-	Quit();
 }
 
 void CClient::Quit()

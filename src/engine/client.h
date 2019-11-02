@@ -113,7 +113,7 @@ public:
 	virtual int ClientFPS() const = 0;
 	virtual void RequestMmoInfo() = 0;
 	virtual bool EditorHasUnsavedData() = 0;
-	virtual void Restart() = 0;
+	virtual void OpenUpdateArchive() = 0;
 
 	// remote console
 	virtual void RconAuth(const char *pUsername, const char *pPassword) = 0;

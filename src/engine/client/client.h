@@ -272,7 +272,7 @@ public:
 	void ResetMmoInfo();
 	void FinishMmoInfo();
 	void LoadMmoInfo();
-	virtual void Restart();
+	virtual void OpenUpdateArchive();
 
 	virtual void Quit();
 
