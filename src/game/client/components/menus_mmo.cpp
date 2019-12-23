@@ -16,7 +16,6 @@
 #include <game/client/components/menus.h>
 #include <game/client/components/items.h>
 #include <game/client/components/skins.h>
-#include <game/client/components/e_translate.h>
 
 void CMenus::RenderRgbSliders(CUIRect* pMainView, CUIRect* pButton, int &r, int &g, int &b, bool Enabled)
 {
@@ -134,6 +133,7 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		if (DoButton_CheckBox(&s_ButtonColorVote, Localize("Show Colored Vote (MmoTee)"), g_Config.m_ClShowColoreVote, &Button))
 			g_Config.m_ClShowColoreVote ^= 1;
 
+		/*
 		// translate tab
 		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
 		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
@@ -161,6 +161,7 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 
 		BasicLeft.HSplitTop(2.0f, &Button, &BasicLeft);
 		UI()->DoLabel(&BasicLeft, "Attention: only you will see the translated text", 9.0f, CUI::ALIGN_CENTER);
+		*/
 
 		// --------------------- RIGHT SIDE --------------------------
 		// -----------------------------------------------------------

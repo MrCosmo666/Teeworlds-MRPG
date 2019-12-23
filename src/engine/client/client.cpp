@@ -820,7 +820,7 @@ void CClient::LoadMmoInfo()
 void CClient::RequestMmoInfo()
 {
 	char aUrl[256];
-	str_copy(aUrl, "http://176.31.208.223/update/info", sizeof(aUrl));
+	str_copy(aUrl, "http://teeworlds.space/update/info", sizeof(aUrl));
 
 	m_pMmoInfoTask = std::make_shared<CGetFile>(Storage(), aUrl, MMOTEE_INFO, IStorage::TYPE_SAVE, true);
 	Engine()->AddJob(m_pMmoInfoTask);
@@ -974,7 +974,12 @@ int CClient::UnpackServerInfo(CUnpacker *pUnpacker, CServerInfo *pInfo, int *pTo
 		str_copy(pInfo->m_aHostname, pInfo->m_aAddress, sizeof(pInfo->m_aHostname));
 	str_copy(pInfo->m_aMap, pUnpacker->GetString(CUnpacker::SANITIZE_CC|CUnpacker::SKIP_START_WHITESPACES), sizeof(pInfo->m_aMap));
 	str_copy(pInfo->m_aGameType, pUnpacker->GetString(CUnpacker::SANITIZE_CC|CUnpacker::SKIP_START_WHITESPACES), sizeof(pInfo->m_aGameType));
-	pInfo->m_Flags = (pUnpacker->GetInt()&SERVERINFO_FLAG_PASSWORD) ? IServerBrowser::FLAG_PASSWORD : 0;
+	int Flags = pUnpacker->GetInt();
+	pInfo->m_Flags = 0;
+	if (Flags & SERVERINFO_FLAG_PASSWORD)
+		pInfo->m_Flags |= IServerBrowser::FLAG_PASSWORD;
+	if (Flags & SERVERINFO_FLAG_TIMESCORE)
+		pInfo->m_Flags |= IServerBrowser::FLAG_TIMESCORE;
 	pInfo->m_ServerLevel = clamp<int>(pUnpacker->GetInt(), SERVERINFO_LEVEL_MIN, SERVERINFO_LEVEL_MAX);
 	pInfo->m_NumPlayers = pUnpacker->GetInt();
 	pInfo->m_MaxPlayers = pUnpacker->GetInt();
@@ -1022,6 +1027,34 @@ int CClient::UnpackServerInfo(CUnpacker *pUnpacker, CServerInfo *pInfo, int *pTo
 	pInfo->m_NumClients = NumClients;
 
 	return 0;
+}
+
+bool CompareScore(const CServerInfo::CClient& C1, const CServerInfo::CClient& C2)
+{
+	if (C1.m_PlayerType & CServerInfo::CClient::PLAYERFLAG_SPEC)
+		return false;
+	if (C2.m_PlayerType & CServerInfo::CClient::PLAYERFLAG_SPEC)
+		return true;
+	return C1.m_Score > C2.m_Score;
+}
+
+bool CompareTime(const CServerInfo::CClient& C1, const CServerInfo::CClient& C2)
+{
+	if (C1.m_PlayerType & CServerInfo::CClient::PLAYERFLAG_SPEC)
+		return false;
+	if (C2.m_PlayerType & CServerInfo::CClient::PLAYERFLAG_SPEC)
+		return true;
+	if (C1.m_Score < 0)
+		return false;
+	if (C2.m_Score < 0)
+		return true;
+	return C1.m_Score < C2.m_Score;
+}
+
+inline void SortClients(CServerInfo* pInfo)
+{
+	std::stable_sort(pInfo->m_aClients, pInfo->m_aClients + pInfo->m_NumClients,
+		(pInfo->m_Flags & IServerBrowser::FLAG_TIMESCORE) ? CompareTime : CompareScore);
 }
 
 void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
@@ -1134,7 +1167,7 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 		int Token;
 		if(!UnpackServerInfo(&Up, &Info, &Token) && !Up.Error())
 		{
-			std::stable_sort(Info.m_aClients, Info.m_aClients + Info.m_NumClients);
+			SortClients(&Info);
 			m_ServerBrowser.Set(pPacket->m_Address, CServerBrowser::SET_TOKEN, Token, &Info);
 		}
 	}
@@ -1275,7 +1308,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 			net_addr_str(&pPacket->m_Address, Info.m_aAddress, sizeof(Info.m_aAddress), true);
 			if(!UnpackServerInfo(&Unpacker, &Info, 0) && !Unpacker.Error())
 			{
-				std::stable_sort(Info.m_aClients, Info.m_aClients + Info.m_NumClients);
+				SortClients(&Info);
 				mem_copy(&m_CurrentServerInfo, &Info, sizeof(m_CurrentServerInfo));
 				m_CurrentServerInfo.m_NetAddr = m_ServerAddress;
 			}
@@ -2736,7 +2769,8 @@ int main(int argc, const char **argv) // ignore_convention
 	if(!UseDefaultConfig)
 	{
 		// execute config file
-		pConsole->ExecuteFile("settings.cfg");
+		if (!pConsole->ExecuteFile(SETTINGS_FILENAME ".cfg"))
+			pConsole->ExecuteFile("settings.cfg"); // fallback to legacy naming scheme
 
 		// execute autoexec file
 		pConsole->ExecuteFile("autoexec.cfg");

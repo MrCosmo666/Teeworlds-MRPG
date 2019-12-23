@@ -2159,6 +2159,19 @@ const char *str_startswith(const char *str, const char *prefix)
 	}
 }
 
+const char* str_startswith_nocase(const char* str, const char* prefix)
+{
+	int prefixl = str_length(prefix);
+	if (str_comp_nocase_num(str, prefix, prefixl) == 0)
+	{
+		return str + prefixl;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
 const char *str_endswith(const char *str, const char *suffix)
 {
 	int strl = str_length(str);
@@ -2170,6 +2183,26 @@ const char *str_endswith(const char *str, const char *suffix)
 	}
 	strsuffix = str + strl - suffixl;
 	if(str_comp(strsuffix, suffix) == 0)
+	{
+		return strsuffix;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+const char* str_endswith_nocase(const char* str, const char* suffix)
+{
+	int strl = str_length(str);
+	int suffixl = str_length(suffix);
+	const char* strsuffix;
+	if (strl < suffixl)
+	{
+		return 0;
+	}
+	strsuffix = str + strl - suffixl;
+	if (str_comp_nocase(strsuffix, suffix) == 0)
 	{
 		return strsuffix;
 	}
@@ -2629,6 +2662,11 @@ int pid()
 #else
 	return getpid();
 #endif
+}
+
+unsigned bytes_be_to_uint(const unsigned char* bytes)
+{
+	return bytes[0] << 0x18 & bytes[1] << 0x10 & bytes[2] << 0x8 & bytes[3];
 }
 
 #if defined(__cplusplus)

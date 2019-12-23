@@ -3,10 +3,10 @@
 #ifndef GAME_CLIENT_COMPONENTS_CHAT_H
 #define GAME_CLIENT_COMPONENTS_CHAT_H
 #include <base/system.h>
+#include <base/tl/array.h>
 #include <engine/shared/ringbuffer.h>
 #include <game/client/component.h>
 #include <game/client/lineinput.h>
-#include "e_translate.h"
 
 class CChat : public CComponent
 {
@@ -21,7 +21,7 @@ class CChat : public CComponent
 	struct CLine
 	{
 		int64 m_Time;
-		vec2 m_Size[2];
+		vec2 m_Size;
 		int m_ClientID;
 		int m_TargetID;
 		int m_Mode;
@@ -65,6 +65,7 @@ class CChat : public CComponent
 	int m_PlaceholderLength;
 	bool m_ReverseCompletion;
 	bool m_FirstMap;
+	float m_CurrentLineWidth;
 
 	int m_ChatBufferMode;
 	char m_ChatBuffer[512];
@@ -80,26 +81,41 @@ class CChat : public CComponent
 	int64 m_LastChatSend;
 	int64 m_aLastSoundPlayed[CHAT_NUM];
 
+	typedef void (*COMMAND_CALLBACK)(CChat* pChatData, const char* pArgs);
+
 	// chat commands
 	struct CChatCommand
 	{
-		const char* m_pCommandText;
-		const char* m_pHelpText;
-		void (*m_pfnFunc)(CChat *pChatData, const char* pCommand);
+		char* m_pName;
+		char* m_pHelpText;
+		char* m_pArgsFormat;
+		// If callback is null, then it's a server-side command.
+		COMMAND_CALLBACK m_pfnCallback;
 		bool m_aFiltered; // 0 = shown, 1 = hidden
+
+		~CChatCommand();
 	};
 
 	class CChatCommands
 	{
-		CChatCommand *m_apCommands;
-		int m_Count;
+		array<CChatCommand*> m_aCommands;
 		CChatCommand *m_pSelectedCommand;
+
+		enum
+		{
+			// 8 is the number of vanilla commands, 14 the number of commands left to fill the chat.
+			MAX_COMMANDS = 8 + 14
+		};
 
 	private:
 		int GetActiveIndex(int index) const;
 	public:
-		CChatCommands(CChatCommand apCommands[], int Count);
+		CChatCommands();
 		~CChatCommands();
+
+		void AddCommand(const char* pName, const char* pArgsFormat, const char* pHelpText, COMMAND_CALLBACK pfnCallback);
+		void ClearCommands();
+		CChatCommand* GetCommandByName(const char* pName);
 		void Reset();
 		void Filter(const char* pLine);
 		int CountActiveCommands() const;
@@ -109,7 +125,7 @@ class CChat : public CComponent
 		void SelectNextCommand();
 	};
 
-	CChatCommands *m_pCommands;
+	CChatCommands m_Commands;
 	bool m_IgnoreCommand;
 	bool IsTypingCommand() const;
 	void HandleCommands(float x, float y, float w);
@@ -130,9 +146,6 @@ class CChat : public CComponent
 	static void ConWhisper(IConsole::IResult *pResult, void *pUserData);
 	static void ConChat(IConsole::IResult *pResult, void *pUserData);
 	static void ConShowChat(IConsole::IResult *pResult, void *pUserData);
-
-	// translate
-	static void Translated(TranslateTextThreadData * Data);
 
 public:
 	CChat();

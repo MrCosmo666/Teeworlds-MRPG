@@ -17,6 +17,10 @@ else()
   message(FATAL_ERROR "Couldn't parse version from src/game/version.h")
 endif()
 
+if(POLICY CMP0072)
+  cmake_policy(SET CMP0072 OLD)
+endif()
+
 if(POLICY CMP0091)
   cmake_policy(SET CMP0091 NEW)
 endif()
@@ -201,40 +205,41 @@ function(set_glob VAR GLOBBING EXTS DIRECTORY) # ...
   endforeach()
   file(${GLOBBING} GLOB_RESULT ${GLOBS})
   list(SORT GLOB_RESULT)
-  set(FILES)
-  foreach(file ${ARGN})
-    list(APPEND FILES "${PROJECT_SOURCE_DIR}/${DIRECTORY}/${file}")
-  endforeach()
+  set(${VAR} ${GLOB_RESULT} PARENT_SCOPE)
+  # set(FILES)
+  # foreach(file ${ARGN})
+  #   list(APPEND FILES "${PROJECT_SOURCE_DIR}/${DIRECTORY}/${file}")
+  # endforeach()
 
-  if(NOT FILES STREQUAL GLOB_RESULT)
-    message(AUTHOR_WARNING "${VAR} does not contain every file from directory ${DIRECTORY}")
-    set(LIST_BUT_NOT_GLOB)
-    if(POLICY CMP0057)
-      cmake_policy(SET CMP0057 NEW)
-      foreach(file ${FILES})
-        if(NOT file IN_LIST GLOB_RESULT)
-          list(APPEND LIST_BUT_NOT_GLOB ${file})
-        endif()
-      endforeach()
-      if(LIST_BUT_NOT_GLOB)
-        message(AUTHOR_WARNING "Entries only present in ${VAR}: ${LIST_BUT_NOT_GLOB}")
-      endif()
-      set(GLOB_BUT_NOT_LIST)
-      foreach(file ${GLOB_RESULT})
-        if(NOT file IN_LIST FILES)
-          list(APPEND GLOB_BUT_NOT_LIST ${file})
-        endif()
-      endforeach()
-      if(GLOB_BUT_NOT_LIST)
-        message(AUTHOR_WARNING "Entries only present in ${DIRECTORY}: ${GLOB_BUT_NOT_LIST}")
-      endif()
-      if(NOT LIST_BUT_NOT_GLOB AND NOT GLOB_BUT_NOT_LIST)
-        message(AUTHOR_WARNING "${VAR} is not alphabetically sorted")
-      endif()
-    endif()
-  endif()
+  # if(NOT FILES STREQUAL GLOB_RESULT)
+  #   message(AUTHOR_WARNING "${VAR} does not contain every file from directory ${DIRECTORY}")
+  #   set(LIST_BUT_NOT_GLOB)
+  #   if(POLICY CMP0057)
+  #     cmake_policy(SET CMP0057 NEW)
+  #     foreach(file ${FILES})
+  #       if(NOT file IN_LIST GLOB_RESULT)
+  #         list(APPEND LIST_BUT_NOT_GLOB ${file})
+  #       endif()
+  #     endforeach()
+  #     if(LIST_BUT_NOT_GLOB)
+  #       message(AUTHOR_WARNING "Entries only present in ${VAR}: ${LIST_BUT_NOT_GLOB}")
+  #     endif()
+  #     set(GLOB_BUT_NOT_LIST)
+  #     foreach(file ${GLOB_RESULT})
+  #       if(NOT file IN_LIST FILES)
+  #         list(APPEND GLOB_BUT_NOT_LIST ${file})
+  #       endif()
+  #     endforeach()
+  #     if(GLOB_BUT_NOT_LIST)
+  #       message(AUTHOR_WARNING "Entries only present in ${DIRECTORY}: ${GLOB_BUT_NOT_LIST}")
+  #     endif()
+  #     if(NOT LIST_BUT_NOT_GLOB AND NOT GLOB_BUT_NOT_LIST)
+  #       message(AUTHOR_WARNING "${VAR} is not alphabetically sorted")
+  #     endif()
+  #   endif()
+  # endif()
 
-  set(${VAR} ${FILES} PARENT_SCOPE)
+  # set(${VAR} ${FILES} PARENT_SCOPE)
 endfunction()
 
 function(set_src VAR GLOBBING DIRECTORY) # ...
@@ -492,7 +497,10 @@ add_library(md5 EXCLUDE_FROM_ALL OBJECT ${DEP_MD5_SRC})
 
 list(APPEND TARGETS_DEP json md5)
 set(DEP_JSON $<TARGET_OBJECTS:json>)
-set(DEP_MD5 $<TARGET_OBJECTS:md5>)
+set(DEP_MD5)
+if(NOT CRYPTO_FOUND)
+  set(DEP_MD5 $<TARGET_OBJECTS:md5>)
+endif()
 
 ########################################################################
 # DATA
@@ -1033,51 +1041,129 @@ set(EXPECTED_DATA
 	particles/particles_blue.png
 	particles/particles_by_Timmy.png
 	particles/silhouette_particles.png
-	skins/bluekitty.json
-	skins/bluestripe.json
-	skins/body/bear.png
-	skins/body/kitty.png
-	skins/body/standard.png
-	skins/body/x_ninja.png
-	skins/bot.png
-	skins/brownbear.json
-	skins/cammo.json
-	skins/cammostripes.json
-	skins/decoration/hair.png
-	skins/decoration/twinbopp.png
-	skins/decoration/unibop.png
-	skins/default.json
-	skins/eyes/standard.png
-	skins/eyes/standardreal.png
-	skins/eyes/x_ninja.png
-	skins/feet/standard.png
-	skins/hands/standard.png
-	skins/koala.json
-	skins/limekitty.json
-	skins/marking/bear.png
-	skins/marking/cammo1.png
-	skins/marking/cammo2.png
-	skins/marking/cammostripes.png
-	skins/marking/donny.png
-	skins/marking/duodonny.png
-	skins/marking/saddo.png
-	skins/marking/stripe.png
-	skins/marking/stripes.png
-	skins/marking/toptri.png
-	skins/marking/twintri.png
-	skins/marking/uppy.png
-	skins/marking/warpaint.png
-	skins/marking/whisker.png
-	skins/pinky.json
-	skins/redbopp.json
-	skins/redstripe.json
-	skins/saddo.json
-	skins/toptri.json
-	skins/twinbop.json
-	skins/twintri.json
-	skins/warpaint.json
-	skins/x_ninja.json
-	skins/xmas_hat.png
+    race_flag.png
+    skins/beaver.json
+    skins/bluekitty.json
+    skins/bluestripe.json
+    skins/body/bat.png
+    skins/body/bear.png
+    skins/body/beaver.png
+    skins/body/dog.png
+    skins/body/force.png
+    skins/body/fox.png
+    skins/body/hippo.png
+    skins/body/kitty.png
+    skins/body/koala.png
+    skins/body/monkey.png
+    skins/body/mouse.png
+    skins/body/piglet.png
+    skins/body/raccoon.png
+    skins/body/spiky.png
+    skins/body/standard.png
+    skins/body/x_ninja.png
+    skins/bot.png
+    skins/brownbear.json
+    skins/bumbler.json
+    skins/cammo.json
+    skins/cammostripes.json
+    skins/cavebat.json
+    skins/decoration/hair.png
+    skins/decoration/twinbopp.png
+    skins/decoration/twinmello.png
+    skins/decoration/twinpen.png
+    skins/decoration/unibop.png
+    skins/decoration/unimelo.png
+    skins/decoration/unipento.png
+    skins/default.json
+    skins/eyes/colorable.png
+    skins/eyes/negativ.png
+    skins/eyes/standard.png
+    skins/eyes/standardreal.png
+    skins/eyes/x_ninja.png
+    skins/feet/standard.png
+    skins/force.json
+    skins/fox.json
+    skins/greycoon.json
+    skins/greyfox.json
+    skins/hands/standard.png
+    skins/hippo.json
+    skins/koala.json
+    skins/limedog.json
+    skins/limekitty.json
+    skins/marking/bear.png
+    skins/marking/belly1.png
+    skins/marking/belly2.png
+    skins/marking/blush.png
+    skins/marking/bug.png
+    skins/marking/cammo1.png
+    skins/marking/cammo2.png
+    skins/marking/cammostripes.png
+    skins/marking/coonfluff.png
+    skins/marking/donny.png
+    skins/marking/downdony.png
+    skins/marking/duodonny.png
+    skins/marking/fox.png
+    skins/marking/hipbel.png
+    skins/marking/lowcross.png
+    skins/marking/lowpaint.png
+    skins/marking/marksman.png
+    skins/marking/mice.png
+    skins/marking/mixture1.png
+    skins/marking/mixture2.png
+    skins/marking/monkey.png
+    skins/marking/panda1.png
+    skins/marking/panda2.png
+    skins/marking/purelove.png
+    skins/marking/saddo.png
+    skins/marking/setisu.png
+    skins/marking/sidemarks.png
+    skins/marking/singu.png
+    skins/marking/stripe.png
+    skins/marking/striped.png
+    skins/marking/stripes.png
+    skins/marking/stripes2.png
+    skins/marking/thunder.png
+    skins/marking/tiger1.png
+    skins/marking/tiger2.png
+    skins/marking/toptri.png
+    skins/marking/triangular.png
+    skins/marking/tricircular.png
+    skins/marking/tripledon.png
+    skins/marking/tritri.png
+    skins/marking/twinbelly.png
+    skins/marking/twincross.png
+    skins/marking/twintri.png
+    skins/marking/uppy.png
+    skins/marking/warpaint.png
+    skins/marking/warstripes.png
+    skins/marking/whisker.png
+    skins/marking/wildpaint.png
+    skins/marking/wildpatch.png
+    skins/marking/yinyang.png
+    skins/monkey.json
+    skins/paintgre.json
+    skins/pandabear.json
+    skins/panther.json
+    skins/pento.json
+    skins/piggy.json
+    skins/pinky.json
+    skins/raccoon.json
+    skins/redbopp.json
+    skins/redstripe.json
+    skins/saddo.json
+    skins/setisu.json
+    skins/snowti.json
+    skins/spiky.json
+    skins/swardy.json
+    skins/tiger.json
+    skins/tooxy.json
+    skins/toptri.json
+    skins/twinbop.json
+    skins/twintri.json
+    skins/warmouse.json
+    skins/warpaint.json
+    skins/x_ninja.json
+    skins/xmas_hat.png
 	ui/blob.png
 	ui/console.png
 	ui/console_bar.png
@@ -1101,6 +1187,7 @@ set(EXPECTED_DATA
 	ui/icons/level.png
 	ui/icons/menu.png
 	ui/icons/sidebar.png
+    ui/icons/timer_clock.png
 	ui/icons/tools.png
 	ui/itemicons/icon_amulet.png
 	ui/itemicons/icon_az_sword.png
@@ -1184,7 +1271,8 @@ if(NOT EXISTS ${PROJECT_SOURCE_DIR}/datasrc/maps/dm1.map)
   endforeach()
 endif()
 
-set_glob(DATA GLOB_RECURSE "json;map;png;rules;ttf;txt;wv" datasrc ${EXPECTED_DATA})
+# set_glob(DATA GLOB_RECURSE "json;map;png;rules;ttf;txt;wv" datasrc ${EXPECTED_DATA})
+set_glob(DATA GLOB_RECURSE "json;map;png;rules;ttf;txt;wv" datasrc)
 
 ########################################################################
 # COPY DATA AND DLLS
@@ -1278,6 +1366,7 @@ set_src(BASE GLOB_RECURSE src/base
   detect.h
   hash.c
   hash.h
+  hash_bundled.c
   hash_ctxt.h
   hash_libtomcrypt.c
   hash_openssl.c
@@ -1366,7 +1455,7 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   snapshot.h
   storage.cpp
 )
-set(ENGINE_GENERATED_SHARED src/generated/protocol.cpp src/generated/protocol.h)
+set(ENGINE_GENERATED_SHARED src/generated/nethash.cpp src/generated/protocol.cpp src/generated/protocol.h)
 set_src(GAME_SHARED GLOB src/game
   collision.cpp
   collision.h
@@ -1403,130 +1492,9 @@ list(APPEND TARGETS_OWN engine-shared game-shared)
 
 if(CLIENT)
   # Sources
-  set_src(ENGINE_CLIENT GLOB src/engine/client
-    backend_sdl.cpp
-    backend_sdl.h
-    client.cpp
-    client.h
-    contacts.cpp
-    contacts.h
-    graphics_threaded.cpp
-    graphics_threaded.h
-	http.cpp
-	http.h
-    input.cpp
-    input.h
-    keynames.h
-    serverbrowser.cpp
-    serverbrowser.h
-    serverbrowser_entry.h
-    serverbrowser_fav.cpp
-    serverbrowser_fav.h
-    serverbrowser_filter.cpp
-    serverbrowser_filter.h
-	sound.cpp
-    sound.h
-    text.cpp
-	updater.cpp
-	updater.h
-  )
-  set_src(GAME_CLIENT GLOB_RECURSE src/game/client
-	animstate.cpp
-	animstate.h
-	component.h
-	components/binds.cpp
-	components/binds.h
-	components/broadcast.cpp
-	components/broadcast.h
-	components/camera.cpp
-	components/camera.h
-	components/chat.cpp
-	components/chat.h
-	components/console.cpp
-	components/console.h
-	components/controls.cpp
-	components/controls.h
-	components/countryflags.cpp
-	components/countryflags.h
-	components/damageind.cpp
-	components/damageind.h
-	components/debughud.cpp
-	components/debughud.h
-	components/e_translate.cpp
-	components/e_translate.h
-	components/effects.cpp
-	components/effects.h
-	components/emoticon.cpp
-	components/emoticon.h
-	components/flow.cpp
-	components/flow.h
-	components/hud.cpp
-	components/hud.h
-	components/items.cpp
-	components/items.h
-	components/killmessages.cpp
-	components/killmessages.h
-	components/mapimages.cpp
-	components/mapimages.h
-	components/maplayers.cpp
-	components/maplayers.h
-	components/menus.cpp
-	components/menus.h
-	components/menus_browser.cpp
-	components/menus_callback.cpp
-	components/menus_demo.cpp
-	components/menus_ingame.cpp
-	components/menus_mmo.cpp
-	components/menus_popups.cpp
-	components/menus_settings.cpp
-	components/menus_start.cpp
-	components/motd.cpp
-	components/motd.h
-	components/nameplates.cpp
-	components/nameplates.h
-	components/notifications.cpp
-	components/notifications.h
-	components/particles.cpp
-	components/particles.h
-	components/players.cpp
-	components/players.h
-	components/scoreboard.cpp
-	components/scoreboard.h
-	components/skinchanger.cpp
-	components/skinchanger.h
-	components/skins.cpp
-	components/skins.h
-	components/sounds.cpp
-	components/sounds.h
-	components/spectator.cpp
-	components/spectator.h
-	components/stats.cpp
-	components/stats.h
-	components/voting.cpp
-	components/voting.h
-	gameclient.cpp
-	gameclient.h
-	lineinput.cpp
-	lineinput.h
-	localization.cpp
-	localization.h
-	render.cpp
-	render.h
-	render_map.cpp
-	ui.cpp
-	ui.h
-  )
-  set_src(GAME_EDITOR GLOB src/game/editor
-    auto_map.cpp
-    auto_map.h
-    editor.cpp
-    editor.h
-    io.cpp
-    layer_game.cpp
-    layer_quads.cpp
-    layer_tiles.cpp
-    popups.cpp
-  )
+  file(GLOB ENGINE_CLIENT "src/engine/client/*.cpp" "src/engine/client/*.h")
+  file(GLOB GAME_CLIENT "src/game/client/*.cpp" "src/game/client/*.h" "src/game/client/components/*.cpp" "src/game/client/components/*.h")
+  file(GLOB GAME_EDITOR "src/game/editor/*.cpp" "src/game/editor/*.h")
   set(GAME_GENERATED_CLIENT
     src/generated/client_data.cpp
     src/generated/client_data.h

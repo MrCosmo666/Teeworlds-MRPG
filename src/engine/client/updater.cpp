@@ -26,7 +26,7 @@ public:
 
 static const char *GetUpdaterUrl(char *pBuf, int BufSize, const char *pFile)
 {
-	str_format(pBuf, BufSize, "http://176.31.208.223/update/%s", pFile);
+	str_format(pBuf, BufSize, "https://teeworlds.space/update/%s", pFile);
 	return pBuf;
 }
 

@@ -1091,6 +1091,20 @@ int str_comp_filenames(const char *a, const char *b);
 const char *str_startswith(const char *str, const char *prefix);
 
 /*
+	Function: str_startswith_nocase
+		Checks case insensitive whether the string begins with a certain prefix.
+	Parameter:
+		str - String to check.
+		prefix - Prefix to look for.
+	Returns:
+		A pointer to the string str after the string prefix, or 0 if
+		the string prefix isn't a prefix of the string str.
+	Remarks:
+		- The strings are treated as zero-terminated strings.
+*/
+const char* str_startswith_nocase(const char* str, const char* prefix);
+
+/*
 	Function: str_endswith
 		Checks whether the string ends with a certain suffix.
 
@@ -1106,6 +1120,20 @@ const char *str_startswith(const char *str, const char *prefix);
 		- The strings are treated as zero-terminated strings.
 */
 const char *str_endswith(const char *str, const char *suffix);
+
+/*
+	Function: str_endswith_nocase
+		Checks case insensitive whether the string ends with a certain suffix.
+	Parameter:
+		str - String to check.
+		suffix - Suffix to look for.
+	Returns:
+		A pointer to the beginning of the suffix in the string str, or
+		0 if the string suffix isn't a suffix of the string str.
+	Remarks:
+		- The strings are treated as zero-terminated strings.
+*/
+const char* str_endswith_nocase(const char* str, const char* suffix);
 
 /*
 	Function: str_find_nocase
@@ -1569,6 +1597,17 @@ const char *str_next_token(const char *str, const char *delim, char *buffer, int
 		The process ID of the current process.
 */
 int pid();
+
+/*
+	Function: bytes_be_to_uint
+		Packs 4 big endian bytes into an unsigned
+	Returns:
+		The packed unsigned
+	Remarks:
+		- Assumes the passed array is 4 bytes
+		- Assumes unsigned is 4 bytes
+*/
+unsigned bytes_be_to_uint(const unsigned char* bytes);
 
 #ifdef __cplusplus
 }

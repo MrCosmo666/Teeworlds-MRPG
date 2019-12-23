@@ -45,11 +45,6 @@ MACRO_CONFIG_INT(Texture, mmo_texture_page, 4, 0, 0, CFGFLAG_CLIENT | CFGFLAG_SA
 MACRO_CONFIG_INT(HdColorProgress, hud_color_progress, 16455505, 0, 16777215, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Color progress bar hud")
 MACRO_CONFIG_INT(ClGBrowser, cl_gbrowser, 1, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Gamer server browser")
 
-// translate
-MACRO_CONFIG_STR(ClYandexApi, cl_ynd_translate_api, 128, "trnsl.1.1.20191030T120841Z.b7d4ae52829a8243.04a1b34b812db85a78102c644ff8d23bccda3a51", CFGFLAG_SAVE | CFGFLAG_CLIENT, "Translate Yandex API. See yandex api.")
-MACRO_CONFIG_STR(ClTranslateLanguage, cl_translate_lang, 16, "en", CFGFLAG_SAVE | CFGFLAG_CLIENT, "Translate Yandex API. See yandex api.")
-MACRO_CONFIG_INT(ClTranslateSelf, cl_translate_self, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Translate self message.")
-
 // curl http download
 MACRO_CONFIG_INT(ClHTTPConnectTimeoutMs, cl_http_connect_timeout_ms, 2000, 0, 100000, CFGFLAG_CLIENT | CFGFLAG_SAVE, "HTTP downloads: timeout for the connect phase in milliseconds (0 to disable)")
 MACRO_CONFIG_INT(ClHTTPLowSpeedLimit, cl_http_low_speed_limit, 500, 0, 100000, CFGFLAG_CLIENT | CFGFLAG_SAVE, "HTTP downloads: Set low speed limit in bytes per second (0 to disable)")

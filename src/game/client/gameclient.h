@@ -144,12 +144,14 @@ public:
 		const CNetObj_GameData *m_pGameData;
 		const CNetObj_GameDataTeam *m_pGameDataTeam;
 		const CNetObj_GameDataFlag *m_pGameDataFlag;
+		const CNetObj_GameDataRace* m_pGameDataRace;
 		int m_GameDataFlagSnapID;
 
 		int m_NotReadyCount;
 		int m_AliveCount[NUM_TEAMS];
 
 		const CNetObj_PlayerInfo *m_paPlayerInfos[MAX_CLIENTS];
+		const CNetObj_PlayerInfoRace* m_paPlayerInfosRace[MAX_CLIENTS];
 		CPlayerInfoItem m_aInfoByScore[MAX_CLIENTS];
 
 		// spectate data
@@ -224,6 +226,8 @@ public:
 	bool m_IsXmasDay;
 	float m_LastSkinChangeTime;
 	bool m_IsEasterDay;
+
+	int RacePrecision() const { return m_Snap.m_pGameDataRace ? m_Snap.m_pGameDataRace->m_Precision : 3; }
 
 	//mmotee
 	bool m_ConnectedMmoServer;
@@ -327,6 +331,9 @@ public:
 	class CCSkinChanger* m_pSkinChanger;
 
 };
+
+void FormatTime(char* pBuf, int Size, int Time, int Precision);
+void FormatTimeDiff(char* pBuf, int Size, int Time, int Precision, bool ForceSign = true);
 
 const char *Localize(const char *pStr, const char *pContext="")
 GNUC_ATTRIBUTE((format_arg(1)));
