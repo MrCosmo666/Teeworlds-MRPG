@@ -1393,63 +1393,63 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 			if(Target)
 				m_PredictedTime.Update(&m_InputtimeMarginGraph, Target, TimeLeft, 1);
 		}
-		else if(Msg == NETMSG_SNAP || Msg == NETMSG_SNAPSINGLE || Msg == NETMSG_SNAPEMPTY)
+		else if (Msg == NETMSG_SNAP || Msg == NETMSG_SNAPSINGLE || Msg == NETMSG_SNAPEMPTY)
 		{
 			int NumParts = 1;
 			int Part = 0;
 			int GameTick = Unpacker.GetInt();
-			int DeltaTick = GameTick-Unpacker.GetInt();
+			int DeltaTick = GameTick - Unpacker.GetInt();
 			int PartSize = 0;
 			int Crc = 0;
 			int CompleteSize = 0;
-			const char *pData = 0;
+			const char* pData = 0;
 
 			// we are not allowed to process snapshot yet
-			if(State() < IClient::STATE_LOADING)
+			if (State() < IClient::STATE_LOADING)
 				return;
 
-			if(Msg == NETMSG_SNAP)
+			if (Msg == NETMSG_SNAP)
 			{
 				NumParts = Unpacker.GetInt();
 				Part = Unpacker.GetInt();
 			}
 
-			if(Msg != NETMSG_SNAPEMPTY)
+			if (Msg != NETMSG_SNAPEMPTY)
 			{
 				Crc = Unpacker.GetInt();
 				PartSize = Unpacker.GetInt();
 			}
 
-			pData = (const char *)Unpacker.GetRaw(PartSize);
+			pData = (const char*)Unpacker.GetRaw(PartSize);
 
-			if(Unpacker.Error() || NumParts < 1 || NumParts > CSnapshot::MAX_PARTS || Part < 0 || Part >= NumParts || PartSize < 0 || PartSize > MAX_SNAPSHOT_PACKSIZE)
+			if (Unpacker.Error() || NumParts < 1 || NumParts > CSnapshot::MAX_PARTS || Part < 0 || Part >= NumParts || PartSize < 0 || PartSize > MAX_SNAPSHOT_PACKSIZE)
 				return;
 
-			if(GameTick >= m_CurrentRecvTick)
+			if (GameTick >= m_CurrentRecvTick)
 			{
-				if(GameTick != m_CurrentRecvTick)
+				if (GameTick != m_CurrentRecvTick)
 				{
 					m_SnapshotParts = 0;
 					m_CurrentRecvTick = GameTick;
 				}
 
 				// TODO: clean this up abit
-				mem_copy((char*)m_aSnapshotIncommingData + Part*MAX_SNAPSHOT_PACKSIZE, pData, PartSize);
-				m_SnapshotParts |= 1<<Part;
+				mem_copy((char*)m_aSnapshotIncommingData + Part * MAX_SNAPSHOT_PACKSIZE, pData, PartSize);
+				m_SnapshotParts |= 1 << Part;
 
-				if(m_SnapshotParts == (unsigned)((1<<NumParts)-1))
+				if (m_SnapshotParts == (unsigned)((1 << NumParts) - 1))
 				{
 					static CSnapshot Emptysnap;
-					CSnapshot *pDeltaShot = &Emptysnap;
+					CSnapshot* pDeltaShot = &Emptysnap;
 					int PurgeTick;
-					void *pDeltaData;
+					void* pDeltaData;
 					int DeltaSize;
 					unsigned char aTmpBuffer2[CSnapshot::MAX_SIZE];
 					unsigned char aTmpBuffer3[CSnapshot::MAX_SIZE];
-					CSnapshot *pTmpBuffer3 = (CSnapshot*)aTmpBuffer3;	// Fix compiler warning for strict-aliasing
+					CSnapshot* pTmpBuffer3 = (CSnapshot*)aTmpBuffer3;	// Fix compiler warning for strict-aliasing
 					int SnapSize;
 
-					CompleteSize = (NumParts-1) * MAX_SNAPSHOT_PACKSIZE + PartSize;
+					CompleteSize = (NumParts - 1) * MAX_SNAPSHOT_PACKSIZE + PartSize;
 
 					// reset snapshoting
 					m_SnapshotParts = 0;
@@ -1458,15 +1458,15 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 					Emptysnap.Clear();
 
 					// find delta
-					if(DeltaTick >= 0)
+					if (DeltaTick >= 0)
 					{
 						int DeltashotSize = m_SnapshotStorage.Get(DeltaTick, 0, &pDeltaShot, 0);
 
-						if(DeltashotSize < 0)
+						if (DeltashotSize < 0)
 						{
 							// couldn't find the delta snapshots that the server used
 							// to compress this snapshot. force the server to resync
-							if(g_Config.m_Debug)
+							if (g_Config.m_Debug)
 							{
 								char aBuf[256];
 								str_format(aBuf, sizeof(aBuf), "error, couldn't find the delta snapshot");
@@ -1482,13 +1482,13 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 
 					// decompress snapshot
 					pDeltaData = m_SnapshotDelta.EmptyDelta();
-					DeltaSize = sizeof(int)*3;
+					DeltaSize = sizeof(int) * 3;
 
-					if(CompleteSize)
+					if (CompleteSize)
 					{
 						int IntSize = CVariableInt::Decompress(m_aSnapshotIncommingData, CompleteSize, aTmpBuffer2, sizeof(aTmpBuffer2));
 
-						if(IntSize < 0) // failure during decompression, bail
+						if (IntSize < 0) // failure during decompression, bail
 							return;
 
 						pDeltaData = aTmpBuffer2;
@@ -1497,15 +1497,15 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 
 					// unpack delta
 					SnapSize = m_SnapshotDelta.UnpackDelta(pDeltaShot, pTmpBuffer3, pDeltaData, DeltaSize);
-					if(SnapSize < 0)
+					if (SnapSize < 0)
 					{
 						m_pConsole->Print(IConsole::OUTPUT_LEVEL_DEBUG, "client", "delta unpack failed!");
 						return;
 					}
 
-					if(Msg != NETMSG_SNAPEMPTY && pTmpBuffer3->Crc() != Crc)
+					if (Msg != NETMSG_SNAPEMPTY && pTmpBuffer3->Crc() != Crc)
 					{
-						if(g_Config.m_Debug)
+						if (g_Config.m_Debug)
 						{
 							char aBuf[256];
 							str_format(aBuf, sizeof(aBuf), "snapshot crc error #%d - tick=%d wantedcrc=%d gotcrc=%d compressed_size=%d delta_tick=%d",
@@ -1514,7 +1514,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 						}
 
 						m_SnapCrcErrors++;
-						if(m_SnapCrcErrors > 10)
+						if (m_SnapCrcErrors > 10)
 						{
 							// to many errors, send reset
 							m_AckGameTick = -1;
@@ -1525,15 +1525,15 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 					}
 					else
 					{
-						if(m_SnapCrcErrors)
+						if (m_SnapCrcErrors)
 							m_SnapCrcErrors--;
 					}
 
 					// purge old snapshots
 					PurgeTick = DeltaTick;
-					if(m_aSnapshots[SNAP_PREV] && m_aSnapshots[SNAP_PREV]->m_Tick < PurgeTick)
+					if (m_aSnapshots[SNAP_PREV] && m_aSnapshots[SNAP_PREV]->m_Tick < PurgeTick)
 						PurgeTick = m_aSnapshots[SNAP_PREV]->m_Tick;
-					if(m_aSnapshots[SNAP_CURRENT] && m_aSnapshots[SNAP_CURRENT]->m_Tick < PurgeTick)
+					if (m_aSnapshots[SNAP_CURRENT] && m_aSnapshots[SNAP_CURRENT]->m_Tick < PurgeTick)
 						PurgeTick = m_aSnapshots[SNAP_CURRENT]->m_Tick;
 					m_SnapshotStorage.PurgeUntil(PurgeTick);
 
@@ -1541,7 +1541,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 					m_SnapshotStorage.Add(GameTick, time_get(), SnapSize, pTmpBuffer3, 1);
 
 					// add snapshot to demo
-					if(m_DemoRecorder.IsRecording())
+					if (m_DemoRecorder.IsRecording())
 					{
 						// build up snapshot and add local messages
 						m_DemoRecSnapshotBuilder.Init(pTmpBuffer3);
@@ -1558,12 +1558,12 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 					m_CurrentRecvTick = GameTick;
 
 					// we got two snapshots until we see us self as connected
-					if(m_RecivedSnapshots == 2)
+					if (m_RecivedSnapshots == 2)
 					{
 						// start at 200ms and work from there
-						m_PredictedTime.Init(GameTick*time_freq()/50);
+						m_PredictedTime.Init(GameTick * time_freq() / 50);
 						m_PredictedTime.SetAdjustSpeed(1, 1000.0f);
-						m_GameTime.Init((GameTick-1)*time_freq()/50);
+						m_GameTime.Init((GameTick - 1) * time_freq() / 50);
 						m_aSnapshots[SNAP_PREV] = m_SnapshotStorage.m_pFirst;
 						m_aSnapshots[SNAP_CURRENT] = m_SnapshotStorage.m_pLast;
 						SetState(IClient::STATE_ONLINE);
@@ -1571,12 +1571,12 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 					}
 
 					// adjust game time
-					if(m_RecivedSnapshots > 2)
+					if (m_RecivedSnapshots > 2)
 					{
 						int64 Now = m_GameTime.Get(time_get());
-						int64 TickStart = GameTick*time_freq()/50;
-						int64 TimeLeft = (TickStart-Now)*1000 / time_freq();
-						m_GameTime.Update(&m_GametimeMarginGraph, (GameTick-1)*time_freq()/50, TimeLeft, 0);
+						int64 TickStart = GameTick * time_freq() / 50;
+						int64 TimeLeft = (TickStart - Now) * 1000 / time_freq();
+						m_GameTime.Update(&m_GametimeMarginGraph, (GameTick - 1) * time_freq() / 50, TimeLeft, 0);
 					}
 
 					// ack snapshot
@@ -1587,12 +1587,12 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 	}
 	else
 	{
-		if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0)
+		if ((pPacket->m_Flags & NET_CHUNKFLAG_VITAL) != 0)
 		{
 			// game message
 			GameClient()->OnMessage(Msg, &Unpacker);
 
-			if(m_RecordGameMessage && m_DemoRecorder.IsRecording())
+			if (m_RecordGameMessage && m_DemoRecorder.IsRecording())
 				m_DemoRecorder.RecordMessage(pPacket->m_pData, pPacket->m_DataSize);
 		}
 	}
