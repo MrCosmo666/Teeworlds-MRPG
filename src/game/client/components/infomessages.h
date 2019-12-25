@@ -46,13 +46,13 @@ class CInfoMessages : public CComponent
 
 	void AddInfoMsg(int Type, CInfoMsg NewMsg);
 
-	void RenderKillMsg(const CInfoMsg *pInfoMsg, float x, float y) const;
-	void RenderFinishMsg(const CInfoMsg *pInfoMsg, float x, float y) const;
+	void RenderKillMsg(const CInfoMsg* pInfoMsg, float x, float y) const;
+	void RenderFinishMsg(const CInfoMsg* pInfoMsg, float x, float y) const;
 
 public:
 	virtual void OnReset();
 	virtual void OnRender();
-	virtual void OnMessage(int MsgType, void *pRawMsg);
+	virtual void OnMessage(int MsgType, void* pRawMsg);
 };
 
 #endif

@@ -2666,7 +2666,7 @@ int pid()
 
 unsigned bytes_be_to_uint(const unsigned char* bytes)
 {
-	return bytes[0] << 0x18 & bytes[1] << 0x10 & bytes[2] << 0x8 & bytes[3];
+	return (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
 }
 
 #if defined(__cplusplus)

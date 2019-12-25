@@ -32,7 +32,7 @@ CScoreboard::CScoreboard()
 
 void CScoreboard::RenderTimeDown()
 {
-	char aTime[11];
+	char aTime[80];
 	time_t rawtime = time(NULL);
 	struct tm *timeinfo = localtime(&rawtime);
 	strftime(aTime, 80, "%H:%M:%S", timeinfo);
@@ -291,19 +291,20 @@ float CScoreboard::RenderScoreboard(float x, float y, float w, int Team, const c
 	{
 		if (m_pClient->m_Snap.m_pGameDataRace && Team != TEAM_BLUE)
 		{
+			float MapRecordFontsize = 16.0f;
 			const char* pMapRecordStr = Localize("Map record");
 			FormatTime(aBuf, sizeof(aBuf), m_pClient->m_Snap.m_pGameDataRace->m_BestTime, m_pClient->RacePrecision());
 			if (Align == -1)
 			{
 				tw = TextRender()->TextWidth(0, HeadlineFontsize, pMapRecordStr, -1, -1.0f);
-				TextRender()->Text(0, x + w - tw - 20.0f, y + 5.0f, HeadlineFontsize, pMapRecordStr, -1.0f);
-				tw = TextRender()->TextWidth(0, HeadlineFontsize, aBuf, -1, -1.0f);
-				TextRender()->Text(0, x + w - tw - 20.0f, y + HeadlineFontsize + 5.0f, HeadlineFontsize, aBuf, -1.0f);
+				TextRender()->Text(0, x + w - tw - 20.0f, y + 3.0f, HeadlineFontsize, pMapRecordStr, -1.0f);
+				tw = TextRender()->TextWidth(0, MapRecordFontsize, aBuf, -1, -1.0f);
+				TextRender()->Text(0, x + w - tw - 20.0f, y + HeadlineFontsize + 3.0f, MapRecordFontsize, aBuf, -1.0f);
 			}
 			else
 			{
-				TextRender()->Text(0, x + 20.0f, y + 5.0f, HeadlineFontsize, pMapRecordStr, -1.0f);
-				TextRender()->Text(0, x + 20.0f, y + HeadlineFontsize + 5.0f, HeadlineFontsize, aBuf, -1.0f);
+				TextRender()->Text(0, x + 20.0f, y + 3.0f, HeadlineFontsize, pMapRecordStr, -1.0f);
+				TextRender()->Text(0, x + 20.0f, y + HeadlineFontsize + 3.0f, MapRecordFontsize, aBuf, -1.0f);
 			}
 		}
 	}

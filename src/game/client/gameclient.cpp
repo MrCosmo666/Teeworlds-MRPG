@@ -1431,7 +1431,7 @@ void CGameClient::OnNewSnapshot()
 			}
 			else if (Item.m_Type == NETOBJTYPE_GAMEDATARACE)
 			{
-			m_Snap.m_pGameDataRace = (const CNetObj_GameDataRace*)pData;
+				m_Snap.m_pGameDataRace = (const CNetObj_GameDataRace*)pData;
 			}
 			else if(Item.m_Type == NETOBJTYPE_FLAG)
 			{
@@ -1759,6 +1759,12 @@ void CGameClient::CClientData::UpdateRenderInfo(CGameClient *pGameClient, int Cl
 	// update skin info
 	if(UpdateSkinInfo)
 	{
+		char* apSkinParts[NUM_SKINPARTS];
+		for (int p = 0; p < NUM_SKINPARTS; p++)
+			apSkinParts[p] = m_aaSkinPartNames[p];
+
+		pGameClient->m_pSkins->ValidateSkinParts(apSkinParts, m_aUseCustomColors, m_aSkinPartColors, pGameClient->m_GameInfo.m_GameFlags);
+
 		m_SkinInfo.m_Size = 64;
 		if(pGameClient->IsXmas())
 		{

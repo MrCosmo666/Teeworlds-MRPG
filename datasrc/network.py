@@ -523,17 +523,6 @@ Messages = [
 		NetArray(NetIntAny("m_aSkinPartColors"), 6),
 	]),
     
-    NetMessage("Sv_CommandInfo", [
-            NetStringStrict("m_pName"),
-            NetStringStrict("m_ArgsFormat"),
-            NetStringStrict("m_HelpText")
-    ]),
-
-    NetMessage("Cl_Command", [
-            NetStringStrict("m_Name"),
-            NetStringStrict("m_Arguments")
-    ]),
-    
 	## Race
 	NetMessage("Sv_RaceFinish", [
 		NetIntRange("m_ClientID", 0, 'MAX_CLIENTS-1'),
@@ -545,6 +534,21 @@ Messages = [
 	NetMessage("Sv_Checkpoint", [
 		NetIntAny("m_Diff"),
 	]),
+    
+    NetMessage("Sv_CommandInfo", [
+            NetStringStrict("m_pName"),
+            NetStringStrict("m_ArgsFormat"),
+            NetStringStrict("m_HelpText")
+    ]),
+
+    NetMessage("Sv_CommandInfoRemove", [
+            NetStringStrict("m_pName")
+    ]),
+    
+    NetMessage("Cl_Command", [
+            NetStringStrict("m_Name"),
+            NetStringStrict("m_Arguments")
+    ]),
     
 	# mmotee client
 	NetMessage("Cl_IsMmoServer", [

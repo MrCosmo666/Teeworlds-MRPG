@@ -4,23 +4,23 @@
 #include <game/client/component.h>
 
 enum {
-	TC_STATS_FRAGS=1,
-	TC_STATS_DEATHS=2,
-	TC_STATS_SUICIDES=4,
-	TC_STATS_RATIO=8,
-	TC_STATS_NET=16,
-	TC_STATS_FPM=32,
-	TC_STATS_SPREE=64,
-	TC_STATS_BESTSPREE=128,
-	TC_STATS_FLAGGRABS=256,
-	TC_STATS_WEAPS=512,
-	TC_STATS_FLAGCAPTURES=1024,
+	TC_STATS_FRAGS = 1,
+	TC_STATS_DEATHS = 2,
+	TC_STATS_SUICIDES = 4,
+	TC_STATS_RATIO = 8,
+	TC_STATS_NET = 16,
+	TC_STATS_FPM = 32,
+	TC_STATS_SPREE = 64,
+	TC_STATS_BESTSPREE = 128,
+	TC_STATS_FLAGGRABS = 256,
+	TC_STATS_WEAPS = 512,
+	TC_STATS_FLAGCAPTURES = 1024,
 };
 
-class CStats: public CComponent
+class CStats : public CComponent
 {
 private:
-// stats
+	// stats
 	class CPlayerStats
 	{
 	public:
@@ -51,7 +51,7 @@ private:
 	bool m_Active;
 	bool m_ScreenshotTaken;
 	int64 m_ScreenshotTime;
-	static void ConKeyStats(IConsole::IResult *pResult, void *pUserData);
+	static void ConKeyStats(IConsole::IResult* pResult, void* pUserData);
 	void AutoStatScreenshot();
 
 public:
@@ -61,7 +61,7 @@ public:
 	void OnStartGame();
 	virtual void OnConsoleInit();
 	virtual void OnRender();
-	virtual void OnMessage(int MsgType, void *pRawMsg);
+	virtual void OnMessage(int MsgType, void* pRawMsg);
 
 	void UpdatePlayTime(int Ticks);
 	void OnMatchStart();
@@ -70,7 +70,7 @@ public:
 	void OnPlayerEnter(int ClientID, int Team);
 	void OnPlayerLeave(int ClientID);
 
-	const CPlayerStats *GetPlayerStats(int ClientID) const { return &m_aStats[ClientID]; }
+	const CPlayerStats* GetPlayerStats(int ClientID) const { return &m_aStats[ClientID]; }
 };
 
 #endif
