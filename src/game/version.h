@@ -5,15 +5,15 @@
 	#include <generated/nethash.cpp>
 
 	#define SETTINGS_FILENAME "settings07"
-	#define GAME_VERSION "0.7.3"
+	#define GAME_VERSION "0.7.4"
 	#define GAME_NETVERSION_HASH_FORCED "802f1be60a05665f"
 	#define GAME_NETVERSION "0.7 " GAME_NETVERSION_HASH_FORCED
 	#define CLIENT_VERSION 0x0704
 	// версия клиента релиза
-	#define GAME_RELEASE_VERSION "1.0.6"
+	#define GAME_RELEASE_VERSION "1.0.7"
 
 	// весрсия под сервер
 	#define CLIENT_VERSION_MOLD 1012
-	#define CLIENT_VERSION_MMO 1017
+	#define CLIENT_VERSION_MMO 1018
 
 #endif

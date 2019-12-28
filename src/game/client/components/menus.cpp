@@ -1472,7 +1472,11 @@ void CMenus::RenderMenubar(CUIRect Rect)
 		if(Client()->State() == IClient::STATE_OFFLINE)
 			SetMenuPage(NewPage);
 		else
+		{
 			m_GamePage = NewPage;
+			if (NewPage == PAGE_INTERNET || NewPage == PAGE_LAN)
+				SetMenuPage(NewPage);
+		}
 	}
 }
 
@@ -2894,7 +2898,8 @@ void CMenus::ToggleMusic()
 	}
 }
 
-void CMenus::SetMenuPage(int NewPage) {
+void CMenus::SetMenuPage(int NewPage)
+{
 	if(NewPage == m_MenuPage)
 		return;
 
