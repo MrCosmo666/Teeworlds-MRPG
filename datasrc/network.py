@@ -266,14 +266,14 @@ Objects = [
 	]),
 
 	NetEvent("SoundWorld:Common", [
-		NetIntAny("m_SoundID"),
+		NetIntRange("m_SoundID", 0, 'NUM_SOUNDS-1'),
 	]),
 
 	NetEvent("Damage:Common", [ # Unused yet
 		NetIntRange("m_ClientID", 0, 'MAX_CLIENTS-1'),
 		NetIntAny("m_Angle"),
-		NetIntAny("m_HealthAmount"),
-		NetIntAny("m_ArmorAmount"),
+		NetIntRange("m_HealthAmount", 0, 9),
+		NetIntRange("m_ArmorAmount", 0, 9),
 		NetBool("m_Self"),
 	]),
 
@@ -290,6 +290,11 @@ Objects = [
 	]),
     
     ## mmotee events
+	NetEvent("MmoDamage:Common", [
+		NetIntRange("m_ClientID", 0, 'MAX_CLIENTS-1'),
+		NetIntAny("m_DamageCount"),
+	]),
+
 	NetEvent("EffectMmo:Common", [
 		NetEnum("m_EffectID", Effects),
 	]),

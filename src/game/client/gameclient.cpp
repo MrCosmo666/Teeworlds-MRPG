@@ -1119,14 +1119,15 @@ void CGameClient::ProcessEvents()
 		if(Item.m_Type == NETEVENTTYPE_DAMAGE)
 		{
 			CNetEvent_Damage *ev = (CNetEvent_Damage *)pData;
-			if (g_Config.m_ClMmoDamageInd || MmoServer())
+			if (g_Config.m_ClMmoDamageInd)
 			{
 				char aBuf[8];
 				int Damage = ev->m_HealthAmount + ev->m_ArmorAmount;
 				str_format(aBuf, sizeof(aBuf), "%d", Damage);
 				m_pEffects->DamageMmoInd(vec2(ev->m_X, ev->m_Y), aBuf);
 			}
-			else m_pEffects->DamageIndicator(vec2(ev->m_X, ev->m_Y), ev->m_HealthAmount + ev->m_ArmorAmount);
+			else
+				m_pEffects->DamageIndicator(vec2(ev->m_X, ev->m_Y), ev->m_HealthAmount + ev->m_ArmorAmount);
 		}
 		else if(Item.m_Type == NETEVENTTYPE_EXPLOSION)
 		{
@@ -1148,6 +1149,11 @@ void CGameClient::ProcessEvents()
 			CNetEvent_Death *ev = (CNetEvent_Death *)pData;
 			m_pEffects->PlayerDeath(vec2(ev->m_X, ev->m_Y), ev->m_ClientID);
 		}
+		else if(Item.m_Type == NETEVENTTYPE_SOUNDWORLD)
+		{
+			CNetEvent_SoundWorld *ev = (CNetEvent_SoundWorld *)pData;
+			m_pSounds->PlayAt(CSounds::CHN_WORLD, ev->m_SoundID, 1.0f, vec2(ev->m_X, ev->m_Y));
+		}
 		else if (Item.m_Type == NETEVENTTYPE_EFFECTMMO)
 		{
 			CNetEvent_EffectMmo* ev = (CNetEvent_EffectMmo*)pData;
@@ -1161,10 +1167,14 @@ void CGameClient::ProcessEvents()
 			IntsToStr(ev->m_Potion, 4, pBuf);
 			m_pEffects->MmoEffectPotion(vec2(ev->m_X, ev->m_Y), pBuf, ev->m_PotionAdded);
 		}
-		else if(Item.m_Type == NETEVENTTYPE_SOUNDWORLD)
+		else if (Item.m_Type == NETEVENTTYPE_MMODAMAGE)
 		{
-			CNetEvent_SoundWorld *ev = (CNetEvent_SoundWorld *)pData;
-			m_pSounds->PlayAt(CSounds::CHN_WORLD, ev->m_SoundID, 1.0f, vec2(ev->m_X, ev->m_Y));
+			CNetEvent_MmoDamage* ev = (CNetEvent_MmoDamage*)pData;
+
+			char aBuf[8];
+			int Damage = ev->m_DamageCount;
+			str_format(aBuf, sizeof(aBuf), "%d", Damage);
+			m_pEffects->DamageMmoInd(vec2(ev->m_X, ev->m_Y), aBuf);
 		}
 	}
 }
