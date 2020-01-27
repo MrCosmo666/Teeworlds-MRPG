@@ -388,7 +388,7 @@ float CMenus::RenderSettingsControlsMisc(CUIRect View, void *pUser)
 	CMenus *pSelf = (CMenus*)pUser;
 	UpdateBindKeys(pSelf->m_pClient->m_pBinds);
 
-	int NumOptions = 13;
+	int NumOptions = 12;
 	int StartOption = 20;
 	float ButtonHeight = 20.0f;
 	float Spaceing = 2.0f;
