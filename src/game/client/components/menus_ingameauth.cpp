@@ -61,7 +61,6 @@ void CMenus::RenderAuthWindow()
 
 	CUIRect MainView = *UI()->Screen();
 	Graphics()->MapScreen(MainView.x, MainView.y, MainView.w, MainView.h);
-	float Spacing = 2.0f;
 
 	// render logo
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOLOGO].m_Id);

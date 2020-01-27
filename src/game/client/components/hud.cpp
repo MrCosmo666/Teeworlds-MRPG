@@ -772,14 +772,11 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 			TextRender()->TextEx(&Cursor, type, -1);
 		}
 
-		float w;
 		str_format(Text, sizeof(Text), "%d", pClientStats->m_Health);
-		w = TextRender()->TextWidth(0, 6.0f, Text, -1, -1.0);
 		TextRender()->SetCursor(&Cursor, 50, 23, 6.0f, TEXTFLAG_RENDER);
 		TextRender()->TextEx(&Cursor, Text, -1);
 
 		str_format(Text, sizeof(Text), "%d", pClientStats->m_Armor);
-		w = TextRender()->TextWidth(0, 6.0f, Text, -1, -1.0);
 		TextRender()->SetCursor(&Cursor, 85, 23, 6.0f, TEXTFLAG_RENDER);
 		TextRender()->TextEx(&Cursor, Text, -1);
 	}

@@ -839,8 +839,6 @@ void CRenderTools::DrawUIText(ITextRender* pTextRender, CTextCursor* pCursor, co
 		return;
 
 	const float LinebaseY = pTextRender->TextGetLineBaseY(pCursor);
-	float FakeToScreenY = (Graphics()->ScreenHeight() / (ScreenY1 - ScreenY0));
-	float font_Size = FontSize;
 	float tw = pTextRender->TextWidth(0, FontSize, pText, -1, -1.0f);
 
 	CUIRect Rect;

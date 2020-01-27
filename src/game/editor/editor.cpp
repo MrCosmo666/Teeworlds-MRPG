@@ -4243,7 +4243,6 @@ void CEditor::RenderMenubar(CUIRect MenuBar)
 	UI()->DoLabel(&MenuBar, aBuf, 10.0f, CUI::ALIGN_LEFT);
 
 	vec2 MousePos = vec2(UI()->MouseX(), UI()->MouseY());
-	vec2 MPOS = vec2(m_WorldOffsetX, m_WorldOffsetY) + MousePos;
 
 	if(m_ShowPosition)
 		str_format(aBuf, sizeof(aBuf), "X: %i(%0.f), Y: %i(%0.f) Z: %i, A: %.1f, G: %i ", 

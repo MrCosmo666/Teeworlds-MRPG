@@ -121,10 +121,12 @@ void CVoting::AddOption(const char *pDescription, vec3 Color, const char *Icon)
 		m_pFirst = pOption;
 
 	// mmotee
+	vec3 ColorVote = g_Config.m_ClShowColoreVote ? Color : vec3(0.0f, 0.0f, 0.0f);
 	str_copy(pOption->m_Icon, Icon, sizeof(pOption->m_Icon));
-	pOption->m_Colored[0] = (g_Config.m_ClShowColoreVote ? Color.x : Color.x);
-	pOption->m_Colored[1] = (g_Config.m_ClShowColoreVote ? Color.y : Color.r);
-	pOption->m_Colored[2] = (g_Config.m_ClShowColoreVote ? Color.z : Color.h);
+
+	pOption->m_Colored[0] = ColorVote.x;
+	pOption->m_Colored[1] = ColorVote.y;
+	pOption->m_Colored[2] = ColorVote.z;
 
 	str_copy(pOption->m_aDescription, pDescription, sizeof(pOption->m_aDescription));
 	++m_NumVoteOptions;

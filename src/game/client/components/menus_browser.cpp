@@ -1363,7 +1363,6 @@ void CMenus::RenderServerbrowserSidebar(CUIRect View)
 		m_SidebarTab = 0;
 	}
 	Header.VSplitLeft(Width*0.30f, &Button, &Header);
-	static CButtonContainer s_TabFilter;
 	if (g_Config.m_ClGBrowser != 2)
 	{
 		Header.VSplitLeft(Width*0.30f, &Button, &Header);

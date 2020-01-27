@@ -115,8 +115,6 @@ void CTalkText::OnMessage(int MsgType, void *pRawMsg)
 	if(MsgType == NETMSGTYPE_SV_TALKTEXT)
 	{
 		CNetMsg_Sv_TalkText* pMsg = (CNetMsg_Sv_TalkText*)pRawMsg;
-
-		int LocalClientID = m_pClient->m_LocalClientID;
 		str_copy(m_TalkText, pMsg->m_pText, sizeof(m_TalkText));
 		m_TalkClientID = pMsg->m_pTalkClientID;
 

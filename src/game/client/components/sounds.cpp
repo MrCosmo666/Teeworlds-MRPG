@@ -36,25 +36,6 @@ struct CUserData
 	bool m_Render;
 } g_UserData;
 
-static int LoadSoundsThread(void *pUser)
-{
-	CUserData *pData = static_cast<CUserData *>(pUser);
-
-	for(int s = 0; s < g_pData->m_NumSounds; s++)
-	{
-		for(int i = 0; i < g_pData->m_aSounds[s].m_NumSounds; i++)
-		{
-			ISound::CSampleHandle Id = pData->m_pGameClient->Sound()->LoadWV(g_pData->m_aSounds[s].m_aSounds[i].m_pFilename);
-			g_pData->m_aSounds[s].m_aSounds[i].m_Id = Id;
-		}
-
-		if(pData->m_Render)
-			pData->m_pGameClient->m_pMenus->RenderLoading();
-	}
-
-	return 0;
-}
-
 ISound::CSampleHandle CSounds::GetSampleId(int SetId)
 {
 	if(!g_Config.m_SndEnable || !Sound()->IsSoundEnabled() || m_WaitForSoundJob || SetId < 0 || SetId >= g_pData->m_NumSounds)
