@@ -1,3 +1,6 @@
 [submodule "other"]
 	path = other
 	url = https://github.com/kurosio/other
+[submodule "libs-mmotee"]
+	path = libs-mmotee
+	url = https://github.com/kurosio/libs-mmotee
