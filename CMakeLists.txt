@@ -323,39 +323,39 @@ find_package(Wavpack)
 find_package(Curl)
 
 # includes for auto-download and install packages cmake
-include(ExternalProject)
-include(cmake/DownloadProject.cmake)
+#include(ExternalProject)
+#include(cmake/DownloadProject.cmake)
 
 # Auto download and install websocketpp
-download_project(
-	PROJ           websocketpp
-	GIT_REPOSITORY https://github.com/zaphoyd/websocketpp.git
-	GIT_TAG        master
-	SOURCE_DIR     ${PROJECT_SOURCE_DIR}/other/websocketpp
-	UPDATE_DISCONNECTED 1
-)
-include_directories("${websocketpp_SOURCE_DIR}")
+#download_project(
+#	PROJ           websocketpp
+#	GIT_REPOSITORY https://github.com/zaphoyd/websocketpp.git
+#	GIT_TAG        master
+#	SOURCE_DIR     ${PROJECT_SOURCE_DIR}/other/websocketpp
+#	UPDATE_DISCONNECTED 1
+#)
+#include_directories("${websocketpp_SOURCE_DIR}")
 
 # Note websocketpp doesn't work with the latest version of asio
 # Remember to go back to the master version after they are fixed
-download_project(
-	PROJ           asio
-	GIT_REPOSITORY https://github.com/chriskohlhoff/asio.git
-	GIT_TAG        22afb86
-	SOURCE_DIR     ${PROJECT_SOURCE_DIR}/other/asio
-	UPDATE_DISCONNECTED 1
-)
-set(asio_INCLUDE_DIR "${asio_SOURCE_DIR}/asio/include")
+#download_project(
+#	PROJ           asio
+#	GIT_REPOSITORY https://github.com/chriskohlhoff/asio.git
+#	GIT_TAG        22afb86
+#	SOURCE_DIR     ${PROJECT_SOURCE_DIR}/other/asio
+#	UPDATE_DISCONNECTED 1
+#)
+#set(asio_INCLUDE_DIR "${asio_SOURCE_DIR}/asio/include")
 
 # CPR
-download_project(
-	PROJ           cpr
-	GIT_REPOSITORY https://github.com/whoshuu/cpr.git
-	GIT_TAG        master
-	SOURCE_DIR     ${PROJECT_SOURCE_DIR}/other/cpr
-	UPDATE_DISCONNECTED 1
-)
-include_directories("${cpr_SOURCE_DIR}")
+#download_project(
+#	PROJ           cpr
+#	GIT_REPOSITORY https://github.com/whoshuu/cpr.git
+#	GIT_TAG        master
+#	SOURCE_DIR     ${PROJECT_SOURCE_DIR}/other/cpr
+#	UPDATE_DISCONNECTED 1
+#)
+#include_directories("${cpr_SOURCE_DIR}")
 
 if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   find_program(CMAKE_OTOOL otool)
