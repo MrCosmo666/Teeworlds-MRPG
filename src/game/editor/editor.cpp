@@ -4242,8 +4242,6 @@ void CEditor::RenderMenubar(CUIRect MenuBar)
 	str_format(aBuf, sizeof(aBuf), "File: %s", m_aFileName);
 	UI()->DoLabel(&MenuBar, aBuf, 10.0f, CUI::ALIGN_LEFT);
 
-	vec2 MousePos = vec2(UI()->MouseX(), UI()->MouseY());
-
 	if(m_ShowPosition)
 		str_format(aBuf, sizeof(aBuf), "X: %i(%0.f), Y: %i(%0.f) Z: %i, A: %.1f, G: %i ", 
 			(int)m_WorldOffsetX / 32, m_WorldOffsetX, 
