@@ -1542,7 +1542,7 @@ set(DEPS ${DEP_JSON} ${DEP_MD5} ${ZLIB_DEP})
 set(LIBS ${CMAKE_THREAD_LIBS_INIT} ${ZLIB_LIBRARIES} ${CRYPTO_LIBRARIES} ${PLATFORM_LIBS})
 
 # Targets
-add_library(engine-shared EXCLUDE_FROM_ALL OBJECT ${ENGINE_INTERFACE} ${ENGINE_SHARED} ${ENGINE_GENERATED_SHARED} ${BASE})
+add_library(engine-shared EXCLUDE_FROM_ALL OBJECT ${ENGINE_INTERFACE} ${ENGINE_SHARED} ${ENGINE_UUID_SHARED} ${BASE})
 add_library(game-shared EXCLUDE_FROM_ALL OBJECT ${GAME_SHARED} ${GAME_GENERATED_SHARED})
 
 ########################################################################
@@ -1550,7 +1550,7 @@ add_library(game-shared EXCLUDE_FROM_ALL OBJECT ${GAME_SHARED} ${GAME_GENERATED_
 ########################################################################
 
 file(GLOB ENGINE_SLEEPY "src/teeother/sleepy_discord/*.cpp" "src/teeother/sleepy_discord/*.h")
-#add_library(sleepy_discord EXCLUDE_FROM_ALL OBJECT ${BASE} ${GAME_SHARED} ${GAME_GENERATED_SHARED} ${ENGINE_SLEEPY})
+#add_library(sleepy_discord EXCLUDE_FROM_ALL OBJECT  ${GAME_SHARED} ${GAME_GENERATED_SHARED} ${ENGINE_SLEEPY})
 
 # Includes
 #target_include_directories(sleepy_discord PRIVATE
@@ -1560,6 +1560,7 @@ file(GLOB ENGINE_SLEEPY "src/teeother/sleepy_discord/*.cpp" "src/teeother/sleepy
 #    ${WEBSOCKETPP_INCLUDE_DIR})
 
 #list(APPEND TARGETS_OWN engine-shared game-shared sleepy_discord)
+list(APPEND TARGETS_OWN engine-shared game-shared)
 
 ########################################################################
 # CLIENT
