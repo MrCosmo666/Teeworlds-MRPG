@@ -419,10 +419,6 @@ if(CLIENT AND NOT(CURL_FOUND))
   message(SEND_ERROR "You must install Curl to compile Teeworlds")
 endif()
 
-if(NOT(CRYPTO_FOUND))
-  message(SEND_ERROR "You must install OpenSSL to compile Teeworlds")
-endif()
-
 if(NOT(PYTHONINTERP_FOUND))
   message(SEND_ERROR "You must install Python to compile Teeworlds")
 endif()
@@ -548,6 +544,9 @@ add_library(md5 EXCLUDE_FROM_ALL OBJECT ${DEP_MD5_SRC})
 list(APPEND TARGETS_DEP json md5)
 set(DEP_JSON $<TARGET_OBJECTS:json>)
 set(DEP_MD5)
+if(NOT CRYPTO_FOUND)
+  set(DEP_MD5 $<TARGET_OBJECTS:md5>)
+endif()
 
 ########################################################################
 # DATA
@@ -2155,8 +2154,10 @@ foreach(target ${TARGETS_OWN})
     target_include_directories(${target} PRIVATE src)
     target_compile_definitions(${target} PRIVATE $<$<CONFIG:Debug>:CONF_DEBUG>)
     target_include_directories(${target} PRIVATE ${ZLIB_INCLUDE_DIRS})
-    target_compile_definitions(${target} PRIVATE CONF_OPENSSL)
-    target_include_directories(${target} PRIVATE ${CRYPTO_INCLUDE_DIRS})
+    if(CRYPTO_FOUND)
+        target_compile_definitions(${target} PRIVATE CONF_OPENSSL)
+        target_include_directories(${target} PRIVATE ${CRYPTO_INCLUDE_DIRS})
+    endif()
 
 endforeach()
 
