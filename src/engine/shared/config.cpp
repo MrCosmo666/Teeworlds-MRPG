@@ -63,6 +63,7 @@ public:
 		m_ConfigFile = 0;
 		m_FlagMask = 0;
 		m_NumCallbacks = 0;
+		mem_zero(m_aCallbacks, sizeof(m_aCallbacks));
 	}
 
 	virtual void Init(int FlagMask)
