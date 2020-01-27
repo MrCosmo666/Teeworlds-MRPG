@@ -118,42 +118,104 @@ MACRO_CONFIG_INT(ClStatboardInfos, cl_statboard_infos, 1259, 1, 2047, CFGFLAG_CL
 MACRO_CONFIG_INT(ClLastVersionPlayed, cl_last_version_played, 0x0703, 0, 0, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Last version of the game that was played")
 
 // server
-MACRO_CONFIG_INT(SvWarmup, sv_warmup, 0, -1, 1000, CFGFLAG_SAVE|CFGFLAG_SERVER, "Number of seconds to do warmup before match starts (0 disables, -1 all players ready)")
-MACRO_CONFIG_INT(SvCountdown, sv_countdown, 0, -1, 1000, CFGFLAG_SAVE|CFGFLAG_SERVER, "Number of seconds to freeze the game in a countdown before match starts (0 enables only for survival gamemodes, -1 disables)")
-MACRO_CONFIG_STR(SvMotd, sv_motd, 900, "", CFGFLAG_SAVE|CFGFLAG_SERVER, "Message of the day to display for the clients")
-MACRO_CONFIG_INT(SvTeamdamage, sv_teamdamage, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Team damage")
-MACRO_CONFIG_STR(SvMaprotation, sv_maprotation, 768, "", CFGFLAG_SAVE|CFGFLAG_SERVER, "Maps to rotate between")
-MACRO_CONFIG_INT(SvMatchesPerMap, sv_matches_per_map, 1, 1, 100, CFGFLAG_SAVE|CFGFLAG_SERVER, "Number of matches on each map before rotating")
-MACRO_CONFIG_INT(SvMatchSwap, sv_match_swap, 1, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Swap teams between matches")
-MACRO_CONFIG_INT(SvPowerups, sv_powerups, 1, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Allow powerups like ninja")
-MACRO_CONFIG_INT(SvScorelimit, sv_scorelimit, 20, 0, 1000, CFGFLAG_SAVE|CFGFLAG_SERVER, "Score limit (0 disables)")
-MACRO_CONFIG_INT(SvTimelimit, sv_timelimit, 0, 0, 1000, CFGFLAG_SAVE|CFGFLAG_SERVER, "Time limit in minutes (0 disables)")
-MACRO_CONFIG_STR(SvGametype, sv_gametype, 32, "dm", CFGFLAG_SAVE|CFGFLAG_SERVER, "Game type (dm, tdm, ctf, lms, lts)")
-MACRO_CONFIG_INT(SvTournamentMode, sv_tournament_mode, 0, 0, 2, CFGFLAG_SAVE|CFGFLAG_SERVER, "Tournament mode. When enabled, players joins the server as spectator (2=additional restricted spectator chat)")
-MACRO_CONFIG_INT(SvPlayerReadyMode, sv_player_ready_mode, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "When enabled, players can pause/unpause the game and start the game on warmup via their ready state")
-MACRO_CONFIG_INT(SvSpamprotection, sv_spamprotection, 1, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Spam protection")
+MACRO_CONFIG_INT(SvWarmup, sv_warmup, 0, -1, 1000, CFGFLAG_SERVER, "Number of seconds to do warmup before match starts (0 disables, -1 all players ready)")
+MACRO_CONFIG_STR(SvMotd, sv_motd, 900, "", CFGFLAG_SERVER, "Message of the day to display for the clients")
+MACRO_CONFIG_STR(SvMaprotation, sv_maprotation, 768, "", CFGFLAG_SERVER, "Maps to rotate between")
+MACRO_CONFIG_INT(SvMatchesPerMap, sv_matches_per_map, 1, 1, 100, CFGFLAG_SERVER, "Number of matches on each map before rotating")
+MACRO_CONFIG_INT(SvMatchSwap, sv_match_swap, 1, 0, 1, CFGFLAG_SERVER, "Swap teams between matches")
+MACRO_CONFIG_INT(SvPowerups, sv_powerups, 1, 0, 1, CFGFLAG_SERVER, "Allow powerups like ninja")
+MACRO_CONFIG_INT(SvScorelimit, sv_scorelimit, 20, 0, 1000, CFGFLAG_SERVER, "Score limit (0 disables)")
+MACRO_CONFIG_INT(SvTimelimit, sv_timelimit, 0, 0, 1000, CFGFLAG_SERVER, "Time limit in minutes (0 disables)")
+MACRO_CONFIG_STR(SvGametype, sv_gametype, 32, "MmoTee", CFGFLAG_SERVER, "Game type (dm, tdm, ctf, lms, lts)")
+MACRO_CONFIG_INT(SvTournamentMode, sv_tournament_mode, 0, 0, 2, CFGFLAG_SERVER, "Tournament mode. When enabled, players joins the server as spectator (2=additional restricted spectator chat)")
+MACRO_CONFIG_INT(SvPlayerReadyMode, sv_player_ready_mode, 0, 0, 1, CFGFLAG_SERVER, "When enabled, players can pause/unpause the game and start the game on warmup via their ready state")
+MACRO_CONFIG_INT(SvSpamprotection, sv_spamprotection, 1, 0, 1, CFGFLAG_SERVER, "Spam protection")
 
-MACRO_CONFIG_INT(SvRespawnDelayTDM, sv_respawn_delay_tdm, 3, 0, 10, CFGFLAG_SAVE|CFGFLAG_SERVER, "Time needed to respawn after death in tdm gametype")
+MACRO_CONFIG_INT(SvRespawnDelayTDM, sv_respawn_delay_tdm, 3, 0, 10, CFGFLAG_SERVER, "Time needed to respawn after death in tdm gametype")
+MACRO_CONFIG_INT(SvSkillLevel, sv_skill_level, 1, SERVERINFO_LEVEL_MIN, SERVERINFO_LEVEL_MAX, CFGFLAG_SERVER, "Supposed player skill level")
+MACRO_CONFIG_INT(SvInactiveKickTime, sv_inactivekick_time, 3, 0, 1000, CFGFLAG_SERVER, "How many minutes to wait before taking care of inactive clients")
+MACRO_CONFIG_INT(SvInactiveKick, sv_inactivekick, 2, 0, 3, CFGFLAG_SERVER, "How to deal with inactive clients (0=move player to spectator, 1=move player to spectator and kick spectator, 2=move to free spectator slot/kick, 3=kick)")
 
-MACRO_CONFIG_INT(SvPlayerSlots, sv_player_slots, 8, 0, MAX_PLAYERS, CFGFLAG_SAVE|CFGFLAG_SERVER, "Number of slots to reserve for players")
-MACRO_CONFIG_INT(SvSkillLevel, sv_skill_level, 1, SERVERINFO_LEVEL_MIN, SERVERINFO_LEVEL_MAX, CFGFLAG_SAVE|CFGFLAG_SERVER, "Supposed player skill level")
-MACRO_CONFIG_INT(SvTeambalanceTime, sv_teambalance_time, 1, 0, 1000, CFGFLAG_SAVE|CFGFLAG_SERVER, "How many minutes to wait before autobalancing teams")
-MACRO_CONFIG_INT(SvInactiveKickTime, sv_inactivekick_time, 3, 0, 1000, CFGFLAG_SAVE|CFGFLAG_SERVER, "How many minutes to wait before taking care of inactive clients")
-MACRO_CONFIG_INT(SvInactiveKick, sv_inactivekick, 2, 1, 3, CFGFLAG_SAVE|CFGFLAG_SERVER, "How to deal with inactive clients (1=move player to spectator, 2=move to free spectator slot/kick, 3=kick)")
-MACRO_CONFIG_INT(SvInactiveKickSpec, sv_inactivekick_spec, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Kick inactive spectators")
+MACRO_CONFIG_INT(SvStrictSpectateMode, sv_strict_spectate_mode, 0, 0, 1, CFGFLAG_SERVER, "Restricts information in spectator mode")
+MACRO_CONFIG_INT(SvVoteSpectate, sv_vote_spectate, 1, 0, 1, CFGFLAG_SERVER, "Allow voting to move players to spectators")
+MACRO_CONFIG_INT(SvVoteSpectateRejoindelay, sv_vote_spectate_rejoindelay, 3, 0, 1000, CFGFLAG_SERVER, "How many minutes to wait before a player can rejoin after being moved to spectators by vote")
+MACRO_CONFIG_INT(SvVoteKick, sv_vote_kick, 1, 0, 1, CFGFLAG_SERVER, "Allow voting to kick players")
+MACRO_CONFIG_INT(SvVoteKickMin, sv_vote_kick_min, 0, 0, MAX_CLIENTS, CFGFLAG_SERVER, "Minimum number of players required to start a kick vote")
+MACRO_CONFIG_INT(SvVoteKickBantime, sv_vote_kick_bantime, 5, 0, 1440, CFGFLAG_SERVER, "The time to ban a player if kicked by vote. 0 makes it just use kick")
 
-MACRO_CONFIG_INT(SvSilentSpectatorMode, sv_silent_spectator_mode, 1, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Mute join/leave message of spectator")
+// another config
+MACRO_CONFIG_INT(SvExpForLevel, sv_needexp_level, 160, 0, 1000, CFGFLAG_SERVER, "(This config + Your level * 2)*(Your level* Your level)")
+MACRO_CONFIG_INT(SvPriceTeleport, sv_price_teleport, 100, 0, 10000, CFGFLAG_SERVER, "Price for teleport*WorldID")
+MACRO_CONFIG_INT(SvExperienceMob, sv_experience_mob, 5, 0, 1000, CFGFLAG_SERVER, "Bonus Damage * This config.")
 
-MACRO_CONFIG_INT(SvStrictSpectateMode, sv_strict_spectate_mode, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Restricts information in spectator mode")
-MACRO_CONFIG_INT(SvVoteSpectate, sv_vote_spectate, 1, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Allow voting to move players to spectators")
-MACRO_CONFIG_INT(SvVoteSpectateRejoindelay, sv_vote_spectate_rejoindelay, 3, 0, 1000, CFGFLAG_SAVE|CFGFLAG_SERVER, "How many minutes to wait before a player can rejoin after being moved to spectators by vote")
-MACRO_CONFIG_INT(SvVoteKick, sv_vote_kick, 1, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Allow voting to kick players")
-MACRO_CONFIG_INT(SvVoteKickMin, sv_vote_kick_min, 0, 0, MAX_CLIENTS, CFGFLAG_SAVE|CFGFLAG_SERVER, "Minimum number of players required to start a kick vote")
-MACRO_CONFIG_INT(SvVoteKickBantime, sv_vote_kick_bantime, 5, 0, 1440, CFGFLAG_SAVE|CFGFLAG_SERVER, "The time to ban a player if kicked by vote. 0 makes it just use kick")
+// auction
+MACRO_CONFIG_INT(SvMaxAuctionSlots, sv_amax_slots, 5, 1, 1000, CFGFLAG_SERVER, "Max autction slots")
+MACRO_CONFIG_INT(SvAuctionPriceSlot, sv_apriceslot, 100, 0, 100000, CFGFLAG_SERVER, "Price for added new slot auction")
+MACRO_CONFIG_INT(SvTimeAuctionSlot, sv_atimeslot, 30, 5, 100000, CFGFLAG_SERVER, "Time in minutes for auction end slot")
+MACRO_CONFIG_INT(SvMaxMasiveAuctionSlots, sv_amax_masslot, 50, 10, 300, CFGFLAG_SERVER, "Max massive auction slots")
+MACRO_CONFIG_INT(SvTimeCheckAuction, sv_achecktime, 10, 1, 300, CFGFLAG_SERVER, "Minutes auction checks")
+
+// member group
+MACRO_CONFIG_INT(SvPriceUpgradeGuildSlot, sv_price_member_slot, 18999, 100, 9000000, CFGFLAG_SERVER, "Price for upgrade member slots")
+MACRO_CONFIG_INT(SvPriceUpgradeGuildAnother, sv_price_member_another, 18999, 100, 9000000, CFGFLAG_SERVER, "Price for upgrade member another")
+
+// payments
+MACRO_CONFIG_INT(SvPaymentBussines, sv_payment_bussines, 600, 100, 1000000, CFGFLAG_SERVER, "Payment bussines")
+MACRO_CONFIG_INT(SvHousePriceUse, sv_hpriceday, 500, 5, 9000000, CFGFLAG_SERVER, "Price house.")
+MACRO_CONFIG_INT(SvStorageFraction, sv_storage_fraction, 5, 5, 1000, CFGFLAG_SERVER, "Storage fraction for remove goods.")
+
+// leveling
+MACRO_CONFIG_INT(SvMinerLeveling, sv_minerleveling, 20, 0, 10000, CFGFLAG_SERVER, "Exp need for up level miner")
+MACRO_CONFIG_INT(SvPlantLeveling, sv_plantleveling, 20, 0, 10000, CFGFLAG_SERVER, "Exp need for up level plant")
+MACRO_CONFIG_INT(SvCraftLeveling, sv_craftleveling, 20, 0, 10000, CFGFLAG_SERVER, "Exp need for up level craft")
+MACRO_CONFIG_INT(SvRelaxLeveling, sv_relaxleveling, 30, 0, 10000, CFGFLAG_SERVER, "Exp need for up level relax")
+MACRO_CONFIG_INT(SvGuildLeveling, sv_guildleveling, 1024, 0, 10000, CFGFLAG_SERVER, "Exp need for up level guild")
+
+// world time
+MACRO_CONFIG_INT(SvShowSvNameTime, sv_worldtime_name, 1, 0, 1, CFGFLAG_SERVER, "Show world time in server")
+
+// items and this type
+MACRO_CONFIG_INT(SvTickDropableBonuses, sv_wtick_dropb, 15, 5, 100, CFGFLAG_SERVER, "Drobale bonuses tick in sec.")
+MACRO_CONFIG_INT(SvTickDropableItems, sv_wtick_dropi, 20, 5, 480, CFGFLAG_SERVER, "Drobale items tick in sec.")
+
+// house
+MACRO_CONFIG_INT(SvMotelPrice, sv_marendprice, 100, 100, 9000000, CFGFLAG_SERVER, "Motel buy price")
+MACRO_CONFIG_INT(SvLimitDecoration, sv_limit_decorations, 10, 5, 20, CFGFLAG_SERVER, "Limit objects for decoration")
+
+// discord
+MACRO_CONFIG_INT(SvCreateDiscordBot, sv_discord_bot, 1, 0, 1, CFGFLAG_SERVER, "Create discord bot")
+MACRO_CONFIG_STR(SvDiscordToken, sv_discord_token, 256, "", CFGFLAG_SERVER, "Discord Token")
+MACRO_CONFIG_STR(SvDiscordChanal, sv_discord_server_chanel, 128, "", CFGFLAG_SERVER, "Discord Server Chanel")
+MACRO_CONFIG_STR(SvDiscordInviteGroup, sv_discord_invite_group, 32, "nope", CFGFLAG_SERVER, "Discord group.")
+MACRO_CONFIG_STR(SvGenerateURL, sv_discord_generateurl, 128, "nope", CFGFLAG_SERVER, "Path folder generate image. Example 'submodules/generator'.")
+MACRO_CONFIG_STR(SvSiteUrl, sv_site_url, 128, "nope", CFGFLAG_SERVER, "Url site. Example 'https://teeworlds.space'")
+
+MACRO_CONFIG_INT(SvDiscordRewardItemID, sv_discord_reward_itemid, 0, 0, 1000, CFGFLAG_SERVER, "Discord reward !mjoinreward.")
+MACRO_CONFIG_INT(SvDiscordRewardCount, sv_discord_reward_count, 1, 1, 1000000, CFGFLAG_SERVER, "Discord reward !mjoinreward.")
+MACRO_CONFIG_STR(SvDiscordRewardImage, sv_discord_reward_image, 256, "random", CFGFLAG_SERVER, "Discord reward !mjoinrewardrver.")
+
+MACRO_CONFIG_STR(SvDiscordColorWarning, sv_discord_color_warning, 32, "13183530", CFGFLAG_SERVER, "Discord embed color warning.")
+MACRO_CONFIG_STR(SvDiscordColorServerChat, sv_discord_color_server, 32, "11253955", CFGFLAG_SERVER, "Discord embed color server chat.")
+MACRO_CONFIG_STR(SvDiscordColorJoinLeave, sv_discord_color_joinleave, 32, "14494801", CFGFLAG_SERVER, "Discord embed color enter exit.")
+MACRO_CONFIG_STR(SvDiscordColorServerInfo, sv_discord_color_serverinfo, 32, "16711849", CFGFLAG_SERVER, "Discord embed color enter exit.")
+MACRO_CONFIG_STR(SvDiscordColorPlayerInfo, sv_discord_color_playerinfo, 32, "1346299", CFGFLAG_SERVER, "Discord embed player info.")
+MACRO_CONFIG_STR(SvDiscordColorDiscordBot, sv_discord_color_discordbot, 32, "4570582", CFGFLAG_SERVER, "Discord embed chat discord bot.")
+MACRO_CONFIG_STR(SvDiscordColorDiscordInfo, sv_discord_color_discordinfo, 32, "5756485", CFGFLAG_SERVER, "Discord embed chat discord info.")
+
+// mysql
+MACRO_CONFIG_STR(SvMySqlHost, sv_sql_host, 32, "localhost", CFGFLAG_SERVER, "MySQL Host")
+MACRO_CONFIG_STR(SvMySqlDatabase, sv_sql_database, 32, "nope", CFGFLAG_SERVER, "MySQL Database")
+MACRO_CONFIG_STR(SvMySqlLogin, sv_sql_login, 32, "nope", CFGFLAG_SERVER, "MySQL Login")
+MACRO_CONFIG_STR(SvMySqlPassword, sv_sql_password, 32, "nope", CFGFLAG_SERVER, "MySQL Password")
+MACRO_CONFIG_INT(SvMySqlPort, sv_sql_port, 3306, 0, 65000, CFGFLAG_SERVER, "MySQL Port")
+MACRO_CONFIG_INT(SvMySqlMaxPool, sv_sql_maxpool, 30, 20, 100, CFGFLAG_SERVER, "MySQL Pool Threads")
+
+MACRO_CONFIG_INT(SvLoltextHspace, sv_loltext_hspace, 7, 7, 25, CFGFLAG_SERVER, "horizontal offset between loltext 'pixels'")
+MACRO_CONFIG_INT(SvLoltextVspace, sv_loltext_vspace, 9, 7, 25, CFGFLAG_SERVER, "vertical offset between loltext 'pixels'")
 
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
-	MACRO_CONFIG_INT(DbgDummies, dbg_dummies, 0, 0, MAX_CLIENTS, CFGFLAG_SERVER, "")
+MACRO_CONFIG_INT(DbgDummies, dbg_dummies, 0, 0, MAX_CLIENTS - 1, CFGFLAG_SERVER, "")
 #endif
 
 MACRO_CONFIG_INT(DbgFocus, dbg_focus, 0, 0, 1, CFGFLAG_CLIENT, "")

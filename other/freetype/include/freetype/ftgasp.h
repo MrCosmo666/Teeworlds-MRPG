@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Access of TrueType's `gasp' table (specification).                   */
 /*                                                                         */
-/*  Copyright 2007-2018 by                                                 */
+/*  Copyright 2007-2017 by                                                 */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -27,9 +27,6 @@
 #error "Please fix the directory search order for header files"
 #error "so that freetype.h of FreeType 2 is found first."
 #endif
-
-
-FT_BEGIN_HEADER
 
 
   /***************************************************************************
@@ -133,8 +130,6 @@ FT_BEGIN_HEADER
 
   /* */
 
-
-FT_END_HEADER
 
 #endif /* FTGASP_H_ */
 

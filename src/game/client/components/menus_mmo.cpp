@@ -179,7 +179,7 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		ExpBar.HMargin(3.0f, &ExpBar), ExpBar.h = 15.0f;
 		vec4 ProgressColor((g_Config.m_HdColorProgress >> 16) / 255.0f,
 			((g_Config.m_HdColorProgress >> 8) & 0xff) / 255.0f, (g_Config.m_HdColorProgress & 0xff) / 255.0f, 0.8f);
-		RenderTools()->RenderMmoBar(TextRender(), ExpBar, ProgressColor, 50, 100, "Exp Bar");
+		RenderTools()->DrawUIBar(TextRender(), ExpBar, ProgressColor, 50, 100, "Exp Bar", true);
 
 		int hri, hgi, hbi;
 		hri = g_Config.m_HdColorProgress >> 16;

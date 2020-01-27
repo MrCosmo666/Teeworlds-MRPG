@@ -181,7 +181,7 @@ void CMenus::RenderGame(CUIRect MainView)
 			if(DoButton_Menu(&s_JoinButton, aBuf, Team == TEAM_RED, &Button) && Team != TEAM_RED && !(Info.m_aNotification[0]))
 			{
 				m_pClient->SendSwitchTeam(TEAM_RED);
-				SetActive(false);
+				SetActive(EMenuState::NOACTIVE);
 			}
 		}
 
@@ -443,8 +443,20 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 
 	GameInfo.HSplitTop(ButtonHeight, &Label, &GameInfo);
 	Label.y += 2.0f;
-	str_format(aBuf, sizeof(aBuf), "%s: %s", Localize("Difficulty"), (CurrentServerInfo.m_ServerLevel == 0) ? Localize("Casual", "Server difficulty") : 
-		(CurrentServerInfo.m_ServerLevel == 1 ? Localize("Normal", "Server difficulty") : Localize("Competitive", "Server difficulty")));
+	const char* pLevelName = "";
+	switch (CurrentServerInfo.m_ServerLevel)
+	{
+	case CServerInfo::LEVEL_CASUAL:
+		pLevelName = Localize("Casual", "Server difficulty");
+		break;
+	case CServerInfo::LEVEL_NORMAL:
+		pLevelName = Localize("Normal", "Server difficulty");
+		break;
+	case CServerInfo::LEVEL_COMPETITIVE:
+		pLevelName = Localize("Competitive", "Server difficulty");
+		break;
+	}
+	str_format(aBuf, sizeof(aBuf), "%s: %s", Localize("Difficulty"), pLevelName);
 	UI()->DoLabel(&Label, aBuf, ButtonHeight*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
 
 	GameInfo.HSplitTop(ButtonHeight, &Label, &GameInfo);
@@ -493,6 +505,14 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 // item icons
 bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect, float Size)
 {
+	// первая загрузка иконок предметов
+	static bool s_Init = true;
+	if (m_pClient->MmoServer() && s_Init)
+	{
+		m_pClient->Storage()->ListDirectory(IStorage::TYPE_ALL, "mmotee/itemicons", ItemIconScan, this);
+		s_Init = false;
+	}
+
 	// форматируем под иконку предмета
 	char aNameBuf[128];
 	str_format(aNameBuf, sizeof(aNameBuf), "icon_%s", pItem);
@@ -545,7 +565,7 @@ int CMenus::ItemIconScan(const char *pName, int IsDir, int DirType, void *pUser)
 
 	// add new game icon
 	char aBuf[512];
-	str_format(aBuf, sizeof(aBuf), "ui/itemicons/%s", pName);
+	str_format(aBuf, sizeof(aBuf), "mmotee/itemicons/%s", pName);
 
 	// загружаем иконки
 	CImageInfo Info;
@@ -576,14 +596,6 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 	CUIRect List = MainView;
 	UiDoListboxHeader(&s_ListBoxState, &List, Localize("Option"), 20.0f, 2.0f);
 	UiDoListboxStart(&s_ListBoxState, &s_VoteList, 20.0f, 0, m_pClient->m_pVoting->m_NumVoteOptions, 1, m_CallvoteSelectedOption, 0, true);
-
-	// первая загрузка иконок предметов
-	static bool s_Init = true;
-	if (m_pClient->MmoServer() && s_Init)
-	{
-		m_pClient->Storage()->ListDirectory(IStorage::TYPE_ALL, "ui/itemicons", ItemIconScan, this);
-		s_Init = false;
-	}
 
 	// рисуем голосования
 	for(CVoteOptionClient *pOption = m_pClient->m_pVoting->m_pFirst; pOption; pOption = pOption->m_pNext)

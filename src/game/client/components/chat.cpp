@@ -242,7 +242,7 @@ bool CChat::OnInput(IInput::CEvent Event)
 	}
 	else if (Event.m_Flags & IInput::FLAG_PRESS && (Event.m_Key == KEY_RETURN || Event.m_Key == KEY_KP_ENTER))
 	{
-		if (IsTypingCommand() && ExecuteCommand())
+		if (IsTypingCommand() && ExecuteCommand(true))
 		{
 			// everything is handled within
 		}
@@ -277,7 +277,11 @@ bool CChat::OnInput(IInput::CEvent Event)
 	}
 	if (Event.m_Flags & IInput::FLAG_PRESS && Event.m_Key == KEY_TAB)
 	{
-		if (m_Mode == CHAT_WHISPER)
+		if (IsTypingCommand() && ExecuteCommand(false))
+		{
+			// everything is handled within
+		}
+		else if (m_Mode == CHAT_WHISPER)
 		{
 			// change target
 			for (int i = 0; i < MAX_CLIENTS; i++)
@@ -515,7 +519,8 @@ void CChat::OnMessage(int MsgType, void* pRawMsg)
 
 		CChatCommand* pCommand = m_Commands.GetCommandByName(pMsg->m_pName);
 
-		if (pCommand) {
+		if (pCommand)
+		{
 			mem_zero(pCommand, sizeof(CChatCommand));
 			dbg_msg("chat_commands", "removed chat command: name='%s'", pMsg->m_pName);
 		}
@@ -707,6 +712,10 @@ void CChat::OnRender()
 {
 	if (Client()->State() <= Client()->STATE_LOADING)
 		return;
+
+	// auth state and opened chat set hide
+	if (m_pClient->m_pMenus->IsActiveEditbox() && m_Show)
+		m_Show = false;
 
 	// send pending chat messages
 	if (m_PendingChatCounter > 0 && m_LastChatSend + time_freq() < time_get())
@@ -1227,6 +1236,12 @@ void CChat::OnRender()
 			BgIdColor.a = 0.5f * Blend;
 			RenderTools()->DrawClientID(TextRender(), &Cursor, NameCID, BgIdColor, IdTextColor);
 			str_format(aBuf, sizeof(aBuf), "%s: ", pLine->m_aName);
+
+			// float Weidth = 15.0f, Height = 4.0f;
+			// CUIRect BackgroundPrefix = { Cursor.m_X, Cursor.m_Y + (Height / 1.5f), Weidth, Height };
+			// RenderTools()->DrawUIRect(&BackgroundPrefix, vec4(1.0f, 0.5f, 0.5f, 0.7f), CUI::CORNER_ALL, 1.0f);
+			// Cursor.m_X += Weidth;
+			
 			TextRender()->TextShadowed(&Cursor, aBuf, -1, ShadowOffset, ShadowColor, TextColor);
 		}
 
@@ -1302,7 +1317,11 @@ void CChat::HandleCommands(float x, float y, float w)
 				CTextCursor Cursor;
 				TextRender()->SetCursor(&Cursor, Rect.x + 5.0f, y, 5.0f, TEXTFLAG_RENDER);
 				TextRender()->TextColor(0.5f, 0.5f, 0.5f, 1.0f);
-				TextRender()->TextEx(&Cursor, Localize("Press Enter to confirm or Esc to cancel"), -1);
+				if (m_Commands.GetSelectedCommand() && str_startswith(m_Input.GetString() + 1, m_Commands.GetSelectedCommand()->m_aName))
+					TextRender()->TextEx(&Cursor, Localize("Press Enter to confirm or Esc to cancel"), -1);
+				else
+					TextRender()->TextEx(&Cursor, Localize("Press Tab to select or Esc to cancel"), -1);
+
 			}
 
 			// render commands
@@ -1360,7 +1379,7 @@ void CChat::HandleCommands(float x, float y, float w)
 	}
 }
 
-bool CChat::ExecuteCommand()
+bool CChat::ExecuteCommand(bool Execute)
 {
 	if (m_Commands.CountActiveCommands() == 0)
 		return false;
@@ -1370,7 +1389,7 @@ bool CChat::ExecuteCommand()
 	dbg_assert(pCommand != 0, "selected command does not exist");
 	bool IsFullMatch = str_find(pCommandStr + 1, pCommand->m_aName); // if the command text is fully inside pCommandStr (aka, not a shortcut)
 
-	if (IsFullMatch)
+	if (IsFullMatch && Execute)
 	{
 		// execute command
 		if (pCommand->m_pfnCallback)
@@ -1381,11 +1400,13 @@ bool CChat::ExecuteCommand()
 			CNetMsg_Cl_Command Msg;
 			Msg.m_Name = pCommand->m_aName;
 			Msg.m_Arguments = pCommandStr;
-			Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
+			Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);			
+			m_Mode = CHAT_NONE;
+			m_pClient->OnRelease();
 		}
-		ClearInput();
+		return true;
 	}
-	else
+	else if (!IsFullMatch && !Execute)
 	{
 		// autocomplete command
 		char aBuf[128];
@@ -1396,8 +1417,9 @@ bool CChat::ExecuteCommand()
 		m_Input.Set(aBuf);
 		m_Input.SetCursorOffset(str_length(aBuf));
 		m_InputUpdate = true;
+		return true;
 	}
-	return true;
+	return false;
 }
 
 // returns -1 if not found or duplicate
@@ -1506,6 +1528,8 @@ void CChat::Com_Mute(CChat* pChatData, const char* pCommand)
 		str_format(aMsg, sizeof(aMsg), !isMuted ? Localize("'%s' was muted") : Localize("'%s' was unmuted"), pChatData->m_pClient->m_aClients[TargetID].m_aName);
 		pChatData->AddLine(CLIENT_MSG, CHAT_ALL, aMsg, -1);
 	}
+	pChatData->m_Mode = CHAT_NONE;
+	pChatData->m_pClient->OnRelease();
 }
 
 void CChat::Com_Befriend(CChat* pChatData, const char* pCommand)
@@ -1526,6 +1550,8 @@ void CChat::Com_Befriend(CChat* pChatData, const char* pCommand)
 		str_format(aMsg, sizeof(aMsg), !isFriend ? Localize("'%s' was added as a friend") : Localize("'%s' was removed as a friend"), pChatData->m_pClient->m_aClients[TargetID].m_aName);
 		pChatData->AddLine(CLIENT_MSG, CHAT_ALL, aMsg, -1);
 	}
+	pChatData->m_Mode = CHAT_NONE;
+	pChatData->m_pClient->OnRelease();
 }
 
 
@@ -1606,9 +1632,10 @@ int CChat::CChatCommands::CountActiveCommands() const
 	return n;
 }
 
-const CChat::CChatCommand* CChat::CChatCommands::GetCommand(int index) const
+const CChat::CChatCommand* CChat::CChatCommands::GetCommand(int Index) const
 {
-	return &m_aCommands[GetActiveIndex(index)];
+	int RealIndex = GetActiveIndex(Index);
+	return RealIndex != -1 ? &m_aCommands[RealIndex] : 0;
 }
 
 CChat::CChatCommand* CChat::CChatCommands::GetCommandByName(const char* pName)
@@ -1660,13 +1687,13 @@ void CChat::CChatCommands::SelectNextCommand()
 	}
 }
 
-int CChat::CChatCommands::GetActiveIndex(int index) const
+int CChat::CChatCommands::GetActiveIndex(int Index) const
 {
 	for (int i = 0; i < MAX_COMMANDS; i++)
 	{
 		if (!m_aCommands[i].m_Used || m_aCommands[i].m_aFiltered)
-			index++;
-		if (i == index)
+			Index++;
+		if (i == Index)
 			return i;
 	}
 	return -1;

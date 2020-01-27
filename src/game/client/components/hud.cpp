@@ -393,6 +393,10 @@ void CHud::RenderCheckpoint()
 	}
 }
 
+void CHud::RenderTalkText()
+{
+
+}
 
 void CHud::OnMessage(int MsgType, void* pRawMsg)
 {
@@ -401,7 +405,7 @@ void CHud::OnMessage(int MsgType, void* pRawMsg)
 		CNetMsg_Sv_Checkpoint* pMsg = (CNetMsg_Sv_Checkpoint*)pRawMsg;
 		m_CheckpointDiff = pMsg->m_Diff;
 		m_CheckpointTime = time_get();
-	}
+	} 
 }
 
 void CHud::RenderWarmupTimer()
@@ -641,7 +645,7 @@ void CHud::RenderNinjaBar(float x, float y, float Progress)
 // mmotee
 void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetObj_Character* pCharacter)
 {
-	if (!pClientStats || !pCharacter)
+	if (!pClientStats || !pCharacter || pClientStats->m_WorldType == WORLD_CUTSCENE)
 		return;
 
 	// рисуем бордюры
@@ -697,12 +701,13 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 		// Exp опыт и бар
 		str_format(aBuf, sizeof(aBuf), "Level: %d Exp: %d/%d", pClientStats->m_Level, pClientStats->m_Exp, pClientStats->m_ExpNeed);
 
-		CUIRect ExpBar = { 8.0f, 43.0f, 0.0f, 5.0f };
+		CUIRect ExpBar = { 8.0f, 43.0f, 100.0f, 7.0f };
 		vec4 ProgressColor(
 			(g_Config.m_HdColorProgress >> 16) / 255.0f,
 			((g_Config.m_HdColorProgress >> 8) & 0xff) / 255.0f,
 			(g_Config.m_HdColorProgress & 0xff) / 255.0f, 0.8f);
-		RenderTools()->RenderMmoBar(TextRender(), ExpBar, ProgressColor, pClientStats->m_Exp, pClientStats->m_ExpNeed, aBuf);
+		RenderTools()->DrawUIBar(TextRender(), ExpBar, ProgressColor, 
+			pClientStats->m_Exp, pClientStats->m_ExpNeed, aBuf, 5, CUI::ALIGN_CENTER, 2.0f, 1.0f);
 
 		IGraphics::CQuadItem Used[2];
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
@@ -786,9 +791,9 @@ void CHud::RenderHealthAndAmmo(const CNetObj_Character *pCharacter)
 		return;
 
 	//  mmotee
-	if(m_pClient->MmoServer() && m_pClient->m_Snap.m_pLocalStats)
+	if(m_pClient->MmoServer() && m_pClient->m_aClients[m_pClient->m_LocalClientID].m_pLocalStats)
 	{
-		RenderMmoHud(m_pClient->m_Snap.m_pLocalStats, pCharacter);
+		RenderMmoHud(m_pClient->m_aClients[m_pClient->m_LocalClientID].m_pLocalStats, pCharacter);
 		return;
 	}
 
@@ -989,6 +994,8 @@ void CHud::OnRender()
 			RenderConnectionWarning();
 		RenderTeambalanceWarning();
 		RenderVoting();
+
+		RenderTalkText();
 	}
 	RenderCursor();
 }

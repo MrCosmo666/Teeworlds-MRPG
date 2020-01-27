@@ -76,11 +76,8 @@
 /* <Sections>                                                              */
 /*    auto_hinter                                                          */
 /*    cff_driver                                                           */
-/*    t1_cid_driver                                                        */
 /*    tt_driver                                                            */
 /*    pcf_driver                                                           */
-/*    properties                                                           */
-/*    parameter_tags                                                       */
 /*                                                                         */
 /***************************************************************************/
 

@@ -13,6 +13,8 @@ class CNamePlates : public CComponent
 		int ClientID
 	);
 
+	const char* GetMoodName(int MoodType);
+
 public:
 	virtual void OnRender();
 };

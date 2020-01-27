@@ -178,12 +178,10 @@ public:
 		};
 
 		CCharacterInfo m_aCharacters[MAX_CLIENTS];
-
-		// mmotee
-		const CNetObj_Mmo_ClientInfo* m_pLocalStats;
 	};
 
 	CSnapState m_Snap;
+
 
 	// client data
 	struct CClientData
@@ -209,6 +207,7 @@ public:
 		bool m_Friend;
 
 		// mmotee
+		const CNetObj_Mmo_ClientInfo* m_pLocalStats;
 		int m_aEquipItems[NUM_EQUIPS];
 		int m_aEnchantItems[NUM_EQUIPS];
 		float m_AnimWings;
@@ -289,7 +288,10 @@ public:
 	static void GetPlayerLabel(char* aBuf, int BufferSize, int ClientID, const char* ClientName);
 	bool IsXmas() const;
 	bool IsEaster() const;
+	
+	//
 	bool MmoServer()  const { return m_ConnectedMmoServer; }
+	void SendAuthPack(const char* Login, const char* Password, bool StateRegistered);
 
 	//
 	void DoEnterMessage(const char *pName, int ClientID, int Team);
@@ -328,6 +330,8 @@ public:
 	class CMapLayers *m_pMapLayersBackGround;
 	class CMapLayers *m_pMapLayersForeGround;
 
+	class CTalkText* m_pTalkText;
+	class CQuestingProcessing* m_pQuestProcess;
 	class CCSkinChanger* m_pSkinChanger;
 
 };

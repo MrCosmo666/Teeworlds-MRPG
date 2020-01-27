@@ -80,7 +80,9 @@ public:
 	// mmotee
 	void RenderPicItems(CAnimState* pAnim, int RenderNum, vec2 Dir, vec2 Pos);
 	void RenderWings(CAnimState* pAnim, int Sprite, vec2 Position, vec2 PlayerPos, int Size1 = 200, int Size2 = 100);
-	void RenderMmoBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color, int Num, int Max, const char *pText);
+	void DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color, int Num, int Max, const char* pText, int Shares, int AlignTextAbroadBar = CUI::ALIGN_CENTER, float Rounding = 2.0f, float Margin = 0.0f);
+	void DrawUIText(ITextRender* pTextRender, CTextCursor* pCursor, const char* pText,
+		const vec4& BgColor, const vec4& TextColor, float FontSize);
 
 	// map render methods (gc_render_map.cpp)
 	static void RenderEvalEnvelope(CEnvPoint *pPoints, int NumPoints, int Channels, float Time, float *pResult);

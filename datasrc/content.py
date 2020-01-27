@@ -233,6 +233,11 @@ container.sounds.Add(SoundSet("menu", ["audio/music_menu.wv"]))
 
 container.sounds.Add(SoundSet("sword_fire", FileList("audio/wp_sword_attack-%02d.wv", 3)))
 
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
+
 image_null = Image("null", "")
 image_particles = Image("particles", "particles.png")
 image_game = Image("game", "game.png")
@@ -251,17 +256,23 @@ image_levelicons = Image("levelicons", "ui/icons/level.png", 1)
 image_sidebaricons = Image("sidebaricons", "ui/icons/sidebar.png", 1)
 image_chatwhisper = Image("chatwhisper", "ui/icons/chat_whisper.png", 1)
 image_timerclock = Image("timerclock", "ui/icons/timer_clock.png", 1)
-# mmotee
-image_mmotee = Image("mmoeffect", "effx/mmotee.png")
-image_teleport = Image("teleporteffect", "effx/teleport.png")
-image_wingit19 = Image("wingsit19", "wings/it19.png")
-image_wingit20 = Image("wingsit20", "wings/it20.png")
-image_wingit21 = Image("wingsit21", "wings/it21.png")
-image_wingit22 = Image("wingsit22", "wings/it22.png")
-image_wingit23 = Image("wingsit23", "wings/it23.png")
-image_odinspear = Image("odinspear", "hammer/odinspear.png")
-image_aztecsword = Image("aztecsword", "hammer/aztecsword.png")
-image_mmogame = Image("mmogame", "mmogame.png")
+
+image_efmmotee = Image("mmoeffect", "mmotee/effx/mmotee.png")
+image_teleport = Image("teleporteffect", "mmotee/effx/teleport.png")
+image_wingit19 = Image("wingsit19", "mmotee/wings/it19.png")
+image_wingit20 = Image("wingsit20", "mmotee/wings/it20.png")
+image_wingit21 = Image("wingsit21", "mmotee/wings/it21.png")
+image_wingit22 = Image("wingsit22", "mmotee/wings/it22.png")
+image_wingit23 = Image("wingsit23", "mmotee/wings/it23.png")
+image_odinspear = Image("odinspear", "mmotee/hammer/odinspear.png")
+image_aztecsword = Image("aztecsword", "mmotee/hammer/aztecsword.png")
+image_mmogame = Image("mmogame", "mmotee/mmogame.png")
+image_mmologo = Image("mmologo", "mmotee/logo.png")
+
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
 
 container.images.Add(image_null)
 container.images.Add(image_game)
@@ -289,7 +300,7 @@ container.images.Add(image_chatwhisper)
 container.images.Add(Image("raceflag", "race_flag.png"))
 container.images.Add(image_timerclock)
 # mmotee
-container.images.Add(image_mmotee)
+container.images.Add(image_efmmotee)
 container.images.Add(image_teleport)
 container.images.Add(image_wingit19)
 container.images.Add(image_wingit20)
@@ -299,6 +310,7 @@ container.images.Add(image_wingit23)
 container.images.Add(image_odinspear)
 container.images.Add(image_aztecsword)
 container.images.Add(image_mmogame)
+container.images.Add(image_mmologo)
 
 container.pickups.Add(Pickup("health"))
 container.pickups.Add(Pickup("armor"))
@@ -306,6 +318,13 @@ container.pickups.Add(Pickup("grenade"))
 container.pickups.Add(Pickup("shotgun"))
 container.pickups.Add(Pickup("laser"))
 container.pickups.Add(Pickup("ninja", 90, 90))
+container.pickups.Add(Pickup("gun"))
+container.pickups.Add(Pickup("hammer"))
+
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
 
 set_particles = SpriteSet("particles", image_particles, 8, 8)
 set_game = SpriteSet("game", image_game, 32, 16)
@@ -332,7 +351,7 @@ set_levelicons = SpriteSet("levelicons", image_levelicons, 4, 4)
 set_sidebaricons = SpriteSet("sidebaricons", image_sidebaricons, 4, 2)
 set_timerclock = SpriteSet("timerclock", image_timerclock, 1, 2)
 # mmotee
-set_mmotee = SpriteSet("mmotee", image_mmotee, 4, 4)
+set_mmotee = SpriteSet("mmotee", image_efmmotee, 4, 4)
 set_teleport = SpriteSet("teleport", image_teleport, 8, 1)
 set_wingsit19 = SpriteSet("wingsit19", image_wingit19, 1, 1)
 set_wingsit20 = SpriteSet("wingsit20", image_wingit20, 1, 1)
@@ -342,6 +361,12 @@ set_wingsit23 = SpriteSet("wingsit23", image_wingit23, 1, 1)
 set_odinspear = SpriteSet("odinspear", image_odinspear, 1, 1)
 set_aztecsword = SpriteSet("aztecsword", image_aztecsword, 1, 1)
 set_mmogame = SpriteSet("mmogame", image_mmogame, 32, 16)
+set_mmologo = SpriteSet("mmologo", image_mmologo, 1, 1)
+
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
 
 container.spritesets.Add(set_particles)
 container.spritesets.Add(set_game)
@@ -378,6 +403,7 @@ container.spritesets.Add(set_wingsit23)
 container.spritesets.Add(set_odinspear)
 container.spritesets.Add(set_aztecsword)
 container.spritesets.Add(set_mmogame)
+container.spritesets.Add(set_mmologo)
 
 container.sprites.Add(Sprite("part_slice", set_particles, 0,0,1,1))
 container.sprites.Add(Sprite("part_ball", set_particles, 1,0,1,1))
@@ -453,6 +479,8 @@ container.sprites.Add(Sprite("pickup_grenade", set_game, 2,8,7,2))
 container.sprites.Add(Sprite("pickup_shotgun", set_game, 2,6,8,2))
 container.sprites.Add(Sprite("pickup_laser", set_game, 2,12,7,3))
 container.sprites.Add(Sprite("pickup_ninja", set_game, 2,10,8,2))
+container.sprites.Add(Sprite("pickup_gun", set_game, 2,4,4,2))
+container.sprites.Add(Sprite("pickup_hammer", set_game, 2,1,4,3))
 
 container.sprites.Add(Sprite("flag_blue", set_game, 12,8,4,8))
 container.sprites.Add(Sprite("flag_red", set_game, 16,8,4,8))
@@ -610,7 +638,11 @@ for i in range(1, 4):
 	container.sprites.Add(Sprite("mmo"+str(i+8), set_mmotee, i-1, 2, 1, 1))
 for i in range(1, 9):
 	container.sprites.Add(Sprite("teleport"+str(i), set_teleport, i-1, 0, 1, 1))
-
+  
+###############################################################################
+###############################################################################
+###############################################################################
+###############################################################################
 
 anim = Animation("base")
 anim.body.frames.Add(AnimKeyframe(0, 0, -4, 0))

@@ -34,6 +34,14 @@ public:
 		#undef MACRO_TUNING_PARAM
 	}
 
+	bool operator==(const CTuningParams& TuningParams)
+	{
+		#define MACRO_TUNING_PARAM(Name,ScriptName,Value) if(m_##Name != TuningParams.m_##Name) return false;
+		#include "tuning.h"
+		#undef MACRO_TUNING_PARAM
+		return true;
+	}
+
 	static const char *m_apNames[];
 
 	#define MACRO_TUNING_PARAM(Name,ScriptName,Value) CTuneParam m_##Name;
@@ -81,12 +89,33 @@ inline void IntsToStr(const int *pInts, int Num, char *pStr)
 	pStr[-1] = 0;
 }
 
-inline vec2 Vec2Range(vec2* Pos, int Range)
+inline vec2 GetDirection(int Angle)
+{
+	float a = Angle/256.0f;
+	return vec2(cosf(a), sinf(a));
+}
+
+inline vec2 Vec2Range(vec2 *Pos, int Range)
 {
 	vec2 SavePos = *Pos;
-	int MinimalRange = Range / 2;
+	int MinimalRange = Range/2;
 
-	return vec2(SavePos.x + rand() % MinimalRange - rand() % Range, SavePos.y + rand() % MinimalRange - rand() % Range);
+	return vec2(SavePos.x+rand()%MinimalRange-rand()%Range, SavePos.y+rand()%MinimalRange-rand()%Range);
+}
+
+inline vec2 GetDir(float Angle)
+{
+	return vec2(cosf(Angle), sinf(Angle));
+}
+
+inline float GetAngle(vec2 Dir)
+{
+	if(Dir.x == 0 && Dir.y == 0)
+		return 0.0f;
+	float a = atanf(Dir.y/Dir.x);
+	if(Dir.x < 0)
+		a = a+pi;
+	return a;
 }
 
 inline vec2 CalcPos(vec2 Pos, vec2 Velocity, float Curvature, float Speed, float Time)
@@ -150,6 +179,21 @@ public:
 
 class CCharacterCore
 {
+public:
+	struct CParams : public CTuningParams
+	{
+		const CTuningParams* m_pTuningParams;
+		int m_HookMode;
+		int m_HookGrabTime;
+		
+		CParams(const CTuningParams* pTuningParams)
+		{
+			m_pTuningParams = pTuningParams;
+			m_HookMode = 0;
+			m_HookGrabTime = SERVER_TICK_SPEED+SERVER_TICK_SPEED/5;
+		}
+	};
+private:
 	CWorldCore *m_pWorld;
 	CCollision *m_pCollision;
 public:
@@ -161,22 +205,23 @@ public:
 	int m_HookTick;
 	int m_HookState;
 	int m_HookedPlayer;
-
+	bool m_ProtectHooked;
+	bool m_Death;
+	bool m_LostData;
+	int m_WorldID;
+	
 	int m_Jumped;
 
 	int m_Direction;
 	int m_Angle;
-
-	bool m_Death;
-
 	CNetObj_PlayerInput m_Input;
 
 	int m_TriggeredEvents;
 
 	void Init(CWorldCore *pWorld, CCollision *pCollision);
 	void Reset();
-	void Tick(bool UseInput);
-	void Move();
+	void Tick(bool UseInput, CTuningParams* TunningParams = NULL);
+	void Move(CTuningParams* TunningParams = NULL);
 
 	void Read(const CNetObj_CharacterCore *pObjCore);
 	void Write(CNetObj_CharacterCore *pObjCore);

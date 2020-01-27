@@ -40,7 +40,7 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 	const float Margins = 5.0f;
 	float TotalHeight;
 
-	if(m_MenuActive)
+	if(m_MenuActiveID == EMenuState::ESCSTATE)
 		TotalHeight = SeekBarHeight+ButtonbarHeight+NameBarHeight+Margins*3;
 	else
 		TotalHeight = SeekBarHeight+Margins*2;
@@ -49,7 +49,7 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 	MainView.VSplitLeft(50.0f, 0, &MainView);
 	MainView.VSplitRight(450.0f, &MainView, 0);
 
-	if (m_SeekBarActive || m_MenuActive) // only draw the background if SeekBar or Menu is active
+	if (m_SeekBarActive || m_MenuActiveID == EMenuState::ESCSTATE) // only draw the background if SeekBar or Menu is active
 		RenderTools()->DrawUIRect(&MainView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), CUI::CORNER_T, 10.0f);
 
 	MainView.Margin(5.0f, &MainView);
@@ -60,7 +60,7 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 	int TotalTicks = pInfo->m_LastTick - pInfo->m_FirstTick;
 
 	// we can toggle the seekbar using CTRL
-	if(!m_MenuActive && (Input()->KeyPress(KEY_LCTRL) || Input()->KeyPress(KEY_RCTRL)))
+	if(!m_MenuActiveID && (Input()->KeyPress(KEY_LCTRL) || Input()->KeyPress(KEY_RCTRL)))
 	{
 		if (m_SeekBarActive)
 			m_SeekBarActive = false;
@@ -74,7 +74,7 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 	if(m_SeekBarActivatedTime < time_get() - 5*time_freq())
 		m_SeekBarActive = false;
 
-	if(m_MenuActive)
+	if(m_MenuActiveID == EMenuState::ESCSTATE)
 	{
 		MainView.HSplitTop(SeekBarHeight, &SeekBar, &ButtonBar);
 		ButtonBar.HSplitTop(Margins, 0, &ButtonBar);
@@ -87,7 +87,7 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 		SeekBar = MainView;
 
 	// do seekbar
-	if(m_SeekBarActive || m_MenuActive)
+	if(m_SeekBarActive || m_MenuActiveID == EMenuState::ESCSTATE)
 	{
 		static int s_SeekBarID = 0;
 		void *id = &s_SeekBarID;
@@ -172,7 +172,7 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 			DemoPlayer()->Unpause();
 	}
 
-	if(m_MenuActive)
+	if(m_MenuActiveID == EMenuState::ESCSTATE)
 	{
 		// do buttons
 		CUIRect Button;

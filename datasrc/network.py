@@ -21,6 +21,14 @@ GameMsgIDs = Enum("GAMEMSG", ["TEAM_SWAP", "SPEC_INVALIDID", "TEAM_SHUFFLE", "TE
 							"GAME_PAUSED"]) # todo 0.8: sort (1 para)
 
 # mmotee
+AuthCodes = Enum("AUTH", ["ALL_UNKNOWN", 
+							"ALL_MUSTCHAR", 
+							"ALL_GOOD", 
+							"LOGIN_ALREADY", 
+							"LOGIN_WRONG", 
+							"LOGIN_NICKNAME", 
+							"REGISTER_ERROR_NICK"])
+
 Effects = Enum("EFFECT", ["SPASALON", 
 							"TELEPORT"])
 
@@ -40,6 +48,21 @@ MmoItems = Enum("ITEMS", ["BOX",
 							"PLANT",
 							"ORE"])
 
+MoodType = Enum("MOOD", ["ANGRY", 
+							"AGRESSED_TANK",
+							"AGRESSED_OTHER", 
+							"NORMAL", 
+							"FRIENDLY",
+							"QUESTING"])
+
+WorldType = Enum("WORLD", ["STANDARD", 
+							"CUTSCENE",
+							"DUNGEON"])
+
+TalkedStyles = Enum("TALK_STYLE", ["STANDARD", 
+							"AGRESSIVE",
+							"HAPPED"])
+							
 RawHeader = '''
 
 #include <engine/message.h>
@@ -90,11 +113,15 @@ Enums = [
 	Votes,
 	ChatModes,
 	GameMsgIDs,
-    
+
     # mmotee
     Effects,
 	Equip,
 	MmoItems,
+    AuthCodes,
+	MoodType,
+	WorldType,
+	TalkedStyles,
 ]
 
 Flags = [
@@ -304,7 +331,7 @@ Objects = [
 		NetBool("m_PotionAdded"),
 	]),
 
-    ## mmotee objects
+    ## mmotee general object
 	NetObject("Mmo_ClientInfo", [
 		NetBool("m_Local"),
 
@@ -320,12 +347,17 @@ Objects = [
 		NetIntAny("m_ExpNeed"),
 		
 		NetIntAny("m_Health"),
+		NetIntAny("m_HealthStart"),
 		NetIntAny("m_Armor"), 
 
 		NetArray(NetIntAny("m_Table"), 12),
 		NetArray(NetIntAny("m_Leveling"), 32),
+
+		NetEnum("m_MoodType", MoodType),
+		NetEnum("m_WorldType", WorldType),
 	]),
 
+	# mmotee send pickup item
 	NetObject("MmoItems", [
 		NetIntAny("m_X"),
 		NetIntAny("m_Y"),
@@ -333,6 +365,7 @@ Objects = [
 		NetEnum("m_Type", MmoItems),
 	]),
     
+	# mmotee send projectile item
 	NetObject("MmoProj", [
 		NetIntAny("m_X"),
 		NetIntAny("m_Y"),
@@ -556,22 +589,76 @@ Messages = [
     ]),
     
 	# mmotee client
-	NetMessage("Cl_IsMmoServer", [
+	# -------------
+	NetMessage("Cl_IsMmoServer", 
+	[
 		NetIntAny("m_Version"),
 	]),
+
+	# authirized client
+	NetMessage("Cl_ClientAuth", 
+	[
+        NetStringStrict("m_Login"),
+        NetStringStrict("m_Password"),
+		NetBool("m_SelectRegister"),
+	]),
+
+	# interactive mmo
+	NetMessage("Cl_TalkInteractive",
+	[
+		
+	]),
+    
+	# mmotee server
+	# -------------
 	NetMessage("Sv_AfterIsMmoServer", []),
 
-    # mmotee equip items
-    NetMessage("Sv_EquipItems", [
+    # mmotee send equip items
+    NetMessage("Sv_EquipItems", 
+	[
 		NetIntRange("m_ClientID", 0, 'MAX_CLIENTS-1'),
 		NetArray(NetIntAny("m_EquipID"),  9),
 		NetArray(NetIntAny("m_EnchantItem"),  9),
 	]),
     
-    # mmotee send vote client
-	NetMessage("Sv_VoteMmoOptionAdd", [
+    # mmotee send add vote client
+	NetMessage("Sv_VoteMmoOptionAdd", 
+	[
 		NetStringStrict("m_pDescription"),
 		NetArray(NetIntAny("m_pColored"), 3),
 		NetArray(NetIntAny("m_pIcon"), 4),
 	]),
+
+	# authirized client
+	NetMessage("Sv_ClientProgressAuth", 
+	[
+		NetIntAny("m_Code"),
+	]),
+
+	# talk type how broadcast
+	NetMessage("Sv_TalkText",
+	[
+		NetStringStrict("m_pText"),
+		NetIntAny("m_pSeconds"),
+		NetIntAny("m_pTalkClientID"),
+		NetEnum("m_TalkedEmote", Emotes),
+		NetEnum("m_Style", TalkedStyles),
+	]),
+
+	# clear talk text
+	NetMessage("Sv_ClearTalkText", []),
+
+	# added item to Questing Process
+	NetMessage("Sv_AddQuestingProcessing",
+	[
+		NetStringStrict("m_pText"),
+		NetArray(NetIntAny("m_pIcon"), 4),
+		NetIntAny("m_pRequiresNum"),
+		NetIntAny("m_pHaveNum"),
+	]),
+
+	# clear all items on Questing Process
+	NetMessage("Sv_ClearQuestingProcessing", []),
+
+
 ]

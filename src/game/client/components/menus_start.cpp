@@ -40,7 +40,6 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	if(DoButton_Menu(&s_SettingsButton, Localize("Settings"), 0, &Button, g_Config.m_ClShowStartMenuImages ? "settings" : 0, CUI::CORNER_ALL, 10.0f, 0.5f) || CheckHotKey(KEY_S))
 		NewPage = PAGE_SETTINGS;
 	
-
 	TopMenu.HSplitBottom(5.0f, &TopMenu, 0); // little space
 	TopMenu.HSplitBottom(40.0f, &TopMenu, &Button);
 	static CButtonContainer s_DemoButton;
@@ -69,11 +68,19 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	}
 
 	TopMenu.HSplitBottom(5.0f, &TopMenu, 0); // little space
+
 	TopMenu.HSplitBottom(40.0f, &TopMenu, &Button);
 	static CButtonContainer s_PlayButton;
 	if(DoButton_Menu(&s_PlayButton, Localize("Play"), 0, &Button, g_Config.m_ClShowStartMenuImages ? "play_game" : 0, CUI::CORNER_ALL, 10.0f, 0.5f) || m_EnterPressed || CheckHotKey(KEY_P))
 		NewPage = g_Config.m_UiBrowserPage;
-	
+
+	// mmotee
+	TopMenu.HSplitBottom(10.0f, &TopMenu, &Button);
+	static CButtonContainer s_MmoButton;
+	if (DoButton_Menu(&s_MmoButton, Localize("Play to MMMO Tee"), 0, &Button, g_Config.m_ClShowStartMenuImages ? "play_game" : 0, CUI::CORNER_ALL, 10.0f, 0.5f) || m_EnterPressed || CheckHotKey(KEY_P))
+		NewPage = g_Config.m_UiBrowserPage;
+
+
 	BottomMenu.HSplitTop(90.0f, 0, &BottomMenu);
 	RenderTools()->DrawUIRect4(&BottomMenu, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), CUI::CORNER_T, 10.0f);
 

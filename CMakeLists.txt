@@ -46,10 +46,10 @@ set(ORIGINAL_CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES})
 set(OWN_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 set(CMAKE_MODULE_PATH ${OWN_CMAKE_MODULE_PATH})
 
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-  set(TARGET_BITS "64")
-elseif(CMAKE_SIZEOF_VOID_P EQUAL 4)
+if(CMAKE_SIZEOF_VOID_P EQUAL 4)
   set(TARGET_BITS "32")
+else()
+  set(TARGET_BITS "64")
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -308,18 +308,54 @@ if(NOT CMAKE_CROSSCOMPILING)
   # quietly.
   find_package(PkgConfig)
 endif()
+
 find_package(ZLIB)
 find_package(Crypto)
 find_package(OwnFreetype)
 find_package(Opus)
 find_package(Opusfile)
-find_package(Curl)
 find_package(Git)
 find_package(GTest)
 find_package(Pnglite)
 find_package(SDL2)
 find_package(Threads)
 find_package(Wavpack)
+find_package(Curl)
+
+# includes for auto-download and install packages cmake
+include(ExternalProject)
+include(cmake/DownloadProject.cmake)
+
+# Auto download and install websocketpp
+download_project(
+	PROJ           websocketpp
+	GIT_REPOSITORY https://github.com/zaphoyd/websocketpp.git
+	GIT_TAG        master
+	SOURCE_DIR     ${PROJECT_SOURCE_DIR}/other/websocketpp
+	UPDATE_DISCONNECTED 1
+)
+include_directories("${websocketpp_SOURCE_DIR}")
+
+# Note websocketpp doesn't work with the latest version of asio
+# Remember to go back to the master version after they are fixed
+download_project(
+	PROJ           asio
+	GIT_REPOSITORY https://github.com/chriskohlhoff/asio.git
+	GIT_TAG        22afb86
+	SOURCE_DIR     ${PROJECT_SOURCE_DIR}/other/asio
+	UPDATE_DISCONNECTED 1
+)
+set(asio_INCLUDE_DIR "${asio_SOURCE_DIR}/asio/include")
+
+# CPR
+download_project(
+	PROJ           cpr
+	GIT_REPOSITORY https://github.com/whoshuu/cpr.git
+	GIT_TAG        master
+	SOURCE_DIR     ${PROJECT_SOURCE_DIR}/other/cpr
+	UPDATE_DISCONNECTED 1
+)
+include_directories("${cpr_SOURCE_DIR}")
 
 if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   find_program(CMAKE_OTOOL otool)
@@ -333,6 +369,11 @@ if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   endif()
 
   find_program(HDIUTIL hdiutil)
+  if(HDIUTIL)
+    set(HDIUTIL_FOUND ON)
+  else()
+    set(HDIUTIL_FOUND OFF)
+  endif()
 endif()
 
 message(STATUS "******** Teeworlds ********")
@@ -373,6 +414,11 @@ show_dependency_status("Zlib" ZLIB)
 if(CLIENT AND NOT(CURL_FOUND))
   message(SEND_ERROR "You must install Curl to compile Teeworlds")
 endif()
+
+if(NOT(CRYPTO_FOUND))
+  message(SEND_ERROR "You must install OpenSSL to compile Teeworlds")
+endif()
+
 if(NOT(PYTHONINTERP_FOUND))
   message(SEND_ERROR "You must install Python to compile Teeworlds")
 endif()
@@ -380,15 +426,19 @@ endif()
 if(CLIENT AND NOT(FREETYPE_FOUND))
   message(SEND_ERROR "You must install Freetype to compile the Teeworlds client")
 endif()
+
 if(CLIENT AND NOT(OPUS_FOUND))
   message(SEND_ERROR "You must install Opus to compile the Teeworlds client")
 endif()
+
 if(CLIENT AND NOT(OPUSFILE_FOUND))
   message(SEND_ERROR "You must install Opusfile to compile the Teeworlds client")
 endif()
+
 if(CLIENT AND NOT(SDL2_FOUND))
   message(SEND_ERROR "You must install SDL2 to compile the Teeworlds client")
 endif()
+
 if(NOT(GTEST_FOUND))
   if(DOWNLOAD_GTEST)
     if(GIT_FOUND)
@@ -498,9 +548,6 @@ add_library(md5 EXCLUDE_FROM_ALL OBJECT ${DEP_MD5_SRC})
 list(APPEND TARGETS_DEP json md5)
 set(DEP_JSON $<TARGET_OBJECTS:json>)
 set(DEP_MD5)
-if(NOT CRYPTO_FOUND)
-  set(DEP_MD5 $<TARGET_OBJECTS:md5>)
-endif()
 
 ########################################################################
 # DATA
@@ -910,8 +957,6 @@ set(EXPECTED_DATA
 	editor/checker.png
 	editor/cursor.png
 	editor/entities.png
-	effx/mmotee.png
-	effx/teleport.png
 	emoticons.png
 	emoticons/Black_Marta.png
 	emoticons/Moffels_White.png
@@ -935,8 +980,6 @@ set(EXPECTED_DATA
 	gameskins/dark_mirror.png
 	gameskins/fight.png
 	gameskins/silhouette_game.png
-	hammer/aztecsword.png
-	hammer/odinspear.png
 	languages/belarusian.json
 	languages/bosnian.json
 	languages/brazilian_portuguese.json
@@ -1029,7 +1072,64 @@ set(EXPECTED_DATA
 	maps/license.txt
 	maps/lms1.map
 	maps/readme.txt
-	mmogame.png
+	mmotee/effx/mmotee.png
+	mmotee/effx/teleport.png
+	mmotee/hammer/aztecsword.png
+	mmotee/hammer/odinspear.png
+	mmotee/mmogame.png
+    mmotee/itemicons/icon_agressed_o.png
+    mmotee/itemicons/icon_agressed_y.png
+	mmotee/itemicons/icon_amulet.png
+    mmotee/itemicons/icon_angry.png
+	mmotee/itemicons/icon_az_sword.png
+	mmotee/itemicons/icon_bamboo.png
+	mmotee/itemicons/icon_bottle.png
+	mmotee/itemicons/icon_bouquet_r.png
+	mmotee/itemicons/icon_bracelet.png
+	mmotee/itemicons/icon_broken_h.png
+	mmotee/itemicons/icon_dark_energy.png
+	mmotee/itemicons/icon_deco_house.png
+	mmotee/itemicons/icon_door_key.png
+	mmotee/itemicons/icon_eat.png
+	mmotee/itemicons/icon_friendly.png
+	mmotee/itemicons/icon_gold.png
+	mmotee/itemicons/icon_goods.png
+	mmotee/itemicons/icon_grenade.png
+	mmotee/itemicons/icon_gun.png
+	mmotee/itemicons/icon_hammer.png
+	mmotee/itemicons/icon_horn.png
+	mmotee/itemicons/icon_kiwi.png
+	mmotee/itemicons/icon_lucky_box.png
+	mmotee/itemicons/icon_mantle.png
+	mmotee/itemicons/icon_material.png
+	mmotee/itemicons/icon_meat.png
+	mmotee/itemicons/icon_mineral.png
+	mmotee/itemicons/icon_mushroom.png
+	mmotee/itemicons/icon_paper.png
+	mmotee/itemicons/icon_pc_coin.png
+	mmotee/itemicons/icon_pickaxe.png
+	mmotee/itemicons/icon_potato.png
+	mmotee/itemicons/icon_potion_r.png
+	mmotee/itemicons/icon_rifle.png
+	mmotee/itemicons/icon_ring.png
+	mmotee/itemicons/icon_rose.png
+	mmotee/itemicons/icon_shotgun.png
+	mmotee/itemicons/icon_skill_point.png
+	mmotee/itemicons/icon_skin.png
+	mmotee/itemicons/icon_sp_bronek.png
+	mmotee/itemicons/icon_ticket.png
+	mmotee/itemicons/icon_token_coin.png
+	mmotee/itemicons/icon_tomate.png
+	mmotee/itemicons/icon_unknow.png
+	mmotee/itemicons/icon_upgr_weapon.png
+	mmotee/itemicons/icon_wings.png
+	mmotee/itemicons/icon_wool.png
+    mmotee/logo.png
+	mmotee/wings/it19.png
+	mmotee/wings/it20.png
+	mmotee/wings/it21.png
+	mmotee/wings/it22.png
+	mmotee/wings/it23.png
 	particles.png
 	particles/Celshaded_particles.png
 	particles/Green_Particles.png
@@ -1189,49 +1289,6 @@ set(EXPECTED_DATA
 	ui/icons/sidebar.png
     ui/icons/timer_clock.png
 	ui/icons/tools.png
-	ui/itemicons/icon_amulet.png
-	ui/itemicons/icon_az_sword.png
-	ui/itemicons/icon_bamboo.png
-	ui/itemicons/icon_bottle.png
-	ui/itemicons/icon_bouquet_r.png
-	ui/itemicons/icon_bracelet.png
-	ui/itemicons/icon_broken_h.png
-	ui/itemicons/icon_dark_energy.png
-	ui/itemicons/icon_deco_house.png
-	ui/itemicons/icon_door_key.png
-	ui/itemicons/icon_eat.png
-	ui/itemicons/icon_gold.png
-	ui/itemicons/icon_goods.png
-	ui/itemicons/icon_grenade.png
-	ui/itemicons/icon_gun.png
-	ui/itemicons/icon_hammer.png
-	ui/itemicons/icon_horn.png
-	ui/itemicons/icon_kiwi.png
-	ui/itemicons/icon_lucky_box.png
-	ui/itemicons/icon_mantle.png
-	ui/itemicons/icon_material.png
-	ui/itemicons/icon_meat.png
-	ui/itemicons/icon_mineral.png
-	ui/itemicons/icon_mushroom.png
-	ui/itemicons/icon_paper.png
-	ui/itemicons/icon_pc_coin.png
-	ui/itemicons/icon_pickaxe.png
-	ui/itemicons/icon_potato.png
-	ui/itemicons/icon_potion_r.png
-	ui/itemicons/icon_rifle.png
-	ui/itemicons/icon_ring.png
-	ui/itemicons/icon_rose.png
-	ui/itemicons/icon_shotgun.png
-	ui/itemicons/icon_skill_point.png
-	ui/itemicons/icon_skin.png
-	ui/itemicons/icon_sp_bronek.png
-	ui/itemicons/icon_ticket.png
-	ui/itemicons/icon_token_coin.png
-	ui/itemicons/icon_tomate.png
-	ui/itemicons/icon_unknow.png
-	ui/itemicons/icon_upgr_weapon.png
-	ui/itemicons/icon_wings.png
-	ui/itemicons/icon_wool.png
 	ui/menuimages/demos.png
 	ui/menuimages/editor.png
 	ui/menuimages/local_server.png
@@ -1249,11 +1306,6 @@ set(EXPECTED_DATA
     ui/themes/winter.png
     ui/themes/winter_day.map
     ui/themes/winter_night.map
-	wings/it19.png
-	wings/it20.png
-	wings/it21.png
-	wings/it22.png
-	wings/it23.png
 )
 
 if(NOT EXISTS ${PROJECT_SOURCE_DIR}/datasrc/languages/index.json)
@@ -1292,6 +1344,7 @@ set(COPY_FILES
   ${FREETYPE_COPY_FILES}
   ${OPUSFILE_COPY_FILES}
   ${SDL2_COPY_FILES}
+  ${OPENSSL_COPY_FILES}
 )
 file(COPY ${COPY_FILES} DESTINATION .)
 
@@ -1365,6 +1418,7 @@ generate_source("src/generated/server_data.h" "server_content_header")
 
 # Sources
 set_src(BASE GLOB_RECURSE src/base
+  another/kurhelper.h
   color.h
   detect.h
   hash.c
@@ -1374,6 +1428,7 @@ set_src(BASE GLOB_RECURSE src/base
   hash_libtomcrypt.c
   hash_openssl.c
   math.h
+  stringable_enum.h
   system.c
   system.h
   tl/algorithm.h
@@ -1384,6 +1439,7 @@ set_src(BASE GLOB_RECURSE src/base
   tl/sorted_array.h
   tl/string.h
   tl/threading.h
+  threadpool.h
   vmath.h
 )
 set_src(ENGINE_INTERFACE GLOB src/engine
@@ -1401,7 +1457,6 @@ set_src(ENGINE_INTERFACE GLOB src/engine
   map.h
   masterserver.h
   message.h
-  server.h
   serverbrowser.h
   sound.h
   storage.h
@@ -1462,12 +1517,15 @@ set(ENGINE_GENERATED_SHARED src/generated/nethash.cpp src/generated/protocol.cpp
 set_src(GAME_SHARED GLOB src/game
   collision.cpp
   collision.h
+  enum_context.h
+  enum_global.h
   gamecore.cpp
   gamecore.h
   layers.cpp
   layers.h
   mapitems.h
   tuning.h
+  typedef_struct.h
   variables.h
   version.h
   voting.h
@@ -1486,8 +1544,22 @@ set(LIBS ${CMAKE_THREAD_LIBS_INIT} ${ZLIB_LIBRARIES} ${CRYPTO_LIBRARIES} ${PLATF
 # Targets
 add_library(engine-shared EXCLUDE_FROM_ALL OBJECT ${ENGINE_INTERFACE} ${ENGINE_SHARED} ${ENGINE_GENERATED_SHARED} ${BASE})
 add_library(game-shared EXCLUDE_FROM_ALL OBJECT ${GAME_SHARED} ${GAME_GENERATED_SHARED})
-list(APPEND TARGETS_OWN engine-shared game-shared)
 
+########################################################################
+# SLEEPY DISCORD
+########################################################################
+
+file(GLOB ENGINE_SLEEPY "src/teeother/sleepy_discord/*.cpp" "src/teeother/sleepy_discord/*.h")
+add_library(sleepy_discord EXCLUDE_FROM_ALL OBJECT ${BASE} ${GAME_SHARED} ${GAME_GENERATED_SHARED} ${ENGINE_SLEEPY})
+
+# Includes
+target_include_directories(sleepy_discord PRIVATE
+    ${asio_INCLUDE_DIR}
+    ${CRYPTO_INCLUDE_DIRS}
+    ${CPR_INCLUDE_DIR}
+    ${WEBSOCKETPP_INCLUDE_DIR})
+
+list(APPEND TARGETS_OWN engine-shared game-shared sleepy_discord)
 
 ########################################################################
 # CLIENT
@@ -1582,47 +1654,10 @@ endif()
 
 # Sources
 set_src(ENGINE_SERVER GLOB src/engine/server
-  register.cpp
-  register.h
-  server.cpp
-  server.h
+
 )
 set_src(GAME_SERVER GLOB_RECURSE src/game/server
-  alloc.h
-  entities/character.cpp
-  entities/character.h
-  entities/flag.cpp
-  entities/flag.h
-  entities/laser.cpp
-  entities/laser.h
-  entities/pickup.cpp
-  entities/pickup.h
-  entities/projectile.cpp
-  entities/projectile.h
-  entity.cpp
-  entity.h
-  eventhandler.cpp
-  eventhandler.h
-  gamecontext.cpp
-  gamecontext.h
-  gamecontroller.cpp
-  gamecontroller.h
-  gamemodes/ctf.cpp
-  gamemodes/ctf.h
-  gamemodes/dm.cpp
-  gamemodes/dm.h
-  gamemodes/lms.cpp
-  gamemodes/lms.h
-  gamemodes/lts.cpp
-  gamemodes/lts.h
-  gamemodes/mod.cpp
-  gamemodes/mod.h
-  gamemodes/tdm.cpp
-  gamemodes/tdm.h
-  gameworld.cpp
-  gameworld.h
-  player.cpp
-  player.h
+
 )
 set(GAME_GENERATED_SERVER
   src/generated/server_data.cpp
@@ -1636,20 +1671,20 @@ else()
 endif()
 
 # Libraries
-set(LIBS_SERVER ${LIBS})
+#set(LIBS_SERVER ${LIBS})
 
 # Target
-set(TARGET_SERVER ${SERVER_EXECUTABLE})
-add_executable(${TARGET_SERVER}
-  ${DEPS}
-  ${SERVER_SRC}
-  ${SERVER_ICON}
-  $<TARGET_OBJECTS:engine-shared>
-  $<TARGET_OBJECTS:game-shared>
-)
-target_link_libraries(${TARGET_SERVER} ${LIBS_SERVER})
-list(APPEND TARGETS_OWN ${TARGET_SERVER})
-list(APPEND TARGETS_LINK ${TARGET_SERVER})
+#set(TARGET_SERVER ${SERVER_EXECUTABLE})
+#add_executable(${TARGET_SERVER}
+#  ${DEPS}
+#  ${SERVER_SRC}
+#  ${SERVER_ICON}
+#  $<TARGET_OBJECTS:engine-shared>
+#  $<TARGET_OBJECTS:game-shared>
+#)
+#target_link_libraries(${TARGET_SERVER} ${LIBS_SERVER})
+#list(APPEND TARGETS_OWN ${TARGET_SERVER})
+#list(APPEND TARGETS_LINK ${TARGET_SERVER})
 
 if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   set(SERVER_LAUNCHER_SRC src/osxlaunch/server.mm)
@@ -2103,23 +2138,24 @@ foreach(target ${TARGETS_LINK})
 endforeach()
 
 foreach(target ${TARGETS_OWN})
-  if(MSVC)
-    target_compile_options(${target} PRIVATE /W3)
-    target_compile_options(${target} PRIVATE /wd4244) # Possible loss of data (float -> int, int -> float, etc.).
-    target_compile_options(${target} PRIVATE /wd4267) # Possible loss of data (size_t - int on win64).
-    target_compile_options(${target} PRIVATE /wd4800) # Implicit conversion of int to bool.
-  endif()
-  if(OUR_FLAGS_OWN)
-    target_compile_options(${target} PRIVATE ${OUR_FLAGS_OWN})
-  endif()
-  target_include_directories(${target} PRIVATE ${PROJECT_BINARY_DIR}/src)
-  target_include_directories(${target} PRIVATE src)
-  target_compile_definitions(${target} PRIVATE $<$<CONFIG:Debug>:CONF_DEBUG>)
-  target_include_directories(${target} PRIVATE ${ZLIB_INCLUDE_DIRS})
-  if(CRYPTO_FOUND)
+    if(MSVC)
+        target_compile_options(${target} PRIVATE /W3)
+        target_compile_options(${target} PRIVATE /wd4244) # Possible loss of data (float -> int, int -> float, etc.).
+        target_compile_options(${target} PRIVATE /wd4267) # Possible loss of data (size_t - int on win64).
+        target_compile_options(${target} PRIVATE /wd4800) # Implicit conversion of int to bool.
+    endif()
+
+    if(OUR_FLAGS_OWN)
+        target_compile_options(${target} PRIVATE ${OUR_FLAGS_OWN})
+    endif()
+
+    target_include_directories(${target} PRIVATE ${PROJECT_BINARY_DIR}/src)
+    target_include_directories(${target} PRIVATE src)
+    target_compile_definitions(${target} PRIVATE $<$<CONFIG:Debug>:CONF_DEBUG>)
+    target_include_directories(${target} PRIVATE ${ZLIB_INCLUDE_DIRS})
     target_compile_definitions(${target} PRIVATE CONF_OPENSSL)
     target_include_directories(${target} PRIVATE ${CRYPTO_INCLUDE_DIRS})
-  endif()
+
 endforeach()
 
 foreach(target ${TARGETS_DEP})

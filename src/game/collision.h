@@ -8,10 +8,16 @@
 class CCollision
 {
 	class CTile *m_pTiles;
+
+	/*another*/
+	int *m_ParseTiles;
+	int GetParseTile(int x, int y) const;
+	/*end another*/
+
 	int m_Width;
 	int m_Height;
-	class CLayers *m_pLayers;
 
+	class CLayers *m_pLayers;
 	bool IsTile(int x, int y, int Flag=COLFLAG_SOLID) const;
 	int GetTile(int x, int y) const;
 
@@ -28,11 +34,18 @@ public:
 	bool CheckPoint(float x, float y, int Flag=COLFLAG_SOLID) const { return IsTile(round_to_int(x), round_to_int(y), Flag); }
 	bool CheckPoint(vec2 Pos, int Flag=COLFLAG_SOLID) const { return CheckPoint(Pos.x, Pos.y, Flag); }
 	int GetCollisionAt(float x, float y) const { return GetTile(round_to_int(x), round_to_int(y)); }
+
+	/*another*/
+	int GetParseTilesAt(float x, float y) const { return GetParseTile(round_to_int(x), round_to_int(y)); }
+	int FastIntersectLine(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *pOutBeforeCollision) const;
+	vec2 FindDirCollision(int CheckNum, vec2 SourceVec, char Cord, char SumSymbol);
+	/*end another*/
+
 	int GetWidth() const { return m_Width; };
 	int GetHeight() const { return m_Height; };
 	int IntersectLine(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *pOutBeforeCollision) const;
 	void MovePoint(vec2 *pInoutPos, vec2 *pInoutVel, float Elasticity, int *pBounces) const;
-	void MoveBox(vec2 *pInoutPos, vec2 *pInoutVel, vec2 Size, float Elasticity, bool *pDeath=0) const;
+	void MoveBox(vec2 *pInoutPos, vec2 *pInoutVel, vec2 Size, float Elasticity, bool *pDeath=NULL) const;
 	bool TestBox(vec2 Pos, vec2 Size, int Flag=COLFLAG_SOLID) const;
 };
 

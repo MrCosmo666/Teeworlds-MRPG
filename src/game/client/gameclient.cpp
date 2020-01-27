@@ -48,12 +48,14 @@
 #include "components/notifications.h"
 #include "components/particles.h"
 #include "components/players.h"
+#include "components/questing_processing.h"
 #include "components/nameplates.h"
 #include "components/scoreboard.h"
 #include "components/skins.h"
 #include "components/sounds.h"
 #include "components/spectator.h"
 #include "components/stats.h"
+#include "components/talktext.h"
 #include "components/voting.h"
 
 //mmotee thnx gamer client # dune
@@ -120,18 +122,17 @@ static CDamageInd gsDamageInd;
 static CVoting gs_Voting;
 static CSpectator gs_Spectator;
 static CStats gs_Stats;
-
 static CPlayers gs_Players;
 static CNamePlates gs_NamePlates;
 static CItems gs_Items;
 static CMapImages gs_MapImages;
-
 static CMapLayers gs_MapLayersBackGround(CMapLayers::TYPE_BACKGROUND);
 static CMapLayers gs_MapLayersForeGround(CMapLayers::TYPE_FOREGROUND);
 
 // mmotee thnx gamer client # dune
 static CCSkinChanger gs_SkinChanger;
-
+static CTalkText gs_TalkText;
+static CQuestingProcessing gs_QuestingProcess;
 
 CGameClient::CStack::CStack() { m_Num = 0; }
 void CGameClient::CStack::Add(class CComponent *pComponent) { m_paComponents[m_Num++] = pComponent; }
@@ -238,11 +239,12 @@ void CGameClient::OnConsoleInit()
 	m_pParticles = &::gs_Particles;
 	m_pMenus = &::gs_Menus;
 
-	//mmotee client loading all skins
+	//mmotee
 	m_pSkins = &::gs_Skins;
 	m_pSkinChanger = &::gs_SkinChanger;
-
-	
+	m_pTalkText = &::gs_TalkText;
+	m_pQuestProcess = &::gs_QuestingProcess;
+	//
 	m_pCountryFlags = &::gs_CountryFlags;
 	m_pChat = &::gs_Chat;
 	m_pFlow = &::gs_Flow;
@@ -262,7 +264,6 @@ void CGameClient::OnConsoleInit()
 
 	// make a list of all the systems, make sure to add them in the corrent render order
 	m_All.Add(m_pSkins);
-
 	m_All.Add(m_pSkinChanger);
 	m_All.Add(&m_pSkinChanger->m_GameSkins);
 	m_All.Add(&m_pSkinChanger->m_Particles);
@@ -295,7 +296,9 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(&m_pParticles->m_RenderMmoEffects);
 	m_All.Add(&m_pParticles->m_RenderTeleports);
 	m_All.Add(&m_pParticles->m_RenderMmoProj);
-
+	m_All.Add(m_pTalkText);
+	m_All.Add(m_pQuestProcess);
+	//
 	m_All.Add(m_pDamageind);
 	m_All.Add(&gs_Hud);
 	m_All.Add(&gs_Spectator);
@@ -314,6 +317,9 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(m_pGameConsole);
 
 	// build the input stack
+	// mmotee
+	m_Input.Add(m_pTalkText); // for pressing esc to remove it
+	//
 	m_Input.Add(&m_pMenus->m_Binder); // this will take over all input when we want to bind a key
 	m_Input.Add(&m_pBinds->m_SpecialBinds);
 	m_Input.Add(m_pGameConsole);
@@ -1054,8 +1060,8 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 	// mmotee
 	else if(MsgId == NETMSGTYPE_SV_AFTERISMMOSERVER)
 	{
-		dbg_msg("test", "Here good check");
 		m_ConnectedMmoServer = true;
+		m_pMenus->SetAuthState(true);
 	}
 
 	else if (MsgId == NETMSGTYPE_SV_EQUIPITEMS)
@@ -1450,11 +1456,8 @@ void CGameClient::OnNewSnapshot()
 			{
 				const CNetObj_Mmo_ClientInfo* pInfo = (const CNetObj_Mmo_ClientInfo*)pData;
 				int ClientID = Item.m_ID;
-				if (pInfo->m_Local)
-				{
+				if(pInfo->m_Local)
 					m_LocalClientID = ClientID;
-					m_Snap.m_pLocalStats = pInfo;
-				}
 
 				CClientData* pClient = &m_aClients[ClientID];
 				IntsToStr(pInfo->m_aName, 4, pClient->m_aName);
@@ -1466,6 +1469,7 @@ void CGameClient::OnNewSnapshot()
 					pClient->m_aUseCustomColors[p] = pInfo->m_aUseCustomColors[p];
 					pClient->m_aSkinPartColors[p] = pInfo->m_aSkinPartColors[p];
 				}
+				pClient->m_pLocalStats = pInfo;
 				pClient->UpdateRenderInfo(this, ClientID, true);
 			}
 		}
@@ -1865,6 +1869,18 @@ void CGameClient::CClientData::Reset(CGameClient *pGameClient, int ClientID)
 	}
 
 	UpdateRenderInfo(pGameClient, ClientID, false);
+}
+
+void CGameClient::SendAuthPack(const char* Login, const char* Password, bool StateRegistered)
+{
+	if (m_pClient->State() == IClient::STATE_ONLINE && MmoServer())
+	{
+		CNetMsg_Cl_ClientAuth Msg;
+		Msg.m_Login = Login;
+		Msg.m_Password = Password;
+		Msg.m_SelectRegister = StateRegistered;
+		Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
+	}
 }
 
 void CGameClient::DoEnterMessage(const char *pName, int ClientID, int Team)

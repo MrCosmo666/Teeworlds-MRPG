@@ -83,7 +83,10 @@ private:
 	static void ui_draw_checkbox(const void *id, const char *text, int checked, const CUIRect *r, const void *extra);
 	static void ui_draw_checkbox_number(const void *id, const char *text, int checked, const CUIRect *r, const void *extra);
 	*/
+public:
 	int DoEditBox(void *pID, const CUIRect *pRect, char *pStr, unsigned StrSize, float FontSize, float *pOffset, bool Hidden=false, int Corners=CUI::CORNER_ALL);
+
+private:
 	void DoEditBoxOption(void *pID, char *pOption, int OptionLength, const CUIRect *pRect, const char *pStr, float VSplitVal, float *pOffset, bool Hidden=false);
 	void DoScrollbarOption(void *pID, int *pOption, const CUIRect *pRect, const char *pStr, int Min, int Max, bool Infinite=false);
 	float DoDropdownMenu(void *pID, const CUIRect *pRect, const char *pStr, float HeaderHeight, FDropdownCallback pfnCallback);
@@ -294,7 +297,27 @@ private:
 	int m_ActivePage;
 	int m_MenuPage;
 	int m_MenuPageOld;
-	bool m_MenuActive;
+
+	// auth mmo and it state ESC / AUTH / NO ACTIVE
+	enum EAuthColorMessage
+	{
+		WARNING_MESSAGE,
+		ERROR_MESSAGE,
+		SUCCESS_MESSAGE
+	};
+	enum EMenuState
+	{
+		NOACTIVE,
+		ESCSTATE,
+		AUTHSTATE,
+	};
+	int m_MenuActiveID;
+	bool m_ShowAuthWindow;
+	bool m_ActiveEditbox;
+	char aAuthResultReason[256];
+	vec4 aAuthResultColor;
+	//
+
 	int m_SidebarTab;
 	bool m_SidebarActive;
 	bool m_ShowServerDetails;
@@ -705,7 +728,17 @@ private:
 	void RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background);
 	void RenderRgbSliders(CUIRect* pMainView, CUIRect* pButton, int &r, int &g, int &b, bool Enabled);
 	void RenderSettingsMmoChangerGeneric(CUIRect MainView, CCSkinChanger::CTextureEntity* pEntities, char* pConfigStr, const char* pLabel, int ItemsPerRow, float Ratio);
+	void RenderCursor(int ImageID, vec4 Color);
+	
+	// auth state for mmotee
+	void RenderAuthWindow();
 
+public:
+	void OnAuthMessage(int MsgType, void* pRawMsg);
+	void SetAuthState(bool ShowWindowAuth);
+	void setAuthMessage(const char *Message, int EAuthColorMessage);
+
+private:
 	// found in menus_settings.cpp
 	void RenderLanguageSelection(CUIRect MainView, bool Header=true);
 	void RenderThemeSelection(CUIRect MainView, bool Header=true);
@@ -739,7 +772,7 @@ private:
 
 	void DoJoystickAxisPicker(CUIRect View);
 
-	void SetActive(bool Active);
+	void SetActive(int ActiveID);
 
 	void InvokePopupMenu(void *pID, int Flags, float X, float Y, float W, float H, int (*pfnFunc)(CMenus *pMenu, CUIRect Rect), void *pExtra=0);
 	void DoPopupMenu();
@@ -769,16 +802,23 @@ public:
 
 	void RenderLoading();
 
-	bool IsActive() const { return m_MenuActive; }
+	int IsActive() const { return m_MenuActiveID; }
+	bool IsActiveEditbox() const { return m_ActiveEditbox; }
 
 	virtual void OnInit();
 
+	virtual void OnMessage(int MsgType, void* pRawMsg);
 	virtual void OnConsoleInit();
 	virtual void OnShutdown();
 	virtual void OnStateChange(int NewState, int OldState);
 	virtual void OnReset();
+	virtual void OnRelease();
 	virtual void OnRender();
+
+	// mmotee impl
+	int GetESCState() const;
 	virtual bool OnInput(IInput::CEvent Event);
+
 	virtual bool OnMouseMove(float x, float y);
 };
 #endif
