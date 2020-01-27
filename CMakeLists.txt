@@ -146,29 +146,27 @@ function(add_c_compiler_flag_if_supported VARIABLE FLAG)
 endfunction()
 
 if(NOT MSVC)
+  if(CMAKE_VERSION VERSION_LESS 3.1 OR TARGET_OS STREQUAL "mac")
+    check_cxx_compiler_flag(-std=gnu++11 FLAG_SUPPORTED_std_gnu__11)
+    if(FLAG_SUPPORTED_std_gnu__11)
+      if(CMAKE_CXX_FLAGS)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
+      else()
+        set(CMAKE_CXX_FLAGS -std=gnu++11)
+      endif()
+    endif()
+  endif()
+
   # Protect the stack pointer.
   # -fstack-protector-all doesn't work on MinGW.
-  add_c_compiler_flag_if_supported(OUR_FLAGS -fstack-protector-strong)
-
-  # Protect the stack from clashing.
-  add_c_compiler_flag_if_supported(OUR_FLAGS -fstack-clash-protection)
-
-  # Control-flow protection. Should protect against ROP.
-  add_c_compiler_flag_if_supported(OUR_FLAGS -fcf-protection)
+  add_c_compiler_flag_if_supported(OUR_FLAGS -fstack-protector-all)
 
   # Inaccurate floating point numbers cause problems on mingw-w64-gcc when
   # compiling for x86, might cause problems elsewhere. So don't store floats
   # in registers but keep them at higher accuracy.
+
   if(TARGET_ARCH STREQUAL "x86")
     add_c_compiler_flag_if_supported(OUR_FLAGS -ffloat-store)
-  endif()
-
-  # gcc < 4.10 chokes on _mm_pause on x86 without SSE support.
-  if(TARGET_ARCH STREQUAL "x86")
-    check_c_source_compiles("#include <immintrin.h>\nint main() { _mm_pause(); return 0; }" MM_PAUSE_WORKS_WITHOUT_MSSE2)
-    if(NOT MM_PAUSE_WORKS_WITHOUT_MSSE2)
-      add_c_compiler_flag_if_supported(OUR_FLAGS -msse2)
-    endif()
   endif()
 
   if(TARGET_OS STREQUAL "mac")
@@ -188,6 +186,12 @@ if(NOT MSVC)
   add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wno-missing-field-initializers)
   add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wformat=2) # Warn about format strings.
   add_c_compiler_flag_if_supported(OUR_FLAGS_DEP -Wno-implicit-function-declaration)
+  add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wduplicated-cond)
+  add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wduplicated-branches)
+  add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wlogical-op)
+  add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wrestrict)
+  # TODO: Enable for C++ code except gtest
+  #add_cxx_compiler_flag_if_supported(OUR_FLAGS_OWN "-Wuseless-cast")
 endif()
 
 if(NOT MSVC)
