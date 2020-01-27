@@ -1,11 +1,3 @@
-[submodule "datasrc/languages"]
-	path = datasrc/languages
-	url = git://github.com/teeworlds/teeworlds-translation.git
-	branch = master
-[submodule "datasrc/maps"]
-	path = datasrc/maps
-	url = git://github.com/teeworlds/teeworlds-maps.git
-	branch = master
 [submodule "MmoTee-Libs"]
-	path = MmoTee-Libs
-	url = https://github.com/kurosio/MmoTee-Libs
+	path = other
+	url = https://github.com/kurosio/other
