@@ -1,50 +1,28 @@
 if(NOT PREFER_BUNDLED_LIBS)
   set(CMAKE_MODULE_PATH ${ORIGINAL_CMAKE_MODULE_PATH})
-  find_package(ZLIB)
+  find_package(GLEW)
   set(CMAKE_MODULE_PATH ${OWN_CMAKE_MODULE_PATH})
-  if(ZLIB_FOUND)
-    set(ZLIB_BUNDLED OFF)
-    set(ZLIB_DEP)
+  if(GLEW_FOUND)
+    set(GLEW_BUNDLED OFF)
+    set(GLEW_DEP)
   endif()
 endif()
 
-if(NOT ZLIB_FOUND)
-  set(ZLIB_BUNDLED ON)
-  set(ZLIB_SRC_DIR src/engine/external/zlib)
-  set_src(ZLIB_SRC GLOB ${ZLIB_SRC_DIR}
-    adler32.c
-    compress.c
-    crc32.c
-    crc32.h
-    deflate.c
-    deflate.h
-    gzguts.h
-    infback.c
-    inffast.c
-    inffast.h
-    inffixed.h
-    inflate.c
-    inflate.h
-    inftrees.c
-    inftrees.h
-    trees.c
-    trees.h
-    uncompr.c
-    zconf.h
-    zlib.h
-    zutil.c
-    zutil.h
-  )
-  add_library(zlib EXCLUDE_FROM_ALL OBJECT ${ZLIB_SRC})
-  set(ZLIB_INCLUDEDIR ${ZLIB_SRC_DIR})
-  target_include_directories(zlib PRIVATE ${ZLIB_INCLUDEDIR})
+if(NOT GLEW_FOUND)
+  set(GLEW_BUNDLED ON)
+  set(GLEW_SRC_DIR src/engine/external/glew)
+  set_src(GLEW_SRC GLOB ${GLEW_SRC_DIR} glew.c)
+  set_src(GLEW_INCLUDES GLOB ${GLEW_SRC_DIR}/GL eglew.h glew.h glxew.h wglew.h)
+  add_library(glew EXCLUDE_FROM_ALL OBJECT ${GLEW_SRC} ${GLEW_INCLUDES})
+  set(GLEW_INCLUDEDIR ${GLEW_SRC_DIR})
+  target_include_directories(glew PRIVATE ${GLEW_INCLUDEDIR})
 
-  set(ZLIB_DEP $<TARGET_OBJECTS:zlib>)
-  set(ZLIB_INCLUDE_DIRS ${ZLIB_INCLUDEDIR})
-  set(ZLIB_LIBRARIES)
+  set(GLEW_DEP $<TARGET_OBJECTS:glew>)
+  set(GLEW_INCLUDE_DIRS ${GLEW_INCLUDEDIR})
+  set(GLEW_LIBRARIES)
 
-  list(APPEND TARGETS_DEP zlib)
+  list(APPEND TARGETS_DEP glew)
 
   include(FindPackageHandleStandardArgs)
-  find_package_handle_standard_args(ZLIB DEFAULT_MSG ZLIB_INCLUDEDIR)
+  find_package_handle_standard_args(GLEW DEFAULT_MSG GLEW_INCLUDEDIR)
 endif()
