@@ -12,27 +12,27 @@ jobs:
         - os: ubuntu-latest
           cmake-args: -G "Unix Makefiles"
           build-args: --parallel
-          package-file: DDNet-*-linux_x86_64.tar.xz
+          package-file: mmoteeworlds-*-linux_x86_64.tar.xz
           env:
             CFLAGS: -Wdeclaration-after-statement -Werror
             CXXFLAGS: -Werror
         - os: ubuntu-16.04
           cmake-path: /usr/bin/
           cmake-args: -G "Unix Makefiles"
-          package-file: DDNet-*-linux_x86_64.tar.xz
+          package-file: mmoteeworlds-*-linux_x86_64.tar.xz
           env:
             CFLAGS: -Wdeclaration-after-statement -Werror
             CXXFLAGS: -Werror
         - os: macOS-latest
           cmake-args: -G "Unix Makefiles"
           build-args: --parallel
-          package-file: DDNet-*-osx.dmg
+          package-file: mmoteeworlds-*-osx.dmg
           env:
             CFLAGS: -Wdeclaration-after-statement -Werror
             CXXFLAGS: -Werror
         - os: windows-latest
           cmake-args: -G "Visual Studio 16 2019" -A x64
-          package-file: DDNet-*-win64.zip
+          package-file: mmoteeworlds-*-win64.zip
           env:
             CFLAGS: /WX
             CXXFLAGS: /WX
@@ -64,11 +64,6 @@ jobs:
         ${{ matrix.cmake-path }}cmake --version
         ${{ matrix.cmake-path }}cmake ${{ matrix.cmake-args }} -DCMAKE_BUILD_TYPE=Debug -Werror=dev -DDOWNLOAD_GTEST=ON -DDEV=ON -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG=. ..
         ${{ matrix.cmake-path }}cmake --build . --config Debug ${{ matrix.build-args }} --target everything
-    - name: Test debug
-      run: |
-        cd debug
-        ${{ matrix.cmake-path }}cmake --build . --config Debug ${{ matrix.build-args }} --target run_tests
-        ./DDNet-Server shutdown
     - name: Build in release mode
       env: ${{ matrix.env }}
       run: |
@@ -76,11 +71,6 @@ jobs:
         cd release
         ${{ matrix.cmake-path }}cmake ${{ matrix.cmake-args }} -DCMAKE_BUILD_TYPE=Release -Werror=dev -DDOWNLOAD_GTEST=ON -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=. ..
         ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target everything
-    - name: Test release
-      run: |
-        cd release
-        ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target run_tests
-        ./DDNet-Server shutdown
     - name: Package
       run: |
         cd release
