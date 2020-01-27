@@ -1550,16 +1550,16 @@ add_library(game-shared EXCLUDE_FROM_ALL OBJECT ${GAME_SHARED} ${GAME_GENERATED_
 ########################################################################
 
 file(GLOB ENGINE_SLEEPY "src/teeother/sleepy_discord/*.cpp" "src/teeother/sleepy_discord/*.h")
-add_library(sleepy_discord EXCLUDE_FROM_ALL OBJECT ${BASE} ${GAME_SHARED} ${GAME_GENERATED_SHARED} ${ENGINE_SLEEPY})
+#add_library(sleepy_discord EXCLUDE_FROM_ALL OBJECT ${BASE} ${GAME_SHARED} ${GAME_GENERATED_SHARED} ${ENGINE_SLEEPY})
 
 # Includes
-target_include_directories(sleepy_discord PRIVATE
-    ${asio_INCLUDE_DIR}
-    ${CRYPTO_INCLUDE_DIRS}
-    ${CPR_INCLUDE_DIR}
-    ${WEBSOCKETPP_INCLUDE_DIR})
+#target_include_directories(sleepy_discord PRIVATE
+#    ${asio_INCLUDE_DIR}
+#    ${CRYPTO_INCLUDE_DIRS}
+#    ${CPR_INCLUDE_DIR}
+#    ${WEBSOCKETPP_INCLUDE_DIR})
 
-list(APPEND TARGETS_OWN engine-shared game-shared sleepy_discord)
+#list(APPEND TARGETS_OWN engine-shared game-shared sleepy_discord)
 
 ########################################################################
 # CLIENT
