@@ -1,0 +1,3 @@
+[submodule "other"]
+	path = other
+	url = https://github.com/kurosio/libs-mworlds
