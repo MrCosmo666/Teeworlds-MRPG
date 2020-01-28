@@ -1,43 +1,43 @@
 cmake_minimum_required(VERSION 2.8)
 
 file(STRINGS src/game/version.h VERSION_LINE
-  LIMIT_COUNT 1
-  REGEX GAME_RELEASE_VERSION
+    LIMIT_COUNT 1
+    REGEX GAME_RELEASE_VERSION
 )
 
 if(VERSION_LINE MATCHES "\"([0-9]+)\\.([0-9]+)\\.([0-9]+|[0-9]+\\.[0-9]+)\"")
-  set(VERSION_MAJOR ${CMAKE_MATCH_1})
-  set(VERSION_MINOR ${CMAKE_MATCH_2})
-  set(VERSION_PATCH ${CMAKE_MATCH_3})
+    set(VERSION_MAJOR ${CMAKE_MATCH_1})
+    set(VERSION_MINOR ${CMAKE_MATCH_2})
+    set(VERSION_PATCH ${CMAKE_MATCH_3})
 elseif(VERSION_LINE MATCHES "\"([0-9]+)\\.([0-9]+)\"")
-  set(VERSION_MAJOR ${CMAKE_MATCH_1})
-  set(VERSION_MINOR ${CMAKE_MATCH_2})
-  set(VERSION_PATCH "0")
+    set(VERSION_MAJOR ${CMAKE_MATCH_1})
+    set(VERSION_MINOR ${CMAKE_MATCH_2})
+    set(VERSION_PATCH "0")
 else()
-  message(FATAL_ERROR "Couldn't parse version from src/game/version.h")
-endif()
-
-if(POLICY CMP0048)
-  cmake_policy(SET CMP0048 NEW)
-  project(mmoteeworlds VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
-else()
-  project(mmoteeworlds)
-  set(PROJECT_VERSION_MAJOR ${VERSION_MAJOR})
-  set(PROJECT_VERSION_MINOR ${VERSION_MINOR})
-  set(PROJECT_VERSION_PATCH ${VERSION_PATCH})
-  set(PROJECT_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
+    message(FATAL_ERROR "Couldn't parse version from src/game/version.h")
 endif()
 
 if(POLICY CMP0072)
-  cmake_policy(SET CMP0072 OLD)
+    cmake_policy(SET CMP0072 OLD)
 endif()
 
 if(POLICY CMP0091)
-  cmake_policy(SET CMP0091 NEW)
+    cmake_policy(SET CMP0091 NEW)
 endif()
 
 if(POLICY CMP0092)
-  cmake_policy(SET CMP0092 NEW)
+    cmake_policy(SET CMP0092 NEW)
+endif()
+
+if(POLICY CMP0048)
+    cmake_policy(SET CMP0048 NEW)
+    project(mmoteeworlds VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
+else()
+    project(mmoteeworlds)
+    set(PROJECT_VERSION_MAJOR ${VERSION_MAJOR})
+    set(PROJECT_VERSION_MINOR ${VERSION_MINOR})
+    set(PROJECT_VERSION_PATCH ${VERSION_PATCH})
+    set(PROJECT_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 endif()
 
 set(ORIGINAL_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
@@ -47,17 +47,17 @@ set(OWN_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 set(CMAKE_MODULE_PATH ${OWN_CMAKE_MODULE_PATH})
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-  set(TARGET_BITS "32")
+    set(TARGET_BITS "32")
 else()
-  set(TARGET_BITS "64")
+    set(TARGET_BITS "64")
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  set(TARGET_OS "windows")
+    set(TARGET_OS "windows")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-  set(TARGET_OS "linux")
+    set(TARGET_OS "linux")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-  set(TARGET_OS "mac")
+    set(TARGET_OS "mac")
 endif()
 
 include(CheckCCompilerFlag)
@@ -66,14 +66,14 @@ include(CheckSymbolExists)
 
 check_symbol_exists(__i386 "" TARGET_ARCH_X86_i386)
 if(TARGET_ARCH_X86_i386)
-  set(TARGET_ARCH x86)
+    set(TARGET_ARCH x86)
 else()
-  set(TARGET_ARCH)
+    set(TARGET_ARCH)
 endif()
 
 set(AUTO_DEPENDENCIES_DEFAULT OFF)
 if(TARGET_OS STREQUAL "windows")
-  set(AUTO_DEPENDENCIES_DEFAULT ON)
+    set(AUTO_DEPENDENCIES_DEFAULT ON)
 endif()
 
 option(CLIENT "Compile client" ON)
@@ -86,17 +86,17 @@ set(OpenGL_GL_PREFERENCE LEGACY)
 
 # Set the default build type to Release
 if(NOT(CMAKE_BUILD_TYPE))
-  if(NOT(DEV))
-    set(CMAKE_BUILD_TYPE Release)
-  else()
-    set(CMAKE_BUILD_TYPE Debug)
-  endif()
+    if(NOT(DEV))
+        set(CMAKE_BUILD_TYPE Release)
+    else()
+        set(CMAKE_BUILD_TYPE Debug)
+    endif()
 endif()
 
 set(DBG $<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>)
 
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-  src/game/version.h
+    src/game/version.h
 )
 
 set(CLIENT_EXECUTABLE mmoteeworlds CACHE STRING "Name of the build client executable")
@@ -363,14 +363,14 @@ function(show_dependency_status OUTPUT_NAME NAME)
   endif()
 endfunction()
 
-show_dependency_status("Curl" CURL)
 if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   show_dependency_status("Dmg tools" DMGTOOLS)
 endif()
-show_dependency_status("Freetype" FREETYPE)
 if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   show_dependency_status("Hdiutil" HDIUTIL)
 endif()
+show_dependency_status("Curl" CURL)
+show_dependency_status("Freetype" FREETYPE)
 show_dependency_status("OpenSSL Crypto" CRYPTO)
 show_dependency_status("Opus" OPUS)
 show_dependency_status("Opusfile" OPUSFILE)
@@ -449,8 +449,6 @@ endif()
 ########################################################################
 
 if(NOT(GTEST_FOUND) AND DOWNLOAD_GTEST)
-  # Change to the 1.9.0 release tag once that works.
-  set(DDNET_GTEST_VERSION 7b6561c56e353100aca8458d7bc49c4e0119bae8)
   configure_file(cmake/Download_GTest_CMakeLists.txt.in googletest-download/CMakeLists.txt)
   execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
     RESULT_VARIABLE result
@@ -480,9 +478,6 @@ if(NOT(GTEST_FOUND) AND DOWNLOAD_GTEST)
 
       if(MSVC)
         foreach(target gtest)
-          # `/w` disables all warnings. This is needed because `gtest` enables
-          # `/WX` (equivalent of `-Werror`) for some reason, breaking builds
-          # when MSVS adds new warnings.
           target_compile_options(${target} PRIVATE $<$<NOT:${DBG}>:/MT> $<${DBG}:/MTd> /w)
         endforeach()
       endif()
