@@ -61,6 +61,7 @@
 	#error missing atomic implementation for this compiler
 #endif
 
+#if !defined(CONF_PLATFORM_MACOSX)
 class semaphore
 {
 	SEMAPHORE sem;
@@ -71,6 +72,7 @@ public:
 	void wait() { sphore_wait(&sem); }
 	void signal() { sphore_signal(&sem); }
 };
+#endif
 
 class lock
 {
