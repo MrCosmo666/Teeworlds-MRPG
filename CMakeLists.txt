@@ -1125,9 +1125,7 @@ set(PACKAGE_TARGETS)
 
 if(CLIENT AND (DMGTOOLS_FOUND OR HDIUTIL))
   file(MAKE_DIRECTORY bundle/client/)
-  file(MAKE_DIRECTORY bundle/server/)
   configure_file(other/bundle/client/Info.plist.in bundle/client/Info.plist)
-  configure_file(other/bundle/server/Info.plist.in bundle/server/Info.plist)
 
   if(HDIUTIL)
     set(DMG_PARAMS --hdiutil ${HDIUTIL})
@@ -1141,13 +1139,7 @@ if(CLIENT AND (DMGTOOLS_FOUND OR HDIUTIL))
     ${TARGET_CLIENT}.app/Contents/Frameworks
     ${TARGET_CLIENT}.app/Contents/MacOS
     ${TARGET_CLIENT}.app/Contents/Resources
-    ${TARGET_SERVER}.app
-    ${TARGET_SERVER}.app/Contents
-    ${TARGET_SERVER}.app/Contents/MacOS
-    ${TARGET_SERVER}.app/Contents/Resources
-    ${TARGET_SERVER}.app/Contents/Resources/data
-    # Needed so the server recognizes the data directory.
-    ${TARGET_SERVER}.app/Contents/Resources/data/mapres
+    ${TARGET_CLIENT}.app/Contents/Resources/data
   )
   set(DMG_MKDIR_COMMANDS)
   foreach(dir ${DMG_MKDIRS})
@@ -1172,15 +1164,10 @@ if(CLIENT AND (DMGTOOLS_FOUND OR HDIUTIL))
 
     DEPENDS
       ${TARGET_CLIENT}
-      ${TARGET_SERVER_LAUNCHER}
-      ${TARGET_SERVER}
       ${PROJECT_BINARY_DIR}/bundle/client/Info.plist
-      ${PROJECT_BINARY_DIR}/bundle/server/Info.plist
       data
       other/bundle/client/PkgInfo
-      other/bundle/server/PkgInfo
       other/icons/${TARGET_CLIENT}.icns
-      other/icons/${TARGET_SERVER}.icns
       scripts/dmg.py
   )
   add_custom_target(package_dmg DEPENDS ${CPACK_PACKAGE_FILE_NAME}.dmg)
