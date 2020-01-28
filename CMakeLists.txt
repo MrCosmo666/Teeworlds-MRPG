@@ -845,12 +845,12 @@ set(GAME_GENERATED_SERVER
   src/generated/server_data.cpp
   src/generated/server_data.h
 )
-set(SERVER_SRC ${ENGINE_SERVER} ${GAME_SERVER} ${GAME_GENERATED_SERVER})
-if(TARGET_OS STREQUAL "windows")
-  set(SERVER_ICON "other/icons/${SERVER_EXECUTABLE}.rc")
-else()
-  set(SERVER_ICON)
-endif()
+#set(SERVER_SRC ${ENGINE_SERVER} ${GAME_SERVER} ${GAME_GENERATED_SERVER})
+#if(TARGET_OS STREQUAL "windows")
+#  set(SERVER_ICON "other/icons/${SERVER_EXECUTABLE}.rc")
+#else()
+#  set(SERVER_ICON)
+#endif()
 
 # Libraries
 #set(LIBS_SERVER ${LIBS})
@@ -868,14 +868,14 @@ endif()
 #list(APPEND TARGETS_OWN ${TARGET_SERVER})
 #list(APPEND TARGETS_LINK ${TARGET_SERVER})
 
-if(TARGET_OS AND TARGET_OS STREQUAL "mac")
-  set(SERVER_LAUNCHER_SRC src/osxlaunch/server.mm)
-  set(TARGET_SERVER_LAUNCHER ${TARGET_SERVER}-Launcher)
-  add_executable(${TARGET_SERVER_LAUNCHER} ${SERVER_LAUNCHER_SRC})
-  target_link_libraries(${TARGET_SERVER_LAUNCHER} ${COCOA})
-  list(APPEND TARGETS_OWN ${TARGET_SERVER_LAUNCHER})
-  list(APPEND TARGETS_LINK ${TARGET_SERVER_LAUNCHER})
-endif()
+#if(TARGET_OS AND TARGET_OS STREQUAL "mac")
+#  set(SERVER_LAUNCHER_SRC src/osxlaunch/server.mm)
+#  set(TARGET_SERVER_LAUNCHER ${TARGET_SERVER}-Launcher)
+#  add_executable(${TARGET_SERVER_LAUNCHER} ${SERVER_LAUNCHER_SRC})
+#  target_link_libraries(${TARGET_SERVER_LAUNCHER} ${COCOA})
+#  list(APPEND TARGETS_OWN ${TARGET_SERVER_LAUNCHER})
+#  list(APPEND TARGETS_LINK ${TARGET_SERVER_LAUNCHER})
+#endif()
 
 ########################################################################
 # VARIOUS TARGETS
@@ -1092,7 +1092,7 @@ set(CMAKE_INSTALL_DEFAULT_COMPONENT_NAME ${PROJECT_NAME})
 
 set(CPACK_TARGETS
   ${TARGET_CLIENT}
-  ${TARGET_SERVER}
+#  ${TARGET_SERVER}
 )
 set(CPACK_DIRS data)
 set(CPACK_FILES
@@ -1107,7 +1107,7 @@ endif()
 if(NOT DEV)
   install(DIRECTORY data DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME} COMPONENT data)
   install(TARGETS ${TARGET_CLIENT} DESTINATION bin COMPONENT client)
-  install(TARGETS ${TARGET_SERVER} DESTINATION bin COMPONENT server)
+#  install(TARGETS ${TARGET_SERVER} DESTINATION bin COMPONENT server)
 endif()
 
 if(DEV)
