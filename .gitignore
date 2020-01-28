@@ -31,7 +31,6 @@ cscope.files
 cscope.out
 
 # CMake
-data
 generated
 
 .ninja_deps
