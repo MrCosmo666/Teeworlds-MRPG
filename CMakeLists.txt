@@ -285,7 +285,7 @@ if(TARGET_OS STREQUAL "windows")
   find_package(OwnICU)
 else()
   set(CMAKE_MODULE_PATH ${ORIGINAL_CMAKE_MODULE_PATH})
-  find_package(ICU)
+  find_package(ICU REQUIRED COMPONENTS uc in)
   set(CMAKE_MODULE_PATH ${OWN_CMAKE_MODULE_PATH})
 endif()
 
