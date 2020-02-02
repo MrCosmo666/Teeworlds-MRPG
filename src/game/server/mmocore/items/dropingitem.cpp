@@ -108,8 +108,8 @@ void CDropingItem::Tick()
 	{			
 		m_Pos = LastPos;
 		m_ActualPos = m_Pos;
-		m_Direction.x *= (100 - 50) / 100.0;
-		m_Direction.y *= (100 - 50) / 65.0;
+		m_Direction.x *= (100 - 50) / 100.0f;
+		m_Direction.y *= (100 - 50) / 65.0f;
 		m_StartTick = Server()->Tick();
 		m_ActualDir = normalize(m_Direction);
 	}

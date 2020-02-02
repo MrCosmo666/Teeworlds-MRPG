@@ -37,7 +37,7 @@ int AccountMainSql::RegisterAccount(int ClientID, const char *Login, const char 
 	if(str_length(Login) > 15 || str_length(Login) < 4 || str_length(Password) > 15 || str_length(Password) < 4)
 	{
 		GS()->ChatFollow(ClientID, "Username / Password must contain 4-15 characters");
-		return (int)SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
+		return SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
 	}
 
 	// информация обо всем подключение
@@ -50,7 +50,7 @@ int AccountMainSql::RegisterAccount(int ClientID, const char *Login, const char 
 	if(RES2->next())
 	{
 		GS()->Chat(ClientID, "Your nick already used change and try again!");
-		return (int)SendAuthCode(ClientID, AUTH_REGISTER_ERROR_NICK);
+		return SendAuthCode(ClientID, AUTH_REGISTER_ERROR_NICK);
 	}
 
 	// устанавливаем айди 
@@ -64,19 +64,20 @@ int AccountMainSql::RegisterAccount(int ClientID, const char *Login, const char 
 	// информация
 	GS()->Chat(ClientID, "Discord group \"{STR}\"", g_Config.m_SvDiscordInviteGroup);
 	GS()->Chat(ClientID, "You can log in: /login <login> <pass>!");
+	return SendAuthCode(ClientID, AUTH_ALL_GOOD);
 }
 
 // Авторизация игрока
 int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Password)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, false);
-	if(!pPlayer) return (int)SendAuthCode(ClientID, AUTH_ALL_UNKNOWN);
+	if(!pPlayer) return SendAuthCode(ClientID, AUTH_ALL_UNKNOWN);
 	
 	// если размер пароля логина мал или слишком большой
 	if(str_length(Login) > 15 || str_length(Login) < 4 || str_length(Password) > 15 || str_length(Password) < 4)
 	{
 		GS()->ChatFollow(ClientID, "Username / Password must contain 4-15 characters");
-		return (int)SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
+		return SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
 	}
 
 	// проверяем логин и пароль и проверяем онлайн игрока
@@ -86,7 +87,7 @@ int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Pa
 	if(!RES->next())
 	{
 		GS()->Chat(ClientID, "Wrong login or password!");
-		return (int)SendAuthCode(ClientID, AUTH_LOGIN_WRONG);
+		return SendAuthCode(ClientID, AUTH_LOGIN_WRONG);
 	}
 
 	const int UserID = RES->getInt("ID");
@@ -94,7 +95,7 @@ int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Pa
 
 	// если игрок уже в игре
 	if(CheckOnlineAccount(UserID) >= 0)
-		return (int)SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
+		return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
 
 	// проверяем ник на правильность
 	CSqlString<32> clear_Nick = CSqlString<32>(GS()->Server()->ClientName(ClientID));
@@ -103,7 +104,7 @@ int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Pa
 	{
 		// если ник не верен из базы данных
 		GS()->Chat(ClientID, "Wrong nickname, use how at registration!");
-		return (int)SendAuthCode(ClientID, AUTH_LOGIN_NICKNAME);
+		return SendAuthCode(ClientID, AUTH_LOGIN_NICKNAME);
 	}
 
 	// если есть такое тогда погнали получать все данные игрока
@@ -134,7 +135,7 @@ int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Pa
 
 	// обновляем дату логина
 	SJK.UD("tw_accounts_data", "LoginDate = CURRENT_TIMESTAMP WHERE ID = '%d'", UserID);
-	return (int)SendAuthCode(ClientID, AUTH_ALL_GOOD);
+	return SendAuthCode(ClientID, AUTH_ALL_GOOD);
 }
 
 // Загрузка данных при успешной авторизации

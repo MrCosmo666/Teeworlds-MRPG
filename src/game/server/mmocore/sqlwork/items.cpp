@@ -583,7 +583,7 @@ bool ItemSql::ClassItems::Remove(int arg_removecount, int arg_settings)
 	if(pPlayer->m_SecurCheckCode <= 0) 
 		return false;
 
-	if(pPlayer->CheckEquipItem(itemid_) > -1)
+	if(pPlayer->CheckEquipItem(itemid_))
 	{
 		int ClientID = pPlayer->GetCID();
 		pPlayer->GS()->ChangeEquipSkin(ClientID, itemid_);

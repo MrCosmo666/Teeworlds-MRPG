@@ -199,6 +199,7 @@ int CPlayerBot::GetMoodNameplacesType(int SnappingClient)
 		return MOOD_FRIENDLY;
 	else if(GetSpawnBot() == SPAWNQUESTNPC)
 		return MOOD_QUESTING;
+	return MOOD_NORMAL;
 }
 
 int CPlayerBot::GetBotLevel() const
