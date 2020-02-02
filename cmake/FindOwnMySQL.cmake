@@ -41,9 +41,7 @@ mark_as_advanced(OWN_MYSQL_LIBRARY OWN_MYSQL_INCLUDEDIR)
 #######################################
 if(NOT(MYSQL_FOUND))
   # [some data may not match dependencies / TODO: later fix it]
-  set(CMAKE_MODULE_PATH ${ORIGINAL_CMAKE_MODULE_PATH})
   find_package(MYSQL)
-  set(CMAKE_MODULE_PATH ${OWN_CMAKE_MODULE_PATH})
 else()
   set(MYSQL_LIBRARIES ${OWN_MYSQL_LIBRARY} ${OWN_MYSQL_CPPCONN_LIBRARY})
   set(MYSQL_INCLUDE_DIRS ${OWN_MYSQL_INCLUDEDIR} ${OWN_MYSQL_CPPCONN_INCLUDEDIR})
