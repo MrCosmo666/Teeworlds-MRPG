@@ -60,10 +60,6 @@ public:
 	/* Destructor */
 	virtual ~CEntity();
 
-	// helper
-	//#define SEARCH_ENTITY(_ENTENUM) \
-	//	for(CEntity *pEnt = GameWorld()->FindFirst(_ENTENUM); pEnt; pEnt = pEnt->TypeNext()) \
-
 	/* Objects */
 	class CGameWorld *GameWorld()		{ return m_pGameWorld; }
 	class CGS *GS()	{ return m_pGameWorld->GS(); }
