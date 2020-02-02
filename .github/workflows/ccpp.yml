@@ -43,12 +43,12 @@ jobs:
       if: contains(matrix.os, 'ubuntu')
       run: |
         sudo apt-get update -y
-        sudo apt-get install pkg-config cmake libfreetype6-dev libsdl2-dev -y
+        sudo apt-get install pkg-config cmake libfreetype6-dev libsdl2-dev libicu-dev -y
     - name: Prepare MacOS
       if: contains(matrix.os, 'macOS')
       run: |
         brew update
-        brew install pkg-config freetype sdl2
+        brew install pkg-config freetype sdl2 icu4c
     - name: Build in debug mode
       env: ${{ matrix.env }}
       run: |
