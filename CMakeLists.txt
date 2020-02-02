@@ -274,8 +274,6 @@ if(NOT CMAKE_CROSSCOMPILING)
   find_package(PkgConfig)
 endif()
 
-
-
 ## own packages
 find_package(ZLIB)
 find_package(Pnglite)
@@ -290,7 +288,6 @@ find_package(Crypto)
 if(TARGET_OS AND TARGET_OS STREQUAL "windows")
   find_package(MySQL)
   find_package(OwnICU)
-  set(Boost_INCLUDE_DIRS "other/boost/include")
 
 elseif(TARGET_OS AND TARGET_OS STREQUAL "linux")
   find_package(MySQL)
@@ -327,6 +324,45 @@ if(TARGET_OS AND TARGET_OS STREQUAL "mac")
     set(HDIUTIL_FOUND OFF)
   endif()
 endif()
+
+########################################################################
+# (DEPENDENCIES SUB) LIBRARIES AND INCLUDES FOR CLIENT/SERVER AND COMPONENTS
+########################################################################
+    
+# clients lib
+set(CLIENT_LIBRARIES
+  ${CURL_LIBRARIES} 
+  ${FREETYPE_LIBRARIES} 
+  ${PNGLITE_LIBRARIES} 
+  ${SDL2_LIBRARIES} 
+  ${WAVPACK_LIBRARIES} 
+  ${OPUSFILE_LIBRARIES} 
+  ${OPUS_LIBRARIES})
+
+# client includes
+set(CLIENT_INCLUDES_DIRS
+  ${CURL_INCLUDE_DIRS} 
+  ${FREETYPE_INCLUDE_DIRS} 
+  ${OPUSFILE_INCLUDE_DIRS} 
+  ${OPUS_INCLUDE_DIRS} 
+  ${PNGLITE_INCLUDE_DIRS} 
+  ${SDL2_INCLUDE_DIRS} 
+  ${WAVPACK_INCLUDE_DIRS})
+
+# server lib
+set(SERVER_LIBRARIES
+  ${MYSQL_LIBRARIES} 
+  ${ICU_LIBRARIES})
+
+# server includes
+if(NOT(Boost_INCLUDES_DIRS))
+  set(Boost_INCLUDE_DIRS "other/boost/include")
+endif()
+
+set(SERVER_INCLUDES_DIRS
+  ${Boost_INCLUDE_DIRS} 
+  ${ICU_INCLUDE_DIRS}
+  ${MYSQL_INCLUDE_DIRS})
 
 message(STATUS "******** Mmo ( Teeworlds) ********")
 message(STATUS "Target OS: ${TARGET_OS} ${TARGET_BITS}bit")
@@ -753,24 +789,7 @@ if(CLIENT_COMPILE)
     src/generated/client_data.h
   )
   set(CLIENT_SRC ${PLATFORM_CLIENT} ${ENGINE_CLIENT} ${GAME_CLIENT} ${GAME_EDITOR} ${GAME_GENERATED_CLIENT})
-
   set(DEPS_CLIENT ${DEPS} ${PNGLITE_DEP} ${WAVPACK_DEP})
-
-  # Libraries
-  set(LIBS_CLIENT
-    ${LIBS}
-    ${CURL_LIBRARIES}
-    ${FREETYPE_LIBRARIES}
-    ${PNGLITE_LIBRARIES}
-    ${SDL2_LIBRARIES}
-    ${WAVPACK_LIBRARIES}
-
-    # Order of these three is important.
-    ${OPUSFILE_LIBRARIES}
-    ${OPUS_LIBRARIES}
-
-    ${PLATFORM_CLIENT_LIBS}
-  )
 
   if(TARGET_OS STREQUAL "windows")
     set(CLIENT_ICON "other/icons/${CLIENT_EXECUTABLE}.rc")
@@ -793,17 +812,12 @@ if(CLIENT_COMPILE)
     $<TARGET_OBJECTS:engine-shared>
     $<TARGET_OBJECTS:game-shared>
   )
-  target_link_libraries(${TARGET_CLIENT} ${LIBS_CLIENT})
 
-  target_include_directories(${TARGET_CLIENT} PRIVATE
-	${CURL_INCLUDE_DIRS}
-    ${FREETYPE_INCLUDE_DIRS}
-    ${OPUSFILE_INCLUDE_DIRS}
-    ${OPUS_INCLUDE_DIRS}
-    ${PNGLITE_INCLUDE_DIRS}
-    ${SDL2_INCLUDE_DIRS}
-    ${WAVPACK_INCLUDE_DIRS}
-  )
+  # client lib
+  target_link_libraries(${TARGET_CLIENT} ${LIBS} ${CLIENT_LIBRARIES} ${PLATFORM_CLIENT_LIBS})
+
+  # client includes
+  target_include_directories(${TARGET_CLIENT} PRIVATE ${CLIENT_INCLUDES_DIRS})
 
   set(PARAMS "${WAVPACK_INCLUDE_DIRS};${WAVPACK_INCLUDE_DIRS}")
   if(NOT(WAVPACK_OPEN_FILE_INPUT_EX_PARAMS STREQUAL PARAMS))
@@ -857,9 +871,12 @@ if(SERVER_COMPILE)
     $<TARGET_OBJECTS:game-shared>
   )
 
-  target_include_directories(${TARGET_SERVER} PRIVATE ${Boost_INCLUDE_DIRS} ${ICU_INCLUDE_DIRS})
+  # server includes
+  target_include_directories(${TARGET_SERVER} PRIVATE ${SERVER_INCLUDES_DIRS})
 
-  target_link_libraries(${TARGET_SERVER} ${LIBS} ${MYSQL_LIBRARIES} ${ICU_LIBRARIES})
+  # server lib
+  target_link_libraries(${TARGET_SERVER} ${LIBS} ${SERVER_LIBRARIES})
+
   list(APPEND TARGETS_OWN ${TARGET_SERVER})
   list(APPEND TARGETS_LINK ${TARGET_SERVER})
 
