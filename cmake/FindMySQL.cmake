@@ -50,7 +50,7 @@ else()
   
   if(TARGET_OS AND TARGET_OS STREQUAL "windows")
     set(MYSQL_COPY_FILES "${EXTRA_MYSQL_LIBDIR}/mysqlcppconn-7-vs14.dll")
-  else
+  else()
     set(MYSQL_COPY_FILES)
   endif()
 endif()
