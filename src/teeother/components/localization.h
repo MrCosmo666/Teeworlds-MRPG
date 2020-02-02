@@ -5,7 +5,6 @@
 #include <teeother/tl/hashtable.h>
 #define CStorage IStorage
 /* END EDIT ***********************************************************/
-
 #include <unicode/ucnv.h>
 #include <unicode/numfmt.h>
 #include <unicode/upluralrules.h>
@@ -86,6 +85,7 @@ public:
 	
 	public:
 		UPluralRules* m_pPluralRules;
+		UNumberFormat* m_pValueFormater;
 		UNumberFormat* m_pNumberFormater;
 		UNumberFormat* m_pPercentFormater;
 		icu::TimeUnitFormat* m_pTimeUnitFormater;
@@ -129,7 +129,7 @@ protected:
 	const char* LocalizeWithDepth_P(const char* pLanguageCode, int Number, const char* pText, int Depth);
 	
 	void AppendNumber(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, int Number);
-	void AppendLongNumber(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, long int Number);
+	void AppendValue(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, int Number);
 	void AppendPercent(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, double Number);
 	void AppendDuration(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, int Number, icu::TimeUnit::UTimeUnitFields Type);
 

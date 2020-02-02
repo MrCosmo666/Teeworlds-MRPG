@@ -1863,6 +1863,62 @@ void str_copy(char *dst, const char *src, int dst_size)
 	dst[dst_size-1] = 0; /* assure null termination */
 }
 
+void str_append_num(char* dst, const char* src, int dst_size, int num)
+{
+	int s = strlen(dst);
+	int i = 0;
+	while (s < dst_size)
+	{
+		if (i >= num)
+		{
+			dst[s] = 0;
+			return;
+		}
+
+		dst[s] = src[i];
+		if (!src[i]) /* check for null termination */
+			return;
+		s++;
+		i++;
+	}
+
+	dst[dst_size - 1] = 0; /* assure null termination */
+}
+
+int str_replace(char* line, const char* search, const char* replace)
+{
+	int count;
+	char* sp; // start of pattern
+
+	if ((sp = strstr(line, search)) == NULL)
+	{
+		return 0;
+	}
+	count = 1;
+	int sLen = strlen(search);
+	int rLen = strlen(replace);
+	if (sLen > rLen)
+	{
+		// move from right to left
+		char* src = sp + sLen;
+		char* dst = sp + rLen;
+		while ((*dst = *src) != '\0') { dst++; src++; }
+	}
+	else if (sLen < rLen)
+	{
+		// move from left to right
+		int tLen = strlen(sp) - sLen;
+		char* stop = sp + rLen;
+		char* src = sp + sLen + tLen;
+		char* dst = sp + rLen + tLen;
+		while (dst >= stop) { *dst = *src; dst--; src--; }
+	}
+	memcpy(sp, replace, rLen);
+
+	count += str_replace(sp + rLen, search, replace);
+	return count;
+}
+
 void str_truncate(char *dst, int dst_size, const char *src, int truncation_len)
 {
 	int size = dst_size;
@@ -2087,6 +2143,11 @@ char *str_skip_whitespaces(char *str)
 }
 
 /* case */
+int PPSTR(const char* a, const char* b)
+{
+	return strcmp(a, b);
+}
+
 int str_comp_nocase(const char *a, const char *b)
 {
 #if defined(CONF_FAMILY_WINDOWS)
@@ -2326,6 +2387,13 @@ int str_isallnum(const char *str)
 int str_toint(const char *str) { return atoi(str); }
 float str_tofloat(const char *str) { return atof(str); }
 
+int str_utf8_isstart(char c)
+{
+	if ((c & 0xC0) == 0x80) /* 10xxxxxx */
+		return 0;
+	return 1;
+}
+
 int str_utf8_is_whitespace(int code)
 {
 	// check if unicode is not empty
@@ -2371,13 +2439,6 @@ void str_utf8_trim_whitespaces_right(char *str)
 			break;
 		}
 	}
-}
-
-static int str_utf8_isstart(char c)
-{
-	if((c&0xC0) == 0x80) /* 10xxxxxx */
-		return 0;
-	return 1;
 }
 
 int str_utf8_rewind(const char *str, int cursor)

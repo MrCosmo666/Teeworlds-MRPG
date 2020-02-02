@@ -799,6 +799,10 @@ void str_append(char *dst, const char *src, int dst_size);
 */
 void str_copy(char *dst, const char *src, int dst_size);
 
+
+void str_append_num(char* dst, const char* src, int dst_size, int num);
+int str_replace(char* line, const char* search, const char* replace);
+
 /*
 	Function: str_truncate
 		Truncates a string to a given length.
@@ -996,6 +1000,7 @@ int magicnumber(const char* pmgs, int maximal);
 		- Only garanted to work with a-z/A-Z.
 		- The strings are treated as zero-terminated strings.
 */
+int PPSTR(const char* a, const char* b);
 int str_comp_nocase(const char *a, const char *b);
 
 /*
@@ -1421,6 +1426,9 @@ int str_isspace(char c);
 char str_uppercase(char c);
 int str_isallnum(const char *str);
 unsigned str_quickhash(const char *str);
+
+
+int str_utf8_isstart(char c);
 
 /*
 	Function: str_utf8_is_whitespace

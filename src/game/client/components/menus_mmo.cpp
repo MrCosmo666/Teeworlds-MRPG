@@ -133,36 +133,6 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		if (DoButton_CheckBox(&s_ButtonColorVote, Localize("Show Colored Vote (MmoTee)"), g_Config.m_ClShowColoreVote, &Button))
 			g_Config.m_ClShowColoreVote ^= 1;
 
-		/*
-		// translate tab
-		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
-		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
-		UI()->DoLabel(&BasicLeft, "Translate Yandex API https://translate.yandex.com/developers/keys", 10.0f, CUI::ALIGN_CENTER);
-		BasicLeft.HSplitTop(14.0f, &Button, &BasicLeft);
-
-		// api yandex
-		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
-		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
-		static float s_OffsetApiYandex = 0.0f;
-		DoEditBoxOption(g_Config.m_ClYandexApi, g_Config.m_ClYandexApi, sizeof(g_Config.m_ClYandexApi), &Button, Localize("API Yandex"), 100.0f, &s_OffsetApiYandex);
-
-		// prefix translate
-		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
-		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
-		static float s_OffsetLangPrefix = 0.0f;
-		DoEditBoxOption(g_Config.m_ClTranslateLanguage, g_Config.m_ClTranslateLanguage, sizeof(g_Config.m_ClTranslateLanguage), &Button, Localize("Lang Prefix"), 100.0f, &s_OffsetLangPrefix);
-
-		// translate self
-		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
-		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
-		static int s_ButtonTranslateSelf = 0;
-		if (DoButton_CheckBox(&s_ButtonTranslateSelf, Localize("Translate self message"), g_Config.m_ClTranslateSelf, &Button))
-			g_Config.m_ClTranslateSelf ^= 1;
-
-		BasicLeft.HSplitTop(2.0f, &Button, &BasicLeft);
-		UI()->DoLabel(&BasicLeft, "Attention: only you will see the translated text", 9.0f, CUI::ALIGN_CENTER);
-		*/
-
 		// --------------------- RIGHT SIDE --------------------------
 		// -----------------------------------------------------------
 		UI()->DoLabel(&BasicRight, "Customize", 12.0f, CUI::ALIGN_CENTER);

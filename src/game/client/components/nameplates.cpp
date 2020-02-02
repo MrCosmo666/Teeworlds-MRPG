@@ -91,7 +91,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 			{
 				str_format(aBuf, sizeof(aBuf), "%d / %d", pClientStats->m_Health, pClientStats->m_HealthStart);
 
-				CUIRect ExpBar = { Position.x - tw / 2.0f , Position.y - FontSize - 82.0f, tw, 21.0f };
+				CUIRect ExpBar = { Position.x - tw / 2.0f , Position.y - FontSize - 82.0f, tw, 25.0f };
 				RenderTools()->DrawUIBar(TextRender(), ExpBar, ColorNameplates / 1.2f,
 					pClientStats->m_Health, pClientStats->m_HealthStart, aBuf, 5, CUI::ALIGN_CENTER, 10.0f, 3.2f);
 			}

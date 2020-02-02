@@ -29,6 +29,11 @@ public:
 	virtual void Unload() = 0;
 	virtual SHA256_DIGEST Sha256() = 0;
 	virtual unsigned Crc() = 0;
+
+	virtual void SetCurrentMapSize(int Size) = 0;
+	virtual int GetCurrentMapSize() = 0;
+	virtual void SetCurrentMapData(unsigned char* CurrentMapData) = 0;
+	virtual unsigned char* GetCurrentMapData() = 0;
 };
 
 extern IEngineMap *CreateEngineMap();

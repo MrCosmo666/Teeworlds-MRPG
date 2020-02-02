@@ -6,38 +6,38 @@ file(STRINGS src/game/version.h VERSION_LINE
 )
 
 if(VERSION_LINE MATCHES "\"([0-9]+)\\.([0-9]+)\\.([0-9]+|[0-9]+\\.[0-9]+)\"")
-    set(VERSION_MAJOR ${CMAKE_MATCH_1})
-    set(VERSION_MINOR ${CMAKE_MATCH_2})
-    set(VERSION_PATCH ${CMAKE_MATCH_3})
+  set(VERSION_MAJOR ${CMAKE_MATCH_1})
+  set(VERSION_MINOR ${CMAKE_MATCH_2})
+  set(VERSION_PATCH ${CMAKE_MATCH_3})
 elseif(VERSION_LINE MATCHES "\"([0-9]+)\\.([0-9]+)\"")
-    set(VERSION_MAJOR ${CMAKE_MATCH_1})
-    set(VERSION_MINOR ${CMAKE_MATCH_2})
-    set(VERSION_PATCH "0")
+  set(VERSION_MAJOR ${CMAKE_MATCH_1})
+  set(VERSION_MINOR ${CMAKE_MATCH_2})
+  set(VERSION_PATCH "0")
 else()
-    message(FATAL_ERROR "Couldn't parse version from src/game/version.h")
+  message(FATAL_ERROR "Couldn't parse version from src/game/version.h")
 endif()
 
 if(POLICY CMP0072)
-    cmake_policy(SET CMP0072 OLD)
+  cmake_policy(SET CMP0072 OLD)
 endif()
 
 if(POLICY CMP0091)
-    cmake_policy(SET CMP0091 NEW)
+  cmake_policy(SET CMP0091 NEW)
 endif()
 
 if(POLICY CMP0092)
-    cmake_policy(SET CMP0092 NEW)
+  cmake_policy(SET CMP0092 NEW)
 endif()
 
 if(POLICY CMP0048)
-    cmake_policy(SET CMP0048 NEW)
-    project(mmoteeworlds VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
+  cmake_policy(SET CMP0048 NEW)
+  project(mmoteeworlds VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 else()
-    project(mmoteeworlds)
-    set(PROJECT_VERSION_MAJOR ${VERSION_MAJOR})
-    set(PROJECT_VERSION_MINOR ${VERSION_MINOR})
-    set(PROJECT_VERSION_PATCH ${VERSION_PATCH})
-    set(PROJECT_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
+  project(mmoteeworlds)
+  set(PROJECT_VERSION_MAJOR ${VERSION_MAJOR})
+  set(PROJECT_VERSION_MINOR ${VERSION_MINOR})
+  set(PROJECT_VERSION_PATCH ${VERSION_PATCH})
+  set(PROJECT_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 endif()
 
 set(ORIGINAL_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH})
@@ -47,17 +47,17 @@ set(OWN_CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 set(CMAKE_MODULE_PATH ${OWN_CMAKE_MODULE_PATH})
 
 if(CMAKE_SIZEOF_VOID_P EQUAL 4)
-    set(TARGET_BITS "32")
+  set(TARGET_BITS "32")
 else()
-    set(TARGET_BITS "64")
+  set(TARGET_BITS "64")
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    set(TARGET_OS "windows")
+  set(TARGET_OS "windows")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    set(TARGET_OS "linux")
+  set(TARGET_OS "linux")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    set(TARGET_OS "mac")
+  set(TARGET_OS "mac")
 endif()
 
 include(CheckCCompilerFlag)
@@ -66,14 +66,14 @@ include(CheckSymbolExists)
 
 check_symbol_exists(__i386 "" TARGET_ARCH_X86_i386)
 if(TARGET_ARCH_X86_i386)
-    set(TARGET_ARCH x86)
+  set(TARGET_ARCH x86)
 else()
-    set(TARGET_ARCH)
+  set(TARGET_ARCH)
 endif()
 
 set(AUTO_DEPENDENCIES_DEFAULT OFF)
 if(TARGET_OS STREQUAL "windows")
-    set(AUTO_DEPENDENCIES_DEFAULT ON)
+  set(AUTO_DEPENDENCIES_DEFAULT ON)
 endif()
 
 option(CLIENT "Compile client" ON)
@@ -81,24 +81,23 @@ option(DOWNLOAD_DEPENDENCIES "Download dependencies (only available on Windows)"
 option(DOWNLOAD_GTEST "Download and compile GTest if not found" ${AUTO_DEPENDENCIES_DEFAULT})
 option(PREFER_BUNDLED_LIBS "Prefer bundled libraries over system libraries" ${AUTO_DEPENDENCIES_DEFAULT})
 option(DEV "Don't generate stuff necessary for packaging" OFF)
-
 set(OpenGL_GL_PREFERENCE LEGACY)
 
 # Set the default build type to Release
 if(NOT(CMAKE_BUILD_TYPE))
-    if(NOT(DEV))
-        set(CMAKE_BUILD_TYPE Release)
-    else()
-        set(CMAKE_BUILD_TYPE Debug)
-    endif()
+  if(NOT(DEV))
+    set(CMAKE_BUILD_TYPE Release)
+  else()
+    set(CMAKE_BUILD_TYPE Debug)
+  endif()
 endif()
 
 set(DBG $<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>)
-
 set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
     src/game/version.h
 )
 
+set(SERVER_EXECUTABLE mmoteeworlds_srv CACHE STRING "Name of the built server executable")
 set(CLIENT_EXECUTABLE mmoteeworlds CACHE STRING "Name of the build client executable")
 
 ########################################################################
@@ -109,13 +108,14 @@ find_package(PythonInterp)
 if(DOWNLOAD_DEPENDENCIES)
   if(PYTHON_EXECUTABLE AND TARGET_OS STREQUAL "windows" AND TARGET_BITS)
     set(DOWNLOADS)
-    foreach(d freetype sdl)
+    foreach(d boost curl freetype icu mysql opus sdl)
       if(NOT EXISTS "${PROJECT_SOURCE_DIR}/other/${d}/${TARGET_OS}/lib${TARGET_BITS}")
         list(APPEND DOWNLOADS ${d})
       endif()
     endforeach()
     if(DOWNLOADS)
-      message(STATUS "Downloading Freetype and SDL 2")
+      message(STATUS "- - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
+      message(STATUS "Downloading dep Teeworlds MMO. This may take a long time.")
       execute_process(COMMAND ${PYTHON_EXECUTABLE} scripts/download.py ${DOWNLOADS}
         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
       )
@@ -222,8 +222,7 @@ endfunction()
 
 set(TARGETS_OWN)
 set(TARGETS_DEP)
-
-set(TARGETS_LINK) # Targets with a linking stage.
+set(TARGETS_LINK)
 
 ########################################################################
 # DEPENDENCIES
@@ -278,53 +277,24 @@ if(NOT CMAKE_CROSSCOMPILING)
   find_package(PkgConfig)
 endif()
 
+## own packages
 find_package(ZLIB)
+find_package(Pnglite)
+
 find_package(Crypto)
-find_package(OwnFreetype)
+find_package(Curl)
 find_package(Opus)
 find_package(Opusfile)
+find_package(OwnFreetype)
+find_package(OwnICU)
+find_package(OwnMySQL)
+find_package(SDL2)
+find_package(Wavpack)
+
+# another packages
 find_package(Git)
 find_package(GTest)
-find_package(Pnglite)
-find_package(SDL2)
 find_package(Threads)
-find_package(Wavpack)
-find_package(Curl)
-
-# includes for auto-download and install packages cmake
-#include(ExternalProject)
-#include(cmake/DownloadProject.cmake)
-
-# Auto download and install websocketpp
-#download_project(
-#	PROJ           websocketpp
-#	GIT_REPOSITORY https://github.com/zaphoyd/websocketpp.git
-#	GIT_TAG        master
-#	SOURCE_DIR     ${PROJECT_SOURCE_DIR}/other/websocketpp
-#	UPDATE_DISCONNECTED 1
-#)
-#include_directories("${websocketpp_SOURCE_DIR}")
-
-# Note websocketpp doesn't work with the latest version of asio
-# Remember to go back to the master version after they are fixed
-#download_project(
-#	PROJ           asio
-#	GIT_REPOSITORY https://github.com/chriskohlhoff/asio.git
-#	GIT_TAG        22afb86
-#	SOURCE_DIR     ${PROJECT_SOURCE_DIR}/other/asio
-#	UPDATE_DISCONNECTED 1
-#)
-#set(asio_INCLUDE_DIR "${asio_SOURCE_DIR}/asio/include")
-
-# CPR
-#download_project(
-#	PROJ           cpr
-#	GIT_REPOSITORY https://github.com/whoshuu/cpr.git
-#	GIT_TAG        master
-#	SOURCE_DIR     ${PROJECT_SOURCE_DIR}/other/cpr
-#	UPDATE_DISCONNECTED 1
-#)
-#include_directories("${cpr_SOURCE_DIR}")
 
 if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   find_program(CMAKE_OTOOL otool)
@@ -345,7 +315,7 @@ if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   endif()
 endif()
 
-message(STATUS "******** Teeworlds ********")
+message(STATUS "******** Mmo ( Teeworlds) ********")
 message(STATUS "Target OS: ${TARGET_OS} ${TARGET_BITS}bit")
 message(STATUS "Compiler: ${CMAKE_CXX_COMPILER}")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
@@ -379,6 +349,8 @@ show_dependency_status("PythonInterp" PYTHONINTERP)
 show_dependency_status("SDL2" SDL2)
 show_dependency_status("Wavpack" WAVPACK)
 show_dependency_status("Zlib" ZLIB)
+show_dependency_status("MySQL" MYSQL)
+show_dependency_status("ICU" ICU)
 
 if(CLIENT AND NOT(CURL_FOUND))
   message(SEND_ERROR "You must install Curl to compile Teeworlds")
@@ -386,6 +358,14 @@ endif()
 
 if(NOT(PYTHONINTERP_FOUND))
   message(SEND_ERROR "You must install Python to compile Teeworlds")
+endif()
+
+if(NOT(MYSQL_FOUND))
+  message(SEND_ERROR "You must install MySQL to compile Teeworlds")
+endif()
+
+if(NOT(ICU_FOUND))
+  message(SEND_ERROR "You must install MySQL to compile Teeworlds")
 endif()
 
 if(CLIENT AND NOT(FREETYPE_FOUND))
@@ -497,12 +477,13 @@ endif()
 
 set_src(DEP_JSON_SRC GLOB src/engine/external/json-parser json.c json.h)
 add_library(json EXCLUDE_FROM_ALL OBJECT ${DEP_JSON_SRC})
+set(DEP_JSON $<TARGET_OBJECTS:json>)
 
 set_src(DEP_MD5_SRC GLOB src/engine/external/md5 md5.c md5.h)
 add_library(md5 EXCLUDE_FROM_ALL OBJECT ${DEP_MD5_SRC})
 
 list(APPEND TARGETS_DEP json md5)
-set(DEP_JSON $<TARGET_OBJECTS:json>)
+
 set(DEP_MD5)
 if(NOT CRYPTO_FOUND)
   set(DEP_MD5 $<TARGET_OBJECTS:md5>)
@@ -512,15 +493,22 @@ endif()
 # COPY DATA AND DLLS
 ########################################################################
 
+file(COPY server_lang DESTINATION .)
 file(COPY data DESTINATION .)
-set(COPY_FILES
+set(COPY_FILES_CLIENT
   ${CURL_COPY_FILES}
   ${FREETYPE_COPY_FILES}
   ${OPUSFILE_COPY_FILES}
   ${SDL2_COPY_FILES}
   ${FFMPEG_COPY_FILES}
 )
-file(COPY ${COPY_FILES} DESTINATION .)
+
+set(COPY_FILES_SERVER
+  ${ICU_COPY_FILES}
+  ${MYSQL_COPY_FILES}
+)
+
+file(COPY ${COPY_FILES_CLIENT} ${COPY_FILES_SERVER} DESTINATION .)
 
 ########################################################################
 # CODE GENERATION
@@ -592,6 +580,7 @@ generate_source("src/generated/server_data.h" "server_content_header")
 
 # Sources
 set_src(BASE GLOB_RECURSE src/base
+  another/kurhelper.cpp
   another/kurhelper.h
   color.h
   detect.h
@@ -824,6 +813,56 @@ if(CLIENT)
 endif()
 
 ########################################################################
+# SERVER
+########################################################################
+
+# Sources
+file(GLOB ENGINE_SERVER "src/engine/server/*.cpp" "src/engine/server/*.h")
+file(GLOB_RECURSE GAME_SERVER "src/game/server/*.cpp" "src/game/server/*.h")
+file(GLOB LOCALIZED_SERVER "src/teeother/components/*.cpp" "src/teeother/components/*.h" "src/teeother/tl/*.h")
+
+set(GAME_GENERATED_SERVER
+  src/generated/server_data.cpp
+  src/generated/server_data.h)
+
+# # #
+set(SERVER_SRC ${ENGINE_SERVER} ${GAME_SERVER} ${GAME_GENERATED_SERVER} ${LOCALIZED_SERVER})
+if(TARGET_OS STREQUAL "windows")
+  set(SERVER_ICON "other/icons/${SERVER_EXECUTABLE}.rc")
+else()
+  set(SERVER_ICON)
+endif()
+
+
+# Target
+set(TARGET_SERVER ${SERVER_EXECUTABLE})
+add_executable(${TARGET_SERVER}
+  ${DEPS}
+  ${SERVER_SRC}
+  ${SERVER_ICON}
+  $<TARGET_OBJECTS:engine-shared>
+  $<TARGET_OBJECTS:game-shared>
+)
+
+set(Boost_INCLUDE_DIRS "other/boost/include")
+target_include_directories(${TARGET_SERVER} PRIVATE
+   ${Boost_INCLUDE_DIRS}
+   ${ICU_INCLUDE_DIRS})
+
+target_link_libraries(${TARGET_SERVER} ${LIBS} ${MYSQL_LIBRARIES} ${ICU_LIBRARIES})
+list(APPEND TARGETS_OWN ${TARGET_SERVER})
+list(APPEND TARGETS_LINK ${TARGET_SERVER})
+
+if(TARGET_OS AND TARGET_OS STREQUAL "mac")
+  set(SERVER_LAUNCHER_SRC src/osxlaunch/server.mm)
+  set(TARGET_SERVER_LAUNCHER ${TARGET_SERVER}-Launcher)
+  add_executable(${TARGET_SERVER_LAUNCHER} ${SERVER_LAUNCHER_SRC})
+  target_link_libraries(${TARGET_SERVER_LAUNCHER} ${COCOA})
+  list(APPEND TARGETS_OWN ${TARGET_SERVER_LAUNCHER})
+  list(APPEND TARGETS_LINK ${TARGET_SERVER_LAUNCHER})
+endif()
+
+########################################################################
 # VARIOUS TARGETS
 ########################################################################
 
@@ -1012,6 +1051,7 @@ set(CPACK_SOURCE_FILES
   other/
   readme.md
   scripts/
+  server_lang/
   src/
   storage.cfg
 )
@@ -1039,7 +1079,7 @@ set(CPACK_DIRS data)
 set(CPACK_FILES
   license.txt
   storage.cfg
-  ${COPY_FILES}
+  ${COPY_FILES_CLIENT}
 )
 if(TARGET_OS STREQUAL "windows")
   list(APPEND CPACK_FILES other/config_directory.bat)
@@ -1047,6 +1087,7 @@ endif()
 
 if(NOT DEV)
   install(DIRECTORY data DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME} COMPONENT data)
+  install(DIRECTORY server_lang DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME} COMPONENT server_lang)
   install(TARGETS ${TARGET_CLIENT} DESTINATION bin COMPONENT client)
 endif()
 
@@ -1243,26 +1284,34 @@ foreach(target ${TARGETS_LINK})
 endforeach()
 
 foreach(target ${TARGETS_OWN})
-    if(MSVC)
-        target_compile_options(${target} PRIVATE /W3)
-        target_compile_options(${target} PRIVATE /wd4244) # Possible loss of data (float -> int, int -> float, etc.).
-        target_compile_options(${target} PRIVATE /wd4267) # Possible loss of data (size_t - int on win64).
-        target_compile_options(${target} PRIVATE /wd4800) # Implicit conversion of int to bool.
-    endif()
+  if(MSVC)
+	target_compile_options(${target} PRIVATE /W3)
+	target_compile_options(${target} PRIVATE /wd4244) # Possible loss of data (float -> int, int -> float, etc.).
+	target_compile_options(${target} PRIVATE /wd4267) # Possible loss of data (size_t - int on win64).
+	target_compile_options(${target} PRIVATE /wd4800) # Implicit conversion of int to bool.
+  endif()
 
-    if(OUR_FLAGS_OWN)
-        target_compile_options(${target} PRIVATE ${OUR_FLAGS_OWN})
-    endif()
+  if(OUR_FLAGS_OWN)
+	target_compile_options(${target} PRIVATE ${OUR_FLAGS_OWN})
+  endif()
 
-    target_include_directories(${target} PRIVATE ${PROJECT_BINARY_DIR}/src)
-    target_include_directories(${target} PRIVATE src)
-    target_compile_definitions(${target} PRIVATE $<$<CONFIG:Debug>:CONF_DEBUG>)
-    target_include_directories(${target} PRIVATE ${ZLIB_INCLUDE_DIRS})
-    if(CRYPTO_FOUND)
-        target_compile_definitions(${target} PRIVATE CONF_OPENSSL)
-        target_include_directories(${target} PRIVATE ${CRYPTO_INCLUDE_DIRS})
-    endif()
+  target_include_directories(${target} PRIVATE ${PROJECT_BINARY_DIR}/src)
+  target_include_directories(${target} PRIVATE src)
+  target_compile_definitions(${target} PRIVATE $<$<CONFIG:Debug>:CONF_DEBUG>)
+  target_include_directories(${target} PRIVATE ${ZLIB_INCLUDE_DIRS})
 
+  if(CRYPTO_FOUND)
+	target_compile_definitions(${target} PRIVATE CONF_OPENSSL)
+	target_include_directories(${target} PRIVATE ${CRYPTO_INCLUDE_DIRS})
+  endif()
+
+  if(MYSQL_FOUND)
+	target_include_directories(${target} PRIVATE ${MYSQL_INCLUDE_DIRS})
+  endif()
+
+  if(ICU_FOUND)
+	target_include_directories(${target} PRIVATE ${ICU_INCLUDE_DIRS})
+  endif()
 endforeach()
 
 foreach(target ${TARGETS_DEP})

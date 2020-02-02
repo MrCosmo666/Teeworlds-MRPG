@@ -1,18 +1,20 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <generated/protocol.h>
+#include <generated/client_data.h>
+
 #include <engine/shared/config.h>
 #include <engine/graphics.h>
 #include <engine/textrender.h>
 #include <engine/keys.h>
-
-#include <generated/protocol.h>
-#include <generated/client_data.h>
 
 #include <game/client/animstate.h>
 #include <game/client/gameclient.h>
 
 #include "binds.h"
 #include "menus.h"
+#include "sounds.h"
+
 #include "talktext.h"
 
 void CTalkText::Clear()
@@ -133,6 +135,9 @@ bool CTalkText::OnInput(IInput::CEvent Event)
 {
 	if(IsActive() && Event.m_Flags&IInput::FLAG_PRESS && Event.m_Key == KEY_TAB)
 	{
+
+		m_pClient->m_pSounds->Play(CSounds::CHN_WORLD, SOUND_UI_SELECTED_CLICK, 100.00f);
+
 		ClientPressed();
 		return true;
 	}

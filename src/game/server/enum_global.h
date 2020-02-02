@@ -61,6 +61,7 @@ enum DayType
 enum
 {
 	COUNT_WORLD = 8,						// кол-во миров
+	LAST_WORLD = COUNT_WORLD - 1,			// последний мир
 	MAX_REALPLAYER = 24, 					// кол-во реальных игроков
 	LOCALWORLD = 0,							// локальный мир
 	CUTSCENEWELCOMEWORLD = 7,				// катсцена начало игры

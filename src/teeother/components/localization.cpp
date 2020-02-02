@@ -1,40 +1,42 @@
 #include "localization.h"
 
-/* BEGIN EDIT *********************************************************/
-#include <engine/external/json-server/json.h>
+#include <engine/external/json-parser/json.h>
 #include <engine/storage.h>
 #include <unicode/ushape.h>
 #include <unicode/ubidi.h>
-/* END EDIT ***********************************************************/
 
-/* LANGUAGE ***********************************************************/
-
-CLocalization::CLanguage::CLanguage() :
-	m_Loaded(false),
-	m_Direction(CLocalization::DIRECTION_LTR),
-	m_pPluralRules(NULL),
-	m_pNumberFormater(NULL),
-	m_pPercentFormater(NULL),
-	m_pTimeUnitFormater(NULL)
+CLocalization::CLanguage::CLanguage() 
+: m_Loaded(false), m_Direction(CLocalization::DIRECTION_LTR), m_pPluralRules(NULL),
+m_pNumberFormater(NULL), m_pPercentFormater(NULL), m_pTimeUnitFormater(NULL), m_pValueFormater(NULL)
 {
 	m_aName[0] = 0;
 	m_aFilename[0] = 0;
 	m_aParentFilename[0] = 0;
 }
 
-CLocalization::CLanguage::CLanguage(const char* pName, const char* pFilename, const char* pParentFilename) :
-	m_Loaded(false),
-	m_Direction(CLocalization::DIRECTION_LTR),
-	m_pPluralRules(NULL),
-	m_pNumberFormater(NULL),
-	m_pPercentFormater(NULL)
+CLocalization::CLanguage::CLanguage(const char* pName, const char* pFilename, const char* pParentFilename) 
+: m_Loaded(false), m_Direction(CLocalization::DIRECTION_LTR), m_pPluralRules(NULL),
+m_pNumberFormater(NULL), m_pPercentFormater(NULL), m_pValueFormater(NULL)
 {
 	str_copy(m_aName, pName, sizeof(m_aName));
 	str_copy(m_aFilename, pFilename, sizeof(m_aFilename));
 	str_copy(m_aParentFilename, pParentFilename, sizeof(m_aParentFilename));
 	
+	// - - - - - ÈÍÈÖÈÀËÈÇÈÐÓÅÌ ÔÎÐÌÀÒÈÐÎÂÀÍÈß ICU
 	UErrorCode Status;
-	
+	Status = U_ZERO_ERROR;
+	m_pValueFormater = unum_open(UNUM_DECIMAL_COMPACT_SHORT, NULL, -1, m_aFilename, NULL, &Status);
+	if(U_FAILURE(Status))
+	{
+		if(m_pValueFormater)
+		{
+			unum_close(m_pValueFormater);
+			m_pValueFormater = NULL;
+		}
+		dbg_msg("Localization", "Can't create value formater for %s (error #%d)", m_aFilename, Status);
+	}	
+
+	// - - - - - ÈÍÈÖÈÀËÈÇÈÐÓÅÌ ÔÎÐÌÀÒÈÐÎÂÀÍÈß ICU
 	Status = U_ZERO_ERROR;
 	m_pNumberFormater = unum_open(UNUM_DECIMAL, NULL, -1, m_aFilename, NULL, &Status);
 	if(U_FAILURE(Status))
@@ -46,7 +48,8 @@ CLocalization::CLanguage::CLanguage(const char* pName, const char* pFilename, co
 		}
 		dbg_msg("Localization", "Can't create number formater for %s (error #%d)", m_aFilename, Status);
 	}
-	
+
+	// - - - - - ÈÍÈÖÈÀËÈÇÈÐÓÅÌ ÔÎÐÌÀÒÈÐÎÂÀÍÈß ICU
 	Status = U_ZERO_ERROR;
 	m_pPercentFormater = unum_open(UNUM_PERCENT, NULL, -1, m_aFilename, NULL, &Status);
 	if(U_FAILURE(Status))
@@ -59,6 +62,7 @@ CLocalization::CLanguage::CLanguage(const char* pName, const char* pFilename, co
 		dbg_msg("Localization", "Can't create percent formater for %s (error #%d)", m_aFilename, Status);
 	}
 	
+	// - - - - - ÈÍÈÖÈÀËÈÇÈÐÓÅÌ ÔÎÐÌÀÒÈÐÎÂÀÍÈß ICU
 	Status = U_ZERO_ERROR;
 	m_pPluralRules = uplrules_openForType(m_aFilename, UPLURAL_TYPE_CARDINAL, &Status);
 	if(U_FAILURE(Status))
@@ -71,7 +75,7 @@ CLocalization::CLanguage::CLanguage(const char* pName, const char* pFilename, co
 		dbg_msg("Localization", "Can't create plural rules for %s (error #%d)", m_aFilename, Status);
 	}
 	
-	//Time unit for second formater
+	// - - - - - ÈÍÈÖÈÀËÈÇÈÐÓÅÌ ÔÎÐÌÀÒÈÐÎÂÀÍÈß ICU
 	Status = U_ZERO_ERROR;
 	m_pTimeUnitFormater = new icu::TimeUnitFormat(m_aFilename,  UTMUTFMT_ABBREVIATED_STYLE, Status);
 	if(U_FAILURE(Status))
@@ -96,6 +100,9 @@ CLocalization::CLanguage::~CLanguage()
 	if(m_pNumberFormater)
 		unum_close(m_pNumberFormater);
 	
+	if (m_pValueFormater)
+		unum_close(m_pValueFormater);
+
 	if(m_pPercentFormater)
 		unum_close(m_pPercentFormater);
 		
@@ -106,34 +113,30 @@ CLocalization::CLanguage::~CLanguage()
 		delete m_pTimeUnitFormater;
 }
 
-/* BEGIN EDIT *********************************************************/
 bool CLocalization::CLanguage::Load(CLocalization* pLocalization, CStorage* pStorage)
-/* END EDIT ***********************************************************/
 {
 	// read file data into buffer
 	char aBuf[256];
-	str_format(aBuf, sizeof(aBuf), "./languages/%s.json", m_aFilename);
-	
+	str_format(aBuf, sizeof(aBuf), "./server_lang/%s.json", m_aFilename);
 	IOHANDLE File = pStorage->OpenFile(aBuf, IOFLAG_READ, CStorage::TYPE_ALL);
 	if(!File)
 		return false;
-	
-	// load the file as a string
+
 	int FileSize = (int)io_length(File);
-	char *pFileData = new char[FileSize+1];
+	char* pFileData = (char*)mem_alloc(FileSize, 1);
 	io_read(File, pFileData, FileSize);
-	pFileData[FileSize] = 0;
 	io_close(File);
 
 	// parse json data
 	json_settings JsonSettings;
 	mem_zero(&JsonSettings, sizeof(JsonSettings));
 	char aError[256];
-	json_value *pJsonData = json_parse_ex(&JsonSettings, pFileData, aError);
+	json_value* pJsonData = json_parse_ex(&JsonSettings, pFileData, FileSize, aError);
+	mem_free(pFileData);
+
 	if(pJsonData == 0)
 	{
 		dbg_msg("Localization", "Can't load the localization file %s : %s", aBuf, aError);
-		delete[] pFileData;
 		return false;
 	}
 	
@@ -217,8 +220,6 @@ bool CLocalization::CLanguage::Load(CLocalization* pLocalization, CStorage* pSto
 
 	// clean up
 	json_value_free(pJsonData);
-	delete[] pFileData;
-	
 	m_Loaded = true;
 	
 	return true;
@@ -309,25 +310,26 @@ bool CLocalization::Init()
 	}
 	
 	// read file data into buffer
-	const char *pFilename = "./languages/index.json";
+	const char *pFilename = "./server_lang/index.json";
 	IOHANDLE File = Storage()->OpenFile(pFilename, IOFLAG_READ, CStorage::TYPE_ALL);
 	if(!File)
 	{
-		dbg_msg("Localization", "can't open ./languages/index.json");
-		return true; //return true because it's not a critical error
+		dbg_msg("Localization", "can't open ./server_lang/index.json");
+		return false;
 	}
 	
+
 	int FileSize = (int)io_length(File);
-	char *pFileData = new char[FileSize+1];
+	char* pFileData = (char*)mem_alloc(FileSize, 1);
 	io_read(File, pFileData, FileSize);
-	pFileData[FileSize] = 0;
 	io_close(File);
 
 	// parse json data
 	json_settings JsonSettings;
 	mem_zero(&JsonSettings, sizeof(JsonSettings));
 	char aError[256];
-	json_value *pJsonData = json_parse_ex(&JsonSettings, pFileData, aError);
+	json_value* pJsonData = json_parse_ex(&JsonSettings, pFileData, FileSize, aError);
+	mem_free(pFileData);
 	if(pJsonData == 0)
 	{
 		delete[] pFileData;
@@ -358,8 +360,6 @@ bool CLocalization::Init()
 
 	// clean up
 	json_value_free(pJsonData);
-	delete[] pFileData;
-	
 	return true;
 }
 	
@@ -480,6 +480,7 @@ void CLocalization::AppendNumber(dynamic_string& Buffer, int& BufferIter, CLangu
 	
 	UErrorCode Status = U_ZERO_ERROR;
 	unum_format(pLanguage->m_pNumberFormater, Number, aBufUtf16, sizeof(aBufUtf16), NULL, &Status);
+
 	if(U_FAILURE(Status))
 		BufferIter = Buffer.append_at(BufferIter, "_NUMBER_");
 	else
@@ -499,18 +500,18 @@ void CLocalization::AppendNumber(dynamic_string& Buffer, int& BufferIter, CLangu
 	}
 }
 
-void CLocalization::AppendLongNumber(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, long int Number)
+void CLocalization::AppendValue(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, int Number)
 {
 	UChar aBufUtf16[128];
 	
 	UErrorCode Status = U_ZERO_ERROR;
-	unum_format(pLanguage->m_pNumberFormater, Number, aBufUtf16, sizeof(aBufUtf16), NULL, &Status);
+	unum_format(pLanguage->m_pValueFormater, Number, aBufUtf16, sizeof(aBufUtf16), NULL, &Status);
 	if(U_FAILURE(Status))
-		BufferIter = Buffer.append_at(BufferIter, "_LONGNUMBER_");
+		BufferIter = Buffer.append_at(BufferIter, "_VALUE_");
 	else
 	{
 		//Update buffer size
-		long int SrcLength = u_strlen(aBufUtf16);
+		int SrcLength = u_strlen(aBufUtf16);
 		int NeededSize = UCNV_GET_MAX_BYTES_FOR_STRING(SrcLength, ucnv_getMaxCharSize(m_pUtf8Converter));
 		
 		while(Buffer.maxsize() - BufferIter <= NeededSize)
@@ -518,12 +519,11 @@ void CLocalization::AppendLongNumber(dynamic_string& Buffer, int& BufferIter, CL
 		
 		int Length = ucnv_fromUChars(m_pUtf8Converter, Buffer.buffer()+BufferIter, Buffer.maxsize() - BufferIter, aBufUtf16, SrcLength, &Status);
 		if(U_FAILURE(Status))
-			BufferIter = Buffer.append_at(BufferIter, "_LONGNUMBER_");
+			BufferIter = Buffer.append_at(BufferIter, "_VALUE_");
 		else
 			BufferIter += Length;
 	}
 }
-
 
 void CLocalization::AppendPercent(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, double Number)
 {
@@ -588,11 +588,11 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 	{
 		for(int i=0; i<m_pLanguages.size(); i++)
 		{
-			if(str_comp(m_pLanguages[i]->GetFilename(), pLanguageCode) == 0)
-			{
-				pLanguage = m_pLanguages[i];
-				break;
-			}
+			if (str_comp(m_pLanguages[i]->GetFilename(), pLanguageCode) != 0)
+				continue;
+			
+			pLanguage = m_pLanguages[i];
+			break;
 		}
 	}
 	if(!pLanguage)
@@ -601,127 +601,77 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 		return;
 	}
 	
-	const char* pVarArgName = NULL;
-	const void* pVarArgValue = NULL;
-	
-	int Iter = 0;
-	int Start = Iter;
+	// ïàðàìåòðû íà÷àëà êîíöà ñòðîêè èìåíè è òèïà
 	int ParamTypeStart = -1;
-	int ParamTypeLength = 0;
-	int ParamNameStart = -1;
-	int ParamNameLength = 0;
-	
 	int BufferStart = Buffer.length();
 	int BufferIter = BufferStart;
-	
+
+	// ïàðñèíã àðãóìåíòîâ
+	va_list VarArgsIter;
+	va_copy(VarArgsIter, VarArgs);
+
+	// ïîçèöèè ñèìâîëîâ
+	int Iter = 0;
+	int Start = Iter;
+
+	// ïàðñèì òåêñò äëÿ ïîèñêà ïîçèöèé
 	while(pText[Iter])
 	{
-		if(ParamNameStart >= 0)
-		{
-			if(pText[Iter] == '}') //End of the macro, try to apply it
-			{
-				//Try to find an argument with this name
-				va_list VarArgsIter;
 
-				//windows
-				#if defined(CONF_FAMILY_WINDOWS)
-					#define va_copy(d,s) ((d) = (s))
-				#endif
-
-				va_copy(VarArgsIter, VarArgs);
-				pVarArgName = va_arg(VarArgsIter, const char*);
-				while(pVarArgName)
-				{
-					pVarArgValue = va_arg(VarArgsIter, const void*);
-					if(str_comp_num(pText+ParamNameStart, pVarArgName, ParamNameLength) == 0)
-					{
-						//Get argument type
-						if(str_comp_num("s:", pText+ParamTypeStart, 2) == 0)
-						{
-							BufferIter = Buffer.append_at(BufferIter, (const char*) pVarArgValue);
-						}
-						else if(str_comp_num("i:", pText+ParamTypeStart, 2) == 0)
-						{
-							int Number = *((const int*) pVarArgValue);
-							AppendNumber(Buffer, BufferIter, pLanguage, Number);
-						}
-						else if(str_comp_num("l:", pText+ParamTypeStart, 2) == 0)
-						{
-							long int Number = *((const long int*) pVarArgValue);
-							AppendLongNumber(Buffer, BufferIter, pLanguage, Number);
-						}
-						else if(str_comp_num("f:", pText+ParamTypeStart, 2) == 0)
-						{
-							float Number = (*((const float*) pVarArgValue));
-							AppendPercent(Buffer, BufferIter, pLanguage, Number);
-						}
-						else if(str_comp_num("t:", pText+ParamTypeStart, 2) == 0)
-						{
-							int Duration = *((const int*) pVarArgValue);
-							int Minutes = Duration / 60;
-							int Seconds = Duration - Minutes*60;
-							if(Minutes > 0)
-							{
-								AppendDuration(Buffer, BufferIter, pLanguage, Minutes, icu::TimeUnit::UTIMEUNIT_MINUTE);
-								if(Seconds > 0)
-								{
-									BufferIter = Buffer.append_at(BufferIter, ", ");
-									AppendDuration(Buffer, BufferIter, pLanguage, Seconds, icu::TimeUnit::UTIMEUNIT_SECOND);
-								}
-							}
-							else
-								AppendDuration(Buffer, BufferIter, pLanguage, Seconds, icu::TimeUnit::UTIMEUNIT_SECOND);
-						}
-						break;
-					}
-					
-					pVarArgName = va_arg(VarArgsIter, const char*);
-				}
-				va_end(VarArgsIter);
-				
-				//Close the macro
-				Start = Iter+1;
-				ParamTypeStart = -1;
-				ParamNameStart = -1;
-			}
-			else
-				ParamNameLength++;
-		}
-		else if(ParamTypeStart >= 0)
+		if(ParamTypeStart >= 0)
 		{
-			if(pText[Iter] == ':') //End of the type, start of the name
+			if (pText[Iter] != '}')
 			{
-				ParamNameStart = Iter+1;
-				ParamNameLength = 0;
+				Iter = str_utf8_forward(pText, Iter);
+				continue;
 			}
-			else if(pText[Iter] == '}') //Invalid: no name found
+
+			// ïîëó÷àåì äàííûå ñ àðãóìåíòà ïàðñèì àðãóìåíòû
+			const void* pVarArgValue = va_arg(VarArgsIter, const void*);
+			if(str_comp_num("STR", pText + ParamTypeStart, 3) == 0)
 			{
-				//Close the macro
-				Start = Iter+1;
-				ParamTypeStart = -1;
-				ParamNameStart = -1;
+				BufferIter = Buffer.append_at(BufferIter, (const char*) pVarArgValue);
 			}
-			else
-				ParamTypeLength++;
+			else if(str_comp_num("INT", pText + ParamTypeStart, 3) == 0)
+			{
+				int Number = *((const int*) pVarArgValue);
+				AppendNumber(Buffer, BufferIter, pLanguage, Number);
+			}
+			else if(str_comp_num("VAL", pText + ParamTypeStart, 3) == 0)
+			{
+				int Number = *((const int*) pVarArgValue);
+				AppendValue(Buffer, BufferIter, pLanguage, Number);
+			}
+			else if(str_comp_num("PRC", pText + ParamTypeStart, 3) == 0)
+			{
+				float Number = (*((const float*) pVarArgValue));
+				AppendPercent(Buffer, BufferIter, pLanguage, Number);
+			}
+
+			// 
+			Start = Iter+1;
+			ParamTypeStart = -1;
 		}
+
+		// íà÷àëà ïàðñèíãà ïàðàìåòðà
 		else
 		{
 			if(pText[Iter] == '{')
 			{
-				//Flush the content of pText in the buffer
 				BufferIter = Buffer.append_at_num(BufferIter, pText+Start, Iter-Start);
 				Iter++;
 				ParamTypeStart = Iter;
 			}
 		}
-		
+
 		Iter = str_utf8_forward(pText, Iter);
 	}
-	
-	if(Iter > 0 && ParamTypeStart == -1 && ParamNameStart == -1)
-	{
+
+	// çàâåðøàåì ìàêðîñ àðãóìåíòîâ
+	va_end(VarArgsIter);
+
+	if(Iter > 0 && ParamTypeStart == -1)
 		BufferIter = Buffer.append_at_num(BufferIter, pText+Start, Iter-Start);
-	}
 	
 	if(pLanguage && pLanguage->GetWritingDirection() == DIRECTION_RTL)
 		ArabicShaping(Buffer, BufferStart);

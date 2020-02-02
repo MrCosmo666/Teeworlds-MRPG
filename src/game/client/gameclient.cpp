@@ -1460,9 +1460,6 @@ void CGameClient::OnNewSnapshot()
 					m_LocalClientID = ClientID;
 
 				CClientData* pClient = &m_aClients[ClientID];
-				IntsToStr(pInfo->m_aName, 4, pClient->m_aName);
-				IntsToStr(pInfo->m_aClan, 3, pClient->m_aClan);
-
 				for (int p = 0; p < NUM_SKINPARTS; p++)
 				{
 					IntsToStr(pInfo->m_aaSkinPartNames[p], 6, pClient->m_aaSkinPartNames[p]);

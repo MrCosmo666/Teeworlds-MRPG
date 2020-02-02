@@ -823,7 +823,6 @@ void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color,
 		}
 	}
 
-
 	// Draw text
 	pTextRender->Text(0, Rect.x, Rect.y, FontSize, pText, -1);
 }

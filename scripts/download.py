@@ -20,8 +20,8 @@ def unzip(filename, where):
 	return z.namelist()[0]
 
 def downloadAll(targets):
-	version = "4bf6dbc8c9f9b2fa89b2b5be1928f5e85bca01e6"
-	url = "https://github.com/teeworlds/teeworlds-libs/archive/{}.zip".format(version)
+	version = "master"
+	url = "https://github.com/kurosio/MmoTee-Libs/archive/{}.zip".format(version)
 
 	# download and unzip
 	src_package_libs = twlib.fetch_file(url)
@@ -32,12 +32,24 @@ def downloadAll(targets):
 	if not libs_dir:
 		print("couldn't unzip libs")
 		sys.exit(-1)
-	libs_dir = "teeworlds-libs-{}".format(version)
+	libs_dir = "MmoTee-Libs-{}".format(version)
 
-	if "sdl" in targets:
-		copy_tree(libs_dir + "/sdl/", "other/sdl/")
+	if "boost" in targets:
+		copy_tree(libs_dir + "/boost/", "other/boost/")
+	if "curl" in targets:
+		copy_tree(libs_dir + "/curl/", "other/curl/")
 	if "freetype" in targets:
 		copy_tree(libs_dir + "/freetype/", "other/freetype/")
+	if "icu" in targets:
+		copy_tree(libs_dir + "/icu/", "other/icu/")
+	if "mysql" in targets:
+		copy_tree(libs_dir + "/mysql/", "other/mysql/")
+	if "openssl" in targets:
+		copy_tree(libs_dir + "/openssl/", "other/openssl/")
+	if "opus" in targets:
+		copy_tree(libs_dir + "/opus/", "other/opus/")
+	if "sdl" in targets:
+		copy_tree(libs_dir + "/sdl/", "other/sdl/")
 
 	# cleanup
 	try:
@@ -47,8 +59,11 @@ def downloadAll(targets):
 
 def main():
     import argparse
-    p = argparse.ArgumentParser(description="Download freetype and SDL library and header files for Windows.")
-    p.add_argument("targets", metavar="TARGET", nargs='+', choices=["sdl", "freetype"], help='Target to download. Valid choices are "sdl" and "freetype"')
+    p = argparse.ArgumentParser(description="Download dep library and header files for Windows.")
+    p.add_argument("targets", metavar="TARGET", nargs='+', 
+        choices=["boost", "curl", "freetype", "icu", "mysql", "openssl", "opus", "sdl"], 
+        help='Target to download.'
+    )
     args = p.parse_args()
 
     downloadAll(args.targets)

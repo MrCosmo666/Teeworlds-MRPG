@@ -3,7 +3,7 @@
 #ifndef GAME_ITEMS_H
 #define GAME_ITEMS_H
 
-#include <game/enum_global.h>
+#include <game/server/enum_global.h>
 #include <generated/protocol.h>
 
 #include <list>

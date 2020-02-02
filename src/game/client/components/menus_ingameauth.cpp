@@ -317,14 +317,6 @@ void CMenus::RenderAuthWindow()
 			}
 		}
 	}
-	// render copyright
-	//CopyrightBox.HSplitBottom(20.0f, &CopyrightBox, &Label);
-	//UI()->DoLabel(&Label, "Copyright 2019 Legion of Marestir", 14.0f, CUI::ALIGN_CENTER);
-
-	// render connection box
-	//CopyrightBox.HSplitBottom(10.0f, &CopyrightBox, 0); // spacer
-	//CopyrightBox.HSplitBottom(30.0f, &CopyrightBox, &Label);
-
 
 	// render cursor
 	RenderCursor(IMAGE_CURSOR, vec4(1.0f, 0.7f, 0.6f, 0.6f));

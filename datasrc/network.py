@@ -293,7 +293,7 @@ Objects = [
 	]),
 
 	NetEvent("SoundWorld:Common", [
-		NetIntRange("m_SoundID", 0, 'NUM_SOUNDS-1'),
+		NetIntRange("m_SoundID", 0, 40),
 	]),
 
 	NetEvent("Damage:Common", [ # Unused yet
@@ -334,9 +334,6 @@ Objects = [
     ## mmotee general object
 	NetObject("Mmo_ClientInfo", [
 		NetBool("m_Local"),
-
-		NetArray(NetIntAny("m_aName"), 4),
-		NetArray(NetIntAny("m_aClan"), 3),
 
 		NetArray(NetArray(NetIntAny("m_aaSkinPartNames"), 6), 6),
 		NetArray(NetBool("m_aUseCustomColors"), 6),

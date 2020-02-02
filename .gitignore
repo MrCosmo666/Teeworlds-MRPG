@@ -3,7 +3,11 @@
 /build
 /config.lua
 /objs
-/other
+/other/*/include
+/other/*/lib
+/other/*/linux
+/other/*/mac
+/other/*/windows
 __pycache__/
 *.pyc
 *.pyo

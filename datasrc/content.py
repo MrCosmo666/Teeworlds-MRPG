@@ -233,6 +233,10 @@ container.sounds.Add(SoundSet("menu", ["audio/music_menu.wv"]))
 
 container.sounds.Add(SoundSet("sword_fire", FileList("audio/wp_sword_attack-%02d.wv", 3)))
 
+#gui
+container.sounds.Add(SoundSet("ui_selected_click", ["audio/mmotee/ui_selection_click.wv"]))
+
+
 ###############################################################################
 ###############################################################################
 ###############################################################################
