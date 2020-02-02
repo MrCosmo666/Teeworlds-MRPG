@@ -106,13 +106,14 @@ set(CLIENT_EXECUTABLE mmoteeworlds CACHE STRING "Name of the build client execut
 
 find_package(PythonInterp)
 if(DOWNLOAD_DEPENDENCIES)
-  if(PYTHON_EXECUTABLE AND TARGET_OS STREQUAL "windows" AND TARGET_BITS)
+  if(PYTHON_EXECUTABLE AND TARGET_BITS)
     set(DOWNLOADS)
     foreach(d boost curl freetype icu mysql opus sdl)
       if(NOT EXISTS "${PROJECT_SOURCE_DIR}/other/${d}/${TARGET_OS}/lib${TARGET_BITS}")
         list(APPEND DOWNLOADS ${d})
       endif()
     endforeach()
+
     if(DOWNLOADS)
       message(STATUS "- - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
       message(STATUS "Downloading dep Teeworlds MMO. This may take a long time.")
