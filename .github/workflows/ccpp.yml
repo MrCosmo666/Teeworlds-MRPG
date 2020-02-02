@@ -44,7 +44,7 @@ jobs:
       run: |
         sudo apt-get update -y
         sudo apt-get install pkg-config cmake libfreetype6-dev libsdl2-dev libicu-dev libssl-dev -y
-        sudo apt-get install libboost-dev libmariadbclient-dev libmysqlcppconn-dev -y
+        sudo apt-get install libboost-dev libmariadbclient-dev libmysqlcppconn-dev libopus-dev -y
     - name: Prepare MacOS
       if: contains(matrix.os, 'macOS')
       run: |
