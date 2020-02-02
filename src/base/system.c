@@ -1888,34 +1888,34 @@ void str_append_num(char* dst, const char* src, int dst_size, int num)
 int str_replace(char* line, const char* search, const char* replace)
 {
 	int count;
-	char* sp; // start of pattern
-
-	if ((sp = strstr(line, search)) == NULL)
+	const char* sp;
+	if ((sp = str_find(line, search)) == NULL)
 	{
 		return 0;
 	}
+
 	count = 1;
-	int sLen = strlen(search);
-	int rLen = strlen(replace);
+	int sLen = str_length(search);
+	int rLen = str_length(replace);
 	if (sLen > rLen)
 	{
 		// move from right to left
-		char* src = sp + sLen;
-		char* dst = sp + rLen;
-		while ((*dst = *src) != '\0') { dst++; src++; }
+		const char* src = sp + sLen;
+		const char* dst = sp + rLen;
+		while ((dst = src) != '\0') { dst++; src++; }
 	}
 	else if (sLen < rLen)
 	{
 		// move from left to right
-		int tLen = strlen(sp) - sLen;
-		char* stop = sp + rLen;
-		char* src = sp + sLen + tLen;
-		char* dst = sp + rLen + tLen;
-		while (dst >= stop) { *dst = *src; dst--; src--; }
+		int tLen = str_length(sp) - sLen;
+		const char* stop = sp + rLen;
+		const char* src = sp + sLen + tLen;
+		const char* dst = sp + rLen + tLen;
+		while (dst >= stop) { dst = src; dst--; src--; }
 	}
-	memcpy(sp, replace, rLen);
+	memcpy((void *)sp, replace, rLen);
 
-	count += str_replace(sp + rLen, search, replace);
+	count += str_replace((char*)sp + rLen, search, replace);
 	return count;
 }
 
