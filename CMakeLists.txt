@@ -71,12 +71,7 @@ else()
   set(TARGET_ARCH)
 endif()
 
-set(AUTO_DEPENDENCIES_DEFAULT OFF)
-if(TARGET_OS STREQUAL "windows")
-  set(AUTO_DEPENDENCIES_DEFAULT ON)
-endif()
-
-option(CLIENT "Compile client" ON)
+set(AUTO_DEPENDENCIES_DEFAULT ON)
 option(DOWNLOAD_DEPENDENCIES "Download dependencies (only available on Windows)" ${AUTO_DEPENDENCIES_DEFAULT})
 option(DOWNLOAD_GTEST "Download and compile GTest if not found" ${AUTO_DEPENDENCIES_DEFAULT})
 option(PREFER_BUNDLED_LIBS "Prefer bundled libraries over system libraries" ${AUTO_DEPENDENCIES_DEFAULT})
@@ -99,6 +94,8 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
 
 set(SERVER_EXECUTABLE mmoteeworlds_srv CACHE STRING "Name of the built server executable")
 set(CLIENT_EXECUTABLE mmoteeworlds CACHE STRING "Name of the build client executable")
+set(SERVER_COMPILE ON)
+set(CLIENT_COMPILE ON)
 
 ########################################################################
 # Download dependencies
@@ -106,7 +103,7 @@ set(CLIENT_EXECUTABLE mmoteeworlds CACHE STRING "Name of the build client execut
 
 find_package(PythonInterp)
 if(DOWNLOAD_DEPENDENCIES)
-  if(PYTHON_EXECUTABLE AND TARGET_OS STREQUAL "windows" AND TARGET_BITS)
+  if(PYTHON_EXECUTABLE AND TARGET_OS AND TARGET_BITS)
     set(DOWNLOADS)
     foreach(d boost curl freetype icu mysql opus sdl)
       if(NOT EXISTS "${PROJECT_SOURCE_DIR}/other/${d}/${TARGET_OS}/lib${TARGET_BITS}")
@@ -277,26 +274,35 @@ if(NOT CMAKE_CROSSCOMPILING)
   find_package(PkgConfig)
 endif()
 
+
+
 ## own packages
 find_package(ZLIB)
 find_package(Pnglite)
-
-if(TARGET_OS STREQUAL "windows")
-  find_package(OwnICU)
-else()
-  set(CMAKE_MODULE_PATH ${ORIGINAL_CMAKE_MODULE_PATH})
-  find_package(ICU REQUIRED COMPONENTS uc in)
-  set(CMAKE_MODULE_PATH ${OWN_CMAKE_MODULE_PATH})
-endif()
-
-find_package(Crypto)
-find_package(Curl)
-find_package(MySQL)
-find_package(Opus)
-find_package(Opusfile)
 find_package(OwnFreetype)
 find_package(SDL2)
 find_package(Wavpack)
+find_package(Curl)
+find_package(Opus)
+find_package(Opusfile)
+find_package(Crypto)
+
+if(TARGET_OS AND TARGET_OS STREQUAL "windows")
+  find_package(MySQL)
+  find_package(OwnICU)
+  set(Boost_INCLUDE_DIRS "other/boost/include")
+
+elseif(TARGET_OS AND TARGET_OS STREQUAL "linux")
+  find_package(MySQL)
+  find_package(ICU REQUIRED COMPONENTS uc in)
+  find_package(Boost 1.36.0)
+    
+  if(NOT(Boost_FOUND))
+    message(FATAL_ERROR, "Boost need install.")
+  endif()
+elseif(TARGET_OS AND TARGET_OS STREQUAL "mac")
+  set(SERVER_COMPILE OFF)
+endif()
 
 # another packages
 find_package(Git)
@@ -737,7 +743,7 @@ list(APPEND TARGETS_OWN engine-shared game-shared)
 # CLIENT
 ########################################################################
 
-if(CLIENT)
+if(CLIENT_COMPILE)
   # Sources
   file(GLOB ENGINE_CLIENT "src/engine/client/*.cpp" "src/engine/client/*.h")
   file(GLOB GAME_CLIENT "src/game/client/*.cpp" "src/game/client/*.h" "src/game/client/components/*.cpp" "src/game/client/components/*.h")
@@ -823,50 +829,48 @@ endif()
 # SERVER
 ########################################################################
 
-# Sources
-file(GLOB ENGINE_SERVER "src/engine/server/*.cpp" "src/engine/server/*.h")
-file(GLOB_RECURSE GAME_SERVER "src/game/server/*.cpp" "src/game/server/*.h")
-file(GLOB LOCALIZED_SERVER "src/teeother/components/*.cpp" "src/teeother/components/*.h" "src/teeother/tl/*.h")
+if(SERVER_COMPILE)
+  # Sources
+  file(GLOB ENGINE_SERVER "src/engine/server/*.cpp" "src/engine/server/*.h")
+  file(GLOB_RECURSE GAME_SERVER "src/game/server/*.cpp" "src/game/server/*.h")
+  file(GLOB LOCALIZED_SERVER "src/teeother/components/*.cpp" "src/teeother/components/*.h" "src/teeother/tl/*.h")
 
-set(GAME_GENERATED_SERVER
-  src/generated/server_data.cpp
-  src/generated/server_data.h)
+  set(GAME_GENERATED_SERVER
+    src/generated/server_data.cpp
+    src/generated/server_data.h)
 
-# # #
-set(SERVER_SRC ${ENGINE_SERVER} ${GAME_SERVER} ${GAME_GENERATED_SERVER} ${LOCALIZED_SERVER})
-if(TARGET_OS STREQUAL "windows")
-  set(SERVER_ICON "other/icons/${SERVER_EXECUTABLE}.rc")
-else()
-  set(SERVER_ICON)
-endif()
-
+  # # #
+  set(SERVER_SRC ${ENGINE_SERVER} ${GAME_SERVER} ${GAME_GENERATED_SERVER} ${LOCALIZED_SERVER})
+  if(TARGET_OS STREQUAL "windows")
+    set(SERVER_ICON "other/icons/${SERVER_EXECUTABLE}.rc")
+  else()
+    set(SERVER_ICON)
+  endif()
 
 # Target
-set(TARGET_SERVER ${SERVER_EXECUTABLE})
-add_executable(${TARGET_SERVER}
-  ${DEPS}
-  ${SERVER_SRC}
-  ${SERVER_ICON}
-  $<TARGET_OBJECTS:engine-shared>
-  $<TARGET_OBJECTS:game-shared>
-)
+  set(TARGET_SERVER ${SERVER_EXECUTABLE})
+  add_executable(${TARGET_SERVER}
+    ${DEPS}
+    ${SERVER_SRC}
+    ${SERVER_ICON}
+    $<TARGET_OBJECTS:engine-shared>
+    $<TARGET_OBJECTS:game-shared>
+  )
 
-set(Boost_INCLUDE_DIRS "other/boost/include")
-target_include_directories(${TARGET_SERVER} PRIVATE
-   ${Boost_INCLUDE_DIRS}
-   ${ICU_INCLUDE_DIRS})
+  target_include_directories(${TARGET_SERVER} PRIVATE ${Boost_INCLUDE_DIRS} ${ICU_INCLUDE_DIRS})
 
-target_link_libraries(${TARGET_SERVER} ${LIBS} ${MYSQL_LIBRARIES} ${ICU_LIBRARIES})
-list(APPEND TARGETS_OWN ${TARGET_SERVER})
-list(APPEND TARGETS_LINK ${TARGET_SERVER})
+  target_link_libraries(${TARGET_SERVER} ${LIBS} ${MYSQL_LIBRARIES} ${ICU_LIBRARIES})
+  list(APPEND TARGETS_OWN ${TARGET_SERVER})
+  list(APPEND TARGETS_LINK ${TARGET_SERVER})
 
-if(TARGET_OS AND TARGET_OS STREQUAL "mac")
-  set(SERVER_LAUNCHER_SRC src/osxlaunch/server.mm)
-  set(TARGET_SERVER_LAUNCHER ${TARGET_SERVER}-Launcher)
-  add_executable(${TARGET_SERVER_LAUNCHER} ${SERVER_LAUNCHER_SRC})
-  target_link_libraries(${TARGET_SERVER_LAUNCHER} ${COCOA})
-  list(APPEND TARGETS_OWN ${TARGET_SERVER_LAUNCHER})
-  list(APPEND TARGETS_LINK ${TARGET_SERVER_LAUNCHER})
+  if(TARGET_OS AND TARGET_OS STREQUAL "mac")
+    set(SERVER_LAUNCHER_SRC src/osxlaunch/server.mm)
+    set(TARGET_SERVER_LAUNCHER ${TARGET_SERVER}-Launcher)
+    add_executable(${TARGET_SERVER_LAUNCHER} ${SERVER_LAUNCHER_SRC})
+    target_link_libraries(${TARGET_SERVER_LAUNCHER} ${COCOA})
+    list(APPEND TARGETS_OWN ${TARGET_SERVER_LAUNCHER})
+    list(APPEND TARGETS_LINK ${TARGET_SERVER_LAUNCHER})
+  endif()
 endif()
 
 ########################################################################
@@ -1111,7 +1115,7 @@ endif()
 
 set(PACKAGE_TARGETS)
 
-if(CLIENT AND (DMGTOOLS_FOUND OR HDIUTIL))
+if(CLIENT_COMPILE AND (DMGTOOLS_FOUND OR HDIUTIL))
   file(MAKE_DIRECTORY bundle/client/)
   configure_file(other/bundle/client/Info.plist.in bundle/client/Info.plist)
 
