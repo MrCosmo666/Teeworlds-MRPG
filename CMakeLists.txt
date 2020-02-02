@@ -294,7 +294,7 @@ find_package(Curl)
 find_package(Opus)
 find_package(Opusfile)
 find_package(OwnFreetype)
- find_package(OwnMySQL)
+find_package(MySQL)
 find_package(SDL2)
 find_package(Wavpack)
 
