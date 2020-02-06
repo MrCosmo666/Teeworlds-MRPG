@@ -1,22 +1,19 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <new>
 #include <engine/shared/config.h>
 
 #include "entities/botai/botaijob.h"
-#include "gamecontext.h"
 
+#include "gamecontext.h"
 #include "player_bot.h"
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayerBot, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
 
-CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint)
-: CPlayer(pGS, ClientID)
-{
-	m_BotID = BotID;
-	m_SpawnPointBot = SpawnPoint;
-	m_SubBotID = SubBotID;
+IServer* CPlayer::Server() const { return m_pGS->Server(); };
 
+CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint)
+: CPlayer(pGS, ClientID), m_BotHealth(NULL), m_BotID(BotID), m_SubBotID(SubBotID), m_SpawnPointBot(SpawnPoint)
+{
 	m_Spawned = true;
 	m_PlayerTick[TickState::Respawn] = Server()->Tick();
 }
@@ -204,8 +201,5 @@ int CPlayerBot::GetMoodNameplacesType(int SnappingClient)
 
 int CPlayerBot::GetBotLevel() const
 {
-	if(m_SpawnPointBot == SPAWNMOBS)
-		return ContextBots::MobBot[m_SubBotID].Level;
-	else
-		return 1;
+	return (m_SpawnPointBot == SPAWNMOBS ? ContextBots::MobBot[m_SubBotID].Level : 1);
 }

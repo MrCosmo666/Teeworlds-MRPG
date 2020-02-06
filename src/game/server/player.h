@@ -55,7 +55,7 @@ public:
 	CGS *GS() const { return m_pGS; }
 	vec2 m_ViewPos;
 	int m_PlayerFlags;
-	int m_PlayerTick[TickState::NumTick];
+	int m_PlayerTick[TickState::NUM_TICK];
 	bool m_Flymode;
 
 	StructLatency m_Latency;
@@ -94,7 +94,7 @@ private:
 	void HandleTuningParams();
 public:
 	CPlayer(CGS *pGS, int ClientID);
-	~CPlayer();
+	virtual ~CPlayer();
 
 	virtual int GetBotID()                                               { return -1; };
 	virtual int GetSpawnBot()                                            { return -1; };
@@ -131,7 +131,6 @@ public:
 	void AddInBroadcast(const char *pBuffer);
 	void ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp);
 	bool Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade, const char *UpgradeName);
-	void ShowPlayerStats();
 	const char *AtributeName(int BonusID) const;
 
 	/* #########################################################################

@@ -6,9 +6,9 @@
 class CVariableInt
 {
 public:
-	static unsigned char *Pack(unsigned char *pDst, int i);
-	static const unsigned char *Unpack(const unsigned char *pSrc, int *pInOut);
-	static long Compress(const void *pSrc, int SrcSize, void *pDst, int DstSize);
-	static long Decompress(const void *pSrc, int SrcSize, void *pDst, int DstSize);
+	static unsigned char* Pack(unsigned char* pDst, int i);
+	static const unsigned char* Unpack(const unsigned char* pSrc, int* pInOut);
+	static long Compress(const void* pSrc, int SrcSize, void* pDst, int DstSize);
+	static long Decompress(const void* pSrc, int SrcSize, void* pDst, int DstSize);
 };
 #endif

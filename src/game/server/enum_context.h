@@ -46,21 +46,15 @@ enum Stats
 // Таймеры Игрока
 enum TickState
 {
-	TeamChange = 1,
-	Die,
-	LastAction,
+	Die = 1,
 	Respawn,
-	ReadyChange,
 	LastKill,
 	LastEmote,
 	LastChangeInfo,
-	LastSetSpectatorMode,
-	LastSetTeam,
 	LastChat,
 	LastVoteTry,
 	CheckClient,
-	InactivityTick,
-	NumTick,
+	NUM_TICK,
 };
 
 enum Skill

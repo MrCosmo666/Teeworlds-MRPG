@@ -277,6 +277,8 @@ endif()
 ## own packages
 find_package(ZLIB)
 find_package(Pnglite)
+find_package(GLEW)
+
 find_package(OwnFreetype)
 find_package(SDL2)
 find_package(Wavpack)
@@ -284,6 +286,7 @@ find_package(Curl)
 find_package(Opus)
 find_package(Opusfile)
 find_package(Crypto)
+find_package(CEGUI)
 
 if(TARGET_OS AND TARGET_OS STREQUAL "windows")
   find_package(MySQL)
@@ -331,23 +334,30 @@ endif()
     
 # clients lib
 set(CLIENT_LIBRARIES
+  ${CEGUI_LIBRARIES} 
   ${CURL_LIBRARIES} 
   ${FREETYPE_LIBRARIES} 
   ${PNGLITE_LIBRARIES} 
   ${SDL2_LIBRARIES} 
   ${WAVPACK_LIBRARIES} 
   ${OPUSFILE_LIBRARIES} 
-  ${OPUS_LIBRARIES})
+  ${OPUS_LIBRARIES}
+  ${GLEW_LIBRARIES}
+)
+
 
 # client includes
 set(CLIENT_INCLUDES_DIRS
-  ${CURL_INCLUDE_DIRS} 
+  ${CEGUI_INCLUDE_DIRS} 
+  ${CURL_INCLUDE_DIRS}
   ${FREETYPE_INCLUDE_DIRS} 
   ${OPUSFILE_INCLUDE_DIRS} 
   ${OPUS_INCLUDE_DIRS} 
   ${PNGLITE_INCLUDE_DIRS} 
   ${SDL2_INCLUDE_DIRS} 
-  ${WAVPACK_INCLUDE_DIRS})
+  ${WAVPACK_INCLUDE_DIRS}
+  ${GLEW_INCLUDE_DIRS}
+)
 
 # server lib
 set(SERVER_LIBRARIES
@@ -382,6 +392,7 @@ function(show_dependency_status OUTPUT_NAME NAME)
   endif()
 endfunction()
 
+show_dependency_status("Glew" GLEW)
 show_dependency_status("PythonInterp" PYTHONINTERP)
 if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   show_dependency_status("Dmg tools" DMGTOOLS)
@@ -547,6 +558,7 @@ set(COPY_FILES_CLIENT
   ${OPUSFILE_COPY_FILES}
   ${SDL2_COPY_FILES}
   ${FFMPEG_COPY_FILES}
+  ${CEGUI_COPY_FILES}
 )
 
 set(COPY_FILES_SERVER
@@ -786,7 +798,7 @@ if(CLIENT_COMPILE)
     src/generated/client_data.h
   )
   set(CLIENT_SRC ${PLATFORM_CLIENT} ${ENGINE_CLIENT} ${GAME_CLIENT} ${GAME_EDITOR} ${GAME_GENERATED_CLIENT})
-  set(DEPS_CLIENT ${DEPS} ${PNGLITE_DEP} ${WAVPACK_DEP})
+  set(DEPS_CLIENT ${DEPS} ${GLEW_DEP} ${PNGLITE_DEP} ${WAVPACK_DEP})
 
   if(TARGET_OS STREQUAL "windows")
     set(CLIENT_ICON "other/icons/${CLIENT_EXECUTABLE}.rc")
@@ -1324,6 +1336,7 @@ foreach(target ${TARGETS_OWN})
   target_include_directories(${target} PRIVATE src)
   target_compile_definitions(${target} PRIVATE $<$<CONFIG:Debug>:CONF_DEBUG>)
   target_include_directories(${target} PRIVATE ${ZLIB_INCLUDE_DIRS})
+  target_compile_definitions(${target} PRIVATE GLEW_STATIC)
 
   if(CRYPTO_FOUND)
 	target_compile_definitions(${target} PRIVATE CONF_OPENSSL)

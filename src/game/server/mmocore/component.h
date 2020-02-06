@@ -13,10 +13,10 @@ protected:
 	class SqlController *m_Job;
 	SqlController* Job() const { return m_Job; }
 
-	CGS *m_GameServer;
+	class CGS *m_GameServer;
 	CGS* GS() const { return m_GameServer; }
 
-	IServer* m_pServer;
+	class IServer* m_pServer;
 	IServer* Server() const { return m_pServer; }
 
 public:

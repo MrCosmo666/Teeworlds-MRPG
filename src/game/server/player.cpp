@@ -1,24 +1,17 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
-#include "gamecontext.h"
 
+#include "gamecontext.h"
 #include "player.h"
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
 
-IServer *CPlayer::Server() const { return m_pGS->Server(); }
-
-CPlayer::CPlayer(CGS *pGS, int ClientID)
+CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 {
-	m_pGS = pGS;
-	m_ClientID = ClientID;
-
 	for(int i = 0 ; i < NUMTABSORT ; i ++ )
 		m_SortTabs[ i ] = 0;
 
-	m_PlayerTick[TickState::LastAction] = Server()->Tick();
-	m_PlayerTick[TickState::TeamChange] = Server()->Tick();
 	m_PlayerTick[TickState::CheckClient] = Server()->Tick();
 	m_PlayerTick[TickState::Respawn] = Server()->Tick();
 	m_PlayerTick[TickState::Die] = Server()->Tick();
@@ -49,14 +42,93 @@ CPlayer::~CPlayer()
 /* #########################################################################
 	FUNCTIONS PLAYER ENGINE 
 ######################################################################### */
+// Тик игрока
+void CPlayer::Tick()
+{
+	if (!Server()->ClientIngame(m_ClientID))
+		return;
+
+	{ // вычисление пинга и установка данных клиенту
+		Server()->SetClientScore(m_ClientID, Acc().Level);
+
+		IServer::CClientInfo Info;
+		if (Server()->GetClientInfo(m_ClientID, &Info))
+		{
+			m_Latency.m_AccumMax = max(m_Latency.m_AccumMax, Info.m_Latency);
+			m_Latency.m_AccumMin = min(m_Latency.m_AccumMin, Info.m_Latency);
+		}
+
+		if (Server()->Tick() % Server()->TickSpeed() == 0)
+		{
+			m_Latency.m_Max = m_Latency.m_AccumMax;
+			m_Latency.m_Min = m_Latency.m_AccumMin;
+			m_Latency.m_AccumMin = 1000;
+			m_Latency.m_AccumMax = 0;
+		}
+	}
+
+	if (!m_pCharacter && GetTeam() == TEAM_SPECTATORS)
+		m_ViewPos -= vec2(clamp(m_ViewPos.x - m_LatestActivity.m_TargetX, -500.0f, 500.0f), clamp(m_ViewPos.y - m_LatestActivity.m_TargetY, -400.0f, 400.0f));
+
+	// # # # # # # # # # # # # # # # # # # # # # #
+	// # # # # # ДАЛЬШЕ АВТОРИЗОВАННЫМ # # # # # #
+	// # # # # # # # # # # # # # # # # # # # # # #
+	if (!IsAuthed())
+		return;
+
+	if (m_pCharacter && !m_pCharacter->IsAlive())
+	{
+		delete m_pCharacter;
+		m_pCharacter = NULL;
+	}
+
+	if (m_pCharacter)
+	{
+		if (m_pCharacter->IsAlive())
+			m_ViewPos = m_pCharacter->GetPos();
+	}
+	else if (m_Spawned && m_PlayerTick[TickState::Respawn] + Server()->TickSpeed() * 3 <= Server()->Tick())
+		TryRespawn();
+
+	if (m_pCharacter && m_pCharacter->IsAlive())
+	{
+		// проверка всех зелий и действия раз в секунду
+		if (Server()->Tick() % Server()->TickSpeed() == 0)
+		{
+			for (auto ieffect = CGS::Effects[m_ClientID].begin(); ieffect != CGS::Effects[m_ClientID].end();)
+			{
+				if (!str_comp(ieffect->first.c_str(), "Poison"))
+					m_pCharacter->TakeDamage(vec2(0, 0), vec2(0, 0), 1, m_ClientID, WEAPON_SELF);
+
+				if (!str_comp(ieffect->first.c_str(), "RegenHealth"))
+					m_pCharacter->IncreaseHealth(15);
+
+				ieffect->second--;
+				if (ieffect->second <= 0)
+				{
+					GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, ieffect->first.c_str(), false);
+					ieffect = CGS::Effects[m_ClientID].erase(ieffect);
+				}
+				else ieffect++;
+			}
+		}
+	}
+
+	HandleTuningParams();
+	TickOnlinePlayer();
+}
+
+// Пост тик
+void CPlayer::PostTick()
+{
+	// update latency value
+	if (Server()->ClientIngame(m_ClientID) && Server()->GetWorldID(m_ClientID) == GS()->GetWorldID() && IsAuthed())
+		Acc().LatencyPing = m_Latency.m_Min;
+}
+
 // Тик авторизированного в ::Tick
 void CPlayer::TickOnlinePlayer()
 {
-	if(!IsAuthed())
-		return;
-
-	GS()->Mmo()->Quest()->ProcessingAddQuesting(this, "Hello it dasd asd 10 / 15", 20, 10, itMoney);
-
 	// показать лист броадкаст
 	if(pValueBroadcast > 0 && m_pCharacter && m_pCharacter->IsAlive())
 	{
@@ -85,6 +157,7 @@ void CPlayer::TickOnlinePlayer()
 	TickSystemTalk();
 	TickSystemEat();
 }
+
 void CPlayer::TickSystemEat()
 {
 	// проверка и снятие голода
@@ -112,19 +185,19 @@ void CPlayer::TickSystemEat()
 
 	GS()->VResetVotes(m_ClientID, MAINMENU);
 }
+
 void CPlayer::TickSystemTalk()
 {
-	if(m_TalkingNPC.m_TalkedID == -1)
+	if(m_TalkingNPC.m_TalkedID == -1 || m_TalkingNPC.m_TalkedID == m_ClientID)
 		return;
 
 	int TalkedID = m_TalkingNPC.m_TalkedID;
-	if(TalkedID > MAX_CLIENTS || TalkedID < 0 || !GS()->m_apPlayers[TalkedID] ||
+	if(TalkedID > MAX_CLIENTS || TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] ||
 		distance(m_ViewPos, GS()->m_apPlayers[TalkedID]->m_ViewPos) > 90.0f)
 	{
 		ClearTalking();
 	}
 }
-
 
 // Персональный тюннинг игрока
 void CPlayer::HandleTuningParams()
@@ -142,88 +215,6 @@ void CPlayer::HandleTuningParams()
 		m_PrevTuningParams = m_NextTuningParams;
 	}
 	m_NextTuningParams = *GS()->Tuning();
-}
-
-// Тик игрока
-void CPlayer::Tick()  
-{
-	if(!Server()->ClientIngame(m_ClientID))
-		return;
-
-	Server()->SetClientScore(m_ClientID, Acc().Level);
-
-	IServer::CClientInfo Info;
-	if(Server()->GetClientInfo(m_ClientID, &Info))
-	{
-		m_Latency.m_AccumMax = max(m_Latency.m_AccumMax, Info.m_Latency);
-		m_Latency.m_AccumMin = min(m_Latency.m_AccumMin, Info.m_Latency);
-	}
-	// each second
-	if(Server()->Tick()%Server()->TickSpeed() == 0)
-	{
-		m_Latency.m_Max = m_Latency.m_AccumMax;
-		m_Latency.m_Min = m_Latency.m_AccumMin;
-		m_Latency.m_AccumMin = 1000;
-		m_Latency.m_AccumMax = 0;
-	}
-	
-	if(!m_pCharacter && GetTeam() == TEAM_SPECTATORS)
-		m_ViewPos -= vec2(clamp(m_ViewPos.x-m_LatestActivity.m_TargetX, -500.0f, 500.0f), clamp(m_ViewPos.y-m_LatestActivity.m_TargetY, -400.0f, 400.0f));
-
-	// скипаем все данные о проверки активности и спавна
-	if(!IsAuthed())
-		return;
-
-	if(m_PlayerTick[TickState::LastAction] != Server()->Tick())
-		++m_PlayerTick[TickState::InactivityTick];
-
-	if(m_pCharacter && !m_pCharacter->IsAlive())
-	{
-		delete m_pCharacter;
-		m_pCharacter = NULL;
-	}
-
-	if(m_pCharacter)
-	{
-		if(m_pCharacter->IsAlive())
-			m_ViewPos = m_pCharacter->GetPos();
-	} 
-	else if(m_Spawned && m_PlayerTick[TickState::Respawn]+Server()->TickSpeed()*3 <= Server()->Tick())
-		TryRespawn();
-
-	if(m_pCharacter && m_pCharacter->IsAlive())
-	{
-		// проверка всех зелий и действия раз в секунду
-		if(Server()->Tick() % Server()->TickSpeed() == 0)
-		{
-			for (auto ieffect = CGS::Effects[m_ClientID].begin(); ieffect != CGS::Effects[m_ClientID].end();)
-			{
-				if(!str_comp(ieffect->first.c_str(), "Poison"))
-					m_pCharacter->TakeDamage(vec2(0,0), vec2(0,0), 1, m_ClientID, WEAPON_SELF);
-
-				if(!str_comp(ieffect->first.c_str(), "RegenHealth"))
-					m_pCharacter->IncreaseHealth(15);
-
-				ieffect->second--;
-				if(ieffect->second <= 0)
-				{
-					GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, ieffect->first.c_str(), false);
-					ieffect = CGS::Effects[m_ClientID].erase(ieffect);
-				} 
-				else ieffect++;
-			}
-		}
-	}
-
-	HandleTuningParams();
-	TickOnlinePlayer();
-}
-// Пост тик
-void CPlayer::PostTick()
-{
-	// update latency value
-	if(Server()->ClientIngame(m_ClientID) && Server()->GetWorldID(m_ClientID) == GS()->GetWorldID() && IsAuthed())
-		Acc().LatencyPing = m_Latency.m_Min;
 }
 
 // Рисовка игрока
@@ -314,7 +305,6 @@ void CPlayer::SetTeam(int Team, bool DoChatMsg)
 	KillCharacter();
 
 	Acc().Team = Team;
-	m_PlayerTick[TickState::LastAction] = Server()->Tick();
 	m_PlayerTick[TickState::Respawn] = Server()->Tick()+Server()->TickSpeed()*2;
 }
 
@@ -404,8 +394,6 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 	{
 		m_LatestActivity.m_TargetX = NewInput->m_TargetX;
 		m_LatestActivity.m_TargetY = NewInput->m_TargetY;
-		m_PlayerTick[TickState::LastAction] = Server()->Tick();
-		m_PlayerTick[TickState::InactivityTick] = 0;
 	}
 }
 // Отправка и установка пред Input
@@ -941,7 +929,6 @@ void CPlayer::FormatTextQuest(int DataBotID, const char *pText)
 	str_replace(m_FormatTalkQuest, "[Talked]", ContextBots::DataBot[DataBotID].NameBot);
 	str_replace(m_FormatTalkQuest, "[Time]", GS()->Server()->GetStringTypeDay());
 }
-
 void CPlayer::ClearFormatQuestText()
 {
 	mem_zero(m_FormatTalkQuest, sizeof(m_FormatTalkQuest));

@@ -552,11 +552,6 @@ bool CServer::ClientIngame(int ClientID) const
 	return ClientID >= 0 && ClientID < MAX_CLIENTS && m_aClients[ClientID].m_State == CServer::CClient::STATE_INGAME;
 }
 
-int CServer::MaxClients() const
-{
-	return m_NetServer.MaxClients()-40;
-}
-
 void CServer::InitRconPasswordIfUnset()
 {
 	if(m_RconPasswordSet)
@@ -590,7 +585,7 @@ void CServer::InitRconPasswordIfUnset()
 int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int WorldID)
 {
 	CNetChunk Packet;
-	if(!pMsg)
+	if(!pMsg || ClientID >= MAX_PLAYERS)
 		return -1;
 
 	mem_zero(&Packet, sizeof(CNetChunk));
@@ -607,13 +602,13 @@ int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int WorldID)
 	{
 		if(ClientID == -1)
 		{
-			int i;
-			for(i = 0; i < MAX_PLAYERS; i++)
-				if(m_aClients[i].m_State == CClient::STATE_INGAME && !m_aClients[i].m_Quitting)
+			for (int i = 0; i < MAX_PLAYERS; i++)
+			{
+				if (m_aClients[i].m_State == CClient::STATE_INGAME && !m_aClients[i].m_Quitting)
 				{
-					if(WorldID != -1) 
+					if (WorldID != -1)
 					{
-						if(m_aClients[i].m_MapID == WorldID)
+						if (m_aClients[i].m_MapID == WorldID)
 						{
 							Packet.m_ClientID = i;
 							m_NetServer.Send(&Packet);
@@ -625,6 +620,7 @@ int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int WorldID)
 						m_NetServer.Send(&Packet);
 					}
 				}
+			}
 		}
 		else
 			m_NetServer.Send(&Packet);
@@ -761,8 +757,8 @@ int CServer::NewClientCallback(int ClientID, void *pUser)
 	pThis->m_aClients[ClientID].m_MapID = 0;
 	pThis->m_aClients[ClientID].m_ChangeMap = false;
 	pThis->m_aClients[ClientID].m_NoRconNote = false;
-	pThis->m_aClients[ClientID].m_Quitting = false;
 	pThis->m_aClients[ClientID].m_ClientVersion = 0;
+	pThis->m_aClients[ClientID].m_Quitting = false;
 	pThis->m_aClients[ClientID].Reset();
 	return 0;
 }
@@ -780,13 +776,13 @@ int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 	// notify the mod about the drop
 	if(pThis->m_aClients[ClientID].m_State >= CClient::STATE_READY)
 	{
-		int MapID = pThis->m_aClients[ClientID].m_MapID;
-		pThis->m_aClients[ClientID].m_Quitting = true;
-		for(int i = 0 ; i < COUNT_WORLD ; i++)
+		for (int i = 0; i < COUNT_WORLD; i++)
+		{
+			pThis->m_aClients[ClientID].m_Quitting = true;
 			pThis->GameServer(i)->OnClientDrop(ClientID, pReason);
+		}
 	}
 	
-	pThis->GameServer(LOCALWORLD)->ClearClientData(ClientID);
 	pThis->m_aClients[ClientID].m_State = CClient::STATE_EMPTY;
 	pThis->m_aClients[ClientID].m_aName[0] = 0;
 	pThis->m_aClients[ClientID].m_aClan[0] = 0;
@@ -798,8 +794,8 @@ int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 	pThis->m_aClients[ClientID].m_MapID = 0;
 	pThis->m_aClients[ClientID].m_ChangeMap = false;
 	pThis->m_aClients[ClientID].m_NoRconNote = false;
-	pThis->m_aClients[ClientID].m_Quitting = false;
 	pThis->m_aClients[ClientID].m_ClientVersion = 0;
+	pThis->m_aClients[ClientID].m_Quitting = false;
 	pThis->m_aClients[ClientID].m_Snapshots.PurgeAll();
 	return 0;
 }
@@ -891,12 +887,12 @@ void CServer::UpdateClientRconCommands()
 
 void CServer::ProcessClientPacket(CNetChunk *pPacket)
 {
-	int ClientID = pPacket->m_ClientID;
-	if(ClientID > MAX_PLAYERS)
-		return;
-
 	CUnpacker Unpacker;
 	Unpacker.Reset(pPacket->m_pData, pPacket->m_DataSize);
+
+	int ClientID = pPacket->m_ClientID;
+	if (ClientID > MAX_PLAYERS)
+		return;
 
 	// unpack msgid and system flag
 	int Msg = Unpacker.GetInt();
@@ -1237,7 +1233,7 @@ void CServer::GenerateServerInfo(CPacker *pPacker, int Token)
 	pPacker->AddInt(PlayerCount); // num players
 	pPacker->AddInt(MAX_PLAYERS); // max players
 	pPacker->AddInt(ClientCount); // num clients
-	pPacker->AddInt(MaxClients()); // max clients
+	pPacker->AddInt(MAX_PLAYERS); // max clients
 
 	if(Token != -1)
 	{
@@ -1271,7 +1267,6 @@ void CServer::SendServerInfo(int ClientID)
 		SendMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH, ClientID);
 }
 
-
 void CServer::PumpNetwork()
 {
 	CNetChunk Packet;
@@ -1280,24 +1275,24 @@ void CServer::PumpNetwork()
 	m_NetServer.Update();
 
 	// process packets
-	while(m_NetServer.Recv(&Packet, &ResponseToken))
+	while (m_NetServer.Recv(&Packet, &ResponseToken))
 	{
-		if(Packet.m_Flags&NETSENDFLAG_CONNLESS)
+		if (Packet.m_Flags & NETSENDFLAG_CONNLESS)
 		{
-			if(m_Register.RegisterProcessPacket(&Packet, ResponseToken))
+			if (m_Register.RegisterProcessPacket(&Packet, ResponseToken))
 				continue;
-			if(Packet.m_DataSize >= int(sizeof(SERVERBROWSE_GETINFO)) &&
+			if (Packet.m_DataSize >= int(sizeof(SERVERBROWSE_GETINFO)) &&
 				mem_comp(Packet.m_pData, SERVERBROWSE_GETINFO, sizeof(SERVERBROWSE_GETINFO)) == 0)
 			{
 				CUnpacker Unpacker;
-				Unpacker.Reset((unsigned char*)Packet.m_pData+sizeof(SERVERBROWSE_GETINFO), Packet.m_DataSize-sizeof(SERVERBROWSE_GETINFO));
+				Unpacker.Reset((unsigned char*)Packet.m_pData + sizeof(SERVERBROWSE_GETINFO), Packet.m_DataSize - sizeof(SERVERBROWSE_GETINFO));
 				int SrvBrwsToken = Unpacker.GetInt();
-				if(Unpacker.Error())
+				if (Unpacker.Error())
 					continue;
 
 				CPacker Packer;
 				CNetChunk Response;
-				
+
 				GenerateServerInfo(&Packer, SrvBrwsToken);
 
 				Response.m_ClientID = -1;
@@ -1406,13 +1401,12 @@ int CServer::Run()
 		BindAddr.port = g_Config.m_SvPort;
 	}
 
-	if(!m_NetServer.Open(BindAddr, &m_ServerBan, g_Config.m_SvMaxClients, g_Config.m_SvMaxClientsPerIP, 0))
+	if(!m_NetServer.Open(BindAddr, &m_ServerBan, g_Config.m_SvMaxClients, g_Config.m_SvMaxClientsPerIP, NewClientCallback, DelClientCallback, this))
 	{
 		dbg_msg("server", "couldn't open socket. port %d might already be in use", g_Config.m_SvPort);
 		return -1;
 	}
 
-	m_NetServer.SetCallbacks(NewClientCallback, DelClientCallback, this);
 	m_Econ.Init(Console(), &m_ServerBan);
 
 	char aBuf[256];
@@ -1484,6 +1478,7 @@ int CServer::Run()
 						WorldSec = 0;
 					}
 				}
+
 				for(int o = 0; o < COUNT_WORLD; o++)
 					GameServer(o)->OnTick();
 			}
@@ -1491,9 +1486,9 @@ int CServer::Run()
 			// snap game
 			if(NewTicks)
 			{
-				for(int o = 0; o < COUNT_WORLD; o++)
+				if (g_Config.m_SvHighBandwidth || (m_CurrentGameTick % 2) == 0)
 				{
-					if(g_Config.m_SvHighBandwidth || (m_CurrentGameTick%2) == 0)
+					for (int o = 0; o < COUNT_WORLD; o++)
 						DoSnapshot(o);
 				}
 				UpdateClientRconCommands();
@@ -1509,13 +1504,8 @@ int CServer::Run()
 	}
 
 	// disconnect all clients on shutdown
-	for(int i = 0; i < MAX_CLIENTS; ++i)
-	{
-		if(m_aClients[i].m_State != CClient::STATE_EMPTY)
-			m_NetServer.Drop(i, "Server shutdown");
-
-		m_Econ.Shutdown();
-	}
+	m_NetServer.Close();
+	m_Econ.Shutdown();
 
 	for(int i = 0 ; i < COUNT_WORLD ; i ++)
 	{

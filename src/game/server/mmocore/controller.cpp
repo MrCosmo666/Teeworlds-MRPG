@@ -51,7 +51,7 @@ SqlController::SqlController(CGS *pGameServer) : m_pGameServer(pGameServer)
 
 SqlController::~SqlController()
 {
-	SJK.DisconnectConnectionPool();
+	SJK.DisconnectConnectionHeap();
 	m_Components.clear();
 }
 

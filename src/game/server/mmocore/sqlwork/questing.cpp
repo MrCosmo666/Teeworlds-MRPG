@@ -813,12 +813,10 @@ bool QuestBase::OnMessage(int MsgID, void *pRawMsg, int ClientID)
 	return false;
 }
 
-void QuestBase::ProcessingAddQuesting(CPlayer *pPlayer, const char *pText, int Requires, int Have, int ItemID)
+void QuestBase::QuestTableAdd(int ClientID, const char* pText, int Requires, int Have, int ItemID)
 {
-	if(!pPlayer || !GS()->CheckClient(pPlayer->GetCID()))
-		return;
-
-	if(ItemID >= itMoney && ItemID <= ItemSql::ItemsInfo.size())
+	CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
+	if (ItemID >= itMoney && ItemID <= ItemSql::ItemsInfo.size() && pPlayer)
 	{
 		ItemSql::ItemPlayer SelectedItem = pPlayer->GetItem(ItemID);
 
@@ -827,19 +825,25 @@ void QuestBase::ProcessingAddQuesting(CPlayer *pPlayer, const char *pText, int R
 		Msg.m_pRequiresNum = Requires;
 		Msg.m_pHaveNum = clamp(SelectedItem.Count, 0, Requires);
 		StrToInts(Msg.m_pIcon, 4, SelectedItem.Info().GetIcon());
-		GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, pPlayer->GetCID());
+		GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 		return;
 	}
+}
+
+void QuestBase::QuestTableAdd(int ClientID, const char *pText, int Requires, int Have)
+{
+	if(!GS()->CheckClient(ClientID))
+		return;
 
 	CNetMsg_Sv_AddQuestingProcessing Msg;
 	Msg.m_pText = pText;
 	Msg.m_pRequiresNum = Requires;
 	Msg.m_pHaveNum = clamp(Have, 0, Requires);
 	StrToInts(Msg.m_pIcon, 4, "unknown");
-	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, pPlayer->GetCID());
+	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
-void QuestBase::ProcessingClear(int ClientID)
+void QuestBase::QuestTableClear(int ClientID)
 {
 	if(!GS()->CheckClient(ClientID))
 		return;

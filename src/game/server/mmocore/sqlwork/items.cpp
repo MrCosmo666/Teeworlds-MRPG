@@ -11,7 +11,7 @@ std::map < int , ItemSql::ItemInformation > ItemSql::ItemsInfo;
 
 // Инициализация класса
 void ItemSql::OnInitGlobal() 
-{ 
+{
 	{ // загрузить информацию предметов
 		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_items_list", "WHERE ItemID > '0'"));
 		while(RES->next())

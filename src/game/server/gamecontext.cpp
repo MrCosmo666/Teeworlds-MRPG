@@ -45,11 +45,11 @@ enum
 // Конструктор сервера
 void CGS::Construct(int Resetting)
 {
+	for (int i = 0; i < MAX_CLIENTS; i++)
+		m_apPlayers[i] = 0;
+
 	m_Resetting = 0;
 	m_pServer = 0;
-
-	for(int i = 0; i < MAX_CLIENTS; i++)
-		m_apPlayers[i] = 0;
 
 	m_pController = 0;
 	if(Resetting==NO_RESET)
@@ -125,23 +125,6 @@ CPlayer *CGS::GetPlayer(int ClientID, bool CheckAuthed, bool CheckCharacter)
 		}
 	}
 	return NULL;
-}
-
-bool CGS::delete_ptr_player(int ClientID)
-{
-	if(ClientID >= MAX_PLAYERS && ClientID < MAX_CLIENTS && m_apPlayers[ClientID])
-	{
-		delete (CPlayerBot *)m_apPlayers[ClientID];
-		m_apPlayers[ClientID] = 0;
-		return true;
-	}
-	else if(ClientID >= 0 && ClientID < MAX_PLAYERS && m_apPlayers[ClientID])
-	{
-		delete (CPlayer *)m_apPlayers[ClientID];
-		m_apPlayers[ClientID] = 0;	
-		return true;
-	}
-	return false;
 }
 
 // Level String by Matodor (Progress Bar) создает что то рода прогресс бара
@@ -825,13 +808,17 @@ int CGS::CheckPlayerMessageWorldID(int ClientID)
 
 	if(ClientID >= MAX_PLAYERS)
 	{
-		CPlayer* pPlayer = m_apPlayers[ClientID];
+		CPlayerBot* pPlayer = static_cast<CPlayerBot *>(m_apPlayers[ClientID]);
 		int SubBotID = pPlayer->GetBotSub();
-		if(pPlayer->GetSpawnBot() == SPAWNMOBS) return ContextBots::MobBot[SubBotID].WorldID;
-		else if(pPlayer->GetSpawnBot() == SPAWNNPC) return ContextBots::NpcBot[SubBotID].WorldID;
-		else return ContextBots::QuestBot[SubBotID].WorldID;
+		if(pPlayer->GetSpawnBot() == SPAWNMOBS) 
+			return ContextBots::MobBot[SubBotID].WorldID;
+		else if(pPlayer->GetSpawnBot() == SPAWNNPC) 
+			return ContextBots::NpcBot[SubBotID].WorldID;
+		else 
+			return ContextBots::QuestBot[SubBotID].WorldID;
 	}
-	else return Server()->GetWorldID(ClientID);
+	else 
+		return Server()->GetWorldID(ClientID);
 }
 
 // Маска игроков с одного мира и сервера
@@ -926,13 +913,12 @@ void CGS::OnShutdown()
 // Таймер GameContext
 void CGS::OnTick()
 {
-	// обновить точки Click Click
-	if(Server()->CheckWorldTime(6, 59))
-		m_pController->RespawnedClickEvent();
-
 	// копируем тюннинг
 	m_World.m_Core.m_Tuning = m_Tuning;
 	m_World.Tick();
+
+	//if(Server()->Tick() % Server()->TickSpeed() / 2 == 0)
+	//	SJK.UD("tw_devnotepad", "nDesc = '1.3.5 pre-relased' WHERE ID = '1'");
 
 	// контроллер тик
 	m_pController->Tick();
@@ -951,6 +937,10 @@ void CGS::OnTick()
 
 	OnTickLocalWorld();
 	Mmo()->OnTick();
+
+	// обновить точки Click Click
+	if (Server()->CheckWorldTime(6, 59))
+		m_pController->RespawnedClickEvent();
 }
 
 // Таймер в OnTick-=
@@ -1153,12 +1143,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		}
 		else if (MsgID == NETMSGTYPE_CL_SETSPECTATORMODE)
 		{
-			CNetMsg_Cl_SetSpectatorMode *pMsg = (CNetMsg_Cl_SetSpectatorMode *)pRawMsg;
 
-			if(g_Config.m_SvSpamprotection && pPlayer->m_PlayerTick[TickState::LastSetSpectatorMode] && pPlayer->m_PlayerTick[TickState::LastSetSpectatorMode]+Server()->TickSpeed() > Server()->Tick())
-				return;
-
-			pPlayer->m_PlayerTick[TickState::LastSetSpectatorMode] = Server()->Tick();
 		}
 		else if (MsgID == NETMSGTYPE_CL_EMOTICON)
 		{
@@ -1180,10 +1165,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		}
 		else if (MsgID == NETMSGTYPE_CL_READYCHANGE)
 		{
-			if(pPlayer->m_PlayerTick[TickState::ReadyChange] && pPlayer->m_PlayerTick[TickState::ReadyChange]+Server()->TickSpeed()*1 > Server()->Tick())
-				return;
 
-			pPlayer->m_PlayerTick[TickState::ReadyChange] = Server()->Tick();
 		}
 		else if(MsgID == NETMSGTYPE_CL_SKINCHANGE)
 		{
@@ -1396,31 +1378,35 @@ void CGS::OnClientEnter(int ClientID)
 // Выход игрока
 void CGS::OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld)
 {
-	CPlayer *pPlayer = m_apPlayers[ClientID];
-	if(!pPlayer) return;
+	if(!m_apPlayers[ClientID])
+		return;
 
 	if(ChangeWorld)
 	{
-		pPlayer->KillCharacter();
+		m_apPlayers[ClientID]->KillCharacter();
 		return;
 	}
-	m_pController->OnPlayerDisconnect(pPlayer);
+	m_pController->OnPlayerDisconnect(m_apPlayers[ClientID]);
 
 	// update clients on drop
-	if(Server()->ClientIngame(ClientID))
+	if (Server()->ClientIngame(ClientID) && m_WorldID == Server()->GetWorldID(ClientID))
 	{
+		ChatDiscord(false, DC_JOIN_LEAVE, Server()->ClientName(ClientID), "leave game Mmo 0.7");
+
 		CNetMsg_Sv_ClientDrop Msg;
 		Msg.m_ClientID = ClientID;
 		Msg.m_pReason = pReason;
 		Msg.m_Silent = false;
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1);
 	}
 
-	if(m_WorldID == Server()->GetWorldID(ClientID))
-		ChatDiscord(false, DC_JOIN_LEAVE, Server()->ClientName(ClientID), "leave game Mmo 0.7");
-
 	// очистка данных
-	delete_ptr_player(ClientID);
+	delete m_apPlayers[ClientID];
+	m_apPlayers[ClientID] = NULL;
+
+	if (m_apPlayers[ClientID])
+		dbg_msg("test", "yes i security");
+
 	ClearClientData(ClientID);
 }
 
@@ -1437,7 +1423,8 @@ void CGS::OnClientDirectInput(int ClientID, void *pInput)
 			Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "server", aBuf);
 		}
 	}
-	else m_apPlayers[ClientID]->OnDirectInput((CNetObj_PlayerInput *)pInput);
+	else 
+		m_apPlayers[ClientID]->OnDirectInput((CNetObj_PlayerInput *)pInput);
 }
 
 // Input проверить и отправить
@@ -1453,15 +1440,18 @@ void CGS::OnClientPredictedInput(int ClientID, void *pInput)
 			Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "server", aBuf);
 		}
 	}
-	else m_apPlayers[ClientID]->OnPredictedInput((CNetObj_PlayerInput *)pInput);
+	else 
+		m_apPlayers[ClientID]->OnPredictedInput((CNetObj_PlayerInput *)pInput);
 }
 
 // Смена мира
 void CGS::ChangeWorld(int ClientID)
 {
-	if(m_apPlayers[ClientID])
-		delete_ptr_player(ClientID);
-
+	if (m_apPlayers[ClientID])
+	{
+		delete m_apPlayers[ClientID];
+		m_apPlayers[ClientID] = NULL;
+	}
 	int savecidmem = ClientID+m_WorldID*MAX_CLIENTS;
 	m_apPlayers[ClientID] = new(savecidmem) CPlayer(this, ClientID);
 	
@@ -2382,7 +2372,7 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 // Создать бота
 void CGS::CreateBot(short SpawnPoint, int BotID, int SubID)
 {
-	int BotClientID = MAX_REALPLAYER;
+	int BotClientID = MAX_PLAYERS;
 	while(BotClientID < MAX_CLIENTS && m_apPlayers[BotClientID])
 		BotClientID++;
 
@@ -2434,7 +2424,8 @@ void CGS::ClearQuestsBot(int QuestID, int Step)
 	if(!ActiveBot && QuestBotClientID >= MAX_PLAYERS)
 	{
 		dbg_msg("test", "я удаляю бота для квеста %d", QuestID);
-		delete_ptr_player(QuestBotClientID);
+		delete m_apPlayers[QuestBotClientID];
+		m_apPlayers[QuestBotClientID] = NULL;
 	}
 }
 

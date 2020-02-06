@@ -301,10 +301,6 @@ void IGameController::DoTeamChange(CPlayer *pPlayer, bool DoChatMsg)
 		GS()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 	}
 	OnPlayerInfoChange(pPlayer, GS()->GetWorldID());
-
-	// обнуляем inactivity counter если подключился к игре
-	if(OldTeam == TEAM_SPECTATORS)
-		pPlayer->m_PlayerTick[TickState::InactivityTick] = 0;
 }
 
 int IGameController::GetRealPlayer()

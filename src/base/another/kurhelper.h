@@ -51,48 +51,7 @@ namespace kurosio
     template <typename T>
     inline float translate_to_procent(T count, T count2) { return (((float)count/(float)count2)*(float)100.0f); }
 
-    /* таймер
-    class kTimer
-    {
-        int m_seconds;
-        int64 m_waitingtime;
-        int64 m_currettime;
-        static std::set < kTimer* > m_Timers;
 
-    public:
-        kTimer() : m_seconds(0), m_currettime(0), m_waitingtime(0)
-        {
-            m_Timers.insert(this);
-        };
-        ~kTimer()
-        {
-            m_Timers.erase(this);
-        }
-        kTimer(const kTimer&) = delete;
-        kTimer& operator=(const kTimer&) = delete;
-
-        //
-        bool isActive() const { return time_get() < m_waitingtime; }
-        bool isExpired() const { return time_get() > m_waitingtime; }
-        int64 curretTime() const { return (int64)m_waitingtime - time_get(); }
-        int64 expiredTime() const { return (int64)(m_waitingtime - time_get()) - time_freq() * m_seconds; }
-
-        //
-        void set(int seconds)
-        {
-            m_seconds = seconds;
-
-            m_waitingtime = time_get() + time_freq() * m_seconds;
-            m_currettime = m_waitingtime;
-        }
-
-        void reset()
-        {
-            m_waitingtime = time_get() + time_freq() * m_seconds;
-            m_currettime = time_get();
-        }
-    };*/
 }
-
 
 #endif

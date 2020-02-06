@@ -3,7 +3,6 @@
 #ifndef GAME_SERVER_PLAYER_BOT_H
 #define GAME_SERVER_PLAYER_BOT_H
 
-#include "entities/character.h"
 #include "player.h"
 
 class CPlayerBot : public CPlayer 
@@ -12,7 +11,7 @@ class CPlayerBot : public CPlayer
 
 public:
 	CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint);
-	~CPlayerBot();
+	virtual ~CPlayerBot() override;
 	
 	CTuningParams m_PrevTuningParams;
 	CTuningParams m_NextTuningParams;

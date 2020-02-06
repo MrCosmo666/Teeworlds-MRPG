@@ -11,39 +11,33 @@
 #include <cppconn/exception.h>
 #include <cppconn/statement.h>
 
+#define START_THREAD() \
+std::thread t([&]() \
+{ \
+
+#define END_THREAD() \
+}); \
+t.detach(); \
+
+
 using namespace sql;
 #define SJK CConectionPool::GetInstance()
 
 class CConectionPool 
 {
-	int m_CurretSize;
-	int m_MaxSize;
 	static std::shared_ptr<CConectionPool> m_Instance;
 	std::list<Connection*>m_connlist;
 	Driver *m_pdriver;
 
-	CConectionPool(int maxSize);
-	Connection* CreateConnection();
+	CConectionPool();
 
-	// инициализация подключения
-	void InitConnection(int Size);
 	
 public:
 	~CConectionPool();
 
-	// получить подключение с pool
-	Connection* GetConnection();
-
-	// освободить подключение в pool
-	void ReleaseConnection(Connection *pConn);
-	
-	// подключить подключение
+	Connection* CreateConnection();
 	void DisconnectConnection(Connection* pConn);
-	
-	// отключить все подключенные пулы
-	void DisconnectConnectionPool();
-
-	// получить данный Instance
+	void DisconnectConnectionHeap();
 	static CConectionPool& GetInstance();
 
 	// функция выборка с бд данных
@@ -71,22 +65,26 @@ public:
 		vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
 		#endif
 		va_end(VarArgs);
-		
-		std::thread t([Table, aBuf, Exception]()
+
+		std::string Buf = "UPDATE " + std::string(Table) + " SET " + std::string(aBuf) + ";";
+		std::thread t([Buf, Exception]()
 		{
+			Connection* pConn = NULL;
 			try
 			{
-				Connection* iconn = SJK.GetConnection();
-				boost::scoped_ptr<Statement> STMT(iconn->createStatement()); 
+				pConn = SJK.CreateConnection();
+				std::shared_ptr<Statement> STMT(pConn->createStatement());
 
-				std::string Buf = "UPDATE " + std::string(Table) + " SET " + std::string(aBuf) + ";";
 				STMT->execute(Buf.c_str());
-				SJK.ReleaseConnection(iconn);
+				SJK.DisconnectConnection(pConn);
 			}
 			catch(sql::SQLException &e)
 			{
-				dbg_msg("sql", "%s", e.what());
 				Exception();
+				if (pConn)
+					SJK.DisconnectConnection(pConn);
+
+				dbg_msg("sql", "%s", e.what());
 			}
 		});
 		t.detach();
@@ -105,20 +103,24 @@ public:
 		#endif
 		va_end(VarArgs);
 
-		std::thread t([Table, aBuf, Exception]() 
+		std::string Buf = "DELETE FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
+		std::thread t([Buf, Exception]()
 		{
+			Connection* pConn = NULL;
 			try
 			{
-				std::string Buf = "DELETE FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
-				Connection* iconn = SJK.GetConnection();
-				boost::scoped_ptr<Statement> STMT(iconn->createStatement()); 
+				pConn = SJK.CreateConnection();
+				std::shared_ptr<Statement> STMT(pConn->createStatement());
 
 				STMT->execute(Buf.c_str());
-				SJK.ReleaseConnection(iconn);
+				SJK.DisconnectConnection(pConn);
 			}
 			catch(sql::SQLException &e)
 			{
 				Exception();
+				if (pConn)
+					SJK.DisconnectConnection(pConn);
+
 				dbg_msg("sql", "%s", e.what());
 			}
 		});
@@ -138,25 +140,30 @@ public:
 		#endif
 		va_end(VarArgs);
 
-		std::thread t([Table, aBuf, Exception]() 
+		std::string Buf = "INSERT INTO " + std::string(Table) + " " + std::string(aBuf) + ";";
+		std::thread t([Buf, Exception]()
 		{
+			Connection* pConn = NULL;
 			try
 			{
-				std::string Buf = "INSERT INTO " + std::string(Table) + " " + std::string(aBuf) + ";";
-				Connection* iconn = SJK.GetConnection();
-				boost::scoped_ptr<Statement> STMT(iconn->createStatement()); 
+				pConn = SJK.CreateConnection();
+				std::shared_ptr<Statement> STMT(pConn->createStatement());
 
 				STMT->execute(Buf.c_str());
-				SJK.ReleaseConnection(iconn);
+				SJK.DisconnectConnection(pConn);
 			}
 			catch(sql::SQLException &e)
 			{
 				Exception();
+				if (pConn)
+					SJK.DisconnectConnection(pConn);
+
 				dbg_msg("sql", "%s", e.what());
 			}
 		});
 		t.detach();
 	}
+
 };
 
 #endif
