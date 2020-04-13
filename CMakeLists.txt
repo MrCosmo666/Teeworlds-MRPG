@@ -105,7 +105,7 @@ find_package(PythonInterp)
 if(DOWNLOAD_DEPENDENCIES)
   if(PYTHON_EXECUTABLE AND TARGET_OS AND TARGET_BITS)
     set(DOWNLOADS)
-    foreach(d boost curl freetype icu mysql opus sdl)
+    foreach(d boost curl freetype icu mysql sdl)
       if(NOT EXISTS "${PROJECT_SOURCE_DIR}/other/${d}/${TARGET_OS}/lib${TARGET_BITS}")
         list(APPEND DOWNLOADS ${d})
       endif()
@@ -283,10 +283,7 @@ find_package(OwnFreetype)
 find_package(SDL2)
 find_package(Wavpack)
 find_package(Curl)
-find_package(Opus)
-find_package(Opusfile)
 find_package(Crypto)
-find_package(CEGUI)
 
 if(TARGET_OS AND TARGET_OS STREQUAL "windows")
   find_package(MySQL)
@@ -334,25 +331,19 @@ endif()
     
 # clients lib
 set(CLIENT_LIBRARIES
-  ${CEGUI_LIBRARIES} 
   ${CURL_LIBRARIES} 
   ${FREETYPE_LIBRARIES} 
   ${PNGLITE_LIBRARIES} 
   ${SDL2_LIBRARIES} 
   ${WAVPACK_LIBRARIES} 
-  ${OPUSFILE_LIBRARIES} 
-  ${OPUS_LIBRARIES}
   ${GLEW_LIBRARIES}
 )
 
 
 # client includes
 set(CLIENT_INCLUDES_DIRS
-  ${CEGUI_INCLUDE_DIRS} 
   ${CURL_INCLUDE_DIRS}
   ${FREETYPE_INCLUDE_DIRS} 
-  ${OPUSFILE_INCLUDE_DIRS} 
-  ${OPUS_INCLUDE_DIRS} 
   ${PNGLITE_INCLUDE_DIRS} 
   ${SDL2_INCLUDE_DIRS} 
   ${WAVPACK_INCLUDE_DIRS}
@@ -405,9 +396,7 @@ if(COMPILE_SERVER)
 elseif(COMPILE_CLIENT)
   show_dependency_status("Curl" CURL)
   show_dependency_status("Freetype" FREETYPE)
-  show_dependency_status("OpenSSL Crypto" CRYPTO)
-  show_dependency_status("Opus" OPUS)
-  show_dependency_status("Opusfile" OPUSFILE)
+  show_dependency_status("OpenSSL Crypto" CRYPTO) 
   show_dependency_status("Pnglite" PNGLITE)
   show_dependency_status("SDL2" SDL2)
   show_dependency_status("Wavpack" WAVPACK)
@@ -430,12 +419,6 @@ if(CLIENT_COMPILE AND NOT(CURL_FOUND))
 endif()
 if(CLIENT_COMPILE AND NOT(FREETYPE_FOUND))
   message(SEND_ERROR "You must install Freetype to compile Teeworlds MMO(Client)")
-endif()
-if(CLIENT_COMPILE AND NOT(OPUS_FOUND))
-  message(SEND_ERROR "You must install Opus to compile Teeworlds MMO(Client)")
-endif()
-if(CLIENT_COMPILE AND NOT(OPUSFILE_FOUND))
-  message(SEND_ERROR "You must install Opusfile to compile Teeworlds MMO(Client)")
 endif()
 if(CLIENT_COMPILE AND NOT(SDL2_FOUND))
   message(SEND_ERROR "You must install SDL2 to compile Teeworlds MMO(Client)")
@@ -555,10 +538,8 @@ file(COPY data DESTINATION .)
 set(COPY_FILES_CLIENT
   ${CURL_COPY_FILES}
   ${FREETYPE_COPY_FILES}
-  ${OPUSFILE_COPY_FILES}
   ${SDL2_COPY_FILES}
   ${FFMPEG_COPY_FILES}
-  ${CEGUI_COPY_FILES}
 )
 
 set(COPY_FILES_SERVER
@@ -769,22 +750,6 @@ add_library(game-shared EXCLUDE_FROM_ALL OBJECT ${GAME_SHARED} ${GAME_GENERATED_
 list(APPEND TARGETS_OWN engine-shared game-shared)
 
 ########################################################################
-# SLEEPY DISCORD
-########################################################################
-
-#file(GLOB ENGINE_SLEEPY "src/teeother/sleepy_discord/*.cpp" "src/teeother/sleepy_discord/*.h")
-#add_library(sleepy_discord EXCLUDE_FROM_ALL OBJECT  ${GAME_SHARED} ${GAME_GENERATED_SHARED} ${ENGINE_SLEEPY})
-
-# Includes
-#target_include_directories(sleepy_discord PRIVATE
-#    ${asio_INCLUDE_DIR}
-#    ${CRYPTO_INCLUDE_DIRS}
-#    ${CPR_INCLUDE_DIR}
-#    ${WEBSOCKETPP_INCLUDE_DIR})
-
-#list(APPEND TARGETS_OWN engine-shared game-shared sleepy_discord)
-
-########################################################################
 # CLIENT
 ########################################################################
 
@@ -822,11 +787,9 @@ if(CLIENT_COMPILE)
     $<TARGET_OBJECTS:game-shared>
   )
 
-  # client lib
-  target_link_libraries(${TARGET_CLIENT} ${LIBS} ${CLIENT_LIBRARIES} ${PLATFORM_CLIENT_LIBS})
-
-  # client includes
+  # client includes & libs
   target_include_directories(${TARGET_CLIENT} PRIVATE ${CLIENT_INCLUDES_DIRS})
+  target_link_libraries(${TARGET_CLIENT} ${LIBS} ${CLIENT_LIBRARIES} ${PLATFORM_CLIENT_LIBS})
 
   set(PARAMS "${WAVPACK_INCLUDE_DIRS};${WAVPACK_INCLUDE_DIRS}")
   if(NOT(WAVPACK_OPEN_FILE_INPUT_EX_PARAMS STREQUAL PARAMS))
@@ -880,10 +843,8 @@ if(SERVER_COMPILE)
     $<TARGET_OBJECTS:game-shared>
   )
 
-  # server includes
+  # server includes & lib
   target_include_directories(${TARGET_SERVER} PRIVATE ${SERVER_INCLUDES_DIRS})
-
-  # server lib
   target_link_libraries(${TARGET_SERVER} ${LIBS} ${SERVER_LIBRARIES})
 
   list(APPEND TARGETS_OWN ${TARGET_SERVER})
@@ -1251,7 +1212,6 @@ unset(CPACK_SOURCE_FILES_INVERTED)
 unset(CPACK_TARGETS)
 unset(CPACK_DIRS)
 unset(CPACK_FILES)
-
 include(CPack)
 
 ########################################################################
