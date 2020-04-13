@@ -49,13 +49,13 @@ void InboxSql::GetInformationInbox(CPlayer *pPlayer)
 		const int Count = RES->getInt("Count"); HideID++;
 
 		// добавляем меню голосования
-		GS()->AVH(ClientID, HideID, vec3(15,40,80), _("✉ Mail Name ID {i:id}: {s:name}"), "id", &MailID, "name", RES->getString("MailName").c_str(), NULL);
-		GS()->AVM(ClientID, "null", NOPE, HideID, _("Desc: {s:desc}"), "desc", RES->getString("MailDesc").c_str(), NULL);
+		GS()->AVH(ClientID, HideID, vec3(15,40,80), "✉ Mail Name ID {INT}: {STR}", &MailID, RES->getString("MailName").c_str());
+		GS()->AVM(ClientID, "null", NOPE, HideID, "Desc: {STR}", RES->getString("MailDesc").c_str());
 
 		// проверяем мы читаем или получаем предмет
 		if(ItemID <= 0 || Count <= 0)
 		{
-			GS()->AVM(ClientID, "MAIL", MailID, HideID, _("I readed (delete email) MID {i:id}"), "id", &MailID, NULL);
+			GS()->AVM(ClientID, "MAIL", MailID, HideID, "I readed (delete email) MID {INT}", &MailID);
 			continue;
 		}
 		
@@ -63,19 +63,19 @@ void InboxSql::GetInformationInbox(CPlayer *pPlayer)
 		const int Enchant = RES->getInt("Enchant");
 		if(Enchant > 0)
 		{
-			GS()->AVM(ClientID, "MAIL", MailID, HideID, _("Receive and delete email [{s:name}+{i:enchant}x{i:count}] MID {i:id}"), 
-				"name", GS()->GetItemInfo(ItemID).GetName(pPlayer), "enchant", &Enchant, "count", &Count, "id", &MailID, NULL);
+			GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive and delete email [{STR}+{INT}x{INT}] MID {INT}", 
+				GS()->GetItemInfo(ItemID).GetName(pPlayer), &Enchant, &Count, &MailID);
 			continue;
 		}
 	
 		// обычный предмет
-		GS()->AVM(ClientID, "MAIL", MailID, HideID, _("Receive and delete email [{s:name}x{i:count}] MID {i:id}"), 
-			"name", GS()->GetItemInfo(ItemID).GetName(pPlayer), "count", &Count, "id", &MailID, NULL);
+		GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive and delete email [{STR}x{INT}] MID {INT}", 
+			GS()->GetItemInfo(ItemID).GetName(pPlayer), &Count, &MailID);
 	}
 
 	// если пустой inbox
 	bool EmptyInbox = (HideID == NUMHIDEMENU + ItemSql::ItemsInfo.size() + 200);
-	if(EmptyInbox) GS()->AVL(ClientID, "null", _("Your mailbox is empty"), NULL);
+	if(EmptyInbox) GS()->AVL(ClientID, "null", "Your mailbox is empty");
 	return;
 }
 // проверить сообщения имеются ли

@@ -293,7 +293,7 @@ void CCmd::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 	if(str_comp_num(Msg->m_pMessage, "/", 1) == 0)
 	{
 		LastChat(GS, pPlayer); 
-		GS->ChatFollow(ClientID, "Command {s:cmd} not found!", Msg->m_pMessage);
+		GS->ChatFollow(ClientID, "Command {STR} not found!", Msg->m_pMessage);
 		return;
 	}
 }

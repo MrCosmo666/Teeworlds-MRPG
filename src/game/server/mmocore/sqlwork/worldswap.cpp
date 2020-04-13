@@ -98,7 +98,7 @@ bool WorldSwapSql::ChangingWorld(int ClientID, vec2 Pos)
 
 		if(pPlayer->Acc().Level < sw.second.Level)
 		{
-			GS()->SBL(ClientID, 100000, 100, "Required {i:level} level!", "level", &sw.second.Level);
+			GS()->SBL(ClientID, 100000, 100, "Required {INT} level!", &sw.second.Level);
 			return false;
 		}
 

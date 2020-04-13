@@ -193,23 +193,21 @@ void QuestBase::ShowQuestID(CPlayer *pPlayer, int QuestID, bool Passive)
 	// тип пасивный или история
 	if(Passive)
 	{
-		GS()->AVH(ClientID, HideID, vec3(18,3,35), _("Basic {s:name} {s:state}"), "level", &activeQuestData.Level, "name", QuestsData[QuestID].Name, 
-			"state", (IsComplecte(ClientID, QuestID) ?  "[OK]" : "\0"), NULL);	
+		GS()->AVH(ClientID, HideID, vec3(18,3,35), "Basic {STR} {STR}", QuestsData[QuestID].Name, (IsComplecte(ClientID, QuestID) ?  "[OK]" : "\0"));	
 	}
 	else
 	{
 		int CountQuest = GetStoryCountQuest(activeQuestData.StoryLine);
 		int LineQuest = GetStoryCountQuest(activeQuestData.StoryLine, QuestID)+1;
-		GS()->AVH(ClientID, HideID, vec3(18,3,35), _("[{i:line}/{i:count} {s:story}] {s:name} {s:state}"), 
-			"line", &LineQuest, "count", &CountQuest, "story", activeQuestData.StoryLine, "name", activeQuestData.Name, 
-			"state", (IsComplecte(ClientID, QuestID) ?  "[OK]" : "\0"), NULL);	
+		GS()->AVH(ClientID, HideID, vec3(18,3,35), "[{INT}/{INT} {STR}] {STR} {STR}", 
+			&LineQuest, &CountQuest, activeQuestData.StoryLine, activeQuestData.Name, (IsComplecte(ClientID, QuestID) ?  "[OK]" : "\0"));	
 	}
 
 	// информация о квесте
-	GS()->AVM(ClientID, "null", NOPE, HideID, _("Location: {s:location}"), "location", activeQuestData.Location, NULL);
+	GS()->AVM(ClientID, "null", NOPE, HideID, "Location: {STR}", activeQuestData.Location);
 
 	{ // подсчет предметов награды
-		GS()->AVM(ClientID, "null", NOPE, HideID, _("You will receive a reward"), NULL);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "You will receive a reward");
 	
 		char aBuf[32];
 		dynamic_string Buffer;
@@ -222,12 +220,11 @@ void QuestBase::ShowQuestID(CPlayer *pPlayer, int QuestID, bool Passive)
 		}
 		if(Buffer.length()) 
 		{	
-			GS()->AVM(ClientID, "null", NOPE, HideID, _("{s:items}"), "items", Buffer.buffer(), NULL); 
+			GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", Buffer.buffer()); 
 		}
 		Buffer.clear();
 
-		GS()->AVM(ClientID, "null", NOPE, HideID, _("Gold: {i:gold} Exp: {i:exp}"), 
-			"gold", &activeQuestData.Money, "exp", &activeQuestData.Exp, NULL);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "Gold: {INT} Exp: {INT}", &activeQuestData.Money, &activeQuestData.Exp);
 	}
 
 	// если квест не принят
@@ -236,12 +233,12 @@ void QuestBase::ShowQuestID(CPlayer *pPlayer, int QuestID, bool Passive)
 		{ // либо принять либо маленький уровень
 			int Level = activeQuestData.Level;
 			if(pPlayer->Acc().Level >= Level)
-				GS()->AVM(ClientID, "ACCEPTQUEST", QuestID, HideID, _("Accept {s:name}"), "name", activeQuestData.Name, NULL);			
+				GS()->AVM(ClientID, "ACCEPTQUEST", QuestID, HideID, "Accept {STR}", activeQuestData.Name);			
 			else
-				GS()->AVM(ClientID, "null", NOPE, HideID, _("☒ Level required {i:level}"), "level", &Level, NULL);
+				GS()->AVM(ClientID, "null", NOPE, HideID, "☒ Level required {INT}", &Level);
 		}
 	}
-	GS()->AVM(ClientID, "null", NOPE, HideID, _(" "), NULL);
+	GS()->AVM(ClientID, "null", NOPE, HideID, " ");
 }
 
 // завершить квест
@@ -372,7 +369,7 @@ void QuestBase::ShowQuestList(CPlayer *pPlayer, int StateQuest)
 
 	int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = { 10,8,50 };
-	GS()->AVL(ClientID, "null", _("★ {s:type} quests"), "type", QuestState(StateQuest), NULL);
+	GS()->AVL(ClientID, "null", "★ {STR} quests", QuestState(StateQuest));
 	
 	for(const auto& qd : QuestsData)
 	{
@@ -414,7 +411,7 @@ void QuestBase::ShowFullQuestLift(CPlayer *pPlayer)
 	if(!ShowAdventureActiveNPC(pPlayer))
 	{
 		pPlayer->m_Colored = { 15, 35, 10 };
-		GS()->AVM(ClientID, "null", NOPE, NOPE, _("In current quests there is no interaction with NPC"), NULL);
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "In current quests there is no interaction with NPC");
 	}
 	GS()->AV(ClientID, "null", "");
 
@@ -424,7 +421,7 @@ void QuestBase::ShowFullQuestLift(CPlayer *pPlayer)
 
 	// показываем меню завершенных
 	pPlayer->m_Colored = { 8,8,40 };
-	GS()->AVM(ClientID, "MENU", FINISHQUESTMENU, NOPE, _("List of completed quests"), NULL);
+	GS()->AVM(ClientID, "MENU", FINISHQUESTMENU, NOPE, "List of completed quests");
 }
 
 // проверяем выполнение квеста
@@ -693,7 +690,7 @@ bool QuestBase::ShowAdventureActiveNPC(CPlayer *pPlayer)
 	const int clientID = pPlayer->GetCID();
 
 	pPlayer->m_Colored = {30, 56, 20};
-	GS()->AVM(clientID, "null", NOPE, NOPE, _("Active NPC for current quests"), NULL);
+	GS()->AVM(clientID, "null", NOPE, NOPE, "Active NPC for current quests");
 
 	// поиск всех активных нпс
 	for(const auto& qq : Quests[clientID])
@@ -709,10 +706,7 @@ bool QuestBase::ShowAdventureActiveNPC(CPlayer *pPlayer)
 		// если нашли выводим информацию
 		int HideID = (NUMHIDEMENU + 12500 + BotInfo.QuestID);
 		int PosX = BotInfo.PositionX / 32, PosY = BotInfo.PositionY / 32;
-
-		GS()->AVH(clientID, HideID, vec3(15,35,10), _("[Active {s:line}] {s:name} {s:loc}(x:{i:xl} y:{i:yl})"), 
-			"line", GetStoryName(qq.first), "name", BotInfo.Name, 
-			"loc", GS()->Server()->GetWorldName(BotInfo.WorldID), "xl", &PosX, "yl", &PosY, NULL);
+		GS()->AVH(clientID, HideID, vec3(15,35,10), "[Active {STR}] {STR} {STR}(x:{INT} y:{INT})", GetStoryName(qq.first), BotInfo.Name, GS()->Server()->GetWorldName(BotInfo.WorldID), &PosX, &PosY);
 
 		// проверяем требуемые мобы
 		bool interactiveNeed = false;
@@ -722,8 +716,7 @@ bool QuestBase::ShowAdventureActiveNPC(CPlayer *pPlayer)
 			if(botID <= 0 || killNeed <= 0 || !Job()->BotsData()->IsDataBotValid(botID)) 
 				continue;
 
-			GS()->AVM(clientID, "null", NOPE, HideID, _("- Defeat {s:name} [{i:local}/{i:need}]"), 
-				"name", ContextBots::DataBot[botID].NameBot, "local", &qq.second.MobProgress[i-4], "need", &killNeed, NULL);
+			GS()->AVM(clientID, "null", NOPE, HideID, "- Defeat {STR} [{INT}/{INT}]", ContextBots::DataBot[botID].NameBot, &qq.second.MobProgress[i-4], &killNeed);
 			interactiveNeed = true;	
 		}
 
@@ -737,8 +730,7 @@ bool QuestBase::ShowAdventureActiveNPC(CPlayer *pPlayer)
 			ItemSql::ItemPlayer searchItem = pPlayer->GetItem(itemID);
 			int ownCount = clamp(searchItem.Count, 0, numNeed);
 
-			GS()->AVMI(clientID, searchItem.Info().GetIcon(), "null", NOPE, HideID, _("- Item {s:name} [{i:local}/{i:need}]"), 
-				"name", searchItem.Info().GetName(pPlayer), "local", &ownCount, "need", &numNeed, NULL);
+			GS()->AVMI(clientID, searchItem.Info().GetIcon(), "null", NOPE, HideID, "- Item {STR} [{INT}/{INT}]", searchItem.Info().GetName(pPlayer), &ownCount, &numNeed);
 			interactiveNeed = true;	
 		}
 
@@ -750,15 +742,14 @@ bool QuestBase::ShowAdventureActiveNPC(CPlayer *pPlayer)
 				continue;
 
 			ItemSql::ItemInformation GivedInfItem = GS()->GetItemInfo(itemID);
-			GS()->AVMI(clientID, GivedInfItem.GetIcon(), "null", NOPE, HideID, _("- Gives {s:name}x{i:count}"), 
-				"name", GivedInfItem.GetName(pPlayer), "count", &getCount, NULL);
+			GS()->AVMI(clientID, GivedInfItem.GetIcon(), "null", NOPE, HideID, "- Gives {STR}x{INT}", GivedInfItem.GetName(pPlayer), &getCount);
 			interactiveNeed = true;	
 		}
 
 		// если не нашли ничего что он делает
 		if(!interactiveNeed) 
 		{
-			GS()->AVM(clientID, "null", NOPE, HideID, _("You just need to talk."), NULL);
+			GS()->AVM(clientID, "null", NOPE, HideID, "You just need to talk.");
 		}
 		activeNPC = true;
 	}

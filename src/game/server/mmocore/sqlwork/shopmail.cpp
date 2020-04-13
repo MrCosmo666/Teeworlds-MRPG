@@ -49,25 +49,23 @@ void ShopMailSql::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		
 		if(Enchant > 0)
 		{
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(15,20,30), _("L{i:level} - {s:name}x{i:count}(+{i:enchant}) [{i:price} {s:need}]"), 
-				"level", &Level, "name", BuyightItem.GetName(pPlayer), "count", &Count, "enchant", &Enchant,
-				"price", &Price, "need", NeededItem.GetName(pPlayer), NULL);
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(15,20,30), "L{INT} - {STR}x{INT}(+{INT}) [{INT} {STR}]", 
+				&Level, BuyightItem.GetName(pPlayer), &Count, &Enchant, &Price, NeededItem.GetName(pPlayer));
 		}
 		else
 		{
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(15,20,30), _("L{i:level} - {s:name}x{i:count} [{i:price} {s:need}]"), 
-				"level", &Level, "name", BuyightItem.GetName(pPlayer), "count", &Count, "price", &Price, "need", NeededItem.GetName(pPlayer), NULL);
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(15,20,30), "L{INT} - {STR}x{INT} [{INT} {STR}]", 
+				&Level, BuyightItem.GetName(pPlayer), &Count, &Price, NeededItem.GetName(pPlayer));
 		}
 
 		if(CGS::AttributInfo.find(BuyightItem.BonusID) != CGS::AttributInfo.end())
 		{
 			int BonusCount = BuyightItem.BonusCount*(Enchant+1);
-			GS()->AVM(ClientID, "null", NOPE, HideID, _("Astro +{i:bonus} {s:name}"), "bonus", &BonusCount, "name", pPlayer->AtributeName(BuyightItem.BonusID), NULL);
+			GS()->AVM(ClientID, "null", NOPE, HideID, "Astro +{INT} {STR}", &BonusCount, pPlayer->AtributeName(BuyightItem.BonusID));
 		}
 
-		GS()->AVM(ClientID, "null", NOPE, HideID, _("{s:desc}"), "desc", BuyightItem.GetDesc(pPlayer), NULL);
-		GS()->AVM(ClientID, "SHOP", ID, HideID, _("Exchange {s:ineed}x{i:iprice} to {s:need}x{i:price}"), 
-			"ineed", NeededItem.GetName(pPlayer), "iprice", &Price, "need", BuyightItem.GetName(pPlayer), "price", &Count, NULL);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", BuyightItem.GetDesc(pPlayer));
+		GS()->AVM(ClientID, "SHOP", ID, HideID, "Exchange {STR}x{INT} to {STR}x{INT}", NeededItem.GetName(pPlayer), &Price, BuyightItem.GetName(pPlayer), &Count);
 		HideID++;
 	}
 }
@@ -76,8 +74,8 @@ void ShopMailSql::ShowMailShop(CPlayer *pPlayer, int StorageID)
 void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 {
 	int ClientID = pPlayer->GetCID();
-	GS()->AVH(ClientID, HAUCTIONINFO, vec3(35,80,40), _("Auction Information"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HAUCTIONINFO, _("To create a slot, see inventory item interact."), NULL);
+	GS()->AVH(ClientID, HAUCTIONINFO, vec3(35,80,40), "Auction Information");
+	GS()->AVM(ClientID, "null", NOPE, HAUCTIONINFO, "To create a slot, see inventory item interact.");
 	GS()->AV(ClientID, "null", "");
 
 	int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + 400;
@@ -88,22 +86,21 @@ void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 		int Level = RES->getInt("Level"), Count = RES->getInt("Count"), OwnerID = RES->getInt("OwnerID");
 
 		ItemSql::ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
-		GS()->AVH(ClientID, HideID, vec3(15,20,30), _("{s:name}x{i:count}(+{i:enchant}) {i:price} gold"), 
-			"name", BuyightItem.GetName(pPlayer), "count", &Count, "enchant", &Enchant, "price", &Price, NULL);
+		GS()->AVH(ClientID, HideID, vec3(15,20,30), "{STR}x{INT}(+{INT}) {INT} gold", BuyightItem.GetName(pPlayer), &Count, &Enchant, &Price);
 
 		if(CGS::AttributInfo.find(BuyightItem.BonusID) != CGS::AttributInfo.end())
 		{
 			int BonusCount = BuyightItem.BonusCount*(Enchant+1);
-			GS()->AVM(ClientID, "null", NOPE, HideID, _("Astro +{i:bonus} {s:name}"), "bonus", &BonusCount, "name", pPlayer->AtributeName(BuyightItem.BonusID), NULL);
+			GS()->AVM(ClientID, "null", NOPE, HideID, "Astro +{INT} {STR}", &BonusCount, pPlayer->AtributeName(BuyightItem.BonusID));
 		}
 
-		GS()->AVM(ClientID, "null", NOPE, HideID, _("{s:desc}"), "desc", BuyightItem.GetDesc(pPlayer), NULL);
-		GS()->AVM(ClientID, "null", NOPE, HideID, _("Seller {s:seller}"), "seller", Job()->PlayerName(OwnerID), NULL);
-		GS()->AVM(ClientID, "SHOP", ID, HideID, _("Buy Price {i:price} gold"), "price", &Price, NULL);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", BuyightItem.GetDesc(pPlayer));
+		GS()->AVM(ClientID, "null", NOPE, HideID, "Seller {STR}", Job()->PlayerName(OwnerID));
+		GS()->AVM(ClientID, "SHOP", ID, HideID, "Buy Price {INT} gold", &Price);
 		++HideID;
 	}
 	if(HideID == (NUMHIDEMENU + ItemSql::ItemsInfo.size() + 400))
-		GS()->AVL(ClientID, "null", _("Currently there are no products."), NULL);
+		GS()->AVL(ClientID, "null", "Currently there are no products.");
 }
 
 // Новый слот аукциона

@@ -133,7 +133,7 @@ void CPlayer::TickOnlinePlayer()
 	if(pValueBroadcast > 0 && m_pCharacter && m_pCharacter->IsAlive())
 	{
 		m_ShowHealthBroadcast = false;
-		GS()->SBL(m_ClientID, PRENORMAL+pValueBroadcast, 80, _(Broadcast.buffer()), NULL);
+		GS()->SBL(m_ClientID, PRENORMAL+pValueBroadcast, 80, Broadcast.buffer());
 		pValueBroadcast = 0;
 		Broadcast.clear();
 	}
@@ -455,14 +455,13 @@ bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int Maxi
 	int UpgradeNeed = Price*Count;
 	if((*Upgrade + Count) > MaximalUpgrade)
 	{
-		GS()->SBL(m_ClientID, PRELEGENDARY, 100, _("This upgrades maximal."), NULL);
+		GS()->SBL(m_ClientID, PRELEGENDARY, 100, "This upgrades maximal.");
 		return false;		
 	}
 
 	if(*Useless < UpgradeNeed)
 	{
-		GS()->SBL(m_ClientID, PRELEGENDARY, 100, _("Have no upgrade points for upgrade +{i:num}. Need {i:need}."), 
-			"num", &Count, "need", &UpgradeNeed, NULL);
+		GS()->SBL(m_ClientID, PRELEGENDARY, 100, "Have no upgrade points for upgrade +{INT}. Need {INT}.", &Count, &UpgradeNeed);
 		return false;
 	}
 

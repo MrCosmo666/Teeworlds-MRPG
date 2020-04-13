@@ -49,7 +49,7 @@ void ShopEatSql::BuyEatItem(CPlayer *pPlayer, int EatID)
 
 	// проверяем голод игрока
 	if(pPlayer->Acc().Hungry >= 100)
-		return GS()->SBL(ClientID, PRELEGENDARY, 100, _("You are not hungry."), NULL);							
+		return GS()->SBL(ClientID, PRELEGENDARY, 100, "You are not hungry.");							
 	
 	// проверяем деньги и склад на доступность покупки
 	const int Price = ShopEat[EatID].Price;
@@ -60,7 +60,7 @@ void ShopEatSql::BuyEatItem(CPlayer *pPlayer, int EatID)
 	pPlayer->Acc().Hungry = clamp(pPlayer->Acc().Hungry + Eat, 0, 100);
 
 	// текст и покупаем предмет взаимодействуя со складом
-	GS()->SBL(ClientID, PRELEGENDARY, 100, _("Satiety +{i:eat}%. Curret {i:cureat}%."), "eat", &Eat, "cureat", &pPlayer->Acc().Hungry, NULL);	
+	GS()->SBL(ClientID, PRELEGENDARY, 100, "Satiety +{INT}%. Curret {INT}%.", &Eat, &pPlayer->Acc().Hungry);	
 	Job()->Storage()->BuyStorageItem(false, ClientID, StorageID, Price);
 
 	// сохраняем аккаунт и обновляем голосование
@@ -76,8 +76,7 @@ void ShopEatSql::ShowListShopEat(CPlayer *pPlayer, int StorageID)
 	// выводим кол-во денег и название склада
 	const int ClientID = pPlayer->GetCID();
 	GS()->AV(ClientID, "null", "");
-	GS()->AVH(ClientID, HCAFELIST, vec3(40,40,40), _("{s:name} : Backpack [{i:money} gold]"), 
-		"name", Job()->Storage()->StorageName(StorageID), "money", &pPlayer->GetItem(itMoney).Count,  NULL);
+	GS()->AVH(ClientID, HCAFELIST, vec3(40,40,40), "{STR} : Backpack [{INT} gold]", Job()->Storage()->StorageName(StorageID), &pPlayer->GetItem(itMoney).Count);
 
 	// имщем список предметов в каффе
 	const int StorageShopEat = Job()->Storage()->GetCountStorage(StorageID);
@@ -85,8 +84,8 @@ void ShopEatSql::ShowListShopEat(CPlayer *pPlayer, int StorageID)
 	{
 		if(StorageID != sheat.second.StorageID) continue;
 		int Available = StorageShopEat / Job()->Storage()->ValidGoodsPrice(sheat.second.Price); 
-		GS()->AVMI(ClientID, "eat", "BUYSHOPEAT", sheat.first, HCAFELIST, _("[{i:price}gold +{i:eat} Eat][Available: {i:count}] {s:name}"),
-			"price", &sheat.second.Price, "eat", &sheat.second.Eat, "count", &Available, "name", sheat.second.EatName, NULL);
+		GS()->AVMI(ClientID, "eat", "BUYSHOPEAT", sheat.first, HCAFELIST, "[{INT}gold +{INT} Eat][Available: {INT}] {STR}",
+			&sheat.second.Price, &sheat.second.Eat, &Available, sheat.second.EatName);
     }
 }
 

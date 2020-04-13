@@ -280,7 +280,7 @@ void MemberSql::ExitGuild(int AccountID)
 		GS()->ResetVotes(ClientID, MAINMENU);
 		AccountMainSql::Data[ClientID].MemberID = -1;
 	}
-	SJK.UD("tw_accounts_data", "MemberID = '-1', MemberRank = '-1', MemberDeposit = '0' WHERE ID = '%d'", AccountID);
+	SJK.UD("tw_accounts_data", "MemberID = NULL, MemberRank = '-1', MemberDeposit = '0' WHERE ID = '%d'", AccountID);
 }
 
 // показываем меню организации
@@ -293,50 +293,45 @@ void MemberSql::ShowMenuGuild(CPlayer *pPlayer)
 	
 	// показываем само меню
 	int ExpNeed = ExpForLevel(Member[MemberID].mLevel);
-	GS()->AVH(ClientID, HMEMBERSTATS, vec3(52,26,80), _("Guild name: {s:member}"), "member", Member[MemberID].mMemberName, NULL);
-	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, _("Level: {i:lvl} Experience: {i:exp}/{i:nexp}"),
-		"lvl", &Member[MemberID].mLevel, "exp", &Member[MemberID].mExperience, "nexp", &ExpNeed, NULL);
-	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, _("Maximal available player count: {i:count}"),
-		"count", &Member[MemberID].mUpgrades[EMEMBERUPGRADE::AvailableNSTSlots], NULL);
-	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, _("Leader: {s:lname}"), "lname", Job()->PlayerName(Member[MemberID].mOwnerID), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, _("- - - - - - - - - -"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, _("Guild Bank: {i:bank}gold"),"bank", &Member[MemberID].mBank, NULL);
+	GS()->AVH(ClientID, HMEMBERSTATS, vec3(52,26,80), "Guild name: {STR}", Member[MemberID].mMemberName);
+	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Level: {INT} Experience: {INT}/{INT}", &Member[MemberID].mLevel, &Member[MemberID].mExperience, &ExpNeed);
+	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Maximal available player count: {INT}", &Member[MemberID].mUpgrades[EMEMBERUPGRADE::AvailableNSTSlots]);
+	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Leader: {STR}", Job()->PlayerName(Member[MemberID].mOwnerID));
+	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "- - - - - - - - - -");
+	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Guild Bank: {INT}gold", &Member[MemberID].mBank);
 	int MemberHouse = GetMemberHouseID(MemberID);
-	if(MemberHouse > 0) { GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, _("Door Status: {s:door}"),"door", GetMemberDoor(MemberID) ? "Closed" : "Opened", NULL); }
-	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, _("- - - - - - - - - -"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, _("/ginvite <id> - to invite a player into members (for leader)"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, _("/gexit - leave of guild group (for all members)"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, _("Many options are unlocked with the purchase of a home"), NULL);
+	if(MemberHouse > 0) { GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Door Status: {STR}", GetMemberDoor(MemberID) ? "Closed" : "Opened"); }
+	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "- - - - - - - - - -");
+	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "/ginvite <id> - to invite a player into members (for leader)");
+	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "/gexit - leave of guild group (for all members)");
+	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Many options are unlocked with the purchase of a home");
 	GS()->AV(ClientID, "null", "");
 
 	pPlayer->m_Colored = { 10,10,10 };
-	GS()->AVL(ClientID, "null", _("# Your money: {i:money}gold"), "money", &pPlayer->GetItem(itMoney).Count, NULL);
-	GS()->AVL(ClientID, "MMONEY", _("Add money guild bank. (Amount in a reason)"), "member", Member[MemberID].mMemberName, NULL);
-	GS()->AVM(ClientID, "MENU", MEMBERRANK, NOPE, _("Settings guild Rank's"), NULL);
-	GS()->AVM(ClientID, "MENU", MEMBERINVITES, NOPE, _("Invites to your guild"), NULL);
-	GS()->AVM(ClientID, "MENU", MEMBERHISTORY, NOPE, _("History of activity"), NULL);
+	GS()->AVL(ClientID, "null", "# Your money: {INT}gold", &pPlayer->GetItem(itMoney).Count);
+	GS()->AVL(ClientID, "MMONEY", "Add money guild bank. (Amount in a reason)", Member[MemberID].mMemberName);
+	GS()->AVM(ClientID, "MENU", MEMBERRANK, NOPE, "Settings guild Rank's");
+	GS()->AVM(ClientID, "MENU", MEMBERINVITES, NOPE, "Invites to your guild");
+	GS()->AVM(ClientID, "MENU", MEMBERHISTORY, NOPE, "History of activity");
 
 	// если имеется дом
 	if(MemberHouse > 0)
 	{
-		GS()->AVL(ClientID, "MDOOR", _("Change state [\"{s:door} door\"]"), "door", GetMemberDoor(MemberID) ? "Open" : "Close", NULL);
-		GS()->AVL(ClientID, "MSPAWN", _("Teleport to guild house"), NULL);
-		GS()->AVL(ClientID, "MHOUSESELL", _("Sell your guild house (in reason 777)"), NULL);
+		GS()->AVL(ClientID, "MDOOR", "Change state [\"{STR} door\"]", GetMemberDoor(MemberID) ? "Open" : "Close");
+		GS()->AVL(ClientID, "MSPAWN", "Teleport to guild house");
+		GS()->AVL(ClientID, "MHOUSESELL", "Sell your guild house (in reason 777)");
 
 		for(int i = EMEMBERUPGRADE::ChairNSTExperience ; i < EMEMBERUPGRADE::NUM_EMEMBERUPGRADE; i++)
 		{
 			int PriceUpgrade = Member[ MemberID ].mUpgrades[ i ] * g_Config.m_SvPriceUpgradeGuildAnother;
-			GS()->AVM(ClientID, "MUPGRADE", i, NOPE, _("Upgrade {s:name} ({i:act}) {i:price}gold"), 
-				"name", UpgradeNames(i).c_str(), "act", &Member[MemberID].mUpgrades[ i ], "price", &PriceUpgrade, NULL);
+			GS()->AVM(ClientID, "MUPGRADE", i, NOPE, "Upgrade {STR} ({INT}) {INT}gold", UpgradeNames(i).c_str(), &Member[MemberID].mUpgrades[i], &PriceUpgrade);
 		}
 	}
 
 	// улучения без дома
 	int PriceUpgrade = Member[ MemberID ].mUpgrades[ EMEMBERUPGRADE::AvailableNSTSlots ] * g_Config.m_SvPriceUpgradeGuildSlot;
-	GS()->AVM(ClientID, "MUPGRADE", EMEMBERUPGRADE::AvailableNSTSlots, NOPE, _("Upgrade {s:name} ({i:act}) {i:price}gold"), 
-		"name", UpgradeNames(EMEMBERUPGRADE::AvailableNSTSlots).c_str(), 
-		"act", &Member[MemberID].mUpgrades[ EMEMBERUPGRADE::AvailableNSTSlots ], 
-		"price", &PriceUpgrade, NULL);
+	GS()->AVM(ClientID, "MUPGRADE", EMEMBERUPGRADE::AvailableNSTSlots, NOPE, "Upgrade {STR} ({INT}) {INT}gold", 
+		UpgradeNames(EMEMBERUPGRADE::AvailableNSTSlots).c_str(), &Member[MemberID].mUpgrades[ EMEMBERUPGRADE::AvailableNSTSlots ], &PriceUpgrade);
 	GS()->AV(ClientID, "null", "");
 	
 	// список членов в гильдии
@@ -347,18 +342,16 @@ void MemberSql::ShowMenuGuild(CPlayer *pPlayer)
 		const int AuthID = RES->getInt("ID");
 		const int RankID = RES->getInt("MemberRank");
 		int Deposit = RES->getInt("MemberDeposit");
-		GS()->AVH(ClientID, HideID, vec3(15,40,80), _("Rank: {s:rank} {s:name} Deposit: {i:deposit}"), 
-			"rank", GetMemberRank(MemberID, RankID), "name", RES->getString("Nick").c_str(), "deposit", &Deposit, NULL);
+		GS()->AVH(ClientID, HideID, vec3(15,40,80), "Rank: {STR} {STR} Deposit: {INT}", GetMemberRank(MemberID, RankID), RES->getString("Nick").c_str(), &Deposit);
 
 		// сбор всех рангов и вывод их
 		for(auto mr: MemberRank) 
 		{
 			if(MemberID != mr.second.MemberID || RankID == mr.first) continue;
-			GS()->AVD(ClientID, "MRANKCHANGE", AuthID, mr.first, HideID, _("Change Rank to: {s:rank}{s:rankz}"), 
-				"rank", mr.second.Rank, "rankz", mr.second.Access > 0 ? "*" : "", NULL);
+			GS()->AVD(ClientID, "MRANKCHANGE", AuthID, mr.first, HideID, "Change Rank to: {STR}{STR}", mr.second.Rank, mr.second.Access > 0 ? "*" : "");
 		}
-		GS()->AVM(ClientID, "MKICK", AuthID, HideID, _("Kick"), NULL);
-		if(AuthID != pPlayer->Acc().AuthID) GS()->AVM(ClientID, "MLEADER", AuthID, HideID, _("Give Leader (in reason 134)"), NULL);
+		GS()->AVM(ClientID, "MKICK", AuthID, HideID, "Kick");
+		if(AuthID != pPlayer->Acc().AuthID) GS()->AVM(ClientID, "MLEADER", AuthID, HideID, "Give Leader (in reason 134)");
 		HideID++;
 	}
 	GS()->AddBack(ClientID);
@@ -576,8 +569,8 @@ void MemberSql::ShowMenuRank(CPlayer *pPlayer)
 	GS()->AV(ClientID, "null", "For leader access full, ignored ranks");
 	GS()->AV(ClientID, "null", "- - - - - - - - - -");
 	GS()->AV(ClientID, "null", "- Maximal 5 ranks for one guild");
-	GS()->AVM(ClientID, "MRANKNAME", 1, NOPE, _("Name rank: {s:rname}"), "rname", CGS::InteractiveSub[ClientID].RankName, NULL);
-	GS()->AVM(ClientID, "MRANKCREATE", 1, NOPE, _("Create new rank"), NULL);
+	GS()->AVM(ClientID, "MRANKNAME", 1, NOPE, "Name rank: {STR}", CGS::InteractiveSub[ClientID].RankName);
+	GS()->AVM(ClientID, "MRANKCREATE", 1, NOPE, "Create new rank");
 	GS()->AV(ClientID, "null", "");
 	
 	int MemberID = pPlayer->Acc().MemberID;
@@ -586,10 +579,10 @@ void MemberSql::ShowMenuRank(CPlayer *pPlayer)
 		if(MemberID != mr.second.MemberID) continue;
 		
 		HideID += mr.first;
-		GS()->AVH(ClientID, HideID, vec3(40,20,15), _("Rank [{s:name}]"), "name", mr.second.Rank, NULL);
-		GS()->AVM(ClientID, "MRANKSET", mr.first, HideID, _("Change rank name to ({s:name})"), "name", CGS::InteractiveSub[ClientID].RankName, NULL);
-		GS()->AVM(ClientID, "MRANKACCESS", mr.first, HideID, _("Access rank ({s:aname})"), "aname", AccessNames(mr.second.Access), NULL);
-		GS()->AVM(ClientID, "MRANKDELETE", mr.first, HideID, _("Delete this rank"), NULL);
+		GS()->AVH(ClientID, HideID, vec3(40,20,15), "Rank [{STR}]", mr.second.Rank);
+		GS()->AVM(ClientID, "MRANKSET", mr.first, HideID, "Change rank name to ({STR})", CGS::InteractiveSub[ClientID].RankName);
+		GS()->AVM(ClientID, "MRANKACCESS", mr.first, HideID, "Access rank ({STR})", AccessNames(mr.second.Access));
+		GS()->AVM(ClientID, "MRANKDELETE", mr.first, HideID, "Delete this rank");
 	}
 	GS()->AddBack(ClientID);
 }
@@ -628,10 +621,10 @@ void MemberSql::ShowInvitesGuilds(int ClientID, int MemberID)
 	{
 		int OwnerID = RES->getInt("OwnerID");
 		const char *PlayerName = Job()->PlayerName(OwnerID);
-		GS()->AVH(ClientID, HideID, vec3(15,40,80), _("Sender {s:name} to join guilds"), "name", PlayerName, NULL);
+		GS()->AVH(ClientID, HideID, vec3(15,40,80), "Sender {STR} to join guilds", PlayerName);
 		{
-			GS()->AVD(ClientID, "MINVITEACCEPT", MemberID, OwnerID, HideID, _("Accept {s:name} to guild"), "name", PlayerName, NULL);
-			GS()->AVD(ClientID, "MINVITEREJECT", MemberID, OwnerID, HideID, _("Reject {s:name} to guild"), "name", PlayerName, NULL);
+			GS()->AVD(ClientID, "MINVITEACCEPT", MemberID, OwnerID, HideID, "Accept {STR} to guild", PlayerName);
+			GS()->AVD(ClientID, "MINVITEREJECT", MemberID, OwnerID, HideID, "Reject {STR} to guild", PlayerName);
 		}
 		HideID++;
 	}
@@ -641,12 +634,11 @@ void MemberSql::ShowInvitesGuilds(int ClientID, int MemberID)
 // показать топ гильдии и позваться к ним
 void MemberSql::ShowFinderGuilds(int ClientID)
 {
-	GS()->AVL(ClientID, "null", _("You are not in guild, or select member"), NULL);
+	GS()->AVL(ClientID, "null", "You are not in guild, or select member");
 	GS()->AV(ClientID, "null", "Use reason how enter Value, Click fields!"); 	
 	GS()->AV(ClientID, "null", "Example: Find guild: [], in reason name, and use this");
 	GS()->AV(ClientID, "null", "");
-	
-	GS()->AVM(ClientID, "MINVITENAME", 1, NOPE, _("Find guild: {s:gname}"), "gname", CGS::InteractiveSub[ClientID].GuildName, NULL);
+	GS()->AVM(ClientID, "MINVITENAME", 1, NOPE, "Find guild: {STR}", CGS::InteractiveSub[ClientID].GuildName);
 
 	int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + 1800;
 	CSqlString<64> cGuildName = CSqlString<64>(CGS::InteractiveSub[ClientID].GuildName);
@@ -658,14 +650,11 @@ void MemberSql::ShowFinderGuilds(int ClientID)
 		const char *MemberName = RES->getString("MemberName").c_str();
 		int PlayersCount = GetGuildPlayerCount(MemberID);
 
-		GS()->AVH(ClientID, HideID, vec3(15,40,80), _("Leader: {s:pname} Guild {s:name} Players [{i:uslots}/{i:pslots}]"), 
-			"pname", Job()->PlayerName(Member[ MemberID ].mOwnerID), "name", MemberName, 
-			"uslots", &PlayersCount, "pslots", &AvailableSlot, NULL);
+		GS()->AVH(ClientID, HideID, vec3(15,40,80), "Leader: {STR} Guild {STR} Players [{INT}/{INT}]", 
+			Job()->PlayerName(Member[ MemberID ].mOwnerID), MemberName, &PlayersCount, &AvailableSlot);
 		{
-			GS()->AVM(ClientID, "null", NOPE, HideID, _("House: {s:home} | Bank: {i:bank} gold"), 
-				"home", (GetMemberHouseID(MemberID) <= 0 ? "No" : "Yes"), "bank", &Member[ MemberID ].mBank, NULL);
-					
-			GS()->AVM(ClientID, "MINVITESEND", MemberID, HideID, _("Send request to join {s:name}"), "name", MemberName, NULL);
+			GS()->AVM(ClientID, "null", NOPE, HideID, "House: {STR} | Bank: {INT} gold", (GetMemberHouseID(MemberID) <= 0 ? "No" : "Yes"), &Member[ MemberID ].mBank);
+			GS()->AVM(ClientID, "MINVITESEND", MemberID, HideID, "Send request to join {STR}", MemberName);
 		}		
 		HideID++;
 	}
@@ -684,7 +673,7 @@ void MemberSql::ShowHistoryGuild(int ClientID, int MemberID)
 	while(RES->next()) 
 	{
 		str_format(aBuf, sizeof(aBuf), "[%s] %s", RES->getString("Time").c_str(), RES->getString("Text").c_str());
-		GS()->AVM(ClientID, "null", NOPE, NOPE, _("{s:text}"), "text", aBuf, NULL);
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "{STR}", aBuf);
 	}
 	GS()->AddBack(ClientID);	
 }
@@ -841,19 +830,19 @@ void MemberSql::ShowBuyHouse(CPlayer *pPlayer, int MID)
 	int MemberID = pPlayer->Acc().MemberID;
 	bool Leader = IsLeaderPlayer(pPlayer);
 
-	GS()->AVH(ClientID, HMEMHOMEINFO, vec3(35,80,40), _("Information Member Housing"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HMEMHOMEINFO, _("Buying a house you will need to constantly the Treasury"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HMEMHOMEINFO, _("In the intervals of time will be paid house"), NULL);
+	GS()->AVH(ClientID, HMEMHOMEINFO, vec3(35,80,40), "Information Member Housing");
+	GS()->AVM(ClientID, "null", NOPE, HMEMHOMEINFO, "Buying a house you will need to constantly the Treasury");
+	GS()->AVM(ClientID, "null", NOPE, HMEMHOMEINFO, "In the intervals of time will be paid house");
 
 	pPlayer->m_Colored = { 20, 20, 20 };
 	
 	if(MemberID == MID)
-		GS()->AVM(ClientID, "null", NOPE, 0, _("Guild Bank: {i:gbank} Price: {i:price}"), "gbank", &Member[ MemberID ].mBank, "price", &MemberHouse[MID].mPrice, NULL);
+		GS()->AVM(ClientID, "null", NOPE, 0, "Guild Bank: {INT} Price: {INT}", &Member[ MemberID ].mBank, &MemberHouse[MID].mPrice);
 	
 	if(Leader && MemberID != MemberHouse[MID].mOwnerMemberID)
 	{
-		GS()->AVM(ClientID, "null", NOPE, 0, _("Every day payment {i:price} gold"), "price", &MemberHouse[MID].mEveryDay, NULL);
-		GS()->AVM(ClientID, "BUYMEMBERHOUSE", MID, 0, _("Buy this member house! Price: {i:price}"), "price", &MemberHouse[MID].mPrice, NULL);
+		GS()->AVM(ClientID, "null", NOPE, 0, "Every day payment {INT} gold", &MemberHouse[MID].mEveryDay);
+		GS()->AVM(ClientID, "BUYMEMBERHOUSE", MID, 0, "Buy this member house! Price: {INT}", &MemberHouse[MID].mPrice);
 	}
 }
 

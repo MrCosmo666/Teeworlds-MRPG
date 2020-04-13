@@ -72,9 +72,9 @@ int SkillsSql::GetSkillLevel(int ClientID, int SkillID) const
 void SkillsSql::ShowMailSkillList(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	GS()->AVH(ClientID, HSKILLLEARN, vec3(35,80,40), _("Skill Learn Information"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HSKILLLEARN, _("Here you can learn passive and active skills"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HSKILLLEARN, _("You can bind active skill any button using the console"), NULL);
+	GS()->AVH(ClientID, HSKILLLEARN, vec3(35,80,40), "Skill Learn Information");
+	GS()->AVM(ClientID, "null", NOPE, HSKILLLEARN, "Here you can learn passive and active skills");
+	GS()->AVM(ClientID, "null", NOPE, HSKILLLEARN, "You can bind active skill any button using the console");
 	GS()->AV(ClientID, "null", "");
 
 	for(const auto& sk : SkillData)
@@ -94,25 +94,23 @@ void SkillsSql::SkillSelected(CPlayer *pPlayer, int SkillID)
 
 	// меню выводим
 	pPlayer->m_Colored = { 5,10,1 };
-	GS()->AVM(ClientID, "SKILLLEARN", SkillID, NOPE, _("{s:act} [{i:my}/{i:max}] {s:name} [Price {i:point}SP]"), 
-		"act", (Passive ? "Passive" : "Active"), "my", &LevelOwn, "max", &SkillData[SkillID].sSkillMaxLevel,
-		"name", SkillData[SkillID].sSkillName, "point", &SkillData[SkillID].sSkillPrice);
+	GS()->AVM(ClientID, "SKILLLEARN", SkillID, NOPE, "{STR} [{INT}/{INT}] {STR} [Price {INT}SP]", 
+		(Passive ? "Passive" : "Active"), &LevelOwn, &SkillData[SkillID].sSkillMaxLevel, SkillData[SkillID].sSkillName, &SkillData[SkillID].sSkillPrice);
 
 	// пасивный скилл
 	if(Passive)
 	{
-		GS()->AVM(ClientID, "null", NOPE, NOPE, _("Next level +{i:bcount} {s:bonus}"), "bcount", &BonusSkill, "bonus", SkillData[SkillID].sBonusName, NULL);
-		GS()->AVM(ClientID, "null", NOPE, NOPE, _("{s:desc}"), "desc", SkillData[SkillID].sSkillDesc, NULL);
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].sBonusName);
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "{STR}", SkillData[SkillID].sSkillDesc);
 		GS()->AV(ClientID, "null", "");
 		return;
 	}
 
 	// если обычный скилл
-	GS()->AVM(ClientID, "null", NOPE, NOPE, _("Mana required (first use -{i:mcr} support -{i:mcu})"), 
-		"mcr", &SkillData[SkillID].sManaCost, "mcu", &SkillData[SkillID].sManaUseCost, NULL);
-	GS()->AVM(ClientID, "null", NOPE, NOPE, _("{s:desc}"), "desc", SkillData[SkillID].sSkillDesc, NULL);
-	GS()->AVM(ClientID, "null", NOPE, NOPE, _("Next level +{i:bcount} {s:bonus}"), "bcount", &BonusSkill, "bonus", SkillData[SkillID].sBonusName, NULL);
-	GS()->AVM(ClientID, "null", NOPE, NOPE, _("F1 Bind: (bind 'key' say \"/useskill {i:skill}\")"), "skill", &SkillID, NULL);
+	GS()->AVM(ClientID, "null", NOPE, NOPE, "Mana required (first use -{INT} support -{INT})", &SkillData[SkillID].sManaCost, &SkillData[SkillID].sManaUseCost);
+	GS()->AVM(ClientID, "null", NOPE, NOPE, "{STR}", SkillData[SkillID].sSkillDesc);
+	GS()->AVM(ClientID, "null", NOPE, NOPE, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].sBonusName);
+	GS()->AVM(ClientID, "null", NOPE, NOPE, "F1 Bind: (bind 'key' say \"/useskill {INT}\")", &SkillID);
 	GS()->AV(ClientID, "null", "");
 }
 

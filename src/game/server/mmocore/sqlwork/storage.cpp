@@ -56,7 +56,7 @@ void StorageSql::OnPaymentTime()
 		{
 			Storage[StorageID].Bank = Bank-g_Config.m_SvPaymentBussines;
 			SJK.UD("tw_storages", "Bank = '%d' WHERE ID = '%d'", Storage[StorageID].Bank, StorageID);
-			SCO(StorageID, _("[Business] Payment {i:price} gold was successful {i:count}"), "name", Storage[StorageID].Name, NULL);
+			SCO(StorageID, "[Business] Payment {INT} gold was successful {STR}", &g_Config.m_SvPaymentBussines, Storage[StorageID].Name, NULL);
 			continue;
 		}
 
@@ -79,36 +79,35 @@ void StorageSql::ShowStorageMenu(int ClientID, int StorageID)
 	if(StorageID < 0) return GS()->AV(ClientID, "null", "Storage Don't work");
 
 	// ремонт и имя склада
-	GS()->AVH(ClientID, HSTORAGEUSE, vec3(40,50,60), _("Bussines [{s:name}/{i:count}]"), "name", Storage[StorageID].Name, "count", &Storage[StorageID].Count, NULL);
+	GS()->AVH(ClientID, HSTORAGEUSE, vec3(40,50,60), "Bussines [{STR}/{INT}]", Storage[StorageID].Name, &Storage[StorageID].Count);
 
 	// выводим владельца склада
 	const bool LoadStorage = (Storage[StorageID].MonsterSubType > 0);
 	if(Storage[StorageID].OwnerID > 0)
 	{
-		GS()->AVM(ClientID, "null", NOPE, HSTORAGEUSE, _("{s:name} Owner: {s:owner}"), 
-			"name", Storage[StorageID].Name, "owner", Job()->PlayerName(Storage[StorageID].OwnerID), NULL);	
+		GS()->AVM(ClientID, "null", NOPE, HSTORAGEUSE, "{STR} Owner: {STR}", Storage[StorageID].Name, Job()->PlayerName(Storage[StorageID].OwnerID));	
 	}
 	else if(!LoadStorage)
 	{
 		int Price = Storage[StorageID].Price + g_Config.m_SvPaymentBussines;
-		GS()->AVM(ClientID, "BUYSTORAGE", StorageID, HSTORAGEUSE, _("Buy this business. Price {i:price}"), "price", &Price, NULL);	
+		GS()->AVM(ClientID, "BUYSTORAGE", StorageID, HSTORAGEUSE, "Buy this business. Price {INT}", &Price);	
 	}
 
 	// если владелец бизнеса
 	if(Storage[StorageID].OwnerID == pPlayer->Acc().AuthID)
 	{
-		GS()->AVM(ClientID, "null", NOPE, HSTORAGEUSE, _("Every day -{i:price} from the bank, or sell"), "price", &g_Config.m_SvPaymentBussines, NULL);	
-		GS()->AVM(ClientID, "null", NOPE, HSTORAGEUSE, _("Your bank: {i:gold}"), "gold", &Storage[StorageID].Bank, NULL);
-		GS()->AVM(ClientID, "null", NOPE, HSTORAGEUSE, _("- - - - - - - - - - - - - - - - - - -"), NULL);	
-		GS()->AVM(ClientID, "ADDMSTORAGE", StorageID, HSTORAGEUSE, _("Add money in business"), NULL);		
-		GS()->AVM(ClientID, "REMMSTORAGE", StorageID, HSTORAGEUSE, _("Remove money in business"), NULL);
-		GS()->AVM(ClientID, "SELLSTORAGE", StorageID, HSTORAGEUSE, _("Sell storage in reason (7). Back half the cost."), NULL);		
+		GS()->AVM(ClientID, "null", NOPE, HSTORAGEUSE, "Every day -{INT} from the bank, or sell", &g_Config.m_SvPaymentBussines);	
+		GS()->AVM(ClientID, "null", NOPE, HSTORAGEUSE, "Your bank: {INT}", &Storage[StorageID].Bank);
+		GS()->AVM(ClientID, "null", NOPE, HSTORAGEUSE, "- - - - - - - - - - - - - - - - - - -");	
+		GS()->AVM(ClientID, "ADDMSTORAGE", StorageID, HSTORAGEUSE, "Add money in business");		
+		GS()->AVM(ClientID, "REMMSTORAGE", StorageID, HSTORAGEUSE, "Remove money in business");
+		GS()->AVM(ClientID, "SELLSTORAGE", StorageID, HSTORAGEUSE, "Sell storage in reason (7). Back half the cost.");		
 	}
 
 	// если мобы для этого склада есть и починка предметов
-	GS()->AVM(ClientID, "REPAIRITEMS", StorageID, HSTORAGEUSE, _("Repair all items - FREE"), NULL);
-	if(LoadStorage) GS()->AVM(ClientID, "LOADSTORAGE", StorageID, HSTORAGEUSE, _("Load goods"), NULL);
-	else GS()->AVM(ClientID, "UNLOADSTORAGE", StorageID, HSTORAGEUSE, _("Unload all goods"), NULL);
+	GS()->AVM(ClientID, "REPAIRITEMS", StorageID, HSTORAGEUSE, "Repair all items - FREE");
+	if(LoadStorage) GS()->AVM(ClientID, "LOADSTORAGE", StorageID, HSTORAGEUSE, "Load goods");
+	else GS()->AVM(ClientID, "UNLOADSTORAGE", StorageID, HSTORAGEUSE, "Unload all goods");
 }
 
 /* #########################################################################
@@ -185,7 +184,7 @@ bool StorageSql::BuyStorageItem(bool CheckStorageCount, int BoughtCID, int Stora
 	
 	// пишем что кто-то что-то купил
 	int StorageBank = GetBankStorage(StorageID);
-	Job()->Storage()->SCO(StorageID, _("{s:name} something bought, your business Bank {i:bank}"), "name", GS()->Server()->ClientName(BoughtCID), "bank", &StorageBank, NULL);
+	Job()->Storage()->SCO(StorageID, "{STR} something bought, your business Bank {INT}", GS()->Server()->ClientName(BoughtCID), &StorageBank);
 	return true;
 }
 

@@ -162,8 +162,7 @@ void SqlController::ShowBussinesHousesSell(CPlayer *pPlayer)
 		int Price = RES->getInt("Price");
 		int Level = RES->getInt("FarmLevel");
 
-		GS()->AVM(ClientID, "null", NOPE, HHOUSEAVAILABLE, _("HL{i:lvl} {s:class} {i:price}gold {s:world}"), 
-			"lvl", &Level, "class", House()->ClassName(HouseID), "price", &Price, "world", GS()->Server()->GetWorldName(WorldID), NULL);
+		GS()->AVM(ClientID, "null", NOPE, HHOUSEAVAILABLE, "HL{INT} {STR} {INT}gold {STR}", &Level, House()->ClassName(HouseID), &Price, GS()->Server()->GetWorldName(WorldID));
 	}
 	GS()->AV(ClientID, "null", "");
 	
@@ -176,8 +175,7 @@ void SqlController::ShowBussinesHousesSell(CPlayer *pPlayer)
 		const int WorldID = RES2->getInt("WorldID");
 		int Price = RES2->getInt("Price");
 
-		GS()->AVM(ClientID, "null", NOPE, HBUSINESSAVAILABLE, _("{s:name} {i:price}gold {s:world}"), 
-			"name", Storage()->StorageName(StorageID), "price", &Price, "world", GS()->Server()->GetWorldName(WorldID), NULL);
+		GS()->AVM(ClientID, "null", NOPE, HBUSINESSAVAILABLE, "{STR} {INT}gold {STR}", Storage()->StorageName(StorageID), &Price, GS()->Server()->GetWorldName(WorldID));
 	}
 }
 
@@ -289,9 +287,9 @@ void SqlController::DevNotebook(CPlayer *pPlayer)
 	while(RES->next())
 	{
 		++HideID;
-		GS()->AVH(ClientID, HideID, vec3(1,2,1), _("{s:desc}"), "desc", RES->getString("nDesc").c_str());
-		GS()->AVM(ClientID, "null", NOPE, HideID, _("{s:desc2}"), "desc2", RES->getString("nDesc2").c_str());
-		GS()->AVM(ClientID, "null", NOPE, HideID, _("{s:desc3}"), "desc3", RES->getString("nDesc3").c_str());
+		GS()->AVH(ClientID, HideID, vec3(1,2,1), "{STR}", RES->getString("nDesc").c_str());
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", RES->getString("nDesc2").c_str());
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", RES->getString("nDesc3").c_str());
 	}
 }
 

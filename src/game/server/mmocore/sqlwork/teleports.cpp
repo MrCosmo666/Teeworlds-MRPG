@@ -103,15 +103,15 @@ void TeleportsSql::ShowTeleportList(CPlayer *pPlayer)
 	const int ClientID = pPlayer->GetCID();
 
 	// весь список телепортов	
-	GS()->AVH(ClientID, HTELEPORTLIST, vec3(50, 10, 5), _("Available teleports"), NULL);
+	GS()->AVH(ClientID, HTELEPORTLIST, vec3(50, 10, 5), "Available teleports");
 	
 	// если имеется дом организации
 	if(Job()->Member()->GetMemberHouseID(pPlayer->Acc().MemberID) >= 1)
-		GS()->AVM(ClientID, "MSPAWN", NOPE, HTELEPORTLIST, _("Move to Member House - free"), NULL);\
+		GS()->AVM(ClientID, "MSPAWN", NOPE, HTELEPORTLIST, "Move to Member House - free");\
 
 	// если имеется дом
 	if(Job()->House()->PlayerHouseID(pPlayer) >= 1)
-		GS()->AVM(ClientID, "HSPAWN", NOPE, HTELEPORTLIST, _("Move to Your House - free"), NULL);
+		GS()->AVM(ClientID, "HSPAWN", NOPE, HTELEPORTLIST, "Move to Your House - free");
 
 	for(const auto& tl : Teleport)
 	{
@@ -123,14 +123,14 @@ void TeleportsSql::ShowTeleportList(CPlayer *pPlayer)
 			distance(pPlayer->GetCharacter()->m_Core.m_Pos, vec2(tl.second.TeleX, tl.second.TeleY)) < 120);	
 		if(LocalTeleport)
 		{
-			GS()->AVM(ClientID, "null", tl.first, HTELEPORTLIST, _("[Local] {s:name}"), "name", tl.second.TeleName, NULL);	
+			GS()->AVM(ClientID, "null", tl.first, HTELEPORTLIST, "[Local] {STR}", tl.second.TeleName);	
 			continue;
 		}
 		
 		// если не локальное то пишем цену и добавляем возможность телепорта
 		int Price = g_Config.m_SvPriceTeleport*tl.second.WorldID;
-		GS()->AVM(ClientID, "TELEPORT", tl.first, HTELEPORTLIST, _("{s:name} {s:world} - {i:price}gold"), 
-			"name", tl.second.TeleName, "world", GS()->Server()->GetWorldName(tl.second.WorldID),  "price", &Price, NULL);	
+		GS()->AVM(ClientID, "TELEPORT", tl.first, HTELEPORTLIST, "{STR} {STR} - {INT}gold", 
+			tl.second.TeleName, GS()->Server()->GetWorldName(tl.second.WorldID), &Price);	
 	}
 }
 
