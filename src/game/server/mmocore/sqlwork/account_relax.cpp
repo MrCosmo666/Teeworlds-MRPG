@@ -72,15 +72,11 @@ void SpaRelaxSql::ShowMenu(int ClientID)
 		return;
 
 	int NeedExp = ExpNeed(pPlayer->Acc().Relax[RlxLevel]);
-	GS()->AVM(ClientID, "null", NOPE, HJOBUPGRADE, _("[Relax Point: {i:point}] Level: {i:level} Exp: {i:exp}/{i:needexp}"), 
-		"point", &pPlayer->Acc().Relax[RlxUpgrade], "level", &pPlayer->Acc().Relax[RlxLevel], 
-		"exp", &pPlayer->Acc().Relax[RlxExp], "needexp", &NeedExp, NULL);
-	GS()->AVD(ClientID, "RELAXUPGRADE", RlxSpaBonus, 12, HJOBUPGRADE, _("[Price 12P]Experience Relax +1 (Active {i:upgradebonus})"), 
-		"upgradebonus", &pPlayer->Acc().Relax[RlxSpaBonus], NULL);
-	GS()->AVD(ClientID, "RELAXUPGRADE", RlxExpBonus, 5, HJOBUPGRADE, _("[Price 5P]Experience Account +1 (Active {i:upgradeexp})"), 
-		"upgradeexp", &pPlayer->Acc().Relax[RlxExpBonus], NULL);
-	GS()->AVD(ClientID, "RELAXUPGRADE", RlxMoneyBonus, 12, HJOBUPGRADE, _("[Price 12P]Money +1 (Active {i:upgrademoney})"), 
-		"upgrademoney", &pPlayer->Acc().Relax[RlxMoneyBonus], NULL);
+	GS()->AVM(ClientID, "null", NOPE, HJOBUPGRADE, "[Relax Point: {INT}] Level: {INT} Exp: {INT}/{INT}", 
+		&pPlayer->Acc().Relax[RlxUpgrade], &pPlayer->Acc().Relax[RlxLevel], &pPlayer->Acc().Relax[RlxExp], &NeedExp);
+	GS()->AVD(ClientID, "RELAXUPGRADE", RlxSpaBonus, 12, HJOBUPGRADE, "[Price 12P]Experience Relax +1 (Active {INT})", &pPlayer->Acc().Relax[RlxSpaBonus]);
+	GS()->AVD(ClientID, "RELAXUPGRADE", RlxExpBonus, 5, HJOBUPGRADE, "[Price 5P]Experience Account +1 (Active {INT})", &pPlayer->Acc().Relax[RlxExpBonus]);
+	GS()->AVD(ClientID, "RELAXUPGRADE", RlxMoneyBonus, 12, HJOBUPGRADE, _("[Price 12P]Money +1 (Active {INT})"), &pPlayer->Acc().Relax[RlxMoneyBonus]);
 }
 
 // парсинг голосований релакса

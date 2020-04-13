@@ -48,12 +48,10 @@ void MinerAccSql::ShowMenu(int ClientID)
 		return;
 
 	int NeedExp = ExpNeed(pPlayer->Acc().Miner[MnrLevel]);
-	GS()->AVM(ClientID, "null", NOPE, HJOBUPGRADE, _("[Miner Point: {i:point}] Level: {i:level} Exp: {i:exp}/{i:needexp}"), 
-		"point", &pPlayer->Acc().Miner[MnrUpgrade], "level", &pPlayer->Acc().Miner[MnrLevel], 
-		"exp", &pPlayer->Acc().Miner[MnrExp], "needexp", &NeedExp, NULL);
+	GS()->AVM(ClientID, "null", NOPE, HJOBUPGRADE, "[Miner Point: {INT}] Level: {INT} Exp: {INT}/{INT}", 
+		&pPlayer->Acc().Miner[MnrUpgrade], &pPlayer->Acc().Miner[MnrLevel], &pPlayer->Acc().Miner[MnrExp], &NeedExp);
 
-	GS()->AVD(ClientID, "MINERUPGRADE", MnrCount, 20, HJOBUPGRADE, _("[Price 20P]Mining bonus +1(Active {i:upgradebonus})"),
-		 "upgradebonus", &pPlayer->Acc().Miner[MnrCount], NULL);
+	GS()->AVD(ClientID, "MINERUPGRADE", MnrCount, 20, HJOBUPGRADE, "[Price 20P]Mining bonus +1(Active {INT})", &pPlayer->Acc().Miner[MnrCount]);
 }
 
 // получить уровень руды

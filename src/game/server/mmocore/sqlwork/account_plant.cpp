@@ -69,11 +69,9 @@ void PlantsAccSql::ShowMenu(int ClientID)
 		return;
 
 	int NeedExp = ExpNeed(pPlayer->Acc().Plant[PlLevel]);
-	GS()->AVM(ClientID, "null", NOPE, HJOBUPGRADE, _("[Plants Point: {i:point}] Level: {i:level} Exp: {i:exp}/{i:needexp}"), 
-		"point", &pPlayer->Acc().Plant[PlUpgrade], "level", &pPlayer->Acc().Plant[PlLevel], 
-		"exp", &pPlayer->Acc().Plant[PlExp], "needexp", &NeedExp, NULL);
-	GS()->AVD(ClientID, "PLANTUPGRADE", PlCounts, 20, HJOBUPGRADE, _("[Price 20P]Plants bonus +1(Active {i:upgradebonus})"),
-		 "upgradebonus", &pPlayer->Acc().Plant[PlCounts], NULL);
+	GS()->AVM(ClientID, "null", NOPE, HJOBUPGRADE, _("[Plants Point: {INT}] Level: {INT} Exp: {INT}/{INT}"), 
+		&pPlayer->Acc().Plant[PlUpgrade], &pPlayer->Acc().Plant[PlLevel], &pPlayer->Acc().Plant[PlExp], &NeedExp);
+	GS()->AVD(ClientID, "PLANTUPGRADE", PlCounts, 20, HJOBUPGRADE, _("[Price 20P]Plants bonus +1(Active {INT})"), &pPlayer->Acc().Plant[PlCounts]);
 }
 // меню всех растений
 void PlantsAccSql::ShowPlantsItems(int ClientID)

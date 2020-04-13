@@ -240,7 +240,7 @@ void CCharacter::FireWeapon()
 		if(m_pPlayer->GetItemEquip(m_ActiveWeapon+EQUIP_HAMMER) == -1)
 		{
 			// hotfix hammer non pick items
-			GS()->SBL(m_pPlayer->GetCID(), PRELEGENDARY, 150, _("You need buy this weapon or module and equip!"), NULL);
+			GS()->SBL(m_pPlayer->GetCID(), PRELEGENDARY, 150, "You need buy this weapon or module and equip!");
 			if(m_ActiveWeapon == WEAPON_HAMMER)
 				GS()->TakeItemCharacter(m_pPlayer->GetCID());
 			return;
@@ -940,9 +940,8 @@ void CCharacter::HandleTilesets()
 				
 						// send info house in broadcast
 						int PriceHouse = GS()->Mmo()->House()->GetHousePrice(HouseID);
-						GS()->SBL(m_pPlayer->GetCID(), PRERARE, 200, _("House Price: {i:price}gold \n"
-							" Owner: {s:owner}.\nInformation load in vote."), "price", &PriceHouse, 
-							"owner", GS()->Mmo()->House()->OwnerName(HouseID), NULL);
+						GS()->SBL(m_pPlayer->GetCID(), PRERARE, 200, "House Price: {INT}gold \n"
+							" Owner: {STR}.\nInformation load in vote.", &PriceHouse, GS()->Mmo()->House()->OwnerName(HouseID));
 					}
 					m_Core.m_ProtectHooked = m_NoAllowDamage = true;
 				} break;
@@ -1000,7 +999,7 @@ void CCharacter::HandleTilesets()
 				case TILE_CLUB:
 				{
 					int Level = 1 + m_pPlayer->GetItem(itClubSeasonTicket).Enchant;
-					GS()->SBL(m_pPlayer->GetCID(), 100000, 100, _("Welcome to Club\nYou season level {i:level}"), "level", &Level, NULL);
+					GS()->SBL(m_pPlayer->GetCID(), 100000, 100, "Welcome to Club\nYou season level {INT}", &Level);
 					SetEvent(TILE_EVENTPARTY);
 					m_NoAllowDamage = true;
 				}

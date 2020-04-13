@@ -61,16 +61,14 @@ void CraftSql::ShowCraftList(CPlayer *pPlayer, int CraftTab)
 
 		// выводим основное меню
 		int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + cr.first;
-		GS()->AVHI(ClientID, InfoSellItem.GetIcon(), HideID, vec3(15,25,55), _("LV:{i:level} | {s:itemname}x{i:count} : {i:price} Gold"),
-			"level", &cr.second.Level, "itemname", InfoSellItem.GetName(pPlayer), 
-			"count", &cr.second.ItemCount, "price", &MoneyDiscount, NULL);
-		GS()->AVM(ClientID, "null", NOPE, HideID, _("{s:desc}"), "desc", InfoSellItem.GetDesc(pPlayer));
+		GS()->AVHI(ClientID, InfoSellItem.GetIcon(), HideID, vec3(15,25,55), "LV:{INT} | {STR}x{INT} : {INT} Gold",
+			&cr.second.Level, InfoSellItem.GetName(pPlayer), &cr.second.ItemCount, &MoneyDiscount);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", InfoSellItem.GetDesc(pPlayer));
 
 		// бонус предметов
 		if(CGS::AttributInfo.find(InfoSellItem.BonusID) != CGS::AttributInfo.end() && InfoSellItem.BonusCount)
 		{
-			GS()->AVM(ClientID, "null", NOPE, HideID, _("Astro stats +{i:bonus} {s:name}"), 
-				"bonus", &InfoSellItem.BonusCount, "name", pPlayer->AtributeName(InfoSellItem.BonusID), NULL);
+			GS()->AVM(ClientID, "null", NOPE, HideID, "Astro stats +{INT} {STR}", &InfoSellItem.BonusCount, pPlayer->AtributeName(InfoSellItem.BonusID));
 		}
 
 		// чтобы проще инициализируем под переменной
@@ -85,11 +83,11 @@ void CraftSql::ShowCraftList(CPlayer *pPlayer, int CraftTab)
 			str_format(aBuf, sizeof(aBuf), "%sx%d(%d) ", PlSearchItem.Info().GetName(pPlayer), SearchCount, PlSearchItem.Count);
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
-		GS()->AVM(ClientID, "null", NOPE, HideID, _("{s:need}"), "need", Buffer.buffer(), NULL);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", Buffer.buffer());
 		Buffer.clear();
 
 		// показать все остальное
-		GS()->AVM(ClientID, "CRAFT", cr.first, HideID, _("Craft {s:item}"), "item", InfoSellItem.GetName(pPlayer), NULL);
+		GS()->AVM(ClientID, "CRAFT", cr.first, HideID, "Craft {STR}", InfoSellItem.GetName(pPlayer));
 	}
 }
 

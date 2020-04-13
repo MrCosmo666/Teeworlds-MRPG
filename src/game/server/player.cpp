@@ -885,19 +885,23 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		int MobID = BotPlayer->GetBotSub();
 		if(BotPlayer->GetSpawnBot() == SPAWNNPC)
 		{
-			if(TalkedProgress >= ContextBots::NpcBot[MobID].m_Talk.size())
+			int sizeTalking = ContextBots::NpcBot[MobID].m_Talk.size();
+			if(TalkedProgress >= sizeTalking)
 			{
 				m_TalkingNPC.m_TalkedProgress = 0;
 				GS()->ClearTalkText(m_ClientID);
 				return;
 			}
 
+			char reformTalkedText[512];
 			int BotID = ContextBots::NpcBot[MobID].BotID;
 			FormatTextQuest(BotID, ContextBots::NpcBot[MobID].m_Talk.at(TalkedProgress).m_TalkingText);
-			GS()->Mmo()->BotsData()->ProcessingTalkingNPC(m_ClientID, TalkedID, 120, FormatedTalkedText(),
+			str_format(reformTalkedText, sizeof(reformTalkedText), "(Progress %d of %d .. ) - %s", 1+m_TalkingNPC.m_TalkedProgress, sizeTalking, FormatedTalkedText());
+			ClearFormatQuestText();
+
+			GS()->Mmo()->BotsData()->ProcessingTalkingNPC(m_ClientID, TalkedID, 120, reformTalkedText,
 				ContextBots::NpcBot[MobID].m_Talk.at(TalkedProgress).m_Style,
 				ContextBots::NpcBot[MobID].m_Talk.at(TalkedProgress).m_Emote);
-			ClearFormatQuestText();
 		}
 
 		m_TalkingNPC.m_TalkedID = TalkedID;

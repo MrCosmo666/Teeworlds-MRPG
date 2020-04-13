@@ -16,7 +16,7 @@ void ItemSql::OnInitGlobal()
 		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_items_list", "WHERE ItemID > '0'"));
 		while(RES->next())
 		{
-			const int ItemID = (int)RES->getInt("ItemID");
+			int ItemID = (int)RES->getInt("ItemID");
 			str_copy(ItemsInfo[ItemID].iItemName, RES->getString("ItemName").c_str(), sizeof(ItemsInfo[ItemID].iItemName));
 			str_copy(ItemsInfo[ItemID].iItemDesc, RES->getString("ItemDesc").c_str(), sizeof(ItemsInfo[ItemID].iItemDesc));
 			str_copy(ItemsInfo[ItemID].iItemIcon, RES->getString("ItemIcon").c_str(), sizeof(ItemsInfo[ItemID].iItemIcon));
@@ -37,12 +37,12 @@ void ItemSql::OnInitGlobal()
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_attributs", "WHERE ID > '0'"));
 	while(RES->next())
 	{
-		int ID = RES->getInt("ID");
-		str_copy(CGS::AttributInfo[ID].Name, RES->getString("name").c_str(), sizeof(CGS::AttributInfo[ID].Name));
-		str_copy(CGS::AttributInfo[ID].FieldName, RES->getString("field_name").c_str(), sizeof(CGS::AttributInfo[ID].FieldName));
-		CGS::AttributInfo[ID].ProcentID = RES->getInt("procent_id");
-		CGS::AttributInfo[ID].UpgradePrice = RES->getInt("price");
-		CGS::AttributInfo[ID].AtType = RES->getInt("at_type");		
+		int AttID = RES->getInt("ID");
+		str_copy(CGS::AttributInfo[AttID].Name, RES->getString("name").c_str(), sizeof(CGS::AttributInfo[AttID].Name));
+		str_copy(CGS::AttributInfo[AttID].FieldName, RES->getString("field_name").c_str(), sizeof(CGS::AttributInfo[AttID].FieldName));
+		CGS::AttributInfo[AttID].ProcentID = RES->getInt("procent_id");
+		CGS::AttributInfo[AttID].UpgradePrice = RES->getInt("price");
+		CGS::AttributInfo[AttID].AtType = RES->getInt("at_type");
 	}
 }
 
@@ -53,7 +53,7 @@ void ItemSql::OnInitAccount(CPlayer *pPlayer)
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ItemID, ItemCount, ItemSettings, ItemEnchant, ItemDurability", "tw_items", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	while(RES->next())
 	{
-		const int ItemID = (int)RES->getInt("ItemID");
+		int ItemID = (int)RES->getInt("ItemID");
 		Items[ClientID][ItemID].Count = (int)RES->getInt("ItemCount");
 		Items[ClientID][ItemID].Settings = (int)RES->getInt("ItemSettings");
 		Items[ClientID][ItemID].Enchant = (int)RES->getInt("ItemEnchant");
@@ -602,13 +602,14 @@ bool ItemSql::ClassItems::SetSettings(int arg_settings)
 
 bool ItemSql::ClassItems::EquipItem()
 {
-	if(Count <= 0 || !pPlayer) return false;
+	if(Count <= 0 || !pPlayer) 
+		return false;
 
 	// если снаряжение
-	int ClientID = pPlayer->GetCID();
 	if(Info().Type == ITEMEQUIP)
 	{
-		int EquipItemID = pPlayer->GetItemEquip(Info().Function);
+		int EquipID = Info().Function;
+		int EquipItemID = pPlayer->GetItemEquip(EquipID);
 		while (EquipItemID >= 1)
 		{
 			ItemSql::ItemPlayer &EquipItem = pPlayer->GetItem(EquipItemID);
@@ -636,7 +637,6 @@ void ItemSql::ClassItems::Save()
 	if(!pPlayer) 
 		return;
 
-	int ClientID = pPlayer->GetCID();
 	SJK.UD("tw_items", "ItemCount = '%d', ItemSettings = '%d', ItemEnchant = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", 
 		Count, Settings, Enchant, pPlayer->Acc().AuthID, itemid_);
 }

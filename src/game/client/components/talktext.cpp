@@ -119,6 +119,7 @@ void CTalkText::OnMessage(int MsgType, void *pRawMsg)
 		CNetMsg_Sv_TalkText* pMsg = (CNetMsg_Sv_TalkText*)pRawMsg;
 		str_copy(m_TalkText, pMsg->m_pText, sizeof(m_TalkText));
 		m_TalkClientID = pMsg->m_pTalkClientID;
+		m_TalkedEmote = pMsg->m_TalkedEmote;
 
 		if(m_TalkText[0])
 			m_TalkTime = time_get() + time_freq() * pMsg->m_pSeconds;

@@ -53,7 +53,7 @@ public:
 		int itemid_;
 		
 	public:
-		ClassItems() : Count(0), Settings(0), Enchant(0), Durability(100), pPlayer(NULL) {};
+		ClassItems() : Count(NULL), Settings(NULL), Enchant(NULL), Durability(100), pPlayer(NULL), itemid_(NULL) {};
 
 		void SetBasic(CPlayer *Player, int itemid) { pPlayer = Player, itemid_ = itemid; }
 		int Count;

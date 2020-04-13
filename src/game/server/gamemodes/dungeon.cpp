@@ -49,7 +49,7 @@ void CGameControllerDungeon::ChangeState(int State)
 			{
 				if(GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter())
 				{	
-					GS()->SBL(i, 99999, 500, _("Dungeon {s:name} Started!"), "name", Server()->GetWorldName(GS()->GetWorldID()));
+					GS()->SBL(i, 99999, 500, "Dungeon {STR} Started!", Server()->GetWorldName(GS()->GetWorldID()));
 					GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_SELF);
 				}
 			}
@@ -76,8 +76,7 @@ void CGameControllerDungeon::StateTick()
 				for(int i = 0; i < MAX_PLAYERS; i++)
 				{
 					if(GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter())	
-						GS()->SBL(i, 99999, 10, _("Dungeon '{s:name}' Waiting 2 players!"), 
-							"name", Server()->GetWorldName(GS()->GetWorldID()));
+						GS()->SBL(i, 99999, 10, "Dungeon '{STR}' Waiting 2 players!", Server()->GetWorldName(GS()->GetWorldID()));
 				}
 			}
 			// начинаем данж если равно 2 игрока или больше

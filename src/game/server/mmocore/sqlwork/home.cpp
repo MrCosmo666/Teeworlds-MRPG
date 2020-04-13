@@ -161,9 +161,8 @@ void HouseSql::ShowDecorationList(CPlayer *pPlayer)
 	{
 		if(deco->second && deco->second->m_HouseID == HouseID) 
 		{
-			GS()->AVD(ClientID, "DECODELETE", deco->first, deco->second->m_DecoID, 
-				1, _("{s:name}:{i:id} back to the inventory"), 
-				"name", GS()->GetItemInfo(deco->second->m_DecoID).GetName(pPlayer), "id", &deco->first, NULL);
+			GS()->AVD(ClientID, "DECODELETE", deco->first, deco->second->m_DecoID, 1, "{STR}:{INT} back to the inventory", 
+				GS()->GetItemInfo(deco->second->m_DecoID).GetName(pPlayer), &deco->first);
 		}
 	}
 }
@@ -454,28 +453,26 @@ void HouseSql::ChangeStateDoor(int HouseID)
 void HouseSql::ShowHouseMenu(CPlayer *pPlayer, int HouseID)
 {
 	int ClientID = pPlayer->GetCID();
-	GS()->AVH(ClientID, HHOMEINFO, vec3(35,80,40), _("House {i:id} . {s:class}"), 
-		"id", &HouseID, "class", Home[HouseID].hClass, NULL);
-	GS()->AVL(ClientID, "null", _("Owner House: {s:name}"), 
-		"name", Job()->PlayerName(Home[HouseID].hOwnerID) ,NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOMEINFO, _("House information : Helper house system"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOMEINFO, _("Every game day, you got check payment house."), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOMEINFO, _("If there is no money left in the account at home."), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOMEINFO, _("The house is automatically sold and you get"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOMEINFO, _("Mail with attached money"), NULL);
+	GS()->AVH(ClientID, HHOMEINFO, vec3(35,80,40), "House {INT} . {STR}", &HouseID, Home[HouseID].hClass);
+	GS()->AVL(ClientID, "null", "Owner House: {STR}", Job()->PlayerName(Home[HouseID].hOwnerID));
+	GS()->AVM(ClientID, "null", NOPE, HHOMEINFO, "House information : Helper house system");
+	GS()->AVM(ClientID, "null", NOPE, HHOMEINFO, "Every game day, you got check payment house.");
+	GS()->AVM(ClientID, "null", NOPE, HHOMEINFO, "If there is no money left in the account at home.");
+	GS()->AVM(ClientID, "null", NOPE, HHOMEINFO, "The house is automatically sold and you get");
+	GS()->AVM(ClientID, "null", NOPE, HHOMEINFO, "Mail with attached money");
 	GS()->AV(ClientID, "null", "");
 
-	GS()->AVH(ClientID, HHOMECOMMAND, vec3(35,80,40), _("House command"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOMECOMMAND, _("/doorhouse - Open or close door your house"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOMECOMMAND, _("/sellhouse - To sell the house to the city"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOMECOMMAND, _("/selltohouse <clientid> <price> - To sell the house to player"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOMECOMMAND, _("Another in House Menu, available only owner "), NULL);
+	GS()->AVH(ClientID, HHOMECOMMAND, vec3(35,80,40), "House command");
+	GS()->AVM(ClientID, "null", NOPE, HHOMECOMMAND, "/doorhouse - Open or close door your house");
+	GS()->AVM(ClientID, "null", NOPE, HHOMECOMMAND, "/sellhouse - To sell the house to the city");
+	GS()->AVM(ClientID, "null", NOPE, HHOMECOMMAND, "/selltohouse <clientid> <price> - To sell the house to player");
+	GS()->AVM(ClientID, "null", NOPE, HHOMECOMMAND, "Another in House Menu, available only owner ");
 	GS()->AV(ClientID, "null", "");
 
 	if(Home[HouseID].hOwnerID <= 0)
 	{
 		int Price =  Home[HouseID].hPrice + g_Config.m_SvHousePriceUse;
-		GS()->AVM(ClientID, "BUYHOUSE", HouseID, NOPE, _("Buy this house. Price {i:price}gold"), "price", &Price, NULL);
+		GS()->AVM(ClientID, "BUYHOUSE", HouseID, NOPE, "Buy this house. Price {INT}gold", &Price);
 	}
 }
 // Показ меню дома персонально
@@ -483,32 +480,29 @@ void HouseSql::ShowPersonalHouse(CPlayer *pPlayer)
 {
 	int ClientID = pPlayer->GetCID();
 	int HouseID = PlayerHouseID(pPlayer);
-	if(HouseID <= 0) return GS()->AVL(ClientID, "null", _("You not owner home!"), NULL);
+	if(HouseID <= 0) return GS()->AVL(ClientID, "null", "You not owner home!");
 
 	bool StateDoor = GetHouseDoor(HouseID);
-	GS()->AVH(ClientID, HHOUSESTATS, vec3(52,26,80), _("House stats {i:id} Class {s:class} Door [{s:state}]"), 
-		"id", &HouseID, "class", Home[HouseID].hClass, "state", StateDoor ? "Closed" : "Opened", NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, _("Farming level: every day +{i:money}gold"), "money", &Home[HouseID].hFarmLevel, NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, _("Bank farming house {i:money}gold"), "money", &Home[HouseID].hFarm, NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, _("- - - - - - - - - -"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, _("Your money: {i:money}gold"), "money", &pPlayer->GetItem(itMoney).Count, NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, _("House {i:hmoney}. Every day -{i:evmoney}gold"), 
-			"hmoney", &Home[HouseID].hBank, "evmoney", &g_Config.m_SvHousePriceUse, NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, _("- - - - - - - - - -"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, _("Notes: Minimal operation house balance 100gold"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, _("Sell house for player. You gived your house bank."), NULL);
+	GS()->AVH(ClientID, HHOUSESTATS, vec3(52,26,80), "House stats {INT} Class {STR} Door [{STR}]", &HouseID, Home[HouseID].hClass, StateDoor ? "Closed" : "Opened");
+	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, "Farming level: every day +{INT}gold", &Home[HouseID].hFarmLevel);
+	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, "Bank farming house {INT}gold", &Home[HouseID].hFarm);
+	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, "- - - - - - - - - -");
+	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, "Your money: {INT}gold", &pPlayer->GetItem(itMoney).Count);
+	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, "House {INT}. Every day -{INT}gold", &Home[HouseID].hBank, &g_Config.m_SvHousePriceUse);
+	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, "- - - - - - - - - -");
+	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, "Notes: Minimal operation house balance 100gold");
+	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, "Sell house for player. You gived your house bank.");
 	GS()->AV(ClientID, "null", "");
-	GS()->AVM(ClientID, "HOUSEMONEY", 1, NOPE, _("Add in house money. (Amount in a reason)"), NULL);
-	GS()->AVM(ClientID, "HOUSETAKE", 1, NOPE, _("Take in house farming bank. (Amount in a reason)"), NULL);
-	GS()->AVM(ClientID, "HOUSEDOOR", HouseID, NOPE, _("Change state [\"{s:door} door\"]"),
-			"door", StateDoor ? "Open" : "Close", NULL);
-	GS()->AVM(ClientID, "HSPAWN", 1, NOPE, _("Teleport to your house"), NULL);
+	GS()->AVM(ClientID, "HOUSEMONEY", 1, NOPE, "Add in house money. (Amount in a reason)");
+	GS()->AVM(ClientID, "HOUSETAKE", 1, NOPE, "Take in house farming bank. (Amount in a reason)");
+	GS()->AVM(ClientID, "HOUSEDOOR", HouseID, NOPE, "Change state [\"{STR} door\"]", StateDoor ? "Open" : "Close");
+	GS()->AVM(ClientID, "HSPAWN", 1, NOPE, "Teleport to your house");
 	if(Home[HouseID].hWorldID == GS()->Server()->GetWorldID(ClientID))
 	{
-		GS()->AVM(ClientID, "MENU", HOUSEDECORATION, NOPE, _("Settings Decorations"), NULL);
-		GS()->AVM(ClientID, "MENU", HOUSEPLANTS, NOPE, _("Settings Plants"), NULL);
+		GS()->AVM(ClientID, "MENU", HOUSEDECORATION, NOPE, "Settings Decorations");
+		GS()->AVM(ClientID, "MENU", HOUSEPLANTS, NOPE, "Settings Plants");
 	}
-	else GS()->AVM(ClientID, "null", HOUSEDECORATION, NOPE, _("More settings allow only own House World"), NULL);
+	else GS()->AVM(ClientID, "null", HOUSEDECORATION, NOPE, "More settings allow only own House World");
 }
 
 /* #########################################################################
@@ -522,8 +516,7 @@ bool HouseSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 	{
 		if(BuyHouse(VoteID, pPlayer))
 		{
-			GS()->Chat(-1, "{STR} becomes the owner of the house class {STR} HID {INT}",
-					GS()->Server()->ClientName(ClientID), Home[VoteID].hClass, &VoteID);
+			GS()->Chat(-1, "{STR} becomes the owner of the house class {STR} HID {INT}", GS()->Server()->ClientName(ClientID), Home[VoteID].hClass, &VoteID);
 			GS()->ChatDiscord(false, DC_SERVER_INFO, "Server information", "**{STR} becomes the owner of the house class [{STR} number {INT}]**",
 					GS()->Server()->ClientName(ClientID), Home[VoteID].hClass, &VoteID);
 			GS()->ChatFollow(ClientID, "Do not forget to top up the balance at home, now the balance {INT}G", &Home[VoteID].hBank);
