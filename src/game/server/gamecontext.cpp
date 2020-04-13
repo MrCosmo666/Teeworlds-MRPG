@@ -1210,7 +1210,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			}
 
 			// пишем клиент успешно прочекан 	
-			SBL(ClientID, 1000, 100, _("Successfully checks client."), NULL);
+			SBL(ClientID, 1000, 100, "Successfully checks client.");
 			pPlayer->m_PlayerTick[TickState::CheckClient] = 0;
 
 			// загрузка всех частей скинов игроков
@@ -1371,7 +1371,7 @@ void CGS::OnClientEnter(int ClientID)
 	// fail check client
 	if(!CheckClient(ClientID))
 	{
-		SBL(ClientID, 1000, 1000, "Vanilla client.\nSpecial client for MmoTee.\n\"{STR}\"", g_Config.m_SvDiscordInviteGroup, NULL);
+		SBL(ClientID, 1000, 1000, "Vanilla client.\nSpecial client for MmoTee.\n\"{STR}\"", g_Config.m_SvDiscordInviteGroup);
 	}
 }
 
@@ -1864,34 +1864,34 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		// меню статистики
 		int NeedExp = pPlayer->ExpNeed(pPlayer->Acc().Level);
-		AVH(ClientID, HSTAT, vec3(35,80,40), _("Hi, {STR} Last log in {STR}"), Server()->ClientName(ClientID), pPlayer->Acc().LastLogin, NULL);
-		AVM(ClientID, "null", NOPE, HSTAT, _("Discord: \"{STR}\". Ideas, bugs, rewards"), g_Config.m_SvDiscordInviteGroup, NULL);
-		AVM(ClientID, "null", NOPE, HSTAT, _("Level {INT} : Exp {INT}/{INT}"), &pPlayer->Acc().Level, &pPlayer->Acc().Exp, &NeedExp, NULL);
-		AVM(ClientID, "null", NOPE, HSTAT, _("Money {INT} gold"), "money", &pPlayer->GetItem(itMoney).Count, NULL);
-		AVM(ClientID, "null", NOPE, HSTAT, _("Satiety {INT}% : Skill Point {INT}SP"), &pPlayer->Acc().Hungry, &pPlayer->GetItem(itSkillPoint).Count, NULL);
+		AVH(ClientID, HSTAT, vec3(35,80,40), "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().LastLogin);
+		AVM(ClientID, "null", NOPE, HSTAT, "Discord: \"{STR}\". Ideas, bugs, rewards", g_Config.m_SvDiscordInviteGroup);
+		AVM(ClientID, "null", NOPE, HSTAT, "Level {INT} : Exp {INT}/{INT}", &pPlayer->Acc().Level, &pPlayer->Acc().Exp, &NeedExp);
+		AVM(ClientID, "null", NOPE, HSTAT, "Money {INT} gold", &pPlayer->GetItem(itMoney).Count);
+		AVM(ClientID, "null", NOPE, HSTAT, "Satiety {INT}% : Skill Point {INT}SP", &pPlayer->Acc().Hungry, &pPlayer->GetItem(itSkillPoint).Count);
 		AV(ClientID, "null", "");
 
 		// меню персонал
-		AVH(ClientID, HPERSONAL, vec3(50,52,57), _("☪ SUB MENU PERSONAL"), NULL);
-		AVM(ClientID, "MENU", INVENTORY, HPERSONAL, _("⁂ Inventory"), NULL); 
-		AVM(ClientID, "MENU", EQUIPMENU, HPERSONAL, _("★ Equipment"), NULL);
-		AVM(ClientID, "MENU", INBOXLIST, HPERSONAL, _("✉ Mailbox"), NULL);
-		AVM(ClientID, "MENU", UPGRADES, HPERSONAL, _("◒ Upgrades"), NULL);
-		AVM(ClientID, "MENU", SETTINGS, HPERSONAL, _("☑ Settings"), NULL);
+		AVH(ClientID, HPERSONAL, vec3(50,52,57), "☪ SUB MENU PERSONAL");
+		AVM(ClientID, "MENU", INVENTORY, HPERSONAL, "⁂ Inventory"); 
+		AVM(ClientID, "MENU", EQUIPMENU, HPERSONAL, "★ Equipment");
+		AVM(ClientID, "MENU", INBOXLIST, HPERSONAL, "✉ Mailbox");
+		AVM(ClientID, "MENU", UPGRADES, HPERSONAL, "◒ Upgrades");
+		AVM(ClientID, "MENU", SETTINGS, HPERSONAL, "☑ Settings");
 
 		CCharacter *pChar = pPlayer->GetCharacter();
 		if(pChar && pChar->IsAlive() && pChar->GetHelper()->BoolIndex(TILE_CRAFT))
-			AVM(ClientID, "MENU", CRAFTING, HPERSONAL, _("☭ Crafting"), NULL);
+			AVM(ClientID, "MENU", CRAFTING, HPERSONAL, "☭ Crafting");
 		
-		AVM(ClientID, "MENU", ADVENTUREJOURNAL, HPERSONAL, _("ღ Adventure Journal"), NULL);
-		AVM(ClientID, "MENU", MEMBERMENU, HPERSONAL, _("☃ Guild Menu"), NULL);
-		AVM(ClientID, "MENU", HOUSEMENU, HPERSONAL, _("❖ House Menu"), NULL);
+		AVM(ClientID, "MENU", ADVENTUREJOURNAL, HPERSONAL, "ღ Adventure Journal");
+		AVM(ClientID, "MENU", MEMBERMENU, HPERSONAL, "☃ Guild Menu");
+		AVM(ClientID, "MENU", HOUSEMENU, HPERSONAL, "❖ House Menu");
 		AV(ClientID, "null", "");
 
 		// меню информации
-		AVH(ClientID, HINFORMATION, vec3(15,40,80), _("# SUB MENU INFORMATION"), NULL);
-		AVM(ClientID, "MENU", DEVNOTEPAD, HINFORMATION, _("☫ Game Dev Notepad "), NULL);
-		AVM(ClientID, "MENU", GUIDEDROP, HINFORMATION, _("♣ Chance to loot mobs "), NULL);
+		AVH(ClientID, HINFORMATION, vec3(15,40,80), "# SUB MENU INFORMATION");
+		AVM(ClientID, "MENU", DEVNOTEPAD, HINFORMATION, "☫ Game Dev Notepad");
+		AVM(ClientID, "MENU", GUIDEDROP, HINFORMATION, "♣ Chance to loot mobs");
 		AV(ClientID, "null", "");
 
 		// чекаем местонахождение
@@ -1925,21 +1925,21 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	else if(MenuList == INVENTORY) 
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;
-		AVH(ClientID, HINVINFO, vec3(35,80,40), _("Inventory Information"), NULL);
-		AVM(ClientID, "null", NOPE, HINVINFO, _("Choose the type of items you want to show"), NULL);
-		AVM(ClientID, "null", NOPE, HINVINFO, _("After, need select item to interact"), NULL);
+		AVH(ClientID, HINVINFO, vec3(35,80,40), "Inventory Information");
+		AVM(ClientID, "null", NOPE, HINVINFO, "Choose the type of items you want to show");
+		AVM(ClientID, "null", NOPE, HINVINFO, "After, need select item to interact");
 		AV(ClientID, "null", "");
 
 		ShowPlayerStats(pPlayer);
 
-		AVH(ClientID, HINVSELECT, vec3(40, 10, 5), _("Inventory Select List"), NULL);
-		AVM(ClientID, "SORTEDINVENTORY", ITEMUSED, HINVSELECT, _("Used Items"), NULL);
-		AVM(ClientID, "SORTEDINVENTORY", ITEMCRAFT, HINVSELECT, _("Craft Items"), NULL);
-		AVM(ClientID, "SORTEDINVENTORY", ITEMQUEST, HINVSELECT, _("Quest Items"), NULL);
-		AVM(ClientID, "SORTEDINVENTORY", ITEMUPGRADE, HINVSELECT, _("Modules Items"), NULL);
-		AVM(ClientID, "SORTEDINVENTORY", ITEMEQUIP, HINVSELECT, _("Equiping Items"), NULL);
-		AVM(ClientID, "SORTEDINVENTORY", ITEMPOTION, HINVSELECT, _("Potion Items"), NULL);
-		AVM(ClientID, "SORTEDINVENTORY", ITEMOTHER, HINVSELECT, _("Other Items"), NULL);
+		AVH(ClientID, HINVSELECT, vec3(40, 10, 5), "Inventory Select List");
+		AVM(ClientID, "SORTEDINVENTORY", ITEMUSED, HINVSELECT, "Used Items");
+		AVM(ClientID, "SORTEDINVENTORY", ITEMCRAFT, HINVSELECT, "Craft Items");
+		AVM(ClientID, "SORTEDINVENTORY", ITEMQUEST, HINVSELECT, "Quest Items");
+		AVM(ClientID, "SORTEDINVENTORY", ITEMUPGRADE, HINVSELECT, "Modules Items");
+		AVM(ClientID, "SORTEDINVENTORY", ITEMEQUIP, HINVSELECT, "Equiping Items");
+		AVM(ClientID, "SORTEDINVENTORY", ITEMPOTION, HINVSELECT, "Potion Items");
+		AVM(ClientID, "SORTEDINVENTORY", ITEMOTHER, HINVSELECT, "Other Items");
 		if(pPlayer->m_SortTabs[SORTINVENTORY])
 			Mmo()->Item()->ListInventory(pPlayer, pPlayer->m_SortTabs[SORTINVENTORY]);
 
@@ -1966,14 +1966,14 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		int SlotPrice =  AuSellItem.a_price;
 		int MinimalPrice = SlotCount*PlSellItem.Info().MinimalPrice;
 
-		AVH(ClientID, HAUCTIONSLOTINFO, vec3(35,80,40), _("Information Auction Slot"), NULL);
-		AVM(ClientID, "null", NOPE, HAUCTIONSLOTINFO, _("The reason for write the number for each row"), NULL);	
+		AVH(ClientID, HAUCTIONSLOTINFO, vec3(35,80,40), "Information Auction Slot");
+		AVM(ClientID, "null", NOPE, HAUCTIONSLOTINFO, "The reason for write the number for each row");	
 		pPlayer->m_Colored = {15,15,15};
-		AVM(ClientID, "null", NOPE, NOPE, _("Item x{INT} Minimal Price: {INT}gold"), &SlotCount, &MinimalPrice, NULL);
-		AVM(ClientID, "null", NOPE, NOPE, _("Auction Slot Price: {INT}gold"), &g_Config.m_SvAuctionPriceSlot, NULL);
-		AVM(ClientID, "AUCTIONCOUNT", ItemID, NOPE, _("Item Count: {INT}"), &SlotCount, NULL);
-		AVM(ClientID, "AUCTIONPRICE", ItemID, NOPE, _("Item Price: {INT}"), &SlotPrice, NULL);
-		AVM(ClientID, "AUCTIONACCEPT", ItemID, NOPE, _("Add {STR}x{INT} {INT}gold"), PlSellItem.Info().GetName(pPlayer), &SlotCount, &SlotPrice, NULL);
+		AVM(ClientID, "null", NOPE, NOPE, "Item x{INT} Minimal Price: {INT}gold", &SlotCount, &MinimalPrice);
+		AVM(ClientID, "null", NOPE, NOPE, "Auction Slot Price: {INT}gold", &g_Config.m_SvAuctionPriceSlot);
+		AVM(ClientID, "AUCTIONCOUNT", ItemID, NOPE, "Item Count: {INT}", &SlotCount);
+		AVM(ClientID, "AUCTIONPRICE", ItemID, NOPE, "Item Price: {INT}", &SlotPrice);
+		AVM(ClientID, "AUCTIONACCEPT", ItemID, NOPE, "Add {STR}x{INT} {INT}gold", PlSellItem.Info().GetName(pPlayer), &SlotCount, &SlotPrice);
 		AddBack(ClientID);
 	}
 	else if(MenuList == INBOXLIST) 
@@ -2016,34 +2016,34 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		
 		// обычные настройки
 		bool FoundSettings = false;
-		AVH(ClientID, HSETTINGSS, vec3(50,30,40), _("Some of the settings becomes valid after death"), NULL);
+		AVH(ClientID, HSETTINGSS, vec3(50,30,40), "Some of the settings becomes valid after death");
 		for(const auto& it : ItemSql::Items[ClientID])
 		{
 			if(it.second.Count <= 0 || it.second.Info().Type != ITEMSETTINGS)
 				continue;
 			
-			AVM(ClientID, "ISETTINGS", it.first, HSETTINGSS, _("[{STR}] {STR}"), 
+			AVM(ClientID, "ISETTINGS", it.first, HSETTINGSS, "[{STR}] {STR}", 
 				it.second.Settings ? "Enable" : "Disable", it.second.Info().GetName(pPlayer));
 			FoundSettings = true;
 		}
-		if(!FoundSettings) { AVM(ClientID, "null", NOPE, HSETTINGSS, _("The list of equipment sub upgrades is empty"), NULL); }
+		if(!FoundSettings) { AVM(ClientID, "null", NOPE, HSETTINGSS, "The list of equipment sub upgrades is empty"); }
 
 		// поиск всех предметов этого типа
 		FoundSettings = false;
 		AV(ClientID, "null", "");
-		AVH(ClientID, HSETTINGSU, vec3(30,50,40), _("Sub items settings."), NULL);
+		AVH(ClientID, HSETTINGSU, vec3(30,50,40), "Sub items settings.");
 		for(const auto& it : ItemSql::Items[ClientID])
 		{
 			if(it.second.Count <= 0 || it.second.Info().Type != ITEMUPGRADE) 
 				continue;
 			
 			int BonusCount = it.second.Info().BonusCount*(it.second.Enchant+1);
-			AVMI(ClientID, it.second.Info().GetIcon(), "ISETTINGS", it.first, HSETTINGSU, _("[{STR}] {STR}({STR} +{INT})"), 
-				(it.second.Settings ? "Dress" : "Not dressed"), it.second.Info().GetName(pPlayer),
-				pPlayer->AtributeName(it.second.Info().BonusID), &BonusCount, NULL);
+			AVMI(ClientID, it.second.Info().GetIcon(), "ISETTINGS", it.first, HSETTINGSU, "[{STR}] {STR}({STR} +{INT})"), 
+				(it.second.Settings ? "Dress" : "Not dressed", it.second.Info().GetName(pPlayer),
+				pPlayer->AtributeName(it.second.Info().BonusID), &BonusCount);
 			FoundSettings = true;
 		}
-		if(!FoundSettings) { AVM(ClientID, "null", NOPE, HSETTINGSU, _("The list of equipment sub upgrades is empty"), NULL); }
+		if(!FoundSettings) { AVM(ClientID, "null", NOPE, HSETTINGSU, "The list of equipment sub upgrades is empty"); }
 		AddBack(ClientID);
 	}
 	else if(MenuList == CRAFTING) 
@@ -2053,25 +2053,25 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		if(pChar && pChar->GetHelper()->BoolIndex(TILE_CRAFT))
 		{
-			AVH(ClientID, HCRAFTINFO, vec3(35,80,40), _("Crafting Information"), NULL);
-			AVM(ClientID, "null", NOPE, HCRAFTINFO, _("Choose the type of crafts you want to show"), NULL);
-			AVM(ClientID, "null", NOPE, HCRAFTINFO, _("If you will not have enough items for crafting"), NULL);
-			AVM(ClientID, "null", NOPE, HCRAFTINFO, _("You will write those and the amount that is still required"), NULL);
+			AVH(ClientID, HCRAFTINFO, vec3(35,80,40), "Crafting Information");
+			AVM(ClientID, "null", NOPE, HCRAFTINFO, "Choose the type of crafts you want to show");
+			AVM(ClientID, "null", NOPE, HCRAFTINFO, "If you will not have enough items for crafting");
+			AVM(ClientID, "null", NOPE, HCRAFTINFO, "You will write those and the amount that is still required");
 			AV(ClientID, "null", "");
 			
-			AVH(ClientID, HCRAFTSELECT, vec3(40, 10, 5), _("Crafting Select List"), NULL);
-			AVM(ClientID, "SORTEDCRAFT", CRAFTBASIC, HCRAFTSELECT, _("Basic Items"), NULL);
-			AVM(ClientID, "SORTEDCRAFT", CRAFTARTIFACT, HCRAFTSELECT, _("Artifacts"), NULL);
-			AVM(ClientID, "SORTEDCRAFT", CRAFTWEAPON, HCRAFTSELECT, _("Modules & Weapons"), NULL);
-			AVM(ClientID, "SORTEDCRAFT", CRAFTEAT, HCRAFTSELECT, _("Buffs & Eat"), NULL);
-			AVM(ClientID, "SORTEDCRAFT", CRAFTWORK, HCRAFTSELECT, _("Work & Job"), NULL);
-			AVM(ClientID, "SORTEDCRAFT", CRAFTQUEST, HCRAFTSELECT, _("Quests"), NULL);
+			AVH(ClientID, HCRAFTSELECT, vec3(40, 10, 5), "Crafting Select List");
+			AVM(ClientID, "SORTEDCRAFT", CRAFTBASIC, HCRAFTSELECT, "Basic Items");
+			AVM(ClientID, "SORTEDCRAFT", CRAFTARTIFACT, HCRAFTSELECT, "Artifacts");
+			AVM(ClientID, "SORTEDCRAFT", CRAFTWEAPON, HCRAFTSELECT, "Modules & Weapons");
+			AVM(ClientID, "SORTEDCRAFT", CRAFTEAT, HCRAFTSELECT, "Buffs & Eat");
+			AVM(ClientID, "SORTEDCRAFT", CRAFTWORK, HCRAFTSELECT, "Work & Job");
+			AVM(ClientID, "SORTEDCRAFT", CRAFTQUEST, HCRAFTSELECT, "Quests");
 			AV(ClientID, "null", "");
 			if(pPlayer->m_SortTabs[SORTCRAFT])
 				Mmo()->Craft()->ShowCraftList(pPlayer, pPlayer->m_SortTabs[SORTCRAFT]);
 		}
 		else
-			AVL(ClientID, "null", _("You need find craft room."), NULL);
+			AVL(ClientID, "null", "You need find craft room.");
 
 		AddBack(ClientID);
 	}
@@ -2086,11 +2086,11 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	{
 		pPlayer->m_LastVoteMenu = HOUSEMENU;
 
-		AVH(ClientID, HDECORATION, vec3(35,80,40), _("Decorations Information"), NULL);
-		AVM(ClientID, "null", NOPE, HDECORATION, _("Add: Select your item in list. Select (Add to house),"), NULL);
-		AVM(ClientID, "null", NOPE, HDECORATION, _("later press (ESC) and mouse select position"), NULL);
-		AVM(ClientID, "null", NOPE, HDECORATION, _("Return in inventory: Select down your decorations"), NULL);
-		AVM(ClientID, "null", NOPE, HDECORATION, _("and press (Back to inventory)."), NULL);
+		AVH(ClientID, HDECORATION, vec3(35,80,40), "Decorations Information");
+		AVM(ClientID, "null", NOPE, HDECORATION, "Add: Select your item in list. Select (Add to house),");
+		AVM(ClientID, "null", NOPE, HDECORATION, "later press (ESC) and mouse select position");
+		AVM(ClientID, "null", NOPE, HDECORATION, "Return in inventory: Select down your decorations");
+		AVM(ClientID, "null", NOPE, HDECORATION, "and press (Back to inventory).");
 
 		Mmo()->Item()->ListInventory(pPlayer, ITEMDECORATION);
 		AV(ClientID, "null", "");
@@ -2105,11 +2105,11 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		const int PlantItemID = Mmo()->House()->GetPlantsID(HouseID);
 		pPlayer->m_LastVoteMenu = HOUSEMENU;
 
-		AVH(ClientID, HPLANTS, vec3(35,80,40), _("Plants Information"), NULL);
-		AVM(ClientID, "null", NOPE, HPLANTS, _("Select item and in tab select 'Change Plants'"), NULL);
+		AVH(ClientID, HPLANTS, vec3(35,80,40), "Plants Information");
+		AVM(ClientID, "null", NOPE, HPLANTS, "Select item and in tab select 'Change Plants'");
 		AV(ClientID, "null", "");
 
-		AVM(ClientID, "null", NOPE, NOPE, _("Housing Active Plants: {STR}"), GetItemInfo(PlantItemID).GetName(pPlayer), NULL);
+		AVM(ClientID, "null", NOPE, NOPE, "Housing Active Plants: {STR}", GetItemInfo(PlantItemID).GetName(pPlayer));
 
 		Mmo()->Item()->ListInventory(pPlayer, ITPLANTS, true);
 		AddBack(ClientID);	
@@ -2118,64 +2118,64 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;
 
-		AVH(ClientID, HUPGRINFO, vec3(35,80,40), _("Upgrades Information"), NULL);
-		AVM(ClientID, "null", NOPE, HUPGRINFO, _("Select upgrades type in Reason, write count."), NULL);
+		AVH(ClientID, HUPGRINFO, vec3(35,80,40), "Upgrades Information");
+		AVM(ClientID, "null", NOPE, HUPGRINFO, "Select upgrades type in Reason, write count.");
 		AV(ClientID, "null", "");
 
 		ShowPlayerStats(pPlayer);
 
 		// Улучшения класса DPS дамаг
 		int Range = pPlayer->GetLevelDisciple(AtributType::AtDps);
-		AVH(ClientID, HUPGDPS, vec3(80,30,30), _("Disciple of War. Level Range {INT}"), &Range, NULL);
+		AVH(ClientID, HUPGDPS, vec3(80,30,30), "Disciple of War. Level Range {INT}", &Range);
 		for(const auto& at : AttributInfo)
 		{
 			if(at.second.AtType != AtributType::AtDps || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGDPS, _("[{INT}] Price {INT}P {STR}"), &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first), NULL);
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGDPS, "[{INT}] Price {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
 		}
 		AV(ClientID, "null", "");
 
 		// Улучшения класса TANK танк
 		Range = pPlayer->GetLevelDisciple(AtributType::AtTank);
-		AVH(ClientID, HUPGTANK, vec3(30,30,80), _("Disciple of Tank. Level Range {INT}"), "lvl", &Range, NULL);
+		AVH(ClientID, HUPGTANK, vec3(30,30,80), "Disciple of Tank. Level Range {INT}", "lvl", &Range);
 		for(const auto& at : AttributInfo)
 		{
 			if(at.second.AtType != AtributType::AtTank || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGTANK, _("[{INT}] Price {INT}P {STR}"), &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first), NULL);
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGTANK, "[{INT}] Price {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
 		}
 		AV(ClientID, "null", "");
 
 		// Улучшения класса HEALER хил
 		Range = pPlayer->GetLevelDisciple(AtributType::AtHealer);
-		AVH(ClientID, HUPGHEALER, vec3(30,80,30), _("Disciple of Healer. Level Range {INT}"), "lvl", &Range, NULL);
+		AVH(ClientID, HUPGHEALER, vec3(30,80,30), "Disciple of Healer. Level Range {INT}", "lvl", &Range);
 		for(const auto& at : AttributInfo)
 		{
 			if(at.second.AtType != AtributType::AtHealer || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGHEALER, _("[{INT}] Price {INT}P {STR}"), &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first), NULL);
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGHEALER, "[{INT}] Price {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
 		}
 		AV(ClientID, "null", "");
 
 		// Улучшения WEAPONS оружия
-		AVH(ClientID, HUPGWEAPON, vec3(30,30,30), _("Upgrades Weapons / Ammo"), NULL);
+		AVH(ClientID, HUPGWEAPON, vec3(30,30,30), "Upgrades Weapons / Ammo");
 		for(const auto& at : AttributInfo)
 		{
 			if(at.second.AtType != AtributType::AtWeapon || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGWEAPON, _("[{INT}] Price {INT}P {STR}"), &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first), NULL);
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGWEAPON, "[{INT}] Price {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
 		}
 
 		AV(ClientID, "null", ""), 
-		AVH(ClientID, HJOBUPGRADE, vec3(80,56,10), _("Disciple of Jobs"), NULL);
+		AVH(ClientID, HJOBUPGRADE, vec3(80,56,10), "Disciple of Jobs");
 		Mmo()->SpaAcc()->ShowMenu(ClientID);
-		AVM(ClientID, "null", NOPE, HJOBUPGRADE, _("═══════════════════════════════"), NULL);
+		AVM(ClientID, "null", NOPE, HJOBUPGRADE, "═══════════════════════════════");
 		Mmo()->PlantsAcc()->ShowMenu(ClientID);
-		AVM(ClientID, "null", NOPE, HJOBUPGRADE, _("═══════════════════════════════"), NULL);
+		AVM(ClientID, "null", NOPE, HJOBUPGRADE, "═══════════════════════════════");
 		Mmo()->MinerAcc()->ShowMenu(ClientID);
 		AddBack(ClientID);
 	}
@@ -2184,8 +2184,8 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		pPlayer->m_LastVoteMenu = MAINMENU;
 
 		// информация
-		AVH(ClientID, HCHANCELOOTINFO, vec3(35,80,40), _("Chance & Loot Information"), NULL);
-		AVM(ClientID, "null", NOPE, HCHANCELOOTINFO, _("Here you can see chance loot, mobs, positions, world."), NULL);
+		AVH(ClientID, HCHANCELOOTINFO, vec3(35,80,40), "Chance & Loot Information");
+		AVM(ClientID, "null", NOPE, HCHANCELOOTINFO, "Here you can see chance loot, mobs, positions, world.");
 		AV(ClientID, "null", "");
 
 		// сортируем всех ботов и получаем их данные по дропу
@@ -2195,8 +2195,8 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			const int HideID = (NUMHIDEMENU+12500+mobs.first);
 			int PosX = mobs.second.PositionX/32, PosY = mobs.second.PositionY/32;
 
-			AVH(ClientID, HideID, vec3(18,3,35), _("{STR} [{STR}] {STR}(x: {INT} y: {INT})"), mobs.second.Boss ? "Raid" : "Mob", mobs.second.Name, 
-				Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY, NULL);
+			AVH(ClientID, HideID, vec3(18,3,35), "{STR} [{STR}] {STR}(x: {INT} y: {INT})", mobs.second.Boss ? "Raid" : "Mob", mobs.second.Name, 
+				Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY);
 	
 			for(int i = 0; i < 6; i++)
 			{
@@ -2207,7 +2207,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 				ItemSql::ItemInformation &InfoDropItem = GetItemInfo(mobs.second.DropItem[i]);
 	
 				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%", InfoDropItem.GetName(pPlayer), mobs.second.CountItem[i], Chance);
-				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, _("{STR}"), aBuf, NULL);		
+				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, "{STR}", aBuf);		
 			}
 		}
 		AddBack(ClientID);
@@ -2215,25 +2215,25 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	else if(MenuList == EQUIPMENU) 
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;
-		AVH(ClientID, HEQUIPINFO, vec3(35,80,40), "Equip / Armor Information", NULL);
-		AVM(ClientID, "null", NOPE, HEQUIPINFO, _("Select tab and select armor."), NULL);
+		AVH(ClientID, HEQUIPINFO, vec3(35,80,40), "Equip / Armor Information");
+		AVM(ClientID, "null", NOPE, HEQUIPINFO, "Select tab and select armor.");
 		AV(ClientID, "null", "");
 		ShowPlayerStats(pPlayer);
 
-		AVH(ClientID, HEQUIPSELECT, vec3(40, 10, 5), _("Equip Select List"), NULL);
+		AVH(ClientID, HEQUIPSELECT, vec3(40, 10, 5), "Equip Select List");
 		const char* pType[NUM_EQUIPS] = { "Wings", "Stabilized", "Hammer", "Gun", "Shotgun", "Grenade", "Rifle", "Discord", "Pickaxe" };
 		for(int i = EQUIP_WINGS; i < NUM_EQUIPS; i++) 
 		{
 			const int ItemID = pPlayer->GetItemEquip(i);
 			if(ItemID <= 0 || !pPlayer->GetItem(ItemID).Settings) 
 			{
-				AVM(ClientID, "SORTEDEQUIP", i, HEQUIPSELECT, _("{STR} Not equipped"), pType[i], NULL);
+				AVM(ClientID, "SORTEDEQUIP", i, HEQUIPSELECT, "{STR} Not equipped", pType[i]);
 				continue;
 			}
 
 			const int BonusItem = GetItemInfo(ItemID).BonusID;
 			int BonusCount = GetItemInfo(ItemID).BonusCount*(pPlayer->GetItem(ItemID).Enchant+1);
-			AVM(ClientID, "SORTEDEQUIP", i, HEQUIPSELECT, _("{STR} {STR} | {STR} +{INT}"), pType[i], GetItemInfo(ItemID).GetName(pPlayer), pPlayer->AtributeName(BonusItem), &BonusCount, NULL);
+			AVM(ClientID, "SORTEDEQUIP", i, HEQUIPSELECT, "{STR} {STR} | {STR} +{INT}", pType[i], GetItemInfo(ItemID).GetName(pPlayer), pPlayer->AtributeName(BonusItem), &BonusCount);
 		}
 
 		// все Equip слоты предемтов
@@ -2254,7 +2254,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			}
 
 			if(!FindItem) 
-				AVL(ClientID, "null", _("There are no items in this tab"), NULL);
+				AVL(ClientID, "null", "There are no items in this tab");
 		}
 		AddBack(ClientID);
 	}
@@ -2287,7 +2287,7 @@ void CGS::AddBack(int ClientID)
 
 	AV(ClientID, "null", "");
 	m_apPlayers[ClientID]->m_Colored = {40,0,0};
-	AVL(ClientID, "BACK", _("Backpage"), NULL);
+	AVL(ClientID, "BACK", "Backpage");
 	m_apPlayers[ClientID]->m_Colored = {0,0,0};
 }
 
@@ -2295,7 +2295,7 @@ void CGS::AddBack(int ClientID)
 void CGS::ShowPlayerStats(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	AVH(ClientID, HUPGRADESTATS, vec3(22,49,80), _("Player Stats"), NULL);
+	AVH(ClientID, HUPGRADESTATS, vec3(22,49,80), "Player Stats");
 	for(const auto& at : AttributInfo)
 	{
 		if(str_comp_nocase(at.second.FieldName, "unfield") == 0) 
@@ -2305,16 +2305,16 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 		if(at.second.UpgradePrice < 10)
 		{
 			int SumingAt = pPlayer->GetAttributeCount(at.first), RealSum = pPlayer->GetAttributeCount(at.first, true);
-			AVM(ClientID, "null", NOPE, HUPGRADESTATS, _("{INT} [+{INT}] - {STR}"), &SumingAt, &RealSum, pPlayer->AtributeName(at.first), NULL);
+			AVM(ClientID, "null", NOPE, HUPGRADESTATS, "{INT} [+{INT}] - {STR}", &SumingAt, &RealSum, pPlayer->AtributeName(at.first));
 			continue;
 		}
 
 		// если апгрейды дорогие они имеют 1 статистики
 		int RealSum = pPlayer->GetAttributeCount(at.first);
-		AVM(ClientID, "null", NOPE, HUPGRADESTATS, _("[+{INT}] - {STR}"), &RealSum, pPlayer->AtributeName(at.first), NULL);
+		AVM(ClientID, "null", NOPE, HUPGRADESTATS, "[+{INT}] - {STR}", &RealSum, pPlayer->AtributeName(at.first));
 	}
 
-	AVM(ClientID, "null", NOPE, NOPE, _("!!! Player Upgrade Point: [{INT}P] !!!"), &pPlayer->Acc().Upgrade, NULL);
+	AVM(ClientID, "null", NOPE, NOPE, "!!! Player Upgrade Point: [{INT}P] !!!", &pPlayer->Acc().Upgrade);
 	AV(ClientID, "null", "");
 }
 
