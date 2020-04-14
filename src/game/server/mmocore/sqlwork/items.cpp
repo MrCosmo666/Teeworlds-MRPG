@@ -612,12 +612,12 @@ bool ItemSql::ClassItems::EquipItem()
 			EquipItem.SetSettings(0);
 			EquipItemID = pPlayer->GetItemEquip(EquipID, itemid_);
 		}
-		pPlayer->AddInformationStats();
 	}
 
 	// обновляем
 	Settings ^= true;
 	pPlayer->GS()->Mmo()->Item()->SetSettingsItem(pPlayer, itemid_, Settings);
+	pPlayer->AddInformationStats();
 
 	// перестановка регена
 	if((Info().BonusID == Stats::StAmmoRegen || Info().BonusID == Stats::StAmmoRegenQ) && pPlayer->GetCharacter())
