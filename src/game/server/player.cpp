@@ -819,7 +819,7 @@ int CPlayer::GetItemEquip(int EquipID) const
 int CPlayer::GetAttributeCount(int BonusID, bool Really)
 {
 	// если бот то возращаем в зависимости от обьема установленного здоровья
-	if(CGS::AttributInfo.find(BonusID) == CGS::AttributInfo.end()) return 0;
+	if (CGS::AttributInfo.find(BonusID) == CGS::AttributInfo.end()) return 0;
 
 	// обычная передача если нет сохранения и нет процентов
 	int AttributEx = EnchantAttributes(BonusID);
@@ -827,17 +827,17 @@ int CPlayer::GetAttributeCount(int BonusID, bool Really)
 	const bool SaveData = (str_comp_nocase(CGS::AttributInfo[BonusID].FieldName, "unfield") != 0);
 
 	// если есть процент прибавляем
-	if(ProcentID > 0)
+	if (ProcentID > 0)
 	{
 		const int ProcentBonus = EnchantAttributes(ProcentID);
 		const int ProcentSize = round_to_int(kurosio::translate_to_procent_rest(AttributEx, ProcentBonus));
 		AttributEx += ProcentSize;
 	}
 	// если есть локальные данные то добавляем
-	if(SaveData) { AttributEx += Acc().Stats[BonusID]; }
+	if (SaveData) { AttributEx += Acc().Stats[BonusID]; }
 
 	// если реальная стата то делил
-	if(Really && CGS::AttributInfo[BonusID].UpgradePrice < 10) { AttributEx /= (int)(BonusID == Stats::StStrength ? 10 : 5); }
+	if (Really && CGS::AttributInfo[BonusID].UpgradePrice < 10) { AttributEx /= (int)(BonusID == Stats::StStrength ? 10 : 5); }
 	return AttributEx;
 }
 
@@ -845,20 +845,20 @@ int CPlayer::GetAttributeCount(int BonusID, bool Really)
 int CPlayer::GetLevelDisciple(int Class)
 {
 	int Atributs = 0;
-	for(const auto& at : CGS::AttributInfo)
+	for (const auto& at : CGS::AttributInfo)
 	{
-		if(at.second.AtType != Class) continue;
+		if (at.second.AtType != Class) continue;
 		Atributs += GetAttributeCount(at.first);
 	}
 	return Atributs;
 }
 
 // Проверить одетый предмет по предмету
-bool CPlayer::CheckEquipItem(int ItemID) const 
+bool CPlayer::CheckEquipItem(int ItemID) const
 {
-	for(int i = 0; i < NUM_EQUIPS; i++) 
+	for (int i = 0; i < NUM_EQUIPS; i++)
 	{
-		if(GetItemEquip(i) != ItemID) continue;
+		if (GetItemEquip(i) != ItemID) continue;
 		return true;
 	}
 	return false;
@@ -870,16 +870,15 @@ bool CPlayer::CheckEquipItem(int ItemID) const
 // - - - - - - V V V V V V V - - - - V V V V - - - - - - - - - 
 void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 {
-	if(!GS()->m_apPlayers[TalkedID] || (!ToProgress && m_TalkingNPC.m_TalkedID != -1) || (ToProgress && m_TalkingNPC.m_TalkedID == -1))
+	if (!GS()->m_apPlayers[TalkedID] || (!ToProgress && m_TalkingNPC.m_TalkedID != -1) || (ToProgress && m_TalkingNPC.m_TalkedID == -1))
 		return;
 
-	CPlayerBot *BotPlayer =	static_cast< CPlayerBot* >(GS()->m_apPlayers[TalkedID]);
+	CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[TalkedID]);
 	int MobID = BotPlayer->GetBotSub();
-
-	if(BotPlayer->GetSpawnBot() == SPAWNNPC)
+	if (BotPlayer->GetSpawnBot() == SPAWNNPC)
 	{
 		int sizeTalking = ContextBots::NpcBot[MobID].m_Talk.size();
-		if(m_TalkingNPC.m_TalkedProgress >= sizeTalking)
+		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
 		{
 			m_TalkingNPC.m_TalkedProgress = 0;
 			GS()->ClearTalkText(m_ClientID);
@@ -889,11 +888,11 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		char reformTalkedText[512];
 		int BotID = ContextBots::NpcBot[MobID].BotID;
 		FormatTextQuest(BotID, ContextBots::NpcBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_TalkingText);
-		str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1+m_TalkingNPC.m_TalkedProgress, sizeTalking, FormatedTalkedText());
+		str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + m_TalkingNPC.m_TalkedProgress, sizeTalking, FormatedTalkedText());
 		ClearFormatQuestText();
 
-		GS()->Mmo()->BotsData()->ProcessingTalkingNPC(m_ClientID, TalkedID, 
-			ContextBots::NpcBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_PlayerTalked, 
+		GS()->Mmo()->BotsData()->ProcessingTalkingNPC(m_ClientID, TalkedID,
+			ContextBots::NpcBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_PlayerTalked,
 			reformTalkedText,
 			ContextBots::NpcBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_Style,
 			ContextBots::NpcBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_Emote);
@@ -902,7 +901,20 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 	else if (BotPlayer->GetSpawnBot() == SPAWNQUESTNPC)
 	{
 		int sizeTalking = ContextBots::QuestBot[MobID].m_Talk.size();
-		if (m_TalkingNPC.m_TalkedProgress < sizeTalking)
+		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
+		{
+			if (GS()->Mmo()->Quest()->InteractiveQuestNPC(this, ContextBots::QuestBot[MobID]))
+			{
+				m_TalkingNPC.m_TalkedProgress = 0;
+				GS()->ClearTalkText(m_ClientID);
+			}
+
+			GS()->Mmo()->BotsData()->ProcessingTalkingNPC(m_ClientID, TalkedID, false, "(Information) Not all criteria are complected!", 0, EMOTE_BLINK);
+			return;
+		}
+
+		GS()->Mmo()->Quest()->QuestTableClear(m_ClientID);
+		if (ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_RequestComplete)
 		{
 			// показываем по информация о предметах
 			for (int i = 0; i < 2; i++)
@@ -912,9 +924,10 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 				if (ItemID <= 0 || Count <= 0)
 					continue;
 
-				GS()->Mmo()->Quest()->QuestTableAddItem(m_ClientID, "Item", Count, ItemID);
+				char aBuf[128];
+				str_format(aBuf, sizeof(aBuf), "I need (%s)", GetItem(ItemID).Info().GetName(this));
+				GS()->Mmo()->Quest()->QuestTableAddItem(m_ClientID, aBuf, Count, ItemID);
 			}
-
 
 			// показываем текст по информации о мобах
 			for (int i = 4; i < 6; i++)
@@ -924,20 +937,11 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 				if (BotID <= 0 || Count <= 0 || !GS()->Mmo()->BotsData()->IsDataBotValid(BotID))
 					continue;
 
-				GS()->Mmo()->Quest()->QuestTableAddItem(m_ClientID, "Defeat", Count, 
+				char aBuf[128];
+				str_format(aBuf, sizeof(aBuf), "Defeat (%s)", ContextBots::DataBot[BotID].NameBot);
+				GS()->Mmo()->Quest()->QuestTableAddInfo(m_ClientID, aBuf, Count,
 					QuestBase::Quests[m_ClientID][ContextBots::QuestBot[MobID].QuestID].MobProgress[i - 4]);
 			}
-		}
-		else
-		{
-			if (GS()->Mmo()->Quest()->InteractiveQuestNPC(this, ContextBots::QuestBot[MobID]))
-			{
-				m_TalkingNPC.m_TalkedProgress = 0;
-				GS()->ClearTalkText(m_ClientID);
-			}
-
-			GS()->Mmo()->BotsData()->ProcessingTalkingNPC(m_ClientID, TalkedID, false, "(Information) Not all criteria are complected!", 2, EMOTE_PAIN);
-			return;
 		}
 
 		char reformTalkedText[512];

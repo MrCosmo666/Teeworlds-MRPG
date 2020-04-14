@@ -813,6 +813,9 @@ bool QuestBase::OnMessage(int MsgID, void *pRawMsg, int ClientID)
 
 void QuestBase::QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID)
 {
+	if (!GS()->CheckClient(ClientID))
+		return;
+
 	CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
 	if (ItemID >= itMoney && ItemID <= ItemSql::ItemsInfo.size() && pPlayer)
 	{
@@ -824,7 +827,6 @@ void QuestBase::QuestTableAddItem(int ClientID, const char* pText, int Requires,
 		Msg.m_pHaveNum = clamp(SelectedItem.Count, 0, Requires);
 		StrToInts(Msg.m_pIcon, 4, SelectedItem.Info().GetIcon());
 		GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-		return;
 	}
 }
 

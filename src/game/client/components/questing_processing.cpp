@@ -120,6 +120,7 @@ void CQuestingProcessing::OnMessage(int MsgType, void *pRawMsg)
 			char pIcon[16];
 			IntsToStr(pMsg->m_pIcon, 4, pIcon);
 			str_copy(QuestTable[i].m_aIcon, pIcon, sizeof(QuestTable[i].m_aIcon));
+			return;
 		}
 	}
 	else if (MsgType == NETMSGTYPE_SV_CLEARQUESTINGPROCESSING)

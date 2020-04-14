@@ -41,12 +41,13 @@ public:
 
 	virtual void OnInitGlobal();
 	virtual void OnInitAccount(CPlayer *pPlayer);
+	bool IsComplecte(int ClientID, int QuestID) const;
 
 private:
 	/* #########################################################################
 		GET CHECK QUESTING 
 	######################################################################### */
-	bool IsComplecte(int ClientID, int QuestID) const;
+
 	int GetQuestState(int ClientID, int QuestID) const;
 	int GetStoryCountQuest(const char *StoryName, int QuestID = -1) const;
 	const char *QuestState(int Type) const;

@@ -107,6 +107,7 @@ void ContextBots::LoadQuestBots()
 			LoadTalk.m_Emote = RES->getInt("TalkingEmote");
 			LoadTalk.m_Style = RES->getInt("Style");
 			LoadTalk.m_PlayerTalked = RES->getBoolean("PlayerTalked");
+			LoadTalk.m_RequestComplete = RES->getBoolean("RequestComplete");
 			str_copy(LoadTalk.m_TalkingText, RES->getString("TalkText").c_str(), sizeof(LoadTalk.m_TalkingText));
 			QuestBot[MotID].m_Talk.push_back(LoadTalk);
 		}

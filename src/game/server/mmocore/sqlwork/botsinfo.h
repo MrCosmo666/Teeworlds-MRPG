@@ -24,6 +24,7 @@ class ContextBots : public CMmoComponent
 		char m_TalkingText[512];
 		int m_Style;
 		int m_Emote;
+		bool m_RequestComplete;
 		bool m_PlayerTalked;
 	};
 
