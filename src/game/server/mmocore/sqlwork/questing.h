@@ -99,9 +99,10 @@ public:
 	virtual bool OnMessage(int MsgID, void *pRawMsg, int ClientID);
 	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
 
-	void QuestTableAdd(int ClientID, const char* pText, int Requires, int Have, int ItemID);
-	void QuestTableAdd(int ClientID, const char* pText, int Requires, int Have);
+	void QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID);
+	void QuestTableAddInfo(int ClientID, const char* pText, int Requires, int Have);
 	void QuestTableClear(int ClientID);
+	void QuestTableShowInformation(CPlayer* pPlayer, ContextBots::QuestBotInfo& BotData);
 };
 
 #endif

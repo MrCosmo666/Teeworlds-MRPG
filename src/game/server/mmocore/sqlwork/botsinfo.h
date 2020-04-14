@@ -24,6 +24,7 @@ class ContextBots : public CMmoComponent
 		char m_TalkingText[512];
 		int m_Style;
 		int m_Emote;
+		bool m_PlayerTalked;
 	};
 
 	struct DescDataBot
@@ -108,7 +109,7 @@ public:
 	void LoadGlobalBots();
 	void ConAddCharacterBot(int ClientID, const char *pCharacter);
 
-	void ProcessingTalkingNPC(int OwnID, int TalkingID, int Seconds, const char *Message, int Style, int TalkingEmote);
+	void ProcessingTalkingNPC(int OwnID, int TalkingID, bool PlayerTalked, const char *Message, int Style, int TalkingEmote);
 
 
 	// ------------------ CHECK VALID DATA --------------------

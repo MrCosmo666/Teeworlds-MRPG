@@ -636,10 +636,10 @@ Messages = [
 	NetMessage("Sv_TalkText",
 	[
 		NetStringStrict("m_pText"),
-		NetIntAny("m_pSeconds"),
 		NetIntAny("m_pTalkClientID"),
 		NetEnum("m_TalkedEmote", Emotes),
 		NetEnum("m_Style", TalkedStyles),
+        NetBool("m_PlayerTalked"),
 	]),
 
 	# clear talk text

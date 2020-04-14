@@ -7,10 +7,10 @@
 class CTalkText : public CComponent
 {
 	// mmotee render talk text
-	int64 m_TalkTime;
 	int m_TalkClientID;
 	int m_Style;
 	int m_TalkedEmote;
+	bool m_PlayerTalked;
 	char m_TalkText[512];
 
 	void ClientPressed();

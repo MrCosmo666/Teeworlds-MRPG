@@ -780,13 +780,13 @@ void CGS::SendTuningParams(int ClientID)
 }
 
 // Отправить пакет разговора с кем то
-void CGS::SendTalkText(int OwnID, int TalkingID, int Seconds, const char *Message, int Style, int TalkingEmote)
+void CGS::SendTalkText(int OwnID, int TalkingID, bool PlayerTalked, const char *Message, int Style, int TalkingEmote)
 {
 	if(!CheckClient(OwnID))
 		return;
 
 	CNetMsg_Sv_TalkText Msg;
-	Msg.m_pSeconds = Seconds;
+	Msg.m_PlayerTalked = PlayerTalked;
 	Msg.m_pTalkClientID = TalkingID;
 	Msg.m_pText = Message;
 	Msg.m_TalkedEmote = TalkingEmote;

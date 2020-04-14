@@ -464,6 +464,13 @@ void QuestBase::ShowQuestInformation(CPlayer *pPlayer, ContextBots::QuestBotInfo
 	int ClientID = pPlayer->GetCID();
 	int QuestID = BotData.QuestID;
 
+	// перекидываем на клиент если проверен
+	if (GS()->CheckClient(ClientID))
+	{
+		QuestTableShowInformation(pPlayer, BotData);
+		return;
+	}
+
 	if(Complecte)
 	{
 		pPlayer->ClearFormatQuestText();
@@ -580,7 +587,7 @@ bool QuestBase::InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo 
 	if(!MultiQuestNPC(pPlayer, BotData, false) || !CheckMobProgress(ClientID, QuestID) || pPlayer->Acc().Level < QuestsData[QuestID].Level)
 	{
 		GS()->Chat(ClientID, "Not all criteria to complete!");
-		return true;
+		return false;
 	}
 
 	// интерактив рандомно понравиться ли предмет даст или нет
@@ -590,7 +597,7 @@ bool QuestBase::InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo 
 		// забираем предмет
 		GS()->Chat(ClientID, "[{STR} NPC] I didn't like it, bring me another one!", BotData.Name);		
 		MultiQuestNPC(pPlayer, BotData, false, true);
-		return true;
+		return false;
 	}
 
 	// проверяем и выдаем потом
@@ -804,7 +811,7 @@ bool QuestBase::OnMessage(int MsgID, void *pRawMsg, int ClientID)
 	return false;
 }
 
-void QuestBase::QuestTableAdd(int ClientID, const char* pText, int Requires, int Have, int ItemID)
+void QuestBase::QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID)
 {
 	CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
 	if (ItemID >= itMoney && ItemID <= ItemSql::ItemsInfo.size() && pPlayer)
@@ -821,7 +828,7 @@ void QuestBase::QuestTableAdd(int ClientID, const char* pText, int Requires, int
 	}
 }
 
-void QuestBase::QuestTableAdd(int ClientID, const char *pText, int Requires, int Have)
+void QuestBase::QuestTableAddInfo(int ClientID, const char *pText, int Requires, int Have)
 {
 	if(!GS()->CheckClient(ClientID))
 		return;
@@ -841,4 +848,33 @@ void QuestBase::QuestTableClear(int ClientID)
 	
 	CNetMsg_Sv_ClearQuestingProcessing Msg;
 	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+}
+
+// Показать разговор информацию как motd
+void QuestBase::QuestTableShowInformation(CPlayer* pPlayer, ContextBots::QuestBotInfo& BotData)
+{
+	if (!pPlayer || !pPlayer->GetCharacter() || !BotData.IsActive())
+		return;
+
+	// показываем текст завершения квеста
+	int ClientID = pPlayer->GetCID();	
+	int QuestID = BotData.QuestID;
+
+
+
+	// если у бота рандомное принятие предмета
+	/*if (BotData.InterRandom[0] > 1)
+	{
+		double Chance = BotData.InterRandom[0] <= 0 ? 100.0f : (1.0f / (double)BotData.InterRandom[0]) * 100;
+
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "\nChance that item he'll like [%0.2f%%]", Chance);
+		Buffer.append_at(Buffer.length(), aBuf);
+	}*/
+
+	// маленький уровень
+	if (pPlayer->Acc().Level < QuestsData[QuestID].Level)
+	{
+		GS()->SBL(ClientID, 100, 100, "Required level: {INT}LVL", QuestsData[QuestID].Level);
+	}
 }

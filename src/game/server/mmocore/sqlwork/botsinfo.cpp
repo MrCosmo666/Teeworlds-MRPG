@@ -99,12 +99,14 @@ void ContextBots::LoadQuestBots()
 			&QuestBot[MotID].InterRandom[0], &QuestBot[MotID].InterRandom[1], &QuestBot[MotID].InterRandom[2],
 			&QuestBot[MotID].InterRandom[3], &QuestBot[MotID].InterRandom[4], &QuestBot[MotID].InterRandom[5]);
 
+		// загрузить разговоры NPC
 		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_quest_npc", "WHERE MobID = '%d'", MotID));
 		while(RES->next())
 		{
 			TalkingData LoadTalk;
 			LoadTalk.m_Emote = RES->getInt("TalkingEmote");
 			LoadTalk.m_Style = RES->getInt("Style");
+			LoadTalk.m_PlayerTalked = RES->getBoolean("PlayerTalked");
 			str_copy(LoadTalk.m_TalkingText, RES->getString("TalkText").c_str(), sizeof(LoadTalk.m_TalkingText));
 			QuestBot[MotID].m_Talk.push_back(LoadTalk);
 		}
@@ -138,12 +140,14 @@ void ContextBots::LoadNpcBots()
 		for(int c = 0; c < CountMobs; c++)
 			GS()->CreateBot(SPAWNNPC, NpcBot[MotID].BotID, MotID);
 
+		// загрузить разговоры NPC
 		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_other_npc", "WHERE MobID = '%d'", MotID));
 		while(RES->next())
 		{
 			TalkingData LoadTalk;
 			LoadTalk.m_Emote = RES->getInt("TalkingEmote");
 			LoadTalk.m_Style = RES->getInt("Style");
+			LoadTalk.m_PlayerTalked = RES->getBoolean("PlayerTalked");
 			str_copy(LoadTalk.m_TalkingText, RES->getString("TalkText").c_str(), sizeof(LoadTalk.m_TalkingText));
 			NpcBot[MotID].m_Talk.push_back(LoadTalk);
 		}
@@ -231,11 +235,12 @@ void ContextBots::ConAddCharacterBot(int ClientID, const char *pCharacter)
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "parseskin", "Added new character bot!");
 }
 
-void ContextBots::ProcessingTalkingNPC(int OwnID, int TalkingID, int Seconds, const char *Message, int Style, int TalkingEmote)
+void ContextBots::ProcessingTalkingNPC(int OwnID, int TalkingID, bool PlayerTalked, const char *Message, int Style, int TalkingEmote)
 {
 	if(GS()->CheckClient(OwnID))
 	{
-		GS()->SendTalkText(OwnID, TalkingID, Seconds, Message, Style, TalkingEmote);
+		dbg_msg("test", "%d", PlayerTalked);
+		GS()->SendTalkText(OwnID, TalkingID, PlayerTalked, Message, Style, TalkingEmote);
 		return;
 	}
 
