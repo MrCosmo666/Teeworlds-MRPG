@@ -455,7 +455,7 @@ void QuestBase::CheckQuest(CPlayer *pPlayer)
 }
 
 // Показать разговор информацию как motd
-void QuestBase::ShowQuestInformation(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData)
+void QuestBase::ShowQuestInformation(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData, const char* TextTalk)
 {
 	if(!pPlayer || !pPlayer->GetCharacter() || !BotData.IsActive()) 
 		return;
@@ -528,7 +528,7 @@ void QuestBase::ShowQuestInformation(CPlayer *pPlayer, ContextBots::QuestBotInfo
 
 	// показываем все информацию
 	GS()->Motd(ClientID, "[Quest NPC] {STR}\n{STR}\n\n {STR}{STR}\n\n", 
-		BotData.Name, pPlayer->FormatedTalkedText(), (ShowItemNeeded ? "- - - - - - - I will need" : "\0"), Buffer.buffer());
+		TextTalk, pPlayer->FormatedTalkedText(), (ShowItemNeeded ? "- - - - - - - I will need" : "\0"), Buffer.buffer());
 	Buffer.clear();
 	GS()->SBL(ClientID, 99999, 8, _("PRESS (F4) FOR CONTINUE TALK!"), NULL);
 }

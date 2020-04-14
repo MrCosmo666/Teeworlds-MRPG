@@ -88,7 +88,7 @@ public:
 
 	void ShowQuestList(CPlayer *pPlayer, int StateQuest);
 	void ShowFullQuestLift(CPlayer *pPlayer);
-	void ShowQuestInformation(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData);
+	void ShowQuestInformation(CPlayer* pPlayer, ContextBots::QuestBotInfo& BotData, const char* TextTalk);
 
 	void CheckQuest(CPlayer *pPlayer);
 	bool AcceptQuest(int QuestID, CPlayer *pPlayer);
