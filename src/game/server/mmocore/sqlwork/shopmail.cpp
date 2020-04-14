@@ -38,24 +38,24 @@ void ShopMailSql::ShowMailShop(CPlayer *pPlayer, int StorageID)
 	GS()->AV(ClientID, "null", "");
 
 	int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + 300;
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID = 0 AND StorageID = '%d' ORDER BY Level", StorageID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID = 0 AND StorageID = '%d' ORDER BY Price", StorageID));
 	while(RES->next())
 	{
 		int ID  = RES->getInt("ID"), ItemID = RES->getInt("ItemID"), Price = RES->getInt("Price"), Enchant = RES->getInt("Enchant");
-		int Level = RES->getInt("Level"), Count = RES->getInt("Count"), NeedItemID = RES->getInt("NeedItem");
+		int Count = RES->getInt("Count"), NeedItemID = RES->getInt("NeedItem");
 		
 		ItemSql::ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
 		ItemSql::ItemInformation &NeededItem = GS()->GetItemInfo(NeedItemID);
 		
 		if(Enchant > 0)
 		{
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(15,20,30), "L{INT} - {STR}x{INT}(+{INT}) [{INT} {STR}]", 
-				&Level, BuyightItem.GetName(pPlayer), &Count, &Enchant, &Price, NeededItem.GetName(pPlayer));
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(15,20,30), "{STR}x{INT}(+{INT}) [{INT} {STR}]", 
+				BuyightItem.GetName(pPlayer), &Count, &Enchant, &Price, NeededItem.GetName(pPlayer));
 		}
 		else
 		{
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(15,20,30), "L{INT} - {STR}x{INT} [{INT} {STR}]", 
-				&Level, BuyightItem.GetName(pPlayer), &Count, &Price, NeededItem.GetName(pPlayer));
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(15,20,30), "{STR}x{INT} [{INT} {STR}]", 
+				BuyightItem.GetName(pPlayer), &Count, &Price, NeededItem.GetName(pPlayer));
 		}
 
 		if(CGS::AttributInfo.find(BuyightItem.BonusID) != CGS::AttributInfo.end())
@@ -83,7 +83,7 @@ void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 	while(RES->next())
 	{
 		int ID  = RES->getInt("ID"), ItemID = RES->getInt("ItemID"), Price = RES->getInt("Price"), Enchant = RES->getInt("Enchant");
-		int Level = RES->getInt("Level"), Count = RES->getInt("Count"), OwnerID = RES->getInt("OwnerID");
+		int Count = RES->getInt("Count"), OwnerID = RES->getInt("OwnerID");
 
 		ItemSql::ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
 		GS()->AVH(ClientID, HideID, vec3(15,20,30), "{STR}x{INT}(+{INT}) {INT} gold", BuyightItem.GetName(pPlayer), &Count, &Enchant, &Price);
@@ -132,7 +132,7 @@ void ShopMailSql::CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem)
 	// забираем предмет и добавляем слот
 	if(PlSellItem.Count >= AuSellItem.a_count && PlSellItem.Remove(AuSellItem.a_count))
 	{
-		SJK.ID("tw_mailshop", "(ItemID, Price, Level, Count, OwnerID, Enchant) VALUES ('%d', '%d', '1', '%d', '%d', '%d')", 
+		SJK.ID("tw_mailshop", "(ItemID, Price, Count, OwnerID, Enchant) VALUES ('%d', '%d', '1', '%d', '%d', '%d')", 
 			ItemID, AuSellItem.a_price, AuSellItem.a_count, pPlayer->Acc().AuthID, PlSellItem.Enchant);
 
 		int AvailableSlot = (g_Config.m_SvMaxAuctionSlots - CountSlot)-1;
@@ -151,14 +151,6 @@ bool ShopMailSql::BuyShopAuctionSlot(CPlayer *pPlayer, int ID)
 	// ищем слот который нам нужен
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE ID = '%d'", ID));
 	if(!RES->next()) return false;
-
-	// проверяем уровень
-	const int Level = RES->getInt("Level");
-	if(pPlayer->Acc().Level < Level)
-	{
-		GS()->Chat(ClientID, "Required level {INT} for buy!", &Level);	
-		return false;		
-	}
 
 	// проверяем имеется ли такой зачарованный предмет
 	const int ItemID = RES->getInt("ItemID");
