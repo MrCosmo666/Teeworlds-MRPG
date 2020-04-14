@@ -49,8 +49,8 @@ void ShopMailSql::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		
 		if(Enchant > 0)
 		{
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(15,20,30), "{STR}x{INT}(+{INT}) [{INT} {STR}]", 
-				BuyightItem.GetName(pPlayer), &Count, &Enchant, &Price, NeededItem.GetName(pPlayer));
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(15,20,30), "{STR}x{INT}(+{INT}) [{INT} {STR}] {STR}", 
+				BuyightItem.GetName(pPlayer), &Count, &Enchant, &Price, NeededItem.GetName(pPlayer), (pPlayer->GetItem(ItemID).Count > 0 ? "✔" : "\0"));
 		}
 		else
 		{
