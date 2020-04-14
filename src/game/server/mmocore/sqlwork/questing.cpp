@@ -530,6 +530,7 @@ void QuestBase::ShowQuestInformation(CPlayer *pPlayer, ContextBots::QuestBotInfo
 	GS()->Motd(ClientID, "[Quest NPC] {STR}\n{STR}\n\n {STR}{STR}\n\n", 
 		TextTalk, pPlayer->FormatedTalkedText(), (ShowItemNeeded ? "- - - - - - - I will need" : "\0"), Buffer.buffer());
 	Buffer.clear();
+	pPlayer->ClearFormatQuestText();
 	GS()->SBL(ClientID, 99999, 8, _("PRESS (F4) FOR CONTINUE TALK!"), NULL);
 }
 
@@ -850,7 +851,32 @@ void QuestBase::QuestTableShowInformation(CPlayer* pPlayer, ContextBots::QuestBo
 	int ClientID = pPlayer->GetCID();	
 	int QuestID = BotData.QuestID;
 
+	// показываем по информация о предметах
+	for (int i = 0; i < 2; i++)
+	{
+		int ItemID = BotData.Interactive[i];
+		int Count = BotData.InterCount[i];
+		if (ItemID <= 0 || Count <= 0)
+			continue;
 
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "I need (%s)", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
+		GS()->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, Count, ItemID);
+	}
+
+	// показываем текст по информации о мобах
+	for (int i = 4; i < 6; i++)
+	{
+		int BotID = BotData.Interactive[i];
+		int Count = BotData.InterCount[i];
+		if (BotID <= 0 || Count <= 0 || !GS()->Mmo()->BotsData()->IsDataBotValid(BotID))
+			continue;
+
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "Defeat (%s)", ContextBots::DataBot[BotID].NameBot);
+		GS()->Mmo()->Quest()->QuestTableAddInfo(ClientID, aBuf, Count,
+			QuestBase::Quests[ClientID][BotData.QuestID].MobProgress[i - 4]);
+	}
 
 	// если у бота рандомное принятие предмета
 	/*if (BotData.InterRandom[0] > 1)
