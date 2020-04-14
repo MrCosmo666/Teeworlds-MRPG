@@ -854,6 +854,14 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		int sizeTalking = ContextBots::QuestBot[MobID].m_Talk.size();
 		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
 		{
+			m_TalkingNPC.m_TalkedProgress = 0;
+			GS()->ClearTalkText(m_ClientID);
+			return;
+		}
+
+		GS()->Mmo()->Quest()->QuestTableClear(m_ClientID);
+		if (ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_RequestComplete)
+		{
 			if (GS()->Mmo()->Quest()->InteractiveQuestNPC(this, ContextBots::QuestBot[MobID]))
 			{
 				m_TalkingNPC.m_TalkedProgress = 0;
@@ -861,15 +869,6 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 				return;
 			}
 
-			if (GS()->CheckClient(m_ClientID))
-				GS()->Mmo()->BotsData()->ProcessingTalkingNPC(m_ClientID, TalkedID, false, "(Information) Not all criteria are complected!", 0, EMOTE_BLINK);
-	
-			return;
-		}
-
-		GS()->Mmo()->Quest()->QuestTableClear(m_ClientID);
-		if (ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_RequestComplete)
-		{
 			if (!GS()->CheckClient(m_ClientID))
 			{
 				char reformTalkedText[512];
@@ -880,10 +879,9 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 				GS()->Mmo()->Quest()->ShowQuestInformation(this, ContextBots::QuestBot[MobID], reformTalkedText);
 				return;
 			}
-			else
-			{
-				GS()->Mmo()->Quest()->ShowQuestInformation(this, ContextBots::QuestBot[MobID], "\0");
-			}
+
+			GS()->Mmo()->BotsData()->ProcessingTalkingNPC(m_ClientID, TalkedID, false, "(Information) Not all criteria are complected!", 0, EMOTE_BLINK);
+			GS()->Mmo()->Quest()->ShowQuestInformation(this, ContextBots::QuestBot[MobID], "\0");
 		}
 
 		char reformTalkedText[512];
