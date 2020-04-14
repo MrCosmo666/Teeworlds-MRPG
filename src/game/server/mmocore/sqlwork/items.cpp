@@ -604,16 +604,13 @@ bool ItemSql::ClassItems::EquipItem()
 	if(Info().Type == ITEMEQUIP)
 	{
 		const int EquipID = Info().Function;
-		int EquipItemID = pPlayer->GetItemEquip(EquipID);
+		int EquipItemID = pPlayer->GetItemEquip(EquipID, itemid_);
 		while (EquipItemID >= 1)
 		{
-			if (EquipItemID == itemid_)
-				continue;
-
 			ItemSql::ItemPlayer &EquipItem = pPlayer->GetItem(EquipItemID);
 			EquipItem.Settings = 0;
 			EquipItem.SetSettings(0);
-			EquipItemID = pPlayer->GetItemEquip(EquipID);
+			EquipItemID = pPlayer->GetItemEquip(EquipID, itemid_);
 		}
 		pPlayer->AddInformationStats();
 	}

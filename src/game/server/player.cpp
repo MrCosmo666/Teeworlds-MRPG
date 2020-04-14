@@ -755,11 +755,13 @@ ItemSql::ItemPlayer &CPlayer::GetItem(int ItemID)
 }
 
 // Получить одетый предмет
-int CPlayer::GetItemEquip(int EquipID) const
+int CPlayer::GetItemEquip(int EquipID, int SkipItemID) const
 {
 	for(const auto& it : ItemSql::Items[m_ClientID])
 	{
-		if(!it.second.Count || !it.second.Settings || it.second.Info().Function != EquipID) continue;
+		if(!it.second.Count || !it.second.Settings || it.second.Info().Function != EquipID || it.first == SkipItemID) 
+			continue;
+
 		return it.first;
 	}
 	return -1;

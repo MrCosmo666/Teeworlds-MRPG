@@ -172,7 +172,7 @@ public:
 	};
 
 	int GetItemDurability(int Item) const;
-	int GetItemEquip(int EquipID) const;
+	int GetItemEquip(int EquipID, int SkipItemID = -1) const;
 	int GetLevelDisciple(int Class);
 	bool CheckEquipItem(int ItemID) const;
 
