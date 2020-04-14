@@ -277,21 +277,6 @@ void SqlController::SaveAccount(CPlayer *pPlayer, int Table)
 	}
 }
 
-// дневник разработки
-void SqlController::DevNotebook(CPlayer *pPlayer)
-{
-	const int ClientID = pPlayer->GetCID();
-	int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + 800;
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_devnotepad"));
-	while(RES->next())
-	{
-		++HideID;
-		GS()->AVH(ClientID, HideID, vec3(1,2,1), "{STR}", RES->getString("nDesc").c_str());
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", RES->getString("nDesc2").c_str());
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", RES->getString("nDesc3").c_str());
-	}
-}
-
 void SqlController::LoadLogicWorld()
 {
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_logicworld", "WHERE WorldID = '%d'", GS()->GetWorldID()));

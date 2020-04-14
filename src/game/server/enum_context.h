@@ -98,7 +98,6 @@ enum
 	MEMBERRANK,								// гильдия ранги меню
 	MEMBERINVITES,							// гильдия приглашения меню
 	MEMBERHISTORY,							// гильдия история действий
-	DEVNOTEPAD,								// прогресс разработки меню
 	CRAFTING,								// крафт меню
 	HOUSEMENU,								// дома меню
 	HOUSEDECORATION,						// дома декорации меню

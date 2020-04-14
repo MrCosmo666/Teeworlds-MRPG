@@ -1890,7 +1890,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		// меню информации
 		AVH(ClientID, HINFORMATION, vec3(15,40,80), "# SUB MENU INFORMATION");
-		AVM(ClientID, "MENU", DEVNOTEPAD, HINFORMATION, "☫ Game Dev Notepad");
 		AVM(ClientID, "MENU", GUIDEDROP, HINFORMATION, "♣ Chance to loot mobs");
 		AV(ClientID, "null", "");
 
@@ -2002,12 +2001,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	{
 		pPlayer->m_LastVoteMenu = MEMBERMENU;		
 		Mmo()->Member()->ShowHistoryGuild(ClientID, pPlayer->Acc().MemberID);
-	}
-	else if(MenuList == DEVNOTEPAD) 
-	{
-		pPlayer->m_LastVoteMenu = MAINMENU;
-		Mmo()->DevNotebook(pPlayer);
-		AddBack(ClientID);	
 	}
 	else if(MenuList == SETTINGS) 
 	{
@@ -2131,7 +2124,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			if(at.second.AtType != AtributType::AtDps || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGDPS, "[{INT}] Price {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGDPS, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
 		}
 		AV(ClientID, "null", "");
 
@@ -2143,7 +2136,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			if(at.second.AtType != AtributType::AtTank || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGTANK, "[{INT}] Price {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGTANK, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
 		}
 		AV(ClientID, "null", "");
 
@@ -2155,7 +2148,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			if(at.second.AtType != AtributType::AtHealer || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGHEALER, "[{INT}] Price {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGHEALER, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
 		}
 		AV(ClientID, "null", "");
 
@@ -2166,7 +2159,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			if(at.second.AtType != AtributType::AtWeapon || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGWEAPON, "[{INT}] Price {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGWEAPON, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
 		}
 
 		AV(ClientID, "null", ""), 

@@ -99,7 +99,6 @@ public:
 	// 
 	void LoadLogicWorld();
 	void LoadDungeons();
-	void DevNotebook(CPlayer *pPlayer);
 	void ShowBussinesHousesSell(CPlayer *pPlayer);
 	
 	//

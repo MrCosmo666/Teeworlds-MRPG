@@ -298,13 +298,13 @@ void MemberSql::ShowMenuGuild(CPlayer *pPlayer)
 	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Maximal available player count: {INT}", &Member[MemberID].mUpgrades[EMEMBERUPGRADE::AvailableNSTSlots]);
 	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Leader: {STR}", Job()->PlayerName(Member[MemberID].mOwnerID));
 	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "- - - - - - - - - -");
-	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Guild Bank: {INT}gold", &Member[MemberID].mBank);
-	int MemberHouse = GetMemberHouseID(MemberID);
-	if(MemberHouse > 0) { GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Door Status: {STR}", GetMemberDoor(MemberID) ? "Closed" : "Opened"); }
-	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "- - - - - - - - - -");
 	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "/ginvite <id> - to invite a player into members (for leader)");
 	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "/gexit - leave of guild group (for all members)");
 	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Many options are unlocked with the purchase of a home");
+	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "- - - - - - - - - -");
+	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Guild Bank: {INT}gold", &Member[MemberID].mBank);
+	int MemberHouse = GetMemberHouseID(MemberID);
+	if (MemberHouse > 0) { GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Door Status: {STR}", GetMemberDoor(MemberID) ? "Closed" : "Opened"); }
 	GS()->AV(ClientID, "null", "");
 
 	pPlayer->m_Colored = { 10,10,10 };
