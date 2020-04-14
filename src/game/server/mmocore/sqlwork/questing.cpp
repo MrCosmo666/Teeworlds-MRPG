@@ -839,7 +839,7 @@ void QuestBase::QuestTableAddInfo(int ClientID, const char *pText, int Requires,
 	Msg.m_pText = pText;
 	Msg.m_pRequiresNum = Requires;
 	Msg.m_pHaveNum = clamp(Have, 0, Requires);
-	StrToInts(Msg.m_pIcon, 4, "unknown");
+	StrToInts(Msg.m_pIcon, 4, "hammer");
 	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
