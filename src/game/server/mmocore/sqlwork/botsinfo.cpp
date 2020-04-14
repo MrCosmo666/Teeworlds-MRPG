@@ -79,9 +79,6 @@ void ContextBots::LoadQuestBots()
 		QuestBot[MotID].QuestID = RES->getInt("QuestID");
 		QuestBot[MotID].Progress = RES->getInt("Progress");
 		QuestBot[MotID].Emote = RES->getInt("Emote");
-
-		str_copy(QuestBot[MotID].TalkText[0], RES->getString("StartTalk").c_str(), sizeof(QuestBot[MotID].TalkText[0]));
-		str_copy(QuestBot[MotID].TalkText[1], RES->getString("EndTalk").c_str(), sizeof(QuestBot[MotID].TalkText[1]));
 		str_copy(QuestBot[MotID].Name, DataBot[QuestBot[MotID].BotID].NameBot, sizeof(QuestBot[MotID].Name));
 
 		QuestBot[MotID].Interactive[0] = RES->getInt("it_need_0");
@@ -131,7 +128,6 @@ void ContextBots::LoadNpcBots()
 		NpcBot[MotID].PositionY = (NpcBot[MotID].Static ? RES->getInt("PositionY")+1 : RES->getInt("PositionY"));
 		NpcBot[MotID].Emote = RES->getInt("Emote");
 		NpcBot[MotID].BotID = RES->getInt("BotID");
-		str_copy(NpcBot[MotID].TalkText, RES->getString("TalkText").c_str(), sizeof(NpcBot[MotID].TalkText));
 		str_copy(NpcBot[MotID].Name, DataBot[NpcBot[MotID].BotID].NameBot, sizeof(NpcBot[MotID].Name));
 	
 		// пропуск если не создаем ботов

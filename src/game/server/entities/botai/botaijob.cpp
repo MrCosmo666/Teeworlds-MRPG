@@ -327,11 +327,6 @@ void BotAI::EngineNPC()
 	m_Input.m_TargetX = (m_Input.m_Direction*10+1);
 
 	// ------------------------------------------------------------------------------
-	// шалаболить ботам с игроками (потом заменить уебищно)
-	// ------------------------------------------------------------------------------	
-	TalkingBots(ContextBots::NpcBot[SubBotID].TalkText);
-
-	// ------------------------------------------------------------------------------
 	// интерактивы бота с найденым игроком
 	// ------------------------------------------------------------------------------	
 	CPlayer *pFind = SearchPlayer((StaticBot ? 300 : 100));
@@ -562,39 +557,6 @@ CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 		SetEmote(EMOTE_ANGRY, 1);
 
 	return pPlayer;
-}
-
-// Разговор ботов
-void BotAI::TalkingBots(const char *Text)
-{
-	for(int tID = 0; tID < MAX_PLAYERS; tID++)
-	{
-		if(!GS()->m_apPlayers[tID])
-			continue;
-
-		if(distance(m_Core.m_Pos, GS()->m_apPlayers[tID]->m_ViewPos) < 80)
-		{
-			if((GS()->Collision()->FastIntersectLine(m_Core.m_Pos, GS()->m_apPlayers[tID]->m_ViewPos, 0, 0)))
-				continue;
-
-			if(GS()->CheckClient(tID))
-			{
-
-			}
-			else if(!m_MessagePlayers[tID])
-			{
-				m_MessagePlayers[tID] = true;
-
-				GS()->ChatFollow(tID, "{STR}.", Text);
-				GS()->CreateSound(m_Pos, 19, CmaskOne(tID));				
-			}
-		}
-		
-		if(m_MessagePlayers[tID] && distance(m_Core.m_Pos, GS()->m_apPlayers[tID]->m_ViewPos) >= 80)
-		{
-			m_MessagePlayers[tID] = false;
-		}
-	}
 }
 
 int BotAI::GetEmoticon(int EmoteEyes) const

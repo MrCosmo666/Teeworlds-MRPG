@@ -524,11 +524,9 @@ void QuestBase::ShowQuestInformation(CPlayer *pPlayer, ContextBots::QuestBotInfo
 		Buffer.append_at(Buffer.length(), aBuf);
 	}
 
-	pPlayer->FormatTextQuest(BotData.BotID, BotData.TalkText[0]);
-
 	// показываем все информацию
-	GS()->Motd(ClientID, "[Quest NPC] {STR}\n{STR}\n\n {STR}{STR}\n\n", 
-		TextTalk, pPlayer->FormatedTalkedText(), (ShowItemNeeded ? "- - - - - - - I will need" : "\0"), Buffer.buffer());
+	GS()->Motd(ClientID, "[Quest NPC] {STR}\n\n {STR}{STR}\n\n", 
+		TextTalk, (ShowItemNeeded ? "- - - - - - - I will need" : "\0"), Buffer.buffer());
 	Buffer.clear();
 	pPlayer->ClearFormatQuestText();
 	GS()->SBL(ClientID, 99999, 8, _("PRESS (F4) FOR CONTINUE TALK!"), NULL);

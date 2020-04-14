@@ -50,11 +50,8 @@ private:
 	CPlayer *SearchPlayer(int Distance);
     CPlayer *SearchTenacityPlayer(float Distance);
 
-	void TalkingBots(const char *Text);
-
 	int GetEmoticon(int EmoteEyes) const;
 
-	int GetMoodType() const;
 };
 
 #endif

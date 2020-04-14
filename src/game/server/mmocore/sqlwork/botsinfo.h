@@ -41,7 +41,6 @@ class ContextBots : public CMmoComponent
 	struct ClassNpcBot
 	{
 		char Name[32];
-		char TalkText[64];
 		bool Static;
 		int PositionX;
 		int PositionY;
@@ -55,7 +54,6 @@ class ContextBots : public CMmoComponent
 	struct ClassQuestBot
 	{
 		char Name[32];
-		char TalkText[2][512];
 		int PositionX;
 		int PositionY;
 		int QuestID;
