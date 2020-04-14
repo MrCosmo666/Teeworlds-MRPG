@@ -395,9 +395,6 @@ void BotAI::EngineQuestMob()
 		else 
 			CGS::InteractiveSub[i].QBI = ContextBots::QuestBot[SubBotID];
 
-		if(Server()->Tick() % Server()->TickSpeed()/20 == 0)
-			GS()->Mmo()->Quest()->ShowQuestInformation(pFind, ContextBots::QuestBot[SubBotID], false);
-
 		pFind->SetTalking(GetPlayer()->GetCID(), false);
 	}
 }

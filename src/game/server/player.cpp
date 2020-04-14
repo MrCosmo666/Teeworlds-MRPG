@@ -704,7 +704,8 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 			return true;
 		}
 
-		GS()->Mmo()->Quest()->InteractiveQuestNPC(this, CGS::InteractiveSub[m_ClientID].QBI);
+		if(!GS()->CheckClient(m_ClientID))
+			SetTalking(GetTalkedID(), true);
 	}
 	return false;
 }
@@ -865,31 +866,38 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		GS()->Mmo()->Quest()->QuestTableClear(m_ClientID);
 		if (ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_RequestComplete)
 		{
-			// показываем по информация о предметах
-			for (int i = 0; i < 2; i++)
+			if (GS()->CheckClient(m_ClientID))
 			{
-				int ItemID = ContextBots::QuestBot[MobID].Interactive[i];
-				int Count = ContextBots::QuestBot[MobID].InterCount[i];
-				if (ItemID <= 0 || Count <= 0)
-					continue;
+				// показываем по информация о предметах
+				for (int i = 0; i < 2; i++)
+				{
+					int ItemID = ContextBots::QuestBot[MobID].Interactive[i];
+					int Count = ContextBots::QuestBot[MobID].InterCount[i];
+					if (ItemID <= 0 || Count <= 0)
+						continue;
 
-				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), "I need (%s)", GetItem(ItemID).Info().GetName(this));
-				GS()->Mmo()->Quest()->QuestTableAddItem(m_ClientID, aBuf, Count, ItemID);
+					char aBuf[128];
+					str_format(aBuf, sizeof(aBuf), "I need (%s)", GetItem(ItemID).Info().GetName(this));
+					GS()->Mmo()->Quest()->QuestTableAddItem(m_ClientID, aBuf, Count, ItemID);
+				}
+
+				// показываем текст по информации о мобах
+				for (int i = 4; i < 6; i++)
+				{
+					int BotID = ContextBots::QuestBot[MobID].Interactive[i];
+					int Count = ContextBots::QuestBot[MobID].InterCount[i];
+					if (BotID <= 0 || Count <= 0 || !GS()->Mmo()->BotsData()->IsDataBotValid(BotID))
+						continue;
+
+					char aBuf[128];
+					str_format(aBuf, sizeof(aBuf), "Defeat (%s)", ContextBots::DataBot[BotID].NameBot);
+					GS()->Mmo()->Quest()->QuestTableAddInfo(m_ClientID, aBuf, Count,
+						QuestBase::Quests[m_ClientID][ContextBots::QuestBot[MobID].QuestID].MobProgress[i - 4]);
+				}
 			}
-
-			// показываем текст по информации о мобах
-			for (int i = 4; i < 6; i++)
+			else
 			{
-				int BotID = ContextBots::QuestBot[MobID].Interactive[i];
-				int Count = ContextBots::QuestBot[MobID].InterCount[i];
-				if (BotID <= 0 || Count <= 0 || !GS()->Mmo()->BotsData()->IsDataBotValid(BotID))
-					continue;
-
-				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), "Defeat (%s)", ContextBots::DataBot[BotID].NameBot);
-				GS()->Mmo()->Quest()->QuestTableAddInfo(m_ClientID, aBuf, Count,
-					QuestBase::Quests[m_ClientID][ContextBots::QuestBot[MobID].QuestID].MobProgress[i - 4]);
+				GS()->Mmo()->Quest()->ShowQuestInformation(this, ContextBots::QuestBot[MobID]);
 			}
 		}
 

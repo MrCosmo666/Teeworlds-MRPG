@@ -245,5 +245,5 @@ void ContextBots::ProcessingTalkingNPC(int OwnID, int TalkingID, bool PlayerTalk
 		return;
 	}
 
-	GS()->Chat(OwnID, Message);
+	GS()->Motd(OwnID, Message);
 }

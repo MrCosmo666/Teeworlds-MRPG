@@ -455,7 +455,7 @@ void QuestBase::CheckQuest(CPlayer *pPlayer)
 }
 
 // Показать разговор информацию как motd
-void QuestBase::ShowQuestInformation(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData, bool Complecte)
+void QuestBase::ShowQuestInformation(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData)
 {
 	if(!pPlayer || !pPlayer->GetCharacter() || !BotData.IsActive()) 
 		return;
@@ -468,15 +468,6 @@ void QuestBase::ShowQuestInformation(CPlayer *pPlayer, ContextBots::QuestBotInfo
 	if (GS()->CheckClient(ClientID))
 	{
 		QuestTableShowInformation(pPlayer, BotData);
-		return;
-	}
-
-	if(Complecte)
-	{
-		pPlayer->ClearFormatQuestText();
-		pPlayer->FormatTextQuest(BotData.BotID, BotData.TalkText[1]);
-		GS()->Motd(ClientID, "[Quest NPC] {STR}\n{STR}\n\nYou contunie quest!", BotData.Name, pPlayer->FormatedTalkedText());
-		pPlayer->ClearFormatQuestText();
 		return;
 	}
 
@@ -606,9 +597,6 @@ bool QuestBase::InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo 
 	// забираем проверяем не является ли тип рандомно взять предмет
 	if(BotData.InterRandom[2] <= 0 || RandomGetItem > 0)
 		MultiQuestNPC(pPlayer, BotData, false, true);
-
-	// вывести показать все что нужно
-	ShowQuestInformation(pPlayer, BotData, true);
 
 	GS()->VResetVotes(ClientID, ADVENTUREJOURNAL);
 	GS()->Mmo()->Quest()->TalkProgress(pPlayer, QuestID);
