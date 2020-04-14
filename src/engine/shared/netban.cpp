@@ -294,7 +294,7 @@ template<class T>
 int CNetBan::Ban(T *pBanPool, const typename T::CDataType *pData, int Seconds, const char *pReason)
 {
 	// do not ban localhost
-	if(NetMatch(pData, &m_LocalhostIPV4) || NetMatch(pData, &m_LocalhostIPV6))
+	if (!IsBannable(pData))
 	{
 		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "net_ban", "ban failed (localhost)");
 		return -1;
@@ -456,6 +456,17 @@ void CNetBan::UnbanAll()
 {
 	m_BanAddrPool.Reset();
 	m_BanRangePool.Reset();
+}
+
+template<class T>
+bool CNetBan::IsBannable(const T* pData)
+{
+	// do not ban localhost
+	if (NetMatch(pData, &m_LocalhostIPV4) || NetMatch(pData, &m_LocalhostIPV6))
+	{
+		return false;
+	}
+	return true;
 }
 
 bool CNetBan::IsBanned(const NETADDR *pAddr, char *pBuf, unsigned BufferSize, int *pLastInfoQuery)
@@ -623,3 +634,5 @@ template void CNetBan::MakeBanInfo<CNetRange>(CBan<CNetRange> *pBan, char *pBuf,
 template void CNetBan::MakeBanInfo<NETADDR>(CBan<NETADDR> *pBan, char *pBuf, unsigned BufferSize, int Type, int *pLastInfoQuery);
 template int CNetBan::Ban<CNetBan::CBanPool<NETADDR, 1> >(CNetBan::CBanPool<NETADDR, 1> *pBanPool, const NETADDR *pData, int Seconds, const char *pReason);
 template int CNetBan::Ban<CNetBan::CBanPool<CNetRange, 16> >(CNetBan::CBanPool<CNetRange, 16> *pBanPool, const CNetRange *pData, int Seconds, const char *pReason);
+template bool CNetBan::IsBannable<NETADDR>(const NETADDR* pData);
+template bool CNetBan::IsBannable<CNetRange>(const CNetRange* pData);

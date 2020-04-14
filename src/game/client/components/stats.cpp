@@ -11,9 +11,7 @@
 
 CStats::CStats()
 {
-	m_Active = false;
-	m_ScreenshotTaken = false;
-	m_ScreenshotTime = -1;
+	OnReset();
 }
 
 void CStats::CPlayerStats::Reset()
@@ -40,9 +38,17 @@ void CStats::OnReset()
 {
 	for (int i = 0; i < MAX_CLIENTS; i++)
 		m_aStats[i].Reset();
+
 	m_Active = false;
+	m_Activate = false;
+
 	m_ScreenshotTaken = false;
 	m_ScreenshotTime = -1;
+}
+
+void CStats::OnRelease()
+{
+	m_Active = false;
 }
 
 bool CStats::IsActive() const
@@ -56,7 +62,15 @@ bool CStats::IsActive() const
 
 void CStats::ConKeyStats(IConsole::IResult* pResult, void* pUserData)
 {
-	((CStats*)pUserData)->m_Active = pResult->GetInteger(0) != 0;
+	CStats* pStats = (CStats*)pUserData;
+	int Result = pResult->GetInteger(0);
+	if (!Result)
+	{
+		pStats->m_Activate = false;
+		pStats->m_Active = false;
+	}
+	else if (!pStats->m_Active)
+		pStats->m_Activate = true;
 }
 
 void CStats::OnConsoleInit()
@@ -116,6 +130,13 @@ void CStats::OnRender()
 	// don't render scoreboard if menu is open
 	if (m_pClient->m_pMenus->IsActive())
 		return;
+
+	// postpone the active state till the render area gets updated during the rendering
+	if (m_Activate)
+	{
+		m_Active = true;
+		m_Activate = false;
+	}
 
 	if (!IsActive())
 		return;

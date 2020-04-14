@@ -563,7 +563,8 @@ Messages = [
 		NetIntRange("m_ClientID", 0, 'MAX_CLIENTS-1'),
 		NetIntRange("m_Time", -1, 'max_int'),
 		NetIntAny("m_Diff"),
-		NetBool("m_NewRecord"),
+		NetBool("m_RecordPersonal"),
+		NetBool("m_RecordServer", default=False),
 	]),
 
 	NetMessage("Sv_Checkpoint", [

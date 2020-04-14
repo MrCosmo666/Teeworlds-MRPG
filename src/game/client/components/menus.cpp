@@ -644,7 +644,7 @@ void CMenus::DoEditBoxOption(void *pID, char *pOption, int OptionLength, const C
 	DoEditBox(pID, &EditBox, pOption, OptionLength, pRect->h*ms_FontmodHeight*0.8f, pOffset, Hidden);
 }
 
-void CMenus::DoScrollbarOption(void *pID, int *pOption, const CUIRect *pRect, const char *pStr, int Min, int Max, bool Infinite)
+void CMenus::DoScrollbarOption(void* pID, int* pOption, const CUIRect* pRect, const char* pStr, int Min, int Max, IScrollbarScale* pScale, bool Infinite)
 {
 	int Value = *pOption;
 	if(Infinite)
@@ -674,7 +674,7 @@ void CMenus::DoScrollbarOption(void *pID, int *pOption, const CUIRect *pRect, co
 	UI()->DoLabel(&Label, aBuf, FontSize, CUI::ALIGN_LEFT);
 
 	ScrollBar.VMargin(4.0f, &ScrollBar);
-	Value = round_to_int(DoScrollbarH(pID, &ScrollBar, (float)(Value - Min) / (float)(Max - Min)) * (float)(Max - Min) + (float)Min + 0.1f);
+	Value = pScale->ToAbsolute(DoScrollbarH(pID, &ScrollBar, pScale->ToRelative(Value, Min, Max)), Min, Max);
 	if(Infinite && Value == Max)
 		Value = 0;
 
@@ -2773,10 +2773,7 @@ void CMenus::OnRender()
 	UI()->StartCheck();
 
 	// reset cursor
-	if(m_CursorActive)
-		m_PrevCursorActive = true;
-	else
-		m_PrevCursorActive = false;
+	m_PrevCursorActive = m_CursorActive;
 	m_CursorActive = false;
 
 	if(m_KeyReaderIsActive)
@@ -2857,7 +2854,9 @@ void CMenus::OnRender()
 
 bool CMenus::CheckHotKey(int Key)
 {
-	return !m_KeyReaderIsActive && !m_KeyReaderWasActive && !m_PrevCursorActive && !m_PopupActive && Input()->KeyIsPressed(Key) && !m_pClient->m_pGameConsole->IsConsoleActive();
+	return !m_KeyReaderIsActive && !m_KeyReaderWasActive && !m_PrevCursorActive && !m_PopupActive &&
+		!Input()->KeyIsPressed(KEY_LSHIFT) && !Input()->KeyIsPressed(KEY_RSHIFT) && !Input()->KeyIsPressed(KEY_LCTRL) && !Input()->KeyIsPressed(KEY_RCTRL) && !Input()->KeyIsPressed(KEY_LALT) && // no modifier
+		Input()->KeyIsPressed(Key) && !m_pClient->m_pGameConsole->IsConsoleActive();
 }
 
 void CMenus::RenderCursor(int ImageID, vec4 Color)

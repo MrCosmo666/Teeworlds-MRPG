@@ -316,7 +316,7 @@ void CServerBrowser::SetType(int Type)
 
 void CServerBrowser::Refresh(int RefreshFlags)
 {
-	m_RefreshFlags = RefreshFlags;
+	m_RefreshFlags |= RefreshFlags;
 
 	if(RefreshFlags&IServerBrowser::REFRESHFLAG_LAN)
 	{

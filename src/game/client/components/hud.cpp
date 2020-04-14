@@ -405,7 +405,14 @@ void CHud::OnMessage(int MsgType, void* pRawMsg)
 		CNetMsg_Sv_Checkpoint* pMsg = (CNetMsg_Sv_Checkpoint*)pRawMsg;
 		m_CheckpointDiff = pMsg->m_Diff;
 		m_CheckpointTime = time_get();
-	} 
+	}
+	else if (MsgType == NETMSGTYPE_SV_KILLMSG && (m_pClient->m_GameInfo.m_GameFlags & GAMEFLAG_RACE))
+	{
+		// reset checkpoint time on death
+		CNetMsg_Sv_KillMsg* pMsg = (CNetMsg_Sv_KillMsg*)pRawMsg;
+		if (pMsg->m_Victim == m_pClient->m_LocalClientID)
+			m_CheckpointTime = 0;
+	}
 }
 
 void CHud::RenderWarmupTimer()
