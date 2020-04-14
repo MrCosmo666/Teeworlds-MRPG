@@ -603,16 +603,18 @@ bool ItemSql::ClassItems::EquipItem()
 	// если снаряжение
 	if(Info().Type == ITEMEQUIP)
 	{
-		int EquipID = Info().Function;
+		const int EquipID = Info().Function;
 		int EquipItemID = pPlayer->GetItemEquip(EquipID);
 		while (EquipItemID >= 1)
 		{
+			if (EquipItemID == itemid_)
+				continue;
+
 			ItemSql::ItemPlayer &EquipItem = pPlayer->GetItem(EquipItemID);
 			EquipItem.Settings = 0;
 			EquipItem.SetSettings(0);
-			EquipItemID = pPlayer->GetItemEquip(Info().BonusID);
+			EquipItemID = pPlayer->GetItemEquip(EquipID);
 		}
-		// добавляем инфу в броадакст
 		pPlayer->AddInformationStats();
 	}
 
