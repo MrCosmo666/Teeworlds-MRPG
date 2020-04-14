@@ -59,6 +59,7 @@ bool CDropingItem::TakeItem(int ClientID)
 	// выдача просто предмета
 	GS()->VResetVotes(ClientID, INVENTORY);
 	PlDropItem.Add(m_DropItem.Count, 0, m_DropItem.Enchant);
+	GS()->SBL(ClientID, 10000, 10, "\0");
 	GS()->m_World.DestroyEntity(this);
 	return true;
 }
