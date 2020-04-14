@@ -155,35 +155,6 @@ void CPlayer::TickOnlinePlayer()
 	}
 
 	TickSystemTalk();
-	TickSystemEat();
-}
-
-void CPlayer::TickSystemEat()
-{
-	// проверка и снятие голода
-	if(Server()->Tick() % (1 * Server()->TickSpeed() * (3*60)) != 0)
-		return;
-
-	if(GetCharacter() && Acc().Hungry <= 0)
-	{
-		Acc().Hungry = 5;
-		m_pCharacter->Die(m_ClientID, WEAPON_SELF);
-		GS()->Chat(m_ClientID, "You starved to death. You need to eat!");
-		return;
-	}
-
-	Acc().Hungry -= 5;
-	if(Acc().Hungry % 25 == 0)
-	{
-		GS()->Chat(m_ClientID, "Now your hunger {INT}%.", &Acc().Hungry);
-		GS()->Mmo()->SaveAccount(this, SAVESTATS);
-	}
-
-	// автозелье на еду
-	if(Acc().Hungry <= 10 && GetItem(itPotionQuenchingHunger).Count > 0 && GetItem(itPotionQuenchingHunger).Settings)
-		GS()->Mmo()->Item()->UsedItems(m_ClientID, itPotionQuenchingHunger, 1);
-
-	GS()->VResetVotes(m_ClientID, MAINMENU);
 }
 
 void CPlayer::TickSystemTalk()
@@ -591,9 +562,6 @@ int CPlayer::EnchantAttributes(int BonusID) const
 		
 		// если предмет поврежден
 		int BonusCount = it.second.Info().BonusCount*(it.second.Enchant+1);
-		if(GetItemDurability(it.first) <= 0) 
-			BonusCount /= 10;
-
 		BonusAttributes += BonusCount;
 	}
 	return BonusAttributes;
@@ -776,25 +744,6 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 /* #########################################################################
 	FUNCTIONS PLAYER ITEMS 
 ######################################################################### */
-
-// Дирабилити снятие предметам прочности
-bool CPlayer::DurabilityIsLowMain()
-{
-	bool LowDurability = false;
-	for(const auto& it : ItemSql::Items[m_ClientID])
-	{
-		if(rand()%8 != 0 || it.second.Count <= 0 || it.second.Durability <= 0 || it.second.Settings <= 0) 
-			continue;
-
-		if(it.second.Info().Type == ITEMUPGRADE || (CheckEquipItem(it.first) && it.second.Info().Type == ITEMEQUIP && it.second.Info().Function != EQUIP_MINER))
-		{
-			const int Durability = it.second.Durability-1;
-			GS()->Mmo()->Item()->SetDurabilityItem(this, it.first, Durability);
-			if(Durability < 25 && Durability % 5 == 0) LowDurability = true;
-		}
-	}
-	return LowDurability;
-}
 
 int CPlayer::GetItemDurability(int Item) const { return ItemSql::Items[m_ClientID][Item].Durability; }
 

@@ -797,16 +797,6 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 
 	if(From != m_pPlayer->GetCID())
 	{
-		// Уменьшение прочности
-		if(!pFrom->IsBot() && rand() % 10 == 0)
-		{
-			if(pFrom->DurabilityIsLowMain())
-			{
-				GS()->Chat(From, "One or more item's low durability.");
-				GS()->Chat(From, "Find any store, and select repair items.");
-			}
-		}
-
 		// Звук удара
 		int64 Mask = CmaskOne(From);
 		for(int i = 0; i < MAX_PLAYERS; i++)
@@ -1282,10 +1272,6 @@ void CCharacter::HandleAuthedPlayer()
 			m_Mana += clamp(m_pPlayer->GetStartMana() / 20, 1, m_pPlayer->GetStartMana() / 20);
 			m_pPlayer->AddInformationStats();
 		}
-
-		// голод эффект печали
-		if(m_pPlayer->Acc().Hungry <= 0)
-			GS()->SendEmoticon(m_pPlayer->GetCID(), 3);
 	}
 }
 

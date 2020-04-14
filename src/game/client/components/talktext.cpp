@@ -12,6 +12,7 @@
 #include <game/client/gameclient.h>
 
 #include "binds.h"
+#include "console.h"
 #include "menus.h"
 #include "sounds.h"
 
@@ -153,6 +154,10 @@ void CTalkText::OnMessage(int MsgType, void *pRawMsg)
 // ожидание прожатия введение действий
 bool CTalkText::OnInput(IInput::CEvent Event)
 {
+	// fix console Press TAB
+	if (m_pClient->m_pGameConsole->IsConsoleActive())
+		return false;
+
 	if(IsActive() && Event.m_Flags&IInput::FLAG_PRESS && Event.m_Key == KEY_TAB)
 	{
 		m_pClient->m_pSounds->Play(CSounds::CHN_WORLD, SOUND_UI_SELECTED_CLICK, 100.00f);

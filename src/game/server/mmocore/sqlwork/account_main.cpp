@@ -112,7 +112,6 @@ int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Pa
 	pPlayer->Acc().Level = RES2->getInt("Level");
 	pPlayer->Acc().Exp = RES2->getInt("Exp");
 	pPlayer->Acc().MemberID = RES2->getInt("MemberID");
-	pPlayer->Acc().Hungry = RES2->getInt("Eat");
 	pPlayer->Acc().Upgrade = RES2->getInt("Upgrade");
 	pPlayer->Acc().MemberRank = RES2->getInt("MemberRank");
 	pPlayer->Acc().WorldID = WorldID;
@@ -202,8 +201,8 @@ void AccountMainSql::ShowDiscordCard(int ClientID)
 #ifdef CONF_DISCORD
 	char pMsg[256], pLoggin[64];
 	str_format(pLoggin, sizeof(pLoggin), "%s logged in Account ID %d", GS()->Server()->ClientName(ClientID), pPlayer->Acc().AuthID);
-	str_format(pMsg, sizeof(pMsg), "?level=%d&player=%s&hungry=%d&rank=%d&dicid=%d",
-		pPlayer->Acc().Level, GS()->Server()->ClientName(ClientID), pPlayer->Acc().Hungry, Rank, pPlayer->GetItemEquip(EQUIP_DISCORD));
+	str_format(pMsg, sizeof(pMsg), "?level=%d&player=%s&hungry=0&rank=%d&dicid=%d",
+		pPlayer->Acc().Level, GS()->Server()->ClientName(ClientID), Rank, pPlayer->GetItemEquip(EQUIP_DISCORD));
 	GS()->Server()->SendDiscordGenerateMessage("16757248", pLoggin, pMsg);
 #endif
 }

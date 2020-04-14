@@ -13,10 +13,10 @@
 #include "talktext.h"
 #include "questing_processing.h"
 
-#define COLOR_TABLE vec4(0.5f, 0.31f, 0.0f, 0.4f)
+#define COLOR_TABLE vec4(0.5f, 0.36f, 0.0f, 0.4f)
 #define COLOR_BACKGROUND vec4(0.05f, 0.05f, 0.05f, 0.30f) 
-#define COLOR_BACKBACKGROUND vec4(0.5f, 0.33f, 0.0f, 0.4f)
-#define COLOR_UIBAR vec4(0.7f, 0.30f, 0.0f, 0.45f)
+#define COLOR_BACKBACKGROUND vec4(0.5f, 0.40f, 0.0f, 0.4f)
+#define COLOR_UIBAR vec4(0.7f, 0.35f, 0.0f, 0.45f)
 
 void CQuestingProcessing::Clear()
 {
@@ -122,6 +122,7 @@ void CQuestingProcessing::OnMessage(int MsgType, void *pRawMsg)
 
 bool CQuestingProcessing::OnInput(IInput::CEvent Event)
 {
+	// fix console Press TAB
 	if (m_pClient->m_pGameConsole->IsConsoleActive())
 		return false;
 

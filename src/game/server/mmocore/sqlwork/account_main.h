@@ -19,7 +19,6 @@ public:
 		int Exp; 
 		int MemberID;
 		int MemberRank;
-		int Hungry;
 
 		// upgrades
 		int Upgrade;

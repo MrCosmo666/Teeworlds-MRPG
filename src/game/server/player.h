@@ -89,7 +89,6 @@ private:
 	######################################################################### */
 	void TickOnlinePlayer();
 	void TickSystemTalk();
-	void TickSystemEat();
 
 	void HandleTuningParams();
 public:
@@ -165,8 +164,6 @@ public:
 	/* #########################################################################
 		FUNCTIONS PLAYER ITEMS 
 	######################################################################### */
-	bool DurabilityIsLowMain();
-
 	ItemSql::ItemPlayer &GetItem(int ItemID);
 
 	AccountMainSql::StructData &Acc() 

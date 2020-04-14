@@ -358,13 +358,6 @@ void ItemSql::UsedItems(int ClientID, int ItemID, int Count)
 		pPlayer->GiveEffect("RegenHealth", 20);
 		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", PlItem.Info().GetName(pPlayer), &Count);
 	}
-	
-	if(ItemID == itPotionQuenchingHunger && PlItem.Remove(Count, 0))
-	{
-		pPlayer->Acc().Hungry = clamp(pPlayer->Acc().Hungry + 30, 30, 100);
-		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", PlItem.Info().GetName(pPlayer), &Count);
-		Job()->SaveAccount(pPlayer, SAVESTATS);
-	}
 
 	if(ItemID == itCapsuleSurvivalExperience && PlItem.Remove(Count, 0))
 	{
@@ -397,8 +390,10 @@ void ItemSql::ItemSelected(CPlayer *pPlayer, const ItemPlayer &PlItem, bool Dres
 	// зачеровыванный или нет
 	if(PlItem.Info().BonusCount)
 	{
-		GS()->AVHI(ClientID, PlItem.Info().GetIcon(), HideID, vec3(50,30,25), "{STR}{STR}+{INT} ({INT}/100)", 
-			(PlItem.Settings ? "☑ - " : "\0"), NameItem, &PlItem.Enchant, &PlItem.Durability);
+		char aEnchantSize[16];
+		str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", PlItem.Enchant);
+		GS()->AVHI(ClientID, PlItem.Info().GetIcon(), HideID, vec3(50,30,25), "{STR}{STR} {STR}", 
+			NameItem, (PlItem.Enchant > 0 ? aEnchantSize : "\0"), (PlItem.Settings ? " ✔" : "\0"));
 	}
 	else
 	{

@@ -17,7 +17,6 @@ SqlController::SqlController(CGS *pGameServer) : m_pGameServer(pGameServer)
 	m_Components.add(m_pAccMiner = new MinerAccSql());
 	m_Components.add(m_pAccPlant = new PlantsAccSql());
 	m_Components.add(m_pAccRelax = new SpaRelaxSql());
-	m_Components.add(m_pCaffeWork = new ShopEatSql());
 	m_Components.add(m_pCraftWork = new CraftSql());
 	m_Components.add(m_pHouseWork = new HouseSql());
 	m_Components.add(m_pInbox = new InboxSql());
@@ -189,8 +188,8 @@ void SqlController::SaveAccount(CPlayer *pPlayer, int Table)
 	if(Table == SAVESTATS)
 	{
 		const int EquipDiscord = pPlayer->GetItemEquip(EQUIP_DISCORD);
-		SJK.UD("tw_accounts_data", "Level = '%d', Exp = '%d', Eat = '%d', DiscordEquip = '%d' WHERE ID = '%d'",
-			pPlayer->Acc().Level, pPlayer->Acc().Exp, pPlayer->Acc().Hungry, EquipDiscord, pPlayer->Acc().AuthID);
+		SJK.UD("tw_accounts_data", "Level = '%d', Exp = '%d', DiscordEquip = '%d' WHERE ID = '%d'",
+			pPlayer->Acc().Level, pPlayer->Acc().Exp, EquipDiscord, pPlayer->Acc().AuthID);
 		return;
 	}
 

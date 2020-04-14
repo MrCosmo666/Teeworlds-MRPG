@@ -15,7 +15,6 @@
 #include "sqlwork/items.h"
 #include "sqlwork/member.h"
 #include "sqlwork/questing.h"
-#include "sqlwork/shopeat.h"
 #include "sqlwork/shopmail.h"
 #include "sqlwork/skills.h"
 #include "sqlwork/storage.h"
@@ -54,7 +53,6 @@ class SqlController
 	class MinerAccSql *m_pAccMiner;
 	class PlantsAccSql *m_pAccPlant;
 	class QuestBase *m_pQuest;
-	class ShopEatSql *m_pCaffeWork;
 	class ShopMailSql *m_pShopmail;
 	class SkillsSql *m_pSkillsWork;
 	class SpaRelaxSql *m_pAccRelax;
@@ -82,7 +80,6 @@ public:
 	MinerAccSql *MinerAcc() const { return m_pAccMiner; }
 	PlantsAccSql *PlantsAcc() const { return m_pAccPlant; }
 	QuestBase *Quest() const { return m_pQuest; }
-	ShopEatSql *ShopEat() const { return m_pCaffeWork; }
 	ShopMailSql *Auction() const { return m_pShopmail; }
 	SkillsSql *Skills() const { return m_pSkillsWork; }
 	SpaRelaxSql *SpaAcc() const { return m_pAccRelax; }

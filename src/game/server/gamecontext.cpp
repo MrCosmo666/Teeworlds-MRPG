@@ -1868,7 +1868,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVM(ClientID, "null", NOPE, HSTAT, "Discord: \"{STR}\". Ideas, bugs, rewards", g_Config.m_SvDiscordInviteGroup);
 		AVM(ClientID, "null", NOPE, HSTAT, "Level {INT} : Exp {INT}/{INT}", &pPlayer->Acc().Level, &pPlayer->Acc().Exp, &NeedExp);
 		AVM(ClientID, "null", NOPE, HSTAT, "Money {INT} gold", &pPlayer->GetItem(itMoney).Count);
-		AVM(ClientID, "null", NOPE, HSTAT, "Satiety {INT}% : Skill Point {INT}SP", &pPlayer->Acc().Hungry, &pPlayer->GetItem(itSkillPoint).Count);
+		AVM(ClientID, "null", NOPE, HSTAT, "Skill Point {INT}SP", &pPlayer->GetItem(itSkillPoint).Count);
 		AV(ClientID, "null", "");
 
 		// меню персонал
@@ -1917,7 +1917,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			const int StorageID = Mmo()->Storage()->GetLoadStorage(pChar->m_Core.m_Pos);
 			Mmo()->Storage()->ShowStorageMenu(ClientID, StorageID);
 			Mmo()->Auction()->ShowMailShop(pPlayer, StorageID);
-			Mmo()->ShopEat()->ShowListShopEat(pPlayer, StorageID);
 		}
 		else if(pChar->GetHelper()->BoolIndex(TILE_LEARNSKILL))
 			Mmo()->Skills()->ShowMailSkillList(pPlayer);
