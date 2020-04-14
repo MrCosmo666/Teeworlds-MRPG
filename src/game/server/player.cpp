@@ -852,8 +852,10 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 	{
 		int BotID = ContextBots::QuestBot[MobID].BotID;
 		int sizeTalking = ContextBots::QuestBot[MobID].m_Talk.size();
+
 		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
 		{
+			GS()->Mmo()->Quest()->InteractiveQuestNPC(this, ContextBots::QuestBot[MobID], true);
 			m_TalkingNPC.m_TalkedProgress = 0;
 			GS()->ClearTalkText(m_ClientID);
 			return;
@@ -862,13 +864,6 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		GS()->Mmo()->Quest()->QuestTableClear(m_ClientID);
 		if (ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_RequestComplete)
 		{
-			if (GS()->Mmo()->Quest()->InteractiveQuestNPC(this, ContextBots::QuestBot[MobID]))
-			{
-				m_TalkingNPC.m_TalkedProgress = 0;
-				GS()->ClearTalkText(m_ClientID);
-				return;
-			}
-
 			if (!GS()->CheckClient(m_ClientID))
 			{
 				char reformTalkedText[512];
@@ -876,11 +871,13 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 				str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + m_TalkingNPC.m_TalkedProgress, sizeTalking, FormatedTalkedText());
 				ClearFormatQuestText();
 
-				GS()->Mmo()->Quest()->ShowQuestInformation(this, ContextBots::QuestBot[MobID], reformTalkedText);
-				return;
+				if (!GS()->Mmo()->Quest()->InteractiveQuestNPC(this, ContextBots::QuestBot[MobID], false))
+				{
+					GS()->Mmo()->Quest()->ShowQuestInformation(this, ContextBots::QuestBot[MobID], reformTalkedText);
+					return;
+				}
 			}
-
-			GS()->Mmo()->BotsData()->ProcessingTalkingNPC(m_ClientID, TalkedID, false, "(Information) Not all criteria are complected!", 0, EMOTE_BLINK);
+			
 			GS()->Mmo()->Quest()->ShowQuestInformation(this, ContextBots::QuestBot[MobID], "\0");
 		}
 
@@ -894,6 +891,11 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			reformTalkedText,
 			ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_Style,
 			ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_Emote);
+	
+		// skip non complete dialog quest
+		if (ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_RequestComplete 
+				&& !GS()->Mmo()->Quest()->InteractiveQuestNPC(this, ContextBots::QuestBot[MobID], false))
+			return;
 	}
 
 	m_TalkingNPC.m_TalkedID = TalkedID;

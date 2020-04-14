@@ -92,7 +92,7 @@ public:
 
 	void CheckQuest(CPlayer *pPlayer);
 	bool AcceptQuest(int QuestID, CPlayer *pPlayer);
-	bool InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData);
+	bool InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData, bool LastDialog);
 	void AutoStartNextQuest(CPlayer *pPlayer, int QuestID);
 
 	void MobProgress(CPlayer *pPlayer, int BotID);

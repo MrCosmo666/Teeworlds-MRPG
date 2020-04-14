@@ -566,7 +566,7 @@ bool QuestBase::AcceptQuest(int QuestID, CPlayer *pPlayer)
 }
 
 // действие над квестом
-bool QuestBase::InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData)
+bool QuestBase::InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData, bool LastDialog)
 {
 	if(!pPlayer || !pPlayer->GetCharacter() || !BotData.IsActive()) 
 		return false;
@@ -584,13 +584,16 @@ bool QuestBase::InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo 
 
 	// интерактив рандомно понравиться ли предмет даст или нет
 	int RandomGetItem = BotData.InterRandom[0];
-	if(RandomGetItem > 1 && random_int()%RandomGetItem != 0)
+	if (RandomGetItem > 1 && random_int() % RandomGetItem != 0)
 	{
 		// забираем предмет
-		GS()->Chat(ClientID, "[{STR} NPC] I didn't like it, bring me another one!", BotData.Name);		
+		GS()->Chat(ClientID, "[{STR} NPC] I didn't like it, bring me another one!", BotData.Name);
 		MultiQuestNPC(pPlayer, BotData, false, true);
 		return false;
 	}
+
+	if (!LastDialog)
+		return true;
 
 	// проверяем и выдаем потом
 	MultiQuestNPC(pPlayer, BotData, true, true);
