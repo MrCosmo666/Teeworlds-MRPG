@@ -54,8 +54,8 @@ void ShopMailSql::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		}
 		else
 		{
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(15,20,30), "{STR}x{INT} [{INT} {STR}]", 
-				BuyightItem.GetName(pPlayer), &Count, &Price, NeededItem.GetName(pPlayer));
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(15,20,30), "{STR}x{INT} [{INT} {STR}] {STR}", 
+				BuyightItem.GetName(pPlayer), &Count, &Price, NeededItem.GetName(pPlayer), (pPlayer->GetItem(ItemID).Count > 0 ? "✔" : "\0"));
 		}
 
 		if(CGS::AttributInfo.find(BuyightItem.BonusID) != CGS::AttributInfo.end())
@@ -86,7 +86,8 @@ void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 		int Count = RES->getInt("Count"), OwnerID = RES->getInt("OwnerID");
 
 		ItemSql::ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
-		GS()->AVH(ClientID, HideID, vec3(15,20,30), "{STR}x{INT}(+{INT}) {INT} gold", BuyightItem.GetName(pPlayer), &Count, &Enchant, &Price);
+		GS()->AVH(ClientID, HideID, vec3(15,20,30), "{STR}x{INT}(+{INT}) {INT} gold {STR}", 
+			BuyightItem.GetName(pPlayer), &Count, &Enchant, &Price, (pPlayer->GetItem(ItemID).Count > 0 ? "✔" : "\0"));
 
 		if(CGS::AttributInfo.find(BuyightItem.BonusID) != CGS::AttributInfo.end())
 		{
