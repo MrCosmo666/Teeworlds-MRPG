@@ -227,7 +227,7 @@ void CGameControllerDungeon::SetMobsSpawn(bool AllowedSpawn)
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS)
+		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS && GS()->CheckPlayerMessageWorldID(i) == GS()->GetWorldID())
 		{
 			BotPlayer->SetDungeonAllowedSpawn(AllowedSpawn);
 			if (!AllowedSpawn && BotPlayer->GetCharacter())
