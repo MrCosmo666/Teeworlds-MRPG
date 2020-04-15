@@ -2395,7 +2395,7 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 		}
 
 		if (!IsDungeon())
-			pPlayer->m_LastWorldID = GetWorldID();
+			pPlayer->Acc().LastWorldID = GetWorldID();
 
 		pPlayer->Acc().TeleportX = -1;
 		pPlayer->Acc().TeleportY = -1;
@@ -2407,7 +2407,7 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 	{
 		pPlayer->Acc().TeleportX = -1;
 		pPlayer->Acc().TeleportY = -1;
-		Server()->ChangeWorld(ClientID, pPlayer->m_LastWorldID);
+		Server()->ChangeWorld(ClientID, pPlayer->Acc().LastWorldID);
 		return true;
 	}
 

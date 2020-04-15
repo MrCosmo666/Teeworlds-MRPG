@@ -33,6 +33,7 @@ public:
 		int TeleportX;
 		int TeleportY;
 		short WorldID;
+		short LastWorldID;
 		short LatencyPing;
 
 		// skins
