@@ -580,6 +580,9 @@ bool QuestBase::InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo 
 		return false;
 	}
 
+	if (!LastDialog)
+		return true;
+
 	// интерактив рандомно понравиться ли предмет даст или нет
 	int RandomGetItem = BotData.InterRandom[0];
 	if (RandomGetItem > 1 && random_int() % RandomGetItem != 0)
@@ -589,9 +592,6 @@ bool QuestBase::InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo 
 		MultiQuestNPC(pPlayer, BotData, false, true);
 		return false;
 	}
-
-	if (!LastDialog)
-		return true;
 
 	// проверяем и выдаем потом
 	MultiQuestNPC(pPlayer, BotData, true, true);
@@ -861,8 +861,18 @@ void QuestBase::QuestTableShowInformation(CPlayer* pPlayer, ContextBots::QuestBo
 			continue;
 
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "I need (%s)", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
-		GS()->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, Count, ItemID);
+		str_format(aBuf, sizeof(aBuf), "%s", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
+		if (BotData.InterRandom[0] > 1)
+		{
+			char aChanceBuf[128];
+			double Chance = BotData.InterRandom[0] <= 0 ? 100.0f : (1.0f / (double)BotData.InterRandom[0]) * 100;
+			str_format(aChanceBuf, sizeof(aChanceBuf), "%s [takes %0.2f%%]", aBuf, Chance);
+			GS()->Mmo()->Quest()->QuestTableAddItem(ClientID, aChanceBuf, Count, ItemID);
+		}
+		else
+		{
+			GS()->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, Count, ItemID);
+		}
 	}
 
 	// показываем текст по информации о мобах
@@ -878,16 +888,6 @@ void QuestBase::QuestTableShowInformation(CPlayer* pPlayer, ContextBots::QuestBo
 		GS()->Mmo()->Quest()->QuestTableAddInfo(ClientID, aBuf, Count,
 			QuestBase::Quests[ClientID][BotData.QuestID].MobProgress[i - 4]);
 	}
-
-	// если у бота рандомное принятие предмета
-	/*if (BotData.InterRandom[0] > 1)
-	{
-		double Chance = BotData.InterRandom[0] <= 0 ? 100.0f : (1.0f / (double)BotData.InterRandom[0]) * 100;
-
-		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "\nChance that item he'll like [%0.2f%%]", Chance);
-		Buffer.append_at(Buffer.length(), aBuf);
-	}*/
 
 	// маленький уровень
 	if (pPlayer->Acc().Level < QuestsData[QuestID].Level)
