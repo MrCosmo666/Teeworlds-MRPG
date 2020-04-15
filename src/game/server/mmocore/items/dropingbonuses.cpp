@@ -82,7 +82,7 @@ void CDropingBonuses::Tick()
 		m_ActualDir = normalize(m_Direction);
 	}
 
-	if(m_LifeSpan < Server()->TickSpeed()*(g_Config.m_SvTickDropableItems-1))
+	if(m_LifeSpan < Server()->TickSpeed() * ( 15 - 1 ))
 	{
 		CCharacter *pChar = (CCharacter*)GameWorld()->ClosestEntity(m_Pos, 16, CGameWorld::ENTTYPE_CHARACTER, 0);
 		if(pChar && pChar->GetPlayer() && !pChar->GetPlayer()->IsBot())

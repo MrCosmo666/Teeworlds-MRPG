@@ -120,7 +120,7 @@ void CDropingItem::Tick()
 	if(m_ForID != -1 && !GS()->m_apPlayers[m_ForID])
 		m_ForID = -1;	
 
-	if(m_LifeSpan > Server()->TickSpeed()*(g_Config.m_SvTickDropableItems-1))
+	if(m_LifeSpan > Server()->TickSpeed() * ( 5 - 1 ))
 		return;
 	
 	CCharacter *pChar = (CCharacter*)GameWorld()->ClosestEntity(m_Pos, 64, CGameWorld::ENTTYPE_CHARACTER, 0);
