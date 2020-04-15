@@ -486,11 +486,8 @@ void CGS::ChatGuild(int GuildID, const char* pText, ...)
 }
 
 // Отправить в данже сообщение
-void CGS::ChatDungeon(int DungID, const char* pText, ...)
+void CGS::ChatWorldID(int WorldID, const char* Suffix, const char* pText, ...)
 {
-	if (DungID <= 0)
-		return;
-
 	CNetMsg_Sv_Chat Msg;
 	Msg.m_Mode = CHAT_ALL;
 	Msg.m_ClientID = -1;
@@ -502,9 +499,9 @@ void CGS::ChatDungeon(int DungID, const char* pText, ...)
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pPlayer = GetPlayer(i, true);
-		if (pPlayer && DungeonID() == DungID)
+		if (pPlayer && Server()->GetWorldID(i) == WorldID)
 		{
-			Buffer.append("[Dungeon]");
+			Buffer.append(Suffix);
 			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
 
 			Msg.m_TargetID = i;
@@ -638,13 +635,13 @@ void CGS::SBL(int ClientID, int Priority, int LifeSpan, const char *pText, ...)
 }
 
 // Форматированный броадкаст в данже
-void CGS::BroadcastDungeon(int DungID, int Priority, int LifeSpan, const char *pText, ...)
+void CGS::BroadcastWorldID(int WorldID, int Priority, int LifeSpan, const char *pText, ...)
 {
 	va_list VarArgs;
 	va_start(VarArgs, pText);
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(m_apPlayers[i] && DungeonID() == DungID)
+		if(m_apPlayers[i] && Server()->GetWorldID(i) == WorldID)
 		{
 			dynamic_string Buffer;
 			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);

@@ -37,6 +37,9 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Ожидание данжа
 	if (State == DUNGEON_WAITING)
 	{
+		m_FinishedTick = 0;
+		m_StartingTick = 0;
+		m_SafeTick = 0;
 		SetMobsSpawn(false);
 	}
 
@@ -52,9 +55,9 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Начало данжа
 	else if (State == DUNGEON_STARTED)
 	{
-		GS()->ChatDungeon(m_DungeonID, "The security timer is enabled for 30 seconds!");
 		m_SafeTick = Server()->TickSpeed() * 30;
-		GS()->BroadcastDungeon(m_DungeonID, 99999, 500, "Dungeon started!");
+		GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "The security timer is enabled for 30 seconds!");
+		GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 500, "Dungeon started!");
 		SetMobsSpawn(true);
 	}
 
@@ -71,15 +74,17 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Завершение данжа
 	else if (State == DUNGEON_FINISHED)
 	{
-
+		ChangeState(DUNGEON_WAITING);
 	}
+
+	// установить статус дверям
 	m_DungeonDoor->SetState(State);
 }
 
 void CGameControllerDungeon::StateTick()
 {
 	int Players = PlayersNum();
-	CGS::Dungeon[m_DungeonID].PlayIt = Players;
+	CGS::Dungeon[m_DungeonID].Players = Players;
 
 	// - - - - - - - - - - - - - - - - - - - - - -
 	// Используется в тике когда Ожидание данжа
@@ -87,8 +92,7 @@ void CGameControllerDungeon::StateTick()
 	{
 		// пишем всем игрокам что ждем 2 игроков
 		if (Players == 1)
-			GS()->BroadcastDungeon(m_DungeonID, 99999, 10, "Dungeon '{STR}' Waiting 2 players!", Server()->GetWorldName(GS()->GetWorldID()));
-
+			GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 10, "Dungeon '{STR}' Waiting 2 players!", Server()->GetWorldName(GS()->GetWorldID()));
 		// начинаем данж если равно 2 игрока или больше
 		else if (Players > 1)
 			ChangeState(DUNGEON_WAITING_START);
@@ -98,10 +102,13 @@ void CGameControllerDungeon::StateTick()
 	// Используется в тике когда Отчет начала данжа
 	else if (m_StateDungeon == DUNGEON_WAITING_START)
 	{
+		if (Players < 1)
+			ChangeState(DUNGEON_WAITING);
+
 		if (m_StartingTick)
 		{
 			int Time = m_StartingTick / Server()->TickSpeed();
-			GS()->BroadcastDungeon(m_DungeonID, 99999, 500, "Dungeon waiting {INT} sec!", &Time);
+			GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 500, "Dungeon waiting {INT} sec!", &Time);
 
 			m_StartingTick--;
 		}
@@ -116,24 +123,15 @@ void CGameControllerDungeon::StateTick()
 	// Используется в тике когда Данж начат
 	else if (m_StateDungeon == DUNGEON_STARTED)
 	{
-		// проверяем если в активном данже нет игроков
 		if (Players < 1)
-		{
-			for (int i = 0; i < MAX_PLAYERS; i++)
-			{
-				if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter())
-					GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_SELF);
-
-				ChangeState(DUNGEON_WAITING);
-			}
-		}
+			ChangeState(DUNGEON_WAITING);
 
 		// тик безопасности в течении какого времени игрок не вернется в старый мир
 		if (m_SafeTick)
 		{
 			m_SafeTick--;
 			if (!m_SafeTick)
-				GS()->ChatDungeon(m_DungeonID, "The security timer is over, be careful!");
+				GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "The security timer is over, be careful!");
 		}
 
 		// завершаем данж когда успешно данж завершен
@@ -145,10 +143,13 @@ void CGameControllerDungeon::StateTick()
 	// Используется в тике когда Отчет начала данжа
 	else if (m_StateDungeon == DUNGEON_WAITING_FINISH)
 	{
+		if (Players < 1)
+			ChangeState(DUNGEON_WAITING);
+
 		if (m_FinishedTick)
 		{
 			int Time = m_FinishedTick / Server()->TickSpeed();
-			GS()->BroadcastDungeon(m_DungeonID, 99999, 500, "Dungeon ended {INT} sec!", &Time);
+			GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 500, "Dungeon ended {INT} sec!", &Time);
 
 			m_FinishedTick--;
 		}
@@ -158,13 +159,6 @@ void CGameControllerDungeon::StateTick()
 			ChangeState(DUNGEON_FINISHED);
 		}
 	}
-
-	// - - - - - - - - - - - - - - - - - - - - - -
-	// Используется в тике когда Завершение данжа
-	else if (m_StateDungeon == DUNGEON_FINISHED)
-	{
-	
-	}
 }
 
 int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKiller, int Weapon)
@@ -173,11 +167,10 @@ int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKill
 		return 0;
 
 	int KillerID = pKiller->GetCID();
-	int VictimID = pVictim->GetPlayer()->GetCID();
 	if (pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetSpawnBot() == SPAWNMOBS)
 	{
 		int Progress = LeftMobsToWin();
-		GS()->Chat(VictimID, "Left defeat mobs to complete the dungeon {INT}", &Progress);
+		GS()->Chat(KillerID, "Left defeat mobs to complete the dungeon {INT}", &Progress);
 	}
 
 	return 0;
