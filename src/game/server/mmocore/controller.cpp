@@ -335,6 +335,19 @@ void SqlController::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Secon
 	pPlayer->Acc().TimeDungeon = 0;
 }
 
+void SqlController::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
+{
+	int ClientID = pPlayer->GetCID();
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "ORDER BY Seconds DESC LIMIT 5"));
+	while (RES->next())
+	{
+		int Rank = RES->getRow();
+		int Seconds = RES->getInt("Seconds");
+		int OwnerID = RES->getInt("OwnerID");
+		GS()->AVM(ClientID, "null", NULL, HideID, "{INT}. {STR} : Seconds {INT}", &Rank, PlayerName(OwnerID), &Seconds);
+	}
+}
+
 void SqlController::ShowDungeonsList(CPlayer* pPlayer)
 {
 	int ClientID = pPlayer->GetCID();
@@ -343,6 +356,8 @@ void SqlController::ShowDungeonsList(CPlayer* pPlayer)
 		int HideID = 7500 + dungeon.first;
 		GS()->AVH(ClientID, HideID, vec3(52, 26, 80), "Lvl{INT} {STR} : Players {INT} : {STR} [{INT}%]",
 			&dungeon.second.Level, dungeon.second.Name, &dungeon.second.Players, (dungeon.second.State > 1 ? "Active dungeon" : "Waiting players"), &dungeon.second.Progress);
+		
+		ShowDungeonTop(pPlayer, dungeon.first, HideID);
 		GS()->AVM(ClientID, "DUNGEONJOIN", dungeon.first, HideID, "Join dungeon {STR}", dungeon.second.Name);
 
 		if (GS()->IsDungeon())
