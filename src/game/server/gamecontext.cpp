@@ -1915,6 +1915,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			AVM(ClientID, "MENU", CRAFTING, HPERSONAL, "☭ Crafting");
 		
 		AVM(ClientID, "MENU", ADVENTUREJOURNAL, HPERSONAL, "ღ Adventure Journal");
+		AVM(ClientID, "MENU", DUNGEONSMENU, HPERSONAL, "◎ Dungeons");
 		AVM(ClientID, "MENU", MEMBERMENU, HPERSONAL, "☃ Your Guild");
 		AVM(ClientID, "MENU", HOUSEMENU, HPERSONAL, "❖ Your House");
 		AV(ClientID, "null", "");
@@ -2012,6 +2013,14 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	{
 		pPlayer->m_LastVoteMenu = MEMBERMENU;		
 		Mmo()->Member()->ShowHistoryGuild(ClientID, pPlayer->Acc().MemberID);
+	}	
+	else if(MenuList == DUNGEONSMENU) 
+	{
+		pPlayer->m_LastVoteMenu = MAINMENU;		
+		AVH(ClientID, HDUNGEONSINFO, vec3(35, 80, 40), "Dungeons Information");
+		AVM(ClientID, "null", NOPE, HDUNGEONSINFO, "Add: Select your item in list. Select (Add to house),");
+
+
 	}
 	else if(MenuList == SETTINGS) 
 	{

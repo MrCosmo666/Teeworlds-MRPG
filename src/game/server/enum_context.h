@@ -113,6 +113,7 @@ enum
 	ADVENTUREJOURNAL,						// журнал квестов меню
 	FINISHQUESTMENU,						// журнал завершенные квесты меню
 	TOPLISTMENU,							// топ лист меню
+	DUNGEONSMENU,							// лист данжей
 	AUCTIONSETSLOT,							// создание слота аукцион меню
 
 	/*
@@ -149,6 +150,7 @@ enum
 	HUPGRADESTATS,
 	HCRAFTINFO,
 	HTOPMENUINFO,
+	HDUNGEONSINFO,
 	HUPGRINFO,
 	HQUESTSINFO,
 	HDECORATION,
