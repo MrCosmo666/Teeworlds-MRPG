@@ -11,7 +11,6 @@ using namespace sqlstr;
 // список хранения всех компонентов Sql Work
 SqlController::SqlController(CGS *pGameServer) : m_pGameServer(pGameServer)
 {
-	// добавляем компоненты в список
 	m_Components.add(m_pAccMain = new AccountMainSql());
 	m_Components.add(m_pBotsInfo = new ContextBots());
 	m_Components.add(m_pAccMiner = new MinerAccSql());
@@ -29,19 +28,16 @@ SqlController::SqlController(CGS *pGameServer) : m_pGameServer(pGameServer)
 	m_Components.add(m_pTeleportsWork = new TeleportsSql());
 	m_Components.add(m_pWorldSwapWork = new WorldSwapSql());
 
-	// инициализируем объекты
 	for(auto& component : m_Components.m_paComponents)
 	{
 		component->m_Job = this;
 		component->m_GameServer = pGameServer;
 
-		// загрузить все статичные данные в конце инициализации
-		if(GS()->GetWorldID() == LAST_WORLD)
+		if(m_pGameServer->GetWorldID() == LAST_WORLD)
 			component->OnInitGlobal();
 
-		// загрузить все статичные данные каждого из миров
 		char aLocalSelect[128];
-		str_format(aLocalSelect, sizeof(aLocalSelect), "WHERE WorldID = '%d'", GS()->GetWorldID());
+		str_format(aLocalSelect, sizeof(aLocalSelect), "WHERE WorldID = '%d'", m_pGameServer->GetWorldID());
 		component->OnInitLocal(aLocalSelect);
 	}
 	LoadDungeons();
@@ -325,4 +321,58 @@ void SqlController::ShowLoadingProgress(const char *Loading, int LoadCount)
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "LOAD DB", aLoadingBuf);
 	// - - - - - - - - -
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "LOAD DB", "------------------------------------");
+}
+
+void SqlController::ShowTopList(CPlayer* pPlayer, int TypeID)
+{
+	int ClientID = pPlayer->GetCID();
+	pPlayer->m_Colored = { 10, 10, 10 };
+	switch (TypeID)
+	{
+
+	case ToplistTypes::GUILDS_LEVELING:
+	{
+		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_members", "ORDER BY Level DESC LIMIT 10"));
+		while (RES->next())
+		{
+			char NameGuild[64];
+			int Rank = RES->getRow();
+			int Level = RES->getInt("Level");
+			str_copy(NameGuild, RES->getString("MemberName").c_str(), sizeof(NameGuild));
+
+			GS()->AVL(ClientID, "null", "{INT}. {STR} : Level {INT}", &Rank, NameGuild, &Level);
+		}
+		break;
+	}
+
+	case ToplistTypes::GUILDS_WEALTHY:
+	{
+		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_members", "ORDER BY Bank DESC LIMIT 10"));
+		while (RES->next())
+		{
+			char NameGuild[64];
+			int Rank = RES->getRow();
+			int Gold = RES->getInt("Bank");
+			str_copy(NameGuild, RES->getString("MemberName").c_str(), sizeof(NameGuild));
+
+			GS()->AVL(ClientID, "null", "{INT}. {STR} : Gold {INT}", &Rank, NameGuild, &Gold);
+		}
+		break;
+	}
+
+	case ToplistTypes::PLAYERS_LEVELING:
+	{
+		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_data", "ORDER BY Level DESC LIMIT 10"));
+		while (RES->next())
+		{
+			char Nick[64];
+			int Rank = RES->getRow();
+			int Level = RES->getInt("Level");
+			str_copy(Nick, RES->getString("Nick").c_str(), sizeof(Nick));
+
+			GS()->AVL(ClientID, "null", "{INT}. {STR} : Level {INT}", &Rank, Nick, &Level);
+		}
+		break;
+	}
+	}
 }

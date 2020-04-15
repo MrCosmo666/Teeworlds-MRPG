@@ -109,6 +109,8 @@ public:
 
 	//
 	void ShowLoadingProgress(const char *Loading, int LoadCount);
+
+	void ShowTopList(CPlayer* pPlayer, int TypeID);
 };
 
 #endif

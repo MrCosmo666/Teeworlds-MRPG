@@ -1884,13 +1884,14 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			AVM(ClientID, "MENU", CRAFTING, HPERSONAL, "☭ Crafting");
 		
 		AVM(ClientID, "MENU", ADVENTUREJOURNAL, HPERSONAL, "ღ Adventure Journal");
-		AVM(ClientID, "MENU", MEMBERMENU, HPERSONAL, "☃ Guild Menu");
-		AVM(ClientID, "MENU", HOUSEMENU, HPERSONAL, "❖ House Menu");
+		AVM(ClientID, "MENU", MEMBERMENU, HPERSONAL, "☃ Your Guild");
+		AVM(ClientID, "MENU", HOUSEMENU, HPERSONAL, "❖ Your House");
 		AV(ClientID, "null", "");
 
 		// меню информации
 		AVH(ClientID, HINFORMATION, vec3(15,40,80), "# SUB MENU INFORMATION");
-		AVM(ClientID, "MENU", GUIDEDROP, HINFORMATION, "♣ Chance to loot mobs");
+		AVM(ClientID, "MENU", TOPLISTMENU, HINFORMATION, "♛ Top list");
+		AVM(ClientID, "MENU", GUIDEDROP, HINFORMATION, "♣ Loot mobs");
 		AV(ClientID, "null", "");
 
 		// чекаем местонахождение
@@ -2171,6 +2172,20 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		Mmo()->MinerAcc()->ShowMenu(ClientID);
 		AddBack(ClientID);
 	}
+	else if (MenuList == TOPLISTMENU)
+	{
+		pPlayer->m_LastVoteMenu = MAINMENU;
+
+		AVH(ClientID, HTOPMENUINFO, vec3(35, 80, 40), "Top list Information");
+		AVM(ClientID, "null", NOPE, HTOPMENUINFO, "Here you can see top server Guilds, Players.");
+		AV(ClientID, "null", "");
+
+		m_apPlayers[ClientID]->m_Colored = { 20,7,15 };
+		AVM(ClientID, "SELECTEDTOP", ToplistTypes::GUILDS_LEVELING, NOPE, "Top 10 guilds leveling");
+		AVM(ClientID, "SELECTEDTOP", ToplistTypes::GUILDS_WEALTHY, NOPE, "Top 10 guilds wealthy");
+		AVM(ClientID, "SELECTEDTOP", ToplistTypes::PLAYERS_LEVELING, NOPE, "Top 10 players leveling");
+		AddBack(ClientID);
+	}
 	else if(MenuList == GUIDEDROP) 
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;
@@ -2187,7 +2202,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			const int HideID = (NUMHIDEMENU+12500+mobs.first);
 			int PosX = mobs.second.PositionX/32, PosY = mobs.second.PositionY/32;
 
-			AVH(ClientID, HideID, vec3(18,3,35), "{STR} [{STR}] {STR}(x: {INT} y: {INT})", mobs.second.Boss ? "Raid" : "Mob", mobs.second.Name, 
+			AVH(ClientID, HideID, vec3(20, 7, 15), "{STR} [{STR}] {STR}(x: {INT} y: {INT})", mobs.second.Boss ? "Raid" : "Mob", mobs.second.Name,
 				Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY);
 	
 			for(int i = 0; i < 6; i++)
@@ -2334,6 +2349,15 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 	if(PPSTR(CMD, "MENU") == 0)
 	{
 		ResetVotes(ClientID, VoteID);
+		return true;
+	}
+
+	if (PPSTR(CMD, "SELECTEDTOP") == 0)
+	{
+		ResetVotes(ClientID, TOPLISTMENU);
+	
+		AV(ClientID, "null", "\0");
+		Mmo()->ShowTopList(pPlayer, VoteID);
 		return true;
 	}
 

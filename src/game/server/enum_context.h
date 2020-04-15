@@ -72,6 +72,14 @@ enum AtributType
 	AtWeapon
 };
 
+// типы TOP LIST
+enum ToplistTypes
+{
+	GUILDS_LEVELING,
+	GUILDS_WEALTHY,
+	PLAYERS_LEVELING,
+};
+
 // Основное
 enum
 {
@@ -104,6 +112,7 @@ enum
 	HOUSEPLANTS,							// дома огород меню
 	ADVENTUREJOURNAL,						// журнал квестов меню
 	FINISHQUESTMENU,						// журнал завершенные квесты меню
+	TOPLISTMENU,							// топ лист меню
 	AUCTIONSETSLOT,							// создание слота аукцион меню
 
 	/*
@@ -139,6 +148,7 @@ enum
 	HHOMEINFO,
 	HUPGRADESTATS,
 	HCRAFTINFO,
+	HTOPMENUINFO,
 	HUPGRINFO,
 	HQUESTSINFO,
 	HDECORATION,
