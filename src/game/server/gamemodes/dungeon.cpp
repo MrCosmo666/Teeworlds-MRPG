@@ -63,61 +63,57 @@ void CGameControllerDungeon::ChangeState(int State)
 
 void CGameControllerDungeon::StateTick()
 {
-	switch(m_StateDungeon)
+	int Players = PlayIt();
+	CGS::Dungeon[m_DungeonID].PlayIt = Players;
+
+	// Используется в тике когда Ожидание данжа
+	if (m_StateDungeon == DUNGEON_WAITING)
 	{
-		// Используется в тике когда Ожидание данжа
-		case DUNGEON_WAITING:
-
-			// пишем всем игрокам что ждем 2 игроков
-			if(PlayIt() == 1)
+		// пишем всем игрокам что ждем 2 игроков
+		if (Players == 1)
+		{
+			for (int i = 0; i < MAX_PLAYERS; i++)
 			{
-				for(int i = 0; i < MAX_PLAYERS; i++)
-				{
-					if(GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter())	
-						GS()->SBL(i, 99999, 10, "Dungeon '{STR}' Waiting 2 players!", Server()->GetWorldName(GS()->GetWorldID()));
-				}
+				if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter())
+					GS()->SBL(i, 99999, 10, "Dungeon '{STR}' Waiting 2 players!", Server()->GetWorldName(GS()->GetWorldID()));
 			}
-			// начинаем данж если равно 2 игрока или больше
-			else if(PlayIt() > 1)
+		}
+		// начинаем данж если равно 2 игрока или больше
+		else if (Players > 1)
+		{
+			ChangeState(DUNGEON_STARTED);
+		}
+	}
+	// Используется в тике когда Данж начат
+	else if (m_StateDungeon == DUNGEON_STARTED)
+	{
+		// проверяем если в активном данже нет игроков
+		if (Players < 1)
+		{
+			for (int i = 0; i < MAX_PLAYERS; i++)
 			{
-				ChangeState(DUNGEON_STARTED);
+				if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter())
+					GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_SELF);
+
+				ChangeState(DUNGEON_WAITING);
 			}
+		}
 
-		break;
-
-		// Используется в тике когда Данж начат
-		case DUNGEON_STARTED: 
-
-			// проверяем если в активном данже нет игроков
-			if(PlayIt() < 1)
-			{
-				for(int i = 0; i < MAX_PLAYERS; i++)
-				{
-					if(GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter())
-						GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_SELF);
-					
-					ChangeState(DUNGEON_WAITING);
-				}
-			}
-
-			// завершаем данж когда успешно данж завершен
-			if(CheckFinishedDungeon())
-			{
-				ChangeState(DUNGEON_FINISHED);
-			}
-		break;
-
-		// Используется в тике когда Завершение данжа
-		case DUNGEON_FINISHED:
-
-		break;		
+		// завершаем данж когда успешно данж завершен
+		if (CheckFinishedDungeon())
+		{
+			ChangeState(DUNGEON_FINISHED);
+		}
+	}
+	// Используется в тике когда Завершение данжа
+	else if (m_StateDungeon == DUNGEON_FINISHED)
+	{
+	
 	}
 }
 
 void CGameControllerDungeon::Tick()
 {
-	CGS::Dungeon[m_DungeonID].PlayIt = PlayIt();
-
 	StateTick();
 	IGameController::Tick();
 }
@@ -166,6 +162,27 @@ int CGameControllerDungeon::PlayIt() const
 			playIt++;
 	}
 	return playIt;
+}
+
+int CGameControllerDungeon::ProgressIt() const
+{
+	int SizeMobs = MobsSize(false);
+	int AliveMobs = MobsSize(true);
+	return (int)kurosio::translate_to_procent(SizeMobs, AliveMobs);
+}
+
+int CGameControllerDungeon::MobsSize(bool ConsiderAlive) const
+{
+	int mobSize = 0;
+	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
+	{
+		if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetSpawnBot() == SPAWNMOBS)
+		{
+			if((ConsiderAlive && GS()->m_apPlayers[i]->GetCharacter()) || !ConsiderAlive)
+				mobSize++;
+		}
+	}
+	return mobSize;
 }
 
 // Двери
