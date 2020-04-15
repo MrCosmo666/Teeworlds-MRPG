@@ -32,7 +32,8 @@ void ShopMailSql::OnTickLocalWorld()
 // Показываем список предметов в магазине
 void ShopMailSql::ShowMailShop(CPlayer *pPlayer, int StorageID)
 {
-	if(!CheckCurrentStorage(StorageID)) return;
+	if(!CheckCurrentStorage(StorageID)) 
+		return;
 
 	int ClientID = pPlayer->GetCID();
 	GS()->AV(ClientID, "null", "");
@@ -41,30 +42,30 @@ void ShopMailSql::ShowMailShop(CPlayer *pPlayer, int StorageID)
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID = 0 AND StorageID = '%d' ORDER BY Price", StorageID));
 	while(RES->next())
 	{
-		int ID  = RES->getInt("ID"), ItemID = RES->getInt("ItemID"), Price = RES->getInt("Price"), Enchant = RES->getInt("Enchant");
-		int Count = RES->getInt("Count"), NeedItemID = RES->getInt("NeedItem");
-		
+		int ID = RES->getInt("ID");
+		int ItemID = RES->getInt("ItemID");
+		int Price = RES->getInt("Price");
+		int Enchant = RES->getInt("Enchant");
+		int Count = RES->getInt("Count");
+		int NeedItemID = RES->getInt("NeedItem");
 		ItemSql::ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
 		ItemSql::ItemInformation &NeededItem = GS()->GetItemInfo(NeedItemID);
 		
 		// зачеровыванный или нет
-		if (BuyightItem.BonusCount)
+		if (CGS::AttributInfo.find(BuyightItem.BonusID) != CGS::AttributInfo.end())
 		{
 			char aEnchantSize[16];
 			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);
 			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(50, 30, 25), "{STR} {STR}{STR} :: {INT} {STR}",
 				(pPlayer->GetItem(ItemID).Count > 0 ? "✔" : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price, NeededItem.GetName(pPlayer));
+
+			int BonusCount = BuyightItem.BonusCount * (Enchant + 1);
+			GS()->AVM(ClientID, "null", NOPE, HideID, "Astro +{INT} {STR}", &BonusCount, pPlayer->AtributeName(BuyightItem.BonusID));
 		}
 		else
 		{
 			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(25, 30, 50), "{STR}x{INT} ({INT}) :: {INT} {STR}",
 				BuyightItem.GetName(pPlayer), &Count, &pPlayer->GetItem(ItemID).Count, &Price, NeededItem.GetName(pPlayer));
-		}
-
-		if(CGS::AttributInfo.find(BuyightItem.BonusID) != CGS::AttributInfo.end())
-		{
-			int BonusCount = BuyightItem.BonusCount*(Enchant+1);
-			GS()->AVM(ClientID, "null", NOPE, HideID, "Astro +{INT} {STR}", &BonusCount, pPlayer->AtributeName(BuyightItem.BonusID));
 		}
 
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", BuyightItem.GetDesc(pPlayer));
@@ -85,17 +86,30 @@ void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 ORDER BY Price"));
 	while(RES->next())
 	{
-		int ID  = RES->getInt("ID"), ItemID = RES->getInt("ItemID"), Price = RES->getInt("Price"), Enchant = RES->getInt("Enchant");
-		int Count = RES->getInt("Count"), OwnerID = RES->getInt("OwnerID");
+		int ID = RES->getInt("ID");
+		int ItemID = RES->getInt("ItemID");
+		int Price = RES->getInt("Price");
+		int Enchant = RES->getInt("Enchant");
+		int Count = RES->getInt("Count");
+		int OwnerID = RES->getInt("OwnerID");
 
 		ItemSql::ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
-		GS()->AVH(ClientID, HideID, vec3(15,20,30), "{STR} {STR}x{INT}(+{INT}) {INT} gold", 
-			(pPlayer->GetItem(ItemID).Count > 0 ? "✔" : "\0"), BuyightItem.GetName(pPlayer), &Count, &Enchant, &Price);
-
-		if(CGS::AttributInfo.find(BuyightItem.BonusID) != CGS::AttributInfo.end())
+		
+		// зачеровыванный или нет
+		if (CGS::AttributInfo.find(BuyightItem.BonusID) != CGS::AttributInfo.end())
 		{
-			int BonusCount = BuyightItem.BonusCount*(Enchant+1);
+			char aEnchantSize[16];
+			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(50, 30, 25), "{STR} {STR}{STR} :: {INT} gold",
+				(pPlayer->GetItem(ItemID).Count > 0 ? "✔" : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price);
+
+			int BonusCount = BuyightItem.BonusCount * (Enchant + 1);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "Astro +{INT} {STR}", &BonusCount, pPlayer->AtributeName(BuyightItem.BonusID));
+		}
+		else
+		{
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(25, 30, 50), "{STR}x{INT} ({INT}) :: {INT} gold",
+				BuyightItem.GetName(pPlayer), &Count, &pPlayer->GetItem(ItemID).Count, &Price);
 		}
 
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", BuyightItem.GetDesc(pPlayer));
