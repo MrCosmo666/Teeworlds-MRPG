@@ -2380,9 +2380,23 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 
 	if (PPSTR(CMD, "DUNGEONJOIN") == 0)
 	{
+		if (CGS::Dungeon[VoteID].State > 1)
+		{
+			Chat(ClientID, "At the moment players are passing this dungeon!");
+			VResetVotes(ClientID, DUNGEONSMENU);
+			return true;
+		}
+
+		if (pPlayer->Acc().Level < CGS::Dungeon[VoteID].Level)
+		{
+			Chat(ClientID, "Your level is low to pass this dungeon!");
+			VResetVotes(ClientID, DUNGEONSMENU);
+			return true;
+		}
+
 		pPlayer->Acc().TeleportX = -1;
 		pPlayer->Acc().TeleportY = -1;
-		Server()->ChangeWorld(ClientID, VoteID);
+		Server()->ChangeWorld(ClientID, CGS::Dungeon[VoteID].WorldID);
 		return true;
 	}
 

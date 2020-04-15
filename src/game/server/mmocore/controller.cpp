@@ -326,12 +326,9 @@ void SqlController::ShowDungeonsList(CPlayer* pPlayer)
 	for (const auto& dungeon : CGS::Dungeon)
 	{
 		int HideID = 7500 + dungeon.first;
-		GS()->AVH(ClientID, HideID, vec3(52, 26, 80), "Lvl{INT} {STR} : Players {INT} : {STR}", 
-			&dungeon.second.Level, dungeon.second.Name, &dungeon.second.Players, (dungeon.second.State == 0 ? "Waiting players" : "Active dungeon"));
-		if (pPlayer->Acc().Level < dungeon.second.Level)
-			GS()->AVM(ClientID, "null", dungeon.second.WorldID, HideID, "Your level is low to pass this dungeon!");
-		else
-			GS()->AVM(ClientID, "DUNGEONJOIN", dungeon.second.WorldID, HideID, "Join dungeon {STR}", dungeon.second.Name);
+		GS()->AVH(ClientID, HideID, vec3(52, 26, 80), "Lvl{INT} {STR} : Players {INT} : {STR} [{INT}%]",
+			&dungeon.second.Level, dungeon.second.Name, &dungeon.second.Players, (dungeon.second.State > 1 ? "Active dungeon" : "Waiting players"), &dungeon.second.Progress);
+		GS()->AVM(ClientID, "DUNGEONJOIN", dungeon.first, HideID, "Join dungeon {STR}", dungeon.second.Name);
 	}
 }
 

@@ -27,6 +27,7 @@ class CGameControllerDungeon : public IGameController
 	int m_StartingTick;
 	int m_FinishedTick;
 	int m_SafeTick;
+	int m_MaximumTick;
 
 public:
 	CGameControllerDungeon(class CGS* pGameServer);
@@ -44,6 +45,7 @@ public:
 private:
 	int PlayersNum() const;
 	int LeftMobsToWin() const;
+	int CountMobs() const;
 
 	void ChangeState(int State);
 	void StateTick();

@@ -49,7 +49,7 @@ namespace kurosio
 
     // перевести от первого числа второе в проценты пример ((10, 5) = 50%)
     template <typename T>
-    inline float translate_to_procent(T count, T count2) { return (((float)count/(float)count2)*(float)100.0f); }
+    inline float translate_to_procent(T count, T count2) { return (((float)count2 /(float)count)*(float)100.0f); }
 
 
 }

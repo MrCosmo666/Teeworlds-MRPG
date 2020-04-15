@@ -37,6 +37,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Ожидание данжа
 	if (State == DUNGEON_WAITING)
 	{
+		m_MaximumTick = 0;
 		m_FinishedTick = 0;
 		m_StartingTick = 0;
 		m_SafeTick = 0;
@@ -47,7 +48,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Ожидание данжа
 	else if (State == DUNGEON_WAITING_START)
 	{
-		m_StartingTick = Server()->TickSpeed() * 20;
+		m_StartingTick = Server()->TickSpeed() * 60;
 		SetMobsSpawn(false);
 	}
 
@@ -55,8 +56,10 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Начало данжа
 	else if (State == DUNGEON_STARTED)
 	{
+		m_MaximumTick = Server()->TickSpeed() * 600;
 		m_SafeTick = Server()->TickSpeed() * 30;
 		GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "The security timer is enabled for 30 seconds!");
+		GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "You are given 10 minutes to complete of dungeon!");
 		GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 500, "Dungeon started!");
 		SetMobsSpawn(true);
 	}
@@ -85,6 +88,10 @@ void CGameControllerDungeon::StateTick()
 {
 	int Players = PlayersNum();
 
+	// сбросить данж
+	if (Players < 1 && m_StateDungeon != DUNGEON_WAITING)
+		ChangeState(DUNGEON_WAITING);
+
 	// обновлять информацию каждую секунду
 	if (Server()->Tick() % Server()->TickSpeed() == 0)
 	{
@@ -108,20 +115,17 @@ void CGameControllerDungeon::StateTick()
 	// Используется в тике когда Отчет начала данжа
 	else if (m_StateDungeon == DUNGEON_WAITING_START)
 	{
-		if (Players < 1)
-			ChangeState(DUNGEON_WAITING);
-
 		if (m_StartingTick)
 		{
 			int Time = m_StartingTick / Server()->TickSpeed();
 			GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 500, "Dungeon waiting {INT} sec!", &Time);
 
 			m_StartingTick--;
-		}
-		if (!m_StartingTick)
-		{
-			KillAllPlayers();
-			ChangeState(DUNGEON_STARTED);
+			if (!m_StartingTick)
+			{
+				KillAllPlayers();
+				ChangeState(DUNGEON_STARTED);
+			}
 		}
 	}
 
@@ -129,9 +133,6 @@ void CGameControllerDungeon::StateTick()
 	// Используется в тике когда Данж начат
 	else if (m_StateDungeon == DUNGEON_STARTED)
 	{
-		if (Players < 1)
-			ChangeState(DUNGEON_WAITING);
-
 		// тик безопасности в течении какого времени игрок не вернется в старый мир
 		if (m_SafeTick)
 		{
@@ -149,9 +150,6 @@ void CGameControllerDungeon::StateTick()
 	// Используется в тике когда Отчет начала данжа
 	else if (m_StateDungeon == DUNGEON_WAITING_FINISH)
 	{
-		if (Players < 1)
-			ChangeState(DUNGEON_WAITING);
-
 		if (m_FinishedTick)
 		{
 			int Time = m_FinishedTick / Server()->TickSpeed();
@@ -175,8 +173,9 @@ int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKill
 	int KillerID = pKiller->GetCID();
 	if (pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetSpawnBot() == SPAWNMOBS)
 	{
-		int Progress = LeftMobsToWin();
-		GS()->Chat(KillerID, "Left defeat mobs to complete the dungeon {INT}", &Progress);
+		int Progress = 100 - (int)kurosio::translate_to_procent(CountMobs(), LeftMobsToWin());
+		CGS::Dungeon[m_DungeonID].Progress = Progress;
+		GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "The dungeon is completed on [{INT}%]", &Progress);
 	}
 
 	return 0;
@@ -191,6 +190,18 @@ void CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 		GS()->Server()->ChangeWorld(ClientID, pChr->GetPlayer()->m_LastWorldID);
 		GS()->Chat(ClientID, "You were thrown out of dungeon!");
 	}
+}
+
+int CGameControllerDungeon::CountMobs() const
+{
+	int countMobs = 0;
+	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
+	{
+		if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetSpawnBot() == SPAWNMOBS 
+			&& GS()->CheckPlayerMessageWorldID(i) == GS()->GetWorldID())
+			countMobs++;
+	}
+	return countMobs;
 }
 
 int CGameControllerDungeon::PlayersNum() const
@@ -231,6 +242,15 @@ void CGameControllerDungeon::SetMobsSpawn(bool AllowedSpawn)
 
 void CGameControllerDungeon::Tick()
 {
+	if (m_MaximumTick)
+	{
+		m_MaximumTick--;
+		if (!m_MaximumTick)
+		{
+			KillAllPlayers();
+		}
+	}
+
 	StateTick();
 	IGameController::Tick();
 }
