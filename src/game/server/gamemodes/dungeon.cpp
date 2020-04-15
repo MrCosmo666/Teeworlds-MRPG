@@ -20,33 +20,51 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	ChangeState(DUNGEON_WAITING);
 }
 
-bool CGameControllerDungeon::IsFinishedDungeon() const
+void CGameControllerDungeon::KillAllPlayers()
 {
-	return (LeftMobsToWin() <= 0);
+	for (int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter())
+			GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_SELF);
+	}
 }
 
 void CGameControllerDungeon::ChangeState(int State)
 {
 	m_StateDungeon = State;
 
+	// - - - - - - - - - - - - - - - - - - - - - -
 	// Используется при смене статуса в Ожидание данжа
 	if (State == DUNGEON_WAITING)
 	{
 		SetMobsSpawn(false);
 	}
+
+	// - - - - - - - - - - - - - - - - - - - - - -
+	// Используется при смене статуса в Ожидание данжа
+	else if (State == DUNGEON_WAITING_START)
+	{
+		m_StartingTick = Server()->TickSpeed() * 20;
+		SetMobsSpawn(false);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - -
 	// Используется при смене статуса в Начало данжа
 	else if (State == DUNGEON_STARTED)
 	{
+		GS()->SBL(-1, 99999, 500, "Dungeon started!");
 		SetMobsSpawn(true);
-		for (int i = 0; i < MAX_PLAYERS; i++)
-		{
-			if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter())
-			{
-				GS()->SBL(i, 99999, 500, "Dungeon {STR} Started!", Server()->GetWorldName(GS()->GetWorldID()));
-				GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_SELF);
-			}
-		}
 	}
+
+	// - - - - - - - - - - - - - - - - - - - - - -
+	// Используется при смене статуса в Ожидание данжа
+	else if (State == DUNGEON_WAITING_FINISH)
+	{
+		m_FinishedTick = Server()->TickSpeed() * 10;
+		SetMobsSpawn(false);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - -
 	// Используется при смене статуса в Завершение данжа
 	else if (State == DUNGEON_FINISHED)
 	{
@@ -60,24 +78,38 @@ void CGameControllerDungeon::StateTick()
 	int Players = PlayersNum();
 	CGS::Dungeon[m_DungeonID].PlayIt = Players;
 
+	// - - - - - - - - - - - - - - - - - - - - - -
 	// Используется в тике когда Ожидание данжа
 	if (m_StateDungeon == DUNGEON_WAITING)
 	{
 		// пишем всем игрокам что ждем 2 игроков
 		if (Players == 1)
-		{
-			for (int i = 0; i < MAX_PLAYERS; i++)
-			{
-				if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter())
-					GS()->SBL(i, 99999, 10, "Dungeon '{STR}' Waiting 2 players!", Server()->GetWorldName(GS()->GetWorldID()));
-			}
-		}
+			GS()->SBL(-1, 99999, 10, "Dungeon '{STR}' Waiting 2 players!", Server()->GetWorldName(GS()->GetWorldID()));
+
 		// начинаем данж если равно 2 игрока или больше
 		else if (Players > 1)
+			ChangeState(DUNGEON_WAITING_START);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - -
+	// Используется в тике когда Отчет начала данжа
+	else if (m_StateDungeon == DUNGEON_WAITING_START)
+	{
+		if (m_StartingTick)
 		{
+			int Time = m_StartingTick / Server()->TickSpeed();
+			GS()->SBL(-1, 99999, 500, "Dungeon waiting {INT} sec!", &Time);
+
+			m_StartingTick--;
+		}
+		if (!m_StartingTick)
+		{
+			KillAllPlayers();
 			ChangeState(DUNGEON_STARTED);
 		}
 	}
+
+	// - - - - - - - - - - - - - - - - - - - - - -
 	// Используется в тике когда Данж начат
 	else if (m_StateDungeon == DUNGEON_STARTED)
 	{
@@ -94,11 +126,29 @@ void CGameControllerDungeon::StateTick()
 		}
 
 		// завершаем данж когда успешно данж завершен
-		if (IsFinishedDungeon())
+		if (LeftMobsToWin() <= 0)
+			ChangeState(DUNGEON_WAITING_FINISH);
+	}
+
+	// - - - - - - - - - - - - - - - - - - - - - -
+	// Используется в тике когда Отчет начала данжа
+	else if (m_StateDungeon == DUNGEON_WAITING_FINISH)
+	{
+		if (m_FinishedTick)
 		{
+			int Time = m_FinishedTick / Server()->TickSpeed();
+			GS()->SBL(-1, 99999, 500, "Dungeon ended {INT} sec!", &Time);
+
+			m_FinishedTick--;
+		}
+		if (!m_FinishedTick)
+		{
+			KillAllPlayers();
 			ChangeState(DUNGEON_FINISHED);
 		}
 	}
+
+	// - - - - - - - - - - - - - - - - - - - - - -
 	// Используется в тике когда Завершение данжа
 	else if (m_StateDungeon == DUNGEON_FINISHED)
 	{
@@ -112,11 +162,20 @@ int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKill
 		return 0;
 
 	int KillerID = pKiller->GetCID();
+	int VictimID = pVictim->GetPlayer()->GetCID();
 	if (pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetSpawnBot() == SPAWNMOBS)
 	{
 		int Progress = LeftMobsToWin();
 		GS()->Chat(KillerID, "Left defeat mobs to complete the dungeon {INT}", &Progress);
 	}
+
+	if (!pVictim->GetPlayer()->IsBot() && m_StateDungeon >= DUNGEON_STARTED)
+	{
+		GS()->Server()->ChangeWorld(VictimID, pVictim->GetPlayer()->m_LastWorldID);
+		GS()->Chat(KillerID, "You were thrown out of dungeon!");
+		return 0;
+	}
+
 	return 0;
 }
 

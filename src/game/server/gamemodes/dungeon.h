@@ -10,9 +10,12 @@
 // todo a modification with their base as well.
 enum DungeonState
 {
-	DUNGEON_STARTED,
-	DUNGEON_FINISHED,
 	DUNGEON_WAITING,
+	DUNGEON_WAITING_START,
+	DUNGEON_STARTED,
+	DUNGEON_WAITING_FINISH,
+	DUNGEON_FINISHED,
+
 };
 
 class DungeonDoor;
@@ -21,18 +24,19 @@ class CGameControllerDungeon : public IGameController
 	DungeonDoor *m_DungeonDoor;
 	int m_StateDungeon;
 	int m_DungeonID;
+	int m_StartingTick;
+	int m_FinishedTick;
 
 public:
 	CGameControllerDungeon(class CGS* pGameServer);
 
 	int PlayersNum() const;
 	int LeftMobsToWin() const;
-	bool IsFinishedDungeon() const;
 
 	void ChangeState(int State);
 	void StateTick();
 	void SetMobsSpawn(bool AllowedSpawn);
-
+	void KillAllPlayers();
 
 	virtual void Tick();
 	virtual bool OnEntity(int Index, vec2 Pos);

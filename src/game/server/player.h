@@ -71,6 +71,7 @@ public:
 	bool m_Spawned;
 	short m_OpenVoteMenu;
 	short m_LastVoteMenu;
+	int m_LastWorldID;
 
 	short m_SecurCheckCode;
 	vec3 m_Colored;
