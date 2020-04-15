@@ -323,6 +323,7 @@ public:
 
 	int GetWorldID() const { return m_WorldID; }
 	int DungeonID() const { return m_DungeonID; }
+	bool IsDungeon() const { return (m_DungeonID > 0); }
 	int IncreaseCountRaid(int IncreaseCount) const;
 	bool GetPlayerCliped(vec2 Pos, float Distance) const;
 

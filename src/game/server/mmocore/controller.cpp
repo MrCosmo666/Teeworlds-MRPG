@@ -329,6 +329,13 @@ void SqlController::ShowDungeonsList(CPlayer* pPlayer)
 		GS()->AVH(ClientID, HideID, vec3(52, 26, 80), "Lvl{INT} {STR} : Players {INT} : {STR} [{INT}%]",
 			&dungeon.second.Level, dungeon.second.Name, &dungeon.second.Players, (dungeon.second.State > 1 ? "Active dungeon" : "Waiting players"), &dungeon.second.Progress);
 		GS()->AVM(ClientID, "DUNGEONJOIN", dungeon.first, HideID, "Join dungeon {STR}", dungeon.second.Name);
+
+		if (GS()->IsDungeon())
+		{
+			GS()->AV(ClientID, "null", "");
+			pPlayer->m_Colored = { 30, 8, 8 };
+			GS()->AVL(ClientID, "DUNGEONEXIT", "!! Exit dungeon {STR} !!", dungeon.second.Name);
+		}
 	}
 }
 

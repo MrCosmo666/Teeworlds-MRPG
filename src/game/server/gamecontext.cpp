@@ -2394,12 +2394,20 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 			return true;
 		}
 
-		if (DungeonID() <= 0)
+		if (!IsDungeon())
 			pPlayer->m_LastWorldID = GetWorldID();
 
 		pPlayer->Acc().TeleportX = -1;
 		pPlayer->Acc().TeleportY = -1;
 		Server()->ChangeWorld(ClientID, CGS::Dungeon[VoteID].WorldID);
+		return true;
+	}	
+	
+	if (PPSTR(CMD, "DUNGEONEXIT") == 0)
+	{
+		pPlayer->Acc().TeleportX = -1;
+		pPlayer->Acc().TeleportY = -1;
+		Server()->ChangeWorld(ClientID, pPlayer->m_LastWorldID);
 		return true;
 	}
 
