@@ -20,42 +20,37 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	ChangeState(DUNGEON_WAITING);
 }
 
-bool CGameControllerDungeon::CheckFinishedDungeon()
+bool CGameControllerDungeon::IsFinishedDungeon() const
 {
-	if (LeftMobsToWin() > 0)
-		return false;
-
-	m_StateDungeon = DUNGEON_FINISHED;
-	return true;
+	return (LeftMobsToWin() <= 0);
 }
 
 void CGameControllerDungeon::ChangeState(int State)
 {
 	m_StateDungeon = State;
-	switch(State) // pre-init use one how use
+
+	// Используется при смене статуса в Ожидание данжа
+	if (State == DUNGEON_WAITING)
 	{
-		// Используется при смене статуса в Ожидание данжа
-		case DUNGEON_WAITING:
-	
-		break;
 
-		// Используется при смене статуса в Начало данжа
-		case DUNGEON_STARTED:
-			AllowMobsSpawn();
-			for(int i = 0; i < MAX_PLAYERS; i++)
+	}
+	// Используется при смене статуса в Начало данжа
+	else if (State == DUNGEON_STARTED)
+	{
+		AllowMobsSpawn();
+		for (int i = 0; i < MAX_PLAYERS; i++)
+		{
+			if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter())
 			{
-				if(GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter())
-				{	
-					GS()->SBL(i, 99999, 500, "Dungeon {STR} Started!", Server()->GetWorldName(GS()->GetWorldID()));
-					GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_SELF);
-				}
+				GS()->SBL(i, 99999, 500, "Dungeon {STR} Started!", Server()->GetWorldName(GS()->GetWorldID()));
+				GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_SELF);
 			}
-		break;
+		}
+	}
+	// Используется при смене статуса в Завершение данжа
+	else if (State == DUNGEON_FINISHED)
+	{
 
-		// Используется при смене статуса в Завершение данжа
-		case DUNGEON_FINISHED:
-
-		break;
 	}
 	m_DungeonDoor->SetState(State);
 }
@@ -99,7 +94,7 @@ void CGameControllerDungeon::StateTick()
 		}
 
 		// завершаем данж когда успешно данж завершен
-		if (CheckFinishedDungeon())
+		if (IsFinishedDungeon())
 		{
 			ChangeState(DUNGEON_FINISHED);
 		}
@@ -108,6 +103,54 @@ void CGameControllerDungeon::StateTick()
 	else if (m_StateDungeon == DUNGEON_FINISHED)
 	{
 	
+	}
+}
+
+
+int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKiller, int Weapon)
+{
+	if (!pKiller || !pVictim || !pVictim->GetPlayer())
+		return 0;
+
+	int KillerID = pKiller->GetCID();
+	if (pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetSpawnBot() == SPAWNMOBS)
+	{
+		int Progress = LeftMobsToWin();
+		GS()->Chat(KillerID, "Left defeat mobs to complete the dungeon {INT}", &Progress);
+	}
+	return 0;
+}
+
+// Кол-во игроков что играет в данже
+int CGameControllerDungeon::PlayIt() const
+{
+	int playIt = 0;
+	for (int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (Server()->GetWorldID(i) == GS()->GetWorldID())
+			playIt++;
+	}
+	return playIt;
+}
+
+int CGameControllerDungeon::LeftMobsToWin() const
+{
+	int leftMobs = 0;
+	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
+	{
+		if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetSpawnBot() == SPAWNMOBS && GS()->m_apPlayers[i]->GetCharacter())
+			leftMobs++;
+	}
+	return leftMobs;
+}
+
+void CGameControllerDungeon::AllowMobsSpawn()
+{
+	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
+	{
+		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
+		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS)
+			BotPlayer->SetDungeonAllowedSpawn(true);
 	}
 }
 
@@ -150,55 +193,6 @@ bool CGameControllerDungeon::OnEntity(int Index, vec2 Pos)
 	}
 	return false;
 }
-
-int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKiller, int Weapon)
-{
-	if (!pKiller || !pVictim || !pVictim->GetPlayer())
-		return 0;
-
-	int KillerID = pKiller->GetCID();
-	if (pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetSpawnBot() == SPAWNMOBS)
-	{
-		int Progress = LeftMobsToWin();
-		GS()->Chat(KillerID, "Left defeat mobs to complete the dungeon {INT}", &Progress);
-	}
-	return 0;
-}
-
-// Кол-во игроков что играет в данже
-int CGameControllerDungeon::PlayIt() const
-{
-	int playIt = 0;
-	for(int i = 0 ; i < MAX_PLAYERS ; i++)
-	{
-		if(Server()->GetWorldID(i) == GS()->GetWorldID())
-			playIt++;
-	}
-	return playIt;
-}
-
-int CGameControllerDungeon::LeftMobsToWin() const
-{
-	int mobSize = 0;
-	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
-	{
-		if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetSpawnBot() == SPAWNMOBS && GS()->m_apPlayers[i]->GetCharacter())
-			mobSize++;
-	}
-	return mobSize;
-}
-
-void CGameControllerDungeon::AllowMobsSpawn()
-{
-	int mobSize = 0;
-	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
-	{
-		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS)
-			BotPlayer->SetDungeonAllowedSpawn(true);
-	}
-}
-
 
 // Двери
 DungeonDoor::DungeonDoor(CGameWorld *pGameWorld, vec2 Pos)

@@ -21,15 +21,18 @@ class CGameControllerDungeon : public IGameController
 	DungeonDoor *m_DungeonDoor;
 	int m_StateDungeon;
 	int m_DungeonID;
+
 public:
-	int LeftMobsToWin() const;
+	CGameControllerDungeon(class CGS* pGameServer);
+
 	int PlayIt() const;
+	int LeftMobsToWin() const;
+	bool IsFinishedDungeon() const;
+
 	void ChangeState(int State);
 	void StateTick();
-	bool CheckFinishedDungeon();
 	void AllowMobsSpawn();
 
-	CGameControllerDungeon(class CGS *pGameServer);
 
 	virtual void Tick();
 	virtual bool OnEntity(int Index, vec2 Pos);
