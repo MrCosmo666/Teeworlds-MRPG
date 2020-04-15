@@ -326,13 +326,13 @@ void SqlController::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Secon
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "WHERE OwnerID = '%d' AND DungeonID = '%d'", pPlayer->Acc().AuthID, DungeonID));
 	if (!RES->rowsCount())
 	{
-		SJK.ID("tw_dungeons_records", "(OwnerID, DungeonID, Seconds) VALUES ('%d', '%d', '%d')", pPlayer->Acc().AuthID, DungeonID, Seconds);
+		SJK.ID("tw_dungeons_records", "(OwnerID, DungeonID, Seconds) VALUES ('%d', '%d', '%f')", pPlayer->Acc().AuthID, DungeonID, Seconds);
 		return;
 	}
 
 	// либо обновляем
-	SJK.UD("tw_dungeons_records", "Seconds = '%d' WHERE OwnerID = '%d' AND DungeonID = '%d'", Seconds, pPlayer->Acc().AuthID, DungeonID);
-	pPlayer->Acc().TimeDungeon = 0;
+	if (RES->getInt("Seconds") > Seconds)
+		SJK.UD("tw_dungeons_records", "Seconds = '%d' WHERE OwnerID = '%d' AND DungeonID = '%d'", Seconds, pPlayer->Acc().AuthID, DungeonID);
 }
 
 void SqlController::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
@@ -342,9 +342,12 @@ void SqlController::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
 	while (RES->next())
 	{
 		int Rank = RES->getRow();
-		int Seconds = RES->getInt("Seconds");
 		int OwnerID = RES->getInt("OwnerID");
-		GS()->AVM(ClientID, "null", NULL, HideID, "{INT}. {STR} : Seconds {INT}", &Rank, PlayerName(OwnerID), &Seconds);
+		int Seconds = RES->getDouble("Seconds");
+
+		char aTimeFormat[64];
+		str_format(aTimeFormat, sizeof(aTimeFormat), "Time: %d minute(s) %d second(s)", Seconds / 60, Seconds - (Seconds / 60 * 60));
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{INT}. {STR} : {STR}", &Rank, PlayerName(OwnerID), aTimeFormat);
 	}
 }
 

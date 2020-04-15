@@ -95,6 +95,7 @@ void CGameControllerDungeon::ChangeState(int State)
 
 			int Seconds = GS()->m_apPlayers[i]->Acc().TimeDungeon / Server()->TickSpeed();
 			GS()->Mmo()->SaveDungeonRecord(GS()->m_apPlayers[i], m_DungeonID, Seconds);
+			GS()->m_apPlayers[i]->Acc().TimeDungeon = 0;
 		}
 
 		KillAllPlayers();
