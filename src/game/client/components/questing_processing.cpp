@@ -13,10 +13,10 @@
 #include "talktext.h"
 #include "questing_processing.h"
 
-#define COLOR_TABLE vec4(0.5f, 0.36f, 0.0f, 0.4f)
-#define COLOR_BACKGROUND vec4(0.05f, 0.05f, 0.05f, 0.30f) 
-#define COLOR_BACKBACKGROUND vec4(0.5f, 0.40f, 0.0f, 0.4f)
-#define COLOR_UIBAR vec4(0.7f, 0.35f, 0.0f, 0.45f)
+#define COLOR_TABLE vec4(0.66f, 0.46f, 0.27f, 0.4f)
+#define COLOR_BACKGROUND vec4(0.40f, 0.29f, 0.15f, 0.30f) 
+#define COLOR_BACKBACKGROUND vec4(0.55f, 0.35f, 0.15f, 0.4f)
+#define COLOR_UIBAR vec4(0.35f, 0.55f, 0.1f, 0.45f)
 
 void CQuestingProcessing::Clear()
 {
@@ -44,9 +44,11 @@ void CQuestingProcessing::ProcessingRenderTable(int TableID, CUIRect &Box)
 	RenderTools()->DrawRoundRect(&Table, COLOR_TABLE, 15.0f);
 
 	{ // RES
+		vec4 ColorBarUI = (QuestTable[TableID].m_Have >= QuestTable[TableID].m_Requires ? vec4(0.35f, 0.65f, 0.1f, 0.45f) : vec4(0.65f, 0.25f, 0.1f, 0.45f));
+
 		char aQuestTable[32];
 		str_format(aQuestTable, sizeof(aQuestTable), "%s %d / %d", QuestTable[TableID].m_aText, QuestTable[TableID].m_Have, QuestTable[TableID].m_Requires);
-		RenderTools()->DrawUIBar(TextRender(), Table, COLOR_UIBAR,
+		RenderTools()->DrawUIBar(TextRender(), Table, ColorBarUI,
 			QuestTable[TableID].m_Have, QuestTable[TableID].m_Requires, aQuestTable, 3, CUI::ALIGN_RIGHT, 10.0f, 8.0f);
 	}
 

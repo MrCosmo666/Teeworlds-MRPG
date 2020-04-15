@@ -93,7 +93,7 @@ void CEffects::MmoEffectPotion(vec2 Pos, const char* Potion, bool Added)
 
 void CEffects::DamageMmoInd(vec2 Pos, const char* pText, int Type)
 {
-	int Damage = magicnumber(pText, 10000000);
+	int Damage = string_to_number(pText, 1, 10000000);
 
 	CParticle p;
 	p.SetDefault();
