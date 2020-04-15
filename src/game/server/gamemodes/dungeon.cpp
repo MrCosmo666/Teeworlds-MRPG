@@ -42,7 +42,8 @@ void CGameControllerDungeon::ChangeState(int State)
 		break;
 
 		// Используется при смене статуса в Начало данжа
-		case DUNGEON_STARTED: 
+		case DUNGEON_STARTED:
+			AllowMobsSpawn();
 			for(int i = 0; i < MAX_PLAYERS; i++)
 			{
 				if(GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter())
