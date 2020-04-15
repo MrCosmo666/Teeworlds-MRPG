@@ -22,11 +22,9 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 
 bool CGameControllerDungeon::CheckFinishedDungeon()
 {
-	for(int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
-	{
-		if(GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter() && GS()->m_apPlayers[i]->GetCharacter()->IsAlive())
-			return false;
-	}
+	if (LeftMobsToWin() > 0)
+		return false;
+
 	m_StateDungeon = DUNGEON_FINISHED;
 	return true;
 }
@@ -161,8 +159,8 @@ int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKill
 	int KillerID = pKiller->GetCID();
 	if (pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetSpawnBot() == SPAWNMOBS)
 	{
-		int Progress = ProgressIt();
-		GS()->Chat(KillerID, "Now progress dungeon {INT}/100%", &Progress);
+		int Progress = LeftMobsToWin();
+		GS()->Chat(KillerID, "Left defeat mobs to complete the dungeon {INT}", &Progress);
 	}
 	return 0;
 }
@@ -179,23 +177,13 @@ int CGameControllerDungeon::PlayIt() const
 	return playIt;
 }
 
-int CGameControllerDungeon::ProgressIt() const
-{
-	int SizeMobs = MobsSize(false);
-	int AliveMobs = MobsSize(true);
-	return (int)kurosio::translate_to_procent(SizeMobs, AliveMobs);
-}
-
-int CGameControllerDungeon::MobsSize(bool ConsiderAlive) const
+int CGameControllerDungeon::LeftMobsToWin() const
 {
 	int mobSize = 0;
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
-		if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetSpawnBot() == SPAWNMOBS)
-		{
-			if((ConsiderAlive && GS()->m_apPlayers[i]->GetCharacter()) || !ConsiderAlive)
-				mobSize++;
-		}
+		if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetSpawnBot() == SPAWNMOBS && GS()->m_apPlayers[i]->GetCharacter())
+			mobSize++;
 	}
 	return mobSize;
 }

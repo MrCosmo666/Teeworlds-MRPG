@@ -22,8 +22,7 @@ class CGameControllerDungeon : public IGameController
 	int m_StateDungeon;
 	int m_DungeonID;
 public:
-	int MobsSize(bool ConsiderAlive) const;
-	int ProgressIt() const;
+	int LeftMobsToWin() const;
 	int PlayIt() const;
 	void ChangeState(int State);
 	void StateTick();
