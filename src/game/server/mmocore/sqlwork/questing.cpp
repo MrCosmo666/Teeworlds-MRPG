@@ -576,6 +576,7 @@ bool QuestBase::InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo 
 	const int QuestID = BotData.QuestID;
 	if(!MultiQuestNPC(pPlayer, BotData, false) || !CheckMobProgress(ClientID, QuestID) || pPlayer->Acc().Level < QuestsData[QuestID].Level)
 	{
+		GS()->CreateDropQuest(BotData, ClientID);
 		GS()->Chat(ClientID, "Not all criteria to complete!");
 		return false;
 	}

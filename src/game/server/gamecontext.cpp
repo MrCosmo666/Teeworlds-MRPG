@@ -2442,12 +2442,8 @@ void CGS::CreateDropQuest(const ContextBots::QuestBotInfo &BotInfo, int ClientID
 	if(!m_apPlayers[ClientID] || !BotInfo.IsActive() || BotInfo.InterRandom[1] <= 0 ||
 		Server()->GetWorldID(ClientID) != BotInfo.WorldID) return;
 
-	// проверяем квест создавались ли предметы или нет
-	const int QuestID = BotInfo.QuestID;
-	if(QuestBase::Quests[ClientID][QuestID].Collection) 
-		return;
-	
 	// создаем предметы
+	const int QuestID = BotInfo.QuestID;
 	const int ItemID = BotInfo.Interactive[0];
 	int Count = BotInfo.InterCount[0];
 	vec2 Pos = vec2(BotInfo.PositionX, BotInfo.PositionY);

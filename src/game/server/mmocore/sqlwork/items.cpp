@@ -252,21 +252,6 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 		return true;
 	}
 
-	// уничтожение предмета
-	if(PPSTR(CMD, "IDESTROY") == 0)
-	{
-		ItemPlayer &PlItem = pPlayer->GetItem(VoteID);
-		if(Get > PlItem.Count)
-			Get = PlItem.Count;
-
-		if(PlItem.Remove(Get))
-		{
-			GS()->Chat(ClientID, "Destroy {STR}x{INT}", PlItem.Info().GetName(pPlayer), &Get);
-			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-		}
-		return true;
-	}
-
 	// десинтез предмета
 	if(PPSTR(CMD, "IDESYNTHESIS") == 0)
 	{
@@ -455,10 +440,6 @@ void ItemSql::ItemSelected(CPlayer *pPlayer, const ItemPlayer &PlItem, bool Dres
 	{
 		GS()->AVM(ClientID, "IDESYNTHESIS", ItemID, HideID, "Desynthesis {STR} +{INT}{STR}(1 item)", 
 			NameItem, &PlItem.Info().Dysenthis, (PlItem.Info().Function == ITPLANTS ? "goods" : "mat"));
-	}
-	else 
-	{
-		GS()->AVM(ClientID, "IDESTROY", ItemID, HideID, "Destroy {STR}", NameItem);			
 	}
 
 	// можно ли дропнуть 
