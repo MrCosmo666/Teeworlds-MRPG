@@ -10,14 +10,15 @@ class CQuestItem : public CEntity
 	vec2 m_Direction;
 	int m_StartTick;
 
-	int m_OwnerID;
-	ContextBots::QuestBotInfo m_QuestBot;
 	bool m_Collide;
 
 	vec2 GetTimePos(float Time);
 public:
 	CQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Dir, ContextBots::QuestBotInfo BotData, int OwnerID);
 	virtual ~CQuestItem();
+
+	int m_OwnerID;
+	ContextBots::QuestBotInfo m_QuestBot;
 
 	virtual void Tick();
 	virtual void TickPaused(); 

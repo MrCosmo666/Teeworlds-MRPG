@@ -10,7 +10,7 @@
 #include "dropquest.h"
 
 CQuestItem::CQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Dir, const ContextBots::QuestBotInfo BotData, int OwnerID)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPITEM, Pos), m_Direction(vec2(Dir.x, Dir.y+2/rand()%9))
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPQUEST, Pos), m_Direction(vec2(Dir.x, Dir.y+2/rand()%9))
 {
 	m_Pos = Pos;
 	m_ActualPos = Pos;

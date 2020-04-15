@@ -2442,6 +2442,15 @@ void CGS::CreateDropQuest(const ContextBots::QuestBotInfo &BotInfo, int ClientID
 	if(!m_apPlayers[ClientID] || !BotInfo.IsActive() || BotInfo.InterRandom[1] <= 0 ||
 		Server()->GetWorldID(ClientID) != BotInfo.WorldID) return;
 
+	// проверяем есть ли такие предметы
+	for (CQuestItem* pHh = (CQuestItem*)m_World.FindFirst(CGameWorld::ENTTYPE_DROPQUEST);
+		pHh; pHh = (CQuestItem*)pHh->TypeNext())
+	{
+		if (pHh->m_OwnerID != ClientID || BotInfo.Interactive[0] != pHh->m_QuestBot.Interactive[0])
+			continue;
+		return;
+	}
+
 	// создаем предметы
 	const int QuestID = BotInfo.QuestID;
 	const int ItemID = BotInfo.Interactive[0];
@@ -2453,7 +2462,6 @@ void CGS::CreateDropQuest(const ContextBots::QuestBotInfo &BotInfo, int ClientID
 		vec2 Projdrop = (Dir * max(0.001f, 2.6f));
 		new CQuestItem(&m_World, Pos, Dir, BotInfo, ClientID);
 	}
-	QuestBase::Quests[ClientID][QuestID].Collection = true;
 }
 
 // Проверить чекнуть и подобрать предмет Если он будет найден

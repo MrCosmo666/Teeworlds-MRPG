@@ -440,11 +440,6 @@ void QuestBase::CheckQuest(CPlayer *pPlayer)
 			continue;
 
 		// создаем дроп элементов если имеются
-		int playerTalkProgress = Quests[ClientID][QuestID].TalkProgress;
-		ContextBots::QuestBotInfo &FindBot = GetQuestBot(QuestID, playerTalkProgress);
-		if(FindBot.IsActive()) 
-			GS()->CreateDropQuest(FindBot, ClientID); 
-
 		if(qData.second.TalkCount > 1 && qData.second.TalkCount != Quests[ClientID][QuestID].TalkProgress) 
 			continue;
 
