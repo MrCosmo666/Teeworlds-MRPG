@@ -49,8 +49,6 @@ private:
 	void StateTick();
 	void SetMobsSpawn(bool AllowedSpawn);
 	void KillAllPlayers();
-
-	const char* DungeonStateName();
 };
 
 // CHomeDoor class

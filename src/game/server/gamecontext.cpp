@@ -2378,6 +2378,14 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 		return true;
 	}
 
+	if (PPSTR(CMD, "DUNGEONJOIN") == 0)
+	{
+		pPlayer->Acc().TeleportX = -1;
+		pPlayer->Acc().TeleportY = -1;
+		Server()->ChangeWorld(ClientID, VoteID);
+		return true;
+	}
+
 	if(pPlayer->ParseVoteUpgrades(CMD, VoteID, VoteID2, Get)) 
 		return true;
 
