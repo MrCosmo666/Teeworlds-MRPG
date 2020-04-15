@@ -101,6 +101,7 @@ public:
 	virtual int GetBotSub()                                              { return -1; };
 	virtual bool CheckQuestSnapPlayer(int SnappingClient, bool SnapData) { return true; };
 	virtual	int GetHealth()                                              { return Acc().PlayerHealth;};
+	virtual void SetDungeonAllowedSpawn(bool Spawn)                      { return; };
 	virtual void SetStandart(int Health, int Mana);
 
 	virtual void Tick();

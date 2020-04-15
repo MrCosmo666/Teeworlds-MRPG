@@ -23,6 +23,7 @@ public:
 	virtual	int GetHealth() override                        { return m_BotHealth; };
 	virtual int GetTeam() override                          { return TEAM_BLUE; };
 	virtual void SetStandart(int Health, int Mana) override { m_BotHealth = Health; };
+	virtual void SetDungeonAllowedSpawn(bool Spawn) override{ m_DungeonAllowedSpawn = Spawn; };
 
 	virtual void Tick() override;
 	virtual int GetStartHealth() override;
@@ -39,6 +40,7 @@ private:
 	int m_BotID;
 	int m_SubBotID;
 	int m_BotHealth;
+	int m_DungeonAllowedSpawn;
 
 	int GetBotLevel() const;
 	int GetMoodNameplacesType(int SnappingClient);

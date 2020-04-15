@@ -28,6 +28,7 @@ public:
 	void ChangeState(int State);
 	void StateTick();
 	bool CheckFinishedDungeon();
+	void AllowMobsSpawn();
 
 	CGameControllerDungeon(class CGS *pGameServer);
 

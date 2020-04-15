@@ -9,15 +9,14 @@
 #include "../logicworld/logicwall.h"
 #include "../entities/jobitems.h"
 
-CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController(pGS)
+CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController(pGS), 
+m_DungeonDoor(new DungeonDoor(&GS()->m_World, vec2(CGS::Dungeon[m_DungeonID].DoorX, CGS::Dungeon[m_DungeonID].DoorY)))
 {
 	m_pGameType = "MmoTee";
 	ChangeState(DUNGEON_WAITING);
 
 	// создание двери
 	m_DungeonID = GS()->DungeonID();
-	vec2 PosDoor = vec2(CGS::Dungeon[m_DungeonID].DoorX, CGS::Dungeon[m_DungeonID].DoorY);
-	m_DungeonDoor = new DungeonDoor(&GS()->m_World, PosDoor);
 }
 
 bool CGameControllerDungeon::CheckFinishedDungeon()
@@ -183,6 +182,17 @@ int CGameControllerDungeon::MobsSize(bool ConsiderAlive) const
 		}
 	}
 	return mobSize;
+}
+
+void CGameControllerDungeon::AllowMobsSpawn()
+{
+	int mobSize = 0;
+	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
+	{
+		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
+		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS)
+			BotPlayer->SetDungeonAllowedSpawn(true);
+	}
 }
 
 // Двери

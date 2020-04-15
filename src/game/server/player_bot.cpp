@@ -15,6 +15,7 @@ CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int Spaw
 : CPlayer(pGS, ClientID), m_BotHealth(NULL), m_BotID(BotID), m_SubBotID(SubBotID), m_SpawnPointBot(SpawnPoint)
 {
 	m_Spawned = true;
+	m_DungeonAllowedSpawn = false;
 	m_PlayerTick[TickState::Respawn] = Server()->Tick();
 }
 
@@ -71,6 +72,10 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 // Спавн игрока
 void CPlayerBot::TryRespawn()
 {
+	// разрешить спавн в данже только по запросу
+	if (GS()->DungeonID() > 0 && !m_DungeonAllowedSpawn)
+		return;
+
 	vec2 SpawnPos;
 	const int SpawnType = m_SpawnPointBot;
 	
@@ -109,6 +114,11 @@ void CPlayerBot::TryRespawn()
 	// чтобы не было видно эффектов что НПС не видемый для одного игрока был видем другому
 	if(SpawnType != SPAWNQUESTNPC) 
 		GS()->CreatePlayerSpawn(SpawnPos);
+
+	// сбросить респавн в данжах если он был разрешен
+	if (SpawnType == SPAWNMOBS && GS()->DungeonID() > 0 && m_DungeonAllowedSpawn)
+		m_DungeonAllowedSpawn = false;
+
 }
 
 
