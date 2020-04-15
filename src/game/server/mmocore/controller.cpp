@@ -322,17 +322,14 @@ void SqlController::ShowLoadingProgress(const char *Loading, int LoadCount)
 
 void SqlController::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds)
 {
-	// если нет записи вставляем
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "WHERE OwnerID = '%d' AND DungeonID = '%d'", pPlayer->Acc().AuthID, DungeonID));
-	if (!RES->rowsCount())
+	if (!RES->next())
 	{
-		SJK.ID("tw_dungeons_records", "(OwnerID, DungeonID, Seconds) VALUES ('%d', '%d', '%f')", pPlayer->Acc().AuthID, DungeonID, Seconds);
+		if (RES->getInt("Seconds") > Seconds)
+			SJK.UD("tw_dungeons_records", "Seconds = '%d' WHERE OwnerID = '%d' AND DungeonID = '%d'", Seconds, pPlayer->Acc().AuthID, DungeonID);
 		return;
 	}
-
-	// либо обновляем
-	if (RES->getInt("Seconds") > Seconds)
-		SJK.UD("tw_dungeons_records", "Seconds = '%d' WHERE OwnerID = '%d' AND DungeonID = '%d'", Seconds, pPlayer->Acc().AuthID, DungeonID);
+	SJK.ID("tw_dungeons_records", "(OwnerID, DungeonID, Seconds) VALUES ('%d', '%d', '%d')", pPlayer->Acc().AuthID, DungeonID, Seconds);
 }
 
 void SqlController::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)

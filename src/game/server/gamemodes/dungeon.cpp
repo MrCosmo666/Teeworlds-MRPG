@@ -57,7 +57,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Ожидание данжа
 	else if (State == DUNGEON_WAITING_START)
 	{
-		m_StartingTick = Server()->TickSpeed() * 60;
+		m_StartingTick = Server()->TickSpeed() * 10;
 		SetMobsSpawn(false);
 	}
 
