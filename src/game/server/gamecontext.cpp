@@ -1096,7 +1096,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			CNetMsg_Cl_CallVote *pMsg = (CNetMsg_Cl_CallVote *)pRawMsg;
 
 			int Get = string_to_number(pMsg->m_Reason, 1, 10000000);
-			if (pMsg->m_Force || Now < pPlayer->m_PlayerTick[TickState::LastVoteTry] + Server()->TickSpeed() / 2)
+			if (pMsg->m_Force || Now < (pPlayer->m_PlayerTick[TickState::LastVoteTry] + Server()->TickSpeed()) / 2)
 				return;
 
 			if(str_comp_nocase(pMsg->m_Type, "option") == 0)
