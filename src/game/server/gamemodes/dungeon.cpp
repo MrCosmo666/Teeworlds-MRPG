@@ -48,7 +48,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Ожидание данжа
 	else if (State == DUNGEON_WAITING_START)
 	{
-		m_StartingTick = Server()->TickSpeed() * 20;
+		m_StartingTick = Server()->TickSpeed() * 60;
 		SetMobsSpawn(false);
 	}
 
@@ -57,8 +57,8 @@ void CGameControllerDungeon::ChangeState(int State)
 	else if (State == DUNGEON_STARTED)
 	{
 		KillAllPlayers();
-		m_MaximumTick = Server()->TickSpeed() * 20;
-		m_SafeTick = Server()->TickSpeed() * 10;
+		m_MaximumTick = Server()->TickSpeed() * 600;
+		m_SafeTick = Server()->TickSpeed() * 30;
 		GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "The security timer is enabled for 30 seconds!");
 		GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "You are given 10 minutes to complete of dungeon!");
 		GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 500, "Dungeon started!");
@@ -227,7 +227,8 @@ void CGameControllerDungeon::SetMobsSpawn(bool AllowedSpawn)
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS && GS()->CheckPlayerMessageWorldID(i) == GS()->GetWorldID())
+		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS 
+			&& GS()->CheckPlayerMessageWorldID(i) == GS()->GetWorldID())
 		{
 			BotPlayer->SetDungeonAllowedSpawn(AllowedSpawn);
 			if (!AllowedSpawn && BotPlayer->GetCharacter())
