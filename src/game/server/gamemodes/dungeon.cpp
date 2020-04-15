@@ -87,6 +87,16 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Завершение данжа
 	else if (State == DUNGEON_FINISHED)
 	{
+		// элемент RACE
+		for (int i = 0; i < MAX_PLAYERS; i++)
+		{
+			if (!GS()->m_apPlayers[i])
+				continue;
+
+			int Seconds = GS()->m_apPlayers[i]->Acc().TimeDungeon / Server()->TickSpeed();
+			GS()->Mmo()->SaveDungeonRecord(GS()->m_apPlayers[i], m_DungeonID, Seconds);
+		}
+
 		KillAllPlayers();
 	}
 
