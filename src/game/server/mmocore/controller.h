@@ -110,6 +110,7 @@ public:
 	//
 	void ShowLoadingProgress(const char *Loading, int LoadCount);
 
+	void SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds);
 	void ShowDungeonsList(CPlayer* pPlayer);
 	void ShowTopList(CPlayer* pPlayer, int TypeID);
 };

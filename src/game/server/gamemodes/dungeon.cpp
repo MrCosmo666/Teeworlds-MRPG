@@ -37,7 +37,15 @@ void CGameControllerDungeon::ChangeState(int State)
 	// - - - - - - - - - - - - - - - - - - - - - -
 	// Используется при смене статуса в Ожидание данжа
 	if (State == DUNGEON_WAITING)
-	{
+	{	
+		// элемент RACE
+		for (int i = 0; i < MAX_PLAYERS; i++)
+		{
+			if (!GS()->m_apPlayers[i])
+				continue;
+
+			GS()->m_apPlayers[i]->Acc().TimeDungeon = 0;
+		}
 		m_MaximumTick = 0;
 		m_FinishedTick = 0;
 		m_StartingTick = 0;
@@ -134,6 +142,15 @@ void CGameControllerDungeon::StateTick()
 	// Используется в тике когда Данж начат
 	else if (m_StateDungeon == DUNGEON_STARTED)
 	{
+		// элемент RACE
+		for (int i = 0; i < MAX_PLAYERS; i++)
+		{
+			if (!GS()->m_apPlayers[i])
+				continue;
+
+			GS()->m_apPlayers[i]->Acc().TimeDungeon++;
+		}
+
 		// тик безопасности в течении какого времени игрок не вернется в старый мир
 		if (m_SafeTick)
 		{

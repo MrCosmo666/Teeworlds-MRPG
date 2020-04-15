@@ -320,6 +320,21 @@ void SqlController::ShowLoadingProgress(const char *Loading, int LoadCount)
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "LOAD DB", aLoadingBuf);
 }
 
+void SqlController::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds)
+{
+	// если нет записи вставляем
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "WHERE OwnerID = '%d' AND DungeonID = '%d'", pPlayer->Acc().AuthID, DungeonID));
+	if (!RES->rowsCount())
+	{
+		SJK.ID("tw_dungeons_records", "(OwnerID, DungeonID, Seconds) VALUES ('%d', '%d', '%d')", pPlayer->Acc().AuthID, DungeonID, Seconds);
+		return;
+	}
+
+	// либо обновляем
+	SJK.UD("tw_dungeons_records", "Seconds = '%d' WHERE OwnerID = '%d' AND DungeonID = '%d'", Seconds, pPlayer->Acc().AuthID, DungeonID);
+	pPlayer->Acc().TimeDungeon = 0;
+}
+
 void SqlController::ShowDungeonsList(CPlayer* pPlayer)
 {
 	int ClientID = pPlayer->GetCID();

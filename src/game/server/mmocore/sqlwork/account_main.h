@@ -35,6 +35,7 @@ public:
 		short WorldID;
 		short LastWorldID;
 		short LatencyPing;
+		int TimeDungeon;
 
 		// skins
 		char m_aaSkinPartNames[6][24];

@@ -49,7 +49,9 @@ void CPlayer::Tick()
 		return;
 
 	{ // вычисление пинга и установка данных клиенту
-		Server()->SetClientScore(m_ClientID, Acc().Level);
+
+		if(!GS()->IsDungeon())
+			Server()->SetClientScore(m_ClientID, Acc().Level);
 
 		IServer::CClientInfo Info;
 		if (Server()->GetClientInfo(m_ClientID, &Info))

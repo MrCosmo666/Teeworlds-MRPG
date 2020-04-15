@@ -29,6 +29,8 @@ class CGameControllerDungeon : public IGameController
 	int m_SafeTick;
 	int m_MaximumTick;
 
+	int m_Time[MAX_PLAYERS];
+
 public:
 	CGameControllerDungeon(class CGS* pGameServer);
 
