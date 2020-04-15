@@ -50,7 +50,6 @@ SqlController::~SqlController()
 	m_Components.clear();
 }
 
-// Загрузить все данные в локальном мире
 void SqlController::LoadFullSystems()
 {
 	for(auto& component : m_Components.m_paComponents)
@@ -64,7 +63,6 @@ void SqlController::LoadFullSystems()
 	}
 }
 
-// Тик всех компонентов
 void SqlController::OnTick()
 {
 	// весь тик компонентов
@@ -313,24 +311,17 @@ const char* SqlController::PlayerName(int AccountID)
 }
 
 void SqlController::ShowLoadingProgress(const char *Loading, int LoadCount)
-{	
-	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "LOAD DB", "------------------------------------");
-	// - - - - - - - - -
+{
 	char aLoadingBuf[128];
 	str_format(aLoadingBuf, sizeof(aLoadingBuf), "Loaded %d %s | CK WorldID %d.", LoadCount, Loading, GS()->GetWorldID());
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "LOAD DB", aLoadingBuf);
-	// - - - - - - - - -
-	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "LOAD DB", "------------------------------------");
 }
 
 void SqlController::ShowTopList(CPlayer* pPlayer, int TypeID)
 {
 	int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = { 10, 10, 10 };
-	switch (TypeID)
-	{
-
-	case ToplistTypes::GUILDS_LEVELING:
+	if(TypeID == ToplistTypes::GUILDS_LEVELING)
 	{
 		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_members", "ORDER BY Level DESC LIMIT 10"));
 		while (RES->next())
@@ -342,10 +333,8 @@ void SqlController::ShowTopList(CPlayer* pPlayer, int TypeID)
 
 			GS()->AVL(ClientID, "null", "{INT}. {STR} : Level {INT}", &Rank, NameGuild, &Level);
 		}
-		break;
 	}
-
-	case ToplistTypes::GUILDS_WEALTHY:
+	else if (TypeID == ToplistTypes::GUILDS_WEALTHY)
 	{
 		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_members", "ORDER BY Bank DESC LIMIT 10"));
 		while (RES->next())
@@ -357,10 +346,8 @@ void SqlController::ShowTopList(CPlayer* pPlayer, int TypeID)
 
 			GS()->AVL(ClientID, "null", "{INT}. {STR} : Gold {INT}", &Rank, NameGuild, &Gold);
 		}
-		break;
 	}
-
-	case ToplistTypes::PLAYERS_LEVELING:
+	else if (TypeID == ToplistTypes::PLAYERS_LEVELING)
 	{
 		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_data", "ORDER BY Level DESC LIMIT 10"));
 		while (RES->next())
@@ -372,7 +359,5 @@ void SqlController::ShowTopList(CPlayer* pPlayer, int TypeID)
 
 			GS()->AVL(ClientID, "null", "{INT}. {STR} : Level {INT}", &Rank, Nick, &Level);
 		}
-		break;
-	}
 	}
 }
