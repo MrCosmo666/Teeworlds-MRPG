@@ -335,7 +335,7 @@ void SqlController::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Secon
 void SqlController::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
 {
 	int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "ORDER BY Seconds DESC LIMIT 5"));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "ORDER BY Seconds ASC LIMIT 5"));
 	while (RES->next())
 	{
 		int Rank = RES->getRow();
