@@ -106,7 +106,7 @@ void CGameControllerDungeon::StateTick()
 	{
 		// пишем всем игрокам что ждем 2 игроков
 		if (Players == 1)
-			GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 10, "Dungeon '{STR}' Waiting 2 players!", Server()->GetWorldName(GS()->GetWorldID()));
+			GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 10, "Dungeon '{STR}' Waiting 2 players!", CGS::Dungeon[m_DungeonID].Name);
 		// начинаем данж если равно 2 игрока или больше
 		else if (Players > 1)
 			ChangeState(DUNGEON_WAITING_START);

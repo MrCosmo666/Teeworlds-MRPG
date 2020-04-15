@@ -2394,6 +2394,8 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 			return true;
 		}
 
+		Chat(-1, "{STR} joined to Dungeon {STR}!", Server()->ClientName(ClientID), CGS::Dungeon[VoteID].Name);
+
 		if (!IsDungeon())
 			pPlayer->Acc().LastWorldID = GetWorldID();
 
