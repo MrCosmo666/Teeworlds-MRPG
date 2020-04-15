@@ -19,7 +19,7 @@ void InboxSql::InteractiveInbox(CPlayer *pPlayer, int InboxID)
 		if(ItemID > 0 && Count > 0)
 		{
 			// если уже имеется такой зачарованный предмет
-			if(GS()->GetItemInfo(ItemID).BonusID > 0 && pPlayer->GetItem(ItemID).Count > 1)
+			if(GS()->GetItemInfo(ItemID).BonusCount > 0 && pPlayer->GetItem(ItemID).Count > 0)
 				return GS()->Chat(pPlayer->GetCID(), "Enchant item maximal count x1 in a backpack!");
 
 			const int Enchant = RES->getInt("Enchant");
