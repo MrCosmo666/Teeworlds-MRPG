@@ -32,7 +32,6 @@ class QuestBase : public CMmoComponent
 		int Type;
 		int MobProgress[2];
 		int TalkProgress;
-		bool Collection;
 	};
 	typedef std::map < int , std::map < int , StructQuest > > QuestType;
 

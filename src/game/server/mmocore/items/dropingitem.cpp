@@ -22,7 +22,7 @@ CDropingItem::CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Dir, ItemSql::
 	m_DropItem = DropItem;
 	m_Flashing = false;
 	m_StartTick = Server()->Tick();
-	m_LifeSpan = Server()->TickSpeed()*g_Config.m_SvTickDropableItems;
+	m_LifeSpan = Server()->TickSpeed() * 15;
 
 	// create object
 	GameWorld()->InsertEntity(this);
@@ -91,6 +91,7 @@ void CDropingItem::Tick()
 		// delete object
 		if(m_LifeSpan < 0)
 		{
+			GS()->CreatePlayerSpawn(m_Pos);
 			GS()->m_World.DestroyEntity(this);
 			return;
 		}

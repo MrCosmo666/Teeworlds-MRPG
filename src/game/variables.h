@@ -174,10 +174,6 @@ MACRO_CONFIG_INT(SvGuildLeveling, sv_guildleveling, 1024, 0, 10000, CFGFLAG_SERV
 // world time
 MACRO_CONFIG_INT(SvShowSvNameTime, sv_worldtime_name, 1, 0, 1, CFGFLAG_SERVER, "Show world time in server")
 
-// items and this type
-MACRO_CONFIG_INT(SvTickDropableBonuses, sv_wtick_dropb, 15, 5, 100, CFGFLAG_SERVER, "Drobale bonuses tick in sec.")
-MACRO_CONFIG_INT(SvTickDropableItems, sv_wtick_dropi, 20, 5, 480, CFGFLAG_SERVER, "Drobale items tick in sec.")
-
 // house
 MACRO_CONFIG_INT(SvMotelPrice, sv_marendprice, 100, 100, 9000000, CFGFLAG_SERVER, "Motel buy price")
 MACRO_CONFIG_INT(SvLimitDecoration, sv_limit_decorations, 10, 5, 20, CFGFLAG_SERVER, "Limit objects for decoration")

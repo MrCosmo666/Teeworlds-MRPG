@@ -20,6 +20,8 @@ CQuestItem::CQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Dir, const Context
 	// other var
 	m_OwnerID = OwnerID;
 	m_QuestBot = BotData;
+	m_Flashing = false;
+	m_LifeSpan = Server()->TickSpeed() * 15;
 	m_StartTick = Server()->Tick();
 
 	// create object
@@ -38,6 +40,30 @@ vec2 CQuestItem::GetTimePos(float Time)
 
 void CQuestItem::Tick()
 {
+	// check life time
+	if (m_LifeSpan < 150)
+	{
+		// effect
+		m_FlashTimer--;
+		if (m_FlashTimer > 5)
+			m_Flashing = true;
+		else
+		{
+			m_Flashing = false;
+			if (m_FlashTimer <= 0)
+				m_FlashTimer = 10;
+		}
+
+		// delete object
+		if (m_LifeSpan < 0)
+		{
+			GS()->CreatePlayerSpawn(m_Pos);
+			GS()->m_World.DestroyEntity(this);
+			return;
+		}
+	}
+	m_LifeSpan--;
+
 	// проверяем есть игрок / если бота нет / если квеста нет
 	if(!GS()->m_apPlayers[m_OwnerID] ||
 		QuestBase::Quests[m_OwnerID].find(m_QuestBot.QuestID) == QuestBase::Quests[m_OwnerID].end())
@@ -104,7 +130,7 @@ void CQuestItem::Snap(int SnappingClient)
 {
 	float Ct = (Server()->Tick()-m_StartTick)/(float)Server()->TickSpeed();
 	
-	if(!m_Collide || m_OwnerID != SnappingClient || NetworkClipped(SnappingClient, GetTimePos(Ct)))
+	if(m_Flashing || !m_Collide || m_OwnerID != SnappingClient || NetworkClipped(SnappingClient, GetTimePos(Ct)))
 		return;
 
 	CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));

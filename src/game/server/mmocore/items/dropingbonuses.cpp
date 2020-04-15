@@ -22,7 +22,7 @@ CDropingBonuses::CDropingBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Dir, int
 	m_Type = Type;
 	m_Flashing = false;
 	m_StartTick = Server()->Tick();
-	m_LifeSpan = Server()->TickSpeed()*g_Config.m_SvTickDropableBonuses;
+	m_LifeSpan = Server()->TickSpeed() * 5;
 	
 	// create object
 	GameWorld()->InsertEntity(this);
@@ -39,7 +39,7 @@ vec2 CDropingBonuses::GetTimePos(float Time)
 void CDropingBonuses::Tick()
 {
 	// check life time
-	if(m_LifeSpan < 150)
+	if (m_LifeSpan < 150)
 	{
 		// effect
 		m_FlashTimer--;
@@ -53,8 +53,9 @@ void CDropingBonuses::Tick()
 		}
 
 		// delete object
-		if(m_LifeSpan < 0)
+		if (m_LifeSpan < 0)
 		{
+			GS()->CreatePlayerSpawn(m_Pos);
 			GS()->m_World.DestroyEntity(this);
 			return;
 		}

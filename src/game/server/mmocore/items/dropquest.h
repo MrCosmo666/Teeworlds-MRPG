@@ -11,6 +11,9 @@ class CQuestItem : public CEntity
 	int m_StartTick;
 
 	bool m_Collide;
+	bool m_Flashing;
+	int m_LifeSpan;
+	int m_FlashTimer;
 
 	vec2 GetTimePos(float Time);
 public:
