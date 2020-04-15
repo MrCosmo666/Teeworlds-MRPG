@@ -843,17 +843,21 @@ void CGS::OnInit(int WorldID)
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 	m_World.SetGameServer(this);
 	m_Events.SetGameServer(this);
-	m_DungeonID = ItCheckToDungeon(WorldID);
+	m_DungeonID = ItDungeon(WorldID);
 	m_WorldID = WorldID;
 
 	for(int i = 0; i < NUM_NETOBJTYPES; i++)
 		Server()->SnapSetStaticsize(i, m_NetObjHandler.GetObjSize(i));
 
 	// создаем все гейм обьекты для сервера
-	if(m_DungeonID >= 1) 
-		m_pController = new CGameControllerDungeon(this);	
-	else 
+	if(m_DungeonID >= 1)
+	{
+		m_pController = new CGameControllerDungeon(this);
+	}
+	else
+	{
 		m_pController = new CGameControllerMOD(this);
+	}
 
 	// создаем контроллер
 	m_Layers.Init(Kernel(), NULL, WorldID);
@@ -2551,7 +2555,7 @@ bool CGS::GetPlayerCliped(vec2 Pos, float Distance) const
 }
 
 // Проверяем данж ли этот мир или нет
-int CGS::ItCheckToDungeon(int WorldID) const
+int CGS::ItDungeon(int WorldID) const
 {
 	for(const auto& dd : Dungeon)
 	{

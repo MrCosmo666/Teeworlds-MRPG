@@ -117,6 +117,9 @@ public:
 
 		int DoorX;
 		int DoorY;
+
+		int PlayIt;
+		int Progress;
 	};
 	typedef std::map < int , StructDungeon > DungeonType;
 	static DungeonType Dungeon;	
@@ -316,13 +319,12 @@ public:
 	void ClearInteractiveSub(int ClientID);
 
 	int GetWorldID() const { return m_WorldID; }
-	bool CheckEnumTime(int DayType) const;
 	int DungeonID() const { return m_DungeonID; }
 	int IncreaseCountRaid(int IncreaseCount) const;
 	bool GetPlayerCliped(vec2 Pos, float Distance) const;
 
 private:
-	int ItCheckToDungeon(int WorldID) const;
+	int ItDungeon(int WorldID) const;
 
 	/* #########################################################################
 		FUNCTIONS PLAYER ITEMS 

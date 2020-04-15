@@ -20,6 +20,7 @@ class CGameControllerDungeon : public IGameController
 {
 	DungeonDoor *m_DungeonDoor;
 	int m_StateDungeon;
+	int m_DungeonID;
 public:
 
 	int PlayIt() const;

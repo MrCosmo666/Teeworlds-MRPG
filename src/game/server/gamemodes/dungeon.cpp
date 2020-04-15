@@ -12,13 +12,11 @@
 CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController(pGS)
 {
 	m_pGameType = "MmoTee";
-
-	// установка данжу ожиданние
 	ChangeState(DUNGEON_WAITING);
 
 	// создание двери
-	int DungeonID = GS()->DungeonID();
-	vec2 PosDoor = vec2(CGS::Dungeon[DungeonID].DoorX, CGS::Dungeon[DungeonID].DoorY);
+	m_DungeonID = GS()->DungeonID();
+	vec2 PosDoor = vec2(CGS::Dungeon[m_DungeonID].DoorX, CGS::Dungeon[m_DungeonID].DoorY);
 	m_DungeonDoor = new DungeonDoor(&GS()->m_World, PosDoor);
 }
 
@@ -118,6 +116,8 @@ void CGameControllerDungeon::StateTick()
 
 void CGameControllerDungeon::Tick()
 {
+	CGS::Dungeon[m_DungeonID].PlayIt = PlayIt();
+
 	StateTick();
 	IGameController::Tick();
 }
@@ -159,13 +159,13 @@ bool CGameControllerDungeon::OnEntity(int Index, vec2 Pos)
 // Кол-во игроков что играет в данже
 int CGameControllerDungeon::PlayIt() const
 {
-	int l_playit = 0;
+	int playIt = 0;
 	for(int i = 0 ; i < MAX_PLAYERS ; i++)
 	{
 		if(Server()->GetWorldID(i) == GS()->GetWorldID())
-			l_playit++;
+			playIt++;
 	}
-	return l_playit;
+	return playIt;
 }
 
 // Двери
@@ -178,6 +178,7 @@ DungeonDoor::DungeonDoor(CGameWorld *pGameWorld, vec2 Pos)
 
 	GameWorld()->InsertEntity(this);
 }
+
 void DungeonDoor::Tick()
 {
 	if(m_State != DUNGEON_STARTED)
@@ -189,10 +190,12 @@ void DungeonDoor::Tick()
 		}
 	}
 }
+
 void DungeonDoor::SetState(int State)
 {
 	m_State = State;
 }
+
 void DungeonDoor::Snap(int SnappingClient)
 {
 	if (m_State == DUNGEON_STARTED || NetworkClipped(SnappingClient))
