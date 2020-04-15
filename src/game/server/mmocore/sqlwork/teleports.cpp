@@ -98,11 +98,11 @@ void TeleportsSql::UnlockLocation(int ClientID, vec2 Pos)
 // Показать лист телепортов
 void TeleportsSql::ShowTeleportList(CPlayer *pPlayer)
 {
-	if(!pPlayer->GetCharacter()) return;
-
-	const int ClientID = pPlayer->GetCID();
+	if(!pPlayer->GetCharacter()) 
+		return;
 
 	// весь список телепортов	
+	const int ClientID = pPlayer->GetCID();
 	GS()->AVH(ClientID, HTELEPORTLIST, vec3(50, 10, 5), "Available teleports");
 	
 	// если имеется дом организации

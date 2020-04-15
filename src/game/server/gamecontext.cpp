@@ -1929,27 +1929,27 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		if(!pChar || !pChar->IsAlive())
 			return;
 
-		if(pChar->GetHelper()->BoolIndex(TILE_AUCTION))
+		if (pChar->GetHelper()->BoolIndex(TILE_AUCTION))
 			Mmo()->Auction()->ShowAuction(pPlayer);
-		else if(pChar->GetHelper()->BoolIndex(TILE_HOUSE)) 
+		else if (pChar->GetHelper()->BoolIndex(TILE_HOUSE))
 		{
 			const int HouseID = Mmo()->House()->GetHouse(pChar->m_Core.m_Pos);
-			if(HouseID > 0) Mmo()->House()->ShowHouseMenu(pPlayer, HouseID);
+			if (HouseID > 0) Mmo()->House()->ShowHouseMenu(pPlayer, HouseID);
 		}
-		else if(pChar->GetHelper()->BoolIndex(TILE_MEMBERHOUSE))
+		else if (pChar->GetHelper()->BoolIndex(TILE_MEMBERHOUSE))
 		{
 			const int HouseID = Mmo()->Member()->GetPosHouseID(pChar->m_Core.m_Pos);
 			Mmo()->Member()->ShowBuyHouse(pPlayer, HouseID);
 		}
-		else if(pChar->GetHelper()->BoolIndex(TILE_SELLHOUSE))
+		else if (pChar->GetHelper()->BoolIndex(TILE_SELLHOUSE))
 			Mmo()->ShowBussinesHousesSell(pPlayer);
-		else if(pChar->GetHelper()->BoolIndex(TILE_STORAGE))
+		else if (pChar->GetHelper()->BoolIndex(TILE_STORAGE))
 		{
 			const int StorageID = Mmo()->Storage()->GetLoadStorage(pChar->m_Core.m_Pos);
 			Mmo()->Storage()->ShowStorageMenu(ClientID, StorageID);
 			Mmo()->Auction()->ShowMailShop(pPlayer, StorageID);
 		}
-		else if(pChar->GetHelper()->BoolIndex(TILE_LEARNSKILL))
+		else if (pChar->GetHelper()->BoolIndex(TILE_LEARNSKILL))
 			Mmo()->Skills()->ShowMailSkillList(pPlayer);
 	}  
 	else if(MenuList == INVENTORY) 
@@ -2281,10 +2281,8 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		Mmo()->Quest()->ShowQuestList(pPlayer, QUESTFINISHED);
 		AddBack(ClientID);
 	}
-	else 
-	{
-		Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList);
-	}
+	
+	Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList);
 }
 
 // Созданно для апдейта меню если именно оно находится в открытых
