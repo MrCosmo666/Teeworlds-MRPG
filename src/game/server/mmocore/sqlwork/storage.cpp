@@ -192,7 +192,7 @@ bool StorageSql::BuyStorageItem(bool CheckStorageCount, int BoughtCID, int Stora
 void StorageSql::AddStorage(int StorageID, int Count)
 {
 	// ищим есть ли такой склад
-	ResultSet* RES = SJK.SD("Count", "tw_storages", "WHERE ID = '%d'", StorageID);
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("Count", "tw_storages", "WHERE ID = '%d'", StorageID));
 	if(RES->next()) return;
 	
 	// добавляем на склад товары

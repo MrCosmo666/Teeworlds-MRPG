@@ -1765,7 +1765,7 @@ int net_socket_read_wait(NETSOCKET sock, int time)
 	}
 
 	/* don't care about writefds and exceptfds */
-	select(sockid+1, &readfds, NULL, NULL, &tv);
+	select(sockid+1, &readfds, NULL, NULL, &tv);	
 
 	if(sock.ipv4sock >= 0 && FD_ISSET(sock.ipv4sock, &readfds))
 		return 1;
@@ -2128,7 +2128,7 @@ const char *str_skip_to_whitespace_const(const char *str)
 int string_to_number(const char* pmgs, int minimal, int maximal)
 {
 	int Number = minimal;
-	if (pmgs[0] != '\0' && isdigit(pmgs))
+	if (pmgs[0] != '\0')
 	{
 		Number = atoi(pmgs);
 		if (Number < minimal)

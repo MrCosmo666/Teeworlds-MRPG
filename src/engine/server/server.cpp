@@ -385,6 +385,8 @@ void CServer::ChangeWorld(int ClientID, int MapID)
 	m_aClients[ClientID].m_ChangeMap = true;
 	m_aClients[ClientID].m_MapChunk = 0;
 	m_aClients[ClientID].m_State = CClient::STATE_CONNECTING;
+
+	m_aClients[ClientID].m_Snapshots.PurgeAll();
 	SendMap(ClientID);
 }
 
@@ -1338,6 +1340,9 @@ bool CServer::LoadMap(const char *pMapName, int ID)
 	IEngineMap *pMap = m_pLoadedMap[ID];
 	if(!pMap->Load(aBuf))
 		return 0;
+
+	// reinit snapshot ids
+	m_IDPool.TimeoutIDs();
 
 	// get the sha256 and crc of the map
 	char aSha256[SHA256_MAXSTRSIZE];
