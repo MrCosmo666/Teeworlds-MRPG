@@ -254,7 +254,35 @@ void ShopMailSql::CheckAuctionTime()
 	return;
 }
 
-// Парсинг голосований магазина аукциона
+bool ShopMailSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
+{
+	int ClientID = pPlayer->GetCID();
+
+	if (Menulist == AUCTIONSETSLOT)
+	{
+		pPlayer->m_LastVoteMenu = INVENTORY;
+		ShopMailSql::AuctionItem& AuSellItem = CGS::InteractiveSub[ClientID].SelectedAuctionItem;
+		ItemSql::ItemPlayer& PlSellItem = pPlayer->GetItem(AuSellItem.a_itemid);
+
+		const int ItemID = AuSellItem.a_itemid;
+		int SlotCount = AuSellItem.a_count;
+		int SlotPrice = AuSellItem.a_price;
+		int MinimalPrice = SlotCount * PlSellItem.Info().MinimalPrice;
+
+		GS()->AVH(ClientID, HAUCTIONSLOTINFO, vec3(35, 80, 40), "Information Auction Slot");
+		GS()->AVM(ClientID, "null", NOPE, HAUCTIONSLOTINFO, "The reason for write the number for each row");
+		pPlayer->m_Colored = { 15,15,15 };
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "Item x{INT} Minimal Price: {INT}gold", &SlotCount, &MinimalPrice);
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "Auction Slot Price: {INT}gold", &g_Config.m_SvAuctionPriceSlot);
+		GS()->AVM(ClientID, "AUCTIONCOUNT", ItemID, NOPE, "Item Count: {INT}", &SlotCount);
+		GS()->AVM(ClientID, "AUCTIONPRICE", ItemID, NOPE, "Item Price: {INT}", &SlotPrice);
+		GS()->AVM(ClientID, "AUCTIONACCEPT", ItemID, NOPE, "Add {STR}x{INT} {INT}gold", PlSellItem.Info().GetName(pPlayer), &SlotCount, &SlotPrice);
+		GS()->AddBack(ClientID);
+		return true;
+	}
+	return false;
+}
+
 bool ShopMailSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	const int ClientID = pPlayer->GetCID();

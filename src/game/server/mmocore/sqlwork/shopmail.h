@@ -16,6 +16,7 @@ class ShopMailSql : public CMmoComponent
 		int a_price;
 		int a_enchant;
 	};
+
 	struct ShopPersonal
 	{
 		int StorageID;
@@ -38,6 +39,7 @@ public:
 	void CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem);
 	void CheckAuctionTime();
 	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
+	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist);
 };
 
 #endif

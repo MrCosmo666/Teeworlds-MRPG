@@ -1954,27 +1954,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		AddBack(ClientID);
 	}
-	else if(MenuList == AUCTIONSETSLOT) 
-	{
-		pPlayer->m_LastVoteMenu = INVENTORY;
-		ShopMailSql::AuctionItem &AuSellItem = InteractiveSub[ClientID].SelectedAuctionItem;
-		ItemSql::ItemPlayer &PlSellItem = pPlayer->GetItem(AuSellItem.a_itemid);
-
-		const int ItemID = AuSellItem.a_itemid;
-		int SlotCount = AuSellItem.a_count;
-		int SlotPrice =  AuSellItem.a_price;
-		int MinimalPrice = SlotCount*PlSellItem.Info().MinimalPrice;
-
-		AVH(ClientID, HAUCTIONSLOTINFO, vec3(35,80,40), "Information Auction Slot");
-		AVM(ClientID, "null", NOPE, HAUCTIONSLOTINFO, "The reason for write the number for each row");	
-		pPlayer->m_Colored = {15,15,15};
-		AVM(ClientID, "null", NOPE, NOPE, "Item x{INT} Minimal Price: {INT}gold", &SlotCount, &MinimalPrice);
-		AVM(ClientID, "null", NOPE, NOPE, "Auction Slot Price: {INT}gold", &g_Config.m_SvAuctionPriceSlot);
-		AVM(ClientID, "AUCTIONCOUNT", ItemID, NOPE, "Item Count: {INT}", &SlotCount);
-		AVM(ClientID, "AUCTIONPRICE", ItemID, NOPE, "Item Price: {INT}", &SlotPrice);
-		AVM(ClientID, "AUCTIONACCEPT", ItemID, NOPE, "Add {STR}x{INT} {INT}gold", PlSellItem.Info().GetName(pPlayer), &SlotCount, &SlotPrice);
-		AddBack(ClientID);
-	}
 	else if(MenuList == INBOXLIST) 
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;
