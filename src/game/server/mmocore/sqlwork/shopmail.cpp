@@ -125,11 +125,11 @@ void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 void ShopMailSql::CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem)
 {
 	int ItemID = AuSellItem.a_itemid;
+	int ClientID = pPlayer->GetCID();
 	ItemSql::ItemPlayer &PlSellItem = pPlayer->GetItem(ItemID);
 
 	// проверяем кол-во слотов занято ли все или нет
-	int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_mailshop", "LIMIT %d", g_Config.m_SvMaxMasiveAuctionSlots));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_mailshop", "WHERE OwnerID > '0' LIMIT %d", g_Config.m_SvMaxMasiveAuctionSlots));
 	if(RES->rowsCount() >= g_Config.m_SvMaxMasiveAuctionSlots)
 		return GS()->Chat(ClientID, "Auction has run out of slots, wait for the release of slots!");
 
@@ -140,7 +140,7 @@ void ShopMailSql::CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem)
 		return GS()->Chat(ClientID, "You use all open the slots in your auction!");
 
 	// проверяем есть ли такой предмет в аукционе
-	boost::scoped_ptr<ResultSet> RES3(SJK.SD("OwnerID", "tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
+	boost::scoped_ptr<ResultSet> RES3(SJK.SD("ID", "tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
 	if(RES3->next()) return GS()->Chat(ClientID, "Your same item found in the database, need reopen the slot!");
 
 	// если снялись деньги за оплату аукцион слота
@@ -150,14 +150,16 @@ void ShopMailSql::CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem)
 	// забираем предмет и добавляем слот
 	if(PlSellItem.Count >= AuSellItem.a_count && PlSellItem.Remove(AuSellItem.a_count))
 	{
-		SJK.ID("tw_mailshop", "(ItemID, Price, Count, OwnerID, Enchant) VALUES ('%d', '%d', '1', '%d', '%d', '%d')", 
-			ItemID, AuSellItem.a_price, AuSellItem.a_count, pPlayer->Acc().AuthID, PlSellItem.Enchant);
+		SJK.ID("tw_mailshop", "(ItemID, Price, Count, OwnerID, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d')", 
+			ItemID, AuSellItem.a_price, AuSellItem.a_count, pPlayer->Acc().AuthID, AuSellItem.a_enchant);
 
 		int AvailableSlot = (g_Config.m_SvMaxAuctionSlots - CountSlot)-1;
-		GS()->Chat(-1, "{STR} created a slot [{STR}x{INT}] on auction.", 
+		GS()->Chat(-1, "{STR} created a slot [{STR}x{INT}] auction.", 
 			GS()->Server()->ClientName(ClientID), PlSellItem.Info().GetName(pPlayer), &AuSellItem.a_count);
 		GS()->ChatFollow(ClientID, "Still available {INT} slots!", &AvailableSlot);
-	}	
+	}
+
+	GS()->ClearInteractiveSub(ClientID);
 	return;
 }
 
@@ -261,12 +263,12 @@ bool ShopMailSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
 	if (Menulist == AUCTIONSETSLOT)
 	{
 		pPlayer->m_LastVoteMenu = INVENTORY;
-		ShopMailSql::AuctionItem& AuSellItem = CGS::InteractiveSub[ClientID].SelectedAuctionItem;
-		ItemSql::ItemPlayer& PlSellItem = pPlayer->GetItem(AuSellItem.a_itemid);
+		ItemSql::ItemPlayer& PlSellItem = pPlayer->GetItem(CGS::InteractiveSub[ClientID].AuctionItem.a_itemid);
 
-		const int ItemID = AuSellItem.a_itemid;
-		int SlotCount = AuSellItem.a_count;
-		int SlotPrice = AuSellItem.a_price;
+		const int ItemID = CGS::InteractiveSub[ClientID].AuctionItem.a_itemid;
+		int SlotCount = CGS::InteractiveSub[ClientID].AuctionItem.a_count;
+		int SlotPrice = CGS::InteractiveSub[ClientID].AuctionItem.a_price;
+		int SlotEnchant = CGS::InteractiveSub[ClientID].AuctionItem.a_enchant;
 		int MinimalPrice = SlotCount * PlSellItem.Info().MinimalPrice;
 
 		GS()->AVH(ClientID, HAUCTIONSLOTINFO, vec3(35, 80, 40), "Information Auction Slot");
@@ -274,6 +276,10 @@ bool ShopMailSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
 		pPlayer->m_Colored = { 15,15,15 };
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "Item x{INT} Minimal Price: {INT}gold", &SlotCount, &MinimalPrice);
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "Auction Slot Price: {INT}gold", &g_Config.m_SvAuctionPriceSlot);
+		if (SlotEnchant > 0)
+		{
+			GS()->AVM(ClientID, "null", NOPE, NOPE, "Warning selling enchanted: +{INT}", &SlotEnchant);
+		}
 		GS()->AVM(ClientID, "AUCTIONCOUNT", ItemID, NOPE, "Item Count: {INT}", &SlotCount);
 		GS()->AVM(ClientID, "AUCTIONPRICE", ItemID, NOPE, "Item Price: {INT}", &SlotPrice);
 		GS()->AVM(ClientID, "AUCTIONACCEPT", ItemID, NOPE, "Add {STR}x{INT} {INT}gold", PlSellItem.Info().GetName(pPlayer), &SlotCount, &SlotPrice);
@@ -292,16 +298,15 @@ bool ShopMailSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int
 	{
 		if(BuyShopAuctionSlot(pPlayer, VoteID))	
 			GS()->ResetVotes(ClientID, MAINMENU);
+
 		return true;
 	} 
 
 	// аукцион установить кол-во
 	if(PPSTR(CMD, "AUCTIONCOUNT") == 0)
 	{
-		ItemSql::ItemPlayer &PlSellItem = pPlayer->GetItem(VoteID);
-		AuctionItem &AuSellItem = CGS::InteractiveSub[ClientID].SelectedAuctionItem;
-
 		// если предметов меньше установленно ставим кол-во что есть
+		ItemSql::ItemPlayer &PlSellItem = pPlayer->GetItem(VoteID);
 		if(Get > PlSellItem.Count)
 			Get = PlSellItem.Count;
 
@@ -311,11 +316,11 @@ bool ShopMailSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int
 
 		// если сбрасываем цену если не хватает
 		const int c_minimalprice = Get*PlSellItem.Info().MinimalPrice;
-		if(AuSellItem.a_price < c_minimalprice)
-			AuSellItem.a_price = c_minimalprice;
+		if(CGS::InteractiveSub[ClientID].AuctionItem.a_price < c_minimalprice)
+			CGS::InteractiveSub[ClientID].AuctionItem.a_price = c_minimalprice;
 			
 		// устанавливаем кол-во предметов
-		AuSellItem.a_count = Get;
+		CGS::InteractiveSub[ClientID].AuctionItem.a_count = Get;
 		GS()->VResetVotes(ClientID, AUCTIONSETSLOT);
 		return true;
 	}
@@ -324,12 +329,11 @@ bool ShopMailSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int
 	if(PPSTR(CMD, "AUCTIONPRICE") == 0)
 	{
 		ItemSql::ItemPlayer &PlSellItem = pPlayer->GetItem(VoteID);
-		AuctionItem &AuSellItem = CGS::InteractiveSub[ClientID].SelectedAuctionItem;
+		const int c_minimalprice = PlSellItem.Info().MinimalPrice * CGS::InteractiveSub[ClientID].AuctionItem.a_count;
+		if(Get < c_minimalprice) 
+			Get = c_minimalprice;
 
-		const int c_minimalprice = PlSellItem.Info().MinimalPrice*AuSellItem.a_count;
-		if(Get < c_minimalprice) Get = c_minimalprice;
-
-		AuSellItem.a_price = Get;
+		CGS::InteractiveSub[ClientID].AuctionItem.a_price = Get;
 		GS()->VResetVotes(ClientID, AUCTIONSETSLOT);		
 		return true;
 	}
@@ -337,7 +341,8 @@ bool ShopMailSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int
 	// аукцион установить предмет слот
 	if(PPSTR(CMD, "AUCTIONSLOT") == 0)
 	{
-		CGS::InteractiveSub[ClientID].SelectedAuctionItem.a_itemid = VoteID;
+		CGS::InteractiveSub[ClientID].AuctionItem.a_itemid = VoteID;
+		CGS::InteractiveSub[ClientID].AuctionItem.a_enchant = pPlayer->GetItem(VoteID).Enchant;
 		GS()->ResetVotes(ClientID, AUCTIONSETSLOT);
 		return true;
 	}
@@ -346,16 +351,11 @@ bool ShopMailSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int
 	if(PPSTR(CMD, "AUCTIONACCEPT") == 0)
 	{
 		ItemSql::ItemPlayer &SellItem = pPlayer->GetItem(VoteID);
-		AuctionItem &AuSellItem = CGS::InteractiveSub[ClientID].SelectedAuctionItem;
-	
-		if(SellItem.Count >= AuSellItem.a_count && AuSellItem.a_price >= 10)
+		if(SellItem.Count >= CGS::InteractiveSub[ClientID].AuctionItem.a_count && CGS::InteractiveSub[ClientID].AuctionItem.a_price >= 10)
 		{
 			// создаем слот
-			CreateAuctionSlot(pPlayer, CGS::InteractiveSub[ClientID].SelectedAuctionItem);
+			CreateAuctionSlot(pPlayer, CGS::InteractiveSub[ClientID].AuctionItem);
 			GS()->ResetVotes(ClientID, INVENTORY);
-
-			// очищаем данные для создания
-			GS()->ClearInteractiveSub(ClientID);
 			return true;
 		}
 

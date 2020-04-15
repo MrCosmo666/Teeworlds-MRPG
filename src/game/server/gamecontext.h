@@ -101,7 +101,7 @@ public:
 
 		// остальное все
 		ContextBots::QuestBotInfo QBI;
-		ShopMailSql::AuctionItem SelectedAuctionItem;
+		ShopMailSql::AuctionItem AuctionItem;
 
 		char RankName[32];
 		char GuildName[32];

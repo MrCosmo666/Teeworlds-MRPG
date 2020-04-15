@@ -2252,10 +2252,8 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	}
 	else 
 	{
-		ResetVotes(ClientID, MAINMENU);
+		Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList);
 	}
-
-	Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList);
 }
 
 // Созданно для апдейта меню если именно оно находится в открытых
