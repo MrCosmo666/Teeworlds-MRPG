@@ -31,14 +31,6 @@ class CGameControllerDungeon : public IGameController
 public:
 	CGameControllerDungeon(class CGS* pGameServer);
 
-	int PlayersNum() const;
-	int LeftMobsToWin() const;
-
-	void ChangeState(int State);
-	void StateTick();
-	void SetMobsSpawn(bool AllowedSpawn);
-	void KillAllPlayers();
-
 	virtual void Tick();
 	virtual bool OnEntity(int Index, vec2 Pos);
 	virtual int OnCharacterDeath(class CCharacter* pVictim, class CPlayer* pKiller, int Weapon);
@@ -48,6 +40,17 @@ public:
 	
 	// пустые функции с mod
 	virtual void RespawnedClickEvent() {};
+
+private:
+	int PlayersNum() const;
+	int LeftMobsToWin() const;
+
+	void ChangeState(int State);
+	void StateTick();
+	void SetMobsSpawn(bool AllowedSpawn);
+	void KillAllPlayers();
+
+	const char* DungeonStateName();
 };
 
 // CHomeDoor class

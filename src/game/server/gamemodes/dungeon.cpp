@@ -84,7 +84,13 @@ void CGameControllerDungeon::ChangeState(int State)
 void CGameControllerDungeon::StateTick()
 {
 	int Players = PlayersNum();
-	CGS::Dungeon[m_DungeonID].Players = Players;
+
+	// обновлять информацию каждую секунду
+	if (Server()->Tick() % Server()->TickSpeed() == 0)
+	{
+		CGS::Dungeon[m_DungeonID].Players = Players;
+		str_copy(CGS::Dungeon[m_DungeonID].State, DungeonStateName(), sizeof(CGS::Dungeon[m_DungeonID].State));
+	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
 	// Используется в тике когда Ожидание данжа
@@ -261,6 +267,13 @@ bool CGameControllerDungeon::OnEntity(int Index, vec2 Pos)
 		return true;
 	}
 	return false;
+}
+
+const char* CGameControllerDungeon::DungeonStateName()
+{
+	if(m_StateDungeon == DungeonState::DUNGEON_WAITING)
+		return "Waiting players";
+	return "Active dungeon";
 }
 
 // Двери

@@ -2020,7 +2020,9 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVH(ClientID, HDUNGEONSINFO, vec3(35, 80, 40), "Dungeons Information");
 		AVM(ClientID, "null", NOPE, HDUNGEONSINFO, "Add: Select your item in list. Select (Add to house),");
 
-
+		AV(ClientID, "null", "");
+		Mmo()->ShowDungeonsList(pPlayer);
+		AddBack(ClientID);
 	}
 	else if(MenuList == SETTINGS) 
 	{

@@ -120,6 +120,7 @@ public:
 
 		int Players;
 		int Progress;
+		char State[32];
 	};
 	typedef std::map < int , StructDungeon > DungeonType;
 	static DungeonType Dungeon;	

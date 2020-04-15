@@ -320,6 +320,33 @@ void SqlController::ShowLoadingProgress(const char *Loading, int LoadCount)
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "LOAD DB", aLoadingBuf);
 }
 
+void SqlController::ShowDungeonsList(CPlayer* pPlayer)
+{
+	int ClientID = pPlayer->GetCID();
+	for (const auto& dungeon : CGS::Dungeon)
+	{
+		int HideID = 7500 + dungeon.first;
+
+		GS()->AVH(ClientID, HideID, vec3(52, 26, 80), "{STR} : Players {INT} : {STR}", dungeon.second.Name, dungeon.second.Players, dungeon.second.State);
+
+
+
+		/*GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Level: {INT} Experience: {INT}/{INT}", &Member[MemberID].mLevel, &Member[MemberID].mExperience, &ExpNeed);
+		GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Maximal available player count: {INT}", &Member[MemberID].mUpgrades[EMEMBERUPGRADE::AvailableNSTSlots]);
+		GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Leader: {STR}", Job()->PlayerName(Member[MemberID].mOwnerID));
+		GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "- - - - - - - - - -");
+		GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "/ginvite <id> - to invite a player into members (for leader)");
+		GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "/gexit - leave of guild group (for all members)");
+		GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Many options are unlocked with the purchase of a home");
+		GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "- - - - - - - - - -");
+		GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Guild Bank: {INT}gold", &Member[MemberID].mBank);
+		int MemberHouse = GetMemberHouseID(MemberID);
+		if (MemberHouse > 0) { GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Door Status: {STR}", GetMemberDoor(MemberID) ? "Closed" : "Opened"); }
+		GS()->AV(ClientID, "null", "");*/
+
+	}
+}
+
 void SqlController::ShowTopList(CPlayer* pPlayer, int TypeID)
 {
 	int ClientID = pPlayer->GetCID();
