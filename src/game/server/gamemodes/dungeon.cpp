@@ -48,7 +48,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Ожидание данжа
 	else if (State == DUNGEON_WAITING_START)
 	{
-		m_StartingTick = Server()->TickSpeed() * 60;
+		m_StartingTick = Server()->TickSpeed() * 20;
 		SetMobsSpawn(false);
 	}
 
@@ -56,8 +56,9 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Начало данжа
 	else if (State == DUNGEON_STARTED)
 	{
-		m_MaximumTick = Server()->TickSpeed() * 600;
-		m_SafeTick = Server()->TickSpeed() * 30;
+		KillAllPlayers();
+		m_MaximumTick = Server()->TickSpeed() * 20;
+		m_SafeTick = Server()->TickSpeed() * 10;
 		GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "The security timer is enabled for 30 seconds!");
 		GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "You are given 10 minutes to complete of dungeon!");
 		GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 500, "Dungeon started!");
@@ -77,7 +78,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Завершение данжа
 	else if (State == DUNGEON_FINISHED)
 	{
-		ChangeState(DUNGEON_WAITING);
+		KillAllPlayers();
 	}
 
 	// установить статус дверям
@@ -124,10 +125,7 @@ void CGameControllerDungeon::StateTick()
 
 			m_StartingTick--;
 			if (!m_StartingTick)
-			{
-				KillAllPlayers();
 				ChangeState(DUNGEON_STARTED);
-			}
 		}
 	}
 
@@ -160,10 +158,7 @@ void CGameControllerDungeon::StateTick()
 			m_FinishedTick--;
 		}
 		if (!m_FinishedTick)
-		{
-			KillAllPlayers();
 			ChangeState(DUNGEON_FINISHED);
-		}
 	}
 }
 
@@ -179,7 +174,6 @@ int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKill
 		CGS::Dungeon[m_DungeonID].Progress = Progress;
 		GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "The dungeon is completed on [{INT}%]", &Progress);
 	}
-
 	return 0;
 }
 
@@ -237,20 +231,19 @@ void CGameControllerDungeon::SetMobsSpawn(bool AllowedSpawn)
 		{
 			BotPlayer->SetDungeonAllowedSpawn(AllowedSpawn);
 			if (!AllowedSpawn && BotPlayer->GetCharacter())
-				BotPlayer->GetCharacter()->Die(-1, -1);
+				BotPlayer->GetCharacter()->Die(i, WEAPON_SELF);
 		}
 	}
 }
 
 void CGameControllerDungeon::Tick()
 {
+	// тик максимально местонахождения там
 	if (m_MaximumTick)
 	{
 		m_MaximumTick--;
 		if (!m_MaximumTick)
-		{
-			KillAllPlayers();
-		}
+			ChangeState(DUNGEON_FINISHED);
 	}
 
 	StateTick();
@@ -328,11 +321,6 @@ void DungeonDoor::Tick()
 			}		
 		}
 	}
-}
-
-void DungeonDoor::SetState(int State)
-{
-	m_State = State;
 }
 
 void DungeonDoor::Snap(int SnappingClient)

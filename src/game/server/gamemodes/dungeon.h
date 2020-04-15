@@ -61,7 +61,7 @@ class DungeonDoor : public CEntity
 public:
 	DungeonDoor(CGameWorld *pGameWorld, vec2 Pos);
 
-	void SetState(int State);
+	void SetState(int State) { m_State = State; };
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);
 };
