@@ -34,6 +34,7 @@ public:
 
 	virtual void Tick();
 	virtual bool OnEntity(int Index, vec2 Pos);
+	virtual int OnCharacterDeath(class CCharacter* pVictim, class CPlayer* pKiller, int Weapon);
 
 	virtual void CreateLogic(int Type, int Mode, vec2 Pos, int ParseID);
 	

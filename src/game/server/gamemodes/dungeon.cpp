@@ -9,14 +9,15 @@
 #include "../logicworld/logicwall.h"
 #include "../entities/jobitems.h"
 
-CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController(pGS), 
-m_DungeonDoor(new DungeonDoor(&GS()->m_World, vec2(CGS::Dungeon[m_DungeonID].DoorX, CGS::Dungeon[m_DungeonID].DoorY)))
+CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController(pGS)
 {
 	m_pGameType = "MmoTee";
-	ChangeState(DUNGEON_WAITING);
 
 	// создание двери
 	m_DungeonID = GS()->DungeonID();
+	vec2 PosDoor = vec2(CGS::Dungeon[m_DungeonID].DoorX, CGS::Dungeon[m_DungeonID].DoorY);
+	m_DungeonDoor = new DungeonDoor(&GS()->m_World, PosDoor);
+	ChangeState(DUNGEON_WAITING);
 }
 
 bool CGameControllerDungeon::CheckFinishedDungeon()
@@ -151,6 +152,20 @@ bool CGameControllerDungeon::OnEntity(int Index, vec2 Pos)
 	return false;
 }
 
+int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKiller, int Weapon)
+{
+	if (!pKiller || !pVictim || !pVictim->GetPlayer())
+		return 0;
+
+	int KillerID = pKiller->GetCID();
+	if (pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetSpawnBot() == SPAWNMOBS)
+	{
+		int Progress = ProgressIt();
+		GS()->Chat(KillerID, "Now progress dungeon {INT}/100%", &Progress);
+	}
+	return 0;
+}
+
 // Кол-во игроков что играет в данже
 int CGameControllerDungeon::PlayIt() const
 {
@@ -195,12 +210,14 @@ void CGameControllerDungeon::AllowMobsSpawn()
 	}
 }
 
+
 // Двери
 DungeonDoor::DungeonDoor(CGameWorld *pGameWorld, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DUNGEONDOOR, Pos)
 {
 	m_To = vec2(Pos.x, Pos.y-140);
 	m_Pos.y += 30;
+
 	m_State = DUNGEON_WAITING;
 
 	GameWorld()->InsertEntity(this);
