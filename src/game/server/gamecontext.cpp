@@ -1092,23 +1092,19 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		}
 		else if(MsgID == NETMSGTYPE_CL_CALLVOTE)
 		{
-			int64 Now = Server()->Tick();
 			CNetMsg_Cl_CallVote *pMsg = (CNetMsg_Cl_CallVote *)pRawMsg;
-
-			int Get = string_to_number(pMsg->m_Reason, 1, 10000000);
-			if (pMsg->m_Force || Now < (pPlayer->m_PlayerTick[TickState::LastVoteTry] + Server()->TickSpeed()) / 2)
+			if (str_comp_nocase(pMsg->m_Type, "option") != 0 || pMsg->m_Force
+				|| Server()->Tick() < (pPlayer->m_PlayerTick[TickState::LastVoteTry] + Server()->TickSpeed()) / 2)
 				return;
-
-			if(str_comp_nocase(pMsg->m_Type, "option") == 0)
+			
+			int InteractiveCount = string_to_number(pMsg->m_Reason, 1, 10000000);
+			for(const auto& ivote : m_PlayerVotes[ClientID])
 			{
-				for(const auto& ivote : m_PlayerVotes[ClientID])
+				if (str_comp_nocase(pMsg->m_Value, ivote.m_aDescription) == 0 
+					&& ParseVote(ClientID, ivote.m_aCommand, ivote.m_TempID, ivote.m_TempID2, InteractiveCount, pMsg->m_Reason))
 				{
-					if (str_comp_nocase(pMsg->m_Value, ivote.m_aDescription) == 0 
-						&& ParseVote(ClientID, ivote.m_aCommand, ivote.m_TempID, ivote.m_TempID2, Get, pMsg->m_Reason))
-					{
-						pPlayer->m_PlayerTick[TickState::LastVoteTry] = Now;
-						return;
-					}
+					pPlayer->m_PlayerTick[TickState::LastVoteTry] = Server()->Tick();
+					return;
 				}
 			}
 		}
