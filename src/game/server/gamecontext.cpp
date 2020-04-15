@@ -1095,38 +1095,21 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			int64 Now = Server()->Tick();
 			CNetMsg_Cl_CallVote *pMsg = (CNetMsg_Cl_CallVote *)pRawMsg;
 
-			int m_ID, m_ID2;
-			char aCmd[VOTE_CMD_LENGTH];
+			int Get = string_to_number(pMsg->m_Reason, 1, 10000000);
+			if (pMsg->m_Force || Now < pPlayer->m_PlayerTick[TickState::LastVoteTry] + Server()->TickSpeed() / 2)
+				return;
+
 			if(str_comp_nocase(pMsg->m_Type, "option") == 0)
 			{
 				for(const auto& ivote : m_PlayerVotes[ClientID])
 				{
-					if(str_comp_nocase(pMsg->m_Value, ivote.m_aDescription) == 0)
+					if (str_comp_nocase(pMsg->m_Value, ivote.m_aDescription) == 0 
+						&& ParseVote(ClientID, ivote.m_aCommand, ivote.m_TempID, ivote.m_TempID2, Get, pMsg->m_Reason))
 					{
-						m_ID = ivote.m_TempID; 
-						m_ID2 = ivote.m_TempID2;
-						str_format(aCmd, sizeof(aCmd), "%s", ivote.m_aCommand);
+						pPlayer->m_PlayerTick[TickState::LastVoteTry] = Now;
+						return;
 					}
 				}
-			}
-
-			int Get = 1;
-			if (pMsg->m_Reason[0] != '\0' && isdigit(pMsg->m_Reason[0]))
-				Get = magicnumber(pMsg->m_Reason, 10000000);
-			
-			if(Get < 1)
-			{
-				Chat(ClientID, "See vote. Minimal 1. Maximal 10.000.000.");
-				Get = 1;
-			}
-
-			if(pMsg->m_Force || Now < pPlayer->m_PlayerTick[TickState::LastVoteTry]+Server()->TickSpeed()/2)
-				return;
-
-			if(ParseVote(ClientID, aCmd, m_ID, m_ID2, Get, pMsg->m_Reason))
-			{
-				pPlayer->m_PlayerTick[TickState::LastVoteTry] = Now;
-				return;
 			}
 		}
 		else if(MsgID == NETMSGTYPE_CL_VOTE)

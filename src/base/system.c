@@ -2125,13 +2125,16 @@ const char *str_skip_to_whitespace_const(const char *str)
 	return str;
 }
 
-int magicnumber(const char* pmgs, int maximal)
+int string_to_number(const char* pmgs, int minimal, int maximal)
 {
-	int Number = 0;
-	Number = atoi(pmgs);
-	if (Number < 1 || Number > maximal)
+	int Number = minimal;
+	if (pmgs[0] != '\0' && isdigit(pmgs))
 	{
-		Number = 0;
+		Number = atoi(pmgs);
+		if (Number < minimal)
+			Number = minimal;
+		if(Number > maximal)
+			Number = maximal;
 	}
 	return Number;
 }

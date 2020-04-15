@@ -978,10 +978,10 @@ const char *str_skip_to_whitespace_const(const char *str);
 char *str_skip_whitespaces(char *str);
 
 /*
-	Function: magicnumber
+	Function: stringtonumber
 		Atoi const char to int used limit maximal.
 */
-int magicnumber(const char* pmgs, int maximal);
+int string_to_number(const char* pmgs, int minimal, int maximal);
 
 /*
 	Function: str_comp_nocase
