@@ -12,9 +12,9 @@
 CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController(pGS)
 {
 	m_pGameType = "MmoTee";
+	m_DungeonID = GS()->DungeonID();
 
 	// создание двери
-	m_DungeonID = GS()->DungeonID();
 	vec2 PosDoor = vec2(CGS::Dungeon[m_DungeonID].DoorX, CGS::Dungeon[m_DungeonID].DoorY);
 	m_DungeonDoor = new DungeonDoor(&GS()->m_World, PosDoor);
 	ChangeState(DUNGEON_WAITING);
@@ -52,6 +52,8 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Начало данжа
 	else if (State == DUNGEON_STARTED)
 	{
+		GS()->Chat(-1, "The security timer is enabled for 30 seconds!");
+		m_SafeTick = Server()->TickSpeed() * 30;
 		GS()->SBL(-1, 99999, 500, "Dungeon started!");
 		SetMobsSpawn(true);
 	}
@@ -60,6 +62,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Ожидание данжа
 	else if (State == DUNGEON_WAITING_FINISH)
 	{
+		m_SafeTick = 0;
 		m_FinishedTick = Server()->TickSpeed() * 10;
 		SetMobsSpawn(false);
 	}
@@ -125,6 +128,14 @@ void CGameControllerDungeon::StateTick()
 			}
 		}
 
+		// тик безопасности в течении какого времени игрок не вернется в старый мир
+		if (m_SafeTick)
+		{
+			m_SafeTick--;
+			if (!m_SafeTick)
+				GS()->Chat(-1, "The security timer is over, be careful!");
+		}
+
 		// завершаем данж когда успешно данж завершен
 		if (LeftMobsToWin() <= 0)
 			ChangeState(DUNGEON_WAITING_FINISH);
@@ -169,14 +180,18 @@ int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKill
 		GS()->Chat(KillerID, "Left defeat mobs to complete the dungeon {INT}", &Progress);
 	}
 
-	if (!pVictim->GetPlayer()->IsBot() && m_StateDungeon >= DUNGEON_STARTED)
-	{
-		GS()->Server()->ChangeWorld(VictimID, pVictim->GetPlayer()->m_LastWorldID);
-		GS()->Chat(KillerID, "You were thrown out of dungeon!");
-		return 0;
-	}
-
 	return 0;
+}
+
+void CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
+{
+	IGameController::OnCharacterSpawn(pChr);
+	if (pChr && pChr->GetPlayer() && m_StateDungeon >= DUNGEON_STARTED && !m_SafeTick)
+	{
+		int ClientID = pChr->GetPlayer()->GetCID();
+		GS()->Server()->ChangeWorld(ClientID, pChr->GetPlayer()->m_LastWorldID);
+		GS()->Chat(ClientID, "You were thrown out of dungeon!");
+	}
 }
 
 // Кол-во игроков что играет в данже
