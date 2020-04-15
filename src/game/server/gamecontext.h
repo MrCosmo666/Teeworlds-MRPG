@@ -175,6 +175,7 @@ public:
 	void ChatDiscord(bool Icon, const char *Color, const char *Title, const char* pText, ...);
 	void ChatDiscordChannel(bool Icon, const char *pChanel, const char *Color, const char *Title, const char* pText, ...);
 	void ChatGuild(int GuildID, const char* pText, ...);
+	void ChatDungeon(int DungID, const char* pText, ...);
 	void Motd(int ClientID, const char* Text, ...);
 
 	/* #########################################################################
@@ -199,6 +200,7 @@ public:
 	void AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSpan);
 	void SendBroadcast(const char *pText, int ClientID, int Priority, int LifeSpan);
 	void SBL(int ClientID, int Priority, int LifeSpan, const char *pText, ...);
+	void BroadcastDungeon(int DungID, int Priority, int LifeSpan, const char *pText, ...);
 	void BroadcastTick(int ClientID);
 
 	/* #########################################################################

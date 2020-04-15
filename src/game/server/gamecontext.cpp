@@ -485,6 +485,38 @@ void CGS::ChatGuild(int GuildID, const char* pText, ...)
 	va_end(VarArgs);
 }
 
+// Отправить в данже сообщение
+void CGS::ChatDungeon(int DungID, const char* pText, ...)
+{
+	if (DungID <= 0)
+		return;
+
+	CNetMsg_Sv_Chat Msg;
+	Msg.m_Mode = CHAT_ALL;
+	Msg.m_ClientID = -1;
+
+	va_list VarArgs;
+	va_start(VarArgs, pText);
+
+	dynamic_string Buffer;
+	for (int i = 0; i < MAX_PLAYERS; i++)
+	{
+		CPlayer* pPlayer = GetPlayer(i, true);
+		if (pPlayer && DungeonID() == DungID)
+		{
+			Buffer.append("[Dungeon]");
+			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
+
+			Msg.m_TargetID = i;
+			Msg.m_pMessage = Buffer.buffer();
+
+			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, i);
+			Buffer.clear();
+		}
+	}
+	va_end(VarArgs);
+}
+
 // Отправить дискорд сообщение
 void CGS::ChatDiscord(bool Icon, const char *Color, const char *Title, const char* pText, ...)
 {
@@ -594,6 +626,25 @@ void CGS::SBL(int ClientID, int Priority, int LifeSpan, const char *pText, ...)
 	for(int i = Start; i < End; i++)
 	{
 		if(m_apPlayers[i])
+		{
+			dynamic_string Buffer;
+			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
+			
+			AddBroadcast(i, Buffer.buffer(), Priority, LifeSpan);
+			Buffer.clear();
+		}
+	}
+	va_end(VarArgs);	
+}
+
+// Форматированный броадкаст в данже
+void CGS::BroadcastDungeon(int DungID, int Priority, int LifeSpan, const char *pText, ...)
+{
+	va_list VarArgs;
+	va_start(VarArgs, pText);
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if(m_apPlayers[i] && DungeonID() == DungID)
 		{
 			dynamic_string Buffer;
 			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
