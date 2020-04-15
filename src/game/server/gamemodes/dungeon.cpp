@@ -115,7 +115,9 @@ void CGameControllerDungeon::StateTick()
 	// Используется в тике когда Отчет начала данжа
 	else if (m_StateDungeon == DUNGEON_WAITING_START)
 	{
-		if (m_StartingTick)
+		if (Players < 2)
+			ChangeState(DUNGEON_WAITING);
+		else if (m_StartingTick)
 		{
 			int Time = m_StartingTick / Server()->TickSpeed();
 			GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 500, "Dungeon waiting {INT} sec!", &Time);
