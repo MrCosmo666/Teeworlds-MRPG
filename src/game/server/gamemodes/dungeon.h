@@ -25,13 +25,13 @@ class CGameControllerDungeon : public IGameController
 public:
 	CGameControllerDungeon(class CGS* pGameServer);
 
-	int PlayIt() const;
+	int PlayersNum() const;
 	int LeftMobsToWin() const;
 	bool IsFinishedDungeon() const;
 
 	void ChangeState(int State);
 	void StateTick();
-	void AllowMobsSpawn();
+	void SetMobsSpawn(bool AllowedSpawn);
 
 
 	virtual void Tick();

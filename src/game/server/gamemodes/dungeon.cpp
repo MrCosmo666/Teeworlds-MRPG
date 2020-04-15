@@ -32,12 +32,12 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Ожидание данжа
 	if (State == DUNGEON_WAITING)
 	{
-
+		SetMobsSpawn(false);
 	}
 	// Используется при смене статуса в Начало данжа
 	else if (State == DUNGEON_STARTED)
 	{
-		AllowMobsSpawn();
+		SetMobsSpawn(true);
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter())
@@ -57,7 +57,7 @@ void CGameControllerDungeon::ChangeState(int State)
 
 void CGameControllerDungeon::StateTick()
 {
-	int Players = PlayIt();
+	int Players = PlayersNum();
 	CGS::Dungeon[m_DungeonID].PlayIt = Players;
 
 	// Используется в тике когда Ожидание данжа
@@ -106,7 +106,6 @@ void CGameControllerDungeon::StateTick()
 	}
 }
 
-
 int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKiller, int Weapon)
 {
 	if (!pKiller || !pVictim || !pVictim->GetPlayer())
@@ -122,7 +121,7 @@ int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKill
 }
 
 // Кол-во игроков что играет в данже
-int CGameControllerDungeon::PlayIt() const
+int CGameControllerDungeon::PlayersNum() const
 {
 	int playIt = 0;
 	for (int i = 0; i < MAX_PLAYERS; i++)
@@ -144,13 +143,17 @@ int CGameControllerDungeon::LeftMobsToWin() const
 	return leftMobs;
 }
 
-void CGameControllerDungeon::AllowMobsSpawn()
+void CGameControllerDungeon::SetMobsSpawn(bool AllowedSpawn)
 {
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
 		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS)
-			BotPlayer->SetDungeonAllowedSpawn(true);
+		{
+			BotPlayer->SetDungeonAllowedSpawn(AllowedSpawn);
+			if (!AllowedSpawn && BotPlayer->GetCharacter())
+				BotPlayer->GetCharacter()->Die(-1, -1);
+		}
 	}
 }
 
@@ -202,7 +205,6 @@ DungeonDoor::DungeonDoor(CGameWorld *pGameWorld, vec2 Pos)
 	m_Pos.y += 30;
 
 	m_State = DUNGEON_WAITING;
-
 	GameWorld()->InsertEntity(this);
 }
 
