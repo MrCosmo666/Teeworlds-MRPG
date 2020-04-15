@@ -18,12 +18,11 @@ void InboxSql::InteractiveInbox(CPlayer *pPlayer, int InboxID)
 		// даем предмет для игрока если даем то удаляем письмо
 		if(ItemID > 0 && Count > 0)
 		{
-			const int Enchant = RES->getInt("Enchant");
-
 			// если уже имеется такой зачарованный предмет
-			if(GS()->GetItemInfo(ItemID).BonusID >= 0 && pPlayer->GetItem(ItemID).Count >= 1)
-				return GS()->Chat(pPlayer->GetCID(), "Enchant item maximal count x1!");	
+			if(GS()->GetItemInfo(ItemID).BonusID > 0 && pPlayer->GetItem(ItemID).Count > 1)
+				return GS()->Chat(pPlayer->GetCID(), "Enchant item maximal count x1 in a backpack!");
 
+			const int Enchant = RES->getInt("Enchant");
 			pPlayer->GetItem(ItemID).Add(Count, 0, Enchant);
 		}
 
@@ -37,9 +36,6 @@ void InboxSql::GetInformationInbox(CPlayer *pPlayer)
 {
 	// инициализируем
 	int ClientID = pPlayer->GetCID();
-	dbg_msg("test", "here %d", pPlayer->Acc().AuthID);
-
-
 	int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + 200;
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().AuthID, MAX_MAILLIST));
 	while(RES->next())

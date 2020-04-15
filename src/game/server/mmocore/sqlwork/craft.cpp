@@ -61,15 +61,18 @@ void CraftSql::ShowCraftList(CPlayer *pPlayer, int CraftTab)
 
 		// выводим основное меню
 		int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + cr.first;
-		GS()->AVHI(ClientID, InfoSellItem.GetIcon(), HideID, vec3(15,25,55), "LV:{INT} | {STR}x{INT} : {INT} Gold",
-			&cr.second.Level, InfoSellItem.GetName(pPlayer), &cr.second.ItemCount, &MoneyDiscount);
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", InfoSellItem.GetDesc(pPlayer));
-
-		// бонус предметов
-		if(CGS::AttributInfo.find(InfoSellItem.BonusID) != CGS::AttributInfo.end() && InfoSellItem.BonusCount)
+		if (CGS::AttributInfo.find(InfoSellItem.BonusID) != CGS::AttributInfo.end())
 		{
+			GS()->AVHI(ClientID, InfoSellItem.GetIcon(), HideID, vec3(15, 25, 55), "{STR}Lvl{INT} : {STR} :: {INT} gold",
+				(pPlayer->GetItem(cr.second.ItemID).Count ? "✔ " : "\0"), &cr.second.Level, InfoSellItem.GetName(pPlayer), &MoneyDiscount);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "Astro stats +{INT} {STR}", &InfoSellItem.BonusCount, pPlayer->AtributeName(InfoSellItem.BonusID));
 		}
+		else
+		{
+			GS()->AVHI(ClientID, InfoSellItem.GetIcon(), HideID, vec3(15, 25, 55), "Lvl{INT} : {STR}x{INT} ({INT}) :: {INT} gold",
+				&cr.second.Level, InfoSellItem.GetName(pPlayer), &cr.second.ItemCount, &pPlayer->GetItem(cr.second.ItemID).Count, &MoneyDiscount);
+		}
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", InfoSellItem.GetDesc(pPlayer));
 
 		// чтобы проще инициализируем под переменной
 		dynamic_string Buffer;
@@ -93,17 +96,18 @@ void CraftSql::ShowCraftList(CPlayer *pPlayer, int CraftTab)
 
 void CraftSql::StartCraftItem(CPlayer *pPlayer, int CraftID)
 {
-	if(Craft.find(CraftID) == Craft.end()) return;
-
-	// проверяем уровень
-	const int ClientID = pPlayer->GetCID();
-	if(Craft[CraftID].Level > pPlayer->Acc().Level)
-		return GS()->Chat(ClientID, "Your 'Craft level' low for this item craft!");
+	if(Craft.find(CraftID) == Craft.end()) 
+		return;
 
 	// проверяем имеется ли зачарованный предмет уже
-	ItemSql::ItemPlayer &PlayerItem = pPlayer->GetItem(Craft[CraftID].ItemID);
-	if(PlayerItem.Info().BonusCount > 0 && PlayerItem.Count > 0)	
-		return GS()->Chat(ClientID, "Thing that enchanting can only be 1!");
+	const int ClientID = pPlayer->GetCID();
+	ItemSql::ItemPlayer& PlayerItem = pPlayer->GetItem(Craft[CraftID].ItemID);
+	if (PlayerItem.Info().BonusCount > 0 && PlayerItem.Count > 0)
+		return GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");
+
+	// проверяем уровень
+	if(Craft[CraftID].Level > pPlayer->Acc().Level)
+		return GS()->Chat(ClientID, "Your level low for this item craft!");
 
 	// первая подбивка устанавливаем что доступно и требуется для снятия
 	dynamic_string Buffer;

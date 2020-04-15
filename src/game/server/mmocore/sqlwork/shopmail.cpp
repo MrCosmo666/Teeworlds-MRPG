@@ -56,8 +56,8 @@ void ShopMailSql::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		{
 			char aEnchantSize[16];
 			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(50, 30, 25), "{STR} {STR}{STR} :: {INT} {STR}",
-				(pPlayer->GetItem(ItemID).Count > 0 ? "✔" : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price, NeededItem.GetName(pPlayer));
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(50, 30, 25), "{STR}{STR}{STR} :: {INT} {STR}",
+				(pPlayer->GetItem(ItemID).Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price, NeededItem.GetName(pPlayer));
 
 			int BonusCount = BuyightItem.BonusCount * (Enchant + 1);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "Astro +{INT} {STR}", &BonusCount, pPlayer->AtributeName(BuyightItem.BonusID));
@@ -100,8 +100,8 @@ void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 		{
 			char aEnchantSize[16];
 			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(50, 30, 25), "{STR} {STR}{STR} :: {INT} gold",
-				(pPlayer->GetItem(ItemID).Count > 0 ? "✔" : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price);
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(50, 30, 25), "{STR}{STR}{STR} :: {INT} gold",
+				(pPlayer->GetItem(ItemID).Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price);
 
 			int BonusCount = BuyightItem.BonusCount * (Enchant + 1);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "Astro +{INT} {STR}", &BonusCount, pPlayer->AtributeName(BuyightItem.BonusID));
@@ -175,9 +175,9 @@ bool ShopMailSql::BuyShopAuctionSlot(CPlayer *pPlayer, int ID)
 	// проверяем имеется ли такой зачарованный предмет
 	const int ItemID = RES->getInt("ItemID");
 	ItemSql::ItemPlayer &BuyightItem = pPlayer->GetItem(ItemID);
-	if(BuyightItem.Count >= 1 && BuyightItem.Info().BonusCount > 0)
+	if(BuyightItem.Count > 0 && BuyightItem.Info().BonusCount > 0)
 	{
-		GS()->Chat(ClientID, "Enchant item maximal count x1!");	
+		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");	
 		return false;		
 	}		
 
