@@ -19,7 +19,7 @@ class QuestBase : public CMmoComponent
 		int Level;
 		int Money;
 		int Exp;
-		int TalkCount;
+		int ProgressSize;
 
 		int ItemRewardID[3];
 		int ItemRewardCount[3];
@@ -31,7 +31,7 @@ class QuestBase : public CMmoComponent
 	{
 		int Type;
 		int MobProgress[2];
-		int TalkProgress;
+		int Progress;
 	};
 	typedef std::map < int , std::map < int , StructQuest > > QuestType;
 
@@ -50,7 +50,7 @@ private:
 	int GetQuestState(int ClientID, int QuestID) const;
 	int GetStoryCountQuest(const char *StoryName, int QuestID = -1) const;
 	const char *QuestState(int Type) const;
-	bool CheckMobProgress(int ClientID, int QuestID);
+	bool IsDefeatMobComplete(int ClientID, int QuestID);
 
 public:
 	bool IsValidQuest(int QuestID, int ClientID = -1) const
@@ -68,7 +68,7 @@ public:
 
 	const char *GetStoryName(int QuestID) const;
 	ContextBots::QuestBotInfo &GetQuestBot(int QuestID, int Progress);
-	bool CheckActiveBot(int QuestID, int Progress);
+	bool IsActiveQuestBot(int QuestID, int Progress);
 
 private:
 	/* #########################################################################
@@ -76,12 +76,10 @@ private:
 	######################################################################### */
 	void ShowQuestID(CPlayer *pPlayer, int QuestID, bool Passive = false);
 	void FinishQuest(CPlayer *pPlayer, int QuestID);
-	bool MultiQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData, bool Gived, bool Interactive = false);
+	bool IsCollectItemComplete(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData, bool Gived, bool Interactive = false);
 	void TalkProgress(CPlayer *pPlayer, int QuestID);
 
 	bool ShowAdventureActiveNPC(CPlayer *pPlayer);
-
-	int FindQuestingBotClientID(int MobID);
 
 public:
 
@@ -94,7 +92,7 @@ public:
 	bool InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData, bool LastDialog);
 	void AutoStartNextQuest(CPlayer *pPlayer, int QuestID);
 
-	void MobProgress(CPlayer *pPlayer, int BotID);
+	void AddMobProgress(CPlayer *pPlayer, int BotID);
 
 	virtual bool OnMessage(int MsgID, void *pRawMsg, int ClientID);
 	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);

@@ -132,7 +132,7 @@ bool CPlayerBot::CheckQuestSnapPlayer(int SnappingClient, bool SnapData)
 		return false;
 
 	// если прогресс разговора не равен прогрессу бота
-	if(TalkProgress != QuestBase::Quests[SnappingClient][QuestID].TalkProgress)
+	if(TalkProgress != QuestBase::Quests[SnappingClient][QuestID].Progress)
 		return false;
 
 	return true;

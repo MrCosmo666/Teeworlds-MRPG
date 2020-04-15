@@ -10,8 +10,7 @@ std::map < int , std::map < int , QuestBase::StructQuest > > QuestBase::Quests;
 // Если завершен квест
 bool QuestBase::IsComplecte(int ClientID, int QuestID) const
 {
-	if(IsValidQuest(QuestID, ClientID) &&
-		Quests[ClientID][QuestID].TalkProgress == (QuestsData[QuestID].TalkCount - 1))
+	if(IsValidQuest(QuestID, ClientID) && Quests[ClientID][QuestID].Progress == (QuestsData[QuestID].ProgressSize - 1))
 		return true;
 	return false;
 }
@@ -40,15 +39,15 @@ void QuestBase::OnInitGlobal()
 			&QuestsData[ QUID ].ItemRewardCount[1], &QuestsData[ QUID ].ItemRewardCount[2]);
 
 		// загружаем кол-во разговоров
-		int TalkCount = 1;
+		int ProgressSize = 1;
 		for(const auto& qb : ContextBots::QuestBot)
 		{
 			if(qb.second.QuestID != QUID) 
 				continue;
 
-			TalkCount++;
+			ProgressSize++;
 		}
-		QuestsData[ QUID ].TalkCount = TalkCount;
+		QuestsData[ QUID ].ProgressSize = ProgressSize;
 	}
 }
 
@@ -63,10 +62,10 @@ void QuestBase::OnInitAccount(CPlayer *pPlayer)
 		if(IsValidQuest(QuestID))
 		{
 			Quests[ ClientID ][ QuestID ].Type = (int)RES->getInt("Type");
-			Quests[ ClientID ][ QuestID ].TalkProgress = (int)RES->getInt("TalkProgress");
+			Quests[ ClientID ][ QuestID ].Progress = (int)RES->getInt("Progress");
 			Quests[ ClientID ][ QuestID ].MobProgress[0] = (int)RES->getInt("Mob1Progress");
 			Quests[ ClientID ][ QuestID ].MobProgress[1] = (int)RES->getInt("Mob2Progress");
-			GS()->ClearQuestsBot(QuestID, Quests[ ClientID ][ QuestID ].TalkProgress);
+			GS()->ClearQuestsBot(QuestID, Quests[ ClientID ][ QuestID ].Progress);
 		}
 	}
 }
@@ -107,32 +106,37 @@ int QuestBase::GetStoryCountQuest(const char *StoryName, int QuestID) const
 // получить имя типа квестов
 const char *QuestBase::QuestState(int Type) const
 {
-	if(Type == QUESTACCEPT) return "Active";
-	else if(Type == QUESTFINISHED) return "Finished";
-	else if(Type == QUESTNOACCEPT) return "Not active";
-	else return "Unknown";
+	if(Type == QUESTACCEPT) 
+		return "Active";
+	else if(Type == QUESTFINISHED) 
+		return "Finished";
+	else if(Type == QUESTNOACCEPT) 
+		return "Not active";
+	
+	return "Unknown";
 }
 
 // Проверить выполнен ли сбор мобов в квесте
-bool QuestBase::CheckMobProgress(int ClientID, int QuestID)
+bool QuestBase::IsDefeatMobComplete(int ClientID, int QuestID)
 {
 	if(!IsValidQuest(QuestID, ClientID)) 
 		return false;
 	
 	// получаем активного бота и проверяем убили ли всех мобов или нет
-	int playerTalkProgress = Quests[ClientID][QuestID].TalkProgress;
-	ContextBots::QuestBotInfo FindBot = GetQuestBot(QuestID, playerTalkProgress);
-	if(FindBot.IsActive())
-	{
-		for(int i = 4; i < 6; i++)
-		{
-			const int MobID = FindBot.Interactive[i], Count = FindBot.InterCount[i];
-			if(MobID <= 0 || Count <= 0) 
-				continue;
+	const int playerProgress = Quests[ClientID][QuestID].Progress;
+	ContextBots::QuestBotInfo FindBot = GetQuestBot(QuestID, playerProgress);
+	if (!FindBot.IsActive())
+		return false;
 
-			if(Quests[ClientID][QuestID].MobProgress[i-4] < Count)
-				return false;
-		}
+	for(int i = 4; i < 6; i++)
+	{
+		const int MobID = FindBot.Interactive[i];
+		const int Count = FindBot.InterCount[i];
+		if(MobID <= 0 || Count <= 0) 
+			continue;
+
+		if(Quests[ClientID][QuestID].MobProgress[i-4] < Count)
+			return false;
 	}
 	return true;
 }
@@ -159,7 +163,7 @@ ContextBots::QuestBotInfo &QuestBase::GetQuestBot(int QuestID, int Progress)
 }
 
 // Узнать активный ли бот
-bool QuestBase::CheckActiveBot(int QuestID, int Progress)
+bool QuestBase::IsActiveQuestBot(int QuestID, int Progress)
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -167,7 +171,7 @@ bool QuestBase::CheckActiveBot(int QuestID, int Progress)
 			continue;
 
 		// -- пропускаем завершеный квест		
-		if(Quests[i][QuestID].Type != QUESTACCEPT || Quests[i][QuestID].TalkProgress != Progress) 
+		if(Quests[i][QuestID].Type != QUESTACCEPT || Quests[i][QuestID].Progress != Progress) 
 			continue;
 
 		// -- сортируем все квесты игрока
@@ -253,7 +257,7 @@ void QuestBase::FinishQuest(CPlayer *pPlayer, int QuestID)
 
 	// установить статистику квеста
 	finishQuestPlayer.Type = QUESTFINISHED;
-	SJK.UD("tw_accounts_quests", "Type = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'", QUESTFINISHED, QuestID, pPlayer->Acc().AuthID);
+	SJK.UD("tw_accounts_quests", "Type = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'", finishQuestPlayer.Type, QuestID, pPlayer->Acc().AuthID);
 
 	// выдать награды и написать о завершении
 	for(int i = 0; i < 3; i++)
@@ -274,7 +278,7 @@ void QuestBase::FinishQuest(CPlayer *pPlayer, int QuestID)
 }
 
 // проверить прогресс по предметам что требует бот
-bool QuestBase::MultiQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData, bool Gived, bool Interactive)
+bool QuestBase::IsCollectItemComplete(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData, bool Gived, bool Interactive)
 {
 	if(!pPlayer || !BotData.IsActive())
 		return false;
@@ -335,23 +339,23 @@ void QuestBase::TalkProgress(CPlayer *pPlayer, int QuestID)
 		return;
 
 	StructQuest &talkQuestPlayer = Quests[ClientID][QuestID];
-	talkQuestPlayer.TalkProgress += 1;
+	talkQuestPlayer.Progress += 1;
 	talkQuestPlayer.MobProgress[0] = 0;
 	talkQuestPlayer.MobProgress[1] = 0;
 
 	{ // очистка прогресса ботов
-		int OldTalkProgress = talkQuestPlayer.TalkProgress - 1;
-		int NewTalkProgress = talkQuestPlayer.TalkProgress;
+		int OldTalkProgress = talkQuestPlayer.Progress - 1;
+		int NewTalkProgress = talkQuestPlayer.Progress;
 
 		GS()->ClearQuestsBot(QuestID, OldTalkProgress);
 		GS()->ClearQuestsBot(QuestID, NewTalkProgress);
 	}
 
-	bool LastTalkingProgress = (talkQuestPlayer.TalkProgress >= QuestsData[QuestID].TalkCount);
+	bool LastTalkingProgress = (talkQuestPlayer.Progress >= QuestsData[QuestID].ProgressSize);
 	if(!LastTalkingProgress)
 	{
 		SJK.UD("tw_accounts_quests", "TalkProgress = '%d', Mob1Progress = '%d', Mob2Progress = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'",
-			talkQuestPlayer.TalkProgress, talkQuestPlayer.MobProgress[0], 
+			talkQuestPlayer.Progress, talkQuestPlayer.MobProgress[0], 
 			talkQuestPlayer.MobProgress[1], QuestID, pPlayer->Acc().AuthID);
 	}
 	Job()->Quest()->CheckQuest(pPlayer);
@@ -440,7 +444,12 @@ void QuestBase::CheckQuest(CPlayer *pPlayer)
 			continue;
 
 		// создаем дроп элементов если имеются
-		if(qData.second.TalkCount > 1 && qData.second.TalkCount != Quests[ClientID][QuestID].TalkProgress) 
+		int playerProgress = Quests[ClientID][QuestID].Progress;
+		ContextBots::QuestBotInfo &FindBot = GetQuestBot(QuestID, playerProgress);
+		if(FindBot.IsActive()) 
+			GS()->CreateDropQuest(FindBot, ClientID); 
+
+		if(qData.second.ProgressSize > 1 && qData.second.ProgressSize != Quests[ClientID][QuestID].Progress) 
 			continue;
 
 		// автозавершение и автостарт нового квеста
@@ -547,9 +556,9 @@ bool QuestBase::AcceptQuest(int QuestID, CPlayer *pPlayer)
 	}
 
 	// принимаем квест
-	Quests[ClientID][QuestID].TalkProgress = 1;
+	Quests[ClientID][QuestID].Progress = 1;
 	Quests[ClientID][QuestID].Type = QUESTACCEPT;
-	GS()->ClearQuestsBot(QuestID, Quests[ClientID][QuestID].TalkProgress);
+	GS()->ClearQuestsBot(QuestID, Quests[ClientID][QuestID].Progress);
 
 	SJK.ID("tw_accounts_quests", "(QuestID, OwnerID, Type) VALUES ('%d', '%d', '%d')", QuestID, pPlayer->Acc().AuthID, QUESTACCEPT);
 	GS()->Chat(ClientID, "Accepted the quest [{STR}]", QuestsData[QuestID].Name);
@@ -564,20 +573,14 @@ bool QuestBase::InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo 
 	if(!pPlayer || !pPlayer->GetCharacter() || !BotData.IsActive()) 
 		return false;
 
-	// очистить интерактив
-	const int ClientID = pPlayer->GetCID();
-
 	// проверяем собрали предметы и убили ли всех ботов
+	const int ClientID = pPlayer->GetCID();
 	const int QuestID = BotData.QuestID;
-	if(!MultiQuestNPC(pPlayer, BotData, false) || !CheckMobProgress(ClientID, QuestID) || pPlayer->Acc().Level < QuestsData[QuestID].Level)
+	if(!IsCollectItemComplete(pPlayer, BotData, false) || !IsDefeatMobComplete(ClientID, QuestID) || pPlayer->Acc().Level < QuestsData[QuestID].Level)
 	{
-		GS()->CreateDropQuest(BotData, ClientID);
 		GS()->Chat(ClientID, "Not all criteria to complete!");
 		return false;
 	}
-
-	if (!LastDialog)
-		return true;
 
 	// интерактив рандомно понравиться ли предмет даст или нет
 	int RandomGetItem = BotData.InterRandom[0];
@@ -585,16 +588,19 @@ bool QuestBase::InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo 
 	{
 		// забираем предмет
 		GS()->Chat(ClientID, "[{STR} NPC] I didn't like it, bring me another one!", BotData.Name);
-		MultiQuestNPC(pPlayer, BotData, false, true);
+		IsCollectItemComplete(pPlayer, BotData, false, true);
 		return false;
 	}
 
+	if (!LastDialog)
+		return true;
+
 	// проверяем и выдаем потом
-	MultiQuestNPC(pPlayer, BotData, true, true);
+	IsCollectItemComplete(pPlayer, BotData, true, true);
 	
 	// забираем проверяем не является ли тип рандомно взять предмет
 	if(BotData.InterRandom[2] <= 0 || RandomGetItem > 0)
-		MultiQuestNPC(pPlayer, BotData, false, true);
+		IsCollectItemComplete(pPlayer, BotData, false, true);
 
 	GS()->VResetVotes(ClientID, ADVENTUREJOURNAL);
 	GS()->Mmo()->Quest()->TalkProgress(pPlayer, QuestID);
@@ -602,7 +608,7 @@ bool QuestBase::InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo 
 }
 
 // Прогресс мобов
-void QuestBase::MobProgress(CPlayer *pPlayer, int BotID)
+void QuestBase::AddMobProgress(CPlayer *pPlayer, int BotID)
 {
 	if(!pPlayer || !Job()->BotsData()->IsDataBotValid(BotID)) 
 		return;
@@ -617,8 +623,8 @@ void QuestBase::MobProgress(CPlayer *pPlayer, int BotID)
 
 		// получаем активного нпс
 		int questID = qp.first;
-		int playerTalkProgress = Quests[ClientID][questID].TalkProgress;
-		ContextBots::QuestBotInfo FindBot = GetQuestBot(questID, playerTalkProgress);
+		int playerProgress = Quests[ClientID][questID].Progress;
+		ContextBots::QuestBotInfo FindBot = GetQuestBot(questID, playerProgress);
 		if(!FindBot.IsActive()) 
 			continue;
 
@@ -660,7 +666,6 @@ void QuestBase::AutoStartNextQuest(CPlayer *pPlayer, int QuestID)
 
 	// проверяем если есть следующий квест то продолжаем сюжетку только сюжетные квесты
 	int NextQuestID = QuestID + 1;
-	
 	if(!IsValidQuest(NextQuestID) || str_comp(QuestsData[QuestID].StoryLine, QuestsData[NextQuestID].StoryLine) != 0)
 	{
 		GS()->Chat(clientID, "At the moment there is no continuation of '{STR}' story", QuestsData[QuestID].StoryLine);			
@@ -670,7 +675,9 @@ void QuestBase::AutoStartNextQuest(CPlayer *pPlayer, int QuestID)
 	// прнимаем квест и пишем информацию о следующем квесте
 	AcceptQuest(NextQuestID, pPlayer);
 	GS()->Chat(clientID, "You can see the details in vote 'Adventure Journal'");
-	if(pPlayer->GetCharacter()) pPlayer->GetCharacter()->CreateQuestsSteps();
+
+	if(pPlayer->GetCharacter()) 
+		pPlayer->GetCharacter()->CreateQuestsSteps();
 	
 	// все остальное
 	GS()->VResetVotes(clientID, ADVENTUREJOURNAL);
@@ -692,7 +699,7 @@ bool QuestBase::ShowAdventureActiveNPC(CPlayer *pPlayer)
 			continue;
 
 		// проверяем бота есть или нет активный по квесту
-		ContextBots::QuestBotInfo &BotInfo = GetQuestBot(qq.first, qq.second.TalkProgress);
+		ContextBots::QuestBotInfo &BotInfo = GetQuestBot(qq.first, qq.second.Progress);
 		if(!BotInfo.IsActive()) 
 			continue;
 
@@ -769,21 +776,6 @@ bool QuestBase::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int V
 	return false;
 }
 
-// Найти квестового бота с ID
-int QuestBase::FindQuestingBotClientID(int MobID)
-{
-	// for(int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
-	// {
-	// 	if(!GS()->m_apPlayers[i] || 
-	// 		GS()->m_apPlayers[i]->GetSpawnBot() != SPAWNQUESTNPC ||
-	// 		GS()->m_apPlayers[i]->GetBotSub() != MobID)
-	// 		continue;
-
-	// 	return i;
-	// }
-	return -1;
-}
-
 bool QuestBase::OnMessage(int MsgID, void *pRawMsg, int ClientID)
 {
 	CPlayer *pPlayer = GS()->m_apPlayers[ClientID];
@@ -857,13 +849,13 @@ void QuestBase::QuestTableShowInformation(CPlayer* pPlayer, ContextBots::QuestBo
 			continue;
 
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "%s", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
+		str_format(aBuf, sizeof(aBuf), "Item %s", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
 		if (BotData.InterRandom[0] > 1)
 		{
 			char aChanceBuf[128];
 			double Chance = BotData.InterRandom[0] <= 0 ? 100.0f : (1.0f / (double)BotData.InterRandom[0]) * 100;
 			str_format(aChanceBuf, sizeof(aChanceBuf), "%s [takes %0.2f%%]", aBuf, Chance);
-			GS()->Mmo()->Quest()->QuestTableAddItem(ClientID, aChanceBuf, Count, ItemID);
+			GS()->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, Count, ItemID);
 		}
 		else
 		{
@@ -883,11 +875,5 @@ void QuestBase::QuestTableShowInformation(CPlayer* pPlayer, ContextBots::QuestBo
 		str_format(aBuf, sizeof(aBuf), "Defeat (%s)", ContextBots::DataBot[BotID].NameBot);
 		GS()->Mmo()->Quest()->QuestTableAddInfo(ClientID, aBuf, Count,
 			QuestBase::Quests[ClientID][BotData.QuestID].MobProgress[i - 4]);
-	}
-
-	// маленький уровень
-	if (pPlayer->Acc().Level < QuestsData[QuestID].Level)
-	{
-		GS()->SBL(ClientID, 100, 100, "Required level: {INT}LVL", QuestsData[QuestID].Level);
 	}
 }

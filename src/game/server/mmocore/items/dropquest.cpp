@@ -78,7 +78,7 @@ void CQuestItem::Tick()
 	ItemSql::ItemPlayer &PlItemForQuest = pPlayer->GetItem(m_QuestBot.Interactive[0]);
 
 	// проверяем если прогресс не равен данному / проверяем завершен ли квест / проверяем если предметов больше чем требуется
-	if(QuestBase::Quests[m_OwnerID][QuestID].TalkProgress != m_QuestBot.Progress || PlItemForQuest.Count >= Count)
+	if(QuestBase::Quests[m_OwnerID][QuestID].Progress != m_QuestBot.Progress || PlItemForQuest.Count >= Count)
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;			

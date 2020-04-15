@@ -113,7 +113,7 @@ bool WorldSwapSql::ChangingWorld(int ClientID, vec2 Pos)
 // Поиск путии до квеста к боту
 vec2 WorldSwapSql::PositionQuestBot(int ClientID, int QuestID)
 {
-	int playerTalkProgress = QuestBase::Quests[ClientID][QuestID].TalkProgress;
+	int playerTalkProgress = QuestBase::Quests[ClientID][QuestID].Progress;
 	ContextBots::QuestBotInfo FindBot = Job()->Quest()->GetQuestBot(QuestID, playerTalkProgress);
 	if(FindBot.IsActive())
 	{

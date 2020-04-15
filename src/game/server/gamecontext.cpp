@@ -1484,7 +1484,7 @@ void CGS::ClearClientData(int ClientID)
 		{
 			if(qp.second.Type == QUESTFINISHED) 
 				continue;
-			m_talkcheck[qp.first] = qp.second.TalkProgress;
+			m_talkcheck[qp.first] = qp.second.Progress;
 		}
 
 		// очищаем квесты игрока
@@ -2370,7 +2370,7 @@ void CGS::ClearQuestsBot(int QuestID, int Step)
 	}
 
 	// ищем есть ли активный бот у всех игроков
-	bool ActiveBot = Mmo()->Quest()->CheckActiveBot(QuestID, Step);
+	bool ActiveBot = Mmo()->Quest()->IsActiveQuestBot(QuestID, Step);
 
 	// если активен у кого то бот но его нету создаем
 	dbg_msg("test", "%d %d", ActiveBot, QuestBotClientID);

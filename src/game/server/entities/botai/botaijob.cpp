@@ -178,7 +178,7 @@ bool BotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 		const int BotID = GetPlayer()->GetBotID();
 		const int SubID = GetPlayer()->GetBotSub();
 		if(!ContextBots::MobBot[SubID].Boss && GetPlayer()->GetSpawnBot() == SPAWNMOBS && pFrom)
-			GS()->Mmo()->Quest()->MobProgress(pFrom, BotID);
+			GS()->Mmo()->Quest()->AddMobProgress(pFrom, BotID);
 	
 		ClearTarget();
 		Die(From, Weapon);
@@ -220,7 +220,7 @@ void BotAI::Die(int Killer, int Weapon)
 		}
 
 		if(ContextBots::MobBot[SubID].Boss && GetPlayer()->GetSpawnBot() == SPAWNMOBS)
-			GS()->Mmo()->Quest()->MobProgress(pPlayer, BotID);
+			GS()->Mmo()->Quest()->AddMobProgress(pPlayer, BotID);
 
 		// exp
 		int DamageExp = (ContextBots::MobBot[SubID].Level*g_Config.m_SvExperienceMob);
