@@ -540,7 +540,7 @@ bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect, float Size)
 
 		Graphics()->TextureSet(Tex);
 		Graphics()->QuadsBegin();
-		Graphics()->SetColor(0.8f, 0.8f, 0.8f, 0.8f); // pow(a, 0.75f) *
+		Graphics()->SetColor(0.85f, 0.85f, 0.85f, 0.9f); // pow(a, 0.75f) *
 		IGraphics::CQuadItem QuadItem(Icon.x, Icon.y, Size, Size);
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
 		Graphics()->QuadsEnd();
@@ -623,7 +623,7 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 			if (m_pClient->MmoServer() && (pOption->m_Colored[0] >= 30 || pOption->m_Colored[1] >= 30 || pOption->m_Colored[2] >= 30))
 				TextRender()->TextOutlineColor(0.7f, 0.7f, 0.7f, 0.3f);
 
-			bool Icon = DoItemIcon(pOption->m_Icon, { Item.m_Rect.x + 3.0f, Item.m_Rect.y, Item.m_Rect.w, Item.m_Rect.h, }, 21.0f);
+			bool Icon = DoItemIcon(pOption->m_Icon, { Item.m_Rect.x + 2.0f, Item.m_Rect.y, Item.m_Rect.w, Item.m_Rect.h, }, 21.0f);
 			Item.m_Rect.VMargin((Icon ? 25.0f : 5.0f), &Item.m_Rect);
 			Item.m_Rect.y += 2.0f;
 			UI()->DoLabel(&Item.m_Rect, pOption->m_aDescription, Item.m_Rect.h*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
