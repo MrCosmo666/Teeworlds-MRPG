@@ -108,6 +108,7 @@ public:
 	void GiveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant);
 	void RemoveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Count, int Settings);
 	void ItemSelected(CPlayer *pPlayer, const ItemPlayer &PlItem, bool Dress = false);
+	int ActionItemCountAllowed(CPlayer* pPlayer, int ItemID);
 
 	void RepairDurability(CPlayer *pPlayer);
 	bool SetDurabilityItem(CPlayer *pPlayer, int ItemID, int Durability);

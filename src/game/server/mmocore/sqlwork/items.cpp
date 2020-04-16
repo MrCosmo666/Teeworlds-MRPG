@@ -211,6 +211,19 @@ int ItemSql::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings
 	return 0;		
 }
 
+int ItemSql::ActionItemCountAllowed(CPlayer *pPlayer, int ItemID)
+{
+	int ClientID = pPlayer->GetCID();
+	int AvailableCount = Job()->Quest()->QuestingAllowedItemsCount(pPlayer, ItemID);
+	if (AvailableCount <= 0)
+	{
+		GS()->Chat(ClientID, "This count of items that you have, iced for the quest!");
+		GS()->Chat(ClientID, "Can see in which quest they are required in Adventure Journal!");
+		return -1;
+	}
+	return AvailableCount;
+}
+
 bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	const int ClientID = pPlayer->GetCID();
@@ -226,14 +239,11 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 	// выброс предмета
 	if(PPSTR(CMD, "IDROP") == 0)
 	{
-		int AvailableCount = Job()->Quest()->QuestingAllowedItemsCount(pPlayer, VoteID);
+		int AvailableCount = ActionItemCountAllowed(pPlayer, VoteID);
 		if (AvailableCount <= 0)
-		{
-			GS()->Chat(ClientID, "This count of items that you have, iced for the quest!");
 			return true;
-		}
 
-		if(Get > AvailableCount)
+		if (Get > AvailableCount)
 			Get = AvailableCount;
 
 		ItemPlayer& PlItem = pPlayer->GetItem(VoteID);
@@ -247,6 +257,13 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 	// использование предмета
 	if(PPSTR(CMD, "IUSE") == 0)
 	{
+		int AvailableCount = ActionItemCountAllowed(pPlayer, VoteID);
+		if (AvailableCount <= 0)
+			return true;
+
+		if (Get > AvailableCount)
+			Get = AvailableCount;
+
 		// проверяем если по функции он используется 1 раз
 		ItemPlayer &PlItem = pPlayer->GetItem(VoteID);
 		if(Get > PlItem.Count)
@@ -262,6 +279,13 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 	// десинтез предмета
 	if(PPSTR(CMD, "IDESYNTHESIS") == 0)
 	{
+		int AvailableCount = ActionItemCountAllowed(pPlayer, VoteID);
+		if (AvailableCount <= 0)
+			return true;
+
+		if (Get > AvailableCount)
+			Get = AvailableCount;
+
 		ItemPlayer &PlItem = pPlayer->GetItem(VoteID);
 		if(Get > PlItem.Count)
 			Get = PlItem.Count;
