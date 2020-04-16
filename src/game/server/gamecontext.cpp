@@ -20,7 +20,6 @@
 // object entities
 #include "mmocore/items/dropingbonuses.h"
 #include "mmocore/items/dropingitem.h"
-#include "mmocore/items/dropquest.h"
 #include "mmocore/mmocontroller/loltext.h"
 
 // информационные данные
@@ -2482,34 +2481,6 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, ItemSql::ItemPlayer &PlayerItem
 		vec2 Dir = normalize(vec2(0+rand()%20-rand()%20, -15-rand()%30));
 		vec2 Projdrop = (Dir * max(0.001f, 0.2f));
 		new CDropingItem(&m_World, Pos, Projdrop, CopyItem, ClientID);
-	}
-}
-
-// Создать предмет квеста
-void CGS::CreateDropQuest(const ContextBots::QuestBotInfo &BotInfo, int ClientID)
-{
-	if(!m_apPlayers[ClientID] || !BotInfo.IsActive() || BotInfo.InterRandom[1] <= 0 ||
-		Server()->GetWorldID(ClientID) != BotInfo.WorldID) return;
-
-	// проверяем есть ли такие предметы
-	for (CQuestItem* pHh = (CQuestItem*)m_World.FindFirst(CGameWorld::ENTTYPE_DROPQUEST);
-		pHh; pHh = (CQuestItem*)pHh->TypeNext())
-	{
-		if (pHh->m_OwnerID != ClientID || BotInfo.Interactive[0] != pHh->m_QuestBot.Interactive[0])
-			continue;
-		return;
-	}
-
-	// создаем предметы
-	const int QuestID = BotInfo.QuestID;
-	const int ItemID = BotInfo.Interactive[0];
-	int Count = BotInfo.InterCount[0];
-	vec2 Pos = vec2(BotInfo.PositionX, BotInfo.PositionY);
-	for(int i = 0; i < Count*3; i++)
-	{
-		vec2 Dir = normalize(vec2(2800-rand()%5600, -400-rand()%400));
-		vec2 Projdrop = (Dir * max(0.001f, 2.6f));
-		new CQuestItem(&m_World, Pos, Dir, BotInfo, ClientID);
 	}
 }
 

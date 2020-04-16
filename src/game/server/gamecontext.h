@@ -293,7 +293,6 @@ public:
 	void CreateDropBonuses(vec2 Pos, int Type, int Count, int BonusCount = 1);
 	void CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant = 0);
 	void CreateDropItem(vec2 Pos, int ClientID, ItemSql::ItemPlayer &PlayerItem, int Count);
-	void CreateDropQuest(const ContextBots::QuestBotInfo &BotInfo, int ClientID);
 	bool TakeItemCharacter(int ClientID);
 	void SendInbox(int ClientID, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
 
