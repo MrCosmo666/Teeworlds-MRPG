@@ -41,9 +41,9 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 		char aName[64];
 		str_format(aName, sizeof(aName), "%s", g_Config.m_ClShowsocial ? m_pClient->m_aClients[ClientID].m_aName : "");
 
-		float a = 1;
+		float a = 0.8f;
 		if (g_Config.m_ClNameplatesAlways == 0)
-			a = clamp(1 - powf(distance(m_pClient->m_pControls->m_TargetPos, Position) / 200.0f, 16.0f), 0.0f, 1.0f);
+			a = clamp(0.8f - powf(distance(m_pClient->m_pControls->m_TargetPos, Position) / 200.0f, 16.0f), 0.0f, 0.8f);
 
 		if (m_pClient->MmoServer() && m_pClient->m_aClients[ClientID].m_pLocalStats && a > 0.001f)
 		{
@@ -91,7 +91,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 			{
 				str_format(aBuf, sizeof(aBuf), "%d / %d", pClientStats->m_Health, pClientStats->m_HealthStart);
 
-				CUIRect ExpBar = { Position.x - tw / 2.0f , Position.y - FontSize - 82.0f, tw, 25.0f };
+				CUIRect ExpBar = { Position.x - tw / 2.0f , Position.y - FontSize - 92.0f, tw, 25.0f };
 				RenderTools()->DrawUIBar(TextRender(), ExpBar, ColorNameplates / 1.2f,
 					pClientStats->m_Health, pClientStats->m_HealthStart, aBuf, 5, CUI::ALIGN_CENTER, 10.0f, 3.2f);
 			}
@@ -99,7 +99,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 			// ставим курсор для рисовки потом здоровья
 			TextRender()->TextColor(ColorNameplates.r, ColorNameplates.g, ColorNameplates.b, ColorNameplates.a);
 			TextRender()->TextOutlineColor(OutlineNameplates.r, OutlineNameplates.g, OutlineNameplates.b, OutlineNameplates.a);
-			TextRender()->SetCursor(&Cursor, Position.x - tw / 2.0f, Position.y - FontSize - 58.0f, FontSize, TEXTFLAG_RENDER);
+			TextRender()->SetCursor(&Cursor, Position.x - tw / 2.0f, Position.y - FontSize - 70.0f, FontSize, TEXTFLAG_RENDER);
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
@@ -123,9 +123,10 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 			{ // рисуем информацию о агрессиии
 				float FontSizeAgressed = FontSize - 8.0f;
 				float twAgressed = TextRender()->TextWidth(0, FontSizeAgressed, GetMoodName(pClientStats->m_MoodType), -1, -1.0f);
-				TextRender()->TextColor(1.0f, 1.0f, 1.0f, a);
-				TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.5f * a);
-				TextRender()->SetCursor(&Cursor, Position.x - twAgressed / 2.0f, Position.y - FontSizeAgressed - 40.0f, FontSizeAgressed, TEXTFLAG_RENDER);
+				float AlphaMoon = clamp(a - 0.18f, 0.0f, a);
+				TextRender()->TextColor(1.0f, 1.0f, 1.0f, AlphaMoon);
+				TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.5f * AlphaMoon);
+				TextRender()->SetCursor(&Cursor, Position.x - twAgressed / 2.0f, Position.y - FontSizeAgressed - 52.0f, FontSizeAgressed, TEXTFLAG_RENDER);
 				TextRender()->TextEx(&Cursor, GetMoodName(pClientStats->m_MoodType), -1);
 			}
 		}
