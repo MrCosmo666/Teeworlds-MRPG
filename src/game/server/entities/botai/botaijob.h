@@ -37,7 +37,6 @@ private:
 
 	std::map < int , int > m_ListDmgPlayers;
 
-	void FindHardHealth();
 	void ClearTarget();
 	void SetTarget(int ClientID);
     void EngineBots();

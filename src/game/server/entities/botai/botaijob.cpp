@@ -22,32 +22,6 @@ int BotAI::GetSnapFullID() const
 	return GetPlayer()->GetCID() * SNAPBOTS;
 }
 
-// Найти самаго толстого танка
-void BotAI::FindHardHealth()
-{
-	// сбрасываем агрессию если игрок далеко
-	CPlayer* pFrom = GS()->GetPlayer(m_BotTargetID, true, true);
-	if(m_BotTargetID != GetPlayer()->GetCID() && pFrom && pFrom->GetCharacter() && (distance(m_Core.m_Pos, pFrom->m_ViewPos) > 600.0f))
-		ClearTarget();
-
-	for (int i = 0; i < MAX_PLAYERS; i++)
-	{
-		// проверяем на дистанцию игрока
-		CPlayer *pFinderHard = GS()->GetPlayer(i, true, true);
-		if(!pFinderHard || distance(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) > 600.0f)
-			continue;	
-		
-		// проверяем есть ли вкуснее игрокв для бота
-		if(m_BotTargetID == GetPlayer()->GetCID() || !pFrom || 
-			GS()->Collision()->FastIntersectLine(pFrom->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) ||	
-			(!GS()->Collision()->FastIntersectLine(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) && 
-				pFinderHard->GetAttributeCount(Stats::StTenacity, true) > pFrom->GetAttributeCount(Stats::StTenacity, true)))
-		{
-			SetTarget(i);
-		}
-	}
-}
-
 bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 {
 	if(!CCharacter::Spawn(pPlayer, Pos))
@@ -97,10 +71,6 @@ void BotAI::Tick()
 {
 	if(!CheckInvisibleBot() || !IsAlive())
 		return;
-
-	// Переброс на игрока если потерян случайно
-	if(Server()->Tick() % (Server()->TickSpeed()/3) == 0)
-		FindHardHealth(); 
 
 	// Крюк таймер
 	if(m_HookTick)
@@ -521,14 +491,32 @@ CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 		return pPlayer;
 	}
 
+	// сбрасываем агрессию если игрок далеко
+	CPlayer* pPlayer = GS()->GetPlayer(m_BotTargetID, true, true);
+	if (m_BotTargetID != GetPlayer()->GetCID() && pPlayer 
+		&& (distance(m_Core.m_Pos, pPlayer->m_ViewPos) > 600.0f 
+			|| GS()->Collision()->FastIntersectLine(pPlayer->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0)))
+		ClearTarget();
+
 	// не враждебные мобы
-	CPlayer *pPlayer = GS()->GetPlayer(m_BotTargetID, true, true);
-	if (m_BotTargetID == GetPlayer()->GetCID() || !pPlayer ||
-		GS()->Collision()->FastIntersectLine(pPlayer->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0))
+	if (m_BotTargetID == GetPlayer()->GetCID() || !pPlayer)
 		return NULL; 
 
-	if(Server()->Tick() % Server()->TickSpeed() == 0)
-		SetEmote(EMOTE_ANGRY, 1);
+	// ищем более сильного
+	for (int i = 0; i < MAX_PLAYERS; i++)
+	{
+		// проверяем на дистанцию игрока
+		CPlayer* pFinderHard = GS()->GetPlayer(i, true, true);
+		if (!pFinderHard || distance(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) > 600.0f)
+			continue;
+
+		// проверяем есть ли вкуснее игрокв для бота
+		if (!GS()->Collision()->FastIntersectLine(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) &&
+				pFinderHard->GetAttributeCount(Stats::StTenacity, true) > pPlayer->GetAttributeCount(Stats::StTenacity, true))
+		{
+			SetTarget(i);
+		}
+	}
 
 	return pPlayer;
 }
