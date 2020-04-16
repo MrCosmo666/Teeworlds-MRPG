@@ -13,8 +13,8 @@
 #include "talktext.h"
 #include "questing_processing.h"
 
-#define COLOR_TABLE vec4(0.56f, 0.38f, 0.25f, 0.4f)
-#define COLOR_BACKGROUND vec4(0.55f, 0.35f, 0.15f, 0.4f)
+#define COLOR_TABLE vec4(0.40f, 0.22f, 0.08f, 0.4f)
+#define COLOR_BACKGROUND vec4(0.35f, 0.20f, 0.05f, 0.4f)
 #define COLOR_BACKBACKGROUND vec4(0.30f, 0.19f, 0.15f, 0.30f)
 #define COLOR_UIBAR vec4(0.35f, 0.55f, 0.1f, 0.45f)
 
@@ -44,7 +44,7 @@ void CQuestingProcessing::ProcessingRenderTable(int TableID, CUIRect &Box)
 	RenderTools()->DrawRoundRect(&Table, COLOR_TABLE, 15.0f);
 
 	{ // RES
-		vec4 ColorBarUI = (QuestTable[TableID].m_Have >= QuestTable[TableID].m_Requires ? vec4(0.40f, 0.70f, 0.1f, 0.45f) : vec4(0.70f, 0.30f, 0.1f, 0.45f));
+		vec4 ColorBarUI = (QuestTable[TableID].m_Have >= QuestTable[TableID].m_Requires ? vec4(0.40f, 0.75f, 0.1f, 0.50f) : vec4(0.75f, 0.30f, 0.1f, 0.50f));
 
 		char aQuestTable[32];
 		str_format(aQuestTable, sizeof(aQuestTable), "%s %d / %d", QuestTable[TableID].m_aText, QuestTable[TableID].m_Have, QuestTable[TableID].m_Requires);
