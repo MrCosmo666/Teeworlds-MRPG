@@ -1,13 +1,13 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
-#include "dungeon.h"
-
 #include <game/server/gamecontext.h>
 
 #include "../entities/npcwall.h"
 #include "../logicworld/logicwall.h"
 #include "../entities/jobitems.h"
+
+#include "dungeon.h"
 
 CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController(pGS)
 {
