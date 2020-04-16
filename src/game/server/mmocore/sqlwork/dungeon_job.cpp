@@ -62,13 +62,13 @@ void DungeonJob::ShowDungeonsList(CPlayer* pPlayer)
 
 		ShowDungeonTop(pPlayer, dungeon.first, HideID);
 		GS()->AVM(ClientID, "DUNGEONJOIN", dungeon.first, HideID, "Join dungeon {STR}", dungeon.second.Name);
+	}
 
-		if (GS()->IsDungeon())
-		{
-			GS()->AV(ClientID, "null", "");
-			pPlayer->m_Colored = { 30, 8, 8 };
-			GS()->AVL(ClientID, "DUNGEONEXIT", "!! Exit dungeon {STR} !!", dungeon.second.Name);
-		}
+	if (GS()->IsDungeon())
+	{
+		GS()->AV(ClientID, "null", "");
+		pPlayer->m_Colored = { 30, 8, 8 };
+		GS()->AVL(ClientID, "DUNGEONEXIT", "Exit dungeon {STR} !!", Dungeon[GS()->DungeonID()].Name);
 	}
 }
 

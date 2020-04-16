@@ -86,7 +86,7 @@ public:
 	virtual void Snap(int SnappingClient);
 	virtual void Tick();
 
-	void SyncStateChanges(int StartingGame);
+	bool SyncStateChanges(bool StartingGame);
 
 };
 

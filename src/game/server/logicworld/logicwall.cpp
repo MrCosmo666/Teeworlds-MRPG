@@ -391,13 +391,13 @@ void CLogicDungeonDoorKey::Tick()
 	}
 }
 
-void CLogicDungeonDoorKey::SyncStateChanges(int StartingGame)
+bool CLogicDungeonDoorKey::SyncStateChanges(bool StartingGame)
 {
 	// если начало игры изначально закрыты все двери
 	if (StartingGame)
 	{
 		m_OpenedDoor = false;
-		return;
+		return false;
 	}
 
 	// синхронизировать с живыми ботами
@@ -408,11 +408,17 @@ void CLogicDungeonDoorKey::SyncStateChanges(int StartingGame)
 			&& BotPlayer->GetBotSub() == m_MobID && GS()->CheckPlayerMessageWorldID(i) == GS()->GetWorldID())
 		{
 			m_OpenedDoor = false;
-			return;
+			return false;
 		}
 	}
-	m_OpenedDoor = true;
-	return;
+
+	if (!m_OpenedDoor)
+	{
+		m_OpenedDoor = true;
+		return true;
+	}
+
+	return false;
 }
 
 void CLogicDungeonDoorKey::Snap(int SnappingClient)
