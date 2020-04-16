@@ -108,7 +108,7 @@ bool DungeonJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int 
 			return true;
 		}
 
-		GS()->Chat(-1, "{STR} joined to Dungeon {STR}!", Server()->ClientName(ClientID), Dungeon[VoteID].Name);
+		GS()->Chat(-1, "{STR} joined to Dungeon {STR}!", GS()->Server()->ClientName(ClientID), Dungeon[VoteID].Name);
 
 		if (!GS()->IsDungeon())
 			pPlayer->Acc().LastWorldID = GS()->GetWorldID();

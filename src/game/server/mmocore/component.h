@@ -16,9 +16,6 @@ protected:
 	class CGS *m_GameServer;
 	CGS* GS() const { return m_GameServer; }
 
-	class IServer* m_pServer;
-	IServer* Server() const { return m_pServer; }
-
 public:
 	virtual ~CMmoComponent() {}
 
