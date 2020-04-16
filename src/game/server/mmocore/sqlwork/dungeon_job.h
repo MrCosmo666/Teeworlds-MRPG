@@ -40,5 +40,4 @@ public:
 	void ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID);
 	void ShowDungeonsList(CPlayer* pPlayer);
 };
-
 #endif

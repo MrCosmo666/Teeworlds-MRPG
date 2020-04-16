@@ -351,55 +351,23 @@ void CLogicDoorKey::Snap(int SnappingClient)
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
-CLogicDestroyDoorKey::CLogicDestroyDoorKey(CGameWorld *pGameWorld, vec2 Pos, int ItemID, int Mode)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER, Pos, 14)
+CLogicDungeonDoorKey::CLogicDungeonDoorKey(CGameWorld *pGameWorld, vec2 Pos, int MobID)
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_DUNGEONDOOR, Pos, 14)
 {
-	m_Pos = Pos;
-	m_To = Pos;
+	m_To = vec2(Pos.x, Pos.y - 140);
+	m_OpenedDoor = false;
+	m_MobID = MobID;
 
-	if(Mode == 0)
-	{
-		m_Pos.y += 30;
-		m_To = GS()->Collision()->FindDirCollision(100, m_To, 'y', '-');
-	}
-	else 
-	{
-		m_Pos.x -= 30;
-		m_To = GS()->Collision()->FindDirCollision(100, m_To, 'x', '+');
-	}
-	m_ItemID = ItemID;
 	GameWorld()->InsertEntity(this);
 }
 
-void CLogicDestroyDoorKey::SetDestroyRespawn()
+void CLogicDungeonDoorKey::Tick()
 {
-	GS()->CreateExplosion(m_To, -1, WEAPON_SELF, 0);
-	GS()->CreateExplosion(m_Pos, -1, WEAPON_SELF, 0);
-	m_RespawnTick = 60*Server()->TickSpeed();
-}
-
-void CLogicDestroyDoorKey::Tick() 
-{
-	// снимаем респавн тик
-	if(m_RespawnTick)
-	{
-		m_RespawnTick--;
+	if (m_OpenedDoor)
 		return;
-	}
 
-	// ищим игроков для двери
 	for(CCharacter *pChar = (CCharacter*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter *)pChar->TypeNext())
 	{
-		// проверяем кол-во предмет хватает ли
-		ItemSql::ItemPlayer &KeyItem = pChar->GetPlayer()->GetItem(m_ItemID);
-		if(KeyItem.Count)
-		{
-			SetDestroyRespawn();
-			GS()->SBL(pChar->GetPlayer()->GetCID(), 100000, 100, _("The door is unlocked for 60 seconds"), NULL);
-			KeyItem.Remove(1);
-			break;
-		}
-
 		// если не залетаем во что либо
 		vec2 IntersectPos = closest_point_on_line(m_Pos, m_To, pChar->m_Core.m_Pos);
 		float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);
@@ -419,15 +387,36 @@ void CLogicDestroyDoorKey::Tick()
 		
 			pChar->m_Core.m_Vel += (Dir*a*(Velocity*0.75f))*0.85f;
 			pChar->m_Core.m_Pos = pChar->m_OldPos + Dir;
-
-			GS()->SBL(pChar->GetPlayer()->GetCID(), 100000, 100, _("You need {s:name}"), "name", KeyItem.Info().GetName(pChar->GetPlayer()));
 		}
 	}
 }
 
-void CLogicDestroyDoorKey::Snap(int SnappingClient)
+void CLogicDungeonDoorKey::SyncStateChanges(int StartingGame)
+{
+	// если начало игры изначально закрыты все двери
+	if (StartingGame)
+	{
+		m_OpenedDoor = false;
+		return;
+	}
+
+	// синхронизировать с живыми ботами
+	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
+	{
+		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
+		if (BotPlayer && BotPlayer->GetCharacter() && BotPlayer->GetSpawnBot() == SPAWNMOBS && BotPlayer->GetBotSub() == m_MobID)
+		{
+			m_OpenedDoor = false;
+			return;
+		}
+	}
+	m_OpenedDoor = true;
+	return;
+}
+
+void CLogicDungeonDoorKey::Snap(int SnappingClient)
 {	
-	if (m_RespawnTick || NetworkClipped(SnappingClient))
+	if (m_OpenedDoor || NetworkClipped(SnappingClient))
 		return;
 
 	CNetObj_Laser *pObj = static_cast<CNetObj_Laser *>(Server()->SnapNewItem(NETOBJTYPE_LASER, GetID(), sizeof(CNetObj_Laser)));

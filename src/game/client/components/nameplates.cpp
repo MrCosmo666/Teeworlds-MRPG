@@ -41,9 +41,9 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 		char aName[64];
 		str_format(aName, sizeof(aName), "%s", g_Config.m_ClShowsocial ? m_pClient->m_aClients[ClientID].m_aName : "");
 
-		float a = 0.8f;
+		float a = 0.95f;
 		if (g_Config.m_ClNameplatesAlways == 0)
-			a = clamp(0.85f - powf(distance(m_pClient->m_pControls->m_TargetPos, Position) / 200.0f, 16.0f), 0.0f, 0.85f);
+			a = clamp(0.95f - powf(distance(m_pClient->m_pControls->m_TargetPos, Position) / 200.0f, 16.0f), 0.0f, 0.95f);
 
 		if (m_pClient->MmoServer() && m_pClient->m_aClients[ClientID].m_pLocalStats && a > 0.001f)
 		{
@@ -62,7 +62,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 					break;
 				case MOOD_AGRESSED_TANK:
 					str_format(aIcon, sizeof(aIcon), "agressed_y");
-					ColorNameplates = vec4(1.0f, 0.3f, 0.3f, a);
+					ColorNameplates = vec4(0.95f, 0.3f, 0.3f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.7f * a);
 					break;
 				case MOOD_AGRESSED_OTHER:
@@ -77,7 +77,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 					break;
 				case MOOD_QUESTING:
 					str_format(aIcon, sizeof(aIcon), "paper");
-					ColorNameplates = vec4(0.8f, 0.75f, 0.35f, a);
+					ColorNameplates = vec4(0.9f, 0.85f, 0.35f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.3f * a);
 					break;
 			}

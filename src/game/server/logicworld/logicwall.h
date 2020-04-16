@@ -75,17 +75,18 @@ public:
 
 };
 
-class CLogicDestroyDoorKey : public CEntity
+class CLogicDungeonDoorKey : public CEntity
 {
 	vec2 m_To;
-	int m_ItemID;
-	int m_RespawnTick;
+	int m_MobID;
+	bool m_OpenedDoor;
 
 public:
-	CLogicDestroyDoorKey(CGameWorld *pGameWorld, vec2 Pos, int ItemID, int Mode);
+	CLogicDungeonDoorKey(CGameWorld *pGameWorld, vec2 Pos, int MobID);
 	virtual void Snap(int SnappingClient);
 	virtual void Tick();
-	void SetDestroyRespawn();
+
+	void SyncStateChanges(int StartingGame);
 
 };
 

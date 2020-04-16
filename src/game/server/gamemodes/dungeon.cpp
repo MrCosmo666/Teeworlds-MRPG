@@ -19,6 +19,15 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	vec2 PosDoor = vec2(DungeonJob::Dungeon[m_DungeonID].DoorX, DungeonJob::Dungeon[m_DungeonID].DoorY);
 	m_DungeonDoor = new DungeonDoor(&GS()->m_World, PosDoor);
 	ChangeState(DUNGEON_WAITING);
+
+	// загрузим все двери
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_door", "WHERE DungeonID = '%d'", m_DungeonID));
+	while (RES->next())
+	{
+		int DungeonMobID = RES->getInt("MobID");
+		vec2 Position = vec2(RES->getInt("PosX"), RES->getInt("PosY"));
+		new CLogicDungeonDoorKey(&GS()->m_World, Position, DungeonMobID);
+	}
 }
 
 void CGameControllerDungeon::KillAllPlayers()
@@ -46,11 +55,13 @@ void CGameControllerDungeon::ChangeState(int State)
 
 			GS()->m_apPlayers[i]->Acc().TimeDungeon = 0;
 		}
+		DungeonJob::Dungeon[m_DungeonID].Progress = 0;
 		m_MaximumTick = 0;
 		m_FinishedTick = 0;
 		m_StartingTick = 0;
 		m_SafeTick = 0;
 		SetMobsSpawn(false);
+		UpdateDoorKeyState();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
@@ -72,10 +83,11 @@ void CGameControllerDungeon::ChangeState(int State)
 		GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "You are given 10 minutes to complete of dungeon!");
 		GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 500, "Dungeon started!");
 		SetMobsSpawn(true);
+		UpdateDoorKeyState(true);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
-	// Используется при смене статуса в Ожидание данжа
+	// Используется при смене статуса в Ожидание финиша данжа
 	else if (State == DUNGEON_WAITING_FINISH)
 	{
 		m_SafeTick = 0;
@@ -96,6 +108,10 @@ void CGameControllerDungeon::ChangeState(int State)
 			int Seconds = GS()->m_apPlayers[i]->Acc().TimeDungeon / Server()->TickSpeed();
 			GS()->Mmo()->Dungeon()->SaveDungeonRecord(GS()->m_apPlayers[i], m_DungeonID, Seconds);
 			GS()->m_apPlayers[i]->Acc().TimeDungeon = 0;
+		
+			char aTimeFormat[64];
+			str_format(aTimeFormat, sizeof(aTimeFormat), "Time: %d minute(s) %d second(s)", Seconds / 60, Seconds - (Seconds / 60 * 60));
+			GS()->Chat(-1, "{STR} finished {STR} : Time {STR}", GS()->Server()->ClientName(i), DungeonJob::Dungeon[m_DungeonID].Name, aTimeFormat);
 		}
 
 		KillAllPlayers();
@@ -202,6 +218,7 @@ int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKill
 		int Progress = 100 - (int)kurosio::translate_to_procent(CountMobs(), LeftMobsToWin());
 		DungeonJob::Dungeon[m_DungeonID].Progress = Progress;
 		GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "The dungeon is completed on [{INT}%]", &Progress);
+		UpdateDoorKeyState();
 	}
 	return 0;
 }
@@ -215,6 +232,13 @@ void CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 		GS()->Server()->ChangeWorld(ClientID, pChr->GetPlayer()->Acc().LastWorldID);
 		GS()->Chat(ClientID, "You were thrown out of dungeon!");
 	}
+}
+
+void CGameControllerDungeon::UpdateDoorKeyState(bool StartingGame)
+{
+	for (CLogicDungeonDoorKey* pDoor = (CLogicDungeonDoorKey*)GS()->m_World.FindFirst(CGameWorld::ENTTYPE_DUNGEONDOOR);
+		pDoor; pDoor = (CLogicDungeonDoorKey*)pDoor->TypeNext())
+		pDoor->SyncStateChanges(StartingGame);
 }
 
 int CGameControllerDungeon::CountMobs() const

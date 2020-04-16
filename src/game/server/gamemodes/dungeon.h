@@ -53,6 +53,8 @@ private:
 	void StateTick();
 	void SetMobsSpawn(bool AllowedSpawn);
 	void KillAllPlayers();
+
+	void UpdateDoorKeyState(bool StartingGame = false);
 };
 
 // CHomeDoor class
@@ -67,4 +69,5 @@ public:
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);
 };
+
 #endif

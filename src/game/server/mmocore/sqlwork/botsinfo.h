@@ -81,6 +81,7 @@ class ContextBots : public CMmoComponent
 		int PositionY;
 		int Level;
 		int RespawnTick;
+		int DungeonDoorID;
 		int WorldID;
 
 		int DropItem[6];
