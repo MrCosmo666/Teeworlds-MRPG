@@ -13,6 +13,7 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 {
 	m_pGameType = "MmoTee";
 	m_DungeonID = GS()->DungeonID();
+	m_WorldID = GS()->GetWorldID();
 	m_GameFlags = 0;
 
 	// создание двери для ожидания начала
@@ -34,7 +35,7 @@ void CGameControllerDungeon::KillAllPlayers()
 {
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter())
+		if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter() && GS()->Server()->GetWorldID(i) == m_WorldID)
 			GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_SELF);
 	}
 }
@@ -49,7 +50,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	{
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
-			if (!GS()->m_apPlayers[i])
+			if (!GS()->m_apPlayers[i] || GS()->Server()->GetWorldID(i) != m_WorldID)
 				continue;
 
 			GS()->m_apPlayers[i]->Acc().TimeDungeon = 0;
@@ -78,9 +79,9 @@ void CGameControllerDungeon::ChangeState(int State)
 		KillAllPlayers();
 		m_MaximumTick = Server()->TickSpeed() * 600;
 		m_SafeTick = Server()->TickSpeed() * 30;
-		GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "The security timer is enabled for 30 seconds!");
-		GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "You are given 10 minutes to complete of dungeon!");
-		GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 500, "Dungeon started!");
+		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The security timer is enabled for 30 seconds!");
+		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "You are given 10 minutes to complete of dungeon!");
+		GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon started!");
 		SetMobsSpawn(true);
 		UpdateDoorKeyState(true);
 	}
@@ -96,7 +97,7 @@ void CGameControllerDungeon::ChangeState(int State)
 		// элемент RACE
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
-			if (!GS()->m_apPlayers[i])
+			if (!GS()->m_apPlayers[i] || GS()->Server()->GetWorldID(i) != m_WorldID)
 				continue;
 
 			int Seconds = GS()->m_apPlayers[i]->Acc().TimeDungeon / Server()->TickSpeed();
@@ -127,7 +128,7 @@ void CGameControllerDungeon::StateTick()
 	// сбросить данж
 	if (Players < 1 && m_StateDungeon != DUNGEON_WAITING)
 		ChangeState(DUNGEON_WAITING);
-
+	
 	// обновлять информацию каждую секунду
 	if (Server()->Tick() % Server()->TickSpeed() == 0)
 	{
@@ -139,11 +140,11 @@ void CGameControllerDungeon::StateTick()
 	// Используется в тике когда Ожидание данжа
 	if (m_StateDungeon == DUNGEON_WAITING)
 	{
-		// пишем всем игрокам что ждем 2 игроков
+		/*// пишем всем игрокам что ждем 2 игроков
 		if (Players == 1)
-			GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 10, "Dungeon '{STR}' Waiting 2 players!", DungeonJob::Dungeon[m_DungeonID].Name);
+			GS()->BroadcastWorldID(m_WorldID, 99999, 10, "Dungeon '{STR}' Waiting 2 players!", DungeonJob::Dungeon[m_DungeonID].Name);
 		// начинаем данж если равно 2 игрока или больше
-		else if (Players > 1)
+		else */if (Players >= 1)
 			ChangeState(DUNGEON_WAITING_START);
 	}
 
@@ -151,12 +152,12 @@ void CGameControllerDungeon::StateTick()
 	// Используется в тике когда Отчет начала данжа
 	else if (m_StateDungeon == DUNGEON_WAITING_START)
 	{
-		if (Players < 2)
+		/*if (Players < 2)
 			ChangeState(DUNGEON_WAITING);
-		else if (m_StartingTick)
+		else */if (m_StartingTick)
 		{
 			int Time = m_StartingTick / Server()->TickSpeed();
-			GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 500, "Dungeon waiting {INT} sec!", &Time);
+			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon waiting {INT} sec!", &Time);
 
 			m_StartingTick--;
 			if (!m_StartingTick)
@@ -171,7 +172,7 @@ void CGameControllerDungeon::StateTick()
 		// элемент RACE
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
-			if (!GS()->m_apPlayers[i])
+			if (!GS()->m_apPlayers[i] || GS()->Server()->GetWorldID(i) != m_WorldID)
 				continue;
 
 			GS()->m_apPlayers[i]->Acc().TimeDungeon++;
@@ -182,7 +183,7 @@ void CGameControllerDungeon::StateTick()
 		{
 			m_SafeTick--;
 			if (!m_SafeTick)
-				GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "The security timer is over, be careful!");
+				GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The security timer is over, be careful!");
 		}
 
 		// завершаем данж когда успешно данж завершен
@@ -197,7 +198,7 @@ void CGameControllerDungeon::StateTick()
 		if (m_FinishedTick)
 		{
 			int Time = m_FinishedTick / Server()->TickSpeed();
-			GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 500, "Dungeon ended {INT} sec!", &Time);
+			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon ended {INT} sec!", &Time);
 
 			m_FinishedTick--;
 		}
@@ -216,7 +217,7 @@ int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKill
 	{
 		int Progress = 100 - (int)kurosio::translate_to_procent(CountMobs(), LeftMobsToWin());
 		DungeonJob::Dungeon[m_DungeonID].Progress = Progress;
-		GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "The dungeon is completed on [{INT}%]", &Progress);
+		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The dungeon is completed on [{INT}%]", &Progress);
 		UpdateDoorKeyState();
 	}
 	return 0;
@@ -239,7 +240,7 @@ void CGameControllerDungeon::UpdateDoorKeyState(bool StartingGame)
 		pDoor; pDoor = (CLogicDungeonDoorKey*)pDoor->TypeNext())
 	{
 		if (pDoor->SyncStateChanges(StartingGame))
-			GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "Scr... Scrr... Opened door somewhere!");
+			GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Scr... Scrr... Opened door somewhere!");
 	}
 }
 
@@ -249,7 +250,7 @@ int CGameControllerDungeon::CountMobs() const
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS)
+		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
 			countMobs++;
 	}
 	return countMobs;
@@ -260,7 +261,7 @@ int CGameControllerDungeon::PlayersNum() const
 	int playIt = 0;
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if (Server()->GetWorldID(i) == GS()->GetWorldID())
+		if (Server()->GetWorldID(i) == m_WorldID)
 			playIt++;
 	}
 	return playIt;
@@ -272,7 +273,7 @@ int CGameControllerDungeon::LeftMobsToWin() const
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS && BotPlayer->GetCharacter())
+		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS && BotPlayer->GetCharacter() && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
 			leftMobs++;
 	}
 	return leftMobs;
@@ -283,8 +284,7 @@ void CGameControllerDungeon::SetMobsSpawn(bool AllowedSpawn)
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS 
-			&& GS()->CheckPlayerMessageWorldID(i) == GS()->GetWorldID())
+		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
 		{
 			BotPlayer->SetDungeonAllowedSpawn(AllowedSpawn);
 			if (!AllowedSpawn && BotPlayer->GetCharacter())
