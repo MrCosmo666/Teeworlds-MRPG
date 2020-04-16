@@ -153,7 +153,7 @@ void SqlController::ShowBussinesHousesSell(CPlayer *pPlayer)
 		const int HouseID = RES->getInt("ID");
 		const int WorldID = RES->getInt("WorldID");
 		int Price = RES->getInt("Price");
-		int Level = RES->getInt("Farm_Level");
+		int Level = RES->getInt("FarmLevel");
 
 		GS()->AVM(ClientID, "null", NOPE, HHOUSEAVAILABLE, "HL{INT} {STR} {INT}gold {STR}", &Level, House()->ClassName(HouseID), &Price, GS()->Server()->GetWorldName(WorldID));
 	}

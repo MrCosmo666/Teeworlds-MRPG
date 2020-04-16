@@ -837,12 +837,12 @@ void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int MID)
 	pPlayer->m_Colored = { 20, 20, 20 };
 	
 	if(GuildID == MID)
-		GS()->AVM(ClientID, "null", NOPE, 0, "Guild Bank: {INT} Price: {INT}", &Guild[ GuildID ].m_Bank, &HouseGuild[MID].m_Price);
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "Guild Bank: {INT} Price: {INT}", &Guild[ GuildID ].m_Bank, &HouseGuild[MID].m_Price);
 	
 	if(Leader && GuildID != HouseGuild[MID].m_GuildID)
 	{
-		GS()->AVM(ClientID, "null", NOPE, 0, "Every day payment {INT} gold", &HouseGuild[MID].m_Payment);
-		GS()->AVM(ClientID, "BUYMEMBERHOUSE", MID, 0, "Buy this member house! Price: {INT}", &HouseGuild[MID].m_Price);
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "Every day payment {INT} gold", &HouseGuild[MID].m_Payment);
+		GS()->AVM(ClientID, "BUYMEMBERHOUSE", MID, NOPE, "Buy this member house! Price: {INT}", &HouseGuild[MID].m_Price);
 	}
 }
 
