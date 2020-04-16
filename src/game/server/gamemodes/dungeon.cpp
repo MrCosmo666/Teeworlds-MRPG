@@ -15,12 +15,12 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	m_DungeonID = GS()->DungeonID();
 	m_GameFlags = 0;
 
-	// создание двери
+	// создание двери для ожидания начала
 	vec2 PosDoor = vec2(DungeonJob::Dungeon[m_DungeonID].DoorX, DungeonJob::Dungeon[m_DungeonID].DoorY);
 	m_DungeonDoor = new DungeonDoor(&GS()->m_World, PosDoor);
 	ChangeState(DUNGEON_WAITING);
 
-	// загрузим все двери
+	// создание ключевых дверей
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_door", "WHERE DungeonID = '%d'", m_DungeonID));
 	while (RES->next())
 	{
@@ -46,8 +46,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	// - - - - - - - - - - - - - - - - - - - - - -
 	// Используется при смене статуса в Ожидание данжа
 	if (State == DUNGEON_WAITING)
-	{	
-		// элемент RACE
+	{
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			if (!GS()->m_apPlayers[i])
@@ -93,12 +92,7 @@ void CGameControllerDungeon::ChangeState(int State)
 		m_SafeTick = 0;
 		m_FinishedTick = Server()->TickSpeed() * 10;
 		SetMobsSpawn(false);
-	}
 
-	// - - - - - - - - - - - - - - - - - - - - - -
-	// Используется при смене статуса в Завершение данжа
-	else if (State == DUNGEON_FINISHED)
-	{
 		// элемент RACE
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
@@ -108,12 +102,17 @@ void CGameControllerDungeon::ChangeState(int State)
 			int Seconds = GS()->m_apPlayers[i]->Acc().TimeDungeon / Server()->TickSpeed();
 			GS()->Mmo()->Dungeon()->SaveDungeonRecord(GS()->m_apPlayers[i], m_DungeonID, Seconds);
 			GS()->m_apPlayers[i]->Acc().TimeDungeon = 0;
-		
+
 			char aTimeFormat[64];
 			str_format(aTimeFormat, sizeof(aTimeFormat), "Time: %d minute(s) %d second(s)", Seconds / 60, Seconds - (Seconds / 60 * 60));
 			GS()->Chat(-1, "{STR} finished {STR} {STR}", GS()->Server()->ClientName(i), DungeonJob::Dungeon[m_DungeonID].Name, aTimeFormat);
 		}
+	}
 
+	// - - - - - - - - - - - - - - - - - - - - - -
+	// Используется при смене статуса в Завершение данжа
+	else if (State == DUNGEON_FINISHED)
+	{
 		KillAllPlayers();
 	}
 
@@ -351,7 +350,7 @@ DungeonDoor::DungeonDoor(CGameWorld *pGameWorld, vec2 Pos)
 
 void DungeonDoor::Tick()
 {
-	if(m_State != DUNGEON_STARTED)
+	if(m_State <= DUNGEON_STARTED)
 	{
 		for(CCharacter *pChar = (CCharacter*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter *)pChar->TypeNext())
 		{
