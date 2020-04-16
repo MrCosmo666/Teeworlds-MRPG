@@ -140,11 +140,11 @@ void CGameControllerDungeon::StateTick()
 	// Используется в тике когда Ожидание данжа
 	if (m_StateDungeon == DUNGEON_WAITING)
 	{
-		/*// пишем всем игрокам что ждем 2 игроков
+		// пишем всем игрокам что ждем 2 игроков
 		if (Players == 1)
 			GS()->BroadcastWorldID(m_WorldID, 99999, 10, "Dungeon '{STR}' Waiting 2 players!", DungeonJob::Dungeon[m_DungeonID].Name);
 		// начинаем данж если равно 2 игрока или больше
-		else */if (Players >= 1)
+		else if (Players >= 2)
 			ChangeState(DUNGEON_WAITING_START);
 	}
 
@@ -152,9 +152,9 @@ void CGameControllerDungeon::StateTick()
 	// Используется в тике когда Отчет начала данжа
 	else if (m_StateDungeon == DUNGEON_WAITING_START)
 	{
-		/*if (Players < 2)
+		if (Players < 2)
 			ChangeState(DUNGEON_WAITING);
-		else */if (m_StartingTick)
+		else if (m_StartingTick)
 		{
 			int Time = m_StartingTick / Server()->TickSpeed();
 			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon waiting {INT} sec!", &Time);

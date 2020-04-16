@@ -1154,7 +1154,8 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				return (str_comp_nocase(pMsg->m_Value, vote.m_aDescription) == 0);
 			});
 
-			if(ParseVote(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveCount, pMsg->m_Reason))
+			if(item != m_PlayerVotes[ClientID].end() 
+				&& ParseVote(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveCount, pMsg->m_Reason))
 				pPlayer->m_PlayerTick[TickState::LastVoteTry] = Server()->Tick();
 		}
 		else if(MsgID == NETMSGTYPE_CL_VOTE)
