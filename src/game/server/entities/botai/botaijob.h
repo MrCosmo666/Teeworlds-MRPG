@@ -29,7 +29,8 @@ private:
 
 	int m_BotTick;
 	int m_BotTargetID;
-	
+	int m_EmotionsStyle;
+
 	int m_StartHealth;
 	int m_HookTick;
 	bool m_MessagePlayers[MAX_CLIENTS];
@@ -38,6 +39,7 @@ private:
 
 	void FindHardHealth();
 	void ClearTarget();
+	void SetTarget(int ClientID);
     void EngineBots();
 	void ChangeWeapons();
 	void ShowProgress();
@@ -50,7 +52,7 @@ private:
 	CPlayer *SearchPlayer(int Distance);
     CPlayer *SearchTenacityPlayer(float Distance);
 
-	int GetEmoticon(int EmoteEyes) const;
+	void EmoteActions(int EmotionStyle);
 
 };
 

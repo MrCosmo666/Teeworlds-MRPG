@@ -33,7 +33,7 @@ void BotAI::FindHardHealth()
 		CPlayer *pFinderHard = GS()->GetPlayer(PlayerID, true, true);
 		if(!pFinderHard || distance(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) > 800.0f)
 		{
-			m_BotTargetID = GetPlayer()->GetCID();
+			ClearTarget();
 			listDmg = m_ListDmgPlayers.erase(listDmg);
 			continue;	
 		}
@@ -55,7 +55,7 @@ void BotAI::FindHardHealth()
 				pFinderHard->GetAttributeCount(Stats::StTenacity, true) > pFrom->GetAttributeCount(Stats::StTenacity, true)
 			))
 		{
-			m_BotTargetID = PlayerID;
+			SetTarget(PlayerID);
 		}
 		listDmg++;
 	}
@@ -75,7 +75,7 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 
 	// Спавн ботов основной
 	m_StartHealth = Health();
-	m_BotTargetID = GetPlayer()->GetCID();
+	ClearTarget();
 
 	// информация о зарождении жирного моба
 	int BotID = GetPlayer()->GetBotID();
@@ -250,8 +250,17 @@ void BotAI::Die(int Killer, int Weapon)
 void BotAI::ClearTarget()
 {
 	int FromID = GetPlayer()->GetCID();
-	if(m_BotTargetID != FromID)
+	if (m_BotTargetID != FromID)
+	{
+		m_EmotionsStyle = 1 + rand() % 5;
 		m_BotTargetID = FromID;
+	}
+}
+
+void BotAI::SetTarget(int ClientID)
+{
+	m_EmotionsStyle = EMOTE_ANGRY;
+	m_BotTargetID = ClientID;
 }
 
 void BotAI::ChangeWeapons()
@@ -311,17 +320,7 @@ void BotAI::EngineNPC()
 	// ------------------------------------------------------------------------------
 	// эмоции ботов
 	int EmoteBot = ContextBots::NpcBot[SubBotID].Emote;
-	if(EmoteBot && (Server()->Tick() % (Server()->TickSpeed()+rand()%50 * 8)) == 0)
-	{
-		SetEmote(EmoteBot, 10);
-		if(EmoteBot == EMOTE_HAPPY) EmoteBot = rand()%2 == 0 ? EMOTICON_EYES : EMOTICON_HEARTS;
-		else if(EmoteBot == EMOTE_BLINK) EmoteBot = EMOTICON_DOTDOT;
-		else if(EmoteBot == EMOTE_ANGRY) EmoteBot = EMOTICON_SUSHI+rand()%4;
-		else if(EmoteBot == EMOTE_PAIN) EmoteBot = EMOTICON_DROP;
-		else if(EmoteBot == EMOTE_SURPRISE) EmoteBot = EMOTICON_EYES;
-
-		GS()->SendEmoticon(GetPlayer()->GetCID(), EmoteBot);
-	}
+	EmoteActions(EmoteBot);
 
 	// направление глаз
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
@@ -356,7 +355,7 @@ void BotAI::EngineQuestMob()
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
 		m_Input.m_TargetY = rand()%4-rand()%8;
 	m_Input.m_TargetX = (m_Input.m_Direction*10+1);
-
+	EmoteActions(EMOTE_BLINK);
 
 	// ------------------------------------------------------------------------------
 	// интерактивы бота с найденым игроком
@@ -401,7 +400,7 @@ void BotAI::EngineMobs()
 
 	// эмоции ботов
 	int SubBotID = GetPlayer()->GetBotSub();
-
+	EmoteActions(m_EmotionsStyle);
 
 	// Зелье мобам восстановление Health без агра
 	if(m_BotTargetID == GetPlayer()->GetCID() && Health() < m_StartHealth && !GetPlayer()->CheckEffect("RegenHealth")) 
@@ -526,12 +525,12 @@ CPlayer *BotAI::SearchPlayer(int Distance)
 CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 {
 	// ночью боты враждебнее ищем сразу игрока для агра если его нету или есть бот злой
-	if(m_BotTargetID == GetPlayer()->GetCID() && ((random_int() % 300 == 0) || Server()->GetEnumTypeDay() == DayType::NIGHTTYPE || GS()->IsDungeon()))
+	if(m_BotTargetID == GetPlayer()->GetCID() && (GS()->IsDungeon() || Server()->GetEnumTypeDay() == DayType::NIGHTTYPE || random_int() % 300 == 0))
 	{
 		// ищем игрока
 		CPlayer *pPlayer = SearchPlayer(800.0f);
 		if(pPlayer && pPlayer->GetCharacter()) 
-			m_BotTargetID = pPlayer->GetCID();
+			SetTarget(pPlayer->GetCID());
 
 		return pPlayer;
 	}
@@ -548,17 +547,34 @@ CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 	return pPlayer;
 }
 
-int BotAI::GetEmoticon(int EmoteEyes) const
+void BotAI::EmoteActions(int EmotionStyle)
 {
-	if(EmoteEyes == EMOTE_HAPPY) 
-		return EMOTICON_EYES;
-	else if(EmoteEyes == EMOTE_BLINK) 
-		return EMOTICON_DOTDOT;
-	else if(EmoteEyes == EMOTE_ANGRY) 
-		return EMOTICON_SUSHI+rand()%4;
-	else if(EmoteEyes == EMOTE_PAIN) 
-		return EMOTICON_DROP;
-	else if(EmoteEyes == EMOTE_SURPRISE) 
-		return EMOTICON_WTF;
-	return -1;
+	if (EmotionStyle < EMOTE_PAIN || EmotionStyle > EMOTE_BLINK)
+		return;
+
+	if ((Server()->Tick() % (Server()->TickSpeed() * 3 + random_int() % 10)) == 0)
+	{
+		if (EmotionStyle == EMOTE_BLINK)
+		{
+			SetEmote(EMOTE_BLINK, 1 + random_int() % 2);
+			GS()->SendEmoticon(GetPlayer()->GetCID(), EMOTICON_DOTDOT);
+
+		}
+		else if (EmotionStyle == EMOTE_HAPPY)
+		{
+			SetEmote(EMOTE_HAPPY, 1 + random_int() % 2);
+			GS()->SendEmoticon(GetPlayer()->GetCID(), (random_int() % 2 == 0 ? (int)EMOTICON_HEARTS : (int)EMOTICON_EYES));
+
+		}
+		else if (EmotionStyle == EMOTE_ANGRY)
+		{
+			SetEmote(EMOTE_ANGRY, 1 + random_int() % 2);
+			GS()->SendEmoticon(GetPlayer()->GetCID(), (EMOTICON_SPLATTEE + random_int() % 3));
+		}		
+		else if (EmotionStyle == EMOTE_PAIN)
+		{
+			SetEmote(EMOTE_PAIN, 1 + random_int() % 2);
+			GS()->SendEmoticon(GetPlayer()->GetCID(), EMOTICON_DROP);
+		}
+	}
 }
