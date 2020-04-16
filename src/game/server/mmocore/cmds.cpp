@@ -224,7 +224,7 @@ void CCmd::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		if ((sscanf(Msg->m_pMessage, "/useskill %d", &sskillid)) != 1)
 			return GS->ChatFollow(ClientID, "Please use: /useitem <itemid>");
 
-		int sizeskills = SkillsSql::SkillData.size();
+		int sizeskills = SkillJob::SkillData.size();
 		int skillid = clamp(sskillid, 0, sizeskills);
 		UseSkill(GS, pPlayer, skillid);
 		return;

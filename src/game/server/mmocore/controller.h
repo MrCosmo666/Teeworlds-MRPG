@@ -9,19 +9,19 @@
 #include "sqlwork/account_plant.h"
 #include "sqlwork/account_relax.h"
 #include "sqlwork/botsinfo.h"
-#include "sqlwork/craft_job.h"
-#include "sqlwork/dungeon_job.h"
-#include "sqlwork/home.h"
-#include "sqlwork/mailbox_job.h"
 #include "sqlwork/items.h"
-#include "sqlwork/guild_job.h"
 #include "sqlwork/questing.h"
 #include "sqlwork/shopmail.h"
-#include "sqlwork/skills.h"
 #include "sqlwork/storage.h"
 #include "sqlwork/teleports.h"
-#include "sqlwork/world_swap_job.h"
 
+#include "sqlwork/skill_job.h"
+#include "sqlwork/world_swap_job.h"
+#include "sqlwork/craft_job.h"
+#include "sqlwork/dungeon_job.h"
+#include "sqlwork/house_job.h"
+#include "sqlwork/mailbox_job.h"
+#include "sqlwork/guild_job.h"
 
 #include <engine/server/sql_connect_pool.h>
 #include <engine/server/sql_string_helpers.h>
@@ -47,21 +47,22 @@ class SqlController
 
 	class AccountMainSql *m_pAccMain;
 	class ContextBots *m_pBotsInfo;
-	class CraftJob *m_pCraftJob;
-	class DungeonJob *m_pDungeonJob;
-	class HouseSql *m_pHouseWork;
-	class MailBoxJob *m_pMailBoxJob;
 	class ItemSql *m_pItemWork;
-	class GuildJob * m_pGuildJob;
 	class MinerAccSql *m_pAccMiner;
 	class PlantsAccSql *m_pAccPlant;
 	class QuestBase *m_pQuest;
 	class ShopMailSql *m_pShopmail;
-	class SkillsSql *m_pSkillsWork;
 	class SpaRelaxSql *m_pAccRelax;
 	class StorageSql *m_pStorageWork;
 	class TeleportsSql *m_pTeleportsWork;
-	class WorldSwapJob *m_pWorldSwapJob;
+
+	class GuildJob* m_pGuildJob;
+	class CraftJob* m_pCraftJob;
+	class DungeonJob* m_pDungeonJob;
+	class HouseJob* m_pHouseJob;
+	class MailBoxJob* m_pMailBoxJob;
+	class SkillJob* m_pSkillJob;
+	class WorldSwapJob* m_pWorldSwapJob;
 
 public:
 	explicit SqlController(CGS *pGameServer);
@@ -73,20 +74,21 @@ public:
 	// ссылки на объекты класса Sql Work
 	AccountMainSql *Account() const { return m_pAccMain; }
 	ContextBots *BotsData() const { return m_pBotsInfo; }
-	CraftJob *Craft() const { return m_pCraftJob; }
-	DungeonJob *Dungeon() const { return m_pDungeonJob; }
-	HouseSql *House() const { return m_pHouseWork; }
-	MailBoxJob *Inbox() const { return m_pMailBoxJob; }
 	ItemSql *Item() const { return m_pItemWork; }
-	GuildJob *Member() const { return m_pGuildJob; }
 	MinerAccSql *MinerAcc() const { return m_pAccMiner; }
 	PlantsAccSql *PlantsAcc() const { return m_pAccPlant; }
 	QuestBase *Quest() const { return m_pQuest; }
 	ShopMailSql *Auction() const { return m_pShopmail; }
-	SkillsSql *Skills() const { return m_pSkillsWork; }
 	SpaRelaxSql *SpaAcc() const { return m_pAccRelax; }
 	StorageSql *Storage() const { return m_pStorageWork; }
 	TeleportsSql *Teleports() const { return m_pTeleportsWork; }
+
+	CraftJob* Craft() const { return m_pCraftJob; }
+	DungeonJob* Dungeon() const { return m_pDungeonJob; }
+	HouseJob* House() const { return m_pHouseJob; }
+	MailBoxJob* Inbox() const { return m_pMailBoxJob; }
+	GuildJob* Member() const { return m_pGuildJob; }
+	SkillJob* Skills() const { return m_pSkillJob; }
 	WorldSwapJob *WorldSwap() const { return m_pWorldSwapJob; }
 
 	// global systems

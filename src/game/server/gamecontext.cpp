@@ -1517,8 +1517,8 @@ void CGS::ClearClientData(int ClientID)
 	if(ItemSql::Items.find(ClientID) != ItemSql::Items.end()) 
 		ItemSql::Items.erase(ClientID);
 
-	if(SkillsSql::Skill.find(ClientID) != SkillsSql::Skill.end()) 
-		SkillsSql::Skill.erase(ClientID);
+	if(SkillJob::Skill.find(ClientID) != SkillJob::Skill.end())
+		SkillJob::Skill.erase(ClientID);
 	
 	if(Effects.find(ClientID) != Effects.end()) 
 		Effects.erase(ClientID);

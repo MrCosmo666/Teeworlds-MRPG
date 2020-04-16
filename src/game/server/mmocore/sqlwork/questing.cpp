@@ -444,11 +444,6 @@ void QuestBase::CheckQuest(CPlayer *pPlayer)
 			continue;
 
 		// создаем дроп элементов если имеются
-		int playerProgress = Quests[ClientID][QuestID].Progress;
-		ContextBots::QuestBotInfo &FindBot = GetQuestBot(QuestID, playerProgress);
-		if(FindBot.IsActive()) 
-			GS()->CreateDropQuest(FindBot, ClientID); 
-
 		if(qData.second.ProgressSize > 1 && qData.second.ProgressSize != Quests[ClientID][QuestID].Progress) 
 			continue;
 
@@ -576,6 +571,9 @@ bool QuestBase::InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo 
 	// проверяем собрали предметы и убили ли всех ботов
 	const int ClientID = pPlayer->GetCID();
 	const int QuestID = BotData.QuestID;
+	if (BotData.InterRandom[1] > 0)
+		GS()->CreateDropQuest(BotData, ClientID);
+	
 	if(!IsCollectItemComplete(pPlayer, BotData, false) || !IsDefeatMobComplete(ClientID, QuestID) || pPlayer->Acc().Level < QuestsData[QuestID].Level)
 	{
 		GS()->Chat(ClientID, "Not all criteria to complete!");
@@ -849,7 +847,7 @@ void QuestBase::QuestTableShowInformation(CPlayer* pPlayer, ContextBots::QuestBo
 			continue;
 
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "Item %s", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
+		str_format(aBuf, sizeof(aBuf), "%s", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
 		if (BotData.InterRandom[0] > 1)
 		{
 			char aChanceBuf[128];

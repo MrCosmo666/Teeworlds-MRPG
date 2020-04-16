@@ -18,13 +18,13 @@ SqlController::SqlController(CGS *pGameServer) : m_pGameServer(pGameServer)
 	m_Components.add(m_pAccRelax = new SpaRelaxSql());
 	m_Components.add(m_pCraftJob = new CraftJob());
 	m_Components.add(m_pDungeonJob = new DungeonJob());
-	m_Components.add(m_pHouseWork = new HouseSql());
+	m_Components.add(m_pHouseJob = new HouseJob());
 	m_Components.add(m_pMailBoxJob = new MailBoxJob());
 	m_Components.add(m_pItemWork = new ItemSql());
 	m_Components.add(m_pGuildJob = new GuildJob());
 	m_Components.add(m_pQuest = new QuestBase());
 	m_Components.add(m_pShopmail = new ShopMailSql());
-	m_Components.add(m_pSkillsWork = new SkillsSql());
+	m_Components.add(m_pSkillJob = new SkillJob());
 	m_Components.add(m_pStorageWork = new StorageSql());
 	m_Components.add(m_pTeleportsWork = new TeleportsSql());
 	m_Components.add(m_pWorldSwapJob = new WorldSwapJob());
@@ -147,7 +147,7 @@ void SqlController::ShowBussinesHousesSell(CPlayer *pPlayer)
 	const int ClientID = pPlayer->GetCID();
 	GS()->AVH(ClientID, HHOUSEAVAILABLE, vec3(52,26,80), _("List of available houses"), NULL);
 	GS()->AVM(ClientID, "null", NOPE, HHOUSEAVAILABLE, _("Symbols: HL - House level"), NULL);
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_homes WHERE OwnerID < '1' ORDER BY Class DESC"));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_houses WHERE OwnerID < '1' ORDER BY Class DESC"));
 	while(RES->next())
 	{
 		const int HouseID = RES->getInt("ID");

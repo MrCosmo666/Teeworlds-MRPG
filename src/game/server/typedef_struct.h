@@ -8,25 +8,7 @@ enum SafeList
 	Empty = -1
 };
 
-struct StructSkillInformation
-{
-	char sSkillName[32];
-	char sSkillDesc[64];
-	char sBonusName[64];
-	int sBonusCount;
-	int sManaCost;
-	int sManaUseCost;
-	int sSkillPrice;
-	int sSkillMaxLevel;
-	bool sPassive;
-};
-typedef StructSkillInformation SkillInfo;
 
-struct StructSkills
-{
-	int sBonusLevel;
-};
-typedef StructSkills SkillPlayer;
 
 
 

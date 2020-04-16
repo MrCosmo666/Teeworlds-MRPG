@@ -13,7 +13,7 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 {
 	m_pGameType = "MmoTee";
 	m_DungeonID = GS()->DungeonID();
-	m_GameFlags = GAMEFLAG_RACE;
+	m_GameFlags = 0;
 
 	// создание двери
 	vec2 PosDoor = vec2(DungeonJob::Dungeon[m_DungeonID].DoorX, DungeonJob::Dungeon[m_DungeonID].DoorY);

@@ -1,15 +1,35 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#ifndef GAME_SERVER_SQLSKILL_H
-#define GAME_SERVER_SQLSKILL_H
+#ifndef GAME_SERVER_SKILLJOB_H
+#define GAME_SERVER_SKILLJOB_H
 
 #include "../component.h"
 
-class SkillsSql : public CMmoComponent
+class SkillJob : public CMmoComponent
 {
 /* #########################################################################
 	GLOBAL SKILL CLASS 
 ######################################################################### */
+	struct StructSkillInformation
+	{
+		char m_SkillName[32];
+		char m_SkillDesc[64];
+		char m_SkillBonusInfo[64];
+		int m_BonusCount;
+		int m_ManaCost;
+		int m_ManaSupport;
+		int m_SkillPrice;
+		int m_SkillMaxLevel;
+		bool m_Passive;
+	};
+	typedef StructSkillInformation SkillInfo;
+
+	struct StructSkills
+	{
+		int m_SkillLevel;
+	};
+	typedef StructSkills SkillPlayer;
+
 public:
 	static std::map < int , SkillInfo > SkillData;
 	static std::map < int , std::map < int , SkillPlayer > > Skill;

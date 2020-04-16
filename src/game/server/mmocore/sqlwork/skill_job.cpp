@@ -4,45 +4,45 @@
 #include <game/server/gamecontext.h>
 
 #include <game/server/player.h>
-#include "skills.h"
+#include "skill_job.h"
 
 #include "skills/healthturret/healer-health.h"
 #include "skills/sleepygravity/sleepygravity.h"
 
 using namespace sqlstr;
 
-std::map < int , SkillInfo > SkillsSql::SkillData;
-std::map < int , std::map < int , SkillPlayer > > SkillsSql::Skill;
+std::map < int , SkillJob::SkillInfo > SkillJob::SkillData;
+std::map < int , std::map < int , SkillJob::SkillPlayer > > SkillJob::Skill;
 
 // Инициализация класса
-void SkillsSql::OnInitGlobal() 
+void SkillJob::OnInitGlobal() 
 { 
 	// загрузить список скиллов
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_skills_list"));
 	while(RES->next())
 	{
 		const int SkillID = (int)RES->getInt("ID");
-		str_copy(SkillData[SkillID].sSkillName, RES->getString("SkillName").c_str(), sizeof(SkillData[SkillID].sSkillName));
-		str_copy(SkillData[SkillID].sSkillDesc, RES->getString("SkillDesc").c_str(), sizeof(SkillData[SkillID].sSkillDesc));
-		str_copy(SkillData[SkillID].sBonusName, RES->getString("BonusName").c_str(), sizeof(SkillData[SkillID].sBonusName));
-		SkillData[SkillID].sManaCost = (int)RES->getInt("ManaCost");
-		SkillData[SkillID].sManaUseCost = (int)RES->getInt("ManaUseCost");
-		SkillData[SkillID].sSkillPrice = (int)RES->getInt("Price");
-		SkillData[SkillID].sSkillMaxLevel = (int)RES->getInt("SkillMaxLevel");
-		SkillData[SkillID].sBonusCount = (int)RES->getInt("BonusCount");
-		SkillData[SkillID].sPassive = (bool)RES->getBoolean("Passive");
+		str_copy(SkillData[SkillID].m_SkillName, RES->getString("SkillName").c_str(), sizeof(SkillData[SkillID].m_SkillName));
+		str_copy(SkillData[SkillID].m_SkillDesc, RES->getString("SkillDesc").c_str(), sizeof(SkillData[SkillID].m_SkillDesc));
+		str_copy(SkillData[SkillID].m_SkillBonusInfo, RES->getString("BonusInfo").c_str(), sizeof(SkillData[SkillID].m_SkillBonusInfo));
+		SkillData[SkillID].m_ManaCost = (int)RES->getInt("ManaCost");
+		SkillData[SkillID].m_ManaSupport = (int)RES->getInt("ManaSupport");
+		SkillData[SkillID].m_SkillPrice = (int)RES->getInt("Price");
+		SkillData[SkillID].m_SkillMaxLevel = (int)RES->getInt("SkillMaxLevel");
+		SkillData[SkillID].m_BonusCount = (int)RES->getInt("BonusCount");
+		SkillData[SkillID].m_Passive = (bool)RES->getBoolean("Passive");
 	}
 }
 
 // Загрузка данных игрока
-void SkillsSql::OnInitAccount(CPlayer *pPlayer)
+void SkillJob::OnInitAccount(CPlayer *pPlayer)
 {
 	int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("SkillID, BonusLevel", "tw_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("SkillID, SkillLevel", "tw_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	while(RES->next())
 	{
 		const int SkillID = (int)RES->getInt("SkillID");
-		Skill[ClientID][SkillID].sBonusLevel = (int)RES->getInt("BonusLevel");
+		Skill[ClientID][SkillID].m_SkillLevel = (int)RES->getInt("SkillLevel");
 	}		
 }
 
@@ -50,18 +50,18 @@ void SkillsSql::OnInitAccount(CPlayer *pPlayer)
 	HELPER SKILL CLASS 
 ######################################################################### */
 // получить бонус скилла
-int SkillsSql::GetSkillBonus(int ClientID, int SkillID) const
+int SkillJob::GetSkillBonus(int ClientID, int SkillID) const
 {
 	if(Skill[ClientID].find(SkillID) != Skill[ClientID].end())
-		return (Skill[ClientID][SkillID].sBonusLevel * SkillData[SkillID].sBonusCount);
+		return (Skill[ClientID][SkillID].m_SkillLevel * SkillData[SkillID].m_BonusCount);
 	return 0;
 }
 
 // получить уровень скилла
-int SkillsSql::GetSkillLevel(int ClientID, int SkillID) const
+int SkillJob::GetSkillLevel(int ClientID, int SkillID) const
 {
 	if(Skill[ClientID].find(SkillID) != Skill[ClientID].end())
-		return Skill[ClientID][SkillID].sBonusLevel;
+		return Skill[ClientID][SkillID].m_SkillLevel;
 	return 0;
 }
 
@@ -69,7 +69,7 @@ int SkillsSql::GetSkillLevel(int ClientID, int SkillID) const
 	FUNCTION SKILL CLASS 
 ######################################################################### */
 // показать лист всех скиллов
-void SkillsSql::ShowMailSkillList(CPlayer *pPlayer)
+void SkillJob::ShowMailSkillList(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
 	GS()->AVH(ClientID, HSKILLLEARN, vec3(35,80,40), "Skill Learn Information");
@@ -82,71 +82,71 @@ void SkillsSql::ShowMailSkillList(CPlayer *pPlayer)
 }
 
 // показать выбранные скиллы
-void SkillsSql::SkillSelected(CPlayer *pPlayer, int SkillID)
+void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 {
 	if(SkillData.find(SkillID) == SkillData.end()) return;
 
-	const bool Passive = SkillData[SkillID].sPassive;
+	const bool Passive = SkillData[SkillID].m_Passive;
 	const int ClientID = pPlayer->GetCID();
 	const int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + 6000; 
 	int LevelOwn = GetSkillLevel(ClientID, SkillID);
-	int BonusSkill = GetSkillBonus(ClientID, SkillID) + SkillData[SkillID].sBonusCount;
+	int BonusSkill = GetSkillBonus(ClientID, SkillID) + SkillData[SkillID].m_BonusCount;
 
 	// меню выводим
 	pPlayer->m_Colored = { 5,10,1 };
 	GS()->AVM(ClientID, "SKILLLEARN", SkillID, NOPE, "{STR} [{INT}/{INT}] {STR} [Price {INT}SP]", 
-		(Passive ? "Passive" : "Active"), &LevelOwn, &SkillData[SkillID].sSkillMaxLevel, SkillData[SkillID].sSkillName, &SkillData[SkillID].sSkillPrice);
+		(Passive ? "Passive" : "Active"), &LevelOwn, &SkillData[SkillID].m_SkillMaxLevel, SkillData[SkillID].m_SkillName, &SkillData[SkillID].m_SkillPrice);
 
 	// пасивный скилл
 	if(Passive)
 	{
-		GS()->AVM(ClientID, "null", NOPE, NOPE, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].sBonusName);
-		GS()->AVM(ClientID, "null", NOPE, NOPE, "{STR}", SkillData[SkillID].sSkillDesc);
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].m_SkillBonusInfo);
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "{STR}", SkillData[SkillID].m_SkillDesc);
 		GS()->AV(ClientID, "null", "");
 		return;
 	}
 
 	// если обычный скилл
-	GS()->AVM(ClientID, "null", NOPE, NOPE, "Mana required (first use -{INT} support -{INT})", &SkillData[SkillID].sManaCost, &SkillData[SkillID].sManaUseCost);
-	GS()->AVM(ClientID, "null", NOPE, NOPE, "{STR}", SkillData[SkillID].sSkillDesc);
-	GS()->AVM(ClientID, "null", NOPE, NOPE, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].sBonusName);
+	GS()->AVM(ClientID, "null", NOPE, NOPE, "Mana required (first use -{INT} support -{INT})", &SkillData[SkillID].m_ManaCost, &SkillData[SkillID].m_ManaSupport);
+	GS()->AVM(ClientID, "null", NOPE, NOPE, "{STR}", SkillData[SkillID].m_SkillDesc);
+	GS()->AVM(ClientID, "null", NOPE, NOPE, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].m_SkillBonusInfo);
 	GS()->AVM(ClientID, "null", NOPE, NOPE, "F1 Bind: (bind 'key' say \"/useskill {INT}\")", &SkillID);
 	GS()->AV(ClientID, "null", "");
 }
 
 // улучшение скилла
-bool SkillsSql::UpgradeSkill(CPlayer *pPlayer, int SkillID)
+bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 {
 	// если такой скилл есть повышаем уровень
 	const int ClientID = pPlayer->GetCID();
-	if(Skill[ClientID][SkillID].sBonusLevel >= SkillData[SkillID].sSkillMaxLevel)
+	if(Skill[ClientID][SkillID].m_SkillLevel >= SkillData[SkillID].m_SkillMaxLevel)
 	{
 		GS()->Chat(ClientID, "This a skill already maximum level");
 		return false;				
 	}
 
 	// проверяем хватает ли денег
-	if(pPlayer->CheckFailMoney(SkillData[SkillID].sSkillPrice, itSkillPoint)) 
+	if(pPlayer->CheckFailMoney(SkillData[SkillID].m_SkillPrice, itSkillPoint)) 
 		return false;
 
 	if(Skill[ClientID].find(SkillID) != Skill[ClientID].end())
 	{
 		// добавляем уровень
-		Skill[ClientID][SkillID].sBonusLevel++;
-		SJK.UD("tw_skills", "BonusLevel = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", Skill[ClientID][SkillID].sBonusLevel, SkillID, pPlayer->Acc().AuthID);
-		GS()->Chat(ClientID, "You have increased the skill [{STR} level to {INT}]!", SkillData[SkillID].sSkillName, &Skill[ClientID][SkillID].sBonusLevel);
+		Skill[ClientID][SkillID].m_SkillLevel++;
+		SJK.UD("tw_skills", "SkillLevel = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", Skill[ClientID][SkillID].m_SkillLevel, SkillID, pPlayer->Acc().AuthID);
+		GS()->Chat(ClientID, "You have increased the skill [{STR} level to {INT}]!", SkillData[SkillID].m_SkillName, &Skill[ClientID][SkillID].m_SkillLevel);
 		return true;	
 	}
 
 	// создаем неовый скилл
-	Skill[ClientID][SkillID].sBonusLevel = 1;
-	SJK.ID("tw_skills", "(SkillID, OwnerID, BonusLevel) VALUES ('%d', '%d', '1');", SkillID, pPlayer->Acc().AuthID);
-	GS()->Chat(ClientID, "You have learned a new skill [{STR}]", SkillData[SkillID].sSkillName);
+	Skill[ClientID][SkillID].m_SkillLevel = 1;
+	SJK.ID("tw_skills", "(SkillID, OwnerID, SkillLevel) VALUES ('%d', '%d', '1');", SkillID, pPlayer->Acc().AuthID);
+	GS()->Chat(ClientID, "You have learned a new skill [{STR}]", SkillData[SkillID].m_SkillName);
 	return true;
 }
 
 // использовать скилл
-bool SkillsSql::UseSkill(CPlayer *pPlayer, int SkillID)
+bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 {
 	// проверяем есть ли игрок обьект чар, уровень скилла и имеется ли скилл вообщем в списках
 	if(!pPlayer || !pPlayer->GetCharacter() || GetSkillLevel(pPlayer->GetCID(), SkillID) <= 0 ||
@@ -154,13 +154,13 @@ bool SkillsSql::UseSkill(CPlayer *pPlayer, int SkillID)
 
 	// проверяем ману
 	CCharacter *pChr = pPlayer->GetCharacter();
-	const int ManaPrice = SkillData[SkillID].sManaCost;
+	const int ManaPrice = SkillData[SkillID].m_ManaCost;
 	if(ManaPrice > 0 && pChr->CheckFailMana(ManaPrice))
 		return true;
 
 	const int ClientID = pPlayer->GetCID();
-	const int ManaUsePrice = SkillData[SkillID].sManaUseCost;
-	const int SkillLevel = Skill[ClientID][SkillID].sBonusLevel;
+	const int ManaUsePrice = SkillData[SkillID].m_ManaSupport;
+	const int SkillLevel = Skill[ClientID][SkillID].m_SkillLevel;
 
 	// скилл турель здоровья
 	if(SkillID == Skill::SkillHeartTurret)
@@ -194,7 +194,7 @@ bool SkillsSql::UseSkill(CPlayer *pPlayer, int SkillID)
 }
 
 // парсинг голосований
-bool SkillsSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool SkillJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	int ClientID = pPlayer->GetCID();
 

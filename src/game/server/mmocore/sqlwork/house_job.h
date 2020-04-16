@@ -1,34 +1,34 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#ifndef GAME_SERVER_SQLHOMES_H
-#define GAME_SERVER_SQLHOMES_H
+#ifndef GAME_SERVER_HOUSESJOB_H
+#define GAME_SERVER_HOUSESJOB_H
 
 #include <game/server/entity.h>
 #include "../component.h"
 
 class HouseDoor;
 class DecoHouse;
-class HouseSql : public CMmoComponent
+class HouseJob : public CMmoComponent
 {
 	/* #########################################################################
 		VAR AND OBJECTS HOUSES 
 	######################################################################### */
 	struct HouseList
 	{
-		int hX;
-		int hY;
-		int hDoorX;
-		int hDoorY;
-		int hPrice;
-		char hClass[32];
-		int hOwnerID;
-		int hBank;
-		int hFarm;
-		int hFarmLevel;
-		int hPlantID;
-		int hPlantX;
-		int hPlantY;
-		int hWorldID;
+		int m_PosX;
+		int m_PosY;
+		int m_DoorX;
+		int m_DoorY;
+		int m_Price;
+		char m_Class[32];
+		int m_OwnerID;
+		int m_Bank;
+		int m_Farm;
+		int m_FarmLevel;
+		int m_PlantID;
+		int m_PlantPosX;
+		int m_PlantPosY;
+		int m_WorldID;
 
 		HouseDoor *m_Door;
 	};
