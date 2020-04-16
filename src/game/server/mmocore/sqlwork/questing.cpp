@@ -578,23 +578,23 @@ bool QuestBase::InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo 
 	if (BotData.InterRandom[1] > 0)
 	{
 		// проверяем есть ли такие предметы
-		for (CQuestItem* pHh = (CQuestItem*)GS()->m_World.FindFirst(CGameWorld::ENTTYPE_DROPQUEST);
-			pHh; pHh = (CQuestItem*)pHh->TypeNext())
+		for (CQuestItem* pHh = (CQuestItem*)GS()->m_World.FindFirst(CGameWorld::ENTTYPE_DROPQUEST); pHh; pHh = (CQuestItem*)pHh->TypeNext())
 		{
 			if (pHh->m_OwnerID != ClientID || BotData.Interactive[0] != pHh->m_QuestBot.Interactive[0])
 				continue;
+			return false;
+		}
 
-			// создаем предметы
-			const int QuestID = BotData.QuestID;
-			const int ItemID = BotData.Interactive[0];
-			int Count = BotData.InterCount[0];
-			vec2 Pos = vec2(BotData.PositionX, BotData.PositionY);
-			for (int i = 0; i < Count * 3; i++)
-			{
-				vec2 Dir = normalize(vec2(2800 - rand() % 5600, -400 - rand() % 400));
-				vec2 Projdrop = (Dir * max(0.001f, 2.6f));
-				new CQuestItem(&GS()->m_World, Pos, Dir, BotData, ClientID);
-			}
+		// создаем предметы
+		const int QuestID = BotData.QuestID;
+		const int ItemID = BotData.Interactive[0];
+		int Count = BotData.InterCount[0];
+		vec2 Pos = vec2(BotData.PositionX, BotData.PositionY);
+		for (int i = 0; i < Count * 3; i++)
+		{
+			vec2 Dir = normalize(vec2(2800 - rand() % 5600, -400 - rand() % 400));
+			vec2 Projdrop = (Dir * max(0.001f, 2.6f));
+			new CQuestItem(&GS()->m_World, Pos, Dir, BotData, ClientID);
 		}
 	}
 
