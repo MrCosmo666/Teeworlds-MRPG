@@ -101,6 +101,7 @@ public:
 	void QuestTableAddInfo(int ClientID, const char* pText, int Requires, int Have);
 	void QuestTableClear(int ClientID);
 	void QuestTableShowInformation(CPlayer* pPlayer, ContextBots::QuestBotInfo& BotData);
+	int QuestingAllowedItemsCount(CPlayer* pPlayer, int ItemID);
 };
 
 #endif

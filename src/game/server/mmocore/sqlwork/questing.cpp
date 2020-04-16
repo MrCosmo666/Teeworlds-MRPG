@@ -899,3 +899,32 @@ void QuestBase::QuestTableShowInformation(CPlayer* pPlayer, ContextBots::QuestBo
 			QuestBase::Quests[ClientID][BotData.QuestID].MobProgress[i - 4]);
 	}
 }
+
+int QuestBase::QuestingAllowedItemsCount(CPlayer *pPlayer, int ItemID)
+{
+	// поиск всех активных нпс
+	int ClientID = pPlayer->GetCID();
+	ItemSql::ItemPlayer searchItem = pPlayer->GetItem(ItemID);
+	for (const auto& qq : Quests[ClientID])
+	{
+		if (qq.second.Type != QUESTACCEPT)
+			continue;
+
+		// проверяем бота есть или нет активный по квесту
+		ContextBots::QuestBotInfo& BotInfo = GetQuestBot(qq.first, qq.second.Progress);
+		if (!BotInfo.IsActive())
+			continue;
+
+		// проверяем требуемые предметы
+		for (int i = 0; i < 2; i++)
+		{
+			int needItemID = BotInfo.Interactive[i], numNeed = BotInfo.InterCount[i];
+			if (needItemID <= 0 || numNeed <= 0 || ItemID != needItemID)
+				continue;
+
+			int AvailableCount = clamp(searchItem.Count - numNeed, 0, searchItem.Count);
+			return AvailableCount;
+		}
+	}
+	return searchItem.Count;
+}

@@ -224,12 +224,19 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 	}
 
 	// выброс предмета
-	if(PPSTR(CMD, "IREPAIRDROP") == 0)
+	if(PPSTR(CMD, "IDROP") == 0)
 	{
-		ItemPlayer &PlItem = pPlayer->GetItem(VoteID);
-		if(Get > PlItem.Count)
-			Get = PlItem.Count;
+		int AvailableCount = Job()->Quest()->QuestingAllowedItemsCount(pPlayer, VoteID);
+		if (AvailableCount <= 0)
+		{
+			GS()->Chat(ClientID, "This count of items that you have, iced for the quest!");
+			return true;
+		}
 
+		if(Get > AvailableCount)
+			Get = AvailableCount;
+
+		ItemPlayer& PlItem = pPlayer->GetItem(VoteID);
 		const int Enchant = PlItem.Enchant;
 		GS()->SBL(ClientID, PRELEGENDARY, 100, "You drop {STR}x{INT}", PlItem.Info().GetName(pPlayer), &Get);
 		GS()->CreateDropItem(pPlayer->GetCharacter()->m_Core.m_Pos, -1, PlItem, Get);
@@ -445,7 +452,7 @@ void ItemSql::ItemSelected(CPlayer *pPlayer, const ItemPlayer &PlItem, bool Dres
 	// можно ли дропнуть 
 	if(PlItem.Info().Dropable)
 	{
-		GS()->AVM(ClientID, "IREPAIRDROP", ItemID, HideID, "Drop {STR}{STR}", (PlItem.Info().BonusCount > 0 ? "and Repair " : ""), NameItem);
+		GS()->AVM(ClientID, "IDROP", ItemID, HideID, "Drop {STR}{STR}", (PlItem.Info().BonusCount > 0 ? "and Repair " : ""), NameItem);
 	}
 
 	if(PlItem.Info().BonusCount)
