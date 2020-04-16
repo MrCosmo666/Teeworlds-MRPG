@@ -341,6 +341,10 @@ bool ShopMailSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int
 	// аукцион установить предмет слот
 	if(PPSTR(CMD, "AUCTIONSLOT") == 0)
 	{
+		int AvailableCount = Job()->Item()->ActionItemCountAllowed(pPlayer, VoteID);
+		if (AvailableCount <= 0)
+			return true;
+
 		CGS::InteractiveSub[ClientID].AuctionItem.a_itemid = VoteID;
 		CGS::InteractiveSub[ClientID].AuctionItem.a_enchant = pPlayer->GetItem(VoteID).Enchant;
 		GS()->ResetVotes(ClientID, AUCTIONSETSLOT);
