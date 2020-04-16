@@ -25,6 +25,10 @@ int BotAI::GetSnapFullID() const
 // Найти самаго толстого танка
 void BotAI::FindHardHealth()
 {
+	CPlayer* pFrom = GS()->GetPlayer(m_BotTargetID, true, true);
+	if(m_BotTargetID != GetPlayer()->GetCID() && pFrom && distance(m_Core.m_Pos, pFrom->m_ViewPos) > 800.0f)
+		ClearTarget();
+
 	for (auto listDmg = m_ListDmgPlayers.begin(); listDmg != m_ListDmgPlayers.end(); )
 	{
 		int PlayerID = listDmg->first;
@@ -33,27 +37,15 @@ void BotAI::FindHardHealth()
 		CPlayer *pFinderHard = GS()->GetPlayer(PlayerID, true, true);
 		if(!pFinderHard || distance(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) > 800.0f)
 		{
-			ClearTarget();
 			listDmg = m_ListDmgPlayers.erase(listDmg);
 			continue;	
 		}
 
 		// проверяем есть ли вкуснее игрокв для бота
-		CPlayer *pFrom = GS()->GetPlayer(m_BotTargetID, true, true);
-		if(
-			// если таргет бота равен самому боту
-			m_BotTargetID == GetPlayer()->GetCID() || 
-			
-			// если игрока на котором таргет
-			!pFrom || 
-
-			// - проверяем нет ли стены между Таргетом
+		if(m_BotTargetID == GetPlayer()->GetCID() || !pFrom || 
 			GS()->Collision()->FastIntersectLine(pFrom->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) ||	
-			
-			( // - проверяем если у игрока Tenacity выше Таргета
-				!GS()->Collision()->FastIntersectLine(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) && 
-				pFinderHard->GetAttributeCount(Stats::StTenacity, true) > pFrom->GetAttributeCount(Stats::StTenacity, true)
-			))
+			(!GS()->Collision()->FastIntersectLine(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) && 
+				pFinderHard->GetAttributeCount(Stats::StTenacity, true) > pFrom->GetAttributeCount(Stats::StTenacity, true)))
 		{
 			SetTarget(PlayerID);
 		}
@@ -528,7 +520,7 @@ CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 	if(m_BotTargetID == GetPlayer()->GetCID() && (GS()->IsDungeon() || Server()->GetEnumTypeDay() == DayType::NIGHTTYPE || random_int() % 300 == 0))
 	{
 		// ищем игрока
-		CPlayer *pPlayer = SearchPlayer(800.0f);
+		CPlayer *pPlayer = SearchPlayer(Distance);
 		if(pPlayer && pPlayer->GetCharacter()) 
 			SetTarget(pPlayer->GetCID());
 
