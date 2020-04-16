@@ -26,7 +26,6 @@
 #include "mmocore/cmds.h"
 
 // Безопасные структуры хоть и прожорливо но работает (Прежде всего всегда их при выходе игрока Отрезаем)
-std::map < int , CGS::StructDungeon > CGS::Dungeon;
 std::map < int , CGS::StructAttribut > CGS::AttributInfo;
 
 // Структуры игроков
@@ -2014,16 +2013,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		pPlayer->m_LastVoteMenu = MEMBERMENU;		
 		Mmo()->Member()->ShowHistoryGuild(ClientID, pPlayer->Acc().MemberID);
 	}	
-	else if(MenuList == DUNGEONSMENU) 
-	{
-		pPlayer->m_LastVoteMenu = MAINMENU;		
-		AVH(ClientID, HDUNGEONSINFO, vec3(35, 80, 40), "Dungeons Information");
-		AVM(ClientID, "null", NOPE, HDUNGEONSINFO, "Add: Select your item in list. Select (Add to house),");
-
-		AV(ClientID, "null", "");
-		Mmo()->ShowDungeonsList(pPlayer);
-		AddBack(ClientID);
-	}
 	else if(MenuList == SETTINGS) 
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;
@@ -2378,41 +2367,6 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 		return true;
 	}
 
-	if (PPSTR(CMD, "DUNGEONJOIN") == 0)
-	{
-		if (CGS::Dungeon[VoteID].State > 1)
-		{
-			Chat(ClientID, "At the moment players are passing this dungeon!");
-			VResetVotes(ClientID, DUNGEONSMENU);
-			return true;
-		}
-
-		if (pPlayer->Acc().Level < CGS::Dungeon[VoteID].Level)
-		{
-			Chat(ClientID, "Your level is low to pass this dungeon!");
-			VResetVotes(ClientID, DUNGEONSMENU);
-			return true;
-		}
-
-		Chat(-1, "{STR} joined to Dungeon {STR}!", Server()->ClientName(ClientID), CGS::Dungeon[VoteID].Name);
-
-		if (!IsDungeon())
-			pPlayer->Acc().LastWorldID = GetWorldID();
-
-		pPlayer->Acc().TeleportX = -1;
-		pPlayer->Acc().TeleportY = -1;
-		Server()->ChangeWorld(ClientID, CGS::Dungeon[VoteID].WorldID);
-		return true;
-	}	
-	
-	if (PPSTR(CMD, "DUNGEONEXIT") == 0)
-	{
-		pPlayer->Acc().TeleportX = -1;
-		pPlayer->Acc().TeleportY = -1;
-		Server()->ChangeWorld(ClientID, pPlayer->Acc().LastWorldID);
-		return true;
-	}
-
 	if(pPlayer->ParseVoteUpgrades(CMD, VoteID, VoteID2, Get)) 
 		return true;
 
@@ -2649,7 +2603,7 @@ bool CGS::GetPlayerCliped(vec2 Pos, float Distance) const
 // Проверяем данж ли этот мир или нет
 int CGS::ItDungeon(int WorldID) const
 {
-	for(const auto& dd : Dungeon)
+	for(const auto& dd : DungeonJob::Dungeon)
 	{
 		if(WorldID == dd.second.WorldID)
 			return dd.first;

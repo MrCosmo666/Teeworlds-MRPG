@@ -17,6 +17,7 @@ SqlController::SqlController(CGS *pGameServer) : m_pGameServer(pGameServer)
 	m_Components.add(m_pAccPlant = new PlantsAccSql());
 	m_Components.add(m_pAccRelax = new SpaRelaxSql());
 	m_Components.add(m_pCraftWork = new CraftSql());
+	m_Components.add(m_pDungeonJob = new DungeonJob());
 	m_Components.add(m_pHouseWork = new HouseSql());
 	m_Components.add(m_pInbox = new InboxSql());
 	m_Components.add(m_pItemWork = new ItemSql());
@@ -26,7 +27,7 @@ SqlController::SqlController(CGS *pGameServer) : m_pGameServer(pGameServer)
 	m_Components.add(m_pSkillsWork = new SkillsSql());
 	m_Components.add(m_pStorageWork = new StorageSql());
 	m_Components.add(m_pTeleportsWork = new TeleportsSql());
-	m_Components.add(m_pWorldSwapWork = new WorldSwapSql());
+	m_Components.add(m_pWorldSwapJob = new WorldSwapJob());
 
 	for(auto& component : m_Components.m_paComponents)
 	{
@@ -40,7 +41,6 @@ SqlController::SqlController(CGS *pGameServer) : m_pGameServer(pGameServer)
 		str_format(aLocalSelect, sizeof(aLocalSelect), "WHERE WorldID = '%d'", m_pGameServer->GetWorldID());
 		component->OnInitLocal(aLocalSelect);
 	}
-	LoadDungeons();
 	m_pBotsInfo->LoadGlobalBots();
 }
 
@@ -285,22 +285,6 @@ void SqlController::LoadLogicWorld()
 	}
 }
 
-void SqlController::LoadDungeons()
-{
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons"));
-	while(RES->next())
-	{
-		int ID = RES->getInt("ID");
-		str_copy(CGS::Dungeon[ID].Name, RES->getString("Name").c_str(), sizeof(CGS::Dungeon[ID].Name));
-
-		// загружаем целечисленые типы
-		CGS::Dungeon[ID].Level = RES->getInt("Level");
-		CGS::Dungeon[ID].DoorX = RES->getInt("DoorX");
-		CGS::Dungeon[ID].DoorY = RES->getInt("DoorY"); 
-		CGS::Dungeon[ID].WorldID = RES->getInt("WorldID");
-	}	
-}
-
 char SaveNick[64];
 const char* SqlController::PlayerName(int AccountID)
 {
@@ -318,55 +302,6 @@ void SqlController::ShowLoadingProgress(const char *Loading, int LoadCount)
 	char aLoadingBuf[128];
 	str_format(aLoadingBuf, sizeof(aLoadingBuf), "Loaded %d %s | CK WorldID %d.", LoadCount, Loading, GS()->GetWorldID());
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "LOAD DB", aLoadingBuf);
-}
-
-void SqlController::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds)
-{
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "WHERE OwnerID = '%d' AND DungeonID = '%d'", pPlayer->Acc().AuthID, DungeonID));
-	if (RES->next())
-	{
-		if (RES->getInt("Seconds") > Seconds)
-			SJK.UD("tw_dungeons_records", "Seconds = '%d' WHERE OwnerID = '%d' AND DungeonID = '%d'", Seconds, pPlayer->Acc().AuthID, DungeonID);
-		return;
-	}
-	SJK.ID("tw_dungeons_records", "(OwnerID, DungeonID, Seconds) VALUES ('%d', '%d', '%d')", pPlayer->Acc().AuthID, DungeonID, Seconds);
-}
-
-void SqlController::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
-{
-	int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "ORDER BY Seconds ASC LIMIT 5"));
-	while (RES->next())
-	{
-		int Rank = RES->getRow();
-		int OwnerID = RES->getInt("OwnerID");
-		int Seconds = RES->getDouble("Seconds");
-
-		char aTimeFormat[64];
-		str_format(aTimeFormat, sizeof(aTimeFormat), "Time: %d minute(s) %d second(s)", Seconds / 60, Seconds - (Seconds / 60 * 60));
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{INT}. {STR} : {STR}", &Rank, PlayerName(OwnerID), aTimeFormat);
-	}
-}
-
-void SqlController::ShowDungeonsList(CPlayer* pPlayer)
-{
-	int ClientID = pPlayer->GetCID();
-	for (const auto& dungeon : CGS::Dungeon)
-	{
-		int HideID = 7500 + dungeon.first;
-		GS()->AVH(ClientID, HideID, vec3(52, 26, 80), "Lvl{INT} {STR} : Players {INT} : {STR} [{INT}%]",
-			&dungeon.second.Level, dungeon.second.Name, &dungeon.second.Players, (dungeon.second.State > 1 ? "Active dungeon" : "Waiting players"), &dungeon.second.Progress);
-		
-		ShowDungeonTop(pPlayer, dungeon.first, HideID);
-		GS()->AVM(ClientID, "DUNGEONJOIN", dungeon.first, HideID, "Join dungeon {STR}", dungeon.second.Name);
-
-		if (GS()->IsDungeon())
-		{
-			GS()->AV(ClientID, "null", "");
-			pPlayer->m_Colored = { 30, 8, 8 };
-			GS()->AVL(ClientID, "DUNGEONEXIT", "!! Exit dungeon {STR} !!", dungeon.second.Name);
-		}
-	}
 }
 
 void SqlController::ShowTopList(CPlayer* pPlayer, int TypeID)

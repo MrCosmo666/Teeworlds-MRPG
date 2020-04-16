@@ -2,13 +2,13 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
-#include "worldswap.h"
+#include "world_swap_job.h"
 
 using namespace sqlstr;
-std::map < int , WorldSwapSql::StructSwapWorld > WorldSwapSql::WorldSwap;
-std::list < WorldSwapSql::StructPositionLogic > WorldSwapSql::WorldPositionLogic;
+std::map < int , WorldSwapJob::StructSwapWorld > WorldSwapJob::WorldSwap;
+std::list < WorldSwapJob::StructPositionLogic > WorldSwapJob::WorldPositionLogic;
 
-void WorldSwapSql::OnInitGlobal() 
+void WorldSwapJob::OnInitGlobal() 
 { 
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_world_swap"));
 	while(RES->next())
@@ -40,7 +40,7 @@ void WorldSwapSql::OnInitGlobal()
 	Job()->ShowLoadingProgress("Worlds Swap Logic", WorldPositionLogic.size());
 }
 
-bool WorldSwapSql::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
+bool WorldSwapJob::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 {
 	CPlayer *pPlayer = pChr->GetPlayer();
 	int ClientID = pPlayer->GetCID();
@@ -73,7 +73,7 @@ bool WorldSwapSql::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 // ------------------------------------------------------------------
 
 // Получить айди смены мира по SwapID
-int WorldSwapSql::CheckPosition(vec2 Pos)
+int WorldSwapJob::CheckPosition(vec2 Pos)
 {
 	for(const auto& sw : WorldSwap)
 	{
@@ -85,7 +85,7 @@ int WorldSwapSql::CheckPosition(vec2 Pos)
 }
 
 // Смена мира игроку
-bool WorldSwapSql::ChangingWorld(int ClientID, vec2 Pos)
+bool WorldSwapJob::ChangingWorld(int ClientID, vec2 Pos)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
 	if(!pPlayer) return true;
@@ -111,7 +111,7 @@ bool WorldSwapSql::ChangingWorld(int ClientID, vec2 Pos)
 }
 
 // Поиск путии до квеста к боту
-vec2 WorldSwapSql::PositionQuestBot(int ClientID, int QuestID)
+vec2 WorldSwapJob::PositionQuestBot(int ClientID, int QuestID)
 {
 	int playerTalkProgress = QuestBase::Quests[ClientID][QuestID].Progress;
 	ContextBots::QuestBotInfo FindBot = Job()->Quest()->GetQuestBot(QuestID, playerTalkProgress);
@@ -133,7 +133,7 @@ vec2 WorldSwapSql::PositionQuestBot(int ClientID, int QuestID)
 	return vec2(0.0f, 0.0f);
 }
 
-int WorldSwapSql::GetWorldType() const
+int WorldSwapJob::GetWorldType() const
 {
 	if(GS()->GetWorldID() == CUTSCENEWELCOMEWORLD)
 		return WORLD_CUTSCENE;

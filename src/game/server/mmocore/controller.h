@@ -10,6 +10,7 @@
 #include "sqlwork/account_relax.h"
 #include "sqlwork/botsinfo.h"
 #include "sqlwork/craft.h"
+#include "sqlwork/dungeon_job.h"
 #include "sqlwork/home.h"
 #include "sqlwork/inbox.h"
 #include "sqlwork/items.h"
@@ -19,7 +20,8 @@
 #include "sqlwork/skills.h"
 #include "sqlwork/storage.h"
 #include "sqlwork/teleports.h"
-#include "sqlwork/worldswap.h"
+#include "sqlwork/world_swap_job.h"
+
 
 #include <engine/server/sql_connect_pool.h>
 #include <engine/server/sql_string_helpers.h>
@@ -46,6 +48,7 @@ class SqlController
 	class AccountMainSql *m_pAccMain;
 	class ContextBots *m_pBotsInfo;
 	class CraftSql *m_pCraftWork;
+	class DungeonJob *m_pDungeonJob;
 	class HouseSql *m_pHouseWork;
 	class InboxSql *m_pInbox;
 	class ItemSql *m_pItemWork;
@@ -58,9 +61,7 @@ class SqlController
 	class SpaRelaxSql *m_pAccRelax;
 	class StorageSql *m_pStorageWork;
 	class TeleportsSql *m_pTeleportsWork;
-	class WorldSwapSql *m_pWorldSwapWork;
-
-	void CheckTimePayment();
+	class WorldSwapJob *m_pWorldSwapJob;
 
 public:
 	explicit SqlController(CGS *pGameServer);
@@ -73,6 +74,7 @@ public:
 	AccountMainSql *Account() const { return m_pAccMain; }
 	ContextBots *BotsData() const { return m_pBotsInfo; }
 	CraftSql *Craft() const { return m_pCraftWork; }
+	DungeonJob *Dungeon() const { return m_pDungeonJob; }
 	HouseSql *House() const { return m_pHouseWork; }
 	InboxSql *Inbox() const { return m_pInbox; }
 	ItemSql *Item() const { return m_pItemWork; }
@@ -85,7 +87,7 @@ public:
 	SpaRelaxSql *SpaAcc() const { return m_pAccRelax; }
 	StorageSql *Storage() const { return m_pStorageWork; }
 	TeleportsSql *Teleports() const { return m_pTeleportsWork; }
-	WorldSwapSql *WorldSwap() const { return m_pWorldSwapWork; }
+	WorldSwapJob *WorldSwap() const { return m_pWorldSwapJob; }
 
 	// global systems
 	void LoadFullSystems();
@@ -109,10 +111,6 @@ public:
 
 	//
 	void ShowLoadingProgress(const char *Loading, int LoadCount);
-
-	void ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID);
-	void SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds);
-	void ShowDungeonsList(CPlayer* pPlayer);
 	void ShowTopList(CPlayer* pPlayer, int TypeID);
 };
 

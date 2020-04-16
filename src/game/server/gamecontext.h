@@ -108,23 +108,6 @@ public:
 	};
 	typedef std::map < int , StructInteractiveSub > InteractiveSubType;
 	static InteractiveSubType InteractiveSub;
-	// - - - - - - - - - - - -
-	struct StructDungeon
-	{
-		char Name[64];
-		int Level;
-		int WorldID;
-
-		int DoorX;
-		int DoorY;
-
-		int Players;
-		int Progress;
-		int State;
-	};
-	typedef std::map < int , StructDungeon > DungeonType;
-	static DungeonType Dungeon;	
-	// - - - - - - - - - - - -
 
 	// - - - - - - - - - - - -
 	typedef std::map < int , std::map < std::string , int > > EffectType;

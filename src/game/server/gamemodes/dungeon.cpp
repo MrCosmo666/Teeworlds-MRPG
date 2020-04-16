@@ -16,7 +16,7 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	m_GameFlags = GAMEFLAG_RACE;
 
 	// создание двери
-	vec2 PosDoor = vec2(CGS::Dungeon[m_DungeonID].DoorX, CGS::Dungeon[m_DungeonID].DoorY);
+	vec2 PosDoor = vec2(DungeonJob::Dungeon[m_DungeonID].DoorX, DungeonJob::Dungeon[m_DungeonID].DoorY);
 	m_DungeonDoor = new DungeonDoor(&GS()->m_World, PosDoor);
 	ChangeState(DUNGEON_WAITING);
 }
@@ -94,7 +94,7 @@ void CGameControllerDungeon::ChangeState(int State)
 				continue;
 
 			int Seconds = GS()->m_apPlayers[i]->Acc().TimeDungeon / Server()->TickSpeed();
-			GS()->Mmo()->SaveDungeonRecord(GS()->m_apPlayers[i], m_DungeonID, Seconds);
+			GS()->Mmo()->Dungeon()->SaveDungeonRecord(GS()->m_apPlayers[i], m_DungeonID, Seconds);
 			GS()->m_apPlayers[i]->Acc().TimeDungeon = 0;
 		}
 
@@ -116,8 +116,8 @@ void CGameControllerDungeon::StateTick()
 	// обновлять информацию каждую секунду
 	if (Server()->Tick() % Server()->TickSpeed() == 0)
 	{
-		CGS::Dungeon[m_DungeonID].Players = Players;
-		CGS::Dungeon[m_DungeonID].State = m_StateDungeon;
+		DungeonJob::Dungeon[m_DungeonID].Players = Players;
+		DungeonJob::Dungeon[m_DungeonID].State = m_StateDungeon;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
@@ -126,7 +126,7 @@ void CGameControllerDungeon::StateTick()
 	{
 		// пишем всем игрокам что ждем 2 игроков
 		if (Players == 1)
-			GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 10, "Dungeon '{STR}' Waiting 2 players!", CGS::Dungeon[m_DungeonID].Name);
+			GS()->BroadcastWorldID(GS()->GetWorldID(), 99999, 10, "Dungeon '{STR}' Waiting 2 players!", DungeonJob::Dungeon[m_DungeonID].Name);
 		// начинаем данж если равно 2 игрока или больше
 		else if (Players > 1)
 			ChangeState(DUNGEON_WAITING_START);
@@ -200,7 +200,7 @@ int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKill
 	if (pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetSpawnBot() == SPAWNMOBS)
 	{
 		int Progress = 100 - (int)kurosio::translate_to_procent(CountMobs(), LeftMobsToWin());
-		CGS::Dungeon[m_DungeonID].Progress = Progress;
+		DungeonJob::Dungeon[m_DungeonID].Progress = Progress;
 		GS()->ChatWorldID(GS()->GetWorldID(), "[Dungeon]", "The dungeon is completed on [{INT}%]", &Progress);
 	}
 	return 0;
