@@ -478,7 +478,8 @@ CPlayer *BotAI::SearchPlayer(int Distance)
 		if(!GS()->m_apPlayers[i] 
 			|| !GS()->m_apPlayers[i]->GetCharacter() 
 			|| distance(m_Core.m_Pos, GS()->m_apPlayers[i]->GetCharacter()->m_Core.m_Pos) > Distance
-			|| GS()->Collision()->FastIntersectLine(GS()->m_apPlayers[i]->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0))
+			|| GS()->Collision()->FastIntersectLine(GS()->m_apPlayers[i]->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0)
+			|| Server()->GetWorldID(i) != GS()->GetWorldID())
 			continue;
 		return GS()->m_apPlayers[i];
 	}
@@ -495,15 +496,15 @@ CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 		CPlayer *pPlayer = SearchPlayer(Distance);
 		if(pPlayer && pPlayer->GetCharacter()) 
 			SetTarget(pPlayer->GetCID());
-
 		return pPlayer;
 	}
 
 	// сбрасываем агрессию если игрок далеко
 	CPlayer* pPlayer = GS()->GetPlayer(m_BotTargetID, true, true);
-	if (m_BotTargetID != GetPlayer()->GetCID() && pPlayer 
-		&& (distance(m_Core.m_Pos, pPlayer->m_ViewPos) > 600.0f 
-			|| GS()->Collision()->FastIntersectLine(pPlayer->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0)))
+	if (m_BotTargetID != GetPlayer()->GetCID() && 
+		(pPlayer && (distance(m_Core.m_Pos, pPlayer->GetCharacter()->m_Core.m_Pos) > 600.0f 
+			|| GS()->Collision()->FastIntersectLine(pPlayer->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0) 
+			|| Server()->GetWorldID(m_BotTargetID) != GS()->GetWorldID())) || !pPlayer)
 		ClearTarget();
 
 	// не враждебные мобы
