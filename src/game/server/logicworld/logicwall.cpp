@@ -404,7 +404,8 @@ void CLogicDungeonDoorKey::SyncStateChanges(int StartingGame)
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetCharacter() && BotPlayer->GetSpawnBot() == SPAWNMOBS && BotPlayer->GetBotSub() == m_MobID)
+		if (BotPlayer && BotPlayer->GetCharacter() && BotPlayer->GetSpawnBot() == SPAWNMOBS
+			&& BotPlayer->GetBotSub() == m_MobID && GS()->CheckPlayerMessageWorldID(i) == GS()->GetWorldID())
 		{
 			m_OpenedDoor = false;
 			return;
