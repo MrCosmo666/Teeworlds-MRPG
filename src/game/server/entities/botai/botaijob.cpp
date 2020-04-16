@@ -25,31 +25,26 @@ int BotAI::GetSnapFullID() const
 // Найти самаго толстого танка
 void BotAI::FindHardHealth()
 {
+	// сбрасываем агрессию если игрок далеко
 	CPlayer* pFrom = GS()->GetPlayer(m_BotTargetID, true, true);
-	if(m_BotTargetID != GetPlayer()->GetCID() && pFrom && distance(m_Core.m_Pos, pFrom->m_ViewPos) > 800.0f)
+	if(m_BotTargetID != GetPlayer()->GetCID() && pFrom && pFrom->GetCharacter() && (distance(m_Core.m_Pos, pFrom->m_ViewPos) > 600.0f))
 		ClearTarget();
 
-	for (auto listDmg = m_ListDmgPlayers.begin(); listDmg != m_ListDmgPlayers.end(); )
+	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
-		int PlayerID = listDmg->first;
-
 		// проверяем на дистанцию игрока
-		CPlayer *pFinderHard = GS()->GetPlayer(PlayerID, true, true);
-		if(!pFinderHard || distance(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) > 800.0f)
-		{
-			listDmg = m_ListDmgPlayers.erase(listDmg);
+		CPlayer *pFinderHard = GS()->GetPlayer(i, true, true);
+		if(!pFinderHard || distance(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) > 600.0f)
 			continue;	
-		}
-
+		
 		// проверяем есть ли вкуснее игрокв для бота
 		if(m_BotTargetID == GetPlayer()->GetCID() || !pFrom || 
 			GS()->Collision()->FastIntersectLine(pFrom->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) ||	
 			(!GS()->Collision()->FastIntersectLine(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) && 
 				pFinderHard->GetAttributeCount(Stats::StTenacity, true) > pFrom->GetAttributeCount(Stats::StTenacity, true)))
 		{
-			SetTarget(PlayerID);
+			SetTarget(i);
 		}
-		listDmg++;
 	}
 }
 
@@ -134,11 +129,9 @@ void BotAI::ShowProgress()
 			pPlayer->AddInBroadcast(Buffer.buffer()), Buffer.clear();
 
 			int Health = GetPlayer()->GetHealth();
-			int ActivePlayers = m_ListDmgPlayers.size();
 			float gethp = ( Health * 100.0 ) / m_StartHealth;
 			const char *Level = GS()->LevelString(100, (int)gethp, 10, ':', ' ');
-			Server()->Localization()->Format(Buffer, pPlayer->GetLanguage(), _("HP {s:proc}({i:hp}/{i:shp}) {i:pl} players\n"),
-				"proc", Level, "hp", &Health, "shp", &m_StartHealth, "pl", &ActivePlayers, NULL);
+			Server()->Localization()->Format(Buffer, pPlayer->GetLanguage(), _("Health {STR}({INT}/{INT})\n"), Level, &Health, &m_StartHealth, NULL);
 			pPlayer->AddInBroadcast(Buffer.buffer()), Buffer.clear();
 			delete Level;
 		}
@@ -192,7 +185,8 @@ void BotAI::Die(int Killer, int Weapon)
 	{
 		int PlayerID = ld.first;
 		CPlayer *pPlayer = GS()->GetPlayer(PlayerID, true, true);
-		if(!pPlayer || PlayerID == GetPlayer()->GetCID()) continue;
+		if(!pPlayer || PlayerID == GetPlayer()->GetCID() || distance(pPlayer->m_ViewPos, m_Core.m_Pos) > 1000.0f) 
+			continue;
 
 		for(int i = 0; i < 6; i++)
 		{
@@ -217,9 +211,8 @@ void BotAI::Die(int Killer, int Weapon)
 		// exp
 		int DamageExp = (ContextBots::MobBot[SubID].Level*g_Config.m_SvExperienceMob);
 		int PowerRaid = GS()->IncreaseCountRaid(DamageExp);
-		GS()->CreateDropBonuses(m_Core.m_Pos, 0, DamageExp / 2.0f, rand() % 3);
+		GS()->CreateDropBonuses(m_Core.m_Pos, 0, DamageExp / 2, rand() % 3);
 		pPlayer->AddExp(PowerRaid);
-
 		GS()->VResetVotes(PlayerID, MAINMENU);	
 
 		// дать скилл поинт
@@ -232,7 +225,8 @@ void BotAI::Die(int Killer, int Weapon)
 
 	// склад пополнение
 	int StorageID = GS()->Mmo()->Storage()->GetStorageMonsterSub(BotID);
-	if(StorageID > 0) GS()->Mmo()->Storage()->AddStorage(StorageID, rand()%5);
+	if(StorageID > 0) 
+		GS()->Mmo()->Storage()->AddStorage(StorageID, rand()%5);
 
 	// очищаем лист и убиваем игрока
 	m_ListDmgPlayers.clear();
