@@ -2,12 +2,12 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
-#include "inbox.h"
+#include "mailbox_job.h"
 
 using namespace sqlstr;
 
 // действие над письмом
-void InboxSql::InteractiveInbox(CPlayer *pPlayer, int InboxID)
+void MailBoxJob::InteractiveInbox(CPlayer *pPlayer, int InboxID)
 {
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Enchant", "tw_inbox", "WHERE ID = '%d'", InboxID));
 	if(RES->next())
@@ -32,7 +32,7 @@ void InboxSql::InteractiveInbox(CPlayer *pPlayer, int InboxID)
 }
 
 // показываем список писем
-void InboxSql::GetInformationInbox(CPlayer *pPlayer)
+void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 {
 	// инициализируем
 	int ClientID = pPlayer->GetCID();
@@ -75,7 +75,7 @@ void InboxSql::GetInformationInbox(CPlayer *pPlayer)
 	return;
 }
 // проверить сообщения имеются ли
-int InboxSql::GetActiveInbox(int ClientID)
+int MailBoxJob::GetActiveInbox(int ClientID)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
 	if(!pPlayer) return 0;
@@ -86,7 +86,7 @@ int InboxSql::GetActiveInbox(int ClientID)
 }
 
 // отправка письма игроку
-void InboxSql::SendInbox(int AuthID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
+void MailBoxJob::SendInbox(int AuthID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
 {
 	// clear str and connection
 	CSqlString<64> cName = CSqlString<64>(Name);
@@ -98,7 +98,7 @@ void InboxSql::SendInbox(int AuthID, const char* Name, const char* Desc, int Ite
 		 cName.cstr(), cDesc.cstr(), ItemID, Count, Enchant, AuthID);
 }
 
-bool InboxSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool MailBoxJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if(PPSTR(CMD, "MAIL") == 0)

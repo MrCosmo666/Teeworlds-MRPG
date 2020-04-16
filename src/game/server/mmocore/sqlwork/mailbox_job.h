@@ -1,11 +1,11 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#ifndef GAME_SERVER_SQLINBOX_H
-#define GAME_SERVER_SQLINBOX_H
+#ifndef GAME_SERVER_MAILBOXJOB_H
+#define GAME_SERVER_MAILBOXJOB_H
 
 #include "../component.h"
 
-class InboxSql : public CMmoComponent
+class MailBoxJob : public CMmoComponent
 {
 	void InteractiveInbox(CPlayer *pPlayer, int InboxID);
 

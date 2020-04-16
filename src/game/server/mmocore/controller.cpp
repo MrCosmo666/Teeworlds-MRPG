@@ -19,7 +19,7 @@ SqlController::SqlController(CGS *pGameServer) : m_pGameServer(pGameServer)
 	m_Components.add(m_pCraftJob = new CraftJob());
 	m_Components.add(m_pDungeonJob = new DungeonJob());
 	m_Components.add(m_pHouseWork = new HouseSql());
-	m_Components.add(m_pInbox = new InboxSql());
+	m_Components.add(m_pMailBoxJob = new MailBoxJob());
 	m_Components.add(m_pItemWork = new ItemSql());
 	m_Components.add(m_pGuildJob = new GuildJob());
 	m_Components.add(m_pQuest = new QuestBase());

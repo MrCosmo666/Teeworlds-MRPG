@@ -12,7 +12,7 @@
 #include "sqlwork/craft_job.h"
 #include "sqlwork/dungeon_job.h"
 #include "sqlwork/home.h"
-#include "sqlwork/inbox.h"
+#include "sqlwork/mailbox_job.h"
 #include "sqlwork/items.h"
 #include "sqlwork/guild_job.h"
 #include "sqlwork/questing.h"
@@ -50,7 +50,7 @@ class SqlController
 	class CraftJob *m_pCraftJob;
 	class DungeonJob *m_pDungeonJob;
 	class HouseSql *m_pHouseWork;
-	class InboxSql *m_pInbox;
+	class MailBoxJob *m_pMailBoxJob;
 	class ItemSql *m_pItemWork;
 	class GuildJob * m_pGuildJob;
 	class MinerAccSql *m_pAccMiner;
@@ -76,7 +76,7 @@ public:
 	CraftJob *Craft() const { return m_pCraftJob; }
 	DungeonJob *Dungeon() const { return m_pDungeonJob; }
 	HouseSql *House() const { return m_pHouseWork; }
-	InboxSql *Inbox() const { return m_pInbox; }
+	MailBoxJob *Inbox() const { return m_pMailBoxJob; }
 	ItemSql *Item() const { return m_pItemWork; }
 	GuildJob *Member() const { return m_pGuildJob; }
 	MinerAccSql *MinerAcc() const { return m_pAccMiner; }
