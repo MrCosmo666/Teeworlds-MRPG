@@ -79,7 +79,8 @@ bool DungeonJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;
 		GS()->AVH(ClientID, HDUNGEONSINFO, vec3(35, 80, 40), "Dungeons Information");
-		GS()->AVM(ClientID, "null", NOPE, HDUNGEONSINFO, "Add: Select your item in list. Select (Add to house),");
+		GS()->AVM(ClientID, "null", NOPE, HDUNGEONSINFO, "In this section you can choose a dungeon");
+		GS()->AVM(ClientID, "null", NOPE, HDUNGEONSINFO, "View the fastest players on the passage");
 
 		GS()->AV(ClientID, "null", "");
 		ShowDungeonsList(pPlayer);
