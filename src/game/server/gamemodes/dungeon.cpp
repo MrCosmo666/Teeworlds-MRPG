@@ -76,13 +76,13 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Начало данжа
 	else if (State == DUNGEON_STARTED)
 	{
-		KillAllPlayers();
 		m_MaximumTick = Server()->TickSpeed() * 600;
 		m_SafeTick = Server()->TickSpeed() * 30;
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The security timer is enabled for 30 seconds!");
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "You are given 10 minutes to complete of dungeon!");
 		GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon started!");
 		SetMobsSpawn(true);
+		KillAllPlayers();
 		UpdateDoorKeyState(true);
 	}
 
@@ -114,6 +114,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Завершение данжа
 	else if (State == DUNGEON_FINISHED)
 	{
+		SetMobsSpawn(false);
 		KillAllPlayers();
 	}
 
@@ -213,7 +214,8 @@ int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKill
 		return 0;
 
 	int KillerID = pKiller->GetCID();
-	if (pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetSpawnBot() == SPAWNMOBS)
+	int VictimID = pVictim->GetPlayer()->GetCID();
+	if (KillerID != VictimID && pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetSpawnBot() == SPAWNMOBS)
 	{
 		int Progress = 100 - (int)kurosio::translate_to_procent(CountMobs(), LeftMobsToWin());
 		DungeonJob::Dungeon[m_DungeonID].Progress = Progress;
