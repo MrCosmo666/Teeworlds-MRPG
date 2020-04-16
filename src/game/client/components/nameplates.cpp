@@ -43,7 +43,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 
 		float a = 0.8f;
 		if (g_Config.m_ClNameplatesAlways == 0)
-			a = clamp(0.8f - powf(distance(m_pClient->m_pControls->m_TargetPos, Position) / 200.0f, 16.0f), 0.0f, 0.8f);
+			a = clamp(0.85f - powf(distance(m_pClient->m_pControls->m_TargetPos, Position) / 200.0f, 16.0f), 0.0f, 0.85f);
 
 		if (m_pClient->MmoServer() && m_pClient->m_aClients[ClientID].m_pLocalStats && a > 0.001f)
 		{
@@ -123,7 +123,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 			{ // рисуем информацию о агрессиии
 				float FontSizeAgressed = FontSize - 8.0f;
 				float twAgressed = TextRender()->TextWidth(0, FontSizeAgressed, GetMoodName(pClientStats->m_MoodType), -1, -1.0f);
-				float AlphaMoon = clamp(a - 0.18f, 0.0f, a);
+				float AlphaMoon = clamp(a - 0.20f, 0.0f, a);
 				TextRender()->TextColor(1.0f, 1.0f, 1.0f, AlphaMoon);
 				TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.5f * AlphaMoon);
 				TextRender()->SetCursor(&Cursor, Position.x - twAgressed / 2.0f, Position.y - FontSizeAgressed - 52.0f, FontSizeAgressed, TEXTFLAG_RENDER);
