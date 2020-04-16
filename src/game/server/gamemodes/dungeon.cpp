@@ -111,7 +111,7 @@ void CGameControllerDungeon::ChangeState(int State)
 		
 			char aTimeFormat[64];
 			str_format(aTimeFormat, sizeof(aTimeFormat), "Time: %d minute(s) %d second(s)", Seconds / 60, Seconds - (Seconds / 60 * 60));
-			GS()->Chat(-1, "{STR} finished {STR} : Time {STR}", GS()->Server()->ClientName(i), DungeonJob::Dungeon[m_DungeonID].Name, aTimeFormat);
+			GS()->Chat(-1, "{STR} finished {STR} {STR}", GS()->Server()->ClientName(i), DungeonJob::Dungeon[m_DungeonID].Name, aTimeFormat);
 		}
 
 		KillAllPlayers();
