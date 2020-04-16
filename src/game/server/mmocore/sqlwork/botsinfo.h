@@ -58,7 +58,6 @@ class ContextBots : public CMmoComponent
 		int PositionY;
 		int QuestID;
 		int Progress;
-		int Emote;
 		int WorldID;
 		int BotID;
 		int SubBotID;
@@ -80,7 +79,6 @@ class ContextBots : public CMmoComponent
 		int Spread;
 		int PositionX;
 		int PositionY;
-		int Emote;
 		int Level;
 		int RespawnTick;
 		int WorldID;

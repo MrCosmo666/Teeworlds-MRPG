@@ -78,7 +78,6 @@ void ContextBots::LoadQuestBots()
 		QuestBot[MotID].PositionY = RES->getInt("pos_y")+1;
 		QuestBot[MotID].QuestID = RES->getInt("QuestID");
 		QuestBot[MotID].Progress = RES->getInt("Progress");
-		QuestBot[MotID].Emote = RES->getInt("Emote");
 		str_copy(QuestBot[MotID].Name, DataBot[QuestBot[MotID].BotID].NameBot, sizeof(QuestBot[MotID].Name));
 
 		QuestBot[MotID].Interactive[0] = RES->getInt("it_need_0");
@@ -170,7 +169,6 @@ void ContextBots::LoadMobsBots()
 		MobBot[MotID].Health = RES->getInt("Health");
 		MobBot[MotID].Spread = RES->getInt("Spread");
 		MobBot[MotID].Boss = RES->getBoolean("Boss");
-		MobBot[MotID].Emote = RES->getInt("Emote");
 		MobBot[MotID].Level = RES->getInt("Level");
 		MobBot[MotID].RespawnTick = RES->getInt("Respawn");
 		MobBot[MotID].BotID = BotID;

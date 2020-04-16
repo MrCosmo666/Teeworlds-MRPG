@@ -357,13 +357,6 @@ void BotAI::EngineQuestMob()
 		m_Input.m_TargetY = rand()%4-rand()%8;
 	m_Input.m_TargetX = (m_Input.m_Direction*10+1);
 
-	// эмоции ботов
-	int EmoteBot = ContextBots::QuestBot[SubBotID].Emote;
-	if(EmoteBot && (Server()->Tick() % (Server()->TickSpeed()+rand()%50 * 8)) == 0)
-	{
-		SetEmote(EmoteBot, 10);
-		GS()->SendEmoticon(GetPlayer()->GetCID(), GetEmoticon(EmoteBot));
-	}
 
 	// ------------------------------------------------------------------------------
 	// интерактивы бота с найденым игроком
@@ -408,12 +401,7 @@ void BotAI::EngineMobs()
 
 	// эмоции ботов
 	int SubBotID = GetPlayer()->GetBotSub();
-	int EmoteBot = ContextBots::MobBot[SubBotID].Emote;
-	if(EmoteBot && (Server()->Tick() % (Server()->TickSpeed()+rand()%50 * 8)) == 0)
-	{
-		SetEmote(EmoteBot, 10);
-		GS()->SendEmoticon(GetPlayer()->GetCID(), GetEmoticon(EmoteBot));
-	}
+
 
 	// Зелье мобам восстановление Health без агра
 	if(m_BotTargetID == GetPlayer()->GetCID() && Health() < m_StartHealth && !GetPlayer()->CheckEffect("RegenHealth")) 
@@ -538,8 +526,7 @@ CPlayer *BotAI::SearchPlayer(int Distance)
 CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 {
 	// ночью боты враждебнее ищем сразу игрока для агра если его нету или есть бот злой
-	if(m_BotTargetID == GetPlayer()->GetCID() && 
-		(ContextBots::MobBot[GetPlayer()->GetBotSub()].Emote == EMOTE_ANGRY || Server()->GetEnumTypeDay() == DayType::NIGHTTYPE))
+	if(m_BotTargetID == GetPlayer()->GetCID() && ((random_int() % 300 == 0) || Server()->GetEnumTypeDay() == DayType::NIGHTTYPE || GS()->IsDungeon()))
 	{
 		// ищем игрока
 		CPlayer *pPlayer = SearchPlayer(800.0f);
