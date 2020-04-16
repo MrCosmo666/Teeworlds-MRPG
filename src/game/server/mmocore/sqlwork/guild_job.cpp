@@ -842,7 +842,7 @@ void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int MID)
 	if(Leader && GuildID != HouseGuild[MID].m_GuildID)
 	{
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "Every day payment {INT} gold", &HouseGuild[MID].m_Payment);
-		GS()->AVM(ClientID, "BUYMEMBERHOUSE", MID, NOPE, "Buy this member house! Price: {INT}", &HouseGuild[MID].m_Price);
+		GS()->AVM(ClientID, "BUYMEMBERHOUSE", MID, NOPE, "Buy this guild house! Price: {INT}", &HouseGuild[MID].m_Price);
 	}
 }
 

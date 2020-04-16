@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/math.h>
 #include <thread>
+#include <algorithm>
 
 #include <engine/shared/config.h>
 #include <engine/shared/memheap.h>
@@ -1149,15 +1150,13 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				return;
 			
 			int InteractiveCount = string_to_number(pMsg->m_Reason, 1, 10000000);
-			for(const auto& ivote : m_PlayerVotes[ClientID])
+			const auto& item = std::find_if(m_PlayerVotes[ClientID].begin(), m_PlayerVotes[ClientID].end(), [&](const CVoteOptions& vote)
 			{
-				if (str_comp_nocase(pMsg->m_Value, ivote.m_aDescription) == 0 
-					&& ParseVote(ClientID, ivote.m_aCommand, ivote.m_TempID, ivote.m_TempID2, InteractiveCount, pMsg->m_Reason))
-				{
-					pPlayer->m_PlayerTick[TickState::LastVoteTry] = Server()->Tick();
-					return;
-				}
-			}
+				return (str_comp_nocase(pMsg->m_Value, vote.m_aDescription) == 0);
+			});
+
+			if(ParseVote(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveCount, pMsg->m_Reason))
+				pPlayer->m_PlayerTick[TickState::LastVoteTry] = Server()->Tick();
 		}
 		else if(MsgID == NETMSGTYPE_CL_VOTE)
 		{
