@@ -31,7 +31,8 @@ public:
 	typedef std::map < int, StructDungeon > DungeonType;
 	static DungeonType Dungeon;
 
-	virtual void OnInitGlobal();
+	DungeonJob();
+
 	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist);
 

@@ -8,7 +8,7 @@ using namespace sqlstr;
 
 std::map < int , DungeonJob::StructDungeon > DungeonJob::Dungeon;
 
-void DungeonJob::OnInitGlobal()
+DungeonJob::DungeonJob()
 {
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons"));
 	while (RES->next())
@@ -115,14 +115,14 @@ bool DungeonJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int 
 
 		pPlayer->Acc().TeleportX = -1;
 		pPlayer->Acc().TeleportY = -1;
-		Server()->ChangeWorld(ClientID, Dungeon[VoteID].WorldID);
+		GS()->Server()->ChangeWorld(ClientID, Dungeon[VoteID].WorldID);
 		return true;
 	}
 	else if (PPSTR(CMD, "DUNGEONEXIT") == 0)
 	{
 		pPlayer->Acc().TeleportX = -1;
 		pPlayer->Acc().TeleportY = -1;
-		Server()->ChangeWorld(ClientID, pPlayer->Acc().LastWorldID);
+		GS()->Server()->ChangeWorld(ClientID, pPlayer->Acc().LastWorldID);
 		return true;
 	}
 	return false;
