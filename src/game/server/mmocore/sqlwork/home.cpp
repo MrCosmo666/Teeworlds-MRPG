@@ -30,7 +30,7 @@ void HouseSql::OnInitLocal(const char *pLocal)
 			Home[HID].hPrice = RES->getInt("Price");
 			Home[HID].hBank = RES->getInt("HouseBank");
 			Home[HID].hFarm = RES->getInt("Farm");
-			Home[HID].hFarmLevel = RES->getInt("FarmLevel");
+			Home[HID].hFarm_Level = RES->getInt("Farm_Level");
 			Home[HID].hWorldID = RES->getInt("WorldID");
 			str_copy(Home[HID].hClass, RES->getString("Class").c_str(), sizeof(Home[HID].hClass));
 
@@ -74,7 +74,7 @@ void HouseSql::OnPaymentTime()
 			}
 
 			Home[HouseID].hBank = HouseBank-g_Config.m_SvHousePriceUse;
-			Home[HouseID].hFarm += Home[HouseID].hFarmLevel;
+			Home[HouseID].hFarm += Home[HouseID].hFarm_Level;
 			int ClientID = Job()->Account()->CheckOnlineAccount(OwnerID);                                           
 			if(ClientID >= 0)
 			{
@@ -83,7 +83,7 @@ void HouseSql::OnPaymentTime()
 			}
 		}
 	}
-	SJK.UD("tw_homes", "HouseBank = HouseBank - '%d', Farm = Farm + FarmLevel WHERE OwnerID > '0'", g_Config.m_SvHousePriceUse);
+	SJK.UD("tw_homes", "HouseBank = HouseBank - '%d', Farm = Farm + Farm_Level WHERE OwnerID > '0'", g_Config.m_SvHousePriceUse);
 }
 
 /*
@@ -403,17 +403,17 @@ void HouseSql::TakeFarmMoney(CPlayer *pPlayer, int TakeCount)
 void HouseSql::AddBalance(CPlayer *pPlayer, int Balance)
 {
 	int ClientID = pPlayer->GetCID(), HouseID = -1;
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, HouseBank, FarmLevel", "tw_homes", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, HouseBank, Farm_Level", "tw_homes", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	if(RES->next())
 	{
 		HouseID = RES->getInt("ID");
-		Home[HouseID].hFarmLevel = RES->getInt("FarmLevel")+(Balance/1000);
+		Home[HouseID].hFarm_Level = RES->getInt("Farm_Level")+(Balance/1000);
 		Home[HouseID].hBank = RES->getInt("HouseBank")+Balance;
 	} else return;
                 
-	GS()->Chat(ClientID, "Current House [Farming Level {INT}]!", &Home[HouseID].hFarmLevel);
+	GS()->Chat(ClientID, "Current House [Farming Level {INT}]!", &Home[HouseID].hFarm_Level);
 	GS()->Chat(ClientID, false, _("Payment: +{INT} Now House Balance: {INT}!"), &Balance, &Home[HouseID].hBank);
-	SJK.UD("tw_homes", "HouseBank = '%d', FarmLevel = '%d' WHERE ID = '%d'", Home[HouseID].hBank, Home[HouseID].hFarmLevel, HouseID);
+	SJK.UD("tw_homes", "HouseBank = '%d', Farm_Level = '%d' WHERE ID = '%d'", Home[HouseID].hBank, Home[HouseID].hFarm_Level, HouseID);
 }
 
 // Действия над дверью
@@ -484,7 +484,7 @@ void HouseSql::ShowPersonalHouse(CPlayer *pPlayer)
 
 	bool StateDoor = GetHouseDoor(HouseID);
 	GS()->AVH(ClientID, HHOUSESTATS, vec3(52,26,80), "House stats {INT} Class {STR} Door [{STR}]", &HouseID, Home[HouseID].hClass, StateDoor ? "Closed" : "Opened");
-	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, "Farming level: every day +{INT}gold", &Home[HouseID].hFarmLevel);
+	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, "Farming level: every day +{INT}gold", &Home[HouseID].hFarm_Level);
 	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, "Bank farming house {INT}gold", &Home[HouseID].hFarm);
 	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, "- - - - - - - - - -");
 	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, "Your money: {INT}gold", &pPlayer->GetItem(itMoney).Count);

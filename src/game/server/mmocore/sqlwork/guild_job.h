@@ -1,63 +1,63 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#ifndef GAME_SERVER_SQLMEMBER_H
-#define GAME_SERVER_SQLMEMBER_H
+#ifndef GAME_SERVER_GUILDJOB_H
+#define GAME_SERVER_GUILDJOB_H
 
 #include "../component.h"
 #include <map>
 
-class MemberDoor;
-class MemberSql : public CMmoComponent
+class GuildDoor;
+class GuildJob : public CMmoComponent
 {
 /* #########################################################################
 	VAR AND OBJECTS MEMBER 
 ######################################################################### */
-	struct MemberStruct
+	struct GuildStruct
 	{
-		char mMemberName[32];
-		int mLevel;
-		int mExperience;
-		int mOwnerID;
-		int mBank;
-		int mUpgrades[EMEMBERUPGRADE::NUM_EMEMBERUPGRADE];
-		int mScore;
+		char m_Name[32];
+		int m_Level;
+		int m_Exp;
+		int m_OwnerID;
+		int m_Bank;
+		int m_Upgrades[EMEMBERUPGRADE::NUM_EMEMBERUPGRADE];
+		int m_Score;
 	};
 	
-	struct MemberStructHouse
+	struct GuildStructHouse
 	{
-		int mX;
-		int mY;
-		int mDoorX;
-		int mDoorY;
-		int mTextX;
-		int mTextY;
-		int mWorldID;
-		int mPrice;
-		int mEveryDay;
-		int mOwnerMemberID;
-		MemberDoor *m_Door;
+		int m_PosX;
+		int m_PosY;
+		int m_DoorX;
+		int m_DoorY;
+		int m_TextX;
+		int m_TextY;
+		int m_WorldID;
+		int m_Price;
+		int m_Payment;
+		int m_GuildID;
+		GuildDoor *m_Door;
 	};
 
-	struct MemberStructRank
+	struct GuildStructRank
 	{
 		char Rank[32];
-		int MemberID;
+		int GuildID;
 		int Access;
 	};
 
-	typedef std::map < int , MemberStruct > MemberType;
-	static MemberType Member;
+	typedef std::map < int , GuildStruct > GuildType;
+	static GuildType Guild;
 
-	typedef std::map < int , MemberStructHouse > MemberHouseType;
-	static MemberHouseType MemberHouse;
+	typedef std::map < int , GuildStructHouse > GuildHouseType;
+	static GuildHouseType HouseGuild;
 
-	typedef std::map < int , MemberStructRank > MemberRankType;
-	static MemberRankType MemberRank;
+	typedef std::map < int , GuildStructRank > GuildRankType;
+	static GuildRankType RankGuild;
 
 /* #########################################################################
 	LOADING MEMBER 
 ######################################################################### */
-	void LoadMemberRank(int MemberID);
+	void LoadGuildRank(int GuildID);
 
 public:
 	virtual void OnInitGlobal();
@@ -68,9 +68,9 @@ public:
 /* #########################################################################
 	GET CHECK MEMBER 
 ######################################################################### */
-	const char *MemberName(int MemberID) const;
+	const char *GuildName(int GuildID) const;
 	bool IsLeaderPlayer(CPlayer *pPlayer, int Access = -1) const;
-	int GetMemberChairBonus(int MemberID, int Field) const;
+	int GetMemberChairBonus(int GuildID, int Field) const;
 private:
 	std::string UpgradeNames(int Field, bool DataTable = false);
 	int ExpForLevel(int Level);
@@ -78,29 +78,29 @@ public:
 /* #########################################################################
 	FUNCTIONS MEMBER MEMBER 
 ######################################################################### */
-	void CreateGuild(int ClientID, const char *MemberName);
-	void JoinGuild(int AuthID, int MemberID);
+	void CreateGuild(int ClientID, const char *GuildName);
+	void JoinGuild(int AuthID, int GuildID);
 	void ExitGuild(int AccountID);
 	void ShowMenuGuild(CPlayer *pPlayer);
 
-	void AddExperience(int MemberID);	
-	bool AddMoneyBank(int MemberID, int Money);
-	bool RemoveMoneyBank(int MemberID, int Money);
-	bool UpgradeGuild(int MemberID, int Field);
+	void AddExperience(int GuildID);	
+	bool AddMoneyBank(int GuildID, int Money);
+	bool RemoveMoneyBank(int GuildID, int Money);
+	bool UpgradeGuild(int GuildID, int Field);
 
 /* #########################################################################
 	GET CHECK MEMBER RANK MEMBER 
 ######################################################################### */
 	const char *AccessNames(int Access);
-	const char *GetMemberRank(int MemberID, int RankID);
-	int FindMemberRank(int MemberID, const char *Rank) const;
+	const char *GetGuildRank(int GuildID, int RankID);
+	int FindGuildRank(int GuildID, const char *Rank) const;
 
 /* #########################################################################
 	FUNCTIONS MEMBER RANK MEMBER 
 ######################################################################### */
-	void AddRank(int MemberID, const char *Rank);
-	void DeleteRank(int RankID, int MemberID);
-	void ChangeRank(int RankID, int MemberID, const char *NewRank);
+	void AddRank(int GuildID, const char *Rank);
+	void DeleteRank(int RankID, int GuildID);
+	void ChangeRank(int RankID, int GuildID, const char *NewRank);
 	void ChangeRankAccess(int RankID);
 	void ChangePlayerRank(int AuthID, int RankID);
 	void ShowMenuRank(CPlayer *pPlayer);
@@ -108,40 +108,40 @@ public:
 /* #########################################################################
 	GET CHECK MEMBER INVITE MEMBER 
 ######################################################################### */
-	int GetGuildPlayerCount(int MemberID);
+	int GetGuildPlayerCount(int GuildID);
 
 /* #########################################################################
 	FUNCTIONS MEMBER INVITE MEMBER 
 ######################################################################### */
-	bool AddInviteGuild(int MemberID, int OwnerID);
-	void ShowInvitesGuilds(int ClientID, int MemberID);
+	bool AddInviteGuild(int GuildID, int OwnerID);
+	void ShowInvitesGuilds(int ClientID, int GuildID);
 	void ShowFinderGuilds(int ClientID);
 
 /* #########################################################################
 	FUNCTIONS MEMBER HISTORY MEMBER 
 ######################################################################### */
-	void ShowHistoryGuild(int ClientID, int MemberID);
-	void AddHistoryGuild(int MemberID, const char *Buffer, ...);
+	void ShowHistoryGuild(int ClientID, int GuildID);
+	void AddHistoryGuild(int GuildID, const char *Buffer, ...);
 
 /* #########################################################################
 	GET CHECK MEMBER HOUSING MEMBER 
 ######################################################################### */
-	int GetHouseMemberID(int HouseID) const;
+	int GetHouseGuildID(int HouseID) const;
 	int GetHouseWorldID(int HouseID) const;
 	int GetPosHouseID(vec2 Pos) const;
 
-	bool GetMemberDoor(int MemberID) const;
-	vec2 GetPositionHouse(int MemberID) const;
-	int GetMemberHouseID(int MemberID) const;
+	bool GetGuildDoor(int GuildID) const;
+	vec2 GetPositionHouse(int GuildID) const;
+	int GetGuildHouseID(int GuildID) const;
 
 /* #########################################################################
 	FUNCTIONS MEMBER HOUSING MEMBER 
 ######################################################################### */
-	void BuyGuildHouse(int MemberID, int HouseID);
-	void SellGuildHouse(int MemberID);
+	void BuyGuildHouse(int GuildID, int HouseID);
+	void SellGuildHouse(int GuildID);
 	void ShowBuyHouse(CPlayer *pPlayer, int MID);
 	void CheckTimePayment();
-	void ChangeStateDoor(int MemberID);
+	void ChangeStateDoor(int GuildID);
 
 /* #########################################################################
 	GLOBAL MEMBER  
@@ -152,14 +152,14 @@ public:
 /* #########################################################################
 	HOUSE ENTITIES MEMBER  
 ######################################################################### */
-class MemberDoor : public CEntity
+class GuildDoor : public CEntity
 {
-	int m_MemberID;
+	int m_GuildID;
 	vec2 m_To;
 	
 public:
-	MemberDoor(CGameWorld *pGameWorld, vec2 Pos, int HouseID);
-	~MemberDoor();
+	GuildDoor(CGameWorld *pGameWorld, vec2 Pos, int HouseID);
+	~GuildDoor();
 
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);

@@ -1065,9 +1065,9 @@ void CCharacter::HandleTilesets()
 			const int HouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
 			if(HouseID <= 0) return;
 	
-			const int MemberID = GS()->Mmo()->Member()->GetHouseMemberID(HouseID);
-			const int Exp = GS()->Mmo()->Member()->GetMemberChairBonus(MemberID, EMEMBERUPGRADE::ChairNSTExperience);
-			const int Money = GS()->Mmo()->Member()->GetMemberChairBonus(MemberID, EMEMBERUPGRADE::ChairNSTMoney);
+			const int GuildID = GS()->Mmo()->Member()->GetHouseGuildID(HouseID);
+			const int Exp = GS()->Mmo()->Member()->GetMemberChairBonus(GuildID, EMEMBERUPGRADE::ChairNSTExperience);
+			const int Money = GS()->Mmo()->Member()->GetMemberChairBonus(GuildID, EMEMBERUPGRADE::ChairNSTMoney);
 			m_pPlayer->AddExp(Exp);
 			m_pPlayer->AddMoney(Money);
 		}

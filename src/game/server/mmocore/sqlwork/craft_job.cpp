@@ -2,13 +2,13 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
-#include "craft.h"
+#include "craft_job.h"
 
 using namespace sqlstr;
-std::map < int , CraftSql::CraftStruct > CraftSql::Craft;
+std::map < int , CraftJob::CraftStruct > CraftJob::Craft;
 
 // Инициализация класса
-void CraftSql::OnInitGlobal() 
+void CraftJob::OnInitGlobal() 
 { 
 	// получаем список крафтов
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_craftitem", "ORDER BY 'CraftLevel' DESC"));
@@ -44,7 +44,7 @@ void CraftSql::OnInitGlobal()
 
 
 // показать лист крафтов
-void CraftSql::ShowCraftList(CPlayer *pPlayer, int CraftTab)
+void CraftJob::ShowCraftList(CPlayer *pPlayer, int CraftTab)
 {
 	// добавляем голосования
 	int ClientID = pPlayer->GetCID();
@@ -94,7 +94,7 @@ void CraftSql::ShowCraftList(CPlayer *pPlayer, int CraftTab)
 	}
 }
 
-void CraftSql::StartCraftItem(CPlayer *pPlayer, int CraftID)
+void CraftJob::StartCraftItem(CPlayer *pPlayer, int CraftID)
 {
 	if(Craft.find(CraftID) == Craft.end()) 
 		return;
@@ -157,7 +157,7 @@ void CraftSql::StartCraftItem(CPlayer *pPlayer, int CraftID)
 	GS()->Chat(ClientID, "You crafted [{STR}x{INT}].", PlayerItem.Info().GetName(pPlayer), &Craft[CraftID].ItemCount);
 }
 
-bool CraftSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool CraftJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	int ClientID = pPlayer->GetCID();
 	// крафт действие

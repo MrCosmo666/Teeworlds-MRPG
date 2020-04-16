@@ -290,12 +290,12 @@ void CPlayer::TryRespawn()
 		return;
 
 	// спавн в организации
-	const int CheckMemberSpawn = GS()->Mmo()->Member()->GetMemberHouseID(Acc().MemberID);
+	const int CheckMemberSpawn = GS()->Mmo()->Member()->GetGuildHouseID(Acc().GuildID);
 	if(CheckMemberSpawn > 0)
 	{
 		const int WorldID = GS()->Mmo()->Member()->GetHouseWorldID(CheckMemberSpawn);
 		if(WorldID == Server()->GetWorldID(m_ClientID))
-			SpawnPos = GS()->Mmo()->Member()->GetPositionHouse(Acc().MemberID);
+			SpawnPos = GS()->Mmo()->Member()->GetPositionHouse(Acc().GuildID);
 	}
 
 	// спавн в доме
@@ -523,7 +523,7 @@ void CPlayer::AddExp(int Exp)
 	if(rand()%5 == 0) GS()->Mmo()->SaveAccount(this, SAVESTATS);
 
 	if(Acc().IsGuild())
-		GS()->Mmo()->Member()->AddExperience(Acc().MemberID);
+		GS()->Mmo()->Member()->AddExperience(Acc().GuildID);
 }
 
 // Дать деньги игроку
@@ -675,8 +675,8 @@ bool CPlayer::ParseInteractive(int Vote)
 		}
 		else if(!str_comp(CGS::Interactive[m_ClientID].ParsingType, "Member"))
 		{
-			const int MemberID = CGS::Interactive[m_ClientID].ParsingSaveInt;
-			GS()->Mmo()->Member()->JoinGuild(Acc().AuthID, MemberID);
+			const int GuildID = CGS::Interactive[m_ClientID].ParsingSaveInt;
+			GS()->Mmo()->Member()->JoinGuild(Acc().AuthID, GuildID);
 		}
 		ClearParsing(true);
 		return true;

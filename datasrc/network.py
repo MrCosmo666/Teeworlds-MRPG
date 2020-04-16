@@ -190,8 +190,8 @@ Objects = [
 	]),
 
 	NetObject("GameDataTeam", [
-		NetIntAny("m_TeamscoreRed"),
-		NetIntAny("m_TeamscoreBlue"),
+		NetIntAny("m_Team_ScoreRed"),
+		NetIntAny("m_Team_ScoreBlue"),
 	]),
 
 	NetObject("GameDataFlag", [

@@ -106,7 +106,7 @@ void TeleportsSql::ShowTeleportList(CPlayer *pPlayer)
 	GS()->AVH(ClientID, HTELEPORTLIST, vec3(50, 10, 5), "Available teleports");
 	
 	// если имеется дом организации
-	if(Job()->Member()->GetMemberHouseID(pPlayer->Acc().MemberID) >= 1)
+	if(Job()->Member()->GetGuildHouseID(pPlayer->Acc().GuildID) >= 1)
 		GS()->AVM(ClientID, "MSPAWN", NOPE, HTELEPORTLIST, "Move to Member House - free");\
 
 	// если имеется дом

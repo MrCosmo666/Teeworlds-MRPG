@@ -16,12 +16,12 @@ SqlController::SqlController(CGS *pGameServer) : m_pGameServer(pGameServer)
 	m_Components.add(m_pAccMiner = new MinerAccSql());
 	m_Components.add(m_pAccPlant = new PlantsAccSql());
 	m_Components.add(m_pAccRelax = new SpaRelaxSql());
-	m_Components.add(m_pCraftWork = new CraftSql());
+	m_Components.add(m_pCraftJob = new CraftJob());
 	m_Components.add(m_pDungeonJob = new DungeonJob());
 	m_Components.add(m_pHouseWork = new HouseSql());
 	m_Components.add(m_pInbox = new InboxSql());
 	m_Components.add(m_pItemWork = new ItemSql());
-	m_Components.add(m_pMemberWork = new MemberSql());
+	m_Components.add(m_pGuildJob = new GuildJob());
 	m_Components.add(m_pQuest = new QuestBase());
 	m_Components.add(m_pShopmail = new ShopMailSql());
 	m_Components.add(m_pSkillsWork = new SkillsSql());
@@ -153,7 +153,7 @@ void SqlController::ShowBussinesHousesSell(CPlayer *pPlayer)
 		const int HouseID = RES->getInt("ID");
 		const int WorldID = RES->getInt("WorldID");
 		int Price = RES->getInt("Price");
-		int Level = RES->getInt("FarmLevel");
+		int Level = RES->getInt("Farm_Level");
 
 		GS()->AVM(ClientID, "null", NOPE, HHOUSEAVAILABLE, "HL{INT} {STR} {INT}gold {STR}", &Level, House()->ClassName(HouseID), &Price, GS()->Server()->GetWorldName(WorldID));
 	}
@@ -252,7 +252,7 @@ void SqlController::SaveAccount(CPlayer *pPlayer, int Table)
 	// сохранение гильдии даты
 	else if(Table == SAVEMEMBERDATA)
 	{
-		SJK.UD("tw_accounts_data", "MemberID = '%d', MemberRank = '%d' WHERE ID = '%d'", pPlayer->Acc().MemberID, pPlayer->Acc().MemberRank, pPlayer->Acc().AuthID);
+		SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '%d' WHERE ID = '%d'", pPlayer->Acc().GuildID, pPlayer->Acc().GuildRank, pPlayer->Acc().AuthID);
 		return;			
 	}
 
@@ -310,26 +310,26 @@ void SqlController::ShowTopList(CPlayer* pPlayer, int TypeID)
 	pPlayer->m_Colored = { 10, 10, 10 };
 	if(TypeID == ToplistTypes::GUILDS_LEVELING)
 	{
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_members", "ORDER BY Level DESC LIMIT 10"));
+		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "ORDER BY Level DESC LIMIT 10"));
 		while (RES->next())
 		{
 			char NameGuild[64];
 			int Rank = RES->getRow();
 			int Level = RES->getInt("Level");
-			str_copy(NameGuild, RES->getString("MemberName").c_str(), sizeof(NameGuild));
+			str_copy(NameGuild, RES->getString("GuildName").c_str(), sizeof(NameGuild));
 
 			GS()->AVL(ClientID, "null", "{INT}. {STR} : Level {INT}", &Rank, NameGuild, &Level);
 		}
 	}
 	else if (TypeID == ToplistTypes::GUILDS_WEALTHY)
 	{
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_members", "ORDER BY Bank DESC LIMIT 10"));
+		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "ORDER BY Bank DESC LIMIT 10"));
 		while (RES->next())
 		{
 			char NameGuild[64];
 			int Rank = RES->getRow();
 			int Gold = RES->getInt("Bank");
-			str_copy(NameGuild, RES->getString("MemberName").c_str(), sizeof(NameGuild));
+			str_copy(NameGuild, RES->getString("GuildName").c_str(), sizeof(NameGuild));
 
 			GS()->AVL(ClientID, "null", "{INT}. {STR} : Gold {INT}", &Rank, NameGuild, &Gold);
 		}

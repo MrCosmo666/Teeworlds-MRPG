@@ -1,11 +1,11 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#ifndef GAME_SERVER_SQLCRAFT_H
-#define GAME_SERVER_SQLCRAFT_H
+#ifndef GAME_SERVER_CRAFTJOB_H
+#define GAME_SERVER_CRAFTJOB_H
 
 #include "../component.h"
  
-class CraftSql : public CMmoComponent
+class CraftJob : public CMmoComponent
 {
  	// создаем экземпляр класса лишь 1 шт так что можно использовать глобально
 	struct CraftStruct

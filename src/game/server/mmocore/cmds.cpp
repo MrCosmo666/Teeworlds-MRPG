@@ -48,7 +48,7 @@ void CCmd::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 			return;
 
 		// check leader account
-		if(pPlayer->Acc().MemberID > 0)
+		if(pPlayer->Acc().GuildID > 0)
 		{
 			if(!IsLeaderPlayer(GS, pPlayer, MACCESSINVITEKICK))
 				return GS->Chat(ClientID, "You have no access.");
@@ -62,15 +62,15 @@ void CCmd::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 				return GS->Chat(ClientID, "Not entered the correct ID of the player.");
 			
 			// check member group player		
-			if(pPlayerCID->Acc().MemberID > 0)
+			if(pPlayerCID->Acc().GuildID > 0)
 				return GS->Chat(ClientID, "Player already in member group.");
 
 			// start parsing
-			int MemberID = pPlayer->Acc().MemberID;
-			if(pPlayerCID->SetParsing(10, ClientID, MemberID, "Member"))
+			int GuildID = pPlayer->Acc().GuildID;
+			if(pPlayerCID->SetParsing(10, ClientID, GuildID, "Member"))
 			{
 				GS->Chat(ClientID, "You invite in member {STR}.", GS->Server()->ClientName(CID));
-				GS->Chat(ClientID, "{STR} offered enter in member {STR}.", GS->Server()->ClientName(ClientID), GS->Mmo()->Member()->MemberName(MemberID));
+				GS->Chat(ClientID, "{STR} offered enter in member {STR}.", GS->Server()->ClientName(ClientID), GS->Mmo()->Member()->GuildName(GuildID));
 			}
 		}
 		return;
@@ -84,7 +84,7 @@ void CCmd::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 			return;
 
 		// start parsing
-		if(pPlayer->Acc().MemberID > 0)
+		if(pPlayer->Acc().GuildID > 0)
 		{
 			int AuthID = pPlayer->Acc().AuthID;
 			ExitGuild(GS, AuthID);
@@ -100,15 +100,15 @@ void CCmd::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 			return;
 
 		// create member
-		if(pPlayer->Acc().MemberID <= 0)
+		if(pPlayer->Acc().GuildID <= 0)
 		{
-			char MemberName[256];
-			if(sscanf(Msg->m_pMessage, "/gcreate %s", MemberName) != 1) 
+			char GuildName[256];
+			if(sscanf(Msg->m_pMessage, "/gcreate %s", GuildName) != 1) 
 				return GS->ChatFollow(ClientID, "Use: /gcreate <guildname>");
-			if(str_length(MemberName) > 8 || str_length(MemberName) < 3)
+			if(str_length(GuildName) > 8 || str_length(GuildName) < 3)
 				return GS->ChatFollow(ClientID, "Guild name must contain 3-8 characters");
 
-			CreateGuild(GS, ClientID, MemberName);
+			CreateGuild(GS, ClientID, GuildName);
 		}
 		return;
 	}

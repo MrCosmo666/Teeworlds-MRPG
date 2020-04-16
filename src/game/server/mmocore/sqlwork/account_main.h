@@ -17,8 +17,8 @@ public:
 		int AuthID;
 		int Level;
 		int Exp; 
-		int MemberID;
-		int MemberRank;
+		int GuildID;
+		int GuildRank;
 
 		// upgrades
 		int Upgrade;
@@ -48,7 +48,7 @@ public:
 
 		std::map < int , bool > AetherLocation;
 
-		bool IsGuild() { return (MemberID > 0); }
+		bool IsGuild() { return (GuildID > 0); }
 	};
 	typedef std::map < int , StructData > AccDataType;
 	static AccDataType Data;

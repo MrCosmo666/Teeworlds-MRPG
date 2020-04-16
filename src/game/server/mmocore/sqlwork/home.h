@@ -24,7 +24,7 @@ class HouseSql : public CMmoComponent
 		int hOwnerID;
 		int hBank;
 		int hFarm;
-		int hFarmLevel;
+		int hFarm_Level;
 		int hPlantID;
 		int hPlantX;
 		int hPlantY;

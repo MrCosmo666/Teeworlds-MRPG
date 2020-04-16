@@ -9,12 +9,12 @@
 #include "sqlwork/account_plant.h"
 #include "sqlwork/account_relax.h"
 #include "sqlwork/botsinfo.h"
-#include "sqlwork/craft.h"
+#include "sqlwork/craft_job.h"
 #include "sqlwork/dungeon_job.h"
 #include "sqlwork/home.h"
 #include "sqlwork/inbox.h"
 #include "sqlwork/items.h"
-#include "sqlwork/member.h"
+#include "sqlwork/guild_job.h"
 #include "sqlwork/questing.h"
 #include "sqlwork/shopmail.h"
 #include "sqlwork/skills.h"
@@ -47,12 +47,12 @@ class SqlController
 
 	class AccountMainSql *m_pAccMain;
 	class ContextBots *m_pBotsInfo;
-	class CraftSql *m_pCraftWork;
+	class CraftJob *m_pCraftJob;
 	class DungeonJob *m_pDungeonJob;
 	class HouseSql *m_pHouseWork;
 	class InboxSql *m_pInbox;
 	class ItemSql *m_pItemWork;
-	class MemberSql *m_pMemberWork;
+	class GuildJob * m_pGuildJob;
 	class MinerAccSql *m_pAccMiner;
 	class PlantsAccSql *m_pAccPlant;
 	class QuestBase *m_pQuest;
@@ -73,12 +73,12 @@ public:
 	// ссылки на объекты класса Sql Work
 	AccountMainSql *Account() const { return m_pAccMain; }
 	ContextBots *BotsData() const { return m_pBotsInfo; }
-	CraftSql *Craft() const { return m_pCraftWork; }
+	CraftJob *Craft() const { return m_pCraftJob; }
 	DungeonJob *Dungeon() const { return m_pDungeonJob; }
 	HouseSql *House() const { return m_pHouseWork; }
 	InboxSql *Inbox() const { return m_pInbox; }
 	ItemSql *Item() const { return m_pItemWork; }
-	MemberSql *Member() const { return m_pMemberWork; }
+	GuildJob *Member() const { return m_pGuildJob; }
 	MinerAccSql *MinerAcc() const { return m_pAccMiner; }
 	PlantsAccSql *PlantsAcc() const { return m_pAccPlant; }
 	QuestBase *Quest() const { return m_pQuest; }

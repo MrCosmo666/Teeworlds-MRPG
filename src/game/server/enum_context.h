@@ -103,7 +103,7 @@ enum
 	GUIDEDROP,								// гайды по дропам меню
 	EQUIPMENU,								// снаряжение меню
 	MEMBERMENU,								// гильдия меню
-	MEMBERRANK,								// гильдия ранги меню
+	GuildRank,								// гильдия ранги меню
 	MEMBERINVITES,							// гильдия приглашения меню
 	MEMBERHISTORY,							// гильдия история действий
 	CRAFTING,								// крафт меню

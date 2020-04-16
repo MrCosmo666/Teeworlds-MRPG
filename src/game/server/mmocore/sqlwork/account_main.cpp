@@ -111,9 +111,9 @@ int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Pa
 	pPlayer->Acc().AuthID = UserID;
 	pPlayer->Acc().Level = RES2->getInt("Level");
 	pPlayer->Acc().Exp = RES2->getInt("Exp");
-	pPlayer->Acc().MemberID = RES2->getInt("MemberID");
+	pPlayer->Acc().GuildID = RES2->getInt("GuildID");
 	pPlayer->Acc().Upgrade = RES2->getInt("Upgrade");
-	pPlayer->Acc().MemberRank = RES2->getInt("MemberRank");
+	pPlayer->Acc().GuildRank = RES2->getInt("GuildRank");
 	pPlayer->Acc().WorldID = WorldID;
 	str_copy(pPlayer->Acc().Login, clear_Login.cstr(), sizeof(pPlayer->Acc().Login));
 	str_copy(pPlayer->Acc().Password, clear_Pass.cstr(), sizeof(pPlayer->Acc().Password));

@@ -469,7 +469,7 @@ void CGS::ChatGuild(int GuildID, const char* pText, ...)
 	for(int i = 0 ; i < MAX_PLAYERS ; i ++)
 	{
 		CPlayer *pPlayer = GetPlayer(i, true);
-		if(pPlayer && pPlayer->Acc().IsGuild() && pPlayer->Acc().MemberID == GuildID)
+		if(pPlayer && pPlayer->Acc().IsGuild() && pPlayer->Acc().GuildID == GuildID)
 		{
 			Buffer.append("[Guild]");
 			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
@@ -1123,8 +1123,8 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				if(pPlayer->Acc().IsGuild())
 				{
 					char aBuf[1024];
-					str_format(aBuf, sizeof(aBuf), "[%s:%s] %s", Mmo()->Member()->MemberName(pPlayer->Acc().MemberID),
-						Mmo()->Member()->GetMemberRank(pPlayer->Acc().MemberID, pPlayer->Acc().MemberRank), pMsg->m_pMessage);
+					str_format(aBuf, sizeof(aBuf), "[%s:%s] %s", Mmo()->Member()->GuildName(pPlayer->Acc().GuildID),
+						Mmo()->Member()->GetGuildRank(pPlayer->Acc().GuildID, pPlayer->Acc().GuildRank), pMsg->m_pMessage);
 				
 					ChatDiscord(false, DC_SERVER_CHAT, Server()->ClientName(ClientID), aBuf);
 					SendChat(ClientID, Mode, pMsg->m_Target, aBuf);
@@ -1998,7 +1998,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		pPlayer->m_LastVoteMenu = MAINMENU;
 		Mmo()->Member()->ShowMenuGuild(pPlayer);
 	}
-	else if(MenuList == MEMBERRANK) 
+	else if(MenuList == GuildRank) 
 	{
 		pPlayer->m_LastVoteMenu = MEMBERMENU;
 		Mmo()->Member()->ShowMenuRank(pPlayer);
@@ -2006,12 +2006,12 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	else if(MenuList == MEMBERINVITES) 
 	{
 		pPlayer->m_LastVoteMenu = MEMBERMENU;
-		Mmo()->Member()->ShowInvitesGuilds(ClientID, pPlayer->Acc().MemberID);
+		Mmo()->Member()->ShowInvitesGuilds(ClientID, pPlayer->Acc().GuildID);
 	}
 	else if(MenuList == MEMBERHISTORY) 
 	{
 		pPlayer->m_LastVoteMenu = MEMBERMENU;		
-		Mmo()->Member()->ShowHistoryGuild(ClientID, pPlayer->Acc().MemberID);
+		Mmo()->Member()->ShowHistoryGuild(ClientID, pPlayer->Acc().GuildID);
 	}	
 	else if(MenuList == SETTINGS) 
 	{
