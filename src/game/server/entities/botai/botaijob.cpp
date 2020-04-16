@@ -124,6 +124,14 @@ bool BotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 	if(From != GetPlayer()->GetCID() && pFrom)
 		m_ListDmgPlayers[From] += StableDamage;
 
+	if (m_BotTargetID == GetPlayer()->GetCID())
+	{
+		// ищем игрока
+		CPlayer* pPlayer = SearchPlayer(1000.0f);
+		if (pPlayer && pPlayer->GetCharacter())
+			SetTarget(pPlayer->GetCID());
+	}
+
 	if (Damage)
 		return true;
 	
