@@ -4,7 +4,6 @@
 #define GAME_VARIABLES_H
 #undef GAME_VARIABLES_H // this file will be included several times
 
-
 // client
 MACRO_CONFIG_INT(ClPredict, cl_predict, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Predict client movements")
 MACRO_CONFIG_INT(ClNameplates, cl_nameplates, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Show name plates")
@@ -29,21 +28,20 @@ MACRO_CONFIG_INT(ClMouseMaxDistanceDynamic, cl_mouse_max_distance_dynamic, 1000,
 MACRO_CONFIG_INT(ClMouseMaxDistanceStatic, cl_mouse_max_distance_static, 400, 0, 0, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Mouse max distance, in static camera mode")
 
 MACRO_CONFIG_INT(ClCustomizeSkin, cl_customize_skin, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Use a customized skin")
-
 MACRO_CONFIG_INT(ClShowUserId, cl_show_user_id, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Show the ID for every user")
 
 // mmotee
-MACRO_CONFIG_INT(ClShowMEffects, cl_mmo_effects, 0, 0, 3, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show in mmo server effects: 0=all, 1=only enchant, 2=only another items, 3= disable")
+MACRO_CONFIG_INT(ClShowMEffects, cl_mmo_effects, 0, 0, 3, CFGFLAG_CLIENT | CFGFLAG_SAVE, "effects: 0=all, 1=only enchant, 2=only another items, 3= disable")
 MACRO_CONFIG_INT(ClMmoDamageInd, cl_vanilla_textdamage, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Use damage text ind. For vanila clients")
 MACRO_CONFIG_INT(ClShowColoreVote, cl_colored_votes_inmmoserver, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show colored votes in mmo server")
-MACRO_CONFIG_STR(GameTexture, mmo_game_texture, 24, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Gameskin texture")
-MACRO_CONFIG_STR(GameParticles, mmo_particle_texture, 24, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Particle texture")
-MACRO_CONFIG_STR(GameEmoticons, mmo_emoticons_texture, 24, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Emoticons texture")
-MACRO_CONFIG_STR(GameCursor, mmo_cursor_texture, 24, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Cursor texture")
-MACRO_CONFIG_STR(GameEntities, mmo_entities_texture, 64, "editor/entities.png", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Entities texture path")
-MACRO_CONFIG_INT(Texture, mmo_texture_page, 4, 0, 0, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Texture page")
+MACRO_CONFIG_STR(GameTexture, mmo_game_texture, 255, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Gameskin texture")
+MACRO_CONFIG_STR(GameParticles, mmo_particle_texture, 255, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Particle texture")
+MACRO_CONFIG_STR(GameEmoticons, mmo_emoticons_texture, 255, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Emoticons texture")
+MACRO_CONFIG_STR(GameCursor, mmo_cursor_texture, 255, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Cursor texture")
+MACRO_CONFIG_STR(GameEntities, mmo_entities_texture, 255, "editor/entities.png", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Entities texture path")
+MACRO_CONFIG_INT(Texture, mmo_texture_page, 4, 0, 4, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Texture page")
+MACRO_CONFIG_INT(ClGBrowser, cl_gbrowser, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Gamer server browser")
 MACRO_CONFIG_INT(HdColorProgress, hud_color_progress, 16455505, 0, 16777215, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Color progress bar hud")
-MACRO_CONFIG_INT(ClGBrowser, cl_gbrowser, 1, 0, 2, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Gamer server browser")
 
 // curl http download
 MACRO_CONFIG_INT(ClHTTPConnectTimeoutMs, cl_http_connect_timeout_ms, 2000, 0, 100000, CFGFLAG_CLIENT | CFGFLAG_SAVE, "HTTP downloads: timeout for the connect phase in milliseconds (0 to disable)")
