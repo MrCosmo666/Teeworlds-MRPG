@@ -281,6 +281,9 @@ bool ContextBots::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int
 		return false;
 	}
 
+	if (!GS()->CheckClient(ClientID))
+		GS()->SBL(ClientID, 100000, 100, "Press 'F4' to continue the dialog!");
+
 	char reformTalkedText[512];
 	int sizeTalking = QuestBot[MobID].m_Talk.size();
 	if (str_comp_nocase(pText, "empty") != 0)
