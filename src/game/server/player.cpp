@@ -48,11 +48,9 @@ void CPlayer::Tick()
 	if (!Server()->ClientIngame(m_ClientID))
 		return;
 
+	Server()->SetClientScore(m_ClientID, Acc().Level);
+
 	{ // вычисление пинга и установка данных клиенту
-
-		if(!GS()->IsDungeon())
-			Server()->SetClientScore(m_ClientID, Acc().Level);
-
 		IServer::CClientInfo Info;
 		if (Server()->GetClientInfo(m_ClientID, &Info))
 		{
@@ -290,10 +288,10 @@ void CPlayer::TryRespawn()
 		return;
 
 	// спавн в организации
-	const int CheckMemberSpawn = GS()->Mmo()->Member()->GetGuildHouseID(Acc().GuildID);
-	if(CheckMemberSpawn > 0)
+	const int CheckGuildSpawn = GS()->Mmo()->Member()->GetGuildHouseID(Acc().GuildID);
+	if(CheckGuildSpawn > 0)
 	{
-		const int WorldID = GS()->Mmo()->Member()->GetHouseWorldID(CheckMemberSpawn);
+		const int WorldID = GS()->Mmo()->Member()->GetHouseWorldID(CheckGuildSpawn);
 		if(WorldID == Server()->GetWorldID(m_ClientID))
 			SpawnPos = GS()->Mmo()->Member()->GetPositionHouse(Acc().GuildID);
 	}
