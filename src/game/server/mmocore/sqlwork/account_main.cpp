@@ -44,8 +44,6 @@ int AccountMainSql::RegisterAccount(int ClientID, const char *Login, const char 
 	CSqlString<32> clear_Login = CSqlString<32>(Login);
 	CSqlString<32> clear_Pass = CSqlString<32>(Password);
 	CSqlString<32> clear_Nick = CSqlString<32>(GS()->Server()->ClientName(ClientID));
-
-	// проверяем есть ли ник в бд
 	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
 	if(RES2->next())
 	{
@@ -54,8 +52,8 @@ int AccountMainSql::RegisterAccount(int ClientID, const char *Login, const char 
 	}
 
 	// устанавливаем айди 
-	boost::scoped_ptr<ResultSet> RES3(SJK.SD("ID", "tw_accounts", "ORDER BY ID DESC LIMIT 1"));
-	int InitID = RES3->next() ? RES3->getInt("ID")+1 : 1; // thread save ? hm need for table all time auto increment = 1; NEED FIX IT
+	boost::scoped_ptr<ResultSet> RES4(SJK.SD("ID", "tw_accounts", "ORDER BY ID DESC LIMIT 1"));
+	int InitID = RES4->next() ? RES4->getInt("ID")+1 : 1; // thread save ? hm need for table all time auto increment = 1; NEED FIX IT
 
 	// добавляем аккаунт в дб
 	SJK.ID("tw_accounts", "(ID, Username, Password, RegisterDate) VALUES ('%d', '%s', '%s', UTC_TIMESTAMP())", InitID, clear_Login.cstr(), clear_Pass.cstr());
@@ -71,7 +69,8 @@ int AccountMainSql::RegisterAccount(int ClientID, const char *Login, const char 
 int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Password)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, false);
-	if(!pPlayer) return SendAuthCode(ClientID, AUTH_ALL_UNKNOWN);
+	if(!pPlayer) 
+		return SendAuthCode(ClientID, AUTH_ALL_UNKNOWN);
 	
 	// если размер пароля логина мал или слишком большой
 	if(str_length(Login) > 15 || str_length(Login) < 4 || str_length(Password) > 15 || str_length(Password) < 4)
@@ -83,28 +82,29 @@ int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Pa
 	// проверяем логин и пароль и проверяем онлайн игрока
 	CSqlString<32> clear_Login = CSqlString<32>(Login);
 	CSqlString<32> clear_Pass = CSqlString<32>(Password);
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, WorldID", "tw_accounts", "WHERE Username = '%s' AND Password = '%s'", clear_Login.cstr(), clear_Pass.cstr()));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_accounts", "WHERE Username = '%s' AND Password = '%s'", clear_Login.cstr(), clear_Pass.cstr()));
 	if(!RES->next())
 	{
 		GS()->Chat(ClientID, "Wrong login or password!");
 		return SendAuthCode(ClientID, AUTH_LOGIN_WRONG);
 	}
 
-	const int UserID = RES->getInt("ID");
-	const int WorldID = RES->getInt("WorldID");
-
-	// если игрок уже в игре
-	if(CheckOnlineAccount(UserID) >= 0)
-		return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
-
 	// проверяем ник на правильность
 	CSqlString<32> clear_Nick = CSqlString<32>(GS()->Server()->ClientName(ClientID));
-	boost::scoped_ptr<ResultSet> RES2(SJK.SD("*", "tw_accounts_data", "WHERE Nick = '%s' AND ID = '%d'", clear_Nick.cstr(), UserID));
+	boost::scoped_ptr<ResultSet> RES2(SJK.SD("*", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
 	if(!RES2->next())
 	{
 		// если ник не верен из базы данных
 		GS()->Chat(ClientID, "Wrong nickname, use how at registration!");
 		return SendAuthCode(ClientID, AUTH_LOGIN_NICKNAME);
+	}
+
+	const int UserID = RES2->getInt("ID");
+	const int WorldID = RES2->getInt("WorldID");
+	if (CheckOnlineAccount(UserID) >= 0)
+	{
+		GS()->Chat(ClientID, "The account is already in the game!");
+		return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
 	}
 
 	// если есть такое тогда погнали получать все данные игрока

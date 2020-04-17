@@ -262,7 +262,7 @@ void SqlController::SaveAccount(CPlayer *pPlayer, int Table)
 		// запрет в данже сохранять позицию
 		if (GS()->DungeonID() > 0) return;
 
-		SJK.UD("tw_accounts", "WorldID = '%d' WHERE ID = '%d'", GS()->Server()->GetWorldID(ClientID), pPlayer->Acc().AuthID);
+		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", GS()->Server()->GetWorldID(ClientID), pPlayer->Acc().AuthID);
 		return;
 	}
 
