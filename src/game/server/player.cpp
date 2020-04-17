@@ -816,33 +816,27 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			return;
 		}
 
-		int QuestID = ContextBots::NpcBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_GivingQuest;
+		// замораживаем при информации и принятии квеста
+		int QuestID = ContextBots::NpcBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
 		if (QuestID >= 1)
 		{
-			if (GS()->Mmo()->Quest()->GetQuestState(m_ClientID, QuestID) >= QUESTACCEPT)
+			if (!m_TalkingNPC.m_FreezedProgress)
 			{
-				m_TalkingNPC.m_TalkedProgress++;
-				if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
-				{
-					GS()->ClearTalkText(m_ClientID);
-					return;
-				}
+				if (GS()->Mmo()->Quest()->GetQuestState(m_ClientID, QuestID) >= QUESTACCEPT)
+					GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID, "I'm sorry, don't have more new stories for you!");
+				else
+					GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
+
+				m_TalkingNPC.m_FreezedProgress = true;
+				return;
 			}
-			else
-				GS()->Mmo()->Quest()->AcceptQuest(QuestID, this);
+
+			GS()->Mmo()->Quest()->AcceptQuest(QuestID, this);
+			m_TalkingNPC.m_TalkedProgress++;
 		}
 
-		char reformTalkedText[512];
-		int BotID = ContextBots::NpcBot[MobID].BotID;
-		FormatTextQuest(BotID, ContextBots::NpcBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_TalkingText);
-		str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + m_TalkingNPC.m_TalkedProgress, sizeTalking, FormatedTalkedText());
-		ClearFormatQuestText();
-
-		GS()->Mmo()->BotsData()->ProcessingTalkingNPC(m_ClientID, TalkedID,
-			ContextBots::NpcBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_PlayerTalked,
-			reformTalkedText,
-			ContextBots::NpcBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_Style,
-			ContextBots::NpcBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_Emote);
+		if (!GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID))
+			return;
 	}
 
 	else if (BotPlayer->GetSpawnBot() == SPAWNQUESTNPC)
@@ -863,6 +857,12 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		GS()->Mmo()->Quest()->QuestTableClear(m_ClientID);
 		if (ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_RequestComplete)
 		{
+			if (!m_TalkingNPC.m_FreezedProgress)
+			{
+				m_TalkingNPC.m_FreezedProgress = true;
+				return;
+			}
+
 			if (!GS()->CheckClient(m_ClientID) && !GS()->Mmo()->Quest()->InteractiveQuestNPC(this, ContextBots::QuestBot[MobID], false))
 			{
 				char reformTalkedText[512];
@@ -877,17 +877,8 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			GS()->Mmo()->Quest()->ShowQuestInformation(this, ContextBots::QuestBot[MobID], "\0");
 		}
 
-		char reformTalkedText[512];
-		FormatTextQuest(BotID, ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_TalkingText);
-		str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + m_TalkingNPC.m_TalkedProgress, sizeTalking, FormatedTalkedText());
-		ClearFormatQuestText();
+		GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
 
-		GS()->Mmo()->BotsData()->ProcessingTalkingNPC(m_ClientID, TalkedID,
-			ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_PlayerTalked,
-			reformTalkedText,
-			ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_Style,
-			ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_Emote);
-	
 		// skip non complete dialog quest
 		if (ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_RequestComplete 
 				&& !GS()->Mmo()->Quest()->InteractiveQuestNPC(this, ContextBots::QuestBot[MobID], false))
@@ -903,6 +894,7 @@ void CPlayer::ClearTalking()
 	GS()->SendTalkText(m_ClientID, -1, 0, "\0");
 	m_TalkingNPC.m_TalkedID = -1;
 	m_TalkingNPC.m_TalkedProgress = 0;
+	m_TalkingNPC.m_FreezedProgress = false;
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

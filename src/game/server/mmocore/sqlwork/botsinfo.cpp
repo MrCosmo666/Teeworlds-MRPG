@@ -242,3 +242,61 @@ void ContextBots::ProcessingTalkingNPC(int OwnID, int TalkingID, bool PlayerTalk
 
 	GS()->Motd(OwnID, Message);
 }
+
+bool ContextBots::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char *pText)
+{
+	int ClientID = pPlayer->GetCID();
+	if (!IsNpcBotValid(MobID) || Progress >= NpcBot[MobID].m_Talk.size())
+	{
+		GS()->ClearTalkText(ClientID);
+		return false;
+	}
+
+	char reformTalkedText[512];
+	int sizeTalking = NpcBot[MobID].m_Talk.size();
+	if (str_comp_nocase(pText, "empty") != 0)
+	{
+		str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + Progress, sizeTalking, pText);
+		GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID, 0, reformTalkedText, 0, EMOTE_BLINK);
+		return true;
+	}
+
+	int BotID = NpcBot[MobID].BotID;
+	pPlayer->FormatTextQuest(BotID, NpcBot[MobID].m_Talk.at(Progress).m_TalkingText);
+	str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + Progress, sizeTalking, pPlayer->FormatedTalkedText());
+	pPlayer->ClearFormatQuestText();
+
+	GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID,
+		NpcBot[MobID].m_Talk.at(Progress).m_PlayerTalked, reformTalkedText,
+		NpcBot[MobID].m_Talk.at(Progress).m_Style, NpcBot[MobID].m_Talk.at(Progress).m_Emote);
+	return true;
+}
+
+bool ContextBots::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char* pText)
+{
+	int ClientID = pPlayer->GetCID();
+	if (!IsQuestBotValid(MobID) || Progress >= QuestBot[MobID].m_Talk.size())
+	{
+		GS()->ClearTalkText(ClientID);
+		return false;
+	}
+
+	char reformTalkedText[512];
+	int sizeTalking = QuestBot[MobID].m_Talk.size();
+	if (str_comp_nocase(pText, "empty") != 0)
+	{
+		str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + Progress, sizeTalking, pText);
+		GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID, 0, pText, 0, EMOTE_BLINK);
+		return true;
+	}
+
+	int BotID = QuestBot[MobID].BotID;
+	pPlayer->FormatTextQuest(BotID, QuestBot[MobID].m_Talk.at(Progress).m_TalkingText);
+	str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + Progress, sizeTalking, pPlayer->FormatedTalkedText());
+	pPlayer->ClearFormatQuestText();
+
+	GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID,
+		QuestBot[MobID].m_Talk.at(Progress).m_PlayerTalked, reformTalkedText,
+		QuestBot[MobID].m_Talk.at(Progress).m_Style, QuestBot[MobID].m_Talk.at(Progress).m_Emote);
+	return true;
+}

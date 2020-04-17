@@ -39,6 +39,7 @@ class CPlayer
 	
 	struct StructTalkNPC
 	{
+		bool m_FreezedProgress;
 		int m_TalkedID;
 		int m_TalkedProgress;
 	};

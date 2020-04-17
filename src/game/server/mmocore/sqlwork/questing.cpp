@@ -536,26 +536,11 @@ void QuestBase::ShowQuestInformation(CPlayer *pPlayer, ContextBots::QuestBotInfo
 // Принять квест с ID
 bool QuestBase::AcceptQuest(int QuestID, CPlayer *pPlayer)
 {
-	if (!pPlayer || !IsValidQuest(QuestID) || Quests[pPlayer->GetCID()][QuestID].Type == QUESTFINISHED)
+	if (!pPlayer || !IsValidQuest(QuestID) || Quests[pPlayer->GetCID()][QuestID].Type >= QUESTACCEPT)
 		return false;
 
-	// проверяем квест можно ли принять более одного или нет
-	const int ClientID = pPlayer->GetCID();
-	for(const auto& qp : Quests[ClientID])
-	{
-		int QuestSort = qp.first;
-		if(qp.second.Type != QUESTACCEPT) 
-			continue;
-		
-		if(str_comp(QuestsData[QuestSort].StoryLine, "Passive") != 0 && 
-			str_comp(QuestsData[QuestSort].StoryLine, QuestsData[QuestID].StoryLine) == 0)
-		{
-			GS()->Chat(ClientID, "You can only take one '{STR}' quest.", QuestsData[QuestSort].StoryLine);	
-			return false;
-		}
-	}
-
 	// принимаем квест
+	const int ClientID = pPlayer->GetCID();
 	Quests[ClientID][QuestID].Progress = 1;
 	Quests[ClientID][QuestID].Type = QUESTACCEPT;
 	GS()->ClearQuestsBot(QuestID, Quests[ClientID][QuestID].Progress);
