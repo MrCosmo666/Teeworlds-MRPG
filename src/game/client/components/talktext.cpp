@@ -110,7 +110,7 @@ void CTalkText::OnRender()
 			// skin
 			CTeeRenderInfo RenderTalking = m_pClient->m_aClients[TalkClientID].m_RenderInfo;
 			RenderTalking.m_Size = 128.0f;
-			RenderTools()->RenderTee(CAnimState::GetIdle(), &RenderTalking, m_TalkedEmote, vec2(-1.0f, 0.4f), vec2(Width / 1.35f, Height / 1.85f));
+			RenderTools()->RenderTee(CAnimState::GetIdle(), &RenderTalking, m_PlayerTalked ? EMOTE_NORMAL : m_TalkedEmote, vec2(-1.0f, 0.4f), vec2(Width / 1.35f, Height / 1.85f));
 
 			float sizeLize = str_length(m_pClient->m_aClients[TalkClientID].m_aName);
 			TextRender()->Text(0x0, (Width / (1.45f + sizeLize / 64.0f)), Height / 1.97f, 32.0f, m_pClient->m_aClients[TalkClientID].m_aName, -1.0f);
@@ -120,7 +120,7 @@ void CTalkText::OnRender()
 		CTeeRenderInfo RenderYou = m_pClient->m_aClients[LocalClientID].m_RenderInfo;
 		RenderYou.m_Size = 128.0f;
 		RenderTools()->RenderTee(CAnimState::GetIdle(), &RenderYou,
-			m_pClient->m_aClients[LocalClientID].m_Emoticon, vec2(1.0f, 0.4f), vec2(Width / 4.0f, Height / 1.85f));
+			m_PlayerTalked ? m_TalkedEmote : EMOTE_NORMAL, vec2(1.0f, 0.4f), vec2(Width / 4.0f, Height / 1.85f));
 
 		TextRender()->Text(0x0, Width / 3.5f, Height / 1.97f, 32.0f, m_pClient->m_aClients[LocalClientID].m_aName, -1.0f);
 	}
