@@ -1979,7 +1979,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		pPlayer->m_LastVoteMenu = MAINMENU;
 
 		// чекаем местонахождение
-		AV(ClientID, "null", "");
 		Mmo()->Quest()->ShowFullQuestLift(pPlayer);
 
 		AddBack(ClientID);

@@ -199,14 +199,14 @@ void QuestBase::ShowQuestID(CPlayer *pPlayer, int QuestID, bool Passive)
 	// тип пасивный или история
 	if(Passive)
 	{
-		GS()->AVH(ClientID, HideID, vec3(18,3,35), "Basic {STR} {STR}", QuestsData[QuestID].Name, (IsComplecte(ClientID, QuestID) ?  "[OK]" : "\0"));	
+		GS()->AVH(ClientID, HideID, vec3(18,3,35), "Basic {STR}", QuestsData[QuestID].Name);	
 	}
 	else
 	{
 		int CountQuest = GetStoryCountQuest(activeQuestData.StoryLine);
 		int LineQuest = GetStoryCountQuest(activeQuestData.StoryLine, QuestID)+1;
-		GS()->AVH(ClientID, HideID, vec3(18,3,35), "[{INT}/{INT} {STR}] {STR} {STR}", 
-			&LineQuest, &CountQuest, activeQuestData.StoryLine, activeQuestData.Name, (IsComplecte(ClientID, QuestID) ?  "[OK]" : "\0"));	
+		GS()->AVH(ClientID, HideID, vec3(18,3,35), "[{INT}/{INT} {STR}] {STR}", 
+			&LineQuest, &CountQuest, activeQuestData.StoryLine, activeQuestData.Name);	
 	}
 
 	// информация о квесте
@@ -692,7 +692,7 @@ bool QuestBase::ShowAdventureActiveNPC(CPlayer *pPlayer)
 		// если нашли выводим информацию
 		int HideID = (NUMHIDEMENU + 12500 + BotInfo.QuestID);
 		int PosX = BotInfo.PositionX / 32, PosY = BotInfo.PositionY / 32;
-		GS()->AVH(clientID, HideID, vec3(15,35,10), "[Active {STR}] {STR} {STR}(x:{INT} y:{INT})", GetStoryName(qq.first), BotInfo.Name, GS()->Server()->GetWorldName(BotInfo.WorldID), &PosX, &PosY);
+		GS()->AVH(clientID, HideID, vec3(15,35,10), "[{STR}] {STR} {STR}(x:{INT} y:{INT})", GetStoryName(qq.first), BotInfo.Name, GS()->Server()->GetWorldName(BotInfo.WorldID), &PosX, &PosY);
 
 		// проверяем требуемые мобы
 		bool interactiveNeed = false;
