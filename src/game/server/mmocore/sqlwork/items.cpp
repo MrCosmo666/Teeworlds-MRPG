@@ -290,7 +290,7 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 		int DesCount = PlItem.Info().Dysenthis * Get;
 		if(PlItem.Remove(Get) && ItemMaterial.Add(DesCount))
 		{
-			GS()->Chat(ClientID, "Desynthesis {STR}x{INT}, you receive {INT} {STR}(s)", 
+			GS()->Chat(ClientID, "Disassemble {STR}x{INT}, you receive {INT} {STR}(s)", 
 				PlItem.Info().GetName(pPlayer), &Get, &DesCount, ItemMaterial.Info().GetName(pPlayer));
 			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		}
@@ -463,7 +463,7 @@ void ItemSql::ItemSelected(CPlayer *pPlayer, const ItemPlayer &PlItem, bool Dres
 	// десинтез или уничтожение
 	if(PlItem.Info().Dysenthis > 0)
 	{
-		GS()->AVM(ClientID, "IDESYNTHESIS", ItemID, HideID, "Desynthesis {STR} +{INT}{STR}(1 item)", 
+		GS()->AVM(ClientID, "IDESYNTHESIS", ItemID, HideID, "Disassemble {STR} +{INT}{STR}(1 item)", 
 			NameItem, &PlItem.Info().Dysenthis, (PlItem.Info().Function == ITPLANTS ? "goods" : "mat"));
 	}
 
