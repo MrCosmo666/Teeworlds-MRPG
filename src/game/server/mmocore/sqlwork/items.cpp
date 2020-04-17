@@ -529,12 +529,11 @@ bool ItemSql::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 	}
 
 	// проверить пустой слот если да тогда одеть предмет
-	const bool AutoEquip = (Info().Function >= EQUIP_WINGS && Info().Function < NUM_EQUIPS && pPlayer->GetItemEquip(Info().Function) == -1) 
-						|| (Info().Function == ITSETTINGS && Info().BonusCount > 0); 
+	const bool AutoEquip = (Info().Function == ITEMEQUIP && pPlayer->GetItemEquip(Info().Function) == -1)
+		|| (Info().Function == ITSETTINGS && Info().BonusCount > 0); 
 	if(AutoEquip)
 	{
-		GameServer->Chat(ClientID, "Auto equip {STR} ({STR} +{INT})!", 
-			Info().GetName(pPlayer), pPlayer->AtributeName(Info().BonusID), &Info().BonusCount);
+		GameServer->Chat(ClientID, "Auto equip {STR} ({STR} +{INT})!", Info().GetName(pPlayer), pPlayer->AtributeName(Info().BonusID), &Info().BonusCount);
 		GameServer->Chat(ClientID, "For more detail see equip/inventory/settings in vote!");
 
 		// обновить информацию по дискорд карточки
@@ -552,13 +551,12 @@ bool ItemSql::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 		GameServer->VResetVotes(ClientID, INVENTORY);
 
 	// отправить смену скина
-	if(AutoEquip) GameServer->ChangeEquipSkin(ClientID, itemid_);
-
-	// проверить квест
-	GameServer->Mmo()->Quest()->CheckQuest(pPlayer);
+	if(AutoEquip) 
+		GameServer->ChangeEquipSkin(ClientID, itemid_);
 
 	// если тихий режим
-	if(!arg_message || Info().Type == ITEMSETTINGS) return true;
+	if(!arg_message || Info().Type == ITEMSETTINGS) 
+		return true;
 
 	// информация о получении себе предмета
 	if(Info().Type != -1 && itemid_ != itMoney)
@@ -653,17 +651,9 @@ bool ItemSql::ClassItems::IsEquipped()
 		return false;
 
 	if (Info().Type == ITEMSETTINGS)
-		return (bool)Settings;
+		return (bool)(Settings);
+	if (Info().Type == ITEMEQUIP)			
+		return (bool)(pPlayer->GetItemEquip(Info().Function) == itemid_);
 
-	if (Info().Type == ITEMEQUIP)
-	{
-		// Проверить одетый предмет по предмету
-		for (int i = 0; i < NUM_EQUIPS; i++)
-		{
-			if (pPlayer->GetItemEquip(i) != itemid_)
-				continue;
-			return true;
-		}
-	}
 	return false;
 }
