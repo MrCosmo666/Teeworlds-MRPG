@@ -2474,8 +2474,9 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Ench
 // Саздает предметы в позиции Типа и Количества и Их самих кол-ва
 void CGS::CreateDropItem(vec2 Pos, int ClientID, ItemSql::ItemPlayer &PlayerItem, int Count)
 {
-	ItemSql::ItemPlayer CopyItem = PlayerItem;
-	PlayerItem.Copy(CopyItem, Count);
+	ItemSql::ItemPlayer CopyItem;
+	CopyItem.Copy(PlayerItem);
+	CopyItem.Count = Count;
 
 	if(PlayerItem.Remove(Count))
 	{

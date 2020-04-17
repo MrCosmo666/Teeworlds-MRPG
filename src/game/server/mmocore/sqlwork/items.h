@@ -90,12 +90,12 @@ public:
 		};
 
 		// копирование элемента
-		ClassItems Copy(ClassItems right, int num = -1)
+		ClassItems Copy(ClassItems right)
 		{
-			right.itemid_ = itemid_;
-			right.Count = (num >= 1 ? clamp(num, 1, Count) : Count);
-			right.Enchant = Enchant;
-			return right;
+			itemid_ = right.itemid_;
+			Count = right.Count;
+			Enchant = right.Enchant;
+			return *this;
 		};
 	};	
 	typedef ClassItems ItemPlayer;

@@ -266,9 +266,6 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 
 		// проверяем если по функции он используется 1 раз
 		ItemPlayer &PlItem = pPlayer->GetItem(VoteID);
-		if(Get > PlItem.Count)
-			Get = PlItem.Count;
-
 		if(PlItem.Info().Function == ONEUSEDS)
 			Get = 1;
 
@@ -287,13 +284,10 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 			Get = AvailableCount;
 
 		ItemPlayer &PlItem = pPlayer->GetItem(VoteID);
-		if(Get > PlItem.Count)
-			Get = PlItem.Count;
-
 		const int ItemGive = (PlItem.Info().Function == ITPLANTS ? itGoods : itMaterial);
 		ItemPlayer &ItemMaterial = pPlayer->GetItem(ItemGive); 
 
-		int DesCount = PlItem.Info().Dysenthis*Get;
+		int DesCount = PlItem.Info().Dysenthis * Get;
 		if(PlItem.Remove(Get) && ItemMaterial.Add(DesCount))
 		{
 			GS()->Chat(ClientID, "Desynthesis {STR}x{INT}, you receive {INT} {STR}", 
@@ -580,7 +574,7 @@ bool ItemSql::ClassItems::Remove(int arg_removecount, int arg_settings)
 	if(pPlayer->m_SecurCheckCode <= 0) 
 		return false;
 
-	if(IsEquipped())
+	if (IsEquipped())
 	{
 		int ClientID = pPlayer->GetCID();
 		pPlayer->GS()->ChangeEquipSkin(ClientID, itemid_);
@@ -650,10 +644,7 @@ bool ItemSql::ClassItems::IsEquipped()
 	if (!pPlayer)
 		return false;
 
-	if (Info().Type == ITEMSETTINGS)
-		return (bool)(Settings);
-	if (Info().Type == ITEMEQUIP)			
-		return (bool)(pPlayer->GetItemEquip(Info().Function) == itemid_);
-
+	if ((Info().Type == ITEMSETTINGS || Info().Type == ITEMEQUIP) && Settings)
+		return true;
 	return false;
 }
