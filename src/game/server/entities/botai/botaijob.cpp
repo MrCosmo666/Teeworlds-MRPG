@@ -189,7 +189,7 @@ void BotAI::Die(int Killer, int Weapon)
 		// exp
 		int DamageExp = (ContextBots::MobBot[SubID].Level*g_Config.m_SvExperienceMob);
 		int PowerRaid = GS()->IncreaseCountRaid(DamageExp);
-		GS()->CreateDropBonuses(m_Core.m_Pos, 0, DamageExp / 2, rand() % 3);
+		GS()->CreateDropBonuses(m_Core.m_Pos, 1, DamageExp / 2, rand() % 3);
 		pPlayer->AddExp(PowerRaid);
 		GS()->VResetVotes(PlayerID, MAINMENU);	
 

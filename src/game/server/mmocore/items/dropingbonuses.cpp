@@ -20,6 +20,7 @@ CDropingBonuses::CDropingBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Dir, int
 
 	// other var
 	m_Type = Type;
+	m_FlashTimer = 0;
 	m_Flashing = false;
 	m_StartTick = Server()->Tick();
 	m_LifeSpan = Server()->TickSpeed() * 10;
@@ -87,12 +88,12 @@ void CDropingBonuses::Tick()
 		CCharacter *pChar = (CCharacter*)GameWorld()->ClosestEntity(m_Pos, 16, CGameWorld::ENTTYPE_CHARACTER, 0);
 		if(pChar && pChar->GetPlayer() && !pChar->GetPlayer()->IsBot())
 		{
-			if(m_Type == 0)
+			if(m_Type == PICKUP_HEALTH)
 			{
 				GS()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
 			}
 
-			if(m_Type == 1)
+			if(m_Type == PICKUP_ARMOR)
 			{
 				pChar->GetPlayer()->AddExp(m_Count);
 				GS()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
@@ -127,6 +128,7 @@ void CDropingBonuses::Snap(int SnappingClient)
 		pObj->m_Type = ITEMS_EXPERIENCE;
 		return;
 	}
+
 	CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
 	if(!pP)
 		return;
