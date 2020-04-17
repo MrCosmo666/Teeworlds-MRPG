@@ -233,24 +233,13 @@ void CPlayer::Snap(int SnappingClient)
 		pClientInfo->m_aSkinPartColors[p] = Acc().m_aSkinPartColors[p];
 	}
 
-	char aBuf[256];
-	const int ExpRelax = ((g_Config.m_SvRelaxLeveling+Acc().Relax[RlxLevel]*2)*
-					(Acc().Relax[RlxLevel]*Acc().Relax[RlxLevel]));
-	const int ExpPlants = ((g_Config.m_SvPlantLeveling+Acc().Plant[PlLevel]*2)*
-					(Acc().Plant[PlLevel]*Acc().Plant[PlLevel]));
-	const int ExpMiner = ((g_Config.m_SvMinerLeveling+Acc().Miner[MnrLevel]*2)*
-					(Acc().Miner[MnrLevel]*Acc().Miner[MnrLevel]));
 
-	const int SkillPoint = GetItem(itSkillPoint).Count;
-	str_format(aBuf, sizeof(aBuf), "RLX LVL%d EXP(%d/%d)\nPLN LVL%d EXP(%d/%d)\nMNR LVL%d EXP(%d/%d)\nSkill Point %d", 
-		Acc().Relax[RlxLevel], Acc().Relax[RlxExp], ExpRelax,
-		Acc().Plant[PlLevel], Acc().Plant[PlExp], ExpPlants,
-		Acc().Miner[MnrLevel], Acc().Miner[MnrExp], ExpMiner,
-		SkillPoint);
-	StrToInts(pClientInfo->m_Leveling, 32, aBuf);
+	dynamic_string Buffer;
+	Server()->Localization()->Format(Buffer, GetLanguage(), "{INT}", &GetItem(itMoney).Count);
+	StrToInts(pClientInfo->m_Leveling, 32, Buffer.buffer());
+	Buffer.clear();
 
 	// Список эффектов
-	dynamic_string Buffer;
 	for(auto& eff : CGS::Effects[m_ClientID])
 	{
 		char aBuf[32];

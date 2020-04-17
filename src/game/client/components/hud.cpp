@@ -18,6 +18,15 @@
 #include "voting.h"
 #include "binds.h"
 
+/* Helper
+	vec2 Pos = *m_pClient->m_pCamera->GetCenter();
+	RenderTools()->MapScreenToGroup(Pos.x, Pos.y, Layers()->GameGroup(), m_pClient->m_pCamera->GetZoom());
+	Rect.x = m_pClient->m_pControls->m_TargetPos.x;
+	Rect.y = m_pClient->m_pControls->m_TargetPos.y;
+	dbg_msg("test", "position x: %d, y: %d", Rect.x, Rect.y);
+	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.1f, 0.1f, 0.9f), CUI::CORNER_ALL, 5.0f);
+*/
+
 CHud::CHud()
 {
 	// won't work if zero
@@ -670,38 +679,30 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 
 	// переменные
 	char aBuf[256];
-	float FontSize = 5.0f;
+	str_format(aBuf, sizeof(aBuf), "%s. x%d, y%d", Client()->GetCurrentMapName(), pCharacter->m_X / 32, pCharacter->m_Y / 32);
+	TextRender()->Text(0, 2, 5, 4.5f, aBuf, -1);
 
-	// рисуем позицию и нахождение игрока
-	{
-		str_format(aBuf, sizeof(aBuf), "%s. x%d, y%d", Client()->GetCurrentMapName(), pCharacter->m_X / 32, pCharacter->m_Y / 32);
-		TextRender()->Text(0, 2, 5, 4.5f, aBuf, -1);
-	}
+	// рисуем инфу золота
+	IntsToStr(pClientStats->m_Leveling, 32, aBuf);
+	float textWidth = TextRender()->TextWidth(0, 6.0f, aBuf, -1, -1.0);
+	Rect = { 5, 56.0f, textWidth + 16.0f, 10.0f };
+	RenderTools()->DrawUIRect(&Rect, vec4(0.3f, 0.1f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
+
+	m_pClient->m_pMenus->DoItemIcon("gold", { Rect.x, Rect.y - 1.0f, Rect.h, Rect.w }, 12.0f);
+	Rect.VSplitLeft(12.0f, 0, &Rect);
+	TextRender()->Text(0, Rect.x, 56.0f, 6.0f, aBuf, -1);
 
 	// рисуем инфу зелей эффектов
 	IntsToStr(pClientStats->m_Table, 12, aBuf);
-	bool ChangePosition = false;
-	float SizeBuf = (str_length(aBuf) * (FontSize/1.25f)) - (str_length(aBuf) / 2 + str_length(aBuf) / 5);
-	if (SizeBuf > 2.0)
+	textWidth = TextRender()->TextWidth(0, 5.0f, aBuf, -1, -1.0);
+	if (textWidth > 2.0)
 	{
-		TextRender()->Text(0, 10, 56, FontSize, aBuf, -1);
-
-		Rect = { 5, 56, SizeBuf, 9.0f };
-		Graphics()->BlendNormal();
-		RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.2f, 0.4f, 0.14f), CUI::CORNER_ALL, 3.0f);
-		ChangePosition = true;
+		Rect = { 7.0f, 72.0f, textWidth + 10.0f, 9.0f };
+		RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.2f, 0.4f, 0.24f), CUI::CORNER_ALL, 3.0f);
+		m_pClient->m_pMenus->DoItemIcon("potion_r", { Rect.x, Rect.y - 1.0f, Rect.h, Rect.w }, 8.0f);
+		Rect.VSplitLeft(8.0f, 0, &Rect);
+		TextRender()->Text(0, Rect.x, 72.0f, 5.0f, aBuf, -1);
 	}
-
-	// рисуем инфу уровней
-	IntsToStr(pClientStats->m_Leveling, 32, aBuf);
-	Rect = { 5, (ChangePosition ? 71.0f : 56.0f), 100, 20.0f };
-	Graphics()->BlendNormal();
-	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.16f), CUI::CORNER_ALL, 5.0f);
-
-	TextRender()->TextWidth(0, 4.6f, aBuf, -1, -1.0);
-	TextRender()->Text(0, 10, (ChangePosition ? 71.0f : 56.0f), 4.6f, aBuf, -1);
-	TextRender()->TextOutlineColor(0, 0, 0, 0.3f);
-
 
 	// хюд
 	{
@@ -761,8 +762,6 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 		Graphics()->QuadsEnd();
 		Graphics()->WrapNormal();
 
-//		m_pClient->m_pMenus->DoItemIcon("skill_point", Rect, 8.0f);
-
 		// �����
 		CTextCursor Cursor;
 		char type[64];
@@ -786,6 +785,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 		str_format(Text, sizeof(Text), "%d", pClientStats->m_Armor);
 		TextRender()->SetCursor(&Cursor, 85, 23, 6.0f, TEXTFLAG_RENDER);
 		TextRender()->TextEx(&Cursor, Text, -1);
+
 	}
 }
 

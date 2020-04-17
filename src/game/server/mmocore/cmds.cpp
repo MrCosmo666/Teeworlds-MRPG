@@ -181,6 +181,18 @@ void CCmd::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		dbg_msg("test", "%0.f %0.f WorldID: %d", pPlayer->GetCharacter()->m_Core.m_Pos.x, pPlayer->GetCharacter()->m_Core.m_Pos.y, GS->GetWorldID());
 		return;
 	}
+
+	else if (str_comp_num(Msg->m_pMessage, "/test", 5) == 0)
+	{
+		LastChat(GS, pPlayer);
+		char GuildName[256];
+		if (sscanf(Msg->m_pMessage, "/test %s", GuildName) != 1)
+			return GS->ChatFollow(ClientID, "Use: /test <effect>");
+
+
+		pPlayer->GiveEffect(GuildName, 10, 0);
+		return;
+	}
 	else if (str_comp_num(Msg->m_pMessage, "/sd", 3) == 0 && GS->Server()->IsAuthed(ClientID))
 	{
 		LastChat(GS, pPlayer); 

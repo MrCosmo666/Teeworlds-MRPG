@@ -569,8 +569,6 @@ bool ItemSql::ClassItems::Remove(int arg_removecount, int arg_settings)
 
 	if (IsEquipped())
 	{
-		dbg_msg("test", "here");
-
 		Settings = 0;
 		int ClientID = pPlayer->GetCID();
 		pPlayer->GS()->ChangeEquipSkin(ClientID, itemid_);
