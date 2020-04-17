@@ -90,7 +90,7 @@ public:
 
 	void CheckQuest(CPlayer *pPlayer);
 	bool AcceptQuest(int QuestID, CPlayer *pPlayer);
-	bool InteractiveQuestNPC(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData, bool LastDialog);
+	bool InteractiveQuestNPC(CPlayer* pPlayer, ContextBots::QuestBotInfo& BotData, bool LastDialog);
 	void AutoStartNextQuest(CPlayer *pPlayer, int QuestID);
 
 	void AddMobProgress(CPlayer *pPlayer, int BotID);
@@ -103,6 +103,7 @@ public:
 	void QuestTableClear(int ClientID);
 	void QuestTableShowInformation(CPlayer* pPlayer, ContextBots::QuestBotInfo& BotData);
 	int QuestingAllowedItemsCount(CPlayer* pPlayer, int ItemID);
+	void CreateQuestingItems(CPlayer* pPlayer, ContextBots::QuestBotInfo& BotData);
 };
 
 #endif

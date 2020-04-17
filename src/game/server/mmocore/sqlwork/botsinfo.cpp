@@ -300,3 +300,30 @@ bool ContextBots::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int
 		QuestBot[MobID].m_Talk.at(Progress).m_Style, QuestBot[MobID].m_Talk.at(Progress).m_Emote);
 	return true;
 }
+
+void ContextBots::TalkingQuestBotTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
+{
+	int ClientID = pPlayer->GetCID();
+	if (!IsQuestBotValid(MobID) || Progress >= QuestBot[MobID].m_Talk.size())
+	{
+		GS()->ClearTalkText(ClientID);
+		return;
+	}
+
+	// vanila clients
+	int BotID = ContextBots::QuestBot[MobID].BotID;
+	int sizeTalking = ContextBots::QuestBot[MobID].m_Talk.size();
+	if (!GS()->CheckClient(ClientID))
+	{
+		char reformTalkedText[512];
+		pPlayer->FormatTextQuest(BotID, ContextBots::QuestBot[MobID].m_Talk.at(Progress).m_TalkingText);
+		str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + Progress, sizeTalking, pPlayer->FormatedTalkedText());
+		pPlayer->ClearFormatQuestText();
+
+		GS()->Mmo()->Quest()->ShowQuestInformation(pPlayer, ContextBots::QuestBot[MobID], reformTalkedText);
+		return;
+	}
+
+	// mmo clients
+	GS()->Mmo()->Quest()->ShowQuestInformation(pPlayer, ContextBots::QuestBot[MobID], "\0");
+}

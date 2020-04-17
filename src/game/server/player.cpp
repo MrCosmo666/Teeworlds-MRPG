@@ -816,10 +816,11 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			return;
 		}
 
-		// замораживаем при информации и принятии квеста
+		// если прогресс диалога равен какому то квесту
 		int QuestID = ContextBots::NpcBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
 		if (QuestID >= 1)
 		{
+			// замораживаем при информации и принятии квеста
 			if (!m_TalkingNPC.m_FreezedProgress)
 			{
 				if (GS()->Mmo()->Quest()->GetQuestState(m_ClientID, QuestID) >= QUESTACCEPT)
@@ -831,53 +832,41 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 				return;
 			}
 
+			// принимаем квест
 			GS()->Mmo()->Quest()->AcceptQuest(QuestID, this);
 			m_TalkingNPC.m_TalkedProgress++;
 		}
 
-		if (!GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID))
-			return;
+		GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
 	}
 
 	else if (BotPlayer->GetSpawnBot() == SPAWNQUESTNPC)
 	{
-		int BotID = ContextBots::QuestBot[MobID].BotID;
 		int sizeTalking = ContextBots::QuestBot[MobID].m_Talk.size();
 		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
 		{
-			if (GS()->Mmo()->Quest()->InteractiveQuestNPC(this, ContextBots::QuestBot[MobID], true))
-			{
-				GS()->ClearTalkText(m_ClientID);
-				return;
-			}
+			GS()->Mmo()->Quest()->InteractiveQuestNPC(this, ContextBots::QuestBot[MobID], true);
 			GS()->ClearTalkText(m_ClientID);
 			return;
 		}
 
+		int BotID = ContextBots::QuestBot[MobID].BotID;
+		bool RequiestQuestTask = ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_RequestComplete;
 		GS()->Mmo()->Quest()->QuestTableClear(m_ClientID);
-		if (ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_RequestComplete)
+		if (RequiestQuestTask)
 		{
+			GS()->Mmo()->Quest()->CreateQuestingItems(this, ContextBots::QuestBot[MobID]);
+			GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
+			GS()->Mmo()->BotsData()->TalkingQuestBotTaskInfo(this, MobID, m_TalkingNPC.m_TalkedProgress);
 			if (!m_TalkingNPC.m_FreezedProgress)
 			{
 				m_TalkingNPC.m_FreezedProgress = true;
 				return;
 			}
-
-			if (!GS()->CheckClient(m_ClientID) && !GS()->Mmo()->Quest()->InteractiveQuestNPC(this, ContextBots::QuestBot[MobID], false))
-			{
-				char reformTalkedText[512];
-				FormatTextQuest(BotID, ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_TalkingText);
-				str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + m_TalkingNPC.m_TalkedProgress, sizeTalking, FormatedTalkedText());
-				ClearFormatQuestText();
-
-				GS()->Mmo()->Quest()->ShowQuestInformation(this, ContextBots::QuestBot[MobID], reformTalkedText);
-				return;
-			}
-			
-			GS()->Mmo()->Quest()->ShowQuestInformation(this, ContextBots::QuestBot[MobID], "\0");
 		}
-
 		GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
+		if(RequiestQuestTask)
+			GS()->Mmo()->BotsData()->TalkingQuestBotTaskInfo(this, MobID, m_TalkingNPC.m_TalkedProgress);
 
 		// skip non complete dialog quest
 		if (ContextBots::QuestBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_RequestComplete 
