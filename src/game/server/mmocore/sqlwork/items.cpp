@@ -510,8 +510,6 @@ bool ItemSql::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 	// все что потребуется для работы функции
 	CGS *GameServer = pPlayer->GS();
 	const int ClientID = pPlayer->GetCID();
-
-	// бонусный предмет только один
 	if(Info().BonusCount > 0)
 	{
 		if(Count > 0) 
@@ -523,8 +521,7 @@ bool ItemSql::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 	}
 
 	// проверить пустой слот если да тогда одеть предмет
-	const bool AutoEquip = (Info().Type == ITEMEQUIP && pPlayer->GetItemEquip(Info().Function) == -1)
-		|| (Info().Type == ITSETTINGS && Info().BonusCount > 0);
+	const bool AutoEquip = (Info().Type == ITEMEQUIP && pPlayer->GetItemEquip(Info().Function) <= 0) || (Info().Type == ITSETTINGS && Info().BonusCount > 0);
 	if(AutoEquip)
 	{
 		GameServer->Chat(ClientID, "Auto equip {STR} ({STR} +{INT})!", Info().GetName(pPlayer), pPlayer->AtributeName(Info().BonusID), &Info().BonusCount);
@@ -541,8 +538,8 @@ bool ItemSql::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 		return false;
 
 	// автообновление инвентаря если открыт
-	if(pPlayer->m_SortTabs[SORTINVENTORY] && Info().Type == pPlayer->m_SortTabs[SORTINVENTORY])
-		GameServer->VResetVotes(ClientID, INVENTORY);
+	GameServer->VResetVotes(ClientID, INVENTORY);
+	GameServer->VResetVotes(ClientID, EQUIPMENU);
 
 	// отправить смену скина
 	if(AutoEquip) 
@@ -586,14 +583,16 @@ bool ItemSql::ClassItems::Remove(int arg_removecount, int arg_settings)
 
 void ItemSql::ClassItems::SetEnchant(int arg_enchantlevel)
 {
-	if(!Count || !pPlayer) return;
+	if(!Count || !pPlayer) 
+		return;
 
 	pPlayer->GS()->Mmo()->Item()->SetEnchantItem(pPlayer, itemid_, arg_enchantlevel);
 }
 
 bool ItemSql::ClassItems::SetSettings(int arg_settings)
 {
-	if(!Count || !pPlayer) return false;
+	if(!Count || !pPlayer) 
+		return false;
 
 	pPlayer->GS()->Mmo()->Item()->SetSettingsItem(pPlayer, itemid_, arg_settings);
 	return true;
@@ -630,15 +629,6 @@ bool ItemSql::ClassItems::EquipItem()
 	return true;
 }
 
-void ItemSql::ClassItems::Save()
-{
-	if(!pPlayer) 
-		return;
-
-	SJK.UD("tw_items", "ItemCount = '%d', ItemSettings = '%d', ItemEnchant = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", 
-		Count, Settings, Enchant, pPlayer->Acc().AuthID, itemid_);
-}
-
 bool ItemSql::ClassItems::IsEquipped()
 {
 	if (!pPlayer)
@@ -647,4 +637,13 @@ bool ItemSql::ClassItems::IsEquipped()
 	if ((Info().Type == ITEMSETTINGS || Info().Type == ITEMEQUIP) && Settings)
 		return true;
 	return false;
+}
+
+void ItemSql::ClassItems::Save()
+{
+	if (!pPlayer)
+		return;
+
+	SJK.UD("tw_items", "ItemCount = '%d', ItemSettings = '%d', ItemEnchant = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'",
+		Count, Settings, Enchant, pPlayer->Acc().AuthID, itemid_);
 }
