@@ -529,8 +529,8 @@ bool ItemSql::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 	}
 
 	// проверить пустой слот если да тогда одеть предмет
-	const bool AutoEquip = (Info().Function == ITEMEQUIP && pPlayer->GetItemEquip(Info().Function) == -1)
-		|| (Info().Function == ITSETTINGS && Info().BonusCount > 0); 
+	const bool AutoEquip = (Info().Type == ITEMEQUIP && pPlayer->GetItemEquip(Info().Function) == -1)
+		|| (Info().Type == ITSETTINGS && Info().BonusCount > 0);
 	if(AutoEquip)
 	{
 		GameServer->Chat(ClientID, "Auto equip {STR} ({STR} +{INT})!", Info().GetName(pPlayer), pPlayer->AtributeName(Info().BonusID), &Info().BonusCount);
