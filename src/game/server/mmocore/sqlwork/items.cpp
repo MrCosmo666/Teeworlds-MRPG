@@ -476,7 +476,7 @@ void ItemSql::ItemSelected(CPlayer *pPlayer, const ItemPlayer &PlItem, bool Dres
 	if(PlItem.Info().BonusCount)
 	{
 		int Price = PlItem.EnchantMaterCount();
-		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant ({STR}+{INT}) [{INT} material]", NameItem, &PlItem.Enchant, &Price);
+		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR}+{INT} ({INT} material)", NameItem, &PlItem.Enchant, &Price);
 	}
 
 	// аукцион
