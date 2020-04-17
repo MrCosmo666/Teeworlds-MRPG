@@ -822,7 +822,8 @@ bool CPlayer::CheckEquipItem(int ItemID) const
 // - - - - - - V V V V V V V - - - - V V V V - - - - - - - - - 
 void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 {
-	if (!GS()->m_apPlayers[TalkedID] || (!ToProgress && m_TalkingNPC.m_TalkedID != -1) || (ToProgress && m_TalkingNPC.m_TalkedID == -1))
+	if (TalkedID < 0 || TalkedID >= MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] 
+		|| (!ToProgress && m_TalkingNPC.m_TalkedID != -1) || (ToProgress && m_TalkingNPC.m_TalkedID == -1))
 		return;
 
 	CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[TalkedID]);
