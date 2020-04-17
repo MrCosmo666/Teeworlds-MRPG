@@ -2530,11 +2530,10 @@ void CGS::SendDayInfo(int ClientID)
 void CGS::ChangeEquipSkin(int ClientID, int ItemID)
 {
 	CPlayer *pPlayer = GetPlayer(ClientID, true);
-	if(!pPlayer || !pPlayer->IsAuthed())
+	if(!pPlayer)
 		return;
 	
-	if (GetItemInfo(ItemID).Type == ITEMEQUIP &&
-		(GetItemInfo(ItemID).Function == EQUIP_WINGS || GetItemInfo(ItemID).Function == EQUIP_HAMMER))
+	if (GetItemInfo(ItemID).Type == ITEMEQUIP && (GetItemInfo(ItemID).Function == EQUIP_WINGS || GetItemInfo(ItemID).Function == EQUIP_HAMMER))
 	{
 		CNetMsg_Sv_EquipItems Msg;
 		Msg.m_ClientID = ClientID;

@@ -567,15 +567,18 @@ bool ItemSql::ClassItems::Remove(int arg_removecount, int arg_settings)
 	if(Count < arg_removecount)
 		arg_removecount = Count;
 
-	pPlayer->GS()->Mmo()->Item()->RemoveItem(&pPlayer->m_SecurCheckCode, pPlayer, itemid_, arg_removecount, arg_settings);
-	if(pPlayer->m_SecurCheckCode <= 0) 
-		return false;
-
 	if (IsEquipped())
 	{
+		dbg_msg("test", "here");
+
+		Settings = 0;
 		int ClientID = pPlayer->GetCID();
 		pPlayer->GS()->ChangeEquipSkin(ClientID, itemid_);
 	}
+
+	pPlayer->GS()->Mmo()->Item()->RemoveItem(&pPlayer->m_SecurCheckCode, pPlayer, itemid_, arg_removecount, arg_settings);
+	if(pPlayer->m_SecurCheckCode <= 0) 
+		return false;
 
 	pPlayer->GS()->Mmo()->Quest()->CheckQuest(pPlayer);
 	return true;
@@ -631,9 +634,6 @@ bool ItemSql::ClassItems::EquipItem()
 
 bool ItemSql::ClassItems::IsEquipped()
 {
-	if (!pPlayer)
-		return false;
-
 	if ((Info().Type == ITEMSETTINGS || Info().Type == ITEMEQUIP) && Settings)
 		return true;
 	return false;
