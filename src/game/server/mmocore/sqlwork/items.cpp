@@ -290,7 +290,7 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 		int DesCount = PlItem.Info().Dysenthis * Get;
 		if(PlItem.Remove(Get) && ItemMaterial.Add(DesCount))
 		{
-			GS()->Chat(ClientID, "Desynthesis {STR}x{INT}, you receive {INT} {STR}", 
+			GS()->Chat(ClientID, "Desynthesis {STR}x{INT}, you receive {INT} {STR}(s)", 
 				PlItem.Info().GetName(pPlayer), &Get, &DesCount, ItemMaterial.Info().GetName(pPlayer));
 			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		}
