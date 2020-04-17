@@ -856,10 +856,10 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		if (RequiestQuestTask)
 		{
 			GS()->Mmo()->Quest()->CreateQuestingItems(this, ContextBots::QuestBot[MobID]);
-			GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
-			GS()->Mmo()->BotsData()->TalkingQuestBotTaskInfo(this, MobID, m_TalkingNPC.m_TalkedProgress);
 			if (!m_TalkingNPC.m_FreezedProgress)
 			{
+				GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
+				GS()->Mmo()->BotsData()->TalkingQuestBotTaskInfo(this, MobID, m_TalkingNPC.m_TalkedProgress);
 				m_TalkingNPC.m_FreezedProgress = true;
 				return;
 			}
