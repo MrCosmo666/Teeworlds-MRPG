@@ -79,62 +79,60 @@ int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Pa
 		return SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
 	}
 
-	// проверяем логин и пароль и проверяем онлайн игрока
+	// проверяем ник на правильность		
 	CSqlString<32> clear_Login = CSqlString<32>(Login);
 	CSqlString<32> clear_Pass = CSqlString<32>(Password);
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_accounts", "WHERE Username = '%s' AND Password = '%s'", clear_Login.cstr(), clear_Pass.cstr()));
-	if(!RES->next())
-	{
-		GS()->Chat(ClientID, "Wrong login or password!");
-		return SendAuthCode(ClientID, AUTH_LOGIN_WRONG);
-	}
-
-	// проверяем ник на правильность
 	CSqlString<32> clear_Nick = CSqlString<32>(GS()->Server()->ClientName(ClientID));
-	boost::scoped_ptr<ResultSet> RES2(SJK.SD("*", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
-	if(!RES2->next())
+	boost::scoped_ptr<ResultSet> ACCOUNTDATA(SJK.SD("*", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
+	while(ACCOUNTDATA->next())
 	{
-		// если ник не верен из базы данных
-		GS()->Chat(ClientID, "Wrong nickname, use how at registration!");
-		return SendAuthCode(ClientID, AUTH_LOGIN_NICKNAME);
+		// проверяем логин и пароль и проверяем онлайн игрока
+		const int UserID = ACCOUNTDATA->getInt("ID");
+		boost::scoped_ptr<ResultSet> CHECKACCESS(SJK.SD("ID", "tw_accounts", "WHERE Username = '%s' AND Password = '%s' AND ID = '%d'", clear_Login.cstr(), clear_Pass.cstr(), UserID));
+		if (!CHECKACCESS->next())
+		{
+			GS()->Chat(ClientID, "Wrong login or password!");
+			return SendAuthCode(ClientID, AUTH_LOGIN_WRONG);
+		}
+
+		// проверить онлайн ли игрок
+		if (CheckOnlineAccount(UserID) >= 0)
+		{
+			GS()->Chat(ClientID, "The account is already in the game!");
+			return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
+		}
+
+		// если есть такое тогда погнали получать все данные игрока
+		pPlayer->Acc().AuthID = UserID;
+		pPlayer->Acc().Level = ACCOUNTDATA->getInt("Level");
+		pPlayer->Acc().Exp = ACCOUNTDATA->getInt("Exp");
+		pPlayer->Acc().GuildID = ACCOUNTDATA->getInt("GuildID");
+		pPlayer->Acc().Upgrade = ACCOUNTDATA->getInt("Upgrade");
+		pPlayer->Acc().GuildRank = ACCOUNTDATA->getInt("GuildRank");
+		pPlayer->Acc().WorldID = ACCOUNTDATA->getInt("WorldID");
+		str_copy(pPlayer->Acc().Login, clear_Login.cstr(), sizeof(pPlayer->Acc().Login));
+		str_copy(pPlayer->Acc().Password, clear_Pass.cstr(), sizeof(pPlayer->Acc().Password));
+		str_copy(pPlayer->Acc().LastLogin, ACCOUNTDATA->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().LastLogin));
+
+		// загрузка всех апгрейдов по списку что был установлен
+		for (const auto& at : CGS::AttributInfo)
+		{
+			if (str_comp_nocase(at.second.FieldName, "unfield") == 0) continue;
+			pPlayer->Acc().Stats[at.first] = ACCOUNTDATA->getInt(at.second.FieldName);
+		}
+
+		// сообщения функции меняем команду и все такое
+		GS()->ChatFollow(ClientID, "Last Login: {STR} MSK", pPlayer->Acc().LastLogin);
+		GS()->ChatFollow(ClientID, "You authed succesful!");
+		GS()->ChatFollow(ClientID, "Player menu is available in votes!");
+		GS()->m_pController->DoTeamChange(pPlayer, false);
+		SJK.UD("tw_accounts_data", "LoginDate = CURRENT_TIMESTAMP WHERE ID = '%d'", UserID);
+		return SendAuthCode(ClientID, AUTH_ALL_GOOD);
 	}
 
-	const int UserID = RES2->getInt("ID");
-	const int WorldID = RES2->getInt("WorldID");
-	if (CheckOnlineAccount(UserID) >= 0)
-	{
-		GS()->Chat(ClientID, "The account is already in the game!");
-		return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
-	}
-
-	// если есть такое тогда погнали получать все данные игрока
-	pPlayer->Acc().AuthID = UserID;
-	pPlayer->Acc().Level = RES2->getInt("Level");
-	pPlayer->Acc().Exp = RES2->getInt("Exp");
-	pPlayer->Acc().GuildID = RES2->getInt("GuildID");
-	pPlayer->Acc().Upgrade = RES2->getInt("Upgrade");
-	pPlayer->Acc().GuildRank = RES2->getInt("GuildRank");
-	pPlayer->Acc().WorldID = WorldID;
-	str_copy(pPlayer->Acc().Login, clear_Login.cstr(), sizeof(pPlayer->Acc().Login));
-	str_copy(pPlayer->Acc().Password, clear_Pass.cstr(), sizeof(pPlayer->Acc().Password));
-	str_copy(pPlayer->Acc().LastLogin, RES2->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().LastLogin));
-
-	// загрузка всех апгрейдов по списку что был установлен
-	for(const auto& at : CGS::AttributInfo)
-	{
-		if(str_comp_nocase(at.second.FieldName, "unfield") == 0) continue;
-		pPlayer->Acc().Stats[at.first] = RES2->getInt(at.second.FieldName);
-	}
-
-	// сообщения функции меняем команду и все такое
-	GS()->ChatFollow(ClientID, "Last Login: {STR} MSK", pPlayer->Acc().LastLogin);
-	GS()->ChatFollow(ClientID, "You authed succesful!");
-	GS()->ChatFollow(ClientID, "Player menu is available in votes!");
-	GS()->m_pController->DoTeamChange(pPlayer, false);
-
-	// обновляем дату логина
-	SJK.UD("tw_accounts_data", "LoginDate = CURRENT_TIMESTAMP WHERE ID = '%d'", UserID);
-	return SendAuthCode(ClientID, AUTH_ALL_GOOD);
+	// если ник не верен из базы данных
+	GS()->Chat(ClientID, "Your nickname was not found in the database!");
+	return SendAuthCode(ClientID, AUTH_LOGIN_NICKNAME);
 }
 
 // Загрузка данных при успешной авторизации
