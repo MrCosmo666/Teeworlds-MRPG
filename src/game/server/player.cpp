@@ -817,6 +817,18 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			return;
 		}
 
+		int QuestID = ContextBots::NpcBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_GivingQuest;
+		if (QuestID >= 1)
+		{
+			if (GS()->Mmo()->Quest()->GetQuestState(m_ClientID, QuestID) >= QUESTACCEPT)
+			{
+				m_TalkingNPC.m_TalkedProgress++;
+				if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
+					return;
+			}
+			GS()->Mmo()->Quest()->AcceptQuest(QuestID, this);
+		}
+
 		char reformTalkedText[512];
 		int BotID = ContextBots::NpcBot[MobID].BotID;
 		FormatTextQuest(BotID, ContextBots::NpcBot[MobID].m_Talk.at(m_TalkingNPC.m_TalkedProgress).m_TalkingText);
@@ -843,6 +855,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 				return;
 			}
 			m_TalkingNPC.m_TalkedProgress = 0;
+			return;
 		}
 
 		GS()->Mmo()->Quest()->QuestTableClear(m_ClientID);

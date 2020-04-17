@@ -144,6 +144,7 @@ void ContextBots::LoadNpcBots()
 			LoadTalk.m_Emote = RES->getInt("TalkingEmote");
 			LoadTalk.m_Style = RES->getInt("Style");
 			LoadTalk.m_PlayerTalked = RES->getBoolean("PlayerTalked");
+			LoadTalk.m_GivingQuest = RES->getInt("GivingQuest");
 			str_copy(LoadTalk.m_TalkingText, RES->getString("TalkText").c_str(), sizeof(LoadTalk.m_TalkingText));
 			NpcBot[MotID].m_Talk.push_back(LoadTalk);
 		}

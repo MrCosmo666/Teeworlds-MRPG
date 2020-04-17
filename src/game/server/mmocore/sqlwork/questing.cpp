@@ -536,6 +536,9 @@ void QuestBase::ShowQuestInformation(CPlayer *pPlayer, ContextBots::QuestBotInfo
 // Принять квест с ID
 bool QuestBase::AcceptQuest(int QuestID, CPlayer *pPlayer)
 {
+	if (!pPlayer || !IsValidQuest(QuestID) || Quests[pPlayer->GetCID()][QuestID].Type == QUESTFINISHED)
+		return false;
+
 	// проверяем квест можно ли принять более одного или нет
 	const int ClientID = pPlayer->GetCID();
 	for(const auto& qp : Quests[ClientID])

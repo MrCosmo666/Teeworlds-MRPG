@@ -47,12 +47,13 @@ private:
 		GET CHECK QUESTING 
 	######################################################################### */
 
-	int GetQuestState(int ClientID, int QuestID) const;
+
 	int GetStoryCountQuest(const char *StoryName, int QuestID = -1) const;
 	const char *QuestState(int Type) const;
 	bool IsDefeatMobComplete(int ClientID, int QuestID);
 
 public:
+	int GetQuestState(int ClientID, int QuestID) const;
 	bool IsValidQuest(int QuestID, int ClientID = -1) const
 	{
 		if(QuestsData.find(QuestID) != QuestsData.end())
