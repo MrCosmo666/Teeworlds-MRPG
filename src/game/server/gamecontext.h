@@ -11,7 +11,6 @@
 #include <engine/shared/memheap.h>
 #include <teeother/components/localization.h>
 #include <game/server/enum_context.h>
-#include <game/server/typedef_struct.h>
 #include <game/layers.h>
 #include <game/voting.h>
 
