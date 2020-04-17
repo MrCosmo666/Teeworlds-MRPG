@@ -75,26 +75,17 @@ public:
 		// информацияп предмета нахуй всякие ItemInformation где сможет быть игрок
 		ItemInformation& Info() const { return ItemsInfo[itemid_]; };
 
-		// приравнивание элементу
-		ClassItems& operator = (const ClassItems& right) 
+		// копирование элемента
+		ClassItems Paste(ClassItems right)
 		{
 			itemid_ = right.itemid_;
 			Count = right.Count;
 			Settings = right.Settings;
 			Enchant = right.Enchant;
 
-			if(pPlayer != NULL)
+			if (pPlayer != NULL)
 				Save();
 
-			return *this;
-		};
-
-		// копирование элемента
-		ClassItems Copy(ClassItems right)
-		{
-			itemid_ = right.itemid_;
-			Count = right.Count;
-			Enchant = right.Enchant;
 			return *this;
 		};
 	};	

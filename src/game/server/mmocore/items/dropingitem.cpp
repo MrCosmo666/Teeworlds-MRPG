@@ -20,6 +20,7 @@ CDropingItem::CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Dir, ItemSql::
 	// other var
 	m_ForID = ForID;
 	m_DropItem = DropItem;
+	m_DropItem.Settings = 0;
 	m_Flashing = false;
 	m_StartTick = Server()->Tick();
 	m_LifeSpan = Server()->TickSpeed() * 15;
