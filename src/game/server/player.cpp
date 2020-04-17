@@ -805,16 +805,7 @@ int CPlayer::GetLevelDisciple(int Class)
 	return Atributs;
 }
 
-// Проверить одетый предмет по предмету
-bool CPlayer::CheckEquipItem(int ItemID) const
-{
-	for (int i = 0; i < NUM_EQUIPS; i++)
-	{
-		if (GetItemEquip(i) != ItemID) continue;
-		return true;
-	}
-	return false;
-}
+
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
 // - - - - - - V V V V V V V - - - - V V V V - - - - - - - - - 

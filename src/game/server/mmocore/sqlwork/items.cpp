@@ -582,7 +582,7 @@ bool ItemSql::ClassItems::Remove(int arg_removecount, int arg_settings)
 	if(pPlayer->m_SecurCheckCode <= 0) 
 		return false;
 
-	if(pPlayer->CheckEquipItem(itemid_))
+	if(IsEquipped())
 	{
 		int ClientID = pPlayer->GetCID();
 		pPlayer->GS()->ChangeEquipSkin(ClientID, itemid_);
@@ -645,4 +645,25 @@ void ItemSql::ClassItems::Save()
 
 	SJK.UD("tw_items", "ItemCount = '%d', ItemSettings = '%d', ItemEnchant = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", 
 		Count, Settings, Enchant, pPlayer->Acc().AuthID, itemid_);
+}
+
+bool ItemSql::ClassItems::IsEquipped()
+{
+	if (!pPlayer)
+		return false;
+
+	if (Info().Type == ITEMSETTINGS)
+		return (bool)Settings;
+
+	if (Info().Type == ITEMEQUIP)
+	{
+		// Проверить одетый предмет по предмету
+		for (int i = 0; i < NUM_EQUIPS; i++)
+		{
+			if (pPlayer->GetItemEquip(i) != itemid_)
+				continue;
+			return true;
+		}
+	}
+	return false;
 }

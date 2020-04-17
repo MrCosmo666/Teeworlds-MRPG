@@ -175,7 +175,6 @@ public:
 	int GetItemDurability(int Item) const;
 	int GetItemEquip(int EquipID, int SkipItemID = -1) const;
 	int GetLevelDisciple(int Class);
-	bool CheckEquipItem(int ItemID) const;
 
 	// разговоры с нпс функции
 	void SetTalking(int TalkedID, bool ToProgress);

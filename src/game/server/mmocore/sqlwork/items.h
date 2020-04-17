@@ -70,6 +70,8 @@ public:
 		bool EquipItem();
 		void Save();
 
+		bool IsEquipped();
+
 		// информацияп предмета нахуй всякие ItemInformation где сможет быть игрок
 		ItemInformation& Info() const { return ItemsInfo[itemid_]; };
 
