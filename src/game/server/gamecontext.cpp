@@ -1751,7 +1751,7 @@ void CGS::AVL(int To, const char* aCmd, const char* pText, ...)
 		
 		dynamic_string Buffer;
 		if(str_comp(aCmd, "null") != 0)
-			Buffer.append("▻ ");
+			Buffer.append("‣ ");
 		
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
 		AV(To, aCmd, Buffer.buffer());
@@ -1822,7 +1822,7 @@ void CGS::AVM(int To, const char* Type, const int ID, const int HideID, const ch
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		if(ID != NOPE) { Buffer.append("▻ "); }
+		if(ID != NOPE) { Buffer.append("‣ "); }
 
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
 		AV(To, Type, Buffer.buffer(), ID);
@@ -1844,7 +1844,7 @@ void CGS::AVMI(int To, const char *Icon, const char* Type, const int ID, const i
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		if(ID != NOPE) { Buffer.append("▻ "); }
+		if(ID != NOPE) { Buffer.append("‣ "); }
 
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
 		AV(To, Type, Buffer.buffer(), ID, -1, Icon);
@@ -1866,7 +1866,7 @@ void CGS::AVD(int To, const char* Type, const int ID, const int ID2, const int H
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		if(ID != NOPE) { Buffer.append("▸ "); }
+		if(ID != NOPE) { Buffer.append("‣ "); }
 
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
 		AV(To, Type, Buffer.buffer(), ID, ID2);
