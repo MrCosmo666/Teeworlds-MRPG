@@ -352,6 +352,7 @@ Objects = [
 
 		NetEnum("m_MoodType", MoodType),
 		NetEnum("m_WorldType", WorldType),
+		NetBool("m_ActiveQuest"),
 	]),
 
 	# mmotee send pickup item

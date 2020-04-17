@@ -117,6 +117,14 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 				CUIRect IconRect = { Cursor.m_X, Cursor.m_Y + FontSize / 5.0f, 16.0f, 16.0f };
 				m_pClient->m_pMenus->DoItemIcon(aIcon, IconRect, FontSize);
 			}
+						
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
+			if(pClientStats->m_ActiveQuest) // значок квестов
+			{ 
+				CUIRect IconRect = { Position.x - 64.0f / 2.0f, Cursor.m_Y - 55.0f, 16.0f, 16.0f };
+				m_pClient->m_pMenus->DoItemIcon("quest_a", IconRect, 64.0f);
+			}
 
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //

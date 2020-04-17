@@ -44,6 +44,7 @@ private:
 
 	int GetBotLevel() const;
 	int GetMoodNameplacesType(int SnappingClient);
+	bool IsActiveQuests(int SnapClientID);
 };
 
 #endif
