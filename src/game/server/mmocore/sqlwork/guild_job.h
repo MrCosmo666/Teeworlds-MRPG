@@ -91,8 +91,11 @@ public:
 	void CreateGuild(int ClientID, const char *GuildName);
 	void JoinGuild(int AuthID, int GuildID);
 	void ExitGuild(int AuthID);
+
+private:
 	void ShowMenuGuild(CPlayer *pPlayer);
 
+public:
 	void AddExperience(int GuildID);	
 	bool AddMoneyBank(int GuildID, int Money);
 	bool RemoveMoneyBank(int GuildID, int Money);
@@ -102,9 +105,12 @@ public:
 	FUNCTIONS HOUSES DECORATION
 ######################################################################### */
 	bool AddDecorationHouse(int DecoID, int GuildID, vec2 Position);
+
+private:
 	bool DeleteDecorationHouse(int ID);
 	void ShowDecorationList(CPlayer* pPlayer);
 
+public:
 /* #########################################################################
 	GET CHECK MEMBER RANK MEMBER 
 ######################################################################### */
@@ -115,6 +121,7 @@ public:
 /* #########################################################################
 	FUNCTIONS MEMBER RANK MEMBER 
 ######################################################################### */
+private:
 	void AddRank(int GuildID, const char *Rank);
 	void DeleteRank(int RankID, int GuildID);
 	void ChangeRank(int RankID, int GuildID, const char *NewRank);
@@ -122,6 +129,7 @@ public:
 	void ChangePlayerRank(int AuthID, int RankID);
 	void ShowMenuRank(CPlayer *pPlayer);
 
+public:
 /* #########################################################################
 	GET CHECK MEMBER INVITE MEMBER 
 ######################################################################### */
@@ -130,9 +138,10 @@ public:
 /* #########################################################################
 	FUNCTIONS MEMBER INVITE MEMBER 
 ######################################################################### */
-	bool AddInviteGuild(int GuildID, int OwnerID);
+private:
 	void ShowInvitesGuilds(int ClientID, int GuildID);
 	void ShowFinderGuilds(int ClientID);
+	bool AddInviteGuild(int GuildID, int OwnerID);
 
 /* #########################################################################
 	FUNCTIONS MEMBER HISTORY MEMBER 
@@ -140,6 +149,7 @@ public:
 	void ShowHistoryGuild(int ClientID, int GuildID);
 	void AddHistoryGuild(int GuildID, const char *Buffer, ...);
 
+public:
 /* #########################################################################
 	GET CHECK MEMBER HOUSING MEMBER 
 ######################################################################### */
@@ -163,6 +173,7 @@ public:
 	GLOBAL MEMBER  
 ######################################################################### */
 	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
+	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist);
 };
 
 /* #########################################################################

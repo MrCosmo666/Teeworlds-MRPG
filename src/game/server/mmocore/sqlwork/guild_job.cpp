@@ -358,36 +358,44 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "- - - - - - - - - -");
 	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "/ginvite <id> - to invite a player into members (for leader)");
 	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "/gexit - leave of guild group (for all members)");
-	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Many options are unlocked with the purchase of a home");
 	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "- - - - - - - - - -");
 	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Guild Bank: {INT}gold", &Guild[GuildID].m_Bank);
-	if (MemberHouse > 0) 
-		GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Door Status: {STR}", GetGuildDoor(GuildID) ? "Closed" : "Opened");
-	GS()->AV(ClientID, "null", "");
 
+	GS()->AV(ClientID, "null", "");
 	pPlayer->m_Colored = { 10,10,10 };
-	GS()->AVL(ClientID, "null", "# Your money: {INT}gold", &pPlayer->GetItem(itMoney).Count);
+	GS()->AVL(ClientID, "null", "◍ Your money: {INT}gold", &pPlayer->GetItem(itMoney).Count);
 	GS()->AVL(ClientID, "MMONEY", "Add money guild bank. (Amount in a reason)", Guild[GuildID].m_Name);
-	GS()->AVM(ClientID, "MENU", GuildRank, NOPE, "Settings guild Rank's");
+
+	GS()->AV(ClientID, "null", "");
+	pPlayer->m_Colored = { 10,10,10 };
+	GS()->AVL(ClientID, "null", "▤ Guild system", &pPlayer->GetItem(itMoney).Count);
+	GS()->AVM(ClientID, "MENU", GUILDRANK, NOPE, "Settings guild Rank(s)");
 	GS()->AVM(ClientID, "MENU", MEMBERINVITES, NOPE, "Invites to your guild");
 	GS()->AVM(ClientID, "MENU", MEMBERHISTORY, NOPE, "History of activity");
 
-	// если имеется дом
-	if(MemberHouse > 0)
+	if (MemberHouse > 0)
 	{
-		GS()->AVM(ClientID, "MENU", GUILDHOUSEDECORATION, NOPE, "Settings Decorations");
-		GS()->AVL(ClientID, "MDOOR", "Change state [\"{STR} door\"]", GetGuildDoor(GuildID) ? "Open" : "Close");
+		GS()->AV(ClientID, "null", "");
+		pPlayer->m_Colored = { 10,10,10 };
+		GS()->AVL(ClientID, "null", "⌂ Housing system", &pPlayer->GetItem(itMoney).Count);
+		GS()->AVM(ClientID, "MENU", HOUSEGUILDDECORATION, NOPE, "Settings Decoration(s)");
+		GS()->AVL(ClientID, "MDOOR", "Change state (\"{STR} door\")", GetGuildDoor(GuildID) ? "Open" : "Close");
 		GS()->AVL(ClientID, "MSPAWN", "Teleport to guild house");
 		GS()->AVL(ClientID, "MHOUSESELL", "Sell your guild house (in reason 777)");
+	}
 
+
+	GS()->AV(ClientID, "null", "");
+	pPlayer->m_Colored = { 10,10,10 };
+	GS()->AVL(ClientID, "null", "☆ Guild upgrades", &pPlayer->GetItem(itMoney).Count);
+	if (MemberHouse > 0)
+	{
 		for(int i = EMEMBERUPGRADE::ChairNSTExperience ; i < EMEMBERUPGRADE::NUM_EMEMBERUPGRADE; i++)
 		{
 			int PriceUpgrade = Guild[ GuildID ].m_Upgrades[ i ] * g_Config.m_SvPriceUpgradeGuildAnother;
 			GS()->AVM(ClientID, "MUPGRADE", i, NOPE, "Upgrade {STR} ({INT}) {INT}gold", UpgradeNames(i).c_str(), &Guild[GuildID].m_Upgrades[i], &PriceUpgrade);
 		}
 	}
-
-	// улучшения без дома
 	int PriceUpgrade = Guild[ GuildID ].m_Upgrades[ EMEMBERUPGRADE::AvailableNSTSlots ] * g_Config.m_SvPriceUpgradeGuildSlot;
 	GS()->AVM(ClientID, "MUPGRADE", EMEMBERUPGRADE::AvailableNSTSlots, NOPE, "Upgrade {STR} ({INT}) {INT}gold", 
 		UpgradeNames(EMEMBERUPGRADE::AvailableNSTSlots).c_str(), &Guild[GuildID].m_Upgrades[ EMEMBERUPGRADE::AvailableNSTSlots ], &PriceUpgrade);
@@ -1196,7 +1204,7 @@ bool GuildJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 		
 		// устанавливаем текст полученый в ранг
 		str_copy(CGS::InteractiveSub[ClientID].RankName, GetText, sizeof(CGS::InteractiveSub[ClientID].RankName));
-		GS()->VResetVotes(ClientID, GuildRank);
+		GS()->VResetVotes(ClientID, GUILDRANK);
 		return true;
 	}
 	
@@ -1221,7 +1229,7 @@ bool GuildJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 		int GuildID = pPlayer->Acc().GuildID;
 		AddRank(GuildID, CGS::InteractiveSub[ClientID].RankName);
 		GS()->ClearInteractiveSub(ClientID);
-		GS()->VResetVotes(ClientID, GuildRank);
+		GS()->VResetVotes(ClientID, GUILDRANK);
 		return true;
 	}
 
@@ -1238,7 +1246,7 @@ bool GuildJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 		// удаляем ранг
 		int GuildID = pPlayer->Acc().GuildID;
 		DeleteRank(VoteID, GuildID);
-		GS()->VResetVotes(ClientID, GuildRank);
+		GS()->VResetVotes(ClientID, GUILDRANK);
 		return true;
 	}
 
@@ -1254,7 +1262,7 @@ bool GuildJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 
 		// меняем доступ рангу
 		ChangeRankAccess(VoteID);
-		GS()->VResetVotes(ClientID, GuildRank);		
+		GS()->VResetVotes(ClientID, GUILDRANK);		
 		return true;
 	}
 
@@ -1279,7 +1287,7 @@ bool GuildJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 		int GuildID = pPlayer->Acc().GuildID;
 		ChangeRank(VoteID, GuildID, CGS::InteractiveSub[ClientID].RankName);
 		GS()->ClearInteractiveSub(ClientID);
-		GS()->VResetVotes(ClientID, GuildRank);
+		GS()->VResetVotes(ClientID, GUILDRANK);
 		return true;
 	}
 
@@ -1300,7 +1308,40 @@ bool GuildJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 		return true;
 	}
 
-	// декорации
+	/* #########################################################################
+		DECORATION MEMBER
+	######################################################################### */
+	// начала расстановки декорации
+	if (PPSTR(CMD, "DECOGUILDSTART") == 0)
+	{
+		// проверяем если не лидер
+		if (!IsLeaderPlayer(pPlayer, MACCESSUPGHOUSE))
+		{
+			GS()->Chat(ClientID, "You have no access.");
+			return true;
+		}
+
+		int GuildID = pPlayer->Acc().GuildID;
+		int HouseID = GetGuildHouseID(GuildID);
+		vec2 PositionHouse = GetPositionHouse(GuildID);
+		if (HouseID <= 0 || distance(PositionHouse, pPlayer->GetCharacter()->m_Core.m_Pos) > 600)
+		{
+			GS()->Chat(ClientID, "Maximum distance between your home 600!");
+			return true;
+		}
+
+		// информация
+		GS()->ClearVotes(ClientID);
+		GS()->AV(ClientID, "null", "Please close vote and press Left Mouse,");
+		GS()->AV(ClientID, "null", "on position where add decoration!");
+		GS()->AddBack(ClientID);
+
+		CGS::InteractiveSub[ClientID].TempID = VoteID;
+		CGS::InteractiveSub[ClientID].TempID2 = DECOTYPE_GUILD_HOUSE;
+		pPlayer->m_LastVoteMenu = INVENTORY;
+		return true;
+	}
+
 	if (PPSTR(CMD, "DECOGUILDDELETE") == 0)
 	{
 		// проверяем если не имеет прав на приглашения и кик
@@ -1310,22 +1351,64 @@ bool GuildJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 			return true;
 		}
 
-		// дом проверка
 		int GuildID = pPlayer->Acc().GuildID;
 		int HouseID = GetGuildHouseID(GuildID);
-		if (HouseID < 0)
-		{
-			GS()->Chat(ClientID, "You not owner home!");
-			return true;
-		}
-
-		if (DeleteDecorationHouse(VoteID))
+		if (HouseID > 0 && DeleteDecorationHouse(VoteID))
 		{
 			ItemSql::ItemPlayer& PlDecoItem = pPlayer->GetItem(VoteID2);
 			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
 			PlDecoItem.Add(1);
 		}
-		GS()->VResetVotes(ClientID, GUILDHOUSEDECORATION);
+		GS()->VResetVotes(ClientID,HOUSEGUILDDECORATION);
+		return true;
+	}
+	return false;
+}
+
+bool GuildJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
+{
+	int ClientID = pPlayer->GetCID();
+	if (Menulist == MEMBERMENU)
+	{
+		pPlayer->m_LastVoteMenu = MAINMENU;
+		ShowMenuGuild(pPlayer);
+		return true;
+	}
+
+	if (Menulist == MEMBERHISTORY)
+	{
+		pPlayer->m_LastVoteMenu = MEMBERMENU;
+		ShowHistoryGuild(ClientID, pPlayer->Acc().GuildID);
+		return true;
+	}
+
+	if (Menulist == GUILDRANK)
+	{
+		pPlayer->m_LastVoteMenu = MEMBERMENU;
+		ShowMenuRank(pPlayer);
+		return true;
+	}
+
+	if (Menulist == MEMBERINVITES)
+	{
+		pPlayer->m_LastVoteMenu = MEMBERMENU;
+		ShowInvitesGuilds(ClientID, pPlayer->Acc().GuildID);
+		return true;
+	}
+
+	if (Menulist == HOUSEGUILDDECORATION)
+	{
+		pPlayer->m_LastVoteMenu = HOUSEMENU;
+		GS()->AVH(ClientID, HDECORATION, vec3(35, 80, 40), "Decorations Information");
+		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "Add: Select your item in list. Select (Add to house),");
+		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "later press (ESC) and mouse select position");
+		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "Return in inventory: Select down your decorations");
+		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "and press (Back to inventory).");
+
+		Job()->Item()->ListInventory(pPlayer, ITEMDECORATION);
+		GS()->AV(ClientID, "null", "");
+		ShowDecorationList(pPlayer);
+		GS()->AddBack(ClientID);
 		return true;
 	}
 	return false;

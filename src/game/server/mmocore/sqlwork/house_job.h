@@ -49,12 +49,14 @@ public:
 		FUNCTIONS HOUSES DECORATION
 	######################################################################### */
 	bool AddDecorationHouse(int DecoID, int OwnerID, vec2 Position);
+private:
 	bool DeleteDecorationHouse(int ID);
 	void ShowDecorationList(CPlayer *pPlayer);
 
 	/* #########################################################################
 		GET CHECK HOUSES 
 	######################################################################### */
+public:
 	int GetWorldID(int HouseID) const;
 	int GetHouse(vec2 Pos, bool Plants = false);
 	int GetHousePrice(int HouseID) const;
@@ -90,6 +92,7 @@ public:
 		PARSING HOUSES 
 	######################################################################### */
 	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
+	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist);
 };
 
 

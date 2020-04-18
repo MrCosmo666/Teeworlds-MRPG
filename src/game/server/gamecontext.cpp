@@ -1990,61 +1990,47 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AddBack(ClientID);
 		AV(ClientID, "null", "");
 		Mmo()->Inbox()->GetInformationInbox(pPlayer);
-	}
-	else if(MenuList == MEMBERMENU) 
-	{ 
-		pPlayer->m_LastVoteMenu = MAINMENU;
-		Mmo()->Member()->ShowMenuGuild(pPlayer);
-	}
-	else if(MenuList == GuildRank) 
-	{
-		pPlayer->m_LastVoteMenu = MEMBERMENU;
-		Mmo()->Member()->ShowMenuRank(pPlayer);
-	}
-	else if(MenuList == MEMBERINVITES) 
-	{
-		pPlayer->m_LastVoteMenu = MEMBERMENU;
-		Mmo()->Member()->ShowInvitesGuilds(ClientID, pPlayer->Acc().GuildID);
-	}
-	else if(MenuList == MEMBERHISTORY) 
-	{
-		pPlayer->m_LastVoteMenu = MEMBERMENU;		
-		Mmo()->Member()->ShowHistoryGuild(ClientID, pPlayer->Acc().GuildID);
-	}	
+	} 
 	else if(MenuList == SETTINGS) 
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;
-		
-		// обычные настройки
+
+		// Настройки
 		bool FoundSettings = false;
 		AVH(ClientID, HSETTINGSS, vec3(50,30,40), "Some of the settings becomes valid after death");
 		for(const auto& it : ItemSql::Items[ClientID])
 		{
-			if(it.second.Count <= 0 || it.second.Info().Type != ITEMSETTINGS)
+			const ItemSql::ItemPlayer ItemData = it.second;
+			if(ItemData.Info().Type != ITEMSETTINGS || ItemData.Count <= 0)
 				continue;
 			
-			AVM(ClientID, "ISETTINGS", it.first, HSETTINGSS, "[{STR}] {STR}", 
-				it.second.Settings ? "Enable" : "Disable", it.second.Info().GetName(pPlayer));
+			AVM(ClientID, "ISETTINGS", it.first, HSETTINGSS, "[{STR}] {STR}", (ItemData.Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
 			FoundSettings = true;
 		}
-		if(!FoundSettings) { AVM(ClientID, "null", NOPE, HSETTINGSS, "The list of equipment sub upgrades is empty"); }
+		if (!FoundSettings)
+		{
+			AVM(ClientID, "null", NOPE, HSETTINGSS, "The list of settings is empty");
+		}
 
-		// поиск всех предметов этого типа
+		// Снаряжение
 		FoundSettings = false;
 		AV(ClientID, "null", "");
 		AVH(ClientID, HSETTINGSU, vec3(30,50,40), "Sub items settings.");
 		for(const auto& it : ItemSql::Items[ClientID])
 		{
-			if(it.second.Count <= 0 || it.second.Info().Type != ITEMUPGRADE) 
+			const ItemSql::ItemPlayer ItemData = it.second;
+			if(ItemData.Count <= 0 || ItemData.Info().Type != ITEMUPGRADE)
 				continue;
 			
-			int BonusCount = it.second.Info().BonusCount*(it.second.Enchant+1);
-			AVMI(ClientID, it.second.Info().GetIcon(), "ISETTINGS", it.first, HSETTINGSU, "[{STR}] {STR}({STR} +{INT})"), 
-				(it.second.Settings ? "Dress" : "Not dressed", it.second.Info().GetName(pPlayer),
-				pPlayer->AtributeName(it.second.Info().BonusID), &BonusCount);
+			int BonusCount = ItemData.Info().BonusCount*(ItemData.Enchant+1);
+			AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, HSETTINGSU, "{STR}({STR} +{INT}){STR}",
+				ItemData.Info().GetName(pPlayer), pPlayer->AtributeName(ItemData.Info().BonusID), &BonusCount, (ItemData.Settings ? " ✔" : "\0"));
 			FoundSettings = true;
 		}
-		if(!FoundSettings) { AVM(ClientID, "null", NOPE, HSETTINGSU, "The list of equipment sub upgrades is empty"); }
+		if (!FoundSettings)
+		{
+			AVM(ClientID, "null", NOPE, HSETTINGSU, "The list of equipment sub upgrades is empty");
+		}
 		AddBack(ClientID);
 	}
 	else if(MenuList == CRAFTING) 
@@ -2082,39 +2068,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		
 		Mmo()->House()->ShowPersonalHouse(pPlayer);
 		AddBack(ClientID);
-	}
-	else if(MenuList == HOUSEDECORATION) 
-	{
-		pPlayer->m_LastVoteMenu = HOUSEMENU;
-
-		AVH(ClientID, HDECORATION, vec3(35,80,40), "Decorations Information");
-		AVM(ClientID, "null", NOPE, HDECORATION, "Add: Select your item in list. Select (Add to house),");
-		AVM(ClientID, "null", NOPE, HDECORATION, "later press (ESC) and mouse select position");
-		AVM(ClientID, "null", NOPE, HDECORATION, "Return in inventory: Select down your decorations");
-		AVM(ClientID, "null", NOPE, HDECORATION, "and press (Back to inventory).");
-
-		Mmo()->Item()->ListInventory(pPlayer, ITEMDECORATION);
-		AV(ClientID, "null", "");
-
-		Mmo()->House()->ShowDecorationList(pPlayer);
-
-		AddBack(ClientID);	
-	}	
-	else if(MenuList == GUILDHOUSEDECORATION)
-	{
-		pPlayer->m_LastVoteMenu = HOUSEMENU;
-
-		AVH(ClientID, HDECORATION, vec3(35,80,40), "Decorations Information");
-		AVM(ClientID, "null", NOPE, HDECORATION, "Add: Select your item in list. Select (Add to house),");
-		AVM(ClientID, "null", NOPE, HDECORATION, "later press (ESC) and mouse select position");
-		AVM(ClientID, "null", NOPE, HDECORATION, "Return in inventory: Select down your decorations");
-		AVM(ClientID, "null", NOPE, HDECORATION, "and press (Back to inventory).");
-
-		Mmo()->Item()->ListInventory(pPlayer, ITEMDECORATION);
-		AV(ClientID, "null", "");
-
-		Mmo()->House()->ShowDecorationList(pPlayer);
-		AddBack(ClientID);	
 	}
 	else if(MenuList == HOUSEPLANTS) 
 	{

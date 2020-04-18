@@ -574,38 +574,23 @@ bool HouseJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 	// начала расстановки декорации
 	if(PPSTR(CMD, "DECOSTART") == 0)
 	{
-		if(!pPlayer->GetCharacter())
-			return true;
-
-		// дом проверка
 		int HouseID = PlayerHouseID(pPlayer);
-		if(HouseID < 0)
-		{
-			GS()->Chat(ClientID, "You not owner home!");
-			return true;
-		}
-
-		// дастанция проверка
 		vec2 PositionHouse = GetPositionHouse(HouseID);
-		if(distance(PositionHouse, pPlayer->GetCharacter()->m_Core.m_Pos) > 600)
+		if(HouseID <= 0 || distance(PositionHouse, pPlayer->GetCharacter()->m_Core.m_Pos) > 600)
 		{
-			GS()->Chat(ClientID, "Maximum distance between your home 600!");
+			GS()->Chat(ClientID, "Long distance from the house, or you do not own the house!");
 			return true;
 		}
-
-		// пишем о добавлении
-		int *DecoID = &CGS::InteractiveSub[ClientID].TempID;
-		
-		// очищаем голосования
-		GS()->ClearVotes(ClientID);
 
 		// информация
+		GS()->ClearVotes(ClientID);
 		GS()->AV(ClientID, "null", "Please close vote and press Left Mouse,");
 		GS()->AV(ClientID, "null", "on position where add decoration!");
 		GS()->AddBack(ClientID);
 
 		pPlayer->m_LastVoteMenu = INVENTORY;
-		*DecoID = VoteID;
+		CGS::InteractiveSub[ClientID].TempID = VoteID;
+		CGS::InteractiveSub[ClientID].TempID2 = DECOTYPE_HOUSE;
 		return true;
 	}
 
@@ -614,13 +599,7 @@ bool HouseJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 	{
 		// дом проверка
 		int HouseID = PlayerHouseID(pPlayer);
-		if(HouseID < 0)
-		{
-			GS()->Chat(ClientID, "You not owner home!");
-			return true;
-		}
-
-		if(DeleteDecorationHouse(VoteID))
+		if(HouseID > 0 && DeleteDecorationHouse(VoteID))
 		{
 			ItemSql::ItemPlayer &PlDecoItem = pPlayer->GetItem(VoteID2);
 			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
@@ -654,6 +633,27 @@ bool HouseJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 
 		ChangePlantsID(HouseID, VoteID);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+	}
+	return false;
+}
+
+bool HouseJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
+{
+	int ClientID = pPlayer->GetCID();
+	if (Menulist == HOUSEDECORATION)
+	{
+		pPlayer->m_LastVoteMenu = HOUSEMENU;
+		GS()->AVH(ClientID, HDECORATION, vec3(35, 80, 40), "Decorations Information");
+		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "Add: Select your item in list. Select (Add to house),");
+		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "later press (ESC) and mouse select position");
+		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "Return in inventory: Select down your decorations");
+		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "and press (Back to inventory).");
+
+		Job()->Item()->ListInventory(pPlayer, ITEMDECORATION);
+		GS()->AV(ClientID, "null", "");
+		ShowDecorationList(pPlayer);
+		GS()->AddBack(ClientID);
+		return true;
 	}
 	return false;
 }

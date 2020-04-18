@@ -259,7 +259,6 @@ void ShopMailSql::CheckAuctionTime()
 bool ShopMailSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
 {
 	int ClientID = pPlayer->GetCID();
-
 	if (Menulist == AUCTIONSETSLOT)
 	{
 		pPlayer->m_LastVoteMenu = INVENTORY;

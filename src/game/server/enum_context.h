@@ -103,13 +103,13 @@ enum
 	GUIDEDROP,								// гайды по дропам меню
 	EQUIPMENU,								// снаряжение меню
 	MEMBERMENU,								// гильдия меню
-	GuildRank,								// гильдия ранги меню
+	GUILDRANK,								// гильдия ранги меню
 	MEMBERINVITES,							// гильдия приглашения меню
 	MEMBERHISTORY,							// гильдия история действий
 	CRAFTING,								// крафт меню
 	HOUSEMENU,								// дома меню
 	HOUSEDECORATION,						// дома декорации меню
-	GUILDHOUSEDECORATION,						// дома декорации гильдии меню
+	HOUSEGUILDDECORATION,					// дома декорации гильдии меню
 	HOUSEPLANTS,							// дома огород меню
 	ADVENTUREJOURNAL,						// журнал квестов меню
 	FINISHQUESTMENU,						// журнал завершенные квесты меню

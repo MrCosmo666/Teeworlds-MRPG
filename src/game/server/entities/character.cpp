@@ -206,7 +206,7 @@ bool CCharacter::DecoInteractive()
 			if (GS()->Mmo()->Member()->AddDecorationHouse(DecoID, GuildID, m_pHelper->MousePos()))
 			{
 				GS()->Chat(ClientID, "You added {STR}, to your guild house!", GS()->GetItemInfo(DecoID).GetName(m_pPlayer));
-				GS()->ResetVotes(ClientID, GUILDHOUSEDECORATION);
+				GS()->ResetVotes(ClientID, HOUSEGUILDDECORATION);
 				m_pPlayer->GetItem(DecoID).Remove(1);
 				return true;
 			}

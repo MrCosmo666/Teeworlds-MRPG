@@ -440,8 +440,11 @@ void ItemSql::ItemSelected(CPlayer *pPlayer, const ItemPlayer &PlItem, bool Dres
 	}
 
 	// поставить дома предмет
-	if(PlItem.Info().Type == ITEMDECORATION)
-		GS()->AVM(ClientID, "DECOSTART", ItemID, HideID, "Added {STR} to your house", NameItem);			
+	if (PlItem.Info().Type == ITEMDECORATION)
+	{
+		GS()->AVM(ClientID, "DECOSTART", ItemID, HideID, "Added {STR} to your house", NameItem);
+		GS()->AVM(ClientID, "DECOGUILDSTART", ItemID, HideID, "Added {STR} to your guild house", NameItem);
+	}
 
 	// установить предмет как расстение
 	if(PlItem.Info().Function == ITPLANTS)
