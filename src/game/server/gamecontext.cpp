@@ -971,9 +971,6 @@ void CGS::OnTick()
 	m_World.m_Core.m_Tuning = m_Tuning;
 	m_World.Tick();
 
-	//if(Server()->Tick() % Server()->TickSpeed() / 2 == 0)
-	//	SJK.UD("tw_devnotepad", "nDesc = '1.3.5 pre-relased' WHERE ID = '1'");
-
 	// контроллер тик
 	m_pController->Tick();
 	for(int i = 0; i < MAX_CLIENTS; i++)
