@@ -145,6 +145,7 @@ MACRO_CONFIG_INT(SvVoteKickBantime, sv_vote_kick_bantime, 5, 0, 1440, CFGFLAG_SE
 MACRO_CONFIG_INT(SvExpForLevel, sv_needexp_level, 160, 0, 1000, CFGFLAG_SERVER, "(This config + Your level * 2)*(Your level* Your level)")
 MACRO_CONFIG_INT(SvPriceTeleport, sv_price_teleport, 100, 0, 10000, CFGFLAG_SERVER, "Price for teleport*WorldID")
 MACRO_CONFIG_INT(SvExperienceMob, sv_experience_mob, 5, 0, 1000, CFGFLAG_SERVER, "Bonus Damage * This config.")
+MACRO_CONFIG_INT(SvDoorRadiusHit, sv_door_radius_hit, 16, 16, 1000, CFGFLAG_SERVER, "Door radius hit.")
 
 // auction
 MACRO_CONFIG_INT(SvMaxAuctionSlots, sv_amax_slots, 5, 1, 1000, CFGFLAG_SERVER, "Max autction slots")
@@ -173,7 +174,7 @@ MACRO_CONFIG_INT(SvGuildLeveling, sv_guildleveling, 1024, 0, 10000, CFGFLAG_SERV
 MACRO_CONFIG_INT(SvShowSvNameTime, sv_worldtime_name, 1, 0, 1, CFGFLAG_SERVER, "Show world time in server")
 
 // house
-MACRO_CONFIG_INT(SvMotelPrice, sv_marendprice, 100, 100, 9000000, CFGFLAG_SERVER, "Motel buy price")
+MACRO_CONFIG_INT(SvMotelPrice, sv_marendprice, 100, 0, 9000000, CFGFLAG_SERVER, "Motel buy price")
 MACRO_CONFIG_INT(SvLimitDecoration, sv_limit_decorations, 10, 5, 20, CFGFLAG_SERVER, "Limit objects for decoration")
 
 // discord

@@ -105,6 +105,7 @@ public:
 	HouseDoor(CGameWorld *pGameWorld, vec2 Pos);
 	~HouseDoor();
 
+	bool HitCharacter();
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);
 };

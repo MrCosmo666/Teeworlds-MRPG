@@ -179,27 +179,12 @@ void CLogicWallWall::Tick()
 
 	if(!m_RespawnTick) 
 	{
-		for(CCharacter *pChar = (CCharacter*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter *)pChar->TypeNext())
+		for (CCharacter* pChar = (CCharacter*)GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter*)pChar->TypeNext())
 		{
 			vec2 IntersectPos = closest_point_on_line(m_Pos, m_To, pChar->m_Core.m_Pos);
 			float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);
-		
-			// снижаем скокрость
-			if(Distance < 64.0f && length(pChar->m_Core.m_Vel) >= 64.0)
-				pChar->m_Core.m_Vel = vec2(0,0);
-
-			// проверяем дистанцию
-			if(Distance < 30.0f) 
-			{
-				vec2 Dir = normalize(pChar->m_Core.m_Pos - IntersectPos);
-				float a = (30.0f*1.45f - Distance);
-				float Velocity = 0.5f;
-				if (length(pChar->m_Core.m_Vel) > 0.0001)
-					Velocity = 1-(dot(normalize(pChar->m_Core.m_Vel), Dir)+1)/4;
-			
-				pChar->m_Core.m_Vel += (Dir*a*(Velocity*0.75f))*0.85f;
-				pChar->m_Core.m_Pos = pChar->m_OldPos + Dir;
-			}
+			if (Distance <= g_Config.m_SvDoorRadiusHit)
+				pChar->m_DoorHit = true;
 		}
 	}
 }
@@ -301,32 +286,19 @@ CLogicDoorKey::CLogicDoorKey(CGameWorld *pGameWorld, vec2 Pos, int ItemID, int M
 
 void CLogicDoorKey::Tick() 
 {
-	for(CCharacter *pChar = (CCharacter*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter *)pChar->TypeNext())
+	for (CCharacter* pChar = (CCharacter*)GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter*)pChar->TypeNext())
 	{
-		if(pChar->GetPlayer()->GetItem(m_ItemID).Count)
+		const int ClientID = pChar->GetPlayer()->GetCID();
+		CPlayer* pPlayer = pChar->GetPlayer();
+		if (pPlayer->GetItem(m_ItemID).Count)
 			continue;
-			
+
 		vec2 IntersectPos = closest_point_on_line(m_Pos, m_To, pChar->m_Core.m_Pos);
 		float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);
-		
-		// снижаем скокрость
-		if(Distance < 64.0f && length(pChar->m_Core.m_Vel) >= 64.0)
-			pChar->m_Core.m_Vel = vec2(0,0);
+		if (Distance <= g_Config.m_SvDoorRadiusHit)
+			pChar->m_DoorHit = true;
 
-		// проверяем дистанцию
-		if(Distance < 30.0f) 
-		{
-			vec2 Dir = normalize(pChar->m_Core.m_Pos - IntersectPos);
-			float a = (30.0f*1.45f - Distance);
-			float Velocity = 0.5f;
-			if (length(pChar->m_Core.m_Vel) > 0.0001)
-				Velocity = 1-(dot(normalize(pChar->m_Core.m_Vel), Dir)+1)/4;
-		
-			pChar->m_Core.m_Vel += (Dir*a*(Velocity*0.75f))*0.85f;
-			pChar->m_Core.m_Pos = pChar->m_OldPos + Dir;
-
-			GS()->SBL(pChar->GetPlayer()->GetCID(), 100000, 100, _("You need {s:name}"), "name", GS()->GetItemInfo(m_ItemID).GetName(pChar->GetPlayer()));
-		}
+		GS()->SBL(pChar->GetPlayer()->GetCID(), 100000, 100, _("You need {s:name}"), "name", GS()->GetItemInfo(m_ItemID).GetName(pChar->GetPlayer()));
 	}
 }
 
@@ -366,28 +338,12 @@ void CLogicDungeonDoorKey::Tick()
 	if (m_OpenedDoor)
 		return;
 
-	for(CCharacter *pChar = (CCharacter*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter *)pChar->TypeNext())
+	for (CCharacter* pChar = (CCharacter*)GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter*)pChar->TypeNext())
 	{
-		// если не залетаем во что либо
 		vec2 IntersectPos = closest_point_on_line(m_Pos, m_To, pChar->m_Core.m_Pos);
 		float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);
-		
-		// снижаем скокрость
-		if(Distance < 64.0f && length(pChar->m_Core.m_Vel) >= 64.0)
-			pChar->m_Core.m_Vel = vec2(0,0);
-
-		// проверяем дистанцию
-		if(Distance < 30.0f) 
-		{
-			vec2 Dir = normalize(pChar->m_Core.m_Pos - IntersectPos);
-			float a = (30.0f*1.45f - Distance);
-			float Velocity = 0.5f;
-			if (length(pChar->m_Core.m_Vel) > 0.0001)
-				Velocity = 1-(dot(normalize(pChar->m_Core.m_Vel), Dir)+1)/4;
-		
-			pChar->m_Core.m_Vel += (Dir*a*(Velocity*0.75f))*0.85f;
-			pChar->m_Core.m_Pos = pChar->m_OldPos + Dir;
-		}
+		if (Distance <= g_Config.m_SvDoorRadiusHit)
+			pChar->m_DoorHit = true;
 	}
 }
 

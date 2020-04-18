@@ -45,6 +45,7 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 	// another function
 	m_pHelper = new CHelperCharacter(this);
 
+	m_DoorHit = false;
 	m_Health = 0;
 	m_Armor = 0;
 	m_TriggeredEvents = 0;
@@ -541,7 +542,6 @@ void CCharacter::Tick()
 	m_pPlayer->SetStandart(m_Health, m_Mana);
 	HandleTunning();
 
-	m_OldPos = m_Pos;
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true, &m_pPlayer->m_NextTuningParams);
 
@@ -553,6 +553,12 @@ void CCharacter::Tick()
 
 	// handle Weapons
 	HandleWeapons();
+
+	if (!m_DoorHit)
+	{
+		m_OlderPos = m_OldPos;
+		m_OldPos = m_Core.m_Pos;
+	}
 
 	if(m_pPlayer->IsBot())
 		return;
@@ -569,6 +575,12 @@ void CCharacter::TickDefered()
 {
 	if(!CheckInvisibleBot())
 		return;
+
+	if (m_DoorHit)
+	{
+		ResetDoorPos();
+		m_DoorHit = false;
+	}
 
 	// если бот то отправляем мало всего по кору
 	if(m_pPlayer->IsBot())
@@ -747,6 +759,9 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 		return false;
 
 	m_Core.m_Vel += Force;
+	if (length(m_Core.m_Vel) > 32.0f)
+		m_Core.m_Vel = normalize(m_Core.m_Vel) * 32.0f;
+
 	if(!pFrom->IsBot() && !m_pPlayer->IsBot())
 		return false;
 
@@ -924,7 +939,6 @@ void CCharacter::HandleTilesets()
 			{
 				// Обновление меню и отправка информации в голосование
 				case TILE_STORAGE:
-				case TILE_MOTEL:
 				case TILE_AUCTION:
 				case TILE_LEARNSKILL:
 				{
@@ -1017,7 +1031,6 @@ void CCharacter::HandleTilesets()
 				// Снятие урона защиты и крюка и обновить меню
 				case TILE_STORAGE:
 				case TILE_CRAFT:
-				case TILE_MOTEL:
 				case TILE_QUESTS:
 				case TILE_AUCTION:
 				case TILE_LEARNSKILL:
@@ -1326,4 +1339,12 @@ void CCharacter::RemoveSnapProj(int Count, int SnapID, bool Effect)
 		pSnapItem->RemoveItem(Count, SnapID, Effect);
 		return;
 	}	
+}
+
+void CCharacter::ResetDoorPos()
+{
+	m_Core.m_Pos = m_OlderPos;
+	m_Core.m_Vel = vec2(0, 0);
+	if (m_Core.m_Jumped >= 2)
+		m_Core.m_Jumped = 1;
 }

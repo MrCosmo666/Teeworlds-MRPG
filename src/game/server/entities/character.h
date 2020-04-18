@@ -64,8 +64,6 @@ public:
 
 	bool IsAlive() const { return m_Alive; }
 
-	vec2 m_OldPos;
-
 	bool CheckInvisibleBot();
 	void SetEvent(int EventID) { m_Event = EventID; };
 	void SetEmote(int Emote, int Sec);
@@ -86,6 +84,7 @@ public:
 	void CreateRandomDrop(int DropCID, int Random, int ItemID, int Count);
 	void GiveRandomMobEffect(int FromID);
 	void ChangePosition(vec2 NewPos);
+	void ResetDoorPos();
 
 	// these are non-heldback inputs
 	CNetObj_PlayerInput m_Input;
@@ -103,6 +102,10 @@ public:
 	bool m_NoAllowDamage;
 	int m_AmmoRegen;
 	int m_ReloadTimer;
+
+	vec2 m_OldPos;
+	vec2 m_OlderPos;
+	int m_DoorHit;
 
 private:
 	bool m_Alive;

@@ -675,23 +675,8 @@ void HouseDoor::Tick()
 	{
 		vec2 IntersectPos = closest_point_on_line(m_Pos, m_To, pChar->m_Core.m_Pos);
 		float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);
-		
-		// снижаем скокрость
-		if(Distance < 64.0f && length(pChar->m_Core.m_Vel) >= 64.0)
-			pChar->m_Core.m_Vel = vec2(0,0);
-
-		// проверяем дистанцию
-		if(Distance < 30.0f) 
-		{
-			vec2 Dir = normalize(pChar->m_Core.m_Pos - IntersectPos);
-			float a = (30.0f*1.45f - Distance);
-			float Velocity = 0.5f;
-			if (length(pChar->m_Core.m_Vel) > 0.0001)
-				Velocity = 1-(dot(normalize(pChar->m_Core.m_Vel), Dir)+1)/4;
-		
-			pChar->m_Core.m_Vel += (Dir*a*(Velocity*0.75f))*0.85f;
-			pChar->m_Core.m_Pos = pChar->m_OldPos + Dir;
-		}
+		if (Distance <= g_Config.m_SvDoorRadiusHit)
+			pChar->m_DoorHit = true;
 	}
 }
 
