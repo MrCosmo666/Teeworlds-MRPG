@@ -122,7 +122,7 @@ void CPlayer::Tick()
 void CPlayer::PostTick()
 {
 	// update latency value
-	if (Server()->ClientIngame(m_ClientID) && Server()->GetWorldID(m_ClientID) == GS()->GetWorldID() && IsAuthed())
+	if (Server()->ClientIngame(m_ClientID) && GS()->IsClientEqualWorldID(m_ClientID) && IsAuthed())
 		Acc().LatencyPing = m_Latency.m_Min;
 }
 
@@ -281,7 +281,7 @@ void CPlayer::TryRespawn()
 	if(CheckGuildSpawn > 0)
 	{
 		const int WorldID = GS()->Mmo()->Member()->GetHouseWorldID(CheckGuildSpawn);
-		if(WorldID == Server()->GetWorldID(m_ClientID))
+		if(GS()->IsClientEqualWorldID(m_ClientID, WorldID))
 			SpawnPos = GS()->Mmo()->Member()->GetPositionHouse(Acc().GuildID);
 	}
 
@@ -290,7 +290,7 @@ void CPlayer::TryRespawn()
 	if(CheckHouseSpawn > 0)
 	{
 		const int HouseWorldID = GS()->Mmo()->House()->GetWorldID(CheckHouseSpawn);
-		if(HouseWorldID == Server()->GetWorldID(m_ClientID))
+		if (GS()->IsClientEqualWorldID(m_ClientID, HouseWorldID))
 		{
 			int HouseID = GS()->Mmo()->House()->PlayerHouseID(this);
 			SpawnPos = GS()->Mmo()->House()->GetPositionHouse(HouseID);

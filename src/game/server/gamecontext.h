@@ -306,7 +306,7 @@ public:
 	int DungeonID() const { return m_DungeonID; }
 	bool IsDungeon() const { return (m_DungeonID > 0); }
 	int IncreaseCountRaid(int IncreaseCount) const;
-	bool GetPlayerCliped(vec2 Pos, float Distance) const;
+	bool IsClientEqualWorldID(int ClientID, int WorldID = -1) const;
 
 private:
 	int ItDungeon(int WorldID) const;

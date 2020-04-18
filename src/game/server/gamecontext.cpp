@@ -498,7 +498,7 @@ void CGS::ChatWorldID(int WorldID, const char* Suffix, const char* pText, ...)
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pPlayer = GetPlayer(i, true);
-		if (pPlayer && Server()->GetWorldID(i) == WorldID)
+		if (pPlayer && IsClientEqualWorldID(i, WorldID))
 		{
 			Buffer.append(Suffix);
 			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
@@ -640,7 +640,7 @@ void CGS::BroadcastWorldID(int WorldID, int Priority, int LifeSpan, const char *
 	va_start(VarArgs, pText);
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(m_apPlayers[i] && Server()->GetWorldID(i) == WorldID)
+		if(m_apPlayers[i] && IsClientEqualWorldID(i, WorldID))
 		{
 			dynamic_string Buffer;
 			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
@@ -655,7 +655,7 @@ void CGS::BroadcastWorldID(int WorldID, int Priority, int LifeSpan, const char *
 // Тик броадкаса и его жизни
 void CGS::BroadcastTick(int ClientID)
 {
-	if(m_apPlayers[ClientID] && GetWorldID() == Server()->GetWorldID(ClientID))
+	if(m_apPlayers[ClientID] && IsClientEqualWorldID(ClientID))
 	{
 		if(m_BroadcastStates[ClientID].m_LifeSpanTick > 0 && m_BroadcastStates[ClientID].m_TimedPriority > m_BroadcastStates[ClientID].m_Priority)
 		{
@@ -877,7 +877,7 @@ int64 CGS::MaskWorldID()
 	int64 Mask = -1;
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(Server()->GetWorldID(i) == GetWorldID())
+		if(IsClientEqualWorldID(i))
 			Mask |= CmaskOne(i);
 	}
 	return Mask;
@@ -1418,7 +1418,7 @@ void CGS::OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld)
 	m_pController->OnPlayerDisconnect(m_apPlayers[ClientID]);
 
 	// update clients on drop
-	if (Server()->ClientIngame(ClientID) && m_WorldID == Server()->GetWorldID(ClientID))
+	if (Server()->ClientIngame(ClientID) && IsClientEqualWorldID(ClientID))
 	{
 		ChatDiscord(false, DC_JOIN_LEAVE, Server()->ClientName(ClientID), "leave game Mmo 0.7");
 
@@ -2440,11 +2440,15 @@ void CGS::ClearQuestsBot(int QuestID, int Step)
 // Создать Лол текст в мире
 void CGS::CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, int WorldID)
 {
-	if(!GetPlayerCliped(Pos, 1200)) 
-		return;
-	
-	CLoltext Text;
-	Text.Create(this, &m_World, pParent, Pos, Vel, Lifespan, pText, true, Follow, WorldID);
+	for (int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if (m_apPlayers[i] && distance(m_apPlayers[i]->m_ViewPos, Pos) < 1000.0f)
+		{
+			CLoltext Text;
+			Text.Create(this, &m_World, pParent, Pos, Vel, Lifespan, pText, true, Follow, WorldID);
+			return;
+		}
+	}
 }
 
 // Саздает бонус в позиции Типа и Количества и Их самих кол-ва
@@ -2560,17 +2564,6 @@ int CGS::IncreaseCountRaid(int IncreaseCount) const
 	return (int)kurosio::translate_to_procent_rest(IncreaseCount, m_RaidExp);
 }
 
-// Узнать есть ли рядом игроки
-bool CGS::GetPlayerCliped(vec2 Pos, float Distance) const
-{
-	for(int i = 0; i < MAX_PLAYERS; i++)
-	{
-		if(m_apPlayers[i] && distance(m_apPlayers[i]->m_ViewPos, Pos) < Distance)
-			return true;
-	}
-	return false;
-}
-
 // Проверяем данж ли этот мир или нет
 int CGS::ItDungeon(int WorldID) const
 {
@@ -2580,6 +2573,13 @@ int CGS::ItDungeon(int WorldID) const
 			return dd.first;
 	}
 	return -1;
+}
+
+bool CGS::IsClientEqualWorldID(int ClientID, int WorldID) const
+{
+	if (WorldID == -1)
+		return (Server()->GetWorldID(ClientID) == WorldID);
+	return (Server()->GetWorldID(ClientID) == m_WorldID);
 }
 
 IGameServer *CreateGameServer() { return new CGS; }
