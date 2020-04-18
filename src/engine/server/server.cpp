@@ -398,7 +398,7 @@ void CServer::QuestBotRecheck(int WorldID, int QuestID, int Step)
 int CServer::GetWorldID(int ClientID)
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
-		return 0;
+		return -1;
 
 	return m_aClients[ClientID].m_MapID;
 }
