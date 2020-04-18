@@ -200,8 +200,8 @@ public:
 	void SendGameMsg(int GameMsgID, int ParaI1, int ClientID);
 	void SendGameMsg(int GameMsgID, int ParaI1, int ParaI2, int ParaI3, int ClientID);
 	void SendTuningParams(int ClientID);
-	void SendTalkText(int OwnID, int TalkingID, bool PlayerTalked, const char *Message, int Style = -1, int TalkingEmote = -1);
-	void ClearTalkText(int OwnID);
+	void SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char *Message, int Style = -1, int TalkingEmote = -1);
+	void ClearTalkText(int ClientID);
 	int CheckPlayerMessageWorldID(int ClientID);
 	int64 MaskWorldID();
 

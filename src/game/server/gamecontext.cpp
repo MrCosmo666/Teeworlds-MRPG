@@ -763,7 +763,7 @@ void CGS::SendSkinChange(int ClientID, int TargetID)
 // Отправить Equip Items
 void CGS::SendEquipItem(int ClientID, int TargetID)
 {
-	if(!m_apPlayers[ClientID] || !m_apPlayers[ClientID]->IsAuthed())
+	if(!CheckClient(TargetID) || !m_apPlayers[ClientID] || !m_apPlayers[ClientID]->IsAuthed())
 		return;
 
 	CNetMsg_Sv_EquipItems Msg;
@@ -827,9 +827,9 @@ void CGS::SendTuningParams(int ClientID)
 }
 
 // Отправить пакет разговора с кем то
-void CGS::SendTalkText(int OwnID, int TalkingID, bool PlayerTalked, const char *Message, int Style, int TalkingEmote)
+void CGS::SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char *Message, int Style, int TalkingEmote)
 {
-	if(!CheckClient(OwnID))
+	if (!CheckClient(ClientID))
 		return;
 
 	CNetMsg_Sv_TalkText Msg;
@@ -838,13 +838,16 @@ void CGS::SendTalkText(int OwnID, int TalkingID, bool PlayerTalked, const char *
 	Msg.m_pText = Message;
 	Msg.m_TalkedEmote = TalkingEmote;
 	Msg.m_Style = Style;
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, OwnID);
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
-void CGS::ClearTalkText(int OwnID)
+void CGS::ClearTalkText(int ClientID)
 {
+	if (!CheckClient(ClientID))
+		return;
+
 	CNetMsg_Sv_ClearTalkText Msg;
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, OwnID);	
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
 // Помощь в поиске мира бота и отправки его
