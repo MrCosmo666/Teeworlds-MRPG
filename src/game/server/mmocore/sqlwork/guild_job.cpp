@@ -19,23 +19,22 @@ void GuildJob::OnInitLocal(const char *pLocal)
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_houses", pLocal));
 	while(RES->next())
 	{
-		int MHID = RES->getInt("ID");
-		HouseGuild[MHID].m_DoorX = RES->getInt("DoorX");
-		HouseGuild[MHID].m_DoorY = RES->getInt("DoorY");	
-		if(!HouseGuild[MHID].m_Door) { HouseGuild[MHID].m_Door = 0; }
-
-		HouseGuild[MHID].m_GuildID = RES->getInt("OwnerMID");
-		HouseGuild[MHID].m_PosX = RES->getInt("PosX");
-		HouseGuild[MHID].m_PosY = RES->getInt("PosY");
-		HouseGuild[MHID].m_Price = RES->getInt("Price");
-		HouseGuild[MHID].m_Payment = RES->getInt("Payment");
-		HouseGuild[MHID].m_WorldID = RES->getInt("WorldID");
-		HouseGuild[MHID].m_TextX = RES->getInt("TextX");
-		HouseGuild[MHID].m_TextY = RES->getInt("TextY");
-
-		// создаем дверь если есть владельцы
-		if(HouseGuild[MHID].m_GuildID > 0 && !HouseGuild[MHID].m_Door)
-			HouseGuild[MHID].m_Door = new GuildDoor(&GS()->m_World, vec2(HouseGuild[MHID].m_DoorX, HouseGuild[MHID].m_DoorY), HouseGuild[MHID].m_GuildID);
+		int HouseID = RES->getInt("ID");
+		HouseGuild[HouseID].m_DoorX = RES->getInt("DoorX");
+		HouseGuild[HouseID].m_DoorY = RES->getInt("DoorY");	
+		HouseGuild[HouseID].m_GuildID = RES->getInt("OwnerMID");
+		HouseGuild[HouseID].m_PosX = RES->getInt("PosX");
+		HouseGuild[HouseID].m_PosY = RES->getInt("PosY");
+		HouseGuild[HouseID].m_Price = RES->getInt("Price");
+		HouseGuild[HouseID].m_Payment = RES->getInt("Payment");
+		HouseGuild[HouseID].m_WorldID = RES->getInt("WorldID");
+		HouseGuild[HouseID].m_TextX = RES->getInt("TextX");
+		HouseGuild[HouseID].m_TextY = RES->getInt("TextY");
+		if (HouseGuild[HouseID].m_GuildID > 0 && !HouseGuild[HouseID].m_Door)
+		{
+			HouseGuild[HouseID].m_Door = 0;
+			HouseGuild[HouseID].m_Door = new GuildDoor(&GS()->m_World, vec2(HouseGuild[HouseID].m_DoorX, HouseGuild[HouseID].m_DoorY), HouseGuild[HouseID].m_GuildID);
+		}
 	}
 
 	// пропускаем загрузку если там есть элементы
@@ -44,8 +43,8 @@ void GuildJob::OnInitLocal(const char *pLocal)
 		boost::scoped_ptr<ResultSet> DecoLoadingRES(SJK.SD("*", "tw_guilds_decorations", pLocal));
 		while (DecoLoadingRES->next())
 		{
-			const int DID = DecoLoadingRES->getInt("ID");
-			m_DecorationHouse[DID] = new DecoHouse(&GS()->m_World, vec2(DecoLoadingRES->getInt("X"),
+			const int DecoID = DecoLoadingRES->getInt("ID");
+			m_DecorationHouse[DecoID] = new DecoHouse(&GS()->m_World, vec2(DecoLoadingRES->getInt("X"),
 				DecoLoadingRES->getInt("Y")), DecoLoadingRES->getInt("HouseID"), DecoLoadingRES->getInt("DecoID"));
 		}
 	}

@@ -16,32 +16,26 @@ void HouseJob::OnInitLocal(const char *pLocal)
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_houses", pLocal));
 	while(RES->next())
 	{
-		int HID = RES->getInt("ID");
-
-		// двери
-		Home[HID].m_DoorX = RES->getInt("DoorX");
-		Home[HID].m_DoorY = RES->getInt("DoorY");
-		if(!Home[HID].m_Door) { Home[HID].m_Door = 0; }
-
-		// дом информация
-		Home[HID].m_PosX = RES->getInt("PosX");
-		Home[HID].m_PosY = RES->getInt("PosY");
-		Home[HID].m_OwnerID = RES->getInt("OwnerID");
-		Home[HID].m_Price = RES->getInt("Price");
-		Home[HID].m_Bank = RES->getInt("HouseBank");
-		Home[HID].m_Farm = RES->getInt("Farm");
-		Home[HID].m_FarmLevel = RES->getInt("FarmLevel");
-		Home[HID].m_WorldID = RES->getInt("WorldID");
-		str_copy(Home[HID].m_Class, RES->getString("Class").c_str(), sizeof(Home[HID].m_Class));
-
-		// плантации
-		Home[HID].m_PlantID = RES->getInt("PlantID");
-		Home[HID].m_PlantPosX = RES->getInt("PlantX");
-		Home[HID].m_PlantPosY = RES->getInt("PlantY");
-
-		// создаем дверь если ее нету
-		if(GS()->GetWorldID() == Home[HID].m_WorldID && Home[HID].m_OwnerID > 0 && !Home[HID].m_Door)
-			Home[HID].m_Door = new HouseDoor(&GS()->m_World, vec2(Home[HID].m_DoorX, Home[HID].m_DoorY));
+		int HouseID = RES->getInt("ID");
+		Home[HouseID].m_DoorX = RES->getInt("DoorX");
+		Home[HouseID].m_DoorY = RES->getInt("DoorY");
+		Home[HouseID].m_PosX = RES->getInt("PosX");
+		Home[HouseID].m_PosY = RES->getInt("PosY");
+		Home[HouseID].m_OwnerID = RES->getInt("OwnerID");
+		Home[HouseID].m_Price = RES->getInt("Price");
+		Home[HouseID].m_Bank = RES->getInt("HouseBank");
+		Home[HouseID].m_Farm = RES->getInt("Farm");
+		Home[HouseID].m_FarmLevel = RES->getInt("FarmLevel");
+		Home[HouseID].m_WorldID = RES->getInt("WorldID");
+		str_copy(Home[HouseID].m_Class, RES->getString("Class").c_str(), sizeof(Home[HouseID].m_Class));
+		Home[HouseID].m_PlantID = RES->getInt("PlantID");
+		Home[HouseID].m_PlantPosX = RES->getInt("PlantX");
+		Home[HouseID].m_PlantPosY = RES->getInt("PlantY");
+		if (GS()->GetWorldID() == Home[HouseID].m_WorldID && Home[HouseID].m_OwnerID > 0 && !Home[HouseID].m_Door)
+		{
+			Home[HouseID].m_Door = 0;
+			Home[HouseID].m_Door = new HouseDoor(&GS()->m_World, vec2(Home[HouseID].m_DoorX, Home[HouseID].m_DoorY));
+		}
 	}
 
 	// загружаем декорации
@@ -50,8 +44,8 @@ void HouseJob::OnInitLocal(const char *pLocal)
 		boost::scoped_ptr<ResultSet> DecoLoadingRES(SJK.SD("*", "tw_houses_decorations", pLocal));
 		while (DecoLoadingRES->next())
 		{
-			const int DID = DecoLoadingRES->getInt("ID");
-			m_DecorationHouse[DID] = new DecoHouse(&GS()->m_World, vec2(DecoLoadingRES->getInt("X"),
+			const int DecoID = DecoLoadingRES->getInt("ID");
+			m_DecorationHouse[DecoID] = new DecoHouse(&GS()->m_World, vec2(DecoLoadingRES->getInt("X"),
 				DecoLoadingRES->getInt("Y")), DecoLoadingRES->getInt("HouseID"), DecoLoadingRES->getInt("DecoID"));
 		}
 	}
