@@ -893,7 +893,7 @@ void CGS::OnInit(int WorldID)
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 	m_World.SetGameServer(this);
 	m_Events.SetGameServer(this);
-	m_DungeonID = ItDungeon(WorldID);
+	m_DungeonID = GetDungeonID();
 	m_WorldID = WorldID;
 
 	for(int i = 0; i < NUM_NETOBJTYPES; i++)
@@ -2565,11 +2565,11 @@ int CGS::IncreaseCountRaid(int IncreaseCount) const
 }
 
 // Проверяем данж ли этот мир или нет
-int CGS::ItDungeon(int WorldID) const
+int CGS::GetDungeonID() const
 {
 	for(const auto& dd : DungeonJob::Dungeon)
 	{
-		if(WorldID == dd.second.WorldID)
+		if(m_WorldID == dd.second.WorldID)
 			return dd.first;
 	}
 	return -1;

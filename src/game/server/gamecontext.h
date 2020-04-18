@@ -309,7 +309,7 @@ public:
 	bool IsClientEqualWorldID(int ClientID, int WorldID = -1) const;
 
 private:
-	int ItDungeon(int WorldID) const;
+	int GetDungeonID() const;
 
 	/* #########################################################################
 		FUNCTIONS PLAYER ITEMS 
