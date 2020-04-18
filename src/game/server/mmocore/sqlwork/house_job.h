@@ -3,7 +3,7 @@
 #ifndef GAME_SERVER_HOUSESJOB_H
 #define GAME_SERVER_HOUSESJOB_H
 
-#include <game/server/entity.h>
+#include "../mmocontroller/decorations_houses.h"
 #include "../component.h"
 
 class HouseDoor;
@@ -94,8 +94,6 @@ public:
 };
 
 
-
-
 // - - - - - - - - - - - - - - DOOR HOUSES - - - - - - - - - - - - - - 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class HouseDoor : public CEntity
@@ -104,29 +102,6 @@ class HouseDoor : public CEntity
 public:
 	HouseDoor(CGameWorld *pGameWorld, vec2 Pos);
 	~HouseDoor();
-
-	virtual void Tick();
-	virtual void Snap(int SnappingClient);
-};
-
-// CDecorations class
-class DecoHouse : public CEntity
-{
-	enum
-	{
-		PERSPECT = 1,
-		BODY,
-		NUM_IDS,
-	};
-	int m_IDs[NUM_IDS];
-
-	int SwitchToObject(bool Data);
-public:
-	int m_DecoID;
-	int m_HouseID;
-
-	DecoHouse(CGameWorld *pGameWorld, vec2 Pos, int OwnerID, int DecoID);
-	~DecoHouse();
 
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);
