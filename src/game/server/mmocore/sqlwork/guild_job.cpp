@@ -709,17 +709,16 @@ void GuildJob::ShowFinderGuilds(int ClientID)
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "WHERE GuildName LIKE '%%%s%%'", cGuildName.cstr()));
 	while(RES->next())
 	{
+		char GuildName[32];
 		int GuildID = RES->getInt("ID");
 		int AvailableSlot = RES->getInt("AvailableSlots");
-		const char *GuildName = RES->getString("GuildName").c_str();
 		int PlayersCount = GetGuildPlayerCount(GuildID);
+		str_copy(GuildName, RES->getString("GuildName").c_str(), sizeof(GuildName));
 
-		GS()->AVH(ClientID, HideID, vec3(15,40,80), "Leader: {STR} Guild {STR} Players [{INT}/{INT}]", 
-			Job()->PlayerName(Guild[ GuildID ].m_OwnerID), GuildName, &PlayersCount, &AvailableSlot);
-		{
-			GS()->AVM(ClientID, "null", NOPE, HideID, "House: {STR} | Bank: {INT} gold", (GetGuildHouseID(GuildID) <= 0 ? "No" : "Yes"), &Guild[ GuildID ].m_Bank);
-			GS()->AVM(ClientID, "MINVITESEND", GuildID, HideID, "Send request to join {STR}", GuildName);
-		}		
+		GS()->AVH(ClientID, HideID, vec3(15,20,40), "Leader {STR} : {STR} Players [{INT}/{INT}]", 
+			Job()->PlayerName(Guild[GuildID].m_OwnerID), GuildName, &PlayersCount, &AvailableSlot);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "House: {STR} | Bank: {INT} gold", (GetGuildHouseID(GuildID) <= 0 ? "No" : "Yes"), &Guild[ GuildID ].m_Bank);
+		GS()->AVM(ClientID, "MINVITESEND", GuildID, HideID, "Send request to join {STR}", GuildName);		
 		HideID++;
 	}
 	GS()->AddBack(ClientID);
