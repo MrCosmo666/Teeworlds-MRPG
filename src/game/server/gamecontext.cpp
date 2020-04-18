@@ -930,7 +930,7 @@ void CGS::OnInit(int WorldID)
 		}
 	}
 
-	// ставим на постоянную обработку
+	CheckZonePVP();
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
 	Console()->Chain("sv_vote_kick", ConchainSettingUpdate, this);
 	Console()->Chain("sv_vote_kick_min", ConchainSettingUpdate, this);
@@ -2484,6 +2484,18 @@ bool CGS::IsClientEqualWorldID(int ClientID, int WorldID) const
 	if (WorldID <= -1)
 		return (Server()->GetWorldID(ClientID) == m_WorldID);
 	return (Server()->GetWorldID(ClientID) == WorldID);
+}
+
+void CGS::CheckZonePVP()
+{
+	int CountMobs = 0;
+	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
+	{
+		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(m_apPlayers[i]);
+		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS && CheckPlayerMessageWorldID(i) == m_WorldID)
+			CountMobs++;
+	}
+	m_AllowedPVP = (bool)(CountMobs >= 5);
 }
 
 IGameServer *CreateGameServer() { return new CGS; }

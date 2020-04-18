@@ -759,7 +759,7 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 	if (length(m_Core.m_Vel) > 32.0f)
 		m_Core.m_Vel = normalize(m_Core.m_Vel) * 32.0f;
 
-	if(GS()->IsDungeon() && !pFrom->IsBot() && !m_pPlayer->IsBot())
+	if((GS()->IsDungeon() || GS()->IsAllowedPVP()) && !pFrom->IsBot() && !m_pPlayer->IsBot())
 		return false;
 
 	if(m_Health > m_pPlayer->GetStartHealth())

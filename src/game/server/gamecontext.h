@@ -307,13 +307,16 @@ public:
 	bool IsDungeon() const { return (m_DungeonID > 0); }
 	int IncreaseCountRaid(int IncreaseCount) const;
 	bool IsClientEqualWorldID(int ClientID, int WorldID = -1) const;
+	bool IsAllowedPVP() const { return m_AllowedPVP; }
 
 private:
 	int GetDungeonID() const;
+	void CheckZonePVP();
 
 	/* #########################################################################
-		FUNCTIONS PLAYER ITEMS 
+		FUNCTIONS PLAYER ITEMS
 	######################################################################### */
+	bool m_AllowedPVP;
 	int m_DayEnumType;
 	static int m_RaidExp;
 };
