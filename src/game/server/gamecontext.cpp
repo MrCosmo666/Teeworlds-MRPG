@@ -2514,14 +2514,15 @@ void CGS::SendDayInfo(int ClientID)
 	if(m_DayEnumType == DayType::NIGHTTYPE)
 	{
 		if(ClientID == -1) { m_RaidExp = 100+rand()%200; } // для всех значит глобально
-		Chat(ClientID, "Night, Mobs more aggressive!");
 		Chat(ClientID, "Raid, increase to experience [{INT}%]", &m_RaidExp);
+		Chat(ClientID, "Mobs more aggressive!");
+
 	}
 	else if(m_DayEnumType == DayType::MORNINGTYPE)
 	{
 		if(ClientID == -1) { m_RaidExp = 100; } // для всех значит глобально
-		Chat(ClientID, "Morning, Mobs not particularly aggressive!");
 		Chat(ClientID, "Raid, experience was downgraded to [100%]!");
+		Chat(ClientID, "Mobs not particularly aggressive!");
 	}
 }
 

@@ -911,9 +911,9 @@ void QuestBase::CreateQuestingItems(CPlayer *pPlayer, ContextBots::QuestBotInfo 
 		}
 
 		// создаем предметы
+		int Count = BotData.InterCount[0];
 		const int QuestID = BotData.QuestID;
 		const int ItemID = BotData.Interactive[0];
-		int Count = BotData.InterCount[0];
 		vec2 Pos = vec2(BotData.PositionX, BotData.PositionY);
 		for (int i = 0; i < Count * 2; i++)
 		{
