@@ -749,27 +749,20 @@ void CCharacter::Die(int Killer, int Weapon)
 bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 {
 	CPlayer *pFrom = GS()->m_apPlayers[From];
-	if(From >= 0 && pFrom)
-	{
-		// Нельзя бить с запретами
-		if(From != m_pPlayer->GetCID() && ((pFrom->GetCharacter() && pFrom->GetCharacter()->m_NoAllowDamage) || m_NoAllowDamage))
-			return false;
-	}
-	else if(From < 0 || !pFrom) 
+	if (From < 0 || From >= MAX_CLIENTS || !pFrom)
+		return false;
+
+	if(From != m_pPlayer->GetCID() && ((pFrom->GetCharacter() && pFrom->GetCharacter()->m_NoAllowDamage) || m_NoAllowDamage))
 		return false;
 
 	m_Core.m_Vel += Force;
 	if (length(m_Core.m_Vel) > 32.0f)
 		m_Core.m_Vel = normalize(m_Core.m_Vel) * 32.0f;
 
-	if(!pFrom->IsBot() && !m_pPlayer->IsBot())
-		return false;
 
-	// Если здоровье больше максимального тогда ставим максимальное
 	if(m_Health > m_pPlayer->GetStartHealth())
 		m_Health = m_pPlayer->GetStartHealth();
 
-	// Уменьшаем дамаг до минимума
 	if(From == m_pPlayer->GetCID())
 		Dmg = max(1, Dmg/2);
 
