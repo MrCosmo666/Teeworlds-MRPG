@@ -1004,7 +1004,7 @@ void CGS::OnTickLocalWorld()
 	if(m_DayEnumType != Server()->GetEnumTypeDay())
 	{
 		int Hour = Server()->GetHourWorld();
-		Chat(-1, "{STR} came! Good {STR}! Time {INT}:00", Server()->GetStringTypeDay(), Server()->GetStringTypeDay(), &Hour);
+		Chat(-1, "{STR} came! Good {STR}!", Server()->GetStringTypeDay(), Server()->GetStringTypeDay());
 
 		m_DayEnumType = Server()->GetEnumTypeDay();
 		if (m_DayEnumType == DayType::NIGHTTYPE)

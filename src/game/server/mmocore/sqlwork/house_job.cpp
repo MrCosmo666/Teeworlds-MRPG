@@ -12,51 +12,52 @@ std::map < int , HouseJob::HouseList > HouseJob::Home;
 // Инициализация класса
 void HouseJob::OnInitLocal(const char *pLocal) 
 { 
-	{ // загрузка домов
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_houses", pLocal));
-		while(RES->next())
-		{
-			int HID = RES->getInt("ID");
-
-			// двери
-			Home[HID].m_DoorX = RES->getInt("DoorX");
-			Home[HID].m_DoorY = RES->getInt("DoorY");
-			if(!Home[HID].m_Door) { Home[HID].m_Door = 0; }
-
-			// дом информация
-			Home[HID].m_PosX = RES->getInt("PosX");
-			Home[HID].m_PosY = RES->getInt("PosY");
-			Home[HID].m_OwnerID = RES->getInt("OwnerID");
-			Home[HID].m_Price = RES->getInt("Price");
-			Home[HID].m_Bank = RES->getInt("HouseBank");
-			Home[HID].m_Farm = RES->getInt("Farm");
-			Home[HID].m_FarmLevel = RES->getInt("FarmLevel");
-			Home[HID].m_WorldID = RES->getInt("WorldID");
-			str_copy(Home[HID].m_Class, RES->getString("Class").c_str(), sizeof(Home[HID].m_Class));
-
-			// плантации
-			Home[HID].m_PlantID = RES->getInt("PlantID");
-			Home[HID].m_PlantPosX = RES->getInt("PlantX");
-			Home[HID].m_PlantPosY = RES->getInt("PlantY");
-
-			// создаем дверь если ее нету
-			if(GS()->GetWorldID() == Home[HID].m_WorldID && Home[HID].m_OwnerID > 0 && !Home[HID].m_Door)
-				Home[HID].m_Door = new HouseDoor(&GS()->m_World, vec2(Home[HID].m_DoorX, Home[HID].m_DoorY));
-		}
-		Job()->ShowLoadingProgress("Houses", Home.size());	
-	}
-	
-	// пропускаем загрузку если там есть элементы
-	if(m_decorations.size() > 0) return;
-
-	// загрузка декораций		
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_houses_decorations", "WHERE WorldID = '%d'", GS()->GetWorldID()));
+	// загрузка домов
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_houses", pLocal));
 	while(RES->next())
 	{
-		const int DID = RES->getInt("ID");
-		m_decorations[DID] = new DecoHouse(&GS()->m_World, vec2(RES->getInt("X"), 
-									RES->getInt("Y")), RES->getInt("HouseID"), RES->getInt("DecoID"));
+		int HID = RES->getInt("ID");
+
+		// двери
+		Home[HID].m_DoorX = RES->getInt("DoorX");
+		Home[HID].m_DoorY = RES->getInt("DoorY");
+		if(!Home[HID].m_Door) { Home[HID].m_Door = 0; }
+
+		// дом информация
+		Home[HID].m_PosX = RES->getInt("PosX");
+		Home[HID].m_PosY = RES->getInt("PosY");
+		Home[HID].m_OwnerID = RES->getInt("OwnerID");
+		Home[HID].m_Price = RES->getInt("Price");
+		Home[HID].m_Bank = RES->getInt("HouseBank");
+		Home[HID].m_Farm = RES->getInt("Farm");
+		Home[HID].m_FarmLevel = RES->getInt("FarmLevel");
+		Home[HID].m_WorldID = RES->getInt("WorldID");
+		str_copy(Home[HID].m_Class, RES->getString("Class").c_str(), sizeof(Home[HID].m_Class));
+
+		// плантации
+		Home[HID].m_PlantID = RES->getInt("PlantID");
+		Home[HID].m_PlantPosX = RES->getInt("PlantX");
+		Home[HID].m_PlantPosY = RES->getInt("PlantY");
+
+		// создаем дверь если ее нету
+		if(GS()->GetWorldID() == Home[HID].m_WorldID && Home[HID].m_OwnerID > 0 && !Home[HID].m_Door)
+			Home[HID].m_Door = new HouseDoor(&GS()->m_World, vec2(Home[HID].m_DoorX, Home[HID].m_DoorY));
 	}
+
+	// загружаем декорации
+	if (m_DecorationHouse.size() <= 0)
+	{
+		boost::scoped_ptr<ResultSet> DecoLoadingRES(SJK.SD("*", "tw_houses_decorations", pLocal));
+		while (DecoLoadingRES->next())
+		{
+			const int DID = DecoLoadingRES->getInt("ID");
+			m_DecorationHouse[DID] = new DecoHouse(&GS()->m_World, vec2(DecoLoadingRES->getInt("X"),
+				DecoLoadingRES->getInt("Y")), DecoLoadingRES->getInt("HouseID"), DecoLoadingRES->getInt("DecoID"));
+		}
+	}
+
+	Job()->ShowLoadingProgress("Houses", Home.size());
+	Job()->ShowLoadingProgress("Houses Decorations", m_DecorationHouse.size());
 }
 
 void HouseJob::OnPaymentTime()
@@ -133,20 +134,20 @@ bool HouseJob::AddDecorationHouse(int DecoID, int HouseID, vec2 Position)
 	SJK.ID("tw_houses_decorations", "(ID, DecoID, HouseID, X, Y, WorldID) VALUES ('%d', '%d', '%d', '%d', '%d', '%d')", 
 		InitID, DecoID, HouseID, (int)Position.x, (int)Position.y, GS()->GetWorldID());
 
-	m_decorations[InitID] = new DecoHouse(&GS()->m_World, Position, HouseID, DecoID);
+	m_DecorationHouse[InitID] = new DecoHouse(&GS()->m_World, Position, HouseID, DecoID);
 	return true;
 }
 // Удалить декорацию
 bool HouseJob::DeleteDecorationHouse(int ID)
 {
-	if(m_decorations.find(ID) != m_decorations.end())
+	if(m_DecorationHouse.find(ID) != m_DecorationHouse.end())
 	{
-		if(m_decorations.at(ID))
+		if(m_DecorationHouse.at(ID))
 		{
-			delete m_decorations.at(ID);
-			m_decorations.at(ID) = 0;
+			delete m_DecorationHouse.at(ID);
+			m_DecorationHouse.at(ID) = 0;
 		}
-		m_decorations.erase(ID);
+		m_DecorationHouse.erase(ID);
 		SJK.DD("tw_houses_decorations", "WHERE ID = '%d'", ID);
 		return true;
 	}
@@ -157,7 +158,7 @@ void HouseJob::ShowDecorationList(CPlayer *pPlayer)
 {
 	int HouseID = PlayerHouseID(pPlayer);
 	int ClientID = pPlayer->GetCID();
-	for (auto deco = m_decorations.begin(); deco != m_decorations.end(); deco++)  
+	for (auto deco = m_DecorationHouse.begin(); deco != m_DecorationHouse.end(); deco++)
 	{
 		if(deco->second && deco->second->m_HouseID == HouseID) 
 		{

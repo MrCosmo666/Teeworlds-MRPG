@@ -19,21 +19,17 @@ void GuildJob::OnInitLocal(const char *pLocal)
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_houses", pLocal));
 	while(RES->next())
 	{
-		// позиции дома
 		int MHID = RES->getInt("ID");
 		HouseGuild[MHID].m_DoorX = RES->getInt("DoorX");
 		HouseGuild[MHID].m_DoorY = RES->getInt("DoorY");	
 		if(!HouseGuild[MHID].m_Door) { HouseGuild[MHID].m_Door = 0; }
 
-		// информация дома
 		HouseGuild[MHID].m_GuildID = RES->getInt("OwnerMID");
 		HouseGuild[MHID].m_PosX = RES->getInt("PosX");
 		HouseGuild[MHID].m_PosY = RES->getInt("PosY");
 		HouseGuild[MHID].m_Price = RES->getInt("Price");
 		HouseGuild[MHID].m_Payment = RES->getInt("Payment");
 		HouseGuild[MHID].m_WorldID = RES->getInt("WorldID");
-
-		// текст позиции
 		HouseGuild[MHID].m_TextX = RES->getInt("TextX");
 		HouseGuild[MHID].m_TextY = RES->getInt("TextY");
 
@@ -43,18 +39,18 @@ void GuildJob::OnInitLocal(const char *pLocal)
 	}
 
 	// пропускаем загрузку если там есть элементы
-	if (m_decorations.size() > 0) return;
-
-	// загрузка декораций		
-	boost::scoped_ptr<ResultSet> DECOLOADING(SJK.SD("*", "tw_guilds_decorations", "WHERE WorldID = '%d'", GS()->GetWorldID()));
-	while (DECOLOADING->next())
+	if (m_DecorationHouse.size() <= 0)
 	{
-		const int DID = DECOLOADING->getInt("ID");
-		m_decorations[DID] = new DecoHouse(&GS()->m_World, vec2(DECOLOADING->getInt("X"),
-			DECOLOADING->getInt("Y")), DECOLOADING->getInt("HouseID"), DECOLOADING->getInt("DecoID"));
+		boost::scoped_ptr<ResultSet> DecoLoadingRES(SJK.SD("*", "tw_guilds_decorations", pLocal));
+		while (DecoLoadingRES->next())
+		{
+			const int DID = DecoLoadingRES->getInt("ID");
+			m_DecorationHouse[DID] = new DecoHouse(&GS()->m_World, vec2(DecoLoadingRES->getInt("X"),
+				DecoLoadingRES->getInt("Y")), DecoLoadingRES->getInt("HouseID"), DecoLoadingRES->getInt("DecoID"));
+		}
 	}
-
 	Job()->ShowLoadingProgress("Guilds Houses", HouseGuild.size());
+	Job()->ShowLoadingProgress("Guilds Houses Decorations", m_DecorationHouse.size());
 }
 
 void GuildJob::OnInitGlobal()
@@ -214,20 +210,20 @@ bool GuildJob::AddDecorationHouse(int DecoID, int GuildID, vec2 Position)
 	SJK.ID("tw_guilds_decorations", "(ID, DecoID, HouseID, X, Y, WorldID) VALUES ('%d', '%d', '%d', '%d', '%d', '%d')",
 		InitID, DecoID, HouseID, (int)Position.x, (int)Position.y, GS()->GetWorldID());
 
-	m_decorations[InitID] = new DecoHouse(&GS()->m_World, Position, HouseID, DecoID);
+	m_DecorationHouse[InitID] = new DecoHouse(&GS()->m_World, Position, HouseID, DecoID);
 	return true;
 }
 // Удалить декорацию
 bool GuildJob::DeleteDecorationHouse(int ID)
 {
-	if (m_decorations.find(ID) != m_decorations.end())
+	if (m_DecorationHouse.find(ID) != m_DecorationHouse.end())
 	{
-		if (m_decorations.at(ID))
+		if (m_DecorationHouse.at(ID))
 		{
-			delete m_decorations.at(ID);
-			m_decorations.at(ID) = 0;
+			delete m_DecorationHouse.at(ID);
+			m_DecorationHouse.at(ID) = 0;
 		}
-		m_decorations.erase(ID);
+		m_DecorationHouse.erase(ID);
 		SJK.DD("tw_guilds_decorations", "WHERE ID = '%d'", ID);
 		return true;
 	}
@@ -240,7 +236,7 @@ void GuildJob::ShowDecorationList(CPlayer* pPlayer)
 	int GuildID = pPlayer->Acc().GuildID;
 	int HouseID = GetGuildHouseID(GuildID);
 
-	for (auto deco = m_decorations.begin(); deco != m_decorations.end(); deco++)
+	for (auto deco = m_DecorationHouse.begin(); deco != m_DecorationHouse.end(); deco++)
 	{
 		if (deco->second && deco->second->m_HouseID == HouseID)
 		{

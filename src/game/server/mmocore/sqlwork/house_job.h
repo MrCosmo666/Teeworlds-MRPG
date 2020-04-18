@@ -35,7 +35,7 @@ class HouseJob : public CMmoComponent
 	typedef std::map < int , HouseList > HouseType;
 	static HouseType Home;
 
-	std::map < int , DecoHouse * > m_decorations;
+	std::map < int , DecoHouse * > m_DecorationHouse;
 public:
 	virtual void OnInitLocal(const char *pLocal);
 	virtual void OnPaymentTime();

@@ -54,7 +54,7 @@ class GuildJob : public CMmoComponent
 	typedef std::map < int , GuildStructRank > GuildRankType;
 	static GuildRankType RankGuild;
 
-	std::map < int, DecoHouse* > m_decorations;
+	std::map < int, DecoHouse* > m_DecorationHouse;
 
 /* #########################################################################
 	LOADING MEMBER 
