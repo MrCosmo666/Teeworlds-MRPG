@@ -456,7 +456,7 @@ void QuestBase::CheckQuest(CPlayer *pPlayer)
 }
 
 // Показать разговор информацию как motd
-void QuestBase::ShowQuestInformation(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData, const char* TextTalk)
+void QuestBase::ShowQuestRequired(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData, const char* TextTalk)
 {
 	if(!pPlayer || !pPlayer->GetCharacter() || !BotData.IsActive()) 
 		return;

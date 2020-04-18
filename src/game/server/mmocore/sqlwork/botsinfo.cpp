@@ -235,7 +235,6 @@ void ContextBots::ProcessingTalkingNPC(int OwnID, int TalkingID, bool PlayerTalk
 {
 	if(GS()->CheckClient(OwnID))
 	{
-		dbg_msg("test", "%d", PlayerTalked);
 		GS()->SendTalkText(OwnID, TalkingID, PlayerTalked, Message, Style, TalkingEmote);
 		return;
 	}
@@ -304,7 +303,7 @@ bool ContextBots::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int
 	return true;
 }
 
-void ContextBots::TalkingQuestBotTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
+void ContextBots::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 {
 	int ClientID = pPlayer->GetCID();
 	if (!IsQuestBotValid(MobID) || Progress >= QuestBot[MobID].m_Talk.size())
@@ -323,10 +322,10 @@ void ContextBots::TalkingQuestBotTaskInfo(CPlayer* pPlayer, int MobID, int Progr
 		str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + Progress, sizeTalking, pPlayer->FormatedTalkedText());
 		pPlayer->ClearFormatQuestText();
 
-		GS()->Mmo()->Quest()->ShowQuestInformation(pPlayer, ContextBots::QuestBot[MobID], reformTalkedText);
+		GS()->Mmo()->Quest()->ShowQuestRequired(pPlayer, ContextBots::QuestBot[MobID], reformTalkedText);
 		return;
 	}
 
 	// mmo clients
-	GS()->Mmo()->Quest()->ShowQuestInformation(pPlayer, ContextBots::QuestBot[MobID], "\0");
+	GS()->Mmo()->Quest()->ShowQuestRequired(pPlayer, ContextBots::QuestBot[MobID], "\0");
 }

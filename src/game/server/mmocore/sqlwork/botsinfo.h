@@ -113,7 +113,7 @@ public:
 
 	bool TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char *pText = "empty");
 	bool TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char* pText = "empty");
-	void TalkingQuestBotTaskInfo(CPlayer* pPlayer, int MobID, int Progress);
+	void ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress);
 
 	// ------------------ CHECK VALID DATA --------------------
 	// --------------------------------------------------------
