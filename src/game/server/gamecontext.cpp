@@ -2099,6 +2099,22 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		Mmo()->House()->ShowDecorationList(pPlayer);
 
 		AddBack(ClientID);	
+	}	
+	else if(MenuList == GUILDHOUSEDECORATION)
+	{
+		pPlayer->m_LastVoteMenu = HOUSEMENU;
+
+		AVH(ClientID, HDECORATION, vec3(35,80,40), "Decorations Information");
+		AVM(ClientID, "null", NOPE, HDECORATION, "Add: Select your item in list. Select (Add to house),");
+		AVM(ClientID, "null", NOPE, HDECORATION, "later press (ESC) and mouse select position");
+		AVM(ClientID, "null", NOPE, HDECORATION, "Return in inventory: Select down your decorations");
+		AVM(ClientID, "null", NOPE, HDECORATION, "and press (Back to inventory).");
+
+		Mmo()->Item()->ListInventory(pPlayer, ITEMDECORATION);
+		AV(ClientID, "null", "");
+
+		Mmo()->House()->ShowDecorationList(pPlayer);
+		AddBack(ClientID);	
 	}
 	else if(MenuList == HOUSEPLANTS) 
 	{

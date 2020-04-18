@@ -46,12 +46,12 @@ void GuildJob::OnInitLocal(const char *pLocal)
 	if (m_decorations.size() > 0) return;
 
 	// загрузка декораций		
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_decorations", "WHERE WorldID = '%d'", GS()->GetWorldID()));
-	while (RES->next())
+	boost::scoped_ptr<ResultSet> DECOLOADING(SJK.SD("*", "tw_guilds_decorations", "WHERE WorldID = '%d'", GS()->GetWorldID()));
+	while (DECOLOADING->next())
 	{
-		const int DID = RES->getInt("ID");
-		m_decorations[DID] = new DecoHouse(&GS()->m_World, vec2(RES->getInt("X"),
-			RES->getInt("Y")), RES->getInt("HouseID"), RES->getInt("DecoID"));
+		const int DID = DECOLOADING->getInt("ID");
+		m_decorations[DID] = new DecoHouse(&GS()->m_World, vec2(DECOLOADING->getInt("X"),
+			DECOLOADING->getInt("Y")), DECOLOADING->getInt("HouseID"), DECOLOADING->getInt("DecoID"));
 	}
 
 	Job()->ShowLoadingProgress("Guilds Houses", HouseGuild.size());
@@ -195,15 +195,16 @@ int GuildJob::ExpForLevel(int Level)
 	FUNCTIONS HOUSES DECORATION
 ######################################################################### */
 // добавить декорацию для дома
-bool GuildJob::AddDecorationHouse(int DecoID, int HouseID, vec2 Position)
+bool GuildJob::AddDecorationHouse(int DecoID, int GuildID, vec2 Position)
 {
-	if (HouseID <= 0)
+	if (Guild.find(GuildID) == Guild.end())
 		return false;
 
-	vec2 PositionHouse = GetPositionHouse(HouseID);
+	vec2 PositionHouse = GetPositionHouse(GuildID);
 	if (distance(PositionHouse, Position) > 600)
 		return false;
 
+	int HouseID = GetGuildHouseID(GuildID);
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_decorations", "WHERE HouseID = '%d'", HouseID));
 	if (RES->rowsCount() >= g_Config.m_SvLimitDecoration) return false;
 
@@ -235,16 +236,18 @@ bool GuildJob::DeleteDecorationHouse(int ID)
 // Показать меню декораций
 void GuildJob::ShowDecorationList(CPlayer* pPlayer)
 {
-	/*int HouseID = PlayerHouseID(pPlayer);
 	int ClientID = pPlayer->GetCID();
+	int GuildID = pPlayer->Acc().GuildID;
+	int HouseID = GetGuildHouseID(GuildID);
+
 	for (auto deco = m_decorations.begin(); deco != m_decorations.end(); deco++)
 	{
 		if (deco->second && deco->second->m_HouseID == HouseID)
 		{
-			GS()->AVD(ClientID, "DECODELETE", deco->first, deco->second->m_DecoID, 1, "{STR}:{INT} back to the inventory",
+			GS()->AVD(ClientID, "DECOGUILDDELETE", deco->first, deco->second->m_DecoID, 1, "{STR}:{INT} back to the inventory",
 				GS()->GetItemInfo(deco->second->m_DecoID).GetName(pPlayer), &deco->first);
 		}
-	}*/
+	}
 }
 
 /* #########################################################################
@@ -388,6 +391,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	// если имеется дом
 	if(MemberHouse > 0)
 	{
+		GS()->AVM(ClientID, "MENU", GUILDHOUSEDECORATION, NOPE, "Settings Decorations");
 		GS()->AVL(ClientID, "MDOOR", "Change state [\"{STR} door\"]", GetGuildDoor(GuildID) ? "Open" : "Close");
 		GS()->AVL(ClientID, "MSPAWN", "Teleport to guild house");
 		GS()->AVL(ClientID, "MHOUSESELL", "Sell your guild house (in reason 777)");
@@ -1316,6 +1320,28 @@ bool GuildJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 		ChangePlayerRank(VoteID, VoteID2);
 		GS()->ClearInteractiveSub(ClientID);
 		GS()->VResetVotes(ClientID, MEMBERMENU);
+		return true;
+	}
+
+	// декорации
+	if (PPSTR(CMD, "DECOGUILDDELETE") == 0)
+	{
+		// дом проверка
+		int GuildID = pPlayer->Acc().GuildID;
+		int HouseID = GetGuildHouseID(GuildID);
+		if (HouseID < 0)
+		{
+			GS()->Chat(ClientID, "You not owner home!");
+			return true;
+		}
+
+		if (DeleteDecorationHouse(VoteID))
+		{
+			ItemSql::ItemPlayer& PlDecoItem = pPlayer->GetItem(VoteID2);
+			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
+			PlDecoItem.Add(1);
+		}
+		GS()->VResetVotes(ClientID, GUILDHOUSEDECORATION);
 		return true;
 	}
 	return false;

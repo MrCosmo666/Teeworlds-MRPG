@@ -93,7 +93,7 @@ public:
 /* #########################################################################
 	FUNCTIONS HOUSES DECORATION
 ######################################################################### */
-	bool AddDecorationHouse(int DecoID, int OwnerID, vec2 Position);
+	bool AddDecorationHouse(int DecoID, int GuildID, vec2 Position);
 	bool DeleteDecorationHouse(int ID);
 	void ShowDecorationList(CPlayer* pPlayer);
 

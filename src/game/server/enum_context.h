@@ -109,6 +109,7 @@ enum
 	CRAFTING,								// крафт меню
 	HOUSEMENU,								// дома меню
 	HOUSEDECORATION,						// дома декорации меню
+	GUILDHOUSEDECORATION,						// дома декорации гильдии меню
 	HOUSEPLANTS,							// дома огород меню
 	ADVENTUREJOURNAL,						// журнал квестов меню
 	FINISHQUESTMENU,						// журнал завершенные квесты меню
