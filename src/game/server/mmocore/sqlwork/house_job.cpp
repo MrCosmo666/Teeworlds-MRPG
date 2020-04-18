@@ -337,24 +337,19 @@ void HouseJob::SellToHouse(int SellerID, int BuyightID, int Price)
 // Продажа дома
 void HouseJob::SellHouse(int HouseID)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("OwnerID, Function", "tw_houses", "WHERE ID = '%d'", HouseID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("OwnerID", "tw_houses", "WHERE ID = '%d'", HouseID));
 	if(RES->next())
 	{
 		int OwnerID = RES->getInt("OwnerID");
-		int Function = RES->getInt("Function");
-		int ClientID = Job()->Account()->CheckOnlineAccount(OwnerID); 
-
-		if(Function == FUNCTIONHOUSE)
-		{                                          
-			if(ClientID >= 0)
-			{
-				GS()->ChatFollow(ClientID, "Your House is sold !");
-				GS()->Chat(-1, "House: {INT} have been is released!", &HouseID);
-				GS()->ChatDiscord(false, DC_SERVER_INFO, "Server information", "**[House: {INT}] have been sold!**", &HouseID);
-			}
-			int Price = Home[HouseID].m_Price;
-			Job()->Inbox()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itMoney, Price, 0);
+		int ClientID = Job()->Account()->CheckOnlineAccount(OwnerID);                    
+		if(ClientID >= 0)
+		{
+			GS()->ChatFollow(ClientID, "Your House is sold !");
+			GS()->Chat(-1, "House: {INT} have been is released!", &HouseID);
+			GS()->ChatDiscord(false, DC_SERVER_INFO, "Server information", "**[House: {INT}] have been sold!**", &HouseID);
 		}
+		int Price = Home[HouseID].m_Price;
+		Job()->Inbox()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itMoney, Price, 0);
 
 		// удалить двери если есть и очистить инфу
 		if(Home[HouseID].m_Door)

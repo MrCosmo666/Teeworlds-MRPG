@@ -1,11 +1,6 @@
 #include <base/detect.h>
 #include "SDL.h"
 #include "SDL_opengl.h"
-#if defined(CONF_PLATFORM_MACOSX)
-#include "OpenGL/glu.h"
-#else
-#include "GL/glu.h"
-#endif
 
 #include <base/tl/threading.h>
 
@@ -58,7 +53,7 @@ void CGraphicsBackend_Threaded::StartProcessor(ICommandProcessor* pProcessor)
 {
 	m_Shutdown = false;
 	m_pProcessor = pProcessor;
-	m_pThread = thread_init(ThreadFunc, this, "Basket SDL");
+	m_pThread = thread_init(ThreadFunc, this, "GRAPHICS");
 	m_BufferDone.signal();
 }
 
@@ -91,17 +86,17 @@ void CGraphicsBackend_Threaded::WaitForIdle()
 
 // ------------ CCommandProcessorFragment_General
 
-void CCommandProcessorFragment_General::Cmd_Signal(const CCommandBuffer::SCommand_Signal* pCommand)
+void CCommandProcessorFragment_General::Cmd_Signal(const CCommandBuffer::CSignalCommand* pCommand)
 {
 	pCommand->m_pSemaphore->signal();
 }
 
-bool CCommandProcessorFragment_General::RunCommand(const CCommandBuffer::SCommand* pBaseCommand)
+bool CCommandProcessorFragment_General::RunCommand(const CCommandBuffer::CCommand* pBaseCommand)
 {
 	switch (pBaseCommand->m_Cmd)
 	{
 	case CCommandBuffer::CMD_NOP: break;
-	case CCommandBuffer::CMD_SIGNAL: Cmd_Signal(static_cast<const CCommandBuffer::SCommand_Signal*>(pBaseCommand)); break;
+	case CCommandBuffer::CMD_SIGNAL: Cmd_Signal(static_cast<const CCommandBuffer::CSignalCommand*>(pBaseCommand)); break;
 	default: return false;
 	}
 
@@ -153,7 +148,7 @@ void* CCommandProcessorFragment_OpenGL::Rescale(int Width, int Height, int NewWi
 	return pTmpData;
 }
 
-void CCommandProcessorFragment_OpenGL::SetState(const CCommandBuffer::SState& State)
+void CCommandProcessorFragment_OpenGL::SetState(const CCommandBuffer::CState& State)
 {
 	// clip
 	if (State.m_ClipEnable)
@@ -249,7 +244,7 @@ void CCommandProcessorFragment_OpenGL::SetState(const CCommandBuffer::SState& St
 	glOrtho(State.m_ScreenTL.x, State.m_ScreenBR.x, State.m_ScreenBR.y, State.m_ScreenTL.y, -1.0f, 1.0f);
 }
 
-void CCommandProcessorFragment_OpenGL::Cmd_Init(const SCommand_Init* pCommand)
+void CCommandProcessorFragment_OpenGL::Cmd_Init(const CInitCommand* pCommand)
 {
 	m_pTextureMemoryUsage = pCommand->m_pTextureMemoryUsage;
 	*m_pTextureMemoryUsage = 0;
@@ -262,7 +257,7 @@ void CCommandProcessorFragment_OpenGL::Cmd_Init(const SCommand_Init* pCommand)
 	*pCommand->m_pTextureArraySize = m_TextureArraySize;
 }
 
-void CCommandProcessorFragment_OpenGL::Cmd_Texture_Update(const CCommandBuffer::SCommand_Texture_Update* pCommand)
+void CCommandProcessorFragment_OpenGL::Cmd_Texture_Update(const CCommandBuffer::CTextureUpdateCommand* pCommand)
 {
 	if (m_aTextures[pCommand->m_Slot].m_State & CTexture::STATE_TEX2D)
 	{
@@ -273,7 +268,7 @@ void CCommandProcessorFragment_OpenGL::Cmd_Texture_Update(const CCommandBuffer::
 	mem_free(pCommand->m_pData);
 }
 
-void CCommandProcessorFragment_OpenGL::Cmd_Texture_Destroy(const CCommandBuffer::SCommand_Texture_Destroy* pCommand)
+void CCommandProcessorFragment_OpenGL::Cmd_Texture_Destroy(const CCommandBuffer::CTextureDestroyCommand* pCommand)
 {
 	if (m_aTextures[pCommand->m_Slot].m_State & CTexture::STATE_TEX2D)
 		glDeleteTextures(1, &m_aTextures[pCommand->m_Slot].m_Tex2D);
@@ -284,7 +279,7 @@ void CCommandProcessorFragment_OpenGL::Cmd_Texture_Destroy(const CCommandBuffer:
 	m_aTextures[pCommand->m_Slot].m_MemSize = 0;
 }
 
-void CCommandProcessorFragment_OpenGL::Cmd_Texture_Create(const CCommandBuffer::SCommand_Texture_Create* pCommand)
+void CCommandProcessorFragment_OpenGL::Cmd_Texture_Create(const CCommandBuffer::CTextureCreateCommand* pCommand)
 {
 	int Width = pCommand->m_Width;
 	int Height = pCommand->m_Height;
@@ -374,7 +369,8 @@ void CCommandProcessorFragment_OpenGL::Cmd_Texture_Create(const CCommandBuffer::
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 			else
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
-			gluBuild2DMipmaps(GL_TEXTURE_2D, StoreOglformat, Width, Height, Oglformat, GL_UNSIGNED_BYTE, pTexData);
+			glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+			glTexImage2D(GL_TEXTURE_2D, 0, StoreOglformat, Width, Height, 0, Oglformat, GL_UNSIGNED_BYTE, pTexData);
 		}
 
 		// calculate memory usage
@@ -439,19 +435,19 @@ void CCommandProcessorFragment_OpenGL::Cmd_Texture_Create(const CCommandBuffer::
 	mem_free(pTexData);
 }
 
-void CCommandProcessorFragment_OpenGL::Cmd_Clear(const CCommandBuffer::SCommand_Clear* pCommand)
+void CCommandProcessorFragment_OpenGL::Cmd_Clear(const CCommandBuffer::CClearCommand* pCommand)
 {
 	glClearColor(pCommand->m_Color.r, pCommand->m_Color.g, pCommand->m_Color.b, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void CCommandProcessorFragment_OpenGL::Cmd_Render(const CCommandBuffer::SCommand_Render* pCommand)
+void CCommandProcessorFragment_OpenGL::Cmd_Render(const CCommandBuffer::CRenderCommand* pCommand)
 {
 	SetState(pCommand->m_State);
 
-	glVertexPointer(2, GL_FLOAT, sizeof(CCommandBuffer::SVertex), (char*)pCommand->m_pVertices);
-	glTexCoordPointer(3, GL_FLOAT, sizeof(CCommandBuffer::SVertex), (char*)pCommand->m_pVertices + sizeof(float) * 2);
-	glColorPointer(4, GL_FLOAT, sizeof(CCommandBuffer::SVertex), (char*)pCommand->m_pVertices + sizeof(float) * 5);
+	glVertexPointer(2, GL_FLOAT, sizeof(CCommandBuffer::CVertex), (char*)pCommand->m_pVertices);
+	glTexCoordPointer(3, GL_FLOAT, sizeof(CCommandBuffer::CVertex), (char*)pCommand->m_pVertices + sizeof(float) * 2);
+	glColorPointer(4, GL_FLOAT, sizeof(CCommandBuffer::CVertex), (char*)pCommand->m_pVertices + sizeof(float) * 5);
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 	glEnableClientState(GL_COLOR_ARRAY);
@@ -469,7 +465,7 @@ void CCommandProcessorFragment_OpenGL::Cmd_Render(const CCommandBuffer::SCommand
 	};
 }
 
-void CCommandProcessorFragment_OpenGL::Cmd_Screenshot(const CCommandBuffer::SCommand_Screenshot* pCommand)
+void CCommandProcessorFragment_OpenGL::Cmd_Screenshot(const CCommandBuffer::CScreenshotCommand* pCommand)
 {
 	// fetch image data
 	GLint aViewport[4] = { 0,0,0,0 };
@@ -512,17 +508,17 @@ CCommandProcessorFragment_OpenGL::CCommandProcessorFragment_OpenGL()
 	m_pTextureMemoryUsage = 0;
 }
 
-bool CCommandProcessorFragment_OpenGL::RunCommand(const CCommandBuffer::SCommand* pBaseCommand)
+bool CCommandProcessorFragment_OpenGL::RunCommand(const CCommandBuffer::CCommand* pBaseCommand)
 {
 	switch (pBaseCommand->m_Cmd)
 	{
-	case CMD_INIT: Cmd_Init(static_cast<const SCommand_Init*>(pBaseCommand)); break;
-	case CCommandBuffer::CMD_TEXTURE_CREATE: Cmd_Texture_Create(static_cast<const CCommandBuffer::SCommand_Texture_Create*>(pBaseCommand)); break;
-	case CCommandBuffer::CMD_TEXTURE_DESTROY: Cmd_Texture_Destroy(static_cast<const CCommandBuffer::SCommand_Texture_Destroy*>(pBaseCommand)); break;
-	case CCommandBuffer::CMD_TEXTURE_UPDATE: Cmd_Texture_Update(static_cast<const CCommandBuffer::SCommand_Texture_Update*>(pBaseCommand)); break;
-	case CCommandBuffer::CMD_CLEAR: Cmd_Clear(static_cast<const CCommandBuffer::SCommand_Clear*>(pBaseCommand)); break;
-	case CCommandBuffer::CMD_RENDER: Cmd_Render(static_cast<const CCommandBuffer::SCommand_Render*>(pBaseCommand)); break;
-	case CCommandBuffer::CMD_SCREENSHOT: Cmd_Screenshot(static_cast<const CCommandBuffer::SCommand_Screenshot*>(pBaseCommand)); break;
+	case CMD_INIT: Cmd_Init(static_cast<const CInitCommand*>(pBaseCommand)); break;
+	case CCommandBuffer::CMD_TEXTURE_CREATE: Cmd_Texture_Create(static_cast<const CCommandBuffer::CTextureCreateCommand*>(pBaseCommand)); break;
+	case CCommandBuffer::CMD_TEXTURE_DESTROY: Cmd_Texture_Destroy(static_cast<const CCommandBuffer::CTextureDestroyCommand*>(pBaseCommand)); break;
+	case CCommandBuffer::CMD_TEXTURE_UPDATE: Cmd_Texture_Update(static_cast<const CCommandBuffer::CTextureUpdateCommand*>(pBaseCommand)); break;
+	case CCommandBuffer::CMD_CLEAR: Cmd_Clear(static_cast<const CCommandBuffer::CClearCommand*>(pBaseCommand)); break;
+	case CCommandBuffer::CMD_RENDER: Cmd_Render(static_cast<const CCommandBuffer::CRenderCommand*>(pBaseCommand)); break;
+	case CCommandBuffer::CMD_SCREENSHOT: Cmd_Screenshot(static_cast<const CCommandBuffer::CScreenshotCommand*>(pBaseCommand)); break;
 	default: return false;
 	}
 
@@ -532,7 +528,7 @@ bool CCommandProcessorFragment_OpenGL::RunCommand(const CCommandBuffer::SCommand
 
 // ------------ CCommandProcessorFragment_SDL
 
-void CCommandProcessorFragment_SDL::Cmd_Init(const SCommand_Init* pCommand)
+void CCommandProcessorFragment_SDL::Cmd_Init(const CInitCommand* pCommand)
 {
 	m_GLContext = pCommand->m_GLContext;
 	m_pWindow = pCommand->m_pWindow;
@@ -550,12 +546,12 @@ void CCommandProcessorFragment_SDL::Cmd_Init(const SCommand_Init* pCommand)
 	glDepthMask(0);
 }
 
-void CCommandProcessorFragment_SDL::Cmd_Shutdown(const SCommand_Shutdown* pCommand)
+void CCommandProcessorFragment_SDL::Cmd_Shutdown(const CShutdownCommand* pCommand)
 {
 	SDL_GL_MakeCurrent(NULL, NULL);
 }
 
-void CCommandProcessorFragment_SDL::Cmd_Swap(const CCommandBuffer::SCommand_Swap* pCommand)
+void CCommandProcessorFragment_SDL::Cmd_Swap(const CCommandBuffer::CSwapCommand* pCommand)
 {
 	SDL_GL_SwapWindow(m_pWindow);
 
@@ -563,12 +559,12 @@ void CCommandProcessorFragment_SDL::Cmd_Swap(const CCommandBuffer::SCommand_Swap
 		glFinish();
 }
 
-void CCommandProcessorFragment_SDL::Cmd_VSync(const CCommandBuffer::SCommand_VSync* pCommand)
+void CCommandProcessorFragment_SDL::Cmd_VSync(const CCommandBuffer::CVSyncCommand* pCommand)
 {
 	*pCommand->m_pRetOk = SDL_GL_SetSwapInterval(pCommand->m_VSync) == 0;
 }
 
-void CCommandProcessorFragment_SDL::Cmd_VideoModes(const CCommandBuffer::SCommand_VideoModes* pCommand)
+void CCommandProcessorFragment_SDL::Cmd_VideoModes(const CCommandBuffer::CVideoModesCommand* pCommand)
 {
 	SDL_DisplayMode mode;
 	int maxModes = SDL_GetNumDisplayModes(pCommand->m_Screen),
@@ -608,15 +604,15 @@ CCommandProcessorFragment_SDL::CCommandProcessorFragment_SDL()
 {
 }
 
-bool CCommandProcessorFragment_SDL::RunCommand(const CCommandBuffer::SCommand* pBaseCommand)
+bool CCommandProcessorFragment_SDL::RunCommand(const CCommandBuffer::CCommand* pBaseCommand)
 {
 	switch (pBaseCommand->m_Cmd)
 	{
-	case CCommandBuffer::CMD_SWAP: Cmd_Swap(static_cast<const CCommandBuffer::SCommand_Swap*>(pBaseCommand)); break;
-	case CCommandBuffer::CMD_VSYNC: Cmd_VSync(static_cast<const CCommandBuffer::SCommand_VSync*>(pBaseCommand)); break;
-	case CCommandBuffer::CMD_VIDEOMODES: Cmd_VideoModes(static_cast<const CCommandBuffer::SCommand_VideoModes*>(pBaseCommand)); break;
-	case CMD_INIT: Cmd_Init(static_cast<const SCommand_Init*>(pBaseCommand)); break;
-	case CMD_SHUTDOWN: Cmd_Shutdown(static_cast<const SCommand_Shutdown*>(pBaseCommand)); break;
+	case CCommandBuffer::CMD_SWAP: Cmd_Swap(static_cast<const CCommandBuffer::CSwapCommand*>(pBaseCommand)); break;
+	case CCommandBuffer::CMD_VSYNC: Cmd_VSync(static_cast<const CCommandBuffer::CVSyncCommand*>(pBaseCommand)); break;
+	case CCommandBuffer::CMD_VIDEOMODES: Cmd_VideoModes(static_cast<const CCommandBuffer::CVideoModesCommand*>(pBaseCommand)); break;
+	case CMD_INIT: Cmd_Init(static_cast<const CInitCommand*>(pBaseCommand)); break;
+	case CMD_SHUTDOWN: Cmd_Shutdown(static_cast<const CShutdownCommand*>(pBaseCommand)); break;
 	default: return false;
 	}
 
@@ -630,7 +626,7 @@ void CCommandProcessor_SDL_OpenGL::RunBuffer(CCommandBuffer* pBuffer)
 	unsigned CmdIndex = 0;
 	while (1)
 	{
-		const CCommandBuffer::SCommand* pBaseCommand = pBuffer->GetCommand(&CmdIndex);
+		const CCommandBuffer::CCommand* pBaseCommand = pBuffer->GetCommand(&CmdIndex);
 		if (pBaseCommand == 0x0)
 			break;
 
@@ -649,7 +645,7 @@ void CCommandProcessor_SDL_OpenGL::RunBuffer(CCommandBuffer* pBuffer)
 
 // ------------ CGraphicsBackend_SDL_OpenGL
 
-int CGraphicsBackend_SDL_OpenGL::Init(const char* pName, int* Screen, int* pWindowWidth, int* pWindowHeight, int* pScreenWidth, int* pScreenHeight, int FsaaSamples, int Flags, int* pDesktopWidth, int* pDesktopHeight)
+int CGraphicsBackend_SDL_OpenGL::Init(const char* pName, int* pScreen, int* pWindowWidth, int* pWindowHeight, int* pScreenWidth, int* pScreenHeight, int FsaaSamples, int Flags, int* pDesktopWidth, int* pDesktopHeight)
 {
 	if (!SDL_WasInit(SDL_INIT_VIDEO))
 	{
@@ -665,13 +661,12 @@ int CGraphicsBackend_SDL_OpenGL::Init(const char* pName, int* Screen, int* pWind
 	m_NumScreens = SDL_GetNumVideoDisplays();
 	if (m_NumScreens > 0)
 	{
-		*Screen = clamp(*Screen, 0, m_NumScreens - 1);
-		if (SDL_GetDisplayBounds(*Screen, &ScreenPos) != 0)
+		*pScreen = clamp(*pScreen, 0, m_NumScreens - 1);
+		if (SDL_GetDisplayBounds(*pScreen, &ScreenPos) != 0)
 		{
 			dbg_msg("gfx", "unable to retrieve screen information: %s", SDL_GetError());
 			return -1;
 		}
-
 	}
 	else
 	{
@@ -680,7 +675,7 @@ int CGraphicsBackend_SDL_OpenGL::Init(const char* pName, int* Screen, int* pWind
 	}
 
 	// store desktop resolution for settings reset button
-	if (!GetDesktopResolution(*Screen, pDesktopWidth, pDesktopHeight))
+	if (!GetDesktopResolution(*pScreen, pDesktopWidth, pDesktopHeight))
 	{
 		dbg_msg("gfx", "unable to get desktop resolution: %s", SDL_GetError());
 		return -1;
@@ -781,11 +776,11 @@ int CGraphicsBackend_SDL_OpenGL::Init(const char* pName, int* Screen, int* pWind
 
 	// issue init commands for OpenGL and SDL
 	CCommandBuffer CmdBuffer(1024, 512);
-	CCommandProcessorFragment_SDL::SCommand_Init CmdSDL;
+	CCommandProcessorFragment_SDL::CInitCommand CmdSDL;
 	CmdSDL.m_pWindow = m_pWindow;
 	CmdSDL.m_GLContext = m_GLContext;
 	CmdBuffer.AddCommand(CmdSDL);
-	CCommandProcessorFragment_OpenGL::SCommand_Init CmdOpenGL;
+	CCommandProcessorFragment_OpenGL::CInitCommand CmdOpenGL;
 	CmdOpenGL.m_pTextureMemoryUsage = &m_TextureMemoryUsage;
 	CmdOpenGL.m_pTextureArraySize = &m_TextureArraySize;
 	CmdBuffer.AddCommand(CmdOpenGL);
@@ -800,7 +795,7 @@ int CGraphicsBackend_SDL_OpenGL::Shutdown()
 {
 	// issue a shutdown command
 	CCommandBuffer CmdBuffer(1024, 512);
-	CCommandProcessorFragment_SDL::SCommand_Shutdown Cmd;
+	CCommandProcessorFragment_SDL::CShutdownCommand Cmd;
 	CmdBuffer.AddCommand(Cmd);
 	RunBuffer(&CmdBuffer);
 	WaitForIdle();

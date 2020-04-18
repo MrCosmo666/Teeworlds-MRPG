@@ -209,10 +209,10 @@ void CServerBrowser::Update(bool ForceResort)
 	int64 Timeout = time_freq();
 	int64 Now = time_get();
 	int Count;
-	CServerEntry *pEntry, *pNext;
+	CServerEntry* pEntry, * pNext;
 
 	// do server list requests
-	if(m_NeedRefresh && !m_pMasterServer->IsRefreshing())
+	if (m_NeedRefresh && !m_pMasterServer->IsRefreshing())
 	{
 		CNetChunk Packet;
 
@@ -224,9 +224,9 @@ void CServerBrowser::Update(bool ForceResort)
 		Packet.m_DataSize = sizeof(SERVERBROWSE_GETLIST);
 		Packet.m_pData = SERVERBROWSE_GETLIST;
 
-		for(int i = 0; i < IMasterServer::MAX_MASTERSERVERS; i++)
+		for (int i = 0; i < IMasterServer::MAX_MASTERSERVERS; i++)
 		{
-			if(!m_pMasterServer->IsValid(i))
+			if (!m_pMasterServer->IsValid(i))
 				continue;
 
 			Packet.m_Address = m_pMasterServer->GetAddr(i);
@@ -235,30 +235,30 @@ void CServerBrowser::Update(bool ForceResort)
 
 		m_MasterRefreshTime = Now;
 
-		if(g_Config.m_Debug)
+		if (g_Config.m_Debug)
 			m_pConsole->Print(IConsole::OUTPUT_LEVEL_DEBUG, "client_srvbrowse", "requesting server list");
 	}
 
 	// load server list backup from file in case the masters don't response
-	if(m_MasterRefreshTime && m_MasterRefreshTime+2*Timeout < Now)
+	if (m_MasterRefreshTime && m_MasterRefreshTime + 2 * Timeout < Now)
 	{
 		LoadServerlist();
 		m_MasterRefreshTime = 0;
 
-		if(g_Config.m_Debug)
+		if (g_Config.m_Debug)
 			m_pConsole->Print(IConsole::OUTPUT_LEVEL_DEBUG, "client_srvbrowse", "using backup server list");
 	}
 
 	// do timeouts
 	pEntry = m_pFirstReqServer;
-	while(1)
+	while (1)
 	{
-		if(!pEntry) // no more entries
+		if (!pEntry) // no more entries
 			break;
 
 		pNext = pEntry->m_pNextReq;
 
-		if(pEntry->m_RequestTime && pEntry->m_RequestTime+Timeout < Now)
+		if (pEntry->m_RequestTime && pEntry->m_RequestTime + Timeout < Now)
 		{
 			// timeout
 			RemoveRequest(pEntry);
@@ -270,16 +270,16 @@ void CServerBrowser::Update(bool ForceResort)
 	// do timeouts
 	pEntry = m_pFirstReqServer;
 	Count = 0;
-	while(1)
+	while (1)
 	{
-		if(!pEntry) // no more entries
+		if (!pEntry) // no more entries
 			break;
 
 		// no more then 10 concurrent requests
-		if(Count == g_Config.m_BrMaxRequests)
+		if (Count == g_Config.m_BrMaxRequests)
 			break;
 
-		if(pEntry->m_RequestTime == 0)
+		if (pEntry->m_RequestTime == 0)
 			RequestImpl(pEntry->m_Addr, pEntry);
 
 		Count++;
@@ -287,16 +287,16 @@ void CServerBrowser::Update(bool ForceResort)
 	}
 
 	// update favorite
-	const NETADDR *pFavAddr = m_ServerBrowserFavorites.UpdateFavorites();
-	if(pFavAddr)
+	const NETADDR* pFavAddr = m_ServerBrowserFavorites.UpdateFavorites();
+	if (pFavAddr)
 	{
-		for(int i = 0; i < NUM_TYPES; ++i)
+		for (int i = 0; i < NUM_TYPES; ++i)
 		{
-			CServerEntry *pEntry = Find(i, *pFavAddr);
-			if(pEntry)
-				pEntry->m_Info.m_Favorite = 1;
+			CServerEntry* pEntry = Find(i, *pFavAddr);
+			if (pEntry)
+				pEntry->m_Info.m_Favorite = true;
 
-			if(i == m_ActServerlistType)
+			if (i == m_ActServerlistType)
 				ForceResort = true;
 		}
 	}

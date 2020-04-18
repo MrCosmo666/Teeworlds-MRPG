@@ -98,9 +98,6 @@ void CGraph::Add(float v, float r, float g, float b)
 
 void CGraph::Render(IGraphics *pGraphics, IGraphics::CTextureHandle FontTexture, float x, float y, float w, float h, const char *pDescription)
 {
-	//m_pGraphics->BlendNormal();
-
-
 	pGraphics->TextureClear();
 
 	pGraphics->QuadsBegin();
@@ -151,7 +148,6 @@ void CGraph::Render(IGraphics *pGraphics, IGraphics::CTextureHandle FontTexture,
 	pGraphics->QuadsEnd();
 }
 
-
 void CSmoothTime::Init(int64 Target)
 {
 	m_Snap = time_get();
@@ -176,17 +172,15 @@ int64 CSmoothTime::Get(int64 Now)
 	// we might need to adjust these abit
 
 	float AdjustSpeed = m_aAdjustSpeed[0];
-	if(t > c)
+	if (t > c)
 		AdjustSpeed = m_aAdjustSpeed[1];
 
-	float a = ((Now-m_Snap)/(float)time_freq()) * AdjustSpeed;
-	if(a > 1.0f)
+	float a = ((Now - m_Snap) / (float)time_freq()) * AdjustSpeed;
+	if (a > 1.0f)
 		a = 1.0f;
 
-	int64 r = c + (int64)((t-c)*a);
-
-	m_Graph.Add(a+0.5f,1,1,1);
-
+	int64 r = c + (int64)((t - c) * a);
+	m_Graph.Add(a + 0.5f, 1, 1, 1);
 	return r;
 }
 
@@ -2048,7 +2042,6 @@ void CClient::Run()
 			dbg_msg("client", "unable to init SDL base: %s", SDL_GetError());
 			return;
 		}
-
 		atexit(SDL_Quit); // ignore_convention
 	}
 
@@ -2716,16 +2709,6 @@ int main(int argc, const char **argv) // ignore_convention
 	}
 #endif
 
-	bool UseDefaultConfig = false;
-	for(int i = 1; i < argc; i++) // ignore_convention
-	{
-		if(str_comp("-d", argv[i]) == 0 || str_comp("--default", argv[i]) == 0) // ignore_convention
-		{
-			UseDefaultConfig = true;
-			break;
-		}
-	}
-
 	if(secure_random_init() != 0)
 	{
 		dbg_msg("secure", "could not initialize secure RNG");
@@ -2792,33 +2775,31 @@ int main(int argc, const char **argv) // ignore_convention
 
 	pKernel->RequestInterface<IGameClient>()->OnConsoleInit();
 
-	if(!UseDefaultConfig)
+	// execute config file
+	if (!pConsole->ExecuteFile(SETTINGS_FILENAME ".cfg"))
+		pConsole->ExecuteFile("settings.cfg"); // fallback to legacy naming scheme
+
+	// execute autoexec file
+	pConsole->ExecuteFile("autoexec.cfg");
+
+	// parse the command line arguments
+	if(argc > 1) // ignore_convention
 	{
-		// execute config file
-		if (!pConsole->ExecuteFile(SETTINGS_FILENAME ".cfg"))
-			pConsole->ExecuteFile("settings.cfg"); // fallback to legacy naming scheme
-
-		// execute autoexec file
-		pConsole->ExecuteFile("autoexec.cfg");
-
-		// parse the command line arguments
-		if(argc > 1) // ignore_convention
+		const char *pAddress = 0;
+		if(argc == 2)
 		{
-			const char *pAddress = 0;
-			if(argc == 2)
-			{
-				pAddress = str_startswith(argv[1], "teeworlds:");
-			}
-			if(pAddress)
-			{
-				pClient->ConnectOnStart(pAddress);
-			}
-			else
-			{
-				pConsole->ParseArguments(argc - 1, &argv[1]);
-			}
+			pAddress = str_startswith(argv[1], "teeworlds:");
+		}
+		if(pAddress)
+		{
+			pClient->ConnectOnStart(pAddress);
+		}
+		else
+		{
+			pConsole->ParseArguments(argc - 1, &argv[1]);
 		}
 	}
+
 #if defined(CONF_FAMILY_WINDOWS)
 	bool HideConsole = false;
 	#ifdef CONF_RELEASE
