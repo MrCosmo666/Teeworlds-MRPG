@@ -577,7 +577,7 @@ void CRenderTools::RenderTee(CAnimState* pAnim, const CTeeRenderInfo* pInfo, int
 			}
 			else
 			{
-				bool Indicate = !pInfo->m_GotAirJump && g_Config.m_ClAirjumpindicator;
+				bool Indicate = !pInfo->m_GotAirJump;
 				float cs = 1.0f; // color scale
 				if(Indicate)
 					cs = 0.5f;
