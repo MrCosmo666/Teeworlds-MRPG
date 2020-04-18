@@ -95,7 +95,7 @@ int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Pa
 			return SendAuthCode(ClientID, AUTH_LOGIN_WRONG);
 		}
 
-		// проверить онлайн ли игрок
+		// проверить онлайн ли игрок 
 		if (CheckOnlineAccount(UserID) >= 0)
 		{
 			GS()->Chat(ClientID, "The account is already in the game!");
