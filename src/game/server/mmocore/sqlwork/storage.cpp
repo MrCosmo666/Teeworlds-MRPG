@@ -451,7 +451,7 @@ bool StorageSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int 
 	// починка предметов
 	if(PPSTR(CMD, "REPAIRITEMS") == 0)
 	{
-		Job()->Item()->RepairDurability(pPlayer);
+		Job()->Item()->RepairDurabilityFull(pPlayer);
 		GS()->Chat(ClientID, "You repaired all your items.");
 		return true;
 	}

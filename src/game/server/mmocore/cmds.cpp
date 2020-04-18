@@ -344,7 +344,7 @@ int CCmd::PlayerHouseID(CGS *GS, CPlayer *pPlayer) const
 
 void CCmd::UseItems(CGS *GS, int ClientID, int ItemID, int Count)
 {
-	GS->Mmo()->Item()->UsedItems(ClientID, ItemID, Count);
+	GS->Mmo()->Item()->UseItem(ClientID, ItemID, Count);
 }
 
 bool CCmd::UseSkill(CGS *GS, CPlayer *pPlayer, int SkillID) const

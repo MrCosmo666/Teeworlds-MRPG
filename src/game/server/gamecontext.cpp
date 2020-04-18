@@ -1950,29 +1950,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		}
 		else if (pChar->GetHelper()->BoolIndex(TILE_LEARNSKILL))
 			Mmo()->Skills()->ShowMailSkillList(pPlayer);
-	}  
-	else if(MenuList == INVENTORY) 
-	{
-		pPlayer->m_LastVoteMenu = MAINMENU;
-		AVH(ClientID, HINVINFO, vec3(35,80,40), "Inventory Information");
-		AVM(ClientID, "null", NOPE, HINVINFO, "Choose the type of items you want to show");
-		AVM(ClientID, "null", NOPE, HINVINFO, "After, need select item to interact");
-		AV(ClientID, "null", "");
-
-		ShowPlayerStats(pPlayer);
-
-		AVH(ClientID, HINVSELECT, vec3(40, 10, 5), "Inventory Select List");
-		AVM(ClientID, "SORTEDINVENTORY", ITEMUSED, HINVSELECT, "Used Items");
-		AVM(ClientID, "SORTEDINVENTORY", ITEMCRAFT, HINVSELECT, "Craft Items");
-		AVM(ClientID, "SORTEDINVENTORY", ITEMQUEST, HINVSELECT, "Quest Items");
-		AVM(ClientID, "SORTEDINVENTORY", ITEMUPGRADE, HINVSELECT, "Modules Items");
-		AVM(ClientID, "SORTEDINVENTORY", ITEMEQUIP, HINVSELECT, "Equiping Items");
-		AVM(ClientID, "SORTEDINVENTORY", ITEMPOTION, HINVSELECT, "Potion Items");
-		AVM(ClientID, "SORTEDINVENTORY", ITEMOTHER, HINVSELECT, "Other Items");
-		if(pPlayer->m_SortTabs[SORTINVENTORY])
-			Mmo()->Item()->ListInventory(pPlayer, pPlayer->m_SortTabs[SORTINVENTORY]);
-
-		AddBack(ClientID);
 	}
 	else if(MenuList == ADVENTUREJOURNAL) 
 	{
@@ -1990,48 +1967,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AddBack(ClientID);
 		AV(ClientID, "null", "");
 		Mmo()->Inbox()->GetInformationInbox(pPlayer);
-	} 
-	else if(MenuList == SETTINGS) 
-	{
-		pPlayer->m_LastVoteMenu = MAINMENU;
-
-		// Настройки
-		bool FoundSettings = false;
-		AVH(ClientID, HSETTINGSS, vec3(50,30,40), "Some of the settings becomes valid after death");
-		for(const auto& it : ItemSql::Items[ClientID])
-		{
-			const ItemSql::ItemPlayer ItemData = it.second;
-			if(ItemData.Info().Type != ITEMSETTINGS || ItemData.Count <= 0)
-				continue;
-			
-			AVM(ClientID, "ISETTINGS", it.first, HSETTINGSS, "[{STR}] {STR}", (ItemData.Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
-			FoundSettings = true;
-		}
-		if (!FoundSettings)
-		{
-			AVM(ClientID, "null", NOPE, HSETTINGSS, "The list of settings is empty");
-		}
-
-		// Снаряжение
-		FoundSettings = false;
-		AV(ClientID, "null", "");
-		AVH(ClientID, HSETTINGSU, vec3(30,50,40), "Sub items settings.");
-		for(const auto& it : ItemSql::Items[ClientID])
-		{
-			const ItemSql::ItemPlayer ItemData = it.second;
-			if(ItemData.Count <= 0 || ItemData.Info().Type != ITEMUPGRADE)
-				continue;
-			
-			int BonusCount = ItemData.Info().BonusCount*(ItemData.Enchant+1);
-			AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, HSETTINGSU, "{STR}({STR} +{INT}){STR}",
-				ItemData.Info().GetName(pPlayer), pPlayer->AtributeName(ItemData.Info().BonusID), &BonusCount, (ItemData.Settings ? " ✔" : "\0"));
-			FoundSettings = true;
-		}
-		if (!FoundSettings)
-		{
-			AVM(ClientID, "null", NOPE, HSETTINGSU, "The list of equipment sub upgrades is empty");
-		}
-		AddBack(ClientID);
 	}
 	else if(MenuList == CRAFTING) 
 	{

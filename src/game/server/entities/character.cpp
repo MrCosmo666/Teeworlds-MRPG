@@ -826,7 +826,7 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 	if(m_Health <= m_pPlayer->GetStartHealth()/3)
 	{
 		if(!m_pPlayer->CheckEffect("RegenHealth") && m_pPlayer->GetItem(itPotionHealthRegen).Count > 0 && m_pPlayer->GetItem(itPotionHealthRegen).Settings)
-			GS()->Mmo()->Item()->UsedItems(m_pPlayer->GetCID(), itPotionHealthRegen, 1);
+			GS()->Mmo()->Item()->UseItem(m_pPlayer->GetCID(), itPotionHealthRegen, 1);
 	}
 
 	// Проверка при смерти если игрок погиб

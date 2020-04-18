@@ -7,7 +7,6 @@
 
 class ItemSql : public CMmoComponent
 {
-	// Приватные методы
 	int SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant);
 	int DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings);
 
@@ -37,25 +36,15 @@ public:
 	typedef ClassItemInformation ItemInformation;
 	static std::map < int , ItemInformation > ItemsInfo;
 
-	/*
-		После познания в итогом счете нужно будет сделать мамку что будет хранить Глобальное для работы данного класса
-		Но прежде всего этот класс будет наследывать функции мамки к примеру мамка хранит (pPlayer) дабы для каждого предмета не хранить отдельно
-		Так-же можно внедрить список предметов внутрь что тоже хорошо обращение будет через Глобальный список предметов
-		Что то рода 
-		{
-			ItemPlayerList *PlItem = ListItems()->Get(int index);
-			PlItem->Give(5), PlItem->Remove(3), PlItem->Info()->GetName();
-		}
-	*/
 	class ClassItems
 	{
-		CPlayer *pPlayer;
+		CPlayer* pPlayer;
 		int itemid_;
-		
+
 	public:
 		ClassItems() : Count(NULL), Settings(NULL), Enchant(NULL), Durability(100), pPlayer(NULL), itemid_(NULL) {};
 
-		void SetBasic(CPlayer *Player, int itemid) { pPlayer = Player, itemid_ = itemid; }
+		void SetBasic(CPlayer* Player, int itemid) { pPlayer = Player, itemid_ = itemid; }
 		int Count;
 		int Settings;
 		int Enchant;
@@ -88,28 +77,28 @@ public:
 
 			return *this;
 		};
-	};	
+	};
 	typedef ClassItems ItemPlayer;
-	static std::map < int , std::map < int , ItemPlayer > > Items;
+	static std::map < int, std::map < int, ItemPlayer > > Items;
 
 	virtual void OnInitGlobal();
 	virtual void OnInitAccount(CPlayer *pPlayer);
+	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist);
 
 	// Основное
 	void ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction = false);
-
 	void GiveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant);
 	void RemoveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Count, int Settings);
 	void ItemSelected(CPlayer *pPlayer, const ItemPlayer &PlItem, bool Dress = false);
 	int ActionItemCountAllowed(CPlayer* pPlayer, int ItemID);
 
-	void RepairDurability(CPlayer *pPlayer);
-	bool SetDurabilityItem(CPlayer *pPlayer, int ItemID, int Durability);
-	bool SetEnchantItem(CPlayer *pPlayer, int ItemID, int Enchant);
-	bool SetSettingsItem(CPlayer *pPlayer, int ItemID, int Settings);
-	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);	
+	void UseItem(int ClientID, int ItemID, int Count);
+	void RepairDurabilityFull(CPlayer *pPlayer);
+	bool SetDurability(CPlayer *pPlayer, int ItemID, int Durability);
+	bool SetEnchant(CPlayer *pPlayer, int ItemID, int Enchant);
+	bool SetSettings(CPlayer *pPlayer, int ItemID, int Settings);
 
-	void UsedItems(int ClientID, int ItemID, int Count);
 
 };
 

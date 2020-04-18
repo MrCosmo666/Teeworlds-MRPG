@@ -63,7 +63,7 @@ void CJobItems::Work(int ClientID)
 
 		int Durability = PlEquipItem.Durability;
 		{ // кирка поломка и информация о ремонте
-			if(rand()%10 == 0) GS()->Mmo()->Item()->SetDurabilityItem(pPlayer, EquipItem, Durability-1);
+			if(rand()%10 == 0) GS()->Mmo()->Item()->SetDurability(pPlayer, EquipItem, Durability-1);
 			if(Durability <= 0) return pPlayer->AddInBroadcast("Need repair Pickaxe\n"); 
 		}
 
