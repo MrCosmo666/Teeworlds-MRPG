@@ -2577,9 +2577,9 @@ int CGS::ItDungeon(int WorldID) const
 
 bool CGS::IsClientEqualWorldID(int ClientID, int WorldID) const
 {
-	if (WorldID == -1)
-		return (Server()->GetWorldID(ClientID) == WorldID);
-	return (Server()->GetWorldID(ClientID) == m_WorldID);
+	if (WorldID <= -1)
+		return (Server()->GetWorldID(ClientID) == m_WorldID);
+	return (Server()->GetWorldID(ClientID) == WorldID);
 }
 
 IGameServer *CreateGameServer() { return new CGS; }
