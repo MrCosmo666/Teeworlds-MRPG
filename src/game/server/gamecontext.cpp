@@ -2488,6 +2488,12 @@ bool CGS::IsClientEqualWorldID(int ClientID, int WorldID) const
 
 void CGS::CheckZonePVP()
 {
+	if (IsDungeon())
+	{
+		m_AllowedPVP = false;
+		return;
+	}
+
 	int CountMobs = 0;
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
