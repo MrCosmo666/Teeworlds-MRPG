@@ -64,25 +64,33 @@ class GuildJob : public CMmoComponent
 public:
 	virtual void OnInitGlobal();
 	virtual void OnInitLocal(const char *pLocal);
+
+/* #########################################################################
+	BASED MEMBER
+######################################################################### */
 	virtual void OnTick();
 	virtual void OnPaymentTime();
+
+private:
+	void TickHousingText();
 
 /* #########################################################################
 	GET CHECK MEMBER 
 ######################################################################### */
+	std::string UpgradeNames(int Field, bool DataTable = false);
+	int ExpForLevel(int Level);
+
+public:
 	const char *GuildName(int GuildID) const;
 	bool IsLeaderPlayer(CPlayer *pPlayer, int Access = -1) const;
 	int GetMemberChairBonus(int GuildID, int Field) const;
-private:
-	std::string UpgradeNames(int Field, bool DataTable = false);
-	int ExpForLevel(int Level);
-public:
+
 /* #########################################################################
 	FUNCTIONS MEMBER MEMBER 
 ######################################################################### */
 	void CreateGuild(int ClientID, const char *GuildName);
 	void JoinGuild(int AuthID, int GuildID);
-	void ExitGuild(int AccountID);
+	void ExitGuild(int AuthID);
 	void ShowMenuGuild(CPlayer *pPlayer);
 
 	void AddExperience(int GuildID);	
@@ -149,7 +157,6 @@ public:
 	void BuyGuildHouse(int GuildID, int HouseID);
 	void SellGuildHouse(int GuildID);
 	void ShowBuyHouse(CPlayer *pPlayer, int MID);
-	void CheckTimePayment();
 	void ChangeStateDoor(int GuildID);
 
 /* #########################################################################

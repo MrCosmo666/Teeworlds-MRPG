@@ -49,7 +49,6 @@ void HouseJob::OnInitLocal(const char *pLocal)
 				DecoLoadingRES->getInt("Y")), DecoLoadingRES->getInt("HouseID"), DecoLoadingRES->getInt("DecoID"));
 		}
 	}
-
 	Job()->ShowLoadingProgress("Houses", Home.size());
 	Job()->ShowLoadingProgress("Houses Decorations", m_DecorationHouse.size());
 }

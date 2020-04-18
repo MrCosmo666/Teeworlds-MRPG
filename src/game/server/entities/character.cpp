@@ -184,17 +184,32 @@ bool CCharacter::DecoInteractive()
 {
 	int ClientID = m_pPlayer->GetCID();
 	int DecoID = CGS::InteractiveSub[ClientID].TempID;
+	int InteractiveType = CGS::InteractiveSub[ClientID].TempID2;
 	GS()->ClearInteractiveSub(ClientID);
 
 	if(DecoID > 0 && m_pPlayer->GetItem(DecoID).Count > 0 && GS()->GetItemInfo(DecoID).Type == ITEMDECORATION)
 	{
-		int HouseID = GS()->Mmo()->House()->PlayerHouseID(m_pPlayer);
-		if(GS()->Mmo()->House()->AddDecorationHouse(DecoID, HouseID, m_pHelper->MousePos()))
+		if (InteractiveType == DECOTYPE_HOUSE)
 		{
-			GS()->Chat(ClientID, "You added {STR}, to your house!", GS()->GetItemInfo(DecoID).GetName(m_pPlayer));
-			GS()->ResetVotes(ClientID, HOUSEDECORATION);
-			m_pPlayer->GetItem(DecoID).Remove(1);
-			return true;
+			int HouseID = GS()->Mmo()->House()->PlayerHouseID(m_pPlayer);
+			if (GS()->Mmo()->House()->AddDecorationHouse(DecoID, HouseID, m_pHelper->MousePos()))
+			{
+				GS()->Chat(ClientID, "You added {STR}, to your house!", GS()->GetItemInfo(DecoID).GetName(m_pPlayer));
+				GS()->ResetVotes(ClientID, HOUSEDECORATION);
+				m_pPlayer->GetItem(DecoID).Remove(1);
+				return true;
+			}
+		}
+		else if (InteractiveType == DECOTYPE_GUILD_HOUSE)
+		{
+			int GuildID = m_pPlayer->Acc().GuildID;
+			if (GS()->Mmo()->Member()->AddDecorationHouse(DecoID, GuildID, m_pHelper->MousePos()))
+			{
+				GS()->Chat(ClientID, "You added {STR}, to your guild house!", GS()->GetItemInfo(DecoID).GetName(m_pPlayer));
+				GS()->ResetVotes(ClientID, GUILDHOUSEDECORATION);
+				m_pPlayer->GetItem(DecoID).Remove(1);
+				return true;
+			}
 		}
 
 		GS()->Chat(ClientID, "Distance House and Decoration maximal {INT} block!", &g_Config.m_SvLimitDecoration);
