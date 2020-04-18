@@ -35,7 +35,6 @@ class HouseJob : public CMmoComponent
 	typedef std::map < int , HouseList > HouseType;
 	static HouseType Home;
 
-	friend DecoHouse;
 	std::map < int , DecoHouse * > m_decorations;
 public:
 	virtual void OnInitLocal(const char *pLocal);

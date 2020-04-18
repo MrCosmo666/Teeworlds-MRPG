@@ -41,6 +41,19 @@ void GuildJob::OnInitLocal(const char *pLocal)
 		if(HouseGuild[MHID].m_GuildID > 0 && !HouseGuild[MHID].m_Door)
 			HouseGuild[MHID].m_Door = new GuildDoor(&GS()->m_World, vec2(HouseGuild[MHID].m_DoorX, HouseGuild[MHID].m_DoorY), HouseGuild[MHID].m_GuildID);
 	}
+
+	// пропускаем загрузку если там есть элементы
+	if (m_decorations.size() > 0) return;
+
+	// загрузка декораций		
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_decorations", "WHERE WorldID = '%d'", GS()->GetWorldID()));
+	while (RES->next())
+	{
+		const int DID = RES->getInt("ID");
+		m_decorations[DID] = new DecoHouse(&GS()->m_World, vec2(RES->getInt("X"),
+			RES->getInt("Y")), RES->getInt("HouseID"), RES->getInt("DecoID"));
+	}
+
 	Job()->ShowLoadingProgress("Guilds Houses", HouseGuild.size());
 }
 
@@ -176,6 +189,63 @@ int GuildJob::ExpForLevel(int Level)
 {
 	return (g_Config.m_SvGuildLeveling+Level*2)*(Level*Level);
 } 
+
+
+/* #########################################################################
+	FUNCTIONS HOUSES DECORATION
+######################################################################### */
+// добавить декорацию для дома
+bool GuildJob::AddDecorationHouse(int DecoID, int HouseID, vec2 Position)
+{
+	if (HouseID <= 0)
+		return false;
+
+	vec2 PositionHouse = GetPositionHouse(HouseID);
+	if (distance(PositionHouse, Position) > 600)
+		return false;
+
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_decorations", "WHERE HouseID = '%d'", HouseID));
+	if (RES->rowsCount() >= g_Config.m_SvLimitDecoration) return false;
+
+	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_guilds_decorations", "ORDER BY ID DESC LIMIT 1"));
+	int InitID = (RES2->next() ? RES2->getInt("ID") + 1 : 1);
+
+	SJK.ID("tw_guilds_decorations", "(ID, DecoID, HouseID, X, Y, WorldID) VALUES ('%d', '%d', '%d', '%d', '%d', '%d')",
+		InitID, DecoID, HouseID, (int)Position.x, (int)Position.y, GS()->GetWorldID());
+
+	m_decorations[InitID] = new DecoHouse(&GS()->m_World, Position, HouseID, DecoID);
+	return true;
+}
+// Удалить декорацию
+bool GuildJob::DeleteDecorationHouse(int ID)
+{
+	if (m_decorations.find(ID) != m_decorations.end())
+	{
+		if (m_decorations.at(ID))
+		{
+			delete m_decorations.at(ID);
+			m_decorations.at(ID) = 0;
+		}
+		m_decorations.erase(ID);
+		SJK.DD("tw_guilds_decorations", "WHERE ID = '%d'", ID);
+		return true;
+	}
+	return false;
+}
+// Показать меню декораций
+void GuildJob::ShowDecorationList(CPlayer* pPlayer)
+{
+	/*int HouseID = PlayerHouseID(pPlayer);
+	int ClientID = pPlayer->GetCID();
+	for (auto deco = m_decorations.begin(); deco != m_decorations.end(); deco++)
+	{
+		if (deco->second && deco->second->m_HouseID == HouseID)
+		{
+			GS()->AVD(ClientID, "DECODELETE", deco->first, deco->second->m_DecoID, 1, "{STR}:{INT} back to the inventory",
+				GS()->GetItemInfo(deco->second->m_DecoID).GetName(pPlayer), &deco->first);
+		}
+	}*/
+}
 
 /* #########################################################################
 	FUNCTIONS MEMBER MEMBER 

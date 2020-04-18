@@ -3,8 +3,8 @@
 #ifndef GAME_SERVER_GUILDJOB_H
 #define GAME_SERVER_GUILDJOB_H
 
+#include "../mmocontroller/decorations_houses.h"
 #include "../component.h"
-#include <map>
 
 class GuildDoor;
 class GuildJob : public CMmoComponent
@@ -54,6 +54,8 @@ class GuildJob : public CMmoComponent
 	typedef std::map < int , GuildStructRank > GuildRankType;
 	static GuildRankType RankGuild;
 
+	std::map < int, DecoHouse* > m_decorations;
+
 /* #########################################################################
 	LOADING MEMBER 
 ######################################################################### */
@@ -87,6 +89,13 @@ public:
 	bool AddMoneyBank(int GuildID, int Money);
 	bool RemoveMoneyBank(int GuildID, int Money);
 	bool UpgradeGuild(int GuildID, int Field);
+
+/* #########################################################################
+	FUNCTIONS HOUSES DECORATION
+######################################################################### */
+	bool AddDecorationHouse(int DecoID, int OwnerID, vec2 Position);
+	bool DeleteDecorationHouse(int ID);
+	void ShowDecorationList(CPlayer* pPlayer);
 
 /* #########################################################################
 	GET CHECK MEMBER RANK MEMBER 
