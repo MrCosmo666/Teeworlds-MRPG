@@ -135,9 +135,7 @@ vec2 WorldSwapJob::PositionQuestBot(int ClientID, int QuestID)
 
 int WorldSwapJob::GetWorldType() const
 {
-	if(GS()->GetWorldID() == CUTSCENEWELCOMEWORLD)
-		return WORLD_CUTSCENE;
-	else if(GS()->DungeonID())
+	if(GS()->DungeonID())
 		return WORLD_DUNGEON;
 	else 
 		return WORLD_STANDARD;

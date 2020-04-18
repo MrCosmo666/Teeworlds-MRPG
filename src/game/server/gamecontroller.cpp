@@ -49,12 +49,8 @@ void IGameController::OnCharacterSpawn(CCharacter *pChr)
 
 	// миркатсцены начало игры
 	if(GS()->GetWorldID() == LOCALWORLD && pChr->GetPlayer()->GetItem(itTitleNewHero).Count <= 0)
-	{
 		pChr->GetPlayer()->GetItem(itTitleNewHero).Add(1);
-		GS()->Mmo()->Quest()->AcceptQuest(2, pChr->GetPlayer());
-		GS()->Chat(ClientID, "You can see the quests and their progress in 'Journal' see votes!");
-		GS()->Chat(ClientID, "Follow 'Armor' what's around you!");
-	}
+
 
 	// если спавним игрока
 	int StartHealth = pChr->GetPlayer()->Acc().PlayerHealth > 0 ? pChr->GetPlayer()->Acc().PlayerHealth : pChr->GetPlayer()->GetStartHealth();

@@ -63,7 +63,6 @@ enum
 	COUNT_WORLD = 8,						// кол-во миров
 	LAST_WORLD = COUNT_WORLD - 1,			// последний мир
 	LOCALWORLD = 0,							// локальный мир
-	CUTSCENEWELCOMEWORLD = 7,				// катсцена начало игры
 };
 
 #endif

@@ -1256,13 +1256,6 @@ void CCharacter::HandleAuthedPlayer()
 	if(!IsAlive() || !m_pPlayer->IsAuthed())
 		return;
 
-	// катсцена
-	if(GS()->GetWorldID() == CUTSCENEWELCOMEWORLD)
-	{
-		m_Core.m_Pos.y = m_OldPos.y;
-		m_Core.m_Pos.x += 5;
-	}
-
 	// тик весь в одной секунде
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
 	{

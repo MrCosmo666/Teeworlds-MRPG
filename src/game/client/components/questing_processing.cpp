@@ -13,8 +13,8 @@
 #include "talktext.h"
 #include "questing_processing.h"
 
-#define COLOR_TABLE vec4(0.40f, 0.22f, 0.08f, 0.4f)
-#define COLOR_BACKGROUND vec4(0.35f, 0.20f, 0.05f, 0.4f)
+#define COLOR_TABLE vec4(0.40f, 0.22f, 0.08f, 0.3f)
+#define COLOR_BACKGROUND vec4(0.35f, 0.20f, 0.15f, 0.4f)
 #define COLOR_BACKBACKGROUND vec4(0.30f, 0.19f, 0.15f, 0.30f)
 #define COLOR_UIBAR vec4(0.35f, 0.55f, 0.1f, 0.45f)
 

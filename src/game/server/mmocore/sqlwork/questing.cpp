@@ -858,7 +858,7 @@ void QuestBase::QuestTableShowInformation(CPlayer* pPlayer, ContextBots::QuestBo
 			continue;
 
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "Defeat (%s)", ContextBots::DataBot[BotID].NameBot);
+		str_format(aBuf, sizeof(aBuf), "Defeat %s", ContextBots::DataBot[BotID].NameBot);
 		GS()->Mmo()->Quest()->QuestTableAddInfo(ClientID, aBuf, Count,
 			QuestBase::Quests[ClientID][BotData.QuestID].MobProgress[i - 4]);
 	}
@@ -905,7 +905,7 @@ void QuestBase::CreateQuestingItems(CPlayer *pPlayer, ContextBots::QuestBotInfo 
 		// проверяем есть ли такие предметы
 		for (CQuestItem* pHh = (CQuestItem*)GS()->m_World.FindFirst(CGameWorld::ENTTYPE_DROPQUEST); pHh; pHh = (CQuestItem*)pHh->TypeNext())
 		{
-			if (pHh->m_OwnerID != ClientID || BotData.Interactive[0] != pHh->m_QuestBot.Interactive[0])
+			if (pHh->m_OwnerID != ClientID || pHh->m_QuestBot.QuestID != BotData.QuestID)
 				continue;
 			return;
 		}
