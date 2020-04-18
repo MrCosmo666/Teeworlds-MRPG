@@ -39,8 +39,9 @@ void StorageSql::OnTick()
 				continue;
 			
 			// выводим текст о кол-ве на складах
+			const int LifeTime = GS()->Server()->TickSpeed() - 5;
 			vec2 Pos = vec2(x.second.TextX, x.second.TextY);
-			GS()->CreateText(NULL, false, Pos, vec2(0, 0), 248, std::to_string(Storage[x.first].Count).c_str(), x.second.WorldID);
+			GS()->CreateText(NULL, false, Pos, vec2(0, 0), LifeTime, std::to_string(Storage[x.first].Count).c_str(), x.second.WorldID);
 		}
 	}
 }

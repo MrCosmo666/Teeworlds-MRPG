@@ -1063,9 +1063,9 @@ void CCharacter::HandleTilesets()
 		if(Server()->Tick() % Server()->TickSpeed() == 0) 
 		{
 			const int HouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
-			if(HouseID <= 0) return;
-	
 			const int GuildID = GS()->Mmo()->Member()->GetHouseGuildID(HouseID);
+			if(HouseID <= 0 || GuildID <= 0) return;
+	
 			const int Exp = GS()->Mmo()->Member()->GetMemberChairBonus(GuildID, EMEMBERUPGRADE::ChairNSTExperience);
 			const int Money = GS()->Mmo()->Member()->GetMemberChairBonus(GuildID, EMEMBERUPGRADE::ChairNSTMoney);
 			m_pPlayer->AddExp(Exp);

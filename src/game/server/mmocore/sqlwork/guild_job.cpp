@@ -76,13 +76,14 @@ void GuildJob::OnTick()
 			if(mh.second.m_WorldID != GS()->GetWorldID()) 
 				continue;
 
+			const int LifeTime = GS()->Server()->TickSpeed() - 5;
 			const int GuildID = mh.second.m_GuildID;
 			if(GuildID > 0)
 			{
-				GS()->CreateText(NULL, false, vec2(mh.second.m_TextX, mh.second.m_TextY), vec2 (0, 0), 49, Guild[GuildID].m_Name, mh.second.m_WorldID);
+				GS()->CreateText(NULL, false, vec2(mh.second.m_TextX, mh.second.m_TextY), vec2 (0, 0), LifeTime, Guild[GuildID].m_Name, mh.second.m_WorldID);
 				continue;
 			}
-			GS()->CreateText(NULL, false, vec2(mh.second.m_TextX, mh.second.m_TextY), vec2 (0, 0), 49, "FREE", mh.second.m_WorldID);
+			GS()->CreateText(NULL, false, vec2(mh.second.m_TextX, mh.second.m_TextY), vec2 (0, 0), LifeTime, "FREE", mh.second.m_WorldID);
 		}
 	}
 }
