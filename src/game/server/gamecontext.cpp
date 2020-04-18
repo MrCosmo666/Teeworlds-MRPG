@@ -893,8 +893,8 @@ void CGS::OnInit(int WorldID)
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 	m_World.SetGameServer(this);
 	m_Events.SetGameServer(this);
-	m_DungeonID = GetDungeonID();
 	m_WorldID = WorldID;
+	m_DungeonID = GetDungeonID();
 
 	for(int i = 0; i < NUM_NETOBJTYPES; i++)
 		Server()->SnapSetStaticsize(i, m_NetObjHandler.GetObjSize(i));
@@ -2442,7 +2442,7 @@ void CGS::CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Life
 {
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if (m_apPlayers[i] && distance(m_apPlayers[i]->m_ViewPos, Pos) < 1000.0f)
+		if (m_apPlayers[i] && distance(m_apPlayers[i]->m_ViewPos, Pos) < 800.0f)
 		{
 			CLoltext Text;
 			Text.Create(this, &m_World, pParent, Pos, Vel, Lifespan, pText, true, Follow, WorldID);
