@@ -53,7 +53,6 @@ public:
 	typedef std::map < int , StructData > AccDataType;
 	static AccDataType Data;
 
-	virtual void OnTickLocalWorld();
 	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
 
 private:
@@ -64,6 +63,7 @@ public:
 	int RegisterAccount(int ClientID, const char *Login, const char *Password);
 	int LoginAccount(int ClientID, const char *Login, const char *Password);
 	void LoadAccount(CPlayer *pPlayer, bool FirstInitilize = false);
+	int CheckOnlineAccount(int AuthID) const;
 
 	// discord
 	void ShowDiscordCard(int ClientID);
@@ -71,12 +71,6 @@ public:
 	
 	//
 	int GetRank(int AuthID);
-	void ShowLeaderboardPlayers(int ClientID, const char *SelectIntegerField, int ShowMaximal = 5);
-
-	//
-	int CheckOnlineAccount(int AuthID) const;
-
-	//
 	bool IsActive(int ClientID) const
 	{
 		if(Data.find(ClientID) != Data.end())

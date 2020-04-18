@@ -8,14 +8,6 @@ using namespace sqlstr;
 
 std::map < int , AccountMainSql::StructData > AccountMainSql::Data;
 
-// Тик компонента
-void AccountMainSql::OnTickLocalWorld()
-{
-	// показать табло лидеров игроков по уровню
-	if(GS()->Server()->Tick() % (GS()->Server()->TickSpeed() * (29 * 60)) == 0)
-		ShowLeaderboardPlayers(-1, "Level", 5);
-}
-
 // Отправить данные о авторизации клиенту
 int AccountMainSql::SendAuthCode(int ClientID, int Code)
 {
@@ -84,9 +76,9 @@ int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Pa
 	CSqlString<32> clear_Pass = CSqlString<32>(Password);
 	CSqlString<32> clear_Nick = CSqlString<32>(GS()->Server()->ClientName(ClientID));
 	boost::scoped_ptr<ResultSet> ACCOUNTDATA(SJK.SD("*", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
-	while(ACCOUNTDATA->next())
+	if(ACCOUNTDATA->next())
 	{
-		// проверяем логин и пароль и проверяем онлайн игрока
+		// проверяем по этому нику (ник может зарегестрирован только один), логин и пароль
 		const int UserID = ACCOUNTDATA->getInt("ID");
 		boost::scoped_ptr<ResultSet> CHECKACCESS(SJK.SD("ID", "tw_accounts", "WHERE Username = '%s' AND Password = '%s' AND ID = '%d'", clear_Login.cstr(), clear_Pass.cstr(), UserID));
 		if (!CHECKACCESS->next())
@@ -95,7 +87,7 @@ int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Pa
 			return SendAuthCode(ClientID, AUTH_LOGIN_WRONG);
 		}
 
-		// проверить онлайн ли игрок 
+		// проверить онлайн ли игрок
 		if (CheckOnlineAccount(UserID) >= 0)
 		{
 			GS()->Chat(ClientID, "The account is already in the game!");
@@ -219,24 +211,6 @@ void AccountMainSql::DiscordConnect(int ClientID, const char *pDID)
 	GS()->Chat(ClientID, "Update Discord ID.");
 	GS()->Chat(ClientID, "Check connect status in Discord \"!mconnect\".");
 #endif
-}
-
-// Показать топ лист игроков и всего чего можно
-void AccountMainSql::ShowLeaderboardPlayers(int ClientID, const char *IntegerField, int ShowMaximal)
-{
-	GS()->Chat(ClientID, "----- Player Leaderboard {STR}", IntegerField);
-
-	int Position = 0;
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_data", "ORDER BY %s DESC", IntegerField));
-	while(RES->next())
-	{
-		if(Position == ShowMaximal) break;
-		Position++;
-
-		const int Count = RES->getInt(IntegerField);
-		const char *Nick = RES->getString("Nick").c_str();
-		GS()->Chat(ClientID, "{INT}. {STR} | {STR}: {INT}", &Position, Nick, IntegerField, &Count);
-	}
 }
 
 // Получить ранг игрока
