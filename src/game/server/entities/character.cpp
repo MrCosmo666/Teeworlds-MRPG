@@ -924,7 +924,6 @@ void CCharacter::HandleTilesets()
 			{
 				// Обновление меню и отправка информации в голосование
 				case TILE_STORAGE:
-				case TILE_SELLHOUSE:
 				case TILE_MOTEL:
 				case TILE_AUCTION:
 				case TILE_LEARNSKILL:
@@ -1018,7 +1017,6 @@ void CCharacter::HandleTilesets()
 				// Снятие урона защиты и крюка и обновить меню
 				case TILE_STORAGE:
 				case TILE_CRAFT:
-				case TILE_SELLHOUSE:
 				case TILE_MOTEL:
 				case TILE_QUESTS:
 				case TILE_AUCTION:

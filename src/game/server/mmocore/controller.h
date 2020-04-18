@@ -102,8 +102,6 @@ public:
 
 	// 
 	void LoadLogicWorld();
-	void LoadDungeons();
-	void ShowBussinesHousesSell(CPlayer *pPlayer);
 	
 	//
 	const char* PlayerName(int AccountID);

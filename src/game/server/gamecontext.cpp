@@ -1940,8 +1940,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			const int HouseID = Mmo()->Member()->GetPosHouseID(pChar->m_Core.m_Pos);
 			Mmo()->Member()->ShowBuyHouse(pPlayer, HouseID);
 		}
-		else if (pChar->GetHelper()->BoolIndex(TILE_SELLHOUSE))
-			Mmo()->ShowBussinesHousesSell(pPlayer);
 		else if (pChar->GetHelper()->BoolIndex(TILE_STORAGE))
 		{
 			const int StorageID = Mmo()->Storage()->GetLoadStorage(pChar->m_Core.m_Pos);

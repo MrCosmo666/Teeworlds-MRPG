@@ -140,38 +140,6 @@ bool SqlController::OnMessage(int MsgID, void *pRawMsg, int ClientID)
 	return false;
 }
 
-// Показать продоваемые все дома и бизнесы
-void SqlController::ShowBussinesHousesSell(CPlayer *pPlayer)
-{
-	// показываем лист продоваемых домов
-	const int ClientID = pPlayer->GetCID();
-	GS()->AVH(ClientID, HHOUSEAVAILABLE, vec3(52,26,80), _("List of available houses"), NULL);
-	GS()->AVM(ClientID, "null", NOPE, HHOUSEAVAILABLE, _("Symbols: HL - House level"), NULL);
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_houses WHERE OwnerID < '1' ORDER BY Class DESC"));
-	while(RES->next())
-	{
-		const int HouseID = RES->getInt("ID");
-		const int WorldID = RES->getInt("WorldID");
-		int Price = RES->getInt("Price");
-		int Level = RES->getInt("FarmLevel");
-
-		GS()->AVM(ClientID, "null", NOPE, HHOUSEAVAILABLE, "HL{INT} {STR} {INT}gold {STR}", &Level, House()->ClassName(HouseID), &Price, GS()->Server()->GetWorldName(WorldID));
-	}
-	GS()->AV(ClientID, "null", "");
-	
-	// показываем лист продоваемых бизнесов
-	GS()->AVH(ClientID, HBUSINESSAVAILABLE, vec3(24,26,80), _("List of available business"), NULL);
-	boost::scoped_ptr<ResultSet> RES2(SJK.SD("*", "tw_storages WHERE OwnerID < '1' AND MonsterSubType < '1' AND ID > '1' ORDER BY WorldID DESC"));
-	while(RES2->next())
-	{
-		const int StorageID = RES2->getInt("ID");
-		const int WorldID = RES2->getInt("WorldID");
-		int Price = RES2->getInt("Price");
-
-		GS()->AVM(ClientID, "null", NOPE, HBUSINESSAVAILABLE, "{STR} {INT}gold {STR}", Storage()->StorageName(StorageID), &Price, GS()->Server()->GetWorldName(WorldID));
-	}
-}
-
 // Сохранение аккаунта
 void SqlController::SaveAccount(CPlayer *pPlayer, int Table)
 {
