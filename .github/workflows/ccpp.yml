@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
         include:
         - os: ubuntu-latest
           cmake-args: -G "Unix Makefiles"
@@ -16,23 +16,12 @@ jobs:
           env:
             CFLAGS: -Wdeclaration-after-statement -Werror
             CXXFLAGS: -Werror
-        - os: macOS-latest
-          cmake-args: -G "Unix Makefiles"
-          build-args: --parallel
-          package-file: mmoteeworlds-osx.dmg
-          env:
-            CFLAGS: -Wdeclaration-after-statement -Werror
-            CXXFLAGS: -Werror
-        - os: windows-latest
-          cmake-args: -G "Visual Studio 16 2019" -A x64
-          package-file: mmoteeworlds-win64.zip
-          env:
-            CFLAGS: /WX
-            CXXFLAGS: /WX
-            LDFLAGS: /WX
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout private tools
+      uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
     - name: Checkout submodules
       shell: bash
       run: |
@@ -45,15 +34,7 @@ jobs:
         sudo apt-get update -y
         sudo apt-get install pkg-config cmake libfreetype6-dev libsdl2-dev libicu-dev libssl-dev libcurl4-openssl-dev -y
         sudo apt-get install libboost-dev libmariadbclient-dev libmysqlcppconn-dev libopus-dev libopusfile-dev -y
-    - name: Build in debug mode
-      env: ${{ matrix.env }}
-      run: |
-        mkdir debug
-        cd debug
-        ${{ matrix.cmake-path }}cmake --version
-        ${{ matrix.cmake-path }}cmake ${{ matrix.cmake-args }} -DCMAKE_BUILD_TYPE=Debug -Werror=dev -DDOWNLOAD_GTEST=ON -DDEV=ON -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG=. ..
-        ${{ matrix.cmake-path }}cmake --build . --config Debug ${{ matrix.build-args }} --target everything
-    - name: Build in release mode
+    - name: Build
       env: ${{ matrix.env }}
       run: |
         mkdir release
