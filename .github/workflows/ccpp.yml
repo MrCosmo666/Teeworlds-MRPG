@@ -4,6 +4,12 @@ on: [push, pull_request]
 
 jobs:
   build-cmake:
+    steps:
+      - uses: bagbyte/use-private-action@v0.0.2
+    with:
+      private-action: 
+      private-action-token: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
+
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
