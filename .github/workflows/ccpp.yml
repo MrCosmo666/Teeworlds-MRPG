@@ -25,14 +25,11 @@ jobs:
             LDFLAGS: /WX
 
     steps:
-    - name: Private Action Loader
-      uses: InVisionApp/private-action-loader@v3
-        pal-repo-token: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
-        pal-repo-name: kurosio/MmoTee-Global
     - name: bagbyte/use-private-action
       uses: bagbyte/use-private-action@v0.0.2
       with:
-        private-action: actions/checkout@v2
+        private-action: kurosio/MmoTee-Global
+        private-action-token: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
     - name: Checkout submodules
       shell: bash
       run: |
