@@ -51,7 +51,7 @@ jobs:
       uses: kolpav/purge-artifacts-action@v1
       with:
         token: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
-        expire-in: 0
+        expire-in: 3days
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2-preview
       with:
