@@ -89,7 +89,6 @@ public:
 		UNumberFormat* m_pNumberFormater;
 		UNumberFormat* m_pPercentFormater;
 
-	public:
 		CLanguage();
 		CLanguage(const char* pName, const char* pFilename, const char* pParentFilename);
 		~CLanguage();

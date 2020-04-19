@@ -42,13 +42,15 @@ public:
 		int itemid_;
 
 	public:
-		ClassItems() : Count(NULL), Settings(NULL), Enchant(NULL), Durability(100), pPlayer(NULL), itemid_(NULL) {};
-
-		void SetBasic(CPlayer* Player, int itemid) { pPlayer = Player, itemid_ = itemid; }
 		int Count;
 		int Settings;
 		int Enchant;
 		int Durability;
+
+		ClassItems() : pPlayer(NULL), itemid_(NULL), Count(NULL), Settings(NULL), Enchant(NULL), Durability(100) {};
+
+		void SetBasic(CPlayer* Player, int itemid) { pPlayer = Player, itemid_ = itemid; }
+
 		int GetID() const { return itemid_; }
 
 		bool Remove(int arg_removecount, int arg_settings = 0);

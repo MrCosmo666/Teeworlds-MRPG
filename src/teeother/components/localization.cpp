@@ -7,7 +7,7 @@
 
 CLocalization::CLanguage::CLanguage() 
 : m_Loaded(false), m_Direction(CLocalization::DIRECTION_LTR), 
-m_pPluralRules(NULL), m_pNumberFormater(NULL), m_pPercentFormater(NULL), m_pValueFormater(NULL)
+m_pPluralRules(NULL), m_pValueFormater(NULL), m_pNumberFormater(NULL), m_pPercentFormater(NULL)
 {
 	m_aName[0] = 0;
 	m_aFilename[0] = 0;
@@ -16,7 +16,7 @@ m_pPluralRules(NULL), m_pNumberFormater(NULL), m_pPercentFormater(NULL), m_pValu
 
 CLocalization::CLanguage::CLanguage(const char* pName, const char* pFilename, const char* pParentFilename) 
 : m_Loaded(false), m_Direction(CLocalization::DIRECTION_LTR), 
-m_pPluralRules(NULL), m_pNumberFormater(NULL), m_pPercentFormater(NULL), m_pValueFormater(NULL)
+m_pPluralRules(NULL), m_pValueFormater(NULL), m_pNumberFormater(NULL), m_pPercentFormater(NULL)
 {
 	str_copy(m_aName, pName, sizeof(m_aName));
 	str_copy(m_aFilename, pFilename, sizeof(m_aFilename));
