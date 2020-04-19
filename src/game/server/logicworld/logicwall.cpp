@@ -297,7 +297,7 @@ void CLogicDoorKey::Tick()
 		if (Distance <= g_Config.m_SvDoorRadiusHit)
 		{
 			pChar->m_DoorHit = true;
-			GS()->SBL(pChar->GetPlayer()->GetCID(), 100000, 100, _("You need {s:name}"), "name", GS()->GetItemInfo(m_ItemID).GetName(pChar->GetPlayer()));
+			GS()->SBL(pChar->GetPlayer()->GetCID(), 100000, 100, _("You need {STR}"), GS()->GetItemInfo(m_ItemID).GetName(pChar->GetPlayer()));
 		}
 	}
 }

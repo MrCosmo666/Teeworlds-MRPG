@@ -575,10 +575,7 @@ Messages = [
 	]),
 
 	# interactive mmo
-	NetMessage("Cl_TalkInteractive",
-	[
-		
-	]),
+	NetMessage("Cl_TalkInteractive", []),
     
 	# mmotee server
 	# -------------

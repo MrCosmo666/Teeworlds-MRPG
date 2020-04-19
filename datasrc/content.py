@@ -355,7 +355,7 @@ set_levelicons = SpriteSet("levelicons", image_levelicons, 4, 4)
 set_sidebaricons = SpriteSet("sidebaricons", image_sidebaricons, 4, 2)
 set_timerclock = SpriteSet("timerclock", image_timerclock, 1, 2)
 # mmotee
-set_relax = SpriteSet("relax", image_relax, 1, 2)
+set_relax = SpriteSet("relax", image_relax, 2, 1)
 set_teleport = SpriteSet("teleport", image_teleport, 8, 1)
 set_wingsit19 = SpriteSet("wingsit19", image_wingit19, 1, 1)
 set_wingsit20 = SpriteSet("wingsit20", image_wingit20, 1, 1)
