@@ -48,7 +48,7 @@ jobs:
         mkdir artifacts
         mv ${{ matrix.package-file }} artifacts
     - name: Upload Artifacts
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2-preview
       with:
         name: mmoteeworlds-${{ matrix.os }}
-        path: release/artifacts
+        path: release/artifacts/${{ matrix.package-file }}
