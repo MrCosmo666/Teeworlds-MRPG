@@ -25,11 +25,10 @@ jobs:
             LDFLAGS: /WX
 
     steps:
-    - name: bagbyte/use-private-action
-      uses: bagbyte/use-private-action@v0.0.2
+    - name: Checkout private tools
+      uses: actions/checkout@v2
       with:
-        private-action: kurosio/MmoTee-Global@master
-        private-action-token: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
+        token: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
     - name: Checkout submodules
       shell: bash
       run: |
