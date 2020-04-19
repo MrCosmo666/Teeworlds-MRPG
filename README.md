@@ -6,7 +6,7 @@ Teeworlds [![CircleCI](https://circleci.com/gh/teeworlds/teeworlds.svg?style=svg
 =========
 
 A retro multiplayer shooter
----------------------------
+--------------------------- 
 
 Teeworlds is a free online multiplayer game, available for all major
 operating systems. Battle with up to 16 players in a variety of game
