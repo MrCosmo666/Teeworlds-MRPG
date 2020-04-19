@@ -4,12 +4,6 @@ on: [push, pull_request]
 
 jobs:
   build-cmake:
-    steps:
-      - uses: bagbyte/use-private-action@v0.0.2
-    with:
-      private-action: 
-      private-action-token: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
-
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -31,7 +25,12 @@ jobs:
             LDFLAGS: /WX
 
     steps:
-    - uses: actions/checkout@v2
+
+
+    - uses: bagbyte/use-private-action@v0.0.2
+      with:
+        private-action: t 
+        private-action-token: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
     - name: Checkout submodules
       shell: bash
       run: |
