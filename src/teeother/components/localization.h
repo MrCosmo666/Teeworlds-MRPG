@@ -88,8 +88,7 @@ public:
 		UNumberFormat* m_pValueFormater;
 		UNumberFormat* m_pNumberFormater;
 		UNumberFormat* m_pPercentFormater;
-		icu::TimeUnitFormat* m_pTimeUnitFormater;
-		
+
 	public:
 		CLanguage();
 		CLanguage(const char* pName, const char* pFilename, const char* pParentFilename);
@@ -131,7 +130,6 @@ protected:
 	void AppendNumber(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, int Number);
 	void AppendValue(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, int Number);
 	void AppendPercent(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, double Number);
-	void AppendDuration(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, int Number, icu::TimeUnit::UTimeUnitFields Type);
 
 public:
 /* BEGIN EDIT *********************************************************/

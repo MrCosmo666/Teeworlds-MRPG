@@ -1093,15 +1093,6 @@ void CClient::ProcessConnlessPacket(CNetChunk *pPacket)
 				str_copy(m_aVersionStr, aVersion, sizeof(m_aVersionStr));
 			}
 
-			// request the map version list now
-			CNetChunk Packet;
-			mem_zero(&Packet, sizeof(Packet));
-			Packet.m_ClientID = -1;
-			Packet.m_Address = m_VersionInfo.m_VersionServeraddr.m_Addr;
-			Packet.m_pData = VERSIONSRV_GETMAPLIST;
-			Packet.m_DataSize = sizeof(VERSIONSRV_GETMAPLIST);
-			Packet.m_Flags = NETSENDFLAG_CONNLESS;
-			m_ContactClient.Send(&Packet);
 		}
 
 		// map version list
@@ -1395,17 +1386,17 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 
 			// adjust our prediction time
 			int64 Target = 0;
-			for(int k = 0; k < 200; k++)
+			for (int k = 0; k < 200; k++)
 			{
-				if(m_aInputs[k].m_Tick == InputPredTick)
+				if (m_aInputs[k].m_Tick == InputPredTick)
 				{
 					Target = m_aInputs[k].m_PredictedTime + (time_get() - m_aInputs[k].m_Time);
-					Target = Target - (int64)(((TimeLeft-PREDICTION_MARGIN)/1000.0f)*time_freq());
+					Target = Target - (int64)(((TimeLeft - PREDICTION_MARGIN) / 1000.0f) * time_freq());
 					break;
 				}
 			}
 
-			if(Target)
+			if (Target)
 				m_PredictedTime.Update(&m_InputtimeMarginGraph, Target, TimeLeft, 1);
 		}
 		else if (Msg == NETMSG_SNAP || Msg == NETMSG_SNAPSINGLE || Msg == NETMSG_SNAPEMPTY)
@@ -1449,7 +1440,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 				}
 
 				// TODO: clean this up abit
-				mem_copy((char*)m_aSnapshotIncommingData + Part * MAX_SNAPSHOT_PACKSIZE, pData, PartSize);
+				mem_copy((char*)m_aSnapshotIncomingData + Part * MAX_SNAPSHOT_PACKSIZE, pData, PartSize);
 				m_SnapshotParts |= 1 << Part;
 
 				if (m_SnapshotParts == (unsigned)((1 << NumParts) - 1))
@@ -1501,7 +1492,7 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 
 					if (CompleteSize)
 					{
-						int IntSize = CVariableInt::Decompress(m_aSnapshotIncommingData, CompleteSize, aTmpBuffer2, sizeof(aTmpBuffer2));
+						int IntSize = CVariableInt::Decompress(m_aSnapshotIncomingData, CompleteSize, aTmpBuffer2, sizeof(aTmpBuffer2));
 
 						if (IntSize < 0) // failure during decompression, bail
 							return;
@@ -1582,7 +1573,6 @@ void CClient::ProcessServerPacket(CNetChunk *pPacket)
 						m_aSnapshots[SNAP_PREV] = m_SnapshotStorage.m_pFirst;
 						m_aSnapshots[SNAP_CURRENT] = m_SnapshotStorage.m_pLast;
 						SetState(IClient::STATE_ONLINE);
-						DemoRecorder_HandleAutoStart();
 					}
 
 					// adjust game time
@@ -1648,12 +1638,6 @@ void CClient::PumpNetwork()
 	}
 
 	// process connless packets data
-	m_ContactClient.Update();
-	while(m_ContactClient.Recv(&Packet))
-	{
-		if(Packet.m_Flags&NETSENDFLAG_CONNLESS)
-			ProcessConnlessPacket(&Packet);
-	}
 }
 
 void CClient::OnDemoPlayerSnapshot(void *pData, int Size)
@@ -1877,36 +1861,7 @@ void CClient::Update()
 
 void CClient::VersionUpdate()
 {
-	if(m_VersionInfo.m_State == CVersionInfo::STATE_INIT)
-	{
-		CHostLookup(g_Config.m_ClVersionServer, m_ContactClient.NetType());
-		m_VersionInfo.m_State = CVersionInfo::STATE_START;
-	}
-	else if(m_VersionInfo.m_State == CVersionInfo::STATE_START)
-	{
-		if(m_VersionInfo.m_VersionServeraddr.Status() == IJob::STATE_DONE)
-		{
-			if(m_VersionInfo.m_VersionServeraddr.m_Result == 0)
-			{
-				CNetChunk Packet;
 
-				mem_zero(&Packet, sizeof(Packet));
-
-				m_VersionInfo.m_VersionServeraddr.m_Addr.port = VERSIONSRV_PORT;
-
-				Packet.m_ClientID = -1;
-				Packet.m_Address = m_VersionInfo.m_VersionServeraddr.m_Addr;
-				Packet.m_pData = VERSIONSRV_GETVERSION;
-				Packet.m_DataSize = sizeof(VERSIONSRV_GETVERSION);
-				Packet.m_Flags = NETSENDFLAG_CONNLESS;
-
-				m_ContactClient.Send(&Packet);
-				m_VersionInfo.m_State = CVersionInfo::STATE_READY;
-			}
-			else
-				m_VersionInfo.m_State = CVersionInfo::STATE_ERROR;
-		}
-	}
 }
 
 void CClient::RegisterInterfaces()
@@ -1934,8 +1889,7 @@ void CClient::InitInterfaces()
 	m_pUpdater = Kernel()->RequestInterface<IUpdater>();
 
 	//
-	m_ServerBrowser.Init(&m_ContactClient, m_pGameClient->NetVersion());
-	
+
 	HttpInit(m_pStorage);
 	m_Updater.Init();
 
@@ -2085,11 +2039,7 @@ void CClient::Run()
 			return;
 		}
 		BindAddr.port = 0;
-		if(!m_ContactClient.Open(BindAddr, 0))
-		{
-			dbg_msg("client", "couldn't open socket(contact)");
-			return;
-		}
+
 	}
 
 	// init font rendering
@@ -2098,12 +2048,8 @@ void CClient::Run()
 	// init the input
 	Input()->Init();
 
-	// start refreshing addresses while we load
-	MasterServer()->RefreshAddresses(m_ContactClient.NetType());
-
 	// init the editor
 	m_pEditor->Init();
-
 
 	// load data
 	if(!LoadData())
