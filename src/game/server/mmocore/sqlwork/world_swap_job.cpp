@@ -42,10 +42,8 @@ void WorldSwapJob::OnInitGlobal()
 
 bool WorldSwapJob::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 {
-	CPlayer *pPlayer = pChr->GetPlayer();
-	int ClientID = pPlayer->GetCID();
-
 	// парсинг на раз
+	CPlayer *pPlayer = pChr->GetPlayer();
 	if(pChr->GetHelper()->TileEnter(IndexCollision, TILE_WORLDSWAP))
 	{
 		pChr->m_Core.m_ProtectHooked = true;

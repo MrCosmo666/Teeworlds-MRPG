@@ -55,8 +55,7 @@ void CraftJob::ShowCraftList(CPlayer *pPlayer, int CraftTab)
 		
 		// бонус дискаунта
 		int MoneyDiscount = round_to_int(kurosio::translate_to_procent_rest(cr.second.Money, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount)));
-		int Price = clamp(cr.second.Money - MoneyDiscount, 0, cr.second.Money - MoneyDiscount);
-		
+	
 		ItemSql::ItemInformation &InfoSellItem = GS()->GetItemInfo(cr.second.ItemID);
 
 		// выводим основное меню
@@ -134,8 +133,8 @@ void CraftJob::StartCraftItem(CPlayer *pPlayer, int CraftID)
 
 	// чекаем деньги
 	int MoneyDiscount = round_to_int(kurosio::translate_to_procent_rest(Craft[CraftID].Money, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount)));
-	int Price = clamp(Craft[CraftID].Money - MoneyDiscount, 0, Craft[CraftID].Money - MoneyDiscount);
-	if(pPlayer->CheckFailMoney(MoneyDiscount)) return;
+	if(pPlayer->CheckFailMoney(MoneyDiscount)) 
+		return;
 
 	// вторая подбивка снимает что стабильно для снятия
 	for(int i = 0; i < 3; i++) 

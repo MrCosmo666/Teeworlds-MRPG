@@ -39,7 +39,6 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 	ClearTarget();
 
 	// информация о зарождении жирного моба
-	int BotID = GetPlayer()->GetBotID();
 	int SubBotID = GetPlayer()->GetBotSub();
 	if(GetPlayer()->GetSpawnBot() == SPAWNMOBS && ContextBots::MobBot[SubBotID].Boss)
 	{
@@ -93,7 +92,6 @@ void BotAI::ShowProgress()
 		{
 			dynamic_string Buffer;
 			int SubBotID = GetPlayer()->GetBotSub();
-			int Dexterity = ContextBots::MobBot[SubBotID].Health * 7;
 			Server()->Localization()->Format(Buffer, pPlayer->GetLanguage(), _("Hard Mob: {s:name} Target: {s:tname}\n"),
 				"name", ContextBots::MobBot[SubBotID].Name, "tname", Server()->ClientName(m_BotTargetID), NULL);
 			pPlayer->AddInBroadcast(Buffer.buffer()), Buffer.clear();
@@ -248,7 +246,6 @@ void BotAI::EngineBots()
 	m_Input.m_Jump = 0;
 
 	// рандом для дружественного моба
-	int BotID = GetPlayer()->GetBotID();
 	if(GetPlayer()->GetSpawnBot() == SPAWNNPC)
 		EngineNPC();
 	else if(GetPlayer()->GetSpawnBot() == SPAWNMOBS)
@@ -275,7 +272,6 @@ void BotAI::EngineBots()
 // Интерактивы NPC
 void BotAI::EngineNPC()
 {
-	int ClientID = GetPlayer()->GetCID();
 	int SubBotID = GetPlayer()->GetBotSub();
 	bool StaticBot = ContextBots::NpcBot[SubBotID].Static;
 
@@ -304,8 +300,6 @@ void BotAI::EngineNPC()
 	}
 
 	pFind->SetTalking(GetPlayer()->GetCID(), false);
-
-	int FindCID = pFind->GetCID();
 	m_Input.m_TargetX = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
 	m_Input.m_TargetY = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
 	m_Input.m_Direction = 0;
@@ -376,7 +370,6 @@ void BotAI::EngineMobs()
 	// крюк
 	if(!m_HookTick && rand()%120 == 0)
 	{
-		vec2 InputHook = vec2(0.0f, 0.0f);
 		vec2 HookDir(0.0f,0.0f);
 		for(int i = 0 ; i < 32; i++)
 		{
@@ -409,7 +402,6 @@ void BotAI::EngineMobs()
 	{
         if (Server()->Tick()-m_BotTick > Server()->TickSpeed()*rand()%150+150)
         {
-			vec2 DirPlayer = normalize(vec2(m_Input.m_TargetX, m_Input.m_TargetY)*10 - m_Pos);
             int Action = rand()%3;
             if (Action == 0)
 			{
@@ -501,10 +493,10 @@ CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 
 	// сбрасываем агрессию если игрок далеко
 	CPlayer* pPlayer = GS()->GetPlayer(m_BotTargetID, true, true);
-	if (m_BotTargetID != GetPlayer()->GetCID() && 
-		(pPlayer && (distance(m_Core.m_Pos, pPlayer->GetCharacter()->m_Core.m_Pos) > 600.0f 
-			|| GS()->Collision()->FastIntersectLine(pPlayer->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0) 
-			|| Server()->GetWorldID(m_BotTargetID) != GS()->GetWorldID())) || !pPlayer)
+	if (m_BotTargetID != GetPlayer()->GetCID() && (!pPlayer || (pPlayer && 
+			(distance(m_Core.m_Pos, pPlayer->GetCharacter()->m_Core.m_Pos) > 600.0f
+				|| GS()->Collision()->FastIntersectLine(pPlayer->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0) 
+				|| Server()->GetWorldID(m_BotTargetID) != GS()->GetWorldID()))))
 		ClearTarget();
 
 	// не враждебные мобы

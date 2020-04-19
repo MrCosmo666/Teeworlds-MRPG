@@ -9,6 +9,14 @@ class CPlayerBot : public CPlayer
 {
 	MACRO_ALLOC_POOL_ID()
 
+private:
+	int m_SpawnPointBot;
+	int m_BotID;
+	int m_SubBotID;
+	int m_BotHealth;
+	int m_DungeonAllowedSpawn;
+
+
 public:
 	CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint);
 	virtual ~CPlayerBot() override;
@@ -33,15 +41,6 @@ public:
 
 private:
 	virtual void TryRespawn() override;
-
-	//
-
-	int m_SpawnPointBot;
-	int m_BotID;
-	int m_SubBotID;
-	int m_BotHealth;
-	int m_DungeonAllowedSpawn;
-
 	int GetBotLevel() const;
 	int GetMoodNameplacesType(int SnappingClient);
 	bool IsActiveQuests(int SnapClientID);

@@ -288,7 +288,6 @@ void CLogicDoorKey::Tick()
 {
 	for (CCharacter* pChar = (CCharacter*)GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter*)pChar->TypeNext())
 	{
-		const int ClientID = pChar->GetPlayer()->GetCID();
 		CPlayer* pPlayer = pChar->GetPlayer();
 		if (pPlayer->GetItem(m_ItemID).Count)
 			continue;

@@ -12,7 +12,7 @@ MACRO_ALLOC_POOL_ID_IMPL(CPlayerBot, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
 IServer* CPlayer::Server() const { return m_pGS->Server(); };
 
 CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint)
-: CPlayer(pGS, ClientID), m_BotHealth(NULL), m_BotID(BotID), m_SubBotID(SubBotID), m_SpawnPointBot(SpawnPoint)
+: CPlayer(pGS, ClientID), m_SpawnPointBot(SpawnPoint), m_BotID(BotID), m_SubBotID(SubBotID), m_BotHealth(0)
 {
 	m_Spawned = true;
 	m_DungeonAllowedSpawn = false;

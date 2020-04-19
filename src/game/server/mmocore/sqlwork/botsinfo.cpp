@@ -245,7 +245,7 @@ void ContextBots::ProcessingTalkingNPC(int OwnID, int TalkingID, bool PlayerTalk
 bool ContextBots::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char *pText)
 {
 	int ClientID = pPlayer->GetCID();
-	if (!IsNpcBotValid(MobID) || Progress >= NpcBot[MobID].m_Talk.size())
+	if (!IsNpcBotValid(MobID) || Progress >= (int)NpcBot[MobID].m_Talk.size())
 	{
 		GS()->ClearTalkText(ClientID);
 		return false;
@@ -274,7 +274,7 @@ bool ContextBots::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int T
 bool ContextBots::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char* pText)
 {
 	int ClientID = pPlayer->GetCID();
-	if (!IsQuestBotValid(MobID) || Progress >= QuestBot[MobID].m_Talk.size())
+	if (!IsQuestBotValid(MobID) || Progress >= (int)QuestBot[MobID].m_Talk.size())
 	{
 		GS()->ClearTalkText(ClientID);
 		return false;
@@ -306,7 +306,7 @@ bool ContextBots::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int
 void ContextBots::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 {
 	int ClientID = pPlayer->GetCID();
-	if (!IsQuestBotValid(MobID) || Progress >= QuestBot[MobID].m_Talk.size())
+	if (!IsQuestBotValid(MobID) || Progress >= (int)QuestBot[MobID].m_Talk.size())
 	{
 		GS()->ClearTalkText(ClientID);
 		return;

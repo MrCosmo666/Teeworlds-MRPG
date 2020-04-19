@@ -88,7 +88,6 @@ void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 
 	const bool Passive = SkillData[SkillID].m_Passive;
 	const int ClientID = pPlayer->GetCID();
-	const int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + 6000; 
 	int LevelOwn = GetSkillLevel(ClientID, SkillID);
 	int BonusSkill = GetSkillBonus(ClientID, SkillID) + SkillData[SkillID].m_BonusCount;
 

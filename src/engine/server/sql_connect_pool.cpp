@@ -216,11 +216,11 @@ ResultSet *CConectionPool::SD(const char *Select, const char *Table, const char 
 	#endif  
 	va_end(VarArgs);
 
-	ResultSet* m_results;
 	aBuf[sizeof(aBuf) - 1] = '\0';
 	std::string Buf = "SELECT " + std::string(Select) + " FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
 
 	Connection* pConn = NULL;
+	ResultSet* m_results = NULL;
 
 	try
 	{

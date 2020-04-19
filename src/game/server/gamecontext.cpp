@@ -368,7 +368,7 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 }
 
 // Отправить форматированное сообщение
-void CGS::Chat(int ClientID, const char* pText, ... )
+void CGS::Chat(int ClientID, const char* pText, ...)
 {
 	int Start = (ClientID < 0 ? 0 : ClientID);
 	int End = (ClientID < 0 ? MAX_CLIENTS : ClientID + 1);
@@ -1005,7 +1005,6 @@ void CGS::OnTickLocalWorld()
 	// получить и отправить измененный день
 	if(m_DayEnumType != Server()->GetEnumTypeDay())
 	{
-		int Hour = Server()->GetHourWorld();
 		Chat(-1, "{STR} came! Good {STR}!", Server()->GetStringTypeDay(), Server()->GetStringTypeDay());
 
 		m_DayEnumType = Server()->GetEnumTypeDay();

@@ -67,7 +67,7 @@ void CProjectile::Tick()
 
 	m_LifeSpan--;
 
-	if(TargetChr && !TargetChr->m_Core.m_LostData || Collide || m_LifeSpan < 0 || GameLayerClipped(CurPos))
+	if(m_LifeSpan < 0 || GameLayerClipped(CurPos) || Collide || (TargetChr && !TargetChr->m_Core.m_LostData))
 	{
 		if(!OwnerChar)
 		{

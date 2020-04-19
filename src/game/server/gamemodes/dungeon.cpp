@@ -371,12 +371,6 @@ void DungeonDoor::Tick()
 		// проверяем дистанцию
 		if (Distance < 30.0f && pChar->IsAlive())
 		{
-			vec2 Dir = normalize(pChar->m_Core.m_Pos - IntersectPos);
-			float a = (30.0f * 1.45f - Distance);
-			float Velocity = 0.5f;
-			if (length(pChar->m_Core.m_Vel) > 0.0001)
-				Velocity = 1 - (dot(normalize(pChar->m_Core.m_Vel), Dir) + 1) / 4;
-
 			pChar->Die(pChar->GetPlayer()->GetCID(), WEAPON_SELF);
 		}		
 	}

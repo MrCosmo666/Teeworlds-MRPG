@@ -148,12 +148,11 @@ const char *GuildJob::GuildName(int GuildID) const
 
 bool GuildJob::IsLeaderPlayer(CPlayer *pPlayer, int Access) const
 {
-	const int ClientID = pPlayer->GetCID();
 	const int GuildID = pPlayer->Acc().GuildID;
 	if(GuildID > 0 && Guild.find(GuildID) != Guild.end() &&
 		(Guild[GuildID].m_OwnerID == pPlayer->Acc().AuthID ||
-			RankGuild.find(pPlayer->Acc().GuildRank) != RankGuild.end() &&
-				(RankGuild[pPlayer->Acc().GuildRank].Access == Access || RankGuild[pPlayer->Acc().GuildRank].Access == MACCESSFULL)))
+			(RankGuild.find(pPlayer->Acc().GuildRank) != RankGuild.end() &&
+				(RankGuild[pPlayer->Acc().GuildRank].Access == Access || RankGuild[pPlayer->Acc().GuildRank].Access == MACCESSFULL))))
 		return true;
 	return false;
 }
@@ -195,7 +194,8 @@ bool GuildJob::AddDecorationHouse(int DecoID, int GuildID, vec2 Position)
 
 	int HouseID = GetGuildHouseID(GuildID);
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_decorations", "WHERE HouseID = '%d'", HouseID));
-	if (RES->rowsCount() >= g_Config.m_SvLimitDecoration) return false;
+	if ((int)RES->rowsCount() >= g_Config.m_SvLimitDecoration) 
+		return false;
 
 	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_guilds_decorations", "ORDER BY ID DESC LIMIT 1"));
 	int InitID = (RES2->next() ? RES2->getInt("ID") + 1 : 1);
@@ -295,7 +295,7 @@ void GuildJob::JoinGuild(int AuthID, int GuildID)
 
 	// проверяем количество слотов доступных
 	boost::scoped_ptr<ResultSet> CheckSlotsRES(SJK.SD("ID", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID));
-	if(CheckSlotsRES->rowsCount() >= Guild[GuildID].m_Upgrades[EMEMBERUPGRADE::AvailableNSTSlots])
+	if((int)CheckSlotsRES->rowsCount() >= Guild[GuildID].m_Upgrades[EMEMBERUPGRADE::AvailableNSTSlots])
 	{
 		GS()->ChatAccountID(AuthID, "You don't joined [No slots for join]");
 		return GS()->ChatGuild(GuildID, "{STR} don't joined [No slots for join]", PlayerName);
@@ -455,7 +455,6 @@ bool GuildJob::AddMoneyBank(int GuildID, int Money)
 		return false;
 	
 	// добавить деньги
-	int MoneyLastBank = Guild[GuildID].m_Bank;
 	Guild[GuildID].m_Bank = RES->getInt("Bank") + Money;
 	SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, GuildID);
 	return true;
@@ -1432,7 +1431,6 @@ void GuildDoor::Tick()
 {
 	for (CCharacter* pChar = (CCharacter*)GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter*)pChar->TypeNext())
 	{
-		const int ClientID = pChar->GetPlayer()->GetCID();
 		CPlayer* pPlayer = pChar->GetPlayer();
 		if (m_GuildID == pPlayer->Acc().GuildID)
 			continue;

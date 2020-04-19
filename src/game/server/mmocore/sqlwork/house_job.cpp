@@ -119,7 +119,7 @@ bool HouseJob::AddDecorationHouse(int DecoID, int HouseID, vec2 Position)
 		return false;
 
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_houses_decorations", "WHERE HouseID = '%d'", HouseID));
-	if(RES->rowsCount() >= g_Config.m_SvLimitDecoration) return false;
+	if((int)RES->rowsCount() >= g_Config.m_SvLimitDecoration) return false;
 
 	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_houses_decorations", "ORDER BY ID DESC LIMIT 1"));
 	int InitID = (RES2->next() ? RES2->getInt("ID")+1 : 1); 
@@ -401,7 +401,7 @@ void HouseJob::AddBalance(CPlayer *pPlayer, int Balance)
 	} else return;
                 
 	GS()->Chat(ClientID, "Current House [Farming Level {INT}]!", &Home[HouseID].m_FarmLevel);
-	GS()->Chat(ClientID, false, _("Payment: +{INT} Now House Balance: {INT}!"), &Balance, &Home[HouseID].m_Bank);
+	GS()->Chat(ClientID, _("Payment: +{INT} Now House Balance: {INT}!"), &Balance, &Home[HouseID].m_Bank);
 	SJK.UD("tw_houses", "HouseBank = '%d', FarmLevel = '%d' WHERE ID = '%d'", Home[HouseID].m_Bank, Home[HouseID].m_FarmLevel, HouseID);
 }
 

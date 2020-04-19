@@ -36,7 +36,6 @@ void IGameController::OnCharacterSpawn(CCharacter *pChr)
 	pChr->GetPlayer()->ClearTalking();
 
 	// если спавним бота
-	int ClientID = pChr->GetPlayer()->GetCID();
 	if(pChr->GetPlayer()->IsBot())
 	{
 		pChr->IncreaseHealth(pChr->GetPlayer()->GetStartHealth());
@@ -199,9 +198,6 @@ void IGameController::UpdateGameInfo(int ClientID)
 	}
 }
 
-// map
-static bool IsSeparator(char c) { return c == ';' || c == ' ' || c == ',' || c == '\t'; }
-
 // spawn
 bool IGameController::CanSpawn(int Team, vec2 *pOutPos, vec2 BotPos) const
 {
@@ -279,7 +275,6 @@ void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type, vec2 BotPos
 void IGameController::DoTeamChange(CPlayer *pPlayer, bool DoChatMsg)
 {
 	int ClientID = pPlayer->GetCID();
-	int OldTeam = pPlayer->GetTeam();
 	{
 		// проверяем равняется ли команда той на которуюю меняем
 		int Team = pPlayer->GetStartTeam();

@@ -460,7 +460,6 @@ void CCharacter::CreateQuestsSteps()
 
 void CCharacter::FinishQuestStep(int QuestID)
 {
-	int ClientID = m_pPlayer->GetCID();
 	for(CQuestAI *pQ = (CQuestAI*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_FINDQUEST); pQ; pQ = (CQuestAI *)pQ->TypeNext())
 	{
 		if(pQ->GetClientID() == m_pPlayer->GetCID() && pQ->GetQuestID() == QuestID)
@@ -1106,7 +1105,6 @@ void CCharacter::HandleTilesets()
 
 		if(Server()->Tick() % Server()->TickSpeed() == 0)
 		{
-			int SnapID = m_pPlayer->GetCID()*SNAPPLAYER;
 			int SeasonLevel = m_pPlayer->GetItem(itClubSeasonTicket).Enchant+1;
 			m_pPlayer->AddExp(SeasonLevel*5);
 			m_pPlayer->GetItem(itSeasonToken).Add(SeasonLevel);
@@ -1174,7 +1172,6 @@ bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)
 	if(m_pPlayer->GetItemEquip(EQUIP_HAMMER) == itSpearBronekhods) {
 		int ShotSpread = 8; 
 		for(int i = -ShotSpread; i <= ShotSpread; ++i) {
-			float Spreading = ShotSpread*0.06f + 0.06f / i;
 			float a = angle(Direction) ;
 			float v = 1-(absolute(i)/(float)ShotSpread);
 			float Speed = mix((float)GS()->Tuning()->m_ShotgunSpeeddiff, 1.0f, v);

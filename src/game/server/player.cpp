@@ -850,7 +850,6 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			return;
 		}
 
-		int BotID = ContextBots::QuestBot[MobID].BotID;
 		bool RequiestQuestTask = ContextBots::QuestBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_RequestComplete;
 		GS()->Mmo()->Quest()->QuestTableClear(m_ClientID);
 		if (RequiestQuestTask)

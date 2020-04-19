@@ -94,7 +94,7 @@ void CLoltext::Create(CGS *pGs, CGameWorld *pGameWorld, CEntity *pParent, vec2 P
 
 bool CLoltext::HasRepr(char c) // can be removed when we have a full character set
 {
-	if(c < 0 || c  > 255)
+	if((int)c < 0 || (int)c  > 255)
 		return false;
 
 	for(int y = 0; y < 5; ++y)

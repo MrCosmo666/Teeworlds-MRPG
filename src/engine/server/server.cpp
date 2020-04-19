@@ -973,7 +973,6 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 		{
 			if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && m_aClients[ClientID].m_State == CClient::STATE_CONNECTING)
 			{
-				int OldMapID = m_aClients[ClientID].m_OldMapID;
 				int MapID = m_aClients[ClientID].m_MapID;
 				m_aClients[ClientID].m_State = CClient::STATE_READY;	
 				if(!m_aClients[ClientID].m_ChangeMap)

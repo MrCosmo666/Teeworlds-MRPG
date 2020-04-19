@@ -36,7 +36,8 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 {
 	// инициализируем
 	int ClientID = pPlayer->GetCID();
-	int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + 200;
+	int StartHideCount = (int)(NUMHIDEMENU + ItemSql::ItemsInfo.size() + 200);
+	int HideID = StartHideCount;
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().AuthID, MAX_MAILLIST));
 	while(RES->next())
 	{
@@ -70,8 +71,8 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 	}
 
 	// если пустой inbox
-	bool EmptyInbox = (HideID == NUMHIDEMENU + ItemSql::ItemsInfo.size() + 200);
-	if(EmptyInbox) GS()->AVL(ClientID, "null", "Your mailbox is empty");
+	if(HideID == StartHideCount)
+		GS()->AVL(ClientID, "null", "Your mailbox is empty");
 	return;
 }
 // проверить сообщения имеются ли

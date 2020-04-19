@@ -82,7 +82,8 @@ void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 	GS()->AVM(ClientID, "null", NOPE, HAUCTIONINFO, "To create a slot, see inventory item interact.");
 	GS()->AV(ClientID, "null", "");
 
-	int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + 400;
+	int StartHideCount = (int)(NUMHIDEMENU + ItemSql::ItemsInfo.size() + 400);
+	int HideID = StartHideCount;
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 ORDER BY Price"));
 	while(RES->next())
 	{
@@ -117,7 +118,7 @@ void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 		GS()->AVM(ClientID, "SHOP", ID, HideID, "Buy Price {INT} gold", &Price);
 		++HideID;
 	}
-	if(HideID == (NUMHIDEMENU + ItemSql::ItemsInfo.size() + 400))
+	if(HideID == StartHideCount)
 		GS()->AVL(ClientID, "null", "Currently there are no products.");
 }
 
@@ -130,7 +131,7 @@ void ShopMailSql::CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem)
 
 	// проверяем кол-во слотов занято ли все или нет
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_mailshop", "WHERE OwnerID > '0' LIMIT %d", g_Config.m_SvMaxMasiveAuctionSlots));
-	if(RES->rowsCount() >= g_Config.m_SvMaxMasiveAuctionSlots)
+	if((int)RES->rowsCount() >= g_Config.m_SvMaxMasiveAuctionSlots)
 		return GS()->Chat(ClientID, "Auction has run out of slots, wait for the release of slots!");
 
 	// проверяем кол-во своих слотов
@@ -198,7 +199,6 @@ bool ShopMailSql::BuyShopAuctionSlot(CPlayer *pPlayer, int ID)
 	int Price = RES->getInt("Price");
 	if(OwnerID <= 0 && StorageID > 0) 
 	{
-		const int CountStorage = Job()->Storage()->GetCountStorage(StorageID);
 		if(!Job()->Storage()->BuyStorageItem(true, ClientID, StorageID, Price)) 
 			return false;
 	}

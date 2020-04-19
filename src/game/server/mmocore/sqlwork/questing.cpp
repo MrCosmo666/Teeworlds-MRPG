@@ -491,7 +491,6 @@ void QuestBase::ShowQuestRequired(CPlayer *pPlayer, ContextBots::QuestBotInfo &B
 	}
 
 	// показываем текст по информации о мобах
-	bool ShowMobNeeded = false;
 	{
 		for(int i = 4; i < 6; i++)
 		{
@@ -503,7 +502,6 @@ void QuestBase::ShowQuestRequired(CPlayer *pPlayer, ContextBots::QuestBotInfo &B
 			char aBuf[48];
 			str_format(aBuf, sizeof(aBuf), "\n- Defeat %s [%d/%d]", ContextBots::DataBot[BotID].NameBot, Quests[ClientID][QuestID].MobProgress[i-4], Count);
 			Buffer.append_at(Buffer.length(), aBuf);
-			ShowMobNeeded = true;
 		}
 	}
 
@@ -781,7 +779,7 @@ void QuestBase::QuestTableAddItem(int ClientID, const char* pText, int Requires,
 		return;
 
 	CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
-	if (ItemID >= itMoney && ItemID <= ItemSql::ItemsInfo.size() && pPlayer)
+	if (ItemID >= itMoney && ItemID <= (int)ItemSql::ItemsInfo.size() && pPlayer)
 	{
 		ItemSql::ItemPlayer SelectedItem = pPlayer->GetItem(ItemID);
 
@@ -824,7 +822,6 @@ void QuestBase::QuestTableShowInformation(CPlayer* pPlayer, ContextBots::QuestBo
 
 	// показываем текст завершения квеста
 	int ClientID = pPlayer->GetCID();	
-	int QuestID = BotData.QuestID;
 
 	// показываем по информация о предметах
 	for (int i = 0; i < 2; i++)
@@ -912,13 +909,10 @@ void QuestBase::CreateQuestingItems(CPlayer *pPlayer, ContextBots::QuestBotInfo 
 
 		// создаем предметы
 		int Count = BotData.InterCount[0];
-		const int QuestID = BotData.QuestID;
-		const int ItemID = BotData.Interactive[0];
 		vec2 Pos = vec2(BotData.PositionX, BotData.PositionY);
 		for (int i = 0; i < Count * 2; i++)
 		{
 			vec2 Dir = normalize(vec2(2800 - rand() % 5600, -400 - rand() % 400));
-			vec2 Projdrop = (Dir * max(0.001f, 2.6f));
 			new CQuestItem(&GS()->m_World, Pos, Dir, BotData, ClientID);
 		}
 	}

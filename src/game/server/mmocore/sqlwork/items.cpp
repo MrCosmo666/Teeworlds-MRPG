@@ -121,7 +121,7 @@ void ItemSql::ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction)
 	bool Found = false;	
 	for(const auto& it : Items[ClientID])
 	{
-		if(!it.second.Count || (SortedFunction && it.second.Info().Function != TypeList || !SortedFunction && it.second.Info().Type != TypeList))
+		if(!it.second.Count || ((SortedFunction && it.second.Info().Function != TypeList) || (!SortedFunction && it.second.Info().Type != TypeList)))
 			continue;
 
 		ItemSelected(pPlayer, it.second);
@@ -169,7 +169,6 @@ int ItemSql::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, 
 // удаляем предмет второстепенная обработка
 void ItemSql::RemoveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Count, int Settings)
 {
-	const int ClientID = pPlayer->GetCID();
 	*SecureCode = DeSecureCheck(pPlayer, ItemID, Count, Settings);
 	if(*SecureCode != 1) return;
 
@@ -340,7 +339,6 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 			Get = AvailableCount;
 
 		ItemPlayer& PlItem = pPlayer->GetItem(VoteID);
-		const int Enchant = PlItem.Enchant;
 		GS()->SBL(ClientID, PRELEGENDARY, 100, "You drop {STR}x{INT}", PlItem.Info().GetName(pPlayer), &Get);
 		GS()->CreateDropItem(pPlayer->GetCharacter()->m_Core.m_Pos, -1, PlItem, Get);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
