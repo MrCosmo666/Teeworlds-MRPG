@@ -43,12 +43,12 @@ jobs:
         ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target everything
     - name: Package
       run: |
-        cd release
+        cd Release
         ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target package_default
         mkdir artifacts
         mv ${{ matrix.package-file }} artifacts
     - name: Upload Artifacts
       uses: actions/upload-artifact@v1
       with:
-        name: mmoteeworlds-${{ matrix.os }}
-        path: release/artifacts
+        name: ${{ matrix.package-file }}
+        path: Release/artifacts
