@@ -310,15 +310,11 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAME].m_Id);
 	Graphics()->QuadsBegin();
 
-	const int c[] = { SPRITE_MOBEYESFIRE, SPRITE_MOBEYES };
+	const int c[] = { SPRITE_BUBBLE_FIRE };
 	RenderTools()->SelectSprite(c[pCurrent->m_Type]);
 
-	// эффекты
-	vec2 Vel = Pos - PrevPos;
-	if (pCurrent->m_Type == 0)
-		m_pClient->m_pEffects->BubbleEffect(Pos, Vel * -1);
-
 	// добавить эффект проджектайлу
+	vec2 Vel = Pos - PrevPos;
 	if (pCurrent->m_Weapon == WEAPON_GRENADE) {
 		static float s_Time = 0.0f;
 		static float s_LastLocalTime = Client()->LocalTime();
@@ -347,23 +343,14 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 
 void CItems::RenderMmoitems(const CNetObj_MmoItems * pPrev, const CNetObj_MmoItems * pCurrent)
 {
-	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAME].m_Id);
-	Graphics()->QuadsBegin();
-
 	vec2 Prev = vec2(pPrev->m_X, pPrev->m_Y);
 	vec2 Curr = vec2(pCurrent->m_X, pCurrent->m_Y);
 	vec2 Pos = mix(Prev, Curr, Client()->IntraGameTick());
-	const int c[] = { SPRITE_BOX, SPRITE_EXPERIENCE, SPRITE_MOBEYES, SPRITE_PLANT, SPRITE_ORES };
 
-	if (g_Config.m_ClShowMEffects != 3 && g_Config.m_ClShowMEffects != 1)
-	{
-		if (pCurrent->m_Type == ITEMS_BOX)
-			m_pClient->m_pEffects->WingsEffect(Pos, vec2(0, 0), vec4(0.2f, 0.04f, 0.04f, 0.005f));
-		if (pCurrent->m_Type == ITEMS_PLANT)
-			m_pClient->m_pEffects->WingsEffect(Pos, vec2(0, 0), vec4(0.0f, 0.04f, 0.0f, 0.015f));
-		if (pCurrent->m_Type == ITEMS_ORE)
-			m_pClient->m_pEffects->WingsEffect(Pos, vec2(0, 0), vec4(0.04f, 0.00f, 0.02f, 0.015f));
-	}
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAME].m_Id);
+	Graphics()->QuadsBegin();
+
+	const int c[] = { SPRITE_BOX, SPRITE_EXPERIENCE, SPRITE_PLANT, SPRITE_ORES };
 	RenderTools()->SelectSprite(c[pCurrent->m_Type]);
 
 	static float s_Time = 0.0f;
@@ -373,7 +360,8 @@ void CItems::RenderMmoitems(const CNetObj_MmoItems * pPrev, const CNetObj_MmoIte
 		const IDemoPlayer::CInfo* pInfo = DemoPlayer()->BaseInfo();
 		if (!pInfo->m_Paused) s_Time += (Client()->LocalTime() - s_LastLocalTime) * pInfo->m_Speed;
 	}
-	else {
+	else 
+	{
 		if (m_pClient->m_Snap.m_pGameData && !(m_pClient->m_Snap.m_pGameData->m_GameStateFlags & GAMESTATEFLAG_PAUSED))
 			s_Time += Client()->LocalTime() - s_LastLocalTime;
 	}

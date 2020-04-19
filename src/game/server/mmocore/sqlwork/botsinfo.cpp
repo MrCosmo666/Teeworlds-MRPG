@@ -9,17 +9,19 @@ using namespace sqlstr;
 // Структуры ботов
 const char *ContextBots::DescDataBot::Name(CPlayer *pPlayer) const
 {
-	if(!pPlayer) return "(invalid)";
+	if(!pPlayer) 
+		return "(invalid)";
 
 	int ClientID = pPlayer->GetCID();
-	if(pPlayer->IsBot())
+	if (ClientID >= MAX_PLAYERS)
 	{
-		if(pPlayer->GetSpawnBot() == SPAWNMOBS)
+		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(pPlayer);
+		if (BotPlayer->GetSpawnBot() == SPAWNMOBS)
 		{
-			int SubID = pPlayer->GetBotSub();
+			int SubID = BotPlayer->GetBotSub();
 			return ContextBots::MobBot[SubID].Name;
 		}
-		int BotID = pPlayer->GetBotID();
+		int BotID = BotPlayer->GetBotID();
 		return ContextBots::DataBot[BotID].NameBot;
 	}
 	return pPlayer->GS()->Server()->ClientName(ClientID);

@@ -1357,15 +1357,14 @@ void CGS::OnClientEnter(int ClientID)
 			Server()->SendPackMsg(&NewClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, i);
 
 		// existing infos for new player
-		bool Bot = m_apPlayers[i]->IsBot();
-		int BotID = m_apPlayers[i]->GetBotID();
-
 		CNetMsg_Sv_ClientInfo ClientInfoMsg;
 		ClientInfoMsg.m_ClientID = i;
 		ClientInfoMsg.m_Local = 0;
 		ClientInfoMsg.m_Team = m_apPlayers[i]->GetTeam();
 
 		// имя
+		bool Bot = m_apPlayers[i]->IsBot();
+		int BotID = m_apPlayers[i]->GetBotID();
 		ClientInfoMsg.m_pName = ContextBots::DataBot[BotID].Name(m_apPlayers[i]);
 		ClientInfoMsg.m_pClan = Server()->ClientClan(i);
 		ClientInfoMsg.m_Country = Server()->ClientCountry(i);
@@ -2139,7 +2138,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		ShowPlayerStats(pPlayer);
 
 		AVH(ClientID, HEQUIPSELECT, vec3(40, 10, 5), "Equip Select List");
-		const char* pType[NUM_EQUIPS] = { "Wings", "Stabilized", "Hammer", "Gun", "Shotgun", "Grenade", "Rifle", "Discord", "Pickaxe" };
+		const char* pType[NUM_EQUIPS] = { "Wings", "Hammer", "Gun", "Shotgun", "Grenade", "Rifle", "Discord", "Pickaxe" };
 		for(int i = EQUIP_WINGS; i < NUM_EQUIPS; i++) 
 		{
 			const int ItemID = pPlayer->GetItemEquip(i);
@@ -2280,7 +2279,32 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 /* #########################################################################
 	MMO GAMECONTEXT 
 ######################################################################### */
-// Создать бота
+void CGS::SendInformationBot(CPlayerBot *pPlayerBot)
+{
+	if (!pPlayerBot)
+		return;
+
+	int ClientID = pPlayerBot->GetCID();
+	CNetMsg_Sv_ClientInfo ClientInfoMsg;
+	ClientInfoMsg.m_ClientID = ClientID;
+	ClientInfoMsg.m_Local = 0;
+	ClientInfoMsg.m_Team = TEAM_RED;
+
+	int BotID = pPlayerBot->GetBotID();
+	ClientInfoMsg.m_pName = ContextBots::DataBot[BotID].Name(pPlayerBot);
+	ClientInfoMsg.m_pClan = "::Bots::";
+	ClientInfoMsg.m_Country = 0;
+	ClientInfoMsg.m_Silent = true;
+	for (int p = 0; p < 6; p++)
+	{
+		ClientInfoMsg.m_apSkinPartNames[p] = ContextBots::DataBot[BotID].SkinNameBot[p];
+		ClientInfoMsg.m_aUseCustomColors[p] = ContextBots::DataBot[BotID].UseCustomBot[p];
+		ClientInfoMsg.m_aSkinPartColors[p] = ContextBots::DataBot[BotID].SkinColorBot[p];
+	}
+	dbg_msg("test", "here");
+	Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1);
+}
+
 void CGS::CreateBot(short SpawnPoint, int BotID, int SubID)
 {
 	int BotClientID = MAX_PLAYERS;

@@ -17,6 +17,7 @@ CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int Spaw
 	m_Spawned = true;
 	m_DungeonAllowedSpawn = false;
 	m_PlayerTick[TickState::Respawn] = Server()->Tick();
+	GS()->SendInformationBot(this);
 }
 
 CPlayerBot::~CPlayerBot() 

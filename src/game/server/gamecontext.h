@@ -286,6 +286,7 @@ public:
 	/* #########################################################################
 		MMO GAMECONTEXT 
 	######################################################################### */
+	void SendInformationBot(CPlayerBot* pPlayer);
 	void CreateBot(short SpawnPoint, int BotID, int SubID);
 	virtual void ClearQuestsBot(int QuestID, int Step);
 	void CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, int WorldID);

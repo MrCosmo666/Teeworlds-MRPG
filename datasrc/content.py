@@ -261,7 +261,7 @@ image_sidebaricons = Image("sidebaricons", "ui/icons/sidebar.png", 1)
 image_chatwhisper = Image("chatwhisper", "ui/icons/chat_whisper.png", 1)
 image_timerclock = Image("timerclock", "ui/icons/timer_clock.png", 1)
 
-image_efmmotee = Image("mmoeffect", "mmotee/effx/mmotee.png")
+image_relax = Image("mmoeffect", "mmotee/effx/relax.png")
 image_teleport = Image("teleporteffect", "mmotee/effx/teleport.png")
 image_wingit19 = Image("wingsit19", "mmotee/wings/it19.png")
 image_wingit20 = Image("wingsit20", "mmotee/wings/it20.png")
@@ -304,7 +304,7 @@ container.images.Add(image_chatwhisper)
 container.images.Add(Image("raceflag", "race_flag.png"))
 container.images.Add(image_timerclock)
 # mmotee
-container.images.Add(image_efmmotee)
+container.images.Add(image_relax)
 container.images.Add(image_teleport)
 container.images.Add(image_wingit19)
 container.images.Add(image_wingit20)
@@ -355,7 +355,7 @@ set_levelicons = SpriteSet("levelicons", image_levelicons, 4, 4)
 set_sidebaricons = SpriteSet("sidebaricons", image_sidebaricons, 4, 2)
 set_timerclock = SpriteSet("timerclock", image_timerclock, 1, 2)
 # mmotee
-set_mmotee = SpriteSet("mmotee", image_efmmotee, 4, 4)
+set_relax = SpriteSet("relax", image_relax, 1, 2)
 set_teleport = SpriteSet("teleport", image_teleport, 8, 1)
 set_wingsit19 = SpriteSet("wingsit19", image_wingit19, 1, 1)
 set_wingsit20 = SpriteSet("wingsit20", image_wingit20, 1, 1)
@@ -364,7 +364,7 @@ set_wingsit22 = SpriteSet("wingsit22", image_wingit22, 1, 1)
 set_wingsit23 = SpriteSet("wingsit23", image_wingit23, 1, 1)
 set_odinspear = SpriteSet("odinspear", image_odinspear, 1, 1)
 set_aztecsword = SpriteSet("aztecsword", image_aztecsword, 1, 1)
-set_mmogame = SpriteSet("mmogame", image_mmogame, 32, 16)
+set_mmogame = SpriteSet("mmogame", image_mmogame, 16, 8)
 set_mmologo = SpriteSet("mmologo", image_mmologo, 1, 1)
 
 ###############################################################################
@@ -397,7 +397,7 @@ container.spritesets.Add(set_levelicons)
 container.spritesets.Add(set_sidebaricons)
 container.spritesets.Add(set_timerclock)
 # mmotee
-container.spritesets.Add(set_mmotee)
+container.spritesets.Add(set_relax)
 container.spritesets.Add(set_teleport)
 container.spritesets.Add(set_wingsit19)
 container.spritesets.Add(set_wingsit20)
@@ -627,22 +627,19 @@ container.sprites.Add(Sprite("sidebar_info_b", set_sidebaricons, 3,1,1,1))
 container.sprites.Add(Sprite("timerclock_a", set_timerclock, 0,0,1,1))
 container.sprites.Add(Sprite("timerclock_b", set_timerclock, 0,1,1,1))
 #mmotee
-container.sprites.Add(Sprite("box", set_mmogame, 0, 0, 2, 2))
-container.sprites.Add(Sprite("experience", set_mmogame, 2, 0, 2, 2))
-container.sprites.Add(Sprite("mobeyes", set_mmogame, 4, 0, 2, 2))
-container.sprites.Add(Sprite("plant", set_mmogame, 6, 0, 2, 2))
-container.sprites.Add(Sprite("ores", set_mmogame, 8, 0, 2, 2))
-container.sprites.Add(Sprite("mobeyesfire", set_mmogame, 0, 6, 2, 2))
+container.sprites.Add(Sprite("box", set_mmogame, 0, 0, 1, 1))
+container.sprites.Add(Sprite("experience", set_mmogame, 1, 0, 1, 1))
+container.sprites.Add(Sprite("plant", set_mmogame, 2, 0, 1, 1))
+container.sprites.Add(Sprite("ores", set_mmogame, 3, 0, 1, 1))
+container.sprites.Add(Sprite("bubble_fire", set_mmogame, 0, 3, 1, 1))
 
-for i in range(1, 4):
-	container.sprites.Add(Sprite("mmo"+str(i), set_mmotee, i-1, 0, 1, 1))
-for i in range(1, 4):
-	container.sprites.Add(Sprite("mmo"+str(i+4), set_mmotee, i-1, 1, 1, 1))
-for i in range(1, 4):
-	container.sprites.Add(Sprite("mmo"+str(i+8), set_mmotee, i-1, 2, 1, 1))
+container.sprites.Add(Sprite("relax_heart", set_relax, 0, 0, 1, 1))
+container.sprites.Add(Sprite("relax_eyes", set_relax, 1, 0, 1, 1))
+
+# teleports frames
 for i in range(1, 9):
 	container.sprites.Add(Sprite("teleport"+str(i), set_teleport, i-1, 0, 1, 1))
-  
+	
 ###############################################################################
 ###############################################################################
 ###############################################################################

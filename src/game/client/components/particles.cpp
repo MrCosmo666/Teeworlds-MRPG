@@ -275,6 +275,7 @@ void CParticles::RenderMmoEffect(int Group)
 		Graphics()->BlendNormal();
 		return;
 	}
+
 	if (Group == GROUP_MMOPROJ)
 	{
 		Graphics()->BlendNormal();

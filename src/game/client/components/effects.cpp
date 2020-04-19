@@ -28,19 +28,18 @@ CEffects::CEffects()
 
 // mmotee
 void CEffects::MmoEffects(vec2 Pos, int EffectID)
-{
+{ 
+	CParticle p;
+	p.SetDefault();
 	if (EffectID == EFFECT_SPASALON)
 	{
-		CParticle p;
-		p.SetDefault();
-		p.m_Spr = rand() % 2 == 0 ? SPRITE_MMO1 : SPRITE_MMO2;
+		p.m_Spr = rand() % 2 == 0 ? (int)(SPRITE_RELAX_EYES) : (int)(SPRITE_RELAX_HEART);
 		p.m_Pos = Pos;
 		p.m_LifeSpan = 2.5f;
 
 		p.m_Gravity = -1000.0f;
 		p.m_Friction = 0.4f;
 		p.m_Frames = 1;
-
 		p.m_StartSize = 60.0f + rand() % 10;
 		p.m_EndSize = 0;
 		p.m_Rot = 0 + rand() % 2 - rand() % 4;
@@ -49,24 +48,18 @@ void CEffects::MmoEffects(vec2 Pos, int EffectID)
 		m_pClient->m_pParticles->Add(CParticles::GROUP_MMOEFFECTS, &p);
 		return;
 	}
-	if (EffectID == EFFECT_TELEPORT)
-	{
-		CParticle p;
-		p.SetDefault();
-		p.m_Spr = SPRITE_TELEPORT1;
-		p.m_Frames = 8;
-		p.m_Pos = Pos;
-		p.m_LifeSpan = 0.4f;
-		p.m_Gravity = -1000.0f;
-		p.m_Friction = 0.4f;
-		p.m_StartSize = 220;
-		p.m_EndSize = 220;
-		p.m_Rot = 0;
-		p.m_Color = vec4(100.0f, 100.0f, 100.0f, 0.10f);
-
-		m_pClient->m_pParticles->Add(CParticles::GROUP_TELEPORT, &p);
-		return;
-	}
+	// эффект телепорта
+	p.m_Spr = SPRITE_TELEPORT1;
+	p.m_Frames = 8;
+	p.m_Pos = Pos;
+	p.m_LifeSpan = 0.4f;
+	p.m_Gravity = -1000.0f;
+	p.m_Friction = 0.4f;
+	p.m_StartSize = 220;
+	p.m_EndSize = 220;
+	p.m_Rot = 0;
+	p.m_Color = vec4(100.0f, 100.0f, 100.0f, 0.10f);
+	m_pClient->m_pParticles->Add(CParticles::GROUP_TELEPORT, &p);
 }
 
 void CEffects::MmoEffectPotion(vec2 Pos, const char* Potion, bool Added)
@@ -119,7 +112,7 @@ void CEffects::WingsEffect(vec2 Pos, vec2 Vel, vec4 Color)
 
 	CParticle p;
 	p.SetDefault();
-	p.m_Spr = SPRITE_MOBEYESFIRE;
+	p.m_Spr = SPRITE_BOX;
 	p.m_Pos = vec2(Pos.x + 20 - rand() % 40, Pos.y + 20 - rand() % 40);
 	p.m_Vel = Vel + RandomDir() * 200.0f;
 	p.m_LifeSpan = 0.5f + frandom() * 0.5f;
@@ -138,7 +131,7 @@ void CEffects::BubbleEffect(vec2 Pos, vec2 Vel)
 
 	CParticle p;
 	p.SetDefault();
-	p.m_Spr = SPRITE_MOBEYESFIRE;
+	p.m_Spr = SPRITE_BUBBLE_FIRE;
 	p.m_Pos = Pos;
 	p.m_Vel = Vel + RandomDir() * 200.0f;
 	p.m_LifeSpan = 0.5f + frandom() * 0.5f;
@@ -390,10 +383,8 @@ void CEffects::Explosion(vec2 Pos)
 	}
 }
 
-
 void CEffects::HammerHit(vec2 Pos)
 {
-	// add the explosion
 	CParticle p;
 	p.SetDefault();
 	p.m_Spr = SPRITE_PART_HIT01;

@@ -21,48 +21,19 @@ GameMsgIDs = Enum("GAMEMSG", ["TEAM_SWAP", "SPEC_INVALIDID", "TEAM_SHUFFLE", "TE
 							"GAME_PAUSED"]) # todo 0.8: sort (1 para)
 
 # mmotee
-AuthCodes = Enum("AUTH", ["ALL_UNKNOWN", 
-							"ALL_MUSTCHAR", 
-							"ALL_GOOD", 
-							"LOGIN_ALREADY", 
-							"LOGIN_WRONG", 
-							"LOGIN_NICKNAME", 
-							"REGISTER_ERROR_NICK"])
+WorldType = Enum("WORLD", ["STANDARD", "CUTSCENE", "DUNGEON"])
+TalkedStyles = Enum("TALK_STYLE", ["STANDARD", "AGRESSIVE", "HAPPED"])
+MoodType = Enum("MOOD", ["ANGRY", "AGRESSED_TANK", "AGRESSED_OTHER", "NORMAL", "FRIENDLY", "QUESTING"])
+MmoItems = Enum("ITEMS", ["BOX", "EXPERIENCE", "PLANT", "ORE"])
+Equip = Enum("EQUIP", ["WINGS", "HAMMER", "GUN", "SHOTGUN", "GRENADE", "RIFLE", "DISCORD", "MINER"])
+Effects = Enum("EFFECT", ["SPASALON", "TELEPORT"])
+AuthCodes = Enum("AUTH", ["ALL_UNKNOWN", "ALL_MUSTCHAR", "ALL_GOOD", "LOGIN_ALREADY", 
+							"LOGIN_WRONG", "LOGIN_NICKNAME", "REGISTER_ERROR_NICK"])
 
-Effects = Enum("EFFECT", ["SPASALON", 
-							"TELEPORT"])
 
-Equip = Enum("EQUIP", ["WINGS", 
-						"STABILIZED", 
-						"HAMMER", 
-						"GUN", 
-						"SHOTGUN", 
-						"GRENADE", 
-						"RIFLE", 
-						"DISCORD",
-						"MINER"])
 
-MmoItems = Enum("ITEMS", ["BOX", 
-							"EXPERIENCE",
-							"MOBEYES", 
-							"PLANT",
-							"ORE"])
 
-MoodType = Enum("MOOD", ["ANGRY", 
-							"AGRESSED_TANK",
-							"AGRESSED_OTHER", 
-							"NORMAL", 
-							"FRIENDLY",
-							"QUESTING"])
-
-WorldType = Enum("WORLD", ["STANDARD", 
-							"CUTSCENE",
-							"DUNGEON"])
-
-TalkedStyles = Enum("TALK_STYLE", ["STANDARD", 
-							"AGRESSIVE",
-							"HAPPED"])
-							
+						
 RawHeader = '''
 
 #include <engine/message.h>

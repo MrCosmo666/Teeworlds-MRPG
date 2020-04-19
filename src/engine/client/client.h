@@ -12,7 +12,7 @@ public:
 	enum
 	{
 		// restrictions: Must be power of two
-		MAX_VALUES=128,
+		MAX_VALUES = 128,
 	};
 
 	float m_Min, m_Max;
@@ -27,7 +27,7 @@ public:
 	void ScaleMin();
 
 	void Add(float v, float r, float g, float b);
-	void Render(IGraphics *pGraphics, IGraphics::CTextureHandle FontTexture, float x, float y, float w, float h, const char *pDescription);
+	void Render(IGraphics* pGraphics, IGraphics::CTextureHandle FontTexture, float x, float y, float w, float h, const char* pDescription);
 };
 
 
@@ -49,32 +49,33 @@ public:
 	int64 Get(int64 Now);
 
 	void UpdateInt(int64 Target);
-	void Update(CGraph *pGraph, int64 Target, int TimeLeft, int AdjustDirection);
+	void Update(CGraph* pGraph, int64 Target, int TimeLeft, int AdjustDirection);
 };
 
 
 class CClient : public IClient, public CDemoPlayer::IListner
 {
 	// needed interfaces
-	IEngine *m_pEngine;
-	IEditor *m_pEditor;
-	IEngineInput *m_pInput;
-	IEngineGraphics *m_pGraphics;
-	IEngineSound *m_pSound;
-	IGameClient *m_pGameClient;
-	IEngineMap *m_pMap;
-	IConsole *m_pConsole;
-	IStorage *m_pStorage;
-	IUpdater *m_pUpdater;
-	IEngineMasterServer *m_pMasterServer;
+	IEngine* m_pEngine;
+	IEditor* m_pEditor;
+	IEngineInput* m_pInput;
+	IEngineGraphics* m_pGraphics;
+	IEngineSound* m_pSound;
+	IGameClient* m_pGameClient;
+	IEngineMap* m_pMap;
+	IConsole* m_pConsole;
+	IStorage* m_pStorage;
+	IUpdater* m_pUpdater;
+	IEngineMasterServer* m_pMasterServer;
 
 	enum
 	{
-		NUM_SNAPSHOT_TYPES=2,
-		PREDICTION_MARGIN=1000/50/2, // magic network prediction value
+		NUM_SNAPSHOT_TYPES = 2,
+		PREDICTION_MARGIN = 1000 / 50 / 2, // magic network prediction value
 	};
 
 	class CNetClient m_NetClient;
+	class CNetClient m_ContactClient;
 	class CDemoPlayer m_DemoPlayer;
 	class CDemoRecorder m_DemoRecorder;
 	class CServerBrowser m_ServerBrowser;
@@ -166,13 +167,13 @@ class CClient : public IClient, public CDemoPlayer::IListner
 
 	// the game snapshots are modifiable by the game
 	class CSnapshotStorage m_SnapshotStorage;
-	CSnapshotStorage::CHolder *m_aSnapshots[NUM_SNAPSHOT_TYPES];
+	CSnapshotStorage::CHolder* m_aSnapshots[NUM_SNAPSHOT_TYPES];
 
 	int m_RecivedSnapshots;
-	char m_aSnapshotIncomingData[CSnapshot::MAX_SIZE];
+	char m_aSnapshotIncommingData[CSnapshot::MAX_SIZE];
 
 	class CSnapshotStorage::CHolder m_aDemorecSnapshotHolders[NUM_SNAPSHOT_TYPES];
-	char *m_aDemorecSnapshotData[NUM_SNAPSHOT_TYPES][2][CSnapshot::MAX_SIZE];
+	char* m_aDemorecSnapshotData[NUM_SNAPSHOT_TYPES][2][CSnapshot::MAX_SIZE];
 	class CSnapshotBuilder m_DemoRecSnapshotBuilder;
 
 	class CSnapshotDelta m_SnapshotDelta;
@@ -185,7 +186,7 @@ class CClient : public IClient, public CDemoPlayer::IListner
 	{
 		enum
 		{
-			STATE_INIT=0,
+			STATE_INIT = 0,
 			STATE_START,
 			STATE_READY,
 			STATE_ERROR,
@@ -198,19 +199,19 @@ class CClient : public IClient, public CDemoPlayer::IListner
 	int64 TickStartTime(int Tick);
 
 public:
-	IEngine *Engine() { return m_pEngine; }
-	IEngineGraphics *Graphics() { return m_pGraphics; }
-	IEngineInput *Input() { return m_pInput; }
-	IEngineSound *Sound() { return m_pSound; }
-	IGameClient *GameClient() { return m_pGameClient; }
-	IEngineMasterServer *MasterServer() { return m_pMasterServer; }
-	IStorage *Storage() { return m_pStorage; }
-	IUpdater *Updater() { return m_pUpdater; }
+	IEngine* Engine() { return m_pEngine; }
+	IEngineGraphics* Graphics() { return m_pGraphics; }
+	IEngineInput* Input() { return m_pInput; }
+	IEngineSound* Sound() { return m_pSound; }
+	IGameClient* GameClient() { return m_pGameClient; }
+	IEngineMasterServer* MasterServer() { return m_pMasterServer; }
+	IStorage* Storage() { return m_pStorage; }
+	IUpdater* Updater() { return m_pUpdater; }
 
 	CClient();
 
 	// ----- send functions -----
-	virtual int SendMsg(CMsgPacker *pMsg, int Flags);
+	virtual int SendMsg(CMsgPacker* pMsg, int Flags);
 
 	void SendInfo();
 	void SendEnterGame();
@@ -222,8 +223,8 @@ public:
 
 	virtual bool RconAuthed() const { return m_RconAuthed != 0; }
 	virtual bool UseTempRconCommands() const { return m_UseTempRconCommands != 0; }
-	void RconAuth(const char *pName, const char *pPassword);
-	virtual void Rcon(const char *pCmd);
+	void RconAuth(const char* pName, const char* pPassword);
+	virtual void Rcon(const char* pCmd);
 
 	virtual bool ConnectionProblems() const;
 
@@ -234,9 +235,9 @@ public:
 	void SendInput();
 
 	// TODO: OPT: do this alot smarter!
-	virtual const int *GetInput(int Tick) const;
+	virtual const int* GetInput(int Tick) const;
 
-	const char *LatestVersion() const;
+	const char* LatestVersion() const;
 	void VersionUpdate();
 
 	// ------ state handling -----
@@ -246,22 +247,22 @@ public:
 	void OnEnterGame();
 	virtual void EnterGame();
 
-	virtual void Connect(const char *pAddress);
-	void DisconnectWithReason(const char *pReason);
+	virtual void Connect(const char* pAddress);
+	void DisconnectWithReason(const char* pReason);
 	virtual void Disconnect();
 
 
-	virtual void GetServerInfo(CServerInfo *pServerInfo) const;
+	virtual void GetServerInfo(CServerInfo* pServerInfo) const;
 
 	int LoadData();
 
 	// ---
 
-	const void *SnapGetItem(int SnapID, int Index, CSnapItem *pItem) const;
+	const void* SnapGetItem(int SnapID, int Index, CSnapItem* pItem) const;
 	void SnapInvalidateItem(int SnapID, int Index);
-	const void *SnapFindItem(int SnapID, int Type, int ID) const;
+	const void* SnapFindItem(int SnapID, int Type, int ID) const;
 	int SnapNumItems(int SnapID) const;
-	void *SnapNewItem(int Type, int ID, int Size);
+	void* SnapNewItem(int Type, int ID, int Size);
 	void SnapSetStaticsize(int ItemType, int Size);
 
 	void Render();
@@ -276,25 +277,25 @@ public:
 
 	virtual void Quit();
 
-	virtual const char *ErrorString() const;
+	virtual const char* ErrorString() const;
 
-	const char *LoadMap(const char *pName, const char *pFilename, const SHA256_DIGEST *pWantedSha256, unsigned WantedCrc);
-	const char *LoadMapSearch(const char *pMapName, const SHA256_DIGEST *pWantedSha256, int WantedCrc);
+	const char* LoadMap(const char* pName, const char* pFilename, const SHA256_DIGEST* pWantedSha256, unsigned WantedCrc);
+	const char* LoadMapSearch(const char* pMapName, const SHA256_DIGEST* pWantedSha256, int WantedCrc);
 
-	int UnpackServerInfo(CUnpacker *pUnpacker, CServerInfo *pInfo, int *pToken);
-	void ProcessConnlessPacket(CNetChunk *pPacket);
-	void ProcessServerPacket(CNetChunk *pPacket);
+	int UnpackServerInfo(CUnpacker* pUnpacker, CServerInfo* pInfo, int* pToken);
+	void ProcessConnlessPacket(CNetChunk* pPacket);
+	void ProcessServerPacket(CNetChunk* pPacket);
 
-	const char *GetCurrentMapName() const { return m_aCurrentMap; }
-	const char *GetCurrentMapPath() const { return m_aCurrentMapPath; }
-	virtual const char *MapDownloadName() const { return m_aMapdownloadName; }
+	const char* GetCurrentMapName() const { return m_aCurrentMap; }
+	const char* GetCurrentMapPath() const { return m_aCurrentMapPath; }
+	virtual const char* MapDownloadName() const { return m_aMapdownloadName; }
 	virtual int MapDownloadAmount() const { return m_MapdownloadAmount; }
 	virtual int MapDownloadTotalsize() const { return m_MapdownloadTotalsize; }
 
 	void PumpNetwork();
 
-	virtual void OnDemoPlayerSnapshot(void *pData, int Size);
-	virtual void OnDemoPlayerMessage(void *pData, int Size);
+	virtual void OnDemoPlayerSnapshot(void* pData, int Size);
+	virtual void OnDemoPlayerMessage(void* pData, int Size);
 
 	void Update();
 
@@ -304,33 +305,33 @@ public:
 	bool LimitFps();
 	void Run();
 
-	void ConnectOnStart(const char *pAddress);
+	void ConnectOnStart(const char* pAddress);
 	void DoVersionSpecificActions();
 
-	static void Con_Connect(IConsole::IResult *pResult, void *pUserData);
-	static void Con_Disconnect(IConsole::IResult *pResult, void *pUserData);
-	static void Con_Quit(IConsole::IResult *pResult, void *pUserData);
-	static void Con_Minimize(IConsole::IResult *pResult, void *pUserData);
-	static void Con_Ping(IConsole::IResult *pResult, void *pUserData);
-	static void Con_Screenshot(IConsole::IResult *pResult, void *pUserData);
-	static void Con_Rcon(IConsole::IResult *pResult, void *pUserData);
-	static void Con_RconAuth(IConsole::IResult *pResult, void *pUserData);
-	static void Con_AddFavorite(IConsole::IResult *pResult, void *pUserData);
-	static void Con_RemoveFavorite(IConsole::IResult *pResult, void *pUserData);
-	static void Con_Play(IConsole::IResult *pResult, void *pUserData);
-	static void Con_Record(IConsole::IResult *pResult, void *pUserData);
-	static void Con_StopRecord(IConsole::IResult *pResult, void *pUserData);
-	static void Con_AddDemoMarker(IConsole::IResult *pResult, void *pUserData);
-	static void ConchainServerBrowserUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainFullscreen(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainWindowBordered(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainWindowScreen(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
-	static void ConchainWindowVSync(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
+	static void Con_Connect(IConsole::IResult* pResult, void* pUserData);
+	static void Con_Disconnect(IConsole::IResult* pResult, void* pUserData);
+	static void Con_Quit(IConsole::IResult* pResult, void* pUserData);
+	static void Con_Minimize(IConsole::IResult* pResult, void* pUserData);
+	static void Con_Ping(IConsole::IResult* pResult, void* pUserData);
+	static void Con_Screenshot(IConsole::IResult* pResult, void* pUserData);
+	static void Con_Rcon(IConsole::IResult* pResult, void* pUserData);
+	static void Con_RconAuth(IConsole::IResult* pResult, void* pUserData);
+	static void Con_AddFavorite(IConsole::IResult* pResult, void* pUserData);
+	static void Con_RemoveFavorite(IConsole::IResult* pResult, void* pUserData);
+	static void Con_Play(IConsole::IResult* pResult, void* pUserData);
+	static void Con_Record(IConsole::IResult* pResult, void* pUserData);
+	static void Con_StopRecord(IConsole::IResult* pResult, void* pUserData);
+	static void Con_AddDemoMarker(IConsole::IResult* pResult, void* pUserData);
+	static void ConchainServerBrowserUpdate(IConsole::IResult* pResult, void* pUserData, IConsole::FCommandCallback pfnCallback, void* pCallbackUserData);
+	static void ConchainFullscreen(IConsole::IResult* pResult, void* pUserData, IConsole::FCommandCallback pfnCallback, void* pCallbackUserData);
+	static void ConchainWindowBordered(IConsole::IResult* pResult, void* pUserData, IConsole::FCommandCallback pfnCallback, void* pCallbackUserData);
+	static void ConchainWindowScreen(IConsole::IResult* pResult, void* pUserData, IConsole::FCommandCallback pfnCallback, void* pCallbackUserData);
+	static void ConchainWindowVSync(IConsole::IResult* pResult, void* pUserData, IConsole::FCommandCallback pfnCallback, void* pCallbackUserData);
 
 	void RegisterCommands();
 
-	const char *DemoPlayer_Play(const char *pFilename, int StorageType);
-	void DemoRecorder_Start(const char *pFilename, bool WithTimestamp);
+	const char* DemoPlayer_Play(const char* pFilename, int StorageType);
+	void DemoRecorder_Start(const char* pFilename, bool WithTimestamp);
 	void DemoRecorder_HandleAutoStart();
 	void DemoRecorder_Stop();
 	void DemoRecorder_AddDemoMarker();

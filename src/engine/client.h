@@ -150,6 +150,8 @@ public:
 		CMsgPacker Packer(pMsg->MsgID(), false);
 		if(pMsg->Pack(&Packer))
 			return -1;
+		
+		dbg_msg("test", "send packet");
 		return SendMsg(&Packer, Flags);
 	}
 
