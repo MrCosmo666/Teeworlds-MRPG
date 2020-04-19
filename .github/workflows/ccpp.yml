@@ -1,59 +1,13 @@
-name: Build
-
-on: [push, pull_request]
+name: 'Delete old artifacts'
+on:
+  schedule:
+    - cron: '0 * * * *' # every hour
 
 jobs:
-  build-cmake:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        include:
-        - os: ubuntu-latest
-          cmake-args: -G "Unix Makefiles"
-          build-args: --parallel
-          package-file: mmoteeworlds-linux_x86_64.tar.xz
-          env:
-            CFLAGS: -Wdeclaration-after-statement -Werror
-            CXXFLAGS: -Werror
-
+  delete-artifacts:
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout private tools
-      uses: actions/checkout@v2
-      with:
-        token: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
-    - name: Checkout submodules
-      shell: bash
-      run: |
-        auth_header="$(git config --local --get http.https://github.com/.extraheader)"
-        git submodule sync --recursive
-        git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
-    - name: Prepare Linux
-      if: contains(matrix.os, 'ubuntu')
-      run: |
-        sudo apt-get update -y
-        sudo apt-get install pkg-config cmake libfreetype6-dev libsdl2-dev libicu-dev libssl-dev libcurl4-openssl-dev -y
-        sudo apt-get install libboost-dev libmariadbclient-dev libmysqlcppconn-dev libopus-dev libopusfile-dev -y
-    - name: Build
-      env: ${{ matrix.env }}
-      run: |
-        mkdir release
-        cd release
-        ${{ matrix.cmake-path }}cmake ${{ matrix.cmake-args }} -DCMAKE_BUILD_TYPE=Release -Werror=dev -DDOWNLOAD_GTEST=ON -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=. ..
-        ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target everything
-    - name: Package
-      run: |
-        cd release
-        ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target package_default
-        mkdir artifacts
-        mv ${{ matrix.package-file }} artifacts
-    - name: Upload Artifacts
-      uses: actions/upload-artifact@v2-preview
-      with:
-        name: mmoteeworlds-${{ matrix.os }}
-        path: release/artifacts/${{ matrix.package-file }}
-    - name: Purge Artifacts more than 3 days    
-      uses: kolpav/purge-artifacts-action@v1
-      with:
-        token: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
-        expire-in: 0
+      - uses: kolpav/purge-artifacts-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          expire-in: 7days # Setting this to 0 will delete all artifacts
