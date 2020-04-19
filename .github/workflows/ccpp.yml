@@ -7,19 +7,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest]
         include:
         - os: ubuntu-latest
           cmake-args: -G "Unix Makefiles"
           build-args: --parallel
           package-file: mmoteeworlds-linux_x86_64.tar.xz
-          env:
-            CFLAGS: -Wdeclaration-after-statement -Werror
-            CXXFLAGS: -Werror
-        - os: macOS-latest
-          cmake-args: -G "Unix Makefiles"
-          build-args: --parallel
-          package-file: mmoteeworlds-osx.dmg
           env:
             CFLAGS: -Wdeclaration-after-statement -Werror
             CXXFLAGS: -Werror
