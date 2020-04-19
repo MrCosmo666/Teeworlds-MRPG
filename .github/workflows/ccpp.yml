@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest]
         include:
         - os: ubuntu-latest
           cmake-args: -G "Unix Makefiles"
@@ -16,13 +16,6 @@ jobs:
           env:
             CFLAGS: -Wdeclaration-after-statement -Werror
             CXXFLAGS: -Werror
-        - os: windows-latest
-          cmake-args: -G "Visual Studio 16 2019" -A x64
-          package-file: mmoteeworlds-win64.zip
-          env:
-            CFLAGS: /WX
-            CXXFLAGS: /WX
-            LDFLAGS: /WX
 
     steps:
     - name: Checkout private tools
