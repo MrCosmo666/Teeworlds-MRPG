@@ -25,9 +25,8 @@ jobs:
             LDFLAGS: /WX
 
     steps:
-
-
-    - uses: bagbyte/use-private-action@v0.0.2
+    - name: bagbyte/use-private-action
+      uses: bagbyte/use-private-action@v0.0.2
       with:
         private-action: actions/checkout@v2
         private-action-token: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
