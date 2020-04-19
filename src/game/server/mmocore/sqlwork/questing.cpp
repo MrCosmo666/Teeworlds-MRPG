@@ -143,6 +143,14 @@ bool QuestBase::IsDefeatMobComplete(int ClientID, int QuestID)
 	return true;
 }
 
+// получить имя квеста
+const char *QuestBase::GetQuestName(int QuestID) const
+{
+	if(IsValidQuest(QuestID))
+		return QuestsData[QuestID].Name;
+	return "Unknown";
+}
+
 // получить имя истории квеста
 const char *QuestBase::GetStoryName(int QuestID) const
 {

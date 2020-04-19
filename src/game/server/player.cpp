@@ -233,22 +233,25 @@ void CPlayer::Snap(int SnappingClient)
 		pClientInfo->m_aSkinPartColors[p] = Acc().m_aSkinPartColors[p];
 	}
 
-
 	dynamic_string Buffer;
-	Server()->Localization()->Format(Buffer, GetLanguage(), "{INT}", &GetItem(itMoney).Count);
-	StrToInts(pClientInfo->m_Leveling, 32, Buffer.buffer());
-	Buffer.clear();
-
-	// Список эффектов
-	for(auto& eff : CGS::Effects[m_ClientID])
+	for (auto& eff : CGS::Effects[m_ClientID])
 	{
 		char aBuf[32];
 		bool Minutes = eff.second >= 60;
-		str_format(aBuf, sizeof(aBuf), "%s %d%s ", eff.first.c_str(), Minutes ? eff.second/60 : eff.second, Minutes ? "m" : "");
+		str_format(aBuf, sizeof(aBuf), "%s %d%s ", eff.first.c_str(), Minutes ? eff.second / 60 : eff.second, Minutes ? "m" : "");
 		Buffer.append_at(Buffer.length(), aBuf);
 	}
-	StrToInts(pClientInfo->m_Table, 12, Buffer.buffer());
+	StrToInts(pClientInfo->m_Potions, 12, Buffer.buffer());
 	Buffer.clear();
+
+	Server()->Localization()->Format(Buffer, GetLanguage(), "{INT}", &GetItem(itMoney).Count);
+	StrToInts(pClientInfo->m_Gold, 6, Buffer.buffer());
+	Buffer.clear();
+
+	if(Acc().GuildID > 0)
+		StrToInts(pClientInfo->m_Guildname, 12, GS()->Mmo()->Member()->GuildName(Acc().GuildID));
+	else
+		StrToInts(pClientInfo->m_Guildname, 12, "\0");
 }
 
 // Получить черактера игрока

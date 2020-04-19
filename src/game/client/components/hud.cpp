@@ -683,7 +683,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	TextRender()->Text(0, 2, 5, 4.5f, aBuf, -1);
 
 	// рисуем инфу золота
-	IntsToStr(pClientStats->m_Leveling, 32, aBuf);
+	IntsToStr(pClientStats->m_Gold, 6, aBuf);
 	float textWidth = TextRender()->TextWidth(0, 6.0f, aBuf, -1, -1.0);
 	Rect = { 5, 56.0f, textWidth + 16.0f, 10.0f };
 	RenderTools()->DrawUIRect(&Rect, vec4(0.3f, 0.1f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
@@ -693,7 +693,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	TextRender()->Text(0, Rect.x, 56.0f, 6.0f, aBuf, -1);
 
 	// рисуем инфу зелей эффектов
-	IntsToStr(pClientStats->m_Table, 12, aBuf);
+	IntsToStr(pClientStats->m_Potions, 12, aBuf);
 	textWidth = TextRender()->TextWidth(0, 5.0f, aBuf, -1, -1.0);
 	if (textWidth > 2.0)
 	{

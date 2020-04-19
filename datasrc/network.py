@@ -318,8 +318,9 @@ Objects = [
 		NetIntAny("m_HealthStart"),
 		NetIntAny("m_Armor"), 
 
-		NetArray(NetIntAny("m_Table"), 12),
-		NetArray(NetIntAny("m_Leveling"), 32),
+		NetArray(NetIntAny("m_Potions"), 12),
+		NetArray(NetIntAny("m_Gold"), 6),
+		NetArray(NetIntAny("m_Guildname"), 12),
 
 		NetEnum("m_MoodType", MoodType),
 		NetEnum("m_WorldType", WorldType),

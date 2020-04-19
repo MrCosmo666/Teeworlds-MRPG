@@ -344,21 +344,7 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 
 	if(Mode == CHAT_ALL)
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
-	else if(Mode == CHAT_TEAM)
-	{
-		// pack one for the recording only
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOSEND, -1);
-
-		To = m_apPlayers[ChatterClientID]->GetTeam();
-
-		// send to the clients
-		for(int i = 0; i < MAX_CLIENTS; i++)
-		{
-			if(m_apPlayers[i] && m_apPlayers[i]->GetTeam() == To)
-				Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, i);
-		}
-	}
-	else // Mode == CHAT_WHISPER
+	else if(Mode == CHAT_WHISPER) // Mode == CHAT_WHISPER
 	{
 		// send to the clients
 		Msg.m_TargetID = To;
@@ -1123,12 +1109,8 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				// общение чат для организаций
 				if(pPlayer->Acc().IsGuild())
 				{
-					char aBuf[1024];
-					str_format(aBuf, sizeof(aBuf), "[%s:%s] %s", Mmo()->Member()->GuildName(pPlayer->Acc().GuildID),
-						Mmo()->Member()->GetGuildRank(pPlayer->Acc().GuildID, pPlayer->Acc().GuildRank), pMsg->m_pMessage);
-				
-					ChatDiscord(false, DC_SERVER_CHAT, Server()->ClientName(ClientID), aBuf);
-					SendChat(ClientID, Mode, pMsg->m_Target, aBuf);
+					ChatDiscord(false, DC_SERVER_CHAT, Server()->ClientName(ClientID), pMsg->m_pMessage);
+					SendChat(ClientID, Mode, pMsg->m_Target, pMsg->m_pMessage);
 					return;
 				}
 
@@ -2288,7 +2270,7 @@ void CGS::SendInformationBot(CPlayerBot *pPlayerBot)
 	CNetMsg_Sv_ClientInfo ClientInfoMsg;
 	ClientInfoMsg.m_ClientID = ClientID;
 	ClientInfoMsg.m_Local = 0;
-	ClientInfoMsg.m_Team = TEAM_RED;
+	ClientInfoMsg.m_Team = pPlayerBot->GetTeam();
 
 	int BotID = pPlayerBot->GetBotID();
 	ClientInfoMsg.m_pName = ContextBots::DataBot[BotID].Name(pPlayerBot);
@@ -2301,7 +2283,6 @@ void CGS::SendInformationBot(CPlayerBot *pPlayerBot)
 		ClientInfoMsg.m_aUseCustomColors[p] = ContextBots::DataBot[BotID].UseCustomBot[p];
 		ClientInfoMsg.m_aSkinPartColors[p] = ContextBots::DataBot[BotID].SkinColorBot[p];
 	}
-	dbg_msg("test", "here");
 	Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1);
 }
 

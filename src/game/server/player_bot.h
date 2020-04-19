@@ -43,7 +43,7 @@ private:
 	virtual void TryRespawn() override;
 	int GetBotLevel() const;
 	int GetMoodNameplacesType(int SnappingClient);
-	bool IsActiveQuests(int SnapClientID);
+	bool GetActiveQuestsID(int SnapClientID);
 };
 
 #endif

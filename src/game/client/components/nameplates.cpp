@@ -48,7 +48,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 		if (m_pClient->MmoServer() && m_pClient->m_aClients[ClientID].m_pLocalStats && a > 0.001f)
 		{
 			// ïåðåìåííûå
-			char aBuf[64], aIcon[32]; aIcon[0] = '\0';
+			char aBuf[64], aIconPlayerType[32]; aIconPlayerType[0] = '\0';
 			vec4 ColorNameplates = vec4(1.0f, 1.0f, 1.0f, a);
 			vec4 OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.5f * a);
 
@@ -56,35 +56,34 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 			switch (pClientStats->m_MoodType)
 			{
 				case MOOD_ANGRY:
-					str_format(aIcon, sizeof(aIcon), "angry");
+					str_format(aIconPlayerType, sizeof(aIconPlayerType), "angry");
 					ColorNameplates = vec4(0.8f, 0.6f, 0.6f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.3f * a);
 					break;
 				case MOOD_AGRESSED_TANK:
-					str_format(aIcon, sizeof(aIcon), "agressed_y");
+					str_format(aIconPlayerType, sizeof(aIconPlayerType), "agressed_y");
 					ColorNameplates = vec4(0.95f, 0.3f, 0.3f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.7f * a);
 					break;
 				case MOOD_AGRESSED_OTHER:
-					str_format(aIcon, sizeof(aIcon), "agressed_o");
+					str_format(aIconPlayerType, sizeof(aIconPlayerType), "agressed_o");
 					ColorNameplates = vec4(0.6f, 0.4f, 0.8f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.6f * a);
 					break;
 				case MOOD_FRIENDLY:
-					str_format(aIcon, sizeof(aIcon), "friendly");
+					str_format(aIconPlayerType, sizeof(aIconPlayerType), "friendly");
 					ColorNameplates = vec4(0.5f, 0.8f, 0.2f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.3f * a);
 					break;
 				case MOOD_QUESTING:
-					str_format(aIcon, sizeof(aIcon), "paper");
+					str_format(aIconPlayerType, sizeof(aIconPlayerType), "paper");
 					ColorNameplates = vec4(0.9f, 0.85f, 0.35f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.3f * a);
 					break;
 			}
 
+			// - - - - - - - - - - - - - - - -ÏÐÎÃÐÅÑÑ ÁÀÐ - - - - - - - - - - - - - - //
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
-			// ïðîãðåññ áàð
 			str_format(aBuf, sizeof(aBuf), "L%d%s", pClientStats->m_Level, aName);
 			float tw = TextRender()->TextWidth(0, FontSize, aBuf, -1, -1.0f);
 			if (pClientStats->m_Health < pClientStats->m_HealthStart)
@@ -96,29 +95,27 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 					pClientStats->m_Health, pClientStats->m_HealthStart, aBuf, 5, CUI::ALIGN_CENTER, 10.0f, 3.2f);
 			}
 
-			// ñòàâèì êóðñîð äëÿ ðèñîâêè ïîòîì çäîðîâüÿ
-			TextRender()->TextColor(ColorNameplates.r, ColorNameplates.g, ColorNameplates.b, ColorNameplates.a);
-			TextRender()->TextOutlineColor(OutlineNameplates.r, OutlineNameplates.g, OutlineNameplates.b, OutlineNameplates.a);
-			TextRender()->SetCursor(&Cursor, Position.x - tw / 2.0f, Position.y - FontSize - 70.0f, FontSize, TEXTFLAG_RENDER);
+			// - - - - - - - - - - -  - - - ÓÐÎÂÅÍÜ ÈÃÐÎÊÀ - - - - - - - - - - - - - - //
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
+			{
+				TextRender()->TextColor(ColorNameplates.r, ColorNameplates.g, ColorNameplates.b, ColorNameplates.a);
+				TextRender()->TextOutlineColor(OutlineNameplates.r, OutlineNameplates.g, OutlineNameplates.b, OutlineNameplates.a);
+				TextRender()->SetCursor(&Cursor, Position.x - tw / 2.0f, Position.y - FontSize - 70.0f, FontSize, TEXTFLAG_RENDER);
 
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
-			{ // èíôà ïî óðîâíþ
 				str_format(aBuf, sizeof(aBuf), "%d", pClientStats->m_Level);
 				RenderTools()->DrawUIText(TextRender(), &Cursor, aBuf,
-					vec4(ColorNameplates.r, ColorNameplates.g, ColorNameplates.b, ColorNameplates.a / 3.0f) , vec4(1.0f, 1.0f, 1.0f, 1.0f), FontSize);
+					vec4(ColorNameplates.r, ColorNameplates.g, ColorNameplates.b, ColorNameplates.a / 3.0f), vec4(1.0f, 1.0f, 1.0f, 1.0f), FontSize);
 				TextRender()->TextEx(&Cursor, aName, -1);
 			}
-
+			// - - - - - - - - - - - - -  ÇÍÀ×ÎÊ ÒÈÏÀ ÈÃÐÎÊÀ - - - - - - - - - - - - - //
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
-			if(aIcon[0] != '\0') // çíà÷îê òèïà
+			if(aIconPlayerType[0] != '\0') // çíà÷îê òèïà
 			{ 
 				CUIRect IconRect = { Cursor.m_X, Cursor.m_Y + FontSize / 5.0f, 16.0f, 16.0f };
-				m_pClient->m_pMenus->DoItemIcon(aIcon, IconRect, FontSize);
+				m_pClient->m_pMenus->DoItemIcon(aIconPlayerType, IconRect, FontSize);
 			}
 						
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
+			// - - - - - - - - - - - - - - ÇÍÀ×ÎÊ ÊÂÅÑÒÎÂ  - - - - - - - - - - - - - - //
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			if(pClientStats->m_ActiveQuest) // çíà÷îê êâåñòîâ
 			{ 
@@ -126,9 +123,9 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 				m_pClient->m_pMenus->DoItemIcon("quest_a", IconRect, 64.0f);
 			}
 
+			// - - - - - - - - - - - - - - -  ÒÈÏ ÀÃÐÅÑÑÈß - - - - - - - - - - - - - - //
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
-			{ // ðèñóåì èíôîðìàöèþ î àãðåññèèè
+			{
 				float FontSizeAgressed = FontSize - 8.0f;
 				float twAgressed = TextRender()->TextWidth(0, FontSizeAgressed, GetMoodName(pClientStats->m_MoodType), -1, -1.0f);
 				float AlphaMoon = clamp(a - 0.20f, 0.0f, a);
@@ -136,6 +133,22 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 				TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.5f * AlphaMoon);
 				TextRender()->SetCursor(&Cursor, Position.x - twAgressed / 2.0f, Position.y - FontSizeAgressed - 52.0f, FontSizeAgressed, TEXTFLAG_RENDER);
 				TextRender()->TextEx(&Cursor, GetMoodName(pClientStats->m_MoodType), -1);
+			}
+
+			// - - - - - - - - - - - - - - -ÃÈËÜÄÈß ÈÃÐÎÊÀ - - - - - - - - - - - - - - //
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
+			{
+				IntsToStr(pClientStats->m_Guildname, 12, aBuf);
+				if (str_length(aBuf) > 3)
+				{
+					float FontGuildname = FontSize - 10.0f;
+					float twGuildname = TextRender()->TextWidth(0, FontGuildname, aBuf, -1, -1.0f);
+					float AlphaMoon = clamp(a - 0.20f, 0.0f, a);
+					TextRender()->TextColor(1.0f, 0.95f, 0.0f, AlphaMoon);
+					TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.5f * AlphaMoon);
+					TextRender()->SetCursor(&Cursor, Position.x - twGuildname / 2.0f, Position.y - FontGuildname - 95.0f, FontGuildname, TEXTFLAG_RENDER);
+					TextRender()->TextEx(&Cursor, aBuf, -1);
+				}
 			}
 		}
 		else
@@ -173,7 +186,6 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 
 		TextRender()->TextColor(1,1,1,1);
 		TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
-
 	}
 }
 

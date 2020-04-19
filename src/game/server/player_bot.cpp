@@ -179,7 +179,15 @@ void CPlayerBot::Snap(int SnappingClient)
 	pClientInfo->m_HealthStart = GetStartHealth();
 	pClientInfo->m_Health = GetHealth();
 	pClientInfo->m_Level = GetBotLevel();
-	pClientInfo->m_ActiveQuest = IsActiveQuests(SnappingClient);
+	pClientInfo->m_ActiveQuest = GetActiveQuestsID(SnappingClient);
+
+	if (m_SpawnPointBot == SPAWNQUESTNPC)
+	{
+		int QuestID = ContextBots::QuestBot[m_SubBotID].QuestID;
+		StrToInts(pClientInfo->m_Guildname, 12, GS()->Mmo()->Quest()->GetQuestName(QuestID));
+	}
+	else 
+		StrToInts(pClientInfo->m_Guildname, 12, "\0");
 
 	for(int p = 0; p < 6; p++)
 	{
@@ -216,7 +224,7 @@ int CPlayerBot::GetBotLevel() const
 	return (m_SpawnPointBot == SPAWNMOBS ? ContextBots::MobBot[m_SubBotID].Level : 1);
 }
 
-bool CPlayerBot::IsActiveQuests(int SnapClientID)
+bool CPlayerBot::GetActiveQuestsID(int SnapClientID)
 {
 	if (SnapClientID >= MAX_PLAYERS || SnapClientID < 0 || m_SpawnPointBot != SPAWNNPC)
 		return false;

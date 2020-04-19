@@ -67,6 +67,7 @@ public:
 		return false;
 	}
 
+	const char *GetQuestName(int QuestID) const;
 	const char *GetStoryName(int QuestID) const;
 	ContextBots::QuestBotInfo &GetQuestBot(int QuestID, int Progress);
 	bool IsActiveQuestBot(int QuestID, int Progress);
