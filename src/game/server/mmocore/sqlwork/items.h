@@ -47,7 +47,7 @@ public:
 		int Enchant;
 		int Durability;
 
-		ClassItems() : pPlayer(NULL), itemid_(NULL), Count(NULL), Settings(NULL), Enchant(NULL), Durability(100) {};
+		ClassItems() : pPlayer(NULL), itemid_(0), Count(0), Settings(0), Enchant(0), Durability(100) {};
 
 		void SetBasic(CPlayer* Player, int itemid) { pPlayer = Player, itemid_ = itemid; }
 
