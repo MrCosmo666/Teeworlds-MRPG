@@ -52,3 +52,8 @@ jobs:
       with:
         name: mmoteeworlds-${{ matrix.os }}
         path: release/artifacts/${{ matrix.package-file }}
+    - name: Purge Artifacts more than 3 days    
+      uses: kolpav/purge-artifacts-action@v1
+      with:
+        token: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}
+        expire-in: 0
