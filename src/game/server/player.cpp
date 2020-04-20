@@ -680,24 +680,37 @@ bool CPlayer::ParseInteractive(int Vote)
 	}
 	return false;
 }
-// Парсинг F3 или F4 действий
+
 bool CPlayer::ParseItemsF3F4(int Vote)
 {
-	if(Vote == 1)
+	if (!m_pCharacter)
 	{
-
+		GS()->Chat(m_ClientID, "Use it when you're not dead!");
+		return true;
 	}
-	else
-	{
-		if(m_PlayerFlags&PLAYERFLAG_SCOREBOARD && GetItemEquip(EQUIP_WINGS) > 0)
-		{
-			m_Flymode ^= true;
-			GS()->Chat(m_ClientID, "You {STR} fly mode, your hook changes!", m_Flymode ? "Enable" : "Disable");
-			return true;
-		}
 
-		if(!GS()->CheckClient(m_ClientID))
-			SetTalking(GetTalkedID(), true);
+	// - - - - - - - - - - - - -
+	// - - - - - F3- - - - - - -
+	if (Vote == 1)
+	{
+		return false;
+	}
+
+	// - - - - - - - - - - - - -
+	// - - - - - F4- - - - - - -
+	// смена режима полета
+	if(m_PlayerFlags&PLAYERFLAG_SCOREBOARD && GetItemEquip(EQUIP_WINGS) > 0)
+	{
+		m_Flymode ^= true;
+		GS()->Chat(m_ClientID, "You {STR} fly mode, your hook changes!", m_Flymode ? "Enable" : "Disable");
+		return true;
+	}
+
+	// общение на диалогах для ванильных клиентов
+	if (GetTalkedID() > 0 && !GS()->CheckClient(m_ClientID))
+	{
+		SetTalking(GetTalkedID(), true);
+		return true;
 	}
 	return false;
 }
