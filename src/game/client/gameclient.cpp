@@ -1075,8 +1075,8 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		CNetMsg_Sv_EquipItems* pMsg = (CNetMsg_Sv_EquipItems*)pRawMsg;
 		for (int p = 0; p < NUM_EQUIPS; p++)
 		{
-			m_aClients[pMsg->m_ClientID].m_aEquipItems[p] = pMsg->m_EquipID[p];
-			m_aClients[pMsg->m_ClientID].m_aEnchantItems[p] = pMsg->m_EnchantItem[p];
+			m_aClients[pMsg->m_ClientID].m_aEquipItem[p] = pMsg->m_EquipID[p];
+			m_aClients[pMsg->m_ClientID].m_aEnchantItem[p] = pMsg->m_EnchantItem[p];
 		}
 	}
 }
@@ -1867,26 +1867,24 @@ void CGameClient::CClientData::Reset(CGameClient *pGameClient, int ClientID)
 		m_SkinInfo.m_aColors[p] = vec4(1.0f, 1.0f, 1.0f , 1.0f);
 	}
 
-	// mmotee
 	for (int p = 0; p < NUM_EQUIPS; p++)
 	{
-		m_aEquipItems[p] = -1;
-		m_aEnchantItems[p] = -1;
+		m_aEquipItem[p] = -1;
+		m_aEnchantItem[p] = -1;
 	}
-
 	UpdateRenderInfo(pGameClient, ClientID, false);
 }
 
 void CGameClient::SendAuthPack(const char* Login, const char* Password, bool StateRegistered)
 {
-	if (m_pClient->State() == IClient::STATE_ONLINE && MmoServer())
-	{
-		CNetMsg_Cl_ClientAuth Msg;
-		Msg.m_Login = Login;
-		Msg.m_Password = Password;
-		Msg.m_SelectRegister = StateRegistered;
-		Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
-	}
+	if (m_pClient->State() != IClient::STATE_ONLINE || !MmoServer())
+		return;
+
+	CNetMsg_Cl_ClientAuth Msg;
+	Msg.m_Login = Login;
+	Msg.m_Password = Password;
+	Msg.m_SelectRegister = StateRegistered;
+	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
 }
 
 void CGameClient::DoEnterMessage(const char *pName, int ClientID, int Team)

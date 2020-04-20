@@ -751,7 +751,7 @@ void CGS::SendSkinChange(int ClientID, int TargetID)
 // Отправить Equip Items
 void CGS::SendEquipItem(int ClientID, int TargetID)
 {
-	if(!CheckClient(TargetID) || !m_apPlayers[ClientID] || !m_apPlayers[ClientID]->IsAuthed())
+	if((TargetID > 0 && TargetID < MAX_PLAYERS && !CheckClient(TargetID)) || !m_apPlayers[ClientID] || !m_apPlayers[ClientID]->IsAuthed())
 		return;
 
 	CNetMsg_Sv_EquipItems Msg;

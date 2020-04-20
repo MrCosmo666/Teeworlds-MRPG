@@ -138,13 +138,8 @@ void CPlayers::RenderHook(
 	}
 }
 
-void CPlayers::RenderPlayer(
-	const CNetObj_Character *pPrevChar,
-	const CNetObj_Character *pPlayerChar,
-	const CNetObj_PlayerInfo *pPrevInfo,
-	const CNetObj_PlayerInfo *pPlayerInfo,
-	int ClientID
-	)
+void CPlayers::RenderPlayer(const CNetObj_Character *pPrevChar, const CNetObj_Character *pPlayerChar,
+	const CNetObj_PlayerInfo *pPrevInfo, const CNetObj_PlayerInfo *pPlayerInfo, int ClientID)
 {
 	CNetObj_Character Prev;
 	CNetObj_Character Player;
@@ -153,46 +148,18 @@ void CPlayers::RenderPlayer(
 
 	CNetObj_PlayerInfo pInfo = *pPlayerInfo;
 	CTeeRenderInfo RenderInfo = m_aRenderInfo[ClientID];
-
-	// set size
 	RenderInfo.m_Size = 64.0f;
 
 	float IntraTick = Client()->IntraGameTick();
-
 	if(Prev.m_Angle < pi*-128 && Player.m_Angle > pi*128)
 		Prev.m_Angle += 2*pi*256;
 	else if(Prev.m_Angle > pi*128 && Player.m_Angle < pi*-128)
 		Player.m_Angle += 2*pi*256;
 	float Angle = mix((float)Prev.m_Angle, (float)Player.m_Angle, IntraTick)/256.0f;
-
-	//float angle = 0;
-
 	if(m_pClient->m_LocalClientID == ClientID && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 	{
 		// just use the direct input if it's local player we are rendering
 		Angle = angle(m_pClient->m_pControls->m_MousePos);
-	}
-	else
-	{
-		/*
-		float mixspeed = Client()->FrameTime()*2.5f;
-		if(player.attacktick != prev.attacktick) // shooting boosts the mixing speed
-			mixspeed *= 15.0f;
-
-		// move the delta on a constant speed on a x^2 curve
-		float current = g_GameClient.m_aClients[info.cid].angle;
-		float target = player.angle/256.0f;
-		float delta = angular_distance(current, target);
-		float sign = delta < 0 ? -1 : 1;
-		float new_delta = delta - 2*mixspeed*sqrt(delta*sign)*sign + mixspeed*mixspeed;
-
-		// make sure that it doesn't vibrate when it's still
-		if(fabs(delta) < 2/256.0f)
-			angle = target;
-		else
-			angle = angular_approach(current, target, fabs(delta-new_delta));
-
-		g_GameClient.m_aClients[info.cid].angle = angle;*/
 	}
 
 	// use preditect players if needed
@@ -214,9 +181,7 @@ void CPlayers::RenderPlayer(
 	vec2 Direction = direction(Angle);
 	vec2 Position = mix(vec2(Prev.m_X, Prev.m_Y), vec2(Player.m_X, Player.m_Y), IntraTick);
 	vec2 Vel = mix(vec2(Prev.m_VelX/256.0f, Prev.m_VelY/256.0f), vec2(Player.m_VelX/256.0f, Player.m_VelY/256.0f), IntraTick);
-
 	m_pClient->m_pFlow->Add(Position, Vel*100.0f, 10.0f);
-
 	RenderInfo.m_GotAirJump = Player.m_Jumped&2?0:1;
 
 	bool Stationary = Player.m_VelX <= 1 && Player.m_VelX >= -1;
@@ -266,7 +231,7 @@ void CPlayers::RenderPlayer(
 			if (m_pClient->m_aClients[ClientID].m_AnimWings >= 2.6f)
 				m_pClient->m_aClients[ClientID].m_AnimWings = 2.2f;
 		}
-		else if (RenderInfo.m_GotAirJump && !InAir)
+		else
 		{
 			if (m_pClient->m_aClients[ClientID].m_AnimWings >= 1.0f)
 				m_pClient->m_aClients[ClientID].m_AnimWings = 0.0f;
@@ -274,10 +239,10 @@ void CPlayers::RenderPlayer(
 		State.Add(&g_pData->m_aAnimations[ANIM_WINGS], m_pClient->m_aClients[ClientID].m_AnimWings, 1.0f);
 		m_pClient->m_aClients[ClientID].m_AnimWings += 0.59f / Client()->ClientFPS();
 
-		int EquipItem = m_pClient->m_aClients[ClientID].m_aEquipItems[EQUIP_WINGS];
-		int EnchantItem = m_pClient->m_aClients[ClientID].m_aEnchantItems[EQUIP_WINGS];
-		RenderEffectsWings(Position, Direction, EquipItem, EnchantItem);
-		RenderTools()->RenderPicItems(&State, m_pClient->m_aClients[ClientID].m_aEquipItems[EQUIP_WINGS], Direction, Position);
+		int WingsEquipItem = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_WINGS];
+		int WingsEnchantItem = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_WINGS];
+		RenderEffectsWings(Position, Direction, WingsEquipItem, WingsEnchantItem);
+		RenderTools()->RenderPicItems(&State, m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_WINGS], Direction, Position);
 	}
 
 	// do skidding
@@ -331,34 +296,24 @@ void CPlayers::RenderPlayer(
 		int iw = clamp(Player.m_Weapon, 0, NUM_WEAPONS-1);
 		RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[iw].m_pSpriteBody, Direction.x < 0 ? SPRITE_FLAG_FLIP_Y : 0);
 
-		vec2 Dir = Direction;
+		vec2 Dir = Direction, p;
 		float Recoil = 0.0f;
-		vec2 p;
 		if (Player.m_Weapon == WEAPON_HAMMER)
 		{
-			// ��������� ����� IMAGE_GAME
 			Graphics()->QuadsEnd();
 
-			// ������ �������
-			bool m_RenderHammer = RenderHammer(&State, Player, Angle, Position, m_pClient->m_aClients[ClientID].m_aEquipItems[EQUIP_HAMMER]);
-			
-			// �������� ����� IMAGE_GAME
+			bool m_RenderHammer = RenderHammer(&State, Player, Angle, Position, m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_HAMMER]);
 			Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 
 			Graphics()->QuadsBegin();
 			Graphics()->QuadsSetRotation(State.GetAttach()->m_Angle*pi * 2 + Angle);
-
-			// ���� �� ������� �������� �����
 			if(m_RenderHammer)
 			{
-				// normal weapons
 				int iw = clamp(Player.m_Weapon, 0, NUM_WEAPONS - 1);
 				RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[iw].m_pSpriteBody, Direction.x < 0 ? SPRITE_FLAG_FLIP_Y : 0);
 
-				// Static position for hammer
 				p = Position + vec2(State.GetAttach()->m_X, State.GetAttach()->m_Y);
 				p.y += g_pData->m_Weapons.m_aId[iw].m_Offsety;
-				// if attack is under way, bash stuffs
 				if (Direction.x < 0)
 				{
 					Graphics()->QuadsSetRotation(-pi / 2 - State.GetAttach()->m_Angle*pi * 2);
@@ -635,38 +590,19 @@ void CPlayers::OnRender()
 // mmotee
 void CPlayers::RenderEffectsWings(vec2 Position, vec2 Direction, int EquipItem, int Enchant)
 {
-	if (g_Config.m_ClShowMEffects != 2)
+	if (g_Config.m_ClShowMEffects != 2 && Enchant >= EFFECTENCHANT)
 	{
-		if (EquipItem == 19 && Enchant >= EFFECTENCHANT)
+		vec4 Color = vec4(1.0f, 1.0f, 1.0f, 0.0f);
+		switch(EquipItem)
 		{
-			vec4 Color = vec4(1.75f, 0.0f, 0.0f, 0.01f);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
+		case  19: Color = vec4(1.75f, 0.0f, 0.0f, 0.01f); break;
+		case  20: Color = vec4(0.2f, 0.2f, 1.75f, 0.01f); break;
+		case  21: Color = vec4(0.2f, 0.2f, 1.75f, 0.01f); break;
+		case  22: Color = vec4(1.0f, 1.0f, 0.0f, 0.01f); break;
+		case  23: Color = vec4(0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.01f); break;
 		}
-		if (EquipItem == 20 && Enchant >= EFFECTENCHANT)
-		{
-			vec4 Color = vec4(0.2f, 0.2f, 1.75f, 0.01f);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
-		}
-		if (EquipItem == 21 && Enchant >= EFFECTENCHANT)
-		{
-			vec4 Color = vec4(0.2f, 0.2f, 1.75f, 0.01f);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
-		}
-		if (EquipItem == 22 && Enchant >= EFFECTENCHANT)
-		{
-			vec4 Color = vec4(1.0f, 1.0f, 0.0f, 0.01f);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
-		}
-		if (EquipItem == 23 && Enchant >= EFFECTENCHANT)
-		{
-			vec4 Color = vec4(0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.01f);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
-			m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
-		}
+		m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
+		m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
 	}
 }
 
