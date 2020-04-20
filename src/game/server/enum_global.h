@@ -7,9 +7,11 @@
 
 #define GRAY_COLOR vec3(40, 42, 45)
 #define GOLDEN_COLOR vec3(40, 25, 2)
+#define LIGHT_GOLDEN_COLOR vec3(16, 7, 0)
 #define RED_COLOR vec3(40, 15, 15)
 #define LIGHT_RED_COLOR vec3(16, 7, 5)
 #define BLUE_COLOR vec3(10, 22, 40)
+#define LIGHT_BLUE_COLOR vec3(2, 7, 16)
 #define PURPLE_COLOR vec3(32, 10, 40)
 #define GREEN_COLOR vec3(15, 40, 15)
 

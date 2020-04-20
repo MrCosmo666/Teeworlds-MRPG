@@ -46,7 +46,7 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 		const int Count = RES->getInt("Count"); HideID++;
 
 		// добавляем меню голосования
-		GS()->AVH(ClientID, HideID, GOLDEN_COLOR, "✉ Mail Name ID {INT}: {STR}", &MailID, RES->getString("MailName").c_str());
+		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "✉ Mail Name ID {INT}: {STR}", &MailID, RES->getString("MailName").c_str());
 		GS()->AVM(ClientID, "null", NOPE, HideID, "Desc: {STR}", RES->getString("MailDesc").c_str());
 
 		// проверяем мы читаем или получаем предмет

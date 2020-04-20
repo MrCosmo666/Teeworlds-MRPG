@@ -409,7 +409,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 		const int AuthID = RES->getInt("ID");
 		const int RankID = RES->getInt("GuildRank");
 		int Deposit = RES->getInt("GuildDeposit");
-		GS()->AVH(ClientID, HideID, RED_COLOR, "Rank: {STR} {STR} Deposit: {INT}", GetGuildRank(GuildID, RankID), RES->getString("Nick").c_str(), &Deposit);
+		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "{STR} {STR} Deposit: {INT}", GetGuildRank(GuildID, RankID), RES->getString("Nick").c_str(), &Deposit);
 
 		// сбор всех рангов и вывод их
 		for(auto mr: RankGuild)
