@@ -821,6 +821,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 	if (TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] || (!ToProgress && m_TalkingNPC.m_TalkedID != -1) || (ToProgress && m_TalkingNPC.m_TalkedID == -1))
 		return;
 
+	m_TalkingNPC.m_TalkedID = TalkedID;
 	CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[TalkedID]);
 	int MobID = BotPlayer->GetBotSub();
 	if (BotPlayer->GetSpawnBot() == SPAWNNPC)
@@ -833,13 +834,13 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		}
 
 		// если прогресс диалога равен какому то квесту
-		int QuestID = ContextBots::NpcBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
-		if (QuestID >= 1)
+		int GivingQuestID = ContextBots::NpcBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
+		if (GivingQuestID >= 1)
 		{
 			// замораживаем при информации и принятии квеста
 			if (!m_TalkingNPC.m_FreezedProgress)
 			{
-				if (GS()->Mmo()->Quest()->GetQuestState(m_ClientID, QuestID) >= QUESTACCEPT)
+				if (GS()->Mmo()->Quest()->GetQuestState(m_ClientID, GivingQuestID) >= QUESTACCEPT)
 					GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID, "I'm sorry, don't have more new stories for you!");
 				else
 					GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
@@ -849,7 +850,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			}
 
 			// принимаем квест
-			GS()->Mmo()->Quest()->AcceptQuest(QuestID, this);
+			GS()->Mmo()->Quest()->AcceptQuest(GivingQuestID, this);
 			m_TalkingNPC.m_TalkedProgress++;
 		}
 
@@ -866,8 +867,8 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			return;
 		}
 
-		bool RequiestQuestTask = ContextBots::QuestBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_RequestComplete;
 		GS()->Mmo()->Quest()->QuestTableClear(m_ClientID);
+		bool RequiestQuestTask = ContextBots::QuestBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_RequestComplete;
 		if (RequiestQuestTask)
 		{
 			GS()->Mmo()->Quest()->CreateQuestingItems(this, ContextBots::QuestBot[MobID]);
@@ -894,7 +895,6 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
 	}
 
-	m_TalkingNPC.m_TalkedID = TalkedID;
 	m_TalkingNPC.m_TalkedProgress++;
 }
 

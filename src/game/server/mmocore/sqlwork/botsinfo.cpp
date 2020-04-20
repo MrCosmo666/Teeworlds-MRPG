@@ -273,7 +273,7 @@ bool ContextBots::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int T
 	return true;
 }
 
-bool ContextBots::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char* pText)
+bool ContextBots::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID)
 {
 	int ClientID = pPlayer->GetCID();
 	if (!IsQuestBotValid(MobID) || Progress >= (int)QuestBot[MobID].m_Talk.size())
@@ -285,16 +285,9 @@ bool ContextBots::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int
 	if (!GS()->CheckClient(ClientID))
 		GS()->SBL(ClientID, 100000, 50, "Press 'F4' to continue the dialog!");
 
+	int BotID = QuestBot[MobID].BotID;
 	char reformTalkedText[512];
 	int sizeTalking = QuestBot[MobID].m_Talk.size();
-	if (str_comp_nocase(pText, "empty") != 0)
-	{
-		str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + Progress, sizeTalking, pText);
-		GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID, 0, pText, 0, EMOTE_BLINK);
-		return true;
-	}
-
-	int BotID = QuestBot[MobID].BotID;
 	pPlayer->FormatTextQuest(BotID, QuestBot[MobID].m_Talk.at(Progress).m_TalkingText);
 	str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + Progress, sizeTalking, pPlayer->FormatedTalkedText());
 	pPlayer->ClearFormatQuestText();
