@@ -72,7 +72,7 @@ int SkillJob::GetSkillLevel(int ClientID, int SkillID) const
 void SkillJob::ShowMailSkillList(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	GS()->AVH(ClientID, HSKILLLEARN, vec3(35,80,40), "Skill Learn Information");
+	GS()->AVH(ClientID, HSKILLLEARN, GREEN_COLOR, "Skill Learn Information");
 	GS()->AVM(ClientID, "null", NOPE, HSKILLLEARN, "Here you can learn passive and active skills");
 	GS()->AVM(ClientID, "null", NOPE, HSKILLLEARN, "You can bind active skill any button using the console");
 	GS()->AV(ClientID, "null", "");

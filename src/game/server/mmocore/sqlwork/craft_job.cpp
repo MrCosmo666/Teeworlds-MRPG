@@ -62,13 +62,13 @@ void CraftJob::ShowCraftList(CPlayer *pPlayer, int CraftTab)
 		int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + cr.first;
 		if (CGS::AttributInfo.find(InfoSellItem.BonusID) != CGS::AttributInfo.end())
 		{
-			GS()->AVHI(ClientID, InfoSellItem.GetIcon(), HideID, vec3(15, 25, 55), "{STR}Lvl{INT} : {STR} :: {INT} gold",
+			GS()->AVHI(ClientID, InfoSellItem.GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}Lvl{INT} : {STR} :: {INT} gold",
 				(pPlayer->GetItem(cr.second.ItemID).Count ? "✔ " : "\0"), &cr.second.Level, InfoSellItem.GetName(pPlayer), &MoneyDiscount);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "Astro stats +{INT} {STR}", &InfoSellItem.BonusCount, pPlayer->AtributeName(InfoSellItem.BonusID));
 		}
 		else
 		{
-			GS()->AVHI(ClientID, InfoSellItem.GetIcon(), HideID, vec3(15, 25, 55), "Lvl{INT} : {STR}x{INT} ({INT}) :: {INT} gold",
+			GS()->AVHI(ClientID, InfoSellItem.GetIcon(), HideID, LIGHT_RED_COLOR, "Lvl{INT} : {STR}x{INT} ({INT}) :: {INT} gold",
 				&cr.second.Level, InfoSellItem.GetName(pPlayer), &cr.second.ItemCount, &pPlayer->GetItem(cr.second.ItemID).Count, &MoneyDiscount);
 		}
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", InfoSellItem.GetDesc(pPlayer));

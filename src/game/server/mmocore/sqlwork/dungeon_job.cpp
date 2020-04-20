@@ -57,7 +57,7 @@ void DungeonJob::ShowDungeonsList(CPlayer* pPlayer)
 	for (const auto& dungeon : Dungeon)
 	{
 		int HideID = 7500 + dungeon.first;
-		GS()->AVH(ClientID, HideID, vec3(52, 26, 80), "Lvl{INT} {STR} : Players {INT} : {STR} [{INT}%]",
+		GS()->AVH(ClientID, HideID, GOLDEN_COLOR, "Lvl{INT} {STR} : Players {INT} : {STR} [{INT}%]",
 			&dungeon.second.Level, dungeon.second.Name, &dungeon.second.Players, (dungeon.second.State > 1 ? "Active dungeon" : "Waiting players"), &dungeon.second.Progress);
 
 		ShowDungeonTop(pPlayer, dungeon.first, HideID);
@@ -78,7 +78,7 @@ bool DungeonJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
 	if (Menulist == DUNGEONSMENU)
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;
-		GS()->AVH(ClientID, HDUNGEONSINFO, vec3(35, 80, 40), "Dungeons Information");
+		GS()->AVH(ClientID, HDUNGEONSINFO, GREEN_COLOR, "Dungeons Information");
 		GS()->AVM(ClientID, "null", NOPE, HDUNGEONSINFO, "In this section you can choose a dungeon");
 		GS()->AVM(ClientID, "null", NOPE, HDUNGEONSINFO, "View the fastest players on the passage");
 

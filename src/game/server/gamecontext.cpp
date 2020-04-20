@@ -751,7 +751,7 @@ void CGS::SendSkinChange(int ClientID, int TargetID)
 // Отправить Equip Items
 void CGS::SendEquipItem(int ClientID, int TargetID)
 {
-	if(TargetID != -1 && !CheckClient(TargetID) || !m_apPlayers[ClientID] || !m_apPlayers[ClientID]->IsAuthed())
+	if((TargetID != -1 && !CheckClient(TargetID)) || !m_apPlayers[ClientID] || !m_apPlayers[ClientID]->IsAuthed())
 		return;
 
 	CNetMsg_Sv_EquipItems Msg;
@@ -1758,9 +1758,9 @@ void CGS::AVH(int To, const int ID, vec3 Color, const char* pText, ...)
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
 		if(ID > HQUESTITEM && ID < NUMHIDEMENU) { Buffer.append(" (Press me for help)"); }
 
-		m_apPlayers[To]->m_Colored = { Color.r/2, Color.g/2, Color.b/2 };
+		m_apPlayers[To]->m_Colored = { Color.r, Color.g, Color.b };
 		AV(To, "HIDEN", Buffer.buffer(), ID);
-		m_apPlayers[To]->m_Colored = { Color.r/5, Color.g/5, Color.b/5 };
+		m_apPlayers[To]->m_Colored = { Color.r/4, Color.g/4, Color.b/4 };
 		Buffer.clear();
 		va_end(VarArgs);
 	}
@@ -1782,9 +1782,9 @@ void CGS::AVHI(int To, const char *Icon, const int ID, vec3 Color, const char* p
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
 		if(ID > HQUESTITEM && ID < NUMHIDEMENU) { Buffer.append(" (Press me for help)"); }
 
-		m_apPlayers[To]->m_Colored = { Color.r/2, Color.g/2, Color.b/2 };
+		m_apPlayers[To]->m_Colored = { Color.r, Color.g, Color.b };
 		AV(To, "HIDEN", Buffer.buffer(), ID, -1, Icon);
-		m_apPlayers[To]->m_Colored = { Color.r/5, Color.g/5, Color.b/5 };
+		m_apPlayers[To]->m_Colored = { Color.r / 4, Color.g / 4, Color.b / 4 };
 		Buffer.clear();
 		va_end(VarArgs);
 	}
@@ -1874,7 +1874,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		// меню статистики
 		int NeedExp = pPlayer->ExpNeed(pPlayer->Acc().Level);
-		AVH(ClientID, HSTAT, vec3(35,80,40), "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().LastLogin);
+		AVH(ClientID, HSTAT, PURPLE_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().LastLogin);
 		AVM(ClientID, "null", NOPE, HSTAT, "Discord: \"{STR}\". Ideas, bugs, rewards", g_Config.m_SvDiscordInviteGroup);
 		AVM(ClientID, "null", NOPE, HSTAT, "Level {INT} : Exp {INT}/{INT}", &pPlayer->Acc().Level, &pPlayer->Acc().Exp, &NeedExp);
 		AVM(ClientID, "null", NOPE, HSTAT, "Money {INT} gold", &pPlayer->GetItem(itMoney).Count);
@@ -1882,7 +1882,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AV(ClientID, "null", "");
 
 		// меню персонал
-		AVH(ClientID, HPERSONAL, vec3(50,52,57), "☪ SUB MENU PERSONAL");
+		AVH(ClientID, HPERSONAL, GRAY_COLOR, "☪ SUB MENU PERSONAL");
 		AVM(ClientID, "MENU", INVENTORY, HPERSONAL, "⁂ Inventory"); 
 		AVM(ClientID, "MENU", EQUIPMENU, HPERSONAL, "★ Equipment");
 		AVM(ClientID, "MENU", INBOXLIST, HPERSONAL, "✉ Mailbox");
@@ -1900,7 +1900,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AV(ClientID, "null", "");
 
 		// меню информации
-		AVH(ClientID, HINFORMATION, vec3(15,40,80), "# SUB MENU INFORMATION");
+		AVH(ClientID, HINFORMATION, BLUE_COLOR, "# SUB MENU INFORMATION");
 		AVM(ClientID, "MENU", TOPLISTMENU, HINFORMATION, "♛ Top list");
 		AVM(ClientID, "MENU", GUIDEDROP, HINFORMATION, "♣ Loot mobs");
 		AV(ClientID, "null", "");
@@ -1954,13 +1954,13 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		if(pChar && pChar->GetHelper()->BoolIndex(TILE_CRAFT))
 		{
-			AVH(ClientID, HCRAFTINFO, vec3(35,80,40), "Crafting Information");
+			AVH(ClientID, HCRAFTINFO, GREEN_COLOR, "Crafting Information");
 			AVM(ClientID, "null", NOPE, HCRAFTINFO, "Choose the type of crafts you want to show");
 			AVM(ClientID, "null", NOPE, HCRAFTINFO, "If you will not have enough items for crafting");
 			AVM(ClientID, "null", NOPE, HCRAFTINFO, "You will write those and the amount that is still required");
 			AV(ClientID, "null", "");
 			
-			AVH(ClientID, HCRAFTSELECT, vec3(40, 10, 5), "Crafting Select List");
+			AVH(ClientID, HCRAFTSELECT, RED_COLOR, "Crafting Select List");
 			AVM(ClientID, "SORTEDCRAFT", CRAFTBASIC, HCRAFTSELECT, "Basic Items");
 			AVM(ClientID, "SORTEDCRAFT", CRAFTARTIFACT, HCRAFTSELECT, "Artifacts");
 			AVM(ClientID, "SORTEDCRAFT", CRAFTWEAPON, HCRAFTSELECT, "Modules & Weapons");
@@ -1989,7 +1989,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		const int PlantItemID = Mmo()->House()->GetPlantsID(HouseID);
 		pPlayer->m_LastVoteMenu = HOUSEMENU;
 
-		AVH(ClientID, HPLANTS, vec3(35,80,40), "Plants Information");
+		AVH(ClientID, HPLANTS, GREEN_COLOR, "Plants Information");
 		AVM(ClientID, "null", NOPE, HPLANTS, "Select item and in tab select 'Change Plants'");
 		AV(ClientID, "null", "");
 
@@ -2002,7 +2002,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;
 
-		AVH(ClientID, HUPGRINFO, vec3(35,80,40), "Upgrades Information");
+		AVH(ClientID, HUPGRINFO, GREEN_COLOR, "Upgrades Information");
 		AVM(ClientID, "null", NOPE, HUPGRINFO, "Select upgrades type in Reason, write count.");
 		AV(ClientID, "null", "");
 
@@ -2010,7 +2010,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		// Улучшения класса DPS дамаг
 		int Range = pPlayer->GetLevelDisciple(AtributType::AtDps);
-		AVH(ClientID, HUPGDPS, vec3(80,30,30), "Disciple of War. Level Range {INT}", &Range);
+		AVH(ClientID, HUPGDPS, RED_COLOR, "Disciple of War. Level Range {INT}", &Range);
 		for(const auto& at : AttributInfo)
 		{
 			if(at.second.AtType != AtributType::AtDps || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
@@ -2022,7 +2022,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		// Улучшения класса TANK танк
 		Range = pPlayer->GetLevelDisciple(AtributType::AtTank);
-		AVH(ClientID, HUPGTANK, vec3(30,30,80), "Disciple of Tank. Level Range {INT}", "lvl", &Range);
+		AVH(ClientID, HUPGTANK, BLUE_COLOR, "Disciple of Tank. Level Range {INT}", "lvl", &Range);
 		for(const auto& at : AttributInfo)
 		{
 			if(at.second.AtType != AtributType::AtTank || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
@@ -2034,7 +2034,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		// Улучшения класса HEALER хил
 		Range = pPlayer->GetLevelDisciple(AtributType::AtHealer);
-		AVH(ClientID, HUPGHEALER, vec3(30,80,30), "Disciple of Healer. Level Range {INT}", "lvl", &Range);
+		AVH(ClientID, HUPGHEALER, GREEN_COLOR, "Disciple of Healer. Level Range {INT}", "lvl", &Range);
 		for(const auto& at : AttributInfo)
 		{
 			if(at.second.AtType != AtributType::AtHealer || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
@@ -2045,7 +2045,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AV(ClientID, "null", "");
 
 		// Улучшения WEAPONS оружия
-		AVH(ClientID, HUPGWEAPON, vec3(30,30,30), "Upgrades Weapons / Ammo");
+		AVH(ClientID, HUPGWEAPON, GRAY_COLOR, "Upgrades Weapons / Ammo");
 		for(const auto& at : AttributInfo)
 		{
 			if(at.second.AtType != AtributType::AtWeapon || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
@@ -2055,7 +2055,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		}
 
 		AV(ClientID, "null", ""), 
-		AVH(ClientID, HJOBUPGRADE, vec3(80,56,10), "Disciple of Jobs");
+		AVH(ClientID, HJOBUPGRADE, GOLDEN_COLOR, "Disciple of Jobs");
 		Mmo()->SpaAcc()->ShowMenu(ClientID);
 		AVM(ClientID, "null", NOPE, HJOBUPGRADE, "═══════════════════════════════");
 		Mmo()->PlantsAcc()->ShowMenu(ClientID);
@@ -2067,7 +2067,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;
 
-		AVH(ClientID, HTOPMENUINFO, vec3(35, 80, 40), "Top list Information");
+		AVH(ClientID, HTOPMENUINFO, GREEN_COLOR, "Top list Information");
 		AVM(ClientID, "null", NOPE, HTOPMENUINFO, "Here you can see top server Guilds, Players.");
 		AV(ClientID, "null", "");
 
@@ -2082,7 +2082,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		pPlayer->m_LastVoteMenu = MAINMENU;
 
 		// информация
-		AVH(ClientID, HCHANCELOOTINFO, vec3(35,80,40), "Chance & Loot Information");
+		AVH(ClientID, HCHANCELOOTINFO, GREEN_COLOR, "Chance & Loot Information");
 		AVM(ClientID, "null", NOPE, HCHANCELOOTINFO, "Here you can see chance loot, mobs, positions, world.");
 		AV(ClientID, "null", "");
 
@@ -2093,7 +2093,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			const int HideID = (NUMHIDEMENU+12500+mobs.first);
 			int PosX = mobs.second.PositionX/32, PosY = mobs.second.PositionY/32;
 
-			AVH(ClientID, HideID, vec3(20, 7, 15), "{STR} [{STR}] {STR}(x: {INT} y: {INT})", mobs.second.Boss ? "Raid" : "Mob", mobs.second.Name,
+			AVH(ClientID, HideID, BLUE_COLOR, "{STR} [{STR}] {STR}(x: {INT} y: {INT})", mobs.second.Boss ? "Raid" : "Mob", mobs.second.Name,
 				Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY);
 	
 			for(int i = 0; i < 6; i++)
@@ -2113,12 +2113,12 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	else if(MenuList == EQUIPMENU) 
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;
-		AVH(ClientID, HEQUIPINFO, vec3(35,80,40), "Equip / Armor Information");
+		AVH(ClientID, HEQUIPINFO, GREEN_COLOR, "Equip / Armor Information");
 		AVM(ClientID, "null", NOPE, HEQUIPINFO, "Select tab and select armor.");
 		AV(ClientID, "null", "");
 		ShowPlayerStats(pPlayer);
 
-		AVH(ClientID, HEQUIPSELECT, vec3(40, 10, 5), "Equip Select List");
+		AVH(ClientID, HEQUIPSELECT, RED_COLOR, "Equip Select List");
 		const char* pType[NUM_EQUIPS] = { "Wings", "Hammer", "Gun", "Shotgun", "Grenade", "Rifle", "Discord", "Pickaxe" };
 		for(int i = EQUIP_WINGS; i < NUM_EQUIPS; i++) 
 		{
@@ -2189,7 +2189,7 @@ void CGS::AddBack(int ClientID)
 void CGS::ShowPlayerStats(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	AVH(ClientID, HUPGRADESTATS, vec3(22,49,80), "Player Stats");
+	AVH(ClientID, HUPGRADESTATS, BLUE_COLOR, "Player Stats");
 	for(const auto& at : AttributInfo)
 	{
 		if(str_comp_nocase(at.second.FieldName, "unfield") == 0) 

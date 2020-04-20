@@ -103,7 +103,7 @@ void TeleportsSql::ShowTeleportList(CPlayer *pPlayer)
 
 	// весь список телепортов	
 	const int ClientID = pPlayer->GetCID();
-	GS()->AVH(ClientID, HTELEPORTLIST, vec3(50, 10, 5), "Available teleports");
+	GS()->AVH(ClientID, HTELEPORTLIST, GOLDEN_COLOR, "Available teleports");
 	
 	// если имеется дом организации
 	if(Job()->Member()->GetGuildHouseID(pPlayer->Acc().GuildID) >= 1)

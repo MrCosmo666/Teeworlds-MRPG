@@ -56,7 +56,7 @@ void ShopMailSql::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		{
 			char aEnchantSize[16];
 			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(50, 30, 25), "{STR}{STR}{STR} :: {INT} {STR}",
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}{STR}{STR} :: {INT} {STR}",
 				(pPlayer->GetItem(ItemID).Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price, NeededItem.GetName(pPlayer));
 
 			int BonusCount = BuyightItem.BonusCount * (Enchant + 1);
@@ -64,7 +64,7 @@ void ShopMailSql::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		}
 		else
 		{
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(25, 30, 50), "{STR}x{INT} ({INT}) :: {INT} {STR}",
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}x{INT} ({INT}) :: {INT} {STR}",
 				BuyightItem.GetName(pPlayer), &Count, &pPlayer->GetItem(ItemID).Count, &Price, NeededItem.GetName(pPlayer));
 		}
 
@@ -78,7 +78,7 @@ void ShopMailSql::ShowMailShop(CPlayer *pPlayer, int StorageID)
 void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 {
 	int ClientID = pPlayer->GetCID();
-	GS()->AVH(ClientID, HAUCTIONINFO, vec3(35,80,40), "Auction Information");
+	GS()->AVH(ClientID, HAUCTIONINFO, GREEN_COLOR, "Auction Information");
 	GS()->AVM(ClientID, "null", NOPE, HAUCTIONINFO, "To create a slot, see inventory item interact.");
 	GS()->AV(ClientID, "null", "");
 
@@ -101,7 +101,7 @@ void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 		{
 			char aEnchantSize[16];
 			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(50, 30, 25), "{STR}{STR}{STR} :: {INT} gold",
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}{STR}{STR} :: {INT} gold",
 				(pPlayer->GetItem(ItemID).Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price);
 
 			int BonusCount = BuyightItem.BonusCount * (Enchant + 1);
@@ -109,7 +109,7 @@ void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 		}
 		else
 		{
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, vec3(25, 30, 50), "{STR}x{INT} ({INT}) :: {INT} gold",
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}x{INT} ({INT}) :: {INT} gold",
 				BuyightItem.GetName(pPlayer), &Count, &pPlayer->GetItem(ItemID).Count, &Price);
 		}
 
@@ -270,7 +270,7 @@ bool ShopMailSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
 		int SlotEnchant = CGS::InteractiveSub[ClientID].AuctionItem.a_enchant;
 		int MinimalPrice = SlotCount * PlSellItem.Info().MinimalPrice;
 
-		GS()->AVH(ClientID, HAUCTIONSLOTINFO, vec3(35, 80, 40), "Information Auction Slot");
+		GS()->AVH(ClientID, HAUCTIONSLOTINFO, GREEN_COLOR, "Information Auction Slot");
 		GS()->AVM(ClientID, "null", NOPE, HAUCTIONSLOTINFO, "The reason for write the number for each row");
 		pPlayer->m_Colored = { 15,15,15 };
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "Item x{INT} Minimal Price: {INT}gold", &SlotCount, &MinimalPrice);

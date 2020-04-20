@@ -80,7 +80,7 @@ void StorageSql::ShowStorageMenu(int ClientID, int StorageID)
 	if(StorageID < 0) return GS()->AV(ClientID, "null", "Storage Don't work");
 
 	// ремонт и имя склада
-	GS()->AVH(ClientID, HSTORAGEUSE, vec3(40,50,60), "Bussines [{STR}/{INT}]", Storage[StorageID].Name, &Storage[StorageID].Count);
+	GS()->AVH(ClientID, HSTORAGEUSE, GOLDEN_COLOR, "Bussines [{STR}/{INT}]", Storage[StorageID].Name, &Storage[StorageID].Count);
 
 	// выводим владельца склада
 	const bool LoadStorage = (Storage[StorageID].MonsterSubType > 0);

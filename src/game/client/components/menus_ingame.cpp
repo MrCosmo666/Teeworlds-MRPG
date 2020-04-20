@@ -604,31 +604,31 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 			continue; // no match found
 
 		CListboxItem Item = UiDoListboxNextItem(&s_ListBoxState, pOption);
+		float FontSize = Item.m_Rect.h * ms_FontmodHeight * 0.8f;
 
-		// mmotee
 		if (m_pClient->MmoServer())
 		{
 			float Alpha = UI()->MouseInside(&Item.m_Rect) ? 0.07f : 0.05f;
-			RenderTools()->DrawUIRect(&Item.m_Rect, vec4((float)pOption->m_Colored[0] / 10,
-				(float)pOption->m_Colored[1] / 10,
-				(float)pOption->m_Colored[2] / 10, Alpha), CUI::CORNER_ALL, 0.0f);
-		}
-		else if (UI()->MouseInside(&Item.m_Rect))
-		{
-			RenderTools()->DrawUIRect(&Item.m_Rect, vec4(0.0f, 0.0f, 0.0f, 0.15f), CUI::CORNER_ALL, 5.0f);
+			int SizeColors = max(pOption->m_Colored[0], pOption->m_Colored[1], pOption->m_Colored[2]);
+			float LengthColors = Item.m_Rect.h * ms_FontmodHeight;
+			bool MainMenu = (bool)(SizeColors > 15);
+
+			FontSize = (MainMenu ? LengthColors * 0.8f : LengthColors * 0.71f);
+			vec4 VoteColor = vec4((float)pOption->m_Colored[0] / 10, (float)pOption->m_Colored[1] / 10, (float)pOption->m_Colored[2] / 10, Alpha);
+			RenderTools()->DrawUIRect(&Item.m_Rect, VoteColor, CUI::CORNER_ALL, 0.0f);
+
+			if (!MainMenu)
+				TextRender()->TextColor(1, 1, 1, 0.85f);
 		}
 
 		if(Item.m_Visible)
-		{			
-			if (m_pClient->MmoServer() && (pOption->m_Colored[0] >= 30 || pOption->m_Colored[1] >= 30 || pOption->m_Colored[2] >= 30))
-				TextRender()->TextOutlineColor(0.7f, 0.7f, 0.7f, 0.3f);
-
+		{
 			bool Icon = DoItemIcon(pOption->m_Icon, { Item.m_Rect.x + 2.0f, Item.m_Rect.y, Item.m_Rect.w, Item.m_Rect.h, }, 21.0f);
 			Item.m_Rect.VMargin((Icon ? 25.0f : 5.0f), &Item.m_Rect);
 			Item.m_Rect.y += 2.0f;
-			UI()->DoLabel(&Item.m_Rect, pOption->m_aDescription, Item.m_Rect.h*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
+			UI()->DoLabel(&Item.m_Rect, pOption->m_aDescription, FontSize, CUI::ALIGN_LEFT);
 
-			TextRender()->TextOutlineColor(0.3f, 0.3f, 0.3f, 0.3f);
+			TextRender()->TextColor(1, 1, 1, 1);
 		}
 	}
 
@@ -752,6 +752,12 @@ void CMenus::RenderServerControl(CUIRect MainView)
 	if(m_pClient->m_LocalClientID == -1)
 		return;
 
+	if (m_pClient->MmoServer())
+	{
+		RenderServerControlMRPG(MainView);
+		return;
+	}
+
 	static int s_ControlPage = 0;
 	const char *pNotification = 0;
 	char aBuf[64];
@@ -838,7 +844,6 @@ void CMenus::RenderServerControl(CUIRect MainView)
 	bool doCallVote = false;
 	// render page
 	if(s_ControlPage == 0)
-		// double click triggers vote if not spectating
 		doCallVote = RenderServerControlServer(MainView) && m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team != TEAM_SPECTATORS; 
 	else if(s_ControlPage == 1)
 		RenderServerControlKick(MainView, false);
@@ -969,6 +974,65 @@ void CMenus::RenderServerControl(CUIRect MainView)
 				static float s_OffsetCmd = 0.0f;
 				DoEditBox(&s_aVoteCommand, &Button, s_aVoteCommand, sizeof(s_aVoteCommand), 14.0f, &s_OffsetCmd, false, CUI::CORNER_ALL);
 			}
+		}
+	}
+}
+
+
+void CMenus::RenderServerControlMRPG(CUIRect MainView)
+{
+	if (m_pClient->m_LocalClientID == -1)
+		return;
+
+	// затемнить и чуть обрезать
+	MainView.HSplitBottom(80.0f, &MainView, 0);
+	RenderTools()->DrawUIRect(&MainView, vec4(0.0f, 0.0f, 0.0f, 0.60f), CUI::CORNER_ALL, 5.0f);
+
+	// tab bar
+	CUIRect Bottom, Extended, Button;
+	MainView.HSplitBottom(40.0f, &MainView, &Extended);
+	RenderTools()->DrawUIRect(&Extended, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
+	bool doCallVote = RenderServerControlServer(MainView) && m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team != TEAM_SPECTATORS;
+
+	// нижняя граница
+	Extended.Margin(5.0f, &Extended);
+	Extended.HSplitTop(20.0f, &Bottom, &Extended);
+	{
+		CUIRect Reason, Search, Label;
+
+		// - - - - - - - - - - ПОИСК - - - - - - - - - -
+		Bottom.VSplitLeft(15.0f, 0, &Bottom);
+		Bottom.VSplitLeft(260.0f, &Search, &Bottom);
+
+		const char* pSearchLabel = Localize("Search:");
+		float w = TextRender()->TextWidth(0, Search.h * ms_FontmodHeight * 0.8f, pSearchLabel, -1, -1.0f);
+		Search.VSplitLeft(w + 10.0f, &Label, &Search);
+		Label.y += 2.0f;
+		UI()->DoLabel(&Label, pSearchLabel, Search.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_LEFT);
+		static float s_SearchOffset = 0.0f;
+		if (DoEditBox(&m_aFilterString, &Search, m_aFilterString, sizeof(m_aFilterString), Search.h * ms_FontmodHeight * 0.8f, &s_SearchOffset))
+			m_CallvoteSelectedOption = 0;
+
+		// - - - - - - - - - - ИНТЕРАКТИВЫ - - - - - - - - - -
+		Bottom.VSplitLeft(200.0f, 0, &Bottom);
+		Bottom.VSplitLeft(260.0f, &Reason, &Bottom);
+		const char* pReasonLabel = Localize("Interaction:");
+		w = TextRender()->TextWidth(0, Reason.h * ms_FontmodHeight * 0.8f, pReasonLabel, -1, -1.0f);
+		Reason.VSplitLeft(w + 10.0f, &Label, &Reason);
+		Label.y += 2.0f;
+		UI()->DoLabel(&Label, pReasonLabel, Reason.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_LEFT);
+		static float s_ReasonOffset = 0.0f;
+		DoEditBox(&m_aCallvoteReason, &Reason, m_aCallvoteReason, sizeof(m_aCallvoteReason), Reason.h * ms_FontmodHeight * 0.8f, &s_ReasonOffset, false, CUI::CORNER_ALL);
+
+		// - - - - - - - - - - ГОЛОСОВАНИЯ - - - - - - - - - -
+		Bottom.VSplitLeft(15.0f, 0, &Bottom);
+		Bottom.VSplitLeft(110.0f, &Button, &Bottom);
+		static CButtonContainer s_CallVoteButton;
+		if (DoButton_Menu(&s_CallVoteButton, Localize("Select"), 0, &Button) || doCallVote)
+		{
+			HandleCallvote(0, false);
+			m_aCallvoteReason[0] = 0;
+			mem_zero(m_aFilterString, sizeof(m_aFilterString));
 		}
 	}
 }

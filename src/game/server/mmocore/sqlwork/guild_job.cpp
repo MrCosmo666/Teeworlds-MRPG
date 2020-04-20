@@ -351,7 +351,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	// показываем само меню
 	int MemberHouse = GetGuildHouseID(GuildID);
 	int ExpNeed = ExpForLevel(Guild[GuildID].m_Level);
-	GS()->AVH(ClientID, HMEMBERSTATS, vec3(52,26,80), "Guild name: {STR}", Guild[GuildID].m_Name);
+	GS()->AVH(ClientID, HMEMBERSTATS, BLUE_COLOR, "Guild name: {STR}", Guild[GuildID].m_Name);
 	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Level: {INT} Experience: {INT}/{INT}", &Guild[GuildID].m_Level, &Guild[GuildID].m_Exp, &ExpNeed);
 	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Maximal available player count: {INT}", &Guild[GuildID].m_Upgrades[EMEMBERUPGRADE::AvailableNSTSlots]);
 	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Leader: {STR}", Job()->PlayerName(Guild[GuildID].m_OwnerID));
@@ -409,7 +409,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 		const int AuthID = RES->getInt("ID");
 		const int RankID = RES->getInt("GuildRank");
 		int Deposit = RES->getInt("GuildDeposit");
-		GS()->AVH(ClientID, HideID, vec3(15,40,80), "Rank: {STR} {STR} Deposit: {INT}", GetGuildRank(GuildID, RankID), RES->getString("Nick").c_str(), &Deposit);
+		GS()->AVH(ClientID, HideID, RED_COLOR, "Rank: {STR} {STR} Deposit: {INT}", GetGuildRank(GuildID, RankID), RES->getString("Nick").c_str(), &Deposit);
 
 		// сбор всех рангов и вывод их
 		for(auto mr: RankGuild)
@@ -642,7 +642,7 @@ void GuildJob::ShowMenuRank(CPlayer *pPlayer)
 		if(GuildID != mr.second.GuildID) continue;
 		
 		HideID += mr.first;
-		GS()->AVH(ClientID, HideID, vec3(40,20,15), "Rank [{STR}]", mr.second.Rank);
+		GS()->AVH(ClientID, HideID, GOLDEN_COLOR, "Rank [{STR}]", mr.second.Rank);
 		GS()->AVM(ClientID, "MRANKSET", mr.first, HideID, "Change rank name to ({STR})", CGS::InteractiveSub[ClientID].RankName);
 		GS()->AVM(ClientID, "MRANKACCESS", mr.first, HideID, "Access rank ({STR})", AccessNames(mr.second.Access));
 		GS()->AVM(ClientID, "MRANKDELETE", mr.first, HideID, "Delete this rank");
@@ -684,7 +684,7 @@ void GuildJob::ShowInvitesGuilds(int ClientID, int GuildID)
 	{
 		int OwnerID = RES->getInt("OwnerID");
 		const char *PlayerName = Job()->PlayerName(OwnerID);
-		GS()->AVH(ClientID, HideID, vec3(15,40,80), "Sender {STR} to join guilds", PlayerName);
+		GS()->AVH(ClientID, HideID, BLUE_COLOR, "Sender {STR} to join guilds", PlayerName);
 		{
 			GS()->AVD(ClientID, "MINVITEACCEPT", GuildID, OwnerID, HideID, "Accept {STR} to guild", PlayerName);
 			GS()->AVD(ClientID, "MINVITEREJECT", GuildID, OwnerID, HideID, "Reject {STR} to guild", PlayerName);
@@ -713,7 +713,7 @@ void GuildJob::ShowFinderGuilds(int ClientID)
 		int PlayersCount = GetGuildPlayerCount(GuildID);
 		cGuildName = RES->getString("GuildName").c_str();
 
-		GS()->AVH(ClientID, HideID, vec3(15,20,40), "{STR} : Leader {STR} : Players [{INT}/{INT}]", 
+		GS()->AVH(ClientID, HideID, RED_COLOR, "{STR} : Leader {STR} : Players [{INT}/{INT}]", 
 			cGuildName.cstr(), Job()->PlayerName(Guild[GuildID].m_OwnerID), &PlayersCount, &AvailableSlot);
 		GS()->AVM(ClientID, "null", NOPE, HideID, "House: {STR} | Bank: {INT} gold", (GetGuildHouseID(GuildID) <= 0 ? "No" : "Yes"), &Guild[ GuildID ].m_Bank);
 		GS()->AVM(ClientID, "MINVITESEND", GuildID, HideID, "Send request to join {STR}", cGuildName.cstr());
@@ -887,7 +887,7 @@ void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int MID)
 	int GuildID = pPlayer->Acc().GuildID;
 	bool Leader = IsLeaderPlayer(pPlayer);
 
-	GS()->AVH(ClientID, HMEMHOMEINFO, vec3(35,80,40), "Information Member Housing");
+	GS()->AVH(ClientID, HMEMHOMEINFO, GREEN_COLOR, "Information Member Housing");
 	GS()->AVM(ClientID, "null", NOPE, HMEMHOMEINFO, "Buying a house you will need to constantly the Treasury");
 	GS()->AVM(ClientID, "null", NOPE, HMEMHOMEINFO, "In the intervals of time will be paid house");
 
@@ -1396,7 +1396,7 @@ bool GuildJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
 	if (Menulist == HOUSEGUILDDECORATION)
 	{
 		pPlayer->m_LastVoteMenu = HOUSEMENU;
-		GS()->AVH(ClientID, HDECORATION, vec3(35, 80, 40), "Decorations Information");
+		GS()->AVH(ClientID, HDECORATION, GREEN_COLOR, "Decorations Information");
 		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "Add: Select your item in list. Select (Add to house),");
 		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "later press (ESC) and mouse select position");
 		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "Return in inventory: Select down your decorations");

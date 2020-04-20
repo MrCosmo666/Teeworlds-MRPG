@@ -231,12 +231,12 @@ void ItemSql::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 	{
 		char aEnchantSize[16];
 		str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", PlItem.Enchant);
-		GS()->AVHI(ClientID, PlItem.Info().GetIcon(), HideID, vec3(50, 30, 25), "{STR}{STR} {STR}",
+		GS()->AVHI(ClientID, PlItem.Info().GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}{STR} {STR}",
 			NameItem, (PlItem.Enchant > 0 ? aEnchantSize : "\0"), (PlItem.Settings ? " ✔" : "\0"));
 	}
 	else
 	{
-		GS()->AVHI(ClientID, PlItem.Info().GetIcon(), HideID, vec3(25, 30, 50), "{STR}{STR} x{INT}",
+		GS()->AVHI(ClientID, PlItem.Info().GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}{STR} x{INT}",
 			(PlItem.Settings ? "Dressed - " : "\0"), NameItem, &PlItem.Count);
 	}
 
@@ -456,7 +456,7 @@ bool ItemSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
 
 		// Настройки
 		bool FoundSettings = false;
-		GS()->AVH(ClientID, HSETTINGSS, vec3(50, 30, 40), "Some of the settings becomes valid after death");
+		GS()->AVH(ClientID, HSETTINGSS, RED_COLOR, "Some of the settings becomes valid after death");
 		for (const auto& it : Items[ClientID])
 		{
 			const ItemPlayer ItemData = it.second;
@@ -474,7 +474,7 @@ bool ItemSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
 		// Снаряжение
 		FoundSettings = false;
 		GS()->AV(ClientID, "null", "");
-		GS()->AVH(ClientID, HSETTINGSU, vec3(30, 50, 40), "Sub items settings.");
+		GS()->AVH(ClientID, HSETTINGSU, GREEN_COLOR, "Sub items settings.");
 		for (const auto& it : Items[ClientID])
 		{
 			const ItemPlayer ItemData = it.second;
@@ -497,14 +497,14 @@ bool ItemSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
 	if (Menulist == INVENTORY)
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;
-		GS()->AVH(ClientID, HINVINFO, vec3(35, 80, 40), "Inventory Information");
+		GS()->AVH(ClientID, HINVINFO, GREEN_COLOR, "Inventory Information");
 		GS()->AVM(ClientID, "null", NOPE, HINVINFO, "Choose the type of items you want to show");
 		GS()->AVM(ClientID, "null", NOPE, HINVINFO, "After, need select item to interact");
 		GS()->AV(ClientID, "null", "");
 
 		GS()->ShowPlayerStats(pPlayer);
 
-		GS()->AVH(ClientID, HINVSELECT, vec3(40, 10, 5), "Inventory Select List");
+		GS()->AVH(ClientID, HINVSELECT, RED_COLOR, "Inventory Select List");
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ITEMUSED, HINVSELECT, "Used Items");
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ITEMCRAFT, HINVSELECT, "Craft Items");
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ITEMQUEST, HINVSELECT, "Quest Items");

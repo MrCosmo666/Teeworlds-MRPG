@@ -442,7 +442,7 @@ void HouseJob::ChangeStateDoor(int HouseID)
 void HouseJob::ShowHouseMenu(CPlayer *pPlayer, int HouseID)
 {
 	int ClientID = pPlayer->GetCID();
-	GS()->AVH(ClientID, HHOMEINFO, vec3(35,80,40), "House {INT} . {STR}", &HouseID, Home[HouseID].m_Class);
+	GS()->AVH(ClientID, HHOMEINFO, GREEN_COLOR, "House {INT} . {STR}", &HouseID, Home[HouseID].m_Class);
 	GS()->AVL(ClientID, "null", "Owner House: {STR}", Job()->PlayerName(Home[HouseID].m_OwnerID));
 	GS()->AVM(ClientID, "null", NOPE, HHOMEINFO, "House information : Helper house system");
 	GS()->AVM(ClientID, "null", NOPE, HHOMEINFO, "Every game day, you got check payment house.");
@@ -451,7 +451,7 @@ void HouseJob::ShowHouseMenu(CPlayer *pPlayer, int HouseID)
 	GS()->AVM(ClientID, "null", NOPE, HHOMEINFO, "Mail with attached money");
 	GS()->AV(ClientID, "null", "");
 
-	GS()->AVH(ClientID, HHOMECOMMAND, vec3(35,80,40), "House command");
+	GS()->AVH(ClientID, HHOMECOMMAND, GREEN_COLOR, "House command");
 	GS()->AVM(ClientID, "null", NOPE, HHOMECOMMAND, "/doorhouse - Open or close door your house");
 	GS()->AVM(ClientID, "null", NOPE, HHOMECOMMAND, "/sellhouse - To sell the house to the city");
 	GS()->AVM(ClientID, "null", NOPE, HHOMECOMMAND, "/selltohouse <clientid> <price> - To sell the house to player");
@@ -472,7 +472,7 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 	if(HouseID <= 0) return GS()->AVL(ClientID, "null", "You not owner home!");
 
 	bool StateDoor = GetHouseDoor(HouseID);
-	GS()->AVH(ClientID, HHOUSESTATS, vec3(52,26,80), "House stats {INT} Class {STR} Door [{STR}]", &HouseID, Home[HouseID].m_Class, StateDoor ? "Closed" : "Opened");
+	GS()->AVH(ClientID, HHOUSESTATS, BLUE_COLOR, "House stats {INT} Class {STR} Door [{STR}]", &HouseID, Home[HouseID].m_Class, StateDoor ? "Closed" : "Opened");
 	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, "Farming level: every day +{INT}gold", &Home[HouseID].m_FarmLevel);
 	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, "Bank farming house {INT}gold", &Home[HouseID].m_Farm);
 	GS()->AVM(ClientID, "null", NOPE, HHOUSESTATS, "- - - - - - - - - -");
@@ -638,7 +638,7 @@ bool HouseJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
 	if (Menulist == HOUSEDECORATION)
 	{
 		pPlayer->m_LastVoteMenu = HOUSEMENU;
-		GS()->AVH(ClientID, HDECORATION, vec3(35, 80, 40), "Decorations Information");
+		GS()->AVH(ClientID, HDECORATION, GREEN_COLOR, "Decorations Information");
 		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "Add: Select your item in list. Select (Add to house),");
 		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "later press (ESC) and mouse select position");
 		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "Return in inventory: Select down your decorations");
