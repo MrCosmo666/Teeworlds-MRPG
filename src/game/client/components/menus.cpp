@@ -2629,12 +2629,16 @@ bool CMenus::OnMouseMove(float x, float y)
 	return true;
 }
 
-int CMenus::GetESCState() const
+int CMenus::GetNewESCState() const
 {
-	// special state ESC for authed menu
-	if(m_ShowAuthWindow)
-		return m_MenuActiveID == EMenuState::AUTHSTATE ? (int)EMenuState::ESCSTATE : (int)EMenuState::AUTHSTATE;
-
+	// Authed menus
+	if (m_ShowAuthWindow)
+	{
+		if (m_MenuActiveID == EMenuState::AUTHSTATE)
+			return (int)EMenuState::ESCSTATE;
+		else
+			return (int)EMenuState::AUTHSTATE;
+	}
 	return !IsActive();
 }
 
@@ -2648,7 +2652,7 @@ bool CMenus::OnInput(IInput::CEvent e)
 		if(e.m_Key == KEY_ESCAPE)
 		{
 			m_EscapePressed = true;
-			SetActive(GetESCState());
+			SetActive(GetNewESCState());
 			return true;
 		}
 	}

@@ -30,7 +30,7 @@ void CTalkText::Clear()
 bool CTalkText::IsActive()
 {
 	// dont render talktext if the menu is active
-	return m_TalkClientID > 0;
+	return (bool)(m_TalkClientID > 0 && m_pClient->m_pMenus->IsActive() <= 0);
 }
 
 // изменения статуса
@@ -43,7 +43,7 @@ void CTalkText::OnStateChange(int NewState, int OldState)
 // прорисовка
 void CTalkText::OnRender()
 {
-	if(!IsActive())
+	if(!IsActive() || m_pClient->m_pMenus->IsActive())
 		return;
 
 	int TalkingEmoticion = SPRITE_DOTDOT;
@@ -155,7 +155,7 @@ void CTalkText::OnMessage(int MsgType, void *pRawMsg)
 bool CTalkText::OnInput(IInput::CEvent Event)
 {
 	// fix console Press TAB
-	if (m_pClient->m_pGameConsole->IsConsoleActive())
+	if (m_pClient->m_pGameConsole->IsConsoleActive() || !IsActive())
 		return false;
 
 	if(IsActive() && Event.m_Flags&IInput::FLAG_PRESS && Event.m_Key == KEY_TAB)
@@ -170,9 +170,6 @@ bool CTalkText::OnInput(IInput::CEvent Event)
 // нажатие клиента продолжения
 void CTalkText::ClientPressed()
 {
-	if(!IsActive())
-		return;
-
 	CNetMsg_Cl_TalkInteractive Msg;
 	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
 }

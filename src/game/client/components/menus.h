@@ -867,7 +867,7 @@ public:
 	virtual void OnRender();
 
 	// mmotee impl
-	int GetESCState() const;
+	int GetNewESCState() const;
 	virtual bool OnInput(IInput::CEvent Event);
 
 	virtual bool OnMouseMove(float x, float y);
