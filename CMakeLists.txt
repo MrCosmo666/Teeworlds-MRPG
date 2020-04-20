@@ -280,7 +280,7 @@ find_package(ZLIB)
 find_package(Pnglite)
 find_package(GLEW)
 
-find_package(OwnFreetype)
+find_package(Freetype)
 find_package(SDL2)
 find_package(Wavpack)
 find_package(Curl)
