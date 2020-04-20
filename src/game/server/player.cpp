@@ -900,10 +900,10 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 
 void CPlayer::ClearTalking()
 {
-	GS()->SendTalkText(m_ClientID, -1, 0, "\0");
 	m_TalkingNPC.m_TalkedID = -1;
 	m_TalkingNPC.m_TalkedProgress = 0;
 	m_TalkingNPC.m_FreezedProgress = false;
+	GS()->SendTalkText(m_ClientID, -1, 0, "\0");
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

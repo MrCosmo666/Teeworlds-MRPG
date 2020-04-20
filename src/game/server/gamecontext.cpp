@@ -751,7 +751,7 @@ void CGS::SendSkinChange(int ClientID, int TargetID)
 // Отправить Equip Items
 void CGS::SendEquipItem(int ClientID, int TargetID)
 {
-	if((TargetID > 0 && TargetID < MAX_PLAYERS && !CheckClient(TargetID)) || !m_apPlayers[ClientID] || !m_apPlayers[ClientID]->IsAuthed())
+	if(TargetID != -1 && !CheckClient(TargetID) || !m_apPlayers[ClientID] || !m_apPlayers[ClientID]->IsAuthed())
 		return;
 
 	CNetMsg_Sv_EquipItems Msg;
@@ -1466,9 +1466,8 @@ void CGS::ChangeWorld(int ClientID)
 	int savecidmem = ClientID+m_WorldID*MAX_CLIENTS;
 	m_apPlayers[ClientID] = new(savecidmem) CPlayer(this, ClientID);
 	
-	// если клиент проверен отправим свой скин
-	if(CheckClient(ClientID))
-		SendEquipItem(ClientID, ClientID);
+	SendEquipItem(ClientID, -1);
+	SendEquipItem(ClientID, ClientID);
 }
 
 // Если игрок Готов к игре
