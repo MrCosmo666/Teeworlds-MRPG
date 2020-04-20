@@ -49,7 +49,7 @@ void CQuestingProcessing::ProcessingRenderTable(int TableID, CUIRect &Box)
 		char aQuestTable[32];
 		str_format(aQuestTable, sizeof(aQuestTable), "%s %d / %d", QuestTable[TableID].m_aText, QuestTable[TableID].m_Have, QuestTable[TableID].m_Requires);
 		RenderTools()->DrawUIBar(TextRender(), Table, ColorBarUI,
-			QuestTable[TableID].m_Have, QuestTable[TableID].m_Requires, aQuestTable, 3, CUI::ALIGN_RIGHT, 10.0f, 8.0f);
+			QuestTable[TableID].m_Have, QuestTable[TableID].m_Requires, aQuestTable, 3, 10.0f, 8.0f);
 	}
 
 	//  ICON

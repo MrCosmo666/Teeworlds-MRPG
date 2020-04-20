@@ -241,8 +241,7 @@ void CPlayers::RenderPlayer(const CNetObj_Character *pPrevChar, const CNetObj_Ch
 
 		int WingsEquipItem = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_WINGS];
 		int WingsEnchantItem = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_WINGS];
-		RenderEffectsWings(Position, Direction, WingsEquipItem, WingsEnchantItem);
-		RenderTools()->RenderPicItems(&State, m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_WINGS], Direction, Position);
+		RenderWings(&State, Position, Direction, WingsEquipItem, WingsEnchantItem);
 	}
 
 	// do skidding
@@ -588,7 +587,7 @@ void CPlayers::OnRender()
 }
 
 // mmotee
-void CPlayers::RenderEffectsWings(vec2 Position, vec2 Direction, int EquipItem, int Enchant)
+void CPlayers::RenderWings(CAnimState* pAnimWings, vec2 Position, vec2 Direction, int EquipItem, int Enchant)
 {
 	if (g_Config.m_ClShowMEffects != 2 && Enchant >= EFFECTENCHANT)
 	{
@@ -601,9 +600,12 @@ void CPlayers::RenderEffectsWings(vec2 Position, vec2 Direction, int EquipItem, 
 		case  22: Color = vec4(1.0f, 1.0f, 0.0f, 0.01f); break;
 		case  23: Color = vec4(0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.01f); break;
 		}
+
 		m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
 		m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
+
 	}
+	RenderTools()->RenderPicItems(pAnimWings, EquipItem, Direction, Position);
 }
 
 bool CPlayers::RenderHammer(CAnimState* pAnim, const CNetObj_Character pPlayer, float Angle, vec2 Position, int EquipID)

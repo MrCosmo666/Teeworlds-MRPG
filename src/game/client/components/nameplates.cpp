@@ -37,14 +37,14 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 	// render name plate
 	if (m_pClient->m_LocalClientID != ClientID)
 	{
-		CTextCursor Cursor;
 		char aName[64];
 		str_format(aName, sizeof(aName), "%s", g_Config.m_ClShowsocial ? m_pClient->m_aClients[ClientID].m_aName : "");
 
 		float a = 0.95f;
 		if (g_Config.m_ClNameplatesAlways == 0)
 			a = clamp(0.95f - powf(distance(m_pClient->m_pControls->m_TargetPos, Position) / 200.0f, 16.0f), 0.0f, 0.95f);
-
+		
+		CTextCursor Cursor;
 		if (m_pClient->MmoServer() && m_pClient->m_aClients[ClientID].m_pLocalStats && a > 0.001f)
 		{
 			// переменные
@@ -92,7 +92,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 
 				CUIRect ExpBar = { Position.x - tw / 2.0f , Position.y - FontSize - 92.0f, tw, 25.0f };
 				RenderTools()->DrawUIBar(TextRender(), ExpBar, ColorNameplates / 1.2f,
-					pClientStats->m_Health, pClientStats->m_HealthStart, aBuf, 5, CUI::ALIGN_CENTER, 10.0f, 3.2f);
+					pClientStats->m_Health, pClientStats->m_HealthStart, aBuf, 5, 10.0f, 3.2f);
 			}
 
 			// - - - - - - - - - - -  - - - УРОВЕНЬ ИГРОКА - - - - - - - - - - - - - - //

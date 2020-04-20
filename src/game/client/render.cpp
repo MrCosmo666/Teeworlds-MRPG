@@ -327,59 +327,6 @@ void CRenderTools::DrawUIRect4(const CUIRect *r, vec4 ColorTopLeft, vec4 ColorTo
 	Graphics()->QuadsEnd();
 }
 
-// mmotee
-void CRenderTools::RenderPicItems(CAnimState* pAnim, int RenderNum, vec2 Dir, vec2 Pos)
-{
-	vec2 Position = Pos;
-
-	// first pass we draw the outline
-	// second pass we draw the filling
-	for (int p = 0; p < 2; p++)
-	{
-		for (int f = 0; f < 2; f++)
-		{
-			if (f == 1)
-			{
-				// test effects
-				switch (RenderNum)
-				{
-				case 19: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT19, vec2(130, 70), Position, 200, 90);
-					break;
-				case 20: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT20, vec2(115, 60), Position);
-					break;
-				case 21: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT21, vec2(115, 64), Position);
-					break;
-				case 22: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT22, vec2(115, 74), Position);
-					break;
-				case 23: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT23, vec2(115, 70), Position);
-					break;
-				}
-			}
-		}
-	}
-}
-
-void CRenderTools::RenderWings(CAnimState* pAnim, int Sprite, vec2 Position, vec2 PlayerPos, int Size1, int Size2)
-{
-	Graphics()->TextureSet(g_pData->m_aImages[Sprite].m_Id);
-	Graphics()->QuadsBegin();
-
-	Graphics()->QuadsSetRotation(0 - pAnim->GetWings()->m_Angle * pi * 2);
-	IGraphics::CQuadItem Quad2((PlayerPos.x - Position.x) + (pAnim->GetWings()->m_X), PlayerPos.y - (Position.y + pAnim->GetWings()->m_Y), Size1, Size2);
-	Graphics()->QuadsDrawTL(&Quad2, 1);
-
-	Graphics()->QuadsSetRotation(0 + pAnim->GetWings()->m_Angle * pi * 2);
-	IGraphics::CQuadItem Quad((PlayerPos.x + Position.x) - (pAnim->GetWings()->m_X), PlayerPos.y - (Position.y + pAnim->GetWings()->m_Y), -Size1, Size2);
-	Graphics()->QuadsDrawTL(&Quad, 1);
-
-	Graphics()->QuadsEnd();
-}
-
 void CRenderTools::RenderTee(CAnimState* pAnim, const CTeeRenderInfo* pInfo, int Emote, vec2 Dir, vec2 Pos)
 {
 	vec2 Direction = Dir;
@@ -764,69 +711,7 @@ float CRenderTools::GetClientIdRectSize(float FontSize)
 	return 1.4f * FontSize + 0.2f * FontSize;
 }
 
-void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color, int Num, int Max, const char* pText, int Shares, int AlignTextAbroadBar, float Rounding, float Margin)
-{
-	float ScreenX0, ScreenY0, ScreenX1, ScreenY1;
-	Graphics()->GetScreen(&ScreenX0, &ScreenY0, &ScreenX1, &ScreenY1);
-
-	// Background colored progress
-	CUIRect BackgroundProgress = Rect;
-	BackgroundProgress.Margin(Margin, &BackgroundProgress);
-
-
-	// Processing and centralizing the text by bar
-	float FakeToScreenY = (Graphics()->ScreenHeight() / (ScreenY1 - ScreenY0));
-	const float FontSize = (int)(BackgroundProgress.h * FakeToScreenY) / FakeToScreenY;
-	float TextWeidth = pTextRender->TextWidth(0, FontSize, pText, -1, -1.0f);
-	if (TextWeidth > Rect.w)
-	{
-		float changesSize = TextWeidth - Rect.w;
-		if (AlignTextAbroadBar == CUI::ALIGN_CENTER)
-		{
-			Rect.x -= changesSize / 2.0f;
-			Rect.w = TextWeidth;
-		}
-		else if (AlignTextAbroadBar == CUI::ALIGN_LEFT)
-		{
-			Rect.x -= changesSize;
-			Rect.w = TextWeidth;
-		}
-		else
-			Rect.w = TextWeidth;
-
-		BackgroundProgress.x = Rect.x;
-		BackgroundProgress.w = Rect.w;
-	}
-
-
-	// Render bar
-	DrawRoundRect(&Rect, vec4(0.5f, 0.5f, 0.5f, 0.3f), Rounding);
-	float Progress = clamp(Num * BackgroundProgress.w / (float)Max, 0.0f, Rect.w);
-	BackgroundProgress.w = Progress;
-	DrawRoundRect(&BackgroundProgress, Color, (Progress < Rounding ? Progress : Rounding));
-
-	if (Shares)
-	{
-		float FakeToScreenX = (Graphics()->ScreenWidth() / (ScreenX1 - ScreenX0));
-		const float BordourWidth = (int)((FontSize / Shares) * FakeToScreenX) / FakeToScreenX;
-		const float BordourWidthLost = BordourWidth / 2.0f;
-		float BordourSize = Rect.w / Shares;
-
-		for (int i = 0; i < Shares; i++)
-		{
-			float NextPointPosX = BordourSize * (i + 1);
-			if ((BackgroundProgress.w - BordourWidthLost) < NextPointPosX)
-				continue;
-
-			CUIRect Bordour = { Rect.x + NextPointPosX, BackgroundProgress.y, BordourWidth, BackgroundProgress.h };
-			DrawUIRect(&Bordour, Color / 4.0f, 0, 0.0f);
-		}
-	}
-
-	// Draw text
-	pTextRender->Text(0, Rect.x, Rect.y, FontSize, pText, -1);
-}
-
+// mrpg client
 void CRenderTools::DrawUIText(ITextRender* pTextRender, CTextCursor* pCursor, const char* pText,
 	const vec4& BgColor, const vec4& TextColor, float FontSize)
 {
@@ -849,5 +734,114 @@ void CRenderTools::DrawUIText(ITextRender* pTextRender, CTextCursor* pCursor, co
 
 	// TODO: make a simple text one (no shadow)
 	pTextRender->TextShadowed(pCursor, pText, -1, vec2(0, 0), vec4(0, 0, 0, 0), TextColor);
+}
 
+void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color, int Num, int Max, const char* pText, int Shares, float Rounding, float Margin)
+{
+	float ScreenX0, ScreenY0, ScreenX1, ScreenY1;
+	Graphics()->GetScreen(&ScreenX0, &ScreenY0, &ScreenX1, &ScreenY1);
+
+	// Background colored progress
+	CUIRect BackgroundProgress;
+	Rect.Margin(Margin, &BackgroundProgress);
+
+	// Processing and centralizing the text by bar
+	float FakeToScreenY = (Graphics()->ScreenHeight() / (ScreenY1 - ScreenY0));
+	const float FontSize = (int)(BackgroundProgress.h * FakeToScreenY) / FakeToScreenY;
+	float TextWeidth = pTextRender->TextWidth(0, FontSize, pText, -1, -1.0f);
+	if (TextWeidth > Rect.w)
+	{
+		float changesSize = TextWeidth - Rect.w;
+		Rect.x -= changesSize / 2.0f;
+		Rect.w = TextWeidth;
+
+		BackgroundProgress.x = Rect.x;
+		BackgroundProgress.w = Rect.w;
+	}
+
+	// Render bar
+	DrawRoundRect(&Rect, vec4(0.5f, 0.5f, 0.5f, 0.3f), Rounding);
+	float Progress = clamp(Num * BackgroundProgress.w / (float)Max, 0.0f, Rect.w);
+	BackgroundProgress.w = Progress;
+	DrawRoundRect(&BackgroundProgress, Color, (Progress < Rounding ? Progress : Rounding));
+
+	// Cursor
+	CTextCursor Cursor;
+	float ProgressCursorX = (Rect.x + Rect.w / 2.0f) - TextWeidth / 2.0f;
+	pTextRender->SetCursor(&Cursor, ProgressCursorX, Rect.y, FontSize, TEXTFLAG_RENDER);
+
+	if (Shares)
+	{
+		float FakeToScreenX = (Graphics()->ScreenWidth() / (ScreenX1 - ScreenX0));
+		const float BordourWidth = (int)((FontSize / Shares) * FakeToScreenX) / FakeToScreenX;
+		const float BordourWidthLost = BordourWidth / 2.0f;
+		float BordourSize = Rect.w / Shares;
+
+		for (int i = 0; i < Shares; i++)
+		{
+			float NextPointPosX = BordourSize * (i + 1);
+			if ((BackgroundProgress.w - BordourWidthLost) < NextPointPosX)
+				continue;
+
+			CUIRect Bordour = { Rect.x + NextPointPosX, BackgroundProgress.y, BordourWidth, BackgroundProgress.h };
+			DrawUIRect(&Bordour, Color / 4.0f, 0, 0.0f);
+		}
+	}
+
+	// Text
+	pTextRender->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.1f);
+	pTextRender->TextEx(&Cursor, pText, -1);
+	pTextRender->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
+}
+
+void CRenderTools::RenderPicItems(CAnimState* pAnim, int RenderNum, vec2 Dir, vec2 Pos)
+{
+	vec2 Position = Pos;
+
+	// first pass we draw the outline
+	// second pass we draw the filling
+	for (int p = 0; p < 2; p++)
+	{
+		for (int f = 0; f < 2; f++)
+		{
+			if (f == 1)
+			{
+				// test effects
+				switch (RenderNum)
+				{
+				case 19: // items wings
+					RenderWings(pAnim, IMAGE_WINGSIT19, vec2(130, 70), Position, 200, 90);
+					break;
+				case 20: // items wings
+					RenderWings(pAnim, IMAGE_WINGSIT20, vec2(115, 60), Position);
+					break;
+				case 21: // items wings
+					RenderWings(pAnim, IMAGE_WINGSIT21, vec2(115, 64), Position);
+					break;
+				case 22: // items wings
+					RenderWings(pAnim, IMAGE_WINGSIT22, vec2(115, 74), Position);
+					break;
+				case 23: // items wings
+					RenderWings(pAnim, IMAGE_WINGSIT23, vec2(115, 70), Position);
+					break;
+				}
+			}
+		}
+	}
+}
+
+void CRenderTools::RenderWings(CAnimState* pAnim, int Sprite, vec2 Position, vec2 PlayerPos, int Size1, int Size2)
+{
+	Graphics()->TextureSet(g_pData->m_aImages[Sprite].m_Id);
+	Graphics()->QuadsBegin();
+
+	Graphics()->QuadsSetRotation(0 - pAnim->GetWings()->m_Angle * pi * 2);
+	IGraphics::CQuadItem Quad2((PlayerPos.x - Position.x) + (pAnim->GetWings()->m_X), PlayerPos.y - (Position.y + pAnim->GetWings()->m_Y), Size1, Size2);
+	Graphics()->QuadsDrawTL(&Quad2, 1);
+
+	Graphics()->QuadsSetRotation(0 + pAnim->GetWings()->m_Angle * pi * 2);
+	IGraphics::CQuadItem Quad((PlayerPos.x + Position.x) - (pAnim->GetWings()->m_X), PlayerPos.y - (Position.y + pAnim->GetWings()->m_Y), -Size1, Size2);
+	Graphics()->QuadsDrawTL(&Quad, 1);
+
+	Graphics()->QuadsEnd();
 }

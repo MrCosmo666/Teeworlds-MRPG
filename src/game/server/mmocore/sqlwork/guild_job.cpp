@@ -1161,7 +1161,7 @@ bool GuildJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 
 		// принимаем приглашение
 		SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", VoteID, VoteID2);
-		Job()->Inbox()->SendInbox(VoteID2, Guild[ VoteID ].m_Name, "You were accepted to join this guild");
+		Job()->Inbox()->SendInbox(VoteID2, Guild[ VoteID ].m_Name, "You were accepted to join guild");
 		JoinGuild(VoteID2, VoteID);
 		GS()->ResetVotes(ClientID, MEMBERMENU);
 		return true;
@@ -1181,7 +1181,7 @@ bool GuildJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 		int GuildID = VoteID, OwnerID = VoteID2;
 		GS()->Chat(ClientID, "You reject invite.");
 		SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, OwnerID);
-		Job()->Inbox()->SendInbox(OwnerID, Guild[ GuildID ].m_Name, "You were denied join this guild");
+		Job()->Inbox()->SendInbox(OwnerID, Guild[ GuildID ].m_Name, "You were denied join guild");
 		GS()->ResetVotes(ClientID, MEMBERMENU);
 		return true;
 	}

@@ -715,7 +715,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 			((g_Config.m_HdColorProgress >> 8) & 0xff) / 255.0f,
 			(g_Config.m_HdColorProgress & 0xff) / 255.0f, 0.8f);
 		RenderTools()->DrawUIBar(TextRender(), ExpBar, ProgressColor, 
-			pClientStats->m_Exp, pClientStats->m_ExpNeed, aBuf, 5, CUI::ALIGN_CENTER, 2.0f, 1.0f);
+			pClientStats->m_Exp, pClientStats->m_ExpNeed, aBuf, 5, 2.0f, 1.0f);
 
 		IGraphics::CQuadItem Used[2];
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);

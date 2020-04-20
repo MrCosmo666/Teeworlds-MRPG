@@ -50,7 +50,7 @@ class CRenderTools
 {
 	void DrawRoundRectExt(float x, float y, float w, float h, float r, int Corners);
 	void DrawRoundRectExt4(float x, float y, float w, float h, vec4 ColorTopLeft, vec4 ColorTopRight, vec4 ColorBottomLeft, vec4 ColorBottomRight, float r, int Corners);
-	
+
 public:
 	class IGraphics *m_pGraphics;
 	class CUI *m_pUI;
@@ -77,13 +77,6 @@ public:
 	void RenderTeeHand(const CTeeRenderInfo* pInfo, vec2 CenterPos, vec2 Dir, float AngleOffset,
 		vec2 PostRotOffset);
 
-	// mmotee
-	void RenderPicItems(CAnimState* pAnim, int RenderNum, vec2 Dir, vec2 Pos);
-	void RenderWings(CAnimState* pAnim, int Sprite, vec2 Position, vec2 PlayerPos, int Size1 = 200, int Size2 = 100);
-	void DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color, int Num, int Max, const char* pText, int Shares, int AlignTextAbroadBar = CUI::ALIGN_CENTER, float Rounding = 2.0f, float Margin = 0.0f);
-	void DrawUIText(ITextRender* pTextRender, CTextCursor* pCursor, const char* pText,
-		const vec4& BgColor, const vec4& TextColor, float FontSize);
-
 	// map render methods (gc_render_map.cpp)
 	static void RenderEvalEnvelope(CEnvPoint *pPoints, int NumPoints, int Channels, float Time, float *pResult);
 	void RenderQuads(CQuad *pQuads, int NumQuads, int Flags, ENVELOPE_EVAL pfnEval, void *pUser);
@@ -97,6 +90,16 @@ public:
 	void DrawClientID(ITextRender* pTextRender, CTextCursor* pCursor, int ID,
 					  const vec4& BgColor = vec4(1, 1, 1, 0.5f), const vec4& TextColor = vec4(0.1f, 0.1f, 0.1f, 1.0f));
 	float GetClientIdRectSize(float FontSize);
+
+	// mrpg client
+	void RenderPicItems(CAnimState* pAnim, int RenderNum, vec2 Dir, vec2 Pos);
+	void DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color, int Num, int Max, const char* pText, int Shares, float Rounding = 2.0f, float Margin = 0.0f);
+	void DrawUIText(ITextRender* pTextRender, CTextCursor* pCursor, const char* pText,
+		const vec4& BgColor, const vec4& TextColor, float FontSize);
+
+private:
+	void RenderWings(CAnimState* pAnim, int Sprite, vec2 Position, vec2 PlayerPos, int Size1 = 200, int Size2 = 100);
+
 };
 
 #endif
