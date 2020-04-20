@@ -715,9 +715,6 @@ float CRenderTools::GetClientIdRectSize(float FontSize)
 void CRenderTools::DrawUIText(ITextRender* pTextRender, CTextCursor* pCursor, const char* pText,
 	const vec4& BgColor, const vec4& TextColor, float FontSize)
 {
-	float ScreenX0, ScreenY0, ScreenX1, ScreenY1;
-	Graphics()->GetScreen(&ScreenX0, &ScreenY0, &ScreenX1, &ScreenY1);
-
 	// abort when exceeding the maximum numbers of lines
 	if (pCursor->m_MaxLines > 0 && pCursor->m_LineCount > pCursor->m_MaxLines)
 		return;
@@ -789,8 +786,10 @@ void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color,
 	}
 
 	// Text
+	pTextRender->TextColor(1, 1, 1, 0.8f);
 	pTextRender->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.1f);
 	pTextRender->TextEx(&Cursor, pText, -1);
+	pTextRender->TextColor(1, 1, 1, 1);
 	pTextRender->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
 }
 

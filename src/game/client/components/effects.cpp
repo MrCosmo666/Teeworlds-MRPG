@@ -70,8 +70,8 @@ void CEffects::MmoEffectPotion(vec2 Pos, const char* Potion, bool Added)
 	p.m_LifeSpan = 1.2f;
 
 	p.m_Gravity = -1000.0f;
-	p.m_StartSize = 23.0f;
-	p.m_EndSize = 23.0f;
+	p.m_StartSize = 20.0f;
+	p.m_EndSize = 20.0f;
 
 	vec4 Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	if (!str_comp_nocase(Potion, "RegenHealth")) Color = vec4(1.0f, 0.80f, 1.0f, 1.0f);
@@ -80,21 +80,22 @@ void CEffects::MmoEffectPotion(vec2 Pos, const char* Potion, bool Added)
 	if (!str_comp_nocase(Potion, "Ice")) Color = vec4(0.0f, 0.50f, 1.0f, 1.0f);
 
 	p.m_Color = Color;
-	str_format(p.m_TextBuf, sizeof(p.m_TextBuf), "%s %s", Added ? "+Effect" : "-Effect", Potion);
+	str_format(p.m_TextBuf, sizeof(p.m_TextBuf), "%s %s", Added ? "+" : "-", Potion);
 	m_pClient->m_pParticles->Add(CParticles::GROUP_DAMAGEMMO, &p);
 }
 
 void CEffects::DamageMmoInd(vec2 Pos, const char* pText, int Type)
 {
-	int Damage = string_to_number(pText, 1, 10000000);
+	const int Damage = string_to_number(pText, 1, 10000000);
+	const int IncreaseSizeDamage = min(Damage, 30);
 
 	CParticle p;
 	p.SetDefault();
 	p.m_Pos = Pos;
-	p.m_Vel = vec2(-5 + rand() % 10, -5 + rand() % 10) * 50 * (1 + min(Damage, 30) * 0.025f);
-	p.m_LifeSpan = 1.0f + min(Damage, 30) * 0.025f;
-	p.m_StartSize = 22.0f + min(Damage, 30) * 0.5f;
-	p.m_EndSize = 22.0f + min(Damage, 30) * 0.3f;
+	p.m_Vel = vec2(-5 + rand() % 10, -5 + rand() % 10) * 50 * (1 + IncreaseSizeDamage * 0.025f);
+	p.m_LifeSpan = 1.0f + IncreaseSizeDamage * 0.025f;
+	p.m_StartSize = 18.0f + IncreaseSizeDamage * 0.5f;
+	p.m_EndSize = 18.0f + IncreaseSizeDamage * 0.3f;
 	p.m_Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	p.m_Rot = 0;
 	p.m_Rotspeed = 0;
