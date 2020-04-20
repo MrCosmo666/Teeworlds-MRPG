@@ -50,6 +50,7 @@ bool TeleportsSql::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 	{
 		pChr->m_Core.m_ProtectHooked = false;
 		pChr->m_NoAllowDamage = false;
+		GS()->VResetVotes(ClientID, MAINMENU);
 		return true;
 	}
 

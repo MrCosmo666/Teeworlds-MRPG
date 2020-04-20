@@ -1871,7 +1871,34 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	if(MenuList == MAINMENU)
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;
-
+		CCharacter* pChar = pPlayer->GetCharacter();
+		if (pChar && pChar->IsAlive() && pChar->GetHelper()->BoolIndex(TILE_STORAGE))
+		{
+			const int StorageID = Mmo()->Storage()->GetLoadStorage(pChar->m_Core.m_Pos);
+			Mmo()->Storage()->ShowStorageMenu(ClientID, StorageID);
+			Mmo()->Auction()->ShowMailShop(pPlayer, StorageID);
+			return;
+		}
+		else if (pChar && pChar->IsAlive() && pChar->GetHelper()->BoolIndex(TILE_AUCTION))
+		{
+			Mmo()->Auction()->ShowAuction(pPlayer);
+			return;
+		}
+		else if (pChar && pChar->IsAlive() && pChar->GetHelper()->BoolIndex(TILE_LEARNSKILL))
+		{
+			Mmo()->Skills()->ShowMailSkillList(pPlayer);
+			return;
+		}
+		else if (pChar && pChar->IsAlive() && pChar->GetHelper()->BoolIndex(TILE_LEARNSKILL))
+		{
+			Mmo()->Skills()->ShowMailSkillList(pPlayer);
+			return;
+		}
+		else if (pChar && pChar->IsAlive() && pChar->GetHelper()->BoolIndex(TILE_AETHER))
+		{
+			Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList);
+			return;
+		}
 		// меню статистики
 		int NeedExp = pPlayer->ExpNeed(pPlayer->Acc().Level);
 		AVH(ClientID, HSTAT, PURPLE_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().LastLogin);
@@ -1889,7 +1916,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVM(ClientID, "MENU", UPGRADES, HPERSONAL, "◒ Upgrades");
 		AVM(ClientID, "MENU", SETTINGS, HPERSONAL, "☑ Settings");
 
-		CCharacter *pChar = pPlayer->GetCharacter();
 		if(pChar && pChar->IsAlive() && pChar->GetHelper()->BoolIndex(TILE_CRAFT))
 			AVM(ClientID, "MENU", CRAFTING, HPERSONAL, "☭ Crafting");
 		
@@ -1909,9 +1935,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		if(!pChar || !pChar->IsAlive())
 			return;
 
-		if (pChar->GetHelper()->BoolIndex(TILE_AUCTION))
-			Mmo()->Auction()->ShowAuction(pPlayer);
-		else if (pChar->GetHelper()->BoolIndex(TILE_HOUSE))
+		if (pChar->GetHelper()->BoolIndex(TILE_HOUSE))
 		{
 			const int HouseID = Mmo()->House()->GetHouse(pChar->m_Core.m_Pos);
 			if (HouseID > 0) Mmo()->House()->ShowHouseMenu(pPlayer, HouseID);
@@ -1921,14 +1945,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			const int HouseID = Mmo()->Member()->GetPosHouseID(pChar->m_Core.m_Pos);
 			Mmo()->Member()->ShowBuyHouse(pPlayer, HouseID);
 		}
-		else if (pChar->GetHelper()->BoolIndex(TILE_STORAGE))
-		{
-			const int StorageID = Mmo()->Storage()->GetLoadStorage(pChar->m_Core.m_Pos);
-			Mmo()->Storage()->ShowStorageMenu(ClientID, StorageID);
-			Mmo()->Auction()->ShowMailShop(pPlayer, StorageID);
-		}
-		else if (pChar->GetHelper()->BoolIndex(TILE_LEARNSKILL))
-			Mmo()->Skills()->ShowMailSkillList(pPlayer);
 	}
 	else if(MenuList == ADVENTUREJOURNAL) 
 	{
@@ -2093,8 +2109,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			const int HideID = (NUMHIDEMENU+12500+mobs.first);
 			int PosX = mobs.second.PositionX/32, PosY = mobs.second.PositionY/32;
 
-			AVH(ClientID, HideID, BLUE_COLOR, "{STR} [{STR}] {STR}(x: {INT} y: {INT})", mobs.second.Boss ? "Raid" : "Mob", mobs.second.Name,
-				Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY);
+			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} {STR}(x: {INT} y: {INT})", mobs.second.Name, Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY);
 	
 			for(int i = 0; i < 6; i++)
 			{

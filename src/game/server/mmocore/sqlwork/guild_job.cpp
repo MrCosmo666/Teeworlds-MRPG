@@ -642,7 +642,7 @@ void GuildJob::ShowMenuRank(CPlayer *pPlayer)
 		if(GuildID != mr.second.GuildID) continue;
 		
 		HideID += mr.first;
-		GS()->AVH(ClientID, HideID, GOLDEN_COLOR, "Rank [{STR}]", mr.second.Rank);
+		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "Rank [{STR}]", mr.second.Rank);
 		GS()->AVM(ClientID, "MRANKSET", mr.first, HideID, "Change rank name to ({STR})", CGS::InteractiveSub[ClientID].RankName);
 		GS()->AVM(ClientID, "MRANKACCESS", mr.first, HideID, "Access rank ({STR})", AccessNames(mr.second.Access));
 		GS()->AVM(ClientID, "MRANKDELETE", mr.first, HideID, "Delete this rank");
@@ -684,7 +684,7 @@ void GuildJob::ShowInvitesGuilds(int ClientID, int GuildID)
 	{
 		int OwnerID = RES->getInt("OwnerID");
 		const char *PlayerName = Job()->PlayerName(OwnerID);
-		GS()->AVH(ClientID, HideID, BLUE_COLOR, "Sender {STR} to join guilds", PlayerName);
+		GS()->AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "Sender {STR} to join guilds", PlayerName);
 		{
 			GS()->AVD(ClientID, "MINVITEACCEPT", GuildID, OwnerID, HideID, "Accept {STR} to guild", PlayerName);
 			GS()->AVD(ClientID, "MINVITEREJECT", GuildID, OwnerID, HideID, "Reject {STR} to guild", PlayerName);

@@ -207,13 +207,13 @@ void QuestBase::ShowQuestID(CPlayer *pPlayer, int QuestID, bool Passive)
 	// тип пасивный или история
 	if(Passive)
 	{
-		GS()->AVH(ClientID, HideID, GOLDEN_COLOR, "Basic {STR}", QuestsData[QuestID].Name);	
+		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "Basic {STR}", QuestsData[QuestID].Name);	
 	}
 	else
 	{
 		int CountQuest = GetStoryCountQuest(activeQuestData.StoryLine);
 		int LineQuest = GetStoryCountQuest(activeQuestData.StoryLine, QuestID)+1;
-		GS()->AVH(ClientID, HideID, GOLDEN_COLOR, "[{INT}/{INT} {STR}] {STR}", 
+		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "[{INT}/{INT} {STR}] {STR}",
 			&LineQuest, &CountQuest, activeQuestData.StoryLine, activeQuestData.Name);	
 	}
 
@@ -379,7 +379,7 @@ void QuestBase::ShowQuestList(CPlayer *pPlayer, int StateQuest)
 	bool foundQuests = false;
 
 	int ClientID = pPlayer->GetCID();
-	pPlayer->m_Colored = { 10,8,50 };
+	pPlayer->m_Colored = GOLDEN_COLOR;
 	GS()->AVL(ClientID, "null", "★ {STR} quests", QuestState(StateQuest));
 	
 	for(const auto& qd : QuestsData)
@@ -408,7 +408,7 @@ void QuestBase::ShowQuestList(CPlayer *pPlayer, int StateQuest)
 	
 	if(!foundQuests)
 	{	
-		pPlayer->m_Colored = { 9,2,17 };
+		pPlayer->m_Colored = LIGHT_GOLDEN_COLOR;
 		GS()->AV(ClientID, "null", "This list is empty");		
 	}
 	GS()->AV(ClientID, "null", "");
@@ -421,7 +421,7 @@ void QuestBase::ShowFullQuestLift(CPlayer *pPlayer)
 	int ClientID = pPlayer->GetCID();
 	if(!ShowAdventureActiveNPC(pPlayer))
 	{
-		pPlayer->m_Colored = { 15, 35, 10 };
+		pPlayer->m_Colored = LIGHT_BLUE_COLOR;
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "In current quests there is no interaction with NPC");
 	}
 	GS()->AV(ClientID, "null", "");
@@ -431,7 +431,7 @@ void QuestBase::ShowFullQuestLift(CPlayer *pPlayer)
 	ShowQuestList(pPlayer, QUESTNOACCEPT);
 
 	// показываем меню завершенных
-	pPlayer->m_Colored = { 8,8,40 };
+	pPlayer->m_Colored = BLUE_COLOR;
 	GS()->AVM(ClientID, "MENU", FINISHQUESTMENU, NOPE, "List of completed quests");
 }
 
@@ -678,7 +678,7 @@ bool QuestBase::ShowAdventureActiveNPC(CPlayer *pPlayer)
 	bool activeNPC = false;
 	const int clientID = pPlayer->GetCID();
 
-	pPlayer->m_Colored = {30, 56, 20};
+	pPlayer->m_Colored = BLUE_COLOR;
 	GS()->AVM(clientID, "null", NOPE, NOPE, "Active NPC for current quests");
 
 	// поиск всех активных нпс
@@ -695,7 +695,7 @@ bool QuestBase::ShowAdventureActiveNPC(CPlayer *pPlayer)
 		// если нашли выводим информацию
 		int HideID = (NUMHIDEMENU + 12500 + BotInfo.QuestID);
 		int PosX = BotInfo.PositionX / 32, PosY = BotInfo.PositionY / 32;
-		GS()->AVH(clientID, HideID, BLUE_COLOR, "[{STR}] {STR} {STR}(x:{INT} y:{INT})", GetStoryName(qq.first), BotInfo.Name, GS()->Server()->GetWorldName(BotInfo.WorldID), &PosX, &PosY);
+		GS()->AVH(clientID, HideID, LIGHT_BLUE_COLOR, "[{STR}] {STR} {STR}(x:{INT} y:{INT})", GetStoryName(qq.first), BotInfo.Name, GS()->Server()->GetWorldName(BotInfo.WorldID), &PosX, &PosY);
 
 		// проверяем требуемые мобы
 		bool interactiveNeed = false;
