@@ -354,17 +354,17 @@ void QuestBase::TalkProgress(CPlayer *pPlayer, int QuestID)
 	talkQuestPlayer.MobProgress[1] = 0;
 
 	{ // очистка прогресса ботов
-		int OldTalkProgress = talkQuestPlayer.Progress - 1;
-		int NewTalkProgress = talkQuestPlayer.Progress;
+		int OldProgress = talkQuestPlayer.Progress - 1;
+		int NewProgress = talkQuestPlayer.Progress;
 
-		GS()->ClearQuestsBot(QuestID, OldTalkProgress);
-		GS()->ClearQuestsBot(QuestID, NewTalkProgress);
+		GS()->ClearQuestsBot(QuestID, OldProgress);
+		GS()->ClearQuestsBot(QuestID, NewProgress);
 	}
 
 	bool LastTalkingProgress = (talkQuestPlayer.Progress >= QuestsData[QuestID].ProgressSize);
 	if(!LastTalkingProgress)
 	{
-		SJK.UD("tw_accounts_quests", "TalkProgress = '%d', Mob1Progress = '%d', Mob2Progress = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'",
+		SJK.UD("tw_accounts_quests", "Progress = '%d', Mob1Progress = '%d', Mob2Progress = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'",
 			talkQuestPlayer.Progress, talkQuestPlayer.MobProgress[0], 
 			talkQuestPlayer.MobProgress[1], QuestID, pPlayer->Acc().AuthID);
 	}

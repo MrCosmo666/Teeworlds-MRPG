@@ -587,7 +587,7 @@ void CServer::InitRconPasswordIfUnset()
 int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int WorldID)
 {
 	CNetChunk Packet;
-	if(!pMsg || ClientID >= MAX_PLAYERS)
+	if(ClientID >= MAX_PLAYERS || !pMsg)
 		return -1;
 
 	mem_zero(&Packet, sizeof(CNetChunk));
