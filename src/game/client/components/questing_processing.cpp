@@ -44,7 +44,7 @@ void CQuestingProcessing::ProcessingRenderTable(int TableID, CUIRect &Box)
 	RenderTools()->DrawRoundRect(&Table, COLOR_TABLE, 15.0f);
 
 	{ // RES
-		vec4 ColorBarUI = (QuestTable[TableID].m_Have >= QuestTable[TableID].m_Requires ? vec4(0.40f, 0.75f, 0.1f, 0.50f) : vec4(0.75f, 0.30f, 0.1f, 0.50f));
+		vec4 ColorBarUI = (QuestTable[TableID].m_Have >= QuestTable[TableID].m_Requires ? vec4(0.40f, 0.80f, 0.1f, 0.50f) : vec4(0.80f, 0.30f, 0.1f, 0.50f));
 
 		char aQuestTable[32];
 		str_format(aQuestTable, sizeof(aQuestTable), "%s %d / %d", QuestTable[TableID].m_aText, QuestTable[TableID].m_Have, QuestTable[TableID].m_Requires);

@@ -597,7 +597,7 @@ void CPlayers::RenderWings(CAnimState* pAnimWings, vec2 Position, vec2 Direction
 		case  19: Color = vec4(1.75f, 0.0f, 0.0f, 0.01f); break;
 		case  20: Color = vec4(0.2f, 0.2f, 1.75f, 0.01f); break;
 		case  21: Color = vec4(0.2f, 0.2f, 1.75f, 0.01f); break;
-		case  22: Color = vec4(1.0f, 1.0f, 0.0f, 0.01f); break;
+		case  22: Color = vec4(1.0f, 0.85f, 0.0f, 0.01f); break;
 		case  23: Color = vec4(0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.01f); break;
 		}
 

@@ -818,7 +818,7 @@ void CRenderTools::RenderPicItems(CAnimState* pAnim, int RenderNum, vec2 Dir, ve
 					RenderWings(pAnim, IMAGE_WINGSIT21, vec2(115, 64), Position);
 					break;
 				case 22: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT22, vec2(115, 74), Position);
+					RenderWings(pAnim, IMAGE_WINGSIT22, vec2(170, 100), Position, 280, 150);
 					break;
 				case 23: // items wings
 					RenderWings(pAnim, IMAGE_WINGSIT23, vec2(115, 70), Position);

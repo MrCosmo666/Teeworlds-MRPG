@@ -40,9 +40,9 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 		char aName[64];
 		str_format(aName, sizeof(aName), "%s", g_Config.m_ClShowsocial ? m_pClient->m_aClients[ClientID].m_aName : "");
 
-		float a = 0.95f;
+		float a = 1.0f;
 		if (g_Config.m_ClNameplatesAlways == 0)
-			a = clamp(0.95f - powf(distance(m_pClient->m_pControls->m_TargetPos, Position) / 200.0f, 16.0f), 0.0f, 0.95f);
+			a = clamp(1.0f - powf(distance(m_pClient->m_pControls->m_TargetPos, Position) / 200.0f, 16.0f), 0.0f, 1.0f);
 		
 		CTextCursor Cursor;
 		if (m_pClient->MmoServer() && m_pClient->m_aClients[ClientID].m_pLocalStats && a > 0.001f)
@@ -57,22 +57,22 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 			{
 				case MOOD_ANGRY:
 					str_format(aIconPlayerType, sizeof(aIconPlayerType), "angry");
-					ColorNameplates = vec4(0.8f, 0.6f, 0.6f, a);
+					ColorNameplates = vec4(0.8f, 0.65f, 0.65f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.3f * a);
 					break;
 				case MOOD_AGRESSED_TANK:
 					str_format(aIconPlayerType, sizeof(aIconPlayerType), "agressed_y");
-					ColorNameplates = vec4(0.95f, 0.3f, 0.3f, a);
+					ColorNameplates = vec4(0.85f, 0.3f, 0.3f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.7f * a);
 					break;
 				case MOOD_AGRESSED_OTHER:
 					str_format(aIconPlayerType, sizeof(aIconPlayerType), "agressed_o");
-					ColorNameplates = vec4(0.6f, 0.4f, 0.8f, a);
+					ColorNameplates = vec4(0.5f, 0.3f, 0.7f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.6f * a);
 					break;
 				case MOOD_FRIENDLY:
 					str_format(aIconPlayerType, sizeof(aIconPlayerType), "friendly");
-					ColorNameplates = vec4(0.5f, 0.8f, 0.2f, a);
+					ColorNameplates = vec4(0.4f, 0.8f, 0.2f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.3f * a);
 					break;
 				case MOOD_QUESTING:
@@ -84,6 +84,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 
 			// - - - - - - - - - - - - - - - -ÏÐÎÃÐÅÑÑ ÁÀÐ - - - - - - - - - - - - - - //
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
+			bool ShowedProgressBar = false;
 			str_format(aBuf, sizeof(aBuf), "L%d%s", pClientStats->m_Level, aName);
 			float tw = TextRender()->TextWidth(0, FontSize, aBuf, -1, -1.0f);
 			if (pClientStats->m_Health < pClientStats->m_HealthStart)
@@ -93,6 +94,24 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 				CUIRect ExpBar = { Position.x - tw / 2.0f , Position.y - FontSize - 92.0f, tw, 25.0f };
 				RenderTools()->DrawUIBar(TextRender(), ExpBar, ColorNameplates / 1.2f,
 					pClientStats->m_Health, pClientStats->m_HealthStart, aBuf, 5, 10.0f, 3.2f);
+				ShowedProgressBar = true;
+			}
+
+			// - - - - - - - - - - - - - - -ÃÈËÜÄÈß ÈÃÐÎÊÀ - - - - - - - - - - - - - - //
+			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
+			{
+				IntsToStr(pClientStats->m_Guildname, 12, aBuf);
+				if (str_length(aBuf) > 3)
+				{
+					const float FontGuildname = FontSize - 10.0f;
+					const float twGuildname = TextRender()->TextWidth(0, FontGuildname, aBuf, -1, -1.0f);
+					const float AlphaMoon = clamp(a - 0.20f, 0.0f, a);
+					const float GuildnameY = Position.y - FontGuildname - (ShowedProgressBar ? 120.0f : 95.0f);
+					TextRender()->TextColor(1.0f, 0.95f, 0.0f, AlphaMoon);
+					TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.5f * AlphaMoon);
+					TextRender()->SetCursor(&Cursor, Position.x - twGuildname / 2.0f, GuildnameY, FontGuildname, TEXTFLAG_RENDER);
+					TextRender()->TextEx(&Cursor, aBuf, -1);
+				}
 			}
 
 			// - - - - - - - - - - -  - - - ÓÐÎÂÅÍÜ ÈÃÐÎÊÀ - - - - - - - - - - - - - - //
@@ -126,29 +145,13 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 			// - - - - - - - - - - - - - - -  ÒÈÏ ÀÃÐÅÑÑÈß - - - - - - - - - - - - - - //
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			{
-				float FontSizeAgressed = FontSize - 8.0f;
-				float twAgressed = TextRender()->TextWidth(0, FontSizeAgressed, GetMoodName(pClientStats->m_MoodType), -1, -1.0f);
-				float AlphaMoon = clamp(a - 0.20f, 0.0f, a);
+				const float FontSizeAgressed = FontSize - 8.0f;
+				const float twAgressed = TextRender()->TextWidth(0, FontSizeAgressed, GetMoodName(pClientStats->m_MoodType), -1, -1.0f);
+				const float AlphaMoon = clamp(a - 0.20f, 0.0f, a);
 				TextRender()->TextColor(1.0f, 1.0f, 1.0f, AlphaMoon);
 				TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.5f * AlphaMoon);
 				TextRender()->SetCursor(&Cursor, Position.x - twAgressed / 2.0f, Position.y - FontSizeAgressed - 52.0f, FontSizeAgressed, TEXTFLAG_RENDER);
 				TextRender()->TextEx(&Cursor, GetMoodName(pClientStats->m_MoodType), -1);
-			}
-
-			// - - - - - - - - - - - - - - -ÃÈËÜÄÈß ÈÃÐÎÊÀ - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
-			{
-				IntsToStr(pClientStats->m_Guildname, 12, aBuf);
-				if (str_length(aBuf) > 3)
-				{
-					float FontGuildname = FontSize - 10.0f;
-					float twGuildname = TextRender()->TextWidth(0, FontGuildname, aBuf, -1, -1.0f);
-					float AlphaMoon = clamp(a - 0.20f, 0.0f, a);
-					TextRender()->TextColor(1.0f, 0.95f, 0.0f, AlphaMoon);
-					TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.5f * AlphaMoon);
-					TextRender()->SetCursor(&Cursor, Position.x - twGuildname / 2.0f, Position.y - FontGuildname - 95.0f, FontGuildname, TEXTFLAG_RENDER);
-					TextRender()->TextEx(&Cursor, aBuf, -1);
-				}
 			}
 		}
 		else
