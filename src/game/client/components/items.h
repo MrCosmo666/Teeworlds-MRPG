@@ -12,7 +12,7 @@ class CItems : public CComponent
 	void RenderLaser(const struct CNetObj_Laser *pCurrent);
 
 	//mmotee
-	void RenderMmoitems(const CNetObj_MmoItems* pPrev, const CNetObj_MmoItems* pCurrent);
+	void RenderMmoPickups(const CNetObj_MmoPickup* pPrev, const CNetObj_MmoPickup* pCurrent);
 	void RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID);
 public:
 	virtual void OnRender();

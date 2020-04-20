@@ -262,14 +262,12 @@ void QuestBase::FinishQuest(CPlayer *pPlayer, int QuestID)
 	if(!IsValidQuest(QuestID, ClientID))
 		return;
 	
-	StructQuestData finishQuestData = QuestsData[QuestID];
-	StructQuest &finishQuestPlayer = Quests[ClientID][QuestID];
-
 	// установить статистику квеста
-	finishQuestPlayer.Type = QUESTFINISHED;
-	SJK.UD("tw_accounts_quests", "Type = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'", finishQuestPlayer.Type, QuestID, pPlayer->Acc().AuthID);
+	Quests[ClientID][QuestID].Type = QUESTFINISHED;
+	SJK.UD("tw_accounts_quests", "Type = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'", Quests[ClientID][QuestID].Type, QuestID, pPlayer->Acc().AuthID);
 
 	// выдать награды и написать о завершении
+	StructQuestData finishQuestData = QuestsData[QuestID];
 	for(int i = 0; i < 3; i++)
 	{
 		if(finishQuestData.ItemRewardID[i] <= 0 || finishQuestData.ItemRewardCount[i] <= 0) continue;
@@ -278,9 +276,8 @@ void QuestBase::FinishQuest(CPlayer *pPlayer, int QuestID)
 
 	pPlayer->AddMoney(finishQuestData.Money);
 	pPlayer->AddExp(finishQuestData.Exp);
-	GS()->Chat(-1, "{STR} completed quest [{STR} {STR}]", finishQuestData.StoryLine, GS()->Server()->ClientName(ClientID), finishQuestData.Name);			
+	GS()->Chat(-1, "{STR} completed quest [{STR} {STR}]", GS()->Server()->ClientName(ClientID), finishQuestData.StoryLine, finishQuestData.Name);
 	GS()->ChatDiscord(false, DC_PLAYER_INFO, GS()->Server()->ClientName(ClientID), "Completed quest [{STR} {STR}]", finishQuestData.StoryLine, finishQuestData.Name);
-
 	Job()->SaveAccount(pPlayer, SAVESTATS);
 
 	if(pPlayer->GetCharacter()) 

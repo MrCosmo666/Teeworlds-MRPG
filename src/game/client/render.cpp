@@ -795,8 +795,6 @@ void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color,
 
 void CRenderTools::RenderPicItems(CAnimState* pAnim, int RenderNum, vec2 Dir, vec2 Pos)
 {
-	vec2 Position = Pos;
-
 	// first pass we draw the outline
 	// second pass we draw the filling
 	for (int p = 0; p < 2; p++)
@@ -809,19 +807,19 @@ void CRenderTools::RenderPicItems(CAnimState* pAnim, int RenderNum, vec2 Dir, ve
 				switch (RenderNum)
 				{
 				case 19: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT19, vec2(130, 70), Position, 200, 90);
+					RenderWings(pAnim, IMAGE_WINGSIT19, vec2(130, 70), Pos, 200, 90);
 					break;
 				case 20: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT20, vec2(120, 50), Position);
+					RenderWings(pAnim, IMAGE_WINGSIT20, vec2(120, 50), Pos);
 					break;
 				case 21: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT21, vec2(115, 64), Position);
+					RenderWings(pAnim, IMAGE_WINGSIT21, vec2(115, 64), Pos);
 					break;
 				case 22: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT22, vec2(170, 100), Position, 280, 150);
+					RenderWings(pAnim, IMAGE_WINGSIT22, vec2(170, 100), Pos, 280, 150);
 					break;
 				case 23: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT23, vec2(115, 70), Position);
+					RenderWings(pAnim, IMAGE_WINGSIT23, vec2(115, 70), Pos);
 					break;
 				}
 			}

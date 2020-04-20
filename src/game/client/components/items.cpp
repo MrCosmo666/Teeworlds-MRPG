@@ -58,8 +58,6 @@ void CItems::RenderProjectile(const CNetObj_Projectile *pCurrent, int ItemID)
 
 	RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[clamp(pCurrent->m_Type, 0, NUM_WEAPONS-1)].m_pSpriteProj);
 	vec2 Vel = Pos-PrevPos;
-	//vec2 pos = mix(vec2(prev->x, prev->y), vec2(current->x, current->y), Client()->IntraGameTick());
-
 
 	// add particle for this projectile
 	if(pCurrent->m_Type == WEAPON_GRENADE)
@@ -315,7 +313,8 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 
 	// добавить эффект проджектайлу
 	vec2 Vel = Pos - PrevPos;
-	if (pCurrent->m_Weapon == WEAPON_GRENADE) {
+	if (pCurrent->m_Weapon == WEAPON_GRENADE) 
+	{
 		static float s_Time = 0.0f;
 		static float s_LastLocalTime = Client()->LocalTime();
 		if (Client()->State() == IClient::STATE_DEMOPLAYBACK) {
@@ -329,9 +328,12 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 		Graphics()->QuadsSetRotation(s_Time * pi * 2 * 2 + ItemID);
 		s_LastLocalTime = Client()->LocalTime();
 	}
-	else {
-		if (length(Vel) > 0.00001f) Graphics()->QuadsSetRotation(angle(Vel));
-		else Graphics()->QuadsSetRotation(0);
+	else 
+	{
+		if (length(Vel) > 0.00001f) 
+			Graphics()->QuadsSetRotation(angle(Vel));
+		else 
+			Graphics()->QuadsSetRotation(0);
 	}
 
 
@@ -341,24 +343,30 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 	Graphics()->QuadsEnd();
 }
 
-void CItems::RenderMmoitems(const CNetObj_MmoItems * pPrev, const CNetObj_MmoItems * pCurrent)
+void CItems::RenderMmoPickups(const CNetObj_MmoPickup* pPrev, const CNetObj_MmoPickup* pCurrent)
 {
+	float Size = 64.0f;
 	vec2 Prev = vec2(pPrev->m_X, pPrev->m_Y);
 	vec2 Curr = vec2(pCurrent->m_X, pCurrent->m_Y);
 	vec2 Pos = mix(Prev, Curr, Client()->IntraGameTick());
+	float Angle = mix((float)pPrev->m_Angle, (float)pCurrent->m_Angle, Client()->IntraGameTick()) / 256.0f;
+	const int c[] = { SPRITE_BOX, SPRITE_EXPERIENCE, SPRITE_PLANT, SPRITE_ORES, SPRITE_ARROW };
+
+	if (pCurrent->m_Type == MMO_PICKUP_ARROW)
+		Size = 48.0f;
 
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAME].m_Id);
 	Graphics()->QuadsBegin();
-
-	const int c[] = { SPRITE_BOX, SPRITE_EXPERIENCE, SPRITE_PLANT, SPRITE_ORES };
 	RenderTools()->SelectSprite(c[pCurrent->m_Type]);
 
 	static float s_Time = 0.0f;
 	static float s_LastLocalTime = Client()->LocalTime();
 	float Offset = Pos.y / 32.0f + Pos.x / 32.0f;
-	if (Client()->State() == IClient::STATE_DEMOPLAYBACK) {
+	if (Client()->State() == IClient::STATE_DEMOPLAYBACK) 
+	{
 		const IDemoPlayer::CInfo* pInfo = DemoPlayer()->BaseInfo();
-		if (!pInfo->m_Paused) s_Time += (Client()->LocalTime() - s_LastLocalTime) * pInfo->m_Speed;
+		if (!pInfo->m_Paused) 
+			s_Time += (Client()->LocalTime() - s_LastLocalTime) * pInfo->m_Speed;
 	}
 	else 
 	{
@@ -369,7 +377,9 @@ void CItems::RenderMmoitems(const CNetObj_MmoItems * pPrev, const CNetObj_MmoIte
 	Pos.y += sinf(s_Time * 2.0f + Offset) * 2.5f;
 	s_LastLocalTime = Client()->LocalTime();
 
-	RenderTools()->DrawSprite(Pos.x, Pos.y, 64.0f);
+	Graphics()->QuadsSetRotation(Angle);
+	RenderTools()->DrawSprite(Pos.x, Pos.y, Size);
+	Graphics()->QuadsSetRotation(0);
 	Graphics()->QuadsEnd();
 }
 
@@ -399,11 +409,11 @@ void CItems::OnRender()
 			RenderLaser((const CNetObj_Laser *)pData);
 		}
 		// mmotee
-		else if (Item.m_Type == NETOBJTYPE_MMOITEMS)
+		else if (Item.m_Type == NETOBJTYPE_MMOPICKUP)
 		{
 			const void* pPrev = Client()->SnapFindItem(IClient::SNAP_PREV, Item.m_Type, Item.m_ID);
 			if (pPrev)
-				RenderMmoitems((const CNetObj_MmoItems*)pPrev, (const CNetObj_MmoItems*)pData);
+				RenderMmoPickups((const CNetObj_MmoPickup*)pPrev, (const CNetObj_MmoPickup*)pData);
 		}
 		else if (Item.m_Type == NETOBJTYPE_MMOPROJ)
 		{

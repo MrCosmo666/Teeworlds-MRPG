@@ -114,8 +114,8 @@ int CJobItems::SwitchToObject(bool MmoItem)
 {
 	switch(m_Type)
 	{
-		case 0/*plants*/: return (MmoItem ? (int)ITEMS_PLANT : (int)PICKUP_HEALTH);
-		case 1/*miner*/: return (MmoItem ? (int)ITEMS_ORE : (int)PICKUP_ARMOR);
+		case 0/*plants*/: return (MmoItem ? (int)MMO_PICKUP_PLANT : (int)PICKUP_HEALTH);
+		case 1/*miner*/: return (MmoItem ? (int)MMO_PICKUP_ORE : (int)PICKUP_ARMOR);
 	}
 	return -1;
 }
@@ -149,7 +149,7 @@ void CJobItems::Snap(int SnappingClient)
 
 	if(SwitchToObject(true) > -1 && GS()->CheckClient(SnappingClient))
 	{
-		CNetObj_MmoItems *pObj = static_cast<CNetObj_MmoItems *>(Server()->SnapNewItem(NETOBJTYPE_MMOITEMS, GetID(), sizeof(CNetObj_MmoItems)));
+		CNetObj_MmoPickup *pObj = static_cast<CNetObj_MmoPickup*>(Server()->SnapNewItem(NETOBJTYPE_MMOPICKUP, GetID(), sizeof(CNetObj_MmoPickup)));
 		if(!pObj)
 			return;
 

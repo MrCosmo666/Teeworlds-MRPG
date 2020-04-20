@@ -119,13 +119,14 @@ void CDropingBonuses::Snap(int SnappingClient)
 	// проверка клиента если чекнут дальше не рисуем
 	if(GS()->CheckClient(SnappingClient))
 	{
-		CNetObj_MmoItems *pObj = static_cast<CNetObj_MmoItems *>(Server()->SnapNewItem(NETOBJTYPE_MMOITEMS, GetID(), sizeof(CNetObj_MmoItems)));
-		if(!pObj)
+		CNetObj_MmoPickup* pObj = static_cast<CNetObj_MmoPickup*>(Server()->SnapNewItem(NETOBJTYPE_MMOPICKUP, GetID(), sizeof(CNetObj_MmoPickup)));
+		if (!pObj)
 			return;
 
 		pObj->m_X = (int)m_ActualPos.x;
 		pObj->m_Y = (int)m_ActualPos.y;
-		pObj->m_Type = ITEMS_EXPERIENCE;
+		pObj->m_Type = MMO_PICKUP_EXPERIENCE;
+		pObj->m_Angle = 0;
 		return;
 	}
 

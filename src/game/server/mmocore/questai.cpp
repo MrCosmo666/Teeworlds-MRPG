@@ -40,6 +40,21 @@ void CQuestAI::Snap(int SnappingClient)
 	if(NetworkClipped(SnappingClient) || m_TargetPos == vec2(0.0f, 0.0f) || SnappingClient != m_ClientID)
 		return;
 
+	// проверка клиента если чекнут дальше не рисуем
+	if (GS()->CheckClient(SnappingClient))
+	{
+		vec2 Direction = normalize(m_Pos - m_TargetPos);
+		CNetObj_MmoPickup* pObj = static_cast<CNetObj_MmoPickup*>(Server()->SnapNewItem(NETOBJTYPE_MMOPICKUP, GetID(), sizeof(CNetObj_MmoPickup)));
+		if (!pObj)
+			return;
+
+		pObj->m_X = (int)m_Pos.x;
+		pObj->m_Y = (int)m_Pos.y;
+		pObj->m_Type = MMO_PICKUP_ARROW;
+		pObj->m_Angle = (int)(angle(vec2(Direction.x, Direction.y)) * 256.0f);
+		return;
+	}
+
 	CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
 	if(!pP)
 		return;

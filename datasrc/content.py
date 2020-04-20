@@ -325,6 +325,8 @@ container.pickups.Add(Pickup("ninja", 90, 90))
 container.pickups.Add(Pickup("gun"))
 container.pickups.Add(Pickup("hammer"))
 
+# mpickups
+
 ###############################################################################
 ###############################################################################
 ###############################################################################
@@ -631,7 +633,8 @@ container.sprites.Add(Sprite("box", set_mmogame, 0, 0, 1, 1))
 container.sprites.Add(Sprite("experience", set_mmogame, 1, 0, 1, 1))
 container.sprites.Add(Sprite("plant", set_mmogame, 2, 0, 1, 1))
 container.sprites.Add(Sprite("ores", set_mmogame, 3, 0, 1, 1))
-container.sprites.Add(Sprite("bubble_fire", set_mmogame, 0, 3, 1, 1))
+container.sprites.Add(Sprite("arrow", set_mmogame, 4, 0, 1, 1))
+container.sprites.Add(Sprite("bubble_fire", set_mmogame, 1, 3, 1, 1))
 
 container.sprites.Add(Sprite("relax_heart", set_relax, 0, 0, 1, 1))
 container.sprites.Add(Sprite("relax_eyes", set_relax, 1, 0, 1, 1))

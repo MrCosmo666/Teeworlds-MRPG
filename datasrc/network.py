@@ -24,7 +24,8 @@ GameMsgIDs = Enum("GAMEMSG", ["TEAM_SWAP", "SPEC_INVALIDID", "TEAM_SHUFFLE", "TE
 WorldType = Enum("WORLD", ["STANDARD", "CUTSCENE", "DUNGEON"])
 TalkedStyles = Enum("TALK_STYLE", ["STANDARD", "AGRESSIVE", "HAPPED"])
 MoodType = Enum("MOOD", ["ANGRY", "AGRESSED_TANK", "AGRESSED_OTHER", "NORMAL", "FRIENDLY", "QUESTING"])
-MmoItems = Enum("ITEMS", ["BOX", "EXPERIENCE", "PLANT", "ORE"])
+MmoPickups = Enum("MMO_PICKUP", ["BOX", "EXPERIENCE", "PLANT", "ORE", "ARROW"])
+MmoProjectiles = Enum("MMO_PROJ", ["BUBBLE"])
 Equip = Enum("EQUIP", ["WINGS", "HAMMER", "GUN", "SHOTGUN", "GRENADE", "RIFLE", "DISCORD", "MINER"])
 Effects = Enum("EFFECT", ["SPASALON", "TELEPORT"])
 AuthCodes = Enum("AUTH", ["ALL_UNKNOWN", "ALL_MUSTCHAR", "ALL_GOOD", "LOGIN_ALREADY", 
@@ -88,7 +89,8 @@ Enums = [
     # mmotee
     Effects,
 	Equip,
-	MmoItems,
+	MmoPickups,
+    MmoProjectiles,
     AuthCodes,
 	MoodType,
 	WorldType,
@@ -328,11 +330,12 @@ Objects = [
 	]),
 
 	# mmotee send pickup item
-	NetObject("MmoItems", [
+	NetObject("MmoPickup", [
 		NetIntAny("m_X"),
 		NetIntAny("m_Y"),
+		NetIntAny("m_Angle"),
 
-		NetEnum("m_Type", MmoItems),
+		NetEnum("m_Type", MmoPickups),
 	]),
     
 	# mmotee send projectile item
@@ -342,7 +345,7 @@ Objects = [
 		NetIntAny("m_VelX"),
 		NetIntAny("m_VelY"),
 
-		NetIntRange("m_Type", 0, 20),
+		NetEnum("m_Type", MmoProjectiles),
 		NetIntRange("m_Weapon", 0, 'NUM_WEAPONS-1'),
 		NetTick("m_StartTick"),
 	]),

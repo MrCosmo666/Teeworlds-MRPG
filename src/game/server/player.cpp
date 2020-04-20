@@ -833,11 +833,9 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			return;
 		}
 
-		// если прогресс диалога равен какому то квесту
 		int GivingQuestID = ContextBots::NpcBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
 		if (GivingQuestID >= 1)
 		{
-			// замораживаем при информации и принятии квеста
 			if (!m_TalkingNPC.m_FreezedProgress)
 			{
 				if (GS()->Mmo()->Quest()->GetQuestState(m_ClientID, GivingQuestID) >= QUESTACCEPT)
@@ -894,7 +892,6 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		}
 		GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
 	}
-
 	m_TalkingNPC.m_TalkedProgress++;
 }
 
