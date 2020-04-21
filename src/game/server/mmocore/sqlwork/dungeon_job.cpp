@@ -99,6 +99,9 @@ bool DungeonJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Rep
 bool DungeonJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
+	if (!pPlayer->GetCharacter() || !pPlayer->GetCharacter()->IsAlive())
+		return false;
+
 	if (PPSTR(CMD, "DUNGEONJOIN") == 0)
 	{
 		if (Dungeon[VoteID].State > 1)
@@ -120,15 +123,13 @@ bool DungeonJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int 
 		if (!GS()->IsDungeon())
 			pPlayer->Acc().LastWorldID = GS()->GetWorldID();
 
-		pPlayer->Acc().TeleportX = -1;
-		pPlayer->Acc().TeleportY = -1;
+		pPlayer->Acc().TeleportX = pPlayer->GetCharacter()->m_Core.m_Pos.x;
+		pPlayer->Acc().TeleportY = pPlayer->GetCharacter()->m_Core.m_Pos.y;
 		GS()->Server()->ChangeWorld(ClientID, Dungeon[VoteID].WorldID);
 		return true;
 	}
 	else if (PPSTR(CMD, "DUNGEONEXIT") == 0)
 	{
-		pPlayer->Acc().TeleportX = -1;
-		pPlayer->Acc().TeleportY = -1;
 		GS()->Server()->ChangeWorld(ClientID, pPlayer->Acc().LastWorldID);
 		return true;
 	}

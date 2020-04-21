@@ -12,7 +12,7 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	for(int i = 0 ; i < NUMTABSORT ; i ++ )
 		m_SortTabs[ i ] = 0;
 
-	m_PlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed() * 2;
+	m_PlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed();
 	m_PlayerTick[TickState::CheckClient] = Server()->Tick();
 	m_PlayerTick[TickState::Die] = Server()->Tick();
 
@@ -291,7 +291,7 @@ void CPlayer::TryRespawn()
 	}
 
 	// спавн в точках что указаны
-	if(Acc().TeleportX > 1 || Acc().TeleportY > 1)
+	if(!GS()->IsDungeon() && (Acc().TeleportX > 1 || Acc().TeleportY > 1))
 		SpawnPos = vec2(Acc().TeleportX, Acc().TeleportY);
 
 	int savecidmem = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;

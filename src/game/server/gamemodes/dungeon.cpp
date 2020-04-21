@@ -231,8 +231,8 @@ void CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 	if (pChr && pChr->GetPlayer() && m_StateDungeon >= DUNGEON_STARTED && !m_SafeTick)
 	{
 		int ClientID = pChr->GetPlayer()->GetCID();
-		GS()->Server()->ChangeWorld(ClientID, pChr->GetPlayer()->Acc().LastWorldID);
 		GS()->Chat(ClientID, "You were thrown out of dungeon!");
+		GS()->Server()->ChangeWorld(ClientID, pChr->GetPlayer()->Acc().LastWorldID);
 	}
 }
 
