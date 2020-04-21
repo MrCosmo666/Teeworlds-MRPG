@@ -52,7 +52,7 @@ bool CDropingItem::TakeItem(int ClientID)
 	if(PlDropItem.Count > 0 && PlDropItem.Info().BonusCount > 0)
 	{
 		tl_swap(PlDropItem, m_DropItem);
-		GS()->Chat(ClientID, "You equip item [{STR} +{INT}]", PlDropItem.Info().GetName(pPlayer), &PlDropItem.Enchant);
+		GS()->Chat(ClientID, "You now own [{STR} +{INT}]", PlDropItem.Info().GetName(pPlayer), &PlDropItem.Enchant);
 		GS()->VResetVotes(ClientID, INVENTORY);
 		return true;
 	}

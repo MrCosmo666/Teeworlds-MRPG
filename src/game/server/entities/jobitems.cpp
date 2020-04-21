@@ -66,7 +66,7 @@ void CJobItems::Work(int ClientID)
 		m_Progress += 3+pPlayer->EnchantAttributes(Stats::StEfficiency);
 		GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
-		GS()->SBL(ClientID, 100000, 100, "{STR} [PR {INT}/{INT}] : {STR} ({INT}/100%)", 
+		GS()->SBL(ClientID, 100000, 100, "{STR} [{INT}/{INT}P] : {STR} ({INT}/100%)", 
 			PlDropItem.Info().GetName(pPlayer), 
 			(m_Progress > m_Health ? &m_Health : &m_Progress), &m_Health, 
 			PlEquipItem.Info().GetName(pPlayer), &Durability);
@@ -89,7 +89,7 @@ void CJobItems::Work(int ClientID)
 	m_Progress += 10;
 	GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
-	GS()->SBL(ClientID, 100000, 100, "{STR} [HP {INT}/{INT}]",
+	GS()->SBL(ClientID, 100000, 100, "{STR} [{INT}/{INT}P]",
 		PlDropItem.Info().GetName(pPlayer), (m_Progress > m_Health ? &m_Health : &m_Progress), &m_Health);
 
 	if(m_Progress >= m_Health)
