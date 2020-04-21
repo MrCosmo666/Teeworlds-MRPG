@@ -1,15 +1,15 @@
 set_extra_dirs_lib(ICU icu)
 #######################################  MSVC LIB
 find_library(OWN_ICU_LIBRARYDT
-  NAMES icudt
+  NAMES icudt libicudata
   HINTS ${HINTS_ICU_LIBDIR} ${PC_ICU_LIBDIR} ${PC_ICU_LIBRARY_DIRS})
   
 find_library(OWN_ICU_LIBRARYIN
-  NAMES icuin
+  NAMES icuin libicui18n
   HINTS ${HINTS_ICU_LIBDIR} ${PC_ICU_LIBDIR} ${PC_ICU_LIBRARY_DIRS})
   
 find_library(OWN_ICU_LIBRARYUC
-  NAMES icuuc
+  NAMES icuuc libicuuc
   HINTS ${HINTS_ICU_LIBDIR} ${PC_ICU_LIBDIR} ${PC_ICU_LIBRARY_DIRS})
 
 #######################################  INCLUDES
