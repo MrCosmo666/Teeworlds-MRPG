@@ -35,7 +35,7 @@ mark_as_advanced(OWN_ICU_LIBRARYDT OWN_ICU_INCLUDEDIR)
 if(NOT(ICU_FOUND))
   # [some data may not match dependencies / TODO: later fix it]
   set(CMAKE_MODULE_PATH ${ORIGINAL_CMAKE_MODULE_PATH})
-  find_package(ICU REQUIRED COMPONENTS uc in)
+  find_package(ICU)
   set(CMAKE_MODULE_PATH ${OWN_CMAKE_MODULE_PATH})
 else()
   set(ICU_LIBRARIES ${OWN_ICU_LIBRARYDT} ${OWN_ICU_LIBRARYIN} ${OWN_ICU_LIBRARYUC})

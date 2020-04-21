@@ -289,7 +289,7 @@ find_package(SDL2)
 find_package(Wavpack)
 find_package(Curl)
 find_package(Crypto)
-find_package(OwnICU)
+find_package(ICU)
 find_package(MySQL)
 
 if(TARGET_OS AND TARGET_OS STREQUAL "linux")
