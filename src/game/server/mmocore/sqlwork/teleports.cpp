@@ -118,7 +118,7 @@ void TeleportsSql::UnlockLocation(int ClientID, vec2 Pos)
 			pPlayer->Acc().AetherLocation.find(tl.first) != pPlayer->Acc().AetherLocation.end())
 			continue;
 
-		SJK.ID("tw_location", "(OwnerID, TeleportID) VALUES ('%d', '%d')", pPlayer->Acc().AuthID, tl.first);
+		SJK.ID("tw_accounts_locations", "(OwnerID, TeleportID) VALUES ('%d', '%d')", pPlayer->Acc().AuthID, tl.first);
 		GS()->Chat(ClientID, "You unlock new location {STR}!", Teleport[tl.first].TeleName);
 		GS()->ChatDiscord(false, "14671083", GS()->Server()->ClientName(ClientID),
 			"Adventure unlock new location {STR}", Teleport[tl.first].TeleName);
