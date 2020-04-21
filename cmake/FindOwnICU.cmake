@@ -21,14 +21,10 @@ find_path(OWN_ICU_INCLUDEDIR
 #######################################
 include(FindPackageHandleStandardArgs)
 find_package_handle_standard_args(ICU DEFAULT_MSG OWN_ICU_LIBRARYDT OWN_ICU_INCLUDEDIR)
-
 mark_as_advanced(OWN_ICU_LIBRARYDT OWN_ICU_INCLUDEDIR)
 
 #######################################
-if(NOT(ICU_FOUND))
-  # [some data may not match dependencies / TODO: later fix it]
-  find_package(ICU)
-else()
+if(ICU_FOUND)
   set(ICU_LIBRARIES ${OWN_ICU_LIBRARYDT} ${OWN_ICU_LIBRARYIN} ${OWN_ICU_LIBRARYUC})
   set(ICU_INCLUDE_DIRS ${OWN_ICU_INCLUDEDIR})
   set(ICU_COPY_FILES "${EXTRA_ICU_LIBDIR}/icudt65.dll" "${EXTRA_ICU_LIBDIR}/icuin65.dll" "${EXTRA_ICU_LIBDIR}/icuuc65.dll")
