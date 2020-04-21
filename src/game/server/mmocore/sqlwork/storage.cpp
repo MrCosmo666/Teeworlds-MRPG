@@ -206,7 +206,7 @@ bool StorageSql::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int 
 			return true;
 
 		// добавляем на склад
-		AddStorageMoney(VoteID, Get);
+		AddStorageMoney(StorageID, Get);
 		GS()->Chat(ClientID, "You added on your business {INT}.", &Get);
 		GS()->ResetVotes(ClientID, MAINMENU);
 		return true;
