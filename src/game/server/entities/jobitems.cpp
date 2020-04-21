@@ -50,23 +50,23 @@ void CJobItems::Work(int ClientID)
 	{
 		int EquipItem = pPlayer->GetItemEquip(EQUIP_MINER);
 		if(EquipItem <= 0) 
-			return GS()->SBL(ClientID, 100000, 100, "Need equip Pickaxe");
+			return GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Need equip Pickaxe");
 
 		// проверка уровня на доступность
 		ItemSql::ItemPlayer &PlEquipItem = pPlayer->GetItem(EquipItem);
 		if(pPlayer->Acc().Miner[PlLevel] < m_Level)
-			return GS()->SBL(ClientID, 100000, 100, "Your level low. {STR} {INT} Level", PlDropItem.Info().GetName(pPlayer), &m_Level);
+			return GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", PlDropItem.Info().GetName(pPlayer), &m_Level);
 
 		int Durability = PlEquipItem.Durability;
 		if(rand()%10 == 0) 
 			GS()->Mmo()->Item()->SetDurability(pPlayer, EquipItem, Durability-1);
 		if(Durability <= 0) 
-			return GS()->SBL(ClientID, 100000, 100, "Need repair pickaxe!");
+			return GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Need repair pickaxe!");
 
 		m_Progress += 3+pPlayer->EnchantAttributes(Stats::StEfficiency);
 		GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
-		GS()->SBL(ClientID, 100000, 100, "{STR} [{INT}/{INT}P] : {STR} ({INT}/100%)", 
+		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P] : {STR} ({INT}/100%)", 
 			PlDropItem.Info().GetName(pPlayer), 
 			(m_Progress > m_Health ? &m_Health : &m_Progress), &m_Health, 
 			PlEquipItem.Info().GetName(pPlayer), &Durability);
@@ -84,12 +84,12 @@ void CJobItems::Work(int ClientID)
 
 	// проверка уровня на доступность
 	if(pPlayer->Acc().Plant[PlLevel] < m_Level)
-		return GS()->SBL(ClientID, 100000, 100, "Your level low. {STR} {INT} Level", PlDropItem.Info().GetName(pPlayer), &m_Level);
+		return GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", PlDropItem.Info().GetName(pPlayer), &m_Level);
 
 	m_Progress += 10;
 	GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
-	GS()->SBL(ClientID, 100000, 100, "{STR} [{INT}/{INT}P]",
+	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P]",
 		PlDropItem.Info().GetName(pPlayer), (m_Progress > m_Health ? &m_Health : &m_Progress), &m_Health);
 
 	if(m_Progress >= m_Health)

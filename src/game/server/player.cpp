@@ -394,7 +394,7 @@ void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed,
 	char *Level = GS()->LevelString(100, (int)getlv, 10, ':', ' ');
 	char BufferInBroadcast[128];
 	str_format(BufferInBroadcast, sizeof(BufferInBroadcast), "^235Lv%d %s%s %0.2f%%+%0.3f%%(%d)XP\n", MyLevel, Name, Level, getlv, getexp, GivedExp);
-	GS()->SBL(m_ClientID, 100000, 100, BufferInBroadcast);
+	GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, BufferInBroadcast);
 	mem_zero(Level, sizeof(Level));
 }
 // Улучшения апгрейдов любых не зависимо от структуры класса или переменных
@@ -403,13 +403,13 @@ bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int Maxi
 	int UpgradeNeed = Price*Count;
 	if((*Upgrade + Count) > MaximalUpgrade)
 	{
-		GS()->SBL(m_ClientID, PRELEGENDARY, 100, "This upgrades maximal.");
+		GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "This upgrades maximal.");
 		return false;		
 	}
 
 	if(*Useless < UpgradeNeed)
 	{
-		GS()->SBL(m_ClientID, PRELEGENDARY, 100, "Have no upgrade points for upgrade +{INT}. Need {INT}.", &Count, &UpgradeNeed);
+		GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Have no upgrade points for upgrade +{INT}. Need {INT}.", &Count, &UpgradeNeed);
 		return false;
 	}
 
@@ -581,7 +581,7 @@ void CPlayer::ShowInformationStats()
 	int StartHealth = GetStartHealth();
 	int Mana = m_pCharacter->Mana();
 	int StartMana = GetStartMana();
-	GS()->SBL(m_ClientID, 10000, 100, "H: {INT}/{INT} M: {INT}/{INT}", &Health, &StartHealth, &Mana, &StartMana);
+	GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_BASIC_STATS, 100, "H: {INT}/{INT} M: {INT}/{INT}", &Health, &StartHealth, &Mana, &StartMana);
 }
 
 /* #########################################################################

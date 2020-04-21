@@ -256,7 +256,7 @@ void CCharacter::FireWeapon()
 		if(m_pPlayer->GetItemEquip(m_ActiveWeapon+EQUIP_HAMMER) == -1)
 		{
 			// hotfix hammer non pick items
-			GS()->SBL(m_pPlayer->GetCID(), PRELEGENDARY, 150, "You need buy this weapon or module and equip!");
+			GS()->SBL(m_pPlayer->GetCID(), BroadcastPriority::BROADCAST_GAME_WARNING, 150, "You need buy this weapon or module and equip!");
 			if(m_ActiveWeapon == WEAPON_HAMMER)
 				GS()->TakeItemCharacter(m_pPlayer->GetCID());
 			return;
@@ -950,7 +950,7 @@ void CCharacter::HandleTilesets()
 						GS()->ResetVotes(m_pPlayer->GetCID(), MAINMENU);
 
 						int PriceHouse = GS()->Mmo()->House()->GetHousePrice(HouseID);
-						GS()->SBL(m_pPlayer->GetCID(), PRERARE, 200, "House Price: {INT}gold \n"
+						GS()->SBL(m_pPlayer->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 200, "House Price: {INT}gold \n"
 							" Owner: {STR}.\nInformation load in vote.", &PriceHouse, GS()->Mmo()->House()->OwnerName(HouseID));
 					}
 					m_Core.m_ProtectHooked = m_NoAllowDamage = true;
@@ -1203,7 +1203,7 @@ bool CCharacter::CheckFailMana(int Mana)
 {
 	if(m_Mana < Mana)
 	{
-		GS()->SBL(m_pPlayer->GetCID(), 10000, 100, "No mana for use this or for maintenance.");
+		GS()->SBL(m_pPlayer->GetCID(), BroadcastPriority::BROADCAST_GAME_WARNING, 100, "No mana for use this or for maintenance.");
 		return true;
 	}
 	m_Mana -= Mana;

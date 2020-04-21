@@ -551,7 +551,6 @@ void QuestBase::ShowQuestRequired(CPlayer *pPlayer, ContextBots::QuestBotInfo &B
 		TextTalk, (ShowItemNeeded ? "- - - - - - - I will need" : "\0"), Buffer.buffer());
 	Buffer.clear();
 	pPlayer->ClearFormatQuestText();
-	GS()->SBL(ClientID, 99999, 8, _("PRESS (F4) FOR CONTINUE TALK!"), NULL);
 }
 
 // Принять квест с ID
@@ -569,6 +568,7 @@ bool QuestBase::AcceptQuest(int QuestID, CPlayer *pPlayer)
 	SJK.ID("tw_accounts_quests", "(QuestID, OwnerID, Type) VALUES ('%d', '%d', '%d')", QuestID, pPlayer->Acc().AuthID, QUESTACCEPT);
 	GS()->Chat(ClientID, "Accepted the quest [{STR}]", QuestsData[QuestID].Name);
 	GS()->Chat(ClientID, "You will receive a reward Gold {INT}, Experience {INT}", &QuestsData[QuestID].Money, &QuestsData[QuestID].Exp);
+	pPlayer->GetCharacter()->CreateQuestsSteps();
 	CheckQuest(pPlayer);
 	return true;
 }

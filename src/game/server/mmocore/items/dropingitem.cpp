@@ -52,7 +52,7 @@ bool CDropingItem::TakeItem(int ClientID)
 	if(PlDropItem.Count > 0 && PlDropItem.Info().BonusCount > 0)
 	{
 		tl_swap(PlDropItem, m_DropItem);
-		GS()->Chat(ClientID, "You now own [{STR} +{INT}]", PlDropItem.Info().GetName(pPlayer), &PlDropItem.Enchant);
+		GS()->Chat(ClientID, "You now own [{STR}+{INT}]", PlDropItem.Info().GetName(pPlayer), &PlDropItem.Enchant);
 		GS()->VResetVotes(ClientID, INVENTORY);
 		return true;
 	}
@@ -60,7 +60,7 @@ bool CDropingItem::TakeItem(int ClientID)
 	// выдача просто предмета
 	GS()->VResetVotes(ClientID, INVENTORY);
 	PlDropItem.Add(m_DropItem.Count, 0, m_DropItem.Enchant);
-	GS()->SBL(ClientID, 10000, 10, "\0");
+	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 10, "\0");
 	GS()->m_World.DestroyEntity(this);
 	return true;
 }
@@ -129,14 +129,14 @@ void CDropingItem::Tick()
 	const ItemSql::ItemPlayer PlDropItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
 	if(PlDropItem.Info().BonusCount <= 0)
 	{
-		GS()->SBL(pChar->GetPlayer()->GetCID(), 10000, 100, "{STR}x{INT} : {STR}",
+		GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}x{INT} : {STR}",
 			m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.Count, (m_ForID != -1 ? Server()->ClientName(m_ForID) : "Nope"));
 		return;
 	}
 
 	if (PlDropItem.Count > 0)
 	{
-		GS()->SBL(pChar->GetPlayer()->GetCID(), 10000, 100, "{STR}(+{INT}) -> (+{INT}) : {STR}", 
+		GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) -> (+{INT}) : {STR}", 
 			m_DropItem.Info().GetName(pChar->GetPlayer()),
 			&PlDropItem.Enchant, &m_DropItem.Enchant, 
 			(m_ForID != -1 ? Server()->ClientName(m_ForID) : "Nope"));
@@ -144,7 +144,7 @@ void CDropingItem::Tick()
 		return;
 	}
 
-	GS()->SBL(pChar->GetPlayer()->GetCID(), 10000, 100, "{STR}(+{INT}) : {STR}",
+	GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) : {STR}",
 		PlDropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.Enchant, (m_ForID != -1 ? Server()->ClientName(m_ForID) : "Nope"));
 }
 

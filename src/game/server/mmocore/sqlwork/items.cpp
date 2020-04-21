@@ -345,7 +345,7 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 			Get = AvailableCount;
 
 		ItemPlayer& PlItem = pPlayer->GetItem(VoteID);
-		GS()->SBL(ClientID, PRELEGENDARY, 100, "You drop {STR}x{INT}", PlItem.Info().GetName(pPlayer), &Get);
+		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "You drop {STR}x{INT}", PlItem.Info().GetName(pPlayer), &Get);
 		GS()->CreateDropItem(pPlayer->GetCharacter()->m_Core.m_Pos, -1, PlItem, Get);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;

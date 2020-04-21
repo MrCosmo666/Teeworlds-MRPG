@@ -88,7 +88,7 @@ void CQuestItem::Tick()
 	if(pPlayer->GetCharacter() && distance(m_ActualPos, pPlayer->GetCharacter()->m_Core.m_Pos) < 32)
 	{
 		// текст подбора предмета
-		GS()->SBL(m_OwnerID, 1000, 10, "Press 'Fire' for pick Quest Item");
+		GS()->SBL(m_OwnerID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Press 'Fire' for pick Quest Item");
 
 		// если кнопка нажата
 		if(pPlayer->GetCharacter()->m_ReloadTimer)

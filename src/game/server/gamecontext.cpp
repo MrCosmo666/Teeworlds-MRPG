@@ -1157,7 +1157,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		else if(MsgID == NETMSGTYPE_CL_SETTEAM)
 		{
 			if(!pPlayer->IsAuthed())
-				return SBL(pPlayer->GetCID(), PRENORMAL, 100, "Use /register <name> <pass>.");
+				return SBL(pPlayer->GetCID(), BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Use /register <name> <pass>.");
 
 		}
 		else if (MsgID == NETMSGTYPE_CL_SETSPECTATORMODE)
@@ -1229,7 +1229,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			}
 
 			// пишем клиент успешно прочекан 	
-			SBL(ClientID, 1000, 100, "Successfully checks client.");
+			SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Successfully checks client.");
 			pPlayer->m_PlayerTick[TickState::CheckClient] = 0;
 
 			// загрузка всех частей скинов игроков
@@ -1389,7 +1389,7 @@ void CGS::OnClientEnter(int ClientID)
 	// fail check client
 	if(!CheckClient(ClientID))
 	{
-		SBL(ClientID, 1000, 1000, "Vanilla client.\nSpecial client for MmoTee.\n\"{STR}\"", g_Config.m_SvDiscordInviteGroup);
+		SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 1000, "Vanilla client.\nSpecial client for MmoTee.\n\"{STR}\"", g_Config.m_SvDiscordInviteGroup);
 	}
 }
 
