@@ -741,6 +741,7 @@ void CCharacter::Die(int Killer, int Weapon)
 	GS()->CreateSound(m_Pos, SOUND_PLAYER_DIE);
 
 	// this is for auto respawn after 3 secs
+	m_pPlayer->ClearTalking();
 	m_pPlayer->m_PlayerTick[TickState::Die] = Server()->Tick()/2;
 	m_pPlayer->m_Spawned = true;
 	GS()->m_World.RemoveEntity(this);
