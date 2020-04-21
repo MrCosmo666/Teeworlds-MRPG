@@ -7,7 +7,6 @@
 
 class ShopMailSql : public CMmoComponent
 {
-	bool BuyShopAuctionSlot(CPlayer *pPlayer, int ID);
 
 	struct StructAuctionItem
 	{
@@ -24,7 +23,7 @@ class ShopMailSql : public CMmoComponent
 	typedef std::map < int , ShopPersonal > ShopType;
 	static ShopType Shop;
 
-	bool CheckCurrentStorage(int StorageID);
+	bool BuyShopItem(CPlayer* pPlayer, int ID);
 	void ShowAuction(CPlayer* pPlayer);
 	void ShowMailShop(CPlayer* pPlayer, int StorageID);
 

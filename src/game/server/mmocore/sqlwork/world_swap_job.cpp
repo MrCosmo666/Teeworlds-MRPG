@@ -15,10 +15,10 @@ void WorldSwapJob::OnInitGlobal()
 	{
 		const int ID = RES->getInt("ID");
 		WorldSwap[ID].Level = RES->getInt("Level");
-		WorldSwap[ID].SwapID = RES->getInt("SwapID");
 		WorldSwap[ID].PositionX = RES->getInt("PositionX");
 		WorldSwap[ID].PositionY = RES->getInt("PositionY");
 		WorldSwap[ID].WorldID = RES->getInt("WorldID");
+		WorldSwap[ID].SwapID = RES->getInt("SwapID");
 		SJK.UD("tw_world_swap", "Name = '%s' WHERE ID = '%d'", GS()->Server()->GetWorldName(WorldSwap[ID].WorldID), ID);
 	}
 
@@ -42,7 +42,6 @@ void WorldSwapJob::OnInitGlobal()
 
 bool WorldSwapJob::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 {
-	// парсинг на раз
 	CPlayer *pPlayer = pChr->GetPlayer();
 	if(pChr->GetHelper()->TileEnter(IndexCollision, TILE_WORLDSWAP))
 	{
@@ -57,7 +56,7 @@ bool WorldSwapJob::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 		return true;	
 	}
 
-	// парсинг в секунду
+
 	if(pChr->GetHelper()->BoolIndex(TILE_WORLDSWAP))
 	{
 		if(ChangingWorld(pPlayer->GetCID(), pChr->m_Core.m_Pos))
@@ -66,12 +65,10 @@ bool WorldSwapJob::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 	return false;
 }
 
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
-// ------------------------------------------------------------------
-
-// Получить айди смены мира по SwapID
-int WorldSwapJob::CheckPosition(vec2 Pos)
+/* #########################################################################
+	FUNCTION TELEPORT CLASS
+######################################################################### */
+int WorldSwapJob::GetSwapID(vec2 Pos)
 {
 	for(const auto& sw : WorldSwap)
 	{
@@ -82,7 +79,6 @@ int WorldSwapJob::CheckPosition(vec2 Pos)
 	return -1;
 }
 
-// Смена мира игроку
 bool WorldSwapJob::ChangingWorld(int ClientID, vec2 Pos)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
@@ -90,7 +86,7 @@ bool WorldSwapJob::ChangingWorld(int ClientID, vec2 Pos)
 
 	for(const auto& sw : WorldSwap)
 	{
-		int SwapID = CheckPosition(Pos);
+		int SwapID = GetSwapID(Pos);
 		if(sw.second.WorldID == GS()->GetWorldID() || SwapID != sw.second.SwapID)
 			continue;
 
@@ -108,8 +104,7 @@ bool WorldSwapJob::ChangingWorld(int ClientID, vec2 Pos)
 	return false;
 }
 
-// Поиск путии до квеста к боту
-vec2 WorldSwapJob::PositionQuestBot(int ClientID, int QuestID)
+vec2 WorldSwapJob::GetPositionQuestBot(int ClientID, int QuestID)
 {
 	int playerTalkProgress = QuestBase::Quests[ClientID][QuestID].Progress;
 	ContextBots::QuestBotInfo FindBot = Job()->Quest()->GetQuestBot(QuestID, playerTalkProgress);

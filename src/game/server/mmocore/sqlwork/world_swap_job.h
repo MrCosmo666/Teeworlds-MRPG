@@ -31,11 +31,11 @@ public:
 	virtual void OnInitGlobal();
 	virtual bool OnPlayerHandleTile(CCharacter* pChr, int IndexCollision);
 
-	vec2 PositionQuestBot(int ClientID, int QuestID);
+	vec2 GetPositionQuestBot(int ClientID, int QuestID);
 	int GetWorldType() const;
 
 private:
-	int CheckPosition(vec2 Pos);
+	int GetSwapID(vec2 Pos);
 	bool ChangingWorld(int ClientID, vec2 Pos);
 };
 

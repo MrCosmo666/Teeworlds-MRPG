@@ -202,7 +202,7 @@ void BotAI::Die(int Killer, int Weapon)
 	// склад пополнение
 	int StorageID = GS()->Mmo()->Storage()->GetStorageMonsterSub(BotID);
 	if(StorageID > 0) 
-		GS()->Mmo()->Storage()->AddStorage(StorageID, rand()%5);
+		GS()->Mmo()->Storage()->AddStorageGoods(StorageID, rand()%5);
 
 	// очищаем лист и убиваем игрока
 	m_ListDmgPlayers.clear();

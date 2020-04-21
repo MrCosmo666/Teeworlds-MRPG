@@ -7,9 +7,6 @@
 
 class StorageSql : public CMmoComponent
 {
-/* #########################################################################
-	VAR STORAGE CLASS 
-######################################################################### */
 	struct SturctStorage
 	{
 		char Name[32];
@@ -27,42 +24,28 @@ class StorageSql : public CMmoComponent
 	typedef std::map < int , SturctStorage > StorageType;
 	static StorageType Storage;
 
-/* #########################################################################
-	GLOBAL STORAGE CLASS 
-######################################################################### */
 public:
 	virtual void OnInitGlobal();
 	virtual void OnTick();
 	virtual void OnPaymentTime();
+	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 	
 	void ShowStorageMenu(int ClientID, int StorageID);
-
-/* #########################################################################
-	HELPER STORAGE CLASS 
-######################################################################### */
-	const char *StorageName(int StorageID) const;
-	int GetCountStorage(int StorageID) const;
-	int GetBankStorage(int StorageID) const;
-	int GetStorageMonsterSub(int MonsterSubType) const;
-	int GetLoadStorage(vec2 Pos) const;
-	int ValidGoodsPrice(int Price) const;
-
-/* #########################################################################
-	FUNCTION STORAGE CLASS 
-######################################################################### */
-	bool BuyStorageItem(bool CheckStorageCount, int BoughtCID, int StorageID, int Price);
-	void AddStorage(int StorageID, int Count);
-	void RemoveStorage(int StorageID, int Count);
+	bool BuyStorageItem(int ClientID, int StorageID, int Price);
+	void AddStorageGoods(int StorageID, int Count);
+	bool RemoveStorageGoods(int StorageID, int Count);
 	void AddStorageMoney(int StorageID, int Count);
-	void RemoveStorageMoney(int StorageID, int Count);
+	bool RemoveStorageMoney(int StorageID, int Count);
 
+	int GetStorageMonsterSub(int MonsterSubType) const;
+	int GetStorageID(vec2 Pos) const;
+
+private:
 	void BuyStorages(CPlayer *pPlayer, int StorageID);
 	void SellStorage(int AuthID);
-/* #########################################################################
-	ANOTHER STORAGE CLASS 
-######################################################################### */
+
+public:
 	void SCO(int StorageID, const char* pText, ...);
-	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
 };
 
 #endif

@@ -9,7 +9,6 @@ using namespace sqlstr;
 /* Information NON STATIC DATA LOAD ONLY DATABASE (MultiWorld Work) Later need changes object on static class*/
 std::map < int , ShopMailSql::ShopPersonal > ShopMailSql::Shop;
 
-// Инициализация класса
 void ShopMailSql::OnInitGlobal() 
 {
 	// загрузить магазины
@@ -21,7 +20,6 @@ void ShopMailSql::OnInitGlobal()
 	}
 }
 
-// Локальный таймер в лок мире
 void ShopMailSql::OnTickLocalWorld()
 {
 	// проверять оконченые слоты аукцион
@@ -29,13 +27,9 @@ void ShopMailSql::OnTickLocalWorld()
 		CheckAuctionTime();
 }
 
-// Показываем список предметов в магазине
 void ShopMailSql::ShowMailShop(CPlayer *pPlayer, int StorageID)
 {
-	if(!CheckCurrentStorage(StorageID)) 
-		return;
-
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	GS()->AV(ClientID, "null", "");
 
 	int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + 300;
@@ -77,13 +71,13 @@ void ShopMailSql::ShowMailShop(CPlayer *pPlayer, int StorageID)
 // Показываем аукцион
 void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	GS()->AVH(ClientID, HAUCTIONINFO, GREEN_COLOR, "Auction Information");
 	GS()->AVM(ClientID, "null", NOPE, HAUCTIONINFO, "To create a slot, see inventory item interact.");
 	GS()->AV(ClientID, "null", "");
 
-	int StartHideCount = (int)(NUMHIDEMENU + ItemSql::ItemsInfo.size() + 400);
-	int HideID = StartHideCount;
+	bool FoundItems = false;
+	int HideID = (int)(NUMHIDEMENU + ItemSql::ItemsInfo.size() + 400);
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 ORDER BY Price"));
 	while(RES->next())
 	{
@@ -94,9 +88,8 @@ void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 		int Count = RES->getInt("Count");
 		int OwnerID = RES->getInt("OwnerID");
 
-		ItemSql::ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
-		
 		// зачеровыванный или нет
+		ItemSql::ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
 		if (CGS::AttributInfo.find(BuyightItem.BonusID) != CGS::AttributInfo.end())
 		{
 			char aEnchantSize[16];
@@ -116,18 +109,18 @@ void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", BuyightItem.GetDesc(pPlayer));
 		GS()->AVM(ClientID, "null", NOPE, HideID, "Seller {STR}", Job()->PlayerName(OwnerID));
 		GS()->AVM(ClientID, "SHOP", ID, HideID, "Buy Price {INT} gold", &Price);
+		FoundItems = true;
 		++HideID;
 	}
-	if(HideID == StartHideCount)
+	if(FoundItems)
 		GS()->AVL(ClientID, "null", "Currently there are no products.");
 }
 
-// Новый слот аукциона
 void ShopMailSql::CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem)
 {
 	int ItemID = AuSellItem.a_itemid;
 	int ClientID = pPlayer->GetCID();
-	ItemSql::ItemPlayer &PlSellItem = pPlayer->GetItem(ItemID);
+	ItemSql::ItemPlayer &PlayerItem = pPlayer->GetItem(ItemID);
 
 	// проверяем кол-во слотов занято ли все или нет
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_mailshop", "WHERE OwnerID > '0' LIMIT %d", g_Config.m_SvMaxMasiveAuctionSlots));
@@ -149,14 +142,14 @@ void ShopMailSql::CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem)
 		return;
 
 	// забираем предмет и добавляем слот
-	if(PlSellItem.Count >= AuSellItem.a_count && PlSellItem.Remove(AuSellItem.a_count))
+	if(PlayerItem.Count >= AuSellItem.a_count && PlayerItem.Remove(AuSellItem.a_count))
 	{
 		SJK.ID("tw_mailshop", "(ItemID, Price, Count, OwnerID, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d')", 
 			ItemID, AuSellItem.a_price, AuSellItem.a_count, pPlayer->Acc().AuthID, AuSellItem.a_enchant);
 
-		int AvailableSlot = (g_Config.m_SvMaxAuctionSlots - CountSlot)-1;
+		int AvailableSlot = (g_Config.m_SvMaxAuctionSlots - CountSlot) - 1;
 		GS()->Chat(-1, "{STR} created a slot [{STR}x{INT}] auction.", 
-			GS()->Server()->ClientName(ClientID), PlSellItem.Info().GetName(pPlayer), &AuSellItem.a_count);
+			GS()->Server()->ClientName(ClientID), PlayerItem.Info().GetName(pPlayer), &AuSellItem.a_count);
 		GS()->ChatFollow(ClientID, "Still available {INT} slots!", &AvailableSlot);
 	}
 
@@ -164,90 +157,80 @@ void ShopMailSql::CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem)
 	return;
 }
 
-// покупка предмета в аукционе или магазине
-bool ShopMailSql::BuyShopAuctionSlot(CPlayer *pPlayer, int ID)
+bool ShopMailSql::BuyShopItem(CPlayer* pPlayer, int ID)
 {
 	const int ClientID = pPlayer->GetCID();
+	boost::scoped_ptr<ResultSet> SHOPITEM(SJK.SD("*", "tw_mailshop", "WHERE ID = '%d'", ID));
+	if (!SHOPITEM->next()) return false;
 
-	// ищем слот который нам нужен
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE ID = '%d'", ID));
-	if(!RES->next()) return false;
-
-	// проверяем имеется ли такой зачарованный предмет
-	const int ItemID = RES->getInt("ItemID");
-	ItemSql::ItemPlayer &BuyightItem = pPlayer->GetItem(ItemID);
-	if(BuyightItem.Count > 0 && BuyightItem.Info().BonusCount > 0)
+	const int ItemID = SHOPITEM->getInt("ItemID");
+	ItemSql::ItemPlayer& BuyightItem = pPlayer->GetItem(ItemID);
+	if (BuyightItem.Count > 0 && BuyightItem.Info().BonusCount > 0)
 	{
-		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");	
-		return false;		
-	}		
-
-	// снятие слота если мы владелец
-	const int OwnerID = RES->getInt("OwnerID");
-	const int Count = RES->getInt("Count");
-	const int Enchant = RES->getInt("Enchant");
-	if(pPlayer->Acc().AuthID == OwnerID)
-	{
-		GS()->Chat(ClientID, "You closed auction slot!");	
-		GS()->SendInbox(ClientID, "Auction Alert", "You have bought a item, or canceled your slot", ItemID, Count, Enchant);
-		SJK.DD("tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, OwnerID);
-		return true;
-	}
-
-	// проверяем склад но если нет владельца магазинный предмет
-	const int StorageID = RES->getInt("StorageID");
-	int Price = RES->getInt("Price");
-	if(OwnerID <= 0 && StorageID > 0) 
-	{
-		if(!Job()->Storage()->BuyStorageItem(true, ClientID, StorageID, Price)) 
-			return false;
-	}
-
-	// проверяем есть ли золото
-	const int NeedItem = RES->getInt("NeedItem");
-	if(pPlayer->CheckFailMoney(Price, NeedItem)) 
+		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");
 		return false;
+	}
 
-	// купить не со предмет со склада
-	// if(OwnerID <= 0 && StorageID > 0) 
-	// 	Job()->Storage()->BuyStorageItem(false, ClientID, StorageID, Price);
-
-	// купить с аукциона
-	if(OwnerID > 0) 
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// - - - - - - - - - - AUCTION - - - - - - - - - - - - -
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	int Price = SHOPITEM->getInt("Price");
+	const int OwnerID = SHOPITEM->getInt("OwnerID");
+	const int Count = SHOPITEM->getInt("Count");
+	const int Enchant = SHOPITEM->getInt("Enchant");
+	if (OwnerID > 0)
 	{
+		// забираем свой слот
+		if (OwnerID == pPlayer->Acc().AuthID)
+		{
+			GS()->Chat(ClientID, "You closed auction slot!");
+			GS()->SendInbox(ClientID, "Auction Alert", "You have bought a item, or canceled your slot", ItemID, Count, Enchant);
+			SJK.DD("tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, OwnerID);
+			return true;
+		}
+
+		const int NeedItem = SHOPITEM->getInt("NeedItem");
+		if (pPlayer->CheckFailMoney(Price, NeedItem))
+			return false;
+
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "Your [Slot %sx%d] was sold!", BuyightItem.Info().GetName(pPlayer), Count);
 		Job()->Inbox()->SendInbox(OwnerID, "Auction Sell", aBuf, itMoney, Price, 0);
 		SJK.DD("tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, OwnerID);
+		BuyightItem.Add(Count, 0, Enchant);
+		GS()->Chat(ClientID, "You buy {STR}x{INT}.", BuyightItem.Info().GetName(pPlayer), &Count);
+		return true;
 	}
 
-	// купили предмет
-	BuyightItem.Add(Count, 0, Enchant);
-	GS()->Chat(ClientID, "You exchange {STR}x{INT} to {STR}x{INT}.", BuyightItem.Info().GetName(pPlayer), &Count, GS()->GetItemInfo(NeedItem).GetName(pPlayer), &Price);
-	return true;
-}
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	// - - - - - - - - - - - -SHOP - - - - - - - - - - - - -
+	// - - - - - - - - - - - - - - - - - - - - - - - - - - -
+	const int NeedItem = SHOPITEM->getInt("NeedItem");
+	if (pPlayer->CheckFailMoney(Price, NeedItem, true))
+		return false;
 
-// Проверить склад существует ли он и в магазине указан он
-bool ShopMailSql::CheckCurrentStorage(int StorageID)
-{
-	for(const auto& sh : Shop)
+	const int StorageID = SHOPITEM->getInt("StorageID");
+	if (Job()->Storage()->BuyStorageItem(ClientID, StorageID, Price))
 	{
-		if(StorageID == sh.second.StorageID)
-			return true;
+		pPlayer->CheckFailMoney(Price, NeedItem);
+		BuyightItem.Add(Count, 0, Enchant);
+		GS()->Chat(ClientID, "You exchange {STR}x{INT} to {STR}x{INT}.", BuyightItem.Info().GetName(pPlayer), &Count, GS()->GetItemInfo(NeedItem).GetName(pPlayer), &Price);
+		return true;
 	}
 	return false;
 }
 
-// Проверить время истекших слотов
 void ShopMailSql::CheckAuctionTime()
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE DATE_SUB(NOW(),INTERVAL %d MINUTE) > Time AND OwnerID > 0", g_Config.m_SvTimeAuctionSlot));
-	int ReleaseSlots = RES->rowsCount();
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 AND DATE_SUB(NOW(),INTERVAL %d MINUTE) > Time", g_Config.m_SvTimeAuctionSlot));
+	int ReleaseSlots = (int)RES->rowsCount();
 	while(RES->next())
 	{
-		const int ID  = RES->getInt("ID"), ItemID = RES->getInt("ItemID"), Count = RES->getInt("Count");
-		const int Enchant = RES->getInt("Enchant"), OwnerID = RES->getInt("OwnerID");
-
+		const int ID = RES->getInt("ID");
+		const int ItemID = RES->getInt("ItemID");
+		const int Count = RES->getInt("Count");
+		const int Enchant = RES->getInt("Enchant");
+		const int OwnerID = RES->getInt("OwnerID");
 		Job()->Inbox()->SendInbox(OwnerID, "Auction expired", "Your slot has expired", ItemID, Count, Enchant);
 		SJK.DD("tw_mailshop", "WHERE ID = '%d'", ID);
 	}
@@ -272,7 +255,7 @@ bool ShopMailSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Re
 
 		if (pChr->GetHelper()->BoolIndex(TILE_STORAGE))
 		{
-			const int StorageID = Job()->Storage()->GetLoadStorage(pChr->m_Core.m_Pos);
+			const int StorageID = Job()->Storage()->GetStorageID(pChr->m_Core.m_Pos);
 			Job()->Storage()->ShowStorageMenu(ClientID, StorageID);
 			ShowMailShop(pPlayer, StorageID);
 			return true;
@@ -317,7 +300,7 @@ bool ShopMailSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int
 	// купить предмет
 	if(PPSTR(CMD, "SHOP") == 0)
 	{
-		if(BuyShopAuctionSlot(pPlayer, VoteID))	
+		if(BuyShopItem(pPlayer, VoteID))	
 			GS()->ResetVotes(ClientID, MAINMENU);
 
 		return true;

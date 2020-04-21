@@ -450,7 +450,7 @@ void CCharacter::CreateQuestsSteps()
 			continue;
 
 		bool DontStep = false;
-		vec2 Pos = GS()->Mmo()->WorldSwap()->PositionQuestBot(ClientID, quests->first);
+		vec2 Pos = GS()->Mmo()->WorldSwap()->GetPositionQuestBot(ClientID, quests->first);
 		for(CQuestAI *pQ = (CQuestAI*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_FINDQUEST); pQ; pQ = (CQuestAI *)pQ->TypeNext())
 			if(pQ->GetClientID() == m_pPlayer->GetCID() && pQ->GetQuestID() == quests->first) pQ->Finish();
 

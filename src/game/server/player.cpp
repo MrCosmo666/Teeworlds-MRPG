@@ -450,7 +450,7 @@ const char *CPlayer::AtributeName(int BonusID) const
 	FUNCTIONS PLAYER ACCOUNT 
 ######################################################################### */
 // Проверить и снять деньги
-bool CPlayer::CheckFailMoney(int Price, int ItemID)
+bool CPlayer::CheckFailMoney(int Price, int ItemID, bool CheckOnly)
 {
 	ItemSql::ItemPlayer &CoinItem = GetItem(ItemID);
 	if(CoinItem.Count < Price)
@@ -459,7 +459,10 @@ bool CPlayer::CheckFailMoney(int Price, int ItemID)
 		return true;
 	}
 
-	if(!CoinItem.Remove(Price)) 
+	if (CheckOnly)
+		return false;
+
+	if(!CoinItem.Remove(Price))
 		return true;
 
 	return false;

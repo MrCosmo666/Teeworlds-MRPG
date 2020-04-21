@@ -194,7 +194,6 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 
 bool SkillJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
-	const int ClientID = pPlayer->GetCID();
 	if (ReplaceMenu)
 	{
 		CCharacter* pChr = pPlayer->GetCharacter();
