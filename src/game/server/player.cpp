@@ -461,10 +461,8 @@ bool CPlayer::CheckFailMoney(int Price, int ItemID, bool CheckOnly)
 
 	if (CheckOnly)
 		return false;
-
-	if(!CoinItem.Remove(Price))
+	if (!CoinItem.Remove(Price))
 		return true;
-
 	return false;
 }
 // Наложить на игрока 'Эффект зелий'

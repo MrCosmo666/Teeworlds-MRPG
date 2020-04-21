@@ -302,7 +302,7 @@ void ItemSql::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 	// можно ли дропнуть 
 	if (PlItem.Info().Dropable)
 	{
-		GS()->AVM(ClientID, "IDROP", ItemID, HideID, "Drop {STR}{STR}", (PlItem.Info().BonusCount > 0 ? "and Repair " : ""), NameItem);
+		GS()->AVM(ClientID, "IDROP", ItemID, HideID, "Drop {STR}", NameItem);
 	}
 
 	if (PlItem.Info().BonusCount)

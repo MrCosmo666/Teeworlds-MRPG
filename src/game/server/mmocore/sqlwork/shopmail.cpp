@@ -112,7 +112,7 @@ void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 		FoundItems = true;
 		++HideID;
 	}
-	if(FoundItems)
+	if(!FoundItems)
 		GS()->AVL(ClientID, "null", "Currently there are no products.");
 }
 
