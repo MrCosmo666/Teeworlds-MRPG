@@ -447,9 +447,14 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 	return false;
 }
 
-bool ItemSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
+bool ItemSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
+	if (ReplaceMenu)
+	{
+		return false;
+	}
+
 	if (Menulist == SETTINGS)
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;

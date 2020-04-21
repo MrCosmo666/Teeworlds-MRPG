@@ -57,16 +57,22 @@ bool TeleportsSql::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 	return false;
 }
 
-bool TeleportsSql::OnPlayerHandleMainMenu(CPlayer *pPlayer, int Menulist)
+bool TeleportsSql::OnPlayerHandleMainMenu(CPlayer *pPlayer, int Menulist, bool ReplaceMenu)
 {
-	CCharacter *pChr = pPlayer->GetCharacter();
-	if(!pChr) return false;
-
-	if(Menulist == MAINMENU && pChr->GetHelper()->BoolIndex(TILE_AETHER))
+	if (ReplaceMenu)
 	{
-		ShowTeleportList(pPlayer);	
-		return true;
+		CCharacter* pChr = pPlayer->GetCharacter();
+		if (!pChr) return false;
+
+		if(Menulist == MAINMENU && pChr->GetHelper()->BoolIndex(TILE_AETHER))
+		{
+			ShowTeleportList(pPlayer);
+			return true;
+		}
+		return false;
 	}
+
+
 	return false;
 }
 

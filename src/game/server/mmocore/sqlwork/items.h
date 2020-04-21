@@ -86,7 +86,7 @@ public:
 	virtual void OnInitGlobal();
 	virtual void OnInitAccount(CPlayer *pPlayer);
 	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
-	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist);
+	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 
 	// Основное
 	void ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction = false);

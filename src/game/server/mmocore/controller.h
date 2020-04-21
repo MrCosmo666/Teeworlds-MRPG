@@ -95,7 +95,7 @@ public:
 	void LoadFullSystems();
 	void OnTick();
 	bool OnPlayerHandleTile(CCharacter *pChr, int IndexCollision);
-	void OnPlayerHandleMainMenu(int ClientID, int Menulist);
+	bool OnPlayerHandleMainMenu(int ClientID, int Menulist, bool ReplaceMenu);
 	void OnInitAccount(int ClientID);
 	bool OnMessage(int MsgID, void *pRawMsg, int ClientID);
 	bool OnParseFullVote(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);

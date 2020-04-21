@@ -30,6 +30,8 @@ class SkillJob : public CMmoComponent
 	};
 	typedef StructSkills SkillPlayer;
 
+	void ShowMailSkillList(CPlayer* pPlayer);
+
 public:
 	static std::map < int , SkillInfo > SkillData;
 	static std::map < int , std::map < int , SkillPlayer > > Skill;
@@ -46,10 +48,10 @@ public:
 /* #########################################################################
 	FUNCTION SKILL CLASS 
 ######################################################################### */
-	void ShowMailSkillList(CPlayer *pPlayer);
 	void SkillSelected(CPlayer *pPlayer, int SkillID);
 	bool UpgradeSkill(CPlayer *pPlayer, int SkillID);
 	bool UseSkill(CPlayer *pPlayer, int SkillID);
+	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
 };
 

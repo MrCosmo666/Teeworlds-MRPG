@@ -34,7 +34,7 @@ public:
 	DungeonJob();
 
 	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
-	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist);
+	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 
 	void SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds);
 	void ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID);

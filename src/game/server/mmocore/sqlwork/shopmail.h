@@ -25,7 +25,8 @@ class ShopMailSql : public CMmoComponent
 	static ShopType Shop;
 
 	bool CheckCurrentStorage(int StorageID);
-
+	void ShowAuction(CPlayer* pPlayer);
+	void ShowMailShop(CPlayer* pPlayer, int StorageID);
 
 public:
 	typedef StructAuctionItem AuctionItem;
@@ -33,13 +34,10 @@ public:
 	virtual void OnInitGlobal();
 	virtual void OnTickLocalWorld();
 
-	void ShowMailShop(CPlayer *pPlayer, int StorageID);
-
-	void ShowAuction(CPlayer *pPlayer);
 	void CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem);
 	void CheckAuctionTime();
 	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
-	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist);
+	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 };
 
 #endif

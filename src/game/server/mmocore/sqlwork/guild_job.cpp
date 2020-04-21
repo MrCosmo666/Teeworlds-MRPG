@@ -1362,9 +1362,14 @@ bool GuildJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 	return false;
 }
 
-bool GuildJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
+bool GuildJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
 	int ClientID = pPlayer->GetCID();
+	if (ReplaceMenu)
+	{
+		return false;
+	}
+
 	if (Menulist == MEMBERMENU)
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;

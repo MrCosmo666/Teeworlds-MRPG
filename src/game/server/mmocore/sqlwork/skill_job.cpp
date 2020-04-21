@@ -192,6 +192,24 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 	return false;
 }
 
+bool SkillJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+{
+	const int ClientID = pPlayer->GetCID();
+	if (ReplaceMenu)
+	{
+		CCharacter* pChr = pPlayer->GetCharacter();
+		if (!pChr) return false;
+
+		if (Menulist == MAINMENU && pChr->GetHelper()->BoolIndex(TILE_LEARNSKILL))
+		{
+			ShowMailSkillList(pPlayer);
+			return true;
+		}
+		return false;
+	}
+	return false;
+}
+
 // парсинг голосований
 bool SkillJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {

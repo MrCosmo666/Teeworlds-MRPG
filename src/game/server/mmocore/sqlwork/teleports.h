@@ -24,7 +24,7 @@ public:
 	virtual void OnInitGlobal();
 	virtual void OnInitAccount(CPlayer *pPlayer);
 	virtual bool OnPlayerHandleTile(CCharacter *pChr, int IndexCollision);
-	virtual bool OnPlayerHandleMainMenu(CPlayer *pPlayer, int Menulist);
+	virtual bool OnPlayerHandleMainMenu(CPlayer *pPlayer, int Menulist, bool ReplaceMenu);
 	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
 };
 

@@ -256,9 +256,31 @@ void ShopMailSql::CheckAuctionTime()
 	return;
 }
 
-bool ShopMailSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
+bool ShopMailSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
+	if (ReplaceMenu)
+	{
+		CCharacter* pChr = pPlayer->GetCharacter();
+		if (!pChr) return false;
+
+		if (pChr->GetHelper()->BoolIndex(TILE_AUCTION))
+		{
+			ShowAuction(pPlayer);
+			return true;
+		}
+
+		if (pChr->GetHelper()->BoolIndex(TILE_STORAGE))
+		{
+			const int StorageID = Job()->Storage()->GetLoadStorage(pChr->m_Core.m_Pos);
+			Job()->Storage()->ShowStorageMenu(ClientID, StorageID);
+			ShowMailShop(pPlayer, StorageID);
+			return true;
+		}
+		return false;
+	}
+
+
 	if (Menulist == AUCTIONSETSLOT)
 	{
 		pPlayer->m_LastVoteMenu = INVENTORY;

@@ -632,9 +632,14 @@ bool HouseJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 	return false;
 }
 
-bool HouseJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
+bool HouseJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
 	int ClientID = pPlayer->GetCID();
+	if (ReplaceMenu)
+	{
+		return false;
+	}
+
 	if (Menulist == HOUSEDECORATION)
 	{
 		pPlayer->m_LastVoteMenu = HOUSEMENU;

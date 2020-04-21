@@ -1868,37 +1868,20 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	CPlayer *pPlayer = m_apPlayers[ClientID];
 	pPlayer->m_OpenVoteMenu = MenuList;
 	ClearVotes(ClientID);
+
+	if (Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList, true))
+	{
+		m_apPlayers[ClientID]->m_Colored = { 20,7,15 };
+		AV(ClientID, "null", "↑ The main menu will return as soon as you leave this zone! ↑");
+		return;
+	}
+
 	if(MenuList == MAINMENU)
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;
 		CCharacter* pChar = pPlayer->GetCharacter();
-		if (pChar && pChar->IsAlive() && pChar->GetHelper()->BoolIndex(TILE_STORAGE))
-		{
-			const int StorageID = Mmo()->Storage()->GetLoadStorage(pChar->m_Core.m_Pos);
-			Mmo()->Storage()->ShowStorageMenu(ClientID, StorageID);
-			Mmo()->Auction()->ShowMailShop(pPlayer, StorageID);
-			return;
-		}
-		else if (pChar && pChar->IsAlive() && pChar->GetHelper()->BoolIndex(TILE_AUCTION))
-		{
-			Mmo()->Auction()->ShowAuction(pPlayer);
-			return;
-		}
-		else if (pChar && pChar->IsAlive() && pChar->GetHelper()->BoolIndex(TILE_LEARNSKILL))
-		{
-			Mmo()->Skills()->ShowMailSkillList(pPlayer);
-			return;
-		}
-		else if (pChar && pChar->IsAlive() && pChar->GetHelper()->BoolIndex(TILE_LEARNSKILL))
-		{
-			Mmo()->Skills()->ShowMailSkillList(pPlayer);
-			return;
-		}
-		else if (pChar && pChar->IsAlive() && pChar->GetHelper()->BoolIndex(TILE_AETHER))
-		{
-			Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList);
-			return;
-		}
+
+
 		// меню статистики
 		int NeedExp = pPlayer->ExpNeed(pPlayer->Acc().Level);
 		AVH(ClientID, HSTAT, PURPLE_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().LastLogin);
@@ -2178,7 +2161,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AddBack(ClientID);
 	}
 	
-	Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList);
+	Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList, false);
 }
 
 // Созданно для апдейта меню если именно оно находится в открытых

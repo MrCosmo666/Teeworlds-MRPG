@@ -72,9 +72,15 @@ void DungeonJob::ShowDungeonsList(CPlayer* pPlayer)
 	}
 }
 
-bool DungeonJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist)
+bool DungeonJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
 	const int ClientID = pPlayer->GetCID();
+	if (ReplaceMenu)
+	{
+		return false;
+	}
+
+
 	if (Menulist == DUNGEONSMENU)
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;

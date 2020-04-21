@@ -94,16 +94,17 @@ void SqlController::OnInitAccount(int ClientID)
 		component->OnInitAccount(pPlayer);
 }
 
-void SqlController::OnPlayerHandleMainMenu(int ClientID, int Menulist)
+bool SqlController::OnPlayerHandleMainMenu(int ClientID, int Menulist, bool ReplaceMenu)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
-	if(!pPlayer || !pPlayer->IsAuthed()) return;
+	if(!pPlayer || !pPlayer->IsAuthed()) return false;
 
 	for(auto& component : m_Components.m_paComponents)
 	{
-		if(component->OnPlayerHandleMainMenu(pPlayer, Menulist))
-			return;
+		if(component->OnPlayerHandleMainMenu(pPlayer, Menulist, ReplaceMenu))
+			return true;
 	}
+	return false;
 }
 
 bool SqlController::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
