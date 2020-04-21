@@ -12,8 +12,8 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	for(int i = 0 ; i < NUMTABSORT ; i ++ )
 		m_SortTabs[ i ] = 0;
 
+	m_PlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed() * 2;
 	m_PlayerTick[TickState::CheckClient] = Server()->Tick();
-	m_PlayerTick[TickState::Respawn] = Server()->Tick();
 	m_PlayerTick[TickState::Die] = Server()->Tick();
 
 	m_Spawned = true;
