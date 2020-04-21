@@ -74,7 +74,7 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 void CPlayerBot::TryRespawn()
 {
 	// разрешить спавн в данже только по запросу
-	if (GS()->DungeonID() > 0 && !m_DungeonAllowedSpawn)
+	if (GS()->DungeonID() > 0 && !m_DungeonAllowedSpawn && m_SpawnPointBot == SPAWNMOBS)
 		return;
 
 	vec2 SpawnPos;
