@@ -807,7 +807,7 @@ void CRenderTools::RenderPicItems(CAnimState* pAnim, int RenderNum, vec2 Dir, ve
 				switch (RenderNum)
 				{
 				case 19: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT19, vec2(115.0f, g_Config.m_JoystickSens), Pos, 200, 90);
+					RenderWings(pAnim, IMAGE_WINGSIT19, vec2(115.0f, 55.0f), Pos, 200, 90);
 					break;
 				case 20: // items wings
 					RenderWings(pAnim, IMAGE_WINGSIT20, vec2(120, 50), Pos);

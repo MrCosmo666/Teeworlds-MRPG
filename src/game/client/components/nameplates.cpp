@@ -22,7 +22,9 @@ const char* CNamePlates::GetMoodName(int MoodType)
 	else if (MoodType == MOOD_FRIENDLY)
 		return "Friendly";
 	else if (MoodType == MOOD_QUESTING)
-		return "Questing NPC";
+		return "Questing NPC";	
+	else if (MoodType == MOOD_PLAYER_TANK)
+		return "Tank Player";	
 	else
 		return "Player";
 }
@@ -78,6 +80,11 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 				case MOOD_QUESTING:
 					str_format(aIconPlayerType, sizeof(aIconPlayerType), "paper");
 					ColorNameplates = vec4(0.9f, 0.85f, 0.35f, a);
+					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.3f * a);
+					break;				
+				case MOOD_PLAYER_TANK:
+					str_format(aIconPlayerType, sizeof(aIconPlayerType), "paper");
+					ColorNameplates = vec4(0.15f, 0.60f, 1.00f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.3f * a);
 					break;
 			}

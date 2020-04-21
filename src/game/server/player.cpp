@@ -208,7 +208,7 @@ void CPlayer::Snap(int SnappingClient)
 	bool local_ClientID = (m_ClientID == SnappingClient);
 	pClientInfo->m_Local = local_ClientID;
 	pClientInfo->m_WorldType = GS()->Mmo()->WorldSwap()->GetWorldType();
-	pClientInfo->m_MoodType = MOOD_NORMAL;
+	pClientInfo->m_MoodType = GetMoodNameplacesType(SnappingClient);
 	pClientInfo->m_Level = Acc().Level;
 	pClientInfo->m_Exp = Acc().Exp;
 	pClientInfo->m_ExpNeed = ExpNeed(Acc().Level);
@@ -908,4 +908,24 @@ void CPlayer::FormatTextQuest(int DataBotID, const char *pText)
 void CPlayer::ClearFormatQuestText()
 {
 	mem_zero(m_FormatTalkQuest, sizeof(m_FormatTalkQuest));
+}
+
+// another
+int CPlayer::GetMoodNameplacesType(int SnappingClient)
+{
+	if (!GS()->IsDungeon())
+		return MOOD_NORMAL;
+
+	int MaximalHealth = GetAttributeCount(Stats::StHardness, true);
+	for (int i = 0; i < MAX_PLAYERS; i++)
+	{
+		CPlayer* pPlayer = GS()->m_apPlayers[i];
+		if (!pPlayer || Server()->GetWorldID(m_ClientID) != Server()->GetWorldID(i))
+			continue;
+
+		int FinderHardness = pPlayer->GetAttributeCount(Stats::StHardness, true);
+		if (FinderHardness > MaximalHealth)
+			return MOOD_NORMAL;
+	}
+	return MOOD_PLAYER_TANK;
 }

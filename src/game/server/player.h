@@ -100,6 +100,7 @@ public:
 	virtual	int GetHealth()                                              { return Acc().PlayerHealth;};
 	virtual void SetDungeonAllowedSpawn(bool Spawn)                      { return; };
 	virtual void SetStandart(int Health, int Mana);
+	virtual int GetMoodNameplacesType(int SnappingClient);
 
 	virtual void Tick();
 	virtual int GetTeam();
