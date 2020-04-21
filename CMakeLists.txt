@@ -282,8 +282,6 @@ endif()
 find_package(Threads)
 find_package(ZLIB)
 find_package(Pnglite)
-find_package(GLEW)
-
 find_package(Freetype)
 find_package(SDL2)
 find_package(Wavpack)
@@ -335,8 +333,7 @@ set(CLIENT_LIBRARIES
   ${FREETYPE_LIBRARIES} 
   ${PNGLITE_LIBRARIES} 
   ${SDL2_LIBRARIES} 
-  ${WAVPACK_LIBRARIES} 
-  ${GLEW_LIBRARIES}
+  ${WAVPACK_LIBRARIES}
 )
 
 # client includes
@@ -346,7 +343,6 @@ set(CLIENT_INCLUDES_DIRS
   ${PNGLITE_INCLUDE_DIRS} 
   ${SDL2_INCLUDE_DIRS} 
   ${WAVPACK_INCLUDE_DIRS}
-  ${GLEW_INCLUDE_DIRS}
 )
 
 # server lib
@@ -382,7 +378,6 @@ function(show_dependency_status OUTPUT_NAME NAME)
   endif()
 endfunction()
 
-show_dependency_status("Glew" GLEW)
 show_dependency_status("PythonInterp" PYTHONINTERP)
 if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   show_dependency_status("Dmg tools" DMGTOOLS)
@@ -761,7 +756,7 @@ if(CLIENT_COMPILE)
     src/generated/client_data.h
   )
   set(CLIENT_SRC ${PLATFORM_CLIENT} ${ENGINE_CLIENT} ${GAME_CLIENT} ${GAME_EDITOR} ${GAME_GENERATED_CLIENT})
-  set(DEPS_CLIENT ${DEPS} ${GLEW_DEP} ${PNGLITE_DEP} ${WAVPACK_DEP})
+  set(DEPS_CLIENT ${DEPS} ${PNGLITE_DEP} ${WAVPACK_DEP})
 
   if(TARGET_OS STREQUAL "windows")
     set(CLIENT_ICON "other/icons/${CLIENT_EXECUTABLE}.rc")
@@ -1290,7 +1285,6 @@ foreach(target ${TARGETS_OWN})
   target_include_directories(${target} PRIVATE src)
   target_compile_definitions(${target} PRIVATE $<$<CONFIG:Debug>:CONF_DEBUG>)
   target_include_directories(${target} PRIVATE ${ZLIB_INCLUDE_DIRS})
-  target_compile_definitions(${target} PRIVATE GLEW_STATIC)
 
   if(CRYPTO_FOUND)
 	target_compile_definitions(${target} PRIVATE CONF_OPENSSL)
