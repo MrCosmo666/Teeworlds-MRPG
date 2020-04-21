@@ -292,7 +292,7 @@ find_package(Crypto)
 
 if(TARGET_OS AND TARGET_OS STREQUAL "windows")
   find_package(MySQL)
-  find_package(OwnICU)
+  find_package(ICU)
 
 elseif(TARGET_OS AND TARGET_OS STREQUAL "linux")
   find_package(MySQL)
