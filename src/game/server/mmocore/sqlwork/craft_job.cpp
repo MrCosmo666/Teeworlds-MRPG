@@ -170,9 +170,45 @@ bool CraftJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 	if(PPSTR(CMD, "SORTEDCRAFT") == 0)
 	{
 		pPlayer->m_SortTabs[SORTCRAFT] = VoteID;
-		GS()->VResetVotes(ClientID, CRAFTING);
+		GS()->VResetVotes(ClientID, MAINMENU);
 		return true;		
 	}
 	
+	return false;
+}
+
+bool CraftJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+{
+	const int ClientID = pPlayer->GetCID();
+	if (ReplaceMenu)
+	{
+		CCharacter* pChr = pPlayer->GetCharacter();
+		if (!pChr) return false;
+
+		if (Menulist == MAINMENU && pChr->GetHelper()->BoolIndex(TILE_CRAFT))
+		{
+			pPlayer->m_LastVoteMenu = MAINMENU;
+			GS()->AVH(ClientID, HCRAFTINFO, GREEN_COLOR, "Crafting Information");
+			GS()->AVM(ClientID, "null", NOPE, HCRAFTINFO, "Choose the type of crafts you want to show");
+			GS()->AVM(ClientID, "null", NOPE, HCRAFTINFO, "If you will not have enough items for crafting");
+			GS()->AVM(ClientID, "null", NOPE, HCRAFTINFO, "You will write those and the amount that is still required");
+			GS()->AV(ClientID, "null", "");
+
+			GS()->AVH(ClientID, HCRAFTSELECT, RED_COLOR, "Crafting Select List");
+			GS()->AVM(ClientID, "SORTEDCRAFT", CRAFTBASIC, HCRAFTSELECT, "Basic Items");
+			GS()->AVM(ClientID, "SORTEDCRAFT", CRAFTARTIFACT, HCRAFTSELECT, "Artifacts");
+			GS()->AVM(ClientID, "SORTEDCRAFT", CRAFTWEAPON, HCRAFTSELECT, "Modules & Weapons");
+			GS()->AVM(ClientID, "SORTEDCRAFT", CRAFTEAT, HCRAFTSELECT, "Buffs & Eat");
+			GS()->AVM(ClientID, "SORTEDCRAFT", CRAFTWORK, HCRAFTSELECT, "Work & Job");
+			GS()->AVM(ClientID, "SORTEDCRAFT", CRAFTQUEST, HCRAFTSELECT, "Quests");
+			GS()->AV(ClientID, "null", "");
+			if (pPlayer->m_SortTabs[SORTCRAFT])
+				ShowCraftList(pPlayer, pPlayer->m_SortTabs[SORTCRAFT]);
+
+			return true;
+		}
+		return false;
+	}
+
 	return false;
 }

@@ -27,15 +27,16 @@ class WorldSwapJob : public CMmoComponent
 	typedef std::list < StructPositionLogic > WorldPositionLogicType;
 	static WorldPositionLogicType WorldPositionLogic;
 
-	int CheckPosition(vec2 Pos);
-	bool ChangingWorld(int ClientID, vec2 Pos);
-
 public:
 	virtual void OnInitGlobal();
-	virtual bool OnPlayerHandleTile(CCharacter *pChr, int IndexCollision);
+	virtual bool OnPlayerHandleTile(CCharacter* pChr, int IndexCollision);
 
-	int GetWorldType() const;
 	vec2 PositionQuestBot(int ClientID, int QuestID);
+	int GetWorldType() const;
+
+private:
+	int CheckPosition(vec2 Pos);
+	bool ChangingWorld(int ClientID, vec2 Pos);
 };
 
 #endif

@@ -971,7 +971,7 @@ void CCharacter::HandleTilesets()
 				// Крафт лист
 				case TILE_CRAFT:
 				{
-					GS()->ResetVotes(m_pPlayer->GetCID(), CRAFTING);
+					GS()->ResetVotes(m_pPlayer->GetCID(), MAINMENU);
 					GS()->Chat(m_pPlayer->GetCID(), "Information load in Vote!");	
 					m_Core.m_ProtectHooked = m_NoAllowDamage = true;	
 				} break;

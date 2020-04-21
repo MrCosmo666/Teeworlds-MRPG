@@ -17,15 +17,16 @@ class TeleportsSql : public CMmoComponent
 	typedef std::map < int , StructTeleport > Telep;
 	static Telep Teleport;
 
-	void UnlockLocation(int ClientID, vec2 Pos);
-	void ShowTeleportList(CPlayer *pPlayer);
-
 public:
 	virtual void OnInitGlobal();
 	virtual void OnInitAccount(CPlayer *pPlayer);
 	virtual bool OnPlayerHandleTile(CCharacter *pChr, int IndexCollision);
-	virtual bool OnPlayerHandleMainMenu(CPlayer *pPlayer, int Menulist, bool ReplaceMenu);
-	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
+	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
+	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+
+private:
+	void UnlockLocation(int ClientID, vec2 Pos);
+	void ShowTeleportList(CCharacter* pChar);
 };
 
 #endif

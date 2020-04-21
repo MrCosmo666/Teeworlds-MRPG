@@ -1872,15 +1872,13 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	if (Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList, true))
 	{
 		m_apPlayers[ClientID]->m_Colored = { 20,7,15 };
-		AV(ClientID, "null", "↑ The main menu will return as soon as you leave this zone! ↑");
+		AV(ClientID, "null", "↑ The main menu will return as soon as you leave this zone!");
 		return;
 	}
 
 	if(MenuList == MAINMENU)
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;
-		CCharacter* pChar = pPlayer->GetCharacter();
-
 
 		// меню статистики
 		int NeedExp = pPlayer->ExpNeed(pPlayer->Acc().Level);
@@ -1898,10 +1896,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVM(ClientID, "MENU", INBOXLIST, HPERSONAL, "✉ Mailbox");
 		AVM(ClientID, "MENU", UPGRADES, HPERSONAL, "◒ Upgrades");
 		AVM(ClientID, "MENU", SETTINGS, HPERSONAL, "☑ Settings");
-
-		if(pChar && pChar->IsAlive() && pChar->GetHelper()->BoolIndex(TILE_CRAFT))
-			AVM(ClientID, "MENU", CRAFTING, HPERSONAL, "☭ Crafting");
-		
 		AVM(ClientID, "MENU", ADVENTUREJOURNAL, HPERSONAL, "ღ Adventure Journal");
 		AVM(ClientID, "MENU", DUNGEONSMENU, HPERSONAL, "◎ Dungeons");
 		AVM(ClientID, "MENU", MEMBERMENU, HPERSONAL, "☃ Your Guild");
@@ -1915,6 +1909,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AV(ClientID, "null", "");
 
 		// чекаем местонахождение
+		CCharacter* pChar = pPlayer->GetCharacter();
 		if(!pChar || !pChar->IsAlive())
 			return;
 
@@ -1946,35 +1941,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AV(ClientID, "null", "");
 		Mmo()->Inbox()->GetInformationInbox(pPlayer);
 	}
-	else if(MenuList == CRAFTING) 
-	{
-		pPlayer->m_LastVoteMenu = MAINMENU;
-		CCharacter *pChar = pPlayer->GetCharacter();
 
-		if(pChar && pChar->GetHelper()->BoolIndex(TILE_CRAFT))
-		{
-			AVH(ClientID, HCRAFTINFO, GREEN_COLOR, "Crafting Information");
-			AVM(ClientID, "null", NOPE, HCRAFTINFO, "Choose the type of crafts you want to show");
-			AVM(ClientID, "null", NOPE, HCRAFTINFO, "If you will not have enough items for crafting");
-			AVM(ClientID, "null", NOPE, HCRAFTINFO, "You will write those and the amount that is still required");
-			AV(ClientID, "null", "");
-			
-			AVH(ClientID, HCRAFTSELECT, RED_COLOR, "Crafting Select List");
-			AVM(ClientID, "SORTEDCRAFT", CRAFTBASIC, HCRAFTSELECT, "Basic Items");
-			AVM(ClientID, "SORTEDCRAFT", CRAFTARTIFACT, HCRAFTSELECT, "Artifacts");
-			AVM(ClientID, "SORTEDCRAFT", CRAFTWEAPON, HCRAFTSELECT, "Modules & Weapons");
-			AVM(ClientID, "SORTEDCRAFT", CRAFTEAT, HCRAFTSELECT, "Buffs & Eat");
-			AVM(ClientID, "SORTEDCRAFT", CRAFTWORK, HCRAFTSELECT, "Work & Job");
-			AVM(ClientID, "SORTEDCRAFT", CRAFTQUEST, HCRAFTSELECT, "Quests");
-			AV(ClientID, "null", "");
-			if(pPlayer->m_SortTabs[SORTCRAFT])
-				Mmo()->Craft()->ShowCraftList(pPlayer, pPlayer->m_SortTabs[SORTCRAFT]);
-		}
-		else
-			AVL(ClientID, "null", "You need find craft room.");
-
-		AddBack(ClientID);
-	}
 	else if(MenuList == HOUSEMENU) 
 	{
 		pPlayer->m_LastVoteMenu = MAINMENU;

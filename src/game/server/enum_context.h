@@ -106,7 +106,6 @@ enum
 	GUILDRANK,								// гильдия ранги меню
 	MEMBERINVITES,							// гильдия приглашения меню
 	MEMBERHISTORY,							// гильдия история действий
-	CRAFTING,								// крафт меню
 	HOUSEMENU,								// дома меню
 	HOUSEDECORATION,						// дома декорации меню
 	HOUSEGUILDDECORATION,					// дома декорации гильдии меню
