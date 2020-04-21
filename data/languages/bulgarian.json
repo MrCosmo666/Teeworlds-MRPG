@@ -10,6 +10,10 @@
 },
 "translated strings": [
 	{
+		"or": " (%s seconds faster)",
+		"tr": " (по-бързо с %s секунди)"
+	},
+	{
 		"or": "%.3f KiB",
 		"tr": "%.3f КиБ"
 	},
@@ -70,6 +74,10 @@
 		"tr": "Остават %i секунди"
 	},
 	{
+		"or": "%s is muted by you",
+		"tr": "%s е заглушен(а) от Вас"
+	},
+	{
 		"or": "%s wins!",
 		"tr": "%s печели!"
 	},
@@ -102,12 +110,24 @@
 		"tr": "„%s“ влезе и се присъедини към наблюдателите"
 	},
 	{
+		"or": "'%s' finished in: %s",
+		"tr": "„%s“ завърши за: %s"
+	},
+	{
 		"or": "'%s' has left the game",
 		"tr": "„%s“ напусна играта"
 	},
 	{
 		"or": "'%s' has left the game (%s)",
 		"tr": "„%s“ напусна играта (%s)"
+	},
+	{
+		"or": "'%s' has set a new map record: %s",
+		"tr": "„%s“ записа нов рекорд на картата: %s"
+	},
+	{
+		"or": "'%s' has set a new personal record: %s",
+		"tr": "„%s“ записа нов собствен рекорд: %s"
 	},
 	{
 		"or": "'%s' initiated a pause",
@@ -148,6 +168,10 @@
 	{
 		"or": "-Page %d-",
 		"tr": "-Страница %d-"
+	},
+	{
+		"or": "-Page %d/%d-",
+		"tr": "-Страница %d/%d-"
 	},
 	{
 		"or": "Abort",
@@ -194,6 +218,10 @@
 		"tr": "Администраторът направи „%s“ наблюдател (%s)"
 	},
 	{
+		"or": "Aim bind",
+		"tr": "Прицелване"
+	},
+	{
 		"or": "All",
 		"tr": "Всички"
 	},
@@ -238,6 +266,10 @@
 		"tr": "Наистина ли искате да напуснете?"
 	},
 	{
+		"or": "Are you sure that you want to remove the clan from your friends list?",
+		"tr": "Наинстина ли искате да премахнете клана от списъка си с приятели?"
+	},
+	{
 		"or": "Are you sure that you want to remove the filter from the server browser?",
 		"tr": "Наистина ли искате да премахнете филтъра от списъка със сървъри?"
 	},
@@ -272,6 +304,10 @@
 	{
 		"or": "Basic",
 		"tr": "Прости"
+	},
+	{
+		"or": "Best spree",
+		"tr": "Най-добра серия"
 	},
 	{
 		"or": "Blue team",
@@ -320,10 +356,6 @@
 		"tr": "Затваряне"
 	},
 	{
-		"or": "Color",
-		"tr": "Цвят"
-	},
-	{
 		"or": "Compatible version",
 		"tr": "Съвместима версия"
 	},
@@ -331,6 +363,10 @@
 		"context": "Server difficulty",
 		"or": "Competitive",
 		"tr": "Съревнователен"
+	},
+	{
+		"or": "Configure statboard",
+		"tr": "Настройка на таблото с резултатите"
 	},
 	{
 		"or": "Connect",
@@ -373,6 +409,10 @@
 		"tr": "Създаден"
 	},
 	{
+		"or": "Current spree",
+		"tr": "Текуща серия"
+	},
+	{
 		"or": "Current: %dx%d (%d:%d)",
 		"tr": "Текуща: %dx%d (%d:%d)"
 	},
@@ -389,6 +429,10 @@
 		"tr": "Персонализиране"
 	},
 	{
+		"or": "Deaths",
+		"tr": "Умирания"
+	},
+	{
 		"or": "Delete",
 		"tr": "Изтриване"
 	},
@@ -399,10 +443,6 @@
 	{
 		"or": "Delete skin",
 		"tr": "Изтриване на облика"
-	},
-	{
-		"or": "Demo",
-		"tr": "Запис"
 	},
 	{
 		"or": "Demo details",
@@ -421,12 +461,20 @@
 		"tr": "Детайли"
 	},
 	{
+		"or": "Device",
+		"tr": "Устройство"
+	},
+	{
 		"or": "Difficulty",
 		"tr": "Трудност"
 	},
 	{
 		"or": "Difficulty:",
 		"tr": "Трудност:"
+	},
+	{
+		"or": "Disable whisper feature",
+		"tr": "Изключване на функционалността за шепоти"
 	},
 	{
 		"or": "Disconnect",
@@ -461,6 +509,10 @@
 		"tr": "Включване на цветните излъчвания от сървъра"
 	},
 	{
+		"or": "Enable joystick",
+		"tr": "Включване на контролера"
+	},
+	{
 		"or": "Enter",
 		"tr": "Влизане"
 	},
@@ -473,6 +525,10 @@
 		"tr": "Грешка при зареждане на запис"
 	},
 	{
+		"or": "FPM",
+		"tr": "Уб./мин"
+	},
+	{
 		"or": "Favorite",
 		"tr": "Любим"
 	},
@@ -481,8 +537,20 @@
 		"tr": "Любими"
 	},
 	{
+		"or": "Fetching server info",
+		"tr": "Получаване на информацията за сървъра"
+	},
+	{
 		"or": "Fire",
 		"tr": "Стрелба"
+	},
+	{
+		"or": "Flag captures",
+		"tr": "Превзети флагове"
+	},
+	{
+		"or": "Flag grabs",
+		"tr": "Вземания на флага"
 	},
 	{
 		"or": "Folder",
@@ -491,6 +559,14 @@
 	{
 		"or": "Force vote",
 		"tr": "Насилено гласуване"
+	},
+	{
+		"or": "Frags",
+		"tr": "Убийства"
+	},
+	{
+		"or": "Frags per minute",
+		"tr": "Убийства в минута"
 	},
 	{
 		"or": "Free-View",
@@ -543,6 +619,11 @@
 	{
 		"or": "Global",
 		"tr": "Общи"
+	},
+	{
+		"context": "Flag grabs",
+		"or": "Grabs",
+		"tr": "Вземания"
 	},
 	{
 		"or": "Graphics",
@@ -618,6 +699,22 @@
 		"tr": "Присъединихте се към червените"
 	},
 	{
+		"or": "Joystick",
+		"tr": "Контролер"
+	},
+	{
+		"or": "Joystick Axis #%d",
+		"tr": "Ос #%d"
+	},
+	{
+		"or": "Joystick jitter tolerance",
+		"tr": "Допустимо треперене на джойстика"
+	},
+	{
+		"or": "Joystick sens.",
+		"tr": "Чувствителност на контролера"
+	},
+	{
 		"or": "Jump",
 		"tr": "Скок"
 	},
@@ -654,10 +751,6 @@
 		"tr": "Зареждане на звуковата система"
 	},
 	{
-		"or": "Loading",
-		"tr": "Зареждане"
-	},
-	{
 		"or": "Local",
 		"tr": "Местни"
 	},
@@ -672,6 +765,14 @@
 	{
 		"or": "Map",
 		"tr": "Карта"
+	},
+	{
+		"or": "Map changed to '%s'",
+		"tr": "Картата е променена на „%s“"
+	},
+	{
+		"or": "Map record",
+		"tr": "Рекорд на картата"
 	},
 	{
 		"or": "Map:",
@@ -699,12 +800,20 @@
 		"tr": "Макс. време за отговор:"
 	},
 	{
+		"or": "Menu background transparency",
+		"tr": "Прозрачност на фона на менюто"
+	},
+	{
 		"or": "Menu mouse sens.",
 		"tr": "Чувств. на мишката в менютата"
 	},
 	{
 		"or": "Misc",
 		"tr": "Разнообр."
+	},
+	{
+		"or": "Mouse",
+		"tr": "Мишка"
 	},
 	{
 		"or": "Move left",
@@ -735,6 +844,15 @@
 		"tr": "Име"
 	},
 	{
+		"context": "Net score",
+		"or": "Net",
+		"tr": "Разлика"
+	},
+	{
+		"or": "Net score",
+		"tr": "Разлика уб.-ум."
+	},
+	{
 		"or": "Netversion",
 		"tr": "Мрежова версия"
 	},
@@ -762,6 +880,14 @@
 		"context": "Without/None",
 		"or": "No",
 		"tr": "Не"
+	},
+	{
+		"or": "No filter category is selected",
+		"tr": "Не е избран филтър за категорията"
+	},
+	{
+		"or": "No joysticks found. Plug in a joystick and restart the game.",
+		"tr": "Няма намерени контролери. Включете контролер и рестартирайте играта."
 	},
 	{
 		"or": "No password",
@@ -876,8 +1002,20 @@
 		"tr": "Моля уравновесете отборите!"
 	},
 	{
+		"or": "Press %s to resume chatting",
+		"tr": "Натиснетеs %s, за да продължите да пишете"
+	},
+	{
 		"or": "Press Enter to confirm or Esc to cancel",
 		"tr": "Натиснете „Enter“ за потвърждение или „Esc“ за отказ"
+	},
+	{
+		"or": "Press Tab to cycle chat recipients. Whispers aren't encrypted and might be logged by the server.",
+		"tr": "Натиснете „Tab“, за да превъртате получателите. Шепотите не са шифровани и могат да бъдат записване в журнала на сървъра."
+	},
+	{
+		"or": "Press Tab to select or Esc to cancel",
+		"tr": "Натиснете „Tab“ за избор или „Esc“ за отказ"
 	},
 	{
 		"or": "Prev. weapon",
@@ -894,6 +1032,10 @@
 	{
 		"or": "REC %3d:%02d",
 		"tr": "Записани %3d:%02d"
+	},
+	{
+		"or": "Ratio",
+		"tr": "Съотношение"
 	},
 	{
 		"or": "Ready",
@@ -988,6 +1130,14 @@
 		"tr": "Запазване"
 	},
 	{
+		"or": "Save password",
+		"tr": "Запазване на паролата"
+	},
+	{
+		"or": "Save password and server as favorite",
+		"tr": "Запазване на паролата и сървъра като любими"
+	},
+	{
 		"or": "Save skin",
 		"tr": "Запазване на облика"
 	},
@@ -1006,6 +1156,10 @@
 	{
 		"or": "Screen",
 		"tr": "Екран"
+	},
+	{
+		"or": "Screen:",
+		"tr": "Екран:"
 	},
 	{
 		"or": "Screenshot",
@@ -1062,6 +1216,10 @@
 	{
 		"or": "Show chat",
 		"tr": "Показване на чата"
+	},
+	{
+		"or": "Show chat messages from",
+		"tr": "Показване на съобщенията от"
 	},
 	{
 		"or": "Show chat messages from:",
@@ -1140,6 +1298,10 @@
 		"tr": "Наблюдателите не могат да поискат гласуване."
 	},
 	{
+		"or": "Spree",
+		"tr": "Серия"
+	},
+	{
 		"or": "Standard gametype",
 		"tr": "Стандартен тип игри"
 	},
@@ -1148,12 +1310,24 @@
 		"tr": "Стандартни карти"
 	},
 	{
+		"or": "Statboard",
+		"tr": "Табло с резултати"
+	},
+	{
+		"or": "Status",
+		"tr": "Състояние"
+	},
+	{
 		"or": "Stop record",
 		"tr": "Спиране на записването"
 	},
 	{
 		"or": "Sudden Death",
 		"tr": "Внезапна смърт"
+	},
+	{
+		"or": "Suicides",
+		"tr": "Самоубийства"
 	},
 	{
 		"or": "Switch weapon on pickup",
@@ -1180,8 +1354,20 @@
 		"tr": "Отборите са заключени. Време, което трябва да изчакате, преди да смените отбора си: %02d:%02d"
 	},
 	{
+		"or": "Teams have been balanced",
+		"tr": "Отборите бяха балансирани"
+	},
+	{
 		"or": "Teams were locked",
 		"tr": "Отборите бяха заключени"
+	},
+	{
+		"or": "Teams were shuffled",
+		"tr": "Отборите бяха разбъркани"
+	},
+	{
+		"or": "Teams were swapped",
+		"tr": "Отборите бяха разменени"
 	},
 	{
 		"or": "Teams were unlocked",
@@ -1236,12 +1422,24 @@
 		"tr": "Има незапазена карта в редактора. Ако напуснете играта, картата няма да бъде запазена."
 	},
 	{
+		"or": "Time",
+		"tr": "Време"
+	},
+	{
 		"or": "Time limit",
 		"tr": "Ограничение на времето"
 	},
 	{
 		"or": "Time limit: %d min",
 		"tr": "Ограничение на времето: %d мин"
+	},
+	{
+		"or": "Toggle dynamic camera",
+		"tr": "Превключване на динамичната камера"
+	},
+	{
+		"or": "Toggle sounds",
+		"tr": "Превключване на звуците"
 	},
 	{
 		"or": "Try again",
@@ -1345,6 +1543,10 @@
 		"tr": "Оръжие"
 	},
 	{
+		"or": "Weapons stats",
+		"tr": "Статистика за оръжията"
+	},
+	{
 		"or": "Welcome to Teeworlds",
 		"tr": "Добре дошли в Teeworlds"
 	},
@@ -1386,16 +1588,8 @@
 		"tr": "Вие бяхте преместен(а) в синия отбор с цел балансиране на отборите"
 	},
 	{
-		"or": "You were moved to the game due to team balancing",
-		"tr": "Вие бяхте преместен(а) в играта с цел балансиране на отборите"
-	},
-	{
 		"or": "You were moved to the red team due to team balancing",
 		"tr": "Вие бяхте преместен(а) в червения отбор с цел балансиране на отборите"
-	},
-	{
-		"or": "You were moved to the spectators due to team balancing",
-		"tr": "Вие бяхте преместен(а) при наблюдателит с цел балансиране на отборите"
 	},
 	{
 		"or": "blue flag",
@@ -1410,6 +1604,11 @@
 		"context": "skins",
 		"or": "decoration",
 		"tr": "украса"
+	},
+	{
+		"context": "Show chat messages from",
+		"or": "everyone",
+		"tr": "всички"
 	},
 	{
 		"context": "Show chat messages from:",
@@ -1427,6 +1626,11 @@
 		"tr": "крака"
 	},
 	{
+		"context": "Show chat messages from",
+		"or": "friends only",
+		"tr": "само от приятели"
+	},
+	{
 		"context": "Show chat messages from:",
 		"or": "friends only",
 		"tr": "само от приятели"
@@ -1437,6 +1641,10 @@
 		"tr": "ръце"
 	},
 	{
+		"or": "key not found",
+		"tr": "ключът не е намерен"
+	},
+	{
 		"or": "locked",
 		"tr": "заключено"
 	},
@@ -1444,6 +1652,11 @@
 		"context": "skins",
 		"or": "marking",
 		"tr": "оцветяване"
+	},
+	{
+		"context": "Show chat messages from",
+		"or": "no one",
+		"tr": "никого"
 	},
 	{
 		"context": "Show chat messages from:",
