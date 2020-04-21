@@ -1970,7 +1970,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		// Улучшения класса TANK танк
 		Range = pPlayer->GetLevelDisciple(AtributType::AtTank);
-		AVH(ClientID, HUPGTANK, BLUE_COLOR, "Disciple of Tank. Level Range {INT}", "lvl", &Range);
+		AVH(ClientID, HUPGTANK, BLUE_COLOR, "Disciple of Tank. Level Range {INT}", &Range);
 		for(const auto& at : AttributInfo)
 		{
 			if(at.second.AtType != AtributType::AtTank || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
@@ -1982,7 +1982,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		// Улучшения класса HEALER хил
 		Range = pPlayer->GetLevelDisciple(AtributType::AtHealer);
-		AVH(ClientID, HUPGHEALER, GREEN_COLOR, "Disciple of Healer. Level Range {INT}", "lvl", &Range);
+		AVH(ClientID, HUPGHEALER, GREEN_COLOR, "Disciple of Healer. Level Range {INT}", &Range);
 		for(const auto& at : AttributInfo)
 		{
 			if(at.second.AtType != AtributType::AtHealer || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 

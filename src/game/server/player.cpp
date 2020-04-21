@@ -791,8 +791,10 @@ int CPlayer::GetLevelDisciple(int Class)
 	int Atributs = 0;
 	for (const auto& at : CGS::AttributInfo)
 	{
-		if (at.second.AtType != Class) continue;
-		Atributs += GetAttributeCount(at.first);
+		if (at.second.AtType != Class) 
+			continue;
+		
+		Atributs += GetAttributeCount(at.first, true);
 	}
 	return Atributs;
 }
