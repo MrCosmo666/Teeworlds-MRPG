@@ -467,7 +467,7 @@ void CPlayer::SetLanguage(const char* pLanguage)
 {
 	str_copy(m_aLanguage, pLanguage, sizeof(m_aLanguage));
 }
-// Установка здоровья и маны
+
 void CPlayer::SetStandart(int Health, int Mana)
 {
 	Acc().PlayerHealth = Health;
@@ -577,6 +577,9 @@ const char* CPlayer::GetLanguage()
 // Добавить статистику в broadcast
 void CPlayer::ShowInformationStats()
 {
+	if (m_ClientID >= MAX_PLAYERS)
+		return;
+
 	int Health = GetHealth();
 	int StartHealth = GetStartHealth();
 	int Mana = m_pCharacter->Mana();

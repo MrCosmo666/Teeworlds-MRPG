@@ -96,9 +96,9 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_Core.m_WorldID = GS()->CheckPlayerMessageWorldID(m_pPlayer->GetCID());
 	if(!m_pPlayer->IsBot())
 	{
-		m_pPlayer->ShowInformationStats();
 		m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
-
+		m_pPlayer->SetStandart(m_Health, m_Mana);
+		m_pPlayer->ShowInformationStats();
 		CreateQuestsSteps();
 	}
 	GS()->VResetVotes(m_pPlayer->GetCID(), m_pPlayer->m_OpenVoteMenu);
@@ -538,7 +538,6 @@ void CCharacter::ResetInput()
 
 void CCharacter::Tick()
 {
-	m_pPlayer->SetStandart(m_Health, m_Mana);
 	HandleTunning();
 
 	m_Core.m_Input = m_Input;
@@ -696,6 +695,7 @@ bool CCharacter::IncreaseHealth(int Amount)
 
 	int m_OldHealth = m_Health;
 	m_Health = clamp(m_Health+Amount, 0, m_pPlayer->GetStartHealth());
+	m_pPlayer->SetStandart(m_Health, m_Mana);
 	m_pPlayer->ShowInformationStats();
 
 	if(IsAlive())
@@ -712,6 +712,9 @@ bool CCharacter::IncreaseArmor(int Amount)
 	if(m_Armor >= 10)
 		return false;
 	m_Armor = clamp(m_Armor+Amount, 0, 10);
+
+	m_pPlayer->SetStandart(m_Health, m_Mana);
+	m_pPlayer->ShowInformationStats();
 	return true;
 }
 
@@ -842,13 +845,20 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 	if(m_Health <= 0)
 	{
 		m_Health = 0;
-		if(!m_pPlayer->IsBot()) Die(From, Weapon);
-		if (From != m_pPlayer->GetCID() && pFrom->GetCharacter()) pFrom->GetCharacter()->SetEmote(EMOTE_HAPPY, 1);
+		m_pPlayer->SetStandart(m_Health, m_Mana);
+		m_pPlayer->ShowInformationStats();
+
+		if(!m_pPlayer->IsBot()) 
+			Die(From, Weapon);
+		if (From != m_pPlayer->GetCID() && pFrom->GetCharacter()) 
+			pFrom->GetCharacter()->SetEmote(EMOTE_HAPPY, 1);
 		return false;
 	}
 
-	if (Dmg > 2) GS()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_LONG);
-	else GS()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_SHORT);
+	if (Dmg > 2) 
+		GS()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_LONG);
+	else 
+		GS()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_SHORT);
 
 	m_EmoteType = EMOTE_PAIN;
 	m_EmoteStop = Server()->Tick() + 500 * Server()->TickSpeed() / 1000;
@@ -1187,13 +1197,13 @@ void CCharacter::HandleAuthedPlayer()
 	if(!IsAlive() || !m_pPlayer->IsAuthed())
 		return;
 
-	// тик весь в одной секунде
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
 	{
 		// мана прибавка
 		if(m_Mana < m_pPlayer->GetStartMana())
 		{
 			m_Mana += clamp(m_pPlayer->GetStartMana() / 20, 1, m_pPlayer->GetStartMana() / 20);
+			m_pPlayer->SetStandart(m_Health, m_Mana);
 			m_pPlayer->ShowInformationStats();
 		}
 	}
@@ -1207,6 +1217,7 @@ bool CCharacter::CheckFailMana(int Mana)
 		return true;
 	}
 	m_Mana -= Mana;
+	m_pPlayer->SetStandart(m_Health, m_Mana);
 	m_pPlayer->ShowInformationStats();
 	return false;	
 }
