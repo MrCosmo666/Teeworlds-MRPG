@@ -44,36 +44,32 @@ void CJobItems::Work(int ClientID)
 	if(ClientID >= MAX_PLAYERS || ClientID < 0 || m_Progress >= m_Health || !GS()->m_apPlayers[ClientID])
 		return;
 
-	char aBuf[128];
 	CPlayer *pPlayer = GS()->m_apPlayers[ClientID];
 	ItemSql::ItemPlayer &PlDropItem = pPlayer->GetItem(m_ItemID);
 	if(m_Type == 1)
 	{
 		int EquipItem = pPlayer->GetItemEquip(EQUIP_MINER);
-		if(EquipItem <= 0) return pPlayer->AddInBroadcast("Need equip Pickaxe\n");
+		if(EquipItem <= 0) 
+			return GS()->SBL(ClientID, 100000, 100, "Need equip Pickaxe");
 
 		// проверка уровня на доступность
 		ItemSql::ItemPlayer &PlEquipItem = pPlayer->GetItem(EquipItem);
 		if(pPlayer->Acc().Miner[PlLevel] < m_Level)
-		{
-			str_format(aBuf, sizeof(aBuf), "^611Your level low. %s %d Level\n", PlDropItem.Info().GetName(pPlayer), m_Level);
-			pPlayer->AddInBroadcast(aBuf);
-			return;
-		}
+			return GS()->SBL(ClientID, 100000, 100, "Your level low. {STR} {INT} Level", PlDropItem.Info().GetName(pPlayer), &m_Level);
 
 		int Durability = PlEquipItem.Durability;
-		{ // кирка поломка и информация о ремонте
-			if(rand()%10 == 0) GS()->Mmo()->Item()->SetDurability(pPlayer, EquipItem, Durability-1);
-			if(Durability <= 0) return pPlayer->AddInBroadcast("Need repair Pickaxe\n"); 
-		}
+		if(rand()%10 == 0) 
+			GS()->Mmo()->Item()->SetDurability(pPlayer, EquipItem, Durability-1);
+		if(Durability <= 0) 
+			return GS()->SBL(ClientID, 100000, 100, "Need repair pickaxe!");
 
 		m_Progress += 3+pPlayer->EnchantAttributes(Stats::StEfficiency);
 		GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
-		str_format(aBuf, sizeof(aBuf), "Level %d Mining %s work [HP %d/%d]\n", 
-			m_Level, PlDropItem.Info().GetName(pPlayer), (m_Progress > m_Health ? m_Health : m_Progress), m_Health);
-		pPlayer->AddInBroadcast(aBuf);
-		str_format(aBuf, sizeof(aBuf), "Durability %s (%d/100%%)\n", PlEquipItem.Info().GetName(pPlayer), Durability);
-		pPlayer->AddInBroadcast(aBuf);
+
+		GS()->SBL(ClientID, 100000, 100, "{STR} [PR {INT}/{INT}] : {STR} ({INT}/100%)", 
+			PlDropItem.Info().GetName(pPlayer), 
+			(m_Progress > m_Health ? &m_Health : &m_Progress), &m_Health, 
+			PlEquipItem.Info().GetName(pPlayer), &Durability);
 
 		if(m_Progress >= m_Health)
 		{
@@ -88,17 +84,13 @@ void CJobItems::Work(int ClientID)
 
 	// проверка уровня на доступность
 	if(pPlayer->Acc().Plant[PlLevel] < m_Level)
-	{
-		str_format(aBuf, sizeof(aBuf), "^611Your level low. %s %d Level\n", PlDropItem.Info().GetName(pPlayer), m_Level);
-		pPlayer->AddInBroadcast(aBuf);
-		return;
-	}
+		return GS()->SBL(ClientID, 100000, 100, "Your level low. {STR} {INT} Level", PlDropItem.Info().GetName(pPlayer), &m_Level);
 
 	m_Progress += 10;
 	GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
-	str_format(aBuf, sizeof(aBuf), "Level %d Harvest %s work [HP %d/%d]\n", 
-		m_Level, PlDropItem.Info().GetName(pPlayer), m_Progress, m_Health);
-	pPlayer->AddInBroadcast(aBuf);
+
+	GS()->SBL(ClientID, 100000, 100, "{STR} [HP {INT}/{INT}]",
+		PlDropItem.Info().GetName(pPlayer), (m_Progress > m_Health ? &m_Health : &m_Progress), &m_Health);
 
 	if(m_Progress >= m_Health)
 	{

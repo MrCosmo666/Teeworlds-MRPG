@@ -15,7 +15,6 @@ SqlController::SqlController(CGS *pGameServer) : m_pGameServer(pGameServer)
 	m_Components.add(m_pBotsInfo = new ContextBots());
 	m_Components.add(m_pAccMiner = new MinerAccSql());
 	m_Components.add(m_pAccPlant = new PlantsAccSql());
-	m_Components.add(m_pAccRelax = new SpaRelaxSql());
 	m_Components.add(m_pCraftJob = new CraftJob());
 	m_Components.add(m_pDungeonJob = new DungeonJob());
 	m_Components.add(m_pHouseJob = new HouseJob());
@@ -141,6 +140,12 @@ bool SqlController::OnMessage(int MsgID, void *pRawMsg, int ClientID)
 	return false;
 }
 
+void SqlController::ResetClientData(int ClientID)
+{
+	for (auto& component : m_Components.m_paComponents)
+		component->OnResetClientData(ClientID);
+}
+
 // Сохранение аккаунта
 void SqlController::SaveAccount(CPlayer *pPlayer, int Table)
 {
@@ -172,20 +177,6 @@ void SqlController::SaveAccount(CPlayer *pPlayer, int Table)
 
 		// обновляем статистику и очищаем буфер
 		SJK.UD("tw_accounts_data", "Upgrade = '%d' %s WHERE ID = '%d'", pPlayer->Acc().Upgrade, Buffer.buffer(), pPlayer->Acc().AuthID);
-		Buffer.clear();
-		return;
-	}
-
-	// сохранение спа аккаунта
-	else if(Table == SAVESPAACCOUNT)
-	{
-		char aBuf[64];
-		dynamic_string Buffer;
-		for(int i = 0; i < RELAX::NUM_RELAX; i++) {
-			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", str_RELAX((RELAX) i), pPlayer->Acc().Relax[i], (i == NUM_RELAX-1 ? "" : ", "));
-			Buffer.append_at(Buffer.length(), aBuf);
-		}
-		SJK.UD("tw_accounts_relax", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().AuthID);
 		Buffer.clear();
 		return;
 	}

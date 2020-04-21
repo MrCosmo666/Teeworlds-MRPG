@@ -43,13 +43,13 @@ void WorldSwapJob::OnInitGlobal()
 bool WorldSwapJob::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 {
 	CPlayer *pPlayer = pChr->GetPlayer();
-	if(pChr->GetHelper()->TileEnter(IndexCollision, TILE_WORLDSWAP))
+	if(pChr->GetHelper()->TileEnter(IndexCollision, TILE_WORLD_SWAP))
 	{
 		pChr->m_Core.m_ProtectHooked = true;
 		pChr->m_NoAllowDamage = true;
 		return true;
 	}
-	else if(pChr->GetHelper()->TileExit(IndexCollision, TILE_WORLDSWAP))
+	else if(pChr->GetHelper()->TileExit(IndexCollision, TILE_WORLD_SWAP))
 	{
 		pChr->m_Core.m_ProtectHooked = false;
 		pChr->m_NoAllowDamage = false;
@@ -57,7 +57,7 @@ bool WorldSwapJob::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 	}
 
 
-	if(pChr->GetHelper()->BoolIndex(TILE_WORLDSWAP))
+	if(pChr->GetHelper()->BoolIndex(TILE_WORLD_SWAP))
 	{
 		if(ChangingWorld(pPlayer->GetCID(), pChr->m_Core.m_Pos))
 			return true;

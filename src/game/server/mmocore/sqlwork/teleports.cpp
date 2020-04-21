@@ -64,7 +64,7 @@ bool TeleportsSql::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
 	CPlayer* pPlayer = pChr->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
 
-	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_AETHER))
+	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_AETHER_TELEPORT))
 	{
 		GS()->Chat(ClientID, "List of your Aether Locations, you can see on vote!");
 		UnlockLocation(ClientID, pChr->m_Core.m_Pos);
@@ -74,7 +74,7 @@ bool TeleportsSql::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
 		GS()->VResetVotes(ClientID, MAINMENU);
 		return true;
 	}
-	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_AETHER))
+	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_AETHER_TELEPORT))
 	{
 		pChr->m_Core.m_ProtectHooked = false;
 		pChr->m_NoAllowDamage = false;
@@ -92,7 +92,7 @@ bool TeleportsSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool R
 		CCharacter* pChr = pPlayer->GetCharacter();
 		if (!pChr || !pChr->IsAlive()) return false;
 
-		if (Menulist == MAINMENU && pChr->GetHelper()->BoolIndex(TILE_AETHER))
+		if (Menulist == MAINMENU && pChr->GetHelper()->BoolIndex(TILE_AETHER_TELEPORT))
 		{
 			ShowTeleportList(pChr);
 			return true;

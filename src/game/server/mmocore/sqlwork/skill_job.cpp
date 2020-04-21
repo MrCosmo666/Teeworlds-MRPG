@@ -34,16 +34,82 @@ void SkillJob::OnInitGlobal()
 	}
 }
 
-// Загрузка данных игрока
 void SkillJob::OnInitAccount(CPlayer *pPlayer)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("SkillID, SkillLevel", "tw_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	while(RES->next())
 	{
 		const int SkillID = (int)RES->getInt("SkillID");
 		Skill[ClientID][SkillID].m_SkillLevel = (int)RES->getInt("SkillLevel");
 	}		
+}
+
+void SkillJob::OnResetClientData(int ClientID)
+{
+	if (Skill.find(ClientID) != Skill.end())
+		Skill.erase(ClientID);
+}
+
+bool SkillJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+{
+	if (ReplaceMenu)
+	{
+		CCharacter* pChr = pPlayer->GetCharacter();
+		if (!pChr) return false;
+
+		if (Menulist == MAINMENU && pChr->GetHelper()->BoolIndex(TILE_LEARN_SKILL))
+		{
+			ShowMailSkillList(pPlayer);
+			return true;
+		}
+		return false;
+	}
+	return false;
+}
+
+bool SkillJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
+{
+	CPlayer* pPlayer = pChr->GetPlayer();
+	const int ClientID = pPlayer->GetCID();
+
+	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_LEARN_SKILL))
+	{
+		GS()->Chat(ClientID, "You can see list of available skills in the voting!");
+		pChr->m_Core.m_ProtectHooked = true;
+		pChr->m_NoAllowDamage = true;
+		GS()->ResetVotes(ClientID, MAINMENU);
+		return true;
+	}
+	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_LEARN_SKILL))
+	{
+		pChr->m_Core.m_ProtectHooked = true;
+		pChr->m_NoAllowDamage = true;
+		GS()->ResetVotes(ClientID, MAINMENU);
+		return true;
+	}
+
+	return false;
+}
+
+// парсинг голосований
+bool SkillJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+{
+	int ClientID = pPlayer->GetCID();
+
+	// улучшение скилла
+	if (PPSTR(CMD, "SKILLLEARN") == 0)
+	{
+		const int SkillID = VoteID;
+
+		// улучшение
+		if (UpgradeSkill(pPlayer, SkillID))
+		{
+			GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		}
+		return true;
+	}
+	return false;
 }
 
 /* #########################################################################
@@ -189,42 +255,5 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 		new CSleepyGravity(&GS()->m_World, pPlayer, SkillLevel, ManaUsePrice, pChr->m_Core.m_Pos);
 	}
 
-	return false;
-}
-
-bool SkillJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
-{
-	if (ReplaceMenu)
-	{
-		CCharacter* pChr = pPlayer->GetCharacter();
-		if (!pChr) return false;
-
-		if (Menulist == MAINMENU && pChr->GetHelper()->BoolIndex(TILE_LEARNSKILL))
-		{
-			ShowMailSkillList(pPlayer);
-			return true;
-		}
-		return false;
-	}
-	return false;
-}
-
-// парсинг голосований
-bool SkillJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
-{
-	int ClientID = pPlayer->GetCID();
-
-	// улучшение скилла
-	if(PPSTR(CMD, "SKILLLEARN") == 0)
-	{
-		const int SkillID = VoteID;
-
-		// улучшение
-		if(UpgradeSkill(pPlayer, SkillID))
-		{
-			GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-		}
-		return true;				
-	}
 	return false;
 }

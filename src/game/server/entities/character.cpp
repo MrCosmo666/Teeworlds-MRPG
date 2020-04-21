@@ -78,7 +78,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_Mana = 0;
 	m_OldPos = Pos;
 	m_NoAllowDamage = false;
-	m_Event = TILE_CLEAREVENTS;
+	m_Event = TILE_CLEAR_EVENTS;
 
 	m_Pos = Pos;
 	m_Core.Reset();
@@ -96,7 +96,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_Core.m_WorldID = GS()->CheckPlayerMessageWorldID(m_pPlayer->GetCID());
 	if(!m_pPlayer->IsBot())
 	{
-		m_pPlayer->AddInformationStats();
+		m_pPlayer->ShowInformationStats();
 		m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
 
 		CreateQuestsSteps();
@@ -696,7 +696,7 @@ bool CCharacter::IncreaseHealth(int Amount)
 
 	int m_OldHealth = m_Health;
 	m_Health = clamp(m_Health+Amount, 0, m_pPlayer->GetStartHealth());
-	m_pPlayer->AddInformationStats();
+	m_pPlayer->ShowInformationStats();
 
 	if(IsAlive())
 	{
@@ -813,7 +813,7 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 	{
 		m_Health -= Dmg;
 		m_pPlayer->SetStandart(m_Health, m_Mana);
-		m_pPlayer->AddInformationStats();
+		m_pPlayer->ShowInformationStats();
 	}
 
 	// create healthmod indicator
@@ -926,96 +926,66 @@ void CCharacter::HandleTilesets()
 		return;
 
 	// check all tilesets
-	for(int i = TILE_MEMBERHOUSE; i < MAX_TILES; i++) {
+	for(int i = TILE_GUILD_HOUSE; i < MAX_TILES; i++) 
+	{
 		if(m_pHelper->TileEnter(Index, i))
 		{
 			switch(i)
 			{
-				// Обновление меню и отправка информации в голосование
-				case TILE_STORAGE:
-				case TILE_AUCTION:
-				case TILE_LEARNSKILL:
+				case TILE_GUILD_HOUSE:
 				{
-					GS()->ResetVotes(m_pPlayer->GetCID(), MAINMENU);
+					int HouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
+					if (HouseID > 0) GS()->ResetVotes(m_pPlayer->GetCID(), MAINMENU);
+
 					GS()->Chat(m_pPlayer->GetCID(), "Information load in Vote!");
 					m_Core.m_ProtectHooked = m_NoAllowDamage = true;
-				} break;
+					break;
+				} 
 
-				// Дом и проверка позиций и вывод информации
-				case TILE_HOUSE:
-				{	
+				case TILE_PLAYER_HOUSE:
+				{
 					int HouseID = GS()->Mmo()->House()->GetHouse(m_Core.m_Pos);
-					if(HouseID > 0)
+					if (HouseID > 0)
 					{
-						// reset votes
 						GS()->ResetVotes(m_pPlayer->GetCID(), MAINMENU);
-				
-						// send info house in broadcast
+
 						int PriceHouse = GS()->Mmo()->House()->GetHousePrice(HouseID);
 						GS()->SBL(m_pPlayer->GetCID(), PRERARE, 200, "House Price: {INT}gold \n"
 							" Owner: {STR}.\nInformation load in vote.", &PriceHouse, GS()->Mmo()->House()->OwnerName(HouseID));
 					}
 					m_Core.m_ProtectHooked = m_NoAllowDamage = true;
-				} break;
+					break;
+				} 
 
-				// Проверка домов
-				case TILE_MEMBERHOUSE:
-				{
-					int HouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
-					if(HouseID > 0) GS()->ResetVotes(m_pPlayer->GetCID(), MAINMENU);
-
-					GS()->Chat(m_pPlayer->GetCID(), "Information load in Vote!");	
-					m_Core.m_ProtectHooked = m_NoAllowDamage = true;
-				} break;
-
-				// Крафт лист
-				case TILE_CRAFT:
+				case TILE_LEARN_SKILL:
+				case TILE_PLAYER_BUSSINES:
+				case TILE_CRAFT_ZONE:
 				{
 					GS()->ResetVotes(m_pPlayer->GetCID(), MAINMENU);
-					GS()->Chat(m_pPlayer->GetCID(), "Information load in Vote!");	
-					m_Core.m_ProtectHooked = m_NoAllowDamage = true;	
-				} break;
-
-				// Список квестов
-				case TILE_QUESTS:
-				{
-					GS()->ResetVotes(m_pPlayer->GetCID(), ADVENTUREJOURNAL);
-					GS()->Chat(m_pPlayer->GetCID(), "Information load in Vote!");	
+					GS()->Chat(m_pPlayer->GetCID(), "Information load in Vote!");
 					m_Core.m_ProtectHooked = m_NoAllowDamage = true;
-				} break;
+					break;
+				} 
 
-				// Спа салон
-				case TILE_SPASALON:
+				case TILE_GUILD_CHAIRS:
 				{
-					if(m_Core.m_Vel.y > 10.0f)
-					{
-						GS()->CreateDeath(m_Core.m_Pos, m_pPlayer->GetCID());
-						GS()->CreatePlayerSound(m_pPlayer->GetCID(), SOUND_PICKUP_NINJA);		
-					}
-					GS()->ResetVotes(m_pPlayer->GetCID(), MAINMENU);			
-					m_Core.m_ProtectHooked = m_NoAllowDamage = true;				
-				} break;
-
-				// Дать защиту урона и крюка
-				case TILE_BASICRELAX:
-				case TILE_CLANRELAX:
-
-				// Инвенты установить
-				case TILE_CLEAREVENTS:
-				case TILE_EVENTPARTY:
-					SetEvent(i);
-				break;
-				case TILE_WATER:
-					GS()->CreateDeath(m_Pos, m_pPlayer->GetCID());
-				break;
-				case TILE_CLUB:
-				{
-					int Level = 1 + m_pPlayer->GetItem(itClubSeasonTicket).Enchant;
-					GS()->SBL(m_pPlayer->GetCID(), 100000, 100, "Welcome to Club\nYou season level {INT}", &Level);
-					SetEvent(TILE_EVENTPARTY);
-					m_NoAllowDamage = true;
+					m_Core.m_ProtectHooked = m_NoAllowDamage = false;
+					break;
 				}
-				break;
+
+				case TILE_CLEAR_EVENTS:
+				case TILE_EVENT_PARTY:
+				case TILE_EVENT_LIKE:
+				{
+					SetEvent(i);
+					break;
+				}
+
+				case TILE_WATER:
+				{
+					GS()->CreateDeath(m_Pos, m_pPlayer->GetCID());
+					break;
+				}
 			}
 		}
 		else if(m_pHelper->TileExit(Index, i))
@@ -1023,62 +993,35 @@ void CCharacter::HandleTilesets()
 			switch(i)
 			{
 				// Снятие урона защиты и крюка и обновить меню
-				case TILE_STORAGE:
-				case TILE_CRAFT:
-				case TILE_QUESTS:
-				case TILE_AUCTION:
-				case TILE_LEARNSKILL:
-				case TILE_HOUSE:
-				case TILE_MEMBERHOUSE:
+				case TILE_LEARN_SKILL:
+				case TILE_PLAYER_BUSSINES:
+				case TILE_CRAFT_ZONE:
+				case TILE_PLAYER_HOUSE:
+				case TILE_GUILD_HOUSE:
 				{
 					GS()->ResetVotes(m_pPlayer->GetCID(), MAINMENU);
 					m_Core.m_ProtectHooked = m_NoAllowDamage = false;
-				} break;
-
-				// Спасалон выход из него
-				case TILE_SPASALON:
-				{
-					if(m_Core.m_Vel.y < 10.0f)
-					{
-						GS()->CreateDeath(m_Core.m_Pos, m_pPlayer->GetCID());
-						GS()->CreatePlayerSound(m_pPlayer->GetCID(), SOUND_PICKUP_NINJA);
-					}
-					GS()->ResetVotes(m_pPlayer->GetCID(), MAINMENU);
-					m_Core.m_ProtectHooked = m_NoAllowDamage = false;
-				} break;
+					break;
+				}
 
 				// Снятие урона защиты и крюка
-				case TILE_BASICRELAX:
-				case TILE_CLANRELAX:
-				case TILE_WORLDSWAP:
+				case TILE_GUILD_CHAIRS:
 				{
 					m_Core.m_ProtectHooked = m_NoAllowDamage = false;
-				} break;
+					break;
+				}
 
 				case TILE_WATER:
+				{
 					GS()->CreateDeath(m_Pos, m_pPlayer->GetCID());
-				break;
-
-				case TILE_CLUB:
-					SetEvent(TILE_CLEAREVENTS);
-					m_NoAllowDamage = false;				
-				break;
+					break;
+				}
 			}
 		}
 	}
 
-	// Релакс обычный
-	if(m_pHelper->BoolIndex(TILE_BASICRELAX))
-	{
-		if(Server()->Tick() % Server()->TickSpeed() == 0)
-		{
-			GS()->Mmo()->SpaAcc()->Work(m_pPlayer->GetCID());
-			SetEmote(EMOTE_HAPPY, 1);
-		}
-	}
-
-	// Релакс клана
-	if(m_pHelper->BoolIndex(TILE_CLANRELAX))
+	// Седения гильдии
+	if(m_pHelper->BoolIndex(TILE_GUILD_CHAIRS))
 	{
 		if(Server()->Tick() % Server()->TickSpeed() == 0) 
 		{
@@ -1090,24 +1033,6 @@ void CCharacter::HandleTilesets()
 			const int Money = GS()->Mmo()->Member()->GetMemberChairBonus(GuildID, EMEMBERUPGRADE::ChairNSTMoney);
 			m_pPlayer->AddExp(Exp);
 			m_pPlayer->AddMoney(Money);
-		}
-	}
-
-	// Сезоный клуб
-	if(m_pHelper->BoolIndex(TILE_CLUB))
-	{
-		if(!m_pPlayer->GetItem(itClubSeasonTicket).Settings)
-		{
-			Die(m_pPlayer->GetCID(), WEAPON_SELF);
-			GS()->Chat(m_pPlayer->GetCID(), "You need {STR}!", GS()->GetItemInfo(itClubSeasonTicket).GetName(m_pPlayer));			
-			return;
-		}
-
-		if(Server()->Tick() % Server()->TickSpeed() == 0)
-		{
-			int SeasonLevel = m_pPlayer->GetItem(itClubSeasonTicket).Enchant+1;
-			m_pPlayer->AddExp(SeasonLevel*5);
-			m_pPlayer->GetItem(itSeasonToken).Add(SeasonLevel);
 		}
 	}
 }
@@ -1226,26 +1151,6 @@ void CCharacter::HandleTunning()
 	if(m_pPlayer->IsBot())
 		return;
 
-	// спа салон
-	if(m_pHelper->BoolIndex(TILE_SPASALON))
-	{
-		if(Server()->Tick() % Server()->TickSpeed() == 0)
-		{
-			GS()->Mmo()->SpaAcc()->Work(m_pPlayer->GetCID());
-			SetEmote(EMOTE_HAPPY, 1);
-		}
-		pTuningParams->m_Gravity = 0.00f;
-		pTuningParams->m_GroundFriction = 0.95f;
-		pTuningParams->m_GroundControlSpeed = 250.0f / Server()->TickSpeed();
-		pTuningParams->m_GroundControlAccel = 1.5f;
-		pTuningParams->m_GroundJumpImpulse = 5.0f;
-		pTuningParams->m_AirFriction = 0.95f;
-		pTuningParams->m_AirControlSpeed = 250.0f / Server()->TickSpeed();
-		pTuningParams->m_AirControlAccel = 1.5f;
-		pTuningParams->m_AirJumpImpulse = 5.0f;
-		pTuningParams->m_PlayerHooking = false;
-	}
-
 	// режим полета
 	if(m_pPlayer->m_Flymode && m_pPlayer->GetItemEquip(EQUIP_WINGS) > 0)
 	{
@@ -1258,7 +1163,7 @@ void CCharacter::HandleTunning()
 	}
 
 	// тайл инвента
-	if(m_Event == TILE_EVENTPARTY)
+	if(m_Event == TILE_EVENT_PARTY)
 	{
 		SetEmote(EMOTE_HAPPY, 1);
 		if(rand()%50 == 0)
@@ -1266,6 +1171,14 @@ void CCharacter::HandleTunning()
 			GS()->SendEmoticon(m_pPlayer->GetCID(), 1+rand()%2);
 			GS()->CreateDeath(m_Core.m_Pos, m_pPlayer->GetCID());
 		}
+	}	
+	
+	// тайл инвента
+	if(m_Event == TILE_EVENT_LIKE)
+	{
+		SetEmote(EMOTE_HAPPY, 1);
+		if (Server()->Tick() % Server()->TickSpeed() == 0)
+			GS()->SendMmoEffect(m_Core.m_Pos, EFFECT_SPASALON);
 	}
 }
 
@@ -1281,7 +1194,7 @@ void CCharacter::HandleAuthedPlayer()
 		if(m_Mana < m_pPlayer->GetStartMana())
 		{
 			m_Mana += clamp(m_pPlayer->GetStartMana() / 20, 1, m_pPlayer->GetStartMana() / 20);
-			m_pPlayer->AddInformationStats();
+			m_pPlayer->ShowInformationStats();
 		}
 	}
 }
@@ -1290,11 +1203,11 @@ bool CCharacter::CheckFailMana(int Mana)
 {
 	if(m_Mana < Mana)
 	{
-		m_pPlayer->AddInBroadcast("No mana for use this or for maintenance.\n");
+		GS()->SBL(m_pPlayer->GetCID(), 10000, 100, "No mana for use this or for maintenance.");
 		return true;
 	}
-	m_pPlayer->AddInformationStats();
 	m_Mana -= Mana;
+	m_pPlayer->ShowInformationStats();
 	return false;	
 }
 

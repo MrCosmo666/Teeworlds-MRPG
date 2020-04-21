@@ -27,6 +27,30 @@ void ShopMailSql::OnTickLocalWorld()
 		CheckAuctionTime();
 }
 
+bool ShopMailSql::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
+{
+	CPlayer* pPlayer = pChr->GetPlayer();
+	const int ClientID = pPlayer->GetCID();
+
+	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_AUCTION))
+	{
+		GS()->Chat(ClientID, "You can see list of auctions items in the votes!");
+		pChr->m_Core.m_ProtectHooked = true;
+		pChr->m_NoAllowDamage = true;
+		GS()->ResetVotes(ClientID, MAINMENU);
+		return true;
+	}
+	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_AUCTION))
+	{
+		pChr->m_Core.m_ProtectHooked = true;
+		pChr->m_NoAllowDamage = true;
+		GS()->ResetVotes(ClientID, MAINMENU);
+		return true;
+	}
+
+	return false;
+}
+
 void ShopMailSql::ShowMailShop(CPlayer *pPlayer, int StorageID)
 {
 	const int ClientID = pPlayer->GetCID();
@@ -253,7 +277,7 @@ bool ShopMailSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Re
 			return true;
 		}
 
-		if (pChr->GetHelper()->BoolIndex(TILE_STORAGE))
+		if (pChr->GetHelper()->BoolIndex(TILE_PLAYER_BUSSINES))
 		{
 			const int StorageID = Job()->Storage()->GetStorageID(pChr->m_Core.m_Pos);
 			Job()->Storage()->ShowStorageMenu(ClientID, StorageID);

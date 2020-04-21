@@ -67,6 +67,30 @@ void StorageSql::OnPaymentTime()
 	}
 }
 
+bool StorageSql::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
+{
+	CPlayer* pPlayer = pChr->GetPlayer();
+	const int ClientID = pPlayer->GetCID();
+
+	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_PLAYER_BUSSINES))
+	{
+		GS()->Chat(ClientID, "You can see list of store items in the votes!");
+		pChr->m_Core.m_ProtectHooked = true;
+		pChr->m_NoAllowDamage = true;
+		GS()->ResetVotes(ClientID, MAINMENU);
+		return true;
+	}
+	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_PLAYER_BUSSINES))
+	{
+		pChr->m_Core.m_ProtectHooked = true;
+		pChr->m_NoAllowDamage = true;
+		GS()->ResetVotes(ClientID, MAINMENU);
+		return true;
+	}
+
+	return false;
+}
+
 bool StorageSql::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();

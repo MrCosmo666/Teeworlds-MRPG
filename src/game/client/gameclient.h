@@ -331,7 +331,6 @@ public:
 	class CMapLayers *m_pMapLayersForeGround;
 
 	class CTalkText* m_pTalkText;
-	class CQuestingProcessing* m_pQuestProcess;
 	class CCSkinChanger* m_pSkinChanger;
 
 };

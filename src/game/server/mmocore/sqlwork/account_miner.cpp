@@ -5,26 +5,23 @@
 #include "account_miner.h"
 
 using namespace sqlstr;
-std::map < int , MinerAccSql::StructOres > MinerAccSql::DataOre;
+std::map < int , MinerAccSql::StructOres > MinerAccSql::Ore;
 
-// Инициализация класса
 void MinerAccSql::OnInitLocal(const char *pLocal)
 {
-	// загружаем руду
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_position_miner", pLocal));
 	while(RES->next())
 	{
 		const int ID = RES->getInt("ID");
-		DataOre[ ID ].ItemID = RES->getInt("ItemID");
-		DataOre[ ID ].Level = RES->getInt("Level");
-		DataOre[ ID ].Health = RES->getInt("Health");
-		DataOre[ ID ].PositionX = RES->getInt("PositionX");
-		DataOre[ ID ].PositionY = RES->getInt("PositionY");	
-		DataOre[ ID ].Distance = RES->getInt("Distance");
+		Ore[ ID ].ItemID = RES->getInt("ItemID");
+		Ore[ ID ].Level = RES->getInt("Level");
+		Ore[ ID ].Health = RES->getInt("Health");
+		Ore[ ID ].PositionX = RES->getInt("PositionX");
+		Ore[ ID ].PositionY = RES->getInt("PositionY");	
+		Ore[ ID ].Distance = RES->getInt("Distance");
 	}
 }
 
-// Загрузка данных игрока
 void MinerAccSql::OnInitAccount(CPlayer *pPlayer)
 {
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_miner", "WHERE AccountID = '%d'", pPlayer->Acc().AuthID));
@@ -40,13 +37,9 @@ void MinerAccSql::OnInitAccount(CPlayer *pPlayer)
 	return;	
 }
 
-// меню крафта
-void MinerAccSql::ShowMenu(int ClientID)
+void MinerAccSql::ShowMenu(CPlayer *pPlayer)
 {
-	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true);
-	if(!pPlayer)
-		return;
-
+	const int ClientID = pPlayer->GetCID();
 	int NeedExp = ExpNeed(pPlayer->Acc().Miner[MnrLevel]);
 	GS()->AVM(ClientID, "null", NOPE, HJOBUPGRADE, "[Miner Point: {INT}] Level: {INT} Exp: {INT}/{INT}", 
 		&pPlayer->Acc().Miner[MnrUpgrade], &pPlayer->Acc().Miner[MnrLevel], &pPlayer->Acc().Miner[MnrExp], &NeedExp);
@@ -54,10 +47,9 @@ void MinerAccSql::ShowMenu(int ClientID)
 	GS()->AVD(ClientID, "MINERUPGRADE", MnrCount, 20, HJOBUPGRADE, "[Price 20P]Mining bonus +1(Active {INT})", &pPlayer->Acc().Miner[MnrCount]);
 }
 
-// получить уровень руды
 int MinerAccSql::GetOreLevel(vec2 Pos) const
 {
-	for(const auto& ore : DataOre)
+	for(const auto& ore : Ore)
 	{
 		vec2 Position = vec2(ore.second.PositionX, ore.second.PositionY);
 		if(distance(Position, Pos) < ore.second.Distance)
@@ -66,10 +58,9 @@ int MinerAccSql::GetOreLevel(vec2 Pos) const
 	return -1;
 }
 
-// получить предмет руды
 int MinerAccSql::GetOreItemID(vec2 Pos) const
 {
-	for(const auto& ore : DataOre)
+	for(const auto& ore : Ore)
 	{
 		vec2 Position = vec2(ore.second.PositionX, ore.second.PositionY);
 		if(distance(Position, Pos) < ore.second.Distance)
@@ -78,10 +69,9 @@ int MinerAccSql::GetOreItemID(vec2 Pos) const
 	return -1;
 }
 
-// получить здоровье руды
 int MinerAccSql::GetOreHealth(vec2 Pos) const
 {
-	for(const auto& ore : DataOre)
+	for(const auto& ore : Ore)
 	{
 		vec2 Position = vec2(ore.second.PositionX, ore.second.PositionY);
 		if(distance(Position, Pos) < ore.second.Distance)
@@ -90,7 +80,6 @@ int MinerAccSql::GetOreHealth(vec2 Pos) const
 	return -1;
 }
 
-// Работа получение опыта miner
 void MinerAccSql::Work(CPlayer *pPlayer, int Exp)
 {
 	const int ClientID = pPlayer->GetCID();
@@ -98,7 +87,8 @@ void MinerAccSql::Work(CPlayer *pPlayer, int Exp)
 	for( ; pPlayer->Acc().Miner[MnrExp] >= ExpNeed(pPlayer->Acc().Miner[MnrLevel]) ; ) 
 	{
 		pPlayer->Acc().Miner[MnrExp] -= ExpNeed(pPlayer->Acc().Miner[MnrLevel]);
-		pPlayer->Acc().Miner[MnrLevel]++, pPlayer->Acc().Miner[MnrUpgrade]++;
+		pPlayer->Acc().Miner[MnrLevel]++;
+		pPlayer->Acc().Miner[MnrUpgrade]++;
 
 		if(pPlayer->GetCharacter() && pPlayer->GetCharacter()->IsAlive())
 		{
@@ -108,8 +98,7 @@ void MinerAccSql::Work(CPlayer *pPlayer, int Exp)
 		}
 		GS()->ChatFollow(ClientID, "Miner Level UP. Now Level {INT}!", &pPlayer->Acc().Miner[MnrLevel]);
 	}
-	pPlayer->ProgressBar("Miner", pPlayer->Acc().Miner[MnrLevel], 
-						pPlayer->Acc().Miner[MnrExp], ExpNeed(pPlayer->Acc().Miner[MnrLevel]), Exp);
+	pPlayer->ProgressBar("Miner", pPlayer->Acc().Miner[MnrLevel], pPlayer->Acc().Miner[MnrExp], ExpNeed(pPlayer->Acc().Miner[MnrLevel]), Exp);
 	Job()->SaveAccount(pPlayer, SAVEMINERACCOUNT);
 }
 

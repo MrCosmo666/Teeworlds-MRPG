@@ -121,35 +121,31 @@ void CDropingItem::Tick()
 	if(m_ForID != -1 && !GS()->m_apPlayers[m_ForID])
 		m_ForID = -1;	
 
-	if(m_LifeSpan > Server()->TickSpeed() * ( 5 - 1 ))
-		return;
-	
 	CCharacter *pChar = (CCharacter*)GameWorld()->ClosestEntity(m_Pos, 64, CGameWorld::ENTTYPE_CHARACTER, 0);
 	if(!pChar || !pChar->GetPlayer() || pChar->GetPlayer()->IsBot())
 		return;
 
-	char ItemBuf[128];
-	const ItemSql::ItemPlayer PlDropItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
-
 	// если не зачарованный предмет
+	const ItemSql::ItemPlayer PlDropItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
 	if(PlDropItem.Info().BonusCount <= 0)
 	{
-		str_format(ItemBuf, sizeof(ItemBuf), "^351\nHammer: %sx%d : %s\n", 
-			PlDropItem.Info().GetName(pChar->GetPlayer()), m_DropItem.Count, (m_ForID != -1 ? Server()->ClientName(m_ForID) : "Nope"));
-		pChar->GetPlayer()->AddInBroadcast(ItemBuf);
+		GS()->SBL(pChar->GetPlayer()->GetCID(), 10000, 100, "{STR}x{INT} : {STR}",
+			m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.Count, (m_ForID != -1 ? Server()->ClientName(m_ForID) : "Nope"));
 		return;
 	}
 
-	// зачарованный предмет
-	str_format(ItemBuf, sizeof(ItemBuf), "^351\nHammer: %sx%d(+%d) : %s\n", 
-		PlDropItem.Info().GetName(pChar->GetPlayer()), m_DropItem.Count, m_DropItem.Enchant, (m_ForID != -1 ? Server()->ClientName(m_ForID) : "Nope"));
-	pChar->GetPlayer()->AddInBroadcast(ItemBuf);
-
-	if(PlDropItem.Count > 0)
+	if (PlDropItem.Count > 0)
 	{
-		str_format(ItemBuf, sizeof(ItemBuf), "Swap [Dropped Level +%d] -> [Equiped Level +%d]\n", m_DropItem.Enchant, PlDropItem.Enchant);
-		pChar->GetPlayer()->AddInBroadcast(ItemBuf);				
+		GS()->SBL(pChar->GetPlayer()->GetCID(), 10000, 100, "{STR}(+{INT}) -> (+{INT}) : {STR}", 
+			m_DropItem.Info().GetName(pChar->GetPlayer()),
+			&PlDropItem.Enchant, &m_DropItem.Enchant, 
+			(m_ForID != -1 ? Server()->ClientName(m_ForID) : "Nope"));
+
+		return;
 	}
+
+	GS()->SBL(pChar->GetPlayer()->GetCID(), 10000, 100, "{STR}(+{INT}) : {STR}",
+		PlDropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.Enchant, (m_ForID != -1 ? Server()->ClientName(m_ForID) : "Nope"));
 }
 
 void CDropingItem::TickPaused()

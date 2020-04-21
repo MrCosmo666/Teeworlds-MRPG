@@ -127,12 +127,12 @@ CPlayer *CGS::GetPlayer(int ClientID, bool CheckAuthed, bool CheckCharacter)
 }
 
 // Level String by Matodor (Progress Bar) создает что то рода прогресс бара
-const char* CGS::LevelString(int MaxValue, int CurrentValue, int Step, char toValue, char fromValue) 
+char* CGS::LevelString(int MaxValue, int CurrentValue, int Step, char toValue, char fromValue) 
 {
     if (CurrentValue < 0) CurrentValue = 0;
     if (CurrentValue > MaxValue) CurrentValue = MaxValue;
 
-    int Size = 2 + MaxValue / Step + 1;
+    int Size = 2 + MaxValue / Step;
     char *Buf = new char[Size];
     Buf[0] = '[';
     Buf[Size - 2] = ']';
@@ -142,16 +142,11 @@ const char* CGS::LevelString(int MaxValue, int CurrentValue, int Step, char toVa
     int b = (MaxValue - CurrentValue) / Step;
     int i = 1;
 
-    for (int ai = 0; ai < a; ai++, i++) 
-    {
-        Buf[i] = toValue;
-    }
-
-    for (int bi = 0; bi < b || i < Size - 2; bi++, i++) 
-    {
-        Buf[i] = fromValue;
-    }
-    return Buf;
+	for (int ai = 0; ai < a; ai++, i++)
+		Buf[i] = toValue;
+	for (int bi = 0; bi < b || i < Size - 2; bi++, i++)
+		Buf[i] = fromValue;
+	return Buf;
 }
 // получить объект предмета
 ItemSql::ItemInformation &CGS::GetItemInfo(int ItemID) const { return ItemSql::ItemsInfo[ItemID]; }
@@ -829,6 +824,18 @@ void CGS::SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const cha
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
+void CGS::SendProgressBar(int ClientID, int Count, int Request, const char* Message)
+{
+	if (!CheckClient(ClientID))
+		return;
+
+	CNetMsg_Sv_ProgressBar Msg;
+	Msg.m_pText = Message;
+	Msg.m_pCount = Count;
+	Msg.m_pRequires = Request;
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+}
+
 void CGS::ClearTalkText(int ClientID)
 {
 	if (!CheckClient(ClientID))
@@ -1489,42 +1496,17 @@ const char *CGS::NetVersion() const { return GAME_NETVERSION; }
 // Очистка всех данных при выходие клиента обезательно вызова на раз достаточно
 void CGS::ClearClientData(int ClientID)
 {
-	if(AccountMainSql::Data.find(ClientID) != AccountMainSql::Data.end()) 
-		AccountMainSql::Data.erase(ClientID);
+	Mmo()->ResetClientData(ClientID);
 
 	if(Interactive.find(ClientID) != Interactive.end()) 
 		Interactive.erase(ClientID);
-		
-	if(ItemSql::Items.find(ClientID) != ItemSql::Items.end()) 
-		ItemSql::Items.erase(ClientID);
 
-	if(SkillJob::Skill.find(ClientID) != SkillJob::Skill.end())
-		SkillJob::Skill.erase(ClientID);
-	
 	if(Effects.find(ClientID) != Effects.end()) 
 		Effects.erase(ClientID);
 
 	if(InteractiveSub.find(ClientID) != InteractiveSub.end())
 		InteractiveSub.erase(ClientID);
-		
-	if(QuestBase::Quests.find(ClientID) != QuestBase::Quests.end())
-	{ 
-		// пробрасываем мобов что требуется удалить
-		std::map < int, int > m_talkcheck;
-		for(const auto& qp : QuestBase::Quests[ClientID])
-		{
-			if(qp.second.Type == QUESTFINISHED) 
-				continue;
-			m_talkcheck[qp.first] = qp.second.Progress;
-		}
 
-		// очищаем квесты игрока
-		QuestBase::Quests.erase(ClientID); 
-
-		// очищаем ботов что требуется проверить для удаления
-		for(const auto& qst : m_talkcheck)
-			ClearQuestsBot(qst.first, qst.second);
-	}
 }
 
 // Обновить мир
@@ -1913,12 +1895,12 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		if(!pChar || !pChar->IsAlive())
 			return;
 
-		if (pChar->GetHelper()->BoolIndex(TILE_HOUSE))
+		if (pChar->GetHelper()->BoolIndex(TILE_PLAYER_HOUSE))
 		{
 			const int HouseID = Mmo()->House()->GetHouse(pChar->m_Core.m_Pos);
 			if (HouseID > 0) Mmo()->House()->ShowHouseMenu(pPlayer, HouseID);
 		}
-		else if (pChar->GetHelper()->BoolIndex(TILE_MEMBERHOUSE))
+		else if (pChar->GetHelper()->BoolIndex(TILE_GUILD_HOUSE))
 		{
 			const int HouseID = Mmo()->Member()->GetPosHouseID(pChar->m_Core.m_Pos);
 			Mmo()->Member()->ShowBuyHouse(pPlayer, HouseID);
@@ -2022,11 +2004,8 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		AV(ClientID, "null", ""), 
 		AVH(ClientID, HJOBUPGRADE, GOLDEN_COLOR, "Disciple of Jobs");
-		Mmo()->SpaAcc()->ShowMenu(ClientID);
-		AVM(ClientID, "null", NOPE, HJOBUPGRADE, "═══════════════════════════════");
 		Mmo()->PlantsAcc()->ShowMenu(ClientID);
-		AVM(ClientID, "null", NOPE, HJOBUPGRADE, "═══════════════════════════════");
-		Mmo()->MinerAcc()->ShowMenu(ClientID);
+		Mmo()->MinerAcc()->ShowMenu(pPlayer);
 		AddBack(ClientID);
 	}
 	else if (MenuList == TOPLISTMENU)

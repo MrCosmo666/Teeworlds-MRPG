@@ -185,7 +185,7 @@ bool CraftJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Repla
 		CCharacter* pChr = pPlayer->GetCharacter();
 		if (!pChr) return false;
 
-		if (Menulist == MAINMENU && pChr->GetHelper()->BoolIndex(TILE_CRAFT))
+		if (Menulist == MAINMENU && pChr->GetHelper()->BoolIndex(TILE_CRAFT_ZONE))
 		{
 			pPlayer->m_LastVoteMenu = MAINMENU;
 			GS()->AVH(ClientID, HCRAFTINFO, GREEN_COLOR, "Crafting Information");

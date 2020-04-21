@@ -58,6 +58,12 @@ void ItemSql::OnInitAccount(CPlayer *pPlayer)
 	}		
 }
 
+void ItemSql::OnResetClientData(int ClientID)
+{
+	if (Items.find(ClientID) != Items.end())
+		Items.erase(ClientID);
+}
+
 // Восстановить прочность всем предметам
 void ItemSql::RepairDurabilityFull(CPlayer *pPlayer)
 { 
@@ -596,7 +602,7 @@ bool ItemSql::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 	}
 
 	// проверить пустой слот если да тогда одеть предмет
-	const bool AutoEquip = (Info().Type == ITEMEQUIP && pPlayer->GetItemEquip(Info().Function) <= 0) || (Info().Type == ITSETTINGS && Info().BonusCount > 0);
+	const bool AutoEquip = (Info().Type == ITEMEQUIP && pPlayer->GetItemEquip(Info().Function) <= 0) || (Info().Function == ITSETTINGS && Info().BonusCount > 0);
 	if(AutoEquip)
 	{
 		GameServer->Chat(ClientID, "Auto equip {STR} ({STR} +{INT})!", Info().GetName(pPlayer), pPlayer->AtributeName(Info().BonusID), &Info().BonusCount);
@@ -696,7 +702,7 @@ bool ItemSql::ClassItems::EquipItem()
 	// обновляем
 	Settings ^= true;
 	pPlayer->GS()->Mmo()->Item()->SetSettings(pPlayer, itemid_, Settings);
-	pPlayer->AddInformationStats();
+	pPlayer->ShowInformationStats();
 
 	// перестановка регена
 	if((Info().BonusID == Stats::StAmmoRegen || Info().BonusID == Stats::StAmmoRegenQ) && pPlayer->GetCharacter())

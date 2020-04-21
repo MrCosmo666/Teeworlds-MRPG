@@ -79,10 +79,6 @@ public:
 private:
 	char m_FormatTalkQuest[512];
 	char m_aLanguage[16];
-
-	dynamic_string Broadcast;	
-	short pValueBroadcast;
-	bool m_ShowHealthBroadcast;
 	std::map < int , bool > m_HidenMenu;
 
 	/* #########################################################################
@@ -129,7 +125,6 @@ public:
 	/* #########################################################################
 		FUNCTIONS PLAYER HELPER 
 	######################################################################### */
-	void AddInBroadcast(const char *pBuffer);
 	void ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp);
 	bool Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade, const char *UpgradeName);
 	const char *AtributeName(int BonusID) const;
@@ -152,7 +147,7 @@ public:
 	int ExpNeed(int Level);
 	int GetStartMana();
 	const char* GetLanguage();
-	void AddInformationStats();
+	void ShowInformationStats();
 
 	/* #########################################################################
 		FUNCTIONS PLAYER PARSING 

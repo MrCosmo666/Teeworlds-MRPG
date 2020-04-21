@@ -53,13 +53,14 @@ public:
 	typedef std::map < int , StructData > AccDataType;
 	static AccDataType Data;
 
-	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
-
 private:
 	// auth state
 	int SendAuthCode(int ClientID, int Code);
 
 public:
+	virtual void OnResetClientData(int ClientID);
+	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+
 	int RegisterAccount(int ClientID, const char *Login, const char *Password);
 	int LoginAccount(int ClientID, const char *Login, const char *Password);
 	void LoadAccount(CPlayer *pPlayer, bool FirstInitilize = false);

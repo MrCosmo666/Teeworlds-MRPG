@@ -9,14 +9,6 @@
 std::map < int , QuestBase::StructQuestData > QuestBase::QuestsData;
 std::map < int , std::map < int , QuestBase::StructQuest > > QuestBase::Quests;
 
-// Если завершен квест
-bool QuestBase::IsComplecte(int ClientID, int QuestID) const
-{
-	if(IsValidQuest(QuestID, ClientID) && Quests[ClientID][QuestID].Progress == (QuestsData[QuestID].ProgressSize - 1))
-		return true;
-	return false;
-}
-
 // Инициализация класса
 void QuestBase::OnInitGlobal() 
 {
@@ -70,6 +62,32 @@ void QuestBase::OnInitAccount(CPlayer *pPlayer)
 			GS()->ClearQuestsBot(QuestID, Quests[ ClientID ][ QuestID ].Progress);
 		}
 	}
+}
+
+void QuestBase::OnResetClientData(int ClientID)
+{
+	if (Quests.find(ClientID) != Quests.end())
+	{
+		std::map < int, int > m_talkcheck;
+		for (const auto& qp : Quests[ClientID])
+		{
+			if (qp.second.Type == QUESTFINISHED)
+				continue;
+			m_talkcheck[qp.first] = qp.second.Progress;
+		}
+		Quests.erase(ClientID);
+
+		for (const auto& qst : m_talkcheck)
+			GS()->ClearQuestsBot(qst.first, qst.second);
+	}
+}
+
+// Если завершен квест
+bool QuestBase::IsComplecte(int ClientID, int QuestID) const
+{
+	if (IsValidQuest(QuestID, ClientID) && Quests[ClientID][QuestID].Progress == (QuestsData[QuestID].ProgressSize - 1))
+		return true;
+	return false;
 }
 
 /* #########################################################################

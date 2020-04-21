@@ -20,7 +20,7 @@ class MinerAccSql : public CMmoComponent
 		int Distance;
 	};
 	typedef std::map < int , StructOres > OresType;
-	static OresType DataOre;
+	static OresType Ore;
 
 public:
 	virtual void OnInitLocal(const char *pLocal);
@@ -30,7 +30,7 @@ public:
 	int GetOreItemID(vec2 Pos) const;
 	int GetOreHealth(vec2 Pos) const;
 
-	void ShowMenu(int ClientID);
+	void ShowMenu(CPlayer *pPlayer);
 
 	void Work(CPlayer *pPlayer, int Exp);
 	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);

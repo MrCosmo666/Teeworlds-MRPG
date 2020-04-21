@@ -25,6 +25,7 @@ public:
 	virtual void OnTick() {};
 	virtual void OnTickLocalWorld() {};
 	virtual void OnPaymentTime() {};
+	virtual void OnResetClientData(int ClientID) {};
 	virtual bool OnPlayerHandleTile(CCharacter *pChr, int IndexCollision) { return false; };
 	virtual bool OnPlayerHandleMainMenu(CPlayer *pPlayer, int Menulist, bool ReplaceMenu) { return false; };
 	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText) { return false; }

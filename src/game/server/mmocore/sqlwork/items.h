@@ -7,11 +7,6 @@
 
 class ItemSql : public CMmoComponent
 {
-	int SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant);
-	int DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings);
-
-public:
-
 	class ClassItemInformation
 	{
 	public:
@@ -28,13 +23,19 @@ public:
 		int MaximalEnchant;
 		int iItemEnchantPrice;
 		bool Dropable;
-	
-		const char *GetName(CPlayer *pPlayer = NULL) const;
-		const char *GetDesc(CPlayer *pPlayer = NULL) const;
-		const char *GetIcon() const { return iItemIcon; };
+
+		const char* GetName(CPlayer* pPlayer = NULL) const;
+		const char* GetDesc(CPlayer* pPlayer = NULL) const;
+		const char* GetIcon() const { return iItemIcon; };
 	};
+
+	int SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant);
+	int DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings);
+
+public:
 	typedef ClassItemInformation ItemInformation;
 	static std::map < int , ItemInformation > ItemsInfo;
+
 
 	class ClassItems
 	{
@@ -60,10 +61,8 @@ public:
 		bool SetSettings(int arg_settings);
 		bool EquipItem();
 		void Save();
-
 		bool IsEquipped();
 
-		// информацияп предмета нахуй всякие ItemInformation где сможет быть игрок
 		ItemInformation& Info() const { return ItemsInfo[itemid_]; };
 
 		// копирование элемента
@@ -80,11 +79,13 @@ public:
 			return *this;
 		};
 	};
+
 	typedef ClassItems ItemPlayer;
 	static std::map < int, std::map < int, ItemPlayer > > Items;
 
 	virtual void OnInitGlobal();
 	virtual void OnInitAccount(CPlayer *pPlayer);
+	virtual void OnResetClientData(int ClientID);
 	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 
@@ -100,8 +101,6 @@ public:
 	bool SetDurability(CPlayer *pPlayer, int ItemID, int Durability);
 	bool SetEnchant(CPlayer *pPlayer, int ItemID, int Enchant);
 	bool SetSettings(CPlayer *pPlayer, int ItemID, int Settings);
-
-
 };
 
 #endif

@@ -7,7 +7,6 @@
 #include "sqlwork/account_main.h"
 #include "sqlwork/account_miner.h"
 #include "sqlwork/account_plant.h"
-#include "sqlwork/account_relax.h"
 #include "sqlwork/botsinfo.h"
 #include "sqlwork/items.h"
 #include "sqlwork/questing.h"
@@ -52,7 +51,6 @@ class SqlController
 	class PlantsAccSql *m_pAccPlant;
 	class QuestBase *m_pQuest;
 	class ShopMailSql *m_pShopmail;
-	class SpaRelaxSql *m_pAccRelax;
 	class StorageSql *m_pStorageWork;
 	class TeleportsSql *m_pTeleportsWork;
 
@@ -79,7 +77,6 @@ public:
 	PlantsAccSql *PlantsAcc() const { return m_pAccPlant; }
 	QuestBase *Quest() const { return m_pQuest; }
 	ShopMailSql *Auction() const { return m_pShopmail; }
-	SpaRelaxSql *SpaAcc() const { return m_pAccRelax; }
 	StorageSql *Storage() const { return m_pStorageWork; }
 	TeleportsSql *Teleports() const { return m_pTeleportsWork; }
 
@@ -99,6 +96,7 @@ public:
 	void OnInitAccount(int ClientID);
 	bool OnMessage(int MsgID, void *pRawMsg, int ClientID);
 	bool OnParseFullVote(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
+	void ResetClientData(int ClientID);
 
 	// 
 	void LoadLogicWorld();

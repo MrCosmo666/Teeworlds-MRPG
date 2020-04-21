@@ -90,6 +90,7 @@ void BotAI::ShowProgress()
 		CPlayer *pPlayer = GS()->GetPlayer(iparse->first, true);
 		if(pPlayer)
 		{
+			/*
 			dynamic_string Buffer;
 			int SubBotID = GetPlayer()->GetBotSub();
 			Server()->Localization()->Format(Buffer, pPlayer->GetLanguage(), _("Hard Mob: {s:name} Target: {s:tname}\n"),
@@ -102,6 +103,7 @@ void BotAI::ShowProgress()
 			Server()->Localization()->Format(Buffer, pPlayer->GetLanguage(), _("Health {STR}({INT}/{INT})\n"), Level, &Health, &m_StartHealth, NULL);
 			pPlayer->AddInBroadcast(Buffer.buffer()), Buffer.clear();
 			delete Level;
+			*/
 		}
 	}	
 }

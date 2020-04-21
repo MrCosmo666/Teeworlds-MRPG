@@ -631,5 +631,12 @@ Messages = [
 	# clear all items on Questing Process
 	NetMessage("Sv_ClearQuestingProcessing", []),
 
+	# progress bar
+	NetMessage("Sv_ProgressBar",
+	[
+		NetStringStrict("m_pText"),
+		NetIntAny("m_pCount"),
+		NetIntAny("m_pRequires"),
+	]),
 
 ]

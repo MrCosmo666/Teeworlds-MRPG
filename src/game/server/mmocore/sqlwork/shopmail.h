@@ -32,6 +32,7 @@ public:
 	
 	virtual void OnInitGlobal();
 	virtual void OnTickLocalWorld();
+	virtual bool OnPlayerHandleTile(CCharacter* pChr, int IndexCollision);
 
 	void CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem);
 	void CheckAuctionTime();

@@ -28,6 +28,7 @@ public:
 	virtual void OnInitGlobal();
 	virtual void OnTick();
 	virtual void OnPaymentTime();
+	virtual bool OnPlayerHandleTile(CCharacter* pChr, int IndexCollision);
 	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 	
 	void ShowStorageMenu(int ClientID, int StorageID);

@@ -30,29 +30,27 @@ class SkillJob : public CMmoComponent
 	};
 	typedef StructSkills SkillPlayer;
 
-	void ShowMailSkillList(CPlayer* pPlayer);
+	static std::map < int, SkillInfo > SkillData;
+	static std::map < int, std::map < int, SkillPlayer > > Skill;
 
 public:
-	static std::map < int , SkillInfo > SkillData;
-	static std::map < int , std::map < int , SkillPlayer > > Skill;
-
 	virtual void OnInitGlobal();
 	virtual void OnInitAccount(CPlayer *pPlayer);
+	virtual void OnResetClientData(int ClientID);
+	virtual bool OnPlayerHandleTile(CCharacter* pChr, int IndexCollision);
+	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
+	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 
-/* #########################################################################
-	HELPER SKILL CLASS 
-######################################################################### */
 	int GetSkillBonus(int ClientID, int SkillID) const;
 	int GetSkillLevel(int ClientID, int SkillID) const;
+	int SkillsSize() const { return SkillData.size(); };
 
-/* #########################################################################
-	FUNCTION SKILL CLASS 
-######################################################################### */
 	void SkillSelected(CPlayer *pPlayer, int SkillID);
 	bool UpgradeSkill(CPlayer *pPlayer, int SkillID);
 	bool UseSkill(CPlayer *pPlayer, int SkillID);
-	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
-	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
+
+private:
+	void ShowMailSkillList(CPlayer* pPlayer);
 };
 
 #endif

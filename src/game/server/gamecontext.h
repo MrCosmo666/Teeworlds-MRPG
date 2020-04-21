@@ -128,7 +128,7 @@ public:
 	######################################################################### */
 	class CCharacter *GetPlayerChar(int ClientID);
 	CPlayer *GetPlayer(int ClientID, bool CheckAuthed = false, bool CheckCharacter = false);
-	const char* LevelString(int max, int value, int step, char ch1, char ch2);
+	char* LevelString(int max, int value, int step, char ch1, char ch2);
 	ItemSql::ItemInformation &GetItemInfo(int ItemID) const;
 
 	/* #########################################################################
@@ -201,6 +201,7 @@ public:
 	void SendGameMsg(int GameMsgID, int ParaI1, int ParaI2, int ParaI3, int ClientID);
 	void SendTuningParams(int ClientID);
 	void SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char *Message, int Style = -1, int TalkingEmote = -1);
+	void SendProgressBar(int ClientID, int Count, int Request, const char *Message);
 	void ClearTalkText(int ClientID);
 	int CheckPlayerMessageWorldID(int ClientID);
 	int64 MaskWorldID();

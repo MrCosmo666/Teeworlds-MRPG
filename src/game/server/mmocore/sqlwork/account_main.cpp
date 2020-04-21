@@ -8,21 +8,28 @@ using namespace sqlstr;
 
 std::map < int , AccountMainSql::StructData > AccountMainSql::Data;
 
-// Отправить данные о авторизации клиенту
+void AccountMainSql::OnResetClientData(int ClientID)
+{
+	if (Data.find(ClientID) != Data.end())
+		Data.erase(ClientID);
+}
+
+bool AccountMainSql::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+{
+	return false;
+}
+
 int AccountMainSql::SendAuthCode(int ClientID, int Code)
 {
-	// если ванильный клиент просто возращаем код
 	if(!GS()->CheckClient(ClientID))
 		return Code;
 
-	// отправляем пакет с кодом клиенту на авторизацию
 	CNetMsg_Sv_ClientProgressAuth ProgressMsg;
 	ProgressMsg.m_Code = Code;
 	GS()->Server()->SendPackMsg(&ProgressMsg, MSGFLAG_VITAL, ClientID);
 	return Code;
 }
 
-// Регистрация аккаунта
 int AccountMainSql::RegisterAccount(int ClientID, const char *Login, const char *Password)
 {
 	// если размер пароля логина мал или слишком большой
@@ -57,7 +64,6 @@ int AccountMainSql::RegisterAccount(int ClientID, const char *Login, const char 
 	return SendAuthCode(ClientID, AUTH_ALL_GOOD);
 }
 
-// Авторизация игрока
 int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Password)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, false);
@@ -122,21 +128,17 @@ int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Pa
 		return SendAuthCode(ClientID, AUTH_ALL_GOOD);
 	}
 
-	// если ник не верен из базы данных
 	GS()->Chat(ClientID, "Your nickname was not found in the database!");
 	return SendAuthCode(ClientID, AUTH_LOGIN_NICKNAME);
 }
 
-// Загрузка данных при успешной авторизации
 void AccountMainSql::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 {
-	if(!pPlayer || !pPlayer->IsAuthed()) return;
+	if(!pPlayer || !pPlayer->IsAuthed()) 
+		return;
 
-	// если обычная прогрузка между мирами
 	int ClientID = pPlayer->GetCID();
 	GS()->AddBroadcast(ClientID, GS()->Server()->GetWorldName(GS()->GetWorldID()), 200, 500);
-
-	// первая прогрузка
 	if(!FirstInitilize)
 	{
 		// проверяем квесты и отправляем одетые предметы всем
@@ -147,17 +149,13 @@ void AccountMainSql::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		int CountMessageInbox = Job()->Inbox()->GetActiveInbox(ClientID);
 		if(CountMessageInbox > 0) 
 			GS()->Chat(ClientID, "You have unread [{INT} emails]. Check your Mailbox!", &CountMessageInbox);
-
-		SendAuthCode(ClientID, AUTH_ALL_GOOD);
 		return;
 	}
 
-	// загружаем данные аккаунта
 	Job()->OnInitAccount(ClientID);
 	Job()->Quest()->CheckQuest(pPlayer);
 	ShowDiscordCard(ClientID);
 
-	// выдаем молот если нет его
 	if(!pPlayer->GetItem(itHammer).Count)
 		pPlayer->GetItem(itHammer).Add(1, 0);
 
@@ -168,15 +166,8 @@ void AccountMainSql::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		return;
 	}
 
-	// если клиент проверен отправим свой скин
 	if(GS()->CheckClient(ClientID))
 		GS()->SendEquipItem(ClientID, ClientID);
-}
-
-// Парсинг голосований
-bool AccountMainSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
-{
-	return false;
 }
 
 // Показать дискорд карту
@@ -197,7 +188,6 @@ void AccountMainSql::ShowDiscordCard(int ClientID)
 #endif
 }
 
-// смена дискорда подключение к дискорду
 void AccountMainSql::DiscordConnect(int ClientID, const char *pDID)
 {
 #ifdef CONF_DISCORD
@@ -213,7 +203,6 @@ void AccountMainSql::DiscordConnect(int ClientID, const char *pDID)
 #endif
 }
 
-// Получить ранг игрока
 int AccountMainSql::GetRank(int AuthID)
 {
 	int Rank = 0;
@@ -222,15 +211,12 @@ int AccountMainSql::GetRank(int AuthID)
 	{
 		Rank++;
 		int SelectedAuthID = RES->getInt("ID");
-		if(AuthID != SelectedAuthID) 
-			continue;
-
-		return Rank;
+		if(AuthID == SelectedAuthID) 
+			return Rank;
 	}
 	return -1;
 }
 
-// Проверяем игрок по AccountID онлайн если да то возращаем его ClientID
 int AccountMainSql::CheckOnlineAccount(int AuthID) const
 {
 	for(const auto& dt : AccountMainSql::Data)

@@ -47,6 +47,7 @@
 #include "components/motd.h"
 #include "components/notifications.h"
 #include "components/particles.h"
+#include "components/progress_bar.h"
 #include "components/players.h"
 #include "components/questing_processing.h"
 #include "components/nameplates.h"
@@ -133,6 +134,7 @@ static CMapLayers gs_MapLayersForeGround(CMapLayers::TYPE_FOREGROUND);
 static CCSkinChanger gs_SkinChanger;
 static CTalkText gs_TalkText;
 static CQuestingProcessing gs_QuestingProcess;
+static CProgressBar gs_ProgressBar;
 
 CGameClient::CStack::CStack() { m_Num = 0; }
 void CGameClient::CStack::Add(class CComponent *pComponent) { m_paComponents[m_Num++] = pComponent; }
@@ -243,7 +245,7 @@ void CGameClient::OnConsoleInit()
 	m_pSkins = &::gs_Skins;
 	m_pSkinChanger = &::gs_SkinChanger;
 	m_pTalkText = &::gs_TalkText;
-	m_pQuestProcess = &::gs_QuestingProcess;
+
 	//
 	m_pCountryFlags = &::gs_CountryFlags;
 	m_pChat = &::gs_Chat;
@@ -297,8 +299,10 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(&m_pParticles->m_RenderTeleports);
 	m_All.Add(&m_pParticles->m_RenderMmoProj);
 	m_All.Add(m_pTalkText);
-	m_All.Add(m_pQuestProcess);
-	//
+	m_All.Add(&gs_QuestingProcess);
+	m_All.Add(&gs_ProgressBar);
+
+	// vanilla
 	m_All.Add(m_pDamageind);
 	m_All.Add(&gs_Hud);
 	m_All.Add(&gs_Spectator);
@@ -312,14 +316,13 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(m_pStats);
 	m_All.Add(m_pMotd);
 	m_All.Add(m_pMenus);
-
 	m_All.Add(&m_pMenus->m_Binder);
 	m_All.Add(m_pGameConsole);
 
-	// build the input stack
-	// mmotee
-	m_Input.Add(m_pTalkText); // for pressing esc to remove it
-	//
+	// mmotee inputs
+	m_Input.Add(m_pTalkText);
+
+	// vanilla inputs
 	m_Input.Add(&m_pMenus->m_Binder); // this will take over all input when we want to bind a key
 	m_Input.Add(&m_pBinds->m_SpecialBinds);
 	m_Input.Add(m_pGameConsole);

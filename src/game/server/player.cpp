@@ -15,7 +15,6 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	m_PlayerTick[TickState::CheckClient] = Server()->Tick();
 	m_PlayerTick[TickState::Respawn] = Server()->Tick();
 	m_PlayerTick[TickState::Die] = Server()->Tick();
-	m_ShowHealthBroadcast = false;
 
 	m_Spawned = true;
 	m_LastVoteMenu = NOPE;
@@ -129,15 +128,6 @@ void CPlayer::PostTick()
 // Тик авторизированного в ::Tick
 void CPlayer::TickOnlinePlayer()
 {
-	// показать лист броадкаст
-	if(pValueBroadcast > 0 && m_pCharacter && m_pCharacter->IsAlive())
-	{
-		m_ShowHealthBroadcast = false;
-		GS()->SBL(m_ClientID, PRENORMAL+pValueBroadcast, 80, Broadcast.buffer());
-		pValueBroadcast = 0;
-		Broadcast.clear();
-	}
-
 	// интерактив принятия F3 или F4
 	if(CGS::Interactive[m_ClientID].ParsingLifeTick > 0)
 	{
@@ -387,18 +377,7 @@ int CPlayer::GetTeam()
 /* #########################################################################
 	FUNCTIONS PLAYER HELPER 
 ######################################################################### */
-// Добавить броадкаст в общий вывод
-void CPlayer::AddInBroadcast(const char *pBuffer)
-{
-	const char *pSaveBuf = Broadcast.buffer();
-	const unsigned sizes = sizeof(pBuffer) + sizeof(pSaveBuf);
-	if(sizes < 256 && pValueBroadcast < 3)
-	{
-		pValueBroadcast++;
-		Broadcast.append(pBuffer);
-	}
-	return;
-}
+
 // Прогресс бар информация о уровнях
 void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp)
 {
@@ -406,11 +385,17 @@ void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed,
 	float getlv = ( MyExp * 100.0 ) / NeedXp;
 	float getexp = ( GivedExp * 100.0 ) / NeedXp;
 
-	const char *Level = GS()->LevelString(100, (int)getlv, 10, ':', ' ');
+	if (GS()->CheckClient(m_ClientID))
+	{
+		GS()->SendProgressBar(m_ClientID, MyExp, ExpNeed, Name);
+		return;
+	}
+
+	char *Level = GS()->LevelString(100, (int)getlv, 10, ':', ' ');
 	char BufferInBroadcast[128];
 	str_format(BufferInBroadcast, sizeof(BufferInBroadcast), "^235Lv%d %s%s %0.2f%%+%0.3f%%(%d)XP\n", MyLevel, Name, Level, getlv, getexp, GivedExp);
-	AddInBroadcast(BufferInBroadcast);
-	delete [] Level;
+	GS()->SBL(m_ClientID, 100000, 100, BufferInBroadcast);
+	mem_zero(Level, sizeof(Level));
 }
 // Улучшения апгрейдов любых не зависимо от структуры класса или переменных
 bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade, const char *UpgradeName)
@@ -590,15 +575,13 @@ const char* CPlayer::GetLanguage()
 	return m_aLanguage;
 }
 // Добавить статистику в broadcast
-void CPlayer::AddInformationStats()
+void CPlayer::ShowInformationStats()
 {
-	if(m_ShowHealthBroadcast)
-		return;
-
-	char aBuf[64];
-	str_format(aBuf, sizeof(aBuf), "^151H: %d/%d ^115M: %d/%d\n", GetHealth(), GetStartHealth(), m_pCharacter->Mana(), GetStartMana());
-	AddInBroadcast(aBuf);
-	m_ShowHealthBroadcast = true;
+	int Health = GetHealth();
+	int StartHealth = GetStartHealth();
+	int Mana = m_pCharacter->Mana();
+	int StartMana = GetStartMana();
+	GS()->SBL(m_ClientID, 10000, 100, "H: {INT}/{INT} M: {INT}/{INT}", &Health, &StartHealth, &Mana, &StartMana);
 }
 
 /* #########################################################################

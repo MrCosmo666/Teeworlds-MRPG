@@ -185,12 +185,6 @@ enum
 	PARSESELLHOUSE = 1,
 	PARSEINVITEMEMBER,
 
-	/*
-		Типы домов
-	*/
-	FUNCTIONHOUSE = 0,						// дом
-	FUNCTIONMOTEL,							// отель
-
 	// Редкость броадкастов
 	PRELOW = 1,
 	PRENORMAL,
@@ -302,7 +296,6 @@ enum
 	SAVEACCOUNT,			// Save Login Password Data
 	SAVESTATS,				// Save Stats Level Exp and other this type
 	SAVEUPGRADES,			// Save Upgrades Damage and other this type
-	SAVESPAACCOUNT,			// Save Spa Account Upgrades and all spa data
 	SAVEPLANTACCOUNT,		// Save Plant Account
 	SAVEMINERACCOUNT,
 	SAVEMEMBERDATA,			// Save Member Data
