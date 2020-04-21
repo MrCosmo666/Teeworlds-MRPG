@@ -21,7 +21,6 @@ enum Stats
  	StCriticalHit,
 	StDirectCriticalHit,
     StHardness,
-	StTenacity,
 	StLucky,
 	StPiety,
 	StVampirism,
