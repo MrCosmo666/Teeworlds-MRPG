@@ -853,6 +853,11 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	GS()->AVM(ClientID, "null", NOPE, HMEMBERSTATS, "Guild Bank: {INT}gold", &Guild[GuildID].m_Bank);
 
 	GS()->AV(ClientID, "null", "");
+	pPlayer->m_Colored = GOLDEN_COLOR;
+	GS()->AVL(ClientID, "null", "۩ Players list on guild", &pPlayer->GetItem(itMoney).Count);
+	ShowGuildPlayers(pPlayer);
+	GS()->AV(ClientID, "null", "");
+
 	pPlayer->m_Colored = { 10,10,10 };
 	GS()->AVL(ClientID, "null", "◍ Your money: {INT}gold", &pPlayer->GetItem(itMoney).Count);
 	GS()->AVL(ClientID, "MMONEY", "Add money guild bank. (Amount in a reason)", Guild[GuildID].m_Name);
@@ -891,31 +896,36 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	GS()->AVM(ClientID, "MUPGRADE", EMEMBERUPGRADE::AvailableNSTSlots, NOPE, "Upgrade {STR} ({INT}) {INT}gold", 
 		UpgradeNames(EMEMBERUPGRADE::AvailableNSTSlots).c_str(), &Guild[GuildID].m_Upgrades[ EMEMBERUPGRADE::AvailableNSTSlots ], &PriceUpgrade);
 	GS()->AV(ClientID, "null", "");
-	
-	// список членов в гильдии
+	GS()->AddBack(ClientID);
+	return;
+}
+
+void GuildJob::ShowGuildPlayers(CPlayer* pPlayer)
+{
+	const int ClientID = pPlayer->GetCID();
+	const int GuildID = pPlayer->Acc().GuildID;
 	int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + 1000;
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, Nick, GuildRank, GuildDeposit", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID));
-	while(RES->next())
+	while (RES->next())
 	{
 		const int AuthID = RES->getInt("ID");
 		const int RankID = RES->getInt("GuildRank");
-		int Deposit = RES->getInt("GuildDeposit");
+		const int Deposit = RES->getInt("GuildDeposit");
 		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "{STR} {STR} Deposit: {INT}", GetGuildRank(GuildID, RankID), RES->getString("Nick").c_str(), &Deposit);
 
-		// сбор всех рангов и вывод их
-		for(auto mr: RankGuild)
+		for (auto mr : RankGuild)
 		{
-			if(GuildID != mr.second.GuildID || RankID == mr.first) 
+			if (GuildID != mr.second.GuildID || RankID == mr.first)
 				continue;
-			
+
 			GS()->AVD(ClientID, "MRANKCHANGE", AuthID, mr.first, HideID, "Change Rank to: {STR}{STR}", mr.second.Rank, mr.second.Access > 0 ? "*" : "");
 		}
 		GS()->AVM(ClientID, "MKICK", AuthID, HideID, "Kick");
-		if(AuthID != pPlayer->Acc().AuthID) GS()->AVM(ClientID, "MLEADER", AuthID, HideID, "Give Leader (in reason 134)");
+		if (AuthID != pPlayer->Acc().AuthID) 
+			GS()->AVM(ClientID, "MLEADER", AuthID, HideID, "Give Leader (in reason 134)");
 		HideID++;
 	}
-	GS()->AddBack(ClientID);
-	return;
+
 }
 
 void GuildJob::AddExperience(int GuildID)
@@ -1060,7 +1070,7 @@ void GuildJob::DeleteRank(int RankID, int GuildID)
 {
 	if(RankGuild.find(RankID) != RankGuild.end())
 	{
-		SJK.UD("tw_accounts_data", "SET GuildRank = '-1' WHERE GuildRank = '%d' AND GuildID = '%d'", RankID, GuildID);
+		SJK.UD("tw_accounts_data", "GuildRank = '-1' WHERE GuildRank = '%d' AND GuildID = '%d'", RankID, GuildID);
 		SJK.DD("tw_guilds_ranks", "WHERE ID = '%d' AND GuildID = '%d'", RankID, GuildID);
 		GS()->ChatGuild(GuildID, "Rank [{STR}] succesful delete", RankGuild[RankID].Rank);
 		AddHistoryGuild(GuildID, "Deleted rank '%s'.", RankGuild[RankID].Rank);

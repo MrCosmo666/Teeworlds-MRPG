@@ -91,6 +91,7 @@ public:
 
 private:
 	void ShowMenuGuild(CPlayer *pPlayer);
+	void ShowGuildPlayers(CPlayer *pPlayer);
 
 public:
 	void AddExperience(int GuildID);	
