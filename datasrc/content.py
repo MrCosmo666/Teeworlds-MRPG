@@ -271,6 +271,7 @@ image_wingit23 = Image("wingsit23", "mmotee/wings/it23.png")
 image_odinspear = Image("odinspear", "mmotee/hammer/odinspear.png")
 image_aztecsword = Image("aztecsword", "mmotee/hammer/aztecsword.png")
 image_mmogame = Image("mmogame", "mmotee/mmogame.png")
+image_mmohammer = Image("mmohammer", "mmotee/mmohammer.png")
 image_mmologo = Image("mmologo", "mmotee/logo.png")
 
 ###############################################################################
@@ -314,6 +315,7 @@ container.images.Add(image_wingit23)
 container.images.Add(image_odinspear)
 container.images.Add(image_aztecsword)
 container.images.Add(image_mmogame)
+container.images.Add(image_mmohammer)
 container.images.Add(image_mmologo)
 
 container.pickups.Add(Pickup("health"))
@@ -367,6 +369,7 @@ set_wingsit23 = SpriteSet("wingsit23", image_wingit23, 1, 1)
 set_odinspear = SpriteSet("odinspear", image_odinspear, 1, 1)
 set_aztecsword = SpriteSet("aztecsword", image_aztecsword, 1, 1)
 set_mmogame = SpriteSet("mmogame", image_mmogame, 16, 8)
+set_mmohammer = SpriteSet("mmohammer", image_mmohammer, 8, 4)
 set_mmologo = SpriteSet("mmologo", image_mmologo, 1, 1)
 
 ###############################################################################
@@ -409,6 +412,7 @@ container.spritesets.Add(set_wingsit23)
 container.spritesets.Add(set_odinspear)
 container.spritesets.Add(set_aztecsword)
 container.spritesets.Add(set_mmogame)
+container.spritesets.Add(set_mmohammer)
 container.spritesets.Add(set_mmologo)
 
 container.sprites.Add(Sprite("part_slice", set_particles, 0,0,1,1))
@@ -629,12 +633,15 @@ container.sprites.Add(Sprite("sidebar_info_b", set_sidebaricons, 3,1,1,1))
 container.sprites.Add(Sprite("timerclock_a", set_timerclock, 0,0,1,1))
 container.sprites.Add(Sprite("timerclock_b", set_timerclock, 0,1,1,1))
 #mmotee
-container.sprites.Add(Sprite("box", set_mmogame, 0, 0, 1, 1))
-container.sprites.Add(Sprite("experience", set_mmogame, 1, 0, 1, 1))
-container.sprites.Add(Sprite("plant", set_mmogame, 2, 0, 1, 1))
-container.sprites.Add(Sprite("ores", set_mmogame, 3, 0, 1, 1))
-container.sprites.Add(Sprite("arrow", set_mmogame, 4, 0, 1, 1))
-container.sprites.Add(Sprite("bubble_fire", set_mmogame, 1, 3, 1, 1))
+container.sprites.Add(Sprite("mmo_game_box", set_mmogame, 0, 0, 1, 1))
+container.sprites.Add(Sprite("mmo_game_experience", set_mmogame, 1, 0, 1, 1))
+container.sprites.Add(Sprite("mmo_game_plant", set_mmogame, 2, 0, 1, 1))
+container.sprites.Add(Sprite("mmo_game_ores", set_mmogame, 3, 0, 1, 1))
+container.sprites.Add(Sprite("mmo_game_arrow", set_mmogame, 4, 0, 1, 1))
+container.sprites.Add(Sprite("mmo_game_bubble_fire", set_mmogame, 1, 3, 1, 1))
+
+#mmotee hammer
+container.sprites.Add(Sprite("mmo_hammer_thoor", set_mmohammer, 0, 0, 1, 1))
 
 container.sprites.Add(Sprite("relax_heart", set_relax, 0, 0, 1, 1))
 container.sprites.Add(Sprite("relax_eyes", set_relax, 1, 0, 1, 1))

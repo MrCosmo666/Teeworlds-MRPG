@@ -308,7 +308,7 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAME].m_Id);
 	Graphics()->QuadsBegin();
 
-	const int c[] = { SPRITE_BUBBLE_FIRE };
+	const int c[] = { SPRITE_MMO_GAME_BUBBLE_FIRE };
 	RenderTools()->SelectSprite(c[pCurrent->m_Type]);
 
 	// добавить эффект проджектайлу
@@ -350,7 +350,7 @@ void CItems::RenderMmoPickups(const CNetObj_MmoPickup* pPrev, const CNetObj_MmoP
 	vec2 Curr = vec2(pCurrent->m_X, pCurrent->m_Y);
 	vec2 Pos = mix(Prev, Curr, Client()->IntraGameTick());
 	float Angle = mix((float)pPrev->m_Angle, (float)pCurrent->m_Angle, Client()->IntraGameTick()) / 256.0f;
-	const int c[] = { SPRITE_BOX, SPRITE_EXPERIENCE, SPRITE_PLANT, SPRITE_ORES, SPRITE_ARROW };
+	const int c[] = { SPRITE_MMO_GAME_BOX, SPRITE_MMO_GAME_EXPERIENCE, SPRITE_MMO_GAME_PLANT, SPRITE_MMO_GAME_ORES, SPRITE_MMO_GAME_ARROW };
 
 	if (pCurrent->m_Type == MMO_PICKUP_ARROW)
 		Size = 48.0f;

@@ -6,7 +6,9 @@
 #include <base/stringable_enum.h>
 
 #define GRAY_COLOR vec3(40, 42, 45)
-#define GOLDEN_COLOR vec3(40, 25, 2)
+#define LIGHT_GRAY_COLOR vec3(15, 15, 16)
+#define SMALL_LIGHT_GRAY_COLOR vec3(10, 11, 11)
+#define GOLDEN_COLOR vec3(35, 20, 2)
 #define LIGHT_GOLDEN_COLOR vec3(16, 7, 0)
 #define RED_COLOR vec3(40, 15, 15)
 #define LIGHT_RED_COLOR vec3(16, 7, 5)

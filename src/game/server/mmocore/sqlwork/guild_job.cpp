@@ -854,17 +854,19 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 
 	GS()->AV(ClientID, "null", "");
 	pPlayer->m_Colored = GOLDEN_COLOR;
-	GS()->AVL(ClientID, "null", "۩ Players list on guild", &pPlayer->GetItem(itMoney).Count);
+	GS()->AVL(ClientID, "null", "₪ Players list on guild", &pPlayer->GetItem(itMoney).Count);
 	ShowGuildPlayers(pPlayer);
 	GS()->AV(ClientID, "null", "");
 
-	pPlayer->m_Colored = { 10,10,10 };
+	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "◍ Your money: {INT}gold", &pPlayer->GetItem(itMoney).Count);
+	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "MMONEY", "Add money guild bank. (Amount in a reason)", Guild[GuildID].m_Name);
 
 	GS()->AV(ClientID, "null", "");
-	pPlayer->m_Colored = { 10,10,10 };
+	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "▤ Guild system", &pPlayer->GetItem(itMoney).Count);
+	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVM(ClientID, "MENU", GUILDRANK, NOPE, "Settings guild Rank(s)");
 	GS()->AVM(ClientID, "MENU", MEMBERINVITES, NOPE, "Invites to your guild");
 	GS()->AVM(ClientID, "MENU", MEMBERHISTORY, NOPE, "History of activity");
@@ -872,8 +874,9 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	if (MemberHouse > 0)
 	{
 		GS()->AV(ClientID, "null", "");
-		pPlayer->m_Colored = { 10,10,10 };
+		pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 		GS()->AVL(ClientID, "null", "⌂ Housing system", &pPlayer->GetItem(itMoney).Count);
+		pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 		GS()->AVM(ClientID, "MENU", HOUSEGUILDDECORATION, NOPE, "Settings Decoration(s)");
 		GS()->AVL(ClientID, "MDOOR", "Change state (\"{STR} door\")", GetGuildDoor(GuildID) ? "Open" : "Close");
 		GS()->AVL(ClientID, "MSPAWN", "Teleport to guild house");
@@ -882,8 +885,9 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 
 
 	GS()->AV(ClientID, "null", "");
-	pPlayer->m_Colored = { 10,10,10 };
+	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "☆ Guild upgrades", &pPlayer->GetItem(itMoney).Count);
+	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	if (MemberHouse > 0)
 	{
 		for(int i = EMEMBERUPGRADE::ChairNSTExperience ; i < EMEMBERUPGRADE::NUM_EMEMBERUPGRADE; i++)
@@ -895,7 +899,6 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	int PriceUpgrade = Guild[ GuildID ].m_Upgrades[ EMEMBERUPGRADE::AvailableNSTSlots ] * g_Config.m_SvPriceUpgradeGuildSlot;
 	GS()->AVM(ClientID, "MUPGRADE", EMEMBERUPGRADE::AvailableNSTSlots, NOPE, "Upgrade {STR} ({INT}) {INT}gold", 
 		UpgradeNames(EMEMBERUPGRADE::AvailableNSTSlots).c_str(), &Guild[GuildID].m_Upgrades[ EMEMBERUPGRADE::AvailableNSTSlots ], &PriceUpgrade);
-	GS()->AV(ClientID, "null", "");
 	GS()->AddBack(ClientID);
 	return;
 }

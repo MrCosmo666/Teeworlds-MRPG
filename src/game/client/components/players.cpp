@@ -299,14 +299,7 @@ void CPlayers::RenderPlayer(const CNetObj_Character *pPrevChar, const CNetObj_Ch
 		float Recoil = 0.0f;
 		if (Player.m_Weapon == WEAPON_HAMMER)
 		{
-			Graphics()->QuadsEnd();
-
-			bool m_RenderHammer = RenderHammer(&State, Player, Angle, Position, m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_HAMMER]);
-			Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
-
-			Graphics()->QuadsBegin();
-			Graphics()->QuadsSetRotation(State.GetAttach()->m_Angle*pi * 2 + Angle);
-			if(m_RenderHammer)
+			if(!RenderHammer(&State, Angle, Direction, Position, m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_HAMMER]))
 			{
 				int iw = clamp(Player.m_Weapon, 0, NUM_WEAPONS - 1);
 				RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[iw].m_pSpriteBody, Direction.x < 0 ? SPRITE_FLAG_FLIP_Y : 0);
@@ -608,52 +601,37 @@ void CPlayers::RenderWings(CAnimState* pAnimWings, vec2 Position, vec2 Direction
 	RenderTools()->RenderPicItems(pAnimWings, EquipItem, Direction, Position);
 }
 
-bool CPlayers::RenderHammer(CAnimState* pAnim, const CNetObj_Character pPlayer, float Angle, vec2 Position, int EquipID)
+bool CPlayers::RenderHammer(CAnimState* pAnim, float Angle, vec2 Direction, vec2 Position, int EquipID)
 {
-	vec2 Direction = direction(Angle);
-	if (EquipID == 24) // spear
-	{
-		// ������� � ������ ������
-		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_ODINSPEAR].m_Id);
-		Graphics()->QuadsBegin();
-
-		vec2 p = Position + vec2(pAnim->GetAttach()->m_X, pAnim->GetAttach()->m_Y);
-		p.x -= 58;
-		p.y -= 100;
-
-		Graphics()->QuadsSetRotation(20 + pAnim->GetAttach()->m_Angle*pi * 90);
-		IGraphics::CQuadItem Quad2(p.x, p.y, 120, 120);
-		Graphics()->QuadsDrawTL(&Quad2, 1);
-
-		// ��������� �����
-		Graphics()->QuadsEnd();
-		
-		// ������ ������ ������
-		m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 20, Position.y - 70), vec2(0,0), vec4(0.8f, 0.3f, 0.0f, 0.2f));
-		return true;
-	}
-
-	if (EquipID == 10) // aztec sword
-	{
-		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_AZTECSWORD].m_Id);
-		Graphics()->QuadsBegin();
-
-		vec2 p = vec2(Position.x, Position.y);
-		int SizeX = 250, SizeY = 60;
-		if (Direction.x < 0)
-		{
-			Graphics()->QuadsSetRotation(-pi / 2 - (pAnim->GetAttach()->m_Angle*2)*pi * 2);
-			SizeY -= SizeY * 2;
-		}
-		else Graphics()->QuadsSetRotation(-pi / 2 + (pAnim->GetAttach()->m_Angle*2)*pi * 2 );
-
-		// ������ ������
-		IGraphics::CQuadItem Quad2(p.x-SizeX/2, (p.y-SizeY/2)-15, SizeX, SizeY);
-		Graphics()->QuadsDrawTL(&Quad2, 1);
-		
-		// ��������� �����
-		Graphics()->QuadsEnd();
+	vec2 p;
+	int SPRITEID = -1;
+	if (EquipID == 24) // thor hammer
+		SPRITEID = SPRITE_MMO_HAMMER_THOOR;
+	
+	if(SPRITEID == -1)
 		return false;
+
+	Graphics()->QuadsEnd();
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOHAMMER].m_Id);
+	Graphics()->QuadsBegin();
+	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
+	RenderTools()->SelectSprite(SPRITEID, Direction.x < 0 ? SPRITE_FLAG_FLIP_Y : 0);
+
+	p = Position + vec2(pAnim->GetAttach()->m_X, pAnim->GetAttach()->m_Y);
+	p.y += g_pData->m_Weapons.m_aId[WEAPON_HAMMER].m_Offsety;
+	if (Direction.x < 0)
+	{
+		Graphics()->QuadsSetRotation(-pi / 2 - pAnim->GetAttach()->m_Angle * pi * 2);
+		p.x -= g_pData->m_Weapons.m_aId[WEAPON_HAMMER].m_Offsetx;
 	}
+	else
+		Graphics()->QuadsSetRotation(-pi / 2 + pAnim->GetAttach()->m_Angle * pi * 2);
+
+	RenderTools()->DrawSprite(p.x, p.y, g_pData->m_Weapons.m_aId[WEAPON_HAMMER].m_VisualSize);
+	Graphics()->QuadsEnd();
+
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+	Graphics()->QuadsBegin();
+	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
 	return true;
 } 

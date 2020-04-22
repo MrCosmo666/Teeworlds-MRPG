@@ -113,7 +113,7 @@ void CEffects::WingsEffect(vec2 Pos, vec2 Vel, vec4 Color)
 
 	CParticle p;
 	p.SetDefault();
-	p.m_Spr = SPRITE_EXPERIENCE;
+	p.m_Spr = SPRITE_MMO_GAME_EXPERIENCE;
 	p.m_Pos = vec2(Pos.x + 20 - rand() % 40, Pos.y + 20 - rand() % 40);
 	p.m_Vel = Vel + RandomDir() * 200.0f;
 	p.m_LifeSpan = 0.5f + frandom() * 0.5f;
@@ -132,7 +132,7 @@ void CEffects::BubbleEffect(vec2 Pos, vec2 Vel)
 
 	CParticle p;
 	p.SetDefault();
-	p.m_Spr = SPRITE_BUBBLE_FIRE;
+	p.m_Spr = SPRITE_MMO_GAME_BUBBLE_FIRE;
 	p.m_Pos = Pos;
 	p.m_Vel = Vel + RandomDir() * 200.0f;
 	p.m_LifeSpan = 0.5f + frandom() * 0.5f;
