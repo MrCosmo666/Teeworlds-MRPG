@@ -9,9 +9,6 @@ std::map < int , GuildJob::GuildStruct > GuildJob::Guild;
 std::map < int , GuildJob::GuildStructHouse > GuildJob::HouseGuild;
 std::map < int , GuildJob::GuildStructRank > GuildJob::RankGuild;
 
-/* #########################################################################
-	LOADING GUILDS 
-######################################################################### */
 void GuildJob::LoadGuildRank(int GuildID)
 {
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_ranks", "WHERE ID > '0' AND GuildID = '%d'", GuildID));
@@ -70,18 +67,512 @@ void GuildJob::OnInitLocal(const char *pLocal)
 	}
 
 	// загрузка декораций
-	if (m_DecorationHouse.size() <= 0)
+	boost::scoped_ptr<ResultSet> DecoLoadingRES(SJK.SD("*", "tw_guilds_decorations", pLocal));
+	while (DecoLoadingRES->next())
 	{
-		boost::scoped_ptr<ResultSet> DecoLoadingRES(SJK.SD("*", "tw_guilds_decorations", pLocal));
-		while (DecoLoadingRES->next())
-		{
-			const int DecoID = DecoLoadingRES->getInt("ID");
-			m_DecorationHouse[DecoID] = new DecoHouse(&GS()->m_World, vec2(DecoLoadingRES->getInt("X"),
-				DecoLoadingRES->getInt("Y")), DecoLoadingRES->getInt("HouseID"), DecoLoadingRES->getInt("DecoID"));
-		}
+		const int DecoID = DecoLoadingRES->getInt("ID");
+		m_DecorationHouse[DecoID] = new DecoHouse(&GS()->m_World, vec2(DecoLoadingRES->getInt("X"),
+			DecoLoadingRES->getInt("Y")), DecoLoadingRES->getInt("HouseID"), DecoLoadingRES->getInt("DecoID"));
 	}
 	Job()->ShowLoadingProgress("Guilds Houses", HouseGuild.size());
 	Job()->ShowLoadingProgress("Guilds Houses Decorations", m_DecorationHouse.size());
+}
+
+bool GuildJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
+{
+	CPlayer* pPlayer = pChr->GetPlayer();
+	const int ClientID = pPlayer->GetCID();
+
+	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_GUILD_HOUSE))
+	{
+		const int HouseID = GetPosHouseID(pChr->m_Core.m_Pos);
+		if (HouseID > 0)
+		{
+			GS()->ResetVotes(ClientID, MAINMENU);
+			GS()->Chat(ClientID, "Information load in Vote!");
+		}
+		pChr->m_Core.m_ProtectHooked = true;
+		pChr->m_NoAllowDamage = true;
+		return true;
+	}
+	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_GUILD_HOUSE))
+	{
+		GS()->ResetVotes(ClientID, MAINMENU);
+		pChr->m_Core.m_ProtectHooked = false;
+		pChr->m_NoAllowDamage = false;
+		return true;
+	}
+
+
+	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_GUILD_CHAIRS))
+	{
+		pChr->m_Core.m_ProtectHooked = true;
+		pChr->m_NoAllowDamage = true; 
+		return true;
+	}
+	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_GUILD_CHAIRS))
+	{
+		pChr->m_Core.m_ProtectHooked = false;
+		pChr->m_NoAllowDamage = false;
+		return true;
+	}
+	if (pChr->GetHelper()->BoolIndex(TILE_GUILD_CHAIRS))
+	{
+		if (GS()->Server()->Tick() % GS()->Server()->TickSpeed() == 0)
+		{
+			const int HouseID = GetPosHouseID(pChr->m_Core.m_Pos);
+			const int GuildID = GetHouseGuildID(HouseID);
+			if (HouseID <= 0 || GuildID <= 0) 
+				return true;
+
+			const int Exp = GetMemberChairBonus(GuildID, EMEMBERUPGRADE::ChairNSTExperience);
+			const int Money = GetMemberChairBonus(GuildID, EMEMBERUPGRADE::ChairNSTMoney);
+			pPlayer->AddExp(Exp);
+			pPlayer->AddMoney(Money);
+		}
+		return true;
+	}
+
+	return false;
+}
+
+/* #########################################################################
+	GLOBAL MEMBER
+######################################################################### */
+// парсинг голосований для меню
+bool GuildJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+{
+	const int ClientID = pPlayer->GetCID();
+	if (PPSTR(CMD, "MLEADER") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer) || Get != 134)
+		{
+			GS()->Chat(ClientID, "You have no access.");
+			return true;
+		}
+
+		const int SelectedAccountID = VoteID;
+		SJK.UD("tw_guilds", "OwnerID = '%d' WHERE ID = '%d'", SelectedAccountID, GuildID);
+		Guild[GuildID].m_OwnerID = SelectedAccountID;
+
+		AddHistoryGuild(GuildID, "New guild leader '%s'.", Job()->PlayerName(SelectedAccountID));
+		GS()->ChatGuild(GuildID, "Change leader {STR}->{STR}", GS()->Server()->ClientName(ClientID), Job()->PlayerName(SelectedAccountID));
+		GS()->VResetVotes(ClientID, MEMBERMENU);
+		return true;
+	}
+
+	// переместится домой
+	if (PPSTR(CMD, "MSPAWN") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		const int HouseID = GetGuildHouseID(GuildID);
+		if (GuildID <= 0 || HouseID <= 0)
+			return true;
+
+		const int WorldID = HouseGuild[HouseID].m_WorldID;
+		if (GS()->IsClientEqualWorldID(ClientID, WorldID))
+		{
+			vec2 Position = GetPositionHouse(GuildID);
+			pPlayer->Acc().TeleportX = Position.x;
+			pPlayer->Acc().TeleportY = Position.y;
+			GS()->Server()->ChangeWorld(ClientID, WorldID);
+			return true;
+		}
+
+		vec2 Position = GetPositionHouse(GuildID);
+		pPlayer->GetCharacter()->ChangePosition(Position);
+		return true;
+	}
+
+	// кикнуть игрока из организации
+	if (PPSTR(CMD, "MKICK") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
+		{
+			GS()->Chat(ClientID, "You have no access.");
+			return true;
+		}
+
+		// todo: close kick for accesses peoples
+		ExitGuild(VoteID);
+		GS()->VResetVotes(ClientID, MEMBERMENU);
+		return true;
+	}
+
+	// покупка улучшения стула
+	if (PPSTR(CMD, "MUPGRADE") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
+		{
+			GS()->Chat(ClientID, "You have no access.");
+			return true;
+		}
+
+		const int UpgradeID = VoteID;
+		if (UpgradeGuild(GuildID, UpgradeID))
+		{
+			int GuildCount = Guild[GuildID].m_Upgrades[UpgradeID] - 1;
+			GS()->Chat(ClientID, "Added ({INT}+1) {STR} to {STR}!", &GuildCount, UpgradeNames(UpgradeID).c_str(), Guild[GuildID].m_Name);
+			GS()->VResetVotes(ClientID, MEMBERMENU);
+		}
+		else 
+			GS()->Chat(ClientID, "You don't have that much money in the Bank.");
+		return true;
+	}
+
+	// добавка денег в банк организации
+	if (PPSTR(CMD, "MMONEY") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		if (GuildID <= 0)
+			return true;
+
+		if (Get < 100)
+		{
+			GS()->Chat(ClientID, "Minimal 100 gold.");
+			return true;
+		}
+
+		if (pPlayer->CheckFailMoney(Get))
+			return true;
+
+		if (AddMoneyBank(GuildID, Get))
+		{
+			SJK.UD("tw_accounts_data", "GuildDeposit = GuildDeposit + '%d' WHERE ID = '%d'", Get, pPlayer->Acc().AuthID);
+			GS()->ChatGuild(GuildID, "{STR} deposit in treasury {INT}gold.", GS()->Server()->ClientName(ClientID), &Get);
+			AddHistoryGuild(GuildID, "'%s' added to bank %dgold.", GS()->Server()->ClientName(ClientID), Get);
+			GS()->VResetVotes(ClientID, MEMBERMENU);
+		}
+		return true;
+	}
+
+	// покупка дома
+	if (PPSTR(CMD, "BUYMEMBERHOUSE") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		{
+			GS()->Chat(ClientID, "You have no access.");
+			return true;
+		}
+
+		BuyGuildHouse(GuildID, VoteID);
+		GS()->VResetVotes(ClientID, MAINMENU);
+	}
+
+	// продажа дома
+	if (PPSTR(CMD, "MHOUSESELL") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer) || Get != 777)
+		{
+			GS()->Chat(ClientID, "You have no access.");
+			return true;
+		}
+
+		SellGuildHouse(GuildID);
+		GS()->VResetVotes(ClientID, MEMBERMENU);
+		return true;
+	}
+
+	// дверь дома организации
+	if (PPSTR(CMD, "MDOOR") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
+		{
+			GS()->Chat(ClientID, "You have no access.");
+			return true;
+		}
+
+		ChangeStateDoor(GuildID);
+		GS()->VResetVotes(ClientID, MEMBERMENU);
+		return true;
+	}
+
+	// принять приглошение
+	if (PPSTR(CMD, "MINVITEACCEPT") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
+		{
+			GS()->Chat(ClientID, "You have no access.");
+			return true;
+		}
+
+		const int SenderID = VoteID;
+		SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
+		Job()->Inbox()->SendInbox(SenderID, Guild[GuildID].m_Name, "You were accepted to join guild");
+		JoinGuild(SenderID, GuildID);
+		GS()->ResetVotes(ClientID, MEMBERMENU);
+		return true;
+	}
+
+	// отклонить приглашение
+	if (PPSTR(CMD, "MINVITEREJECT") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
+		{
+			GS()->Chat(ClientID, "You have no access.");
+			return true;
+		}
+
+		const int SenderID = VoteID;
+		GS()->Chat(ClientID, "You reject invite.");
+		SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
+		Job()->Inbox()->SendInbox(SenderID, Guild[GuildID].m_Name, "You were denied join guild");
+		GS()->ResetVotes(ClientID, MEMBERMENU);
+		return true;
+	}
+
+	// - - - - - - -
+	// Поиск гильдии
+	if (PPSTR(CMD, "MINVITENAME") == 0)
+	{
+		if (PPSTR(GetText, "NULL") == 0)
+		{
+			GS()->Chat(ClientID, "Use please another name.");
+			return true;
+		}
+
+		str_copy(CGS::InteractiveSub[ClientID].GuildName, GetText, sizeof(CGS::InteractiveSub[ClientID].GuildName));
+		GS()->VResetVotes(ClientID, MEMBERMENU);
+		return true;
+	}
+
+	// создать новое приглашение в гильдию
+	if (PPSTR(CMD, "MINVITESEND") == 0)
+	{
+		if (!AddInviteGuild(VoteID, pPlayer->Acc().AuthID))
+		{
+			GS()->Chat(ClientID, "You have already sent the invitation.");
+			return true;
+		}
+
+		GS()->Chat(ClientID, "You sent the invitation to join.");
+		return true;
+	}
+
+	// - - - - - - РАНГИ - - - - 
+	// изменить поле ранга имени
+	if (PPSTR(CMD, "MRANKNAME") == 0)
+	{
+		if (PPSTR(GetText, "NULL") == 0)
+		{
+			GS()->Chat(ClientID, "Use please another name.");
+			return true;
+		}
+
+		str_copy(CGS::InteractiveSub[ClientID].RankName, GetText, sizeof(CGS::InteractiveSub[ClientID].RankName));
+		GS()->VResetVotes(ClientID, GUILDRANK);
+		return true;
+	}
+
+	// создать ранг
+	if (PPSTR(CMD, "MRANKCREATE") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		{
+			GS()->Chat(ClientID, "You have no access.");
+			return true;
+		}
+
+		if (str_length(CGS::InteractiveSub[ClientID].RankName) < 2)
+		{
+			GS()->Chat(ClientID, "Minimal symbols 2.");
+			return true;
+		}
+
+		AddRank(GuildID, CGS::InteractiveSub[ClientID].RankName);
+		GS()->ClearInteractiveSub(ClientID);
+		GS()->VResetVotes(ClientID, GUILDRANK);
+		return true;
+	}
+
+	// удалить ранг
+	if (PPSTR(CMD, "MRANKDELETE") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		{
+			GS()->Chat(ClientID, "You have no access.");
+			return true;
+		}
+
+		const int RankID = VoteID;
+		DeleteRank(RankID, GuildID);
+		GS()->VResetVotes(ClientID, GUILDRANK);
+		return true;
+	}
+
+	// изменить доступ рангу
+	if (PPSTR(CMD, "MRANKACCESS") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		{
+			GS()->Chat(ClientID, "You have no access.");
+			return true;
+		}
+
+		const int RankID = VoteID;
+		ChangeRankAccess(RankID);
+		GS()->VResetVotes(ClientID, GUILDRANK);
+		return true;
+	}
+
+	// установить ранг
+	if (PPSTR(CMD, "MRANKSET") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		{
+			GS()->Chat(ClientID, "You have no access.");
+			return true;
+		}
+
+		if (str_length(CGS::InteractiveSub[ClientID].RankName) < 2)
+		{
+			GS()->Chat(ClientID, "Minimal symbols 2.");
+			return true;
+		}
+
+		const int RankID = VoteID;
+		ChangeRank(RankID, GuildID, CGS::InteractiveSub[ClientID].RankName);
+		GS()->ClearInteractiveSub(ClientID);
+		GS()->VResetVotes(ClientID, GUILDRANK);
+		return true;
+	}
+
+	// изменить имя ранга
+	if (PPSTR(CMD, "MRANKCHANGE") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		{
+			GS()->Chat(ClientID, "You have no access.");
+			return true;
+		}
+
+		// меняем ранг и очишаем меню интерактивов
+		ChangePlayerRank(VoteID, VoteID2);
+		GS()->ClearInteractiveSub(ClientID);
+		GS()->VResetVotes(ClientID, MEMBERMENU);
+		return true;
+	}
+
+
+	// начала расстановки декорации
+	if (PPSTR(CMD, "DECOGUILDSTART") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		const int HouseID = GetGuildHouseID(GuildID);
+		if (GuildID <= 0 || HouseID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
+		{
+			GS()->Chat(ClientID, "You have no access.");
+			return true;
+		}
+
+		vec2 PositionHouse = GetPositionHouse(GuildID);
+		if (distance(PositionHouse, pPlayer->GetCharacter()->m_Core.m_Pos) > 600)
+		{
+			GS()->Chat(ClientID, "Maximum distance between your home 600!");
+			return true;
+		}
+
+		GS()->ClearVotes(ClientID);
+		GS()->AV(ClientID, "null", "Please close vote and press Left Mouse,");
+		GS()->AV(ClientID, "null", "on position where add decoration!");
+		GS()->AddBack(ClientID);
+
+		const int DecoItemID = VoteID;
+		CGS::InteractiveSub[ClientID].TempID = DecoItemID;
+		CGS::InteractiveSub[ClientID].TempID2 = DECOTYPE_GUILD_HOUSE;
+		pPlayer->m_LastVoteMenu = INVENTORY;
+		return true;
+	}
+
+	if (PPSTR(CMD, "DECOGUILDDELETE") == 0)
+	{
+		const int GuildID = pPlayer->Acc().GuildID;
+		const int HouseID = GetGuildHouseID(GuildID);
+		if (GuildID <= 0 || HouseID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
+		{
+			GS()->Chat(ClientID, "You have no access.");
+			return true;
+		}
+
+		const int DecoID = VoteID;
+		const int DecoItemID = VoteID2;
+		if (DeleteDecorationHouse(DecoID))
+		{
+			ItemSql::ItemPlayer& PlDecoItem = pPlayer->GetItem(DecoItemID);
+			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
+			PlDecoItem.Add(1);
+		}
+		GS()->VResetVotes(ClientID, HOUSEGUILDDECORATION);
+		return true;
+	}
+	return false;
+}
+
+bool GuildJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+{
+	int ClientID = pPlayer->GetCID();
+	if (ReplaceMenu)
+	{
+		return false;
+	}
+
+	if (Menulist == MEMBERMENU)
+	{
+		pPlayer->m_LastVoteMenu = MAINMENU;
+		ShowMenuGuild(pPlayer);
+		return true;
+	}
+
+	if (Menulist == MEMBERHISTORY)
+	{
+		pPlayer->m_LastVoteMenu = MEMBERMENU;
+		ShowHistoryGuild(ClientID, pPlayer->Acc().GuildID);
+		return true;
+	}
+
+	if (Menulist == GUILDRANK)
+	{
+		pPlayer->m_LastVoteMenu = MEMBERMENU;
+		ShowMenuRank(pPlayer);
+		return true;
+	}
+
+	if (Menulist == MEMBERINVITES)
+	{
+		pPlayer->m_LastVoteMenu = MEMBERMENU;
+		ShowInvitesGuilds(ClientID, pPlayer->Acc().GuildID);
+		return true;
+	}
+
+	if (Menulist == HOUSEGUILDDECORATION)
+	{
+		pPlayer->m_LastVoteMenu = HOUSEMENU;
+		GS()->AVH(ClientID, HDECORATION, GREEN_COLOR, "Decorations Information");
+		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "Add: Select your item in list. Select (Add to house),");
+		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "later press (ESC) and mouse select position");
+		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "Return in inventory: Select down your decorations");
+		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "and press (Back to inventory).");
+
+		Job()->Item()->ListInventory(pPlayer, ITEMDECORATION);
+		GS()->AV(ClientID, "null", "");
+		ShowDecorationList(pPlayer);
+		GS()->AddBack(ClientID);
+		return true;
+	}
+	return false;
 }
 
 /* #########################################################################
@@ -152,7 +643,7 @@ bool GuildJob::IsLeaderPlayer(CPlayer *pPlayer, int Access) const
 	if(GuildID > 0 && Guild.find(GuildID) != Guild.end() &&
 		(Guild[GuildID].m_OwnerID == pPlayer->Acc().AuthID ||
 			(RankGuild.find(pPlayer->Acc().GuildRank) != RankGuild.end() &&
-				(RankGuild[pPlayer->Acc().GuildRank].Access == Access || RankGuild[pPlayer->Acc().GuildRank].Access == MACCESSFULL))))
+				(RankGuild[pPlayer->Acc().GuildRank].Access == Access || RankGuild[pPlayer->Acc().GuildRank].Access == GuildAccess::ACCESS_FULL))))
 		return true;
 	return false;
 }
@@ -513,9 +1004,9 @@ const char *GuildJob::AccessNames(int Access)
 	switch(Access) 
 	{
 		default: return "No Access";
-		case MACCESSINVITEKICK: return "Access Invite Kick";
-		case MACCESSUPGHOUSE: return "Access Upgrades & House";
-		case MACCESSFULL: return "Full Access";
+		case GuildAccess::ACCESS_INVITE_KICK: return "Access Invite Kick";
+		case GuildAccess::ACCESS_UPGRADE_HOUSE: return "Access Upgrades & House";
+		case GuildAccess::ACCESS_FULL: return "Full Access";
 	}
 }
 
@@ -600,8 +1091,8 @@ void GuildJob::ChangeRankAccess(int RankID)
 	if(RankGuild.find(RankID) != RankGuild.end())
 	{
 		RankGuild[ RankID ].Access++;
-		if(RankGuild[ RankID ].Access > MACCESSFULL)
-			RankGuild[ RankID ].Access = MACCESSNO;
+		if(RankGuild[ RankID ].Access > GuildAccess::ACCESS_FULL)
+			RankGuild[ RankID ].Access = GuildAccess::ACCESS_NO;
 
 		int GuildID = RankGuild[RankID].GuildID;
 		SJK.UD("tw_guilds_ranks", "Access = '%d' WHERE ID = '%d' AND GuildID = '%d'", 
@@ -682,12 +1173,12 @@ void GuildJob::ShowInvitesGuilds(int ClientID, int GuildID)
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_invites", "WHERE GuildID = '%d'", GuildID));
 	while(RES->next())
 	{
-		int OwnerID = RES->getInt("OwnerID");
-		const char *PlayerName = Job()->PlayerName(OwnerID);
+		int SenderID = RES->getInt("OwnerID");
+		const char *PlayerName = Job()->PlayerName(SenderID);
 		GS()->AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "Sender {STR} to join guilds", PlayerName);
 		{
-			GS()->AVD(ClientID, "MINVITEACCEPT", GuildID, OwnerID, HideID, "Accept {STR} to guild", PlayerName);
-			GS()->AVD(ClientID, "MINVITEREJECT", GuildID, OwnerID, HideID, "Reject {STR} to guild", PlayerName);
+			GS()->AVM(ClientID, "MINVITEACCEPT", SenderID, HideID, "Accept {STR} to guild", PlayerName);
+			GS()->AVM(ClientID, "MINVITEREJECT", SenderID, HideID, "Reject {STR} to guild", PlayerName);
 		}
 		HideID++;
 	}
@@ -767,11 +1258,10 @@ int GuildJob::GetHouseGuildID(int HouseID) const
 	return -1;
 }
 
-// мир дома организации
 int GuildJob::GetHouseWorldID(int HouseID) const
 {
-	if(HouseGuild.find(HouseID) != HouseGuild.end())
-		return HouseGuild.at(HouseID).m_WorldID;
+	if (HouseGuild.find(HouseID) != HouseGuild.end())
+		return HouseGuild.at(HouseID).m_GuildID;
 	return -1;
 }
 
@@ -939,482 +1429,6 @@ void GuildJob::ChangeStateDoor(int GuildID)
 	GS()->ChatGuild(GuildID, "{STR} the house for others.", (StateDoor ? "closed" : "opened"));
 }
 
-/* #########################################################################
-	GLOBAL MEMBER  
-######################################################################### */
-// парсинг голосований для меню
-bool GuildJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
-{
-	int ClientID = pPlayer->GetCID();
-
-	/* #########################################################################
-		FUNCTIONS MEMBER 
-	######################################################################### */
-	if(PPSTR(CMD, "MLEADER") == 0)
-	{
-		// проверяем если не является лидером
-		if(!IsLeaderPlayer(pPlayer) || Get != 134)
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		// устанавливаем нового лидера
-		int GuildID = pPlayer->Acc().GuildID;
-		SJK.UD("tw_guilds", "OwnerID = '%d' WHERE ID = '%d'", VoteID, GuildID);
-		Guild[GuildID].m_OwnerID = VoteID;
-
-		AddHistoryGuild(GuildID, "New guild leader '%s'.", Job()->PlayerName(VoteID));
-		GS()->ChatGuild(GuildID, "Change leader {STR}->{STR}", GS()->Server()->ClientName(ClientID), Job()->PlayerName(VoteID));
-		GS()->VResetVotes(ClientID, MEMBERMENU);
-		return true;
-	}
-
-	// переместится домой
-	if(PPSTR(CMD, "MSPAWN") == 0)
-	{
-		// если нет игрока в мире
-		if(!pPlayer->GetCharacter()) return true;
-
-		// проверяем если мир не является локальным
-		const int GuildID = pPlayer->Acc().GuildID;
-		const int HouseID = GetGuildHouseID(GuildID);
-		const int WorldID = GetHouseWorldID(HouseID);
-		if(WorldID != GS()->Server()->GetWorldID(ClientID))
-		{
-			// перемешаем в мир дома
-			vec2 Position = GetPositionHouse(GuildID);
-			pPlayer->Acc().TeleportX = Position.x;
-			pPlayer->Acc().TeleportY = Position.y;
-			GS()->Server()->ChangeWorld(ClientID, WorldID);
-			return true;
-		}
-		else
-		{
-			// перемешаем в кординаты дома
-			vec2 Position = GetPositionHouse(GuildID);
-			pPlayer->GetCharacter()->ChangePosition(Position);
-		}
-		return true;
-	}
-
-	// кикнуть игрока из организации
-	if(PPSTR(CMD, "MKICK") == 0)
-	{
-		// проверяем если не имеем прав на кик и приглашения
-		if(!IsLeaderPlayer(pPlayer, MACCESSINVITEKICK))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		// кикаем
-		ExitGuild(VoteID);
-		GS()->VResetVotes(ClientID, MEMBERMENU);
-		return true;
-	}
-
-	// покупка улучшения стула
-	if(PPSTR(CMD, "MUPGRADE") == 0)
-	{
-		// проверяем если нет доступа к дому и улучшениям
-		if(!IsLeaderPlayer(pPlayer, MACCESSUPGHOUSE))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		// улучшаем гильдию
-		int GuildID = pPlayer->Acc().GuildID, UpgradeID = VoteID;
-		if(UpgradeGuild(GuildID, UpgradeID))
-		{
-			int MemberCount = Guild[GuildID].m_Upgrades[ UpgradeID ]-1;
-			GS()->Chat(ClientID, "Added ({INT}+1) {STR} to {STR}!", &MemberCount, UpgradeNames(UpgradeID).c_str(), Guild[GuildID].m_Name);
-			GS()->VResetVotes(ClientID, MEMBERMENU);
-		}
-		else GS()->Chat(ClientID, "You don't have that much money in the Bank.");
-		return true;
-	}
-
-	// добавка денег в банк организации
-	if(PPSTR(CMD, "MMONEY") == 0)
-	{
-		// если добавляется менее 100
-		if(Get < 100)
-		{
-			GS()->Chat(ClientID, "Minimal 100 gold.");
-			return true;
-		}
-
-		// если у игрока нет денег
-		if(pPlayer->CheckFailMoney(Get))
-			return true;
-
-		// добавляем деньги
-		int GuildID = pPlayer->Acc().GuildID;
-		if(AddMoneyBank(GuildID, Get))
-		{
-			SJK.UD("tw_accounts_data", "GuildDeposit = GuildDeposit + '%d' WHERE ID = '%d'", Get, pPlayer->Acc().AuthID);
-			GS()->ChatGuild(GuildID, "{STR} deposit in treasury {INT}gold.", GS()->Server()->ClientName(ClientID), &Get);
-			AddHistoryGuild(GuildID, "'%s' added to bank %dgold.", GS()->Server()->ClientName(ClientID), Get);
-			GS()->VResetVotes(ClientID, MEMBERMENU);
-		}
-		return true;
-	}
-
-	/* #########################################################################
-		FUNCTIONS MEMBER HOUSING MEMBER 
-	######################################################################### */
-	// покупка дома
-	if(PPSTR(CMD, "BUYMEMBERHOUSE") == 0)
-	{
-		// проверяем если не является лидером
-		if(!IsLeaderPlayer(pPlayer))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		// покупаем дом
-		int GuildID = pPlayer->Acc().GuildID;
-		BuyGuildHouse(GuildID, VoteID);
-		GS()->VResetVotes(ClientID, MAINMENU);
-	}
-
-	// продажа дома
-	if(PPSTR(CMD, "MHOUSESELL") == 0)
-	{
-		// проверяем если не является лидером или число проверка не 777
-		if(!IsLeaderPlayer(pPlayer) || Get != 777)
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		// продаем дом
-		int GuildID = pPlayer->Acc().GuildID;
-		SellGuildHouse(GuildID);
-		GS()->VResetVotes(ClientID, MEMBERMENU);
-		return true;
-	}
-
-	// дверь дома организации
-	if(PPSTR(CMD, "MDOOR") == 0)
-	{
-		// проверяем если не имеет прав на управление домом
-		if(!IsLeaderPlayer(pPlayer, MACCESSUPGHOUSE))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		// открываем дом
-		int GuildID = pPlayer->Acc().GuildID;
-		ChangeStateDoor(GuildID);
-		GS()->VResetVotes(ClientID, MEMBERMENU);
-		return true;
-	}
-
-	/* #########################################################################
-		FUNCTIONS MEMBER INVITES MEMBER 
-	######################################################################### */
-	// поиск гильдии по имени
-	if(PPSTR(CMD, "MINVITENAME") == 0)
-	{
-		// если текст является нулем
-		if(PPSTR(GetText, "NULL") == 0)
-		{
-			GS()->Chat(ClientID, "Use please another name.");
-			return true;
-		}
-
-		// копируем имя гильдии в интерактив
-		str_copy(CGS::InteractiveSub[ClientID].GuildName, GetText, sizeof(CGS::InteractiveSub[ClientID].GuildName));
-		GS()->VResetVotes(ClientID, MEMBERMENU);
-		return true;
-	}
-
-	// создать новое приглашение в гильдию
-	if(PPSTR(CMD, "MINVITESEND") == 0)
-	{
-		// отправить приглашение если имеется отказать
-		if(!AddInviteGuild(VoteID, pPlayer->Acc().AuthID))
-		{
-			GS()->Chat(ClientID, "You have already sent the invitation.");
-			return true;
-		}
-
-		// если отправленно то пишет что отправили
-		GS()->Chat(ClientID, "You sent the invitation to join.");		
-		return true;
-	}
-
-	// принять приглошение
-	if(PPSTR(CMD, "MINVITEACCEPT") == 0)
-	{
-		// проверяем если не имеет прав на приглашения и кик
-		if(!IsLeaderPlayer(pPlayer, MACCESSINVITEKICK))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		// принимаем приглашение
-		SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", VoteID, VoteID2);
-		Job()->Inbox()->SendInbox(VoteID2, Guild[ VoteID ].m_Name, "You were accepted to join guild");
-		JoinGuild(VoteID2, VoteID);
-		GS()->ResetVotes(ClientID, MEMBERMENU);
-		return true;
-	}
-
-	// отклонить приглашение
-	if(PPSTR(CMD, "MINVITEREJECT") == 0)
-	{
-		// проверяем если не имеет прав на приглашения и кик
-		if(!IsLeaderPlayer(pPlayer, MACCESSINVITEKICK))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-		
-		// отклоняем приглашение
-		int GuildID = VoteID, OwnerID = VoteID2;
-		GS()->Chat(ClientID, "You reject invite.");
-		SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, OwnerID);
-		Job()->Inbox()->SendInbox(OwnerID, Guild[ GuildID ].m_Name, "You were denied join guild");
-		GS()->ResetVotes(ClientID, MEMBERMENU);
-		return true;
-	}
-
-	/* #########################################################################
-		FUNCTIONS MEMBER RANK MEMBER 
-	######################################################################### */
-	// изменить поле ранга имени
-	if(PPSTR(CMD, "MRANKNAME") == 0)
-	{
-		// проверяем является нулем
-		if(PPSTR(GetText, "NULL") == 0)
-		{
-			GS()->Chat(ClientID, "Use please another name.");
-			return true;
-		}
-		
-		// устанавливаем текст полученый в ранг
-		str_copy(CGS::InteractiveSub[ClientID].RankName, GetText, sizeof(CGS::InteractiveSub[ClientID].RankName));
-		GS()->VResetVotes(ClientID, GUILDRANK);
-		return true;
-	}
-	
-	// создать ранг
-	if(PPSTR(CMD, "MRANKCREATE") == 0)
-	{
-		// проверяем если не лидер
-		if(!IsLeaderPlayer(pPlayer))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		// проверяем размер ранга
-		if(str_length(CGS::InteractiveSub[ClientID].RankName) < 2)
-		{
-			GS()->Chat(ClientID, "Minimal symbols 2.");
-			return true;
-		}
-
-		// создаем ранг
-		int GuildID = pPlayer->Acc().GuildID;
-		AddRank(GuildID, CGS::InteractiveSub[ClientID].RankName);
-		GS()->ClearInteractiveSub(ClientID);
-		GS()->VResetVotes(ClientID, GUILDRANK);
-		return true;
-	}
-
-	// удалить ранг
-	if(PPSTR(CMD, "MRANKDELETE") == 0)
-	{
-		// проверяем если не лидер
-		if(!IsLeaderPlayer(pPlayer))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		// удаляем ранг
-		int GuildID = pPlayer->Acc().GuildID;
-		DeleteRank(VoteID, GuildID);
-		GS()->VResetVotes(ClientID, GUILDRANK);
-		return true;
-	}
-
-	// изменить доступ рангу
-	if(PPSTR(CMD, "MRANKACCESS") == 0)
-	{
-		// проверяем если не лидер
-		if(!IsLeaderPlayer(pPlayer))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		// меняем доступ рангу
-		ChangeRankAccess(VoteID);
-		GS()->VResetVotes(ClientID, GUILDRANK);		
-		return true;
-	}
-
-	// установить ранг
-	if(PPSTR(CMD, "MRANKSET") == 0)
-	{
-		// проверяем если не лидер
-		if(!IsLeaderPlayer(pPlayer))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		// проверяем размер ранга
-		if(str_length(CGS::InteractiveSub[ClientID].RankName) < 2)
-		{
-			GS()->Chat(ClientID, "Minimal symbols 2.");
-			return true;
-		}
-
-		// устанавливаем рангу имя
-		int GuildID = pPlayer->Acc().GuildID;
-		ChangeRank(VoteID, GuildID, CGS::InteractiveSub[ClientID].RankName);
-		GS()->ClearInteractiveSub(ClientID);
-		GS()->VResetVotes(ClientID, GUILDRANK);
-		return true;
-	}
-
-	// изменить имя ранга
-	if(PPSTR(CMD, "MRANKCHANGE") == 0)
-	{
-		// проверяем если не лидер
-		if(!IsLeaderPlayer(pPlayer))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		// меняем ранг и очишаем меню интерактивов
-		ChangePlayerRank(VoteID, VoteID2);
-		GS()->ClearInteractiveSub(ClientID);
-		GS()->VResetVotes(ClientID, MEMBERMENU);
-		return true;
-	}
-
-	/* #########################################################################
-		DECORATION MEMBER
-	######################################################################### */
-	// начала расстановки декорации
-	if (PPSTR(CMD, "DECOGUILDSTART") == 0)
-	{
-		// проверяем если не лидер
-		if (!IsLeaderPlayer(pPlayer, MACCESSUPGHOUSE))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		int GuildID = pPlayer->Acc().GuildID;
-		int HouseID = GetGuildHouseID(GuildID);
-		vec2 PositionHouse = GetPositionHouse(GuildID);
-		if (HouseID <= 0 || distance(PositionHouse, pPlayer->GetCharacter()->m_Core.m_Pos) > 600)
-		{
-			GS()->Chat(ClientID, "Maximum distance between your home 600!");
-			return true;
-		}
-
-		// информация
-		GS()->ClearVotes(ClientID);
-		GS()->AV(ClientID, "null", "Please close vote and press Left Mouse,");
-		GS()->AV(ClientID, "null", "on position where add decoration!");
-		GS()->AddBack(ClientID);
-
-		CGS::InteractiveSub[ClientID].TempID = VoteID;
-		CGS::InteractiveSub[ClientID].TempID2 = DECOTYPE_GUILD_HOUSE;
-		pPlayer->m_LastVoteMenu = INVENTORY;
-		return true;
-	}
-
-	if (PPSTR(CMD, "DECOGUILDDELETE") == 0)
-	{
-		// проверяем если не имеет прав на приглашения и кик
-		if (!IsLeaderPlayer(pPlayer, MACCESSUPGHOUSE))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		int GuildID = pPlayer->Acc().GuildID;
-		int HouseID = GetGuildHouseID(GuildID);
-		if (HouseID > 0 && DeleteDecorationHouse(VoteID))
-		{
-			ItemSql::ItemPlayer& PlDecoItem = pPlayer->GetItem(VoteID2);
-			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
-			PlDecoItem.Add(1);
-		}
-		GS()->VResetVotes(ClientID,HOUSEGUILDDECORATION);
-		return true;
-	}
-	return false;
-}
-
-bool GuildJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
-{
-	int ClientID = pPlayer->GetCID();
-	if (ReplaceMenu)
-	{
-		return false;
-	}
-
-	if (Menulist == MEMBERMENU)
-	{
-		pPlayer->m_LastVoteMenu = MAINMENU;
-		ShowMenuGuild(pPlayer);
-		return true;
-	}
-
-	if (Menulist == MEMBERHISTORY)
-	{
-		pPlayer->m_LastVoteMenu = MEMBERMENU;
-		ShowHistoryGuild(ClientID, pPlayer->Acc().GuildID);
-		return true;
-	}
-
-	if (Menulist == GUILDRANK)
-	{
-		pPlayer->m_LastVoteMenu = MEMBERMENU;
-		ShowMenuRank(pPlayer);
-		return true;
-	}
-
-	if (Menulist == MEMBERINVITES)
-	{
-		pPlayer->m_LastVoteMenu = MEMBERMENU;
-		ShowInvitesGuilds(ClientID, pPlayer->Acc().GuildID);
-		return true;
-	}
-
-	if (Menulist == HOUSEGUILDDECORATION)
-	{
-		pPlayer->m_LastVoteMenu = HOUSEMENU;
-		GS()->AVH(ClientID, HDECORATION, GREEN_COLOR, "Decorations Information");
-		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "Add: Select your item in list. Select (Add to house),");
-		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "later press (ESC) and mouse select position");
-		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "Return in inventory: Select down your decorations");
-		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "and press (Back to inventory).");
-
-		Job()->Item()->ListInventory(pPlayer, ITEMDECORATION);
-		GS()->AV(ClientID, "null", "");
-		ShowDecorationList(pPlayer);
-		GS()->AddBack(ClientID);
-		return true;
-	}
-	return false;
-}
 
 /* #########################################################################
 	HOUSE ENTITIES MEMBER  

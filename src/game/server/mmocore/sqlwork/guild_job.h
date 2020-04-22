@@ -9,9 +9,6 @@
 class GuildDoor;
 class GuildJob : public CMmoComponent
 {
-/* #########################################################################
-	VAR AND OBJECTS MEMBER 
-######################################################################### */
 	struct GuildStruct
 	{
 		char m_Name[32];
@@ -56,14 +53,14 @@ class GuildJob : public CMmoComponent
 
 	std::map < int, DecoHouse* > m_DecorationHouse;
 
-/* #########################################################################
-	LOADING MEMBER 
-######################################################################### */
 	void LoadGuildRank(int GuildID);
 
 public:
 	virtual void OnInitGlobal();
 	virtual void OnInitLocal(const char *pLocal);
+	virtual bool OnPlayerHandleTile(CCharacter* pChr, int IndexCollision);
+	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 
 /* #########################################################################
 	BASED MEMBER
@@ -82,7 +79,7 @@ private:
 
 public:
 	const char *GuildName(int GuildID) const;
-	bool IsLeaderPlayer(CPlayer *pPlayer, int Access = -1) const;
+	bool IsLeaderPlayer(CPlayer *pPlayer, int Access = GuildAccess::ACCESS_LEADER) const;
 	int GetMemberChairBonus(int GuildID, int Field) const;
 
 /* #########################################################################
@@ -169,11 +166,6 @@ public:
 	void ShowBuyHouse(CPlayer *pPlayer, int MID);
 	void ChangeStateDoor(int GuildID);
 
-/* #########################################################################
-	GLOBAL MEMBER  
-######################################################################### */
-	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
-	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 };
 
 /* #########################################################################

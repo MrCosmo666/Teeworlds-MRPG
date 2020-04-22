@@ -943,16 +943,6 @@ void CCharacter::HandleTilesets()
 		{
 			switch(i)
 			{
-				case TILE_GUILD_HOUSE:
-				{
-					int HouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
-					if (HouseID > 0) GS()->ResetVotes(m_pPlayer->GetCID(), MAINMENU);
-
-					GS()->Chat(m_pPlayer->GetCID(), "Information load in Vote!");
-					m_Core.m_ProtectHooked = m_NoAllowDamage = true;
-					break;
-				} 
-
 				case TILE_PLAYER_HOUSE:
 				{
 					int HouseID = GS()->Mmo()->House()->GetHouse(m_Core.m_Pos);
@@ -1008,19 +998,6 @@ void CCharacter::HandleTilesets()
 				case TILE_PLAYER_BUSSINES:
 				case TILE_CRAFT_ZONE:
 				case TILE_PLAYER_HOUSE:
-				case TILE_GUILD_HOUSE:
-				{
-					GS()->ResetVotes(m_pPlayer->GetCID(), MAINMENU);
-					m_Core.m_ProtectHooked = m_NoAllowDamage = false;
-					break;
-				}
-
-				// Снятие урона защиты и крюка
-				case TILE_GUILD_CHAIRS:
-				{
-					m_Core.m_ProtectHooked = m_NoAllowDamage = false;
-					break;
-				}
 
 				case TILE_WATER:
 				{
@@ -1030,35 +1007,18 @@ void CCharacter::HandleTilesets()
 			}
 		}
 	}
-
-	// Седения гильдии
-	if(m_pHelper->BoolIndex(TILE_GUILD_CHAIRS))
-	{
-		if(Server()->Tick() % Server()->TickSpeed() == 0) 
-		{
-			const int HouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
-			const int GuildID = GS()->Mmo()->Member()->GetHouseGuildID(HouseID);
-			if(HouseID <= 0 || GuildID <= 0) return;
-	
-			const int Exp = GS()->Mmo()->Member()->GetMemberChairBonus(GuildID, EMEMBERUPGRADE::ChairNSTExperience);
-			const int Money = GS()->Mmo()->Member()->GetMemberChairBonus(GuildID, EMEMBERUPGRADE::ChairNSTMoney);
-			m_pPlayer->AddExp(Exp);
-			m_pPlayer->AddMoney(Money);
-		}
-	}
 }
 
 void CCharacter::HandleEvents() { }
 
 void CCharacter::CreateRandomDrop(int DropCID, int Random, int ItemID, int Count)
 {
-	if((DropCID >= 0 && DropCID < MAX_PLAYERS && 
-		!GS()->m_apPlayers[DropCID]) || !GS()->m_apPlayers[DropCID]->GetCharacter() || !m_Alive)
+	if(DropCID < 0 || DropCID >= MAX_PLAYERS || !GS()->m_apPlayers[DropCID] || !GS()->m_apPlayers[DropCID]->GetCharacter() || !m_Alive)
 		return;
 
-	// рандом
 	int RandomDrop = (Random == 0 ? 0 : rand()%Random);
-	if(RandomDrop == 0) GS()->CreateDropItem(m_Core.m_Pos, DropCID, ItemID, Count);
+	if(RandomDrop == 0) 
+		GS()->CreateDropItem(m_Core.m_Pos, DropCID, ItemID, Count);
 	return;
 }
 

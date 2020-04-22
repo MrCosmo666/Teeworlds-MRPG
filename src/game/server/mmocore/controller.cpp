@@ -277,7 +277,6 @@ void SqlController::ShowTopList(CPlayer* pPlayer, int TypeID)
 			int Rank = RES->getRow();
 			int Level = RES->getInt("Level");
 			str_copy(NameGuild, RES->getString("GuildName").c_str(), sizeof(NameGuild));
-
 			GS()->AVL(ClientID, "null", "{INT}. {STR} : Level {INT}", &Rank, NameGuild, &Level);
 		}
 	}
@@ -290,7 +289,6 @@ void SqlController::ShowTopList(CPlayer* pPlayer, int TypeID)
 			int Rank = RES->getRow();
 			int Gold = RES->getInt("Bank");
 			str_copy(NameGuild, RES->getString("GuildName").c_str(), sizeof(NameGuild));
-
 			GS()->AVL(ClientID, "null", "{INT}. {STR} : Gold {INT}", &Rank, NameGuild, &Gold);
 		}
 	}
@@ -303,7 +301,6 @@ void SqlController::ShowTopList(CPlayer* pPlayer, int TypeID)
 			int Rank = RES->getRow();
 			int Level = RES->getInt("Level");
 			str_copy(Nick, RES->getString("Nick").c_str(), sizeof(Nick));
-
 			GS()->AVL(ClientID, "null", "{INT}. {STR} : Level {INT}", &Rank, Nick, &Level);
 		}
 	}

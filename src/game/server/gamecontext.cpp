@@ -923,7 +923,7 @@ void CGS::OnInit(int WorldID)
 		}
 	}
 
-	CheckZonePVP();
+	LoadZonePVP();
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
 	Console()->Chain("sv_vote_kick", ConchainSettingUpdate, this);
 	Console()->Chain("sv_vote_kick_min", ConchainSettingUpdate, this);
@@ -1507,13 +1507,6 @@ void CGS::ClearClientData(int ClientID)
 	if(InteractiveSub.find(ClientID) != InteractiveSub.end())
 		InteractiveSub.erase(ClientID);
 
-}
-
-// Обновить мир
-void CGS::UpdateWorld()
-{
-	Mmo()->BotsData()->LoadGlobalBots();
-	Mmo()->LoadFullSystems();
 }
 
 int CGS::GetRank(int AuthID)
@@ -2429,11 +2422,11 @@ int CGS::GetDungeonID() const
 bool CGS::IsClientEqualWorldID(int ClientID, int WorldID) const
 {
 	if (WorldID <= -1)
-		return (Server()->GetWorldID(ClientID) == m_WorldID);
-	return (Server()->GetWorldID(ClientID) == WorldID);
+		return (bool)(Server()->GetWorldID(ClientID) == m_WorldID);
+	return (bool)(Server()->GetWorldID(ClientID) == WorldID);
 }
 
-void CGS::CheckZonePVP()
+void CGS::LoadZonePVP()
 {
 	if (IsDungeon())
 	{

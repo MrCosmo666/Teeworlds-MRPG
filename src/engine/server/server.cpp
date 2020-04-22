@@ -1519,12 +1519,6 @@ int CServer::Run()
 	return 0;
 }
 
-void CServer::ConUpdateWorld(IConsole::IResult *pResult, void *pUser)
-{
-	for(int i = 0 ; i < COUNT_WORLD; i++)
-		((CServer *)pUser)->GameServer(i)->UpdateWorld();
-}
-
 void CServer::ConKick(IConsole::IResult *pResult, void *pUser)
 {
 	if(pResult->NumArguments() > 1)
@@ -1663,7 +1657,6 @@ void CServer::RegisterCommands()
 	m_pStorage = Kernel()->RequestInterface<IStorage>();
 
 	// register console commands
-	Console()->Register("updateworld", "", CFGFLAG_SERVER, ConUpdateWorld, this, "Update world");
 	Console()->Register("kick", "i?r", CFGFLAG_SERVER, ConKick, this, "Kick player with specified id for any reason");
 	Console()->Register("status", "", CFGFLAG_SERVER, ConStatus, this, "List players");
 	Console()->Register("shutdown", "", CFGFLAG_SERVER, ConShutdown, this, "Shut down");

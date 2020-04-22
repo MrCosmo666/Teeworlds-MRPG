@@ -134,8 +134,6 @@ public:
 
 	virtual bool TimeScore() const { return false; }
 	virtual int GetRank(int AuthID) = 0;
-
-	virtual void UpdateWorld() = 0;
 };
 
 extern IGameServer *CreateGameServer();

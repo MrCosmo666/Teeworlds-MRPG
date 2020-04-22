@@ -237,7 +237,6 @@ public:
 	virtual const char *NetVersion() const;
 
 	virtual void ClearClientData(int ClientID);
-	virtual void UpdateWorld();
 	virtual int GetRank(int AuthID);
 
 	/* #########################################################################
@@ -313,7 +312,7 @@ public:
 
 private:
 	int GetDungeonID() const;
-	void CheckZonePVP();
+	void LoadZonePVP();
 
 	/* #########################################################################
 		FUNCTIONS PLAYER ITEMS

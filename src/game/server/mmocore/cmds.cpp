@@ -50,7 +50,7 @@ void CCmd::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		// check leader account
 		if(pPlayer->Acc().GuildID > 0)
 		{
-			if(!IsLeaderPlayer(GS, pPlayer, MACCESSINVITEKICK))
+			if(!IsLeaderPlayer(GS, pPlayer, GuildAccess::ACCESS_INVITE_KICK))
 				return GS->Chat(ClientID, "You have no access.");
 
 			int CID;

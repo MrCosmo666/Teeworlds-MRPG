@@ -258,18 +258,18 @@ enum
 	QUESTACCEPT,
 	QUESTFINISHED,
 
-	/*
-		Ранги организаций и доступ
-		Типы доступа к гильдии
-	*/
-	MACCESSNO = 0,
-	MACCESSINVITEKICK,
-	MACCESSUPGHOUSE,
-	MACCESSFULL,
-
 	/* Вид декораций */
 	DECOTYPE_HOUSE = 0,
 	DECOTYPE_GUILD_HOUSE
+};
+
+enum GuildAccess
+{
+	ACCESS_LEADER = -1,
+	ACCESS_NO,
+	ACCESS_INVITE_KICK,
+	ACCESS_UPGRADE_HOUSE,
+	ACCESS_FULL,
 };
 
 enum BroadcastPriority
