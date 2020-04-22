@@ -1060,6 +1060,7 @@ void GuildJob::DeleteRank(int RankID, int GuildID)
 {
 	if(RankGuild.find(RankID) != RankGuild.end())
 	{
+		SJK.UD("tw_accounts_data", "SET GuildRank = '-1' WHERE GuildRank = '%d' AND GuildID = '%d'", RankID, GuildID);
 		SJK.DD("tw_guilds_ranks", "WHERE ID = '%d' AND GuildID = '%d'", RankID, GuildID);
 		GS()->ChatGuild(GuildID, "Rank [{STR}] succesful delete", RankGuild[RankID].Rank);
 		AddHistoryGuild(GuildID, "Deleted rank '%s'.", RankGuild[RankID].Rank);
