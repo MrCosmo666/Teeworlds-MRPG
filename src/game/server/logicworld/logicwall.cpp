@@ -323,12 +323,12 @@ void CLogicDoorKey::Snap(int SnappingClient)
 /////////////////////////////////////////
 /////////////////////////////////////////
 /////////////////////////////////////////
-CLogicDungeonDoorKey::CLogicDungeonDoorKey(CGameWorld *pGameWorld, vec2 Pos, int MobID)
+CLogicDungeonDoorKey::CLogicDungeonDoorKey(CGameWorld *pGameWorld, vec2 Pos, int BotID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DUNGEONDOOR, Pos, 14)
 {
 	m_To = vec2(Pos.x, Pos.y - 140);
 	m_OpenedDoor = false;
-	m_MobID = MobID;
+	m_BotID = BotID;
 
 	GameWorld()->InsertEntity(this);
 }
@@ -361,7 +361,7 @@ bool CLogicDungeonDoorKey::SyncStateChanges(bool StartingGame)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
 		if (BotPlayer && BotPlayer->GetCharacter() && BotPlayer->GetSpawnBot() == SPAWNMOBS
-			&& BotPlayer->GetBotSub() == m_MobID && GS()->CheckPlayerMessageWorldID(i) == GS()->GetWorldID())
+			&& BotPlayer->GetBotID() == m_BotID && GS()->CheckPlayerMessageWorldID(i) == GS()->GetWorldID())
 		{
 			m_OpenedDoor = false;
 			return false;

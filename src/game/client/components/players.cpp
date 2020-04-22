@@ -299,13 +299,11 @@ void CPlayers::RenderPlayer(const CNetObj_Character *pPrevChar, const CNetObj_Ch
 		float Recoil = 0.0f;
 		if (Player.m_Weapon == WEAPON_HAMMER)
 		{
-			if(!RenderHammer(&State, Angle, Direction, Position, m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_HAMMER]))
+			p = Position + vec2(State.GetAttach()->m_X, State.GetAttach()->m_Y);
+			p.y += g_pData->m_Weapons.m_aId[iw].m_Offsety;
+	
+			if (!RenderWeaponsMRPG(Player, &State, Angle, p, ClientID))
 			{
-				int iw = clamp(Player.m_Weapon, 0, NUM_WEAPONS - 1);
-				RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[iw].m_pSpriteBody, Direction.x < 0 ? SPRITE_FLAG_FLIP_Y : 0);
-
-				p = Position + vec2(State.GetAttach()->m_X, State.GetAttach()->m_Y);
-				p.y += g_pData->m_Weapons.m_aId[iw].m_Offsety;
 				if (Direction.x < 0)
 				{
 					Graphics()->QuadsSetRotation(-pi / 2 - State.GetAttach()->m_Angle*pi * 2);
@@ -317,6 +315,7 @@ void CPlayers::RenderPlayer(const CNetObj_Character *pPrevChar, const CNetObj_Ch
 				}
 				RenderTools()->DrawSprite(p.x, p.y, g_pData->m_Weapons.m_aId[iw].m_VisualSize);
 			}
+	
 		}
 		else if (Player.m_Weapon == WEAPON_NINJA)
 		{
@@ -385,50 +384,49 @@ void CPlayers::RenderPlayer(const CNetObj_Character *pPrevChar, const CNetObj_Ch
 				Recoil = sinf(a*pi);
 			p = Position + Dir * g_pData->m_Weapons.m_aId[iw].m_Offsetx - Dir*Recoil*10.0f;
 			p.y += g_pData->m_Weapons.m_aId[iw].m_Offsety;
-			RenderTools()->DrawSprite(p.x, p.y, g_pData->m_Weapons.m_aId[iw].m_VisualSize);
-		}
 
-		if (Player.m_Weapon == WEAPON_GUN || Player.m_Weapon == WEAPON_SHOTGUN)
-		{
-			// check if we're firing stuff
-			if(g_pData->m_Weapons.m_aId[iw].m_NumSpriteMuzzles)//prev.attackticks)
+			if (!RenderWeaponsMRPG(Player, &State, Angle, p, ClientID))
 			{
-				float Alpha = 0.0f;
-				int Phase1Tick = (Client()->GameTick() - Player.m_AttackTick);
-				if (Phase1Tick < (g_pData->m_Weapons.m_aId[iw].m_Muzzleduration + 3))
-				{
-					float t = ((((float)Phase1Tick) + IntraTick)/(float)g_pData->m_Weapons.m_aId[iw].m_Muzzleduration);
-					Alpha = mix(2.0f, 0.0f, min(1.0f,max(0.0f,t)));
-				}
+				RenderTools()->DrawSprite(p.x, p.y, g_pData->m_Weapons.m_aId[iw].m_VisualSize);
 
-				int IteX = random_int() % g_pData->m_Weapons.m_aId[iw].m_NumSpriteMuzzles;
-				static int s_LastIteX = IteX;
-				if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
+				if ((Player.m_Weapon == WEAPON_GUN || Player.m_Weapon == WEAPON_SHOTGUN) && g_pData->m_Weapons.m_aId[iw].m_NumSpriteMuzzles)
 				{
-					const IDemoPlayer::CInfo *pInfo = DemoPlayer()->BaseInfo();
-					if(pInfo->m_Paused)
-						IteX = s_LastIteX;
+					float Alpha = 0.0f;
+					int Phase1Tick = (Client()->GameTick() - Player.m_AttackTick);
+					if (Phase1Tick < (g_pData->m_Weapons.m_aId[iw].m_Muzzleduration + 3))
+					{
+						float t = ((((float)Phase1Tick) + IntraTick) / (float)g_pData->m_Weapons.m_aId[iw].m_Muzzleduration);
+						Alpha = mix(2.0f, 0.0f, min(1.0f, max(0.0f, t)));
+					}
+
+					int IteX = random_int() % g_pData->m_Weapons.m_aId[iw].m_NumSpriteMuzzles;
+					static int s_LastIteX = IteX;
+					if (Client()->State() == IClient::STATE_DEMOPLAYBACK)
+					{
+						const IDemoPlayer::CInfo* pInfo = DemoPlayer()->BaseInfo();
+						if (pInfo->m_Paused)
+							IteX = s_LastIteX;
+						else
+							s_LastIteX = IteX;
+					}
 					else
-						s_LastIteX = IteX;
-				}
-				else
-				{
-					if(m_pClient->m_Snap.m_pGameData && m_pClient->m_Snap.m_pGameData->m_GameStateFlags&GAMESTATEFLAG_PAUSED)
-						IteX = s_LastIteX;
-					else
-						s_LastIteX = IteX;
-				}
-				if (Alpha > 0.0f && g_pData->m_Weapons.m_aId[iw].m_aSpriteMuzzles[IteX])
-				{
-					float OffsetY = -g_pData->m_Weapons.m_aId[iw].m_Muzzleoffsety;
-					RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[iw].m_aSpriteMuzzles[IteX], Direction.x < 0 ? SPRITE_FLAG_FLIP_Y : 0);
-					if(Direction.x < 0)
-						OffsetY = -OffsetY;
+					{
+						if (m_pClient->m_Snap.m_pGameData && m_pClient->m_Snap.m_pGameData->m_GameStateFlags & GAMESTATEFLAG_PAUSED)
+							IteX = s_LastIteX;
+						else
+							s_LastIteX = IteX;
+					}
+					if (Alpha > 0.0f && g_pData->m_Weapons.m_aId[iw].m_aSpriteMuzzles[IteX])
+					{
+						float OffsetY = -g_pData->m_Weapons.m_aId[iw].m_Muzzleoffsety;
+						RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[iw].m_aSpriteMuzzles[IteX], Direction.x < 0 ? SPRITE_FLAG_FLIP_Y : 0);
+						if (Direction.x < 0)
+							OffsetY = -OffsetY;
 
-					vec2 DirY(-Dir.y,Dir.x);
-					vec2 MuzzlePos = p + Dir * g_pData->m_Weapons.m_aId[iw].m_Muzzleoffsetx + DirY * OffsetY;
-
-					RenderTools()->DrawSprite(MuzzlePos.x, MuzzlePos.y, g_pData->m_Weapons.m_aId[iw].m_VisualSize);
+						vec2 DirY(-Dir.y, Dir.x);
+						vec2 MuzzlePos = p + Dir * g_pData->m_Weapons.m_aId[iw].m_Muzzleoffsetx + DirY * OffsetY;
+						RenderTools()->DrawSprite(MuzzlePos.x, MuzzlePos.y, g_pData->m_Weapons.m_aId[iw].m_VisualSize);
+					}
 				}
 			}
 		}
@@ -580,6 +578,50 @@ void CPlayers::OnRender()
 }
 
 // mmotee
+bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int ClientID)
+{
+	if (Player.m_Weapon == WEAPON_HAMMER)
+	{
+		int SpriteID = -1;
+		float Size = 75.0f;
+		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_HAMMER];
+		if (EquipID == 10000) // Небесный
+		{
+			Size = 100.0f;
+			SpriteID = SPRITE_MMO_HAMMER_THOOR;
+		}
+		return RenderHammer(pAnim, Angle, Position, SpriteID, Size);
+	}
+	else if (Player.m_Weapon == WEAPON_GUN)
+	{
+		int SpriteID = -1;
+		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_GUN];
+		if (EquipID == 10001) SpriteID = SPRITE_MMO_GUN_THOOR; // Небесный
+		return RenderGun(Player, pAnim, Angle, Position, SpriteID);
+	}
+	else if (Player.m_Weapon == WEAPON_SHOTGUN)
+	{
+		int SpriteID = -1;
+		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_SHOTGUN];
+		if (EquipID == 10002) SpriteID = SPRITE_MMO_SHOTGUN_THOOR; // Небесный
+		return RenderShotgun(Player, pAnim, Angle, Position, SpriteID);
+	}
+	else if (Player.m_Weapon == WEAPON_GRENADE)
+	{
+		int SpriteID = -1;
+		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_GRENADE];
+		if (EquipID == 10003) SpriteID = SPRITE_MMO_GRENADE_THOOR; // Небесный
+		return RenderGrenade(pAnim, Angle, Position, SpriteID);
+	}
+	else if (Player.m_Weapon == WEAPON_LASER)
+	{
+		int SpriteID = -1;
+		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_RIFLE];
+		if (EquipID == 10004) SpriteID = SPRITE_MMO_RIFLE_THOOR; // Небесный
+		return RenderRifle(pAnim, Angle, Position, SpriteID);
+	}
+	return false;
+}
 void CPlayers::RenderWings(CAnimState* pAnimWings, vec2 Position, vec2 Direction, int EquipItem, int Enchant)
 {
 	if (g_Config.m_ClShowMEffects != 2 && Enchant >= EFFECTENCHANT)
@@ -601,37 +643,171 @@ void CPlayers::RenderWings(CAnimState* pAnimWings, vec2 Position, vec2 Direction
 	RenderTools()->RenderPicItems(pAnimWings, EquipItem, Direction, Position);
 }
 
-bool CPlayers::RenderHammer(CAnimState* pAnim, float Angle, vec2 Direction, vec2 Position, int EquipID)
+// - - - - - - - - - - MMOREPLACE GAME GUNS - - - - - - - - - - -
+bool CPlayers::RenderHammer(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID, float Size)
 {
-	vec2 p;
-	int SPRITEID = -1;
-	if (EquipID == 24) // thor hammer
-		SPRITEID = SPRITE_MMO_HAMMER_THOOR;
-	
-	if(SPRITEID == -1)
+	if(SpriteID == -1)
 		return false;
 
 	Graphics()->QuadsEnd();
+	vec2 Direction = direction(Angle);
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOHAMMER].m_Id);
 	Graphics()->QuadsBegin();
 	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
-	RenderTools()->SelectSprite(SPRITEID, Direction.x < 0 ? SPRITE_FLAG_FLIP_Y : 0);
+	RenderTools()->SelectSprite(SpriteID, Direction.x < 0 ? SPRITE_FLAG_FLIP_Y : 0);
 
-	p = Position + vec2(pAnim->GetAttach()->m_X, pAnim->GetAttach()->m_Y);
-	p.y += g_pData->m_Weapons.m_aId[WEAPON_HAMMER].m_Offsety;
 	if (Direction.x < 0)
 	{
 		Graphics()->QuadsSetRotation(-pi / 2 - pAnim->GetAttach()->m_Angle * pi * 2);
-		p.x -= g_pData->m_Weapons.m_aId[WEAPON_HAMMER].m_Offsetx;
+		Position.x -= g_pData->m_Weapons.m_aId[WEAPON_HAMMER].m_Offsetx;
 	}
 	else
+	{
 		Graphics()->QuadsSetRotation(-pi / 2 + pAnim->GetAttach()->m_Angle * pi * 2);
+	}
 
-	RenderTools()->DrawSprite(p.x, p.y, g_pData->m_Weapons.m_aId[WEAPON_HAMMER].m_VisualSize);
+	RenderTools()->DrawSprite(Position.x, Position.y, Size, Size);
 	Graphics()->QuadsEnd();
 
+	//
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 	Graphics()->QuadsBegin();
 	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
 	return true;
 } 
+
+bool CPlayers::RenderGun(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int SpriteID)
+{
+	if (SpriteID == -1)
+		return false;
+
+	Graphics()->QuadsEnd();
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGUN].m_Id);
+	Graphics()->QuadsBegin();
+	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
+
+	vec2 Direction = direction(Angle);
+	RenderTools()->SelectSprite(SpriteID, Direction.x < 0 ? SPRITE_FLAG_FLIP_Y : 0);
+	RenderTools()->DrawSprite(Position.x, Position.y, 50.0f, 25.0f);
+
+	// - - - - - - - - MUZZLE - - - - - - - - -
+	float IntraTick = Client()->IntraGameTick();
+	int SPRITE_MUZZLE = (1 + SpriteID + (random_int() % 2));
+
+	float Alpha = 0.0f;
+	int Phase1Tick = (Client()->GameTick() - Player.m_AttackTick);
+	if (Phase1Tick < (g_pData->m_Weapons.m_aId[WEAPON_GUN].m_Muzzleduration + 3))
+	{
+		float t = ((((float)Phase1Tick) + IntraTick) / (float)g_pData->m_Weapons.m_aId[WEAPON_GUN].m_Muzzleduration);
+		Alpha = mix(2.0f, 0.0f, min(1.0f, max(0.0f, t)));
+	}
+
+	if (Alpha > 0.0f)
+	{
+		float OffsetY = -g_pData->m_Weapons.m_aId[WEAPON_GUN].m_Muzzleoffsety;
+		RenderTools()->SelectSprite(SPRITE_MUZZLE, Direction.x < 0 ? SPRITE_FLAG_FLIP_Y : 0);
+		if (Direction.x < 0)
+			OffsetY = -OffsetY;
+
+		vec2 DirY(-Direction.y, Direction.x);
+		vec2 MuzzlePos = Position + Direction * g_pData->m_Weapons.m_aId[WEAPON_GUN].m_Muzzleoffsetx + DirY * OffsetY;
+		RenderTools()->DrawSprite(MuzzlePos.x, MuzzlePos.y, g_pData->m_Weapons.m_aId[WEAPON_GUN].m_VisualSize);
+	}
+	Graphics()->QuadsEnd();
+
+	// - - - - - - - - BACK GAME TEEWORLDS - - - - - - - - -
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+	Graphics()->QuadsBegin();
+	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
+	return true;
+}
+
+bool CPlayers::RenderShotgun(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int SpriteID)
+{
+	if (SpriteID == -1)
+		return false;
+
+	Graphics()->QuadsEnd();
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOSHOTGUN].m_Id);
+	Graphics()->QuadsBegin();
+	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
+
+	vec2 Direction = direction(Angle);
+	RenderTools()->SelectSprite(SpriteID, Direction.x < 0 ? SPRITE_FLAG_FLIP_Y : 0);
+	RenderTools()->DrawSprite(Position.x, Position.y, 100.0f, 25.0f);
+
+	// - - - - - - - - MUZZLE - - - - - - - - -
+	float IntraTick = Client()->IntraGameTick();
+	int SPRITE_MUZZLE = (1 + SpriteID + (random_int() % 2));
+
+	float Alpha = 0.0f;
+	int Phase1Tick = (Client()->GameTick() - Player.m_AttackTick);
+	if (Phase1Tick < (g_pData->m_Weapons.m_aId[WEAPON_SHOTGUN].m_Muzzleduration + 3))
+	{
+		float t = ((((float)Phase1Tick) + IntraTick) / (float)g_pData->m_Weapons.m_aId[WEAPON_SHOTGUN].m_Muzzleduration);
+		Alpha = mix(2.0f, 0.0f, min(1.0f, max(0.0f, t)));
+	}
+
+	if (Alpha > 0.0f)
+	{
+		float OffsetY = -g_pData->m_Weapons.m_aId[WEAPON_SHOTGUN].m_Muzzleoffsety;
+		RenderTools()->SelectSprite(SPRITE_MUZZLE, Direction.x < 0 ? SPRITE_FLAG_FLIP_Y : 0);
+		if (Direction.x < 0)
+			OffsetY = -OffsetY;
+
+		vec2 DirY(-Direction.y, Direction.x);
+		vec2 MuzzlePos = Position + Direction * g_pData->m_Weapons.m_aId[WEAPON_SHOTGUN].m_Muzzleoffsetx + DirY * OffsetY;
+		RenderTools()->DrawSprite(MuzzlePos.x, MuzzlePos.y, g_pData->m_Weapons.m_aId[WEAPON_SHOTGUN].m_VisualSize);
+	}
+	Graphics()->QuadsEnd();
+
+	// - - - - - - - - BACK GAME TEEWORLDS - - - - - - - - -
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+	Graphics()->QuadsBegin();
+	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
+	return true;
+}
+
+bool CPlayers::RenderGrenade(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID)
+{
+	if (SpriteID == -1)
+		return false;
+
+	Graphics()->QuadsEnd();
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGRENADE].m_Id);
+	Graphics()->QuadsBegin();
+	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
+
+	vec2 Direction = direction(Angle);
+	RenderTools()->SelectSprite(SpriteID, Direction.x < 0 ? SPRITE_FLAG_FLIP_Y : 0);
+	RenderTools()->DrawSprite(Position.x, Position.y, 100.0f, 25.0f);
+	Graphics()->QuadsEnd();
+
+	// - - - - - - - - BACK GAME TEEWORLDS - - - - - - - - -
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+	Graphics()->QuadsBegin();
+	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
+	return true;
+}
+
+bool CPlayers::RenderRifle(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID)
+{
+	if (SpriteID == -1)
+		return false;
+
+	Graphics()->QuadsEnd();
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMORIFLE].m_Id);
+	Graphics()->QuadsBegin();
+	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
+
+	vec2 Direction = direction(Angle);
+	RenderTools()->SelectSprite(SpriteID, Direction.x < 0 ? SPRITE_FLAG_FLIP_Y : 0);
+	RenderTools()->DrawSprite(Position.x, Position.y, 100.0f, 50.0f);
+	Graphics()->QuadsEnd();
+
+	// - - - - - - - - BACK GAME TEEWORLDS - - - - - - - - -
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
+	Graphics()->QuadsBegin();
+	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
+	return true;
+}

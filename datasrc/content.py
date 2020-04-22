@@ -268,10 +268,12 @@ image_wingit20 = Image("wingsit20", "mmotee/wings/it20.png")
 image_wingit21 = Image("wingsit21", "mmotee/wings/it21.png")
 image_wingit22 = Image("wingsit22", "mmotee/wings/it22.png")
 image_wingit23 = Image("wingsit23", "mmotee/wings/it23.png")
-image_odinspear = Image("odinspear", "mmotee/hammer/odinspear.png")
-image_aztecsword = Image("aztecsword", "mmotee/hammer/aztecsword.png")
 image_mmogame = Image("mmogame", "mmotee/mmogame.png")
-image_mmohammer = Image("mmohammer", "mmotee/mmohammer.png")
+image_mmohammer = Image("mmohammer", "mmotee/weapons/mmohammer.png")
+image_mmogun = Image("mmogun", "mmotee/weapons/mmogun.png")
+image_mmoshotgun = Image("mmoshotgun", "mmotee/weapons/mmoshotgun.png")
+image_mmogrenade = Image("mmogrenade", "mmotee/weapons/mmogrenade.png")
+image_mmorifle = Image("mmorifle", "mmotee/weapons/mmorifle.png")
 image_mmologo = Image("mmologo", "mmotee/logo.png")
 
 ###############################################################################
@@ -312,10 +314,12 @@ container.images.Add(image_wingit20)
 container.images.Add(image_wingit21)
 container.images.Add(image_wingit22)
 container.images.Add(image_wingit23)
-container.images.Add(image_odinspear)
-container.images.Add(image_aztecsword)
 container.images.Add(image_mmogame)
 container.images.Add(image_mmohammer)
+container.images.Add(image_mmogun)
+container.images.Add(image_mmoshotgun)
+container.images.Add(image_mmogrenade)
+container.images.Add(image_mmorifle)
 container.images.Add(image_mmologo)
 
 container.pickups.Add(Pickup("health"))
@@ -366,10 +370,12 @@ set_wingsit20 = SpriteSet("wingsit20", image_wingit20, 1, 1)
 set_wingsit21 = SpriteSet("wingsit21", image_wingit21, 1, 1)
 set_wingsit22 = SpriteSet("wingsit22", image_wingit22, 1, 1)
 set_wingsit23 = SpriteSet("wingsit23", image_wingit23, 1, 1)
-set_odinspear = SpriteSet("odinspear", image_odinspear, 1, 1)
-set_aztecsword = SpriteSet("aztecsword", image_aztecsword, 1, 1)
 set_mmogame = SpriteSet("mmogame", image_mmogame, 16, 8)
 set_mmohammer = SpriteSet("mmohammer", image_mmohammer, 8, 4)
+set_mmogun = SpriteSet("mmogun", image_mmogun, 18, 8)
+set_mmoshotgun = SpriteSet("mmoshotgun", image_mmoshotgun, 16, 12)
+set_mmogrenade = SpriteSet("mmogrenade", image_mmogrenade, 4, 6)
+set_mmorifle = SpriteSet("mmorifle", image_mmogrenade, 4, 6)
 set_mmologo = SpriteSet("mmologo", image_mmologo, 1, 1)
 
 ###############################################################################
@@ -409,10 +415,12 @@ container.spritesets.Add(set_wingsit20)
 container.spritesets.Add(set_wingsit21)
 container.spritesets.Add(set_wingsit22)
 container.spritesets.Add(set_wingsit23)
-container.spritesets.Add(set_odinspear)
-container.spritesets.Add(set_aztecsword)
 container.spritesets.Add(set_mmogame)
 container.spritesets.Add(set_mmohammer)
+container.spritesets.Add(set_mmogun)
+container.spritesets.Add(set_mmoshotgun)
+container.spritesets.Add(set_mmogrenade)
+container.spritesets.Add(set_mmorifle)
 container.spritesets.Add(set_mmologo)
 
 container.sprites.Add(Sprite("part_slice", set_particles, 0,0,1,1))
@@ -642,6 +650,23 @@ container.sprites.Add(Sprite("mmo_game_bubble_fire", set_mmogame, 1, 3, 1, 1))
 
 #mmotee hammer
 container.sprites.Add(Sprite("mmo_hammer_thoor", set_mmohammer, 0, 0, 1, 1))
+
+#mmotee gun
+container.sprites.Add(Sprite("mmo_gun_thoor", set_mmogun, 0, 0, 2, 1))
+container.sprites.Add(Sprite("mmo_gun_thoor_muzzle1", set_mmogun, 2, 0, 2, 1))
+container.sprites.Add(Sprite("mmo_gun_thoor_muzzle2", set_mmogun, 4, 0, 2, 1))
+
+#mmotee shotgun
+container.sprites.Add(Sprite("mmo_shotgun_thoor", set_mmoshotgun, 0, 0, 4, 1))
+container.sprites.Add(Sprite("mmo_shotgun_thoor_muzzle1", set_mmoshotgun, 4, 0, 2, 1))
+container.sprites.Add(Sprite("mmo_shotgun_thoor_muzzle2", set_mmoshotgun, 6, 0, 2, 1))
+
+#mmotee grenade
+container.sprites.Add(Sprite("mmo_grenade_thoor", set_mmogrenade, 0, 0, 1, 1))
+
+#mmotee rifle
+container.sprites.Add(Sprite("mmo_rifle_thoor", set_mmorifle, 0, 0, 1, 1))
+
 
 container.sprites.Add(Sprite("relax_heart", set_relax, 0, 0, 1, 1))
 container.sprites.Add(Sprite("relax_eyes", set_relax, 1, 0, 1, 1))

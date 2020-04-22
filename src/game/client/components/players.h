@@ -24,8 +24,13 @@ class CPlayers : public CComponent
 
 	// mmotee
 	void RenderWings(CAnimState* pAnimWings, vec2 Position, vec2 Direction, int EquipItem, int Enchant);
-	bool RenderHammer(CAnimState* pAnim, float Angle, vec2 Direction, vec2 Position, int EquipID);
+	bool RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int ClientID);
 
+	bool RenderHammer(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID, float Size);
+	bool RenderGun(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int SpriteID);
+	bool RenderShotgun(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int SpriteID);
+	bool RenderGrenade(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID);
+	bool RenderRifle(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID);
 public:
 	virtual void OnRender();
 };

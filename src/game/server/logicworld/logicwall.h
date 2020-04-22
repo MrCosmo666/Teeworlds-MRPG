@@ -78,11 +78,11 @@ public:
 class CLogicDungeonDoorKey : public CEntity
 {
 	vec2 m_To;
-	int m_MobID;
+	int m_BotID;
 	bool m_OpenedDoor;
 
 public:
-	CLogicDungeonDoorKey(CGameWorld *pGameWorld, vec2 Pos, int MobID);
+	CLogicDungeonDoorKey(CGameWorld *pGameWorld, vec2 Pos, int BotID);
 	virtual void Snap(int SnappingClient);
 	virtual void Tick();
 

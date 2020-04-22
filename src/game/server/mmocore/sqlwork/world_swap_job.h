@@ -27,6 +27,8 @@ class WorldSwapJob : public CMmoComponent
 	typedef std::list < StructPositionLogic > WorldPositionLogicType;
 	static WorldPositionLogicType WorldPositionLogic;
 
+	void UpdateWorldsList();
+
 public:
 	virtual void OnInitGlobal();
 	virtual bool OnPlayerHandleTile(CCharacter* pChr, int IndexCollision);

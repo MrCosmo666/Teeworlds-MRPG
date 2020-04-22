@@ -8,6 +8,17 @@ using namespace sqlstr;
 std::map < int , WorldSwapJob::StructSwapWorld > WorldSwapJob::WorldSwap;
 std::list < WorldSwapJob::StructPositionLogic > WorldSwapJob::WorldPositionLogic;
 
+void WorldSwapJob::UpdateWorldsList()
+{
+	for (int i = 0; i < COUNT_WORLD; i++)
+	{
+		CSqlString<32> world_name = CSqlString<32>(GS()->Server()->GetWorldName(i));
+		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "ENUM_WORLDS", "WHERE WorldID = '%d'", i));
+		if (!RES->next()) { SJK.ID("ENUM_WORLDS", "(WorldID, Name) VALUES ('%d', '%s')", i, world_name.cstr()); }
+		else { SJK.UD("ENUM_WORLDS", "Name = '%s' WHERE WorldID = '%d'", world_name.cstr(), i); }
+	}
+}
+
 void WorldSwapJob::OnInitGlobal() 
 { 
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_world_swap"));
@@ -19,7 +30,6 @@ void WorldSwapJob::OnInitGlobal()
 		WorldSwap[ID].PositionY = RES->getInt("PositionY");
 		WorldSwap[ID].WorldID = RES->getInt("WorldID");
 		WorldSwap[ID].SwapID = RES->getInt("SwapID");
-		SJK.UD("tw_world_swap", "Name = '%s' WHERE ID = '%d'", GS()->Server()->GetWorldName(WorldSwap[ID].WorldID), ID);
 	}
 
 	for(const auto& sw1 : WorldSwap)
@@ -36,6 +46,7 @@ void WorldSwapJob::OnInitGlobal()
 			WorldPositionLogic.push_back(pPositionLogic);
 		}
 	}
+	UpdateWorldsList();
 	Job()->ShowLoadingProgress("Worlds Swap", WorldSwap.size());
 	Job()->ShowLoadingProgress("Worlds Swap Logic", WorldPositionLogic.size());
 }

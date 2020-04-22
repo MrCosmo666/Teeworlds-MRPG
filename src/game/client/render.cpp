@@ -65,6 +65,12 @@ void CRenderTools::DrawSprite(float x, float y, float Size)
 	Graphics()->QuadsDraw(&QuadItem, 1);
 }
 
+void CRenderTools::DrawSprite(float x, float y, float Width, float Height)
+{
+	IGraphics::CQuadItem QuadItem(x, y, Width, Height);
+	Graphics()->QuadsDraw(&QuadItem, 1);
+}
+
 void CRenderTools::DrawRoundRectExt(float x, float y, float w, float h, float r, int Corners)
 {
 	IGraphics::CFreeformItem ArrayF[32];
@@ -806,19 +812,19 @@ void CRenderTools::RenderPicItems(CAnimState* pAnim, int RenderNum, vec2 Dir, ve
 				// test effects
 				switch (RenderNum)
 				{
-				case 19: // items wings
+				case 10005: // items wings
 					RenderWings(pAnim, IMAGE_WINGSIT19, vec2(115.0f, 55.0f), Pos, 200, 90);
 					break;
-				case 20: // items wings
+				case 10006: // items wings
 					RenderWings(pAnim, IMAGE_WINGSIT20, vec2(120, 50), Pos);
 					break;
-				case 21: // items wings
+				case 10007: // items wings
 					RenderWings(pAnim, IMAGE_WINGSIT21, vec2(115, 64), Pos);
 					break;
-				case 22: // items wings
+				case 10008: // items wings
 					RenderWings(pAnim, IMAGE_WINGSIT22, vec2(170, 100), Pos, 280, 150);
 					break;
-				case 23: // items wings
+				case 10009: // items wings
 					RenderWings(pAnim, IMAGE_WINGSIT23, vec2(115, 70), Pos);
 					break;
 				}

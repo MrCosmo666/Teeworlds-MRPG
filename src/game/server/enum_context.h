@@ -12,8 +12,7 @@
 // Статы оружия и хар-ки игрока
 enum Stats
 {
-	StSeasonLevel,
-	StSpreadShotgun,
+	StSpreadShotgun = 1,
 	StSpreadGrenade,
 	StSpreadRifle,
     StStrength,

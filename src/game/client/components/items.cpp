@@ -18,7 +18,6 @@
 
 #include "items.h"
 
-
 void CItems::RenderProjectile(const CNetObj_Projectile *pCurrent, int ItemID)
 {
 	// get positions

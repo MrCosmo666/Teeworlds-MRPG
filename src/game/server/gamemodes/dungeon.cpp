@@ -25,9 +25,9 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_door", "WHERE DungeonID = '%d'", m_DungeonID));
 	while (RES->next())
 	{
-		int DungeonMobID = RES->getInt("MobID");
+		int DungeonBotID = RES->getInt("BotID");
 		vec2 Position = vec2(RES->getInt("PosX"), RES->getInt("PosY"));
-		new CLogicDungeonDoorKey(&GS()->m_World, Position, DungeonMobID);
+		new CLogicDungeonDoorKey(&GS()->m_World, Position, DungeonBotID);
 	}
 }
 

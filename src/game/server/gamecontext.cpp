@@ -2381,18 +2381,18 @@ void CGS::ChangeEquipSkin(int ClientID, int ItemID)
 	if(!pPlayer)
 		return;
 	
-	if (GetItemInfo(ItemID).Type == ITEMEQUIP && (GetItemInfo(ItemID).Function == EQUIP_WINGS || GetItemInfo(ItemID).Function == EQUIP_HAMMER))
+	if (GetItemInfo(ItemID).Type == ITEMEQUIP && (GetItemInfo(ItemID).Function == EQUIP_DISCORD || GetItemInfo(ItemID).Function == EQUIP_MINER))
+		return;
+
+	CNetMsg_Sv_EquipItems Msg;
+	Msg.m_ClientID = ClientID;
+	for (int p = 0; p < NUM_EQUIPS; p++)
 	{
-		CNetMsg_Sv_EquipItems Msg;
-		Msg.m_ClientID = ClientID;
-		for (int p = 0; p < NUM_EQUIPS; p++)
-		{
-			int EquipItem = pPlayer->GetItemEquip(p);
-			Msg.m_EquipID[p] = EquipItem;
-			Msg.m_EnchantItem[p] = pPlayer->GetItem(EquipItem).Enchant;
-		}
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1);
+		int EquipItem = pPlayer->GetItemEquip(p);
+		Msg.m_EquipID[p] = EquipItem;
+		Msg.m_EnchantItem[p] = pPlayer->GetItem(EquipItem).Enchant;
 	}
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1);
 }
 
 // Очистить интерактивы сюб
