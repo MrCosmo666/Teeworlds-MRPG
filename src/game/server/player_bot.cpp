@@ -64,17 +64,9 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 	if(m_SpawnPointBot == SPAWNMOBS)
 	{
 		int Power = GS()->IncreaseCountRaid(ContextBots::MobBot[m_SubBotID].Health); 
-		for (int i = 0; i < EQUIP_MAX_BOTS; i++)
-		{
-			int ItemID = GetItemEquip(i);
-			if (BonusID != GS()->GetItemInfo(ItemID).BonusID)
-				continue;
-			Power += GS()->GetItemInfo(ItemID).BonusCount * ContextBots::MobBot[m_SubBotID].Health;
-		}
-
 		if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
 			Power /= 15;
-		else
+		else 
 			Power /= 8;
 
 		return Power;

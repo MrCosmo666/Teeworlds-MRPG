@@ -287,13 +287,13 @@ void CCharacter::FireWeapon()
 				return;
 			}
 
+			float PlayerRadius = (float)m_pPlayer->GetAttributeCount(Stats::StHammerPower, true);
+			float Radius = clamp(PlayerRadius / 10.0f, 0.5f, 7.0f);
+			
 			bool Hits = false;
 			GS()->CreateSound(m_Pos, SOUND_HAMMER_FIRE);
-
-			float PlayerRadius = (float)m_pPlayer->GetAttributeCount(Stats::StHammerPower, true);
-			float Radius = clamp(PlayerRadius/10.0f, 0.5f, 7.0f);
 			CCharacter *apEnts[MAX_CLIENTS];
-			int Num = GS()->m_World.FindEntities(ProjStartPos, GetProximityRadius()* 7.0f, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
+			int Num = GS()->m_World.FindEntities(ProjStartPos, GetProximityRadius()* Radius, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
 			for (int i = 0; i < Num; ++i)
 			{
 				CCharacter *pTarget = apEnts[i];
