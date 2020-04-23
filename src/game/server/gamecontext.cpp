@@ -238,7 +238,6 @@ void CGS::CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamage)
 	}
 }
 
-// Отправить запрос на рендер Спавна игрока
 void CGS::CreatePlayerSpawn(vec2 Pos)
 {
 	// create the event
@@ -250,7 +249,6 @@ void CGS::CreatePlayerSpawn(vec2 Pos)
 	}
 }
 
-// Отправить запрос на рендер Смерти игрока
 void CGS::CreateDeath(vec2 Pos, int ClientID)
 {
 	// create the event
@@ -263,7 +261,6 @@ void CGS::CreateDeath(vec2 Pos, int ClientID)
 	}
 }
 
-// Отправить запрос на звук, по маске
 void CGS::CreateSound(vec2 Pos, int Sound, int64 Mask)
 {
 	// create a sound
@@ -276,14 +273,12 @@ void CGS::CreateSound(vec2 Pos, int Sound, int64 Mask)
 	}
 }
 
-// Отправить запрос на звук, по маске
 void CGS::CreatePlayerSound(int ClientID, int Sound)
 {
 	int64 Mask = CmaskOne(ClientID);
 	CreateSound(m_apPlayers[ClientID]->m_ViewPos, Sound, Mask);
 }
 
-// Отправить ммо эффекты
 void CGS::SendMmoEffect(vec2 Pos, int EffectID)
 {
 	CNetEvent_EffectMmo *pEvent = (CNetEvent_EffectMmo *)m_Events.Create(NETEVENTTYPE_EFFECTMMO, sizeof(CNetEvent_EffectMmo), MaskWorldID());
@@ -295,7 +290,6 @@ void CGS::SendMmoEffect(vec2 Pos, int EffectID)
 	}
 }
 
-// Отправить эффект Зелья
 void CGS::SendMmoPotion(vec2 Pos, const char *Potion, bool Added)
 {
 	CNetEvent_EffectPotion *pEvent = (CNetEvent_EffectPotion *)m_Events.Create(NETEVENTTYPE_EFFECTPOTION, sizeof(CNetEvent_EffectPotion), MaskWorldID());
@@ -954,12 +948,6 @@ void CGS::OnInit(int WorldID)
 
 	LoadZonePVP();
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
-	Console()->Chain("sv_vote_kick", ConchainSettingUpdate, this);
-	Console()->Chain("sv_vote_kick_min", ConchainSettingUpdate, this);
-	Console()->Chain("sv_vote_spectate", ConchainSettingUpdate, this);
-	Console()->Chain("sv_scorelimit", ConchainGameinfoUpdate, this);
-	Console()->Chain("sv_timelimit", ConchainGameinfoUpdate, this);
-	Console()->Chain("sv_matches_per_map", ConchainGameinfoUpdate, this);
 }
 
 // Инициализация консоли

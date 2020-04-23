@@ -75,7 +75,7 @@ void CProjectile::Tick()
 			return;
 		}
 
-		if(m_LifeSpan >= 0 || m_Weapon == WEAPON_GRENADE)
+		if((m_LifeSpan >= 0 || m_Weapon == WEAPON_GRENADE) && m_SoundImpact >= 0 && m_SoundImpact <= 40)
 			GS()->CreateSound(CurPos, m_SoundImpact);
 
 		if(m_Explosive)
