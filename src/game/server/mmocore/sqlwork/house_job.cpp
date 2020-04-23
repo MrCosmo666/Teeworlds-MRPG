@@ -364,7 +364,7 @@ void HouseJob::SellHouse(int HouseID)
 		if(ClientID >= 0)
 			GS()->ResetVotes(ClientID, MAINMENU);
 
-		SJK.UD("tw_houses", "OwnerID = '0', HouseBank = '50000' WHERE ID = '%d'", HouseID);
+		SJK.UD("tw_houses", "OwnerID = NULL, HouseBank = '50000' WHERE ID = '%d'", HouseID);
 	}
 }
 
@@ -649,7 +649,7 @@ bool HouseJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Repla
 		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "Return in inventory: Select down your decorations");
 		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "and press (Back to inventory).");
 
-		Job()->Item()->ListInventory(pPlayer, ITEMDECORATION);
+		Job()->Item()->ListInventory(pPlayer, ItemType::TYPE_DECORATION);
 		GS()->AV(ClientID, "null", "");
 		ShowDecorationList(pPlayer);
 		GS()->AddBack(ClientID);

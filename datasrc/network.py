@@ -589,7 +589,7 @@ Messages = [
 	[
 		NetIntRange("m_ClientID", 0, 'MAX_CLIENTS-1'),
 		NetArray(NetIntAny("m_EquipID"),  9),
-		NetArray(NetIntAny("m_EnchantItem"),  9),
+		NetArray(NetBool("m_EnchantItem"),  9),
 	]),
     
     # mmotee send add vote client

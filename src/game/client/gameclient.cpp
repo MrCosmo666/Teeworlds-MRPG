@@ -1873,7 +1873,7 @@ void CGameClient::CClientData::Reset(CGameClient *pGameClient, int ClientID)
 	for (int p = 0; p < NUM_EQUIPS; p++)
 	{
 		m_aEquipItem[p] = -1;
-		m_aEnchantItem[p] = -1;
+		m_aEnchantItem[p] = false;
 	}
 	UpdateRenderInfo(pGameClient, ClientID, false);
 }

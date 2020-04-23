@@ -754,8 +754,9 @@ void CGS::SendEquipItem(int ClientID, int TargetID)
 	for(int k = 0; k < NUM_EQUIPS; k++)
 	{
 		int EquipItem = m_apPlayers[ClientID]->GetItemEquip(k);
+		bool EnchantItem = m_apPlayers[ClientID]->GetItem(EquipItem).Enchant >= m_apPlayers[ClientID]->GetItem(EquipItem).Info().MaximalEnchant;
 		Msg.m_EquipID[k] = EquipItem;
-		Msg.m_EnchantItem[k] = m_apPlayers[ClientID]->GetItem(EquipItem).Enchant;
+		Msg.m_EnchantItem[k] = EnchantItem;
 	}
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID);
 }
@@ -1936,7 +1937,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		AVM(ClientID, "null", NOPE, NOPE, "Housing Active Plants: {STR}", GetItemInfo(PlantItemID).GetName(pPlayer));
 
-		Mmo()->Item()->ListInventory(pPlayer, ITPLANTS, true);
+		Mmo()->Item()->ListInventory(pPlayer, FUNCTION_PLANTS, true);
 		AddBack(ClientID);	
 	}
 	else if(MenuList == UPGRADES) 
@@ -2381,7 +2382,7 @@ void CGS::ChangeEquipSkin(int ClientID, int ItemID)
 	if(!pPlayer)
 		return;
 	
-	if (GetItemInfo(ItemID).Type == ITEMEQUIP && (GetItemInfo(ItemID).Function == EQUIP_DISCORD || GetItemInfo(ItemID).Function == EQUIP_MINER))
+	if (GetItemInfo(ItemID).Type == ItemType::TYPE_EQUIP && (GetItemInfo(ItemID).Function == EQUIP_DISCORD || GetItemInfo(ItemID).Function == EQUIP_MINER))
 		return;
 
 	CNetMsg_Sv_EquipItems Msg;
@@ -2389,8 +2390,9 @@ void CGS::ChangeEquipSkin(int ClientID, int ItemID)
 	for (int p = 0; p < NUM_EQUIPS; p++)
 	{
 		int EquipItem = pPlayer->GetItemEquip(p);
+		bool EnchantItem = pPlayer->GetItem(EquipItem).Enchant >= pPlayer->GetItem(EquipItem).Info().MaximalEnchant;
 		Msg.m_EquipID[p] = EquipItem;
-		Msg.m_EnchantItem[p] = pPlayer->GetItem(EquipItem).Enchant;
+		Msg.m_EnchantItem[p] = EnchantItem;
 	}
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1);
 }

@@ -78,6 +78,22 @@ enum ToplistTypes
 	PLAYERS_LEVELING,
 };
 
+
+// типы предметов
+enum ItemType
+{
+	TYPE_USED = 1,
+	TYPE_CRAFT,
+	TYPE_QUEST,
+	TYPE_MODULE,
+	TYPE_OTHER,
+	TYPE_SETTINGS,
+	TYPE_EQUIP,
+	TYPE_DECORATION,
+	TYPE_POTION,
+};
+
+
 // Основное
 enum
 {
@@ -195,51 +211,28 @@ enum
 		Все функции предметов
 		Это сортируется в вкладках
 	*/
-	NOFUNCTIONITEM = 0,
-	ONEUSEDS = NUM_EQUIPS,
-	USEDS,
-	ITSETTINGS,
-	ITPLANTS,
-	ITMINER,
+	FUNCTION_ONE_USED = NUM_EQUIPS,
+	FUNCTION_USED,
+	FUNCTION_SETTINGS,
+	FUNCTION_PLANTS,
+	FUNCTION_MINER,
 
-	/*
-		Типы предметов
-		Это влияет на взаимодействие в будующем
-	*/
-	ITEMUSED = 1,
-	ITEMCRAFT,
-	ITEMQUEST,
-	ITEMUPGRADE,
-	ITEMOTHER,
-	ITEMSETTINGS,
-	ITEMEQUIP,
-	ITEMDECORATION,
-	ITEMPOTION,
 
-	/*
-		Лист придметов суда добавляется лишь то что
-		в будующем будет взаимодействованно с кодом
-	*/
-	NOPE = -1, 
-	itMoney						= 1,				// Деньги обычная валюта
-	itHammer					= 2,				// Снаряжение Молоток | Молоток
-	itMaterial					= 7,				// Материал для зачирования вещей
-	itGoods						= 8,				// Товары для загрузки разгрузки
-	itTicketGuild				= 9,				// Билет для создания гильдии
-	itSpearBronekhods			= 24,				// Снаряжение Молоток | Копье
-	itDecoHealth				= 25,				// Декорация Сердце
-	itDecoArmor					= 26,				// Декорация Щит
-	itEliteDecoHealth			= 27,				// Декорация элитная сердце
-	itEliteDecoNinja			= 28,				// Декорация элитная ниндзя
-	itPotionHealthRegen			= 38,				// Зелье регенерации здоровья
-	itCapsuleSurvivalExperience = 39,				// Дает 1.000 опыта
-	itLittleBagGold				= 40,				// Дает 10-100 золота
-	itTitleNewHero				= 46,				// Титул новый герой
-	itClubSeasonTicket			= 49,				// Клуб сезоный билет
-	itSeasonToken				= 50,				// Клуб сезоный жетон
-	itPotionQuenchingHunger		= 60,				// Зелье регенерации голода
-	itSkillPoint				= 77,				// Скилл поинт
-	itAutoHammer				= 78,				// Автоматический хамер
+	NOPE = -1,
+	itMoney = 1,				// Деньги обычная валюта
+	itHammer = 2,				// Снаряжение Молоток | Молоток
+	itMaterial = 7,				// Материал для зачирования вещей
+	itGoods = 8,				// Товары для загрузки разгрузки
+	itTicketGuild = 9,				// Билет для создания гильдии
+	itSkillPoint = 10,				// Скилл поинт
+	itDecoArmor = 11,				// Декорация Щит
+	itEliteDecoHealth = 12,				// Декорация элитная сердце
+	itEliteDecoNinja = 13,				// Декорация элитная ниндзя
+	itDecoHealth = 14,				// Декорация Сердце
+	itPotionHealthRegen = 18,				// Зелье регенерации здоровья
+	itCapsuleSurvivalExperience = 19,				// Дает 1.000 опыта
+	itLittleBagGold = 20,				// Дает 10-100 золота
+	itTitleNewHero = 23,				// Титул новый герой
 
 	/*
 		Все листы сортировок что существуют на сервере

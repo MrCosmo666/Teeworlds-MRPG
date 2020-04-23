@@ -209,7 +209,7 @@ public:
 		// mmotee
 		const CNetObj_Mmo_ClientInfo* m_pLocalStats;
 		int m_aEquipItem[NUM_EQUIPS];
-		int m_aEnchantItem[NUM_EQUIPS];
+		bool m_aEnchantItem[NUM_EQUIPS];
 		float m_AnimWings;
 
 		void UpdateRenderInfo(CGameClient *pGameClient, int ClientID, bool UpdateSkinInfo);

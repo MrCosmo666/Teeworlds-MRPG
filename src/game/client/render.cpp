@@ -799,52 +799,30 @@ void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color,
 	pTextRender->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
 }
 
-void CRenderTools::RenderPicItems(CAnimState* pAnim, int RenderNum, vec2 Dir, vec2 Pos)
+void CRenderTools::RenderWings(CAnimState* pAnim, int SpriteID, vec2 Dir, vec2 Pos, vec2 PosWings, vec2 Size)
 {
-	// first pass we draw the outline
-	// second pass we draw the filling
+	if (SpriteID <= 0)
+		return;
+
 	for (int p = 0; p < 2; p++)
 	{
 		for (int f = 0; f < 2; f++)
 		{
 			if (f == 1)
 			{
-				// test effects
-				switch (RenderNum)
-				{
-				case 10005: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT19, vec2(115.0f, 55.0f), Pos, 200, 90);
-					break;
-				case 10006: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT20, vec2(120, 50), Pos);
-					break;
-				case 10007: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT21, vec2(115, 64), Pos);
-					break;
-				case 10008: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT22, vec2(170, 100), Pos, 280, 150);
-					break;
-				case 10009: // items wings
-					RenderWings(pAnim, IMAGE_WINGSIT23, vec2(115, 70), Pos);
-					break;
-				}
+				Graphics()->TextureSet(g_pData->m_aImages[SpriteID].m_Id);
+				Graphics()->QuadsBegin();
+
+				Graphics()->QuadsSetRotation(0 - pAnim->GetWings()->m_Angle * pi * 2);
+				IGraphics::CQuadItem Quad2((Pos.x - PosWings.x) + (pAnim->GetWings()->m_X), Pos.y - (PosWings.y + pAnim->GetWings()->m_Y), Size.x, Size.y);
+				Graphics()->QuadsDrawTL(&Quad2, 1);
+
+				Graphics()->QuadsSetRotation(0 + pAnim->GetWings()->m_Angle * pi * 2);
+				IGraphics::CQuadItem Quad((Pos.x + PosWings.x) - (pAnim->GetWings()->m_X), Pos.y - (PosWings.y + pAnim->GetWings()->m_Y), -Size.x, Size.y);
+				Graphics()->QuadsDrawTL(&Quad, 1);
+
+				Graphics()->QuadsEnd();
 			}
 		}
 	}
-}
-
-void CRenderTools::RenderWings(CAnimState* pAnim, int Sprite, vec2 Position, vec2 PlayerPos, int Size1, int Size2)
-{
-	Graphics()->TextureSet(g_pData->m_aImages[Sprite].m_Id);
-	Graphics()->QuadsBegin();
-
-	Graphics()->QuadsSetRotation(0 - pAnim->GetWings()->m_Angle * pi * 2);
-	IGraphics::CQuadItem Quad2((PlayerPos.x - Position.x) + (pAnim->GetWings()->m_X), PlayerPos.y - (Position.y + pAnim->GetWings()->m_Y), Size1, Size2);
-	Graphics()->QuadsDrawTL(&Quad2, 1);
-
-	Graphics()->QuadsSetRotation(0 + pAnim->GetWings()->m_Angle * pi * 2);
-	IGraphics::CQuadItem Quad((PlayerPos.x + Position.x) - (pAnim->GetWings()->m_X), PlayerPos.y - (Position.y + pAnim->GetWings()->m_Y), -Size1, Size2);
-	Graphics()->QuadsDrawTL(&Quad, 1);
-
-	Graphics()->QuadsEnd();
 }

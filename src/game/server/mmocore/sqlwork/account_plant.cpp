@@ -80,7 +80,7 @@ void PlantsAccSql::ShowPlantsItems(int ClientID)
 	if(!pPlayer)
 		return;
 
-	Job()->Item()->ListInventory(pPlayer, ITPLANTS, true);
+	Job()->Item()->ListInventory(pPlayer, FUNCTION_PLANTS, true);
 }
 
 void PlantsAccSql::Work(int ClientID, int Exp)

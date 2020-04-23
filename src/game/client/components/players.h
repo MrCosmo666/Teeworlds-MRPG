@@ -3,9 +3,19 @@
 #ifndef GAME_CLIENT_COMPONENTS_PLAYERS_H
 #define GAME_CLIENT_COMPONENTS_PLAYERS_H
 #include <game/client/component.h>
+#include <map>
 
 class CPlayers : public CComponent
 {
+	struct EquipSlot
+	{
+		vec4 Color;
+		vec2 Position;
+		vec2 Size;
+		int SpriteID;
+	};
+	std::map < int, EquipSlot > EquipInformation;
+
 	CTeeRenderInfo m_aRenderInfo[MAX_CLIENTS];
 	void RenderPlayer(
 		const CNetObj_Character *pPrevChar,
@@ -22,8 +32,6 @@ class CPlayers : public CComponent
 		int ClientID
 	);
 
-	// mmotee
-	void RenderWings(CAnimState* pAnimWings, vec2 Position, vec2 Direction, int EquipItem, int Enchant);
 	bool RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int ClientID);
 
 	bool RenderHammer(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID, float Size);
@@ -31,6 +39,7 @@ class CPlayers : public CComponent
 	bool RenderShotgun(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int SpriteID);
 	bool RenderGrenade(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID);
 	bool RenderRifle(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID);
+	void RenderWings(const CNetObj_Character Player, CAnimState* pAnimWings, vec2 Position, vec2 Direction, int ClientID);
 public:
 	virtual void OnRender();
 };

@@ -250,7 +250,7 @@ void ItemSql::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 	GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", DescItem);
 
 	// квестовыый предмет
-	if (PlItem.Info().Type == ITEMQUEST) return;
+	if (PlItem.Info().Type == ItemType::TYPE_QUEST) return;
 
 	// бонус предметов
 	if (CGS::AttributInfo.find(PlItem.Info().BonusID) != CGS::AttributInfo.end() && PlItem.Info().BonusCount)
@@ -260,7 +260,7 @@ void ItemSql::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 	}
 
 	// используемое или нет
-	if (PlItem.Info().Function == ONEUSEDS || PlItem.Info().Function == USEDS)
+	if (PlItem.Info().Function == FUNCTION_ONE_USED || PlItem.Info().Function == FUNCTION_USED)
 	{
 		char aBuf[64];
 		str_format(aBuf, sizeof(aBuf), "Bind command \"/useitem %d'\"", ItemID);
@@ -269,20 +269,20 @@ void ItemSql::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 	}
 
 	// зелье или нет
-	if (PlItem.Info().Type == ITEMPOTION)
+	if (PlItem.Info().Type == ItemType::TYPE_POTION)
 	{
 		GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "Auto use {STR} - {STR}", NameItem, (PlItem.Settings ? "Enable" : "Disable"));
 	}
 
 	// поставить дома предмет
-	if (PlItem.Info().Type == ITEMDECORATION)
+	if (PlItem.Info().Type == ItemType::TYPE_DECORATION)
 	{
 		GS()->AVM(ClientID, "DECOSTART", ItemID, HideID, "Added {STR} to your house", NameItem);
 		GS()->AVM(ClientID, "DECOGUILDSTART", ItemID, HideID, "Added {STR} to your guild house", NameItem);
 	}
 
 	// установить предмет как расстение
-	if (PlItem.Info().Function == ITPLANTS)
+	if (PlItem.Info().Function == FUNCTION_PLANTS)
 	{
 		const int HouseID = Job()->House()->OwnerHouseID(pPlayer->Acc().AuthID);
 		const int PlantItemID = Job()->House()->GetPlantsID(HouseID);
@@ -293,7 +293,7 @@ void ItemSql::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 	}
 
 	// снаряжение или настройка
-	if (PlItem.Info().Type == ITEMEQUIP || PlItem.Info().Function == ITSETTINGS)
+	if (PlItem.Info().Type == ItemType::TYPE_EQUIP || PlItem.Info().Function == FUNCTION_SETTINGS)
 	{
 		GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "{STR} {STR}", (PlItem.Settings ? "Undress" : "Equip"), NameItem);
 	}
@@ -302,7 +302,7 @@ void ItemSql::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 	if (PlItem.Info().Dysenthis > 0)
 	{
 		GS()->AVM(ClientID, "IDESYNTHESIS", ItemID, HideID, "Disassemble {STR} (+{INT}{STR} - 1 item)",
-			NameItem, &PlItem.Info().Dysenthis, (PlItem.Info().Function == ITPLANTS ? "goods" : "mat"));
+			NameItem, &PlItem.Info().Dysenthis, (PlItem.Info().Function == FUNCTION_PLANTS ? "goods" : "mat"));
 	}
 
 	// можно ли дропнуть 
@@ -363,7 +363,7 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 
 		// проверяем если по функции он используется 1 раз
 		ItemPlayer &PlItem = pPlayer->GetItem(VoteID);
-		if(PlItem.Info().Function == ONEUSEDS)
+		if(PlItem.Info().Function == FUNCTION_ONE_USED)
 			Get = 1;
 
 		UseItem(ClientID, VoteID, Get);
@@ -381,7 +381,7 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 			Get = AvailableCount;
 
 		ItemPlayer &PlItem = pPlayer->GetItem(VoteID);
-		const int ItemGive = (PlItem.Info().Function == ITPLANTS ? itGoods : itMaterial);
+		const int ItemGive = (PlItem.Info().Function == FUNCTION_PLANTS ? itGoods : itMaterial);
 		ItemPlayer &ItemMaterial = pPlayer->GetItem(ItemGive); 
 
 		int DesCount = PlItem.Info().Dysenthis * Get;
@@ -398,7 +398,7 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 	if(PPSTR(CMD, "ISETTINGS") == 0)
 	{
 		pPlayer->GetItem(VoteID).EquipItem();
-		if(GS()->GetItemInfo(VoteID).Type == ITEMEQUIP)
+		if(GS()->GetItemInfo(VoteID).Type == ItemType::TYPE_EQUIP)
 		{
 			GS()->Mmo()->SaveAccount(pPlayer, SAVESTATS);
 			GS()->ChangeEquipSkin(ClientID, VoteID);
@@ -471,7 +471,7 @@ bool ItemSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Replac
 		for (const auto& it : Items[ClientID])
 		{
 			const ItemPlayer ItemData = it.second;
-			if (ItemData.Info().Type != ITEMSETTINGS || ItemData.Count <= 0)
+			if (ItemData.Info().Type != ItemType::TYPE_SETTINGS || ItemData.Count <= 0)
 				continue;
 
 			GS()->AVM(ClientID, "ISETTINGS", it.first, HSETTINGSS, "[{STR}] {STR}", (ItemData.Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
@@ -489,7 +489,7 @@ bool ItemSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Replac
 		for (const auto& it : Items[ClientID])
 		{
 			const ItemPlayer ItemData = it.second;
-			if (ItemData.Count <= 0 || ItemData.Info().Type != ITEMUPGRADE)
+			if (ItemData.Count <= 0 || ItemData.Info().Type != ItemType::TYPE_MODULE)
 				continue;
 
 			int BonusCount = ItemData.Info().BonusCount * (ItemData.Enchant + 1);
@@ -516,13 +516,13 @@ bool ItemSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Replac
 		GS()->ShowPlayerStats(pPlayer);
 
 		GS()->AVH(ClientID, HINVSELECT, RED_COLOR, "Inventory Select List");
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ITEMUSED, HINVSELECT, "Used Items");
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ITEMCRAFT, HINVSELECT, "Craft Items");
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ITEMQUEST, HINVSELECT, "Quest Items");
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ITEMUPGRADE, HINVSELECT, "Modules Items");
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ITEMEQUIP, HINVSELECT, "Equiping Items");
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ITEMPOTION, HINVSELECT, "Potion Items");
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ITEMOTHER, HINVSELECT, "Other Items");
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_USED, HINVSELECT, "Used Items");
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_CRAFT, HINVSELECT, "Craft Items");
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_QUEST, HINVSELECT, "Quest Items");
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_MODULE, HINVSELECT, "Modules Items");
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_EQUIP, HINVSELECT, "Equiping Items");
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_POTION, HINVSELECT, "Potion Items");
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_OTHER, HINVSELECT, "Other Items");
 		if (pPlayer->m_SortTabs[SORTINVENTORY])
 			ListInventory(pPlayer, pPlayer->m_SortTabs[SORTINVENTORY]);
 
@@ -602,7 +602,7 @@ bool ItemSql::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 	}
 
 	// проверить пустой слот если да тогда одеть предмет
-	const bool AutoEquip = (Info().Type == ITEMEQUIP && pPlayer->GetItemEquip(Info().Function) <= 0) || (Info().Function == ITSETTINGS && Info().BonusCount > 0);
+	const bool AutoEquip = (Info().Type == ItemType::TYPE_EQUIP && pPlayer->GetItemEquip(Info().Function) <= 0) || (Info().Function == FUNCTION_SETTINGS && Info().BonusCount > 0);
 	if(AutoEquip)
 	{
 		GameServer->Chat(ClientID, "Auto equip {STR} ({STR} +{INT})!", Info().GetName(pPlayer), pPlayer->AtributeName(Info().BonusID), &Info().BonusCount);
@@ -627,7 +627,7 @@ bool ItemSql::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 		GameServer->ChangeEquipSkin(ClientID, itemid_);
 
 	// если тихий режим
-	if(!arg_message || Info().Type == ITEMSETTINGS) 
+	if(!arg_message || Info().Type == ItemType::TYPE_SETTINGS) 
 		return true;
 
 	// информация о получении себе предмета
@@ -686,7 +686,7 @@ bool ItemSql::ClassItems::EquipItem()
 		return false;
 
 	// если снаряжение
-	if(Info().Type == ITEMEQUIP)
+	if(Info().Type == ItemType::TYPE_EQUIP)
 	{
 		const int EquipID = Info().Function;
 		int EquipItemID = pPlayer->GetItemEquip(EquipID, itemid_);
@@ -713,7 +713,7 @@ bool ItemSql::ClassItems::EquipItem()
 
 bool ItemSql::ClassItems::IsEquipped()
 {
-	if ((Info().Type == ITEMSETTINGS || Info().Type == ITEMEQUIP) && Settings)
+	if ((Info().Type == ItemType::TYPE_SETTINGS || Info().Type == ItemType::TYPE_EQUIP) && Settings)
 		return true;
 	return false;
 }

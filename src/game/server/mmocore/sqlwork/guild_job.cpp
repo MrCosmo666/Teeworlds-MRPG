@@ -566,7 +566,7 @@ bool GuildJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Repla
 		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "Return in inventory: Select down your decorations");
 		GS()->AVM(ClientID, "null", NOPE, HDECORATION, "and press (Back to inventory).");
 
-		Job()->Item()->ListInventory(pPlayer, ITEMDECORATION);
+		Job()->Item()->ListInventory(pPlayer, ItemType::TYPE_DECORATION);
 		GS()->AV(ClientID, "null", "");
 		ShowDecorationList(pPlayer);
 		GS()->AddBack(ClientID);
@@ -800,7 +800,7 @@ void GuildJob::JoinGuild(int AuthID, int GuildID)
 		AccountMainSql::Data[ClientID].GuildRank = 0;
 		GS()->ResetVotes(ClientID, MAINMENU);
 	}
-	SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '0' WHERE ID = '%d'", GuildID, AuthID);
+	SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = NULL WHERE ID = '%d'", GuildID, AuthID);
 	GS()->ChatGuild(GuildID, "Player {STR} join in your guild!", PlayerName);
 }
 
@@ -827,7 +827,7 @@ void GuildJob::ExitGuild(int AuthID)
 			GS()->ResetVotes(ClientID, MAINMENU);
 			AccountMainSql::Data[ClientID].GuildID = 0;
 		}
-		SJK.UD("tw_accounts_data", "GuildID = NULL, GuildRank = '-1', GuildDeposit = '0' WHERE ID = '%d'", AuthID);
+		SJK.UD("tw_accounts_data", "GuildID = NULL, GuildRank = NULL, GuildDeposit = '0' WHERE ID = '%d'", AuthID);
 	}
 }
 
@@ -1073,7 +1073,7 @@ void GuildJob::DeleteRank(int RankID, int GuildID)
 {
 	if(RankGuild.find(RankID) != RankGuild.end())
 	{
-		SJK.UD("tw_accounts_data", "GuildRank = '-1' WHERE GuildRank = '%d' AND GuildID = '%d'", RankID, GuildID);
+		SJK.UD("tw_accounts_data", "GuildRank = NULL WHERE GuildRank = '%d' AND GuildID = '%d'", RankID, GuildID);
 		SJK.DD("tw_guilds_ranks", "WHERE ID = '%d' AND GuildID = '%d'", RankID, GuildID);
 		GS()->ChatGuild(GuildID, "Rank [{STR}] succesful delete", RankGuild[RankID].Rank);
 		AddHistoryGuild(GuildID, "Deleted rank '%s'.", RankGuild[RankID].Rank);
@@ -1372,7 +1372,7 @@ void GuildJob::SellGuildHouse(int GuildID)
 		HouseGuild[HouseID].m_Door = 0;
 	}
 	HouseGuild[ HouseID ].m_GuildID = 0;
-	SJK.UD("tw_guilds_houses", "OwnerMID = '0' WHERE ID = '%d'", HouseID);
+	SJK.UD("tw_guilds_houses", "OwnerMID = NULL WHERE ID = '%d'", HouseID);
 	
 	// возращаем деньги
 	int SoldBack = HouseGuild[ HouseID ].m_Price;

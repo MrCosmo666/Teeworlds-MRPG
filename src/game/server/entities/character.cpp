@@ -188,7 +188,7 @@ bool CCharacter::DecoInteractive()
 	int InteractiveType = CGS::InteractiveSub[ClientID].TempID2;
 	GS()->ClearInteractiveSub(ClientID);
 
-	if(DecoID > 0 && m_pPlayer->GetItem(DecoID).Count > 0 && GS()->GetItemInfo(DecoID).Type == ITEMDECORATION)
+	if(DecoID > 0 && m_pPlayer->GetItem(DecoID).Count > 0 && GS()->GetItemInfo(DecoID).Type == ItemType::TYPE_DECORATION)
 	{
 		if (InteractiveType == DECOTYPE_HOUSE)
 		{
@@ -1064,20 +1064,6 @@ bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)
 		}
 	}
 
-	// копье охотника
-	if(m_pPlayer->GetItemEquip(EQUIP_HAMMER) == itSpearBronekhods) {
-		int ShotSpread = 8; 
-		for(int i = -ShotSpread; i <= ShotSpread; ++i) {
-			float a = angle(Direction) ;
-			float v = 1-(absolute(i)/(float)ShotSpread);
-			float Speed = mix((float)GS()->Tuning()->m_ShotgunSpeeddiff, 1.0f, v);
-			new CProjectile(GameWorld(), WEAPON_SHOTGUN, m_pPlayer->GetCID(), ProjStartPos, vec2(cosf(a), sinf(a))*Speed,
-				(int)(Server()->TickSpeed()*GS()->Tuning()->m_ShotgunLifetime),
-				1, false, 0, -1, WEAPON_SHOTGUN);
-		}
-		m_ReloadTimer = Server()->TickSpeed()/2;
-		return false;
-	}
 	return true;
 }
 
