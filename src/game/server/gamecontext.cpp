@@ -753,7 +753,6 @@ void CGS::SendEquipItem(int ClientID, int TargetID)
 	if (ClientID >= MAX_PLAYERS && ClientID < MAX_CLIENTS)
 	{
 		CPlayerBot* pBotPlayer = static_cast<CPlayerBot*>(m_apPlayers[ClientID]);
-
 		CNetMsg_Sv_EquipItems Msg;
 		Msg.m_ClientID = ClientID;
 		for (int k = 0; k < EQUIP_MAX_BOTS; k++)
@@ -782,6 +781,19 @@ void CGS::SendEquipItem(int ClientID, int TargetID)
 		Msg.m_EnchantItem[k] = EnchantItem;
 	}
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID);
+}
+
+// Отправить снаряжение в радиусе
+void CGS::SendRangeEquipItem(int TargetID, int StartSenderClientID, int EndSenderClientID)
+{
+	if (!CheckClient(TargetID) || StartSenderClientID < 0 || EndSenderClientID > MAX_CLIENTS || StartSenderClientID >= EndSenderClientID)
+		return;
+
+	for (int i = StartSenderClientID; i < EndSenderClientID; i++)
+		SendEquipItem(i, TargetID);
+
+	SendEquipItem(TargetID, TargetID);
+	SendEquipItem(TargetID, -1);
 }
 
 // Отправить смену команды или команду
@@ -1256,18 +1268,12 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Successfully checks client.");
 			pPlayer->m_PlayerTick[TickState::CheckClient] = 0;
 
-			// загрузка всех частей скинов игроков
-			for(int i = 0; i < MAX_CLIENTS; ++i)
-			{
-				if(i == ClientID || !m_apPlayers[i])
-					continue;
-
-				SendEquipItem(i, ClientID);
-			}
-
 			// отправим что прошли проверку на стороне сервера
 			CNetMsg_Sv_AfterIsMmoServer GoodCheck;
 			Server()->SendPackMsg(&GoodCheck, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
+
+			// загрузка всех частей скинов игроков
+			SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
 		}
 		else if(MsgID == NETMSGTYPE_CL_CLIENTAUTH)
 		{
@@ -1496,9 +1502,6 @@ void CGS::ChangeWorld(int ClientID)
 	}
 	int savecidmem = ClientID+m_WorldID*MAX_CLIENTS;
 	m_apPlayers[ClientID] = new(savecidmem) CPlayer(this, ClientID);
-	
-	SendEquipItem(ClientID, -1);
-	SendEquipItem(ClientID, ClientID);
 }
 
 // Если игрок Готов к игре
@@ -1512,7 +1515,10 @@ bool CGS::IsClientPlayer(int ClientID) const
 {
 	return m_apPlayers[ClientID] && m_apPlayers[ClientID]->GetTeam() == TEAM_SPECTATORS ? false : true;
 }
-bool CGS::CheckClient(int ClientID) const{ return (Server()->GetClientVersion(ClientID) == CLIENT_VERSION_MMO); }
+bool CGS::CheckClient(int ClientID) const
+{
+	return (bool)((Server()->GetClientVersion(ClientID) == CLIENT_VERSION_MMO) || (ClientID >= MAX_PLAYERS && ClientID < MAX_CLIENTS)); 
+}
 const char *CGS::GameType() const { return m_pController && m_pController->GetGameType() ? m_pController->GetGameType() : ""; }
 const char *CGS::Version() const { return GAME_VERSION; }
 const char *CGS::NetVersion() const { return GAME_NETVERSION; }
@@ -2405,19 +2411,10 @@ void CGS::ChangeEquipSkin(int ClientID, int ItemID)
 	if(!pPlayer)
 		return;
 	
-	if (GetItemInfo(ItemID).Type == ItemType::TYPE_EQUIP && (GetItemInfo(ItemID).Function == EQUIP_DISCORD || GetItemInfo(ItemID).Function == EQUIP_MINER))
+	if (GetItemInfo(ItemID).Type != ItemType::TYPE_EQUIP || GetItemInfo(ItemID).Function == EQUIP_DISCORD || GetItemInfo(ItemID).Function == EQUIP_MINER)
 		return;
 
-	CNetMsg_Sv_EquipItems Msg;
-	Msg.m_ClientID = ClientID;
-	for (int p = 0; p < NUM_EQUIPS; p++)
-	{
-		int EquipItem = pPlayer->GetItemEquip(p);
-		bool EnchantItem = pPlayer->GetItem(EquipItem).Enchant >= pPlayer->GetItem(EquipItem).Info().MaximalEnchant;
-		Msg.m_EquipID[p] = EquipItem;
-		Msg.m_EnchantItem[p] = EnchantItem;
-	}
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1);
+	SendEquipItem(ClientID, -1);
 }
 
 // Очистить интерактивы сюб

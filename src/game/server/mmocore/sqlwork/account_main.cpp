@@ -149,6 +149,8 @@ void AccountMainSql::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		int CountMessageInbox = Job()->Inbox()->GetActiveInbox(ClientID);
 		if(CountMessageInbox > 0) 
 			GS()->Chat(ClientID, "You have unread [{INT} emails]. Check your Mailbox!", &CountMessageInbox);
+
+		GS()->SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
 		return;
 	}
 
@@ -166,8 +168,7 @@ void AccountMainSql::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		return;
 	}
 
-	if(GS()->CheckClient(ClientID))
-		GS()->SendEquipItem(ClientID, ClientID);
+	GS()->SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
 }
 
 // Показать дискорд карту

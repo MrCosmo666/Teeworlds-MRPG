@@ -347,16 +347,22 @@ void CServer::SetClientScore(int ClientID, int Score)
 
 void CServer::SetClientVersion(int ClientID, int Version)
 {
+	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
+		return;
 	m_aClients[ClientID].m_ClientVersion = Version;
 }
 
 int CServer::GetClientVersion(int ClientID)
 {
+	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
+		return 0;
 	return m_aClients[ClientID].m_ClientVersion;
 }
 
 void CServer::SetClientLanguage(int ClientID, const char* pLanguage)
 {
+	if (ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
+		return;
 	str_copy(m_aClients[ClientID].m_aLanguage, pLanguage, sizeof(m_aClients[ClientID].m_aLanguage));
 }
 
@@ -371,6 +377,8 @@ const char *CServer::GetWorldName(int WorldID)
 
 const char* CServer::GetClientLanguage(int ClientID)
 {
+	if (ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
+		return "unknow";
 	return m_aClients[ClientID].m_aLanguage;
 }
 
@@ -392,6 +400,9 @@ void CServer::ChangeWorld(int ClientID, int MapID)
 
 void CServer::QuestBotRecheck(int WorldID, int QuestID, int Step)
 {
+	if (WorldID < 0 || WorldID >= COUNT_WORLD)
+		return;
+
 	GameServer(WorldID)->ClearQuestsBot(QuestID, Step);
 }
 

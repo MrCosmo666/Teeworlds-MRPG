@@ -75,6 +75,7 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 		GS()->AVL(ClientID, "null", "Your mailbox is empty");
 	return;
 }
+
 // проверить сообщения имеются ли
 int MailBoxJob::GetActiveInbox(int ClientID)
 {

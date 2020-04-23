@@ -195,6 +195,7 @@ public:
 	void SendSettings(int ClientID);
 	void SendSkinChange(int ClientID, int TargetID);
 	void SendEquipItem(int ClientID, int TargetID);
+	void SendRangeEquipItem(int TargetID, int StartSenderClientID, int EndSenderClientID33);
 	void SendTeam(int ClientID, int Team, bool DoChatMsg, int TargetID);
 	void SendGameMsg(int GameMsgID, int ClientID);
 	void SendGameMsg(int GameMsgID, int ParaI1, int ClientID);

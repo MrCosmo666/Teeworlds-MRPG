@@ -435,9 +435,10 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 			GS()->Chat(-1, "{STR} enchant {STR}+{INT}({STR} +{INT})", 
 				GS()->Server()->ClientName(ClientID), PlItem.Info().GetName(), &EnchantLevel, pPlayer->AtributeName(BonusID), &BonusCount);
 		
-			if(EnchantLevel >= EFFECTENCHANT)
+			if (EnchantLevel >= EFFECTENCHANT)
+			{
 				GS()->SendEquipItem(ClientID, -1);
-
+			}
 			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		}
 		return true;
