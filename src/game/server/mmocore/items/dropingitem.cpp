@@ -118,8 +118,11 @@ void CDropingItem::Tick()
 	}
 
 	// Проверяем есть ли игрок которому предназначен предмет нету то делаем публичным
-	if(m_ForID != -1 && !GS()->m_apPlayers[m_ForID])
-		m_ForID = -1;	
+	{
+		CPlayer* pForPlayer = GS()->GetPlayer(m_ForID, true, true);
+		if (m_ForID != -1 && !pForPlayer)
+			m_ForID = -1;
+	}
 
 	CCharacter *pChar = (CCharacter*)GameWorld()->ClosestEntity(m_Pos, 64, CGameWorld::ENTTYPE_CHARACTER, 0);
 	if(!pChar || !pChar->GetPlayer() || pChar->GetPlayer()->IsBot())

@@ -2341,7 +2341,6 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, ItemSql::ItemPlayer &PlayerItem
 // Проверить чекнуть и подобрать предмет Если он будет найден
 bool CGS::TakeItemCharacter(int ClientID)
 {
-	// check for use
 	CPlayer *pPlayer = GetPlayer(ClientID, true);
 	if(!pPlayer || !pPlayer->GetCharacter() /*|| pChar->m_ReloadTimer*/)
 		return false;
@@ -2354,8 +2353,8 @@ bool CGS::TakeItemCharacter(int ClientID)
 // Отправить сообщение с предметом или без используя ClientID
 void CGS::SendInbox(int ClientID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
 {
-	CPlayer *pPlayer = GetPlayer(ClientID, true);
-	if(!pPlayer)
+	CPlayer* pPlayer = GetPlayer(ClientID, true);
+	if(pPlayer)
 		return;
 
 	Mmo()->Inbox()->SendInbox(pPlayer->Acc().AuthID, Name, Desc, ItemID, Count, Enchant);
@@ -2367,14 +2366,14 @@ void CGS::SendDayInfo(int ClientID)
 	if(m_DayEnumType == DayType::NIGHTTYPE)
 	{
 		if(ClientID == -1) { m_RaidExp = 100+rand()%200; } // для всех значит глобально
-		Chat(ClientID, "Raid, increase to experience [{INT}%]", &m_RaidExp);
+		Chat(ClientID, "Night increase to experience {INT}%", &m_RaidExp);
 		Chat(ClientID, "Mobs more aggressive!");
 
 	}
 	else if(m_DayEnumType == DayType::MORNINGTYPE)
 	{
 		if(ClientID == -1) { m_RaidExp = 100; } // для всех значит глобально
-		Chat(ClientID, "Raid, experience was downgraded to [100%]!");
+		Chat(ClientID, "Experience was downgraded to 100%");
 		Chat(ClientID, "Mobs not particularly aggressive!");
 	}
 }
