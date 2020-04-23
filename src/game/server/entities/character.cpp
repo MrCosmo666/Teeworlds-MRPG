@@ -954,7 +954,7 @@ void CCharacter::HandleTilesets()
 	{
 		if (m_pHelper->TileEnter(Index, i))
 			SetEvent(i);
-		else if (m_pHelper->TileExit(Index, TILE_EVENT_PARTY)) {}
+		else if (m_pHelper->TileExit(Index, i)) {}
 	}
 
 	// вода
