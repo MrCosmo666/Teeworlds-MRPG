@@ -42,19 +42,28 @@ void ContextBots::LoadGlobalBots()
 		int BotID = (int)RES->getInt("ID");
 		str_copy(DataBot[BotID].NameBot, RES->getString("BotName").c_str(), sizeof(DataBot[BotID].NameBot));
 
-		sscanf(RES->getString("SkinName").c_str(), "%s %s %s %s %s %s", 
-			DataBot[BotID].SkinNameBot[SKINPART_BODY], DataBot[BotID].SkinNameBot[SKINPART_MARKING], 
-			DataBot[BotID].SkinNameBot[SKINPART_DECORATION], DataBot[BotID].SkinNameBot[SKINPART_HANDS], 
-			DataBot[BotID].SkinNameBot[SKINPART_FEET], DataBot[BotID].SkinNameBot[SKINPART_EYES]);
-		sscanf(RES->getString("SkinColor").c_str(), "%d %d %d %d %d %d", 
+		if (!sscanf(RES->getString("SkinName").c_str(), "%s %s %s %s %s %s",
+			DataBot[BotID].SkinNameBot[SKINPART_BODY], DataBot[BotID].SkinNameBot[SKINPART_MARKING],
+			DataBot[BotID].SkinNameBot[SKINPART_DECORATION], DataBot[BotID].SkinNameBot[SKINPART_HANDS],
+			DataBot[BotID].SkinNameBot[SKINPART_FEET], DataBot[BotID].SkinNameBot[SKINPART_EYES]))
+			dbg_msg("Error", "Mised bots information");
+
+		if(!sscanf(RES->getString("SkinColor").c_str(), "%d %d %d %d %d %d", 
 			&DataBot[BotID].SkinColorBot[SKINPART_BODY], &DataBot[BotID].SkinColorBot[SKINPART_MARKING], 
 			&DataBot[BotID].SkinColorBot[SKINPART_DECORATION], &DataBot[BotID].SkinColorBot[SKINPART_HANDS], 
-			&DataBot[BotID].SkinColorBot[SKINPART_FEET], &DataBot[BotID].SkinColorBot[SKINPART_EYES]);
+			&DataBot[BotID].SkinColorBot[SKINPART_FEET], &DataBot[BotID].SkinColorBot[SKINPART_EYES]))
+			dbg_msg("Error", "Mised bots information");
 
 		for(int j = SKINPART_BODY; j < NUM_SKINPARTS; j ++) {
 			if(DataBot[BotID].SkinColorBot[j] != 0)
 				DataBot[BotID].UseCustomBot[j] = true;
 		}
+		DataBot[BotID].EquipSlot[EQUIP_WINGS] = RES->getInt("SlotWings");
+		DataBot[BotID].EquipSlot[EQUIP_HAMMER] = RES->getInt("SlotHammer");
+		DataBot[BotID].EquipSlot[EQUIP_GUN] = RES->getInt("SlotGun");
+		DataBot[BotID].EquipSlot[EQUIP_SHOTGUN] = RES->getInt("SlotShotgun");
+		DataBot[BotID].EquipSlot[EQUIP_GRENADE] = RES->getInt("SlotGrenade");
+		DataBot[BotID].EquipSlot[EQUIP_RIFLE] = RES->getInt("SlotRifle");
 	}
 
 	// загружаем связанных ботов

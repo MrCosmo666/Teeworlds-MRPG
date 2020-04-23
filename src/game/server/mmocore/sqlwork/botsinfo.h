@@ -35,6 +35,7 @@ class ContextBots : public CMmoComponent
 		char SkinNameBot[6][24];
 		int UseCustomBot[6];
 		int SkinColorBot[6];
+		int EquipSlot[EQUIP_MAX_BOTS];
 
 		const char *Name(CPlayer *pPlayer) const;
 	};

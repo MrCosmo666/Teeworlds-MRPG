@@ -33,6 +33,7 @@ public:
 	virtual void SetStandart(int Health, int Mana) override { m_BotHealth = Health; };
 	virtual void SetDungeonAllowedSpawn(bool Spawn) override{ m_DungeonAllowedSpawn = Spawn; };
 	virtual	int GetMoodNameplacesType(int SnappingClient);
+	virtual int GetItemEquip(int EquipID, int SkipItemID = -1) const;
 
 	virtual void Tick() override;
 	virtual int GetStartHealth() override;

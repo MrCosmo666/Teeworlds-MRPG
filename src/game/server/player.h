@@ -107,6 +107,7 @@ public:
 	virtual int GetStartHealth();
 	virtual int GetAttributeCount(int BonusID, bool Really = false);
 	virtual void Snap(int SnappingClient);
+	virtual int GetItemEquip(int EquipID, int SkipItemID = -1) const;
 	
 private:
 	virtual void TryRespawn();
@@ -170,7 +171,6 @@ public:
 	};
 
 	int GetItemDurability(int Item) const;
-	int GetItemEquip(int EquipID, int SkipItemID = -1) const;
 	int GetLevelDisciple(int Class);
 
 	// разговоры с нпс функции

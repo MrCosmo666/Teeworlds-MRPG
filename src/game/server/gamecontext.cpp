@@ -746,15 +746,38 @@ void CGS::SendSkinChange(int ClientID, int TargetID)
 // Отправить Equip Items
 void CGS::SendEquipItem(int ClientID, int TargetID)
 {
-	if((TargetID != -1 && !CheckClient(TargetID)) || !m_apPlayers[ClientID] || !m_apPlayers[ClientID]->IsAuthed())
+	if((TargetID != -1 && !CheckClient(TargetID)) || !m_apPlayers[ClientID])
 		return;
 
+	// - - отправляем снаряжение ботов - -
+	if (ClientID >= MAX_PLAYERS && ClientID < MAX_CLIENTS)
+	{
+		CPlayerBot* pBotPlayer = static_cast<CPlayerBot*>(m_apPlayers[ClientID]);
+
+		CNetMsg_Sv_EquipItems Msg;
+		Msg.m_ClientID = ClientID;
+		for (int k = 0; k < EQUIP_MAX_BOTS; k++)
+		{
+			int EquipItem = pBotPlayer->GetItemEquip(k);
+			bool EnchantItem = false;
+			Msg.m_EquipID[k] = EquipItem;
+			Msg.m_EnchantItem[k] = EnchantItem;
+		}
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, TargetID);
+		return;
+	}
+
+	// - - отправляем снаряжение игроков - -
+	if (ClientID < 0 || ClientID >= MAX_PLAYERS || !m_apPlayers[ClientID]->IsAuthed())
+		return;
+
+	CPlayer* pPlayer = m_apPlayers[ClientID];
 	CNetMsg_Sv_EquipItems Msg;
 	Msg.m_ClientID = ClientID;
 	for(int k = 0; k < NUM_EQUIPS; k++)
 	{
-		int EquipItem = m_apPlayers[ClientID]->GetItemEquip(k);
-		bool EnchantItem = m_apPlayers[ClientID]->GetItem(EquipItem).Enchant >= m_apPlayers[ClientID]->GetItem(EquipItem).Info().MaximalEnchant;
+		int EquipItem = pPlayer->GetItemEquip(k);
+		bool EnchantItem = pPlayer->GetItem(EquipItem).Enchant >= pPlayer->GetItem(EquipItem).Info().MaximalEnchant;
 		Msg.m_EquipID[k] = EquipItem;
 		Msg.m_EnchantItem[k] = EnchantItem;
 	}

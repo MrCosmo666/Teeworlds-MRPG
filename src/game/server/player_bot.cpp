@@ -237,3 +237,10 @@ bool CPlayerBot::GetActiveQuestsID(int SnapClientID)
 	}
 	return false;
 }
+
+int CPlayerBot::GetItemEquip(int EquipID, int SkipItemID) const
+{
+	if (EquipID < EQUIP_WINGS || EquipID > EQUIP_RIFLE)
+		return -1;
+	return ContextBots::DataBot[m_BotID].EquipSlot[EquipID];
+}
