@@ -166,16 +166,14 @@ void SqlController::SaveAccount(CPlayer *pPlayer, int Table)
 	{
 		char aBuf[64];
 		dynamic_string Buffer;
-		
-		// добавляем в буфер всю статистику что требуется обновить
 		for(const auto& at : CGS::AttributInfo)
 		{
-			if(str_comp_nocase(at.second.FieldName, "unfield") == 0) continue;
+			if(str_comp_nocase(at.second.FieldName, "unfield") == 0) 
+				continue;
 			str_format(aBuf, sizeof(aBuf), ", %s = '%d' ", at.second.FieldName, pPlayer->Acc().Stats[at.first]);
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
 
-		// обновляем статистику и очищаем буфер
 		SJK.UD("tw_accounts_data", "Upgrade = '%d' %s WHERE ID = '%d'", pPlayer->Acc().Upgrade, Buffer.buffer(), pPlayer->Acc().AuthID);
 		Buffer.clear();
 		return;
@@ -220,7 +218,8 @@ void SqlController::SaveAccount(CPlayer *pPlayer, int Table)
 	else if(Table == SAVEPOSITION)
 	{
 		// запрет в данже сохранять позицию
-		if (GS()->DungeonID() > 0) return;
+		if (GS()->DungeonID() > 0) 
+			return;
 
 		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", GS()->Server()->GetWorldID(ClientID), pPlayer->Acc().AuthID);
 		return;

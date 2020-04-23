@@ -207,10 +207,10 @@ void CGameControllerDungeon::StateTick()
 	}
 }
 
-int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKiller, int Weapon)
+void CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKiller, int Weapon)
 {
 	if (!pKiller || !pVictim || !pVictim->GetPlayer())
-		return 0;
+		return;
 
 	int KillerID = pKiller->GetCID();
 	int VictimID = pVictim->GetPlayer()->GetCID();
@@ -221,7 +221,7 @@ int CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKill
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The dungeon is completed on [{INT}%]", &Progress);
 		UpdateDoorKeyState();
 	}
-	return 0;
+	return;
 }
 
 void CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)

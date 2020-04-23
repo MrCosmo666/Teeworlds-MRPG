@@ -730,15 +730,8 @@ void CCharacter::Die(int Killer, int Weapon)
 	}
 	else m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick()+Server()->TickSpeed()/2;
 
-	int ModeSpecial = GS()->m_pController->OnCharacterDeath(this, GS()->m_apPlayers[Killer], Weapon);
-
-	char aBuf[256];
-	str_format(aBuf, sizeof(aBuf), "kill killer='%d:%s' victim='%d:%s' weapon=%d special=%d",
-		Killer, Server()->ClientName(Killer),
-		m_pPlayer->GetCID(), Server()->ClientName(m_pPlayer->GetCID()), Weapon, ModeSpecial);
-	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
-
 	// a nice sound
+	GS()->m_pController->OnCharacterDeath(this, GS()->m_apPlayers[Killer], Weapon);
 	GS()->CreateSound(m_Pos, SOUND_PLAYER_DIE);
 
 	// this is for auto respawn after 3 secs

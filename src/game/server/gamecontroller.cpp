@@ -25,10 +25,10 @@ IGameController::IGameController(CGS *pGS)
 	OnInitCommands();
 }
 
-int IGameController::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKiller, int Weapon)
+void IGameController::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKiller, int Weapon)
 {
 	pVictim->GetPlayer()->ClearTalking();
-	return 0;
+	return;
 }
 
 void IGameController::OnCharacterSpawn(CCharacter *pChr)

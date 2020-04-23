@@ -794,17 +794,16 @@ int CPlayer::GetAttributeCount(int BonusID, bool Really)
 	// если тип мира данж
 	if (GS()->IsDungeon() && CGS::AttributInfo[BonusID].UpgradePrice < 10)
 	{
-		float NewStat = 0.0f;
+		int NewStat = 0;
 		if (AttributEx > 0)
 		{
-			NewStat = ((float)m_SyncFactor / 25.0f) + (AttributEx / 25.0f);
+			NewStat = (int)((float)m_SyncFactor / 25.0f) + (AttributEx / 25.0f);
 			if (m_MoodState == MOOD_PLAYER_TANK && BonusID == Stats::StHardness)
 				NewStat *= 2;
 		}
-		if(AttributEx > (int)NewStat)
-			AttributEx = (int)NewStat;
+		if(AttributEx > NewStat)
+			AttributEx = NewStat;
 	}
-
 	return AttributEx;
 }
 
