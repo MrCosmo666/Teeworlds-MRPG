@@ -85,6 +85,7 @@ public:
 	void GiveRandomMobEffect(int FromID);
 	void ChangePosition(vec2 NewPos);
 	void ResetDoorPos();
+	int GetPowerWeapons(int WeaponID);
 
 	// these are non-heldback inputs
 	CNetObj_PlayerInput m_Input;

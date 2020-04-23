@@ -61,7 +61,7 @@ void CGameControllerDungeon::ChangeState(int State)
 		m_StartingTick = 0;
 		m_SafeTick = 0;
 		SetMobsSpawn(false);
-		UpdateDoorKeyState();
+		ResetDoorKeyState();
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
@@ -83,7 +83,6 @@ void CGameControllerDungeon::ChangeState(int State)
 		GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon started!");
 		SetMobsSpawn(true);
 		KillAllPlayers();
-		UpdateDoorKeyState(true);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
@@ -236,14 +235,21 @@ void CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 	}
 }
 
-void CGameControllerDungeon::UpdateDoorKeyState(bool StartingGame)
+void CGameControllerDungeon::UpdateDoorKeyState()
 {
-	for (CLogicDungeonDoorKey* pDoor = (CLogicDungeonDoorKey*)GS()->m_World.FindFirst(CGameWorld::ENTTYPE_DUNGEONDOOR);
+	for (CLogicDungeonDoorKey* pDoor = (CLogicDungeonDoorKey*)GS()->m_World.FindFirst(CGameWorld::ENTTYPE_DUNGEONKEYDOOR);
 		pDoor; pDoor = (CLogicDungeonDoorKey*)pDoor->TypeNext())
 	{
-		if (pDoor->SyncStateChanges(StartingGame))
+		if (pDoor->SyncStateChanges())
 			GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Scr... Scrr... Opened door somewhere!");
 	}
+}
+
+void CGameControllerDungeon::ResetDoorKeyState()
+{
+	for (CLogicDungeonDoorKey* pDoor = (CLogicDungeonDoorKey*)GS()->m_World.FindFirst(CGameWorld::ENTTYPE_DUNGEONKEYDOOR);
+		pDoor; pDoor = (CLogicDungeonDoorKey*)pDoor->TypeNext())
+		pDoor->ResetDoor();
 }
 
 int CGameControllerDungeon::CountMobs() const

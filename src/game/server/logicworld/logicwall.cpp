@@ -324,7 +324,7 @@ void CLogicDoorKey::Snap(int SnappingClient)
 /////////////////////////////////////////
 /////////////////////////////////////////
 CLogicDungeonDoorKey::CLogicDungeonDoorKey(CGameWorld *pGameWorld, vec2 Pos, int BotID)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_DUNGEONDOOR, Pos, 14)
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_DUNGEONKEYDOOR, Pos, 14)
 {
 	m_To = vec2(Pos.x, Pos.y - 140);
 	m_OpenedDoor = false;
@@ -347,15 +347,8 @@ void CLogicDungeonDoorKey::Tick()
 	}
 }
 
-bool CLogicDungeonDoorKey::SyncStateChanges(bool StartingGame)
+bool CLogicDungeonDoorKey::SyncStateChanges()
 {
-	// если начало игры изначально закрыты все двери
-	if (StartingGame)
-	{
-		m_OpenedDoor = false;
-		return false;
-	}
-
 	// синхронизировать с живыми ботами
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
@@ -368,12 +361,12 @@ bool CLogicDungeonDoorKey::SyncStateChanges(bool StartingGame)
 		}
 	}
 
+
 	if (!m_OpenedDoor)
 	{
 		m_OpenedDoor = true;
 		return true;
 	}
-
 	return false;
 }
 

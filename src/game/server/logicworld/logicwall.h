@@ -86,8 +86,8 @@ public:
 	virtual void Snap(int SnappingClient);
 	virtual void Tick();
 
-	bool SyncStateChanges(bool StartingGame);
-
+	bool SyncStateChanges();
+	void ResetDoor() { m_OpenedDoor = false; };
 };
 
 #endif

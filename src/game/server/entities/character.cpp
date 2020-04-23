@@ -779,6 +779,18 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 		int EnchantBonus = pFrom->GetAttributeCount(Stats::StStrength, true);
 		Dmg += EnchantBonus;
 
+		// Добавить силу к оружию		
+		if (pFrom->GetCharacter()->m_ActiveWeapon == WEAPON_GUN)
+			Dmg += pFrom->GetAttributeCount(Stats::StGunPower, true);
+		else if (pFrom->GetCharacter()->m_ActiveWeapon == WEAPON_SHOTGUN)
+			Dmg += pFrom->GetAttributeCount(Stats::StShotgunPower, true);
+		else if (pFrom->GetCharacter()->m_ActiveWeapon == WEAPON_GRENADE)
+			Dmg += pFrom->GetAttributeCount(Stats::StGrenadePower, true);
+		else if (pFrom->GetCharacter()->m_ActiveWeapon == WEAPON_LASER)
+			Dmg += pFrom->GetAttributeCount(Stats::StRiflePower, true);
+		else 
+			Dmg += pFrom->GetAttributeCount(Stats::StHammerPower, true);
+
 		// Vampirism пополнить здоровье
 		int TempInt = pFrom->GetAttributeCount(Stats::StVampirism, true);
 		if(rand()%5000 < clamp(TempInt, 100, 3000))

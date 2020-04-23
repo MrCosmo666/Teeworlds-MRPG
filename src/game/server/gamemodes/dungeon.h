@@ -55,7 +55,8 @@ private:
 	void SetMobsSpawn(bool AllowedSpawn);
 	void KillAllPlayers();
 
-	void UpdateDoorKeyState(bool StartingGame = false);
+	void UpdateDoorKeyState();
+	void ResetDoorKeyState();
 };
 
 // CHomeDoor class
