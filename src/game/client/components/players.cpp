@@ -586,80 +586,102 @@ bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAn
 	EquipInformation[itRainbowWings] =		{ vec4(0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.01f), 
 											vec2(115, 70), vec2(200, 100), IMAGE_WINGSIT23 };
 
+	// - - - молоток
 	if (Player.m_Weapon == WEAPON_HAMMER)
 	{
 		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_HAMMER];
-		int SpriteID = EquipInformation[EquipID].SpriteID;
-		bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_HAMMER];
-		if (SpriteID > 0 && g_Config.m_ClShowMEffects != 2 && Enchant)
+		if (EquipInformation.find(EquipID) != EquipInformation.end() && EquipInformation[EquipID].SpriteID > 0)
 		{
-			vec2 Direction = direction(Angle);
-			vec4 Color = EquipInformation[EquipID].Color;
-			m_pClient->m_pEffects->WingsEffect(Position, Direction, Color);
+			bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_HAMMER];
+			if(g_Config.m_ClShowMEffects != 2 && Enchant)
+			{
+				vec2 Direction = direction(Angle);
+				vec4 Color = EquipInformation[EquipID].Color;
+				m_pClient->m_pEffects->WingsEffect(Position, Direction, Color);
+			}
+			RenderHammer(pAnim, Angle, Position, EquipInformation[EquipID].SpriteID, EquipInformation[EquipID].Size.x);
+			return true;
 		}
-		return RenderHammer(pAnim, Angle, Position, EquipInformation[EquipID].SpriteID, EquipInformation[EquipID].Size.x);
+		return false;
 	}
+	// - - - пистолет
 	else if (Player.m_Weapon == WEAPON_GUN)
 	{
 		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_GUN];
-		int SpriteID = EquipInformation[EquipID].SpriteID;
-		bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_GUN];
-		if (SpriteID > 0 && g_Config.m_ClShowMEffects != 2 && Enchant)
+		if (EquipInformation.find(EquipID) != EquipInformation.end() && EquipInformation[EquipID].SpriteID > 0)
 		{
-			vec2 Direction = direction(Angle);
-			vec4 Color = EquipInformation[EquipID].Color;
-			m_pClient->m_pEffects->WingsEffect(Position, Direction, Color);
+			bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_GUN];
+			if (g_Config.m_ClShowMEffects != 2 && Enchant)
+			{
+				vec2 Direction = direction(Angle);
+				vec4 Color = EquipInformation[EquipID].Color;
+				m_pClient->m_pEffects->WingsEffect(Position, Direction, Color);
+			}
+			RenderGun(Player, pAnim, Angle, Position, EquipInformation[EquipID].SpriteID);
+			return true;
 		}
-		return RenderGun(Player, pAnim, Angle, Position, EquipInformation[EquipID].SpriteID);
+		return false;
 	}
+	// - - - шотган
 	else if (Player.m_Weapon == WEAPON_SHOTGUN)
 	{
 		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_SHOTGUN];
-		int SpriteID = EquipInformation[EquipID].SpriteID;
-		bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_SHOTGUN];
-		if (SpriteID > 0 && g_Config.m_ClShowMEffects != 2 && Enchant)
+		if (EquipInformation.find(EquipID) != EquipInformation.end() && EquipInformation[EquipID].SpriteID > 0)
 		{
-			vec2 Direction = direction(Angle);
-			vec4 Color = EquipInformation[EquipID].Color;
-			m_pClient->m_pEffects->WingsEffect(Position, Direction, Color);
+			bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_SHOTGUN];
+			if (g_Config.m_ClShowMEffects != 2 && Enchant)
+			{
+				vec2 Direction = direction(Angle);
+				vec4 Color = EquipInformation[EquipID].Color;
+				m_pClient->m_pEffects->WingsEffect(Position, Direction, Color);
+			}
+			RenderShotgun(Player, pAnim, Angle, Position, EquipInformation[EquipID].SpriteID);
+			return true;
 		}
-		return RenderShotgun(Player, pAnim, Angle, Position, EquipInformation[EquipID].SpriteID);
+		return false;
 	}
+	// - - - гранаты
 	else if (Player.m_Weapon == WEAPON_GRENADE)
 	{
 		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_GRENADE];
-		int SpriteID = EquipInformation[EquipID].SpriteID;
-		bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_GRENADE];
-		if (SpriteID > 0 && g_Config.m_ClShowMEffects != 2 && Enchant)
+		if (EquipInformation.find(EquipID) != EquipInformation.end() && EquipInformation[EquipID].SpriteID > 0)
 		{
-			vec2 Direction = direction(Angle);
-			vec4 Color = EquipInformation[EquipID].Color;
-			m_pClient->m_pEffects->WingsEffect(Position, Direction, Color);
+			bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_GRENADE];
+			if (g_Config.m_ClShowMEffects != 2 && Enchant)
+			{
+				vec2 Direction = direction(Angle);
+				vec4 Color = EquipInformation[EquipID].Color;
+				m_pClient->m_pEffects->WingsEffect(Position, Direction, Color);
+			}
+			RenderGrenade(pAnim, Angle, Position, EquipInformation[EquipID].SpriteID);
+			return true;
 		}
-		return RenderGrenade(pAnim, Angle, Position, EquipInformation[EquipID].SpriteID);
+		return false; 
 	}
+	// - - - лазер
 	else if (Player.m_Weapon == WEAPON_LASER)
 	{
 		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_RIFLE];
-		int SpriteID = EquipInformation[EquipID].SpriteID;
-		bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_RIFLE];
-		if (SpriteID > 0 && g_Config.m_ClShowMEffects != 2 && Enchant)
+		if (EquipInformation.find(EquipID) != EquipInformation.end() && EquipInformation[EquipID].SpriteID > 0)
 		{
-			vec2 Direction = direction(Angle);
-			vec4 Color = EquipInformation[EquipID].Color;
-			m_pClient->m_pEffects->WingsEffect(Position, Direction, Color);
+			bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_RIFLE];
+			if (g_Config.m_ClShowMEffects != 2 && Enchant)
+			{
+				vec2 Direction = direction(Angle);
+				vec4 Color = EquipInformation[EquipID].Color;
+				m_pClient->m_pEffects->WingsEffect(Position, Direction, Color);
+			}
+			RenderRifle(pAnim, Angle, Position, EquipInformation[EquipID].SpriteID);
+			return true;
 		}
-		return RenderRifle(pAnim, Angle, Position, EquipInformation[EquipID].SpriteID);
+		return false;
 	}
 	return false;
 }
 
 // - - - - - - - - - - MMOREPLACE GAME GUNS - - - - - - - - - - -
-bool CPlayers::RenderHammer(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID, float Size)
+void CPlayers::RenderHammer(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID, float Size)
 {
-	if(SpriteID <= 0)
-		return false;
-
 	Graphics()->QuadsEnd();
 	vec2 Direction = direction(Angle);
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOHAMMER].m_Id);
@@ -684,14 +706,10 @@ bool CPlayers::RenderHammer(CAnimState* pAnim, float Angle, vec2 Position, int S
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 	Graphics()->QuadsBegin();
 	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
-	return true;
 } 
 
-bool CPlayers::RenderGun(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int SpriteID)
+void CPlayers::RenderGun(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int SpriteID)
 {
-	if (SpriteID <= 0)
-		return false;
-
 	Graphics()->QuadsEnd();
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGUN].m_Id);
 	Graphics()->QuadsBegin();
@@ -730,14 +748,10 @@ bool CPlayers::RenderGun(const CNetObj_Character Player, CAnimState* pAnim, floa
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 	Graphics()->QuadsBegin();
 	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
-	return true;
 }
 
-bool CPlayers::RenderShotgun(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int SpriteID)
+void CPlayers::RenderShotgun(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int SpriteID)
 {
-	if (SpriteID <= 0)
-		return false;
-
 	Graphics()->QuadsEnd();
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOSHOTGUN].m_Id);
 	Graphics()->QuadsBegin();
@@ -776,14 +790,10 @@ bool CPlayers::RenderShotgun(const CNetObj_Character Player, CAnimState* pAnim, 
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 	Graphics()->QuadsBegin();
 	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
-	return true;
 }
 
-bool CPlayers::RenderGrenade(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID)
+void CPlayers::RenderGrenade(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID)
 {
-	if (SpriteID <= 0)
-		return false;
-
 	Graphics()->QuadsEnd();
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGRENADE].m_Id);
 	Graphics()->QuadsBegin();
@@ -798,14 +808,10 @@ bool CPlayers::RenderGrenade(CAnimState* pAnim, float Angle, vec2 Position, int 
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 	Graphics()->QuadsBegin();
 	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
-	return true;
 }
 
-bool CPlayers::RenderRifle(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID)
+void CPlayers::RenderRifle(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID)
 {
-	if (SpriteID <= 0)
-		return false;
-
 	Graphics()->QuadsEnd();
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMORIFLE].m_Id);
 	Graphics()->QuadsBegin();
@@ -820,14 +826,12 @@ bool CPlayers::RenderRifle(CAnimState* pAnim, float Angle, vec2 Position, int Sp
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 	Graphics()->QuadsBegin();
 	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
-	return true;
 }
 
 void CPlayers::RenderWings(const CNetObj_Character Player, CAnimState* pAnimWings, vec2 Position, vec2 Direction, int ClientID)
 {
 	int EquipItem = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_WINGS];
-	int SpriteID = EquipInformation[EquipItem].SpriteID;
-	if (SpriteID <= 0 || EquipInformation.find(EquipItem) == EquipInformation.end())
+	if (EquipInformation.find(EquipItem) == EquipInformation.end() || EquipInformation[EquipItem].SpriteID <= 0)
 		return;
 
 	// - - - - - - - - - - - - - АНИМАЦИИ КРЫЛЬЕВ - - - - - - - - - - - -
@@ -861,4 +865,21 @@ void CPlayers::RenderWings(const CNetObj_Character Player, CAnimState* pAnimWing
 	}
 	RenderTools()->RenderWings(pAnimWings, EquipInformation[EquipItem].SpriteID, Direction, Position,
 		EquipInformation[EquipItem].Position, EquipInformation[EquipItem].Size);
+}
+
+
+void CPlayers::OnMessage(int MsgType, void* pRawMsg)
+{
+	if (Client()->State() == IClient::STATE_DEMOPLAYBACK)
+		return;
+
+	if (MsgType == NETMSGTYPE_SV_EQUIPITEMS)
+	{
+		CNetMsg_Sv_EquipItems* pMsg = (CNetMsg_Sv_EquipItems*)pRawMsg;
+		for (int p = 0; p < NUM_EQUIPS; p++)
+		{
+			m_pClient->m_aClients[pMsg->m_ClientID].m_aEquipItem[p] = pMsg->m_EquipID[p];
+			m_pClient->m_aClients[pMsg->m_ClientID].m_aEnchantItem[p] = pMsg->m_EnchantItem[p];
+		}
+	}
 }

@@ -25,8 +25,6 @@ class CQuestingProcessing : public CComponent
 	};
 	QuestingTable QuestTable[MAX_TABLE];
 
-	void Continue();
-
 public:
 	void Clear();
 	bool IsActive();

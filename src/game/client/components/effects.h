@@ -33,7 +33,5 @@ public:
 	void PlayerSpawn(vec2 Pos);
 	void PlayerDeath(vec2 Pos, int ClientID);
 	void PowerupShine(vec2 Pos, vec2 Size);
-
-	void Update();
 };
 #endif

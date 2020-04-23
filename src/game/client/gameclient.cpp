@@ -1072,16 +1072,6 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		m_ConnectedMmoServer = true;
 		m_pMenus->SetAuthState(true);
 	}
-
-	else if (MsgId == NETMSGTYPE_SV_EQUIPITEMS)
-	{
-		CNetMsg_Sv_EquipItems* pMsg = (CNetMsg_Sv_EquipItems*)pRawMsg;
-		for (int p = 0; p < NUM_EQUIPS; p++)
-		{
-			m_aClients[pMsg->m_ClientID].m_aEquipItem[p] = pMsg->m_EquipID[p];
-			m_aClients[pMsg->m_ClientID].m_aEnchantItem[p] = pMsg->m_EnchantItem[p];
-		}
-	}
 }
 
 void CGameClient::OnStateChange(int NewState, int OldState)
