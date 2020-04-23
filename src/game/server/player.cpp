@@ -19,7 +19,6 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	m_Spawned = true;
 	m_LastVoteMenu = NOPE;
 	m_OpenVoteMenu = MAINMENU;
-
 	m_PrevTuningParams = *pGS->Tuning();
 	m_NextTuningParams = m_PrevTuningParams;
 
@@ -206,9 +205,10 @@ void CPlayer::Snap(int SnappingClient)
 		return;
 
 	bool local_ClientID = (m_ClientID == SnappingClient);
+	m_MoodState = GetMoodNameplacesType(SnappingClient);
 	pClientInfo->m_Local = local_ClientID;
 	pClientInfo->m_WorldType = GS()->Mmo()->WorldSwap()->GetWorldType();
-	pClientInfo->m_MoodType = GetMoodNameplacesType(SnappingClient);
+	pClientInfo->m_MoodType = m_MoodState;
 	pClientInfo->m_Level = Acc().Level;
 	pClientInfo->m_Exp = Acc().Exp;
 	pClientInfo->m_ExpNeed = ExpNeed(Acc().Level);
@@ -781,14 +781,26 @@ int CPlayer::GetAttributeCount(int BonusID, bool Really)
 	if (SaveData) { AttributEx += Acc().Stats[BonusID]; }
 
 	// если реальная стата то делил
-	if (Really && CGS::AttributInfo[BonusID].UpgradePrice < 10) { AttributEx /= (int)(BonusID == Stats::StStrength ? 10 : 5); }
+	if (Really && CGS::AttributInfo[BonusID].UpgradePrice < 10) 
+	{ 
+		if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
+			AttributEx /= 10;
+		else
+			AttributEx /= 5; 
+	}
 
 	// если тип мира данж
 	if (GS()->IsDungeon() && CGS::AttributInfo[BonusID].UpgradePrice < 10)
 	{
-		int NewStat = GS()->Mmo()->Dungeon()->SynchronizationPriceStats(AttributEx);
-		if(AttributEx > NewStat)
-			AttributEx = NewStat;
+		float NewStat = 0.0f;
+		if (AttributEx > 0)
+		{
+			NewStat = ((float)m_SyncFactor / 25.0f) + (AttributEx / 25.0f);
+			if (m_MoodState == MOOD_PLAYER_TANK && BonusID == Stats::StHardness)
+				NewStat *= 2;
+		}
+		if(AttributEx > (int)NewStat)
+			AttributEx = (int)NewStat;
 	}
 
 	return AttributEx;
@@ -921,7 +933,7 @@ void CPlayer::ClearFormatQuestText()
 	mem_zero(m_FormatTalkQuest, sizeof(m_FormatTalkQuest));
 }
 
-// another
+// another need optimize
 int CPlayer::GetMoodNameplacesType(int SnappingClient)
 {
 	if (!GS()->IsDungeon())

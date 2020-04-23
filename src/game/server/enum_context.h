@@ -71,7 +71,8 @@ enum AtributType
 	AtTank,
 	AtHealer,
 	AtDps,
-	AtWeapon
+	AtWeapon,
+	AtHardtype
 };
 
 // типы TOP LIST

@@ -58,6 +58,8 @@ public:
 	int m_PlayerFlags;
 	int m_PlayerTick[TickState::NUM_TICK];
 	bool m_Flymode;
+	int m_SyncFactor;
+	int m_MoodState;
 
 	StructLatency m_Latency;
 	StructLastAction m_LatestActivity;

@@ -136,19 +136,17 @@ bool DungeonJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int 
 	return false;
 }
 
-int DungeonJob::SynchronizationPriceStats(int StatsCount)
+int DungeonJob::SyncFactor()
 {
-	if (!GS()->IsDungeon() || StatsCount <= 0)
+	if (!GS()->IsDungeon())
 		return 0;
 
-	float Factor = 0;
+	int Factor = 0;
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
 		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS && GS()->CheckPlayerMessageWorldID(i) == GS()->GetWorldID())
-			Factor += (float)BotPlayer->GetStartHealth();
+			Factor += BotPlayer->GetStartHealth();
 	}
-
-	float WorkStats = (Factor / 10.0f) + (StatsCount / 25.0f);
-	return (int)WorkStats;
+	return Factor;
 }
