@@ -82,8 +82,8 @@ bool StorageSql::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_PLAYER_BUSSINES))
 	{
-		pChr->m_Core.m_ProtectHooked = true;
-		pChr->m_NoAllowDamage = true;
+		pChr->m_Core.m_ProtectHooked = false;
+		pChr->m_NoAllowDamage = false;
 		GS()->ResetVotes(ClientID, MAINMENU);
 		return true;
 	}
