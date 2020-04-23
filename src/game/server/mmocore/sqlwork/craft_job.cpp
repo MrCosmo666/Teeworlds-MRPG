@@ -43,6 +43,28 @@ void CraftJob::OnInitGlobal()
 }
 
 
+bool CraftJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
+{
+	CPlayer* pPlayer = pChr->GetPlayer();
+	const int ClientID = pPlayer->GetCID();
+
+	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_CRAFT_ZONE))
+	{
+		GS()->ResetVotes(ClientID, MAINMENU);
+		GS()->Chat(ClientID, "Information load in Vote!");
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
+		return true;
+	}
+	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_CRAFT_ZONE))
+	{
+		GS()->ResetVotes(ClientID, MAINMENU);
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
+		return true;
+	}
+
+	return false;
+}
+
 // показать лист крафтов
 void CraftJob::ShowCraftList(CPlayer *pPlayer, int CraftTab)
 {

@@ -76,15 +76,13 @@ bool SkillJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
 	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_LEARN_SKILL))
 	{
 		GS()->Chat(ClientID, "You can see list of available skills in the voting!");
-		pChr->m_Core.m_ProtectHooked = true;
-		pChr->m_NoAllowDamage = true;
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
 		GS()->ResetVotes(ClientID, MAINMENU);
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_LEARN_SKILL))
 	{
-		pChr->m_Core.m_ProtectHooked = false;
-		pChr->m_NoAllowDamage = false;
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		GS()->ResetVotes(ClientID, MAINMENU);
 		return true;
 	}

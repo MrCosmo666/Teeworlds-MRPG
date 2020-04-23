@@ -36,13 +36,12 @@ enum Stats
 	StPietyQ				= 22,
 	StVampirismQ			= 23,
 	StAmmoRegenQ			= 24,
-	StAutoFire				= 25,
-	StAmmoQ					= 26,
-	StHammerPower			= 27,
-	StGunPower				= 28,
-	StShotgunPower			= 29,
-	StGrenadePower			= 30,
-	StRiflePower			= 31,
+	StAmmoQ					= 25,
+	StHammerPower			= 26,
+	StGunPower				= 27,
+	StShotgunPower			= 28,
+	StGrenadePower			= 29,
+	StRiflePower			= 30,
 };
  
 // Таймеры Игрока
@@ -64,6 +63,7 @@ enum Skill
 	SkillHeartTurret = 1,	// турель восстановления здоровья
 	SkillSleepyGravity = 2, // притягивает мобов вокруг себя
 	SkillCraftDiscount = 3, // скидка на крафт
+	SkillMasterWeapon = 4, // автоматический огонь с оружий
 };
 
 enum AtributType

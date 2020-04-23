@@ -368,6 +368,35 @@ void HouseJob::SellHouse(int HouseID)
 	}
 }
 
+bool HouseJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
+{
+	CPlayer* pPlayer = pChr->GetPlayer();
+	const int ClientID = pPlayer->GetCID();
+
+	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_PLAYER_HOUSE))
+	{
+		int HouseID = GS()->Mmo()->House()->GetHouse(pChr->m_Core.m_Pos);
+		if (HouseID > 0)
+		{
+			GS()->ResetVotes(ClientID, MAINMENU);
+
+			int PriceHouse = GS()->Mmo()->House()->GetHousePrice(HouseID);
+			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 200, "House Price: {INT}gold \n"
+				" Owner: {STR}.\nInformation load in vote.", &PriceHouse, GS()->Mmo()->House()->OwnerName(HouseID));
+		}
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
+		return true;
+	}
+	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_PLAYER_HOUSE))
+	{
+		GS()->ResetVotes(ClientID, MAINMENU);
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
+		return true;
+	}
+
+	return false;
+}
+
 // Снять баланс с фарм счета
 void HouseJob::TakeFarmMoney(CPlayer *pPlayer, int TakeCount)
 {

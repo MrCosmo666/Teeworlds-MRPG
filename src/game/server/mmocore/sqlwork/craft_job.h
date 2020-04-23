@@ -30,8 +30,10 @@ public:
 
 	// действия с крафтами
 	void StartCraftItem(CPlayer *pPlayer, int CraftID);
+	virtual bool OnPlayerHandleTile(CCharacter* pChr, int IndexCollision);
 	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
 	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
+
 };
 
 #endif

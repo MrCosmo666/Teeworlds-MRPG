@@ -91,29 +91,25 @@ bool GuildJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
 			GS()->ResetVotes(ClientID, MAINMENU);
 			GS()->Chat(ClientID, "Information load in Vote!");
 		}
-		pChr->m_Core.m_ProtectHooked = true;
-		pChr->m_NoAllowDamage = true;
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_GUILD_HOUSE))
 	{
 		GS()->ResetVotes(ClientID, MAINMENU);
-		pChr->m_Core.m_ProtectHooked = false;
-		pChr->m_NoAllowDamage = false;
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		return true;
 	}
 
 
 	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_GUILD_CHAIRS))
 	{
-		pChr->m_Core.m_ProtectHooked = true;
-		pChr->m_NoAllowDamage = true; 
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true; 
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_GUILD_CHAIRS))
 	{
-		pChr->m_Core.m_ProtectHooked = false;
-		pChr->m_NoAllowDamage = false;
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		return true;
 	}
 	if (pChr->GetHelper()->BoolIndex(TILE_GUILD_CHAIRS))

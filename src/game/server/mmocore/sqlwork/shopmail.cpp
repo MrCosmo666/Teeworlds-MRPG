@@ -35,15 +35,13 @@ bool ShopMailSql::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
 	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_AUCTION))
 	{
 		GS()->Chat(ClientID, "You can see list of auctions items in the votes!");
-		pChr->m_Core.m_ProtectHooked = true;
-		pChr->m_NoAllowDamage = true;
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
 		GS()->ResetVotes(ClientID, MAINMENU);
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_AUCTION))
 	{
-		pChr->m_Core.m_ProtectHooked = false;
-		pChr->m_NoAllowDamage = false;
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		GS()->ResetVotes(ClientID, MAINMENU);
 		return true;
 	}

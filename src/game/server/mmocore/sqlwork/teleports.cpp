@@ -68,16 +68,14 @@ bool TeleportsSql::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
 	{
 		GS()->Chat(ClientID, "List of your Aether Locations, you can see on vote!");
 		UnlockLocation(ClientID, pChr->m_Core.m_Pos);
-		pChr->m_Core.m_ProtectHooked = true;
-		pChr->m_NoAllowDamage = true;
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
 
 		GS()->VResetVotes(ClientID, MAINMENU);
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_AETHER_TELEPORT))
 	{
-		pChr->m_Core.m_ProtectHooked = false;
-		pChr->m_NoAllowDamage = false;
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		GS()->VResetVotes(ClientID, MAINMENU);
 		return true;
 	}

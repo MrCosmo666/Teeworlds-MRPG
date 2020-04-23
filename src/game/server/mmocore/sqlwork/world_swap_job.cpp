@@ -56,14 +56,12 @@ bool WorldSwapJob::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 	CPlayer *pPlayer = pChr->GetPlayer();
 	if(pChr->GetHelper()->TileEnter(IndexCollision, TILE_WORLD_SWAP))
 	{
-		pChr->m_Core.m_ProtectHooked = true;
-		pChr->m_NoAllowDamage = true;
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
 		return true;
 	}
 	else if(pChr->GetHelper()->TileExit(IndexCollision, TILE_WORLD_SWAP))
 	{
-		pChr->m_Core.m_ProtectHooked = false;
-		pChr->m_NoAllowDamage = false;
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		return true;	
 	}
 

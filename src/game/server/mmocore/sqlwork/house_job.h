@@ -39,6 +39,7 @@ class HouseJob : public CMmoComponent
 public:
 	virtual void OnInitLocal(const char *pLocal);
 	virtual void OnPaymentTime();
+	virtual bool OnPlayerHandleTile(CCharacter* pChr, int IndexCollision);
 	
 	/* #########################################################################
 		FUNCTIONS HOUSES PLANTS

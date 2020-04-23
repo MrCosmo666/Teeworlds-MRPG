@@ -230,7 +230,7 @@ void CCharacter::FireWeapon()
 	vec2 Direction = normalize(vec2(m_LatestInput.m_TargetX, m_LatestInput.m_TargetY));
 
 	bool FullAuto = false;
-	if(m_pPlayer->GetAttributeCount(Stats::StAutoFire))
+	if(GS()->Mmo()->Skills()->GetSkillLevel(m_pPlayer->GetCID(), SkillMasterWeapon))
 		FullAuto = true;
 
 	// check if we gonna fire
@@ -281,40 +281,41 @@ void CCharacter::FireWeapon()
 	{
 		case WEAPON_HAMMER:
 		{
-			bool Hits = false;
-			m_NumObjectsHit = 0;
-			GS()->CreateSound(m_Pos, SOUND_HAMMER_FIRE);
-			if(IamBot || InteractiveHammer(Direction, ProjStartPos))
+			if (InteractiveHammer(Direction, ProjStartPos))
 			{
-				CCharacter *apEnts[MAX_CLIENTS];
-				int Num = GS()->m_World.FindEntities(ProjStartPos, GetProximityRadius()*(IamBot ? 0.5f : 2.5f),
-					(CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
-
-				for (int i = 0; i < Num; ++i)
-				{
-					CCharacter *pTarget = apEnts[i];
-
-					if ((pTarget == this) || pTarget->m_Core.m_LostData || GS()->Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, NULL, NULL))
-						continue;
-
-					// set his velocity to fast upward (for now)
-					if(length(pTarget->m_Pos-ProjStartPos) > 0.0f)
-						GS()->CreateHammerHit(pTarget->m_Pos-normalize(pTarget->m_Pos-ProjStartPos)*GetProximityRadius()*0.5f);
-					else
-						GS()->CreateHammerHit(ProjStartPos);
-
-					vec2 Dir;
-					if (length(pTarget->m_Pos - m_Pos) > 0.0f)
-						Dir = normalize(pTarget->m_Pos - m_Pos);
-					else
-						Dir = vec2(0.f, -1.f);
-
-					pTarget->TakeDamage(vec2(0.f, -1.f) + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f, Dir*-1, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage,
-						m_pPlayer->GetCID(), m_ActiveWeapon);
-					Hits = true;
-				}
+				m_ReloadTimer = Server()->TickSpeed() / 3;
+				return;
 			}
-			if(Hits) m_ReloadTimer = Server()->TickSpeed()/3;
+
+			bool Hits = false;
+			GS()->CreateSound(m_Pos, SOUND_HAMMER_FIRE);
+			int Radius = (IamBot ? 0.5f : m_pPlayer->GetAttributeCount(Stats::StHammerPower, true));
+			CCharacter *apEnts[MAX_CLIENTS];
+			int Num = GS()->m_World.FindEntities(ProjStartPos, GetProximityRadius()* Radius, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
+			for (int i = 0; i < Num; ++i)
+			{
+				CCharacter *pTarget = apEnts[i];
+				if ((pTarget == this) || pTarget->m_Core.m_LostData || GS()->Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, NULL, NULL))
+					continue;
+
+				// set his velocity to fast upward (for now)
+				if(length(pTarget->m_Pos-ProjStartPos) > 0.0f)
+					GS()->CreateHammerHit(pTarget->m_Pos-normalize(pTarget->m_Pos-ProjStartPos)*GetProximityRadius()*0.5f);
+				else
+					GS()->CreateHammerHit(ProjStartPos);
+
+				vec2 Dir;
+				if (length(pTarget->m_Pos - m_Pos) > 0.0f)
+					Dir = normalize(pTarget->m_Pos - m_Pos);
+				else
+					Dir = vec2(0.f, -1.f);
+
+				pTarget->TakeDamage(vec2(0.f, -1.f) + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f, Dir*-1, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage,
+					m_pPlayer->GetCID(), m_ActiveWeapon);
+				Hits = true;
+			}
+			if(Hits) 
+				m_ReloadTimer = Server()->TickSpeed()/3;
 		} break;
 
 		case WEAPON_GUN:
@@ -948,77 +949,19 @@ void CCharacter::HandleTilesets()
 	if(GS()->Mmo()->OnPlayerHandleTile(this, Index))
 		return;
 
-	// check all tilesets
-	for(int i = TILE_GUILD_HOUSE; i < MAX_TILES; i++) 
+	// инвенты
+	for (int i = TILE_CLEAR_EVENTS; i <= TILE_EVENT_LIKE; i++)
 	{
-		if(m_pHelper->TileEnter(Index, i))
-		{
-			switch(i)
-			{
-				case TILE_PLAYER_HOUSE:
-				{
-					int HouseID = GS()->Mmo()->House()->GetHouse(m_Core.m_Pos);
-					if (HouseID > 0)
-					{
-						GS()->ResetVotes(m_pPlayer->GetCID(), MAINMENU);
-
-						int PriceHouse = GS()->Mmo()->House()->GetHousePrice(HouseID);
-						GS()->SBL(m_pPlayer->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 200, "House Price: {INT}gold \n"
-							" Owner: {STR}.\nInformation load in vote.", &PriceHouse, GS()->Mmo()->House()->OwnerName(HouseID));
-					}
-					m_Core.m_ProtectHooked = m_NoAllowDamage = true;
-					break;
-				} 
-
-				case TILE_LEARN_SKILL:
-				case TILE_PLAYER_BUSSINES:
-				case TILE_CRAFT_ZONE:
-				{
-					GS()->ResetVotes(m_pPlayer->GetCID(), MAINMENU);
-					GS()->Chat(m_pPlayer->GetCID(), "Information load in Vote!");
-					m_Core.m_ProtectHooked = m_NoAllowDamage = true;
-					break;
-				} 
-
-				case TILE_GUILD_CHAIRS:
-				{
-					m_Core.m_ProtectHooked = m_NoAllowDamage = false;
-					break;
-				}
-
-				case TILE_CLEAR_EVENTS:
-				case TILE_EVENT_PARTY:
-				case TILE_EVENT_LIKE:
-				{
-					SetEvent(i);
-					break;
-				}
-
-				case TILE_WATER:
-				{
-					GS()->CreateDeath(m_Pos, m_pPlayer->GetCID());
-					break;
-				}
-			}
-		}
-		else if(m_pHelper->TileExit(Index, i))
-		{
-			switch(i)
-			{
-				// Снятие урона защиты и крюка и обновить меню
-				case TILE_LEARN_SKILL:
-				case TILE_PLAYER_BUSSINES:
-				case TILE_CRAFT_ZONE:
-				case TILE_PLAYER_HOUSE:
-
-				case TILE_WATER:
-				{
-					GS()->CreateDeath(m_Pos, m_pPlayer->GetCID());
-					break;
-				}
-			}
-		}
+		if (m_pHelper->TileEnter(Index, i))
+			SetEvent(i);
+		else if (m_pHelper->TileExit(Index, TILE_EVENT_PARTY)) {}
 	}
+
+	// вода
+	if (m_pHelper->TileEnter(Index, TILE_WATER))
+		GS()->CreateDeath(m_Pos, m_pPlayer->GetCID());
+	else if (m_pHelper->TileExit(Index, TILE_WATER))
+		GS()->CreateDeath(m_Pos, m_pPlayer->GetCID());
 }
 
 void CCharacter::HandleEvents() { }
@@ -1050,8 +993,12 @@ void CCharacter::GiveRandomMobEffect(int FromID)
 
 bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)
 {
-	// подбор предмета и если нет хамера
-	GS()->TakeItemCharacter(m_pPlayer->GetCID());
+	if (m_pPlayer->IsBot())
+		return false;
+
+	// подбор предмета
+	if (GS()->TakeItemCharacter(m_pPlayer->GetCID()))
+		return true;
 
 	// мини игра клик тее
 	ClickTee *pClick = (ClickTee*)GameWorld()->ClosestEntity(m_Pos, 180, CGameWorld::ENTTYPE_CLICKGAME, 0);
@@ -1072,11 +1019,11 @@ bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)
 			PosJob = pJobItem->GetPos();
 			pJobItem->Work(m_pPlayer->GetCID());
 			m_ReloadTimer = Server()->TickSpeed()/3;
-			return false;
+			return true;
 		}
 	}
 
-	return true;
+	return false;
 }
 
 void CCharacter::InteractiveGun(vec2 Direction, vec2 ProjStartPos)

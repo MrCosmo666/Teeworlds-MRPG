@@ -115,9 +115,6 @@ private:
 	int m_Mana;
 
 	// weapon info
-	CEntity *m_apHitObjects[10];
-	int m_NumObjectsHit;
-
 	struct WeaponStat
 	{
 		int m_AmmoRegenStart;
