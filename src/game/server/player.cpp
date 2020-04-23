@@ -782,6 +782,15 @@ int CPlayer::GetAttributeCount(int BonusID, bool Really)
 
 	// если реальная стата то делил
 	if (Really && CGS::AttributInfo[BonusID].UpgradePrice < 10) { AttributEx /= (int)(BonusID == Stats::StStrength ? 10 : 5); }
+
+	// если тип мира данж
+	if (GS()->IsDungeon() && CGS::AttributInfo[BonusID].UpgradePrice < 10)
+	{
+		int NewStat = GS()->Mmo()->Dungeon()->SynchronizationPriceStats(AttributEx);
+		if(AttributEx > NewStat)
+			AttributEx = NewStat;
+	}
+
 	return AttributEx;
 }
 

@@ -39,5 +39,6 @@ public:
 	void SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds);
 	void ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID);
 	void ShowDungeonsList(CPlayer* pPlayer);
+	int SynchronizationPriceStats(int StatsCount);
 };
 #endif

@@ -263,6 +263,9 @@ void CGS::CreateDeath(vec2 Pos, int ClientID)
 
 void CGS::CreateSound(vec2 Pos, int Sound, int64 Mask)
 {
+	if (Sound < 0 || Sound > 40)
+		return;
+
 	// create a sound
 	CNetEvent_SoundWorld *pEvent = (CNetEvent_SoundWorld *)m_Events.Create(NETEVENTTYPE_SOUNDWORLD, sizeof(CNetEvent_SoundWorld), Mask);
 	if(pEvent)
