@@ -169,7 +169,6 @@ void AccountMainSql::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	}
 
 	GS()->SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
-	pPlayer->m_SyncFactor = Job()->Dungeon()->SyncFactor();
 }
 
 // Показать дискорд карту

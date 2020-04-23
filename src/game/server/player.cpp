@@ -25,9 +25,11 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	ClearParsing();
 
 	Acc().Team = GetStartTeam();
-	if(Acc().AuthID > 0)
+	if (Acc().AuthID > 0)
+	{
 		GS()->Mmo()->Account()->LoadAccount(this, false);
-	
+		m_SyncFactor = GS()->Mmo()->Dungeon()->SyncFactor();
+	}
 	SetLanguage(Server()->GetClientLanguage(ClientID));
 }
 
