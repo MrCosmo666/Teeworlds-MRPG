@@ -29,7 +29,6 @@
 std::map < int , CGS::StructAttribut > CGS::AttributInfo;
 
 // Структуры игроков
-
 std::map < int , CGS::StructParsing > CGS::Interactive;
 std::map < int , CGS::StructInteractiveSub > CGS::InteractiveSub;
 std::map < int , std::map < std::string , int > > CGS::Effects;
@@ -49,8 +48,8 @@ void CGS::Construct(int Resetting)
 
 	m_Resetting = 0;
 	m_pServer = 0;
-
 	m_pController = 0;
+
 	if(Resetting==NO_RESET)
 		pMmoController = 0;
 }
@@ -560,7 +559,7 @@ void CGS::Motd(int ClientID, const char* Text, ...)
 void CGS::SendBroadcast(const char *pText, int ClientID, int Priority, int LifeSpan)
 {
 	int Start = (ClientID < 0 ? 0 : ClientID);
-	int End = (ClientID < 0 ? MAX_CLIENTS : ClientID+1);
+	int End = (ClientID < 0 ? MAX_PLAYERS : ClientID+1);
 	
 	for(int i = Start; i < End; i++)
 	{
@@ -572,25 +571,25 @@ void CGS::SendBroadcast(const char *pText, int ClientID, int Priority, int LifeS
 // Добавить броадкаст
 void CGS::AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSpan)
 {
-	if(ClientID >= 0 && ClientID < MAX_PLAYERS)
+	if (ClientID < 0 || ClientID >= MAX_PLAYERS)
+		return;
+
+	if(LifeSpan > 0)
 	{
-		if(LifeSpan > 0)
-		{
-			if(m_BroadcastStates[ClientID].m_TimedPriority > Priority)
-				return;
+		if(m_BroadcastStates[ClientID].m_TimedPriority > Priority)
+			return;
 				
-			str_copy(m_BroadcastStates[ClientID].m_TimedMessage, pText, sizeof(m_BroadcastStates[ClientID].m_TimedMessage));
-			m_BroadcastStates[ClientID].m_LifeSpanTick = LifeSpan;
-			m_BroadcastStates[ClientID].m_TimedPriority = Priority;
-		}
-		else
-		{
-			if(m_BroadcastStates[ClientID].m_Priority > Priority)
-				return;
+		str_copy(m_BroadcastStates[ClientID].m_TimedMessage, pText, sizeof(m_BroadcastStates[ClientID].m_TimedMessage));
+		m_BroadcastStates[ClientID].m_LifeSpanTick = LifeSpan;
+		m_BroadcastStates[ClientID].m_TimedPriority = Priority;
+	}
+	else
+	{
+		if(m_BroadcastStates[ClientID].m_Priority > Priority)
+			return;
 				
-			str_copy(m_BroadcastStates[ClientID].m_NextMessage, pText, sizeof(m_BroadcastStates[ClientID].m_NextMessage));
-			m_BroadcastStates[ClientID].m_Priority = Priority;
-		}
+		str_copy(m_BroadcastStates[ClientID].m_NextMessage, pText, sizeof(m_BroadcastStates[ClientID].m_NextMessage));
+		m_BroadcastStates[ClientID].m_Priority = Priority;
 	}
 }
 
@@ -598,7 +597,7 @@ void CGS::AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSp
 void CGS::SBL(int ClientID, int Priority, int LifeSpan, const char *pText, ...)
 {
 	int Start = (ClientID < 0 ? 0 : ClientID);
-	int End = (ClientID < 0 ? MAX_CLIENTS : ClientID+1);
+	int End = (ClientID < 0 ? MAX_PLAYERS : ClientID+1);
 	
 	va_list VarArgs;
 	va_start(VarArgs, pText);
@@ -638,24 +637,22 @@ void CGS::BroadcastWorldID(int WorldID, int Priority, int LifeSpan, const char *
 // Тик броадкаса и его жизни
 void CGS::BroadcastTick(int ClientID)
 {
+	if (ClientID < 0 || ClientID >= MAX_PLAYERS)
+		return;
+
 	if(m_apPlayers[ClientID] && IsClientEqualWorldID(ClientID))
 	{
 		if(m_BroadcastStates[ClientID].m_LifeSpanTick > 0 && m_BroadcastStates[ClientID].m_TimedPriority > m_BroadcastStates[ClientID].m_Priority)
-		{
 			str_copy(m_BroadcastStates[ClientID].m_NextMessage, m_BroadcastStates[ClientID].m_TimedMessage, sizeof(m_BroadcastStates[ClientID].m_NextMessage));
-		}
 		
 		//Send broadcast only if the message is different, or to fight auto-fading
 		if(str_comp(m_BroadcastStates[ClientID].m_PrevMessage, m_BroadcastStates[ClientID].m_NextMessage) != 0 ||
-			m_BroadcastStates[ClientID].m_NoChangeTick > Server()->TickSpeed()
-		)
+			m_BroadcastStates[ClientID].m_NoChangeTick > Server()->TickSpeed())
 		{
 			CNetMsg_Sv_Broadcast Msg;
 			Msg.m_pMessage = m_BroadcastStates[ClientID].m_NextMessage;
 			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-			
 			str_copy(m_BroadcastStates[ClientID].m_PrevMessage, m_BroadcastStates[ClientID].m_NextMessage, sizeof(m_BroadcastStates[ClientID].m_PrevMessage));
-			
 			m_BroadcastStates[ClientID].m_NoChangeTick = 0;
 		}
 		else
@@ -688,7 +685,6 @@ void CGS::BroadcastTick(int ClientID)
 /* #########################################################################
 	PACKET MESSAGE FUNCTIONS 
 ######################################################################### */
-// Отправить эмоции что на шифт
 void CGS::SendEmoticon(int ClientID, int Emoticon)
 {
 	CNetMsg_Sv_Emoticon Msg;
@@ -697,7 +693,6 @@ void CGS::SendEmoticon(int ClientID, int Emoticon)
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1, m_WorldID);
 }
 
-// Отправить оружие подбора
 void CGS::SendWeaponPickup(int ClientID, int Weapon)
 {
 	CNetMsg_Sv_WeaponPickup Msg;
@@ -705,7 +700,6 @@ void CGS::SendWeaponPickup(int ClientID, int Weapon)
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
-// Отправить мотд
 void CGS::SendMotd(int ClientID)
 {
 	CNetMsg_Sv_Motd Msg;
@@ -713,13 +707,12 @@ void CGS::SendMotd(int ClientID)
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
-// Отправить настройки сервера
 void CGS::SendSettings(int ClientID)
 {
 	CNetMsg_Sv_ServerSettings Msg;
-	Msg.m_KickVote = g_Config.m_SvVoteKick;
-	Msg.m_KickMin = g_Config.m_SvVoteKickMin;
-	Msg.m_SpecVote = g_Config.m_SvVoteSpectate;
+	Msg.m_KickVote = 0;
+	Msg.m_KickMin = 0;
+	Msg.m_SpecVote = 0;
 	Msg.m_TeamLock = 0;
 	Msg.m_TeamBalance = 0;
 	Msg.m_PlayerSlots = MAX_CLIENTS;
@@ -1129,16 +1122,6 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 			// don't allow spectators to disturb players during a running game in tournament mode
 			int Mode = pMsg->m_Mode;
-			if((g_Config.m_SvTournamentMode == 2) &&
-				pPlayer->GetTeam() == TEAM_SPECTATORS &&
-				!Server()->IsAuthed(ClientID))
-			{
-				if(Mode != CHAT_WHISPER)
-					Mode = CHAT_TEAM;
-				else if(m_apPlayers[pMsg->m_Target] && m_apPlayers[pMsg->m_Target]->GetTeam() != TEAM_SPECTATORS)
-					Mode = CHAT_NONE;
-			}
-
 			if(Mode != CHAT_NONE)
 			{
 				// команды сервера
@@ -1146,14 +1129,6 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				{
 					CCmd pChat;
 					pChat.ChatCmd(pMsg, this, pPlayer);
-					return;
-				}
-
-				// общение чат для организаций
-				if(pPlayer->Acc().IsGuild())
-				{
-					ChatDiscord(false, DC_SERVER_CHAT, Server()->ClientName(ClientID), pMsg->m_pMessage);
-					SendChat(ClientID, Mode, pMsg->m_Target, pMsg->m_pMessage);
 					return;
 				}
 
