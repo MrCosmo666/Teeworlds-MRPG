@@ -338,9 +338,9 @@ void BotAI::EngineMobs()
 	// крюк
 	if (!m_Input.m_Hook)
 	{
-		if ((m_Core.m_Vel.y > 0 && m_Input.m_TargetY > 0) || (m_Core.m_Vel.y < 0 && m_Input.m_TargetY < 0) ||
-			(m_Core.m_Vel.x > 0 && m_Input.m_TargetX > 0 && m_Input.m_Direction == -1) || 
-			(m_Core.m_Vel.x < 0 && m_Input.m_TargetX < 0 && m_Input.m_Direction == 1) || rand()%3 == 0)
+		if ((m_Core.m_Vel.y < 0 && m_Input.m_TargetY > 0) || (m_Core.m_Vel.y > 0 && m_Input.m_TargetY < 0) ||
+			(m_Core.m_Vel.x > 0 && m_Input.m_TargetX > 0 && m_Input.m_Direction == -1) ||
+			(m_Core.m_Vel.x < 0 && m_Input.m_TargetX < 0 && m_Input.m_Direction == 1) || rand() % 4 == 0)
 		{
 			vec2 HookDir = GetHookPos(vec2(m_Input.m_TargetX, m_Input.m_TargetY));
 			if ((int)HookDir.x > 0 && (int)HookDir.y > 0)
@@ -355,7 +355,7 @@ void BotAI::EngineMobs()
 			}
 		}
 	}
-	if (m_Input.m_Hook && rand() % 20 == 0)
+	if (m_Input.m_Hook && rand() % 18 == 0)
 		m_Input.m_Hook = false;
 
 	// эмоции ботов
@@ -393,14 +393,18 @@ void BotAI::EngineMobs()
 		return;
 	}
 
+	bool NeedJumping = (m_Pos.y > pPlayer->GetCharacter()->m_Core.m_Pos.y + rand() % 400
+		|| (GS()->Collision()->GetCollisionAt(m_Pos.x + 32.0f, m_Pos.y) && m_Core.m_Direction == 1)
+		|| (GS()->Collision()->GetCollisionAt(m_Pos.x - 32.0f, m_Pos.y) && m_Core.m_Direction == -1));
+
+	if (NeedJumping)
+		m_Input.m_Jump = 1;
+
+
 	// ------------------------------------------------------------------------------
 	// интерактивы бота с найденым игроком
 	// ------------------------------------------------------------------------------
 	int Dist = distance(m_Pos, pPlayer->GetCharacter()->m_Core.m_Pos);
-	if(m_Pos.y > pPlayer->GetCharacter()->m_Core.m_Pos.y+rand()%400)
-		m_Input.m_Jump = 1;
-
-	// интерактив с игроком
 	if (Dist < 600.0f)
 	{
 		bool StaticBot = (ContextBots::MobBot[SubBotID].Spread >= 1);
@@ -411,8 +415,10 @@ void BotAI::EngineMobs()
 			if(m_BotTargetCollised || Dist > (StaticBot ? 250 : 70))
 			{
 				vec2 DirPlayer = normalize(pPlayer->GetCharacter()->m_Core.m_Pos - m_Pos);
-				if (DirPlayer.x < 0) m_Input.m_Direction = -1;
-				else m_Input.m_Direction = 1;
+				if (DirPlayer.x < 0) 
+					m_Input.m_Direction = -1;
+				else 
+					m_Input.m_Direction = 1;
 			}
 			else 
 				m_LatestInput.m_Fire = m_Input.m_Fire = 1;
