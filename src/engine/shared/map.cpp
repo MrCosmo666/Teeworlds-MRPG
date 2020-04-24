@@ -13,7 +13,12 @@ class CMap : public IEngineMap
 
 	CDataFileReader m_DataFile;
 public:
-	CMap() : m_CurrentMapSize(0), m_pCurrentMapData(nullptr) {}
+	CMap() : m_CurrentMapSize(0), m_pCurrentMapData(0x0) {}
+	~CMap()
+	{
+		mem_free(m_pCurrentMapData);
+		m_pCurrentMapData = 0x0;
+	}
 
 	virtual void *GetData(int Index) { return m_DataFile.GetData(Index); }
 	virtual void *GetDataSwapped(int Index) { return m_DataFile.GetDataSwapped(Index); }
@@ -35,6 +40,7 @@ public:
 		
 		m_CurrentMapSize = 0;
 		mem_free(m_pCurrentMapData);
+		m_pCurrentMapData = 0x0;
 	}
 
 	virtual bool Load(const char *pMapName, IStorage *pStorage)
