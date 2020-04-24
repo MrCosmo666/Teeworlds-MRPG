@@ -338,9 +338,9 @@ void BotAI::EngineMobs()
 	// крюк
 	if (!m_Input.m_Hook)
 	{
-		if (m_Core.m_Vel.y > 0 && m_Input.m_TargetY > 0 || m_Core.m_Vel.y < 0 && m_Input.m_TargetY < 0 ||
-			m_Core.m_Vel.x > 0 && m_Input.m_TargetX > 0 && m_Input.m_Direction == -1 || 
-			m_Core.m_Vel.x < 0 && m_Input.m_TargetX < 0 && m_Input.m_Direction == 1 || rand()%3 == 0)
+		if ((m_Core.m_Vel.y > 0 && m_Input.m_TargetY > 0) || (m_Core.m_Vel.y < 0 && m_Input.m_TargetY < 0) ||
+			(m_Core.m_Vel.x > 0 && m_Input.m_TargetX > 0 && m_Input.m_Direction == -1) || 
+			(m_Core.m_Vel.x < 0 && m_Input.m_TargetX < 0 && m_Input.m_Direction == 1) || rand()%3 == 0)
 		{
 			vec2 HookDir = GetHookPos(vec2(m_Input.m_TargetX, m_Input.m_TargetY));
 			if ((int)HookDir.x > 0 && (int)HookDir.y > 0)

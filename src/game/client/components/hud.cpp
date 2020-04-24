@@ -681,7 +681,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	IntsToStr(pClientStats->m_Gold, 6, aBuf);
 	float textWidth = TextRender()->TextWidth(0, 5.0f, aBuf, -1, -1.0);
 	Rect = { 5, 57.0f, textWidth + 16.0f, 9.0f };
-	RenderTools()->DrawUIRect(&Rect, vec4(0.3f, 0.1f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
+	RenderTools()->DrawUIRect(&Rect, vec4(0.3f, 0.1f, 0.0f, 0.25f), CUI::CORNER_ALL, 4.0f);
 
 	m_pClient->m_pMenus->DoItemIcon("gold", { Rect.x, Rect.y - 2.0f, Rect.h, Rect.w }, 12.0f);
 	Rect.VSplitLeft(13.0f, 0, &Rect);
