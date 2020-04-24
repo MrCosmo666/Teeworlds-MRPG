@@ -670,12 +670,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.18f), CUI::CORNER_ALL, 5.0f);
 
 	Rect = { 5, 15, 28, 25.0f };
-	Graphics()->BlendNormal();
 	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.18f), CUI::CORNER_ALL, 5.0f);
-
-	Rect = { 5, 15, 106, 25.0f };
-	Graphics()->BlendNormal();
-	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.1f, 0.1f, 0.06f), CUI::CORNER_ALL, 5.0f);
 
 	// переменные
 	char aBuf[256];
@@ -684,13 +679,13 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 
 	// рисуем инфу золота
 	IntsToStr(pClientStats->m_Gold, 6, aBuf);
-	float textWidth = TextRender()->TextWidth(0, 6.0f, aBuf, -1, -1.0);
-	Rect = { 5, 56.0f, textWidth + 16.0f, 10.0f };
+	float textWidth = TextRender()->TextWidth(0, 5.0f, aBuf, -1, -1.0);
+	Rect = { 5, 57.0f, textWidth + 16.0f, 9.0f };
 	RenderTools()->DrawUIRect(&Rect, vec4(0.3f, 0.1f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
 
-	m_pClient->m_pMenus->DoItemIcon("gold", { Rect.x, Rect.y - 1.0f, Rect.h, Rect.w }, 12.0f);
-	Rect.VSplitLeft(12.0f, 0, &Rect);
-	TextRender()->Text(0, Rect.x, 56.0f, 6.0f, aBuf, -1);
+	m_pClient->m_pMenus->DoItemIcon("gold", { Rect.x, Rect.y - 2.0f, Rect.h, Rect.w }, 12.0f);
+	Rect.VSplitLeft(13.0f, 0, &Rect);
+	TextRender()->Text(0, Rect.x, 57.0f, 5.0f, aBuf, -1);
 
 	// рисуем инфу зелей эффектов
 	IntsToStr(pClientStats->m_Potions, 12, aBuf);
@@ -709,7 +704,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 		// Exp опыт и бар
 		str_format(aBuf, sizeof(aBuf), "Level: %d Exp: %d/%d", pClientStats->m_Level, pClientStats->m_Exp, pClientStats->m_ExpNeed);
 
-		CUIRect ExpBar = { 8.0f, 43.0f, 100.0f, 7.0f };
+		CUIRect ExpBar = { 8.0f, 41.5, 100.0f, 7.0f };
 		vec4 ProgressColor(
 			(g_Config.m_HdColorProgress >> 16) / 255.0f,
 			((g_Config.m_HdColorProgress >> 8) & 0xff) / 255.0f,

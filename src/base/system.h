@@ -1574,6 +1574,12 @@ int os_is_winxp_or_lower();
 */
 int secure_random_init();
 
+
+/*
+*/
+int secure_rand();
+
+
 /*
 	Function: secure_random_fill
 		Fills the buffer with the specified amount of random bytes.

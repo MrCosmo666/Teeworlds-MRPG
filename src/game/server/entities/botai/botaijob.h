@@ -29,10 +29,11 @@ private:
 
 	int m_BotTick;
 	int m_BotTargetID;
+	int m_BotTargetLife;
+	bool m_BotTargetCollised;
 	int m_EmotionsStyle;
 
 	int m_StartHealth;
-	int m_HookTick;
 	bool m_MessagePlayers[MAX_CLIENTS];
 
 	std::map < int , int > m_ListDmgPlayers;
@@ -53,6 +54,8 @@ private:
 
 	void EmoteActions(int EmotionStyle);
 
+	// test
+	vec2 GetHookPos(vec2 Position);
 };
 
 #endif

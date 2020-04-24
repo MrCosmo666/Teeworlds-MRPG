@@ -1952,8 +1952,6 @@ void str_format(char *buffer, int buffer_size, const char *format, ...)
 	buffer[buffer_size-1] = 0; /* assure null termination */
 }
 
-
-
 /* makes sure that the string only contains the characters between 32 and 127 */
 void str_sanitize_strong(char *str_in)
 {
@@ -2612,7 +2610,7 @@ void shell_execute(const char *file)
 #endif
 }
 
-int os_is_winxp_or_lower(unsigned int major, unsigned int minor)
+int os_is_winxp_or_lower()
 {
 #if defined(CONF_FAMILY_WINDOWS)
 	static const DWORD WINXP_MAJOR = 5;
@@ -2668,6 +2666,13 @@ int secure_random_init()
 		return 1;
 	}
 #endif
+}
+
+int secure_rand()
+{
+	unsigned int i;
+	secure_random_fill(&i, sizeof(i));
+	return (int)(i % RAND_MAX);
 }
 
 void secure_random_fill(void *bytes, unsigned length)

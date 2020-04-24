@@ -10,8 +10,9 @@
 #include <game/version.h>
 #include <game/client/render.h>
 #include <game/client/ui.h>
-
 #include "menus.h"
+
+#include "scoreboard.h"
 
 void CMenus::OnAuthMessage(int MsgType, void* pRawMsg)
 {
@@ -57,18 +58,13 @@ void CMenus::OnAuthMessage(int MsgType, void* pRawMsg)
 
 void CMenus::RenderAuthWindow()
 {
+	if (m_pClient->m_pScoreboard->IsActive())
+		return;
+
 	m_MenuActiveID = EMenuState::AUTHSTATE;
 
 	CUIRect MainView = *UI()->Screen();
 	Graphics()->MapScreen(MainView.x, MainView.y, MainView.w, MainView.h);
-
-	// render logo
-	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOLOGO].m_Id);
-	Graphics()->QuadsBegin();
-	Graphics()->SetColor(0.9f, 0.9f, 0.9f, 0.9f);
-	IGraphics::CQuadItem QuadItem(MainView.w / 2 - 140, MainView.h / 2 - 220, 280, 70);
-	Graphics()->QuadsDrawTL(&QuadItem, 1);
-	Graphics()->QuadsEnd();
 
 	// óñòàíàâëèâàåì ñòîðîíû
 	CUIRect Basic = MainView, BasicLeft, BasicRight, Label;
@@ -83,7 +79,7 @@ void CMenus::RenderAuthWindow()
 		BackgroundLogo.HSplitTop(330.0f, &BackgroundLogo, 0);
 		RenderTools()->DrawUIRect4(&BackgroundLogo,
 			vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f),
-			vec4(0.1f, 0.035f, 0.08f, 0.8f), vec4(0.1f, 0.035f, 0.08f, 0.8f), 0, 5.0f);
+			vec4(0.02f, 0.02f, 0.02f, 0.5f), vec4(0.02f, 0.02f, 0.02f, 0.5f), CUI::CORNER_B, 5.0f);
 	}
 
 	// --------------------- BACKGROUND --------------------------
@@ -93,7 +89,7 @@ void CMenus::RenderAuthWindow()
 	{ // main
 		Basic.HMargin(170.0f, &MainBox);
 		MainBox.VMargin(25.0f, &MainBox);
-		RenderTools()->DrawUIRect(&MainBox, vec4(0.0f, 0.0f, 0.0f, 0.2f), 0, 5.0f);
+		RenderTools()->DrawUIRect(&MainBox, vec4(0.0f, 0.0f, 0.0f, 0.2f), CUI::CORNER_ALL, 5.0f);
 	}
 
 	CUIRect BackLeft = BasicLeft;
@@ -139,7 +135,7 @@ void CMenus::RenderAuthWindow()
 		// ----------------- BACKGROUND RULES ----------------
 		CUIRect BackRules;
 		BackLeft.Margin(5.0f, &BackRules);
-		RenderTools()->DrawUIRect(&BackRules, vec4(0.2f, 0.1f, 0.5f, 0.2f), CUI::CORNER_ALL, 5.0f);
+		RenderTools()->DrawUIRect(&BackRules, HexToRgba(0x2B3A4186), CUI::CORNER_ALL, 5.0f);
 
 		// ------------------ RULES --------------------------
 
@@ -187,13 +183,13 @@ void CMenus::RenderAuthWindow()
 		{ // left
 			CUIRect BackLogin;
 			BasicLogin.Margin(5.0f, &BackLogin);
-			RenderTools()->DrawUIRect(&BackLogin, vec4(0.5f, 0.8f, 0.5f, 0.125f), CUI::CORNER_ALL, 5.0f);
+			RenderTools()->DrawUIRect(&BackLogin, HexToRgba(0x925F3F), CUI::CORNER_ALL, 5.0f);
 		}
 
 		{ // right
 			CUIRect BackRegister; 
 			BasicRegister.Margin(5.0f, &BackRegister);
-			RenderTools()->DrawUIRect(&BackRegister, vec4(0.1f, 0.5f, 0.8f, 0.125f), CUI::CORNER_ALL, 5.0f);
+			RenderTools()->DrawUIRect(&BackRegister, HexToRgba(0x147FF57), CUI::CORNER_ALL, 5.0f);
 		}
 
 		BasicLogin.Margin(6.0f, &BasicLogin);
@@ -209,12 +205,12 @@ void CMenus::RenderAuthWindow()
 
 			// - - - - - - - - - - - - - - - - - - ËÎÃÈÍ - - - - - - - - - - - - - - - //
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
-			BasicLogin.HSplitTop(10.0f, &Label, &BasicLogin);
+			BasicLogin.HSplitTop(15.0f, &Label, &BasicLogin);
 			UI()->DoLabel(&Label, Localize("Login"), 12.0f, CUI::ALIGN_LEFT);
 			{
 				static float s_OffsetUsername = 0.0f;
 				static int s_boxAccountLogin = 0;
-				BasicLogin.HSplitTop(20.0f, &Button, &BasicLogin);
+				BasicLogin.HSplitTop(25.0f, &Button, &BasicLogin);
 				if (DoEditBox(&s_boxAccountLogin, &Button, g_Config.m_AccountMRPG, sizeof(g_Config.m_AccountMRPG),
 					Button.h * ms_FontmodHeight * 0.8f, &s_OffsetUsername))
 					m_ActiveEditbox = true;
@@ -223,12 +219,12 @@ void CMenus::RenderAuthWindow()
 			// - - - - - - - - - - - - - - - - - -ÏÀÐÎËÜ - - - - - - - - - - - - - - - //
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			BasicLogin.HSplitTop(10.0f, 0, &BasicLogin); // spacer
-			BasicLogin.HSplitTop(10.0f, &Label, &BasicLogin);
+			BasicLogin.HSplitTop(15.0f, &Label, &BasicLogin);
 			UI()->DoLabel(&Label, Localize("Password"), 12.0f, CUI::ALIGN_LEFT);
 			{
 				static float s_OffsetPassword = 0.0f;
 				static int s_boxPasswordLogin = 0;
-				BasicLogin.HSplitTop(20.0f, &Button, &BasicLogin);
+				BasicLogin.HSplitTop(25.0f, &Button, &BasicLogin);
 				if (DoEditBox(&s_boxPasswordLogin, &Button, g_Config.m_PasswordMRPG, sizeof(g_Config.m_PasswordMRPG),
 					Button.h * ms_FontmodHeight * 0.8f, &s_OffsetPassword, true))
 					m_ActiveEditbox = true;
@@ -236,8 +232,8 @@ void CMenus::RenderAuthWindow()
 
 			// - - - - - - - - - - - - - - - - - -ÊÍÎÏÊÈ - - - - - - - - - - - - - - - //
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
-			BasicLogin.HSplitTop(10.0f, 0, &BasicLogin); // spacer
-			BasicLogin.HSplitTop(20.0f, &Button, &BasicLogin);
+			BasicLogin.HSplitTop(60.0f, 0, &BasicLogin); // spacer
+			BasicLogin.HSplitTop(25.0f, &Button, &BasicLogin);
 			static CButtonContainer s_LoginButton;
 			if(DoButton_Menu(&s_LoginButton, Localize("Join"), 0, &Button, 0, CUI::CORNER_ALL, 2.5f, 0.0f, vec4(1.0f, 1.0f, 1.0f, 0.75f), true))
 				m_pClient->SendAuthPack(g_Config.m_AccountMRPG, g_Config.m_PasswordMRPG, false);
@@ -258,9 +254,9 @@ void CMenus::RenderAuthWindow()
 
 			// - - - - - - - - - - - - - - - - - - ËÎÃÈÍ - - - - - - - - - - - - - - - //
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
-			BasicRegister.HSplitTop(10.0f, &Label, &BasicRegister);
+			BasicRegister.HSplitTop(15.0f, &Label, &BasicRegister);
 			UI()->DoLabel(&Label, Localize("Login"), 12.0f, CUI::ALIGN_LEFT);
-			BasicRegister.HSplitTop(20.0f, &Button, &BasicRegister);
+			BasicRegister.HSplitTop(25.0f, &Button, &BasicRegister);
 			{
 				static float s_OffsetUsername = 0.0f;
 				static int s_boxAccountLogin = 0;
@@ -272,9 +268,9 @@ void CMenus::RenderAuthWindow()
 			// - - - - - - - - - - - - - - - - - -ÏÀÐÎËÜ - - - - - - - - - - - - - - - //
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			BasicRegister.HSplitTop(10.0f, 0, &BasicRegister); // spacer
-			BasicRegister.HSplitTop(10.0f, &Label, &BasicRegister);
+			BasicRegister.HSplitTop(15.0f, &Label, &BasicRegister);
 			UI()->DoLabel(&Label, Localize("Password"), 12.0f, CUI::ALIGN_LEFT);
-			BasicRegister.HSplitTop(20.0f, &Button, &BasicRegister);
+			BasicRegister.HSplitTop(25.0f, &Button, &BasicRegister);
 			{
 				static float s_OffsetPassword = 0.0f;
 				if (DoEditBox(&s_aPassword, &Button, s_aPassword, sizeof(s_aPassword),
@@ -285,9 +281,9 @@ void CMenus::RenderAuthWindow()
 			// - - - - - - - - - - - - - - ÏÎÂÒÎÐ ÏÀÐÎËß - - - - - - - - - - - - - - - //
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			BasicRegister.HSplitTop(10.0f, 0, &BasicRegister); // spacer
-			BasicRegister.HSplitTop(10.0f, &Label, &BasicRegister);
+			BasicRegister.HSplitTop(15.0f, &Label, &BasicRegister);
 			UI()->DoLabel(&Label, Localize("Repeat password"), 12.0f, CUI::ALIGN_LEFT);
-			BasicRegister.HSplitTop(20.0f, &Button, &BasicRegister);
+			BasicRegister.HSplitTop(25.0f, &Button, &BasicRegister);
 			{
 				static float s_OffsetRepeatPassword = 0.0f;
 				if (DoEditBox(&s_aRepeatPassword, &Button, s_aRepeatPassword, sizeof(s_aRepeatPassword),
@@ -298,7 +294,7 @@ void CMenus::RenderAuthWindow()
 			// - - - - - - - - - - - - - - - - - -ÊÍÎÏÊÈ - - - - - - - - - - - - - - - //
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			BasicRegister.HSplitTop(10.0f, 0, &BasicRegister); // spacer
-			BasicRegister.HSplitTop(20.0f, &Button, &BasicRegister);
+			BasicRegister.HSplitTop(25.0f, &Button, &BasicRegister);
 			static CButtonContainer s_LoginButton;
 			if(DoButton_Menu(&s_LoginButton, Localize("Register"), 0, &Button, 0, CUI::CORNER_ALL, 2.5f, 0.0f, vec4(1.0f, 1.0f, 1.0f, 0.75f), true))
 			{
@@ -319,6 +315,13 @@ void CMenus::RenderAuthWindow()
 			}
 		}
 	}
+
+	// render logo
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOLOGO].m_Id);
+	Graphics()->QuadsBegin();
+	IGraphics::CQuadItem QuadItem(MainView.w / 2 - 240, MainView.h / 2 - 270, 513, 128);
+	Graphics()->QuadsDrawTL(&QuadItem, 1);
+	Graphics()->QuadsEnd();
 
 	// render cursor
 	RenderCursor(IMAGE_CURSOR, vec4(1.0f, 0.7f, 0.6f, 0.6f));

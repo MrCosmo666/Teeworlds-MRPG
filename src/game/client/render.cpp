@@ -816,7 +816,6 @@ void CRenderTools::RenderWings(CAnimState* pAnim, int SpriteID, vec2 Dir, vec2 P
 				Graphics()->QuadsSetRotation(0 - pAnim->GetWings()->m_Angle * pi * 2);
 				IGraphics::CQuadItem Quad2((Pos.x - PosWings.x) + (pAnim->GetWings()->m_X), Pos.y - (PosWings.y + pAnim->GetWings()->m_Y), Size.x, Size.y);
 				Graphics()->QuadsDrawTL(&Quad2, 1);
-
 				Graphics()->QuadsSetRotation(0 + pAnim->GetWings()->m_Angle * pi * 2);
 				IGraphics::CQuadItem Quad((Pos.x + PosWings.x) - (pAnim->GetWings()->m_X), Pos.y - (PosWings.y + pAnim->GetWings()->m_Y), -Size.x, Size.y);
 				Graphics()->QuadsDrawTL(&Quad, 1);

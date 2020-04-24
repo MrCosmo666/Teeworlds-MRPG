@@ -47,14 +47,7 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 			CreateSnapProj(GetSnapFullID(), 1, PICKUP_HEALTH, true, false);
 			CreateSnapProj(GetSnapFullID(), 1, WEAPON_HAMMER, false, true);
 		}
-
-		for(int i = 0 ; i < MAX_PLAYERS; i++)
-		{
-			if(Server()->GetWorldID(i) != ContextBots::MobBot[SubBotID].WorldID)
-				continue;
-
-			GS()->Chat(i, "In your area, spawned, {STR}, HP {INT}", ContextBots::MobBot[SubBotID].Name, &m_StartHealth);
-		}
+		GS()->ChatWorldID(ContextBots::MobBot[SubBotID].WorldID, "[Raid]", "In your area, spawned, {STR}, HP {INT}", ContextBots::MobBot[SubBotID].Name, &m_StartHealth);
 	}
 	else if(GetPlayer()->GetSpawnBot() == SPAWNQUESTNPC)
 	{
@@ -71,14 +64,6 @@ void BotAI::Tick()
 	if(!CheckInvisibleBot() || !IsAlive())
 		return;
 
-	// Крюк таймер
-	if(m_HookTick)
-	{
-		m_HookTick--;
-		m_Input.m_Hook = true;
-		if(!m_HookTick) 
-			m_Input.m_Hook = false;
-	}
 	EngineBots();
 	CCharacter::Tick();
 }
@@ -218,6 +203,8 @@ void BotAI::ClearTarget()
 	{
 		m_EmotionsStyle = 1 + rand() % 5;
 		m_BotTargetID = FromID;
+		m_BotTargetLife = 0;
+		m_BotTargetCollised = 0;
 	}
 }
 
@@ -234,10 +221,6 @@ void BotAI::ChangeWeapons()
 	{
 		int randomweapon = random_int()%5;	
 		m_ActiveWeapon = clamp(randomweapon, 0, 4);
-	}
-	if(!m_HookTick) 
-	{
-		m_HookTick = rand()%40;
 	}
 }
 
@@ -315,7 +298,6 @@ void BotAI::EngineNPC()
 void BotAI::EngineQuestMob()
 {
 	// направление глаз
-	int SubBotID  = GetPlayer()->GetBotSub();
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
 		m_Input.m_TargetY = rand()%4-rand()%8;
 	m_Input.m_TargetX = (m_Input.m_Direction*10+1);
@@ -338,7 +320,7 @@ void BotAI::EngineQuestMob()
 
 		// ------------------------------------------------------------------------------
 		// квесты с нпс
-		// ------------------------------------------------------------------------------f
+		// ------------------------------------------------------------------------------
 		pFind->SetTalking(GetPlayer()->GetCID(), false);
 	}
 }
@@ -350,8 +332,31 @@ void BotAI::EngineMobs()
 	// интерактивы бота без найденого игрока
 	// ------------------------------------------------------------------------------
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
-		m_Input.m_TargetY = rand()%2-rand()%4 + m_Core.m_Vel.y;
-	m_Input.m_TargetX = (m_Input.m_Direction*10+1) + m_Core.m_Vel.x;
+		m_Input.m_TargetY = rand()%30-rand()%60 + m_Core.m_Vel.y;
+	m_Input.m_TargetX = m_Input.m_Direction*rand()%30;
+
+	// крюк
+	if (!m_Input.m_Hook)
+	{
+		if (m_Core.m_Vel.y > 0 && m_Input.m_TargetY > 0 || m_Core.m_Vel.y < 0 && m_Input.m_TargetY < 0 ||
+			m_Core.m_Vel.x > 0 && m_Input.m_TargetX > 0 && m_Input.m_Direction == -1 || 
+			m_Core.m_Vel.x < 0 && m_Input.m_TargetX < 0 && m_Input.m_Direction == 1 || rand()%3 == 0)
+		{
+			vec2 HookDir = GetHookPos(vec2(m_Input.m_TargetX, m_Input.m_TargetY));
+			if ((int)HookDir.x > 0 && (int)HookDir.y > 0)
+			{
+				vec2 AimDir = HookDir - m_Core.m_Pos;
+				m_Input.m_TargetX = AimDir.x;
+				m_Input.m_TargetY = AimDir.y;
+				m_LatestInput.m_TargetX = (int)AimDir.x;
+				m_LatestInput.m_TargetY = (int)AimDir.y;
+				m_Input.m_Hook = true;
+				return;
+			}
+		}
+	}
+	if (m_Input.m_Hook && rand() % 20 == 0)
+		m_Input.m_Hook = false;
 
 	// эмоции ботов
 	int SubBotID = GetPlayer()->GetBotSub();
@@ -364,40 +369,10 @@ void BotAI::EngineMobs()
 		GetPlayer()->GiveEffect("RegenHealth", 5);
 	}
 
-	// крюк
-	if(!m_HookTick && rand()%120 == 0)
-	{
-		vec2 HookDir(0.0f,0.0f);
-		for(int i = 0 ; i < 32; i++)
-		{
-			float a = 2*i*pi / 32;
-			vec2 dir = direction(a);
-			vec2 Pos = m_Core.m_Pos+dir*GS()->Tuning()->m_HookLength;
-			if((GS()->Collision()->FastIntersectLine(m_Core.m_Pos,Pos,&Pos,0)))
-			{
-				vec2 HookVel = dir*GS()->Tuning()->m_HookDragAccel;
-				if(HookVel.y > 0) HookVel.y *= 0.3f;
-				if((HookVel.x < 0 && m_Input.m_Direction < 0) || (HookVel.x > 0 && m_Input.m_Direction > 0))
-					HookVel.x *= 0.95f;
-				else HookVel.x *= 0.75f;
-
-				HookVel += vec2(0,1)*GS()->Tuning()->m_Gravity;
-				HookDir = Pos - m_Core.m_Pos;
-			}
-		}
-		if(length(HookDir) > 32.f && length(HookDir) < 400.0f)
-		{
-			m_Input.m_TargetX = HookDir.x;
-			m_Input.m_TargetY = HookDir.y;
-			m_Input.m_Hook = true;
-			m_HookTick = 20+rand()%80;
-		}
-	}
-
 	CPlayer *pPlayer = SearchTenacityPlayer(1000.0f);
 	if(!pPlayer || !pPlayer->GetCharacter())
 	{
-        if (Server()->Tick()-m_BotTick > Server()->TickSpeed()*rand()%150+150)
+        if (Server()->Tick() - m_BotTick > Server()->TickSpeed()*rand()%300)
         {
             int Action = rand()%3;
             if (Action == 0)
@@ -431,21 +406,16 @@ void BotAI::EngineMobs()
 		bool StaticBot = (ContextBots::MobBot[SubBotID].Spread >= 1);
 		if(rand() % 7 == 1)
 		{
-			if(rand()%30 == 0) m_HookTick = rand()%80;
 			m_Input.m_TargetX = static_cast<int>(pPlayer->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
 			m_Input.m_TargetY = static_cast<int>(pPlayer->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
-			if(Dist > (StaticBot ? 250 : 70))
+			if(m_BotTargetCollised || Dist > (StaticBot ? 250 : 70))
 			{
 				vec2 DirPlayer = normalize(pPlayer->GetCharacter()->m_Core.m_Pos - m_Pos);
 				if (DirPlayer.x < 0) m_Input.m_Direction = -1;
 				else m_Input.m_Direction = 1;
 			}
-			else m_LatestInput.m_Fire = m_Input.m_Fire = 1;
-		
-			if(!m_HookTick && rand()%60 == 0)
-			{
-				m_HookTick = 50+rand()%150;
-			}	
+			else 
+				m_LatestInput.m_Fire = m_Input.m_Fire = 1;
 		}
 
 		// сменять оружие если статик
@@ -478,8 +448,10 @@ CPlayer *BotAI::SearchPlayer(int Distance)
 // Поиск игрока среди людей который имеет ярость выше всех
 CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 {
+	bool ActiveTargetID = m_BotTargetID != GetPlayer()->GetCID();
+
 	// ночью боты враждебнее ищем сразу игрока для агра если его нету или есть бот злой
-	if(m_BotTargetID == GetPlayer()->GetCID() && (GS()->IsDungeon() || Server()->GetEnumTypeDay() == DayType::NIGHTTYPE || random_int() % 300 == 0))
+	if(!ActiveTargetID && (GS()->IsDungeon() || Server()->GetEnumTypeDay() == DayType::NIGHTTYPE || random_int() % 300 == 0))
 	{
 		// ищем игрока
 		CPlayer *pPlayer = SearchPlayer(Distance);
@@ -490,15 +462,26 @@ CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 
 	// сбрасываем агрессию если игрок далеко
 	CPlayer* pPlayer = GS()->GetPlayer(m_BotTargetID, true, true);
-	if (m_BotTargetID != GetPlayer()->GetCID() && (!pPlayer || (pPlayer && 
-			(distance(m_Core.m_Pos, pPlayer->GetCharacter()->m_Core.m_Pos) > 600.0f
-				|| GS()->Collision()->FastIntersectLine(pPlayer->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0) 
-				|| Server()->GetWorldID(m_BotTargetID) != GS()->GetWorldID()))))
+	if (ActiveTargetID && (!pPlayer 
+		|| (pPlayer && (distance(m_Core.m_Pos, pPlayer->GetCharacter()->m_Core.m_Pos) > 600.0f || Server()->GetWorldID(m_BotTargetID) != GS()->GetWorldID()))))
 		ClearTarget();
 
 	// не враждебные мобы
-	if (m_BotTargetID == GetPlayer()->GetCID() || !pPlayer)
+	if (!ActiveTargetID || !pPlayer)
 		return NULL; 
+
+	// сбрасываем время жизни таргета
+	m_BotTargetCollised = GS()->Collision()->FastIntersectLine(pPlayer->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0);
+	if (m_BotTargetLife && m_BotTargetCollised)
+	{
+		m_BotTargetLife--;
+		if (!m_BotTargetLife)
+			ClearTarget();
+	}
+	else
+	{
+		m_BotTargetLife = Server()->TickSpeed() * 2;
+	}
 
 	// ищем более сильного
 	for (int i = 0; i < MAX_PLAYERS; i++)
@@ -510,10 +493,8 @@ CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 
 		// проверяем есть ли вкуснее игрокв для бота
 		if (!GS()->Collision()->FastIntersectLine(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) &&
-				pFinderHard->GetAttributeCount(Stats::StHardness, true) > pPlayer->GetAttributeCount(Stats::StHardness, true))
-		{
+				(m_BotTargetLife <= 10 && m_BotTargetCollised || pFinderHard->GetAttributeCount(Stats::StHardness, true) > pPlayer->GetAttributeCount(Stats::StHardness, true)))
 			SetTarget(i);
-		}
 	}
 
 	return pPlayer;
@@ -549,4 +530,99 @@ void BotAI::EmoteActions(int EmotionStyle)
 			GS()->SendEmoticon(GetPlayer()->GetCID(), EMOTICON_DROP);
 		}
 	}
+}
+
+vec2 BotAI::GetHookPos(vec2 Position)
+{
+	vec2 HookPos = vec2(0, 0);
+	int HookLength = GS()->Tuning()->m_HookLength - 50.0f;
+	// search for when going up
+	// right
+	if (Position.x > 0 && Position.y < -0.2)
+	{
+		// search up right first
+		vec2 SearchDir = normalize(vec2(2, -3));
+
+		vec2 TmpDir;
+		float Angle;
+		for (int i = 0; i < 45; i += 3)
+		{
+			Angle = (-i * (3.14159265f / 180.0f));
+			TmpDir.x = (SearchDir.x * cos(Angle)) - (SearchDir.y * sin(Angle));
+			TmpDir.y = (SearchDir.x * sin(Angle)) + (SearchDir.y * cos(Angle));
+			SearchDir = TmpDir;
+			if (distance(HookPos, GetPos()) > 40 && !GS()->Collision()->CheckPoint(TmpDir.x, TmpDir.y, CCollision::COLFLAG_NOHOOK)
+				&& GS()->Collision()->FastIntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
+				break;
+		}
+
+		return HookPos;
+	}
+
+	// left
+	if (Position.x < 0 && Position.y < -0.2)
+	{
+		// search up left
+		vec2 SearchDir = normalize(vec2(-2, -3));
+
+		vec2 TmpDir;
+		float Angle;
+		for (int i = 0; i < 45; i += 3)
+		{
+			Angle = (i * (3.14159265f / 180.0f));
+			TmpDir.x = (SearchDir.x * cos(Angle)) - (SearchDir.y * sin(Angle));
+			TmpDir.y = (SearchDir.x * sin(Angle)) + (SearchDir.y * cos(Angle));
+			SearchDir = TmpDir;
+			if (distance(HookPos, GetPos()) > 40 && !GS()->Collision()->CheckPoint(TmpDir.x, TmpDir.y, CCollision::COLFLAG_NOHOOK)
+				&& GS()->Collision()->FastIntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
+				break;
+		}
+
+		return HookPos;
+	}
+
+	// go down faster \o/
+	if (Position.x > 0 && Position.y > 0.2)
+	{
+		// search down right
+		vec2 SearchDir = normalize(vec2(1, 2));
+
+		vec2 TmpDir;
+		float Angle;
+		for (int i = 0; i < 15; i += 3)
+		{
+			Angle = (-i * (3.14159265f / 180.0f));
+			TmpDir.x = (SearchDir.x * cos(Angle)) - (SearchDir.y * sin(Angle));
+			TmpDir.y = (SearchDir.x * sin(Angle)) + (SearchDir.y * cos(Angle));
+			SearchDir = TmpDir;
+			if (distance(HookPos, GetPos()) > 40 && !GS()->Collision()->CheckPoint(TmpDir.x, TmpDir.y, CCollision::COLFLAG_NOHOOK)
+				&& GS()->Collision()->FastIntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
+				break;
+		}
+
+		return HookPos;
+	}
+
+	if (Position.x < 0 && Position.y > 0.2)
+	{
+		// search down left
+		vec2 SearchDir = normalize(vec2(-1, 2));
+
+		vec2 TmpDir;
+		float Angle;
+		for (int i = 0; i < 15; i += 3)
+		{
+			Angle = (i * (3.14159265f / 180.0f));
+			TmpDir.x = (SearchDir.x * cos(Angle)) - (SearchDir.y * sin(Angle));
+			TmpDir.y = (SearchDir.x * sin(Angle)) + (SearchDir.y * cos(Angle));
+			SearchDir = TmpDir;
+			if (distance(HookPos, GetPos()) > 40 && !GS()->Collision()->CheckPoint(TmpDir.x, TmpDir.y, CCollision::COLFLAG_NOHOOK)
+				&& GS()->Collision()->FastIntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
+				break;
+		}
+
+		return HookPos;
+	}
+
+	return HookPos;
 }

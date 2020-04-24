@@ -356,12 +356,7 @@ private:
 		ERROR_MESSAGE,
 		SUCCESS_MESSAGE
 	};
-	enum EMenuState
-	{
-		NOACTIVE,
-		ESCSTATE,
-		AUTHSTATE,
-	};
+
 	int m_MenuActiveID;
 	bool m_ShowAuthWindow;
 	bool m_ActiveEditbox;
@@ -452,6 +447,12 @@ private:
 	array<CItemIcon> m_lItemIcons;
 
 public:
+	enum EMenuState
+	{
+		NOACTIVE,
+		ESCSTATE,
+		AUTHSTATE,
+	};
 	bool DoItemIcon(const char *pItem, CUIRect pRect, float Size = 20.0f);
 
 private:

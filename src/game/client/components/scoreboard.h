@@ -28,7 +28,6 @@ public:
 	virtual void OnRelease();
 	
 	bool IsActive() const;
-	void ResetPlayerStats(int ClientID);
 	class CUIRect GetScoreboardRect() const { return m_TotalRect; }
 };
 

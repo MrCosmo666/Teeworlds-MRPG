@@ -52,7 +52,6 @@ inline vec4 HexToRgba(int hex)
 	c.g = ((hex >> 16) & 0xFF) / 255.0f;
 	c.b = ((hex >> 8) & 0xFF) / 255.0f;
 	c.a = (hex & 0xFF) / 255.0f;
-
 	return c;
 }
 

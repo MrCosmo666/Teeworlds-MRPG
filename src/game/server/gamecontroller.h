@@ -6,7 +6,6 @@
 #include <base/tl/array.h>
 #include <base/vmath.h>
 #include <generated/protocol.h>
-
 /*
 	Class: Game Controller
 		Controls the main game logic. Keeping track of team and player score,
@@ -25,6 +24,7 @@ class IGameController
 			m_Got = false;
 			m_FriendlyTeam = -1;
 			m_Pos = vec2(100,100);
+			m_Score = 0;
 		}
 
 		vec2 m_Pos;
@@ -38,9 +38,6 @@ class IGameController
 	float EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos) const;
 	void EvaluateSpawnType(CSpawnEval *pEval, int Type, vec2 BotPos) const;
 
-	// team
-	int ClampTeam(int Team) const;
-
 protected:
 	CGS *GS() const { return m_pGS; }
 	IServer *Server() const { return m_pServer; }
@@ -50,7 +47,6 @@ protected:
 	int m_GameFlags;
 	
 	void UpdateGameInfo(int ClientID);
-
 
 public:
 	typedef void (*COMMAND_CALLBACK)(class CPlayer *pPlayer, const char *pArgs);
@@ -156,6 +152,7 @@ public:
 	// team
 	void DoTeamChange(class CPlayer *pPlayer, bool DoChatMsg=true);
 	int GetRealPlayer();
+
 };
 
 #endif
