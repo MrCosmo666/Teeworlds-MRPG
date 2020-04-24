@@ -178,7 +178,7 @@ void ContextBots::LoadMobsBots()
 		MobBot[MotID].WorldID = WorldID;
 		MobBot[MotID].PositionX = RES->getInt("PositionX");
 		MobBot[MotID].PositionY = RES->getInt("PositionY");
-		MobBot[MotID].Health = RES->getInt("Health");
+		MobBot[MotID].Power = RES->getInt("Power");
 		MobBot[MotID].Spread = RES->getInt("Spread");
 		MobBot[MotID].Boss = RES->getBoolean("Boss");
 		MobBot[MotID].Level = RES->getInt("Level");

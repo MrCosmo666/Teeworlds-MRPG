@@ -291,20 +291,24 @@ void BotAI::EngineNPC()
 
 	// ------------------------------------------------------------------------------
 	// интерактивы бота с найденым игроком
-	// ------------------------------------------------------------------------------	
-	CPlayer *pFind = SearchPlayer((StaticBot ? 300 : 100));
-	if(!pFind || !pFind->GetCharacter())
+	// ------------------------------------------------------------------------------
+	bool PlayerFinding = false;
+	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
-		// рандомно ставим направление движения
-		if(!StaticBot && Server()->Tick() % (Server()->TickSpeed() * (m_Input.m_Direction == 0 ? 5 : 1)) == 0)
-			m_Input.m_Direction = -1+rand()%3;
-		return;
+		CPlayer *pFind = GS()->GetPlayer(i, true, true);
+		if (pFind && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 300 &&
+			!GS()->Collision()->FastIntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0))
+		{
+			pFind->SetTalking(GetPlayer()->GetCID(), false);
+			m_Input.m_TargetX = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
+			m_Input.m_TargetY = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
+			m_Input.m_Direction = 0;
+			PlayerFinding = true;
+		}
 	}
 
-	pFind->SetTalking(GetPlayer()->GetCID(), false);
-	m_Input.m_TargetX = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
-	m_Input.m_TargetY = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
-	m_Input.m_Direction = 0;
+	if (!PlayerFinding && !StaticBot && Server()->Tick() % (Server()->TickSpeed() * (m_Input.m_Direction == 0 ? 5 : 1)) == 0)
+		m_Input.m_Direction = -1 + rand() % 3;
 }
 
 // Интерактивы квестовых мобов
@@ -334,16 +338,7 @@ void BotAI::EngineQuestMob()
 
 		// ------------------------------------------------------------------------------
 		// квесты с нпс
-		// ------------------------------------------------------------------------------
-		if(distance(m_Core.m_Pos, pFind->GetCharacter()->m_Core.m_Pos) > 120)
-		{
-			pFind->ClearFormatQuestText();
-			CGS::InteractiveSub[i].QBI = ContextBots::QuestBot[-1];
-			return;
-		} 
-		else 
-			CGS::InteractiveSub[i].QBI = ContextBots::QuestBot[SubBotID];
-
+		// ------------------------------------------------------------------------------f
 		pFind->SetTalking(GetPlayer()->GetCID(), false);
 	}
 }

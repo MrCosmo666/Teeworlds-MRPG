@@ -99,7 +99,6 @@ public:
 		int TempID3;
 
 		// остальное все
-		ContextBots::QuestBotInfo QBI;
 		ShopMailSql::AuctionItem AuctionItem;
 
 		char RankName[32];

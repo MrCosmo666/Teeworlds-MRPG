@@ -77,7 +77,7 @@ class ContextBots : public CMmoComponent
 	{
 		char Name[32];
 		bool Boss;
-		int Health;
+		int Power;
 		int Spread;
 		int PositionX;
 		int PositionY;

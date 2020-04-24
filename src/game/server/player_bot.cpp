@@ -52,23 +52,30 @@ void CPlayerBot::Tick()
 int CPlayerBot::GetStartHealth()
 {
 	if(m_SpawnPointBot == SPAWNMOBS)
-		return ContextBots::MobBot[m_SubBotID].Health*10;
+		return GetAttributeCount(Stats::StHardness);
 	return 10;	
 }
 
 int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 {
-	// если бот то возращаем в зависимости от обьема установленного здоровья
-	if(CGS::AttributInfo.find(BonusID) == CGS::AttributInfo.end()) return 0;
+	if(CGS::AttributInfo.find(BonusID) == CGS::AttributInfo.end()) 
+		return 0;
 
 	if(m_SpawnPointBot == SPAWNMOBS)
 	{
-		int Power = GS()->IncreaseCountRaid(ContextBots::MobBot[m_SubBotID].Health); 
-		if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
-			Power /= 15;
-		else 
-			Power /= 8;
+		int Power = ContextBots::MobBot[m_SubBotID].Power;
+		for (int i = 0; i < EQUIP_MAX_BOTS; i++)
+		{
+			int ItemID = GetItemEquip(i);
+			if (ItemID <= 0 || BonusID != GS()->GetItemInfo(ItemID).BonusID)
+				continue;
+			Power += GS()->GetItemInfo(ItemID).BonusCount;
+		}
 
+		if (BonusID == Stats::StStrength || BonusID == Stats::StCriticalHit ||CGS::AttributInfo[BonusID].AtType == AtHardtype)
+			Power /= 250;
+		else if(BonusID != Stats::StHardness)
+			Power /= 10;
 		return Power;
 	}
 	return 10;

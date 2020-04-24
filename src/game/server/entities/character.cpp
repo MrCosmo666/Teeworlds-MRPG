@@ -403,14 +403,7 @@ void CCharacter::FireWeapon()
 	if(!m_ReloadTimer)
 	{
 		int ReloadArt = 0;
-		if(m_pPlayer->GetSpawnBot() == SPAWNMOBS)
-		{
-			int SubBotID = GetPlayer()->GetBotSub();
-			ReloadArt = ContextBots::MobBot[SubBotID].Health * 7;
-		}
-		else if(!m_pPlayer->IsBot())
-			ReloadArt = m_pPlayer->GetAttributeCount(Stats::StDexterity);
-
+		ReloadArt = m_pPlayer->GetAttributeCount(Stats::StDexterity);
 		m_ReloadTimer = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Firedelay * Server()->TickSpeed() / (1000 + ReloadArt);
 	}
 }

@@ -764,8 +764,8 @@ int CPlayer::GetItemEquip(int EquipID, int SkipItemID) const
 // Общий уровень атрибутов Реальный и Обычный
 int CPlayer::GetAttributeCount(int BonusID, bool Really)
 {
-	// если бот то возращаем в зависимости от обьема установленного здоровья
-	if (CGS::AttributInfo.find(BonusID) == CGS::AttributInfo.end()) return 0;
+	if (CGS::AttributInfo.find(BonusID) == CGS::AttributInfo.end()) 
+		return 0;
 
 	// обычная передача если нет сохранения и нет процентов
 	int AttributEx = EnchantAttributes(BonusID);
@@ -797,7 +797,7 @@ int CPlayer::GetAttributeCount(int BonusID, bool Really)
 		int NewStat = 0;
 		if (AttributEx > 0)
 		{
-			NewStat = (int)((float)m_SyncFactor / 25.0f) + (AttributEx / 25.0f);
+			NewStat = (int)((float)m_SyncFactor / 25.0f) + ((float)AttributEx / 25.0f);
 			if (m_MoodState == MOOD_PLAYER_TANK && BonusID == Stats::StHardness)
 				NewStat *= 2;
 		}
