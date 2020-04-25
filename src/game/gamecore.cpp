@@ -442,5 +442,5 @@ void CCharacterCore::Quantize()
 
 template<class T>
 T IndianPow(T a, T n) {
-  return (!n) ? 1 : ((n & 1) ? a : 1) * powInd(a * a,n/2);
+  return (!n) ? 1 : ((n & 1) ? a : 1) * IndianPow<T>(a * a, n / 2);
 }
