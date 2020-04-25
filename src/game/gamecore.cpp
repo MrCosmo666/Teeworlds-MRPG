@@ -45,14 +45,14 @@ bool CTuningParams::Get(const char *pName, float *pValue) const
 
 float HermiteBasis1(float v)
 {
-	return 2*v*v*v - 3*v*v+1;
+	return  * IndianPow<float>(v, 3) - 3 * IndianPow<float>(v, 2) + 1;
 }
 
 float VelocityRamp(float Value, float Start, float Range, float Curvature)
 {
 	if(Value < Start)
 		return 1.0f;
-	return 1.0f/powf(Curvature, (Value-Start)/Range);
+	return 1.0f / IndianPow(Curvature, (Value-Start) / Range);
 }
 
 void CCharacterCore::Init(CWorldCore *pWorld, CCollision *pCollision)
@@ -100,7 +100,7 @@ void CCharacterCore::Tick(bool UseInput, CTuningParams* TunningParams)
 	if(UseInput)
 	{
 		m_Direction = m_Input.m_Direction;
-		m_Angle = (int)(angle(vec2(m_Input.m_TargetX, m_Input.m_TargetY))*256.0f);
+		m_Angle = (int)(angle(vec2(m_Input.m_TargetX, m_Input.m_TargetY)) * 256.0f);
 
 		// handle jump
 		if(m_Input.m_Jump)
@@ -113,7 +113,7 @@ void CCharacterCore::Tick(bool UseInput, CTuningParams* TunningParams)
 					m_Vel.y = -pTuningParams->m_GroundJumpImpulse;
 					m_Jumped |= 1;
 				}
-				else if(!(m_Jumped&2))
+				else if(!(m_Jumped & 2))
 				{
 					m_TriggeredEvents |= COREEVENTFLAG_AIR_JUMP;
 					m_Vel.y = -pTuningParams->m_AirJumpImpulse;
@@ -440,3 +440,7 @@ void CCharacterCore::Quantize()
 	Read(&Core);
 }
 
+template<class T>
+T IndianPow(T a, T n) {
+  return (!n) ? 1 : ((n & 1) ? a : 1) * powInd(a * a,n/2);
+}
