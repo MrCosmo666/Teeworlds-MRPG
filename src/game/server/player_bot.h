@@ -26,7 +26,6 @@ public:
 
 	virtual int GetBotID() override                         { return m_BotID; };
 	virtual int GetSpawnBot() override                      { return m_SpawnPointBot; };
-	virtual bool IsBot() override                           { return true; };
 	virtual int GetBotSub() override                        { return m_SubBotID; };
 	virtual	int GetHealth() override                        { return m_BotHealth; };
 	virtual int GetTeam() override                          { return TEAM_BLUE; };

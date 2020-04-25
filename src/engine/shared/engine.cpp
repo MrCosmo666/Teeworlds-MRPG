@@ -31,6 +31,7 @@ public:
 	IConsole *m_pConsole;
 	IStorage *m_pStorage;
 	bool m_Logging;
+	const char* m_pAppname;
 
 	static void Con_DbgLognetwork(IConsole::IResult *pResult, void *pUserData)
 	{
@@ -46,8 +47,8 @@ public:
 			char aBuf[32];
 			str_timestamp(aBuf, sizeof(aBuf));
 			char aFilenameSent[128], aFilenameRecv[128];
-			str_format(aFilenameSent, sizeof(aFilenameSent), "dumps/network_sent_%s.txt", aBuf);
-			str_format(aFilenameRecv, sizeof(aFilenameRecv), "dumps/network_recv_%s.txt", aBuf);
+			str_format(aFilenameSent, sizeof(aFilenameSent), "dumps/%s_network_sent_%s.txt", pEngine->m_pAppname, aBuf);
+			str_format(aFilenameRecv, sizeof(aFilenameRecv), "dumps/%s_network_recv_%s.txt", pEngine->m_pAppname, aBuf);
 			CNetBase::OpenLog(pEngine->m_pStorage->OpenFile(aFilenameSent, IOFLAG_WRITE, IStorage::TYPE_SAVE),
 				pEngine->m_pStorage->OpenFile(aFilenameRecv, IOFLAG_WRITE, IStorage::TYPE_SAVE));
 			pEngine->m_Logging = true;
@@ -77,6 +78,7 @@ public:
 		m_JobPool.Init(Jobs);
 
 		m_Logging = false;
+		m_pAppname = pAppname;
 	}
 
 	void Init()

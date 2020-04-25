@@ -94,9 +94,12 @@ public:
 	CPlayer(CGS *pGS, int ClientID);
 	virtual ~CPlayer();
 
+	bool IsBot() 
+	{ 
+		return (bool)(m_ClientID >= MAX_PLAYERS && m_ClientID < MAX_CLIENTS); 
+	};
 	virtual int GetBotID()                                               { return -1; };
 	virtual int GetSpawnBot()                                            { return -1; };
-	virtual bool IsBot()                                                 { return false; };
 	virtual int GetBotSub()                                              { return -1; };
 	virtual bool CheckQuestSnapPlayer(int SnappingClient, bool SnapData) { return true; };
 	virtual	int GetHealth()                                              { return Acc().PlayerHealth;};

@@ -21,7 +21,6 @@ IGameController::IGameController(CGS *pGS)
 	m_aNumSpawnPoints[0] = 0;
 	m_aNumSpawnPoints[1] = 0;
 	m_aNumSpawnPoints[2] = 0;
-	OnInitCommands();
 }
 
 void IGameController::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKiller, int Weapon)
@@ -101,9 +100,6 @@ void IGameController::OnPlayerConnect(CPlayer *pPlayer)
 
 	// update game info
 	UpdateGameInfo(ClientID);
-
-	CommandsManager()->SendRemoveCommand(Server(), "all", pPlayer->GetCID());
-	CommandsManager()->OnPlayerConnect(Server(), pPlayer);
 }
 
 void IGameController::OnPlayerDisconnect(CPlayer *pPlayer)
@@ -304,171 +300,15 @@ int IGameController::GetRealPlayer()
 	return NumPlayers;
 }
 
-IGameController::CChatCommands::CChatCommands()
+void IGameController::Com_Example(IConsole::IResult* pResult, void* pContext)
 {
-	mem_zero(m_aCommands, sizeof(m_aCommands));
+	CCommandManager::SCommandContext* pComContext = (CCommandManager::SCommandContext*)pContext;
+	IGameController* pSelf = (IGameController*)pComContext->m_pContext;
+
+	pSelf->GS()->SendBroadcast(pResult->GetString(0), -1, 100, 100);
 }
 
-void IGameController::CChatCommands::AddCommand(const char *pName, const char *pArgsFormat, const char *pHelpText, COMMAND_CALLBACK pfnCallback)
+void IGameController::RegisterChatCommands(CCommandManager* pManager)
 {
-	if(GetCommand(pName))
-		return;
-
-	for(int i = 0; i < MAX_COMMANDS; i++)
-	{
-		if(!m_aCommands[i].m_Used)
-		{
-			mem_zero(&m_aCommands[i], sizeof(CChatCommand));
-
-			str_copy(m_aCommands[i].m_aName, pName, sizeof(m_aCommands[i].m_aName));
-			str_copy(m_aCommands[i].m_aHelpText, pHelpText, sizeof(m_aCommands[i].m_aHelpText));
-			str_copy(m_aCommands[i].m_aArgsFormat, pArgsFormat, sizeof(m_aCommands[i].m_aArgsFormat));
-
-			m_aCommands[i].m_pfnCallback = pfnCallback;
-			m_aCommands[i].m_Used = true;
-			break;
-		}
-	}
-}
-
-void IGameController::CChatCommands::SendRemoveCommand(IServer *pServer, const char *pName, int ClientID)
-{
-	CNetMsg_Sv_CommandInfoRemove Msg;
-	Msg.m_pName = pName;
-
-	pServer->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID, pServer->GetWorldID(ClientID));
-}
-
-void IGameController::CChatCommands::RemoveCommand(const char *pName)
-{
-	CChatCommand *pCommand = GetCommand(pName);
-
-	if(pCommand)
-	{
-		mem_zero(pCommand, sizeof(CChatCommand));
-	}
-}
-
-IGameController::CChatCommand *IGameController::CChatCommands::GetCommand(const char *pName)
-{
-	for(int i = 0; i < MAX_COMMANDS; i++)
-	{
-		if(m_aCommands[i].m_Used && str_comp(m_aCommands[i].m_aName, pName) == 0)
-		{
-			return &m_aCommands[i];
-		}
-	}
-	return 0;
-}
-
-void IGameController::CChatCommands::OnPlayerConnect(IServer *pServer, CPlayer *pPlayer)
-{
-	for(int i = 0; i < MAX_COMMANDS; i++)
-	{
-		CChatCommand *pCommand = &m_aCommands[i];
-
-		if(pCommand->m_Used)
-		{
-			CNetMsg_Sv_CommandInfo Msg;
-			Msg.m_pName = pCommand->m_aName;
-			Msg.m_HelpText = pCommand->m_aHelpText;
-			Msg.m_ArgsFormat = pCommand->m_aArgsFormat;
-
-			pServer->SendPackMsg(&Msg, MSGFLAG_VITAL, pPlayer->GetCID());
-		}
-	}
-}
-
-void IGameController::OnPlayerCommand(CPlayer *pPlayer, const char *pCommandName, const char *pCommandArgs)
-{
-	// TODO: Add a argument parser?
-	CChatCommand *pCommand = CommandsManager()->GetCommand(pCommandName);
-
-	if(pCommand)
-		pCommand->m_pfnCallback(pPlayer, pCommandArgs);
-}
-
-void IGameController::OnInitCommands()
-{
-	// авторизация
-	CommandsManager()->AddCommand("login", "ss", "Log in use example: / login name pass", [](CPlayer *pPlayer, const char *Args) 
-	{
-		CGS *GS = pPlayer->GS();
-		int ClientID = pPlayer->GetCID();
-
-		// проверяем авторизацию и проверку клиента
-		if(pPlayer->IsAuthed()) 
-			return GS->Chat(ClientID, "You already authed.");
-		
-		if(pPlayer->m_PlayerTick[TickState::CheckClient] && 
-				pPlayer->m_PlayerTick[TickState::CheckClient]+GS->Server()->TickSpeed()*5 > GS->Server()->Tick())	
-			return GS->Chat(ClientID, "Please wait your client check repeat after 1-4 sec!");
-		
-		// если аргументы не совпадают
-		char Username[256], Password[256];
-		if(sscanf(Args, "/login %s %s", Username, Password) != 2)  
-			return GS->ChatFollow(ClientID, "Use: /login <username> <password>");
-		
-		// если размер пароля логина мал или слишком большой
-		if(str_length(Username) > 15 || str_length(Username) < 4 || str_length(Password) > 15 || str_length(Password) < 4)
-			return GS->Chat(ClientID, "Username / Password must contain 4-15 characters");
-
-		// загружаем аккаунт и данные если он загрузился
-		if(GS->Mmo()->Account()->LoginAccount(ClientID, Username, Password) == AUTH_ALL_GOOD)
-			GS->Mmo()->Account()->LoadAccount(pPlayer, true);
-	});
-
-	// регистрация
-	CommandsManager()->AddCommand("register", "ss", "Register new account", [](CPlayer *pPlayer, const char *Args)
-	{
-		CGS *GS = pPlayer->GS();
-		int ClientID = pPlayer->GetCID();
-
-		// проверяем авторизацию и проверку клиента
-		if(pPlayer->IsAuthed()) 
-			return GS->Chat(ClientID, "Logout account and create!");
-		
-		if(pPlayer->m_PlayerTick[TickState::CheckClient] && 
-				pPlayer->m_PlayerTick[TickState::CheckClient]+GS->Server()->TickSpeed()*5 > GS->Server()->Tick())	
-			return GS->Chat(ClientID, "Please wait your client check repeat after 1-4 sec!");
-
-		// если аргументы не совпадают
-		char Username[256], Password[256];
-		if(sscanf(Args, "/register %s %s", Username, Password) != 2) 
-			return GS->ChatFollow(ClientID, "Use: /register <username> <password>");
-	
-		// регестрируем аккаунт
-		GS->Mmo()->Account()->RegisterAccount(ClientID, Username, Password);
-	});
-
-#ifdef CONF_DISCORD
-	CommandsManager()->AddCommand("discord_connect", "s", "Connect discord to account", [](CPlayer *pPlayer, const char *Args) 
-	{
-		// check authed
-		CGS *GS = pPlayer->GS();
-		int ClientID = pPlayer->GetCID();
-
-		if(!pPlayer->IsAuthed())
-			return;
-		
-		char DiscordDID[256];
-		if(sscanf(Args, "/discord_connect %s", DiscordDID) != 1) 
-			return GS->ChatFollow(ClientID, "Use: /discord_connect <DID>");
-		if(str_length(DiscordDID) > 30 || str_length(DiscordDID) < 10)
-			return GS->ChatFollow(ClientID, "Discord ID must contain 10-30 characters.");
-
-		GS->Mmo()->Account()->DiscordConnect(ClientID, DiscordDID);
-	});
-#endif
-
-	// список команд
-	CommandsManager()->AddCommand("cmdlist", "", "Command list", [](CPlayer *pPlayer, const char *Args) 
-	{
-		CGS *GS = pPlayer->GS();
-		int ClientID = pPlayer->GetCID();
-		GS->ChatFollow(ClientID, "Command List / Help");
-		GS->ChatFollow(ClientID, "/register <name> <pass> - new account.");
-		GS->ChatFollow(ClientID, "/login <name> <pass> - log in account.");
-		GS->ChatFollow(ClientID, "Another information see Wiki Page.");
-	});
+	pManager->AddCommand("test", "Test the command system", "r", Com_Example, this);
 }

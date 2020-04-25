@@ -348,7 +348,8 @@ set(CLIENT_INCLUDES_DIRS
 # server lib
 set(SERVER_LIBRARIES
   ${MYSQL_LIBRARIES} 
-  ${ICU_LIBRARIES})
+  ${ICU_LIBRARIES}
+)
 
 # server includes
 if(NOT(Boost_INCLUDES_DIRS))

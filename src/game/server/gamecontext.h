@@ -11,6 +11,7 @@
 #include <engine/shared/memheap.h>
 #include <teeother/components/localization.h>
 #include <game/server/enum_context.h>
+#include <game/commands.h>
 #include <game/layers.h>
 #include <game/voting.h>
 
@@ -74,6 +75,8 @@ public:
 	CPlayer *m_apPlayers[MAX_CLIENTS];
 	class IGameController *m_pController;
 	CGameWorld m_World;
+	CCommandManager m_CommandManager;
+	CCommandManager* CommandManager() { return &m_CommandManager; }
 
 	/* #########################################################################
 		SWAP GAMECONTEX DATA 
@@ -199,6 +202,11 @@ public:
 	void SendGameMsg(int GameMsgID, int ClientID);
 	void SendGameMsg(int GameMsgID, int ParaI1, int ClientID);
 	void SendGameMsg(int GameMsgID, int ParaI1, int ParaI2, int ParaI3, int ClientID);
+
+	void SendChatCommand(const CCommandManager::CCommand* pCommand, int ClientID);
+	void SendChatCommands(int ClientID);
+	void SendRemoveChatCommand(const CCommandManager::CCommand* pCommand, int ClientID);
+
 	void SendTuningParams(int ClientID);
 	void SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char *Message, int Style = -1, int TalkingEmote = -1);
 	void SendProgressBar(int ClientID, int Count, int Request, const char *Message);
@@ -253,6 +261,9 @@ private:
 	static void ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	static void ConchainSettingUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	static void ConchainGameinfoUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
+
+	static void NewCommandHook(const CCommandManager::CCommand* pCommand, void* pContext);
+	static void RemoveCommandHook(const CCommandManager::CCommand* pCommand, void* pContext);
 
 	/* #########################################################################
 		VOTING MMO GAMECONTEXT 

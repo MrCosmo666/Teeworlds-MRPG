@@ -5,7 +5,10 @@
 
 #include <base/tl/array.h>
 #include <base/vmath.h>
+#include <game/commands.h>
+
 #include <generated/protocol.h>
+
 /*
 	Class: Game Controller
 		Controls the main game logic. Keeping track of team and player score,
@@ -49,41 +52,6 @@ protected:
 	void UpdateGameInfo(int ClientID);
 
 public:
-	typedef void (*COMMAND_CALLBACK)(class CPlayer *pPlayer, const char *pArgs);
-
-	struct CChatCommand 
-	{
-		char m_aName[32];
-		char m_aHelpText[64];
-		char m_aArgsFormat[16];
-		COMMAND_CALLBACK m_pfnCallback;
-		bool m_Used;
-	};
-
-	class CChatCommands
-	{
-		enum
-		{
-			// 8 is the number of vanilla commands, 14 the number of commands left to fill the chat.
-			MAX_COMMANDS = 8 + 14
-		};
-
-		CChatCommand m_aCommands[MAX_COMMANDS];
-	public:
-		CChatCommands();
-
-		// Format: i = int, s = string, p = playername, c = subcommand
-		void AddCommand(const char *pName, const char *pArgsFormat, const char *pHelpText, COMMAND_CALLBACK pfnCallback);
-		void RemoveCommand(const char *pName);
-		void SendRemoveCommand(class IServer *pServer, const char *pName, int ClientID);
-		CChatCommand *GetCommand(const char *pName);
-
-		void OnPlayerConnect(class IServer *pServer, class CPlayer *pPlayer);
-	};
-
-	CChatCommands m_Commands;
-	CChatCommands *CommandsManager() { return &m_Commands; }
-
 	IGameController(class CGS *pGS);
 	virtual ~IGameController() {};
 
@@ -122,8 +90,9 @@ public:
 	*/
 	virtual bool OnEntity(int Index, vec2 Pos);
 
-	void OnInitCommands();
-	void OnPlayerCommand(class CPlayer *pPlayer, const char *pCommandName, const char *pCommandArgs);
+	static void Com_Example(IConsole::IResult* pResult, void* pContext);
+	virtual void RegisterChatCommands(CCommandManager* pManager);
+
 	void OnPlayerConnect(class CPlayer *pPlayer);
 	void OnPlayerDisconnect(class CPlayer *pPlayer);
 	void OnPlayerInfoChange(class CPlayer *pPlayer, int WorldID);
