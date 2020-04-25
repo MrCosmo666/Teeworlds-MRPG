@@ -81,7 +81,7 @@ public:
 	void CreateSnapProj(int SnapID, int Count, int TypeID, bool Dynamic, bool Projectile);
 	void RemoveSnapProj(int Count, int SnapID, bool Effect = false);
 	
-	void CreateRandomDrop(int DropCID, int Random, int ItemID, int Count);
+	void CreateRandomDropItem(int DropCID, int Random, int ItemID, int Count, vec2 Force);
 	void GiveRandomMobEffect(int FromID);
 	void ChangePosition(vec2 NewPos);
 	void ResetDoorPos();
@@ -135,15 +135,16 @@ private:
 	int m_LastAction;
 	int m_LastNoAmmoSound;
 	int m_NumInputs;
-
-	int m_Health;
-	int m_Armor;
 	int m_TriggeredEvents;
 
 	// info for dead reckoning
 	int m_ReckoningTick; // tick that we are performing dead reckoning From
 	CCharacterCore m_SendCore; // core that we should send
 	CCharacterCore m_ReckoningCore; // the dead reckoning core
+
+protected:
+	int m_Health;
+	int m_Armor;
 };
 
 #endif

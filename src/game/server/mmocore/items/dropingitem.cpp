@@ -9,15 +9,11 @@
 
 #include "dropingitem.h"
 
-CDropingItem::CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Dir, ItemSql::ItemPlayer DropItem, int ForID)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPITEM, Pos), m_Direction(vec2(Dir.x, Dir.y+2/rand()%9))
+CDropingItem::CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, ItemSql::ItemPlayer DropItem, int ForID)
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPITEM, Pos)
 {
 	m_Pos = Pos;
-	m_ActualPos = Pos;
-	m_ActualDir = Dir;
-	m_Direction = Dir;
-
-	// other var
+	m_Vel = Vel;
 	m_ForID = ForID;
 	m_DropItem = DropItem;
 	m_DropItem.Settings = 0;
@@ -25,7 +21,6 @@ CDropingItem::CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Dir, ItemSql::
 	m_StartTick = Server()->Tick();
 	m_LifeSpan = Server()->TickSpeed() * 15;
 
-	// create object
 	GameWorld()->InsertEntity(this);
 	for(int i=0; i<NUM_IDS; i++)
 	{
@@ -65,17 +60,9 @@ bool CDropingItem::TakeItem(int ClientID)
 	return true;
 }
 
-vec2 CDropingItem::GetTimePos(float Time)
-{
-	float Curvature = 1.25f;
-	float Speed = 2750.0f;
-
-	return CalcPos(m_Pos, m_Direction, Curvature, Speed, Time);
-}
-
 void CDropingItem::Tick()
 {
-	// check life time
+	m_LifeSpan--;
 	if(m_LifeSpan < 150)
 	{
 		// effect
@@ -97,25 +84,21 @@ void CDropingItem::Tick()
 			return;
 		}
 	}
-	m_LifeSpan--;
 
-	float Pt = (Server()->Tick()-m_StartTick-1)/(float)Server()->TickSpeed();
-	float Ct = (Server()->Tick()-m_StartTick)/(float)Server()->TickSpeed();
-	vec2 PrevPos = GetTimePos(Pt), CurPos = GetTimePos(Ct);
-	m_ActualPos = CurPos;
-	m_ActualDir = normalize(CurPos - PrevPos);
+	m_Vel.y += 0.5f;
 
-	vec2 LastPos;
-	int Collide = GS()->Collision()->IntersectLine(PrevPos, CurPos, NULL, &LastPos);
-	if(Collide)
-	{			
-		m_Pos = LastPos;
-		m_ActualPos = m_Pos;
-		m_Direction.x *= (100 - 50) / 100.0f;
-		m_Direction.y *= (100 - 50) / 65.0f;
-		m_StartTick = Server()->Tick();
-		m_ActualDir = normalize(m_Direction);
-	}
+	bool Grounded = false;
+	if (GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5))
+		Grounded = true;
+	if (GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5))
+		Grounded = true;
+
+	if (Grounded)
+		m_Vel.x *= 0.8f;
+	else
+		m_Vel.x *= 0.99f;
+
+	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(24.0f, 24.0f), 0.4f);
 
 	// Проверяем есть ли игрок которому предназначен предмет нету то делаем публичным
 	{
@@ -160,7 +143,7 @@ void CDropingItem::Snap(int SnappingClient)
 {
 	float Ct = (Server()->Tick()-m_StartTick)/(float)Server()->TickSpeed();
 	
-	if(m_Flashing || NetworkClipped(SnappingClient, GetTimePos(Ct)))
+	if(m_Flashing || NetworkClipped(SnappingClient))
 		return;
 
 	if(GS()->CheckClient(SnappingClient))
@@ -169,8 +152,8 @@ void CDropingItem::Snap(int SnappingClient)
 		if(!pObj)
 			return;
 
-		pObj->m_X = (int)m_ActualPos.x;
-		pObj->m_Y = (int)m_ActualPos.y;
+		pObj->m_X = (int)m_Pos.x;
+		pObj->m_Y = (int)m_Pos.y;
 		pObj->m_Type = MMO_PICKUP_BOX;
 		pObj->m_Angle = 0;
 		return;
@@ -181,7 +164,7 @@ void CDropingItem::Snap(int SnappingClient)
 	float Radius = 30.0f;
 	for(int i=0; i<CDropingItem::BODY; i++)
 	{
-		vec2 PosStart = m_ActualPos + vec2(Radius * cos(AngleStart + AngleStep*i), Radius * sin(AngleStart + AngleStep*i));
+		vec2 PosStart = m_Pos + vec2(Radius * cos(AngleStart + AngleStep*i), Radius * sin(AngleStart + AngleStep*i));
 		CNetObj_Projectile *pObj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, m_IDs[i], sizeof(CNetObj_Projectile)));
 		if(!pObj)
 			return;
@@ -198,7 +181,7 @@ void CDropingItem::Snap(int SnappingClient)
 	if(!pP)
 		return;
 
-	pP->m_X = (int)m_ActualPos.x;
-	pP->m_Y = (int)m_ActualPos.y;
+	pP->m_X = (int)m_Pos.x;
+	pP->m_Y = (int)m_Pos.y;
 	pP->m_Type = 0;
 } 

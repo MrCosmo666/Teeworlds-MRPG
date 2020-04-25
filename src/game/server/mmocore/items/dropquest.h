@@ -5,9 +5,7 @@
 
 class CQuestItem : public CEntity
 {
-	vec2 m_ActualPos;
-	vec2 m_ActualDir;
-	vec2 m_Direction;
+	vec2 m_Vel;
 	int m_StartTick;
 
 	bool m_Collide;
@@ -15,7 +13,6 @@ class CQuestItem : public CEntity
 	int m_LifeSpan;
 	int m_FlashTimer;
 
-	vec2 GetTimePos(float Time);
 public:
 	CQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Dir, ContextBots::QuestBotInfo BotData, int OwnerID);
 	virtual ~CQuestItem();

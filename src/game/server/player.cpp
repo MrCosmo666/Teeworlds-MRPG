@@ -502,6 +502,8 @@ void CPlayer::AddExp(int Exp)
 
 	if(Acc().IsGuild())
 		GS()->Mmo()->Member()->AddExperience(Acc().GuildID);
+
+	GS()->VResetVotes(m_ClientID, MAINMENU);
 }
 
 // Дать деньги игроку

@@ -2335,41 +2335,36 @@ void CGS::CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Life
 }
 
 // Саздает бонус в позиции Типа и Количества и Их самих кол-ва
-void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int BonusCount)
+void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop, vec2 Force)
 {
-	for(int i = 0; i < BonusCount; i++) {
-		vec2 Dir = normalize(vec2(1200-rand()%2400, -1500-rand()%2000));
-		vec2 Projdrop = (Dir * max(0.001f, 2.6f));
-		new CDropingBonuses(&m_World, Pos, Projdrop/15, Type, Count);	
+	for(int i = 0; i < NumDrop; i++) 
+	{
+		vec2 Vel = Force + vec2(frandom() * 15.0, frandom() * 15.0);
+		new CDropingBonuses(&m_World, Pos, Vel, Type, Count);
 	}
 }
 
 // Саздает предметы в позиции Типа и Количества и Их самих кол-ва
-void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant)
+void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant, vec2 Force)
 {
 	ItemSql::ItemPlayer DropItem;
 	DropItem.SetBasic(NULL, ItemID);
 	DropItem.Count = Count;
 	DropItem.Enchant = Enchant;
-	
-	vec2 Dir = normalize(vec2(0+rand()%20-rand()%20, -15-rand()%30));
-	vec2 Projdrop = (Dir * max(0.001f, 0.2f));
-	new CDropingItem(&m_World, Pos, Projdrop, DropItem, ClientID);
+
+	vec2 Vel = Force + vec2(frandom() * 15.0, frandom() * 15.0);
+	new CDropingItem(&m_World, Pos, Vel, DropItem, ClientID);
 }
 
 // Саздает предметы в позиции Типа и Количества и Их самих кол-ва
-void CGS::CreateDropItem(vec2 Pos, int ClientID, ItemSql::ItemPlayer &PlayerItem, int Count)
+void CGS::CreateDropItem(vec2 Pos, int ClientID, ItemSql::ItemPlayer &PlayerItem, int Count, vec2 Force)
 {
 	ItemSql::ItemPlayer CopyItem;
 	CopyItem.Paste(PlayerItem);
 	CopyItem.Count = Count;
 
 	if(PlayerItem.Remove(Count))
-	{
-		vec2 Dir = normalize(vec2(0+rand()%20-rand()%20, -15-rand()%30));
-		vec2 Projdrop = (Dir * max(0.001f, 0.2f));
-		new CDropingItem(&m_World, Pos, Projdrop, CopyItem, ClientID);
-	}
+		new CDropingItem(&m_World, Pos, Force, CopyItem, ClientID);
 }
 
 // Проверить чекнуть и подобрать предмет Если он будет найден

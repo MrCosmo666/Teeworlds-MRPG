@@ -21,12 +21,6 @@ public:
 	int GetBotTarget() const { return m_BotTargetID; };
 
 private: 
-	virtual bool Spawn(class CPlayer *pPlayer, vec2 Pos);
-	virtual void Tick();
-	virtual bool TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon);
-	virtual void Die(int Killer, int Weapon);
-	virtual int GetSnapFullID() const;
-
 	int m_BotTick;
 	int m_BotTargetID;
 	int m_BotTargetLife;
@@ -36,8 +30,17 @@ private:
 	int m_StartHealth;
 	bool m_MessagePlayers[MAX_CLIENTS];
 
-	std::map < int , int > m_ListDmgPlayers;
+	std::map < int, int > m_ListDmgPlayers;
 
+	virtual bool Spawn(class CPlayer *pPlayer, vec2 Pos);
+	virtual void Tick();
+	virtual bool TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon);
+	virtual void Die(int Killer, int Weapon);
+	virtual int GetSnapFullID() const;
+
+	void CreateRandomDropItem(int DropCID, int Random, int ItemID, int Count, vec2 Force);
+	void DieRewardPlayer(CPlayer *pPlayer, vec2 ForceDies);
+	
 	void ClearTarget();
 	void SetTarget(int ClientID);
     void EngineBots();

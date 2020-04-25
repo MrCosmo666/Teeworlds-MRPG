@@ -9,38 +9,33 @@
 
 #include "dropquest.h"
 
-CQuestItem::CQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Dir, const ContextBots::QuestBotInfo BotData, int OwnerID)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPQUEST, Pos), m_Direction(vec2(Dir.x, Dir.y+2/rand()%9))
+CQuestItem::CQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, const ContextBots::QuestBotInfo BotData, int OwnerID)
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPQUEST, Pos)
 {
 	m_Pos = Pos;
-	m_ActualPos = Pos;
-	m_ActualDir = Dir;
-	m_Direction = Dir;
-
-	// other var
+	m_Vel = Vel;
 	m_OwnerID = OwnerID;
 	m_QuestBot = BotData;
 	m_Flashing = false;
 	m_LifeSpan = Server()->TickSpeed() * 15;
 	m_StartTick = Server()->Tick();
 
-	// create object
 	GameWorld()->InsertEntity(this);
 }
 
 CQuestItem::~CQuestItem(){ }
 
-vec2 CQuestItem::GetTimePos(float Time)
-{
-	float Curvature = 1.25f;
-	float Speed = 2750.0f;
-
-	return CalcPos(m_Pos, m_Direction, Curvature, Speed, Time);
-}
-
 void CQuestItem::Tick()
 {
-	// check life time
+	// проверяем есть игрок / если бота нет / если квеста нет
+	if (!GS()->m_apPlayers[m_OwnerID] ||
+		QuestBase::Quests[m_OwnerID].find(m_QuestBot.QuestID) == QuestBase::Quests[m_OwnerID].end())
+	{
+		GS()->m_World.DestroyEntity(this);
+		return;
+	}
+
+	m_LifeSpan--;
 	if (m_LifeSpan < 150)
 	{
 		// effect
@@ -62,36 +57,42 @@ void CQuestItem::Tick()
 			return;
 		}
 	}
-	m_LifeSpan--;
 
-	// проверяем есть игрок / если бота нет / если квеста нет
-	if(!GS()->m_apPlayers[m_OwnerID] ||
-		QuestBase::Quests[m_OwnerID].find(m_QuestBot.QuestID) == QuestBase::Quests[m_OwnerID].end())
-	{
-		GS()->m_World.DestroyEntity(this);
-		return;		
-	}
+	m_Vel.y += 0.5f;
+
+	bool Grounded = false;
+	if (GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5))
+		Grounded = true;
+	if (GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5))
+		Grounded = true;
+
+	if (Grounded)
+		m_Vel.x *= 0.8f;
+	else
+		m_Vel.x *= 0.99f;
+
+	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(24.0f, 24.0f), 0.4f);
 
 	int Count = m_QuestBot.InterCount[0];
 	int QuestID = m_QuestBot.QuestID;
-	CPlayer *pPlayer = GS()->m_apPlayers[m_OwnerID];
-	ItemSql::ItemPlayer &PlItemForQuest = pPlayer->GetItem(m_QuestBot.Interactive[0]);
+	CPlayer* pPlayer = GS()->m_apPlayers[m_OwnerID];
+	ItemSql::ItemPlayer& PlItemForQuest = pPlayer->GetItem(m_QuestBot.Interactive[0]);
 
 	// проверяем если прогресс не равен данному / проверяем завершен ли квест / проверяем если предметов больше чем требуется
-	if(QuestBase::Quests[m_OwnerID][QuestID].Progress != m_QuestBot.Progress || PlItemForQuest.Count >= Count)
+	if (QuestBase::Quests[m_OwnerID][QuestID].Progress != m_QuestBot.Progress || PlItemForQuest.Count >= Count)
 	{
 		GS()->m_World.DestroyEntity(this);
-		return;			
+		return;
 	}
 
 	// подбор предмета
-	if(pPlayer->GetCharacter() && distance(m_ActualPos, pPlayer->GetCharacter()->m_Core.m_Pos) < 32)
+	if (pPlayer->GetCharacter() && distance(m_Pos, pPlayer->GetCharacter()->m_Core.m_Pos) < 32)
 	{
 		// текст подбора предмета
 		GS()->SBL(m_OwnerID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Press 'Fire' for pick Quest Item");
 
 		// если кнопка нажата
-		if(pPlayer->GetCharacter()->m_ReloadTimer)
+		if (pPlayer->GetCharacter()->m_ReloadTimer)
 		{
 			pPlayer->GetCharacter()->m_ReloadTimer = 0;
 			PlItemForQuest.Add(1);
@@ -99,25 +100,6 @@ void CQuestItem::Tick()
 			GS()->m_World.DestroyEntity(this);
 			return;
 		}
-	}
-
-	// эфект рандомного гравитации ляля flagball
-	float Pt = (Server()->Tick()-m_StartTick-1)/(float)Server()->TickSpeed();
-	float Ct = (Server()->Tick()-m_StartTick)/(float)Server()->TickSpeed();
-	vec2 PrevPos = GetTimePos(Pt), CurPos = GetTimePos(Ct);
-	m_ActualPos = CurPos;
-	m_ActualDir = normalize(CurPos - PrevPos);
-
-	vec2 LastPos;
-	m_Collide = GS()->Collision()->IntersectLine(PrevPos, CurPos, NULL, &LastPos);
-	if(m_Collide)
-	{			
-		m_Pos = LastPos;
-		m_ActualPos = m_Pos;
-		m_Direction.x *= (100 - 50) / 100.0f;
-		m_Direction.y *= (100 - 50) / 65.0f;
-		m_StartTick = Server()->Tick();
-		m_ActualDir = normalize(m_Direction);
 	}
 }
 
@@ -130,14 +112,14 @@ void CQuestItem::Snap(int SnappingClient)
 {
 	float Ct = (Server()->Tick()-m_StartTick)/(float)Server()->TickSpeed();
 	
-	if(m_Flashing || !m_Collide || m_OwnerID != SnappingClient || NetworkClipped(SnappingClient, GetTimePos(Ct)))
+	if(m_Flashing || !m_Collide || m_OwnerID != SnappingClient || NetworkClipped(SnappingClient))
 		return;
 
 	CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
 	if(!pP)
 		return;
 
-	pP->m_X = (int)m_ActualPos.x;
-	pP->m_Y = (int)m_ActualPos.y;
+	pP->m_X = (int)m_Pos.x;
+	pP->m_Y = (int)m_Pos.y;
 	pP->m_Type = 0;
 } 

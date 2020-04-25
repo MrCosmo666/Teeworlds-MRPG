@@ -12,9 +12,7 @@ class CDropingItem : public CEntity
 		NUM_IDS,
 	};
 
-	vec2 m_ActualPos;
-	vec2 m_ActualDir;
-	vec2 m_Direction;
+	vec2 m_Vel;
 	int m_StartTick;
 	bool m_Flashing;
 	int m_LifeSpan;
@@ -24,10 +22,9 @@ class CDropingItem : public CEntity
 	int m_ForID;
 	int m_IDs[NUM_IDS];
 
-	vec2 GetTimePos(float Time);
 public:
-	CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Dir, ItemSql::ItemPlayer DropItem, int ForID);
-	virtual ~CDropingItem();
+	CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, ItemSql::ItemPlayer DropItem, int ForID);
+	~CDropingItem();
 
 	virtual void Tick();
 	virtual void TickPaused(); 

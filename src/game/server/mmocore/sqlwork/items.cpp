@@ -337,6 +337,9 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 	// выброс предмета
 	if(PPSTR(CMD, "IDROP") == 0)
 	{
+		if (!pPlayer->GetCharacter())
+			return true;
+
 		int AvailableCount = ActionItemCountAllowed(pPlayer, VoteID);
 		if (AvailableCount <= 0)
 			return true;
@@ -345,8 +348,13 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 			Get = AvailableCount;
 
 		ItemPlayer& PlItem = pPlayer->GetItem(VoteID);
+		vec2 Force(pPlayer->GetCharacter()->m_Core.m_Input.m_TargetX, pPlayer->GetCharacter()->m_Core.m_Input.m_TargetY);
+		if(length(Force) > 8.0f)
+			Force = normalize(Force) * 8.0f;
+
+		GS()->CreateDropItem(pPlayer->GetCharacter()->m_Core.m_Pos, -1, PlItem, Get, Force);
+
 		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "You drop {STR}x{INT}", PlItem.Info().GetName(pPlayer), &Get);
-		GS()->CreateDropItem(pPlayer->GetCharacter()->m_Core.m_Pos, -1, PlItem, Get);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
@@ -397,12 +405,13 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 	// настройка предмета
 	if(PPSTR(CMD, "ISETTINGS") == 0)
 	{
-		pPlayer->GetItem(VoteID).EquipItem();
-		if(GS()->GetItemInfo(VoteID).Type == ItemType::TYPE_EQUIP)
-		{
+		ItemPlayer& EquipItem = pPlayer->GetItem(VoteID);
+		EquipItem.EquipItem();
+		if(EquipItem.Info().Function == EQUIP_DISCORD)
 			GS()->Mmo()->SaveAccount(pPlayer, SAVESTATS);
+		else if(EquipItem.Info().Type == ItemType::TYPE_EQUIP)
 			GS()->ChangeEquipSkin(ClientID, VoteID);
-		}
+
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}

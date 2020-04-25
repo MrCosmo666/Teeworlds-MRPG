@@ -5,9 +5,7 @@
 
 class CDropingBonuses : public CEntity
 {
-	vec2 m_ActualPos;
-	vec2 m_ActualDir;
-	vec2 m_Direction;
+	vec2 m_Vel;
 	int m_StartTick;
 	int m_Type;
 	bool m_Flashing;
@@ -15,16 +13,12 @@ class CDropingBonuses : public CEntity
 	int m_FlashTimer;
 	int m_Count;
 
-	vec2 GetTimePos(float Time);
-
 public:
-	CDropingBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Dir, int Type, int Count);
+	CDropingBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, int Type, int Count);
 
 	virtual void Tick();
 	virtual void TickPaused(); 
 	virtual void Snap(int SnappingClient);
-
-	vec2 GetPos() const { return m_ActualPos; }
 };
 
 #endif

@@ -9,37 +9,24 @@
 
 #include "dropingbonuses.h"
 
-CDropingBonuses::CDropingBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Dir, int Type, int Count)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPBONUS, Pos), m_Direction(vec2(Dir.x, Dir.y+2/rand()%9))
+CDropingBonuses::CDropingBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, int Type, int Count)
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPBONUS, Pos)
 {
 	m_Pos = Pos;
-	m_ActualPos = Pos;
-	m_ActualDir = Dir;
-	m_Direction = Dir;
+	m_Vel = Vel;
 	m_Count = Count;
-
-	// other var
 	m_Type = Type;
 	m_FlashTimer = 0;
 	m_Flashing = false;
 	m_StartTick = Server()->Tick();
 	m_LifeSpan = Server()->TickSpeed() * 10;
-	
-	// create object
+
 	GameWorld()->InsertEntity(this);
-}
-
-vec2 CDropingBonuses::GetTimePos(float Time)
-{
-	float Curvature = 1.25f;
-	float Speed = 2750.0f;
-
-	return CalcPos(m_Pos, m_Direction, Curvature, Speed, Time);
 }
 
 void CDropingBonuses::Tick()
 {
-	// check life time
+	m_LifeSpan--;
 	if (m_LifeSpan < 150)
 	{
 		// effect
@@ -61,46 +48,38 @@ void CDropingBonuses::Tick()
 			return;
 		}
 	}
-	m_LifeSpan--;
-
-	float Pt = (Server()->Tick()-m_StartTick-1)/(float)Server()->TickSpeed();
-	float Ct = (Server()->Tick()-m_StartTick)/(float)Server()->TickSpeed();
-	vec2 PrevPos = GetTimePos(Pt);
-	vec2 CurPos = GetTimePos(Ct);
 	
-	m_ActualPos = CurPos;
-	m_ActualDir = normalize(CurPos - PrevPos);
-	
-	vec2 LastPos;
-	int Collide = GS()->Collision()->IntersectLine(PrevPos, CurPos, NULL, &LastPos);
-	if(Collide)
-	{			
-		m_Pos = LastPos;
-		m_ActualPos = m_Pos;
-		m_Direction.x *= (100 - 50) / 100.0f;
-		m_Direction.y *= (100 - 50) / 65.0f;
-		m_StartTick = Server()->Tick();
-		m_ActualDir = normalize(m_Direction);
-	}
+	m_Vel.y += 0.5f;
 
-	if(m_LifeSpan < Server()->TickSpeed() * ( 10 - 1 ))
+	bool Grounded = false;
+	if (GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5))
+		Grounded = true;
+	if (GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5))
+		Grounded = true;
+
+	if (Grounded)
+		m_Vel.x *= 0.8f;
+	else
+		m_Vel.x *= 0.99f;
+
+	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(24.0f, 24.0f), 0.4f);
+
+
+	CCharacter *pChar = (CCharacter*)GameWorld()->ClosestEntity(m_Pos, 16.0f, CGameWorld::ENTTYPE_CHARACTER, 0);
+	if(pChar && pChar->GetPlayer() && !pChar->GetPlayer()->IsBot())
 	{
-		CCharacter *pChar = (CCharacter*)GameWorld()->ClosestEntity(m_Pos, 16, CGameWorld::ENTTYPE_CHARACTER, 0);
-		if(pChar && pChar->GetPlayer() && !pChar->GetPlayer()->IsBot())
+		if(m_Type == PICKUP_HEALTH)
 		{
-			if(m_Type == PICKUP_HEALTH)
-			{
-				GS()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
-			}
-
-			if(m_Type == PICKUP_ARMOR)
-			{
-				pChar->GetPlayer()->AddExp(m_Count);
-				GS()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
-			} 
-			GS()->m_World.DestroyEntity(this);
-			return;			
+			GS()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
 		}
+
+		if(m_Type == PICKUP_ARMOR)
+		{
+			pChar->GetPlayer()->AddExp(m_Count);
+			GS()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
+		} 
+		GS()->m_World.DestroyEntity(this);
+		return;			
 	}
 }
 
@@ -113,7 +92,7 @@ void CDropingBonuses::Snap(int SnappingClient)
 {
 	float Ct = (Server()->Tick()-m_StartTick)/(float)Server()->TickSpeed();
 	
-	if(m_Flashing || NetworkClipped(SnappingClient, GetTimePos(Ct)))
+	if(m_Flashing || NetworkClipped(SnappingClient))
 		return;
 
 	// проверка клиента если чекнут дальше не рисуем
@@ -123,8 +102,8 @@ void CDropingBonuses::Snap(int SnappingClient)
 		if (!pObj)
 			return;
 
-		pObj->m_X = (int)m_ActualPos.x;
-		pObj->m_Y = (int)m_ActualPos.y;
+		pObj->m_X = (int)m_Pos.x;
+		pObj->m_Y = (int)m_Pos.y;
 		pObj->m_Type = MMO_PICKUP_EXPERIENCE;
 		pObj->m_Angle = 0;
 		return;
@@ -134,7 +113,7 @@ void CDropingBonuses::Snap(int SnappingClient)
 	if(!pP)
 		return;
 
-	pP->m_X = (int)m_ActualPos.x+m_ActualDir.x;
-	pP->m_Y = (int)m_ActualPos.y+m_ActualDir.y;
+	pP->m_X = (int)m_Pos.x;
+	pP->m_Y = (int)m_Pos.y;
 	pP->m_Type = m_Type;
 }

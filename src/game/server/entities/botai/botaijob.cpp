@@ -102,13 +102,10 @@ bool BotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 	if(GetPlayer()->GetSpawnBot() != SPAWNMOBS || GS()->m_apPlayers[From]->IsBot())
 		return false;
 
-	int StableDamage = Health(); // FIX DAMAGE COUNT
-	bool SuccessDamage = CCharacter::TakeDamage(Force, Source, Dmg, From, Weapon);
+	// до урона и после урона здоровье
+	int StableDamage = Health();
+	bool BotDie = CCharacter::TakeDamage(Force, Source, Dmg, From, Weapon);
 	StableDamage -= Health();
-
-	// later take damage
-	if (!pFrom || !pFrom->GetCharacter())
-		return false;
 
 	// установить агрессию на того от кого пришел урон
 	if (From != GetPlayer()->GetCID())
@@ -118,20 +115,20 @@ bool BotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 			SetTarget(From);
 	}
 
-
-	// пропускаем если там урон прошел
-	if (SuccessDamage)
-		return true;
-	
 	// проверка при смерте
-	if(Health() <= 0)
+	if(BotDie)
 	{
-		const int BotID = GetPlayer()->GetBotID();
-		const int SubID = GetPlayer()->GetBotSub();
-		if(!ContextBots::MobBot[SubID].Boss && GetPlayer()->GetSpawnBot() == SPAWNMOBS && pFrom)
-			GS()->Mmo()->Quest()->AddMobProgress(pFrom, BotID);
-	
 		ClearTarget();
+
+		for (const auto& ld : m_ListDmgPlayers)
+		{
+			int ParseClientID = ld.first;
+			CPlayer* pPlayer = GS()->GetPlayer(ParseClientID, true, true);
+			if (!pPlayer || ParseClientID == GetPlayer()->GetCID() || distance(pPlayer->m_ViewPos, m_Core.m_Pos) > 1000.0f)
+				continue;
+
+			DieRewardPlayer(pPlayer, Force);
+		}
 		Die(From, Weapon);
 	}
 
@@ -144,52 +141,8 @@ void BotAI::Die(int Killer, int Weapon)
 	if(GetPlayer()->GetSpawnBot() != SPAWNMOBS)
 		return;
 
-	// Ищим игроков кто ранил человека и даем бонус
-	int BotID = GetPlayer()->GetBotID();
-	int SubID = GetPlayer()->GetBotSub();
-	for(const auto& ld : m_ListDmgPlayers)
-	{
-		int PlayerID = ld.first;
-		CPlayer *pPlayer = GS()->GetPlayer(PlayerID, true, true);
-		if(!pPlayer || PlayerID == GetPlayer()->GetCID() || distance(pPlayer->m_ViewPos, m_Core.m_Pos) > 1000.0f) 
-			continue;
-
-		for(int i = 0; i < 6; i++)
-		{
-			int DropItem = ContextBots::MobBot[SubID].DropItem[i];
-			int CountItem = ContextBots::MobBot[SubID].CountItem[i];
-			if(DropItem <= 0 || CountItem <= 0) 
-				continue;
-
-			int RandomDrop = ContextBots::MobBot[SubID].RandomItem[i];
-			if(DropItem == itMoney)
-			{
-				if(RandomDrop <= 0 || rand()%RandomDrop == 0)
-					pPlayer->AddMoney(CountItem);
-				continue;
-			}
-			CreateRandomDrop(PlayerID, RandomDrop, DropItem, CountItem);
-		}
-
-		if(ContextBots::MobBot[SubID].Boss && GetPlayer()->GetSpawnBot() == SPAWNMOBS)
-			GS()->Mmo()->Quest()->AddMobProgress(pPlayer, BotID);
-
-		// exp
-		int DamageExp = (ContextBots::MobBot[SubID].Level*g_Config.m_SvExperienceMob);
-		int PowerRaid = GS()->IncreaseCountRaid(DamageExp);
-		GS()->CreateDropBonuses(m_Core.m_Pos, 1, DamageExp / 2, rand() % 3);
-		pPlayer->AddExp(PowerRaid);
-		GS()->VResetVotes(PlayerID, MAINMENU);	
-
-		// дать скилл поинт
-		if(random_int()%80 == 0)
-		{
-			pPlayer->GetItem(itSkillPoint).Add(1);
-			GS()->Chat(PlayerID, "Skill points increased. Now ~{INT}SP~", &pPlayer->GetItem(itSkillPoint).Count);
-		}
-	}
-
 	// склад пополнение
+	int BotID = GetPlayer()->GetBotID();
 	int StorageID = GS()->Mmo()->Storage()->GetStorageMonsterSub(BotID);
 	if(StorageID > 0) 
 		GS()->Mmo()->Storage()->AddStorageGoods(StorageID, rand()%5);
@@ -197,6 +150,58 @@ void BotAI::Die(int Killer, int Weapon)
 	// очищаем лист и убиваем игрока
 	m_ListDmgPlayers.clear();
 	CCharacter::Die(Killer, Weapon);
+}
+
+void BotAI::CreateRandomDropItem(int DropCID, int Random, int ItemID, int Count, vec2 Force)
+{
+	if (DropCID < 0 || DropCID >= MAX_PLAYERS || !GS()->m_apPlayers[DropCID] || !GS()->m_apPlayers[DropCID]->GetCharacter() || !IsAlive())
+		return;
+
+	int RandomDrop = (Random == 0 ? 0 : rand() % Random);
+	if (RandomDrop == 0)
+		GS()->CreateDropItem(m_Core.m_Pos, DropCID, ItemID, Count, 0, Force);
+	return;
+}
+
+void BotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
+{
+	int ClientID = pPlayer->GetCID();
+	int BotID = GetPlayer()->GetBotID();
+	int SubID = GetPlayer()->GetBotSub();
+
+	if (GetPlayer()->GetSpawnBot() == SPAWNMOBS)
+		GS()->Mmo()->Quest()->AddMobProgress(pPlayer, BotID);
+
+	// создаем дроп
+	for (int i = 0; i < 6; i++)
+	{
+		int DropItem = ContextBots::MobBot[SubID].DropItem[i];
+		int CountItem = ContextBots::MobBot[SubID].CountItem[i];
+		if (DropItem <= 0 || CountItem <= 0)
+			continue;
+
+		int RandomDrop = ContextBots::MobBot[SubID].RandomItem[i];
+		if (DropItem == itMoney)
+		{
+			if (RandomDrop <= 0 || rand() % RandomDrop == 0)
+				pPlayer->AddMoney(CountItem);
+			continue;
+		}
+		CreateRandomDropItem(ClientID, RandomDrop, DropItem, CountItem, ForceDies);
+	}
+
+	// exp
+	int DamageExp = (ContextBots::MobBot[SubID].Level * g_Config.m_SvExperienceMob);
+	int PowerRaid = GS()->IncreaseCountRaid(DamageExp);
+	GS()->CreateDropBonuses(m_Core.m_Pos, 1, DamageExp / 2, rand() % 3, ForceDies);
+	pPlayer->AddExp(PowerRaid);
+
+	// дать скилл поинт
+	if (random_int() % 80 == 0)
+	{
+		pPlayer->GetItem(itSkillPoint).Add(1);
+		GS()->Chat(ClientID, "Skill points increased. Now ~{INT}SP~", &pPlayer->GetItem(itSkillPoint).Count);
+	}
 }
 
 void BotAI::ClearTarget()

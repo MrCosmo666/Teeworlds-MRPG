@@ -838,6 +838,12 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 	if(From != m_pPlayer->GetCID())
 		GS()->CreatePlayerSound(From, SOUND_HIT);
 
+	// - - - - - - - - - -
+	// перекинуть на BotAI
+	if (m_pPlayer->IsBot())
+		return (bool)(m_Health <= 0);
+	// - - - - - - - - - -
+
 	// автозелье здоровья
 	if(m_Health <= m_pPlayer->GetStartHealth()/3)
 	{
@@ -851,9 +857,7 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 		m_Health = 0;
 		m_pPlayer->SetStandart(m_Health, m_Mana);
 		m_pPlayer->ShowInformationStats();
-
-		if(!m_pPlayer->IsBot()) 
-			Die(From, Weapon);
+		Die(From, Weapon);
 		if (From != m_pPlayer->GetCID() && pFrom->GetCharacter()) 
 			pFrom->GetCharacter()->SetEmote(EMOTE_HAPPY, 1);
 		return false;
@@ -955,17 +959,6 @@ void CCharacter::HandleTilesets()
 }
 
 void CCharacter::HandleEvents() { }
-
-void CCharacter::CreateRandomDrop(int DropCID, int Random, int ItemID, int Count)
-{
-	if(DropCID < 0 || DropCID >= MAX_PLAYERS || !GS()->m_apPlayers[DropCID] || !GS()->m_apPlayers[DropCID]->GetCharacter() || !m_Alive)
-		return;
-
-	int RandomDrop = (Random == 0 ? 0 : rand()%Random);
-	if(RandomDrop == 0) 
-		GS()->CreateDropItem(m_Core.m_Pos, DropCID, ItemID, Count);
-	return;
-}
 
 void CCharacter::GiveRandomMobEffect(int FromID)
 {
