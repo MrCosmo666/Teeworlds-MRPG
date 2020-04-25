@@ -573,6 +573,7 @@ enum ItemList
 	itMagitechShotgun = 10012,
 	itMagitechGrenade = 10013,
 	itMagitechRifle = 10014,
+	itTwinBrothersWings = 10015,
 };
 
 // mmotee
@@ -596,7 +597,8 @@ bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAn
 	EquipInformation[itAngelWings] =		{ vec4(0.2f, 0.2f, 1.75f, 0.01f),	vec2(115, 64),	vec2(200, 100),	IMAGE_WINGSIT21, ANIM_WINGS_LENGTH };
 	EquipInformation[itHeavenlyWings] =		{ vec4(1.0f, 0.85f, 0.0f, 0.01f),	vec2(170, 100),	vec2(280, 150),	IMAGE_WINGSIT22, ANIM_WINGS_LENGTH };
 	EquipInformation[itRainbowWings] =		{ vec4(0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.01f), 
-											vec2(115, 70), vec2(200, 100), IMAGE_WINGSIT23 };
+											vec2(115, 70), vec2(200, 100), IMAGE_WINGSIT23, ANIM_WINGS_LENGTH  };
+	EquipInformation[itTwinBrothersWings] = { vec4(1.0f, 0.85f, 0.0f, 0.01f),	vec2(140, 50),	vec2(280, 100),	IMAGE_WINGSIT24, ANIM_WINGS_STATIC };
 
 	// - - - молоток
 	if (Player.m_Weapon == WEAPON_HAMMER)

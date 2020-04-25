@@ -314,6 +314,7 @@ container.images.Add(Image("wingsit20", "mmotee/wings/it20.png"))
 container.images.Add(Image("wingsit21", "mmotee/wings/it21.png"))
 container.images.Add(Image("wingsit22", "mmotee/wings/it22.png"))
 container.images.Add(Image("wingsit23", "mmotee/wings/it23.png"))
+container.images.Add(Image("wingsit24", "mmotee/wings/it24.png"))
 container.images.Add(Image("mmologo", "mmotee/logo.png"))
 
 container.pickups.Add(Pickup("health"))
@@ -746,6 +747,26 @@ anim.wings.frames.Add(AnimKeyframe(2.3, 0, 0, -0.06))
 anim.wings.frames.Add(AnimKeyframe(2.6, 0, 0, -0.05))
 anim.wings.frames.Add(AnimKeyframe(2.7, 0, 0, -0.04))
 anim.wings.frames.Add(AnimKeyframe(3.0, 0, 0, -0.01))
+container.animations.Add(anim)
+
+anim = Animation("wings_static")
+anim.wings.frames.Add(AnimKeyframe(0.0, 0, 0, 0.0)) # walk
+anim.wings.frames.Add(AnimKeyframe(0.2, -0.5, 0.4, -0.006))
+anim.wings.frames.Add(AnimKeyframe(0.5, 0.0, 0.0, -0.015))
+anim.wings.frames.Add(AnimKeyframe(0.8, 0.4, -0.5, -0.006))
+anim.wings.frames.Add(AnimKeyframe(0.9, 0.0, 0.0, 0.0))
+
+anim.wings.frames.Add(AnimKeyframe(1.0, 0, 0, 0.0)) # yes jump and air
+anim.wings.frames.Add(AnimKeyframe(1.2, -0.3, 0.4, -0.006))
+anim.wings.frames.Add(AnimKeyframe(1.5, 0.0, 0.0, -0.015))
+anim.wings.frames.Add(AnimKeyframe(1.8, 0.4, -0.3, -0.006))
+anim.wings.frames.Add(AnimKeyframe(1.9, 0.0, 0.0, 0.0))
+
+anim.wings.frames.Add(AnimKeyframe(2.0, 0, 0, 0.0)) # no jump air
+anim.wings.frames.Add(AnimKeyframe(2.2, -0.5, 0.4, -0.006))
+anim.wings.frames.Add(AnimKeyframe(2.5, 0.0, 0.0, -0.015))
+anim.wings.frames.Add(AnimKeyframe(2.8, 0.4, -0.5, -0.006))
+anim.wings.frames.Add(AnimKeyframe(3.0, 0.0, 0.0, 0.0))
 container.animations.Add(anim)
 
 weapon = WeaponSpec(container, "hammer")
