@@ -693,7 +693,7 @@ void CScoreboard::RenderRecordingNotification(float x)
 void CScoreboard::OnRender()
 {
 	// don't render scoreboard if menu or statboard is open
-	if (m_pClient->m_pMenus->IsActive() == (int)(CMenus::EMenuState::AUTHSTATE || CMenus::EMenuState::NOACTIVE) || m_pClient->m_pStats->IsActive())
+	if (m_pClient->m_pMenus->IsActive() == (int)CMenus::EMenuState::AUTHSTATE || !m_pClient->m_pMenus->IsActive() || m_pClient->m_pStats->IsActive())
 		return;
 
 	// postpone the active state till the render area gets updated during the rendering

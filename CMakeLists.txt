@@ -713,8 +713,7 @@ set(ENGINE_GENERATED_SHARED src/generated/nethash.cpp src/generated/protocol.cpp
 set_src(GAME_SHARED GLOB src/game
   collision.cpp
   collision.h
-  enum_context.h
-  enum_global.h
+  commands.h
   gamecore.cpp
   gamecore.h
   layers.cpp

@@ -26,123 +26,6 @@ CEffects::CEffects()
 	m_DamageTakenTick = 0;
 }
 
-// mmotee
-void CEffects::MmoEffects(vec2 Pos, int EffectID)
-{ 
-	CParticle p;
-	p.SetDefault();
-	if (EffectID == EFFECT_SPASALON)
-	{
-		p.m_Spr = rand() % 2 == 0 ? (int)(SPRITE_RELAX_EYES) : (int)(SPRITE_RELAX_HEART);
-		p.m_Pos = Pos;
-		p.m_LifeSpan = 2.5f;
-
-		p.m_Gravity = -1000.0f;
-		p.m_Friction = 0.4f;
-		p.m_Frames = 1;
-		p.m_StartSize = 60.0f + rand() % 10;
-		p.m_EndSize = 0;
-		p.m_Rot = 0 + rand() % 2 - rand() % 4;
-		p.m_Color = vec4(100.0f, 100.0f, 100.0f, 0.01f);
-
-		m_pClient->m_pParticles->Add(CParticles::GROUP_MMOEFFECTS, &p);
-		return;
-	}
-	// эффект телепорта
-	p.m_Spr = SPRITE_TELEPORT1;
-	p.m_Frames = 8;
-	p.m_Pos = Pos;
-	p.m_LifeSpan = 0.4f;
-	p.m_Gravity = -1000.0f;
-	p.m_Friction = 0.4f;
-	p.m_StartSize = 220;
-	p.m_EndSize = 220;
-	p.m_Rot = 0;
-	p.m_Color = vec4(100.0f, 100.0f, 100.0f, 0.10f);
-	m_pClient->m_pParticles->Add(CParticles::GROUP_TELEPORT, &p);
-}
-
-void CEffects::MmoEffectPotion(vec2 Pos, const char* Potion, bool Added)
-{
-	CParticle p;
-	p.SetDefault();
-	p.m_Pos = Vec2Range(&Pos, 60);
-	p.m_LifeSpan = 1.2f;
-
-	p.m_Gravity = -1000.0f;
-	p.m_StartSize = 20.0f;
-	p.m_EndSize = 20.0f;
-
-	vec4 Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	if (!str_comp_nocase(Potion, "RegenHealth")) Color = vec4(1.0f, 0.80f, 1.0f, 1.0f);
-	if (!str_comp_nocase(Potion, "Fire")) Color = vec4(1.0f, 0.65f, 0.0f, 1.0f);
-	if (!str_comp_nocase(Potion, "Poison")) Color = vec4(0.40f, 0.80f, 0.0f, 1.0f);
-	if (!str_comp_nocase(Potion, "Ice")) Color = vec4(0.0f, 0.50f, 1.0f, 1.0f);
-
-	p.m_Color = Color;
-	str_format(p.m_TextBuf, sizeof(p.m_TextBuf), "%s %s", Added ? "+" : "-", Potion);
-	m_pClient->m_pParticles->Add(CParticles::GROUP_DAMAGEMMO, &p);
-}
-
-void CEffects::DamageMmoInd(vec2 Pos, const char* pText, int Type)
-{
-	const int Damage = string_to_number(pText, 1, 10000000);
-	const int IncreaseSizeDamage = min(Damage, 30);
-
-	CParticle p;
-	p.SetDefault();
-	p.m_Pos = Pos;
-	p.m_Vel = vec2(-5 + rand() % 10, -5 + rand() % 10) * 50 * (1 + IncreaseSizeDamage * 0.025f);
-	p.m_LifeSpan = 1.0f + IncreaseSizeDamage * 0.025f;
-	p.m_StartSize = 18.0f + IncreaseSizeDamage * 0.5f;
-	p.m_EndSize = 18.0f + IncreaseSizeDamage * 0.3f;
-	p.m_Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	p.m_Rot = 0;
-	p.m_Rotspeed = 0;
-	p.m_Gravity = 0;
-	p.m_Friction = 0.9f;
-	p.m_FlowAffected = 0.0f;
-	str_copy(p.m_TextBuf, pText, sizeof(p.m_TextBuf));
-	m_pClient->m_pParticles->Add(CParticles::GROUP_DAMAGEMMO, &p);
-}
-
-void CEffects::WingsEffect(vec2 Pos, vec2 Vel, vec4 Color)
-{
-	if (!m_Add50hz || g_Config.m_ClShowMEffects == 3)
-		return;
-
-	CParticle p;
-	p.SetDefault();
-	p.m_Spr = SPRITE_MMO_GAME_EXPERIENCE;
-	p.m_Pos = vec2(Pos.x + 20 - rand() % 40, Pos.y + 20 - rand() % 40);
-	p.m_Vel = Vel + RandomDir() * 200.0f;
-	p.m_LifeSpan = 0.5f + frandom() * 0.5f;
-	p.m_StartSize = 0.1f + frandom() * 10;
-	p.m_EndSize = 0;
-	p.m_Friction = 0.8f;
-	p.m_Gravity = frandom() * -500.0f;
-	p.m_Color = Color;
-	m_pClient->m_pParticles->Add(CParticles::GROUP_MMOPROJ, &p);
-}
-
-void CEffects::BubbleEffect(vec2 Pos, vec2 Vel)
-{
-	if (!m_Add50hz)
-		return;
-
-	CParticle p;
-	p.SetDefault();
-	p.m_Spr = SPRITE_MMO_GAME_BUBBLE_FIRE;
-	p.m_Pos = Pos;
-	p.m_Vel = Vel + RandomDir() * 200.0f;
-	p.m_LifeSpan = 0.5f + frandom() * 0.5f;
-	p.m_StartSize = 16.0f + frandom() * 18;
-	p.m_EndSize = 0;
-	p.m_Friction = 0.6f;
-	p.m_Gravity = frandom() * -500.0f;
-	m_pClient->m_pParticles->Add(CParticles::GROUP_MMOPROJ, &p);
-}
-
 void CEffects::AirJump(vec2 Pos)
 {
 	CParticle p;
@@ -398,53 +281,156 @@ void CEffects::HammerHit(vec2 Pos)
 	m_pClient->m_pSounds->PlayAt(CSounds::CHN_WORLD, SOUND_HAMMER_HIT, 1.0f, Pos);
 }
 
-void CEffects::OnRender()
+
+// mmotee
+void CEffects::MmoEffects(vec2 Pos, int EffectID)
 {
-	static int64 LastUpdate100hz = 0;
-	static int64 LastUpdate50hz = 0;
-
-	if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
+	CParticle p;
+	p.SetDefault();
+	if (EffectID == EFFECT_SPASALON)
 	{
-		const IDemoPlayer::CInfo *pInfo = DemoPlayer()->BaseInfo();
+		p.m_Spr = rand() % 2 == 0 ? (int)(SPRITE_RELAX_EYES) : (int)(SPRITE_RELAX_HEART);
+		p.m_Pos = Pos;
+		p.m_LifeSpan = 2.5f;
 
-		if(time_get()-LastUpdate100hz > time_freq()/(100*pInfo->m_Speed))
-		{
-			m_Add100hz = true;
-			LastUpdate100hz = time_get();
-		}
-		else
-			m_Add100hz = false;
+		p.m_Gravity = -1000.0f;
+		p.m_Friction = 0.4f;
+		p.m_Frames = 1;
+		p.m_StartSize = 60.0f + rand() % 10;
+		p.m_EndSize = 0;
+		p.m_Rot = 0 + rand() % 2 - rand() % 4;
+		p.m_Color = vec4(100.0f, 100.0f, 100.0f, 0.01f);
 
-		if(time_get()-LastUpdate50hz > time_freq()/(100*pInfo->m_Speed))
-		{
-			m_Add50hz = true;
-			LastUpdate50hz = time_get();
-		}
-		else
-			m_Add50hz = false;
-
-		if(m_Add50hz)
-			m_pClient->m_pFlow->Update();
-
+		m_pClient->m_pParticles->Add(CParticles::GROUP_MMOEFFECTS, &p);
 		return;
 	}
+	// эффект телепорта
+	p.m_Spr = SPRITE_TELEPORT1;
+	p.m_Frames = 8;
+	p.m_Pos = Pos;
+	p.m_LifeSpan = 0.4f;
+	p.m_Gravity = -1000.0f;
+	p.m_Friction = 0.4f;
+	p.m_StartSize = 220;
+	p.m_EndSize = 220;
+	p.m_Rot = 0;
+	p.m_Color = vec4(100.0f, 100.0f, 100.0f, 0.10f);
+	m_pClient->m_pParticles->Add(CParticles::GROUP_TELEPORT, &p);
+}
 
-	if(time_get()-LastUpdate100hz > time_freq()/100)
+void CEffects::MmoEffectPotion(vec2 Pos, const char* Potion, bool Added)
+{
+	CParticle p;
+	p.SetDefault();
+	p.m_Pos = Vec2Range(&Pos, 60);
+	p.m_LifeSpan = 1.2f;
+
+	p.m_Gravity = -1000.0f;
+	p.m_StartSize = 20.0f;
+	p.m_EndSize = 20.0f;
+
+	vec4 Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	if (!str_comp_nocase(Potion, "RegenHealth")) Color = vec4(1.0f, 0.80f, 1.0f, 1.0f);
+	if (!str_comp_nocase(Potion, "Fire")) Color = vec4(1.0f, 0.65f, 0.0f, 1.0f);
+	if (!str_comp_nocase(Potion, "Poison")) Color = vec4(0.40f, 0.80f, 0.0f, 1.0f);
+	if (!str_comp_nocase(Potion, "Ice")) Color = vec4(0.0f, 0.50f, 1.0f, 1.0f);
+
+	p.m_Color = Color;
+	str_format(p.m_TextBuf, sizeof(p.m_TextBuf), "%s %s", Added ? "+" : "-", Potion);
+	m_pClient->m_pParticles->Add(CParticles::GROUP_DAMAGEMMO, &p);
+}
+
+void CEffects::DamageMmoInd(vec2 Pos, const char* pText, int Type)
+{
+	const int Damage = string_to_number(pText, 1, 10000000);
+	const int IncreaseSizeDamage = min(Damage, 30);
+
+	CParticle p;
+	p.SetDefault();
+	p.m_Pos = Pos;
+	p.m_Vel = vec2(-5 + rand() % 10, -5 + rand() % 10) * 50 * (1 + IncreaseSizeDamage * 0.025f);
+	p.m_LifeSpan = 1.0f + IncreaseSizeDamage * 0.025f;
+	p.m_StartSize = 18.0f + IncreaseSizeDamage * 0.5f;
+	p.m_EndSize = 18.0f + IncreaseSizeDamage * 0.3f;
+	p.m_Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+	p.m_Rot = 0;
+	p.m_Rotspeed = 0;
+	p.m_Gravity = 0;
+	p.m_Friction = 0.9f;
+	p.m_FlowAffected = 0.0f;
+	str_copy(p.m_TextBuf, pText, sizeof(p.m_TextBuf));
+	m_pClient->m_pParticles->Add(CParticles::GROUP_DAMAGEMMO, &p);
+}
+
+void CEffects::WingsEffect(vec2 Pos, vec2 Vel, vec4 Color)
+{
+	if (!m_Add50hz || g_Config.m_ClShowMEffects == 3)
+		return;
+
+	CParticle p;
+	p.SetDefault();
+	p.m_Spr = SPRITE_MMO_GAME_EXPERIENCE;
+	p.m_Pos = vec2(Pos.x + 20 - rand() % 40, Pos.y + 20 - rand() % 40);
+	p.m_Vel = Vel + RandomDir() * 200.0f;
+	p.m_LifeSpan = 0.5f + frandom() * 0.5f;
+	p.m_StartSize = 0.1f + frandom() * 10;
+	p.m_EndSize = 0;
+	p.m_Friction = 0.8f;
+	p.m_Gravity = frandom() * -500.0f;
+	p.m_Color = Color;
+	m_pClient->m_pParticles->Add(CParticles::GROUP_MMOPROJ, &p);
+}
+
+void CEffects::BubbleEffect(vec2 Pos, vec2 Vel)
+{
+	if (!m_Add50hz)
+		return;
+
+	CParticle p;
+	p.SetDefault();
+	p.m_Spr = SPRITE_MMO_GAME_BUBBLE_FIRE;
+	p.m_Pos = Pos;
+	p.m_Vel = Vel + RandomDir() * 200.0f;
+	p.m_LifeSpan = 0.5f + frandom() * 0.5f;
+	p.m_StartSize = 16.0f + frandom() * 18;
+	p.m_EndSize = 0;
+	p.m_Friction = 0.6f;
+	p.m_Gravity = frandom() * -500.0f;
+	m_pClient->m_pParticles->Add(CParticles::GROUP_MMOPROJ, &p);
+}
+
+void CEffects::OnRender()
+{
+	static int64 s_LastUpdate100hz = 0;
+	static int64 s_LastUpdate50hz = 0;
+
+	const float Speed = GetEffectsSpeed();
+	const int64 Now = time_get();
+	const int64 Freq = time_freq();
+
+	if (Now - s_LastUpdate100hz > Freq / (100 * Speed))
 	{
 		m_Add100hz = true;
-		LastUpdate100hz = time_get();
+		s_LastUpdate100hz = Now;
 	}
 	else
 		m_Add100hz = false;
 
-	if(time_get()-LastUpdate50hz > time_freq()/100)
+	if (Now - s_LastUpdate50hz > Freq / (50 * Speed))
 	{
 		m_Add50hz = true;
-		LastUpdate50hz = time_get();
+		s_LastUpdate50hz = Now;
 	}
 	else
 		m_Add50hz = false;
 
-	if(m_Add50hz)
+	if (m_Add50hz)
 		m_pClient->m_pFlow->Update();
+}
+
+float CEffects::GetEffectsSpeed()
+{
+	if (Client()->State() == IClient::STATE_DEMOPLAYBACK)
+		return DemoPlayer()->BaseInfo()->m_Speed;
+	return 1.0f;
 }

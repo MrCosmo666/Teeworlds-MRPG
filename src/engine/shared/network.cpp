@@ -24,6 +24,13 @@ void CNetRecvUnpacker::Start(const NETADDR* pAddr, CNetConnection* pConnection, 
 // TODO: rename this function
 int CNetRecvUnpacker::FetchChunk(CNetChunk* pChunk)
 {
+	// Don't bother with connections that already went offline
+	if (m_pConnection && m_pConnection->State() != NET_CONNSTATE_ONLINE)
+	{
+		Clear();
+		return 0;
+	}
+
 	CNetChunkHeader Header;
 	unsigned char* pEnd = m_Data.m_aChunkData + m_Data.m_DataSize;
 
