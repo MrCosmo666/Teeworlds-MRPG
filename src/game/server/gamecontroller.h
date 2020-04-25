@@ -101,14 +101,7 @@ public:
 	// виртуал аномаль
 	virtual void RespawnedClickEvent() = 0;
 	virtual void CreateLogic(int Type, int Mode, vec2 Pos, int Health) = 0;
-
-	// game
-	enum
-	{
-		TIMER_INFINITE = -1,
-		TIMER_END = 10,
-	};
-
+	
 	// general
 	virtual void Snap(int SnappingClient);
 	virtual void Tick();
