@@ -220,7 +220,6 @@ void CPlayers::RenderPlayer(const CNetObj_Character *pPrevChar, const CNetObj_Ch
 
 	// Wings animation
 	{
-
 		RenderWings(Player, &State, Position, Direction, ClientID);
 	}
 
@@ -580,22 +579,22 @@ enum ItemList
 bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int ClientID)
 {
 	/* Õ¿¡Œ– HEAVEN */
-	EquipInformation[itHeavenlyHammer] =	{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(100, 100),	SPRITE_MMO_HAMMER_HEAVEN };
-	EquipInformation[itHeavenlyGun] =		{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_GUN_HEAVEN };
-	EquipInformation[itHeavenlyShotgun] =	{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_SHOTGUN_HEAVEN };
-	EquipInformation[itHeavenlyGrenade] =	{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_GRENADE_HEAVEN };
-	EquipInformation[itHeavenlyRifle] =		{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_RIFLE_HEAVEN };	
+	EquipInformation[itHeavenlyHammer] =	{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(100, 100),	SPRITE_MMO_HAMMER_HEAVEN,	0 };
+	EquipInformation[itHeavenlyGun] =		{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_GUN_HEAVEN,		0 };
+	EquipInformation[itHeavenlyShotgun] =	{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_SHOTGUN_HEAVEN,	0 };
+	EquipInformation[itHeavenlyGrenade] =	{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_GRENADE_HEAVEN,	0 };
+	EquipInformation[itHeavenlyRifle] =		{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_RIFLE_HEAVEN,	0 };	
 	/* Õ¿¡Œ– MAGITECH */
-	EquipInformation[itMagitechHammer] =	{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(100, 100),	SPRITE_MMO_HAMMER_MAGITECH };
-	EquipInformation[itMagitechGun] =		{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(0, 0),		SPRITE_MMO_GUN_MAGITECH };
-	EquipInformation[itMagitechShotgun] =	{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(0, 0),		SPRITE_MMO_SHOTGUN_MAGITECH };
-	EquipInformation[itMagitechGrenade] =	{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(0, 0),		SPRITE_MMO_GRENADE_MAGITECH };
-	EquipInformation[itMagitechRifle] =		{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(0, 0),		SPRITE_MMO_RIFLE_MAGITECH };
+	EquipInformation[itMagitechHammer] =	{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(100, 100),	SPRITE_MMO_HAMMER_MAGITECH,	0 };
+	EquipInformation[itMagitechGun] =		{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(0, 0),		SPRITE_MMO_GUN_MAGITECH,	0 };
+	EquipInformation[itMagitechShotgun] =	{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(0, 0),		SPRITE_MMO_SHOTGUN_MAGITECH, 0 };
+	EquipInformation[itMagitechGrenade] =	{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(0, 0),		SPRITE_MMO_GRENADE_MAGITECH, 0 };
+	EquipInformation[itMagitechRifle] =		{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(0, 0),		SPRITE_MMO_RIFLE_MAGITECH,	0 };
 	/*  –€À‹ﬂ */
-	EquipInformation[itShadowWings] =		{ vec4(1.75f, 0.0f, 0.0f, 0.01f),	vec2(115, 55),	vec2(200, 90),	IMAGE_WINGSIT19 };
-	EquipInformation[itNeptuneWings] =		{ vec4(0.2f, 0.2f, 1.75f, 0.01f),	vec2(120, 50),	vec2(200, 100),	IMAGE_WINGSIT20 };
-	EquipInformation[itAngelWings] =		{ vec4(0.2f, 0.2f, 1.75f, 0.01f),	vec2(115, 64),	vec2(200, 100),	IMAGE_WINGSIT21 };
-	EquipInformation[itHeavenlyWings] =		{ vec4(1.0f, 0.85f, 0.0f, 0.01f),	vec2(170, 100),	vec2(280, 150),	IMAGE_WINGSIT22 };
+	EquipInformation[itShadowWings] =		{ vec4(1.75f, 0.0f, 0.0f, 0.01f),	vec2(115, 55),	vec2(200, 90),	IMAGE_WINGSIT19, ANIM_WINGS_LENGTH };
+	EquipInformation[itNeptuneWings] =		{ vec4(0.2f, 0.2f, 1.75f, 0.01f),	vec2(120, 50),	vec2(200, 100),	IMAGE_WINGSIT20, ANIM_WINGS_LENGTH };
+	EquipInformation[itAngelWings] =		{ vec4(0.2f, 0.2f, 1.75f, 0.01f),	vec2(115, 64),	vec2(200, 100),	IMAGE_WINGSIT21, ANIM_WINGS_LENGTH };
+	EquipInformation[itHeavenlyWings] =		{ vec4(1.0f, 0.85f, 0.0f, 0.01f),	vec2(170, 100),	vec2(280, 150),	IMAGE_WINGSIT22, ANIM_WINGS_LENGTH };
 	EquipInformation[itRainbowWings] =		{ vec4(0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.01f), 
 											vec2(115, 70), vec2(200, 100), IMAGE_WINGSIT23 };
 
@@ -865,7 +864,8 @@ void CPlayers::RenderWings(const CNetObj_Character Player, CAnimState* pAnimWing
 		if (m_pClient->m_aClients[ClientID].m_AnimWings >= 1.0f)
 			m_pClient->m_aClients[ClientID].m_AnimWings = 0.0f;
 	}
-	pAnimWings->Add(&g_pData->m_aAnimations[ANIM_WINGS], m_pClient->m_aClients[ClientID].m_AnimWings, 1.0f);
+	int AnimationID = EquipInformation[EquipItem].AnimationID;
+	pAnimWings->Add(&g_pData->m_aAnimations[AnimationID], m_pClient->m_aClients[ClientID].m_AnimWings, 1.0f);
 	m_pClient->m_aClients[ClientID].m_AnimWings += 0.59f / Client()->ClientFPS();
 
 	// - - - - - - - - - - - - - –»—”≈Ã  –€À‹ﬂ - - - - - - - - - - - - - - - - -

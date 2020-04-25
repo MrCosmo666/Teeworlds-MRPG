@@ -192,7 +192,7 @@ void BotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 	// exp
 	int DamageExp = (ContextBots::MobBot[SubID].Level * g_Config.m_SvExperienceMob);
 	int PowerRaid = GS()->IncreaseCountRaid(DamageExp);
-	GS()->CreateDropBonuses(m_Core.m_Pos, 1, DamageExp / 2, (1+random_int() % 3), ForceDies);
+	GS()->CreateDropBonuses(m_Core.m_Pos, 1, DamageExp / 2, (1+random_int() % 2), ForceDies);
 	pPlayer->AddExp(PowerRaid);
 
 	// дать скилл поинт

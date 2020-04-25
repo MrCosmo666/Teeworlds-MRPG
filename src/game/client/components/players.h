@@ -13,6 +13,7 @@ class CPlayers : public CComponent
 		vec2 Position;
 		vec2 Size;
 		int SpriteID;
+		int AnimationID;
 	};
 	std::map < int, EquipSlot > EquipInformation;
 

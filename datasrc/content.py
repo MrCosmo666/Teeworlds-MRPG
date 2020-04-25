@@ -727,7 +727,7 @@ anim.attach.frames.Add(AnimKeyframe(1.00, 0, 0, -0.25))
 container.animations.Add(anim)
 
 # mmotee
-anim = Animation("wings")
+anim = Animation("wings_length")
 anim.wings.frames.Add(AnimKeyframe(0.0, 0, 0, 0.0)) # walk
 anim.wings.frames.Add(AnimKeyframe(0.2, 0, 0, -0.02))
 anim.wings.frames.Add(AnimKeyframe(0.3, 0, 0, -0.03))
