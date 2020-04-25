@@ -498,8 +498,9 @@ CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 			continue;
 
 		// проверяем есть ли вкуснее игрокв для бота
-		if ((!GS()->Collision()->FastIntersectLine(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) &&
-				(m_BotTargetLife <= 10 && m_BotTargetCollised) || (pFinderHard->GetAttributeCount(Stats::StHardness, true) > pPlayer->GetAttributeCount(Stats::StHardness, true))))
+		bool FinderCollised = (bool)GS()->Collision()->FastIntersectLine(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0);
+		if (!FinderCollised && (m_BotTargetLife <= 10 && m_BotTargetCollised 
+			|| pFinderHard->GetAttributeCount(Stats::StHardness, true) > pPlayer->GetAttributeCount(Stats::StHardness, true)))
 			SetTarget(i);
 	}
 
