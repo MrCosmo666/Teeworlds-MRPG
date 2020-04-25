@@ -226,7 +226,7 @@ void CParticles::RenderMmoEffect(int Group)
 	if (Group == GROUP_MMOEFFECTS)
 	{
 		Graphics()->BlendNormal();
-		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOEFFECT].m_Id);
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_RELAX].m_Id);
 		Graphics()->QuadsBegin();
 
 		int i = m_aFirstPart[Group];
@@ -253,7 +253,7 @@ void CParticles::RenderMmoEffect(int Group)
 	if (Group == GROUP_TELEPORT)
 	{
 		Graphics()->BlendNormal();
-		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_TELEPORTEFFECT].m_Id);
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_TELEPORT].m_Id);
 		Graphics()->QuadsBegin();
 
 		int i = m_aFirstPart[Group];

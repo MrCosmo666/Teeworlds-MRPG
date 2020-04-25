@@ -569,16 +569,29 @@ enum ItemList
 	itAngelWings = 10007,
 	itHeavenlyWings = 10008,
 	itRainbowWings = 10009,
+	itMagitechHammer = 10010,
+	itMagitechGun = 10011,
+	itMagitechShotgun = 10012,
+	itMagitechGrenade = 10013,
+	itMagitechRifle = 10014,
 };
 
 // mmotee
 bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int ClientID)
 {
-	EquipInformation[itHeavenlyHammer] =	{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(100, 100),	SPRITE_MMO_HAMMER_THOOR };
-	EquipInformation[itHeavenlyGun] =		{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_GUN_THOOR };
-	EquipInformation[itHeavenlyShotgun] =	{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_SHOTGUN_THOOR };
-	EquipInformation[itHeavenlyGrenade] =	{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_GRENADE_THOOR };
-	EquipInformation[itHeavenlyRifle] =		{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_RIFLE_THOOR };
+	/* Õ¿¡Œ– HEAVEN */
+	EquipInformation[itHeavenlyHammer] =	{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(100, 100),	SPRITE_MMO_HAMMER_HEAVEN };
+	EquipInformation[itHeavenlyGun] =		{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_GUN_HEAVEN };
+	EquipInformation[itHeavenlyShotgun] =	{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_SHOTGUN_HEAVEN };
+	EquipInformation[itHeavenlyGrenade] =	{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_GRENADE_HEAVEN };
+	EquipInformation[itHeavenlyRifle] =		{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_RIFLE_HEAVEN };	
+	/* Õ¿¡Œ– MAGITECH */
+	EquipInformation[itMagitechHammer] =	{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(100, 100),	SPRITE_MMO_HAMMER_MAGITECH };
+	EquipInformation[itMagitechGun] =		{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(0, 0),		SPRITE_MMO_GUN_MAGITECH };
+	EquipInformation[itMagitechShotgun] =	{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(0, 0),		SPRITE_MMO_SHOTGUN_MAGITECH };
+	EquipInformation[itMagitechGrenade] =	{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(0, 0),		SPRITE_MMO_GRENADE_MAGITECH };
+	EquipInformation[itMagitechRifle] =		{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(0, 0),		SPRITE_MMO_RIFLE_MAGITECH };
+	/*  –€À‹ﬂ */
 	EquipInformation[itShadowWings] =		{ vec4(1.75f, 0.0f, 0.0f, 0.01f),	vec2(115, 55),	vec2(200, 90),	IMAGE_WINGSIT19 };
 	EquipInformation[itNeptuneWings] =		{ vec4(0.2f, 0.2f, 1.75f, 0.01f),	vec2(120, 50),	vec2(200, 100),	IMAGE_WINGSIT20 };
 	EquipInformation[itAngelWings] =		{ vec4(0.2f, 0.2f, 1.75f, 0.01f),	vec2(115, 64),	vec2(200, 100),	IMAGE_WINGSIT21 };
