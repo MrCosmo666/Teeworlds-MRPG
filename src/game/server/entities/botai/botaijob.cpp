@@ -98,7 +98,6 @@ bool BotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 	if (From < 0 || From > MAX_CLIENTS || !GS()->m_apPlayers[From])
 		return false;
 
-	CPlayer* pFrom = GS()->m_apPlayers[From];
 	if(GetPlayer()->GetSpawnBot() != SPAWNMOBS || GS()->m_apPlayers[From]->IsBot())
 		return false;
 
@@ -145,7 +144,7 @@ void BotAI::Die(int Killer, int Weapon)
 	int BotID = GetPlayer()->GetBotID();
 	int StorageID = GS()->Mmo()->Storage()->GetStorageMonsterSub(BotID);
 	if(StorageID > 0) 
-		GS()->Mmo()->Storage()->AddStorageGoods(StorageID, rand()%5);
+		GS()->Mmo()->Storage()->AddStorageGoods(StorageID, random_int()%5);
 
 	// очищаем лист и убиваем игрока
 	m_ListDmgPlayers.clear();
@@ -157,7 +156,7 @@ void BotAI::CreateRandomDropItem(int DropCID, int Random, int ItemID, int Count,
 	if (DropCID < 0 || DropCID >= MAX_PLAYERS || !GS()->m_apPlayers[DropCID] || !GS()->m_apPlayers[DropCID]->GetCharacter() || !IsAlive())
 		return;
 
-	int RandomDrop = (Random == 0 ? 0 : rand() % Random);
+	int RandomDrop = (Random == 0 ? 0 : random_int() % Random);
 	if (RandomDrop == 0)
 		GS()->CreateDropItem(m_Core.m_Pos, DropCID, ItemID, Count, 0, Force);
 	return;
@@ -183,7 +182,7 @@ void BotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 		int RandomDrop = ContextBots::MobBot[SubID].RandomItem[i];
 		if (DropItem == itMoney)
 		{
-			if (RandomDrop <= 0 || rand() % RandomDrop == 0)
+			if (RandomDrop <= 0 || random_int() % RandomDrop == 0)
 				pPlayer->AddMoney(CountItem);
 			continue;
 		}
@@ -193,7 +192,7 @@ void BotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 	// exp
 	int DamageExp = (ContextBots::MobBot[SubID].Level * g_Config.m_SvExperienceMob);
 	int PowerRaid = GS()->IncreaseCountRaid(DamageExp);
-	GS()->CreateDropBonuses(m_Core.m_Pos, 1, DamageExp / 2, rand() % 3, ForceDies);
+	GS()->CreateDropBonuses(m_Core.m_Pos, 1, DamageExp / 2, (1+random_int() % 3), ForceDies);
 	pPlayer->AddExp(PowerRaid);
 
 	// дать скилл поинт
@@ -209,7 +208,7 @@ void BotAI::ClearTarget()
 	int FromID = GetPlayer()->GetCID();
 	if (m_BotTargetID != FromID)
 	{
-		m_EmotionsStyle = 1 + rand() % 5;
+		m_EmotionsStyle = 1 + random_int() % 5;
 		m_BotTargetID = FromID;
 		m_BotTargetLife = 0;
 		m_BotTargetCollised = 0;
@@ -277,7 +276,7 @@ void BotAI::EngineNPC()
 
 	// направление глаз
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
-		m_Input.m_TargetY = rand()%4-rand()%8;
+		m_Input.m_TargetY = random_int()%4- random_int()%8;
 	m_Input.m_TargetX = (m_Input.m_Direction*10+1);
 
 	// ------------------------------------------------------------------------------
@@ -299,7 +298,7 @@ void BotAI::EngineNPC()
 	}
 
 	if (!PlayerFinding && !StaticBot && Server()->Tick() % (Server()->TickSpeed() * (m_Input.m_Direction == 0 ? 5 : 1)) == 0)
-		m_Input.m_Direction = -1 + rand() % 3;
+		m_Input.m_Direction = -1 + random_int() % 3;
 }
 
 // Интерактивы квестовых мобов
@@ -307,7 +306,7 @@ void BotAI::EngineQuestMob()
 {
 	// направление глаз
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
-		m_Input.m_TargetY = rand()%4-rand()%8;
+		m_Input.m_TargetY = random_int()%4- random_int()%8;
 	m_Input.m_TargetX = (m_Input.m_Direction*10+1);
 	EmoteActions(EMOTE_BLINK);
 
@@ -340,15 +339,15 @@ void BotAI::EngineMobs()
 	// интерактивы бота без найденого игрока
 	// ------------------------------------------------------------------------------
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
-		m_Input.m_TargetY = rand()%30-rand()%60 + m_Core.m_Vel.y;
-	m_Input.m_TargetX = m_Input.m_Direction*rand()%30;
+		m_Input.m_TargetY = random_int()%30- random_int()%60 + m_Core.m_Vel.y;
+	m_Input.m_TargetX = m_Input.m_Direction* random_int()%30;
 
 	// крюк
 	if (!m_Input.m_Hook)
 	{
 		if ((m_Core.m_Vel.y < 0 && m_Input.m_TargetY > 0) || (m_Core.m_Vel.y > 0 && m_Input.m_TargetY < 0) ||
 			(m_Core.m_Vel.x > 0 && m_Input.m_TargetX > 0 && m_Input.m_Direction == -1) ||
-			(m_Core.m_Vel.x < 0 && m_Input.m_TargetX < 0 && m_Input.m_Direction == 1) || rand() % 4 == 0)
+			(m_Core.m_Vel.x < 0 && m_Input.m_TargetX < 0 && m_Input.m_Direction == 1) || random_int() % 4 == 0)
 		{
 			vec2 HookDir = GetHookPos(vec2(m_Input.m_TargetX, m_Input.m_TargetY));
 			if ((int)HookDir.x > 0 && (int)HookDir.y > 0)
@@ -363,7 +362,7 @@ void BotAI::EngineMobs()
 			}
 		}
 	}
-	if (m_Input.m_Hook && rand() % 18 == 0)
+	if (m_Input.m_Hook && random_int() % 18 == 0)
 		m_Input.m_Hook = false;
 
 	// эмоции ботов
@@ -380,17 +379,17 @@ void BotAI::EngineMobs()
 	CPlayer *pPlayer = SearchTenacityPlayer(1000.0f);
 	if(!pPlayer || !pPlayer->GetCharacter())
 	{
-        if (Server()->Tick() - m_BotTick > Server()->TickSpeed()*rand()%300)
+        if (Server()->Tick() - m_BotTick > Server()->TickSpeed()* random_int()%300)
         {
-            int Action = rand()%3;
+            int Action = random_int()%3;
             if (Action == 0)
 			{
-				m_Input.m_Jump = rand()%2;
+				m_Input.m_Jump = random_int()%2;
                 m_Input.m_Direction = -1;
 			}
             else if (Action == 1)
 			{
-				m_Input.m_Jump = rand()%2;
+				m_Input.m_Jump = random_int()%2;
                 m_Input.m_Direction = 1;
 			}
 			else if (Action == 2)
@@ -401,7 +400,7 @@ void BotAI::EngineMobs()
 		return;
 	}
 
-	bool NeedJumping = (m_Pos.y > pPlayer->GetCharacter()->m_Core.m_Pos.y + rand() % 400
+	bool NeedJumping = (m_Pos.y > pPlayer->GetCharacter()->m_Core.m_Pos.y + random_int() % 400
 		|| (GS()->Collision()->GetCollisionAt(m_Pos.x + 32.0f, m_Pos.y) && m_Core.m_Direction == 1)
 		|| (GS()->Collision()->GetCollisionAt(m_Pos.x - 32.0f, m_Pos.y) && m_Core.m_Direction == -1));
 
@@ -416,7 +415,7 @@ void BotAI::EngineMobs()
 	if (Dist < 600.0f)
 	{
 		bool StaticBot = (ContextBots::MobBot[SubBotID].Spread >= 1);
-		if(rand() % 7 == 1)
+		if(random_int() % 7 == 1)
 		{
 			m_Input.m_TargetX = static_cast<int>(pPlayer->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
 			m_Input.m_TargetY = static_cast<int>(pPlayer->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);

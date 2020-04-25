@@ -110,8 +110,6 @@ void CQuestItem::TickPaused()
 
 void CQuestItem::Snap(int SnappingClient)
 {
-	float Ct = (Server()->Tick()-m_StartTick)/(float)Server()->TickSpeed();
-	
 	if(m_Flashing || !m_Collide || m_OwnerID != SnappingClient || NetworkClipped(SnappingClient))
 		return;
 

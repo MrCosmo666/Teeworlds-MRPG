@@ -141,8 +141,6 @@ void CDropingItem::TickPaused()
 
 void CDropingItem::Snap(int SnappingClient)
 {
-	float Ct = (Server()->Tick()-m_StartTick)/(float)Server()->TickSpeed();
-	
 	if(m_Flashing || NetworkClipped(SnappingClient))
 		return;
 
