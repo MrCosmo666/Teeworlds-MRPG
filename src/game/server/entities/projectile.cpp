@@ -61,6 +61,15 @@ void CProjectile::Tick()
 	float Ct = (Server()->Tick()-m_StartTick)/(float)Server()->TickSpeed();
 	vec2 PrevPos = GetPos(Pt);
 	vec2 CurPos = GetPos(Ct);
+	if (!GS()->m_apPlayers[m_Owner] || !GS()->m_apPlayers[m_Owner]->GetCharacter())
+	{
+		if (m_Explosive)
+			GS()->CreateExplosion(CurPos, -1, m_Weapon, m_Damage);
+
+		GS()->m_World.DestroyEntity(this);
+		return;
+	}
+
 	int Collide = GS()->Collision()->IntersectLine(PrevPos, CurPos, &CurPos, 0);
 	CCharacter *OwnerChar = GS()->GetPlayerChar(m_Owner);
 	CCharacter *TargetChr = GS()->m_World.IntersectCharacter(PrevPos, CurPos, 6.0f, CurPos, OwnerChar);
@@ -69,11 +78,6 @@ void CProjectile::Tick()
 
 	if(m_LifeSpan < 0 || GameLayerClipped(CurPos) || Collide || (TargetChr && !TargetChr->m_Core.m_LostData))
 	{
-		if(!OwnerChar)
-		{
-			GS()->m_World.DestroyEntity(this);			
-			return;
-		}
 
 		if(m_LifeSpan >= 0 || m_Weapon == WEAPON_GRENADE)
 			GS()->CreateSound(CurPos, m_SoundImpact);
@@ -91,16 +95,6 @@ void CProjectile::Tick()
 void CProjectile::TickPaused()
 {
 	++m_StartTick;
-}
-
-void CProjectile::FillInfo(CNetObj_Projectile *pProj)
-{
-	pProj->m_X = (int)m_Pos.x;
-	pProj->m_Y = (int)m_Pos.y;
-	pProj->m_VelX = (int)(m_Direction.x*100.0f);
-	pProj->m_VelY = (int)(m_Direction.y*100.0f);
-	pProj->m_StartTick = m_StartTick;
-	pProj->m_Type = m_Type;
 }
 
 void CProjectile::Snap(int SnappingClient)
@@ -126,7 +120,13 @@ void CProjectile::Snap(int SnappingClient)
 	// }
 
 	CNetObj_Projectile *pProj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, GetID(), sizeof(CNetObj_Projectile)));
-	if(pProj)
-		FillInfo(pProj);
+	if (pProj)
+	{
+		pProj->m_X = (int)m_Pos.x;
+		pProj->m_Y = (int)m_Pos.y;
+		pProj->m_VelX = (int)(m_Direction.x * 100.0f);
+		pProj->m_VelY = (int)(m_Direction.y * 100.0f);
+		pProj->m_StartTick = m_StartTick;
+		pProj->m_Type = m_Type;
+	}
 }
-vec2 CProjectile::GetRealPos() { float Ct = (Server()->Tick()-m_StartTick)/(float)Server()->TickSpeed(); return GetPos(Ct); }

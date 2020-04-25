@@ -98,10 +98,10 @@ bool BotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 	if(GetPlayer()->GetSpawnBot() != SPAWNMOBS)
 		return false;
 
-	CPlayer *pFrom = GS()->m_apPlayers[From];
-	if(pFrom && pFrom->IsBot())
+	if(From < 0 || From > MAX_CLIENTS || !GS()->m_apPlayers[From] || GS()->m_apPlayers[From]->IsBot())
 		return false;
 
+	CPlayer* pFrom = GS()->m_apPlayers[From];
 	int StableDamage = Health(); // FIX DAMAGE COUNT
 	bool Damage = CCharacter::TakeDamage(Force, Source, Dmg, From, Weapon);
 	StableDamage -= Health();

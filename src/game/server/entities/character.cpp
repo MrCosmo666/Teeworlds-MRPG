@@ -740,10 +740,13 @@ void CCharacter::Die(int Killer, int Weapon)
 
 bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 {
-	CPlayer *pFrom = GS()->m_apPlayers[From];
-	if (From < 0 || From >= MAX_CLIENTS || !pFrom)
+	if (From < 0 || From >= MAX_CLIENTS || !GS()->m_apPlayers[From])
+	{
+		m_Core.m_Vel += Force;
 		return false;
+	}
 
+	CPlayer* pFrom = GS()->m_apPlayers[From];
 	if(From != m_pPlayer->GetCID() && ((pFrom->GetCharacter() && pFrom->GetCharacter()->m_NoAllowDamage) || m_NoAllowDamage))
 		return false;
 
