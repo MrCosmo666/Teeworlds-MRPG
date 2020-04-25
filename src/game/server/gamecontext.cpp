@@ -825,6 +825,32 @@ void CGS::SendGameMsg(int GameMsgID, int ParaI1, int ParaI2, int ParaI3, int Cli
 	Server()->SendMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
+void CGS::SendChatCommand(const CCommandManager::CCommand* pCommand, int ClientID)
+{
+	CNetMsg_Sv_CommandInfo Msg;
+	Msg.m_Name = pCommand->m_aName;
+	Msg.m_HelpText = pCommand->m_aHelpText;
+	Msg.m_ArgsFormat = pCommand->m_aArgsFormat;
+
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+}
+
+void CGS::SendChatCommands(int ClientID)
+{
+	for (int i = 0; i < CommandManager()->CommandCount(); i++)
+	{
+		SendChatCommand(CommandManager()->GetCommand(i), ClientID);
+	}
+}
+
+void CGS::SendRemoveChatCommand(const CCommandManager::CCommand* pCommand, int ClientID)
+{
+	CNetMsg_Sv_CommandInfoRemove Msg;
+	Msg.m_Name = pCommand->m_aName;
+
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+}
+
 // Отправить тюннинг
 void CGS::SendTuningParams(int ClientID)
 {
@@ -907,6 +933,18 @@ int64 CGS::MaskWorldID()
 /* #########################################################################
 	ENGINE GAMECONTEXT 
 ######################################################################### */
+void CGS::NewCommandHook(const CCommandManager::CCommand* pCommand, void* pContext)
+{
+	CGS* pSelf = (CGS*)pContext;
+	pSelf->SendChatCommand(pCommand, -1);
+}
+
+void CGS::RemoveCommandHook(const CCommandManager::CCommand* pCommand, void* pContext)
+{
+	CGS* pSelf = (CGS*)pContext;
+	pSelf->SendRemoveChatCommand(pCommand, -1);
+}
+
 // инициализация GameContext данных
 void CGS::OnInit(int WorldID)
 {
@@ -914,6 +952,8 @@ void CGS::OnInit(int WorldID)
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 	m_World.SetGameServer(this);
 	m_Events.SetGameServer(this);
+	m_CommandManager.Init(m_pConsole, this, NewCommandHook, RemoveCommandHook);
+
 	m_WorldID = WorldID;
 	m_DungeonID = GetDungeonID();
 
@@ -929,6 +969,7 @@ void CGS::OnInit(int WorldID)
 	{
 		m_pController = new CGameControllerMOD(this);
 	}
+	m_pController->RegisterChatCommands(CommandManager());
 
 	// создаем контроллер
 	m_Layers.Init(Kernel(), NULL, WorldID);
@@ -1131,7 +1172,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		else if (MsgID == NETMSGTYPE_CL_COMMAND)
 		{
 			CNetMsg_Cl_Command *pMsg = (CNetMsg_Cl_Command*)pRawMsg;
-			m_pController->OnPlayerCommand(pPlayer, pMsg->m_Name, pMsg->m_Arguments);
+			CommandManager()->OnCommand(pMsg->m_Name, pMsg->m_Arguments, ClientID);
 		}
 		else if(MsgID == NETMSGTYPE_CL_CALLVOTE)
 		{
@@ -1313,6 +1354,8 @@ void CGS::OnClientConnected(int ClientID)
 // Вход на сервер игрока
 void CGS::OnClientEnter(int ClientID)
 {
+	SendChatCommands(ClientID);
+
 	CPlayer *pPlayer = m_apPlayers[ClientID];
 	m_pController->OnPlayerConnect(pPlayer);
 

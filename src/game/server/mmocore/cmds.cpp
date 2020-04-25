@@ -15,8 +15,28 @@ void CCmd::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 	// вход в аккаунт
 	if(str_comp_num(Msg->m_pMessage, "/login", 6) == 0)
 	{
-		LastChat(GS, pPlayer); 	
-		GS->m_pController->OnPlayerCommand(pPlayer, "login", Msg->m_pMessage);
+		int ClientID = pPlayer->GetCID();
+
+		// проверяем авторизацию и проверку клиента
+		if (pPlayer->IsAuthed())
+			return GS->Chat(ClientID, "You already authed.");
+
+		if (pPlayer->m_PlayerTick[TickState::CheckClient] &&
+			pPlayer->m_PlayerTick[TickState::CheckClient] + GS->Server()->TickSpeed() * 5 > GS->Server()->Tick())
+			return GS->Chat(ClientID, "Please wait your client check repeat after 1-4 sec!");
+
+		// если аргументы не совпадают
+		char Username[256], Password[256];
+		if (sscanf(Msg->m_pMessage, "/login %s %s", Username, Password) != 2)
+			return GS->ChatFollow(ClientID, "Use: /login <username> <password>");
+
+		// если размер пароля логина мал или слишком большой
+		if (str_length(Username) > 15 || str_length(Username) < 4 || str_length(Password) > 15 || str_length(Password) < 4)
+			return GS->Chat(ClientID, "Username / Password must contain 4-15 characters");
+
+		// загружаем аккаунт и данные если он загрузился
+		if (GS->Mmo()->Account()->LoginAccount(ClientID, Username, Password) == AUTH_ALL_GOOD)
+			GS->Mmo()->Account()->LoadAccount(pPlayer, true);
 		return;
 	}
 
@@ -24,15 +44,43 @@ void CCmd::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 	 if(str_comp_num(Msg->m_pMessage, "/register", 9) == 0)
 	{
 		LastChat(GS, pPlayer);
-		GS->m_pController->OnPlayerCommand(pPlayer, "register", Msg->m_pMessage);
+		int ClientID = pPlayer->GetCID();
+
+		// проверяем авторизацию и проверку клиента
+		if (pPlayer->IsAuthed())
+			return GS->Chat(ClientID, "Logout account and create!");
+
+		if (pPlayer->m_PlayerTick[TickState::CheckClient] &&
+			pPlayer->m_PlayerTick[TickState::CheckClient] + GS->Server()->TickSpeed() * 5 > GS->Server()->Tick())
+			return GS->Chat(ClientID, "Please wait your client check repeat after 1-4 sec!");
+
+		// если аргументы не совпадают
+		char Username[256], Password[256];
+		if (sscanf(Msg->m_pMessage, "/register %s %s", Username, Password) != 2)
+			return GS->ChatFollow(ClientID, "Use: /register <username> <password>");
+
+		// регестрируем аккаунт
+		GS->Mmo()->Account()->RegisterAccount(ClientID, Username, Password);
 		return;
 	}
 
 #ifdef CONF_DISCORD
 	else if(str_comp_num(Msg->m_pMessage, "/discord_connect", 16) == 0)
 	{
-		LastChat(GS, pPlayer); 
-		GS->m_pController->OnPlayerCommand(pPlayer, "discord_connect", Msg->m_pMessage);
+		// check authed
+		LastChat(GS, pPlayer);
+		int ClientID = pPlayer->GetCID();
+
+		if (!pPlayer->IsAuthed())
+			return;
+
+		char DiscordDID[256];
+		if (sscanf(Msg->m_pMessage, "/discord_connect %s", DiscordDID) != 1)
+			return GS->ChatFollow(ClientID, "Use: /discord_connect <DID>");
+		if (str_length(DiscordDID) > 30 || str_length(DiscordDID) < 10)
+			return GS->ChatFollow(ClientID, "Discord ID must contain 10-30 characters.");
+
+		GS->Mmo()->Account()->DiscordConnect(ClientID, DiscordDID);
 		return;
 	}
 #endif
@@ -247,8 +295,11 @@ void CCmd::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 	else if(str_comp_num(Msg->m_pMessage, "/cmdlist", 8) == 0 || str_comp_num(Msg->m_pMessage, "/help", 5) == 0)
 	{
 		LastChat(GS, pPlayer);
-
-		GS->m_pController->OnPlayerCommand(pPlayer, "cmdlist", Msg->m_pMessage);
+		int ClientID = pPlayer->GetCID();
+		GS->ChatFollow(ClientID, "Command List / Help");
+		GS->ChatFollow(ClientID, "/register <name> <pass> - new account.");
+		GS->ChatFollow(ClientID, "/login <name> <pass> - log in account.");
+		GS->ChatFollow(ClientID, "Another information see Wiki Page.");
 		return;
 	}
 

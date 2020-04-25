@@ -785,7 +785,7 @@ void CMenus::DoInfoBox(const CUIRect *pRect, const char *pLabel, const char *pVa
 	RenderTools()->DrawUIRect(pRect, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
 
 	CUIRect Label, Value;
-	pRect->VSplitMid(&Label, &Value);
+	pRect->VSplitMid(&Label, &Value, 2.0f);
 
 	RenderTools()->DrawUIRect(&Value, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
 
@@ -861,7 +861,7 @@ float CMenus::DoScrollbarH(const void *pID, const CUIRect *pRect, float Current)
 	static float OffsetX;
 	pRect->VSplitLeft(min(pRect->w / 8.0f, 33.0f), &Handle, 0);
 
-	Handle.x += (pRect->w-Handle.w)*Current;
+	Handle.x += (pRect->w - Handle.w) * clamp(Current, 0.0f, 1.0f);
 
 	// logic
 	float ReturnValue = Current;
@@ -2114,9 +2114,7 @@ int CMenus::Render()
 			}
 
 			// buttons
-			BottomBar.VSplitMid(&No, &Yes);
-			No.VSplitRight(SpacingW/2.0f, &No, 0);
-			Yes.VSplitLeft(SpacingW/2.0f, 0, &Yes);
+			BottomBar.VSplitMid(&No, &Yes, SpacingW);
 
 			static CButtonContainer s_ButtonAbort;
 			if(DoButton_Menu(&s_ButtonAbort, Localize("No"), 0, &No) || m_EscapePressed)
@@ -2140,9 +2138,7 @@ int CMenus::Render()
 			DoEditBoxOption(g_Config.m_Password, g_Config.m_Password, sizeof(g_Config.m_Password), &EditBox, Localize("Password"), ButtonWidth, &s_OffsetPassword, true);
 
 			// buttons
-			BottomBar.VSplitMid(&Abort, &TryAgain);
-			Abort.VSplitRight(SpacingW/2.0f, &Abort, 0);
-			TryAgain.VSplitLeft(SpacingW/2.0f, 0, &TryAgain);
+			BottomBar.VSplitMid(&Abort, &TryAgain, SpacingW);
 
 			static CButtonContainer s_ButtonAbort;
 			if(DoButton_Menu(&s_ButtonAbort, Localize("Abort"), 0, &Abort) || m_EscapePressed)
@@ -2306,9 +2302,7 @@ int CMenus::Render()
 			UI()->DoLabel(&Box, pExtraText, ButtonHeight*ms_FontmodHeight*0.8f, ExtraAlign);
 
 			// buttons
-			BottomBar.VSplitMid(&No, &Yes);
-			No.VSplitRight(SpacingW/2.0f, &No, 0);
-			Yes.VSplitLeft(SpacingW/2.0f, 0, &Yes);
+			BottomBar.VSplitMid(&No, &Yes, SpacingW);
 
 			static CButtonContainer s_ButtonNo;
 			if(DoButton_Menu(&s_ButtonNo, Localize("No"), 0, &No) || m_EscapePressed)
@@ -2348,9 +2342,7 @@ int CMenus::Render()
 			DoEditBoxOption(m_aCurrentDemoFile, m_aCurrentDemoFile, sizeof(m_aCurrentDemoFile), &EditBox, Localize("Name"), ButtonWidth, &s_OffsetRenameDemo);
 
 			// buttons
-			BottomBar.VSplitMid(&No, &Yes);
-			No.VSplitRight(SpacingW/2.0f, &No, 0);
-			Yes.VSplitLeft(SpacingW/2.0f, 0, &Yes);
+			BottomBar.VSplitMid(&No, &Yes, SpacingW);
 
 			static CButtonContainer s_ButtonNo;
 			if(DoButton_Menu(&s_ButtonNo, Localize("No"), 0, &No) || m_EscapePressed)
@@ -2395,9 +2387,7 @@ int CMenus::Render()
 				ButtonHeight* ms_FontmodHeight * 1.2f, CUI::ALIGN_CENTER, NameLabel.w);
 
 			// buttons
-			BottomBar.VSplitMid(&No, &Yes);
-			No.VSplitRight(SpacingW/2.0f, &No, 0);
-			Yes.VSplitLeft(SpacingW/2.0f, 0, &Yes);
+			BottomBar.VSplitMid(&No, &Yes, SpacingW);
 
 			static CButtonContainer s_ButtonNo;
 			if (DoButton_Menu(&s_ButtonNo, Localize("No"), 0, &No) || m_EscapePressed)
@@ -2427,9 +2417,7 @@ int CMenus::Render()
 			UI()->DoLabel(&Box, pExtraText, ButtonHeight*ms_FontmodHeight*0.8f, ExtraAlign, Box.w);
 
 			// buttons
-			BottomBar.VSplitMid(&No, &Yes);
-			No.VSplitRight(SpacingW / 2.0f, &No, 0);
-			Yes.VSplitLeft(SpacingW / 2.0f, 0, &Yes);
+			BottomBar.VSplitMid(&No, &Yes, SpacingW);
 
 			static CButtonContainer s_ButtonNo;
 			if(DoButton_Menu(&s_ButtonNo, Localize("No"), 0, &No) || m_EscapePressed)
@@ -2461,9 +2449,7 @@ int CMenus::Render()
 			DoEditBoxOption(m_aSaveSkinName, m_aSaveSkinName, sizeof(m_aSaveSkinName), &EditBox, Localize("Name"), ButtonWidth, &s_OffsetSaveSkin);
 
 			// buttons
-			BottomBar.VSplitMid(&No, &Yes);
-			No.VSplitRight(SpacingW/2.0f, &No, 0);
-			Yes.VSplitLeft(SpacingW/2.0f, 0, &Yes);
+			BottomBar.VSplitMid(&No, &Yes, SpacingW);
 
 			static CButtonContainer s_ButtonAbort;
 			if(DoButton_Menu(&s_ButtonAbort, Localize("No"), 0, &No) || m_EscapePressed)
@@ -2489,9 +2475,7 @@ int CMenus::Render()
 			UI()->DoLabel(&Box, pExtraText, ButtonHeight*ms_FontmodHeight*0.8f, ExtraAlign);
 
 			// buttons
-			BottomBar.VSplitMid(&No, &Yes);
-			No.VSplitRight(SpacingW/2.0f, &No, 0);
-			Yes.VSplitLeft(SpacingW/2.0f, 0, &Yes);
+			BottomBar.VSplitMid(&No, &Yes, SpacingW);
 
 			static CButtonContainer s_ButtonNo;
 			if(DoButton_Menu(&s_ButtonNo, Localize("No"), 0, &No) || m_EscapePressed)

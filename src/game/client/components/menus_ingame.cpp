@@ -366,7 +366,7 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 	// serverinfo
 	MainView.HSplitBottom(250.0f, &ServerInfo, &Motd);
 	ServerInfo.VSplitMid(&ServerInfo, &GameInfo);
-	ServerInfo.VSplitRight(1.0f, &ServerInfo, 0);
+	ServerInfo.VSplitMid(&ServerInfo, &GameInfo, 2.0f);
 	RenderTools()->DrawUIRect(&ServerInfo, vec4(0.0, 0.0, 0.0, 0.25f), CUI::CORNER_ALL, 5.0f);
 
 	ServerInfo.HSplitTop(ButtonHeight, &Label, &ServerInfo);
@@ -422,7 +422,6 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 	}
 
 	// gameinfo
-	GameInfo.VSplitLeft(1.0f, 0, &GameInfo);
 	RenderTools()->DrawUIRect(&GameInfo, vec4(0.0, 0.0, 0.0, 0.25f), CUI::CORNER_ALL, 5.0f);
 
 	GameInfo.HSplitTop(ButtonHeight, &Label, &GameInfo);
@@ -609,16 +608,18 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 		if (m_pClient->MmoServer())
 		{
 			float Alpha = UI()->MouseInside(&Item.m_Rect) ? 0.07f : 0.05f;
+			vec4 ColorTable = vec4((float)pOption->m_Colored[0] / 10, (float)pOption->m_Colored[1] / 10, (float)pOption->m_Colored[2] / 10, Alpha);
 			int SizeColors = max(pOption->m_Colored[0], pOption->m_Colored[1], pOption->m_Colored[2]);
 			float LengthColors = Item.m_Rect.h * ms_FontmodHeight;
 			bool MainMenu = (bool)(SizeColors > 15);
 
 			FontSize = (MainMenu ? LengthColors * 0.8f : LengthColors * 0.71f);
-			vec4 VoteColor = vec4((float)pOption->m_Colored[0] / 10, (float)pOption->m_Colored[1] / 10, (float)pOption->m_Colored[2] / 10, Alpha);
-			RenderTools()->DrawUIRect(&Item.m_Rect, VoteColor, CUI::CORNER_ALL, 0.0f);
+			RenderTools()->DrawUIRect(&Item.m_Rect, ColorTable, CUI::CORNER_ALL, 0.0f);
 
 			if (!MainMenu)
 				TextRender()->TextColor(1, 1, 1, 0.85f);
+			else
+				TextRender()->TextColor(1, 1, 1, 1);
 		}
 
 		if(Item.m_Visible)
@@ -628,10 +629,10 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 			Item.m_Rect.y += 2.0f;
 			UI()->DoLabel(&Item.m_Rect, pOption->m_aDescription, FontSize, CUI::ALIGN_LEFT);
 
-			TextRender()->TextColor(1, 1, 1, 1);
 		}
 	}
 
+	TextRender()->TextColor(1, 1, 1, 1);
 	m_CallvoteSelectedOption = UiDoListboxEnd(&s_ListBoxState, &doCallVote);
 	return doCallVote;
 }
