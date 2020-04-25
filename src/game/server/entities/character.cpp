@@ -740,6 +740,7 @@ void CCharacter::Die(int Killer, int Weapon)
 
 bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 {
+	// если нет человека от которого поступает урон
 	if (From < 0 || From >= MAX_CLIENTS || !GS()->m_apPlayers[From])
 	{
 		m_Core.m_Vel += Force;
@@ -747,24 +748,30 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 	}
 
 	CPlayer* pFrom = GS()->m_apPlayers[From];
-	if(From != m_pPlayer->GetCID() && ((pFrom->GetCharacter() && pFrom->GetCharacter()->m_NoAllowDamage) || m_NoAllowDamage))
+	if((pFrom->GetCharacter() && pFrom->GetCharacter()->m_NoAllowDamage) || m_NoAllowDamage)
 		return false;
 
 	m_Core.m_Vel += Force;
 	if (length(m_Core.m_Vel) > 32.0f)
 		m_Core.m_Vel = normalize(m_Core.m_Vel) * 32.0f;
 
+	// если зона не PVP
 	if(!GS()->IsAllowedPVP() && !pFrom->IsBot() && !m_pPlayer->IsBot())
 		return false;
 
-	if(m_Health > m_pPlayer->GetStartHealth())
+	// если здоровья больше чем твое начальное
+	if (m_Health > m_pPlayer->GetStartHealth())
+	{
+		GS()->Chat(m_pPlayer->GetCID(), "Your health has been lowered.");
+		GS()->Chat(m_pPlayer->GetCID(), "You may have removed equipment that gave it away.");
 		m_Health = m_pPlayer->GetStartHealth();
+	}
 
 	if(From == m_pPlayer->GetCID())
 		Dmg = max(1, Dmg/2);
+	else
+		Dmg = max(1, Dmg);
 
-	Dmg = max(1, Dmg);
-	int OldHealth = m_Health, OldArmor = m_Armor;
 	if(From != m_pPlayer->GetCID() && pFrom->GetCharacter())
 	{
 		// Обычный урон сила урона
@@ -817,6 +824,7 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 		GiveRandomMobEffect(From);
 	}
 
+	int OldHealth = m_Health, OldArmor = m_Armor;
 	if(Dmg)
 	{
 		m_Health -= Dmg;
@@ -828,16 +836,7 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 	GS()->CreateDamage(m_Pos, m_pPlayer->GetCID(), Source, OldHealth-m_Health, OldArmor-m_Armor, From == m_pPlayer->GetCID());
 
 	if(From != m_pPlayer->GetCID())
-	{
-		// Звук удара
-		int64 Mask = CmaskOne(From);
-		for(int i = 0; i < MAX_PLAYERS; i++)
-		{
-			if(GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS)
-				Mask |= CmaskOne(i);
-		}
-		GS()->CreateSound(GS()->m_apPlayers[From]->m_ViewPos, SOUND_HIT, Mask);
-	}
+		GS()->CreatePlayerSound(From, SOUND_HIT);
 
 	// автозелье здоровья
 	if(m_Health <= m_pPlayer->GetStartHealth()/3)

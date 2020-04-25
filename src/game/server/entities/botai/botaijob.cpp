@@ -95,29 +95,32 @@ void BotAI::ShowProgress()
 
 bool BotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 {
-	if(GetPlayer()->GetSpawnBot() != SPAWNMOBS)
-		return false;
-
-	if(From < 0 || From > MAX_CLIENTS || !GS()->m_apPlayers[From] || GS()->m_apPlayers[From]->IsBot())
+	if (From < 0 || From > MAX_CLIENTS || !GS()->m_apPlayers[From])
 		return false;
 
 	CPlayer* pFrom = GS()->m_apPlayers[From];
+	if(GetPlayer()->GetSpawnBot() != SPAWNMOBS || GS()->m_apPlayers[From]->IsBot())
+		return false;
+
 	int StableDamage = Health(); // FIX DAMAGE COUNT
-	bool Damage = CCharacter::TakeDamage(Force, Source, Dmg, From, Weapon);
+	bool SuccessDamage = CCharacter::TakeDamage(Force, Source, Dmg, From, Weapon);
 	StableDamage -= Health();
 
-	if(From != GetPlayer()->GetCID() && pFrom)
-		m_ListDmgPlayers[From] += StableDamage;
+	// later take damage
+	if (!pFrom || !pFrom->GetCharacter())
+		return false;
 
-	if (m_BotTargetID == GetPlayer()->GetCID())
+	// установить агрессию на того от кого пришел урон
+	if (From != GetPlayer()->GetCID())
 	{
-		// ищем игрока
-		CPlayer* pPlayer = SearchPlayer(1000.0f);
-		if (pPlayer && pPlayer->GetCharacter())
-			SetTarget(pPlayer->GetCID());
+		m_ListDmgPlayers[From] += StableDamage;
+		if (m_BotTargetID == GetPlayer()->GetCID())
+			SetTarget(From);
 	}
 
-	if (Damage)
+
+	// пропускаем если там урон прошел
+	if (SuccessDamage)
 		return true;
 	
 	// проверка при смерте
