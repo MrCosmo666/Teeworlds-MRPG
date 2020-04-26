@@ -340,7 +340,7 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 	}
 
 
-	IGraphics::CQuadItem QuadItem(Pos.x, Pos.y, 64, 64);
+	IGraphics::CQuadItem QuadItem(Pos.x, Pos.y, 32, 32);
 	Graphics()->QuadsDraw(&QuadItem, 1);
 	Graphics()->QuadsSetRotation(0);
 	Graphics()->QuadsEnd();
