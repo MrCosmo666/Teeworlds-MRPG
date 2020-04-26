@@ -872,24 +872,9 @@ void CPlayers::RenderWings(const CNetObj_Character Player, CAnimState* pAnimWing
 		return;
 
 	// - - - - - - - - - - - - - ÀÍÈÌÀÖÈÈ ÊÐÛËÜÅÂ - - - - - - - - - - - -
-	bool InAir = !Collision()->CheckPoint(Player.m_X, Player.m_Y + 16);
-	CTeeRenderInfo RenderInfo = m_aRenderInfo[ClientID];
-	if (RenderInfo.m_GotAirJump && InAir)
-	{
-		if (m_pClient->m_aClients[ClientID].m_AnimWings >= 1.6f)
-			m_pClient->m_aClients[ClientID].m_AnimWings = 1.0f;
-	}
-	else if (!RenderInfo.m_GotAirJump && InAir)
-	{
-		if (m_pClient->m_aClients[ClientID].m_AnimWings >= 2.6f)
-			m_pClient->m_aClients[ClientID].m_AnimWings = 2.2f;
-	}
-	else
-	{
-		if (m_pClient->m_aClients[ClientID].m_AnimWings >= 1.0f)
-			m_pClient->m_aClients[ClientID].m_AnimWings = 0.0f;
-	}
 	int AnimationID = pEquipInfo->AnimationID;
+	bool InAir = !Collision()->CheckPoint(Player.m_X, Player.m_Y + 16);
+	TickAnimationWings(AnimationID, ClientID, InAir);
 	pAnimWings->Add(&g_pData->m_aAnimations[AnimationID], m_pClient->m_aClients[ClientID].m_AnimWings, 1.0f);
 	m_pClient->m_aClients[ClientID].m_AnimWings += 0.59f / Client()->ClientFPS();
 
@@ -902,6 +887,35 @@ void CPlayers::RenderWings(const CNetObj_Character Player, CAnimState* pAnimWing
 		m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
 	}
 	RenderTools()->RenderWings(pAnimWings, pEquipInfo->SpriteID, Direction, Position, pEquipInfo->Position, pEquipInfo->Size);
+}
+
+void CPlayers::TickAnimationWings(int AnimationID, int ClientID, bool InAir)
+{
+	CTeeRenderInfo RenderInfo = m_aRenderInfo[ClientID];
+
+	if (AnimationID == ANIM_WINGS_LENGTH)
+	{
+		if (RenderInfo.m_GotAirJump && InAir)
+		{
+			if (m_pClient->m_aClients[ClientID].m_AnimWings >= 1.6f)
+				m_pClient->m_aClients[ClientID].m_AnimWings = 1.0f;
+		}
+		else if (!RenderInfo.m_GotAirJump && InAir)
+		{
+			if (m_pClient->m_aClients[ClientID].m_AnimWings >= 2.6f)
+				m_pClient->m_aClients[ClientID].m_AnimWings = 2.2f;
+		}
+		else
+		{
+			if (m_pClient->m_aClients[ClientID].m_AnimWings >= 1.0f)
+				m_pClient->m_aClients[ClientID].m_AnimWings = 0.0f;
+		}
+	}
+	else if (AnimationID == ANIM_WINGS_STATIC)
+	{
+		if (m_pClient->m_aClients[ClientID].m_AnimWings >= 1.0f)
+			m_pClient->m_aClients[ClientID].m_AnimWings = 0.0f;
+	}
 }
 
 void CPlayers::OnMessage(int MsgType, void* pRawMsg)

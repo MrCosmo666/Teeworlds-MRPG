@@ -42,7 +42,9 @@ class CPlayers : public CComponent
 	void RenderShotgun(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int SpriteID);
 	void RenderGrenade(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID);
 	void RenderRifle(CAnimState* pAnim, float Angle, vec2 Position, int SpriteID);
+
 	void RenderWings(const CNetObj_Character Player, CAnimState* pAnimWings, vec2 Position, vec2 Direction, int ClientID);
+	void TickAnimationWings(int AnimationID, int ClientID, bool InAir);
 public:
 	virtual void OnInit();
 	virtual void OnRender();

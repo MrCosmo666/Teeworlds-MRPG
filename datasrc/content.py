@@ -755,18 +755,6 @@ anim.wings.frames.Add(AnimKeyframe(0.2, -0.5, 0.4, -0.006))
 anim.wings.frames.Add(AnimKeyframe(0.5, 0.0, 0.0, -0.015))
 anim.wings.frames.Add(AnimKeyframe(0.8, 0.4, -0.5, -0.006))
 anim.wings.frames.Add(AnimKeyframe(0.9, 0.0, 0.0, 0.0))
-
-anim.wings.frames.Add(AnimKeyframe(1.0, 0, 0, 0.0)) # yes jump and air
-anim.wings.frames.Add(AnimKeyframe(1.2, -0.3, 0.4, -0.006))
-anim.wings.frames.Add(AnimKeyframe(1.5, 0.0, 0.0, -0.015))
-anim.wings.frames.Add(AnimKeyframe(1.8, 0.4, -0.3, -0.006))
-anim.wings.frames.Add(AnimKeyframe(1.9, 0.0, 0.0, 0.0))
-
-anim.wings.frames.Add(AnimKeyframe(2.0, 0, 0, 0.0)) # no jump air
-anim.wings.frames.Add(AnimKeyframe(2.2, -0.5, 0.4, -0.006))
-anim.wings.frames.Add(AnimKeyframe(2.5, 0.0, 0.0, -0.015))
-anim.wings.frames.Add(AnimKeyframe(2.8, 0.4, -0.5, -0.006))
-anim.wings.frames.Add(AnimKeyframe(3.0, 0.0, 0.0, 0.0))
 container.animations.Add(anim)
 
 weapon = WeaponSpec(container, "hammer")
