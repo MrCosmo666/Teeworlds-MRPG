@@ -584,7 +584,7 @@ CPlayers::EquipItem* CPlayers::FindEquipInformation(int ItemID, vec2 SetPosition
 		if (m_aEquipInfo[i].ItemID != ItemID)
 			continue;
 
-		if (m_aEquipInfo[i].Position.x != 0.0f && m_aEquipInfo[i].Position.y != 0.0f)
+		if (SetPosition.x != 0.0f && SetPosition.y != 0.0f)
 			m_aEquipInfo[i].Position = SetPosition;
 
 		return &m_aEquipInfo[i];
@@ -596,21 +596,21 @@ void CPlayers::OnInit()
 {
 	// загружаем всю информацию о equip item's
 
-	/* НАБОР HEAVEN */
+	/* SET HEAVEN */
 	m_aEquipInfo.add({ itHeavenlyHammer, vec4(1.0f, 1.0f, 1.0f, 1.0f), vec2(0,0), vec2(100, 100), 0.0f, SPRITE_MMO_HAMMER_HEAVEN, 0 });
 	m_aEquipInfo.add({ itHeavenlyGun, vec4(1.0f, 1.0f, 1.0f, 1.0f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GUN_HEAVEN, 0 });
 	m_aEquipInfo.add({ itHeavenlyShotgun,  vec4(1.0f, 1.0f, 1.0f, 1.0f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_SHOTGUN_HEAVEN, 0 });
 	m_aEquipInfo.add({ itHeavenlyGrenade, vec4(1.0f, 1.0f, 1.0f, 1.0f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GRENADE_HEAVEN, 0 });
 	m_aEquipInfo.add({ itHeavenlyRifle, vec4(1.0f, 1.0f, 1.0f, 1.0f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_RIFLE_HEAVEN, 0 });
 	
-	/* НАБОР MAGITECH */
+	/* SET MAGITECH */
 	m_aEquipInfo.add({ itMagitechHammer, vec4(1.0f, 0.3f, 1.0f, 0.7f), vec2(0,0), vec2(100, 100), 0.0f, SPRITE_MMO_HAMMER_MAGITECH, 0 });
 	m_aEquipInfo.add({ itMagitechGun, vec4(1.0f, 0.3f, 1.0f, 0.7f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GUN_MAGITECH, 0 });
 	m_aEquipInfo.add({ itMagitechShotgun,  vec4(1.0f, 0.3f, 1.0f, 0.7f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_SHOTGUN_MAGITECH, 0 });
 	m_aEquipInfo.add({ itMagitechGrenade, vec4(1.0f, 0.3f, 1.0f, 0.7f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GRENADE_MAGITECH, 0 });
 	m_aEquipInfo.add({ itMagitechRifle, vec4(1.0f, 0.3f, 1.0f, 0.7f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_RIFLE_MAGITECH, 0 });
 		
-	/* КРЫЛЬЯ */
+	/* WINGS */
 	m_aEquipInfo.add({ itShadowWings, vec4(1.75f, 0.0f, 0.0f, 0.01f), vec2(115, 55), vec2(200, 90), 0.0f, IMAGE_WINGSIT19, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itNeptuneWings, vec4(0.2f, 0.2f, 1.75f, 0.01f), vec2(120, 50), vec2(200, 100), 0.0f, IMAGE_WINGSIT20, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itAngelWings,  vec4(0.2f, 0.2f, 1.75f, 0.01f), vec2(115, 64), vec2(200, 100), 0.0f, IMAGE_WINGSIT21, ANIM_WINGS_LENGTH });
