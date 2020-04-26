@@ -577,119 +577,141 @@ enum ItemList
 };
 
 // mmotee
+CPlayers::EquipItem* CPlayers::FindEquipInformation(int ItemID, vec2 SetPosition)
+{
+	for (int i = 0; i < m_aEquipInfo.size(); i++)
+	{
+		if (m_aEquipInfo[i].ItemID != ItemID)
+			continue;
+
+		if (m_aEquipInfo[i].Position.x != 0.0f && m_aEquipInfo[i].Position.y != 0.0f)
+			m_aEquipInfo[i].Position = SetPosition;
+
+		return &m_aEquipInfo[i];
+	}
+	return NULL;
+}
+
+void CPlayers::OnInit()
+{
+	// çàãðóæàåì âñþ èíôîðìàöèþ î equip item's
+
+	/* ÍÀÁÎÐ HEAVEN */
+	m_aEquipInfo.add({ itHeavenlyHammer, vec4(1.0f, 1.0f, 1.0f, 1.0f), vec2(0,0), vec2(100, 100), 0.0f, SPRITE_MMO_HAMMER_HEAVEN, 0 });
+	m_aEquipInfo.add({ itHeavenlyGun, vec4(1.0f, 1.0f, 1.0f, 1.0f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GUN_HEAVEN, 0 });
+	m_aEquipInfo.add({ itHeavenlyShotgun,  vec4(1.0f, 1.0f, 1.0f, 1.0f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_SHOTGUN_HEAVEN, 0 });
+	m_aEquipInfo.add({ itHeavenlyGrenade, vec4(1.0f, 1.0f, 1.0f, 1.0f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GRENADE_HEAVEN, 0 });
+	m_aEquipInfo.add({ itHeavenlyRifle, vec4(1.0f, 1.0f, 1.0f, 1.0f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_RIFLE_HEAVEN, 0 });
+	
+	/* ÍÀÁÎÐ MAGITECH */
+	m_aEquipInfo.add({ itMagitechHammer, vec4(1.0f, 0.3f, 1.0f, 0.7f), vec2(0,0), vec2(100, 100), 0.0f, SPRITE_MMO_HAMMER_MAGITECH, 0 });
+	m_aEquipInfo.add({ itMagitechGun, vec4(1.0f, 0.3f, 1.0f, 0.7f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GUN_MAGITECH, 0 });
+	m_aEquipInfo.add({ itMagitechShotgun,  vec4(1.0f, 0.3f, 1.0f, 0.7f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_SHOTGUN_MAGITECH, 0 });
+	m_aEquipInfo.add({ itMagitechGrenade, vec4(1.0f, 0.3f, 1.0f, 0.7f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GRENADE_MAGITECH, 0 });
+	m_aEquipInfo.add({ itMagitechRifle, vec4(1.0f, 0.3f, 1.0f, 0.7f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_RIFLE_MAGITECH, 0 });
+		
+	/* ÊÐÛËÜß */
+	m_aEquipInfo.add({ itShadowWings, vec4(1.75f, 0.0f, 0.0f, 0.01f), vec2(115, 55), vec2(200, 90), 0.0f, IMAGE_WINGSIT19, ANIM_WINGS_LENGTH });
+	m_aEquipInfo.add({ itNeptuneWings, vec4(0.2f, 0.2f, 1.75f, 0.01f), vec2(120, 50), vec2(200, 100), 0.0f, IMAGE_WINGSIT20, ANIM_WINGS_LENGTH });
+	m_aEquipInfo.add({ itAngelWings,  vec4(0.2f, 0.2f, 1.75f, 0.01f), vec2(115, 64), vec2(200, 100), 0.0f, IMAGE_WINGSIT21, ANIM_WINGS_LENGTH });
+	m_aEquipInfo.add({ itHeavenlyWings, vec4(1.0f, 0.85f, 0.0f, 0.01f), vec2(170, 100), vec2(280, 150), 0.0f, IMAGE_WINGSIT22, ANIM_WINGS_LENGTH });
+	m_aEquipInfo.add({ itRainbowWings, vec4(0.1f, 0.1f, 0.1f, 0.01f), vec2(115, 70), vec2(200, 100), 0.9f, IMAGE_WINGSIT23, ANIM_WINGS_LENGTH });
+	m_aEquipInfo.add({ itTwinBrothersWings, vec4(1.0f, 0.85f, 0.0f, 0.01f), vec2(140, 50), vec2(280, 100), 0.0f, IMAGE_WINGSIT24, ANIM_WINGS_STATIC });
+}
+
 bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int ClientID)
 {
-	/* ÍÀÁÎÐ HEAVEN */
-	EquipInformation[itHeavenlyHammer] =	{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(100, 100),	SPRITE_MMO_HAMMER_HEAVEN,	0 };
-	EquipInformation[itHeavenlyGun] =		{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_GUN_HEAVEN,		0 };
-	EquipInformation[itHeavenlyShotgun] =	{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_SHOTGUN_HEAVEN,	0 };
-	EquipInformation[itHeavenlyGrenade] =	{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_GRENADE_HEAVEN,	0 };
-	EquipInformation[itHeavenlyRifle] =		{ vec4(1.0f, 1.0f, 1.0f, 1.0f),		Position,		vec2(0, 0),		SPRITE_MMO_RIFLE_HEAVEN,	0 };	
-	/* ÍÀÁÎÐ MAGITECH */
-	EquipInformation[itMagitechHammer] =	{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(100, 100),	SPRITE_MMO_HAMMER_MAGITECH,	0 };
-	EquipInformation[itMagitechGun] =		{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(0, 0),		SPRITE_MMO_GUN_MAGITECH,	0 };
-	EquipInformation[itMagitechShotgun] =	{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(0, 0),		SPRITE_MMO_SHOTGUN_MAGITECH, 0 };
-	EquipInformation[itMagitechGrenade] =	{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(0, 0),		SPRITE_MMO_GRENADE_MAGITECH, 0 };
-	EquipInformation[itMagitechRifle] =		{ vec4(1.0f, 0.3f, 1.0f, 0.7f),		Position,		vec2(0, 0),		SPRITE_MMO_RIFLE_MAGITECH,	0 };
-	/* ÊÐÛËÜß */
-	EquipInformation[itShadowWings] =		{ vec4(1.75f, 0.0f, 0.0f, 0.01f),	vec2(115, 55),	vec2(200, 90),	IMAGE_WINGSIT19, ANIM_WINGS_LENGTH };
-	EquipInformation[itNeptuneWings] =		{ vec4(0.2f, 0.2f, 1.75f, 0.01f),	vec2(120, 50),	vec2(200, 100),	IMAGE_WINGSIT20, ANIM_WINGS_LENGTH };
-	EquipInformation[itAngelWings] =		{ vec4(0.2f, 0.2f, 1.75f, 0.01f),	vec2(115, 64),	vec2(200, 100),	IMAGE_WINGSIT21, ANIM_WINGS_LENGTH };
-	EquipInformation[itHeavenlyWings] =		{ vec4(1.0f, 0.85f, 0.0f, 0.01f),	vec2(170, 100),	vec2(280, 150),	IMAGE_WINGSIT22, ANIM_WINGS_LENGTH };
-	EquipInformation[itRainbowWings] =		{ vec4(0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.1f + frandom() * 0.9f, 0.01f), 
-											vec2(115, 70), vec2(200, 100), IMAGE_WINGSIT23, ANIM_WINGS_LENGTH  };
-	EquipInformation[itTwinBrothersWings] = { vec4(1.0f, 0.85f, 0.0f, 0.01f),	vec2(140, 50),	vec2(280, 100),	IMAGE_WINGSIT24, ANIM_WINGS_STATIC };
-
 	// - - - ìîëîòîê
 	if (Player.m_Weapon == WEAPON_HAMMER)
 	{
 		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_HAMMER];
-		if (EquipInformation.find(EquipID) != EquipInformation.end() && EquipInformation[EquipID].SpriteID > 0)
+		CPlayers::EquipItem* pEquipInfo = FindEquipInformation(EquipID, Position);
+		if (!pEquipInfo || pEquipInfo->SpriteID <= 0)
+			return false;
+
+		bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_HAMMER];
+		if (g_Config.m_ClShowMEffects != 2 && Enchant)
 		{
-			bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_HAMMER];
-			if(g_Config.m_ClShowMEffects != 2 && Enchant)
-			{
-				vec2 Direction = direction(Angle);
-				vec4 Color = EquipInformation[EquipID].Color;
-				m_pClient->m_pEffects->WingsEffect(Position, Direction, Color);
-			}
-			RenderHammer(pAnim, Angle, Position, EquipInformation[EquipID].SpriteID, EquipInformation[EquipID].Size.x);
-			return true;
+			vec4 Color = pEquipInfo->Color;
+			vec2 Direction = direction(Angle);
+			m_pClient->m_pEffects->WingsEffect(Position, Direction, Color, pEquipInfo->EffectColorRandom);
 		}
-		return false;
+		RenderHammer(pAnim, Angle, Position, pEquipInfo->SpriteID, pEquipInfo->Size.x);
+		return true;
 	}
 	// - - - ïèñòîëåò
 	else if (Player.m_Weapon == WEAPON_GUN)
 	{
 		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_GUN];
-		if (EquipInformation.find(EquipID) != EquipInformation.end() && EquipInformation[EquipID].SpriteID > 0)
+		CPlayers::EquipItem* pEquipInfo = FindEquipInformation(EquipID, Position);
+		if (!pEquipInfo || pEquipInfo->SpriteID <= 0)
+			return false;
+	
+		bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_GUN];
+		if (g_Config.m_ClShowMEffects != 2 && Enchant)
 		{
-			bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_GUN];
-			if (g_Config.m_ClShowMEffects != 2 && Enchant)
-			{
-				vec2 Direction = direction(Angle);
-				vec4 Color = EquipInformation[EquipID].Color;
-				m_pClient->m_pEffects->WingsEffect(Position, Direction, Color);
-			}
-			RenderGun(Player, pAnim, Angle, Position, EquipInformation[EquipID].SpriteID);
-			return true;
+			vec4 Color = pEquipInfo->Color;
+			vec2 Direction = direction(Angle);
+			m_pClient->m_pEffects->WingsEffect(Position, Direction, Color, pEquipInfo->EffectColorRandom);
 		}
-		return false;
+		RenderGun(Player, pAnim, Angle, Position, pEquipInfo->SpriteID);
+		return true;
 	}
 	// - - - øîòãàí
 	else if (Player.m_Weapon == WEAPON_SHOTGUN)
 	{
 		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_SHOTGUN];
-		if (EquipInformation.find(EquipID) != EquipInformation.end() && EquipInformation[EquipID].SpriteID > 0)
+		CPlayers::EquipItem* pEquipInfo = FindEquipInformation(EquipID, Position);
+		if (!pEquipInfo || pEquipInfo->SpriteID <= 0)
+			return false;
+
+		bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_SHOTGUN];
+		if (g_Config.m_ClShowMEffects != 2 && Enchant)
 		{
-			bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_SHOTGUN];
-			if (g_Config.m_ClShowMEffects != 2 && Enchant)
-			{
-				vec2 Direction = direction(Angle);
-				vec4 Color = EquipInformation[EquipID].Color;
-				m_pClient->m_pEffects->WingsEffect(Position, Direction, Color);
-			}
-			RenderShotgun(Player, pAnim, Angle, Position, EquipInformation[EquipID].SpriteID);
-			return true;
+			vec4 Color = pEquipInfo->Color;
+			vec2 Direction = direction(Angle);
+			m_pClient->m_pEffects->WingsEffect(Position, Direction, Color, pEquipInfo->EffectColorRandom);
 		}
-		return false;
+		RenderShotgun(Player, pAnim, Angle, Position, pEquipInfo->SpriteID);
+		return true;
 	}
 	// - - - ãðàíàòû
 	else if (Player.m_Weapon == WEAPON_GRENADE)
 	{
 		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_GRENADE];
-		if (EquipInformation.find(EquipID) != EquipInformation.end() && EquipInformation[EquipID].SpriteID > 0)
+		CPlayers::EquipItem* pEquipInfo = FindEquipInformation(EquipID, Position);
+		if (!pEquipInfo || pEquipInfo->SpriteID <= 0)
+			return false;
+
+		bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_GRENADE];
+		if (g_Config.m_ClShowMEffects != 2 && Enchant)
 		{
-			bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_GRENADE];
-			if (g_Config.m_ClShowMEffects != 2 && Enchant)
-			{
-				vec2 Direction = direction(Angle);
-				vec4 Color = EquipInformation[EquipID].Color;
-				m_pClient->m_pEffects->WingsEffect(Position, Direction, Color);
-			}
-			RenderGrenade(pAnim, Angle, Position, EquipInformation[EquipID].SpriteID);
-			return true;
+			vec4 Color = pEquipInfo->Color;
+			vec2 Direction = direction(Angle);
+			m_pClient->m_pEffects->WingsEffect(Position, Direction, Color, pEquipInfo->EffectColorRandom);
 		}
-		return false; 
+		RenderGrenade(pAnim, Angle, Position, pEquipInfo->SpriteID);
+		return true;
 	}
 	// - - - ëàçåð
 	else if (Player.m_Weapon == WEAPON_LASER)
 	{
 		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_RIFLE];
-		if (EquipInformation.find(EquipID) != EquipInformation.end() && EquipInformation[EquipID].SpriteID > 0)
+		CPlayers::EquipItem* pEquipInfo = FindEquipInformation(EquipID, Position);
+		if (!pEquipInfo || pEquipInfo->SpriteID <= 0)
+			return false;
+
+		bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_GRENADE];
+		if (g_Config.m_ClShowMEffects != 2 && Enchant)
 		{
-			bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_RIFLE];
-			if (g_Config.m_ClShowMEffects != 2 && Enchant)
-			{
-				vec2 Direction = direction(Angle);
-				vec4 Color = EquipInformation[EquipID].Color;
-				m_pClient->m_pEffects->WingsEffect(Position, Direction, Color);
-			}
-			RenderRifle(pAnim, Angle, Position, EquipInformation[EquipID].SpriteID);
-			return true;
+			vec4 Color = pEquipInfo->Color;
+			vec2 Direction = direction(Angle);
+			m_pClient->m_pEffects->WingsEffect(Position, Direction, Color, pEquipInfo->EffectColorRandom);
 		}
-		return false;
+		RenderRifle(pAnim, Angle, Position, pEquipInfo->SpriteID);
+		return true;
 	}
+
 	return false;
 }
 
@@ -845,7 +867,8 @@ void CPlayers::RenderRifle(CAnimState* pAnim, float Angle, vec2 Position, int Sp
 void CPlayers::RenderWings(const CNetObj_Character Player, CAnimState* pAnimWings, vec2 Position, vec2 Direction, int ClientID)
 {
 	int EquipItem = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_WINGS];
-	if (EquipInformation.find(EquipItem) == EquipInformation.end() || EquipInformation[EquipItem].SpriteID <= 0)
+	CPlayers::EquipItem* pEquipInfo = FindEquipInformation(EquipItem);
+	if (!pEquipInfo || pEquipInfo->SpriteID <= 0)
 		return;
 
 	// - - - - - - - - - - - - - ÀÍÈÌÀÖÈÈ ÊÐÛËÜÅÂ - - - - - - - - - - - -
@@ -866,7 +889,7 @@ void CPlayers::RenderWings(const CNetObj_Character Player, CAnimState* pAnimWing
 		if (m_pClient->m_aClients[ClientID].m_AnimWings >= 1.0f)
 			m_pClient->m_aClients[ClientID].m_AnimWings = 0.0f;
 	}
-	int AnimationID = EquipInformation[EquipItem].AnimationID;
+	int AnimationID = pEquipInfo->AnimationID;
 	pAnimWings->Add(&g_pData->m_aAnimations[AnimationID], m_pClient->m_aClients[ClientID].m_AnimWings, 1.0f);
 	m_pClient->m_aClients[ClientID].m_AnimWings += 0.59f / Client()->ClientFPS();
 
@@ -874,14 +897,12 @@ void CPlayers::RenderWings(const CNetObj_Character Player, CAnimState* pAnimWing
 	bool WingsEnchantItem = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_WINGS];
 	if (g_Config.m_ClShowMEffects != 2 && WingsEnchantItem)
 	{
-		vec4 Color = EquipInformation[EquipItem].Color;
+		vec4 Color = pEquipInfo->Color;
 		m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
 		m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
 	}
-	RenderTools()->RenderWings(pAnimWings, EquipInformation[EquipItem].SpriteID, Direction, Position,
-		EquipInformation[EquipItem].Position, EquipInformation[EquipItem].Size);
+	RenderTools()->RenderWings(pAnimWings, pEquipInfo->SpriteID, Direction, Position, pEquipInfo->Position, pEquipInfo->Size);
 }
-
 
 void CPlayers::OnMessage(int MsgType, void* pRawMsg)
 {

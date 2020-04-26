@@ -362,7 +362,7 @@ void CEffects::DamageMmoInd(vec2 Pos, const char* pText, int Type)
 	m_pClient->m_pParticles->Add(CParticles::GROUP_DAMAGEMMO, &p);
 }
 
-void CEffects::WingsEffect(vec2 Pos, vec2 Vel, vec4 Color)
+void CEffects::WingsEffect(vec2 Pos, vec2 Vel, vec4 Color, float RandomSize)
 {
 	if (!m_Add50hz || g_Config.m_ClShowMEffects == 3)
 		return;
@@ -377,7 +377,12 @@ void CEffects::WingsEffect(vec2 Pos, vec2 Vel, vec4 Color)
 	p.m_EndSize = 0;
 	p.m_Friction = 0.8f;
 	p.m_Gravity = frandom() * -500.0f;
-	p.m_Color = Color;
+
+	if (RandomSize > 0.0f)
+		p.m_Color = vec4(Color.r + frandom() * RandomSize, Color.g + frandom() * RandomSize, Color.b + frandom() * RandomSize, Color.a);
+	else
+		p.m_Color = Color;
+
 	m_pClient->m_pParticles->Add(CParticles::GROUP_MMOPROJ, &p);
 }
 
