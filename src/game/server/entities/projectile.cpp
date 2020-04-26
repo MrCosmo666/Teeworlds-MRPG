@@ -20,6 +20,7 @@ CProjectile::CProjectile(CGameWorld *pGameWorld, int Type, int Owner, vec2 Pos, 
 	m_StartTick = Server()->Tick();
 	m_Explosive = Explosive;
 	m_OwnerMmoProjType = GetOwnerProjID(m_Owner);
+	dbg_msg("test", "%d", m_OwnerMmoProjType);
 
 	GameWorld()->InsertEntity(this);
 }

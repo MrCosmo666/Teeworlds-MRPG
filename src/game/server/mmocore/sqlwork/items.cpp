@@ -27,7 +27,7 @@ void ItemSql::OnInitGlobal()
 		ItemsInfo[ItemID].MaximalEnchant = (int)RES->getInt("ItemEnchantMax");
 		ItemsInfo[ItemID].iItemEnchantPrice = (int)RES->getInt("ItemEnchantPrice");
 		ItemsInfo[ItemID].Dropable = (bool)RES->getBoolean("ItemDropable");
-		ItemsInfo[ItemID].ItemProjID = (int)RES->getBoolean("ItemProjID");
+		ItemsInfo[ItemID].ItemProjID = (int)RES->getInt("ItemProjID");
 	}
 
 	// загрузить аттрибуты

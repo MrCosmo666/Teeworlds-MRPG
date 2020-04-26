@@ -307,8 +307,8 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAME].m_Id);
 	Graphics()->QuadsBegin();
 
-	const int c[] = { SPRITE_MMO_FIRE_MAGITECH_GUN, SPRITE_MMO_FIRE_MAGITECH_SHOTGUN, SPRITE_MMO_FIRE_MAGITECH_GRENADE };
-	RenderTools()->SelectSprite(c[pCurrent->m_Type]);
+	const int citem = SPRITE_MMO_FIRE_MAGITECH_GUN + pCurrent->m_Type;
+	RenderTools()->SelectSprite(citem);
 
 	// добавить эффект проджектайлу
 	vec2 Vel = Pos - PrevPos;
