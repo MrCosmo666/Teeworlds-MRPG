@@ -25,7 +25,8 @@ WorldType = Enum("WORLD", ["STANDARD", "CUTSCENE", "DUNGEON"])
 TalkedStyles = Enum("TALK_STYLE", ["STANDARD", "AGRESSIVE", "HAPPED"])
 MoodType = Enum("MOOD", ["ANGRY", "AGRESSED_TANK", "AGRESSED_OTHER", "NORMAL", "FRIENDLY", "QUESTING", "PLAYER_TANK"])
 MmoPickups = Enum("MMO_PICKUP", ["BOX", "EXPERIENCE", "PLANT", "ORE", "ARROW"])
-MmoProjectiles = Enum("MMO_PROJ", ["BUBBLE"])
+MmoProjectiles = Enum("MMO_PROJ", ["MAGITECH_GUN", "MAGITECH_SHOTGUN", "MAGITECH_GRENADE",
+                                    "HEAVENLY_GUN", "HEAVENLY_SHOTGUN", "HEAVENLY_GRENADE"])
 Equip = Enum("EQUIP", ["WINGS", "HAMMER", "GUN", "SHOTGUN", "GRENADE", "RIFLE", "DISCORD", "MINER"])
 Effects = Enum("EFFECT", ["SPASALON", "TELEPORT"])
 AuthCodes = Enum("AUTH", ["ALL_UNKNOWN", "ALL_MUSTCHAR", "ALL_GOOD", "LOGIN_ALREADY", 

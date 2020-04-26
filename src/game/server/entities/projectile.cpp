@@ -19,6 +19,7 @@ CProjectile::CProjectile(CGameWorld *pGameWorld, int Type, int Owner, vec2 Pos, 
 	m_Weapon = Weapon;
 	m_StartTick = Server()->Tick();
 	m_Explosive = Explosive;
+	m_OwnerMmoProjType = GetOwnerProjID(m_Owner);
 
 	GameWorld()->InsertEntity(this);
 }
@@ -33,32 +34,32 @@ vec2 CProjectile::GetPos(float Time)
 	float Curvature = 0;
 	float Speed = 0;
 
-	switch(m_Type)
-	{
-		case WEAPON_GRENADE:
-			Curvature = GS()->Tuning()->m_GrenadeCurvature;
-			Speed = GS()->Tuning()->m_GrenadeSpeed;
-			break;
+switch (m_Type)
+{
+case WEAPON_GRENADE:
+	Curvature = GS()->Tuning()->m_GrenadeCurvature;
+	Speed = GS()->Tuning()->m_GrenadeSpeed;
+	break;
 
-		case WEAPON_SHOTGUN:
-			Curvature = GS()->Tuning()->m_ShotgunCurvature;
-			Speed = GS()->Tuning()->m_ShotgunSpeed;
-			break;
+case WEAPON_SHOTGUN:
+	Curvature = GS()->Tuning()->m_ShotgunCurvature;
+	Speed = GS()->Tuning()->m_ShotgunSpeed;
+	break;
 
-		case WEAPON_GUN:
-			Curvature = GS()->Tuning()->m_GunCurvature;
-			Speed = GS()->Tuning()->m_GunSpeed;
-			break;
-	}
+case WEAPON_GUN:
+	Curvature = GS()->Tuning()->m_GunCurvature;
+	Speed = GS()->Tuning()->m_GunSpeed;
+	break;
+}
 
-	return CalcPos(m_Pos, m_Direction, Curvature, Speed, Time);
+return CalcPos(m_Pos, m_Direction, Curvature, Speed, Time);
 }
 
 
 void CProjectile::Tick()
 {
-	float Pt = (Server()->Tick()-m_StartTick-1)/(float)Server()->TickSpeed();
-	float Ct = (Server()->Tick()-m_StartTick)/(float)Server()->TickSpeed();
+	float Pt = (Server()->Tick() - m_StartTick - 1) / (float)Server()->TickSpeed();
+	float Ct = (Server()->Tick() - m_StartTick) / (float)Server()->TickSpeed();
 	vec2 PrevPos = GetPos(Pt);
 	vec2 CurPos = GetPos(Ct);
 	if (!GS()->m_apPlayers[m_Owner] || !GS()->m_apPlayers[m_Owner]->GetCharacter())
@@ -71,22 +72,22 @@ void CProjectile::Tick()
 	}
 
 	int Collide = GS()->Collision()->IntersectLine(PrevPos, CurPos, &CurPos, 0);
-	CCharacter *OwnerChar = GS()->GetPlayerChar(m_Owner);
-	CCharacter *TargetChr = GS()->m_World.IntersectCharacter(PrevPos, CurPos, 6.0f, CurPos, OwnerChar);
+	CCharacter* OwnerChar = GS()->GetPlayerChar(m_Owner);
+	CCharacter* TargetChr = GS()->m_World.IntersectCharacter(PrevPos, CurPos, 6.0f, CurPos, OwnerChar);
 
 	m_LifeSpan--;
 
-	if(m_LifeSpan < 0 || GameLayerClipped(CurPos) || Collide || (TargetChr && !TargetChr->m_Core.m_LostData))
+	if (m_LifeSpan < 0 || GameLayerClipped(CurPos) || Collide || (TargetChr && !TargetChr->m_Core.m_LostData))
 	{
 
-		if(m_LifeSpan >= 0 || m_Weapon == WEAPON_GRENADE)
+		if (m_LifeSpan >= 0 || m_Weapon == WEAPON_GRENADE)
 			GS()->CreateSound(CurPos, m_SoundImpact);
 
-		if(m_Explosive)
+		if (m_Explosive)
 			GS()->CreateExplosion(CurPos, m_Owner, m_Weapon, m_Damage);
 
-		else if(TargetChr)
-			TargetChr->TakeDamage(m_Direction * max(0.001f, m_Force), m_Direction*-1, m_Damage, m_Owner, m_Weapon);
+		else if (TargetChr)
+			TargetChr->TakeDamage(m_Direction * max(0.001f, m_Force), m_Direction * -1, m_Damage, m_Owner, m_Weapon);
 
 		GS()->m_World.DestroyEntity(this);
 	}
@@ -99,27 +100,27 @@ void CProjectile::TickPaused()
 
 void CProjectile::Snap(int SnappingClient)
 {
-	float Ct = (Server()->Tick()-m_StartTick)/(float)Server()->TickSpeed();
-	if(NetworkClipped(SnappingClient, GetPos(Ct)))
+	float Ct = (Server()->Tick() - m_StartTick) / (float)Server()->TickSpeed();
+	if (NetworkClipped(SnappingClient, GetPos(Ct)))
 		return;
 
-	// if(GS()->CheckClient(SnappingClient))
-	// {
-	// 	CNetObj_MmoProj *pProj = static_cast<CNetObj_MmoProj *>(Server()->SnapNewItem(NETOBJTYPE_MMOPROJ, GetID(), sizeof(CNetObj_MmoProj)));
-	// 	if(!pProj)
-	// 		return;
+	if(GS()->CheckClient(SnappingClient) && m_OwnerMmoProjType >= 0)
+	{
+	 	CNetObj_MmoProj *pProj = static_cast<CNetObj_MmoProj *>(Server()->SnapNewItem(NETOBJTYPE_MMOPROJ, GetID(), sizeof(CNetObj_MmoProj)));
+	 	if(!pProj)
+	 		return;
 
-	// 	pProj->m_X = (int)m_Pos.x;
-	// 	pProj->m_Y = (int)m_Pos.y;
-	// 	pProj->m_VelX = (int)(m_Direction.x*100.0f);
-	// 	pProj->m_VelY = (int)(m_Direction.y*100.0f);
-	// 	pProj->m_StartTick = m_StartTick;
-	// 	pProj->m_Type = 1;
-	// 	pProj->m_Weapon = m_Type;
-	// 	return;
-	// }
+	 	pProj->m_X = (int)m_Pos.x;
+	 	pProj->m_Y = (int)m_Pos.y;
+	 	pProj->m_VelX = (int)(m_Direction.x*100.0f);
+	 	pProj->m_VelY = (int)(m_Direction.y*100.0f);
+	 	pProj->m_StartTick = m_StartTick;
+	 	pProj->m_Type = m_OwnerMmoProjType;
+	 	pProj->m_Weapon = m_Type;
+	 	return;
+	}
 
-	CNetObj_Projectile *pProj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, GetID(), sizeof(CNetObj_Projectile)));
+	CNetObj_Projectile* pProj = static_cast<CNetObj_Projectile*>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, GetID(), sizeof(CNetObj_Projectile)));
 	if (pProj)
 	{
 		pProj->m_X = (int)m_Pos.x;
@@ -129,4 +130,37 @@ void CProjectile::Snap(int SnappingClient)
 		pProj->m_StartTick = m_StartTick;
 		pProj->m_Type = m_Type;
 	}
+}
+
+int CProjectile::GetOwnerProjID(int ClientID)
+{
+	CPlayer* pPlayer = GS()->m_apPlayers[ClientID];
+	switch (m_Type)
+	{
+	case WEAPON_GUN:
+	{
+		int EquipID = pPlayer->GetItemEquip(EQUIP_GUN);
+		if (EquipID <= 0)
+			return -1;
+
+		return GS()->GetItemInfo(EquipID).ItemProjID;
+	}
+	case WEAPON_SHOTGUN:
+	{
+		int EquipID = pPlayer->GetItemEquip(EQUIP_SHOTGUN);
+		if (EquipID <= 0)
+			return -1;
+
+		return GS()->GetItemInfo(EquipID).ItemProjID;
+	}
+	case WEAPON_GRENADE:
+	{
+		int EquipID = pPlayer->GetItemEquip(EQUIP_GRENADE);
+		if (EquipID <= 0)
+			return -1;
+
+		return GS()->GetItemInfo(EquipID).ItemProjID;
+	}
+	}
+	return -1;
 }

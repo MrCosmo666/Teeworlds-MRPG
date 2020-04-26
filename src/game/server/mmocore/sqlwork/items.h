@@ -23,6 +23,7 @@ class ItemSql : public CMmoComponent
 		int MaximalEnchant;
 		int iItemEnchantPrice;
 		bool Dropable;
+		int ItemProjID;
 
 		const char* GetName(CPlayer* pPlayer = NULL) const;
 		const char* GetDesc(CPlayer* pPlayer = NULL) const;

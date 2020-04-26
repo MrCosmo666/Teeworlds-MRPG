@@ -386,7 +386,7 @@ void CEffects::WingsEffect(vec2 Pos, vec2 Vel, vec4 Color, float RandomSize)
 	m_pClient->m_pParticles->Add(CParticles::GROUP_MMOPROJ, &p);
 }
 
-void CEffects::BubbleEffect(vec2 Pos, vec2 Vel)
+/*void CEffects::BubbleEffect(vec2 Pos, vec2 Vel)
 {
 	if (!m_Add50hz)
 		return;
@@ -402,7 +402,7 @@ void CEffects::BubbleEffect(vec2 Pos, vec2 Vel)
 	p.m_Friction = 0.6f;
 	p.m_Gravity = frandom() * -500.0f;
 	m_pClient->m_pParticles->Add(CParticles::GROUP_MMOPROJ, &p);
-}
+}*/
 
 void CEffects::OnRender()
 {

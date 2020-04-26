@@ -635,7 +635,11 @@ container.sprites.Add(Sprite("mmo_game_plant", set_mmogame, 2, 0, 1, 1))
 container.sprites.Add(Sprite("mmo_game_ores", set_mmogame, 3, 0, 1, 1))
 container.sprites.Add(Sprite("mmo_game_arrow", set_mmogame, 4, 0, 1, 1))
 container.sprites.Add(Sprite("mmo_game_effect", set_mmogame, 4, 0, 1, 1))
-container.sprites.Add(Sprite("mmo_game_bubble_fire", set_mmogame, 1, 3, 1, 1))
+
+# magitech fires
+container.sprites.Add(Sprite("mmo_fire_magitech_gun", set_mmogame, 0, 3, 1, 1))
+container.sprites.Add(Sprite("mmo_fire_magitech_shotgun", set_mmogame, 1, 3, 1, 1))
+container.sprites.Add(Sprite("mmo_fire_magitech_grenade", set_mmogame, 2, 3, 1, 1))
 
   
 #mmotee hammer [8 weapon] on 1 line

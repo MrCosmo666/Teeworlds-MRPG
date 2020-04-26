@@ -288,7 +288,7 @@ void CCharacter::FireWeapon()
 			}
 
 			float PlayerRadius = (float)m_pPlayer->GetAttributeCount(Stats::StHammerPower, true);
-			float Radius = clamp(PlayerRadius / 10.0f, 0.5f, 7.0f);
+			float Radius = clamp(PlayerRadius / 5.0f, 0.7f, 7.0f);
 			
 			bool Hits = false;
 			GS()->CreateSound(m_Pos, SOUND_HAMMER_FIRE);

@@ -5,6 +5,19 @@
 
 class CProjectile : public CEntity
 {
+	vec2 m_Direction;
+	int m_LifeSpan;
+	int m_Owner;
+	int m_Type;
+	int m_Damage;
+	int m_SoundImpact;
+	int m_Weapon;
+	float m_Force;
+	int m_StartTick;
+	bool m_Explosive;
+
+	int m_OwnerMmoProjType;
+
 public:
 	CProjectile(CGameWorld *pGameWorld, int Type, int Owner, vec2 Pos, vec2 Dir, int Span,
 		int Damage, bool Explosive, float Force, int SoundImpact, int Weapon);
@@ -17,16 +30,7 @@ public:
 	virtual void Snap(int SnappingClient);
 
 private:
-	vec2 m_Direction;
-	int m_LifeSpan;
-	int m_Owner;
-	int m_Type;
-	int m_Damage;
-	int m_SoundImpact;
-	int m_Weapon;
-	float m_Force;
-	int m_StartTick;
-	bool m_Explosive;
+	int GetOwnerProjID(int ClientID);
 };
 
 #endif

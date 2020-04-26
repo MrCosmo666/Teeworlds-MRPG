@@ -30,7 +30,7 @@ public:
 	void MmoEffectPotion(vec2 Pos, const char* Potion, bool Added);
 	void DamageMmoInd(vec2 Pos, const char* pText, int Type = -1);
 	void WingsEffect(vec2 Pos, vec2 Vel, vec4 Color, float RandomSize = 0.0f);
-	void BubbleEffect(vec2 Pos, vec2 Vel);
+	//void BubbleEffect(vec2 Pos, vec2 Vel);
 
 	virtual void OnRender();
 	float GetEffectsSpeed();

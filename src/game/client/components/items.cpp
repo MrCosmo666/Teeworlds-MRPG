@@ -307,13 +307,15 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAME].m_Id);
 	Graphics()->QuadsBegin();
 
-	const int c[] = { SPRITE_MMO_GAME_BUBBLE_FIRE };
+	const int c[] = { SPRITE_MMO_FIRE_MAGITECH_GUN, SPRITE_MMO_FIRE_MAGITECH_SHOTGUN, SPRITE_MMO_FIRE_MAGITECH_GRENADE };
 	RenderTools()->SelectSprite(c[pCurrent->m_Type]);
 
 	// добавить эффект проджектайлу
 	vec2 Vel = Pos - PrevPos;
-	if (pCurrent->m_Weapon == WEAPON_GRENADE) 
+	if (pCurrent->m_Type == WEAPON_GRENADE)
 	{
+		m_pClient->m_pEffects->SmokeTrail(Pos, Vel * -1);
+
 		static float s_Time = 0.0f;
 		static float s_LastLocalTime = Client()->LocalTime();
 		if (Client()->State() == IClient::STATE_DEMOPLAYBACK) {
@@ -329,6 +331,8 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 	}
 	else 
 	{
+		m_pClient->m_pEffects->BulletTrail(Pos);
+
 		if (length(Vel) > 0.00001f) 
 			Graphics()->QuadsSetRotation(angle(Vel));
 		else 
@@ -336,7 +340,7 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 	}
 
 
-	IGraphics::CQuadItem QuadItem(Pos.x, Pos.y, 32, 32);
+	IGraphics::CQuadItem QuadItem(Pos.x, Pos.y, 64, 64);
 	Graphics()->QuadsDraw(&QuadItem, 1);
 	Graphics()->QuadsSetRotation(0);
 	Graphics()->QuadsEnd();
