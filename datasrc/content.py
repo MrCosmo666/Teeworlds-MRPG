@@ -754,7 +754,7 @@ anim.wings.frames.Add(AnimKeyframe(0.0, 0, 0, 0.0)) # walk
 anim.wings.frames.Add(AnimKeyframe(0.2, -0.5, 0.4, -0.006))
 anim.wings.frames.Add(AnimKeyframe(0.5, 0.0, 0.0, -0.015))
 anim.wings.frames.Add(AnimKeyframe(0.8, 0.4, -0.5, -0.006))
-anim.wings.frames.Add(AnimKeyframe(0.9, 0.0, 0.0, 0.0))
+anim.wings.frames.Add(AnimKeyframe(1.0, 0.0, 0.0, 0.0))
 container.animations.Add(anim)
 
 weapon = WeaponSpec(container, "hammer")
