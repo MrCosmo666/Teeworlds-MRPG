@@ -312,17 +312,19 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 
 	// добавить эффект проджектайлу
 	vec2 Vel = Pos - PrevPos;
-	if (pCurrent->m_Type == WEAPON_GRENADE)
+	if (pCurrent->m_Weapon == WEAPON_GRENADE)
 	{
 		m_pClient->m_pEffects->SmokeTrail(Pos, Vel * -1);
 
 		static float s_Time = 0.0f;
 		static float s_LastLocalTime = Client()->LocalTime();
-		if (Client()->State() == IClient::STATE_DEMOPLAYBACK) {
+		if (Client()->State() == IClient::STATE_DEMOPLAYBACK) 
+		{
 			const IDemoPlayer::CInfo* pInfo = DemoPlayer()->BaseInfo();
 			if (!pInfo->m_Paused) s_Time += (Client()->LocalTime() - s_LastLocalTime) * pInfo->m_Speed;
 		}
-		else {
+		else 
+		{
 			if (m_pClient->m_Snap.m_pGameData && !(m_pClient->m_Snap.m_pGameData->m_GameStateFlags & GAMESTATEFLAG_PAUSED))
 				s_Time += Client()->LocalTime() - s_LastLocalTime;
 		}
@@ -338,7 +340,6 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 		else 
 			Graphics()->QuadsSetRotation(0);
 	}
-
 
 	IGraphics::CQuadItem QuadItem(Pos.x, Pos.y, 32, 32);
 	Graphics()->QuadsDraw(&QuadItem, 1);

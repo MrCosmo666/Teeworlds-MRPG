@@ -237,14 +237,22 @@ int CPlayerBot::GetBotLevel() const
 
 bool CPlayerBot::GetActiveQuestsID(int SnapClientID)
 {
-	if (SnapClientID >= MAX_PLAYERS || SnapClientID < 0 || m_SpawnPointBot != SPAWNNPC)
+	if (SnapClientID >= MAX_PLAYERS || SnapClientID < 0)
 		return false;
 
-	for (const auto& talk : ContextBots::NpcBot[m_SubBotID].m_Talk)
-	{
-		if (talk.m_GivingQuest <= 0 || GS()->Mmo()->Quest()->GetQuestState(SnapClientID, talk.m_GivingQuest) != QUESTNOACCEPT)
-			continue;
+	// если квестовый бот
+	if (m_SpawnPointBot == SPAWNQUESTNPC)
 		return true;
+
+	// если бот дает квест
+	if (m_SpawnPointBot == SPAWNNPC)
+	{
+		for (const auto& talk : ContextBots::NpcBot[m_SubBotID].m_Talk)
+		{
+			if (talk.m_GivingQuest <= 0 || GS()->Mmo()->Quest()->GetQuestState(SnapClientID, talk.m_GivingQuest) != QUESTNOACCEPT)
+				continue;
+			return true;
+		}
 	}
 	return false;
 }
