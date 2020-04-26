@@ -369,11 +369,11 @@ void CEffects::WingsEffect(vec2 Pos, vec2 Vel, vec4 Color, float RandomSize)
 
 	CParticle p;
 	p.SetDefault();
-	p.m_Spr = SPRITE_MMO_GAME_EXPERIENCE;
+	p.m_Spr = SPRITE_MMO_GAME_EFFECT;
 	p.m_Pos = vec2(Pos.x + 20 - rand() % 40, Pos.y + 20 - rand() % 40);
 	p.m_Vel = Vel + RandomDir() * 200.0f;
 	p.m_LifeSpan = 0.5f + frandom() * 0.5f;
-	p.m_StartSize = 0.1f + frandom() * 10;
+	p.m_StartSize = 15.0f + frandom() * 10;
 	p.m_EndSize = 0;
 	p.m_Friction = 0.8f;
 	p.m_Gravity = frandom() * -500.0f;
