@@ -271,15 +271,6 @@ void CPlayer::TryRespawn()
 	if(!GS()->m_pController->CanSpawn(TEAM_RED, &SpawnPos, vec2(-1, -1)))
 		return;
 
-	// спавн в организации
-	const int CheckGuildSpawn = GS()->Mmo()->Member()->GetGuildHouseID(Acc().GuildID);
-	if(CheckGuildSpawn > 0)
-	{
-		const int WorldID = GS()->Mmo()->Member()->GetHouseWorldID(CheckGuildSpawn);
-		if(GS()->IsClientEqualWorldID(m_ClientID, WorldID))
-			SpawnPos = GS()->Mmo()->Member()->GetPositionHouse(Acc().GuildID);
-	}
-
 	// спавн в доме
 	const int CheckHouseSpawn = GS()->Mmo()->House()->PlayerHouseID(this);
 	if(CheckHouseSpawn > 0)

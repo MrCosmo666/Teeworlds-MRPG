@@ -167,7 +167,7 @@ bool GuildJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int Vo
 			return true;
 
 		const int WorldID = HouseGuild[HouseID].m_WorldID;
-		if (GS()->IsClientEqualWorldID(ClientID, WorldID))
+		if (!GS()->IsClientEqualWorldID(ClientID, WorldID))
 		{
 			vec2 Position = GetPositionHouse(GuildID);
 			pPlayer->Acc().TeleportX = Position.x;
@@ -1280,8 +1280,11 @@ int GuildJob::GetPosHouseID(vec2 Pos) const
 {
 	for(const auto& m: HouseGuild)
 	{
+		if (m.second.m_WorldID != GS()->GetWorldID())
+			continue;
+
 		vec2 PositionHouse = vec2(m.second.m_PosX, m.second.m_PosY);
-		if(distance(Pos, PositionHouse) < 400)
+		if(distance(Pos, PositionHouse) < 1000)
 			return m.first;
 	}
 	return -1;

@@ -19,11 +19,9 @@ void QuestBase::OnInitGlobal()
 		// получить все текстовые данные
 		int QUID = RES->getInt("ID");
 		str_copy(QuestsData[ QUID ].Name, RES->getString("Name").c_str(), sizeof(QuestsData[ QUID ].Name));
-		str_copy(QuestsData[ QUID ].Location, RES->getString("Location").c_str(), sizeof(QuestsData[ QUID ].Location));
 		str_copy(QuestsData[ QUID ].StoryLine, RES->getString("StoryLine").c_str(), sizeof(QuestsData[ QUID ].StoryLine));
 
 		/// установить целочисленные данные
-		QuestsData[ QUID ].Level = (int)RES->getInt("Level");
 		QuestsData[ QUID ].Money = (int)RES->getInt("Money");
 		QuestsData[ QUID ].Exp = (int)RES->getInt("Exp");
 
@@ -42,6 +40,7 @@ void QuestBase::OnInitGlobal()
 			ProgressSize++;
 		}
 		QuestsData[ QUID ].ProgressSize = ProgressSize;
+		dbg_msg("test", "TWWWWWWWWWWWWWWWWWWWWWWWW %d", ProgressSize);
 	}
 }
 
@@ -203,6 +202,21 @@ bool QuestBase::IsActiveQuestBot(int QuestID, int Progress)
 	return false;
 }
 
+// получить прогресс моба
+int QuestBase::GetBotQuestProgress(int QuestID, int MobID)
+{
+	int Progress = 1;
+	for (const auto& qbots : ContextBots::QuestBot)
+	{
+		if (qbots.second.QuestID != QuestID)
+			continue;
+		if (qbots.first == MobID)
+			break;
+		Progress++;
+	}
+	return Progress;
+}
+
 /* #########################################################################
 	FUNCTIONS QUESTING 
 ######################################################################### */
@@ -216,7 +230,6 @@ void QuestBase::ShowQuestID(CPlayer *pPlayer, int QuestID)
 	int LineQuest = GetStoryCount(activeQuestData.StoryLine, QuestID)+1;
 	GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "[{INT}/{INT} {STR}] {STR}",
 		&LineQuest, &CountQuest, activeQuestData.StoryLine, activeQuestData.Name);	
-	GS()->AVM(ClientID, "null", NOPE, HideID, "Location: {STR}", activeQuestData.Location);
 	GS()->AVM(ClientID, "null", NOPE, HideID, "You will receive a reward");
 	GS()->AVM(ClientID, "null", NOPE, HideID, "Gold: {INT} Exp: {INT}", &activeQuestData.Money, &activeQuestData.Exp);
 
@@ -260,8 +273,8 @@ void QuestBase::FinishQuest(CPlayer *pPlayer, int QuestID)
 	pPlayer->AddMoney(finishQuestData.Money);
 	pPlayer->AddExp(finishQuestData.Exp);
 
-	GS()->Chat(-1, "{STR} completed quest [{STR} {STR}]", GS()->Server()->ClientName(ClientID), finishQuestData.StoryLine, finishQuestData.Name);
-	GS()->ChatDiscord(false, DC_PLAYER_INFO, GS()->Server()->ClientName(ClientID), "Completed quest [{STR} {STR}]", finishQuestData.StoryLine, finishQuestData.Name);
+	GS()->Chat(-1, "{STR} completed ({STR} {STR})", GS()->Server()->ClientName(ClientID), finishQuestData.StoryLine, finishQuestData.Name);
+	GS()->ChatDiscord(false, DC_PLAYER_INFO, GS()->Server()->ClientName(ClientID), "Completed ({STR} {STR})", finishQuestData.StoryLine, finishQuestData.Name);
 	Job()->SaveAccount(pPlayer, SAVESTATS);
 
 	if (!CheckNewStories(pPlayer, QuestID))
@@ -332,7 +345,7 @@ void QuestBase::AddProgress(CPlayer *pPlayer, int QuestID)
 		return;
 
 	StructQuest &talkQuestPlayer = Quests[ClientID][QuestID];
-	talkQuestPlayer.Progress += 1;
+	talkQuestPlayer.Progress++;
 	talkQuestPlayer.MobProgress[0] = 0;
 	talkQuestPlayer.MobProgress[1] = 0;
 	bool FinishedProgress = (talkQuestPlayer.Progress >= QuestsData[QuestID].ProgressSize);
@@ -386,7 +399,7 @@ bool QuestBase::InteractiveQuestNPC(CPlayer* pPlayer, ContextBots::QuestBotInfo&
 	const int ClientID = pPlayer->GetCID();
 	const int QuestID = BotData.QuestID;
 
-	if (!IsCollectItemComplete(pPlayer, BotData, false) || !IsDefeatComplete(ClientID, QuestID) || pPlayer->Acc().Level < QuestsData[QuestID].Level)
+	if (!IsCollectItemComplete(pPlayer, BotData, false) || !IsDefeatComplete(ClientID, QuestID))
 	{
 		GS()->Chat(ClientID, "Not all criteria to complete!");
 		return false;
@@ -694,14 +707,6 @@ void QuestBase::ShowQuestRequired(CPlayer *pPlayer, ContextBots::QuestBotInfo &B
 
 		char aBuf[64];
 		str_format(aBuf, sizeof(aBuf), "\nChance that item he'll like [%0.2f%%]", Chance);
-		Buffer.append_at(Buffer.length(), aBuf);
-	}
-
-	// маленький уровень
-	if(pPlayer->Acc().Level < QuestsData[QuestID].Level)
-	{
-		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "\n\n# You are too weak, for continuation\n# Required level: %dLVL", QuestsData[QuestID].Level);
 		Buffer.append_at(Buffer.length(), aBuf);
 	}
 

@@ -169,20 +169,22 @@ int HouseJob::GetWorldID(int HouseID) const
 {
 	if(Home.find(HouseID) != Home.end())
 		return Home.at(HouseID).m_WorldID;
-	return 0;
+	return -1;
 }
 // Получить дом по позиции
 int HouseJob::GetHouse(vec2 Pos, bool Plants)
 {
-	int HouseID = -1, Distance = (Plants ? 300 : 100);
-	for (auto ihome = Home.begin(); ihome != Home.end(); ihome++)
+	float Distance = (Plants ? 300.0f : 100.0f);
+	for(const auto& ihome : Home)
 	{
-		vec2 PosHome = (Plants ? vec2(Home.at(ihome->first).m_PlantPosX, Home.at(ihome->first).m_PlantPosY) 
-							   : vec2(Home.at(ihome->first).m_PosX, Home.at(ihome->first).m_PosY));
+		if (ihome.second.m_WorldID != GS()->GetWorldID())
+			continue;
+
+		vec2 PosHome = (Plants ? vec2(ihome.second.m_PlantPosX, ihome.second.m_PlantPosY) : vec2(ihome.second.m_PosX, ihome.second.m_PosY));
 		if(distance(PosHome, Pos) < Distance)
-			HouseID =  ihome->first;
+			return ihome.first;
 	}
-	return HouseID;
+	return -1;
 }
 // Узнать стоимость дома по айди дома
 int HouseJob::GetHousePrice(int HouseID) const	
@@ -551,17 +553,15 @@ bool HouseJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 		int HouseID = PlayerHouseID(pPlayer);
 		int HouseWorldID = GetWorldID(HouseID);
 		vec2 Position = GetPositionHouse(HouseID);
-		if(HouseWorldID != GS()->Server()->GetWorldID(ClientID))
+		if(!GS()->IsClientEqualWorldID(ClientID, HouseWorldID))
 		{
 			pPlayer->Acc().TeleportX = Position.x;
 			pPlayer->Acc().TeleportY = Position.y;
 			GS()->Server()->ChangeWorld(ClientID, HouseWorldID);
 			return true;
 		}
-		else 
-		{
-			pPlayer->GetCharacter()->ChangePosition(Position);
-		}
+
+		pPlayer->GetCharacter()->ChangePosition(Position);
 		return true;
 	}
 

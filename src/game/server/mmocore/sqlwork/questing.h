@@ -13,7 +13,6 @@ class QuestBase : public CMmoComponent
 		char Location[64];
 		char StoryLine[32];
 
-		int Level;
 		int Money;
 		int Exp;
 		int ProgressSize;
@@ -65,6 +64,7 @@ public:
 	const char *GetStoryName(int QuestID) const;
 	ContextBots::QuestBotInfo &GetQuestBot(int QuestID, int Progress);
 	bool IsActiveQuestBot(int QuestID, int Progress);
+	int GetBotQuestProgress(int QuestID, int QuestMobID);
 
 private:
 	/* #########################################################################

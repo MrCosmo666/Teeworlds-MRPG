@@ -1081,6 +1081,19 @@ void CCharacter::HandleAuthedPlayer()
 			m_pPlayer->SetStandart(m_Health, m_Mana);
 			m_pPlayer->ShowInformationStats();
 		}
+
+		// сменять мир игрокам что находятся в гильдейских домах но для них мире что выше их по уровню
+		if (m_pPlayer->Acc().Level < GS()->Mmo()->WorldSwap()->GetWorldLevel())
+		{
+			int HouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
+			if (HouseID <= 0)
+			{
+				m_pPlayer->Acc().TeleportX = -1;
+				m_pPlayer->Acc().TeleportY = -1;
+				GS()->Server()->ChangeWorld(m_pPlayer->GetCID(), LOCALWORLD);
+				return;
+			}
+		}
 	}
 }
 

@@ -96,6 +96,12 @@ void MailBoxJob::SendInbox(int AuthID, const char* Name, const char* Desc, int I
 
 	// проверяем игрока онлайн
 	GS()->ChatAccountID(AuthID, "You have a new [{STR}] mail!", cName.cstr());
+	if (ItemID <= 0)
+	{
+		SJK.ID("tw_inbox", "(MailName, MailDesc, OwnerID) VALUES ('%s', '%s', '%d');", cName.cstr(), cDesc.cstr(), AuthID);
+		return;
+	}
+
 	SJK.ID("tw_inbox", "(MailName, MailDesc, ItemID, Count, Enchant, OwnerID) VALUES ('%s', '%s', '%d', '%d', '%d', '%d');",
 		 cName.cstr(), cDesc.cstr(), ItemID, Count, Enchant, AuthID);
 }

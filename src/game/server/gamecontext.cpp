@@ -1583,15 +1583,22 @@ void CGS::ConParseSkin(IConsole::IResult *pResult, void *pUserData)
 // Выдать предмет игроку
 void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 {
-	CGS *pSelf = (CGS *)pUserData;
-	int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS-1), ItemID = pResult->GetInteger(1), Count = pResult->GetInteger(2);
-	int Enchant = pResult->GetInteger(3), Mail = pResult->GetInteger(4);
-	
+	int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS - 1);
+	int ItemID = pResult->GetInteger(1);
+	int Count = pResult->GetInteger(2);
+	int Enchant = pResult->GetInteger(3);
+	int Mail = pResult->GetInteger(4);
+
+	CGS *pSelf = (CGS *)pUserData;	
 	CPlayer *pPlayer = pSelf->GetPlayer(ClientID, true);
 	if(pPlayer)
 	{
-		if(Mail == 0) pPlayer->GetItem(ItemID).Add(Count, 0, Enchant);
-		else pSelf->SendInbox(ClientID, "The sender heavens", "Sent from console", ItemID, Count, Enchant);
+		if (Mail == 0)
+		{
+			pPlayer->GetItem(ItemID).Add(Count, 0, Enchant);
+			return;
+		}
+		pSelf->SendInbox(ClientID, "The sender heavens", "Sent from console", ItemID, Count, Enchant);
 	}
 }
 
@@ -2388,7 +2395,7 @@ bool CGS::TakeItemCharacter(int ClientID)
 void CGS::SendInbox(int ClientID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
 {
 	CPlayer* pPlayer = GetPlayer(ClientID, true);
-	if(pPlayer)
+	if(!pPlayer) 
 		return;
 
 	Mmo()->Inbox()->SendInbox(pPlayer->Acc().AuthID, Name, Desc, ItemID, Count, Enchant);
@@ -2455,6 +2462,7 @@ bool CGS::IsClientEqualWorldID(int ClientID, int WorldID) const
 {
 	if (WorldID <= -1)
 		return (bool)(Server()->GetWorldID(ClientID) == m_WorldID);
+
 	return (bool)(Server()->GetWorldID(ClientID) == WorldID);
 }
 

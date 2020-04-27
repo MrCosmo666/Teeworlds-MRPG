@@ -28,23 +28,24 @@ void WorldSwapJob::OnInitGlobal()
 		WorldSwap[ID].Level = RES->getInt("Level");
 		WorldSwap[ID].PositionX = RES->getInt("PositionX");
 		WorldSwap[ID].PositionY = RES->getInt("PositionY");
-		WorldSwap[ID].WorldID = RES->getInt("WorldID");
-		WorldSwap[ID].SwapID = RES->getInt("SwapID");
+		WorldSwap[ID].WorldID = RES->getInt("WorldID");		
+		WorldSwap[ID].TwoPositionX = RES->getInt("TwoPositionX");
+		WorldSwap[ID].TwoPositionY = RES->getInt("TwoPositionY");
+		WorldSwap[ID].TwoWorldID = RES->getInt("TwoWorldID");
 	}
 
-	for(const auto& sw1 : WorldSwap)
+	for(const auto& swapw : WorldSwap)
 	{
-		for(const auto& sw2 : WorldSwap)
-		{
-			if(sw1.second.WorldID == sw2.second.WorldID || sw1.second.SwapID != sw2.second.SwapID)
-				continue;
-		
-			StructPositionLogic pPositionLogic;
-			pPositionLogic.BaseWorldID = sw1.second.WorldID;
-			pPositionLogic.FindWorldID = sw2.second.WorldID;
-			pPositionLogic.Position = vec2(sw2.second.PositionX, sw2.second.PositionY);
-			WorldPositionLogic.push_back(pPositionLogic);
-		}
+		StructPositionLogic pPositionLogic;
+		pPositionLogic.BaseWorldID = swapw.second.WorldID;
+		pPositionLogic.FindWorldID = swapw.second.TwoWorldID;
+		pPositionLogic.Position = vec2(swapw.second.TwoPositionX, swapw.second.TwoPositionY);
+		WorldPositionLogic.push_back(pPositionLogic);
+			
+		pPositionLogic.BaseWorldID = swapw.second.TwoWorldID;
+		pPositionLogic.FindWorldID = swapw.second.WorldID;
+		pPositionLogic.Position = vec2(swapw.second.PositionX, swapw.second.PositionY);
+		WorldPositionLogic.push_back(pPositionLogic);
 	}
 	UpdateWorldsList();
 	Job()->ShowLoadingProgress("Worlds Swap", WorldSwap.size());
@@ -65,7 +66,7 @@ bool WorldSwapJob::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 		return true;	
 	}
 
-
+	
 	if(pChr->GetHelper()->BoolIndex(TILE_WORLD_SWAP))
 	{
 		if(ChangingWorld(pPlayer->GetCID(), pChr->m_Core.m_Pos))
@@ -74,16 +75,41 @@ bool WorldSwapJob::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 	return false;
 }
 
-/* #########################################################################
-	FUNCTION TELEPORT CLASS
-######################################################################### */
 int WorldSwapJob::GetSwapID(vec2 Pos)
 {
 	for(const auto& sw : WorldSwap)
 	{
-		vec2 SwapPosition = vec2(sw.second.PositionX, sw.second.PositionY);
-		if(distance(SwapPosition, Pos) < 400 && sw.second.WorldID == GS()->GetWorldID())
-			return sw.second.SwapID;
+		if (sw.second.WorldID == GS()->GetWorldID())
+		{
+			vec2 SwapPosition = vec2(sw.second.PositionX, sw.second.PositionY);
+			if (distance(SwapPosition, Pos) < 400)
+				return sw.first;
+			continue;
+		}
+		
+		if (sw.second.TwoWorldID == GS()->GetWorldID())
+		{
+			vec2 SwapPosition = vec2(sw.second.TwoPositionX, sw.second.TwoPositionY);
+			if (distance(SwapPosition, Pos) < 400)
+				return sw.first;
+			continue;
+		}
+	}
+	return -1;
+}
+
+int WorldSwapJob::GetWorldLevel() const
+{
+	if (GS()->IsDungeon())
+	{
+		int DungeonID = GS()->DungeonID();
+		return DungeonJob::Dungeon[DungeonID].Level;
+	}
+
+	for (const auto& sw : WorldSwap)
+	{
+		if (sw.second.WorldID == GS()->GetWorldID() || sw.second.TwoWorldID == GS()->GetWorldID())
+			return sw.second.Level;
 	}
 	return -1;
 }
@@ -93,21 +119,26 @@ bool WorldSwapJob::ChangingWorld(int ClientID, vec2 Pos)
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
 	if(!pPlayer) return true;
 
-	for(const auto& sw : WorldSwap)
+	int SwapID = GetSwapID(Pos);
+	if (WorldSwap.find(SwapID) != WorldSwap.end())
 	{
-		int SwapID = GetSwapID(Pos);
-		if(sw.second.WorldID == GS()->GetWorldID() || SwapID != sw.second.SwapID)
-			continue;
-
-		if(pPlayer->Acc().Level < sw.second.Level)
+		if (pPlayer->Acc().Level < WorldSwap[SwapID].Level)
 		{
-			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Required {INT} level!", &sw.second.Level);
+			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Required {INT} level!", &WorldSwap[SwapID].Level);
 			return false;
 		}
 
-		pPlayer->Acc().TeleportX = sw.second.PositionX;
-		pPlayer->Acc().TeleportY = sw.second.PositionY;
-		GS()->Server()->ChangeWorld(ClientID, sw.second.WorldID);
+		if (WorldSwap[SwapID].WorldID == GS()->GetWorldID())
+		{
+			pPlayer->Acc().TeleportX = WorldSwap[SwapID].TwoPositionX;
+			pPlayer->Acc().TeleportY = WorldSwap[SwapID].TwoPositionY;
+			GS()->Server()->ChangeWorld(ClientID, WorldSwap[SwapID].TwoWorldID);
+			return true;
+		}
+
+		pPlayer->Acc().TeleportX = WorldSwap[SwapID].PositionX;
+		pPlayer->Acc().TeleportY = WorldSwap[SwapID].PositionY;
+		GS()->Server()->ChangeWorld(ClientID, WorldSwap[SwapID].WorldID);
 		return true;
 	}
 	return false;

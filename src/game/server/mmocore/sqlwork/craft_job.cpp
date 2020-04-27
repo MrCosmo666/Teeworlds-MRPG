@@ -11,32 +11,27 @@ std::map < int , CraftJob::CraftStruct > CraftJob::Craft;
 void CraftJob::OnInitGlobal() 
 { 
 	// получаем список крафтов
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_craftitem", "ORDER BY 'CraftLevel' DESC"));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_craftitem", "ORDER BY 'Level' DESC"));
 	while(RES->next())
 	{
-		// получаем текстовую и форматируем ее
-		int ID = RES->getInt("ID");
-
-		// получаем предметы
 		char aBuf[32];
+		int ID = RES->getInt("ID");
 		for(int i = 0; i < 3; i ++)
 		{
-			str_format(aBuf, sizeof(aBuf), "Craft_Item_%d", i);
+			str_format(aBuf, sizeof(aBuf), "Item_%d", i);
 			Craft[ID].Need[i] = RES->getInt(aBuf);
 		}
-
-		// получим количество
-		char StringNeedCount[32];
-		str_copy(StringNeedCount, RES->getString("Craft_Count_Need").c_str(), sizeof(StringNeedCount));
-		sscanf(StringNeedCount, "%d %d %d", &Craft[ID].Count[0], &Craft[ID].Count[1], &Craft[ID].Count[2]);
+		str_copy(aBuf, RES->getString("CountNeed").c_str(), sizeof(aBuf));
+		if (!sscanf(aBuf, "%d %d %d", &Craft[ID].Count[0], &Craft[ID].Count[1], &Craft[ID].Count[2]))
+			dbg_msg("Error", "Error on scanf in Crafting");
 
 		// устанавливаем обычные переменные
-		Craft[ID].ItemID = RES->getInt("CraftIID");
-		Craft[ID].ItemCount = RES->getInt("CraftICount");
-		Craft[ID].Money = RES->getInt("CraftMoney");
-		Craft[ID].Level = RES->getInt("CraftLevel");
+		Craft[ID].ItemID = RES->getInt("GetItemID");
+		Craft[ID].ItemCount = RES->getInt("GetCount");
+		Craft[ID].Money = RES->getInt("Price");
+		Craft[ID].Level = RES->getInt("Level");
 		Craft[ID].Rare = RES->getBoolean("Rare");
-		Craft[ID].Tab = RES->getInt("CraftTab");	
+		Craft[ID].Tab = RES->getInt("Tab");	
 	}
 	Job()->ShowLoadingProgress("Crafts", Craft.size());	
 	return;	

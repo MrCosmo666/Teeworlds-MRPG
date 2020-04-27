@@ -1816,47 +1816,6 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		return;
 	}
 
-	if (message.startsWith("!mjoinreward"))
-	{
-		if(g_Config.m_SvDiscordRewardItemID <= 0)
-		{
-			sendEmbedMessage(message.channelID, DC_SERVER_WARNING, "Sorry ;c",  "No active rewards", false);
-			return;
-		}
-
-		// информация для поиска
-		SleepyDiscord::Snowflake<SleepyDiscord::User> userAuth = getUser(message.author).cast();
-		std::string UserID = userAuth;
-		sqlstr::CSqlString<64> cDiscordID = sqlstr::CSqlString<64>(UserID.c_str());
-		sqlstr::CSqlString<64> cNick;
-
-		// ищим пользователя
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, Nick", "tw_dataplayers", "WHERE DiscordID = '%s'", cDiscordID.cstr()));
-		if(!RES->next())
-		{
-			sendEmbedMessage(message.channelID, DC_SERVER_WARNING, "Warning",  "You need to connect the discord account to your game account !mconnect", false);
-			return;
-		}
-
-		int AuthID = RES->getInt("ID");
-		cNick = sqlstr::CSqlString<64>(RES->getString("Nick").c_str());
-		boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_reedem", "WHERE Nick = '%s' AND ItemID = '%d'", cNick.cstr(), g_Config.m_SvDiscordRewardItemID));
-		if(RES2->next())
-		{
-			sendEmbedMessage(message.channelID, DC_SERVER_WARNING, "Warning", "```You already got this Reward Bonus!```", false);
-			return;
-		}
-
-		SJK.ID("tw_reedem", "(ItemID, Nick) VALUES ('%d', '%s')", g_Config.m_SvDiscordRewardItemID, cNick.cstr());	
-		SJK.ID("tw_inbox", "(ItemID, Count, Enchant, MailName, MailDesc, OwnerID) VALUES ('%d', '%d', '0', 'Discord Reward', 'You got discord reward', '%d')", 
-			g_Config.m_SvDiscordRewardItemID, g_Config.m_SvDiscordRewardCount, AuthID);	
-
-		// пишем что предмет выдан
-		sendEmbedMessage(message.channelID, DC_DISCORD_BOT, "You succesful got this Reward",  
-			"```Information:\\n- Discord Reward sent you in game attachment item. Check 'Inbox/Mail'```", false);
-		return;
-	}
-
 	// ВРЕМЯ СЕРВЕРА
 	if (message.startsWith("!mtime"))
 	{

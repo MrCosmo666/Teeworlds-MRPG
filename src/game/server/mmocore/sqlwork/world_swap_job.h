@@ -13,7 +13,9 @@ class WorldSwapJob : public CMmoComponent
 		int PositionX;
 		int PositionY;
 		int WorldID;
-		int SwapID;
+		int TwoPositionX;
+		int TwoPositionY;
+		int TwoWorldID;
 	};
 	typedef std::map < int , StructSwapWorld > WorldSwapType;
 	static WorldSwapType WorldSwap;
@@ -35,10 +37,11 @@ public:
 
 	vec2 GetPositionQuestBot(int ClientID, int QuestID);
 	int GetWorldType() const;
+	int GetWorldLevel() const;
+	bool ChangingWorld(int ClientID, vec2 Pos);
 
 private:
 	int GetSwapID(vec2 Pos);
-	bool ChangingWorld(int ClientID, vec2 Pos);
 };
 
 #endif

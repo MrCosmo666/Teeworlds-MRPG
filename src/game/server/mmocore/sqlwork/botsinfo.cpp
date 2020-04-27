@@ -88,7 +88,6 @@ void ContextBots::LoadQuestBots()
 		QuestBot[MotID].PositionX = RES->getInt("pos_x");
 		QuestBot[MotID].PositionY = RES->getInt("pos_y")+1;
 		QuestBot[MotID].QuestID = RES->getInt("QuestID");
-		QuestBot[MotID].Progress = RES->getInt("Progress");
 		str_copy(QuestBot[MotID].Name, DataBot[QuestBot[MotID].BotID].NameBot, sizeof(QuestBot[MotID].Name));
 
 		QuestBot[MotID].Interactive[0] = RES->getInt("it_need_0");
@@ -119,6 +118,9 @@ void ContextBots::LoadQuestBots()
 			QuestBot[MotID].m_Talk.push_back(LoadTalk);
 		}
 	}
+
+	for (auto& qupdate : QuestBot)
+		qupdate.second.Progress = Job()->Quest()->GetBotQuestProgress(qupdate.second.QuestID, qupdate.first);
 }
 
 // Загрузка обычных NPC
@@ -200,6 +202,7 @@ void ContextBots::LoadMobsBots()
 		sscanf(RES->getString("it_random").c_str(), "|%d|%d|%d|%d|%d|%d|", 
 			&MobBot[MotID].RandomItem[0], &MobBot[MotID].RandomItem[1], &MobBot[MotID].RandomItem[2],
 			&MobBot[MotID].RandomItem[3], &MobBot[MotID].RandomItem[4], &MobBot[MotID].RandomItem[5]);
+
 
 		// пропуск если не создаем ботов
 		if(!CreateBot) continue;
