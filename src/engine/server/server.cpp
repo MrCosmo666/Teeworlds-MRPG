@@ -398,12 +398,12 @@ void CServer::ChangeWorld(int ClientID, int MapID)
 	SendMap(ClientID);
 }
 
-void CServer::QuestBotRecheck(int WorldID, int QuestID, int Step)
+void CServer::QuestBotUpdateOnWorld(int WorldID, int QuestID, int Step)
 {
 	if (WorldID < 0 || WorldID >= COUNT_WORLD)
 		return;
 
-	GameServer(WorldID)->ClearQuestsBot(QuestID, Step);
+	GameServer(WorldID)->UpdateQuestsBot(QuestID, Step);
 }
 
 int CServer::GetWorldID(int ClientID)

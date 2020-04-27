@@ -99,7 +99,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 		m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
 		m_pPlayer->SetStandart(m_Health, m_Mana);
 		m_pPlayer->ShowInformationStats();
-		CreateQuestsSteps();
+		GS()->Mmo()->Quest()->UpdateArrowStep(m_pPlayer->GetCID());
 	}
 	GS()->VResetVotes(m_pPlayer->GetCID(), m_pPlayer->m_OpenVoteMenu);
 	GS()->m_pController->OnCharacterSpawn(this);
@@ -288,7 +288,7 @@ void CCharacter::FireWeapon()
 			}
 
 			float PlayerRadius = (float)m_pPlayer->GetAttributeCount(Stats::StHammerPower, true);
-			float Radius = clamp(PlayerRadius / 5.0f, 0.7f, 7.0f);
+			float Radius = clamp(PlayerRadius / 5.0f, 1.2f, 7.0f);
 			
 			bool Hits = false;
 			GS()->CreateSound(m_Pos, SOUND_HAMMER_FIRE);
@@ -437,33 +437,15 @@ void CCharacter::HandleWeapons()
 	return;
 }
 
-void CCharacter::CreateQuestsSteps()
+void CCharacter::CreateQuestsStep(int QuestID)
 {
 	int ClientID = m_pPlayer->GetCID();
-	for(auto quests = QuestBase::Quests[ClientID].begin(); quests != QuestBase::Quests[ClientID].end(); quests++)
-	{
-		if(quests->second.Type != QUESTACCEPT) 
-			continue;
+	vec2 Pos = GS()->Mmo()->WorldSwap()->GetPositionQuestBot(ClientID, QuestID);
+	if (QuestBase::Quests[ClientID].find(QuestID) == QuestBase::Quests[ClientID].end() || (Pos.x == 0.0f && Pos.y == 0.0f))
+		return;
 
-		bool DontStep = false;
-		vec2 Pos = GS()->Mmo()->WorldSwap()->GetPositionQuestBot(ClientID, quests->first);
-		for(CQuestAI *pQ = (CQuestAI*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_FINDQUEST); pQ; pQ = (CQuestAI *)pQ->TypeNext())
-			if(pQ->GetClientID() == m_pPlayer->GetCID() && pQ->GetQuestID() == quests->first) pQ->Finish();
-
-		if(!DontStep) new CQuestAI(GameWorld(), m_Core.m_Pos, quests->first, ClientID, Pos);
-	}
-}
-
-void CCharacter::FinishQuestStep(int QuestID)
-{
-	for(CQuestAI *pQ = (CQuestAI*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_FINDQUEST); pQ; pQ = (CQuestAI *)pQ->TypeNext())
-	{
-		if(pQ->GetClientID() == m_pPlayer->GetCID() && pQ->GetQuestID() == QuestID)
-		{
-			pQ->Finish();
-			return;
-		}
-	}
+	int Progress = QuestBase::Quests[ClientID][QuestID].Progress;
+	new CQuestAI(GameWorld(), m_Core.m_Pos, ClientID, QuestID, Progress, Pos);
 }
 
 bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)

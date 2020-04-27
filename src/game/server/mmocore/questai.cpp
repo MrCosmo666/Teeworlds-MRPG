@@ -7,11 +7,12 @@
 #include <game/server/gamecontext.h>
 #include "questai.h"
 
-CQuestAI::CQuestAI(CGameWorld *pGameWorld, vec2 Pos, int QuestID, int ClientID, vec2 TargetPos)
+CQuestAI::CQuestAI(CGameWorld *pGameWorld, vec2 Pos, int ClientID, int QuestID, int QuestProgress, vec2 TargetPos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_FINDQUEST, Pos)
 {
 	m_Pos = Pos;
 	m_QuestID = QuestID;
+	m_QuestProgress = QuestProgress;
 	m_ClientID = ClientID;
 	m_TargetPos = TargetPos;
 	GameWorld()->InsertEntity(this);
@@ -19,7 +20,8 @@ CQuestAI::CQuestAI(CGameWorld *pGameWorld, vec2 Pos, int QuestID, int ClientID, 
 
 void CQuestAI::Tick() 
 {
-	if (!GS()->m_apPlayers[m_ClientID] || !GS()->m_apPlayers[m_ClientID]->GetCharacter()) 
+	CPlayer* pPlayer = GS()->GetPlayer(m_ClientID, true, true);
+	if (!pPlayer || QuestBase::Quests[m_ClientID][m_QuestID].Progress != m_QuestProgress || QuestBase::Quests[m_ClientID][m_QuestID].State != QuestState::QUEST_ACCEPT)
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;

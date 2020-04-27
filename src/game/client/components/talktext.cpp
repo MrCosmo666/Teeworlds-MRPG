@@ -90,18 +90,10 @@ void CTalkText::OnRender()
 
 	Graphics()->QuadsEnd();
 
-	// ------------------------ TEXT --------------------------
-	// --------------------------------------------------------
-	CTextCursor Cursor;
-	int LocalClientID = m_pClient->m_LocalClientID; float FontSize = 22.0f;
-	TextRender()->SetCursor(&Cursor, BackgroundOther.x, BackgroundOther.y, FontSize, TEXTFLAG_RENDER);
-	Cursor.m_LineWidth = BackgroundOther.w;
-	Cursor.m_MaxLines = ceil(BackgroundOther.h / FontSize);
-	TextRender()->TextEx(&Cursor, m_TalkText, -1);
-
 	// -------------------- PLAYER SKINS ----------------------
 	// --------------------------------------------------------
 	int TalkClientID = m_TalkClientID;
+	int LocalClientID = m_pClient->m_LocalClientID;
 	if(m_pClient->m_aClients[LocalClientID].m_Active ||
 		(TalkClientID >= 0 && TalkClientID < MAX_CLIENTS && m_pClient->m_aClients[TalkClientID].m_Active))
 	{
@@ -125,9 +117,20 @@ void CTalkText::OnRender()
 		TextRender()->Text(0x0, Width / 3.5f, Height / 1.97f, 32.0f, m_pClient->m_aClients[LocalClientID].m_aName, -1.0f);
 	}
 
+	// ------------------------ TEXT --------------------------
+	// --------------------------------------------------------
+	CTextCursor Cursor; float FontSize = 22.0f;
+	TextRender()->SetCursor(&Cursor, BackgroundOther.x, BackgroundOther.y, FontSize, TEXTFLAG_RENDER);
+	Cursor.m_LineWidth = BackgroundOther.w;
+	Cursor.m_MaxLines = ceil(BackgroundOther.h / FontSize);
+	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 0.9f);
+	TextRender()->TextEx(&Cursor, m_TalkText, -1);
+
+
 	// ------------------ INTERACTIVE TEXT -----------------
 	// -----------------------------------------------------
 	TextRender()->Text(0x0, Width / 1.8f, Height / 1.50f, 25.0f, Localize("Press (TAB) for continue!"), -1.0f);
+	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 }
 
 // пакеты между сервером клиентом

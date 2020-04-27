@@ -265,10 +265,7 @@ void CCmd::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		int sitemid = 0;
 		if ((sscanf(Msg->m_pMessage, "/useitem %d", &sitemid)) != 1)
 			return GS->ChatFollow(ClientID, "Please use: /useitem <itemid>");
-
-		int sizeitems = ItemSql::ItemsInfo.size();
-		int itemid = clamp(sitemid, 0, sizeitems);
-		UseItems(GS, ClientID, itemid, 1);
+		UseItems(GS, ClientID, sitemid, 1);
 		return;
 	}
 

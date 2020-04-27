@@ -354,15 +354,24 @@ void CItems::RenderMmoPickups(const CNetObj_MmoPickup* pPrev, const CNetObj_MmoP
 	vec2 Curr = vec2(pCurrent->m_X, pCurrent->m_Y);
 	vec2 Pos = mix(Prev, Curr, Client()->IntraGameTick());
 	float Angle = mix((float)pPrev->m_Angle, (float)pCurrent->m_Angle, Client()->IntraGameTick()) / 256.0f;
-	const int c[] = { SPRITE_MMO_GAME_BOX, SPRITE_MMO_GAME_EXPERIENCE, SPRITE_MMO_GAME_PLANT, SPRITE_MMO_GAME_ORES, SPRITE_MMO_GAME_ARROW };
-
-	if (pCurrent->m_Type == MMO_PICKUP_ARROW)
-		Size = 48.0f;
+	const int c[] = { SPRITE_MMO_GAME_BOX, SPRITE_MMO_GAME_EXPERIENCE, SPRITE_MMO_GAME_PLANT, SPRITE_MMO_GAME_ORES, SPRITE_MMO_GAME_ARROW, SPRITE_MMO_GAME_DROP };
 
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAME].m_Id);
 	Graphics()->QuadsBegin();
 	RenderTools()->SelectSprite(c[pCurrent->m_Type]);
+	if (pCurrent->m_Type == MMO_PICKUP_ARROW || pCurrent->m_Type == MMO_PICKUP_BOX || pCurrent->m_Type == MMO_PICKUP_DROP)
+	{
+		if (pCurrent->m_Type == MMO_PICKUP_ARROW)
+			Size = 48.0f;
 
+		Graphics()->QuadsSetRotation(Angle);
+		RenderTools()->DrawSprite(Pos.x, Pos.y, Size);
+		Graphics()->QuadsSetRotation(0);
+		Graphics()->QuadsEnd();
+		return;
+	}
+
+	// дальше эффект что они двигаются
 	static float s_Time = 0.0f;
 	static float s_LastLocalTime = Client()->LocalTime();
 	float Offset = Pos.y / 32.0f + Pos.x / 32.0f;
@@ -377,6 +386,7 @@ void CItems::RenderMmoPickups(const CNetObj_MmoPickup* pPrev, const CNetObj_MmoP
 		if (m_pClient->m_Snap.m_pGameData && !(m_pClient->m_Snap.m_pGameData->m_GameStateFlags & GAMESTATEFLAG_PAUSED))
 			s_Time += Client()->LocalTime() - s_LastLocalTime;
 	}
+
 	Pos.x += cosf(s_Time * 2.0f + Offset) * 2.5f;
 	Pos.y += sinf(s_Time * 2.0f + Offset) * 2.5f;
 	s_LastLocalTime = Client()->LocalTime();

@@ -141,8 +141,6 @@ void AccountMainSql::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	GS()->AddBroadcast(ClientID, GS()->Server()->GetWorldName(GS()->GetWorldID()), 200, 500);
 	if(!FirstInitilize)
 	{
-		// проверяем квесты и отправляем одетые предметы всем
-		Job()->Quest()->CheckQuest(pPlayer);
 		GS()->ResetVotes(ClientID, MAINMENU);
 
 		// количество не прочитаных писем
@@ -155,7 +153,6 @@ void AccountMainSql::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	}
 
 	Job()->OnInitAccount(ClientID);
-	Job()->Quest()->CheckQuest(pPlayer);
 	ShowDiscordCard(ClientID);
 
 	if(!pPlayer->GetItem(itHammer).Count)

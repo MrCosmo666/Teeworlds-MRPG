@@ -9,11 +9,14 @@
 
 #include "dropingitem.h"
 
-CDropingItem::CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, ItemSql::ItemPlayer DropItem, int ForID)
+CDropingItem::CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, ItemSql::ItemPlayer DropItem, int ForID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPITEM, Pos)
 {
 	m_Pos = Pos;
 	m_Vel = Vel;
+	m_Angle = 0.0f;
+	m_AngleForce = AngleForce;
+
 	m_ForID = ForID;
 	m_DropItem = DropItem;
 	m_DropItem.Settings = 0;
@@ -86,19 +89,23 @@ void CDropingItem::Tick()
 	}
 
 	m_Vel.y += 0.5f;
-
-	bool Grounded = false;
-	if (GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5))
-		Grounded = true;
-	if (GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5))
-		Grounded = true;
-
+	bool Grounded = (bool)GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5) || GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5);
 	if (Grounded)
+	{
+		m_AngleForce += (m_Vel.x - 0.74f * 6.0f - m_AngleForce) / 2.0f;
 		m_Vel.x *= 0.8f;
+	}
 	else
+	{
+		m_Angle += clamp(m_AngleForce * 0.04f, -0.6f, 0.6f);
 		m_Vel.x *= 0.99f;
-
+	}
 	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(24.0f, 24.0f), 0.4f);
+
+	// проверить точно ли на земле уже после MoveBox
+	bool GroundedDouble = (bool)GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5) || GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5);
+	if (GroundedDouble && m_Angle != 0.0f)
+		m_Angle = 0.0f;
 
 	// Проверяем есть ли игрок которому предназначен предмет нету то делаем публичным
 	{
@@ -153,7 +160,7 @@ void CDropingItem::Snap(int SnappingClient)
 		pObj->m_X = (int)m_Pos.x;
 		pObj->m_Y = (int)m_Pos.y;
 		pObj->m_Type = MMO_PICKUP_BOX;
-		pObj->m_Angle = 0;
+		pObj->m_Angle = (int)(m_Angle * 256.0f);
 		return;
 	}
 

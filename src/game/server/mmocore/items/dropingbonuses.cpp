@@ -9,11 +9,14 @@
 
 #include "dropingbonuses.h"
 
-CDropingBonuses::CDropingBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, int Type, int Count)
+CDropingBonuses::CDropingBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, int Type, int Count)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPBONUS, Pos)
 {
 	m_Pos = Pos;
 	m_Vel = Vel;
+	m_Angle = 0.0f;
+	m_AngleForce = AngleForce;
+
 	m_Count = Count;
 	m_Type = Type;
 	m_FlashTimer = 0;
@@ -27,9 +30,14 @@ CDropingBonuses::CDropingBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, int
 void CDropingBonuses::Tick()
 {
 	m_LifeSpan--;
+	if (m_LifeSpan < 0)
+	{
+		GS()->CreatePlayerSpawn(m_Pos);
+		GS()->m_World.DestroyEntity(this);
+		return;
+	}
 	if (m_LifeSpan < 150)
 	{
-		// effect
 		m_FlashTimer--;
 		if (m_FlashTimer > 5)
 			m_Flashing = true;
@@ -39,29 +47,21 @@ void CDropingBonuses::Tick()
 			if (m_FlashTimer <= 0)
 				m_FlashTimer = 10;
 		}
-
-		// delete object
-		if (m_LifeSpan < 0)
-		{
-			GS()->CreatePlayerSpawn(m_Pos);
-			GS()->m_World.DestroyEntity(this);
-			return;
-		}
 	}
-	
+
+
 	m_Vel.y += 0.5f;
-
-	bool Grounded = false;
-	if (GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5))
-		Grounded = true;
-	if (GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5))
-		Grounded = true;
-
+	bool Grounded = (bool)GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5) || GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5);
 	if (Grounded)
+	{
+		m_AngleForce += (m_Vel.x - 0.74f * 6.0f - m_AngleForce) / 2.0f;
 		m_Vel.x *= 0.8f;
+	}
 	else
+	{
+		m_Angle += clamp(m_AngleForce * 0.04f, -0.6f, 0.6f);
 		m_Vel.x *= 0.99f;
-
+	}
 	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(24.0f, 24.0f), 0.4f);
 
 
@@ -103,7 +103,7 @@ void CDropingBonuses::Snap(int SnappingClient)
 		pObj->m_X = (int)m_Pos.x;
 		pObj->m_Y = (int)m_Pos.y;
 		pObj->m_Type = MMO_PICKUP_EXPERIENCE;
-		pObj->m_Angle = 0;
+		pObj->m_Angle = (int)(m_Angle * 256.0f);
 		return;
 	}
 

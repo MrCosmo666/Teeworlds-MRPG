@@ -6,6 +6,9 @@
 class CQuestItem : public CEntity
 {
 	vec2 m_Vel;
+	float m_Angle;
+	float m_AngleForce;
+
 	int m_StartTick;
 
 	bool m_Collide;
@@ -14,7 +17,7 @@ class CQuestItem : public CEntity
 	int m_FlashTimer;
 
 public:
-	CQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Dir, ContextBots::QuestBotInfo BotData, int OwnerID);
+	CQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, ContextBots::QuestBotInfo BotData, int OwnerID);
 	virtual ~CQuestItem();
 
 	int m_OwnerID;

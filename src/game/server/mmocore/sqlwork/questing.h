@@ -7,9 +7,6 @@
 
 class QuestBase : public CMmoComponent
 {
-	/* #########################################################################
-		VAR AND OBJECTS QUESTING 
-	######################################################################### */
 	struct StructQuestData
 	{
 		char Name[32];
@@ -29,7 +26,7 @@ class QuestBase : public CMmoComponent
 
 	struct StructQuest
 	{
-		int Type;
+		int State;
 		int MobProgress[2];
 		int Progress;
 	};
@@ -40,20 +37,17 @@ public:
 
 	virtual void OnInitGlobal();
 	virtual void OnInitAccount(CPlayer *pPlayer);
-	bool IsComplecte(int ClientID, int QuestID) const;
 
 private:
 	/* #########################################################################
 		GET CHECK QUESTING 
 	######################################################################### */
-
-
-	int GetStoryCountQuest(const char *StoryName, int QuestID = -1) const;
-	const char *QuestState(int Type) const;
-	bool IsDefeatMobComplete(int ClientID, int QuestID);
+	int GetStoryCount(const char *StoryName, int QuestID = -1) const;
+	const char *GetStateName(int Type) const;
+	bool IsDefeatComplete(int ClientID, int QuestID);
 
 public:
-	int GetQuestState(int ClientID, int QuestID) const;
+	int GetState(int ClientID, int QuestID) const;
 	bool IsValidQuest(int QuestID, int ClientID = -1) const
 	{
 		if(QuestsData.find(QuestID) != QuestsData.end())
@@ -76,10 +70,10 @@ private:
 	/* #########################################################################
 		FUNCTIONS QUESTING 
 	######################################################################### */
-	void ShowQuestID(CPlayer *pPlayer, int QuestID, bool Passive = false);
+	void ShowQuestID(CPlayer *pPlayer, int QuestID);
 	void FinishQuest(CPlayer *pPlayer, int QuestID);
 	bool IsCollectItemComplete(CPlayer *pPlayer, ContextBots::QuestBotInfo &BotData, bool Gived, bool Interactive = false);
-	void TalkProgress(CPlayer *pPlayer, int QuestID);
+	void AddProgress(CPlayer *pPlayer, int QuestID);
 
 	bool ShowAdventureActiveNPC(CPlayer *pPlayer);
 
@@ -92,18 +86,16 @@ public:
 	void ShowFullQuestLift(CPlayer *pPlayer);
 	void ShowQuestRequired(CPlayer* pPlayer, ContextBots::QuestBotInfo& BotData, const char* TextTalk);
 
-	void CheckQuest(CPlayer *pPlayer);
 	bool AcceptQuest(int QuestID, CPlayer *pPlayer);
 	bool InteractiveQuestNPC(CPlayer* pPlayer, ContextBots::QuestBotInfo& BotData, bool LastDialog);
-	void AutoStartNextQuest(CPlayer *pPlayer, int QuestID);
-
 	void AddMobProgress(CPlayer *pPlayer, int BotID);
-
+	void AutoStartNextQuest(CPlayer* pPlayer, int QuestID);
+	void UpdateArrowStep(int ClientID);
 
 	void QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID);
 	void QuestTableAddInfo(int ClientID, const char* pText, int Requires, int Have);
 	void QuestTableClear(int ClientID);
-	void QuestTableShowInformation(CPlayer* pPlayer, ContextBots::QuestBotInfo& BotData);
+	void QuestTableShowRequired(CPlayer* pPlayer, ContextBots::QuestBotInfo& BotData);
 	int QuestingAllowedItemsCount(CPlayer* pPlayer, int ItemID);
 	void CreateQuestingItems(CPlayer* pPlayer, ContextBots::QuestBotInfo& BotData);
 };

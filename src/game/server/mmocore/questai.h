@@ -7,9 +7,10 @@ class CQuestAI : public CEntity
 {
 	int m_ClientID;
 	int m_QuestID;
+	int m_QuestProgress;
 
 public:
-	CQuestAI(CGameWorld *pGameWorld, vec2 Pos, int QuestID, int ClientID, vec2 TargetPos);
+	CQuestAI(CGameWorld* pGameWorld, vec2 Pos, int ClientID, int QuestID, int QuestProgress, vec2 TargetPos);
 
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);

@@ -150,7 +150,7 @@ bool CPlayerBot::CheckQuestSnapPlayer(int SnappingClient, bool SnapData)
 	if(QuestBase::Quests[SnappingClient].find(QuestID) == QuestBase::Quests[SnappingClient].end()) return false;
 
 	// если квест завершен
-	if(QuestBase::Quests[SnappingClient][QuestID].Type == QUESTFINISHED)
+	if(QuestBase::Quests[SnappingClient][QuestID].State == QuestState::QUEST_FINISHED)
 		return false;
 
 	// если прогресс разговора не равен прогрессу бота
@@ -249,7 +249,7 @@ bool CPlayerBot::GetActiveQuestsID(int SnapClientID)
 	{
 		for (const auto& talk : ContextBots::NpcBot[m_SubBotID].m_Talk)
 		{
-			if (talk.m_GivingQuest <= 0 || GS()->Mmo()->Quest()->GetQuestState(SnapClientID, talk.m_GivingQuest) != QUESTNOACCEPT)
+			if (talk.m_GivingQuest <= 0 || GS()->Mmo()->Quest()->GetState(SnapClientID, talk.m_GivingQuest) != QuestState::QUEST_NO_ACCEPT)
 				continue;
 			return true;
 		}

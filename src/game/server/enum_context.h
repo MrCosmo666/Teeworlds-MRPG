@@ -98,6 +98,14 @@ enum ItemType
 	TYPE_POTION,
 };
 
+// положение квеста
+enum QuestState
+{
+	QUEST_NO_ACCEPT = 1,
+	QUEST_ACCEPT,
+	QUEST_FINISHED,
+};
+
 
 // Основное
 enum
@@ -246,14 +254,6 @@ enum
 	SORTCRAFT,
 	SORTEQUIP,
 	NUMTABSORT,
-
-	/*
-		Статы прогресса квеста
-		Имеет некий прогресс
-	*/
-	QUESTNOACCEPT = 1,
-	QUESTACCEPT,
-	QUESTFINISHED,
 
 	/* Вид декораций */
 	DECOTYPE_HOUSE = 0,

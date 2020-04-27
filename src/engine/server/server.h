@@ -227,7 +227,7 @@ public:
 	virtual void SetClientScore(int ClientID, int Score);
 
 	virtual void ChangeWorld(int ClientID, int WorldID);
-	virtual void QuestBotRecheck(int WorldID, int QuestID, int Step);
+	virtual void QuestBotUpdateOnWorld(int WorldID, int QuestID, int Step);
 	virtual int GetWorldID(int ClientID);
 
 	virtual void SetClientVersion(int ClientID, int Version);

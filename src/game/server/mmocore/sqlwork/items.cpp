@@ -669,8 +669,6 @@ bool ItemSql::ClassItems::Remove(int arg_removecount, int arg_settings)
 	pPlayer->GS()->Mmo()->Item()->RemoveItem(&pPlayer->m_SecurCheckCode, pPlayer, itemid_, arg_removecount, arg_settings);
 	if(pPlayer->m_SecurCheckCode <= 0) 
 		return false;
-
-	pPlayer->GS()->Mmo()->Quest()->CheckQuest(pPlayer);
 	return true;
 }
 

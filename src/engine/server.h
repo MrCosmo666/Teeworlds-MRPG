@@ -66,7 +66,7 @@ public:
 	virtual void SetClientScore(int ClientID, int Score) = 0;
 
 	virtual void ChangeWorld(int ClientID, int WorldID) = 0;
-	virtual void QuestBotRecheck(int WorldID, int QuestID, int Step) = 0;
+	virtual void QuestBotUpdateOnWorld(int WorldID, int QuestID, int Step) = 0;
 	virtual int GetWorldID(int ClientID) = 0;
 	virtual const char* GetWorldName(int WorldID) = 0;
 
@@ -117,7 +117,7 @@ public:
 	virtual void ClearClientData(int ClientID) = 0;
 
 	virtual void ChangeWorld(int ClientID) = 0;
-	virtual void ClearQuestsBot(int QuestID, int Step) = 0;
+	virtual void UpdateQuestsBot(int QuestID, int Step) = 0;
 
 	virtual void OnClientConnected(int ClientID) = 0;
 	virtual void OnClientEnter(int ClientID) = 0;

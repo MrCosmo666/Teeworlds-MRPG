@@ -2135,7 +2135,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	else if(MenuList == FINISHQUESTMENU) 
 	{
 		pPlayer->m_LastVoteMenu = ADVENTUREJOURNAL;
-		Mmo()->Quest()->ShowQuestList(pPlayer, QUESTFINISHED);
+		Mmo()->Quest()->ShowQuestList(pPlayer, QuestState::QUEST_FINISHED);
 		AddBack(ClientID);
 	}
 	
@@ -2276,7 +2276,7 @@ void CGS::CreateBot(short SpawnPoint, int BotID, int SubID)
 }
 
 // Удалить ботов что не активны у людей для квестов
-void CGS::ClearQuestsBot(int QuestID, int Step)
+void CGS::UpdateQuestsBot(int QuestID, int Step)
 {
 	// собираем все данные о ботах
 	ContextBots::QuestBotInfo FindBot = Mmo()->Quest()->GetQuestBot(QuestID, Step);
@@ -2286,7 +2286,7 @@ void CGS::ClearQuestsBot(int QuestID, int Step)
 	// перекидываем recheck на мир моба
 	if(FindBot.WorldID != GetWorldID())
 	{
-		Server()->QuestBotRecheck(FindBot.WorldID, QuestID, Step);
+		Server()->QuestBotUpdateOnWorld(FindBot.WorldID, QuestID, Step);
 		return;
 	}
 
@@ -2340,7 +2340,8 @@ void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop, vec2 For
 	for(int i = 0; i < NumDrop; i++) 
 	{
 		vec2 Vel = Force + vec2(frandom() * 15.0, frandom() * 15.0);
-		new CDropingBonuses(&m_World, Pos, Vel, Type, Count);
+		float Angle = Force.x * (0.15f + frandom() * 0.1f);
+		new CDropingBonuses(&m_World, Pos, Vel, Angle, Type, Count);
 	}
 }
 
@@ -2353,7 +2354,8 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Ench
 	DropItem.Enchant = Enchant;
 
 	vec2 Vel = Force + vec2(frandom() * 15.0, frandom() * 15.0);
-	new CDropingItem(&m_World, Pos, Vel, DropItem, ClientID);
+	float Angle = Force.x * (0.15f + frandom() * 0.1f);
+	new CDropingItem(&m_World, Pos, Vel, Angle, DropItem, ClientID);
 }
 
 // Саздает предметы в позиции Типа и Количества и Их самих кол-ва
@@ -2363,8 +2365,11 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, ItemSql::ItemPlayer &PlayerItem
 	CopyItem.Paste(PlayerItem);
 	CopyItem.Count = Count;
 
-	if(PlayerItem.Remove(Count))
-		new CDropingItem(&m_World, Pos, Force, CopyItem, ClientID);
+	if (PlayerItem.Remove(Count))
+	{
+		float Angle = Force.x * (0.15f + frandom() * 0.1f);
+		new CDropingItem(&m_World, Pos, Force, Angle, CopyItem, ClientID);
+	}
 }
 
 // Проверить чекнуть и подобрать предмет Если он будет найден

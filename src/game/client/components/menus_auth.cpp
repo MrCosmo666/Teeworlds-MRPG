@@ -125,7 +125,7 @@ void CMenus::RenderAuthWindow()
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
-	static bool s_PlayerAcceptTerms = false;
+	static bool s_PlayerAcceptRules = false;
 
 
 	// --------------------- RULES SIDE --------------------------
@@ -166,9 +166,9 @@ void CMenus::RenderAuthWindow()
 
 		BackRules.HSplitTop(70.0f, 0, &BackRules);
 		BackRules.HSplitTop(20.0f, &Button, &BackRules);
-		static int s_AcceptedTerms = 0;
-		if(DoButton_CheckBox(&s_AcceptedTerms, Localize("I read it and agree!"), s_PlayerAcceptTerms, &Button))
-			s_PlayerAcceptTerms ^= true;
+		static int s_AcceptedRules = 0;
+		if(DoButton_CheckBox(&s_AcceptedRules, Localize("I read it and agree!"), s_PlayerAcceptRules, &Button))
+			s_PlayerAcceptRules ^= true;
 	}
 
 	// --------------------- REGISTER / LOGIN SIDE --------------------------
@@ -304,8 +304,8 @@ void CMenus::RenderAuthWindow()
 					mem_zero(s_aPassword, sizeof(s_aPassword));
 					mem_zero(s_aRepeatPassword, sizeof(s_aRepeatPassword));
 				}
-				else if(s_PlayerAcceptTerms == 0)
-					setAuthMessage("Registration: you need to accept the terms!", EAuthColorMessage::WARNING_MESSAGE);
+				else if(s_PlayerAcceptRules == 0)
+					setAuthMessage("Registration: you need to accept rules!", EAuthColorMessage::WARNING_MESSAGE);
 				else
 				{
 					m_pClient->SendAuthPack(s_aAccount, s_aPassword, true);
@@ -340,7 +340,7 @@ void CMenus::setAuthMessage(const char* Message, int EAuthColorMessage)
 		break;
 
 		case EAuthColorMessage::WARNING_MESSAGE:
-		aAuthResultColor = vec4(1.0f, 0.8f, 0.0f, 1.0f);
+		aAuthResultColor = vec4(1.0f, 0.5f, 0.0f, 1.0f);
 		break;
 
 		case EAuthColorMessage::SUCCESS_MESSAGE:

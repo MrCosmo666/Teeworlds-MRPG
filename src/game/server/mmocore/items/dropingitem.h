@@ -13,6 +13,9 @@ class CDropingItem : public CEntity
 	};
 
 	vec2 m_Vel;
+	float m_Angle;
+	float m_AngleForce;
+
 	int m_StartTick;
 	bool m_Flashing;
 	int m_LifeSpan;
@@ -23,7 +26,7 @@ class CDropingItem : public CEntity
 	int m_IDs[NUM_IDS];
 
 public:
-	CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, ItemSql::ItemPlayer DropItem, int ForID);
+	CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, ItemSql::ItemPlayer DropItem, int ForID);
 	~CDropingItem();
 
 	virtual void Tick();

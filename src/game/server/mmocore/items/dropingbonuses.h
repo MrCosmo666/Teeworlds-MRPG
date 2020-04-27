@@ -6,6 +6,9 @@
 class CDropingBonuses : public CEntity
 {
 	vec2 m_Vel;
+	float m_Angle;
+	float m_AngleForce;
+
 	int m_StartTick;
 	int m_Type;
 	bool m_Flashing;
@@ -14,7 +17,7 @@ class CDropingBonuses : public CEntity
 	int m_Count;
 
 public:
-	CDropingBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, int Type, int Count);
+	CDropingBonuses(CGameWorld* pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, int Type, int Count);
 
 	virtual void Tick();
 	virtual void TickPaused(); 

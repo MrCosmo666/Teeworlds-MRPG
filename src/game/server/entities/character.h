@@ -74,8 +74,7 @@ public:
 	int Mana() const { return m_Mana; }
 	int Health() const { return m_Health; }
 
-	void CreateQuestsSteps();
-	void FinishQuestStep(int QuestID);
+	void CreateQuestsStep(int QuestID);
 	bool GiveWeapon(int Weapon, int GiveAmmo);
 
 	void CreateSnapProj(int SnapID, int Count, int TypeID, bool Dynamic, bool Projectile);

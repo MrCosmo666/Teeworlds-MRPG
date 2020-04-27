@@ -9,11 +9,14 @@
 
 #include "dropquest.h"
 
-CQuestItem::CQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, const ContextBots::QuestBotInfo BotData, int OwnerID)
+CQuestItem::CQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, const ContextBots::QuestBotInfo BotData, int OwnerID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPQUEST, Pos)
 {
 	m_Pos = Pos;
 	m_Vel = Vel;
+	m_Angle = 0.0f;
+	m_AngleForce = AngleForce;
+
 	m_OwnerID = OwnerID;
 	m_QuestBot = BotData;
 	m_Flashing = false;
@@ -27,18 +30,20 @@ CQuestItem::~CQuestItem(){ }
 
 void CQuestItem::Tick()
 {
-	// проверяем есть игрок / если бота нет / если квеста нет
-	if (!GS()->m_apPlayers[m_OwnerID] ||
-		QuestBase::Quests[m_OwnerID].find(m_QuestBot.QuestID) == QuestBase::Quests[m_OwnerID].end())
+	if (!GS()->m_apPlayers[m_OwnerID] || QuestBase::Quests[m_OwnerID].find(m_QuestBot.QuestID) == QuestBase::Quests[m_OwnerID].end())
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;
 	}
 
 	m_LifeSpan--;
+	if (m_LifeSpan < 0)
+	{
+		GS()->m_World.DestroyEntity(this);
+		return;
+	}
 	if (m_LifeSpan < 150)
 	{
-		// effect
 		m_FlashTimer--;
 		if (m_FlashTimer > 5)
 			m_Flashing = true;
@@ -48,30 +53,23 @@ void CQuestItem::Tick()
 			if (m_FlashTimer <= 0)
 				m_FlashTimer = 10;
 		}
-
-		// delete object
-		if (m_LifeSpan < 0)
-		{
-			GS()->CreatePlayerSpawn(m_Pos);
-			GS()->m_World.DestroyEntity(this);
-			return;
-		}
 	}
 
+
 	m_Vel.y += 0.5f;
-
-	bool Grounded = false;
-	if (GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5))
-		Grounded = true;
-	if (GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5))
-		Grounded = true;
-
-	if (Grounded)
+	m_Collide = (bool)GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5) || GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5);
+	if (m_Collide)
+	{
+		m_AngleForce += (m_Vel.x - 0.74f * 6.0f - m_AngleForce) / 2.0f;
 		m_Vel.x *= 0.8f;
+	}
 	else
+	{
+		m_Angle += clamp(m_AngleForce * 0.04f, -0.6f, 0.6f);
 		m_Vel.x *= 0.99f;
-
+	}
 	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(24.0f, 24.0f), 0.4f);
+
 
 	int Count = m_QuestBot.InterCount[0];
 	int QuestID = m_QuestBot.QuestID;
@@ -112,6 +110,20 @@ void CQuestItem::Snap(int SnappingClient)
 {
 	if(m_Flashing || !m_Collide || m_OwnerID != SnappingClient || NetworkClipped(SnappingClient))
 		return;
+
+	// проверка клиента если чекнут дальше не рисуем
+	if (GS()->CheckClient(SnappingClient))
+	{
+		CNetObj_MmoPickup* pObj = static_cast<CNetObj_MmoPickup*>(Server()->SnapNewItem(NETOBJTYPE_MMOPICKUP, GetID(), sizeof(CNetObj_MmoPickup)));
+		if (!pObj)
+			return;
+
+		pObj->m_X = (int)m_Pos.x;
+		pObj->m_Y = (int)m_Pos.y;
+		pObj->m_Type = MMO_PICKUP_DROP;
+		pObj->m_Angle = (int)(m_Angle * 256.0f);
+		return;
+	}
 
 	CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
 	if(!pP)

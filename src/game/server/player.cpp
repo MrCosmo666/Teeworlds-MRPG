@@ -851,7 +851,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		{
 			if (!m_TalkingNPC.m_FreezedProgress)
 			{
-				if (GS()->Mmo()->Quest()->GetQuestState(m_ClientID, GivingQuestID) >= QUESTACCEPT)
+				if (GS()->Mmo()->Quest()->GetState(m_ClientID, GivingQuestID) >= QuestState::QUEST_ACCEPT)
 					GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID, "I'm sorry, don't have more new stories for you!");
 				else
 					GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
@@ -882,9 +882,9 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		bool RequiestQuestTask = ContextBots::QuestBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_RequestComplete;
 		if (RequiestQuestTask)
 		{
-			GS()->Mmo()->Quest()->CreateQuestingItems(this, ContextBots::QuestBot[MobID]);
 			if (!m_TalkingNPC.m_FreezedProgress)
 			{
+				GS()->Mmo()->Quest()->CreateQuestingItems(this, ContextBots::QuestBot[MobID]);
 				GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
 				GS()->Mmo()->BotsData()->ShowBotQuestTaskInfo(this, MobID, m_TalkingNPC.m_TalkedProgress);
 				m_TalkingNPC.m_FreezedProgress = true;
