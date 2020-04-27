@@ -338,7 +338,7 @@ void QuestBase::AddProgress(CPlayer *pPlayer, int QuestID)
 	bool FinishedProgress = (talkQuestPlayer.Progress >= QuestsData[QuestID].ProgressSize);
 	if (FinishedProgress)
 	{
-		AutoStartNextQuest(pPlayer, QuestID);
+		FinishQuest(pPlayer, QuestID);
 		GS()->VResetVotes(ClientID, ADVENTUREJOURNAL);
 	}
 	else
@@ -366,9 +366,11 @@ bool QuestBase::AcceptQuest(int QuestID, CPlayer* pPlayer)
 	Quests[ClientID][QuestID].Progress = 1;
 	Quests[ClientID][QuestID].State = QuestState::QUEST_ACCEPT;
 	GS()->UpdateQuestsBot(QuestID, Quests[ClientID][QuestID].Progress);
-
 	SJK.ID("tw_accounts_quests", "(QuestID, OwnerID, Type) VALUES ('%d', '%d', '%d')", QuestID, pPlayer->Acc().AuthID, QuestState::QUEST_ACCEPT);
-	GS()->Chat(ClientID, "Accepted the quest [{STR}]", QuestsData[QuestID].Name);
+
+	int StorySize = GetStoryCount(QuestsData[QuestID].StoryLine);
+	int StoryProgress = GetStoryCount(QuestsData[QuestID].StoryLine, QuestID + 1);
+	GS()->Chat(ClientID, "Story you perform ({STR} {STR} {INT}/{INT})!", QuestsData[QuestID].StoryLine, QuestsData[QuestID].Name, &StoryProgress, &StorySize);
 	GS()->Chat(ClientID, "You will receive a reward Gold {INT}, Experience {INT}", &QuestsData[QuestID].Money, &QuestsData[QuestID].Exp);
 	pPlayer->GetCharacter()->CreateQuestsStep(QuestID);
 	return true;
@@ -454,19 +456,6 @@ void QuestBase::AddMobProgress(CPlayer* pPlayer, int BotID)
 			break;
 		}
 	}
-}
-
-// автозавершение и автопринятие
-void QuestBase::AutoStartNextQuest(CPlayer* pPlayer, int QuestID)
-{
-	// если пассивный то без автозавершения
-	int clientID = pPlayer->GetCID();
-
-	// завершаем квест
-	FinishQuest(pPlayer, QuestID);
-
-	GS()->Chat(clientID, "You can see the details in vote 'Adventure Journal'");
-	GS()->VResetVotes(clientID, ADVENTUREJOURNAL);
 }
 
 // обновить стрелки направление

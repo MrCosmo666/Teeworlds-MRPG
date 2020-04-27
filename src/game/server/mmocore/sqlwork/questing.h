@@ -89,7 +89,6 @@ public:
 	bool AcceptQuest(int QuestID, CPlayer *pPlayer);
 	bool InteractiveQuestNPC(CPlayer* pPlayer, ContextBots::QuestBotInfo& BotData, bool LastDialog);
 	void AddMobProgress(CPlayer *pPlayer, int BotID);
-	void AutoStartNextQuest(CPlayer* pPlayer, int QuestID);
 	void UpdateArrowStep(int ClientID);
 	bool CheckNewStories(CPlayer* pPlayer, int CheckQuestID = -1);
 
