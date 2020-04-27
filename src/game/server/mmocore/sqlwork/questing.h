@@ -91,6 +91,7 @@ public:
 	void AddMobProgress(CPlayer *pPlayer, int BotID);
 	void AutoStartNextQuest(CPlayer* pPlayer, int QuestID);
 	void UpdateArrowStep(int ClientID);
+	bool CheckNewStories(CPlayer* pPlayer, int CheckQuestID = -1);
 
 	void QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID);
 	void QuestTableAddInfo(int ClientID, const char* pText, int Requires, int Have);

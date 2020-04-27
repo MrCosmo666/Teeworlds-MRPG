@@ -263,6 +263,9 @@ void QuestBase::FinishQuest(CPlayer *pPlayer, int QuestID)
 	GS()->Chat(-1, "{STR} completed quest [{STR} {STR}]", GS()->Server()->ClientName(ClientID), finishQuestData.StoryLine, finishQuestData.Name);
 	GS()->ChatDiscord(false, DC_PLAYER_INFO, GS()->Server()->ClientName(ClientID), "Completed quest [{STR} {STR}]", finishQuestData.StoryLine, finishQuestData.Name);
 	Job()->SaveAccount(pPlayer, SAVESTATS);
+
+	if (!CheckNewStories(pPlayer, QuestID))
+		GS()->Chat(ClientID, "At this point you know everything from story {STR} story", QuestsData[QuestID].StoryLine);
 }
 
 // проверить прогресс по предметам что требует бот
@@ -462,16 +465,6 @@ void QuestBase::AutoStartNextQuest(CPlayer* pPlayer, int QuestID)
 	// завершаем квест
 	FinishQuest(pPlayer, QuestID);
 
-	// проверяем если есть следующий квест то продолжаем сюжетку только сюжетные квесты
-	int NextQuestID = QuestID + 1;
-	if (!IsValidQuest(NextQuestID) || str_comp(QuestsData[QuestID].StoryLine, QuestsData[NextQuestID].StoryLine) != 0)
-	{
-		GS()->Chat(clientID, "At the moment there is no continuation of '{STR}' story", QuestsData[QuestID].StoryLine);
-		return;
-	}
-
-	// прнимаем квест и пишем информацию о следующем квесте
-	AcceptQuest(NextQuestID, pPlayer);
 	GS()->Chat(clientID, "You can see the details in vote 'Adventure Journal'");
 	GS()->VResetVotes(clientID, ADVENTUREJOURNAL);
 }
@@ -483,13 +476,48 @@ void QuestBase::UpdateArrowStep(int ClientID)
 	if (!pPlayer)
 		return;
 
-	for (const auto qp : Quests[ClientID])
+	for (const auto& qp : Quests[ClientID])
 	{
 		if (qp.second.State != QuestState::QUEST_ACCEPT)
 			continue;
 
 		pPlayer->GetCharacter()->CreateQuestsStep(qp.first);
 	}
+}
+
+// проверить новые Stories
+bool QuestBase::CheckNewStories(CPlayer *pPlayer, int CheckQuestID)
+{
+	int ClientID = pPlayer->GetCID();
+	if (CheckQuestID > 0)
+	{
+		int NextQuestID = CheckQuestID + 1;
+		bool ActiveNextStories = (bool)(IsValidQuest(NextQuestID) && str_comp(QuestsData[CheckQuestID].StoryLine, QuestsData[NextQuestID].StoryLine) == 0);
+		if(ActiveNextStories)
+			AcceptQuest(NextQuestID, pPlayer);
+
+		return ActiveNextStories;
+	}
+
+
+	bool ActiveNextStories = false;
+	for (const auto& qp : Quests[ClientID])
+	{
+		if (qp.second.State != QuestState::QUEST_FINISHED)
+			continue;
+
+		int NextQuestID = qp.first + 1, QuestID = qp.first;
+		if (!IsValidQuest(NextQuestID) || Quests[ClientID][NextQuestID].State != QuestState::QUEST_NO_ACCEPT)
+			continue;
+
+		if (str_comp(QuestsData[QuestID].StoryLine, QuestsData[NextQuestID].StoryLine) == 0)
+		{
+			AcceptQuest(NextQuestID, pPlayer);
+			ActiveNextStories = true;
+			continue;
+		}
+	}
+	return ActiveNextStories;
 }
 
 // показать квесты

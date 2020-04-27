@@ -99,7 +99,11 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 		m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
 		m_pPlayer->SetStandart(m_Health, m_Mana);
 		m_pPlayer->ShowInformationStats();
+
+		// обновить положение о квестах
 		GS()->Mmo()->Quest()->UpdateArrowStep(m_pPlayer->GetCID());
+		if (GS()->Mmo()->Quest()->CheckNewStories(m_pPlayer))
+			GS()->Chat(m_pPlayer->GetCID(), "There are new stories of familiar NPCs");
 	}
 	GS()->VResetVotes(m_pPlayer->GetCID(), m_pPlayer->m_OpenVoteMenu);
 	GS()->m_pController->OnCharacterSpawn(this);

@@ -101,7 +101,7 @@ enum ItemType
 // положение квеста
 enum QuestState
 {
-	QUEST_NO_ACCEPT = 1,
+	QUEST_NO_ACCEPT = 0,
 	QUEST_ACCEPT,
 	QUEST_FINISHED,
 };
