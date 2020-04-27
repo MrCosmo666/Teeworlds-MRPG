@@ -1085,9 +1085,10 @@ void CCharacter::HandleAuthedPlayer()
 		// сменять мир игрокам что находятся в гильдейских домах но для них мире что выше их по уровню
 		if (m_pPlayer->Acc().Level < GS()->Mmo()->WorldSwap()->GetWorldLevel())
 		{
-			int HouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
-			if (HouseID <= 0)
+			int CheckHouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
+			if (CheckHouseID <= 0)
 			{
+				GS()->Chat(m_pPlayer->GetCID(), "High-level zone, you have been magically transported back!");
 				m_pPlayer->Acc().TeleportX = -1;
 				m_pPlayer->Acc().TeleportY = -1;
 				GS()->Server()->ChangeWorld(m_pPlayer->GetCID(), LOCALWORLD);

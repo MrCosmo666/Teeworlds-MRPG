@@ -106,6 +106,9 @@ int WorldSwapJob::GetWorldLevel() const
 		return DungeonJob::Dungeon[DungeonID].Level;
 	}
 
+	if (GS()->GetWorldID() == LOCALWORLD)
+		return 1;
+
 	for (const auto& sw : WorldSwap)
 	{
 		if (sw.second.WorldID == GS()->GetWorldID() || sw.second.TwoWorldID == GS()->GetWorldID())
