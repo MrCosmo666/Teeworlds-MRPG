@@ -614,7 +614,7 @@ void CPlayers::OnInit()
 	m_aEquipInfo.add({ itMagitechRifle, vec4(0.3f, 0.5f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_RIFLE_MAGITECH, 0 });
 		
 	/* WINGS */
-	m_aEquipInfo.add({ itShadowWings, vec4(1.75f, 0.0f, 0.0f, 0.003f), vec2(115, 55), vec2(200, 90), 0.0f, IMAGE_SHADOW_WINGS, ANIM_WINGS_LENGTH });
+	m_aEquipInfo.add({ itShadowWings, vec4(1.75f, 0.0f, 0.0f, 0.003f), vec2(115, 60), vec2(200, 120), 0.0f, IMAGE_SHADOW_WINGS, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itNeptuneWings, vec4(0.2f, 0.2f, 1.75f, 0.003f), vec2(120, 50), vec2(200, 100), 0.0f, IMAGE_NEPTUNE_WINGS, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itAngelWings,  vec4(0.2f, 0.2f, 1.75f, 0.003f), vec2(115, 64), vec2(200, 100), 0.0f, IMAGE_ANGEL_WINGS, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itHeavenlyWings, vec4(1.0f, 0.85f, 0.0f, 0.003f), vec2(170, 100), vec2(280, 150), 0.0f, IMAGE_HEAVENLY_WINGS, ANIM_WINGS_LENGTH });
