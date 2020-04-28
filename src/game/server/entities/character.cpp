@@ -585,11 +585,6 @@ void CCharacter::TickDefered()
 		m_ReckoningCore.Quantize();
 	}
 
-	//lastsentcore
-	vec2 StartPos = m_Core.m_Pos;
-	vec2 StartVel = m_Core.m_Vel;
-	bool StuckBefore = GS()->Collision()->TestBox(m_Core.m_Pos, vec2(28.0f, 28.0f));
-
 	m_Core.Move();
 	m_Core.Quantize();
 	m_Pos = m_Core.m_Pos;
