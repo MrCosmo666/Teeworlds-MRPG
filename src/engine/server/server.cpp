@@ -1743,24 +1743,24 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	 	return;
 
 	// статистика
-	if (message.startsWith("!mstat"))
+	if (message.startsWith("!mstats"))
 	{
 		// если количество символов меньше нужного
 		std::string messagecont = message.content;
-		if(messagecont.size() <= 7)
+		if(messagecont.size() <= 8)
 		{
 			sendEmbedMessage(message.channelID, DC_SERVER_WARNING, "Not right!",
-			"Use **!mstat <nick full or not>. Minimal symbols 1.**!!!");
+			"Use **!mstats <nick full or not>. Minimal symbols 1.**!!!");
 			return;
 		}
 
 		// информация для поиска
 		bool founds = false; int Limit = 0;
-		std::string input = "%" + messagecont.substr(7, messagecont.length() - 7) + "%";
+		std::string input = "%" + messagecont.substr(8, messagecont.length() - 8) + "%";
 		sqlstr::CSqlString<64> cDiscordIDorNick = sqlstr::CSqlString<64>(input.c_str());
 
 		// ищим пользователя
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "	tw_accounts_data", "WHERE Nick LIKE '%s'LIMIT 5", cDiscordIDorNick.cstr()));
+		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_data", "WHERE Nick LIKE '%s'LIMIT 5", cDiscordIDorNick.cstr()));
 		while(RES->next())
 		{
 			const int AuthID = RES->getInt("ID");
@@ -1853,7 +1853,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		sendEmbedMessage(message.channelID, DC_DISCORD_INFO, "Commands / Information", 
 		"`!mtime` - Tee time in server."
 		"\\n`!mconnect` - Info for connect your discord and account in game."
-		"\\n`!mstat <nick>` - See stats 0.7 mmo players. Minimal 4 symbols."
+		"\\n`!mstats <symbol>` - See stats players. Minimal 4 symbols."
 		"\\n`!monline` - Show players ingame.");
 	}
 }

@@ -362,18 +362,22 @@ void CEffects::DamageMmoInd(vec2 Pos, const char* pText, int Type)
 	m_pClient->m_pParticles->Add(CParticles::GROUP_DAMAGEMMO, &p);
 }
 
-void CEffects::WingsEffect(vec2 Pos, vec2 Vel, vec4 Color, float RandomSize)
+void CEffects::EnchantEffect(vec2 Pos, vec2 Vel, vec4 Color, float RandomSize)
 {
 	if (!m_Add50hz || g_Config.m_ClShowMEffects == 3)
+		return;
+
+	vec2 PosRandom = vec2(Pos.x + 40.0f - frandom() * 80.0f, Pos.y + 40.0f - frandom() * 80.0f);
+	if (length(PosRandom) < 15.0f)
 		return;
 
 	CParticle p;
 	p.SetDefault();
 	p.m_Spr = SPRITE_MMO_GAME_EFFECT;
-	p.m_Pos = vec2(Pos.x + 20 - rand() % 40, Pos.y + 20 - rand() % 40);
+	p.m_Pos = PosRandom;
 	p.m_Vel = Vel + RandomDir() * 200.0f;
 	p.m_LifeSpan = 0.5f + frandom() * 0.5f;
-	p.m_StartSize = 15.0f + frandom() * 10;
+	p.m_StartSize = 5.0f + frandom() * 25.0f;
 	p.m_EndSize = 0;
 	p.m_Friction = 0.8f;
 	p.m_Gravity = frandom() * -500.0f;

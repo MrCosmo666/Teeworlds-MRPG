@@ -597,26 +597,26 @@ void CPlayers::OnInit()
 	// загружаем всю информацию о equip item's
 
 	/* SET HEAVEN */
-	m_aEquipInfo.add({ itHeavenlyHammer, vec4(1.0f, 1.0f, 1.0f, 0.3f), vec2(0,0), vec2(100, 100), 0.0f, SPRITE_MMO_HAMMER_HEAVEN, 0 });
-	m_aEquipInfo.add({ itHeavenlyGun, vec4(1.0f, 1.0f, 1.0f, 0.3f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GUN_HEAVEN, 0 });
-	m_aEquipInfo.add({ itHeavenlyShotgun,  vec4(1.0f, 1.0f, 1.0f, 0.3f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_SHOTGUN_HEAVEN, 0 });
-	m_aEquipInfo.add({ itHeavenlyGrenade, vec4(1.0f, 1.0f, 1.0f, 0.3f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GRENADE_HEAVEN, 0 });
-	m_aEquipInfo.add({ itHeavenlyRifle, vec4(1.0f, 1.0f, 1.0f, 0.3f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_RIFLE_HEAVEN, 0 });
+	m_aEquipInfo.add({ itHeavenlyHammer, vec4(1.0f, 1.0f, 1.0f, 0.003f), vec2(0,0), vec2(100, 100), 0.0f, SPRITE_MMO_HAMMER_HEAVEN, 0 });
+	m_aEquipInfo.add({ itHeavenlyGun, vec4(1.0f, 1.0f, 1.0f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GUN_HEAVEN, 0 });
+	m_aEquipInfo.add({ itHeavenlyShotgun,  vec4(1.0f, 1.0f, 1.0f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_SHOTGUN_HEAVEN, 0 });
+	m_aEquipInfo.add({ itHeavenlyGrenade, vec4(1.0f, 1.0f, 1.0f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GRENADE_HEAVEN, 0 });
+	m_aEquipInfo.add({ itHeavenlyRifle, vec4(1.0f, 1.0f, 1.0f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_RIFLE_HEAVEN, 0 });
 	
 	/* SET MAGITECH */
-	m_aEquipInfo.add({ itMagitechHammer, vec4(0.45f, 0.3f, 0.5f, 0.3f), vec2(0,0), vec2(100, 100), 0.0f, SPRITE_MMO_HAMMER_MAGITECH, 0 });
-	m_aEquipInfo.add({ itMagitechGun, vec4(0.3f, 0.5f, 0.5f, 0.3f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GUN_MAGITECH, 0 });
-	m_aEquipInfo.add({ itMagitechShotgun,  vec4(0.5f, 0.25f, 0.5f, 0.3f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_SHOTGUN_MAGITECH, 0 });
-	m_aEquipInfo.add({ itMagitechGrenade, vec4(0.45f, 0.3f, 0.5f, 0.3f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GRENADE_MAGITECH, 0 });
-	m_aEquipInfo.add({ itMagitechRifle, vec4(0.3f, 0.5f, 0.5f, 0.3f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_RIFLE_MAGITECH, 0 });
+	m_aEquipInfo.add({ itMagitechHammer, vec4(0.45f, 0.3f, 0.5f, 0.003f), vec2(0,0), vec2(100, 100), 0.0f, SPRITE_MMO_HAMMER_MAGITECH, 0 });
+	m_aEquipInfo.add({ itMagitechGun, vec4(0.3f, 0.5f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GUN_MAGITECH, 0 });
+	m_aEquipInfo.add({ itMagitechShotgun,  vec4(0.5f, 0.25f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_SHOTGUN_MAGITECH, 0 });
+	m_aEquipInfo.add({ itMagitechGrenade, vec4(0.45f, 0.3f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GRENADE_MAGITECH, 0 });
+	m_aEquipInfo.add({ itMagitechRifle, vec4(0.3f, 0.5f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_RIFLE_MAGITECH, 0 });
 		
 	/* WINGS */
-	m_aEquipInfo.add({ itShadowWings, vec4(1.75f, 0.0f, 0.0f, 0.3f), vec2(115, 55), vec2(200, 90), 0.0f, IMAGE_SHADOW_WINGS, ANIM_WINGS_LENGTH });
-	m_aEquipInfo.add({ itNeptuneWings, vec4(0.2f, 0.2f, 1.75f, 0.3f), vec2(120, 50), vec2(200, 100), 0.0f, IMAGE_NEPTUNE_WINGS, ANIM_WINGS_LENGTH });
-	m_aEquipInfo.add({ itAngelWings,  vec4(0.2f, 0.2f, 1.75f, 0.3f), vec2(115, 64), vec2(200, 100), 0.0f, IMAGE_ANGEL_WINGS, ANIM_WINGS_LENGTH });
-	m_aEquipInfo.add({ itHeavenlyWings, vec4(1.0f, 0.85f, 0.0f, 0.3f), vec2(170, 100), vec2(280, 150), 0.0f, IMAGE_HEAVENLY_WINGS, ANIM_WINGS_LENGTH });
-	m_aEquipInfo.add({ itRainbowWings, vec4(0.1f, 0.1f, 0.1f, 0.3f), vec2(115, 70), vec2(200, 100), 0.9f, IMAGE_RAINBOW_WINGS, ANIM_WINGS_LENGTH });
-	m_aEquipInfo.add({ itStarsWings, vec4(0.04f, 0.0f, 0.10f, 0.3f), vec2(140, 45), vec2(280, 100), 0.3f, IMAGE_STARS_WINGS, ANIM_WINGS_STATIC });
+	m_aEquipInfo.add({ itShadowWings, vec4(1.75f, 0.0f, 0.0f, 0.003f), vec2(115, 55), vec2(200, 90), 0.0f, IMAGE_SHADOW_WINGS, ANIM_WINGS_LENGTH });
+	m_aEquipInfo.add({ itNeptuneWings, vec4(0.2f, 0.2f, 1.75f, 0.003f), vec2(120, 50), vec2(200, 100), 0.0f, IMAGE_NEPTUNE_WINGS, ANIM_WINGS_LENGTH });
+	m_aEquipInfo.add({ itAngelWings,  vec4(0.2f, 0.2f, 1.75f, 0.003f), vec2(115, 64), vec2(200, 100), 0.0f, IMAGE_ANGEL_WINGS, ANIM_WINGS_LENGTH });
+	m_aEquipInfo.add({ itHeavenlyWings, vec4(1.0f, 0.85f, 0.0f, 0.003f), vec2(170, 100), vec2(280, 150), 0.0f, IMAGE_HEAVENLY_WINGS, ANIM_WINGS_LENGTH });
+	m_aEquipInfo.add({ itRainbowWings, vec4(0.1f, 0.1f, 0.1f, 0.003f), vec2(115, 70), vec2(200, 100), 0.9f, IMAGE_RAINBOW_WINGS, ANIM_WINGS_LENGTH });
+	m_aEquipInfo.add({ itStarsWings, vec4(0.04f, 0.0f, 0.10f, 0.003f), vec2(140, 45), vec2(280, 100), 0.3f, IMAGE_STARS_WINGS, ANIM_WINGS_STATIC });
 }
 
 bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int ClientID)
@@ -634,7 +634,7 @@ bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAn
 		{
 			vec4 Color = pEquipInfo->Color;
 			vec2 Direction = direction(Angle);
-			m_pClient->m_pEffects->WingsEffect(Position, Direction, Color, pEquipInfo->EffectColorRandom);
+			m_pClient->m_pEffects->EnchantEffect(Position, Direction, Color, pEquipInfo->EffectColorRandom);
 		}
 		RenderHammer(pAnim, Angle, Position, pEquipInfo->SpriteID, pEquipInfo->Size.x);
 		return true;
@@ -652,7 +652,7 @@ bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAn
 		{
 			vec4 Color = pEquipInfo->Color;
 			vec2 Direction = direction(Angle);
-			m_pClient->m_pEffects->WingsEffect(Position, Direction, Color, pEquipInfo->EffectColorRandom);
+			m_pClient->m_pEffects->EnchantEffect(Position, Direction, Color, pEquipInfo->EffectColorRandom);
 		}
 		RenderGun(Player, pAnim, Angle, Position, pEquipInfo->SpriteID);
 		return true;
@@ -670,7 +670,7 @@ bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAn
 		{
 			vec4 Color = pEquipInfo->Color;
 			vec2 Direction = direction(Angle);
-			m_pClient->m_pEffects->WingsEffect(Position, Direction, Color, pEquipInfo->EffectColorRandom);
+			m_pClient->m_pEffects->EnchantEffect(Position, Direction, Color, pEquipInfo->EffectColorRandom);
 		}
 		RenderShotgun(Player, pAnim, Angle, Position, pEquipInfo->SpriteID);
 		return true;
@@ -688,7 +688,7 @@ bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAn
 		{
 			vec4 Color = pEquipInfo->Color;
 			vec2 Direction = direction(Angle);
-			m_pClient->m_pEffects->WingsEffect(Position, Direction, Color, pEquipInfo->EffectColorRandom);
+			m_pClient->m_pEffects->EnchantEffect(Position, Direction, Color, pEquipInfo->EffectColorRandom);
 		}
 		RenderGrenade(pAnim, Angle, Position, pEquipInfo->SpriteID);
 		return true;
@@ -706,7 +706,7 @@ bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAn
 		{
 			vec4 Color = pEquipInfo->Color;
 			vec2 Direction = direction(Angle);
-			m_pClient->m_pEffects->WingsEffect(Position, Direction, Color, pEquipInfo->EffectColorRandom);
+			m_pClient->m_pEffects->EnchantEffect(Position, Direction, Color, pEquipInfo->EffectColorRandom);
 		}
 		RenderRifle(pAnim, Angle, Position, pEquipInfo->SpriteID);
 		return true;
@@ -883,8 +883,8 @@ void CPlayers::RenderWings(const CNetObj_Character Player, CAnimState* pAnimWing
 	if (g_Config.m_ClShowMEffects != 2 && WingsEnchantItem)
 	{
 		vec4 Color = pEquipInfo->Color;
-		m_pClient->m_pEffects->WingsEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
-		m_pClient->m_pEffects->WingsEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
+		m_pClient->m_pEffects->EnchantEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
+		m_pClient->m_pEffects->EnchantEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
 	}
 	RenderTools()->RenderWings(pAnimWings, pEquipInfo->SpriteID, Direction, Position, pEquipInfo->Position, pEquipInfo->Size);
 }

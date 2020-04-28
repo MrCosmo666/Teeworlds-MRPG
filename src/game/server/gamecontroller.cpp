@@ -305,7 +305,6 @@ void IGameController::Com_Example(IConsole::IResult* pResult, void* pContext)
 	CCommandManager::SCommandContext* pComContext = (CCommandManager::SCommandContext*)pContext;
 	IGameController* pSelf = (IGameController*)pComContext->m_pContext;
 
-	pSelf->GS()->SendBroadcast(pResult->GetString(0), -1, 100, 100);
 }
 
 void IGameController::RegisterChatCommands(CCommandManager* pManager)

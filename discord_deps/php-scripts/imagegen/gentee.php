@@ -38,6 +38,9 @@
 	$font_size = 40; 
 	$font_size_desc = 16;
 
+	if (strlen($player) >= 12)
+		$font_size = 30;
+
 	// создаём новое изображение из файла
 	$img = imagecreatefrompng("images/$discordcard.png"); 
 	$whitecolor  = imagecolorallocatealpha($img, 255, 255, 255, 20);
