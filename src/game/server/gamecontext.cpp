@@ -1177,8 +1177,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		else if(MsgID == NETMSGTYPE_CL_CALLVOTE)
 		{
 			CNetMsg_Cl_CallVote *pMsg = (CNetMsg_Cl_CallVote *)pRawMsg;
-			if (str_comp_nocase(pMsg->m_Type, "option") != 0 || pMsg->m_Force
-				|| Server()->Tick() < (pPlayer->m_PlayerTick[TickState::LastVoteTry] + Server()->TickSpeed()) / 2)
+			if (str_comp_nocase(pMsg->m_Type, "option") != 0 || Server()->Tick() < (pPlayer->m_PlayerTick[TickState::LastVoteTry] + Server()->TickSpeed()) / 2)
 				return;
 			
 			int InteractiveCount = string_to_number(pMsg->m_Reason, 1, 10000000);
@@ -1187,8 +1186,13 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				return (str_comp_nocase(pMsg->m_Value, vote.m_aDescription) == 0);
 			});
 
-			if(item != m_PlayerVotes[ClientID].end() 
-				&& ParseVote(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveCount, pMsg->m_Reason))
+			if (item == m_PlayerVotes[ClientID].end())
+			{
+				ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+				return;
+			}
+
+			if(ParseVote(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveCount, pMsg->m_Reason))
 				pPlayer->m_PlayerTick[TickState::LastVoteTry] = Server()->Tick();
 		}
 		else if(MsgID == NETMSGTYPE_CL_VOTE)

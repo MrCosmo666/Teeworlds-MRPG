@@ -28,7 +28,7 @@ namespace SleepyDiscord {
 				"},"
 				"\"author\": "
 				"{"
-					" \"name\": \"%s\", "
+					" \"name\": \"MMOTEE\", "
 					" \"url\": \"%s\", "
 					" \"icon_url\": \"%s/%s/dimg/icon.png\" "
 				"}"
@@ -37,7 +37,6 @@ namespace SleepyDiscord {
 		title.c_str(), 
 		color.c_str(), 
 		g_Config.m_SvSiteUrl, g_Config.m_SvGenerateURL, atributes.c_str(),
-		g_Config.m_SvGametype,
 		g_Config.m_SvSiteUrl,
 		g_Config.m_SvSiteUrl, g_Config.m_SvGenerateURL);
 
