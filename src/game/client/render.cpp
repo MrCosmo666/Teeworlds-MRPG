@@ -769,6 +769,10 @@ void CRenderTools::RenderWings(CAnimState* pAnim, int SpriteID, vec2 Dir, vec2 P
 	if (SpriteID <= 0)
 		return;
 
+	vec2 DirNormalizeX = normalize(Dir) * (Size.x / 2.0f);
+	vec2 PosNormalizeX = normalize(Dir) * (Size.x / 4.0f);
+	vec2 DirNormalizeY = normalize(Dir) * 5.0f;
+
 	for (int p = 0; p < 2; p++)
 	{
 		for (int f = 0; f < 2; f++)
@@ -779,10 +783,16 @@ void CRenderTools::RenderWings(CAnimState* pAnim, int SpriteID, vec2 Dir, vec2 P
 				Graphics()->QuadsBegin();
 
 				Graphics()->QuadsSetRotation(0 - pAnim->GetWings()->m_Angle * pi * 2);
-				IGraphics::CQuadItem Quad2((Pos.x - PosWings.x) + (pAnim->GetWings()->m_X), Pos.y - (PosWings.y + pAnim->GetWings()->m_Y), Size.x, Size.y);
+				IGraphics::CQuadItem Quad2((Pos.x - PosWings.x) + (pAnim->GetWings()->m_X) - PosNormalizeX.x,
+					Pos.y - (PosWings.y + pAnim->GetWings()->m_Y) - DirNormalizeY.y,
+					Size.x + DirNormalizeX.x,
+					Size.y);
 				Graphics()->QuadsDrawTL(&Quad2, 1);
 				Graphics()->QuadsSetRotation(0 + pAnim->GetWings()->m_Angle * pi * 2);
-				IGraphics::CQuadItem Quad((Pos.x + PosWings.x) - (pAnim->GetWings()->m_X), Pos.y - (PosWings.y + pAnim->GetWings()->m_Y), -Size.x, Size.y);
+				IGraphics::CQuadItem Quad((Pos.x + PosWings.x) - (pAnim->GetWings()->m_X) - PosNormalizeX.x,
+					Pos.y - (PosWings.y + pAnim->GetWings()->m_Y) - DirNormalizeY.y,
+					-Size.x + DirNormalizeX.x,
+					Size.y);
 				Graphics()->QuadsDrawTL(&Quad, 1);
 
 				Graphics()->QuadsEnd();

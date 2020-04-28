@@ -556,6 +556,24 @@ void CPlayers::OnRender()
 	}
 }
 
+
+// mmotee
+CPlayers::EquipItem* CPlayers::FindEquipInformation(int ItemID, vec2 SetPosition)
+{
+	for (int i = 0; i < m_aEquipInfo.size(); i++)
+	{
+		if (m_aEquipInfo[i].ItemID != ItemID)
+			continue;
+
+		if (SetPosition.x != 0.0f && SetPosition.y != 0.0f)
+			m_aEquipInfo[i].Position = SetPosition;
+
+		return &m_aEquipInfo[i];
+	}
+	return NULL;
+}
+
+
 enum ItemList
 {
 	itHeavenlyHammer = 10000,
@@ -574,23 +592,8 @@ enum ItemList
 	itMagitechGrenade = 10013,
 	itMagitechRifle = 10014,
 	itStarsWings = 10015,
+	itBatWings = 10016,
 };
-
-// mmotee
-CPlayers::EquipItem* CPlayers::FindEquipInformation(int ItemID, vec2 SetPosition)
-{
-	for (int i = 0; i < m_aEquipInfo.size(); i++)
-	{
-		if (m_aEquipInfo[i].ItemID != ItemID)
-			continue;
-
-		if (SetPosition.x != 0.0f && SetPosition.y != 0.0f)
-			m_aEquipInfo[i].Position = SetPosition;
-
-		return &m_aEquipInfo[i];
-	}
-	return NULL;
-}
 
 void CPlayers::OnInit()
 {
@@ -617,6 +620,7 @@ void CPlayers::OnInit()
 	m_aEquipInfo.add({ itHeavenlyWings, vec4(1.0f, 0.85f, 0.0f, 0.003f), vec2(170, 100), vec2(280, 150), 0.0f, IMAGE_HEAVENLY_WINGS, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itRainbowWings, vec4(0.1f, 0.1f, 0.1f, 0.003f), vec2(115, 70), vec2(200, 100), 0.9f, IMAGE_RAINBOW_WINGS, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itStarsWings, vec4(0.04f, 0.0f, 0.10f, 0.003f), vec2(140, 45), vec2(280, 100), 0.3f, IMAGE_STARS_WINGS, ANIM_WINGS_STATIC });
+	m_aEquipInfo.add({ itBatWings, vec4(0.15f, 0.0f, 0.0f, 0.003f), vec2(80, 70), vec2(140, 120), 0.3f, IMAGE_BAT_WINGS, ANIM_WINGS_STATIC });
 }
 
 bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int ClientID)
