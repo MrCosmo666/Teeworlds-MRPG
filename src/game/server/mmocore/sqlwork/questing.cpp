@@ -274,7 +274,7 @@ void QuestBase::FinishQuest(CPlayer *pPlayer, int QuestID)
 	pPlayer->AddExp(finishQuestData.Exp);
 
 	GS()->Chat(-1, "{STR} completed ({STR} {STR})", GS()->Server()->ClientName(ClientID), finishQuestData.StoryLine, finishQuestData.Name);
-	GS()->ChatDiscord(false, DC_PLAYER_INFO, GS()->Server()->ClientName(ClientID), "Completed ({STR} {STR})", finishQuestData.StoryLine, finishQuestData.Name);
+	GS()->ChatDiscord(DC_PLAYER_INFO, GS()->Server()->ClientName(ClientID), "Completed ({STR} {STR})", finishQuestData.StoryLine, finishQuestData.Name);
 	Job()->SaveAccount(pPlayer, SAVESTATS);
 
 	if (!CheckNewStories(pPlayer, QuestID))

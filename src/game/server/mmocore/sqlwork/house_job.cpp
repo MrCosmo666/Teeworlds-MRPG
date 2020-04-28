@@ -327,7 +327,7 @@ void HouseJob::SellToHouse(int SellerID, int BuyightID, int Price)
 		GS()->Chat(-1, "Made a deal {STR} and {STR} at home {VAL} G", 
 			GS()->Server()->ClientName(SellerID), GS()->Server()->ClientName(BuyightID), &Price);
 
-		GS()->ChatDiscord(false, DC_SERVER_INFO, "Server information", "**Made a deal [{STR} and {STR}] at home [{INT}G]**", 
+		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**Made a deal [{STR} and {STR}] at home [{INT}G]**", 
 			GS()->Server()->ClientName(SellerID), GS()->Server()->ClientName(BuyightID), &Price);	
 		
 		GS()->ResetVotes(SellerID, MAINMENU);
@@ -348,7 +348,7 @@ void HouseJob::SellHouse(int HouseID)
 		{
 			GS()->ChatFollow(ClientID, "Your House is sold !");
 			GS()->Chat(-1, "House: {INT} have been is released!", &HouseID);
-			GS()->ChatDiscord(false, DC_SERVER_INFO, "Server information", "**[House: {INT}] have been sold!**", &HouseID);
+			GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**[House: {INT}] have been sold!**", &HouseID);
 		}
 		int Price = Home[HouseID].m_Price;
 		Job()->Inbox()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itMoney, Price, 0);
@@ -537,7 +537,7 @@ bool HouseJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 		if(BuyHouse(VoteID, pPlayer))
 		{
 			GS()->Chat(-1, "{STR} becomes the owner of the house class {STR} HID {INT}", GS()->Server()->ClientName(ClientID), Home[VoteID].m_Class, &VoteID);
-			GS()->ChatDiscord(false, DC_SERVER_INFO, "Server information", "**{STR} becomes the owner of the house class [{STR} number {INT}]**",
+			GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**{STR} becomes the owner of the house class [{STR} number {INT}]**",
 					GS()->Server()->ClientName(ClientID), Home[VoteID].m_Class, &VoteID);
 			GS()->ChatFollow(ClientID, "Do not forget to top up the balance at home, now the balance {INT}G", &Home[VoteID].m_Bank);
 			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);

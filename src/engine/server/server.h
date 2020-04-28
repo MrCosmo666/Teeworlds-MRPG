@@ -89,7 +89,7 @@ public:
 	void SetServer(CServer *pServer);
 	void SetGameServer(CGS *pGameServer);
 
-	void SendMessage(const char *pChanal, const char *Color, const char *Title, const char *pMsg, bool Icon = false);
+	void SendMessage(const char *pChanal, const char *Color, const char *Title, const char *pMsg);
 	void SendGenerateMessage(const char *Color, const char *Title, const char *pMsg);
 };
 #endif
@@ -237,7 +237,7 @@ public:
 	virtual const char* GetClientLanguage(int ClientID);
 	virtual const char* GetWorldName(int WorldID);
 
-	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText, bool Icon);
+	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText);
 	virtual void SendDiscordGenerateMessage(const char *pColor, const char *pTitle, const char *pMsg);
 
 	void Kick(int ClientID, const char *pReason);

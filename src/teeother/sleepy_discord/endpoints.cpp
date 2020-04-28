@@ -12,8 +12,7 @@ namespace SleepyDiscord {
 		return request(Post, path("channels/{channel.id}/messages", { channelID }), "{\"content\":\"" + message + (tts ? "\",\"tts\":\"true\"" : "\"") + "}");
 	}
 
-	ObjectResponse<Message> BaseDiscordClient::generateSendmmo(Snowflake<Channel> channelID, std::string color, std::string title, 
-		std::string atributes, std::string urlserver) 
+	ObjectResponse<Message> BaseDiscordClient::generateSendmmo(Snowflake<Channel> channelID, std::string color, std::string title, std::string atributes) 
 	{	
 		char aBuf[1024];
 		str_format(aBuf, sizeof(aBuf),
@@ -44,49 +43,22 @@ namespace SleepyDiscord {
 	}
 
 
-	ObjectResponse<Message> BaseDiscordClient::sendEmbedMessage(Snowflake<Channel> channelID, std::string color, std::string title, std::string message, bool icon) 
+	ObjectResponse<Message> BaseDiscordClient::sendEmbedMessage(Snowflake<Channel> channelID, std::string color, std::string title, std::string message) 
 	{
 		char aBuf[2048];
-		if(icon)
-		{
-			char aRandomImage[128];
-			str_format(aRandomImage, sizeof(aRandomImage), "%s/%s/dimg/random%d.png", g_Config.m_SvSiteUrl, g_Config.m_SvGenerateURL, 1+rand()%4);
-
-			str_format(aBuf, sizeof(aBuf),
+		str_format(aBuf, sizeof(aBuf),
+		"{"
+			"\"embed\":"
 			"{"
-				"\"embed\":"
-				"{"
-					"\"title\": \"%s\","
-					"\"description\": \"%s\","
-					"\"color\": \"%s\","
-					"\"thumbnail\":"
-					"{"
-						"\"url\": \"%s\""
-					"}"
-				"}"
-			"}",
-			title.c_str(), 
-			message.c_str(),
-			color.c_str(), 
-			aRandomImage,
-			g_Config.m_SvSiteUrl);
-		}
-		else
-		{
-			str_format(aBuf, sizeof(aBuf),
-			"{"
-				"\"embed\":"
-				"{"
-					"\"title\": \"%s\","
-					"\"description\": \"%s\","
-					"\"color\": \"%s\""
-				"}"
-			"}",
-			title.c_str(), 
-			message.c_str(),
-			color.c_str(),
-			g_Config.m_SvSiteUrl);
-		}
+				"\"title\": \"%s\","
+				"\"description\": \"%s\","
+				"\"color\": \"%s\""
+			"}"
+		"}",
+		title.c_str(), 
+		message.c_str(),
+		color.c_str(),
+		g_Config.m_SvSiteUrl);
 		return request(Post, path("channels/{channel.id}/messages", { channelID }), aBuf);
 	}
 

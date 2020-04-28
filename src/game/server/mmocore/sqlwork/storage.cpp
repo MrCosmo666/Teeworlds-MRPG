@@ -109,7 +109,7 @@ bool StorageSql::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int 
 		AddStorageGoods(VoteID, Count);
 		pPlayer->GetItem(itMaterial).Add(Count);
 		GS()->Chat(ClientID, "You sell Goodsx{INT}.", &Count);
-		GS()->ChatDiscord(false, DC_SERVER_INFO, "Server information", "**{STR} was delivery {INT} goods.**", Storage[VoteID].Name, &Count);
+		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**{STR} was delivery {INT} goods.**", Storage[VoteID].Name, &Count);
 		GS()->VResetVotes(ClientID, MAINMENU);
 		return true;
 	}
@@ -343,7 +343,7 @@ void StorageSql::BuyStorages(CPlayer *pPlayer, int StorageID)
 	Storage[StorageID].OwnerID = pPlayer->Acc().AuthID;
 	SJK.UD("tw_storages", "OwnerID = '%d', Bank = '%d' WHERE ID = '%d'", pPlayer->Acc().AuthID, g_Config.m_SvPaymentBussines, StorageID);
 	GS()->Chat(-1, "{STR} becomes the owner {STR}", GS()->Server()->ClientName(ClientID), Storage[StorageID].Name);
-	GS()->ChatDiscord(false, DC_PLAYER_INFO, "Server information", "**{STR} becomes the owner {STR}**", GS()->Server()->ClientName(ClientID), Storage[StorageID].Name);
+	GS()->ChatDiscord(DC_PLAYER_INFO, "Server information", "**{STR} becomes the owner {STR}**", GS()->Server()->ClientName(ClientID), Storage[StorageID].Name);
 }
 
 void StorageSql::SellStorage(int AuthID)

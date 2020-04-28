@@ -172,7 +172,8 @@ void AccountMainSql::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 void AccountMainSql::ShowDiscordCard(int ClientID)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true);
-	if(!pPlayer) return;
+	if(!pPlayer) 
+		return;
 
 	const int Rank = GetRank(pPlayer->Acc().AuthID);
 	GS()->Chat(-1, "{STR} joined to Mmo server Rank #{INT}", GS()->Server()->ClientName(ClientID), &Rank);
@@ -180,8 +181,8 @@ void AccountMainSql::ShowDiscordCard(int ClientID)
 #ifdef CONF_DISCORD
 	char pMsg[256], pLoggin[64];
 	str_format(pLoggin, sizeof(pLoggin), "%s logged in Account ID %d", GS()->Server()->ClientName(ClientID), pPlayer->Acc().AuthID);
-	str_format(pMsg, sizeof(pMsg), "?level=%d&player=%s&hungry=0&rank=%d&dicid=%d",
-		pPlayer->Acc().Level, GS()->Server()->ClientName(ClientID), Rank, pPlayer->GetItemEquip(EQUIP_DISCORD));
+	str_format(pMsg, sizeof(pMsg), "?player=%s&rank=%d&dicid=%d",
+		GS()->Server()->ClientName(ClientID), Rank, pPlayer->GetItemEquip(EQUIP_DISCORD));
 	GS()->Server()->SendDiscordGenerateMessage("16757248", pLoggin, pMsg);
 #endif
 }

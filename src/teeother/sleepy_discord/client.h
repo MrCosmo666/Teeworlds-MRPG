@@ -87,8 +87,8 @@ namespace SleepyDiscord {
 		ArrayResponse <Message     > getMessages             (Snowflake<Channel> channelID, GetMessagesKey when, Snowflake<Message> messageID, uint8_t limit = 0);
 		ObjectResponse<Message     > getMessage              (Snowflake<Channel> channelID, Snowflake<Message> messageID);                                                    //to do add more then one message return
 		ObjectResponse<Message     > sendMessage             (Snowflake<Channel> channelID, std::string message, bool tts = false);
-		ObjectResponse<Message     > sendEmbedMessage        (Snowflake<Channel> channelID, std::string color, std::string title, std::string message, bool icon = false);
-		ObjectResponse<Message     > generateSendmmo         (Snowflake<Channel> channelID, std::string color, std::string title, std::string atributes, std::string urlserver);
+		ObjectResponse<Message     > sendEmbedMessage        (Snowflake<Channel> channelID, std::string color, std::string title, std::string message);
+		ObjectResponse<Message     > generateSendmmo         (Snowflake<Channel> channelID, std::string color, std::string title, std::string atributes);
 		ObjectResponse<Message     > uploadFile              (Snowflake<Channel> channelID, std::string fileLocation, std::string message);
 		bool                         addReaction             (Snowflake<Channel> channelID, Snowflake<Message> messageID, std::string emoji);
 		bool                         removeReaction          (Snowflake<Channel> channelID, Snowflake<Message> messageID, std::string emoji, Snowflake<User> userID = "@me");

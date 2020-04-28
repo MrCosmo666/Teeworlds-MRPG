@@ -493,7 +493,7 @@ void CGS::ChatWorldID(int WorldID, const char* Suffix, const char* pText, ...)
 }
 
 // Отправить дискорд сообщение
-void CGS::ChatDiscord(bool Icon, const char *Color, const char *Title, const char* pText, ...)
+void CGS::ChatDiscord(const char *Color, const char *Title, const char* pText, ...)
 {
 #ifdef CONF_DISCORD
 	va_list VarArgs;
@@ -501,7 +501,7 @@ void CGS::ChatDiscord(bool Icon, const char *Color, const char *Title, const cha
 	
 	dynamic_string Buffer;
 	Server()->Localization()->Format_VL(Buffer, "en", pText, VarArgs);
-	Server()->SendDiscordMessage(g_Config.m_SvDiscordChanal, Color, Title, Buffer.buffer(), Icon);
+	Server()->SendDiscordMessage(g_Config.m_SvDiscordChanal, Color, Title, Buffer.buffer());
 	Buffer.clear();
 
 	va_end(VarArgs);
@@ -509,7 +509,7 @@ void CGS::ChatDiscord(bool Icon, const char *Color, const char *Title, const cha
 }
 
 // Отправить дискорд сообщение в канал
-void CGS::ChatDiscordChannel(bool Icon, const char *pChanel, const char *Color, const char *Title, const char* pText, ...)
+void CGS::ChatDiscordChannel(const char *pChanel, const char *Color, const char *Title, const char* pText, ...)
 {
 #ifdef CONF_DISCORD
 	va_list VarArgs;
@@ -517,7 +517,7 @@ void CGS::ChatDiscordChannel(bool Icon, const char *pChanel, const char *Color, 
 	
 	dynamic_string Buffer;
 	Server()->Localization()->Format_VL(Buffer, "en", pText, VarArgs);
-	Server()->SendDiscordMessage(pChanel, Color, Title, Buffer.buffer(), Icon);
+	Server()->SendDiscordMessage(pChanel, Color, Title, Buffer.buffer());
 	Buffer.clear();
 	
 	va_end(VarArgs);
@@ -1165,7 +1165,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				}
 
 				// отправить обычное сообщение в чат
-				ChatDiscord(false, DC_SERVER_CHAT, Server()->ClientName(ClientID), pMsg->m_pMessage);
+				ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ClientID), pMsg->m_pMessage);
 				SendChat(ClientID, Mode, pMsg->m_Target, pMsg->m_pMessage);						
 			}
 		}
@@ -1426,7 +1426,7 @@ void CGS::OnClientEnter(int ClientID)
 		Chat(ClientID, "Enter '/login <login> <pass> !");
 		
 		SendDayInfo(ClientID);
-		ChatDiscord(false, DC_JOIN_LEAVE, Server()->ClientName(ClientID), "connected and enter in Mmo 0.7");
+		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "connected and enter in Mmo 0.7");
 	}
 
 	// fail check client
@@ -1452,7 +1452,7 @@ void CGS::OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld)
 	// update clients on drop
 	if (Server()->ClientIngame(ClientID) && IsClientEqualWorldID(ClientID))
 	{
-		ChatDiscord(false, DC_JOIN_LEAVE, Server()->ClientName(ClientID), "leave game Mmo 0.7");
+		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "leave game Mmo 0.7");
 
 		CNetMsg_Sv_ClientDrop Msg;
 		Msg.m_ClientID = ClientID;

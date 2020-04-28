@@ -427,16 +427,15 @@ void CServer::SendDiscordGenerateMessage(const char *pColor, const char *pTitle,
 	#endif
 }
 
-void CServer::SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText, bool Icon)
+void CServer::SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText)
 {
 	#ifdef CONF_DISCORD
-		bool pIcon = Icon;
 		char Text[512], Title[256], Color[16];
 		str_copy(Text, pText, sizeof(Text));
 		str_copy(Title, pTitle, sizeof(Title));
 		str_copy(Color, pColor, sizeof(Color));
 
-		std::thread t([=]() { m_pDiscord->SendMessage(pChanel, Color, Title, Text, pIcon); });
+		std::thread t([=]() { m_pDiscord->SendMessage(pChanel, Color, Title, Text); });
 		t.detach();
 	#endif
 }
@@ -1751,7 +1750,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		if(messagecont.size() <= 7)
 		{
 			sendEmbedMessage(message.channelID, DC_SERVER_WARNING, "Not right!",
-			"Use **!mstat <nick full or not>. Minimal symbols 1.**!!!", false);
+			"Use **!mstat <nick full or not>. Minimal symbols 1.**!!!");
 			return;
 		}
 
@@ -1769,16 +1768,15 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 			const int Rank = Server()->GameServer()->GetRank(AuthID);
 
 			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "?level=%d&player=%s&hungry=%d&rank=%d&dicid=%d", 
-				(int)RES->getInt("Level"), RES->getString("Nick").c_str(), RES->getInt("Eat"), Rank, RES->getInt("DiscordEquip"));
-			generateSendmmo(message.channelID, std::to_string(RandomColor), "Discord MmoTee Card", aBuf, g_Config.m_SvGenerateURL);
+			str_format(aBuf, sizeof(aBuf), "?player=%s&rank=%d&dicid=%d", RES->getString("Nick").c_str(), Rank, RES->getInt("DiscordEquip"));
+			generateSendmmo(message.channelID, std::to_string(RandomColor), "Discord MmoTee Card", aBuf);
 			founds = true;
 		}
 
 		if(!founds)
 		{
 			sendEmbedMessage(message.channelID, DC_SERVER_WARNING, "Sorry!",
-				"**This account not found in database!**", false);
+				"**This account not found in database!**");
 		}
 		return;
 	}
@@ -1788,7 +1786,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		// получаем Айди пользователя
 		SleepyDiscord::Snowflake<SleepyDiscord::User> userAuth = getUser(message.author).cast();
 		sendEmbedMessage(message.channelID, DC_DISCORD_INFO, "Connector Information",  
-			"```ini\\n[Warning] Do not connect other people's discords to your account in the game\\nThis is similar to hacking your account in the game\\n# Use in-game for connect your personal discord:\\n# Did '" + userAuth + "'\\n# Command in-game: /discord_connect <did>```", false);
+			"```ini\\n[Warning] Do not connect other people's discords to your account in the game\\nThis is similar to hacking your account in the game\\n# Use in-game for connect your personal discord:\\n# Did '" + userAuth + "'\\n# Command in-game: /discord_connect <did>```");
 
 		// проверяем на поиск пользователя
 		std::string Nick = "Refresh please.";
@@ -1804,14 +1802,14 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		{
 			// пишем хорошее подключение
 			Nick = RES->getString("Nick").c_str();
-			sendEmbedMessage(message.channelID, DC_DISCORD_BOT, "Good work :)", "**Good connect! Connect nickname: " + Nick + "**", true);
+			sendEmbedMessage(message.channelID, DC_DISCORD_BOT, "Good work :)", "**Good connect! Connect nickname: " + Nick + "**");
 			founds = true;
 		}
 
 		// завершаем подключение
 		if(!founds)
 		{
-			sendEmbedMessage(message.channelID, DC_SERVER_WARNING, "Fail in work :(", "**Fail connect! No connect! See !mconnect.\\nUse in-game /discord_connect <DID>..**", true);
+			sendEmbedMessage(message.channelID, DC_SERVER_WARNING, "Fail in work :(", "**Fail connect! No connect! See !mconnect.\\nUse in-game /discord_connect <DID>..**");
 		}
 		return;
 	}
@@ -1823,7 +1821,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		int Hour = Server()->GetHourWorld();
 		int Minutes = Server()->GetSecWorld();
 		str_format(aBuf, sizeof(aBuf), "```%s %d:%d```", Server()->GetStringTypeDay(), Hour, Minutes);
-		sendEmbedMessage(message.channelID, DC_DISCORD_BOT, "World Time", aBuf, true);
+		sendEmbedMessage(message.channelID, DC_DISCORD_BOT, "World Time", aBuf);
 	}
 
 	// ПОКАЗАТЬ ВСЕХ ИГРОКОВ
@@ -1832,7 +1830,8 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		dynamic_string Buffer;
 		for(int i = 0; i < MAX_PLAYERS; i++) 
 		{
-			if(!Server()->ClientIngame(i)) continue;
+			if(!Server()->ClientIngame(i)) 
+				continue;
 
 			char aBuf[48];
 			str_format(aBuf, sizeof(aBuf), "\\n%s - Ingame", Server()->ClientName(i));
@@ -1840,10 +1839,10 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		}
 		if(Buffer.length() <= 0)
 		{
-			sendEmbedMessage(message.channelID, DC_DISCORD_BOT, "Online Server", "Server is empty", true);
+			sendEmbedMessage(message.channelID, DC_DISCORD_BOT, "Online Server", "Server is empty");
 			return;
 		}
-		sendEmbedMessage(message.channelID, DC_DISCORD_BOT, "Online Server", Buffer.buffer(), true);
+		sendEmbedMessage(message.channelID, DC_DISCORD_BOT, "Online Server", Buffer.buffer());
 		Buffer.clear();
 		return;
 	}
@@ -1855,21 +1854,20 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		"`!mtime` - Tee time in server."
 		"\\n`!mconnect` - Info for connect your discord and account in game."
 		"\\n`!mstat <nick>` - See stats 0.7 mmo players. Minimal 4 symbols."
-		"\\n`!mjoinreward` - Get Active Reward."
-		"\\n`!monline` - Show players ingame.", true);
+		"\\n`!monline` - Show players ingame.");
 	}
 }
 
 void DiscordJob::SendGenerateMessage(const char *Color, const char *Title, const char *pMsg)
 {
 	if(!g_Config.m_SvCreateDiscordBot) return;
-	this->generateSendmmo(g_Config.m_SvDiscordChanal, Color, Title, pMsg, g_Config.m_SvGenerateURL);
+	this->generateSendmmo(g_Config.m_SvDiscordChanal, Color, Title, pMsg);
 }
 
-void DiscordJob::SendMessage(const char *pChanal, const char *Color, const char *Title, const char *pMsg, bool Icon)
+void DiscordJob::SendMessage(const char *pChanal, const char *Color, const char *Title, const char *pMsg)
 {
 	if(!g_Config.m_SvCreateDiscordBot) return;
-	this->sendEmbedMessage(pChanal, Color, Title, pMsg, Icon);
+	this->sendEmbedMessage(pChanal, Color, Title, pMsg);
 }
 #endif
 

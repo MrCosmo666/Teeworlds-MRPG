@@ -76,7 +76,7 @@ public:
 	virtual void SetClientLanguage(int ClientID, const char* pLanguage) = 0;
 	virtual const char* GetClientLanguage(int ClientID) = 0;
 
-	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText, bool Icon) = 0;
+	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText) = 0;
 	virtual void SendDiscordGenerateMessage(const char *pColor, const char *pTitle, const char *pMsg) = 0;
 	
 	// Bots
