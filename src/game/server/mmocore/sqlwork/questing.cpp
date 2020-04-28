@@ -738,7 +738,7 @@ void QuestBase::QuestTableShowRequired(CPlayer* pPlayer, ContextBots::QuestBotIn
 			double Chance = BotData.InterRandom[0] <= 0 ? 100.0f : (1.0f / (double)BotData.InterRandom[0]) * 100;
 			str_format(aChanceBuf, sizeof(aChanceBuf), "%s [takes %0.2f%%]", aBuf, Chance);
 		}
-		GS()->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, Count, ItemID);
+		GS()->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, Count, ItemID, false);
 	}
 
 	// показываем текст по информации о мобах
@@ -754,6 +754,19 @@ void QuestBase::QuestTableShowRequired(CPlayer* pPlayer, ContextBots::QuestBotIn
 		GS()->Mmo()->Quest()->QuestTableAddInfo(ClientID, aBuf, Count,
 			QuestBase::Quests[ClientID][BotData.QuestID].MobProgress[i - 4]);
 	}
+
+	for (int i = 2; i < 4; i++)
+	{
+		int ItemID = BotData.Interactive[i];
+		int Count = BotData.InterCount[i];
+		if (ItemID <= 0 || Count <= 0)
+			continue;
+
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "Receive %s", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
+		GS()->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, Count, ItemID, true);
+	}
+
 }
 
 // Парсинг голосованний 
@@ -775,7 +788,7 @@ bool QuestBase::OnMessage(int MsgID, void *pRawMsg, int ClientID)
 	return false;
 }
 
-void QuestBase::QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID)
+void QuestBase::QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID, bool GivingTable)
 {
 	CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
 	if (!pPlayer || ItemID < itMoney || !GS()->CheckClient(ClientID))
@@ -787,6 +800,7 @@ void QuestBase::QuestTableAddItem(int ClientID, const char* pText, int Requires,
 	Msg.m_pText = pText;
 	Msg.m_pRequiresNum = Requires;
 	Msg.m_pHaveNum = clamp(SelectedItem.Count, 0, Requires);
+	Msg.m_pGivingTable = GivingTable;
 	StrToInts(Msg.m_pIcon, 4, SelectedItem.Info().GetIcon());
 	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
@@ -800,6 +814,7 @@ void QuestBase::QuestTableAddInfo(int ClientID, const char *pText, int Requires,
 	Msg.m_pText = pText;
 	Msg.m_pRequiresNum = Requires;
 	Msg.m_pHaveNum = clamp(Have, 0, Requires);
+	Msg.m_pGivingTable = false;
 	StrToInts(Msg.m_pIcon, 4, "hammer");
 	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }

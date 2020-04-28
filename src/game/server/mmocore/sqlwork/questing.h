@@ -92,7 +92,7 @@ public:
 	void UpdateArrowStep(int ClientID);
 	bool CheckNewStories(CPlayer* pPlayer, int CheckQuestID = -1);
 
-	void QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID);
+	void QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID, bool Giving);
 	void QuestTableAddInfo(int ClientID, const char* pText, int Requires, int Have);
 	void QuestTableClear(int ClientID);
 	void QuestTableShowRequired(CPlayer* pPlayer, ContextBots::QuestBotInfo& BotData);

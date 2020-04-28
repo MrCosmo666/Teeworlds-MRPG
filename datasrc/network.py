@@ -624,6 +624,7 @@ Messages = [
 		NetArray(NetIntAny("m_pIcon"), 4),
 		NetIntAny("m_pRequiresNum"),
 		NetIntAny("m_pHaveNum"),
+        NetBool("m_pGivingTable"),
 	]),
 
 	# clear all items on Questing Process

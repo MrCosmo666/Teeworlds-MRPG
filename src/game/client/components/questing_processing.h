@@ -8,7 +8,7 @@ class CQuestingProcessing : public CComponent
 {
 	enum
 	{
-		MAX_TABLE = 4,
+		MAX_TABLE = 6,
 	};
 
 	struct QuestingTable
@@ -17,6 +17,7 @@ class CQuestingProcessing : public CComponent
 		int m_Requires;
 		char m_aText[128];
 		char m_aIcon[32];
+		bool m_GivingTable;
 	
 		bool TableActive() const 
 		{ 
@@ -27,9 +28,10 @@ class CQuestingProcessing : public CComponent
 
 public:
 	void Clear();
-	bool IsActive();
-
+	bool IsActive(); 
 	void ProcessingRenderTable(int TableID, CUIRect& Box);
+
+	int TableSize() const;
 
 	virtual void OnRender();
 	virtual void OnStateChange(int NewState, int OldState);

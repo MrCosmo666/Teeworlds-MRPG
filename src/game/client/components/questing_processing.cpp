@@ -4,6 +4,7 @@
 #include <engine/graphics.h>
 #include <engine/textrender.h>
 #include <engine/keys.h>
+#include <base/color.h>
 
 #include <generated/protocol.h>
 #include <generated/client_data.h>
@@ -14,7 +15,7 @@
 #include "questing_processing.h"
 
 #define COLOR_TABLE vec4(0.40f, 0.22f, 0.08f, 0.3f)
-#define COLOR_BACKGROUND vec4(0.35f, 0.20f, 0.15f, 0.4f)
+#define COLOR_BACKGROUND vec4(0.35f, 0.13f, 0.007f, 0.4f)
 #define COLOR_BACKBACKGROUND vec4(0.30f, 0.19f, 0.15f, 0.30f)
 #define COLOR_UIBAR vec4(0.35f, 0.55f, 0.1f, 0.45f)
 
@@ -36,27 +37,44 @@ void CQuestingProcessing::OnStateChange(int NewState, int OldState)
 
 void CQuestingProcessing::ProcessingRenderTable(int TableID, CUIRect &Box)
 {
-	CUIRect Table;
-	Box.HMargin(120.0f, &Table);
-
+	CUIRect Table = Box;
 	float Space = TableID * 60.0f;
-	Table.y = Box.y + Space + 40.0f;
+	Table.h = 40.0f;
+	Table.y = Box.y + Space + 30.0f;
 	RenderTools()->DrawRoundRect(&Table, COLOR_TABLE, 15.0f);
 
 	{ // RES
+		char aQuestTable[128];
 		vec4 ColorBarUI = (QuestTable[TableID].m_Have >= QuestTable[TableID].m_Requires ? vec4(0.40f, 0.80f, 0.1f, 0.50f) : vec4(0.80f, 0.30f, 0.1f, 0.50f));
-
-		char aQuestTable[32];
-		str_format(aQuestTable, sizeof(aQuestTable), "%s %d / %d", QuestTable[TableID].m_aText, QuestTable[TableID].m_Have, QuestTable[TableID].m_Requires);
-		RenderTools()->DrawUIBar(TextRender(), Table, ColorBarUI,
-			QuestTable[TableID].m_Have, QuestTable[TableID].m_Requires, aQuestTable, 3, 10.0f, 8.0f);
+		if (QuestTable[TableID].m_GivingTable)
+		{
+			ColorBarUI = vec4(1.00f, 0.80f, 0.0f, 0.30f);
+			str_format(aQuestTable, sizeof(aQuestTable), "%sx%d", QuestTable[TableID].m_aText, QuestTable[TableID].m_Requires);
+			RenderTools()->DrawUIBar(TextRender(), Table, ColorBarUI, 10, 10, aQuestTable, 3, 10.0f, 8.0f);
+		}
+		else
+		{
+			str_format(aQuestTable, sizeof(aQuestTable), "%s %d / %d", QuestTable[TableID].m_aText, QuestTable[TableID].m_Have, QuestTable[TableID].m_Requires);
+			RenderTools()->DrawUIBar(TextRender(), Table, ColorBarUI, QuestTable[TableID].m_Have, QuestTable[TableID].m_Requires, aQuestTable, 3, 10.0f, 8.0f);
+		}
 	}
 
 	//  ICON
-	float SizeIcon = 80.0f;
+	float SizeIcon = 70.0f;
 	Table.VSplitRight(50.0f, 0, &Table);
-	Table.HSplitBottom(70.0f, 0, &Table);
+	Table.HSplitBottom(55.0f, 0, &Table);
 	m_pClient->m_pMenus->DoItemIcon(QuestTable[TableID].m_aIcon, Table, SizeIcon);
+}
+
+int CQuestingProcessing::TableSize() const
+{
+	int sizetab = 0;
+	for (int i = 0; i < MAX_TABLE; i++)
+	{
+		if (QuestTable[i].TableActive())
+			sizetab++;
+	}
+	return sizetab;
 }
 
 void CQuestingProcessing::OnRender()
@@ -64,15 +82,16 @@ void CQuestingProcessing::OnRender()
 	if(!IsActive())
 		return;
 
+	int tabsize = TableSize();
 	float Width = 400 * 3.0f * Graphics()->ScreenAspect();
 	float Height = 400 * 3.0f;
 	Graphics()->MapScreen(0, 0, Width, Height);
 
 	// --------------------- BACKGROUND -----------------------
 	// --------------------------------------------------------
-	float tx = Width / 3.0f, ty = Height / 5.0f, tw = Width / 3.0f, th = Height / 4.0f;
-	CUIRect BackgroundMain = { tx, ty, tw, th };
-	RenderTools()->DrawRoundRect(&BackgroundMain, COLOR_BACKBACKGROUND, 30.0f);
+	float tx = Width / 3.0f, ty = Height / 2.5f, tw = Width / 3.0f, th = 60.0f;
+	CUIRect BackgroundMain = { tx, ty - tabsize * (60.0f), tw, (45.0f + th * tabsize) };
+	RenderTools()->DrawRoundRect(&BackgroundMain, COLOR_BACKGROUND, 30.0f);
 
 	CUIRect BackgroundOther;
 	BackgroundMain.Margin(10.0f, &BackgroundOther);
@@ -83,13 +102,13 @@ void CQuestingProcessing::OnRender()
 	// --------------------------------------------------------
 	for (int i = 0; i < MAX_TABLE; i++)
 	{
-		if(QuestTable[i].TableActive())
+		if (QuestTable[i].TableActive())
 			ProcessingRenderTable(i, BackgroundOther);
 	}
 
 	// ---------------- TEXT (Quest Task List) ----------------
 	// --------------------------------------------------------
-	TextRender()->Text(0x0, tx + 30.0f, ty - 20.0f, 42.0f, Localize("Quest Task List"), -1.0f);
+	TextRender()->Text(0x0, BackgroundMain.x, BackgroundMain.y - 20.0f, 42.0f, Localize("Quest Task List"), -1.0f);
 }
 
 void CQuestingProcessing::OnMessage(int MsgType, void *pRawMsg)
@@ -108,6 +127,7 @@ void CQuestingProcessing::OnMessage(int MsgType, void *pRawMsg)
 
 			QuestTable[i].m_Requires = pMsg->m_pRequiresNum;
 			QuestTable[i].m_Have = pMsg->m_pHaveNum;
+			QuestTable[i].m_GivingTable = pMsg->m_pGivingTable;
 			str_copy(QuestTable[i].m_aText, pMsg->m_pText, sizeof(QuestTable[i].m_aText));
 		
 			char pIcon[16];
