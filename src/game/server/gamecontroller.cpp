@@ -302,8 +302,8 @@ int IGameController::GetRealPlayer()
 
 void IGameController::Com_Example(IConsole::IResult* pResult, void* pContext)
 {
-	CCommandManager::SCommandContext* pComContext = (CCommandManager::SCommandContext*)pContext;
-	IGameController* pSelf = (IGameController*)pComContext->m_pContext;
+	//CCommandManager::SCommandContext* pComContext = (CCommandManager::SCommandContext*)pContext;
+	//IGameController* pSelf = (IGameController*)pComContext->m_pContext;
 
 }
 
