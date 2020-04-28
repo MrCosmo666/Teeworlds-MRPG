@@ -1760,7 +1760,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		sqlstr::CSqlString<64> cDiscordIDorNick = sqlstr::CSqlString<64>(input.c_str());
 
 		// ищим пользователя
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dataplayers", "WHERE Nick LIKE '%s'LIMIT 5", cDiscordIDorNick.cstr()));
+		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "	tw_accounts_data", "WHERE Nick LIKE '%s'LIMIT 5", cDiscordIDorNick.cstr()));
 		while(RES->next())
 		{
 			const int AuthID = RES->getInt("ID");
@@ -1797,7 +1797,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		sqlstr::CSqlString<64> cDiscordID = sqlstr::CSqlString<64>(UserID.c_str());
 
 		// получаем подключение
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("Nick", "tw_dataplayers", "WHERE DiscordID = '%s'", cDiscordID.cstr()));
+		boost::scoped_ptr<ResultSet> RES(SJK.SD("Nick", "tw_accounts_data", "WHERE DiscordID = '%s'", cDiscordID.cstr()));
 		while(RES->next())
 		{
 			// пишем хорошее подключение
