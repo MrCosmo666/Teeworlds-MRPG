@@ -595,6 +595,11 @@ enum ItemList
 	itBatWings = 10016,
 	itEagleLittleWings = 10017,
 	itNecromanteWings = 10018,
+	itGoblinHammer = 10019,
+	itGoblinGun = 10020,
+	itGoblinShotgun = 10021,
+	itGoblinGrenade = 10022,
+	itGoblinRifle = 10023,
 };
 
 void CPlayers::OnInit()
@@ -614,6 +619,13 @@ void CPlayers::OnInit()
 	m_aEquipInfo.add({ itMagitechShotgun,  vec4(0.5f, 0.25f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_SHOTGUN_MAGITECH, 0 });
 	m_aEquipInfo.add({ itMagitechGrenade, vec4(0.45f, 0.3f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GRENADE_MAGITECH, 0 });
 	m_aEquipInfo.add({ itMagitechRifle, vec4(0.3f, 0.5f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_RIFLE_MAGITECH, 0 });
+			
+	/* SET GOBLIN */
+	m_aEquipInfo.add({ itGoblinHammer, vec4(0.45f, 0.3f, 0.5f, 0.003f), vec2(0,0), vec2(100, 100), 0.0f, SPRITE_MMO_HAMMER_GOBLIN, 0 });
+	m_aEquipInfo.add({ itGoblinGun, vec4(0.3f, 0.5f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GUN_GOBLIN, 0 });
+	m_aEquipInfo.add({ itGoblinShotgun,  vec4(0.5f, 0.25f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_SHOTGUN_GOBLIN, 0 });
+	m_aEquipInfo.add({ itGoblinGrenade, vec4(0.45f, 0.3f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GRENADE_GOBLIN, 0 });
+	m_aEquipInfo.add({ itGoblinRifle, vec4(0.3f, 0.5f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_RIFLE_GOBLIN, 0 });
 		
 	/* WINGS */
 	m_aEquipInfo.add({ itShadowWings, vec4(1.75f, 0.0f, 0.0f, 0.003f), vec2(115, 60), vec2(200, 120), 0.0f, IMAGE_SHADOW_WINGS, ANIM_WINGS_LENGTH });
@@ -624,7 +636,7 @@ void CPlayers::OnInit()
 	m_aEquipInfo.add({ itStarsWings, vec4(0.04f, 0.0f, 0.10f, 0.003f), vec2(140, 45), vec2(280, 100), 0.3f, IMAGE_STARS_WINGS, ANIM_WINGS_STATIC });
 	m_aEquipInfo.add({ itBatWings, vec4(0.15f, 0.0f, 0.0f, 0.003f), vec2(80, 70), vec2(140, 120), 0.3f, IMAGE_BAT_WINGS, ANIM_WINGS_STATIC });
 	m_aEquipInfo.add({ itEagleLittleWings, vec4(0.1f, 0.1f, 0.1f, 0.003f), vec2(60, 50), vec2(100, 80), 0.3f, IMAGE_EAGLE_LITTLE_WINGS, ANIM_WINGS_STATIC });
-	m_aEquipInfo.add({ itNecromanteWings, vec4(0.5f, 0.1f, 0.1f, 0.01f), vec2(100, 60), vec2(180, 140), 0.3f, IMAGE_NECROMANTE_WINGS, ANIM_WINGS_STATIC });
+	m_aEquipInfo.add({ itNecromanteWings, vec4(0.5f, 0.1f, 0.1f, 0.01f), vec2(110, 60), vec2(200, 140), 0.3f, IMAGE_NECROMANTE_WINGS, ANIM_WINGS_STATIC });
 }
 
 bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int ClientID)

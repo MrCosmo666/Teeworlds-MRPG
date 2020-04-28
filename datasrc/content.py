@@ -647,11 +647,15 @@ container.sprites.Add(Sprite("mmo_fire_magitech_grenade", set_mmogame, 2, 3, 1, 
 container.sprites.Add(Sprite("mmo_fire_heavenly_gun", set_mmogame, 3, 3, 1, 1))
 container.sprites.Add(Sprite("mmo_fire_heavenly_shotgun", set_mmogame, 4, 3, 1, 1))
 container.sprites.Add(Sprite("mmo_fire_heavenly_grenade", set_mmogame, 5, 3, 1, 1))
+container.sprites.Add(Sprite("mmo_fire_goblin_gun", set_mmogame, 6, 3, 1, 1))
+container.sprites.Add(Sprite("mmo_fire_goblin_shotgun", set_mmogame, 7, 3, 1, 1))
+container.sprites.Add(Sprite("mmo_fire_goblin_grenade", set_mmogame, 8, 3, 1, 1))
 ###############################
 
 #mmotee hammer [8 weapon] on 1 line
 container.sprites.Add(Sprite("mmo_hammer_heaven", set_mmohammer, 0, 0, 1, 1)) # +1 weapon
 container.sprites.Add(Sprite("mmo_hammer_magitech", set_mmohammer, 1, 0, 1, 1))
+container.sprites.Add(Sprite("mmo_hammer_goblin", set_mmohammer, 2, 0, 1, 1))
 
 #mmotee gun [3 weapon] on 1 line
 container.sprites.Add(Sprite("mmo_gun_heaven", set_mmogun, 0, 0, 2, 1)) # +2 weapon
@@ -660,6 +664,9 @@ container.sprites.Add(Sprite("mmo_gun_heaven_muzzle2", set_mmogun, 4, 0, 2, 1))
 container.sprites.Add(Sprite("mmo_gun_magitech", set_mmogun, 6, 0, 2, 1))
 container.sprites.Add(Sprite("mmo_gun_magitech_muzzle1", set_mmogun, 8, 0, 2, 1))
 container.sprites.Add(Sprite("mmo_gun_magitech_muzzle2", set_mmogun, 10, 0, 2, 1))
+container.sprites.Add(Sprite("mmo_gun_goblin", set_mmogun, 12, 0, 2, 1))
+container.sprites.Add(Sprite("mmo_gun_goblin_muzzle1", set_mmogun, 14, 0, 2, 1))
+container.sprites.Add(Sprite("mmo_gun_goblin_muzzle2", set_mmogun, 16, 0, 2, 1))
 
 #mmotee shotgun [2 weapon] on 1 line
 container.sprites.Add(Sprite("mmo_shotgun_heaven", set_mmoshotgun, 0, 0, 4, 1)) # +4 weapon
@@ -668,14 +675,19 @@ container.sprites.Add(Sprite("mmo_shotgun_heaven_muzzle2", set_mmoshotgun, 6, 0,
 container.sprites.Add(Sprite("mmo_shotgun_magitech", set_mmoshotgun, 8, 0, 4, 1))
 container.sprites.Add(Sprite("mmo_shotgun_magitech_muzzle1", set_mmoshotgun, 12, 0, 2, 1))
 container.sprites.Add(Sprite("mmo_shotgun_magitech_muzzle2", set_mmoshotgun, 14, 0, 2, 1))
+container.sprites.Add(Sprite("mmo_shotgun_goblin", set_mmoshotgun, 0, 1, 4, 1))
+container.sprites.Add(Sprite("mmo_shotgun_goblin_muzzle1", set_mmoshotgun, 4, 1, 2, 1))
+container.sprites.Add(Sprite("mmo_shotgun_goblin_muzzle2", set_mmoshotgun, 6, 1, 2, 1))
 
 #mmotee grenade [4 weapon] on 1 line
 container.sprites.Add(Sprite("mmo_grenade_heaven", set_mmogrenade, 0, 0, 1, 1)) # +1 weapon
 container.sprites.Add(Sprite("mmo_grenade_magitech", set_mmogrenade, 1, 0, 1, 1))
+container.sprites.Add(Sprite("mmo_grenade_goblin", set_mmogrenade, 2, 0, 1, 1))
 
 #mmotee rifle [4 weapon] on 1 line
 container.sprites.Add(Sprite("mmo_rifle_heaven", set_mmorifle, 0, 0, 1, 1)) # +1 weapon
 container.sprites.Add(Sprite("mmo_rifle_magitech", set_mmorifle, 1, 0, 1, 1))
+container.sprites.Add(Sprite("mmo_rifle_goblin", set_mmorifle, 2, 0, 1, 1))
 
 	
 ###############################################################################
