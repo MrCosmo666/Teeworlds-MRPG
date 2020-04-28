@@ -35,7 +35,7 @@ void CCmd::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 			return GS->Chat(ClientID, "Username / Password must contain 4-15 characters");
 
 		// загружаем аккаунт и данные если он загрузился
-		if (GS->Mmo()->Account()->LoginAccount(ClientID, Username, Password) == AUTH_ALL_GOOD)
+		if (GS->Mmo()->Account()->LoginAccount(ClientID, Username, Password) == AUTH_LOGIN_GOOD)
 			GS->Mmo()->Account()->LoadAccount(pPlayer, true);
 		return;
 	}

@@ -531,16 +531,21 @@ void CCharacter::Tick()
 		Die(m_pPlayer->GetCID(), WEAPON_WORLD);
 	}
 
-	// handle Weapons
-	HandleWeapons();
+	// - - - - - - - - - - - -
+	// запретить дальше НПС и Квестовым
+	if (m_pPlayer->IsBot() && m_pPlayer->GetSpawnBot() != SPAWNMOBS)
+		return;
 
 	if (!m_DoorHit)
 	{
 		m_OlderPos = m_OldPos;
 		m_OldPos = m_Core.m_Pos;
 	}
+	HandleWeapons();
 
-	if(m_pPlayer->IsBot())
+	// - - - - - - - - - - - -
+	// запретить дальше Мобам
+	if (m_pPlayer->IsBot())
 		return;
 
 	HandleAuthedPlayer();
@@ -586,37 +591,8 @@ void CCharacter::TickDefered()
 	bool StuckBefore = GS()->Collision()->TestBox(m_Core.m_Pos, vec2(28.0f, 28.0f));
 
 	m_Core.Move();
-	bool StuckAfterMove = GS()->Collision()->TestBox(m_Core.m_Pos, vec2(28.0f, 28.0f));
 	m_Core.Quantize();
-	bool StuckAfterQuant = GS()->Collision()->TestBox(m_Core.m_Pos, vec2(28.0f, 28.0f));
 	m_Pos = m_Core.m_Pos;
-
-	if(!StuckBefore && (StuckAfterMove || StuckAfterQuant))
-	{
-		// Hackish solution to get rid of strict-aliasing warning
-		union
-		{
-			float f;
-			unsigned u;
-		}StartPosX, StartPosY, StartVelX, StartVelY;
-
-		StartPosX.f = StartPos.x;
-		StartPosY.f = StartPos.y;
-		StartVelX.f = StartVel.x;
-		StartVelY.f = StartVel.y;
-
-		char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "STUCK!!! %d %d %d %f %f %f %f %x %x %x %x",
-			StuckBefore,
-			StuckAfterMove,
-			StuckAfterQuant,
-			StartPos.x, StartPos.y,
-			StartVel.x, StartVel.y,
-			StartPosX.u, StartPosY.u,
-			StartVelX.u, StartVelY.u);
-		GS()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
-	}
-	
 	m_TriggeredEvents |= m_Core.m_TriggeredEvents;
 
 	if(m_pPlayer->GetTeam() == TEAM_SPECTATORS)
@@ -653,7 +629,9 @@ bool CCharacter::CheckInvisibleBot()
 	
 	for(int i = 0 ; i < MAX_PLAYERS ; i++) 
 	{
-		if(!GS()->m_apPlayers[i] || distance(m_Pos, GS()->m_apPlayers[i]->m_ViewPos) > 1000.0f) continue;
+		if(!GS()->m_apPlayers[i] || distance(m_Pos, GS()->m_apPlayers[i]->m_ViewPos) > 1000.0f) 
+			continue;
+		
 		return true;
 	}
 	return false;

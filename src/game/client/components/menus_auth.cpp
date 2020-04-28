@@ -30,7 +30,11 @@ void CMenus::OnAuthMessage(int MsgType, void* pRawMsg)
 			setAuthMessage("Must contain 4-15 characters (#1)", EAuthColorMessage::ERROR_MESSAGE);
 			break;
 
-			case AUTH_ALL_GOOD:
+			case AUTH_REGISTER_GOOD:
+			setAuthMessage("The was completed successfully", EAuthColorMessage::SUCCESS_MESSAGE);
+			break;
+			
+			case AUTH_LOGIN_GOOD:
 			SetAuthState(false);
 			setAuthMessage("The was completed successfully", EAuthColorMessage::SUCCESS_MESSAGE);
 			break;

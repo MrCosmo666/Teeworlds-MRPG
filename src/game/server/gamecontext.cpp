@@ -1299,7 +1299,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			}
 
 			// режим авторизация клиента
-			if(Mmo()->Account()->LoginAccount(ClientID, pMsg->m_Login, pMsg->m_Password) == AUTH_ALL_GOOD)
+			if(Mmo()->Account()->LoginAccount(ClientID, pMsg->m_Login, pMsg->m_Password) == AUTH_LOGIN_GOOD)
 				Mmo()->Account()->LoadAccount(pPlayer, true);
 		}
 		else if(Mmo()->OnMessage(MsgID, pRawMsg, ClientID)) { }

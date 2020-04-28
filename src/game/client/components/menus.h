@@ -354,7 +354,7 @@ private:
 	{
 		WARNING_MESSAGE,
 		ERROR_MESSAGE,
-		SUCCESS_MESSAGE
+		SUCCESS_MESSAGE,
 	};
 
 	int m_MenuActiveID;

@@ -61,7 +61,7 @@ int AccountMainSql::RegisterAccount(int ClientID, const char *Login, const char 
 	// информация
 	GS()->Chat(ClientID, "Discord group \"{STR}\"", g_Config.m_SvDiscordInviteGroup);
 	GS()->Chat(ClientID, "You can log in: /login <login> <pass>!");
-	return SendAuthCode(ClientID, AUTH_ALL_GOOD);
+	return SendAuthCode(ClientID, AUTH_REGISTER_GOOD);
 }
 
 int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Password)
@@ -125,7 +125,7 @@ int AccountMainSql::LoginAccount(int ClientID, const char *Login, const char *Pa
 		GS()->ChatFollow(ClientID, "Player menu is available in votes!");
 		GS()->m_pController->DoTeamChange(pPlayer, false);
 		SJK.UD("tw_accounts_data", "LoginDate = CURRENT_TIMESTAMP WHERE ID = '%d'", UserID);
-		return SendAuthCode(ClientID, AUTH_ALL_GOOD);
+		return SendAuthCode(ClientID, AUTH_LOGIN_GOOD);
 	}
 
 	GS()->Chat(ClientID, "Your nickname was not found in the database!");
