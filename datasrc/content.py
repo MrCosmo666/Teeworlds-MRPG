@@ -317,6 +317,7 @@ container.images.Add(Image("rainbow_wings", "mmotee/wings/rainbow_wings.png"))
 container.images.Add(Image("stars_wings", "mmotee/wings/stars_wings.png"))
 container.images.Add(Image("bat_wings", "mmotee/wings/bat_wings.png"))
 container.images.Add(Image("eagle_little_wings", "mmotee/wings/eagle_little_wings.png"))
+container.images.Add(Image("necromante_wings", "mmotee/wings/necromante_wings.png"))
 container.images.Add(Image("mmologo", "mmotee/logo.png"))
 
 container.pickups.Add(Pickup("health"))
