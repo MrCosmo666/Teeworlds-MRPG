@@ -593,6 +593,7 @@ enum ItemList
 	itMagitechRifle = 10014,
 	itStarsWings = 10015,
 	itBatWings = 10016,
+	itEagleLittleWings = 10017,
 };
 
 void CPlayers::OnInit()
@@ -621,6 +622,7 @@ void CPlayers::OnInit()
 	m_aEquipInfo.add({ itRainbowWings, vec4(0.1f, 0.1f, 0.1f, 0.003f), vec2(115, 70), vec2(200, 100), 0.9f, IMAGE_RAINBOW_WINGS, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itStarsWings, vec4(0.04f, 0.0f, 0.10f, 0.003f), vec2(140, 45), vec2(280, 100), 0.3f, IMAGE_STARS_WINGS, ANIM_WINGS_STATIC });
 	m_aEquipInfo.add({ itBatWings, vec4(0.15f, 0.0f, 0.0f, 0.003f), vec2(80, 70), vec2(140, 120), 0.3f, IMAGE_BAT_WINGS, ANIM_WINGS_STATIC });
+	m_aEquipInfo.add({ itEagleLittleWings, vec4(0.1f, 0.1f, 0.1f, 0.003f), vec2(60, 50), vec2(100, 80), 0.3f, IMAGE_EAGLE_LITTLE_WINGS, ANIM_WINGS_STATIC });
 }
 
 bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int ClientID)
