@@ -1052,7 +1052,7 @@ void CCharacter::HandleAuthedPlayer()
 			int CheckHouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
 			if (CheckHouseID <= 0)
 			{
-				GS()->Chat(m_pPlayer->GetCID(), "High-level zone, you have been magically transported back!");
+				GS()->Chat(m_pPlayer->GetCID(), "This chapter is still closed, you magically transported back!");
 				m_pPlayer->Acc().TeleportX = -1;
 				m_pPlayer->Acc().TeleportY = -1;
 				GS()->Server()->ChangeWorld(m_pPlayer->GetCID(), LOCALWORLD);
