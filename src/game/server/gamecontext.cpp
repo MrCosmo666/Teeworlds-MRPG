@@ -1917,7 +1917,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVM(ClientID, "MENU", INBOXLIST, HPERSONAL, "✉ Mailbox");
 		AVM(ClientID, "MENU", UPGRADES, HPERSONAL, "◒ Upgrades");
 		AVM(ClientID, "MENU", SETTINGS, HPERSONAL, "☑ Settings");
-		AVM(ClientID, "MENU", ADVENTUREJOURNAL, HPERSONAL, "ღ Adventure Journal");
+		AVM(ClientID, "MENU", ADVENTUREJOURNAL, HPERSONAL, "ღ Adventure journal");
 		AVM(ClientID, "MENU", DUNGEONSMENU, HPERSONAL, "◎ Dungeons");
 		AVM(ClientID, "MENU", MEMBERMENU, HPERSONAL, "☃ Your Guild");
 		AVM(ClientID, "MENU", HOUSEMENU, HPERSONAL, "❖ Your House");

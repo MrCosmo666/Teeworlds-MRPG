@@ -77,7 +77,7 @@ void CraftJob::ShowCraftList(CPlayer *pPlayer, int CraftTab)
 
 		// выводим основное меню
 		int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + cr.first;
-		if (CGS::AttributInfo.find(InfoSellItem.BonusID) != CGS::AttributInfo.end())
+		if (InfoSellItem.IsEnchantable())
 		{
 			GS()->AVHI(ClientID, InfoSellItem.GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}Lvl{INT} : {STR} :: {INT} gold",
 				(pPlayer->GetItem(cr.second.ItemID).Count ? "✔ " : "\0"), &cr.second.Level, InfoSellItem.GetName(pPlayer), &MoneyDiscount);

@@ -68,7 +68,7 @@ void ShopMailSql::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		ItemSql::ItemInformation &NeededItem = GS()->GetItemInfo(NeedItemID);
 		
 		// зачеровыванный или нет
-		if (CGS::AttributInfo.find(BuyightItem.BonusID) != CGS::AttributInfo.end())
+		if (BuyightItem.IsEnchantable())
 		{
 			char aEnchantSize[16];
 			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);
@@ -112,7 +112,7 @@ void ShopMailSql::ShowAuction(CPlayer *pPlayer)
 
 		// зачеровыванный или нет
 		ItemSql::ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
-		if (CGS::AttributInfo.find(BuyightItem.BonusID) != CGS::AttributInfo.end())
+		if (BuyightItem.IsEnchantable())
 		{
 			char aEnchantSize[16];
 			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);

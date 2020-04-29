@@ -220,7 +220,7 @@ int ItemSql::ActionItemCountAllowed(CPlayer *pPlayer, int ItemID)
 	if (AvailableCount <= 0)
 	{
 		GS()->Chat(ClientID, "This count of items that you have, iced for the quest!");
-		GS()->Chat(ClientID, "Can see in which quest they are required in Adventure Journal!");
+		GS()->Chat(ClientID, "Can see in which quest they are required in Adventure journal!");
 		return -1;
 	}
 	return AvailableCount;
@@ -234,7 +234,7 @@ void ItemSql::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 	const char* NameItem = PlItem.Info().GetName(pPlayer);
 
 	// зачеровыванный или нет
-	if (PlItem.Info().BonusCount)
+	if (PlItem.Info().IsEnchantable())
 	{
 		char aEnchantSize[16];
 		str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", PlItem.Enchant);
@@ -254,7 +254,7 @@ void ItemSql::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 	if (PlItem.Info().Type == ItemType::TYPE_QUEST) return;
 
 	// бонус предметов
-	if (CGS::AttributInfo.find(PlItem.Info().BonusID) != CGS::AttributInfo.end() && PlItem.Info().BonusCount)
+	if (PlItem.Info().IsEnchantable())
 	{
 		int BonusCountAct = PlItem.Info().BonusCount * (PlItem.Enchant + 1);
 		GS()->AVM(ClientID, "null", NOPE, HideID, "Astro stats +{INT} {STR}", &BonusCountAct, pPlayer->AtributeName(PlItem.Info().BonusID));
@@ -312,7 +312,7 @@ void ItemSql::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 		GS()->AVM(ClientID, "IDROP", ItemID, HideID, "Drop {STR}", NameItem);
 	}
 
-	if (PlItem.Info().BonusCount)
+	if (PlItem.Info().IsEnchantable())
 	{
 		int Price = PlItem.EnchantMaterCount();
 		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR}+{INT} ({INT} material)", NameItem, &PlItem.Enchant, &Price);
@@ -531,10 +531,9 @@ bool ItemSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Replac
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_CRAFT, HINVSELECT, "Craft Items");
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_QUEST, HINVSELECT, "Quest Items");
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_MODULE, HINVSELECT, "Modules Items");
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_EQUIP, HINVSELECT, "Equiping Items");
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_POTION, HINVSELECT, "Potion Items");
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_OTHER, HINVSELECT, "Other Items");
-		if (pPlayer->m_SortTabs[SORTINVENTORY])
+		if (pPlayer->m_SortTabs[SORTINVENTORY])	
 			ListInventory(pPlayer, pPlayer->m_SortTabs[SORTINVENTORY]);
 
 		GS()->AddBack(ClientID);
@@ -589,6 +588,11 @@ const char *ItemSql::ClassItemInformation::GetDesc(CPlayer *pPlayer) const
 	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), _(iItemDesc));	
 }
 
+bool ItemSql::ClassItemInformation::IsEnchantable() const
+{
+	return (BonusID > 0 && CGS::AttributInfo.find(BonusID) != CGS::AttributInfo.end() && BonusCount > 0 && MaximalEnchant > 0 && iItemEnchantPrice > 0);
+}
+
 int ItemSql::ClassItems::EnchantMaterCount() const
 {
 	return ItemSql::ItemsInfo[itemid_].iItemEnchantPrice*(Enchant+1);
@@ -602,7 +606,7 @@ bool ItemSql::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 	// все что потребуется для работы функции
 	CGS *GameServer = pPlayer->GS();
 	const int ClientID = pPlayer->GetCID();
-	if(Info().BonusCount > 0)
+	if(Info().IsEnchantable())
 	{
 		if(Count > 0) 
 		{
@@ -613,7 +617,7 @@ bool ItemSql::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 	}
 
 	// проверить пустой слот если да тогда одеть предмет
-	const bool AutoEquip = (Info().Type == ItemType::TYPE_EQUIP && pPlayer->GetItemEquip(Info().Function) <= 0) || (Info().Function == FUNCTION_SETTINGS && Info().BonusCount > 0);
+	const bool AutoEquip = (Info().Type == ItemType::TYPE_EQUIP && pPlayer->GetItemEquip(Info().Function) <= 0) || (Info().Function == FUNCTION_SETTINGS && Info().IsEnchantable());
 	if(AutoEquip)
 	{
 		GameServer->Chat(ClientID, "Auto equip {STR} ({STR} +{INT})!", Info().GetName(pPlayer), pPlayer->AtributeName(Info().BonusID), &Info().BonusCount);

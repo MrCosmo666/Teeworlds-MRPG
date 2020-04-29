@@ -28,6 +28,7 @@ class ItemSql : public CMmoComponent
 		const char* GetName(CPlayer* pPlayer = NULL) const;
 		const char* GetDesc(CPlayer* pPlayer = NULL) const;
 		const char* GetIcon() const { return iItemIcon; };
+		bool IsEnchantable() const;
 	};
 
 	int SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant);
