@@ -107,7 +107,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 			// - - - - - - - - - - - - - - -ÃÈËÜÄÈß ÈÃÐÎÊÀ - - - - - - - - - - - - - - //
 			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			{
-				IntsToStr(pClientStats->m_Guildname, 12, aBuf);
+				IntsToStr(pClientStats->m_StateName, 6, aBuf);
 				if (str_length(aBuf) > 3)
 				{
 					const float FontGuildname = FontSize - 10.0f;

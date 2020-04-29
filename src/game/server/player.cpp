@@ -240,9 +240,9 @@ void CPlayer::Snap(int SnappingClient)
 	Buffer.clear();
 
 	if(Acc().GuildID > 0)
-		StrToInts(pClientInfo->m_Guildname, 12, GS()->Mmo()->Member()->GuildName(Acc().GuildID));
+		StrToInts(pClientInfo->m_StateName, 6, GS()->Mmo()->Member()->GuildName(Acc().GuildID));
 	else
-		StrToInts(pClientInfo->m_Guildname, 12, "\0");
+		StrToInts(pClientInfo->m_StateName, 6, "\0");
 }
 
 // Получить черактера игрока

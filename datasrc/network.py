@@ -320,7 +320,7 @@ Objects = [
 
 		NetArray(NetIntAny("m_Potions"), 12),
 		NetArray(NetIntAny("m_Gold"), 6),
-		NetArray(NetIntAny("m_Guildname"), 12),
+		NetArray(NetIntAny("m_StateName"), 6),
 
 		NetEnum("m_MoodType", MoodType),
 		NetEnum("m_WorldType", WorldType),

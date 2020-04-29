@@ -195,12 +195,12 @@ void CPlayerBot::Snap(int SnappingClient)
 	if (m_SpawnPointBot == SPAWNQUESTNPC)
 	{
 		int QuestID = ContextBots::QuestBot[m_SubBotID].QuestID;
-		StrToInts(pClientInfo->m_Guildname, 12, GS()->Mmo()->Quest()->GetQuestName(QuestID));
+		StrToInts(pClientInfo->m_StateName, 6, GS()->Mmo()->Quest()->GetQuestName(QuestID));
 	}
 	else if (m_SpawnPointBot == SPAWNMOBS && ContextBots::MobBot[m_SubBotID].Boss)
-		StrToInts(pClientInfo->m_Guildname, 12, "Boss");
+		StrToInts(pClientInfo->m_StateName, 6, "Boss");
 	else 
-		StrToInts(pClientInfo->m_Guildname, 12, "\0");
+		StrToInts(pClientInfo->m_StateName, 6, "\0");
 
 	for(int p = 0; p < 6; p++)
 	{
