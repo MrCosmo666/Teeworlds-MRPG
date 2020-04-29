@@ -92,6 +92,12 @@ int QuestBase::GetState(int ClientID, int QuestID) const
 	return QuestState::QUEST_NO_ACCEPT;
 }
 
+// узанть завершен ли квест у игрока
+bool QuestBase::IsComplectedQuest(int ClientID, int QuestID) const
+{
+	return (bool)(IsValidQuest(QuestID, ClientID) && Quests[ClientID][QuestID].State == QuestState::QUEST_FINISHED);
+}
+
 // получить количество story quests
 int QuestBase::GetStoryCount(const char *StoryName, int QuestID) const
 {

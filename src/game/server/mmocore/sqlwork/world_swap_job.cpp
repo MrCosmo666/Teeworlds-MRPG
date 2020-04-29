@@ -25,7 +25,7 @@ void WorldSwapJob::OnInitGlobal()
 	while(RES->next())
 	{
 		const int ID = RES->getInt("ID");
-		WorldSwap[ID].Level = RES->getInt("Level");
+		WorldSwap[ID].OpenQuestID = RES->getInt("OpenQuestID");
 		WorldSwap[ID].PositionX = RES->getInt("PositionX");
 		WorldSwap[ID].PositionY = RES->getInt("PositionY");
 		WorldSwap[ID].WorldID = RES->getInt("WorldID");		
@@ -69,7 +69,7 @@ bool WorldSwapJob::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 	
 	if(pChr->GetHelper()->BoolIndex(TILE_WORLD_SWAP))
 	{
-		if(ChangingWorld(pPlayer->GetCID(), pChr->m_Core.m_Pos))
+		if(ChangeWorld(pPlayer->GetCID(), pChr->m_Core.m_Pos))
 			return true;
 	}
 	return false;
@@ -98,26 +98,21 @@ int WorldSwapJob::GetSwapID(vec2 Pos)
 	return -1;
 }
 
-int WorldSwapJob::GetWorldLevel() const
+int WorldSwapJob::GetNecessaryQuest(int WorldID) const
 {
-	if (GS()->IsDungeon())
-	{
-		int DungeonID = GS()->DungeonID();
-		return DungeonJob::Dungeon[DungeonID].Level;
-	}
-
-	if (GS()->GetWorldID() == LOCALWORLD)
-		return 1;
+	int CheckWorldID = (WorldID <= -1 ? GS()->GetWorldID() : WorldID);
+	if (CheckWorldID == LOCALWORLD)
+		return -1;
 
 	for (const auto& sw : WorldSwap)
 	{
-		if (sw.second.WorldID == GS()->GetWorldID() || sw.second.TwoWorldID == GS()->GetWorldID())
-			return sw.second.Level;
+		if (sw.second.TwoWorldID == CheckWorldID)
+			return sw.second.OpenQuestID;
 	}
 	return -1;
 }
 
-bool WorldSwapJob::ChangingWorld(int ClientID, vec2 Pos)
+bool WorldSwapJob::ChangeWorld(int ClientID, vec2 Pos)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
 	if(!pPlayer) return true;
@@ -125,9 +120,10 @@ bool WorldSwapJob::ChangingWorld(int ClientID, vec2 Pos)
 	int SwapID = GetSwapID(Pos);
 	if (WorldSwap.find(SwapID) != WorldSwap.end())
 	{
-		if (pPlayer->Acc().Level < WorldSwap[SwapID].Level)
+		int StoryQuestNeeded = WorldSwap[SwapID].OpenQuestID;
+		if (!GS()->Mmo()->Quest()->IsComplectedQuest(ClientID, StoryQuestNeeded))
 		{
-			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Required {INT} level!", &WorldSwap[SwapID].Level);
+			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Requires story quest '{STR}' completion!", GS()->Mmo()->Quest()->GetQuestName(StoryQuestNeeded));
 			return false;
 		}
 

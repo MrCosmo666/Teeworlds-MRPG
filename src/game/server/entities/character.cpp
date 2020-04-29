@@ -1045,8 +1045,9 @@ void CCharacter::HandleAuthedPlayer()
 			m_pPlayer->ShowInformationStats();
 		}
 
-		// сменять мир игрокам что находятся в гильдейских домах но для них мире что выше их по уровню
-		if (m_pPlayer->Acc().Level < GS()->Mmo()->WorldSwap()->GetWorldLevel())
+		// сменять мир игрокам что находятся в гильдейских домах но для них мире что еще не открыт
+		int NecessaryQuest = GS()->Mmo()->WorldSwap()->GetNecessaryQuest();
+		if (NecessaryQuest > 0 && !GS()->Mmo()->Quest()->IsComplectedQuest(m_pPlayer->GetCID(), NecessaryQuest))
 		{
 			int CheckHouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
 			if (CheckHouseID <= 0)

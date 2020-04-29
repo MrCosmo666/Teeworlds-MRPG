@@ -9,7 +9,7 @@ class WorldSwapJob : public CMmoComponent
 {
 	struct StructSwapWorld
 	{
-		int Level;
+		int OpenQuestID;
 		int PositionX;
 		int PositionY;
 		int WorldID;
@@ -37,8 +37,8 @@ public:
 
 	vec2 GetPositionQuestBot(int ClientID, int QuestID);
 	int GetWorldType() const;
-	int GetWorldLevel() const;
-	bool ChangingWorld(int ClientID, vec2 Pos);
+	int GetNecessaryQuest(int WorldID = -1) const;
+	bool ChangeWorld(int ClientID, vec2 Pos);
 
 private:
 	int GetSwapID(vec2 Pos);

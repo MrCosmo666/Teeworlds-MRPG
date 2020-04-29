@@ -40,10 +40,11 @@ private:
 		GET CHECK QUESTING 
 	######################################################################### */
 	int GetStoryCount(const char *StoryName, int QuestID = -1) const;
-	const char *GetStateName(int Type) const;
+	const char* GetStateName(int Type) const;
 	bool IsDefeatComplete(int ClientID, int QuestID);
 
 public:
+	bool IsComplectedQuest(int ClientID, int QuestID) const;
 	int GetState(int ClientID, int QuestID) const;
 	bool IsValidQuest(int QuestID, int ClientID = -1) const
 	{
