@@ -628,16 +628,16 @@ void CPlayers::OnInit()
 	m_aEquipInfo.add({ itGoblinRifle, vec4(0.3f, 0.5f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_RIFLE_GOBLIN, 0 });
 		
 	/* WINGS */
-	m_aEquipInfo.add({ itShadowWings, vec4(1.75f, 0.0f, 0.0f, 0.003f), vec2(115, 60), vec2(200, 120), 0.0f, IMAGE_SHADOW_WINGS, ANIM_WINGS_LENGTH });
-	m_aEquipInfo.add({ itNeptuneWings, vec4(0.2f, 0.2f, 1.75f, 0.003f), vec2(120, 50), vec2(200, 100), 0.0f, IMAGE_NEPTUNE_WINGS, ANIM_WINGS_LENGTH });
+	m_aEquipInfo.add({ itShadowWings, vec4(1.75f, 0.0f, 0.0f, 0.003f), vec2(100, 60), vec2(180, 120), 0.0f, IMAGE_SHADOW_WINGS, ANIM_WINGS_LENGTH });
+	m_aEquipInfo.add({ itNeptuneWings, vec4(0.2f, 0.2f, 1.75f, 0.003f), vec2(110, 50), vec2(180, 100), 0.0f, IMAGE_NEPTUNE_WINGS, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itAngelWings,  vec4(0.2f, 0.2f, 1.75f, 0.003f), vec2(115, 64), vec2(200, 100), 0.0f, IMAGE_ANGEL_WINGS, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itHeavenlyWings, vec4(1.0f, 0.85f, 0.0f, 0.003f), vec2(170, 100), vec2(280, 150), 0.0f, IMAGE_HEAVENLY_WINGS, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itRainbowWings, vec4(0.1f, 0.1f, 0.1f, 0.003f), vec2(115, 70), vec2(200, 100), 0.9f, IMAGE_RAINBOW_WINGS, ANIM_WINGS_LENGTH });
 
-	m_aEquipInfo.add({ itStarsWings, vec4(0.3f, 0.3f, 0.3f, 0.2f), vec2(100, 76), vec2(200, 100), 1.0f, IMAGE_STARS_WINGS, ANIM_WINGS_LENGTH });
+	m_aEquipInfo.add({ itStarsWings, vec4(0.01f, 0.01f, 0.01f, 0.2f), vec2(100, 76), vec2(200, 100), 0.7f, IMAGE_STARS_WINGS, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itBatWings, vec4(0.15f, 0.0f, 0.0f, 0.003f), vec2(80, 70), vec2(140, 120), 0.3f, IMAGE_BAT_WINGS, ANIM_WINGS_STATIC });
-	m_aEquipInfo.add({ itEagleLittleWings, vec4(0.1f, 0.1f, 0.1f, 0.003f), vec2(60, 50), vec2(100, 80), 0.3f, IMAGE_EAGLE_LITTLE_WINGS, ANIM_WINGS_STATIC });
-	m_aEquipInfo.add({ itNecromanteWings, vec4(0.5f, 0.1f, 0.1f, 0.01f), vec2(110, 60), vec2(200, 140), 0.3f, IMAGE_NECROMANTE_WINGS, ANIM_WINGS_STATIC });
+	m_aEquipInfo.add({ itEagleLittleWings, vec4(0.1f, 0.1f, 0.1f, 0.003f), vec2(70, 40), vec2(120, 80), 0.3f, IMAGE_EAGLE_LITTLE_WINGS, ANIM_WINGS_STATIC });
+	m_aEquipInfo.add({ itNecromanteWings, vec4(0.5f, 0.1f, 0.1f, 0.01f), vec2(110, 35), vec2(200, 100), 0.3f, IMAGE_NECROMANTE_WINGS, ANIM_WINGS_STATIC });
 }
 
 bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int ClientID)
