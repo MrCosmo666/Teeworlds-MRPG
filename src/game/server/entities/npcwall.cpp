@@ -30,13 +30,13 @@ void CNPCWall::Tick()
 
 	for (CCharacter* pChar = (CCharacter*)GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter*)pChar->TypeNext())
 	{
-		if (!pChar->GetPlayer()->IsBot())
-			continue;
-
-		vec2 IntersectPos = closest_point_on_line(m_Pos, m_To, pChar->m_Core.m_Pos);
-		float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);
-		if (Distance <= g_Config.m_SvDoorRadiusHit)
-			pChar->m_DoorHit = true;
+		if (pChar->GetPlayer()->IsBot())
+		{
+			vec2 IntersectPos = closest_point_on_line(m_Pos, m_To, pChar->m_Core.m_Pos);
+			float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);
+			if (Distance <= g_Config.m_SvDoorRadiusHit)
+				pChar->m_DoorHit = true;
+		}
 	}
 }
 

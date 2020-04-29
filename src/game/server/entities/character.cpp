@@ -530,16 +530,17 @@ void CCharacter::Tick()
 		Die(m_pPlayer->GetCID(), WEAPON_WORLD);
 	}
 
-	// - - - - - - - - - - - -
-	// запретить дальше НПС и Квестовым
-	if (m_pPlayer->IsBot() && m_pPlayer->GetSpawnBot() != SPAWNMOBS)
-		return;
-
 	if (!m_DoorHit)
 	{
 		m_OlderPos = m_OldPos;
 		m_OldPos = m_Core.m_Pos;
 	}
+
+	// - - - - - - - - - - - -
+	// запретить дальше НПС и Квестовым
+	if (m_pPlayer->IsBot() && m_pPlayer->GetSpawnBot() != SPAWNMOBS)
+		return;
+
 	HandleWeapons();
 
 	// - - - - - - - - - - - -
