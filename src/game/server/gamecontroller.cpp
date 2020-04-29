@@ -277,9 +277,7 @@ void IGameController::DoTeamChange(CPlayer *pPlayer, bool DoChatMsg)
 			return;
 
 		// получаем старую команду и меняем ее игроку
-		pPlayer->SetTeam(Team);
-
-		// информируем о смене команды
+		pPlayer->Acc().Team = Team;
 		GS()->SendTeam(ClientID, Team, DoChatMsg, -1);
 
 		char aBuf[128];

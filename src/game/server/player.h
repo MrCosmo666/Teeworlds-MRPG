@@ -121,7 +121,6 @@ public:
 	void PostTick();
 
 	CCharacter *GetCharacter();
-	void SetTeam(int Team, bool DoChatMsg=true);
 
 	void KillCharacter(int Weapon = WEAPON_GAME);
 	void OnDisconnect();
@@ -174,8 +173,6 @@ public:
 	{ 
 		return AccountMainSql::Data[m_ClientID]; 
 	};
-
-	int GetItemDurability(int Item) const;
 	int GetLevelDisciple(int Class);
 
 	// разговоры с нпс функции

@@ -154,8 +154,7 @@ void CPlayer::TickSystemTalk()
 		return;
 
 	int TalkedID = m_TalkingNPC.m_TalkedID;
-	if(TalkedID >= MAX_CLIENTS || TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] ||
-		distance(m_ViewPos, GS()->m_apPlayers[TalkedID]->m_ViewPos) > 90.0f)
+	if(TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] || distance(m_ViewPos, GS()->m_apPlayers[TalkedID]->m_ViewPos) > 90.0f)
 	{
 		ClearTalking();
 	}
@@ -254,24 +253,13 @@ CCharacter *CPlayer::GetCharacter()
 	return 0;
 }
 
-// Установить команду игроку
-void CPlayer::SetTeam(int Team, bool DoChatMsg)
-{
-	KillCharacter();
-
-	Acc().Team = Team;
-	m_PlayerTick[TickState::Respawn] = Server()->Tick()+Server()->TickSpeed()*2;
-}
-
 // Спавн игрока
 void CPlayer::TryRespawn()
 {
-	// сам спавн
 	vec2 SpawnPos;
 	if(!GS()->m_pController->CanSpawn(TEAM_RED, &SpawnPos, vec2(-1, -1)))
 		return;
 
-	// спавн в доме
 	const int CheckHouseSpawn = GS()->Mmo()->House()->PlayerHouseID(this);
 	if(CheckHouseSpawn > 0)
 	{
@@ -283,7 +271,6 @@ void CPlayer::TryRespawn()
 		}
 	}
 
-	// спавн в точках что указаны
 	if(!GS()->IsDungeon() && (Acc().TeleportX > 1 || Acc().TeleportY > 1))
 		SpawnPos = vec2(Acc().TeleportX, Acc().TeleportY);
 
@@ -294,7 +281,6 @@ void CPlayer::TryRespawn()
 	m_Spawned = false;
 }
 
-// Убить Character игрока и очистить
 void CPlayer::KillCharacter(int Weapon)
 {
 	if(m_pCharacter)
@@ -305,13 +291,11 @@ void CPlayer::KillCharacter(int Weapon)
 	}
 }
 
-// Отключение игрока
 void CPlayer::OnDisconnect()
 {
 	KillCharacter();
 }
 
-// Отправка и установка Input
 void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 {
 	if(NewInput->m_PlayerFlags&PLAYERFLAG_CHATTING)
@@ -342,7 +326,7 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 		m_LatestActivity.m_TargetY = NewInput->m_TargetY;
 	}
 }
-// Отправка и установка пред Input
+
 void CPlayer::OnPredictedInput(CNetObj_PlayerInput *NewInput)
 {
 	// skip the input if chat is active
@@ -358,39 +342,30 @@ int CPlayer::GetTeam()
 {
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID)) 
 		return Acc().Team;
-
 	return TEAM_SPECTATORS;
 }
 
 /* #########################################################################
-	FUNCTIONS PLAYER BOTS 
-######################################################################### */
-
-
-/* #########################################################################
 	FUNCTIONS PLAYER HELPER 
 ######################################################################### */
-
-// Прогресс бар информация о уровнях
 void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp)
 {
-	int NeedXp = ExpNeed;
-	float getlv = ( MyExp * 100.0 ) / NeedXp;
-	float getexp = ( GivedExp * 100.0 ) / NeedXp;
-
 	if (GS()->CheckClient(m_ClientID))
 	{
 		GS()->SendProgressBar(m_ClientID, MyExp, ExpNeed, Name);
 		return;
 	}
 
+	int NeedXp = ExpNeed;
+	float getlv = (MyExp * 100.0) / NeedXp;
+	float getexp = (GivedExp * 100.0) / NeedXp;
 	char *Level = GS()->LevelString(100, (int)getlv, 10, ':', ' ');
 	char BufferInBroadcast[128];
 	str_format(BufferInBroadcast, sizeof(BufferInBroadcast), "^235Lv%d %s%s %0.2f%%+%0.3f%%(%d)XP\n", MyLevel, Name, Level, getlv, getexp, GivedExp);
 	GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, BufferInBroadcast);
 	mem_zero(Level, sizeof(Level));
 }
-// Улучшения апгрейдов любых не зависимо от структуры класса или переменных
+
 bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade, const char *UpgradeName)
 {
 	int UpgradeNeed = Price*Count;
@@ -399,13 +374,11 @@ bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int Maxi
 		GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "This upgrades maximal.");
 		return false;		
 	}
-
 	if(*Useless < UpgradeNeed)
 	{
 		GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Have no upgrade points for upgrade +{INT}. Need {INT}.", &Count, &UpgradeNeed);
 		return false;
 	}
-
 	*Useless -= UpgradeNeed;
 	*Upgrade += Count;
 	return true;
@@ -418,7 +391,6 @@ const char *CPlayer::AtributeName(int BonusID) const
 	{
 		if(at.first != BonusID) 
 			continue;
-			
 		return at.second.Name;
 	}
 	return "Has no stats";
@@ -427,13 +399,12 @@ const char *CPlayer::AtributeName(int BonusID) const
 /* #########################################################################
 	FUNCTIONS PLAYER ACCOUNT 
 ######################################################################### */
-// Проверить и снять деньги
 bool CPlayer::CheckFailMoney(int Price, int ItemID, bool CheckOnly)
 {
 	ItemSql::ItemPlayer &CoinItem = GetItem(ItemID);
 	if(CoinItem.Count < Price)
 	{
-		GS()->Chat(m_ClientID,"Sorry, need {INT} but you have in your pocket/backpack only {INT} {STR}!", &Price, &CoinItem.Count, CoinItem.Info().GetName(this), NULL);
+		GS()->Chat(m_ClientID,"Sorry, need {INT} but you have only {INT} {STR}!", &Price, &CoinItem.Count, CoinItem.Info().GetName(this), NULL);
 		return true;
 	}
 
@@ -443,7 +414,7 @@ bool CPlayer::CheckFailMoney(int Price, int ItemID, bool CheckOnly)
 		return true;
 	return false;
 }
-// Наложить на игрока 'Эффект зелий'
+
 void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
 {
 	if(!m_pCharacter || !m_pCharacter->IsAlive())
@@ -455,7 +426,7 @@ void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
 		GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, Potion, true);
 	}
 }
-// Установить язык
+
 void CPlayer::SetLanguage(const char* pLanguage)
 {
 	str_copy(m_aLanguage, pLanguage, sizeof(m_aLanguage));
@@ -466,7 +437,7 @@ void CPlayer::SetStandart(int Health, int Mana)
 	Acc().PlayerHealth = Health;
 	Acc().PlayerMana = Mana;
 }
-// Дать опыт игроку
+
 void CPlayer::AddExp(int Exp)
 {
 	Acc().Exp += Exp;
@@ -477,10 +448,8 @@ void CPlayer::AddExp(int Exp)
 
 		GS()->CreateDeath(m_pCharacter->m_Core.m_Pos, m_ClientID);
 		GS()->CreateSound(m_pCharacter->m_Core.m_Pos, 4);
-		GS()->CreateText(m_pCharacter, false, vec2(0, -40), vec2(0, -1), 30, "level up", Server()->GetWorldID(m_ClientID));
+		GS()->CreateText(m_pCharacter, false, vec2(0, -40), vec2(0, -1), 30, "level", Server()->GetWorldID(m_ClientID));
 		GS()->ChatFollow(m_ClientID, "Level UP. Now Level {INT}!", &Acc().Level);
-
-		// если это последний уровень повышения
 		if(Acc().Exp < ExpNeed(Acc().Level))
 		{
 			GS()->VResetVotes(m_ClientID, MAINMENU);
@@ -489,35 +458,36 @@ void CPlayer::AddExp(int Exp)
 		}
 	}
 	ProgressBar("Account", Acc().Level, Acc().Exp, ExpNeed(Acc().Level), Exp);
-	if(rand()%5 == 0) GS()->Mmo()->SaveAccount(this, SAVESTATS);
 
-	if(Acc().IsGuild())
+	if (rand() % 5 == 0)
+	{
+		GS()->Mmo()->SaveAccount(this, SAVESTATS);
+		GS()->VResetVotes(m_ClientID, MAINMENU);
+	}
+
+	if (Acc().IsGuild())
 		GS()->Mmo()->Member()->AddExperience(Acc().GuildID);
-
-	GS()->VResetVotes(m_ClientID, MAINMENU);
 }
 
-// Дать деньги игроку
 void CPlayer::AddMoney(int Money) 
 { 
 	GetItem(itMoney).Add(Money); 
 }
 
-// Проверить эффект зелья имеется или нет
 bool CPlayer::CheckEffect(const char* Potion)
 {
 	if(CGS::Effects[m_ClientID].find(Potion) != CGS::Effects[m_ClientID].end())
 		return true;
 	return false;
 }
-// Вернуть скрытое меню
+
 bool CPlayer::GetHidenMenu(int HideID) const
 {
 	if(m_HidenMenu.find(HideID) != m_HidenMenu.end())
 		return m_HidenMenu.at(HideID);
 	return false;
 }
-// Если авторизован
+
 bool CPlayer::IsAuthed()
 { 
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID))
@@ -525,7 +495,6 @@ bool CPlayer::IsAuthed()
 	return false; 
 }
 
-// Уровень зачарованных вещей Атрибутов
 int CPlayer::EnchantAttributes(int BonusID) const
 {
 	int BonusAttributes = 0;
@@ -540,7 +509,6 @@ int CPlayer::EnchantAttributes(int BonusID) const
 	return BonusAttributes;
 }
 
-// Начальная команда
 int CPlayer::GetStartTeam()
 {
 	if(Acc().AuthID)
@@ -548,31 +516,31 @@ int CPlayer::GetStartTeam()
 
 	return TEAM_SPECTATORS;
 }
-// Нужно опыта для повышения уровня
+
 int CPlayer::ExpNeed(int Level)
 {
 	return (g_Config.m_SvExpForLevel+Level*2)*(Level*Level);
 }
-// стартовое здоровье
+
 int CPlayer::GetStartHealth()
 {
 	return 10 + GetAttributeCount(Stats::StHardness, true);
 }
-// стартовая мана
+
 int CPlayer::GetStartMana()
 {
 	int EnchantBonus = GetAttributeCount(Stats::StPiety, true);
 	return 10 + EnchantBonus;
 }
-// язык игрока
+
 const char* CPlayer::GetLanguage()
 {
 	return m_aLanguage;
 }
-// Добавить статистику в broadcast
+
 void CPlayer::ShowInformationStats()
 {
-	if (m_ClientID >= MAX_PLAYERS)
+	if (m_ClientID < 0 || m_ClientID >= MAX_PLAYERS)
 		return;
 
 	int Health = GetHealth();
@@ -618,7 +586,7 @@ void CPlayer::ClearParsing(bool ClearVote, bool VotePass)
 	if(ClearVote)
 	{
 		CNetMsg_Sv_VoteSet Msg;
-		Msg.m_Type = VotePass ? VOTE_END_PASS : VOTE_END_FAIL;
+		Msg.m_Type = VotePass ? (int)VOTE_END_PASS : (int)VOTE_END_FAIL;
 		Msg.m_Timeout = 0;
 		Msg.m_ClientID = m_ClientID;
 		Msg.m_pDescription = "";
@@ -714,10 +682,11 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 		if(VoteID < HSTAT)
 			return true;
 
-		for(auto& x : m_HidenMenu) {
-			if(m_HidenMenu.find(x.first) != m_HidenMenu.end() && (x.first > NUMHIDEMENU && x.first != VoteID))
-				m_HidenMenu[x.first] = false; 
-			}
+		for(auto& x : m_HidenMenu) 
+		{
+			if((x.first > NUMHIDEMENU && x.first != VoteID))
+				x.second = false; 
+		}
 
 		m_HidenMenu[VoteID] ^= true;
 		if(m_HidenMenu[VoteID] == false)
@@ -728,12 +697,6 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 	}
 	return false;
 }
-
-/* #########################################################################
-	FUNCTIONS PLAYER ITEMS 
-######################################################################### */
-
-int CPlayer::GetItemDurability(int Item) const { return ItemSql::Items[m_ClientID][Item].Durability; }
 
 ItemSql::ItemPlayer &CPlayer::GetItem(int ItemID) 
 {
@@ -748,7 +711,6 @@ int CPlayer::GetItemEquip(int EquipID, int SkipItemID) const
 	{
 		if(!it.second.Count || !it.second.Settings || it.second.Info().Function != EquipID || it.first == SkipItemID) 
 			continue;
-
 		return it.first;
 	}
 	return -1;
@@ -773,9 +735,10 @@ int CPlayer::GetAttributeCount(int BonusID, bool Really)
 		AttributEx += ProcentSize;
 	}
 	// если есть локальные данные то добавляем
-	if (SaveData) { AttributEx += Acc().Stats[BonusID]; }
+	if (SaveData)
+		AttributEx += Acc().Stats[BonusID];
 
-	// если реальная стата то делил
+	// если реальная стата то делим
 	if (Really && CGS::AttributInfo[BonusID].UpgradePrice < 10) 
 	{ 
 		if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
@@ -808,7 +771,6 @@ int CPlayer::GetLevelDisciple(int Class)
 	{
 		if (at.second.AtType != Class) 
 			continue;
-		
 		Atributs += GetAttributeCount(at.first, true);
 	}
 	return Atributs;

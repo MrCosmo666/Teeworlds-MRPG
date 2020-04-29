@@ -20,9 +20,6 @@ private:
 public:
 	CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint);
 	virtual ~CPlayerBot() override;
-	
-	CTuningParams m_PrevTuningParams;
-	CTuningParams m_NextTuningParams;
 
 	virtual int GetBotID() override                         { return m_BotID; };
 	virtual int GetSpawnBot() override                      { return m_SpawnPointBot; };
