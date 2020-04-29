@@ -368,7 +368,7 @@ void CEffects::EnchantEffect(vec2 Pos, vec2 Vel, vec4 Color, float RandomSize)
 		return;
 
 	vec2 PosRandom = vec2(Pos.x + 40.0f - frandom() * 80.0f, Pos.y + 40.0f - frandom() * 80.0f);
-	if (length(PosRandom) < 15.0f)
+	if (length(PosRandom) < 40.0f)
 		return;
 
 	CParticle p;
@@ -377,7 +377,7 @@ void CEffects::EnchantEffect(vec2 Pos, vec2 Vel, vec4 Color, float RandomSize)
 	p.m_Pos = PosRandom;
 	p.m_Vel = Vel + RandomDir() * 200.0f;
 	p.m_LifeSpan = 0.5f + frandom() * 0.5f;
-	p.m_StartSize = 5.0f + frandom() * 25.0f;
+	p.m_StartSize = 5.0f + frandom() * 20.0f;
 	p.m_EndSize = 0;
 	p.m_Friction = 0.8f;
 	p.m_Gravity = frandom() * -500.0f;

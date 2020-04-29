@@ -633,7 +633,8 @@ void CPlayers::OnInit()
 	m_aEquipInfo.add({ itAngelWings,  vec4(0.2f, 0.2f, 1.75f, 0.003f), vec2(115, 64), vec2(200, 100), 0.0f, IMAGE_ANGEL_WINGS, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itHeavenlyWings, vec4(1.0f, 0.85f, 0.0f, 0.003f), vec2(170, 100), vec2(280, 150), 0.0f, IMAGE_HEAVENLY_WINGS, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itRainbowWings, vec4(0.1f, 0.1f, 0.1f, 0.003f), vec2(115, 70), vec2(200, 100), 0.9f, IMAGE_RAINBOW_WINGS, ANIM_WINGS_LENGTH });
-	m_aEquipInfo.add({ itStarsWings, vec4(0.04f, 0.0f, 0.10f, 0.003f), vec2(140, 45), vec2(280, 100), 0.3f, IMAGE_STARS_WINGS, ANIM_WINGS_STATIC });
+
+	m_aEquipInfo.add({ itStarsWings, vec4(0.3f, 0.3f, 0.3f, 0.2f), vec2(100, 76), vec2(200, 100), 1.0f, IMAGE_STARS_WINGS, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itBatWings, vec4(0.15f, 0.0f, 0.0f, 0.003f), vec2(80, 70), vec2(140, 120), 0.3f, IMAGE_BAT_WINGS, ANIM_WINGS_STATIC });
 	m_aEquipInfo.add({ itEagleLittleWings, vec4(0.1f, 0.1f, 0.1f, 0.003f), vec2(60, 50), vec2(100, 80), 0.3f, IMAGE_EAGLE_LITTLE_WINGS, ANIM_WINGS_STATIC });
 	m_aEquipInfo.add({ itNecromanteWings, vec4(0.5f, 0.1f, 0.1f, 0.01f), vec2(110, 60), vec2(200, 140), 0.3f, IMAGE_NECROMANTE_WINGS, ANIM_WINGS_STATIC });
@@ -903,8 +904,8 @@ void CPlayers::RenderWings(const CNetObj_Character Player, CAnimState* pAnimWing
 	if (g_Config.m_ClShowMEffects != 2 && WingsEnchantItem)
 	{
 		vec4 Color = pEquipInfo->Color;
-		m_pClient->m_pEffects->EnchantEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color);
-		m_pClient->m_pEffects->EnchantEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color);
+		m_pClient->m_pEffects->EnchantEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color, pEquipInfo->EffectColorRandom);
+		m_pClient->m_pEffects->EnchantEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color, pEquipInfo->EffectColorRandom);
 	}
 	RenderTools()->RenderWings(pAnimWings, pEquipInfo->SpriteID, Direction, Position, pEquipInfo->Position, pEquipInfo->Size);
 }
