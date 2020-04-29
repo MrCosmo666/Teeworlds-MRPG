@@ -898,17 +898,23 @@ void CPlayers::RenderWings(const CTeeRenderInfo& RenderInfo, const CNetObj_Chara
 	int AnimationID = pEquipInfo->AnimationID;
 	if (AnimationID == ANIM_WINGS_LENGTH)
 	{
-		if (RenderInfo.m_GotAirJump && InAir)
+		if (m_pClient->m_aClients[ClientID].m_AnimWings >= 3.0f)
+			m_pClient->m_aClients[ClientID].m_AnimWings = 0.0f;
+
+		if (InAir)
 		{
-			if (m_pClient->m_aClients[ClientID].m_AnimWings >= 1.6f)
-				m_pClient->m_aClients[ClientID].m_AnimWings = 1.0f;
+			if (Player.m_VelY < -2500)
+			{
+				if (m_pClient->m_aClients[ClientID].m_AnimWings >= 1.6f)
+					m_pClient->m_aClients[ClientID].m_AnimWings = 1.0f;
+			}
+			else
+			{
+				if (m_pClient->m_aClients[ClientID].m_AnimWings >= 2.6f)
+					m_pClient->m_aClients[ClientID].m_AnimWings = 2.2f;
+			}
 		}
-		else if (!RenderInfo.m_GotAirJump && InAir)
-		{
-			if (m_pClient->m_aClients[ClientID].m_AnimWings >= 2.6f)
-				m_pClient->m_aClients[ClientID].m_AnimWings = 2.2f;
-		}
-		else if (RenderInfo.m_GotAirJump && !InAir)
+		else
 		{
 			if (m_pClient->m_aClients[ClientID].m_AnimWings >= 1.0f)
 				m_pClient->m_aClients[ClientID].m_AnimWings = 0.0f;
