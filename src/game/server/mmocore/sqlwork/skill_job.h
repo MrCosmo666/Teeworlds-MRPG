@@ -50,7 +50,7 @@ public:
 	bool UseSkill(CPlayer *pPlayer, int SkillID);
 
 private:
-	void ShowMailSkillList(CPlayer* pPlayer);
+	void ShowMailSkillList(CPlayer* pPlayer, bool Pasive);
 };
 
 #endif

@@ -1723,12 +1723,11 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 	// отправить клиентам что имеют клиент ммо
 	if(CheckClient(To))
 	{
-		CNetMsg_Sv_VoteMmoOptionAdd OptionMsg;	
-		OptionMsg.m_pDescription = Vote.m_aDescription;
-
-		if(str_length(Vote.m_aDescription) < 1) 
+		if (str_length(Vote.m_aDescription) < 1)
 			m_apPlayers[To]->m_Colored = { 0, 0, 0 };
 
+		CNetMsg_Sv_VoteMmoOptionAdd OptionMsg;	
+		OptionMsg.m_pDescription = Vote.m_aDescription;
 		OptionMsg.m_pColored[0] = m_apPlayers[To]->m_Colored.r;
 		OptionMsg.m_pColored[1] = m_apPlayers[To]->m_Colored.g;
 		OptionMsg.m_pColored[2] = m_apPlayers[To]->m_Colored.b;
@@ -2206,26 +2205,21 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 		return true;
 	} 
 
-	// базовый парсинг
 	if(PPSTR(CMD, "null") == 0) 
 		return true;
-
 	if(PPSTR(CMD, "BACK") == 0)
 	{
 		ResetVotes(ClientID, pPlayer->m_LastVoteMenu);
 		return true;
 	}
-
 	if(PPSTR(CMD, "MENU") == 0)
 	{
 		ResetVotes(ClientID, VoteID);
 		return true;
 	}
-
 	if (PPSTR(CMD, "SELECTEDTOP") == 0)
 	{
 		ResetVotes(ClientID, TOPLISTMENU);
-	
 		AV(ClientID, "null", "\0");
 		Mmo()->ShowTopList(pPlayer, VoteID);
 		return true;
@@ -2236,8 +2230,7 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 
 	// парсинг всего остального
 	sqlstr::CSqlString<64> FormatText = sqlstr::CSqlString<64>(Text);
-	if(Mmo()->OnParseFullVote(pPlayer, CMD, VoteID, VoteID2, Get, FormatText.cstr())) return true;
-	return false;
+	return (bool)(Mmo()->OnParseFullVote(pPlayer, CMD, VoteID, VoteID2, Get, FormatText.cstr()));
 }
 
 /* #########################################################################

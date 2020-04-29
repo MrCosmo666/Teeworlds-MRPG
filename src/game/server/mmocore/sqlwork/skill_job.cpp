@@ -56,11 +56,19 @@ bool SkillJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Repla
 	if (ReplaceMenu)
 	{
 		CCharacter* pChr = pPlayer->GetCharacter();
-		if (!pChr) return false;
+		if (!pChr) 
+			return false;
 
 		if (Menulist == MAINMENU && pChr->GetHelper()->BoolIndex(TILE_LEARN_SKILL))
 		{
-			ShowMailSkillList(pPlayer);
+			const int ClientID = pPlayer->GetCID();
+			GS()->AVH(ClientID, HSKILLLEARN, GREEN_COLOR, "Skill Learn Information");
+			GS()->AVM(ClientID, "null", NOPE, HSKILLLEARN, "Here you can learn passive and active skills");
+			GS()->AVM(ClientID, "null", NOPE, HSKILLLEARN, "You can bind active skill any button using the console");
+			GS()->AV(ClientID, "null", "");
+
+			ShowMailSkillList(pPlayer, true);
+			ShowMailSkillList(pPlayer, false);
 			return true;
 		}
 		return false;
@@ -130,73 +138,80 @@ int SkillJob::GetSkillLevel(int ClientID, int SkillID) const
 	FUNCTION SKILL CLASS 
 ######################################################################### */
 // показать лист всех скиллов
-void SkillJob::ShowMailSkillList(CPlayer *pPlayer)
+void SkillJob::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
 {
-	const int ClientID = pPlayer->GetCID();
-	GS()->AVH(ClientID, HSKILLLEARN, GREEN_COLOR, "Skill Learn Information");
-	GS()->AVM(ClientID, "null", NOPE, HSKILLLEARN, "Here you can learn passive and active skills");
-	GS()->AVM(ClientID, "null", NOPE, HSKILLLEARN, "You can bind active skill any button using the console");
-	GS()->AV(ClientID, "null", "");
-
-	for(const auto& sk : SkillData)
+	int ClientID = pPlayer->GetCID();
+	pPlayer->m_Colored = BLUE_COLOR;
+	GS()->AVL(ClientID, "null", "{STR} skill's | You have SP {INT}", (Passive ? "Passive" : "Active"), &pPlayer->GetItem(itSkillPoint).Count);
+	for (const auto& sk : SkillData)
+	{
+		if(sk.second.m_Passive == Passive)
 		SkillSelected(pPlayer, sk.first);
+	}
+	GS()->AV(ClientID, "null", "");
 }
 
 // показать выбранные скиллы
 void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 {
-	if(SkillData.find(SkillID) == SkillData.end()) return;
+	if(SkillData.find(SkillID) == SkillData.end()) 
+		return;
+
 
 	const bool Passive = SkillData[SkillID].m_Passive;
 	const int ClientID = pPlayer->GetCID();
 	int LevelOwn = GetSkillLevel(ClientID, SkillID);
 	int BonusSkill = GetSkillBonus(ClientID, SkillID) + SkillData[SkillID].m_BonusCount;
+	int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + SkillID;
 
 	// меню выводим
-	pPlayer->m_Colored = { 5,10,1 };
-	GS()->AVM(ClientID, "SKILLLEARN", SkillID, NOPE, "{STR} [{INT}/{INT}] {STR} [Price {INT}SP]", 
+	GS()->AVHI(ClientID, "skill_point", HideID, LIGHT_BLUE_COLOR, "{STR} [{INT}/{INT}] {STR} : {INT}SP", 
 		(Passive ? "Passive" : "Active"), &LevelOwn, &SkillData[SkillID].m_SkillMaxLevel, SkillData[SkillID].m_SkillName, &SkillData[SkillID].m_SkillPrice);
 
 	// пасивный скилл
 	if(Passive)
 	{
-		GS()->AVM(ClientID, "null", NOPE, NOPE, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].m_SkillBonusInfo);
-		GS()->AVM(ClientID, "null", NOPE, NOPE, "{STR}", SkillData[SkillID].m_SkillDesc);
-		GS()->AV(ClientID, "null", "");
+		GS()->AVM(ClientID, "null", NOPE, HideID, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].m_SkillBonusInfo);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", SkillData[SkillID].m_SkillDesc);
+		GS()->AVM(ClientID, "SKILLLEARN", SkillID, HideID, "Learn {STR}", SkillData[SkillID].m_SkillName);
 		return;
 	}
 
 	// если обычный скилл
-	GS()->AVM(ClientID, "null", NOPE, NOPE, "Mana required (first use -{INT} support -{INT})", &SkillData[SkillID].m_ManaCost, &SkillData[SkillID].m_ManaSupport);
-	GS()->AVM(ClientID, "null", NOPE, NOPE, "{STR}", SkillData[SkillID].m_SkillDesc);
-	GS()->AVM(ClientID, "null", NOPE, NOPE, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].m_SkillBonusInfo);
-	GS()->AVM(ClientID, "null", NOPE, NOPE, "F1 Bind: (bind 'key' say \"/useskill {INT}\")", &SkillID);
-	GS()->AV(ClientID, "null", "");
+	GS()->AVM(ClientID, "null", NOPE, HideID, "Mana required (first use -{INT} support -{INT})", &SkillData[SkillID].m_ManaCost, &SkillData[SkillID].m_ManaSupport);
+	GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", SkillData[SkillID].m_SkillDesc);
+	GS()->AVM(ClientID, "null", NOPE, HideID, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].m_SkillBonusInfo);
+	GS()->AVM(ClientID, "null", NOPE, HideID, "F1 Bind: (bind 'key' say \"/useskill {INT}\")", &SkillID);
+	GS()->AVM(ClientID, "SKILLLEARN", SkillID, HideID, "Learn {STR}", SkillData[SkillID].m_SkillName);
 }
 
 // улучшение скилла
 bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 {
-	// если такой скилл есть повышаем уровень
 	const int ClientID = pPlayer->GetCID();
-	if(Skill[ClientID][SkillID].m_SkillLevel >= SkillData[SkillID].m_SkillMaxLevel)
+	if (Skill[ClientID].find(SkillID) == Skill[ClientID].end()) 
 	{
-		GS()->Chat(ClientID, "This a skill already maximum level");
-		return false;				
-	}
+		// если такой скилл есть повышаем уровень
+		if (Skill[ClientID][SkillID].m_SkillLevel >= SkillData[SkillID].m_SkillMaxLevel)
+		{
+			GS()->Chat(ClientID, "This a skill already maximum level");
+			return false;
+		}
 
-	// проверяем хватает ли денег
-	if(pPlayer->CheckFailMoney(SkillData[SkillID].m_SkillPrice, itSkillPoint)) 
-		return false;
+		// проверяем хватает ли скиллпоинтов
+		if (pPlayer->CheckFailMoney(SkillData[SkillID].m_SkillPrice, itSkillPoint))
+			return false;
 
-	if(Skill[ClientID].find(SkillID) != Skill[ClientID].end())
-	{
 		// добавляем уровень
 		Skill[ClientID][SkillID].m_SkillLevel++;
 		SJK.UD("tw_skills", "SkillLevel = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", Skill[ClientID][SkillID].m_SkillLevel, SkillID, pPlayer->Acc().AuthID);
 		GS()->Chat(ClientID, "You have increased the skill [{STR} level to {INT}]!", SkillData[SkillID].m_SkillName, &Skill[ClientID][SkillID].m_SkillLevel);
 		return true;	
 	}
+
+	// проверяем хватает ли скиллпоинтов
+	if (pPlayer->CheckFailMoney(SkillData[SkillID].m_SkillPrice, itSkillPoint))
+		return false;
 
 	// создаем неовый скилл
 	Skill[ClientID][SkillID].m_SkillLevel = 1;
@@ -208,9 +223,8 @@ bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 // использовать скилл
 bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 {
-	// проверяем есть ли игрок обьект чар, уровень скилла и имеется ли скилл вообщем в списках
-	if(!pPlayer || !pPlayer->GetCharacter() || GetSkillLevel(pPlayer->GetCID(), SkillID) <= 0 ||
-		Skill[pPlayer->GetCID()].find(SkillID) == Skill[pPlayer->GetCID()].end()) return false;
+	if(!pPlayer || !pPlayer->GetCharacter() || GetSkillLevel(pPlayer->GetCID(), SkillID) <= 0) 
+		return false;
 
 	// проверяем ману
 	CCharacter *pChr = pPlayer->GetCharacter();
@@ -225,11 +239,11 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 	// скилл турель здоровья
 	if(SkillID == Skill::SkillHeartTurret)
 	{
-		// ищем удаляем обьект если такой владелец уже имеется
 		for(CHealthHealer *pHh = (CHealthHealer*)GS()->m_World.FindFirst(CGameWorld::ENTYPE_SKILLTURRETHEART); 
 			pHh; pHh = (CHealthHealer *)pHh->TypeNext())
 		{
-			if(pHh->m_pPlayer->GetCID() != pPlayer->GetCID()) continue;
+			if(pHh->m_pPlayer->GetCID() != pPlayer->GetCID()) 
+				continue;
 			pHh->Reset();
 		}
 		// создаем обьект
@@ -239,14 +253,14 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 	// скилл турель гравитации
 	if(SkillID == Skill::SkillSleepyGravity)
 	{
-		// ищем удаляем обьект если такой владелец уже имеется
 		for(CSleepyGravity *pHh = (CSleepyGravity*)GS()->m_World.FindFirst(CGameWorld::ENTYPE_SLEEPYGRAVITY); 
 			pHh; pHh = (CSleepyGravity *)pHh->TypeNext())
 		{
-			if(pHh->m_pPlayer->GetCID() != pPlayer->GetCID()) continue;
+			if(pHh->m_pPlayer->GetCID() != pPlayer->GetCID()) 
+				continue;
+
 			pHh->Reset();
 		}
-		// создаем обьект
 		new CSleepyGravity(&GS()->m_World, pPlayer, SkillLevel, ManaUsePrice, pChr->m_Core.m_Pos);
 	}
 
