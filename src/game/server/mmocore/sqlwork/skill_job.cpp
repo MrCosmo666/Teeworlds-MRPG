@@ -67,8 +67,8 @@ bool SkillJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Repla
 			GS()->AVM(ClientID, "null", NOPE, HSKILLLEARN, "You can bind active skill any button using the console");
 			GS()->AV(ClientID, "null", "");
 
-			ShowMailSkillList(pPlayer, true);
 			ShowMailSkillList(pPlayer, false);
+			ShowMailSkillList(pPlayer, true);
 			return true;
 		}
 		return false;
@@ -142,7 +142,7 @@ void SkillJob::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
 {
 	int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = BLUE_COLOR;
-	GS()->AVL(ClientID, "null", "{STR} skill's | You have SP {INT}", (Passive ? "Passive" : "Active"), &pPlayer->GetItem(itSkillPoint).Count);
+	GS()->AVL(ClientID, "null", "{STR} skill's | You have  [{INT}SP]", (Passive ? "Passive" : "Active"), &pPlayer->GetItem(itSkillPoint).Count);
 	for (const auto& sk : SkillData)
 	{
 		if(sk.second.m_Passive == Passive)
@@ -165,7 +165,7 @@ void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 	int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + SkillID;
 
 	// меню выводим
-	GS()->AVHI(ClientID, "skill_point", HideID, LIGHT_BLUE_COLOR, "{STR} [{INT}/{INT}] {STR} : {INT}SP", 
+	GS()->AVHI(ClientID, "skill_point", HideID, LIGHT_BLUE_COLOR, "{STR} ({INT}/{INT}) {STR} : {INT}SP", 
 		(Passive ? "Passive" : "Active"), &LevelOwn, &SkillData[SkillID].m_SkillMaxLevel, SkillData[SkillID].m_SkillName, &SkillData[SkillID].m_SkillPrice);
 
 	// пасивный скилл

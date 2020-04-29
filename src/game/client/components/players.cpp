@@ -220,7 +220,7 @@ void CPlayers::RenderPlayer(const CNetObj_Character *pPrevChar, const CNetObj_Ch
 
 	// Wings animation
 	{
-		RenderWings(Player, &State, Position, Direction, ClientID);
+		RenderWings(RenderInfo, Player, &State, Position, Direction, ClientID);
 	}
 
 	// do skidding
@@ -885,7 +885,7 @@ void CPlayers::RenderRifle(CAnimState* pAnim, float Angle, vec2 Position, int Sp
 	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
 }
 
-void CPlayers::RenderWings(const CNetObj_Character Player, CAnimState* pAnimWings, vec2 Position, vec2 Direction, int ClientID)
+void CPlayers::RenderWings(const CTeeRenderInfo& RenderInfo, const CNetObj_Character Player, CAnimState* pAnimWings, vec2 Position, vec2 Direction, int ClientID)
 {
 	int EquipItem = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_WINGS];
 	CPlayers::EquipItem* pEquipInfo = FindEquipInformation(EquipItem);
@@ -893,27 +893,9 @@ void CPlayers::RenderWings(const CNetObj_Character Player, CAnimState* pAnimWing
 		return;
 
 	// - - - - - - - - - - - - - ÀÍÈÌÀÖÈÈ ÊÐÛËÜÅÂ - - - - - - - - - - - -
-	int AnimationID = pEquipInfo->AnimationID;
-	bool InAir = !Collision()->CheckPoint(Player.m_X, Player.m_Y + 16);
-	TickAnimationWings(AnimationID, ClientID, InAir);
-	pAnimWings->Add(&g_pData->m_aAnimations[AnimationID], m_pClient->m_aClients[ClientID].m_AnimWings, 1.0f);
 	m_pClient->m_aClients[ClientID].m_AnimWings += 0.59f / Client()->ClientFPS();
-
-	// - - - - - - - - - - - - - ÐÈÑÓÅÌ ÊÐÛËÜß - - - - - - - - - - - - - - - - -
-	bool WingsEnchantItem = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_WINGS];
-	if (g_Config.m_ClShowMEffects != 2 && WingsEnchantItem)
-	{
-		vec4 Color = pEquipInfo->Color;
-		m_pClient->m_pEffects->EnchantEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color, pEquipInfo->EffectColorRandom);
-		m_pClient->m_pEffects->EnchantEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color, pEquipInfo->EffectColorRandom);
-	}
-	RenderTools()->RenderWings(pAnimWings, pEquipInfo->SpriteID, Direction, Position, pEquipInfo->Position, pEquipInfo->Size);
-}
-
-void CPlayers::TickAnimationWings(int AnimationID, int ClientID, bool InAir)
-{
-	CTeeRenderInfo RenderInfo = m_aRenderInfo[ClientID];
-
+	bool InAir = !Collision()->CheckPoint(Player.m_X, Player.m_Y + 16);
+	int AnimationID = pEquipInfo->AnimationID;
 	if (AnimationID == ANIM_WINGS_LENGTH)
 	{
 		if (RenderInfo.m_GotAirJump && InAir)
@@ -926,7 +908,7 @@ void CPlayers::TickAnimationWings(int AnimationID, int ClientID, bool InAir)
 			if (m_pClient->m_aClients[ClientID].m_AnimWings >= 2.6f)
 				m_pClient->m_aClients[ClientID].m_AnimWings = 2.2f;
 		}
-		else
+		else if (RenderInfo.m_GotAirJump && !InAir)
 		{
 			if (m_pClient->m_aClients[ClientID].m_AnimWings >= 1.0f)
 				m_pClient->m_aClients[ClientID].m_AnimWings = 0.0f;
@@ -937,6 +919,17 @@ void CPlayers::TickAnimationWings(int AnimationID, int ClientID, bool InAir)
 		if (m_pClient->m_aClients[ClientID].m_AnimWings >= 1.0f)
 			m_pClient->m_aClients[ClientID].m_AnimWings = 0.0f;
 	}
+	pAnimWings->Add(&g_pData->m_aAnimations[AnimationID], m_pClient->m_aClients[ClientID].m_AnimWings, 1.0f);
+	
+	// - - - - - - - - - - - - - ÐÈÑÓÅÌ ÊÐÛËÜß - - - - - - - - - - - - - - - - -
+	bool WingsEnchantItem = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_WINGS];
+	if (g_Config.m_ClShowMEffects != 2 && WingsEnchantItem)
+	{
+		vec4 Color = pEquipInfo->Color;
+		m_pClient->m_pEffects->EnchantEffect(vec2(Position.x - 60, Position.y - 20), Direction, Color, pEquipInfo->EffectColorRandom);
+		m_pClient->m_pEffects->EnchantEffect(vec2(Position.x + 60, Position.y - 20), Direction, Color, pEquipInfo->EffectColorRandom);
+	}
+	RenderTools()->RenderWings(pAnimWings, pEquipInfo->SpriteID, Direction, Position, pEquipInfo->Position, pEquipInfo->Size);
 }
 
 void CPlayers::OnMessage(int MsgType, void* pRawMsg)
