@@ -99,7 +99,6 @@ public:
 	void OnReset();
 
 	// виртуал аномаль
-	virtual void RespawnedClickEvent() = 0;
 	virtual void CreateLogic(int Type, int Mode, vec2 Pos, int Health) = 0;
 	
 	// general

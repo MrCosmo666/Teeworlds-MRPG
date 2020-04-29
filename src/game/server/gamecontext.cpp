@@ -1044,10 +1044,6 @@ void CGS::OnTick()
 
 	OnTickLocalWorld();
 	Mmo()->OnTick();
-
-	// обновить точки Click Click
-	if (Server()->CheckWorldTime(6, 59))
-		m_pController->RespawnedClickEvent();
 }
 
 // Таймер в OnTick-=

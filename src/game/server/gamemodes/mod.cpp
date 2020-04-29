@@ -6,7 +6,6 @@
 #include <game/server/gamecontext.h>
 
 #include "../entities/npcwall.h"
-#include "../entities/games/clicktee.h"
 #include "../logicworld/logicwall.h"
 #include "../entities/jobitems.h"
 
@@ -43,12 +42,6 @@ bool CGameControllerMOD::OnEntity(int Index, vec2 Pos)
 	if(IGameController::OnEntity(Index, Pos))
 		return true;
 
-	if(Index == ENTITY_CLICKGAME)
-	{
-		new ClickTee(&GS()->m_World, Pos);
-		return true;
-	}
-
 	if(Index == ENTITY_NPC_WALLUP)
 	{
 		new CNPCWall(&GS()->m_World, Pos, false);
@@ -84,11 +77,4 @@ bool CGameControllerMOD::OnEntity(int Index, vec2 Pos)
 			new CJobItems(&GS()->m_World, ItemID, Level, Pos, 1, Health);	
 	}
 	return false;
-}
-
-void CGameControllerMOD::RespawnedClickEvent()
-{
-	// мини игра клик тее
-	for(ClickTee *pClick = (ClickTee*) GS()->m_World.FindFirst(CGameWorld::ENTTYPE_CLICKGAME); pClick; pClick = (ClickTee*) pClick->TypeNext())
-		pClick->SpawnedClick();
 }

@@ -10,7 +10,6 @@
 #include "projectile.h"
 
 #include <game/server/mmocore/questai.h>
-#include "games/clicktee.h"
 #include "snapfull.h"
 #include "jobitems.h"
 
@@ -941,16 +940,6 @@ bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)
 	// подбор предмета
 	if (GS()->TakeItemCharacter(m_pPlayer->GetCID()))
 		return true;
-
-	// мини игра клик тее
-	ClickTee *pClick = (ClickTee*)GameWorld()->ClosestEntity(m_Pos, 180, CGameWorld::ENTTYPE_CLICKGAME, 0);
-	if(pClick && pClick->IsSpawned() && !GS()->Collision()->IntersectLine(ProjStartPos, pClick->GetPos(), NULL, NULL))
-	{
-		SetEmote(EMOTE_ANGRY, 1);
-		pClick->TakeDamage(1, m_pPlayer->GetCID(), m_Core.m_Vel);
-		GS()->CreateHammerHit(pClick->GetPos());
-		m_ReloadTimer = Server()->TickSpeed()/3;
-	}
 
 	// работа
 	{
