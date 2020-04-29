@@ -257,6 +257,7 @@ bool GuildJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int Vo
 
 		BuyGuildHouse(GuildID, VoteID);
 		GS()->VResetVotes(ClientID, MAINMENU);
+		return true;
 	}
 
 	// продажа дома
@@ -850,7 +851,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 
 	GS()->AV(ClientID, "null", "");
 	pPlayer->m_Colored = GOLDEN_COLOR;
-	GS()->AVL(ClientID, "null", "₪ Players list on guild", &pPlayer->GetItem(itMoney).Count);
+	GS()->AVL(ClientID, "null", "₪ Players list on guild");
 	ShowGuildPlayers(pPlayer);
 	GS()->AV(ClientID, "null", "");
 

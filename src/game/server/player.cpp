@@ -401,6 +401,11 @@ const char *CPlayer::AtributeName(int BonusID) const
 ######################################################################### */
 bool CPlayer::CheckFailMoney(int Price, int ItemID, bool CheckOnly)
 {
+	if (ItemID < 0)
+		return true;
+	if (Price < 0)
+		return false;
+
 	ItemSql::ItemPlayer &CoinItem = GetItem(ItemID);
 	if(CoinItem.Count < Price)
 	{

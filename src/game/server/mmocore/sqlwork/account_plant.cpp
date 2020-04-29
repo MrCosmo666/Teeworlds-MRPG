@@ -123,6 +123,7 @@ bool PlantsAccSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const in
 		}
 		return true;
 	}	
+
 	return false;
 }
 

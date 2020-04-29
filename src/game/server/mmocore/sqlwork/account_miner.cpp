@@ -117,6 +117,7 @@ bool MinerAccSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int
 		}
 		return true;
 	}	
+
 	return false;
 }
 

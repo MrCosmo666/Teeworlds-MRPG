@@ -9,34 +9,30 @@ std::map < int , CraftJob::CraftStruct > CraftJob::Craft;
 
 // Инициализация класса
 void CraftJob::OnInitGlobal() 
-{ 
-	// получаем список крафтов
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_craftitem", "ORDER BY 'Level' DESC"));
+{
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_craft_list"));
 	while(RES->next())
 	{
+		const int ID = RES->getInt("ID");
+		Craft[ID].GetItemID = RES->getInt("GetItem");
+		Craft[ID].GetItemCount = RES->getInt("GetItemCount");
+
 		char aBuf[32];
-		int ID = RES->getInt("ID");
 		for(int i = 0; i < 3; i ++)
 		{
-			str_format(aBuf, sizeof(aBuf), "Item_%d", i);
-			Craft[ID].Need[i] = RES->getInt(aBuf);
+			str_format(aBuf, sizeof(aBuf), "ItemNeed%d", i);
+			Craft[ID].ItemNeedID[i] = RES->getInt(aBuf);
 		}
-		str_copy(aBuf, RES->getString("CountNeed").c_str(), sizeof(aBuf));
-		if (!sscanf(aBuf, "%d %d %d", &Craft[ID].Count[0], &Craft[ID].Count[1], &Craft[ID].Count[2]))
+		str_copy(aBuf, RES->getString("ItemNeedCount").c_str(), sizeof(aBuf));
+		if (!sscanf(aBuf, "%d %d %d", &Craft[ID].ItemNeedCount[0], &Craft[ID].ItemNeedCount[1], &Craft[ID].ItemNeedCount[2]))
 			dbg_msg("Error", "Error on scanf in Crafting");
 
 		// устанавливаем обычные переменные
-		Craft[ID].ItemID = RES->getInt("GetItemID");
-		Craft[ID].ItemCount = RES->getInt("GetCount");
-		Craft[ID].Money = RES->getInt("Price");
-		Craft[ID].Level = RES->getInt("Level");
-		Craft[ID].Rare = RES->getBoolean("Rare");
-		Craft[ID].Tab = RES->getInt("Tab");	
+		Craft[ID].Price = RES->getInt("Price");
+		Craft[ID].WorldID = RES->getInt("WorldID");
 	}
 	Job()->ShowLoadingProgress("Crafts", Craft.size());	
-	return;	
 }
-
 
 bool CraftJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
 {
@@ -56,141 +52,149 @@ bool CraftJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		return true;
 	}
-
 	return false;
 }
 
-// показать лист крафтов
-void CraftJob::ShowCraftList(CPlayer *pPlayer, int CraftTab)
+bool CraftJob::ItEmptyType(int SelectType) const
 {
+	for (const auto& foundtype : Craft)
+	{
+		if (foundtype.second.WorldID != GS()->GetWorldID() || GS()->GetItemInfo(foundtype.second.GetItemID).Type != SelectType)
+			continue;
+		return false;
+	}
+	return true;
+}
+
+// показать лист крафтов
+void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectType)
+{
+	// скипаем пустой список
+	if (ItEmptyType(SelectType))
+		return;
+
 	// добавляем голосования
 	int ClientID = pPlayer->GetCID();
+	pPlayer->m_Colored = GRAY_COLOR;
+	GS()->AVL(ClientID, "null", "{STR}", TypeName);
+
 	for(const auto& cr : Craft)
     {
-		// пропускаем если не равен вкладке
-		if(cr.second.Tab != CraftTab) continue;
-		
-		// бонус дискаунта
-		int MoneyDiscount = round_to_int(kurosio::translate_to_procent_rest(cr.second.Money, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount)));
-	
-		ItemSql::ItemInformation &InfoSellItem = GS()->GetItemInfo(cr.second.ItemID);
+		if(cr.second.WorldID != GS()->GetWorldID())
+			continue;
 
-		// выводим основное меню
 		int HideID = NUMHIDEMENU + ItemSql::ItemsInfo.size() + cr.first;
-		if (InfoSellItem.IsEnchantable())
+		ItemSql::ItemInformation &InfoGetItem = GS()->GetItemInfo(cr.second.GetItemID);
+		if (InfoGetItem.Type != SelectType)
+			continue;
+
+		int Discount = (int)kurosio::translate_to_procent_rest(cr.second.Price, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount));
+		int LastPrice = clamp(cr.second.Price - Discount, 0, cr.second.Price);
+		if (InfoGetItem.IsEnchantable())
 		{
-			GS()->AVHI(ClientID, InfoSellItem.GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}Lvl{INT} : {STR} :: {INT} gold",
-				(pPlayer->GetItem(cr.second.ItemID).Count ? "✔ " : "\0"), &cr.second.Level, InfoSellItem.GetName(pPlayer), &MoneyDiscount);
-			GS()->AVM(ClientID, "null", NOPE, HideID, "Astro stats +{INT} {STR}", &InfoSellItem.BonusCount, pPlayer->AtributeName(InfoSellItem.BonusID));
+			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR} {STR} :: {INT} gold",
+				(pPlayer->GetItem(cr.second.GetItemID).Count ? "✔ " : "\0"), InfoGetItem.GetName(pPlayer), &LastPrice);
+			GS()->AVM(ClientID, "null", NOPE, HideID, "Astro stats +{INT} {STR}", &InfoGetItem.BonusCount, pPlayer->AtributeName(InfoGetItem.BonusID));
 		}
 		else
 		{
-			GS()->AVHI(ClientID, InfoSellItem.GetIcon(), HideID, LIGHT_RED_COLOR, "Lvl{INT} : {STR}x{INT} ({INT}) :: {INT} gold",
-				&cr.second.Level, InfoSellItem.GetName(pPlayer), &cr.second.ItemCount, &pPlayer->GetItem(cr.second.ItemID).Count, &MoneyDiscount);
+			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) :: {INT} gold",
+				InfoGetItem.GetName(pPlayer), &cr.second.GetItemCount, &pPlayer->GetItem(cr.second.GetItemID).Count, &LastPrice);
 		}
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", InfoSellItem.GetDesc(pPlayer));
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", InfoGetItem.GetDesc(pPlayer));
 
-		// чтобы проще инициализируем под переменной
-		dynamic_string Buffer;
 		for(int i = 0; i < 3; i++)
 		{
-			int SearchItemID = cr.second.Need[i], SearchCount = cr.second.Count[i];
-			if(SearchItemID <= 0 || SearchCount <= 0) continue;
+			int SearchItemID = cr.second.ItemNeedID[i];
+			int SearchCount = cr.second.ItemNeedCount[i];
+			if(SearchItemID <= 0 || SearchCount <= 0) 
+				continue;
 			
-			char aBuf[32];
 			ItemSql::ItemPlayer &PlSearchItem = pPlayer->GetItem(SearchItemID);
-			str_format(aBuf, sizeof(aBuf), "%sx%d(%d) ", PlSearchItem.Info().GetName(pPlayer), SearchCount, PlSearchItem.Count);
-			Buffer.append_at(Buffer.length(), aBuf);
+			GS()->AVMI(ClientID, PlSearchItem.Info().GetIcon(), "null", NOPE, HideID, "{STR} {INT}({INT})", PlSearchItem.Info().GetName(pPlayer), &SearchCount, &PlSearchItem.Count);
 		}
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", Buffer.buffer());
-		Buffer.clear();
-
-		// показать все остальное
-		GS()->AVM(ClientID, "CRAFT", cr.first, HideID, "Craft {STR}", InfoSellItem.GetName(pPlayer));
+		GS()->AVM(ClientID, "CRAFT", cr.first, HideID, "Craft {STR}", InfoGetItem.GetName(pPlayer));
 	}
+	GS()->AV(ClientID, "null", "");
 }
 
-void CraftJob::StartCraftItem(CPlayer *pPlayer, int CraftID)
+void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 {
-	if(Craft.find(CraftID) == Craft.end()) 
-		return;
-
-	// проверяем имеется ли зачарованный предмет уже
 	const int ClientID = pPlayer->GetCID();
-	ItemSql::ItemPlayer& PlayerItem = pPlayer->GetItem(Craft[CraftID].ItemID);
-	if (PlayerItem.Info().BonusCount > 0 && PlayerItem.Count > 0)
-		return GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");
-
-	// проверяем уровень
-	if(Craft[CraftID].Level > pPlayer->Acc().Level)
-		return GS()->Chat(ClientID, "Your level low for this item craft!");
+	ItemSql::ItemPlayer& PlayerItem = pPlayer->GetItem(Craft[CraftID].GetItemID);
+	if (PlayerItem.Info().IsEnchantable() && PlayerItem.Count > 0)
+	{
+		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");
+		return;
+	}
 
 	// первая подбивка устанавливаем что доступно и требуется для снятия
 	dynamic_string Buffer;
 	for(int i = 0; i < 3; i++) 
 	{
-		int SearchItemID = Craft[CraftID].Need[i], SearchCount = Craft[CraftID].Count[i];
-		if(SearchItemID <= 0 || SearchCount <= 0 || pPlayer->GetItem(SearchItemID).Count >= SearchCount) continue;
+		int SearchItemID = Craft[CraftID].ItemNeedID[i]; 
+		int SearchCount = Craft[CraftID].ItemNeedCount[i];
+		if(SearchItemID <= 0 || SearchCount <= 0 || pPlayer->GetItem(SearchItemID).Count >= SearchCount) 
+			continue;
 
 		char aBuf[48];
-		ItemSql::ItemPlayer &PlSearchItem = pPlayer->GetItem(SearchItemID);
-		int ItemLeft = SearchCount - PlSearchItem.Count;
-		str_format(aBuf, sizeof(aBuf), "%sx%d ", PlSearchItem.Info().GetName(pPlayer), ItemLeft);
+		int ItemLeft = SearchCount - pPlayer->GetItem(SearchItemID).Count;
+		str_format(aBuf, sizeof(aBuf), "%sx%d ", GS()->GetItemInfo(SearchItemID).GetName(pPlayer), ItemLeft);
 		Buffer.append_at(Buffer.length(), aBuf);
 	}
-
-	// проверяем имеется ли в буффере что то либо то сразу пишем вам нужно ляля 
 	if(Buffer.length() > 0) 
 	{
-		GS()->Chat(ClientID, "Item left: {STR}", Buffer.buffer(), NULL);
+		GS()->Chat(ClientID, "Item left: {STR}", Buffer.buffer());
 		Buffer.clear();
 		return;
 	}
 	Buffer.clear();
 
-	// чекаем деньги
-	int MoneyDiscount = round_to_int(kurosio::translate_to_procent_rest(Craft[CraftID].Money, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount)));
-	if(pPlayer->CheckFailMoney(MoneyDiscount)) 
+	// дальше уже организуем крафт
+
+	int Discount = (int)kurosio::translate_to_procent_rest(Craft[CraftID].Price, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount));
+	int LastPrice = clamp(Craft[CraftID].Price - Discount, 0, Craft[CraftID].Price);
+	if(pPlayer->CheckFailMoney(LastPrice))
 		return;
 
-	// вторая подбивка снимает что стабильно для снятия
+	dbg_msg("testy", "here");
 	for(int i = 0; i < 3; i++) 
 	{
-		int SearchItemID = Craft[CraftID].Need[i], SearchCount = Craft[CraftID].Count[i];
-		if(SearchItemID <= 0 || SearchCount <= 0) continue;
-		pPlayer->GetItem(Craft[CraftID].Need[i]).Remove(Craft[CraftID].Count[i]);
+		int SearchItemID = Craft[CraftID].ItemNeedID[i]; 
+		int SearchCount = Craft[CraftID].ItemNeedCount[i];
+		if(SearchItemID <= 0 || SearchCount <= 0) 
+			continue;
+
+		pPlayer->GetItem(SearchItemID).Remove(SearchCount);
 	}
 
-	PlayerItem.Add(Craft[CraftID].ItemCount);
-	GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-
-	// пишем в чат и выдаем предмет
-	if(Craft[CraftID].Rare)
+	int CraftGetCount = Craft[CraftID].GetItemCount;
+	PlayerItem.Add(CraftGetCount);
+	if(PlayerItem.Info().IsEnchantable())
 	{
-		GS()->Chat(-1, "{STR} crafted [{STR}x{INT}].", GS()->Server()->ClientName(ClientID), PlayerItem.Info().GetName(), &Craft[CraftID].ItemCount);
+		GS()->Chat(-1, "{STR} crafted [{STR}x{INT}].", GS()->Server()->ClientName(ClientID), PlayerItem.Info().GetName(), &CraftGetCount);
 		return;
 	}
-	GS()->Chat(ClientID, "You crafted [{STR}x{INT}].", PlayerItem.Info().GetName(pPlayer), &Craft[CraftID].ItemCount);
+	GS()->Chat(ClientID, "You crafted [{STR}x{INT}].", PlayerItem.Info().GetName(pPlayer), &CraftGetCount);
+	GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 }
 
-bool CraftJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool CraftJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
-	int ClientID = pPlayer->GetCID();
-	// крафт действие
+	const int ClientID = pPlayer->GetCID();
+
 	if(PPSTR(CMD, "CRAFT") == 0)
 	{
-		StartCraftItem(pPlayer, VoteID);
+		CraftItem(pPlayer, VoteID);
 		return true;
 	}
 
-	// лист крафта
 	if(PPSTR(CMD, "SORTEDCRAFT") == 0)
 	{
 		pPlayer->m_SortTabs[SORTCRAFT] = VoteID;
 		GS()->VResetVotes(ClientID, MAINMENU);
 		return true;		
 	}
-	
 	return false;
 }
 
@@ -200,7 +204,8 @@ bool CraftJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Repla
 	if (ReplaceMenu)
 	{
 		CCharacter* pChr = pPlayer->GetCharacter();
-		if (!pChr) return false;
+		if (!pChr) 
+			return false;
 
 		if (Menulist == MAINMENU && pChr->GetHelper()->BoolIndex(TILE_CRAFT_ZONE))
 		{
@@ -211,17 +216,12 @@ bool CraftJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Repla
 			GS()->AVM(ClientID, "null", NOPE, HCRAFTINFO, "You will write those and the amount that is still required");
 			GS()->AV(ClientID, "null", "");
 
-			GS()->AVH(ClientID, HCRAFTSELECT, RED_COLOR, "Crafting Select List");
-			GS()->AVM(ClientID, "SORTEDCRAFT", CRAFTBASIC, HCRAFTSELECT, "Basic Items");
-			GS()->AVM(ClientID, "SORTEDCRAFT", CRAFTARTIFACT, HCRAFTSELECT, "Artifacts");
-			GS()->AVM(ClientID, "SORTEDCRAFT", CRAFTWEAPON, HCRAFTSELECT, "Modules & Weapons");
-			GS()->AVM(ClientID, "SORTEDCRAFT", CRAFTEAT, HCRAFTSELECT, "Buffs & Eat");
-			GS()->AVM(ClientID, "SORTEDCRAFT", CRAFTWORK, HCRAFTSELECT, "Work & Job");
-			GS()->AVM(ClientID, "SORTEDCRAFT", CRAFTQUEST, HCRAFTSELECT, "Quests");
-			GS()->AV(ClientID, "null", "");
-			if (pPlayer->m_SortTabs[SORTCRAFT])
-				ShowCraftList(pPlayer, pPlayer->m_SortTabs[SORTCRAFT]);
-
+			ShowCraftList(pPlayer, "Craft | Can be used's", TYPE_USED);
+			ShowCraftList(pPlayer, "Craft | Potion's", TYPE_POTION);
+			ShowCraftList(pPlayer, "Craft | Equipment's", TYPE_EQUIP);
+			ShowCraftList(pPlayer, "Craft | Module's", TYPE_MODULE);
+			ShowCraftList(pPlayer, "Craft | Decoration's", TYPE_DECORATION);
+			ShowCraftList(pPlayer, "Craft | Other's", TYPE_OTHER);
 			return true;
 		}
 		return false;

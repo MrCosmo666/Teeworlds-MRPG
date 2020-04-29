@@ -324,7 +324,6 @@ bool ShopMailSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int
 	{
 		if(BuyShopItem(pPlayer, VoteID))	
 			GS()->ResetVotes(ClientID, MAINMENU);
-
 		return true;
 	} 
 
@@ -393,5 +392,6 @@ bool ShopMailSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int
 		GS()->VResetVotes(ClientID, AUCTIONSETSLOT);
 		return true;
 	}
+
 	return false;
 }

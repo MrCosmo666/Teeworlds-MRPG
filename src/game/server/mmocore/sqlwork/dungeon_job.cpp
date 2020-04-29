@@ -133,6 +133,7 @@ bool DungeonJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int 
 		GS()->Server()->ChangeWorld(ClientID, pPlayer->Acc().LastWorldID);
 		return true;
 	}
+
 	return false;
 }
 

@@ -115,5 +115,6 @@ bool MailBoxJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int 
 		GS()->VResetVotes(ClientID, INBOXLIST);
 		return true;
 	} 
+
 	return false;
 }

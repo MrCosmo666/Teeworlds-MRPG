@@ -10,28 +10,25 @@ class CraftJob : public CMmoComponent
  	// создаем экземпляр класса лишь 1 шт так что можно использовать глобально
 	struct CraftStruct
 	{
-		int Level;
-		int ItemID;
-		int ItemCount;
-		int Money;
-		int Need[3];
-		int	Count[3];
-		int Tab;
-		bool Rare;
+		int ItemNeedID[3];
+		int	ItemNeedCount[3];
+		int GetItemID;
+		int GetItemCount;
+		int Price;
+		int WorldID;
 	};
 	typedef std::map < int , CraftStruct > CraftType;
 	static CraftType Craft;
 
-	void ShowCraftList(CPlayer* pPlayer, int CraftType);
+	void CraftItem(CPlayer* pPlayer, int CraftID);
+	
+	bool ItEmptyType(int SelectType) const;
+	void ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectType);
 
 public:
 	virtual void OnInitGlobal();
-
-
-	// действия с крафтами
-	void StartCraftItem(CPlayer *pPlayer, int CraftID);
 	virtual bool OnPlayerHandleTile(CCharacter* pChr, int IndexCollision);
-	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
+	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 
 };

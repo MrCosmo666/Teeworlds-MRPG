@@ -99,12 +99,9 @@ bool SkillJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int Vo
 	if (PPSTR(CMD, "SKILLLEARN") == 0)
 	{
 		const int SkillID = VoteID;
-
-		// улучшение
 		if (UpgradeSkill(pPlayer, SkillID))
-		{
 			GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-		}
+
 		return true;
 	}
 	return false;

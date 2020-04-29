@@ -56,6 +56,7 @@ bool TeleportsSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const in
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
+
 	return false; 
 }
 
@@ -88,7 +89,8 @@ bool TeleportsSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool R
 	if (ReplaceMenu)
 	{
 		CCharacter* pChr = pPlayer->GetCharacter();
-		if (!pChr || !pChr->IsAlive()) return false;
+		if (!pChr || !pChr->IsAlive()) 
+			return false;
 
 		if (Menulist == MAINMENU && pChr->GetHelper()->BoolIndex(TILE_AETHER_TELEPORT))
 		{

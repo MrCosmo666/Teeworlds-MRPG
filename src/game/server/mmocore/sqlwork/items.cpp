@@ -250,9 +250,6 @@ void ItemSql::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 	const char* DescItem = PlItem.Info().GetDesc(pPlayer);
 	GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", DescItem);
 
-	// квестовыый предмет
-	if (PlItem.Info().Type == ItemType::TYPE_QUEST) return;
-
 	// бонус предметов
 	if (PlItem.Info().IsEnchantable())
 	{
@@ -390,7 +387,7 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 			Get = AvailableCount;
 
 		ItemPlayer &PlItem = pPlayer->GetItem(VoteID);
-		const int ItemGive = (PlItem.Info().Function == FUNCTION_PLANTS ? itGoods : itMaterial);
+		const int ItemGive = (PlItem.Info().Function == FUNCTION_PLANTS ? (int)itGoods : (int)itMaterial);
 		ItemPlayer &ItemMaterial = pPlayer->GetItem(ItemGive); 
 
 		int DesCount = PlItem.Info().Dysenthis * Get;
@@ -461,6 +458,7 @@ bool ItemSql::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 		GS()->VResetVotes(ClientID, EQUIPMENU);
 		return true;				
 	}
+
 	return false;
 }
 
@@ -529,7 +527,6 @@ bool ItemSql::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Replac
 		GS()->AVH(ClientID, HINVSELECT, RED_COLOR, "Inventory Select List");
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_USED, HINVSELECT, "Used Items");
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_CRAFT, HINVSELECT, "Craft Items");
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_QUEST, HINVSELECT, "Quest Items");
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_MODULE, HINVSELECT, "Modules Items");
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_POTION, HINVSELECT, "Potion Items");
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_OTHER, HINVSELECT, "Other Items");

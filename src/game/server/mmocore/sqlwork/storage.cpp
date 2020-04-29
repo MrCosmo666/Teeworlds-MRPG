@@ -217,6 +217,7 @@ bool StorageSql::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int 
 		GS()->Chat(ClientID, "You repaired all your items.");
 		return true;
 	}
+
 	return false;
 }
 

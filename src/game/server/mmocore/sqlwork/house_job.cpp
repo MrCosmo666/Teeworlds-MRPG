@@ -658,6 +658,7 @@ bool HouseJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 		ChangePlantsID(HouseID, VoteID);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 	}
+
 	return false;
 }
 
