@@ -684,6 +684,10 @@ void CGS::BroadcastTick(int ClientID)
 ######################################################################### */
 void CGS::SendEmoticon(int ClientID, int Emoticon)
 {
+	CPlayer* pPlayer = GetPlayer(ClientID, true, true);
+	if (pPlayer)
+		Mmo()->Skills()->ParseEmoticionSkill(pPlayer, Emoticon);
+
 	CNetMsg_Sv_Emoticon Msg;
 	Msg.m_ClientID = ClientID;
 	Msg.m_Emoticon = Emoticon;
@@ -1211,7 +1215,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		{
 			CNetMsg_Cl_Emoticon *pMsg = (CNetMsg_Cl_Emoticon *)pRawMsg;
 
-			if(g_Config.m_SvSpamprotection && pPlayer->m_PlayerTick[TickState::LastEmote] && pPlayer->m_PlayerTick[TickState::LastEmote]+Server()->TickSpeed()*3 > Server()->Tick())
+			if(g_Config.m_SvSpamprotection && pPlayer->m_PlayerTick[TickState::LastEmote] && pPlayer->m_PlayerTick[TickState::LastEmote]+(Server()->TickSpeed() / 2) > Server()->Tick())
 				return;
 
 			pPlayer->m_PlayerTick[TickState::LastEmote] = Server()->Tick();

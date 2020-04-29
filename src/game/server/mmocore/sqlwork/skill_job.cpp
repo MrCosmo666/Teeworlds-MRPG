@@ -37,11 +37,12 @@ void SkillJob::OnInitGlobal()
 void SkillJob::OnInitAccount(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("SkillID, SkillLevel", "tw_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("SkillID, SkillLevel, SelectedEmoticion", "tw_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	while(RES->next())
 	{
 		const int SkillID = (int)RES->getInt("SkillID");
 		Skill[ClientID][SkillID].m_SkillLevel = (int)RES->getInt("SkillLevel");
+		Skill[ClientID][SkillID].m_SelectedEmoticion = (int)RES->getInt("SelectedEmoticion");
 	}		
 }
 
@@ -112,6 +113,19 @@ bool SkillJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int Vo
 
 		return true;
 	}
+
+	if (PPSTR(CMD, "SKILLCHANGEEMOTICION") == 0)
+	{
+		const int SkillID = VoteID;
+		Skill[ClientID][SkillID].m_SelectedEmoticion++;
+		if (Skill[ClientID][SkillID].m_SelectedEmoticion >= NUM_EMOTICONS)
+			Skill[ClientID][SkillID].m_SelectedEmoticion = -1;
+
+		SJK.UD("tw_skills", "SelectedEmoticion = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", Skill[ClientID][SkillID].m_SelectedEmoticion, SkillID, pPlayer->Acc().AuthID);
+		GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		return true;
+	}
+
 	return false;
 }
 
@@ -177,7 +191,11 @@ void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 	GS()->AVM(ClientID, "null", NOPE, HideID, "Mana required (first use -{INT} support -{INT})", &SkillData[SkillID].m_ManaCost, &SkillData[SkillID].m_ManaSupport);
 	GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", SkillData[SkillID].m_SkillDesc);
 	GS()->AVM(ClientID, "null", NOPE, HideID, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].m_SkillBonusInfo);
-	GS()->AVM(ClientID, "null", NOPE, HideID, "F1 Bind: (bind 'key' say \"/useskill {INT}\")", &SkillID);
+	if (LevelOwn >= 1)
+	{
+		GS()->AVM(ClientID, "null", NOPE, HideID, "F1 Bind: (bind 'key' say \"/useskill {INT}\")", &SkillID);
+		GS()->AVM(ClientID, "SKILLCHANGEEMOTICION", SkillID, HideID, "Used on {STR}", GetSelectedEmoticion(Skill[ClientID][SkillID].m_SelectedEmoticion));
+	}
 	GS()->AVM(ClientID, "SKILLLEARN", SkillID, HideID, "Learn {STR}", SkillData[SkillID].m_SkillName);
 }
 
@@ -185,7 +203,8 @@ void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 {
 	const int ClientID = pPlayer->GetCID();
-	if (Skill[ClientID].find(SkillID) == Skill[ClientID].end()) 
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_skills", "WHERE SkillID = '%d' AND OwnerID = '%d'", SkillID, pPlayer->Acc().AuthID));
+	if (RES->next())
 	{
 		// если такой скилл есть повышаем уровень
 		if (Skill[ClientID][SkillID].m_SkillLevel >= SkillData[SkillID].m_SkillMaxLevel)
@@ -202,7 +221,7 @@ bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 		Skill[ClientID][SkillID].m_SkillLevel++;
 		SJK.UD("tw_skills", "SkillLevel = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", Skill[ClientID][SkillID].m_SkillLevel, SkillID, pPlayer->Acc().AuthID);
 		GS()->Chat(ClientID, "You have increased the skill [{STR} level to {INT}]!", SkillData[SkillID].m_SkillName, &Skill[ClientID][SkillID].m_SkillLevel);
-		return true;	
+		return true;
 	}
 
 	// проверяем хватает ли скиллпоинтов
@@ -211,6 +230,7 @@ bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 
 	// создаем неовый скилл
 	Skill[ClientID][SkillID].m_SkillLevel = 1;
+	Skill[ClientID][SkillID].m_SelectedEmoticion = -1;
 	SJK.ID("tw_skills", "(SkillID, OwnerID, SkillLevel) VALUES ('%d', '%d', '1');", SkillID, pPlayer->Acc().AuthID);
 	GS()->Chat(ClientID, "You have learned a new skill [{STR}]", SkillData[SkillID].m_SkillName);
 	return true;
@@ -261,4 +281,39 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 	}
 
 	return false;
+}
+
+void SkillJob::ParseEmoticionSkill(CPlayer *pPlayer, int EmoticionID)
+{
+	int ClientID = pPlayer->GetCID();
+	for (const auto& skillplayer : Skill[ClientID])
+	{
+		if (skillplayer.second.m_SelectedEmoticion != EmoticionID)
+			continue;
+		UseSkill(pPlayer, skillplayer.first);
+	}
+}
+
+const char* SkillJob::GetSelectedEmoticion(int EmoticionID) const
+{
+	switch (EmoticionID)
+	{
+	case EMOTICON_OOP: return "Emoticion Ooop";
+	case EMOTICON_EXCLAMATION: return "Emoticion Exclamation";
+	case EMOTICON_HEARTS: return "Emoticion Hearts";
+	case EMOTICON_DROP: return "Emoticion Drop";
+	case EMOTICON_DOTDOT: return "Emoticion ...";
+	case EMOTICON_MUSIC: return "Emoticion Music";
+	case EMOTICON_SORRY: return "Emoticion Sorry";
+	case EMOTICON_GHOST: return "Emoticion Ghost";
+	case EMOTICON_SUSHI: return "Emoticion Sushi";
+	case EMOTICON_SPLATTEE: return "Emoticion Splatee";
+	case EMOTICON_DEVILTEE: return "Emoticion Deviltee";
+	case EMOTICON_ZOMG: return "Emoticion Zomg";
+	case EMOTICON_ZZZ: return "Emoticion Zzz";
+	case EMOTICON_WTF: return "Emoticion Wtf";
+	case EMOTICON_EYES: return "Emoticion Eyes";
+	case EMOTICON_QUESTION: return "Emoticion Question";
+	}
+	return "Not selected";
 }

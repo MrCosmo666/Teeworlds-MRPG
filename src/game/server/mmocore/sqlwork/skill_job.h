@@ -7,9 +7,6 @@
 
 class SkillJob : public CMmoComponent
 {
-/* #########################################################################
-	GLOBAL SKILL CLASS 
-######################################################################### */
 	struct StructSkillInformation
 	{
 		char m_SkillName[32];
@@ -26,6 +23,7 @@ class SkillJob : public CMmoComponent
 
 	struct StructSkills
 	{
+		int m_SelectedEmoticion;
 		int m_SkillLevel;
 	};
 	typedef StructSkills SkillPlayer;
@@ -44,13 +42,15 @@ public:
 	int GetSkillBonus(int ClientID, int SkillID) const;
 	int GetSkillLevel(int ClientID, int SkillID) const;
 	int SkillsSize() const { return SkillData.size(); };
-
-	void SkillSelected(CPlayer *pPlayer, int SkillID);
-	bool UpgradeSkill(CPlayer *pPlayer, int SkillID);
 	bool UseSkill(CPlayer *pPlayer, int SkillID);
+	void ParseEmoticionSkill(CPlayer* pPlayer, int EmoticionID);
+
 
 private:
+	const char* GetSelectedEmoticion(int EmoticionID) const;
 	void ShowMailSkillList(CPlayer* pPlayer, bool Pasive);
+	void SkillSelected(CPlayer* pPlayer, int SkillID);
+	bool UpgradeSkill(CPlayer* pPlayer, int SkillID);
 };
 
 #endif
