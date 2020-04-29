@@ -9,14 +9,12 @@ class QuestBase : public CMmoComponent
 {
 	struct StructQuestData
 	{
-		char Name[32];
-		char Location[64];
-		char StoryLine[32];
+		char Name[24];
+		char StoryLine[24];
 
 		int Money;
 		int Exp;
 		int ProgressSize;
-
 		int ItemRewardID[3];
 		int ItemRewardCount[3];
 	};
