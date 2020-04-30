@@ -189,7 +189,7 @@ void BotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 		CreateRandomDropItem(ClientID, RandomDrop, DropItem, CountItem, ForceDies);
 	}
 
-	int MultiplierExperience = kurosio::computeExperience(BotJob::MobBot[SubID].Level) / 300;
+	int MultiplierExperience = kurosio::computeExperience(BotJob::MobBot[SubID].Level) / g_Config.m_SvKillmobsIncreaseLevel;
 	int MultiplierRaid = clamp(GS()->IncreaseCountRaid(MultiplierExperience), 1, GS()->IncreaseCountRaid(MultiplierExperience));
 	pPlayer->AddExp(MultiplierRaid);
 

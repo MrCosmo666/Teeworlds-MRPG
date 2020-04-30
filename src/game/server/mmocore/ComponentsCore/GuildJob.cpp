@@ -665,9 +665,6 @@ std::string GuildJob::UpgradeNames(int Field, bool DataTable)
 	return "Error";
 }
 
-int GuildJob::ExpForLevel(int Level) { return (g_Config.m_SvGuildLeveling+Level*2)*(Level*Level); } 
-
-
 /* #########################################################################
 	FUNCTIONS HOUSES DECORATION
 ######################################################################### */
@@ -838,7 +835,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	
 	// показываем само меню
 	int MemberHouse = GetGuildHouseID(GuildID);
-	int ExpNeed = ExpForLevel(Guild[GuildID].m_Level);
+	int ExpNeed = kurosio::computeExperience(Guild[GuildID].m_Level);
 	GS()->AVH(ClientID, TAB_GUILD_STAT, BLUE_COLOR, "Guild name: {STR}", Guild[GuildID].m_Name);
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Level: {INT} Experience: {INT}/{INT}", &Guild[GuildID].m_Level, &Guild[GuildID].m_Exp, &ExpNeed);
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Maximal available player count: {INT}", &Guild[GuildID].m_Upgrades[EMEMBERUPGRADE::AvailableNSTSlots]);
@@ -931,16 +928,17 @@ void GuildJob::ShowGuildPlayers(CPlayer* pPlayer)
 void GuildJob::AddExperience(int GuildID)
 {
 	bool UpdateTable = false;
+	
 	Guild[GuildID].m_Exp += 1;
-	for( ; Guild[GuildID].m_Exp >= ExpForLevel(Guild[GuildID].m_Level); )
+	int ExperienceNeed = kurosio::computeExperience(Guild[GuildID].m_Level);
+	for( ; Guild[GuildID].m_Exp >= ExperienceNeed; )
 	{
-		Guild[GuildID].m_Exp -= ExpForLevel(Guild[GuildID].m_Level), Guild[GuildID].m_Level++;
+		Guild[GuildID].m_Exp -= ExperienceNeed, Guild[GuildID].m_Level++;
 		GS()->Chat(-1, "Guild {STR} raised the level up to {INT}", Guild[GuildID].m_Name, &Guild[GuildID].m_Level);
 		GS()->ChatDiscord(DC_SERVER_INFO, "Information", "Guild {STR} raised the level up to {INT}", Guild[GuildID].m_Name, &Guild[GuildID].m_Level);
 		AddHistoryGuild(GuildID, "Guild raised level to '%d'.", Guild[GuildID].m_Level);
 
-		// если это последний уровень повышения
-		if(Guild[GuildID].m_Exp < ExpForLevel(Guild[GuildID].m_Level))
+		if(Guild[GuildID].m_Exp < ExperienceNeed)
 			UpdateTable = true;
 	}
 	if(rand()%10 == 2 || UpdateTable)

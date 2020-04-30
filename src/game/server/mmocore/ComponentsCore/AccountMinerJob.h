@@ -17,7 +17,6 @@ class AccountMinerJob : public MmoComponent
 		int Distance;
 	};
 	static std::map < int, StructOres > Ore;
-	int ExpNeed(int Level) const;
 
 public:
 	int GetOreLevel(vec2 Pos) const;

@@ -75,7 +75,6 @@ private:
 	GET CHECK MEMBER 
 ######################################################################### */
 	std::string UpgradeNames(int Field, bool DataTable = false);
-	int ExpForLevel(int Level);
 
 public:
 	const char *GuildName(int GuildID) const;

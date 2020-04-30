@@ -15,8 +15,7 @@ class AccountPlantJob : public MmoComponent
 		int PositionY;
 		int Distance;
 	};
-	typedef std::map < int , StructPlants > PlantsType;
-	static PlantsType Plants;
+	static std::map < int, StructPlants > Plants;
 
 public:
 	virtual void OnInitWorld(const char* pWhereLocalWorld);
@@ -28,11 +27,8 @@ public:
 	void ShowMenu(int ClientID);
 	void ShowPlantsItems(int ClientID);
 
-	void Work(int ClientID, int Exp);
+	void Work(CPlayer* pPlayer, int Level);
 	virtual bool OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
-
-private:
-	int ExpNeed(int Level) const;
 };
 
 #endif

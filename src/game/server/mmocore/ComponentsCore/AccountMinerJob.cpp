@@ -7,18 +7,12 @@
 using namespace sqlstr;
 std::map < int , AccountMinerJob::StructOres > AccountMinerJob::Ore;
 
-int AccountMinerJob::ExpNeed(int Level) const 
-{ 
-	return (g_Config.m_SvMinerLeveling + Level * 2) * (Level * Level); 
-}
-
 void AccountMinerJob::ShowMenu(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	int NeedExp = ExpNeed(pPlayer->Acc().Miner[MnrLevel]);
+	int ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().Miner[MnrLevel]);
 	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "[Miner Point: {INT}] Level: {INT} Exp: {INT}/{INT}", 
-		&pPlayer->Acc().Miner[MnrUpgrade], &pPlayer->Acc().Miner[MnrLevel], &pPlayer->Acc().Miner[MnrExp], &NeedExp);
-
+		&pPlayer->Acc().Miner[MnrUpgrade], &pPlayer->Acc().Miner[MnrLevel], &pPlayer->Acc().Miner[MnrExp], &ExperienceNeed);
 	GS()->AVD(ClientID, "MINERUPGRADE", MnrCount, 20, TAB_UPGR_JOB, "[Price 20P]Mining bonus +1(Active {INT})", &pPlayer->Acc().Miner[MnrCount]);
 }
 
@@ -55,13 +49,16 @@ int AccountMinerJob::GetOreHealth(vec2 Pos) const
 	return -1;
 }
 
-void AccountMinerJob::Work(CPlayer *pPlayer, int Exp)
+void AccountMinerJob::Work(CPlayer *pPlayer, int Level)
 {
 	const int ClientID = pPlayer->GetCID();
-	pPlayer->Acc().Miner[MnrExp] += Exp;
-	for( ; pPlayer->Acc().Miner[MnrExp] >= ExpNeed(pPlayer->Acc().Miner[MnrLevel]) ; ) 
+	int MultiplierExperience = kurosio::computeExperience(Level) / g_Config.m_SvMiningIncreaseLevel;
+	pPlayer->Acc().Miner[MnrExp] += clamp(MultiplierExperience, 1, MultiplierExperience);
+
+	int ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().Miner[MnrLevel]);
+	for( ; pPlayer->Acc().Miner[MnrExp] >= ExperienceNeed; )
 	{
-		pPlayer->Acc().Miner[MnrExp] -= ExpNeed(pPlayer->Acc().Miner[MnrLevel]);
+		pPlayer->Acc().Miner[MnrExp] -= ExperienceNeed;
 		pPlayer->Acc().Miner[MnrLevel]++;
 		pPlayer->Acc().Miner[MnrUpgrade]++;
 
@@ -73,7 +70,7 @@ void AccountMinerJob::Work(CPlayer *pPlayer, int Exp)
 		}
 		GS()->ChatFollow(ClientID, "Miner Level UP. Now Level {INT}!", &pPlayer->Acc().Miner[MnrLevel]);
 	}
-	pPlayer->ProgressBar("Miner", pPlayer->Acc().Miner[MnrLevel], pPlayer->Acc().Miner[MnrExp], ExpNeed(pPlayer->Acc().Miner[MnrLevel]), Exp);
+	pPlayer->ProgressBar("Miner", pPlayer->Acc().Miner[MnrLevel], pPlayer->Acc().Miner[MnrExp], ExperienceNeed, MultiplierExperience);
 	Job()->SaveAccount(pPlayer, SAVE_MINER_DATA);
 }
 

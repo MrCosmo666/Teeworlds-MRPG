@@ -43,61 +43,73 @@ void CJobItems::Work(int ClientID)
 	if(ClientID >= MAX_PLAYERS || ClientID < 0 || m_Progress >= m_Health || !GS()->m_apPlayers[ClientID])
 		return;
 
+	// - - - - - - - - MINING - - - - - - - - 
 	CPlayer *pPlayer = GS()->m_apPlayers[ClientID];
-	ItemJob::ItemPlayer &PlDropItem = pPlayer->GetItem(m_ItemID);
+	ItemJob::ItemPlayer &pPlayerWorkedItem = pPlayer->GetItem(m_ItemID);
 	if(m_Type == 1)
 	{
 		int EquipItem = pPlayer->GetItemEquip(EQUIP_MINER);
-		if(EquipItem <= 0) 
-			return GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Need equip Pickaxe");
+		if (EquipItem <= 0)
+		{
+			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Need equip Pickaxe");
+			return;
+		}
+		if (pPlayer->Acc().Miner[PlLevel] < m_Level)
+		{
+			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), &m_Level);
+			return;
+		}
 
-		// проверка уровня на доступность
-		ItemJob::ItemPlayer &PlEquipItem = pPlayer->GetItem(EquipItem);
-		if(pPlayer->Acc().Miner[PlLevel] < m_Level)
-			return GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", PlDropItem.Info().GetName(pPlayer), &m_Level);
+		ItemJob::ItemPlayer& pPlayerEquippedItem = pPlayer->GetItem(EquipItem);
+		int Durability = pPlayerEquippedItem.Durability;
+		if (Durability <= 0)
+		{
+			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Need repair pickaxe!");
+			return;
+		}
 
-		int Durability = PlEquipItem.Durability;
-		if(rand()%10 == 0) 
-			GS()->Mmo()->Item()->SetDurability(pPlayer, EquipItem, Durability-1);
-		if(Durability <= 0) 
-			return GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Need repair pickaxe!");
+		if (rand() % 10 == 0)
+			GS()->Mmo()->Item()->SetDurability(pPlayer, EquipItem, Durability - 1);
+
 
 		m_Progress += 3+pPlayer->EnchantAttributes(Stats::StEfficiency);
 		GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
 		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P] : {STR} ({INT}/100%)", 
-			PlDropItem.Info().GetName(pPlayer), 
-			(m_Progress > m_Health ? &m_Health : &m_Progress), &m_Health, 
-			PlEquipItem.Info().GetName(pPlayer), &Durability);
+			pPlayerWorkedItem.Info().GetName(pPlayer), (m_Progress > m_Health ? &m_Health : &m_Progress), &m_Health, 
+			pPlayerEquippedItem.Info().GetName(pPlayer), &Durability);
 
 		if(m_Progress >= m_Health)
 		{
+			GS()->Mmo()->MinerAcc()->Work(pPlayer, m_Level);
 			SetSpawn(20);
-			GS()->Mmo()->MinerAcc()->Work(pPlayer, m_Level*5);
 
 			const int Count = pPlayer->Acc().Miner[MnrCount];
-			PlDropItem.Add(Count);
+			pPlayerWorkedItem.Add(Count);
 		}
 		return;
 	}
 
-	// проверка уровня на доступность
-	if(pPlayer->Acc().Plant[PlLevel] < m_Level)
-		return GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", PlDropItem.Info().GetName(pPlayer), &m_Level);
+	// - - - - - - - - PLANTS - - - - - - - - 
+	if (pPlayer->Acc().Plant[PlLevel] < m_Level)
+	{
+		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), &m_Level);
+		return;
+	}
 
 	m_Progress += 10;
 	GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
 	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P]",
-		PlDropItem.Info().GetName(pPlayer), (m_Progress > m_Health ? &m_Health : &m_Progress), &m_Health);
+		pPlayerWorkedItem.Info().GetName(pPlayer), (m_Progress > m_Health ? &m_Health : &m_Progress), &m_Health);
 
 	if(m_Progress >= m_Health)
 	{
+		GS()->Mmo()->PlantsAcc()->Work(pPlayer, m_Level);
 		SetSpawn(20);
-		GS()->Mmo()->PlantsAcc()->Work(ClientID, m_Level*5);
 
 		int Count = pPlayer->Acc().Plant[PlCounts];
-		PlDropItem.Add(Count);
+		pPlayerWorkedItem.Add(Count);
 	}
 }
 
