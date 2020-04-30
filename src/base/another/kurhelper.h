@@ -1,9 +1,11 @@
 #ifndef BASE_HELPER_SQL_H
 #define BASE_HELPER_SQL_H
 
+#include <base/detect.h>
 #include <base/threadpool.h>
+
 #if defined(CONF_FAMILY_UNIX)
-#include <math.h>
+#include <cmath>
 #endif
 
 namespace kurosio
