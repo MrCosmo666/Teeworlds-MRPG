@@ -181,8 +181,6 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 
 bool CraftJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
-	const int ClientID = pPlayer->GetCID();
-
 	if(PPSTR(CMD, "CRAFT") == 0)
 	{
 		CraftItem(pPlayer, VoteID);
