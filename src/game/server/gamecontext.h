@@ -19,8 +19,8 @@
 #include "gamecontroller.h"
 #include "gameworld.h"
 
-#include "PlayerBot.h"
-#include "Player.h"
+#include "playerbot.h"
+#include "player.h"
 
 #include <game/server/mmocore/MmoController.h>
 
