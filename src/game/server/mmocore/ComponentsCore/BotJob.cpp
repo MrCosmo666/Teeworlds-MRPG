@@ -265,6 +265,9 @@ bool BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 		return false;
 	}
 
+	if (!GS()->CheckClient(ClientID))
+		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 50, "Press 'F4' to continue the dialog!");
+
 	char reformTalkedText[512];
 	int sizeTalking = NpcBot[MobID].m_Talk.size();
 	if (str_comp_nocase(pText, "empty") != 0)
@@ -295,7 +298,7 @@ bool BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int Talk
 	}
 
 	if (!GS()->CheckClient(ClientID))
-		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 50, "Press 'F4' to continue the dialog!");
+		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 50, "Press 'F4' to continue the dialog!");
 
 	int BotID = QuestBot[MobID].BotID;
 	char reformTalkedText[512];
