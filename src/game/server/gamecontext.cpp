@@ -131,7 +131,7 @@ char* CGS::LevelString(int MaxValue, int CurrentValue, int Step, char toValue, c
     if (CurrentValue < 0) CurrentValue = 0;
     if (CurrentValue > MaxValue) CurrentValue = MaxValue;
 
-    int Size = 2 + MaxValue / Step;
+    int Size = 3 + MaxValue / Step;
     char *Buf = new char[Size];
     Buf[0] = '[';
     Buf[Size - 2] = ']';
@@ -1928,8 +1928,8 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		// меню информации
 		AVH(ClientID, TAB_INFORMATION, BLUE_COLOR, "# SUB MENU INFORMATION");
+		AVM(ClientID, "MENU", MenuList::MENU_GUIDEDROP, TAB_INFORMATION, "♣ Loots, mobs on your zone");
 		AVM(ClientID, "MENU", MenuList::MENU_TOP_LIST, TAB_INFORMATION, "♛ Top list");
-		AVM(ClientID, "MENU", MenuList::MENU_GUIDEDROP, TAB_INFORMATION, "♣ Loot mobs");
 		AV(ClientID, "null", "");
 
 		// чекаем местонахождение
@@ -2068,32 +2068,37 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
-		// информация
 		AVH(ClientID, TAB_INFO_LOOT, GREEN_COLOR, "Chance & Loot Information");
-		AVM(ClientID, "null", NOPE, TAB_INFO_LOOT, "Here you can see chance loot, mobs, positions, world.");
+		AVM(ClientID, "null", NOPE, TAB_INFO_LOOT, "Here you can see chance loot, mobs, on YOUR ZONE.");
 		AV(ClientID, "null", "");
 
-		// сортируем всех ботов и получаем их данные по дропу
 		char aBuf[128];
+		bool FoundedBots = false;
 		for(const auto& mobs : BotJob::MobBot)
 		{
+			if (!IsClientEqualWorldID(ClientID, mobs.second.WorldID))
+				continue;
+
 			const int HideID = (NUM_TAB_MENU+12500+mobs.first);
 			int PosX = mobs.second.PositionX/32, PosY = mobs.second.PositionY/32;
-
 			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} {STR}(x: {INT} y: {INT})", mobs.second.Name, Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY);
 	
 			for(int i = 0; i < 6; i++)
 			{
-				if(mobs.second.DropItem[i] <= 0 || mobs.second.CountItem[i] <= 0) 
+				if(mobs.second.DropItem[i] <= 0 || mobs.second.CountItem[i] <= 0)
 					continue;
 			
 				double Chance = mobs.second.RandomItem[i] <= 0 ? 100.0f : (1.0f / (double)mobs.second.RandomItem[i]) * 100;
 				ItemJob::ItemInformation &InfoDropItem = GetItemInfo(mobs.second.DropItem[i]);
-	
 				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%", InfoDropItem.GetName(pPlayer), mobs.second.CountItem[i], Chance);
-				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, "{STR}", aBuf);		
+				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, "{STR}", aBuf);
+				FoundedBots = true;
 			}
 		}
+
+		if (!FoundedBots)
+			AVL(ClientID, "null", "There are no active mobs in your zone!");
+
 		AddBack(ClientID);
 	}
 	else if(MenuList == MenuList::MENU_EQUIPMENT) 

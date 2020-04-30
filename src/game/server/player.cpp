@@ -154,7 +154,7 @@ void CPlayer::TickSystemTalk()
 		return;
 
 	int TalkedID = m_TalkingNPC.m_TalkedID;
-	if(TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] || distance(m_ViewPos, GS()->m_apPlayers[TalkedID]->m_ViewPos) > 90.0f)
+	if(TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] || distance(m_ViewPos, GS()->m_apPlayers[TalkedID]->m_ViewPos) > 180.0f)
 	{
 		ClearTalking();
 	}

@@ -47,7 +47,10 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 			CreateSnapProj(GetSnapFullID(), 1, PICKUP_HEALTH, true, false);
 			CreateSnapProj(GetSnapFullID(), 1, WEAPON_HAMMER, false, true);
 		}
-		GS()->ChatWorldID(BotJob::MobBot[SubBotID].WorldID, "[Raid]", "In your area, spawned, {STR}, HP {INT}", BotJob::MobBot[SubBotID].Name, &m_StartHealth);
+		if (!GS()->IsDungeon())
+		{
+			GS()->ChatWorldID(BotJob::MobBot[SubBotID].WorldID, "", "In your zone emerging {STR} with power level {INT}!", BotJob::MobBot[SubBotID].Name, &m_StartHealth);
+		}
 	}
 	else if(GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_QUEST_NPC)
 	{
@@ -70,25 +73,16 @@ void BotAI::Tick()
 
 void BotAI::ShowProgress()
 {
-	for(auto iparse = m_ListDmgPlayers.begin(); iparse != m_ListDmgPlayers.end(); iparse++)
+	for(const auto & ListDmgPlayer : m_ListDmgPlayers)
 	{
-		CPlayer *pPlayer = GS()->GetPlayer(iparse->first, true);
+		CPlayer *pPlayer = GS()->GetPlayer(ListDmgPlayer.first, true);
 		if(pPlayer)
 		{
-			/*
-			dynamic_string Buffer;
-			int SubBotID = GetPlayer()->GetBotSub();
-			Server()->Localization()->Format(Buffer, pPlayer->GetLanguage(), _("Hard Mob: {s:name} Target: {s:tname}\n"),
-				"name", ContextBots::MobBot[SubBotID].Name, "tname", Server()->ClientName(m_BotTargetID), NULL);
-			pPlayer->AddInBroadcast(Buffer.buffer()), Buffer.clear();
-
 			int Health = GetPlayer()->GetHealth();
 			float gethp = ( Health * 100.0 ) / m_StartHealth;
-			const char *Level = GS()->LevelString(100, (int)gethp, 10, ':', ' ');
-			Server()->Localization()->Format(Buffer, pPlayer->GetLanguage(), _("Health {STR}({INT}/{INT})\n"), Level, &Health, &m_StartHealth, NULL);
-			pPlayer->AddInBroadcast(Buffer.buffer()), Buffer.clear();
-			delete Level;
-			*/
+			char *Progress = GS()->LevelString(100, (int)gethp, 10, ':', ' ');
+			GS()->SBL(ListDmgPlayer.first, BroadcastPriority::BROADCAST_GAME_PRIORITY, 10, "Health {STR}({INT}/{INT})", Progress, &Health, &m_StartHealth);
+			delete Progress;
 		}
 	}	
 }
@@ -136,17 +130,14 @@ bool BotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 
 void BotAI::Die(int Killer, int Weapon)
 {
-	// просто убить бота если он не моб
 	if(GetPlayer()->GetSpawnBot() != SpawnBot::SPAWN_MOBS)
 		return;
 
-	// склад пополнение
 	int BotID = GetPlayer()->GetBotID();
 	int StorageID = GS()->Mmo()->Storage()->GetStorageMonsterSub(BotID);
-	if(StorageID > 0) 
+	if(StorageID > 0)
 		GS()->Mmo()->Storage()->AddStorageGoods(StorageID, random_int()%5);
 
-	// очищаем лист и убиваем игрока
 	m_ListDmgPlayers.clear();
 	CCharacter::Die(Killer, Weapon);
 }
@@ -171,7 +162,6 @@ void BotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 	if (GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_MOBS)
 		GS()->Mmo()->Quest()->AddMobProgress(pPlayer, BotID);
 
-	// создаем дроп
 	for (int i = 0; i < 6; i++)
 	{
 		int DropItem = BotJob::MobBot[SubID].DropItem[i];
@@ -286,10 +276,12 @@ void BotAI::EngineNPC()
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer *pFind = GS()->GetPlayer(i, true, true);
-		if (pFind && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 300 &&
+		if (pFind && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f &&
 			!GS()->Collision()->FastIntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0))
 		{
-			pFind->SetTalking(GetPlayer()->GetCID(), false);
+			if(!(BotJob::NpcBot[SubBotID].m_Talk).empty())
+				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_PRIORITY, 10, "You can talk to this NPC using an [attack hammer]");
+
 			m_Input.m_TargetX = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
 			m_Input.m_TargetY = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
 			m_Input.m_Direction = 0;
@@ -305,6 +297,7 @@ void BotAI::EngineNPC()
 void BotAI::EngineQuestMob()
 {
 	// направление глаз
+	int SubBotID = GetPlayer()->GetBotSub();
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
 		m_Input.m_TargetY = random_int()%4- random_int()%8;
 	m_Input.m_TargetX = (m_Input.m_Direction*10+1);
@@ -313,22 +306,20 @@ void BotAI::EngineQuestMob()
 	// ------------------------------------------------------------------------------
 	// интерактивы бота с найденым игроком
 	// ------------------------------------------------------------------------------	
-	for(int i = 0; i < MAX_PLAYERS; i++)
+	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(!GS()->m_apPlayers[i] || !GS()->m_apPlayers[i]->GetCharacter() ||
-			!GetPlayer()->CheckQuestSnapPlayer(i, false) ||
-			distance(GS()->m_apPlayers[i]->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) > 180)
-			continue;
+		CPlayer* pFind = GS()->GetPlayer(i, true, true);
+		if (pFind && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f
+			&& !GS()->Collision()->FastIntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0)
+			&& GetPlayer()->CheckQuestSnapPlayer(i, false))
+		{
+			if (!(BotJob::QuestBot[SubBotID].m_Talk).empty())
+				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_PRIORITY, 10, "You can talk to this NPC using an [attack hammer]");
 
-		CPlayer *pFind = GS()->m_apPlayers[i]; 
-		m_Input.m_TargetX = round_to_int(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
-		m_Input.m_TargetY = round_to_int(pFind->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
-		m_Input.m_Direction = 0;
-
-		// ------------------------------------------------------------------------------
-		// квесты с нпс
-		// ------------------------------------------------------------------------------
-		pFind->SetTalking(GetPlayer()->GetCID(), false);
+			m_Input.m_TargetX = round_to_int(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
+			m_Input.m_TargetY = round_to_int(pFind->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
+			m_Input.m_Direction = 0;
+		}
 	}
 }
 

@@ -247,19 +247,18 @@ void CCharacter::FireWeapon()
 	if(!WillFire)
 		return;
 
-	bool IamBot = m_pPlayer->IsBot();
+	bool IsBot = m_pPlayer->IsBot();
 	int SubBotID = GetPlayer()->GetBotSub();
-	if(!IamBot)
+	if(!IsBot)
 	{
-		// добавить декоратив
 		if(DecoInteractive())
 			return;
 
-		// если не одето
 		if(m_pPlayer->GetItemEquip(m_ActiveWeapon+EQUIP_HAMMER) == -1)
 		{
-			// hotfix hammer non pick items
 			GS()->SBL(m_pPlayer->GetCID(), BroadcastPriority::BROADCAST_GAME_WARNING, 150, "You need buy this weapon or module and equip!");
+			m_ReloadTimer = 125 * Server()->TickSpeed() / 1000;
+
 			if(m_ActiveWeapon == WEAPON_HAMMER)
 				GS()->TakeItemCharacter(m_pPlayer->GetCID());
 			return;
@@ -303,7 +302,13 @@ void CCharacter::FireWeapon()
 				if ((pTarget == this) || pTarget->m_Core.m_LostData || GS()->Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, NULL, NULL))
 					continue;
 
-				// set his velocity to fast upward (for now)
+				if (!m_pPlayer->IsBot() && pTarget->GetPlayer()->IsBot() 
+					&& (pTarget->GetPlayer()->GetSpawnBot() == SPAWN_NPC || pTarget->GetPlayer()->GetSpawnBot() == SPAWN_QUEST_NPC))
+				{
+					m_pPlayer->ClearTalking();
+					m_pPlayer->SetTalking(pTarget->GetPlayer()->GetCID(), false);
+				}
+
 				if(length(pTarget->m_Pos-ProjStartPos) > 0.0f)
 					GS()->CreateHammerHit(pTarget->m_Pos-normalize(pTarget->m_Pos-ProjStartPos)*GetProximityRadius()*0.5f);
 				else
@@ -337,7 +342,7 @@ void CCharacter::FireWeapon()
 
 		case WEAPON_SHOTGUN:
 		{
-			int EnchantSpread = IamBot ? 2+BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadShotgun);
+			int EnchantSpread = IsBot ? 2+BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadShotgun);
 			int ShotSpread = 1+EnchantSpread;
 			if(ShotSpread > 36)
 				ShotSpread = 36;
@@ -361,7 +366,7 @@ void CCharacter::FireWeapon()
 
 		case WEAPON_GRENADE:
 		{
-			int EnchantSpread = IamBot ? BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadGrenade);
+			int EnchantSpread = IsBot ? BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadGrenade);
 			int ShotSpread = 1+EnchantSpread;
 			if(ShotSpread > 21)
 				ShotSpread = 21;
@@ -382,7 +387,7 @@ void CCharacter::FireWeapon()
 
 		case WEAPON_LASER:
 		{
-			int EnchantSpread = IamBot ? BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadRifle);
+			int EnchantSpread = IsBot ? BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadRifle);
 			int ShotSpread = 1+EnchantSpread;
 			if(ShotSpread > 36)
 				ShotSpread = 36;
@@ -624,7 +629,8 @@ bool CCharacter::CheckInvisibleBot()
 	
 	for(int i = 0 ; i < MAX_PLAYERS ; i++) 
 	{
-		if(!GS()->m_apPlayers[i] || distance(m_Pos, GS()->m_apPlayers[i]->m_ViewPos) > 1000.0f) 
+		if(!GS()->m_apPlayers[i] || distance(m_Pos, GS()->m_apPlayers[i]->m_ViewPos) > 1000.0f 
+			|| GS()->CheckPlayerMessageWorldID(i) != Server()->GetWorldID(i)) 
 			continue;
 		
 		return true;
