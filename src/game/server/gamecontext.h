@@ -19,10 +19,10 @@
 #include "gamecontroller.h"
 #include "gameworld.h"
 
-#include "player_bot.h"
-#include "player.h"
+#include "PlayerBot.h"
+#include "Player.h"
 
-#include <game/server/mmocore/controller.h>
+#include <game/server/mmocore/MmoController.h>
 
 
 #ifdef _MSC_VER
@@ -40,7 +40,7 @@ class CGS : public IGameServer
 		VAR AND OBJECT GAMECONTEX DATA 
 	######################################################################### */
 	int m_WorldID;
-	class SqlController *pMmoController;
+	class MmoController *pMmoController;
 
 	IServer *m_pServer;
 	class IConsole *m_pConsole;
@@ -69,7 +69,7 @@ public:
 	~CGS();
 	void Clear();
 
-	SqlController *Mmo() { return pMmoController; }
+	MmoController *Mmo() { return pMmoController; }
 
 	CEventHandler m_Events;
 	CPlayer *m_apPlayers[MAX_CLIENTS];
@@ -102,7 +102,7 @@ public:
 		int TempID3;
 
 		// остальное все
-		ShopMailSql::AuctionItem AuctionItem;
+		ShopJob::AuctionItem AuctionItem;
 
 		char RankName[32];
 		char GuildName[32];
@@ -131,7 +131,7 @@ public:
 	class CCharacter *GetPlayerChar(int ClientID);
 	CPlayer *GetPlayer(int ClientID, bool CheckAuthed = false, bool CheckCharacter = false);
 	char* LevelString(int max, int value, int step, char ch1, char ch2);
-	ItemSql::ItemInformation &GetItemInfo(int ItemID) const;
+	ItemJob::ItemInformation &GetItemInfo(int ItemID) const;
 
 	/* #########################################################################
 		EVENTS 
@@ -303,7 +303,7 @@ public:
 	void CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, int WorldID);
 	void CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop = 1, vec2 Force = vec2(0.0f, 0.0f));
 	void CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant = 0, vec2 Force = vec2(0.0f, 0.0f));
-	void CreateDropItem(vec2 Pos, int ClientID, ItemSql::ItemPlayer &PlayerItem, int Count, vec2 Force = vec2(0.0f, 0.0f));
+	void CreateDropItem(vec2 Pos, int ClientID, ItemJob::ItemPlayer &PlayerItem, int Count, vec2 Force = vec2(0.0f, 0.0f));
 	bool TakeItemCharacter(int ClientID);
 	void SendInbox(int ClientID, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
 

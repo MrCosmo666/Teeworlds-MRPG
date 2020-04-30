@@ -5,9 +5,9 @@
 
 #include <game/server/gamecontext.h>
 
-#include "../entities/npcwall.h"
-#include "../logicworld/logicwall.h"
-#include "../entities/jobitems.h"
+#include <game/server/mmocore/GameEntities/npcwall.h>
+#include <game/server/mmocore/GameEntities/jobitems.h>
+#include <game/server/mmocore/GameEntities/Logics/logicwall.h>
 
 CGameControllerMOD::CGameControllerMOD(class CGS *pGS)
 : IGameController(pGS)

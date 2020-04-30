@@ -3,9 +3,9 @@
 
 #include <game/server/gamecontext.h>
 
-#include "../entities/npcwall.h"
-#include "../logicworld/logicwall.h"
-#include "../entities/jobitems.h"
+#include <game/server/mmocore/GameEntities/jobitems.h>
+#include <game/server/mmocore/GameEntities/npcwall.h>
+#include <game/server/mmocore/GameEntities/Logics/logicwall.h>
 
 #include "dungeon.h"
 
@@ -214,7 +214,7 @@ void CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKil
 
 	int KillerID = pKiller->GetCID();
 	int VictimID = pVictim->GetPlayer()->GetCID();
-	if (KillerID != VictimID && pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetSpawnBot() == SPAWNMOBS)
+	if (KillerID != VictimID && pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_MOBS)
 	{
 		int Progress = 100 - (int)kurosio::translate_to_procent(CountMobs(), LeftMobsToWin());
 		DungeonJob::Dungeon[m_DungeonID].Progress = Progress;
@@ -258,7 +258,7 @@ int CGameControllerDungeon::CountMobs() const
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
+		if (BotPlayer && BotPlayer->GetSpawnBot() == SpawnBot::SPAWN_MOBS && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
 			countMobs++;
 	}
 	return countMobs;
@@ -281,7 +281,7 @@ int CGameControllerDungeon::LeftMobsToWin() const
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS && BotPlayer->GetCharacter() && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
+		if (BotPlayer && BotPlayer->GetSpawnBot() == SpawnBot::SPAWN_MOBS && BotPlayer->GetCharacter() && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
 			leftMobs++;
 	}
 	return leftMobs;
@@ -292,7 +292,7 @@ void CGameControllerDungeon::SetMobsSpawn(bool AllowedSpawn)
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
+		if (BotPlayer && BotPlayer->GetSpawnBot() == SpawnBot::SPAWN_MOBS && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
 		{
 			BotPlayer->SetDungeonAllowedSpawn(AllowedSpawn);
 			if (!AllowedSpawn && BotPlayer->GetCharacter())

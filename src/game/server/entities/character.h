@@ -7,7 +7,7 @@
 
 #include <game/gamecore.h>
 #include <game/server/entity.h>
-#include "../mmocore/mmocontroller/helperchar.h"
+#include "../mmocore/TileHandle.h"
 
 class CCharacter : public CEntity
 {
@@ -15,7 +15,7 @@ class CCharacter : public CEntity
 
 	// player controlling this character
 	class CPlayer *m_pPlayer;
-	class CHelperCharacter *m_pHelper;
+	class TileHandle *m_pHelper;
 
 	// Ядро неследование этого думаю не потребуется
 	void FireWeapon();
@@ -44,7 +44,7 @@ public:
 	~CCharacter();
 
 	CPlayer *GetPlayer() const { return m_pPlayer; }
-	CHelperCharacter *GetHelper() const { return m_pHelper; }
+	TileHandle *GetHelper() const { return m_pHelper; }
 
 	virtual int GetSnapFullID() const;
 	virtual void Tick();

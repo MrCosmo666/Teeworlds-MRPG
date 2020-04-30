@@ -9,9 +9,9 @@
 #include "laser.h"
 #include "projectile.h"
 
-#include <game/server/mmocore/questai.h>
-#include "snapfull.h"
-#include "jobitems.h"
+#include <game/server/mmocore/GameEntities/questai.h>
+#include <game/server/mmocore/GameEntities/snapfull.h>
+#include <game/server/mmocore/GameEntities/jobitems.h>
 
 //input count
 struct CInputCount
@@ -42,7 +42,7 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 : CEntity(pWorld, CGameWorld::ENTTYPE_CHARACTER, vec2(0, 0), ms_PhysSize)
 {
 	// another function
-	m_pHelper = new CHelperCharacter(this);
+	m_pHelper = new TileHandle(this);
 
 	m_DoorHit = false;
 	m_Health = 0;
@@ -199,7 +199,7 @@ bool CCharacter::DecoInteractive()
 			if (GS()->Mmo()->House()->AddDecorationHouse(DecoID, HouseID, m_pHelper->MousePos()))
 			{
 				GS()->Chat(ClientID, "You added {STR}, to your house!", GS()->GetItemInfo(DecoID).GetName(m_pPlayer));
-				GS()->ResetVotes(ClientID, HOUSEDECORATION);
+				GS()->ResetVotes(ClientID, MenuList::MENU_HOUSE_DECORATION);
 				m_pPlayer->GetItem(DecoID).Remove(1);
 				return true;
 			}
@@ -210,7 +210,7 @@ bool CCharacter::DecoInteractive()
 			if (GS()->Mmo()->Member()->AddDecorationHouse(DecoID, GuildID, m_pHelper->MousePos()))
 			{
 				GS()->Chat(ClientID, "You added {STR}, to your guild house!", GS()->GetItemInfo(DecoID).GetName(m_pPlayer));
-				GS()->ResetVotes(ClientID, HOUSEGUILDDECORATION);
+				GS()->ResetVotes(ClientID, MenuList::MENU_GUILD_HOUSE_DECORATION);
 				m_pPlayer->GetItem(DecoID).Remove(1);
 				return true;
 			}
@@ -218,7 +218,7 @@ bool CCharacter::DecoInteractive()
 
 		GS()->Chat(ClientID, "Distance House and Decoration maximal {INT} block!", &g_Config.m_SvLimitDecoration);
 		GS()->Chat(ClientID, "Setting object reset, use repeat!");
-		GS()->ResetVotes(ClientID, HOUSEDECORATION);
+		GS()->ResetVotes(ClientID, MenuList::MENU_HOUSE_DECORATION);
 		return true;
 	}
 	return false;
@@ -337,7 +337,7 @@ void CCharacter::FireWeapon()
 
 		case WEAPON_SHOTGUN:
 		{
-			int EnchantSpread = IamBot ? 2+ContextBots::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadShotgun);
+			int EnchantSpread = IamBot ? 2+BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadShotgun);
 			int ShotSpread = 1+EnchantSpread;
 			if(ShotSpread > 36)
 				ShotSpread = 36;
@@ -361,7 +361,7 @@ void CCharacter::FireWeapon()
 
 		case WEAPON_GRENADE:
 		{
-			int EnchantSpread = IamBot ? ContextBots::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadGrenade);
+			int EnchantSpread = IamBot ? BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadGrenade);
 			int ShotSpread = 1+EnchantSpread;
 			if(ShotSpread > 21)
 				ShotSpread = 21;
@@ -382,7 +382,7 @@ void CCharacter::FireWeapon()
 
 		case WEAPON_LASER:
 		{
-			int EnchantSpread = IamBot ? ContextBots::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadRifle);
+			int EnchantSpread = IamBot ? BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadRifle);
 			int ShotSpread = 1+EnchantSpread;
 			if(ShotSpread > 36)
 				ShotSpread = 36;
@@ -444,10 +444,10 @@ void CCharacter::CreateQuestsStep(int QuestID)
 {
 	int ClientID = m_pPlayer->GetCID();
 	vec2 Pos = GS()->Mmo()->WorldSwap()->GetPositionQuestBot(ClientID, QuestID);
-	if (QuestBase::Quests[ClientID].find(QuestID) == QuestBase::Quests[ClientID].end() || (Pos.x == 0.0f && Pos.y == 0.0f))
+	if (QuestJob::Quests[ClientID].find(QuestID) == QuestJob::Quests[ClientID].end() || (Pos.x == 0.0f && Pos.y == 0.0f))
 		return;
 
-	int Progress = QuestBase::Quests[ClientID][QuestID].Progress;
+	int Progress = QuestJob::Quests[ClientID][QuestID].Progress;
 	new CQuestAI(GameWorld(), m_Core.m_Pos, ClientID, QuestID, Progress, Pos);
 }
 
@@ -538,7 +538,7 @@ void CCharacter::Tick()
 
 	// - - - - - - - - - - - -
 	// запретить дальше НПС и Квестовым
-	if (m_pPlayer->IsBot() && m_pPlayer->GetSpawnBot() != SPAWNMOBS)
+	if (m_pPlayer->IsBot() && m_pPlayer->GetSpawnBot() != SpawnBot::SPAWN_MOBS)
 		return;
 
 	HandleWeapons();
@@ -677,10 +677,10 @@ void CCharacter::Die(int Killer, int Weapon)
 {
 	// we got to wait 0.5 secs before respawning
 	m_Alive = false;
-	if(m_pPlayer->GetSpawnBot() == SPAWNMOBS)
+	if(m_pPlayer->GetSpawnBot() == SpawnBot::SPAWN_MOBS)
 	{
 		int SubBotID = m_pPlayer->GetBotSub();
-		m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick()+ContextBots::MobBot[SubBotID].RespawnTick*Server()->TickSpeed();
+		m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick()+BotJob::MobBot[SubBotID].RespawnTick*Server()->TickSpeed();
 	}
 	else m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick()+Server()->TickSpeed()/2;
 

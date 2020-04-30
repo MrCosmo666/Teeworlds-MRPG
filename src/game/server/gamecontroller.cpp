@@ -105,7 +105,7 @@ void IGameController::OnPlayerConnect(CPlayer *pPlayer)
 void IGameController::OnPlayerDisconnect(CPlayer *pPlayer)
 {
 	// обновить позицию игрока
-	GS()->Mmo()->SaveAccount(pPlayer, SAVEPOSITION);
+	GS()->Mmo()->SaveAccount(pPlayer, SAVE_POSITION);
 
 	pPlayer->OnDisconnect();
 

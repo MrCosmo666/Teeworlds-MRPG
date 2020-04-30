@@ -18,7 +18,7 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 
 	m_Spawned = true;
 	m_LastVoteMenu = NOPE;
-	m_OpenVoteMenu = MAINMENU;
+	m_OpenVoteMenu = MenuList::MAIN_MENU;
 	m_PrevTuningParams = *pGS->Tuning();
 	m_NextTuningParams = m_PrevTuningParams;
 
@@ -28,7 +28,7 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	if (Acc().AuthID > 0)
 	{
 		GS()->Mmo()->Account()->LoadAccount(this, false);
-		m_SyncFactor = GS()->Mmo()->Dungeon()->SyncFactor();
+		m_SyncDuneon = GS()->Mmo()->Dungeon()->SyncFactor();
 	}
 	SetLanguage(Server()->GetClientLanguage(ClientID));
 }
@@ -406,7 +406,7 @@ bool CPlayer::CheckFailMoney(int Price, int ItemID, bool CheckOnly)
 	if (Price < 0)
 		return false;
 
-	ItemSql::ItemPlayer &CoinItem = GetItem(ItemID);
+	ItemJob::ItemPlayer &CoinItem = GetItem(ItemID);
 	if(CoinItem.Count < Price)
 	{
 		GS()->Chat(m_ClientID,"Sorry, need {INT} but you have only {INT} {STR}!", &Price, &CoinItem.Count, CoinItem.Info().GetName(this), NULL);
@@ -457,17 +457,17 @@ void CPlayer::AddExp(int Exp)
 		GS()->ChatFollow(m_ClientID, "Level UP. Now Level {INT}!", &Acc().Level);
 		if(Acc().Exp < ExpNeed(Acc().Level))
 		{
-			GS()->VResetVotes(m_ClientID, MAINMENU);
-			GS()->Mmo()->SaveAccount(this, SAVESTATS);
-			GS()->Mmo()->SaveAccount(this, SAVEUPGRADES);
+			GS()->VResetVotes(m_ClientID, MenuList::MAIN_MENU);
+			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_STATS);
+			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_UPGRADES);
 		}
 	}
 	ProgressBar("Account", Acc().Level, Acc().Exp, ExpNeed(Acc().Level), Exp);
 
 	if (rand() % 5 == 0)
 	{
-		GS()->Mmo()->SaveAccount(this, SAVESTATS);
-		GS()->VResetVotes(m_ClientID, MAINMENU);
+		GS()->Mmo()->SaveAccount(this, SaveType::SAVE_STATS);
+		GS()->VResetVotes(m_ClientID, MenuList::MAIN_MENU);
 	}
 
 	if (Acc().IsGuild())
@@ -503,7 +503,7 @@ bool CPlayer::IsAuthed()
 int CPlayer::EnchantAttributes(int BonusID) const
 {
 	int BonusAttributes = 0;
-	for (const auto& it : ItemSql::Items[m_ClientID])
+	for (const auto& it : ItemJob::Items[m_ClientID])
 	{
 		if(it.second.Info().BonusID != BonusID || it.second.Count <= 0 || it.second.Settings <= 0) continue;
 		
@@ -676,20 +676,20 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 	{
 		if(Upgrade(Get, &Acc().Stats[VoteID], &Acc().Upgrade, VoteID2, 1000, AtributeName(VoteID))) 
 		{
-			GS()->Mmo()->SaveAccount(this, SAVEUPGRADES);
-			GS()->ResetVotes(m_ClientID, UPGRADES);
+			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_UPGRADES);
+			GS()->ResetVotes(m_ClientID, MenuList::MENU_UPGRADE);
 		}
 		return true;
 	}
 
 	if(PPSTR(CMD, "HIDEN") == 0)
 	{
-		if(VoteID < HSTAT)
+		if(VoteID < TAB_STAT)
 			return true;
 
 		for(auto& x : m_HidenMenu) 
 		{
-			if((x.first > NUMHIDEMENU && x.first != VoteID))
+			if((x.first > NUM_TAB_MENU && x.first != VoteID))
 				x.second = false; 
 		}
 
@@ -703,16 +703,16 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 	return false;
 }
 
-ItemSql::ItemPlayer &CPlayer::GetItem(int ItemID) 
+ItemJob::ItemPlayer &CPlayer::GetItem(int ItemID) 
 {
-	ItemSql::Items[m_ClientID][ItemID].SetBasic(this, ItemID);
-	return ItemSql::Items[m_ClientID][ItemID]; 
+	ItemJob::Items[m_ClientID][ItemID].SetBasic(this, ItemID);
+	return ItemJob::Items[m_ClientID][ItemID]; 
 }
 
 // Получить одетый предмет
 int CPlayer::GetItemEquip(int EquipID, int SkipItemID) const
 {
-	for(const auto& it : ItemSql::Items[m_ClientID])
+	for(const auto& it : ItemJob::Items[m_ClientID])
 	{
 		if(!it.second.Count || !it.second.Settings || it.second.Info().Function != EquipID || it.first == SkipItemID) 
 			continue;
@@ -758,7 +758,7 @@ int CPlayer::GetAttributeCount(int BonusID, bool Really)
 		int NewStat = 0;
 		if (AttributEx > 0)
 		{
-			NewStat = (int)((float)m_SyncFactor / 25.0f) + ((float)AttributEx / 25.0f);
+			NewStat = (int)((float)m_SyncDuneon / 25.0f) + ((float)AttributEx / 25.0f);
 			if (m_MoodState == MOOD_PLAYER_TANK && BonusID == Stats::StHardness)
 				NewStat *= 2;
 		}
@@ -796,16 +796,16 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 	GS()->Mmo()->Quest()->QuestTableClear(m_ClientID);
 	CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[TalkedID]);
 	int MobID = BotPlayer->GetBotSub();
-	if (BotPlayer->GetSpawnBot() == SPAWNNPC)
+	if (BotPlayer->GetSpawnBot() == SpawnBot::SPAWN_NPC)
 	{
-		int sizeTalking = ContextBots::NpcBot[MobID].m_Talk.size();
+		int sizeTalking = BotJob::NpcBot[MobID].m_Talk.size();
 		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
 		{
 			GS()->ClearTalkText(m_ClientID);
 			return;
 		}
 
-		int GivingQuestID = ContextBots::NpcBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
+		int GivingQuestID = BotJob::NpcBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
 		if (GivingQuestID >= 1)
 		{
 			if (!m_TalkingNPC.m_FreezedProgress)
@@ -827,22 +827,22 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
 	}
 
-	else if (BotPlayer->GetSpawnBot() == SPAWNQUESTNPC)
+	else if (BotPlayer->GetSpawnBot() == SpawnBot::SPAWN_QUEST_NPC)
 	{
-		int sizeTalking = ContextBots::QuestBot[MobID].m_Talk.size();
+		int sizeTalking = BotJob::QuestBot[MobID].m_Talk.size();
 		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
 		{
-			GS()->Mmo()->Quest()->InteractiveQuestNPC(this, ContextBots::QuestBot[MobID], true);
+			GS()->Mmo()->Quest()->InteractiveQuestNPC(this, BotJob::QuestBot[MobID], true);
 			GS()->ClearTalkText(m_ClientID);
 			return;
 		}
 
-		bool RequiestQuestTask = ContextBots::QuestBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_RequestComplete;
+		bool RequiestQuestTask = BotJob::QuestBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_RequestComplete;
 		if (RequiestQuestTask)
 		{
 			if (!m_TalkingNPC.m_FreezedProgress)
 			{
-				GS()->Mmo()->Quest()->CreateQuestingItems(this, ContextBots::QuestBot[MobID]);
+				GS()->Mmo()->Quest()->CreateQuestingItems(this, BotJob::QuestBot[MobID]);
 				GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
 				GS()->Mmo()->BotsData()->ShowBotQuestTaskInfo(this, MobID, m_TalkingNPC.m_TalkedProgress);
 				m_TalkingNPC.m_FreezedProgress = true;
@@ -850,7 +850,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			}
 
 			// skip non complete dialog quest
-			if (!GS()->Mmo()->Quest()->InteractiveQuestNPC(this, ContextBots::QuestBot[MobID], false))
+			if (!GS()->Mmo()->Quest()->InteractiveQuestNPC(this, BotJob::QuestBot[MobID], false))
 			{
 				GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
 				GS()->Mmo()->BotsData()->ShowBotQuestTaskInfo(this, MobID, m_TalkingNPC.m_TalkedProgress);
@@ -886,7 +886,7 @@ void CPlayer::FormatTextQuest(int DataBotID, const char *pText)
 	// формат текста под вид квестов
 	str_copy(m_FormatTalkQuest, pText, sizeof(m_FormatTalkQuest));
 	str_replace(m_FormatTalkQuest, "[Player]", GS()->Server()->ClientName(m_ClientID));
-	str_replace(m_FormatTalkQuest, "[Talked]", ContextBots::DataBot[DataBotID].NameBot);
+	str_replace(m_FormatTalkQuest, "[Talked]", BotJob::DataBot[DataBotID].NameBot);
 	str_replace(m_FormatTalkQuest, "[Time]", GS()->Server()->GetStringTypeDay());
 }
 void CPlayer::ClearFormatQuestText()

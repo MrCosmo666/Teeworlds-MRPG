@@ -28,7 +28,7 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 		return false;
 	
 	// Запрещаем дамаг и хоок для человека
-	if(GetPlayer()->GetSpawnBot() == SPAWNNPC)
+	if(GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_NPC)
 	{
 		m_NoAllowDamage = true;
 		m_Core.m_ProtectHooked = true;
@@ -40,16 +40,16 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 
 	// информация о зарождении жирного моба
 	int SubBotID = GetPlayer()->GetBotSub();
-	if(GetPlayer()->GetSpawnBot() == SPAWNMOBS && ContextBots::MobBot[SubBotID].Boss)
+	if(GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_MOBS && BotJob::MobBot[SubBotID].Boss)
 	{
 		for(int i = 0; i < 3; i++)
 		{
 			CreateSnapProj(GetSnapFullID(), 1, PICKUP_HEALTH, true, false);
 			CreateSnapProj(GetSnapFullID(), 1, WEAPON_HAMMER, false, true);
 		}
-		GS()->ChatWorldID(ContextBots::MobBot[SubBotID].WorldID, "[Raid]", "In your area, spawned, {STR}, HP {INT}", ContextBots::MobBot[SubBotID].Name, &m_StartHealth);
+		GS()->ChatWorldID(BotJob::MobBot[SubBotID].WorldID, "[Raid]", "In your area, spawned, {STR}, HP {INT}", BotJob::MobBot[SubBotID].Name, &m_StartHealth);
 	}
-	else if(GetPlayer()->GetSpawnBot() == SPAWNQUESTNPC)
+	else if(GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_QUEST_NPC)
 	{
 		m_Core.m_LostData = true;
 
@@ -98,7 +98,7 @@ bool BotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 	if (From < 0 || From > MAX_CLIENTS || !GS()->m_apPlayers[From])
 		return false;
 
-	if(GetPlayer()->GetSpawnBot() != SPAWNMOBS || GS()->m_apPlayers[From]->IsBot())
+	if(GetPlayer()->GetSpawnBot() != SpawnBot::SPAWN_MOBS || GS()->m_apPlayers[From]->IsBot())
 		return false;
 
 	// до урона и после урона здоровье
@@ -137,7 +137,7 @@ bool BotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 void BotAI::Die(int Killer, int Weapon)
 {
 	// просто убить бота если он не моб
-	if(GetPlayer()->GetSpawnBot() != SPAWNMOBS)
+	if(GetPlayer()->GetSpawnBot() != SpawnBot::SPAWN_MOBS)
 		return;
 
 	// склад пополнение
@@ -168,18 +168,18 @@ void BotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 	int BotID = GetPlayer()->GetBotID();
 	int SubID = GetPlayer()->GetBotSub();
 
-	if (GetPlayer()->GetSpawnBot() == SPAWNMOBS)
+	if (GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_MOBS)
 		GS()->Mmo()->Quest()->AddMobProgress(pPlayer, BotID);
 
 	// создаем дроп
 	for (int i = 0; i < 6; i++)
 	{
-		int DropItem = ContextBots::MobBot[SubID].DropItem[i];
-		int CountItem = ContextBots::MobBot[SubID].CountItem[i];
+		int DropItem = BotJob::MobBot[SubID].DropItem[i];
+		int CountItem = BotJob::MobBot[SubID].CountItem[i];
 		if (DropItem <= 0 || CountItem <= 0)
 			continue;
 
-		int RandomDrop = ContextBots::MobBot[SubID].RandomItem[i];
+		int RandomDrop = BotJob::MobBot[SubID].RandomItem[i];
 		if (DropItem == itMoney)
 		{
 			if (RandomDrop <= 0 || random_int() % RandomDrop == 0)
@@ -190,7 +190,7 @@ void BotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 	}
 
 	// exp
-	int DamageExp = (ContextBots::MobBot[SubID].Level * g_Config.m_SvExperienceMob);
+	int DamageExp = (BotJob::MobBot[SubID].Level * g_Config.m_SvExperienceMob);
 	int PowerRaid = GS()->IncreaseCountRaid(DamageExp);
 	GS()->CreateDropBonuses(m_Core.m_Pos, 1, DamageExp / 2, (1+random_int() % 2), ForceDies);
 	pPlayer->AddExp(PowerRaid);
@@ -238,11 +238,11 @@ void BotAI::EngineBots()
 	m_Input.m_Jump = 0;
 
 	// рандом для дружественного моба
-	if(GetPlayer()->GetSpawnBot() == SPAWNNPC)
+	if(GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_NPC)
 		EngineNPC();
-	else if(GetPlayer()->GetSpawnBot() == SPAWNMOBS)
+	else if(GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_MOBS)
 		EngineMobs();
-	else if(GetPlayer()->GetSpawnBot() == SPAWNQUESTNPC)
+	else if(GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_QUEST_NPC)
 		EngineQuestMob();
 		
 	// избежать стены
@@ -265,13 +265,13 @@ void BotAI::EngineBots()
 void BotAI::EngineNPC()
 {
 	int SubBotID = GetPlayer()->GetBotSub();
-	bool StaticBot = ContextBots::NpcBot[SubBotID].Static;
+	bool StaticBot = BotJob::NpcBot[SubBotID].Static;
 
 	// ------------------------------------------------------------------------------
 	// интерактивы бота без найденого игрока
 	// ------------------------------------------------------------------------------
 	// эмоции ботов
-	int EmoteBot = ContextBots::NpcBot[SubBotID].Emote;
+	int EmoteBot = BotJob::NpcBot[SubBotID].Emote;
 	EmoteActions(EmoteBot);
 
 	// направление глаз
@@ -414,7 +414,7 @@ void BotAI::EngineMobs()
 	int Dist = distance(m_Pos, pPlayer->GetCharacter()->m_Core.m_Pos);
 	if (Dist < 600.0f)
 	{
-		bool StaticBot = (ContextBots::MobBot[SubBotID].Spread >= 1);
+		bool StaticBot = (BotJob::MobBot[SubBotID].Spread >= 1);
 		if(random_int() % 7 == 1)
 		{
 			m_Input.m_TargetX = static_cast<int>(pPlayer->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
@@ -434,7 +434,7 @@ void BotAI::EngineMobs()
 		// сменять оружие если статик
 		if(StaticBot)
 		{
-			if(ContextBots::MobBot[SubBotID].Boss)
+			if(BotJob::MobBot[SubBotID].Boss)
 				ShowProgress();
 		
 			ChangeWeapons();

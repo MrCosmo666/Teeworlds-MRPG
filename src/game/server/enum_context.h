@@ -75,7 +75,6 @@ enum AtributType
 	AtHardtype
 };
 
-// типы TOP LIST
 enum ToplistTypes
 {
 	GUILDS_LEVELING,
@@ -84,7 +83,6 @@ enum ToplistTypes
 };
 
 
-// типы предметов
 enum ItemType
 {
 	TYPE_USED = 1,
@@ -97,7 +95,6 @@ enum ItemType
 	TYPE_POTION,
 };
 
-// положение квеста
 enum QuestState
 {
 	QUEST_NO_ACCEPT = 0,
@@ -105,6 +102,67 @@ enum QuestState
 	QUEST_FINISHED,
 };
 
+enum MenuList
+{
+	MAIN_MENU = 1,
+	MENU_INVENTORY,
+	MENU_INBOX,
+	MENU_UPGRADE,
+	MENU_SETTINGS,
+	MENU_GUIDEDROP,
+	MENU_EQUIPMENT,
+	MENU_GUILD,
+	MENU_GUILD_RANK,
+	MENU_GUILD_INVITES,
+	MENU_GUILD_HISTORY,
+	MENU_HOUSE,
+	MENU_HOUSE_DECORATION,
+	MENU_GUILD_HOUSE_DECORATION,
+	MENU_HOUSE_PLANTS,
+	MENU_ADVENTURE_JOURNAL_MAIN,
+	MENU_ADVENTURE_JOURNAL_FINISHED,
+	MENU_TOP_LIST,
+	MENU_DUNGEONS,
+	MENU_AUCTION_CREATE_SLOT,
+};
+
+enum TabHideList
+{
+	TAB_STAT = 1,
+	TAB_PERSONAL,
+	TAB_INFORMATION,
+	TAB_HOUSE_COMMAND,
+	TAB_EQUIP_SELECT,
+	TAB_UPGR_DPS,
+	TAB_UPGR_TANK,
+	TAB_UPGR_HEALER,
+	TAB_UPGR_WEAPON,
+	TAB_INVENTORY_SELECT,
+	TAB_UPGR_JOB,
+	TAB_GUILD_STAT,
+	TAB_STORAGE,
+	TAB_HOUSE_STAT,
+	TAB_AETHER,
+	TAB_SETTINGS,
+	TAB_SETTINGS_MODULES, 
+	// start info
+	TAB_INFO_INVENTORY,
+	TAB_INFO_HOUSE,
+	TAB_INFO_STAT,
+	TAB_INFO_CRAFT,
+	TAB_INFO_TOP,
+	TAB_INFO_DUNGEON,
+	TAB_INFO_UPGR,
+	TAB_INFO_DECORATION,
+	TAB_INFO_HOUSE_PLANT,
+	TAB_INFO_GUILD_HOUSE,
+	TAB_INFO_LOOT,
+	TAB_INFO_SKILL,
+	TAB_INFO_AUCTION,
+	TAB_INFO_AUCTION_BIND,
+	TAB_EQUIP_INFO,
+	NUM_TAB_MENU,
+};
 
 // Основное
 enum
@@ -115,83 +173,14 @@ enum
 	*/
 	MIN_SKINCHANGE_CLIENTVERSION = 0x0703,	// минимальная версия клиента для смены скина
 	MIN_RACE_CLIENTVERSION = 0x0704,		// минимальная версия клиента для типа гонки
-	MAX_MAILLIST = 30,						// максимальное кол-во писем что выводится
+	MAX_INBOX_LIST = 30,						// максимальное кол-во писем что выводится
 
-	/*
-		Список листов меню используется:
-		в голосования по типу "MENU", передается в качестве ID
-	*/
-	MAINMENU = 1,							// основное меню
-	INVENTORY,								// инвентарь меню
-	INBOXLIST,								// письма меню
-	UPGRADES,								// апгрейды меню
-	SETTINGS,								// настройки меню
-	GUIDEDROP,								// гайды по дропам меню
-	EQUIPMENU,								// снаряжение меню
-	MEMBERMENU,								// гильдия меню
-	GUILDRANK,								// гильдия ранги меню
-	MEMBERINVITES,							// гильдия приглашения меню
-	MEMBERHISTORY,							// гильдия история действий
-	HOUSEMENU,								// дома меню
-	HOUSEDECORATION,						// дома декорации меню
-	HOUSEGUILDDECORATION,					// дома декорации гильдии меню
-	HOUSEPLANTS,							// дома огород меню
-	ADVENTUREJOURNAL,						// журнал квестов меню
-	FINISHQUESTMENU,						// журнал завершенные квесты меню
-	TOPLISTMENU,							// топ лист меню
-	DUNGEONSMENU,							// лист данжей
-	AUCTIONSETSLOT,							// создание слота аукцион меню
 
 	/*
 		Список вкладок что можно скрыть и раскрыть
 		Передается в качестве AVH как ID, а последющие в качестве HideID
 	*/
-	HSTAT = 1,
-	HPERSONAL,
-	HINFORMATION,
-	HHOMECOMMAND,
-	HCRAFTSELECT,
-	HEQUIPSELECT,
-	HUPGDPS,
-	HUPGTANK,
-	HUPGHEALER,
-	HUPGWEAPON,
-	HINVSELECT,
-	HDISCORDTHEME,
-	HJOBUPGRADE,
-	HMEMBERSTATS,
-	HSTORAGEUSE,
-	HCAFELIST,
-	HHOUSESTATS,
-	HHOUSEMOTEL,
-	HHOUSEDECO,
-	HHOUSEAVAILABLE,
-	HBUSINESSAVAILABLE,
-	HTELEPORTLIST,
-	HSETTINGSS,
-	HSETTINGSU,
-	HQUESTITEM, // start info
-	HINVINFO,
-	HHOMEINFO,
-	HUPGRADESTATS,
-	HCRAFTINFO,
-	HTOPMENUINFO,
-	HDUNGEONSINFO,
-	HUPGRINFO,
-	HQUESTSINFO,
-	HDECORATION,
-	HPLANTS,
-	HMEMHOMEINFO,
-	HCHANCELOOTINFO,
-	HSKILLLEARN,
-	HSPAINFO,
-	HSTORAGEINFO,
-	HDISCORDINFO,
-	HQUESTINFO,
-	HAUCTIONINFO,
-	HAUCTIONSLOTINFO,
-	HEQUIPINFO,
-	NUMHIDEMENU,
+
 
 	/*
 		Список вкладок в меню крафта: Некая сортировка по типу крафта
@@ -250,7 +239,6 @@ enum
 		Все листы сортировок что существуют на сервере
 	*/
 	SORTINVENTORY = 1,
-	SORTCRAFT,
 	SORTEQUIP,
 	NUMTABSORT,
 
@@ -279,33 +267,35 @@ enum BroadcastPriority
 	BROADCAST_MAIN_INFORMATION,
 };
 
+enum SpawnBot
+{
+	SPAWN_MOBS = 1,
+	SPAWN_QUEST_NPC = 2,
+	SPAWN_NPC = 3,
+};
+
+enum PlayerClasses
+{
+	CLASS_TANK,
+	CLASS_HEALER,
+	CLASS_DPS,
+};
+
 enum
 {
-	// Спавн точки и тип
-	SPAWNWORLD = 0,
-	SPAWNMOBS = 1,
-	SPAWNQUESTNPC = 2,
-	SPAWNNPC = 3,
-
-	// Классы
-	CLASSTANK,
-	CLASSHEALER,
-	CLASSDPS,
-
 	SNAPPLAYER = 1,
 	SNAPBOTS = 2,
 };
 
-// Сохранения лист
-enum
+enum SaveType
 {
-	SAVEACCOUNT,			// Save Login Password Data
-	SAVESTATS,				// Save Stats Level Exp and other this type
-	SAVEUPGRADES,			// Save Upgrades Damage and other this type
-	SAVEPLANTACCOUNT,		// Save Plant Account
-	SAVEMINERACCOUNT,
-	SAVEMEMBERDATA,			// Save Member Data
-	SAVEPOSITION,			// Save Position Player
+	SAVE_ACCOUNT,			// Save Login Password Data
+	SAVE_STATS,				// Save Stats Level Exp and other this type
+	SAVE_UPGRADES,			// Save Upgrades Damage and other this type
+	SAVE_PLANT_DATA,		// Save Plant Account
+	SAVE_MINER_DATA,		// Save Mining Account
+	SAVE_GUILD_DATA,		// Save Member Data
+	SAVE_POSITION,			// Save Position Player
 };
 
 #endif

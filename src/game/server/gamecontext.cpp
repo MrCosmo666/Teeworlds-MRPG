@@ -18,12 +18,12 @@
 #include "gamemodes/dungeon.h"
 
 // object entities
-#include "mmocore/items/dropingbonuses.h"
-#include "mmocore/items/dropingitem.h"
-#include "mmocore/mmocontroller/loltext.h"
+#include "mmocore/GameEntities/Items/dropingbonuses.h"
+#include "mmocore/GameEntities/Items/dropingitem.h"
+#include "mmocore/GameEntities/loltext.h"
 
 // информационные данные
-#include "mmocore/cmds.h"
+#include "mmocore/CommandProcessor.h"
 
 // Безопасные структуры хоть и прожорливо но работает (Прежде всего всегда их при выходе игрока Отрезаем)
 std::map < int , CGS::StructAttribut > CGS::AttributInfo;
@@ -148,7 +148,7 @@ char* CGS::LevelString(int MaxValue, int CurrentValue, int Step, char toValue, c
 	return Buf;
 }
 // получить объект предмета
-ItemSql::ItemInformation &CGS::GetItemInfo(int ItemID) const { return ItemSql::ItemsInfo[ItemID]; }
+ItemJob::ItemInformation &CGS::GetItemInfo(int ItemID) const { return ItemJob::ItemsInfo[ItemID]; }
 
 /* #########################################################################
 	EVENTS 
@@ -911,12 +911,12 @@ int CGS::CheckPlayerMessageWorldID(int ClientID)
 	{
 		CPlayerBot* pPlayer = static_cast<CPlayerBot *>(m_apPlayers[ClientID]);
 		int SubBotID = pPlayer->GetBotSub();
-		if(pPlayer->GetSpawnBot() == SPAWNMOBS) 
-			return ContextBots::MobBot[SubBotID].WorldID;
-		else if(pPlayer->GetSpawnBot() == SPAWNNPC) 
-			return ContextBots::NpcBot[SubBotID].WorldID;
+		if(pPlayer->GetSpawnBot() == SpawnBot::SPAWN_MOBS) 
+			return BotJob::MobBot[SubBotID].WorldID;
+		else if(pPlayer->GetSpawnBot() == SpawnBot::SPAWN_NPC) 
+			return BotJob::NpcBot[SubBotID].WorldID;
 		else 
-			return ContextBots::QuestBot[SubBotID].WorldID;
+			return BotJob::QuestBot[SubBotID].WorldID;
 	}
 	else 
 		return Server()->GetWorldID(ClientID);
@@ -978,7 +978,7 @@ void CGS::OnInit(int WorldID)
 	// создаем контроллер
 	m_Layers.Init(Kernel(), NULL, WorldID);
 	m_Collision.Init(&m_Layers);
-	pMmoController = new SqlController(this);
+	pMmoController = new MmoController(this);
 	pMmoController->LoadLogicWorld();
 
 	// инициализируем слои
@@ -1159,7 +1159,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				// команды сервера
 				if(pMsg->m_pMessage[0]=='/')
 				{
-					CCmd pChat;
+					CommandProcessor pChat;
 					pChat.ChatCmd(pMsg, this, pPlayer);
 					return;
 				}
@@ -1397,15 +1397,15 @@ void CGS::OnClientEnter(int ClientID)
 		// имя
 		bool Bot = m_apPlayers[i]->IsBot();
 		int BotID = m_apPlayers[i]->GetBotID();
-		ClientInfoMsg.m_pName = ContextBots::DataBot[BotID].Name(m_apPlayers[i]);
+		ClientInfoMsg.m_pName = BotJob::DataBot[BotID].Name(m_apPlayers[i]);
 		ClientInfoMsg.m_pClan = Server()->ClientClan(i);
 		ClientInfoMsg.m_Country = Server()->ClientCountry(i);
 		ClientInfoMsg.m_Silent = false;
 		for(int p = 0; p < 6; p++)
 		{
-			ClientInfoMsg.m_apSkinPartNames[p] = Bot ? ContextBots::DataBot[BotID].SkinNameBot[p] : m_apPlayers[i]->Acc().m_aaSkinPartNames[p];
-			ClientInfoMsg.m_aUseCustomColors[p] = Bot ? ContextBots::DataBot[BotID].UseCustomBot[p] : m_apPlayers[i]->Acc().m_aUseCustomColors[p];
-			ClientInfoMsg.m_aSkinPartColors[p] = Bot ? ContextBots::DataBot[BotID].SkinColorBot[p] : m_apPlayers[i]->Acc().m_aSkinPartColors[p];
+			ClientInfoMsg.m_apSkinPartNames[p] = Bot ? BotJob::DataBot[BotID].SkinNameBot[p] : m_apPlayers[i]->Acc().m_aaSkinPartNames[p];
+			ClientInfoMsg.m_aUseCustomColors[p] = Bot ? BotJob::DataBot[BotID].UseCustomBot[p] : m_apPlayers[i]->Acc().m_aUseCustomColors[p];
+			ClientInfoMsg.m_aSkinPartColors[p] = Bot ? BotJob::DataBot[BotID].SkinColorBot[p] : m_apPlayers[i]->Acc().m_aSkinPartColors[p];
 		}
 		Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
 	}
@@ -1414,7 +1414,7 @@ void CGS::OnClientEnter(int ClientID)
 	Server()->SendPackMsg(&NewClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
 
 	// another
-	ResetVotes(ClientID, MAINMENU);
+	ResetVotes(ClientID, MenuList::MAIN_MENU);
 	if(!pPlayer->IsAuthed())
 	{
 		// информируем о смене команды
@@ -1775,12 +1775,12 @@ void CGS::AVH(int To, const int ID, vec3 Color, const char* pText, ...)
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		bool HidenTabs = (ID >= HSTAT) ? m_apPlayers[To]->GetHidenMenu(ID) : false;
-		if(HidenTabs) {	Buffer.append(ID >= NUMHIDEMENU ? ("◈ ") : (ID < HQUESTITEM ? ("△ ") : ("▽ ")));	}
-		else {	Buffer.append(ID >= NUMHIDEMENU ? ("◇ ") : (ID < HQUESTITEM ? ("▽ ") : ("△ ")));	}
+		bool HidenTabs = (ID >= TAB_STAT) ? m_apPlayers[To]->GetHidenMenu(ID) : false;
+		if(HidenTabs) {	Buffer.append(ID >= NUM_TAB_MENU ? ("◈ ") : (ID < TAB_SETTINGS_MODULES ? ("△ ") : ("▽ ")));	}
+		else {	Buffer.append(ID >= NUM_TAB_MENU ? ("◇ ") : (ID < TAB_SETTINGS_MODULES ? ("▽ ") : ("△ ")));	}
 
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
-		if(ID > HQUESTITEM && ID < NUMHIDEMENU) { Buffer.append(" (Press me for help)"); }
+		if(ID > TAB_SETTINGS_MODULES && ID < NUM_TAB_MENU) { Buffer.append(" (Press me for help)"); }
 
 		m_apPlayers[To]->m_Colored = { Color.r, Color.g, Color.b };
 		AV(To, "HIDEN", Buffer.buffer(), ID);
@@ -1799,12 +1799,12 @@ void CGS::AVHI(int To, const char *Icon, const int ID, vec3 Color, const char* p
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		bool HidenTabs = (ID >= HSTAT) ? m_apPlayers[To]->GetHidenMenu(ID) : false;
-		if(HidenTabs) {	Buffer.append(ID >= NUMHIDEMENU ? ("◈ ") : (ID < HQUESTITEM ? ("△ ") : ("▽ ")));	}
-		else {	Buffer.append(ID >= NUMHIDEMENU ? ("◇ ") : (ID < HQUESTITEM ? ("▽ ") : ("△ ")));	}
+		bool HidenTabs = (ID >= TAB_STAT) ? m_apPlayers[To]->GetHidenMenu(ID) : false;
+		if(HidenTabs) {	Buffer.append(ID >= NUM_TAB_MENU ? ("◈ ") : (ID < TAB_SETTINGS_MODULES ? ("△ ") : ("▽ ")));	}
+		else {	Buffer.append(ID >= NUM_TAB_MENU ? ("◇ ") : (ID < TAB_SETTINGS_MODULES ? ("▽ ") : ("△ ")));	}
 
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
-		if(ID > HQUESTITEM && ID < NUMHIDEMENU) { Buffer.append(" (Press me for help)"); }
+		if(ID > TAB_SETTINGS_MODULES && ID < NUM_TAB_MENU) { Buffer.append(" (Press me for help)"); }
 
 		m_apPlayers[To]->m_Colored = { Color.r, Color.g, Color.b };
 		AV(To, "HIDEN", Buffer.buffer(), ID, -1, Icon);
@@ -1819,8 +1819,8 @@ void CGS::AVM(int To, const char* Type, const int ID, const int HideID, const ch
 {
 	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
 	{
-		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID >= HQUESTITEM) || 
-			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID < HQUESTITEM))
+		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID >= TAB_SETTINGS_MODULES) || 
+			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID < TAB_SETTINGS_MODULES))
 			return;
 
 		va_list VarArgs;
@@ -1841,8 +1841,8 @@ void CGS::AVMI(int To, const char *Icon, const char* Type, const int ID, const i
 {
 	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
 	{
-		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID >= HQUESTITEM) || 
-			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID < HQUESTITEM))
+		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID >= TAB_SETTINGS_MODULES) || 
+			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID < TAB_SETTINGS_MODULES))
 			return;
 
 		va_list VarArgs;
@@ -1863,8 +1863,8 @@ void CGS::AVD(int To, const char* Type, const int ID, const int ID2, const int H
 {
 	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
 	{
-		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID >= HQUESTITEM) || 
-			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID < HQUESTITEM))
+		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID >= TAB_SETTINGS_MODULES) || 
+			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID < TAB_SETTINGS_MODULES))
 			return;
 			
 		va_list VarArgs;
@@ -1900,36 +1900,36 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		return;
 	}
 
-	if(MenuList == MAINMENU)
+	if(MenuList == MenuList::MAIN_MENU)
 	{
-		pPlayer->m_LastVoteMenu = MAINMENU;
+		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
 		// меню статистики
 		int NeedExp = pPlayer->ExpNeed(pPlayer->Acc().Level);
-		AVH(ClientID, HSTAT, PURPLE_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().LastLogin);
-		AVM(ClientID, "null", NOPE, HSTAT, "Discord: \"{STR}\". Ideas, bugs, rewards", g_Config.m_SvDiscordInviteGroup);
-		AVM(ClientID, "null", NOPE, HSTAT, "Level {INT} : Exp {INT}/{INT}", &pPlayer->Acc().Level, &pPlayer->Acc().Exp, &NeedExp);
-		AVM(ClientID, "null", NOPE, HSTAT, "Money {INT} gold", &pPlayer->GetItem(itMoney).Count);
-		AVM(ClientID, "null", NOPE, HSTAT, "Skill Point {INT}SP", &pPlayer->GetItem(itSkillPoint).Count);
+		AVH(ClientID, TAB_STAT, PURPLE_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().LastLogin);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Discord: \"{STR}\". Ideas, bugs, rewards", g_Config.m_SvDiscordInviteGroup);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Level {INT} : Exp {INT}/{INT}", &pPlayer->Acc().Level, &pPlayer->Acc().Exp, &NeedExp);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Money {INT} gold", &pPlayer->GetItem(itMoney).Count);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Skill Point {INT}SP", &pPlayer->GetItem(itSkillPoint).Count);
 		AV(ClientID, "null", "");
 
 		// меню персонал
-		AVH(ClientID, HPERSONAL, GRAY_COLOR, "☪ SUB MENU PERSONAL");
-		AVM(ClientID, "MENU", INVENTORY, HPERSONAL, "⁂ Inventory"); 
-		AVM(ClientID, "MENU", EQUIPMENU, HPERSONAL, "★ Equipment");
-		AVM(ClientID, "MENU", INBOXLIST, HPERSONAL, "✉ Mailbox");
-		AVM(ClientID, "MENU", UPGRADES, HPERSONAL, "◒ Upgrades");
-		AVM(ClientID, "MENU", SETTINGS, HPERSONAL, "☑ Settings");
-		AVM(ClientID, "MENU", ADVENTUREJOURNAL, HPERSONAL, "ღ Adventure journal");
-		AVM(ClientID, "MENU", DUNGEONSMENU, HPERSONAL, "◎ Dungeons");
-		AVM(ClientID, "MENU", MEMBERMENU, HPERSONAL, "☃ Your Guild");
-		AVM(ClientID, "MENU", HOUSEMENU, HPERSONAL, "❖ Your House");
+		AVH(ClientID, TAB_PERSONAL, GRAY_COLOR, "☪ SUB MENU PERSONAL");
+		AVM(ClientID, "MENU", MenuList::MENU_INVENTORY, TAB_PERSONAL, "⁂ Inventory"); 
+		AVM(ClientID, "MENU", MenuList::MENU_EQUIPMENT, TAB_PERSONAL, "★ Equipment");
+		AVM(ClientID, "MENU", MenuList::MENU_INBOX, TAB_PERSONAL, "✉ Mailbox");
+		AVM(ClientID, "MENU", MenuList::MENU_UPGRADE, TAB_PERSONAL, "◒ Upgrades");
+		AVM(ClientID, "MENU", MenuList::MENU_SETTINGS, TAB_PERSONAL, "☑ Settings");
+		AVM(ClientID, "MENU", MenuList::MENU_ADVENTURE_JOURNAL_MAIN, TAB_PERSONAL, "ღ Adventure journal");
+		AVM(ClientID, "MENU", MenuList::MENU_DUNGEONS, TAB_PERSONAL, "◎ Dungeons");
+		AVM(ClientID, "MENU", MenuList::MENU_GUILD, TAB_PERSONAL, "☃ Your Guild");
+		AVM(ClientID, "MENU", MenuList::MENU_HOUSE, TAB_PERSONAL, "❖ Your House");
 		AV(ClientID, "null", "");
 
 		// меню информации
-		AVH(ClientID, HINFORMATION, BLUE_COLOR, "# SUB MENU INFORMATION");
-		AVM(ClientID, "MENU", TOPLISTMENU, HINFORMATION, "♛ Top list");
-		AVM(ClientID, "MENU", GUIDEDROP, HINFORMATION, "♣ Loot mobs");
+		AVH(ClientID, TAB_INFORMATION, BLUE_COLOR, "# SUB MENU INFORMATION");
+		AVM(ClientID, "MENU", MenuList::MENU_TOP_LIST, TAB_INFORMATION, "♛ Top list");
+		AVM(ClientID, "MENU", MenuList::MENU_GUIDEDROP, TAB_INFORMATION, "♣ Loot mobs");
 		AV(ClientID, "null", "");
 
 		// чекаем местонахождение
@@ -1948,39 +1948,39 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			Mmo()->Member()->ShowBuyHouse(pPlayer, HouseID);
 		}
 	}
-	else if(MenuList == ADVENTUREJOURNAL) 
+	else if(MenuList == MenuList::MENU_ADVENTURE_JOURNAL_MAIN)
 	{
-		pPlayer->m_LastVoteMenu = MAINMENU;
+		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
 		// чекаем местонахождение
 		Mmo()->Quest()->ShowFullQuestLift(pPlayer);
 
 		AddBack(ClientID);
 	}
-	else if(MenuList == INBOXLIST) 
+	else if(MenuList == MenuList::MENU_INBOX) 
 	{
-		pPlayer->m_LastVoteMenu = MAINMENU;
+		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
 		AddBack(ClientID);
 		AV(ClientID, "null", "");
 		Mmo()->Inbox()->GetInformationInbox(pPlayer);
 	}
 
-	else if(MenuList == HOUSEMENU) 
+	else if(MenuList == MenuList::MENU_HOUSE) 
 	{
-		pPlayer->m_LastVoteMenu = MAINMENU;
+		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 		
 		Mmo()->House()->ShowPersonalHouse(pPlayer);
 		AddBack(ClientID);
 	}
-	else if(MenuList == HOUSEPLANTS) 
+	else if(MenuList == MenuList::MENU_HOUSE_PLANTS) 
 	{
 		const int HouseID = Mmo()->House()->OwnerHouseID(pPlayer->Acc().AuthID);
 		const int PlantItemID = Mmo()->House()->GetPlantsID(HouseID);
-		pPlayer->m_LastVoteMenu = HOUSEMENU;
+		pPlayer->m_LastVoteMenu = MenuList::MENU_HOUSE;
 
-		AVH(ClientID, HPLANTS, GREEN_COLOR, "Plants Information");
-		AVM(ClientID, "null", NOPE, HPLANTS, "Select item and in tab select 'Change Plants'");
+		AVH(ClientID, TAB_INFO_HOUSE_PLANT, GREEN_COLOR, "Plants Information");
+		AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE_PLANT, "Select item and in tab select 'Change Plants'");
 		AV(ClientID, "null", "");
 
 		AVM(ClientID, "null", NOPE, NOPE, "Housing Active Plants: {STR}", GetItemInfo(PlantItemID).GetName(pPlayer));
@@ -1988,74 +1988,74 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		Mmo()->Item()->ListInventory(pPlayer, FUNCTION_PLANTS, true);
 		AddBack(ClientID);	
 	}
-	else if(MenuList == UPGRADES) 
+	else if(MenuList == MenuList::MENU_UPGRADE) 
 	{
-		pPlayer->m_LastVoteMenu = MAINMENU;
+		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
-		AVH(ClientID, HUPGRINFO, GREEN_COLOR, "Upgrades Information");
-		AVM(ClientID, "null", NOPE, HUPGRINFO, "Select upgrades type in Reason, write count.");
+		AVH(ClientID, TAB_INFO_UPGR, GREEN_COLOR, "Upgrades Information");
+		AVM(ClientID, "null", NOPE, TAB_INFO_UPGR, "Select upgrades type in Reason, write count.");
 		AV(ClientID, "null", "");
 
 		ShowPlayerStats(pPlayer);
 
 		// Улучшения класса DPS дамаг
 		int Range = pPlayer->GetLevelDisciple(AtributType::AtDps);
-		AVH(ClientID, HUPGDPS, RED_COLOR, "Disciple of War. Level Power {INT}", &Range);
+		AVH(ClientID, TAB_UPGR_DPS, RED_COLOR, "Disciple of War. Level Power {INT}", &Range);
 		for(const auto& at : AttributInfo)
 		{
 			if(at.second.AtType != AtributType::AtDps || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGDPS, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_DPS, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
 		}
 		AV(ClientID, "null", "");
 
 		// Улучшения класса TANK танк
 		Range = pPlayer->GetLevelDisciple(AtributType::AtTank);
-		AVH(ClientID, HUPGTANK, BLUE_COLOR, "Disciple of Tank. Level Power {INT}", &Range);
+		AVH(ClientID, TAB_UPGR_TANK, BLUE_COLOR, "Disciple of Tank. Level Power {INT}", &Range);
 		for(const auto& at : AttributInfo)
 		{
 			if(at.second.AtType != AtributType::AtTank || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGTANK, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_TANK, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
 		}
 		AV(ClientID, "null", "");
 
 		// Улучшения класса HEALER хил
 		Range = pPlayer->GetLevelDisciple(AtributType::AtHealer);
-		AVH(ClientID, HUPGHEALER, GREEN_COLOR, "Disciple of Healer. Level Power {INT}", &Range);
+		AVH(ClientID, TAB_UPGR_HEALER, GREEN_COLOR, "Disciple of Healer. Level Power {INT}", &Range);
 		for(const auto& at : AttributInfo)
 		{
 			if(at.second.AtType != AtributType::AtHealer || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGHEALER, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_HEALER, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
 		}
 		AV(ClientID, "null", "");
 
 		// Улучшения WEAPONS оружия
-		AVH(ClientID, HUPGWEAPON, GRAY_COLOR, "Upgrades Weapons / Ammo");
+		AVH(ClientID, TAB_UPGR_WEAPON, GRAY_COLOR, "Upgrades Weapons / Ammo");
 		for(const auto& at : AttributInfo)
 		{
 			if(at.second.AtType != AtributType::AtWeapon || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, HUPGWEAPON, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_WEAPON, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
 		}
 
 		AV(ClientID, "null", ""), 
-		AVH(ClientID, HJOBUPGRADE, GOLDEN_COLOR, "Disciple of Jobs");
+		AVH(ClientID, TAB_UPGR_JOB, GOLDEN_COLOR, "Disciple of Jobs");
 		Mmo()->PlantsAcc()->ShowMenu(ClientID);
 		Mmo()->MinerAcc()->ShowMenu(pPlayer);
 		AddBack(ClientID);
 	}
-	else if (MenuList == TOPLISTMENU)
+	else if (MenuList == MenuList::MENU_TOP_LIST)
 	{
-		pPlayer->m_LastVoteMenu = MAINMENU;
+		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
-		AVH(ClientID, HTOPMENUINFO, GREEN_COLOR, "Top list Information");
-		AVM(ClientID, "null", NOPE, HTOPMENUINFO, "Here you can see top server Guilds, Players.");
+		AVH(ClientID, TAB_INFO_TOP, GREEN_COLOR, "Top list Information");
+		AVM(ClientID, "null", NOPE, TAB_INFO_TOP, "Here you can see top server Guilds, Players.");
 		AV(ClientID, "null", "");
 
 		m_apPlayers[ClientID]->m_Colored = { 20,7,15 };
@@ -2064,20 +2064,20 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVM(ClientID, "SELECTEDTOP", ToplistTypes::PLAYERS_LEVELING, NOPE, "Top 10 players leveling");
 		AddBack(ClientID);
 	}
-	else if(MenuList == GUIDEDROP) 
+	else if(MenuList == MenuList::MENU_GUIDEDROP) 
 	{
-		pPlayer->m_LastVoteMenu = MAINMENU;
+		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
 		// информация
-		AVH(ClientID, HCHANCELOOTINFO, GREEN_COLOR, "Chance & Loot Information");
-		AVM(ClientID, "null", NOPE, HCHANCELOOTINFO, "Here you can see chance loot, mobs, positions, world.");
+		AVH(ClientID, TAB_INFO_LOOT, GREEN_COLOR, "Chance & Loot Information");
+		AVM(ClientID, "null", NOPE, TAB_INFO_LOOT, "Here you can see chance loot, mobs, positions, world.");
 		AV(ClientID, "null", "");
 
 		// сортируем всех ботов и получаем их данные по дропу
 		char aBuf[128];
-		for(const auto& mobs : ContextBots::MobBot)
+		for(const auto& mobs : BotJob::MobBot)
 		{
-			const int HideID = (NUMHIDEMENU+12500+mobs.first);
+			const int HideID = (NUM_TAB_MENU+12500+mobs.first);
 			int PosX = mobs.second.PositionX/32, PosY = mobs.second.PositionY/32;
 
 			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} {STR}(x: {INT} y: {INT})", mobs.second.Name, Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY);
@@ -2088,7 +2088,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 					continue;
 			
 				double Chance = mobs.second.RandomItem[i] <= 0 ? 100.0f : (1.0f / (double)mobs.second.RandomItem[i]) * 100;
-				ItemSql::ItemInformation &InfoDropItem = GetItemInfo(mobs.second.DropItem[i]);
+				ItemJob::ItemInformation &InfoDropItem = GetItemInfo(mobs.second.DropItem[i]);
 	
 				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%", InfoDropItem.GetName(pPlayer), mobs.second.CountItem[i], Chance);
 				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, "{STR}", aBuf);		
@@ -2096,28 +2096,28 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		}
 		AddBack(ClientID);
 	}
-	else if(MenuList == EQUIPMENU) 
+	else if(MenuList == MenuList::MENU_EQUIPMENT) 
 	{
-		pPlayer->m_LastVoteMenu = MAINMENU;
-		AVH(ClientID, HEQUIPINFO, GREEN_COLOR, "Equip / Armor Information");
-		AVM(ClientID, "null", NOPE, HEQUIPINFO, "Select tab and select armor.");
+		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
+		AVH(ClientID, TAB_EQUIP_INFO, GREEN_COLOR, "Equip / Armor Information");
+		AVM(ClientID, "null", NOPE, TAB_EQUIP_INFO, "Select tab and select armor.");
 		AV(ClientID, "null", "");
 		ShowPlayerStats(pPlayer);
 
-		AVH(ClientID, HEQUIPSELECT, RED_COLOR, "Equip Select List");
+		AVH(ClientID, TAB_EQUIP_SELECT, RED_COLOR, "Equip Select List");
 		const char* pType[NUM_EQUIPS] = { "Wings", "Hammer", "Gun", "Shotgun", "Grenade", "Rifle", "Discord", "Pickaxe" };
 		for(int i = EQUIP_WINGS; i < NUM_EQUIPS; i++) 
 		{
 			const int ItemID = pPlayer->GetItemEquip(i);
 			if(ItemID <= 0 || !pPlayer->GetItem(ItemID).Settings) 
 			{
-				AVM(ClientID, "SORTEDEQUIP", i, HEQUIPSELECT, "{STR} Not equipped", pType[i]);
+				AVM(ClientID, "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} Not equipped", pType[i]);
 				continue;
 			}
 
 			const int BonusItem = GetItemInfo(ItemID).BonusID;
 			int BonusCount = GetItemInfo(ItemID).BonusCount*(pPlayer->GetItem(ItemID).Enchant+1);
-			AVM(ClientID, "SORTEDEQUIP", i, HEQUIPSELECT, "{STR} {STR} | {STR} +{INT}", pType[i], GetItemInfo(ItemID).GetName(pPlayer), pPlayer->AtributeName(BonusItem), &BonusCount);
+			AVM(ClientID, "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR} +{INT}", pType[i], GetItemInfo(ItemID).GetName(pPlayer), pPlayer->AtributeName(BonusItem), &BonusCount);
 		}
 
 		// все Equip слоты предемтов
@@ -2128,7 +2128,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 			bool FindItem = false;
 			AV(ClientID, "null", "");
-			for(const auto& it : ItemSql::Items[ClientID]) 
+			for(const auto& it : ItemJob::Items[ClientID]) 
 			{
 				if(!it.second.Count || it.second.Info().Function != i) 
 					continue;
@@ -2142,9 +2142,9 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		}
 		AddBack(ClientID);
 	}
-	else if(MenuList == FINISHQUESTMENU) 
+	else if(MenuList == MenuList::MENU_ADVENTURE_JOURNAL_FINISHED) 
 	{
-		pPlayer->m_LastVoteMenu = ADVENTUREJOURNAL;
+		pPlayer->m_LastVoteMenu = MenuList::MENU_ADVENTURE_JOURNAL_MAIN;
 		Mmo()->Quest()->ShowQuestList(pPlayer, QuestState::QUEST_FINISHED);
 		AddBack(ClientID);
 	}
@@ -2175,7 +2175,7 @@ void CGS::AddBack(int ClientID)
 void CGS::ShowPlayerStats(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	AVH(ClientID, HUPGRADESTATS, BLUE_COLOR, "Player Stats");
+	AVH(ClientID, TAB_INFO_STAT, BLUE_COLOR, "Player Stats");
 	for(const auto& at : AttributInfo)
 	{
 		if(str_comp_nocase(at.second.FieldName, "unfield") == 0) 
@@ -2185,13 +2185,13 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 		if(at.second.UpgradePrice < 10)
 		{
 			int SumingAt = pPlayer->GetAttributeCount(at.first), RealSum = pPlayer->GetAttributeCount(at.first, true);
-			AVM(ClientID, "null", NOPE, HUPGRADESTATS, "{INT} [+{INT}] - {STR}", &SumingAt, &RealSum, pPlayer->AtributeName(at.first));
+			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} [+{INT}] - {STR}", &SumingAt, &RealSum, pPlayer->AtributeName(at.first));
 			continue;
 		}
 
 		// если апгрейды дорогие они имеют 1 статистики
 		int RealSum = pPlayer->GetAttributeCount(at.first);
-		AVM(ClientID, "null", NOPE, HUPGRADESTATS, "[+{INT}] - {STR}", &RealSum, pPlayer->AtributeName(at.first));
+		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "[+{INT}] - {STR}", &RealSum, pPlayer->AtributeName(at.first));
 	}
 
 	AVM(ClientID, "null", NOPE, NOPE, "!!! Player Upgrade Point: [{INT}P] !!!", &pPlayer->Acc().Upgrade);
@@ -2223,7 +2223,7 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 	}
 	if (PPSTR(CMD, "SELECTEDTOP") == 0)
 	{
-		ResetVotes(ClientID, TOPLISTMENU);
+		ResetVotes(ClientID, MenuList::MENU_TOP_LIST);
 		AV(ClientID, "null", "\0");
 		Mmo()->ShowTopList(pPlayer, VoteID);
 		return true;
@@ -2252,15 +2252,15 @@ void CGS::SendInformationBot(CPlayerBot *pPlayerBot)
 	ClientInfoMsg.m_Team = pPlayerBot->GetTeam();
 
 	int BotID = pPlayerBot->GetBotID();
-	ClientInfoMsg.m_pName = ContextBots::DataBot[BotID].Name(pPlayerBot);
+	ClientInfoMsg.m_pName = BotJob::DataBot[BotID].Name(pPlayerBot);
 	ClientInfoMsg.m_pClan = "::Bots::";
 	ClientInfoMsg.m_Country = 0;
 	ClientInfoMsg.m_Silent = true;
 	for (int p = 0; p < 6; p++)
 	{
-		ClientInfoMsg.m_apSkinPartNames[p] = ContextBots::DataBot[BotID].SkinNameBot[p];
-		ClientInfoMsg.m_aUseCustomColors[p] = ContextBots::DataBot[BotID].UseCustomBot[p];
-		ClientInfoMsg.m_aSkinPartColors[p] = ContextBots::DataBot[BotID].SkinColorBot[p];
+		ClientInfoMsg.m_apSkinPartNames[p] = BotJob::DataBot[BotID].SkinNameBot[p];
+		ClientInfoMsg.m_aUseCustomColors[p] = BotJob::DataBot[BotID].UseCustomBot[p];
+		ClientInfoMsg.m_aSkinPartColors[p] = BotJob::DataBot[BotID].SkinColorBot[p];
 	}
 	Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1);
 }
@@ -2283,7 +2283,7 @@ void CGS::CreateBot(short SpawnPoint, int BotID, int SubID)
 void CGS::UpdateQuestsBot(int QuestID, int Step)
 {
 	// собираем все данные о ботах
-	ContextBots::QuestBotInfo FindBot = Mmo()->Quest()->GetQuestBot(QuestID, Step);
+	BotJob::QuestBotInfo FindBot = Mmo()->Quest()->GetQuestBot(QuestID, Step);
 	if(!FindBot.IsActive())
 		return;
 
@@ -2298,7 +2298,7 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 	int QuestBotClientID = -1;
 	for(int i = MAX_PLAYERS ; i < MAX_CLIENTS; i++)
 	{
-		if(!m_apPlayers[i] || m_apPlayers[i]->GetSpawnBot() != SPAWNQUESTNPC || m_apPlayers[i]->GetBotSub() != FindBot.SubBotID) 
+		if(!m_apPlayers[i] || m_apPlayers[i]->GetSpawnBot() != SpawnBot::SPAWN_QUEST_NPC || m_apPlayers[i]->GetBotSub() != FindBot.SubBotID) 
 			continue;
 		
 		QuestBotClientID = i;
@@ -2312,7 +2312,7 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 	if(ActiveBot && QuestBotClientID <= -1)
 	{
 		dbg_msg("test", "я создаю бота для квеста %d", QuestID);
-		CreateBot(SPAWNQUESTNPC, FindBot.BotID, FindBot.SubBotID);
+		CreateBot(SpawnBot::SPAWN_QUEST_NPC, FindBot.BotID, FindBot.SubBotID);
 	}
 	
 	// если бот не активен не у одного игрока, но игрок найден удаляем
@@ -2352,7 +2352,7 @@ void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop, vec2 For
 // Саздает предметы в позиции Типа и Количества и Их самих кол-ва
 void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant, vec2 Force)
 {
-	ItemSql::ItemPlayer DropItem;
+	ItemJob::ItemPlayer DropItem;
 	DropItem.SetBasic(NULL, ItemID);
 	DropItem.Count = Count;
 	DropItem.Enchant = Enchant;
@@ -2363,9 +2363,9 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Ench
 }
 
 // Саздает предметы в позиции Типа и Количества и Их самих кол-ва
-void CGS::CreateDropItem(vec2 Pos, int ClientID, ItemSql::ItemPlayer &PlayerItem, int Count, vec2 Force)
+void CGS::CreateDropItem(vec2 Pos, int ClientID, ItemJob::ItemPlayer &PlayerItem, int Count, vec2 Force)
 {
-	ItemSql::ItemPlayer CopyItem;
+	ItemJob::ItemPlayer CopyItem;
 	CopyItem.Paste(PlayerItem);
 	CopyItem.Count = Count;
 
@@ -2475,7 +2475,7 @@ void CGS::LoadZonePVP()
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetSpawnBot() == SPAWNMOBS && CheckPlayerMessageWorldID(i) == m_WorldID)
+		if (BotPlayer && BotPlayer->GetSpawnBot() == SpawnBot::SPAWN_MOBS && CheckPlayerMessageWorldID(i) == m_WorldID)
 			CountMobs++;
 	}
 	m_AllowedPVP = (bool)(CountMobs >= 5);

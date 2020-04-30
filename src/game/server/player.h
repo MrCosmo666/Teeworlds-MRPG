@@ -3,9 +3,9 @@
 #ifndef GAME_SERVER_PLAYER_H
 #define GAME_SERVER_PLAYER_H
 
-#include "mmocore/sqlwork/account_main.h"
-#include "mmocore/sqlwork/items.h"
-#include "mmocore/sqlwork/botsinfo.h"
+#include "mmocore/ComponentsCore/AccountMainJob.h"
+#include "mmocore/ComponentsCore/ItemJob.h"
+#include "mmocore/ComponentsCore/BotJob.h"
 
 #include "entities/character.h"
 
@@ -18,9 +18,6 @@ enum
 
 class CPlayer
 {
-	/* #########################################################################
-		VAR AND OBJECTS PLAYER 
-	######################################################################### */
 	MACRO_ALLOC_POOL_ID()
 
 	struct StructLatency
@@ -58,7 +55,7 @@ public:
 	int m_PlayerFlags;
 	int m_PlayerTick[TickState::NUM_TICK];
 	bool m_Flymode;
-	int m_SyncFactor;
+	int m_SyncDuneon;
 	int m_MoodState;
 
 	StructLatency m_Latency;
@@ -167,11 +164,11 @@ public:
 	/* #########################################################################
 		FUNCTIONS PLAYER ITEMS 
 	######################################################################### */
-	ItemSql::ItemPlayer &GetItem(int ItemID);
+	ItemJob::ItemPlayer &GetItem(int ItemID);
 
-	AccountMainSql::StructData &Acc() 
+	AccountMainJob::StructData &Acc() 
 	{ 
-		return AccountMainSql::Data[m_ClientID]; 
+		return AccountMainJob::Data[m_ClientID]; 
 	};
 	int GetLevelDisciple(int Class);
 
