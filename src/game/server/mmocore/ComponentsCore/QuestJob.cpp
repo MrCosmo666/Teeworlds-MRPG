@@ -2,7 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
-#include <game/server/mmocore/GameEntities/items/dropquest.h>
+#include <game/server/mmocore/GameEntities/Items/dropquest.h>
 
 #include "QuestJob.h"
 
