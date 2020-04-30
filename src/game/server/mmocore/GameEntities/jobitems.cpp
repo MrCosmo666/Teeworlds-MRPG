@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <generated/server_data.h>
 #include <game/server/gamecontext.h>
-#include <game/server/Player.h>
 
 #include "jobitems.h"
 // 1 - miner / 2 - plant
