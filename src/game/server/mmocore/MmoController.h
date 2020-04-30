@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_MMOCONTROLLER_H
 #define GAME_SERVER_MMOCONTROLLER_H
-#include <thread>
 
 #include "ComponentsCore/AccountMainJob.h"
 #include "ComponentsCore/AccountMinerJob.h"

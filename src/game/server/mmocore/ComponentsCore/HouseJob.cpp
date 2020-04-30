@@ -10,10 +10,10 @@ using namespace sqlstr;
 std::map < int , HouseJob::HouseList > HouseJob::Home;
 
 // Инициализация класса
-void HouseJob::OnInitLocal(const char *pLocal) 
+void HouseJob::OnInitWorld(const char* pWhereLocalWorld) 
 { 
 	// загрузка домов
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_houses", pLocal));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_houses", pWhereLocalWorld));
 	while(RES->next())
 	{
 		int HouseID = RES->getInt("ID");
@@ -41,7 +41,7 @@ void HouseJob::OnInitLocal(const char *pLocal)
 	// загружаем декорации
 	if (m_DecorationHouse.size() <= 0)
 	{
-		boost::scoped_ptr<ResultSet> DecoLoadingRES(SJK.SD("*", "tw_houses_decorations", pLocal));
+		boost::scoped_ptr<ResultSet> DecoLoadingRES(SJK.SD("*", "tw_houses_decorations", pWhereLocalWorld));
 		while (DecoLoadingRES->next())
 		{
 			const int DecoID = DecoLoadingRES->getInt("ID");
@@ -370,7 +370,7 @@ void HouseJob::SellHouse(int HouseID)
 	}
 }
 
-bool HouseJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
+bool HouseJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 {
 	CPlayer* pPlayer = pChr->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
@@ -529,7 +529,7 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 	PARSING HOUSES 
 ######################################################################### */
 // Парсинг голосований
-bool HouseJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	int ClientID = pPlayer->GetCID();
 	if(PPSTR(CMD, "BUYHOUSE") == 0)
@@ -662,7 +662,7 @@ bool HouseJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vo
 	return false;
 }
 
-bool HouseJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
 	int ClientID = pPlayer->GetCID();
 	if (ReplaceMenu)

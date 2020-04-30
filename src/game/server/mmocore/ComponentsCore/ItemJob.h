@@ -85,11 +85,11 @@ public:
 	typedef ClassItems ItemPlayer;
 	static std::map < int, std::map < int, ItemPlayer > > Items;
 
-	virtual void OnInitGlobal();
+	virtual void OnInit();
 	virtual void OnInitAccount(CPlayer *pPlayer);
-	virtual void OnResetClientData(int ClientID);
-	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
-	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
+	virtual void OnResetClient(int ClientID);
+	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 
 	// Основное
 	void ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction = false);

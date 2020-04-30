@@ -8,7 +8,6 @@
 class AccountMainJob : public MmoComponent
 {
 public:
-	// - - - - - - - - - - - -
 	struct StructData
 	{
 		char Login[64];
@@ -47,36 +46,28 @@ public:
 		int PlayerMana;
 
 		std::map < int , bool > AetherLocation;
-
 		bool IsGuild() { return (GuildID > 0); }
 	};
 	static std::map < int, StructData > Data;
-
-private:
-	// auth state
 	int SendAuthCode(int ClientID, int Code);
 
 public:
-	virtual void OnResetClientData(int ClientID);
-	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+	int CheckOnlineAccount(int AuthID) const;
 
 	int RegisterAccount(int ClientID, const char *Login, const char *Password);
 	int LoginAccount(int ClientID, const char *Login, const char *Password);
 	void LoadAccount(CPlayer *pPlayer, bool FirstInitilize = false);
-	int CheckOnlineAccount(int AuthID) const;
 
-	// discord
 	void ShowDiscordCard(int ClientID);
 	void DiscordConnect(int ClientID, const char *pDID);
 	
-	//
 	int GetRank(int AuthID);
 	bool IsActive(int ClientID) const
 	{
-		if(Data.find(ClientID) != Data.end())
-			return true;
-		return false;
+		return (bool)(Data.find(ClientID) != Data.end());
 	}
+
+	virtual void OnResetClient(int ClientID);
 };
 
 #endif

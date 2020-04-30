@@ -8,7 +8,7 @@ using namespace sqlstr;
 std::map < int , std::map < int , ItemJob::ItemPlayer > > ItemJob::Items;
 std::map < int , ItemJob::ItemInformation > ItemJob::ItemsInfo;
 
-void ItemJob::OnInitGlobal() 
+void ItemJob::OnInit()
 {
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_items_list", "WHERE ItemID > '0'"));
 	while(RES->next())
@@ -59,7 +59,7 @@ void ItemJob::OnInitAccount(CPlayer *pPlayer)
 	}		
 }
 
-void ItemJob::OnResetClientData(int ClientID)
+void ItemJob::OnResetClient(int ClientID)
 {
 	if (Items.find(ClientID) != Items.end())
 		Items.erase(ClientID);
@@ -320,7 +320,7 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 		GS()->AVM(ClientID, "AUCTIONSLOT", ItemID, HideID, "Create Slot Auction {STR}", NameItem);
 }
 
-bool ItemJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 
@@ -462,7 +462,7 @@ bool ItemJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 	return false;
 }
 
-bool ItemJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (ReplaceMenu)

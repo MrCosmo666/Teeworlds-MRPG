@@ -5,12 +5,11 @@
 
 #include <game/server/enum_context.h>
 
-class MmoController;
 class MmoComponent
 {
 protected:
-	friend MmoController;
 	class MmoController *m_Job;
+	friend MmoController;
 	MmoController* Job() const { return m_Job; }
 
 	class CGS *m_GameServer;
@@ -19,16 +18,16 @@ protected:
 public:
 	virtual ~MmoComponent() {}
 
-	virtual void OnInitLocal(const char *pLocal) {};
-	virtual void OnInitGlobal() {};
+	virtual void OnInitWorld(const char* pWhereLocalWorld) {};
+	virtual void OnInit() {};
 	virtual void OnInitAccount(CPlayer *pPlayer) {};
 	virtual void OnTick() {};
-	virtual void OnTickLocalWorld() {};
+	virtual void OnTickWorld() {};
 	virtual void OnPaymentTime() {};
-	virtual void OnResetClientData(int ClientID) {};
-	virtual bool OnPlayerHandleTile(CCharacter *pChr, int IndexCollision) { return false; };
-	virtual bool OnPlayerHandleMainMenu(CPlayer *pPlayer, int Menulist, bool ReplaceMenu) { return false; };
-	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText) { return false; }
+	virtual void OnResetClient(int ClientID) {};
+	virtual bool OnHandleTile(CCharacter *pChr, int IndexCollision) { return false; };
+	virtual bool OnHandleMenulist(CPlayer *pPlayer, int Menulist, bool ReplaceMenu) { return false; };
+	virtual bool OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText) { return false; }
 	virtual bool OnMessage(int MsgID, void *pRawMsg, int ClientID) { return false; };
 };
 

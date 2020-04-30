@@ -7,34 +7,9 @@
 using namespace sqlstr;
 std::map < int , AccountMinerJob::StructOres > AccountMinerJob::Ore;
 
-void AccountMinerJob::OnInitLocal(const char *pLocal)
-{
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_position_miner", pLocal));
-	while(RES->next())
-	{
-		const int ID = RES->getInt("ID");
-		Ore[ ID ].ItemID = RES->getInt("ItemID");
-		Ore[ ID ].Level = RES->getInt("Level");
-		Ore[ ID ].Health = RES->getInt("Health");
-		Ore[ ID ].PositionX = RES->getInt("PositionX");
-		Ore[ ID ].PositionY = RES->getInt("PositionY");	
-		Ore[ ID ].Distance = RES->getInt("Distance");
-	}
-}
-
-void AccountMinerJob::OnInitAccount(CPlayer *pPlayer)
-{
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_miner", "WHERE AccountID = '%d'", pPlayer->Acc().AuthID));
-	if(RES->next()) 
-	{
-		for(int i = 0; i < NUM_MINER; i++)
-			pPlayer->Acc().Miner[i] = RES->getInt(str_MINER((MINER) i));
-		return;
-	}
-	pPlayer->Acc().Miner[MnrLevel] = 1;
-	pPlayer->Acc().Miner[MnrCount] = 1;
-	SJK.ID("tw_accounts_miner", "(AccountID) VALUES ('%d')", pPlayer->Acc().AuthID);	
-	return;	
+int AccountMinerJob::ExpNeed(int Level) const 
+{ 
+	return (g_Config.m_SvMinerLeveling + Level * 2) * (Level * Level); 
 }
 
 void AccountMinerJob::ShowMenu(CPlayer *pPlayer)
@@ -102,24 +77,49 @@ void AccountMinerJob::Work(CPlayer *pPlayer, int Exp)
 	Job()->SaveAccount(pPlayer, SAVE_MINER_DATA);
 }
 
-// Парсинг голосований Минера
-bool AccountMinerJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+void AccountMinerJob::OnInitAccount(CPlayer* pPlayer)
 {
-	const int ClientID = pPlayer->GetCID();	
-	if(PPSTR(CMD, "MINERUPGRADE") == 0)
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_miner", "WHERE AccountID = '%d'", pPlayer->Acc().AuthID));
+	if (RES->next())
+	{
+		for (int i = 0; i < NUM_MINER; i++)
+			pPlayer->Acc().Miner[i] = RES->getInt(str_MINER((MINER)i));
+		return;
+	}
+	pPlayer->Acc().Miner[MnrLevel] = 1;
+	pPlayer->Acc().Miner[MnrCount] = 1;
+	SJK.ID("tw_accounts_miner", "(AccountID) VALUES ('%d')", pPlayer->Acc().AuthID);
+}
+
+void AccountMinerJob::OnInitWorld(const char* pWhereLocalWorld)
+{
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_position_miner", pWhereLocalWorld));
+	while (RES->next())
+	{
+		const int ID = RES->getInt("ID");
+		Ore[ID].ItemID = RES->getInt("ItemID");
+		Ore[ID].Level = RES->getInt("Level");
+		Ore[ID].Health = RES->getInt("Health");
+		Ore[ID].PositionX = RES->getInt("PositionX");
+		Ore[ID].PositionY = RES->getInt("PositionY");
+		Ore[ID].Distance = RES->getInt("Distance");
+	}
+}
+
+bool AccountMinerJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+{
+	const int ClientID = pPlayer->GetCID();
+	if (PPSTR(CMD, "MINERUPGRADE") == 0)
 	{
 		char aBuf[32];
 		str_format(aBuf, sizeof(aBuf), "Mining '%s'", str_MINER((MINER)VoteID));
-		if(pPlayer->Upgrade(Get, &pPlayer->Acc().Miner[VoteID], &pPlayer->Acc().Miner[MnrUpgrade], VoteID2, 1000, aBuf))
+		if (pPlayer->Upgrade(Get, &pPlayer->Acc().Miner[VoteID], &pPlayer->Acc().Miner[MnrUpgrade], VoteID2, 1000, aBuf))
 		{
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_MINER_DATA);
 			GS()->VResetVotes(ClientID, MenuList::MENU_UPGRADE);
 		}
 		return true;
-	}	
+	}
 
 	return false;
 }
-
-// подсчет опыта для лвл апа
-int AccountMinerJob::ExpNeed(int Level) const { return (g_Config.m_SvMinerLeveling+Level*2)*(Level*Level); } 

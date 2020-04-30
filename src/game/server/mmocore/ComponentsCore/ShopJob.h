@@ -30,14 +30,14 @@ class ShopJob : public MmoComponent
 public:
 	typedef StructAuctionItem AuctionItem;
 	
-	virtual void OnInitGlobal();
-	virtual void OnTickLocalWorld();
-	virtual bool OnPlayerHandleTile(CCharacter* pChr, int IndexCollision);
+	void OnInit() override;
+	virtual void OnTickWorld();
+	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
 
 	void CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem);
 	void CheckAuctionTime();
-	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
-	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
+	virtual bool OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
+	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 };
 
 #endif

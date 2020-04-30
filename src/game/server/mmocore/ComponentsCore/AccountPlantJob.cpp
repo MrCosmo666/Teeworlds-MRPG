@@ -8,10 +8,10 @@ using namespace sqlstr;
 std::map < int , AccountPlantJob::StructPlants > AccountPlantJob::Plants;
 
 // Инициализация класса
-void AccountPlantJob::OnInitLocal(const char *pLocal)
+void AccountPlantJob::OnInitWorld(const char* pWhereLocalWorld)
 {
 	// загрузить плантации
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_position_plant", pLocal));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_position_plant", pWhereLocalWorld));
 	while(RES->next())
 	{
 		int ID = RES->getInt("ID");
@@ -108,7 +108,7 @@ void AccountPlantJob::Work(int ClientID, int Exp)
 	Job()->SaveAccount(pPlayer, SAVE_PLANT_DATA);
 }
 
-bool AccountPlantJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool AccountPlantJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	int ClientID = pPlayer->GetCID();	
 	if(PPSTR(CMD, "PLANTUPGRADE") == 0)

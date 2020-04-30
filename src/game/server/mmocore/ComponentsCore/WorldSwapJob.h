@@ -17,8 +17,7 @@ class WorldSwapJob : public MmoComponent
 		int TwoPositionY;
 		int TwoWorldID;
 	};
-	typedef std::map < int , StructSwapWorld > WorldSwapType;
-	static WorldSwapType WorldSwap;
+	static std::map < int, StructSwapWorld > WorldSwap;
 
 	struct StructPositionLogic
 	{
@@ -26,11 +25,10 @@ class WorldSwapJob : public MmoComponent
 		int FindWorldID;
 		vec2 Position;
 	};
-	typedef std::list < StructPositionLogic > WorldPositionLogicType;
-	static WorldPositionLogicType WorldPositionLogic;
+	static std::list < StructPositionLogic > WorldPositionLogic;
 public:
-	virtual void OnInitGlobal();
-	virtual bool OnPlayerHandleTile(CCharacter* pChr, int IndexCollision);
+	virtual void OnInit();
+	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
 
 	vec2 GetPositionQuestBot(int ClientID, int QuestID);
 	int GetWorldType() const;

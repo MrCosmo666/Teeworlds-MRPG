@@ -7,7 +7,7 @@
 using namespace sqlstr;
 std::map < int , AetherJob::StructTeleport > AetherJob::Teleport;
 
-void AetherJob::OnInitGlobal() 
+void AetherJob::OnInit()
 { 
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_teleports"));
 	while(RES->next())
@@ -31,7 +31,7 @@ void AetherJob::OnInitAccount(CPlayer *pPlayer)
 	}
 }
 
-bool AetherJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool AetherJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 
@@ -60,7 +60,7 @@ bool AetherJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int V
 	return false; 
 }
 
-bool AetherJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
+bool AetherJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 {
 	CPlayer* pPlayer = pChr->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
@@ -84,7 +84,7 @@ bool AetherJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
 	return false;
 }
 
-bool AetherJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+bool AetherJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
 	if (ReplaceMenu)
 	{

@@ -21,7 +21,7 @@ void GuildJob::LoadGuildRank(int GuildID)
 	}
 }
 
-void GuildJob::OnInitGlobal()
+void GuildJob::OnInit()
 {
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds"));
 	while (RES->next())
@@ -42,10 +42,10 @@ void GuildJob::OnInitGlobal()
 	Job()->ShowLoadingProgress("Guilds", Guild.size());
 }
 
-void GuildJob::OnInitLocal(const char *pLocal) 
+void GuildJob::OnInitWorld(const char* pWhereLocalWorld) 
 { 
 	// загрузка домов
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_houses", pLocal));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_houses", pWhereLocalWorld));
 	while(RES->next())
 	{
 		int HouseID = RES->getInt("ID");
@@ -67,7 +67,7 @@ void GuildJob::OnInitLocal(const char *pLocal)
 	}
 
 	// загрузка декораций
-	boost::scoped_ptr<ResultSet> DecoLoadingRES(SJK.SD("*", "tw_guilds_decorations", pLocal));
+	boost::scoped_ptr<ResultSet> DecoLoadingRES(SJK.SD("*", "tw_guilds_decorations", pWhereLocalWorld));
 	while (DecoLoadingRES->next())
 	{
 		const int DecoID = DecoLoadingRES->getInt("ID");
@@ -78,7 +78,7 @@ void GuildJob::OnInitLocal(const char *pLocal)
 	Job()->ShowLoadingProgress("Guilds Houses Decorations", m_DecorationHouse.size());
 }
 
-bool GuildJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
+bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 {
 	CPlayer* pPlayer = pChr->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
@@ -136,7 +136,7 @@ bool GuildJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
 	GLOBAL MEMBER
 ######################################################################### */
 // парсинг голосований для меню
-bool GuildJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (PPSTR(CMD, "MLEADER") == 0)
@@ -518,7 +518,7 @@ bool GuildJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int Vo
 	return false;
 }
 
-bool GuildJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+bool GuildJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
 	int ClientID = pPlayer->GetCID();
 	if (ReplaceMenu)

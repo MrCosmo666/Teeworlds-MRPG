@@ -7,9 +7,6 @@
 
 class AccountMinerJob : public MmoComponent
 {
-	/* #########################################################################
-		VAR AND OBJECTS MINER 
-	######################################################################### */
 	struct StructOres
 	{
 		int ItemID;
@@ -19,28 +16,20 @@ class AccountMinerJob : public MmoComponent
 		int PositionY;
 		int Distance;
 	};
-	typedef std::map < int , StructOres > OresType;
-	static OresType Ore;
+	static std::map < int, StructOres > Ore;
+	int ExpNeed(int Level) const;
 
 public:
-	virtual void OnInitLocal(const char *pLocal);
-	virtual void OnInitAccount(CPlayer *pPlayer);
-
 	int GetOreLevel(vec2 Pos) const;
 	int GetOreItemID(vec2 Pos) const;
 	int GetOreHealth(vec2 Pos) const;
 
 	void ShowMenu(CPlayer *pPlayer);
-
 	void Work(CPlayer *pPlayer, int Exp);
-	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
 
-private:
-	int ExpNeed(int Level) const;
-// ********************************************************************************************************
-// ****************************** WARNING DON"T CHANGE NAME DOWN FUNCTION *********************************
-// ********************************************************************************************************
-
+	virtual void OnInitAccount(CPlayer* pPlayer);
+	virtual void OnInitWorld(const char* pWhereLocalWorld);
+	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 };
 
 #endif

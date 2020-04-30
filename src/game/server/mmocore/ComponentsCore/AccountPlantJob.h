@@ -19,7 +19,7 @@ class AccountPlantJob : public MmoComponent
 	static PlantsType Plants;
 
 public:
-	virtual void OnInitLocal(const char *pLocal);
+	virtual void OnInitWorld(const char* pWhereLocalWorld);
 	virtual void OnInitAccount(CPlayer *pPlayer);
 
 	int GetPlantLevel(vec2 Pos);
@@ -29,7 +29,7 @@ public:
 	void ShowPlantsItems(int ClientID);
 
 	void Work(int ClientID, int Exp);
-	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
+	virtual bool OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
 
 private:
 	int ExpNeed(int Level) const;

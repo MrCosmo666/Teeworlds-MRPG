@@ -21,26 +21,25 @@ public:
 	CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint);
 	virtual ~CPlayerBot() override;
 
-	virtual int GetBotID() override                         { return m_BotID; };
-	virtual int GetSpawnBot() override                      { return m_SpawnPointBot; };
-	virtual int GetBotSub() override                        { return m_SubBotID; };
-	virtual	int GetHealth() override                        { return m_BotHealth; };
-	virtual int GetTeam() override                          { return TEAM_BLUE; };
-	virtual void SetStandart(int Health, int Mana) override { m_BotHealth = Health; };
-	virtual void SetDungeonAllowedSpawn(bool Spawn) override{ m_DungeonAllowedSpawn = Spawn; };
-	virtual	int GetMoodNameplacesType(int SnappingClient);
-	virtual int GetItemEquip(int EquipID, int SkipItemID = -1) const;
-
-	virtual void Tick() override;
-	virtual int GetStartHealth() override;
-	virtual int GetAttributeCount(int BonusID, bool Really = false) override;
-	virtual void Snap(int SnappingClient) override;
-	virtual bool CheckQuestSnapPlayer(int SnappingClient, bool SnapData) override;
+	int GetBotID()													override { return m_BotID; };
+	int GetSpawnBot()												override { return m_SpawnPointBot; };
+	int GetBotSub()													override { return m_SubBotID; };
+	int GetHealth() 												override { return m_BotHealth; };
+	int GetTeam()													override { return TEAM_BLUE; };
+	void SetStandart(int Health, int Mana)							override { m_BotHealth = Health; };
+	void SetDungeonAllowedSpawn(bool Spawn)							override { m_DungeonAllowedSpawn = Spawn; };
+	int GetMoodNameplacesType(int SnappingClient)					override;
+	int GetItemEquip(int EquipID, int SkipItemID = -1) const		override;
+	void Tick()														override;
+	int GetStartHealth()											override;
+	int GetAttributeCount(int BonusID, bool Really = false)			override;
+	void Snap(int SnappingClient)									override;
+	bool CheckQuestSnapPlayer(int SnappingClient, bool SnapData)	override;
 
 private:
-	virtual void TryRespawn() override;
-	int GetBotLevel() const;
+	void TryRespawn()												override;
 
+	int GetBotLevel() const;
 	bool GetActiveQuestsID(int SnapClientID);
 };
 

@@ -4,38 +4,32 @@
 #include <game/server/entities/character.h>
 #include "TileHandle.h"
 
-// CHelperCharacter
 TileHandle::TileHandle(CCharacter *Character)
 : m_pCharacter(Character)
 {
-	for(int i = 0; i < MAX_TILES; i++)
-		InFuction[i] = false;
+	for(bool & i : m_Collide)
+		i = false;
 }
 
-TileHandle::~TileHandle()
-{}
-
-// teles helper
 bool TileHandle::TileEnter(int IndexPlayer, int IndexNeed)
 {
-	if(IndexPlayer == IndexNeed && !InFuction[IndexNeed])
+	if(IndexPlayer == IndexNeed && !m_Collide[IndexNeed])
 	{
-		InFuction[IndexNeed] = true;
+		m_Collide[IndexNeed] = true;
 		return true;
 	}
 	return false;
 }
 bool TileHandle::TileExit(int IndexPlayer, int IndexNeed)
 {
-	if(IndexPlayer != IndexNeed && InFuction[IndexNeed])
+	if(IndexPlayer != IndexNeed && m_Collide[IndexNeed])
 	{
-		InFuction[IndexNeed] = false;
+		m_Collide[IndexNeed] = false;
 		return true;
 	}
 	return false;
 }
 
-// vec2 helper and position
 vec2 TileHandle::MousePos() const
 {
 	vec2 Direction = vec2(m_pCharacter->m_Core.m_Input.m_TargetX, m_pCharacter->m_Core.m_Input.m_TargetY);

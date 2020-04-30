@@ -8,7 +8,7 @@ using namespace sqlstr;
 std::map < int , CraftJob::CraftStruct > CraftJob::Craft;
 
 // Инициализация класса
-void CraftJob::OnInitGlobal() 
+void CraftJob::OnInit()
 {
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_craft_list"));
 	while(RES->next())
@@ -34,7 +34,7 @@ void CraftJob::OnInitGlobal()
 	Job()->ShowLoadingProgress("Crafts", Craft.size());	
 }
 
-bool CraftJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
+bool CraftJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 {
 	CPlayer* pPlayer = pChr->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
@@ -179,7 +179,7 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 	GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 }
 
-bool CraftJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool CraftJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	if(PPSTR(CMD, "CRAFT") == 0)
 	{
@@ -190,7 +190,7 @@ bool CraftJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int Vo
 	return false;
 }
 
-bool CraftJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+bool CraftJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (ReplaceMenu)

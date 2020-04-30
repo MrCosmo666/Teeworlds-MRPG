@@ -10,7 +10,7 @@ std::map < int , QuestJob::StructQuestData > QuestJob::QuestsData;
 std::map < int , std::map < int , QuestJob::StructQuest > > QuestJob::Quests;
 
 // Инициализация класса
-void QuestJob::OnInitGlobal() 
+void QuestJob::OnInit()
 {
 	// загрузить все квесты
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_quests_list", "WHERE ID > '0'"));
@@ -63,7 +63,7 @@ void QuestJob::OnInitAccount(CPlayer *pPlayer)
 	}
 }
 
-void QuestJob::OnResetClientData(int ClientID)
+void QuestJob::OnResetClient(int ClientID)
 {
 	if (Quests.find(ClientID) != Quests.end())
 	{
@@ -776,7 +776,7 @@ void QuestJob::QuestTableShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& Bo
 }
 
 // Парсинг голосованний 
-bool QuestJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool QuestJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	return false;
 }

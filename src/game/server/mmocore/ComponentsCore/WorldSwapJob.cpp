@@ -8,7 +8,7 @@ using namespace sqlstr;
 std::map < int , WorldSwapJob::StructSwapWorld > WorldSwapJob::WorldSwap;
 std::list < WorldSwapJob::StructPositionLogic > WorldSwapJob::WorldPositionLogic;
 
-void WorldSwapJob::OnInitGlobal() 
+void WorldSwapJob::OnInit()
 { 
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_world_swap"));
 	while(RES->next())
@@ -41,7 +41,7 @@ void WorldSwapJob::OnInitGlobal()
 	Job()->ShowLoadingProgress("Worlds Swap Logic", WorldPositionLogic.size());
 }
 
-bool WorldSwapJob::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
+bool WorldSwapJob::OnHandleTile(CCharacter *pChr, int IndexCollision)
 {
 	CPlayer *pPlayer = pChr->GetPlayer();
 	if(pChr->GetHelper()->TileEnter(IndexCollision, TILE_WORLD_SWAP))

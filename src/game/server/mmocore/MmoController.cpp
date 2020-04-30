@@ -34,11 +34,11 @@ MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 		component->m_GameServer = pGameServer;
 
 		if(m_pGameServer->GetWorldID() == LAST_WORLD)
-			component->OnInitGlobal();
+			component->OnInit();
 
 		char aLocalSelect[128];
 		str_format(aLocalSelect, sizeof(aLocalSelect), "WHERE WorldID = '%d'", m_pGameServer->GetWorldID());
-		component->OnInitLocal(aLocalSelect);
+		component->OnInitWorld(aLocalSelect);
 	}
 	m_pBotsInfo->LoadGlobalBots();
 }
@@ -54,11 +54,11 @@ void MmoController::LoadFullSystems()
 	for(auto& component : m_Components.m_paComponents)
 	{
 		if(GS()->GetWorldID() == LAST_WORLD)
-			component->OnInitGlobal();
+			component->OnInit();
 
 		char aLocalSelect[128];
 		str_format(aLocalSelect, sizeof(aLocalSelect), "WHERE WorldID = '%d'", GS()->GetWorldID());
-		component->OnInitLocal(aLocalSelect);
+		component->OnInitWorld(aLocalSelect);
 	}
 }
 
@@ -69,7 +69,7 @@ void MmoController::OnTick()
 	{
 		component->OnTick();
 		if(GS()->GetWorldID() == LOCALWORLD)
-			component->OnTickLocalWorld();
+			component->OnTickWorld();
 	}
 
 	// тик в локальном мире
@@ -100,7 +100,7 @@ bool MmoController::OnPlayerHandleMainMenu(int ClientID, int Menulist, bool Repl
 
 	for(auto& component : m_Components.m_paComponents)
 	{
-		if(component->OnPlayerHandleMainMenu(pPlayer, Menulist, ReplaceMenu))
+		if(component->OnHandleMenulist(pPlayer, Menulist, ReplaceMenu))
 			return true;
 	}
 	return false;
@@ -111,7 +111,7 @@ bool MmoController::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 	if(!pChr) return true;
 	for(auto & component : m_Components.m_paComponents)
 	{
-		if(component->OnPlayerHandleTile(pChr, IndexCollision))
+		if(component->OnHandleTile(pChr, IndexCollision))
 			return true;
 	}
 	return false;
@@ -121,7 +121,7 @@ bool MmoController::OnParseFullVote(CPlayer *pPlayer, const char *CMD, const int
 {
 	for(auto& component : m_Components.m_paComponents)
 	{
-		if(component->OnParseVotingMenu(pPlayer, CMD, VoteID, VoteID2, Get, GetText))
+		if(component->OnVotingMenu(pPlayer, CMD, VoteID, VoteID2, Get, GetText))
 			return true;
 	}
 	return false;
@@ -143,7 +143,7 @@ bool MmoController::OnMessage(int MsgID, void *pRawMsg, int ClientID)
 void MmoController::ResetClientData(int ClientID)
 {
 	for (auto& component : m_Components.m_paComponents)
-		component->OnResetClientData(ClientID);
+		component->OnResetClient(ClientID);
 }
 
 // Сохранение аккаунта

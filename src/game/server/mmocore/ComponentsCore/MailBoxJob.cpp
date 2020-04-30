@@ -106,7 +106,7 @@ void MailBoxJob::SendInbox(int AuthID, const char* Name, const char* Desc, int I
 		 cName.cstr(), cDesc.cstr(), ItemID, Count, Enchant, AuthID);
 }
 
-bool MailBoxJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool MailBoxJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if(PPSTR(CMD, "MAIL") == 0)

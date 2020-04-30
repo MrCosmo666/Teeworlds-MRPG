@@ -18,11 +18,11 @@ class AetherJob : public MmoComponent
 	static Telep Teleport;
 
 public:
-	virtual void OnInitGlobal();
+	virtual void OnInit();
 	virtual void OnInitAccount(CPlayer *pPlayer);
-	virtual bool OnPlayerHandleTile(CCharacter *pChr, int IndexCollision);
-	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
-	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+	virtual bool OnHandleTile(CCharacter *pChr, int IndexCollision);
+	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
+	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 
 private:
 	void UnlockLocation(int ClientID, vec2 Pos);

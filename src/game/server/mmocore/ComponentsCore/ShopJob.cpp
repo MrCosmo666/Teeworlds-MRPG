@@ -9,7 +9,7 @@ using namespace sqlstr;
 /* Information NON STATIC DATA LOAD ONLY DATABASE (MultiWorld Work) Later need changes object on static class*/
 std::map < int , ShopJob::ShopPersonal > ShopJob::Shop;
 
-void ShopJob::OnInitGlobal() 
+void ShopJob::OnInit()
 {
 	// загрузить магазины
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop"));
@@ -20,14 +20,14 @@ void ShopJob::OnInitGlobal()
 	}
 }
 
-void ShopJob::OnTickLocalWorld()
+void ShopJob::OnTickWorld()
 {
 	// проверять оконченые слоты аукцион
 	if(GS()->Server()->Tick() % (1 * GS()->Server()->TickSpeed() * (g_Config.m_SvTimeCheckAuction*60)) == 0)
 		CheckAuctionTime();
 }
 
-bool ShopJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
+bool ShopJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 {
 	CPlayer* pPlayer = pChr->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
@@ -261,7 +261,7 @@ void ShopJob::CheckAuctionTime()
 	return;
 }
 
-bool ShopJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+bool ShopJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (ReplaceMenu)
@@ -315,7 +315,7 @@ bool ShopJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Replac
 	return false;
 }
 
-bool ShopJob::OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 

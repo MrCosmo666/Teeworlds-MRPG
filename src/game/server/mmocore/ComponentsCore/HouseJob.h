@@ -37,9 +37,9 @@ class HouseJob : public MmoComponent
 
 	std::map < int , DecoHouse * > m_DecorationHouse;
 public:
-	virtual void OnInitLocal(const char *pLocal);
+	virtual void OnInitWorld(const char* pWhereLocalWorld);
 	virtual void OnPaymentTime();
-	virtual bool OnPlayerHandleTile(CCharacter* pChr, int IndexCollision);
+	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
 	
 	/* #########################################################################
 		FUNCTIONS HOUSES PLANTS
@@ -92,8 +92,8 @@ public:
 	/* #########################################################################
 		PARSING HOUSES 
 	######################################################################### */
-	virtual bool OnParseVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
-	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
+	virtual bool OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
+	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 };
 
 

@@ -32,7 +32,7 @@ class QuestJob : public MmoComponent
 public:
 	static QuestType Quests;
 
-	virtual void OnInitGlobal();
+	virtual void OnInit();
 	virtual void OnInitAccount(CPlayer *pPlayer);
 
 private:
@@ -77,9 +77,9 @@ private:
 	bool ShowAdventureActiveNPC(CPlayer *pPlayer);
 
 public:
-	virtual void OnResetClientData(int ClientID);
+	virtual void OnResetClient(int ClientID);
 	virtual bool OnMessage(int MsgID, void* pRawMsg, int ClientID);
-	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 
 	void ShowQuestList(CPlayer *pPlayer, int StateQuest);
 	void ShowFullQuestLift(CPlayer *pPlayer);

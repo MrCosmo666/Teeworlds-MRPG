@@ -5,43 +5,37 @@
 #include "AccountMainJob.h"
 
 using namespace sqlstr;
-
 std::map < int , AccountMainJob::StructData > AccountMainJob::Data;
-
-void AccountMainJob::OnResetClientData(int ClientID)
-{
-	if (Data.find(ClientID) != Data.end())
-		Data.erase(ClientID);
-}
-
-bool AccountMainJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
-{
-	return false;
-}
 
 int AccountMainJob::SendAuthCode(int ClientID, int Code)
 {
-	if(!GS()->CheckClient(ClientID))
-		return Code;
-
-	CNetMsg_Sv_ClientProgressAuth ProgressMsg;
-	ProgressMsg.m_Code = Code;
-	GS()->Server()->SendPackMsg(&ProgressMsg, MSGFLAG_VITAL, ClientID);
+	if (GS()->CheckClient(ClientID))
+	{
+		CNetMsg_Sv_ClientProgressAuth ProgressMsg;
+		ProgressMsg.m_Code = Code;
+		GS()->Server()->SendPackMsg(&ProgressMsg, MSGFLAG_VITAL, ClientID);
+	}
 	return Code;
+}
+
+int AccountMainJob::CheckOnlineAccount(int AuthID) const
+{
+	for (const auto& dt : AccountMainJob::Data)
+	{
+		if (dt.second.AuthID == AuthID && GS()->m_apPlayers[dt.first])
+			return dt.first;
+	}
+	return -1;
 }
 
 int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char *Password)
 {
-	// если размер пароля логина мал или слишком большой
-	if(str_length(Login) > 15 || str_length(Login) < 4 || str_length(Password) > 15 || str_length(Password) < 4)
+	if(str_length(Login) > 12 || str_length(Login) < 4 || str_length(Password) > 12 || str_length(Password) < 4)
 	{
-		GS()->ChatFollow(ClientID, "Username / Password must contain 4-15 characters");
+		GS()->ChatFollow(ClientID, "Username / Password must contain 4-12 characters");
 		return SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
 	}
 
-	// информация обо всем подключение
-	CSqlString<32> clear_Login = CSqlString<32>(Login);
-	CSqlString<32> clear_Pass = CSqlString<32>(Password);
 	CSqlString<32> clear_Nick = CSqlString<32>(GS()->Server()->ClientName(ClientID));
 	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
 	if(RES2->next())
@@ -50,15 +44,14 @@ int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char 
 		return SendAuthCode(ClientID, AUTH_REGISTER_ERROR_NICK);
 	}
 
-	// устанавливаем айди 
 	boost::scoped_ptr<ResultSet> RES4(SJK.SD("ID", "tw_accounts", "ORDER BY ID DESC LIMIT 1"));
 	int InitID = RES4->next() ? RES4->getInt("ID")+1 : 1; // thread save ? hm need for table all time auto increment = 1; NEED FIX IT
 
-	// добавляем аккаунт в дб
+	CSqlString<32> clear_Login = CSqlString<32>(Login);
+	CSqlString<32> clear_Pass = CSqlString<32>(Password);
 	SJK.ID("tw_accounts", "(ID, Username, Password, RegisterDate) VALUES ('%d', '%s', '%s', UTC_TIMESTAMP())", InitID, clear_Login.cstr(), clear_Pass.cstr());
 	SJK.ID("tw_accounts_data", "(ID, Nick) VALUES ('%d', '%s')", InitID, clear_Nick.cstr());
 
-	// информация
 	GS()->Chat(ClientID, "Discord group \"{STR}\"", g_Config.m_SvDiscordInviteGroup);
 	GS()->Chat(ClientID, "You can log in: /login <login> <pass>!");
 	return SendAuthCode(ClientID, AUTH_REGISTER_GOOD);
@@ -70,21 +63,18 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 	if(!pPlayer) 
 		return SendAuthCode(ClientID, AUTH_ALL_UNKNOWN);
 	
-	// если размер пароля логина мал или слишком большой
-	if(str_length(Login) > 15 || str_length(Login) < 4 || str_length(Password) > 15 || str_length(Password) < 4)
+	if(str_length(Login) > 12 || str_length(Login) < 4 || str_length(Password) > 12 || str_length(Password) < 4)
 	{
-		GS()->ChatFollow(ClientID, "Username / Password must contain 4-15 characters");
+		GS()->ChatFollow(ClientID, "Username / Password must contain 4-12 characters");
 		return SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
 	}
 
-	// проверяем ник на правильность		
 	CSqlString<32> clear_Login = CSqlString<32>(Login);
 	CSqlString<32> clear_Pass = CSqlString<32>(Password);
 	CSqlString<32> clear_Nick = CSqlString<32>(GS()->Server()->ClientName(ClientID));
 	boost::scoped_ptr<ResultSet> ACCOUNTDATA(SJK.SD("*", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
 	if(ACCOUNTDATA->next())
 	{
-		// проверяем по этому нику (ник может зарегестрирован только один), логин и пароль
 		const int UserID = ACCOUNTDATA->getInt("ID");
 		boost::scoped_ptr<ResultSet> CHECKACCESS(SJK.SD("ID", "tw_accounts", "WHERE Username = '%s' AND Password = '%s' AND ID = '%d'", clear_Login.cstr(), clear_Pass.cstr(), UserID));
 		if (!CHECKACCESS->next())
@@ -93,14 +83,12 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 			return SendAuthCode(ClientID, AUTH_LOGIN_WRONG);
 		}
 
-		// проверить онлайн ли игрок
 		if (CheckOnlineAccount(UserID) >= 0)
 		{
 			GS()->Chat(ClientID, "The account is already in the game!");
 			return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
 		}
 
-		// если есть такое тогда погнали получать все данные игрока
 		pPlayer->Acc().AuthID = UserID;
 		pPlayer->Acc().Level = ACCOUNTDATA->getInt("Level");
 		pPlayer->Acc().Exp = ACCOUNTDATA->getInt("Exp");
@@ -111,17 +99,14 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		str_copy(pPlayer->Acc().Login, clear_Login.cstr(), sizeof(pPlayer->Acc().Login));
 		str_copy(pPlayer->Acc().Password, clear_Pass.cstr(), sizeof(pPlayer->Acc().Password));
 		str_copy(pPlayer->Acc().LastLogin, ACCOUNTDATA->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().LastLogin));
-
-		// загрузка всех апгрейдов по списку что был установлен
 		for (const auto& at : CGS::AttributInfo)
 		{
 			if (str_comp_nocase(at.second.FieldName, "unfield") == 0) continue;
 			pPlayer->Acc().Stats[at.first] = ACCOUNTDATA->getInt(at.second.FieldName);
 		}
 
-		// сообщения функции меняем команду и все такое
 		GS()->ChatFollow(ClientID, "Last Login: {STR} MSK", pPlayer->Acc().LastLogin);
-		GS()->ChatFollow(ClientID, "You authed succesful!");
+		GS()->ChatFollow(ClientID, "You authed successful!");
 		GS()->ChatFollow(ClientID, "Player menu is available in votes!");
 		GS()->m_pController->DoTeamChange(pPlayer, false);
 		SJK.UD("tw_accounts_data", "LoginDate = CURRENT_TIMESTAMP WHERE ID = '%d'", UserID);
@@ -141,43 +126,21 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	GS()->AddBroadcast(ClientID, GS()->Server()->GetWorldName(GS()->GetWorldID()), 200, 500);
 	if(!FirstInitilize)
 	{
-		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
-
-		// количество не прочитаных писем
 		int CountMessageInbox = Job()->Inbox()->GetActiveInbox(ClientID);
-		if(CountMessageInbox > 0) 
+		if (CountMessageInbox > 0)
 			GS()->Chat(ClientID, "You have unread [{INT} emails]. Check your Mailbox!", &CountMessageInbox);
 
+		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		GS()->SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
 		return;
 	}
 
 	Job()->OnInitAccount(ClientID);
-	ShowDiscordCard(ClientID);
-
-	if(!pPlayer->GetItem(itHammer).Count)
+	if (!pPlayer->GetItem(itHammer).Count)
 		pPlayer->GetItem(itHammer).Add(1, 0);
-
-	// сменить мир если он не равен локальному
-	if(pPlayer->Acc().WorldID != GS()->GetWorldID())
-	{
-		GS()->Server()->ChangeWorld(ClientID, pPlayer->Acc().WorldID);
-		return;
-	}
-
-	GS()->SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
-}
-
-// Показать дискорд карту
-void AccountMainJob::ShowDiscordCard(int ClientID)
-{
-	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true);
-	if(!pPlayer) 
-		return;
 
 	const int Rank = GetRank(pPlayer->Acc().AuthID);
 	GS()->Chat(-1, "{STR} joined to Mmo server Rank #{INT}", GS()->Server()->ClientName(ClientID), &Rank);
-
 #ifdef CONF_DISCORD
 	char pMsg[256], pLoggin[64];
 	str_format(pLoggin, sizeof(pLoggin), "%s logged in Account ID %d", GS()->Server()->ClientName(ClientID), pPlayer->Acc().AuthID);
@@ -185,6 +148,14 @@ void AccountMainJob::ShowDiscordCard(int ClientID)
 		GS()->Server()->ClientName(ClientID), Rank, pPlayer->GetItemEquip(EQUIP_DISCORD));
 	GS()->Server()->SendDiscordGenerateMessage("16757248", pLoggin, pMsg);
 #endif
+
+	if(pPlayer->Acc().WorldID != GS()->GetWorldID())
+	{
+		GS()->Server()->ChangeWorld(ClientID, pPlayer->Acc().WorldID);
+		return;
+	}
+
+	GS()->SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
 }
 
 void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)
@@ -197,7 +168,7 @@ void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)
 	CSqlString<64> cDID = CSqlString<64>(pDID);
 	SJK.UD("tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", cDID.cstr(), pPlayer->Acc().AuthID);
 
-	GS()->Chat(ClientID, "Update Discord ID.");
+	GS()->Chat(ClientID, "Update DiscordID.");
 	GS()->Chat(ClientID, "Check connect status in Discord \"!mconnect\".");
 #endif
 }
@@ -216,12 +187,8 @@ int AccountMainJob::GetRank(int AuthID)
 	return -1;
 }
 
-int AccountMainJob::CheckOnlineAccount(int AuthID) const
+void AccountMainJob::OnResetClient(int ClientID)
 {
-	for(const auto& dt : AccountMainJob::Data)
-	{
-		if(dt.second.AuthID == AuthID && GS()->m_apPlayers[dt.first])
-			return dt.first;
-	}
-	return -1;
+	if (Data.find(ClientID) != Data.end())
+		Data.erase(ClientID);
 }

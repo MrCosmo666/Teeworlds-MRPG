@@ -9,17 +9,15 @@ class TileHandle
 {
 private:
 	CCharacter *m_pCharacter;
-	CCharacter *Character() const { return m_pCharacter; }
-	bool InFuction[MAX_TILES];
+	bool m_Collide[MAX_TILES];
 
 public:
 	TileHandle(CCharacter *Character);
-	~TileHandle();
 
 	// tiles
 	bool TileEnter(int IndexPlayer, int IndexNeed);
 	bool TileExit(int IndexPlayer, int IndexNeed);
-	bool BoolIndex(int Index) const { return InFuction[Index]; }
+	bool BoolIndex(int Index) const { return m_Collide[Index]; }
 
 	// vec2 and other
 	vec2 MousePos() const;

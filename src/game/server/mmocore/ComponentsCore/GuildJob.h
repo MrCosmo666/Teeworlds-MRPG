@@ -56,11 +56,11 @@ class GuildJob : public MmoComponent
 	void LoadGuildRank(int GuildID);
 
 public:
-	virtual void OnInitGlobal();
-	virtual void OnInitLocal(const char *pLocal);
-	virtual bool OnPlayerHandleTile(CCharacter* pChr, int IndexCollision);
-	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
-	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
+	virtual void OnInit();
+	virtual void OnInitWorld(const char* pWhereLocalWorld);
+	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
+	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 
 /* #########################################################################
 	BASED MEMBER

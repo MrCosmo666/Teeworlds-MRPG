@@ -19,25 +19,22 @@ class SkillJob : public MmoComponent
 		int m_SkillMaxLevel;
 		bool m_Passive;
 	};
-	typedef StructSkillInformation SkillInfo;
-
 	struct StructSkills
 	{
 		int m_SelectedEmoticion;
 		int m_SkillLevel;
 	};
-	typedef StructSkills SkillPlayer;
 
-	static std::map < int, SkillInfo > SkillData;
-	static std::map < int, std::map < int, SkillPlayer > > Skill;
+	static std::map < int, StructSkillInformation > SkillData;
+	static std::map < int, std::map < int, StructSkills > > Skill;
 
 public:
-	virtual void OnInitGlobal();
+	void OnInit() override;
 	virtual void OnInitAccount(CPlayer *pPlayer);
-	virtual void OnResetClientData(int ClientID);
-	virtual bool OnPlayerHandleTile(CCharacter* pChr, int IndexCollision);
-	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
-	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+	virtual void OnResetClient(int ClientID);
+	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
+	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
+	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 
 	int GetSkillBonus(int ClientID, int SkillID) const;
 	int GetSkillLevel(int ClientID, int SkillID) const;

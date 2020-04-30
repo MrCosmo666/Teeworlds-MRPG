@@ -10,11 +10,11 @@
 
 using namespace sqlstr;
 
-std::map < int , SkillJob::SkillInfo > SkillJob::SkillData;
-std::map < int , std::map < int , SkillJob::SkillPlayer > > SkillJob::Skill;
+std::map < int , SkillJob::StructSkillInformation > SkillJob::SkillData;
+std::map < int , std::map < int , SkillJob::StructSkills > > SkillJob::Skill;
 
 // Инициализация класса
-void SkillJob::OnInitGlobal() 
+void SkillJob::OnInit()
 { 
 	// загрузить список скиллов
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_skills_list"));
@@ -45,13 +45,13 @@ void SkillJob::OnInitAccount(CPlayer *pPlayer)
 	}		
 }
 
-void SkillJob::OnResetClientData(int ClientID)
+void SkillJob::OnResetClient(int ClientID)
 {
 	if (Skill.find(ClientID) != Skill.end())
 		Skill.erase(ClientID);
 }
 
-bool SkillJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+bool SkillJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
 	if (ReplaceMenu)
 	{
@@ -76,7 +76,7 @@ bool SkillJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Repla
 	return false;
 }
 
-bool SkillJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
+bool SkillJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 {
 	CPlayer* pPlayer = pChr->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
@@ -98,8 +98,7 @@ bool SkillJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
 	return false;
 }
 
-// парсинг голосований
-bool SkillJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool SkillJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	int ClientID = pPlayer->GetCID();
 
@@ -128,10 +127,6 @@ bool SkillJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int Vo
 	return false;
 }
 
-/* #########################################################################
-	HELPER SKILL CLASS 
-######################################################################### */
-// получить бонус скилла
 int SkillJob::GetSkillBonus(int ClientID, int SkillID) const
 {
 	if(Skill[ClientID].find(SkillID) != Skill[ClientID].end())
@@ -139,7 +134,6 @@ int SkillJob::GetSkillBonus(int ClientID, int SkillID) const
 	return 0;
 }
 
-// получить уровень скилла
 int SkillJob::GetSkillLevel(int ClientID, int SkillID) const
 {
 	if(Skill[ClientID].find(SkillID) != Skill[ClientID].end())
@@ -147,10 +141,6 @@ int SkillJob::GetSkillLevel(int ClientID, int SkillID) const
 	return 0;
 }
 
-/* #########################################################################
-	FUNCTION SKILL CLASS 
-######################################################################### */
-// показать лист всех скиллов
 void SkillJob::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
 {
 	int ClientID = pPlayer->GetCID();
@@ -164,7 +154,6 @@ void SkillJob::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
 	GS()->AV(ClientID, "null", "");
 }
 
-// показать выбранные скиллы
 void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 {
 	if(SkillData.find(SkillID) == SkillData.end()) 
@@ -198,7 +187,6 @@ void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 	GS()->AVM(ClientID, "SKILLLEARN", SkillID, HideID, "Learn {STR}", SkillData[SkillID].m_SkillName);
 }
 
-// улучшение скилла
 bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 {
 	const int ClientID = pPlayer->GetCID();
@@ -235,7 +223,6 @@ bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 	return true;
 }
 
-// использовать скилл
 bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 {
 	if(!pPlayer || !pPlayer->GetCharacter() || GetSkillLevel(pPlayer->GetCID(), SkillID) <= 0) 

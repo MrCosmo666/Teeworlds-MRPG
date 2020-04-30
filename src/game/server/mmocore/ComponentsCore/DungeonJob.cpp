@@ -72,7 +72,7 @@ void DungeonJob::ShowDungeonsList(CPlayer* pPlayer)
 	}
 }
 
-bool DungeonJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+bool DungeonJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (ReplaceMenu)
@@ -96,7 +96,7 @@ bool DungeonJob::OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool Rep
 	return false;
 }
 
-bool DungeonJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (!pPlayer->GetCharacter() || !pPlayer->GetCharacter()->IsAlive())

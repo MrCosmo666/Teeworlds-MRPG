@@ -7,7 +7,7 @@
 using namespace sqlstr;
 std::map < int , StorageJob::SturctStorage > StorageJob::Storage;
 
-void StorageJob::OnInitGlobal() 
+void StorageJob::OnInit()
 { 
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_storages", "WHERE ID > '0'"));
 	while(RES->next())
@@ -67,7 +67,7 @@ void StorageJob::OnPaymentTime()
 	}
 }
 
-bool StorageJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
+bool StorageJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 {
 	CPlayer* pPlayer = pChr->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
@@ -89,7 +89,7 @@ bool StorageJob::OnPlayerHandleTile(CCharacter* pChr, int IndexCollision)
 	return false;
 }
 
-bool StorageJob::OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool StorageJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 

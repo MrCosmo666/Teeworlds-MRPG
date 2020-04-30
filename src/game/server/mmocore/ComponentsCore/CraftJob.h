@@ -26,10 +26,10 @@ class CraftJob : public MmoComponent
 	void ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectType);
 
 public:
-	virtual void OnInitGlobal();
-	virtual bool OnPlayerHandleTile(CCharacter* pChr, int IndexCollision);
-	virtual bool OnParseVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
-	virtual bool OnPlayerHandleMainMenu(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
+	virtual void OnInit();
+	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
+	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 
 };
 
