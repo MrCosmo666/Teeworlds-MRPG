@@ -212,7 +212,6 @@ void CPlayer::Snap(int SnappingClient)
 	pClientInfo->m_MoodType = m_MoodState;
 	pClientInfo->m_Level = Acc().Level;
 	pClientInfo->m_Exp = Acc().Exp;
-	pClientInfo->m_ExpNeed = ExpNeed(Acc().Level);
 	pClientInfo->m_Health = GetHealth();
 	pClientInfo->m_HealthStart = GetStartHealth();
 	pClientInfo->m_Armor = 0;
@@ -524,7 +523,7 @@ int CPlayer::GetStartTeam()
 
 int CPlayer::ExpNeed(int Level)
 {
-	return (g_Config.m_SvExpForLevel+Level*2)*(Level*Level);
+	return (int)kurosio::computeExperience(Level);
 }
 
 int CPlayer::GetStartHealth()

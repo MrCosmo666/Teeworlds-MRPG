@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/another/kurhelper.h>
+
 #include <engine/graphics.h>
 #include <engine/textrender.h>
 #include <engine/shared/config.h>
@@ -701,16 +703,15 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 
 	// хюд
 	{
-		// Exp опыт и бар
-		str_format(aBuf, sizeof(aBuf), "Level: %d Exp: %d/%d", pClientStats->m_Level, pClientStats->m_Exp, pClientStats->m_ExpNeed);
+		int ExpNeeded = (int)kurosio::computeExperience(pClientStats->m_Level);
+		str_format(aBuf, sizeof(aBuf), "Level: %d Exp: %d/%d", pClientStats->m_Level, pClientStats->m_Exp, ExpNeeded);
 
 		CUIRect ExpBar = { 8.0f, 41.5, 100.0f, 7.0f };
 		vec4 ProgressColor(
 			(g_Config.m_HdColorProgress >> 16) / 255.0f,
 			((g_Config.m_HdColorProgress >> 8) & 0xff) / 255.0f,
 			(g_Config.m_HdColorProgress & 0xff) / 255.0f, 0.8f);
-		RenderTools()->DrawUIBar(TextRender(), ExpBar, ProgressColor, 
-			pClientStats->m_Exp, pClientStats->m_ExpNeed, aBuf, 5, 2.0f, 1.0f);
+		RenderTools()->DrawUIBar(TextRender(), ExpBar, ProgressColor, pClientStats->m_Exp, ExpNeeded, aBuf, 5, 2.0f, 1.0f);
 
 		IGraphics::CQuadItem Used[2];
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);

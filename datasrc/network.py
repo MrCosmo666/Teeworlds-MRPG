@@ -312,7 +312,6 @@ Objects = [
 
 		NetIntAny("m_Level"),
 		NetIntAny("m_Exp"),
-		NetIntAny("m_ExpNeed"),
 		
 		NetIntAny("m_Health"),
 		NetIntAny("m_HealthStart"),

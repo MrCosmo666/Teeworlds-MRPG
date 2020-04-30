@@ -2440,7 +2440,7 @@ void CGS::ClearInteractiveSub(int ClientID)
 int CGS::IncreaseCountRaid(int IncreaseCount) const
 {
 	if(IsDungeon())
-		return (int)kurosio::translate_to_procent_rest(IncreaseCount, 100);
+		return (int)kurosio::translate_to_procent_rest(IncreaseCount, 200);
 	return (int)kurosio::translate_to_procent_rest(IncreaseCount, m_RaidExp);
 }
 

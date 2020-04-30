@@ -2,15 +2,11 @@
 #define BASE_HELPER_SQL_H
 
 #include <base/threadpool.h>
-#include <base/system.h>
-#include <set>
 
 namespace kurosio
 {
-    // тоже самое что и set_pause_function только укороченно без написания лямбды
     #define kpause(microsec) set_pause_function([](){}, microsec) \
 
-    // Внимание: осторожно с этим обычно многое не доживает до обращения к этому (так как отдельный поток)
     template <typename T>
     void set_timer_detach(T header, int miliseconds) 
     {
@@ -22,7 +18,6 @@ namespace kurosio
         t.detach();
     }
 
-    // настраиваем шаблонную функцию чтобы потом использовать lambda
     template <typename T>
     void set_pause_function(T header, int miliseconds) 
     {
@@ -42,7 +37,6 @@ namespace kurosio
     template <typename T>
     inline float add_procent_to_source(T *count, float procent)
     {
-        // выводим кол-во остатка (числа от процента)
  	   	*count = ((float)*count * ((float)1.0f + (procent/100.0f)));
 		return (float)(*count);
     }
@@ -51,6 +45,12 @@ namespace kurosio
     template <typename T>
     inline float translate_to_procent(T count, T count2) { return (((float)count2 /(float)count)*(float)100.0f); }
 
+	inline int computeExperience(int Level)
+	{
+        if (Level == 1)
+            return 18;
+        return (int)(24 * pow(Level, 2)) - (24 * Level);
+	}
 
 }
 

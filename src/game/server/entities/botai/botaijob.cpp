@@ -189,13 +189,13 @@ void BotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 		CreateRandomDropItem(ClientID, RandomDrop, DropItem, CountItem, ForceDies);
 	}
 
-	// exp
-	int DamageExp = (BotJob::MobBot[SubID].Level * g_Config.m_SvExperienceMob);
-	int PowerRaid = GS()->IncreaseCountRaid(DamageExp);
-	GS()->CreateDropBonuses(m_Core.m_Pos, 1, DamageExp / 2, (1+random_int() % 2), ForceDies);
-	pPlayer->AddExp(PowerRaid);
+	int MultiplierExperience = kurosio::computeExperience(BotJob::MobBot[SubID].Level) / 300;
+	int MultiplierRaid = clamp(GS()->IncreaseCountRaid(MultiplierExperience), 1, GS()->IncreaseCountRaid(MultiplierExperience));
+	pPlayer->AddExp(MultiplierRaid);
 
-	// дать скилл поинт
+	int MultiplierDrops = clamp(MultiplierRaid / 2, 1, MultiplierRaid);
+	GS()->CreateDropBonuses(m_Core.m_Pos, 1, MultiplierDrops, (1+random_int() % 2), ForceDies);
+
 	if (random_int() % 80 == 0)
 	{
 		pPlayer->GetItem(itSkillPoint).Add(1);
