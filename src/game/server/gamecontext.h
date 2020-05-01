@@ -118,7 +118,6 @@ public:
 	{
 		char Name[32];
 		char FieldName[32];
-		int ProcentID;
 		int UpgradePrice;
 		int AtType;
 	};

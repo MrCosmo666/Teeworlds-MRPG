@@ -42,7 +42,6 @@ void ItemJob::OnInit()
 		int AttID = AttributsLoadRES->getInt("ID");
 		str_copy(CGS::AttributInfo[AttID].Name, AttributsLoadRES->getString("name").c_str(), sizeof(CGS::AttributInfo[AttID].Name));
 		str_copy(CGS::AttributInfo[AttID].FieldName, AttributsLoadRES->getString("field_name").c_str(), sizeof(CGS::AttributInfo[AttID].FieldName));
-		CGS::AttributInfo[AttID].ProcentID = AttributsLoadRES->getInt("procent_id");
 		CGS::AttributInfo[AttID].UpgradePrice = AttributsLoadRES->getInt("price");
 		CGS::AttributInfo[AttID].AtType = AttributsLoadRES->getInt("at_type");
 	}
@@ -705,7 +704,7 @@ bool ItemJob::ClassItems::EquipItem()
 	Settings ^= true;
 	pPlayer->ShowInformationStats();
 
-	if((Info().GetStatsBonus(Stats::StAmmoRegen) > 0 || Info().GetStatsBonus(Stats::StAmmoRegenQ) > 0) && pPlayer->GetCharacter())
+	if(Info().GetStatsBonus(Stats::StAmmoRegen) > 0 && pPlayer->GetCharacter())
 		pPlayer->GetCharacter()->m_AmmoRegen = pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
 
 	Save();

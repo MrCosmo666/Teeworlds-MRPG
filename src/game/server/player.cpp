@@ -722,17 +722,7 @@ int CPlayer::GetAttributeCount(int BonusID, bool Really)
 
 	// обычная передача если нет сохранения и нет процентов
 	int AttributEx = EnchantAttributes(BonusID);
-	const int ProcentID = CGS::AttributInfo[BonusID].ProcentID;
 	const bool SaveData = (str_comp_nocase(CGS::AttributInfo[BonusID].FieldName, "unfield") != 0);
-
-	// если есть процент прибавляем
-	if (ProcentID > 0)
-	{
-		const int ProcentBonus = EnchantAttributes(ProcentID);
-		const int ProcentSize = round_to_int(kurosio::translate_to_procent_rest(AttributEx, ProcentBonus));
-		AttributEx += ProcentSize;
-	}
-	// если есть локальные данные то добавляем
 	if (SaveData)
 		AttributEx += Acc().Stats[BonusID];
 

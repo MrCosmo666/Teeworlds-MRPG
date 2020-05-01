@@ -2123,7 +2123,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 			char aAttributes[128];
 			Mmo()->Item()->FormatAttributes(pPlayerItem, sizeof(aAttributes), aAttributes);
-			AVM(ClientID, "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], GetItemInfo(ItemID).GetName(pPlayer), aAttributes);
+			AVMI(ClientID, pPlayerItem.Info().GetIcon(), "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], GetItemInfo(ItemID).GetName(pPlayer), aAttributes);
 		}
 
 		// все Equip слоты предемтов
