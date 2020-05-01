@@ -9,8 +9,8 @@ MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
 
 CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 {
-	for(int i = 0 ; i < NUMTABSORT ; i ++ )
-		m_SortTabs[ i ] = 0;
+	for(short & SortTab : m_SortTabs)
+		SortTab = 0;
 
 	m_PlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed();
 	m_PlayerTick[TickState::CheckClient] = Server()->Tick();
@@ -36,7 +36,7 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 CPlayer::~CPlayer()
 {
 	delete m_pCharacter;
-	m_pCharacter = NULL;
+	m_pCharacter = nullptr;
 }
 
 /* #########################################################################
@@ -79,7 +79,7 @@ void CPlayer::Tick()
 	if (m_pCharacter && !m_pCharacter->IsAlive())
 	{
 		delete m_pCharacter;
-		m_pCharacter = NULL;
+		m_pCharacter = nullptr;
 	}
 
 	if (m_pCharacter)
@@ -249,7 +249,7 @@ CCharacter *CPlayer::GetCharacter()
 {
 	if(m_pCharacter && m_pCharacter->IsAlive())
 		return m_pCharacter;
-	return 0;
+	return nullptr;
 }
 
 // Спавн игрока
@@ -286,7 +286,7 @@ void CPlayer::KillCharacter(int Weapon)
 	{
 		m_pCharacter->Die(m_ClientID, Weapon);
 		delete m_pCharacter;
-		m_pCharacter = NULL;
+		m_pCharacter = nullptr;
 	}
 }
 
@@ -854,7 +854,7 @@ void CPlayer::ClearTalking()
 	m_TalkingNPC.m_TalkedID = -1;
 	m_TalkingNPC.m_TalkedProgress = 0;
 	m_TalkingNPC.m_FreezedProgress = false;
-	GS()->SendTalkText(m_ClientID, -1, 0, "\0");
+	GS()->SendTalkText(m_ClientID, -1, false, "\0");
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 

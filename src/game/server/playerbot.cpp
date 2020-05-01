@@ -23,7 +23,7 @@ CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int Spaw
 CPlayerBot::~CPlayerBot() 
 { 
 	delete m_pCharacter;
-	m_pCharacter = NULL;
+	m_pCharacter = nullptr;
 }
 
 void CPlayerBot::Tick()
@@ -36,7 +36,7 @@ void CPlayerBot::Tick()
 	if(m_pCharacter && !m_pCharacter->IsAlive())
 	{
 		delete m_pCharacter;
-		m_pCharacter = NULL;
+		m_pCharacter = nullptr;
 	}
 
 	if(m_pCharacter)

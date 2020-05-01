@@ -43,15 +43,15 @@ enum
 // Конструктор сервера
 void CGS::Construct(int Resetting)
 {
-	for (int i = 0; i < MAX_CLIENTS; i++)
-		m_apPlayers[i] = 0;
+	for (auto & apPlayer : m_apPlayers)
+		apPlayer = nullptr;
 
-	m_Resetting = 0;
-	m_pServer = 0;
+	m_Resetting = false;
+	m_pServer = nullptr;
 	m_pController = 0;
 
 	if(Resetting==NO_RESET)
-		pMmoController = 0;
+		pMmoController = nullptr;
 }
 
 // Конструктор сервера
@@ -69,8 +69,8 @@ CGS::CGS()
 // Дискруктор сервера
 CGS::~CGS()
 {
-	for(int i = 0; i < MAX_CLIENTS; i++)
-		delete m_apPlayers[i];
+	for(auto & apPlayer : m_apPlayers)
+		delete apPlayer;
 
 	if(pMmoController)  
 		delete pMmoController;
@@ -85,13 +85,13 @@ void CGS::Clear()
 	mem_zero(this, sizeof(*this));
 	new (this) CGS(RESET);
 
-	for(int i = 0; i < MAX_PLAYERS; i++)
+	for(auto & BroadcastState : m_BroadcastStates)
 	{
-		m_BroadcastStates[i].m_NoChangeTick = 0;
-		m_BroadcastStates[i].m_LifeSpanTick = 0;
-		m_BroadcastStates[i].m_Priority = 0;
-		m_BroadcastStates[i].m_PrevMessage[0] = 0;
-		m_BroadcastStates[i].m_NextMessage[0] = 0;
+		BroadcastState.m_NoChangeTick = 0;
+		BroadcastState.m_LifeSpanTick = 0;
+		BroadcastState.m_Priority = 0;
+		BroadcastState.m_PrevMessage[0] = 0;
+		BroadcastState.m_NextMessage[0] = 0;
 	}
 	m_Tuning = Tuning;
 }
@@ -103,7 +103,7 @@ void CGS::Clear()
 class CCharacter *CGS::GetPlayerChar(int ClientID)
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || !m_apPlayers[ClientID])
-		return 0;
+		return nullptr;
 	return m_apPlayers[ClientID]->GetCharacter();
 }
 
@@ -118,11 +118,11 @@ CPlayer *CGS::GetPlayer(int ClientID, bool CheckAuthed, bool CheckCharacter)
 		else if((CheckAuthed && pPlayer->IsAuthed()) || !CheckAuthed)
 		{
 			if(CheckCharacter && !pPlayer->GetCharacter())
-				return NULL;
+				return nullptr;
 			return pPlayer;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 // Level String by Matodor (Progress Bar) создает что то рода прогресс бара
@@ -976,7 +976,7 @@ void CGS::OnInit(int WorldID)
 	m_pController->RegisterChatCommands(CommandManager());
 
 	// создаем контроллер
-	m_Layers.Init(Kernel(), NULL, WorldID);
+	m_Layers.Init(Kernel(), nullptr, WorldID);
 	m_Collision.Init(&m_Layers);
 	pMmoController = new MmoController(this);
 	pMmoController->LoadLogicWorld();
@@ -1017,10 +1017,10 @@ void CGS::OnConsoleInit()
 void CGS::OnShutdown()
 {
 	delete m_pController;
-	m_pController = 0;
+	m_pController = nullptr;
 
 	delete pMmoController;
-	pMmoController = 0;
+	pMmoController = nullptr;
 	Clear();
 }
 
@@ -1078,10 +1078,10 @@ void CGS::OnSnap(int ClientID)
 	m_World.Snap(ClientID);
 	m_pController->Snap(ClientID);
 	m_Events.Snap(ClientID);
-	for(int i = 0; i < MAX_CLIENTS; i++)
+	for(auto & apPlayer : m_apPlayers)
 	{
-		if(m_apPlayers[i])
-			m_apPlayers[i]->Snap(ClientID);
+		if(apPlayer)
+			apPlayer->Snap(ClientID);
 	}
 }
 
@@ -1121,7 +1121,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			// trim right and set maximum length to 128 utf8-characters
 			int Length = 0;
 			const char *p = pMsg->m_pMessage;
-			const char *pEnd = 0;
+			const char *pEnd = nullptr;
 			while(*p)
 			{
 				const char *pStrOld = p;
@@ -1132,9 +1132,9 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					(Code < 0x205F || Code > 0x2064) && (Code < 0x206A || Code > 0x206F) && (Code < 0xFE00 || Code > 0xFE0F) &&
 					Code != 0xFEFF && (Code < 0xFFF9 || Code > 0xFFFC))
 				{
-					pEnd = 0;
+					pEnd = nullptr;
 				}
-				else if(pEnd == 0)
+				else if(pEnd == nullptr)
 					pEnd = pStrOld;
 
 				if(++Length >= 127)
@@ -1143,7 +1143,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					break;
 				}
 			}
-			if(pEnd != 0)
+			if(pEnd != nullptr)
 				*(const_cast<char *>(pEnd)) = 0;
 
 			// drop empty and autocreated spam messages (more than 20 characters per second)
@@ -1463,7 +1463,7 @@ void CGS::OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld)
 
 	// очистка данных
 	delete m_apPlayers[ClientID];
-	m_apPlayers[ClientID] = NULL;
+	m_apPlayers[ClientID] = nullptr;
 
 	if (m_apPlayers[ClientID])
 		dbg_msg("test", "yes i security");
@@ -1511,7 +1511,7 @@ void CGS::ChangeWorld(int ClientID)
 	if (m_apPlayers[ClientID])
 	{
 		delete m_apPlayers[ClientID];
-		m_apPlayers[ClientID] = NULL;
+		m_apPlayers[ClientID] = nullptr;
 	}
 	int savecidmem = ClientID+m_WorldID*MAX_CLIENTS;
 	m_apPlayers[ClientID] = new(savecidmem) CPlayer(this, ClientID);
@@ -2191,7 +2191,7 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 		if(at.second.UpgradePrice < 10)
 		{
 			int SumingAt = pPlayer->GetAttributeCount(at.first), RealSum = pPlayer->GetAttributeCount(at.first, true);
-			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} [+{INT}] - {STR}", &SumingAt, &RealSum, AtributeName(at.first));
+			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} (+{INT}) - {STR}", &SumingAt, &RealSum, AtributeName(at.first));
 			continue;
 		}
 
@@ -2326,7 +2326,7 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 	{
 		dbg_msg("test", "я удаляю бота для квеста %d", QuestID);
 		delete m_apPlayers[QuestBotClientID];
-		m_apPlayers[QuestBotClientID] = NULL;
+		m_apPlayers[QuestBotClientID] = nullptr;
 	}
 }
 
@@ -2359,7 +2359,7 @@ void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop, vec2 For
 void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant, vec2 Force)
 {
 	ItemJob::ItemPlayer DropItem;
-	DropItem.SetBasic(NULL, ItemID);
+	DropItem.SetBasic(nullptr, ItemID);
 	DropItem.Count = Count;
 	DropItem.Enchant = Enchant;
 
@@ -2389,7 +2389,7 @@ bool CGS::TakeItemCharacter(int ClientID)
 	if(!pPlayer || !pPlayer->GetCharacter() /*|| pChar->m_ReloadTimer*/)
 		return false;
 
-	CDropingItem *pDrop = (CDropingItem*)m_World.ClosestEntity(pPlayer->GetCharacter()->m_Core.m_Pos, 64, CGameWorld::ENTTYPE_DROPITEM, 0);
+	CDropingItem *pDrop = (CDropingItem*)m_World.ClosestEntity(pPlayer->GetCharacter()->m_Core.m_Pos, 64, CGameWorld::ENTTYPE_DROPITEM, nullptr);
 	if(pDrop) { return pDrop->TakeItem(ClientID);}
 	return false;
 }

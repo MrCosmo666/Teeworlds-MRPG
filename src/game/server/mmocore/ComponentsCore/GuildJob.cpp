@@ -848,7 +848,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 
 	GS()->AV(ClientID, "null", "");
 	pPlayer->m_Colored = GOLDEN_COLOR;
-	GS()->AVL(ClientID, "null", "₪ Players list on guild");
+	GS()->AVL(ClientID, "null", "Players list on guild");
 	ShowGuildPlayers(pPlayer);
 	GS()->AV(ClientID, "null", "");
 

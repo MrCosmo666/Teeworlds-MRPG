@@ -91,8 +91,7 @@ public:
 		int ParsingSaveInt;
 		char ParsingType[32];
 	};
-	typedef std::map < int , StructParsing > InteractiveType;
-	static InteractiveType Interactive;
+	static std::map < int, StructParsing > Interactive;
 	// - - - - - - - - - - - -
 	struct StructInteractiveSub
 	{
@@ -107,12 +106,10 @@ public:
 		char RankName[32];
 		char GuildName[32];
 	};
-	typedef std::map < int , StructInteractiveSub > InteractiveSubType;
-	static InteractiveSubType InteractiveSub;
+	static std::map < int, StructInteractiveSub > InteractiveSub;
 
 	// - - - - - - - - - - - -
-	typedef std::map < int , std::map < std::string , int > > EffectType;
-	static EffectType Effects;
+	static std::map < int, std::map < std::string, int > > Effects;
 	// - - - - - - - - - - - -
 	struct StructAttribut
 	{
@@ -121,8 +118,7 @@ public:
 		int UpgradePrice;
 		int AtType;
 	};
-	typedef std::map < int , StructAttribut > AttributType;
-	static AttributType AttributInfo;
+	static std::map < int, StructAttribut > AttributInfo;
 
 	/* #########################################################################
 		HELPER PLAYER FUNCTION 
@@ -216,35 +212,34 @@ public:
 	/* #########################################################################
 		ENGINE GAMECONTEXT 
 	######################################################################### */	
-	virtual void OnInit(int WorldID);
-	virtual void OnConsoleInit();
-	virtual void OnShutdown();
+	void OnInit(int WorldID) override;
+	void OnConsoleInit() override;
+	void OnShutdown() override;
 
-	virtual void OnTick();
+	void OnTick() override;
 	void OnTickLocalWorld();
-	virtual void OnPreSnap();
-	virtual void OnSnap(int ClientID);
-	virtual void OnPostSnap();
+	void OnPreSnap() override;
+	void OnSnap(int ClientID) override;
+	void OnPostSnap() override;
 	
-	virtual void OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID);
-	virtual void OnClientConnected(int ClientID);
+	void OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID) override;
+	void OnClientConnected(int ClientID) override;
+	void ChangeWorld(int ClientID) override;
+	void UpdateQuestsBot(int QuestID, int Step) override;
 
-	virtual void OnClientEnter(int ClientID);
-	virtual void OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld = false);
-	virtual void OnClientDirectInput(int ClientID, void *pInput);
-	virtual void OnClientPredictedInput(int ClientID, void *pInput);
-	virtual void ChangeWorld(int ClientID);
+	void OnClientEnter(int ClientID) override;
+	void OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld = false) override;
+	void OnClientDirectInput(int ClientID, void *pInput) override;
+	void OnClientPredictedInput(int ClientID, void *pInput) override;
+	bool IsClientReady(int ClientID) const override;
+	bool IsClientPlayer(int ClientID) const override;
 
-	virtual bool IsClientReady(int ClientID) const;
-	virtual bool IsClientPlayer(int ClientID) const;
+	const char *GameType() const override;
+	const char *Version() const override;
+	const char *NetVersion() const override;
 
-	bool CheckClient(int ClientID) const;
-	virtual const char *GameType() const;
-	virtual const char *Version() const;
-	virtual const char *NetVersion() const;
-
-	virtual void ClearClientData(int ClientID);
-	virtual int GetRank(int AuthID);
+	void ClearClientData(int ClientID) override;
+	int GetRank(int AuthID) override;
 
 	/* #########################################################################
 		CONSOLE GAMECONTEXT 
@@ -298,7 +293,6 @@ public:
 	######################################################################### */
 	void SendInformationBot(CPlayerBot* pPlayer);
 	void CreateBot(short SpawnPoint, int BotID, int SubID);
-	virtual void UpdateQuestsBot(int QuestID, int Step);
 	void CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, int WorldID);
 	void CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop = 1, vec2 Force = vec2(0.0f, 0.0f));
 	void CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant = 0, vec2 Force = vec2(0.0f, 0.0f));
@@ -313,6 +307,7 @@ public:
 	void ChangeEquipSkin(int ClientID, int ItemID);
 	void ClearInteractiveSub(int ClientID);
 
+	bool CheckClient(int ClientID) const;
 	int GetWorldID() const { return m_WorldID; }
 	int DungeonID() const { return m_DungeonID; }
 	bool IsDungeon() const { return (m_DungeonID > 0); }
