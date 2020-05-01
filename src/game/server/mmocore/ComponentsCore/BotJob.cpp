@@ -269,15 +269,17 @@ bool BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 
 	char reformTalkedText[512];
+	int BotID = NpcBot[MobID].BotID;
 	int sizeTalking = NpcBot[MobID].m_Talk.size();
 	if (str_comp_nocase(pText, "empty") != 0)
 	{
-		str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + Progress, sizeTalking, pText);
+		pPlayer->FormatTextQuest(BotID, pText);
+		str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion 1 of 1 .. ) - %s", pPlayer->FormatedTalkedText());
 		GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID, 0, reformTalkedText, 0, EMOTE_BLINK);
+		pPlayer->ClearFormatQuestText();
 		return true;
 	}
 
-	int BotID = NpcBot[MobID].BotID;
 	pPlayer->FormatTextQuest(BotID, NpcBot[MobID].m_Talk.at(Progress).m_TalkingText);
 	str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + Progress, sizeTalking, pPlayer->FormatedTalkedText());
 	pPlayer->ClearFormatQuestText();
@@ -338,4 +340,17 @@ void BotJob::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 
 	// mmo clients
 	GS()->Mmo()->Quest()->ShowQuestRequired(pPlayer, BotJob::QuestBot[MobID], "\0");
+}
+
+bool BotJob::IsGiveNPCQuest(int MobID) const
+{
+	if (!IsNpcBotValid(MobID))
+		return false;
+		
+	for (const auto& npc : NpcBot[MobID].m_Talk)
+	{
+		if (npc.m_GivingQuest > 0)
+			return true;
+	}
+	return false;
 }

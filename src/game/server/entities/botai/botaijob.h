@@ -59,6 +59,7 @@ private:
 
 	// test
 	vec2 GetHookPos(vec2 Position);
+
 };
 
 #endif

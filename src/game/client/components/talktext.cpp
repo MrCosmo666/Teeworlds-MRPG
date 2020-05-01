@@ -104,8 +104,9 @@ void CTalkText::OnRender()
 			RenderTalking.m_Size = 128.0f;
 			RenderTools()->RenderTee(CAnimState::GetIdle(), &RenderTalking, m_PlayerTalked ? EMOTE_NORMAL : m_TalkedEmote, vec2(-1.0f, 0.4f), vec2(Width / 1.35f, Height / 1.85f));
 
-			float sizeLize = str_length(m_pClient->m_aClients[TalkClientID].m_aName);
-			TextRender()->Text(0x0, (Width / (1.45f + sizeLize / 64.0f)), Height / 1.97f, 32.0f, m_pClient->m_aClients[TalkClientID].m_aName, -1.0f);
+			const char* pTalkedNick = m_Stranger ? "Stranger" : m_pClient->m_aClients[TalkClientID].m_aName;
+			float sizeLize = str_length(pTalkedNick);
+			TextRender()->Text(0x0, (Width / (1.45f + sizeLize / 64.0f)), Height / 1.97f, 32.0f, pTalkedNick, -1.0f);
 		}
 
 		// skin
@@ -147,6 +148,7 @@ void CTalkText::OnMessage(int MsgType, void *pRawMsg)
 		m_TalkedEmote = pMsg->m_TalkedEmote;
 		m_PlayerTalked = pMsg->m_PlayerTalked;
 		m_Style = pMsg->m_Style;
+		m_Stranger = (bool)(str_replace(m_TalkText, "[Stranger]", "\0") > 0);
 	}
 	else if (MsgType == NETMSGTYPE_SV_CLEARTALKTEXT)
 	{

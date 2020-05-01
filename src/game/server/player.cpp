@@ -788,16 +788,22 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			return;
 		}
 
-		int GivingQuestID = BotJob::NpcBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
+		int GivingQuestID = GS()->Mmo()->BotsData()->IsGiveNPCQuest(MobID);
+		if (GS()->Mmo()->Quest()->GetState(m_ClientID, GivingQuestID) >= QuestState::QUEST_ACCEPT)
+		{
+			const char* pTalking[2] = { "[Player], do you have any questions? I'm sorry I can't help you.", 
+										"What a beautiful [Time], we already talked. I don't have anything for you [Player]." };
+			GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID, pTalking[random_int()%2]);
+			m_TalkingNPC.m_TalkedProgress = 999;
+			return;
+		}
+
+		GivingQuestID = BotJob::NpcBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
 		if (GivingQuestID >= 1)
 		{
 			if (!m_TalkingNPC.m_FreezedProgress)
 			{
-				if (GS()->Mmo()->Quest()->GetState(m_ClientID, GivingQuestID) >= QuestState::QUEST_ACCEPT)
-					GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID, "I'm sorry, don't have more new stories for you!");
-				else
-					GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
-
+				GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
 				m_TalkingNPC.m_FreezedProgress = true;
 				return;
 			}

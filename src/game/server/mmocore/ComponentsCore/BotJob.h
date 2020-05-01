@@ -115,6 +115,7 @@ public:
 	bool TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char *pText = "empty");
 	bool TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID);
 	void ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress);
+	bool IsGiveNPCQuest(int MobID) const;
 
 	// ------------------ CHECK VALID DATA --------------------
 	// --------------------------------------------------------

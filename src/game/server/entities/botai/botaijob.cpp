@@ -277,7 +277,7 @@ void BotAI::EngineNPC()
 			!GS()->Collision()->FastIntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0))
 		{
 			if(!(BotJob::NpcBot[SubBotID].m_Talk).empty())
-				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "You can talk to this NPC using an [attack hammer]");
+				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Start dialog with NPC [attack hammer]");
 
 			m_Input.m_TargetX = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
 			m_Input.m_TargetY = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
@@ -311,7 +311,7 @@ void BotAI::EngineQuestMob()
 			&& GetPlayer()->CheckQuestSnapPlayer(i, false))
 		{
 			if (!(BotJob::QuestBot[SubBotID].m_Talk).empty())
-				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "You can talk to this NPC using an [attack hammer]");
+				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Start dialog with NPC [attack hammer]");
 
 			m_Input.m_TargetX = round_to_int(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
 			m_Input.m_TargetY = round_to_int(pFind->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);

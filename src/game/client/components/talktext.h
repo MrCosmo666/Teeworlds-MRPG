@@ -11,6 +11,7 @@ class CTalkText : public CComponent
 	int m_Style;
 	int m_TalkedEmote;
 	bool m_PlayerTalked;
+	bool m_Stranger;
 	char m_TalkText[512];
 
 	void ClientPressed();
@@ -18,7 +19,7 @@ class CTalkText : public CComponent
 public:
 	void Clear();
 	bool IsActive();
-	const char *GetTalkText() const { return m_TalkText; }
+	const char* GetTalkText() const { return m_TalkText; }
 
 	virtual void OnRender();
 	virtual void OnStateChange(int NewState, int OldState);
