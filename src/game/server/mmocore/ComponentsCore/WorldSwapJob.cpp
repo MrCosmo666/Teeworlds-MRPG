@@ -93,7 +93,7 @@ void WorldSwapJob::CheckQuestingOpened(CPlayer* pPlayer, int QuestID)
 	for (const auto& sw : WorldSwap)
 	{
 		if (QuestID == sw.second.OpenQuestID)
-			GS()->Chat(ClientID, "You opened access dungeon ({STR})!", GS()->Server()->GetWorldName(sw.second.TwoWorldID));
+			GS()->Chat(-1, "{STR} opened access dungeon ({STR})!", GS()->Server()->ClientName(ClientID), GS()->Server()->GetWorldName(sw.second.TwoWorldID));
 	}
 }
 
