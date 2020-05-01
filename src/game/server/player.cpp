@@ -497,13 +497,11 @@ int CPlayer::EnchantAttributes(int BonusID) const
 		if(it.second.Count <= 0 || it.second.Settings <= 0) 
 			continue;
 		
-		for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
+		int BonusCount = it.second.Info().GetStatsBonus(BonusID);
+		if (BonusCount > 0)
 		{
-			if (it.second.Info().Attribute[i] != BonusID)
-				continue;
-
-			int BonusCount = it.second.Info().AttributeCount[i] * (it.second.Enchant + 1);
-			BonusAttributes += BonusCount;
+			int PlayerBonusCount = BonusCount * (it.second.Enchant + 1);
+			BonusAttributes += PlayerBonusCount;
 		}
 	}
 	return BonusAttributes;
