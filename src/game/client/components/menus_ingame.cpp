@@ -603,23 +603,23 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 			continue; // no match found
 
 		CListboxItem Item = UiDoListboxNextItem(&s_ListBoxState, pOption);
-		float FontSize = Item.m_Rect.h * ms_FontmodHeight * 0.8f;
+		float OldFontSize = Item.m_Rect.h * ms_FontmodHeight * 0.8f;
+		float FontSize = OldFontSize;
 
 		if (m_pClient->MmoServer())
 		{
-			float Alpha = UI()->MouseInside(&Item.m_Rect) ? 0.07f : 0.05f;
-			vec4 ColorTable = vec4((float)pOption->m_Colored[0] / 10, (float)pOption->m_Colored[1] / 10, (float)pOption->m_Colored[2] / 10, Alpha);
 			int SizeColors = max(pOption->m_Colored[0], pOption->m_Colored[1], pOption->m_Colored[2]);
-			float LengthColors = Item.m_Rect.h * ms_FontmodHeight;
-			bool MainMenu = (bool)(SizeColors > 15);
-
-			FontSize = (MainMenu ? LengthColors * 0.8f : LengthColors * 0.71f);
-			RenderTools()->DrawUIRect(&Item.m_Rect, ColorTable, CUI::CORNER_ALL, 0.0f);
-
-			if (!MainMenu)
-				TextRender()->TextColor(1, 1, 1, 0.85f);
+			if (SizeColors > 15)
+				TextRender()->TextColor(1, 1, 1, 0.90f);
 			else
-				TextRender()->TextColor(1, 1, 1, 1);
+			{
+				FontSize = Item.m_Rect.h * ms_FontmodHeight * 0.66f;
+				TextRender()->TextColor(1, 1, 1, 0.80f);
+			}
+
+			float Alpha = UI()->MouseInside(&Item.m_Rect) ? 0.07f : 0.05f;
+			vec4 ColorTable = vec4((float)pOption->m_Colored[0] / 10.0f, (float)pOption->m_Colored[1] / 10.0f, (float)pOption->m_Colored[2] / 10.0f, Alpha);
+			RenderTools()->DrawUIRect(&Item.m_Rect, ColorTable, CUI::CORNER_ALL, 0.0f);
 		}
 
 		if(Item.m_Visible)
@@ -627,8 +627,11 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 			bool Icon = DoItemIcon(pOption->m_Icon, { Item.m_Rect.x + 2.0f, Item.m_Rect.y, Item.m_Rect.w, Item.m_Rect.h, }, 21.0f);
 			Item.m_Rect.VMargin((Icon ? 25.0f : 5.0f), &Item.m_Rect);
 			Item.m_Rect.y += 2.0f;
-			UI()->DoLabel(&Item.m_Rect, pOption->m_aDescription, FontSize, CUI::ALIGN_LEFT);
 
+			if (FontSize != OldFontSize)
+				Item.m_Rect.y += 0.3;
+
+			UI()->DoLabel(&Item.m_Rect, pOption->m_aDescription, FontSize, CUI::ALIGN_LEFT);
 		}
 	}
 

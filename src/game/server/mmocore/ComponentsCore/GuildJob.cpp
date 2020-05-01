@@ -211,7 +211,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		if (UpgradeGuild(GuildID, UpgradeID))
 		{
 			int GuildCount = Guild[GuildID].m_Upgrades[UpgradeID] - 1;
-			GS()->Chat(ClientID, "Added ({INT}+1) {STR} to {STR}!", &GuildCount, UpgradeNames(UpgradeID).c_str(), Guild[GuildID].m_Name);
+			GS()->Chat(ClientID, "Added ({INT} | +1) {STR} to {STR}!", &GuildCount, UpgradeNames(UpgradeID).c_str(), Guild[GuildID].m_Name);
 			GS()->VResetVotes(ClientID, MenuList::MENU_GUILD);
 		}
 		else 
@@ -710,12 +710,12 @@ void GuildJob::ShowDecorationList(CPlayer* pPlayer)
 	int ClientID = pPlayer->GetCID();
 	int GuildID = pPlayer->Acc().GuildID;
 	int HouseID = GetGuildHouseID(GuildID);
-	for (auto deco = m_DecorationHouse.begin(); deco != m_DecorationHouse.end(); deco++)
+	for (auto & deco : m_DecorationHouse)
 	{
-		if (deco->second && deco->second->m_HouseID == HouseID)
+		if (deco.second && deco.second->m_HouseID == HouseID)
 		{
-			GS()->AVD(ClientID, "DECOGUILDDELETE", deco->first, deco->second->m_DecoID, 1, "{STR}:{INT} back to the inventory",
-				GS()->GetItemInfo(deco->second->m_DecoID).GetName(pPlayer), &deco->first);
+			GS()->AVD(ClientID, "DECOGUILDDELETE", deco.first, deco.second->m_DecoID, 1, "{STR}:{INT} back to the inventory",
+				GS()->GetItemInfo(deco.second->m_DecoID).GetName(pPlayer), &deco.first);
 		}
 	}
 }
