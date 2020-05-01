@@ -629,7 +629,7 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 			Item.m_Rect.y += 2.0f;
 
 			if (FontSize != OldFontSize)
-				Item.m_Rect.y += 0.3;
+				Item.m_Rect.y += 0.5;
 
 			UI()->DoLabel(&Item.m_Rect, pOption->m_aDescription, FontSize, CUI::ALIGN_LEFT);
 		}
