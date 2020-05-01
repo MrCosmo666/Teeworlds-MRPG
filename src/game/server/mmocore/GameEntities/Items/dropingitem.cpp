@@ -47,7 +47,7 @@ bool CDropingItem::TakeItem(int ClientID)
 
 	// размен зачарованных предметов
 	ItemJob::ItemPlayer &PlDropItem = pPlayer->GetItem(m_DropItem.GetID());
-	if(PlDropItem.Count > 0 && PlDropItem.Info().BonusCount > 0)
+	if(PlDropItem.Count > 0 && PlDropItem.Info().StatCount > 0)
 	{
 		tl_swap(PlDropItem, m_DropItem);
 		GS()->Chat(ClientID, "You now own [{STR}+{INT}]", PlDropItem.Info().GetName(pPlayer), &PlDropItem.Enchant);
@@ -120,7 +120,7 @@ void CDropingItem::Tick()
 
 	// если не зачарованный предмет
 	const ItemJob::ItemPlayer PlDropItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
-	if(PlDropItem.Info().BonusCount <= 0)
+	if(PlDropItem.Info().StatCount <= 0)
 	{
 		GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}x{INT} : {STR}",
 			m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.Count, (m_ForID != -1 ? Server()->ClientName(m_ForID) : "Nope"));

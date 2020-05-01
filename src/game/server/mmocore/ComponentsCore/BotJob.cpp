@@ -266,7 +266,7 @@ bool BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 	}
 
 	if (!GS()->CheckClient(ClientID))
-		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 50, "Press 'F4' to continue the dialog!");
+		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 
 	char reformTalkedText[512];
 	int sizeTalking = NpcBot[MobID].m_Talk.size();

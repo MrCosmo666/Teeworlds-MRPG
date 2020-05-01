@@ -94,7 +94,10 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 		{
 			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR} {STR} :: {INT} gold",
 				(pPlayer->GetItem(cr.second.GetItemID).Count ? "✔ " : "\0"), InfoGetItem.GetName(pPlayer), &LastPrice);
-			GS()->AVM(ClientID, "null", NOPE, HideID, "Astro stats +{INT} {STR}", &InfoGetItem.BonusCount, pPlayer->AtributeName(InfoGetItem.BonusID));
+
+			char aAttributes[128];
+			Job()->Item()->FormatAttributes(InfoGetItem, 0, sizeof(aAttributes), aAttributes);
+			GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 		}
 		else
 		{

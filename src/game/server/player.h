@@ -130,7 +130,6 @@ public:
 	######################################################################### */
 	void ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp);
 	bool Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade, const char *UpgradeName);
-	const char *AtributeName(int BonusID) const;
 
 	/* #########################################################################
 		FUNCTIONS PLAYER ACCOUNT 
@@ -166,10 +165,7 @@ public:
 	######################################################################### */
 	ItemJob::ItemPlayer &GetItem(int ItemID);
 
-	AccountMainJob::StructData &Acc() 
-	{ 
-		return AccountMainJob::Data[m_ClientID]; 
-	};
+	AccountMainJob::StructData& Acc() { return AccountMainJob::Data[m_ClientID]; };
 	int GetLevelDisciple(int Class);
 
 	// разговоры с нпс функции

@@ -1929,7 +1929,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		// меню информации
 		AVH(ClientID, TAB_INFORMATION, BLUE_COLOR, "# SUB MENU INFORMATION");
 		AVM(ClientID, "MENU", MenuList::MENU_GUIDEDROP, TAB_INFORMATION, "♣ Loots, mobs on your zone");
-		AVM(ClientID, "MENU", MenuList::MENU_TOP_LIST, TAB_INFORMATION, "♛ Top list");
+		AVM(ClientID, "MENU", MenuList::MENU_TOP_LIST, TAB_INFORMATION, "♛ Top guilds and players");
 		AV(ClientID, "null", "");
 
 		// чекаем местонахождение
@@ -2006,7 +2006,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			if(at.second.AtType != AtributType::AtDps || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_DPS, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_DPS, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], AtributeName(at.first));
 		}
 		AV(ClientID, "null", "");
 
@@ -2018,7 +2018,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			if(at.second.AtType != AtributType::AtTank || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_TANK, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_TANK, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], AtributeName(at.first));
 		}
 		AV(ClientID, "null", "");
 
@@ -2030,7 +2030,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			if(at.second.AtType != AtributType::AtHealer || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_HEALER, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_HEALER, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], AtributeName(at.first));
 		}
 		AV(ClientID, "null", "");
 
@@ -2041,7 +2041,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			if(at.second.AtType != AtributType::AtWeapon || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_WEAPON, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], pPlayer->AtributeName(at.first));
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_WEAPON, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], AtributeName(at.first));
 		}
 
 		AV(ClientID, "null", ""), 
@@ -2114,15 +2114,18 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		for(int i = EQUIP_WINGS; i < NUM_EQUIPS; i++) 
 		{
 			const int ItemID = pPlayer->GetItemEquip(i);
-			if(ItemID <= 0 || !pPlayer->GetItem(ItemID).Settings) 
+			ItemJob::ItemPlayer& pPlayerItem = pPlayer->GetItem(ItemID);
+			if(ItemID <= 0 || !pPlayerItem.Settings)
 			{
 				AVM(ClientID, "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} Not equipped", pType[i]);
 				continue;
 			}
 
-			const int BonusItem = GetItemInfo(ItemID).BonusID;
-			int BonusCount = GetItemInfo(ItemID).BonusCount*(pPlayer->GetItem(ItemID).Enchant+1);
-			AVM(ClientID, "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR} +{INT}", pType[i], GetItemInfo(ItemID).GetName(pPlayer), pPlayer->AtributeName(BonusItem), &BonusCount);
+			char aAttributes[128];
+			Mmo()->Item()->FormatAttributes(pPlayerItem, sizeof(aAttributes), aAttributes);
+			const int BonusItem = GetItemInfo(ItemID).Stat[0];
+			int BonusCount = GetItemInfo(ItemID).StatCount[0] * (pPlayer->GetItem(ItemID).Enchant + 1);
+			AVM(ClientID, "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], GetItemInfo(ItemID).GetName(pPlayer), aAttributes);
 		}
 
 		// все Equip слоты предемтов
@@ -2190,13 +2193,13 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 		if(at.second.UpgradePrice < 10)
 		{
 			int SumingAt = pPlayer->GetAttributeCount(at.first), RealSum = pPlayer->GetAttributeCount(at.first, true);
-			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} [+{INT}] - {STR}", &SumingAt, &RealSum, pPlayer->AtributeName(at.first));
+			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} [+{INT}] - {STR}", &SumingAt, &RealSum, AtributeName(at.first));
 			continue;
 		}
 
 		// если апгрейды дорогие они имеют 1 статистики
 		int RealSum = pPlayer->GetAttributeCount(at.first);
-		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "[+{INT}] - {STR}", &RealSum, pPlayer->AtributeName(at.first));
+		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "[+{INT}] - {STR}", &RealSum, AtributeName(at.first));
 	}
 
 	AVM(ClientID, "null", NOPE, NOPE, "!!! Player Upgrade Point: [{INT}P] !!!", &pPlayer->Acc().Upgrade);
@@ -2484,6 +2487,17 @@ void CGS::LoadZonePVP()
 			CountMobs++;
 	}
 	m_AllowedPVP = (bool)(CountMobs >= 5);
+}
+
+const char* CGS::AtributeName(int BonusID) const
+{
+	for (const auto& at : CGS::AttributInfo)
+	{
+		if (at.first != BonusID)
+			continue;
+		return at.second.Name;
+	}
+	return "Has no stats";
 }
 
 IGameServer *CreateGameServer() { return new CGS; }

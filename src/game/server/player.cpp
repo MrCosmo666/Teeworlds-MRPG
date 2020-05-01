@@ -384,16 +384,6 @@ bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int Maxi
 }
 
 // Именна бонусов статистик
-const char *CPlayer::AtributeName(int BonusID) const
-{
-	for(const auto& at : CGS::AttributInfo)
-	{
-		if(at.first != BonusID) 
-			continue;
-		return at.second.Name;
-	}
-	return "Has no stats";
-}
 
 /* #########################################################################
 	FUNCTIONS PLAYER ACCOUNT 
@@ -504,11 +494,17 @@ int CPlayer::EnchantAttributes(int BonusID) const
 	int BonusAttributes = 0;
 	for (const auto& it : ItemJob::Items[m_ClientID])
 	{
-		if(it.second.Info().BonusID != BonusID || it.second.Count <= 0 || it.second.Settings <= 0) continue;
+		if(it.second.Count <= 0 || it.second.Settings <= 0) 
+			continue;
 		
-		// если предмет поврежден
-		int BonusCount = it.second.Info().BonusCount*(it.second.Enchant+1);
-		BonusAttributes += BonusCount;
+		for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
+		{
+			if (it.second.Info().Stat[i] != BonusID)
+				continue;
+
+			int BonusCount = it.second.Info().StatCount[i] * (it.second.Enchant + 1);
+			BonusAttributes += BonusCount;
+		}
 	}
 	return BonusAttributes;
 }
@@ -673,7 +669,7 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 {
 	if(PPSTR(CMD, "UPGRADE") == 0)
 	{
-		if(Upgrade(Get, &Acc().Stats[VoteID], &Acc().Upgrade, VoteID2, 1000, AtributeName(VoteID))) 
+		if(Upgrade(Get, &Acc().Stats[VoteID], &Acc().Upgrade, VoteID2, 1000, GS()->AtributeName(VoteID))) 
 		{
 			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_UPGRADES);
 			GS()->ResetVotes(m_ClientID, MenuList::MENU_UPGRADE);

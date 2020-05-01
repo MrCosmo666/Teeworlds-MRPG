@@ -193,6 +193,8 @@ enum
 	CRAFTWORK,
 	CRAFTQUEST,
 
+	STATS_MAX_FOR_ITEM = 2,
+
 	/*
 		Парсинг голосований
 		Передается как действие в парсер

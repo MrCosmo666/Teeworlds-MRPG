@@ -75,8 +75,9 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}{STR}{STR} :: {INT} {STR}",
 				(pPlayer->GetItem(ItemID).Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price, NeededItem.GetName(pPlayer));
 
-			int BonusCount = BuyightItem.BonusCount * (Enchant + 1);
-			GS()->AVM(ClientID, "null", NOPE, HideID, "Astro +{INT} {STR}", &BonusCount, pPlayer->AtributeName(BuyightItem.BonusID));
+			char aAttributes[128];
+			Job()->Item()->FormatAttributes(BuyightItem, Enchant, sizeof(aAttributes), aAttributes);
+			GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 		}
 		else
 		{
@@ -119,8 +120,9 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}{STR}{STR} :: {INT} gold",
 				(pPlayer->GetItem(ItemID).Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price);
 
-			int BonusCount = BuyightItem.BonusCount * (Enchant + 1);
-			GS()->AVM(ClientID, "null", NOPE, HideID, "Astro +{INT} {STR}", &BonusCount, pPlayer->AtributeName(BuyightItem.BonusID));
+			char aAttributes[128];
+			Job()->Item()->FormatAttributes(BuyightItem, Enchant, sizeof(aAttributes), aAttributes);
+			GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 		}
 		else
 		{
@@ -187,7 +189,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 
 	const int ItemID = SHOPITEM->getInt("ItemID");
 	ItemJob::ItemPlayer& BuyightItem = pPlayer->GetItem(ItemID);
-	if (BuyightItem.Count > 0 && BuyightItem.Info().BonusCount > 0)
+	if (BuyightItem.Count > 0 && BuyightItem.Info().StatCount > 0)
 	{
 		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");
 		return false;
@@ -336,7 +338,7 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 			Get = PlSellItem.Count;
 
 		// если предмет можно кол-во
-		if(PlSellItem.Info().BonusCount)
+		if(PlSellItem.Info().StatCount)
 			Get = 1;
 
 		// если сбрасываем цену если не хватает

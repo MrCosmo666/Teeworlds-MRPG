@@ -14,20 +14,25 @@ void ItemJob::OnInit()
 	while(RES->next())
 	{
 		int ItemID = (int)RES->getInt("ItemID");
-		str_copy(ItemsInfo[ItemID].iItemName, RES->getString("ItemName").c_str(), sizeof(ItemsInfo[ItemID].iItemName));
-		str_copy(ItemsInfo[ItemID].iItemDesc, RES->getString("ItemDesc").c_str(), sizeof(ItemsInfo[ItemID].iItemDesc));
-		str_copy(ItemsInfo[ItemID].iItemIcon, RES->getString("ItemIcon").c_str(), sizeof(ItemsInfo[ItemID].iItemIcon));
-		ItemsInfo[ItemID].Type = (int)RES->getInt("ItemType");
-		ItemsInfo[ItemID].Function = (int)RES->getInt("ItemFunction");
-		ItemsInfo[ItemID].Notify = (bool)RES->getBoolean("ItemMessage");
-		ItemsInfo[ItemID].Dysenthis = (int)RES->getInt("ItemDesynthesis");
-		ItemsInfo[ItemID].MinimalPrice = (int)RES->getInt("ItemAuctionPrice");
-		ItemsInfo[ItemID].BonusID = (int)RES->getInt("ItemBonus");
-		ItemsInfo[ItemID].BonusCount = (int)RES->getInt("ItemBonusCount");
-		ItemsInfo[ItemID].MaximalEnchant = (int)RES->getInt("ItemEnchantMax");
-		ItemsInfo[ItemID].iItemEnchantPrice = (int)RES->getInt("ItemEnchantPrice");
-		ItemsInfo[ItemID].Dropable = (bool)RES->getBoolean("ItemDropable");
-		ItemsInfo[ItemID].ItemProjID = (int)RES->getInt("ItemProjID");
+		str_copy(ItemsInfo[ItemID].iItemName, RES->getString("Name").c_str(), sizeof(ItemsInfo[ItemID].iItemName));
+		str_copy(ItemsInfo[ItemID].iItemDesc, RES->getString("Description").c_str(), sizeof(ItemsInfo[ItemID].iItemDesc));
+		str_copy(ItemsInfo[ItemID].iItemIcon, RES->getString("Icon").c_str(), sizeof(ItemsInfo[ItemID].iItemIcon));
+		ItemsInfo[ItemID].Type = (int)RES->getInt("Type");
+		ItemsInfo[ItemID].Function = (int)RES->getInt("Function");
+		ItemsInfo[ItemID].Notify = (bool)RES->getBoolean("Message");
+		ItemsInfo[ItemID].Dysenthis = (int)RES->getInt("Desynthesis");
+		ItemsInfo[ItemID].MinimalPrice = (int)RES->getInt("AuctionPrice");
+		for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
+		{
+			char aBuf[32];
+			str_format(aBuf, sizeof(aBuf), "Attribute_%d", i);
+			ItemsInfo[ItemID].Stat[i] = (int)RES->getInt(aBuf);
+			str_format(aBuf, sizeof(aBuf), "AttributeCount_%d", i);
+			ItemsInfo[ItemID].StatCount[i] = (int)RES->getInt(aBuf);
+		}
+		ItemsInfo[ItemID].MaximalEnchant = (int)RES->getInt("EnchantMax");
+		ItemsInfo[ItemID].iItemEnchantPrice = (int)RES->getInt("EnchantPrice");
+		ItemsInfo[ItemID].ItemProjID = (int)RES->getInt("ProjectileID");
 	}
 
 	// загрузить аттрибуты
@@ -47,14 +52,14 @@ void ItemJob::OnInit()
 void ItemJob::OnInitAccount(CPlayer *pPlayer)
 {
 	int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ItemID, ItemCount, ItemSettings, ItemEnchant, ItemDurability", "tw_items", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Settings, Enchant, Durability", "tw_items", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	while(RES->next())
 	{
 		int ItemID = (int)RES->getInt("ItemID");
-		Items[ClientID][ItemID].Count = (int)RES->getInt("ItemCount");
-		Items[ClientID][ItemID].Settings = (int)RES->getInt("ItemSettings");
-		Items[ClientID][ItemID].Enchant = (int)RES->getInt("ItemEnchant");
-		Items[ClientID][ItemID].Durability = (int)RES->getInt("ItemDurability");
+		Items[ClientID][ItemID].Count = (int)RES->getInt("Count");
+		Items[ClientID][ItemID].Settings = (int)RES->getInt("Settings");
+		Items[ClientID][ItemID].Enchant = (int)RES->getInt("Enchant");
+		Items[ClientID][ItemID].Durability = (int)RES->getInt("Durability");
 		Items[ClientID][ItemID].SetBasic(pPlayer, ItemID);
 	}		
 }
@@ -65,57 +70,62 @@ void ItemJob::OnResetClient(int ClientID)
 		Items.erase(ClientID);
 }
 
-// Восстановить прочность всем предметам
 void ItemJob::RepairDurabilityFull(CPlayer *pPlayer)
 { 
 	int ClientID = pPlayer->GetCID();
-	SJK.UD("tw_items", "ItemDurability = '100' WHERE OwnerID = '%d'", pPlayer->Acc().AuthID);
+	SJK.UD("tw_items", "Durability = '100' WHERE OwnerID = '%d'", pPlayer->Acc().AuthID);
 	for(auto& it : Items[ClientID])
 		it.second.Durability = 100;
+}
+
+void ItemJob::FormatAttributes(ItemPlayer& pItem, int size, char* pformat)
+{
+	dynamic_string Buffer;
+	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
+	{
+		int BonusID = pItem.Info().Stat[i];
+		int BonusCount = pItem.Info().StatCount[i] * (pItem.Enchant + 1);
+		if (BonusID <= 0 || BonusCount <= 0)
+			continue;
+
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "%s +%d ", GS()->AtributeName(BonusID), BonusCount);
+		Buffer.append_at(Buffer.length(), aBuf);
+	}
+	str_copy(pformat, Buffer.buffer(), size);
+	Buffer.clear();
+}
+
+void ItemJob::FormatAttributes(ItemInformation& pInfoItem, int Enchant, int size, char* pformat)
+{
+	dynamic_string Buffer;
+	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
+	{
+		int BonusID = pInfoItem.Stat[i];
+		int BonusCount = pInfoItem.StatCount[i] * (Enchant + 1);
+		if (BonusID <= 0 || BonusCount <= 0)
+			continue;
+
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "%s +%d", GS()->AtributeName(BonusID), BonusCount);
+		Buffer.append_at(Buffer.length(), aBuf);
+	}
+	str_copy(pformat, Buffer.buffer(), size);
+	Buffer.clear();
 }
 
 // Установить прочность предмету
 bool ItemJob::SetDurability(CPlayer *pPlayer, int ItemID, int Durability)
 {
-	ResultSet* RES = SJK.SD("ID, ItemSettings", "tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID);
+	ResultSet* RES = SJK.SD("ID", "tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID);
 	if(RES->next())
 	{
 		const int ID = RES->getInt("ID"); 
-		SJK.UD("tw_items", "ItemDurability = '%d' WHERE ID = '%d'", Durability, ID);
+		SJK.UD("tw_items", "Durability = '%d' WHERE ID = '%d'", Durability, ID);
 		pPlayer->GetItem(ItemID).Durability = Durability;
 		return true;		
 	}	
 	return false;	
-}
-
-// Устанавливаем настройку предмету
-bool ItemJob::SetSettings(CPlayer *pPlayer, int ItemID, int Settings)
-{
-	// устанавливаем настройку и сохраняем
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, ItemSettings", "tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
-	if(RES->next())
-	{
-		const int ID = RES->getInt("ID"); 
-		SJK.UD("tw_items", "ItemSettings = '%d' WHERE ID = '%d'", Settings, ID);
-		pPlayer->GetItem(ItemID).Settings = Settings;
-		return true;
-	}	
-	return false;		
-}
-
-// Устанавливаем настройку предмету
-bool ItemJob::SetEnchant(CPlayer *pPlayer, int ItemID, int Enchant)
-{
-	// устанавливаем настройку и сохраняем
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, ItemEnchant", "tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
-	if(RES->next())
-	{
-		const int ID = RES->getInt("ID"); 
-		SJK.UD("tw_items", "ItemEnchant = '%d' WHERE ID = '%d'", Enchant, ID);
-		pPlayer->GetItem(ItemID).Enchant = Enchant;
-		return true;		
-	}	
-	return false;		
 }
 
 // Лист предметов
@@ -146,7 +156,7 @@ void ItemJob::GiveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Coun
 	if(*SecureCode != 1) return;
 
 	// обновляем значения в базе
-	SJK.UD("tw_items", "ItemCount = '%d', ItemSettings = '%d', ItemEnchant = '%d' WHERE ItemID = '%d' AND OwnerID = '%d'", 
+	SJK.UD("tw_items", "Count = '%d', Settings = '%d', Enchant = '%d' WHERE ItemID = '%d' AND OwnerID = '%d'", 
 		Items[ClientID][ItemID].Count, Items[ClientID][ItemID].Settings, Items[ClientID][ItemID].Enchant, ItemID, pPlayer->Acc().AuthID);
 }
 
@@ -155,11 +165,11 @@ int ItemJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, 
 {
 	// проверяем инициализируем и добавляем предмет
 	const int ClientID = pPlayer->GetCID();
-	std::unique_ptr<ResultSet> RES(SJK.SD("ItemCount, ItemSettings", "tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
+	std::unique_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
 	if(RES->next())
 	{
-		Items[ClientID][ItemID].Count = RES->getInt("ItemCount")+Count;
-		Items[ClientID][ItemID].Settings = RES->getInt("ItemSettings")+Settings;
+		Items[ClientID][ItemID].Count = RES->getInt("Count")+Count;
+		Items[ClientID][ItemID].Settings = RES->getInt("Settings")+Settings;
 		Items[ClientID][ItemID].Enchant = Enchant;
 		return 1;	
 	}
@@ -168,7 +178,7 @@ int ItemJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, 
 	Items[ClientID][ItemID].Settings = Settings;
 	Items[ClientID][ItemID].Enchant = Enchant;
 	Items[ClientID][ItemID].Durability = 100;
-	SJK.ID("tw_items", "(ItemID, OwnerID, ItemCount, ItemSettings, ItemEnchant) VALUES ('%d', '%d', '%d', '%d', '%d');",
+	SJK.ID("tw_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d');",
 		ItemID, pPlayer->Acc().AuthID, Count, Settings, Enchant);
 	return 2;
 }
@@ -180,8 +190,7 @@ void ItemJob::RemoveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Co
 	if(*SecureCode != 1) return;
 
 	// если прошла и предметов больше удаляемых то обновляем таблицу
-	SJK.UD("tw_items", "ItemCount = ItemCount - '%d', ItemSettings = ItemSettings - '%d' "
-		"WHERE ItemID = '%d' AND OwnerID = '%d'", Count, Settings, ItemID, pPlayer->Acc().AuthID);	
+	SJK.UD("tw_items", "Count = Count - '%d', Settings = Settings - '%d' WHERE ItemID = '%d' AND OwnerID = '%d'", Count, Settings, ItemID, pPlayer->Acc().AuthID);	
 }
 
 // удаление предмета первостепенная обработка
@@ -189,14 +198,14 @@ int ItemJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings
 {
 	// проверяем в базе данных и проверяем 
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ItemCount, ItemSettings", "tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
 	if(RES->next())
 	{
 		// обновляем если количество больше
-		if(RES->getInt("ItemCount") > Count)
+		if(RES->getInt("Count") > Count)
 		{
-			Items[ClientID][ItemID].Count = RES->getInt("ItemCount")-Count;
-			Items[ClientID][ItemID].Settings = RES->getInt("ItemSettings")-Settings;
+			Items[ClientID][ItemID].Count = RES->getInt("Count")-Count;
+			Items[ClientID][ItemID].Settings = RES->getInt("Settings")-Settings;
 			return 1;		
 		}
 		// удаляем предмет если кол-во меньше положенного
@@ -240,24 +249,19 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 		str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", PlItem.Enchant);
 		GS()->AVHI(ClientID, PlItem.Info().GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}{STR} {STR}",
 			NameItem, (PlItem.Enchant > 0 ? aEnchantSize : "\0"), (PlItem.Settings ? " ✔" : "\0"));
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", PlItem.Info().GetDesc(pPlayer));
+
+		char aAttributes[128];
+		FormatAttributes(PlItem.Info(), PlItem.Enchant, sizeof(aAttributes), aAttributes);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 	}
 	else
 	{
 		GS()->AVHI(ClientID, PlItem.Info().GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}{STR} x{INT}",
 			(PlItem.Settings ? "Dressed - " : "\0"), NameItem, &PlItem.Count);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", PlItem.Info().GetDesc(pPlayer));
 	}
 
-	const char* DescItem = PlItem.Info().GetDesc(pPlayer);
-	GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", DescItem);
-
-	// бонус предметов
-	if (PlItem.Info().IsEnchantable())
-	{
-		int BonusCountAct = PlItem.Info().BonusCount * (PlItem.Enchant + 1);
-		GS()->AVM(ClientID, "null", NOPE, HideID, "Astro stats +{INT} {STR}", &BonusCountAct, pPlayer->AtributeName(PlItem.Info().BonusID));
-	}
-
-	// используемое или нет
 	if (PlItem.Info().Function == FUNCTION_ONE_USED || PlItem.Info().Function == FUNCTION_USED)
 	{
 		char aBuf[64];
@@ -266,20 +270,15 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 		GS()->AVM(ClientID, "IUSE", ItemID, HideID, "Use {STR}", NameItem);
 	}
 
-	// зелье или нет
 	if (PlItem.Info().Type == ItemType::TYPE_POTION)
-	{
 		GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "Auto use {STR} - {STR}", NameItem, (PlItem.Settings ? "Enable" : "Disable"));
-	}
 
-	// поставить дома предмет
 	if (PlItem.Info().Type == ItemType::TYPE_DECORATION)
 	{
 		GS()->AVM(ClientID, "DECOSTART", ItemID, HideID, "Added {STR} to your house", NameItem);
 		GS()->AVM(ClientID, "DECOGUILDSTART", ItemID, HideID, "Added {STR} to your guild house", NameItem);
 	}
 
-	// установить предмет как расстение
 	if (PlItem.Info().Function == FUNCTION_PLANTS)
 	{
 		const int HouseID = Job()->House()->OwnerHouseID(pPlayer->Acc().AuthID);
@@ -290,32 +289,25 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 			GS()->AVL(ClientID, "null", "▲ This plant is active in the house ▲");
 	}
 
-	// снаряжение или настройка
+
 	if (PlItem.Info().Type == ItemType::TYPE_EQUIP || PlItem.Info().Function == FUNCTION_SETTINGS)
-	{
 		GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "{STR} {STR}", (PlItem.Settings ? "Undress" : "Equip"), NameItem);
-	}
-
-	// десинтез или уничтожение
-	if (PlItem.Info().Dysenthis > 0)
-	{
-		GS()->AVM(ClientID, "IDESYNTHESIS", ItemID, HideID, "Disassemble {STR} (+{INT}{STR} - 1 item)",
-			NameItem, &PlItem.Info().Dysenthis, (PlItem.Info().Function == FUNCTION_PLANTS ? "goods" : "mat"));
-	}
-
-	// можно ли дропнуть 
-	if (PlItem.Info().Dropable)
-	{
-		GS()->AVM(ClientID, "IDROP", ItemID, HideID, "Drop {STR}", NameItem);
-	}
 
 	if (PlItem.Info().IsEnchantable())
 	{
-		int Price = PlItem.EnchantMaterCount();
+		int Price = PlItem.EnchantPrice();
 		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR}+{INT} ({INT} material)", NameItem, &PlItem.Enchant, &Price);
 	}
 
-	// аукцион
+	if (ItemID == itHammer)
+		return;
+
+	if (PlItem.Info().Dysenthis > 0)
+		GS()->AVM(ClientID, "IDESYNTHESIS", ItemID, HideID, "Disassemble {STR} (+{INT}{STR} - 1 item)",
+			NameItem, &PlItem.Info().Dysenthis, (PlItem.Info().Function == FUNCTION_PLANTS ? "goods" : "mat"));
+
+	GS()->AVM(ClientID, "IDROP", ItemID, HideID, "Drop {STR}", NameItem);
+
 	if (PlItem.Info().MinimalPrice)
 		GS()->AVM(ClientID, "AUCTIONSLOT", ItemID, HideID, "Create Slot Auction {STR}", NameItem);
 }
@@ -424,7 +416,7 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 			return true;			
 		}
 
-		int Price = PlItem.EnchantMaterCount();
+		int Price = PlItem.EnchantPrice();
 		ItemPlayer &PlMaterial = pPlayer->GetItem(itMaterial);
 		if(Price > PlMaterial.Count)
 		{
@@ -435,17 +427,14 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 		if(PlMaterial.Remove(Price, 0))
 		{
 			int EnchantLevel = PlItem.Enchant+1;
-			int BonusID = PlItem.Info().BonusID;
-			int BonusCount = PlItem.Info().BonusCount*(EnchantLevel+1);
 
 			PlItem.SetEnchant(EnchantLevel);
-			GS()->Chat(-1, "{STR} enchant {STR}+{INT}({STR} +{INT})", 
-				GS()->Server()->ClientName(ClientID), PlItem.Info().GetName(), &EnchantLevel, pPlayer->AtributeName(BonusID), &BonusCount);
-		
 			if (EnchantLevel >= EFFECTENCHANT)
-			{
 				GS()->SendEquipItem(ClientID, -1);
-			}
+
+			char aAttributes[128];
+			FormatAttributes(PlItem, sizeof(aAttributes), aAttributes);
+			GS()->Chat(-1, "{STR} enchant {STR}+{INT} {STR}", GS()->Server()->ClientName(ClientID), PlItem.Info().GetName(), &EnchantLevel, aAttributes);
 			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		}
 		return true;
@@ -497,13 +486,14 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		GS()->AVH(ClientID, TAB_SETTINGS_MODULES, GREEN_COLOR, "Sub items settings.");
 		for (const auto& it : Items[ClientID])
 		{
-			const ItemPlayer ItemData = it.second;
+			ItemPlayer ItemData = it.second;
 			if (ItemData.Count <= 0 || ItemData.Info().Type != ItemType::TYPE_MODULE)
 				continue;
 
-			int BonusCount = ItemData.Info().BonusCount * (ItemData.Enchant + 1);
-			GS()->AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, TAB_SETTINGS_MODULES, "{STR}({STR} +{INT}){STR}",
-				ItemData.Info().GetName(pPlayer), pPlayer->AtributeName(ItemData.Info().BonusID), &BonusCount, (ItemData.Settings ? " ✔" : "\0"));
+			char aAttributes[128];
+			FormatAttributes(ItemData, sizeof(aAttributes), aAttributes);
+			GS()->AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, TAB_SETTINGS_MODULES, "{STR}({STR}){STR}",
+				ItemData.Info().GetName(pPlayer), aAttributes, (ItemData.Settings ? " ✔" : "\0"));
 			FoundSettings = true;
 		}
 		if (!FoundSettings)
@@ -554,24 +544,24 @@ void ItemJob::UseItem(int ClientID, int ItemID, int Count)
 
 	if(ItemID == itCapsuleSurvivalExperience && PlItem.Remove(Count, 0))
 	{
-		int UseCount = 500*Count;
-		UseCount += rand()%UseCount;
-		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} Survival Experience.", 
-			"name", GS()->Server()->ClientName(ClientID), "item", PlItem.Info().GetName(pPlayer), "itemcount", &Count, "count", &UseCount);
-		pPlayer->AddExp(UseCount);		
+		int GetCount = random_int()%(50 * Count);
+		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} Survival Experience.", GS()->Server()->ClientName(ClientID), PlItem.Info().GetName(), &Count, &GetCount);
+		pPlayer->AddExp(GetCount);
 	}
 
 	if(ItemID == itLittleBagGold && PlItem.Remove(Count, 0))
 	{
 		int UseCount = 10*Count;
 		UseCount += (rand()%UseCount)*5;
-		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} gold.", 
-			GS()->Server()->ClientName(ClientID), PlItem.Info().GetName(), &Count, &UseCount);
+		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} gold.", GS()->Server()->ClientName(ClientID), PlItem.Info().GetName(), &Count, &UseCount);
 		pPlayer->AddMoney(UseCount);				
 	}
 	GS()->VResetVotes(ClientID, MenuList::MENU_INVENTORY);
 	return;
 }
+
+
+
 
 const char *ItemJob::ClassItemInformation::GetName(CPlayer *pPlayer) const
 {
@@ -587,12 +577,27 @@ const char *ItemJob::ClassItemInformation::GetDesc(CPlayer *pPlayer) const
 
 bool ItemJob::ClassItemInformation::IsEnchantable() const
 {
-	return (BonusID > 0 && CGS::AttributInfo.find(BonusID) != CGS::AttributInfo.end() && BonusCount > 0 && MaximalEnchant > 0 && iItemEnchantPrice > 0);
+	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
+	{
+		if (CGS::AttributInfo.find(Stat[i]) != CGS::AttributInfo.end() && Stat[i] > 0 && StatCount[i] > 0 && iItemEnchantPrice && MaximalEnchant > 0)
+			return true;
+	}
+	return false;
 }
 
-int ItemJob::ClassItems::EnchantMaterCount() const
+int ItemJob::ClassItems::EnchantPrice() const
 {
 	return ItemJob::ItemsInfo[itemid_].iItemEnchantPrice*(Enchant+1);
+}
+
+bool ItemJob::ClassItems::SetEnchant(int arg_enchantlevel)
+{
+	if (Count < 1 || !pPlayer || !pPlayer->IsAuthed())
+		return false;
+
+	Enchant = arg_enchantlevel;
+	bool Successful = Save();
+	return Successful;
 }
 
 bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, bool arg_message)
@@ -600,8 +605,7 @@ bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 	if(arg_count < 1 || !pPlayer || !pPlayer->IsAuthed()) 
 		return false;
 
-	// все что потребуется для работы функции
-	CGS *GameServer = pPlayer->GS();
+	CGS* GameServer = pPlayer->GS();
 	const int ClientID = pPlayer->GetCID();
 	if(Info().IsEnchantable())
 	{
@@ -617,12 +621,13 @@ bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 	const bool AutoEquip = (Info().Type == ItemType::TYPE_EQUIP && pPlayer->GetItemEquip(Info().Function) <= 0) || (Info().Function == FUNCTION_SETTINGS && Info().IsEnchantable());
 	if(AutoEquip)
 	{
-		GameServer->Chat(ClientID, "Auto equip {STR} ({STR} +{INT})!", Info().GetName(pPlayer), pPlayer->AtributeName(Info().BonusID), &Info().BonusCount);
-		GameServer->Chat(ClientID, "For more detail see equip/inventory/settings in vote!");
-
-		// обновить информацию по дискорд карточки
 		if(Info().Function == EQUIP_DISCORD)  
 			GameServer->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_STATS);
+
+		char aAttributes[128];
+		GameServer->Mmo()->Item()->FormatAttributes(*this, sizeof(aAttributes), aAttributes);
+		GameServer->Chat(ClientID, "Auto equip {STR} ({STR})!", Info().GetName(pPlayer), aAttributes);
+		GameServer->Chat(ClientID, "For more detail see equip/inventory/settings in vote!");
 	}
 
 	// выдаем предмет
@@ -668,34 +673,24 @@ bool ItemJob::ClassItems::Remove(int arg_removecount, int arg_settings)
 	}
 
 	pPlayer->GS()->Mmo()->Item()->RemoveItem(&pPlayer->m_SecurCheckCode, pPlayer, itemid_, arg_removecount, arg_settings);
-	if(pPlayer->m_SecurCheckCode <= 0) 
-		return false;
-	return true;
-}
-
-void ItemJob::ClassItems::SetEnchant(int arg_enchantlevel)
-{
-	if(!Count || !pPlayer) 
-		return;
-
-	pPlayer->GS()->Mmo()->Item()->SetEnchant(pPlayer, itemid_, arg_enchantlevel);
+	return (bool)(pPlayer->m_SecurCheckCode > 0);
 }
 
 bool ItemJob::ClassItems::SetSettings(int arg_settings)
 {
-	if(!Count || !pPlayer) 
+	if (Count < 1 || !pPlayer || !pPlayer->IsAuthed())
 		return false;
 
-	pPlayer->GS()->Mmo()->Item()->SetSettings(pPlayer, itemid_, arg_settings);
+	Settings = arg_settings;
+	Save();
 	return true;
 }
 
 bool ItemJob::ClassItems::EquipItem()
 {
-	if(Count <= 0 || !pPlayer) 
+	if (Count < 1 || !pPlayer || !pPlayer->IsAuthed())
 		return false;
 
-	// если снаряжение
 	if(Info().Type == ItemType::TYPE_EQUIP)
 	{
 		const int EquipID = Info().Function;
@@ -709,15 +704,13 @@ bool ItemJob::ClassItems::EquipItem()
 		}
 	}
 
-	// обновляем
 	Settings ^= true;
-	pPlayer->GS()->Mmo()->Item()->SetSettings(pPlayer, itemid_, Settings);
 	pPlayer->ShowInformationStats();
 
-	// перестановка регена
-	if((Info().BonusID == Stats::StAmmoRegen || Info().BonusID == Stats::StAmmoRegenQ) && pPlayer->GetCharacter())
+	if((Info().CheckStatsID(Stats::StAmmoRegen) > 0 || Info().CheckStatsID(Stats::StAmmoRegenQ) > 0) && pPlayer->GetCharacter())
 		pPlayer->GetCharacter()->m_AmmoRegen = pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
 
+	Save();
 	return true;
 }
 
@@ -728,11 +721,12 @@ bool ItemJob::ClassItems::IsEquipped()
 	return false;
 }
 
-void ItemJob::ClassItems::Save()
+bool ItemJob::ClassItems::Save()
 {
-	if (!pPlayer)
-		return;
-
-	SJK.UD("tw_items", "ItemCount = '%d', ItemSettings = '%d', ItemEnchant = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'",
-		Count, Settings, Enchant, pPlayer->Acc().AuthID, itemid_);
+	if (pPlayer && pPlayer->IsAuthed())
+	{
+		SJK.UD("tw_items", "Count = '%d', Settings = '%d', Enchant = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", Count, Settings, Enchant, pPlayer->Acc().AuthID, itemid_);
+		return true;
+	}
+	return false;
 }

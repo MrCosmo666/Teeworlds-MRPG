@@ -18,17 +18,26 @@ class ItemJob : public MmoComponent
 		bool Notify;
 		int Dysenthis;
 		int MinimalPrice;
-		short BonusID;
-		int BonusCount;
+		short Stat[STATS_MAX_FOR_ITEM];
+		int StatCount[STATS_MAX_FOR_ITEM];
 		int MaximalEnchant;
 		int iItemEnchantPrice;
-		bool Dropable;
 		int ItemProjID;
 
 		const char* GetName(CPlayer* pPlayer = NULL) const;
 		const char* GetDesc(CPlayer* pPlayer = NULL) const;
 		const char* GetIcon() const { return iItemIcon; };
 		bool IsEnchantable() const;
+
+		int CheckStatsID(int BonusID)
+		{
+			for (short i : Stat)
+			{
+				if (BonusID == i)
+					return i;
+			}
+			return -1;
+		}
 	};
 
 	int SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant);
@@ -58,11 +67,11 @@ public:
 
 		bool Remove(int arg_removecount, int arg_settings = 0);
 		bool Add(int arg_count, int arg_settings = 0, int arg_enchant = 0, bool arg_message = true);
-		int EnchantMaterCount() const;
-		void SetEnchant(int arg_enchantlevel);
+		int EnchantPrice() const;
+		bool SetEnchant(int arg_enchantlevel);
 		bool SetSettings(int arg_settings);
 		bool EquipItem();
-		void Save();
+		bool Save();
 		bool IsEquipped();
 
 		ItemInformation& Info() const { return ItemsInfo[itemid_]; };
@@ -91,6 +100,9 @@ public:
 	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 
+	void FormatAttributes(ItemPlayer& pItem, int size, char* pformat);
+	void FormatAttributes(ItemInformation& pInfoItem, int Enchant, int size, char* pformat);
+
 	// Основное
 	void ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction = false);
 	void GiveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant);
@@ -100,9 +112,8 @@ public:
 
 	void UseItem(int ClientID, int ItemID, int Count);
 	void RepairDurabilityFull(CPlayer *pPlayer);
+
 	bool SetDurability(CPlayer *pPlayer, int ItemID, int Durability);
-	bool SetEnchant(CPlayer *pPlayer, int ItemID, int Enchant);
-	bool SetSettings(CPlayer *pPlayer, int ItemID, int Settings);
 };
 
 #endif

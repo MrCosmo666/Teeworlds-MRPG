@@ -320,6 +320,7 @@ public:
 	int IncreaseCountRaid(int IncreaseCount) const;
 	bool IsClientEqualWorldID(int ClientID, int WorldID = -1) const;
 	bool IsAllowedPVP() const { return m_AllowedPVP; }
+	const char* AtributeName(int BonusID) const;
 
 private:
 	int GetDungeonID() const;
