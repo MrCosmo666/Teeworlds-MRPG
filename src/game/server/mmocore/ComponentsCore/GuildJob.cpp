@@ -556,7 +556,7 @@ bool GuildJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 
 	if (Menulist == MenuList::MENU_GUILD_HOUSE_DECORATION)
 	{
-		pPlayer->m_LastVoteMenu = MenuList::MENU_HOUSE;
+		pPlayer->m_LastVoteMenu = MenuList::MENU_GUILD;
 		GS()->AVH(ClientID, TAB_INFO_DECORATION, GREEN_COLOR, "Decorations Information");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "Add: Select your item in list. Select (Add to house),");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "later press (ESC) and mouse select position");
