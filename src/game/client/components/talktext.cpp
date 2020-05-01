@@ -104,9 +104,13 @@ void CTalkText::OnRender()
 			RenderTalking.m_Size = 128.0f;
 			RenderTools()->RenderTee(CAnimState::GetIdle(), &RenderTalking, m_PlayerTalked ? EMOTE_NORMAL : m_TalkedEmote, vec2(-1.0f, 0.4f), vec2(Width / 1.35f, Height / 1.85f));
 
+			if(m_Stranger)
+				TextRender()->TextColor(1.0f, 0.95f, 0.0f, 1);
+
 			const char* pTalkedNick = m_Stranger ? "Stranger" : m_pClient->m_aClients[TalkClientID].m_aName;
 			float sizeLize = str_length(pTalkedNick);
 			TextRender()->Text(0x0, (Width / (1.45f + sizeLize / 64.0f)), Height / 1.97f, 32.0f, pTalkedNick, -1.0f);
+			TextRender()->TextColor(1, 1, 1, 1);
 		}
 
 		// skin
