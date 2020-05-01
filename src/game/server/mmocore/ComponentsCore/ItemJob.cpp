@@ -244,7 +244,7 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 	{
 		char aEnchantSize[16];
 		str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", PlItem.Enchant);
-		GS()->AVHI(ClientID, PlItem.Info().GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}{STR} {STR}",
+		GS()->AVHI(ClientID, PlItem.Info().GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} {STR}",
 			NameItem, (PlItem.Enchant > 0 ? aEnchantSize : "\0"), (PlItem.Settings ? " ✔" : "\0"));
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", PlItem.Info().GetDesc(pPlayer));
 
@@ -254,7 +254,7 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 	}
 	else
 	{
-		GS()->AVHI(ClientID, PlItem.Info().GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}{STR} x{INT}",
+		GS()->AVHI(ClientID, PlItem.Info().GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} x{INT}",
 			(PlItem.Settings ? "Dressed - " : "\0"), NameItem, &PlItem.Count);
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", PlItem.Info().GetDesc(pPlayer));
 	}
@@ -281,7 +281,7 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 		const int HouseID = Job()->House()->OwnerHouseID(pPlayer->Acc().AuthID);
 		const int PlantItemID = Job()->House()->GetPlantsID(HouseID);
 		if (PlantItemID != ItemID)
-			GS()->AVD(ClientID, "HOMEPLANTSET", ItemID, 20000, HideID, "Change plants {STR} to house (20000 items)", NameItem);
+			GS()->AVD(ClientID, "HOMEPLANTSET", ItemID, 1500, HideID, "Change plants {STR} to house (1500 items)", NameItem);
 		else
 			GS()->AVL(ClientID, "null", "▲ This plant is active in the house ▲");
 	}

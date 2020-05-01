@@ -1800,8 +1800,8 @@ void CGS::AVHI(int To, const char *Icon, const int ID, vec3 Color, const char* p
 
 		dynamic_string Buffer;
 		bool HidenTabs = (ID >= TAB_STAT) ? m_apPlayers[To]->GetHidenMenu(ID) : false;
-		if(HidenTabs) {	Buffer.append(ID >= NUM_TAB_MENU ? ("◈ ") : (ID < TAB_SETTINGS_MODULES ? ("△ ") : ("▽ ")));	}
-		else {	Buffer.append(ID >= NUM_TAB_MENU ? ("◇ ") : (ID < TAB_SETTINGS_MODULES ? ("▽ ") : ("△ ")));	}
+		if(HidenTabs) {	Buffer.append(ID >= NUM_TAB_MENU ? ("▿ ") : (ID < TAB_SETTINGS_MODULES ? ("△ ") : ("▽ ")));	}
+		else {	Buffer.append(ID >= NUM_TAB_MENU ? ("▵ ") : (ID < TAB_SETTINGS_MODULES ? ("▽ ") : ("△ ")));	}
 
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
 		if(ID > TAB_SETTINGS_MODULES && ID < NUM_TAB_MENU) { Buffer.append(" (Press me for help)"); }
@@ -1819,8 +1819,8 @@ void CGS::AVM(int To, const char* Type, const int ID, const int HideID, const ch
 {
 	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
 	{
-		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID >= TAB_SETTINGS_MODULES) || 
-			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID < TAB_SETTINGS_MODULES))
+		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) || 
+			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
 			return;
 
 		va_list VarArgs;
@@ -1841,8 +1841,8 @@ void CGS::AVMI(int To, const char *Icon, const char* Type, const int ID, const i
 {
 	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
 	{
-		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID >= TAB_SETTINGS_MODULES) || 
-			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID < TAB_SETTINGS_MODULES))
+		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) || 
+			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
 			return;
 
 		va_list VarArgs;
@@ -1863,8 +1863,8 @@ void CGS::AVD(int To, const char* Type, const int ID, const int ID2, const int H
 {
 	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
 	{
-		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID >= TAB_SETTINGS_MODULES) || 
-			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID < TAB_SETTINGS_MODULES))
+		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) || 
+			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
 			return;
 			
 		va_list VarArgs;

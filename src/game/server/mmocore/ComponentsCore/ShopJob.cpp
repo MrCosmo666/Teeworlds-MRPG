@@ -72,7 +72,7 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		{
 			char aEnchantSize[16];
 			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}{STR}{STR} :: {INT} {STR}",
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR}{STR} :: {INT} {STR}",
 				(pPlayer->GetItem(ItemID).Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price, NeededItem.GetName(pPlayer));
 
 			char aAttributes[128];
@@ -81,7 +81,7 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		}
 		else
 		{
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}x{INT} ({INT}) :: {INT} {STR}",
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) :: {INT} {STR}",
 				BuyightItem.GetName(pPlayer), &Count, &pPlayer->GetItem(ItemID).Count, &Price, NeededItem.GetName(pPlayer));
 		}
 
@@ -117,7 +117,7 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 		{
 			char aEnchantSize[16];
 			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}{STR}{STR} :: {INT} gold",
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR}{STR} :: {INT} gold",
 				(pPlayer->GetItem(ItemID).Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price);
 
 			char aAttributes[128];
@@ -126,7 +126,7 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 		}
 		else
 		{
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_RED_COLOR, "{STR}x{INT} ({INT}) :: {INT} gold",
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) :: {INT} gold",
 				BuyightItem.GetName(pPlayer), &Count, &pPlayer->GetItem(ItemID).Count, &Price);
 		}
 

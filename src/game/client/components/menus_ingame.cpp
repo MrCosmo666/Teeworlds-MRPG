@@ -624,12 +624,17 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 
 		if(Item.m_Visible)
 		{
-			bool Icon = DoItemIcon(pOption->m_Icon, { Item.m_Rect.x + 2.0f, Item.m_Rect.y, Item.m_Rect.w, Item.m_Rect.h, }, 21.0f);
+			float IconSize = 21.0f;
+			if (FontSize != OldFontSize)
+			{
+				IconSize = 18.0f;
+				Item.m_Rect.y += 0.5;
+				Item.m_Rect.x += 2.0f;
+			}
+
+			bool Icon = DoItemIcon(pOption->m_Icon, { Item.m_Rect.x + 2.0f, Item.m_Rect.y, Item.m_Rect.w, Item.m_Rect.h, }, IconSize);
 			Item.m_Rect.VMargin((Icon ? 25.0f : 5.0f), &Item.m_Rect);
 			Item.m_Rect.y += 2.0f;
-
-			if (FontSize != OldFontSize)
-				Item.m_Rect.y += 0.5;
 
 			UI()->DoLabel(&Item.m_Rect, pOption->m_aDescription, FontSize, CUI::ALIGN_LEFT);
 		}

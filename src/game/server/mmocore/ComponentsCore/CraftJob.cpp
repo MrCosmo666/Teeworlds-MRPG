@@ -206,7 +206,6 @@ bool CraftJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		{
 			pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 			GS()->AVH(ClientID, TAB_INFO_CRAFT, GREEN_COLOR, "Crafting Information");
-			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_CRAFT, "Choose the type of crafts you want to show");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_CRAFT, "If you will not have enough items for crafting");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_CRAFT, "You will write those and the amount that is still required");
 			GS()->AV(ClientID, "null", "");
