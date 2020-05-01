@@ -16,6 +16,7 @@ class DungeonJob : public MmoComponent
 	{
 		char Name[64];
 		int Level;
+		int OpenQuestID;
 		int WorldID;
 
 		int DoorX;
@@ -39,6 +40,7 @@ public:
 	void SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds);
 	void ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID);
 	void ShowDungeonsList(CPlayer* pPlayer);
+	void CheckQuestingOpened(CPlayer* pPlayer, int QuestID);
 	int SyncFactor();
 };
 #endif

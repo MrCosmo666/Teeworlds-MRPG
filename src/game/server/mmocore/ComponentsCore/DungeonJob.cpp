@@ -19,6 +19,7 @@ DungeonJob::DungeonJob()
 		Dungeon[ID].Level = RES->getInt("Level");
 		Dungeon[ID].DoorX = RES->getInt("DoorX");
 		Dungeon[ID].DoorY = RES->getInt("DoorY");
+		Dungeon[ID].OpenQuestID = RES->getInt("OpenQuestID");
 		Dungeon[ID].WorldID = RES->getInt("WorldID");
 	}
 }
@@ -61,7 +62,12 @@ void DungeonJob::ShowDungeonsList(CPlayer* pPlayer)
 			&dungeon.second.Level, dungeon.second.Name, &dungeon.second.Players, (dungeon.second.State > 1 ? "Active dungeon" : "Waiting players"), &dungeon.second.Progress);
 
 		ShowDungeonTop(pPlayer, dungeon.first, HideID);
-		GS()->AVM(ClientID, "DUNGEONJOIN", dungeon.first, HideID, "Join dungeon {STR}", dungeon.second.Name);
+
+		int NeededQuestID = dungeon.second.OpenQuestID;
+		if(Job()->Quest()->IsComplectedQuest(ClientID, NeededQuestID))
+			GS()->AVM(ClientID, "DUNGEONJOIN", dungeon.first, HideID, "Join dungeon {STR}", dungeon.second.Name);
+		else
+			GS()->AVM(ClientID, "null", NULL, HideID, "You need to complete {STR}", Job()->Quest()->GetQuestName(NeededQuestID));
 	}
 
 	if (GS()->IsDungeon())
@@ -69,6 +75,16 @@ void DungeonJob::ShowDungeonsList(CPlayer* pPlayer)
 		GS()->AV(ClientID, "null", "");
 		pPlayer->m_Colored = { 30, 8, 8 };
 		GS()->AVL(ClientID, "DUNGEONEXIT", "Exit dungeon {STR} !!", Dungeon[GS()->DungeonID()].Name);
+	}
+}
+
+void DungeonJob::CheckQuestingOpened(CPlayer *pPlayer, int QuestID)
+{
+	const int ClientID = pPlayer->GetCID();
+	for (const auto& dungeon : Dungeon)
+	{
+		if (QuestID == dungeon.second.OpenQuestID)
+			GS()->Chat(ClientID, "You opened access new zone ({STR})!", dungeon.second.Name);
 	}
 }
 

@@ -285,6 +285,9 @@ void QuestJob::FinishQuest(CPlayer *pPlayer, int QuestID)
 
 	if (!CheckNewStories(pPlayer, QuestID))
 		GS()->Chat(ClientID, "At this point you know everything from story {STR} story", QuestsData[QuestID].StoryLine);
+
+	Job()->WorldSwap()->CheckQuestingOpened(pPlayer, QuestID);
+	Job()->Dungeon()->CheckQuestingOpened(pPlayer, QuestID);
 }
 
 // проверить прогресс по предметам что требует бот

@@ -180,7 +180,7 @@ void BotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 	int MultiplierDrops = clamp(MultiplierRaid / 2, 1, MultiplierRaid);
 	GS()->CreateDropBonuses(m_Core.m_Pos, 1, MultiplierDrops, (1+random_int() % 2), ForceDies);
 
-	int MultiplierGolds = BotJob::MobBot[SubID].Power / 8;
+	int MultiplierGolds = BotJob::MobBot[SubID].Power / g_Config.m_SvStrongGold;
 	pPlayer->AddMoney(MultiplierGolds);
 
 	if (random_int() % 80 == 0)

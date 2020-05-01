@@ -33,6 +33,7 @@ public:
 	vec2 GetPositionQuestBot(int ClientID, int QuestID);
 	int GetWorldType() const;
 	int GetNecessaryQuest(int WorldID = -1) const;
+	void CheckQuestingOpened(CPlayer* pPlayer, int QuestID);
 
 private:
 	bool ChangeWorld(int ClientID, vec2 Pos);

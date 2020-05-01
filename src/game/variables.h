@@ -119,7 +119,6 @@ MACRO_CONFIG_INT(SvInactiveKickTime, sv_inactivekick_time, 3, 0, 1000, CFGFLAG_S
 MACRO_CONFIG_INT(SvInactiveKick, sv_inactivekick, 2, 0, 3, CFGFLAG_SERVER, "How to deal with inactive clients (0=move player to spectator, 1=move player to spectator and kick spectator, 2=move to free spectator slot/kick, 3=kick)")
 
 // another config
-MACRO_CONFIG_INT(SvExpForLevel, sv_needexp_level, 160, 0, 1000, CFGFLAG_SERVER, "(This config + Your level * 2)*(Your level* Your level)")
 MACRO_CONFIG_INT(SvPriceTeleport, sv_price_teleport, 100, 0, 10000, CFGFLAG_SERVER, "Price for teleport*WorldID")
 MACRO_CONFIG_INT(SvDoorRadiusHit, sv_door_radius_hit, 16, 16, 1000, CFGFLAG_SERVER, "Door radius hit.")
 
@@ -143,6 +142,7 @@ MACRO_CONFIG_INT(SvStorageFraction, sv_storage_fraction, 5, 5, 1000, CFGFLAG_SER
 MACRO_CONFIG_INT(SvKillmobsIncreaseLevel, sv_kill_mobs_increase_level, 400, 0, 1000, CFGFLAG_SERVER, "Kill mobs of own level to increase.")
 MACRO_CONFIG_INT(SvMiningIncreaseLevel, sv_mining_increase_level, 80, 0, 1000, CFGFLAG_SERVER, "Mining items own level to increase")
 MACRO_CONFIG_INT(SvPlantingIncreaseLevel, sv_planting_increase_level, 80, 0, 10000, CFGFLAG_SERVER, "Planting items own level to increase")
+MACRO_CONFIG_INT(SvStrongGold, sv_strong_gold, 8, 0, 10000, CFGFLAG_SERVER, "Power mobs / strong gold")
 
 MACRO_CONFIG_INT(SvRelaxLeveling, sv_relaxleveling, 30, 0, 10000, CFGFLAG_SERVER, "Exp need for up level relax")
 MACRO_CONFIG_INT(SvGuildLeveling, sv_guildleveling, 1024, 0, 10000, CFGFLAG_SERVER, "Exp need for up level guild")

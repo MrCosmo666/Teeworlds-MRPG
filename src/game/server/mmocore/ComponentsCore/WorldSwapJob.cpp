@@ -87,6 +87,17 @@ int WorldSwapJob::GetID(vec2 Pos)
 	return -1;
 }
 
+void WorldSwapJob::CheckQuestingOpened(CPlayer* pPlayer, int QuestID)
+{
+	const int ClientID = pPlayer->GetCID();
+	for (const auto& sw : WorldSwap)
+	{
+		if (QuestID == sw.second.OpenQuestID)
+			GS()->Chat(ClientID, "You opened access dungeon ({STR})!", GS()->Server()->GetWorldName(sw.second.TwoWorldID));
+	}
+}
+
+
 int WorldSwapJob::GetNecessaryQuest(int WorldID) const
 {
 	int CheckWorldID = ((WorldID <= -1 || WorldID >= COUNT_WORLD) ? GS()->GetWorldID() : WorldID);
