@@ -67,11 +67,11 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 		for (int i = 0; i < EQUIP_MAX_BOTS; i++)
 		{
 			int ItemID = GetItemEquip(i);
-			int ItemBonusID = GS()->GetItemInfo(ItemID).CheckStatsID(BonusID);
-			if (ItemID <= 0 || BonusID != ItemBonusID)
+			int ItemBonusCount = GS()->GetItemInfo(ItemID).GetStatsBonus(BonusID);
+			if (ItemID <= 0 || ItemBonusCount < 0)
 				continue;
 
-			Power += GS()->GetItemInfo(ItemID).StatCount[ItemBonusID];
+			Power += ItemBonusCount;
 		}
 
 		if (BonusID == Stats::StStrength || BonusID == Stats::StCriticalHit ||CGS::AttributInfo[BonusID].AtType == AtHardtype)

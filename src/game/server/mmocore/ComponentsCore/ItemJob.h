@@ -18,8 +18,8 @@ class ItemJob : public MmoComponent
 		bool Notify;
 		int Dysenthis;
 		int MinimalPrice;
-		short Stat[STATS_MAX_FOR_ITEM];
-		int StatCount[STATS_MAX_FOR_ITEM];
+		short Attribute[STATS_MAX_FOR_ITEM];
+		int AttributeCount[STATS_MAX_FOR_ITEM];
 		int MaximalEnchant;
 		int iItemEnchantPrice;
 		int ItemProjID;
@@ -29,12 +29,12 @@ class ItemJob : public MmoComponent
 		const char* GetIcon() const { return iItemIcon; };
 		bool IsEnchantable() const;
 
-		int CheckStatsID(int BonusID)
+		int GetStatsBonus(int BonusID)
 		{
-			for (short i : Stat)
+			for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 			{
-				if (BonusID == i)
-					return i;
+				if (Attribute[i] == BonusID)
+					return AttributeCount[i];
 			}
 			return -1;
 		}

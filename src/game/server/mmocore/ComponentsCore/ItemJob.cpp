@@ -26,9 +26,9 @@ void ItemJob::OnInit()
 		{
 			char aBuf[32];
 			str_format(aBuf, sizeof(aBuf), "Attribute_%d", i);
-			ItemsInfo[ItemID].Stat[i] = (int)RES->getInt(aBuf);
+			ItemsInfo[ItemID].Attribute[i] = (int)RES->getInt(aBuf);
 			str_format(aBuf, sizeof(aBuf), "AttributeCount_%d", i);
-			ItemsInfo[ItemID].StatCount[i] = (int)RES->getInt(aBuf);
+			ItemsInfo[ItemID].AttributeCount[i] = (int)RES->getInt(aBuf);
 		}
 		ItemsInfo[ItemID].MaximalEnchant = (int)RES->getInt("EnchantMax");
 		ItemsInfo[ItemID].iItemEnchantPrice = (int)RES->getInt("EnchantPrice");
@@ -83,8 +83,8 @@ void ItemJob::FormatAttributes(ItemPlayer& pItem, int size, char* pformat)
 	dynamic_string Buffer;
 	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		int BonusID = pItem.Info().Stat[i];
-		int BonusCount = pItem.Info().StatCount[i] * (pItem.Enchant + 1);
+		int BonusID = pItem.Info().Attribute[i];
+		int BonusCount = pItem.Info().AttributeCount[i] * (pItem.Enchant + 1);
 		if (BonusID <= 0 || BonusCount <= 0)
 			continue;
 
@@ -101,20 +101,19 @@ void ItemJob::FormatAttributes(ItemInformation& pInfoItem, int Enchant, int size
 	dynamic_string Buffer;
 	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		int BonusID = pInfoItem.Stat[i];
-		int BonusCount = pInfoItem.StatCount[i] * (Enchant + 1);
+		int BonusID = pInfoItem.Attribute[i];
+		int BonusCount = pInfoItem.AttributeCount[i] * (Enchant + 1);
 		if (BonusID <= 0 || BonusCount <= 0)
 			continue;
 
 		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "%s +%d", GS()->AtributeName(BonusID), BonusCount);
+		str_format(aBuf, sizeof(aBuf), "%s +%d ", GS()->AtributeName(BonusID), BonusCount);
 		Buffer.append_at(Buffer.length(), aBuf);
 	}
 	str_copy(pformat, Buffer.buffer(), size);
 	Buffer.clear();
 }
 
-// Установить прочность предмету
 bool ItemJob::SetDurability(CPlayer *pPlayer, int ItemID, int Durability)
 {
 	ResultSet* RES = SJK.SD("ID", "tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID);
@@ -128,7 +127,6 @@ bool ItemJob::SetDurability(CPlayer *pPlayer, int ItemID, int Durability)
 	return false;	
 }
 
-// Лист предметов
 void ItemJob::ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction)
 {
 	const int ClientID = pPlayer->GetCID();
@@ -579,7 +577,7 @@ bool ItemJob::ClassItemInformation::IsEnchantable() const
 {
 	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if (CGS::AttributInfo.find(Stat[i]) != CGS::AttributInfo.end() && Stat[i] > 0 && StatCount[i] > 0 && iItemEnchantPrice && MaximalEnchant > 0)
+		if (CGS::AttributInfo.find(Attribute[i]) != CGS::AttributInfo.end() && Attribute[i] > 0 && AttributeCount[i] > 0 && iItemEnchantPrice && MaximalEnchant > 0)
 			return true;
 	}
 	return false;
@@ -707,7 +705,7 @@ bool ItemJob::ClassItems::EquipItem()
 	Settings ^= true;
 	pPlayer->ShowInformationStats();
 
-	if((Info().CheckStatsID(Stats::StAmmoRegen) > 0 || Info().CheckStatsID(Stats::StAmmoRegenQ) > 0) && pPlayer->GetCharacter())
+	if((Info().GetStatsBonus(Stats::StAmmoRegen) > 0 || Info().GetStatsBonus(Stats::StAmmoRegenQ) > 0) && pPlayer->GetCharacter())
 		pPlayer->GetCharacter()->m_AmmoRegen = pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
 
 	Save();

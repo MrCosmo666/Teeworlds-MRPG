@@ -189,7 +189,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 
 	const int ItemID = SHOPITEM->getInt("ItemID");
 	ItemJob::ItemPlayer& BuyightItem = pPlayer->GetItem(ItemID);
-	if (BuyightItem.Count > 0 && BuyightItem.Info().StatCount > 0)
+	if (BuyightItem.Count > 0 && BuyightItem.Info().IsEnchantable())
 	{
 		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");
 		return false;
@@ -338,7 +338,7 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 			Get = PlSellItem.Count;
 
 		// если предмет можно кол-во
-		if(PlSellItem.Info().StatCount)
+		if(PlSellItem.Info().IsEnchantable())
 			Get = 1;
 
 		// если сбрасываем цену если не хватает

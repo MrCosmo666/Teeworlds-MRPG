@@ -499,10 +499,10 @@ int CPlayer::EnchantAttributes(int BonusID) const
 		
 		for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 		{
-			if (it.second.Info().Stat[i] != BonusID)
+			if (it.second.Info().Attribute[i] != BonusID)
 				continue;
 
-			int BonusCount = it.second.Info().StatCount[i] * (it.second.Enchant + 1);
+			int BonusCount = it.second.Info().AttributeCount[i] * (it.second.Enchant + 1);
 			BonusAttributes += BonusCount;
 		}
 	}

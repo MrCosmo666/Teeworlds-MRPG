@@ -2123,8 +2123,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 			char aAttributes[128];
 			Mmo()->Item()->FormatAttributes(pPlayerItem, sizeof(aAttributes), aAttributes);
-			const int BonusItem = GetItemInfo(ItemID).Stat[0];
-			int BonusCount = GetItemInfo(ItemID).StatCount[0] * (pPlayer->GetItem(ItemID).Enchant + 1);
 			AVM(ClientID, "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], GetItemInfo(ItemID).GetName(pPlayer), aAttributes);
 		}
 
