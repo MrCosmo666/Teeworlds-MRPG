@@ -83,7 +83,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.3f * a);
 					break;				
 				case MOOD_PLAYER_TANK:
-					str_format(aIconPlayerType, sizeof(aIconPlayerType), "paper");
+					str_format(aIconPlayerType, sizeof(aIconPlayerType), "rose");
 					ColorNameplates = vec4(0.15f, 0.60f, 1.00f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.3f * a);
 					break;

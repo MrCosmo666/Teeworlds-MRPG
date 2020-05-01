@@ -41,6 +41,7 @@ private:
 
 	int GetBotLevel() const;
 	bool GetActiveQuestsID(int SnapClientID);
+	const char* GetStatusBot();
 };
 
 #endif

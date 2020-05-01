@@ -166,7 +166,7 @@ void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 
 	// меню выводим
 	const bool Passive = SkillData[SkillID].m_Passive;
-	GS()->AVHI(ClientID, "skill_point", HideID, LIGHT_BLUE_COLOR, " ({INT}/{INT}) {STR} : {INT}SP",  &LevelOwn, &SkillData[SkillID].m_SkillMaxLevel, SkillData[SkillID].m_SkillName, &SkillData[SkillID].m_SkillPrice);
+	GS()->AVHI(ClientID, "skill", HideID, LIGHT_BLUE_COLOR, "{STR} : {INT}SP ({INT}/{INT})", SkillData[SkillID].m_SkillName, &SkillData[SkillID].m_SkillPrice, &LevelOwn, &SkillData[SkillID].m_SkillMaxLevel);
 	if(Passive)
 	{
 		GS()->AVM(ClientID, "null", NOPE, HideID, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].m_SkillBonusInfo);

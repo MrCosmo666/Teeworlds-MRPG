@@ -56,7 +56,6 @@ namespace kurosio
             return 18;
         return (int)(24 * pow(Level, 2)) - (24 * Level);
 	}
-
 }
 
 #endif

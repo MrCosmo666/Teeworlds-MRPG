@@ -193,16 +193,7 @@ void CPlayerBot::Snap(int SnappingClient)
 	pClientInfo->m_Health = GetHealth();
 	pClientInfo->m_Level = GetBotLevel();
 	pClientInfo->m_ActiveQuest = GetActiveQuestsID(SnappingClient);
-
-	if (m_SpawnPointBot == SpawnBot::SPAWN_QUEST_NPC)
-	{
-		int QuestID = BotJob::QuestBot[m_SubBotID].QuestID;
-		StrToInts(pClientInfo->m_StateName, 6, GS()->Mmo()->Quest()->GetQuestName(QuestID));
-	}
-	else if (m_SpawnPointBot == SpawnBot::SPAWN_MOBS && BotJob::MobBot[m_SubBotID].Boss)
-		StrToInts(pClientInfo->m_StateName, 6, "Boss");
-	else 
-		StrToInts(pClientInfo->m_StateName, 6, "\0");
+	StrToInts(pClientInfo->m_StateName, 6, GetStatusBot());
 
 	for(int p = 0; p < 6; p++)
 	{
@@ -266,4 +257,20 @@ int CPlayerBot::GetItemEquip(int EquipID, int SkipItemID) const
 	if (EquipID < EQUIP_WINGS || EquipID > EQUIP_RIFLE)
 		return -1;
 	return BotJob::DataBot[m_BotID].EquipSlot[EquipID];
+}
+
+const char* CPlayerBot::GetStatusBot()
+{
+	if (m_SpawnPointBot == SpawnBot::SPAWN_QUEST_NPC)
+	{
+		int QuestID = BotJob::QuestBot[m_SubBotID].QuestID;
+		return GS()->Mmo()->Quest()->GetQuestName(QuestID);
+	}
+	else if (m_SpawnPointBot == SpawnBot::SPAWN_MOBS && BotJob::MobBot[m_SubBotID].Boss)
+	{
+		if (GS()->IsDungeon())
+			return "Boss";
+		return "Raid";
+	}
+	return "\0";
 }

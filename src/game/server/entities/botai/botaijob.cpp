@@ -49,7 +49,7 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 		}
 		if (!GS()->IsDungeon())
 		{
-			GS()->ChatWorldID(BotJob::MobBot[SubBotID].WorldID, "", "In your zone emerging {STR} with power level {INT}!", BotJob::MobBot[SubBotID].Name, &m_StartHealth);
+			GS()->ChatWorldID(BotJob::MobBot[SubBotID].WorldID, "", "In your zone emerging {STR}!", BotJob::MobBot[SubBotID].Name);
 		}
 	}
 	else if(GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_QUEST_NPC)
@@ -170,12 +170,6 @@ void BotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 			continue;
 
 		int RandomDrop = BotJob::MobBot[SubID].RandomItem[i];
-		if (DropItem == itMoney)
-		{
-			if (RandomDrop <= 0 || random_int() % RandomDrop == 0)
-				pPlayer->AddMoney(CountItem);
-			continue;
-		}
 		CreateRandomDropItem(ClientID, RandomDrop, DropItem, CountItem, ForceDies);
 	}
 
@@ -185,6 +179,9 @@ void BotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 
 	int MultiplierDrops = clamp(MultiplierRaid / 2, 1, MultiplierRaid);
 	GS()->CreateDropBonuses(m_Core.m_Pos, 1, MultiplierDrops, (1+random_int() % 2), ForceDies);
+
+	int MultiplierGolds = BotJob::MobBot[SubID].Power / 8;
+	pPlayer->AddMoney(MultiplierGolds);
 
 	if (random_int() % 80 == 0)
 	{

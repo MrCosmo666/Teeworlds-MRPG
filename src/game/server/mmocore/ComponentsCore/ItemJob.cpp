@@ -8,6 +8,17 @@ using namespace sqlstr;
 std::map < int , std::map < int , ItemJob::ItemPlayer > > ItemJob::Items;
 std::map < int , ItemJob::ItemInformation > ItemJob::ItemsInfo;
 
+int randomRangecount(int startrandom, int endrandom, int count)
+{
+	int result = 0;
+	for (int i = 0; i < count; i++)
+	{
+		int random = startrandom + rand() % (endrandom - startrandom);
+		result += random;
+	}
+	return result;
+}
+
 void ItemJob::OnInit()
 {
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_items_list", "WHERE ItemID > '0'"));
@@ -539,19 +550,18 @@ void ItemJob::UseItem(int ClientID, int ItemID, int Count)
 		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", PlItem.Info().GetName(pPlayer), &Count);
 	}
 
-	if(ItemID == itCapsuleSurvivalExperience && PlItem.Remove(Count, 0))
+	if(ItemID == itCapsuleSurvivalExperience && PlItem.Remove(Count, 0)) 
 	{
-		int GetCount = random_int()%(50 * Count);
-		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} Survival Experience.", GS()->Server()->ClientName(ClientID), PlItem.Info().GetName(), &Count, &GetCount);
-		pPlayer->AddExp(GetCount);
+		int Getting = randomRangecount(10, 50, Count);
+		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} Survival Experience.", GS()->Server()->ClientName(ClientID), PlItem.Info().GetName(), &Count, &Getting);
+		pPlayer->AddExp(Getting);
 	}
 
 	if(ItemID == itLittleBagGold && PlItem.Remove(Count, 0))
 	{
-		int UseCount = 10*Count;
-		UseCount += (rand()%UseCount)*5;
-		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} gold.", GS()->Server()->ClientName(ClientID), PlItem.Info().GetName(), &Count, &UseCount);
-		pPlayer->AddMoney(UseCount);				
+		int Getting = randomRangecount(10, 50, Count);
+		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} gold.", GS()->Server()->ClientName(ClientID), PlItem.Info().GetName(), &Count, &Getting);
+		pPlayer->AddMoney(Getting);
 	}
 	GS()->VResetVotes(ClientID, MenuList::MENU_INVENTORY);
 	return;
