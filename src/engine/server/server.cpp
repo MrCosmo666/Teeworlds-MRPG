@@ -371,7 +371,14 @@ const char *CServer::GetWorldName(int WorldID)
 	if(WorldID >= COUNT_WORLD)
 		return "UnknowName";
 		
-	const char *NameWorlds[] = { "AcreaLand", "Forgotten lands", "Memoria", "Change later", "Castle King", "Mountains-Icru", "Acrea Cattle Storages", "Cutscene Welcome" };
+	const char *NameWorlds[] = {"AcreaLand", 
+								"Pier on coast of great lands", 
+								"Memoria", 
+								"Change later", 
+								"Castle King", 
+								"Mountains-Icru", 
+								"Acrea Cattle Storages", 
+								"Cutscene Welcome" };
 	return NameWorlds[WorldID];
 }
 

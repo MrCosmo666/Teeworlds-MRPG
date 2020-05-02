@@ -330,8 +330,11 @@ bool QuestJob::IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &Bot
 		{
 			int ItemID = BotData.Interactive[i];
 			int Count = BotData.InterCount[i];
-			if(ItemID > 0 && Count > 0) 
+			if (ItemID > 0 && Count > 0)
+			{
 				pPlayer->GetItem(ItemID).Remove(Count);
+				GS()->Chat(pPlayer->GetCID(), "You used quest item {STR}x{INT}!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer), &Count);
+			}
 		}
 		return true;
 	}
@@ -395,6 +398,7 @@ bool QuestJob::AcceptQuest(int QuestID, CPlayer* pPlayer)
 	GS()->Chat(ClientID, "Story you perform ({STR} {STR} {INT}/{INT})!", QuestsData[QuestID].StoryLine, QuestsData[QuestID].Name, &StoryProgress, &StorySize);
 	GS()->Chat(ClientID, "You will receive a reward Gold {INT}, Experience {INT}", &QuestsData[QuestID].Money, &QuestsData[QuestID].Exp);
 	pPlayer->GetCharacter()->CreateQuestsStep(QuestID);
+	GS()->CreatePlayerSound(ClientID, SOUND_CTF_CAPTURE);
 	return true;
 }
 
@@ -407,32 +411,21 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotDa
 	// проверяем собрали предметы и убили ли всех ботов
 	const int ClientID = pPlayer->GetCID();
 	const int QuestID = BotData.QuestID;
-
 	if (!IsCollectItemComplete(pPlayer, BotData, false) || !IsDefeatComplete(ClientID, QuestID))
 	{
 		GS()->Chat(ClientID, "Not all criteria to complete!");
 		return false;
 	}
 
-	// интерактив рандомно понравиться ли предмет даст или нет
-	int RandomGetItem = BotData.InterRandom[0];
-	if (RandomGetItem > 1 && random_int() % RandomGetItem != 0)
+	if (!LastDialog)
 	{
-		// забираем предмет
-		GS()->Chat(ClientID, "[{STR} NPC] I didn't like it, bring me another one!", BotData.Name);
-		IsCollectItemComplete(pPlayer, BotData, false, true);
-		return false;
+		GS()->CreatePlayerSound(ClientID, SOUND_CTF_CAPTURE);
+		return true;
 	}
 
-	if (!LastDialog)
-		return true;
-
 	// проверяем и выдаем потом
+	IsCollectItemComplete(pPlayer, BotData, false, true);
 	IsCollectItemComplete(pPlayer, BotData, true, true);
-
-	// забираем проверяем не является ли тип рандомно взять предмет
-	if (BotData.InterRandom[2] <= 0 || RandomGetItem > 0)
-		IsCollectItemComplete(pPlayer, BotData, false, true);
 
 	GS()->VResetVotes(ClientID, MenuList::MENU_ADVENTURE_JOURNAL_MAIN);
 	GS()->Mmo()->Quest()->AddProgress(pPlayer, QuestID);

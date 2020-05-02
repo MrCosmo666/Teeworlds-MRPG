@@ -1023,7 +1023,7 @@ void CMenus::RenderServerControlMRPG(CUIRect MainView)
 			m_CallvoteSelectedOption = 0;
 
 		// - - - - - - - - - - ИНТЕРАКТИВЫ - - - - - - - - - -
-		Bottom.VSplitLeft(200.0f, 0, &Bottom);
+		Bottom.VSplitLeft(30.0f, 0, &Bottom);
 		Bottom.VSplitLeft(260.0f, &Reason, &Bottom);
 		const char* pReasonLabel = Localize("Interaction:");
 		w = TextRender()->TextWidth(0, Reason.h * ms_FontmodHeight * 0.8f, pReasonLabel, -1, -1.0f);

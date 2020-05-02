@@ -299,15 +299,22 @@ void CCharacter::FireWeapon()
 			for (int i = 0; i < Num; ++i)
 			{
 				CCharacter *pTarget = apEnts[i];
-				if ((pTarget == this) || pTarget->m_Core.m_LostData || GS()->Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, NULL, NULL))
+				if ((pTarget == this)  || GS()->Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, NULL, NULL))
 					continue;
 
 				if (!m_pPlayer->IsBot() && pTarget->GetPlayer()->IsBot() 
-					&& (pTarget->GetPlayer()->GetSpawnBot() == SPAWN_NPC || pTarget->GetPlayer()->GetSpawnBot() == SPAWN_QUEST_NPC))
+					&& (pTarget->GetPlayer()->GetSpawnBot() == SPAWN_NPC 
+					|| (pTarget->GetPlayer()->GetSpawnBot() == SPAWN_QUEST_NPC
+							&& GS()->Mmo()->Quest()->GetState(m_pPlayer->GetCID(), BotJob::QuestBot[pTarget->GetPlayer()->GetBotSub()].QuestID) == QUEST_ACCEPT)))
 				{
 					m_pPlayer->ClearTalking();
 					m_pPlayer->SetTalking(pTarget->GetPlayer()->GetCID(), false);
+					GS()->CreateHammerHit(ProjStartPos);
+					continue;
 				}
+
+				if (pTarget->m_Core.m_LostData)
+					continue;
 
 				if(length(pTarget->m_Pos-ProjStartPos) > 0.0f)
 					GS()->CreateHammerHit(pTarget->m_Pos-normalize(pTarget->m_Pos-ProjStartPos)*GetProximityRadius()*0.5f);
