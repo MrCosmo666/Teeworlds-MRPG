@@ -959,7 +959,7 @@ void CGS::OnInit(int WorldID)
 	m_CommandManager.Init(m_pConsole, this, NewCommandHook, RemoveCommandHook);
 
 	m_WorldID = WorldID;
-	m_DungeonID = GetDungeonID();
+	UpdateZoneDungeon();
 
 	for(int i = 0; i < NUM_NETOBJTYPES; i++)
 		Server()->SnapSetStaticsize(i, m_NetObjHandler.GetObjSize(i));
@@ -994,7 +994,7 @@ void CGS::OnInit(int WorldID)
 		}
 	}
 
-	LoadZonePVP();
+	UpdateZonePVP();
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
 }
 
@@ -1464,10 +1464,6 @@ void CGS::OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld)
 	// очистка данных
 	delete m_apPlayers[ClientID];
 	m_apPlayers[ClientID] = nullptr;
-
-	if (m_apPlayers[ClientID])
-		dbg_msg("test", "yes i security");
-
 	ClearClientData(ClientID);
 }
 
@@ -2115,7 +2111,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		{
 			const int ItemID = pPlayer->GetItemEquip(i);
 			ItemJob::ItemPlayer& pPlayerItem = pPlayer->GetItem(ItemID);
-			if(ItemID <= 0 || !pPlayerItem.Settings)
+			if(ItemID <= 0 || !pPlayerItem.IsEquipped())
 			{
 				AVM(ClientID, "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} Not equipped", pType[i]);
 				continue;
@@ -2127,25 +2123,20 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		}
 
 		// все Equip слоты предемтов
-		for(int i = EQUIP_WINGS; i < NUM_EQUIPS; i++) 
+		AV(ClientID, "null", "");
+		bool FindItem = false;
+		for (const auto& it : ItemJob::Items[ClientID])
 		{
-			if(pPlayer->m_SortTabs[SORTEQUIP] != i) 
+			if (!it.second.Count || it.second.Info().Function != pPlayer->m_SortTabs[SORTEQUIP])
 				continue;
 
-			bool FindItem = false;
-			AV(ClientID, "null", "");
-			for(const auto& it : ItemJob::Items[ClientID]) 
-			{
-				if(!it.second.Count || it.second.Info().Function != i) 
-					continue;
-		
-				Mmo()->Item()->ItemSelected(pPlayer, it.second, true);			
-				FindItem = true;
-			}
-
-			if(!FindItem) 
-				AVL(ClientID, "null", "There are no items in this tab");
+			Mmo()->Item()->ItemSelected(pPlayer, it.second, true);
+			FindItem = true;
 		}
+
+		if (!FindItem)
+			AVL(ClientID, "null", "There are no items in this tab");
+
 		AddBack(ClientID);
 	}
 	else if(MenuList == MenuList::MENU_ADVENTURE_JOURNAL_FINISHED) 
@@ -2172,7 +2163,7 @@ void CGS::AddBack(int ClientID)
 		return;
 
 	AV(ClientID, "null", "");
-	m_apPlayers[ClientID]->m_Colored = {40,0,0};
+	m_apPlayers[ClientID]->m_Colored = RED_COLOR;
 	AVL(ClientID, "BACK", "Backpage");
 	m_apPlayers[ClientID]->m_Colored = {0,0,0};
 }
@@ -2287,19 +2278,12 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 
 	// ищем есть ли активный бот у всех игроков
 	bool ActiveBot = Mmo()->Quest()->IsActiveQuestBot(QuestID, Step);
-
-	// если активен у кого то бот но его нету создаем
-	dbg_msg("test", "%d %d", ActiveBot, QuestBotClientID);
 	if(ActiveBot && QuestBotClientID <= -1)
-	{
-		dbg_msg("test", "я создаю бота для квеста %d", QuestID);
 		CreateBot(SpawnBot::SPAWN_QUEST_NPC, FindBot.BotID, FindBot.SubBotID);
-	}
 	
 	// если бот не активен не у одного игрока, но игрок найден удаляем
-	if(!ActiveBot && QuestBotClientID >= MAX_PLAYERS)
+	if (!ActiveBot && QuestBotClientID >= MAX_PLAYERS)
 	{
-		dbg_msg("test", "я удаляю бота для квеста %d", QuestID);
 		delete m_apPlayers[QuestBotClientID];
 		m_apPlayers[QuestBotClientID] = nullptr;
 	}
@@ -2426,25 +2410,27 @@ int CGS::IncreaseCountRaid(int IncreaseCount) const
 }
 
 // Проверяем данж ли этот мир или нет
-int CGS::GetDungeonID() const
+void CGS::UpdateZoneDungeon()
 {
 	for(const auto& dd : DungeonJob::Dungeon)
 	{
-		if(m_WorldID == dd.second.WorldID)
-			return dd.first;
+		if (m_WorldID == dd.second.WorldID)
+		{
+			m_DungeonID = dd.first;
+			return;
+		}
 	}
-	return -1;
+	m_DungeonID = 0;
 }
 
 bool CGS::IsClientEqualWorldID(int ClientID, int WorldID) const
 {
 	if (WorldID <= -1)
 		return (bool)(Server()->GetWorldID(ClientID) == m_WorldID);
-
 	return (bool)(Server()->GetWorldID(ClientID) == WorldID);
 }
 
-void CGS::LoadZonePVP()
+void CGS::UpdateZonePVP()
 {
 	if (IsDungeon())
 	{
@@ -2466,9 +2452,8 @@ const char* CGS::AtributeName(int BonusID) const
 {
 	for (const auto& at : CGS::AttributInfo)
 	{
-		if (at.first != BonusID)
-			continue;
-		return at.second.Name;
+		if (at.first == BonusID)
+			return at.second.Name;
 	}
 	return "Has no stats";
 }

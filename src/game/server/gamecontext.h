@@ -316,8 +316,8 @@ public:
 	const char* AtributeName(int BonusID) const;
 
 private:
-	int GetDungeonID() const;
-	void LoadZonePVP();
+	void UpdateZoneDungeon();
+	void UpdateZonePVP();
 
 	/* #########################################################################
 		FUNCTIONS PLAYER ITEMS
