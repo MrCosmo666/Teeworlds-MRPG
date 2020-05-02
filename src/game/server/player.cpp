@@ -452,10 +452,7 @@ void CPlayer::AddExp(int Exp)
 	ProgressBar("Account", Acc().Level, Acc().Exp, ExpNeed(Acc().Level), Exp);
 
 	if (rand() % 5 == 0)
-	{
 		GS()->Mmo()->SaveAccount(this, SaveType::SAVE_STATS);
-		GS()->VResetVotes(m_ClientID, MenuList::MAIN_MENU);
-	}
 
 	if (Acc().IsGuild())
 		GS()->Mmo()->Member()->AddExperience(Acc().GuildID);
@@ -655,6 +652,10 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 	// общение на диалогах для ванильных клиентов
 	if (GetTalkedID() > 0 && !GS()->CheckClient(m_ClientID))
 	{
+		if (m_PlayerTick[TickState::LastDialog] && m_PlayerTick[TickState::LastDialog] + GS()->Server()->TickSpeed() > GS()->Server()->Tick())
+			return true;
+
+		m_PlayerTick[TickState::LastChat] = GS()->Server()->Tick();
 		SetTalking(GetTalkedID(), true);
 		return true;
 	}

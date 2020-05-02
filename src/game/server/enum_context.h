@@ -45,6 +45,7 @@ enum TickState
 	LastChat,
 	LastVoteTry,
 	CheckClient,
+	LastDialog,
 	NUM_TICK,
 };
 

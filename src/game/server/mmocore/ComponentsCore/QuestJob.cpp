@@ -307,8 +307,7 @@ void QuestJob::CollectItem(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData)
 
 	if (antiStressing)
 	{
-		dbg_msg("test", "here stressing");
-		kurosio::kpause(5);
+		kurosio::kpause(10);
 	}
 
 	// выдать предмет
@@ -434,7 +433,6 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotDa
 
 	// проверяем и выдаем потом
 	CollectItem(pPlayer, BotData);
-
 	GS()->VResetVotes(ClientID, MenuList::MENU_ADVENTURE_JOURNAL_MAIN);
 	GS()->Mmo()->Quest()->AddProgress(pPlayer, QuestID);
 	return true;
@@ -790,9 +788,12 @@ bool QuestJob::OnMessage(int MsgID, void *pRawMsg, int ClientID)
 	CPlayer *pPlayer = GS()->m_apPlayers[ClientID];
 	if (MsgID == NETMSGTYPE_CL_TALKINTERACTIVE)
 	{
+		if (pPlayer->m_PlayerTick[TickState::LastDialog] && pPlayer->m_PlayerTick[TickState::LastDialog] + GS()->Server()->TickSpeed() > GS()->Server()->Tick())
+			return true;
+
+		pPlayer->m_PlayerTick[TickState::LastChat] = GS()->Server()->Tick();
 		int TalkedID = pPlayer->GetTalkedID();
 		pPlayer->SetTalking(TalkedID, true);
-
 		return true;
 	}
 	return false;
