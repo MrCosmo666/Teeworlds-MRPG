@@ -291,7 +291,6 @@ public:
 	/* #########################################################################
 		MMO GAMECONTEXT 
 	######################################################################### */
-	void SendInformationBot(CPlayerBot* pPlayer);
 	void CreateBot(short SpawnPoint, int BotID, int SubID);
 	void CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, int WorldID);
 	void CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop = 1, vec2 Force = vec2(0.0f, 0.0f));

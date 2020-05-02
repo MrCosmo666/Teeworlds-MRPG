@@ -9,82 +9,16 @@
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayerBot, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
 
-
-/*
-	Начало глава нулевая: Приезд (1 зона / пару квестов  (небольшая зона))
-
-	Зоны: Пирс у берега великих земель
-
-	Появление происходит на корабле, рядом с караблем стоит NPC() что дает КВЕСТ() где следует помочь (Рабочим(NPC) и один Квестовый NPC)
-	После чего он направляет тебя к входу в новую зону
-
-	(NPC что стоит возле коробля часть 1)
-		- Здравствуй я прибыл с небольшой деревни за горами и океаном, меня зовут [Игрок], у меня есть желание стать авантюристом. Но я не знаю об этом месте, не могли бы вы мне помочь?
-			- Здравствуй [Игрок], да конечно я помогу тебе, объясню куда тебе потребуется идти, но и ты помоги моим рабочим, совсем не справляются.
-		- С чем вам требуется помощь, я хорошо справляюсь с хищниками без мяса вас не оставлю! **Смех**
-			- Ох ты шутник какой, нет спасибо пройди чуть дальше ребята тебе все объяснят!
-		- Хорошо, спасибо!
-
-	(Главный Рабочий часть 2)
-		- Здравствуйте, меня к вам направил плотник сказал помочь вам.
-			- Приветствую тебя, ты только прибыл?
-		- Да, я прибыл к вам, чтобы стать авантюристом, мне нужны деньги.
-			- Ну я тебе скажу [Игрок], в последнее время здесь все очень плохо, жители живут в страхе. Недавно маленькую девочку убили, как мы поняли тут замешана мертвая сила.
-		- Ктоо...  Мертвецы? **страх**
-			- Я точно не знаю. Со временем тебе жители все расскажут, или сам ощутишь на себе что там происходит.
-		- Я не ожидал, что все так плохо. Хорошо с чем вам помочь?
-			- Пройдем за мной наши ребята обронили пушечные ядра, поможешь собрать их.
-
-	(Главный Рабочий часть 3)
-			- Ладно вообщем помоги собрать все доски! Я вознагражу тебя за помощь.
-			[Задание (Собрать 12 досок с пола)]
-		- Ох черт какие они тяжелые, все я собрал.
-			- Отличная работа! Мышцы тебе в любом случае не помешают [Игрок] **смех**
-		- **смех**
-			- А теперь раздай их моих ребятам, пусть продолжают заниматся своим делом.
-		- Хорошо [Talked]
-
-	(Мелкий Рабочий часть 4)
-		- Вот держи, мне сказал ваш начальник отдать это вам!
-			- Спасибо за помощь.
-
-	(Мелкий Рабочий часть 5)
-		- Вот держи, мне сказал ваш начальник отдать это вам!
-			- Спасибо за помощь.
-
-	(Мелкий Рабочий часть 6)
-		- Вот держи, мне сказал ваш начальник отдать это вам!
-			- Спасибо за помощь.
-
-	(Главный рабочий часть 7)
-		- Фух устал. Но я справился!
-			- Молодец, возьми это. Я думаю тебе это надобнее раз ты собрался стать авантюристом. Направляй прямо, и ты выйдешь прямо к жителям, если что спросишь куда идти.
-		- Хорошо спасибо, удачи вам с работой!
-	[[Награда (Молоток / 30 exp / 10 gold) - Открытие следующей главы 1]]
-
-	
-
-	NPC что там имеются
-	
-	(Капитан)
-			- Какая сегодня замечательная погода!
-		- Да я тоже так думаю.
-			- Ну как тебе у нас на корабле [Player]? Захватывает океан. Я думаю тут еще немного побуду, тут замечательно.
-		- Мне тоже очень нравится. Ладно я пойду, желаю вам хорошего отдыха [Talked]!
-			- Спасибо тебе тоже!
-
-*/
-
-
 IServer* CPlayer::Server() const { return m_pGS->Server(); };
 
 CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint)
 : CPlayer(pGS, ClientID), m_SpawnPointBot(SpawnPoint), m_BotID(BotID), m_SubBotID(SubBotID), m_BotHealth(0)
 {
+	SendInformationBot();
+
 	m_Spawned = true;
 	m_DungeonAllowedSpawn = false;
 	m_PlayerTick[TickState::Respawn] = Server()->Tick();
-	GS()->SendInformationBot(this);
 }
 
 CPlayerBot::~CPlayerBot() 
@@ -340,4 +274,30 @@ const char* CPlayerBot::GetStatusBot()
 		return "Raid";
 	}
 	return "\0";
+}
+
+void CPlayerBot::SendInformationBot()
+{
+	CNetMsg_Sv_ClientDrop Msg;
+	Msg.m_ClientID = m_ClientID;
+	Msg.m_pReason = "\0";
+	Msg.m_Silent = true;
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1);
+
+	CNetMsg_Sv_ClientInfo ClientInfoMsg;
+	ClientInfoMsg.m_ClientID = m_ClientID;
+	ClientInfoMsg.m_Local = 0;
+	ClientInfoMsg.m_Team = GetTeam();
+
+	ClientInfoMsg.m_pName = BotJob::DataBot[m_BotID].Name(this);
+	ClientInfoMsg.m_pClan = "::Bots::";
+	ClientInfoMsg.m_Country = 0;
+	ClientInfoMsg.m_Silent = true;
+	for (int p = 0; p < 6; p++)
+	{
+		ClientInfoMsg.m_apSkinPartNames[p] = BotJob::DataBot[m_BotID].SkinNameBot[p];
+		ClientInfoMsg.m_aUseCustomColors[p] = BotJob::DataBot[m_BotID].UseCustomBot[p];
+		ClientInfoMsg.m_aSkinPartColors[p] = BotJob::DataBot[m_BotID].SkinColorBot[p];
+	}
+	Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1, GS()->CheckPlayerMessageWorldID(m_ClientID));
 }

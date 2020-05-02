@@ -36,11 +36,9 @@ void QuestJob::OnInit()
 		{
 			if(qb.second.QuestID != QUID) 
 				continue;
-
 			ProgressSize++;
 		}
 		QuestsData[ QUID ].ProgressSize = ProgressSize;
-		dbg_msg("test", "TWWWWWWWWWWWWWWWWWWWWWWWW %d", ProgressSize);
 	}
 }
 

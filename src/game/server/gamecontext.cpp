@@ -2246,31 +2246,6 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 /* #########################################################################
 	MMO GAMECONTEXT 
 ######################################################################### */
-void CGS::SendInformationBot(CPlayerBot *pPlayerBot)
-{
-	if (!pPlayerBot)
-		return;
-
-	int ClientID = pPlayerBot->GetCID();
-	CNetMsg_Sv_ClientInfo ClientInfoMsg;
-	ClientInfoMsg.m_ClientID = ClientID;
-	ClientInfoMsg.m_Local = 0;
-	ClientInfoMsg.m_Team = pPlayerBot->GetTeam();
-
-	int BotID = pPlayerBot->GetBotID();
-	ClientInfoMsg.m_pName = BotJob::DataBot[BotID].Name(pPlayerBot);
-	ClientInfoMsg.m_pClan = "::Bots::";
-	ClientInfoMsg.m_Country = 0;
-	ClientInfoMsg.m_Silent = true;
-	for (int p = 0; p < 6; p++)
-	{
-		ClientInfoMsg.m_apSkinPartNames[p] = BotJob::DataBot[BotID].SkinNameBot[p];
-		ClientInfoMsg.m_aUseCustomColors[p] = BotJob::DataBot[BotID].UseCustomBot[p];
-		ClientInfoMsg.m_aSkinPartColors[p] = BotJob::DataBot[BotID].SkinColorBot[p];
-	}
-	Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1);
-}
-
 void CGS::CreateBot(short SpawnPoint, int BotID, int SubID)
 {
 	int BotClientID = MAX_PLAYERS;
