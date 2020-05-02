@@ -136,9 +136,6 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	}
 
 	Job()->OnInitAccount(ClientID);
-	if (!pPlayer->GetItem(itHammer).Count)
-		pPlayer->GetItem(itHammer).Add(1, 0);
-
 	const int Rank = GetRank(pPlayer->Acc().AuthID);
 	GS()->Chat(-1, "{STR} joined to Mmo server Rank #{INT}", GS()->Server()->ClientName(ClientID), &Rank);
 #ifdef CONF_DISCORD
@@ -148,6 +145,13 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		GS()->Server()->ClientName(ClientID), Rank, pPlayer->GetItemEquip(EQUIP_DISCORD));
 	GS()->Server()->SendDiscordGenerateMessage("16757248", pLoggin, pMsg);
 #endif
+
+	if (!pPlayer->GetItem(itHammer).Count)
+	{
+		pPlayer->GetItem(itHammer).Add(1);
+		GS()->Server()->ChangeWorld(ClientID, NEWBIE_ZERO_WORLD);
+		return;
+	}
 
 	if(pPlayer->Acc().WorldID != GS()->GetWorldID())
 	{

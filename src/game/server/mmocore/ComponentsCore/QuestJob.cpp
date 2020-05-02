@@ -284,7 +284,7 @@ void QuestJob::FinishQuest(CPlayer *pPlayer, int QuestID)
 	Job()->SaveAccount(pPlayer, SaveType::SAVE_STATS);
 
 	if (!CheckNewStories(pPlayer, QuestID))
-		GS()->Chat(ClientID, "At this point you know everything from story {STR} story", QuestsData[QuestID].StoryLine);
+		GS()->Chat(ClientID, "You completed the chapter {STR}!", QuestsData[QuestID].StoryLine);
 
 	Job()->WorldSwap()->CheckQuestingOpened(pPlayer, QuestID);
 	Job()->Dungeon()->CheckQuestingOpened(pPlayer, QuestID);
