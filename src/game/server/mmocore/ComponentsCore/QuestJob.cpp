@@ -279,8 +279,8 @@ void QuestJob::FinishQuest(CPlayer *pPlayer, int QuestID)
 	pPlayer->AddMoney(finishQuestData.Money);
 	pPlayer->AddExp(finishQuestData.Exp);
 
-	GS()->Chat(-1, "{STR} completed ({STR} {STR})", GS()->Server()->ClientName(ClientID), finishQuestData.StoryLine, finishQuestData.Name);
-	GS()->ChatDiscord(DC_PLAYER_INFO, GS()->Server()->ClientName(ClientID), "Completed ({STR} {STR})", finishQuestData.StoryLine, finishQuestData.Name);
+	GS()->Chat(-1, "{STR} completed ({STR} : {STR})", GS()->Server()->ClientName(ClientID), finishQuestData.StoryLine, finishQuestData.Name);
+	GS()->ChatDiscord(DC_PLAYER_INFO, GS()->Server()->ClientName(ClientID), "Completed ({STR} : {STR})", finishQuestData.StoryLine, finishQuestData.Name);
 	Job()->SaveAccount(pPlayer, SaveType::SAVE_STATS);
 
 	if (!CheckNewStories(pPlayer, QuestID))
