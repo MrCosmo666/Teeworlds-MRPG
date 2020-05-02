@@ -534,6 +534,50 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		GS()->AddBack(ClientID);
 		return true;
 	}
+
+	if (Menulist == MenuList::MENU_EQUIPMENT)
+	{
+		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
+		GS()->AVH(ClientID, TAB_EQUIP_INFO, GREEN_COLOR, "Equip / Armor Information");
+		GS()->AVM(ClientID, "null", NOPE, TAB_EQUIP_INFO, "Select tab and select armor.");
+		GS()->AV(ClientID, "null", "");
+		GS()->ShowPlayerStats(pPlayer);
+
+		GS()->AVH(ClientID, TAB_EQUIP_SELECT, RED_COLOR, "Equip Select List");
+		const char* pType[NUM_EQUIPS] = { "Wings", "Hammer", "Gun", "Shotgun", "Grenade", "Rifle", "Discord", "Pickaxe" };
+		for (int i = EQUIP_WINGS; i < NUM_EQUIPS; i++)
+		{
+			const int ItemID = pPlayer->GetItemEquip(i);
+			ItemJob::ItemPlayer& pPlayerItem = pPlayer->GetItem(ItemID);
+			if (ItemID <= 0 || !pPlayerItem.IsEquipped())
+			{
+				GS()->AVM(ClientID, "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} Not equipped", pType[i]);
+				continue;
+			}
+
+			char aAttributes[128];
+			FormatAttributes(pPlayerItem, sizeof(aAttributes), aAttributes);
+			GS()->AVMI(ClientID, pPlayerItem.Info().GetIcon(), "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], GS()->GetItemInfo(ItemID).GetName(pPlayer), aAttributes);
+		}
+
+		// все Equip слоты предемтов
+		GS()->AV(ClientID, "null", "");
+		bool FindItem = false;
+		for (const auto& it : ItemJob::Items[ClientID])
+		{
+			if (!it.second.Count || it.second.Info().Function != pPlayer->m_SortTabs[SORTEQUIP])
+				continue;
+
+			ItemSelected(pPlayer, it.second, true);
+			FindItem = true;
+		}
+
+		if (!FindItem)
+			GS()->AVL(ClientID, "null", "There are no items in this tab");
+
+		GS()->AddBack(ClientID);
+		return true;
+	}
 	return false;
 }
 

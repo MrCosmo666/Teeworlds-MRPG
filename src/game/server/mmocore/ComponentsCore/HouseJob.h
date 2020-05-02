@@ -40,6 +40,7 @@ public:
 	virtual void OnInitWorld(const char* pWhereLocalWorld);
 	virtual void OnPaymentTime();
 	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
+	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 	
 	/* #########################################################################
 		FUNCTIONS HOUSES PLANTS
@@ -53,6 +54,12 @@ public:
 private:
 	bool DeleteDecorationHouse(int ID);
 	void ShowDecorationList(CPlayer *pPlayer);
+
+	/* #########################################################################
+		MENUS HOUSES 
+	######################################################################### */
+	void ShowHouseMenu(CPlayer* pPlayer, int HouseID);
+	void ShowPersonalHouse(CPlayer* pPlayer);
 
 	/* #########################################################################
 		GET CHECK HOUSES 
@@ -84,16 +91,9 @@ public:
 	void ChangeStateDoor(int HouseID);
 
 	/* #########################################################################
-		MENUS HOUSES 
-	######################################################################### */
-	void ShowHouseMenu(CPlayer *pPlayer, int HouseID);
-	void ShowPersonalHouse(CPlayer *pPlayer);
-
-	/* #########################################################################
 		PARSING HOUSES 
 	######################################################################### */
 	virtual bool OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
-	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 };
 
 

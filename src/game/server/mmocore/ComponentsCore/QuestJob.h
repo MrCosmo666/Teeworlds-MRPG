@@ -71,7 +71,8 @@ private:
 	######################################################################### */
 	void ShowQuestID(CPlayer *pPlayer, int QuestID);
 	void FinishQuest(CPlayer *pPlayer, int QuestID);
-	bool IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData, bool Gived, bool Interactive = false);
+	bool IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData, bool Gived);
+	void CollectItem(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData);
 	void AddProgress(CPlayer *pPlayer, int QuestID);
 
 	bool ShowAdventureActiveNPC(CPlayer *pPlayer);

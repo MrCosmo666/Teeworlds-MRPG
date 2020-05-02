@@ -1933,12 +1933,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		if(!pChar || !pChar->IsAlive())
 			return;
 
-		if (pChar->GetHelper()->BoolIndex(TILE_PLAYER_HOUSE))
-		{
-			const int HouseID = Mmo()->House()->GetHouse(pChar->m_Core.m_Pos);
-			if (HouseID > 0) Mmo()->House()->ShowHouseMenu(pPlayer, HouseID);
-		}
-		else if (pChar->GetHelper()->BoolIndex(TILE_GUILD_HOUSE))
+		if (pChar->GetHelper()->BoolIndex(TILE_GUILD_HOUSE))
 		{
 			const int HouseID = Mmo()->Member()->GetPosHouseID(pChar->m_Core.m_Pos);
 			Mmo()->Member()->ShowBuyHouse(pPlayer, HouseID);
@@ -1960,29 +1955,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AddBack(ClientID);
 		AV(ClientID, "null", "");
 		Mmo()->Inbox()->GetInformationInbox(pPlayer);
-	}
-
-	else if(MenuList == MenuList::MENU_HOUSE) 
-	{
-		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
-		
-		Mmo()->House()->ShowPersonalHouse(pPlayer);
-		AddBack(ClientID);
-	}
-	else if(MenuList == MenuList::MENU_HOUSE_PLANTS) 
-	{
-		const int HouseID = Mmo()->House()->OwnerHouseID(pPlayer->Acc().AuthID);
-		const int PlantItemID = Mmo()->House()->GetPlantsID(HouseID);
-		pPlayer->m_LastVoteMenu = MenuList::MENU_HOUSE;
-
-		AVH(ClientID, TAB_INFO_HOUSE_PLANT, GREEN_COLOR, "Plants Information");
-		AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE_PLANT, "Select item and in tab select 'Change Plants'");
-		AV(ClientID, "null", "");
-
-		AVM(ClientID, "null", NOPE, NOPE, "Housing Active Plants: {STR}", GetItemInfo(PlantItemID).GetName(pPlayer));
-
-		Mmo()->Item()->ListInventory(pPlayer, FUNCTION_PLANTS, true);
-		AddBack(ClientID);	
 	}
 	else if(MenuList == MenuList::MENU_UPGRADE) 
 	{
@@ -2094,48 +2066,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		if (!FoundedBots)
 			AVL(ClientID, "null", "There are no active mobs in your zone!");
-
-		AddBack(ClientID);
-	}
-	else if(MenuList == MenuList::MENU_EQUIPMENT) 
-	{
-		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
-		AVH(ClientID, TAB_EQUIP_INFO, GREEN_COLOR, "Equip / Armor Information");
-		AVM(ClientID, "null", NOPE, TAB_EQUIP_INFO, "Select tab and select armor.");
-		AV(ClientID, "null", "");
-		ShowPlayerStats(pPlayer);
-
-		AVH(ClientID, TAB_EQUIP_SELECT, RED_COLOR, "Equip Select List");
-		const char* pType[NUM_EQUIPS] = { "Wings", "Hammer", "Gun", "Shotgun", "Grenade", "Rifle", "Discord", "Pickaxe" };
-		for(int i = EQUIP_WINGS; i < NUM_EQUIPS; i++) 
-		{
-			const int ItemID = pPlayer->GetItemEquip(i);
-			ItemJob::ItemPlayer& pPlayerItem = pPlayer->GetItem(ItemID);
-			if(ItemID <= 0 || !pPlayerItem.IsEquipped())
-			{
-				AVM(ClientID, "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} Not equipped", pType[i]);
-				continue;
-			}
-
-			char aAttributes[128];
-			Mmo()->Item()->FormatAttributes(pPlayerItem, sizeof(aAttributes), aAttributes);
-			AVMI(ClientID, pPlayerItem.Info().GetIcon(), "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], GetItemInfo(ItemID).GetName(pPlayer), aAttributes);
-		}
-
-		// все Equip слоты предемтов
-		AV(ClientID, "null", "");
-		bool FindItem = false;
-		for (const auto& it : ItemJob::Items[ClientID])
-		{
-			if (!it.second.Count || it.second.Info().Function != pPlayer->m_SortTabs[SORTEQUIP])
-				continue;
-
-			Mmo()->Item()->ItemSelected(pPlayer, it.second, true);
-			FindItem = true;
-		}
-
-		if (!FindItem)
-			AVL(ClientID, "null", "There are no items in this tab");
 
 		AddBack(ClientID);
 	}

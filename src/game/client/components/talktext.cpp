@@ -3,6 +3,8 @@
 #include <generated/protocol.h>
 #include <generated/client_data.h>
 
+#include <base/color.h>
+
 #include <engine/shared/config.h>
 #include <engine/graphics.h>
 #include <engine/textrender.h>
@@ -55,18 +57,19 @@ void CTalkText::OnRender()
 	// --------------------------------------------------------
 	CUIRect BackgroundOther;
 	{
-		vec4 ColorBackground = vec4(0.3f, 0.23f, 0.15f, 0.5f);
+		vec4 ColorBackground = vec4(0.06f, 0.19f, 0.37f, 0.65f);
 		vec4 ColorBackgroundOther = vec4(0.05f, 0.05f, 0.05f, 0.35f);
 		if (m_Style == TALK_STYLE_AGRESSIVE)
 		{
 			TalkingEmoticion = SPRITE_DEVILTEE;
-			ColorBackground = vec4(0.6f, 0.15f, 0.22f, 0.4f);
+			ColorBackground = vec4(0.37f, 0.06f, 0.11f, 0.65f);
 			ColorBackgroundOther = vec4(0.05f, 0.05f, 0.05f, 0.35f);
 		}
 		else if (m_Style == TALK_STYLE_HAPPED)
 		{
+
 			TalkingEmoticion = SPRITE_EYES;
-			ColorBackground = vec4(0.15f, 0.6f, 0.22f, 0.4f);
+			ColorBackground = vec4(0.06f, 0.24f, 0.07f, 0.65f);
 			ColorBackgroundOther = vec4(0.05f, 0.05f, 0.05f, 0.35f);
 		}
 

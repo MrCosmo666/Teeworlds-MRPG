@@ -15,7 +15,7 @@
 #include "questing_processing.h"
 
 #define COLOR_TABLE vec4(0.40f, 0.22f, 0.08f, 0.3f)
-#define COLOR_BACKGROUND vec4(0.35f, 0.13f, 0.007f, 0.4f)
+#define COLOR_BACKGROUND vec4(0.30f, 0.11f, 0.004f, 0.65f)
 #define COLOR_BACKBACKGROUND vec4(0.30f, 0.19f, 0.15f, 0.30f)
 #define COLOR_UIBAR vec4(0.35f, 0.55f, 0.1f, 0.45f)
 

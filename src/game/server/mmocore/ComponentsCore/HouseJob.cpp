@@ -399,6 +399,68 @@ bool HouseJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	return false;
 }
 
+bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+{
+	int ClientID = pPlayer->GetCID();
+	if (ReplaceMenu)
+	{
+		CCharacter* pChr = pPlayer->GetCharacter();
+		if (!pChr || !pChr->IsAlive())
+			return false;
+
+		if (Menulist == MenuList::MAIN_MENU && pChr->GetHelper()->BoolIndex(TILE_PLAYER_HOUSE))
+		{
+			const int HouseID = GetHouse(pChr->m_Core.m_Pos);
+			if (HouseID > 0)
+				ShowHouseMenu(pPlayer, HouseID);
+
+			return true;
+		}
+		return false;
+	}
+
+	if (Menulist == MenuList::MENU_HOUSE_DECORATION)
+	{
+		pPlayer->m_LastVoteMenu = MenuList::MENU_HOUSE;
+		GS()->AVH(ClientID, TAB_INFO_DECORATION, GREEN_COLOR, "Decorations Information");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "Add: Select your item in list. Select (Add to house),");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "later press (ESC) and mouse select position");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "Return in inventory: Select down your decorations");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "and press (Back to inventory).");
+
+		Job()->Item()->ListInventory(pPlayer, ItemType::TYPE_DECORATION);
+		GS()->AV(ClientID, "null", "");
+		ShowDecorationList(pPlayer);
+		GS()->AddBack(ClientID);
+		return true;
+	}
+	if (Menulist == MenuList::MENU_HOUSE)
+	{
+		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
+
+		ShowPersonalHouse(pPlayer);
+		GS()->AddBack(ClientID);
+		return true;
+	}
+	if (Menulist == MenuList::MENU_HOUSE_PLANTS)
+	{
+		const int HouseID = OwnerHouseID(pPlayer->Acc().AuthID);
+		const int PlantItemID = GetPlantsID(HouseID);
+		pPlayer->m_LastVoteMenu = MenuList::MENU_HOUSE;
+
+		GS()->AVH(ClientID, TAB_INFO_HOUSE_PLANT, GREEN_COLOR, "Plants Information");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE_PLANT, "Select item and in tab select 'Change Plants'");
+		GS()->AV(ClientID, "null", "");
+
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "Housing Active Plants: {STR}", GS()->GetItemInfo(PlantItemID).GetName(pPlayer));
+
+		GS()->Mmo()->Item()->ListInventory(pPlayer, FUNCTION_PLANTS, true);
+		GS()->AddBack(ClientID);
+		return true;
+	}
+	return false;
+}
+
 // Снять баланс с фарм счета
 void HouseJob::TakeFarmMoney(CPlayer *pPlayer, int TakeCount)
 {
@@ -659,32 +721,6 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 	}
 
-	return false;
-}
-
-bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
-{
-	int ClientID = pPlayer->GetCID();
-	if (ReplaceMenu)
-	{
-		return false;
-	}
-
-	if (Menulist == MenuList::MENU_HOUSE_DECORATION)
-	{
-		pPlayer->m_LastVoteMenu = MenuList::MENU_HOUSE;
-		GS()->AVH(ClientID, TAB_INFO_DECORATION, GREEN_COLOR, "Decorations Information");
-		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "Add: Select your item in list. Select (Add to house),");
-		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "later press (ESC) and mouse select position");
-		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "Return in inventory: Select down your decorations");
-		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "and press (Back to inventory).");
-
-		Job()->Item()->ListInventory(pPlayer, ItemType::TYPE_DECORATION);
-		GS()->AV(ClientID, "null", "");
-		ShowDecorationList(pPlayer);
-		GS()->AddBack(ClientID);
-		return true;
-	}
 	return false;
 }
 

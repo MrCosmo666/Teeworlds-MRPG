@@ -288,8 +288,43 @@ void QuestJob::FinishQuest(CPlayer *pPlayer, int QuestID)
 	Job()->Dungeon()->CheckQuestingOpened(pPlayer, QuestID);
 }
 
+
+void QuestJob::CollectItem(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData)
+{
+	// забрать предмет
+	bool antiStressing = false;
+	for (int i = 0; i < 2; i++)
+	{
+		int ItemID = BotData.Interactive[i];
+		int Count = BotData.InterCount[i];
+		if (ItemID > 0 && Count > 0)
+		{
+			pPlayer->GetItem(ItemID).Remove(Count);
+			GS()->Chat(pPlayer->GetCID(), "You used quest item {STR}x{INT}!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer), &Count);
+			antiStressing = (bool)(ItemID == BotData.Interactive[2] || ItemID == BotData.Interactive[3]);
+		}
+	}
+
+	if (antiStressing)
+	{
+		dbg_msg("test", "here stressing");
+		kurosio::kpause(5);
+	}
+
+	// выдать предмет
+	for (int i = 2; i < 4; i++)
+	{
+		int ItemID = BotData.Interactive[i];
+		int Count = BotData.InterCount[i] - pPlayer->GetItem(ItemID).Count;
+		if (ItemID > 0 && Count > 0)
+		{
+			pPlayer->GetItem(ItemID).Add(Count);
+		}
+	}
+}
+
 // проверить прогресс по предметам что требует бот
-bool QuestJob::IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData, bool Gived, bool Interactive)
+bool QuestJob::IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData, bool Gived)
 {
 	if(!pPlayer || !BotData.IsActive())
 		return false;
@@ -297,20 +332,6 @@ bool QuestJob::IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &Bot
 	// проверить выданые предметы или выдать
 	if(Gived)
 	{
-		// выдать предмет
-		if(Interactive)
-		{
-			for(int i = 2; i < 4; i++)
-			{
-				int ItemID = BotData.Interactive[i];
-				int Count = BotData.InterCount[i] - pPlayer->GetItem(ItemID).Count;
-				if (ItemID > 0 && Count > 0)
-				{
-					pPlayer->GetItem(ItemID).Add(Count);
-				}
-			}
-			return true;
-		}
 
 		// проверить выдавание предмета
 		for(int i = 2; i < 4; i++)
@@ -319,22 +340,6 @@ bool QuestJob::IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &Bot
 			int Count = BotData.InterCount[i];
 			if(ItemID > 0 && pPlayer->GetItem(ItemID).Count < Count)
 				return false;
-		}
-		return true;
-	}
-
-	// забрать предмет
-	if(Interactive)
-	{
-		for(int i = 0; i < 2; i++)
-		{
-			int ItemID = BotData.Interactive[i];
-			int Count = BotData.InterCount[i];
-			if (ItemID > 0 && Count > 0)
-			{
-				pPlayer->GetItem(ItemID).Remove(Count);
-				GS()->Chat(pPlayer->GetCID(), "You used quest item {STR}x{INT}!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer), &Count);
-			}
 		}
 		return true;
 	}
@@ -428,8 +433,7 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotDa
 	}
 
 	// проверяем и выдаем потом
-	IsCollectItemComplete(pPlayer, BotData, false, true);
-	IsCollectItemComplete(pPlayer, BotData, true, true);
+	CollectItem(pPlayer, BotData);
 
 	GS()->VResetVotes(ClientID, MenuList::MENU_ADVENTURE_JOURNAL_MAIN);
 	GS()->Mmo()->Quest()->AddProgress(pPlayer, QuestID);
