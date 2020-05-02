@@ -306,8 +306,10 @@ bool QuestJob::IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &Bot
 			{
 				int ItemID = BotData.Interactive[i];
 				int Count = BotData.InterCount[i] - pPlayer->GetItem(ItemID).Count;
-				if(ItemID > 0 && Count > 0) 
+				if (ItemID > 0 && Count > 0)
+				{
 					pPlayer->GetItem(ItemID).Add(Count);
+				}
 			}
 			return true;
 		}
@@ -342,8 +344,12 @@ bool QuestJob::IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &Bot
 	// проверить предмет
 	for(int i = 0; i < 2; i++)
 	{
-		if(BotData.Interactive[i] <= 0 || BotData.InterCount[i] <= 0) continue;
-		if(pPlayer->GetItem(BotData.Interactive[i]).Count < BotData.InterCount[i])
+		int ItemID = BotData.Interactive[i];
+		int Count = BotData.InterCount[i];
+		if(ItemID <= 0 || Count <= 0)
+			continue;
+
+		if(pPlayer->GetItem(ItemID).Count < Count)
 			return false;
 	}
 	return true;

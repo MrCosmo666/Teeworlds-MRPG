@@ -373,7 +373,7 @@ const char *CServer::GetWorldName(int WorldID)
 		
 	const char *NameWorlds[] = {"AcreaLand", 
 								"Pier on coast of great lands", 
-								"Memoria", 
+								"Way to the great lands", 
 								"Change later", 
 								"Castle King", 
 								"Mountains-Icru", 

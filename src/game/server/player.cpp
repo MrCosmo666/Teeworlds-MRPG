@@ -155,9 +155,7 @@ void CPlayer::TickSystemTalk()
 
 	int TalkedID = m_TalkingNPC.m_TalkedID;
 	if(TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] || distance(m_ViewPos, GS()->m_apPlayers[TalkedID]->m_ViewPos) > 180.0f)
-	{
 		ClearTalking();
-	}
 }
 
 // Персональный тюннинг игрока
@@ -784,6 +782,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		int sizeTalking = BotJob::NpcBot[MobID].m_Talk.size();
 		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
 		{
+			ClearTalking();
 			GS()->ClearTalkText(m_ClientID);
 			return;
 		}
@@ -821,8 +820,9 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		int sizeTalking = BotJob::QuestBot[MobID].m_Talk.size();
 		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
 		{
-			GS()->Mmo()->Quest()->InteractiveQuestNPC(this, BotJob::QuestBot[MobID], true);
+			ClearTalking();
 			GS()->ClearTalkText(m_ClientID);
+			GS()->Mmo()->Quest()->InteractiveQuestNPC(this, BotJob::QuestBot[MobID], true);
 			return;
 		}
 
@@ -857,10 +857,10 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 
 void CPlayer::ClearTalking()
 {
+	GS()->SendTalkText(m_ClientID, -1, false, "\0");
 	m_TalkingNPC.m_TalkedID = -1;
 	m_TalkingNPC.m_TalkedProgress = 0;
 	m_TalkingNPC.m_FreezedProgress = false;
-	GS()->SendTalkText(m_ClientID, -1, false, "\0");
 }
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
