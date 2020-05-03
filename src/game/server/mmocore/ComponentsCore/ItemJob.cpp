@@ -677,8 +677,7 @@ bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 
 		char aAttributes[128];
 		GameServer->Mmo()->Item()->FormatAttributes(*this, sizeof(aAttributes), aAttributes);
-		GameServer->Chat(ClientID, "Auto equip {STR} ({STR})!", Info().GetName(pPlayer), aAttributes);
-		GameServer->Chat(ClientID, "For more detail see equip/inventory/settings in vote!");
+		GameServer->Chat(ClientID, "Auto equip {STR} - {STR}", Info().GetName(pPlayer), aAttributes);
 	}
 
 	// выдаем предмет
