@@ -16,7 +16,6 @@ CCollision::CCollision()
 {
 	m_pTiles = nullptr;
 	m_pLayers = nullptr;
-	m_ParseTiles = nullptr;
 	m_Width = 0;
 	m_Height = 0;
 }
@@ -27,12 +26,10 @@ void CCollision::Init(class CLayers *pLayers)
 	m_Width = m_pLayers->GameLayer()->m_Width;
 	m_Height = m_pLayers->GameLayer()->m_Height;
 	m_pTiles = static_cast<CTile *>(m_pLayers->Map()->GetData(m_pLayers->GameLayer()->m_Data));
-	m_ParseTiles = new unsigned short[m_Width*m_Height];
 
 	for(int i = 0; i < m_Width*m_Height; i++)
 	{
 		int Index = m_pTiles[i].m_Index;
-
 		if(Index > 128)
 			continue;
 
@@ -49,7 +46,7 @@ void CCollision::Init(class CLayers *pLayers)
 			break;
 		default:
 			m_pTiles[i].m_Index = 0;
-			m_ParseTiles[i] = Index;
+			m_pTiles[i].m_Flags = static_cast< char >(Index);
 		}
 	}
 }
@@ -68,7 +65,7 @@ unsigned short CCollision::GetParseTile(int x, int y) const
 	int Nx = clamp(x/32, 0, m_Width-1);
 	int Ny = clamp(y/32, 0, m_Height-1);
 
-	return m_ParseTiles[Ny*m_Width+Nx];
+	return static_cast<int>(m_pTiles[Ny * m_Width + Nx].m_Flags);
 }
 
 int CCollision::FastIntersectLine(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *pOutBeforeCollision) const
