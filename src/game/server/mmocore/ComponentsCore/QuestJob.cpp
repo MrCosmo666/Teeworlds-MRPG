@@ -668,7 +668,7 @@ void QuestJob::ShowQuestRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData
 				continue;
 
 			char aBuf[48];
-			str_format(aBuf, sizeof(aBuf), "\n- Defeat %s [%d/%d]", BotJob::DataBot[BotID].NameBot, Quests[ClientID][QuestID].MobProgress[i-4], Count);
+			str_format(aBuf, sizeof(aBuf), "\n- Defeat %s [%d/%d]", BotJob::DataBot[BotID].NameBot, Quests[ClientID][QuestID].MobProgress[i], Count);
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
 	}
