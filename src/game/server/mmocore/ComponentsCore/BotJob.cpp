@@ -99,9 +99,9 @@ void BotJob::LoadQuestBots()
 		QuestBot[MobID].NeedMob[1] = (int)RES->getInt("mob_1");
 
 		sscanf(RES->getString("it_count").c_str(), "|%d|%d|%d|%d|%d|%d|", 
-			&QuestBot[MobID].ItemSearch[0], &QuestBot[MobID].ItemSearch[1],
-			&QuestBot[MobID].ItemGives[0], &QuestBot[MobID].ItemGives[1],
-			&QuestBot[MobID].NeedMob[0], &QuestBot[MobID].NeedMob[1]);
+			&QuestBot[MobID].ItemSearchCount[0], &QuestBot[MobID].ItemSearchCount[1],
+			&QuestBot[MobID].ItemGivesCount[0], &QuestBot[MobID].ItemGivesCount[1],
+			&QuestBot[MobID].NeedMobCount[0], &QuestBot[MobID].NeedMobCount[1]);
 
 		sscanf(RES->getString("it_random").c_str(), "|%d|%d|%d|%d|%d|%d|", 
 			&QuestBot[MobID].InterRandom[0], &QuestBot[MobID].InterRandom[1], &QuestBot[MobID].InterRandom[2],
