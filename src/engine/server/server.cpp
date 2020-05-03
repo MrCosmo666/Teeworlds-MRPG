@@ -134,7 +134,7 @@ void CServerBan::InitServerBan(IConsole *pConsole, IStorage *pStorage, CServer* 
 	m_pServer = pServer;
 
 	// overwrites base command, todo: improve this
-	Console()->Register("ban", "s?ir", CFGFLAG_SERVER|CFGFLAG_STORE, ConBanExt, this, "Ban player with ip/client id for x minutes for any reason");
+	Console()->Register("ban", "s[id|ip|range] ?i[minutes] r[reason]", CFGFLAG_SERVER | CFGFLAG_STORE, ConBanExt, this, "Ban player with IP/IP range/client id for x minutes for any reason");
 }
 
 template<class T>
@@ -1674,7 +1674,7 @@ void CServer::RegisterCommands()
 	m_pStorage = Kernel()->RequestInterface<IStorage>();
 
 	// register console commands
-	Console()->Register("kick", "i?r", CFGFLAG_SERVER, ConKick, this, "Kick player with specified id for any reason");
+	Console()->Register("kick", "i[id] ?r[reason]", CFGFLAG_SERVER, ConKick, this, "Kick player with specified id for any reason");
 	Console()->Register("status", "", CFGFLAG_SERVER, ConStatus, this, "List players");
 	Console()->Register("shutdown", "", CFGFLAG_SERVER, ConShutdown, this, "Shut down");
 	Console()->Register("logout", "", CFGFLAG_SERVER, ConLogout, this, "Logout of rcon");

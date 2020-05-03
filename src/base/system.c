@@ -2301,7 +2301,6 @@ const char *str_find_nocase(const char *haystack, const char *needle)
 	return 0;
 }
 
-
 const char *str_find(const char *haystack, const char *needle)
 {
 	while(*haystack) /* native implementation */
@@ -2362,6 +2361,11 @@ void str_timestamp(char* buffer, int buffer_size)
 #ifdef __GNUC__
 #pragma GCC diagnostic pop
 #endif
+
+int str_span(const char* str, const char* set)
+{
+	return strcspn(str, set);
+}
 
 int mem_comp(const void *a, const void *b, int size)
 {

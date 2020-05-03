@@ -74,7 +74,7 @@ public:
 		Reset();
 
 		if(m_pConsole)
-			m_pConsole->Register("save_config", "?s", CFGFLAG_SERVER|CFGFLAG_CLIENT|CFGFLAG_STORE, Con_SaveConfig, this, "Save config to file");
+			m_pConsole->Register("save_config", "?s[file]", CFGFLAG_SERVER | CFGFLAG_CLIENT | CFGFLAG_STORE, Con_SaveConfig, this, "Save config to file");
 	}
 
 	virtual void Reset()

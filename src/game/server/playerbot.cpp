@@ -278,12 +278,6 @@ const char* CPlayerBot::GetStatusBot()
 
 void CPlayerBot::SendInformationBot()
 {
-	CNetMsg_Sv_ClientDrop Msg;
-	Msg.m_ClientID = m_ClientID;
-	Msg.m_pReason = "\0";
-	Msg.m_Silent = true;
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1, GS()->CheckPlayerMessageWorldID(m_ClientID));
-
 	CNetMsg_Sv_ClientInfo ClientInfoMsg;
 	ClientInfoMsg.m_ClientID = m_ClientID;
 	ClientInfoMsg.m_Local = 0;
@@ -299,5 +293,5 @@ void CPlayerBot::SendInformationBot()
 		ClientInfoMsg.m_aUseCustomColors[p] = BotJob::DataBot[m_BotID].UseCustomBot[p];
 		ClientInfoMsg.m_aSkinPartColors[p] = BotJob::DataBot[m_BotID].SkinColorBot[p];
 	}
-	Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1, GS()->CheckPlayerMessageWorldID(m_ClientID));
+	Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1, GS()->CheckPlayerMessageWorldID(m_ClientID));
 }

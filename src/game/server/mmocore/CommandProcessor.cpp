@@ -15,12 +15,13 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 	// вход в аккаунт
 	if(str_comp_num(Msg->m_pMessage, "/login", 6) == 0)
 	{
-		int ClientID = pPlayer->GetCID();
-
 		// проверяем авторизацию и проверку клиента
+		LastChat(GS, pPlayer);
 		if (pPlayer->IsAuthed())
-			return GS->Chat(ClientID, "You already authed.");
-
+		{
+			GS->Chat(ClientID, "You already authed.");
+			return;
+		}
 		if (pPlayer->m_PlayerTick[TickState::CheckClient] &&
 			pPlayer->m_PlayerTick[TickState::CheckClient] + GS->Server()->TickSpeed() * 5 > GS->Server()->Tick())
 			return GS->Chat(ClientID, "Please wait your client check repeat after 1-4 sec!");
@@ -41,15 +42,15 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 	}
 
 	// регистрация аккаунта
-	 if(str_comp_num(Msg->m_pMessage, "/register", 9) == 0)
+	else if(str_comp_num(Msg->m_pMessage, "/register", 9) == 0)
 	{
-		LastChat(GS, pPlayer);
-		int ClientID = pPlayer->GetCID();
-
 		// проверяем авторизацию и проверку клиента
+		LastChat(GS, pPlayer);
 		if (pPlayer->IsAuthed())
-			return GS->Chat(ClientID, "Logout account and create!");
-
+		{
+			GS->Chat(ClientID, "Logout account and create!");
+			return;
+		}
 		if (pPlayer->m_PlayerTick[TickState::CheckClient] &&
 			pPlayer->m_PlayerTick[TickState::CheckClient] + GS->Server()->TickSpeed() * 5 > GS->Server()->Tick())
 			return GS->Chat(ClientID, "Please wait your client check repeat after 1-4 sec!");
@@ -69,8 +70,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 	{
 		// check authed
 		LastChat(GS, pPlayer);
-		int ClientID = pPlayer->GetCID();
-
 		if (!pPlayer->IsAuthed())
 			return;
 
@@ -89,9 +88,8 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 ////////////////////////////////////////////////////////////////////////////////////////////////
 	else if(str_comp_num(Msg->m_pMessage, "/ginvite", 8) == 0)
 	{
-		LastChat(GS, pPlayer); 		
-
 		// check authed
+		LastChat(GS, pPlayer);
 		if(!pPlayer->IsAuthed())
 			return;
 

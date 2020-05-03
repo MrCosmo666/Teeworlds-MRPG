@@ -34,8 +34,8 @@ void CServerBrowserFavorites::Init(CNetClient *pNetClient, IConsole *pConsole, I
 	if(pConfig)
 		pConfig->RegisterCallback(ConfigSaveCallback, this);
 
-	m_pConsole->Register("add_favorite", "s", CFGFLAG_CLIENT, ConAddFavorite, this, "Add a server as a favorite");
-	m_pConsole->Register("remove_favorite", "s", CFGFLAG_CLIENT, ConRemoveFavorite, this, "Remove a server from favorites");
+	m_pConsole->Register("add_favorite", "s[hostname] ?s[password]", CFGFLAG_CLIENT, ConAddFavorite, this, "Add a server (optionally with password) as a favorite. Also updates password of existing favorite.");
+	m_pConsole->Register("remove_favorite", "s[hostname]", CFGFLAG_CLIENT, ConRemoveFavorite, this, "Remove a server from favorites");
 }
 
 bool CServerBrowserFavorites::AddFavoriteEx(const char *pHostname, const NETADDR *pAddr, bool DoCheck)

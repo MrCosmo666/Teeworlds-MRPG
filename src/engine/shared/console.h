@@ -122,6 +122,16 @@ class CConsole : public IConsole
 	int ParseStart(CResult *pResult, const char *pString, int Length);
 	int ParseArgs(CResult *pResult, const char *pFormat);
 
+	/*
+	This function will set pFormat to the next parameter (i,s,r,v,?) it contains and
+	pNext to the command.
+	Descriptions in brackets like [file] will be skipped.
+	Returns true on failure.
+	Expects pFormat to point at a parameter.
+	*/
+	bool NextParam(char* pNext, const char*& pFormat);
+
+
 	class CExecutionQueue
 	{
 		CHeap m_Queue;
@@ -187,6 +197,7 @@ public:
 	virtual void Chain(const char *pName, FChainCommandCallback pfnChainFunc, void *pUser);
 	virtual void StoreCommands(bool Store);
 
+	virtual bool ArgStringIsValid(const char* pFormat);
 	virtual bool LineIsValid(const char *pStr);
 	virtual void ExecuteLine(const char *pStr);
 	virtual void ExecuteLineFlag(const char *pStr, int FlagMask);

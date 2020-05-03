@@ -1004,13 +1004,13 @@ void CGS::OnConsoleInit()
 	m_pServer = Kernel()->RequestInterface<IServer>();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 
-	Console()->Register("parseskin", "i", CFGFLAG_SERVER, ConParseSkin, this, "Parse skin on console. Easy for devlop bots.");
-	Console()->Register("giveitem", "iiiii", CFGFLAG_SERVER, ConGiveItem, this, "Give item <clientid> <itemid> <count> <enchant> <mail 1=yes 0=no>");
-	Console()->Register("tune", "si", CFGFLAG_SERVER, ConTuneParam, this, "Tune variable to value");
+	Console()->Register("parseskin", "i[cid]", CFGFLAG_SERVER, ConParseSkin, this, "Parse skin on console. Easy for devlop bots.");
+	Console()->Register("giveitem", "i[cid]i[itemid]i[count]i[ench]i[mail]", CFGFLAG_SERVER, ConGiveItem, this, "Give item <clientid> <itemid> <count> <enchant> <mail 1=yes 0=no>");
+	Console()->Register("tune", "s[tuning] i[value]", CFGFLAG_SERVER, ConTuneParam, this, "Tune variable to value");
 	Console()->Register("tune_reset", "", CFGFLAG_SERVER, ConTuneReset, this, "Reset tuning");
 	Console()->Register("tune_dump", "", CFGFLAG_SERVER, ConTuneDump, this, "Dump tuning");
-	Console()->Register("say", "r", CFGFLAG_SERVER, ConSay, this, "Say in chat");
-	Console()->Register("addcharacter", "ir", CFGFLAG_SERVER, ConAddCharacter, this, "Add new bot on datatable <clientid> <nick name>");
+	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, this, "Say in chat");
+	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, this, "Add new bot on datatable <clientid> <nick name>");
 }
 
 // Отключение сервера
@@ -2214,14 +2214,14 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 	// если бот не активен не у одного игрока, но игрок найден удаляем
 	if (!ActiveBot && QuestBotClientID >= MAX_PLAYERS)
 	{
-		delete m_apPlayers[QuestBotClientID];
-		m_apPlayers[QuestBotClientID] = nullptr;
-
 		CNetMsg_Sv_ClientDrop Msg;
 		Msg.m_ClientID = QuestBotClientID;
 		Msg.m_pReason = "\0";
 		Msg.m_Silent = true;
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1, CheckPlayerMessageWorldID(QuestBotClientID));
+
+		delete m_apPlayers[QuestBotClientID];
+		m_apPlayers[QuestBotClientID] = nullptr;
 	}
 }
 
