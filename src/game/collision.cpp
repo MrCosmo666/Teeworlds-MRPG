@@ -46,7 +46,7 @@ void CCollision::Init(class CLayers *pLayers)
 			break;
 		default:
 			m_pTiles[i].m_Index = 0;
-			m_pTiles[i].m_Flags = static_cast< char >(Index);
+			m_pTiles[i].m_Reserved = static_cast< char >(Index);
 		}
 	}
 }
@@ -65,7 +65,7 @@ unsigned short CCollision::GetParseTile(int x, int y) const
 	int Nx = clamp(x/32, 0, m_Width-1);
 	int Ny = clamp(y/32, 0, m_Height-1);
 
-	return static_cast<int>(m_pTiles[Ny * m_Width + Nx].m_Flags);
+	return static_cast<int>(m_pTiles[Ny * m_Width + Nx].m_Reserved);
 }
 
 int CCollision::FastIntersectLine(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *pOutBeforeCollision) const
