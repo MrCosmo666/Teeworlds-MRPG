@@ -34,7 +34,6 @@ public:
 
 	/*another*/
 	int GetParseTilesAt(float x, float y) const { return GetParseTile(round_to_int(x), round_to_int(y)); }
-	int FastIntersectLine(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *pOutBeforeCollision) const;
 	vec2 FindDirCollision(int CheckNum, vec2 SourceVec, char Cord, char SumSymbol);
 	/*end another*/
 

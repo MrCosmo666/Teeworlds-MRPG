@@ -274,7 +274,7 @@ void BotAI::EngineNPC()
 	{
 		CPlayer *pFind = GS()->GetPlayer(i, true, true);
 		if (pFind && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f &&
-			!GS()->Collision()->FastIntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0))
+			!GS()->Collision()->IntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0))
 		{
 			if(!(BotJob::NpcBot[SubBotID].m_Talk).empty())
 				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Start dialog with NPC [attack hammer]");
@@ -307,7 +307,7 @@ void BotAI::EngineQuestMob()
 	{
 		CPlayer* pFind = GS()->GetPlayer(i, true, true);
 		if (pFind && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f
-			&& !GS()->Collision()->FastIntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0)
+			&& !GS()->Collision()->IntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0)
 			&& GetPlayer()->CheckQuestSnapPlayer(i, false))
 		{
 			if (!(BotJob::QuestBot[SubBotID].m_Talk).empty())
@@ -439,7 +439,7 @@ CPlayer *BotAI::SearchPlayer(int Distance)
 		if(!GS()->m_apPlayers[i] 
 			|| !GS()->m_apPlayers[i]->GetCharacter() 
 			|| distance(m_Core.m_Pos, GS()->m_apPlayers[i]->GetCharacter()->m_Core.m_Pos) > Distance
-			|| GS()->Collision()->FastIntersectLine(GS()->m_apPlayers[i]->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0)
+			|| GS()->Collision()->IntersectLine(GS()->m_apPlayers[i]->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0)
 			|| Server()->GetWorldID(i) != GS()->GetWorldID())
 			continue;
 		return GS()->m_apPlayers[i];
@@ -473,7 +473,7 @@ CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 		return nullptr; 
 
 	// сбрасываем время жизни таргета
-	m_BotTargetCollised = GS()->Collision()->FastIntersectLine(pPlayer->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0);
+	m_BotTargetCollised = GS()->Collision()->IntersectLine(pPlayer->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0);
 	if (m_BotTargetLife && m_BotTargetCollised)
 	{
 		m_BotTargetLife--;
@@ -494,7 +494,7 @@ CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 			continue;
 
 		// проверяем есть ли вкуснее игрокв для бота
-		bool FinderCollised = (bool)GS()->Collision()->FastIntersectLine(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0);
+		bool FinderCollised = (bool)GS()->Collision()->IntersectLine(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0);
 		if (!FinderCollised && ((m_BotTargetLife <= 10 && m_BotTargetCollised)
 			|| pFinderHard->GetAttributeCount(Stats::StHardness, true) > pPlayer->GetAttributeCount(Stats::StHardness, true)))
 			SetTarget(i);
@@ -555,7 +555,7 @@ vec2 BotAI::GetHookPos(vec2 Position)
 			TmpDir.y = (SearchDir.x * sin(Angle)) + (SearchDir.y * cos(Angle));
 			SearchDir = TmpDir;
 			if (distance(HookPos, GetPos()) > 40 && !GS()->Collision()->CheckPoint(TmpDir.x, TmpDir.y, CCollision::COLFLAG_NOHOOK)
-				&& GS()->Collision()->FastIntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
+				&& GS()->Collision()->IntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
 				break;
 		}
 		return HookPos;
@@ -576,7 +576,7 @@ vec2 BotAI::GetHookPos(vec2 Position)
 			TmpDir.y = (SearchDir.x * sin(Angle)) + (SearchDir.y * cos(Angle));
 			SearchDir = TmpDir;
 			if (distance(HookPos, GetPos()) > 40 && !GS()->Collision()->CheckPoint(TmpDir.x, TmpDir.y, CCollision::COLFLAG_NOHOOK)
-				&& GS()->Collision()->FastIntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
+				&& GS()->Collision()->IntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
 				break;
 		}
 		return HookPos;
@@ -597,7 +597,7 @@ vec2 BotAI::GetHookPos(vec2 Position)
 			TmpDir.y = (SearchDir.x * sin(Angle)) + (SearchDir.y * cos(Angle));
 			SearchDir = TmpDir;
 			if (distance(HookPos, GetPos()) > 40 && !GS()->Collision()->CheckPoint(TmpDir.x, TmpDir.y, CCollision::COLFLAG_NOHOOK)
-				&& GS()->Collision()->FastIntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
+				&& GS()->Collision()->IntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
 				break;
 		}
 		return HookPos;
@@ -617,7 +617,7 @@ vec2 BotAI::GetHookPos(vec2 Position)
 			TmpDir.y = (SearchDir.x * sin(Angle)) + (SearchDir.y * cos(Angle));
 			SearchDir = TmpDir;
 			if (distance(HookPos, GetPos()) > 40 && !GS()->Collision()->CheckPoint(TmpDir.x, TmpDir.y, CCollision::COLFLAG_NOHOOK)
-				&& GS()->Collision()->FastIntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
+				&& GS()->Collision()->IntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
 				break;
 		}
 		return HookPos;

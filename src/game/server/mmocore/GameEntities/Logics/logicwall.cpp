@@ -160,6 +160,7 @@ CLogicWallWall::CLogicWallWall(CGameWorld *pGameWorld, vec2 Pos, int Mode, int H
 		m_Pos.x += 30;
 		m_To = GS()->Collision()->FindDirCollision(100, m_To, 'x', '+');
 	}
+	
 	m_RespawnTick = Server()->TickSpeed()*10;
 	GameWorld()->InsertEntity(this);
 }
@@ -326,7 +327,9 @@ void CLogicDoorKey::Snap(int SnappingClient)
 CLogicDungeonDoorKey::CLogicDungeonDoorKey(CGameWorld *pGameWorld, vec2 Pos, int BotID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DUNGEONKEYDOOR, Pos, 14)
 {
-	m_To = vec2(Pos.x, Pos.y - 140);
+	m_Pos.y += 30;
+	m_To = Pos;
+	m_To = GS()->Collision()->FindDirCollision(100, m_To, 'y', '-');
 	m_OpenedDoor = false;
 	m_BotID = BotID;
 

@@ -957,12 +957,17 @@ void CGS::OnInit(int WorldID)
 	m_World.SetGameServer(this);
 	m_Events.SetGameServer(this);
 	m_CommandManager.Init(m_pConsole, this, NewCommandHook, RemoveCommandHook);
-
 	m_WorldID = WorldID;
-	UpdateZoneDungeon();
 
 	for(int i = 0; i < NUM_NETOBJTYPES; i++)
 		Server()->SnapSetStaticsize(i, m_NetObjHandler.GetObjSize(i));
+
+	// создаем контроллер
+	m_Layers.Init(Kernel(), nullptr, WorldID);
+	m_Collision.Init(&m_Layers);
+	pMmoController = new MmoController(this);
+	pMmoController->LoadLogicWorld();
+	UpdateZoneDungeon();
 
 	// создаем все гейм обьекты для сервера
 	if(m_DungeonID >= 1)
@@ -975,19 +980,16 @@ void CGS::OnInit(int WorldID)
 	}
 	m_pController->RegisterChatCommands(CommandManager());
 
-	// создаем контроллер
-	m_Layers.Init(Kernel(), nullptr, WorldID);
-	m_Collision.Init(&m_Layers);
-	pMmoController = new MmoController(this);
-	pMmoController->LoadLogicWorld();
-
 	// инициализируем слои
 	CMapItemLayerTilemap *pTileMap = m_Layers.GameLayer();
 	CTile *pTiles = (CTile *)Kernel()->RequestInterface<IMap>(WorldID)->GetData(pTileMap->m_Data);
-	for(int y = 0; y < pTileMap->m_Height; y++) {
-		for(int x = 0; x < pTileMap->m_Width; x++) {
+	for(int y = 0; y < pTileMap->m_Height; y++) 
+	{
+		for(int x = 0; x < pTileMap->m_Width; x++) 
+		{
 			int Index = pTiles[y*pTileMap->m_Width+x].m_Index;
-			if(Index >= ENTITY_OFFSET) {
+			if(Index >= ENTITY_OFFSET) 
+			{
 				vec2 Pos(x*32.0f+16.0f, y*32.0f+16.0f);
 				m_pController->OnEntity(Index-ENTITY_OFFSET, Pos);
 			}

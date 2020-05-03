@@ -1448,10 +1448,10 @@ void GuildJob::ChangeStateDoor(int GuildID)
 GuildDoor::GuildDoor(CGameWorld *pGameWorld, vec2 Pos, int GuildID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_HOUSEDOOR, Pos)
 {
-	m_GuildID = GuildID;
-
-	m_To = vec2(Pos.x, Pos.y-200);
 	m_Pos.y += 30;
+	m_To = Pos;
+	m_To = GS()->Collision()->FindDirCollision(100, m_To, 'y', '-');
+	m_GuildID = GuildID;
 
 	GameWorld()->InsertEntity(this);
 }

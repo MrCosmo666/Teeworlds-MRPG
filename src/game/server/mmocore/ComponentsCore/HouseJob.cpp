@@ -728,8 +728,8 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 HouseDoor::HouseDoor(CGameWorld *pGameWorld, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_HOUSEDOOR, Pos)
 {
-	m_To = vec2(Pos.x, Pos.y-140);
 	m_Pos.y += 30;
+	m_To = GS()->Collision()->FindDirCollision(100, m_To, 'y', '-');
 
 	GameWorld()->InsertEntity(this);
 }

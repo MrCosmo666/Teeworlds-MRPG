@@ -68,7 +68,7 @@ unsigned short CCollision::GetParseTile(int x, int y) const
 	return static_cast<int>(m_pTiles[Ny * m_Width + Nx].m_Reserved);
 }
 
-int CCollision::FastIntersectLine(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *pOutBeforeCollision) const
+int CCollision::IntersectLine(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *pOutBeforeCollision) const
 {
 	const int Tile0X = round_to_int(Pos0.x)/32;
 	const int Tile0Y = round_to_int(Pos0.y)/32;
@@ -181,34 +181,6 @@ vec2 CCollision::FindDirCollision(int CheckNum, vec2 SourceVec, char Cord, char 
 bool CCollision::IsTile(int x, int y, int Flag) const
 {
 	return GetTile(x, y)&Flag;
-}
-
-// TODO: rewrite this smarter!
-int CCollision::IntersectLine(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *pOutBeforeCollision) const
-{
-	float Distance = distance(Pos0, Pos1);
-	int End(Distance+1);
-	vec2 Last = Pos0;
-
-	for(int i = 0; i <= End; i++)
-	{
-		float a = i/float(End);
-		vec2 Pos = mix(Pos0, Pos1, a);
-		if(CheckPoint(Pos.x, Pos.y))
-		{
-			if(pOutCollision)
-				*pOutCollision = Pos;
-			if(pOutBeforeCollision)
-				*pOutBeforeCollision = Last;
-			return GetCollisionAt(Pos.x, Pos.y);
-		}
-		Last = Pos;
-	}
-	if(pOutCollision)
-		*pOutCollision = Pos1;
-	if(pOutBeforeCollision)
-		*pOutBeforeCollision = Pos1;
-	return 0;
 }
 
 // TODO: OPT: rewrite this smarter!
