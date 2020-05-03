@@ -274,14 +274,14 @@ bool BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 	if (str_comp_nocase(pText, "empty") != 0)
 	{
 		pPlayer->FormatTextQuest(BotID, pText);
-		str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion 1 of 1 .. ) - %s", pPlayer->FormatedTalkedText());
+		str_format(reformTalkedText, sizeof(reformTalkedText), "( 1 of 1 ) - %s", pPlayer->FormatedTalkedText());
 		GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID, 0, reformTalkedText, 0, EMOTE_BLINK);
 		pPlayer->ClearFormatQuestText();
 		return true;
 	}
 
 	pPlayer->FormatTextQuest(BotID, NpcBot[MobID].m_Talk.at(Progress).m_TalkingText);
-	str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + Progress, sizeTalking, pPlayer->FormatedTalkedText());
+	str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) - %s", 1 + Progress, sizeTalking, pPlayer->FormatedTalkedText());
 	pPlayer->ClearFormatQuestText();
 
 	GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID,
@@ -306,7 +306,7 @@ bool BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int Talk
 	char reformTalkedText[512];
 	int sizeTalking = QuestBot[MobID].m_Talk.size();
 	pPlayer->FormatTextQuest(BotID, QuestBot[MobID].m_Talk.at(Progress).m_TalkingText);
-	str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + Progress, sizeTalking, pPlayer->FormatedTalkedText());
+	str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) - %s", 1 + Progress, sizeTalking, pPlayer->FormatedTalkedText());
 	pPlayer->ClearFormatQuestText();
 
 	GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID,
@@ -331,7 +331,7 @@ void BotJob::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 	{
 		char reformTalkedText[512];
 		pPlayer->FormatTextQuest(BotID, BotJob::QuestBot[MobID].m_Talk.at(Progress).m_TalkingText);
-		str_format(reformTalkedText, sizeof(reformTalkedText), "(Discussion %d of %d .. ) - %s", 1 + Progress, sizeTalking, pPlayer->FormatedTalkedText());
+		str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) - %s", 1 + Progress, sizeTalking, pPlayer->FormatedTalkedText());
 		pPlayer->ClearFormatQuestText();
 
 		GS()->Mmo()->Quest()->ShowQuestRequired(pPlayer, BotJob::QuestBot[MobID], reformTalkedText);

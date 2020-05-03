@@ -788,12 +788,11 @@ bool QuestJob::OnMessage(int MsgID, void *pRawMsg, int ClientID)
 	CPlayer *pPlayer = GS()->m_apPlayers[ClientID];
 	if (MsgID == NETMSGTYPE_CL_TALKINTERACTIVE)
 	{
-		if (pPlayer->m_PlayerTick[TickState::LastDialog] && pPlayer->m_PlayerTick[TickState::LastDialog] + GS()->Server()->TickSpeed() > GS()->Server()->Tick())
+		if (pPlayer->m_PlayerTick[TickState::LastDialog] && pPlayer->m_PlayerTick[TickState::LastDialog] > GS()->Server()->Tick())
 			return true;
 
-		pPlayer->m_PlayerTick[TickState::LastChat] = GS()->Server()->Tick();
-		int TalkedID = pPlayer->GetTalkedID();
-		pPlayer->SetTalking(TalkedID, true);
+		pPlayer->m_PlayerTick[TickState::LastDialog] = GS()->Server()->Tick() + (GS()->Server()->TickSpeed() / 4);
+		pPlayer->SetTalking(pPlayer->GetTalkedID(), true);
 		return true;
 	}
 	return false;

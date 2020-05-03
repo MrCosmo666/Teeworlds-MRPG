@@ -652,10 +652,10 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 	// общение на диалогах для ванильных клиентов
 	if (GetTalkedID() > 0 && !GS()->CheckClient(m_ClientID))
 	{
-		if (m_PlayerTick[TickState::LastDialog] && m_PlayerTick[TickState::LastDialog] + GS()->Server()->TickSpeed() > GS()->Server()->Tick())
+		if (m_PlayerTick[TickState::LastDialog] && m_PlayerTick[TickState::LastDialog] > GS()->Server()->Tick())
 			return true;
 
-		m_PlayerTick[TickState::LastChat] = GS()->Server()->Tick();
+		m_PlayerTick[TickState::LastDialog] = GS()->Server()->Tick() + (GS()->Server()->TickSpeed() / 4);
 		SetTalking(GetTalkedID(), true);
 		return true;
 	}
