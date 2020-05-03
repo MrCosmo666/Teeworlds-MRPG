@@ -78,9 +78,12 @@ void BotJob::LoadQuestBots()
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_quest"));
 	while(RES->next())
 	{
+		// it for every world initilize quest progress size
 		const int MobID = (int)RES->getInt("ID");
-		int WorldID = (int)RES->getInt("WorldID");
 		QuestBot[MobID].QuestID = RES->getInt("QuestID");
+
+		// check world
+		int WorldID = (int)RES->getInt("WorldID");
 		if(WorldID != GS()->GetWorldID()) 
 			continue;
 

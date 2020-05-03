@@ -603,7 +603,8 @@ bool QuestJob::ShowAdventureActiveNPC(CPlayer* pPlayer)
 				}
 			}
 			{
-				int itemID = BotInfo.ItemGives[i], getCount = BotInfo.ItemGivesCount[i];
+				int itemID = BotInfo.ItemGives[i];
+				int getCount = BotInfo.ItemGivesCount[i];
 				if (itemID > 0 && getCount > 0)
 				{
 					ItemJob::ItemInformation GivedInfItem = GS()->GetItemInfo(itemID);
