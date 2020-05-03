@@ -10,8 +10,8 @@ class CCollision
 	class CTile *m_pTiles;
 
 	/*another*/
-	int *m_ParseTiles;
-	int GetParseTile(int x, int y) const;
+	unsigned short *m_ParseTiles;
+	unsigned short GetParseTile(int x, int y) const;
 	/*end another*/
 
 	int m_Width;

@@ -14,13 +14,11 @@
 
 CCollision::CCollision()
 {
-	m_pTiles = 0;
+	m_pTiles = nullptr;
+	m_pLayers = nullptr;
+	m_ParseTiles = nullptr;
 	m_Width = 0;
 	m_Height = 0;
-	m_pLayers = 0;
-	// another
-	m_ParseTiles = 0;
-	// end another
 }
 
 void CCollision::Init(class CLayers *pLayers)
@@ -29,10 +27,7 @@ void CCollision::Init(class CLayers *pLayers)
 	m_Width = m_pLayers->GameLayer()->m_Width;
 	m_Height = m_pLayers->GameLayer()->m_Height;
 	m_pTiles = static_cast<CTile *>(m_pLayers->Map()->GetData(m_pLayers->GameLayer()->m_Data));
-
-	// another
-	m_ParseTiles = new int[m_Width*m_Height];
-	// end another
+	m_ParseTiles = new unsigned short[m_Width*m_Height];
 
 	for(int i = 0; i < m_Width*m_Height; i++)
 	{
@@ -68,7 +63,7 @@ int CCollision::GetTile(int x, int y) const
 }
 
 /* another */
-int CCollision::GetParseTile(int x, int y) const
+unsigned short CCollision::GetParseTile(int x, int y) const
 {
 	int Nx = clamp(x/32, 0, m_Width-1);
 	int Ny = clamp(y/32, 0, m_Height-1);

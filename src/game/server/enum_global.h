@@ -73,7 +73,7 @@ enum DayType
 */
 enum
 {
-	COUNT_WORLD = 8,						// кол-во миров
+	COUNT_WORLD = 3,						// кол-во миров
 	LAST_WORLD = COUNT_WORLD - 1,			// последний мир
 	LOCALWORLD = 0,							// локальный мир
 };
