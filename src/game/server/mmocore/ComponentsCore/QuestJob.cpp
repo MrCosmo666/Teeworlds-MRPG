@@ -277,7 +277,7 @@ void QuestJob::FinishQuest(CPlayer *pPlayer, int QuestID)
 	pPlayer->AddMoney(finishQuestData.Money);
 	pPlayer->AddExp(finishQuestData.Exp);
 
-	GS()->Chat(-1, "{STR} completed ({STR} : {STR})", GS()->Server()->ClientName(ClientID), finishQuestData.StoryLine, finishQuestData.Name);
+	GS()->Chat(-1, "{STR} completed [{STR}] - {STR}!", GS()->Server()->ClientName(ClientID), finishQuestData.StoryLine, finishQuestData.Name);
 	GS()->ChatDiscord(DC_PLAYER_INFO, GS()->Server()->ClientName(ClientID), "Completed ({STR} : {STR})", finishQuestData.StoryLine, finishQuestData.Name);
 	Job()->SaveAccount(pPlayer, SaveType::SAVE_STATS);
 
@@ -403,8 +403,8 @@ bool QuestJob::AcceptQuest(int QuestID, CPlayer* pPlayer)
 
 	int StorySize = GetStoryCount(QuestsData[QuestID].StoryLine);
 	int StoryProgress = GetStoryCount(QuestsData[QuestID].StoryLine, QuestID + 1);
-	GS()->Chat(ClientID, "Story you perform ({STR} {STR} {INT}/{INT})!", QuestsData[QuestID].StoryLine, QuestsData[QuestID].Name, &StoryProgress, &StorySize);
-	GS()->Chat(ClientID, "You will receive a reward Gold {INT}, Experience {INT}", &QuestsData[QuestID].Money, &QuestsData[QuestID].Exp);
+	GS()->Chat(ClientID, "Story perform [{STR}] - {STR} {INT}/{INT}!", QuestsData[QuestID].StoryLine, QuestsData[QuestID].Name, &StoryProgress, &StorySize);
+	GS()->Chat(ClientID, "Receive a reward Gold {INT}, Experience {INT}", &QuestsData[QuestID].Money, &QuestsData[QuestID].Exp);
 	pPlayer->GetCharacter()->CreateQuestsStep(QuestID);
 	GS()->CreatePlayerSound(ClientID, SOUND_CTF_CAPTURE);
 	return true;
