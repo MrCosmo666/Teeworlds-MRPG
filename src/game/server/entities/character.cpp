@@ -299,13 +299,10 @@ void CCharacter::FireWeapon()
 			for (int i = 0; i < Num; ++i)
 			{
 				CCharacter *pTarget = apEnts[i];
-				if ((pTarget == this)  || GS()->Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, NULL, NULL))
+				if ((pTarget == this)  || GS()->Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, nullptr, nullptr))
 					continue;
 
-				if (!m_pPlayer->IsBot() && pTarget->GetPlayer()->IsBot() 
-					&& (pTarget->GetPlayer()->GetSpawnBot() == SPAWN_NPC 
-					|| (pTarget->GetPlayer()->GetSpawnBot() == SPAWN_QUEST_NPC
-							&& GS()->Mmo()->Quest()->GetState(m_pPlayer->GetCID(), BotJob::QuestBot[pTarget->GetPlayer()->GetBotSub()].QuestID) == QUEST_ACCEPT)))
+				if (TalkInteractiveHammer(pTarget->GetPlayer()))
 				{
 					m_pPlayer->ClearTalking();
 					m_pPlayer->SetTalking(pTarget->GetPlayer()->GetCID(), false);
@@ -1129,4 +1126,24 @@ void CCharacter::ResetDoorPos()
 	m_Core.m_Vel = vec2(0, 0);
 	if (m_Core.m_Jumped >= 2)
 		m_Core.m_Jumped = 1;
+}
+
+bool CCharacter::TalkInteractiveHammer(CPlayer *pTarget)
+{
+	if (!m_pPlayer || !pTarget || m_pPlayer->IsBot() || !pTarget->IsBot())
+		return false;
+
+	CPlayerBot* pTargetBot = static_cast<CPlayerBot*>(pTarget);
+	if (pTargetBot->GetSpawnBot() == SPAWN_NPC)
+		return true;
+
+	int MobID = pTargetBot->GetBotSub();
+	if (pTargetBot->GetSpawnBot() != SPAWN_QUEST_NPC || GS()->Mmo()->Quest()->GetState(m_pPlayer->GetCID(), BotJob::QuestBot[MobID].QuestID) != QUEST_ACCEPT)
+		return false;
+
+	int ClientID = m_pPlayer->GetCID();
+	int QuestID = BotJob::QuestBot[MobID].QuestID;
+	if(!GS()->Mmo()->Quest()->IsValidQuest(QuestID, ClientID) || QuestJob::Quests[ClientID][QuestID].Progress != BotJob::QuestBot[MobID].Progress)
+		return false;
+	return true;
 }

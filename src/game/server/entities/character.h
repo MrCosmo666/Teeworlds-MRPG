@@ -141,6 +141,8 @@ private:
 	CCharacterCore m_SendCore; // core that we should send
 	CCharacterCore m_ReckoningCore; // the dead reckoning core
 
+	bool TalkInteractiveHammer(CPlayer* pTarget);
+
 protected:
 	int m_Health;
 	int m_Armor;
