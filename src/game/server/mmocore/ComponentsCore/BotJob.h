@@ -64,8 +64,15 @@ class BotJob : public MmoComponent
 		int BotID;
 		int SubBotID;
 
-		int Interactive[6];
-		int InterCount[6];
+		int ItemSearch[2];
+		int ItemSearchCount[2];
+
+		int ItemGives[2];
+		int ItemGivesCount[2];
+
+		int NeedMob[2];
+		int NeedMobCount[2];
+
 		int InterRandom[6];
 
 		std::vector < TalkingData > m_Talk;

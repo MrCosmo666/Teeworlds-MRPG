@@ -15,8 +15,6 @@ class QuestJob : public MmoComponent
 		int Money;
 		int Exp;
 		int ProgressSize;
-		int ItemRewardID[3];
-		int ItemRewardCount[3];
 	};
 	typedef std::map < int , StructQuestData > QuestDataType;
 	static QuestDataType QuestsData;

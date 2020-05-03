@@ -71,10 +71,10 @@ void CQuestItem::Tick()
 	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(24.0f, 24.0f), 0.4f);
 
 
-	int Count = m_QuestBot.InterCount[0];
+	int Count = m_QuestBot.ItemSearchCount[0];
 	int QuestID = m_QuestBot.QuestID;
 	CPlayer* pPlayer = GS()->m_apPlayers[m_OwnerID];
-	ItemJob::ItemPlayer& PlItemForQuest = pPlayer->GetItem(m_QuestBot.Interactive[0]);
+	ItemJob::ItemPlayer& PlItemForQuest = pPlayer->GetItem(m_QuestBot.ItemSearch[0]);
 
 	// проверяем если прогресс не равен данному / проверяем завершен ли квест / проверяем если предметов больше чем требуется
 	if (QuestJob::Quests[m_OwnerID][QuestID].Progress != m_QuestBot.Progress || PlItemForQuest.Count >= Count)

@@ -36,7 +36,7 @@ std::map < int , BotJob::MobBotInfo > BotJob::MobBot;
 void BotJob::LoadGlobalBots()
 {
 	// загружаем всю информацию о ботах
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_world", "WHERE ID > '0'"));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_world"));
 	while(RES->next())
 	{
 		int BotID = (int)RES->getInt("ID");
@@ -78,35 +78,37 @@ void BotJob::LoadQuestBots()
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_quest"));
 	while(RES->next())
 	{
-		int MotID = (int)RES->getInt("ID");
-		int WorldID = RES->getInt("WorldID");
-		if(WorldID != GS()->GetWorldID()) continue;
+		const int MobID = (int)RES->getInt("ID");
+		int WorldID = (int)RES->getInt("WorldID");
+		QuestBot[MobID].QuestID = RES->getInt("QuestID");
+		if(WorldID != GS()->GetWorldID()) 
+			continue;
 
-		QuestBot[MotID].SubBotID = MotID;
-		QuestBot[MotID].BotID = RES->getInt("BotID");
-		QuestBot[MotID].WorldID = WorldID;
-		QuestBot[MotID].PositionX = RES->getInt("pos_x");
-		QuestBot[MotID].PositionY = RES->getInt("pos_y")+1;
-		QuestBot[MotID].QuestID = RES->getInt("QuestID");
-		str_copy(QuestBot[MotID].Name, DataBot[QuestBot[MotID].BotID].NameBot, sizeof(QuestBot[MotID].Name));
+		QuestBot[MobID].SubBotID = MobID;
+		QuestBot[MobID].BotID = (int)RES->getInt("BotID");
+		QuestBot[MobID].WorldID = WorldID;
+		QuestBot[MobID].PositionX = (int)RES->getInt("pos_x");
+		QuestBot[MobID].PositionY = (int)RES->getInt("pos_y")+1;
+		str_copy(QuestBot[MobID].Name, DataBot[QuestBot[MobID].BotID].NameBot, sizeof(QuestBot[MobID].Name));
 
-		QuestBot[MotID].Interactive[0] = RES->getInt("it_need_0");
-		QuestBot[MotID].Interactive[1] = RES->getInt("it_need_1");
-		QuestBot[MotID].Interactive[2] = RES->getInt("it_reward_0");
-		QuestBot[MotID].Interactive[3] = RES->getInt("it_reward_1");
-		QuestBot[MotID].Interactive[4] = RES->getInt("mob_0");
-		QuestBot[MotID].Interactive[5] = RES->getInt("mob_1");
+		QuestBot[MobID].ItemSearch[0] = (int)RES->getInt("it_need_0");
+		QuestBot[MobID].ItemSearch[1] = (int)RES->getInt("it_need_1");
+		QuestBot[MobID].ItemGives[0] = (int)RES->getInt("it_reward_0");
+		QuestBot[MobID].ItemGives[1] = (int)RES->getInt("it_reward_1");
+		QuestBot[MobID].NeedMob[0] = (int)RES->getInt("mob_0");
+		QuestBot[MobID].NeedMob[1] = (int)RES->getInt("mob_1");
 
 		sscanf(RES->getString("it_count").c_str(), "|%d|%d|%d|%d|%d|%d|", 
-			&QuestBot[MotID].InterCount[0], &QuestBot[MotID].InterCount[1], &QuestBot[MotID].InterCount[2],
-			&QuestBot[MotID].InterCount[3], &QuestBot[MotID].InterCount[4], &QuestBot[MotID].InterCount[5]);
+			&QuestBot[MobID].ItemSearch[0], &QuestBot[MobID].ItemSearch[1],
+			&QuestBot[MobID].ItemGives[0], &QuestBot[MobID].ItemGives[1],
+			&QuestBot[MobID].NeedMob[0], &QuestBot[MobID].NeedMob[1]);
 
 		sscanf(RES->getString("it_random").c_str(), "|%d|%d|%d|%d|%d|%d|", 
-			&QuestBot[MotID].InterRandom[0], &QuestBot[MotID].InterRandom[1], &QuestBot[MotID].InterRandom[2],
-			&QuestBot[MotID].InterRandom[3], &QuestBot[MotID].InterRandom[4], &QuestBot[MotID].InterRandom[5]);
+			&QuestBot[MobID].InterRandom[0], &QuestBot[MobID].InterRandom[1], &QuestBot[MobID].InterRandom[2],
+			&QuestBot[MobID].InterRandom[3], &QuestBot[MobID].InterRandom[4], &QuestBot[MobID].InterRandom[5]);
 
 		// загрузить разговоры NPC
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_quest_npc", "WHERE MobID = '%d'", MotID));
+		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_quest_npc", "WHERE MobID = '%d'", MobID));
 		while(RES->next())
 		{
 			TalkingData LoadTalk;
@@ -115,7 +117,7 @@ void BotJob::LoadQuestBots()
 			LoadTalk.m_PlayerTalked = RES->getBoolean("PlayerTalked");
 			LoadTalk.m_RequestComplete = RES->getBoolean("RequestComplete");
 			str_copy(LoadTalk.m_TalkingText, RES->getString("TalkText").c_str(), sizeof(LoadTalk.m_TalkingText));
-			QuestBot[MotID].m_Talk.push_back(LoadTalk);
+			QuestBot[MobID].m_Talk.push_back(LoadTalk);
 		}
 	}
 
@@ -129,28 +131,28 @@ void BotJob::LoadNpcBots()
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_npc"));
 	while(RES->next())
 	{
-		int MotID = (int)RES->getInt("ID");
+		int MobID = (int)RES->getInt("ID");
 		int WorldID = RES->getInt("WorldID");
 		if(WorldID != GS()->GetWorldID()) continue;
-		bool CreateBot = !IsNpcBotValid(MotID);
+		bool CreateBot = !IsNpcBotValid(MobID);
 
-		NpcBot[MotID].WorldID = WorldID;
-		NpcBot[MotID].Static = RES->getBoolean("Static");
-		NpcBot[MotID].PositionX = RES->getInt("PositionX");
-		NpcBot[MotID].PositionY = (NpcBot[MotID].Static ? RES->getInt("PositionY")+1 : RES->getInt("PositionY"));
-		NpcBot[MotID].Emote = RES->getInt("Emote");
-		NpcBot[MotID].BotID = RES->getInt("BotID");
-		str_copy(NpcBot[MotID].Name, DataBot[NpcBot[MotID].BotID].NameBot, sizeof(NpcBot[MotID].Name));
+		NpcBot[MobID].WorldID = WorldID;
+		NpcBot[MobID].Static = RES->getBoolean("Static");
+		NpcBot[MobID].PositionX = RES->getInt("PositionX");
+		NpcBot[MobID].PositionY = (NpcBot[MobID].Static ? RES->getInt("PositionY")+1 : RES->getInt("PositionY"));
+		NpcBot[MobID].Emote = RES->getInt("Emote");
+		NpcBot[MobID].BotID = RES->getInt("BotID");
+		str_copy(NpcBot[MobID].Name, DataBot[NpcBot[MobID].BotID].NameBot, sizeof(NpcBot[MobID].Name));
 	
 		// пропуск если не создаем ботов
 		if(!CreateBot) continue;
 
 		int CountMobs = RES->getInt("Count");
 		for(int c = 0; c < CountMobs; c++)
-			GS()->CreateBot(SpawnBot::SPAWN_NPC, NpcBot[MotID].BotID, MotID);
+			GS()->CreateBot(SpawnBot::SPAWN_NPC, NpcBot[MobID].BotID, MobID);
 
 		// загрузить разговоры NPC
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_other_npc", "WHERE MobID = '%d'", MotID));
+		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_other_npc", "WHERE MobID = '%d'", MobID));
 		while(RES->next())
 		{
 			TalkingData LoadTalk;
@@ -159,7 +161,7 @@ void BotJob::LoadNpcBots()
 			LoadTalk.m_PlayerTalked = RES->getBoolean("PlayerTalked");
 			LoadTalk.m_GivingQuest = RES->getInt("GivingQuest");
 			str_copy(LoadTalk.m_TalkingText, RES->getString("TalkText").c_str(), sizeof(LoadTalk.m_TalkingText));
-			NpcBot[MotID].m_Talk.push_back(LoadTalk);
+			NpcBot[MobID].m_Talk.push_back(LoadTalk);
 		}
 	}
 }
@@ -173,35 +175,35 @@ void BotJob::LoadMobsBots()
 		int WorldID = RES->getInt("WorldID");
 		if(WorldID != GS()->GetWorldID()) continue;
 
-		int MotID = (int)RES->getInt("ID");
+		int MobID = (int)RES->getInt("ID");
 		int BotID = RES->getInt("BotID");
-		bool CreateBot = !IsMobBotValid(MotID);
+		bool CreateBot = !IsMobBotValid(MobID);
 
-		MobBot[MotID].WorldID = WorldID;
-		MobBot[MotID].PositionX = RES->getInt("PositionX");
-		MobBot[MotID].PositionY = RES->getInt("PositionY");
-		MobBot[MotID].Power = RES->getInt("Power");
-		MobBot[MotID].Spread = RES->getInt("Spread");
-		MobBot[MotID].Boss = RES->getBoolean("Boss");
-		MobBot[MotID].Level = RES->getInt("Level");
-		MobBot[MotID].RespawnTick = RES->getInt("Respawn");
-		MobBot[MotID].BotID = BotID;
-		str_copy(MobBot[MotID].Name, DataBot[BotID].NameBot, sizeof(MobBot[MotID].Name));
+		MobBot[MobID].WorldID = WorldID;
+		MobBot[MobID].PositionX = RES->getInt("PositionX");
+		MobBot[MobID].PositionY = RES->getInt("PositionY");
+		MobBot[MobID].Power = RES->getInt("Power");
+		MobBot[MobID].Spread = RES->getInt("Spread");
+		MobBot[MobID].Boss = RES->getBoolean("Boss");
+		MobBot[MobID].Level = RES->getInt("Level");
+		MobBot[MobID].RespawnTick = RES->getInt("Respawn");
+		MobBot[MobID].BotID = BotID;
+		str_copy(MobBot[MobID].Name, DataBot[BotID].NameBot, sizeof(MobBot[MobID].Name));
 
 		char aBuf[32];
 		for(int i = 0; i < 6; i ++)
 		{
 			str_format(aBuf, sizeof(aBuf), "it_drop_%d", i);
-			MobBot[MotID].DropItem[i] = RES->getInt(aBuf);
+			MobBot[MobID].DropItem[i] = RES->getInt(aBuf);
 		}
 
 		sscanf(RES->getString("it_count").c_str(), "|%d|%d|%d|%d|%d|%d|", 
-			&MobBot[MotID].CountItem[0], &MobBot[MotID].CountItem[1], &MobBot[MotID].CountItem[2],
-			&MobBot[MotID].CountItem[3], &MobBot[MotID].CountItem[4], &MobBot[MotID].CountItem[5]);
+			&MobBot[MobID].CountItem[0], &MobBot[MobID].CountItem[1], &MobBot[MobID].CountItem[2],
+			&MobBot[MobID].CountItem[3], &MobBot[MobID].CountItem[4], &MobBot[MobID].CountItem[5]);
 
 		sscanf(RES->getString("it_random").c_str(), "|%d|%d|%d|%d|%d|%d|", 
-			&MobBot[MotID].RandomItem[0], &MobBot[MotID].RandomItem[1], &MobBot[MotID].RandomItem[2],
-			&MobBot[MotID].RandomItem[3], &MobBot[MotID].RandomItem[4], &MobBot[MotID].RandomItem[5]);
+			&MobBot[MobID].RandomItem[0], &MobBot[MobID].RandomItem[1], &MobBot[MobID].RandomItem[2],
+			&MobBot[MobID].RandomItem[3], &MobBot[MobID].RandomItem[4], &MobBot[MobID].RandomItem[5]);
 
 
 		// пропуск если не создаем ботов
@@ -209,7 +211,7 @@ void BotJob::LoadMobsBots()
 
 		int CountMobs = RES->getInt("Count");
 		for(int c = 0; c < CountMobs; c++)
-			GS()->CreateBot(SpawnBot::SPAWN_MOBS, BotID, MotID);
+			GS()->CreateBot(SpawnBot::SPAWN_MOBS, BotID, MobID);
 	}	
 }
 
