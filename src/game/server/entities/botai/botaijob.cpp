@@ -330,27 +330,7 @@ void BotAI::EngineMobs()
 		m_Input.m_TargetY = random_int()%30- random_int()%60 + m_Core.m_Vel.y;
 	m_Input.m_TargetX = m_Input.m_Direction* random_int()%30;
 
-	// крюк
-	if (!m_Input.m_Hook)
-	{
-		if ((m_Core.m_Vel.y < 0 && m_Input.m_TargetY > 0) || (m_Core.m_Vel.y > 0 && m_Input.m_TargetY < 0) ||
-			(m_Core.m_Vel.x > 0 && m_Input.m_TargetX > 0 && m_Input.m_Direction == -1) ||
-			(m_Core.m_Vel.x < 0 && m_Input.m_TargetX < 0 && m_Input.m_Direction == 1) || random_int() % 4 == 0)
-		{
-			vec2 HookDir = GetHookPos(vec2(m_Input.m_TargetX, m_Input.m_TargetY));
-			if ((int)HookDir.x > 0 && (int)HookDir.y > 0)
-			{
-				vec2 AimDir = HookDir - m_Core.m_Pos;
-				m_Input.m_TargetX = AimDir.x;
-				m_Input.m_TargetY = AimDir.y;
-				m_LatestInput.m_TargetX = (int)AimDir.x;
-				m_LatestInput.m_TargetY = (int)AimDir.y;
-				m_Input.m_Hook = true;
-				return;
-			}
-		}
-	}
-	if (m_Input.m_Hook && random_int() % 18 == 0)
+	if (m_Input.m_Hook && random_int() % 16 == 0)
 		m_Input.m_Hook = false;
 
 	// эмоции ботов
@@ -402,11 +382,12 @@ void BotAI::EngineMobs()
 	int Dist = distance(m_Pos, pPlayer->GetCharacter()->m_Core.m_Pos);
 	if (Dist < 600.0f)
 	{
+		m_Input.m_TargetX = static_cast<int>(pPlayer->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
+		m_Input.m_TargetY = static_cast<int>(pPlayer->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
+
 		bool StaticBot = (BotJob::MobBot[SubBotID].Spread >= 1);
 		if(random_int() % 7 == 1)
 		{
-			m_Input.m_TargetX = static_cast<int>(pPlayer->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
-			m_Input.m_TargetY = static_cast<int>(pPlayer->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
 			if(m_BotTargetCollised || Dist > (StaticBot ? 250 : 70))
 			{
 				vec2 DirPlayer = normalize(pPlayer->GetCharacter()->m_Core.m_Pos - m_Pos);
@@ -428,6 +409,26 @@ void BotAI::EngineMobs()
 			ChangeWeapons();
 		}
 	}
+
+	// крюк
+	if (!m_Input.m_Hook)
+	{
+		vec2 HookDir = GetHookPos(vec2(m_Input.m_TargetX, m_Input.m_TargetY));
+		if ((int)HookDir.x !=  0 && (int)HookDir.y !=  0)
+		{
+			vec2 AimDir = HookDir - m_Core.m_Pos;
+			m_Input.m_TargetX = AimDir.x;
+			m_Input.m_TargetY = AimDir.y;
+			m_LatestInput.m_TargetX = (int)AimDir.x;
+			m_LatestInput.m_TargetY = (int)AimDir.y;
+			m_Input.m_Hook = true;
+			return;
+		}
+
+	}
+
+	if (m_Input.m_Hook && random_int() % 16 == 0)
+		m_Input.m_Hook = false;
 }
 
 // Поиск игрока среди людей
@@ -443,7 +444,7 @@ CPlayer *BotAI::SearchPlayer(int Distance)
 			continue;
 		return GS()->m_apPlayers[i];
 	}
-	return NULL;
+	return nullptr;
 }
 
 // Поиск игрока среди людей который имеет ярость выше всех
@@ -469,7 +470,7 @@ CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 
 	// не враждебные мобы
 	if (!ActiveTargetID || !pPlayer)
-		return NULL; 
+		return nullptr; 
 
 	// сбрасываем время жизни таргета
 	m_BotTargetCollised = GS()->Collision()->FastIntersectLine(pPlayer->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0);
@@ -557,7 +558,6 @@ vec2 BotAI::GetHookPos(vec2 Position)
 				&& GS()->Collision()->FastIntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
 				break;
 		}
-
 		return HookPos;
 	}
 
@@ -579,7 +579,6 @@ vec2 BotAI::GetHookPos(vec2 Position)
 				&& GS()->Collision()->FastIntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
 				break;
 		}
-
 		return HookPos;
 	}
 
@@ -601,7 +600,6 @@ vec2 BotAI::GetHookPos(vec2 Position)
 				&& GS()->Collision()->FastIntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
 				break;
 		}
-
 		return HookPos;
 	}
 
@@ -622,9 +620,7 @@ vec2 BotAI::GetHookPos(vec2 Position)
 				&& GS()->Collision()->FastIntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
 				break;
 		}
-
 		return HookPos;
 	}
-
 	return HookPos;
 }
