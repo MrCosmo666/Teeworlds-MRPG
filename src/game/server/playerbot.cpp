@@ -282,7 +282,7 @@ void CPlayerBot::SendInformationBot()
 	Msg.m_ClientID = m_ClientID;
 	Msg.m_pReason = "\0";
 	Msg.m_Silent = true;
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1);
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1, GS()->CheckPlayerMessageWorldID(m_ClientID));
 
 	CNetMsg_Sv_ClientInfo ClientInfoMsg;
 	ClientInfoMsg.m_ClientID = m_ClientID;

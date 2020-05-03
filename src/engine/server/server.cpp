@@ -1776,7 +1776,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 
 			char aBuf[256];
 			str_format(aBuf, sizeof(aBuf), "?player=%s&rank=%d&dicid=%d", RES->getString("Nick").c_str(), Rank, RES->getInt("DiscordEquip"));
-			generateSendmmo(message.channelID, std::to_string(RandomColor), "Discord MmoTee Card", aBuf);
+			generateSendmmo(message.channelID, std::to_string(RandomColor), "Discord MRPG Card", aBuf);
 			founds = true;
 		}
 

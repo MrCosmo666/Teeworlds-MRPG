@@ -1068,7 +1068,7 @@ void CCharacter::HandleAuthedPlayer()
 				GS()->Chat(m_pPlayer->GetCID(), "This chapter is still closed, you magically transported back!");
 				m_pPlayer->Acc().TeleportX = -1;
 				m_pPlayer->Acc().TeleportY = -1;
-				GS()->Server()->ChangeWorld(m_pPlayer->GetCID(), LOCALWORLD);
+				GS()->Server()->ChangeWorld(m_pPlayer->GetCID(), NEWBIE_ZERO_WORLD);
 				return;
 			}
 		}

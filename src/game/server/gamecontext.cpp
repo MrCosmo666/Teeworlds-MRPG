@@ -1421,7 +1421,7 @@ void CGS::OnClientEnter(int ClientID)
 		SendTeam(ClientID, TEAM_SPECTATORS, false, -1);
 
 		// информация
-		Chat(ClientID, "Welcome to MmoTee");
+		Chat(ClientID, "Welcome to MRPG");
 		Chat(ClientID, "You need to register '/register <login> <pass> or");
 		Chat(ClientID, "Enter '/login <login> <pass> !");
 		
@@ -1432,7 +1432,7 @@ void CGS::OnClientEnter(int ClientID)
 	// fail check client
 	if(!CheckClient(ClientID))
 	{
-		SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 1000, "Vanilla client.\nSpecial client for MmoTee.\n\"{STR}\"", g_Config.m_SvDiscordInviteGroup);
+		SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 1000, "Vanilla client.\nSpecial client for MRPG.\n\"{STR}\"", g_Config.m_SvDiscordInviteGroup);
 	}
 }
 
@@ -2216,6 +2216,12 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 	{
 		delete m_apPlayers[QuestBotClientID];
 		m_apPlayers[QuestBotClientID] = nullptr;
+
+		CNetMsg_Sv_ClientDrop Msg;
+		Msg.m_ClientID = QuestBotClientID;
+		Msg.m_pReason = "\0";
+		Msg.m_Silent = true;
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1, CheckPlayerMessageWorldID(QuestBotClientID));
 	}
 }
 

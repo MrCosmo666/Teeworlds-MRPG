@@ -109,7 +109,7 @@ public:
 	// input
 	virtual const int *GetInput(int Tick) const = 0;
 
-	// mmotee
+	// MRPG
 	virtual int ClientFPS() const = 0;
 	virtual void RequestMmoInfo() = 0;
 	virtual bool EditorHasUnsavedData() = 0;
@@ -150,8 +150,6 @@ public:
 		CMsgPacker Packer(pMsg->MsgID(), false);
 		if(pMsg->Pack(&Packer))
 			return -1;
-		
-		dbg_msg("test", "send packet");
 		return SendMsg(&Packer, Flags);
 	}
 

@@ -12,7 +12,7 @@ public:
 	virtual ~IEditor() {}
 	virtual void Init() = 0;
 
-	//mmotee
+	//MRPG
 	virtual void ReInitEntities() = 0;
 
 	virtual void UpdateAndRender() = 0;
