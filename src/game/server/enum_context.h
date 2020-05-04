@@ -9,6 +9,13 @@
 #include <list>
 #include <map>
 
+enum QuestInteractive
+{
+	QUEST_INT_RANDOM_ACCEPT_ITEM,
+	QUEST_INT_DROP_AND_TAKE_IT,
+
+};
+
 // Статы оружия и хар-ки игрока
 enum Stats
 {

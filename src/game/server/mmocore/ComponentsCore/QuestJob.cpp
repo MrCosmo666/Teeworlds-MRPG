@@ -299,10 +299,36 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotDa
 		return true;
 	}
 
+	if (!InteractiveTypeQuest(pPlayer, BotData))
+		return false;
+
 	// проверяем и выдаем потом
 	CollectItem(pPlayer, BotData);
 	GS()->VResetVotes(ClientID, MenuList::MENU_ADVENTURE_JOURNAL_MAIN);
 	GS()->Mmo()->Quest()->AddProgress(pPlayer, QuestID);
+	return true;
+}
+
+bool QuestJob::InteractiveTypeQuest(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData)
+{
+	int ClientID = pPlayer->GetCID();
+	if (BotData.InteractiveType == (int)QuestInteractive::QUEST_INT_RANDOM_ACCEPT_ITEM)
+	{
+		if (BotData.InteractiveTemp > 0 && random_int() % BotData.InteractiveTemp != 0)
+		{
+			for (int i = 0; i < 2; i++)
+			{
+				int ItemID = BotData.ItemSearch[i];
+				int Count = BotData.ItemSearchCount[i];
+				if (ItemID > 0 && Count > 0)
+					pPlayer->GetItem(ItemID).Remove(Count);
+			}
+			GS()->Chat(ClientID, "{STR} don't like the item.", BotData.Name);
+			return false;
+		}
+		return true;
+	}
+
 	return true;
 }
 
@@ -573,9 +599,9 @@ void QuestJob::QuestTableShowRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &Bo
 	}
 
 	// если у бота рандомное принятие предмета
-	if(BotData.InterRandom[0] > 1)
+	if(BotData.InteractiveType == (int)QuestInteractive::QUEST_INT_RANDOM_ACCEPT_ITEM)
 	{
-		double Chance = BotData.InterRandom[0] <= 0 ? 100.0f : (1.0f / (double)BotData.InterRandom[0]) * 100;
+		double Chance = BotData.InteractiveTemp <= 0 ? 100.0f : (1.0f / (double)BotData.InteractiveTemp) * 100;
 
 		char aBuf[64];
 		str_format(aBuf, sizeof(aBuf), "\nChance that item he'll like [%0.2f%%]", Chance);
@@ -603,10 +629,10 @@ void QuestJob::QuestTableShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& Bo
 
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "%s", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
-		if (BotData.InterRandom[0] > 1)
+		if (BotData.InteractiveType == (int)QuestInteractive::QUEST_INT_RANDOM_ACCEPT_ITEM)
 		{
 			char aChanceBuf[128];
-			double Chance = BotData.InterRandom[0] <= 0 ? 100.0f : (1.0f / (double)BotData.InterRandom[0]) * 100;
+			double Chance = BotData.InteractiveTemp <= 0 ? 100.0f : (1.0f / (double)BotData.InteractiveTemp) * 100;
 			str_format(aChanceBuf, sizeof(aChanceBuf), "%s [takes %0.2f%%]", aBuf, Chance);
 		}
 		GS()->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, Count, ItemID, false);
@@ -711,7 +737,7 @@ int QuestJob::QuestingAllowedItemsCount(CPlayer *pPlayer, int ItemID)
 
 void QuestJob::CreateQuestingItems(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData)
 {
-	if (!pPlayer || !pPlayer->GetCharacter() || BotData.InterRandom[1] <= 0)
+	if (!pPlayer || !pPlayer->GetCharacter() || BotData.InteractiveType != (int)QuestInteractive::QUEST_INT_DROP_AND_TAKE_IT)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
@@ -723,7 +749,7 @@ void QuestJob::CreateQuestingItems(CPlayer *pPlayer, BotJob::QuestBotInfo &BotDa
 
 	int Count = BotData.ItemSearch[0];
 	vec2 Pos = vec2(BotData.PositionX, BotData.PositionY);
-	for (int i = 0; i < Count * 2; i++)
+	for (int i = 0; i < Count; i++)
 	{
 		vec2 Vel = vec2(frandom() * 40.0f - frandom() * 80.0f, frandom() * 40.0f - frandom() * 80.0f);
 		float AngleForce = Vel.x * (0.15f + frandom() * 0.1f);

@@ -100,15 +100,13 @@ void BotJob::LoadQuestBots()
 		QuestBot[MobID].ItemGives[1] = (int)RES->getInt("it_reward_1");
 		QuestBot[MobID].NeedMob[0] = (int)RES->getInt("mob_0");
 		QuestBot[MobID].NeedMob[1] = (int)RES->getInt("mob_1");
+		QuestBot[MobID].InteractiveType = (int)RES->getInt("interactive_type");
+		QuestBot[MobID].InteractiveTemp = (int)RES->getInt("interactive_temp");
 
 		sscanf(RES->getString("it_count").c_str(), "|%d|%d|%d|%d|%d|%d|", 
 			&QuestBot[MobID].ItemSearchCount[0], &QuestBot[MobID].ItemSearchCount[1],
 			&QuestBot[MobID].ItemGivesCount[0], &QuestBot[MobID].ItemGivesCount[1],
 			&QuestBot[MobID].NeedMobCount[0], &QuestBot[MobID].NeedMobCount[1]);
-
-		sscanf(RES->getString("it_random").c_str(), "|%d|%d|%d|%d|%d|%d|", 
-			&QuestBot[MobID].InterRandom[0], &QuestBot[MobID].InterRandom[1], &QuestBot[MobID].InterRandom[2],
-			&QuestBot[MobID].InterRandom[3], &QuestBot[MobID].InterRandom[4], &QuestBot[MobID].InterRandom[5]);
 
 		// загрузить разговоры NPC
 		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_quest_npc", "WHERE MobID = '%d'", MobID));

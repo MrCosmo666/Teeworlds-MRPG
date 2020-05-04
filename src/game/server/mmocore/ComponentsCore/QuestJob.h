@@ -60,6 +60,7 @@ private:
 	void ShowQuestList(CPlayer* pPlayer, int StateQuest);
 	void QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID, bool Giving);
 	void QuestTableAddInfo(int ClientID, const char* pText, int Requires, int Have);
+	bool InteractiveTypeQuest(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData);
 
 public:
 	bool AcceptQuest(int QuestID, CPlayer* pPlayer);

@@ -73,7 +73,8 @@ class BotJob : public MmoComponent
 		int NeedMob[2];
 		int NeedMobCount[2];
 
-		int InterRandom[6];
+		int InteractiveType;
+		int InteractiveTemp;
 
 		std::vector < TalkingData > m_Talk;
 	};
