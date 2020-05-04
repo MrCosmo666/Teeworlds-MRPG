@@ -133,11 +133,6 @@ void BotAI::Die(int Killer, int Weapon)
 	if(GetPlayer()->GetSpawnBot() != SpawnBot::SPAWN_MOBS)
 		return;
 
-	int BotID = GetPlayer()->GetBotID();
-	int StorageID = GS()->Mmo()->Storage()->GetStorageMonsterSub(BotID);
-	if(StorageID > 0)
-		GS()->Mmo()->Storage()->AddStorageGoods(StorageID, random_int()%5);
-
 	m_ListDmgPlayers.clear();
 	CCharacter::Die(Killer, Weapon);
 }

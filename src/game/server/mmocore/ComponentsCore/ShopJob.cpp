@@ -55,7 +55,7 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 	GS()->AV(ClientID, "null", "");
 
 	int HideID = NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 300;
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID = 0 AND StorageID = '%d' ORDER BY Price", StorageID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE StorageID = '%d' ORDER BY Price", StorageID));
 	while(RES->next())
 	{
 		int ID = RES->getInt("ID");
@@ -230,18 +230,12 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 	// - - - - - - - - - - - -SHOP - - - - - - - - - - - - -
 	// - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	const int NeedItem = SHOPITEM->getInt("NeedItem");
-	if (pPlayer->CheckFailMoney(Price, NeedItem, true))
+	if (pPlayer->CheckFailMoney(Price, NeedItem))
 		return false;
 
-	const int StorageID = SHOPITEM->getInt("StorageID");
-	if (Job()->Storage()->BuyStorageItem(ClientID, StorageID, Price))
-	{
-		pPlayer->CheckFailMoney(Price, NeedItem);
-		BuyightItem.Add(Count, 0, Enchant);
-		GS()->Chat(ClientID, "You exchange {STR}x{INT} to {STR}x{INT}.", BuyightItem.Info().GetName(pPlayer), &Count, GS()->GetItemInfo(NeedItem).GetName(pPlayer), &Price);
-		return true;
-	}
-	return false;
+	BuyightItem.Add(Count, 0, Enchant);
+	GS()->Chat(ClientID, "You exchange {STR}x{INT} to {STR}x{INT}.", BuyightItem.Info().GetName(pPlayer), &Count, GS()->GetItemInfo(NeedItem).GetName(pPlayer), &Price);
+	return true;
 }
 
 void ShopJob::CheckAuctionTime()
@@ -277,7 +271,7 @@ bool ShopJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 			return true;
 		}
 
-		if (pChr->GetHelper()->BoolIndex(TILE_PLAYER_BUSSINES))
+		if (pChr->GetHelper()->BoolIndex(TILE_SHOP_ZONE))
 		{
 			const int StorageID = Job()->Storage()->GetStorageID(pChr->m_Core.m_Pos);
 			Job()->Storage()->ShowStorageMenu(ClientID, StorageID);
