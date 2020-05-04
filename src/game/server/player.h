@@ -48,6 +48,7 @@ protected:
 
 	IServer *Server() const;
 	int m_ClientID;
+	void PotionsTick();
 
 public:
 	CGS *GS() const { return m_pGS; }

@@ -326,14 +326,18 @@ void CEffects::MmoEffectPotion(vec2 Pos, const char* Potion, bool Added)
 	p.m_LifeSpan = 1.2f;
 
 	p.m_Gravity = -1000.0f;
-	p.m_StartSize = 20.0f;
-	p.m_EndSize = 20.0f;
+	p.m_StartSize = 18.0f;
+	p.m_EndSize = 18.0f;
 
 	vec4 Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	if (!str_comp_nocase(Potion, "RegenHealth")) Color = vec4(1.0f, 0.80f, 1.0f, 1.0f);
-	if (!str_comp_nocase(Potion, "Fire")) Color = vec4(1.0f, 0.65f, 0.0f, 1.0f);
-	if (!str_comp_nocase(Potion, "Poison")) Color = vec4(0.40f, 0.80f, 0.0f, 1.0f);
-	if (!str_comp_nocase(Potion, "Ice")) Color = vec4(0.0f, 0.50f, 1.0f, 1.0f);
+	if (str_find(Potion, "Health") != nullptr) 
+		Color = vec4(1.0f, 0.80f, 1.0f, 1.0f);
+	if (str_find(Potion, "Poison") != nullptr)
+		Color = vec4(0.40f, 0.80f, 0.0f, 1.0f);
+	if (str_find(Potion, "Fire") != nullptr)
+		Color = vec4(1.0f, 0.65f, 0.0f, 1.0f);
+	if (str_find(Potion, "Ice") != nullptr)
+		Color = vec4(0.0f, 0.50f, 1.0f, 1.0f);
 
 	p.m_Color = Color;
 	str_format(p.m_TextBuf, sizeof(p.m_TextBuf), "%s %s", Added ? "+" : "-", Potion);

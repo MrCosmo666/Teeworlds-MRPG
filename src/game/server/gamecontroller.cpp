@@ -307,5 +307,5 @@ void IGameController::Com_Example(IConsole::IResult* pResult, void* pContext)
 
 void IGameController::RegisterChatCommands(CCommandManager* pManager)
 {
-	pManager->AddCommand("test", "Test the command system", "r", Com_Example, this);
+	//pManager->AddCommand("test", "Test the command system", "r", Com_Example, this);
 }

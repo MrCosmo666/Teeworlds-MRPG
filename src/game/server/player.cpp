@@ -91,31 +91,34 @@ void CPlayer::Tick()
 		TryRespawn();
 
 	if (m_pCharacter && m_pCharacter->IsAlive())
-	{
-		// проверка всех зелий и действия раз в секунду
-		if (Server()->Tick() % Server()->TickSpeed() == 0)
-		{
-			for (auto ieffect = CGS::Effects[m_ClientID].begin(); ieffect != CGS::Effects[m_ClientID].end();)
-			{
-				if (!str_comp(ieffect->first.c_str(), "Poison"))
-					m_pCharacter->TakeDamage(vec2(0, 0), vec2(0, 0), 1, m_ClientID, WEAPON_SELF);
-
-				if (!str_comp(ieffect->first.c_str(), "RegenHealth"))
-					m_pCharacter->IncreaseHealth(15);
-
-				ieffect->second--;
-				if (ieffect->second <= 0)
-				{
-					GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, ieffect->first.c_str(), false);
-					ieffect = CGS::Effects[m_ClientID].erase(ieffect);
-				}
-				else ieffect++;
-			}
-		}
-	}
+		PotionsTick();
 
 	HandleTuningParams();
 	TickOnlinePlayer();
+}
+
+void CPlayer::PotionsTick()
+{
+	if (Server()->Tick() % Server()->TickSpeed() != 0)
+		return;
+
+	for (auto ieffect = CGS::Effects[m_ClientID].begin(); ieffect != CGS::Effects[m_ClientID].end();)
+	{
+		if (str_comp(ieffect->first.c_str(), "Poison") == 0)
+			m_pCharacter->TakeDamage(vec2(0, 0), vec2(0, 0), 1, m_ClientID, WEAPON_SELF);
+
+		if (str_comp(ieffect->first.c_str(), "RegenHealth") == 0)
+			m_pCharacter->IncreaseHealth(15);
+
+		ieffect->second--;
+		if (ieffect->second <= 0)
+		{
+			GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, ieffect->first.c_str(), false);
+			ieffect = CGS::Effects[m_ClientID].erase(ieffect);
+			continue;
+		}
+		ieffect++;
+	}	
 }
 
 // Пост тик

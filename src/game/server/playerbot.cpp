@@ -48,6 +48,8 @@ void CPlayerBot::Tick()
 	else if(m_Spawned && m_PlayerTick[TickState::Respawn]+Server()->TickSpeed()*3 <= Server()->Tick())
 		TryRespawn();
 
+	if (m_pCharacter && m_pCharacter->IsAlive())
+		PotionsTick();
 }
 
 int CPlayerBot::GetStartHealth()
