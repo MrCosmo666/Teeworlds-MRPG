@@ -88,7 +88,6 @@ public:
 	WorldSwapJob *WorldSwap() const { return m_pWorldSwapJob; }
 
 	// global systems
-	void LoadFullSystems();
 	void OnTick();
 	bool OnPlayerHandleTile(CCharacter *pChr, int IndexCollision);
 	bool OnPlayerHandleMainMenu(int ClientID, int Menulist, bool ReplaceMenu);

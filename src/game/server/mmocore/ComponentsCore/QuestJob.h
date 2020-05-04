@@ -16,86 +16,69 @@ class QuestJob : public MmoComponent
 		int Exp;
 		int ProgressSize;
 	};
-	typedef std::map < int , StructQuestData > QuestDataType;
-	static QuestDataType QuestsData;
-
 	struct StructQuest
 	{
 		int State;
 		int MobProgress[2];
 		int Progress;
 	};
-	typedef std::map < int , std::map < int , StructQuest > > QuestType;
+
+	static std::map < int, StructQuestData > QuestsData;
 
 public:
-	static QuestType Quests;
-
-	virtual void OnInit();
-	virtual void OnInitAccount(CPlayer *pPlayer);
-
-private:
-	/* #########################################################################
-		GET CHECK QUESTING 
-	######################################################################### */
-	int GetStoryCount(const char *StoryName, int QuestID = -1) const;
-	const char* GetStateName(int Type) const;
-	bool IsDefeatComplete(int ClientID, int QuestID);
-
-public:
-	bool IsComplectedQuest(int ClientID, int QuestID) const;
-	int GetState(int ClientID, int QuestID) const;
+	static std::map < int, std::map < int, StructQuest > > Quests;
 	bool IsValidQuest(int QuestID, int ClientID = -1) const
 	{
-		if(QuestsData.find(QuestID) != QuestsData.end())
+		if (QuestsData.find(QuestID) != QuestsData.end())
 		{
-			if(ClientID < 0 || ClientID >= MAX_PLAYERS)
+			if (ClientID < 0 || ClientID >= MAX_PLAYERS)
 				return true;
-			
-			if(Quests[ClientID].find(QuestID) != Quests[ClientID].end())
+			if (Quests[ClientID].find(QuestID) != Quests[ClientID].end())
 				return true;
 		}
 		return false;
 	}
-
+	bool IsComplectedQuest(int ClientID, int QuestID) const;
+	int GetState(int ClientID, int QuestID) const;
 	const char *GetQuestName(int QuestID) const;
 	const char *GetStoryName(int QuestID) const;
-	BotJob::QuestBotInfo &GetQuestBot(int QuestID, int Progress);
-	bool IsActiveQuestBot(int QuestID, int Progress);
-	int GetBotQuestProgress(int QuestID, int QuestMobID);
+	BotJob::QuestBotInfo *GetQuestBot(int QuestID, int Progress) const;
+	bool IsActiveQuestBot(int QuestID, int Progress) const;
 
 private:
-	/* #########################################################################
-		FUNCTIONS QUESTING 
-	######################################################################### */
+	int GetStoryCount(const char* StoryName, int CountFromQuestID = -1) const;
+	const char* GetStateName(int Type) const;
+	bool IsDefeatMobsComplete(int ClientID, int QuestID) const;
+
 	void ShowQuestID(CPlayer *pPlayer, int QuestID);
 	void FinishQuest(CPlayer *pPlayer, int QuestID);
-	bool IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData, bool Gived);
+	bool IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData, bool Gived) const;
 	void CollectItem(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData);
 	void AddProgress(CPlayer *pPlayer, int QuestID);
-
 	bool ShowAdventureActiveNPC(CPlayer *pPlayer);
-
-public:
-	virtual void OnResetClient(int ClientID);
-	virtual bool OnMessage(int MsgID, void* pRawMsg, int ClientID);
-	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
-
-	void ShowQuestList(CPlayer *pPlayer, int StateQuest);
-	void ShowFullQuestLift(CPlayer *pPlayer);
-	void ShowQuestRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData, const char* TextTalk);
-
-	bool AcceptQuest(int QuestID, CPlayer *pPlayer);
-	bool InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData, bool LastDialog);
-	void AddMobProgress(CPlayer *pPlayer, int BotID);
-	void UpdateArrowStep(int ClientID);
-	bool CheckNewStories(CPlayer* pPlayer, int CheckQuestID = -1);
-
+	void QuestTableShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData);
+	void ShowQuestList(CPlayer* pPlayer, int StateQuest);
 	void QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID, bool Giving);
 	void QuestTableAddInfo(int ClientID, const char* pText, int Requires, int Have);
+
+public:
+	bool AcceptQuest(int QuestID, CPlayer* pPlayer);
+	void QuestTableShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData, const char* TextTalk);
+	void AddMobProgress(CPlayer* pPlayer, int BotID);
+	void UpdateArrowStep(int ClientID);
+	bool CheckNewStories(CPlayer* pPlayer, int CheckQuestID = -1);
+	bool InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData, bool LastDialog);
+	void ShowFullQuestLift(CPlayer* pPlayer);
 	void QuestTableClear(int ClientID);
-	void QuestTableShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData);
 	int QuestingAllowedItemsCount(CPlayer* pPlayer, int ItemID);
 	void CreateQuestingItems(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData);
+
+	virtual void OnInit();
+	virtual void OnInitAccount(CPlayer* pPlayer);
+	virtual void OnResetClient(int ClientID);
+	virtual bool OnMessage(int MsgID, void* pRawMsg, int ClientID);
+	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
+	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 };
 
 #endif

@@ -2071,13 +2071,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		AddBack(ClientID);
 	}
-	else if(MenuList == MenuList::MENU_ADVENTURE_JOURNAL_FINISHED) 
-	{
-		pPlayer->m_LastVoteMenu = MenuList::MENU_ADVENTURE_JOURNAL_MAIN;
-		Mmo()->Quest()->ShowQuestList(pPlayer, QuestState::QUEST_FINISHED);
-		AddBack(ClientID);
-	}
-	
+		
 	Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList, false);
 }
 
@@ -2187,14 +2181,14 @@ void CGS::CreateBot(short SpawnPoint, int BotID, int SubID)
 void CGS::UpdateQuestsBot(int QuestID, int Step)
 {
 	// собираем все данные о ботах
-	BotJob::QuestBotInfo FindBot = Mmo()->Quest()->GetQuestBot(QuestID, Step);
-	if(!FindBot.IsActive())
+	BotJob::QuestBotInfo *FindBot = Mmo()->Quest()->GetQuestBot(QuestID, Step);
+	if(!FindBot)
 		return;
 
 	// перекидываем recheck на мир моба
-	if(FindBot.WorldID != GetWorldID())
+	if(FindBot->WorldID != GetWorldID())
 	{
-		Server()->QuestBotUpdateOnWorld(FindBot.WorldID, QuestID, Step);
+		Server()->QuestBotUpdateOnWorld(FindBot->WorldID, QuestID, Step);
 		return;
 	}
 
@@ -2202,7 +2196,7 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 	int QuestBotClientID = -1;
 	for(int i = MAX_PLAYERS ; i < MAX_CLIENTS; i++)
 	{
-		if(!m_apPlayers[i] || m_apPlayers[i]->GetSpawnBot() != SpawnBot::SPAWN_QUEST_NPC || m_apPlayers[i]->GetBotSub() != FindBot.SubBotID) 
+		if(!m_apPlayers[i] || m_apPlayers[i]->GetSpawnBot() != SpawnBot::SPAWN_QUEST_NPC || m_apPlayers[i]->GetBotSub() != FindBot->SubBotID) 
 			continue;
 		
 		QuestBotClientID = i;
@@ -2211,7 +2205,7 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 	// ищем есть ли активный бот у всех игроков
 	bool ActiveBot = Mmo()->Quest()->IsActiveQuestBot(QuestID, Step);
 	if(ActiveBot && QuestBotClientID <= -1)
-		CreateBot(SpawnBot::SPAWN_QUEST_NPC, FindBot.BotID, FindBot.SubBotID);
+		CreateBot(SpawnBot::SPAWN_QUEST_NPC, FindBot->BotID, FindBot->SubBotID);
 	
 	// если бот не активен не у одного игрока, но игрок найден удаляем
 	if (!ActiveBot && QuestBotClientID >= MAX_PLAYERS)

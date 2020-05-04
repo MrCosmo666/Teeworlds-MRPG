@@ -49,19 +49,6 @@ MmoController::~MmoController()
 	m_Components.clear();
 }
 
-void MmoController::LoadFullSystems()
-{
-	for(auto& component : m_Components.m_paComponents)
-	{
-		if(GS()->GetWorldID() == LAST_WORLD)
-			component->OnInit();
-
-		char aLocalSelect[128];
-		str_format(aLocalSelect, sizeof(aLocalSelect), "WHERE WorldID = '%d'", GS()->GetWorldID());
-		component->OnInitWorld(aLocalSelect);
-	}
-}
-
 void MmoController::OnTick()
 {
 	// весь тик компонентов

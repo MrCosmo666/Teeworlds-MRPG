@@ -76,8 +76,6 @@ class BotJob : public MmoComponent
 		int InterRandom[6];
 
 		std::vector < TalkingData > m_Talk;
-
-		bool IsActive() const { return (QuestID > 0 && BotID > 0 && SubBotID > 0); };
 	};
 
 	struct ClassMobsBot

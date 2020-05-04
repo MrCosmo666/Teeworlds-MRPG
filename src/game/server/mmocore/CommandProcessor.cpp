@@ -351,8 +351,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
  
 	if(str_comp_num(Msg->m_pMessage, "/", 1) == 0)
 	{
-		GS->Mmo()->Quest()->QuestTableAddInfo(ClientID, "Help", 10, 15);
-
 		LastChat(GS, pPlayer); 
 		GS->ChatFollow(ClientID, "Command {STR} not found!", Msg->m_pMessage);
 		return;

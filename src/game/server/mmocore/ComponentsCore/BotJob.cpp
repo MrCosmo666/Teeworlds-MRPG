@@ -124,8 +124,18 @@ void BotJob::LoadQuestBots()
 		}
 	}
 
-	for (auto& qupdate : QuestBot)
-		qupdate.second.Progress = Job()->Quest()->GetBotQuestProgress(qupdate.second.QuestID, qupdate.first);
+	for (auto& qparseprogress : QuestBot)
+	{
+		qparseprogress.second.Progress = 1;
+		for (const auto& qbots : QuestBot)
+		{
+			if (qbots.second.QuestID != qparseprogress.second.QuestID)
+				continue;
+			if (qbots.first == qparseprogress.first)
+				break;
+			qparseprogress.second.Progress++;
+		}
+	}
 }
 
 // Загрузка обычных NPC
@@ -338,13 +348,12 @@ void BotJob::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 		pPlayer->FormatTextQuest(BotID, BotJob::QuestBot[MobID].m_Talk.at(Progress).m_TalkingText);
 		str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) - %s", 1 + Progress, sizeTalking, pPlayer->FormatedTalkedText());
 		pPlayer->ClearFormatQuestText();
-
-		GS()->Mmo()->Quest()->ShowQuestRequired(pPlayer, BotJob::QuestBot[MobID], reformTalkedText);
+		GS()->Mmo()->Quest()->QuestTableShowRequired(pPlayer, BotJob::QuestBot[MobID], reformTalkedText);
 		return;
 	}
 
 	// mmo clients
-	GS()->Mmo()->Quest()->ShowQuestRequired(pPlayer, BotJob::QuestBot[MobID], "\0");
+	GS()->Mmo()->Quest()->QuestTableShowRequired(pPlayer, BotJob::QuestBot[MobID], "\0");
 }
 
 bool BotJob::IsGiveNPCQuest(int MobID) const

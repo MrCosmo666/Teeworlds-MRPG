@@ -147,13 +147,13 @@ bool WorldSwapJob::ChangeWorld(int ClientID, vec2 Pos)
 vec2 WorldSwapJob::GetPositionQuestBot(int ClientID, int QuestID)
 {
 	int playerTalkProgress = QuestJob::Quests[ClientID][QuestID].Progress;
-	BotJob::QuestBotInfo FindBot = Job()->Quest()->GetQuestBot(QuestID, playerTalkProgress);
-	if(FindBot.IsActive())
+	BotJob::QuestBotInfo *FindBot = Job()->Quest()->GetQuestBot(QuestID, playerTalkProgress);
+	if(FindBot)
 	{
-		if(GS()->GetWorldID() == FindBot.WorldID)
-			return vec2(FindBot.PositionX, FindBot.PositionY);
+		if(GS()->GetWorldID() == FindBot->WorldID)
+			return vec2(FindBot->PositionX, FindBot->PositionY);
 
-		int TargetWorldID = FindBot.WorldID;
+		int TargetWorldID = FindBot->WorldID;
 		for(const auto& swp : WorldPositionLogic)
 		{
 			if(TargetWorldID != swp.BaseWorldID) 
