@@ -894,7 +894,7 @@ void CGS::SendProgressBar(int ClientID, int Count, int Request, const char* Mess
 
 void CGS::ClearTalkText(int ClientID)
 {
-	if (!CheckClient(ClientID))
+	if(!CheckClient(ClientID))
 		return;
 
 	CNetMsg_Sv_ClearTalkText Msg;

@@ -4,6 +4,8 @@
 #define GAME_CLIENT_COMPONENTS_TALKTEXT_H
 #include <game/client/component.h>
 
+#define TALKING_SIZE 512
+
 class CTalkText : public CComponent
 {
 	// mmotee render talk text
@@ -12,10 +14,16 @@ class CTalkText : public CComponent
 	int m_TalkedEmote;
 	bool m_PlayerTalked;
 	bool m_Stranger;
-	char m_TalkText[512];
+	
+	int m_RegrnizedTalkPosition;
+	int64 m_RegrnizedTalkTime;
+	char m_TalkText[TALKING_SIZE];
+	char m_RegrnizedTalkText[TALKING_SIZE];
+	void RegrnizedTalkingText();
+
 
 	void ClientPressed();
-
+	
 public:
 	void Clear();
 	bool IsActive();

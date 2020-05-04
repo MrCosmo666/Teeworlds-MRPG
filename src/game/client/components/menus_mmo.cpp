@@ -162,12 +162,15 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		// эффекты
 		BasicRight.HSplitTop(Spacing, 0, &BasicRight);
 		BasicRight.HSplitTop(ButtonHeight, &Button, &BasicRight);
-		UI()->DoLabel(&BasicRight, "Effects Mmo Items", 12.0f, CUI::ALIGN_CENTER);
+		const char* Name[4] = { "All Effects", "Only Enchant Effects", "Only Item Effects", "Off Effects" };
+		UI()->DoLabel(&BasicRight, Name[g_Config.m_ClShowMEffects], 12.0f, CUI::ALIGN_CENTER);
 		BasicRight.HSplitTop(14.0f, 0, &BasicRight);
 	
 		BasicRight.HSplitTop(ButtonHeight, &Button, &BasicRight);
-		const char* Name[4] = { "All", "Ench", "Item", "Off" };
-		DoScrollbarOption(&g_Config.m_ClShowMEffects, &g_Config.m_ClShowMEffects, &Button, Name[g_Config.m_ClShowMEffects], 0, 3);
+		DoScrollbarOption(&g_Config.m_ClShowMEffects, &g_Config.m_ClShowMEffects, &Button, "Effects (MRPG)", 0, 3);
+
+		BasicRight.HSplitTop(ButtonHeight, &Button, &BasicRight);
+		DoScrollbarOption(&g_Config.m_ClDialogsSpeedNPC, &g_Config.m_ClDialogsSpeedNPC, &Button, Localize("Dialogs speed with NPC (MRPG)"), 50, 100, &LogarithmicScrollbarScale);
 	}
 	else if (Page == 2)
 	{

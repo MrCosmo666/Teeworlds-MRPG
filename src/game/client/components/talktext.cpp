@@ -20,37 +20,50 @@
 
 #include "talktext.h"
 
-// очистка текста
 void CTalkText::Clear()
 {
 	m_TalkClientID = 0;
 	m_TalkedEmote = 0;
+	m_RegrnizedTalkTime = 0;
+	m_RegrnizedTalkPosition = 0;
 	mem_zero(m_TalkText, sizeof(m_TalkText));
+	mem_zero(m_RegrnizedTalkText, sizeof(m_RegrnizedTalkText));
 }
 
-// если активный
 bool CTalkText::IsActive()
 {
-	// dont render talktext if the menu is active
 	return (bool)(m_TalkClientID > 0 && m_pClient->m_pMenus->IsActive() <= 0);
 }
 
-// изменения статуса
 void CTalkText::OnStateChange(int NewState, int OldState)
 {
 	if(OldState == IClient::STATE_ONLINE || OldState == IClient::STATE_OFFLINE)
 		Clear();
 }
 
-// прорисовка
+void CTalkText::RegrnizedTalkingText()
+{
+	if(time_get() > m_RegrnizedTalkTime)
+	{
+		if(m_TalkText[m_RegrnizedTalkPosition] != '\0')
+		{
+			m_RegrnizedTalkText[m_RegrnizedTalkPosition] = m_TalkText[m_RegrnizedTalkPosition];
+			m_RegrnizedTalkPosition++;
+			m_RegrnizedTalkTime = time_get() + time_freq() / g_Config.m_ClDialogsSpeedNPC;
+		}
+		else
+			m_RegrnizedTalkTime = 0;
+	}
+}
+
 void CTalkText::OnRender()
 {
 	if(!IsActive() || m_pClient->m_pMenus->IsActive())
 		return;
 
 	int TalkingEmoticion = SPRITE_DOTDOT;
-	float Width = 400 * 3.0f * Graphics()->ScreenAspect();
-	float Height = 400 * 3.0f;
+	static float Width = 400 * 3.0f * Graphics()->ScreenAspect();
+	static float Height = 400 * 3.0f;
 	Graphics()->MapScreen(0, 0, Width, Height);
 
 	// --------------------- BACKGROUND -----------------------
@@ -95,8 +108,8 @@ void CTalkText::OnRender()
 
 	// -------------------- PLAYER SKINS ----------------------
 	// --------------------------------------------------------
-	int TalkClientID = m_TalkClientID;
-	int LocalClientID = m_pClient->m_LocalClientID;
+	const int TalkClientID = m_TalkClientID;
+	const int LocalClientID = m_pClient->m_LocalClientID;
 	if(m_pClient->m_aClients[LocalClientID].m_Active ||
 		(TalkClientID >= 0 && TalkClientID < MAX_CLIENTS && m_pClient->m_aClients[TalkClientID].m_Active))
 	{
@@ -112,7 +125,7 @@ void CTalkText::OnRender()
 
 			const char* pTalkedNick = m_Stranger ? "Stranger" : m_pClient->m_aClients[TalkClientID].m_aName;
 			float sizeLize = str_length(pTalkedNick);
-			TextRender()->Text(0x0, (Width / (1.45f + sizeLize / 64.0f)), Height / 1.97f, 32.0f, pTalkedNick, -1.0f);
+			TextRender()->Text(nullptr, (Width / (1.45f + sizeLize / 64.0f)), Height / 1.97f, 32.0f, pTalkedNick, -1.0f);
 			TextRender()->TextColor(1, 1, 1, 1);
 		}
 
@@ -122,7 +135,7 @@ void CTalkText::OnRender()
 		RenderTools()->RenderTee(CAnimState::GetIdle(), &RenderYou,
 			m_PlayerTalked ? m_TalkedEmote : EMOTE_NORMAL, vec2(1.0f, 0.4f), vec2(Width / 4.0f, Height / 1.85f));
 
-		TextRender()->Text(0x0, Width / 3.5f, Height / 1.97f, 32.0f, m_pClient->m_aClients[LocalClientID].m_aName, -1.0f);
+		TextRender()->Text(nullptr, Width / 3.5f, Height / 1.97f, 32.0f, m_pClient->m_aClients[LocalClientID].m_aName, -1.0f);
 	}
 
 	// ------------------------ TEXT --------------------------
@@ -132,16 +145,16 @@ void CTalkText::OnRender()
 	Cursor.m_LineWidth = BackgroundOther.w;
 	Cursor.m_MaxLines = ceil(BackgroundOther.h / FontSize);
 	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 0.9f);
-	TextRender()->TextEx(&Cursor, m_TalkText, -1);
+	TextRender()->TextEx(&Cursor, m_RegrnizedTalkText, -1);
 
 
 	// ------------------ INTERACTIVE TEXT -----------------
 	// -----------------------------------------------------
-	TextRender()->Text(0x0, Width / 1.8f, Height / 1.50f, 25.0f, Localize("Press (TAB) for continue!"), -1.0f);
+	TextRender()->Text(nullptr, Width / 1.8f, Height / 1.50f, 25.0f, Localize("Press (TAB) for continue!"), -1.0f);
 	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+	RegrnizedTalkingText();
 }
 
-// пакеты между сервером клиентом
 void CTalkText::OnMessage(int MsgType, void *pRawMsg)
 {
 	if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
@@ -149,6 +162,12 @@ void CTalkText::OnMessage(int MsgType, void *pRawMsg)
 
 	if(MsgType == NETMSGTYPE_SV_TALKTEXT)
 	{
+		// clear snake text
+		m_RegrnizedTalkTime = 0;
+		m_RegrnizedTalkPosition = 0;
+		mem_zero(m_RegrnizedTalkText, sizeof(m_RegrnizedTalkText));
+
+		// start new dialogs
 		CNetMsg_Sv_TalkText* pMsg = (CNetMsg_Sv_TalkText*)pRawMsg;
 		str_copy(m_TalkText, pMsg->m_pText, sizeof(m_TalkText));
 		m_TalkClientID = pMsg->m_pTalkClientID;
@@ -156,14 +175,14 @@ void CTalkText::OnMessage(int MsgType, void *pRawMsg)
 		m_PlayerTalked = pMsg->m_PlayerTalked;
 		m_Style = pMsg->m_Style;
 		m_Stranger = (bool)(str_replace(m_TalkText, "[Stranger]", "\0") > 0);
+		m_RegrnizedTalkTime = time_get() + time_freq() / g_Config.m_ClDialogsSpeedNPC;
 	}
-	else if (MsgType == NETMSGTYPE_SV_CLEARTALKTEXT)
+	else if(MsgType == NETMSGTYPE_SV_CLEARTALKTEXT)
 	{
 		Clear();
 	}
 }
 
-// ожидание прожатия введение действий
 bool CTalkText::OnInput(IInput::CEvent Event)
 {
 	// fix console Press TAB
@@ -179,7 +198,6 @@ bool CTalkText::OnInput(IInput::CEvent Event)
 	return false;
 }
 
-// нажатие клиента продолжения
 void CTalkText::ClientPressed()
 {
 	CNetMsg_Cl_TalkInteractive Msg;
