@@ -62,15 +62,15 @@ void CTalkText::OnRender()
 		return;
 
 	int TalkingEmoticion = SPRITE_DOTDOT;
-	static float Width = 400 * 3.0f * Graphics()->ScreenAspect();
-	static float Height = 400 * 3.0f;
+	const float Width = 400 * 3.0f * Graphics()->ScreenAspect();
+	const float Height = 400 * 3.0f;
 	Graphics()->MapScreen(0, 0, Width, Height);
 
 	// --------------------- BACKGROUND -----------------------
 	// --------------------------------------------------------
 	CUIRect BackgroundOther;
 	{
-		vec4 ColorBackground = vec4(0.06f, 0.19f, 0.37f, 0.65f);
+		vec4 ColorBackground = vec4(0.06f, 0.13f, 0.37f, 0.65f);
 		vec4 ColorBackgroundOther = vec4(0.05f, 0.05f, 0.05f, 0.35f);
 		if (m_Style == TALK_STYLE_AGRESSIVE)
 		{
@@ -82,12 +82,12 @@ void CTalkText::OnRender()
 		{
 
 			TalkingEmoticion = SPRITE_EYES;
-			ColorBackground = vec4(0.06f, 0.24f, 0.07f, 0.65f);
+			ColorBackground = vec4(0.08f, 0.34f, 0.10f, 0.65f);
 			ColorBackgroundOther = vec4(0.05f, 0.05f, 0.05f, 0.35f);
 		}
 
 		CUIRect BackgroundMain = { Width / 4.0f, Height / 1.8f, Width / 2.0f, Height / 8.0f };
-		RenderTools()->DrawRoundRect(&BackgroundMain, ColorBackground, 30.0f);
+		RenderTools()->DrawUIRect4(&BackgroundMain, ColorBackground, ColorBackground, ColorBackground / 1.8f, ColorBackground / 1.8f, CUI::CORNER_ALL, 30.0f);
 
 		BackgroundMain.Margin(10.0f, &BackgroundOther);
 		RenderTools()->DrawRoundRect(&BackgroundOther, ColorBackgroundOther, 30.0f);
@@ -191,7 +191,7 @@ bool CTalkText::OnInput(IInput::CEvent Event)
 
 	if(IsActive() && Event.m_Flags&IInput::FLAG_PRESS && Event.m_Key == KEY_TAB)
 	{
-		m_pClient->m_pSounds->Play(CSounds::CHN_WORLD, SOUND_UI_SELECTED_CLICK, 100.00f);
+		//m_pClient->m_pSounds->Play(CSounds::CHN_WORLD, SOUND_UI_SELECTED_CLICK, 100.00f);
 		ClientPressed();
 		return true;
 	}

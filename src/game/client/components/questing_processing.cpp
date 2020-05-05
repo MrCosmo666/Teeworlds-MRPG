@@ -15,8 +15,8 @@
 #include "questing_processing.h"
 
 #define COLOR_TABLE vec4(0.40f, 0.22f, 0.08f, 0.3f)
-#define COLOR_BACKGROUND vec4(0.30f, 0.11f, 0.004f, 0.65f)
-#define COLOR_BACKBACKGROUND vec4(0.30f, 0.19f, 0.15f, 0.30f)
+#define COLOR_BACKGROUND vec4(0.27f, 0.09f, 0.002f, 0.75f)
+#define COLOR_BACKBACKGROUND vec4(0.30f, 0.19f, 0.15f, 0.50f)
 #define COLOR_UIBAR vec4(0.35f, 0.55f, 0.1f, 0.45f)
 
 void CQuestingProcessing::Clear()
@@ -48,7 +48,7 @@ void CQuestingProcessing::ProcessingRenderTable(int TableID, CUIRect &Box)
 		vec4 ColorBarUI = (QuestTable[TableID].m_Have >= QuestTable[TableID].m_Requires ? vec4(0.40f, 0.80f, 0.1f, 0.50f) : vec4(0.80f, 0.30f, 0.1f, 0.50f));
 		if (QuestTable[TableID].m_GivingTable)
 		{
-			ColorBarUI = vec4(1.00f, 0.80f, 0.0f, 0.30f);
+			ColorBarUI = vec4(0.90f, 0.70f, 0.0f, 0.70f);
 			str_format(aQuestTable, sizeof(aQuestTable), "%sx%d", QuestTable[TableID].m_aText, QuestTable[TableID].m_Requires);
 			RenderTools()->DrawUIBar(TextRender(), Table, ColorBarUI, 10, 10, aQuestTable, 3, 10.0f, 8.0f);
 		}
@@ -91,11 +91,12 @@ void CQuestingProcessing::OnRender()
 	// --------------------------------------------------------
 	float tx = Width / 3.0f, ty = Height / 2.5f, tw = Width / 3.0f, th = 60.0f;
 	CUIRect BackgroundMain = { tx, ty - tabsize * (60.0f), tw, (45.0f + th * tabsize) };
-	RenderTools()->DrawRoundRect(&BackgroundMain, COLOR_BACKGROUND, 30.0f);
+	RenderTools()->DrawUIRect4(&BackgroundMain, COLOR_BACKBACKGROUND, COLOR_BACKBACKGROUND, COLOR_BACKBACKGROUND / 1.2f, COLOR_BACKBACKGROUND / 1.2f, CUI::CORNER_ALL, 30.0f);
 
 	CUIRect BackgroundOther;
-	BackgroundMain.Margin(10.0f, &BackgroundOther);
-	RenderTools()->DrawRoundRect(&BackgroundOther, COLOR_BACKGROUND, 30.0f);
+	BackgroundMain.Margin(5.0f, &BackgroundOther);
+	RenderTools()->DrawUIRect4(&BackgroundOther, COLOR_BACKGROUND, COLOR_BACKGROUND, COLOR_BACKGROUND / 1.2f, COLOR_BACKGROUND / 1.2f, CUI::CORNER_ALL, 30.0f);
+
 	BackgroundOther.VMargin(20.0f, &BackgroundOther);
 
 	// --------------------- DRAW TABLES ----------------------

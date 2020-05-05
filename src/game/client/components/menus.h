@@ -782,6 +782,7 @@ private:
 	void RenderRgbSliders(CUIRect* pMainView, CUIRect* pButton, int &r, int &g, int &b, bool Enabled);
 	void RenderSettingsMmoChangerGeneric(CUIRect MainView, CCSkinChanger::CTextureEntity* pEntities, char* pConfigStr, const char* pLabel, int ItemsPerRow, float Ratio);
 	void RenderCursor(int ImageID, vec4 Color);
+	void PreparationLeftRightSide(const char* pName, CUIRect MainView, CUIRect* LeftSide, CUIRect* RightSide, const float Spacing, const float ButtonHeight);
 	
 	// auth state for mmotee
 	void RenderAuthWindow();

@@ -593,7 +593,7 @@ Messages = [
 	NetMessage("Sv_VoteMmoOptionAdd", 
 	[
 		NetStringStrict("m_pDescription"),
-		NetArray(NetIntAny("m_pColored"), 3),
+        NetIntAny("m_pHexColor"),
 		NetArray(NetIntAny("m_pIcon"), 4),
 	]),
 

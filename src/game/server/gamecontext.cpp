@@ -282,8 +282,9 @@ void CGS::CreatePlayerSound(int ClientID, int Sound)
 	CreateSound(m_apPlayers[ClientID]->m_ViewPos, Sound, Mask);
 }
 
-void CGS::SendMmoEffect(vec2 Pos, int EffectID)
+void CGS::SendMmoEffect(vec2 Pos, int EffectID, int ClientID)
 {
+	int64 Mask = (int64)(ClientID >= 0 && ClientID < MAX_PLAYERS ? MaskWorldID() : CmaskOne(ClientID));
 	CNetEvent_EffectMmo *pEvent = (CNetEvent_EffectMmo *)m_Events.Create(NETEVENTTYPE_EFFECTMMO, sizeof(CNetEvent_EffectMmo), MaskWorldID());
 	if(pEvent)
 	{
@@ -1728,11 +1729,10 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 		if (str_length(Vote.m_aDescription) < 1)
 			m_apPlayers[To]->m_Colored = { 0, 0, 0 };
 
-		CNetMsg_Sv_VoteMmoOptionAdd OptionMsg;	
+		CNetMsg_Sv_VoteMmoOptionAdd OptionMsg;
+		vec3 ToHexColor = m_apPlayers[To]->m_Colored;
+		OptionMsg.m_pHexColor = ((int)ToHexColor.r << 16) + ((int)ToHexColor.g << 8) + (int)ToHexColor.b;
 		OptionMsg.m_pDescription = Vote.m_aDescription;
-		OptionMsg.m_pColored[0] = m_apPlayers[To]->m_Colored.r;
-		OptionMsg.m_pColored[1] = m_apPlayers[To]->m_Colored.g;
-		OptionMsg.m_pColored[2] = m_apPlayers[To]->m_Colored.b;
 		StrToInts(OptionMsg.m_pIcon, 4, Icon);
 		Server()->SendPackMsg(&OptionMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, To);
 		return;

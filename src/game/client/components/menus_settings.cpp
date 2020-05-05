@@ -1983,7 +1983,7 @@ void CMenus::RenderSettingsSound(CUIRect MainView)
 	CUIRect Label, Button, Sound, Detail, BottomView, Background;
 
 	// render sound menu background
-	int NumOptions = g_Config.m_SndEnable ? 3 : 2;
+	int NumOptions = g_Config.m_SndEnable ? 4 : 2;
 	float ButtonHeight = 20.0f;
 	float Spacing = 2.0f;
 	float BackgroundHeight = (float)(NumOptions+1)*ButtonHeight+(float)NumOptions*Spacing;
@@ -2025,6 +2025,13 @@ void CMenus::RenderSettingsSound(CUIRect MainView)
 
 	if(g_Config.m_SndEnable)
 	{
+		Sound.HSplitTop(Spacing, 0, &Sound);
+		Sound.HSplitTop(ButtonHeight, &Button, &Sound);
+		Button.VSplitLeft(ButtonHeight, 0, &Button);
+		static int s_ButtonSndEnableUI = 0;
+		if(DoButton_CheckBox(&s_ButtonSndEnableUI, Localize("Enable interface sounds"), g_Config.m_SndEnableUI, &Button))
+			g_Config.m_SndEnableUI ^= 1;
+
 		Sound.HSplitTop(Spacing, 0, &Sound);
 		Sound.HSplitTop(ButtonHeight, &Button, &Sound);
 		Button.VSplitLeft(ButtonHeight, 0, &Button);

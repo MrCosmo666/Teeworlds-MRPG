@@ -45,15 +45,15 @@ void CMenus::RenderRgbSliders(CUIRect* pMainView, CUIRect* pButton, int &r, int 
 void CMenus::RenderSettingsMmo(CUIRect MainView)
 {
 	CUIRect Label, Button, Tabbar;
-
 	static int s_SettingsPage = 0;
 	MainView.HSplitTop(20.0f, 0, &MainView);
 	MainView.HSplitTop(20.0f, &Tabbar, &MainView);
 
 	// рисуем меню вкладок
-	const char* Tabs[3] = { "Visual", "General", "Credits" };
-	const int Corner[3] = { CUI::CORNER_TL, 0, CUI::CORNER_TR };
-	for (int i = 0; i < 3; i++)
+	const int TAB_SIZE = 4;
+	const char* Tabs[TAB_SIZE] = { "Visual", "General", "Gamer", "Credits" };
+	const int Corner[TAB_SIZE] = { CUI::CORNER_TL, 0, 0, CUI::CORNER_TR };
+	for (int i = 0; i < TAB_SIZE; i++)
 	{
 		Tabbar.VSplitLeft(182.5f, &Button, &Tabbar);
 
@@ -62,14 +62,13 @@ void CMenus::RenderSettingsMmo(CUIRect MainView)
 			s_SettingsPage = i;
 	}
 
-	// длина фона и место для текста
-	MainView.HSplitTop(400.0f, &MainView, &Label);
-
 	// рисуем текст информации
-	const char* Information[3] = { "Setting up the visual part of the client", "Setting up the general part of the client", "Information & Credits" };
+	MainView.HSplitTop(400.0f, &MainView, &Label);
+	const char* Information[TAB_SIZE] = { "Setting up the visual part of the client",
+											"Setting up the general part of the client",
+											"Features of the Gamer(Dune)",
+											"Information & Credits" };
 	UI()->DoLabel(&Label, Information[s_SettingsPage], 14.0f, CUI::ALIGN_CENTER);
-
-	// рисуем меню выбранной страницы
 	RenderSettingsMmoGeneral(MainView, s_SettingsPage);
 }
 
@@ -78,44 +77,21 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 	CUIRect Button;
 	RenderTools()->DrawUIRect4(&MainView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), 0, 5.0f);
 
-	// render MmoSet menu background
+	// visual
 	float ButtonHeight = 20.0f;
 	float Spacing = 2.0f;
-
-	// Визуальные настройки
-	if (Page == 0)
+	if(Page == 0)
+	{
 		RenderMmoSettingsTexture(MainView, MainView);
-	
-	// генеральные настройки
+	}
+
+	// general
 	else if (Page == 1)
 	{
-		// базовые настройки
-		UI()->DoLabel(&MainView, "Basic settings", 14.0f, CUI::ALIGN_CENTER);
-		MainView.HSplitTop(ButtonHeight, &Button, &MainView);
-
-		// устанавливаем стороны
-		CUIRect Basic = MainView, BasicLeft, BasicRight;
-		Basic.VSplitMid(&BasicLeft, &BasicRight);
-
-		// --------------------- BACKGROUND --------------------------
-		// -----------------------------------------------------------
-		{ // left
-			CUIRect BackLeft;
-			BasicLeft.VMargin(Spacing * 2.0f, &BackLeft);
-			BackLeft.VMargin(2.0f, &BasicLeft);
-			RenderTools()->DrawUIRect(&BackLeft, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), CUI::CORNER_ALL, 5.0f);
-		}
-		{ // right
-			CUIRect BackRight;
-			BasicRight.VMargin(Spacing * 2.0f, &BackRight);
-			BackRight.VMargin(2.0f, &BasicRight);
-			RenderTools()->DrawUIRect(&BackRight, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), CUI::CORNER_ALL, 5.0f);
-		}
-		BasicLeft.VSplitRight(Spacing * 0.5f, &BasicLeft, 0);
-		BasicRight.VSplitLeft(Spacing * 0.5f, 0, &BasicRight);
+		CUIRect BasicLeft, BasicRight;
+		PreparationLeftRightSide("Basic settings", MainView, &BasicLeft, &BasicRight, Spacing, ButtonHeight);
 
 		// ---------------------- LEFT SIDE --------------------------
-		// -----------------------------------------------------------
 		UI()->DoLabel(&BasicLeft, "General Mmo Settings", 12.0f, CUI::ALIGN_CENTER);
 		BasicLeft.HSplitTop(14.0f, &Button, &BasicLeft);
 
@@ -134,22 +110,22 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 			g_Config.m_ClShowColoreVote ^= 1;
 
 		// --------------------- RIGHT SIDE --------------------------
-		// -----------------------------------------------------------
 		UI()->DoLabel(&BasicRight, "Customize", 12.0f, CUI::ALIGN_CENTER);
 		BasicRight.HSplitTop(14.0f, &Button, &BasicRight);
 
 		// background
 		CUIRect BackgroundExpBar = Button;
-		BasicRight.HSplitTop(ButtonHeight * 3.5f, &BackgroundExpBar, 0);
+		BasicRight.HSplitTop(ButtonHeight * 4.2f, &BackgroundExpBar, 0);
 		RenderTools()->DrawUIRect(&BackgroundExpBar, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 80.0f), CUI::CORNER_ALL, 5.0f);
 		
 		// expbar
 		CUIRect ExpBar;
-		BasicRight.VMargin(g_Config.m_ClGBrowser ? 165.0f : 130.0f, &ExpBar);
-		ExpBar.HMargin(3.0f, &ExpBar), ExpBar.h = 15.0f;
+		BasicRight.VMargin(10.0f, &ExpBar);
+		ExpBar.HMargin(5.0f, &ExpBar), ExpBar.h = 20.0f;
 		vec4 ProgressColor((g_Config.m_HdColorProgress >> 16) / 255.0f,
 			((g_Config.m_HdColorProgress >> 8) & 0xff) / 255.0f, (g_Config.m_HdColorProgress & 0xff) / 255.0f, 0.8f);
-		RenderTools()->DrawUIBar(TextRender(), ExpBar, ProgressColor, 50, 100, "Exp Bar", true);
+		RenderTools()->DrawUIBar(TextRender(), ExpBar, ProgressColor, 50, 100, "Experience Bar", 20, 5.0f, 2.0f);
+		BasicRight.HSplitTop(10.0f, &ExpBar, &BasicRight);
 
 		int hri, hgi, hbi;
 		hri = g_Config.m_HdColorProgress >> 16;
@@ -160,7 +136,6 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		g_Config.m_HdColorProgress = (hri<<16) + (hgi<<8) + hbi;
 
 		// эффекты
-		BasicRight.HSplitTop(Spacing, 0, &BasicRight);
 		BasicRight.HSplitTop(ButtonHeight, &Button, &BasicRight);
 		const char* Name[4] = { "All Effects", "Only Enchant Effects", "Only Item Effects", "Off Effects" };
 		UI()->DoLabel(&BasicRight, Name[g_Config.m_ClShowMEffects], 12.0f, CUI::ALIGN_CENTER);
@@ -172,7 +147,22 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		BasicRight.HSplitTop(ButtonHeight, &Button, &BasicRight);
 		DoScrollbarOption(&g_Config.m_ClDialogsSpeedNPC, &g_Config.m_ClDialogsSpeedNPC, &Button, Localize("Dialogs speed with NPC (MRPG)"), 50, 100, &LogarithmicScrollbarScale);
 	}
-	else if (Page == 2)
+	// gamer dune
+	else if(Page == 2)
+	{
+		CUIRect BasicLeft, BasicRight;
+		PreparationLeftRightSide("Gamer features (Dune)", MainView, &BasicLeft, &BasicRight, Spacing, ButtonHeight);
+
+		// ---------------------- LEFT SIDE --------------------------
+		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
+		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
+		static int s_ButtonAddaptivePickupInd = 0;
+		if(DoButton_CheckBox(&s_ButtonAddaptivePickupInd, Localize("Make pickups grey when you don't need them"), g_Config.m_ClAdaptivePickups, &Button))
+			g_Config.m_ClAdaptivePickups ^= 1;
+
+	}
+	// information
+	else if (Page == 3)
 	{
 		UI()->DoLabel(&MainView, "The client uses open source client codes:\n*Teeworlds by (teeworlds team)\n*DDRaceNetwork Client by (DDNet team)\n*Gamer Client by (Dune)\n*MmoTee Client by (Kurosio)", 16.0f, CUI::ALIGN_CENTER);
 	}
@@ -395,4 +385,26 @@ void CMenus::RenderFontSelection(CUIRect MainView)
 
 		TextRender()->SetDefaultFont(TextRender()->LoadFont(aFontPath));
 	}
+}
+
+void CMenus::PreparationLeftRightSide(const char* pName, CUIRect MainView, CUIRect *LeftSide, CUIRect *RightSide, const float Spacing, const float ButtonHeight)
+{
+	UI()->DoLabel(&MainView, pName, 14.0f, CUI::ALIGN_CENTER);
+	MainView.HSplitTop(ButtonHeight, 0, &MainView);
+	MainView.VSplitMid(LeftSide, RightSide);
+
+	{ // left
+		CUIRect BackLeft;
+		LeftSide->VMargin(Spacing * 2.0f, &BackLeft);
+		BackLeft.VMargin(2.0f, LeftSide);
+		RenderTools()->DrawUIRect(&BackLeft, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), CUI::CORNER_ALL, 5.0f);
+	}
+	{ // right
+		CUIRect BackRight;
+		RightSide->VMargin(Spacing * 2.0f, &BackRight);
+		BackRight.VMargin(2.0f, RightSide);
+		RenderTools()->DrawUIRect(&BackRight, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), CUI::CORNER_ALL, 5.0f);
+	}
+	LeftSide->VSplitRight(Spacing * 0.5f, LeftSide, 0);
+	RightSide->VSplitLeft(Spacing * 0.5f, 0, RightSide);
 }

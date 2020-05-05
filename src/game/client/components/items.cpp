@@ -140,6 +140,16 @@ void CItems::RenderPickup(const CNetObj_Pickup *pPrev, const CNetObj_Pickup *pCu
 		break;
 	}
 	
+	if(g_Config.m_ClAdaptivePickups
+		&& m_pClient->m_Snap.m_pLocalCharacter
+		&& !(m_pClient->m_Snap.m_pGameData->m_GameStateFlags & (GAMESTATEFLAG_ROUNDOVER | GAMESTATEFLAG_GAMEOVER)))
+	{
+		if((pCurrent->m_Type == PICKUP_HEALTH && m_pClient->m_Snap.m_pLocalCharacter->m_Health == 10)
+			|| (pCurrent->m_Type == PICKUP_ARMOR && m_pClient->m_Snap.m_pLocalCharacter->m_Armor == 10))
+		{
+			Graphics()->SetColor(0.35f, 0.35f, 0.35f, 0.5f);
+		}
+	}
 
 	Graphics()->QuadsSetRotation(Angle);
 

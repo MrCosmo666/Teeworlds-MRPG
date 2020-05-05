@@ -228,13 +228,13 @@ container.sounds.Add(SoundSet("ctf_return", ["audio/sfx_ctf_rtn.wv"]))
 container.sounds.Add(SoundSet("ctf_grab_pl", ["audio/sfx_ctf_grab_pl.wv"]))
 container.sounds.Add(SoundSet("ctf_grab_en", ["audio/sfx_ctf_grab_en.wv"]))
 container.sounds.Add(SoundSet("ctf_capture", ["audio/sfx_ctf_cap_pl.wv"]))
-
 container.sounds.Add(SoundSet("menu", ["audio/music_menu.wv"]))
 
-container.sounds.Add(SoundSet("sword_fire", FileList("audio/wp_sword_attack-%02d.wv", 3)))
-
 #gui
-container.sounds.Add(SoundSet("ui_selected_click", ["audio/mmotee/ui_selection_click.wv"]))
+container.sounds.Add(SoundSet("button_hover", ["audio/ui_button_hover.wv"]))
+container.sounds.Add(SoundSet("button_click", ["audio/ui_button_click.wv"]))
+container.sounds.Add(SoundSet("race_checkpoint_fast", ["audio/race_checkpoint_fast.wv"]))
+container.sounds.Add(SoundSet("race_checkpoint_slow", ["audio/race_checkpoint_slow.wv"]))
 
 
 ###############################################################################

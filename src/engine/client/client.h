@@ -85,6 +85,7 @@ class CClient : public IClient, public CDemoPlayer::IListner
 	class CMapChecker m_MapChecker;
 
 	char m_aServerAddressStr[256];
+	char m_aServerPassword[128];
 
 	unsigned m_SnapshotParts;
 	int64 m_LocalStartTime;
@@ -216,6 +217,7 @@ public:
 	void SendInfo();
 	void SendEnterGame();
 	void SendReady();
+	void OnClientOnline();
 
 	// mmotee
 	virtual int ClientFPS() const;
@@ -252,7 +254,7 @@ public:
 	virtual void Disconnect();
 
 
-	virtual void GetServerInfo(CServerInfo* pServerInfo) const;
+	virtual void GetServerInfo(CServerInfo* pServerInfo);
 
 	int LoadData();
 

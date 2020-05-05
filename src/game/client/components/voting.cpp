@@ -270,7 +270,9 @@ void CVoting::OnMessage(int MsgType, void *pRawMsg)
 
 		char pBuf[16];
 		IntsToStr(pMsg->m_pIcon, 4, pBuf);
-		AddOption(pMsg->m_pDescription, vec3(pMsg->m_pColored[0], pMsg->m_pColored[1], pMsg->m_pColored[2]), pBuf);
+
+		vec3 Color = vec3((int)pMsg->m_pHexColor >> 16, ((int)pMsg->m_pHexColor >> 8) & 0xff, (int)pMsg->m_pHexColor & 0xff);
+		AddOption(pMsg->m_pDescription, Color, pBuf);
 	}
 	else if(MsgType == NETMSGTYPE_SV_VOTEOPTIONREMOVE)
 	{

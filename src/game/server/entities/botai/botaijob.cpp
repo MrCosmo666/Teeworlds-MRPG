@@ -325,19 +325,32 @@ void BotAI::EngineMobs()
 		m_Input.m_TargetY = random_int()%30- random_int()%60 + m_Core.m_Vel.y;
 	m_Input.m_TargetX = m_Input.m_Direction* random_int()%30;
 
-	if (m_Input.m_Hook && random_int() % 16 == 0)
+	// крюк
+	if(!m_Input.m_Hook)
+	{
+		if((m_Core.m_Vel.y < 0 && m_Input.m_TargetY > 0) || (m_Core.m_Vel.y > 0 && m_Input.m_TargetY < 0) ||
+			(m_Core.m_Vel.x > 0 && m_Input.m_TargetX > 0 && m_Input.m_Direction == -1) ||
+			(m_Core.m_Vel.x < 0 && m_Input.m_TargetX < 0 && m_Input.m_Direction == 1) || random_int() % 4 == 0)
+		{
+			vec2 HookDir = GetHookPos(vec2(m_Input.m_TargetX, m_Input.m_TargetY));
+			if((int)HookDir.x > 0 && (int)HookDir.y > 0)
+			{
+				vec2 AimDir = HookDir - m_Core.m_Pos;
+				m_Input.m_TargetX = AimDir.x;
+				m_Input.m_TargetY = AimDir.y;
+				m_LatestInput.m_TargetX = (int)AimDir.x;
+				m_LatestInput.m_TargetY = (int)AimDir.y;
+				m_Input.m_Hook = true;
+				return;
+			}
+		}
+	}
+	if(m_Input.m_Hook && random_int() % 18 == 0)
 		m_Input.m_Hook = false;
 
 	// эмоции ботов
 	int SubBotID = GetPlayer()->GetBotSub();
 	EmoteActions(m_EmotionsStyle);
-
-	// Зелье мобам восстановление Health без агра
-	if(m_BotTargetID == GetPlayer()->GetCID() && Health() < m_StartHealth && !GetPlayer()->CheckEffect("RegenHealth")) 
-	{
-		SetEmote(EMOTE_HAPPY, 3);
-		GetPlayer()->GiveEffect("RegenHealth", 5);
-	}
 
 	CPlayer *pPlayer = SearchTenacityPlayer(1000.0f);
 	if(!pPlayer || !pPlayer->GetCharacter())
@@ -404,26 +417,6 @@ void BotAI::EngineMobs()
 			ChangeWeapons();
 		}
 	}
-
-	// крюк
-	if (!m_Input.m_Hook)
-	{
-		vec2 HookDir = GetHookPos(vec2(m_Input.m_TargetX, m_Input.m_TargetY));
-		if ((int)HookDir.x !=  0 && (int)HookDir.y !=  0)
-		{
-			vec2 AimDir = HookDir - m_Core.m_Pos;
-			m_Input.m_TargetX = AimDir.x;
-			m_Input.m_TargetY = AimDir.y;
-			m_LatestInput.m_TargetX = (int)AimDir.x;
-			m_LatestInput.m_TargetY = (int)AimDir.y;
-			m_Input.m_Hook = true;
-			return;
-		}
-
-	}
-
-	if (m_Input.m_Hook && random_int() % 16 == 0)
-		m_Input.m_Hook = false;
 }
 
 // Поиск игрока среди людей

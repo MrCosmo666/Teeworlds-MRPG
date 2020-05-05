@@ -400,10 +400,10 @@ const char *CBinds::GetModifierName(int m)
 
 void CBinds::ConfigSaveCallback(IConfig *pConfig, void *pUserData)
 {
-	CBinds *pSelf = (CBinds *)pUserData;
+	CBinds* pSelf = (CBinds*)pUserData;
 
 	char aBuffer[256];
-	char *pEnd = aBuffer+sizeof(aBuffer)-8;
+	char* pEnd = aBuffer + sizeof(aBuffer) - 8;
 	for(int i = 0; i < KEY_LAST; i++)
 	{
 		for(int m = 0; m < MODIFIER_COUNT; m++)
@@ -411,11 +411,11 @@ void CBinds::ConfigSaveCallback(IConfig *pConfig, void *pUserData)
 			if(pSelf->m_aaaKeyBindings[i][m][0] == 0)
 				continue;
 
-			str_format(aBuffer, sizeof(aBuffer), "bind %s%s ", GetModifierName(m), pSelf->Input()->KeyName(i));
+			str_format(aBuffer, sizeof(aBuffer), "bind %s%s", GetModifierName(m), pSelf->Input()->KeyName(i));
 
 			// process the string. we need to escape some characters
-			const char *pSrc = pSelf->m_aaaKeyBindings[i][m];
-			char *pDst = aBuffer + str_length(aBuffer);
+			const char* pSrc = pSelf->m_aaaKeyBindings[i][m];
+			char* pDst = aBuffer + str_length(aBuffer);
 			*pDst++ = '"';
 			while(*pSrc && pDst < pEnd)
 			{
@@ -430,14 +430,14 @@ void CBinds::ConfigSaveCallback(IConfig *pConfig, void *pUserData)
 		}
 	}
 
-	for(unsigned j = 0; j < sizeof(s_aaDefaultBindKeys)/sizeof(int)/2; j++)
+	for(unsigned j = 0; j < sizeof(s_aaDefaultBindKeys) / sizeof(int) / 2; j++)
 	{
 		const int Key = s_aaDefaultBindKeys[j][0];
 		const int Modifier = s_aaDefaultBindKeys[j][1];
 		if(pSelf->m_aaaKeyBindings[Key][Modifier][0] == 0)
 		{
 			// explicitly unbind keys that were unbound by the user
-			str_format(aBuffer, sizeof(aBuffer), "unbind %s%s ", GetModifierName(Modifier), pSelf->Input()->KeyName(Key));
+			str_format(aBuffer, sizeof(aBuffer), "unbind %s%s", GetModifierName(Modifier), pSelf->Input()->KeyName(Key));
 			pConfig->WriteLine(aBuffer);
 		}
 	}
