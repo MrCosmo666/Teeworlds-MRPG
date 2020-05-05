@@ -7,6 +7,7 @@
 
 const int g_MaxKeys = 512;
 extern const char g_aaKeyStrings[g_MaxKeys][20];
+const int g_MaxJoystickAxes = 12;
 
 class IInput : public IInterface
 {
@@ -24,7 +25,7 @@ public:
 protected:
 	enum
 	{
-		INPUT_BUFFER_SIZE=32
+		INPUT_BUFFER_SIZE = 32
 	};
 
 	// quick access to events
@@ -34,20 +35,20 @@ protected:
 public:
 	enum
 	{
-		FLAG_PRESS=1,
-		FLAG_RELEASE=2,
-		FLAG_REPEAT=4,
-		FLAG_TEXT=8,
+		FLAG_PRESS = 1,
+		FLAG_RELEASE = 2,
+		FLAG_REPEAT = 4,
+		FLAG_TEXT = 8,
 	};
 
 	// events
 	int NumEvents() const { return m_NumEvents; }
-	virtual bool IsEventValid(CEvent *pEvent) const = 0;
+	virtual bool IsEventValid(CEvent* pEvent) const = 0;
 	CEvent GetEvent(int Index) const
 	{
 		if(Index < 0 || Index >= m_NumEvents)
 		{
-			IInput::CEvent e = {0,0};
+			IInput::CEvent e = { 0,0 };
 			return e;
 		}
 		return m_aInputEvents[Index];
@@ -55,22 +56,26 @@ public:
 
 	// keys
 	virtual bool KeyIsPressed(int Key) const = 0;
-	virtual bool KeyPress(int Key, bool CheckCounter=false) const = 0;
-	const char *KeyName(int Key) const { return (Key >= 0 && Key < g_MaxKeys) ? g_aaKeyStrings[Key] : g_aaKeyStrings[0]; }
+	virtual bool KeyPress(int Key, bool CheckCounter = false) const = 0;
+	const char* KeyName(int Key) const { return (Key >= 0 && Key < g_MaxKeys) ? g_aaKeyStrings[Key] : g_aaKeyStrings[0]; }
 	virtual void Clear() = 0;
 
 	// joystick
-	virtual bool HasJoystick() const = 0;
-	virtual float GetJoystickAxisValue(int Axis) const = 0;
+	virtual int NumJoysticks() const = 0;
+	virtual int GetJoystickIndex() const = 0;
+	virtual void SelectNextJoystick() = 0;
+	virtual const char* GetJoystickName() = 0;
+	virtual int GetJoystickNumAxes() = 0;
+	virtual float GetJoystickAxisValue(int Axis) = 0;
 
 	// mouse
 	virtual void MouseModeRelative() = 0;
 	virtual void MouseModeAbsolute() = 0;
 	virtual int MouseDoubleClick() = 0;
 	virtual const char* GetClipboardText() = 0;
-	virtual void SetClipboardText(const char *pText) = 0;
+	virtual void SetClipboardText(const char* pText) = 0;
 
-	virtual void MouseRelative(float *x, float *y) = 0;
+	virtual void MouseRelative(float* x, float* y) = 0;
 };
 
 
@@ -82,6 +87,6 @@ public:
 	virtual int Update() = 0;
 };
 
-extern IEngineInput *CreateEngineInput();
+extern IEngineInput* CreateEngineInput();
 
 #endif

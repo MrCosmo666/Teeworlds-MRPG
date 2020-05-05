@@ -231,13 +231,13 @@ void CMenus::RenderPlayers(CUIRect MainView)
 	MainView.Margin(5.0f, &MainView);
 
 	// prepare scroll
-	static CScrollRegion s_ScrollRegion;
+	static CScrollRegion s_ScrollRegion(this);
 	vec2 ScrollOffset(0, 0);
 	CScrollRegionParams ScrollParams;
 	ScrollParams.m_ClipBgColor = vec4(0, 0, 0, 0);
 	ScrollParams.m_ScrollbarBgColor = vec4(0, 0, 0, 0);
 	ScrollParams.m_ScrollSpeed = 15;
-	if (s_ScrollRegion.m_ContentH > s_ScrollRegion.m_ClipRect.h) // scrollbar is shown
+	if(s_ScrollRegion.IsScrollbarShown())
 		Row.VSplitRight(ScrollParams.m_ScrollbarWidth, &Row, 0);
 
 	// headline
@@ -265,7 +265,7 @@ void CMenus::RenderPlayers(CUIRect MainView)
 
 	// scroll, ignore margins
 	MainView.Margin(-5.0f, &MainView);
-	BeginScrollRegion(&s_ScrollRegion, &MainView, &ScrollOffset, &ScrollParams);
+	s_ScrollRegion.Begin(&MainView, &ScrollOffset, &ScrollParams);
 	MainView.Margin(5.0f, &MainView);
 	MainView.y += ScrollOffset.y;
 
@@ -280,7 +280,7 @@ void CMenus::RenderPlayers(CUIRect MainView)
 				continue;
 
 			MainView.HSplitTop(ButtonHeight, &Row, &MainView);
-			ScrollRegionAddRect(&s_ScrollRegion, Row);
+			s_ScrollRegion.AddRect(Row);
 
 			if(Count++ % 2 == 0)
 				RenderTools()->DrawUIRect(&Row, vec4(1.0f, 1.0f, 1.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
@@ -341,7 +341,7 @@ void CMenus::RenderPlayers(CUIRect MainView)
 			}
 		}
 	}
-	EndScrollRegion(&s_ScrollRegion);
+	s_ScrollRegion.End();
 }
 
 void CMenus::RenderServerInfo(CUIRect MainView)
@@ -381,7 +381,7 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 
 	ServerInfo.HSplitTop(ButtonHeight, &Label, &ServerInfo);
 	Label.y += 2.0f;
-	str_format(aBuf, sizeof(aBuf), "%s: %s", Localize("Address"), g_Config.m_UiServerAddress);
+	str_format(aBuf, sizeof(aBuf), "%s: %s", Localize("Address"), CurrentServerInfo.m_aHostname);
 	UI()->DoLabel(&Label, aBuf, ButtonHeight*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
 	
 	ServerInfo.HSplitTop(ButtonHeight, &Label, &ServerInfo);
@@ -483,9 +483,9 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 	RenderTools()->DrawUIRect(&Motd, vec4(0.0, 0.0, 0.0, 0.25f), CUI::CORNER_ALL, 5.0f);
 	Motd.Margin(5.0f, &Motd);
 
-	static CScrollRegion s_ScrollRegion;
+	static CScrollRegion s_ScrollRegion(this);
 	vec2 ScrollOffset(0, 0);
-	BeginScrollRegion(&s_ScrollRegion, &Motd, &ScrollOffset);
+	s_ScrollRegion.Begin(&Motd, &ScrollOffset);
 	Motd.y += ScrollOffset.y;
 
 	CTextCursor Cursor;
@@ -496,9 +496,9 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 	// define the MOTD text area and make it scrollable
 	CUIRect MotdTextArea;
 	Motd.HSplitTop(Cursor.m_Y - Motd.y + ButtonHeight * ms_FontmodHeight * 0.8f + 5.0f, &MotdTextArea, &Motd);
-	ScrollRegionAddRect(&s_ScrollRegion, MotdTextArea);
+	s_ScrollRegion.AddRect(MotdTextArea);
 
-	EndScrollRegion(&s_ScrollRegion);
+	s_ScrollRegion.End();
 }
 
 // item icons
@@ -589,12 +589,10 @@ int CMenus::ItemIconScan(const char *pName, int IsDir, int DirType, void *pUser)
 // Рисуем контроль панель
 bool CMenus::RenderServerControlServer(CUIRect MainView)
 {
-	bool doCallVote = false;
-	static int s_VoteList = 0;
-	static CListBoxState s_ListBoxState;
+	static CListBox s_ListBox(this);
 	CUIRect List = MainView;
-	UiDoListboxHeader(&s_ListBoxState, &List, Localize("Option"), 20.0f, 2.0f);
-	UiDoListboxStart(&s_ListBoxState, &s_VoteList, 20.0f, 0, m_pClient->m_pVoting->m_NumVoteOptions, 1, m_CallvoteSelectedOption, 0, true);
+	s_ListBox.DoHeader(&List, Localize("Option"));
+	s_ListBox.DoStart(20.0f, 0, m_pClient->m_pVoting->m_NumVoteOptions, 1, m_CallvoteSelectedOption, 0, true);
 
 	// рисуем голосования
 	for(CVoteOptionClient *pOption = m_pClient->m_pVoting->m_pFirst; pOption; pOption = pOption->m_pNext)
@@ -602,7 +600,7 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 		if (m_aFilterString[0] && !str_find_nocase(pOption->m_aDescription, m_aFilterString))
 			continue; // no match found
 
-		CListboxItem Item = UiDoListboxNextItem(&s_ListBoxState, pOption);
+		CListboxItem Item = s_ListBox.DoNextItem(pOption);
 		float OldFontSize = Item.m_Rect.h * ms_FontmodHeight * 0.8f;
 		float FontSize = OldFontSize;
 
@@ -641,7 +639,8 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 	}
 
 	TextRender()->TextColor(1, 1, 1, 1);
-	m_CallvoteSelectedOption = UiDoListboxEnd(&s_ListBoxState, &doCallVote);
+	bool doCallVote = false;
+	m_CallvoteSelectedOption = s_ListBox.DoEnd(&doCallVote);
 	return doCallVote;
 }
 
@@ -668,15 +667,15 @@ void CMenus::RenderServerControlKick(CUIRect MainView, bool FilterSpectators)
 	const float Spacing = 2.0f;
 	const float NameWidth = 250.0f;
 	const float ClanWidth = 250.0f;
-	static int s_VoteList = 0;
-	static CListBoxState s_ListBoxState;
+
+	static CListBox s_ListBox(this);
 	CUIRect List = MainView;
-	UiDoListboxHeader(&s_ListBoxState, &List, Localize("Player"), 20.0f, 2.0f);
-	UiDoListboxStart(&s_ListBoxState, &s_VoteList, 20.0f, 0, NumOptions, 1, Selected, 0, true);
+	s_ListBox.DoHeader(&List, Localize("Player"));
+	s_ListBox.DoStart(20.0f, 0, NumOptions, 1, Selected, 0, true);
 
 	for(int i = 0; i < NumOptions; i++)
 	{
-		CListboxItem Item = UiDoListboxNextItem(&s_ListBoxState, &aPlayerIDs[i]);
+		CListboxItem Item = s_ListBox.DoNextItem(&aPlayerIDs[i]);
 
 		if(Item.m_Visible)
 		{
@@ -714,7 +713,7 @@ void CMenus::RenderServerControlKick(CUIRect MainView, bool FilterSpectators)
 		}
 	}
 
-	Selected = UiDoListboxEnd(&s_ListBoxState, 0);
+	Selected = s_ListBox.DoEnd(0);
 	m_CallvoteSelectedPlayer = Selected != -1 ? aPlayerIDs[Selected] : -1;
 }
 

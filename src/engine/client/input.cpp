@@ -19,10 +19,10 @@
 
 // support older SDL version (pre 2.0.6)
 #ifndef SDL_JOYSTICK_AXIS_MAX
-	#define SDL_JOYSTICK_AXIS_MAX 32767
+#define SDL_JOYSTICK_AXIS_MAX 32767
 #endif
 
-void CInput::AddEvent(char *pText, int Key, int Flags)
+void CInput::AddEvent(char* pText, int Key, int Flags)
 {
 	if(m_NumEvents != INPUT_BUFFER_SIZE)
 	{
@@ -42,11 +42,12 @@ CInput::CInput()
 	mem_zero(m_aInputCount, sizeof(m_aInputCount));
 	mem_zero(m_aInputState, sizeof(m_aInputState));
 
-	m_pJoystick = 0;
-
 	m_InputCounter = 1;
 	m_InputGrabbed = 0;
 	m_pClipboardText = 0;
+
+	m_SelectedJoystickIndex = -1;
+	m_aSelectedJoystickGUID[0] = '\0';
 
 	m_PreviousHat = 0;
 
@@ -61,6 +62,7 @@ CInput::~CInput()
 	{
 		SDL_free(m_pClipboardText);
 	}
+	CloseJoysticks();
 }
 
 void CInput::Init()
@@ -71,6 +73,11 @@ void CInput::Init()
 
 	MouseModeRelative();
 
+	InitJoysticks();
+}
+
+void CInput::InitJoysticks()
+{
 	if(!SDL_WasInit(SDL_INIT_JOYSTICK))
 	{
 		if(SDL_InitSubSystem(SDL_INIT_JOYSTICK) < 0)
@@ -80,20 +87,27 @@ void CInput::Init()
 		}
 	}
 
-	if(SDL_NumJoysticks() > 0)
+	int NumJoysticks = SDL_NumJoysticks();
+	if(NumJoysticks > 0)
 	{
-		m_pJoystick = SDL_JoystickOpen(0);
+		dbg_msg("joystick", "%d joystick(s) found", NumJoysticks);
 
-		if(!m_pJoystick) {
-			dbg_msg("joystick", "Could not open 0th joystick: %s", SDL_GetError());
-			return;
+		for(int i = 0; i < NumJoysticks; i++)
+		{
+			SDL_Joystick* pJoystick = SDL_JoystickOpen(i);
+
+			if(!pJoystick) {
+				dbg_msg("joystick", "Could not open joystick %d: %s", i, SDL_GetError());
+				return;
+			}
+			m_apJoysticks.add(pJoystick);
+
+			dbg_msg("joystick", "Opened Joystick %d", i);
+			dbg_msg("joystick", "Name: %s", SDL_JoystickNameForIndex(i));
+			dbg_msg("joystick", "Number of Axes: %d", SDL_JoystickNumAxes(pJoystick));
+			dbg_msg("joystick", "Number of Buttons: %d", SDL_JoystickNumButtons(pJoystick));
+			dbg_msg("joystick", "Number of Balls: %d", SDL_JoystickNumBalls(pJoystick));
 		}
-
-		dbg_msg("joystick", "Opened Joystick 0");
-		dbg_msg("joystick", "Name: %s", SDL_JoystickNameForIndex(0));
-		dbg_msg("joystick", "Number of Axes: %d", SDL_JoystickNumAxes(m_pJoystick));
-		dbg_msg("joystick", "Number of Buttons: %d", SDL_JoystickNumButtons(m_pJoystick));
-		dbg_msg("joystick", "Number of Balls: %d", SDL_JoystickNumBalls(m_pJoystick));
 	}
 	else
 	{
@@ -101,13 +115,85 @@ void CInput::Init()
 	}
 }
 
-float CInput::GetJoystickAxisValue(int Axis) const
+SDL_Joystick* CInput::GetActiveJoystick()
 {
-	dbg_assert((bool)m_pJoystick, "Requesting joystic axis value, but no joysticks were initialized");
-	return static_cast<float>(SDL_JoystickGetAxis(m_pJoystick, Axis)) / (float)(SDL_JOYSTICK_AXIS_MAX + 1);
+	if(m_apJoysticks.size() == 0)
+	{
+		return NULL;
+	}
+	if(m_aSelectedJoystickGUID[0] && str_comp(m_aSelectedJoystickGUID, g_Config.m_JoystickGUID) != 0)
+	{
+		// Refresh if cached GUID differs from configured GUID
+		m_SelectedJoystickIndex = -1;
+	}
+	if(m_SelectedJoystickIndex == -1)
+	{
+		for(int i = 0; i < m_apJoysticks.size(); i++)
+		{
+			char aGUID[sizeof(m_aSelectedJoystickGUID)];
+			SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(m_apJoysticks[i]), aGUID, sizeof(aGUID));
+			if(str_comp(g_Config.m_JoystickGUID, aGUID) == 0)
+			{
+				m_SelectedJoystickIndex = i;
+				str_copy(m_aSelectedJoystickGUID, g_Config.m_JoystickGUID, sizeof(m_aSelectedJoystickGUID));
+				break;
+			}
+		}
+		// could not find configured joystick, falling back to first available
+		if(m_SelectedJoystickIndex == -1)
+		{
+			m_SelectedJoystickIndex = 0;
+			SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(m_apJoysticks[0]), g_Config.m_JoystickGUID, sizeof(g_Config.m_JoystickGUID));
+			str_copy(m_aSelectedJoystickGUID, g_Config.m_JoystickGUID, sizeof(m_aSelectedJoystickGUID));
+		}
+	}
+	return m_apJoysticks[m_SelectedJoystickIndex];
 }
 
-void CInput::MouseRelative(float *x, float *y)
+void CInput::CloseJoysticks()
+{
+	for(sorted_array<SDL_Joystick*>::range r = m_apJoysticks.all(); !r.empty(); r.pop_front())
+	{
+		if(SDL_JoystickGetAttached(r.front()))
+		{
+			SDL_JoystickClose(r.front());
+		}
+	}
+	m_apJoysticks.clear();
+}
+
+void CInput::SelectNextJoystick()
+{
+	const int Num = m_apJoysticks.size();
+	if(Num > 1)
+	{
+		const int NextIndex = (m_SelectedJoystickIndex + 1) % Num;
+		SDL_JoystickGetGUIDString(SDL_JoystickGetGUID(m_apJoysticks[NextIndex]), g_Config.m_JoystickGUID, sizeof(g_Config.m_JoystickGUID));
+	}
+}
+
+const char* CInput::GetJoystickName()
+{
+	SDL_Joystick* pJoystick = GetActiveJoystick();
+	dbg_assert((bool)pJoystick, "Requesting joystick name, but no joysticks were initialized");
+	return SDL_JoystickName(pJoystick);
+}
+
+float CInput::GetJoystickAxisValue(int Axis)
+{
+	SDL_Joystick* pJoystick = GetActiveJoystick();
+	dbg_assert((bool)pJoystick, "Requesting joystick axis value, but no joysticks were initialized");
+	return static_cast<float>(SDL_JoystickGetAxis(pJoystick, Axis)) / (float)(SDL_JOYSTICK_AXIS_MAX + 1);
+}
+
+int CInput::GetJoystickNumAxes()
+{
+	SDL_Joystick* pJoystick = GetActiveJoystick();
+	dbg_assert((bool)pJoystick, "Requesting joystick axes count, but no joysticks were initialized");
+	return SDL_JoystickNumAxes(pJoystick);
+}
+
+void CInput::MouseRelative(float* x, float* y)
 {
 	if(!m_InputGrabbed)
 		return;
@@ -116,29 +202,29 @@ void CInput::MouseRelative(float *x, float *y)
 	float MouseSens = g_Config.m_InpMousesens / 100.0f;
 	float JoystickSens = g_Config.m_JoystickSens / 100.0f;
 
-	SDL_GetRelativeMouseState(&nx,&ny);
+	SDL_GetRelativeMouseState(&nx, &ny);
 
 	vec2 j = vec2(0.0f, 0.0f);
 
-	if (g_Config.m_JoystickEnable && m_pJoystick)
+	if(g_Config.m_JoystickEnable && GetActiveJoystick())
 	{
 		const float Max = 50.0f;
 		j = vec2(GetJoystickAxisValue(g_Config.m_JoystickX), GetJoystickAxisValue(g_Config.m_JoystickY)) * Max;
 		const float Len = length(j);
 
-		if (Len / sqrtf(2.0f) <= g_Config.m_JoystickTolerance) 
+		if(Len / sqrtf(2.0f) <= g_Config.m_JoystickTolerance)
 		{
 			j = vec2(0.0f, 0.0f);
-		} 
-		else 
+		}
+		else
 		{
 			const vec2 nj = Len > 0.0f ? j / Len : vec2(0.0f, 0.0f);
 			j = nj * min(Len, Max) - nj * g_Config.m_JoystickTolerance;
 		}
 	}
 
-	*x = nx * MouseSens + j.x*JoystickSens;
-	*y = ny * MouseSens + j.y*JoystickSens;
+	*x = nx * MouseSens + j.x * JoystickSens;
+	*y = ny * MouseSens + j.y * JoystickSens;
 }
 
 void CInput::MouseModeAbsolute()
@@ -176,7 +262,7 @@ int CInput::MouseDoubleClick()
 	return 0;
 }
 
-const char *CInput::GetClipboardText()
+const char* CInput::GetClipboardText()
 {
 	if(m_pClipboardText)
 	{
@@ -188,7 +274,7 @@ const char *CInput::GetClipboardText()
 	return m_pClipboardText;
 }
 
-void CInput::SetClipboardText(const char *pText)
+void CInput::SetClipboardText(const char* pText)
 {
 	SDL_SetClipboardText(pText);
 }
@@ -202,33 +288,33 @@ void CInput::Clear()
 
 bool CInput::KeyState(int Key) const
 {
-	return m_aInputState[Key>=KEY_MOUSE_1 ? Key : SDL_GetScancodeFromKey(KeyToKeycode(Key))];
+	return m_aInputState[Key >= KEY_MOUSE_1 ? Key : SDL_GetScancodeFromKey(KeyToKeycode(Key))];
 }
 
 int CInput::Update()
 {
 	// keep the counter between 1..0xFFFF, 0 means not pressed
-	m_InputCounter = (m_InputCounter%0xFFFF)+1;
+	m_InputCounter = (m_InputCounter % 0xFFFF) + 1;
 
 	{
 		int i;
-		const Uint8 *pState = SDL_GetKeyboardState(&i);
+		const Uint8* pState = SDL_GetKeyboardState(&i);
 		if(i >= KEY_LAST)
-			i = KEY_LAST-1;
+			i = KEY_LAST - 1;
 		mem_copy(m_aInputState, pState, i);
 	}
 
 	// these states must always be updated manually because they are not in the GetKeyState from SDL
 	int i = SDL_GetMouseState(NULL, NULL);
-	if(i&SDL_BUTTON(1)) m_aInputState[KEY_MOUSE_1] = 1; // 1 is left
-	if(i&SDL_BUTTON(3)) m_aInputState[KEY_MOUSE_2] = 1; // 3 is right
-	if(i&SDL_BUTTON(2)) m_aInputState[KEY_MOUSE_3] = 1; // 2 is middle
-	if(i&SDL_BUTTON(4)) m_aInputState[KEY_MOUSE_4] = 1;
-	if(i&SDL_BUTTON(5)) m_aInputState[KEY_MOUSE_5] = 1;
-	if(i&SDL_BUTTON(6)) m_aInputState[KEY_MOUSE_6] = 1;
-	if(i&SDL_BUTTON(7)) m_aInputState[KEY_MOUSE_7] = 1;
-	if(i&SDL_BUTTON(8)) m_aInputState[KEY_MOUSE_8] = 1;
-	if(i&SDL_BUTTON(9)) m_aInputState[KEY_MOUSE_9] = 1;
+	if(i & SDL_BUTTON(1)) m_aInputState[KEY_MOUSE_1] = 1; // 1 is left
+	if(i & SDL_BUTTON(3)) m_aInputState[KEY_MOUSE_2] = 1; // 3 is right
+	if(i & SDL_BUTTON(2)) m_aInputState[KEY_MOUSE_3] = 1; // 2 is middle
+	if(i & SDL_BUTTON(4)) m_aInputState[KEY_MOUSE_4] = 1;
+	if(i & SDL_BUTTON(5)) m_aInputState[KEY_MOUSE_5] = 1;
+	if(i & SDL_BUTTON(6)) m_aInputState[KEY_MOUSE_6] = 1;
+	if(i & SDL_BUTTON(7)) m_aInputState[KEY_MOUSE_7] = 1;
+	if(i & SDL_BUTTON(8)) m_aInputState[KEY_MOUSE_8] = 1;
+	if(i & SDL_BUTTON(9)) m_aInputState[KEY_MOUSE_9] = 1;
 
 	{
 		SDL_Event Event;
@@ -238,134 +324,134 @@ int CInput::Update()
 			int Key = -1;
 			int Scancode = 0;
 			int Action = IInput::FLAG_PRESS;
-			switch (Event.type)
+			switch(Event.type)
 			{
 				case SDL_TEXTINPUT:
-					AddEvent(Event.text.text, 0, IInput::FLAG_TEXT);
-					break;
+				AddEvent(Event.text.text, 0, IInput::FLAG_TEXT);
+				break;
 
 				// handle keys
 				case SDL_KEYDOWN:
-					Key = KeycodeToKey(Event.key.keysym.sym);
-					Scancode = Event.key.keysym.scancode;
-					break;
+				Key = KeycodeToKey(Event.key.keysym.sym);
+				Scancode = Event.key.keysym.scancode;
+				break;
 				case SDL_KEYUP:
-					Action = IInput::FLAG_RELEASE;
-					Key = KeycodeToKey(Event.key.keysym.sym);
-					Scancode = Event.key.keysym.scancode;
-					break;
+				Action = IInput::FLAG_RELEASE;
+				Key = KeycodeToKey(Event.key.keysym.sym);
+				Scancode = Event.key.keysym.scancode;
+				break;
 
 				// handle the joystick events
 				case SDL_JOYBUTTONUP:
-					Action = IInput::FLAG_RELEASE;
+				Action = IInput::FLAG_RELEASE;
 
-					// fall through
+				// fall through
 				case SDL_JOYBUTTONDOWN:
-					Key = Event.jbutton.button + KEY_JOYSTICK_BUTTON_0;
-					Scancode = Key;
-					break;
+				Key = Event.jbutton.button + KEY_JOYSTICK_BUTTON_0;
+				Scancode = Key;
+				break;
 
 				case SDL_JOYHATMOTION:
-					switch (Event.jhat.value) {
+				switch(Event.jhat.value) {
 					case SDL_HAT_LEFTUP:
-						Key = KEY_JOY_HAT_LEFTUP;
-						Scancode = Key;
-						m_PreviousHat = Key;
-						break;
-					case SDL_HAT_UP:
-						Key = KEY_JOY_HAT_UP;
-						Scancode = Key;
-						m_PreviousHat = Key;
-						break;
-					case SDL_HAT_RIGHTUP:
-						Key = KEY_JOY_HAT_RIGHTUP;
-						Scancode = Key;
-						m_PreviousHat = Key;
-						break;
-					case SDL_HAT_LEFT:
-						Key = KEY_JOY_HAT_LEFT;
-						Scancode = Key;
-						m_PreviousHat = Key;
-						break;
-					case SDL_HAT_CENTERED:
-						Action = IInput::FLAG_RELEASE;
-						Key = m_PreviousHat;
-						Scancode = m_PreviousHat;
-						m_PreviousHat = 0;
-						break;
-					case SDL_HAT_RIGHT:
-						Key = KEY_JOY_HAT_RIGHT;
-						Scancode = Key;
-						m_PreviousHat = Key;
-						break;
-					case SDL_HAT_LEFTDOWN:
-						Key = KEY_JOY_HAT_LEFTDOWN;
-						Scancode = Key;
-						m_PreviousHat = Key;
-						break;
-					case SDL_HAT_DOWN:
-						Key = KEY_JOY_HAT_DOWN;
-						Scancode = Key;
-						m_PreviousHat = Key;
-						break;
-					case SDL_HAT_RIGHTDOWN:
-						Key = KEY_JOY_HAT_RIGHTDOWN;
-						Scancode = Key;
-						m_PreviousHat = Key;
-						break;
-					}
+					Key = KEY_JOY_HAT_LEFTUP;
+					Scancode = Key;
+					m_PreviousHat = Key;
 					break;
+					case SDL_HAT_UP:
+					Key = KEY_JOY_HAT_UP;
+					Scancode = Key;
+					m_PreviousHat = Key;
+					break;
+					case SDL_HAT_RIGHTUP:
+					Key = KEY_JOY_HAT_RIGHTUP;
+					Scancode = Key;
+					m_PreviousHat = Key;
+					break;
+					case SDL_HAT_LEFT:
+					Key = KEY_JOY_HAT_LEFT;
+					Scancode = Key;
+					m_PreviousHat = Key;
+					break;
+					case SDL_HAT_CENTERED:
+					Action = IInput::FLAG_RELEASE;
+					Key = m_PreviousHat;
+					Scancode = m_PreviousHat;
+					m_PreviousHat = 0;
+					break;
+					case SDL_HAT_RIGHT:
+					Key = KEY_JOY_HAT_RIGHT;
+					Scancode = Key;
+					m_PreviousHat = Key;
+					break;
+					case SDL_HAT_LEFTDOWN:
+					Key = KEY_JOY_HAT_LEFTDOWN;
+					Scancode = Key;
+					m_PreviousHat = Key;
+					break;
+					case SDL_HAT_DOWN:
+					Key = KEY_JOY_HAT_DOWN;
+					Scancode = Key;
+					m_PreviousHat = Key;
+					break;
+					case SDL_HAT_RIGHTDOWN:
+					Key = KEY_JOY_HAT_RIGHTDOWN;
+					Scancode = Key;
+					m_PreviousHat = Key;
+					break;
+				}
+				break;
 
 				// handle mouse buttons
 				case SDL_MOUSEBUTTONUP:
-					Action = IInput::FLAG_RELEASE;
+				Action = IInput::FLAG_RELEASE;
 
-					// fall through
+				// fall through
 				case SDL_MOUSEBUTTONDOWN:
-					if(Event.button.button == SDL_BUTTON_LEFT) Key = KEY_MOUSE_1; // ignore_convention
-					if(Event.button.button == SDL_BUTTON_RIGHT) Key = KEY_MOUSE_2; // ignore_convention
-					if(Event.button.button == SDL_BUTTON_MIDDLE) Key = KEY_MOUSE_3; // ignore_convention
-					if(Event.button.button == 4) Key = KEY_MOUSE_4; // ignore_convention
-					if(Event.button.button == 5) Key = KEY_MOUSE_5; // ignore_convention
-					if(Event.button.button == 6) Key = KEY_MOUSE_6; // ignore_convention
-					if(Event.button.button == 7) Key = KEY_MOUSE_7; // ignore_convention
-					if(Event.button.button == 8) Key = KEY_MOUSE_8; // ignore_convention
-					if(Event.button.button == 9) Key = KEY_MOUSE_9; // ignore_convention
-					if(Event.button.button == SDL_BUTTON_LEFT)
-					{
-						if(Event.button.clicks%2 == 0)
-							m_MouseDoubleClick = true;
-						if(Event.button.clicks == 1)
-							m_MouseDoubleClick = false;
-					}
-					Scancode = Key;
-					break;
+				if(Event.button.button == SDL_BUTTON_LEFT) Key = KEY_MOUSE_1; // ignore_convention
+				if(Event.button.button == SDL_BUTTON_RIGHT) Key = KEY_MOUSE_2; // ignore_convention
+				if(Event.button.button == SDL_BUTTON_MIDDLE) Key = KEY_MOUSE_3; // ignore_convention
+				if(Event.button.button == 4) Key = KEY_MOUSE_4; // ignore_convention
+				if(Event.button.button == 5) Key = KEY_MOUSE_5; // ignore_convention
+				if(Event.button.button == 6) Key = KEY_MOUSE_6; // ignore_convention
+				if(Event.button.button == 7) Key = KEY_MOUSE_7; // ignore_convention
+				if(Event.button.button == 8) Key = KEY_MOUSE_8; // ignore_convention
+				if(Event.button.button == 9) Key = KEY_MOUSE_9; // ignore_convention
+				if(Event.button.button == SDL_BUTTON_LEFT)
+				{
+					if(Event.button.clicks % 2 == 0)
+						m_MouseDoubleClick = true;
+					if(Event.button.clicks == 1)
+						m_MouseDoubleClick = false;
+				}
+				Scancode = Key;
+				break;
 
 				case SDL_MOUSEWHEEL:
-					if(Event.wheel.y > 0) Key = KEY_MOUSE_WHEEL_UP; // ignore_convention
-					if(Event.wheel.y < 0) Key = KEY_MOUSE_WHEEL_DOWN; // ignore_convention
-					Action |= IInput::FLAG_RELEASE;
-					break;
+				if(Event.wheel.y > 0) Key = KEY_MOUSE_WHEEL_UP; // ignore_convention
+				if(Event.wheel.y < 0) Key = KEY_MOUSE_WHEEL_DOWN; // ignore_convention
+				Action |= IInput::FLAG_RELEASE;
+				break;
 
 #if defined(CONF_PLATFORM_MACOSX)	// Todo SDL: remove this when fixed (mouse state is faulty on start)
 				case SDL_WINDOWEVENT:
-					if(Event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
-					{
-						MouseModeAbsolute();
-						MouseModeRelative();
-					}
-					break;
+				if(Event.window.event == SDL_WINDOWEVENT_MAXIMIZED)
+				{
+					MouseModeAbsolute();
+					MouseModeRelative();
+				}
+				break;
 #endif
 
 				// other messages
 				case SDL_QUIT:
-					return 1;
+				return 1;
 			}
 
 			//
 			if(Key != -1)
 			{
-				if(Action&IInput::FLAG_PRESS)
+				if(Action & IInput::FLAG_PRESS)
 				{
 					m_aInputState[Scancode] = 1;
 					m_aInputCount[Key] = m_InputCounter;
@@ -380,4 +466,4 @@ int CInput::Update()
 }
 
 
-IEngineInput *CreateEngineInput() { return new CInput; }
+IEngineInput* CreateEngineInput() { return new CInput; }

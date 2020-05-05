@@ -1475,7 +1475,7 @@ void CGameClient::OnNewSnapshot()
 		CSnapState::CCharacterInfo *c = &m_Snap.m_aCharacters[m_LocalClientID];
 		if(c->m_Active)
 		{
-			if (!m_Snap.m_SpecInfo.m_Active)
+			if(!m_Snap.m_SpecInfo.m_Active)
 			{
 				m_Snap.m_pLocalCharacter = &c->m_Cur;
 				m_Snap.m_pLocalPrevCharacter = &c->m_Prev;

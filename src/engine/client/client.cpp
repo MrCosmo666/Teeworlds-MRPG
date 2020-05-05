@@ -2167,9 +2167,8 @@ void CClient::Run()
 		VersionUpdate();
 
 		// handle pending connects
-		if (m_aCmdConnect[0])
+		if(m_aCmdConnect[0])
 		{
-			str_copy(g_Config.m_UiServerAddress, m_aCmdConnect, sizeof(g_Config.m_UiServerAddress));
 			Connect(m_aCmdConnect);
 			m_aCmdConnect[0] = 0;
 		}

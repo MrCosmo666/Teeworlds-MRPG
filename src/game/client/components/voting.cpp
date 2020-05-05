@@ -270,7 +270,6 @@ void CVoting::OnMessage(int MsgType, void *pRawMsg)
 
 		char pBuf[16];
 		IntsToStr(pMsg->m_pIcon, 4, pBuf);
-
 		vec3 Color = vec3((int)pMsg->m_pHexColor >> 16, ((int)pMsg->m_pHexColor >> 8) & 0xff, (int)pMsg->m_pHexColor & 0xff);
 		AddOption(pMsg->m_pDescription, Color, pBuf);
 	}

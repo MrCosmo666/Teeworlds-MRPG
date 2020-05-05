@@ -9,6 +9,7 @@
 #include <engine/graphics.h>
 #include <engine/demo.h>
 #include <engine/contacts.h>
+#include <engine/serverbrowser.h>
 
 #include <game/voting.h>
 #include <game/client/component.h>
@@ -116,26 +117,12 @@ private:
 
 	int DoButton_MouseOver(int ImageID, int SpriteID, const CUIRect *pRect);
 
-	/*static void ui_draw_menu_button(const void *id, const char *text, int checked, const CUIRect *r, const void *extra);
-	static void ui_draw_keyselect_button(const void *id, const char *text, int checked, const CUIRect *r, const void *extra);
-	static void ui_draw_menu_tab_button(const void *id, const char *text, int checked, const CUIRect *r, const void *extra);
-	static void ui_draw_settings_tab_button(const void *id, const char *text, int checked, const CUIRect *r, const void *extra);
-	*/
-
 	int DoIcon(int ImageId, int SpriteId, const CUIRect *pRect);
 	void DoIconColor(int ImageId, int SpriteId, const CUIRect *pRect, const vec4& Color);
 	int DoButton_GridHeader(const void *pID, const char *pText, int Checked, CUI::EAlignment Align, const CUIRect *pRect);
-	// int DoButton_GridHeaderIcon(CButtonContainer *pBC, int ImageID, int SpriteID, const CUIRect *pRect, int Corners);
 
-	//static void ui_draw_browse_icon(int what, const CUIRect *r);
-	//static void ui_draw_grid_header(const void *id, const char *text, int checked, const CUIRect *r, const void *extra);
-
-	/*static void ui_draw_checkbox_common(const void *id, const char *text, const char *boxtext, const CUIRect *r, const void *extra);
-	static void ui_draw_checkbox(const void *id, const char *text, int checked, const CUIRect *r, const void *extra);
-	static void ui_draw_checkbox_number(const void *id, const char *text, int checked, const CUIRect *r, const void *extra);
-	*/
 public:
-	int DoEditBox(void *pID, const CUIRect *pRect, char *pStr, unsigned StrSize, float FontSize, float *pOffset, bool Hidden=false, int Corners=CUI::CORNER_ALL);
+	bool DoEditBox(void* pID, const CUIRect* pRect, char* pStr, unsigned StrSize, float FontSize, float* pOffset, bool Hidden = false, int Corners = CUI::CORNER_ALL);
 
 private:
 	void DoEditBoxOption(void *pID, char *pOption, int OptionLength, const CUIRect *pRect, const char *pStr, float VSplitVal, float *pOffset, bool Hidden=false);
@@ -154,8 +141,7 @@ private:
 	//static int ui_do_key_reader(void *id, const CUIRect *rect, int key);
 	void UiDoGetButtons(int Start, int Stop, CUIRect View, float ButtonHeight, float Spacing);
 
-
-
+	// Scroll region : found in menus_scrollregion.cpp
 	struct CScrollRegionParams
 	{
 		float m_ScrollbarWidth;
@@ -190,8 +176,31 @@ private:
 		}
 	};
 
-	struct CScrollRegion
+	/*
+	Usage:
+		-- Initialization --
+		static CScrollRegion s_ScrollRegion(this);
+		vec2 ScrollOffset(0, 0);
+		s_ScrollRegion.Begin(&ScrollRegionRect, &ScrollOffset);
+		Content = ScrollRegionRect;
+		Content.y += ScrollOffset.y;
+		-- "Register" your content rects --
+		CUIRect Rect;
+		Content.HSplitTop(SomeValue, &Rect, &Content);
+		s_ScrollRegion.AddRect(Rect);
+		-- [Optionnal] Knowing if a rect is clipped --
+		s_ScrollRegion.IsRectClipped(Rect);
+		-- [Optionnal] Scroll to a rect (to the last added rect)--
+		...
+		s_ScrollRegion.AddRect(Rect);
+		s_ScrollRegion.ScrollHere(Option);
+		-- End --
+		s_ScrollRegion.End();
+	*/
+	class CScrollRegion
 	{
+	private:
+		CMenus* m_pMenus;
 		float m_ScrollY;
 		float m_ContentH;
 		float m_RequestScrollY; // [0, ContentHeight]
@@ -204,58 +213,23 @@ private:
 		bool m_WasClipped;
 		CScrollRegionParams m_Params;
 
+	public:
 		enum {
 			SCROLLHERE_KEEP_IN_VIEW=0,
 			SCROLLHERE_TOP,
 			SCROLLHERE_BOTTOM,
 		};
 
-		CScrollRegion()
-		{
-			m_ScrollY = 0;
-			m_ContentH = 0;
-			m_RequestScrollY = -1;
-			m_ContentScrollOff = vec2(0,0);
-			m_WasClipped = false;
-			m_Params = CScrollRegionParams();
-		}
+		CScrollRegion(CMenus* pMenus);
+		void Begin(CUIRect* pClipRect, vec2* pOutOffset, const CScrollRegionParams* pParams = 0);
+		void End();
+		void AddRect(CUIRect Rect);
+		void ScrollHere(int Option = CScrollRegion::SCROLLHERE_KEEP_IN_VIEW);
+		bool IsRectClipped(const CUIRect& Rect) const;
+		bool IsScrollbarShown() const;
 	};
 
-	// Scroll region
-	/*
-
-	Usage:
-		-- Initialization --
-		static CScrollRegion s_ScrollRegion;
-		vec2 ScrollOffset(0, 0);
-		BeginScrollRegion(&s_ScrollRegion, &ScrollRegionRect, &ScrollOffset);
-		Content = ScrollRegionRect;
-		Content.y += ScrollOffset.y;
-
-		-- "Register" your content rects --
-		CUIRect Rect;
-		Content.HSplitTop(SomeValue, &Rect, &Content);
-		ScrollRegionAddRect(&s_ScrollRegion, Rect);
-
-		-- [Optionnal] Knowing if a rect is clipped --
-		ScrollRegionIsRectClipped(&s_ScrollRegion, Rect);
-
-		-- [Optionnal] Scroll to a rect (to the last added rect)--
-		...
-		ScrollRegionAddRect(&s_ScrollRegion, Rect);
-		ScrollRegionScrollHere(&s_ScrollRegion, Option);
-
-		-- End --
-		EndScrollRegion(&s_ScrollRegion);
-
-	*/
-
-	void BeginScrollRegion(CScrollRegion* pSr, CUIRect* pClipRect, vec2* pOutOffset, const CScrollRegionParams* pParams = 0);
-	void EndScrollRegion(CScrollRegion* pSr);
-	void ScrollRegionAddRect(CScrollRegion* pSr, CUIRect Rect);
-	void ScrollRegionScrollHere(CScrollRegion* pSr, int Option = CScrollRegion::SCROLLHERE_KEEP_IN_VIEW);
-	bool ScrollRegionIsRectClipped(CScrollRegion* pSr, const CUIRect& Rect);
-
+	// Listbox : found in menus_listbox.cpp
 	struct CListboxItem
 	{
 		int m_Visible;
@@ -263,8 +237,10 @@ private:
 		CUIRect m_Rect;
 	};
 
-	struct CListBoxState
+	class CListBox
 	{
+	private:
+		CMenus* m_pMenus;
 		CUIRect m_ListBoxView;
 		float m_ListBoxRowHeight;
 		int m_ListBoxItemIndex;
@@ -278,20 +254,21 @@ private:
 		bool m_ListBoxItemActivated;
 		CScrollRegion m_ScrollRegion;
 		vec2 m_ScrollOffset;
+		char m_aFilterString[64];
+		float m_OffsetFilter;
 
-		CListBoxState()
-		{
-			m_ScrollOffset = vec2(0, 0);
-			m_ListBoxUpdateScroll = false;
-		}
+	public:
+		CListBox(CMenus* pMenus);
+
+		void DoHeader(const CUIRect* pRect, const char* pTitle, float HeaderHeight = 20.0f, float Spacing = 2.0f);
+		bool DoFilter(float FilterHeight = 20.0f, float Spacing = 2.0f);
+		void DoStart(float RowHeight, const char* pBottomText, int NumItems, int ItemsPerRow, int SelectedIndex,
+			const CUIRect* pRect = 0, bool Background = true, bool* pActive = 0);
+		CListboxItem DoNextItem(const void* pID, bool Selected = false, bool* pActive = 0);
+		CListboxItem DoNextRow();
+		int DoEnd(bool* pItemActivated);
+		bool FilterMatches(const char* pNeedle);
 	};
-
-	void UiDoListboxHeader(CListBoxState* pState, const CUIRect *pRect, const char *pTitle, float HeaderHeight, float Spacing);
-	void UiDoListboxStart(CListBoxState* pState, const void *pID, float RowHeight, const char *pBottomText, int NumItems,
-		int ItemsPerRow, int SelectedIndex, const CUIRect* pRect = 0, bool Background = true, bool* pActive = 0);
-	CListboxItem UiDoListboxNextItem(CListBoxState* pState, const void* pID, bool Selected = false, bool* pActive = 0);
-	CListboxItem UiDoListboxNextRow(CListBoxState* pState);
-	int UiDoListboxEnd(CListBoxState* pState, bool *pItemActivated);
 
 	enum
 	{
@@ -364,9 +341,6 @@ private:
 	vec4 aAuthResultColor;
 	//
 
-	int m_SidebarTab;
-	bool m_SidebarActive;
-	bool m_ShowServerDetails;
 	bool m_UseMouseButtons;
 	vec2 m_MousePos;
 	vec2 m_PrevMousePos;
@@ -564,10 +538,7 @@ private:
 			if(!m_aName[0] && Other.m_aName[0])
 				return false;
 			int Result = str_comp_nocase(m_aName, Other.m_aName);
-			if(Result < 0 || (Result == 0 && str_comp_nocase(m_aClan, Other.m_aClan) < 0))
-				return true;
-			
-			return false;
+			return Result < 0 || (Result == 0 && str_comp_nocase(m_aClan, Other.m_aClan) < 0);
 		}
 	};
 
@@ -583,20 +554,20 @@ private:
 
 	void FriendlistOnUpdate();
 
+	// server browser
 	class CBrowserFilter
 	{
 		bool m_Extended;
 		int m_Custom;
 		char m_aName[64];
 		int m_Filter;
-		class IServerBrowser *m_pServerBrowser;
+		IServerBrowser* m_pServerBrowser;
 
-		static class CServerFilterInfo ms_FilterStandard;
-		static class CServerFilterInfo ms_FilterFavorites;
-		static class CServerFilterInfo ms_FilterAll;
+		static CServerFilterInfo ms_FilterStandard;
+		static CServerFilterInfo ms_FilterFavorites;
+		static CServerFilterInfo ms_FilterAll;
 
 	public:
-
 		enum
 		{
 			FILTER_CUSTOM=0,
@@ -620,17 +591,16 @@ private:
 
 		int NumSortedServers() const;
 		int NumPlayers() const;
-		const CServerInfo *SortedGet(int Index) const;
-		const void *ID(int Index) const;
+		const CServerInfo* SortedGet(int Index) const;
+		const void* ID(int Index) const;
 
 		void Reset();
-		void GetFilter(class CServerFilterInfo *pFilterInfo) const;
-		void SetFilter(const class CServerFilterInfo *pFilterInfo);
+		void GetFilter(CServerFilterInfo* pFilterInfo) const;
+		void SetFilter(const CServerFilterInfo* pFilterInfo);
 	};
 
 	array<CBrowserFilter> m_lFilters;
 
-	int m_SelectedFilter;
 	int m_RemoveFilterIndex;
 
 	void LoadFilters();
@@ -658,29 +628,6 @@ private:
 	CInfoOverlay m_InfoOverlay;
 	bool m_InfoOverlayActive;
 
-	class CServerEntry
-	{
-	public:
-		int m_Filter;
-		int m_Index;
-	};
-
-	CServerEntry m_SelectedServer;
-
-	enum
-	{
-		FIXED=1,
-		SPACER=2,
-
-		COL_BROWSER_FLAG=0,
-		COL_BROWSER_NAME,
-		COL_BROWSER_GAMETYPE,
-		COL_BROWSER_MAP,
-		COL_BROWSER_PLAYERS,
-		COL_BROWSER_PING,
-		NUM_BROWSER_COLS,
-	};
-
 	struct CColumn
 	{
 		int m_ID;
@@ -694,8 +641,58 @@ private:
 		CUI::EAlignment m_Align;
 	};
 
+	enum
+	{
+		COL_BROWSER_FLAG=0,
+		COL_BROWSER_NAME,
+		COL_BROWSER_GAMETYPE,
+		COL_BROWSER_MAP,
+		COL_BROWSER_PLAYERS,
+		COL_BROWSER_PING,
+		NUM_BROWSER_COLS,
+
+		ADDR_SELECTION_CHANGE = 1,
+		ADDR_SELECTION_RESET_SERVER_IF_NOT_FOUND = 2,
+		ADDR_SELECTION_REVEAL = 4,
+		ADDR_SELECTION_UPDATE_ADDRESS = 8,
+	};
+
+	int m_SidebarTab;
+	bool m_SidebarActive;
+	bool m_ShowServerDetails;
+	int m_LastBrowserType; // -1 if not initialized
+	int m_aSelectedFilters[IServerBrowser::NUM_TYPES]; // -1 if none selected, -2 if not initialized
+	int m_aSelectedServers[IServerBrowser::NUM_TYPES]; // -1 if none selected
+	int m_AddressSelection;
 	static CColumn ms_aBrowserCols[NUM_BROWSER_COLS];
 
+	CBrowserFilter* GetSelectedBrowserFilter()
+	{
+		const int Tab = ServerBrowser()->GetType();
+		if(m_aSelectedFilters[Tab] == -1)
+			return 0;
+		return &m_lFilters[m_aSelectedFilters[Tab]];
+	}
+
+	const CServerInfo* GetSelectedServerInfo()
+	{
+		CBrowserFilter* pSelectedFilter = GetSelectedBrowserFilter();
+		if(!pSelectedFilter)
+			return 0;
+		const int Tab = ServerBrowser()->GetType();
+		if(m_aSelectedServers[Tab] < 0 || m_aSelectedServers[Tab] >= pSelectedFilter->NumSortedServers())
+			return 0;
+		return pSelectedFilter->SortedGet(m_aSelectedServers[Tab]);
+	}
+
+	void UpdateServerBrowserAddress();
+	const char* GetServerBrowserAddress();
+	void SetServerBrowserAddress(const char* pAddress);
+	void ServerBrowserFilterOnUpdate();
+	void ServerBrowserSortingOnUpdate();
+
+
+	// video settings
 	enum
 	{
 		MAX_RESOLUTIONS=256,
@@ -721,8 +718,6 @@ private:
 
 	// found in menus.cpp
 	int Render();
-	//void render_background();
-	//void render_loading(float percent);
 	void RenderMenubar(CUIRect r);
 	void RenderNews(CUIRect MainView);
 	void RenderBackButton(CUIRect MainView);
@@ -749,7 +744,6 @@ private:
 	bool RenderServerControlServer(CUIRect MainView);
 
 	// found in menus_browser.cpp
-	// int m_ScrollOffset;
 	void RenderServerbrowserServerList(CUIRect View);
 	void RenderServerbrowserSidebar(CUIRect View);
 	void RenderServerbrowserFilterbar(CUIRect View); // gamer only
@@ -760,7 +754,6 @@ private:
 	void RenderDetailInfo(CUIRect View, const CServerInfo *pInfo);
 	void RenderDetailScoreboard(CUIRect View, const CServerInfo *pInfo, int RowCount, vec4 TextColor = vec4(1,1,1,1));
 	void RenderServerbrowserServerDetail(CUIRect View, const CServerInfo *pInfo);
-	//void RenderServerbrowserFriends(CUIRect View);
 	void RenderServerbrowserBottomBox(CUIRect View);
 	void RenderServerbrowserOverlay();
 	void RenderFilterHeader(CUIRect View, int FilterIndex);
@@ -768,6 +761,7 @@ private:
 	void RenderServerbrowser(CUIRect MainView);
 	static void ConchainFriendlistUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	static void ConchainServerbrowserUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
+	static void ConchainServerbrowserSortingUpdate(IConsole::IResult* pResult, void* pUserData, IConsole::FCommandCallback pfnCallback, void* pCallbackUserData);
 	static void ConchainToggleMusic(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	void DoFriendListEntry(CUIRect *pView, CFriendItem *pFriend, const void *pID, const CContactInfo *pFriendInfo, const CServerInfo *pServerInfo, bool Checked, bool Clan = false);
 	void SetOverlay(int Type, float x, float y, const void *pData);
@@ -810,8 +804,8 @@ private:
 	void RenderSettingsSound(CUIRect MainView);
 	void RenderSettings(CUIRect MainView);
 
-	bool DoResolutionList(CUIRect* pRect, CListBoxState* pListBoxState,
-						  const sorted_array<CVideoMode>& lModes);
+	bool DoResolutionList(CUIRect* pRect, CListBox* pListBox,
+		const sorted_array<CVideoMode>& lModes);
 
 	// found in menu_callback.cpp
 	static float RenderSettingsControlsMouse(CUIRect View, void *pUser);

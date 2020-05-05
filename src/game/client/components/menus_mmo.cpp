@@ -55,7 +55,7 @@ void CMenus::RenderSettingsMmo(CUIRect MainView)
 	const int Corner[TAB_SIZE] = { CUI::CORNER_TL, 0, 0, CUI::CORNER_TR };
 	for (int i = 0; i < TAB_SIZE; i++)
 	{
-		Tabbar.VSplitLeft(182.5f, &Button, &Tabbar);
+		Tabbar.VSplitLeft(100.0f, &Button, &Tabbar);
 
 		static CButtonContainer s_Buttons[3];
 		if (DoButton_MenuTabTop(&s_Buttons[i], Tabs[i], Client()->State() == IClient::STATE_OFFLINE && s_SettingsPage == i, &Button, s_SettingsPage == i ? 1.0f : 1.5f, 1.0f, Corner[i], 6.0f))
@@ -171,13 +171,13 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 void CMenus::RenderSettingsMmoChangerGeneric(CUIRect MainView, CCSkinChanger::CTextureEntity* pEntities, char* pConfigStr, const char* pLabel, int ItemsPerRow, float Ratio)
 {
 	char aBuf[512];
-	static CListBoxState s_ListBoxState;
+	static CListBox s_ListBox(this);
 	int OldSelected = -1;
 	str_format(aBuf, sizeof(aBuf), "%s: %s", pLabel, pConfigStr[0] ? pConfigStr : "default");
-	UiDoListboxHeader(&s_ListBoxState, &MainView, aBuf, 20.0f, 2.0f);
+	s_ListBox.DoHeader(&MainView, aBuf, 20.0f, 2.0f);
 
 	const int Num = pEntities->Num();
-	UiDoListboxStart(&s_ListBoxState, &s_ListBoxState, MainView.w / (float)ItemsPerRow / Ratio, 0, Num, ItemsPerRow, OldSelected);
+	s_ListBox.DoStart(MainView.w / (float)ItemsPerRow / Ratio, 0, Num, ItemsPerRow, OldSelected);
 
 	for (int i = 0; i < Num + 1; ++i) // first is default
 	{
@@ -189,7 +189,7 @@ void CMenus::RenderSettingsMmoChangerGeneric(CUIRect MainView, CCSkinChanger::CT
 		else if (str_comp(pEntities->GetName(i - 1), pConfigStr) == 0)
 			OldSelected = i;
 		static int s_DefaultEntitiyId;
-		CListboxItem Item = UiDoListboxNextItem(&s_ListBoxState, i > 0 ? (void*)pEntities->GetName(i - 1) : (void*)&s_DefaultEntitiyId, OldSelected == i);
+		CListboxItem Item = s_ListBox.DoNextItem(i > 0 ? (void*)pEntities->GetName(i - 1) : (void*)&s_DefaultEntitiyId, OldSelected == i);
 		if (Item.m_Visible)
 		{
 			CUIRect Pos;
@@ -209,7 +209,7 @@ void CMenus::RenderSettingsMmoChangerGeneric(CUIRect MainView, CCSkinChanger::CT
 		}
 	}
 
-	const int NewSelected = UiDoListboxEnd(&s_ListBoxState, 0);
+	const int NewSelected = s_ListBox.DoEnd(0);
 	if (OldSelected != NewSelected)
 	{
 		if (NewSelected == 0)
@@ -338,7 +338,7 @@ int GatherFonts(const char *pFileName, int IsDir, int Type, void *pUser)
 
 void CMenus::RenderFontSelection(CUIRect MainView)
 {
-	static CListBoxState s_FontList;
+	static CListBox s_ListBox(this);
 	static int s_SelectedFont = 0;
 	static sorted_array<CFontFile> s_Fonts;
 
@@ -357,11 +357,11 @@ void CMenus::RenderFontSelection(CUIRect MainView)
 
 	int OldSelectedFont = s_SelectedFont;
 	static float s_Fade[2] = { 0 };
-	UiDoListboxHeader(&s_FontList, &MainView, Localize(""), 20.0f, 2.0f);
-	UiDoListboxStart(&s_FontList, &s_Fade[0], 20.0f, Localize("Fonts"), s_Fonts.size(), 1, s_SelectedFont);
+	s_ListBox.DoHeader(&MainView, Localize(""), 20.0f, 2.0f);
+	s_ListBox.DoStart(20.0f, Localize("Fonts"), s_Fonts.size(), 1, s_SelectedFont);
 	for (sorted_array<CFontFile>::range r = s_Fonts.all(); !r.empty(); r.pop_front())
 	{
-		CListboxItem Item = UiDoListboxNextItem(&s_FontList, &r.front());
+		CListboxItem Item = s_ListBox.DoNextItem(&r.front());
 		if (Item.m_Visible)
 		{
 			Item.m_Rect.VMargin(5.0f, &Item.m_Rect);
@@ -370,7 +370,7 @@ void CMenus::RenderFontSelection(CUIRect MainView)
 		}
 	}
 
-	s_SelectedFont = UiDoListboxEnd(&s_FontList, 0);
+	s_SelectedFont = s_ListBox.DoEnd(0);
 	if (OldSelectedFont != s_SelectedFont)
 	{
 		str_copy(g_Config.m_ClFontfile, s_Fonts[s_SelectedFont].m_FileName, sizeof(g_Config.m_ClFontfile));
