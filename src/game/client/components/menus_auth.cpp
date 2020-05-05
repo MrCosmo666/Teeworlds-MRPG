@@ -215,9 +215,7 @@ void CMenus::RenderAuthWindow()
 				static float s_OffsetUsername = 0.0f;
 				static int s_boxAccountLogin = 0;
 				BasicLogin.HSplitTop(25.0f, &Button, &BasicLogin);
-				if (DoEditBox(&s_boxAccountLogin, &Button, g_Config.m_AccountMRPG, sizeof(g_Config.m_AccountMRPG),
-					Button.h * ms_FontmodHeight * 0.8f, &s_OffsetUsername))
-					m_ActiveEditbox = true;
+				DoEditBox(&s_boxAccountLogin, &Button, g_Config.m_AccountMRPG, sizeof(g_Config.m_AccountMRPG), Button.h * ms_FontmodHeight * 0.8f, &s_OffsetUsername);
 			}
 
 			// - - - - - - - - - - - - - - - - - -œ¿–ŒÀ‹ - - - - - - - - - - - - - - - //
@@ -229,9 +227,7 @@ void CMenus::RenderAuthWindow()
 				static float s_OffsetPassword = 0.0f;
 				static int s_boxPasswordLogin = 0;
 				BasicLogin.HSplitTop(25.0f, &Button, &BasicLogin);
-				if (DoEditBox(&s_boxPasswordLogin, &Button, g_Config.m_PasswordMRPG, sizeof(g_Config.m_PasswordMRPG),
-					Button.h * ms_FontmodHeight * 0.8f, &s_OffsetPassword, true))
-					m_ActiveEditbox = true;
+				DoEditBox(&s_boxPasswordLogin, &Button, g_Config.m_PasswordMRPG, sizeof(g_Config.m_PasswordMRPG), Button.h* ms_FontmodHeight * 0.8f, &s_OffsetPassword, true);
 			}
 
 			// - - - - - - - - - - - - - - - - - - ÕŒœ » - - - - - - - - - - - - - - - //
@@ -264,9 +260,7 @@ void CMenus::RenderAuthWindow()
 			{
 				static float s_OffsetUsername = 0.0f;
 				static int s_boxAccountLogin = 0;
-				if (DoEditBox(&s_boxAccountLogin, &Button, s_aAccount, sizeof(s_aAccount),
-					Button.h * ms_FontmodHeight * 0.8f, &s_OffsetUsername))
-					m_ActiveEditbox = true;
+				DoEditBox(&s_boxAccountLogin, &Button, s_aAccount, sizeof(s_aAccount), Button.h * ms_FontmodHeight * 0.8f, &s_OffsetUsername);
 			}
 
 			// - - - - - - - - - - - - - - - - - -œ¿–ŒÀ‹ - - - - - - - - - - - - - - - //
@@ -277,9 +271,7 @@ void CMenus::RenderAuthWindow()
 			BasicRegister.HSplitTop(25.0f, &Button, &BasicRegister);
 			{
 				static float s_OffsetPassword = 0.0f;
-				if (DoEditBox(&s_aPassword, &Button, s_aPassword, sizeof(s_aPassword),
-					Button.h * ms_FontmodHeight * 0.8f, &s_OffsetPassword, true))
-					m_ActiveEditbox = true;
+				DoEditBox(&s_aPassword, &Button, s_aPassword, sizeof(s_aPassword), Button.h * ms_FontmodHeight * 0.8f, &s_OffsetPassword, true);
 			}
 
 			// - - - - - - - - - - - - - - œŒ¬“Œ– œ¿–ŒÀﬂ - - - - - - - - - - - - - - - //
@@ -290,9 +282,7 @@ void CMenus::RenderAuthWindow()
 			BasicRegister.HSplitTop(25.0f, &Button, &BasicRegister);
 			{
 				static float s_OffsetRepeatPassword = 0.0f;
-				if (DoEditBox(&s_aRepeatPassword, &Button, s_aRepeatPassword, sizeof(s_aRepeatPassword),
-					Button.h * ms_FontmodHeight * 0.8f, &s_OffsetRepeatPassword, true))
-					m_ActiveEditbox = true;
+				DoEditBox(&s_aRepeatPassword, &Button, s_aRepeatPassword, sizeof(s_aRepeatPassword), Button.h * ms_FontmodHeight * 0.8f, &s_OffsetRepeatPassword, true);
 			}
 
 			// - - - - - - - - - - - - - - - - - - ÕŒœ » - - - - - - - - - - - - - - - //

@@ -95,7 +95,7 @@ public:
 	};
 
 private:
-	typedef float (*FDropdownCallback)(CUIRect View, void *pUser);
+	typedef float (CMenus::* FDropdownCallback)(CUIRect View);
 
 	float ButtonFade(CButtonContainer *pBC, float Seconds, int Checked=0);
 
@@ -108,12 +108,11 @@ private:
 	int DoButton_Menu(CButtonContainer *pBC, const char *pText, int Checked, const CUIRect *pRect, const char *pImageName=0, int Corners=CUI::CORNER_ALL, float r=5.0f, float FontFactor=0.0f, vec4 ColorHot=vec4(1.0f, 1.0f, 1.0f, 0.75f), bool TextFade=true);
 	int DoButton_MenuTab(const void *pID, const char *pText, int Checked, const CUIRect *pRect, int Corners);
 	int DoButton_MenuTabTop(CButtonContainer *pBC, const char *pText, int Checked, const CUIRect *pRect, float Alpha=1.0f, float FontAlpha=1.0f, int Corners=CUI::CORNER_ALL, float r=5.0f, float FontFactor=0.0f);
-	void DoButton_MenuTabTop_Dummy(const char *pText, int Checked, const CUIRect *pRect, float Alpha);
 	int DoButton_Customize(CButtonContainer *pBC, IGraphics::CTextureHandle Texture, int SpriteID, const CUIRect *pRect, float ImageRatio);
 
 	int DoButton_CheckBox_Common(const void *pID, const char *pText, const char *pBoxText, const CUIRect *pRect, bool Checked=false, bool Locked=false);
-	int DoButton_CheckBox(const void *pID, const char *pText, int Checked, const CUIRect *pRect, bool Locked=false);
-	int DoButton_CheckBox_Number(const void *pID, const char *pText, int Checked, const CUIRect *pRect);
+	int DoButton_CheckBox(const void* pID, const char* pText, int Checked, const CUIRect* pRect, bool Locked = false);
+	int DoButton_CheckBox_Number(const void* pID, const char* pText, int SelectedNumber, const CUIRect* pRect);
 
 	int DoButton_MouseOver(int ImageID, int SpriteID, const CUIRect *pRect);
 
@@ -140,6 +139,18 @@ private:
 
 	//static int ui_do_key_reader(void *id, const CUIRect *rect, int key);
 	void UiDoGetButtons(int Start, int Stop, CUIRect View, float ButtonHeight, float Spacing);
+
+	class CUIElementBase
+	{
+	protected:
+		static CMenus* m_pMenus;	// TODO: Refactor in order to remove this reference to menus
+		static CRenderTools* m_pRenderTools;
+		static CUI* m_pUI;
+		static IInput* m_pInput;
+
+	public:
+		static void Init(CMenus* pMenus) { m_pMenus = pMenus; m_pRenderTools = pMenus->RenderTools(); m_pUI = pMenus->UI(); m_pInput = pMenus->Input(); };
+	};
 
 	// Scroll region : found in menus_scrollregion.cpp
 	struct CScrollRegionParams
@@ -179,7 +190,7 @@ private:
 	/*
 	Usage:
 		-- Initialization --
-		static CScrollRegion s_ScrollRegion(this);
+		static CScrollRegion s_ScrollRegion;
 		vec2 ScrollOffset(0, 0);
 		s_ScrollRegion.Begin(&ScrollRegionRect, &ScrollOffset);
 		Content = ScrollRegionRect;
@@ -197,7 +208,7 @@ private:
 		-- End --
 		s_ScrollRegion.End();
 	*/
-	class CScrollRegion
+	class CScrollRegion : private CUIElementBase
 	{
 	private:
 		CMenus* m_pMenus;
@@ -205,12 +216,10 @@ private:
 		float m_ContentH;
 		float m_RequestScrollY; // [0, ContentHeight]
 		CUIRect m_ClipRect;
-		CUIRect m_OldClipRect;
 		CUIRect m_RailRect;
 		CUIRect m_LastAddedRect; // saved for ScrollHere()
 		vec2 m_MouseGrabStart;
 		vec2 m_ContentScrollOff;
-		bool m_WasClipped;
 		CScrollRegionParams m_Params;
 
 	public:
@@ -220,7 +229,7 @@ private:
 			SCROLLHERE_BOTTOM,
 		};
 
-		CScrollRegion(CMenus* pMenus);
+		CScrollRegion();
 		void Begin(CUIRect* pClipRect, vec2* pOutOffset, const CScrollRegionParams* pParams = 0);
 		void End();
 		void AddRect(CUIRect Rect);
@@ -232,15 +241,14 @@ private:
 	// Listbox : found in menus_listbox.cpp
 	struct CListboxItem
 	{
-		int m_Visible;
-		int m_Selected;
+		bool m_Visible;
+		bool m_Selected;
 		CUIRect m_Rect;
 	};
 
-	class CListBox
+	class CListBox : private CUIElementBase
 	{
 	private:
-		CMenus* m_pMenus;
 		CUIRect m_ListBoxView;
 		float m_ListBoxRowHeight;
 		int m_ListBoxItemIndex;
@@ -252,22 +260,28 @@ private:
 		int m_ListBoxNumItems;
 		int m_ListBoxItemsPerRow;
 		bool m_ListBoxItemActivated;
+		const char* m_pBottomText;
+		float m_FooterHeight;
 		CScrollRegion m_ScrollRegion;
 		vec2 m_ScrollOffset;
 		char m_aFilterString[64];
 		float m_OffsetFilter;
 
+	protected:
+		CListboxItem DoNextRow();
+
 	public:
-		CListBox(CMenus* pMenus);
+		CListBox();
 
 		void DoHeader(const CUIRect* pRect, const char* pTitle, float HeaderHeight = 20.0f, float Spacing = 2.0f);
 		bool DoFilter(float FilterHeight = 20.0f, float Spacing = 2.0f);
-		void DoStart(float RowHeight, const char* pBottomText, int NumItems, int ItemsPerRow, int SelectedIndex,
+		void DoFooter(const char* pBottomText, float FooterHeight = 20.0f); // call before DoStart to create a footer
+		void DoStart(float RowHeight, int NumItems, int ItemsPerRow, int SelectedIndex,
 			const CUIRect* pRect = 0, bool Background = true, bool* pActive = 0);
 		CListboxItem DoNextItem(const void* pID, bool Selected = false, bool* pActive = 0);
-		CListboxItem DoNextRow();
-		int DoEnd(bool* pItemActivated);
-		bool FilterMatches(const char* pNeedle);
+		int DoEnd();
+		bool FilterMatches(const char* pNeedle) const;
+		bool WasItemActivated() const { return m_ListBoxItemActivated; };
 	};
 
 	enum
@@ -460,7 +474,6 @@ private:
 	int m_TeePartSelected;
 	char m_aSaveSkinName[24];
 
-	void SaveSkinfile();
 	bool m_RefreshSkinSelector;
 	const CSkins::CSkin *m_pSelectedSkin;
 
@@ -498,9 +511,14 @@ private:
 		bool m_Valid;
 		CDemoHeader m_Info;
 
-		bool operator<(const CDemoItem &Other) const { return !str_comp(m_aFilename, "..") ? true : !str_comp(Other.m_aFilename, "..") ? false :
-														m_IsDir && !Other.m_IsDir ? true : !m_IsDir && Other.m_IsDir ? false :
-														str_comp_filenames(m_aFilename, Other.m_aFilename) < 0; }
+		bool operator<(const CDemoItem& Other) const
+		{
+			return !str_comp(m_aFilename, "..") ? true
+				: !str_comp(Other.m_aFilename, "..") ? false
+				: m_IsDir && !Other.m_IsDir ? true
+				: !m_IsDir && Other.m_IsDir ? false
+				: str_comp_filenames(m_aFilename, Other.m_aFilename) < 0;
+		}
 	};
 
 	sorted_array<CDemoItem> m_lDemos;
@@ -727,7 +745,7 @@ private:
 	// found in menus_demo.cpp
 	void RenderDemoPlayer(CUIRect MainView);
 	void RenderDemoList(CUIRect MainView);
-	static float RenderDemoDetails(CUIRect View, void *pUser);
+	float RenderDemoDetails(CUIRect View);
 
 	// found in menus_start.cpp
 	void RenderStartMenu(CUIRect MainView);
@@ -808,15 +826,15 @@ private:
 		const sorted_array<CVideoMode>& lModes);
 
 	// found in menu_callback.cpp
-	static float RenderSettingsControlsMouse(CUIRect View, void *pUser);
-	static float RenderSettingsControlsJoystick(CUIRect View, void *pUser);
-	static float RenderSettingsControlsMovement(CUIRect View, void *pUser);
-	static float RenderSettingsControlsWeapon(CUIRect View, void *pUser);
-	static float RenderSettingsControlsVoting(CUIRect View, void *pUser);
-	static float RenderSettingsControlsChat(CUIRect View, void *pUser);
-	static float RenderSettingsControlsScoreboard(CUIRect View, void *pUser);
-	static float RenderSettingsControlsStats(CUIRect View, void *pUser);
-	static float RenderSettingsControlsMisc(CUIRect View, void *pUser);
+	float RenderSettingsControlsMouse(CUIRect View);
+	float RenderSettingsControlsJoystick(CUIRect View);
+	float RenderSettingsControlsMovement(CUIRect View);
+	float RenderSettingsControlsWeapon(CUIRect View);
+	float RenderSettingsControlsVoting(CUIRect View);
+	float RenderSettingsControlsChat(CUIRect View);
+	float RenderSettingsControlsScoreboard(CUIRect View);
+	float RenderSettingsControlsStats(CUIRect View);
+	float RenderSettingsControlsMisc(CUIRect View);
 
 	void DoJoystickAxisPicker(CUIRect View);
 
@@ -831,7 +849,7 @@ private:
 
 	void SetMenuPage(int NewPage);
 
-	bool CheckHotKey(int Key);
+	bool CheckHotKey(int Key) const;
 public:
 	struct CSwitchTeamInfo
 	{

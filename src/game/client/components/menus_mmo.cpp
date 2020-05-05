@@ -171,13 +171,13 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 void CMenus::RenderSettingsMmoChangerGeneric(CUIRect MainView, CCSkinChanger::CTextureEntity* pEntities, char* pConfigStr, const char* pLabel, int ItemsPerRow, float Ratio)
 {
 	char aBuf[512];
-	static CListBox s_ListBox(this);
+	static CListBox s_ListBox;
 	int OldSelected = -1;
 	str_format(aBuf, sizeof(aBuf), "%s: %s", pLabel, pConfigStr[0] ? pConfigStr : "default");
 	s_ListBox.DoHeader(&MainView, aBuf, 20.0f, 2.0f);
 
 	const int Num = pEntities->Num();
-	s_ListBox.DoStart(MainView.w / (float)ItemsPerRow / Ratio, 0, Num, ItemsPerRow, OldSelected);
+	s_ListBox.DoStart(MainView.w / (float)ItemsPerRow / Ratio, Num, ItemsPerRow, OldSelected);
 
 	for (int i = 0; i < Num + 1; ++i) // first is default
 	{
@@ -209,7 +209,7 @@ void CMenus::RenderSettingsMmoChangerGeneric(CUIRect MainView, CCSkinChanger::CT
 		}
 	}
 
-	const int NewSelected = s_ListBox.DoEnd(0);
+	const int NewSelected = s_ListBox.DoEnd();
 	if (OldSelected != NewSelected)
 	{
 		if (NewSelected == 0)
@@ -338,7 +338,7 @@ int GatherFonts(const char *pFileName, int IsDir, int Type, void *pUser)
 
 void CMenus::RenderFontSelection(CUIRect MainView)
 {
-	static CListBox s_ListBox(this);
+	static CListBox s_ListBox;
 	static int s_SelectedFont = 0;
 	static sorted_array<CFontFile> s_Fonts;
 
@@ -356,9 +356,8 @@ void CMenus::RenderFontSelection(CUIRect MainView)
 	}
 
 	int OldSelectedFont = s_SelectedFont;
-	static float s_Fade[2] = { 0 };
-	s_ListBox.DoHeader(&MainView, Localize(""), 20.0f, 2.0f);
-	s_ListBox.DoStart(20.0f, Localize("Fonts"), s_Fonts.size(), 1, s_SelectedFont);
+	s_ListBox.DoHeader(&MainView, Localize("Fonts"), 20.0f, 2.0f);
+	s_ListBox.DoStart(20.0f, s_Fonts.size(), 1, s_SelectedFont);
 	for (sorted_array<CFontFile>::range r = s_Fonts.all(); !r.empty(); r.pop_front())
 	{
 		CListboxItem Item = s_ListBox.DoNextItem(&r.front());
@@ -370,7 +369,7 @@ void CMenus::RenderFontSelection(CUIRect MainView)
 		}
 	}
 
-	s_SelectedFont = s_ListBox.DoEnd(0);
+	s_SelectedFont = s_ListBox.DoEnd();
 	if (OldSelectedFont != s_SelectedFont)
 	{
 		str_copy(g_Config.m_ClFontfile, s_Fonts[s_SelectedFont].m_FileName, sizeof(g_Config.m_ClFontfile));

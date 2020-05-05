@@ -38,6 +38,10 @@ float CMenus::ms_ButtonHeight = 25.0f;
 float CMenus::ms_ListheaderHeight = 17.0f;
 float CMenus::ms_FontmodHeight = 0.67f;
 
+CMenus* CMenus::CUIElementBase::m_pMenus = 0;
+CRenderTools* CMenus::CUIElementBase::m_pRenderTools = 0;
+CUI* CMenus::CUIElementBase::m_pUI = 0;
+IInput* CMenus::CUIElementBase::m_pInput = 0;
 
 CMenus::CMenus()
 {
@@ -152,7 +156,7 @@ int CMenus::DoButton_Toggle(const void *pID, int Checked, const CUIRect *pRect, 
 	}
 	Graphics()->QuadsEnd();
 
-	return Active ? UI()->DoButtonLogic(pID, "", Checked, pRect) : 0;
+	return Active && UI()->DoButtonLogic(pID, pRect);
 }
 
 int CMenus::DoButton_Menu(CButtonContainer *pBC, const char *pText, int Checked, const CUIRect *pRect, const char *pImageName, int Corners, float r, float FontFactor, vec4 ColorHot, bool TextFade)
@@ -212,7 +216,7 @@ int CMenus::DoButton_Menu(CButtonContainer *pBC, const char *pText, int Checked,
 
 	// UI sounds
 	const void* pLastActiveItem = UI()->GetActiveItem();
-	int Logic = UI()->DoButtonLogic(pBC->GetID(), pText, Checked, pRect);
+	int Logic = UI()->DoButtonLogic(pBC->GetID(), pRect);
 	if(g_Config.m_SndEnableUI)
 	{
 		if(g_Config.m_SndEnableUIHover && UI()->NextHotItem() == pBC->GetID() && UI()->NextHotItem() != UI()->HotItem())
@@ -258,7 +262,7 @@ int CMenus::DoButton_MenuTab(const void *pID, const char *pText, int Checked, co
 
 	// UI sounds
 	const void* pLastActiveItem = UI()->GetActiveItem();
-	int Logic = UI()->DoButtonLogic(pID, pText, Checked, pRect);
+	int Logic = UI()->DoButtonLogic(pID, pRect);
 	if(g_Config.m_SndEnableUI)
 	{
 		if(g_Config.m_SndEnableUIHover && UI()->NextHotItem() == pID && UI()->NextHotItem() != UI()->HotItem())
@@ -289,7 +293,7 @@ int CMenus::DoButton_MenuTabTop(CButtonContainer *pBC, const char *pText, int Ch
 
 	// UI sounds
 	const void* pLastActiveItem = UI()->GetActiveItem();
-	int Logic = UI()->DoButtonLogic(pBC->GetID(), pText, Checked, pRect);
+	int Logic = UI()->DoButtonLogic(pBC->GetID(), pRect);
 	if(g_Config.m_SndEnableUI)
 	{
 		if(g_Config.m_SndEnableUIHover && UI()->NextHotItem() == pBC->GetID() && UI()->NextHotItem() != UI()->HotItem())
@@ -298,18 +302,6 @@ int CMenus::DoButton_MenuTabTop(CButtonContainer *pBC, const char *pText, int Ch
 			m_pClient->m_pSounds->Play(CSounds::CHN_GUI, SOUND_BUTTON_CLICK, 0);
 	}
 	return Logic;
-}
-
-void CMenus::DoButton_MenuTabTop_Dummy(const char *pText, int Checked, const CUIRect *pRect, float Alpha)
-{
-	RenderTools()->DrawUIRect(pRect, vec4(0.0f, 0.0f, 0.0f, 0.25f*Alpha), CUI::CORNER_ALL, 5.0f);
-	CUIRect Temp;
-	pRect->HMargin(pRect->h >= 20.0f ? 2.0f : 1.0f, &Temp);
-	TextRender()->TextColor(0.15f, 0.15f, 0.15f, Alpha);
-	TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.25f*Alpha);
-	UI()->DoLabel(&Temp, pText, Temp.h*ms_FontmodHeight, CUI::ALIGN_CENTER);
-	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-	TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
 }
 
 int CMenus::DoButton_GridHeader(const void *pID, const char *pText, int Checked, CUI::EAlignment Align, const CUIRect *pRect)
@@ -337,7 +329,7 @@ int CMenus::DoButton_GridHeader(const void *pID, const char *pText, int Checked,
 		TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
 	}
 
-	return UI()->DoButtonLogic(pID, pText, Checked, pRect);
+	return UI()->DoButtonLogic(pID, pRect);
 }
 
 int CMenus::DoButton_CheckBox_Common(const void *pID, const char *pText, const char *pBoxText, const CUIRect *pRect, bool Checked, bool Locked)
@@ -365,10 +357,7 @@ int CMenus::DoButton_CheckBox_Common(const void *pID, const char *pText, const c
 		IGraphics::CQuadItem QuadItem(c.x, c.y, c.w, c.h);
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
 	}
-	if(Checked)
-		RenderTools()->SelectSprite(SPRITE_MENU_CHECKBOX_ACTIVE);
-	else
-		RenderTools()->SelectSprite(SPRITE_MENU_CHECKBOX_INACTIVE);
+	RenderTools()->SelectSprite(Checked ? SPRITE_MENU_CHECKBOX_ACTIVE : SPRITE_MENU_CHECKBOX_INACTIVE);
 	IGraphics::CQuadItem QuadItem(c.x, c.y, c.w, c.h);
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
@@ -379,7 +368,7 @@ int CMenus::DoButton_CheckBox_Common(const void *pID, const char *pText, const c
 
 	// UI sounds
 	const void* pLastActiveItem = UI()->GetActiveItem();
-	int Logic = UI()->DoButtonLogic(pID, pText, 0, pRect);
+	int Logic = UI()->DoButtonLogic(pID, pRect);
 	if(g_Config.m_SndEnableUI)
 	{
 		if(UI()->GetActiveItem() == pID && pLastActiveItem != pID)
@@ -400,10 +389,10 @@ int CMenus::DoButton_CheckBox(const void *pID, const char *pText, int Checked, c
 	return DoButton_CheckBox_Common(pID, pText, "", pRect, Checked, Locked);
 }
 
-int CMenus::DoButton_CheckBox_Number(const void *pID, const char *pText, int Checked, const CUIRect *pRect)
+int CMenus::DoButton_CheckBox_Number(const void* pID, const char* pText, int SelectedNumber, const CUIRect* pRect)
 {
 	char aBuf[16];
-	str_format(aBuf, sizeof(aBuf), "%d", Checked);
+	str_format(aBuf, sizeof(aBuf), "%d", SelectedNumber);
 	return DoButton_CheckBox_Common(pID, pText, aBuf, pRect);
 }
 
@@ -428,7 +417,7 @@ int CMenus::DoButton_SpriteID(CButtonContainer *pBC, int ImageID, int SpriteID, 
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
 
-	return UI()->DoButtonLogic(pBC->GetID(), "", false, pRect);
+	return UI()->DoButtonLogic(pBC->GetID(), pRect);
 }
 
 int CMenus::DoButton_SpriteClean(int ImageID, int SpriteID, const CUIRect *pRect)
@@ -462,7 +451,7 @@ int CMenus::DoButton_SpriteCleanID(const void *pID, int ImageID, int SpriteID, c
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
 
-	return UI()->DoButtonLogic(pID, 0, 0, pRect);
+	return UI()->DoButtonLogic(pID, pRect);
 }
 
 int CMenus::DoButton_MouseOver(int ImageID, int SpriteID, const CUIRect *pRect)
@@ -543,6 +532,7 @@ bool CMenus::DoEditBox(void* pID, const CUIRect* pRect, char* pStr, unsigned Str
 
 		if(UI()->LastActiveItem() == pID && !m_pClient->m_pGameConsole->IsConsoleActive())
 		{
+			m_ActiveEditbox = true;
 			for(int i = 0; i < Input()->NumEvents(); i++)
 			{
 				Len = str_length(pStr);
@@ -742,7 +732,7 @@ float CMenus::DoDropdownMenu(void *pID, const CUIRect *pRect, const char *pStr, 
 	Label.y += 2.0f;
 	UI()->DoLabel(&Label, pStr, Header.h*ms_FontmodHeight*0.8f, CUI::ALIGN_CENTER);
 
-	if(UI()->DoButtonLogic(pID, 0, 0, &Header))
+	if(UI()->DoButtonLogic(pID, &Header))
 	{
 		if(Active)
 			m_pActiveDropdown = 0;
@@ -752,7 +742,7 @@ float CMenus::DoDropdownMenu(void *pID, const CUIRect *pRect, const char *pStr, 
 
 	// render content of expanded menu
 	if(Active)
-		return HeaderHeight + pfnCallback(View, this);
+		return HeaderHeight + (this->*pfnCallback)(View);
 
 	return HeaderHeight;
 }
@@ -794,12 +784,12 @@ float CMenus::DoIndependentDropdownMenu(void *pID, const CUIRect *pRect, const c
 	Label.y += 2.0f;
 	UI()->DoLabel(&Label, pStr, Header.h*ms_FontmodHeight*0.8f, CUI::ALIGN_CENTER);
 
-	if(UI()->DoButtonLogic(pID, 0, 0, &Header))
+	if(UI()->DoButtonLogic(pID, &Header))
 		*pActive ^= 1;
 
 	// render content of expanded menu
 	if(Active)
-		return HeaderHeight + pfnCallback(View, this);
+		return HeaderHeight + (this->*pfnCallback)(View);
 
 	return HeaderHeight;
 }
@@ -1323,7 +1313,7 @@ void CMenus::RenderMenubar(CUIRect Rect)
 					Icon.Margin(2.0f, &Icon);
 					DoIcon(IMAGE_ARROWICONS, (IconId ^ g_Config.m_ClGBrowser) ? SPRITE_ARROW_RIGHT_A : SPRITE_ARROW_LEFT_A, &Icon);
 				}
-				if(UI()->DoButtonLogic(s_SwitchViewButton.GetID(), "", 0, &Button))
+				if(UI()->DoButtonLogic(s_SwitchViewButton.GetID(), &Button))
 				{
 					g_Config.m_ClGBrowser = (g_Config.m_ClGBrowser + 1) % 2;
 				}
@@ -1734,7 +1724,7 @@ int CMenus::Render()
 				// XText.HMargin(Button.h>=20.0f?2.0f:1.0f, &XText);
 				
 				UI()->DoLabel(&XText, "\xE2\x9C\x95", XText.h*ms_FontmodHeight, CUI::ALIGN_CENTER);
-				if(UI()->DoButtonLogic(s_QuitButton.GetID(), "\xE2\x9C\x95", 0, &Button))
+				if(UI()->DoButtonLogic(s_QuitButton.GetID(), &Button))
 				// if(DoButton_SpriteCleanID(&s_QuitButton, IMAGE_FRIENDICONS, SPRITE_FRIEND_X_A, &Button, false))
 					m_Popup = POPUP_QUIT;
 
@@ -2090,9 +2080,9 @@ int CMenus::Render()
 			static int s_ActSelection = -2;
 			if(s_ActSelection == -2)
 				s_ActSelection = FilterInfo.m_Country;
-			static CListBox s_ListBox(this);
+			static CListBox s_ListBox;
 			int OldSelected = -1;
-			s_ListBox.DoStart(40.0f, 0, m_pClient->m_pCountryFlags->Num(), 12, OldSelected, &Box, false);
+			s_ListBox.DoStart(40.0f, m_pClient->m_pCountryFlags->Num(), 12, OldSelected, &Box, false);
 
 			for(int i = 0; i < m_pClient->m_pCountryFlags->Num(); ++i)
 			{
@@ -2130,7 +2120,7 @@ int CMenus::Render()
 				}
 			}
 
-			const int NewSelected = s_ListBox.DoEnd(0);
+			const int NewSelected = s_ListBox.DoEnd();
 			if(OldSelected != NewSelected)
 				s_ActSelection = m_pClient->m_pCountryFlags->GetByIndex(NewSelected, true)->m_CountryCode;
 
@@ -2317,7 +2307,7 @@ int CMenus::Render()
 				if(m_aSaveSkinName[0] && m_aSaveSkinName[0] != 'x' && m_aSaveSkinName[1] != '_')
 				{
 					m_Popup = POPUP_NONE;
-					SaveSkinfile();
+					m_pClient->m_pSkins->SaveSkinfile(m_aSaveSkinName);
 					m_aSaveSkinName[0] = 0;
 					m_RefreshSkinSelector = true;
 				}
@@ -2563,6 +2553,8 @@ void CMenus::OnConsoleInit()
 	// expand the all filter tab by default
 	if(UseDefaultFilters)
 		m_lFilters[m_lFilters.size() - 1].Switch();
+
+	CUIElementBase::Init(this);
 }
 
 void CMenus::OnShutdown()
@@ -2695,7 +2687,7 @@ void CMenus::OnRender()
 	m_DownArrowPressed = false;
 }
 
-bool CMenus::CheckHotKey(int Key)
+bool CMenus::CheckHotKey(int Key) const
 {
 	return !m_KeyReaderIsActive && !m_KeyReaderWasActive && !m_PrevCursorActive && !m_PopupActive &&
 		!Input()->KeyIsPressed(KEY_LSHIFT) && !Input()->KeyIsPressed(KEY_RSHIFT) && !Input()->KeyIsPressed(KEY_LCTRL) && !Input()->KeyIsPressed(KEY_RCTRL) && !Input()->KeyIsPressed(KEY_LALT) && // no modifier
