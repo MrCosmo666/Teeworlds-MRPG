@@ -70,20 +70,20 @@ void CTalkText::OnRender()
 	// --------------------------------------------------------
 	CUIRect BackgroundOther;
 	{
-		vec4 ColorBackground = vec4(0.06f, 0.13f, 0.37f, 0.65f);
-		vec4 ColorBackgroundOther = vec4(0.05f, 0.05f, 0.05f, 0.35f);
+		vec4 ColorBackground = vec4(0.06f, 0.13f, 0.37f, 0.85f);
+		vec4 ColorBackgroundOther = vec4(0.05f, 0.05f, 0.05f, 0.40f);
 		if (m_Style == TALK_STYLE_AGRESSIVE)
 		{
 			TalkingEmoticion = SPRITE_DEVILTEE;
-			ColorBackground = vec4(0.37f, 0.06f, 0.11f, 0.65f);
-			ColorBackgroundOther = vec4(0.05f, 0.05f, 0.05f, 0.35f);
+			ColorBackground = vec4(0.37f, 0.06f, 0.11f, 0.85f);
+			ColorBackgroundOther = vec4(0.05f, 0.05f, 0.05f, 0.40f);
 		}
 		else if (m_Style == TALK_STYLE_HAPPED)
 		{
 
 			TalkingEmoticion = SPRITE_EYES;
-			ColorBackground = vec4(0.08f, 0.34f, 0.10f, 0.65f);
-			ColorBackgroundOther = vec4(0.05f, 0.05f, 0.05f, 0.35f);
+			ColorBackground = vec4(0.08f, 0.34f, 0.10f, 0.85f);
+			ColorBackgroundOther = vec4(0.05f, 0.05f, 0.05f, 0.40f);
 		}
 
 		CUIRect BackgroundMain = { Width / 4.0f, Height / 1.8f, Width / 2.0f, Height / 8.0f };

@@ -14,10 +14,7 @@
 #include "talktext.h"
 #include "questing_processing.h"
 
-#define COLOR_TABLE vec4(0.40f, 0.22f, 0.08f, 0.3f)
-#define COLOR_BACKGROUND vec4(0.27f, 0.09f, 0.002f, 0.75f)
-#define COLOR_BACKBACKGROUND vec4(0.30f, 0.19f, 0.15f, 0.50f)
-#define COLOR_UIBAR vec4(0.35f, 0.55f, 0.1f, 0.45f)
+#define COLOR_BACKGROUND vec4(0.27f, 0.07f, 0.01f, 1.00f)
 
 void CQuestingProcessing::Clear()
 {
@@ -41,14 +38,13 @@ void CQuestingProcessing::ProcessingRenderTable(int TableID, CUIRect &Box)
 	float Space = TableID * 60.0f;
 	Table.h = 40.0f;
 	Table.y = Box.y + Space + 30.0f;
-	RenderTools()->DrawRoundRect(&Table, COLOR_TABLE, 15.0f);
 
 	{ // RES
 		char aQuestTable[128];
-		vec4 ColorBarUI = (QuestTable[TableID].m_Have >= QuestTable[TableID].m_Requires ? vec4(0.40f, 0.80f, 0.1f, 0.50f) : vec4(0.80f, 0.30f, 0.1f, 0.50f));
+		vec4 ColorBarUI = (QuestTable[TableID].m_Have >= QuestTable[TableID].m_Requires ? vec4(0.20f, 0.50f, 0.1f, 0.50f) : vec4(0.50f, 0.20f, 0.1f, 0.50f));
 		if (QuestTable[TableID].m_GivingTable)
 		{
-			ColorBarUI = vec4(0.90f, 0.70f, 0.0f, 0.70f);
+			ColorBarUI = vec4(0.50f, 0.30f, 0.0f, 0.50f);
 			str_format(aQuestTable, sizeof(aQuestTable), "%sx%d", QuestTable[TableID].m_aText, QuestTable[TableID].m_Requires);
 			RenderTools()->DrawUIBar(TextRender(), Table, ColorBarUI, 10, 10, aQuestTable, 3, 10.0f, 8.0f);
 		}
@@ -91,25 +87,22 @@ void CQuestingProcessing::OnRender()
 	// --------------------------------------------------------
 	float tx = Width / 3.0f, ty = Height / 2.5f, tw = Width / 3.0f, th = 60.0f;
 	CUIRect BackgroundMain = { tx, ty - tabsize * (60.0f), tw, (45.0f + th * tabsize) };
-	RenderTools()->DrawUIRect4(&BackgroundMain, COLOR_BACKBACKGROUND, COLOR_BACKBACKGROUND, COLOR_BACKBACKGROUND / 1.2f, COLOR_BACKBACKGROUND / 1.2f, CUI::CORNER_ALL, 30.0f);
+	BackgroundMain.Margin(5.0f, &BackgroundMain);
+	RenderTools()->DrawUIRect4(&BackgroundMain, COLOR_BACKGROUND, COLOR_BACKGROUND, COLOR_BACKGROUND / 1.2f, COLOR_BACKGROUND / 1.2f, CUI::CORNER_ALL, 30.0f);
 
-	CUIRect BackgroundOther;
-	BackgroundMain.Margin(5.0f, &BackgroundOther);
-	RenderTools()->DrawUIRect4(&BackgroundOther, COLOR_BACKGROUND, COLOR_BACKGROUND, COLOR_BACKGROUND / 1.2f, COLOR_BACKGROUND / 1.2f, CUI::CORNER_ALL, 30.0f);
-
-	BackgroundOther.VMargin(20.0f, &BackgroundOther);
+	BackgroundMain.VMargin(20.0f, &BackgroundMain);
 
 	// --------------------- DRAW TABLES ----------------------
 	// --------------------------------------------------------
 	for (int i = 0; i < MAX_TABLE; i++)
 	{
 		if (QuestTable[i].TableActive())
-			ProcessingRenderTable(i, BackgroundOther);
+			ProcessingRenderTable(i, BackgroundMain);
 	}
 
 	// ---------------- TEXT (Quest Task List) ----------------
 	// --------------------------------------------------------
-	TextRender()->Text(0x0, BackgroundMain.x, BackgroundMain.y - 20.0f, 42.0f, Localize("Quest Task List"), -1.0f);
+	TextRender()->Text(0x0, BackgroundMain.x, BackgroundMain.y - 30.0f, 42.0f, Localize("Quest Task List"), -1.0f);
 }
 
 void CQuestingProcessing::OnMessage(int MsgType, void *pRawMsg)

@@ -13,9 +13,7 @@
 #include "talktext.h"
 #include "progress_bar.h"
 
-#define COLOR_BACKGROUND vec4(0.2f, 0.2f, 0.2f, 0.4f)
-#define COLOR_BACKBACKGROUND vec4(0.2f, 0.2f, 0.2f, 0.2f)
-
+#define COLOR_BACKGROUND vec4(0.2f, 0.2f, 0.2f, 0.5f)
 void CProgressBar::Clear()
 {
 	m_ProgressTime = 0;
@@ -44,35 +42,28 @@ void CProgressBar::OnRender()
 	if (Client()->LocalTime() < m_ProgressTime)
 	{
 		// --------------------- BACKGROUND -----------------------
-		// --------------------------------------------------------
 		CUIRect BackgroundMain = { Width / 3.0f, Height - 120.0f, Width / 3.0f, Height / 17.0f };	
-		RenderTools()->DrawRoundRect(&BackgroundMain, COLOR_BACKBACKGROUND, 30.0f);
-
-		CUIRect BackgroundOther;
-		BackgroundMain.VMargin(10.0f, &BackgroundOther);
-		RenderTools()->DrawRoundRect(&BackgroundOther, COLOR_BACKGROUND, 30.0f);
-		BackgroundOther.VMargin(20.0f, &BackgroundOther);
+		RenderTools()->DrawRoundRect(&BackgroundMain, vec4(0.2f, 0.2f, 0.2f, 0.4f), 30.0f);
+		BackgroundMain.VMargin(20.0f, &BackgroundMain);
 
 		// ---------------------- EXP BAR -------------------------
-		// --------------------------------------------------------
 		char aBuf[128];
 		CUIRect ExpBar;
-		BackgroundOther.HMargin(15.0f, &ExpBar);
+		BackgroundMain.HMargin(15.0f, &ExpBar);
 		ExpBar.h = 40.0f;
 		str_format(aBuf, sizeof(aBuf), "%d / %d", m_ProgressCount, m_ProgressRequest);
-		RenderTools()->DrawUIBar(TextRender(), ExpBar, vec4(0.10f, 0.70f, 0.06f, 0.5f),
+		RenderTools()->DrawUIBar(TextRender(), ExpBar, vec4(0.20f, 0.50f, 0.1f, 0.50f),
 			m_ProgressCount, m_ProgressRequest, aBuf, 5, 10.0f, 6.0f);
 
 		// ----------------------- TEXT ---------------------------
-		// --------------------------------------------------------
 		CTextCursor Cursor;
 		float FontSize = 32.0f;
-		float CenterText = BackgroundOther.x + (BackgroundOther.w / 2.0f);
+		float CenterText = BackgroundMain.x + (BackgroundMain.w / 2.0f);
 		float tw = TextRender()->TextWidth(0, FontSize, m_ProgressText, -1, -1.0f);
-		BackgroundOther.HSplitBottom(95.0f, 0, &BackgroundOther);
-		TextRender()->SetCursor(&Cursor, CenterText - tw / 2.0f, BackgroundOther.y, FontSize, TEXTFLAG_RENDER);
-		Cursor.m_LineWidth = BackgroundOther.w;
-		Cursor.m_MaxLines = ceil(BackgroundOther.h / FontSize);
+		BackgroundMain.HSplitBottom(95.0f, 0, &BackgroundMain);
+		TextRender()->SetCursor(&Cursor, CenterText - tw / 2.0f, BackgroundMain.y, FontSize, TEXTFLAG_RENDER);
+		Cursor.m_LineWidth = BackgroundMain.w;
+		Cursor.m_MaxLines = ceil(BackgroundMain.h / FontSize);
 		TextRender()->TextEx(&Cursor, m_ProgressText, -1);
 	}
 }
