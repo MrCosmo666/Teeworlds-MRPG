@@ -593,8 +593,6 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 	CUIRect List = MainView;
 	s_ListBox.DoHeader(&List, Localize("Option"), GetListHeaderHeight());
 	s_ListBox.DoStart(20.0f, m_pClient->m_pVoting->m_NumVoteOptions, 1, m_CallvoteSelectedOption, 0, true);
-
-	// рисуем голосования
 	for(CVoteOptionClient *pOption = m_pClient->m_pVoting->m_pFirst; pOption; pOption = pOption->m_pNext)
 	{	
 		if (m_aFilterString[0] && !str_find_nocase(pOption->m_aDescription, m_aFilterString))
@@ -630,10 +628,12 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 				Item.m_Rect.x += 2.0f;
 			}
 
-			bool Icon = DoItemIcon(pOption->m_Icon, { Item.m_Rect.x + 2.0f, Item.m_Rect.y, Item.m_Rect.w, Item.m_Rect.h, }, IconSize);
-			Item.m_Rect.VMargin((Icon ? 25.0f : 5.0f), &Item.m_Rect);
-			Item.m_Rect.y += 2.0f;
-
+			if(pOption->m_Icon[0] != '\0')
+			{
+				bool Icon = DoItemIcon(pOption->m_Icon, { Item.m_Rect.x + 2.0f, Item.m_Rect.y, Item.m_Rect.w, Item.m_Rect.h, }, IconSize);
+				Item.m_Rect.VMargin((Icon ? 25.0f : 5.0f), &Item.m_Rect);
+				Item.m_Rect.y += 2.0f;
+			}
 			UI()->DoLabel(&Item.m_Rect, pOption->m_aDescription, FontSize, CUI::ALIGN_LEFT);
 		}
 	}

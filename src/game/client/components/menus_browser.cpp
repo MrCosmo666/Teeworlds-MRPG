@@ -731,20 +731,20 @@ void CMenus::RenderFilterHeader(CUIRect View, int FilterIndex)
 	View.VSplitLeft(20.0f, &Button, &View);
 	Button.Margin(2.0f, &Button);
 	DoIconColor(IMAGE_MENUICONS, pFilter->Extended() ? SPRITE_MENU_EXPANDED : SPRITE_MENU_COLLAPSED, &Button, Color);
-	
+
 	// split buttons from label
 	View.VSplitLeft(Spacing, 0, &View);
-	View.VSplitRight((ButtonHeight+Spacing)*4.0f, &View, &EditButtons);
+	View.VSplitRight((ButtonHeight + Spacing) * 4.0f, &View, &EditButtons);
 
 	View.VSplitLeft(20.0f, 0, &View); // little space
 	View.y += 2.0f;
-	UI()->DoLabel(&View, pFilter->Name(), ButtonHeight*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
+	UI()->DoLabel(&View, pFilter->Name(), ButtonHeight * ms_FontmodHeight * 0.8f, CUI::ALIGN_LEFT);
 
 	View.VSplitRight(20.0f, &View, 0); // little space
 	char aBuf[128];
 	str_format(aBuf, sizeof(aBuf), Localize("%d servers, %d players"), pFilter->NumSortedServers(), pFilter->NumPlayers());
-	UI()->DoLabel(&View, aBuf, ButtonHeight*ms_FontmodHeight*0.8f, CUI::ALIGN_RIGHT);
-	
+	UI()->DoLabel(&View, aBuf, ButtonHeight * ms_FontmodHeight * 0.8f, CUI::ALIGN_RIGHT);
+
 	EditButtons.VSplitRight(ButtonHeight, &EditButtons, &Button);
 	Button.Margin(2.0f, &Button);
 	if(pFilter->Custom() == CBrowserFilter::FILTER_CUSTOM)
@@ -762,7 +762,7 @@ void CMenus::RenderFilterHeader(CUIRect View, int FilterIndex)
 	EditButtons.VSplitRight(Spacing, &EditButtons, 0);
 	EditButtons.VSplitRight(ButtonHeight, &EditButtons, &Button);
 	Button.Margin(2.0f, &Button);
-	if(FilterIndex > 0 && (pFilter->Custom() > CBrowserFilter::FILTER_ALL || m_lFilters[FilterIndex-1].Custom() != CBrowserFilter::FILTER_STANDARD))
+	if(FilterIndex > 0 && (pFilter->Custom() > CBrowserFilter::FILTER_ALL || m_lFilters[FilterIndex - 1].Custom() != CBrowserFilter::FILTER_STANDARD))
 	{
 		DoIcon(IMAGE_TOOLICONS, SPRITE_TOOL_UP_A, &Button);
 		if(UI()->DoButtonLogic(&pFilter->m_aButtonID[0], &Button))
@@ -777,7 +777,7 @@ void CMenus::RenderFilterHeader(CUIRect View, int FilterIndex)
 	EditButtons.VSplitRight(Spacing, &EditButtons, 0);
 	EditButtons.VSplitRight(ButtonHeight, &EditButtons, &Button);
 	Button.Margin(2.0f, &Button);
-	if(FilterIndex >= 0 && FilterIndex < m_lFilters.size()-1 && (pFilter->Custom() != CBrowserFilter::FILTER_STANDARD || m_lFilters[FilterIndex+1].Custom() > CBrowserFilter::FILTER_ALL))
+	if(FilterIndex >= 0 && FilterIndex < m_lFilters.size() - 1 && (pFilter->Custom() != CBrowserFilter::FILTER_STANDARD || m_lFilters[FilterIndex + 1].Custom() > CBrowserFilter::FILTER_ALL))
 	{
 		DoIcon(IMAGE_TOOLICONS, SPRITE_TOOL_DOWN_A, &Button);
 		if(UI()->DoButtonLogic(&pFilter->m_aButtonID[1], &Button))
@@ -1276,10 +1276,6 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 
 		// filter header
 		CUIRect Row;
-		View.HSplitTop(20.0f, &Row, &View);
-		s_ScrollRegion.AddRect(Row);
-
-		// render header
 		if (!g_Config.m_ClGBrowser)
 		{
 			View.HSplitTop(20.0f, &Row, &View);
@@ -2510,17 +2506,17 @@ void CMenus::RenderServerbrowser(CUIRect MainView)
 
 	CUIRect ServerList, Sidebar, Filterbar, BottomBox, SidebarButton;
 
-	MainView.HSplitTop(20.0f, 0, &MainView);
+	if(Client()->State() == IClient::STATE_OFFLINE)
+		MainView.HSplitTop(20.0f, 0, &MainView);
 	MainView.HSplitBottom(80.0f, &MainView, &BottomBox);
+	MainView.VSplitRight(20.0f, &ServerList, &SidebarButton);
 
 	if (g_Config.m_ClGBrowser == 2)
 	{
 		MainView.VSplitRight(150.0f, &MainView, &Filterbar);
 		MainView.VSplitRight(30.0f, &MainView, 0); // Margin
-		// ServerList.VSplitRight(150.0f, &ServerList, &Sidebar);
 	}
 
-	MainView.VSplitRight(20.0f, &ServerList, &SidebarButton);
 	if(m_SidebarActive)
 		ServerList.VSplitRight(150.0f, &ServerList, &Sidebar);
 
