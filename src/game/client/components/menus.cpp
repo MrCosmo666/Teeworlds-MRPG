@@ -1429,21 +1429,10 @@ void CMenus::RenderLoading(int WorkedAmount)
 	float Spacing = 40.0f;
 	float Rounding = 5.0f;
 
-	CUIRect FullBar = { x + Spacing, y + h - 75.0f, w - 2 * Spacing, 25.0f };
-	RenderTools()->DrawRoundRect(&FullBar, vec4(1.0f, 1.0f, 1.0f, 0.1f), Rounding);
-	CUIRect FillingBar = FullBar;
-	FillingBar.w = (FullBar.w - 2 * Rounding) * Percent + 2 * Rounding;
-	RenderTools()->DrawRoundRect(&FillingBar, vec4(1.0f, 1.0f, 1.0f, 0.75f), Rounding);
-
-	if(Percent > 0.5f)
-	{
-		TextRender()->TextOutlineColor(1.0f, 1.0f, 1.0f, 0.7f);
-		TextRender()->TextColor(0.2f, 0.2f, 0.2f, 1.0f);
-	}
-	char aBuf[8];
+	char aBuf[16];
 	str_format(aBuf, sizeof(aBuf), "%d%%", (int)(100 * Percent));
-	UI()->DoLabel(&FullBar, aBuf, 20.0f, CUI::ALIGN_CENTER);
-
+	CUIRect FullBar = { x + Spacing, y + h - 75.0f, w - 2 * Spacing, 30.0f };
+	RenderTools()->DrawUIBar(TextRender(), FullBar, vec4(0.7f, 0.7f, 0.7f, 1.0f), m_LoadCurrent, m_LoadTotal, aBuf, 15, 5.0f, 5.0f);
 	Graphics()->Swap();
 }
 

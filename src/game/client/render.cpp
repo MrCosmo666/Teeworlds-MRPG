@@ -704,22 +704,22 @@ void CRenderTools::DrawUIText(ITextRender* pTextRender, CTextCursor* pCursor, co
 	pTextRender->TextShadowed(pCursor, pText, -1, vec2(0, 0), vec4(0, 0, 0, 0), TextColor);
 }
 
-void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color, int Num, int Max, const char* pText, int Shares, float Rounding, float Margin)
+void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color, int Num, int Max, const char* pText, const int Shares, const float Rounding, const float MarginSize)
 {
 	float ScreenX0, ScreenY0, ScreenX1, ScreenY1;
 	Graphics()->GetScreen(&ScreenX0, &ScreenY0, &ScreenX1, &ScreenY1);
 
 	// Background colored progress
 	CUIRect BackgroundProgress;
-	Rect.Margin(Margin, &BackgroundProgress);
+	Rect.Margin(MarginSize, &BackgroundProgress);
 
 	// Processing and centralizing the text by bar
-	float FakeToScreenY = (Graphics()->ScreenHeight() / (ScreenY1 - ScreenY0));
-	const float FontSize = (int)(BackgroundProgress.h * FakeToScreenY) / FakeToScreenY;
-	float TextWeidth = pTextRender->TextWidth(0, FontSize, pText, -1, -1.0f);
+	const float FakeToScreenY = (Graphics()->ScreenHeight() / (ScreenY1 - ScreenY0));
+	const float FontSize = (float)(BackgroundProgress.h * FakeToScreenY) / FakeToScreenY;
+	const float TextWeidth = (float)pTextRender->TextWidth(nullptr, FontSize, pText, -1, -1.0f);
 	if (TextWeidth > Rect.w)
 	{
-		float changesSize = TextWeidth - Rect.w;
+		const float changesSize = TextWeidth - Rect.w;
 		Rect.x -= changesSize / 2.0f;
 		Rect.w = TextWeidth;
 
@@ -728,36 +728,38 @@ void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color,
 	}
 
 	// Render bar
-	DrawRoundRect(&Rect, vec4(0.5f, 0.5f, 0.5f, 0.3f), Rounding);
-	float Progress = clamp(Num * BackgroundProgress.w / (float)Max, 0.0f, Rect.w);
+	const float Progress = clamp((float)Num * BackgroundProgress.w / (float)Max, 0.0f, Rect.w);
+	DrawRoundRect(&Rect, vec4(0.5f, 0.5f, 0.5f, 0.3f), (Progress < Rounding ? Progress : Rounding));
 	BackgroundProgress.w = Progress;
 	DrawRoundRect(&BackgroundProgress, Color, (Progress < Rounding ? Progress : Rounding));
 
 	// Cursor
 	CTextCursor Cursor;
-	float ProgressCursorX = (Rect.x + Rect.w / 2.0f) - TextWeidth / 2.0f;
+	const float ProgressCursorX = (Rect.x + Rect.w / 2.0f) - TextWeidth / 2.0f;
 	pTextRender->SetCursor(&Cursor, ProgressCursorX, Rect.y, FontSize, TEXTFLAG_RENDER);
 
+	// Shares
 	if (Shares)
 	{
-		float FakeToScreenX = (Graphics()->ScreenWidth() / (ScreenX1 - ScreenX0));
-		const float BordourWidth = (int)((FontSize / Shares) * FakeToScreenX) / FakeToScreenX;
-		const float BordourWidthLost = BordourWidth / 2.0f;
-		float BordourSize = Rect.w / Shares;
+		const float FakeToScreenX = (Graphics()->ScreenWidth() / (ScreenX1 - ScreenX0));
+		const float BordourWeidth = (float)((FontSize / 8.0f) * FakeToScreenX) / FakeToScreenX;
+		const float BordourWeidthLost = BordourWeidth / 2.0f;
+		const float BordourSize = Rect.w / Shares;
 
+		float NextPointPosX;
 		for (int i = 0; i < Shares; i++)
 		{
-			float NextPointPosX = BordourSize * (i + 1);
-			if ((BackgroundProgress.w - BordourWidthLost) < NextPointPosX)
+			NextPointPosX = BordourSize * (i + 1);
+			if ((BackgroundProgress.w - BordourWeidthLost) < NextPointPosX)
 				continue;
 
-			CUIRect Bordour = { Rect.x + NextPointPosX, BackgroundProgress.y, BordourWidth, BackgroundProgress.h };
+			CUIRect Bordour = { Rect.x + NextPointPosX, BackgroundProgress.y, BordourWeidth, BackgroundProgress.h };
 			DrawUIRect(&Bordour, Color / 4.0f, 0, 0.0f);
 		}
 	}
 
 	// Text
-	pTextRender->TextColor(1, 1, 1, 0.8f);
+	pTextRender->TextColor(1, 1, 1, 0.85f);
 	pTextRender->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.1f);
 	pTextRender->TextEx(&Cursor, pText, -1);
 	pTextRender->TextColor(1, 1, 1, 1);

@@ -91,7 +91,7 @@ public:
 
 	// mrpg client
 	void RenderWings(CAnimState* pAnim, int SpriteID, vec2 Dir, vec2 Pos, vec2 PosWings, vec2 Size);
-	void DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color, int Num, int Max, const char* pText, int Shares, float Rounding = 2.0f, float Margin = 0.0f);
+	void DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color, int Num, int Max, const char* pText, const int Shares, const float Rounding = 2.0f, const float MarginSize = 0.0f);
 	void DrawUIText(ITextRender* pTextRender, CTextCursor* pCursor, const char* pText,
 		const vec4& BgColor, const vec4& TextColor, float FontSize);
 };

@@ -2124,7 +2124,7 @@ void CMenus::ResetSettingsGeneral()
 	g_Config.m_ClFilterchat = 0;
 	g_Config.m_ClNameplates = 1;
 	g_Config.m_ClNameplatesAlways = 1;
-	g_Config.m_ClNameplatesSize = 50;
+	g_Config.m_ClNameplatesSize = 30;
 	g_Config.m_ClNameplatesTeamcolors = 1;
 	g_Config.m_ClAutoDemoRecord = 0;
 	g_Config.m_ClAutoDemoMax = 10;
@@ -2143,7 +2143,7 @@ void CMenus::ResetSettingsGraphics()
 	g_Config.m_GfxScreenHeight = Graphics()->DesktopHeight();
 	g_Config.m_GfxBorderless = 0;
 	g_Config.m_GfxFullscreen = 1;
-	g_Config.m_GfxVsync = 1;
+	g_Config.m_GfxVsync = 0;
 	g_Config.m_GfxFsaaSamples = 0;
 	g_Config.m_GfxTextureQuality = 1;
 	g_Config.m_GfxTextureCompression = 0;
