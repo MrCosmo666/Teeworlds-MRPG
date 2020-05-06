@@ -285,7 +285,7 @@ void CGS::CreatePlayerSound(int ClientID, int Sound)
 void CGS::SendMmoEffect(vec2 Pos, int EffectID, int ClientID)
 {
 	int64 Mask = (int64)(ClientID >= 0 && ClientID < MAX_PLAYERS ? MaskWorldID() : CmaskOne(ClientID));
-	CNetEvent_EffectMmo *pEvent = (CNetEvent_EffectMmo *)m_Events.Create(NETEVENTTYPE_EFFECTMMO, sizeof(CNetEvent_EffectMmo), MaskWorldID());
+	CNetEvent_EffectMmo *pEvent = (CNetEvent_EffectMmo *)m_Events.Create(NETEVENTTYPE_EFFECTMMO, sizeof(CNetEvent_EffectMmo), Mask);
 	if(pEvent)
 	{
 		pEvent->m_X = (int)Pos.x;
