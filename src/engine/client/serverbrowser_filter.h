@@ -10,24 +10,24 @@ class CServerBrowserFilter
 public:
 	enum
 	{
-		RESORT_FLAG_FORCE=1,
-		RESORT_FLAG_FAV=2,
+		RESORT_FLAG_FORCE = 1,
+		RESORT_FLAG_FAV = 2,
 	};
 
 	class CServerFilter
 	{
 	public:
-		CServerBrowserFilter *m_pServerBrowserFilter;
+		CServerBrowserFilter* m_pServerBrowserFilter;
 
 		// filter settings
 		CServerFilterInfo m_FilterInfo;
-		
+
 		// stats
 		int m_NumSortedPlayers;
 		int m_NumSortedServers;
-		int *m_pSortedServerlist;
+		int* m_pSortedServerlist;
 		int m_SortedServersCapacity;
-		
+
 		CServerFilter();
 		~CServerFilter();
 		CServerFilter& operator=(const CServerFilter& Other);
@@ -48,29 +48,29 @@ public:
 	};
 
 	//
-	void Init(class IFriends *pFriends, const char *pNetVersion);
+	void Init(class IFriends* pFriends, const char* pNetVersion);
 	void Clear();
-	void Sort(class CServerEntry **ppServerlist, int NumServers, int ResortFlags);
+	void Sort(class CServerEntry** ppServerlist, int NumServers, int ResortFlags);
 
 	// filter
-	int AddFilter(const class CServerFilterInfo *pFilterInfo);
-	void GetFilter(int Index, class CServerFilterInfo *pFilterInfo) const;
+	int AddFilter(const class CServerFilterInfo* pFilterInfo);
+	void GetFilter(int Index, class CServerFilterInfo* pFilterInfo) const;
 	void RemoveFilter(int Index);
-	void SetFilter(int Index, const class CServerFilterInfo *pFilterInfo);
-	
+	void SetFilter(int Index, const class CServerFilterInfo* pFilterInfo);
+
 	// stats
-	const void *GetID(int FilterIndex, int Index) const { return &m_lFilters[FilterIndex].m_pSortedServerlist[Index]; }
+	const void* GetID(int FilterIndex, int Index) const { return &m_lFilters[FilterIndex].m_pSortedServerlist[Index]; }
 	int GetIndex(int FilterIndex, int Index) const { return m_lFilters[FilterIndex].m_pSortedServerlist[Index]; }
 	int GetNumSortedServers(int FilterIndex) const { return m_lFilters[FilterIndex].m_NumSortedServers; }
 	int GetNumSortedPlayers(int FilterIndex) const { return m_lFilters[FilterIndex].m_NumSortedPlayers; }
 
 private:
-	class IFriends *m_pFriends;
+	class IFriends* m_pFriends;
 	char m_aNetVersion[128];
 	array<CServerFilter> m_lFilters;
 
 	// get updated on sort
-	class CServerEntry **m_ppServerlist;
+	class CServerEntry** m_ppServerlist;
 	int m_NumServers;
 };
 

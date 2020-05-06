@@ -5,7 +5,6 @@
 #include <base/math.h>
 
 #include <engine/shared/config.h>
-
 #include <engine/client/contacts.h>
 #include <engine/serverbrowser.h>
 
@@ -15,11 +14,11 @@
 
 class SortWrap
 {
-	typedef bool (CServerBrowserFilter::CServerFilter::*SortFunc)(int, int) const;
+	typedef bool (CServerBrowserFilter::CServerFilter::* SortFunc)(int, int) const;
 	SortFunc m_pfnSort;
-	CServerBrowserFilter::CServerFilter *m_pThis;
+	CServerBrowserFilter::CServerFilter* m_pThis;
 public:
-	SortWrap(CServerBrowserFilter::CServerFilter *t, SortFunc f) : m_pfnSort(f), m_pThis(t) {}
+	SortWrap(CServerBrowserFilter::CServerFilter* t, SortFunc f) : m_pfnSort(f), m_pThis(t) {}
 	bool operator()(int a, int b) { return (g_Config.m_BrSortOrder ? (m_pThis->*m_pfnSort)(b, a) : (m_pThis->*m_pfnSort)(a, b)); }
 };
 
@@ -71,7 +70,7 @@ CServerBrowserFilter::CServerFilter& CServerBrowserFilter::CServerFilter::operat
 		m_NumSortedServers = Other.m_NumSortedServers;
 		m_SortedServersCapacity = Other.m_SortedServersCapacity;
 
-		m_pSortedServerlist = (int *)mem_alloc(m_SortedServersCapacity * sizeof(int), 1);
+		m_pSortedServerlist = (int*)mem_alloc(m_SortedServersCapacity * sizeof(int), 1);
 		for(int i = 0; i < m_SortedServersCapacity; ++i)
 			m_pSortedServerlist[i] = Other.m_pSortedServerlist[i];
 	}
@@ -89,8 +88,8 @@ void CServerBrowserFilter::CServerFilter::Filter()
 	{
 		if(m_pSortedServerlist)
 			mem_free(m_pSortedServerlist);
-		m_SortedServersCapacity = max(1000, NumServers+NumServers/2);
-		m_pSortedServerlist = (int *)mem_alloc(m_SortedServersCapacity*sizeof(int), 1);
+		m_SortedServersCapacity = max(1000, NumServers + NumServers / 2);
+		m_pSortedServerlist = (int*)mem_alloc(m_SortedServersCapacity * sizeof(int), 1);
 	}
 
 	// filter the servers
@@ -98,34 +97,34 @@ void CServerBrowserFilter::CServerFilter::Filter()
 	{
 		int Filtered = 0;
 
-		int RelevantClientCount = (m_FilterInfo.m_SortHash&IServerBrowser::FILTER_SPECTATORS) ? m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_NumPlayers : m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_NumClients;
-		if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_BOTS)
+		int RelevantClientCount = (m_FilterInfo.m_SortHash & IServerBrowser::FILTER_SPECTATORS) ? m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_NumPlayers : m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_NumClients;
+		if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_BOTS)
 		{
 			RelevantClientCount -= m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_NumBotPlayers;
-			if(!(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_SPECTATORS))
+			if(!(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_SPECTATORS))
 				RelevantClientCount -= m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_NumBotSpectators;
 		}
 
-		if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_EMPTY && RelevantClientCount == 0)
+		if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_EMPTY && RelevantClientCount == 0)
 			Filtered = 1;
-		else if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_FULL && ((m_FilterInfo.m_SortHash&IServerBrowser::FILTER_SPECTATORS && m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_NumPlayers == m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_MaxPlayers) ||
-				m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_NumClients == m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_MaxClients))
+		else if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_FULL && ((m_FilterInfo.m_SortHash & IServerBrowser::FILTER_SPECTATORS && m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_NumPlayers == m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_MaxPlayers) ||
+			m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_NumClients == m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_MaxClients))
 			Filtered = 1;
-		else if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_PW && m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_Flags&IServerBrowser::FLAG_PASSWORD)
+		else if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_PW && m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_Flags & IServerBrowser::FLAG_PASSWORD)
 			Filtered = 1;
-		else if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_FAVORITE && !m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_Favorite)
+		else if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_FAVORITE && !m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_Favorite)
 			Filtered = 1;
-		else if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_PURE && !(m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_Flags&IServerBrowser::FLAG_PURE))
+		else if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_PURE && !(m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_Flags & IServerBrowser::FLAG_PURE))
 			Filtered = 1;
-		else if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_PURE_MAP &&  !(m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_Flags&IServerBrowser::FLAG_PUREMAP))
+		else if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_PURE_MAP && !(m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_Flags & IServerBrowser::FLAG_PUREMAP))
 			Filtered = 1;
 		else if(m_FilterInfo.m_Ping < m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_Latency)
 			Filtered = 1;
-		else if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_COMPAT_VERSION && str_comp_num(m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_aVersion, m_pServerBrowserFilter->m_aNetVersion, 3) != 0)
+		else if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_COMPAT_VERSION && str_comp_num(m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_aVersion, m_pServerBrowserFilter->m_aNetVersion, 3) != 0)
 			Filtered = 1;
 		else if(m_FilterInfo.m_aAddress[0] && !str_find_nocase(m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_aAddress, m_FilterInfo.m_aAddress))
 			Filtered = 1;
-		else if (m_FilterInfo.IsLevelFiltered(m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_ServerLevel))
+		else if(m_FilterInfo.IsLevelFiltered(m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_ServerLevel))
 			Filtered = 1;
 		else
 		{
@@ -144,7 +143,7 @@ void CServerBrowserFilter::CServerFilter::Filter()
 				}
 			}
 
-			if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_COUNTRY)
+			if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_COUNTRY)
 			{
 				Filtered = 1;
 				// match against player country
@@ -190,6 +189,13 @@ void CServerBrowserFilter::CServerFilter::Filter()
 					m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_QuickSearchHit |= IServerBrowser::QUICK_MAPNAME;
 				}
 
+				// match against game type
+				if(str_find_nocase(m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_aGameType, g_Config.m_BrFilterString))
+				{
+					MatchFound = 1;
+					m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_QuickSearchHit |= IServerBrowser::QUICK_GAMETYPE;
+				}
+
 				if(!MatchFound)
 					Filtered = 1;
 			}
@@ -206,7 +212,7 @@ void CServerBrowserFilter::CServerFilter::Filter()
 				m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_FriendState = max(m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_FriendState, m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_aClients[p].m_FriendState);
 			}
 
-			if (!(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_FRIENDS) || m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_FriendState != CContactInfo::CONTACT_NO)
+			if(!(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_FRIENDS) || m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_FriendState != CContactInfo::CONTACT_NO)
 			{
 				m_pSortedServerlist[m_NumSortedServers++] = i;
 				m_NumSortedPlayers += RelevantClientCount;
@@ -217,19 +223,19 @@ void CServerBrowserFilter::CServerFilter::Filter()
 
 int CServerBrowserFilter::CServerFilter::GetSortHash() const
 {
-	int i = g_Config.m_BrSort&0x7;
-	i |= g_Config.m_BrSortOrder<<3;
-	if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_BOTS) i |= 1<<4;
-	if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_EMPTY) i |= 1<<5;
-	if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_FULL) i |= 1<<6;
-	if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_SPECTATORS) i |= 1<<7;
-	if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_FRIENDS) i |= 1<<8;
-	if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_PW) i |= 1<<9;
-	if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_FAVORITE) i |= 1<<10;
-	if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_COMPAT_VERSION) i |= 1<<11;
-	if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_PURE) i |= 1<<12;
-	if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_PURE_MAP) i |= 1<<13;
-	if(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_COUNTRY) i |= 1<<14;
+	int i = g_Config.m_BrSort & 0x7;
+	i |= g_Config.m_BrSortOrder << 3;
+	if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_BOTS) i |= 1 << 4;
+	if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_EMPTY) i |= 1 << 5;
+	if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_FULL) i |= 1 << 6;
+	if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_SPECTATORS) i |= 1 << 7;
+	if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_FRIENDS) i |= 1 << 8;
+	if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_PW) i |= 1 << 9;
+	if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_FAVORITE) i |= 1 << 10;
+	if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_COMPAT_VERSION) i |= 1 << 11;
+	if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_PURE) i |= 1 << 12;
+	if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_PURE_MAP) i |= 1 << 13;
+	if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_COUNTRY) i |= 1 << 14;
 	return i;
 }
 
@@ -241,25 +247,25 @@ void CServerBrowserFilter::CServerFilter::Sort()
 	// sort
 	switch(g_Config.m_BrSort)
 	{
-	case IServerBrowser::SORT_NAME:
-		std::stable_sort(m_pSortedServerlist, m_pSortedServerlist+m_NumSortedServers, SortWrap(this, &CServerBrowserFilter::CServerFilter::SortCompareName));
+		case IServerBrowser::SORT_NAME:
+		std::stable_sort(m_pSortedServerlist, m_pSortedServerlist + m_NumSortedServers, SortWrap(this, &CServerBrowserFilter::CServerFilter::SortCompareName));
 		break;
-	case IServerBrowser::SORT_PING:
-		std::stable_sort(m_pSortedServerlist, m_pSortedServerlist+m_NumSortedServers, SortWrap(this, &CServerBrowserFilter::CServerFilter::SortComparePing));
+		case IServerBrowser::SORT_PING:
+		std::stable_sort(m_pSortedServerlist, m_pSortedServerlist + m_NumSortedServers, SortWrap(this, &CServerBrowserFilter::CServerFilter::SortComparePing));
 		break;
-	case IServerBrowser::SORT_MAP:
-		std::stable_sort(m_pSortedServerlist, m_pSortedServerlist+m_NumSortedServers, SortWrap(this, &CServerBrowserFilter::CServerFilter::SortCompareMap));
+		case IServerBrowser::SORT_MAP:
+		std::stable_sort(m_pSortedServerlist, m_pSortedServerlist + m_NumSortedServers, SortWrap(this, &CServerBrowserFilter::CServerFilter::SortCompareMap));
 		break;
-	case IServerBrowser::SORT_NUMPLAYERS:
-		if(!(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_BOTS))
-			std::stable_sort(m_pSortedServerlist, m_pSortedServerlist+m_NumSortedServers, SortWrap(this,
-						(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_SPECTATORS) ? &CServerBrowserFilter::CServerFilter::SortCompareNumPlayers : &CServerBrowserFilter::CServerFilter::SortCompareNumClients));
+		case IServerBrowser::SORT_NUMPLAYERS:
+		if(!(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_BOTS))
+			std::stable_sort(m_pSortedServerlist, m_pSortedServerlist + m_NumSortedServers, SortWrap(this,
+			(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_SPECTATORS) ? &CServerBrowserFilter::CServerFilter::SortCompareNumPlayers : &CServerBrowserFilter::CServerFilter::SortCompareNumClients));
 		else
-			std::stable_sort(m_pSortedServerlist, m_pSortedServerlist+m_NumSortedServers, SortWrap(this,
-						(m_FilterInfo.m_SortHash&IServerBrowser::FILTER_SPECTATORS) ? &CServerBrowserFilter::CServerFilter::SortCompareNumRealPlayers : &CServerBrowserFilter::CServerFilter::SortCompareNumRealClients));
+			std::stable_sort(m_pSortedServerlist, m_pSortedServerlist + m_NumSortedServers, SortWrap(this,
+			(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_SPECTATORS) ? &CServerBrowserFilter::CServerFilter::SortCompareNumRealPlayers : &CServerBrowserFilter::CServerFilter::SortCompareNumRealClients));
 		break;
-	case IServerBrowser::SORT_GAMETYPE:
-		std::stable_sort(m_pSortedServerlist, m_pSortedServerlist+m_NumSortedServers, SortWrap(this, &CServerBrowserFilter::CServerFilter::SortCompareGametype));
+		case IServerBrowser::SORT_GAMETYPE:
+		std::stable_sort(m_pSortedServerlist, m_pSortedServerlist + m_NumSortedServers, SortWrap(this, &CServerBrowserFilter::CServerFilter::SortCompareGametype));
 	}
 
 	m_FilterInfo.m_SortHash = GetSortHash();
@@ -267,70 +273,70 @@ void CServerBrowserFilter::CServerFilter::Sort()
 
 bool CServerBrowserFilter::CServerFilter::SortCompareName(int Index1, int Index2) const
 {
-	CServerEntry *a = m_pServerBrowserFilter->m_ppServerlist[Index1];
-	CServerEntry *b = m_pServerBrowserFilter->m_ppServerlist[Index2];
+	CServerEntry* a = m_pServerBrowserFilter->m_ppServerlist[Index1];
+	CServerEntry* b = m_pServerBrowserFilter->m_ppServerlist[Index2];
 	//	make sure empty entries are listed last
 	return (a->m_InfoState == CServerEntry::STATE_READY && b->m_InfoState == CServerEntry::STATE_READY) || (a->m_InfoState != CServerEntry::STATE_READY && b->m_InfoState != CServerEntry::STATE_READY) ? str_comp_nocase(a->m_Info.m_aName, b->m_Info.m_aName) < 0 :
-			a->m_InfoState == CServerEntry::STATE_READY;
+		a->m_InfoState == CServerEntry::STATE_READY;
 }
 
 bool CServerBrowserFilter::CServerFilter::SortCompareMap(int Index1, int Index2) const
 {
-	CServerEntry *a = m_pServerBrowserFilter->m_ppServerlist[Index1];
-	CServerEntry *b = m_pServerBrowserFilter->m_ppServerlist[Index2];
+	CServerEntry* a = m_pServerBrowserFilter->m_ppServerlist[Index1];
+	CServerEntry* b = m_pServerBrowserFilter->m_ppServerlist[Index2];
 	int Result = str_comp_nocase(a->m_Info.m_aMap, b->m_Info.m_aMap);
-	return Result < 0 || (Result == 0 && (a->m_Info.m_Flags&IServerBrowser::FLAG_PURE) && !(b->m_Info.m_Flags&IServerBrowser::FLAG_PURE));
+	return Result < 0 || (Result == 0 && (a->m_Info.m_Flags & IServerBrowser::FLAG_PURE) && !(b->m_Info.m_Flags & IServerBrowser::FLAG_PURE));
 }
 
 bool CServerBrowserFilter::CServerFilter::SortComparePing(int Index1, int Index2) const
 {
-	CServerEntry *a = m_pServerBrowserFilter->m_ppServerlist[Index1];
-	CServerEntry *b = m_pServerBrowserFilter->m_ppServerlist[Index2];
+	CServerEntry* a = m_pServerBrowserFilter->m_ppServerlist[Index1];
+	CServerEntry* b = m_pServerBrowserFilter->m_ppServerlist[Index2];
 	return a->m_Info.m_Latency < b->m_Info.m_Latency ||
-		(a->m_Info.m_Latency == b->m_Info.m_Latency && (a->m_Info.m_Flags&IServerBrowser::FLAG_PURE) && !(b->m_Info.m_Flags&IServerBrowser::FLAG_PURE));
+		(a->m_Info.m_Latency == b->m_Info.m_Latency && (a->m_Info.m_Flags & IServerBrowser::FLAG_PURE) && !(b->m_Info.m_Flags & IServerBrowser::FLAG_PURE));
 }
 
 bool CServerBrowserFilter::CServerFilter::SortCompareGametype(int Index1, int Index2) const
 {
-	CServerEntry *a = m_pServerBrowserFilter->m_ppServerlist[Index1];
-	CServerEntry *b = m_pServerBrowserFilter->m_ppServerlist[Index2];
+	CServerEntry* a = m_pServerBrowserFilter->m_ppServerlist[Index1];
+	CServerEntry* b = m_pServerBrowserFilter->m_ppServerlist[Index2];
 	return str_comp_nocase(a->m_Info.m_aGameType, b->m_Info.m_aGameType) < 0;
 }
 
 bool CServerBrowserFilter::CServerFilter::SortCompareNumPlayers(int Index1, int Index2) const
 {
-	CServerEntry *a = m_pServerBrowserFilter->m_ppServerlist[Index1];
-	CServerEntry *b = m_pServerBrowserFilter->m_ppServerlist[Index2];
+	CServerEntry* a = m_pServerBrowserFilter->m_ppServerlist[Index1];
+	CServerEntry* b = m_pServerBrowserFilter->m_ppServerlist[Index2];
 	return a->m_Info.m_NumPlayers < b->m_Info.m_NumPlayers ||
-		(a->m_Info.m_NumPlayers == b->m_Info.m_NumPlayers && !(a->m_Info.m_Flags&IServerBrowser::FLAG_PURE) && (b->m_Info.m_Flags&IServerBrowser::FLAG_PURE));
+		(a->m_Info.m_NumPlayers == b->m_Info.m_NumPlayers && !(a->m_Info.m_Flags & IServerBrowser::FLAG_PURE) && (b->m_Info.m_Flags & IServerBrowser::FLAG_PURE));
 }
 
 bool CServerBrowserFilter::CServerFilter::SortCompareNumRealPlayers(int Index1, int Index2) const
 {
-	CServerEntry *a = m_pServerBrowserFilter->m_ppServerlist[Index1];
-	CServerEntry *b = m_pServerBrowserFilter->m_ppServerlist[Index2];
+	CServerEntry* a = m_pServerBrowserFilter->m_ppServerlist[Index1];
+	CServerEntry* b = m_pServerBrowserFilter->m_ppServerlist[Index2];
 	return (a->m_Info.m_NumPlayers - a->m_Info.m_NumBotPlayers) < (b->m_Info.m_NumPlayers - b->m_Info.m_NumBotPlayers) ||
-		((a->m_Info.m_NumPlayers - a->m_Info.m_NumBotPlayers) == (b->m_Info.m_NumPlayers - b->m_Info.m_NumBotPlayers) && !(a->m_Info.m_Flags&IServerBrowser::FLAG_PURE) && (b->m_Info.m_Flags&IServerBrowser::FLAG_PURE));
+		((a->m_Info.m_NumPlayers - a->m_Info.m_NumBotPlayers) == (b->m_Info.m_NumPlayers - b->m_Info.m_NumBotPlayers) && !(a->m_Info.m_Flags & IServerBrowser::FLAG_PURE) && (b->m_Info.m_Flags & IServerBrowser::FLAG_PURE));
 }
 
 bool CServerBrowserFilter::CServerFilter::SortCompareNumClients(int Index1, int Index2) const
 {
-	CServerEntry *a = m_pServerBrowserFilter->m_ppServerlist[Index1];
-	CServerEntry *b = m_pServerBrowserFilter->m_ppServerlist[Index2];
+	CServerEntry* a = m_pServerBrowserFilter->m_ppServerlist[Index1];
+	CServerEntry* b = m_pServerBrowserFilter->m_ppServerlist[Index2];
 	return a->m_Info.m_NumClients < b->m_Info.m_NumClients ||
-		(a->m_Info.m_NumClients == b->m_Info.m_NumClients && !(a->m_Info.m_Flags&IServerBrowser::FLAG_PURE) && (b->m_Info.m_Flags&IServerBrowser::FLAG_PURE));
+		(a->m_Info.m_NumClients == b->m_Info.m_NumClients && !(a->m_Info.m_Flags & IServerBrowser::FLAG_PURE) && (b->m_Info.m_Flags & IServerBrowser::FLAG_PURE));
 }
 
 bool CServerBrowserFilter::CServerFilter::SortCompareNumRealClients(int Index1, int Index2) const
 {
-	CServerEntry *a = m_pServerBrowserFilter->m_ppServerlist[Index1];
-	CServerEntry *b = m_pServerBrowserFilter->m_ppServerlist[Index2];
+	CServerEntry* a = m_pServerBrowserFilter->m_ppServerlist[Index1];
+	CServerEntry* b = m_pServerBrowserFilter->m_ppServerlist[Index2];
 	return (a->m_Info.m_NumClients - a->m_Info.m_NumBotPlayers - a->m_Info.m_NumBotSpectators) < (b->m_Info.m_NumClients - b->m_Info.m_NumBotPlayers - b->m_Info.m_NumBotSpectators) ||
-		((a->m_Info.m_NumClients - a->m_Info.m_NumBotPlayers - a->m_Info.m_NumBotSpectators) == (b->m_Info.m_NumClients - b->m_Info.m_NumBotPlayers - b->m_Info.m_NumBotSpectators) && !(a->m_Info.m_Flags&IServerBrowser::FLAG_PURE) && (b->m_Info.m_Flags&IServerBrowser::FLAG_PURE));
+		((a->m_Info.m_NumClients - a->m_Info.m_NumBotPlayers - a->m_Info.m_NumBotSpectators) == (b->m_Info.m_NumClients - b->m_Info.m_NumBotPlayers - b->m_Info.m_NumBotSpectators) && !(a->m_Info.m_Flags & IServerBrowser::FLAG_PURE) && (b->m_Info.m_Flags & IServerBrowser::FLAG_PURE));
 }
 
 //	CServerBrowserFilter
-void CServerBrowserFilter::Init(IFriends *pFriends, const char *pNetVersion)
+void CServerBrowserFilter::Init(IFriends* pFriends, const char* pNetVersion)
 {
 	m_pFriends = pFriends;
 	str_copy(m_aNetVersion, pNetVersion, sizeof(m_aNetVersion));
@@ -345,20 +351,20 @@ void CServerBrowserFilter::Clear()
 	}
 }
 
-void CServerBrowserFilter::Sort(CServerEntry **ppServerlist, int NumServers, int ResortFlags)
+void CServerBrowserFilter::Sort(CServerEntry** ppServerlist, int NumServers, int ResortFlags)
 {
 	m_ppServerlist = ppServerlist;
 	m_NumServers = NumServers;
 	for(int i = 0; i < m_lFilters.size(); i++)
 	{
 		// check if we need to resort
-		CServerFilter *pFilter = &m_lFilters[i];
-		if((ResortFlags&RESORT_FLAG_FORCE) || ((ResortFlags&RESORT_FLAG_FAV) && pFilter->m_FilterInfo.m_SortHash&IServerBrowser::FILTER_FAVORITE) || pFilter->m_FilterInfo.m_SortHash != pFilter->GetSortHash())
+		CServerFilter* pFilter = &m_lFilters[i];
+		if((ResortFlags & RESORT_FLAG_FORCE) || ((ResortFlags & RESORT_FLAG_FAV) && pFilter->m_FilterInfo.m_SortHash & IServerBrowser::FILTER_FAVORITE) || pFilter->m_FilterInfo.m_SortHash != pFilter->GetSortHash())
 			pFilter->Sort();
 	}
 }
 
-int CServerBrowserFilter::AddFilter(const CServerFilterInfo *pFilterInfo)
+int CServerBrowserFilter::AddFilter(const CServerFilterInfo* pFilterInfo)
 {
 	CServerFilter Filter;
 	Filter.m_FilterInfo.m_SortHash = pFilterInfo->m_SortHash;
@@ -375,12 +381,12 @@ int CServerBrowserFilter::AddFilter(const CServerFilterInfo *pFilterInfo)
 	Filter.m_pServerBrowserFilter = this;
 	m_lFilters.add(Filter);
 
-	return m_lFilters.size()-1;
+	return m_lFilters.size() - 1;
 }
 
-void CServerBrowserFilter::GetFilter(int Index, CServerFilterInfo *pFilterInfo) const
+void CServerBrowserFilter::GetFilter(int Index, CServerFilterInfo* pFilterInfo) const
 {
-	const CServerFilter *pFilter = &m_lFilters[Index];
+	const CServerFilter* pFilter = &m_lFilters[Index];
 	pFilterInfo->m_SortHash = pFilter->m_FilterInfo.m_SortHash;
 	pFilterInfo->m_Ping = pFilter->m_FilterInfo.m_Ping;
 	pFilterInfo->m_Country = pFilter->m_FilterInfo.m_Country;
@@ -390,9 +396,9 @@ void CServerBrowserFilter::GetFilter(int Index, CServerFilterInfo *pFilterInfo) 
 	str_copy(pFilterInfo->m_aAddress, pFilter->m_FilterInfo.m_aAddress, sizeof(pFilterInfo->m_aAddress));
 }
 
-void CServerBrowserFilter::SetFilter(int Index, const CServerFilterInfo *pFilterInfo)
+void CServerBrowserFilter::SetFilter(int Index, const CServerFilterInfo* pFilterInfo)
 {
-	CServerFilter *pFilter = &m_lFilters[Index];
+	CServerFilter* pFilter = &m_lFilters[Index];
 	pFilter->m_FilterInfo.m_SortHash = pFilterInfo->m_SortHash;
 	pFilter->m_FilterInfo.m_Ping = pFilterInfo->m_Ping;
 	pFilter->m_FilterInfo.m_Country = pFilterInfo->m_Country;

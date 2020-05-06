@@ -50,6 +50,8 @@ public:
 		vec4 ShadowColor, vec4 TextColor_) = 0;
 
 	// old foolish interface
+	inline void TextColor(const vec4& Color) { TextColor(Color.r, Color.g, Color.b, Color.a); }
+	inline void TextOutlineColor(const vec4& Color) { TextOutlineColor(Color.r, Color.g, Color.b, Color.a); }
 	virtual void TextColor(float r, float g, float b, float a) = 0;
 	virtual void TextOutlineColor(float r, float g, float b, float a) = 0;
 	virtual void Text(void *pFontSetV, float x, float y, float Size, const char *pText, float LineWidth, bool MultiLine=true) = 0;

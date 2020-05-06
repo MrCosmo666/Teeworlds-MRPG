@@ -9,6 +9,7 @@ class CHud : public CComponent
 	float m_Width, m_Height;
 	float m_AverageFPS;
 	int64 m_WarmupHideTick;
+	bool IsLargeWarmupTimerShown();
 
 	int m_CheckpointDiff;
 	int64 m_CheckpointTime;

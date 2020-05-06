@@ -26,7 +26,7 @@ void CSoundLoading::Run()
 		}
 
 		if (m_Render)
-			m_pGameClient->m_pMenus->RenderLoading();
+			m_pGameClient->m_pMenus->RenderLoading(1);
 	}
 }
 
@@ -57,6 +57,13 @@ ISound::CSampleHandle CSounds::GetSampleId(int SetId)
 	while(Id == pSet->m_Last);
 	pSet->m_Last = Id;
 	return pSet->m_aSounds[Id].m_Id;
+}
+
+int CSounds::GetInitAmount() const
+{
+	if(g_Config.m_SndAsyncLoading)
+		return 0;
+	return g_pData->m_NumSounds;
 }
 
 void CSounds::OnInit()

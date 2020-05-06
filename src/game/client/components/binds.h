@@ -11,8 +11,8 @@ class CBinds : public CComponent
 
 	static void ConBind(IConsole::IResult *pResult, void *pUserData);
 	static void ConUnbind(IConsole::IResult *pResult, void *pUserData);
-	static void ConUnbindAll(IConsole::IResult *pResult, void *pUserData);
-	static void ConDumpBinds(IConsole::IResult *pResult, void *pUserData);
+	static void ConUnbindAll(IConsole::IResult* pResult, void* pUserData);
+	static void ConBinds(IConsole::IResult* pResult, void* pUserData);
 	class IConsole *GetConsole() const { return Console(); }
 
 	static void ConfigSaveCallback(class IConfig *pConfig, void *pUserData);
@@ -29,6 +29,8 @@ public:
 
 	enum
 	{
+		BIND_LENGTH = 128,
+
 		MODIFIER_NONE=0,
 		MODIFIER_SHIFT,
 		MODIFIER_CTRL,
@@ -54,7 +56,7 @@ public:
 	virtual bool OnInput(IInput::CEvent Event);
 
 private:
-	char m_aaaKeyBindings[KEY_LAST][MODIFIER_COUNT][128];
+	char m_aaaKeyBindings[KEY_LAST][MODIFIER_COUNT][BIND_LENGTH];
 	static const int s_aaDefaultBindKeys[][2];
 	static const char s_aaDefaultBindValues[][32];
 };

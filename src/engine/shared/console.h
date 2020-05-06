@@ -139,9 +139,8 @@ class CConsole : public IConsole
 	public:
 		struct CQueueEntry
 		{
-			CQueueEntry *m_pNext;
-			FCommandCallback m_pfnCommandCallback;
-			void *m_pCommandUserData;
+			CQueueEntry* m_pNext;
+			CCommand* m_pCommand;
 			CResult m_Result;
 		} *m_pFirst, *m_pLast;
 
@@ -173,7 +172,6 @@ class CConsole : public IConsole
 	};
 
 	CHeap *m_pTempMapListHeap;
-	int m_NumMapListEntries;
 	CMapListEntryTemp *m_pFirstMapEntry;
 	CMapListEntryTemp *m_pLastMapEntry;
 

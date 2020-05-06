@@ -225,6 +225,7 @@ public:
 	bool m_IsXmasDay;
 	float m_LastSkinChangeTime;
 	bool m_IsEasterDay;
+	bool m_InitComplete;
 
 	int RacePrecision() const { return m_Snap.m_pGameDataRace ? m_Snap.m_pGameDataRace->m_Precision : 3; }
 
@@ -288,6 +289,7 @@ public:
 	static void GetPlayerLabel(char* aBuf, int BufferSize, int ClientID, const char* ClientName);
 	bool IsXmas() const;
 	bool IsEaster() const;
+	void StartRendering();
 	
 	//
 	bool MmoServer()  const { return m_ConnectedMmoServer; }

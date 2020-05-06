@@ -2159,7 +2159,7 @@ int PPSTR(const char* a, const char* b)
 
 int str_comp_nocase(const char *a, const char *b)
 {
-#if defined(CONF_FAMILY_WINDOWS)
+#if defined(CONF_FAMILY_WINDOWS) && !defined(__GNUC__)
 	return _stricmp(a,b);
 #else
 	return strcasecmp(a,b);
@@ -2168,7 +2168,7 @@ int str_comp_nocase(const char *a, const char *b)
 
 int str_comp_nocase_num(const char *a, const char *b, const int num)
 {
-#if defined(CONF_FAMILY_WINDOWS)
+#if defined(CONF_FAMILY_WINDOWS) && !defined(__GNUC__)
 	return _strnicmp(a, b, num);
 #else
 	return strncasecmp(a, b, num);
@@ -2334,6 +2334,17 @@ void str_hex(char *dst, int dst_size, const void *data, int data_size)
 	}
 }
 
+int str_is_number(const char* str)
+{
+	while(*str)
+	{
+		if(!(*str >= '0' && *str <= '9'))
+			return -1;
+		str++;
+	}
+	return 0;
+}
+
 #ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
@@ -2411,7 +2422,7 @@ int str_utf8_is_whitespace(int code)
 {
 	// check if unicode is not empty
 	if(code > 0x20 && code != 0xA0 && code != 0x034F && (code < 0x2000 || code > 0x200F) && (code < 0x2028 || code > 0x202F) &&
-		(code < 0x205F || code > 0x2064) && (code < 0x206A || code > 0x206F) && (code < 0xFE00 || code > 0xFE0F) &&
+		(code < 0x205F || code > 0x2064) && (code < 0x206A || code > 0x206F) && code != 0x3000 && (code < 0xFE00 || code > 0xFE0F) &&
 		code != 0xFEFF && (code < 0xFFF9 || code > 0xFFFC))
 	{
 		return 0;
@@ -2748,6 +2759,14 @@ int pid()
 unsigned bytes_be_to_uint(const unsigned char* bytes)
 {
 	return (bytes[0] << 24) | (bytes[1] << 16) | (bytes[2] << 8) | bytes[3];
+}
+
+void uint_to_bytes_be(unsigned char* bytes, unsigned value)
+{
+	bytes[0] = (value >> 24) & 0xff;
+	bytes[1] = (value >> 16) & 0xff;
+	bytes[2] = (value >> 8) & 0xff;
+	bytes[3] = value & 0xff;
 }
 
 #if defined(__cplusplus)

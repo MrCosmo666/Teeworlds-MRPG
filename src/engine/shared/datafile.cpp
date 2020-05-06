@@ -1,10 +1,11 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include "datafile.h"
+
 #include <base/hash_ctxt.h>
 #include <base/math.h>
 #include <base/system.h>
 #include <engine/storage.h>
-#include "datafile.h"
 #include <zlib.h>
 
 static const int DEBUG = 0;
@@ -495,7 +496,7 @@ bool CDataFileWriter::Open(class IStorage *pStorage, const char *pFilename)
 	return true;
 }
 
-int CDataFileWriter::AddItem(int Type, int ID, int Size, void *pData)
+int CDataFileWriter::AddItem(int Type, int ID, int Size, const void* pData)
 {
 	if (!m_File) return 0;
 
@@ -531,7 +532,7 @@ int CDataFileWriter::AddItem(int Type, int ID, int Size, void *pData)
 	return m_NumItems - 1;
 }
 
-int CDataFileWriter::AddData(int Size, void *pData)
+int CDataFileWriter::AddData(int Size, const void* pData)
 {
 	if (!m_File) return 0;
 
@@ -558,7 +559,7 @@ int CDataFileWriter::AddData(int Size, void *pData)
 	return m_NumDatas - 1;
 }
 
-int CDataFileWriter::AddDataSwapped(int Size, void *pData)
+int CDataFileWriter::AddDataSwapped(int Size, const void* pData)
 {
 	dbg_assert(Size % sizeof(int) == 0, "incorrect boundary");
 
@@ -577,7 +578,7 @@ int CDataFileWriter::AddDataSwapped(int Size, void *pData)
 
 int CDataFileWriter::Finish()
 {
-	if (!m_File) return 1;
+	if(!m_File) return 0;
 
 	int ItemSize = 0;
 	int TypesSize, HeaderSize, OffsetSize, FileSize, SwapSize;
@@ -752,5 +753,5 @@ int CDataFileWriter::Finish()
 
 	if (DEBUG)
 		dbg_msg("datafile", "done");
-	return 0;
+	return 1;
 }

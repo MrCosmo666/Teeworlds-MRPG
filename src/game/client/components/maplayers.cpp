@@ -14,9 +14,9 @@
 #include <game/client/component.h>
 #include <game/client/render.h>
 
-#include <game/client/components/camera.h>
-#include <game/client/components/mapimages.h>
-
+#include "camera.h"
+#include "mapimages.h"
+#include "menus.h"
 
 #include "maplayers.h"
 
@@ -39,9 +39,6 @@ void CMapLayers::OnStateChange(int NewState, int OldState)
 
 void CMapLayers::LoadBackgroundMap()
 {
-	if(!g_Config.m_ClShowMenuMap)
-		return;
-
 	int HourOfTheDay = time_houroftheday();
 	char aBuf[128];
 	// check for the appropriate day/night map
@@ -71,6 +68,13 @@ void CMapLayers::LoadBackgroundMap()
 	LoadEnvPoints(m_pMenuLayers, m_lEnvPointsMenu);
 }
 
+int CMapLayers::GetInitAmount() const
+{
+	if(m_Type == TYPE_BACKGROUND)
+		return 1 + (g_Config.m_ClShowMenuMap ? 14 : 0);
+	return 0;
+}
+
 void CMapLayers::OnInit()
 {
 	if(m_Type == TYPE_BACKGROUND)
@@ -78,7 +82,12 @@ void CMapLayers::OnInit()
 		m_pMenuLayers = new CLayers;
 		m_pMenuMap = CreateEngineMap();
 
-		LoadBackgroundMap();
+		m_pClient->m_pMenus->RenderLoading(1);
+		if(g_Config.m_ClShowMenuMap)
+		{
+			LoadBackgroundMap();
+			m_pClient->m_pMenus->RenderLoading(14);
+		}
 	}
 
 	m_pEggTiles = 0;
@@ -524,7 +533,7 @@ void CMapLayers::BackgroundMapUpdate()
 	{
 		// unload map
 		m_pMenuMap->Unload();
-
-		LoadBackgroundMap();
+		if(g_Config.m_ClShowMenuMap)
+			LoadBackgroundMap();
 	}
 }

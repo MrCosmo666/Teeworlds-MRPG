@@ -857,7 +857,7 @@ void CMenus::RenderSettingsGeneral(CUIRect MainView)
 	BottomView.HSplitTop(20.f, 0, &BottomView);
 
 	// render game menu backgrounds
-	int NumOptions = max(g_Config.m_ClNameplates ? 6 : 3, g_Config.m_ClShowsocial ? 5 : 4);
+	int NumOptions = max(g_Config.m_ClNameplates ? 6 : 3, g_Config.m_ClShowsocial ? 6 : 5);
 	float ButtonHeight = 20.0f;
 	float Spacing = 2.0f;
 	float BackgroundHeight = (float)(NumOptions+1)*ButtonHeight+(float)NumOptions*Spacing;
@@ -972,7 +972,7 @@ void CMenus::RenderSettingsGeneral(CUIRect MainView)
 		GameRight.HSplitTop(Spacing, 0, &GameRight);
 		GameRight.HSplitTop(ButtonHeight, &Button, &GameRight);
 		Button.VSplitLeft(ButtonHeight, 0, &Button);
-		RenderTools()->DrawUIRect(&Button, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
+		/*RenderTools()->DrawUIRect(&Button, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
 		CUIRect Text;
 		Button.VSplitLeft(ButtonHeight+5.0f, 0, &Button);
 		Button.VSplitLeft(200.0f, &Text, &Button);
@@ -991,7 +991,11 @@ void CMenus::RenderSettingsGeneral(CUIRect MainView)
 			str_format(aBuf, sizeof(aBuf), Localize("no one", "Show chat messages from:"));
 		static CButtonContainer s_ButtonFilterchat;
 		if(DoButton_Menu(&s_ButtonFilterchat, aBuf, 0, &Button))
-			g_Config.m_ClFilterchat = (g_Config.m_ClFilterchat + 1) % 3;
+			g_Config.m_ClFilterchat = (g_Config.m_ClFilterchat + 1) % 3;*/
+
+		const int NumLabels = 3;
+		const char* aLabels[NumLabels] = { Localize("everyone", "Show chat messages from"), Localize("friends only", "Show chat messages from"), Localize("no one", "Show chat messages from") };
+		DoScrollbarOptionLabeled(&g_Config.m_ClFilterchat, &g_Config.m_ClFilterchat, &Button, Localize("Show chat messages from"), aLabels, NumLabels);
 	}
 
 	GameRight.HSplitTop(Spacing, 0, &GameRight);
@@ -1057,28 +1061,15 @@ void CMenus::RenderSettingsGeneral(CUIRect MainView)
 	float ButtonWidth = (BottomView.w/6.0f)-(Spacing*5.0)/6.0f;
 
 	BottomView.VSplitRight(ButtonWidth, 0, &BottomView);
-	RenderTools()->DrawUIRect4(&BottomView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), CUI::CORNER_T, 5.0f);
+	RenderBackgroundShadow(&BottomView, true);
 
 	BottomView.HSplitTop(25.0f, &BottomView, 0);
 	Button = BottomView;
 	static CButtonContainer s_ResetButton;
 	if(DoButton_Menu(&s_ResetButton, Localize("Reset"), 0, &Button))
 	{
-		g_Config.m_ClDynamicCamera = 1;
-		g_Config.m_ClMouseMaxDistanceDynamic = 1000;
-		g_Config.m_ClMouseFollowfactor = 60;
-		g_Config.m_ClMouseDeadzone = 300;
-		g_Config.m_ClAutoswitchWeapons = 1;
-		g_Config.m_ClShowhud = 1;
-		g_Config.m_ClFilterchat = 0;
-		g_Config.m_ClNameplates = 1;
-		g_Config.m_ClNameplatesAlways = 1;
-		g_Config.m_ClNameplatesSize = 50;
-		g_Config.m_ClNameplatesTeamcolors = 1;
-		g_Config.m_ClAutoDemoRecord = 0;
-		g_Config.m_ClAutoDemoMax = 10;
-		g_Config.m_ClAutoScreenshot = 0;
-		g_Config.m_ClAutoScreenshotMax = 10;
+		PopupConfirm(Localize("Reset general settings"), Localize("Are you sure that you want to reset the general settings to their defaults?"),
+			Localize("Reset"), Localize("Cancel"), &CMenus::ResetSettingsGeneral);
 	}
 }
 
@@ -1143,7 +1134,7 @@ void CMenus::RenderSettingsPlayer(CUIRect MainView)
 		if(pEntry->m_CountryCode == g_Config.m_PlayerCountry)
 			OldSelected = i;
 
-		CListboxItem Item = s_ListBox.DoNextItem(&pEntry->m_CountryCode, OldSelected == i);
+		CListboxItem Item = s_ListBox.DoNextItem(pEntry, OldSelected == i);
 		if(Item.m_Visible)
 		{
 			CUIRect Label;
@@ -1247,13 +1238,11 @@ void CMenus::RenderSettingsTee(CUIRect MainView)
 	BottomView.HSplitTop(20.f, 0, &BottomView);
 
 	// render skin preview background
-	float SpacingH = 2.0f;
-	float SpacingW = 3.0f;
-	float ButtonHeight = 20.0f;
-	float SkinHeight = 50.0f;
-	float BackgroundHeight = ButtonHeight+SpacingH+SkinHeight;
-	if(!s_CustomSkinMenu)
-		BackgroundHeight = (ButtonHeight+SpacingH)*2.0f+SkinHeight;
+	const float SpacingH = 2.0f;
+	const float SpacingW = 3.0f;
+	const float ButtonHeight = 20.0f;
+	const float SkinHeight = 50.0f;
+	const float BackgroundHeight = (ButtonHeight + SpacingH) * (s_CustomSkinMenu ? 1.0f : 2.0f) + SkinHeight;
 
 	if(this->Client()->State() == IClient::STATE_ONLINE)
 		Background = MainView;
@@ -1404,7 +1393,7 @@ void CMenus::RenderSettingsTee(CUIRect MainView)
 	float BackgroundWidth = s_CustomSkinMenu || (m_pSelectedSkin && (m_pSelectedSkin->m_Flags & CSkins::SKINFLAG_STANDARD) == 0) ? ButtonWidth * 3.0f + SpacingW : ButtonWidth;
 
 	BottomView.VSplitRight(BackgroundWidth, 0, &BottomView);
-	RenderTools()->DrawUIRect4(&BottomView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), CUI::CORNER_T, 5.0f);
+	RenderBackgroundShadow(&BottomView, true);
 
 	BottomView.HSplitTop(25.0f, &BottomView, 0);
 	if(s_CustomSkinMenu)
@@ -1467,7 +1456,11 @@ void CMenus::RenderSettingsTee(CUIRect MainView)
 		BottomView.VSplitLeft(ButtonWidth, &Button, &BottomView);
 		static CButtonContainer s_CustomSkinDeleteButton;
 		if(DoButton_Menu(&s_CustomSkinDeleteButton, Localize("Delete"), 0, &Button))
-			m_Popup = POPUP_DELETE_SKIN;
+		{
+			char aBuf[128];
+			str_format(aBuf, sizeof(aBuf), Localize("Are you sure that you want to delete the skin '%s'?"), m_pSelectedSkin->m_aName);
+			PopupConfirm(Localize("Delete skin"), aBuf, Localize("Yes"), Localize("No"), &CMenus::PopupConfirmDeleteSkin);
+		}
 		BottomView.VSplitLeft(SpacingW, 0, &BottomView);
 	}
 
@@ -1475,10 +1468,24 @@ void CMenus::RenderSettingsTee(CUIRect MainView)
 	static CButtonContainer s_CustomSwitchButton;
 	if(DoButton_Menu(&s_CustomSwitchButton, s_CustomSkinMenu ? Localize("Basic") : Localize("Custom"), 0, &Button))
 	{
-		if(s_CustomSkinMenu)
-			s_CustomSkinMenu = false;
+		s_CustomSkinMenu = !s_CustomSkinMenu;
+	}
+}
+
+void CMenus::PopupConfirmDeleteSkin()
+{
+	if(m_pSelectedSkin)
+	{
+		char aBuf[IO_MAX_PATH_LENGTH];
+		str_format(aBuf, sizeof(aBuf), "skins/%s.json", m_pSelectedSkin->m_aName);
+		if(Storage()->RemoveFile(aBuf, IStorage::TYPE_SAVE))
+		{
+			m_pClient->m_pSkins->RemoveSkin(m_pSelectedSkin);
+			m_RefreshSkinSelector = true;
+			m_pSelectedSkin = 0;
+		}
 		else
-			s_CustomSkinMenu = true;
+			PopupMessage(Localize("Error"), Localize("Unable to delete the skin"), Localize("Ok"));
 	}
 }
 
@@ -1564,13 +1571,16 @@ void CMenus::RenderSettingsControls(CUIRect MainView)
 	float ButtonWidth = (BottomView.w/6.0f)-(Spacing*5.0)/6.0f;
 
 	BottomView.VSplitRight(ButtonWidth, 0, &BottomView);
-	RenderTools()->DrawUIRect4(&BottomView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), CUI::CORNER_T, 5.0f);
+	RenderBackgroundShadow(&BottomView, true);
 
 	BottomView.HSplitTop(25.0f, &BottomView, 0);
 	Button = BottomView;
 	static CButtonContainer s_ResetButton;
 	if(DoButton_Menu(&s_ResetButton, Localize("Reset"), 0, &Button))
-		m_pClient->m_pBinds->SetDefaults();
+	{
+		PopupConfirm(Localize("Reset controls"), Localize("Are you sure that you want to reset the controls to their defaults?"),
+			Localize("Reset"), Localize("Cancel"), &CMenus::ResetSettingsControls);
+	}
 }
 
 float CMenus::RenderSettingsControlsStats(CUIRect View)
@@ -1682,13 +1692,17 @@ bool CMenus::DoResolutionList(CUIRect* pRect, CListBox* pListBox,
 
 void CMenus::RenderSettingsGraphics(CUIRect MainView)
 {
-	bool CheckSettings = false;
-
-	static int s_GfxScreenWidth = g_Config.m_GfxScreenWidth;
-	static int s_GfxScreenHeight = g_Config.m_GfxScreenHeight;
-	static int s_GfxFsaaSamples = g_Config.m_GfxFsaaSamples;
-	static int s_GfxTextureQuality = g_Config.m_GfxTextureQuality;
-	static int s_GfxTextureCompression = g_Config.m_GfxTextureCompression;
+	bool CheckFullscreen = false;
+#ifdef CONF_PLATFORM_MACOSX
+	CheckFullscreen = true;
+#endif
+	
+	static const int s_GfxFullscreen = g_Config.m_GfxFullscreen;
+	static const int s_GfxScreenWidth = g_Config.m_GfxScreenWidth;
+	static const int s_GfxScreenHeight = g_Config.m_GfxScreenHeight;
+	static const int s_GfxFsaaSamples = g_Config.m_GfxFsaaSamples;
+	static const int s_GfxTextureQuality = g_Config.m_GfxTextureQuality;
+	static const int s_GfxTextureCompression = g_Config.m_GfxTextureCompression;
 
 	CUIRect Label, Button, ScreenLeft, ScreenRight, Texture, BottomView, Background;
 
@@ -1792,7 +1806,7 @@ void CMenus::RenderSettingsGraphics(CUIRect MainView)
 				g_Config.m_GfxFsaaSamples = 0;
 			else
 				g_Config.m_GfxFsaaSamples *= 2;
-			CheckSettings = true;
+			m_CheckVideoSettings = true;
 		}
 	}
 
@@ -1834,7 +1848,7 @@ void CMenus::RenderSettingsGraphics(CUIRect MainView)
 	if(DoButton_CheckBox(&s_ButtonGfxTextureQuality, Localize("Quality Textures"), g_Config.m_GfxTextureQuality, &Button))
 	{
 		g_Config.m_GfxTextureQuality ^= 1;
-		CheckSettings = true;
+		m_CheckVideoSettings = true;
 	}
 
 	Texture.HSplitTop(Spacing, 0, &Texture);
@@ -1843,7 +1857,7 @@ void CMenus::RenderSettingsGraphics(CUIRect MainView)
 	if(DoButton_CheckBox(&s_ButtonGfxTextureCompression, Localize("Texture Compression"), g_Config.m_GfxTextureCompression, &Button))
 	{
 		g_Config.m_GfxTextureCompression ^= 1;
-		CheckSettings = true;
+		m_CheckVideoSettings = true;
 	}
 
 	Texture.HSplitTop(Spacing, 0, &Texture);
@@ -1901,8 +1915,8 @@ void CMenus::RenderSettingsGraphics(CUIRect MainView)
 
 		static CListBox s_RecListBox;
 		static CListBox s_OthListBox;
-		CheckSettings |= DoResolutionList(&ListRec, &s_RecListBox, m_lRecommendedVideoModes);
-		CheckSettings |= DoResolutionList(&ListOth, &s_OthListBox, m_lOtherVideoModes);
+		m_CheckVideoSettings |= DoResolutionList(&ListRec, &s_RecListBox, m_lRecommendedVideoModes);
+		m_CheckVideoSettings |= DoResolutionList(&ListOth, &s_OthListBox, m_lOtherVideoModes);
 	}
 
 	// reset button
@@ -1910,43 +1924,28 @@ void CMenus::RenderSettingsGraphics(CUIRect MainView)
 	float ButtonWidth = (BottomView.w/6.0f)-(Spacing*5.0)/6.0f;
 
 	BottomView.VSplitRight(ButtonWidth, 0, &BottomView);
-	RenderTools()->DrawUIRect4(&BottomView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), CUI::CORNER_T, 5.0f);
+	RenderBackgroundShadow(&BottomView, true);
 
 	BottomView.HSplitTop(25.0f, &BottomView, 0);
 	Button = BottomView;
 	static CButtonContainer s_ResetButton;
 	if(DoButton_Menu(&s_ResetButton, Localize("Reset"), 0, &Button))
 	{
-		g_Config.m_GfxScreenWidth = Graphics()->DesktopWidth();
-		g_Config.m_GfxScreenHeight = Graphics()->DesktopHeight();
-		g_Config.m_GfxBorderless = 0;
-		g_Config.m_GfxFullscreen = 1;
-		g_Config.m_GfxVsync = 1;
-		g_Config.m_GfxFsaaSamples = 0;
-		g_Config.m_GfxTextureQuality = 1;
-		g_Config.m_GfxTextureCompression = 0;
-		g_Config.m_GfxHighDetail = 1;
-
-		if(g_Config.m_GfxDisplayAllModes)
-		{
-			g_Config.m_GfxDisplayAllModes = 0;
-			UpdateVideoModeSettings();
-		}
-
-		CheckSettings = true;
+		PopupConfirm(Localize("Reset graphics settings"), Localize("Are you sure that you want to reset the graphics settings to their defaults?"),
+			Localize("Reset"), Localize("Cancel"), &CMenus::ResetSettingsGraphics);
 	}
 
 	// check if the new settings require a restart
-	if(CheckSettings)
+	if(m_CheckVideoSettings)
 	{
-		if(s_GfxScreenWidth == g_Config.m_GfxScreenWidth &&
-			s_GfxScreenHeight == g_Config.m_GfxScreenHeight &&
-			s_GfxFsaaSamples == g_Config.m_GfxFsaaSamples &&
-			s_GfxTextureQuality == g_Config.m_GfxTextureQuality &&
-			s_GfxTextureCompression == g_Config.m_GfxTextureCompression)
-			m_NeedRestartGraphics = false;
-		else
-			m_NeedRestartGraphics = true;
+		m_NeedRestartGraphics =
+			s_GfxScreenWidth != g_Config.m_GfxScreenWidth ||
+			s_GfxScreenHeight != g_Config.m_GfxScreenHeight ||
+			s_GfxFsaaSamples != g_Config.m_GfxFsaaSamples ||
+			s_GfxTextureQuality != g_Config.m_GfxTextureQuality ||
+			s_GfxTextureCompression != g_Config.m_GfxTextureCompression ||
+			(CheckFullscreen && s_GfxFullscreen != g_Config.m_GfxFullscreen);
+		m_CheckVideoSettings = false;
 	}
 }
 
@@ -2011,7 +2010,7 @@ void CMenus::RenderSettingsSound(CUIRect MainView)
 		if(DoButton_CheckBox(&s_ButtonSndMusic, Localize("Play background music"), g_Config.m_SndMusic, &Button))
 		{
 			g_Config.m_SndMusic ^= 1;
-			ToggleMusic();
+			UpdateMusicState();
 		}
 
 		Sound.HSplitTop(Spacing, 0, &Sound);
@@ -2089,11 +2088,8 @@ void CMenus::RenderSettingsSound(CUIRect MainView)
 		if(g_Config.m_SndEnable)
 		{
 			g_Config.m_SndInit = 1;
-			if(g_Config.m_SndMusic)
-				m_pClient->m_pSounds->Play(CSounds::CHN_MUSIC, SOUND_MENU, 1.0f);
 		}
-		else
-			m_pClient->m_pSounds->Stop(SOUND_MENU);
+		UpdateMusicState();
 	}
 
 	// reset button
@@ -2103,24 +2099,74 @@ void CMenus::RenderSettingsSound(CUIRect MainView)
 	float ButtonWidth = (BottomView.w/6.0f)-(Spacing*5.0)/6.0f;
 
 	BottomView.VSplitRight(ButtonWidth, 0, &BottomView);
-	RenderTools()->DrawUIRect4(&BottomView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), CUI::CORNER_T, 5.0f);
+	RenderBackgroundShadow(&BottomView, true);
 
 	BottomView.HSplitTop(25.0f, &BottomView, 0);
 	Button = BottomView;
 	static CButtonContainer s_ResetButton;
 	if(DoButton_Menu(&s_ResetButton, Localize("Reset"), 0, &Button))
 	{
-		g_Config.m_SndEnable = 1;
-		g_Config.m_SndInit = 1;
-		if(!g_Config.m_SndMusic)
-		{
-			g_Config.m_SndMusic = 1;
-			m_pClient->m_pSounds->Play(CSounds::CHN_MUSIC, SOUND_MENU, 1.0f);
-		}
-		g_Config.m_SndNonactiveMute = 0;
-		g_Config.m_SndRate = 48000;
-		g_Config.m_SndVolume = 100;
+		PopupConfirm(Localize("Reset sound settings"), Localize("Are you sure that you want to reset the sound settings to their defaults?"),
+			Localize("Reset"), Localize("Cancel"), &CMenus::ResetSettingsSound);
 	}
+}
+
+
+void CMenus::ResetSettingsGeneral()
+{
+	g_Config.m_ClDynamicCamera = 0;
+	g_Config.m_ClMouseMaxDistanceStatic = 400;
+	g_Config.m_ClMouseMaxDistanceDynamic = 1000;
+	g_Config.m_ClMouseFollowfactor = 60;
+	g_Config.m_ClMouseDeadzone = 300;
+	g_Config.m_ClAutoswitchWeapons = 1;
+	g_Config.m_ClShowhud = 1;
+	g_Config.m_ClFilterchat = 0;
+	g_Config.m_ClNameplates = 1;
+	g_Config.m_ClNameplatesAlways = 1;
+	g_Config.m_ClNameplatesSize = 50;
+	g_Config.m_ClNameplatesTeamcolors = 1;
+	g_Config.m_ClAutoDemoRecord = 0;
+	g_Config.m_ClAutoDemoMax = 10;
+	g_Config.m_ClAutoScreenshot = 0;
+	g_Config.m_ClAutoScreenshotMax = 10;
+}
+
+void CMenus::ResetSettingsControls()
+{
+	m_pClient->m_pBinds->SetDefaults();
+}
+
+void CMenus::ResetSettingsGraphics()
+{
+	g_Config.m_GfxScreenWidth = Graphics()->DesktopWidth();
+	g_Config.m_GfxScreenHeight = Graphics()->DesktopHeight();
+	g_Config.m_GfxBorderless = 0;
+	g_Config.m_GfxFullscreen = 1;
+	g_Config.m_GfxVsync = 1;
+	g_Config.m_GfxFsaaSamples = 0;
+	g_Config.m_GfxTextureQuality = 1;
+	g_Config.m_GfxTextureCompression = 0;
+	g_Config.m_GfxHighDetail = 1;
+
+	if(g_Config.m_GfxDisplayAllModes)
+	{
+		g_Config.m_GfxDisplayAllModes = 0;
+		UpdateVideoModeSettings();
+	}
+
+	m_CheckVideoSettings = true;
+}
+
+void CMenus::ResetSettingsSound()
+{
+	g_Config.m_SndEnable = 1;
+	g_Config.m_SndInit = 1;
+	g_Config.m_SndMusic = 1;
+	g_Config.m_SndNonactiveMute = 0;
+	g_Config.m_SndRate = 48000;
+	g_Config.m_SndVolume = 100;
+	UpdateMusicState();
 }
 
 void CMenus::RenderSettings(CUIRect MainView)

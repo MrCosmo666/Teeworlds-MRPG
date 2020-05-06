@@ -222,7 +222,7 @@ void CServerBan::ConBanExt(IConsole::IResult *pResult, void *pUser)
 	int Minutes = pResult->NumArguments()>1 ? clamp(pResult->GetInteger(1), 0, 44640) : 30;
 	const char *pReason = pResult->NumArguments()>2 ? pResult->GetString(2) : "No reason given";
 
-	if(StrAllnum(pStr))
+	if(!str_is_number(pStr))
 	{
 		int ClientID = str_toint(pStr);
 		if(ClientID < 0 || ClientID >= MAX_PLAYERS || pThis->Server()->m_aClients[ClientID].m_State == CServer::CClient::STATE_EMPTY)
@@ -1456,12 +1456,15 @@ int CServer::Run()
 		while(m_RunServer)
 		{
 			int64 t = time_get();
-			int NewTicks = 0;
+			bool NewTicks = false;
+			bool ShouldSnap = false;
 
 			while(t > TickStartTime(m_CurrentGameTick+1))
 			{
 				m_CurrentGameTick++;
-				NewTicks++;
+				NewTicks = true;
+				if((m_CurrentGameTick % 2) == 0)
+					ShouldSnap = true;
 
 				// apply new input
 				for(int c = 0; c < MAX_PLAYERS; c++)
@@ -1507,7 +1510,7 @@ int CServer::Run()
 			// snap game
 			if(NewTicks)
 			{
-				if (g_Config.m_SvHighBandwidth || (m_CurrentGameTick % 2) == 0)
+				if(g_Config.m_SvHighBandwidth || ShouldSnap)
 				{
 					for (int o = 0; o < COUNT_WORLD; o++)
 						DoSnapshot(o);
@@ -1520,7 +1523,7 @@ int CServer::Run()
 			PumpNetwork();
 
 			// wait for incomming data
-			net_socket_read_wait(m_NetServer.Socket(), 5);
+			net_socket_read_wait(m_NetServer.Socket(), clamp(int((TickStartTime(m_CurrentGameTick + 1) - time_get()) * 1000 / time_freq()), 1, 1000 / SERVER_TICK_SPEED / 2));
 		}
 	}
 

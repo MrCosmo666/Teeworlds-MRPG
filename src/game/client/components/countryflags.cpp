@@ -10,6 +10,7 @@
 #include <engine/external/json-parser/json.h>
 #include <engine/shared/config.h>
 
+#include "menus.h"
 #include "countryflags.h"
 
 
@@ -129,6 +130,11 @@ void CCountryFlags::LoadCountryflagsIndexfile()
 		m_CodeIndexLUT[max(0, (m_aCountryFlags[i].m_CountryCode-CODE_LB)%CODE_RANGE)] = i;
 }
 
+int CCountryFlags::GetInitAmount() const
+{
+	return 10;
+}
+
 void CCountryFlags::OnInit()
 {
 	// load country flags
@@ -143,6 +149,7 @@ void CCountryFlags::OnInit()
 		mem_zero(DummyEntry.m_aCountryCodeString, sizeof(DummyEntry.m_aCountryCodeString));
 		m_aCountryFlags.add(DummyEntry);
 	}
+	m_pClient->m_pMenus->RenderLoading(10);
 }
 
 int CCountryFlags::Num() const

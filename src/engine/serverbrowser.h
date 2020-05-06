@@ -36,7 +36,6 @@ public:
 			PLAYERFLAG_BOT=2,
 			PLAYERFLAG_MASK=3,
 		};
-
 	};
 
 	enum
@@ -91,7 +90,7 @@ public:
 	void ToggleLevel(int Level)
 	{
 		m_ServerLevel ^= 1 << Level;
-		if (m_ServerLevel == (1 << CServerInfo::NUM_SERVER_LEVELS) - 1)
+		if(m_ServerLevel == (1 << CServerInfo::NUM_SERVER_LEVELS)-1)
 		{
 			// Prevent filter that excludes everything
 			m_ServerLevel = 0;
@@ -126,6 +125,7 @@ public:
 		QUICK_SERVERNAME=1,
 		QUICK_PLAYER=2,
 		QUICK_MAPNAME=4,
+		QUICK_GAMETYPE=8,
 
 		TYPE_INTERNET=0,
 		TYPE_LAN,
@@ -137,7 +137,7 @@ public:
 		FLAG_PASSWORD=1,
 		FLAG_PURE=2,
 		FLAG_PUREMAP=4,
-		FLAG_TIMESCORE = 8,
+		FLAG_TIMESCORE=8,
 
 		FILTER_BOTS=16,
 		FILTER_EMPTY=32,
@@ -169,11 +169,11 @@ public:
 	virtual const CServerInfo *SortedGet(int FilterIndex, int Index) const = 0;
 	virtual const void *GetID(int FilterIndex, int Index) const = 0;
 
-	virtual void AddFavorite(const CServerInfo* pInfo) = 0;
-	virtual void RemoveFavorite(const CServerInfo* pInfo) = 0;
-	virtual void UpdateFavoriteState(CServerInfo* pInfo) = 0;
-	virtual void SetFavoritePassword(const char* pAddress, const char* pPassword) = 0;
-	virtual const char* GetFavoritePassword(const char* pAddress) = 0;
+	virtual void AddFavorite(const CServerInfo *pInfo) = 0;
+	virtual void RemoveFavorite(const CServerInfo *pInfo) = 0;
+	virtual void UpdateFavoriteState(CServerInfo *pInfo) = 0;
+	virtual void SetFavoritePassword(const char *pAddress, const char *pPassword) = 0;
+	virtual const char *GetFavoritePassword(const char *pAddress) = 0;
 
 	virtual int AddFilter(const CServerFilterInfo *pFilterInfo) = 0;
 	virtual void SetFilter(int Index, const CServerFilterInfo *pFilterInfo) = 0;

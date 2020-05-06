@@ -201,7 +201,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 
 void CNamePlates::OnRender()
 {
-	if (!g_Config.m_ClNameplates)
+	if(!g_Config.m_ClNameplates || Client()->State() < IClient::STATE_ONLINE)
 		return;
 
 	for(int i = 0; i < MAX_CLIENTS; i++)
