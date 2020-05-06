@@ -45,9 +45,9 @@ const char *QuestJob::GetStateName(int Type) const
 {
 	switch (Type)
 	{
-	case QuestState::QUEST_NO_ACCEPT: return "Not active";
-	case QuestState::QUEST_ACCEPT: return "Active";
-	case QuestState::QUEST_FINISHED: return "Finished";
+		case QuestState::QUEST_NO_ACCEPT: return "Not active";
+		case QuestState::QUEST_ACCEPT: return "Active";
+		case QuestState::QUEST_FINISHED: return "Finished";
 	}
 	return "unknow";
 }

@@ -441,7 +441,7 @@ CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 	bool ActiveTargetID = m_BotTargetID != GetPlayer()->GetCID();
 
 	// ночью боты враждебнее ищем сразу игрока для агра если его нету или есть бот злой
-	if(!ActiveTargetID && (GS()->IsDungeon() || Server()->GetEnumTypeDay() == DayType::NIGHTTYPE || random_int() % 300 == 0))
+	if(!ActiveTargetID && (GS()->IsDungeon() || random_int() % 50 == 0))
 	{
 		// ищем игрока
 		CPlayer *pPlayer = SearchPlayer(Distance);

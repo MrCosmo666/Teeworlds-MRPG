@@ -609,7 +609,7 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 				TextRender()->TextColor(1, 1, 1, 0.90f);
 			else
 			{
-				FontSize = Item.m_Rect.h * ms_FontmodHeight * 0.66f;
+				FontSize = Item.m_Rect.h * ms_FontmodHeight * 0.69f;
 				TextRender()->TextColor(1, 1, 1, 0.80f);
 			}
 
@@ -624,7 +624,7 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 			if (FontSize != OldFontSize)
 			{
 				IconSize = 18.0f;
-				Item.m_Rect.y += 0.5;
+				Item.m_Rect.y += 1.5f;
 				Item.m_Rect.x += 2.0f;
 			}
 

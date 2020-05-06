@@ -235,6 +235,8 @@ container.sounds.Add(SoundSet("button_hover", ["audio/ui_button_hover.wv"]))
 container.sounds.Add(SoundSet("button_click", ["audio/ui_button_click.wv"]))
 container.sounds.Add(SoundSet("race_checkpoint_fast", ["audio/race_checkpoint_fast.wv"]))
 container.sounds.Add(SoundSet("race_checkpoint_slow", ["audio/race_checkpoint_slow.wv"]))
+container.sounds.Add(SoundSet("race_start", ["audio/race_start.wv"]))
+container.sounds.Add(SoundSet("race_finish", ["audio/race_finish.wv"]))
 
 
 ###############################################################################

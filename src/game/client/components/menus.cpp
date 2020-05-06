@@ -1427,7 +1427,6 @@ void CMenus::RenderLoading(int WorkedAmount)
 
 	float Percent = m_LoadCurrent / (float)m_LoadTotal;
 	float Spacing = 40.0f;
-	float Rounding = 5.0f;
 
 	char aBuf[16];
 	str_format(aBuf, sizeof(aBuf), "%d%%", (int)(100 * Percent));
