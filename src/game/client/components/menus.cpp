@@ -2250,11 +2250,15 @@ void CMenus::SetAuthState(bool ShowWindowAuth)
 	m_ShowAuthWindow = ShowWindowAuth;
 	if(!m_ShowAuthWindow)
 	{
+		m_pClient->m_pSounds->Stop(SOUND_MUSIC_MRPG_FESTIVAL);
 		SetActive(EMenuState::NOACTIVE);
 		mem_zero(aAuthResultReason, sizeof(aAuthResultReason));
 	}
 	else
+	{
+		m_pClient->m_pSounds->Play(CSounds::CHN_MMORPG, SOUND_MUSIC_MRPG_FESTIVAL, 0.3f);
 		SetActive(EMenuState::AUTHSTATE);
+	}
 }
 
 void CMenus::SetActive(int ActiveID)

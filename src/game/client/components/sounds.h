@@ -44,6 +44,7 @@ public:
 		CHN_MUSIC,
 		CHN_WORLD,
 		CHN_GLOBAL,
+		CHN_MMORPG,
 	};
 
 	virtual int GetInitAmount() const;

@@ -263,10 +263,9 @@ void CGS::CreateDeath(vec2 Pos, int ClientID)
 
 void CGS::CreateSound(vec2 Pos, int Sound, int64 Mask)
 {
-	if (Sound < 0 || Sound > 40)
+	if(Sound < 0 || Sound > 40)
 		return;
 
-	// create a sound
 	CNetEvent_SoundWorld *pEvent = (CNetEvent_SoundWorld *)m_Events.Create(NETEVENTTYPE_SOUNDWORLD, sizeof(CNetEvent_SoundWorld), Mask);
 	if(pEvent)
 	{
@@ -278,8 +277,16 @@ void CGS::CreateSound(vec2 Pos, int Sound, int64 Mask)
 
 void CGS::CreatePlayerSound(int ClientID, int Sound)
 {
-	int64 Mask = CmaskOne(ClientID);
-	CreateSound(m_apPlayers[ClientID]->m_ViewPos, Sound, Mask);
+	if(!m_apPlayers[ClientID] || (!CheckClient(ClientID) && (Sound < 0 || Sound > 40)))
+		return;
+
+	CNetEvent_SoundWorld* pEvent = (CNetEvent_SoundWorld*)m_Events.Create(NETEVENTTYPE_SOUNDWORLD, sizeof(CNetEvent_SoundWorld), CmaskOne(ClientID));
+	if(pEvent)
+	{
+		pEvent->m_X = (int)m_apPlayers[ClientID]->m_ViewPos.x;
+		pEvent->m_Y = (int)m_apPlayers[ClientID]->m_ViewPos.y;
+		pEvent->m_SoundID = Sound;
+	}
 }
 
 void CGS::SendMmoEffect(vec2 Pos, int EffectID, int ClientID)

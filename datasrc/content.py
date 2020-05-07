@@ -231,12 +231,14 @@ container.sounds.Add(SoundSet("ctf_capture", ["audio/sfx_ctf_cap_pl.wv"]))
 container.sounds.Add(SoundSet("menu", ["audio/music_menu.wv"]))
 
 #gui
-container.sounds.Add(SoundSet("button_hover", ["audio/ui_button_hover.wv"]))
-container.sounds.Add(SoundSet("button_click", ["audio/ui_button_click.wv"]))
-container.sounds.Add(SoundSet("race_checkpoint_fast", ["audio/race_checkpoint_fast.wv"]))
-container.sounds.Add(SoundSet("race_checkpoint_slow", ["audio/race_checkpoint_slow.wv"]))
-container.sounds.Add(SoundSet("race_start", ["audio/race_start.wv"]))
-container.sounds.Add(SoundSet("race_finish", ["audio/race_finish.wv"]))
+container.sounds.Add(SoundSet("button_hover", ["audio/mmotee/ui_button_hover.wv"]))
+container.sounds.Add(SoundSet("button_click", ["audio/mmotee/ui_button_click.wv"]))
+container.sounds.Add(SoundSet("race_checkpoint_fast", ["audio/mmotee/race_checkpoint_fast.wv"]))
+container.sounds.Add(SoundSet("race_checkpoint_slow", ["audio/mmotee/race_checkpoint_slow.wv"]))
+container.sounds.Add(SoundSet("race_start", ["audio/mmotee/race_start.wv"]))
+container.sounds.Add(SoundSet("race_finish", ["audio/mmotee/race_finish.wv"]))
+container.sounds.Add(SoundSet("cloth_equip", ["audio/mmotee/cloth_equip.wv"]))
+container.sounds.Add(SoundSet("music_mrpg_festival", ["audio/mmotee/music_mrpg_festival.wv"]))
 
 
 ###############################################################################

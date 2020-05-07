@@ -73,6 +73,7 @@ void CSounds::OnInit()
 	Sound()->SetChannelVolume(CSounds::CHN_MUSIC, 1.0f);
 	Sound()->SetChannelVolume(CSounds::CHN_WORLD, 0.9f);
 	Sound()->SetChannelVolume(CSounds::CHN_GLOBAL, 1.0f);
+	Sound()->SetChannelVolume(CSounds::CHN_MMORPG, 0.7f);
 
 	Sound()->SetListenerPos(0.0f, 0.0f);
 
@@ -152,7 +153,7 @@ void CSounds::Enqueue(int Channel, int SetId)
 	// add sound to the queue
 	if(m_QueuePos < QUEUE_SIZE)
 	{
-		if(Channel == CHN_MUSIC || !g_Config.m_ClEditor)
+		if(Channel == CHN_MUSIC || Channel == CHN_MMORPG || !g_Config.m_ClEditor)
 		{
 			m_aQueue[m_QueuePos].m_Channel = Channel;
 			m_aQueue[m_QueuePos++].m_SetId = SetId;
@@ -170,7 +171,7 @@ void CSounds::Play(int Chn, int SetId, float Vol)
 		return;
 
 	int Flags = 0;
-	if(Chn == CHN_MUSIC)
+	if(Chn == CHN_MUSIC || Chn == CHN_MMORPG)
 		Flags = ISound::FLAG_LOOP;
 
 	Sound()->Play(Chn, SampleId, Flags);
@@ -186,7 +187,7 @@ void CSounds::PlayAt(int Chn, int SetId, float Vol, vec2 Pos)
 		return;
 
 	int Flags = 0;
-	if(Chn == CHN_MUSIC)
+	if(Chn == CHN_MUSIC || Chn == CHN_MMORPG)
 		Flags = ISound::FLAG_LOOP;
 
 	Sound()->PlayAt(Chn, SampleId, Flags, Pos.x, Pos.y);

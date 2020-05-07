@@ -410,6 +410,7 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 		else if(EquipItem.Info().Type == ItemType::TYPE_EQUIP)
 			GS()->ChangeEquipSkin(ClientID, VoteID);
 
+		GS()->CreatePlayerSound(ClientID, SOUND_CLOTH_EQUIP);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}

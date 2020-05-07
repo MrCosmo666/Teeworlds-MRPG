@@ -264,7 +264,7 @@ Objects = [
 	]),
 
 	NetEvent("SoundWorld:Common", [
-		NetIntRange("m_SoundID", 0, 40),
+		NetIntAny("m_SoundID"),
 	]),
 
 	NetEvent("Damage:Common", [ # Unused yet
