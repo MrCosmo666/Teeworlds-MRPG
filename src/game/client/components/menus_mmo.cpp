@@ -74,17 +74,14 @@ void CMenus::RenderSettingsMmo(CUIRect MainView)
 
 void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 {
+	float ButtonHeight = 20.0f;
+	float Spacing = 2.0f;
 	CUIRect Button;
 	RenderTools()->DrawUIRect4(&MainView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), 0, 5.0f);
 
 	// visual
-	float ButtonHeight = 20.0f;
-	float Spacing = 2.0f;
 	if(Page == 0)
-	{
 		RenderMmoSettingsTexture(MainView, MainView);
-	}
-
 	// general
 	else if (Page == 1)
 	{
@@ -163,9 +160,7 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 	}
 	// information
 	else if (Page == 3)
-	{
-		UI()->DoLabel(&MainView, "The client uses open source client codes:\n*Teeworlds by (teeworlds team)\n*DDRaceNetwork Client by (DDNet team)\n*Gamer Client by (Dune)\n*MmoTee Client by (Kurosio)", 16.0f, CUI::ALIGN_CENTER);
-	}
+		UI()->DoLabel(&MainView, "Uses open source client codes:\n*Teeworlds by (Teeworlds team)\n*DDRaceNetwork Client by (DDNet team)\n*Gamer Client by (Dune)\n*MRPG Client by (Kurosio)", 16.0f, CUI::ALIGN_LEFT);
 }
 
 void CMenus::RenderSettingsMmoChangerGeneric(CUIRect MainView, CCSkinChanger::CTextureEntity* pEntities, char* pConfigStr, const char* pLabel, int ItemsPerRow, float Ratio)
