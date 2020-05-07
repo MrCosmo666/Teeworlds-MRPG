@@ -159,7 +159,6 @@ void CCommandProcessorFragment_OpenGL::SetState(const CCommandBuffer::CState& St
 	else
 		glDisable(GL_SCISSOR_TEST);
 
-
 	// texture
 	int SrcBlendMode = GL_ONE;
 	glDisable(GL_TEXTURE_2D);

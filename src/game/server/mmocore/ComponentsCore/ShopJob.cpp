@@ -274,7 +274,7 @@ bool ShopJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		if (pChr->GetHelper()->BoolIndex(TILE_SHOP_ZONE))
 		{
 			const int StorageID = Job()->Storage()->GetStorageID(pChr->m_Core.m_Pos);
-			Job()->Storage()->ShowStorageMenu(ClientID, StorageID);
+			Job()->Storage()->ShowStorageMenu(pChr->GetPlayer(), StorageID);
 			ShowMailShop(pPlayer, StorageID);
 			return true;
 		}
@@ -375,16 +375,13 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	// принять аукцион слот
 	if(PPSTR(CMD, "AUCTIONACCEPT") == 0)
 	{
-		ItemJob::ItemPlayer &SellItem = pPlayer->GetItem(VoteID);
-		if(SellItem.Count >= CGS::InteractiveSub[ClientID].AuctionItem.a_count && CGS::InteractiveSub[ClientID].AuctionItem.a_price >= 10)
+		ItemJob::ItemPlayer &pSellItem = pPlayer->GetItem(VoteID);
+		if(pSellItem.Count >= CGS::InteractiveSub[ClientID].AuctionItem.a_count && CGS::InteractiveSub[ClientID].AuctionItem.a_price >= 10)
 		{
-			// создаем слот
 			CreateAuctionSlot(pPlayer, CGS::InteractiveSub[ClientID].AuctionItem);
 			GS()->ResetVotes(ClientID, MenuList::MENU_INVENTORY);
 			return true;
 		}
-
-		// обновляем меню аукцион слота
 		GS()->VResetVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
 		return true;
 	}

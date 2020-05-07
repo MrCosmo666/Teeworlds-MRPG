@@ -80,7 +80,6 @@ bool SkillJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 {
 	CPlayer* pPlayer = pChr->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
-
 	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_LEARN_SKILL))
 	{
 		GS()->Chat(ClientID, "You can see list of available skills in the voting!");
@@ -100,15 +99,12 @@ bool SkillJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 
 bool SkillJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
-	int ClientID = pPlayer->GetCID();
-
-	// улучшение скилла
+	const int ClientID = pPlayer->GetCID();
 	if (PPSTR(CMD, "SKILLLEARN") == 0)
 	{
 		const int SkillID = VoteID;
 		if (UpgradeSkill(pPlayer, SkillID))
 			GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-
 		return true;
 	}
 
@@ -123,7 +119,6 @@ bool SkillJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
-
 	return false;
 }
 
@@ -160,12 +155,10 @@ void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
-	int LevelOwn = GetSkillLevel(ClientID, SkillID);
-	int BonusSkill = GetSkillBonus(ClientID, SkillID) + SkillData[SkillID].m_BonusCount;
-	int HideID = NUM_TAB_MENU + ItemJob::ItemsInfo.size() + SkillID;
-
-	// меню выводим
+	const int LevelOwn = GetSkillLevel(ClientID, SkillID);
+	const int BonusSkill = GetSkillBonus(ClientID, SkillID) + SkillData[SkillID].m_BonusCount;
 	const bool Passive = SkillData[SkillID].m_Passive;
+	const int HideID = NUM_TAB_MENU + ItemJob::ItemsInfo.size() + SkillID;
 	GS()->AVHI(ClientID, "skill", HideID, LIGHT_BLUE_COLOR, "{STR} : {INT}SP ({INT}/{INT})", SkillData[SkillID].m_SkillName, &SkillData[SkillID].m_SkillPrice, &LevelOwn, &SkillData[SkillID].m_SkillMaxLevel);
 	if(Passive)
 	{
@@ -193,29 +186,24 @@ bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_skills", "WHERE SkillID = '%d' AND OwnerID = '%d'", SkillID, pPlayer->Acc().AuthID));
 	if (RES->next())
 	{
-		// если такой скилл есть повышаем уровень
 		if (Skill[ClientID][SkillID].m_SkillLevel >= SkillData[SkillID].m_SkillMaxLevel)
 		{
 			GS()->Chat(ClientID, "This a skill already maximum level");
 			return false;
 		}
 
-		// проверяем хватает ли скиллпоинтов
 		if (pPlayer->CheckFailMoney(SkillData[SkillID].m_SkillPrice, itSkillPoint))
 			return false;
 
-		// добавляем уровень
 		Skill[ClientID][SkillID].m_SkillLevel++;
 		SJK.UD("tw_skills", "SkillLevel = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", Skill[ClientID][SkillID].m_SkillLevel, SkillID, pPlayer->Acc().AuthID);
 		GS()->Chat(ClientID, "You have increased the skill [{STR} level to {INT}]!", SkillData[SkillID].m_SkillName, &Skill[ClientID][SkillID].m_SkillLevel);
 		return true;
 	}
 
-	// проверяем хватает ли скиллпоинтов
 	if (pPlayer->CheckFailMoney(SkillData[SkillID].m_SkillPrice, itSkillPoint))
 		return false;
 
-	// создаем неовый скилл
 	Skill[ClientID][SkillID].m_SkillLevel = 1;
 	Skill[ClientID][SkillID].m_SelectedEmoticion = -1;
 	SJK.ID("tw_skills", "(SkillID, OwnerID, SkillLevel) VALUES ('%d', '%d', '1');", SkillID, pPlayer->Acc().AuthID);
@@ -248,7 +236,6 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 				continue;
 			pHh->Reset();
 		}
-		// создаем обьект
 		new CHealthHealer(&GS()->m_World, pPlayer, SkillLevel, ManaUsePrice, pChr->m_Core.m_Pos);
 	}
 
@@ -274,9 +261,8 @@ void SkillJob::ParseEmoticionSkill(CPlayer *pPlayer, int EmoticionID)
 	int ClientID = pPlayer->GetCID();
 	for (const auto& skillplayer : Skill[ClientID])
 	{
-		if (skillplayer.second.m_SelectedEmoticion != EmoticionID)
-			continue;
-		UseSkill(pPlayer, skillplayer.first);
+		if (skillplayer.second.m_SelectedEmoticion == EmoticionID)
+			UseSkill(pPlayer, skillplayer.first);
 	}
 }
 
@@ -284,22 +270,22 @@ const char* SkillJob::GetSelectedEmoticion(int EmoticionID) const
 {
 	switch (EmoticionID)
 	{
-	case EMOTICON_OOP: return "Emoticion Ooop";
-	case EMOTICON_EXCLAMATION: return "Emoticion Exclamation";
-	case EMOTICON_HEARTS: return "Emoticion Hearts";
-	case EMOTICON_DROP: return "Emoticion Drop";
-	case EMOTICON_DOTDOT: return "Emoticion ...";
-	case EMOTICON_MUSIC: return "Emoticion Music";
-	case EMOTICON_SORRY: return "Emoticion Sorry";
-	case EMOTICON_GHOST: return "Emoticion Ghost";
-	case EMOTICON_SUSHI: return "Emoticion Sushi";
-	case EMOTICON_SPLATTEE: return "Emoticion Splatee";
-	case EMOTICON_DEVILTEE: return "Emoticion Deviltee";
-	case EMOTICON_ZOMG: return "Emoticion Zomg";
-	case EMOTICON_ZZZ: return "Emoticion Zzz";
-	case EMOTICON_WTF: return "Emoticion Wtf";
-	case EMOTICON_EYES: return "Emoticion Eyes";
-	case EMOTICON_QUESTION: return "Emoticion Question";
+		case EMOTICON_OOP: return "Emoticion Ooop";
+		case EMOTICON_EXCLAMATION: return "Emoticion Exclamation";
+		case EMOTICON_HEARTS: return "Emoticion Hearts";
+		case EMOTICON_DROP: return "Emoticion Drop";
+		case EMOTICON_DOTDOT: return "Emoticion ...";
+		case EMOTICON_MUSIC: return "Emoticion Music";
+		case EMOTICON_SORRY: return "Emoticion Sorry";
+		case EMOTICON_GHOST: return "Emoticion Ghost";
+		case EMOTICON_SUSHI: return "Emoticion Sushi";
+		case EMOTICON_SPLATTEE: return "Emoticion Splatee";
+		case EMOTICON_DEVILTEE: return "Emoticion Deviltee";
+		case EMOTICON_ZOMG: return "Emoticion Zomg";
+		case EMOTICON_ZZZ: return "Emoticion Zzz";
+		case EMOTICON_WTF: return "Emoticion Wtf";
+		case EMOTICON_EYES: return "Emoticion Eyes";
+		case EMOTICON_QUESTION: return "Emoticion Question";
 	}
 	return "Not selected";
 }

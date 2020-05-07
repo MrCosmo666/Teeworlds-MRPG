@@ -12,21 +12,21 @@ int StorageJob::GetStorageID(vec2 Pos) const
 	for (const auto& st : Storage)
 	{
 		vec2 PosStorage = vec2(st.second.PosX, st.second.PosY);
-		if (distance(PosStorage, Pos) > 200) continue;
+		if (distance(PosStorage, Pos) > 200) 
+			continue;
 		return st.first;
 	}
 	return -1;
 }
 
-void StorageJob::ShowStorageMenu(int ClientID, int StorageID)
+void StorageJob::ShowStorageMenu(CPlayer* pPlayer, int StorageID)
 {
-	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
-	if(!pPlayer) 
+	const int ClientID = pPlayer->GetCID();
+	if(StorageID < 0)
+	{
+		GS()->AV(ClientID, "null", "Storage Don't work");
 		return;
-
-	if(StorageID < 0) 
-		return GS()->AV(ClientID, "null", "Storage Don't work");
-
+	}
 	GS()->AVH(ClientID, TAB_STORAGE, GOLDEN_COLOR, "Shop [{STR}/{INT}]", Storage[StorageID].Name, &Storage[StorageID].Count);
 	GS()->AVM(ClientID, "REPAIRITEMS", StorageID, TAB_STORAGE, "Repair all items - FREE");
 }
@@ -48,7 +48,6 @@ bool StorageJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 {
 	CPlayer* pPlayer = pChr->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
-
 	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_SHOP_ZONE))
 	{
 		GS()->Chat(ClientID, "You can see menu in the votes!");
@@ -69,7 +68,6 @@ bool StorageJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 bool StorageJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
-	// починка предметов
 	if (PPSTR(CMD, "REPAIRITEMS") == 0)
 	{
 		Job()->Item()->RepairDurabilityFull(pPlayer);

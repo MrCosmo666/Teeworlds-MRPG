@@ -36,7 +36,7 @@ public:
 	void CheckQuestingOpened(CPlayer* pPlayer, int QuestID);
 
 private:
-	bool ChangeWorld(int ClientID, vec2 Pos);
+	bool ChangeWorld(CPlayer *pPlayer, vec2 Pos);
 	void UpdateWorldsList();
 	int GetID(vec2 Pos);
 };

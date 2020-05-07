@@ -67,10 +67,9 @@ bool AetherJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 
 	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_AETHER_TELEPORT))
 	{
-		GS()->Chat(ClientID, "List of your Aether Locations, you can see on vote!");
-		UnlockLocation(ClientID, pChr->m_Core.m_Pos);
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
-
+		GS()->Chat(ClientID, "List of your Aether Locations, you can see on vote!");
+		UnlockLocation(pChr->GetPlayer(), pChr->m_Core.m_Pos);
 		GS()->VResetVotes(ClientID, MenuList::MAIN_MENU);
 		return true;
 	}
@@ -104,18 +103,12 @@ bool AetherJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMen
 	return false;
 }
 
-/* #########################################################################
-	FUNCTION TELEPORT CLASS
-######################################################################### */
-void AetherJob::UnlockLocation(int ClientID, vec2 Pos)
+void AetherJob::UnlockLocation(CPlayer *pPlayer, vec2 Pos)
 {
-	CPlayer* pPlayer = GS()->GetPlayer(ClientID);
-	if (!pPlayer) return;
-
+	const int ClientID = pPlayer->GetCID();
 	for (const auto& tl : Teleport)
 	{
-		if (distance(vec2(tl.second.TeleX, tl.second.TeleY), Pos) > 100 ||
-			pPlayer->Acc().AetherLocation.find(tl.first) != pPlayer->Acc().AetherLocation.end())
+		if (distance(vec2(tl.second.TeleX, tl.second.TeleY), Pos) > 100 || pPlayer->Acc().AetherLocation.find(tl.first) != pPlayer->Acc().AetherLocation.end())
 			continue;
 
 		SJK.ID("tw_accounts_locations", "(OwnerID, TeleportID) VALUES ('%d', '%d')", pPlayer->Acc().AuthID, tl.first);
@@ -135,7 +128,7 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 
 	GS()->AVH(ClientID, TAB_AETHER, GOLDEN_COLOR, "Available teleports");
 	if (Job()->Member()->GetGuildHouseID(pPlayer->Acc().GuildID) >= 1)
-		GS()->AVM(ClientID, "MSPAWN", NOPE, TAB_AETHER, "Move to Member House - free");
+		GS()->AVM(ClientID, "MSPAWN", NOPE, TAB_AETHER, "Move to Guild House - free");
 	if (Job()->House()->PlayerHouseID(pPlayer) >= 1)
 		GS()->AVM(ClientID, "HSPAWN", NOPE, TAB_AETHER, "Move to Your House - free");
 

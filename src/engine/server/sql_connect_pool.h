@@ -11,15 +11,6 @@
 #include <cppconn/exception.h>
 #include <cppconn/statement.h>
 
-#define START_THREAD() \
-std::thread t([&]() \
-{ \
-
-#define END_THREAD() \
-}); \
-t.detach(); \
-
-
 using namespace sql;
 #define SJK CConectionPool::GetInstance()
 

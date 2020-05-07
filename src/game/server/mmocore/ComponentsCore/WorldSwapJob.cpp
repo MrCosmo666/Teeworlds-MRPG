@@ -47,19 +47,13 @@ bool WorldSwapJob::OnHandleTile(CCharacter *pChr, int IndexCollision)
 	if(pChr->GetHelper()->TileEnter(IndexCollision, TILE_WORLD_SWAP))
 	{
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
+		ChangeWorld(pPlayer, pChr->m_Core.m_Pos);
 		return true;
 	}
 	else if(pChr->GetHelper()->TileExit(IndexCollision, TILE_WORLD_SWAP))
 	{
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		return true;	
-	}
-
-	
-	if(pChr->GetHelper()->BoolIndex(TILE_WORLD_SWAP))
-	{
-		if(ChangeWorld(pPlayer->GetCID(), pChr->m_Core.m_Pos))
-			return true;
 	}
 	return false;
 }
@@ -68,20 +62,12 @@ int WorldSwapJob::GetID(vec2 Pos)
 {
 	for(const auto& sw : WorldSwap)
 	{
-		if (sw.second.WorldID == GS()->GetWorldID())
+		if (sw.second.WorldID == GS()->GetWorldID() || sw.second.TwoWorldID == GS()->GetWorldID())
 		{
 			vec2 SwapPosition = vec2(sw.second.PositionX, sw.second.PositionY);
-			if (distance(SwapPosition, Pos) < 400)
+			vec2 SwapPosition2 = vec2(sw.second.TwoPositionX, sw.second.TwoPositionY);
+			if (distance(SwapPosition, Pos) < 400 || distance(SwapPosition2, Pos) < 400)
 				return sw.first;
-			continue;
-		}
-		
-		if (sw.second.TwoWorldID == GS()->GetWorldID())
-		{
-			vec2 SwapPosition = vec2(sw.second.TwoPositionX, sw.second.TwoPositionY);
-			if (distance(SwapPosition, Pos) < 400)
-				return sw.first;
-			continue;
 		}
 	}
 	return -1;
@@ -97,13 +83,9 @@ void WorldSwapJob::CheckQuestingOpened(CPlayer* pPlayer, int QuestID)
 	}
 }
 
-
 int WorldSwapJob::GetNecessaryQuest(int WorldID) const
 {
 	int CheckWorldID = ((WorldID <= -1 || WorldID >= COUNT_WORLD) ? GS()->GetWorldID() : WorldID);
-	if (CheckWorldID == LOCALWORLD)
-		return -1;
-
 	for (const auto& sw : WorldSwap)
 	{
 		if (sw.second.TwoWorldID == CheckWorldID)
@@ -112,15 +94,12 @@ int WorldSwapJob::GetNecessaryQuest(int WorldID) const
 	return -1;
 }
 
-bool WorldSwapJob::ChangeWorld(int ClientID, vec2 Pos)
+bool WorldSwapJob::ChangeWorld(CPlayer *pPlayer, vec2 Pos)
 {
-	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
-	if(!pPlayer) 
-		return true;
-
-	int WID = GetID(Pos);
+	const int WID = GetID(Pos);
 	if (WorldSwap.find(WID) != WorldSwap.end())
 	{
+		const int ClientID = pPlayer->GetCID();
 		int StoryQuestNeeded = WorldSwap[WID].OpenQuestID;
 		if (StoryQuestNeeded > 0 && !GS()->Mmo()->Quest()->IsComplectedQuest(ClientID, StoryQuestNeeded))
 		{
@@ -158,7 +137,6 @@ vec2 WorldSwapJob::GetPositionQuestBot(int ClientID, int QuestID)
 		{
 			if(TargetWorldID != swp.BaseWorldID) 
 				continue;
-
 			TargetWorldID = swp.FindWorldID;
 			if(GS()->GetWorldID() == swp.FindWorldID)
 				return swp.Position;
@@ -171,7 +149,6 @@ int WorldSwapJob::GetWorldType() const
 {
 	if(GS()->DungeonID())
 		return WORLD_DUNGEON;
-
 	return WORLD_STANDARD;
 }
 

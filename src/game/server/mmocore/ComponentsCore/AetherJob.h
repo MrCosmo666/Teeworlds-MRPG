@@ -25,7 +25,7 @@ public:
 	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 
 private:
-	void UnlockLocation(int ClientID, vec2 Pos);
+	void UnlockLocation(CPlayer* pPlayer, vec2 Pos);
 	void ShowTeleportList(CCharacter* pChar);
 };
 

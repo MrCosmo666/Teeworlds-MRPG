@@ -232,8 +232,8 @@ int ItemJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings
 
 int ItemJob::ActionItemCountAllowed(CPlayer *pPlayer, int ItemID)
 {
-	int ClientID = pPlayer->GetCID();
-	int AvailableCount = Job()->Quest()->QuestingAllowedItemsCount(pPlayer, ItemID);
+	const int ClientID = pPlayer->GetCID();
+	const int AvailableCount = Job()->Quest()->QuestingAllowedItemsCount(pPlayer, ItemID);
 	if (AvailableCount <= 0)
 	{
 		GS()->Chat(ClientID, "This count of items that you have, iced for the quest!");

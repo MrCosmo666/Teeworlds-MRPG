@@ -22,7 +22,7 @@ public:
 	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
 	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 	
-	void ShowStorageMenu(int ClientID, int StorageID);
+	void ShowStorageMenu(CPlayer *pPlayer, int StorageID);
 	int GetStorageID(vec2 Pos) const;
 };
 
