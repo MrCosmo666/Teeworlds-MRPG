@@ -108,7 +108,7 @@ void CConectionPool::UD(const char *Table, const char *Buffer, ...)
 
 	std::thread t([Buf]()
 	{
-		Connection* pConn;
+		Connection* pConn = nullptr;
 		try
 		{
 			pConn = SJK.CreateConnection();
@@ -142,7 +142,7 @@ void CConectionPool::DD(const char *Table, const char *Buffer, ...)
 
 	std::thread t([Buf]()
 	{
-		Connection* pConn;
+		Connection* pConn = nullptr;
 		try
 		{
 			pConn = SJK.CreateConnection();
@@ -176,7 +176,7 @@ void CConectionPool::ID(const char *Table, const char *Buffer, ...)
 
 	std::thread t([Buf]()
 	{
-		Connection* pConn;
+		Connection* pConn = nullptr;
 		try
 		{
 			pConn = SJK.CreateConnection();
@@ -208,8 +208,8 @@ ResultSet *CConectionPool::SD(const char *Select, const char *Table, const char 
 	std::string Buf = "SELECT " + std::string(Select) + " FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
 	dbg_msg("sql", "%s", Buf.c_str());
 
-	Connection* pConn;
-	ResultSet* m_results;
+	Connection* pConn = nullptr;
+	ResultSet* m_results = nullptr;
 
 	try
 	{
