@@ -158,7 +158,6 @@ void CGameControllerDungeon::StateTick()
 		{
 			int Time = m_StartingTick / Server()->TickSpeed();
 			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon waiting {INT} sec!", &Time);
-
 			m_StartingTick--;
 			if (!m_StartingTick)
 				ChangeState(DUNGEON_STARTED);

@@ -92,6 +92,7 @@ void CQuestItem::Tick()
 		// если кнопка нажата
 		if (pPlayer->GetCharacter()->m_ReloadTimer)
 		{
+			GS()->CreatePlayerSound(m_OwnerID, SOUND_ITEM_PICKUP);
 			pPlayer->GetCharacter()->m_ReloadTimer = 0;
 			PlItemForQuest.Add(1);
 			GS()->Chat(m_OwnerID, "You pick {STR} for {STR}!", PlItemForQuest.Info().GetName(pPlayer), m_QuestBot.Name);

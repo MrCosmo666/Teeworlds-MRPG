@@ -410,7 +410,7 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 		else if(EquipItem.Info().Type == ItemType::TYPE_EQUIP)
 			GS()->ChangeEquipSkin(ClientID, VoteID);
 
-		GS()->CreatePlayerSound(ClientID, SOUND_CLOTH_EQUIP);
+		GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
@@ -679,6 +679,7 @@ bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 		char aAttributes[128];
 		GameServer->Mmo()->Item()->FormatAttributes(*this, sizeof(aAttributes), aAttributes);
 		GameServer->Chat(ClientID, "Auto equip {STR} - {STR}", Info().GetName(pPlayer), aAttributes);
+		GameServer->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 	}
 
 	// выдаем предмет

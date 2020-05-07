@@ -191,7 +191,7 @@ bool CTalkText::OnInput(IInput::CEvent Event)
 
 	if(IsActive() && Event.m_Flags&IInput::FLAG_PRESS && Event.m_Key == KEY_TAB)
 	{
-		//m_pClient->m_pSounds->Play(CSounds::CHN_WORLD, SOUND_UI_SELECTED_CLICK, 100.00f);
+		m_pClient->m_pSounds->Play(CSounds::CHN_WORLD, SOUND_KEY_PRESS, 100.00f);
 		ClientPressed();
 		return true;
 	}

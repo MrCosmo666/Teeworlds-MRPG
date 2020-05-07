@@ -49,6 +49,7 @@ bool CDropingItem::TakeItem(int ClientID)
 	ItemJob::ItemPlayer &PlDropItem = pPlayer->GetItem(m_DropItem.GetID());
 	if(PlDropItem.Count > 0 && PlDropItem.Info().IsEnchantable())
 	{
+		GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 		tl_swap(PlDropItem, m_DropItem);
 		GS()->Chat(ClientID, "You now own [{STR}+{INT}]", PlDropItem.Info().GetName(pPlayer), &PlDropItem.Enchant);
 		GS()->VResetVotes(ClientID, MenuList::MENU_INVENTORY);
@@ -56,6 +57,7 @@ bool CDropingItem::TakeItem(int ClientID)
 	}
 	
 	// выдача просто предмета
+	GS()->CreatePlayerSound(ClientID, SOUND_ITEM_PICKUP);
 	GS()->VResetVotes(ClientID, MenuList::MENU_INVENTORY);
 	PlDropItem.Add(m_DropItem.Count, 0, m_DropItem.Enchant);
 	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 10, "\0");

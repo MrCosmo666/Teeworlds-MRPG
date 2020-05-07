@@ -223,7 +223,6 @@ int CMenus::DoButton_Menu(CButtonContainer *pBC, const char *pText, int Checked,
 		if(UI()->GetActiveItem() == pBC->GetID() && pLastActiveItem != pBC->GetID())
 			m_pClient->m_pSounds->Play(CSounds::CHN_GUI, SOUND_BUTTON_CLICK, 0);
 	}
-
 	return Logic;
 }
 
@@ -637,8 +636,11 @@ bool CMenus::DoEditBox(void* pID, const CUIRect* pRect, char* pStr, unsigned Str
 	}
 	UI()->ClipDisable();
 
-	// mmotee impl set item how pressed to true
-	// example use for check editboxed IsActiveEditBox()
+	if(g_Config.m_SndEnableUI)
+	{
+		if(g_Config.m_SndEnableUIHover && UI()->NextHotItem() == pID && UI()->NextHotItem() != UI()->HotItem())
+			m_pClient->m_pSounds->Play(CSounds::CHN_GUI, SOUND_BUTTON_HOVER, 1);
+	}
 	return Changed;
 }
 
@@ -2292,6 +2294,7 @@ void CMenus::OnRelease()
 
 void CMenus::OnReset()
 {
+	m_pClient->m_pSounds->Stop(SOUND_MUSIC_MRPG_FESTIVAL);
 	m_ShowAuthWindow = false;
 	m_MenuActiveID = EMenuState::NOACTIVE;
 	mem_zero(aAuthResultReason, sizeof(aAuthResultReason));
@@ -2464,6 +2467,7 @@ void CMenus::OnRender()
 		m_DeletePressed = false;
 		m_UpArrowPressed = false;
 		m_DownArrowPressed = false;
+		m_ActiveEditbox = false;
 
 		// render auth for mmotee
 		if(m_pClient->MmoServer() && Client()->State() == IClient::STATE_ONLINE && m_ShowAuthWindow)
@@ -2505,6 +2509,7 @@ void CMenus::OnRender()
 	m_DeletePressed = false;
 	m_UpArrowPressed = false;
 	m_DownArrowPressed = false;
+	m_ActiveEditbox = false;
 }
 
 bool CMenus::CheckHotKey(int Key) const
