@@ -109,9 +109,6 @@ public:
 
 		// temp guild name for searching
 		char m_aGuildSearchBuf[32];
-
-		// temp for safe spawn
-		bool m_ActiveSafeSpawn;
 	};
 	static std::map < int, StructInteractiveSub > InteractiveSub;
 
@@ -323,7 +320,7 @@ public:
 	const char* AtributeName(int BonusID) const;
 
 	void SetRespawnWorld(int WorldID) { m_RespawnWorld = WorldID; }
-	bool GetRespawnWorld() { return m_RespawnWorld; }
+	int GetRespawnWorld() const { return m_RespawnWorld; }
 
 private:
 	void UpdateZoneDungeon();

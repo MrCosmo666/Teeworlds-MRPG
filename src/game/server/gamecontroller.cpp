@@ -67,13 +67,13 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 	switch(Index)
 	{
 	case ENTITY_SPAWN:
-		m_aaSpawnPoints[0][m_aNumSpawnPoints[0]++] = Pos;
+		m_aaSpawnPoints[SpawnTypes::SPAWN_HUMAN][m_aNumSpawnPoints[0]++] = Pos;
 		break;
 	case ENTITY_SPAWN_MOBS:
-		m_aaSpawnPoints[1][m_aNumSpawnPoints[1]++] = Pos;
+		m_aaSpawnPoints[SpawnTypes::SPAWN_BOT][m_aNumSpawnPoints[1]++] = Pos;
 		break;
 	case ENTITY_SPAWN_SAFE:
-		m_aaSpawnPoints[2][m_aNumSpawnPoints[2]++] = Pos;
+		m_aaSpawnPoints[SpawnTypes::SPAWN_HUMAN_SAFE][m_aNumSpawnPoints[2]++] = Pos;
 		break;
 	case ENTITY_ARMOR_1:
 		Type = PICKUP_ARMOR;
@@ -233,7 +233,7 @@ void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type, vec2 BotPos
 		// check if the position is occupado
 		CCharacter *aEnts[MAX_CLIENTS];
 		int Num = GS()->m_World.FindEntities(m_aaSpawnPoints[Type][i], 64, (CEntity**)aEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
-		vec2 Positions[5] = { vec2(0.0f, 0.0f), vec2(-32.0f, 0.0f), vec2(0.0f, -32.0f), vec2(32.0f, 0.0f), vec2(0.0f, 32.0f) };	// start, left, up, right, down
+		vec2 Positions[5] = { vec2(0.0f, 0.0f), vec2(-32.0f, 0.0f), vec2(0.0f, -32.0f), vec2(32.0f, 0.0f), vec2(0.0f, 32.0f) };
 		int Result = -1;
 	
 		if(BotPos != vec2(-1, -1) && distance(BotPos, m_aaSpawnPoints[Type][i]) > 800.0f)

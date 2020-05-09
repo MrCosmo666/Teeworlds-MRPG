@@ -29,12 +29,15 @@ public:
 		int Miner[MINER::NUM_MINER];
 
 		// save pos teleport
-		int TeleportX;
-		int TeleportY;
+		bool TempActiveSafeSpawn;
+		int TempTeleportX;
+		int TempTeleportY;
+		short TempLatencyPing;
+		int TempTimeDungeon;
+
+		// world
 		short WorldID;
 		short LastWorldID;
-		short LatencyPing;
-		int TimeDungeon;
 
 		// skins
 		char m_aaSkinPartNames[6][24];

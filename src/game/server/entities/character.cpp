@@ -701,14 +701,10 @@ void CCharacter::Die(int Killer, int Weapon)
 	// change to safe zone
 	const int ClientID = m_pPlayer->GetCID();
 	const int SafezoneWorldID = GS()->GetRespawnWorld();
-	if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot())
-	{
-		GS()->CreateDeath(m_Pos, ClientID);
-		CGS::InteractiveSub[ClientID].m_ActiveSafeSpawn = true;
-		GS()->Server()->ChangeWorld(ClientID, SafezoneWorldID);
-		return;
-	}
+	if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot() && GS()->m_apPlayers[Killer] && GS()->m_apPlayers[Killer]->IsBot())
+		m_pPlayer->Acc().TempActiveSafeSpawn = true;
 	
+	// respawn
 	m_pPlayer->m_PlayerTick[TickState::Die] = Server()->Tick()/2;
 	m_pPlayer->m_Spawned = true;
 	GS()->m_World.RemoveEntity(this);
@@ -1071,9 +1067,9 @@ void CCharacter::HandleAuthedPlayer()
 			int CheckHouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
 			if (CheckHouseID <= 0)
 			{
+				m_pPlayer->Acc().TempTeleportX = -1;
+				m_pPlayer->Acc().TempTeleportY = -1;
 				GS()->Chat(m_pPlayer->GetCID(), "This chapter is still closed, you magically transported back!");
-				m_pPlayer->Acc().TeleportX = -1;
-				m_pPlayer->Acc().TeleportY = -1;
 				GS()->Server()->ChangeWorld(m_pPlayer->GetCID(), NEWBIE_ZERO_WORLD);
 				return;
 			}

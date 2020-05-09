@@ -170,8 +170,8 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		if (!GS()->IsClientEqualWorldID(ClientID, WorldID))
 		{
 			vec2 Position = GetPositionHouse(GuildID);
-			pPlayer->Acc().TeleportX = Position.x;
-			pPlayer->Acc().TeleportY = Position.y;
+			pPlayer->Acc().TempTeleportX = Position.x;
+			pPlayer->Acc().TempTeleportY = Position.y;
 			GS()->Server()->ChangeWorld(ClientID, WorldID);
 			return true;
 		}

@@ -139,8 +139,8 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 		if (!GS()->IsDungeon())
 			pPlayer->Acc().LastWorldID = GS()->GetWorldID();
 
-		pPlayer->Acc().TeleportX = pPlayer->GetCharacter()->m_Core.m_Pos.x;
-		pPlayer->Acc().TeleportY = pPlayer->GetCharacter()->m_Core.m_Pos.y;
+		pPlayer->Acc().TempTeleportX = pPlayer->GetCharacter()->m_Core.m_Pos.x;
+		pPlayer->Acc().TempTeleportY = pPlayer->GetCharacter()->m_Core.m_Pos.y;
 		GS()->Server()->ChangeWorld(ClientID, Dungeon[VoteID].WorldID);
 		return true;
 	}

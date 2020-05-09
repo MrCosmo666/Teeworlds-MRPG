@@ -36,9 +36,24 @@ void WorldSwapJob::OnInit()
 		pPositionLogic.Position = vec2(swapw.second.PositionX, swapw.second.PositionY);
 		WorldPositionLogic.push_back(pPositionLogic);
 	}
-	UpdateWorldsList();
 	Job()->ShowLoadingProgress("Worlds Swap", WorldSwap.size());
 	Job()->ShowLoadingProgress("Worlds Swap Logic", WorldPositionLogic.size());
+}
+
+void WorldSwapJob::OnInitWorld(const char* pWhereLocalWorld)
+{
+	const int WorldID = GS()->GetWorldID();
+	CSqlString<32> world_name = CSqlString<32>(GS()->Server()->GetWorldName(WorldID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("RespawnWorld", "ENUM_WORLDS", pWhereLocalWorld));
+	if(RES->next())
+	{
+		const int RespawnWorld = (int)RES->getInt("RespawnWorld");
+		SJK.UD("ENUM_WORLDS", "Name = '%s' WHERE WorldID = '%d'", world_name.cstr(), WorldID);
+		dbg_msg("test", "for world %d respawn world %d", WorldID, RespawnWorld);
+		GS()->SetRespawnWorld(RespawnWorld);
+		return;
+	}
+	SJK.ID("ENUM_WORLDS", "(WorldID, Name) VALUES ('%d', '%s')", WorldID, world_name.cstr());
 }
 
 bool WorldSwapJob::OnHandleTile(CCharacter *pChr, int IndexCollision)
@@ -109,14 +124,14 @@ bool WorldSwapJob::ChangeWorld(CPlayer *pPlayer, vec2 Pos)
 
 		if (WorldSwap[WID].WorldID == GS()->GetWorldID())
 		{
-			pPlayer->Acc().TeleportX = WorldSwap[WID].TwoPositionX;
-			pPlayer->Acc().TeleportY = WorldSwap[WID].TwoPositionY;
+			pPlayer->Acc().TempTeleportX = WorldSwap[WID].TwoPositionX;
+			pPlayer->Acc().TempTeleportY = WorldSwap[WID].TwoPositionY;
 			GS()->Server()->ChangeWorld(ClientID, WorldSwap[WID].TwoWorldID);
 			return true;
 		}
 
-		pPlayer->Acc().TeleportX = WorldSwap[WID].PositionX;
-		pPlayer->Acc().TeleportY = WorldSwap[WID].PositionY;
+		pPlayer->Acc().TempTeleportX = WorldSwap[WID].PositionX;
+		pPlayer->Acc().TempTeleportY = WorldSwap[WID].PositionY;
 		GS()->Server()->ChangeWorld(ClientID, WorldSwap[WID].WorldID);
 		return true;
 	}
@@ -150,23 +165,4 @@ int WorldSwapJob::GetWorldType() const
 	if(GS()->DungeonID())
 		return WORLD_DUNGEON;
 	return WORLD_STANDARD;
-}
-
-void WorldSwapJob::UpdateWorldsList()
-{
-	for (int i = 0; i < COUNT_WORLD; i++)
-	{
-		CSqlString<32> world_name = CSqlString<32>(GS()->Server()->GetWorldName(i));
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "ENUM_WORLDS", "WHERE WorldID = '%d'", i));
-		if(!RES->next())
-		{
-			SJK.ID("ENUM_WORLDS", "(WorldID, Name) VALUES ('%d', '%s')", i, world_name.cstr());
-		}
-		else 
-		{
-			const int RespawnWorld = (int)RES->getInt("RespawnWorld");
-			SJK.UD("ENUM_WORLDS", "Name = '%s' WHERE WorldID = '%d'", world_name.cstr(), i);
-			GS()->SetRespawnWorld(RespawnWorld);
-		}
-	}
 }

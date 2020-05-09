@@ -7,6 +7,7 @@
 #include <base/vmath.h>
 #include <game/commands.h>
 
+#include <game/server/enum_context.h>
 #include <generated/protocol.h>
 
 /*
@@ -35,8 +36,8 @@ class IGameController
 		int m_FriendlyTeam;
 		float m_Score;
 	};
-	vec2 m_aaSpawnPoints[3][64];
-	int m_aNumSpawnPoints[3];
+	vec2 m_aaSpawnPoints[SpawnTypes::SPAWN_NUM][64];
+	int m_aNumSpawnPoints[SpawnTypes::SPAWN_NUM];
 	
 	float EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos) const;
 	void EvaluateSpawnType(CSpawnEval *pEval, int Type, vec2 BotPos) const;

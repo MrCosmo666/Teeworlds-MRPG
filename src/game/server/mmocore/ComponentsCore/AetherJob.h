@@ -14,8 +14,7 @@ class AetherJob : public MmoComponent
 		int WorldID;
 		char TeleName[64];
 	};
-	typedef std::map < int , StructTeleport > Telep;
-	static Telep Teleport;
+	static std::map < int, StructTeleport > Teleport;
 
 public:
 	virtual void OnInit();

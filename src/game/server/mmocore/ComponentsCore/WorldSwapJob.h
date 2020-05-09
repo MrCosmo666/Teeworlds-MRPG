@@ -28,6 +28,7 @@ class WorldSwapJob : public MmoComponent
 	static std::list < StructPositionLogic > WorldPositionLogic;
 public:
 	virtual void OnInit();
+	virtual void OnInitWorld(const char* pWhereLocalWorld);
 	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
 
 	vec2 GetPositionQuestBot(int ClientID, int QuestID);
@@ -37,7 +38,6 @@ public:
 
 private:
 	bool ChangeWorld(CPlayer *pPlayer, vec2 Pos);
-	void UpdateWorldsList();
 	int GetID(vec2 Pos);
 };
 

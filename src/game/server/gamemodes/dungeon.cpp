@@ -53,7 +53,7 @@ void CGameControllerDungeon::ChangeState(int State)
 			if (!GS()->m_apPlayers[i] || GS()->Server()->GetWorldID(i) != m_WorldID)
 				continue;
 
-			GS()->m_apPlayers[i]->Acc().TimeDungeon = 0;
+			GS()->m_apPlayers[i]->Acc().TempTimeDungeon = 0;
 		}
 		DungeonJob::Dungeon[m_DungeonID].Progress = 0;
 		m_MaximumTick = 0;
@@ -99,9 +99,9 @@ void CGameControllerDungeon::ChangeState(int State)
 			if (!GS()->m_apPlayers[i] || GS()->Server()->GetWorldID(i) != m_WorldID)
 				continue;
 
-			int Seconds = GS()->m_apPlayers[i]->Acc().TimeDungeon / Server()->TickSpeed();
+			int Seconds = GS()->m_apPlayers[i]->Acc().TempTimeDungeon / Server()->TickSpeed();
 			GS()->Mmo()->Dungeon()->SaveDungeonRecord(GS()->m_apPlayers[i], m_DungeonID, Seconds);
-			GS()->m_apPlayers[i]->Acc().TimeDungeon = 0;
+			GS()->m_apPlayers[i]->Acc().TempTimeDungeon = 0;
 
 			char aTimeFormat[64];
 			str_format(aTimeFormat, sizeof(aTimeFormat), "Time: %d minute(s) %d second(s)", Seconds / 60, Seconds - (Seconds / 60 * 60));
@@ -174,7 +174,7 @@ void CGameControllerDungeon::StateTick()
 			if (!GS()->m_apPlayers[i] || GS()->Server()->GetWorldID(i) != m_WorldID)
 				continue;
 
-			GS()->m_apPlayers[i]->Acc().TimeDungeon++;
+			GS()->m_apPlayers[i]->Acc().TempTimeDungeon++;
 		}
 
 		// тик безопасности в течении какого времени игрок не вернется в старый мир

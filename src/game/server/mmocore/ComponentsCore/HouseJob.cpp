@@ -617,12 +617,11 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		vec2 Position = GetPositionHouse(HouseID);
 		if(!GS()->IsClientEqualWorldID(ClientID, HouseWorldID))
 		{
-			pPlayer->Acc().TeleportX = Position.x;
-			pPlayer->Acc().TeleportY = Position.y;
+			pPlayer->Acc().TempTeleportX = Position.x;
+			pPlayer->Acc().TempTeleportY = Position.y;
 			GS()->Server()->ChangeWorld(ClientID, HouseWorldID);
 			return true;
 		}
-
 		pPlayer->GetCharacter()->ChangePosition(Position);
 		return true;
 	}
