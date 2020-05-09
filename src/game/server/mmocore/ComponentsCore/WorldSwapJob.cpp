@@ -158,12 +158,15 @@ void WorldSwapJob::UpdateWorldsList()
 	{
 		CSqlString<32> world_name = CSqlString<32>(GS()->Server()->GetWorldName(i));
 		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "ENUM_WORLDS", "WHERE WorldID = '%d'", i));
-		if (!RES->next()) { SJK.ID("ENUM_WORLDS", "(WorldID, Name) VALUES ('%d', '%s')", i, world_name.cstr()); }
+		if(!RES->next())
+		{
+			SJK.ID("ENUM_WORLDS", "(WorldID, Name) VALUES ('%d', '%s')", i, world_name.cstr());
+		}
 		else 
-		{ 
-			int RespawnWorld = (int)RES->getInt("RespawnWorld");
+		{
+			const int RespawnWorld = (int)RES->getInt("RespawnWorld");
+			SJK.UD("ENUM_WORLDS", "Name = '%s' WHERE WorldID = '%d'", world_name.cstr(), i);
 			GS()->SetRespawnWorld(RespawnWorld);
-			SJK.UD("ENUM_WORLDS", "Name = '%s' WHERE WorldID = '%d'", world_name.cstr(), i); 
 		}
 	}
 }

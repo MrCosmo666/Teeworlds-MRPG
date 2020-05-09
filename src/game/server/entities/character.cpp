@@ -700,7 +700,7 @@ void CCharacter::Die(int Killer, int Weapon)
 
 	// change to safe zone
 	const int ClientID = m_pPlayer->GetCID();
-	const int SafezoneWorldID = GS()->GetSafeZoneWorldID();
+	const int SafezoneWorldID = GS()->GetRespawnWorld();
 	if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot())
 	{
 		GS()->CreateDeath(m_Pos, ClientID);
