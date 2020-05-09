@@ -11,14 +11,12 @@ CNurseHealthNPC::CNurseHealthNPC(CGameWorld* pGameWorld, int ClientID, vec2 Pos)
 	: CEntity(pGameWorld, CGameWorld::ENTTYPE_EVENTS, Pos)
 {
 	m_OwnerID = ClientID;
-	m_LifeTime = Server()->TickSpeed() * 2;
 	GameWorld()->InsertEntity(this);
 }
 
 void CNurseHealthNPC::Tick()
 {
-	m_LifeTime--;
-	if(!m_LifeTime || !GS()->m_apPlayers[m_OwnerID] || !GS()->m_apPlayers[m_OwnerID]->GetCharacter())
+	if(!GS()->m_apPlayers[m_OwnerID] || !GS()->m_apPlayers[m_OwnerID]->GetCharacter())
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;
@@ -37,10 +35,10 @@ void CNurseHealthNPC::Tick()
 			if(!p || p->GetPlayer()->IsBot() || distance(p->m_Core.m_Pos, m_Pos) > 240.0f)
 				continue;
 
-			// показать восстановление
-			int Health = clamp(p->GetPlayer()->GetStartHealth() / 20, 1, p->GetPlayer()->GetStartHealth());
+			const int Health = clamp(p->GetPlayer()->GetStartHealth() / 20, 1, p->GetPlayer()->GetStartHealth());
 			std::string Text = std::to_string(Health) + "HP";
-			GS()->CreateText(NULL, false, m_Pos, vec2(0, 0), 40, Text.c_str(), GS()->GetWorldID());
+			vec2 DrawPosition = vec2(p->m_Core.m_Pos.x, p->m_Core.m_Pos.y - 90.0f);
+			GS()->CreateText(NULL, false, DrawPosition, vec2(0, 0), 40, Text.c_str(), GS()->GetWorldID());
 
 			// уровень и здоровье для пополнение
 			new CHearth(&GS()->m_World, m_Pos, p->GetPlayer(), Health, p->m_Core.m_Vel);

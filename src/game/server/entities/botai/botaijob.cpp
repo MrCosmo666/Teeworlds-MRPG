@@ -65,7 +65,9 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 	{
 		const int Function = BotJob::NpcBot[SubBotID].Function;
 		if(Function == FunctionsNPC::FUNCTION_NPC_NURSE)
+		{
 			new CNurseHealthNPC(&GS()->m_World, GetPlayer()->GetCID(), m_Core.m_Pos);
+		}
 	}
 	return true;
 }
@@ -276,10 +278,10 @@ void BotAI::EngineNPC()
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer *pFind = GS()->GetPlayer(i, true, true);
-		if (pFind && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f &&
+		if (pFind && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < ViewDistanceNPC() &&
 			!GS()->Collision()->IntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0))
 		{
-			if(!(BotJob::NpcBot[SubBotID].m_Talk).empty())
+			if(!(BotJob::NpcBot[SubBotID].m_Talk).empty() && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f)
 				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Start dialog with NPC [attack hammer]");
 
 			m_Input.m_TargetX = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
@@ -619,4 +621,16 @@ vec2 BotAI::GetHookPos(vec2 Position)
 		return HookPos;
 	}
 	return HookPos;
+}
+
+float BotAI::ViewDistanceNPC() const
+{
+	if(GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_NPC)
+	{
+		int SubBotID = GetPlayer()->GetBotSub();
+		const int Function = BotJob::NpcBot[SubBotID].Function;
+		if(Function == FunctionsNPC::FUNCTION_NPC_NURSE)
+			return 256.0f;
+	}
+	return 128.0f;
 }

@@ -5,7 +5,6 @@
 
 class CNurseHealthNPC : public CEntity
 {
-	int m_LifeTime;
 	int m_OwnerID;
 
 public:
