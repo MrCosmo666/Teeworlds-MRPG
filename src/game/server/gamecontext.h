@@ -40,7 +40,7 @@ class CGS : public IGameServer
 		VAR AND OBJECT GAMECONTEX DATA 
 	######################################################################### */
 	int m_WorldID;
-	int m_SafeZoneWorldID;
+	int m_RespawnWorld;
 	class MmoController *pMmoController;
 
 	IServer *m_pServer;
@@ -322,8 +322,8 @@ public:
 	bool IsAllowedPVP() const { return m_AllowedPVP; }
 	const char* AtributeName(int BonusID) const;
 
-	void SetSafeZoneWorldID(int WorldID) { m_SafeZoneWorldID = WorldID; }
-	bool GetSafeZoneWorldID() { return m_SafeZoneWorldID; }
+	void SetRespawnWorld(int WorldID) { m_RespawnWorld = WorldID; }
+	bool GetRespawnWorld() { return m_RespawnWorld; }
 
 private:
 	void UpdateZoneDungeon();

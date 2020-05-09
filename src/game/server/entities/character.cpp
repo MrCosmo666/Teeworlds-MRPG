@@ -685,7 +685,6 @@ bool CCharacter::IncreaseArmor(int Amount)
 
 void CCharacter::Die(int Killer, int Weapon)
 {
-
 	m_Alive = false;
 	m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed() / 2;
 	if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
@@ -700,8 +699,8 @@ void CCharacter::Die(int Killer, int Weapon)
 	m_pPlayer->ClearTalking();
 
 	// change to safe zone
-	int ClientID = m_pPlayer->GetCID();
-	int SafezoneWorldID = GS()->GetSafeZoneWorldID();
+	const int ClientID = m_pPlayer->GetCID();
+	const int SafezoneWorldID = GS()->GetSafeZoneWorldID();
 	if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot())
 	{
 		GS()->CreateDeath(m_Pos, ClientID);

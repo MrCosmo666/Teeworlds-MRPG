@@ -161,8 +161,8 @@ void WorldSwapJob::UpdateWorldsList()
 		if (!RES->next()) { SJK.ID("ENUM_WORLDS", "(WorldID, Name) VALUES ('%d', '%s')", i, world_name.cstr()); }
 		else 
 		{ 
-			int SafeZoneID = (int)RES->getInt("SafeZoneWorldID");
-			GS()->SetSafeZoneWorldID(SafeZoneID);
+			int RespawnWorld = (int)RES->getInt("RespawnWorld");
+			GS()->SetRespawnWorld(RespawnWorld);
 			SJK.UD("ENUM_WORLDS", "Name = '%s' WHERE WorldID = '%d'", world_name.cstr(), i); 
 		}
 	}
