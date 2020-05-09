@@ -108,7 +108,7 @@ public:
 	const char *GetGameType() const { return m_pGameType; }
 	
 	//spawn
-	bool CanSpawn(int Team, vec2 *pPos, vec2 BotPos) const;
+	bool CanSpawn(int SpawnType, vec2 *pPos, vec2 BotPos) const;
 
 	// team
 	void DoTeamChange(class CPlayer *pPlayer, bool DoChatMsg=true);

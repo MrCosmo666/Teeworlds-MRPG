@@ -273,7 +273,7 @@ void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 
 		int CountMobs = RES->getInt("Count");
 		for(int c = 0; c < CountMobs; c++)
-			GS()->CreateBot(SpawnBot::SPAWN_NPC, NpcBot[MobID].BotID, MobID);
+			GS()->CreateBot(BotsTypes::TYPE_BOT_NPC, NpcBot[MobID].BotID, MobID);
 
 		// загрузить разговоры NPC
 		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_other_npc", "WHERE MobID = '%d'", MobID));
@@ -325,6 +325,6 @@ void BotJob::LoadMobsBots(const char* pWhereLocalWorld)
 
 		int CountMobs = RES->getInt("Count");
 		for(int c = 0; c < CountMobs; c++)
-			GS()->CreateBot(SpawnBot::SPAWN_MOBS, BotID, MobID);
+			GS()->CreateBot(BotsTypes::TYPE_BOT_MOB, BotID, MobID);
 	}
 }

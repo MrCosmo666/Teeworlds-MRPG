@@ -547,7 +547,7 @@ void CCharacter::Tick()
 
 	// - - - - - - - - - - - -
 	// запретить дальше НПС и Квестовым
-	if (m_pPlayer->IsBot() && m_pPlayer->GetSpawnBot() != SpawnBot::SPAWN_MOBS)
+	if (m_pPlayer->IsBot() && m_pPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB)
 		return;
 
 	HandleWeapons();
@@ -685,26 +685,36 @@ bool CCharacter::IncreaseArmor(int Amount)
 
 void CCharacter::Die(int Killer, int Weapon)
 {
-	// we got to wait 0.5 secs before respawning
+
 	m_Alive = false;
-	if(m_pPlayer->GetSpawnBot() == SpawnBot::SPAWN_MOBS)
+	m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed() / 2;
+	if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
 		int SubBotID = m_pPlayer->GetBotSub();
 		m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick()+BotJob::MobBot[SubBotID].RespawnTick*Server()->TickSpeed();
 	}
-	else m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick()+Server()->TickSpeed()/2;
 
 	// a nice sound
 	GS()->m_pController->OnCharacterDeath(this, GS()->m_apPlayers[Killer], Weapon);
 	GS()->CreateSound(m_Pos, SOUND_PLAYER_DIE);
-
-	// this is for auto respawn after 3 secs
 	m_pPlayer->ClearTalking();
+
+	// change to safe zone
+	int ClientID = m_pPlayer->GetCID();
+	int SafezoneWorldID = GS()->GetSafeZoneWorldID();
+	if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot())
+	{
+		GS()->CreateDeath(m_Pos, ClientID);
+		CGS::InteractiveSub[ClientID].m_ActiveSafeSpawn = true;
+		GS()->Server()->ChangeWorld(ClientID, SafezoneWorldID);
+		return;
+	}
+	
 	m_pPlayer->m_PlayerTick[TickState::Die] = Server()->Tick()/2;
 	m_pPlayer->m_Spawned = true;
 	GS()->m_World.RemoveEntity(this);
-	GS()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCID()] = 0;
-	GS()->CreateDeath(m_Pos, m_pPlayer->GetCID());
+	GS()->m_World.m_Core.m_apCharacters[ClientID] = 0;
+	GS()->CreateDeath(m_Pos, ClientID);
 }
 
 bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
@@ -1134,11 +1144,11 @@ bool CCharacter::TalkInteractiveHammer(CPlayer *pTarget)
 		return false;
 
 	CPlayerBot* pTargetBot = static_cast<CPlayerBot*>(pTarget);
-	if (pTargetBot->GetSpawnBot() == SPAWN_NPC)
+	if (pTargetBot->GetBotType() == TYPE_BOT_NPC)
 		return true;
 
 	int MobID = pTargetBot->GetBotSub();
-	if (pTargetBot->GetSpawnBot() != SPAWN_QUEST_NPC || GS()->Mmo()->Quest()->GetState(m_pPlayer->GetCID(), BotJob::QuestBot[MobID].QuestID) != QUEST_ACCEPT)
+	if (pTargetBot->GetBotType() != TYPE_BOT_QUEST || GS()->Mmo()->Quest()->GetState(m_pPlayer->GetCID(), BotJob::QuestBot[MobID].QuestID) != QUEST_ACCEPT)
 		return false;
 
 	int ClientID = m_pPlayer->GetCID();

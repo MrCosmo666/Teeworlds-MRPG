@@ -270,11 +270,19 @@ enum BroadcastPriority
 	BROADCAST_MAIN_INFORMATION,
 };
 
-enum SpawnBot
+enum SpawnTypes
 {
-	SPAWN_MOBS = 1,
-	SPAWN_QUEST_NPC = 2,
-	SPAWN_NPC = 3,
+	SPAWN_HUMAN = 0,
+	SPAWN_BOT = 1,
+	SPAWN_HUMAN_SAFE = 2,
+	SPAWN_NUM
+};
+
+enum BotsTypes
+{
+	TYPE_BOT_MOB = 1,
+	TYPE_BOT_QUEST = 2,
+	TYPE_BOT_NPC = 3,
 };
 
 enum PlayerClasses

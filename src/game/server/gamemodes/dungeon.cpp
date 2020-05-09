@@ -213,7 +213,7 @@ void CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKil
 
 	int KillerID = pKiller->GetCID();
 	int VictimID = pVictim->GetPlayer()->GetCID();
-	if (KillerID != VictimID && pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_MOBS)
+	if (KillerID != VictimID && pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
 		int Progress = 100 - (int)kurosio::translate_to_procent(CountMobs(), LeftMobsToWin());
 		DungeonJob::Dungeon[m_DungeonID].Progress = Progress;
@@ -257,7 +257,7 @@ int CGameControllerDungeon::CountMobs() const
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetSpawnBot() == SpawnBot::SPAWN_MOBS && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
+		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
 			countMobs++;
 	}
 	return countMobs;
@@ -280,7 +280,7 @@ int CGameControllerDungeon::LeftMobsToWin() const
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetSpawnBot() == SpawnBot::SPAWN_MOBS && BotPlayer->GetCharacter() && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
+		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && BotPlayer->GetCharacter() && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
 			leftMobs++;
 	}
 	return leftMobs;
@@ -291,7 +291,7 @@ void CGameControllerDungeon::SetMobsSpawn(bool AllowedSpawn)
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetSpawnBot() == SpawnBot::SPAWN_MOBS && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
+		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
 		{
 			BotPlayer->SetDungeonAllowedSpawn(AllowedSpawn);
 			if (!AllowedSpawn && BotPlayer->GetCharacter())

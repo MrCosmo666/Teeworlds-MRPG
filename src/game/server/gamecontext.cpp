@@ -918,9 +918,9 @@ int CGS::CheckPlayerMessageWorldID(int ClientID)
 	{
 		CPlayerBot* pPlayer = static_cast<CPlayerBot *>(m_apPlayers[ClientID]);
 		int SubBotID = pPlayer->GetBotSub();
-		if(pPlayer->GetSpawnBot() == SpawnBot::SPAWN_MOBS) 
+		if(pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB) 
 			return BotJob::MobBot[SubBotID].WorldID;
-		else if(pPlayer->GetSpawnBot() == SpawnBot::SPAWN_NPC) 
+		else if(pPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC) 
 			return BotJob::NpcBot[SubBotID].WorldID;
 		else 
 			return BotJob::QuestBot[SubBotID].WorldID;
@@ -965,6 +965,7 @@ void CGS::OnInit(int WorldID)
 	m_Events.SetGameServer(this);
 	m_CommandManager.Init(m_pConsole, this, NewCommandHook, RemoveCommandHook);
 	m_WorldID = WorldID;
+	m_SafeZoneWorldID = -1;
 
 	for(int i = 0; i < NUM_NETOBJTYPES; i++)
 		Server()->SnapSetStaticsize(i, m_NetObjHandler.GetObjSize(i));
@@ -2167,7 +2168,7 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 /* #########################################################################
 	MMO GAMECONTEXT 
 ######################################################################### */
-void CGS::CreateBot(short SpawnPoint, int BotID, int SubID)
+void CGS::CreateBot(short BotType, int BotID, int SubID)
 {
 	int BotClientID = MAX_PLAYERS;
 	while(BotClientID < MAX_CLIENTS && m_apPlayers[BotClientID])
@@ -2177,7 +2178,7 @@ void CGS::CreateBot(short SpawnPoint, int BotID, int SubID)
 		return;
 
 	int savecidmem = BotClientID+m_WorldID*MAX_CLIENTS;
-	m_apPlayers[BotClientID] = new(savecidmem) CPlayerBot(this, BotClientID, BotID, SubID, SpawnPoint);
+	m_apPlayers[BotClientID] = new(savecidmem) CPlayerBot(this, BotClientID, BotID, SubID, BotType);
 	Server()->InitClientBot(BotClientID);
 }
 
@@ -2200,7 +2201,7 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 	int QuestBotClientID = -1;
 	for(int i = MAX_PLAYERS ; i < MAX_CLIENTS; i++)
 	{
-		if(!m_apPlayers[i] || m_apPlayers[i]->GetSpawnBot() != SpawnBot::SPAWN_QUEST_NPC || m_apPlayers[i]->GetBotSub() != FindBot->SubBotID) 
+		if(!m_apPlayers[i] || m_apPlayers[i]->GetBotType() != BotsTypes::TYPE_BOT_QUEST || m_apPlayers[i]->GetBotSub() != FindBot->SubBotID) 
 			continue;
 		
 		QuestBotClientID = i;
@@ -2209,7 +2210,7 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 	// ищем есть ли активный бот у всех игроков
 	bool ActiveBot = Mmo()->Quest()->IsActiveQuestBot(QuestID, Step);
 	if(ActiveBot && QuestBotClientID <= -1)
-		CreateBot(SpawnBot::SPAWN_QUEST_NPC, FindBot->BotID, FindBot->SubBotID);
+		CreateBot(BotsTypes::TYPE_BOT_QUEST, FindBot->BotID, FindBot->SubBotID);
 
 	// если бот не активен не у одного игрока, но игрок найден удаляем
 	if (!ActiveBot && QuestBotClientID >= MAX_PLAYERS)
@@ -2375,7 +2376,7 @@ void CGS::UpdateZonePVP()
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetSpawnBot() == SpawnBot::SPAWN_MOBS && CheckPlayerMessageWorldID(i) == m_WorldID)
+		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && CheckPlayerMessageWorldID(i) == m_WorldID)
 			CountMobs++;
 	}
 	m_AllowedPVP = (bool)(CountMobs >= 5);

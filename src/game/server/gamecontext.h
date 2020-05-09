@@ -40,6 +40,7 @@ class CGS : public IGameServer
 		VAR AND OBJECT GAMECONTEX DATA 
 	######################################################################### */
 	int m_WorldID;
+	int m_SafeZoneWorldID;
 	class MmoController *pMmoController;
 
 	IServer *m_pServer;
@@ -103,8 +104,14 @@ public:
 		// остальное все
 		ShopJob::AuctionItem AuctionItem;
 
-		char RankName[32];
-		char GuildName[32];
+		// temp rankname for guild rank settings
+		char m_aRankGuildBuf[32];
+
+		// temp guild name for searching
+		char m_aGuildSearchBuf[32];
+
+		// temp for safe spawn
+		bool m_ActiveSafeSpawn;
 	};
 	static std::map < int, StructInteractiveSub > InteractiveSub;
 
@@ -291,7 +298,7 @@ public:
 	/* #########################################################################
 		MMO GAMECONTEXT 
 	######################################################################### */
-	void CreateBot(short SpawnPoint, int BotID, int SubID);
+	void CreateBot(short BotType, int BotID, int SubID);
 	void CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, int WorldID);
 	void CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop = 1, vec2 Force = vec2(0.0f, 0.0f));
 	void CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant = 0, vec2 Force = vec2(0.0f, 0.0f));
@@ -314,6 +321,9 @@ public:
 	bool IsClientEqualWorldID(int ClientID, int WorldID = -1) const;
 	bool IsAllowedPVP() const { return m_AllowedPVP; }
 	const char* AtributeName(int BonusID) const;
+
+	void SetSafeZoneWorldID(int WorldID) { m_SafeZoneWorldID = WorldID; }
+	bool GetSafeZoneWorldID() { return m_SafeZoneWorldID; }
 
 private:
 	void UpdateZoneDungeon();

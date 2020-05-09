@@ -259,7 +259,16 @@ CCharacter *CPlayer::GetCharacter()
 void CPlayer::TryRespawn()
 {
 	vec2 SpawnPos;
-	if(!GS()->m_pController->CanSpawn(TEAM_RED, &SpawnPos, vec2(-1, -1)))
+
+	// safe zones
+	int SpawnType = SPAWN_HUMAN;
+	if(CGS::InteractiveSub[m_ClientID].m_ActiveSafeSpawn)
+	{
+		SpawnType = SPAWN_HUMAN_SAFE;
+		CGS::InteractiveSub[m_ClientID].m_ActiveSafeSpawn = false;
+	}
+
+	if(!GS()->m_pController->CanSpawn(SpawnType, &SpawnPos, vec2(-1, -1)))
 		return;
 
 	const int CheckHouseSpawn = GS()->Mmo()->House()->PlayerHouseID(this);
@@ -684,11 +693,7 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 		if(VoteID < TAB_STAT)
 			return true;
 
-		for(auto& x : m_HidenMenu) 
-		{
-			if((x.first > NUM_TAB_MENU && x.first != VoteID))
-				x.second = false; 
-		}
+		m_HidenMenu.clear();
 
 		m_HidenMenu[VoteID] ^= true;
 		if(m_HidenMenu[VoteID] == false)
@@ -777,7 +782,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 	GS()->Mmo()->Quest()->QuestTableClear(m_ClientID);
 	CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[TalkedID]);
 	int MobID = BotPlayer->GetBotSub();
-	if (BotPlayer->GetSpawnBot() == SpawnBot::SPAWN_NPC)
+	if (BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
 		int sizeTalking = BotJob::NpcBot[MobID].m_Talk.size();
 		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
@@ -815,7 +820,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
 	}
 
-	else if (BotPlayer->GetSpawnBot() == SpawnBot::SPAWN_QUEST_NPC)
+	else if (BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 	{
 		int sizeTalking = BotJob::QuestBot[MobID].m_Talk.size();
 		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)

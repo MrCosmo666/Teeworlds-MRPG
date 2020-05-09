@@ -28,7 +28,7 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 		return false;
 	
 	// Запрещаем дамаг и хоок для человека
-	if(GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_NPC)
+	if(GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
 		m_NoAllowDamage = true;
 		m_Core.m_ProtectHooked = true;
@@ -40,7 +40,7 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 
 	// информация о зарождении жирного моба
 	int SubBotID = GetPlayer()->GetBotSub();
-	if(GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_MOBS && BotJob::MobBot[SubBotID].Boss)
+	if(GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_MOB && BotJob::MobBot[SubBotID].Boss)
 	{
 		for(int i = 0; i < 3; i++)
 		{
@@ -52,7 +52,7 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 			GS()->ChatWorldID(BotJob::MobBot[SubBotID].WorldID, "", "In your zone emerging {STR}!", BotJob::MobBot[SubBotID].GetName());
 		}
 	}
-	else if(GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_QUEST_NPC)
+	else if(GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 	{
 		m_Core.m_LostData = true;
 
@@ -92,7 +92,7 @@ bool BotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 	if (From < 0 || From > MAX_CLIENTS || !GS()->m_apPlayers[From])
 		return false;
 
-	if(GetPlayer()->GetSpawnBot() != SpawnBot::SPAWN_MOBS || GS()->m_apPlayers[From]->IsBot())
+	if(GetPlayer()->GetBotType() != BotsTypes::TYPE_BOT_MOB || GS()->m_apPlayers[From]->IsBot())
 		return false;
 
 	// до урона и после урона здоровье
@@ -130,7 +130,7 @@ bool BotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 
 void BotAI::Die(int Killer, int Weapon)
 {
-	if(GetPlayer()->GetSpawnBot() != SpawnBot::SPAWN_MOBS)
+	if(GetPlayer()->GetBotType() != BotsTypes::TYPE_BOT_MOB)
 		return;
 
 	m_ListDmgPlayers.clear();
@@ -154,7 +154,7 @@ void BotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 	int BotID = GetPlayer()->GetBotID();
 	int SubID = GetPlayer()->GetBotSub();
 
-	if (GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_MOBS)
+	if (GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 		GS()->Mmo()->Quest()->AddMobProgress(pPlayer, BotID);
 
 	for (int i = 0; i < 6; i++)
@@ -220,11 +220,11 @@ void BotAI::EngineBots()
 	m_Input.m_Jump = 0;
 
 	// рандом для дружественного моба
-	if(GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_NPC)
+	if(GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 		EngineNPC();
-	else if(GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_MOBS)
+	else if(GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 		EngineMobs();
-	else if(GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_QUEST_NPC)
+	else if(GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 		EngineQuestMob();
 		
 	// избежать стены

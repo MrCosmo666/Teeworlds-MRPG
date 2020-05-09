@@ -12,7 +12,7 @@ MACRO_ALLOC_POOL_ID_IMPL(CPlayerBot, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
 IServer* CPlayer::Server() const { return m_pGS->Server(); };
 
 CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint)
-: CPlayer(pGS, ClientID), m_SpawnPointBot(SpawnPoint), m_BotID(BotID), m_SubBotID(SubBotID), m_BotHealth(0)
+: CPlayer(pGS, ClientID), m_BotType(SpawnPoint), m_BotID(BotID), m_SubBotID(SubBotID), m_BotHealth(0)
 {
 	SendInformationBot();
 
@@ -51,7 +51,7 @@ void CPlayerBot::Tick()
 
 int CPlayerBot::GetStartHealth()
 {
-	if(m_SpawnPointBot == SpawnBot::SPAWN_MOBS)
+	if(m_BotType == BotsTypes::TYPE_BOT_MOB)
 		return GetAttributeCount(Stats::StHardness);
 	return 10;	
 }
@@ -61,7 +61,7 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 	if(CGS::AttributInfo.find(BonusID) == CGS::AttributInfo.end()) 
 		return 0;
 
-	if(m_SpawnPointBot == SpawnBot::SPAWN_MOBS)
+	if(m_BotType == BotsTypes::TYPE_BOT_MOB)
 	{
 		int Power = BotJob::MobBot[m_SubBotID].Power;
 		for (int i = 0; i < EQUIP_MAX_BOTS; i++)
@@ -87,24 +87,24 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 void CPlayerBot::TryRespawn()
 {
 	// разрешить спавн в данже только по запросу
-	if (GS()->DungeonID() > 0 && !m_DungeonAllowedSpawn && m_SpawnPointBot == SpawnBot::SPAWN_MOBS)
+	if (GS()->DungeonID() > 0 && !m_DungeonAllowedSpawn && m_BotType == BotsTypes::TYPE_BOT_MOB)
 		return;
 
 	vec2 SpawnPos;
-	const int SpawnType = m_SpawnPointBot;
+	const int SpawnType = m_BotType;
 	
 	// если бот обычный моб
-	if(SpawnType == SpawnBot::SPAWN_MOBS)
+	if(SpawnType == BotsTypes::TYPE_BOT_MOB)
 	{
 		if(GS()->GetWorldID() != BotJob::MobBot[m_SubBotID].WorldID)
 			return;
 
 		vec2 MobPos = vec2(BotJob::MobBot[m_SubBotID].PositionX, BotJob::MobBot[m_SubBotID].PositionY);
-		if(!GS()->m_pController->CanSpawn(m_SpawnPointBot, &SpawnPos, MobPos))
+		if(!GS()->m_pController->CanSpawn(m_BotType, &SpawnPos, MobPos))
 			return;
 	}
 	// если бот обычный NPC
-	else if(SpawnType == SpawnBot::SPAWN_NPC)
+	else if(SpawnType == BotsTypes::TYPE_BOT_NPC)
 	{
 		if(GS()->GetWorldID() != BotJob::NpcBot[m_SubBotID].WorldID)
 			return;
@@ -112,7 +112,7 @@ void CPlayerBot::TryRespawn()
 		SpawnPos = vec2(BotJob::NpcBot[m_SubBotID].PositionX, BotJob::NpcBot[m_SubBotID].PositionY);		
 	}
 	// если бот квестовый NPC
-	else if(SpawnType == SpawnBot::SPAWN_QUEST_NPC)
+	else if(SpawnType == BotsTypes::TYPE_BOT_QUEST)
 	{
 		if(GS()->GetWorldID() != BotJob::QuestBot[m_SubBotID].WorldID)
 			return;
@@ -126,11 +126,11 @@ void CPlayerBot::TryRespawn()
 	m_pCharacter->Spawn(this, SpawnPos);
 
 	// чтобы не было видно эффектов что НПС не видемый для одного игрока был видем другому
-	if(SpawnType != SpawnBot::SPAWN_QUEST_NPC) 
+	if(SpawnType != BotsTypes::TYPE_BOT_QUEST) 
 		GS()->CreatePlayerSpawn(SpawnPos);
 
 	// сбросить респавн в данжах если он был разрешен
-	if (SpawnType == SpawnBot::SPAWN_MOBS && GS()->DungeonID() > 0 && m_DungeonAllowedSpawn)
+	if (SpawnType == BotsTypes::TYPE_BOT_MOB && GS()->DungeonID() > 0 && m_DungeonAllowedSpawn)
 		m_DungeonAllowedSpawn = false;
 
 }
@@ -140,7 +140,7 @@ void CPlayerBot::TryRespawn()
 bool CPlayerBot::CheckQuestSnapPlayer(int SnappingClient, bool SnapData)
 {
 	CPlayer *pSnap = GS()->m_apPlayers[SnappingClient];
-	if(m_SpawnPointBot != SpawnBot::SPAWN_QUEST_NPC || !pSnap)
+	if(m_BotType != BotsTypes::TYPE_BOT_QUEST || !pSnap)
 		return SnapData;
 
 	// все переменные
@@ -174,7 +174,7 @@ void CPlayerBot::Snap(int SnappingClient)
 
 	pPlayerInfo->m_PlayerFlags = PLAYERFLAG_READY;
 	pPlayerInfo->m_Latency = 0;
-	pPlayerInfo->m_Score = (m_SpawnPointBot == SpawnBot::SPAWN_MOBS ? BotJob::MobBot[m_SubBotID].Level : 1);
+	pPlayerInfo->m_Score = (m_BotType == BotsTypes::TYPE_BOT_MOB ? BotJob::MobBot[m_SubBotID].Level : 1);
 
 	// --------------------- CUSTOM ----------------------
 	// ---------------------------------------------------
@@ -205,7 +205,7 @@ void CPlayerBot::Snap(int SnappingClient)
 
 int CPlayerBot::GetMoodState(int SnappingClient)
 {
-	if(GetSpawnBot() == SpawnBot::SPAWN_MOBS)
+	if(GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
 		BotAI *pChr = (BotAI *)m_pCharacter;
 		if(pChr && pChr->GetBotTarget() != m_ClientID)
@@ -218,16 +218,16 @@ int CPlayerBot::GetMoodState(int SnappingClient)
 		else 
 			return MOOD_ANGRY;
 	}
-	else if(GetSpawnBot() == SpawnBot::SPAWN_NPC)
+	else if(GetBotType() == BotsTypes::TYPE_BOT_NPC)
 		return MOOD_FRIENDLY;
-	else if(GetSpawnBot() == SpawnBot::SPAWN_QUEST_NPC)
+	else if(GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 		return MOOD_QUESTING;
 	return MOOD_NORMAL;
 }
 
 int CPlayerBot::GetBotLevel() const
 {
-	return (m_SpawnPointBot == SpawnBot::SPAWN_MOBS ? BotJob::MobBot[m_SubBotID].Level : 1);
+	return (m_BotType == BotsTypes::TYPE_BOT_MOB ? BotJob::MobBot[m_SubBotID].Level : 1);
 }
 
 bool CPlayerBot::GetActiveQuestsID(int SnapClientID)
@@ -236,11 +236,11 @@ bool CPlayerBot::GetActiveQuestsID(int SnapClientID)
 		return false;
 
 	// если квестовый бот
-	if (m_SpawnPointBot == SpawnBot::SPAWN_QUEST_NPC)
+	if (m_BotType == BotsTypes::TYPE_BOT_QUEST)
 		return true;
 
 	// если бот дает квест
-	if (m_SpawnPointBot == SpawnBot::SPAWN_NPC)
+	if (m_BotType == BotsTypes::TYPE_BOT_NPC)
 	{
 		for (const auto& talk : BotJob::NpcBot[m_SubBotID].m_Talk)
 		{
@@ -261,12 +261,12 @@ int CPlayerBot::GetItemEquip(int EquipID, int SkipItemID) const
 
 const char* CPlayerBot::GetStatusBot()
 {
-	if (m_SpawnPointBot == SpawnBot::SPAWN_QUEST_NPC)
+	if (m_BotType == BotsTypes::TYPE_BOT_QUEST)
 	{
 		int QuestID = BotJob::QuestBot[m_SubBotID].QuestID;
 		return GS()->Mmo()->Quest()->GetQuestName(QuestID);
 	}
-	else if (m_SpawnPointBot == SpawnBot::SPAWN_MOBS && BotJob::MobBot[m_SubBotID].Boss)
+	else if (m_BotType == BotsTypes::TYPE_BOT_MOB && BotJob::MobBot[m_SubBotID].Boss)
 	{
 		if (GS()->IsDungeon())
 			return "Boss";

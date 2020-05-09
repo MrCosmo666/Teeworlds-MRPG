@@ -194,14 +194,14 @@ void IGameController::UpdateGameInfo(int ClientID)
 }
 
 // spawn
-bool IGameController::CanSpawn(int Team, vec2 *pOutPos, vec2 BotPos) const
+bool IGameController::CanSpawn(int SpawnType, vec2 *pOutPos, vec2 BotPos) const
 {
 	// spectators can't spawn
-	if(Team == TEAM_SPECTATORS || GS()->m_World.m_ResetRequested)
+	if(SpawnType < SpawnTypes::SPAWN_HUMAN || SpawnType >= SpawnTypes::SPAWN_NUM || GS()->m_World.m_ResetRequested)
 		return false;
 
 	CSpawnEval Eval;
-	EvaluateSpawnType(&Eval, Team, BotPos);
+	EvaluateSpawnType(&Eval, SpawnType, BotPos);
 
 	*pOutPos = Eval.m_Pos;
 	return Eval.m_Got;

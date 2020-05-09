@@ -10,7 +10,7 @@ class CPlayerBot : public CPlayer
 	MACRO_ALLOC_POOL_ID()
 
 private:
-	int m_SpawnPointBot;
+	int m_BotType;
 	int m_BotID;
 	int m_SubBotID;
 	int m_BotHealth;
@@ -22,7 +22,7 @@ public:
 	virtual ~CPlayerBot() override;
 
 	int GetBotID()													override { return m_BotID; };
-	int GetSpawnBot()												override { return m_SpawnPointBot; };
+	int GetBotType()												override { return m_BotType; };
 	int GetBotSub()													override { return m_SubBotID; };
 	int GetHealth() 												override { return m_BotHealth; };
 	int GetTeam()													override { return TEAM_BLUE; };
