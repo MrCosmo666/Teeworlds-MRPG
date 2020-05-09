@@ -100,6 +100,11 @@ enum QuestState
 	QUEST_FINISHED,
 };
 
+enum FunctionsNPC
+{
+	FUNCTION_NPC_NURSE,
+};
+
 enum MenuList
 {
 	MAIN_MENU = 1,

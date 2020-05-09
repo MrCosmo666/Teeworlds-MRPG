@@ -48,6 +48,7 @@ class BotJob : public MmoComponent
 		int Emote;
 		int WorldID;
 		int BotID;
+		int Function;
 		std::vector < TalkingData > m_Talk;
 	};
 

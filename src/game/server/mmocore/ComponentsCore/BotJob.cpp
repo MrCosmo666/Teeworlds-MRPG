@@ -270,6 +270,7 @@ void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 		NpcBot[MobID].PositionY = (NpcBot[MobID].Static ? RES->getInt("PositionY") + 1 : RES->getInt("PositionY"));
 		NpcBot[MobID].Emote = RES->getInt("Emote");
 		NpcBot[MobID].BotID = RES->getInt("BotID");
+		NpcBot[MobID].Function = RES->getInt("Function");
 
 		int CountMobs = RES->getInt("Count");
 		for(int c = 0; c < CountMobs; c++)
