@@ -210,7 +210,7 @@ public:
 	void SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char *Message, int Style = -1, int TalkingEmote = -1);
 	void SendProgressBar(int ClientID, int Count, int Request, const char *Message);
 	void ClearTalkText(int ClientID);
-	int CheckPlayerMessageWorldID(int ClientID);
+	int CheckPlayerMessageWorldID(int ClientID) const;
 	int64 MaskWorldID();
 
 	/* #########################################################################
@@ -319,6 +319,7 @@ public:
 	bool IsAllowedPVP() const { return m_AllowedPVP; }
 	const char* AtributeName(int BonusID) const;
 
+	bool CheckPlayersDistance(vec2 Pos, float Distance) const;
 	void SetRespawnWorld(int WorldID) { m_RespawnWorld = WorldID; }
 	int GetRespawnWorld() const { return m_RespawnWorld; }
 

@@ -12,7 +12,6 @@
 #include <game/server/mmocore/GameEntities/questai.h>
 #include <game/server/mmocore/GameEntities/snapfull.h>
 #include <game/server/mmocore/GameEntities/jobitems.h>
-#include <game/server/mmocore/GameEntities/Events/event_health.h>
 
 //input count
 struct CInputCount
@@ -569,7 +568,7 @@ void CCharacter::Tick()
 
 void CCharacter::TickDefered()
 {
-	if(!CheckInvisibleBot())
+	if(m_pPlayer->IsBot() && !GS()->CheckPlayersDistance(m_Core.m_Pos, 1000.0f))
 		return;
 
 	if (m_DoorHit)
@@ -626,22 +625,6 @@ void CCharacter::TickDefered()
 			m_ReckoningCore = m_Core;
 		}
 	}
-}
-
-bool CCharacter::CheckInvisibleBot()
-{
-	if(!m_pPlayer->IsBot()) 
-		return true;
-	
-	for(int i = 0 ; i < MAX_PLAYERS ; i++) 
-	{
-		if(!GS()->m_apPlayers[i] || distance(m_Pos, GS()->m_apPlayers[i]->m_ViewPos) > 1000.0f 
-			|| GS()->CheckPlayerMessageWorldID(i) != Server()->GetWorldID(i)) 
-			continue;
-		
-		return true;
-	}
-	return false;
 }
 
 void CCharacter::TickPaused()
@@ -957,12 +940,6 @@ void CCharacter::HandleEvents()
 		SetEmote(EMOTE_HAPPY, 1);
 		if(Server()->Tick() % Server()->TickSpeed() == 0)
 			GS()->SendMmoEffect(m_Core.m_Pos, EFFECT_SPASALON);
-	}
-
-	if(m_Event == TILE_EVENT_HEALTH)
-	{
-		if(Server()->Tick() % Server()->TickSpeed() == 0)
-			new CEventHealth(&GS()->m_World, m_Core.m_Pos);
 	}
 }
 

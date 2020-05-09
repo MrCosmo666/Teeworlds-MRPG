@@ -6,6 +6,8 @@
 #include <game/mapitems.h>
 #include "botaijob.h"
 
+#include <game/server/mmocore/GameEntities/Events/event_health.h>
+
 MACRO_ALLOC_POOL_ID_IMPL(BotAI, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
 
 BotAI::BotAI(CGameWorld *pWorld) : CCharacter(pWorld) {}
@@ -59,12 +61,18 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 		CreateSnapProj(GetSnapFullID(), 3, PICKUP_HEALTH, true, false);
 		CreateSnapProj(GetSnapFullID(), 3, PICKUP_ARMOR, true, false);
 	}
+	else if(GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_NPC)
+	{
+		const int Function = BotJob::NpcBot[SubBotID].Function;
+		if(Function == FunctionsNPC::FUNCTION_NPC_NURSE)
+			new CNurseHealthNPC(&GS()->m_World, GetPlayer()->GetCID(), m_Core.m_Pos);
+	}
 	return true;
 }
 
 void BotAI::Tick()
 {
-	if(!CheckInvisibleBot() || !IsAlive())
+	if(!GS()->CheckPlayersDistance(m_Core.m_Pos, 1000.0f) || !IsAlive())
 		return;
 
 	EngineBots();

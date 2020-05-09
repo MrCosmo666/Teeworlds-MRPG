@@ -3,28 +3,52 @@
 #include <game/server/gamecontext.h>
 #include "event_health.h"
 
+#include <game/server/mmocore/GameEntities/Skills/healthturret/hearth.h>
+
+
 // Декорации
-CEventHealth::CEventHealth(CGameWorld* pGameWorld, vec2 Pos) 
+CNurseHealthNPC::CNurseHealthNPC(CGameWorld* pGameWorld, int ClientID, vec2 Pos) 
 	: CEntity(pGameWorld, CGameWorld::ENTTYPE_EVENTS, Pos)
 {
+	m_OwnerID = ClientID;
 	m_LifeTime = Server()->TickSpeed() * 2;
 	GameWorld()->InsertEntity(this);
 }
 
-void CEventHealth::Tick()
+void CNurseHealthNPC::Tick()
 {
 	m_LifeTime--;
-	if(!m_LifeTime)
+	if(!m_LifeTime || !GS()->m_apPlayers[m_OwnerID] || !GS()->m_apPlayers[m_OwnerID]->GetCharacter())
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;
 	}
 
-	m_Pos.y -= 1.5f;
+	if(!GS()->CheckPlayersDistance(m_Pos, 800.0f))
+		return;
 
+	CCharacter* pOwnerChar = GS()->m_apPlayers[m_OwnerID]->GetCharacter();
+	vec2 Direction = normalize(vec2(pOwnerChar->m_LatestInput.m_TargetX, pOwnerChar->m_LatestInput.m_TargetY));
+	m_Pos = pOwnerChar->m_Core.m_Pos + normalize(Direction) * (32.0f + 10.0f);
+	if(Server()->Tick() % Server()->TickSpeed() == 0)
+	{
+		for(CCharacter* p = (CCharacter*)GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); p; p = (CCharacter*)p->TypeNext())
+		{
+			if(!p || p->GetPlayer()->IsBot() || distance(p->m_Core.m_Pos, m_Pos) > 240.0f)
+				continue;
+
+			// показать восстановление
+			int Health = clamp(p->GetPlayer()->GetStartHealth() / 20, 1, p->GetPlayer()->GetStartHealth());
+			std::string Text = std::to_string(Health) + "HP";
+			GS()->CreateText(NULL, false, m_Pos, vec2(0, 0), 40, Text.c_str(), GS()->GetWorldID());
+
+			// уровень и здоровье для пополнение
+			new CHearth(&GS()->m_World, m_Pos, p->GetPlayer(), Health, p->m_Core.m_Vel);
+		}
+	}
 }
 
-void CEventHealth::Snap(int SnappingClient)
+void CNurseHealthNPC::Snap(int SnappingClient)
 {
 	if (NetworkClipped(SnappingClient))
 		return;

@@ -3,12 +3,13 @@
 
 #include <game/server/entity.h>
 
-class CEventHealth : public CEntity
+class CNurseHealthNPC : public CEntity
 {
 	int m_LifeTime;
+	int m_OwnerID;
 
 public:
-	CEventHealth(CGameWorld* pGameWorld, vec2 Pos);
+	CNurseHealthNPC(CGameWorld* pGameWorld, int ClientID, vec2 Pos);
 
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);

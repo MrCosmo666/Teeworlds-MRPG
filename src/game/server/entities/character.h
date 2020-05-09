@@ -64,8 +64,6 @@ public:
 
 
 	bool IsAlive() const { return m_Alive; }
-
-	bool CheckInvisibleBot();
 	void SetEvent(int EventID) { m_Event = EventID; };
 	void SetEmote(int Emote, int Sec);
 	void SetWeapon(int W);

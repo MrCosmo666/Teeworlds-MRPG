@@ -909,7 +909,7 @@ void CGS::ClearTalkText(int ClientID)
 }
 
 // Помощь в поиске мира бота и отправки его
-int CGS::CheckPlayerMessageWorldID(int ClientID)
+int CGS::CheckPlayerMessageWorldID(int ClientID) const
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || !m_apPlayers[ClientID])
 		return -1;
@@ -2391,5 +2391,17 @@ const char* CGS::AtributeName(int BonusID) const
 	}
 	return "Has no stats";
 }
+
+bool CGS::CheckPlayersDistance(vec2 Pos, float Distance) const
+{
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if(!m_apPlayers[i] || distance(Pos, m_apPlayers[i]->m_ViewPos) > 1000.0f || CheckPlayerMessageWorldID(i) != GetWorldID())
+			continue;
+		return true;
+	}
+	return false;
+}
+
 
 IGameServer *CreateGameServer() { return new CGS; }
