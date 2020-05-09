@@ -103,7 +103,6 @@ public:
 	virtual	int GetHealth()                                              { return Acc().PlayerHealth;};
 	virtual void SetDungeonAllowedSpawn(bool Spawn)                      { return; };
 	virtual void SetStandart(int Health, int Mana);
-	virtual int GetMoodNameplacesType(int SnappingClient);
 
 	virtual void Tick();
 	virtual int GetTeam();
@@ -164,7 +163,7 @@ public:
 	/* #########################################################################
 		FUNCTIONS PLAYER ITEMS 
 	######################################################################### */
-	ItemJob::ItemPlayer &GetItem(int ItemID);
+	ItemJob::InventoryItem &GetItem(int ItemID);
 
 	AccountMainJob::StructData& Acc() { return AccountMainJob::Data[m_ClientID]; };
 	int GetLevelDisciple(int Class);
@@ -178,6 +177,8 @@ public:
 	const char *FormatedTalkedText() const { return m_FormatTalkQuest; };
 	void FormatTextQuest(int DataBotID, const char *pText);
 	void ClearFormatQuestText();
+
+	int GetMoodState();
 };
 
 #endif

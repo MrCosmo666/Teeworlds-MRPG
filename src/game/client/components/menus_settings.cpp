@@ -361,7 +361,7 @@ void CMenus::RenderSkinSelection(CUIRect MainView)
 
 	for(int i = 0; i < s_paSkinList.size(); ++i)
 	{
-		const CSkins::CSkin *s = s_paSkinList[i];
+		const CSkins::CSkin* s = s_paSkinList[i];
 		if(s == 0)
 			continue;
 		if(!str_comp(s->m_aName, g_Config.m_PlayerSkin))
@@ -379,7 +379,7 @@ void CMenus::RenderSkinSelection(CUIRect MainView)
 				if(s->m_aUseCustomColors[p])
 				{
 					Info.m_aTextures[p] = s->m_apParts[p]->m_ColorTexture;
-					Info.m_aColors[p] = m_pClient->m_pSkins->GetColorV4(s->m_aPartColors[p], p==SKINPART_MARKING);
+					Info.m_aColors[p] = m_pClient->m_pSkins->GetColorV4(s->m_aPartColors[p], p == SKINPART_MARKING);
 				}
 				else
 				{
@@ -390,7 +390,7 @@ void CMenus::RenderSkinSelection(CUIRect MainView)
 
 			Info.m_Size = 50.0f;
 			Item.m_Rect.HSplitTop(5.0f, 0, &Item.m_Rect); // some margin from the top
-			RenderTools()->RenderTee(CAnimState::GetIdle(), &Info, 0, vec2(1.0f, 0.0f), vec2(Item.m_Rect.x+Item.m_Rect.w/2, Item.m_Rect.y+Item.m_Rect.h/2));
+			RenderTools()->RenderTee(CAnimState::GetIdle(), &Info, 0, vec2(1.0f, 0.0f), vec2(Item.m_Rect.x + Item.m_Rect.w / 2, Item.m_Rect.y + Item.m_Rect.h / 2));
 		}
 	}
 
@@ -433,14 +433,14 @@ void CMenus::RenderSkinPartSelection(CUIRect MainView)
 		s_InitSkinPartList = false;
 	}
 
-	static int OldSelected = -1;	
-	s_InitSkinPartList = s_ListBox.DoFilter();
+	static int OldSelected = -1;
 	s_ListBox.DoHeader(&MainView, Localize(CSkins::ms_apSkinPartNames[m_TeePartSelected]), GetListHeaderHeight());
+	s_InitSkinPartList = s_ListBox.DoFilter();
 	s_ListBox.DoStart(50.0f, s_paList[m_TeePartSelected].size(), 5, OldSelected);
 
 	for(int i = 0; i < s_paList[m_TeePartSelected].size(); ++i)
 	{
-		const CSkins::CSkinPart *s = s_paList[m_TeePartSelected][i];
+		const CSkins::CSkinPart* s = s_paList[m_TeePartSelected][i];
 		if(s == 0)
 			continue;
 		if(!str_comp(s->m_aName, CSkins::ms_apSkinVariables[m_TeePartSelected]))
@@ -453,14 +453,14 @@ void CMenus::RenderSkinPartSelection(CUIRect MainView)
 			for(int j = 0; j < NUM_SKINPARTS; j++)
 			{
 				int SkinPart = m_pClient->m_pSkins->FindSkinPart(j, CSkins::ms_apSkinVariables[j], false);
-				const CSkins::CSkinPart *pSkinPart = m_pClient->m_pSkins->GetSkinPart(j, SkinPart);
+				const CSkins::CSkinPart* pSkinPart = m_pClient->m_pSkins->GetSkinPart(j, SkinPart);
 				if(*CSkins::ms_apUCCVariables[j])
 				{
 					if(m_TeePartSelected == j)
 						Info.m_aTextures[j] = s->m_ColorTexture;
 					else
 						Info.m_aTextures[j] = pSkinPart->m_ColorTexture;
-					Info.m_aColors[j] = m_pClient->m_pSkins->GetColorV4(*CSkins::ms_apColorVariables[j], j==SKINPART_MARKING);
+					Info.m_aColors[j] = m_pClient->m_pSkins->GetColorV4(*CSkins::ms_apColorVariables[j], j == SKINPART_MARKING);
 				}
 				else
 				{
@@ -473,11 +473,11 @@ void CMenus::RenderSkinPartSelection(CUIRect MainView)
 			}
 			Info.m_Size = 50.0f;
 			Item.m_Rect.HSplitTop(5.0f, 0, &Item.m_Rect); // some margin from the top
-			const vec2 TeePos(Item.m_Rect.x+Item.m_Rect.w/2, Item.m_Rect.y+Item.m_Rect.h/2);
+			const vec2 TeePos(Item.m_Rect.x + Item.m_Rect.w / 2, Item.m_Rect.y + Item.m_Rect.h / 2);
 
 			if(m_TeePartSelected == SKINPART_HANDS)
 			{
-				RenderTools()->RenderTeeHand(&Info, TeePos, vec2(1.0f, 0.0f), -pi*0.5f, vec2(18, 0));
+				RenderTools()->RenderTeeHand(&Info, TeePos, vec2(1.0f, 0.0f), -pi * 0.5f, vec2(18, 0));
 			}
 			RenderTools()->RenderTee(CAnimState::GetIdle(), &Info, 0, vec2(1.0f, 0.0f), TeePos);
 		}

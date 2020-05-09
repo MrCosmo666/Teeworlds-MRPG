@@ -4,8 +4,19 @@
 #include <engine/shared/config.h>
 #include "sql_connect_pool.h"
 
-std::mutex tlock;
+/*
+	I don't see the point in using SELECT operations in the thread, 
+	since this will lead to unnecessary code, which may cause confusion, 
+	and by calculations if (SQL server / server) = localhoset, 
+	this will not do any harm (but after the release is complete, 
+	it is advisable to use the Thread function with Callback)
 
+	And in General, you should review the SQL system, 
+	it works (and has been tested by time and tests), 
+	but this implementation is not very narrowly focused
+*/
+
+std::mutex tlock;
 std::shared_ptr<CConectionPool> CConectionPool::m_Instance;
 CConectionPool::CConectionPool()
 {

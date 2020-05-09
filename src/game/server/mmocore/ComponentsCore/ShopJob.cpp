@@ -41,6 +41,7 @@ bool ShopJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_AUCTION))
 	{
+		GS()->Chat(ClientID, "You have left the active zone, menu is restored!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		return true;
@@ -144,7 +145,7 @@ void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem)
 {
 	int ItemID = AuSellItem.a_itemid;
 	int ClientID = pPlayer->GetCID();
-	ItemJob::ItemPlayer &PlayerItem = pPlayer->GetItem(ItemID);
+	ItemJob::InventoryItem &pPlayerAuctionItem = pPlayer->GetItem(ItemID);
 
 	// проверяем кол-во слотов занято ли все или нет
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_mailshop", "WHERE OwnerID > '0' LIMIT %d", g_Config.m_SvMaxMasiveAuctionSlots));
@@ -166,14 +167,14 @@ void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem)
 		return;
 
 	// забираем предмет и добавляем слот
-	if(PlayerItem.Count >= AuSellItem.a_count && PlayerItem.Remove(AuSellItem.a_count))
+	if(pPlayerAuctionItem.Count >= AuSellItem.a_count && pPlayerAuctionItem.Remove(AuSellItem.a_count))
 	{
 		SJK.ID("tw_mailshop", "(ItemID, Price, Count, OwnerID, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d')", 
 			ItemID, AuSellItem.a_price, AuSellItem.a_count, pPlayer->Acc().AuthID, AuSellItem.a_enchant);
 
 		int AvailableSlot = (g_Config.m_SvMaxAuctionSlots - CountSlot) - 1;
 		GS()->Chat(-1, "{STR} created a slot [{STR}x{INT}] auction.", 
-			GS()->Server()->ClientName(ClientID), PlayerItem.Info().GetName(pPlayer), &AuSellItem.a_count);
+			GS()->Server()->ClientName(ClientID), pPlayerAuctionItem.Info().GetName(pPlayer), &AuSellItem.a_count);
 		GS()->ChatFollow(ClientID, "Still available {INT} slots!", &AvailableSlot);
 	}
 
@@ -188,8 +189,8 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 	if (!SHOPITEM->next()) return false;
 
 	const int ItemID = SHOPITEM->getInt("ItemID");
-	ItemJob::ItemPlayer& BuyightItem = pPlayer->GetItem(ItemID);
-	if (BuyightItem.Count > 0 && BuyightItem.Info().IsEnchantable())
+	ItemJob::InventoryItem &pPlayerBuyightItem = pPlayer->GetItem(ItemID);
+	if (pPlayerBuyightItem.Count > 0 && pPlayerBuyightItem.Info().IsEnchantable())
 	{
 		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");
 		return false;
@@ -218,11 +219,11 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 			return false;
 
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "Your [Slot %sx%d] was sold!", BuyightItem.Info().GetName(pPlayer), Count);
+		str_format(aBuf, sizeof(aBuf), "Your [Slot %sx%d] was sold!", pPlayerBuyightItem.Info().GetName(pPlayer), Count);
 		Job()->Inbox()->SendInbox(OwnerID, "Auction Sell", aBuf, itMoney, Price, 0);
 		SJK.DD("tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, OwnerID);
-		BuyightItem.Add(Count, 0, Enchant);
-		GS()->Chat(ClientID, "You buy {STR}x{INT}.", BuyightItem.Info().GetName(pPlayer), &Count);
+		pPlayerBuyightItem.Add(Count, 0, Enchant);
+		GS()->Chat(ClientID, "You buy {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(pPlayer), &Count);
 		return true;
 	}
 
@@ -233,8 +234,8 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 	if (pPlayer->CheckFailMoney(Price, NeedItem))
 		return false;
 
-	BuyightItem.Add(Count, 0, Enchant);
-	GS()->Chat(ClientID, "You exchange {STR}x{INT} to {STR}x{INT}.", BuyightItem.Info().GetName(pPlayer), &Count, GS()->GetItemInfo(NeedItem).GetName(pPlayer), &Price);
+	pPlayerBuyightItem.Add(Count, 0, Enchant);
+	GS()->Chat(ClientID, "You exchange {STR}x{INT} to {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(pPlayer), &Count, GS()->GetItemInfo(NeedItem).GetName(pPlayer), &Price);
 	return true;
 }
 
@@ -285,13 +286,13 @@ bool ShopJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 	if (Menulist == MenuList::MENU_AUCTION_CREATE_SLOT)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
-		ItemJob::ItemPlayer& PlSellItem = pPlayer->GetItem(CGS::InteractiveSub[ClientID].AuctionItem.a_itemid);
+		ItemJob::ItemInformation& pInformationSellItem = GS()->GetItemInfo(CGS::InteractiveSub[ClientID].AuctionItem.a_itemid);
 
 		const int ItemID = CGS::InteractiveSub[ClientID].AuctionItem.a_itemid;
-		int SlotCount = CGS::InteractiveSub[ClientID].AuctionItem.a_count;
-		int SlotPrice = CGS::InteractiveSub[ClientID].AuctionItem.a_price;
-		int SlotEnchant = CGS::InteractiveSub[ClientID].AuctionItem.a_enchant;
-		int MinimalPrice = SlotCount * PlSellItem.Info().MinimalPrice;
+		const int SlotCount = CGS::InteractiveSub[ClientID].AuctionItem.a_count;
+		const int SlotPrice = CGS::InteractiveSub[ClientID].AuctionItem.a_price;
+		const int SlotEnchant = CGS::InteractiveSub[ClientID].AuctionItem.a_enchant;
+		const int MinimalPrice = SlotCount * pInformationSellItem.MinimalPrice;
 
 		GS()->AVH(ClientID, TAB_INFO_AUCTION_BIND, GREEN_COLOR, "Information Auction Slot");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_AUCTION_BIND, "The reason for write the number for each row");
@@ -299,12 +300,11 @@ bool ShopJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "Item x{INT} Minimal Price: {INT}gold", &SlotCount, &MinimalPrice);
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "Auction Slot Price: {INT}gold", &g_Config.m_SvAuctionPriceSlot);
 		if (SlotEnchant > 0)
-		{
 			GS()->AVM(ClientID, "null", NOPE, NOPE, "Warning selling enchanted: +{INT}", &SlotEnchant);
-		}
+
 		GS()->AVM(ClientID, "AUCTIONCOUNT", ItemID, NOPE, "Item Count: {INT}", &SlotCount);
 		GS()->AVM(ClientID, "AUCTIONPRICE", ItemID, NOPE, "Item Price: {INT}", &SlotPrice);
-		GS()->AVM(ClientID, "AUCTIONACCEPT", ItemID, NOPE, "Add {STR}x{INT} {INT}gold", PlSellItem.Info().GetName(pPlayer), &SlotCount, &SlotPrice);
+		GS()->AVM(ClientID, "AUCTIONACCEPT", ItemID, NOPE, "Add {STR}x{INT} {INT}gold", pInformationSellItem.GetName(pPlayer), &SlotCount, &SlotPrice);
 		GS()->AddBack(ClientID);
 		return true;
 	}
@@ -327,16 +327,16 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	if(PPSTR(CMD, "AUCTIONCOUNT") == 0)
 	{
 		// если предметов меньше установленно ставим кол-во что есть
-		ItemJob::ItemPlayer &PlSellItem = pPlayer->GetItem(VoteID);
-		if(Get > PlSellItem.Count)
-			Get = PlSellItem.Count;
+		ItemJob::InventoryItem &pPlayerSellItem = pPlayer->GetItem(VoteID);
+		if(Get > pPlayerSellItem.Count)
+			Get = pPlayerSellItem.Count;
 
 		// если предмет можно кол-во
-		if(PlSellItem.Info().IsEnchantable())
+		if(pPlayerSellItem.Info().IsEnchantable())
 			Get = 1;
 
 		// если сбрасываем цену если не хватает
-		const int c_minimalprice = Get*PlSellItem.Info().MinimalPrice;
+		const int c_minimalprice = Get* pPlayerSellItem.Info().MinimalPrice;
 		if(CGS::InteractiveSub[ClientID].AuctionItem.a_price < c_minimalprice)
 			CGS::InteractiveSub[ClientID].AuctionItem.a_price = c_minimalprice;
 			
@@ -349,8 +349,8 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	// аукцион установить цену
 	if(PPSTR(CMD, "AUCTIONPRICE") == 0)
 	{
-		ItemJob::ItemPlayer &PlSellItem = pPlayer->GetItem(VoteID);
-		const int c_minimalprice = PlSellItem.Info().MinimalPrice * CGS::InteractiveSub[ClientID].AuctionItem.a_count;
+		ItemJob::ItemInformation &pInformationSellItem = GS()->GetItemInfo(VoteID);
+		const int c_minimalprice = pInformationSellItem.MinimalPrice * CGS::InteractiveSub[ClientID].AuctionItem.a_count;
 		if(Get < c_minimalprice) 
 			Get = c_minimalprice;
 
@@ -375,8 +375,8 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	// принять аукцион слот
 	if(PPSTR(CMD, "AUCTIONACCEPT") == 0)
 	{
-		ItemJob::ItemPlayer &pSellItem = pPlayer->GetItem(VoteID);
-		if(pSellItem.Count >= CGS::InteractiveSub[ClientID].AuctionItem.a_count && CGS::InteractiveSub[ClientID].AuctionItem.a_price >= 10)
+		ItemJob::InventoryItem &pPlayerSellItem = pPlayer->GetItem(VoteID);
+		if(pPlayerSellItem.Count >= CGS::InteractiveSub[ClientID].AuctionItem.a_count && CGS::InteractiveSub[ClientID].AuctionItem.a_price >= 10)
 		{
 			CreateAuctionSlot(pPlayer, CGS::InteractiveSub[ClientID].AuctionItem);
 			GS()->ResetVotes(ClientID, MenuList::MENU_INVENTORY);

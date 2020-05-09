@@ -29,11 +29,11 @@ class ItemJob : public MmoComponent
 		const char* GetIcon() const { return iItemIcon; };
 		bool IsEnchantable() const;
 
-		int GetStatsBonus(int BonusID)
+		int GetStatsBonus(int AttributeID)
 		{
 			for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 			{
-				if (Attribute[i] == BonusID)
+				if (Attribute[i] == AttributeID)
 					return AttributeCount[i];
 			}
 			return -1;
@@ -47,7 +47,7 @@ public:
 	typedef ClassItemInformation ItemInformation;
 	static std::map < int , ItemInformation > ItemsInfo;
 
-
+	// TODO: Change it bad
 	class ClassItems
 	{
 		CPlayer* pPlayer;
@@ -59,40 +59,28 @@ public:
 		int Enchant;
 		int Durability;
 
-		ClassItems() : pPlayer(NULL), itemid_(0), Count(0), Settings(0), Enchant(0), Durability(100) {};
-
-		void SetBasic(CPlayer* Player, int itemid) { pPlayer = Player, itemid_ = itemid; }
+		void SetBasic(CPlayer* Player, int itemid)
+		{
+			pPlayer = Player;
+			itemid_ = itemid;
+		}
 
 		int GetID() const { return itemid_; }
+		int EnchantPrice() const;
+		ItemInformation& Info() const { return ItemsInfo[itemid_]; };
 
 		bool Remove(int arg_removecount, int arg_settings = 0);
 		bool Add(int arg_count, int arg_settings = 0, int arg_enchant = 0, bool arg_message = true);
-		int EnchantPrice() const;
+
 		bool SetEnchant(int arg_enchantlevel);
 		bool SetSettings(int arg_settings);
 		bool EquipItem();
 		bool Save();
 		bool IsEquipped();
-
-		ItemInformation& Info() const { return ItemsInfo[itemid_]; };
-
-		// копирование элемента
-		ClassItems Paste(ClassItems right)
-		{
-			itemid_ = right.itemid_;
-			Count = right.Count;
-			Settings = right.Settings;
-			Enchant = right.Enchant;
-
-			if (pPlayer != NULL)
-				Save();
-
-			return *this;
-		};
 	};
 
-	typedef ClassItems ItemPlayer;
-	static std::map < int, std::map < int, ItemPlayer > > Items;
+	typedef ClassItems InventoryItem;
+	static std::map < int, std::map < int, InventoryItem > > Items;
 
 	virtual void OnInit();
 	virtual void OnInitAccount(CPlayer *pPlayer);
@@ -100,14 +88,14 @@ public:
 	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 
-	void FormatAttributes(ItemPlayer& pItem, int size, char* pformat);
+	void FormatAttributes(InventoryItem& pItem, int size, char* pformat);
 	void FormatAttributes(ItemInformation& pInfoItem, int Enchant, int size, char* pformat);
 
 	// Основное
 	void ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction = false);
 	void GiveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant);
 	void RemoveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Count, int Settings);
-	void ItemSelected(CPlayer *pPlayer, const ItemPlayer &PlItem, bool Dress = false);
+	void ItemSelected(CPlayer *pPlayer, const InventoryItem& pPlayerItem, bool Dress = false);
 	int ActionItemCountAllowed(CPlayer* pPlayer, int ItemID);
 
 	void UseItem(int ClientID, int ItemID, int Count);

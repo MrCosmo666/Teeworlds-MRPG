@@ -24,6 +24,8 @@
 
 // информационные данные
 #include "mmocore/CommandProcessor.h"
+#include "mmocore/ComponentsCore/GuildJob.h"
+
 
 // Безопасные структуры хоть и прожорливо но работает (Прежде всего всегда их при выходе игрока Отрезаем)
 std::map < int , CGS::StructAttribut > CGS::AttributInfo;
@@ -96,9 +98,6 @@ void CGS::Clear()
 	m_Tuning = Tuning;
 }
 
-/* #########################################################################
-	HELPER PLAYER FUNCTION 
-######################################################################### */
 // Получить Character по ClientID
 class CCharacter *CGS::GetPlayerChar(int ClientID)
 {
@@ -1214,8 +1213,10 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		else if(MsgID == NETMSGTYPE_CL_SETTEAM)
 		{
 			if(!pPlayer->IsAuthed())
-				return SBL(pPlayer->GetCID(), BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Use /register <name> <pass>.");
-
+			{
+				SBL(pPlayer->GetCID(), BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Use /register <name> <pass>.");
+				return;
+			}
 		}
 		else if (MsgID == NETMSGTYPE_CL_SETSPECTATORMODE)
 		{
@@ -1312,7 +1313,8 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			if(Mmo()->Account()->LoginAccount(ClientID, pMsg->m_Login, pMsg->m_Password) == AUTH_LOGIN_GOOD)
 				Mmo()->Account()->LoadAccount(pPlayer, true);
 		}
-		else if(Mmo()->OnMessage(MsgID, pRawMsg, ClientID)) { }
+		else 
+			Mmo()->OnMessage(MsgID, pRawMsg, ClientID);
 	}
 	else
 	{
@@ -1339,9 +1341,6 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			// send vote options
 			CNetMsg_Sv_VoteClearOptions ClearMsg;
 			Server()->SendPackMsg(&ClearMsg, MSGFLAG_VITAL, ClientID);
-
-			// send tuning parameters to client
-			SendTuningParams(ClientID);
 
 			// client is ready to enter
 			CNetMsg_Sv_ReadyToEnter m;
@@ -1407,7 +1406,7 @@ void CGS::OnClientEnter(int ClientID)
 		// имя
 		bool Bot = m_apPlayers[i]->IsBot();
 		int BotID = m_apPlayers[i]->GetBotID();
-		ClientInfoMsg.m_pName = BotJob::DataBot[BotID].Name(m_apPlayers[i]);
+		ClientInfoMsg.m_pName = Bot ? BotJob::DataBot[BotID].NameBot : Server()->ClientName(i);
 		ClientInfoMsg.m_pClan = Server()->ClientClan(i);
 		ClientInfoMsg.m_Country = Server()->ClientCountry(i);
 		ClientInfoMsg.m_Silent = false;
@@ -1934,7 +1933,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		// меню информации
 		AVH(ClientID, TAB_INFORMATION, BLUE_COLOR, "# SUB MENU INFORMATION");
 		AVM(ClientID, "MENU", MenuList::MENU_GUIDEDROP, TAB_INFORMATION, "♣ Loots, mobs on your zone");
-		AVM(ClientID, "MENU", MenuList::MENU_TOP_LIST, TAB_INFORMATION, "♛ Top guilds and players");
+		AVM(ClientID, "MENU", MenuList::MENU_TOP_LIST, TAB_INFORMATION, "♛ Ranking guilds and players");
 		AV(ClientID, "null", "");
 
 		// чекаем местонахождение
@@ -1952,9 +1951,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
-		// чекаем местонахождение
 		Mmo()->Quest()->ShowFullQuestLift(pPlayer);
-
 		AddBack(ClientID);
 	}
 	else if(MenuList == MenuList::MENU_INBOX) 
@@ -2058,7 +2055,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 			const int HideID = (NUM_TAB_MENU+12500+mobs.first);
 			int PosX = mobs.second.PositionX/32, PosY = mobs.second.PositionY/32;
-			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} {STR}(x: {INT} y: {INT})", mobs.second.Name, Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY);
+			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} {STR}(x: {INT} y: {INT})", mobs.second.GetName(), Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY);
 	
 			for(int i = 0; i < 6; i++)
 			{
@@ -2213,7 +2210,7 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 	bool ActiveBot = Mmo()->Quest()->IsActiveQuestBot(QuestID, Step);
 	if(ActiveBot && QuestBotClientID <= -1)
 		CreateBot(SpawnBot::SPAWN_QUEST_NPC, FindBot->BotID, FindBot->SubBotID);
-	
+
 	// если бот не активен не у одного игрока, но игрок найден удаляем
 	if (!ActiveBot && QuestBotClientID >= MAX_PLAYERS)
 	{
@@ -2256,7 +2253,7 @@ void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop, vec2 For
 // Саздает предметы в позиции Типа и Количества и Их самих кол-ва
 void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant, vec2 Force)
 {
-	ItemJob::ItemPlayer DropItem;
+	ItemJob::InventoryItem DropItem;
 	DropItem.SetBasic(nullptr, ItemID);
 	DropItem.Count = Count;
 	DropItem.Enchant = Enchant;
@@ -2267,13 +2264,12 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Ench
 }
 
 // Саздает предметы в позиции Типа и Количества и Их самих кол-ва
-void CGS::CreateDropItem(vec2 Pos, int ClientID, ItemJob::ItemPlayer &PlayerItem, int Count, vec2 Force)
+void CGS::CreateDropItem(vec2 Pos, int ClientID, ItemJob::InventoryItem &pPlayerItem, int Count, vec2 Force)
 {
-	ItemJob::ItemPlayer CopyItem;
-	CopyItem.Paste(PlayerItem);
+	ItemJob::InventoryItem CopyItem = pPlayerItem;
 	CopyItem.Count = Count;
 
-	if (PlayerItem.Remove(Count))
+	if (pPlayerItem.Remove(Count))
 	{
 		float Angle = Force.x * (0.15f + frandom() * 0.1f);
 		new CDropingItem(&m_World, Pos, Force, Angle, CopyItem, ClientID);

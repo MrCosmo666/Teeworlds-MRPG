@@ -6,27 +6,30 @@
 #include <game/server/gamecontext.h>
 #include "MmoController.h"
 
+#include "ComponentsCore/AetherJob.h"
+
 using namespace sqlstr;
 
 // список хранения всех компонентов Sql Work
 MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 {
-	m_Components.add(m_pAccMain = new AccountMainJob());
+	// order
 	m_Components.add(m_pBotsInfo = new BotJob());
+	m_Components.add(m_pItemWork = new ItemJob());
+	m_Components.add(m_pCraftJob = new CraftJob());
+	m_Components.add(m_pStorageWork = new StorageJob());
+	m_Components.add(m_pShopmail = new ShopJob());
+	m_Components.add(m_pQuest = new QuestJob());
+	m_Components.add(m_pDungeonJob = new DungeonJob());
+	m_Components.add(new AetherJob());
+	m_Components.add(m_pWorldSwapJob = new WorldSwapJob());
+	m_Components.add(m_pHouseJob = new HouseJob());
+	m_Components.add(m_pGuildJob = new GuildJob());
+	m_Components.add(m_pSkillJob = new SkillJob());
+	m_Components.add(m_pAccMain = new AccountMainJob());
 	m_Components.add(m_pAccMiner = new AccountMinerJob());
 	m_Components.add(m_pAccPlant = new AccountPlantJob());
-	m_Components.add(m_pCraftJob = new CraftJob());
-	m_Components.add(m_pDungeonJob = new DungeonJob());
-	m_Components.add(m_pHouseJob = new HouseJob());
 	m_Components.add(m_pMailBoxJob = new MailBoxJob());
-	m_Components.add(m_pItemWork = new ItemJob());
-	m_Components.add(m_pGuildJob = new GuildJob());
-	m_Components.add(m_pQuest = new QuestJob());
-	m_Components.add(m_pShopmail = new ShopJob());
-	m_Components.add(m_pSkillJob = new SkillJob());
-	m_Components.add(m_pStorageWork = new StorageJob());
-	m_Components.add(m_pTeleportsWork = new AetherJob());
-	m_Components.add(m_pWorldSwapJob = new WorldSwapJob());
 
 	for(auto& component : m_Components.m_paComponents)
 	{
@@ -40,7 +43,6 @@ MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 		str_format(aLocalSelect, sizeof(aLocalSelect), "WHERE WorldID = '%d'", m_pGameServer->GetWorldID());
 		component->OnInitWorld(aLocalSelect);
 	}
-	m_pBotsInfo->LoadGlobalBots();
 }
 
 MmoController::~MmoController()
@@ -114,17 +116,13 @@ bool MmoController::OnParseFullVote(CPlayer *pPlayer, const char *CMD, const int
 	return false;
 }
 
-bool MmoController::OnMessage(int MsgID, void *pRawMsg, int ClientID)
+void MmoController::OnMessage(int MsgID, void *pRawMsg, int ClientID)
 {
 	if(!pRawMsg)
-		return true;
+		return;
 
 	for(auto& component : m_Components.m_paComponents)
-	{
-		if(component->OnMessage(MsgID, pRawMsg, ClientID))
-			return true;
-	}	
-	return false;
+		component->OnMessage(MsgID, pRawMsg, ClientID);
 }
 
 void MmoController::ResetClientData(int ClientID)

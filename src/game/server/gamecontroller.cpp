@@ -72,7 +72,7 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 	case ENTITY_SPAWN_MOBS:
 		m_aaSpawnPoints[1][m_aNumSpawnPoints[1]++] = Pos;
 		break;
-	case ENTITY_SPAWN_BLUE:
+	case ENTITY_SPAWN_SAFE:
 		m_aaSpawnPoints[2][m_aNumSpawnPoints[2]++] = Pos;
 		break;
 	case ENTITY_ARMOR_1:

@@ -5,7 +5,7 @@
 #include "ItemJob.h"
 
 using namespace sqlstr;
-std::map < int , std::map < int , ItemJob::ItemPlayer > > ItemJob::Items;
+std::map < int , std::map < int , ItemJob::InventoryItem > > ItemJob::Items;
 std::map < int , ItemJob::ItemInformation > ItemJob::ItemsInfo;
 
 int randomRangecount(int startrandom, int endrandom, int count)
@@ -88,7 +88,7 @@ void ItemJob::RepairDurabilityFull(CPlayer *pPlayer)
 		it.second.Durability = 100;
 }
 
-void ItemJob::FormatAttributes(ItemPlayer& pItem, int size, char* pformat)
+void ItemJob::FormatAttributes(InventoryItem& pItem, int size, char* pformat)
 {
 	dynamic_string Buffer;
 	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
@@ -243,34 +243,34 @@ int ItemJob::ActionItemCountAllowed(CPlayer *pPlayer, int ItemID)
 	return AvailableCount;
 }
 
-void ItemJob::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dress)
+void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, bool Dress)
 {
 	const int ClientID = pPlayer->GetCID();
-	const int ItemID = PlItem.GetID();
+	const int ItemID = pPlayerItem.GetID();
 	const int HideID = NUM_TAB_MENU + ItemID;
-	const char* NameItem = PlItem.Info().GetName(pPlayer);
+	const char* NameItem = pPlayerItem.Info().GetName(pPlayer);
 
 	// зачеровыванный или нет
-	if (PlItem.Info().IsEnchantable())
+	if (pPlayerItem.Info().IsEnchantable())
 	{
 		char aEnchantSize[16];
-		str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", PlItem.Enchant);
-		GS()->AVHI(ClientID, PlItem.Info().GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} {STR}",
-			NameItem, (PlItem.Enchant > 0 ? aEnchantSize : "\0"), (PlItem.Settings ? " ✔" : "\0"));
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", PlItem.Info().GetDesc(pPlayer));
+		str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", pPlayerItem.Enchant);
+		GS()->AVHI(ClientID, pPlayerItem.Info().GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} {STR}",
+			NameItem, (pPlayerItem.Enchant > 0 ? aEnchantSize : "\0"), (pPlayerItem.Settings ? " ✔" : "\0"));
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pPlayerItem.Info().GetDesc(pPlayer));
 
 		char aAttributes[128];
-		FormatAttributes(PlItem.Info(), PlItem.Enchant, sizeof(aAttributes), aAttributes);
+		FormatAttributes(pPlayerItem.Info(), pPlayerItem.Enchant, sizeof(aAttributes), aAttributes);
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 	}
 	else
 	{
-		GS()->AVHI(ClientID, PlItem.Info().GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} x{INT}",
-			(PlItem.Settings ? "Dressed - " : "\0"), NameItem, &PlItem.Count);
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", PlItem.Info().GetDesc(pPlayer));
+		GS()->AVHI(ClientID, pPlayerItem.Info().GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} x{INT}",
+			(pPlayerItem.Settings ? "Dressed - " : "\0"), NameItem, &pPlayerItem.Count);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pPlayerItem.Info().GetDesc(pPlayer));
 	}
 
-	if (PlItem.Info().Function == FUNCTION_ONE_USED || PlItem.Info().Function == FUNCTION_USED)
+	if (pPlayerItem.Info().Function == FUNCTION_ONE_USED || pPlayerItem.Info().Function == FUNCTION_USED)
 	{
 		char aBuf[64];
 		str_format(aBuf, sizeof(aBuf), "Bind command \"/useitem %d'\"", ItemID);
@@ -278,16 +278,16 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 		GS()->AVM(ClientID, "IUSE", ItemID, HideID, "Use {STR}", NameItem);
 	}
 
-	if (PlItem.Info().Type == ItemType::TYPE_POTION)
-		GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "Auto use {STR} - {STR}", NameItem, (PlItem.Settings ? "Enable" : "Disable"));
+	if (pPlayerItem.Info().Type == ItemType::TYPE_POTION)
+		GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "Auto use {STR} - {STR}", NameItem, (pPlayerItem.Settings ? "Enable" : "Disable"));
 
-	if (PlItem.Info().Type == ItemType::TYPE_DECORATION)
+	if (pPlayerItem.Info().Type == ItemType::TYPE_DECORATION)
 	{
 		GS()->AVM(ClientID, "DECOSTART", ItemID, HideID, "Added {STR} to your house", NameItem);
 		GS()->AVM(ClientID, "DECOGUILDSTART", ItemID, HideID, "Added {STR} to your guild house", NameItem);
 	}
 
-	if (PlItem.Info().Function == FUNCTION_PLANTS)
+	if (pPlayerItem.Info().Function == FUNCTION_PLANTS)
 	{
 		const int HouseID = Job()->House()->OwnerHouseID(pPlayer->Acc().AuthID);
 		const int PlantItemID = Job()->House()->GetPlantsID(HouseID);
@@ -298,25 +298,25 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const ItemPlayer& PlItem, bool Dres
 	}
 
 
-	if (PlItem.Info().Type == ItemType::TYPE_EQUIP || PlItem.Info().Function == FUNCTION_SETTINGS)
-		GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "{STR} {STR}", (PlItem.Settings ? "Undress" : "Equip"), NameItem);
+	if (pPlayerItem.Info().Type == ItemType::TYPE_EQUIP || pPlayerItem.Info().Function == FUNCTION_SETTINGS)
+		GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "{STR} {STR}", (pPlayerItem.Settings ? "Undress" : "Equip"), NameItem);
 
-	if (PlItem.Info().IsEnchantable())
+	if (pPlayerItem.Info().IsEnchantable())
 	{
-		int Price = PlItem.EnchantPrice();
-		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR}+{INT} ({INT} material)", NameItem, &PlItem.Enchant, &Price);
+		int Price = pPlayerItem.EnchantPrice();
+		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR}+{INT} ({INT} material)", NameItem, &pPlayerItem.Enchant, &Price);
 	}
 
 	if (ItemID == itHammer)
 		return;
 
-	if (PlItem.Info().Dysenthis > 0)
+	if (pPlayerItem.Info().Dysenthis > 0)
 		GS()->AVM(ClientID, "IDESYNTHESIS", ItemID, HideID, "Disassemble {STR} (+{INT}{STR} - 1 item)",
-			NameItem, &PlItem.Info().Dysenthis, (PlItem.Info().Function == FUNCTION_PLANTS ? "goods" : "mat"));
+			NameItem, &pPlayerItem.Info().Dysenthis, (pPlayerItem.Info().Function == FUNCTION_PLANTS ? "goods" : "mat"));
 
 	GS()->AVM(ClientID, "IDROP", ItemID, HideID, "Drop {STR}", NameItem);
 
-	if (PlItem.Info().MinimalPrice)
+	if (pPlayerItem.Info().MinimalPrice)
 		GS()->AVM(ClientID, "AUCTIONSLOT", ItemID, HideID, "Create Slot Auction {STR}", NameItem);
 }
 
@@ -345,14 +345,14 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 		if (Get > AvailableCount)
 			Get = AvailableCount;
 
-		ItemPlayer& PlItem = pPlayer->GetItem(VoteID);
+		InventoryItem& pPlayerDropItem = pPlayer->GetItem(VoteID);
 		vec2 Force(pPlayer->GetCharacter()->m_Core.m_Input.m_TargetX, pPlayer->GetCharacter()->m_Core.m_Input.m_TargetY);
 		if(length(Force) > 8.0f)
 			Force = normalize(Force) * 8.0f;
 
-		GS()->CreateDropItem(pPlayer->GetCharacter()->m_Core.m_Pos, -1, PlItem, Get, Force);
+		GS()->CreateDropItem(pPlayer->GetCharacter()->m_Core.m_Pos, -1, pPlayerDropItem, Get, Force);
 
-		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "You drop {STR}x{INT}", PlItem.Info().GetName(pPlayer), &Get);
+		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "You drop {STR}x{INT}", pPlayerDropItem.Info().GetName(pPlayer), &Get);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
@@ -367,9 +367,8 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 		if (Get > AvailableCount)
 			Get = AvailableCount;
 
-		// проверяем если по функции он используется 1 раз
-		ItemPlayer &PlItem = pPlayer->GetItem(VoteID);
-		if(PlItem.Info().Function == FUNCTION_ONE_USED)
+		ItemInformation &pInformationItem = GS()->GetItemInfo(VoteID);
+		if(pInformationItem.Function == FUNCTION_ONE_USED)
 			Get = 1;
 
 		UseItem(ClientID, VoteID, Get);
@@ -386,15 +385,14 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 		if (Get > AvailableCount)
 			Get = AvailableCount;
 
-		ItemPlayer &PlItem = pPlayer->GetItem(VoteID);
-		const int ItemGive = (PlItem.Info().Function == FUNCTION_PLANTS ? (int)itGoods : (int)itMaterial);
-		ItemPlayer &ItemMaterial = pPlayer->GetItem(ItemGive); 
-
-		int DesCount = PlItem.Info().Dysenthis * Get;
-		if(PlItem.Remove(Get) && ItemMaterial.Add(DesCount))
+		InventoryItem &pPlayerSelectedItem = pPlayer->GetItem(VoteID);
+		const int ItemGive = (pPlayerSelectedItem.Info().Function == FUNCTION_PLANTS ? (int)itGoods : (int)itMaterial);
+		InventoryItem &pPlayerMaterialItem = pPlayer->GetItem(ItemGive); 
+		const int DesCount = pPlayerSelectedItem.Info().Dysenthis * Get;
+		if(pPlayerSelectedItem.Remove(Get) && pPlayerMaterialItem.Add(DesCount))
 		{
 			GS()->Chat(ClientID, "Disassemble {STR}x{INT}, you receive {INT} {STR}(s)", 
-				PlItem.Info().GetName(pPlayer), &Get, &DesCount, ItemMaterial.Info().GetName(pPlayer));
+				pPlayerSelectedItem.Info().GetName(pPlayer), &Get, &DesCount, pPlayerMaterialItem.Info().GetName(pPlayer));
 			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		}
 		return true;
@@ -403,11 +401,11 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	// настройка предмета
 	if(PPSTR(CMD, "ISETTINGS") == 0)
 	{
-		ItemPlayer& EquipItem = pPlayer->GetItem(VoteID);
-		EquipItem.EquipItem();
-		if(EquipItem.Info().Function == EQUIP_DISCORD)
+		InventoryItem& pPlayerSelectedItem = pPlayer->GetItem(VoteID);
+		pPlayerSelectedItem.EquipItem();
+		if(pPlayerSelectedItem.Info().Function == EQUIP_DISCORD)
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_STATS);
-		else if(EquipItem.Info().Type == ItemType::TYPE_EQUIP)
+		else if(pPlayerSelectedItem.Info().Type == ItemType::TYPE_EQUIP)
 			GS()->ChangeEquipSkin(ClientID, VoteID);
 
 		GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
@@ -418,32 +416,31 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	// зачарование
 	if(PPSTR(CMD, "IENCHANT") == 0)
 	{
-		ItemPlayer &PlItem = pPlayer->GetItem(VoteID);
-		if(PlItem.Enchant >= PlItem.Info().MaximalEnchant)
+		InventoryItem &pPlayerSelectedItem = pPlayer->GetItem(VoteID);
+		if(pPlayerSelectedItem.Enchant >= pPlayerSelectedItem.Info().MaximalEnchant)
 		{
 			GS()->Chat(ClientID, "You enchant max level for this item!");
 			return true;			
 		}
 
-		int Price = PlItem.EnchantPrice();
-		ItemPlayer &PlMaterial = pPlayer->GetItem(itMaterial);
-		if(Price > PlMaterial.Count)
+		const int Price = pPlayerSelectedItem.EnchantPrice();
+		InventoryItem &pPlayerMaterialItem = pPlayer->GetItem(itMaterial);
+		if(Price > pPlayerMaterialItem.Count)
 		{
-			GS()->Chat(ClientID, "You need {INT} Your {INT} materials!", &Price, &PlMaterial.Count);
+			GS()->Chat(ClientID, "You need {INT} Your {INT} materials!", &Price, &pPlayerMaterialItem.Count);
 			return true;
 		}
 
-		if(PlMaterial.Remove(Price, 0))
+		if(pPlayerMaterialItem.Remove(Price, 0))
 		{
-			int EnchantLevel = PlItem.Enchant+1;
-
-			PlItem.SetEnchant(EnchantLevel);
+			const int EnchantLevel = pPlayerSelectedItem.Enchant+1;
+			pPlayerSelectedItem.SetEnchant(EnchantLevel);
 			if (EnchantLevel >= EFFECTENCHANT)
 				GS()->SendEquipItem(ClientID, -1);
 
 			char aAttributes[128];
-			FormatAttributes(PlItem, sizeof(aAttributes), aAttributes);
-			GS()->Chat(-1, "{STR} enchant {STR}+{INT} {STR}", GS()->Server()->ClientName(ClientID), PlItem.Info().GetName(), &EnchantLevel, aAttributes);
+			FormatAttributes(pPlayerSelectedItem, sizeof(aAttributes), aAttributes);
+			GS()->Chat(-1, "{STR} enchant {STR}+{INT} {STR}", GS()->Server()->ClientName(ClientID), pPlayerSelectedItem.Info().GetName(), &EnchantLevel, aAttributes);
 			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		}
 		return true;
@@ -477,7 +474,7 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		GS()->AVH(ClientID, TAB_SETTINGS, RED_COLOR, "Some of the settings becomes valid after death");
 		for (const auto& it : Items[ClientID])
 		{
-			const ItemPlayer ItemData = it.second;
+			const InventoryItem ItemData = it.second;
 			if (ItemData.Info().Type != ItemType::TYPE_SETTINGS || ItemData.Count <= 0)
 				continue;
 
@@ -495,7 +492,7 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		GS()->AVH(ClientID, TAB_SETTINGS_MODULES, GREEN_COLOR, "Sub items settings.");
 		for (const auto& it : Items[ClientID])
 		{
-			ItemPlayer ItemData = it.second;
+			InventoryItem ItemData = it.second;
 			if (ItemData.Count <= 0 || ItemData.Info().Type != ItemType::TYPE_MODULE)
 				continue;
 
@@ -549,7 +546,7 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		for (int i = EQUIP_WINGS; i < NUM_EQUIPS; i++)
 		{
 			const int ItemID = pPlayer->GetItemEquip(i);
-			ItemJob::ItemPlayer& pPlayerItem = pPlayer->GetItem(ItemID);
+			ItemJob::InventoryItem& pPlayerItem = pPlayer->GetItem(ItemID);
 			if (ItemID <= 0 || !pPlayerItem.IsEquipped())
 			{
 				GS()->AVM(ClientID, "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} Not equipped", pType[i]);
@@ -588,7 +585,7 @@ void ItemJob::UseItem(int ClientID, int ItemID, int Count)
 	if(!pPlayer || pPlayer->GetItem(ItemID).Count < Count) 
 		return;
 
-	ItemPlayer &PlItem = pPlayer->GetItem(ItemID);
+	InventoryItem &PlItem = pPlayer->GetItem(ItemID);
 	if(ItemID == itPotionHealthRegen && PlItem.Remove(Count, 0))
 	{
 		pPlayer->GiveEffect("RegenHealth", 20);
@@ -749,7 +746,7 @@ bool ItemJob::ClassItems::EquipItem()
 		int EquipItemID = pPlayer->GetItemEquip(EquipID, itemid_);
 		while (EquipItemID >= 1)
 		{
-			ItemJob::ItemPlayer &EquipItem = pPlayer->GetItem(EquipItemID);
+			ItemJob::InventoryItem &EquipItem = pPlayer->GetItem(EquipItemID);
 			EquipItem.Settings = 0;
 			EquipItem.SetSettings(0);
 			EquipItemID = pPlayer->GetItemEquip(EquipID, itemid_);

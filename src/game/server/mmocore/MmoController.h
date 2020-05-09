@@ -3,6 +3,11 @@
 #ifndef GAME_SERVER_MMOCONTROLLER_H
 #define GAME_SERVER_MMOCONTROLLER_H
 
+/*
+	At the end, distribute the components in MmoController.cpp
+	And distribute where they are required
+	This will affect the size of the output file
+*/
 #include "ComponentsCore/AccountMainJob.h"
 #include "ComponentsCore/AccountMinerJob.h"
 #include "ComponentsCore/AccountPlantJob.h"
@@ -11,7 +16,6 @@
 #include "ComponentsCore/QuestJob.h"
 #include "ComponentsCore/ShopJob.h"
 #include "ComponentsCore/StorageJob.h"
-#include "ComponentsCore/AetherJob.h"
 
 #include "ComponentsCore/SkillJob.h"
 #include "ComponentsCore/WorldSwapJob.h"
@@ -51,7 +55,6 @@ class MmoController
 	class QuestJob *m_pQuest;
 	class ShopJob *m_pShopmail;
 	class StorageJob *m_pStorageWork;
-	class AetherJob *m_pTeleportsWork;
 
 	class GuildJob* m_pGuildJob;
 	class CraftJob* m_pCraftJob;
@@ -77,7 +80,6 @@ public:
 	QuestJob *Quest() const { return m_pQuest; }
 	ShopJob *Auction() const { return m_pShopmail; }
 	StorageJob *Storage() const { return m_pStorageWork; }
-	AetherJob *Teleports() const { return m_pTeleportsWork; }
 
 	CraftJob* Craft() const { return m_pCraftJob; }
 	DungeonJob* Dungeon() const { return m_pDungeonJob; }
@@ -92,20 +94,14 @@ public:
 	bool OnPlayerHandleTile(CCharacter *pChr, int IndexCollision);
 	bool OnPlayerHandleMainMenu(int ClientID, int Menulist, bool ReplaceMenu);
 	void OnInitAccount(int ClientID);
-	bool OnMessage(int MsgID, void *pRawMsg, int ClientID);
+	void OnMessage(int MsgID, void *pRawMsg, int ClientID);
 	bool OnParseFullVote(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
 	void ResetClientData(int ClientID);
 
 	// 
 	void LoadLogicWorld();
-	
-	//
 	const char* PlayerName(int AccountID);
-
-	// Аккаунт
 	void SaveAccount(CPlayer *pPlayer, int Table);
-
-	//
 	void ShowLoadingProgress(const char *Loading, int LoadCount);
 	void ShowTopList(CPlayer* pPlayer, int TypeID);
 };

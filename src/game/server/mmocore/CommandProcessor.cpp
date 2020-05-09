@@ -31,10 +31,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		if (sscanf(Msg->m_pMessage, "/login %s %s", Username, Password) != 2)
 			return GS->ChatFollow(ClientID, "Use: /login <username> <password>");
 
-		// если размер пароля логина мал или слишком большой
-		if (str_length(Username) > 15 || str_length(Username) < 4 || str_length(Password) > 15 || str_length(Password) < 4)
-			return GS->Chat(ClientID, "Username / Password must contain 4-15 characters");
-
 		// загружаем аккаунт и данные если он загрузился
 		if (GS->Mmo()->Account()->LoginAccount(ClientID, Username, Password) == AUTH_LOGIN_GOOD)
 			GS->Mmo()->Account()->LoadAccount(pPlayer, true);

@@ -187,7 +187,7 @@ void CPlayerBot::Snap(int SnappingClient)
 
 	bool local_ClientID = (m_ClientID == SnappingClient);
 	pClientInfo->m_Local = local_ClientID;
-	pClientInfo->m_MoodType = GetMoodNameplacesType(SnappingClient);
+	pClientInfo->m_MoodType = GetMoodState(SnappingClient);
 	pClientInfo->m_WorldType = GS()->Mmo()->WorldSwap()->GetWorldType();
 	pClientInfo->m_HealthStart = GetStartHealth();
 	pClientInfo->m_Health = GetHealth();
@@ -203,7 +203,7 @@ void CPlayerBot::Snap(int SnappingClient)
 	}
 }
 
-int CPlayerBot::GetMoodNameplacesType(int SnappingClient) 
+int CPlayerBot::GetMoodState(int SnappingClient)
 {
 	if(GetSpawnBot() == SpawnBot::SPAWN_MOBS)
 	{
@@ -282,7 +282,7 @@ void CPlayerBot::SendInformationBot()
 	ClientInfoMsg.m_Local = 0;
 	ClientInfoMsg.m_Team = GetTeam();
 
-	ClientInfoMsg.m_pName = BotJob::DataBot[m_BotID].Name(this);
+	ClientInfoMsg.m_pName = BotJob::DataBot[m_BotID].NameBot;
 	ClientInfoMsg.m_pClan = "::Bots::";
 	ClientInfoMsg.m_Country = 0;
 	ClientInfoMsg.m_Silent = true;

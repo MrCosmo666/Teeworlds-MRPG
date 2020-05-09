@@ -52,7 +52,7 @@ private:
 
 	void ShowQuestID(CPlayer *pPlayer, int QuestID);
 	void FinishQuest(CPlayer *pPlayer, int QuestID);
-	bool IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData, bool Gived) const;
+	bool IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData) const;
 	void CollectItem(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData);
 	void AddProgress(CPlayer *pPlayer, int QuestID);
 	bool ShowAdventureActiveNPC(CPlayer *pPlayer);
@@ -77,7 +77,7 @@ public:
 	virtual void OnInit();
 	virtual void OnInitAccount(CPlayer* pPlayer);
 	virtual void OnResetClient(int ClientID);
-	virtual bool OnMessage(int MsgID, void* pRawMsg, int ClientID);
+	virtual void OnMessage(int MsgID, void* pRawMsg, int ClientID);
 	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 };

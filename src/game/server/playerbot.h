@@ -28,7 +28,6 @@ public:
 	int GetTeam()													override { return TEAM_BLUE; };
 	void SetStandart(int Health, int Mana)							override { m_BotHealth = Health; };
 	void SetDungeonAllowedSpawn(bool Spawn)							override { m_DungeonAllowedSpawn = Spawn; };
-	int GetMoodNameplacesType(int SnappingClient)					override;
 	int GetItemEquip(int EquipID, int SkipItemID = -1) const		override;
 	void Tick()														override;
 	int GetStartHealth()											override;
@@ -43,6 +42,7 @@ private:
 	bool GetActiveQuestsID(int SnapClientID);
 	const char* GetStatusBot();
 	void SendInformationBot();
+	int GetMoodState(int SnappingClient);
 };
 
 #endif

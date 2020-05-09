@@ -23,14 +23,15 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	m_NextTuningParams = m_PrevTuningParams;
 
 	ClearParsing();
-
 	Acc().Team = GetStartTeam();
 	if (Acc().AuthID > 0)
 	{
 		GS()->Mmo()->Account()->LoadAccount(this, false);
 		m_SyncDuneon = GS()->Mmo()->Dungeon()->SyncFactor();
 	}
+
 	SetLanguage(Server()->GetClientLanguage(ClientID));
+	GS()->SendTuningParams(ClientID);
 }
 
 CPlayer::~CPlayer()
@@ -102,6 +103,7 @@ void CPlayer::PotionsTick()
 	if (Server()->Tick() % Server()->TickSpeed() != 0)
 		return;
 
+	// TODO: change it
 	for (auto ieffect = CGS::Effects[m_ClientID].begin(); ieffect != CGS::Effects[m_ClientID].end();)
 	{
 		if (str_comp(ieffect->first.c_str(), "Poison") == 0)
@@ -207,7 +209,7 @@ void CPlayer::Snap(int SnappingClient)
 		return;
 
 	bool local_ClientID = (m_ClientID == SnappingClient);
-	m_MoodState = GetMoodNameplacesType(SnappingClient);
+	m_MoodState = GetMoodState();
 	pClientInfo->m_Local = local_ClientID;
 	pClientInfo->m_WorldType = GS()->Mmo()->WorldSwap()->GetWorldType();
 	pClientInfo->m_MoodType = m_MoodState;
@@ -396,16 +398,16 @@ bool CPlayer::CheckFailMoney(int Price, int ItemID, bool CheckOnly)
 	if (Price < 0)
 		return false;
 
-	ItemJob::ItemPlayer &CoinItem = GetItem(ItemID);
-	if(CoinItem.Count < Price)
+	ItemJob::InventoryItem &pPlayerItem = GetItem(ItemID);
+	if(pPlayerItem.Count < Price)
 	{
-		GS()->Chat(m_ClientID,"Sorry, need {INT} but you have only {INT} {STR}!", &Price, &CoinItem.Count, CoinItem.Info().GetName(this), NULL);
+		GS()->Chat(m_ClientID,"Sorry, need {INT} but you have only {INT} {STR}!", &Price, &pPlayerItem.Count, pPlayerItem.Info().GetName(this), NULL);
 		return true;
 	}
 
 	if (CheckOnly)
 		return false;
-	if (!CoinItem.Remove(Price))
+	if (!pPlayerItem.Remove(Price))
 		return true;
 	return false;
 }
@@ -698,7 +700,7 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 	return false;
 }
 
-ItemJob::ItemPlayer &CPlayer::GetItem(int ItemID) 
+ItemJob::InventoryItem &CPlayer::GetItem(int ItemID) 
 {
 	ItemJob::Items[m_ClientID][ItemID].SetBasic(this, ItemID);
 	return ItemJob::Items[m_ClientID][ItemID]; 
@@ -759,19 +761,13 @@ int CPlayer::GetLevelDisciple(int Class)
 	int Atributs = 0;
 	for (const auto& at : CGS::AttributInfo)
 	{
-		if (at.second.AtType != Class) 
-			continue;
-		Atributs += GetAttributeCount(at.first, true);
+		if (at.second.AtType == Class)
+			Atributs += GetAttributeCount(at.first, true);
 	}
 	return Atributs;
 }
 
-
-
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-// - - - - - - V V V V V V V - - - - V V V V - - - - - - - - - 
 // - - - - - - T A L K I N G - - - - B O T S - - - - - - - - - 
-// - - - - - - V V V V V V V - - - - V V V V - - - - - - - - - 
 void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 {
 	if (TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] || (!ToProgress && m_TalkingNPC.m_TalkedID != -1) || (ToProgress && m_TalkingNPC.m_TalkedID == -1))
@@ -861,22 +857,18 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 
 void CPlayer::ClearTalking()
 {
-	GS()->SendTalkText(m_ClientID, -1, false, "\0");
+	GS()->ClearTalkText(m_ClientID);
 	m_TalkingNPC.m_TalkedID = -1;
 	m_TalkingNPC.m_TalkedProgress = 0;
 	m_TalkingNPC.m_FreezedProgress = false;
 }
 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
-// - - - - - - V V V V V V - - - - - V V V V - - - - - - - - - 
 // - - - - - - F O R M A T - - - - - T E X T - - - - - - - - - 
-// - - - - - - V V V V V V - - - - - V V V V - - - - - - - - - 
 void CPlayer::FormatTextQuest(int DataBotID, const char *pText)
 {
 	if(!GS()->Mmo()->BotsData()->IsDataBotValid(DataBotID) || m_FormatTalkQuest[0] != '\0') 
 		return;
 
-	// формат текста под вид квестов
 	str_copy(m_FormatTalkQuest, pText, sizeof(m_FormatTalkQuest));
 	str_replace(m_FormatTalkQuest, "[Player]", GS()->Server()->ClientName(m_ClientID));
 	str_replace(m_FormatTalkQuest, "[Talked]", BotJob::DataBot[DataBotID].NameBot);
@@ -888,7 +880,7 @@ void CPlayer::ClearFormatQuestText()
 }
 
 // another need optimize
-int CPlayer::GetMoodNameplacesType(int SnappingClient)
+int CPlayer::GetMoodState()
 {
 	if (!GS()->IsDungeon())
 		return MOOD_NORMAL;

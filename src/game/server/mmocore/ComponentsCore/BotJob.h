@@ -15,10 +15,6 @@ class BotJob : public MmoComponent
 		MobBot.clear();
 	};
 
-	void LoadQuestBots();
-	void LoadNpcBots();
-	void LoadMobsBots();
-
 	struct TalkingData
 	{
 		char m_TalkingText[512];
@@ -36,26 +32,33 @@ class BotJob : public MmoComponent
 		int UseCustomBot[6];
 		int SkinColorBot[6];
 		int EquipSlot[EQUIP_MAX_BOTS];
-
-		const char *Name(CPlayer *pPlayer) const;
 	};
 
 	struct ClassNpcBot
 	{
-		char Name[32];
+		const char* GetName() const
+		{
+			dbg_assert(DataBot.find(BotID) != DataBot.end(), "Name bot it invalid");
+			return DataBot[BotID].NameBot;
+		}
+
 		bool Static;
 		int PositionX;
 		int PositionY;
 		int Emote;
 		int WorldID;
 		int BotID;
-
 		std::vector < TalkingData > m_Talk;
 	};
 
 	struct ClassQuestBot
 	{
-		char Name[32];
+		const char* GetName() const
+		{
+			dbg_assert(DataBot.find(BotID) != DataBot.end(), "Name bot it invalid");
+			return DataBot[BotID].NameBot;
+		}
+
 		int PositionX;
 		int PositionY;
 		int QuestID;
@@ -75,13 +78,17 @@ class BotJob : public MmoComponent
 
 		int InteractiveType;
 		int InteractiveTemp;
-
 		std::vector < TalkingData > m_Talk;
 	};
 
 	struct ClassMobsBot
 	{
-		char Name[32];
+		const char* GetName() const
+		{
+			dbg_assert(DataBot.find(BotID) != DataBot.end(), "Name bot it invalid");
+			return DataBot[BotID].NameBot;
+		}
+
 		bool Boss;
 		int Power;
 		int Spread;
@@ -98,8 +105,13 @@ class BotJob : public MmoComponent
 		int BotID;
 	};
 
-
+	void LoadMainInformationBots();
+	void LoadQuestBots(const char* pWhereLocalWorld);
+	void LoadNpcBots(const char* pWhereLocalWorld);
+	void LoadMobsBots(const char* pWhereLocalWorld);
 public:
+	virtual void OnInitWorld(const char* pWhereLocalWorld);
+
 	typedef DescDataBot DataBotInfo;
 	static std::map < int , DataBotInfo > DataBot;
 
@@ -112,20 +124,14 @@ public:
 	typedef ClassMobsBot MobBotInfo;
 	static std::map < int , MobBotInfo > MobBot;
 
-	void LoadGlobalBots();
 	void ConAddCharacterBot(int ClientID, const char *pCharacter);
-
 	void ProcessingTalkingNPC(int OwnID, int TalkingID, bool PlayerTalked, const char *Message, int Style, int TalkingEmote);
-
-
 	bool TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char *pText = "empty");
 	bool TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID);
 	void ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress);
 	bool IsGiveNPCQuest(int MobID) const;
 
 	// ------------------ CHECK VALID DATA --------------------
-	// --------------------------------------------------------
-	// --------------------------------------------------------
 	bool IsDataBotValid(int BotID) const { return (DataBot.find(BotID) != DataBot.end()); }
 	bool IsNpcBotValid(int MobID) const 
 	{ 
@@ -146,8 +152,7 @@ public:
 			return true;
 		return false;
 	}
-	// --------------------------------------------------------
-	// --------------------------------------------------------
+
 };
 
 #endif

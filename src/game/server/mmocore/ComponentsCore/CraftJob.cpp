@@ -41,13 +41,14 @@ bool CraftJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 
 	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_CRAFT_ZONE))
 	{
+		GS()->Chat(ClientID, "List of your craft's, you can see on vote!");
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
-		GS()->Chat(ClientID, "Information load in Vote!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_CRAFT_ZONE))
 	{
+		GS()->Chat(ClientID, "You have left the active zone, menu is restored!");
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		return true;
@@ -113,7 +114,7 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 			if(SearchItemID <= 0 || SearchCount <= 0) 
 				continue;
 			
-			ItemJob::ItemPlayer &PlSearchItem = pPlayer->GetItem(SearchItemID);
+			ItemJob::InventoryItem &PlSearchItem = pPlayer->GetItem(SearchItemID);
 			GS()->AVMI(ClientID, PlSearchItem.Info().GetIcon(), "null", NOPE, HideID, "{STR} {INT}({INT})", PlSearchItem.Info().GetName(pPlayer), &SearchCount, &PlSearchItem.Count);
 		}
 		GS()->AVM(ClientID, "CRAFT", cr.first, HideID, "Craft {STR}", InfoGetItem.GetName(pPlayer));
@@ -124,7 +125,7 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 {
 	const int ClientID = pPlayer->GetCID();
-	ItemJob::ItemPlayer& PlayerItem = pPlayer->GetItem(Craft[CraftID].GetItemID);
+	ItemJob::InventoryItem& PlayerItem = pPlayer->GetItem(Craft[CraftID].GetItemID);
 	if (PlayerItem.Info().IsEnchantable() && PlayerItem.Count > 0)
 	{
 		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");

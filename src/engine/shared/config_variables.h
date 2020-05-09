@@ -48,7 +48,7 @@ MACRO_CONFIG_INT(SndVolume, snd_volume, 100, 0, 100, CFGFLAG_SAVE|CFGFLAG_CLIENT
 MACRO_CONFIG_INT(SndNonactiveMute, snd_nonactive_mute, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Mute the application when not active")
 MACRO_CONFIG_INT(SndAsyncLoading, snd_async_loading, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Load sound files threaded")
 MACRO_CONFIG_INT(SndEnableUI, snd_enable_ui, 1, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Enable interface sounds")
-MACRO_CONFIG_INT(SndEnableUIHover, snd_enable_ui_hover, 0, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Enable on-hover interface sounds")
+MACRO_CONFIG_INT(SndEnableUIHover, snd_enable_ui_hover, 1, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Enable on-hover interface sounds")
 MACRO_CONFIG_INT(SndEnableRace, snd_enable_race, 1, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Enable race sounds (checkpoints)")
 
 MACRO_CONFIG_INT(GfxScreen, gfx_screen, 0, 0, 0, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Screen index")

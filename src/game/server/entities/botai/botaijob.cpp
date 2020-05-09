@@ -49,7 +49,7 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 		}
 		if (!GS()->IsDungeon())
 		{
-			GS()->ChatWorldID(BotJob::MobBot[SubBotID].WorldID, "", "In your zone emerging {STR}!", BotJob::MobBot[SubBotID].Name);
+			GS()->ChatWorldID(BotJob::MobBot[SubBotID].WorldID, "", "In your zone emerging {STR}!", BotJob::MobBot[SubBotID].GetName());
 		}
 	}
 	else if(GetPlayer()->GetSpawnBot() == SpawnBot::SPAWN_QUEST_NPC)

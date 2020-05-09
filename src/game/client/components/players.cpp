@@ -603,11 +603,15 @@ enum ItemList
 	itGoblinShotgun = 10021,
 	itGoblinGrenade = 10022,
 	itGoblinRifle = 10023,
+	itScytheHammer = 10024,
 };
 
 void CPlayers::OnInit()
 {
 	// загружаем всю информацию о equip item's
+	/* UNSET */
+	m_aEquipInfo.add({ itScytheHammer, vec4(1.0f, 1.0f, 1.0f, 0.003f), vec2(0,0), vec2(110, 110), 0.0f, SPRITE_MMO_HAMMER_SCYTHE, 0 });
+
 
 	/* SET HEAVEN */
 	m_aEquipInfo.add({ itHeavenlyHammer, vec4(1.0f, 1.0f, 1.0f, 0.003f), vec2(0,0), vec2(100, 100), 0.0f, SPRITE_MMO_HAMMER_HEAVEN, 0 });

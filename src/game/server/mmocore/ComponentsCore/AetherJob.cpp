@@ -67,14 +67,15 @@ bool AetherJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 
 	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_AETHER_TELEPORT))
 	{
+		GS()->Chat(ClientID, "List of your aether's, you can see on vote!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
-		GS()->Chat(ClientID, "List of your Aether Locations, you can see on vote!");
 		UnlockLocation(pChr->GetPlayer(), pChr->m_Core.m_Pos);
 		GS()->VResetVotes(ClientID, MenuList::MAIN_MENU);
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_AETHER_TELEPORT))
 	{
+		GS()->Chat(ClientID, "You have left the active zone, menu is restored!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		GS()->VResetVotes(ClientID, MenuList::MAIN_MENU);
 		return true;

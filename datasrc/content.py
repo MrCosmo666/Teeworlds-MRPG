@@ -662,6 +662,8 @@ container.sprites.Add(Sprite("mmo_hammer_heaven", set_mmohammer, 0, 0, 1, 1)) # 
 container.sprites.Add(Sprite("mmo_hammer_magitech", set_mmohammer, 1, 0, 1, 1))
 container.sprites.Add(Sprite("mmo_hammer_goblin", set_mmohammer, 2, 0, 1, 1))
 
+container.sprites.Add(Sprite("mmo_hammer_scythe", set_mmohammer, 0, 3, 1, 1))
+
 #mmotee gun [3 weapon] on 1 line
 container.sprites.Add(Sprite("mmo_gun_heaven", set_mmogun, 0, 0, 2, 1)) # +2 weapon
 container.sprites.Add(Sprite("mmo_gun_heaven_muzzle1", set_mmogun, 2, 0, 2, 1)) # +2 muzzle

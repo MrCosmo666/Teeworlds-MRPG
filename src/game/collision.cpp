@@ -155,24 +155,29 @@ int CCollision::IntersectLine(vec2 Pos0, vec2 Pos1, vec2 *pOutCollision, vec2 *p
 // Cord 'X','x' or 'Y','y' | SumSymbol '+' or '-'
 vec2 CCollision::FindDirCollision(int CheckNum, vec2 SourceVec, char Cord, char SumSymbol)
 {
-	for (int i = 0; i < CheckNum; i++) 
+	const bool IsCordinateX= (bool)(Cord == 'x' || Cord == 'X');
+	const bool IsCordinateY= (bool)(Cord == 'y' || Cord == 'Y');
+	if((SumSymbol == '-' || SumSymbol == '+') && (IsCordinateX || IsCordinateY))
 	{
-		if(SumSymbol == '-') 
+		for(int i = 0; i < CheckNum; i++)
 		{
-			if(Cord == 'x' || Cord == 'X')
-				SourceVec.x -= i;
-			else if(Cord == 'y' || Cord == 'Y')
-				SourceVec.y -= i;
+			if(SumSymbol == '-')
+			{
+				if(IsCordinateX)
+					SourceVec.x -= i;
+				else if(IsCordinateY)
+					SourceVec.y -= i;
+			}
+			else if(SumSymbol == '+')
+			{
+				if(IsCordinateX)
+					SourceVec.x += i;
+				else if(IsCordinateY)
+					SourceVec.y += i;
+			}
+			if(GetCollisionAt(SourceVec.x, SourceVec.y) > 0)
+				break;
 		}
-		else if(SumSymbol == '+') 
-		{
-			if(Cord == 'x' || Cord == 'X')
-				SourceVec.x += i;
-			else if(Cord == 'y' || Cord == 'Y')
-				SourceVec.y += i;
-		}
-		if (GetCollisionAt(SourceVec.x, SourceVec.y) > 0)
-			break;
 	}
 	return SourceVec;
 }
@@ -250,14 +255,9 @@ void CCollision::MoveBox(vec2 *pInoutPos, vec2 *pInoutVel, vec2 Size, float Elas
 
 	if(Distance > 0.00001f)
 	{
-		//vec2 old_pos = pos;
 		float Fraction = 1.0f/(float)(Max+1);
 		for(int i = 0; i <= Max; i++)
 		{
-			//float amount = i/(float)max;
-			//if(max == 0)
-				//amount = 0;
-
 			vec2 NewPos = Pos + Vel*Fraction; // TODO: this row is not nice
 			if(pDeath && TestBox(vec2(NewPos.x, NewPos.y), Size*(2.0f/3.0f), COLFLAG_DEATH))
 			{

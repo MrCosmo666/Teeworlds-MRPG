@@ -9,7 +9,7 @@
 
 #include "dropingitem.h"
 
-CDropingItem::CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, ItemJob::ItemPlayer DropItem, int ForID)
+CDropingItem::CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, ItemJob::InventoryItem DropItem, int ForID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPITEM, Pos)
 {
 	m_Pos = Pos;
@@ -46,7 +46,7 @@ bool CDropingItem::TakeItem(int ClientID)
 		return false;
 
 	// размен зачарованных предметов
-	ItemJob::ItemPlayer &PlDropItem = pPlayer->GetItem(m_DropItem.GetID());
+	ItemJob::InventoryItem &PlDropItem = pPlayer->GetItem(m_DropItem.GetID());
 	if(PlDropItem.Count > 0 && PlDropItem.Info().IsEnchantable())
 	{
 		GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
@@ -121,7 +121,7 @@ void CDropingItem::Tick()
 		return;
 
 	// если не зачарованный предмет
-	const ItemJob::ItemPlayer PlDropItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
+	const ItemJob::InventoryItem PlDropItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
 	if(!PlDropItem.Info().IsEnchantable())
 	{
 		GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}x{INT} : {STR}",

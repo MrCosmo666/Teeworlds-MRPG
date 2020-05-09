@@ -74,7 +74,7 @@ void CQuestItem::Tick()
 	int Count = m_QuestBot.ItemSearchCount[0];
 	int QuestID = m_QuestBot.QuestID;
 	CPlayer* pPlayer = GS()->m_apPlayers[m_OwnerID];
-	ItemJob::ItemPlayer& PlItemForQuest = pPlayer->GetItem(m_QuestBot.ItemSearch[0]);
+	ItemJob::InventoryItem& PlItemForQuest = pPlayer->GetItem(m_QuestBot.ItemSearch[0]);
 
 	// проверяем если прогресс не равен данному / проверяем завершен ли квест / проверяем если предметов больше чем требуется
 	if (QuestJob::Quests[m_OwnerID][QuestID].Progress != m_QuestBot.Progress || PlItemForQuest.Count >= Count)
@@ -95,7 +95,7 @@ void CQuestItem::Tick()
 			GS()->CreatePlayerSound(m_OwnerID, SOUND_ITEM_PICKUP);
 			pPlayer->GetCharacter()->m_ReloadTimer = 0;
 			PlItemForQuest.Add(1);
-			GS()->Chat(m_OwnerID, "You pick {STR} for {STR}!", PlItemForQuest.Info().GetName(pPlayer), m_QuestBot.Name);
+			GS()->Chat(m_OwnerID, "You pick {STR} for {STR}!", PlItemForQuest.Info().GetName(pPlayer), m_QuestBot.GetName());
 			GS()->m_World.DestroyEntity(this);
 			return;
 		}

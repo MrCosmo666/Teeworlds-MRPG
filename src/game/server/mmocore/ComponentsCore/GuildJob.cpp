@@ -508,7 +508,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		const int DecoItemID = VoteID2;
 		if (DeleteDecorationHouse(DecoID))
 		{
-			ItemJob::ItemPlayer& PlDecoItem = pPlayer->GetItem(DecoItemID);
+			ItemJob::InventoryItem& PlDecoItem = pPlayer->GetItem(DecoItemID);
 			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
 			PlDecoItem.Add(1);
 		}

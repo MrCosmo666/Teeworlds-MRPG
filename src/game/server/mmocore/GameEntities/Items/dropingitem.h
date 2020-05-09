@@ -21,12 +21,12 @@ class CDropingItem : public CEntity
 	int m_LifeSpan;
 	int m_FlashTimer;
 
-	ItemJob::ItemPlayer m_DropItem;
+	ItemJob::InventoryItem m_DropItem;
 	int m_ForID;
 	int m_IDs[NUM_IDS];
 
 public:
-	CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, ItemJob::ItemPlayer DropItem, int ForID);
+	CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, ItemJob::InventoryItem DropItem, int ForID);
 	~CDropingItem();
 
 	virtual void Tick();

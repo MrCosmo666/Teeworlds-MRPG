@@ -46,19 +46,19 @@ bool CMenus::CListBox::DoFilter(float FilterHeight, float Spacing)
 	CUIRect View = m_ListBoxView;
 
 	// background
-	View.HSplitTop(FilterHeight+Spacing, &Filter, 0);
+	View.HSplitTop(FilterHeight + Spacing, &Filter, 0);
 	m_pRenderTools->DrawUIRect(&Filter, vec4(0.0f, 0.0f, 0.0f, 0.25f), 0, 5.0f);
 
 	// draw filter
 	View.HSplitTop(FilterHeight, &Filter, &View);
 	Filter.Margin(Spacing, &Filter);
 
-	float FontSize = Filter.h*ms_FontmodHeight*0.8f;
+	float FontSize = Filter.h * ms_FontmodHeight * 0.8f;
 
 	CUIRect Label, EditBox;
-	Filter.VSplitLeft(Filter.w/5.0f, &Label, &EditBox);
+	Filter.VSplitLeft(Filter.w / 5.0f, &Label, &EditBox);
 	Label.y += Spacing;
-	m_pMenus->UI()->DoLabel(&Label, Localize("Search:"), FontSize, CUI::ALIGN_CENTER);
+	m_pUI->DoLabel(&Label, Localize("Search:"), FontSize, CUI::ALIGN_CENTER);
 	bool Changed = m_pMenus->DoEditBox(m_aFilterString, &EditBox, m_aFilterString, sizeof(m_aFilterString), FontSize, &m_OffsetFilter);
 
 	View.HSplitTop(Spacing, &Filter, &View);
