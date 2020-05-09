@@ -259,15 +259,13 @@ CCharacter *CPlayer::GetCharacter()
 void CPlayer::TryRespawn()
 {
 	vec2 SpawnPos;
-
-	// safe zones
 	int SpawnType = SPAWN_HUMAN;
 	if(Acc().TempActiveSafeSpawn)
 	{
 		const int SafezoneWorldID = GS()->GetRespawnWorld();
 		if(SafezoneWorldID >= 0 && !GS()->IsClientEqualWorldID(m_ClientID, SafezoneWorldID))
 		{
-			GS()->Server()->ChangeWorld(m_ClientID, SafezoneWorldID);
+			ChangeWorld(SafezoneWorldID);
 			return;
 		}
 		SpawnType = SPAWN_HUMAN_SAFE;
@@ -910,4 +908,14 @@ int CPlayer::GetMoodState()
 			return MOOD_NORMAL;
 	}
 	return MOOD_PLAYER_TANK;
+}
+
+void CPlayer::ChangeWorld(int WorldID)
+{
+	if(m_pCharacter)
+	{
+		GS()->m_World.DestroyEntity(m_pCharacter);
+		GS()->m_World.m_Core.m_apCharacters[m_ClientID] = 0;
+	}
+	Server()->ChangeWorld(m_ClientID, WorldID);
 }

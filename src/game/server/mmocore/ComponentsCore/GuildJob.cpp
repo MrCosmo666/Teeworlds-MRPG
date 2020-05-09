@@ -172,7 +172,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			vec2 Position = GetPositionHouse(GuildID);
 			pPlayer->Acc().TempTeleportX = Position.x;
 			pPlayer->Acc().TempTeleportY = Position.y;
-			GS()->Server()->ChangeWorld(ClientID, WorldID);
+			pPlayer->ChangeWorld(WorldID);
 			return true;
 		}
 

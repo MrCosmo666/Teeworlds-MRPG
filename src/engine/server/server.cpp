@@ -603,8 +603,11 @@ void CServer::InitRconPasswordIfUnset()
 
 int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int WorldID)
 {
-	if (ClientID >= MAX_PLAYERS || !pMsg)
+	if (!pMsg)
 		return -1;
+
+	if(ClientID != -1 && (ClientID < 0 || ClientID >= MAX_PLAYERS || m_aClients[ClientID].m_State == CClient::STATE_EMPTY || m_aClients[ClientID].m_Quitting))
+		return 0;
 
 	CNetChunk Packet;
 	mem_zero(&Packet, sizeof(CNetChunk));

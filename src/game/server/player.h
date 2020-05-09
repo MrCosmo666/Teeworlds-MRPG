@@ -179,6 +179,8 @@ public:
 	void ClearFormatQuestText();
 
 	int GetMoodState();
+
+	void ChangeWorld(int WorldID);
 };
 
 #endif

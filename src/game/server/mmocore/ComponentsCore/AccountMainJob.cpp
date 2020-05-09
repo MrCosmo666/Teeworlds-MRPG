@@ -149,13 +149,13 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	if (!pPlayer->GetItem(itHammer).Count)
 	{
 		pPlayer->GetItem(itHammer).Add(1);
-		GS()->Server()->ChangeWorld(ClientID, NEWBIE_ZERO_WORLD);
+		pPlayer->ChangeWorld(NEWBIE_ZERO_WORLD);
 		return;
 	}
 
 	if(pPlayer->Acc().WorldID != GS()->GetWorldID())
 	{
-		GS()->Server()->ChangeWorld(ClientID, pPlayer->Acc().WorldID);
+		pPlayer->ChangeWorld(pPlayer->Acc().WorldID);
 		return;
 	}
 

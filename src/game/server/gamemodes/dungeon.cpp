@@ -230,7 +230,7 @@ void CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 	{
 		int ClientID = pChr->GetPlayer()->GetCID();
 		GS()->Chat(ClientID, "You were thrown out of dungeon!");
-		GS()->Server()->ChangeWorld(ClientID, pChr->GetPlayer()->Acc().LastWorldID);
+		pChr->GetPlayer()->ChangeWorld(pChr->GetPlayer()->Acc().LastWorldID);
 	}
 }
 

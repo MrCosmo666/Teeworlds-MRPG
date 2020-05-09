@@ -12,6 +12,7 @@
 #include <game/server/mmocore/GameEntities/questai.h>
 #include <game/server/mmocore/GameEntities/snapfull.h>
 #include <game/server/mmocore/GameEntities/jobitems.h>
+#include <game/server/mmocore/GameEntities/Events/event_health.h>
 
 //input count
 struct CInputCount
@@ -554,15 +555,16 @@ void CCharacter::Tick()
 
 	// - - - - - - - - - - - -
 	// запретить дальше Мобам
-	if (m_pPlayer->IsBot())
+	if (m_pPlayer->IsBot() || IsLockedWorld())
 		return;
 
-	HandleAuthedPlayer();
-
 	// another function
-	HandleEvents();
 	if(IsAlive())
+	{
+		HandleAuthedPlayer();
+		HandleEvents();
 		HandleTilesets();
+	}
 }
 
 void CCharacter::TickDefered()
@@ -918,7 +920,7 @@ void CCharacter::HandleTilesets()
 		return;
 
 	// инвенты
-	for (int i = TILE_CLEAR_EVENTS; i <= TILE_EVENT_LIKE; i++)
+	for (int i = TILE_CLEAR_EVENTS; i <= TILE_EVENT_HEALTH; i++)
 	{
 		if (m_pHelper->TileEnter(Index, i))
 			SetEvent(i);
@@ -932,7 +934,37 @@ void CCharacter::HandleTilesets()
 		GS()->CreateDeath(m_Pos, m_pPlayer->GetCID());
 }
 
-void CCharacter::HandleEvents() { }
+void CCharacter::HandleEvents() 
+{
+	if(m_pPlayer->IsBot())
+		return;
+
+	// тайл инвента
+	int ClientID = m_pPlayer->GetCID();
+	if(m_Event == TILE_EVENT_PARTY)
+	{
+		SetEmote(EMOTE_HAPPY, 1);
+		if(rand() % 50 == 0)
+		{
+			GS()->SendEmoticon(ClientID, 1 + rand() % 2);
+			GS()->CreateDeath(m_Core.m_Pos, ClientID);
+		}
+	}
+
+	// тайл инвента
+	if(m_Event == TILE_EVENT_LIKE)
+	{
+		SetEmote(EMOTE_HAPPY, 1);
+		if(Server()->Tick() % Server()->TickSpeed() == 0)
+			GS()->SendMmoEffect(m_Core.m_Pos, EFFECT_SPASALON);
+	}
+
+	if(m_Event == TILE_EVENT_HEALTH)
+	{
+		if(Server()->Tick() % Server()->TickSpeed() == 0)
+			new CEventHealth(&GS()->m_World, m_Core.m_Pos);
+	}
+}
 
 void CCharacter::GiveRandomMobEffect(int FromID)
 {
@@ -1024,25 +1056,6 @@ void CCharacter::HandleTunning()
 		vec2 Direction = vec2(m_Core.m_Input.m_TargetX, m_Core.m_Input.m_TargetY);
 		m_Core.m_Vel += Direction*0.001f;
 	}
-
-	// тайл инвента
-	if(m_Event == TILE_EVENT_PARTY)
-	{
-		SetEmote(EMOTE_HAPPY, 1);
-		if(rand()%50 == 0)
-		{
-			GS()->SendEmoticon(m_pPlayer->GetCID(), 1+rand()%2);
-			GS()->CreateDeath(m_Core.m_Pos, m_pPlayer->GetCID());
-		}
-	}	
-	
-	// тайл инвента
-	if(m_Event == TILE_EVENT_LIKE)
-	{
-		SetEmote(EMOTE_HAPPY, 1);
-		if (Server()->Tick() % Server()->TickSpeed() == 0)
-			GS()->SendMmoEffect(m_Core.m_Pos, EFFECT_SPASALON);
-	}
 }
 
 void CCharacter::HandleAuthedPlayer()
@@ -1059,22 +1072,27 @@ void CCharacter::HandleAuthedPlayer()
 			m_pPlayer->SetStandart(m_Health, m_Mana);
 			m_pPlayer->ShowInformationStats();
 		}
+	}
+}
 
-		// сменять мир игрокам что находятся в гильдейских домах но для них мире что еще не открыт
-		int NecessaryQuest = GS()->Mmo()->WorldSwap()->GetNecessaryQuest();
-		if (NecessaryQuest > 0 && !GS()->Mmo()->Quest()->IsComplectedQuest(m_pPlayer->GetCID(), NecessaryQuest))
+bool CCharacter::IsLockedWorld()
+{
+	if(m_Alive && m_pPlayer->IsAuthed() && (Server()->Tick() % Server()->TickSpeed() * 3) == 0)
+	{
+		const int NecessaryQuest = GS()->Mmo()->WorldSwap()->GetNecessaryQuest();
+		if(NecessaryQuest > 0 && !GS()->Mmo()->Quest()->IsComplectedQuest(m_pPlayer->GetCID(), NecessaryQuest))
 		{
 			int CheckHouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
-			if (CheckHouseID <= 0)
+			if(CheckHouseID <= 0)
 			{
-				m_pPlayer->Acc().TempTeleportX = -1;
-				m_pPlayer->Acc().TempTeleportY = -1;
+				m_pPlayer->Acc().TempTeleportX = m_pPlayer->Acc().TempTeleportY = -1;
 				GS()->Chat(m_pPlayer->GetCID(), "This chapter is still closed, you magically transported back!");
-				GS()->Server()->ChangeWorld(m_pPlayer->GetCID(), NEWBIE_ZERO_WORLD);
-				return;
+				m_pPlayer->ChangeWorld(NEWBIE_ZERO_WORLD);
+				return true;
 			}
 		}
 	}
+	return false;
 }
 
 bool CCharacter::CheckFailMana(int Mana)

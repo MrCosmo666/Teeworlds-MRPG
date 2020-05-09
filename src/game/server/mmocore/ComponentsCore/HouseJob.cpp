@@ -619,7 +619,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		{
 			pPlayer->Acc().TempTeleportX = Position.x;
 			pPlayer->Acc().TempTeleportY = Position.y;
-			GS()->Server()->ChangeWorld(ClientID, HouseWorldID);
+			pPlayer->ChangeWorld(HouseWorldID);
 			return true;
 		}
 		pPlayer->GetCharacter()->ChangePosition(Position);

@@ -36,6 +36,7 @@ class CCharacter : public CEntity
 	void InteractiveRifle(vec2 Direction, vec2 ProjStartPos);
 	void HandleTunning();
 	void HandleAuthedPlayer();
+	bool IsLockedWorld();
 
 public:
 	//character's size
