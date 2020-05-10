@@ -10,6 +10,7 @@
 #include <game/gamecore.h>
 #include "../character.h"
 
+class CEntityFunctionNurse;
 class BotAI : public CCharacter
 {
 	MACRO_ALLOC_POOL_ID()
@@ -50,18 +51,23 @@ private:
 	void EngineNPC();
 	void EngineMobs();
 	void EngineQuestMob();
-	// void HandleHook();
 
 	CPlayer *SearchPlayer(int Distance);
     CPlayer *SearchTenacityPlayer(float Distance);
-
 	void EmoteActions(int EmotionStyle);
 
-	// test
 	vec2 GetHookPos(vec2 Position);
+	bool FunctionNurseNPC();
+	bool BaseFunctionNPC();
+};
 
-
-	float ViewDistanceNPC() const;
+class CEntityFunctionNurse : public CEntity
+{
+	int m_OwnerID;
+public:
+	CEntityFunctionNurse(CGameWorld* pGameWorld, int ClientID, vec2 Pos);
+	virtual void Tick();
+	virtual void Snap(int SnappingClient);
 };
 
 #endif

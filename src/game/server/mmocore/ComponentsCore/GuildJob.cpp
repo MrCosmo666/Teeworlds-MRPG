@@ -821,26 +821,25 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "/gexit - leave of guild group (for all members)");
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "- - - - - - - - - -");
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Guild Bank: {INT}gold", &Guild[GuildID].m_Bank);
-
 	GS()->AV(ClientID, "null", "");
+	//
 	pPlayer->m_Colored = GOLDEN_COLOR;
 	GS()->AVL(ClientID, "null", "Players list on guild");
 	ShowGuildPlayers(pPlayer);
 	GS()->AV(ClientID, "null", "");
-
+	//
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "◍ Your money: {INT}gold", &pPlayer->GetItem(itMoney).Count);
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "MMONEY", "Add money guild bank. (Amount in a reason)", Guild[GuildID].m_Name);
-
 	GS()->AV(ClientID, "null", "");
+	//
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
-	GS()->AVL(ClientID, "null", "▤ Guild system", &pPlayer->GetItem(itMoney).Count);
+	GS()->AVL(ClientID, "null", "▤ Guild system");
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_RANK, NOPE, "Settings guild Rank(s)");
 	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_INVITES, NOPE, "Invites to your guild");
 	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_HISTORY, NOPE, "History of activity");
-
 	if (MemberHouse > 0)
 	{
 		GS()->AV(ClientID, "null", "");
@@ -852,9 +851,8 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 		GS()->AVL(ClientID, "MSPAWN", "Teleport to guild house");
 		GS()->AVL(ClientID, "MHOUSESELL", "Sell your guild house (in reason 777)");
 	}
-
-
 	GS()->AV(ClientID, "null", "");
+	//
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "☆ Guild upgrades", &pPlayer->GetItem(itMoney).Count);
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;

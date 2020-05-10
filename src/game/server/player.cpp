@@ -274,17 +274,6 @@ void CPlayer::TryRespawn()
 	if(!GS()->m_pController->CanSpawn(SpawnType, &SpawnPos, vec2(-1, -1)))
 		return;
 
-	const int CheckHouseSpawn = GS()->Mmo()->House()->PlayerHouseID(this);
-	if(CheckHouseSpawn > 0)
-	{
-		const int HouseWorldID = GS()->Mmo()->House()->GetWorldID(CheckHouseSpawn);
-		if (GS()->IsClientEqualWorldID(m_ClientID, HouseWorldID))
-		{
-			int HouseID = GS()->Mmo()->House()->PlayerHouseID(this);
-			SpawnPos = GS()->Mmo()->House()->GetPositionHouse(HouseID);
-		}
-	}
-
 	if(Acc().TempTeleportX > 1 || Acc().TempTeleportY > 1)
 	{
 		SpawnPos = vec2(Acc().TempTeleportX, Acc().TempTeleportY);

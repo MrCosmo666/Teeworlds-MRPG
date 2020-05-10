@@ -195,8 +195,8 @@ bool CCharacter::DecoInteractive()
 			if (GS()->Mmo()->House()->AddDecorationHouse(DecoID, HouseID, m_pHelper->MousePos()))
 			{
 				GS()->Chat(ClientID, "You added {STR}, to your house!", GS()->GetItemInfo(DecoID).GetName(m_pPlayer));
-				GS()->ResetVotes(ClientID, MenuList::MENU_HOUSE_DECORATION);
 				m_pPlayer->GetItem(DecoID).Remove(1);
+				GS()->ResetVotes(ClientID, MenuList::MENU_HOUSE_DECORATION);
 				return true;
 			}
 		}
@@ -206,8 +206,8 @@ bool CCharacter::DecoInteractive()
 			if (GS()->Mmo()->Member()->AddDecorationHouse(DecoID, GuildID, m_pHelper->MousePos()))
 			{
 				GS()->Chat(ClientID, "You added {STR}, to your guild house!", GS()->GetItemInfo(DecoID).GetName(m_pPlayer));
-				GS()->ResetVotes(ClientID, MenuList::MENU_GUILD_HOUSE_DECORATION);
 				m_pPlayer->GetItem(DecoID).Remove(1);
+				GS()->ResetVotes(ClientID, MenuList::MENU_GUILD_HOUSE_DECORATION);
 				return true;
 			}
 		}

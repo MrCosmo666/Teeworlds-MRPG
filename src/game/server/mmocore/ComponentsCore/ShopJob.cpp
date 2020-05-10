@@ -5,13 +5,10 @@
 #include "ShopJob.h"
 
 using namespace sqlstr;
-
-/* Information NON STATIC DATA LOAD ONLY DATABASE (MultiWorld Work) Later need changes object on static class*/
 std::map < int , ShopJob::ShopPersonal > ShopJob::Shop;
 
 void ShopJob::OnInit()
 {
-	// загрузить магазины
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop"));
 	while(RES->next())
 	{
@@ -196,9 +193,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 		return false;
 	}
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - AUCTION - - - - - - - - - - - - -
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	int Price = SHOPITEM->getInt("Price");
 	const int OwnerID = SHOPITEM->getInt("OwnerID");
 	const int Count = SHOPITEM->getInt("Count");
@@ -227,9 +222,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 		return true;
 	}
 
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	// - - - - - - - - - - - -SHOP - - - - - - - - - - - - -
-	// - - - - - - - - - - - - - - - - - - - - - - - - - - -
 	const int NeedItem = SHOPITEM->getInt("NeedItem");
 	if (pPlayer->CheckFailMoney(Price, NeedItem))
 		return false;

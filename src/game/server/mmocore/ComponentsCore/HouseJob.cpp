@@ -89,7 +89,7 @@ bool HouseJob::AddDecorationHouse(int DecoID, int HouseID, vec2 Position)
 		return false;
 
 	vec2 PositionHouse = GetPositionHouse(HouseID);
-	if(distance(PositionHouse, Position) > 600)
+	if(distance(PositionHouse, Position) > 400.0f)
 		return false;
 
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_houses_decorations", "WHERE HouseID = '%d'", HouseID));
@@ -304,7 +304,7 @@ bool HouseJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 
 	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_PLAYER_HOUSE))
 	{
-		int HouseID = GS()->Mmo()->House()->GetHouse(pChr->m_Core.m_Pos);
+		const int HouseID = GS()->Mmo()->House()->GetHouse(pChr->m_Core.m_Pos);
 		if (HouseID > 0)
 		{
 			GS()->Chat(ClientID, "List of house, you can see on vote!");
@@ -377,7 +377,7 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		pPlayer->m_LastVoteMenu = MenuList::MENU_HOUSE;
 
 		GS()->AVH(ClientID, TAB_INFO_HOUSE_PLANT, GREEN_COLOR, "Plants Information");
-		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE_PLANT, "Select item and in tab select 'Change Plants'");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE_PLANT, "Select item and in tab select 'To plant'");
 		GS()->AV(ClientID, "null", "");
 
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "Housing Active Plants: {STR}", GS()->GetItemInfo(PlantItemID).GetName(pPlayer));
@@ -398,7 +398,13 @@ void HouseJob::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
 		return;
 
 	const int HouseID = RES->getInt("ID");
-	Home[HouseID].m_Bank -= clamp(TakeCount, 1, (int)RES->getInt("HouseBank"));
+	const int Bank = (int)RES->getInt("HouseBank");
+	if(Bank < TakeCount)
+	{
+		GS()->Chat(ClientID, "Acceptable for take {INT}gold", &Bank);
+		return;
+	}
+	Home[HouseID].m_Bank = Bank - TakeCount;
 	GS()->Chat(ClientID, _("You take gold in the safe (+{VAL}){VAL}!"), &TakeCount, &Home[HouseID].m_Bank);
 	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", Home[HouseID].m_Bank, HouseID);
 }
@@ -471,15 +477,24 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 	}
 	const bool StateDoor = GetHouseDoor(HouseID);
 	GS()->AVH(ClientID, TAB_HOUSE_STAT, BLUE_COLOR, "House stats {INT} Class {STR} Door [{STR}]", &HouseID, Home[HouseID].m_Class, StateDoor ? "Closed" : "Opened");
-	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "In your safe is: {INT}gold", &Home[HouseID].m_Bank);
-	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "- - - - - - - - - -");
-	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "Your gold: {INT}gold", &pPlayer->GetItem(itMoney).Count);
+	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "/doorhouse - interactive with door.");
+	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "/sellhouse - sell house to world.");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "- - - - - - - - - -");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "Notes: Minimal operation house balance 100gold");
+	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "In your safe is: {INT}gold", &Home[HouseID].m_Bank);
 	GS()->AV(ClientID, "null", "");
-	GS()->AVM(ClientID, "HOUSEMONEY", 1, NOPE, "Add to the safe gold. (Amount in a reason)");
+	//
+	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
+	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", &pPlayer->GetItem(itMoney).Count);
+	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
+	GS()->AVM(ClientID, "HOUSEADD", 1, NOPE, "Add to the safe gold. (Amount in a reason)");
 	GS()->AVM(ClientID, "HOUSETAKE", 1, NOPE, "Take the safe gold. (Amount in a reason)");
-	GS()->AVM(ClientID, "HOUSEDOOR", HouseID, NOPE, "Change state [\"{STR} door\"]", StateDoor ? "Open" : "Close");
+	GS()->AV(ClientID, "null", "");
+	//
+	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
+	GS()->AVL(ClientID, "null", "▤ House system");
+	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
+	GS()->AVM(ClientID, "HOUSEDOOR", HouseID, NOPE, "Change state to [\"{STR} door\"]", StateDoor ? "Open" : "Close");
 	GS()->AVM(ClientID, "HSPAWN", 1, NOPE, "Teleport to your house");
 	if(Home[HouseID].m_WorldID == GS()->Server()->GetWorldID(ClientID))
 	{
@@ -495,15 +510,15 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 // Парсинг голосований
 bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	if(PPSTR(CMD, "BUYHOUSE") == 0)
 	{
-		if(BuyHouse(VoteID, pPlayer))
+		const int HouseID = VoteID;
+		if(BuyHouse(HouseID, pPlayer))
 		{
-			GS()->Chat(-1, "{STR} becomes the owner of the house class {STR} HID {INT}", GS()->Server()->ClientName(ClientID), Home[VoteID].m_Class, &VoteID);
-			GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**{STR} becomes the owner of the house class [{STR} number {INT}]**",
-					GS()->Server()->ClientName(ClientID), Home[VoteID].m_Class, &VoteID);
-			GS()->ChatFollow(ClientID, "Do not forget to top up the balance at home, now the balance {INT}G", &Home[VoteID].m_Bank);
+			GS()->Chat(-1, "{STR} becomes the owner of the house class {STR}", GS()->Server()->ClientName(ClientID), Home[VoteID].m_Class);
+			GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**{STR} becomes the owner of the house class {STR}**", GS()->Server()->ClientName(ClientID), Home[HouseID].m_Class);
+			GS()->ChatFollow(ClientID, "Do not forget to top up the balance at home, now the balance {INT}G", &Home[HouseID].m_Bank);
 			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		}
 		return true;
@@ -599,7 +614,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 	// смена расстения дома
 	if(PPSTR(CMD, "HOMEPLANTSET") == 0)
 	{
-		int HouseID = PlayerHouseID(pPlayer);
+		const int HouseID = PlayerHouseID(pPlayer);
 		if(HouseID < 0)
 		{
 			GS()->Chat(ClientID,"You not owner home!");
@@ -612,8 +627,17 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 			return true;		
 		}
 
-		if(pPlayer->CheckFailMoney(VoteID2, VoteID))
+		const int ItemID = VoteID;
+		if(pPlayer->CheckFailMoney(1, ItemID))
 			return true;
+
+		const int ChanceSuccesful = VoteID2;
+		if(ChanceSuccesful != 0)
+		{
+			GS()->Chat(ClientID, "Unfortunately the plant did not take root!");
+			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			return true;
+		}
 
 		ChangePlantsID(HouseID, VoteID);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
@@ -624,7 +648,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 
 // Двери
 HouseDoor::HouseDoor(CGameWorld *pGameWorld, vec2 Pos)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_HOUSEDOOR, Pos)
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_HOUSEDOOR, Pos), m_To(Pos)
 {
 	m_Pos.y += 30;
 	m_To = GS()->Collision()->FindDirCollision(100, m_To, 'y', '-');

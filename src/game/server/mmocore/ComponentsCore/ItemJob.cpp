@@ -280,12 +280,15 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, b
 	{
 		const int HouseID = Job()->House()->OwnerHouseID(pPlayer->Acc().AuthID);
 		const int PlantItemID = Job()->House()->GetPlantsID(HouseID);
-		if (PlantItemID != ItemID)
-			GS()->AVD(ClientID, "HOMEPLANTSET", ItemID, 1500, HideID, "Change plants {STR} to house (1500 items)", NameItem);
-		else
-			GS()->AVL(ClientID, "null", "▲ This plant is active in the house ▲");
+		if(HouseID > 0)
+		{
+			if(PlantItemID != ItemID)
+			{
+				const int random_change = random_int() % 250;
+				GS()->AVD(ClientID, "HOMEPLANTSET", ItemID, random_change, HideID, "To plant {STR}, to house (chance 0.25%)", NameItem);
+			}
+		}
 	}
-
 
 	if (pPlayerItem.Info().Type == ItemType::TYPE_EQUIP || pPlayerItem.Info().Function == FUNCTION_SETTINGS)
 		GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "{STR} {STR}", (pPlayerItem.Settings ? "Undress" : "Equip"), NameItem);
@@ -300,8 +303,7 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, b
 		return;
 
 	if (pPlayerItem.Info().Dysenthis > 0)
-		GS()->AVM(ClientID, "IDESYNTHESIS", ItemID, HideID, "Disassemble {STR} (+{INT}{STR} - 1 item)",
-			NameItem, &pPlayerItem.Info().Dysenthis, (pPlayerItem.Info().Function == FUNCTION_PLANTS ? "goods" : "mat"));
+		GS()->AVM(ClientID, "IDESYNTHESIS", ItemID, HideID, "Disassemble {STR} (+{INT}mat - 1 item)", NameItem, &pPlayerItem.Info().Dysenthis);
 
 	GS()->AVM(ClientID, "IDROP", ItemID, HideID, "Drop {STR}", NameItem);
 
@@ -375,8 +377,7 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 			Get = AvailableCount;
 
 		InventoryItem &pPlayerSelectedItem = pPlayer->GetItem(VoteID);
-		const int ItemGive = (pPlayerSelectedItem.Info().Function == FUNCTION_PLANTS ? (int)itGoods : (int)itMaterial);
-		InventoryItem &pPlayerMaterialItem = pPlayer->GetItem(ItemGive); 
+		InventoryItem &pPlayerMaterialItem = pPlayer->GetItem(itMaterial);
 		const int DesCount = pPlayerSelectedItem.Info().Dysenthis * Get;
 		if(pPlayerSelectedItem.Remove(Get) && pPlayerMaterialItem.Add(DesCount))
 		{

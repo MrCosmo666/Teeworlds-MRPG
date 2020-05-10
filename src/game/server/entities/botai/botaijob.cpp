@@ -6,7 +6,7 @@
 #include <game/mapitems.h>
 #include "botaijob.h"
 
-#include <game/server/mmocore/GameEntities/Events/event_health.h>
+#include <game/server/mmocore/GameEntities/Skills/healthturret/hearth.h>
 
 MACRO_ALLOC_POOL_ID_IMPL(BotAI, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
 
@@ -59,9 +59,8 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 
 		const int Function = BotJob::NpcBot[SubBotID].Function;
 		if(Function == FunctionsNPC::FUNCTION_NPC_NURSE)
-		{
-			new CNurseHealthNPC(&GS()->m_World, GetPlayer()->GetCID(), m_Core.m_Pos);
-		}
+			new CEntityFunctionNurse(&GS()->m_World, GetPlayer()->GetCID(), m_Core.m_Pos);
+
 		else if(Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST)
 		{
 			CreateSnapProj(GetSnapFullID(), 3, PICKUP_ARMOR, false, false);
@@ -254,14 +253,14 @@ void BotAI::EngineBots()
 // Интерактивы NPC
 void BotAI::EngineNPC()
 {
-	int SubBotID = GetPlayer()->GetBotSub();
-	bool StaticBot = BotJob::NpcBot[SubBotID].Static;
+	const int SubBotID = GetPlayer()->GetBotSub();
+	const bool StaticBot = BotJob::NpcBot[SubBotID].Static;
 
 	// ------------------------------------------------------------------------------
 	// интерактивы бота без найденого игрока
 	// ------------------------------------------------------------------------------
 	// эмоции ботов
-	int EmoteBot = BotJob::NpcBot[SubBotID].Emote;
+	const int EmoteBot = BotJob::NpcBot[SubBotID].Emote;
 	EmoteActions(EmoteBot);
 
 	// направление глаз
@@ -273,20 +272,13 @@ void BotAI::EngineNPC()
 	// интерактивы бота с найденым игроком
 	// ------------------------------------------------------------------------------
 	bool PlayerFinding = false;
-	for (int i = 0; i < MAX_PLAYERS; i++)
+	if(BotJob::NpcBot[SubBotID].Function == FunctionsNPC::FUNCTION_NPC_NURSE)
 	{
-		CPlayer *pFind = GS()->GetPlayer(i, true, true);
-		if (pFind && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < ViewDistanceNPC() &&
-			!GS()->Collision()->IntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0))
-		{
-			if(!(BotJob::NpcBot[SubBotID].m_Talk).empty() && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f)
-				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Start dialog with NPC [attack hammer]");
-
-			m_Input.m_TargetX = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
-			m_Input.m_TargetY = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
-			m_Input.m_Direction = 0;
-			PlayerFinding = true;
-		}
+		PlayerFinding = FunctionNurseNPC();
+	}
+	else
+	{
+		PlayerFinding = BaseFunctionNPC();
 	}
 
 	if (!PlayerFinding && !StaticBot && Server()->Tick() % (Server()->TickSpeed() * (m_Input.m_Direction == 0 ? 5 : 1)) == 0)
@@ -621,14 +613,99 @@ vec2 BotAI::GetHookPos(vec2 Position)
 	return HookPos;
 }
 
-float BotAI::ViewDistanceNPC() const
+// - - - - - - - - - - - - - - - - - - - BASE FUNCTION
+bool BotAI::BaseFunctionNPC()
 {
-	if(GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_NPC)
+	bool PlayerFinding = false;
+	const int SubBotID = GetPlayer()->GetBotSub();
+	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		int SubBotID = GetPlayer()->GetBotSub();
-		const int Function = BotJob::NpcBot[SubBotID].Function;
-		if(Function == FunctionsNPC::FUNCTION_NPC_NURSE)
-			return 256.0f;
+		CPlayer* pFind = GS()->GetPlayer(i, true, true);
+		if(pFind && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f &&
+			!GS()->Collision()->IntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0))
+		{
+			if(!(BotJob::NpcBot[SubBotID].m_Talk).empty())
+				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Start dialog with NPC [attack hammer]");
+
+			m_Input.m_TargetX = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
+			m_Input.m_TargetY = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
+			m_Input.m_Direction = 0;
+			PlayerFinding = true;
+		}
 	}
-	return 128.0f;
+	return PlayerFinding;
+}
+
+// - - - - - - - - - - - - - - - - - - - FUNCTION NURSE
+bool BotAI::FunctionNurseNPC()
+{
+	bool PlayerFinding = false;
+	if(Server()->Tick() % Server()->TickSpeed() != 0)
+	{
+		CPlayer* pFind = SearchPlayer(256.0f);
+		if(pFind && pFind->GetCharacter() && pFind->GetHealth() < pFind->GetStartHealth())
+		{
+			m_Input.m_TargetX = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
+			m_Input.m_TargetY = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
+		}
+		return true;
+	}
+
+	char aBuf[16];
+	const int SubBotID = GetPlayer()->GetBotSub();
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		CPlayer* pFind = GS()->GetPlayer(i, true, true);
+		if(!pFind || pFind->GetHealth() >= pFind->GetStartHealth() ||
+			distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) >= 256.0f ||
+			GS()->Collision()->IntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0))
+			continue;
+
+		m_Input.m_TargetX = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
+		m_Input.m_TargetY = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
+		m_LatestInput.m_TargetX = m_Input.m_TargetX;
+		m_LatestInput.m_TargetY = m_Input.m_TargetX;
+
+		const int Health = clamp(pFind->GetStartHealth() / 20, 1, pFind->GetStartHealth());
+		vec2 DrawPosition = vec2(pFind->GetCharacter()->m_Core.m_Pos.x, pFind->GetCharacter()->m_Core.m_Pos.y - 90.0f);
+		str_format(aBuf, sizeof(aBuf), "%dHP", Health);
+		GS()->CreateText(NULL, false, DrawPosition, vec2(0, 0), 40, aBuf, GS()->GetWorldID());
+		new CHearth(&GS()->m_World, m_Pos, pFind, Health, pFind->GetCharacter()->m_Core.m_Vel);
+
+		m_Input.m_Direction = 0;
+		PlayerFinding = true;
+	}
+	return PlayerFinding;
+}
+
+CEntityFunctionNurse::CEntityFunctionNurse(CGameWorld* pGameWorld, int ClientID, vec2 Pos)
+	: CEntity(pGameWorld, CGameWorld::ENTTYPE_EVENTS, Pos)
+{
+	m_OwnerID = ClientID;
+	GameWorld()->InsertEntity(this);
+}
+void CEntityFunctionNurse::Tick()
+{
+	if(!GS()->m_apPlayers[m_OwnerID] || !GS()->m_apPlayers[m_OwnerID]->GetCharacter())
+	{
+		GS()->m_World.DestroyEntity(this);
+		return;
+	}
+
+	CCharacter* pOwnerChar = GS()->m_apPlayers[m_OwnerID]->GetCharacter();
+	vec2 Direction = normalize(vec2(pOwnerChar->m_LatestInput.m_TargetX, pOwnerChar->m_LatestInput.m_TargetY));
+	m_Pos = pOwnerChar->m_Core.m_Pos + normalize(Direction) * (28.0f);
+}
+void CEntityFunctionNurse::Snap(int SnappingClient)
+{
+	if(NetworkClipped(SnappingClient))
+		return;
+
+	CNetObj_Pickup* pP = static_cast<CNetObj_Pickup*>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
+	if(!pP)
+		return;
+
+	pP->m_X = (int)m_Pos.x;
+	pP->m_Y = (int)m_Pos.y;
+	pP->m_Type = PICKUP_HEALTH;
 }
