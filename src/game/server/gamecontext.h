@@ -131,6 +131,7 @@ public:
 	CPlayer *GetPlayer(int ClientID, bool CheckAuthed = false, bool CheckCharacter = false);
 	char* LevelString(int max, int value, int step, char ch1, char ch2);
 	ItemJob::ItemInformation &GetItemInfo(int ItemID) const;
+	const char* GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const;
 
 	/* #########################################################################
 		EVENTS 

@@ -488,8 +488,8 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 
 			char aAttributes[128];
 			FormatAttributes(ItemData, sizeof(aAttributes), aAttributes);
-			GS()->AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, TAB_SETTINGS_MODULES, "{STR} {STR}{STR}",
-				ItemData.Info().GetName(pPlayer), aAttributes, (ItemData.Settings ? "✔" : "\0"));
+			GS()->AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, TAB_SETTINGS_MODULES, "{STR}{STR}{STR}",
+				ItemData.Info().GetName(pPlayer), aAttributes, (ItemData.Settings ? "✔ " : "\0"));
 			FoundSettings = true;
 		}
 		if (!FoundSettings)

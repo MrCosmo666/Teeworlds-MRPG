@@ -149,6 +149,20 @@ char* CGS::LevelString(int MaxValue, int CurrentValue, int Step, char toValue, c
 // получить объект предмета
 ItemJob::ItemInformation &CGS::GetItemInfo(int ItemID) const { return ItemJob::ItemsInfo[ItemID]; }
 
+const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const
+{
+	if(CheckClient(ClientID))
+	{
+		if(HidenTabs)
+			return ID >= NUM_TAB_MENU ? ("▵ ") : (ID < TAB_SETTINGS_MODULES ? ("△ ") : ("▽ "));
+		return ID >= NUM_TAB_MENU ? ("▿  ") : (ID < TAB_SETTINGS_MODULES ? ("▽ ") : ("△ "));
+	}
+
+	if(HidenTabs)
+		return ID >= NUM_TAB_MENU ? ("/\\ :: ") : (ID < TAB_SETTINGS_MODULES ? ("\\/ :: ") : ("/\\ :: "));
+	return ID >= NUM_TAB_MENU ? ("\\/ :: ") : (ID < TAB_SETTINGS_MODULES ? ("/\\ :: ") : ("\\/ :: "));
+}
+
 /* #########################################################################
 	EVENTS 
 ######################################################################### */
@@ -1752,8 +1766,7 @@ void CGS::AVH(int To, const int ID, vec3 Color, const char* pText, ...)
 
 		dynamic_string Buffer;
 		bool HidenTabs = (ID >= TAB_STAT) ? m_apPlayers[To]->GetHidenMenu(ID) : false;
-		if(HidenTabs) {	Buffer.append(ID >= NUM_TAB_MENU ? ("◈ ") : (ID < TAB_SETTINGS_MODULES ? ("△ ") : ("▽ ")));	}
-		else {	Buffer.append(ID >= NUM_TAB_MENU ? ("◇ ") : (ID < TAB_SETTINGS_MODULES ? ("▽ ") : ("△ ")));	}
+		Buffer.append(GetSymbolHandleMenu(To, HidenTabs, ID));
 
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
 		if(ID > TAB_SETTINGS_MODULES && ID < NUM_TAB_MENU) { Buffer.append(" (Press me for help)"); }
@@ -1776,8 +1789,7 @@ void CGS::AVHI(int To, const char *Icon, const int ID, vec3 Color, const char* p
 
 		dynamic_string Buffer;
 		bool HidenTabs = (ID >= TAB_STAT) ? m_apPlayers[To]->GetHidenMenu(ID) : false;
-		if(HidenTabs) {	Buffer.append(ID >= NUM_TAB_MENU ? ("▿ ") : (ID < TAB_SETTINGS_MODULES ? ("△ ") : ("▽ ")));	}
-		else {	Buffer.append(ID >= NUM_TAB_MENU ? ("▵ ") : (ID < TAB_SETTINGS_MODULES ? ("▽ ") : ("△ ")));	}
+		Buffer.append(GetSymbolHandleMenu(To, HidenTabs, ID));
 
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
 		if(ID > TAB_SETTINGS_MODULES && ID < NUM_TAB_MENU) { Buffer.append(" (Press me for help)"); }
@@ -1803,7 +1815,7 @@ void CGS::AVM(int To, const char* Type, const int ID, const int HideID, const ch
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		if(ID != NOPE) { Buffer.append("‣ "); }
+		if(ID != NOPE) { Buffer.append("- "); }
 
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
 		AV(To, Type, Buffer.buffer(), ID);
@@ -1825,7 +1837,7 @@ void CGS::AVMI(int To, const char *Icon, const char* Type, const int ID, const i
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		if(ID != NOPE) { Buffer.append("‣ "); }
+		if(ID != NOPE) { Buffer.append("- "); }
 
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
 		AV(To, Type, Buffer.buffer(), ID, -1, Icon);
@@ -1847,7 +1859,7 @@ void CGS::AVD(int To, const char* Type, const int ID, const int ID2, const int H
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		if(ID != NOPE) { Buffer.append("‣ "); }
+		if(ID != NOPE) { Buffer.append("- "); }
 
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
 		AV(To, Type, Buffer.buffer(), ID, ID2);

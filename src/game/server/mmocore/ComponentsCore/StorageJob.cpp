@@ -27,7 +27,7 @@ void StorageJob::ShowStorageMenu(CPlayer* pPlayer, int StorageID)
 		GS()->AV(ClientID, "null", "Storage Don't work");
 		return;
 	}
-	GS()->AVH(ClientID, TAB_STORAGE, GOLDEN_COLOR, "Shop [{STR}/{INT}]", Storage[StorageID].Name, &Storage[StorageID].Count);
+	GS()->AVH(ClientID, TAB_STORAGE, GOLDEN_COLOR, "Shop :: {STR}", Storage[StorageID].Name);
 	GS()->AVM(ClientID, "REPAIRITEMS", StorageID, TAB_STORAGE, "Repair all items - FREE");
 }
 
