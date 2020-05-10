@@ -508,8 +508,6 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_INVENTORY, "After, need select item to interact");
 		GS()->AV(ClientID, "null", "");
 
-		GS()->ShowPlayerStats(pPlayer);
-
 		int SizeItems;
 		GS()->AVH(ClientID, TAB_INVENTORY_SELECT, RED_COLOR, "Inventory Select List");
 		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_USED); 
@@ -539,7 +537,6 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		GS()->AVH(ClientID, TAB_EQUIP_INFO, GREEN_COLOR, "Equip / Armor Information");
 		GS()->AVM(ClientID, "null", NOPE, TAB_EQUIP_INFO, "Select tab and select armor.");
 		GS()->AV(ClientID, "null", "");
-		GS()->ShowPlayerStats(pPlayer);
 
 		GS()->AVH(ClientID, TAB_EQUIP_SELECT, RED_COLOR, "Equip Select List");
 		const char* pType[NUM_EQUIPS] = { "Wings", "Hammer", "Gun", "Shotgun", "Grenade", "Rifle", "Discord", "Pickaxe" };

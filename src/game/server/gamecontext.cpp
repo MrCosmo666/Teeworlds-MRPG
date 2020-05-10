@@ -1746,7 +1746,7 @@ void CGS::AVL(int To, const char* aCmd, const char* pText, ...)
 		
 		dynamic_string Buffer;
 		if(str_comp(aCmd, "null") != 0)
-			Buffer.append("‣ ");
+			Buffer.append("- ");
 		
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
 		AV(To, aCmd, Buffer.buffer());
@@ -2106,7 +2106,7 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "[+{INT}] - {STR}", &RealSum, AtributeName(at.first));
 	}
 
-	AVM(ClientID, "null", NOPE, NOPE, "!!! Player Upgrade Point: [{INT}P] !!!", &pPlayer->Acc().Upgrade);
+	AVM(ClientID, "null", NOPE, NOPE, "Player Upgrade Point: {INT}P", &pPlayer->Acc().Upgrade);
 	AV(ClientID, "null", "");
 }
 
