@@ -681,10 +681,10 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	// рисуем бордюры
 	CUIRect Rect = { 5, 15, 106, 36.0f };
 	Graphics()->BlendNormal();
-	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.18f), CUI::CORNER_ALL, 5.0f);
+	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.10f), CUI::CORNER_ALL, 5.0f);
 
 	Rect = { 5, 15, 28, 25.0f };
-	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.18f), CUI::CORNER_ALL, 5.0f);
+	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.10f), CUI::CORNER_ALL, 5.0f);
 
 	// переменные
 	char aBuf[256];
@@ -695,7 +695,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	IntsToStr(pClientStats->m_Gold, 6, aBuf);
 	float textWidth = TextRender()->TextWidth(0, 5.0f, aBuf, -1, -1.0);
 	Rect = { 5, 57.0f, textWidth + 16.0f, 9.0f };
-	RenderTools()->DrawUIRect(&Rect, vec4(0.3f, 0.1f, 0.0f, 0.25f), CUI::CORNER_ALL, 4.0f);
+	RenderTools()->DrawUIRect(&Rect, vec4(0.3f, 0.1f, 0.0f, 0.15f), CUI::CORNER_ALL, 4.0f);
 
 	m_pClient->m_pMenus->DoItemIcon("gold", { Rect.x, Rect.y - 2.0f, Rect.h, Rect.w }, 12.0f);
 	Rect.VSplitLeft(13.0f, 0, &Rect);
@@ -707,7 +707,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	if (textWidth > 2.0)
 	{
 		Rect = { 7.0f, 72.0f, textWidth + 10.0f, 9.0f };
-		RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.2f, 0.4f, 0.24f), CUI::CORNER_ALL, 3.0f);
+		RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.2f, 0.4f, 0.15f), CUI::CORNER_ALL, 3.0f);
 		m_pClient->m_pMenus->DoItemIcon("potion_r", { Rect.x, Rect.y - 1.0f, Rect.h, Rect.w }, 8.0f);
 		Rect.VSplitLeft(8.0f, 0, &Rect);
 		TextRender()->Text(0, Rect.x, 72.0f, 5.0f, aBuf, -1);

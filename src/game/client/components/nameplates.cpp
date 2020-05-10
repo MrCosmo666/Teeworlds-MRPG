@@ -59,12 +59,12 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 			{
 				case MOOD_ANGRY:
 					str_format(aIconPlayerType, sizeof(aIconPlayerType), "angry");
-					ColorNameplates = vec4(1.0f, 0.65f, 0.65f, a);
+					ColorNameplates = vec4(0.9f, 0.65f, 0.65f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.3f * a);
 					break;
 				case MOOD_AGRESSED_TANK:
 					str_format(aIconPlayerType, sizeof(aIconPlayerType), "agressed_y");
-					ColorNameplates = vec4(1.0f, 0.4f, 0.4f, a);
+					ColorNameplates = vec4(0.9f, 0.4f, 0.4f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.7f * a);
 					break;
 				case MOOD_AGRESSED_OTHER:
@@ -100,7 +100,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 
 				CUIRect ExpBar = { Position.x - tw / 2.0f , Position.y - FontSize - 92.0f, tw, 25.0f };
 				RenderTools()->DrawUIBar(TextRender(), ExpBar, ColorNameplates / 1.2f,
-					pClientStats->m_Health, pClientStats->m_HealthStart, aBuf, 5, 10.0f, 3.2f);
+					pClientStats->m_Health, pClientStats->m_HealthStart, aBuf, 5, 8.0f, 3.0f);
 				ShowedProgressBar = true;
 			}
 
