@@ -25,7 +25,7 @@ public:
 	int GetBotSub()													override { return m_SubBotID; };
 	int GetHealth() 												override { return m_BotHealth; };
 	int GetTeam()													override { return TEAM_BLUE; };
-	void SetStandart(int Health, int Mana)							override { m_BotHealth = Health; };
+	void UpdateTempData(int Health, int Mana)						override { m_BotHealth = Health; };
 	void SetDungeonAllowedSpawn(bool Spawn)							override { m_DungeonAllowedSpawn = Spawn; };
 	int GetItemEquip(int EquipID, int SkipItemID = -1) const		override;
 	void Tick()														override;

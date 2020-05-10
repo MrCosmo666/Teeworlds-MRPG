@@ -73,12 +73,6 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_LastWeapon = WEAPON_HAMMER;
 	m_QueuedWeapon = -1;
 
-	// helper
-	m_Mana = 0;
-	m_OldPos = Pos;
-	m_NoAllowDamage = false;
-	m_Event = TILE_CLEAR_EVENTS;
-
 	m_Pos = Pos;
 	m_Core.Reset();
 	m_Core.Init(&GS()->m_World.m_Core, GS()->Collision());
@@ -88,24 +82,26 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_ReckoningTick = 0;
 	mem_zero(&m_SendCore, sizeof(m_SendCore));
 	mem_zero(&m_ReckoningCore, sizeof(m_ReckoningCore));
-
 	GS()->m_World.InsertEntity(this);
-	m_Alive = true;
 
+	m_Mana = 0;
+	m_OldPos = Pos;
+	m_NoAllowDamage = false;
+	m_Event = TILE_CLEAR_EVENTS;
+	m_Alive = true;
 	m_Core.m_WorldID = GS()->CheckPlayerMessageWorldID(m_pPlayer->GetCID());
+	GS()->m_pController->OnCharacterSpawn(this);
+
 	if(!m_pPlayer->IsBot())
 	{
-		m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
-		m_pPlayer->SetStandart(m_Health, m_Mana);
-		m_pPlayer->ShowInformationStats();
-
-		// обновить положение о квестах
 		GS()->Mmo()->Quest()->UpdateArrowStep(m_pPlayer->GetCID());
-		if (GS()->Mmo()->Quest()->CheckNewStories(m_pPlayer))
+		if(GS()->Mmo()->Quest()->CheckNewStories(m_pPlayer))
 			GS()->Chat(m_pPlayer->GetCID(), "There are new stories of familiar NPCs");
+
+		m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
+		m_pPlayer->ShowInformationStats();
+		GS()->VResetVotes(m_pPlayer->GetCID(), m_pPlayer->m_OpenVoteMenu);
 	}
-	GS()->VResetVotes(m_pPlayer->GetCID(), m_pPlayer->m_OpenVoteMenu);
-	GS()->m_pController->OnCharacterSpawn(this);
 	return true;
 }
 
@@ -529,14 +525,14 @@ void CCharacter::ResetInput()
 void CCharacter::Tick()
 {
 	HandleTunning();
-
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true, &m_pPlayer->m_NextTuningParams);
+	m_pPlayer->UpdateTempData(m_Health, m_Mana);
 
 	// handle death-tiles and leaving gamelayer
 	if(GameLayerClipped(m_Pos))
 	{
-		Die(m_pPlayer->GetCID(), WEAPON_WORLD);
+		Die(m_pPlayer->GetCID(), WEAPON_SELF);
 	}
 
 	if (!m_DoorHit)
@@ -606,7 +602,7 @@ void CCharacter::TickDefered()
 		m_Pos.y = m_Input.m_TargetY;
 	}
 	else if(m_Core.m_Death)
-		Die(m_pPlayer->GetCID(), WEAPON_WORLD);
+		Die(m_pPlayer->GetCID(), WEAPON_SELF);
 
 	// update the m_SendCore if needed
 	{
@@ -645,7 +641,6 @@ bool CCharacter::IncreaseHealth(int Amount)
 
 	int m_OldHealth = m_Health;
 	m_Health = clamp(m_Health+Amount, 0, m_pPlayer->GetStartHealth());
-	m_pPlayer->SetStandart(m_Health, m_Mana);
 	m_pPlayer->ShowInformationStats();
 
 	if(IsAlive())
@@ -662,8 +657,6 @@ bool CCharacter::IncreaseArmor(int Amount)
 	if(m_Armor >= 10)
 		return false;
 	m_Armor = clamp(m_Armor+Amount, 0, 10);
-
-	m_pPlayer->SetStandart(m_Health, m_Mana);
 	m_pPlayer->ShowInformationStats();
 	return true;
 }
@@ -685,10 +678,17 @@ void CCharacter::Die(int Killer, int Weapon)
 
 	// change to safe zone
 	const int ClientID = m_pPlayer->GetCID();
-	const int SafezoneWorldID = GS()->GetRespawnWorld();
-	if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot() && GS()->m_apPlayers[Killer] && GS()->m_apPlayers[Killer]->IsBot())
-		m_pPlayer->Acc().TempActiveSafeSpawn = true;
-	
+	if(Weapon != WEAPON_WORLD)
+	{
+		const int SafezoneWorldID = GS()->GetRespawnWorld();
+		if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot() && GS()->m_apPlayers[Killer])
+		{
+			GS()->Chat(ClientID, "You are dead, you will be treated in {STR}", Server()->GetWorldName(SafezoneWorldID));
+			m_pPlayer->Acc().TempActiveSafeSpawn = true;
+		}
+		m_pPlayer->UpdateTempData(0, 0);
+	}
+
 	// respawn
 	m_pPlayer->m_PlayerTick[TickState::Die] = Server()->Tick()/2;
 	m_pPlayer->m_Spawned = true;
@@ -787,7 +787,6 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 	if(Dmg)
 	{
 		m_Health -= Dmg;
-		m_pPlayer->SetStandart(m_Health, m_Mana);
 		m_pPlayer->ShowInformationStats();
 	}
 
@@ -814,7 +813,6 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 	if(m_Health <= 0)
 	{
 		m_Health = 0;
-		m_pPlayer->SetStandart(m_Health, m_Mana);
 		m_pPlayer->ShowInformationStats();
 		Die(From, Weapon);
 		if (From != m_pPlayer->GetCID() && pFrom->GetCharacter()) 
@@ -862,30 +860,24 @@ void CCharacter::Snap(int SnappingClient)
 		m_EmoteStop = -1;
 	}
 
-	pCharacter->m_Emote = m_EmoteType;
+	pCharacter->m_Emote = m_EmoteType;	
+	if(250 - ((Server()->Tick() - m_LastAction) % (250)) < 5)
+		pCharacter->m_Emote = EMOTE_BLINK;
 
 	pCharacter->m_AmmoCount = 0;
 	pCharacter->m_Health = 0;
 	pCharacter->m_Armor = 0;
 	pCharacter->m_TriggeredEvents = m_TriggeredEvents;
-
 	pCharacter->m_Weapon = m_ActiveWeapon;
 	pCharacter->m_AttackTick = m_AttackTick;
-
 	pCharacter->m_Direction = m_Input.m_Direction;
 
 	if(m_pPlayer->GetCID() == SnappingClient || SnappingClient == -1)
 	{
-		pCharacter->m_Health = m_Health > 10 ? 10 : m_Health;
-		pCharacter->m_Armor = m_Armor > 10 ? 10 : m_Armor;
+		pCharacter->m_Health = clamp(m_Health, 0, 10);
+		pCharacter->m_Armor = clamp(m_Armor, 0, 10);
 		if(m_aWeapons[m_ActiveWeapon].m_Ammo > 0)
 			pCharacter->m_AmmoCount = m_aWeapons[m_ActiveWeapon].m_Ammo;
-	}
-
-	if(pCharacter->m_Emote == EMOTE_NORMAL)
-	{
-		if(250 - ((Server()->Tick() - m_LastAction)%(250)) < 5)
-			pCharacter->m_Emote = EMOTE_BLINK;
 	}
 }
 
@@ -1046,7 +1038,6 @@ void CCharacter::HandleAuthedPlayer()
 		if(m_Mana < m_pPlayer->GetStartMana())
 		{
 			m_Mana += clamp(m_pPlayer->GetStartMana() / 20, 1, m_pPlayer->GetStartMana() / 20);
-			m_pPlayer->SetStandart(m_Health, m_Mana);
 			m_pPlayer->ShowInformationStats();
 		}
 	}
@@ -1080,7 +1071,6 @@ bool CCharacter::CheckFailMana(int Mana)
 		return true;
 	}
 	m_Mana -= Mana;
-	m_pPlayer->SetStandart(m_Health, m_Mana);
 	m_pPlayer->ShowInformationStats();
 	return false;	
 }

@@ -269,7 +269,6 @@ void CPlayer::TryRespawn()
 			return;
 		}
 		SpawnType = SPAWN_HUMAN_SAFE;
-		Acc().TempActiveSafeSpawn = false;
 	}
 
 	if(!GS()->m_pController->CanSpawn(SpawnType, &SpawnPos, vec2(-1, -1)))
@@ -444,10 +443,10 @@ void CPlayer::SetLanguage(const char* pLanguage)
 	str_copy(m_aLanguage, pLanguage, sizeof(m_aLanguage));
 }
 
-void CPlayer::SetStandart(int Health, int Mana)
+void CPlayer::UpdateTempData(int Health, int Mana)
 {
-	Acc().PlayerHealth = Health;
-	Acc().PlayerMana = Mana;
+	Acc().TempHealth = Health;
+	Acc().TempMana = Mana;
 }
 
 void CPlayer::AddExp(int Exp)

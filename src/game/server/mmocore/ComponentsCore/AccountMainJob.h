@@ -45,8 +45,8 @@ public:
 		int m_aSkinPartColors[6];
 
 		int Team;
-		int PlayerHealth;
-		int PlayerMana;
+		int TempHealth;
+		int TempMana;
 
 		std::map < int , bool > AetherLocation;
 		bool IsGuild() { return (GuildID > 0); }

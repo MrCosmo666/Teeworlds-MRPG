@@ -2350,7 +2350,7 @@ void CGS::UpdateZonePVP()
 		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && CheckPlayerMessageWorldID(i) == m_WorldID)
 			CountMobs++;
 	}
-	m_AllowedPVP = (bool)(CountMobs >= 5);
+	m_AllowedPVP = (bool)(CountMobs >= 3);
 }
 
 const char* CGS::AtributeName(int BonusID) const

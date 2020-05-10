@@ -239,7 +239,6 @@ enum
 	itPotionHealthRegen = 18,				// Зелье регенерации здоровья
 	itCapsuleSurvivalExperience = 19,				// Дает 1.000 опыта
 	itLittleBagGold = 20,				// Дает 10-100 золота
-	itTitleNewHero = 23,				// Титул новый герой
 
 	/*
 		Все листы сортировок что существуют на сервере

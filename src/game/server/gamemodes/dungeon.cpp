@@ -36,7 +36,7 @@ void CGameControllerDungeon::KillAllPlayers()
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter() && GS()->Server()->GetWorldID(i) == m_WorldID)
-			GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_SELF);
+			GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_WORLD);
 	}
 }
 
@@ -295,7 +295,7 @@ void CGameControllerDungeon::SetMobsSpawn(bool AllowedSpawn)
 		{
 			BotPlayer->SetDungeonAllowedSpawn(AllowedSpawn);
 			if (!AllowedSpawn && BotPlayer->GetCharacter())
-				BotPlayer->GetCharacter()->Die(i, WEAPON_SELF);
+				BotPlayer->GetCharacter()->Die(i, WEAPON_WORLD);
 		}
 	}
 }
@@ -376,7 +376,7 @@ void DungeonDoor::Tick()
 		// проверяем дистанцию
 		if (Distance < 30.0f && pChar->IsAlive())
 		{
-			pChar->Die(pChar->GetPlayer()->GetCID(), WEAPON_SELF);
+			pChar->Die(pChar->GetPlayer()->GetCID(), WEAPON_WORLD);
 		}		
 	}
 }

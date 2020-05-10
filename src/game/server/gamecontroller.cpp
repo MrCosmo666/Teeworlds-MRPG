@@ -29,7 +29,7 @@ void IGameController::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKiller, in
 	return;
 }
 
-void IGameController::OnCharacterSpawn(CCharacter *pChr)
+void IGameController::OnCharacterSpawn(CCharacter* pChr)
 {
 	pChr->GetPlayer()->ClearTalking();
 
@@ -38,19 +38,22 @@ void IGameController::OnCharacterSpawn(CCharacter *pChr)
 	{
 		pChr->IncreaseHealth(pChr->GetPlayer()->GetStartHealth());
 		pChr->GiveWeapon(WEAPON_HAMMER, -1);
-		for(int i = 1; i < WEAPON_LASER+1; i++)
+		for(int i = 1; i < WEAPON_LASER + 1; i++)
 			pChr->GiveWeapon(i, 10);
 
 		return;
 	}
 
-	// миркатсцены начало игры
-	if(GS()->GetWorldID() == LOCALWORLD && pChr->GetPlayer()->GetItem(itTitleNewHero).Count <= 0)
-		pChr->GetPlayer()->GetItem(itTitleNewHero).Add(1);
-
-
 	// если спавним игрока
-	int StartHealth = pChr->GetPlayer()->Acc().PlayerHealth > 0 ? pChr->GetPlayer()->Acc().PlayerHealth : pChr->GetPlayer()->GetStartHealth();
+	int StartHealth = pChr->GetPlayer()->GetStartHealth();
+	if(pChr->GetPlayer()->Acc().TempActiveSafeSpawn == true)
+	{
+		pChr->GetPlayer()->Acc().TempActiveSafeSpawn = false;
+		StartHealth /= 2;
+	}
+	
+	if(pChr->GetPlayer()->Acc().TempHealth > 0)
+		StartHealth = pChr->GetPlayer()->Acc().TempHealth;
 	pChr->IncreaseHealth(StartHealth);
 
 	// оружие и здоровье

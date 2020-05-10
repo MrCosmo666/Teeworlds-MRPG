@@ -11,9 +11,8 @@
 
 enum
 {
-	WEAPON_GAME = -3, // team switching etc
-	WEAPON_SELF = -2, // console kill command
-	WEAPON_WORLD = -1, // death tiles etc
+	WEAPON_SELF = -2, // self die
+	WEAPON_WORLD = -1, // swap world etc
 };
 
 class CPlayer
@@ -100,9 +99,9 @@ public:
 	virtual int GetBotType()                                             { return -1; };
 	virtual int GetBotSub()                                              { return -1; };
 	virtual int IsActiveSnappingBot(int SnappingClient)					 { return 2; };
-	virtual	int GetHealth()                                              { return Acc().PlayerHealth;};
+	virtual	int GetHealth()                                              { return Acc().TempHealth;};
 	virtual void SetDungeonAllowedSpawn(bool Spawn)                      { return; };
-	virtual void SetStandart(int Health, int Mana);
+	virtual void UpdateTempData(int Health, int Mana);
 
 	virtual void Tick();
 	virtual int GetTeam();
@@ -119,7 +118,7 @@ public:
 
 	CCharacter *GetCharacter();
 
-	void KillCharacter(int Weapon = WEAPON_GAME);
+	void KillCharacter(int Weapon = WEAPON_WORLD);
 	void OnDisconnect();
 	void OnDirectInput(CNetObj_PlayerInput *NewInput);
 	void OnPredictedInput(CNetObj_PlayerInput *NewInput);
