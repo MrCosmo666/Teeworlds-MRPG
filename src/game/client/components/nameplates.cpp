@@ -59,12 +59,12 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 			{
 				case MOOD_ANGRY:
 					str_format(aIconPlayerType, sizeof(aIconPlayerType), "angry");
-					ColorNameplates = vec4(0.8f, 0.65f, 0.65f, a);
+					ColorNameplates = vec4(1.0f, 0.65f, 0.65f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.3f * a);
 					break;
 				case MOOD_AGRESSED_TANK:
 					str_format(aIconPlayerType, sizeof(aIconPlayerType), "agressed_y");
-					ColorNameplates = vec4(0.85f, 0.3f, 0.3f, a);
+					ColorNameplates = vec4(1.0f, 0.4f, 0.4f, a);
 					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.7f * a);
 					break;
 				case MOOD_AGRESSED_OTHER:
