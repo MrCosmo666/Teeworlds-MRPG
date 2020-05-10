@@ -55,7 +55,6 @@ void GuildJob::OnInitWorld(const char* pWhereLocalWorld)
 		HouseGuild[HouseID].m_PosX = RES->getInt("PosX");
 		HouseGuild[HouseID].m_PosY = RES->getInt("PosY");
 		HouseGuild[HouseID].m_Price = RES->getInt("Price");
-		HouseGuild[HouseID].m_Payment = RES->getInt("Payment");
 		HouseGuild[HouseID].m_WorldID = RES->getInt("WorldID");
 		HouseGuild[HouseID].m_TextX = RES->getInt("TextX");
 		HouseGuild[HouseID].m_TextY = RES->getInt("TextY");
@@ -598,29 +597,6 @@ void GuildJob::TickHousingText()
 			continue;
 		}
 		GS()->CreateText(NULL, false, vec2(mh.second.m_TextX, mh.second.m_TextY), vec2(0, 0), LifeTime, "FREE", mh.second.m_WorldID);
-	}
-}
-
-void GuildJob::OnPaymentTime()
-{
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, Bank", "tw_guilds"));
-	while(RES->next())
-	{
-		const int MID = RES->getInt("ID");
-		const int HouseID = GetGuildHouseID(MID);
-		if(HouseID > 0 && Guild.find(MID) != Guild.end() && HouseGuild.find(HouseID) != HouseGuild.end())
-		{
-			if(Guild[MID].m_Bank < HouseGuild[ HouseID ].m_Payment)
-			{
-				GS()->Chat(-1, "Guild {STR} lost house, nope payment!", Guild[MID].m_Name);
-				SellGuildHouse(MID);
-				continue;
-			}
-			
-			Guild[MID].m_Bank -= HouseGuild[ HouseID ].m_Payment;
-			SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[MID].m_Bank, MID);
-			GS()->ChatGuild(MID, "Payment {INT} gold was successful {INT}", &HouseGuild[HouseID].m_Payment, &Guild[MID].m_Bank);
-		}
 	}
 }
 
@@ -1400,7 +1376,6 @@ void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int MID)
 	
 	if(Leader && GuildID != HouseGuild[MID].m_GuildID)
 	{
-		GS()->AVM(ClientID, "null", NOPE, NOPE, "Every day payment {INT} gold", &HouseGuild[MID].m_Payment);
 		GS()->AVM(ClientID, "BUYMEMBERHOUSE", MID, NOPE, "Buy this guild house! Price: {INT}", &HouseGuild[MID].m_Price);
 	}
 }

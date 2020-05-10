@@ -1893,7 +1893,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVH(ClientID, TAB_PERSONAL, GRAY_COLOR, "☪ SUB MENU PERSONAL");
 		AVM(ClientID, "MENU", MenuList::MENU_INVENTORY, TAB_PERSONAL, "Inventory"); 
 		AVM(ClientID, "MENU", MenuList::MENU_EQUIPMENT, TAB_PERSONAL, "Equipment");
-		AVM(ClientID, "MENU", MenuList::MENU_UPGRADE, TAB_PERSONAL, "Upgrades{STR}", pPlayer->Acc().Upgrade ? "(unused points)" : "\0");
+		AVM(ClientID, "MENU", MenuList::MENU_UPGRADE, TAB_PERSONAL, "Upgrades({INT}p)", &pPlayer->Acc().Upgrade);
 		AVM(ClientID, "MENU", MenuList::MENU_DUNGEONS, TAB_PERSONAL, "Dungeons");
 		AVM(ClientID, "MENU", MenuList::MENU_SETTINGS, TAB_PERSONAL, "Settings");
 		AVM(ClientID, "MENU", MenuList::MENU_INBOX, TAB_PERSONAL, "Mailbox");

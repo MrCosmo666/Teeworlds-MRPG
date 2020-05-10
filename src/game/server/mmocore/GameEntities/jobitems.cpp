@@ -43,6 +43,13 @@ void CJobItems::Work(int ClientID)
 	if(ClientID >= MAX_PLAYERS || ClientID < 0 || m_Progress >= m_Health || !GS()->m_apPlayers[ClientID])
 		return;
 
+	// not allowed un owner house job 
+	if(GS()->Mmo()->House()->GetOwnerHouse(m_HouseID) <= 0)
+	{
+		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "It is forbidden to pick plants without the owner!");
+		return;
+	}
+
 	// - - - - - - - - MINING - - - - - - - - 
 	CPlayer *pPlayer = GS()->m_apPlayers[ClientID];
 	ItemJob::InventoryItem &pPlayerWorkedItem = pPlayer->GetItem(m_ItemID);
@@ -51,7 +58,7 @@ void CJobItems::Work(int ClientID)
 		int EquipItem = pPlayer->GetItemEquip(EQUIP_MINER);
 		if (EquipItem <= 0)
 		{
-			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Need equip Pickaxe");
+			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Need equip Pickaxe!");
 			return;
 		}
 		if (pPlayer->Acc().Miner[PlLevel] < m_Level)

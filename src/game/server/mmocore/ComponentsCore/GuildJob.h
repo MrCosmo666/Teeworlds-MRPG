@@ -66,7 +66,6 @@ public:
 	BASED MEMBER
 ######################################################################### */
 	virtual void OnTick();
-	virtual void OnPaymentTime();
 
 private:
 	void TickHousingText();

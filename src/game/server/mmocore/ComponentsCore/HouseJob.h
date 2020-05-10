@@ -23,8 +23,6 @@ class HouseJob : public MmoComponent
 		char m_Class[32];
 		int m_OwnerID;
 		int m_Bank;
-		int m_Farm;
-		int m_FarmLevel;
 		int m_PlantID;
 		int m_PlantPosX;
 		int m_PlantPosY;
@@ -38,7 +36,6 @@ class HouseJob : public MmoComponent
 	std::map < int , DecoHouse * > m_DecorationHouse;
 public:
 	virtual void OnInitWorld(const char* pWhereLocalWorld);
-	virtual void OnPaymentTime();
 	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
 	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 	
@@ -66,6 +63,7 @@ private:
 	######################################################################### */
 public:
 	int GetWorldID(int HouseID) const;
+	int GetOwnerHouse(int HouseID);
 	int GetHouse(vec2 Pos, bool Plants = false);
 	int GetHousePrice(int HouseID) const;
 	bool GetHouseDoor(int HouseID) const;
@@ -83,10 +81,9 @@ public:
 	bool BuyHouse(int HouseID, CPlayer *pPlayer);
 	void SellHouse(int HouseID);
 
-	void TakeFarmMoney(CPlayer *pPlayer, int TakeCount);
-	void AddBalance(CPlayer *pPlayer, int Balance);
+	void TakeFromSafeDeposit(CPlayer *pPlayer, int TakeCount);
+	void AddSafeDeposit(CPlayer *pPlayer, int Balance);
 	
-	void CheckTimePayment();
 	void ChangeStateDoor(int HouseID);
 
 	/* #########################################################################
