@@ -874,10 +874,16 @@ void CCharacter::Snap(int SnappingClient)
 
 	if(m_pPlayer->GetCID() == SnappingClient || SnappingClient == -1)
 	{
-		pCharacter->m_Health = clamp(m_Health, 0, 10);
-		pCharacter->m_Armor = clamp(m_Armor, 0, 10);
+		const int HealthTranslate =(m_Health / m_pPlayer->GetStartHealth()) * 10;
+		const int ArmorTranslate = (m_Armor / m_pPlayer->GetStartMana()) * 10;
+		pCharacter->m_Health = clamp(HealthTranslate, 0, 10);
+		pCharacter->m_Armor = clamp(ArmorTranslate, 0, 10);
 		if(m_aWeapons[m_ActiveWeapon].m_Ammo > 0)
-			pCharacter->m_AmmoCount = m_aWeapons[m_ActiveWeapon].m_Ammo;
+		{
+			const int StartAmmo = 10 + m_pPlayer->GetAttributeCount(Stats::StAmmo);
+			const int AmmoTranslate = (m_aWeapons[m_ActiveWeapon].m_Ammo / m_pPlayer->GetStartHealth()) * 10;
+			pCharacter->m_AmmoCount = clamp(AmmoTranslate, 0, 10);
+		}
 	}
 }
 
