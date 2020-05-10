@@ -153,33 +153,27 @@ ItemJob::ItemInformation &CGS::GetItemInfo(int ItemID) const { return ItemJob::I
 	EVENTS 
 ######################################################################### */
 // Отправить запрос на рендер Урона
-void CGS::CreateDamage(vec2 Pos, int Id, vec2 Source, int HealthAmount, int ArmorAmount, bool Self)
+void CGS::CreateDamage(vec2 Pos, int ClientID, vec2 Source, int HealthAmount, int ArmorAmount, bool Self)
 {
-	CreateDamageTranslate(Pos, Id, Source, HealthAmount, ArmorAmount, Self);
-}
-
-// Транслированный урон // TODO: исправить упростить и не отправлять в обработку по 2000 инвентов за дамаг
-void CGS::CreateDamageTranslate(vec2 Pos, int Id, vec2 Source, int HealthAmount, int ArmorAmount, bool Self)
-{
-	CNetEvent_Damage* pEventVanilla = (CNetEvent_Damage*)m_Events.Create(NETEVENTTYPE_DAMAGE, sizeof(CNetEvent_Damage), MaskWorldID());
+	CNetEvent_Damage* pEventVanilla = (CNetEvent_Damage*)m_Events.Create(NETEVENTTYPE_DAMAGE, sizeof(CNetEvent_Damage));
 	if(pEventVanilla)
 	{
 		float f = angle(Source);
 		pEventVanilla->m_X = (int)Pos.x;
 		pEventVanilla->m_Y = (int)Pos.y;
-		pEventVanilla->m_ClientID = Id;
+		pEventVanilla->m_ClientID = ClientID;
 		pEventVanilla->m_Angle = (int)(f * 256.0f);
 		pEventVanilla->m_HealthAmount = clamp(HealthAmount, 1, 9);
 		pEventVanilla->m_ArmorAmount = clamp(ArmorAmount, 1, 9);
 		pEventVanilla->m_Self = Self;
 	}
 
-	CNetEvent_MmoDamage* pEventMmo = (CNetEvent_MmoDamage*)m_Events.Create(NETEVENTTYPE_MMODAMAGE, sizeof(CNetEvent_MmoDamage), MaskWorldID());
+	CNetEvent_MmoDamage* pEventMmo = (CNetEvent_MmoDamage*)m_Events.Create(NETEVENTTYPE_MMODAMAGE, sizeof(CNetEvent_MmoDamage));
 	if(pEventMmo)
 	{
 		pEventMmo->m_X = (int)Pos.x;
 		pEventMmo->m_Y = (int)Pos.y;
-		pEventMmo->m_ClientID = Id;
+		pEventMmo->m_ClientID = ClientID;
 		pEventMmo->m_DamageCount = HealthAmount + ArmorAmount;
 	}
 }
@@ -187,8 +181,7 @@ void CGS::CreateDamageTranslate(vec2 Pos, int Id, vec2 Source, int HealthAmount,
 // Отправить запрос на рендер Удара молотка
 void CGS::CreateHammerHit(vec2 Pos)
 {
-	// create the event
-	CNetEvent_HammerHit *pEvent = (CNetEvent_HammerHit *)m_Events.Create(NETEVENTTYPE_HAMMERHIT, sizeof(CNetEvent_HammerHit), MaskWorldID());
+	CNetEvent_HammerHit *pEvent = (CNetEvent_HammerHit *)m_Events.Create(NETEVENTTYPE_HAMMERHIT, sizeof(CNetEvent_HammerHit));
 	if(pEvent)
 	{
 		pEvent->m_X = (int)Pos.x;
@@ -200,7 +193,7 @@ void CGS::CreateHammerHit(vec2 Pos)
 void CGS::CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamage)
 {
 	// create the event
-	CNetEvent_Explosion *pEvent = (CNetEvent_Explosion *)m_Events.Create(NETEVENTTYPE_EXPLOSION, sizeof(CNetEvent_Explosion), MaskWorldID());
+	CNetEvent_Explosion *pEvent = (CNetEvent_Explosion *)m_Events.Create(NETEVENTTYPE_EXPLOSION, sizeof(CNetEvent_Explosion));
 	if(pEvent)
 	{
 		pEvent->m_X = (int)Pos.x;
@@ -230,7 +223,7 @@ void CGS::CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamage)
 void CGS::CreatePlayerSpawn(vec2 Pos)
 {
 	// create the event
-	CNetEvent_Spawn *ev = (CNetEvent_Spawn *)m_Events.Create(NETEVENTTYPE_SPAWN, sizeof(CNetEvent_Spawn), MaskWorldID());
+	CNetEvent_Spawn *ev = (CNetEvent_Spawn *)m_Events.Create(NETEVENTTYPE_SPAWN, sizeof(CNetEvent_Spawn));
 	if(ev)
 	{
 		ev->m_X = (int)Pos.x;
@@ -240,7 +233,7 @@ void CGS::CreatePlayerSpawn(vec2 Pos)
 
 void CGS::CreateDeath(vec2 Pos, int ClientID)
 {
-	CNetEvent_Death *pEvent = (CNetEvent_Death *)m_Events.Create(NETEVENTTYPE_DEATH, sizeof(CNetEvent_Death), MaskWorldID());
+	CNetEvent_Death *pEvent = (CNetEvent_Death *)m_Events.Create(NETEVENTTYPE_DEATH, sizeof(CNetEvent_Death));
 	if(pEvent)
 	{
 		pEvent->m_X = (int)Pos.x;
@@ -293,7 +286,7 @@ void CGS::SendMmoEffect(vec2 Pos, int EffectID, int ClientID)
 
 void CGS::SendMmoPotion(vec2 Pos, const char *Potion, bool Added)
 {
-	CNetEvent_EffectPotion *pEvent = (CNetEvent_EffectPotion *)m_Events.Create(NETEVENTTYPE_EFFECTPOTION, sizeof(CNetEvent_EffectPotion), MaskWorldID());
+	CNetEvent_EffectPotion *pEvent = (CNetEvent_EffectPotion *)m_Events.Create(NETEVENTTYPE_EFFECTPOTION, sizeof(CNetEvent_EffectPotion));
 	if(pEvent)
 	{
 		pEvent->m_X = (int)Pos.x;

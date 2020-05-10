@@ -14,8 +14,7 @@ class CEventHandler
 	int64 m_aClientMasks[MAX_EVENTS];
 	char m_aData[MAX_DATASIZE];
 
-	class CGS *m_pGameServer;
-
+	class CGS* m_pGameServer;
 	int m_CurrentOffset;
 	int m_NumEvents;
 public:

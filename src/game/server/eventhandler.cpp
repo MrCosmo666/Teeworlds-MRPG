@@ -43,7 +43,6 @@ void CEventHandler::Clear()
 
 void CEventHandler::Snap(int SnappingClient)
 {
-	// проверить если мир игрока не равен миру в котором происходят инвенты
 	if(!GS()->IsClientEqualWorldID(SnappingClient))
 		return;
 
