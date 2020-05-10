@@ -209,7 +209,7 @@ void QuestJob::AddProgress(CPlayer *pPlayer, int QuestID)
 	if (FinishedProgress)
 	{
 		FinishQuest(pPlayer, QuestID);
-		GS()->VResetVotes(ClientID, MenuList::MENU_ADVENTURE_JOURNAL_MAIN);
+		GS()->VResetVotes(ClientID, MenuList::MENU_JOURNAL_MAIN);
 	}
 	else
 	{
@@ -267,7 +267,7 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotDa
 		return false;
 
 	CollectItem(pPlayer, BotData);
-	GS()->VResetVotes(ClientID, MenuList::MENU_ADVENTURE_JOURNAL_MAIN);
+	GS()->VResetVotes(ClientID, MenuList::MENU_JOURNAL_MAIN);
 	GS()->Mmo()->Quest()->AddProgress(pPlayer, QuestID);
 	return true;
 }
@@ -431,7 +431,7 @@ void QuestJob::ShowFullQuestLift(CPlayer* pPlayer)
 
 	// показываем меню завершенных
 	pPlayer->m_Colored = BLUE_COLOR;
-	GS()->AVM(ClientID, "MENU", MenuList::MENU_ADVENTURE_JOURNAL_FINISHED, NOPE, "List of completed quests");
+	GS()->AVM(ClientID, "MENU", MenuList::MENU_JOURNAL_FINISHED, NOPE, "List of completed quests");
 }
 
 // Адвентур активные нпс показ информации
@@ -783,9 +783,9 @@ bool QuestJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		return false;
 	}
 
-	if (Menulist == MenuList::MENU_ADVENTURE_JOURNAL_FINISHED)
+	if (Menulist == MenuList::MENU_JOURNAL_FINISHED)
 	{
-		pPlayer->m_LastVoteMenu = MenuList::MENU_ADVENTURE_JOURNAL_MAIN;
+		pPlayer->m_LastVoteMenu = MenuList::MENU_JOURNAL_MAIN;
 		ShowQuestList(pPlayer, QuestState::QUEST_FINISHED);
 		GS()->AddBack(ClientID);
 		return true;

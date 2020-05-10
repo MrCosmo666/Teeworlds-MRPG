@@ -620,12 +620,7 @@ bool CPlayer::ParseInteractive(int Vote)
 	// проверяем если нажата F3
 	if(Vote == 1)
 	{
-		if(!str_comp(CGS::Interactive[m_ClientID].ParsingType, "Deal"))
-		{
-			const int Price = CGS::Interactive[m_ClientID].ParsingSaveInt;
-			GS()->Mmo()->House()->SellToHouse(SaveCID, m_ClientID, Price);
-		}
-		else if(!str_comp(CGS::Interactive[m_ClientID].ParsingType, "Member"))
+		if(!str_comp(CGS::Interactive[m_ClientID].ParsingType, "Member"))
 		{
 			const int GuildID = CGS::Interactive[m_ClientID].ParsingSaveInt;
 			GS()->Mmo()->Member()->JoinGuild(Acc().AuthID, GuildID);

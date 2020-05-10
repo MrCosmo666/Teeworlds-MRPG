@@ -105,9 +105,8 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 			pPlayer->Acc().Stats[at.first] = ACCOUNTDATA->getInt(at.second.FieldName);
 		}
 
-		GS()->ChatFollow(ClientID, "Last Login: {STR} MSK", pPlayer->Acc().LastLogin);
-		GS()->ChatFollow(ClientID, "You authed successful!");
 		GS()->ChatFollow(ClientID, "Player menu is available in votes!");
+		GS()->ChatFollow(ClientID, "You authed successful!");
 		GS()->m_pController->DoTeamChange(pPlayer, false);
 		SJK.UD("tw_accounts_data", "LoginDate = CURRENT_TIMESTAMP WHERE ID = '%d'", UserID);
 		return SendAuthCode(ClientID, AUTH_LOGIN_GOOD);

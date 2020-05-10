@@ -184,30 +184,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		GS->Mmo()->House()->SellHouse(HouseID);
 		return;
 	}
-	else if (str_comp_num(Msg->m_pMessage, "/selltohouse", 12) == 0)
-	{
-		LastChat(GS, pPlayer); 
-
-		// check authed
-		if(!pPlayer->IsAuthed())
-			return;
-
-		int CID, Price;
-		if(sscanf(Msg->m_pMessage, "/selltohouse %d %d", &CID, &Price) != 2) 
-			return GS->ChatFollow(ClientID, "Use: /selltohouse <ClientID> <Price>");
-
-		CPlayer *pPlayerCID = GS->m_apPlayers[CID];
-		if(CID < 0 || CID > MAX_CLIENTS || Price < 100 || !pPlayerCID || !pPlayerCID->IsAuthed() || ClientID == CID)
-			return GS->Chat(ClientID, "Not entered the correct ID of the player. House min price 100.");
-
-		// start parsing
-		if(pPlayerCID->SetParsing(10, ClientID, Price, "Deal"))
-		{
-			GS->Chat(ClientID, "You sent a request {STR} to sell house {INT} gold.", GS->Server()->ClientName(CID), &Price);
-			GS->Chat(CID, "{STR} offered to buy a house {INT} gold.", GS->Server()->ClientName(ClientID),&Price);
-		}
-		return;
-	}
 
 /////////////////////////////////////// HELPER COMMAND /////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////	

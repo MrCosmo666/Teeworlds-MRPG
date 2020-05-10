@@ -282,78 +282,23 @@ bool HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 	return false;
 }
 
-// Продажа кому то дома
-void HouseJob::SellToHouse(int SellerID, int BuyightID, int Price)
-{
-	// check player in world
-	CPlayer *pSeller = GS()->GetPlayer(SellerID, true);
-	CPlayer *pBuyight = GS()->GetPlayer(BuyightID, true);
-	if(!pSeller || !pBuyight)
-		return;
-
-	// checl buyight ownerhouses and release
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_houses", "WHERE OwnerID = '%d'", pBuyight->Acc().AuthID));
-	if(RES->next())
-	{
-		GS()->Chat(BuyightID, "You are already a home owner!");	
-		return;
-	}
-
-	// check owner seller
-	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_houses", "WHERE OwnerID = '%d'", pSeller->Acc().AuthID));
-	if(RES2->next())
-	{
-		// check money for buy this house and release
-		if(pBuyight->CheckFailMoney(Price))	
-		{	
-			GS()->Chat(BuyightID, "You have so much money!");
-			GS()->Chat(SellerID, "The player {STR} doesn't have that much money", GS()->Server()->ClientName(BuyightID));
-			return;
-		}
-	
-		// send money who sell house
-		int SellerAuthID = pSeller->Acc().AuthID;
-		Job()->Inbox()->SendInbox(SellerAuthID, "House is sold", "Your house is sold !", itMoney, Price, 0);
-
-		// update house information
-		int HouseID = RES2->getInt("ID");
-		int BuyightAuthID = pBuyight->Acc().AuthID;
-		SJK.UD("tw_houses", "OwnerID = '%d' WHERE ID = '%d'", BuyightAuthID, HouseID);
-		
-		// если есть двери удаляем их
-		Home[HouseID].m_OwnerID = BuyightAuthID;
-	
-		// send message
-		GS()->Chat(-1, "Made a deal {STR} and {STR} at home {VAL} G", 
-			GS()->Server()->ClientName(SellerID), GS()->Server()->ClientName(BuyightID), &Price);
-
-		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**Made a deal [{STR} and {STR}] at home [{INT}G]**", 
-			GS()->Server()->ClientName(SellerID), GS()->Server()->ClientName(BuyightID), &Price);	
-		
-		GS()->ResetVotes(SellerID, MenuList::MAIN_MENU);
-		GS()->ResetVotes(BuyightID, MenuList::MAIN_MENU);
-		return;
-	}	
-	return;
-}
 // Продажа дома
 void HouseJob::SellHouse(int HouseID)
 {
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("OwnerID", "tw_houses", "WHERE ID = '%d'", HouseID));
 	if(RES->next())
 	{
-		int OwnerID = RES->getInt("OwnerID");
-		int ClientID = Job()->Account()->CheckOnlineAccount(OwnerID);                    
+		const int OwnerID = RES->getInt("OwnerID");
+		const int ClientID = Job()->Account()->CheckOnlineAccount(OwnerID);
 		if(ClientID >= 0)
 		{
 			GS()->ChatFollow(ClientID, "Your House is sold !");
 			GS()->Chat(-1, "House: {INT} have been is released!", &HouseID);
 			GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**[House: {INT}] have been sold!**", &HouseID);
 		}
-		int Price = Home[HouseID].m_Price;
+		const int Price = Home[HouseID].m_Price;
 		Job()->Inbox()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itMoney, Price, 0);
 
-		// удалить двери если есть и очистить инфу
 		if(Home[HouseID].m_Door)
 		{
 			delete Home[HouseID].m_Door;
@@ -547,7 +492,6 @@ void HouseJob::ShowHouseMenu(CPlayer *pPlayer, int HouseID)
 	GS()->AVH(ClientID, TAB_HOUSE_COMMAND, GREEN_COLOR, "House command");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_COMMAND, "/doorhouse - Open or close door your house");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_COMMAND, "/sellhouse - To sell the house to the city");
-	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_COMMAND, "/selltohouse <clientid> <price> - To sell the house to player");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_COMMAND, "Another in House Menu, available only owner ");
 	GS()->AV(ClientID, "null", "");
 
@@ -560,11 +504,14 @@ void HouseJob::ShowHouseMenu(CPlayer *pPlayer, int HouseID)
 // Показ меню дома персонально
 void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 {
-	int ClientID = pPlayer->GetCID();
-	int HouseID = PlayerHouseID(pPlayer);
-	if(HouseID <= 0) return GS()->AVL(ClientID, "null", "You not owner home!");
-
-	bool StateDoor = GetHouseDoor(HouseID);
+	const int ClientID = pPlayer->GetCID();
+	const int HouseID = PlayerHouseID(pPlayer);
+	if(HouseID <= 0)
+	{
+		GS()->AVL(ClientID, "null", "You not owner home!");
+		return;
+	}
+	const bool StateDoor = GetHouseDoor(HouseID);
 	GS()->AVH(ClientID, TAB_HOUSE_STAT, BLUE_COLOR, "House stats {INT} Class {STR} Door [{STR}]", &HouseID, Home[HouseID].m_Class, StateDoor ? "Closed" : "Opened");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "Farming level: every day +{INT}gold", &Home[HouseID].m_FarmLevel);
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "Bank farming house {INT}gold", &Home[HouseID].m_Farm);
@@ -584,12 +531,12 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_HOUSE_DECORATION, NOPE, "Settings Decorations");
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_HOUSE_PLANTS, NOPE, "Settings Plants");
 	}
-	else GS()->AVM(ClientID, "null", MenuList::MENU_HOUSE_DECORATION, NOPE, "More settings allow only own House World");
+	else
+	{
+		GS()->AVM(ClientID, "null", MenuList::MENU_HOUSE_DECORATION, NOPE, "More settings allow, only on house zone");
+	}
 }
 
-/* #########################################################################
-	PARSING HOUSES 
-######################################################################### */
 // Парсинг голосований
 bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
@@ -697,7 +644,6 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 	// смена расстения дома
 	if(PPSTR(CMD, "HOMEPLANTSET") == 0)
 	{
-		// дом проверка
 		int HouseID = PlayerHouseID(pPlayer);
 		if(HouseID < 0)
 		{
@@ -705,14 +651,12 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 			return true;
 		}
 
-		// не разрешать менять если нет поддержки
 		if(GetPlantsID(HouseID) <= 0)
 		{
 			GS()->Chat(ClientID, "Your home does not support plants!");
 			return true;		
 		}
 
-		// проверка хватит ли расстений на рассадку дома
 		if(pPlayer->CheckFailMoney(VoteID2, VoteID))
 			return true;
 
@@ -729,10 +673,8 @@ HouseDoor::HouseDoor(CGameWorld *pGameWorld, vec2 Pos)
 {
 	m_Pos.y += 30;
 	m_To = GS()->Collision()->FindDirCollision(100, m_To, 'y', '-');
-
 	GameWorld()->InsertEntity(this);
 }
-HouseDoor::~HouseDoor(){}
 
 void HouseDoor::Tick()
 {

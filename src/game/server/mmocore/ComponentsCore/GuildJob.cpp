@@ -1213,7 +1213,7 @@ void GuildJob::ShowFinderGuilds(int ClientID)
 		int PlayersCount = GetGuildPlayerCount(GuildID);
 		cGuildName = RES->getString("GuildName").c_str();
 
-		GS()->AVH(ClientID, HideID, RED_COLOR, "{STR} : Leader {STR} : Players [{INT}/{INT}]", 
+		GS()->AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} : Leader {STR} : Players [{INT}/{INT}]", 
 			cGuildName.cstr(), Job()->PlayerName(Guild[GuildID].m_OwnerID), &PlayersCount, &AvailableSlot);
 		GS()->AVM(ClientID, "null", NOPE, HideID, "House: {STR} | Bank: {INT} gold", (GetGuildHouseID(GuildID) <= 0 ? "No" : "Yes"), &Guild[ GuildID ].m_Bank);
 		GS()->AVM(ClientID, "MINVITESEND", GuildID, HideID, "Send request to join {STR}", cGuildName.cstr());

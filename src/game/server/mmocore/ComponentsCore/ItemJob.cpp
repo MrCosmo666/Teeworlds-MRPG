@@ -8,17 +8,6 @@ using namespace sqlstr;
 std::map < int , std::map < int , ItemJob::InventoryItem > > ItemJob::Items;
 std::map < int , ItemJob::ItemInformation > ItemJob::ItemsInfo;
 
-int randomRangecount(int startrandom, int endrandom, int count)
-{
-	int result = 0;
-	for (int i = 0; i < count; i++)
-	{
-		int random = startrandom + rand() % (endrandom - startrandom);
-		result += random;
-	}
-	return result;
-}
-
 void ItemJob::OnInit()
 {
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_items_list", "WHERE ItemID > '0'"));
@@ -520,12 +509,22 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 
 		GS()->ShowPlayerStats(pPlayer);
 
+		int SizeItems;
 		GS()->AVH(ClientID, TAB_INVENTORY_SELECT, RED_COLOR, "Inventory Select List");
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_USED, TAB_INVENTORY_SELECT, "Used Items");
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_CRAFT, TAB_INVENTORY_SELECT, "Craft Items");
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_MODULE, TAB_INVENTORY_SELECT, "Modules Items");
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_POTION, TAB_INVENTORY_SELECT, "Potion Items");
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_OTHER, TAB_INVENTORY_SELECT, "Other Items");
+		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_USED); 
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_USED, TAB_INVENTORY_SELECT, "Used Items ({INT})", &SizeItems);
+
+		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_CRAFT);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_CRAFT, TAB_INVENTORY_SELECT, "Craft Items ({INT})", &SizeItems);
+		
+		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_MODULE);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_MODULE, TAB_INVENTORY_SELECT, "Modules Items ({INT})", &SizeItems);
+
+		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_POTION);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_POTION, TAB_INVENTORY_SELECT, "Potion Items ({INT})", &SizeItems);
+
+		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_OTHER);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_OTHER, TAB_INVENTORY_SELECT, "Other Items ({INT})", &SizeItems);
 		if (pPlayer->m_SortTabs[SORTINVENTORY])	
 			ListInventory(pPlayer, pPlayer->m_SortTabs[SORTINVENTORY]);
 
@@ -579,6 +578,16 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 	return false;
 }
 
+int randomRangecount(int startrandom, int endrandom, int count)
+{
+	int result = 0;
+	for(int i = 0; i < count; i++)
+	{
+		int random = startrandom + random_int() % (endrandom - startrandom);
+		result += random;
+	}
+	return result;
+}
 void ItemJob::UseItem(int ClientID, int ItemID, int Count)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true, true);
@@ -609,8 +618,17 @@ void ItemJob::UseItem(int ClientID, int ItemID, int Count)
 	return;
 }
 
-
-
+int ItemJob::GetCountItemsType(CPlayer *pPlayer, int Type) const
+{
+	int SizeItems = 0;
+	const int ClientID = pPlayer->GetCID();
+	for(const auto& item : Items[ClientID])
+	{
+		if(item.second.Count > 0 && item.second.Info().Type == Type)
+			SizeItems++;
+	}
+	return SizeItems;
+}
 
 const char *ItemJob::ClassItemInformation::GetName(CPlayer *pPlayer) const
 {

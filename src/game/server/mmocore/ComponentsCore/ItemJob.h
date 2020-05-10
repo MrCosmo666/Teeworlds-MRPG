@@ -102,6 +102,8 @@ public:
 	void RepairDurabilityFull(CPlayer *pPlayer);
 
 	bool SetDurability(CPlayer *pPlayer, int ItemID, int Durability);
+
+	int GetCountItemsType(CPlayer* pPlayer, int Type) const;
 };
 
 #endif

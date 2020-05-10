@@ -131,7 +131,7 @@ MACRO_CONFIG_INT(SvDoorRadiusHit, sv_door_radius_hit, 16, 16, 1000, CFGFLAG_SERV
 
 // auction
 MACRO_CONFIG_INT(SvMaxAuctionSlots, sv_amax_slots, 5, 1, 1000, CFGFLAG_SERVER, "Max autction slots")
-MACRO_CONFIG_INT(SvAuctionPriceSlot, sv_apriceslot, 100, 0, 100000, CFGFLAG_SERVER, "Price for added new slot auction")
+MACRO_CONFIG_INT(SvAuctionPriceSlot, sv_apriceslot, 25, 0, 100000, CFGFLAG_SERVER, "Price for added new slot auction")
 MACRO_CONFIG_INT(SvTimeAuctionSlot, sv_atimeslot, 30, 5, 100000, CFGFLAG_SERVER, "Time in minutes for auction end slot")
 MACRO_CONFIG_INT(SvMaxMasiveAuctionSlots, sv_amax_masslot, 50, 10, 300, CFGFLAG_SERVER, "Max massive auction slots")
 MACRO_CONFIG_INT(SvTimeCheckAuction, sv_achecktime, 10, 1, 300, CFGFLAG_SERVER, "Minutes auction checks")
@@ -141,9 +141,7 @@ MACRO_CONFIG_INT(SvPriceUpgradeGuildSlot, sv_price_member_slot, 18999, 100, 9000
 MACRO_CONFIG_INT(SvPriceUpgradeGuildAnother, sv_price_member_another, 18999, 100, 9000000, CFGFLAG_SERVER, "Price for upgrade member another")
 
 // payments
-MACRO_CONFIG_INT(SvPaymentBussines, sv_payment_bussines, 600, 100, 1000000, CFGFLAG_SERVER, "Payment bussines")
-MACRO_CONFIG_INT(SvHousePriceUse, sv_hpriceday, 500, 5, 9000000, CFGFLAG_SERVER, "Price house.")
-MACRO_CONFIG_INT(SvStorageFraction, sv_storage_fraction, 5, 5, 1000, CFGFLAG_SERVER, "Storage fraction for remove goods.")
+MACRO_CONFIG_INT(SvHousePriceUse, sv_hpriceday, 80, 5, 9000000, CFGFLAG_SERVER, "Price house.")
 
 // leveling
 MACRO_CONFIG_INT(SvKillmobsIncreaseLevel, sv_kill_mobs_increase_level, 400, 0, 1000, CFGFLAG_SERVER, "Kill mobs of own level to increase.")
