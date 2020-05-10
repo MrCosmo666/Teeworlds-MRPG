@@ -150,17 +150,17 @@ void BotJob::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 	GS()->Mmo()->Quest()->QuestTableShowRequired(pPlayer, BotJob::QuestBot[MobID], "\0");
 }
 
-bool BotJob::IsGiveNPCQuest(int MobID) const
+int BotJob::IsGiveQuestNPC(int MobID) const
 {
 	if (!IsNpcBotValid(MobID))
-		return false;
+		return -1;
 		
 	for (const auto& npc : NpcBot[MobID].m_Talk)
 	{
 		if (npc.m_GivingQuest > 0)
-			return true;
+			return npc.m_GivingQuest;
 	}
-	return false;
+	return -1;
 }
 
 

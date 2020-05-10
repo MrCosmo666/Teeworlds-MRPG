@@ -130,7 +130,7 @@ public:
 	bool TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char *pText = "empty");
 	bool TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID);
 	void ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress);
-	bool IsGiveNPCQuest(int MobID) const;
+	int IsGiveQuestNPC(int MobID) const;
 
 	// ------------------ CHECK VALID DATA --------------------
 	bool IsDataBotValid(int BotID) const { return (DataBot.find(BotID) != DataBot.end()); }

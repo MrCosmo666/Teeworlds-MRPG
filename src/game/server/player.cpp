@@ -801,7 +801,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			return;
 		}
 
-		int GivingQuestID = GS()->Mmo()->BotsData()->IsGiveNPCQuest(MobID);
+		int GivingQuestID = GS()->Mmo()->BotsData()->IsGiveQuestNPC(MobID);
 		if (GS()->Mmo()->Quest()->GetState(m_ClientID, GivingQuestID) >= QuestState::QUEST_ACCEPT)
 		{
 			const char* pTalking[2] = { "[Player], do you have any questions? I'm sorry I can't help you.", 

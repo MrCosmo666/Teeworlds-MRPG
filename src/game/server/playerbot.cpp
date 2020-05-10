@@ -242,9 +242,14 @@ bool CPlayerBot::IsActiveQuests(int SnapClientID)
 	if (m_BotType == BotsTypes::TYPE_BOT_QUEST)
 		return true;
 
-	if (m_BotType == BotsTypes::TYPE_BOT_NPC)
-		return (bool)(BotJob::NpcBot[m_SubBotID].Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST);
-
+	if(m_BotType == BotsTypes::TYPE_BOT_NPC)
+	{
+		int GivesQuest = GS()->Mmo()->BotsData()->IsGiveQuestNPC(m_SubBotID);
+		if(BotJob::NpcBot[m_SubBotID].Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST && 
+			GS()->Mmo()->Quest()->GetState(SnapClientID, GivesQuest) == QuestState::QUEST_NO_ACCEPT)
+			return true;
+		return false;
+	}
 	return false;
 }
 

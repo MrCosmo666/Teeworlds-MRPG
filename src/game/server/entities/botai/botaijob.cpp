@@ -49,8 +49,8 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 	else if(GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 	{
 		m_Core.m_LostData = true;
-		CreateSnapProj(GetSnapFullID(), 3, PICKUP_HEALTH, true, false);
-		CreateSnapProj(GetSnapFullID(), 3, PICKUP_ARMOR, true, false);
+		CreateSnapProj(GetSnapFullID(), 2, PICKUP_HEALTH, true, false);
+		CreateSnapProj(GetSnapFullID(), 2, PICKUP_ARMOR, true, false);
 	}
 	else if(GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
