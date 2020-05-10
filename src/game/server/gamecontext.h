@@ -211,7 +211,6 @@ public:
 	void SendProgressBar(int ClientID, int Count, int Request, const char *Message);
 	void ClearTalkText(int ClientID);
 	int CheckPlayerMessageWorldID(int ClientID) const;
-	int64 MaskWorldID();
 
 	/* #########################################################################
 		ENGINE GAMECONTEXT 
@@ -333,6 +332,9 @@ private:
 	bool m_AllowedPVP;
 	int m_DayEnumType;
 	static int m_RaidExp;
+
+
+	int64 MaskWorldID();
 };
 
 inline int64 CmaskAll() { return -1; }

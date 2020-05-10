@@ -635,12 +635,10 @@ int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int WorldID)
 							Packet.m_ClientID = i;
 							m_NetServer.Send(&Packet);
 						}
+						continue;
 					}
-					else
-					{
-						Packet.m_ClientID = i;
-						m_NetServer.Send(&Packet);
-					}
+					Packet.m_ClientID = i;
+					m_NetServer.Send(&Packet);
 				}
 			}
 		}

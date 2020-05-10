@@ -161,36 +161,26 @@ void CGS::CreateDamage(vec2 Pos, int Id, vec2 Source, int HealthAmount, int Armo
 // Транслированный урон // TODO: исправить упростить и не отправлять в обработку по 2000 инвентов за дамаг
 void CGS::CreateDamageTranslate(vec2 Pos, int Id, vec2 Source, int HealthAmount, int ArmorAmount, bool Self)
 {
-	for(int i = 0 ; i < MAX_PLAYERS ; i ++)
+	CNetEvent_Damage* pEventVanilla = (CNetEvent_Damage*)m_Events.Create(NETEVENTTYPE_DAMAGE, sizeof(CNetEvent_Damage), MaskWorldID());
+	if(pEventVanilla)
 	{
-		if(!Server()->ClientIngame(i))
-			continue;
-		
-		if(!CheckClient(i))
-		{
-			CNetEvent_Damage *pEventVanilla = (CNetEvent_Damage *)m_Events.Create(NETEVENTTYPE_DAMAGE, sizeof(CNetEvent_Damage), CmaskOne(i));
-			if(pEventVanilla)
-			{
-				float f = angle(Source);
-				pEventVanilla->m_X = (int)Pos.x;
-				pEventVanilla->m_Y = (int)Pos.y;
-				pEventVanilla->m_ClientID = Id;
-				pEventVanilla->m_Angle = (int)(f*256.0f);
-				pEventVanilla->m_HealthAmount = clamp(HealthAmount, 1, 9);
-				pEventVanilla->m_ArmorAmount = clamp(ArmorAmount, 1, 9);
-				pEventVanilla->m_Self = Self;
-			}
-			continue;
-		}
+		float f = angle(Source);
+		pEventVanilla->m_X = (int)Pos.x;
+		pEventVanilla->m_Y = (int)Pos.y;
+		pEventVanilla->m_ClientID = Id;
+		pEventVanilla->m_Angle = (int)(f * 256.0f);
+		pEventVanilla->m_HealthAmount = clamp(HealthAmount, 1, 9);
+		pEventVanilla->m_ArmorAmount = clamp(ArmorAmount, 1, 9);
+		pEventVanilla->m_Self = Self;
+	}
 
-		CNetEvent_MmoDamage *pEventMmo = (CNetEvent_MmoDamage *)m_Events.Create(NETEVENTTYPE_MMODAMAGE, sizeof(CNetEvent_MmoDamage), CmaskOne(i));
-		if(pEventMmo)
-		{
-			pEventMmo->m_X = (int)Pos.x;
-			pEventMmo->m_Y = (int)Pos.y;
-			pEventMmo->m_ClientID = Id;
-			pEventMmo->m_DamageCount = HealthAmount + ArmorAmount;
-		}
+	CNetEvent_MmoDamage* pEventMmo = (CNetEvent_MmoDamage*)m_Events.Create(NETEVENTTYPE_MMODAMAGE, sizeof(CNetEvent_MmoDamage), MaskWorldID());
+	if(pEventMmo)
+	{
+		pEventMmo->m_X = (int)Pos.x;
+		pEventMmo->m_Y = (int)Pos.y;
+		pEventMmo->m_ClientID = Id;
+		pEventMmo->m_DamageCount = HealthAmount + ArmorAmount;
 	}
 }
 
@@ -250,7 +240,6 @@ void CGS::CreatePlayerSpawn(vec2 Pos)
 
 void CGS::CreateDeath(vec2 Pos, int ClientID)
 {
-	// create the event
 	CNetEvent_Death *pEvent = (CNetEvent_Death *)m_Events.Create(NETEVENTTYPE_DEATH, sizeof(CNetEvent_Death), MaskWorldID());
 	if(pEvent)
 	{
@@ -262,6 +251,7 @@ void CGS::CreateDeath(vec2 Pos, int ClientID)
 
 void CGS::CreateSound(vec2 Pos, int Sound, int64 Mask)
 {
+	// fix for vanilla unterstand SoundID
 	if(Sound < 0 || Sound > 40)
 		return;
 
@@ -276,6 +266,7 @@ void CGS::CreateSound(vec2 Pos, int Sound, int64 Mask)
 
 void CGS::CreatePlayerSound(int ClientID, int Sound)
 {
+	// fix for vanilla unterstand SoundID
 	if(!m_apPlayers[ClientID] || (!CheckClient(ClientID) && (Sound < 0 || Sound > 40)))
 		return;
 
@@ -342,9 +333,8 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 
 	if(Mode == CHAT_ALL)
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
-	else if(Mode == CHAT_WHISPER) // Mode == CHAT_WHISPER
+	else if(Mode == CHAT_WHISPER)
 	{
-		// send to the clients
 		Msg.m_TargetID = To;
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ChatterClientID);
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, To);
@@ -484,17 +474,17 @@ void CGS::ChatWorldID(int WorldID, const char* Suffix, const char* pText, ...)
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pPlayer = GetPlayer(i, true);
-		if (pPlayer && IsClientEqualWorldID(i, WorldID))
-		{
-			Buffer.append(Suffix);
-			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
+		if(!pPlayer || !IsClientEqualWorldID(i, WorldID))
+			continue;
 
-			Msg.m_TargetID = i;
-			Msg.m_pMessage = Buffer.buffer();
+		Buffer.append(Suffix);
+		Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
 
-			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, i);
-			Buffer.clear();
-		}
+		Msg.m_TargetID = i;
+		Msg.m_pMessage = Buffer.buffer();
+
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, i, WorldID);
+		Buffer.clear();
 	}
 	va_end(VarArgs);
 }
@@ -929,18 +919,6 @@ int CGS::CheckPlayerMessageWorldID(int ClientID) const
 		return Server()->GetWorldID(ClientID);
 }
 
-// Маска игроков с одного мира и сервера
-int64 CGS::MaskWorldID()
-{
-	int64 Mask = -1;
-	for(int i = 0; i < MAX_PLAYERS; i++)
-	{
-		if(IsClientEqualWorldID(i))
-			Mask |= CmaskOne(i);
-	}
-	return Mask;
-}
-
 /* #########################################################################
 	ENGINE GAMECONTEXT 
 ######################################################################### */
@@ -1293,7 +1271,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 			// отправим что прошли проверку на стороне сервера
 			CNetMsg_Sv_AfterIsMmoServer GoodCheck;
-			Server()->SendPackMsg(&GoodCheck, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
+			Server()->SendPackMsg(&GoodCheck, MSGFLAG_VITAL|MSGFLAG_FLUSH|MSGFLAG_NORECORD, ClientID);
 
 			// загрузка всех частей скинов игроков
 			SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
@@ -2396,12 +2374,23 @@ bool CGS::CheckPlayersDistance(vec2 Pos, float Distance) const
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(!m_apPlayers[i] || distance(Pos, m_apPlayers[i]->m_ViewPos) > 1000.0f || CheckPlayerMessageWorldID(i) != GetWorldID())
+		if(!m_apPlayers[i] || distance(Pos, m_apPlayers[i]->m_ViewPos) > Distance || CheckPlayerMessageWorldID(i) != GetWorldID())
 			continue;
 		return true;
 	}
 	return false;
 }
 
+// MASK
+int64 CGS::MaskWorldID()
+{
+	int64 Mask = -1;
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if(IsClientEqualWorldID(i))
+			Mask |= CmaskOne(i);
+	}
+	return Mask;
+}
 
 IGameServer *CreateGameServer() { return new CGS; }
