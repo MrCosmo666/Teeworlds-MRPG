@@ -32,13 +32,13 @@ public:
 	int GetStartHealth()											override;
 	int GetAttributeCount(int BonusID, bool Really = false)			override;
 	void Snap(int SnappingClient)									override;
-	bool CheckQuestSnapPlayer(int SnappingClient, bool SnapData)	override;
+	int IsActiveSnappingBot(int SnappingClient)		override;
 
 private:
 	void TryRespawn()												override;
 
 	int GetBotLevel() const;
-	bool GetActiveQuestsID(int SnapClientID);
+	bool IsActiveQuests(int SnapClientID);
 	const char* GetStatusBot();
 	void SendInformationBot();
 	int GetMoodState(int SnappingClient);

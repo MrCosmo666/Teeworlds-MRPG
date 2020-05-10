@@ -58,7 +58,6 @@ int CGameWorld::FindEntities(vec2 Pos, float Radius, CEntity **ppEnts, int Max, 
 				break;
 		}
 	}
-
 	return Num;
 }
 

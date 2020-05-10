@@ -94,7 +94,7 @@ void CSnapFull::Tick()
 void CSnapFull::Snap(int SnappingClient)
 {
 	CPlayer *pOwner = GS()->m_apPlayers[m_Owner];
-	if(NetworkClipped(SnappingClient) || !pOwner->GetCharacter() || !pOwner->CheckQuestSnapPlayer(SnappingClient, true))
+	if(NetworkClipped(SnappingClient) || !pOwner->GetCharacter() || pOwner->IsActiveSnappingBot(SnappingClient) != 2)
 		return;
 
 	float AngleStart = (2.0f * pi * Server()->Tick()/static_cast<float>(Server()->TickSpeed()))/10.0f;

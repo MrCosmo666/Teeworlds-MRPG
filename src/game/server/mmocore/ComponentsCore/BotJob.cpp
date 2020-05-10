@@ -287,6 +287,9 @@ void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 			LoadTalk.m_GivingQuest = RES->getInt("GivingQuest");
 			str_copy(LoadTalk.m_TalkingText, RES->getString("TalkText").c_str(), sizeof(LoadTalk.m_TalkingText));
 			NpcBot[MobID].m_Talk.push_back(LoadTalk);
+
+			if(LoadTalk.m_GivingQuest > 0)
+				NpcBot[MobID].Function = FunctionsNPC::FUNCTION_NPC_GIVE_QUEST;
 		}
 	}
 }

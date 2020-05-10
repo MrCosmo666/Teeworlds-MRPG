@@ -99,7 +99,7 @@ public:
 	virtual int GetBotID()                                               { return -1; };
 	virtual int GetBotType()                                             { return -1; };
 	virtual int GetBotSub()                                              { return -1; };
-	virtual bool CheckQuestSnapPlayer(int SnappingClient, bool SnapData) { return true; };
+	virtual int IsActiveSnappingBot(int SnappingClient)					 { return 2; };
 	virtual	int GetHealth()                                              { return Acc().PlayerHealth;};
 	virtual void SetDungeonAllowedSpawn(bool Spawn)                      { return; };
 	virtual void SetStandart(int Health, int Mana);

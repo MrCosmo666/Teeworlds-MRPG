@@ -699,8 +699,11 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 		if(VoteID < TAB_STAT)
 			return true;
 
-		m_HidenMenu.clear();
-
+		for(auto& x : m_HidenMenu)
+		{
+			if((x.first > NUM_TAB_MENU && x.first != VoteID))
+				x.second = false;
+		}
 		m_HidenMenu[VoteID] ^= true;
 		if(m_HidenMenu[VoteID] == false)
 			m_HidenMenu.erase(VoteID);

@@ -135,37 +135,41 @@ void CPlayerBot::TryRespawn()
 
 }
 
-
-// Проверить рисорку под квест игрока
-bool CPlayerBot::CheckQuestSnapPlayer(int SnappingClient, bool SnapData)
+/*
+	0 - empty
+	1 - is active draw only bot
+	2 - is active draw bot and entities
+*/
+int CPlayerBot::IsActiveSnappingBot(int SnappingClient)
 {
-	CPlayer *pSnap = GS()->m_apPlayers[SnappingClient];
-	if(m_BotType != BotsTypes::TYPE_BOT_QUEST || !pSnap)
-		return SnapData;
+	if(m_BotType == BotsTypes::TYPE_BOT_NPC)
+	{
+		if(IsActiveQuests(SnappingClient))
+			return 2;
+		else 
+			return 1;
+	}
 
-	// все переменные
-	const int QuestID = BotJob::QuestBot[m_SubBotID].QuestID;	
-	const int TalkProgress = BotJob::QuestBot[m_SubBotID].Progress;
-	if(!pSnap->IsAuthed()) return false;
+	if(m_BotType == BotsTypes::TYPE_BOT_QUEST)
+	{
+		const int QuestID = BotJob::QuestBot[m_SubBotID].QuestID;
+		const int TalkProgress = BotJob::QuestBot[m_SubBotID].Progress;
+		if(QuestJob::Quests[SnappingClient].find(QuestID) == QuestJob::Quests[SnappingClient].end()) 
+			return 0;
 
-	// ищем игрока что квест равен боту и не равен завершенному и не выполнен по сбору предметов или прогресс разговора не является концу квеста
-	if(QuestJob::Quests[SnappingClient].find(QuestID) == QuestJob::Quests[SnappingClient].end()) return false;
+		if(QuestJob::Quests[SnappingClient][QuestID].State == QuestState::QUEST_FINISHED)
+			return 0;
 
-	// если квест завершен
-	if(QuestJob::Quests[SnappingClient][QuestID].State == QuestState::QUEST_FINISHED)
-		return false;
-
-	// если прогресс разговора не равен прогрессу бота
-	if(TalkProgress != QuestJob::Quests[SnappingClient][QuestID].Progress)
-		return false;
-
-	return true;
+		if(TalkProgress != QuestJob::Quests[SnappingClient][QuestID].Progress)
+			return 0;
+	}
+	return 2;
 }
 
 // Рисовка игрока как бота
 void CPlayerBot::Snap(int SnappingClient)
 {
-	if(!Server()->ClientIngame(m_ClientID) || !CheckQuestSnapPlayer(SnappingClient, true))
+	if(!Server()->ClientIngame(m_ClientID) || !IsActiveSnappingBot(SnappingClient))
 		return;
 
 	CNetObj_PlayerInfo *pPlayerInfo = static_cast<CNetObj_PlayerInfo *>(Server()->SnapNewItem(NETOBJTYPE_PLAYERINFO, m_ClientID, sizeof(CNetObj_PlayerInfo)));
@@ -192,7 +196,7 @@ void CPlayerBot::Snap(int SnappingClient)
 	pClientInfo->m_HealthStart = GetStartHealth();
 	pClientInfo->m_Health = GetHealth();
 	pClientInfo->m_Level = GetBotLevel();
-	pClientInfo->m_ActiveQuest = GetActiveQuestsID(SnappingClient);
+	pClientInfo->m_ActiveQuest = IsActiveQuests(SnappingClient);
 	StrToInts(pClientInfo->m_StateName, 6, GetStatusBot());
 
 	for(int p = 0; p < 6; p++)
@@ -230,25 +234,17 @@ int CPlayerBot::GetBotLevel() const
 	return (m_BotType == BotsTypes::TYPE_BOT_MOB ? BotJob::MobBot[m_SubBotID].Level : 1);
 }
 
-bool CPlayerBot::GetActiveQuestsID(int SnapClientID)
+bool CPlayerBot::IsActiveQuests(int SnapClientID)
 {
 	if (SnapClientID >= MAX_PLAYERS || SnapClientID < 0)
 		return false;
 
-	// если квестовый бот
 	if (m_BotType == BotsTypes::TYPE_BOT_QUEST)
 		return true;
 
-	// если бот дает квест
 	if (m_BotType == BotsTypes::TYPE_BOT_NPC)
-	{
-		for (const auto& talk : BotJob::NpcBot[m_SubBotID].m_Talk)
-		{
-			if (talk.m_GivingQuest <= 0 || GS()->Mmo()->Quest()->GetState(SnapClientID, talk.m_GivingQuest) != QuestState::QUEST_NO_ACCEPT)
-				continue;
-			return true;
-		}
-	}
+		return (bool)(BotJob::NpcBot[m_SubBotID].Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST);
+
 	return false;
 }
 

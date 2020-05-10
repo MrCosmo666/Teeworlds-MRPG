@@ -29,14 +29,6 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 	if(!CCharacter::Spawn(pPlayer, Pos))
 		return false;
 	
-	// Запрещаем дамаг и хоок для человека
-	if(GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_NPC)
-	{
-		m_NoAllowDamage = true;
-		m_Core.m_ProtectHooked = true;
-	}
-
-	// Спавн ботов основной
 	m_StartHealth = Health();
 	ClearTarget();
 
@@ -57,16 +49,22 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 	else if(GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 	{
 		m_Core.m_LostData = true;
-
 		CreateSnapProj(GetSnapFullID(), 3, PICKUP_HEALTH, true, false);
 		CreateSnapProj(GetSnapFullID(), 3, PICKUP_ARMOR, true, false);
 	}
 	else if(GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
+		m_NoAllowDamage = true;
+		m_Core.m_ProtectHooked = true;
+
 		const int Function = BotJob::NpcBot[SubBotID].Function;
 		if(Function == FunctionsNPC::FUNCTION_NPC_NURSE)
 		{
 			new CNurseHealthNPC(&GS()->m_World, GetPlayer()->GetCID(), m_Core.m_Pos);
+		}
+		else if(Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST)
+		{
+			CreateSnapProj(GetSnapFullID(), 3, PICKUP_ARMOR, false, false);
 		}
 	}
 	return true;
@@ -313,7 +311,7 @@ void BotAI::EngineQuestMob()
 		CPlayer* pFind = GS()->GetPlayer(i, true, true);
 		if (pFind && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f
 			&& !GS()->Collision()->IntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0)
-			&& GetPlayer()->CheckQuestSnapPlayer(i, false))
+			&& GetPlayer()->IsActiveSnappingBot(i))
 		{
 			if (!(BotJob::QuestBot[SubBotID].m_Talk).empty())
 				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Start dialog with NPC [attack hammer]");

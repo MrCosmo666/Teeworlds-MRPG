@@ -1891,21 +1891,21 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		// меню персонал
 		AVH(ClientID, TAB_PERSONAL, GRAY_COLOR, "☪ SUB MENU PERSONAL");
-		AVM(ClientID, "MENU", MenuList::MENU_INVENTORY, TAB_PERSONAL, "⁂ Inventory"); 
-		AVM(ClientID, "MENU", MenuList::MENU_EQUIPMENT, TAB_PERSONAL, "★ Equipment");
-		AVM(ClientID, "MENU", MenuList::MENU_INBOX, TAB_PERSONAL, "✉ Mailbox");
-		AVM(ClientID, "MENU", MenuList::MENU_UPGRADE, TAB_PERSONAL, "◒ Upgrades");
-		AVM(ClientID, "MENU", MenuList::MENU_SETTINGS, TAB_PERSONAL, "☑ Settings");
-		AVM(ClientID, "MENU", MenuList::MENU_ADVENTURE_JOURNAL_MAIN, TAB_PERSONAL, "ღ Adventure journal");
-		AVM(ClientID, "MENU", MenuList::MENU_DUNGEONS, TAB_PERSONAL, "◎ Dungeons");
-		AVM(ClientID, "MENU", MenuList::MENU_GUILD, TAB_PERSONAL, "☃ Your Guild");
-		AVM(ClientID, "MENU", MenuList::MENU_HOUSE, TAB_PERSONAL, "❖ Your House");
+		AVM(ClientID, "MENU", MenuList::MENU_INVENTORY, TAB_PERSONAL, "Inventory"); 
+		AVM(ClientID, "MENU", MenuList::MENU_EQUIPMENT, TAB_PERSONAL, "Equipment");
+		AVM(ClientID, "MENU", MenuList::MENU_INBOX, TAB_PERSONAL, "Mailbox");
+		AVM(ClientID, "MENU", MenuList::MENU_UPGRADE, TAB_PERSONAL, "Upgrades");
+		AVM(ClientID, "MENU", MenuList::MENU_SETTINGS, TAB_PERSONAL, "Settings");
+		AVM(ClientID, "MENU", MenuList::MENU_ADVENTURE_JOURNAL_MAIN, TAB_PERSONAL, "Adventure journal");
+		AVM(ClientID, "MENU", MenuList::MENU_DUNGEONS, TAB_PERSONAL, "Dungeons");
+		AVM(ClientID, "MENU", MenuList::MENU_GUILD, TAB_PERSONAL, "Your Guild");
+		AVM(ClientID, "MENU", MenuList::MENU_HOUSE, TAB_PERSONAL, "Your House");
 		AV(ClientID, "null", "");
 
 		// меню информации
 		AVH(ClientID, TAB_INFORMATION, BLUE_COLOR, "# SUB MENU INFORMATION");
-		AVM(ClientID, "MENU", MenuList::MENU_GUIDEDROP, TAB_INFORMATION, "♣ Loots, mobs on your zone");
-		AVM(ClientID, "MENU", MenuList::MENU_TOP_LIST, TAB_INFORMATION, "♛ Ranking guilds and players");
+		AVM(ClientID, "MENU", MenuList::MENU_GUIDEDROP, TAB_INFORMATION, "Loots, mobs on your zone");
+		AVM(ClientID, "MENU", MenuList::MENU_TOP_LIST, TAB_INFORMATION, "Ranking guilds and players");
 		AV(ClientID, "null", "");
 
 		// чекаем местонахождение

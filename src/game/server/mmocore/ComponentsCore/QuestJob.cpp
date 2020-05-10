@@ -554,7 +554,7 @@ void QuestJob::QuestTableShowRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &Bo
 		const int CountItem = BotData.ItemGivesCount[i];
 		if(ItemID > 0 && CountItem > 0)
 		{
-			str_format(aBuf, sizeof(aBuf), "\n- Gives %s %d", GS()->GetItemInfo(ItemID).GetName(pPlayer), CountItem);
+			str_format(aBuf, sizeof(aBuf), "\n- Receive %s [%d]", GS()->GetItemInfo(ItemID).GetName(pPlayer), CountItem);
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
 	}
