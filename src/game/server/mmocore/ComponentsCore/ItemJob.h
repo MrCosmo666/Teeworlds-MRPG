@@ -53,8 +53,8 @@ public:
 		int itemid_;
 
 	public:
-		ClassItems() : Count(NULL), Settings(NULL), Enchant(NULL), Durability(NULL) {};
-		ClassItems(CPlayer* pPlayer, int ItemID) : m_pPlayer(pPlayer), itemid_(ItemID), Count(NULL), Settings(NULL), Enchant(NULL), Durability(NULL) {};
+		ClassItems() : Count(0), Settings(0), Enchant(0), Durability(0) {};
+		ClassItems(CPlayer* pPlayer, int ItemID) : m_pPlayer(pPlayer), itemid_(ItemID), Count(0), Settings(0), Enchant(0), Durability(0) {};
 
 		int Count;
 		int Settings;
