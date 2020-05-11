@@ -36,7 +36,7 @@ void CGameControllerDungeon::KillAllPlayers()
 {
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter() && GS()->Server()->GetWorldID(i) == m_WorldID)
+		if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter() && Server()->GetWorldID(i) == m_WorldID)
 			GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_WORLD);
 	}
 }
@@ -51,7 +51,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	{
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
-			if (!GS()->m_apPlayers[i] || GS()->Server()->GetWorldID(i) != m_WorldID)
+			if (!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID)
 				continue;
 
 			GS()->m_apPlayers[i]->Acc().TempTimeDungeon = 0;
@@ -98,7 +98,7 @@ void CGameControllerDungeon::ChangeState(int State)
 		// элемент RACE
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
-			if (!GS()->m_apPlayers[i] || GS()->Server()->GetWorldID(i) != m_WorldID)
+			if (!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID)
 				continue;
 
 			int Seconds = GS()->m_apPlayers[i]->Acc().TempTimeDungeon / Server()->TickSpeed();
@@ -107,7 +107,7 @@ void CGameControllerDungeon::ChangeState(int State)
 
 			char aTimeFormat[64];
 			str_format(aTimeFormat, sizeof(aTimeFormat), "Time: %d minute(s) %d second(s)", Seconds / 60, Seconds - (Seconds / 60 * 60));
-			GS()->Chat(-1, "{STR} finished {STR} {STR}", GS()->Server()->ClientName(i), DungeonJob::Dungeon[m_DungeonID].Name, aTimeFormat);
+			GS()->Chat(-1, "{STR} finished {STR} {STR}", Server()->ClientName(i), DungeonJob::Dungeon[m_DungeonID].Name, aTimeFormat);
 		}
 	}
 
@@ -173,7 +173,7 @@ void CGameControllerDungeon::StateTick()
 		// элемент RACE
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
-			if (!GS()->m_apPlayers[i] || GS()->Server()->GetWorldID(i) != m_WorldID)
+			if (!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID)
 				continue;
 
 			GS()->m_apPlayers[i]->Acc().TempTimeDungeon++;
@@ -213,11 +213,11 @@ void CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKil
 	if (!pKiller || !pVictim || !pVictim->GetPlayer())
 		return;
 
-	int KillerID = pKiller->GetCID();
-	int VictimID = pVictim->GetPlayer()->GetCID();
+	const int KillerID = pKiller->GetCID();
+	const int VictimID = pVictim->GetPlayer()->GetCID();
 	if (KillerID != VictimID && pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
-		int Progress = 100 - (int)kurosio::translate_to_procent(CountMobs(), LeftMobsToWin());
+		const int Progress = 100 - (int)kurosio::translate_to_procent(CountMobs(), LeftMobsToWin());
 		DungeonJob::Dungeon[m_DungeonID].Progress = Progress;
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The dungeon is completed on [{INT}%]", &Progress);
 		UpdateDoorKeyState();
@@ -225,24 +225,26 @@ void CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKil
 	return;
 }
 
-void CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
+bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 {
-	IGameController::OnCharacterSpawn(pChr);
-	if (pChr && pChr->GetPlayer() && m_StateDungeon >= DUNGEON_STARTED)
+	if(m_StateDungeon >= DUNGEON_STARTED)
 	{
 		const int ClientID = pChr->GetPlayer()->GetCID();
 		if(pChr->GetPlayer()->m_MoodState == MOOD_PLAYER_TANK && !m_ShowedTankingInfo)
 		{
 			m_ShowedTankingInfo = true;
-			int StrengthTank = pChr->GetPlayer()->GetLevelDisciple(AtributType::AtTank);
-			GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned  with class strength {INT}p!", GS()->Server()->ClientName(ClientID), &StrengthTank);
+			const int StrengthTank = pChr->GetPlayer()->GetLevelDisciple(AtributType::AtTank);
+			GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned with class strength {INT}p!", Server()->ClientName(ClientID), &StrengthTank);
 		}
 		if(!m_SafeTick)
 		{
 			GS()->Chat(ClientID, "You were thrown out of dungeon!");
 			pChr->GetPlayer()->ChangeWorld(pChr->GetPlayer()->Acc().LastWorldID);
+			return false;
 		}
 	}
+	IGameController::OnCharacterSpawn(pChr);
+	return true;
 }
 
 void CGameControllerDungeon::UpdateDoorKeyState()

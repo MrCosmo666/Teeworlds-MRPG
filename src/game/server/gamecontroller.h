@@ -75,7 +75,7 @@ public:
 		Arguments:
 			chr - The CCharacter that was spawned.
 	*/
-	virtual void OnCharacterSpawn(class CCharacter *pChr);
+	virtual bool OnCharacterSpawn(class CCharacter *pChr);
 
 	/*
 		Function: on_entity

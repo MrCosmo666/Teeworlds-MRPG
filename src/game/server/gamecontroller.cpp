@@ -28,7 +28,7 @@ void IGameController::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKiller, in
 	return;
 }
 
-void IGameController::OnCharacterSpawn(CCharacter* pChr)
+bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 {
 	// если спавним бота
 	if(pChr->GetPlayer()->IsBot())
@@ -37,7 +37,7 @@ void IGameController::OnCharacterSpawn(CCharacter* pChr)
 		pChr->GiveWeapon(WEAPON_HAMMER, -1);
 		for(int i = WEAPON_GUN; i < NUM_WEAPONS; i++)
 			pChr->GiveWeapon(i, 10);
-		return;
+		return true;
 	}
 
 	// если спавним игрока
@@ -55,6 +55,7 @@ void IGameController::OnCharacterSpawn(CCharacter* pChr)
 	pChr->GiveWeapon(WEAPON_HAMMER, -1);
 	for(int i = 1; i < WEAPON_LASER+1; i++)
 		pChr->GiveWeapon(i, StartAmmo);
+	return true;
 }
 
 bool IGameController::OnEntity(int Index, vec2 Pos)

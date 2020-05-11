@@ -65,7 +65,6 @@ int CCharacter::GetSnapFullID() const
 bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 {
 	m_pPlayer = pPlayer;
-	m_pPlayer->m_MoodState = m_pPlayer->GetMoodState();
 
 	m_EmoteStop = -1;
 	m_LastAction = -1;
@@ -84,17 +83,17 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	mem_zero(&m_SendCore, sizeof(m_SendCore));
 	mem_zero(&m_ReckoningCore, sizeof(m_ReckoningCore));
 	GS()->m_World.InsertEntity(this);
+	m_Alive = true;
 
 	m_Mana = 0;
 	m_OldPos = Pos;
 	m_NoAllowDamage = false;
 	m_Event = TILE_CLEAR_EVENTS;
-	m_Alive = true;
 	m_Core.m_WorldID = GS()->CheckPlayerMessageWorldID(m_pPlayer->GetCID());
-	GS()->m_pController->OnCharacterSpawn(this);
 
 	if(!m_pPlayer->IsBot())
 	{
+		m_pPlayer->m_MoodState = m_pPlayer->GetMoodState();
 		GS()->Mmo()->Quest()->UpdateArrowStep(m_pPlayer->GetCID());
 		if(GS()->Mmo()->Quest()->CheckNewStories(m_pPlayer))
 			GS()->Chat(m_pPlayer->GetCID(), "There are new stories of familiar NPCs");
@@ -103,7 +102,9 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 		m_pPlayer->ShowInformationStats();
 		GS()->VResetVotes(m_pPlayer->GetCID(), m_pPlayer->m_OpenVoteMenu);
 	}
-	return true;
+
+	bool Spawned = GS()->m_pController->OnCharacterSpawn(this);
+	return Spawned;
 }
 
 void CCharacter::SetWeapon(int W)
@@ -679,7 +680,7 @@ void CCharacter::Die(int Killer, int Weapon)
 
 	// change to safe zone
 	const int ClientID = m_pPlayer->GetCID();
-	if(Weapon != WEAPON_WORLD)
+	if(Weapon != WEAPON_WORLD && !GS()->IsDungeon())
 	{
 		const int SafezoneWorldID = GS()->GetRespawnWorld();
 		if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot() && GS()->m_apPlayers[Killer])

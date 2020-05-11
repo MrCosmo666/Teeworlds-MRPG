@@ -174,9 +174,11 @@ void QuestJob::CollectItem(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData)
 		if(ItemID > 0 && Count > 0)
 		{
 			if(antiStressing)
+			{
 				Job()->Item()->AddItemSleep(pPlayer->Acc().AuthID, ItemID, Count, 300);
-			else
-				pPlayer->GetItem(ItemID).Add(Count);
+				continue;
+			}
+			pPlayer->GetItem(ItemID).Add(Count);
 		}
 	}	
 }

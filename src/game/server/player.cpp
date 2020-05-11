@@ -86,14 +86,14 @@ void CPlayer::Tick()
 
 	if (m_pCharacter)
 	{
-		if (m_pCharacter->IsAlive())
+		if(m_pCharacter->IsAlive())
+		{
 			m_ViewPos = m_pCharacter->GetPos();
+			PotionsTick();
+		}
 	}
 	else if (m_Spawned && m_PlayerTick[TickState::Respawn] + Server()->TickSpeed() * 3 <= Server()->Tick())
 		TryRespawn();
-
-	if (m_pCharacter && m_pCharacter->IsAlive())
-		PotionsTick();
 
 	HandleTuningParams();
 	TickOnlinePlayer();
