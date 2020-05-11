@@ -176,8 +176,6 @@ void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem)
 			GS()->Server()->ClientName(ClientID), pPlayerAuctionItem.Info().GetName(pPlayer), &AuSellItem.a_count);
 		GS()->ChatFollow(ClientID, "Still available {INT} slots!", &AvailableSlot);
 	}
-
-	GS()->ClearInteractiveSub(ClientID);
 	return;
 }
 
@@ -281,13 +279,15 @@ bool ShopJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 	if (Menulist == MenuList::MENU_AUCTION_CREATE_SLOT)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
-		ItemJob::ItemInformation& pInformationSellItem = GS()->GetItemInfo(CGS::InteractiveSub[ClientID].AuctionItem.a_itemid);
-
 		const int ItemID = CGS::InteractiveSub[ClientID].AuctionItem.a_itemid;
+		ItemJob::ItemInformation& pInformationSellItem = GS()->GetItemInfo(ItemID);
+
 		const int SlotCount = CGS::InteractiveSub[ClientID].AuctionItem.a_count;
+		const int MinimalPrice = SlotCount * pInformationSellItem.MinimalPrice;
+		
+		CGS::InteractiveSub[ClientID].AuctionItem.a_price = MinimalPrice;
 		const int SlotPrice = CGS::InteractiveSub[ClientID].AuctionItem.a_price;
 		const int SlotEnchant = CGS::InteractiveSub[ClientID].AuctionItem.a_enchant;
-		const int MinimalPrice = SlotCount * pInformationSellItem.MinimalPrice;
 
 		GS()->AVH(ClientID, TAB_INFO_AUCTION_BIND, GREEN_COLOR, "Information Auction Slot");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_AUCTION_BIND, "The reason for write the number for each row");

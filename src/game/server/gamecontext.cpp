@@ -1525,7 +1525,6 @@ const char *CGS::NetVersion() const { return GAME_NETVERSION; }
 void CGS::ClearClientData(int ClientID)
 {
 	Mmo()->ResetClientData(ClientID);
-
 	if(Interactive.find(ClientID) != Interactive.end()) 
 		Interactive.erase(ClientID);
 
@@ -2301,13 +2300,6 @@ void CGS::ChangeEquipSkin(int ClientID, int ItemID)
 		return;
 
 	SendEquipItem(ClientID, -1);
-}
-
-// Очистить интерактивы сюб
-void CGS::ClearInteractiveSub(int ClientID)
-{
-	if(InteractiveSub.find(ClientID) != InteractiveSub.end()) 
-		InteractiveSub.erase(ClientID);
 }
 
 // Повышем кол-во для определеннго значения как рейд

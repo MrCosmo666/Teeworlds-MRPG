@@ -47,6 +47,7 @@ bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 		pChr->GetPlayer()->Acc().TempActiveSafeSpawn = false;
 		StartHealth /= 2;
 	}
+
 	if(pChr->GetPlayer()->Acc().TempHealth > 0)
 		StartHealth = pChr->GetPlayer()->Acc().TempHealth;
 	pChr->IncreaseHealth(StartHealth);

@@ -90,7 +90,6 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_NoAllowDamage = false;
 	m_Event = TILE_CLEAR_EVENTS;
 	m_Core.m_WorldID = GS()->CheckPlayerMessageWorldID(m_pPlayer->GetCID());
-
 	if(!m_pPlayer->IsBot())
 	{
 		m_pPlayer->m_MoodState = m_pPlayer->GetMoodState();
@@ -184,13 +183,16 @@ void CCharacter::HandleWeaponSwitch()
 
 bool CCharacter::DecoInteractive()
 {
-	int ClientID = m_pPlayer->GetCID();
-	int DecoID = CGS::InteractiveSub[ClientID].TempID;
-	int InteractiveType = CGS::InteractiveSub[ClientID].TempID2;
-	GS()->ClearInteractiveSub(ClientID);
-
-	if(DecoID > 0 && m_pPlayer->GetItem(DecoID).Count > 0 && GS()->GetItemInfo(DecoID).Type == ItemType::TYPE_DECORATION)
+	const int ClientID = m_pPlayer->GetCID();
+	if(CGS::InteractiveSub[ClientID].TempDecoractionID > 0)
 	{
+		const int DecoID = CGS::InteractiveSub[ClientID].TempDecoractionID;
+		const int InteractiveType = CGS::InteractiveSub[ClientID].TempDecorationType;
+		CGS::InteractiveSub[ClientID].TempDecoractionID = -1;
+		CGS::InteractiveSub[ClientID].TempDecorationType = -1;
+		if(m_pPlayer->GetItem(DecoID).Count <= 0 || GS()->GetItemInfo(DecoID).Type != ItemType::TYPE_DECORATION)
+			return false;
+
 		if (InteractiveType == DECOTYPE_HOUSE)
 		{
 			int HouseID = GS()->Mmo()->House()->PlayerHouseID(m_pPlayer);

@@ -385,7 +385,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		}
 
 		AddRank(GuildID, CGS::InteractiveSub[ClientID].m_aRankGuildBuf);
-		GS()->ClearInteractiveSub(ClientID);
 		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD_RANK);
 		return true;
 	}
@@ -440,7 +439,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 
 		const int RankID = VoteID;
 		ChangeRank(RankID, GuildID, CGS::InteractiveSub[ClientID].m_aRankGuildBuf);
-		GS()->ClearInteractiveSub(ClientID);
 		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD_RANK);
 		return true;
 	}
@@ -457,7 +455,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 
 		// меняем ранг и очишаем меню интерактивов
 		ChangePlayerRank(VoteID, VoteID2);
-		GS()->ClearInteractiveSub(ClientID);
 		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD);
 		return true;
 	}
@@ -487,8 +484,8 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		GS()->AddBack(ClientID);
 
 		const int DecoItemID = VoteID;
-		CGS::InteractiveSub[ClientID].TempID = DecoItemID;
-		CGS::InteractiveSub[ClientID].TempID2 = DECOTYPE_GUILD_HOUSE;
+		CGS::InteractiveSub[ClientID].TempDecoractionID = DecoItemID;
+		CGS::InteractiveSub[ClientID].TempDecorationType = DECOTYPE_GUILD_HOUSE;
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
 		return true;
 	}

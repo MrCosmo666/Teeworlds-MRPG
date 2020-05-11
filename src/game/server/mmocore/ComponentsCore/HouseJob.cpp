@@ -591,8 +591,8 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		GS()->AddBack(ClientID);
 
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
-		CGS::InteractiveSub[ClientID].TempID = VoteID;
-		CGS::InteractiveSub[ClientID].TempID2 = DECOTYPE_HOUSE;
+		CGS::InteractiveSub[ClientID].TempDecoractionID = VoteID;
+		CGS::InteractiveSub[ClientID].TempDecorationType = DECOTYPE_HOUSE;
 		return true;
 	}
 

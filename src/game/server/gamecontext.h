@@ -97,8 +97,8 @@ public:
 	struct StructInteractiveSub
 	{
 		// обычные что не можно раскидать на все
-		int TempID;
-		int TempID2;
+		int TempDecoractionID;
+		int TempDecorationType;
 		int TempID3;
 
 		// остальное все
@@ -307,7 +307,6 @@ private:
 
 public:
 	void ChangeEquipSkin(int ClientID, int ItemID);
-	void ClearInteractiveSub(int ClientID);
 
 	bool CheckClient(int ClientID) const;
 	int GetWorldID() const { return m_WorldID; }
