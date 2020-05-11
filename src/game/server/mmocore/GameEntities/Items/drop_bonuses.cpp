@@ -7,9 +7,9 @@
 #include <generated/protocol.h>
 #include <game/server/gamecontext.h>
 
-#include "dropingbonuses.h"
+#include "drop_bonuses.h"
 
-CDropingBonuses::CDropingBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, int Type, int Count)
+CDropBonuses::CDropBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, int Type, int Count)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPBONUS, Pos)
 {
 	m_Pos = Pos;
@@ -23,11 +23,10 @@ CDropingBonuses::CDropingBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, flo
 	m_Flashing = false;
 	m_StartTick = Server()->Tick();
 	m_LifeSpan = Server()->TickSpeed() * 10;
-
 	GameWorld()->InsertEntity(this);
 }
 
-void CDropingBonuses::Tick()
+void CDropBonuses::Tick()
 {
 	m_LifeSpan--;
 	if (m_LifeSpan < 0)
@@ -36,6 +35,7 @@ void CDropingBonuses::Tick()
 		GS()->m_World.DestroyEntity(this);
 		return;
 	}
+
 	if (m_LifeSpan < 150)
 	{
 		m_FlashTimer--;
@@ -48,7 +48,6 @@ void CDropingBonuses::Tick()
 				m_FlashTimer = 10;
 		}
 	}
-
 
 	m_Vel.y += 0.5f;
 	bool Grounded = (bool)GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5) || GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5);
@@ -64,14 +63,11 @@ void CDropingBonuses::Tick()
 	}
 	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(24.0f, 24.0f), 0.4f);
 
-
 	CCharacter *pChar = (CCharacter*)GameWorld()->ClosestEntity(m_Pos, 16.0f, CGameWorld::ENTTYPE_CHARACTER, 0);
 	if(pChar && pChar->GetPlayer() && !pChar->GetPlayer()->IsBot())
 	{
 		if(m_Type == PICKUP_HEALTH)
-		{
 			GS()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
-		}
 
 		if(m_Type == PICKUP_ARMOR)
 		{
@@ -83,12 +79,12 @@ void CDropingBonuses::Tick()
 	}
 }
 
-void CDropingBonuses::TickPaused()
+void CDropBonuses::TickPaused()
 {
 	m_StartTick++;
 }
 
-void CDropingBonuses::Snap(int SnappingClient)
+void CDropBonuses::Snap(int SnappingClient)
 {
 	if(m_Flashing || NetworkClipped(SnappingClient))
 		return;

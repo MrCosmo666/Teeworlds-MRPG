@@ -2,7 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
-#include <game/server/mmocore/GameEntities/Items/dropquest.h>
+#include <game/server/mmocore/GameEntities/Items/drop_quest_items.h>
 
 #include "QuestJob.h"
 
@@ -689,7 +689,7 @@ void QuestJob::CreateQuestingItems(CPlayer *pPlayer, BotJob::QuestBotInfo &BotDa
 		return;
 
 	const int ClientID = pPlayer->GetCID();
-	for (CQuestItem* pHh = (CQuestItem*)GS()->m_World.FindFirst(CGameWorld::ENTTYPE_DROPQUEST); pHh; pHh = (CQuestItem*)pHh->TypeNext())
+	for (CDropQuestItem* pHh = (CDropQuestItem*)GS()->m_World.FindFirst(CGameWorld::ENTTYPE_DROPQUEST); pHh; pHh = (CDropQuestItem*)pHh->TypeNext())
 	{
 		if (pHh->m_OwnerID == ClientID && pHh->m_QuestBot.QuestID == BotData.QuestID)
 			return;
@@ -701,7 +701,7 @@ void QuestJob::CreateQuestingItems(CPlayer *pPlayer, BotJob::QuestBotInfo &BotDa
 	{
 		vec2 Vel = vec2(frandom() * 40.0f - frandom() * 80.0f, frandom() * 40.0f - frandom() * 80.0f);
 		float AngleForce = Vel.x * (0.15f + frandom() * 0.1f);
-		new CQuestItem(&GS()->m_World, Pos, Vel, AngleForce, BotData, ClientID);
+		new CDropQuestItem(&GS()->m_World, Pos, Vel, AngleForce, BotData, ClientID);
 	}
 }
 

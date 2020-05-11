@@ -1,39 +1,32 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#ifndef GAME_SERVER_ENTITIES_DROPINGITEMS_H
-#define GAME_SERVER_ENTITIES_DROPINGITEMS_H
+#ifndef GAME_SERVER_ENTITIES_QUESTITEM_H
+#define GAME_SERVER_ENTITIES_QUESTITEM_H
 
-class CDropingItem : public CEntity
+class CDropQuestItem : public CEntity
 {
-	enum
-	{
-		PERSPECT = 1,
-		BODY,
-		NUM_IDS,
-	};
-
 	vec2 m_Vel;
 	float m_Angle;
 	float m_AngleForce;
 
 	int m_StartTick;
+
+	bool m_Collide;
 	bool m_Flashing;
 	int m_LifeSpan;
 	int m_FlashTimer;
 
-	ItemJob::InventoryItem m_DropItem;
-	int m_ForID;
-	int m_IDs[NUM_IDS];
-
 public:
-	CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, ItemJob::InventoryItem DropItem, int ForID);
-	~CDropingItem();
+	CDropQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, BotJob::QuestBotInfo BotData, int OwnerID);
+	virtual ~CDropQuestItem();
+
+	int m_OwnerID;
+	BotJob::QuestBotInfo m_QuestBot;
 
 	virtual void Tick();
 	virtual void TickPaused(); 
 	virtual void Snap(int SnappingClient);
 
-	bool TakeItem(int ClientID);
 };
 
 #endif

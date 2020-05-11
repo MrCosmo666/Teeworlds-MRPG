@@ -43,7 +43,7 @@ void HouseJob::OnInitWorld(const char* pWhereLocalWorld)
 		while (DecoLoadingRES->next())
 		{
 			const int DecoID = DecoLoadingRES->getInt("ID");
-			m_DecorationHouse[DecoID] = new DecoHouse(&GS()->m_World, vec2(DecoLoadingRES->getInt("X"),
+			m_DecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(DecoLoadingRES->getInt("X"),
 				DecoLoadingRES->getInt("Y")), DecoLoadingRES->getInt("HouseID"), DecoLoadingRES->getInt("DecoID"));
 		}
 	}
@@ -101,7 +101,7 @@ bool HouseJob::AddDecorationHouse(int DecoID, int HouseID, vec2 Position)
 	SJK.ID("tw_houses_decorations", "(ID, DecoID, HouseID, X, Y, WorldID) VALUES ('%d', '%d', '%d', '%d', '%d', '%d')", 
 		InitID, DecoID, HouseID, (int)Position.x, (int)Position.y, GS()->GetWorldID());
 
-	m_DecorationHouse[InitID] = new DecoHouse(&GS()->m_World, Position, HouseID, DecoID);
+	m_DecorationHouse[InitID] = new CDecorationHouses(&GS()->m_World, Position, HouseID, DecoID);
 	return true;
 }
 // Удалить декорацию

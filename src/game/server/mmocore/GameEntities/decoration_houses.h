@@ -3,7 +3,7 @@
 
 #include <game/server/entity.h>
 
-class DecoHouse : public CEntity
+class CDecorationHouses : public CEntity
 {
 	enum
 	{
@@ -18,8 +18,8 @@ public:
 	int m_DecoID;
 	int m_HouseID;
 
-	DecoHouse(CGameWorld* pGameWorld, vec2 Pos, int OwnerID, int DecoID);
-	~DecoHouse();
+	CDecorationHouses(CGameWorld* pGameWorld, vec2 Pos, int OwnerID, int DecoID);
+	~CDecorationHouses();
 
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);

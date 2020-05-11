@@ -3,14 +3,14 @@
 #ifndef GAME_SERVER_ENTITIES_QUESTAI_H
 #define GAME_SERVER_ENTITIES_QUESTAI_H
 
-class CQuestAI : public CEntity
+class CQuestPathFinder : public CEntity
 {
 	int m_ClientID;
 	int m_QuestID;
 	int m_QuestProgress;
 
 public:
-	CQuestAI(CGameWorld* pGameWorld, vec2 Pos, int ClientID, int QuestID, int QuestProgress, vec2 TargetPos);
+	CQuestPathFinder(CGameWorld* pGameWorld, vec2 Pos, int ClientID, int QuestID, int QuestProgress, vec2 TargetPos);
 
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);

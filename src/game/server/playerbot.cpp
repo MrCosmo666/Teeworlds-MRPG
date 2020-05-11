@@ -2,7 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 
-#include "entities/botai/botaijob.h"
+#include "entities/botai/character_bot_ai.h"
 
 #include "gamecontext.h"
 #include "playerbot.h"
@@ -115,7 +115,7 @@ void CPlayerBot::TryRespawn()
 	
 	// создаем бота
 	int savecidmem = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
-	m_pCharacter = new(savecidmem) BotAI(&GS()->m_World);
+	m_pCharacter = new(savecidmem) CCharacterBotAI(&GS()->m_World);
 	m_pCharacter->Spawn(this, SpawnPos);
 
 	// чтобы не было видно эффектов что НПС не видемый для одного игрока был видем другому
@@ -195,7 +195,7 @@ int CPlayerBot::GetMoodState(int SnappingClient)
 {
 	if(GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
-		BotAI *pChr = (BotAI *)m_pCharacter;
+		CCharacterBotAI *pChr = (CCharacterBotAI *)m_pCharacter;
 		if(pChr && pChr->GetBotTarget() != m_ClientID)
 		{
 			if(pChr->GetBotTarget() == SnappingClient)

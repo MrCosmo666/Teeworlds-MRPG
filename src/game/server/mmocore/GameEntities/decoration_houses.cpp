@@ -1,10 +1,10 @@
 #include <engine/shared/config.h>
 #include <generated/protocol.h>
 #include <game/server/gamecontext.h>
-#include "decorations_houses.h"
+#include "decoration_houses.h"
 
 // Декорации
-DecoHouse::DecoHouse(CGameWorld* pGameWorld, vec2 Pos, int HouseID, int DecoID)
+CDecorationHouses::CDecorationHouses(CGameWorld* pGameWorld, vec2 Pos, int HouseID, int DecoID)
 	: CEntity(pGameWorld, CGameWorld::ENTTYPE_DECOHOUSE, Pos)
 {
 	m_HouseID = HouseID;
@@ -17,7 +17,7 @@ DecoHouse::DecoHouse(CGameWorld* pGameWorld, vec2 Pos, int HouseID, int DecoID)
 			m_IDs[i] = Server()->SnapNewID();
 	}
 }
-DecoHouse::~DecoHouse()
+CDecorationHouses::~CDecorationHouses()
 {
 	if (SwitchToObject(true) >= 0) {
 		for (int i = 0; i < NUM_IDS; i++)
@@ -25,7 +25,7 @@ DecoHouse::~DecoHouse()
 	}
 }
 
-int DecoHouse::SwitchToObject(bool Data)
+int CDecorationHouses::SwitchToObject(bool Data)
 {
 	switch (m_DecoID)
 	{
@@ -37,11 +37,11 @@ int DecoHouse::SwitchToObject(bool Data)
 	return -1;
 }
 
-void DecoHouse::Tick()
+void CDecorationHouses::Tick()
 {
 }
 
-void DecoHouse::Snap(int SnappingClient)
+void CDecorationHouses::Snap(int SnappingClient)
 {
 	if (NetworkClipped(SnappingClient))
 		return;
@@ -59,9 +59,9 @@ void DecoHouse::Snap(int SnappingClient)
 	}
 
 	float AngleStart = (2.0f * pi * Server()->Tick() / static_cast<float>(Server()->TickSpeed())) / 10.0f;
-	float AngleStep = 2.0f * pi / DecoHouse::BODY;
+	float AngleStep = 2.0f * pi / CDecorationHouses::BODY;
 	float Radius = 30.0f;
-	for (int i = 0; i < DecoHouse::BODY; i++)
+	for (int i = 0; i < CDecorationHouses::BODY; i++)
 	{
 		vec2 PosStart = m_Pos + vec2(Radius * cos(AngleStart + AngleStep * i), Radius * sin(AngleStart + AngleStep * i));
 		CNetObj_Projectile* pObj = static_cast<CNetObj_Projectile*>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, m_IDs[i], sizeof(CNetObj_Projectile)));

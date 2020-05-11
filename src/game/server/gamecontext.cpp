@@ -18,8 +18,8 @@
 #include "gamemodes/dungeon.h"
 
 // object entities
-#include "mmocore/GameEntities/Items/dropingbonuses.h"
-#include "mmocore/GameEntities/Items/dropingitem.h"
+#include "mmocore/GameEntities/Items/drop_bonuses.h"
+#include "mmocore/GameEntities/Items/drop_items.h"
 #include "mmocore/GameEntities/loltext.h"
 
 // информационные данные
@@ -2225,7 +2225,7 @@ void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop, vec2 For
 	{
 		vec2 Vel = Force + vec2(frandom() * 15.0, frandom() * 15.0);
 		float Angle = Force.x * (0.15f + frandom() * 0.1f);
-		new CDropingBonuses(&m_World, Pos, Vel, Angle, Type, Count);
+		new CDropBonuses(&m_World, Pos, Vel, Angle, Type, Count);
 	}
 }
 
@@ -2239,7 +2239,7 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Ench
 
 	vec2 Vel = Force + vec2(frandom() * 15.0, frandom() * 15.0);
 	float Angle = Force.x * (0.15f + frandom() * 0.1f);
-	new CDropingItem(&m_World, Pos, Vel, Angle, DropItem, ClientID);
+	new CDropItem(&m_World, Pos, Vel, Angle, DropItem, ClientID);
 }
 
 // Саздает предметы в позиции Типа и Количества и Их самих кол-ва
@@ -2251,7 +2251,7 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, ItemJob::InventoryItem &pPlayer
 	if (pPlayerItem.Remove(Count))
 	{
 		float Angle = Force.x * (0.15f + frandom() * 0.1f);
-		new CDropingItem(&m_World, Pos, Force, Angle, CopyItem, ClientID);
+		new CDropItem(&m_World, Pos, Force, Angle, CopyItem, ClientID);
 	}
 }
 
@@ -2262,7 +2262,7 @@ bool CGS::TakeItemCharacter(int ClientID)
 	if(!pPlayer || !pPlayer->GetCharacter() /*|| pChar->m_ReloadTimer*/)
 		return false;
 
-	CDropingItem *pDrop = (CDropingItem*)m_World.ClosestEntity(pPlayer->GetCharacter()->m_Core.m_Pos, 64, CGameWorld::ENTTYPE_DROPITEM, nullptr);
+	CDropItem *pDrop = (CDropItem*)m_World.ClosestEntity(pPlayer->GetCharacter()->m_Core.m_Pos, 64, CGameWorld::ENTTYPE_DROPITEM, nullptr);
 	if(pDrop) { return pDrop->TakeItem(ClientID);}
 	return false;
 }

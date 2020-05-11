@@ -3,7 +3,7 @@
 #ifndef GAME_SERVER_GUILDJOB_H
 #define GAME_SERVER_GUILDJOB_H
 
-#include <game/server/mmocore/GameEntities/decorations_houses.h>
+#include <game/server/mmocore/GameEntities/decoration_houses.h>
 #include "../MmoComponent.h"
 
 class GuildDoor;
@@ -51,7 +51,7 @@ class GuildJob : public MmoComponent
 	typedef std::map < int , GuildStructRank > GuildRankType;
 	static GuildRankType RankGuild;
 
-	std::map < int, DecoHouse* > m_DecorationHouse;
+	std::map < int, CDecorationHouses* > m_DecorationHouse;
 
 	void LoadGuildRank(int GuildID);
 

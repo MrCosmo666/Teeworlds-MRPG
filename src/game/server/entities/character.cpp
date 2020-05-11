@@ -9,7 +9,7 @@
 #include "laser.h"
 #include "projectile.h"
 
-#include <game/server/mmocore/GameEntities/questai.h>
+#include <game/server/mmocore/GameEntities/quest_path_finder.h>
 #include <game/server/mmocore/GameEntities/snapfull.h>
 #include <game/server/mmocore/GameEntities/jobitems.h>
 
@@ -453,7 +453,7 @@ void CCharacter::CreateQuestsStep(int QuestID)
 		return;
 
 	int Progress = QuestJob::Quests[ClientID][QuestID].Progress;
-	new CQuestAI(GameWorld(), m_Core.m_Pos, ClientID, QuestID, Progress, Pos);
+	new CQuestPathFinder(GameWorld(), m_Core.m_Pos, ClientID, QuestID, Progress, Pos);
 }
 
 bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)

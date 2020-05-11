@@ -4,27 +4,27 @@
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 #include <game/mapitems.h>
-#include "botaijob.h"
+#include "character_bot_ai.h"
 
 #include <game/server/mmocore/GameEntities/Skills/healthturret/hearth.h>
 
-MACRO_ALLOC_POOL_ID_IMPL(BotAI, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
+MACRO_ALLOC_POOL_ID_IMPL(CCharacterBotAI, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
 
-BotAI::BotAI(CGameWorld *pWorld) : CCharacter(pWorld) {}
+CCharacterBotAI::CCharacterBotAI(CGameWorld *pWorld) : CCharacter(pWorld) {}
 
-BotAI::~BotAI() 
+CCharacterBotAI::~CCharacterBotAI() 
 {
 	RemoveSnapProj(100, GetSnapFullID());
 	RemoveSnapProj(100, GetSnapFullID(), true);
 }
 
 // Получить оформление для SnapFull
-int BotAI::GetSnapFullID() const 
+int CCharacterBotAI::GetSnapFullID() const 
 {
 	return GetPlayer()->GetCID() * SNAPBOTS;
 }
 
-bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
+bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 {
 	if(!CCharacter::Spawn(pPlayer, Pos))
 		return false;
@@ -69,7 +69,7 @@ bool BotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 	return true;
 }
 
-void BotAI::Tick()
+void CCharacterBotAI::Tick()
 {
 	if(!GS()->CheckPlayersDistance(m_Core.m_Pos, 1000.0f) || !IsAlive())
 		return;
@@ -78,7 +78,7 @@ void BotAI::Tick()
 	CCharacter::Tick();
 }
 
-void BotAI::ShowProgress()
+void CCharacterBotAI::ShowProgress()
 {
 	for(const auto & ListDmgPlayer : m_ListDmgPlayers)
 	{
@@ -94,7 +94,7 @@ void BotAI::ShowProgress()
 	}	
 }
 
-bool BotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
+bool CCharacterBotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 {
 	if (From < 0 || From > MAX_CLIENTS || !GS()->m_apPlayers[From])
 		return false;
@@ -135,7 +135,7 @@ bool BotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 	return false;
 }
 
-void BotAI::Die(int Killer, int Weapon)
+void CCharacterBotAI::Die(int Killer, int Weapon)
 {
 	if(GetPlayer()->GetBotType() != BotsTypes::TYPE_BOT_MOB)
 		return;
@@ -144,7 +144,7 @@ void BotAI::Die(int Killer, int Weapon)
 	CCharacter::Die(Killer, Weapon);
 }
 
-void BotAI::CreateRandomDropItem(int DropCID, int Random, int ItemID, int Count, vec2 Force)
+void CCharacterBotAI::CreateRandomDropItem(int DropCID, int Random, int ItemID, int Count, vec2 Force)
 {
 	if (DropCID < 0 || DropCID >= MAX_PLAYERS || !GS()->m_apPlayers[DropCID] || !GS()->m_apPlayers[DropCID]->GetCharacter() || !IsAlive())
 		return;
@@ -155,7 +155,7 @@ void BotAI::CreateRandomDropItem(int DropCID, int Random, int ItemID, int Count,
 	return;
 }
 
-void BotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
+void CCharacterBotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 {
 	int ClientID = pPlayer->GetCID();
 	int BotID = GetPlayer()->GetBotID();
@@ -192,7 +192,7 @@ void BotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 	}
 }
 
-void BotAI::ClearTarget()
+void CCharacterBotAI::ClearTarget()
 {
 	int FromID = GetPlayer()->GetCID();
 	if (m_BotTargetID != FromID)
@@ -204,13 +204,13 @@ void BotAI::ClearTarget()
 	}
 }
 
-void BotAI::SetTarget(int ClientID)
+void CCharacterBotAI::SetTarget(int ClientID)
 {
 	m_EmotionsStyle = EMOTE_ANGRY;
 	m_BotTargetID = ClientID;
 }
 
-void BotAI::ChangeWeapons()
+void CCharacterBotAI::ChangeWeapons()
 {
 	int randtime = 1+random_int()%3;
 	if(Server()->Tick() % (Server()->TickSpeed()*randtime) == 0)
@@ -221,7 +221,7 @@ void BotAI::ChangeWeapons()
 }
 
 // Интерактивы ботов
-void BotAI::EngineBots()
+void CCharacterBotAI::EngineBots()
 {
 	m_Input.m_Fire = 0;
 	m_Input.m_Jump = 0;
@@ -251,7 +251,7 @@ void BotAI::EngineBots()
 }
 
 // Интерактивы NPC
-void BotAI::EngineNPC()
+void CCharacterBotAI::EngineNPC()
 {
 	const int SubBotID = GetPlayer()->GetBotSub();
 	const bool StaticBot = BotJob::NpcBot[SubBotID].Static;
@@ -286,7 +286,7 @@ void BotAI::EngineNPC()
 }
 
 // Интерактивы квестовых мобов
-void BotAI::EngineQuestMob()
+void CCharacterBotAI::EngineQuestMob()
 {
 	// направление глаз
 	int SubBotID = GetPlayer()->GetBotSub();
@@ -316,7 +316,7 @@ void BotAI::EngineQuestMob()
 }
 
 // Интерактивы мобов враждебных
-void BotAI::EngineMobs()
+void CCharacterBotAI::EngineMobs()
 {
 	// ------------------------------------------------------------------------------
 	// интерактивы бота без найденого игрока
@@ -420,7 +420,7 @@ void BotAI::EngineMobs()
 }
 
 // Поиск игрока среди людей
-CPlayer *BotAI::SearchPlayer(int Distance)
+CPlayer *CCharacterBotAI::SearchPlayer(int Distance)
 {
 	for(int i = 0 ; i < MAX_PLAYERS; i ++)
 	{
@@ -436,7 +436,7 @@ CPlayer *BotAI::SearchPlayer(int Distance)
 }
 
 // Поиск игрока среди людей который имеет ярость выше всех
-CPlayer *BotAI::SearchTenacityPlayer(float Distance)
+CPlayer *CCharacterBotAI::SearchTenacityPlayer(float Distance)
 {
 	bool ActiveTargetID = m_BotTargetID != GetPlayer()->GetCID();
 
@@ -491,7 +491,7 @@ CPlayer *BotAI::SearchTenacityPlayer(float Distance)
 	return pPlayer;
 }
 
-void BotAI::EmoteActions(int EmotionStyle)
+void CCharacterBotAI::EmoteActions(int EmotionStyle)
 {
 	if (EmotionStyle < EMOTE_PAIN || EmotionStyle > EMOTE_BLINK)
 		return;
@@ -523,7 +523,7 @@ void BotAI::EmoteActions(int EmotionStyle)
 	}
 }
 
-vec2 BotAI::GetHookPos(vec2 Position)
+vec2 CCharacterBotAI::GetHookPos(vec2 Position)
 {
 	vec2 HookPos = vec2(0, 0);
 	int HookLength = GS()->Tuning()->m_HookLength - 50.0f;
@@ -614,7 +614,7 @@ vec2 BotAI::GetHookPos(vec2 Position)
 }
 
 // - - - - - - - - - - - - - - - - - - - BASE FUNCTION
-bool BotAI::BaseFunctionNPC()
+bool CCharacterBotAI::BaseFunctionNPC()
 {
 	bool PlayerFinding = false;
 	const int SubBotID = GetPlayer()->GetBotSub();
@@ -637,7 +637,7 @@ bool BotAI::BaseFunctionNPC()
 }
 
 // - - - - - - - - - - - - - - - - - - - FUNCTION NURSE
-bool BotAI::FunctionNurseNPC()
+bool CCharacterBotAI::FunctionNurseNPC()
 {
 	bool PlayerFinding = false;
 	if(Server()->Tick() % Server()->TickSpeed() != 0)
@@ -652,7 +652,6 @@ bool BotAI::FunctionNurseNPC()
 	}
 
 	char aBuf[16];
-	const int SubBotID = GetPlayer()->GetBotSub();
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pFind = GS()->GetPlayer(i, true, true);

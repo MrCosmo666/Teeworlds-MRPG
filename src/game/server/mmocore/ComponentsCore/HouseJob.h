@@ -3,11 +3,11 @@
 #ifndef GAME_SERVER_HOUSESJOB_H
 #define GAME_SERVER_HOUSESJOB_H
 
-#include <game/server/mmocore/GameEntities/decorations_houses.h>
+#include <game/server/mmocore/GameEntities/decoration_houses.h>
 #include "../MmoComponent.h"
 
 class HouseDoor;
-class DecoHouse;
+class CDecorationHouses;
 class HouseJob : public MmoComponent
 {
 	/* #########################################################################
@@ -33,7 +33,7 @@ class HouseJob : public MmoComponent
 	typedef std::map < int , HouseList > HouseType;
 	static HouseType Home;
 
-	std::map < int , DecoHouse * > m_DecorationHouse;
+	std::map < int , CDecorationHouses * > m_DecorationHouse;
 public:
 	virtual void OnInitWorld(const char* pWhereLocalWorld);
 	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);

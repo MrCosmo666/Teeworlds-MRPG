@@ -11,13 +11,13 @@
 #include "../character.h"
 
 class CEntityFunctionNurse;
-class BotAI : public CCharacter
+class CCharacterBotAI : public CCharacter
 {
 	MACRO_ALLOC_POOL_ID()
 
 public:
-	BotAI(CGameWorld *pWorld);
-	~BotAI();
+	CCharacterBotAI(CGameWorld *pWorld);
+	~CCharacterBotAI();
 
 	int GetBotTarget() const { return m_BotTargetID; };
 

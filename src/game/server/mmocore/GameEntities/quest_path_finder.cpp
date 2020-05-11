@@ -5,9 +5,9 @@
 #include <generated/protocol.h>
 
 #include <game/server/gamecontext.h>
-#include "questai.h"
+#include "quest_path_finder.h"
 
-CQuestAI::CQuestAI(CGameWorld *pGameWorld, vec2 Pos, int ClientID, int QuestID, int QuestProgress, vec2 TargetPos)
+CQuestPathFinder::CQuestPathFinder(CGameWorld *pGameWorld, vec2 Pos, int ClientID, int QuestID, int QuestProgress, vec2 TargetPos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_FINDQUEST, Pos)
 {
 	m_Pos = Pos;
@@ -18,7 +18,7 @@ CQuestAI::CQuestAI(CGameWorld *pGameWorld, vec2 Pos, int ClientID, int QuestID, 
 	GameWorld()->InsertEntity(this);
 }
 
-void CQuestAI::Tick() 
+void CQuestPathFinder::Tick() 
 {
 	CPlayer* pPlayer = GS()->GetPlayer(m_ClientID, true, true);
 	if (!pPlayer || QuestJob::Quests[m_ClientID][m_QuestID].Progress != m_QuestProgress || QuestJob::Quests[m_ClientID][m_QuestID].State != QuestState::QUEST_ACCEPT)
@@ -30,14 +30,14 @@ void CQuestAI::Tick()
 	m_Pos = GS()->m_apPlayers[m_ClientID]->GetCharacter()->m_Core.m_Pos - Direction * 90;
 }
 
-void CQuestAI::Finish()
+void CQuestPathFinder::Finish()
 {
 	GS()->CreateDeath(m_Pos, m_ClientID);
 	GS()->m_World.DestroyEntity(this);
 	return;
 }
 
-void CQuestAI::Snap(int SnappingClient)
+void CQuestPathFinder::Snap(int SnappingClient)
 {
 	if(NetworkClipped(SnappingClient) || m_TargetPos == vec2(0.0f, 0.0f) || SnappingClient != m_ClientID)
 		return;

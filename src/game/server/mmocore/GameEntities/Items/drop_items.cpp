@@ -7,9 +7,9 @@
 #include <generated/protocol.h>
 #include <game/server/gamecontext.h>
 
-#include "dropingitem.h"
+#include "drop_items.h"
 
-CDropingItem::CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, ItemJob::InventoryItem DropItem, int ForID)
+CDropItem::CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, ItemJob::InventoryItem DropItem, int OwnerID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPITEM, Pos)
 {
 	m_Pos = Pos;
@@ -17,7 +17,7 @@ CDropingItem::CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float Ang
 	m_Angle = 0.0f;
 	m_AngleForce = AngleForce;
 
-	m_ForID = ForID;
+	m_OwnerID = OwnerID;
 	m_DropItem = DropItem;
 	m_DropItem.Settings = 0;
 	m_Flashing = false;
@@ -31,7 +31,7 @@ CDropingItem::CDropingItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float Ang
 	}
 }
 
-CDropingItem::~CDropingItem()
+CDropItem::~CDropItem()
 {
 	for(int i=0; i<NUM_IDS; i++)
 	{
@@ -39,38 +39,43 @@ CDropingItem::~CDropingItem()
 	}
 }
 
-bool CDropingItem::TakeItem(int ClientID)
+bool CDropItem::TakeItem(int ClientID)
 {
 	CPlayer *pPlayer = GS()->m_apPlayers[ClientID];
-	if(!pPlayer || !pPlayer->GetCharacter() || (m_ForID >= 0 && m_ForID != ClientID))
+	if(!pPlayer || !pPlayer->GetCharacter() || (m_OwnerID >= 0 && m_OwnerID != ClientID))
 		return false;
 
 	// размен зачарованных предметов
-	ItemJob::InventoryItem &PlDropItem = pPlayer->GetItem(m_DropItem.GetID());
-	if(PlDropItem.Count > 0 && PlDropItem.Info().IsEnchantable())
+	GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
+	ItemJob::InventoryItem &pPlayerDroppedItem = pPlayer->GetItem(m_DropItem.GetID());
+	if(pPlayerDroppedItem.Count > 0 && pPlayerDroppedItem.Info().IsEnchantable())
 	{
-		GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
-		tl_swap(PlDropItem, m_DropItem);
-		GS()->Chat(ClientID, "You now own [{STR}+{INT}]", PlDropItem.Info().GetName(pPlayer), &PlDropItem.Enchant);
+		tl_swap(pPlayerDroppedItem, m_DropItem);
+		GS()->Chat(ClientID, "You now own {STR}(+{INT})", pPlayerDroppedItem.Info().GetName(pPlayer), &pPlayerDroppedItem.Enchant);
 		GS()->VResetVotes(ClientID, MenuList::MENU_INVENTORY);
 		return true;
 	}
 	
 	// выдача просто предмета
-	GS()->CreatePlayerSound(ClientID, SOUND_ITEM_PICKUP);
 	GS()->VResetVotes(ClientID, MenuList::MENU_INVENTORY);
-	PlDropItem.Add(m_DropItem.Count, 0, m_DropItem.Enchant);
+	pPlayerDroppedItem.Add(m_DropItem.Count, 0, m_DropItem.Enchant);
 	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 10, "\0");
 	GS()->m_World.DestroyEntity(this);
 	return true;
 }
 
-void CDropingItem::Tick()
+void CDropItem::Tick()
 {
+	if(m_LifeSpan < 0)
+	{
+		GS()->CreatePlayerSpawn(m_Pos);
+		GS()->m_World.DestroyEntity(this);
+		return;
+	}
+
 	m_LifeSpan--;
 	if(m_LifeSpan < 150)
 	{
-		// effect
 		m_FlashTimer--;
 		if (m_FlashTimer > 5)
 			m_Flashing = true;
@@ -79,14 +84,6 @@ void CDropingItem::Tick()
 			m_Flashing = false;
 			if (m_FlashTimer <= 0)
 				m_FlashTimer = 10;
-		}
-
-		// delete object
-		if(m_LifeSpan < 0)
-		{
-			GS()->CreatePlayerSpawn(m_Pos);
-			GS()->m_World.DestroyEntity(this);
-			return;
 		}
 	}
 
@@ -110,10 +107,11 @@ void CDropingItem::Tick()
 		m_Angle = 0.0f;
 
 	// Проверяем есть ли игрок которому предназначен предмет нету то делаем публичным
+	if(m_OwnerID != -1)
 	{
-		CPlayer* pForPlayer = GS()->GetPlayer(m_ForID, true, true);
-		if (m_ForID != -1 && !pForPlayer)
-			m_ForID = -1;
+		CPlayer* pOwnerPlayer = GS()->GetPlayer(m_OwnerID, true, true);
+		if(!pOwnerPlayer)
+			m_OwnerID = -1;
 	}
 
 	CCharacter *pChar = (CCharacter*)GameWorld()->ClosestEntity(m_Pos, 64, CGameWorld::ENTTYPE_CHARACTER, 0);
@@ -121,34 +119,34 @@ void CDropingItem::Tick()
 		return;
 
 	// если не зачарованный предмет
-	const ItemJob::InventoryItem PlDropItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
-	if(!PlDropItem.Info().IsEnchantable())
+	const ItemJob::InventoryItem pPlayerDroppedItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
+	if(!pPlayerDroppedItem.Info().IsEnchantable())
 	{
 		GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}x{INT} : {STR}",
-			m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.Count, (m_ForID != -1 ? Server()->ClientName(m_ForID) : "Nope"));
+			m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.Count, (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "Nope"));
 		return;
 	}
 
-	if (PlDropItem.Count > 0)
+	if (pPlayerDroppedItem.Count > 0)
 	{
 		GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) -> (+{INT}) : {STR}", 
 			m_DropItem.Info().GetName(pChar->GetPlayer()),
-			&PlDropItem.Enchant, &m_DropItem.Enchant, 
-			(m_ForID != -1 ? Server()->ClientName(m_ForID) : "Nope"));
+			&pPlayerDroppedItem.Enchant, &m_DropItem.Enchant,
+			(m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "Nope"));
 
 		return;
 	}
 
 	GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) : {STR}",
-		PlDropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.Enchant, (m_ForID != -1 ? Server()->ClientName(m_ForID) : "Nope"));
+		pPlayerDroppedItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.Enchant, (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "Nope"));
 }
 
-void CDropingItem::TickPaused()
+void CDropItem::TickPaused()
 {
 	m_StartTick++;
 }
 
-void CDropingItem::Snap(int SnappingClient)
+void CDropItem::Snap(int SnappingClient)
 {
 	if(m_Flashing || NetworkClipped(SnappingClient))
 		return;
@@ -167,9 +165,9 @@ void CDropingItem::Snap(int SnappingClient)
 	}
 
 	float AngleStart = (2.0f * pi * Server()->Tick()/static_cast<float>(Server()->TickSpeed()))/10.0f;
-	float AngleStep = 2.0f * pi / CDropingItem::BODY;
+	float AngleStep = 2.0f * pi / CDropItem::BODY;
 	float Radius = 30.0f;
-	for(int i=0; i<CDropingItem::BODY; i++)
+	for(int i=0; i<CDropItem::BODY; i++)
 	{
 		vec2 PosStart = m_Pos + vec2(Radius * cos(AngleStart + AngleStep*i), Radius * sin(AngleStart + AngleStep*i));
 		CNetObj_Projectile *pObj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, m_IDs[i], sizeof(CNetObj_Projectile)));
