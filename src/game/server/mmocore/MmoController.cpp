@@ -53,7 +53,6 @@ MmoController::~MmoController()
 
 void MmoController::OnTick()
 {
-	// весь тик компонентов
 	for(auto& component : m_Components.m_paComponents)
 		component->OnTick();
 }
@@ -61,7 +60,8 @@ void MmoController::OnTick()
 void MmoController::OnInitAccount(int ClientID)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
-	if(!pPlayer || !pPlayer->IsAuthed()) return;
+	if(!pPlayer || !pPlayer->IsAuthed()) 
+		return;
 
 	for(auto& component : m_Components.m_paComponents)
 		component->OnInitAccount(pPlayer);
@@ -70,7 +70,8 @@ void MmoController::OnInitAccount(int ClientID)
 bool MmoController::OnPlayerHandleMainMenu(int ClientID, int Menulist, bool ReplaceMenu)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
-	if(!pPlayer || !pPlayer->IsAuthed()) return false;
+	if(!pPlayer || !pPlayer->IsAuthed()) 
+		return true;
 
 	for(auto& component : m_Components.m_paComponents)
 	{
@@ -82,7 +83,9 @@ bool MmoController::OnPlayerHandleMainMenu(int ClientID, int Menulist, bool Repl
 
 bool MmoController::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 {
-	if(!pChr) return true;
+	if(!pChr || !pChr->IsAlive()) 
+		return true;
+
 	for(auto & component : m_Components.m_paComponents)
 	{
 		if(component->OnHandleTile(pChr, IndexCollision))
@@ -93,6 +96,9 @@ bool MmoController::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 
 bool MmoController::OnParseFullVote(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
+	if(!pPlayer)
+		return true;
+
 	for(auto& component : m_Components.m_paComponents)
 	{
 		if(component->OnVotingMenu(pPlayer, CMD, VoteID, VoteID2, Get, GetText))
@@ -236,15 +242,15 @@ void MmoController::ShowLoadingProgress(const char *Loading, int LoadCount)
 void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 {
 	int ClientID = pPlayer->GetCID();
-	pPlayer->m_Colored = { 10, 10, 10 };
+	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	if(TypeID == ToplistTypes::GUILDS_LEVELING)
 	{
 		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "ORDER BY Level DESC LIMIT 10"));
 		while (RES->next())
 		{
 			char NameGuild[64];
-			int Rank = RES->getRow();
-			int Level = RES->getInt("Level");
+			const int Rank = RES->getRow();
+			const int Level = RES->getInt("Level");
 			str_copy(NameGuild, RES->getString("GuildName").c_str(), sizeof(NameGuild));
 			GS()->AVL(ClientID, "null", "{INT}. {STR} : Level {INT}", &Rank, NameGuild, &Level);
 		}
@@ -255,8 +261,8 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 		while (RES->next())
 		{
 			char NameGuild[64];
-			int Rank = RES->getRow();
-			int Gold = RES->getInt("Bank");
+			const int Rank = RES->getRow();
+			const int Gold = RES->getInt("Bank");
 			str_copy(NameGuild, RES->getString("GuildName").c_str(), sizeof(NameGuild));
 			GS()->AVL(ClientID, "null", "{INT}. {STR} : Gold {INT}", &Rank, NameGuild, &Gold);
 		}
@@ -267,8 +273,8 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 		while (RES->next())
 		{
 			char Nick[64];
-			int Rank = RES->getRow();
-			int Level = RES->getInt("Level");
+			const int Rank = RES->getRow();
+			const int Level = RES->getInt("Level");
 			str_copy(Nick, RES->getString("Nick").c_str(), sizeof(Nick));
 			GS()->AVL(ClientID, "null", "{INT}. {STR} : Level {INT}", &Rank, Nick, &Level);
 		}

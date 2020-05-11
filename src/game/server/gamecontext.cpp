@@ -154,8 +154,8 @@ const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const
 	if(CheckClient(ClientID))
 	{
 		if(HidenTabs)
-			return ID >= NUM_TAB_MENU ? ("▵ ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("▽ ") : ("△ "));
-		return ID >= NUM_TAB_MENU ? ("▿  ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("△ ") : ("▽ "));
+			return ID >= NUM_TAB_MENU ? ("▵ ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("▼ :: ") : ("▲ :: "));
+		return ID >= NUM_TAB_MENU ? ("▿  ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("▲ :: ") : ("▼ :: "));
 	}
 
 	if(HidenTabs)
