@@ -25,22 +25,18 @@ IGameController::IGameController(CGS *pGS)
 
 void IGameController::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKiller, int Weapon)
 {
-	pVictim->GetPlayer()->ClearTalking();
 	return;
 }
 
 void IGameController::OnCharacterSpawn(CCharacter* pChr)
 {
-	pChr->GetPlayer()->ClearTalking();
-
 	// если спавним бота
 	if(pChr->GetPlayer()->IsBot())
 	{
 		pChr->IncreaseHealth(pChr->GetPlayer()->GetStartHealth());
 		pChr->GiveWeapon(WEAPON_HAMMER, -1);
-		for(int i = 1; i < WEAPON_LASER + 1; i++)
+		for(int i = WEAPON_GUN; i < NUM_WEAPONS; i++)
 			pChr->GiveWeapon(i, 10);
-
 		return;
 	}
 
@@ -51,13 +47,11 @@ void IGameController::OnCharacterSpawn(CCharacter* pChr)
 		pChr->GetPlayer()->Acc().TempActiveSafeSpawn = false;
 		StartHealth /= 2;
 	}
-	
 	if(pChr->GetPlayer()->Acc().TempHealth > 0)
 		StartHealth = pChr->GetPlayer()->Acc().TempHealth;
 	pChr->IncreaseHealth(StartHealth);
 
-	// оружие и здоровье
-	int StartAmmo = 10 + pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo);
+	const int StartAmmo = 10 + pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo);
 	pChr->GiveWeapon(WEAPON_HAMMER, -1);
 	for(int i = 1; i < WEAPON_LASER+1; i++)
 		pChr->GiveWeapon(i, StartAmmo);
@@ -95,24 +89,22 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 
 void IGameController::OnPlayerConnect(CPlayer *pPlayer)
 {
-	int ClientID = pPlayer->GetCID();
-
-	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "team_join player='%d:%s' team=%d", ClientID, Server()->ClientName(ClientID), pPlayer->GetTeam());
-	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
-
-	// update game info
-	UpdateGameInfo(ClientID);
+	const int ClientID = pPlayer->GetCID();
+	if(Server()->ClientIngame(ClientID))
+	{
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "team_join player='%d:%s' team=%d", ClientID, Server()->ClientName(ClientID), pPlayer->GetTeam());
+		GS()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
+		UpdateGameInfo(ClientID);
+	}
 }
 
 void IGameController::OnPlayerDisconnect(CPlayer *pPlayer)
 {
-	// обновить позицию игрока
 	GS()->Mmo()->SaveAccount(pPlayer, SAVE_POSITION);
-
 	pPlayer->OnDisconnect();
 
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	if(Server()->ClientIngame(ClientID))
 	{
 		char aBuf[128];
@@ -121,10 +113,7 @@ void IGameController::OnPlayerDisconnect(CPlayer *pPlayer)
 	}
 }
 
-void IGameController::OnPlayerInfoChange(CPlayer *pPlayer, int WorldID)
-{
-
-}
+void IGameController::OnPlayerInfoChange(CPlayer *pPlayer, int WorldID) {}
 
 void IGameController::OnReset()
 {
@@ -196,10 +185,8 @@ void IGameController::UpdateGameInfo(int ClientID)
 	}
 }
 
-// spawn
 bool IGameController::CanSpawn(int SpawnType, vec2 *pOutPos, vec2 BotPos) const
 {
-	// spectators can't spawn
 	if(SpawnType < SpawnTypes::SPAWN_HUMAN || SpawnType >= SpawnTypes::SPAWN_NUM || GS()->m_World.m_ResetRequested)
 		return false;
 
@@ -272,33 +259,18 @@ void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type, vec2 BotPos
 
 void IGameController::DoTeamChange(CPlayer *pPlayer, bool DoChatMsg)
 {
-	int ClientID = pPlayer->GetCID();
-	{
-		// проверяем равняется ли команда той на которуюю меняем
-		int Team = pPlayer->GetStartTeam();
-		if(Team == pPlayer->GetTeam())
-			return;
+	const int ClientID = pPlayer->GetCID();
+	const int Team = pPlayer->GetStartTeam();
+	if(Team == pPlayer->GetTeam())
+		return;
 
-		// получаем старую команду и меняем ее игроку
-		pPlayer->Acc().Team = Team;
-		GS()->SendTeam(ClientID, Team, DoChatMsg, -1);
+	pPlayer->Acc().Team = Team;
+	GS()->SendTeam(ClientID, Team, DoChatMsg, -1);
 
-		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "team_join player='%d:%s' m_Team=%d", ClientID, Server()->ClientName(ClientID), Team);
-		GS()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
-	}
+	char aBuf[128];
+	str_format(aBuf, sizeof(aBuf), "team_join player='%d:%s' m_Team=%d", ClientID, Server()->ClientName(ClientID), Team);
+	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 	OnPlayerInfoChange(pPlayer, GS()->GetWorldID());
-}
-
-int IGameController::GetRealPlayer()
-{
-	int NumPlayers = 0;
-	for(int i = 0; i < MAX_PLAYERS; i++)
-	{
-		if(GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetTeam() != TEAM_SPECTATORS)
-			NumPlayers++;
-	}
-	return NumPlayers;
 }
 
 void IGameController::Com_Example(IConsole::IResult* pResult, void* pContext)

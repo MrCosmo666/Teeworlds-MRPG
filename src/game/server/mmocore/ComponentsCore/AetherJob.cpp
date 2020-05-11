@@ -12,7 +12,7 @@ void AetherJob::OnInit()
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_teleports"));
 	while(RES->next())
 	{
-		int ID = RES->getInt("ID");
+		const int ID = RES->getInt("ID");
 		str_copy(Teleport[ID].TeleName, RES->getString("TeleName").c_str(), sizeof(Teleport[ID].TeleName));
 		Teleport[ID].TeleX = RES->getInt("TeleX");
 		Teleport[ID].TeleY = RES->getInt("TeleY");
@@ -100,7 +100,6 @@ bool AetherJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMen
 		return false;
 	}
 
-
 	return false;
 }
 
@@ -113,9 +112,8 @@ void AetherJob::UnlockLocation(CPlayer *pPlayer, vec2 Pos)
 			continue;
 
 		SJK.ID("tw_accounts_locations", "(OwnerID, TeleportID) VALUES ('%d', '%d')", pPlayer->Acc().AuthID, tl.first);
-		GS()->Chat(ClientID, "You unlock new location {STR}!", Teleport[tl.first].TeleName);
-		GS()->ChatDiscord("14671083", GS()->Server()->ClientName(ClientID),
-			"Adventure unlock new location {STR}", Teleport[tl.first].TeleName);
+		GS()->Chat(ClientID, "You unlock aether {STR}!", Teleport[tl.first].TeleName);
+		GS()->ChatDiscord("14671083", GS()->Server()->ClientName(ClientID), "Adventure unlock aether {STR}", Teleport[tl.first].TeleName);
 
 		pPlayer->Acc().AetherLocation[tl.first] = true;
 		return;
@@ -127,7 +125,7 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 	CPlayer* pPlayer = pChar->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
 
-	GS()->AVH(ClientID, TAB_AETHER, GOLDEN_COLOR, "Available teleports");
+	GS()->AVH(ClientID, TAB_AETHER, GOLDEN_COLOR, "Available aether's");
 	if (Job()->Member()->GetGuildHouseID(pPlayer->Acc().GuildID) >= 1)
 		GS()->AVM(ClientID, "MSPAWN", NOPE, TAB_AETHER, "Move to Guild House - free");
 	if (Job()->House()->PlayerHouseID(pPlayer) >= 1)

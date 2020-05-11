@@ -30,8 +30,8 @@ class ShopJob : public MmoComponent
 public:
 	typedef StructAuctionItem AuctionItem;
 	
-	void OnInit() override;
-	virtual void OnTickWorld();
+	virtual void OnInit();
+	virtual void OnTick();
 	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
 
 	void CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem);

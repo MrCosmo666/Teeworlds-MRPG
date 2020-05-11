@@ -158,8 +158,8 @@ void CPlayer::TickSystemTalk()
 	if(m_TalkingNPC.m_TalkedID == -1 || m_TalkingNPC.m_TalkedID == m_ClientID)
 		return;
 
-	int TalkedID = m_TalkingNPC.m_TalkedID;
-	if(TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] || distance(m_ViewPos, GS()->m_apPlayers[TalkedID]->m_ViewPos) > 180.0f)
+	const int TalkedID = m_TalkingNPC.m_TalkedID;
+	if(!m_pCharacter || TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] || distance(m_ViewPos, GS()->m_apPlayers[TalkedID]->m_ViewPos) > 180.0f)
 		ClearTalking();
 }
 
@@ -218,13 +218,6 @@ void CPlayer::Snap(int SnappingClient)
 	pClientInfo->m_Health = GetHealth();
 	pClientInfo->m_HealthStart = GetStartHealth();
 	pClientInfo->m_Armor = 0;
-
-	for(int p = 0; p < 6; p++)
-	{
-		StrToInts(pClientInfo->m_aaSkinPartNames[p], 6, Acc().m_aaSkinPartNames[p]);
-		pClientInfo->m_aUseCustomColors[p] = Acc().m_aUseCustomColors[p];
-		pClientInfo->m_aSkinPartColors[p] = Acc().m_aSkinPartColors[p];
-	}
 
 	dynamic_string Buffer;
 	for (auto& eff : CGS::Effects[m_ClientID])

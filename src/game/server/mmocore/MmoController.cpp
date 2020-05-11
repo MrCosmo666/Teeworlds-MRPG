@@ -55,22 +55,7 @@ void MmoController::OnTick()
 {
 	// весь тик компонентов
 	for(auto& component : m_Components.m_paComponents)
-	{
 		component->OnTick();
-		if(GS()->GetWorldID() == LOCALWORLD)
-			component->OnTickWorld();
-	}
-
-	// тик в локальном мире
-	if(GS()->GetWorldID() == LOCALWORLD) 
-	{
-		// плата за дома и все владения
-		if(GS()->Server()->CheckWorldTime(23, 30))
-		{
-			for(auto& component : m_Components.m_paComponents)
-				component->OnPaymentTime();
-		}
-	}
 }
 
 void MmoController::OnInitAccount(int ClientID)

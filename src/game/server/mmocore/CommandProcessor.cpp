@@ -10,13 +10,10 @@
 
 void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 {
-	int ClientID = pPlayer->GetCID();
-
-	// вход в аккаунт
+	LastChat(GS, pPlayer);
+	const int ClientID = pPlayer->GetCID();
 	if(str_comp_num(Msg->m_pMessage, "/login", 6) == 0)
 	{
-		// проверяем авторизацию и проверку клиента
-		LastChat(GS, pPlayer);
 		if (pPlayer->IsAuthed())
 		{
 			GS->Chat(ClientID, "You already authed.");
@@ -40,8 +37,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 	// регистрация аккаунта
 	else if(str_comp_num(Msg->m_pMessage, "/register", 9) == 0)
 	{
-		// проверяем авторизацию и проверку клиента
-		LastChat(GS, pPlayer);
 		if (pPlayer->IsAuthed())
 		{
 			GS->Chat(ClientID, "Logout account and create!");
@@ -64,8 +59,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 #ifdef CONF_DISCORD
 	else if(str_comp_num(Msg->m_pMessage, "/discord_connect", 16) == 0)
 	{
-		// check authed
-		LastChat(GS, pPlayer);
 		if (!pPlayer->IsAuthed())
 			return;
 
@@ -84,8 +77,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 ////////////////////////////////////////////////////////////////////////////////////////////////
 	else if(str_comp_num(Msg->m_pMessage, "/ginvite", 8) == 0)
 	{
-		// check authed
-		LastChat(GS, pPlayer);
 		if(!pPlayer->IsAuthed())
 			return;
 
@@ -119,9 +110,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 	}
 	else if(str_comp_num(Msg->m_pMessage, "/gexit", 5) == 0)
 	{
-		LastChat(GS, pPlayer); 		
-
-		// check authed
 		if(!pPlayer->IsAuthed())
 			return;
 
@@ -135,9 +123,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 	}
 	else if(str_comp_num(Msg->m_pMessage, "/gcreate", 8) == 0)
 	{
-		LastChat(GS, pPlayer); 		
-
-		// check authed
 		if(!pPlayer->IsAuthed())
 			return;
 
@@ -159,7 +144,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 ////////////////////////////////////////////////////////////////////////////////////////////////	
 	else if (str_comp_num(Msg->m_pMessage, "/doorhouse", 10) == 0)
 	{
-		LastChat(GS, pPlayer); 
 		if(!pPlayer->IsAuthed())
 			return;
 
@@ -169,9 +153,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 	}
 	else if (str_comp_num(Msg->m_pMessage, "/sellhouse", 10) == 0)
 	{
-		LastChat(GS, pPlayer); 
-
-		// check authed
 		if(!pPlayer->IsAuthed())
 			return;
 
@@ -189,7 +170,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 ////////////////////////////////////////////////////////////////////////////////////////////////	
 	else if (str_comp_num(Msg->m_pMessage, "/pos", 4) == 0)
 	{
-		LastChat(GS, pPlayer); 
 		if(!pPlayer->GetCharacter())
 			return;
 
@@ -202,7 +182,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 
 	else if (str_comp_num(Msg->m_pMessage, "/test", 5) == 0)
 	{
-		LastChat(GS, pPlayer);
 		char GuildName[256];
 		if (sscanf(Msg->m_pMessage, "/test %s", GuildName) != 1)
 			return GS->ChatFollow(ClientID, "Use: /test <effect>");
@@ -213,7 +192,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 	}
 	else if (str_comp_num(Msg->m_pMessage, "/sd", 3) == 0 && GS->Server()->IsAuthed(ClientID))
 	{
-		LastChat(GS, pPlayer); 
 		int size = 0;
 		if ((sscanf(Msg->m_pMessage, "/sd %d", &size)) != 1)
 			return GS->ChatFollow(ClientID, "Please use: /sd <idsound>");
@@ -227,9 +205,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 
 	else if (str_comp_num(Msg->m_pMessage, "/useitem", 8) == 0)
 	{
-		LastChat(GS, pPlayer);
-
-		// check authed
 		if(!pPlayer->IsAuthed())
 			return;
 
@@ -242,9 +217,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 
 	else if (str_comp_num(Msg->m_pMessage, "/useskill", 9) == 0)
 	{
-		LastChat(GS, pPlayer);
-
-		// check authed
 		if(!pPlayer->IsAuthed())
 			return;
 
@@ -262,8 +234,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 ////////////////////////////////////////////////////////////////////////////////////////////////	
 	else if(str_comp_num(Msg->m_pMessage, "/cmdlist", 8) == 0 || str_comp_num(Msg->m_pMessage, "/help", 5) == 0)
 	{
-		LastChat(GS, pPlayer);
-		int ClientID = pPlayer->GetCID();
 		GS->ChatFollow(ClientID, "Command List / Help");
 		GS->ChatFollow(ClientID, "/register <name> <pass> - new account.");
 		GS->ChatFollow(ClientID, "/login <name> <pass> - log in account.");
@@ -323,7 +293,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
  
 	if(str_comp_num(Msg->m_pMessage, "/", 1) == 0)
 	{
-		LastChat(GS, pPlayer); 
 		GS->ChatFollow(ClientID, "Command {STR} not found!", Msg->m_pMessage);
 		return;
 	}
@@ -331,7 +300,8 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 
 void CommandProcessor::LastChat(CGS *GS, CPlayer *pPlayer)
 {
-	pPlayer->m_PlayerTick[TickState::LastChat] = GS->Server()->Tick();
+	if(pPlayer->m_PlayerTick[TickState::LastChat] + GS->Server()->TickSpeed() <= GS->Server()->Tick())
+		pPlayer->m_PlayerTick[TickState::LastChat] = GS->Server()->Tick();
 }
 
 bool CommandProcessor::IsLeaderPlayer(CGS *GS, CPlayer *pPlayer, int Access) const

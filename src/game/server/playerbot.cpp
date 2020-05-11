@@ -86,14 +86,11 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 // Спавн игрока
 void CPlayerBot::TryRespawn()
 {
-	// разрешить спавн в данже только по запросу
-	if (GS()->DungeonID() > 0 && !m_DungeonAllowedSpawn && m_BotType == BotsTypes::TYPE_BOT_MOB)
+	if (GS()->IsDungeon() && !m_DungeonAllowedSpawn && m_BotType == BotsTypes::TYPE_BOT_MOB)
 		return;
 
 	vec2 SpawnPos;
 	const int SpawnType = m_BotType;
-	
-	// если бот обычный моб
 	if(SpawnType == BotsTypes::TYPE_BOT_MOB)
 	{
 		if(GS()->GetWorldID() != BotJob::MobBot[m_SubBotID].WorldID)
@@ -103,20 +100,16 @@ void CPlayerBot::TryRespawn()
 		if(!GS()->m_pController->CanSpawn(m_BotType, &SpawnPos, MobPos))
 			return;
 	}
-	// если бот обычный NPC
 	else if(SpawnType == BotsTypes::TYPE_BOT_NPC)
 	{
 		if(GS()->GetWorldID() != BotJob::NpcBot[m_SubBotID].WorldID)
 			return;
-
 		SpawnPos = vec2(BotJob::NpcBot[m_SubBotID].PositionX, BotJob::NpcBot[m_SubBotID].PositionY);		
 	}
-	// если бот квестовый NPC
 	else if(SpawnType == BotsTypes::TYPE_BOT_QUEST)
 	{
 		if(GS()->GetWorldID() != BotJob::QuestBot[m_SubBotID].WorldID)
 			return;
-
 		SpawnPos = vec2(BotJob::QuestBot[m_SubBotID].PositionX, BotJob::QuestBot[m_SubBotID].PositionY);			
 	}
 	
@@ -126,13 +119,12 @@ void CPlayerBot::TryRespawn()
 	m_pCharacter->Spawn(this, SpawnPos);
 
 	// чтобы не было видно эффектов что НПС не видемый для одного игрока был видем другому
-	if(SpawnType != BotsTypes::TYPE_BOT_QUEST) 
+	if(SpawnType != BotsTypes::TYPE_BOT_QUEST)
 		GS()->CreatePlayerSpawn(SpawnPos);
 
 	// сбросить респавн в данжах если он был разрешен
-	if (SpawnType == BotsTypes::TYPE_BOT_MOB && GS()->DungeonID() > 0 && m_DungeonAllowedSpawn)
+	if (SpawnType == BotsTypes::TYPE_BOT_MOB && GS()->IsDungeon() && m_DungeonAllowedSpawn)
 		m_DungeonAllowedSpawn = false;
-
 }
 
 /*
@@ -181,7 +173,6 @@ void CPlayerBot::Snap(int SnappingClient)
 	pPlayerInfo->m_Score = (m_BotType == BotsTypes::TYPE_BOT_MOB ? BotJob::MobBot[m_SubBotID].Level : 1);
 
 	// --------------------- CUSTOM ----------------------
-	// ---------------------------------------------------
 	if(!GS()->CheckClient(SnappingClient))
 		return;
 
@@ -198,13 +189,6 @@ void CPlayerBot::Snap(int SnappingClient)
 	pClientInfo->m_Level = GetBotLevel();
 	pClientInfo->m_ActiveQuest = IsActiveQuests(SnappingClient);
 	StrToInts(pClientInfo->m_StateName, 6, GetStatusBot());
-
-	for(int p = 0; p < 6; p++)
-	{
-		StrToInts(pClientInfo->m_aaSkinPartNames[p], 6, BotJob::DataBot[m_BotID].SkinNameBot[p]);
-		pClientInfo->m_aUseCustomColors[p] = BotJob::DataBot[m_BotID].UseCustomBot[p];
-		pClientInfo->m_aSkinPartColors[p] = BotJob::DataBot[m_BotID].SkinColorBot[p];
-	}
 }
 
 int CPlayerBot::GetMoodState(int SnappingClient)

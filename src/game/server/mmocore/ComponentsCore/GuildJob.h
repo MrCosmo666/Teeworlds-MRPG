@@ -61,18 +61,11 @@ public:
 	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
 	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
-
-/* #########################################################################
-	BASED MEMBER
-######################################################################### */
 	virtual void OnTick();
 
 private:
 	void TickHousingText();
 
-/* #########################################################################
-	GET CHECK MEMBER 
-######################################################################### */
 	std::string UpgradeNames(int Field, bool DataTable = false);
 
 public:
@@ -80,9 +73,6 @@ public:
 	bool IsLeaderPlayer(CPlayer *pPlayer, int Access = GuildAccess::ACCESS_LEADER) const;
 	int GetMemberChairBonus(int GuildID, int Field) const;
 
-/* #########################################################################
-	FUNCTIONS MEMBER MEMBER 
-######################################################################### */
 	void CreateGuild(int ClientID, const char *GuildName);
 	void JoinGuild(int AuthID, int GuildID);
 	void ExitGuild(int AuthID);
@@ -96,10 +86,6 @@ public:
 	bool AddMoneyBank(int GuildID, int Money);
 	bool RemoveMoneyBank(int GuildID, int Money);
 	bool UpgradeGuild(int GuildID, int Field);
-
-/* #########################################################################
-	FUNCTIONS HOUSES DECORATION
-######################################################################### */
 	bool AddDecorationHouse(int DecoID, int GuildID, vec2 Position);
 
 private:
@@ -107,16 +93,10 @@ private:
 	void ShowDecorationList(CPlayer* pPlayer);
 
 public:
-/* #########################################################################
-	GET CHECK MEMBER RANK MEMBER 
-######################################################################### */
 	const char *AccessNames(int Access);
 	const char *GetGuildRank(int GuildID, int RankID);
 	int FindGuildRank(int GuildID, const char *Rank) const;
 
-/* #########################################################################
-	FUNCTIONS MEMBER RANK MEMBER 
-######################################################################### */
 private:
 	void AddRank(int GuildID, const char *Rank);
 	void DeleteRank(int RankID, int GuildID);
@@ -126,29 +106,17 @@ private:
 	void ShowMenuRank(CPlayer *pPlayer);
 
 public:
-/* #########################################################################
-	GET CHECK MEMBER INVITE MEMBER 
-######################################################################### */
 	int GetGuildPlayerCount(int GuildID);
 
-/* #########################################################################
-	FUNCTIONS MEMBER INVITE MEMBER 
-######################################################################### */
 private:
 	void ShowInvitesGuilds(int ClientID, int GuildID);
 	void ShowFinderGuilds(int ClientID);
 	bool AddInviteGuild(int GuildID, int OwnerID);
 
-/* #########################################################################
-	FUNCTIONS MEMBER HISTORY MEMBER 
-######################################################################### */
 	void ShowHistoryGuild(int ClientID, int GuildID);
 	void AddHistoryGuild(int GuildID, const char *Buffer, ...);
 
 public:
-/* #########################################################################
-	GET CHECK MEMBER HOUSING MEMBER 
-######################################################################### */
 	int GetHouseGuildID(int HouseID) const;
 	int GetHouseWorldID(int HouseID) const;
 	int GetPosHouseID(vec2 Pos) const;
@@ -157,19 +125,12 @@ public:
 	vec2 GetPositionHouse(int GuildID) const;
 	int GetGuildHouseID(int GuildID) const;
 
-/* #########################################################################
-	FUNCTIONS MEMBER HOUSING MEMBER 
-######################################################################### */
 	void BuyGuildHouse(int GuildID, int HouseID);
 	void SellGuildHouse(int GuildID);
 	void ShowBuyHouse(CPlayer *pPlayer, int MID);
 	void ChangeStateDoor(int GuildID);
-
 };
 
-/* #########################################################################
-	HOUSE ENTITIES MEMBER  
-######################################################################### */
 class GuildDoor : public CEntity
 {
 	int m_GuildID;

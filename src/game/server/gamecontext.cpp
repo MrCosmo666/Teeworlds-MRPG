@@ -236,7 +236,6 @@ void CGS::CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamage)
 
 void CGS::CreatePlayerSpawn(vec2 Pos)
 {
-	// create the event
 	CNetEvent_Spawn *ev = (CNetEvent_Spawn *)m_Events.Create(NETEVENTTYPE_SPAWN, sizeof(CNetEvent_Spawn));
 	if(ev)
 	{
@@ -1141,13 +1140,8 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			if(pEnd != nullptr)
 				*(const_cast<char *>(pEnd)) = 0;
 
-			// drop empty and autocreated spam messages (more than 20 characters per second)
-			if(Length == 0 || (g_Config.m_SvSpamprotection && pPlayer->m_PlayerTick[TickState::LastChat] && pPlayer->m_PlayerTick[TickState::LastChat] + Server()->TickSpeed()*(Length/20) > Server()->Tick()))
-				return;
-
 			pPlayer->m_PlayerTick[TickState::LastChat] = Server()->Tick();
 
-			// don't allow spectators to disturb players during a running game in tournament mode
 			int Mode = pMsg->m_Mode;
 			if(Mode != CHAT_NONE)
 			{

@@ -113,7 +113,6 @@ public:
 
 	// team
 	void DoTeamChange(class CPlayer *pPlayer, bool DoChatMsg=true);
-	int GetRealPlayer();
 
 };
 

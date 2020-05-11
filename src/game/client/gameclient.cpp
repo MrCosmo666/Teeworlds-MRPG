@@ -1511,14 +1511,7 @@ void CGameClient::OnNewSnapshot()
 					m_LocalClientID = ClientID;
 
 				CClientData* pClient = &m_aClients[ClientID];
-				for (int p = 0; p < NUM_SKINPARTS; p++)
-				{
-					IntsToStr(pInfo->m_aaSkinPartNames[p], 6, pClient->m_aaSkinPartNames[p]);
-					pClient->m_aUseCustomColors[p] = pInfo->m_aUseCustomColors[p];
-					pClient->m_aSkinPartColors[p] = pInfo->m_aSkinPartColors[p];
-				}
 				pClient->m_pLocalStats = pInfo;
-				pClient->UpdateRenderInfo(this, ClientID, true);
 			}
 		}
 	}

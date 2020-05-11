@@ -17,11 +17,13 @@ void ShopJob::OnInit()
 	}
 }
 
-void ShopJob::OnTickWorld()
+void ShopJob::OnTick()
 {
-	// проверять оконченые слоты аукцион
-	if(GS()->Server()->Tick() % (1 * GS()->Server()->TickSpeed() * (g_Config.m_SvTimeCheckAuction*60)) == 0)
-		CheckAuctionTime();
+	if(GS()->GetWorldID() == LOCALWORLD)
+	{
+		if(GS()->Server()->Tick() % (1 * GS()->Server()->TickSpeed() * (g_Config.m_SvTimeCheckAuction * 60)) == 0)
+			CheckAuctionTime();
+	}
 }
 
 bool ShopJob::OnHandleTile(CCharacter* pChr, int IndexCollision)

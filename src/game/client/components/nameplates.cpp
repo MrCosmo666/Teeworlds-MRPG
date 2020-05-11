@@ -60,32 +60,26 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 				case MOOD_ANGRY:
 					str_format(aIconPlayerType, sizeof(aIconPlayerType), "angry");
 					ColorNameplates = vec4(0.9f, 0.65f, 0.65f, a);
-					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.3f * a);
 					break;
 				case MOOD_AGRESSED_TANK:
 					str_format(aIconPlayerType, sizeof(aIconPlayerType), "agressed_y");
 					ColorNameplates = vec4(0.9f, 0.4f, 0.4f, a);
-					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.7f * a);
 					break;
 				case MOOD_AGRESSED_OTHER:
 					str_format(aIconPlayerType, sizeof(aIconPlayerType), "agressed_o");
 					ColorNameplates = vec4(0.5f, 0.3f, 0.7f, a);
-					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.6f * a);
 					break;
 				case MOOD_FRIENDLY:
 					str_format(aIconPlayerType, sizeof(aIconPlayerType), "friendly");
 					ColorNameplates = vec4(0.4f, 0.8f, 0.2f, a);
-					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.3f * a);
 					break;
 				case MOOD_QUESTING:
 					str_format(aIconPlayerType, sizeof(aIconPlayerType), "paper");
 					ColorNameplates = vec4(0.9f, 0.85f, 0.35f, a);
-					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.3f * a);
 					break;				
 				case MOOD_PLAYER_TANK:
 					str_format(aIconPlayerType, sizeof(aIconPlayerType), "rose");
 					ColorNameplates = vec4(0.15f, 0.60f, 1.00f, a);
-					OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.3f * a);
 					break;
 			}
 
@@ -98,9 +92,9 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 			{
 				str_format(aBuf, sizeof(aBuf), "%d / %d", pClientStats->m_Health, pClientStats->m_HealthStart);
 
-				CUIRect ExpBar = { Position.x - tw / 2.0f , Position.y - FontSize - 92.0f, tw, 25.0f };
+				CUIRect ExpBar = { Position.x - tw / 2.0f , Position.y - FontSize - 92.0f, tw, 22.0f };
 				RenderTools()->DrawUIBar(TextRender(), ExpBar, ColorNameplates / 1.2f,
-					pClientStats->m_Health, pClientStats->m_HealthStart, aBuf, 5, 8.0f, 3.0f);
+					pClientStats->m_Health, pClientStats->m_HealthStart, aBuf, 5, 6.0f, 3.0f);
 				ShowedProgressBar = true;
 			}
 

@@ -305,11 +305,6 @@ Objects = [
     ## mmotee general object
 	NetObject("Mmo_ClientInfo", [
 		NetBool("m_Local"),
-
-		NetArray(NetArray(NetIntAny("m_aaSkinPartNames"), 6), 6),
-		NetArray(NetBool("m_aUseCustomColors"), 6),
-		NetArray(NetIntAny("m_aSkinPartColors"), 6),
-
 		NetIntAny("m_Level"),
 		NetIntAny("m_Exp"),
 		

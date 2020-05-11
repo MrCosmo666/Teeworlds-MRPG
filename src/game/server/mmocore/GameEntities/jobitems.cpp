@@ -13,7 +13,6 @@ CJobItems::CJobItems(CGameWorld *pGameWorld, int ItemID, int Level, vec2 Pos, in
 	m_Type = Type;
 	m_Health = Health;
 	m_HouseID = HouseID;
-	
 	SpawnPositions();
 
 	Reset();
@@ -23,13 +22,17 @@ CJobItems::CJobItems(CGameWorld *pGameWorld, int ItemID, int Level, vec2 Pos, in
 void CJobItems::SpawnPositions()
 {
 	vec2 SwapPos = vec2(m_Pos.x, m_Pos.y-20);
-	if (GS()->Collision()->GetCollisionAt(SwapPos.x, SwapPos.y) > 0) m_Pos = SwapPos;
+	if (GS()->Collision()->GetCollisionAt(SwapPos.x, SwapPos.y) > 0) 
+		m_Pos = SwapPos;
 	SwapPos = vec2(m_Pos.x, m_Pos.y+16);
-	if (GS()->Collision()->GetCollisionAt(SwapPos.x, SwapPos.y) > 0) m_Pos = SwapPos;
+	if (GS()->Collision()->GetCollisionAt(SwapPos.x, SwapPos.y) > 0) 
+		m_Pos = SwapPos;
 	SwapPos = vec2(m_Pos.x-18, m_Pos.y);
-	if (GS()->Collision()->GetCollisionAt(SwapPos.x, SwapPos.y) > 0) m_Pos = SwapPos;
+	if (GS()->Collision()->GetCollisionAt(SwapPos.x, SwapPos.y) > 0) 
+		m_Pos = SwapPos;
 	SwapPos = vec2(m_Pos.x+18, m_Pos.y);
-	if (GS()->Collision()->GetCollisionAt(SwapPos.x, SwapPos.y) > 0) m_Pos = SwapPos;
+	if (GS()->Collision()->GetCollisionAt(SwapPos.x, SwapPos.y) > 0) 
+		m_Pos = SwapPos;
 }
 
 void CJobItems::SetSpawn(int Sec)
@@ -44,7 +47,7 @@ void CJobItems::Work(int ClientID)
 		return;
 
 	// not allowed un owner house job 
-	if(GS()->Mmo()->House()->GetOwnerHouse(m_HouseID) <= 0)
+	if(m_HouseID && GS()->Mmo()->House()->GetOwnerHouse(m_HouseID) <= 0)
 	{
 		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "It is forbidden to pick plants without the owner!");
 		return;

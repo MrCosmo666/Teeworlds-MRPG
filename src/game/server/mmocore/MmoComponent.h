@@ -22,8 +22,6 @@ public:
 	virtual void OnInit() {};
 	virtual void OnInitAccount(CPlayer *pPlayer) {};
 	virtual void OnTick() {};
-	virtual void OnTickWorld() {};
-	virtual void OnPaymentTime() {};
 	virtual void OnResetClient(int ClientID) {};
 	virtual bool OnHandleTile(CCharacter *pChr, int IndexCollision) { return false; };
 	virtual bool OnHandleMenulist(CPlayer *pPlayer, int Menulist, bool ReplaceMenu) { return false; };
