@@ -53,13 +53,15 @@ bool CDropItem::TakeItem(int ClientID)
 		tl_swap(pPlayerDroppedItem, m_DropItem);
 		GS()->Chat(ClientID, "You now own {STR}(+{INT})", pPlayerDroppedItem.Info().GetName(pPlayer), &pPlayerDroppedItem.Enchant);
 		GS()->VResetVotes(ClientID, MenuList::MENU_INVENTORY);
+		GS()->VResetVotes(ClientID, MenuList::MENU_EQUIPMENT);
 		return true;
 	}
 	
 	// выдача просто предмета
-	GS()->VResetVotes(ClientID, MenuList::MENU_INVENTORY);
 	pPlayerDroppedItem.Add(m_DropItem.Count, 0, m_DropItem.Enchant);
 	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 10, "\0");
+	GS()->VResetVotes(ClientID, MenuList::MENU_INVENTORY);
+	GS()->VResetVotes(ClientID, MenuList::MENU_EQUIPMENT);
 	GS()->m_World.DestroyEntity(this);
 	return true;
 }

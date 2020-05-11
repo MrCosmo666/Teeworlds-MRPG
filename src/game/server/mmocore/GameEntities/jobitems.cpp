@@ -79,8 +79,7 @@ void CJobItems::Work(int ClientID)
 		}
 
 		if (rand() % 10 == 0)
-			GS()->Mmo()->Item()->SetDurability(pPlayer, EquipItem, Durability - 1);
-
+			pPlayerEquippedItem.SetDurability(Durability - 1);
 
 		m_Progress += 3+pPlayer->EnchantAttributes(Stats::StEfficiency);
 		GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));

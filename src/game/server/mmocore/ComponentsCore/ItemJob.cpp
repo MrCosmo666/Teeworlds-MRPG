@@ -14,9 +14,9 @@ void ItemJob::OnInit()
 	while(RES->next())
 	{
 		int ItemID = (int)RES->getInt("ItemID");
-		str_copy(ItemsInfo[ItemID].iItemName, RES->getString("Name").c_str(), sizeof(ItemsInfo[ItemID].iItemName));
-		str_copy(ItemsInfo[ItemID].iItemDesc, RES->getString("Description").c_str(), sizeof(ItemsInfo[ItemID].iItemDesc));
-		str_copy(ItemsInfo[ItemID].iItemIcon, RES->getString("Icon").c_str(), sizeof(ItemsInfo[ItemID].iItemIcon));
+		str_copy(ItemsInfo[ItemID].Name, RES->getString("Name").c_str(), sizeof(ItemsInfo[ItemID].Name));
+		str_copy(ItemsInfo[ItemID].Desc, RES->getString("Description").c_str(), sizeof(ItemsInfo[ItemID].Desc));
+		str_copy(ItemsInfo[ItemID].Icon, RES->getString("Icon").c_str(), sizeof(ItemsInfo[ItemID].Icon));
 		ItemsInfo[ItemID].Type = (int)RES->getInt("Type");
 		ItemsInfo[ItemID].Function = (int)RES->getInt("Function");
 		ItemsInfo[ItemID].Notify = (bool)RES->getBoolean("Message");
@@ -31,8 +31,8 @@ void ItemJob::OnInit()
 			ItemsInfo[ItemID].AttributeCount[i] = (int)RES->getInt(aBuf);
 		}
 		ItemsInfo[ItemID].MaximalEnchant = (int)RES->getInt("EnchantMax");
-		ItemsInfo[ItemID].iItemEnchantPrice = (int)RES->getInt("EnchantPrice");
-		ItemsInfo[ItemID].ItemProjID = (int)RES->getInt("ProjectileID");
+		ItemsInfo[ItemID].EnchantPrice = (int)RES->getInt("EnchantPrice");
+		ItemsInfo[ItemID].ProjID = (int)RES->getInt("ProjectileID");
 	}
 
 	// загрузить аттрибуты
@@ -55,11 +55,11 @@ void ItemJob::OnInitAccount(CPlayer *pPlayer)
 	while(RES->next())
 	{
 		int ItemID = (int)RES->getInt("ItemID");
+		Items[ClientID][ItemID] = InventoryItem(pPlayer, ItemID);
 		Items[ClientID][ItemID].Count = (int)RES->getInt("Count");
 		Items[ClientID][ItemID].Settings = (int)RES->getInt("Settings");
 		Items[ClientID][ItemID].Enchant = (int)RES->getInt("Enchant");
 		Items[ClientID][ItemID].Durability = (int)RES->getInt("Durability");
-		Items[ClientID][ItemID].SetBasic(pPlayer, ItemID);
 	}		
 }
 
@@ -113,19 +113,6 @@ void ItemJob::FormatAttributes(ItemInformation& pInfoItem, int Enchant, int size
 	Buffer.clear();
 }
 
-bool ItemJob::SetDurability(CPlayer *pPlayer, int ItemID, int Durability)
-{
-	ResultSet* RES = SJK.SD("ID", "tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID);
-	if(RES->next())
-	{
-		const int ID = RES->getInt("ID"); 
-		SJK.UD("tw_items", "Durability = '%d' WHERE ID = '%d'", Durability, ID);
-		pPlayer->GetItem(ItemID).Durability = Durability;
-		return true;		
-	}	
-	return false;	
-}
-
 void ItemJob::ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction)
 {
 	const int ClientID = pPlayer->GetCID();
@@ -150,11 +137,11 @@ void ItemJob::GiveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Coun
 	// проверяем выдан ли и вправду предмет
 	const int ClientID = pPlayer->GetCID();
 	*SecureCode = SecureCheck(pPlayer, ItemID, Count, Settings, Enchant);
-	if(*SecureCode != 1) return;
-
-	// обновляем значения в базе
-	SJK.UD("tw_items", "Count = '%d', Settings = '%d', Enchant = '%d' WHERE ItemID = '%d' AND OwnerID = '%d'", 
-		Items[ClientID][ItemID].Count, Items[ClientID][ItemID].Settings, Items[ClientID][ItemID].Enchant, ItemID, pPlayer->Acc().AuthID);
+	if(*SecureCode == 1)
+	{
+		SJK.UD("tw_items", "Count = '%d', Settings = '%d', Enchant = '%d' WHERE ItemID = '%d' AND OwnerID = '%d'",
+			Items[ClientID][ItemID].Count, Items[ClientID][ItemID].Settings, Items[ClientID][ItemID].Enchant, ItemID, pPlayer->Acc().AuthID);
+	}
 }
 
 // Выдаем предмет обработка первичная
@@ -162,7 +149,7 @@ int ItemJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, 
 {
 	// проверяем инициализируем и добавляем предмет
 	const int ClientID = pPlayer->GetCID();
-	std::unique_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
 	if(RES->next())
 	{
 		Items[ClientID][ItemID].Count = RES->getInt("Count")+Count;
@@ -175,7 +162,7 @@ int ItemJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, 
 	Items[ClientID][ItemID].Settings = Settings;
 	Items[ClientID][ItemID].Enchant = Enchant;
 	Items[ClientID][ItemID].Durability = 100;
-	SJK.ID("tw_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d');",
+	SJK.ID("tw_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d')",
 		ItemID, pPlayer->Acc().AuthID, Count, Settings, Enchant);
 	return 2;
 }
@@ -184,10 +171,8 @@ int ItemJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, 
 void ItemJob::RemoveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Count, int Settings)
 {
 	*SecureCode = DeSecureCheck(pPlayer, ItemID, Count, Settings);
-	if(*SecureCode != 1) return;
-
-	// если прошла и предметов больше удаляемых то обновляем таблицу
-	SJK.UD("tw_items", "Count = Count - '%d', Settings = Settings - '%d' WHERE ItemID = '%d' AND OwnerID = '%d'", Count, Settings, ItemID, pPlayer->Acc().AuthID);	
+	if(*SecureCode == 1)
+		SJK.UD("tw_items", "Count = Count - '%d', Settings = Settings - '%d' WHERE ItemID = '%d' AND OwnerID = '%d'", Count, Settings, ItemID, pPlayer->Acc().AuthID);
 }
 
 // удаление предмета первостепенная обработка
@@ -392,7 +377,7 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	if(PPSTR(CMD, "ISETTINGS") == 0)
 	{
 		InventoryItem& pPlayerSelectedItem = pPlayer->GetItem(VoteID);
-		pPlayerSelectedItem.EquipItem();
+		pPlayerSelectedItem.Equip();
 		if(pPlayerSelectedItem.Info().Function == EQUIP_DISCORD)
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_STATS);
 		else if(pPlayerSelectedItem.Info().Type == ItemType::TYPE_EQUIP)
@@ -630,34 +615,29 @@ int ItemJob::GetCountItemsType(CPlayer *pPlayer, int Type) const
 
 const char *ItemJob::ClassItemInformation::GetName(CPlayer *pPlayer) const
 {
-	if(!pPlayer) return iItemName;
-	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), _(iItemName));	
+	if(!pPlayer) return Name;
+	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), _(Name));	
 }
 
 const char *ItemJob::ClassItemInformation::GetDesc(CPlayer *pPlayer) const
 {
-	if(!pPlayer) return iItemDesc;
-	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), _(iItemDesc));	
+	if(!pPlayer) return Desc;
+	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), _(Desc));	
 }
 
 bool ItemJob::ClassItemInformation::IsEnchantable() const
 {
 	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if (CGS::AttributInfo.find(Attribute[i]) != CGS::AttributInfo.end() && Attribute[i] > 0 && AttributeCount[i] > 0 && iItemEnchantPrice && MaximalEnchant > 0)
+		if (CGS::AttributInfo.find(Attribute[i]) != CGS::AttributInfo.end() && Attribute[i] > 0 && AttributeCount[i] > 0 && EnchantPrice && MaximalEnchant > 0)
 			return true;
 	}
 	return false;
 }
 
-int ItemJob::ClassItems::EnchantPrice() const
-{
-	return ItemJob::ItemsInfo[itemid_].iItemEnchantPrice*(Enchant+1);
-}
-
 bool ItemJob::ClassItems::SetEnchant(int arg_enchantlevel)
 {
-	if (Count < 1 || !pPlayer || !pPlayer->IsAuthed())
+	if (Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
 		return false;
 
 	Enchant = arg_enchantlevel;
@@ -667,42 +647,38 @@ bool ItemJob::ClassItems::SetEnchant(int arg_enchantlevel)
 
 bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, bool arg_message)
 {
-	if(arg_count < 1 || !pPlayer || !pPlayer->IsAuthed()) 
+	if(arg_count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed()) 
 		return false;
 
-	CGS* GameServer = pPlayer->GS();
-	const int ClientID = pPlayer->GetCID();
+	CGS* GameServer = m_pPlayer->GS();
+	const int ClientID = m_pPlayer->GetCID();
 	if(Info().IsEnchantable())
 	{
 		if(Count > 0) 
 		{
-			pPlayer->GS()->Chat(ClientID, "This item cannot have more than 1 item");
+			m_pPlayer->GS()->Chat(ClientID, "This item cannot have more than 1 item");
 			return false;
 		}
 		arg_count = 1;
 	}
 
 	// проверить пустой слот если да тогда одеть предмет
-	const bool AutoEquip = (Info().Type == ItemType::TYPE_EQUIP && pPlayer->GetItemEquip(Info().Function) <= 0) || (Info().Function == FUNCTION_SETTINGS && Info().IsEnchantable());
+	const bool AutoEquip = (Info().Type == ItemType::TYPE_EQUIP && m_pPlayer->GetItemEquip(Info().Function) <= 0) || (Info().Function == FUNCTION_SETTINGS && Info().IsEnchantable());
 	if(AutoEquip)
 	{
 		if(Info().Function == EQUIP_DISCORD)  
-			GameServer->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_STATS);
+			GameServer->Mmo()->SaveAccount(m_pPlayer, SaveType::SAVE_STATS);
 
 		char aAttributes[128];
 		GameServer->Mmo()->Item()->FormatAttributes(*this, sizeof(aAttributes), aAttributes);
-		GameServer->Chat(ClientID, "Auto equip {STR} - {STR}", Info().GetName(pPlayer), aAttributes);
+		GameServer->Chat(ClientID, "Auto equip {STR} - {STR}", Info().GetName(m_pPlayer), aAttributes);
 		GameServer->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 	}
 
 	// выдаем предмет
-	GameServer->Mmo()->Item()->GiveItem(&pPlayer->m_SecurCheckCode, pPlayer, itemid_, arg_count, (AutoEquip ? 1 : arg_settings), arg_enchant);
-	if(pPlayer->m_SecurCheckCode <= 0) 
+	GameServer->Mmo()->Item()->GiveItem(&m_pPlayer->m_SecurCheckCode, m_pPlayer, itemid_, arg_count, (AutoEquip ? 1 : arg_settings), arg_enchant);
+	if(m_pPlayer->m_SecurCheckCode <= 0) 
 		return false;
-
-	// автообновление инвентаря если открыт
-	GameServer->VResetVotes(ClientID, MenuList::MENU_INVENTORY);
-	GameServer->VResetVotes(ClientID, MenuList::MENU_EQUIPMENT);
 
 	// отправить смену скина
 	if(AutoEquip) 
@@ -714,17 +690,16 @@ bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 
 	// информация о получении себе предмета
 	if(Info().Type != -1 && itemid_ != itMoney)
-		GameServer->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(pPlayer), &arg_count);
+		GameServer->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(m_pPlayer), &arg_count);
 	else if(Info().Notify)
-	{
 		GameServer->Chat(-1, "{STR} got of the {STR}x{INT}!", GameServer->Server()->ClientName(ClientID), Info().GetName(), &arg_count);
-	}
+
 	return true;
 }
 
 bool ItemJob::ClassItems::Remove(int arg_removecount, int arg_settings)
 {
-	if(Count <= 0 || arg_removecount < 1 || !pPlayer) 
+	if(Count <= 0 || arg_removecount < 1 || !m_pPlayer) 
 		return false;
 
 	if(Count < arg_removecount)
@@ -733,65 +708,95 @@ bool ItemJob::ClassItems::Remove(int arg_removecount, int arg_settings)
 	if (IsEquipped())
 	{
 		Settings = 0;
-		int ClientID = pPlayer->GetCID();
-		pPlayer->GS()->ChangeEquipSkin(ClientID, itemid_);
+		int ClientID = m_pPlayer->GetCID();
+		m_pPlayer->GS()->ChangeEquipSkin(ClientID, itemid_);
 	}
 
-	pPlayer->GS()->Mmo()->Item()->RemoveItem(&pPlayer->m_SecurCheckCode, pPlayer, itemid_, arg_removecount, arg_settings);
-	return (bool)(pPlayer->m_SecurCheckCode > 0);
+	m_pPlayer->GS()->Mmo()->Item()->RemoveItem(&m_pPlayer->m_SecurCheckCode, m_pPlayer, itemid_, arg_removecount, arg_settings);
+	return (bool)(m_pPlayer->m_SecurCheckCode > 0);
 }
 
 bool ItemJob::ClassItems::SetSettings(int arg_settings)
 {
-	if (Count < 1 || !pPlayer || !pPlayer->IsAuthed())
+	if (Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
 		return false;
 
 	Settings = arg_settings;
-	Save();
-	return true;
+	return Save();
 }
 
-bool ItemJob::ClassItems::EquipItem()
+bool ItemJob::ClassItems::SetDurability(int arg_durability)
 {
-	if (Count < 1 || !pPlayer || !pPlayer->IsAuthed())
+	if(Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
+		return false;
+
+	Durability = arg_durability;
+	return Save();
+}
+
+bool ItemJob::ClassItems::Equip()
+{
+	if (Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
 		return false;
 
 	if(Info().Type == ItemType::TYPE_EQUIP)
 	{
 		const int EquipID = Info().Function;
-		int EquipItemID = pPlayer->GetItemEquip(EquipID, itemid_);
+		int EquipItemID = m_pPlayer->GetItemEquip(EquipID, itemid_);
 		while (EquipItemID >= 1)
 		{
-			ItemJob::InventoryItem &EquipItem = pPlayer->GetItem(EquipItemID);
+			ItemJob::InventoryItem &EquipItem = m_pPlayer->GetItem(EquipItemID);
 			EquipItem.Settings = 0;
 			EquipItem.SetSettings(0);
-			EquipItemID = pPlayer->GetItemEquip(EquipID, itemid_);
+			EquipItemID = m_pPlayer->GetItemEquip(EquipID, itemid_);
 		}
 	}
 
 	Settings ^= true;
-	pPlayer->ShowInformationStats();
+	if(Info().GetStatsBonus(Stats::StAmmoRegen) > 0 && m_pPlayer->GetCharacter())
+		m_pPlayer->GetCharacter()->m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
 
-	if(Info().GetStatsBonus(Stats::StAmmoRegen) > 0 && pPlayer->GetCharacter())
-		pPlayer->GetCharacter()->m_AmmoRegen = pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
-
-	Save();
-	return true;
-}
-
-bool ItemJob::ClassItems::IsEquipped()
-{
-	if ((Info().Type == ItemType::TYPE_SETTINGS || Info().Type == ItemType::TYPE_EQUIP) && Settings)
-		return true;
-	return false;
+	m_pPlayer->ShowInformationStats();
+	return Save();
 }
 
 bool ItemJob::ClassItems::Save()
 {
-	if (pPlayer && pPlayer->IsAuthed())
+	if (m_pPlayer && m_pPlayer->IsAuthed())
 	{
-		SJK.UD("tw_items", "Count = '%d', Settings = '%d', Enchant = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", Count, Settings, Enchant, pPlayer->Acc().AuthID, itemid_);
+		SJK.UD("tw_items", "Count = '%d', Settings = '%d', Enchant = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", Count, Settings, Enchant, m_pPlayer->Acc().AuthID, itemid_);
 		return true;
 	}
 	return false;
+}
+
+// TODO: FIX IT (lock .. unlock)
+static std::map<int, std::mutex > lock_sleep;
+void ItemJob::AddItemSleep(int AccountID, int ItemID, int GiveCount, int Milliseconds)
+{
+	std::thread([this, AccountID, ItemID, GiveCount, Milliseconds]()
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
+
+			lock_sleep[AccountID].lock();
+			const int ClientID = Job()->Account()->CheckOnlineAccount(AccountID);
+			CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
+			if(pPlayer)
+			{
+				pPlayer->GetItem(ItemID).Add(GiveCount);
+				lock_sleep[AccountID].unlock();
+				return;
+			}
+
+			boost::scoped_ptr<ResultSet> RES(SJK.SD("Count", "tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, AccountID));
+			if(RES->next())
+			{
+				const int ReallyCount = (int)RES->getInt("Count") + GiveCount;
+				SJK.UD("tw_items", "Count = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", ReallyCount, AccountID, ItemID);
+				lock_sleep[AccountID].unlock();
+				return;
+			}
+			SJK.ID("tw_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '0', '0')", ItemID, AccountID, GiveCount);
+			lock_sleep[AccountID].unlock();
+		}).detach();
 }

@@ -10,9 +10,9 @@ class ItemJob : public MmoComponent
 	class ClassItemInformation
 	{
 	public:
-		char iItemName[32];
-		char iItemDesc[64];
-		char iItemIcon[16];
+		char Name[32];
+		char Desc[64];
+		char Icon[16];
 		int Type;
 		int Function;
 		bool Notify;
@@ -21,23 +21,22 @@ class ItemJob : public MmoComponent
 		short Attribute[STATS_MAX_FOR_ITEM];
 		int AttributeCount[STATS_MAX_FOR_ITEM];
 		int MaximalEnchant;
-		int iItemEnchantPrice;
-		int ItemProjID;
-
-		const char* GetName(CPlayer* pPlayer = NULL) const;
-		const char* GetDesc(CPlayer* pPlayer = NULL) const;
-		const char* GetIcon() const { return iItemIcon; };
-		bool IsEnchantable() const;
-
-		int GetStatsBonus(int AttributeID)
+		int EnchantPrice;
+		int ProjID;
+		
+		int GetStatsBonus(int AttributeID) const
 		{
-			for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
+			for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 			{
-				if (Attribute[i] == AttributeID)
+				if(Attribute[i] == AttributeID)
 					return AttributeCount[i];
 			}
 			return -1;
 		}
+		const char* GetName(CPlayer* pPlayer = NULL) const;
+		const char* GetDesc(CPlayer* pPlayer = NULL) const;
+		const char* GetIcon() const { return Icon; };
+		bool IsEnchantable() const;
 	};
 
 	int SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant);
@@ -50,33 +49,31 @@ public:
 	// TODO: Change it bad
 	class ClassItems
 	{
-		CPlayer* pPlayer;
+		CPlayer* m_pPlayer;
 		int itemid_;
 
 	public:
+		ClassItems() : Count(NULL), Settings(NULL), Enchant(NULL), Durability(NULL) {};
+		ClassItems(CPlayer* pPlayer, int ItemID) : m_pPlayer(pPlayer), itemid_(ItemID), Count(NULL), Settings(NULL), Enchant(NULL), Durability(NULL) {};
+
 		int Count;
 		int Settings;
 		int Enchant;
 		int Durability;
 
-		void SetBasic(CPlayer* Player, int itemid)
-		{
-			pPlayer = Player;
-			itemid_ = itemid;
-		}
-
-		int GetID() const { return itemid_; }
-		int EnchantPrice() const;
-		ItemInformation& Info() const { return ItemsInfo[itemid_]; };
-
+		bool SetDurability(int arg_durability);
+		bool SetEnchant(int arg_enchantlevel);
+		bool SetSettings(int arg_settings);
 		bool Remove(int arg_removecount, int arg_settings = 0);
 		bool Add(int arg_count, int arg_settings = 0, int arg_enchant = 0, bool arg_message = true);
 
-		bool SetEnchant(int arg_enchantlevel);
-		bool SetSettings(int arg_settings);
-		bool EquipItem();
+		bool Equip();
 		bool Save();
-		bool IsEquipped();
+	
+		int GetID() const { return itemid_; }
+		int EnchantPrice() const { return Info().EnchantPrice * (Enchant + 1); }
+		bool IsEquipped() const { return (Info().Type == ItemType::TYPE_SETTINGS || Info().Type == ItemType::TYPE_EQUIP) && Settings; }
+		ItemInformation& Info() const { return ItemsInfo[itemid_]; };
 	};
 
 	typedef ClassItems InventoryItem;
@@ -100,10 +97,10 @@ public:
 
 	void UseItem(int ClientID, int ItemID, int Count);
 	void RepairDurabilityFull(CPlayer *pPlayer);
-
-	bool SetDurability(CPlayer *pPlayer, int ItemID, int Durability);
-
 	int GetCountItemsType(CPlayer* pPlayer, int Type) const;
+
+	// TODO: FIX IT (lock .. unlock)
+	void AddItemSleep(int AccountID, int ItemID, int GiveCount, int Milliseconds);
 };
 
 #endif

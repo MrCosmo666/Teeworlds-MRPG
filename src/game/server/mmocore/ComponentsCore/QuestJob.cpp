@@ -157,27 +157,23 @@ void QuestJob::CollectItem(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData)
 	bool antiStressing = false;
 	for (int i = 0; i < 2; i++)
 	{
-		int ItemID = BotData.ItemSearch[i];
-		int Count = BotData.ItemSearchCount[i];
+		const int ItemID = BotData.ItemSearch[i];
+		const int Count = BotData.ItemSearchCount[i];
 		if (ItemID > 0 && Count > 0)
 		{
-			pPlayer->GetItem(ItemID).Remove(Count);
 			GS()->Chat(pPlayer->GetCID(), "You used quest item {STR}x{INT}!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer), &Count);
 			antiStressing = (bool)(ItemID == BotData.ItemGives[0] || ItemID == BotData.ItemGives[1]);
-		}
-
-		if (antiStressing)
-		{
-			kurosio::kpause(10);
-		}
-
-		ItemID = BotData.ItemGives[i];
-		Count = BotData.ItemGivesCount[i] - pPlayer->GetItem(ItemID).Count;
-		if (ItemID > 0 && Count > 0)
-		{
-			pPlayer->GetItem(ItemID).Add(Count);
+			pPlayer->GetItem(ItemID).Remove(Count);
 		}
 	}
+
+	for(int i = 0; i < 2; i++)
+	{
+		const int ItemID = BotData.ItemGives[i];
+		const int Count = BotData.ItemGivesCount[i] - pPlayer->GetItem(ItemID).Count;
+		if(ItemID > 0 && Count > 0)
+			Job()->Item()->AddItemSleep(pPlayer->Acc().AuthID, ItemID, Count, 30000);
+	}	
 }
 
 bool QuestJob::IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData) const

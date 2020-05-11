@@ -1868,9 +1868,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	if(!GetPlayer(ClientID, true))
 		return;
 
-	// таймер для синхронизации с SQL
-	kurosio::kpause(3);
-	
+	kurosio::kpause(3);	
 	CPlayer *pPlayer = m_apPlayers[ClientID];
 	pPlayer->m_OpenVoteMenu = MenuList;
 	ClearVotes(ClientID);
@@ -2232,8 +2230,7 @@ void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop, vec2 For
 // Саздает предметы в позиции Типа и Количества и Их самих кол-ва
 void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant, vec2 Force)
 {
-	ItemJob::InventoryItem DropItem;
-	DropItem.SetBasic(nullptr, ItemID);
+	ItemJob::InventoryItem DropItem(nullptr, ItemID);
 	DropItem.Count = Count;
 	DropItem.Enchant = Enchant;
 

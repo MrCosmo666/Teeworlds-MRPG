@@ -534,13 +534,13 @@ const char* CPlayer::GetLanguage()
 
 void CPlayer::ShowInformationStats()
 {
-	if (m_ClientID < 0 || m_ClientID >= MAX_PLAYERS)
+	if (!m_pCharacter)
 		return;
 
-	int Health = GetHealth();
-	int StartHealth = GetStartHealth();
-	int Mana = m_pCharacter->Mana();
-	int StartMana = GetStartMana();
+	const int Health = GetHealth();
+	const int StartHealth = GetStartHealth();
+	const int Mana = m_pCharacter->Mana();
+	const int StartMana = GetStartMana();
 	GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_BASIC_STATS, 100, "H: {INT}/{INT} M: {INT}/{INT}", &Health, &StartHealth, &Mana, &StartMana);
 }
 
@@ -692,8 +692,9 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 
 ItemJob::InventoryItem &CPlayer::GetItem(int ItemID) 
 {
-	ItemJob::Items[m_ClientID][ItemID].SetBasic(this, ItemID);
-	return ItemJob::Items[m_ClientID][ItemID]; 
+	if(ItemJob::Items[m_ClientID].find(ItemID) == ItemJob::Items[m_ClientID].end())
+		ItemJob::Items[m_ClientID][ItemID] = ItemJob::InventoryItem(this, ItemID);
+	return ItemJob::Items[m_ClientID][ItemID];
 }
 
 // Получить одетый предмет
