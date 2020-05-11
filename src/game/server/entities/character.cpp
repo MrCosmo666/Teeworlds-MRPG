@@ -65,6 +65,7 @@ int CCharacter::GetSnapFullID() const
 bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 {
 	m_pPlayer = pPlayer;
+	m_pPlayer->m_MoodState = m_pPlayer->GetMoodState();
 
 	m_EmoteStop = -1;
 	m_LastAction = -1;

@@ -21,6 +21,7 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	m_OpenVoteMenu = MenuList::MAIN_MENU;
 	m_PrevTuningParams = *pGS->Tuning();
 	m_NextTuningParams = m_PrevTuningParams;
+	m_MoodState = MOOD_NORMAL;
 
 	ClearParsing();
 	Acc().Team = GetStartTeam();
@@ -209,7 +210,6 @@ void CPlayer::Snap(int SnappingClient)
 		return;
 
 	bool local_ClientID = (m_ClientID == SnappingClient);
-	m_MoodState = GetMoodState();
 	pClientInfo->m_Local = local_ClientID;
 	pClientInfo->m_WorldType = GS()->Mmo()->WorldSwap()->GetWorldType();
 	pClientInfo->m_MoodType = m_MoodState;
@@ -869,7 +869,6 @@ void CPlayer::ClearFormatQuestText()
 	mem_zero(m_FormatTalkQuest, sizeof(m_FormatTalkQuest));
 }
 
-// another need optimize
 int CPlayer::GetMoodState()
 {
 	if (!GS()->IsDungeon())
@@ -882,7 +881,7 @@ int CPlayer::GetMoodState()
 		if (!pPlayer || Server()->GetWorldID(m_ClientID) != Server()->GetWorldID(i))
 			continue;
 
-		int FinderHardness = pPlayer->GetAttributeCount(Stats::StHardness, true);
+		int FinderHardness = pPlayer->GetLevelDisciple(AtributType::AtTank);
 		if (FinderHardness > MaximalHealth)
 			return MOOD_NORMAL;
 	}

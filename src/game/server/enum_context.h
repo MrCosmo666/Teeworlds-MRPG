@@ -192,29 +192,13 @@ enum
 		Список вкладок в меню крафта: Некая сортировка по типу крафта
 		Передается исключительно в ShowMenuCraft( int )
 	*/
-	CRAFTBASIC = 1,
-	CRAFTARTIFACT,
-	CRAFTWEAPON,
-	CRAFTEAT,
-	CRAFTWORK,
-	CRAFTQUEST,
-
 	STATS_MAX_FOR_ITEM = 2,
 
 	/*
 		Парсинг голосований
 		Передается как действие в парсер
 	*/
-	PARSESELLHOUSE = 1,
-	PARSEINVITEMEMBER,
-
-	// Редкость броадкастов
-	PRELOW = 1,
-	PRENORMAL,
-	PREHIGHT,
-	PRERARE,
-	PRERAREUP,
-	PRELEGENDARY,
+	PARSEINVITEMEMBER = 1,
 
 	/*
 		Все функции предметов
@@ -290,13 +274,6 @@ enum BotsTypes
 	TYPE_BOT_MOB = 1,
 	TYPE_BOT_QUEST = 2,
 	TYPE_BOT_NPC = 3,
-};
-
-enum PlayerClasses
-{
-	CLASS_TANK,
-	CLASS_HEALER,
-	CLASS_DPS,
 };
 
 enum

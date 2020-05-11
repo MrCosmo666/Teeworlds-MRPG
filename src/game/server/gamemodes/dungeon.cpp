@@ -15,6 +15,7 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	m_DungeonID = GS()->DungeonID();
 	m_WorldID = GS()->GetWorldID();
 	m_GameFlags = 0;
+	m_ShowedTankingInfo = false;
 
 	// создание двери для ожидания начала
 	vec2 PosDoor = vec2(DungeonJob::Dungeon[m_DungeonID].DoorX, DungeonJob::Dungeon[m_DungeonID].DoorY);
@@ -25,7 +26,7 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_door", "WHERE DungeonID = '%d'", m_DungeonID));
 	while (RES->next())
 	{
-		int DungeonBotID = RES->getInt("BotID");
+		const int DungeonBotID = RES->getInt("BotID");
 		vec2 Position = vec2(RES->getInt("PosX"), RES->getInt("PosY"));
 		new CLogicDungeonDoorKey(&GS()->m_World, Position, DungeonBotID);
 	}
@@ -60,6 +61,7 @@ void CGameControllerDungeon::ChangeState(int State)
 		m_FinishedTick = 0;
 		m_StartingTick = 0;
 		m_SafeTick = 0;
+		m_ShowedTankingInfo = false;
 		SetMobsSpawn(false);
 		ResetDoorKeyState();
 	}
@@ -226,11 +228,20 @@ void CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKil
 void CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 {
 	IGameController::OnCharacterSpawn(pChr);
-	if (pChr && pChr->GetPlayer() && m_StateDungeon >= DUNGEON_STARTED && !m_SafeTick)
+	if (pChr && pChr->GetPlayer() && m_StateDungeon >= DUNGEON_STARTED)
 	{
-		int ClientID = pChr->GetPlayer()->GetCID();
-		GS()->Chat(ClientID, "You were thrown out of dungeon!");
-		pChr->GetPlayer()->ChangeWorld(pChr->GetPlayer()->Acc().LastWorldID);
+		const int ClientID = pChr->GetPlayer()->GetCID();
+		if(pChr->GetPlayer()->m_MoodState == MOOD_PLAYER_TANK && !m_ShowedTankingInfo)
+		{
+			m_ShowedTankingInfo = true;
+			int StrengthTank = pChr->GetPlayer()->GetLevelDisciple(AtributType::AtTank);
+			GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned  with class strength {INT}p!", GS()->Server()->ClientName(ClientID), &StrengthTank);
+		}
+		if(!m_SafeTick)
+		{
+			GS()->Chat(ClientID, "You were thrown out of dungeon!");
+			pChr->GetPlayer()->ChangeWorld(pChr->GetPlayer()->Acc().LastWorldID);
+		}
 	}
 }
 
