@@ -293,20 +293,20 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(&m_pParticles->m_RenderExplosions);
 	m_All.Add(&gs_NamePlates);
 	m_All.Add(&m_pParticles->m_RenderGeneral);
+	m_All.Add(m_pDamageind);
 
-	// mmotee
 	m_All.Add(&m_pParticles->m_RenderDamageMmo);
 	m_All.Add(&m_pParticles->m_RenderMmoEffects);
 	m_All.Add(&m_pParticles->m_RenderTeleports);
 	m_All.Add(&m_pParticles->m_RenderMmoProj);
+
+	m_All.Add(&gs_Hud);
+	m_All.Add(&gs_Spectator);
+
 	m_All.Add(m_pTalkText);
 	m_All.Add(&gs_QuestingProcess);
 	m_All.Add(&gs_ProgressBar);
 
-	// vanilla
-	m_All.Add(m_pDamageind);
-	m_All.Add(&gs_Hud);
-	m_All.Add(&gs_Spectator);
 	m_All.Add(&gs_Emoticon);
 	m_All.Add(&gs_InfoMessages);
 	m_All.Add(m_pChat);

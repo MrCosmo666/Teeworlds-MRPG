@@ -748,7 +748,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 			Dmg = max(1, Dmg/3);
 
 		// TODO: Impl it
-		//GiveRandomMobEffect(From);
+		GiveRandomMobEffect(From);
 	}
 
 	int OldHealth = m_Health, OldArmor = m_Armor;
@@ -909,11 +909,11 @@ void CCharacter::HandleEvents()
 
 void CCharacter::GiveRandomMobEffect(int FromID)
 {
-	CPlayer *pPlayer = GS()->GetPlayer(FromID, false, true);
-	if(!pPlayer)
+	CPlayer* pFrom = GS()->GetPlayer(FromID);
+	if(!pFrom || !pFrom->IsBot() || pFrom->GetBotType() != BotsTypes::TYPE_BOT_MOB || BotJob::MobBot[pFrom->GetBotSub()].Effect[0] == '\0')
 		return;
 
-	m_pPlayer->GiveEffect("Poison", 3, 5);
+	m_pPlayer->GiveEffect(BotJob::MobBot[pFrom->GetBotSub()].Effect, 5, 25);
 }
 
 bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)

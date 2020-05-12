@@ -99,6 +99,7 @@ class BotJob : public MmoComponent
 		int RespawnTick;
 		int DungeonDoorID;
 		int WorldID;
+		char Effect[16];
 
 		int DropItem[6];
 		int CountItem[6];

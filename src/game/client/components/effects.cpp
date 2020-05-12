@@ -336,6 +336,8 @@ void CEffects::MmoEffectPotion(vec2 Pos, const char* Potion, bool Added)
 		Color = vec4(0.80f, 0.80f, 1.0f, 1.0f);
 	if (str_find(Potion, "Poison") != nullptr)
 		Color = vec4(0.40f, 0.80f, 0.0f, 1.0f);
+	if(str_find(Potion, "Slowdown") != nullptr)
+		Color = vec4(0.60f, 1.00f, 0.60f, 1.0f);
 	if (str_find(Potion, "Fire") != nullptr)
 		Color = vec4(1.0f, 0.65f, 0.0f, 1.0f);
 	if (str_find(Potion, "Ice") != nullptr)

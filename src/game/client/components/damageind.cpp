@@ -14,18 +14,18 @@ CDamageInd::CDamageInd()
 	m_NumItems = 0;
 }
 
-CDamageInd::CItem *CDamageInd::CreateI()
+CDamageInd::CItem* CDamageInd::CreateI()
 {
-	if (m_NumItems < MAX_ITEMS)
+	if(m_NumItems < MAX_ITEMS)
 	{
-		CItem *p = &m_aItems[m_NumItems];
+		CItem* p = &m_aItems[m_NumItems];
 		m_NumItems++;
 		return p;
 	}
 	return 0;
 }
 
-void CDamageInd::DestroyI(CDamageInd::CItem *i)
+void CDamageInd::DestroyI(CDamageInd::CItem* i)
 {
 	m_NumItems--;
 	*i = m_aItems[m_NumItems];
@@ -33,12 +33,12 @@ void CDamageInd::DestroyI(CDamageInd::CItem *i)
 
 void CDamageInd::Create(vec2 Pos, vec2 Dir)
 {
-	CItem *i = CreateI();
-	if (i)
+	CItem* i = CreateI();
+	if(i)
 	{
 		i->m_Pos = Pos;
 		i->m_StartTime = Client()->LocalTime();
-		i->m_Dir = Dir*-1;
+		i->m_Dir = Dir * -1;
 		i->m_StartAngle = (frandom() - 1.0f) * 2.0f * pi;
 	}
 }
@@ -52,16 +52,16 @@ void CDamageInd::OnRender()
 	{
 		if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
 		{
-			const IDemoPlayer::CInfo *pInfo = DemoPlayer()->BaseInfo();
+			const IDemoPlayer::CInfo* pInfo = DemoPlayer()->BaseInfo();
 			if(pInfo->m_Paused)
-				m_aItems[i].m_StartTime += Client()->LocalTime()-s_LastLocalTime;
+				m_aItems[i].m_StartTime += Client()->LocalTime() - s_LastLocalTime;
 			else
-				m_aItems[i].m_StartTime += (Client()->LocalTime()-s_LastLocalTime)*(1.0f-pInfo->m_Speed);
+				m_aItems[i].m_StartTime += (Client()->LocalTime() - s_LastLocalTime) * (1.0f - pInfo->m_Speed);
 		}
 		else
 		{
-			if(m_pClient->m_Snap.m_pGameData && m_pClient->m_Snap.m_pGameData->m_GameStateFlags&GAMESTATEFLAG_PAUSED)
-				m_aItems[i].m_StartTime += Client()->LocalTime()-s_LastLocalTime;
+			if(m_pClient->m_Snap.m_pGameData && m_pClient->m_Snap.m_pGameData->m_GameStateFlags & GAMESTATEFLAG_PAUSED)
+				m_aItems[i].m_StartTime += Client()->LocalTime() - s_LastLocalTime;
 		}
 
 		float Life = 0.75f - (Client()->LocalTime() - m_aItems[i].m_StartTime);
@@ -69,9 +69,9 @@ void CDamageInd::OnRender()
 			DestroyI(&m_aItems[i]);
 		else
 		{
-			vec2 Pos = mix(m_aItems[i].m_Pos+m_aItems[i].m_Dir*75.0f, m_aItems[i].m_Pos, clamp((Life-0.60f)/0.15f, 0.0f, 1.0f));
+			vec2 Pos = mix(m_aItems[i].m_Pos + m_aItems[i].m_Dir * 75.0f, m_aItems[i].m_Pos, clamp((Life - 0.60f) / 0.15f, 0.0f, 1.0f));
 			const float Alpha = clamp(Life * 10.0f, 0.0f, 1.0f); // 0.1 -> 0.0 == 1.0 -> 0.0
-			Graphics()->SetColor(1.0f*Alpha, 1.0f*Alpha, 1.0f*Alpha, Alpha);
+			Graphics()->SetColor(1.0f * Alpha, 1.0f * Alpha, 1.0f * Alpha, Alpha);
 			Graphics()->QuadsSetRotation(m_aItems[i].m_StartAngle + Life * 2.0f);
 			RenderTools()->SelectSprite(SPRITE_STAR1);
 			RenderTools()->DrawSprite(Pos.x, Pos.y, 48.0f);

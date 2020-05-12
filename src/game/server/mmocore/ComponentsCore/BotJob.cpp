@@ -311,6 +311,7 @@ void BotJob::LoadMobsBots(const char* pWhereLocalWorld)
 		MobBot[MobID].Level = RES->getInt("Level");
 		MobBot[MobID].RespawnTick = RES->getInt("Respawn");
 		MobBot[MobID].BotID = BotID;
+		str_copy(MobBot[MobID].Effect, RES->getString("Effect").c_str(), sizeof(MobBot[MobID].Effect));
 
 		char aBuf[32];
 		for(int i = 0; i < 6; i++)
