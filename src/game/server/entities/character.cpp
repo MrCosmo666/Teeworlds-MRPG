@@ -997,6 +997,12 @@ void CCharacter::HandleTunning()
 	}
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
 	{
+		if(m_pPlayer->CheckEffect("Fire"))
+		{
+			const int ExplodeDamageSize = kurosio::translate_to_procent_rest(m_pPlayer->GetStartHealth(), 3);
+			GS()->CreateExplosion(m_Core.m_Pos, m_pPlayer->GetCID(), WEAPON_GRENADE, 0);
+			TakeDamage(vec2(0, 0), ExplodeDamageSize, m_pPlayer->GetCID(), WEAPON_SELF);
+		}
 		if(m_pPlayer->CheckEffect("Poison"))
 		{
 			const int PoisonSize = kurosio::translate_to_procent_rest(m_pPlayer->GetStartHealth(), 3);
