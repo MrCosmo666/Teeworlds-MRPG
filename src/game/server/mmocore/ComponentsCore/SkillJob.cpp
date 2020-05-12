@@ -24,8 +24,7 @@ void SkillJob::OnInit()
 		str_copy(SkillData[SkillID].m_SkillName, RES->getString("SkillName").c_str(), sizeof(SkillData[SkillID].m_SkillName));
 		str_copy(SkillData[SkillID].m_SkillDesc, RES->getString("SkillDesc").c_str(), sizeof(SkillData[SkillID].m_SkillDesc));
 		str_copy(SkillData[SkillID].m_SkillBonusInfo, RES->getString("BonusInfo").c_str(), sizeof(SkillData[SkillID].m_SkillBonusInfo));
-		SkillData[SkillID].m_ManaCost = (int)RES->getInt("ManaCost");
-		SkillData[SkillID].m_ManaSupport = (int)RES->getInt("ManaSupport");
+		SkillData[SkillID].m_ManaProcent = (int)RES->getInt("ManaCost");
 		SkillData[SkillID].m_SkillPrice = (int)RES->getInt("Price");
 		SkillData[SkillID].m_SkillMaxLevel = (int)RES->getInt("SkillMaxLevel");
 		SkillData[SkillID].m_BonusCount = (int)RES->getInt("BonusCount");
@@ -170,7 +169,7 @@ void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 	}
 
 	// если обычный скилл
-	GS()->AVM(ClientID, "null", NOPE, HideID, "Mana required (first use -{INT} support -{INT})", &SkillData[SkillID].m_ManaCost, &SkillData[SkillID].m_ManaSupport);
+	GS()->AVM(ClientID, "null", NOPE, HideID, "Mana required (-{INT}%)", &SkillData[SkillID].m_ManaProcent);
 	GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", SkillData[SkillID].m_SkillDesc);
 	GS()->AVM(ClientID, "null", NOPE, HideID, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].m_SkillBonusInfo);
 	if (LevelOwn >= 1)
@@ -219,12 +218,11 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 
 	// проверяем ману
 	CCharacter *pChr = pPlayer->GetCharacter();
-	const int ManaPrice = SkillData[SkillID].m_ManaCost;
+	const int ManaPrice = SkillData[SkillID].m_ManaProcent;
 	if(ManaPrice > 0 && pChr->CheckFailMana(ManaPrice))
 		return true;
 
 	const int ClientID = pPlayer->GetCID();
-	const int ManaUsePrice = SkillData[SkillID].m_ManaSupport;
 	const int SkillLevel = Skill[ClientID][SkillID].m_SkillLevel;
 
 	// скилл турель здоровья
@@ -237,7 +235,7 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 				continue;
 			pHh->Reset();
 		}
-		new CHealthHealer(&GS()->m_World, pPlayer, SkillLevel, ManaUsePrice, pChr->m_Core.m_Pos);
+		new CHealthHealer(&GS()->m_World, pPlayer, SkillLevel, pChr->m_Core.m_Pos);
 	}
 
 	// скилл турель гравитации
@@ -248,10 +246,9 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 		{
 			if(pHh->m_pPlayer->GetCID() != pPlayer->GetCID()) 
 				continue;
-
 			pHh->Reset();
 		}
-		new CSleepyGravity(&GS()->m_World, pPlayer, SkillLevel, ManaUsePrice, pChr->m_Core.m_Pos);
+		new CSleepyGravity(&GS()->m_World, pPlayer, SkillLevel, pChr->m_Core.m_Pos);
 	}
 
 	return false;

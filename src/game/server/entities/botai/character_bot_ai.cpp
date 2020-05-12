@@ -665,7 +665,7 @@ bool CCharacterBotAI::FunctionNurseNPC()
 		m_LatestInput.m_TargetX = m_Input.m_TargetX;
 		m_LatestInput.m_TargetY = m_Input.m_TargetX;
 
-		const int Health = clamp(pFind->GetStartHealth() / 20, 1, pFind->GetStartHealth());
+		const int Health = pFind->GetStartHealth() / 20;
 		vec2 DrawPosition = vec2(pFind->GetCharacter()->m_Core.m_Pos.x, pFind->GetCharacter()->m_Core.m_Pos.y - 90.0f);
 		str_format(aBuf, sizeof(aBuf), "%dHP", Health);
 		GS()->CreateText(NULL, false, DrawPosition, vec2(0, 0), 40, aBuf, GS()->GetWorldID());

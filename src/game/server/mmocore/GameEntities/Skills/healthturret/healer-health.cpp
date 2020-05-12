@@ -6,14 +6,13 @@
 #include "healer-health.h"
 #include "hearth.h"
 
-CHealthHealer::CHealthHealer(CGameWorld *pGameWorld, CPlayer *pPlayer, int SkillLevel, int ManaUseCost, vec2 Pos)
+CHealthHealer::CHealthHealer(CGameWorld *pGameWorld, CPlayer *pPlayer, int SkillLevel, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTYPE_SKILLTURRETHEART, Pos)
 {
 	// переданные аргументы
 	m_Pos = Pos;
 	m_pPlayer = pPlayer;
 	m_SkillLevel = SkillLevel;
-	m_ManaUseCost = ManaUseCost;
 
 	// обычные настройки без передачи аргументов
 	m_LifeSpan = 16*Server()->TickSpeed();
@@ -58,10 +57,7 @@ void CHealthHealer::Tick()
 		return;
 	}
 	
-	// все тики что нужны тут
 	m_LifeSpan--;
-
-	// перезарядка
 	if(m_ReloadTick)
 	{
 		m_ReloadTick--;
@@ -72,14 +68,16 @@ void CHealthHealer::Tick()
 	bool ShowHealthRestore = false;
 	for(CCharacter *p = (CCharacter*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); p; p = (CCharacter *)p->TypeNext())
 	{
-		if(!p || p->GetPlayer()->IsBot() || distance(p->m_Core.m_Pos, m_Pos) > 520.0f) continue;
+		if(!p || p->GetPlayer()->IsBot() || distance(p->m_Core.m_Pos, m_Pos) > 520.0f) 
+			continue;
 		
 		// показать восстановление
-		int Health = 5 * m_SkillLevel;
+		const int Health = 5 * m_SkillLevel;
 		if(!ShowHealthRestore)
 		{
-			std::string Text = std::to_string(Health) + "HP";
-			GS()->CreateText(NULL, false, m_Pos, vec2(0,0), 40, Text.c_str(), GS()->GetWorldID());
+			char aBuf[16];
+			str_format(aBuf, sizeof(aBuf), "%dHP", Health);
+			GS()->CreateText(NULL, false, m_Pos, vec2(0,0), 40, aBuf, GS()->GetWorldID());
 			ShowHealthRestore = true;
 		}
 
@@ -89,13 +87,6 @@ void CHealthHealer::Tick()
 
 	// устанавливаем перезарядку
 	m_ReloadTick = 2*Server()->TickSpeed();
-
-	// если на дальнейшее использование нет маны
-	if(m_pPlayer->GetCharacter()->CheckFailMana(m_ManaUseCost))
-	{
-		Reset();
-		return;
-	}
 }
 
 void CHealthHealer::Snap(int SnappingClient)

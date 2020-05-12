@@ -100,6 +100,7 @@ public:
 	virtual int GetBotSub()                                              { return -1; };
 	virtual int IsActiveSnappingBot(int SnappingClient)					 { return 2; };
 	virtual	int GetHealth()                                              { return Acc().TempHealth;};
+	virtual	int GetMana()                                                { return Acc().TempMana;};
 	virtual void SetDungeonAllowedSpawn(bool Spawn)                      { return; };
 	virtual void UpdateTempData(int Health, int Mana);
 
@@ -108,7 +109,7 @@ public:
 	virtual int GetStartHealth();
 	virtual int GetAttributeCount(int BonusID, bool Really = false);
 	virtual void Snap(int SnappingClient);
-	virtual int GetItemEquip(int EquipID, int SkipItemID = -1) const;
+	virtual int GetEquippedItem(int EquipID, int SkipItemID = -1) const;
 	
 private:
 	virtual void TryRespawn();

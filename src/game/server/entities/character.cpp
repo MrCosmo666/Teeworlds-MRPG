@@ -41,9 +41,7 @@ MACRO_ALLOC_POOL_ID_IMPL(CCharacter, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
 CCharacter::CCharacter(CGameWorld *pWorld)
 : CEntity(pWorld, CGameWorld::ENTTYPE_CHARACTER, vec2(0, 0), ms_PhysSize)
 {
-	// another function
 	m_pHelper = new TileHandle(this);
-
 	m_DoorHit = false;
 	m_Health = 0;
 	m_Armor = 0;
@@ -53,10 +51,9 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 CCharacter::~CCharacter()
 {
 	delete m_pHelper;
-	GS()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCID()] = NULL;
+	GS()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCID()] = nullptr;
 }
 
-// Получить оформление для SnapFull
 int CCharacter::GetSnapFullID() const
 {
 	return m_pPlayer->GetCID() * SNAPPLAYER;
@@ -102,7 +99,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 		GS()->VResetVotes(m_pPlayer->GetCID(), m_pPlayer->m_OpenVoteMenu);
 	}
 
-	bool Spawned = GS()->m_pController->OnCharacterSpawn(this);
+	const bool Spawned = GS()->m_pController->OnCharacterSpawn(this);
 	return Spawned;
 }
 
@@ -195,7 +192,7 @@ bool CCharacter::DecoInteractive()
 
 		if (InteractiveType == DECOTYPE_HOUSE)
 		{
-			int HouseID = GS()->Mmo()->House()->PlayerHouseID(m_pPlayer);
+			const int HouseID = GS()->Mmo()->House()->PlayerHouseID(m_pPlayer);
 			if (GS()->Mmo()->House()->AddDecorationHouse(DecoID, HouseID, m_pHelper->MousePos()))
 			{
 				GS()->Chat(ClientID, "You added {STR}, to your house!", GS()->GetItemInfo(DecoID).GetName(m_pPlayer));
@@ -206,7 +203,7 @@ bool CCharacter::DecoInteractive()
 		}
 		else if (InteractiveType == DECOTYPE_GUILD_HOUSE)
 		{
-			int GuildID = m_pPlayer->Acc().GuildID;
+			const int GuildID = m_pPlayer->Acc().GuildID;
 			if (GS()->Mmo()->Member()->AddDecorationHouse(DecoID, GuildID, m_pHelper->MousePos()))
 			{
 				GS()->Chat(ClientID, "You added {STR}, to your guild house!", GS()->GetItemInfo(DecoID).GetName(m_pPlayer));
@@ -230,13 +227,10 @@ void CCharacter::FireWeapon()
 		return;
 
 	DoWeaponSwitch();
-	vec2 Direction = normalize(vec2(m_LatestInput.m_TargetX, m_LatestInput.m_TargetY));
-
 	bool FullAuto = false;
 	if(GS()->Mmo()->Skills()->GetSkillLevel(m_pPlayer->GetCID(), SkillMasterWeapon))
 		FullAuto = true;
 
-	// check if we gonna fire
 	bool WillFire = false;
 	if(CountInput(m_LatestPrevInput.m_Fire, m_LatestInput.m_Fire).m_Presses)
 		WillFire = true;
@@ -247,27 +241,24 @@ void CCharacter::FireWeapon()
 	if(!WillFire)
 		return;
 
-	bool IsBot = m_pPlayer->IsBot();
-	int SubBotID = GetPlayer()->GetBotSub();
+	const bool IsBot = m_pPlayer->IsBot();
+	const int SubBotID = GetPlayer()->GetBotSub();
 	if(!IsBot)
 	{
 		if(DecoInteractive())
 			return;
 
-		if(m_pPlayer->GetItemEquip(m_ActiveWeapon+EQUIP_HAMMER) == -1)
+		if(m_pPlayer->GetEquippedItem(m_ActiveWeapon+EQUIP_HAMMER) == -1)
 		{
 			GS()->SBL(m_pPlayer->GetCID(), BroadcastPriority::BROADCAST_GAME_WARNING, 150, "You need buy this weapon or module and equip!");
 			m_ReloadTimer = 125 * Server()->TickSpeed() / 1000;
-
 			if(m_ActiveWeapon == WEAPON_HAMMER)
 				GS()->TakeItemCharacter(m_pPlayer->GetCID());
 			return;
 		}
 
-		// check for ammo
 		if(!m_aWeapons[m_ActiveWeapon].m_Ammo)
 		{
-			// 125ms is a magical limit of how fast a human can click
 			m_ReloadTimer = 125 * Server()->TickSpeed() / 1000;
 			if(m_LastNoAmmoSound+Server()->TickSpeed() <= Server()->Tick())
 			{
@@ -278,6 +269,7 @@ void CCharacter::FireWeapon()
 		}
 	}
 
+	vec2 Direction = normalize(vec2(m_LatestInput.m_TargetX, m_LatestInput.m_TargetY));
 	vec2 ProjStartPos = m_Pos+Direction*GetProximityRadius()*0.75f;
 	switch(m_ActiveWeapon)
 	{
@@ -289,11 +281,11 @@ void CCharacter::FireWeapon()
 				return;
 			}
 
-			float PlayerRadius = (float)m_pPlayer->GetAttributeCount(Stats::StHammerPower, true);
-			float Radius = clamp(PlayerRadius / 5.0f, 1.2f, 7.0f);
-			
 			bool Hits = false;
+			const float PlayerRadius = (float)m_pPlayer->GetAttributeCount(Stats::StHammerPower, true);
+			const float Radius = clamp(PlayerRadius / 5.0f, 1.2f, 7.0f);
 			GS()->CreateSound(m_Pos, SOUND_HAMMER_FIRE);
+			
 			CCharacter *apEnts[MAX_CLIENTS];
 			int Num = GS()->m_World.FindEntities(ProjStartPos, GetProximityRadius()* Radius, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
 			for (int i = 0; i < Num; ++i)
@@ -314,18 +306,15 @@ void CCharacter::FireWeapon()
 					continue;
 
 				if(length(pTarget->m_Pos-ProjStartPos) > 0.0f)
-					GS()->CreateHammerHit(pTarget->m_Pos-normalize(pTarget->m_Pos-ProjStartPos)*GetProximityRadius()*0.5f);
+					GS()->CreateHammerHit(pTarget->m_Pos-normalize(pTarget->m_Pos-ProjStartPos) * GetProximityRadius() * Radius);
 				else
 					GS()->CreateHammerHit(ProjStartPos);
 
-				vec2 Dir;
+				vec2 Dir = vec2(0.f, -1.f);
 				if (length(pTarget->m_Pos - m_Pos) > 0.0f)
 					Dir = normalize(pTarget->m_Pos - m_Pos);
-				else
-					Dir = vec2(0.f, -1.f);
 
-				pTarget->TakeDamage(vec2(0.f, -1.f) + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f, Dir*-1, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage,
-					m_pPlayer->GetCID(), m_ActiveWeapon);
+				pTarget->TakeDamage(vec2(0.f, -1.f) + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f, Dir*-1, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage, m_pPlayer->GetCID(), m_ActiveWeapon);
 				Hits = true;
 			}
 			if(Hits) 
@@ -346,11 +335,8 @@ void CCharacter::FireWeapon()
 
 		case WEAPON_SHOTGUN:
 		{
-			int EnchantSpread = IsBot ? 2+BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadShotgun);
-			int ShotSpread = 1+EnchantSpread;
-			if(ShotSpread > 36)
-				ShotSpread = 36;
-
+			const int EnchantSpread = IsBot ? 2+BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadShotgun);
+			const int ShotSpread = clamp(1+EnchantSpread, 1, 36);
 			CMsgPacker Msg(NETMSGTYPE_SV_EXTRAPROJECTILE);
 			Msg.AddInt(ShotSpread);
 			for (int i = 1; i <= ShotSpread; ++i)
@@ -370,11 +356,8 @@ void CCharacter::FireWeapon()
 
 		case WEAPON_GRENADE:
 		{
-			int EnchantSpread = IsBot ? BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadGrenade);
-			int ShotSpread = 1+EnchantSpread;
-			if(ShotSpread > 21)
-				ShotSpread = 21;
-			
+			const int EnchantSpread = IsBot ? BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadGrenade);
+			const int ShotSpread = clamp(1 + EnchantSpread, 1, 21);
 			CMsgPacker Msg(NETMSGTYPE_SV_EXTRAPROJECTILE);
 			Msg.AddInt(ShotSpread);
 			for (int i = 1; i < ShotSpread; ++i)
@@ -391,11 +374,8 @@ void CCharacter::FireWeapon()
 
 		case WEAPON_LASER:
 		{
-			int EnchantSpread = IsBot ? BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadRifle);
-			int ShotSpread = 1+EnchantSpread;
-			if(ShotSpread > 36)
-				ShotSpread = 36;
-
+			const int EnchantSpread = IsBot ? 2 + BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadRifle);
+			const int ShotSpread = clamp(1 + EnchantSpread, 1, 36);
 			for (int i = 1; i < ShotSpread; ++i)
 			{
 				float Spreading = ((0.0058945f*(9.0f*ShotSpread)/2)) - (0.0058945f*(9.0f*i));
@@ -414,26 +394,22 @@ void CCharacter::FireWeapon()
 
 	if(!m_ReloadTimer)
 	{
-		int ReloadArt = 0;
-		ReloadArt = m_pPlayer->GetAttributeCount(Stats::StDexterity);
+		int ReloadArt = m_pPlayer->GetAttributeCount(Stats::StDexterity);
 		m_ReloadTimer = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Firedelay * Server()->TickSpeed() / (1000 + ReloadArt);
 	}
 }
 
 void CCharacter::HandleWeapons()
 {
-	// check reload timer
 	if(m_ReloadTimer)
 	{
 		m_ReloadTimer--;
 		return;
 	}
 
-	// fire Weapon, if wanted
 	FireWeapon();
 
-	// ammo regen
-	int AmmoRegenTime = clamp(5000-m_AmmoRegen, 1000, 10000);
+	const int AmmoRegenTime = clamp(5000-m_AmmoRegen, 1000, 10000);
 	if(AmmoRegenTime && m_aWeapons[m_ActiveWeapon].m_Ammo >= 0)
 	{
 		if (m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart < 0)
@@ -441,32 +417,31 @@ void CCharacter::HandleWeapons()
 
 		if ((Server()->Tick() - m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart) >= AmmoRegenTime * Server()->TickSpeed() / 1000)
 		{
-			int RealAmmo = 10 + m_pPlayer->GetAttributeCount(Stats::StAmmo);
+			const int RealAmmo = 10 + m_pPlayer->GetAttributeCount(Stats::StAmmo);
 			m_aWeapons[m_ActiveWeapon].m_Ammo = min(m_aWeapons[m_ActiveWeapon].m_Ammo + 1, RealAmmo);
 			m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart = -1;
 		}
 	}
-	return;
 }
 
 void CCharacter::CreateQuestsStep(int QuestID)
 {
-	int ClientID = m_pPlayer->GetCID();
+	const int ClientID = m_pPlayer->GetCID();
 	vec2 Pos = GS()->Mmo()->WorldSwap()->GetPositionQuestBot(ClientID, QuestID);
 	if (QuestJob::Quests[ClientID].find(QuestID) == QuestJob::Quests[ClientID].end() || (Pos.x == 0.0f && Pos.y == 0.0f))
 		return;
 
-	int Progress = QuestJob::Quests[ClientID][QuestID].Progress;
+	const int Progress = QuestJob::Quests[ClientID][QuestID].Progress;
 	new CQuestPathFinder(GameWorld(), m_Core.m_Pos, ClientID, QuestID, Progress, Pos);
 }
 
 bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)
 {
-	int RealAmmo = 10 + m_pPlayer->GetAttributeCount(Stats::StAmmo);
+	const int RealAmmo = 10 + m_pPlayer->GetAttributeCount(Stats::StAmmo);
 	if(m_aWeapons[Weapon].m_Ammo < RealAmmo || !m_aWeapons[Weapon].m_Got)
 	{
 		m_aWeapons[Weapon].m_Got = true;
-		m_aWeapons[Weapon].m_Ammo = min(RealAmmo, GiveAmmo);
+		m_aWeapons[Weapon].m_Ammo = min(GiveAmmo, RealAmmo);
 		return true;
 	}
 	return false;
@@ -510,7 +485,6 @@ void CCharacter::OnDirectInput(CNetObj_PlayerInput *pNewInput)
 		HandleWeaponSwitch();
 		FireWeapon();
 	}
-
 	mem_copy(&m_LatestPrevInput, &m_LatestInput, sizeof(m_LatestInput));
 }
 
@@ -532,8 +506,6 @@ void CCharacter::Tick()
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true, &m_pPlayer->m_NextTuningParams);
 	m_pPlayer->UpdateTempData(m_Health, m_Mana);
-
-	// handle death-tiles and leaving gamelayer
 	if(GameLayerClipped(m_Pos))
 	{
 		Die(m_pPlayer->GetCID(), WEAPON_SELF);
@@ -545,14 +517,12 @@ void CCharacter::Tick()
 		m_OldPos = m_Core.m_Pos;
 	}
 
-	// - - - - - - - - - - - -
 	// запретить дальше НПС и Квестовым
 	if (m_pPlayer->IsBot() && m_pPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB)
 		return;
 
 	HandleWeapons();
 
-	// - - - - - - - - - - - -
 	// запретить дальше Мобам
 	if (m_pPlayer->IsBot() || IsLockedWorld())
 		return;
@@ -577,7 +547,6 @@ void CCharacter::TickDefered()
 		m_DoorHit = false;
 	}
 
-	// если бот то отправляем мало всего по кору
 	if(m_pPlayer->IsBot())
 	{
 		m_Core.Move();
@@ -641,27 +610,39 @@ void CCharacter::TickPaused()
 
 bool CCharacter::IncreaseHealth(int Amount)
 {
-	if(m_Health >= m_pPlayer->GetStartHealth()) return false;
+	if(m_Health >= m_pPlayer->GetStartHealth()) 
+		return false;
 
-	int m_OldHealth = m_Health;
+	const int OldHealth = m_Health;
+	Amount = clamp(Amount, 1, Amount);
 	m_Health = clamp(m_Health+Amount, 0, m_pPlayer->GetStartHealth());
 	m_pPlayer->ShowInformationStats();
 
 	if(IsAlive())
 	{
-		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "%d Health", m_Health-m_OldHealth);
+		char aBuf[32];
+		str_format(aBuf, sizeof(aBuf), "%d Health", m_Health - OldHealth);
 		GS()->SendMmoPotion(m_Core.m_Pos, aBuf, true);
 	}
 	return true;
 }
 
-bool CCharacter::IncreaseArmor(int Amount)
+bool CCharacter::IncreaseMana(int Amount)
 {
-	if(m_Armor >= 10)
+	if(m_Mana >= m_pPlayer->GetStartMana())
 		return false;
-	m_Armor = clamp(m_Armor+Amount, 0, 10);
+
+	const int OldMana = m_Mana;
+	Amount = clamp(Amount, 1, Amount);
+	m_Mana = clamp(m_Mana + Amount, 0, m_pPlayer->GetStartMana());
 	m_pPlayer->ShowInformationStats();
+
+	if(IsAlive())
+	{
+		char aBuf[32];
+		str_format(aBuf, sizeof(aBuf), "%d Mana", m_Mana - OldMana);
+		GS()->SendMmoPotion(m_Core.m_Pos, aBuf, true);
+	}
 	return true;
 }
 
@@ -703,62 +684,46 @@ void CCharacter::Die(int Killer, int Weapon)
 
 bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
 {
-	// если нет человека от которого поступает урон
-	if (From < 0 || From >= MAX_CLIENTS || !GS()->m_apPlayers[From])
-	{
-		m_Core.m_Vel += Force;
-		return false;
-	}
-
-	CPlayer* pFrom = GS()->m_apPlayers[From];
-	if((pFrom->GetCharacter() && pFrom->GetCharacter()->m_NoAllowDamage) || m_NoAllowDamage)
-		return false;
-
 	m_Core.m_Vel += Force;
-	if (length(m_Core.m_Vel) > 32.0f)
+	if(length(m_Core.m_Vel) > 32.0f)
 		m_Core.m_Vel = normalize(m_Core.m_Vel) * 32.0f;
 
-	// если зона не PVP
-	if(!GS()->IsAllowedPVP() && !pFrom->IsBot() && !m_pPlayer->IsBot())
+	CPlayer* pFrom = GS()->GetPlayer(From);
+	if (!pFrom || (pFrom->GetCharacter() && pFrom->GetCharacter()->m_NoAllowDamage) || m_NoAllowDamage 
+		|| !GS()->IsAllowedPVP() && !pFrom->IsBot() && !m_pPlayer->IsBot())
 		return false;
 
-	// если здоровья больше чем твое начальное
 	if (m_Health > m_pPlayer->GetStartHealth())
 	{
 		GS()->Chat(m_pPlayer->GetCID(), "Your health has been lowered.");
 		GS()->Chat(m_pPlayer->GetCID(), "You may have removed equipment that gave it away.");
 		m_Health = m_pPlayer->GetStartHealth();
 	}
+	Dmg = (From == m_pPlayer->GetCID() ? max(1, Dmg/2) : max(1, Dmg));
 
-	if(From == m_pPlayer->GetCID())
-		Dmg = max(1, Dmg/2);
-	else
-		Dmg = max(1, Dmg);
 
 	if(From != m_pPlayer->GetCID() && pFrom->GetCharacter())
 	{
-		// Обычный урон сила урона
-		int EnchantBonus = pFrom->GetAttributeCount(Stats::StStrength, true);
-		Dmg += EnchantBonus;
-
-		// Добавить силу к оружию		
-		if (pFrom->GetCharacter()->m_ActiveWeapon == WEAPON_GUN)
+		if(pFrom->GetCharacter()->m_ActiveWeapon == WEAPON_GUN)
 			Dmg += pFrom->GetAttributeCount(Stats::StGunPower, true);
-		else if (pFrom->GetCharacter()->m_ActiveWeapon == WEAPON_SHOTGUN)
+		else if(pFrom->GetCharacter()->m_ActiveWeapon == WEAPON_SHOTGUN)
 			Dmg += pFrom->GetAttributeCount(Stats::StShotgunPower, true);
-		else if (pFrom->GetCharacter()->m_ActiveWeapon == WEAPON_GRENADE)
+		else if(pFrom->GetCharacter()->m_ActiveWeapon == WEAPON_GRENADE)
 			Dmg += pFrom->GetAttributeCount(Stats::StGrenadePower, true);
-		else if (pFrom->GetCharacter()->m_ActiveWeapon == WEAPON_LASER)
+		else if(pFrom->GetCharacter()->m_ActiveWeapon == WEAPON_LASER)
 			Dmg += pFrom->GetAttributeCount(Stats::StRiflePower, true);
-		else 
+		else
 			Dmg += pFrom->GetAttributeCount(Stats::StHammerPower, true);
 
+		const int EnchantBonus = pFrom->GetAttributeCount(Stats::StStrength, true);
+		Dmg += EnchantBonus;
+	
 		// Vampirism пополнить здоровье
 		int TempInt = pFrom->GetAttributeCount(Stats::StVampirism, true);
 		if(rand()%5000 < clamp(TempInt, 100, 3000))
 		{
 			pFrom->GetCharacter()->IncreaseHealth(max(1, Dmg/2));
-			GS()->SendEmoticon(From, 3);
+			GS()->SendEmoticon(From, EMOTICON_DROP);
 		}
 		
 		// lucky пропустить урон
@@ -766,24 +731,25 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 		if(rand()%5000 < clamp(TempInt, 100, 3000))
 		{
 			Dmg = 0;
-			GS()->SendEmoticon(From, 2);
+			GS()->SendEmoticon(From, EMOTICON_HEARTS);
 		}
 		
 		// Критический урон
 		TempInt = pFrom->GetAttributeCount(Stats::StDirectCriticalHit, true);
 		if(rand()%5000 < clamp(TempInt, 100, 2200))
 		{
-			int CritDamage = pFrom->GetAttributeCount(Stats::StCriticalHit, true);
+			const int CritDamage = pFrom->GetAttributeCount(Stats::StCriticalHit, true);
 			Dmg = Dmg*2+(CritDamage+rand()%9);
-			GS()->SendEmoticon(From, 1);
 			pFrom->GetCharacter()->SetEmote(EMOTE_ANGRY, 2);
+			GS()->SendEmoticon(From, EMOTICON_EXCLAMATION);
 		}
 
 		// Фикс быстрого уйбиства спредом игроков
 		if(pFrom->GetCharacter()->m_ActiveWeapon != WEAPON_HAMMER && 
-			distance(m_Core.m_Pos, pFrom->GetCharacter()->m_Core.m_Pos) < ms_PhysSize+90)
+			distance(m_Core.m_Pos, pFrom->GetCharacter()->m_Core.m_Pos) < ms_PhysSize+90.0f)
 			Dmg = max(1, Dmg/3);
 
+		// TODO: Impl it
 		GiveRandomMobEffect(From);
 	}
 
@@ -800,11 +766,9 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 	if(From != m_pPlayer->GetCID())
 		GS()->CreatePlayerSound(From, SOUND_HIT);
 
-	// - - - - - - - - - -
 	// перекинуть на BotAI
 	if (m_pPlayer->IsBot())
 		return (bool)(m_Health <= 0);
-	// - - - - - - - - - -
 
 	// автозелье здоровья
 	if(m_Health <= m_pPlayer->GetStartHealth()/3)
@@ -879,8 +843,9 @@ void CCharacter::Snap(int SnappingClient)
 	if(m_pPlayer->GetCID() == SnappingClient || SnappingClient == -1)
 	{
 		const float HealthTranslate = (float)m_Health / (float)m_pPlayer->GetStartHealth() * 10.0f;
+		const float ManaTranslate = (float)m_Mana / (float)m_pPlayer->GetStartMana() * 10.0f;
 		pCharacter->m_Health = m_Health <= 0 ? 0 : clamp((int)HealthTranslate, 1, 10);
-		pCharacter->m_Armor = m_Armor <= 0 ? 0 : clamp((int)HealthTranslate, 1, 10);
+		pCharacter->m_Armor = m_Mana <= 0 ? 0 : clamp((int)ManaTranslate, 1, 10);
 		if(m_aWeapons[m_ActiveWeapon].m_Ammo > 0)
 		{
 			const int StartAmmo = 10 + m_pPlayer->GetAttributeCount(Stats::StAmmo);
@@ -950,12 +915,7 @@ void CCharacter::GiveRandomMobEffect(int FromID)
 	if(!pPlayer)
 		return;
 
-	switch(pPlayer->GetBotID())
-	{
-		case 18: // Robber
-			m_pPlayer->GiveEffect("Poison", 3, 5);
-		break;
-	}
+	m_pPlayer->GiveEffect("Poison", 3, 5);
 }
 
 bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)
@@ -1025,7 +985,7 @@ void CCharacter::HandleTunning()
 		return;
 
 	// режим полета
-	if(m_pPlayer->m_Flymode && m_pPlayer->GetItemEquip(EQUIP_WINGS) > 0)
+	if(m_pPlayer->m_Flymode && m_pPlayer->GetEquippedItem(EQUIP_WINGS) > 0)
 	{
 		pTuningParams->m_Gravity = 0.00f;
 		pTuningParams->m_HookLength = 700.0f;
@@ -1041,14 +1001,11 @@ void CCharacter::HandleAuthedPlayer()
 	if(!IsAlive() || !m_pPlayer->IsAuthed())
 		return;
 
-	if(Server()->Tick() % Server()->TickSpeed() == 0)
+	// мана прибавка
+	if(m_Mana < m_pPlayer->GetStartMana() && Server()->Tick() % (Server()->TickSpeed() * 3) == 0)
 	{
-		// мана прибавка
-		if(m_Mana < m_pPlayer->GetStartMana())
-		{
-			m_Mana += clamp(m_pPlayer->GetStartMana() / 20, 1, m_pPlayer->GetStartMana() / 20);
-			m_pPlayer->ShowInformationStats();
-		}
+		IncreaseMana(m_pPlayer->GetStartMana() / 20);
+		m_pPlayer->ShowInformationStats();
 	}
 }
 

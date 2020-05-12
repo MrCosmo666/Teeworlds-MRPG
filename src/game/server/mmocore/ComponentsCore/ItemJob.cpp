@@ -527,7 +527,7 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		const char* pType[NUM_EQUIPS] = { "Wings", "Hammer", "Gun", "Shotgun", "Grenade", "Rifle", "Discord", "Pickaxe" };
 		for (int i = EQUIP_WINGS; i < NUM_EQUIPS; i++)
 		{
-			const int ItemID = pPlayer->GetItemEquip(i);
+			const int ItemID = pPlayer->GetEquippedItem(i);
 			ItemJob::InventoryItem& pPlayerItem = pPlayer->GetItem(ItemID);
 			if (ItemID <= 0 || !pPlayerItem.IsEquipped())
 			{
@@ -663,7 +663,7 @@ bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 	}
 
 	// проверить пустой слот если да тогда одеть предмет
-	const bool AutoEquip = (Info().Type == ItemType::TYPE_EQUIP && m_pPlayer->GetItemEquip(Info().Function) <= 0) || (Info().Function == FUNCTION_SETTINGS && Info().IsEnchantable());
+	const bool AutoEquip = (Info().Type == ItemType::TYPE_EQUIP && m_pPlayer->GetEquippedItem(Info().Function) <= 0) || (Info().Function == FUNCTION_SETTINGS && Info().IsEnchantable());
 	if(AutoEquip)
 	{
 		if(Info().Function == EQUIP_DISCORD)  
@@ -742,13 +742,13 @@ bool ItemJob::ClassItems::Equip()
 	if(Info().Type == ItemType::TYPE_EQUIP)
 	{
 		const int EquipID = Info().Function;
-		int EquipItemID = m_pPlayer->GetItemEquip(EquipID, itemid_);
+		int EquipItemID = m_pPlayer->GetEquippedItem(EquipID, itemid_);
 		while (EquipItemID >= 1)
 		{
 			ItemJob::InventoryItem &EquipItem = m_pPlayer->GetItem(EquipItemID);
 			EquipItem.Settings = 0;
 			EquipItem.SetSettings(0);
-			EquipItemID = m_pPlayer->GetItemEquip(EquipID, itemid_);
+			EquipItemID = m_pPlayer->GetEquippedItem(EquipID, itemid_);
 		}
 	}
 

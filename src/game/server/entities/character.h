@@ -68,7 +68,7 @@ public:
 	void SetEmote(int Emote, int Sec);
 	void SetWeapon(int W);
 	bool IncreaseHealth(int Amount);
-	bool IncreaseArmor(int Amount);
+	bool IncreaseMana(int Amount);
 	bool CheckFailMana(int Mana);
 	int Mana() const { return m_Mana; }
 	int Health() const { return m_Health; }

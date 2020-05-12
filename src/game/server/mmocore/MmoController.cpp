@@ -131,7 +131,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	// сохранение статистики
 	if(Table == SaveType::SAVE_STATS)
 	{
-		const int EquipDiscord = pPlayer->GetItemEquip(EQUIP_DISCORD);
+		const int EquipDiscord = pPlayer->GetEquippedItem(EQUIP_DISCORD);
 		SJK.UD("tw_accounts_data", "Level = '%d', Exp = '%d', DiscordEquip = '%d' WHERE ID = '%d'",
 			pPlayer->Acc().Level, pPlayer->Acc().Exp, EquipDiscord, pPlayer->Acc().AuthID);
 		return;

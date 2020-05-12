@@ -50,8 +50,13 @@ void CPlayer::Tick()
 	if (!Server()->ClientIngame(m_ClientID))
 		return;
 
-	Server()->SetClientScore(m_ClientID, Acc().Level);
+	if(!m_pCharacter && GetTeam() == TEAM_SPECTATORS)
+		m_ViewPos -= vec2(clamp(m_ViewPos.x - m_LatestActivity.m_TargetX, -500.0f, 500.0f), clamp(m_ViewPos.y - m_LatestActivity.m_TargetY, -400.0f, 400.0f));
 
+	if(!IsAuthed())
+		return;
+
+	Server()->SetClientScore(m_ClientID, Acc().Level);
 	{ // вычисление пинга и установка данных клиенту
 		IServer::CClientInfo Info;
 		if (Server()->GetClientInfo(m_ClientID, &Info))
@@ -69,14 +74,9 @@ void CPlayer::Tick()
 		}
 	}
 
-	if (!m_pCharacter && GetTeam() == TEAM_SPECTATORS)
-		m_ViewPos -= vec2(clamp(m_ViewPos.x - m_LatestActivity.m_TargetX, -500.0f, 500.0f), clamp(m_ViewPos.y - m_LatestActivity.m_TargetY, -400.0f, 400.0f));
-
 	// # # # # # # # # # # # # # # # # # # # # # #
 	// # # # # # ДАЛЬШЕ АВТОРИЗОВАННЫМ # # # # # #
 	// # # # # # # # # # # # # # # # # # # # # # #
-	if (!IsAuthed())
-		return;
 
 	if (m_pCharacter && !m_pCharacter->IsAlive())
 	{
@@ -141,7 +141,7 @@ void CPlayer::TickOnlinePlayer()
 		CGS::Interactive[m_ClientID].ParsingLifeTick--;
 		if(!CGS::Interactive[m_ClientID].ParsingLifeTick)
 		{
-			int SaveCID = CGS::Interactive[m_ClientID].ParsingClientID;
+			const int SaveCID = CGS::Interactive[m_ClientID].ParsingClientID;
 			if(SaveCID >= 0 && SaveCID < MAX_PLAYERS && GS()->m_apPlayers[SaveCID])
 			{
 				GS()->Chat(SaveCID, "Your invite {STR} refused {STR}.", CGS::Interactive[m_ClientID].ParsingType, Server()->ClientName(m_ClientID));
@@ -201,7 +201,6 @@ void CPlayer::Snap(int SnappingClient)
 	pPlayerInfo->m_Score = Acc().Level;
 
 	// --------------------- CUSTOM ----------------------
-	// ---------------------------------------------------
 	if(!GS()->CheckClient(SnappingClient) || GetTeam() == TEAM_SPECTATORS || !IsAuthed())
 		return;
 
@@ -217,7 +216,7 @@ void CPlayer::Snap(int SnappingClient)
 	pClientInfo->m_Exp = Acc().Exp;
 	pClientInfo->m_Health = GetHealth();
 	pClientInfo->m_HealthStart = GetStartHealth();
-	pClientInfo->m_Armor = 0;
+	pClientInfo->m_Armor = GetMana();
 
 	dynamic_string Buffer;
 	for (auto& eff : CGS::Effects[m_ClientID])
@@ -490,13 +489,13 @@ int CPlayer::EnchantAttributes(int BonusID) const
 	int BonusAttributes = 0;
 	for (const auto& it : ItemJob::Items[m_ClientID])
 	{
-		if(it.second.Count <= 0 || it.second.Settings <= 0) 
+		if(!it.second.IsEquipped()) 
 			continue;
 		
-		int BonusCount = it.second.Info().GetStatsBonus(BonusID);
+		const int BonusCount = it.second.Info().GetStatsBonus(BonusID);
 		if (BonusCount > 0)
 		{
-			int PlayerBonusCount = BonusCount * (it.second.Enchant + 1);
+			const int PlayerBonusCount = BonusCount * (it.second.Enchant + 1);
 			BonusAttributes += PlayerBonusCount;
 		}
 	}
@@ -513,7 +512,7 @@ int CPlayer::GetStartTeam()
 
 int CPlayer::ExpNeed(int Level)
 {
-	return (int)kurosio::computeExperience(Level);
+	return kurosio::computeExperience(Level);
 }
 
 int CPlayer::GetStartHealth()
@@ -539,7 +538,7 @@ void CPlayer::ShowInformationStats()
 
 	const int Health = GetHealth();
 	const int StartHealth = GetStartHealth();
-	const int Mana = m_pCharacter->Mana();
+	const int Mana = GetMana();
 	const int StartMana = GetStartMana();
 	GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_BASIC_STATS, 100, "H: {INT}/{INT} M: {INT}/{INT}", &Health, &StartHealth, &Mana, &StartMana);
 }
@@ -607,7 +606,6 @@ bool CPlayer::ParseInteractive(int Vote)
 			const int GuildID = CGS::Interactive[m_ClientID].ParsingSaveInt;
 			GS()->Mmo()->Member()->JoinGuild(Acc().AuthID, GuildID);
 		}
-		ClearParsing(true);
 		return true;
 	}
 	else // если игрок нажал F4
@@ -628,32 +626,31 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 		return true;
 	}
 
-	// - - - - - - - - - - - - -
 	// - - - - - F3- - - - - - -
 	if (Vote == 1)
 	{
-		return false;
 	}
-
-	// - - - - - - - - - - - - -
 	// - - - - - F4- - - - - - -
-	// смена режима полета
-	if(m_PlayerFlags&PLAYERFLAG_SCOREBOARD && GetItemEquip(EQUIP_WINGS) > 0)
+	else
 	{
-		m_Flymode ^= true;
-		GS()->Chat(m_ClientID, "You {STR} fly mode, your hook changes!", m_Flymode ? "Enable" : "Disable");
-		return true;
-	}
-
-	// общение на диалогах для ванильных клиентов
-	if (GetTalkedID() > 0 && !GS()->CheckClient(m_ClientID))
-	{
-		if (m_PlayerTick[TickState::LastDialog] && m_PlayerTick[TickState::LastDialog] > GS()->Server()->Tick())
+		// смена режима полета
+		if(m_PlayerFlags & PLAYERFLAG_SCOREBOARD && GetEquippedItem(EQUIP_WINGS) > 0)
+		{
+			m_Flymode ^= true;
+			GS()->Chat(m_ClientID, "You {STR} fly mode, your hook changes!", m_Flymode ? "Enable" : "Disable");
 			return true;
+		}
 
-		m_PlayerTick[TickState::LastDialog] = GS()->Server()->Tick() + (GS()->Server()->TickSpeed() / 4);
-		SetTalking(GetTalkedID(), true);
-		return true;
+		// общение на диалогах для ванильных клиентов
+		if(GetTalkedID() > 0 && !GS()->CheckClient(m_ClientID))
+		{
+			if(m_PlayerTick[TickState::LastDialog] && m_PlayerTick[TickState::LastDialog] > GS()->Server()->Tick())
+				return true;
+
+			m_PlayerTick[TickState::LastDialog] = GS()->Server()->Tick() + (GS()->Server()->TickSpeed() / 4);
+			SetTalking(GetTalkedID(), true);
+			return true;
+		}
 	}
 	return false;
 }
@@ -698,7 +695,7 @@ ItemJob::InventoryItem &CPlayer::GetItem(int ItemID)
 }
 
 // Получить одетый предмет
-int CPlayer::GetItemEquip(int EquipID, int SkipItemID) const
+int CPlayer::GetEquippedItem(int EquipID, int SkipItemID) const
 {
 	for(const auto& it : ItemJob::Items[m_ClientID])
 	{
@@ -767,10 +764,10 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 	m_TalkingNPC.m_TalkedID = TalkedID;
 	GS()->Mmo()->Quest()->QuestTableClear(m_ClientID);
 	CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[TalkedID]);
-	int MobID = BotPlayer->GetBotSub();
+	const int MobID = BotPlayer->GetBotSub();
 	if (BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
-		int sizeTalking = BotJob::NpcBot[MobID].m_Talk.size();
+		const int sizeTalking = BotJob::NpcBot[MobID].m_Talk.size();
 		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
 		{
 			ClearTalking();
@@ -808,7 +805,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 
 	else if (BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 	{
-		int sizeTalking = BotJob::QuestBot[MobID].m_Talk.size();
+		const int sizeTalking = BotJob::QuestBot[MobID].m_Talk.size();
 		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
 		{
 			ClearTalking();
@@ -875,14 +872,14 @@ int CPlayer::GetMoodState()
 	if (!GS()->IsDungeon())
 		return MOOD_NORMAL;
 
-	int MaximalHealth = GetAttributeCount(Stats::StHardness, true);
+	int MaximalHealth = GetLevelDisciple(AtributType::AtTank);
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pPlayer = GS()->m_apPlayers[i];
 		if (!pPlayer || Server()->GetWorldID(m_ClientID) != Server()->GetWorldID(i))
 			continue;
 
-		int FinderHardness = pPlayer->GetLevelDisciple(AtributType::AtTank);
+		const int FinderHardness = pPlayer->GetLevelDisciple(AtributType::AtTank);
 		if (FinderHardness > MaximalHealth)
 			return MOOD_NORMAL;
 	}

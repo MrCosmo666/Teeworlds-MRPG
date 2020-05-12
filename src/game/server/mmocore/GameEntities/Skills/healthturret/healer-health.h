@@ -14,7 +14,7 @@ public:
 	};
 	
 public:
-	CHealthHealer(CGameWorld *pGameWorld, CPlayer *pPlayer, int SkillLevel, int ManaUseCost, vec2 Pos);
+	CHealthHealer(CGameWorld *pGameWorld, CPlayer *pPlayer, int SkillLevel, vec2 Pos);
 	virtual ~CHealthHealer();
 
 	virtual void Snap(int SnappingClient);
@@ -26,7 +26,6 @@ private:
 	int m_LifeSpan;	
 	int m_ReloadTick;
 	int m_SkillLevel;
-	int m_ManaUseCost;
 
 public:
 	CPlayer *m_pPlayer;

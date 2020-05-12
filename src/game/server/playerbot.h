@@ -24,10 +24,11 @@ public:
 	int GetBotType()												override { return m_BotType; };
 	int GetBotSub()													override { return m_SubBotID; };
 	int GetHealth() 												override { return m_BotHealth; };
+	int GetMana() 													override { return 999; };
 	int GetTeam()													override { return TEAM_BLUE; };
 	void UpdateTempData(int Health, int Mana)						override { m_BotHealth = Health; };
 	void SetDungeonAllowedSpawn(bool Spawn)							override { m_DungeonAllowedSpawn = Spawn; };
-	int GetItemEquip(int EquipID, int SkipItemID = -1) const		override;
+	int GetEquippedItem(int EquipID, int SkipItemID = -1) const		override;
 	void Tick()														override;
 	int GetStartHealth()											override;
 	int GetAttributeCount(int BonusID, bool Really = false)			override;

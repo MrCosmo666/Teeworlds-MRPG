@@ -13,8 +13,7 @@ class SkillJob : public MmoComponent
 		char m_SkillDesc[64];
 		char m_SkillBonusInfo[64];
 		int m_BonusCount;
-		int m_ManaCost;
-		int m_ManaSupport;
+		int m_ManaProcent;
 		int m_SkillPrice;
 		int m_SkillMaxLevel;
 		bool m_Passive;

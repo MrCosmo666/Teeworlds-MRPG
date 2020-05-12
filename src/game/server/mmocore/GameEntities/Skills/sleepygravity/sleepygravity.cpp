@@ -5,16 +5,13 @@
 
 #include "sleepygravity.h"
 
-CSleepyGravity::CSleepyGravity(CGameWorld *pGameWorld, CPlayer *pPlayer, int SkillLevel, int ManaUseCost, vec2 Pos)
+CSleepyGravity::CSleepyGravity(CGameWorld *pGameWorld, CPlayer *pPlayer, int SkillLevel, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTYPE_SLEEPYGRAVITY, Pos)
 {
 	// переданные аргументы
 	m_Pos = Pos;
 	m_pPlayer = pPlayer;
 	m_SkillLevel = SkillLevel;
-	m_ManaUseCost = ManaUseCost;
-
-	// обычные настройки без передачи аргументов
 	m_LifeSpan = 20*Server()->TickSpeed();
 
 	// создаем обьект
@@ -55,24 +52,14 @@ void CSleepyGravity::Tick()
 		Reset();
 		return;
 	}
-	
-	// все тики что нужны тут
 	m_LifeSpan--;
 	
-	// находим игроков притягиваем
 	for(CCharacter *p = (CCharacter*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); p; p = (CCharacter *)p->TypeNext())
 	{
 		if(!p || !p->GetPlayer()->IsBot() || p->GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_NPC || distance(p->m_Core.m_Pos, m_Pos) > 300.0f) continue;
 		
 		vec2 Dir = normalize(p->m_Core.m_Pos - m_Pos);
 		p->m_Core.m_Vel -= Dir*(0.55f+(0.25f*m_SkillLevel));
-	}
-
-	// если на дальнейшее использование нет маны
-	if((Server()->Tick() % (Server()->TickSpeed()*3) == 0) && m_pPlayer->GetCharacter()->CheckFailMana(m_ManaUseCost))
-	{
-		Reset();
-		return;
 	}
 }
 

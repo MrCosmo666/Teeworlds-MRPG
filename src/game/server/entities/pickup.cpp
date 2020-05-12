@@ -12,7 +12,6 @@ CPickup::CPickup(CGameWorld *pGameWorld, int Type, vec2 Pos)
 	m_Type = Type;
 
 	Reset();
-
 	GameWorld()->InsertEntity(this);
 }
 
@@ -40,11 +39,10 @@ void CPickup::Tick()
 		else
 			return;
 	}
-	// Check if a player intersected us
+
 	CCharacter *pChr = (CCharacter *)GS()->m_World.ClosestEntity(m_Pos, 20.0f, CGameWorld::ENTTYPE_CHARACTER, 0);
 	if(pChr && pChr->IsAlive())
 	{
-		// player picked us up, is someone was hooking us, let them go
 		bool Picked = false;
 		switch (m_Type)
 		{
@@ -57,7 +55,7 @@ void CPickup::Tick()
 				break;
 
 			case PICKUP_ARMOR:
-				if(pChr->IncreaseArmor(1))
+				if(pChr->IncreaseMana(1))
 				{
 					Picked = true;
 					GS()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);

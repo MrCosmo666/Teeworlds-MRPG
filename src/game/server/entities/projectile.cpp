@@ -139,7 +139,7 @@ int CProjectile::GetOwnerProjID(int ClientID)
 	{
 	case WEAPON_GUN:
 	{
-		int EquipID = pPlayer->GetItemEquip(EQUIP_GUN);
+		int EquipID = pPlayer->GetEquippedItem(EQUIP_GUN);
 		if (EquipID <= 0)
 			return -1;
 
@@ -147,7 +147,7 @@ int CProjectile::GetOwnerProjID(int ClientID)
 	}
 	case WEAPON_SHOTGUN:
 	{
-		int EquipID = pPlayer->GetItemEquip(EQUIP_SHOTGUN);
+		int EquipID = pPlayer->GetEquippedItem(EQUIP_SHOTGUN);
 		if (EquipID <= 0)
 			return -1;
 
@@ -155,7 +155,7 @@ int CProjectile::GetOwnerProjID(int ClientID)
 	}
 	case WEAPON_GRENADE:
 	{
-		int EquipID = pPlayer->GetItemEquip(EQUIP_GRENADE);
+		int EquipID = pPlayer->GetEquippedItem(EQUIP_GRENADE);
 		if (EquipID <= 0)
 			return -1;
 

@@ -134,13 +134,13 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 			return true;
 		}
 
-		GS()->Chat(-1, "{STR} joined to Dungeon {STR}!", GS()->Server()->ClientName(ClientID), Dungeon[VoteID].Name);
-
-		if (!GS()->IsDungeon())
+		if(!GS()->IsDungeon())
+		{
 			pPlayer->Acc().LastWorldID = GS()->GetWorldID();
-
-		pPlayer->Acc().TempTeleportX = pPlayer->GetCharacter()->m_Core.m_Pos.x;
-		pPlayer->Acc().TempTeleportY = pPlayer->GetCharacter()->m_Core.m_Pos.y;
+			pPlayer->Acc().TempTeleportX = pPlayer->GetCharacter()->m_Core.m_Pos.x;
+			pPlayer->Acc().TempTeleportY = pPlayer->GetCharacter()->m_Core.m_Pos.y;
+		}
+		GS()->Chat(-1, "{STR} joined to Dungeon {STR}!", GS()->Server()->ClientName(ClientID), Dungeon[VoteID].Name);
 		pPlayer->ChangeWorld(Dungeon[VoteID].WorldID);
 		return true;
 	}

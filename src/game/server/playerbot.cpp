@@ -66,7 +66,7 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 		int Power = BotJob::MobBot[m_SubBotID].Power;
 		for (int i = 0; i < EQUIP_MAX_BOTS; i++)
 		{
-			int ItemID = GetItemEquip(i);
+			int ItemID = GetEquippedItem(i);
 			int ItemBonusCount = GS()->GetItemInfo(ItemID).GetStatsBonus(BonusID);
 			if (ItemID <= 0 || ItemBonusCount < 0)
 				continue;
@@ -237,7 +237,7 @@ bool CPlayerBot::IsActiveQuests(int SnapClientID)
 	return false;
 }
 
-int CPlayerBot::GetItemEquip(int EquipID, int SkipItemID) const
+int CPlayerBot::GetEquippedItem(int EquipID, int SkipItemID) const
 {
 	if (EquipID < EQUIP_WINGS || EquipID > EQUIP_RIFLE)
 		return -1;
