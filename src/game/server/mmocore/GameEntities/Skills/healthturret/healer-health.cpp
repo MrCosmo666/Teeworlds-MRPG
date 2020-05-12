@@ -6,19 +6,17 @@
 #include "healer-health.h"
 #include "hearth.h"
 
-CHealthHealer::CHealthHealer(CGameWorld *pGameWorld, CPlayer *pPlayer, int SkillLevel, vec2 Pos)
+CHealthHealer::CHealthHealer(CGameWorld *pGameWorld, CPlayer* pPlayer, int SkillLevel, int PowerLevel, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTYPE_SKILLTURRETHEART, Pos)
 {
 	// переданные аргументы
 	m_Pos = Pos;
 	m_pPlayer = pPlayer;
-	m_SkillLevel = SkillLevel;
+	m_PowerLevel = PowerLevel;
 
 	// обычные настройки без передачи аргументов
 	m_LifeSpan = 16*Server()->TickSpeed();
 	m_ReloadTick = 2*Server()->TickSpeed();
-
-	// создаем обьект
 	GameWorld()->InsertEntity(this);	
 	for(int i=0; i<NUM_IDS; i++)
 	{
@@ -72,7 +70,7 @@ void CHealthHealer::Tick()
 			continue;
 		
 		// показать восстановление
-		const int Health = 5 * m_SkillLevel;
+		const int Health = 5 * m_PowerLevel;
 		if(!ShowHealthRestore)
 		{
 			char aBuf[16];

@@ -5,13 +5,13 @@
 
 #include "sleepygravity.h"
 
-CSleepyGravity::CSleepyGravity(CGameWorld *pGameWorld, CPlayer *pPlayer, int SkillLevel, vec2 Pos)
+CSleepyGravity::CSleepyGravity(CGameWorld *pGameWorld, CPlayer *pPlayer, int SkillLevel, int PowerLevel, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTYPE_SLEEPYGRAVITY, Pos)
 {
 	// переданные аргументы
 	m_Pos = Pos;
 	m_pPlayer = pPlayer;
-	m_SkillLevel = SkillLevel;
+	m_PowerLevel = PowerLevel;
 	m_LifeSpan = 20*Server()->TickSpeed();
 
 	// создаем обьект
@@ -59,7 +59,7 @@ void CSleepyGravity::Tick()
 		if(!p || !p->GetPlayer()->IsBot() || p->GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_NPC || distance(p->m_Core.m_Pos, m_Pos) > 300.0f) continue;
 		
 		vec2 Dir = normalize(p->m_Core.m_Pos - m_Pos);
-		p->m_Core.m_Vel -= Dir*(0.55f+(0.25f*m_SkillLevel));
+		p->m_Core.m_Vel -= Dir*(0.55f+(0.25f * m_PowerLevel));
 	}
 }
 

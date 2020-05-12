@@ -14,7 +14,7 @@ public:
 	};
 	
 public:
-	CSleepyGravity(CGameWorld *pGameWorld, CPlayer *pPlayer, int SkillLevel, vec2 Pos);
+	CSleepyGravity(CGameWorld *pGameWorld, CPlayer* pPlayer, int SkillLevel, int PowerLevel, vec2 Pos);
 	virtual ~CSleepyGravity();
 
 	virtual void Snap(int SnappingClient);
@@ -24,7 +24,7 @@ public:
 private:
 	int m_IDs[NUM_IDS];
 	int m_LifeSpan;	
-	int m_SkillLevel;
+	int m_PowerLevel;
 
 public:
 	CPlayer *m_pPlayer;
