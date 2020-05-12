@@ -988,9 +988,11 @@ void CCharacter::HandleTunning()
 		pTuningParams->m_GroundFriction = 0.30f;
 		pTuningParams->m_GroundControlSpeed = 60.0f / Server()->TickSpeed();
 		pTuningParams->m_GroundControlAccel = 0.4f;
+		pTuningParams->m_GroundJumpImpulse = 3.0f;
 		pTuningParams->m_AirFriction = 0.4f;
 		pTuningParams->m_AirControlSpeed = 60.0f / Server()->TickSpeed();
 		pTuningParams->m_AirControlAccel = 0.4f;
+		pTuningParams->m_AirJumpImpulse = 3.0f;
 		pTuningParams->m_HookLength = 0.0f;
 	}
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
