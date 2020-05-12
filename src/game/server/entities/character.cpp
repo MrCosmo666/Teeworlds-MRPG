@@ -981,6 +981,7 @@ void CCharacter::HandleTunning()
 	if(m_pPlayer->IsBot())
 		return;
 
+	// effects
 	if(m_pPlayer->CheckEffect("Slowdown"))
 	{
 		pTuningParams->m_Gravity = 0.35f;
@@ -992,6 +993,25 @@ void CCharacter::HandleTunning()
 		pTuningParams->m_AirControlAccel = 0.4f;
 		pTuningParams->m_HookLength = 0.0f;
 	}
+	if(Server()->Tick() % Server()->TickSpeed() == 0)
+	{
+		if(m_pPlayer->CheckEffect("Poison"))
+		{
+			const int PoisonSize = kurosio::translate_to_procent_rest(m_pPlayer->GetStartHealth(), 3);
+			TakeDamage(vec2(0, 0), PoisonSize, m_pPlayer->GetCID(), WEAPON_SELF);
+		}
+		if(m_pPlayer->CheckEffect("RegenHealth"))
+		{
+			const int RegenHP = kurosio::translate_to_procent_rest(m_pPlayer->GetStartHealth(), 3);
+			IncreaseHealth(RegenHP);
+		}
+		if(m_pPlayer->CheckEffect("RegenMana"))
+		{
+			const int RegenMana = kurosio::translate_to_procent_rest(m_pPlayer->GetStartHealth(), 5);
+			IncreaseMana(RegenMana);
+		}
+	}
+
 
 	// режим полета
 	if(m_pPlayer->m_Flymode && m_pPlayer->GetEquippedItem(EQUIP_WINGS) > 0)

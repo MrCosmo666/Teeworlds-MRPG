@@ -107,20 +107,6 @@ void CPlayer::PotionsTick()
 	// TODO: change it
 	for (auto ieffect = CGS::Effects[m_ClientID].begin(); ieffect != CGS::Effects[m_ClientID].end();)
 	{
-		if (str_comp(ieffect->first.c_str(), "Poison") == 0)
-			m_pCharacter->TakeDamage(vec2(0, 0), 1, m_ClientID, WEAPON_SELF);
-
-		if(str_comp(ieffect->first.c_str(), "RegenHealth") == 0)
-		{
-			const int RegenHP = kurosio::translate_to_procent_rest(GetStartHealth(), 3);
-			m_pCharacter->IncreaseHealth(RegenHP);
-		}
-		if(str_comp(ieffect->first.c_str(), "RegenMana") == 0)
-		{
-			const int RegenMana = kurosio::translate_to_procent_rest(GetStartHealth(), 5);
-			m_pCharacter->IncreaseMana(RegenMana);
-		}
-
 		ieffect->second--;
 		if (ieffect->second <= 0)
 		{
