@@ -225,7 +225,7 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 
 	// скилл турель здоровья
 	const int ClientID = pPlayer->GetCID();
-	const int SkillLevel = Skill[ClientID][SkillID].m_SkillLevel;
+	const int SkillBonus = GetSkillBonus(ClientID, SkillID);
 	if(SkillID == Skill::SkillHeartTurret)
 	{
 		for(CHealthHealer *pHh = (CHealthHealer*)GS()->m_World.FindFirst(CGameWorld::ENTYPE_SKILLTURRETHEART); pHh; pHh = (CHealthHealer *)pHh->TypeNext())
@@ -237,7 +237,7 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 			}
 		}
 		const int PowerLevel = ManaPrice;
-		new CHealthHealer(&GS()->m_World, pPlayer, SkillLevel, PowerLevel, pChr->m_Core.m_Pos);
+		new CHealthHealer(&GS()->m_World, pPlayer, SkillBonus, PowerLevel, pChr->m_Core.m_Pos);
 		return true;
 	}
 
@@ -253,7 +253,7 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 			}
 		}
 		const int PowerLevel = ManaPrice;
-		new CSleepyGravity(&GS()->m_World, pPlayer, SkillLevel, PowerLevel, pChr->m_Core.m_Pos);
+		new CSleepyGravity(&GS()->m_World, pPlayer, SkillBonus, PowerLevel, pChr->m_Core.m_Pos);
 		return true;
 	}
 
@@ -268,6 +268,14 @@ void SkillJob::ParseEmoticionSkill(CPlayer *pPlayer, int EmoticionID)
 		if (skillplayer.second.m_SelectedEmoticion == EmoticionID)
 			UseSkill(pPlayer, skillplayer.first);
 	}
+}
+
+bool SkillJob::CheckInteraction(CCharacter* pChar, vec2 SkillPos, float Distance)
+{
+	if(pChar && distance(SkillPos, pChar->m_Core.m_Pos) < Distance && 
+		((!pChar->GetPlayer()->IsBot() && GS()->IsAllowedPVP()) || (pChar->GetPlayer()->IsBot() && pChar->GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_MOB)))
+		return true;
+	return false;
 }
 
 const char* SkillJob::GetSelectedEmoticion(int EmoticionID) const

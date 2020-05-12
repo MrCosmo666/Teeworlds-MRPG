@@ -6,7 +6,7 @@
 #include "healer-health.h"
 #include "hearth.h"
 
-CHealthHealer::CHealthHealer(CGameWorld *pGameWorld, CPlayer* pPlayer, int SkillLevel, int PowerLevel, vec2 Pos)
+CHealthHealer::CHealthHealer(CGameWorld *pGameWorld, CPlayer* pPlayer, int SkillBonus, int PowerLevel, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTYPE_SKILLTURRETHEART, Pos)
 {
 	// переданные аргументы
@@ -15,7 +15,7 @@ CHealthHealer::CHealthHealer(CGameWorld *pGameWorld, CPlayer* pPlayer, int Skill
 	m_PowerLevel = PowerLevel;
 
 	// обычные настройки без передачи аргументов
-	m_LifeSpan = 16*Server()->TickSpeed();
+	m_LifeSpan = (10 + SkillBonus)*Server()->TickSpeed();
 	m_ReloadTick = 2*Server()->TickSpeed();
 	GameWorld()->InsertEntity(this);	
 	for(int i=0; i<NUM_IDS; i++)
@@ -48,43 +48,36 @@ void CHealthHealer::Reset()
 
 void CHealthHealer::Tick()
 {
-	// проверяем есть ли игрок или нет для использования его функций
+	m_LifeSpan--;
 	if(!m_pPlayer || !m_pPlayer->GetCharacter() || !m_LifeSpan)
 	{
 		Reset();
 		return;
 	}
-	
-	m_LifeSpan--;
 	if(m_ReloadTick)
 	{
 		m_ReloadTick--;
 		return;
 	}
 	
-	// находим игроков и кидаем ему сердце
 	bool ShowHealthRestore = false;
+	const int HealthRestore = m_PowerLevel;
 	for(CCharacter *p = (CCharacter*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); p; p = (CCharacter *)p->TypeNext())
 	{
-		if(!p || p->GetPlayer()->IsBot() || distance(p->m_Core.m_Pos, m_Pos) > 520.0f) 
+		if(!GS()->Mmo()->Skills()->CheckInteraction(p, m_Pos, 520.0f))
 			continue;
-		
-		// показать восстановление
-		const int Health = 5 * m_PowerLevel;
-		if(!ShowHealthRestore)
-		{
-			char aBuf[16];
-			str_format(aBuf, sizeof(aBuf), "%dHP", Health);
-			GS()->CreateText(NULL, false, m_Pos, vec2(0,0), 40, aBuf, GS()->GetWorldID());
-			ShowHealthRestore = true;
-		}
 
-		// уровень и здоровье для пополнение
-		new CHearth(&GS()->m_World, m_Pos, p->GetPlayer(), Health, p->m_Core.m_Vel);
+		ShowHealthRestore = true;
+		new CHearth(&GS()->m_World, m_Pos, p->GetPlayer(), HealthRestore, p->m_Core.m_Vel);
 	}
+	m_ReloadTick = 2 * Server()->TickSpeed();
 
-	// устанавливаем перезарядку
-	m_ReloadTick = 2*Server()->TickSpeed();
+	if(ShowHealthRestore)
+	{
+		char aBuf[16];
+		str_format(aBuf, sizeof(aBuf), "%dHP", HealthRestore);
+		GS()->CreateText(NULL, false, m_Pos, vec2(0, 0), 40, aBuf, GS()->GetWorldID());
+	}
 }
 
 void CHealthHealer::Snap(int SnappingClient)

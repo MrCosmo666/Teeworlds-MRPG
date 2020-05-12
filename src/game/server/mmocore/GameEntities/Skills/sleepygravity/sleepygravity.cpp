@@ -5,16 +5,14 @@
 
 #include "sleepygravity.h"
 
-CSleepyGravity::CSleepyGravity(CGameWorld *pGameWorld, CPlayer *pPlayer, int SkillLevel, int PowerLevel, vec2 Pos)
+CSleepyGravity::CSleepyGravity(CGameWorld *pGameWorld, CPlayer* pPlayer, int SkillBonus, int PowerLevel, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTYPE_SLEEPYGRAVITY, Pos)
 {
 	// переданные аргументы
-	m_Pos = Pos;
 	m_pPlayer = pPlayer;
 	m_PowerLevel = PowerLevel;
-	m_LifeSpan = 20*Server()->TickSpeed();
-
-	// создаем обьект
+	m_Radius = min(200 + PowerLevel * 2, 400);
+	m_LifeSpan = (10 + SkillBonus) * Server()->TickSpeed();
 	GameWorld()->InsertEntity(this);	
 	for(int i=0; i<NUM_IDS; i++)
 	{
@@ -46,20 +44,20 @@ void CSleepyGravity::Reset()
 
 void CSleepyGravity::Tick()
 {
-	// проверяем есть ли игрок или нет для использования его функций
+	m_LifeSpan--;
 	if(!m_pPlayer || !m_pPlayer->GetCharacter() || !m_LifeSpan)
 	{
 		Reset();
 		return;
 	}
-	m_LifeSpan--;
 	
 	for(CCharacter *p = (CCharacter*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); p; p = (CCharacter *)p->TypeNext())
 	{
-		if(!p || !p->GetPlayer()->IsBot() || p->GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_NPC || distance(p->m_Core.m_Pos, m_Pos) > 300.0f) continue;
-		
+		if(!GS()->Mmo()->Skills()->CheckInteraction(p, m_Pos, m_Radius))
+			continue;
+
 		vec2 Dir = normalize(p->m_Core.m_Pos - m_Pos);
-		p->m_Core.m_Vel -= Dir*(0.55f+(0.25f * m_PowerLevel));
+		p->m_Core.m_Vel -= Dir * (1.20f);
 	}
 }
 
@@ -69,10 +67,9 @@ void CSleepyGravity::Snap(int SnappingClient)
 		return;
 	
 	float AngleStep = 2.0f * pi / CSleepyGravity::NUM_IDS;
-	float Radius = 300.0f;
 	for(int i=0; i<CSleepyGravity::NUM_IDS; i++)
 	{
-		vec2 VertexPos = m_Pos + vec2(Radius * cos(AngleStep*i), Radius * sin(AngleStep*i));
+		vec2 VertexPos = m_Pos + vec2(m_Radius * cos(AngleStep*i), m_Radius * sin(AngleStep*i));
 		CNetObj_Projectile *pObj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, m_IDs[i], sizeof(CNetObj_Projectile)));
 		if(!pObj)
 			return;

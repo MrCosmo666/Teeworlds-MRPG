@@ -41,6 +41,7 @@ public:
 	bool UseSkill(CPlayer *pPlayer, int SkillID);
 	void ParseEmoticionSkill(CPlayer* pPlayer, int EmoticionID);
 
+	bool CheckInteraction(CCharacter* pChar, vec2 SkillPos, float Distance);
 
 private:
 	const char* GetSelectedEmoticion(int EmoticionID) const;
