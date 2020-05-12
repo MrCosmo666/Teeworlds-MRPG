@@ -64,11 +64,11 @@ void CHealthHealer::Tick()
 	const int HealthRestore = m_PowerLevel;
 	for(CCharacter *p = (CCharacter*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); p; p = (CCharacter *)p->TypeNext())
 	{
-		if(!GS()->Mmo()->Skills()->CheckInteraction(p, m_Pos, 520.0f))
-			continue;
-
-		ShowHealthRestore = true;
-		new CHearth(&GS()->m_World, m_Pos, p->GetPlayer(), HealthRestore, p->m_Core.m_Vel);
+		if(p && distance(m_Pos, p->m_Core.m_Pos) < 520.0f && (m_pPlayer->GetCID() == p->GetPlayer()->GetCID() || !p->IsAllowedPVP(m_pPlayer->GetCID())))
+		{
+			ShowHealthRestore = true;
+			new CHearth(&GS()->m_World, m_Pos, p->GetPlayer(), HealthRestore, p->m_Core.m_Vel);
+		}
 	}
 	m_ReloadTick = 2 * Server()->TickSpeed();
 
@@ -76,7 +76,7 @@ void CHealthHealer::Tick()
 	{
 		char aBuf[16];
 		str_format(aBuf, sizeof(aBuf), "%dHP", HealthRestore);
-		GS()->CreateText(NULL, false, m_Pos, vec2(0, 0), 40, aBuf, GS()->GetWorldID());
+		GS()->CreateText(NULL, false, vec2(m_Pos.x, m_Pos.y - 96.0f), vec2(0, 0), 40, aBuf, GS()->GetWorldID());
 	}
 }
 
@@ -86,7 +86,7 @@ void CHealthHealer::Snap(int SnappingClient)
 		return;
 
 	float AngleStep = 2.0f * pi / CHealthHealer::NUM_IDS;
-	float Radius = clamp(50.0f-(int)m_ReloadTick, -50.0f, 50.0f);
+	float Radius = clamp(0.0f+(int)m_ReloadTick, 0.0f, 32.0f);
 	for(int i=0; i<CHealthHealer::NUM_IDS; i++)
 	{
 		vec2 VertexPos = m_Pos + vec2(Radius * cos(AngleStep*i), Radius * sin(AngleStep*i));
@@ -96,7 +96,7 @@ void CHealthHealer::Snap(int SnappingClient)
 
 		pObj->m_X = (int)VertexPos.x;
 		pObj->m_Y = (int)VertexPos.y;
-		pObj->m_Type = 1;
+		pObj->m_Type = PICKUP_HEALTH;
 	}
 	
 	CNetObj_Pickup *pObj = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
@@ -105,5 +105,5 @@ void CHealthHealer::Snap(int SnappingClient)
 
 	pObj->m_X = (int)m_Pos.x;
 	pObj->m_Y = (int)m_Pos.y;
-	pObj->m_Type = 0;
+	pObj->m_Type = PICKUP_ARMOR;
 }

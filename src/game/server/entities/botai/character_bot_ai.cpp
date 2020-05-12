@@ -94,7 +94,7 @@ void CCharacterBotAI::ShowProgress()
 	}	
 }
 
-bool CCharacterBotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
+bool CCharacterBotAI::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 {
 	if (From < 0 || From > MAX_CLIENTS || !GS()->m_apPlayers[From])
 		return false;
@@ -104,7 +104,7 @@ bool CCharacterBotAI::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int
 
 	// до урона и после урона здоровье
 	int StableDamage = Health();
-	bool BotDie = CCharacter::TakeDamage(Force, Source, Dmg, From, Weapon);
+	bool BotDie = CCharacter::TakeDamage(Force, Dmg, From, Weapon);
 	StableDamage -= Health();
 
 	// установить агрессию на того от кого пришел урон
@@ -665,7 +665,7 @@ bool CCharacterBotAI::FunctionNurseNPC()
 		m_LatestInput.m_TargetX = m_Input.m_TargetX;
 		m_LatestInput.m_TargetY = m_Input.m_TargetX;
 
-		const int Health = pFind->GetStartHealth() / 20;
+		const int Health = max(pFind->GetStartHealth() / 20, 1);
 		vec2 DrawPosition = vec2(pFind->GetCharacter()->m_Core.m_Pos.x, pFind->GetCharacter()->m_Core.m_Pos.y - 90.0f);
 		str_format(aBuf, sizeof(aBuf), "%dHP", Health);
 		GS()->CreateText(NULL, false, DrawPosition, vec2(0, 0), 40, aBuf, GS()->GetWorldID());

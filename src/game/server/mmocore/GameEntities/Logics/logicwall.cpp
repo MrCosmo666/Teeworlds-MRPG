@@ -236,7 +236,7 @@ void CLogicWallLine::Tick()
 	{
 		m_To = PositionPlayer;
 		if(Server()->Tick() % Server()->TickSpeed() == 0)
-			GS()->m_apPlayers[m_ClientID]->GetCharacter()->TakeDamage(vec2(0,0), vec2(0,0), 1, -1, WEAPON_WORLD);
+			GS()->m_apPlayers[m_ClientID]->GetCharacter()->TakeDamage(vec2(0,0), 1, -1, WEAPON_WORLD);
 		return;
 	}
 	m_To = m_Pos;

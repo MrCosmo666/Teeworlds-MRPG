@@ -167,20 +167,22 @@ const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const
 	EVENTS 
 ######################################################################### */
 // Отправить запрос на рендер Урона
-void CGS::CreateDamage(vec2 Pos, int ClientID, vec2 Source, int HealthAmount, int ArmorAmount, bool Self)
+void CGS::CreateDamage(vec2 Pos, int ClientID, int HealthAmount, int ArmorAmount, bool OnlyVanilla)
 {
 	CNetEvent_Damage* pEventVanilla = (CNetEvent_Damage*)m_Events.Create(NETEVENTTYPE_DAMAGE, sizeof(CNetEvent_Damage));
 	if(pEventVanilla)
 	{
-		float f = angle(Source);
 		pEventVanilla->m_X = (int)Pos.x;
 		pEventVanilla->m_Y = (int)Pos.y;
 		pEventVanilla->m_ClientID = ClientID;
-		pEventVanilla->m_Angle = (int)(f * 256.0f);
-		pEventVanilla->m_HealthAmount = clamp(HealthAmount, 1, 9);
-		pEventVanilla->m_ArmorAmount = clamp(ArmorAmount, 1, 9);
-		pEventVanilla->m_Self = Self;
+		pEventVanilla->m_Angle = 0;
+		pEventVanilla->m_HealthAmount = HealthAmount;
+		pEventVanilla->m_ArmorAmount = ArmorAmount;
+		pEventVanilla->m_Self = 0;
 	}
+
+	if(OnlyVanilla)
+		return;
 
 	CNetEvent_MmoDamage* pEventMmo = (CNetEvent_MmoDamage*)m_Events.Create(NETEVENTTYPE_MMODAMAGE, sizeof(CNetEvent_MmoDamage));
 	if(pEventMmo)
@@ -229,7 +231,7 @@ void CGS::CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamage)
 		float Factor = 1 - clamp((l-InnerRadius)/(Radius-InnerRadius), 0.0f, 1.0f);
 		if ((int)(Factor * MaxDamage))
 		{
-			apEnts[i]->TakeDamage(Force * Factor, Diff * -1, (int)(Factor * MaxDamage), Owner, Weapon);
+			apEnts[i]->TakeDamage(Force * Factor, (int)(Factor * MaxDamage), Owner, Weapon);
 		}
 	}
 }

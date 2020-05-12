@@ -108,7 +108,7 @@ void CPlayer::PotionsTick()
 	for (auto ieffect = CGS::Effects[m_ClientID].begin(); ieffect != CGS::Effects[m_ClientID].end();)
 	{
 		if (str_comp(ieffect->first.c_str(), "Poison") == 0)
-			m_pCharacter->TakeDamage(vec2(0, 0), vec2(0, 0), 1, m_ClientID, WEAPON_SELF);
+			m_pCharacter->TakeDamage(vec2(0, 0), 1, m_ClientID, WEAPON_SELF);
 
 		if (str_comp(ieffect->first.c_str(), "RegenHealth") == 0)
 			m_pCharacter->IncreaseHealth(15);

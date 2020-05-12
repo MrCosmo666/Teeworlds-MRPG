@@ -1176,14 +1176,6 @@ void CGameClient::ProcessEvents()
 		if(Item.m_Type == NETEVENTTYPE_DAMAGE)
 		{
 			CNetEvent_Damage *ev = (CNetEvent_Damage *)pData;
-			if (g_Config.m_ClMmoDamageInd)
-			{
-				char aBuf[8];
-				int Damage = ev->m_HealthAmount + ev->m_ArmorAmount;
-				str_format(aBuf, sizeof(aBuf), "%d", Damage);
-				m_pEffects->DamageMmoInd(vec2(ev->m_X, ev->m_Y), aBuf);
-				continue;
-			}
 			m_pEffects->DamageIndicator(vec2(ev->m_X, ev->m_Y), ev->m_HealthAmount + ev->m_ArmorAmount);
 		}
 		else if(Item.m_Type == NETEVENTTYPE_EXPLOSION)

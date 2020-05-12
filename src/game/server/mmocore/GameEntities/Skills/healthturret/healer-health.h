@@ -10,7 +10,7 @@ class CHealthHealer : public CEntity
 public:
 	enum
 	{
-		NUM_IDS = 5,
+		NUM_IDS = 4,
 	};
 	
 public:

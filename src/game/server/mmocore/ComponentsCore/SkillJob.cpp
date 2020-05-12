@@ -270,14 +270,6 @@ void SkillJob::ParseEmoticionSkill(CPlayer *pPlayer, int EmoticionID)
 	}
 }
 
-bool SkillJob::CheckInteraction(CCharacter* pChar, vec2 SkillPos, float Distance)
-{
-	if(pChar && distance(SkillPos, pChar->m_Core.m_Pos) < Distance && 
-		((!pChar->GetPlayer()->IsBot() && GS()->IsAllowedPVP()) || (pChar->GetPlayer()->IsBot() && pChar->GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_MOB)))
-		return true;
-	return false;
-}
-
 const char* SkillJob::GetSelectedEmoticion(int EmoticionID) const
 {
 	switch (EmoticionID)

@@ -314,7 +314,7 @@ void CCharacter::FireWeapon()
 				if (length(pTarget->m_Pos - m_Pos) > 0.0f)
 					Dir = normalize(pTarget->m_Pos - m_Pos);
 
-				pTarget->TakeDamage(vec2(0.f, -1.f) + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f, Dir*-1, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage, m_pPlayer->GetCID(), m_ActiveWeapon);
+				pTarget->TakeDamage(vec2(0.f, -1.f) + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage, m_pPlayer->GetCID(), m_ActiveWeapon);
 				Hits = true;
 			}
 			if(Hits) 
@@ -682,15 +682,13 @@ void CCharacter::Die(int Killer, int Weapon)
 	GS()->CreateDeath(m_Pos, ClientID);
 }
 
-bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon)
+bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 {
 	m_Core.m_Vel += Force;
 	if(length(m_Core.m_Vel) > 32.0f)
 		m_Core.m_Vel = normalize(m_Core.m_Vel) * 32.0f;
 
-	CPlayer* pFrom = GS()->GetPlayer(From);
-	if (!pFrom || (pFrom->GetCharacter() && pFrom->GetCharacter()->m_NoAllowDamage) || m_NoAllowDamage 
-		|| !GS()->IsAllowedPVP() && !pFrom->IsBot() && !m_pPlayer->IsBot())
+	if(!IsAllowedPVP(From))
 		return false;
 
 	if (m_Health > m_pPlayer->GetStartHealth())
@@ -701,7 +699,7 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 	}
 	Dmg = (From == m_pPlayer->GetCID() ? max(1, Dmg/2) : max(1, Dmg));
 
-
+	CPlayer* pFrom = GS()->GetPlayer(From);
 	if(From != m_pPlayer->GetCID() && pFrom->GetCharacter())
 	{
 		if(pFrom->GetCharacter()->m_ActiveWeapon == WEAPON_GUN)
@@ -761,7 +759,7 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 	}
 
 	// create healthmod indicator
-	GS()->CreateDamage(m_Pos, m_pPlayer->GetCID(), Source, OldHealth-m_Health, OldArmor-m_Armor, From == m_pPlayer->GetCID());
+	GS()->CreateDamage(m_Pos, m_pPlayer->GetCID(), OldHealth-m_Health, OldArmor-m_Armor, false);
 
 	if(From != m_pPlayer->GetCID())
 		GS()->CreatePlayerSound(From, SOUND_HIT);
@@ -1007,6 +1005,25 @@ void CCharacter::HandleAuthedPlayer()
 		IncreaseMana(m_pPlayer->GetStartMana() / 20);
 		m_pPlayer->ShowInformationStats();
 	}
+}
+
+bool CCharacter::IsAllowedPVP(int FromID)
+{
+	if(FromID < 0 || FromID >= MAX_CLIENTS)
+		return false;
+
+	CPlayer* pFrom = GS()->m_apPlayers[FromID];
+	if(!pFrom || !pFrom->GetCharacter())
+		return false;
+	if(pFrom->IsBot() && m_pPlayer->IsBot())
+		return false;
+	if(!pFrom->IsBot() && !m_pPlayer->IsBot() && (!GS()->IsAllowedPVP() || GS()->IsDungeon()))
+		return false;
+	if(m_pPlayer->IsBot() && m_pPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB || pFrom->IsBot() && pFrom->GetBotType() != BotsTypes::TYPE_BOT_MOB)
+		return false;
+	if(pFrom->GetCharacter()->m_NoAllowDamage || m_NoAllowDamage)
+		return false;
+	return true;
 }
 
 bool CCharacter::IsLockedWorld()

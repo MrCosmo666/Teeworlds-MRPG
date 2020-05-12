@@ -44,20 +44,44 @@ void CSleepyGravity::Reset()
 
 void CSleepyGravity::Tick()
 {
-	m_LifeSpan--;
 	if(!m_pPlayer || !m_pPlayer->GetCharacter() || !m_LifeSpan)
 	{
 		Reset();
 		return;
 	}
+
+	m_LifeSpan--;
+	const int TimeLeft = m_LifeSpan / Server()->TickSpeed();
+	if(TimeLeft < 3)
+	{
+		for(int i = 0; i < CSleepyGravity::NUM_IDS; i++)
+		{
+			float AngleStep = 2.0f * pi / CSleepyGravity::NUM_IDS;
+			vec2 VertexPos = m_Pos + vec2(m_Radius * cos(AngleStep * i), m_Radius * sin(AngleStep * i));
+			if(!m_LifeSpan)
+			{
+				GS()->CreateExplosion(VertexPos, m_pPlayer->GetCID(), WEAPON_GRENADE, m_PowerLevel);
+				if(i == CSleepyGravity::NUM_IDS - 1)
+					GS()->CreateExplosion(m_Pos, m_pPlayer->GetCID(), WEAPON_GRENADE, m_PowerLevel);
+			}
+			else if(m_LifeSpan && TimeLeft == i)
+			{
+				GS()->CreateDamage(m_Pos, m_pPlayer->GetCID(), 1, 0, true);
+				break;
+			}
+		}
+	}
 	
 	for(CCharacter *p = (CCharacter*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); p; p = (CCharacter *)p->TypeNext())
 	{
-		if(!GS()->Mmo()->Skills()->CheckInteraction(p, m_Pos, m_Radius))
+		if(!p || distance(m_Pos, p->m_Core.m_Pos) > m_Radius  || m_pPlayer->GetCID() == p->GetPlayer()->GetCID() || !p->IsAllowedPVP(m_pPlayer->GetCID()))
 			continue;
 
 		vec2 Dir = normalize(p->m_Core.m_Pos - m_Pos);
-		p->m_Core.m_Vel -= Dir * (1.20f);
+		if(distance(m_Pos, p->m_Core.m_Pos) < 20.0f)
+			continue;
+
+		p->m_Core.m_Vel -= Dir * (1.0f);
 	}
 }
 

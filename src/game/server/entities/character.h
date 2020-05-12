@@ -54,7 +54,7 @@ public:
 	virtual void Snap(int SnappingClient);
 	virtual void PostSnap();
 	virtual bool Spawn(class CPlayer *pPlayer, vec2 Pos);
-	virtual bool TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weapon);
+	virtual bool TakeDamage(vec2 Force, int Dmg, int From, int Weapon);
 	virtual void Die(int Killer, int Weapon);
 
 	void OnPredictedInput(CNetObj_PlayerInput *pNewInput);
@@ -62,7 +62,7 @@ public:
 	void ResetInput();
 	bool IsGrounded();
 
-
+	bool IsAllowedPVP(int FromID);
 	bool IsAlive() const { return m_Alive; }
 	void SetEvent(int EventID) { m_Event = EventID; };
 	void SetEmote(int Emote, int Sec);
