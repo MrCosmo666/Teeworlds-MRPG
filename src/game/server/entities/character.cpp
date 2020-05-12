@@ -1023,6 +1023,15 @@ bool CCharacter::IsAllowedPVP(int FromID)
 		return false;
 	if(pFrom->GetCharacter()->m_NoAllowDamage || m_NoAllowDamage)
 		return false;
+
+	const int FromAttributeLevel = pFrom->GetLevelDisciple(AtributType::AtDps) + pFrom->GetLevelDisciple(AtributType::AtTank) + pFrom->GetAttributeCount(AtributType::AtHealer);
+	const int PlayerAttributeLevel = m_pPlayer->GetLevelDisciple(AtributType::AtDps) + m_pPlayer->GetLevelDisciple(AtributType::AtTank) + m_pPlayer->GetAttributeCount(AtributType::AtHealer);
+	if(!pFrom->IsBot() && !m_pPlayer->IsBot() && ((FromAttributeLevel - PlayerAttributeLevel > g_Config.m_SvStrongAntiPVP) || (PlayerAttributeLevel - FromAttributeLevel > g_Config.m_SvStrongAntiPVP)))
+	{
+		GS()->Chat(FromID, "Battle PVP and so clear. Denied, some of you are weak.");
+		return false;
+	}
+
 	return true;
 }
 

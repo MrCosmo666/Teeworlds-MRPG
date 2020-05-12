@@ -126,37 +126,31 @@ MACRO_CONFIG_INT(SvInactiveKickTime, sv_inactivekick_time, 3, 0, 1000, CFGFLAG_S
 MACRO_CONFIG_INT(SvInactiveKick, sv_inactivekick, 2, 0, 3, CFGFLAG_SERVER, "How to deal with inactive clients (0=move player to spectator, 1=move player to spectator and kick spectator, 2=move to free spectator slot/kick, 3=kick)")
 
 // another config
-MACRO_CONFIG_INT(SvPriceTeleport, sv_price_teleport, 100, 0, 10000, CFGFLAG_SERVER, "Price for teleport*WorldID")
+MACRO_CONFIG_INT(SvPriceTeleport, sv_price_teleport, 120, 0, 10000, CFGFLAG_SERVER, "Price for teleport*WorldID")
 MACRO_CONFIG_INT(SvDoorRadiusHit, sv_door_radius_hit, 16, 16, 1000, CFGFLAG_SERVER, "Door radius hit.")
 
 // auction
 MACRO_CONFIG_INT(SvMaxAuctionSlots, sv_amax_slots, 5, 1, 1000, CFGFLAG_SERVER, "Max autction slots")
-MACRO_CONFIG_INT(SvAuctionPriceSlot, sv_apriceslot, 25, 0, 100000, CFGFLAG_SERVER, "Price for added new slot auction")
+MACRO_CONFIG_INT(SvAuctionPriceSlot, sv_apriceslot, 40, 0, 100000, CFGFLAG_SERVER, "Price for added new slot auction")
 MACRO_CONFIG_INT(SvTimeAuctionSlot, sv_atimeslot, 30, 5, 100000, CFGFLAG_SERVER, "Time in minutes for auction end slot")
 MACRO_CONFIG_INT(SvMaxMasiveAuctionSlots, sv_amax_masslot, 50, 10, 300, CFGFLAG_SERVER, "Max massive auction slots")
 MACRO_CONFIG_INT(SvTimeCheckAuction, sv_achecktime, 10, 1, 300, CFGFLAG_SERVER, "Minutes auction checks")
 
 // member group
-MACRO_CONFIG_INT(SvPriceUpgradeGuildSlot, sv_price_member_slot, 18999, 100, 9000000, CFGFLAG_SERVER, "Price for upgrade member slots")
-MACRO_CONFIG_INT(SvPriceUpgradeGuildAnother, sv_price_member_another, 18999, 100, 9000000, CFGFLAG_SERVER, "Price for upgrade member another")
-
-// payments
-MACRO_CONFIG_INT(SvHousePriceUse, sv_hpriceday, 80, 5, 9000000, CFGFLAG_SERVER, "Price house.")
+MACRO_CONFIG_INT(SvPriceUpgradeGuildSlot, sv_price_member_slot, 5900, 100, 9000000, CFGFLAG_SERVER, "Price for upgrade member slots")
+MACRO_CONFIG_INT(SvPriceUpgradeGuildAnother, sv_price_member_another, 16800, 100, 9000000, CFGFLAG_SERVER, "Price for upgrade member another")
 
 // leveling
 MACRO_CONFIG_INT(SvKillmobsIncreaseLevel, sv_kill_mobs_increase_level, 400, 0, 1000, CFGFLAG_SERVER, "Kill mobs of own level to increase.")
 MACRO_CONFIG_INT(SvMiningIncreaseLevel, sv_mining_increase_level, 80, 0, 1000, CFGFLAG_SERVER, "Mining items own level to increase")
 MACRO_CONFIG_INT(SvPlantingIncreaseLevel, sv_planting_increase_level, 80, 0, 10000, CFGFLAG_SERVER, "Planting items own level to increase")
 MACRO_CONFIG_INT(SvStrongGold, sv_strong_gold, 8, 0, 10000, CFGFLAG_SERVER, "Power mobs / strong gold")
-
-MACRO_CONFIG_INT(SvRelaxLeveling, sv_relaxleveling, 30, 0, 10000, CFGFLAG_SERVER, "Exp need for up level relax")
-MACRO_CONFIG_INT(SvGuildLeveling, sv_guildleveling, 1024, 0, 10000, CFGFLAG_SERVER, "Exp need for up level guild")
+MACRO_CONFIG_INT(SvStrongAntiPVP, sv_strong_anti_pvp, 25, 0, 10000, CFGFLAG_SERVER, "Anti-PVP Difference classing leveling for denied.")
 
 // world time
-MACRO_CONFIG_INT(SvShowSvNameTime, sv_worldtime_name, 1, 0, 1, CFGFLAG_SERVER, "Show world time in server")
+MACRO_CONFIG_INT(SvShowSvNameTime, sv_worldtime_name, 0, 0, 1, CFGFLAG_SERVER, "Show world time in server")
 
 // house
-MACRO_CONFIG_INT(SvMotelPrice, sv_marendprice, 100, 0, 9000000, CFGFLAG_SERVER, "Motel buy price")
 MACRO_CONFIG_INT(SvLimitDecoration, sv_limit_decorations, 10, 5, 20, CFGFLAG_SERVER, "Limit objects for decoration")
 
 // discord

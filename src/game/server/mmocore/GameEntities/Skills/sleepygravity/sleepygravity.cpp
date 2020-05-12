@@ -11,8 +11,8 @@ CSleepyGravity::CSleepyGravity(CGameWorld *pGameWorld, CPlayer* pPlayer, int Ski
 	// переданные аргументы
 	m_pPlayer = pPlayer;
 	m_PowerLevel = PowerLevel;
-	m_Radius = min(200 + PowerLevel * 2, 400);
-	m_LifeSpan = (10 + SkillBonus) * Server()->TickSpeed();
+	m_Radius = min(200 + SkillBonus, 400);
+	m_LifeSpan = 10 * Server()->TickSpeed();
 	GameWorld()->InsertEntity(this);	
 	for(int i=0; i<NUM_IDS; i++)
 	{
@@ -81,7 +81,7 @@ void CSleepyGravity::Tick()
 		if(distance(m_Pos, p->m_Core.m_Pos) < 20.0f)
 			continue;
 
-		p->m_Core.m_Vel -= Dir * (1.0f);
+		p->m_Core.m_Vel -= Dir * (1.25f);
 	}
 }
 
