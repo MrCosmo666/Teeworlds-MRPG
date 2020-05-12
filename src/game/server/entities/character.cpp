@@ -1019,7 +1019,7 @@ bool CCharacter::IsAllowedPVP(int FromID)
 		return false;
 	if(!pFrom->IsBot() && !m_pPlayer->IsBot() && (!GS()->IsAllowedPVP() || GS()->IsDungeon()))
 		return false;
-	if((m_pPlayer->IsBot() && m_pPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB) || pFrom->IsBot() && pFrom->GetBotType() != BotsTypes::TYPE_BOT_MOB)
+	if((m_pPlayer->IsBot() && m_pPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB) || (pFrom->IsBot() && pFrom->GetBotType() != BotsTypes::TYPE_BOT_MOB))
 		return false;
 	if(pFrom->GetCharacter()->m_NoAllowDamage || m_NoAllowDamage)
 		return false;
