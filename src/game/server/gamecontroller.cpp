@@ -51,6 +51,11 @@ bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 	if(pChr->GetPlayer()->Acc().TempHealth > 0)
 		StartHealth = pChr->GetPlayer()->Acc().TempHealth;
 	pChr->IncreaseHealth(StartHealth);
+	if(pChr->GetPlayer()->Acc().TempMana > 0)
+	{
+		const int StartMana = pChr->GetPlayer()->Acc().TempMana;
+		pChr->IncreaseMana(StartMana);
+	}
 
 	const int StartAmmo = 10 + pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo);
 	pChr->GiveWeapon(WEAPON_HAMMER, -1);
