@@ -116,6 +116,9 @@ void CPlayer::PotionsTick()
 		ieffect->second--;
 		if (ieffect->second <= 0)
 		{
+			if(!GS()->CheckClient(m_ClientID))
+				GS()->Chat(m_ClientID, "You lost the effect {STR}.", ieffect->first.c_str());
+
 			GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, ieffect->first.c_str(), false);
 			ieffect = CGS::Effects[m_ClientID].erase(ieffect);
 			continue;
@@ -414,6 +417,9 @@ void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
 
 	if((Random && rand()%Random == 0) || !Random)
 	{
+		if(!GS()->CheckClient(m_ClientID))
+			GS()->Chat(m_ClientID, "You got the effect {STR} time {INT}sec.", Potion, &Sec);
+
 		CGS::Effects[m_ClientID][Potion] = Sec;
 		GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, Potion, true);
 	}

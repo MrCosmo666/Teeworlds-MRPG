@@ -228,8 +228,7 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 	// скилл турель здоровья
 	if(SkillID == Skill::SkillHeartTurret)
 	{
-		for(CHealthHealer *pHh = (CHealthHealer*)GS()->m_World.FindFirst(CGameWorld::ENTYPE_SKILLTURRETHEART); 
-			pHh; pHh = (CHealthHealer *)pHh->TypeNext())
+		for(CHealthHealer *pHh = (CHealthHealer*)GS()->m_World.FindFirst(CGameWorld::ENTYPE_SKILLTURRETHEART); pHh; pHh = (CHealthHealer *)pHh->TypeNext())
 		{
 			if(pHh->m_pPlayer->GetCID() != pPlayer->GetCID()) 
 				continue;
@@ -241,8 +240,7 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 	// скилл турель гравитации
 	if(SkillID == Skill::SkillSleepyGravity)
 	{
-		for(CSleepyGravity *pHh = (CSleepyGravity*)GS()->m_World.FindFirst(CGameWorld::ENTYPE_SLEEPYGRAVITY); 
-			pHh; pHh = (CSleepyGravity *)pHh->TypeNext())
+		for(CSleepyGravity *pHh = (CSleepyGravity*)GS()->m_World.FindFirst(CGameWorld::ENTYPE_SLEEPYGRAVITY); pHh; pHh = (CSleepyGravity *)pHh->TypeNext())
 		{
 			if(pHh->m_pPlayer->GetCID() != pPlayer->GetCID()) 
 				continue;
