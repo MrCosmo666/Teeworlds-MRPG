@@ -279,7 +279,7 @@ void HouseJob::SellHouse(int HouseID)
 			GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**[House: {INT}] have been sold!**", &HouseID);
 		}
 		const int Price = Home[HouseID].m_Price;
-		Job()->Inbox()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itMoney, Price, 0);
+		Job()->Inbox()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itGold, Price, 0);
 
 		if(Home[HouseID].m_Door)
 		{
@@ -485,7 +485,7 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 	GS()->AV(ClientID, "null", "");
 	//
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
-	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", &pPlayer->GetItem(itMoney).Count);
+	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", &pPlayer->GetItem(itGold).Count);
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVM(ClientID, "HOUSEADD", 1, NOPE, "Add to the safe gold. (Amount in a reason)");
 	GS()->AVM(ClientID, "HOUSETAKE", 1, NOPE, "Take the safe gold. (Amount in a reason)");

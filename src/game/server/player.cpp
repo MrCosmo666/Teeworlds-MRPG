@@ -110,15 +110,21 @@ void CPlayer::PotionsTick()
 		if (str_comp(ieffect->first.c_str(), "Poison") == 0)
 			m_pCharacter->TakeDamage(vec2(0, 0), 1, m_ClientID, WEAPON_SELF);
 
-		if (str_comp(ieffect->first.c_str(), "RegenHealth") == 0)
-			m_pCharacter->IncreaseHealth(15);
+		if(str_comp(ieffect->first.c_str(), "RegenHealth") == 0)
+		{
+			const int RegenHP = kurosio::translate_to_procent_rest(GetStartHealth(), 3);
+			m_pCharacter->IncreaseHealth(RegenHP);
+		}
+		if(str_comp(ieffect->first.c_str(), "RegenMana") == 0)
+		{
+			const int RegenMana = kurosio::translate_to_procent_rest(GetStartHealth(), 5);
+			m_pCharacter->IncreaseMana(RegenMana);
+		}
 
 		ieffect->second--;
 		if (ieffect->second <= 0)
 		{
-			if(!GS()->CheckClient(m_ClientID))
-				GS()->Chat(m_ClientID, "You lost the effect {STR}.", ieffect->first.c_str());
-
+			GS()->Chat(m_ClientID, "You lost the effect {STR}.", ieffect->first.c_str());
 			GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, ieffect->first.c_str(), false);
 			ieffect = CGS::Effects[m_ClientID].erase(ieffect);
 			continue;
@@ -232,7 +238,7 @@ void CPlayer::Snap(int SnappingClient)
 	StrToInts(pClientInfo->m_Potions, 12, Buffer.buffer());
 	Buffer.clear();
 
-	Server()->Localization()->Format(Buffer, GetLanguage(), "{INT}", &GetItem(itMoney).Count);
+	Server()->Localization()->Format(Buffer, GetLanguage(), "{INT}", &GetItem(itGold).Count);
 	StrToInts(pClientInfo->m_Gold, 6, Buffer.buffer());
 	Buffer.clear();
 
@@ -417,9 +423,7 @@ void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
 
 	if((Random && rand()%Random == 0) || !Random)
 	{
-		if(!GS()->CheckClient(m_ClientID))
-			GS()->Chat(m_ClientID, "You got the effect {STR} time {INT}sec.", Potion, &Sec);
-
+		GS()->Chat(m_ClientID, "You got the effect {STR} time {INT}sec.", Potion, &Sec);
 		CGS::Effects[m_ClientID][Potion] = Sec;
 		GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, Potion, true);
 	}
@@ -466,7 +470,7 @@ void CPlayer::AddExp(int Exp)
 
 void CPlayer::AddMoney(int Money) 
 { 
-	GetItem(itMoney).Add(Money); 
+	GetItem(itGold).Add(Money); 
 }
 
 bool CPlayer::CheckEffect(const char* Potion)

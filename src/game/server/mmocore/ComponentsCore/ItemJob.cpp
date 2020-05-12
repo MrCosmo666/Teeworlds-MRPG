@@ -580,7 +580,13 @@ void ItemJob::UseItem(int ClientID, int ItemID, int Count)
 	InventoryItem &PlItem = pPlayer->GetItem(ItemID);
 	if(ItemID == itPotionHealthRegen && PlItem.Remove(Count, 0))
 	{
-		pPlayer->GiveEffect("RegenHealth", 20);
+		pPlayer->GiveEffect("RegenHealth", 15);
+		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", PlItem.Info().GetName(pPlayer), &Count);
+	}
+	
+	if(ItemID == itPotionManaRegen && PlItem.Remove(Count, 0))
+	{
+		pPlayer->GiveEffect("RegenMana", 15);
 		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", PlItem.Info().GetName(pPlayer), &Count);
 	}
 
@@ -689,7 +695,7 @@ bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 		return true;
 
 	// информация о получении себе предмета
-	if(Info().Type != -1 && itemid_ != itMoney)
+	if(Info().Type != -1 && itemid_ != itGold)
 		GameServer->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(m_pPlayer), &arg_count);
 	else if(Info().Notify)
 		GameServer->Chat(-1, "{STR} got of the {STR}x{INT}!", GameServer->Server()->ClientName(ClientID), Info().GetName(), &arg_count);

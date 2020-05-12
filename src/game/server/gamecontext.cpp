@@ -1890,7 +1890,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVH(ClientID, TAB_STAT, PURPLE_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().LastLogin);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Discord: \"{STR}\". Ideas, bugs, rewards", g_Config.m_SvDiscordInviteGroup);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Level {INT} : Exp {INT}/{INT}", &pPlayer->Acc().Level, &pPlayer->Acc().Exp, &NeedExp);
-		AVM(ClientID, "null", NOPE, TAB_STAT, "Money {INT} gold", &pPlayer->GetItem(itMoney).Count);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Money {INT} gold", &pPlayer->GetItem(itGold).Count);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Skill Point {INT}SP", &pPlayer->GetItem(itSkillPoint).Count);
 		AV(ClientID, "null", "");
 

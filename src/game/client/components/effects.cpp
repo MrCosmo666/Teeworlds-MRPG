@@ -330,7 +330,7 @@ void CEffects::MmoEffectPotion(vec2 Pos, const char* Potion, bool Added)
 	p.m_EndSize = 18.0f;
 
 	vec4 Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	if (str_find(Potion, "Health") != nullptr) 
+	if (str_find(Potion, "Health") != nullptr)
 		Color = vec4(1.0f, 0.80f, 1.0f, 1.0f);	
 	if(str_find(Potion, "Mana") != nullptr)
 		Color = vec4(0.80f, 0.80f, 1.0f, 1.0f);

@@ -212,19 +212,19 @@ enum
 
 
 	NOPE = -1,
-	itMoney = 1,				// Деньги обычная валюта
-	itHammer = 2,				// Снаряжение Молоток | Молоток
-	itMaterial = 7,				// Материал для зачирования вещей
-	itGoods = 8,				// Товары для загрузки разгрузки
-	itTicketGuild = 9,				// Билет для создания гильдии
-	itSkillPoint = 10,				// Скилл поинт
-	itDecoArmor = 11,				// Декорация Щит
-	itEliteDecoHealth = 12,				// Декорация элитная сердце
-	itEliteDecoNinja = 13,				// Декорация элитная ниндзя
-	itDecoHealth = 14,				// Декорация Сердце
-	itPotionHealthRegen = 18,				// Зелье регенерации здоровья
-	itCapsuleSurvivalExperience = 19,				// Дает 1.000 опыта
-	itLittleBagGold = 20,				// Дает 10-100 золота
+	itGold = 1,						// Деньги обычная валюта
+	itHammer = 2,						// Снаряжение Молоток | Молоток
+	itMaterial = 7,						// Материал для зачирования вещей
+	itTicketGuild = 8,					// Билет для создания гильдии
+	itSkillPoint = 9,					// Скилл поинт
+	itDecoArmor = 10,					// Декорация Щит
+	itEliteDecoHealth = 11,				// Декорация элитная сердце
+	itEliteDecoNinja = 12,				// Декорация элитная ниндзя
+	itDecoHealth = 13,					// Декорация Сердце
+	itPotionManaRegen = 14,				// Зелье регенерации маны
+	itPotionHealthRegen = 15,			// Зелье регенерации здоровья
+	itCapsuleSurvivalExperience = 16,	// Дает 10-50 опыта
+	itLittleBagGold = 17,				// Дает 10-50 золота
 
 	/*
 		Все листы сортировок что существуют на сервере

@@ -620,7 +620,7 @@ void QuestJob::QuestTableShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& Bo
 void QuestJob::QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID, bool GivingTable)
 {
 	CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
-	if (!pPlayer || ItemID < itMoney || !GS()->CheckClient(ClientID))
+	if (!pPlayer || ItemID < itGold || !GS()->CheckClient(ClientID))
 		return;
 
 	ItemJob::InventoryItem PlayerSelectedItem = pPlayer->GetItem(ItemID);

@@ -215,7 +215,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "Your [Slot %sx%d] was sold!", pPlayerBuyightItem.Info().GetName(pPlayer), Count);
-		Job()->Inbox()->SendInbox(OwnerID, "Auction Sell", aBuf, itMoney, Price, 0);
+		Job()->Inbox()->SendInbox(OwnerID, "Auction Sell", aBuf, itGold, Price, 0);
 		SJK.DD("tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, OwnerID);
 		pPlayerBuyightItem.Add(Count, 0, Enchant);
 		GS()->Chat(ClientID, "You buy {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(pPlayer), &Count);

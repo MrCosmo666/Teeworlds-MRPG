@@ -748,7 +748,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 			Dmg = max(1, Dmg/3);
 
 		// TODO: Impl it
-		GiveRandomMobEffect(From);
+		//GiveRandomMobEffect(From);
 	}
 
 	int OldHealth = m_Health, OldArmor = m_Armor;
@@ -1019,7 +1019,7 @@ bool CCharacter::IsAllowedPVP(int FromID)
 		return false;
 	if(!pFrom->IsBot() && !m_pPlayer->IsBot() && (!GS()->IsAllowedPVP() || GS()->IsDungeon()))
 		return false;
-	if(m_pPlayer->IsBot() && m_pPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB || pFrom->IsBot() && pFrom->GetBotType() != BotsTypes::TYPE_BOT_MOB)
+	if((m_pPlayer->IsBot() && m_pPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB) || pFrom->IsBot() && pFrom->GetBotType() != BotsTypes::TYPE_BOT_MOB)
 		return false;
 	if(pFrom->GetCharacter()->m_NoAllowDamage || m_NoAllowDamage)
 		return false;
@@ -1063,6 +1063,14 @@ bool CCharacter::CheckFailMana(int Mana)
 		return true;
 	}
 	m_Mana -= Mana;
+
+	// автозелье маны
+	if(m_Mana <= m_pPlayer->GetStartMana() / 5)
+	{
+		if(!m_pPlayer->CheckEffect("RegenMana") && m_pPlayer->GetItem(itPotionManaRegen).Count > 0 && m_pPlayer->GetItem(itPotionManaRegen).Settings)
+			GS()->Mmo()->Item()->UseItem(m_pPlayer->GetCID(), itPotionManaRegen, 1);
+	}
+
 	m_pPlayer->ShowInformationStats();
 	return false;	
 }

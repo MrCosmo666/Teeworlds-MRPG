@@ -826,7 +826,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	GS()->AV(ClientID, "null", "");
 	//
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
-	GS()->AVL(ClientID, "null", "◍ Your money: {INT}gold", &pPlayer->GetItem(itMoney).Count);
+	GS()->AVL(ClientID, "null", "◍ Your money: {INT}gold", &pPlayer->GetItem(itGold).Count);
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "MMONEY", "Add money guild bank. (Amount in a reason)", Guild[GuildID].m_Name);
 	GS()->AV(ClientID, "null", "");
@@ -841,7 +841,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	{
 		GS()->AV(ClientID, "null", "");
 		pPlayer->m_Colored = LIGHT_GRAY_COLOR;
-		GS()->AVL(ClientID, "null", "⌂ Housing system", &pPlayer->GetItem(itMoney).Count);
+		GS()->AVL(ClientID, "null", "⌂ Housing system", &pPlayer->GetItem(itGold).Count);
 		pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_HOUSE_DECORATION, NOPE, "Settings Decoration(s)");
 		GS()->AVL(ClientID, "MDOOR", "Change state (\"{STR} door\")", GetGuildDoor(GuildID) ? "Open" : "Close");
@@ -851,7 +851,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	GS()->AV(ClientID, "null", "");
 	//
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
-	GS()->AVL(ClientID, "null", "☆ Guild upgrades", &pPlayer->GetItem(itMoney).Count);
+	GS()->AVL(ClientID, "null", "☆ Guild upgrades", &pPlayer->GetItem(itGold).Count);
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	if (MemberHouse > 0)
 	{
