@@ -190,7 +190,7 @@ public:
 	/* #########################################################################
 		PACKET MESSAGE FUNCTIONS 
 	######################################################################### */
-	void SendEmoticon(int ClientID, int Emoticon);
+	void SendEmoticon(int ClientID, int Emoticon, bool SenderClient = false);
 	void SendWeaponPickup(int ClientID, int Weapon);
 	void SendMotd(int ClientID);
 	void SendSettings(int ClientID);

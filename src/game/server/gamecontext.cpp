@@ -687,10 +687,10 @@ void CGS::BroadcastTick(int ClientID)
 /* #########################################################################
 	PACKET MESSAGE FUNCTIONS 
 ######################################################################### */
-void CGS::SendEmoticon(int ClientID, int Emoticon)
+void CGS::SendEmoticon(int ClientID, int Emoticon, bool SenderClient)
 {
 	CPlayer* pPlayer = GetPlayer(ClientID, true, true);
-	if (pPlayer)
+	if (pPlayer && SenderClient)
 		Mmo()->Skills()->ParseEmoticionSkill(pPlayer, Emoticon);
 
 	CNetMsg_Sv_Emoticon Msg;
@@ -1212,7 +1212,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				return;
 
 			pPlayer->m_PlayerTick[TickState::LastEmote] = Server()->Tick();
-			SendEmoticon(ClientID, pMsg->m_Emoticon);
+			SendEmoticon(ClientID, pMsg->m_Emoticon, true);
 		}
 		else if (MsgID == NETMSGTYPE_CL_KILL)
 		{

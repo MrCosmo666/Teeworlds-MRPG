@@ -912,8 +912,7 @@ void CCharacter::GiveRandomMobEffect(int FromID)
 	CPlayer* pFrom = GS()->GetPlayer(FromID);
 	if(!pFrom || !pFrom->IsBot() || pFrom->GetBotType() != BotsTypes::TYPE_BOT_MOB || BotJob::MobBot[pFrom->GetBotSub()].Effect[0] == '\0')
 		return;
-
-	m_pPlayer->GiveEffect(BotJob::MobBot[pFrom->GetBotSub()].Effect, 5, 25);
+	m_pPlayer->GiveEffect(BotJob::MobBot[pFrom->GetBotSub()].Effect, 3+rand()%3, 16);
 }
 
 bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)
@@ -981,6 +980,18 @@ void CCharacter::HandleTunning()
 	// боты тюнинг
 	if(m_pPlayer->IsBot())
 		return;
+
+	if(m_pPlayer->CheckEffect("Slowdown"))
+	{
+		pTuningParams->m_Gravity = 0.35f;
+		pTuningParams->m_GroundFriction = 0.30f;
+		pTuningParams->m_GroundControlSpeed = 60.0f / Server()->TickSpeed();
+		pTuningParams->m_GroundControlAccel = 0.4f;
+		pTuningParams->m_AirFriction = 0.4f;
+		pTuningParams->m_AirControlSpeed = 60.0f / Server()->TickSpeed();
+		pTuningParams->m_AirControlAccel = 0.4f;
+		pTuningParams->m_HookLength = 0.0f;
+	}
 
 	// режим полета
 	if(m_pPlayer->m_Flymode && m_pPlayer->GetEquippedItem(EQUIP_WINGS) > 0)
