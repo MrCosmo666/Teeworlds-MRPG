@@ -229,7 +229,13 @@ void CPlayer::Snap(int SnappingClient)
 	Buffer.clear();
 
 	if(Acc().GuildID > 0)
-		StrToInts(pClientInfo->m_StateName, 6, GS()->Mmo()->Member()->GuildName(Acc().GuildID));
+	{
+		const int GuildID = Acc().GuildID;
+
+		char aBuf[24];
+		str_format(aBuf, sizeof(aBuf), "%s %s", GS()->Mmo()->Member()->GetGuildRank(GuildID, Acc().GuildRank), GS()->Mmo()->Member()->GuildName(GuildID));
+		StrToInts(pClientInfo->m_StateName, 6, aBuf);
+	}
 	else
 		StrToInts(pClientInfo->m_StateName, 6, "\0");
 }
