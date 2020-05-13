@@ -261,7 +261,7 @@ void CPlayer::TryRespawn()
 	if(!GS()->m_pController->CanSpawn(SpawnType, &SpawnPos, vec2(-1, -1)))
 		return;
 
-	if(Acc().TempTeleportX > 1 || Acc().TempTeleportY > 1)
+	if(!GS()->IsDungeon() && (Acc().TempTeleportX > 1 || Acc().TempTeleportY > 1))
 	{
 		SpawnPos = vec2(Acc().TempTeleportX, Acc().TempTeleportY);
 		Acc().TempTeleportX = Acc().TempTeleportY = -1;

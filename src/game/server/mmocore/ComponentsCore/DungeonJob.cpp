@@ -38,13 +38,13 @@ void DungeonJob::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds)
 
 void DungeonJob::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "WHERE DungeonID = '%d' ORDER BY Seconds ASC LIMIT 5", DungeonID));
 	while (RES->next())
 	{
-		int Rank = RES->getRow();
-		int OwnerID = RES->getInt("OwnerID");
-		int Seconds = RES->getDouble("Seconds");
+		const int Rank = RES->getRow();
+		const int OwnerID = RES->getInt("OwnerID");
+		const int Seconds = RES->getDouble("Seconds");
 
 		char aTimeFormat[64];
 		str_format(aTimeFormat, sizeof(aTimeFormat), "Time: %d minute(s) %d second(s)", Seconds / 60, Seconds - (Seconds / 60 * 60));
@@ -54,16 +54,16 @@ void DungeonJob::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
 
 void DungeonJob::ShowDungeonsList(CPlayer* pPlayer)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	for (const auto& dungeon : Dungeon)
 	{
-		int HideID = 7500 + dungeon.first;
+		const int HideID = 7500 + dungeon.first;
 		GS()->AVH(ClientID, HideID, GOLDEN_COLOR, "Lvl{INT} {STR} : Players {INT} : {STR} [{INT}%]",
 			&dungeon.second.Level, dungeon.second.Name, &dungeon.second.Players, (dungeon.second.State > 1 ? "Active dungeon" : "Waiting players"), &dungeon.second.Progress);
 
 		ShowDungeonTop(pPlayer, dungeon.first, HideID);
 
-		int NeededQuestID = dungeon.second.OpenQuestID;
+		const int NeededQuestID = dungeon.second.OpenQuestID;
 		if(NeededQuestID <= 0 || Job()->Quest()->IsComplectedQuest(ClientID, NeededQuestID))
 			GS()->AVM(ClientID, "DUNGEONJOIN", dungeon.first, HideID, "Join dungeon {STR}", dungeon.second.Name);
 		else

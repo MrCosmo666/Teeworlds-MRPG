@@ -51,7 +51,7 @@ void ItemJob::OnInit()
 void ItemJob::OnInitAccount(CPlayer *pPlayer)
 {
 	int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Settings, Enchant, Durability", "tw_items", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Settings, Enchant, Durability", "tw_accounts_items", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	while(RES->next())
 	{
 		int ItemID = (int)RES->getInt("ItemID");
@@ -72,7 +72,7 @@ void ItemJob::OnResetClient(int ClientID)
 void ItemJob::RepairDurabilityFull(CPlayer *pPlayer)
 { 
 	int ClientID = pPlayer->GetCID();
-	SJK.UD("tw_items", "Durability = '100' WHERE OwnerID = '%d'", pPlayer->Acc().AuthID);
+	SJK.UD("tw_accounts_items", "Durability = '100' WHERE OwnerID = '%d'", pPlayer->Acc().AuthID);
 	for(auto& it : Items[ClientID])
 		it.second.Durability = 100;
 }
@@ -139,7 +139,7 @@ void ItemJob::GiveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Coun
 	*SecureCode = SecureCheck(pPlayer, ItemID, Count, Settings, Enchant);
 	if(*SecureCode == 1)
 	{
-		SJK.UD("tw_items", "Count = '%d', Settings = '%d', Enchant = '%d' WHERE ItemID = '%d' AND OwnerID = '%d'",
+		SJK.UD("tw_accounts_items", "Count = '%d', Settings = '%d', Enchant = '%d' WHERE ItemID = '%d' AND OwnerID = '%d'",
 			Items[ClientID][ItemID].Count, Items[ClientID][ItemID].Settings, Items[ClientID][ItemID].Enchant, ItemID, pPlayer->Acc().AuthID);
 	}
 }
@@ -149,7 +149,7 @@ int ItemJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, 
 {
 	// проверяем инициализируем и добавляем предмет
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
 	if(RES->next())
 	{
 		Items[ClientID][ItemID].Count = RES->getInt("Count")+Count;
@@ -162,7 +162,7 @@ int ItemJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, 
 	Items[ClientID][ItemID].Settings = Settings;
 	Items[ClientID][ItemID].Enchant = Enchant;
 	Items[ClientID][ItemID].Durability = 100;
-	SJK.ID("tw_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d')",
+	SJK.ID("tw_accounts_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d')",
 		ItemID, pPlayer->Acc().AuthID, Count, Settings, Enchant);
 	return 2;
 }
@@ -172,7 +172,7 @@ void ItemJob::RemoveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Co
 {
 	*SecureCode = DeSecureCheck(pPlayer, ItemID, Count, Settings);
 	if(*SecureCode == 1)
-		SJK.UD("tw_items", "Count = Count - '%d', Settings = Settings - '%d' WHERE ItemID = '%d' AND OwnerID = '%d'", Count, Settings, ItemID, pPlayer->Acc().AuthID);
+		SJK.UD("tw_accounts_items", "Count = Count - '%d', Settings = Settings - '%d' WHERE ItemID = '%d' AND OwnerID = '%d'", Count, Settings, ItemID, pPlayer->Acc().AuthID);
 }
 
 // удаление предмета первостепенная обработка
@@ -180,7 +180,7 @@ int ItemJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings
 {
 	// проверяем в базе данных и проверяем 
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
 	if(RES->next())
 	{
 		// обновляем если количество больше
@@ -194,7 +194,7 @@ int ItemJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings
 		Items[ClientID][ItemID].Count = 0;
 		Items[ClientID][ItemID].Settings = 0;
 		Items[ClientID][ItemID].Enchant = 0;
-		SJK.DD("tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID);
+		SJK.DD("tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID);
 		return 2;		
 	}
 	// суда мы заходим если предметов нет и нечего удалять
@@ -770,7 +770,7 @@ bool ItemJob::ClassItems::Save()
 {
 	if (m_pPlayer && m_pPlayer->IsAuthed())
 	{
-		SJK.UD("tw_items", "Count = '%d', Settings = '%d', Enchant = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", Count, Settings, Enchant, m_pPlayer->Acc().AuthID, itemid_);
+		SJK.UD("tw_accounts_items", "Count = '%d', Settings = '%d', Enchant = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", Count, Settings, Enchant, m_pPlayer->Acc().AuthID, itemid_);
 		return true;
 	}
 	return false;
@@ -794,15 +794,15 @@ void ItemJob::AddItemSleep(int AccountID, int ItemID, int GiveCount, int Millise
 				return;
 			}
 
-			boost::scoped_ptr<ResultSet> RES(SJK.SD("Count", "tw_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, AccountID));
+			boost::scoped_ptr<ResultSet> RES(SJK.SD("Count", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, AccountID));
 			if(RES->next())
 			{
 				const int ReallyCount = (int)RES->getInt("Count") + GiveCount;
-				SJK.UD("tw_items", "Count = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", ReallyCount, AccountID, ItemID);
+				SJK.UD("tw_accounts_items", "Count = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", ReallyCount, AccountID, ItemID);
 				lock_sleep[AccountID].unlock();
 				return;
 			}
-			SJK.ID("tw_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '0', '0')", ItemID, AccountID, GiveCount);
+			SJK.ID("tw_accounts_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '0', '0')", ItemID, AccountID, GiveCount);
 			lock_sleep[AccountID].unlock();
 		}).detach();
 }

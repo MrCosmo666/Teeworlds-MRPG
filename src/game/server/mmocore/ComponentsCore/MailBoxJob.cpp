@@ -9,7 +9,7 @@ using namespace sqlstr;
 // действие над письмом
 void MailBoxJob::InteractiveInbox(CPlayer *pPlayer, int InboxID)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Enchant", "tw_inbox", "WHERE ID = '%d'", InboxID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Enchant", "tw_accounts_inbox", "WHERE ID = '%d'", InboxID));
 	if(RES->next())
 	{
 		// получаем информацию о письме
@@ -27,7 +27,7 @@ void MailBoxJob::InteractiveInbox(CPlayer *pPlayer, int InboxID)
 		}
 
 		// удаляем письмо
-		SJK.DD("tw_inbox", "WHERE ID = '%d'", InboxID);
+		SJK.DD("tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
 	}
 }
 
@@ -38,7 +38,7 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 	int ClientID = pPlayer->GetCID();
 	int StartHideCount = (int)(NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 200);
 	int HideID = StartHideCount;
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().AuthID, MAX_INBOX_LIST));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().AuthID, MAX_INBOX_LIST));
 	while(RES->next())
 	{
 		// получаем информацию для создания предмета
@@ -82,7 +82,7 @@ int MailBoxJob::GetActiveInbox(int ClientID)
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
 	if(!pPlayer) return 0;
 
-	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	const int MailCount = RES2->rowsCount();
 	return MailCount;
 }
@@ -98,11 +98,11 @@ void MailBoxJob::SendInbox(int AuthID, const char* Name, const char* Desc, int I
 	GS()->ChatAccountID(AuthID, "You have a new [{STR}] mail!", cName.cstr());
 	if (ItemID <= 0)
 	{
-		SJK.ID("tw_inbox", "(MailName, MailDesc, OwnerID) VALUES ('%s', '%s', '%d');", cName.cstr(), cDesc.cstr(), AuthID);
+		SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, OwnerID) VALUES ('%s', '%s', '%d');", cName.cstr(), cDesc.cstr(), AuthID);
 		return;
 	}
 
-	SJK.ID("tw_inbox", "(MailName, MailDesc, ItemID, Count, Enchant, OwnerID) VALUES ('%s', '%s', '%d', '%d', '%d', '%d');",
+	SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, ItemID, Count, Enchant, OwnerID) VALUES ('%s', '%s', '%d', '%d', '%d', '%d');",
 		 cName.cstr(), cDesc.cstr(), ItemID, Count, Enchant, AuthID);
 }
 

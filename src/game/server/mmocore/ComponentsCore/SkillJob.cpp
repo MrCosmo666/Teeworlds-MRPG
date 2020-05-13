@@ -35,7 +35,7 @@ void SkillJob::OnInit()
 void SkillJob::OnInitAccount(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("SkillID, SkillLevel, SelectedEmoticion", "tw_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("SkillID, SkillLevel, SelectedEmoticion", "tw_accounts_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	while(RES->next())
 	{
 		const int SkillID = (int)RES->getInt("SkillID");
@@ -115,7 +115,7 @@ bool SkillJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		if (Skill[ClientID][SkillID].m_SelectedEmoticion >= NUM_EMOTICONS)
 			Skill[ClientID][SkillID].m_SelectedEmoticion = -1;
 
-		SJK.UD("tw_skills", "SelectedEmoticion = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", Skill[ClientID][SkillID].m_SelectedEmoticion, SkillID, pPlayer->Acc().AuthID);
+		SJK.UD("tw_accounts_skills", "SelectedEmoticion = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", Skill[ClientID][SkillID].m_SelectedEmoticion, SkillID, pPlayer->Acc().AuthID);
 		GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
@@ -183,7 +183,7 @@ void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 {
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_skills", "WHERE SkillID = '%d' AND OwnerID = '%d'", SkillID, pPlayer->Acc().AuthID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_skills", "WHERE SkillID = '%d' AND OwnerID = '%d'", SkillID, pPlayer->Acc().AuthID));
 	if (RES->next())
 	{
 		if (Skill[ClientID][SkillID].m_SkillLevel >= SkillData[SkillID].m_SkillMaxLevel)
@@ -196,7 +196,7 @@ bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 			return false;
 
 		Skill[ClientID][SkillID].m_SkillLevel++;
-		SJK.UD("tw_skills", "SkillLevel = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", Skill[ClientID][SkillID].m_SkillLevel, SkillID, pPlayer->Acc().AuthID);
+		SJK.UD("tw_accounts_skills", "SkillLevel = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", Skill[ClientID][SkillID].m_SkillLevel, SkillID, pPlayer->Acc().AuthID);
 		GS()->Chat(ClientID, "You have increased the skill [{STR} level to {INT}]!", SkillData[SkillID].m_SkillName, &Skill[ClientID][SkillID].m_SkillLevel);
 		return true;
 	}
@@ -206,7 +206,7 @@ bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 
 	Skill[ClientID][SkillID].m_SkillLevel = 1;
 	Skill[ClientID][SkillID].m_SelectedEmoticion = -1;
-	SJK.ID("tw_skills", "(SkillID, OwnerID, SkillLevel) VALUES ('%d', '%d', '1');", SkillID, pPlayer->Acc().AuthID);
+	SJK.ID("tw_accounts_skills", "(SkillID, OwnerID, SkillLevel) VALUES ('%d', '%d', '1');", SkillID, pPlayer->Acc().AuthID);
 	GS()->Chat(ClientID, "You have learned a new skill [{STR}]", SkillData[SkillID].m_SkillName);
 	return true;
 }

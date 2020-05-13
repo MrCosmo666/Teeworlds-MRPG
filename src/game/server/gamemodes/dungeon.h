@@ -6,8 +6,6 @@
 #include <game/server/entity.h>
 #include <game/server/gamecontroller.h>
 
-// you can subclass GAMECONTROLLER_CTF, GAMECONTROLLER_TDM etc if you want
-// todo a modification with their base as well.
 enum DungeonState
 {
 	DUNGEON_WAITING,
@@ -15,7 +13,6 @@ enum DungeonState
 	DUNGEON_STARTED,
 	DUNGEON_WAITING_FINISH,
 	DUNGEON_FINISHED,
-
 };
 
 class DungeonDoor;
@@ -39,11 +36,7 @@ public:
 	virtual bool OnEntity(int Index, vec2 Pos);
 	virtual void OnCharacterDeath(class CCharacter* pVictim, class CPlayer* pKiller, int Weapon);
 	virtual bool OnCharacterSpawn(class CCharacter* pChr);
-
 	virtual void CreateLogic(int Type, int Mode, vec2 Pos, int ParseID);
-	
-	// пустые функции с mod
-	virtual void RespawnedClickEvent() {};
 
 private:
 	int PlayersNum() const;
@@ -59,7 +52,6 @@ private:
 	void ResetDoorKeyState();
 };
 
-// CHomeDoor class
 class DungeonDoor : public CEntity
 {
 	vec2 m_To;

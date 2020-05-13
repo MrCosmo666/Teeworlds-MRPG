@@ -981,6 +981,17 @@ void CCharacter::HandleTunning()
 	if(m_pPlayer->IsBot())
 		return;
 
+	// режим полета
+	if(m_pPlayer->m_Flymode && m_pPlayer->GetEquippedItem(EQUIP_WINGS) > 0)
+	{
+		pTuningParams->m_Gravity = 0.00f;
+		pTuningParams->m_HookLength = 700.0f;
+		pTuningParams->m_AirControlAccel = 1.5f;
+
+		vec2 Direction = vec2(m_Core.m_Input.m_TargetX, m_Core.m_Input.m_TargetY);
+		m_Core.m_Vel += Direction * 0.001f;
+	}
+
 	// effects
 	if(m_pPlayer->CheckEffect("Slowdown"))
 	{
@@ -1020,17 +1031,6 @@ void CCharacter::HandleTunning()
 		}
 	}
 
-
-	// режим полета
-	if(m_pPlayer->m_Flymode && m_pPlayer->GetEquippedItem(EQUIP_WINGS) > 0)
-	{
-		pTuningParams->m_Gravity = 0.00f;
-		pTuningParams->m_HookLength = 700.0f;
-		pTuningParams->m_AirControlAccel = 1.5f;
-
-		vec2 Direction = vec2(m_Core.m_Input.m_TargetX, m_Core.m_Input.m_TargetY);
-		m_Core.m_Vel += Direction*0.001f;
-	}
 }
 
 void CCharacter::HandleAuthedPlayer()

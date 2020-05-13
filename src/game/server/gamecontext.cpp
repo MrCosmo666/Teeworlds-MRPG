@@ -14,7 +14,7 @@
 #include "gamecontext.h"
 #include <game/collision.h>
 #include <game/gamecore.h>
-#include "gamemodes/mod.h"
+#include "gamemodes/main.h"
 #include "gamemodes/dungeon.h"
 
 // object entities
@@ -970,7 +970,7 @@ void CGS::OnInit(int WorldID)
 	}
 	else
 	{
-		m_pController = new CGameControllerMOD(this);
+		m_pController = new CGameControllerMain(this);
 	}
 	m_pController->RegisterChatCommands(CommandManager());
 

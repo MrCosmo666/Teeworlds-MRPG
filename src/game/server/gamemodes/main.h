@@ -4,13 +4,11 @@
 #define GAME_SERVER_GAMEMODES_MOD_H
 #include <game/server/gamecontroller.h>
 
-// you can subclass GAMECONTROLLER_CTF, GAMECONTROLLER_TDM etc if you want
-// todo a modification with their base as well.
-class CGameControllerMOD : public IGameController
+class CGameControllerMain : public IGameController
 {
 public:
 
-	CGameControllerMOD(class CGS *pGameServer);
+	CGameControllerMain(class CGS *pGameServer);
 
 	virtual void Tick();
 	virtual bool OnEntity(int Index, vec2 Pos);

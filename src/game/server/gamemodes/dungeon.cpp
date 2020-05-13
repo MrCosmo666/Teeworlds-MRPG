@@ -1,6 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
+#include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 
 #include <game/server/mmocore/GameEntities/jobitems.h>
@@ -70,7 +71,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Ожидание данжа
 	else if (State == DUNGEON_WAITING_START)
 	{
-		m_StartingTick = Server()->TickSpeed() * 10;
+		m_StartingTick = Server()->TickSpeed() * 180;
 		SetMobsSpawn(false);
 	}
 
@@ -125,12 +126,15 @@ void CGameControllerDungeon::ChangeState(int State)
 
 void CGameControllerDungeon::StateTick()
 {
-	int Players = PlayersNum();
-
+	const int Players = PlayersNum();
 	// сбросить данж
 	if (Players < 1 && m_StateDungeon != DUNGEON_WAITING)
 		ChangeState(DUNGEON_WAITING);
-	
+
+	// уменьшить время если игроков больше одного
+	if(Players > 1 && m_StartingTick > Server()->TickSpeed() * 120)
+		m_StartingTick = Server()->TickSpeed() * 120;
+
 	// обновлять информацию каждую секунду
 	if (Server()->Tick() % Server()->TickSpeed() == 0)
 	{
@@ -142,11 +146,7 @@ void CGameControllerDungeon::StateTick()
 	// Используется в тике когда Ожидание данжа
 	if (m_StateDungeon == DUNGEON_WAITING)
 	{
-		// пишем всем игрокам что ждем 2 игроков
-		if (Players == 1)
-			GS()->BroadcastWorldID(m_WorldID, 99999, 10, "Dungeon '{STR}' Waiting 2 players!", DungeonJob::Dungeon[m_DungeonID].Name);
-		// начинаем данж если равно 2 игрока или больше
-		else if (Players >= 2)
+		if (Players >= 1)
 			ChangeState(DUNGEON_WAITING_START);
 	}
 
@@ -361,11 +361,11 @@ bool CGameControllerDungeon::OnEntity(int Index, vec2 Pos)
 	return false;
 }
 
-// Двери
+
 DungeonDoor::DungeonDoor(CGameWorld *pGameWorld, vec2 Pos)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_DUNGEONDOOR, Pos)
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_DUNGEONDOOR, Pos), m_To(Pos)
 {
-	m_To = vec2(Pos.x, Pos.y-140);
+	m_To = GS()->Collision()->FindDirCollision(100, m_To, 'y', '-');
 	m_Pos.y += 30;
 
 	m_State = DUNGEON_WAITING;
@@ -381,16 +381,11 @@ void DungeonDoor::Tick()
 	{
 		vec2 IntersectPos = closest_point_on_line(m_Pos, m_To, pChar->m_Core.m_Pos);
 		float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);
-
-		// снижаем скокрость
-		if (Distance < 64.0f && length(pChar->m_Core.m_Vel) >= 64.0)
-			pChar->m_Core.m_Vel = vec2(0, 0);
-
-		// проверяем дистанцию
-		if (Distance < 30.0f && pChar->IsAlive())
+		if(Distance <= g_Config.m_SvDoorRadiusHit)
 		{
+			pChar->m_DoorHit = true;
 			pChar->Die(pChar->GetPlayer()->GetCID(), WEAPON_WORLD);
-		}		
+		}
 	}
 }
 
