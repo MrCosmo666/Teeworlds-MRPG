@@ -58,8 +58,10 @@ bool CGameControllerMain::OnEntity(int Index, vec2 Pos)
 		const int HouseID = GS()->Mmo()->House()->GetHouse(Pos, true);
 		const int PlantsID = GS()->Mmo()->House()->GetPlantsID(HouseID);
 		if(HouseID > 0 && PlantsID > 0)
+		{
 			new CJobItems(&GS()->m_World, PlantsID, 1, Pos, 0, 100, HouseID);
-
+			return true;
+		}
 		// расстения по миру
 		const int ItemID = GS()->Mmo()->PlantsAcc()->GetPlantItemID(Pos), Level = GS()->Mmo()->PlantsAcc()->GetPlantLevel(Pos);
 		if(ItemID > 0)

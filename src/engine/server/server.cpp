@@ -368,17 +368,15 @@ void CServer::SetClientLanguage(int ClientID, const char* pLanguage)
 
 const char *CServer::GetWorldName(int WorldID)
 {
-	if(WorldID >= COUNT_WORLD)
+	if(WorldID < 0 || WorldID >= COUNT_WORLD)
 		return "UnknowName";
-		
-	const char *NameWorlds[] = {"AcreaLand", 
-								"Pier on coast of great lands", 
-								"Way to the great lands", 
-								"Change later", 
-								"Castle King", 
-								"Mountains-Icru", 
-								"Acrea Cattle Storages", 
-								"Cutscene Welcome" };
+	
+	const char *NameWorlds[COUNT_WORLD] = 
+	{ 
+		"Pier Elfinia",
+		"Way to the Elfinia",
+		"Elfinia"
+	};
 	return NameWorlds[WorldID];
 }
 

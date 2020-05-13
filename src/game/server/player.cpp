@@ -857,6 +857,7 @@ void CPlayer::FormatTextQuest(int DataBotID, const char *pText)
 	str_replace(m_FormatTalkQuest, "[Player]", GS()->Server()->ClientName(m_ClientID));
 	str_replace(m_FormatTalkQuest, "[Talked]", BotJob::DataBot[DataBotID].NameBot);
 	str_replace(m_FormatTalkQuest, "[Time]", GS()->Server()->GetStringTypeDay());
+	str_replace(m_FormatTalkQuest, "[Here]", GS()->Server()->GetWorldName(GS()->GetWorldID()));
 }
 void CPlayer::ClearFormatQuestText()
 {
