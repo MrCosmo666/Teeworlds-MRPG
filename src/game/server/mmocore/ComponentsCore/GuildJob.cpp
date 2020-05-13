@@ -992,7 +992,7 @@ const char *GuildJob::GetGuildRank(int GuildID, int RankID)
 {
 	if(RankGuild.find(RankID) != RankGuild.end() && GuildID == RankGuild[RankID].GuildID)
 		return RankGuild[RankID].Rank;
-	return "Young";
+	return "Member";
 }
 
 // найти ранг по имени и организации
