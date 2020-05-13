@@ -322,7 +322,7 @@ void CCharacterBotAI::EngineMobs()
 	// интерактивы бота без найденого игрока
 	// ------------------------------------------------------------------------------
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
-		m_Input.m_TargetY = random_int()%30- random_int()%60 + m_Core.m_Vel.y;
+		m_Input.m_TargetY = random_int()%15- random_int()%30 + m_Core.m_Vel.y;
 	m_Input.m_TargetX = m_Input.m_Direction* random_int()%30;
 
 	// крюк

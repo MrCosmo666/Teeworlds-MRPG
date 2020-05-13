@@ -375,7 +375,8 @@ const char *CServer::GetWorldName(int WorldID)
 	{ 
 		"Pier Elfinia",
 		"Way to the Elfinia",
-		"Elfinia"
+		"Elfinia",
+		"Elfinia Deep cave",
 	};
 	return NameWorlds[WorldID];
 }

@@ -593,7 +593,7 @@ void GuildJob::TickHousingText()
 			GS()->CreateText(NULL, false, vec2(mh.second.m_TextX, mh.second.m_TextY), vec2(0, 0), LifeTime, Guild[GuildID].m_Name, mh.second.m_WorldID);
 			continue;
 		}
-		GS()->CreateText(NULL, false, vec2(mh.second.m_TextX, mh.second.m_TextY), vec2(0, 0), LifeTime, "FREE", mh.second.m_WorldID);
+		GS()->CreateText(NULL, false, vec2(mh.second.m_TextX, mh.second.m_TextY), vec2(0, 0), LifeTime, "GUILD HOUSE", mh.second.m_WorldID);
 	}
 }
 

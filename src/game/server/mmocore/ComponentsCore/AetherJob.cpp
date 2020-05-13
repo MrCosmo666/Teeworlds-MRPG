@@ -140,7 +140,7 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 			distance(pPlayer->GetCharacter()->m_Core.m_Pos, vec2(tl.second.TeleX, tl.second.TeleY)) < 120);
 		if (LocalTeleport)
 		{
-			GS()->AVM(ClientID, "null", tl.first, TAB_AETHER, "[Local] {STR} - {STR}", tl.second.TeleName, GS()->Server()->GetWorldName(tl.second.WorldID));
+			GS()->AVM(ClientID, "null", tl.first, TAB_AETHER, "[Local] {STR} :: {STR}", tl.second.TeleName, GS()->Server()->GetWorldName(tl.second.WorldID));
 			continue;
 		}
 

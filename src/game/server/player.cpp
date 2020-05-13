@@ -438,7 +438,7 @@ void CPlayer::AddExp(int Exp)
 	for( ; Acc().Exp >= ExpNeed(Acc().Level); ) 
 	{
 		Acc().Exp -= ExpNeed(Acc().Level), Acc().Level++;
-		Acc().Upgrade += 8;
+		Acc().Upgrade += 10;
 
 		GS()->CreateDeath(m_pCharacter->m_Core.m_Pos, m_ClientID);
 		GS()->CreateSound(m_pCharacter->m_Core.m_Pos, 4);

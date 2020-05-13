@@ -74,10 +74,15 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 			Power += ItemBonusCount;
 		}
 
-		if (BonusID == Stats::StStrength || BonusID == Stats::StCriticalHit ||CGS::AttributInfo[BonusID].AtType == AtHardtype)
-			Power /= 250;
+		// maximal crit and direct lowered
+		if(BonusID == Stats::StCriticalHit || BonusID == Stats::StDirectCriticalHit)
+			return 0;
+		// all hardtypews and strength lowered
+		else if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
+			Power /= 40;
+		// lowered hardness 
 		else if(BonusID != Stats::StHardness)
-			Power /= 10;
+			Power /= 5;
 		return Power;
 	}
 	return 10;
