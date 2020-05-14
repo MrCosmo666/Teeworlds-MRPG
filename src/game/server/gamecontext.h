@@ -93,24 +93,6 @@ public:
 		char ParsingType[32];
 	};
 	static std::map < int, StructParsing > Interactive;
-	// - - - - - - - - - - - -
-	struct StructInteractiveSub
-	{
-		// обычные что не можно раскидать на все
-		int TempDecoractionID;
-		int TempDecorationType;
-		int TempID3;
-
-		// остальное все
-		ShopJob::AuctionItem AuctionItem;
-
-		// temp rankname for guild rank settings
-		char m_aRankGuildBuf[32];
-
-		// temp guild name for searching
-		char m_aGuildSearchBuf[32];
-	};
-	static std::map < int, StructInteractiveSub > InteractiveSub;
 
 	// - - - - - - - - - - - -
 	static std::map < int, std::map < std::string, int > > Effects;

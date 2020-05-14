@@ -32,7 +32,6 @@ std::map < int , CGS::StructAttribut > CGS::AttributInfo;
 
 // Структуры игроков
 std::map < int , CGS::StructParsing > CGS::Interactive;
-std::map < int , CGS::StructInteractiveSub > CGS::InteractiveSub;
 std::map < int , std::map < std::string , int > > CGS::Effects;
 int CGS::m_RaidExp = 100;
 
@@ -1532,10 +1531,6 @@ void CGS::ClearClientData(int ClientID)
 
 	if(Effects.find(ClientID) != Effects.end()) 
 		Effects.erase(ClientID);
-
-	if(InteractiveSub.find(ClientID) != InteractiveSub.end())
-		InteractiveSub.erase(ClientID);
-
 }
 
 int CGS::GetRank(int AuthID)

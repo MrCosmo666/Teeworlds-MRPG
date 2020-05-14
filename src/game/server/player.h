@@ -163,9 +163,10 @@ public:
 	/* #########################################################################
 		FUNCTIONS PLAYER ITEMS 
 	######################################################################### */
-	ItemJob::InventoryItem &GetItem(int ItemID);
+	ItemJob::InventoryItem& GetItem(int ItemID);
+	AccountMainJob::StructTempPlayerData& GetTempData() { return AccountMainJob::PlayerTempData[m_ClientID]; }
+	AccountMainJob::StructData& Acc() { return AccountMainJob::Data[m_ClientID]; }
 
-	AccountMainJob::StructData& Acc() { return AccountMainJob::Data[m_ClientID]; };
 	int GetLevelDisciple(int Class);
 
 	// разговоры с нпс функции

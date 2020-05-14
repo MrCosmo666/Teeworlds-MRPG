@@ -42,9 +42,9 @@ bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 
 	// если спавним игрока
 	int StartHealth = pChr->GetPlayer()->GetStartHealth();
-	if(pChr->GetPlayer()->Acc().TempActiveSafeSpawn == true)
+	if(pChr->GetPlayer()->GetTempData().TempActiveSafeSpawn == true)
 	{
-		pChr->GetPlayer()->Acc().TempActiveSafeSpawn = false;
+		pChr->GetPlayer()->GetTempData().TempActiveSafeSpawn = false;
 		StartHealth /= 2;
 	}
 

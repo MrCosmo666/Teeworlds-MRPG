@@ -124,7 +124,7 @@ void CPlayer::PostTick()
 {
 	// update latency value
 	if (Server()->ClientIngame(m_ClientID) && GS()->IsClientEqualWorldID(m_ClientID) && IsAuthed())
-		Acc().TempLatencyPing = m_Latency.m_Min;
+		GetTempData().TempLatencyPing = m_Latency.m_Min;
 }
 
 // Тик авторизированного в ::Tick
@@ -192,7 +192,7 @@ void CPlayer::Snap(int SnappingClient)
 	if(Server()->IsAuthed(m_ClientID))
 		pPlayerInfo->m_PlayerFlags |= PLAYERFLAG_ADMIN;
 
-	pPlayerInfo->m_Latency = (SnappingClient == -1 ? m_Latency.m_Min : Acc().TempLatencyPing);
+	pPlayerInfo->m_Latency = (SnappingClient == -1 ? m_Latency.m_Min : GetTempData().TempLatencyPing);
 	pPlayerInfo->m_Score = Acc().Level;
 
 	// --------------------- CUSTOM ----------------------
@@ -253,7 +253,7 @@ void CPlayer::TryRespawn()
 {
 	vec2 SpawnPos;
 	int SpawnType = SPAWN_HUMAN;
-	if(Acc().TempActiveSafeSpawn)
+	if(GetTempData().TempActiveSafeSpawn)
 	{
 		const int SafezoneWorldID = GS()->GetRespawnWorld();
 		if(SafezoneWorldID >= 0 && !GS()->IsClientEqualWorldID(m_ClientID, SafezoneWorldID))
@@ -267,10 +267,10 @@ void CPlayer::TryRespawn()
 	if(!GS()->m_pController->CanSpawn(SpawnType, &SpawnPos, vec2(-1, -1)))
 		return;
 
-	if(!GS()->IsDungeon() && (Acc().TempTeleportX > 1 || Acc().TempTeleportY > 1))
+	if(!GS()->IsDungeon() && (GetTempData().TempTeleportX > 1 || GetTempData().TempTeleportY > 1))
 	{
-		SpawnPos = vec2(Acc().TempTeleportX, Acc().TempTeleportY);
-		Acc().TempTeleportX = Acc().TempTeleportY = -1;
+		SpawnPos = vec2(GetTempData().TempTeleportX, GetTempData().TempTeleportY);
+		GetTempData().TempTeleportX = GetTempData().TempTeleportY = -1;
 	}
 	int savecidmem = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
 	m_pCharacter = new(savecidmem) CCharacter(&GS()->m_World);

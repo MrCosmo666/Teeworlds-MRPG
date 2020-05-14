@@ -534,8 +534,8 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		vec2 Position = GetPositionHouse(HouseID);
 		if(!GS()->IsClientEqualWorldID(ClientID, HouseWorldID))
 		{
-			pPlayer->Acc().TempTeleportX = Position.x;
-			pPlayer->Acc().TempTeleportY = Position.y;
+			pPlayer->GetTempData().TempTeleportX = Position.x;
+			pPlayer->GetTempData().TempTeleportY = Position.y;
 			pPlayer->ChangeWorld(HouseWorldID);
 			return true;
 		}
@@ -591,8 +591,8 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		GS()->AddBack(ClientID);
 
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
-		CGS::InteractiveSub[ClientID].TempDecoractionID = VoteID;
-		CGS::InteractiveSub[ClientID].TempDecorationType = DECOTYPE_HOUSE;
+		pPlayer->GetTempData().TempDecoractionID = VoteID;
+		pPlayer->GetTempData().TempDecorationType = DECOTYPE_HOUSE;
 		return true;
 	}
 

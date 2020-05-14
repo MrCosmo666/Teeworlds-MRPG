@@ -46,8 +46,8 @@ bool AetherJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID
 		vec2 Position = vec2(Teleport[TeleportID].TeleX, Teleport[TeleportID].TeleY);
 		if(Teleport[TeleportID].WorldID != GS()->Server()->GetWorldID(ClientID))
 		{
-			pPlayer->Acc().TempTeleportX = Position.x;
-			pPlayer->Acc().TempTeleportY = Position.y;
+			pPlayer->GetTempData().TempTeleportX = Position.x;
+			pPlayer->GetTempData().TempTeleportY = Position.y;
 			pPlayer->ChangeWorld(Teleport[TeleportID].WorldID);
 			return true;
 		}

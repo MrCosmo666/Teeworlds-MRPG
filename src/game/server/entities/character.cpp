@@ -181,12 +181,12 @@ void CCharacter::HandleWeaponSwitch()
 bool CCharacter::DecoInteractive()
 {
 	const int ClientID = m_pPlayer->GetCID();
-	if(CGS::InteractiveSub[ClientID].TempDecoractionID > 0)
+	if(m_pPlayer->GetTempData().TempDecoractionID > 0)
 	{
-		const int DecoID = CGS::InteractiveSub[ClientID].TempDecoractionID;
-		const int InteractiveType = CGS::InteractiveSub[ClientID].TempDecorationType;
-		CGS::InteractiveSub[ClientID].TempDecoractionID = -1;
-		CGS::InteractiveSub[ClientID].TempDecorationType = -1;
+		const int DecoID = m_pPlayer->GetTempData().TempDecoractionID;
+		const int InteractiveType = m_pPlayer->GetTempData().TempDecorationType;
+		m_pPlayer->GetTempData().TempDecoractionID = -1;
+		m_pPlayer->GetTempData().TempDecorationType = -1;
 		if(m_pPlayer->GetItem(DecoID).Count <= 0 || GS()->GetItemInfo(DecoID).Type != ItemType::TYPE_DECORATION)
 			return false;
 
@@ -665,7 +665,7 @@ void CCharacter::Die(int Killer, int Weapon)
 		if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot() && GS()->m_apPlayers[Killer])
 		{
 			GS()->Chat(ClientID, "You are dead, you will be treated in {STR}", Server()->GetWorldName(SafezoneWorldID));
-			m_pPlayer->Acc().TempActiveSafeSpawn = true;
+			m_pPlayer->GetTempData().TempActiveSafeSpawn = true;
 		}
 		m_pPlayer->UpdateTempData(0, 0);
 	}
@@ -1080,7 +1080,7 @@ bool CCharacter::IsLockedWorld()
 			int CheckHouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
 			if(CheckHouseID <= 0)
 			{
-				m_pPlayer->Acc().TempTeleportX = m_pPlayer->Acc().TempTeleportY = -1;
+				m_pPlayer->GetTempData().TempTeleportX = m_pPlayer->GetTempData().TempTeleportY = -1;
 				GS()->Chat(m_pPlayer->GetCID(), "This chapter is still closed, you magically transported back!");
 				m_pPlayer->ChangeWorld(NEWBIE_ZERO_WORLD);
 				return true;

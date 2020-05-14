@@ -124,14 +124,14 @@ bool WorldSwapJob::ChangeWorld(CPlayer *pPlayer, vec2 Pos)
 
 		if (WorldSwap[WID].WorldID == GS()->GetWorldID())
 		{
-			pPlayer->Acc().TempTeleportX = WorldSwap[WID].TwoPositionX;
-			pPlayer->Acc().TempTeleportY = WorldSwap[WID].TwoPositionY;
+			pPlayer->GetTempData().TempTeleportX = WorldSwap[WID].TwoPositionX;
+			pPlayer->GetTempData().TempTeleportY = WorldSwap[WID].TwoPositionY;
 			pPlayer->ChangeWorld(WorldSwap[WID].TwoWorldID);
 			return true;
 		}
 
-		pPlayer->Acc().TempTeleportX = WorldSwap[WID].PositionX;
-		pPlayer->Acc().TempTeleportY = WorldSwap[WID].PositionY;
+		pPlayer->GetTempData().TempTeleportX = WorldSwap[WID].PositionX;
+		pPlayer->GetTempData().TempTeleportY = WorldSwap[WID].PositionY;
 		pPlayer->ChangeWorld(WorldSwap[WID].WorldID);
 		return true;
 	}

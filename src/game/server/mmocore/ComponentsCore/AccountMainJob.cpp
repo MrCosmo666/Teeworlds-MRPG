@@ -5,7 +5,8 @@
 #include "AccountMainJob.h"
 
 using namespace sqlstr;
-std::map < int , AccountMainJob::StructData > AccountMainJob::Data;
+std::map < int, AccountMainJob::StructData > AccountMainJob::Data;
+std::map < int, AccountMainJob::StructTempPlayerData > AccountMainJob::PlayerTempData;
 
 int AccountMainJob::SendAuthCode(int ClientID, int Code)
 {
@@ -192,6 +193,9 @@ int AccountMainJob::GetRank(int AuthID)
 
 void AccountMainJob::OnResetClient(int ClientID)
 {
+	if(PlayerTempData.find(ClientID) != PlayerTempData.end())
+		PlayerTempData.erase(ClientID);
+
 	if (Data.find(ClientID) != Data.end())
 		Data.erase(ClientID);
 }

@@ -5,6 +5,8 @@
 
 #include "../MmoComponent.h"
 
+#include "ShopJob.h"
+
 class AccountMainJob : public MmoComponent
 {
 public:
@@ -27,13 +29,6 @@ public:
 		int Plant[PLANT::NUM_PLANT];
 		int Miner[MINER::NUM_MINER];
 
-		// save pos teleport
-		bool TempActiveSafeSpawn;
-		int TempTeleportX;
-		int TempTeleportY;
-		short TempLatencyPing;
-		int TempTimeDungeon;
-
 		// world
 		short WorldID;
 		short LastWorldID;
@@ -51,6 +46,32 @@ public:
 		bool IsGuild() { return (GuildID > 0); }
 	};
 	static std::map < int, StructData > Data;
+
+	struct StructTempPlayerData
+	{
+		// обычные что не можно раскидать на все
+		int TempDecoractionID;
+		int TempDecorationType;
+		int TempID3;
+
+		// остальное все
+		ShopJob::AuctionItem AuctionItem;
+
+		// temp rankname for guild rank settings
+		char m_aRankGuildBuf[32];
+
+		// temp guild name for searching
+		char m_aGuildSearchBuf[32];
+
+		// save pos teleport
+		bool TempActiveSafeSpawn;
+		int TempTeleportX;
+		int TempTeleportY;
+		short TempLatencyPing;
+		int TempTimeDungeon;
+	};
+	static std::map < int, StructTempPlayerData > PlayerTempData;
+
 	int SendAuthCode(int ClientID, int Code);
 
 public:

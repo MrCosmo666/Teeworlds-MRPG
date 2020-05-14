@@ -169,8 +169,8 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		if (!GS()->IsClientEqualWorldID(ClientID, WorldID))
 		{
 			vec2 Position = GetPositionHouse(GuildID);
-			pPlayer->Acc().TempTeleportX = Position.x;
-			pPlayer->Acc().TempTeleportY = Position.y;
+			pPlayer->GetTempData().TempTeleportX = Position.x;
+			pPlayer->GetTempData().TempTeleportY = Position.y;
 			pPlayer->ChangeWorld(WorldID);
 			return true;
 		}
@@ -335,7 +335,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			return true;
 		}
 
-		str_copy(CGS::InteractiveSub[ClientID].m_aGuildSearchBuf, GetText, sizeof(CGS::InteractiveSub[ClientID].m_aGuildSearchBuf));
+		str_copy(pPlayer->GetTempData().m_aGuildSearchBuf, GetText, sizeof(pPlayer->GetTempData().m_aGuildSearchBuf));
 		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD);
 		return true;
 	}
@@ -363,7 +363,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			return true;
 		}
 
-		str_copy(CGS::InteractiveSub[ClientID].m_aRankGuildBuf, GetText, sizeof(CGS::InteractiveSub[ClientID].m_aRankGuildBuf));
+		str_copy(pPlayer->GetTempData().m_aRankGuildBuf, GetText, sizeof(pPlayer->GetTempData().m_aRankGuildBuf));
 		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD_RANK);
 		return true;
 	}
@@ -378,13 +378,13 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			return true;
 		}
 
-		if (str_length(CGS::InteractiveSub[ClientID].m_aRankGuildBuf) < 2)
+		if (str_length(pPlayer->GetTempData().m_aRankGuildBuf) < 2)
 		{
 			GS()->Chat(ClientID, "Minimal symbols 2.");
 			return true;
 		}
 
-		AddRank(GuildID, CGS::InteractiveSub[ClientID].m_aRankGuildBuf);
+		AddRank(GuildID, pPlayer->GetTempData().m_aRankGuildBuf);
 		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD_RANK);
 		return true;
 	}
@@ -431,14 +431,14 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			return true;
 		}
 
-		if (str_length(CGS::InteractiveSub[ClientID].m_aRankGuildBuf) < 2)
+		if (str_length(pPlayer->GetTempData().m_aRankGuildBuf) < 2)
 		{
 			GS()->Chat(ClientID, "Minimal symbols 2.");
 			return true;
 		}
 
 		const int RankID = VoteID;
-		ChangeRank(RankID, GuildID, CGS::InteractiveSub[ClientID].m_aRankGuildBuf);
+		ChangeRank(RankID, GuildID, pPlayer->GetTempData().m_aRankGuildBuf);
 		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD_RANK);
 		return true;
 	}
@@ -484,8 +484,8 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		GS()->AddBack(ClientID);
 
 		const int DecoItemID = VoteID;
-		CGS::InteractiveSub[ClientID].TempDecoractionID = DecoItemID;
-		CGS::InteractiveSub[ClientID].TempDecorationType = DECOTYPE_GUILD_HOUSE;
+		pPlayer->GetTempData().TempDecoractionID = DecoItemID;
+		pPlayer->GetTempData().TempDecorationType = DECOTYPE_GUILD_HOUSE;
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
 		return true;
 	}
@@ -1101,7 +1101,7 @@ void GuildJob::ShowMenuRank(CPlayer *pPlayer)
 	GS()->AV(ClientID, "null", "For leader access full, ignored ranks");
 	GS()->AV(ClientID, "null", "- - - - - - - - - -");
 	GS()->AV(ClientID, "null", "- Maximal 5 ranks for one guild");
-	GS()->AVM(ClientID, "MRANKNAME", 1, NOPE, "Name rank: {STR}", CGS::InteractiveSub[ClientID].m_aRankGuildBuf);
+	GS()->AVM(ClientID, "MRANKNAME", 1, NOPE, "Name rank: {STR}", pPlayer->GetTempData().m_aRankGuildBuf);
 	GS()->AVM(ClientID, "MRANKCREATE", 1, NOPE, "Create new rank");
 	GS()->AV(ClientID, "null", "");
 	
@@ -1113,7 +1113,7 @@ void GuildJob::ShowMenuRank(CPlayer *pPlayer)
 		
 		HideID += mr.first;
 		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "Rank [{STR}]", mr.second.Rank);
-		GS()->AVM(ClientID, "MRANKSET", mr.first, HideID, "Change rank name to ({STR})", CGS::InteractiveSub[ClientID].m_aRankGuildBuf);
+		GS()->AVM(ClientID, "MRANKSET", mr.first, HideID, "Change rank name to ({STR})", pPlayer->GetTempData().m_aRankGuildBuf);
 		GS()->AVM(ClientID, "MRANKACCESS", mr.first, HideID, "Access rank ({STR})", AccessNames(mr.second.Access));
 		GS()->AVM(ClientID, "MRANKDELETE", mr.first, HideID, "Delete this rank");
 	}
@@ -1167,14 +1167,18 @@ void GuildJob::ShowInvitesGuilds(int ClientID, int GuildID)
 // показать топ гильдии и позваться к ним
 void GuildJob::ShowFinderGuilds(int ClientID)
 {
+	CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
+	if(!pPlayer)
+		return;
+
 	GS()->AVL(ClientID, "null", "You are not in guild, or select member");
 	GS()->AV(ClientID, "null", "Use reason how enter Value, Click fields!"); 	
 	GS()->AV(ClientID, "null", "Example: Find guild: [], in reason name, and use this");
 	GS()->AV(ClientID, "null", "");
-	GS()->AVM(ClientID, "MINVITENAME", 1, NOPE, "Find guild: {STR}", CGS::InteractiveSub[ClientID].m_aGuildSearchBuf);
+	GS()->AVM(ClientID, "MINVITENAME", 1, NOPE, "Find guild: {STR}", pPlayer->GetTempData().m_aGuildSearchBuf);
 
 	int HideID = NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 1800;
-	CSqlString<64> cGuildName = CSqlString<64>(CGS::InteractiveSub[ClientID].m_aGuildSearchBuf);
+	CSqlString<64> cGuildName = CSqlString<64>(pPlayer->GetTempData().m_aGuildSearchBuf);
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "WHERE GuildName LIKE '%%%s%%'", cGuildName.cstr()));
 	while(RES->next())
 	{
