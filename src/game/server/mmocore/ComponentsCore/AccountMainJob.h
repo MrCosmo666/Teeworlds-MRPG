@@ -4,7 +4,6 @@
 #define GAME_SERVER_SQL_MAINACCOUNT_H
 
 #include "../MmoComponent.h"
-
 #include "ShopJob.h"
 
 class AccountMainJob : public MmoComponent
@@ -39,9 +38,6 @@ public:
 		int m_aSkinPartColors[6];
 
 		int Team;
-		int TempHealth;
-		int TempMana;
-
 		std::map < int , bool > AetherLocation;
 		bool IsGuild() { return (GuildID > 0); }
 	};
@@ -55,7 +51,7 @@ public:
 		int TempID3;
 
 		// остальное все
-		ShopJob::AuctionItem AuctionItem;
+		ShopJob::AuctionSlot SellItem;
 
 		// temp rankname for guild rank settings
 		char m_aRankGuildBuf[32];
@@ -63,11 +59,15 @@ public:
 		// temp guild name for searching
 		char m_aGuildSearchBuf[32];
 
+		// player stats
+		int TempHealth;
+		int TempMana;
+		short TempLatencyPing;
+
 		// save pos teleport
 		bool TempActiveSafeSpawn;
 		int TempTeleportX;
 		int TempTeleportY;
-		short TempLatencyPing;
 		int TempTimeDungeon;
 	};
 	static std::map < int, StructTempPlayerData > PlayerTempData;

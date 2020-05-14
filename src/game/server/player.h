@@ -99,8 +99,8 @@ public:
 	virtual int GetBotType()                                             { return -1; };
 	virtual int GetBotSub()                                              { return -1; };
 	virtual int IsActiveSnappingBot(int SnappingClient)					 { return 2; };
-	virtual	int GetHealth()                                              { return Acc().TempHealth;};
-	virtual	int GetMana()                                                { return Acc().TempMana;};
+	virtual	int GetHealth()                                              { return GetTempData().TempHealth;};
+	virtual	int GetMana()                                                { return GetTempData().TempMana;};
 	virtual void SetDungeonAllowedSpawn(bool Spawn)                      { return; };
 	virtual void UpdateTempData(int Health, int Mana);
 

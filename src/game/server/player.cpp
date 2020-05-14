@@ -428,8 +428,8 @@ void CPlayer::SetLanguage(const char* pLanguage)
 
 void CPlayer::UpdateTempData(int Health, int Mana)
 {
-	Acc().TempHealth = Health;
-	Acc().TempMana = Mana;
+	GetTempData().TempHealth = Health;
+	GetTempData().TempMana = Mana;
 }
 
 void CPlayer::AddExp(int Exp)

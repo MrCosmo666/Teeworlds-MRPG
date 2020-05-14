@@ -48,12 +48,12 @@ bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 		StartHealth /= 2;
 	}
 
-	if(pChr->GetPlayer()->Acc().TempHealth > 0)
-		StartHealth = pChr->GetPlayer()->Acc().TempHealth;
+	if(pChr->GetPlayer()->GetTempData().TempHealth > 0)
+		StartHealth = pChr->GetPlayer()->GetTempData().TempHealth;
 	pChr->IncreaseHealth(StartHealth);
-	if(pChr->GetPlayer()->Acc().TempMana > 0)
+	if(pChr->GetPlayer()->GetTempData().TempMana > 0)
 	{
-		const int StartMana = pChr->GetPlayer()->Acc().TempMana;
+		const int StartMana = pChr->GetPlayer()->GetTempData().TempMana;
 		pChr->IncreaseMana(StartMana);
 	}
 

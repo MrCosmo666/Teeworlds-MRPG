@@ -140,7 +140,7 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 		GS()->AVL(ClientID, "null", "Currently there are no products.");
 }
 
-void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionItem &AuSellItem)
+void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
 {
 	int ItemID = AuSellItem.a_itemid;
 	int ClientID = pPlayer->GetCID();
@@ -279,15 +279,15 @@ bool ShopJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 	if (Menulist == MenuList::MENU_AUCTION_CREATE_SLOT)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
-		const int ItemID = pPlayer->GetTempData().AuctionItem.a_itemid;
+		const int ItemID = pPlayer->GetTempData().SellItem.a_itemid;
 		ItemJob::ItemInformation& pInformationSellItem = GS()->GetItemInfo(ItemID);
 
-		const int SlotCount = pPlayer->GetTempData().AuctionItem.a_count;
+		const int SlotCount = pPlayer->GetTempData().SellItem.a_count;
 		const int MinimalPrice = SlotCount * pInformationSellItem.MinimalPrice;
 		
-		pPlayer->GetTempData().AuctionItem.a_price = MinimalPrice;
-		const int SlotPrice = pPlayer->GetTempData().AuctionItem.a_price;
-		const int SlotEnchant = pPlayer->GetTempData().AuctionItem.a_enchant;
+		pPlayer->GetTempData().SellItem.a_price = MinimalPrice;
+		const int SlotPrice = pPlayer->GetTempData().SellItem.a_price;
+		const int SlotEnchant = pPlayer->GetTempData().SellItem.a_enchant;
 
 		GS()->AVH(ClientID, TAB_INFO_AUCTION_BIND, GREEN_COLOR, "Information Auction Slot");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_AUCTION_BIND, "The reason for write the number for each row");
@@ -332,11 +332,11 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 
 		// если сбрасываем цену если не хватает
 		const int c_minimalprice = Get* pPlayerSellItem.Info().MinimalPrice;
-		if(pPlayer->GetTempData().AuctionItem.a_price < c_minimalprice)
-			pPlayer->GetTempData().AuctionItem.a_price = c_minimalprice;
+		if(pPlayer->GetTempData().SellItem.a_price < c_minimalprice)
+			pPlayer->GetTempData().SellItem.a_price = c_minimalprice;
 			
 		// устанавливаем кол-во предметов
-		pPlayer->GetTempData().AuctionItem.a_count = Get;
+		pPlayer->GetTempData().SellItem.a_count = Get;
 		GS()->VResetVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
 		return true;
 	}
@@ -345,11 +345,11 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	if(PPSTR(CMD, "AUCTIONPRICE") == 0)
 	{
 		ItemJob::ItemInformation &pInformationSellItem = GS()->GetItemInfo(VoteID);
-		const int c_minimalprice = pInformationSellItem.MinimalPrice * pPlayer->GetTempData().AuctionItem.a_count;
+		const int c_minimalprice = pInformationSellItem.MinimalPrice * pPlayer->GetTempData().SellItem.a_count;
 		if(Get < c_minimalprice) 
 			Get = c_minimalprice;
 
-		pPlayer->GetTempData().AuctionItem.a_price = Get;
+		pPlayer->GetTempData().SellItem.a_price = Get;
 		GS()->VResetVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);		
 		return true;
 	}
@@ -361,8 +361,8 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 		if (AvailableCount <= 0)
 			return true;
 
-		pPlayer->GetTempData().AuctionItem.a_itemid = VoteID;
-		pPlayer->GetTempData().AuctionItem.a_enchant = pPlayer->GetItem(VoteID).Enchant;
+		pPlayer->GetTempData().SellItem.a_itemid = VoteID;
+		pPlayer->GetTempData().SellItem.a_enchant = pPlayer->GetItem(VoteID).Enchant;
 		GS()->ResetVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
 		return true;
 	}
@@ -371,9 +371,9 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	if(PPSTR(CMD, "AUCTIONACCEPT") == 0)
 	{
 		ItemJob::InventoryItem &pPlayerSellItem = pPlayer->GetItem(VoteID);
-		if(pPlayerSellItem.Count >= pPlayer->GetTempData().AuctionItem.a_count && pPlayer->GetTempData().AuctionItem.a_price >= 10)
+		if(pPlayerSellItem.Count >= pPlayer->GetTempData().SellItem.a_count && pPlayer->GetTempData().SellItem.a_price >= 10)
 		{
-			CreateAuctionSlot(pPlayer, pPlayer->GetTempData().AuctionItem);
+			CreateAuctionSlot(pPlayer, pPlayer->GetTempData().SellItem);
 			GS()->ResetVotes(ClientID, MenuList::MENU_INVENTORY);
 			return true;
 		}
