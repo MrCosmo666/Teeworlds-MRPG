@@ -72,7 +72,7 @@ public:
 	
 		int GetID() const { return itemid_; }
 		int EnchantPrice() const { return Info().EnchantPrice * (Enchant + 1); }
-		bool IsEquipped() const { return (Info().Type == ItemType::TYPE_SETTINGS || Info().Type == ItemType::TYPE_MODULE || Info().Type == ItemType::TYPE_EQUIP) && Count && Settings; }
+		bool IsEquipped() const { return Count > 0 && Settings > 0 && (Info().Type == ItemType::TYPE_SETTINGS || Info().Type == ItemType::TYPE_MODULE || Info().Type == ItemType::TYPE_EQUIP); }
 		ItemInformation& Info() const { return ItemsInfo[itemid_]; };
 	};
 

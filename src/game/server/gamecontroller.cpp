@@ -35,7 +35,7 @@ bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 	{
 		pChr->IncreaseHealth(pChr->GetPlayer()->GetStartHealth());
 		pChr->GiveWeapon(WEAPON_HAMMER, -1);
-		for(int i = WEAPON_GUN; i < NUM_WEAPONS; i++)
+		for(int i = WEAPON_GUN; i < NUM_WEAPONS-1; i++)
 			pChr->GiveWeapon(i, 10);
 		return true;
 	}
@@ -59,7 +59,7 @@ bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 
 	const int StartAmmo = 10 + pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo);
 	pChr->GiveWeapon(WEAPON_HAMMER, -1);
-	for(int i = 1; i < WEAPON_LASER+1; i++)
+	for(int i = 1; i < NUM_WEAPONS-1; i++)
 		pChr->GiveWeapon(i, StartAmmo);
 	return true;
 }

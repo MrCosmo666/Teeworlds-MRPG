@@ -438,13 +438,9 @@ void CCharacter::CreateQuestsStep(int QuestID)
 bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)
 {
 	const int RealAmmo = 10 + m_pPlayer->GetAttributeCount(Stats::StAmmo);
-	if(m_aWeapons[Weapon].m_Ammo < RealAmmo || !m_aWeapons[Weapon].m_Got)
-	{
-		m_aWeapons[Weapon].m_Got = true;
-		m_aWeapons[Weapon].m_Ammo = min(GiveAmmo, RealAmmo);
-		return true;
-	}
-	return false;
+	m_aWeapons[Weapon].m_Got = true;
+	m_aWeapons[Weapon].m_Ammo = min(GiveAmmo, RealAmmo);
+	return true;
 }
 
 void CCharacter::SetEmote(int Emote, int Sec)

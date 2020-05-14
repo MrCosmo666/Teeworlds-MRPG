@@ -39,7 +39,7 @@ MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 		if(m_pGameServer->GetWorldID() == LAST_WORLD)
 			component->OnInit();
 
-		char aLocalSelect[128];
+		char aLocalSelect[64];
 		str_format(aLocalSelect, sizeof(aLocalSelect), "WHERE WorldID = '%d'", m_pGameServer->GetWorldID());
 		component->OnInitWorld(aLocalSelect);
 	}
@@ -126,7 +126,8 @@ void MmoController::ResetClientData(int ClientID)
 void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 {
 	const int ClientID = pPlayer->GetCID();
-	if(!pPlayer->IsAuthed()) return;
+	if(!pPlayer->IsAuthed()) 
+		return;
 	
 	// сохранение статистики
 	if(Table == SaveType::SAVE_STATS)
@@ -191,17 +192,11 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	}
 
 	// сохранение мира позиции
-	else if(Table == SaveType::SAVE_POSITION)
+	else if(Table == SaveType::SAVE_POSITION && !GS()->IsDungeon())
 	{
-		// запрет в данже сохранять позицию
-		if (GS()->DungeonID() > 0) 
-			return;
-
 		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", GS()->Server()->GetWorldID(ClientID), pPlayer->Acc().AuthID);
 		return;
 	}
-
-	// сохранение аккаунта
 	else
 	{
 		SJK.UD("tw_accounts", "Username = '%s', Password = '%s' WHERE ID = '%d'", pPlayer->Acc().Login, pPlayer->Acc().Password, pPlayer->Acc().AuthID);
@@ -220,7 +215,7 @@ void MmoController::LoadLogicWorld()
 	}
 }
 
-char SaveNick[64];
+char SaveNick[32];
 const char* MmoController::PlayerName(int AccountID)
 {
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("Nick", "tw_accounts_data", "WHERE ID = '%d'", AccountID));
@@ -241,7 +236,7 @@ void MmoController::ShowLoadingProgress(const char *Loading, int LoadCount)
 
 void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	if(TypeID == ToplistTypes::GUILDS_LEVELING)
 	{

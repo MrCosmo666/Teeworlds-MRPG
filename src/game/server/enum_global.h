@@ -26,24 +26,6 @@
 	F(MnrCount)
 STRINGABLE_ENUM_DECL(MINER)
 
-// Аккаунт Data Craft
-#define CRAFT(F) \
-	F(CrftLevel) \
-	F(CrftExp) \
-	F(CrftUpgrade) \
-	F(CrftDiscount)
-STRINGABLE_ENUM_DECL(CRAFT)
-
-// Аккаунт Data Relax
-#define RELAX(F) \
-	F(RlxLevel) \
-	F(RlxExp) \
-	F(RlxExpBonus) \
-	F(RlxMoneyBonus) \
-	F(RlxSpaBonus) \
-	F(RlxUpgrade)
-STRINGABLE_ENUM_DECL(RELAX)
-
 // Аккаунт Data Plants
 #define PLANT(F) \
 	F(PlLevel) \

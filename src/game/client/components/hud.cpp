@@ -780,9 +780,11 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 			else if (pCharacter->m_AmmoCount == -2)
 				str_copy(type, " ", sizeof(type));
 			else
-				str_format(type, sizeof(type), "%d", pCharacter->m_AmmoCount);
-
-			TextRender()->SetCursor(&Cursor, 6, 17.0f, 8.0f, TEXTFLAG_RENDER);
+			{
+				const int AmmoProcent = pCharacter->m_AmmoCount * 10;
+				str_format(type, sizeof(type), "%d%%", AmmoProcent);
+			}
+			TextRender()->SetCursor(&Cursor, 6, 18.0f, 6.0f, TEXTFLAG_RENDER);
 			TextRender()->TextEx(&Cursor, type, -1);
 		}
 

@@ -24,7 +24,6 @@ public:
 		std::map < int, int > Stats;
 
 		// jobs
-		int Relax[RELAX::NUM_RELAX];
 		int Plant[PLANT::NUM_PLANT];
 		int Miner[MINER::NUM_MINER];
 
