@@ -45,7 +45,7 @@ class CGS : public IGameServer
 
 	IServer *m_pServer;
 	class IConsole *m_pConsole;
-	
+
 	CLayers m_Layers;
 	CCollision m_Collision;
 
@@ -56,7 +56,7 @@ class CGS : public IGameServer
 	void Construct(int Resetting);
 	bool m_Resetting;
 
-	// данжы
+	class CPathfinder* m_pPathFinder;
 	int m_DungeonID;
 
 public:
@@ -78,6 +78,7 @@ public:
 	CGameWorld m_World;
 	CCommandManager m_CommandManager;
 	CCommandManager* CommandManager() { return &m_CommandManager; }
+	CPathfinder* PathFinder() const { return m_pPathFinder; }
 
 	/* #########################################################################
 		SWAP GAMECONTEX DATA 
@@ -303,6 +304,10 @@ public:
 	void SetRespawnWorld(int WorldID) { m_RespawnWorld = WorldID; }
 	int GetRespawnWorld() const { return m_RespawnWorld; }
 
+
+	void FindThreadPathBot(int ClientID, vec2 StartPosition, vec2 EndPosition);
+	void GetThreadRandomWaypointTargetBot(int ClientID);
+
 private:
 	void UpdateZoneDungeon();
 	void UpdateZonePVP();
@@ -313,7 +318,6 @@ private:
 	bool m_AllowedPVP;
 	int m_DayEnumType;
 	static int m_RaidExp;
-
 
 	int64 MaskWorldID();
 };

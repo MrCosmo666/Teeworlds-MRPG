@@ -7,6 +7,8 @@
 #include "gamecontext.h"
 #include "playerbot.h"
 
+#include "mmocore/PathFinder.h"
+
 MACRO_ALLOC_POOL_ID_IMPL(CPlayerBot, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
 
 IServer* CPlayer::Server() const { return m_pGS->Server(); };
@@ -29,11 +31,10 @@ CPlayerBot::~CPlayerBot()
 
 void CPlayerBot::Tick()
 {
-	if(!Server()->ClientIngame(m_ClientID))
+	if(!Server()->ClientIngame(m_ClientID) || !GS()->CheckPlayersDistance(m_ViewPos, 1000.0f))
 		return;
 
 	Server()->SetClientScore(m_ClientID, 1);
-
 	if(m_pCharacter && !m_pCharacter->IsAlive())
 	{
 		delete m_pCharacter;
@@ -43,10 +44,14 @@ void CPlayerBot::Tick()
 	if(m_pCharacter)
 	{
 		if(m_pCharacter->IsAlive())
+		{
 			m_ViewPos = m_pCharacter->GetPos();
+			TickThreadMobsPathFinder();
+		}
 	} 
 	else if(m_Spawned && m_PlayerTick[TickState::Respawn]+Server()->TickSpeed()*3 <= Server()->Tick())
 		TryRespawn();
+
 }
 
 int CPlayerBot::GetStartHealth()
@@ -283,4 +288,17 @@ void CPlayerBot::SendInformationBot()
 		ClientInfoMsg.m_aSkinPartColors[p] = BotJob::DataBot[m_BotID].SkinColorBot[p];
 	}
 	Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1, GS()->CheckPlayerMessageWorldID(m_ClientID));
+}
+
+
+void CPlayerBot::TickThreadMobsPathFinder()
+{
+	if(GetBotType() != BotsTypes::TYPE_BOT_MOB)
+		return;
+
+	const int MobID = GetBotSub();
+	if(m_TargetPos != vec2(0, 0) && (Server()->Tick() + 3 * m_ClientID) % (Server()->TickSpeed()) == 0)
+		BotJob::MobBot[MobID].FindThreadPath(this, m_ViewPos, m_TargetPos);
+	else if(m_TargetPos == vec2(0, 0) || distance(m_ViewPos, m_TargetPos) < 90.0f)
+		BotJob::MobBot[MobID].GetThreadRandomWaypointTarget(this);
 }

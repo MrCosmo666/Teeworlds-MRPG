@@ -16,6 +16,7 @@ private:
 	int m_BotHealth;
 	int m_DungeonAllowedSpawn;
 
+
 public:
 	CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint);
 	virtual ~CPlayerBot() override;
@@ -33,16 +34,23 @@ public:
 	int GetStartHealth()											override;
 	int GetAttributeCount(int BonusID, bool Really = false)			override;
 	void Snap(int SnappingClient)									override;
-	int IsActiveSnappingBot(int SnappingClient)		override;
+	int IsActiveSnappingBot(int SnappingClient)						override;
+
+	int m_PathSize;
+	vec2 m_CharPos;
+	vec2 m_TargetPos;
+	std::map<int, vec2> m_WayPoints;
 
 private:
 	void TryRespawn()												override;
-
 	int GetBotLevel() const;
 	bool IsActiveQuests(int SnapClientID);
 	const char* GetStatusBot();
 	void SendInformationBot();
 	int GetMoodState(int SnappingClient);
+
+	// threading path finder
+	void TickThreadMobsPathFinder();
 };
 
 #endif

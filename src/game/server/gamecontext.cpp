@@ -26,6 +26,8 @@
 #include "mmocore/CommandProcessor.h"
 #include "mmocore/ComponentsCore/GuildJob.h"
 
+// поиск пути
+#include "mmocore/PathFinder.h"
 
 // Безопасные структуры хоть и прожорливо но работает (Прежде всего всегда их при выходе игрока Отрезаем)
 std::map < int , CGS::StructAttribut > CGS::AttributInfo;
@@ -75,6 +77,9 @@ CGS::~CGS()
 
 	if(pMmoController)  
 		delete pMmoController;
+
+	if(m_pPathFinder)
+		delete m_pPathFinder;
 }
 
 // Очистка сервера  
@@ -988,6 +993,9 @@ void CGS::OnInit(int WorldID)
 			}
 		}
 	}
+	
+	// инициализируем pathfinder
+	m_pPathFinder = new CPathfinder(&m_Layers, &m_Collision);
 
 	UpdateZonePVP();
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
@@ -2360,7 +2368,7 @@ bool CGS::CheckPlayersDistance(vec2 Pos, float Distance) const
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(!m_apPlayers[i] || distance(Pos, m_apPlayers[i]->m_ViewPos) > Distance || CheckPlayerMessageWorldID(i) != GetWorldID())
+		if(!m_apPlayers[i] || CheckPlayerMessageWorldID(i) != GetWorldID() || distance(Pos, m_apPlayers[i]->m_ViewPos) > Distance)
 			continue;
 		return true;
 	}

@@ -19,7 +19,7 @@ class CPlayer
 {
 	MACRO_ALLOC_POOL_ID()
 
-	struct StructLatency
+		struct StructLatency
 	{
 		int m_AccumMin;
 		int m_AccumMax;
@@ -32,7 +32,7 @@ class CPlayer
 		int m_TargetX;
 		int m_TargetY;
 	};
-	
+
 	struct StructTalkNPC
 	{
 		bool m_FreezedProgress;
@@ -42,15 +42,15 @@ class CPlayer
 	StructTalkNPC m_TalkingNPC;
 
 protected:
-	CCharacter *m_pCharacter;
-	CGS *m_pGS;
+	CCharacter* m_pCharacter;
+	CGS* m_pGS;
 
-	IServer *Server() const;
+	IServer* Server() const;
 	int m_ClientID;
 	void PotionsTick();
 
 public:
-	CGS *GS() const { return m_pGS; }
+	CGS* GS() const { return m_pGS; }
 	vec2 m_ViewPos;
 	int m_PlayerFlags;
 	int m_PlayerTick[TickState::NUM_TICK];
@@ -62,7 +62,7 @@ public:
 	StructLastAction m_LatestActivity;
 
 	/* #########################################################################
-		VAR AND OBJECTS PLAYER MMO 
+		VAR AND OBJECTS PLAYER MMO
 	######################################################################### */
 	CTuningParams m_PrevTuningParams;
 	CTuningParams m_NextTuningParams;
@@ -78,30 +78,30 @@ public:
 private:
 	char m_FormatTalkQuest[512];
 	char m_aLanguage[16];
-	std::map < int , bool > m_HidenMenu;
+	std::map < int, bool > m_HidenMenu;
 
 	/* #########################################################################
-		FUNCTIONS PLAYER ENGINE 
+		FUNCTIONS PLAYER ENGINE
 	######################################################################### */
 	void TickOnlinePlayer();
 	void TickSystemTalk();
 
 	void HandleTuningParams();
 public:
-	CPlayer(CGS *pGS, int ClientID);
+	CPlayer(CGS* pGS, int ClientID);
 	virtual ~CPlayer();
 
-	bool IsBot() 
-	{ 
-		return (bool)(m_ClientID >= MAX_PLAYERS && m_ClientID < MAX_CLIENTS); 
+	bool IsBot()
+	{
+		return (bool)(m_ClientID >= MAX_PLAYERS && m_ClientID < MAX_CLIENTS);
 	};
-	virtual int GetBotID()                                               { return -1; };
-	virtual int GetBotType()                                             { return -1; };
-	virtual int GetBotSub()                                              { return -1; };
-	virtual int IsActiveSnappingBot(int SnappingClient)					 { return 2; };
-	virtual	int GetHealth()                                              { return GetTempData().TempHealth;};
-	virtual	int GetMana()                                                { return GetTempData().TempMana;};
-	virtual void SetDungeonAllowedSpawn(bool Spawn)                      { return; };
+	virtual int GetBotID() { return -1; };
+	virtual int GetBotType() { return -1; };
+	virtual int GetBotSub() { return -1; };
+	virtual int IsActiveSnappingBot(int SnappingClient) { return 2; };
+	virtual	int GetHealth() { return GetTempData().TempHealth; };
+	virtual	int GetMana() { return GetTempData().TempMana; };
+	virtual void SetDungeonAllowedSpawn(bool Spawn) { return; };
 	virtual void UpdateTempData(int Health, int Mana);
 
 	virtual void Tick();

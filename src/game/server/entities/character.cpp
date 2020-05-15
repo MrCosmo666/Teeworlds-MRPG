@@ -488,7 +488,6 @@ void CCharacter::ResetInput()
 {
 	m_Input.m_Direction = 0;
 	m_Input.m_Hook = 0;
-	// simulate releasing the fire button
 	if((m_Input.m_Fire&1) != 0)
 		m_Input.m_Fire++;
 	m_Input.m_Fire &= INPUT_STATE_MASK;

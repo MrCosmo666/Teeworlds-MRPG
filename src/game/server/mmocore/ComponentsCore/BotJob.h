@@ -15,6 +15,15 @@ class BotJob : public MmoComponent
 		MobBot.clear();
 	};
 
+	// threading path finder
+	class CPathFinderThread
+	{
+	public:
+		void FindThreadPath(class CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos);
+		void GetThreadRandomWaypointTarget(class CPlayerBot* pBotPlayer);
+	};
+
+	// bots talking data
 	struct TalkingData
 	{
 		char m_TalkingText[512];
@@ -25,6 +34,7 @@ class BotJob : public MmoComponent
 		bool m_PlayerTalked;
 	};
 
+	// main bots information
 	struct DescDataBot
 	{
 		char NameBot[16];
@@ -34,6 +44,7 @@ class BotJob : public MmoComponent
 		int EquipSlot[EQUIP_MAX_BOTS];
 	};
 
+	// types bots information
 	struct ClassNpcBot
 	{
 		const char* GetName() const
@@ -82,14 +93,14 @@ class BotJob : public MmoComponent
 		std::vector < TalkingData > m_Talk;
 	};
 
-	struct ClassMobsBot
+	class ClassMobsBot : public CPathFinderThread
 	{
+	public:
 		const char* GetName() const
 		{
 			dbg_assert(DataBot.find(BotID) != DataBot.end(), "Name bot it invalid");
 			return DataBot[BotID].NameBot;
 		}
-
 		bool Boss;
 		int Power;
 		int Spread;

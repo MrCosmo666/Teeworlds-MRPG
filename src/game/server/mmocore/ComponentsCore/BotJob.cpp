@@ -4,6 +4,8 @@
 #include <game/server/gamecontext.h>
 #include "BotJob.h"
 
+#include <game/server/mmocore/PathFinder.h>
+
 using namespace sqlstr;
 
 // Структуры ботов
@@ -328,8 +330,39 @@ void BotJob::LoadMobsBots(const char* pWhereLocalWorld)
 			&MobBot[MobID].RandomItem[0], &MobBot[MobID].RandomItem[1], &MobBot[MobID].RandomItem[2],
 			&MobBot[MobID].RandomItem[3], &MobBot[MobID].RandomItem[4], &MobBot[MobID].RandomItem[5]);
 
-		int CountMobs = RES->getInt("Count");
+		const int CountMobs = RES->getInt("Count");
 		for(int c = 0; c < CountMobs; c++)
 			GS()->CreateBot(BotsTypes::TYPE_BOT_MOB, BotID, MobID);
 	}
+}
+
+// threading CPathFinderThread botai ? TODO: protect BotPlayer?
+std::mutex lockingPath;
+void BotJob::CPathFinderThread::FindThreadPath(class CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos)
+{
+	std::thread([pBotPlayer, StartPos, SearchPos]()
+		{
+			lockingPath.lock();
+			pBotPlayer->GS()->PathFinder()->Init();
+			pBotPlayer->GS()->PathFinder()->SetStart(StartPos);
+			pBotPlayer->GS()->PathFinder()->SetEnd(SearchPos);
+			pBotPlayer->GS()->PathFinder()->FindPath();
+			pBotPlayer->m_PathSize = pBotPlayer->GS()->PathFinder()->m_FinalSize;
+			for(int i = pBotPlayer->m_PathSize - 1, j = 0; i >= 0; i--, j++)
+			{
+				pBotPlayer->m_WayPoints[j] = vec2(pBotPlayer->GS()->PathFinder()->m_lFinalPath[i].m_Pos.x * 32 + 16, pBotPlayer->GS()->PathFinder()->m_lFinalPath[i].m_Pos.y * 32 + 16);
+			}
+			lockingPath.unlock();
+		}).detach();
+}
+
+void BotJob::CPathFinderThread::GetThreadRandomWaypointTarget(class CPlayerBot* pBotPlayer)
+{
+	std::thread([this, pBotPlayer]()
+		{
+			lockingPath.lock();
+			vec2 TargetPos = pBotPlayer->GS()->PathFinder()->GetRandomWaypoint();
+			pBotPlayer->m_TargetPos = vec2(TargetPos.x * 32.0f, TargetPos.y * 32.0f);
+			lockingPath.unlock();
+		}).detach();
 }

@@ -4,7 +4,6 @@
 #define GAME_SERVER_BOTAI_HELPER_H
 
 #include <map>
-
 #include <game/server/entity.h>
 
 #include <game/gamecore.h>
@@ -21,13 +20,22 @@ public:
 
 	int GetBotTarget() const { return m_BotTargetID; };
 
+
 private: 
+	class CPlayerBot* m_pBotPlayer;
+
+	int m_MoveTick;
+	int m_PrevDirection;
+
+	vec2 m_PrevVel;
+	vec2 m_PrevPos;
+	vec2 m_WallPos;
+
 	int m_BotTick;
 	int m_BotTargetID;
 	int m_BotTargetLife;
 	bool m_BotTargetCollised;
 	int m_EmotionsStyle;
-
 	int m_StartHealth;
 	bool m_MessagePlayers[MAX_CLIENTS];
 
@@ -59,6 +67,8 @@ private:
 	vec2 GetHookPos(vec2 Position);
 	bool FunctionNurseNPC();
 	bool BaseFunctionNPC();
+	void Move();
+	void Action();
 };
 
 class CEntityFunctionNurse : public CEntity

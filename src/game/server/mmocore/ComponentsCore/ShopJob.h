@@ -14,13 +14,13 @@ class ShopJob : public MmoComponent
 		int a_price;
 		int a_enchant;
 	};
+
 	struct ShopPersonal
 	{
 		int StorageID;
 	};
 	typedef std::map < int , ShopPersonal > ShopType;
 	static ShopType Shop;
-
 
 	bool BuyShopItem(CPlayer* pPlayer, int ID);
 	void ShowAuction(CPlayer* pPlayer);
