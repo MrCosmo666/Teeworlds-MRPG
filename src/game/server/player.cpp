@@ -74,10 +74,7 @@ void CPlayer::Tick()
 		}
 	}
 
-	// # # # # # # # # # # # # # # # # # # # # # #
 	// # # # # # ДАЛЬШЕ АВТОРИЗОВАННЫМ # # # # # #
-	// # # # # # # # # # # # # # # # # # # # # # #
-
 	if (m_pCharacter && !m_pCharacter->IsAlive())
 	{
 		delete m_pCharacter;

@@ -80,8 +80,8 @@ bool BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 
 	char reformTalkedText[512];
-	int BotID = NpcBot[MobID].BotID;
-	int sizeTalking = NpcBot[MobID].m_Talk.size();
+	const int BotID = NpcBot[MobID].BotID;
+	const int sizeTalking = NpcBot[MobID].m_Talk.size();
 	if (str_comp_nocase(pText, "empty") != 0)
 	{
 		pPlayer->FormatTextQuest(BotID, pText);
@@ -103,7 +103,7 @@ bool BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 
 bool BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	if (!IsQuestBotValid(MobID) || Progress >= (int)QuestBot[MobID].m_Talk.size())
 	{
 		GS()->ClearTalkText(ClientID);
@@ -113,9 +113,9 @@ bool BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int Talk
 	if (!GS()->CheckClient(ClientID))
 		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 50, "Press 'F4' to continue the dialog!");
 
-	int BotID = QuestBot[MobID].BotID;
 	char reformTalkedText[512];
-	int sizeTalking = QuestBot[MobID].m_Talk.size();
+	const int BotID = QuestBot[MobID].BotID;
+	const int sizeTalking = QuestBot[MobID].m_Talk.size();
 	pPlayer->FormatTextQuest(BotID, QuestBot[MobID].m_Talk.at(Progress).m_TalkingText);
 	str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) - %s", 1 + Progress, sizeTalking, pPlayer->FormatedTalkedText());
 	pPlayer->ClearFormatQuestText();
@@ -136,8 +136,8 @@ void BotJob::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 	}
 
 	// vanila clients
-	int BotID = BotJob::QuestBot[MobID].BotID;
-	int sizeTalking = BotJob::QuestBot[MobID].m_Talk.size();
+	const int BotID = BotJob::QuestBot[MobID].BotID;
+	const int sizeTalking = BotJob::QuestBot[MobID].m_Talk.size();
 	if (!GS()->CheckClient(ClientID))
 	{
 		char reformTalkedText[512];
@@ -175,7 +175,7 @@ void BotJob::LoadMainInformationBots()
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_world"));
 	while(RES->next())
 	{
-		int BotID = (int)RES->getInt("ID");
+		const int BotID = (int)RES->getInt("ID");
 		str_copy(DataBot[BotID].NameBot, RES->getString("BotName").c_str(), sizeof(DataBot[BotID].NameBot));
 
 		if(!sscanf(RES->getString("SkinName").c_str(), "%s %s %s %s %s %s",
@@ -265,7 +265,7 @@ void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_npc", pWhereLocalWorld));
 	while(RES->next())
 	{
-		int MobID = (int)RES->getInt("ID");
+		const int MobID = (int)RES->getInt("ID");
 		NpcBot[MobID].WorldID = RES->getInt("WorldID");
 		NpcBot[MobID].Static = RES->getBoolean("Static");
 		NpcBot[MobID].PositionX = RES->getInt("PositionX");
@@ -274,7 +274,7 @@ void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 		NpcBot[MobID].BotID = RES->getInt("BotID");
 		NpcBot[MobID].Function = RES->getInt("Function");
 
-		int CountMobs = RES->getInt("Count");
+		const int CountMobs = RES->getInt("Count");
 		for(int c = 0; c < CountMobs; c++)
 			GS()->CreateBot(BotsTypes::TYPE_BOT_NPC, NpcBot[MobID].BotID, MobID);
 
@@ -302,8 +302,8 @@ void BotJob::LoadMobsBots(const char* pWhereLocalWorld)
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_mobs", pWhereLocalWorld));
 	while(RES->next())
 	{
-		int MobID = (int)RES->getInt("ID");
-		int BotID = RES->getInt("BotID");
+		const int MobID = (int)RES->getInt("ID");
+		const int BotID = RES->getInt("BotID");
 		MobBot[MobID].WorldID = RES->getInt("WorldID");
 		MobBot[MobID].PositionX = RES->getInt("PositionX");
 		MobBot[MobID].PositionY = RES->getInt("PositionY");
@@ -349,9 +349,8 @@ void BotJob::CPathFinderThread::FindThreadPath(class CPlayerBot* pBotPlayer, vec
 			pBotPlayer->GS()->PathFinder()->FindPath();
 			pBotPlayer->m_PathSize = pBotPlayer->GS()->PathFinder()->m_FinalSize;
 			for(int i = pBotPlayer->m_PathSize - 1, j = 0; i >= 0; i--, j++)
-			{
 				pBotPlayer->m_WayPoints[j] = vec2(pBotPlayer->GS()->PathFinder()->m_lFinalPath[i].m_Pos.x * 32 + 16, pBotPlayer->GS()->PathFinder()->m_lFinalPath[i].m_Pos.y * 32 + 16);
-			}
+	
 			lockingPath.unlock();
 		}).detach();
 }

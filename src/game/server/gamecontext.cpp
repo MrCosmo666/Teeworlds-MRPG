@@ -2183,15 +2183,17 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 	{
 		if(!m_apPlayers[i] || m_apPlayers[i]->GetBotType() != BotsTypes::TYPE_BOT_QUEST || m_apPlayers[i]->GetBotSub() != FindBot->SubBotID) 
 			continue;
-		
+
 		QuestBotClientID = i;
 	}
 
 	// ищем есть ли активный бот у всех игроков
 	bool ActiveBot = Mmo()->Quest()->IsActiveQuestBot(QuestID, Step);
 	if(ActiveBot && QuestBotClientID <= -1)
+	{
+		dbg_msg("test", "herte");
 		CreateBot(BotsTypes::TYPE_BOT_QUEST, FindBot->BotID, FindBot->SubBotID);
-
+	}
 	// если бот не активен не у одного игрока, но игрок найден удаляем
 	if (!ActiveBot && QuestBotClientID >= MAX_PLAYERS)
 	{

@@ -31,7 +31,7 @@ CPlayerBot::~CPlayerBot()
 
 void CPlayerBot::Tick()
 {
-	if(!Server()->ClientIngame(m_ClientID) || !GS()->CheckPlayersDistance(m_ViewPos, 1000.0f))
+	if(!Server()->ClientIngame(m_ClientID))
 		return;
 
 	Server()->SetClientScore(m_ClientID, 1);
@@ -43,15 +43,14 @@ void CPlayerBot::Tick()
 
 	if(m_pCharacter)
 	{
-		if(m_pCharacter->IsAlive())
+		if(m_pCharacter->IsAlive() && GS()->CheckPlayersDistance(m_pCharacter->GetPos(), 1000.0f))
 		{
-			m_ViewPos = m_pCharacter->GetPos();
 			TickThreadMobsPathFinder();
+			m_ViewPos = m_pCharacter->GetPos();
 		}
 	} 
 	else if(m_Spawned && m_PlayerTick[TickState::Respawn]+Server()->TickSpeed()*3 <= Server()->Tick())
 		TryRespawn();
-
 }
 
 int CPlayerBot::GetStartHealth()
@@ -293,15 +292,15 @@ void CPlayerBot::SendInformationBot()
 
 void CPlayerBot::TickThreadMobsPathFinder()
 {
-	if(GetBotType() != BotsTypes::TYPE_BOT_MOB)
-		return;
-
 	const int MobID = GetBotSub();
-	if(m_TargetPos != vec2(0, 0) && (Server()->Tick() + 3 * m_ClientID) % (Server()->TickSpeed()) == 0)
-		BotJob::MobBot[MobID].FindThreadPath(this, m_ViewPos, m_TargetPos);
-	else if(m_TargetPos == vec2(0, 0) || distance(m_ViewPos, m_TargetPos) < 60.0f)
+	if(GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
-		m_LastPosTick = Server()->Tick() + (Server()->TickSpeed() * 2 + rand()%4);
-		BotJob::MobBot[MobID].GetThreadRandomWaypointTarget(this);
+		if(m_TargetPos != vec2(0, 0) && (Server()->Tick() + 3 * m_ClientID) % (Server()->TickSpeed()) == 0)
+			BotJob::MobBot[MobID].FindThreadPath(this, m_ViewPos, m_TargetPos);
+		else if(m_TargetPos == vec2(0, 0) || distance(m_ViewPos, m_TargetPos) < 60.0f)
+		{
+			m_LastPosTick = Server()->Tick() + (Server()->TickSpeed() * 2 + rand() % 4);
+			BotJob::MobBot[MobID].GetThreadRandomWaypointTarget(this);
+		}
 	}
 }

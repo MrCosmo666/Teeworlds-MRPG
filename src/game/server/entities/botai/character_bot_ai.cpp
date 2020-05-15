@@ -362,7 +362,8 @@ void CCharacterBotAI::Move()
 		m_Input.m_Jump = 0;
 
 	// jump over friend
-	CCharacter* pChar = GameWorld()->IntersectCharacter(GetPos(), GetPos() + vec2(m_Input.m_Direction, 0) * 150, 16.0f, vec2(0,0), (CCharacter*)this);
+	vec2 IncreasePos;
+	CCharacter* pChar = GameWorld()->IntersectCharacter(GetPos(), GetPos() + vec2(m_Input.m_Direction, 0) * 150, 16.0f, IncreasePos, (CCharacter*)this);
 	if(pChar)
 		m_Input.m_Jump = 1;
 	

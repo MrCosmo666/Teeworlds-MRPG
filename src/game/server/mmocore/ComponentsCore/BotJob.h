@@ -16,9 +16,8 @@ class BotJob : public MmoComponent
 	};
 
 	// threading path finder
-	class CPathFinderThread
+	struct CPathFinderThread
 	{
-	public:
 		void FindThreadPath(class CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos);
 		void GetThreadRandomWaypointTarget(class CPlayerBot* pBotPlayer);
 	};
@@ -45,7 +44,7 @@ class BotJob : public MmoComponent
 	};
 
 	// types bots information
-	struct ClassNpcBot
+	struct ClassNpcBot : public CPathFinderThread
 	{
 		const char* GetName() const
 		{
@@ -93,9 +92,8 @@ class BotJob : public MmoComponent
 		std::vector < TalkingData > m_Talk;
 	};
 
-	class ClassMobsBot : public CPathFinderThread
+	struct ClassMobsBot : public CPathFinderThread
 	{
-	public:
 		const char* GetName() const
 		{
 			dbg_assert(DataBot.find(BotID) != DataBot.end(), "Name bot it invalid");
