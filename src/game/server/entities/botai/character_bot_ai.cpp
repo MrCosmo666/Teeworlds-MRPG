@@ -379,9 +379,8 @@ void CCharacterBotAI::Move()
 			else
 				HookVel.x *= 0.75f;
 
-			vec2 Target = vec2(m_Input.m_TargetX, m_Input.m_TargetY);
-			float ps = dot(Target, HookVel);
-			if(ps > 0 || (Target.y < 0 && m_Core.m_Vel.y > 0.f && m_Core.m_HookTick < SERVER_TICK_SPEED + SERVER_TICK_SPEED / 2))
+			float ps = dot(WayDir, HookVel);
+			if(ps > 0 || (WayDir.y < 0 && m_Core.m_Vel.y > 0.f && m_Core.m_HookTick < SERVER_TICK_SPEED + SERVER_TICK_SPEED / 2))
 				m_Input.m_Hook = 1;
 			if(m_Core.m_HookTick > 4 * SERVER_TICK_SPEED || length(m_Core.m_HookPos - GetPos()) < 20.0f)
 				m_Input.m_Hook = 0;
@@ -502,7 +501,7 @@ CPlayer *CCharacterBotAI::SearchTenacityPlayer(float Distance)
 	// сбрасываем агрессию если игрок далеко
 	CPlayer* pPlayer = GS()->GetPlayer(m_BotTargetID, true, true);
 	if (ActiveTargetID && (!pPlayer 
-		|| (pPlayer && (distance(m_Core.m_Pos, pPlayer->GetCharacter()->m_Core.m_Pos) > 600.0f || Server()->GetWorldID(m_BotTargetID) != GS()->GetWorldID()))))
+		|| (pPlayer && (distance(m_Core.m_Pos, pPlayer->GetCharacter()->m_Core.m_Pos) > 800.0f || Server()->GetWorldID(m_BotTargetID) != GS()->GetWorldID()))))
 		ClearTarget();
 
 	// не враждебные мобы
@@ -519,7 +518,7 @@ CPlayer *CCharacterBotAI::SearchTenacityPlayer(float Distance)
 	}
 	else
 	{
-		m_BotTargetLife = Server()->TickSpeed() * 2;
+		m_BotTargetLife = Server()->TickSpeed() * 3;
 	}
 
 	// ищем более сильного
@@ -527,7 +526,7 @@ CPlayer *CCharacterBotAI::SearchTenacityPlayer(float Distance)
 	{
 		// проверяем на дистанцию игрока
 		CPlayer* pFinderHard = GS()->GetPlayer(i, true, true);
-		if (!pFinderHard || distance(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) > 600.0f)
+		if (!pFinderHard || distance(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) > 800.0f)
 			continue;
 
 		// проверяем есть ли вкуснее игрокв для бота
