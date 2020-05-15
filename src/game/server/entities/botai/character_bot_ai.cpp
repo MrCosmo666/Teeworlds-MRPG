@@ -19,10 +19,7 @@ CCharacterBotAI::~CCharacterBotAI()
 	RemoveSnapProj(100, GetSnapFullID(), true);
 }
 
-int CCharacterBotAI::GetSnapFullID() const
-{
-	return m_pBotPlayer->GetCID() * SNAPBOTS;
-}
+int CCharacterBotAI::GetSnapFullID() const { return m_pBotPlayer->GetCID() * SNAPBOTS; }
 
 bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 {
@@ -30,11 +27,9 @@ bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 	if(!m_pBotPlayer)
 		return false;
 
-	m_pBotPlayer->m_TargetPos = vec2(0, 0);
 	if(!CCharacter::Spawn(pPlayer, Pos))
 		return false;
 
-	m_StartHealth = Health();
 	ClearTarget();
 
 	// информация о зарождении моба
@@ -77,9 +72,10 @@ void CCharacterBotAI::ShowProgress()
 		if(pPlayer)
 		{
 			int Health = m_pBotPlayer->GetHealth();
-			float gethp = ( Health * 100.0 ) / m_StartHealth;
+			int StartHealth = m_pBotPlayer->GetStartHealth();
+			float gethp = ( Health * 100.0 ) / StartHealth;
 			char *Progress = GS()->LevelString(100, (int)gethp, 10, ':', ' ');
-			GS()->SBL(ListDmgPlayer.first, BroadcastPriority::BROADCAST_GAME_PRIORITY, 10, "Health {STR}({INT}/{INT})", Progress, &Health, &m_StartHealth);
+			GS()->SBL(ListDmgPlayer.first, BroadcastPriority::BROADCAST_GAME_PRIORITY, 10, "Health {STR}({INT}/{INT})", Progress, &Health, &StartHealth);
 			delete Progress;
 		}
 	}	
@@ -187,6 +183,7 @@ void CCharacterBotAI::ClearTarget()
 	const int FromID = m_pBotPlayer->GetCID();
 	if (m_BotTargetID != FromID)
 	{
+		m_pBotPlayer->m_TargetPos = vec2(0, 0);
 		m_EmotionsStyle = 1 + random_int() % 5;
 		m_BotTargetID = FromID;
 		m_BotTargetLife = 0;
@@ -222,7 +219,6 @@ void CCharacterBotAI::Tick()
 // Интерактивы ботов
 void CCharacterBotAI::EngineBots()
 {
-	CPlayerBot* pBotPlayer = static_cast<CPlayerBot*>(GetPlayer());
 	ResetInput();
 	if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
@@ -293,6 +289,7 @@ void CCharacterBotAI::EngineQuestMob()
 // Интерактивы мобов враждебных
 void CCharacterBotAI::EngineMobs()
 {
+	SetAim(m_pBotPlayer->m_TargetPos - m_Pos);
 	const int MobID = m_pBotPlayer->GetBotSub();
 	bool WeaponedBot = (BotJob::MobBot[MobID].Spread >= 1);
 	if(WeaponedBot)
@@ -301,25 +298,26 @@ void CCharacterBotAI::EngineMobs()
 			ShowProgress();
 		ChangeWeapons();
 	}
-	Move();
 
-	m_PrevPos = m_Pos;
-	m_PrevVel = m_Core.m_Vel;
-	if(m_Input.m_Direction)
-		m_PrevDirection = m_Input.m_Direction;
-
-	CPlayer* pPlayer = SearchTenacityPlayer(1000.0f);	
+	CPlayer* pPlayer = SearchTenacityPlayer(1000.0f);
 	if(pPlayer && pPlayer->GetCharacter())
 	{
 		m_pBotPlayer->m_TargetPos = pPlayer->GetCharacter()->GetPos();
 		Action();
 	}
+	else if(Server()->Tick() > m_pBotPlayer->m_LastPosTick)
+		m_pBotPlayer->m_TargetPos = vec2(0, 0);
+
+	Move();
+	m_PrevPos = m_Pos;
+	if(m_Input.m_Direction)
+		m_PrevDirection = m_Input.m_Direction;
+
 	EmoteActions(m_EmotionsStyle);
 }
 
 void CCharacterBotAI::Move()
 {
-	int SubType = m_pBotPlayer->GetBotSub();
 	int Index = -1;
 	int ActiveWayPoints = 0;
 	for(int i = 0; i < m_pBotPlayer->m_PathSize && i < 30 && !GS()->Collision()->IntersectLine(m_pBotPlayer->m_WayPoints[i], m_Pos, 0x0, 0x0); i++)
@@ -341,10 +339,14 @@ void CCharacterBotAI::Move()
 		m_Input.m_Direction = m_PrevDirection;
 
 	// jumping
-	if(WayDir.y < -0.5)
+	const bool IsGround = IsGrounded();
+	if(IsGround && WayDir.y < -0.5)
 		m_Input.m_Jump = 1;
 
-	const bool IsGround = IsGrounded();
+	// doublejump
+	if(!IsGround && WayDir.y < -0.5 && m_Core.m_Vel.y > 0)
+		m_Input.m_Jump = 1;
+
 	const bool IsCollide = GS()->Collision()->IntersectLine(m_Pos, m_Pos + vec2(m_Input.m_Direction, 0) * 150, &m_WallPos, 0x0);
 	if(IsCollide)
 	{
@@ -359,6 +361,72 @@ void CCharacterBotAI::Move()
 	if(m_Input.m_Jump == 1 && (WayDir.y >= 0 || ActiveWayPoints < 3))
 		m_Input.m_Jump = 0;
 
+	// jump over friend
+	CCharacter* pChar = GameWorld()->IntersectCharacter(GetPos(), GetPos() + vec2(m_Input.m_Direction, 0) * 150, 16.0f, vec2(0,0), (CCharacter*)this);
+	if(pChar)
+		m_Input.m_Jump = 1;
+	
+	// hook
+	if(ActiveWayPoints > 2 && !m_Input.m_Hook && (WayDir.x != 0 || WayDir.y != 0) && !pChar)
+	{
+		if(m_Core.m_HookState == HOOK_GRABBED && m_Core.m_HookedPlayer == -1)
+		{
+			vec2 HookVel = normalize(m_Core.m_HookPos - GetPos()) * GS()->Tuning()->m_HookDragAccel;
+			if(HookVel.y > 0)
+				HookVel.y *= 0.3f;
+			if((HookVel.x < 0 && m_Input.m_Direction < 0) || (HookVel.x > 0 && m_Input.m_Direction > 0))
+				HookVel.x *= 0.95f;
+			else
+				HookVel.x *= 0.75f;
+
+			vec2 Target = vec2(m_Input.m_TargetX, m_Input.m_TargetY);
+			float ps = dot(Target, HookVel);
+			if(ps > 0 || (Target.y < 0 && m_Core.m_Vel.y > 0.f && m_Core.m_HookTick < SERVER_TICK_SPEED + SERVER_TICK_SPEED / 2))
+				m_Input.m_Hook = 1;
+			if(m_Core.m_HookTick > 4 * SERVER_TICK_SPEED || length(m_Core.m_HookPos - GetPos()) < 20.0f)
+				m_Input.m_Hook = 0;
+		}
+		else if(m_Core.m_HookState == HOOK_FLYING)
+			m_Input.m_Hook = 1;
+		else if(m_LatestInput.m_Hook == 0 && m_Core.m_HookState == HOOK_IDLE)
+		{
+			int NumDir = 32;
+			vec2 HookDir(0.0f, 0.0f);
+			float MaxForce = 0;
+			for(int i = 0; i < NumDir; i++)
+			{
+				float a = 2 * i * pi / NumDir;
+				vec2 dir = direction(a);
+				vec2 Pos = GetPos() + dir * GS()->Tuning()->m_HookLength;
+
+				if((GS()->Collision()->IntersectLine(GetPos(), Pos, &Pos, 0) & (CCollision::COLFLAG_SOLID | CCollision::COLFLAG_NOHOOK)) == CCollision::COLFLAG_SOLID)
+				{
+					vec2 HookVel = dir * GS()->Tuning()->m_HookDragAccel;
+					if(HookVel.y > 0)
+						HookVel.y *= 0.3f;
+					if((HookVel.x < 0 && m_Input.m_Direction < 0) || (HookVel.x > 0 && m_Input.m_Direction > 0))
+						HookVel.x *= 0.95f;
+					else
+						HookVel.x *= 0.75f;
+
+					HookVel += vec2(0, 1) * GS()->Tuning()->m_Gravity;
+
+					float ps = dot(WayDir, HookVel);
+					if(ps > MaxForce)
+					{
+						MaxForce = ps;
+						HookDir = Pos - GetPos();
+					}
+				}
+			}
+			if(length(HookDir) > 32.f)
+			{
+				SetAim(HookDir);
+				m_Input.m_Hook = 1;
+			}
+		}
+	}
+
 	// in case the bot stucks
 	if(m_Pos.x != m_PrevPos.x)
 		m_MoveTick = Server()->Tick();
@@ -369,29 +437,6 @@ void CCharacterBotAI::Move()
 		m_Input.m_Jump = 1;
 		m_MoveTick = Server()->Tick();
 	}
-
-	// jump over friend
-	CCharacter* pChar = GameWorld()->IntersectCharacter(GetPos(), GetPos() + vec2(m_Input.m_Direction, 0) * 150, 16.0f, vec2(0,0), (CCharacter*)this);
-	if(pChar)
-		m_Input.m_Jump = 1;
-
-	if(ActiveWayPoints > 2 && !m_Input.m_Hook && (WayDir.x != 0 || WayDir.y != 0))
-	{
-		vec2 HookPos = GetHookPos(WayDir);
-		if((int)HookPos.x > 0 && (int)HookPos.y > 0 && !pChar)
-		{
-			vec2 AimDir = HookPos - m_Core.m_Pos;
-			m_Input.m_TargetX = (int)AimDir.x;
-			m_Input.m_TargetY = (int)AimDir.y;
-			m_LatestInput.m_TargetX = (int)AimDir.x;
-			m_LatestInput.m_TargetY = (int)AimDir.y;
-			m_Input.m_Hook = true;
-		}
-	}
-
-	// hook
-	if(m_Input.m_Hook && random_int() % 16 == 0)
-		m_Input.m_Hook = false;
 }
 
 void CCharacterBotAI::Action()
@@ -411,14 +456,19 @@ void CCharacterBotAI::Action()
 	if((m_Input.m_Hook && m_Core.m_HookState == HOOK_IDLE) || m_ReloadTimer != 0)
 		return;
 
-	m_Input.m_TargetX = round_to_int(pPlayer->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
-	m_Input.m_TargetY = round_to_int(pPlayer->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
-
 	if(!(m_Input.m_Fire & 1))
 	{
 		m_LatestInput.m_Fire++;
 		m_Input.m_Fire++;
 	}
+}
+
+void CCharacterBotAI::SetAim(vec2 Dir)
+{
+	m_Input.m_TargetX = (int)Dir.x;
+	m_Input.m_TargetY = (int)Dir.y;
+	m_LatestInput.m_TargetX = (int)Dir.x;
+	m_LatestInput.m_TargetY = (int)Dir.y;
 }
 
 // Поиск игрока среди людей
@@ -440,8 +490,8 @@ CPlayer *CCharacterBotAI::SearchPlayer(int Distance)
 // Поиск игрока среди людей который имеет ярость выше всех
 CPlayer *CCharacterBotAI::SearchTenacityPlayer(float Distance)
 {
-	bool ActiveTargetID = m_BotTargetID != m_pBotPlayer->GetCID();
-	if(!ActiveTargetID && (GS()->IsDungeon() || random_int() % 50 == 0))
+	const bool ActiveTargetID = m_BotTargetID != m_pBotPlayer->GetCID();
+	if(!ActiveTargetID && (GS()->IsDungeon() || random_int() % 30 == 0))
 	{
 		CPlayer *pPlayer = SearchPlayer(Distance);
 		if(pPlayer && pPlayer->GetCharacter()) 
@@ -481,7 +531,7 @@ CPlayer *CCharacterBotAI::SearchTenacityPlayer(float Distance)
 			continue;
 
 		// проверяем есть ли вкуснее игрокв для бота
-		bool FinderCollised = (bool)GS()->Collision()->IntersectLine(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0);
+		const bool FinderCollised = (bool)GS()->Collision()->IntersectLine(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0);
 		if (!FinderCollised && ((m_BotTargetLife <= 10 && m_BotTargetCollised)
 			|| pFinderHard->GetAttributeCount(Stats::StHardness, true) > pPlayer->GetAttributeCount(Stats::StHardness, true)))
 			SetTarget(i);
@@ -520,96 +570,6 @@ void CCharacterBotAI::EmoteActions(int EmotionStyle)
 			GS()->SendEmoticon(m_pBotPlayer->GetCID(), EMOTICON_DROP);
 		}
 	}
-}
-
-vec2 CCharacterBotAI::GetHookPos(vec2 Position)
-{
-	vec2 HookPos = vec2(0, 0);
-	int HookLength = GS()->Tuning()->m_HookLength - 50.0f;
-	// search for when going up
-	// right
-	if (Position.x > 0 && Position.y < -0.2)
-	{
-		// search up right first
-		vec2 SearchDir = normalize(vec2(2, -3));
-
-		vec2 TmpDir;
-		float Angle;
-		for (int i = 0; i < 45; i += 3)
-		{
-			Angle = (-i * (3.14159265f / 180.0f));
-			TmpDir.x = (SearchDir.x * cos(Angle)) - (SearchDir.y * sin(Angle));
-			TmpDir.y = (SearchDir.x * sin(Angle)) + (SearchDir.y * cos(Angle));
-			SearchDir = TmpDir;
-			if (distance(HookPos, GetPos()) > 40 && !GS()->Collision()->CheckPoint(TmpDir.x, TmpDir.y, CCollision::COLFLAG_NOHOOK)
-				&& GS()->Collision()->IntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
-				break;
-		}
-		return HookPos;
-	}
-
-	// left
-	if (Position.x < 0 && Position.y < -0.2)
-	{
-		// search up left
-		vec2 SearchDir = normalize(vec2(-2, -3));
-
-		vec2 TmpDir;
-		float Angle;
-		for (int i = 0; i < 45; i += 3)
-		{
-			Angle = (i * (3.14159265f / 180.0f));
-			TmpDir.x = (SearchDir.x * cos(Angle)) - (SearchDir.y * sin(Angle));
-			TmpDir.y = (SearchDir.x * sin(Angle)) + (SearchDir.y * cos(Angle));
-			SearchDir = TmpDir;
-			if (distance(HookPos, GetPos()) > 40 && !GS()->Collision()->CheckPoint(TmpDir.x, TmpDir.y, CCollision::COLFLAG_NOHOOK)
-				&& GS()->Collision()->IntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
-				break;
-		}
-		return HookPos;
-	}
-
-	// go down faster \o/
-	if (Position.x > 0 && Position.y > 0.2)
-	{
-		// search down right
-		vec2 SearchDir = normalize(vec2(1, 2));
-
-		vec2 TmpDir;
-		float Angle;
-		for (int i = 0; i < 15; i += 3)
-		{
-			Angle = (-i * (3.14159265f / 180.0f));
-			TmpDir.x = (SearchDir.x * cos(Angle)) - (SearchDir.y * sin(Angle));
-			TmpDir.y = (SearchDir.x * sin(Angle)) + (SearchDir.y * cos(Angle));
-			SearchDir = TmpDir;
-			if (distance(HookPos, GetPos()) > 40 && !GS()->Collision()->CheckPoint(TmpDir.x, TmpDir.y, CCollision::COLFLAG_NOHOOK)
-				&& GS()->Collision()->IntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
-				break;
-		}
-		return HookPos;
-	}
-
-	if (Position.x < 0 && Position.y > 0.2)
-	{
-		// search down left
-		vec2 SearchDir = normalize(vec2(-1, 2));
-
-		vec2 TmpDir;
-		float Angle;
-		for (int i = 0; i < 15; i += 3)
-		{
-			Angle = (i * (3.14159265f / 180.0f));
-			TmpDir.x = (SearchDir.x * cos(Angle)) - (SearchDir.y * sin(Angle));
-			TmpDir.y = (SearchDir.x * sin(Angle)) + (SearchDir.y * cos(Angle));
-			SearchDir = TmpDir;
-			if (distance(HookPos, GetPos()) > 40 && !GS()->Collision()->CheckPoint(TmpDir.x, TmpDir.y, CCollision::COLFLAG_NOHOOK)
-				&& GS()->Collision()->IntersectLine(GetPos(), GetPos() + (SearchDir * HookLength), &TmpDir, &HookPos))
-				break;
-		}
-		return HookPos;
-	}
-	return HookPos;
 }
 
 // - - - - - - - - - - - - - - - - - - - BASE FUNCTION

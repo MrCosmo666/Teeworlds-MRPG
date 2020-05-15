@@ -362,7 +362,7 @@ void BotJob::CPathFinderThread::GetThreadRandomWaypointTarget(class CPlayerBot* 
 		{
 			lockingPath.lock();
 			vec2 TargetPos = pBotPlayer->GS()->PathFinder()->GetRandomWaypoint();
-			pBotPlayer->m_TargetPos = vec2(TargetPos.x * 32.0f, TargetPos.y * 32.0f);
+			pBotPlayer->m_TargetPos = vec2(TargetPos.x * 32, TargetPos.y * 32);
 			lockingPath.unlock();
 		}).detach();
 }

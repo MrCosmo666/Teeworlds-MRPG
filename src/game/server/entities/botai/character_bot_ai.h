@@ -23,22 +23,18 @@ public:
 
 private: 
 	class CPlayerBot* m_pBotPlayer;
-
+	
+	// bot ai
 	int m_MoveTick;
 	int m_PrevDirection;
-
-	vec2 m_PrevVel;
 	vec2 m_PrevPos;
 	vec2 m_WallPos;
+	int m_EmotionsStyle;
 
-	int m_BotTick;
+	// target system
 	int m_BotTargetID;
 	int m_BotTargetLife;
 	bool m_BotTargetCollised;
-	int m_EmotionsStyle;
-	int m_StartHealth;
-	bool m_MessagePlayers[MAX_CLIENTS];
-
 	std::map < int, int > m_ListDmgPlayers;
 
 	virtual bool Spawn(class CPlayer *pPlayer, vec2 Pos);
@@ -52,19 +48,19 @@ private:
 	
 	void ClearTarget();
 	void SetTarget(int ClientID);
-    void EngineBots();
 	void ChangeWeapons();
 	void ShowProgress();
+	void EmoteActions(int EmotionStyle);
+	void SetAim(vec2 Dir);
 
+	void EngineBots();
 	void EngineNPC();
 	void EngineMobs();
 	void EngineQuestMob();
 
 	CPlayer *SearchPlayer(int Distance);
     CPlayer *SearchTenacityPlayer(float Distance);
-	void EmoteActions(int EmotionStyle);
 
-	vec2 GetHookPos(vec2 Position);
 	bool FunctionNurseNPC();
 	bool BaseFunctionNPC();
 	void Move();

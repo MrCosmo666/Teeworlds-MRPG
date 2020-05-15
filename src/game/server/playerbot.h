@@ -36,6 +36,7 @@ public:
 	void Snap(int SnappingClient)									override;
 	int IsActiveSnappingBot(int SnappingClient)						override;
 
+	int m_LastPosTick;
 	int m_PathSize;
 	vec2 m_CharPos;
 	vec2 m_TargetPos;

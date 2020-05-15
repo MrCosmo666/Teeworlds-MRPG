@@ -299,6 +299,9 @@ void CPlayerBot::TickThreadMobsPathFinder()
 	const int MobID = GetBotSub();
 	if(m_TargetPos != vec2(0, 0) && (Server()->Tick() + 3 * m_ClientID) % (Server()->TickSpeed()) == 0)
 		BotJob::MobBot[MobID].FindThreadPath(this, m_ViewPos, m_TargetPos);
-	else if(m_TargetPos == vec2(0, 0) || distance(m_ViewPos, m_TargetPos) < 90.0f)
+	else if(m_TargetPos == vec2(0, 0) || distance(m_ViewPos, m_TargetPos) < 60.0f)
+	{
+		m_LastPosTick = Server()->Tick() + (Server()->TickSpeed() * 2 + rand()%4);
 		BotJob::MobBot[MobID].GetThreadRandomWaypointTarget(this);
+	}
 }
