@@ -441,7 +441,7 @@ void CCharacterBotAI::Move()
 void CCharacterBotAI::Action()
 {
 	CPlayer* pPlayer = GS()->GetPlayer(m_BotTargetID, true, true);
-	if(m_BotTargetID == m_pBotPlayer->GetCID() || !pPlayer)
+	if(m_BotTargetID == m_pBotPlayer->GetCID() || !pPlayer || m_BotTargetCollised)
 		return;
 
 	// fire
@@ -453,6 +453,9 @@ void CCharacterBotAI::Action()
 	}
 
 	if((m_Input.m_Hook && m_Core.m_HookState == HOOK_IDLE) || m_ReloadTimer != 0)
+		return;
+
+	if(m_ActiveWeapon == WEAPON_HAMMER && distance(pPlayer->GetCharacter()->GetPos(), GetPos()) > 128.0f)
 		return;
 
 	if(!(m_Input.m_Fire & 1))

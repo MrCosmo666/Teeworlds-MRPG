@@ -124,23 +124,23 @@ void CDropItem::Tick()
 	const ItemJob::InventoryItem pPlayerDroppedItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
 	if(!pPlayerDroppedItem.Info().IsEnchantable())
 	{
-		GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}x{INT} : {STR}",
-			m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.Count, (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "Nope"));
+		GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}x{INT} {STR}",
+			m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.Count, (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0"));
 		return;
 	}
 
 	if (pPlayerDroppedItem.Count > 0)
 	{
-		GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) -> (+{INT}) : {STR}", 
+		GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) -> (+{INT}) {STR}", 
 			m_DropItem.Info().GetName(pChar->GetPlayer()),
 			&pPlayerDroppedItem.Enchant, &m_DropItem.Enchant,
-			(m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "Nope"));
+			(m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0"));
 
 		return;
 	}
 
-	GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) : {STR}",
-		pPlayerDroppedItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.Enchant, (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "Nope"));
+	GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) {STR}",
+		pPlayerDroppedItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.Enchant, (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0"));
 }
 
 void CDropItem::TickPaused()
