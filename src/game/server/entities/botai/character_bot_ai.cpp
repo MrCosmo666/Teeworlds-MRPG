@@ -115,6 +115,7 @@ bool CCharacterBotAI::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 			DieRewardPlayer(pPlayer, Force);
 		}
+		m_ListDmgPlayers.clear();
 		ClearTarget();
 		Die(From, Weapon);
 		return true;
@@ -127,7 +128,6 @@ void CCharacterBotAI::Die(int Killer, int Weapon)
 	if(m_pBotPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB)
 		return;
 
-	m_ListDmgPlayers.clear();
 	CCharacter::Die(Killer, Weapon);
 }
 
@@ -148,7 +148,7 @@ void CCharacterBotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 	const int BotID = m_pBotPlayer->GetBotID();
 	const int SubID = m_pBotPlayer->GetBotSub();
 
-	if (m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
+	if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 		GS()->Mmo()->Quest()->AddMobProgress(pPlayer, BotID);
 
 	for (int i = 0; i < 6; i++)

@@ -310,7 +310,7 @@ void QuestJob::AddMobProgress(CPlayer* pPlayer, int BotID)
 
 		// получаем активного нпс
 		const int questID = qp.first;
-		const int playerProgress = Quests[ClientID][questID].Progress;
+		const int playerProgress = qp.second.Progress;
 		BotJob::QuestBotInfo *FindBot = GetQuestBot(questID, playerProgress);
 		if (!FindBot)
 			continue;
@@ -318,14 +318,14 @@ void QuestJob::AddMobProgress(CPlayer* pPlayer, int BotID)
 		// ищим нужен ли такой Моб
 		for (int i = 0; i < 2; i++)
 		{
-			// проверяем если равен и прогресс меньше чем требуется
 			if (BotID != FindBot->NeedMob[i] || qp.second.MobProgress[i] >= FindBot->NeedMobCount[i])
 				continue;
 
 			qp.second.MobProgress[i]++;
-			if (qp.second.MobProgress[i] >= FindBot->NeedMobCount[i])
+			if(qp.second.MobProgress[i] >= FindBot->NeedMobCount[i])
+			{
 				GS()->Chat(ClientID, "You killed {STR} the required amount for NPC {STR}", BotJob::DataBot[BotID].NameBot, FindBot->GetName());
-
+			}
 			SJK.UD("tw_accounts_quests", "Mob1Progress = '%d', Mob2Progress = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'",
 				qp.second.MobProgress[0], qp.second.MobProgress[1], questID, pPlayer->Acc().AuthID);
 			break;

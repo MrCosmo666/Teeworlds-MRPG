@@ -281,7 +281,7 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, b
 	if (pPlayerItem.Info().IsEnchantable())
 	{
 		int Price = pPlayerItem.EnchantPrice();
-		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR}+{INT} ({INT} material)", NameItem, &pPlayerItem.Enchant, &Price);
+		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR} ({INT} material)", NameItem, &Price);
 	}
 
 	if (ItemID == itHammer)
