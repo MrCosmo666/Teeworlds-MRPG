@@ -771,7 +771,7 @@ bool ItemJob::ClassItems::Equip()
 	{
 		m_pPlayer->GS()->ChangeEquipSkin(m_pPlayer->GetCID(), itemid_);
 		if(m_pPlayer->GetCharacter() && (Info().Function >= EQUIP_HAMMER || Info().Function <= EQUIP_RIFLE))
-			m_pPlayer->GetCharacter()->GiveWeapon(Info().Function, 1);
+			m_pPlayer->GetCharacter()->GiveWeapon(Info().Function, 3);
 	}
 
 	if(m_pPlayer->GetCharacter() && Info().GetStatsBonus(Stats::StAmmoRegen) > 0)

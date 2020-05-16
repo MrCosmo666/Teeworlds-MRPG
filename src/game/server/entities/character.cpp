@@ -439,7 +439,8 @@ void CCharacter::CreateQuestsStep(int QuestID)
 bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)
 {
 	const int WeaponID = clamp(Weapon, (int)WEAPON_HAMMER, (int)WEAPON_NINJA);
-	if(m_pPlayer->GetEquippedItem(WeaponID) <= 0)
+	const bool IsHammer = (bool)(WeaponID == WEAPON_HAMMER);
+	if(m_pPlayer->GetEquippedItem(WeaponID) <= 0 && !IsHammer)
 	{
 		RemoveWeapon(WeaponID);
 		m_ActiveWeapon = m_LastWeapon;
@@ -450,9 +451,17 @@ bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)
 	if(m_aWeapons[WeaponID].m_Ammo >= MaximalAmmo)
 		return false;
 
-	const int GivesAmmo = min(m_aWeapons[WeaponID].m_Ammo + GiveAmmo, MaximalAmmo);
-	m_aWeapons[WeaponID].m_Got = true;
-	m_aWeapons[WeaponID].m_Ammo = GivesAmmo;
+	if(!IsHammer)
+	{
+		const int GivesAmmo = m_aWeapons[WeaponID].m_Got ? min(m_aWeapons[WeaponID].m_Ammo + GiveAmmo, MaximalAmmo) : min(GiveAmmo, MaximalAmmo);
+		m_aWeapons[WeaponID].m_Got = true;
+		m_aWeapons[WeaponID].m_Ammo = (Weapon == (int)WEAPON_HAMMER ? -1 : GivesAmmo);
+	}
+	else
+	{
+		m_aWeapons[WeaponID].m_Got = true;
+		m_aWeapons[WeaponID].m_Ammo = -1;
+	}
 	return true;
 }
 
