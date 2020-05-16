@@ -218,7 +218,7 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 
 	// проверяем ману
 	const int SkillProcent = SkillData[SkillID].m_ManaProcent;
-	const int ManaPrice = (int)kurosio::translate_to_procent_rest(pPlayer->GetStartMana(), SkillProcent);
+	const int ManaPrice = kurosio::translate_to_procent_rest(pPlayer->GetStartMana(), SkillProcent);
 	CCharacter* pChr = pPlayer->GetCharacter();
 	if(ManaPrice > 0 && pChr->CheckFailMana(ManaPrice))
 		return false;

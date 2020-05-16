@@ -233,7 +233,7 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, b
 			NameItem, (pPlayerItem.Enchant > 0 ? aEnchantSize : "\0"), (pPlayerItem.Settings ? " ✔" : "\0"));
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pPlayerItem.Info().GetDesc(pPlayer));
 
-		char aAttributes[128];
+		char aAttributes[64];
 		FormatAttributes(pPlayerItem.Info(), pPlayerItem.Enchant, sizeof(aAttributes), aAttributes);
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 	}
@@ -254,11 +254,17 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, b
 
 	if (pPlayerItem.Info().Type == ItemType::TYPE_POTION)
 		GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "Auto use {STR} - {STR}", NameItem, (pPlayerItem.Settings ? "Enable" : "Disable"));
-
-	if (pPlayerItem.Info().Type == ItemType::TYPE_DECORATION)
+	else if (pPlayerItem.Info().Type == ItemType::TYPE_DECORATION)
 	{
 		GS()->AVM(ClientID, "DECOSTART", ItemID, HideID, "Added {STR} to your house", NameItem);
 		GS()->AVM(ClientID, "DECOGUILDSTART", ItemID, HideID, "Added {STR} to your guild house", NameItem);
+	}
+	else if(pPlayerItem.Info().Type == ItemType::TYPE_EQUIP || pPlayerItem.Info().Function == FUNCTION_SETTINGS)
+	{
+		if((pPlayerItem.Info().Function == EQUIP_HAMMER && pPlayerItem.IsEquipped()))
+			GS()->AVM(ClientID, "null", NOPE, HideID, "You can not undress equiping hammer", NameItem);
+		else
+			GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "{STR} {STR}", (pPlayerItem.Settings ? "Undress" : "Equip"), NameItem);
 	}
 
 	if (pPlayerItem.Info().Function == FUNCTION_PLANTS)
@@ -275,12 +281,9 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, b
 		}
 	}
 
-	if (pPlayerItem.Info().Type == ItemType::TYPE_EQUIP || pPlayerItem.Info().Function == FUNCTION_SETTINGS)
-		GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "{STR} {STR}", (pPlayerItem.Settings ? "Undress" : "Equip"), NameItem);
-
 	if (pPlayerItem.Info().IsEnchantable())
 	{
-		int Price = pPlayerItem.EnchantPrice();
+		const int Price = pPlayerItem.EnchantPrice();
 		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR} ({INT} material)", NameItem, &Price);
 	}
 
@@ -292,7 +295,7 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, b
 
 	GS()->AVM(ClientID, "IDROP", ItemID, HideID, "Drop {STR}", NameItem);
 
-	if (pPlayerItem.Info().MinimalPrice)
+	if (pPlayerItem.Info().MinimalPrice > 0)
 		GS()->AVM(ClientID, "AUCTIONSLOT", ItemID, HideID, "Create Slot Auction {STR}", NameItem);
 }
 

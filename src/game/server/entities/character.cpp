@@ -248,16 +248,6 @@ void CCharacter::FireWeapon()
 		if(DecoInteractive())
 			return;
 
-		if(m_pPlayer->GetEquippedItem(m_ActiveWeapon) <= 0)
-		{
-			if(m_ActiveWeapon == WEAPON_HAMMER)
-				GS()->TakeItemCharacter(m_pPlayer->GetCID());
-
-			GS()->SBL(m_pPlayer->GetCID(), BroadcastPriority::BROADCAST_GAME_WARNING, 150, "You need buy this weapon or module and equip!");
-			m_ReloadTimer = 125 * Server()->TickSpeed() / 1000;
-			return;
-		}
-
 		if(!m_aWeapons[m_ActiveWeapon].m_Ammo)
 		{
 			m_ReloadTimer = 125 * Server()->TickSpeed() / 1000;
