@@ -690,6 +690,8 @@ ItemJob::InventoryItem &CPlayer::GetItem(int ItemID)
 {
 	if(ItemJob::Items[m_ClientID].find(ItemID) == ItemJob::Items[m_ClientID].end())
 		ItemJob::Items[m_ClientID][ItemID] = ItemJob::InventoryItem(this, ItemID);
+
+	ItemJob::Items[m_ClientID][ItemID].SetPlayer(this);
 	return ItemJob::Items[m_ClientID][ItemID];
 }
 

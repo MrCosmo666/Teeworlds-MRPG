@@ -41,6 +41,7 @@ private:
 	virtual void Tick();
 	virtual bool TakeDamage(vec2 Force, int Dmg, int From, int Weapon);
 	virtual void Die(int Killer, int Weapon);
+	virtual bool GiveWeapon(int Weapon, int GiveAmmo);
 	virtual int GetSnapFullID() const;
 
 	void CreateRandomDropItem(int DropCID, int Random, int ItemID, int Count, vec2 Force);

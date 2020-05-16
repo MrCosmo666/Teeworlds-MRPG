@@ -376,12 +376,13 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	// настройка предмета
 	if(PPSTR(CMD, "ISETTINGS") == 0)
 	{
+		if(!pPlayer->GetCharacter())
+			return true;
+
 		InventoryItem& pPlayerSelectedItem = pPlayer->GetItem(VoteID);
 		pPlayerSelectedItem.Equip();
 		if(pPlayerSelectedItem.Info().Function == EQUIP_DISCORD)
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_STATS);
-		else if(pPlayerSelectedItem.Info().Type == ItemType::TYPE_EQUIP)
-			GS()->ChangeEquipSkin(ClientID, VoteID);
 
 		GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
@@ -524,8 +525,8 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		GS()->AV(ClientID, "null", "");
 
 		GS()->AVH(ClientID, TAB_EQUIP_SELECT, RED_COLOR, "Equip Select List");
-		const char* pType[NUM_EQUIPS] = { "Wings", "Hammer", "Gun", "Shotgun", "Grenade", "Rifle", "Discord", "Pickaxe" };
-		for (int i = EQUIP_WINGS; i < NUM_EQUIPS; i++)
+		const char* pType[NUM_EQUIPS] = { "Hammer", "Gun", "Shotgun", "Grenade", "Rifle", "Pickaxe", "Wings", "Discord" };
+		for (int i = 0; i < NUM_EQUIPS; i++)
 		{
 			const int ItemID = pPlayer->GetEquippedItem(i);
 			ItemJob::InventoryItem& pPlayerItem = pPlayer->GetItem(ItemID);
@@ -766,7 +767,14 @@ bool ItemJob::ClassItems::Equip()
 	}
 
 	Settings ^= true;
-	if(Info().GetStatsBonus(Stats::StAmmoRegen) > 0 && m_pPlayer->GetCharacter())
+	if(Info().Type == ItemType::TYPE_EQUIP)
+	{
+		m_pPlayer->GS()->ChangeEquipSkin(m_pPlayer->GetCID(), itemid_);
+		if(m_pPlayer->GetCharacter() && (Info().Function >= EQUIP_HAMMER || Info().Function <= EQUIP_RIFLE))
+			m_pPlayer->GetCharacter()->GiveWeapon(Info().Function, 1);
+	}
+
+	if(m_pPlayer->GetCharacter() && Info().GetStatsBonus(Stats::StAmmoRegen) > 0)
 		m_pPlayer->GetCharacter()->m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
 
 	m_pPlayer->ShowInformationStats();

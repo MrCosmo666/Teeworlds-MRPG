@@ -248,12 +248,13 @@ void CCharacter::FireWeapon()
 		if(DecoInteractive())
 			return;
 
-		if(m_pPlayer->GetEquippedItem(m_ActiveWeapon+EQUIP_HAMMER) == -1)
+		if(m_pPlayer->GetEquippedItem(m_ActiveWeapon) <= 0)
 		{
-			GS()->SBL(m_pPlayer->GetCID(), BroadcastPriority::BROADCAST_GAME_WARNING, 150, "You need buy this weapon or module and equip!");
-			m_ReloadTimer = 125 * Server()->TickSpeed() / 1000;
 			if(m_ActiveWeapon == WEAPON_HAMMER)
 				GS()->TakeItemCharacter(m_pPlayer->GetCID());
+
+			GS()->SBL(m_pPlayer->GetCID(), BroadcastPriority::BROADCAST_GAME_WARNING, 150, "You need buy this weapon or module and equip!");
+			m_ReloadTimer = 125 * Server()->TickSpeed() / 1000;
 			return;
 		}
 
@@ -437,10 +438,28 @@ void CCharacter::CreateQuestsStep(int QuestID)
 
 bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)
 {
-	const int RealAmmo = 10 + m_pPlayer->GetAttributeCount(Stats::StAmmo);
-	m_aWeapons[Weapon].m_Got = true;
-	m_aWeapons[Weapon].m_Ammo = min(GiveAmmo, RealAmmo);
+	const int WeaponID = clamp(Weapon, (int)WEAPON_HAMMER, (int)WEAPON_NINJA);
+	if(m_pPlayer->GetEquippedItem(WeaponID) <= 0)
+	{
+		RemoveWeapon(WeaponID);
+		m_ActiveWeapon = m_LastWeapon;
+		return false;
+	}
+
+	const int MaximalAmmo = 10 + m_pPlayer->GetAttributeCount(Stats::StAmmo);
+	if(m_aWeapons[WeaponID].m_Ammo >= MaximalAmmo)
+		return false;
+
+	const int GivesAmmo = min(m_aWeapons[WeaponID].m_Ammo + GiveAmmo, MaximalAmmo);
+	m_aWeapons[WeaponID].m_Got = true;
+	m_aWeapons[WeaponID].m_Ammo = GivesAmmo;
 	return true;
+}
+
+void CCharacter::RemoveWeapon(int Weapon)
+{
+	m_aWeapons[Weapon].m_Got = false;
+	m_aWeapons[Weapon].m_Ammo = -1;
 }
 
 void CCharacter::SetEmote(int Emote, int Sec)

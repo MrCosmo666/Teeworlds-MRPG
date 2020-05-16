@@ -55,6 +55,7 @@ public:
 	public:
 		ClassItems() : Count(0), Settings(0), Enchant(0), Durability(0) {};
 		ClassItems(CPlayer* pPlayer, int ItemID) : m_pPlayer(pPlayer), itemid_(ItemID), Count(0), Settings(0), Enchant(0), Durability(0) {};
+		void SetPlayer(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
 
 		int Count;
 		int Settings;

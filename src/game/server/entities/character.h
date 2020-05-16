@@ -74,7 +74,8 @@ public:
 	int Health() const { return m_Health; }
 
 	void CreateQuestsStep(int QuestID);
-	bool GiveWeapon(int Weapon, int GiveAmmo);
+	virtual bool GiveWeapon(int Weapon, int GiveAmmo);
+	void RemoveWeapon(int Weapon);
 
 	void CreateSnapProj(int SnapID, int Count, int TypeID, bool Dynamic, bool Projectile);
 	void RemoveSnapProj(int Count, int SnapID, bool Effect = false);
@@ -106,13 +107,7 @@ public:
 	vec2 m_OlderPos;
 	int m_DoorHit;
 
-private:
-	bool m_Alive;
-
-	int m_Event;
-	int m_Mana;
-
-	// weapon info
+protected:
 	struct WeaponStat
 	{
 		int m_AmmoRegenStart;
@@ -120,6 +115,12 @@ private:
 		bool m_Got;
 
 	} m_aWeapons[NUM_WEAPONS];
+
+private:
+	bool m_Alive;
+
+	int m_Event;
+	int m_Mana;
 
 	int m_LastWeapon;
 	int m_QueuedWeapon;
