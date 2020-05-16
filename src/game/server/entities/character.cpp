@@ -502,9 +502,7 @@ void CCharacter::Tick()
 	m_Core.Tick(true, &m_pPlayer->m_NextTuningParams);
 	m_pPlayer->UpdateTempData(m_Health, m_Mana);
 	if(GameLayerClipped(m_Pos))
-	{
 		Die(m_pPlayer->GetCID(), WEAPON_SELF);
-	}
 
 	if (!m_DoorHit)
 	{
@@ -643,6 +641,25 @@ bool CCharacter::IncreaseMana(int Amount)
 
 void CCharacter::Die(int Killer, int Weapon)
 {
+	// change to safe zone
+	const int ClientID = m_pPlayer->GetCID();
+	if(Weapon != WEAPON_WORLD && !GS()->IsDungeon())
+	{
+		m_pPlayer->UpdateTempData(0, 0);
+		const int SafezoneWorldID = GS()->GetRespawnWorld();
+		if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot() && GS()->m_apPlayers[Killer])
+		{
+			// potion resurrection
+			if(m_pPlayer->GetItem(itPotionResurrection).IsEquipped())
+				GS()->Mmo()->Item()->UseItem(ClientID, itPotionResurrection, 1);
+			else
+			{
+				GS()->Chat(ClientID, "You are dead, you will be treated in {STR}", Server()->GetWorldName(SafezoneWorldID));
+				m_pPlayer->GetTempData().TempActiveSafeSpawn = true;
+			}
+		}
+	}
+
 	m_Alive = false;
 	m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed() / 2;
 	if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
@@ -655,19 +672,6 @@ void CCharacter::Die(int Killer, int Weapon)
 	GS()->m_pController->OnCharacterDeath(this, GS()->m_apPlayers[Killer], Weapon);
 	GS()->CreateSound(m_Pos, SOUND_PLAYER_DIE);
 	m_pPlayer->ClearTalking();
-
-	// change to safe zone
-	const int ClientID = m_pPlayer->GetCID();
-	if(Weapon != WEAPON_WORLD && !GS()->IsDungeon())
-	{
-		const int SafezoneWorldID = GS()->GetRespawnWorld();
-		if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot() && GS()->m_apPlayers[Killer])
-		{
-			GS()->Chat(ClientID, "You are dead, you will be treated in {STR}", Server()->GetWorldName(SafezoneWorldID));
-			m_pPlayer->GetTempData().TempActiveSafeSpawn = true;
-		}
-		m_pPlayer->UpdateTempData(0, 0);
-	}
 
 	// respawn
 	m_pPlayer->m_PlayerTick[TickState::Die] = Server()->Tick()/2;
@@ -766,7 +770,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	// автозелье здоровья
 	if(m_Health <= m_pPlayer->GetStartHealth()/3)
 	{
-		if(!m_pPlayer->CheckEffect("RegenHealth") && m_pPlayer->GetItem(itPotionHealthRegen).Count > 0 && m_pPlayer->GetItem(itPotionHealthRegen).Settings)
+		if(!m_pPlayer->CheckEffect("RegenHealth") && m_pPlayer->GetItem(itPotionHealthRegen).IsEquipped())
 			GS()->Mmo()->Item()->UseItem(m_pPlayer->GetCID(), itPotionHealthRegen, 1);
 	}
 
@@ -1101,7 +1105,7 @@ bool CCharacter::CheckFailMana(int Mana)
 	// автозелье маны
 	if(m_Mana <= m_pPlayer->GetStartMana() / 5)
 	{
-		if(!m_pPlayer->CheckEffect("RegenMana") && m_pPlayer->GetItem(itPotionManaRegen).Count > 0 && m_pPlayer->GetItem(itPotionManaRegen).Settings)
+		if(!m_pPlayer->CheckEffect("RegenMana") && m_pPlayer->GetItem(itPotionManaRegen).IsEquipped())
 			GS()->Mmo()->Item()->UseItem(m_pPlayer->GetCID(), itPotionManaRegen, 1);
 	}
 

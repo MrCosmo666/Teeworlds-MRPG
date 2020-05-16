@@ -590,6 +590,13 @@ void ItemJob::UseItem(int ClientID, int ItemID, int Count)
 		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", PlItem.Info().GetName(pPlayer), &Count);
 	}
 
+	if(ItemID == itPotionResurrection && PlItem.Remove(Count, 0))
+	{
+		pPlayer->GetTempData().TempActiveSafeSpawn = false;
+		pPlayer->GetTempData().TempHealth = pPlayer->GetStartHealth();
+		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", PlItem.Info().GetName(pPlayer), &Count);
+	}
+
 	if(ItemID == itCapsuleSurvivalExperience && PlItem.Remove(Count, 0)) 
 	{
 		int Getting = randomRangecount(10, 50, Count);

@@ -21,6 +21,8 @@ public:
 	CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint);
 	virtual ~CPlayerBot() override;
 
+	void GenerateNick(char* buffer, int size_buffer);
+
 	int GetBotID()													override { return m_BotID; };
 	int GetBotType()												override { return m_BotType; };
 	int GetBotSub()													override { return m_SubBotID; };

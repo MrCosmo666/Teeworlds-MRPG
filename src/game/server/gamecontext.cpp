@@ -765,7 +765,7 @@ void CGS::SendEquipItem(int ClientID, int TargetID)
 			Msg.m_EquipID[k] = EquipItem;
 			Msg.m_EnchantItem[k] = EnchantItem;
 		}
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, TargetID);
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, TargetID, CheckPlayerMessageWorldID(ClientID));
 		return;
 	}
 
@@ -1356,10 +1356,12 @@ void CGS::OnClientConnected(int ClientID)
 // Вход на сервер игрока
 void CGS::OnClientEnter(int ClientID)
 {
-	SendChatCommands(ClientID);
+	CPlayer* pPlayer = m_apPlayers[ClientID];
+	if(!pPlayer || pPlayer->IsBot())
+		return;
 
-	CPlayer *pPlayer = m_apPlayers[ClientID];
 	m_pController->OnPlayerConnect(pPlayer);
+	SendChatCommands(ClientID);
 
 	// update client infos (others before local)
 	CNetMsg_Sv_ClientInfo NewClientInfoMsg;
@@ -1393,12 +1395,22 @@ void CGS::OnClientEnter(int ClientID)
 		ClientInfoMsg.m_Team = m_apPlayers[i]->GetTeam();
 
 		// имя
-		bool Bot = m_apPlayers[i]->IsBot();
-		int BotID = m_apPlayers[i]->GetBotID();
-		ClientInfoMsg.m_pName = Bot ? BotJob::DataBot[BotID].NameBot : Server()->ClientName(i);
+		const bool Bot = m_apPlayers[i]->IsBot();
+		if(Bot)
+		{
+			CPlayerBot* pBotPlayer = static_cast<CPlayerBot*>(m_apPlayers[i]);
+			char aNickname[24];
+			pBotPlayer->GenerateNick(aNickname, sizeof(aNickname));
+			ClientInfoMsg.m_pName = aNickname;
+		}
+		else
+			ClientInfoMsg.m_pName = Server()->ClientName(i);
+
 		ClientInfoMsg.m_pClan = Server()->ClientClan(i);
 		ClientInfoMsg.m_Country = Server()->ClientCountry(i);
 		ClientInfoMsg.m_Silent = false;
+
+		const int BotID = m_apPlayers[i]->GetBotID();
 		for(int p = 0; p < 6; p++)
 		{
 			ClientInfoMsg.m_apSkinPartNames[p] = Bot ? BotJob::DataBot[BotID].SkinNameBot[p] : m_apPlayers[i]->Acc().m_aaSkinPartNames[p];

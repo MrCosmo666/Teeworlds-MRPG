@@ -225,6 +225,7 @@ enum
 	itPotionHealthRegen = 15,			// Зелье регенерации здоровья
 	itCapsuleSurvivalExperience = 16,	// Дает 10-50 опыта
 	itLittleBagGold = 17,				// Дает 10-50 золота
+	itPotionResurrection = 25,			// Зелье воскрешения
 
 	/*
 		Все листы сортировок что существуют на сервере

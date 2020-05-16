@@ -16,11 +16,11 @@ IServer* CPlayer::Server() const { return m_pGS->Server(); };
 CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint)
 : CPlayer(pGS, ClientID), m_BotType(SpawnPoint), m_BotID(BotID), m_SubBotID(SubBotID), m_BotHealth(0)
 {
-	SendInformationBot();
-
 	m_Spawned = true;
 	m_DungeonAllowedSpawn = false;
 	m_PlayerTick[TickState::Respawn] = Server()->Tick();
+
+	SendInformationBot();
 }
 
 CPlayerBot::~CPlayerBot() 
@@ -275,7 +275,6 @@ void CPlayerBot::SendInformationBot()
 	ClientInfoMsg.m_ClientID = m_ClientID;
 	ClientInfoMsg.m_Local = 0;
 	ClientInfoMsg.m_Team = GetTeam();
-
 	ClientInfoMsg.m_pName = BotJob::DataBot[m_BotID].NameBot;
 	ClientInfoMsg.m_pClan = "::Bots::";
 	ClientInfoMsg.m_Country = 0;
@@ -289,7 +288,23 @@ void CPlayerBot::SendInformationBot()
 	Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1, GS()->CheckPlayerMessageWorldID(m_ClientID));
 }
 
+void CPlayerBot::GenerateNick(char* buffer, int size_buffer)
+{
+	if(GetBotType() == BotsTypes::TYPE_BOT_MOB && BotJob::MobBot[m_SubBotID].Spread > 0)
+	{
+		static const int SIZE_GENERATE = 6;
+		const char* FirstPos[SIZE_GENERATE] = { "Ja", "Qu", "Je", "Di", "Xo", "Us" };
+		const char* LastPos[SIZE_GENERATE] = { "de", "sa", "ul", "ma", "sa", "py" };
 
+		char aBuf[24];
+		str_format(aBuf, sizeof(aBuf), "%s %s%s", BotJob::DataBot[m_BotID].NameBot, FirstPos[random_int() % SIZE_GENERATE], LastPos[random_int() % SIZE_GENERATE]);
+		mem_copy(buffer, aBuf, size_buffer);
+		return;
+	}
+	mem_copy(buffer, BotJob::DataBot[m_BotID].NameBot, size_buffer);
+}
+
+// thread path finder
 void CPlayerBot::TickThreadMobsPathFinder()
 {
 	const int MobID = GetBotSub();
