@@ -1020,13 +1020,13 @@ void CCharacter::HandleTunning()
 		}
 		if(m_pPlayer->CheckEffect("RegenHealth"))
 		{
-			const int RegenHP = kurosio::translate_to_procent_rest(m_pPlayer->GetStartHealth(), 3);
-			IncreaseHealth(RegenHP);
+			const int RestoreHealth = kurosio::translate_to_procent_rest(m_pPlayer->GetStartHealth(), 3);
+			IncreaseHealth(RestoreHealth);
 		}
 		if(m_pPlayer->CheckEffect("RegenMana"))
 		{
-			const int RegenMana = kurosio::translate_to_procent_rest(m_pPlayer->GetStartHealth(), 5);
-			IncreaseMana(RegenMana);
+			const int RestoreMana = kurosio::translate_to_procent_rest(m_pPlayer->GetStartMana(), 5);
+			IncreaseMana(RestoreMana);
 		}
 	}
 

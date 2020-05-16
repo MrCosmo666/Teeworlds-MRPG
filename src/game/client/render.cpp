@@ -741,9 +741,9 @@ void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color,
 	// Shares
 	if (Shares)
 	{
-		const float FakeToScreenX = (Graphics()->ScreenWidth() / (ScreenX1 - ScreenX0));
-		const float BordourWeidth = (int)((MarginSize) * FakeToScreenX) / FakeToScreenX;
 		const float BordourSize = Rect.w / Shares;
+		const float FakeToScreenX = (Graphics()->ScreenWidth() / (ScreenX1 - ScreenX0));
+		const float BordourWeidth = max((int)((MarginSize)*FakeToScreenX) / FakeToScreenX, (int)((FontSize / 8.0f) * FakeToScreenX) / FakeToScreenX);
 		CUIRect Bordour = { Rect.x, BackgroundProgress.y, BordourWeidth, BackgroundProgress.h };
 		for (int i = 0; i < Shares; i++)
 		{

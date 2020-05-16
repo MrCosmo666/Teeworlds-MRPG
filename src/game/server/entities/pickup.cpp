@@ -30,9 +30,7 @@ void CPickup::Tick()
 	{
 		if(Server()->Tick() > m_SpawnTick)
 		{
-			// respawn
 			m_SpawnTick = -1;
-
 			if(m_Type == PICKUP_GRENADE || m_Type == PICKUP_SHOTGUN || m_Type == PICKUP_LASER)
 				GS()->CreateSound(m_Pos, SOUND_WEAPON_SPAWN);
 		}
@@ -41,69 +39,62 @@ void CPickup::Tick()
 	}
 
 	CCharacter *pChr = (CCharacter *)GS()->m_World.ClosestEntity(m_Pos, 20.0f, CGameWorld::ENTTYPE_CHARACTER, 0);
-	if(pChr && pChr->IsAlive())
+	if(!pChr || !pChr->IsAlive())
+		return;
+
+	bool Picked = false;
+	if(m_Type == PICKUP_HEALTH)
 	{
-		bool Picked = false;
-		switch (m_Type)
+		const int RestoreHealth = kurosio::translate_to_procent_rest(pChr->GetPlayer()->GetStartHealth(), 1);
+		if(pChr->IncreaseHealth(RestoreHealth))
 		{
-			case PICKUP_HEALTH:
-				if(pChr->IncreaseHealth(1))
-				{
-					Picked = true;
-					GS()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
-				}
-				break;
-
-			case PICKUP_ARMOR:
-				if(pChr->IncreaseMana(1))
-				{
-					Picked = true;
-					GS()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
-				}
-				break;
-
-			case PICKUP_GRENADE:
-				if(pChr->GiveWeapon(WEAPON_GRENADE, g_pData->m_Weapons.m_aId[WEAPON_GRENADE].m_Maxammo))
-				{
-					Picked = true;
-					GS()->CreateSound(m_Pos, SOUND_PICKUP_GRENADE);
-					if(pChr->GetPlayer())
-						GS()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), WEAPON_GRENADE);
-				}
-				break;
-			case PICKUP_SHOTGUN:
-				if(pChr->GiveWeapon(WEAPON_SHOTGUN, g_pData->m_Weapons.m_aId[WEAPON_SHOTGUN].m_Maxammo))
-				{
-					Picked = true;
-					GS()->CreateSound(m_Pos, SOUND_PICKUP_SHOTGUN);
-					if(pChr->GetPlayer())
-						GS()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), WEAPON_SHOTGUN);
-				}
-				break;
-			case PICKUP_LASER:
-				if(pChr->GiveWeapon(WEAPON_LASER, g_pData->m_Weapons.m_aId[WEAPON_LASER].m_Maxammo))
-				{
-					Picked = true;
-					GS()->CreateSound(m_Pos, SOUND_PICKUP_SHOTGUN);
-					if(pChr->GetPlayer())
-						GS()->SendWeaponPickup(pChr->GetPlayer()->GetCID(), WEAPON_LASER);
-				}
-				break;
-
-			default:
-				break;
-		};
-
-		if(Picked)
-		{
-			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "pickup player='%d:%s' item=%d",
-				pChr->GetPlayer()->GetCID(), Server()->ClientName(pChr->GetPlayer()->GetCID()), m_Type);
-			GS()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
-			int RespawnTime = g_pData->m_aPickups[m_Type].m_Respawntime;
-			if(RespawnTime >= 0)
-				m_SpawnTick = Server()->Tick() + Server()->TickSpeed() * RespawnTime;
+			GS()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
+			Picked = true;
 		}
+	}
+	else if(m_Type == PICKUP_ARMOR)
+	{
+		const int RestoreMana = kurosio::translate_to_procent_rest(pChr->GetPlayer()->GetStartMana(), 1);
+		if(pChr->IncreaseMana(RestoreMana))
+		{
+			GS()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
+			Picked = true;
+		}
+	}
+	else if(m_Type == PICKUP_SHOTGUN)
+	{
+		const int RestoreAmmo = kurosio::translate_to_procent_rest(pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo), 1);
+		if(pChr->GiveWeapon(WEAPON_SHOTGUN, RestoreAmmo))
+		{
+			Picked = true;
+			GS()->CreateSound(m_Pos, SOUND_PICKUP_SHOTGUN);
+		}
+	}
+	else if(m_Type == PICKUP_GRENADE)
+	{
+		const int RestoreAmmo = kurosio::translate_to_procent_rest(pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo), 1);
+		if(pChr->GiveWeapon(WEAPON_GRENADE, RestoreAmmo))
+		{
+			Picked = true;
+			GS()->CreateSound(m_Pos, SOUND_PICKUP_GRENADE);
+
+		}
+	}
+	else if(m_Type == PICKUP_LASER)
+	{
+		const int RestoreAmmo = kurosio::translate_to_procent_rest(pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo), 1);
+		if(pChr->GiveWeapon(WEAPON_LASER, RestoreAmmo))
+		{
+			Picked = true;
+			GS()->CreateSound(m_Pos, SOUND_PICKUP_SHOTGUN);
+		}
+	}
+
+	if(Picked)
+	{
+		int RespawnTime = g_pData->m_aPickups[m_Type].m_Respawntime;
+		if(RespawnTime >= 0)
+			m_SpawnTick = Server()->Tick() + Server()->TickSpeed() * RespawnTime;
 	}
 }
 
