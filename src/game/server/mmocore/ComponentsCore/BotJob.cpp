@@ -338,7 +338,7 @@ void BotJob::LoadMobsBots(const char* pWhereLocalWorld)
 
 // threading CPathFinderThread botai ? TODO: protect BotPlayer?
 std::mutex lockingPath;
-void BotJob::CPathFinderThread::FindThreadPath(class CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos)
+void BotJob::FindThreadPath(class CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos)
 {
 	std::thread([pBotPlayer, StartPos, SearchPos]()
 		{
@@ -355,7 +355,7 @@ void BotJob::CPathFinderThread::FindThreadPath(class CPlayerBot* pBotPlayer, vec
 		}).detach();
 }
 
-void BotJob::CPathFinderThread::GetThreadRandomWaypointTarget(class CPlayerBot* pBotPlayer)
+void BotJob::GetThreadRandomWaypointTarget(class CPlayerBot* pBotPlayer)
 {
 	std::thread([this, pBotPlayer]()
 		{

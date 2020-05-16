@@ -15,13 +15,6 @@ class BotJob : public MmoComponent
 		MobBot.clear();
 	};
 
-	// threading path finder
-	struct CPathFinderThread
-	{
-		void FindThreadPath(class CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos);
-		void GetThreadRandomWaypointTarget(class CPlayerBot* pBotPlayer);
-	};
-
 	// bots talking data
 	struct TalkingData
 	{
@@ -44,7 +37,7 @@ class BotJob : public MmoComponent
 	};
 
 	// types bots information
-	struct ClassNpcBot : public CPathFinderThread
+	struct ClassNpcBot
 	{
 		const char* GetName() const
 		{
@@ -92,7 +85,7 @@ class BotJob : public MmoComponent
 		std::vector < TalkingData > m_Talk;
 	};
 
-	struct ClassMobsBot : public CPathFinderThread
+	struct ClassMobsBot
 	{
 		const char* GetName() const
 		{
@@ -164,6 +157,9 @@ public:
 		return false;
 	}
 
+	// threading path finder
+	void FindThreadPath(class CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos);
+	void GetThreadRandomWaypointTarget(class CPlayerBot* pBotPlayer);
 };
 
 #endif
