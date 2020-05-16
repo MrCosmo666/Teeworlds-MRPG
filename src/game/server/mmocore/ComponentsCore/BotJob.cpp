@@ -194,12 +194,13 @@ void BotJob::LoadMainInformationBots()
 			if(DataBot[BotID].SkinColorBot[j] != 0)
 				DataBot[BotID].UseCustomBot[j] = true;
 		}
-		DataBot[BotID].EquipSlot[EQUIP_WINGS] = RES->getInt("SlotWings");
 		DataBot[BotID].EquipSlot[EQUIP_HAMMER] = RES->getInt("SlotHammer");
 		DataBot[BotID].EquipSlot[EQUIP_GUN] = RES->getInt("SlotGun");
 		DataBot[BotID].EquipSlot[EQUIP_SHOTGUN] = RES->getInt("SlotShotgun");
 		DataBot[BotID].EquipSlot[EQUIP_GRENADE] = RES->getInt("SlotGrenade");
 		DataBot[BotID].EquipSlot[EQUIP_RIFLE] = RES->getInt("SlotRifle");
+		DataBot[BotID].EquipSlot[EQUIP_MINER] = 0;
+		DataBot[BotID].EquipSlot[EQUIP_WINGS] = RES->getInt("SlotWings");
 	}
 }
 

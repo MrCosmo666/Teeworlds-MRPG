@@ -248,7 +248,7 @@ bool CPlayerBot::IsActiveQuests(int SnapClientID)
 
 int CPlayerBot::GetEquippedItem(int EquipID, int SkipItemID) const
 {
-	if (EquipID < EQUIP_WINGS || EquipID > EQUIP_RIFLE)
+	if (EquipID < EQUIP_HAMMER || EquipID > EQUIP_WINGS || EquipID == EQUIP_MINER)
 		return -1;
 	return BotJob::DataBot[m_BotID].EquipSlot[EquipID];
 }
@@ -257,7 +257,7 @@ const char* CPlayerBot::GetStatusBot()
 {
 	if (m_BotType == BotsTypes::TYPE_BOT_QUEST)
 	{
-		int QuestID = BotJob::QuestBot[m_SubBotID].QuestID;
+		const int QuestID = BotJob::QuestBot[m_SubBotID].QuestID;
 		return GS()->Mmo()->Quest()->GetQuestName(QuestID);
 	}
 	else if (m_BotType == BotsTypes::TYPE_BOT_MOB && BotJob::MobBot[m_SubBotID].Boss)

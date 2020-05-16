@@ -239,7 +239,7 @@ enum
 	DECOTYPE_GUILD_HOUSE,
 
 	// максимальные слоты снаражения ботов
-	EQUIP_MAX_BOTS = EQUIP_RIFLE + 1,
+	EQUIP_MAX_BOTS = EQUIP_WINGS + 1,
 };
 
 enum GuildAccess

@@ -122,7 +122,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	if(!pPlayer || !pPlayer->IsAuthed()) 
 		return;
 
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	GS()->AddBroadcast(ClientID, GS()->Server()->GetWorldName(GS()->GetWorldID()), 200, 500);
 	if(!FirstInitilize)
 	{
@@ -158,7 +158,6 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		pPlayer->ChangeWorld(pPlayer->Acc().WorldID);
 		return;
 	}
-
 	GS()->SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
 }
 
