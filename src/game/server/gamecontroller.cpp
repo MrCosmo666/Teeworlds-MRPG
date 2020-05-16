@@ -70,20 +70,29 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 
 	switch(Index)
 	{
-	case ENTITY_SPAWN:
+		case ENTITY_SPAWN:
 		m_aaSpawnPoints[SpawnTypes::SPAWN_HUMAN][m_aNumSpawnPoints[0]++] = Pos;
 		break;
-	case ENTITY_SPAWN_MOBS:
+		case ENTITY_SPAWN_MOBS:
 		m_aaSpawnPoints[SpawnTypes::SPAWN_BOT][m_aNumSpawnPoints[1]++] = Pos;
 		break;
-	case ENTITY_SPAWN_SAFE:
+		case ENTITY_SPAWN_SAFE:
 		m_aaSpawnPoints[SpawnTypes::SPAWN_HUMAN_SAFE][m_aNumSpawnPoints[2]++] = Pos;
 		break;
-	case ENTITY_ARMOR_1:
+		case ENTITY_ARMOR_1:
 		Type = PICKUP_ARMOR;
 		break;
-	case ENTITY_HEALTH_1:
+		case ENTITY_HEALTH_1:
 		Type = PICKUP_HEALTH;
+		break;
+		case ENTITY_PICKUP_SHOTGUN:
+		Type = PICKUP_SHOTGUN;
+		break;
+		case ENTITY_PICKUP_GRENADE:
+		Type = PICKUP_GRENADE;
+		break;
+		case ENTITY_PICKUP_LASER:
+		Type = PICKUP_LASER;
 		break;
 	}
 	if(Type != -1)

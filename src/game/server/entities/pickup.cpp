@@ -39,7 +39,7 @@ void CPickup::Tick()
 	}
 
 	CCharacter *pChr = (CCharacter *)GS()->m_World.ClosestEntity(m_Pos, 20.0f, CGameWorld::ENTTYPE_CHARACTER, 0);
-	if(!pChr || !pChr->IsAlive())
+	if(!pChr || !pChr->IsAlive() || pChr->GetPlayer()->IsBot())
 		return;
 
 	bool Picked = false;
@@ -63,7 +63,7 @@ void CPickup::Tick()
 	}
 	else if(m_Type == PICKUP_SHOTGUN)
 	{
-		const int RestoreAmmo = kurosio::translate_to_procent_rest(pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo), 1);
+		const int RestoreAmmo = kurosio::translate_to_procent_rest(pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo), 25);
 		if(pChr->GiveWeapon(WEAPON_SHOTGUN, RestoreAmmo))
 		{
 			Picked = true;
@@ -72,7 +72,7 @@ void CPickup::Tick()
 	}
 	else if(m_Type == PICKUP_GRENADE)
 	{
-		const int RestoreAmmo = kurosio::translate_to_procent_rest(pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo), 1);
+		const int RestoreAmmo = kurosio::translate_to_procent_rest(pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo), 25);
 		if(pChr->GiveWeapon(WEAPON_GRENADE, RestoreAmmo))
 		{
 			Picked = true;
@@ -82,7 +82,7 @@ void CPickup::Tick()
 	}
 	else if(m_Type == PICKUP_LASER)
 	{
-		const int RestoreAmmo = kurosio::translate_to_procent_rest(pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo), 1);
+		const int RestoreAmmo = kurosio::translate_to_procent_rest(pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo), 25);
 		if(pChr->GiveWeapon(WEAPON_LASER, RestoreAmmo))
 		{
 			Picked = true;
