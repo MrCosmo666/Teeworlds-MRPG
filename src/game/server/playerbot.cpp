@@ -292,16 +292,16 @@ void CPlayerBot::GenerateNick(char* buffer, int size_buffer)
 {
 	if(GetBotType() == BotsTypes::TYPE_BOT_MOB && BotJob::MobBot[m_SubBotID].Spread > 0)
 	{
-		static const int SIZE_GENERATE = 6;
-		const char* FirstPos[SIZE_GENERATE] = { "Ja", "Qu", "Je", "Di", "Xo", "Us" };
-		const char* LastPos[SIZE_GENERATE] = { "de", "sa", "ul", "ma", "sa", "py" };
+		static const int SIZE_GENERATE = 10;
+		const char* FirstPos[SIZE_GENERATE] = { "Ja", "Qu", "Je", "Di", "Xo", "Us", "St", "Th", "Ge", "Re" };
+		const char* LastPos[SIZE_GENERATE] = { "de", "sa", "ul", "ma", "sa", "py", "as", "al", "ly", "in" };
 
 		char aBuf[24];
 		str_format(aBuf, sizeof(aBuf), "%s %s%s", BotJob::DataBot[m_BotID].NameBot, FirstPos[random_int() % SIZE_GENERATE], LastPos[random_int() % SIZE_GENERATE]);
-		mem_copy(buffer, aBuf, size_buffer);
+		str_copy(buffer, aBuf, size_buffer);
 		return;
 	}
-	mem_copy(buffer, BotJob::DataBot[m_BotID].NameBot, size_buffer);
+	str_copy(buffer, BotJob::DataBot[m_BotID].NameBot, size_buffer);
 }
 
 // thread path finder
