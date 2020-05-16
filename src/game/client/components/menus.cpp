@@ -1433,7 +1433,7 @@ void CMenus::RenderLoading(int WorkedAmount)
 	char aBuf[16];
 	str_format(aBuf, sizeof(aBuf), "%d%%", (int)(100 * Percent));
 	CUIRect FullBar = { x + Spacing, y + h - 75.0f, w - 2 * Spacing, 30.0f };
-	RenderTools()->DrawUIBar(TextRender(), FullBar, vec4(0.7f, 0.7f, 0.7f, 1.0f), m_LoadCurrent, m_LoadTotal, aBuf, 15, 5.0f, 5.0f);
+	RenderTools()->DrawUIBar(TextRender(), FullBar, vec4(0.7f, 0.7f, 0.7f, 1.0f), m_LoadCurrent, m_LoadTotal, aBuf, 3, 5.0f, 5.0f);
 	Graphics()->Swap();
 }
 
