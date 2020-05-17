@@ -285,7 +285,7 @@ void CCharacter::FireWeapon()
 				if ((pTarget == this)  || GS()->Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, nullptr, nullptr))
 					continue;
 
-				if (TalkInteractiveHammer(pTarget->GetPlayer()))
+				if (StartConversation(pTarget->GetPlayer()))
 				{
 					m_pPlayer->ClearTalking();
 					m_pPlayer->SetTalking(pTarget->GetPlayer()->GetCID(), false);
@@ -400,13 +400,13 @@ void CCharacter::HandleWeapons()
 
 	FireWeapon();
 
-	const int AmmoRegenTime = clamp(5000-m_AmmoRegen, 1000, 10000);
-	if(AmmoRegenTime && m_aWeapons[m_ActiveWeapon].m_Ammo >= 0)
+	if(m_aWeapons[m_ActiveWeapon].m_Ammo >= 0)
 	{
+		const int AmmoRegenTime = (m_ActiveWeapon == (int)WEAPON_GUN ? (Server()->TickSpeed()) : (max(5000 - m_AmmoRegen, 1000)) / 10);
 		if (m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart < 0)
-			m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart = Server()->Tick();
+			m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart = Server()->Tick() + AmmoRegenTime;
 
-		if ((Server()->Tick() - m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart) >= AmmoRegenTime * Server()->TickSpeed() / 1000)
+		if (m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart <= Server()->Tick())
 		{
 			const int RealAmmo = 10 + m_pPlayer->GetAttributeCount(Stats::StAmmo);
 			m_aWeapons[m_ActiveWeapon].m_Ammo = min(m_aWeapons[m_ActiveWeapon].m_Ammo + 1, RealAmmo);
@@ -432,8 +432,8 @@ bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)
 	const bool IsHammer = (bool)(WeaponID == WEAPON_HAMMER);
 	if(m_pPlayer->GetEquippedItem(WeaponID) <= 0 && !IsHammer)
 	{
-		RemoveWeapon(WeaponID);
-		m_ActiveWeapon = m_LastWeapon;
+		if(RemoveWeapon(WeaponID))
+			m_ActiveWeapon = m_LastWeapon;
 		return false;
 	}
 
@@ -455,10 +455,12 @@ bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)
 	return true;
 }
 
-void CCharacter::RemoveWeapon(int Weapon)
+bool CCharacter::RemoveWeapon(int Weapon)
 {
+	bool Succesful = m_aWeapons[Weapon].m_Got;
 	m_aWeapons[Weapon].m_Got = false;
 	m_aWeapons[Weapon].m_Ammo = -1;
+	return Succesful;
 }
 
 void CCharacter::SetEmote(int Emote, int Sec)
@@ -708,12 +710,6 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	if(!IsAllowedPVP(From))
 		return false;
 
-	if (m_Health > m_pPlayer->GetStartHealth())
-	{
-		GS()->Chat(m_pPlayer->GetCID(), "Your health has been lowered.");
-		GS()->Chat(m_pPlayer->GetCID(), "You may have removed equipment that gave it away.");
-		m_Health = m_pPlayer->GetStartHealth();
-	}
 	Dmg = (From == m_pPlayer->GetCID() ? max(1, Dmg/2) : max(1, Dmg));
 
 	CPlayer* pFrom = GS()->GetPlayer(From);
@@ -743,7 +739,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 		
 		// lucky пропустить урон
 		TempInt = pFrom->GetAttributeCount(Stats::StLucky, true);
-		if(rand()%5000 < clamp(TempInt, 100, 3000))
+		if(!m_pPlayer->IsBot() && rand()%5000 < clamp(TempInt, 100, 3000))
 		{
 			Dmg = 0;
 			GS()->SendEmoticon(From, EMOTICON_HEARTS);
@@ -751,7 +747,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 		
 		// Критический урон
 		TempInt = pFrom->GetAttributeCount(Stats::StDirectCriticalHit, true);
-		if(rand()%5000 < clamp(TempInt, 100, 2200))
+		if(!m_pPlayer->IsBot() && rand()%5000 < clamp(TempInt, 100, 2200))
 		{
 			const int CritDamage = pFrom->GetAttributeCount(Stats::StCriticalHit, true);
 			Dmg = Dmg*2+(CritDamage+rand()%9);
@@ -929,7 +925,7 @@ void CCharacter::GiveRandomMobEffect(int FromID)
 	CPlayer* pFrom = GS()->GetPlayer(FromID);
 	if(!pFrom || !pFrom->IsBot() || pFrom->GetBotType() != BotsTypes::TYPE_BOT_MOB || BotJob::MobBot[pFrom->GetBotSub()].Effect[0] == '\0')
 		return;
-	m_pPlayer->GiveEffect(BotJob::MobBot[pFrom->GetBotSub()].Effect, 3+rand()%3, 16);
+	m_pPlayer->GiveEffect(BotJob::MobBot[pFrom->GetBotSub()].Effect, 3+rand()%3, 30);
 }
 
 bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)
@@ -942,18 +938,15 @@ bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)
 		return true;
 
 	// работа
+	vec2 PosJob = vec2(0, 0);
+	CJobItems* pJobItem = (CJobItems*)GameWorld()->ClosestEntity(m_Pos, 15, CGameWorld::ENTTYPE_JOBITEMS, 0);
+	if(pJobItem)
 	{
-		vec2 PosJob = vec2(0, 0);
-		CJobItems *pJobItem = (CJobItems*)GameWorld()->ClosestEntity(m_Pos, 15, CGameWorld::ENTTYPE_JOBITEMS, 0);
-		if(pJobItem)
-		{
-			PosJob = pJobItem->GetPos();
-			pJobItem->Work(m_pPlayer->GetCID());
-			m_ReloadTimer = Server()->TickSpeed()/3;
-			return true;
-		}
+		PosJob = pJobItem->GetPos();
+		pJobItem->Work(m_pPlayer->GetCID());
+		m_ReloadTimer = Server()->TickSpeed() / 3;
+		return true;
 	}
-
 	return false;
 }
 
@@ -1050,6 +1043,26 @@ void CCharacter::HandleTunning()
 
 }
 
+void CCharacter::UpdateEquipingStats(int ItemID)
+{
+	if(!IsAlive() || !m_pPlayer->IsAuthed())
+		return;
+
+	if(m_Health > m_pPlayer->GetStartHealth())
+	{
+		GS()->Chat(m_pPlayer->GetCID(), "Your health has been lowered.");
+		GS()->Chat(m_pPlayer->GetCID(), "You may have removed equipment that gave it away.");
+		m_Health = m_pPlayer->GetStartHealth();
+	}
+
+	const ItemJob::ItemInformation pInformationItem = GS()->GetItemInfo(ItemID);
+	if((pInformationItem.Function >= EQUIP_HAMMER || pInformationItem.Function <= EQUIP_RIFLE))
+		m_pPlayer->GetCharacter()->GiveWeapon(pInformationItem.Function, 3);
+
+	if(pInformationItem.GetStatsBonus(Stats::StAmmoRegen) > 0)
+		m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
+}
+
 void CCharacter::HandleAuthedPlayer()
 {
 	if(!IsAlive() || !m_pPlayer->IsAuthed())
@@ -1087,22 +1100,21 @@ bool CCharacter::IsAllowedPVP(int FromID)
 		GS()->Chat(FromID, "Battle PVP and so clear. Denied, some of you are weak.");
 		return false;
 	}
-
 	return true;
 }
 
 bool CCharacter::IsLockedWorld()
 {
-	if(m_Alive && m_pPlayer->IsAuthed() && (Server()->Tick() % Server()->TickSpeed() * 3) == 0)
+	if(m_Alive && (Server()->Tick() % Server()->TickSpeed() * 3) == 0  && m_pPlayer->IsAuthed())
 	{
 		const int NecessaryQuest = GS()->Mmo()->WorldSwap()->GetNecessaryQuest();
 		if(NecessaryQuest > 0 && !GS()->Mmo()->Quest()->IsComplectedQuest(m_pPlayer->GetCID(), NecessaryQuest))
 		{
-			int CheckHouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
+			const int CheckHouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
 			if(CheckHouseID <= 0)
 			{
 				m_pPlayer->GetTempData().TempTeleportX = m_pPlayer->GetTempData().TempTeleportY = -1;
-				GS()->Chat(m_pPlayer->GetCID(), "This chapter is still closed, you magically transported back!");
+				GS()->Chat(m_pPlayer->GetCID(), "This chapter is still closed, you magically transported first zone!");
 				m_pPlayer->ChangeWorld(NEWBIE_ZERO_WORLD);
 				return true;
 			}
@@ -1118,14 +1130,10 @@ bool CCharacter::CheckFailMana(int Mana)
 		GS()->SBL(m_pPlayer->GetCID(), BroadcastPriority::BROADCAST_GAME_WARNING, 100, "No mana for use this or for maintenance.");
 		return true;
 	}
-	m_Mana -= Mana;
 
-	// автозелье маны
-	if(m_Mana <= m_pPlayer->GetStartMana() / 5)
-	{
-		if(!m_pPlayer->CheckEffect("RegenMana") && m_pPlayer->GetItem(itPotionManaRegen).IsEquipped())
-			GS()->Mmo()->Item()->UseItem(m_pPlayer->GetCID(), itPotionManaRegen, 1);
-	}
+	m_Mana -= Mana;
+	if(m_Mana <= m_pPlayer->GetStartMana() / 5  && !m_pPlayer->CheckEffect("RegenMana") && m_pPlayer->GetItem(itPotionManaRegen).IsEquipped())
+		GS()->Mmo()->Item()->UseItem(m_pPlayer->GetCID(), itPotionManaRegen, 1);
 
 	m_pPlayer->ShowInformationStats();
 	return false;	
@@ -1133,19 +1141,49 @@ bool CCharacter::CheckFailMana(int Mana)
 
 void CCharacter::ChangePosition(vec2 NewPos)
 {
-	if(m_Alive)
-	{
-		GS()->SendMmoEffect(m_Core.m_Pos, EFFECT_TELEPORT);
-		GS()->SendMmoEffect(NewPos, EFFECT_TELEPORT);
-		GS()->CreateDeath(m_Core.m_Pos, m_pPlayer->GetCID());
-		GS()->CreateDeath(NewPos, m_pPlayer->GetCID());
-		m_Core.m_Pos = NewPos;
-	}
+	if(!m_Alive)
+		return;
+
+	GS()->SendMmoEffect(m_Core.m_Pos, EFFECT_TELEPORT);
+	GS()->SendMmoEffect(NewPos, EFFECT_TELEPORT);
+	GS()->CreateDeath(m_Core.m_Pos, m_pPlayer->GetCID());
+	GS()->CreateDeath(NewPos, m_pPlayer->GetCID());
+	m_Core.m_Pos = NewPos;
 }
 
+void CCharacter::ResetDoorPos()
+{
+	m_Core.m_Pos = m_OlderPos;
+	m_Core.m_Vel = vec2(0, 0);
+	if (m_Core.m_Jumped >= 2)
+		m_Core.m_Jumped = 1;
+}
+
+// talking system
+bool CCharacter::StartConversation(CPlayer *pTarget)
+{
+	if (!m_pPlayer || m_pPlayer->IsBot() || !pTarget->IsBot())
+		return false;
+
+	CPlayerBot* pTargetBot = static_cast<CPlayerBot*>(pTarget);
+	if (!pTargetBot || pTargetBot->GetBotType() == TYPE_BOT_NPC)
+		return true;
+
+	const int MobID = pTargetBot->GetBotSub();
+	if (pTargetBot->GetBotType() != TYPE_BOT_QUEST || GS()->Mmo()->Quest()->GetState(m_pPlayer->GetCID(), BotJob::QuestBot[MobID].QuestID) != QUEST_ACCEPT)
+		return false;
+
+	const int ClientID = m_pPlayer->GetCID();
+	const int QuestID = BotJob::QuestBot[MobID].QuestID;
+	if(!GS()->Mmo()->Quest()->IsValidQuest(QuestID, ClientID) || QuestJob::Quests[ClientID][QuestID].Progress != BotJob::QuestBot[MobID].Progress)
+		return false;
+	return true;
+}
+
+// decoration player's
 void CCharacter::CreateSnapProj(int SnapID, int Count, int TypeID, bool Dynamic, bool Projectile)
 {
-	CSnapFull *pSnapItem = (CSnapFull*)GameWorld()->ClosestEntity(m_Pos, 300, CGameWorld::ENTTYPE_SNAPEFFECT, 0);
+	CSnapFull* pSnapItem = (CSnapFull*)GameWorld()->ClosestEntity(m_Pos, 300, CGameWorld::ENTTYPE_SNAPEFFECT, 0);
 	if(pSnapItem && pSnapItem->GetOwner() == m_pPlayer->GetCID())
 	{
 		pSnapItem->AddItem(Count, TypeID, Projectile, Dynamic, SnapID);
@@ -1158,38 +1196,10 @@ void CCharacter::CreateSnapProj(int SnapID, int Count, int TypeID, bool Dynamic,
 
 void CCharacter::RemoveSnapProj(int Count, int SnapID, bool Effect)
 {
-	CSnapFull *pSnapItem = (CSnapFull*)GameWorld()->ClosestEntity(m_Pos, 300, CGameWorld::ENTTYPE_SNAPEFFECT, 0);
+	CSnapFull* pSnapItem = (CSnapFull*)GameWorld()->ClosestEntity(m_Pos, 300, CGameWorld::ENTTYPE_SNAPEFFECT, 0);
 	if(pSnapItem && pSnapItem->GetOwner() == m_pPlayer->GetCID())
 	{
 		pSnapItem->RemoveItem(Count, SnapID, Effect);
 		return;
-	}	
-}
-
-void CCharacter::ResetDoorPos()
-{
-	m_Core.m_Pos = m_OlderPos;
-	m_Core.m_Vel = vec2(0, 0);
-	if (m_Core.m_Jumped >= 2)
-		m_Core.m_Jumped = 1;
-}
-
-bool CCharacter::TalkInteractiveHammer(CPlayer *pTarget)
-{
-	if (!m_pPlayer || !pTarget || m_pPlayer->IsBot() || !pTarget->IsBot())
-		return false;
-
-	CPlayerBot* pTargetBot = static_cast<CPlayerBot*>(pTarget);
-	if (pTargetBot->GetBotType() == TYPE_BOT_NPC)
-		return true;
-
-	int MobID = pTargetBot->GetBotSub();
-	if (pTargetBot->GetBotType() != TYPE_BOT_QUEST || GS()->Mmo()->Quest()->GetState(m_pPlayer->GetCID(), BotJob::QuestBot[MobID].QuestID) != QUEST_ACCEPT)
-		return false;
-
-	int ClientID = m_pPlayer->GetCID();
-	int QuestID = BotJob::QuestBot[MobID].QuestID;
-	if(!GS()->Mmo()->Quest()->IsValidQuest(QuestID, ClientID) || QuestJob::Quests[ClientID][QuestID].Progress != BotJob::QuestBot[MobID].Progress)
-		return false;
-	return true;
+	}
 }

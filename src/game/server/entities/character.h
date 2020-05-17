@@ -75,7 +75,7 @@ public:
 
 	void CreateQuestsStep(int QuestID);
 	virtual bool GiveWeapon(int Weapon, int GiveAmmo);
-	void RemoveWeapon(int Weapon);
+	bool RemoveWeapon(int Weapon);
 
 	void CreateSnapProj(int SnapID, int Count, int TypeID, bool Dynamic, bool Projectile);
 	void RemoveSnapProj(int Count, int SnapID, bool Effect = false);
@@ -85,6 +85,7 @@ public:
 	void ChangePosition(vec2 NewPos);
 	void ResetDoorPos();
 	int GetPowerWeapons(int WeaponID);
+	void UpdateEquipingStats(int ItemID);
 
 	// these are non-heldback inputs
 	CNetObj_PlayerInput m_Input;
@@ -141,7 +142,7 @@ private:
 	CCharacterCore m_SendCore; // core that we should send
 	CCharacterCore m_ReckoningCore; // the dead reckoning core
 
-	bool TalkInteractiveHammer(CPlayer* pTarget);
+	bool StartConversation(CPlayer* pTarget);
 
 protected:
 	int m_Health;

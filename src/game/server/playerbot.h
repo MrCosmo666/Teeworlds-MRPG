@@ -34,7 +34,7 @@ public:
 	int GetEquippedItem(int EquipID, int SkipItemID = -1) const		override;
 	void Tick()														override;
 	int GetStartHealth()											override;
-	int GetAttributeCount(int BonusID, bool Really = false)			override;
+	int GetAttributeCount(int BonusID, bool Really = false, bool SearchClass = false) override;
 	void Snap(int SnappingClient)									override;
 	int IsActiveSnappingBot(int SnappingClient)						override;
 

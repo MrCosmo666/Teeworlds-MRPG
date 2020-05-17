@@ -28,6 +28,7 @@ class CGameControllerDungeon : public IGameController
 	int m_MaximumTick;
 	int m_Time[MAX_PLAYERS];
 	bool m_ShowedTankingInfo;
+	int m_StartedPlayers;
 
 public:
 	CGameControllerDungeon(class CGS* pGameServer);

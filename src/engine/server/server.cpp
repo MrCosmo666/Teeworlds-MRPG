@@ -371,15 +371,17 @@ const char *CServer::GetWorldName(int WorldID)
 	if(WorldID < 0 || WorldID >= COUNT_WORLD)
 		return "UnknowName";
 	
-	const char *NameWorlds[COUNT_WORLD] = 
-	{ 
-		"Pier Elfinia",
-		"Way to the Elfinia",
-		"Elfinia",
-		"Elfinia Deep cave",
-		"Elfia home room"
-	};
-	return NameWorlds[WorldID];
+	switch(WorldID)
+	{
+		case 0: return "Pier Elfinia";
+		case 1: return "Way to the Elfinia";
+		case 2: return "Elfinia";
+		case 3: return "Elfinia Deep cave";
+		case 4: return "Elfia home room";
+		case 5: return "Elfinia occupation of goblins";
+		case 6: return "Elfinia Abandoned mine";
+	}
+	return "unknow";
 }
 
 const char* CServer::GetClientLanguage(int ClientID)

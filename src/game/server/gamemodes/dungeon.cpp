@@ -16,6 +16,7 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	m_DungeonID = GS()->DungeonID();
 	m_WorldID = GS()->GetWorldID();
 	m_GameFlags = 0;
+	m_StartedPlayers = 0;
 	m_ShowedTankingInfo = false;
 
 	// создание двери для ожидания начала
@@ -71,7 +72,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Ожидание данжа
 	else if (State == DUNGEON_WAITING_START)
 	{
-		m_StartingTick = Server()->TickSpeed() * 180;
+		m_StartingTick = Server()->TickSpeed() * g_Config.m_SvTimeWaitingsDungeon;
 		SetMobsSpawn(false);
 	}
 
@@ -79,6 +80,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Начало данжа
 	else if (State == DUNGEON_STARTED)
 	{
+		m_StartedPlayers = PlayersNum();
 		m_MaximumTick = Server()->TickSpeed() * 600;
 		m_SafeTick = Server()->TickSpeed() * 30;
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The security timer is enabled for 30 seconds!");
@@ -102,7 +104,7 @@ void CGameControllerDungeon::ChangeState(int State)
 			if (!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID)
 				continue;
 
-			int Seconds = GS()->m_apPlayers[i]->GetTempData().TempTimeDungeon / Server()->TickSpeed();
+			const int Seconds = GS()->m_apPlayers[i]->GetTempData().TempTimeDungeon / Server()->TickSpeed();
 			GS()->Mmo()->Dungeon()->SaveDungeonRecord(GS()->m_apPlayers[i], m_DungeonID, Seconds);
 			GS()->m_apPlayers[i]->GetTempData().TempTimeDungeon = 0;
 
@@ -126,8 +128,8 @@ void CGameControllerDungeon::ChangeState(int State)
 
 void CGameControllerDungeon::StateTick()
 {
-	const int Players = PlayersNum();
 	// сбросить данж
+	const int Players = PlayersNum();
 	if (Players < 1 && m_StateDungeon != DUNGEON_WAITING)
 		ChangeState(DUNGEON_WAITING);
 
@@ -146,6 +148,7 @@ void CGameControllerDungeon::StateTick()
 	// Используется в тике когда Ожидание данжа
 	if (m_StateDungeon == DUNGEON_WAITING)
 	{
+		m_StartedPlayers = Players;
 		if (Players >= 1)
 			ChangeState(DUNGEON_WAITING_START);
 	}
@@ -154,11 +157,9 @@ void CGameControllerDungeon::StateTick()
 	// Используется в тике когда Отчет начала данжа
 	else if (m_StateDungeon == DUNGEON_WAITING_START)
 	{
-		if (Players < 2)
-			ChangeState(DUNGEON_WAITING);
-		else if (m_StartingTick)
+		if (m_StartingTick)
 		{
-			int Time = m_StartingTick / Server()->TickSpeed();
+			const int Time = m_StartingTick / Server()->TickSpeed();
 			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon waiting {INT} sec!", &Time);
 			m_StartingTick--;
 			if (!m_StartingTick)
@@ -198,7 +199,7 @@ void CGameControllerDungeon::StateTick()
 	{
 		if (m_FinishedTick)
 		{
-			int Time = m_FinishedTick / Server()->TickSpeed();
+			const int Time = m_FinishedTick / Server()->TickSpeed();
 			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon ended {INT} sec!", &Time);
 
 			m_FinishedTick--;
@@ -227,13 +228,19 @@ void CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKil
 
 bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 {
+	if(!pChr->GetPlayer()->IsBot())
+	{
+		pChr->GetPlayer()->m_SyncDungeon = GS()->Mmo()->Dungeon()->SyncFactor();
+		pChr->GetPlayer()->m_SyncPlayers = m_StartedPlayers;
+	}
+
 	if(m_StateDungeon >= DUNGEON_STARTED)
 	{
 		const int ClientID = pChr->GetPlayer()->GetCID();
 		if(pChr->GetPlayer()->m_MoodState == MOOD_PLAYER_TANK && !m_ShowedTankingInfo)
 		{
 			m_ShowedTankingInfo = true;
-			const int StrengthTank = pChr->GetPlayer()->GetLevelDisciple(AtributType::AtTank);
+			const int StrengthTank = pChr->GetPlayer()->GetLevelDisciple(AtributType::AtTank, true);
 			GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned with class strength {INT}p!", Server()->ClientName(ClientID), &StrengthTank);
 		}
 		if(!m_SafeTick)
@@ -281,7 +288,7 @@ int CGameControllerDungeon::PlayersNum() const
 	int playIt = 0;
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if (Server()->GetWorldID(i) == m_WorldID)
+		if(Server()->GetWorldID(i) == m_WorldID)
 			playIt++;
 	}
 	return playIt;

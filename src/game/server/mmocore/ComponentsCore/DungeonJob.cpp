@@ -74,7 +74,7 @@ void DungeonJob::ShowDungeonsList(CPlayer* pPlayer)
 	{
 		GS()->AV(ClientID, "null", "");
 		pPlayer->m_Colored = { 30, 8, 8 };
-		GS()->AVL(ClientID, "DUNGEONEXIT", "Exit dungeon {STR} !!", Dungeon[GS()->DungeonID()].Name);
+		GS()->AVL(ClientID, "DUNGEONEXIT", "Exit dungeon {STR} (warning)", Dungeon[GS()->DungeonID()].Name);
 	}
 }
 
@@ -120,6 +120,12 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 
 	if (PPSTR(CMD, "DUNGEONJOIN") == 0)
 	{
+		if(GS()->IsClientEqualWorldID(ClientID, Dungeon[VoteID].WorldID))
+		{
+			GS()->Chat(ClientID, "You are already in this dungeon!");
+			GS()->VResetVotes(ClientID, MenuList::MENU_DUNGEONS);
+			return true;
+		}
 		if (Dungeon[VoteID].State > 1)
 		{
 			GS()->Chat(ClientID, "At the moment players are passing this dungeon!");

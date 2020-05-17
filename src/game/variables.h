@@ -149,6 +149,7 @@ MACRO_CONFIG_INT(SvStrongAntiPVP, sv_strong_anti_pvp, 50, 0, 10000, CFGFLAG_SERV
 
 // world time
 MACRO_CONFIG_INT(SvShowSvNameTime, sv_worldtime_name, 0, 0, 1, CFGFLAG_SERVER, "Show world time in server")
+MACRO_CONFIG_INT(SvTimeWaitingsDungeon, sv_waiting_dungeon_time, 180, 0, 1020, CFGFLAG_SERVER, "Watining time dungeon on secound")
 
 // house
 MACRO_CONFIG_INT(SvLimitDecoration, sv_limit_decorations, 10, 5, 20, CFGFLAG_SERVER, "Limit objects for decoration")

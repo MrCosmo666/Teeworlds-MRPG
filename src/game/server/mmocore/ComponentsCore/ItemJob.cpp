@@ -31,7 +31,6 @@ void ItemJob::OnInit()
 			ItemsInfo[ItemID].AttributeCount[i] = (int)RES->getInt(aBuf);
 		}
 		ItemsInfo[ItemID].MaximalEnchant = (int)RES->getInt("EnchantMax");
-		ItemsInfo[ItemID].EnchantPrice = (int)RES->getInt("EnchantPrice");
 		ItemsInfo[ItemID].ProjID = (int)RES->getInt("ProjectileID");
 	}
 
@@ -477,7 +476,7 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 
 			char aAttributes[128];
 			FormatAttributes(ItemData, sizeof(aAttributes), aAttributes);
-			GS()->AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, TAB_SETTINGS_MODULES, "{STR}{STR}{STR}",
+			GS()->AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, TAB_SETTINGS_MODULES, "{STR} {STR}{STR}",
 				ItemData.Info().GetName(pPlayer), aAttributes, (ItemData.Settings ? "✔ " : "\0"));
 			FoundSettings = true;
 		}
@@ -646,10 +645,24 @@ bool ItemJob::ClassItemInformation::IsEnchantable() const
 {
 	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if (CGS::AttributInfo.find(Attribute[i]) != CGS::AttributInfo.end() && Attribute[i] > 0 && AttributeCount[i] > 0 && EnchantPrice && MaximalEnchant > 0)
+		if (CGS::AttributInfo.find(Attribute[i]) != CGS::AttributInfo.end() && Attribute[i] > 0 && AttributeCount[i] > 0 && MaximalEnchant > 0)
 			return true;
 	}
 	return false;
+}
+
+int ItemJob::ClassItems::EnchantPrice() const
+{
+	int AttributeCount = 0;
+	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
+	{
+		if(Info().Attribute[i] > 0 && Info().AttributeCount[i] > 0 && CGS::AttributInfo.find(Info().Attribute[i]) != CGS::AttributInfo.end())
+		{
+			const int UpgradePrice = max(5, CGS::AttributInfo[Info().Attribute[i]].UpgradePrice) * 2;
+			AttributeCount += (Info().AttributeCount[i] * UpgradePrice);
+		}
+	}
+	return AttributeCount * (Enchant + 1);
 }
 
 bool ItemJob::ClassItems::SetEnchant(int arg_enchantlevel)
@@ -698,8 +711,12 @@ bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 		return false;
 
 	// отправить смену скина
-	if(AutoEquip) 
+	if(AutoEquip)
+	{
+		if(m_pPlayer->GetCharacter())
+			m_pPlayer->GetCharacter()->UpdateEquipingStats(itemid_);
 		GameServer->ChangeEquipSkin(ClientID, itemid_);
+	}
 
 	// если тихий режим
 	if(!arg_message || Info().Type == ItemType::TYPE_SETTINGS) 
@@ -771,14 +788,10 @@ bool ItemJob::ClassItems::Equip()
 
 	Settings ^= true;
 	if(Info().Type == ItemType::TYPE_EQUIP)
-	{
 		m_pPlayer->GS()->ChangeEquipSkin(m_pPlayer->GetCID(), itemid_);
-		if(m_pPlayer->GetCharacter() && (Info().Function >= EQUIP_HAMMER || Info().Function <= EQUIP_RIFLE))
-			m_pPlayer->GetCharacter()->GiveWeapon(Info().Function, 3);
-	}
 
-	if(m_pPlayer->GetCharacter() && Info().GetStatsBonus(Stats::StAmmoRegen) > 0)
-		m_pPlayer->GetCharacter()->m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
+	if(m_pPlayer->GetCharacter())
+		m_pPlayer->GetCharacter()->UpdateEquipingStats(itemid_);
 
 	m_pPlayer->ShowInformationStats();
 	return Save();

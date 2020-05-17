@@ -21,7 +21,6 @@ class ItemJob : public MmoComponent
 		short Attribute[STATS_MAX_FOR_ITEM];
 		int AttributeCount[STATS_MAX_FOR_ITEM];
 		int MaximalEnchant;
-		int EnchantPrice;
 		int ProjID;
 		
 		int GetStatsBonus(int AttributeID) const
@@ -70,9 +69,9 @@ public:
 
 		bool Equip();
 		bool Save();
-	
+
+		int EnchantPrice() const;
 		int GetID() const { return itemid_; }
-		int EnchantPrice() const { return Info().EnchantPrice * (Enchant + 1); }
 		bool IsEquipped() const { return Count > 0 && Settings > 0 && (Info().Type == ItemType::TYPE_POTION || Info().Type == ItemType::TYPE_SETTINGS || Info().Type == ItemType::TYPE_MODULE || Info().Type == ItemType::TYPE_EQUIP); }
 		ItemInformation& Info() const { return ItemsInfo[itemid_]; };
 	};

@@ -26,10 +26,7 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	ClearParsing();
 	Acc().Team = GetStartTeam();
 	if (Acc().AuthID > 0)
-	{
 		GS()->Mmo()->Account()->LoadAccount(this, false);
-		m_SyncDuneon = GS()->Mmo()->Dungeon()->SyncFactor();
-	}
 
 	SetLanguage(Server()->GetClientLanguage(ClientID));
 	GS()->SendTuningParams(ClientID);
@@ -708,7 +705,7 @@ int CPlayer::GetEquippedItem(int EquipID, int SkipItemID) const
 }
 
 // Общий уровень атрибутов Реальный и Обычный
-int CPlayer::GetAttributeCount(int BonusID, bool Really)
+int CPlayer::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 {
 	if (CGS::AttributInfo.find(BonusID) == CGS::AttributInfo.end()) 
 		return 0;
@@ -729,29 +726,29 @@ int CPlayer::GetAttributeCount(int BonusID, bool Really)
 	}
 
 	// если тип мира данж
-	if (GS()->IsDungeon() && CGS::AttributInfo[BonusID].UpgradePrice < 10)
+	if (GS()->IsDungeon() && !SearchClass && CGS::AttributInfo[BonusID].UpgradePrice < 10)
 	{
-		int NewStat = 0;
-		if (AttributEx > 0)
+		AttributEx = kurosio::translate_to_procent_rest(m_SyncDungeon, 20) / m_SyncPlayers;
+		if(m_MoodState == MOOD_PLAYER_TANK)
 		{
-			NewStat = (int)((float)m_SyncDuneon / 25.0f) + ((float)AttributEx / 25.0f);
-			if (m_MoodState == MOOD_PLAYER_TANK && BonusID == Stats::StHardness)
-				NewStat *= 2;
+			const int AtributeType = CGS::AttributInfo[BonusID].AtType;
+			if(AtributeType == AtTank)
+				AttributEx *= 3;
+			else if(AtributeType == AtDps || AtributeType == AtHardtype || AtributeType == AtHealer)
+				AttributEx /= 30;
 		}
-		if(AttributEx > NewStat)
-			AttributEx = NewStat;
 	}
 	return AttributEx;
 }
 
 // Получить уровень Классов по атрибутам
-int CPlayer::GetLevelDisciple(int Class)
+int CPlayer::GetLevelDisciple(int Class, bool SearchClass)
 {
 	int Atributs = 0;
 	for (const auto& at : CGS::AttributInfo)
 	{
 		if (at.second.AtType == Class)
-			Atributs += GetAttributeCount(at.first, true);
+			Atributs += GetAttributeCount(at.first, true, SearchClass);
 	}
 	return Atributs;
 }
@@ -874,14 +871,14 @@ int CPlayer::GetMoodState()
 	if (!GS()->IsDungeon())
 		return MOOD_NORMAL;
 
-	int MaximalHealth = GetLevelDisciple(AtributType::AtTank);
+	const int MaximalHealth = GetLevelDisciple(AtributType::AtTank, true);
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pPlayer = GS()->m_apPlayers[i];
 		if (!pPlayer || Server()->GetWorldID(m_ClientID) != Server()->GetWorldID(i))
 			continue;
 
-		const int FinderHardness = pPlayer->GetLevelDisciple(AtributType::AtTank);
+		const int FinderHardness = pPlayer->GetLevelDisciple(AtributType::AtTank, true);
 		if (FinderHardness > MaximalHealth)
 			return MOOD_NORMAL;
 	}

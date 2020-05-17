@@ -55,7 +55,8 @@ public:
 	int m_PlayerFlags;
 	int m_PlayerTick[TickState::NUM_TICK];
 	bool m_Flymode;
-	int m_SyncDuneon;
+	int m_SyncDungeon;
+	int m_SyncPlayers;
 	int m_MoodState;
 
 	StructLatency m_Latency;
@@ -107,7 +108,7 @@ public:
 	virtual void Tick();
 	virtual int GetTeam();
 	virtual int GetStartHealth();
-	virtual int GetAttributeCount(int BonusID, bool Really = false);
+	virtual int GetAttributeCount(int BonusID, bool Really = false, bool Searchclass = false);
 	virtual void Snap(int SnappingClient);
 	virtual int GetEquippedItem(int EquipID, int SkipItemID = -1) const;
 	
@@ -167,7 +168,7 @@ public:
 	AccountMainJob::StructTempPlayerData& GetTempData() { return AccountMainJob::PlayerTempData[m_ClientID]; }
 	AccountMainJob::StructData& Acc() { return AccountMainJob::Data[m_ClientID]; }
 
-	int GetLevelDisciple(int Class);
+	int GetLevelDisciple(int Class, bool SearchClass = false);
 
 	// разговоры с нпс функции
 	void SetTalking(int TalkedID, bool ToProgress);

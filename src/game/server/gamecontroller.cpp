@@ -48,7 +48,9 @@ bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 		StartHealth /= 2;
 	}
 
-	if(pChr->GetPlayer()->GetTempData().TempHealth > 0)
+	if(GS()->IsDungeon())
+		StartHealth = pChr->GetPlayer()->GetStartHealth();
+	else if(pChr->GetPlayer()->GetTempData().TempHealth > 0)
 		StartHealth = pChr->GetPlayer()->GetTempData().TempHealth;
 	pChr->IncreaseHealth(StartHealth);
 	if(pChr->GetPlayer()->GetTempData().TempMana > 0)
