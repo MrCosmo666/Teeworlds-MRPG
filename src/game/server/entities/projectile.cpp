@@ -62,7 +62,7 @@ void CProjectile::Tick()
 	float Ct = (Server()->Tick() - m_StartTick) / (float)Server()->TickSpeed();
 	vec2 PrevPos = GetPos(Pt);
 	vec2 CurPos = GetPos(Ct);
-	if (!GS()->m_apPlayers[m_Owner] || !GS()->m_apPlayers[m_Owner]->GetCharacter())
+	if (!GS()->m_apPlayers[m_Owner] || !GS()->m_apPlayers[m_Owner]->GetCharacter() || GS()->Collision()->GetParseTilesAt(CurPos.x, CurPos.y) == TILE_DESTROY_PROJ)
 	{
 		if (m_Explosive)
 			GS()->CreateExplosion(CurPos, -1, m_Weapon, m_Damage);

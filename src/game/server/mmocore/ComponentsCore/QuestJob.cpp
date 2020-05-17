@@ -119,7 +119,7 @@ void QuestJob::ShowQuestID(CPlayer *pPlayer, int QuestID)
 	const int CountQuest = GetStoryCount(QuestsData[QuestID].StoryLine);
 	const int LineQuest = GetStoryCount(QuestsData[QuestID].StoryLine, QuestID)+1;
 
-	GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "[{INT}/{INT} {STR}] {STR}", &LineQuest, &CountQuest, QuestsData[QuestID].StoryLine, QuestsData[QuestID].Name);
+	GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "{INT}/{INT} {STR}: {STR}", &LineQuest, &CountQuest, QuestsData[QuestID].StoryLine, QuestsData[QuestID].Name);
 	GS()->AVM(ClientID, "null", NOPE, HideID, "You will receive a reward");
 	GS()->AVM(ClientID, "null", NOPE, HideID, "Gold: {INT} Exp: {INT}", &QuestsData[QuestID].Money, &QuestsData[QuestID].Exp);
 	GS()->AVM(ClientID, "null", NOPE, HideID, " ");

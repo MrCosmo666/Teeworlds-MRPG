@@ -70,8 +70,8 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 		int Power = BotJob::MobBot[m_SubBotID].Power;
 		for (int i = 0; i < EQUIP_MAX_BOTS; i++)
 		{
-			int ItemID = GetEquippedItem(i);
-			int ItemBonusCount = GS()->GetItemInfo(ItemID).GetStatsBonus(BonusID);
+			const int ItemID = GetEquippedItem(i);
+			const int ItemBonusCount = GS()->GetItemInfo(ItemID).GetStatsBonus(BonusID);
 			if (ItemID <= 0 || ItemBonusCount < 0)
 				continue;
 
@@ -80,7 +80,7 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 
 		// all hardtypews and strength lowered
 		if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
-			Power /= 50;
+			Power /= BotJob::MobBot[m_SubBotID].Boss ? 180 : 50;
 		// lowered hardness 
 		else if(BonusID != Stats::StHardness)
 			Power /= 5;
@@ -92,6 +92,7 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 // Спавн игрока
 void CPlayerBot::TryRespawn()
 {
+	// close spawn mobs on non allowed spawn dungeon
 	if (GS()->IsDungeon() && !m_DungeonAllowedSpawn && m_BotType == BotsTypes::TYPE_BOT_MOB)
 		return;
 
@@ -99,25 +100,15 @@ void CPlayerBot::TryRespawn()
 	const int SpawnType = m_BotType;
 	if(SpawnType == BotsTypes::TYPE_BOT_MOB)
 	{
-		if(GS()->GetWorldID() != BotJob::MobBot[m_SubBotID].WorldID)
-			return;
-
 		vec2 MobPos = vec2(BotJob::MobBot[m_SubBotID].PositionX, BotJob::MobBot[m_SubBotID].PositionY);
 		if(!GS()->m_pController->CanSpawn(m_BotType, &SpawnPos, MobPos))
 			return;
 	}
 	else if(SpawnType == BotsTypes::TYPE_BOT_NPC)
-	{
-		if(GS()->GetWorldID() != BotJob::NpcBot[m_SubBotID].WorldID)
-			return;
-		SpawnPos = vec2(BotJob::NpcBot[m_SubBotID].PositionX, BotJob::NpcBot[m_SubBotID].PositionY);		
-	}
+		SpawnPos = vec2(BotJob::NpcBot[m_SubBotID].PositionX, BotJob::NpcBot[m_SubBotID].PositionY);
 	else if(SpawnType == BotsTypes::TYPE_BOT_QUEST)
-	{
-		if(GS()->GetWorldID() != BotJob::QuestBot[m_SubBotID].WorldID)
-			return;
-		SpawnPos = vec2(BotJob::QuestBot[m_SubBotID].PositionX, BotJob::QuestBot[m_SubBotID].PositionY);			
-	}
+		SpawnPos = vec2(BotJob::QuestBot[m_SubBotID].PositionX, BotJob::QuestBot[m_SubBotID].PositionY);
+	
 	
 	// создаем бота
 	int savecidmem = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
@@ -304,7 +295,9 @@ void CPlayerBot::GenerateNick(char* buffer, int size_buffer)
 // thread path finder
 void CPlayerBot::TickThreadMobsPathFinder()
 {
-	const int MobID = GetBotSub();
+	if(!m_pCharacter || !m_pCharacter->IsAlive())
+		return;
+
 	if(GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
 		if(m_TargetPos != vec2(0, 0) && (Server()->Tick() + 3 * m_ClientID) % (Server()->TickSpeed()) == 0)

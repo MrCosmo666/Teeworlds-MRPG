@@ -56,39 +56,8 @@ public:
 	IGameController(class CGS *pGS);
 	virtual ~IGameController() {};
 
-	// event
-	/*
-		Function: on_CCharacter_death
-			Called when a CCharacter in the world dies.
-
-		Arguments:
-			victim - The CCharacter that died.
-			killer - The player that killed it.
-			weapon - What weapon that killed it. Can be -1 for undefined
-				weapon when switching team or player suicides.
-	*/
 	virtual void OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon);
-	/*
-		Function: on_CCharacter_spawn
-			Called when a CCharacter spawns into the game world.
-
-		Arguments:
-			chr - The CCharacter that was spawned.
-	*/
 	virtual bool OnCharacterSpawn(class CCharacter *pChr);
-
-	/*
-		Function: on_entity
-			Called when the map is loaded to process an entity
-			in the map.
-
-		Arguments:
-			index - Entity index.
-			pos - Where the entity is located in the world.
-
-		Returns:
-			bool?
-	*/
 	virtual bool OnEntity(int Index, vec2 Pos);
 
 	static void Com_Example(IConsole::IResult* pResult, void* pContext);
@@ -99,7 +68,7 @@ public:
 	void OnPlayerInfoChange(class CPlayer *pPlayer, int WorldID);
 	void OnReset();
 
-	// виртуал аномаль
+	// хуй манал
 	virtual void CreateLogic(int Type, int Mode, vec2 Pos, int Health) = 0;
 	
 	// general
@@ -107,11 +76,7 @@ public:
 	virtual void Tick();
 
 	const char *GetGameType() const { return m_pGameType; }
-	
-	//spawn
 	bool CanSpawn(int SpawnType, vec2 *pPos, vec2 BotPos) const;
-
-	// team
 	void DoTeamChange(class CPlayer *pPlayer, bool DoChatMsg=true);
 
 };

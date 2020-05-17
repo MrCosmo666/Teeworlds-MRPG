@@ -968,14 +968,11 @@ void CGS::OnInit(int WorldID)
 	UpdateZoneDungeon();
 
 	// создаем все гейм обьекты для сервера
-	if(m_DungeonID >= 1)
-	{
+	if(IsDungeon())
 		m_pController = new CGameControllerDungeon(this);
-	}
 	else
-	{
 		m_pController = new CGameControllerMain(this);
-	}
+
 	m_pController->RegisterChatCommands(CommandManager());
 
 	// инициализируем слои

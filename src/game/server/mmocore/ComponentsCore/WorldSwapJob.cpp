@@ -43,7 +43,6 @@ void WorldSwapJob::OnInit()
 void WorldSwapJob::OnInitWorld(const char* pWhereLocalWorld)
 {
 	const int WorldID = GS()->GetWorldID();
-	dbg_msg("test", "%s", GS()->Server()->GetWorldName(WorldID));
 	CSqlString<32> world_name = CSqlString<32>(GS()->Server()->GetWorldName(WorldID));
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("RespawnWorld", "ENUM_WORLDS", pWhereLocalWorld));
 	if(RES->next())

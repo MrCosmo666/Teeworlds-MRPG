@@ -368,6 +368,44 @@ bool CGameControllerDungeon::OnEntity(int Index, vec2 Pos)
 	return false;
 }
 
+// TODO: something to do with the balance
+int CGameControllerDungeon::GetDungeonSync(CPlayer* pPlayer, int BonusID) const
+{
+	int Procent = 1;
+	int Delay = 0;
+	bool SynchronizeWithPlayers = true;
+
+	const int ParsePlayerStatsClass = CGS::AttributInfo[BonusID].AtType;
+	if(pPlayer->m_MoodState == MOOD_PLAYER_TANK)
+	{
+		if(ParsePlayerStatsClass == AtributType::AtTank)
+			Procent = 12;
+		if(ParsePlayerStatsClass == AtributType::AtHealer || ParsePlayerStatsClass == AtributType::AtDps)
+			Delay = 60;
+	}
+	else
+	{
+		if(ParsePlayerStatsClass == AtributType::AtTank)
+			Procent = 3;
+		else if(ParsePlayerStatsClass == AtributType::AtHealer)
+			Procent = 4;
+		else if(ParsePlayerStatsClass == AtributType::AtDps)
+			Procent = 3;
+
+	}
+
+	if(ParsePlayerStatsClass == AtributType::AtHardtype || BonusID == Stats::StStrength)
+		Delay = 50;
+
+	const int AttributeSyncProcent = kurosio::translate_to_procent_rest(pPlayer->m_SyncDungeon, Procent);
+	int AttributeCount = max(AttributeSyncProcent, 1);
+
+	if(pPlayer->m_MoodState == MOOD_PLAYER_TANK && ParsePlayerStatsClass == AtributType::AtTank)
+		return AttributeCount;
+
+	AttributeCount /= max((pPlayer->m_SyncPlayers + Delay), 1);
+	return AttributeCount;
+}
 
 DungeonDoor::DungeonDoor(CGameWorld *pGameWorld, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DUNGEONDOOR, Pos), m_To(Pos)

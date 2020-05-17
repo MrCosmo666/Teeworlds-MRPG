@@ -87,6 +87,12 @@ void CLaser::Reset()
 
 void CLaser::Tick()
 {
+	if(GS()->Collision()->GetParseTilesAt(m_Pos.x, m_Pos.y) == TILE_DESTROY_PROJ)
+	{
+		Reset();
+		return;
+	}
+
 	if ((Server()->Tick() - m_EvalTick) > (Server()->TickSpeed() * GS()->Tuning()->m_LaserBounceDelay) / 1000.0f)
 		DoBounce();
 }

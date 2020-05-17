@@ -131,6 +131,7 @@ public:
 	######################################################################### */
 	void ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp);
 	bool Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade, const char *UpgradeName);
+	int GetDungeonSync(int BonusID);
 
 	/* #########################################################################
 		FUNCTIONS PLAYER ACCOUNT 

@@ -38,6 +38,7 @@ public:
 	virtual void OnCharacterDeath(class CCharacter* pVictim, class CPlayer* pKiller, int Weapon);
 	virtual bool OnCharacterSpawn(class CCharacter* pChr);
 	virtual void CreateLogic(int Type, int Mode, vec2 Pos, int ParseID);
+	int GetDungeonSync(class CPlayer* pPlayer, int BonusID) const;
 
 private:
 	int PlayersNum() const;

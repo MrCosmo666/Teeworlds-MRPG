@@ -754,13 +754,11 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 		IGraphics::CQuadItem Array[1];
 
 		// render health
-		int nbItems = pCharacter->m_Health;
 		RenderTools()->SelectSprite(SPRITE_HEALTH_FULL);
 		Array[0] = IGraphics::CQuadItem(37, 21, 12, 12);
 		Graphics()->QuadsDrawTL(Array, 1);
 
 		// render armor
-		nbItems = pCharacter->m_Armor;
 		RenderTools()->SelectSprite(SPRITE_ARMOR_FULL);
 		Array[0] = IGraphics::CQuadItem(73, 21, 12, 12);
 		Graphics()->QuadsDrawTL(Array, 1);

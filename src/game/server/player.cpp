@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 
+#include "gamemodes/dungeon.h"
 #include "gamecontext.h"
 #include "player.h"
 
@@ -15,7 +16,6 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	m_PlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed();
 	m_PlayerTick[TickState::CheckClient] = Server()->Tick();
 	m_PlayerTick[TickState::Die] = Server()->Tick();
-
 	m_Spawned = true;
 	m_LastVoteMenu = NOPE;
 	m_OpenVoteMenu = MenuList::MAIN_MENU;
@@ -726,18 +726,8 @@ int CPlayer::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 	}
 
 	// если тип мира данж
-	if (GS()->IsDungeon() && !SearchClass && CGS::AttributInfo[BonusID].UpgradePrice < 10)
-	{
-		AttributEx = kurosio::translate_to_procent_rest(m_SyncDungeon, 20) / m_SyncPlayers;
-		if(m_MoodState == MOOD_PLAYER_TANK)
-		{
-			const int AtributeType = CGS::AttributInfo[BonusID].AtType;
-			if(AtributeType == AtTank)
-				AttributEx *= 3;
-			else if(AtributeType == AtDps || AtributeType == AtHardtype || AtributeType == AtHealer)
-				AttributEx /= 30;
-		}
-	}
+	if(GS()->IsDungeon() && !SearchClass && CGS::AttributInfo[BonusID].UpgradePrice < 10)
+		AttributEx = static_cast<CGameControllerDungeon*>(GS()->m_pController)->GetDungeonSync(this, BonusID);
 	return AttributEx;
 }
 
