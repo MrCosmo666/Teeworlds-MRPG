@@ -64,7 +64,7 @@ void CPickup::Tick()
 	else if(m_Type == PICKUP_SHOTGUN)
 	{
 		const int RealAmmo = 10 + pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo);
-		const int RestoreAmmo = kurosio::translate_to_procent_rest(RealAmmo, 30);
+		const int RestoreAmmo = kurosio::translate_to_procent_rest(RealAmmo, 40);
 		if(pChr->GiveWeapon(WEAPON_SHOTGUN, RestoreAmmo))
 		{
 			Picked = true;
@@ -74,7 +74,7 @@ void CPickup::Tick()
 	else if(m_Type == PICKUP_GRENADE)
 	{
 		const int RealAmmo = 10 + pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo);
-		const int RestoreAmmo = kurosio::translate_to_procent_rest(RealAmmo, 30);
+		const int RestoreAmmo = kurosio::translate_to_procent_rest(RealAmmo, 40);
 		if(pChr->GiveWeapon(WEAPON_GRENADE, RestoreAmmo))
 		{
 			Picked = true;
@@ -85,7 +85,7 @@ void CPickup::Tick()
 	else if(m_Type == PICKUP_LASER)
 	{
 		const int RealAmmo = 10 + pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo);
-		const int RestoreAmmo = kurosio::translate_to_procent_rest(RealAmmo, 30);
+		const int RestoreAmmo = kurosio::translate_to_procent_rest(RealAmmo, 40);
 		if(pChr->GiveWeapon(WEAPON_LASER, RestoreAmmo))
 		{
 			Picked = true;

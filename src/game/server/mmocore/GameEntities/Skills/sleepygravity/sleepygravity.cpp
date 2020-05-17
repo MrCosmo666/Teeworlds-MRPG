@@ -59,17 +59,10 @@ void CSleepyGravity::Tick()
 			float AngleStep = 2.0f * pi / CSleepyGravity::NUM_IDS;
 			vec2 VertexPos = m_Pos + vec2(m_Radius * cos(AngleStep * i), m_Radius * sin(AngleStep * i));
 			if(!m_LifeSpan)
-			{
 				GS()->CreateExplosion(VertexPos, m_pPlayer->GetCID(), WEAPON_GRENADE, m_PowerLevel);
-				if(i == CSleepyGravity::NUM_IDS - 1)
-					GS()->CreateExplosion(m_Pos, m_pPlayer->GetCID(), WEAPON_GRENADE, m_PowerLevel);
-			}
-			else if(m_LifeSpan && TimeLeft == i)
-			{
-				GS()->CreateDamage(m_Pos, m_pPlayer->GetCID(), 1, 0, true);
-				break;
-			}
 		}
+		if(!m_LifeSpan)
+			GS()->CreateExplosion(m_Pos, m_pPlayer->GetCID(), WEAPON_GRENADE, m_PowerLevel);
 	}
 	
 	for(CCharacter *p = (CCharacter*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); p; p = (CCharacter *)p->TypeNext())
@@ -81,7 +74,7 @@ void CSleepyGravity::Tick()
 		if(distance(m_Pos, p->m_Core.m_Pos) < 20.0f)
 			continue;
 
-		p->m_Core.m_Vel -= Dir * (1.25f);
+		p->m_Core.m_Vel -= Dir * (1.50f);
 	}
 }
 

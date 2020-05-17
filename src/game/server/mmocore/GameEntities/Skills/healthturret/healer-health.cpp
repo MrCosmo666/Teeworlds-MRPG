@@ -64,7 +64,7 @@ void CHealthHealer::Tick()
 	const int HealthRestore = m_PowerLevel;
 	for(CCharacter *p = (CCharacter*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); p; p = (CCharacter *)p->TypeNext())
 	{
-		if(p && distance(m_Pos, p->m_Core.m_Pos) < 520.0f && (m_pPlayer->GetCID() == p->GetPlayer()->GetCID() || !p->IsAllowedPVP(m_pPlayer->GetCID())))
+		if(p && distance(m_Pos, p->m_Core.m_Pos) < 620.0f && (m_pPlayer->GetCID() == p->GetPlayer()->GetCID() || !p->IsAllowedPVP(m_pPlayer->GetCID())))
 		{
 			ShowHealthRestore = true;
 			new CHearth(&GS()->m_World, m_Pos, p->GetPlayer(), HealthRestore, p->m_Core.m_Vel);
