@@ -269,7 +269,7 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 
 			if(!pPlayerSearch->GetCharacter()->IsAllowedPVP(ClientID))
 			{
-				const int RealAmmo = 10 + pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo);
+				const int RealAmmo = 10 + pPlayerSearch->GetAttributeCount(Stats::StAmmo);
 				const int RestoreAmmo = kurosio::translate_to_procent_rest(RealAmmo, max(SkillBonus, 100));
 				for(int i = WEAPON_GUN; i <= WEAPON_LASER; i++)
 				{
