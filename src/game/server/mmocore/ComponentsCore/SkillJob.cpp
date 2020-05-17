@@ -273,12 +273,12 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 			for(int i = WEAPON_GUN; i <= WEAPON_LASER; i++)
 			{
 				pPlayerSearch->GetCharacter()->GiveWeapon(i, RestoreAmmo);
+				GS()->CreateWorldSound(PlayerPosition, SOUND_CTF_GRAB_PL);
 				GS()->CreateDeath(PlayerPosition, i);
-				GS()->CreateWorldSound(PlayerPosition, SOUND_PICKUP_NINJA);
 			}
 		}
 
-		GS()->CreateText(NULL, false, vec2(PlayerPosition.x, PlayerPosition.y - 96.0f), vec2(0, 0), 40, "BLESSING WAR", GS()->GetWorldID());
+		GS()->CreateText(NULL, false, vec2(PlayerPosition.x, PlayerPosition.y - 96.0f), vec2(0, 0), 40, "RECOVERY AMMO", GS()->GetWorldID());
 		return true;
 	}
 
