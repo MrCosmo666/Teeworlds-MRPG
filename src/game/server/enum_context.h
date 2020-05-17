@@ -62,6 +62,7 @@ enum Skill
 	SkillSleepyGravity = 2, // притягивает мобов вокруг себя
 	SkillCraftDiscount = 3, // скидка на крафт
 	SkillMasterWeapon = 4, // автоматический огонь с оружий
+	SkillBlessingGodWar = 5, // восстановить патроны
 };
 
 enum AtributType

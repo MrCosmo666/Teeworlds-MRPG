@@ -276,6 +276,21 @@ void CGS::CreateSound(vec2 Pos, int Sound, int64 Mask)
 	}
 }
 
+void CGS::CreateWorldSound(vec2 Pos, int Sound)
+{
+	// fix for vanilla unterstand SoundID
+	if(Sound < 0 || Sound > 40)
+		return;
+
+	CNetEvent_SoundWorld *pEvent = (CNetEvent_SoundWorld *)m_Events.Create(NETEVENTTYPE_SOUNDWORLD, sizeof(CNetEvent_SoundWorld), MaskWorldID());
+	if(pEvent)
+	{
+		pEvent->m_X = (int)Pos.x;
+		pEvent->m_Y = (int)Pos.y;
+		pEvent->m_SoundID = Sound;
+	}
+}
+
 void CGS::CreatePlayerSound(int ClientID, int Sound)
 {
 	// fix for vanilla unterstand SoundID

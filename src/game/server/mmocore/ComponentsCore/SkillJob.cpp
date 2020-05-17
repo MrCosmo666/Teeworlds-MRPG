@@ -224,6 +224,7 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 		return false;
 
 	// скилл турель здоровья
+	const vec2 PlayerPosition = pChr->GetPos();
 	const int ClientID = pPlayer->GetCID();
 	const int SkillBonus = GetSkillBonus(ClientID, SkillID);
 	if(SkillID == Skill::SkillHeartTurret)
@@ -237,7 +238,7 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 			}
 		}
 		const int PowerLevel = ManaPrice;
-		new CHealthHealer(&GS()->m_World, pPlayer, SkillBonus, PowerLevel, pChr->m_Core.m_Pos);
+		new CHealthHealer(&GS()->m_World, pPlayer, SkillBonus, PowerLevel, PlayerPosition);
 		return true;
 	}
 
@@ -253,7 +254,33 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 			}
 		}
 		const int PowerLevel = ManaPrice;
-		new CSleepyGravity(&GS()->m_World, pPlayer, SkillBonus, PowerLevel, pChr->m_Core.m_Pos);
+		new CSleepyGravity(&GS()->m_World, pPlayer, SkillBonus, PowerLevel, PlayerPosition);
+		return true;
+	}
+	
+	// скилл восстановить патроны
+	if(SkillID == Skill::SkillBlessingGodWar)
+	{
+		for(int i = 0; i < MAX_PLAYERS; i++)
+		{
+			CPlayer* pPlayerSearch = GS()->GetPlayer(i, true, true);
+			if(!pPlayerSearch || GS()->Server()->GetWorldID(i) != GS()->Server()->GetWorldID(ClientID) || distance(PlayerPosition, pPlayerSearch->GetCharacter()->GetPos()) > 800)
+				continue;
+
+			if(!pPlayerSearch->GetCharacter()->IsAllowedPVP(ClientID))
+			{
+				const int RealAmmo = 10 + pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo);
+				const int RestoreAmmo = kurosio::translate_to_procent_rest(RealAmmo, max(SkillBonus, 100));
+				for(int i = WEAPON_GUN; i <= WEAPON_LASER; i++)
+				{
+					pPlayerSearch->GetCharacter()->GiveWeapon(i, RestoreAmmo);
+					GS()->CreateDeath(PlayerPosition, i);
+					GS()->CreateWorldSound(PlayerPosition, SOUND_PICKUP_NINJA);
+				}
+			}
+		}
+
+		GS()->CreateText(NULL, false, vec2(PlayerPosition.x, PlayerPosition.y - 96.0f), vec2(0, 0), 40, "BLESSING WAR", GS()->GetWorldID());
 		return true;
 	}
 
