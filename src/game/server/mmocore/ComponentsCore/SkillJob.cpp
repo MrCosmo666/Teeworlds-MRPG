@@ -264,19 +264,17 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 		for(int i = 0; i < MAX_PLAYERS; i++)
 		{
 			CPlayer* pPlayerSearch = GS()->GetPlayer(i, true, true);
-			if(!pPlayerSearch || GS()->Server()->GetWorldID(i) != GS()->Server()->GetWorldID(ClientID) || distance(PlayerPosition, pPlayerSearch->GetCharacter()->GetPos()) > 800)
+			if(!pPlayerSearch || GS()->Server()->GetWorldID(i) != GS()->Server()->GetWorldID(ClientID) || distance(PlayerPosition, pPlayerSearch->GetCharacter()->GetPos()) > 800 
+				|| pPlayerSearch->GetCharacter()->IsAllowedPVP(ClientID))
 				continue;
 
-			if(!pPlayerSearch->GetCharacter()->IsAllowedPVP(ClientID))
+			const int RealAmmo = 10 + pPlayerSearch->GetAttributeCount(Stats::StAmmo);
+			const int RestoreAmmo = kurosio::translate_to_procent_rest(RealAmmo, min(SkillBonus, 100));
+			for(int i = WEAPON_GUN; i <= WEAPON_LASER; i++)
 			{
-				const int RealAmmo = 10 + pPlayerSearch->GetAttributeCount(Stats::StAmmo);
-				const int RestoreAmmo = kurosio::translate_to_procent_rest(RealAmmo, max(SkillBonus, 100));
-				for(int i = WEAPON_GUN; i <= WEAPON_LASER; i++)
-				{
-					pPlayerSearch->GetCharacter()->GiveWeapon(i, RestoreAmmo);
-					GS()->CreateDeath(PlayerPosition, i);
-					GS()->CreateWorldSound(PlayerPosition, SOUND_PICKUP_NINJA);
-				}
+				pPlayerSearch->GetCharacter()->GiveWeapon(i, RestoreAmmo);
+				GS()->CreateDeath(PlayerPosition, i);
+				GS()->CreateWorldSound(PlayerPosition, SOUND_PICKUP_NINJA);
 			}
 		}
 
