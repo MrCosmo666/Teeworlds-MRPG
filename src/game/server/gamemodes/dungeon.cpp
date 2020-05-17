@@ -373,7 +373,6 @@ int CGameControllerDungeon::GetDungeonSync(CPlayer* pPlayer, int BonusID) const
 {
 	int Procent = 1;
 	int Delay = 0;
-	bool SynchronizeWithPlayers = true;
 
 	const int ParsePlayerStatsClass = CGS::AttributInfo[BonusID].AtType;
 	if(pPlayer->m_MoodState == MOOD_PLAYER_TANK)
