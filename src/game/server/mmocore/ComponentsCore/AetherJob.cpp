@@ -9,7 +9,7 @@ std::map < int , AetherJob::StructTeleport > AetherJob::Teleport;
 
 void AetherJob::OnInit()
 { 
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_teleports"));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_aethers"));
 	while(RES->next())
 	{
 		const int ID = RES->getInt("ID");
@@ -18,7 +18,7 @@ void AetherJob::OnInit()
 		Teleport[ID].TeleY = RES->getInt("TeleY");
 		Teleport[ID].WorldID = RES->getInt("WorldID");
 	}
-	Job()->ShowLoadingProgress("Teleports", Teleport.size());	
+	Job()->ShowLoadingProgress("Aethers", Teleport.size());	
 }
 
 void AetherJob::OnInitAccount(CPlayer *pPlayer)

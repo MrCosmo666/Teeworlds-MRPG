@@ -110,7 +110,7 @@ bool AccountMinerJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int 
 	{
 		char aBuf[32];
 		str_format(aBuf, sizeof(aBuf), "Mining '%s'", str_MINER((MINER)VoteID));
-		if (pPlayer->Upgrade(Get, &pPlayer->Acc().Miner[VoteID], &pPlayer->Acc().Miner[MnrUpgrade], VoteID2, 1000, aBuf))
+		if (pPlayer->Upgrade(Get, &pPlayer->Acc().Miner[VoteID], &pPlayer->Acc().Miner[MnrUpgrade], VoteID2, 3, aBuf))
 		{
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_MINER_DATA);
 			GS()->VResetVotes(ClientID, MenuList::MENU_UPGRADE);

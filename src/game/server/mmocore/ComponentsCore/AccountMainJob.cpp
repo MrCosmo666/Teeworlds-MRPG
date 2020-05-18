@@ -119,14 +119,14 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 
 void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 {
-	if(!pPlayer || !pPlayer->IsAuthed()) 
+	if(!pPlayer || !pPlayer->IsAuthed() || !GS()->IsClientEqualWorldID(pPlayer->GetCID()))
 		return;
 
 	const int ClientID = pPlayer->GetCID();
 	GS()->AddBroadcast(ClientID, GS()->Server()->GetWorldName(GS()->GetWorldID()), 200, 500);
 	if(!FirstInitilize)
 	{
-		int CountMessageInbox = Job()->Inbox()->GetActiveInbox(ClientID);
+		int CountMessageInbox = Job()->Inbox()->GetActiveInbox(pPlayer);
 		if (CountMessageInbox > 0)
 			GS()->Chat(ClientID, "You have unread [{INT} emails]. Check your Mailbox!", &CountMessageInbox);
 

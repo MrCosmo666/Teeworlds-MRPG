@@ -14,14 +14,14 @@ void MailBoxJob::InteractiveInbox(CPlayer *pPlayer, int InboxID)
 	{
 		// получаем информацию о письме
 		const int ItemID = RES->getInt("ItemID"), Count = RES->getInt("Count");
-
-		// даем предмет для игрока если даем то удаляем письмо
 		if(ItemID > 0 && Count > 0)
 		{
 			// если уже имеется такой зачарованный предмет
 			if(GS()->GetItemInfo(ItemID).IsEnchantable() && pPlayer->GetItem(ItemID).Count > 0)
-				return GS()->Chat(pPlayer->GetCID(), "Enchant item maximal count x1 in a backpack!");
-
+			{
+				GS()->Chat(pPlayer->GetCID(), "Enchant item maximal count x1 in a backpack!");
+				return;
+			}
 			const int Enchant = RES->getInt("Enchant");
 			pPlayer->GetItem(ItemID).Add(Count, 0, Enchant);
 		}
@@ -34,16 +34,17 @@ void MailBoxJob::InteractiveInbox(CPlayer *pPlayer, int InboxID)
 // показываем список писем
 void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 {
-	// инициализируем
-	int ClientID = pPlayer->GetCID();
-	int StartHideCount = (int)(NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 200);
-	int HideID = StartHideCount;
+	bool EmptyMailBox = true;
+	const int ClientID = pPlayer->GetCID();
+	int HideID = (int)(NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 200);
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().AuthID, MAX_INBOX_LIST));
 	while(RES->next())
 	{
 		// получаем информацию для создания предмета
 		const int MailID = RES->getInt("ID"), ItemID = RES->getInt("ItemID");
 		const int Count = RES->getInt("Count"); HideID++;
+		const int Enchant = RES->getInt("Enchant");
+		EmptyMailBox = false;
 
 		// добавляем меню голосования
 		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "✉ Mail Name ID {INT}: {STR}", &MailID, RES->getString("MailName").c_str());
@@ -51,37 +52,26 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 
 		// проверяем мы читаем или получаем предмет
 		if(ItemID <= 0 || Count <= 0)
-		{
 			GS()->AVM(ClientID, "MAIL", MailID, HideID, "I readed (delete email) MID {INT}", &MailID);
-			continue;
-		}
-		
 		// зачарованный предмет
-		const int Enchant = RES->getInt("Enchant");
-		if(Enchant > 0)
-		{
+		else if(Enchant > 0)
 			GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive and delete email [{STR}+{INT}x{INT}] MID {INT}", 
 				GS()->GetItemInfo(ItemID).GetName(pPlayer), &Enchant, &Count, &MailID);
-			continue;
-		}
-	
 		// обычный предмет
-		GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive and delete email [{STR}x{INT}] MID {INT}", 
-			GS()->GetItemInfo(ItemID).GetName(pPlayer), &Count, &MailID);
+		else
+			GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive and delete email [{STR}x{INT}] MID {INT}",
+				GS()->GetItemInfo(ItemID).GetName(pPlayer), &Count, &MailID);
 	}
 
 	// если пустой inbox
-	if(HideID == StartHideCount)
+	if(EmptyMailBox)
 		GS()->AVL(ClientID, "null", "Your mailbox is empty");
 	return;
 }
 
 // проверить сообщения имеются ли
-int MailBoxJob::GetActiveInbox(int ClientID)
+int MailBoxJob::GetActiveInbox(CPlayer *pPlayer)
 {
-	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
-	if(!pPlayer) return 0;
-
 	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	const int MailCount = RES2->rowsCount();
 	return MailCount;

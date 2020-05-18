@@ -2103,7 +2103,7 @@ void CGS::AddBack(int ClientID)
 void CGS::ShowPlayerStats(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	AVH(ClientID, TAB_INFO_STAT, BLUE_COLOR, "Player Stats");
+	AVH(ClientID, TAB_INFO_STAT, BLUE_COLOR, "Player Stats {STR}", IsDungeon() ? "(Sync)" : "\0");
 	for(const auto& at : AttributInfo)
 	{
 		if(str_comp_nocase(at.second.FieldName, "unfield") == 0) 
@@ -2112,14 +2112,15 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 		// если апгрейды стоят дешево то они имеют деление ральных статистик
 		if(at.second.UpgradePrice < 10)
 		{
-			int SumingAt = pPlayer->GetAttributeCount(at.first), RealSum = pPlayer->GetAttributeCount(at.first, true);
+			const int SumingAt = pPlayer->GetAttributeCount(at.first);
+			const int RealSum = pPlayer->GetAttributeCount(at.first, true);
 			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} (+{INT}) - {STR}", &SumingAt, &RealSum, AtributeName(at.first));
 			continue;
 		}
 
 		// если апгрейды дорогие они имеют 1 статистики
 		int RealSum = pPlayer->GetAttributeCount(at.first);
-		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "[+{INT}] - {STR}", &RealSum, AtributeName(at.first));
+		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "+{INT} - {STR}", &RealSum, AtributeName(at.first));
 	}
 
 	AVM(ClientID, "null", NOPE, NOPE, "Player Upgrade Point: {INT}P", &pPlayer->Acc().Upgrade);

@@ -24,13 +24,13 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	m_NextTuningParams = m_PrevTuningParams;
 	m_MoodState = MOOD_NORMAL;
 
-	ClearParsing();
-	Acc().Team = GetStartTeam();
-	if (Acc().AuthID > 0)
-		GS()->Mmo()->Account()->LoadAccount(this, false);
-
 	SetLanguage(Server()->GetClientLanguage(ClientID));
 	GS()->SendTuningParams(ClientID);
+
+	ClearParsing();
+	Acc().Team = GetStartTeam();
+	if(Acc().AuthID > 0)
+		GS()->Mmo()->Account()->LoadAccount(this, false);
 }
 
 CPlayer::~CPlayer()

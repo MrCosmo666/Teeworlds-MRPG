@@ -109,7 +109,7 @@ bool AccountPlantJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int 
 	{
 		char aBuf[32];
 		str_format(aBuf, sizeof(aBuf), "Harvest '%s'", str_PLANT((PLANT)VoteID));
-		if(pPlayer->Upgrade(Get, &pPlayer->Acc().Plant[VoteID], &pPlayer->Acc().Plant[PlUpgrade], VoteID2, 10, aBuf))
+		if(pPlayer->Upgrade(Get, &pPlayer->Acc().Plant[VoteID], &pPlayer->Acc().Plant[PlUpgrade], VoteID2, 3, aBuf))
 		{
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_PLANT_DATA);
 			GS()->VResetVotes(ClientID, MenuList::MENU_UPGRADE);

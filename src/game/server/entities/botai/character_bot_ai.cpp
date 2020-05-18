@@ -349,11 +349,7 @@ void CCharacterBotAI::Move()
 
 	// jumping
 	const bool IsGround = IsGrounded();
-	if(IsGround && WayDir.y < -0.5)
-		m_Input.m_Jump = 1;
-
-	// doublejump
-	if(!IsGround && WayDir.y < -0.5 && m_Core.m_Vel.y > 0)
+	if((IsGround && WayDir.y < -0.5) || (!IsGround && WayDir.y < -0.5 && m_Core.m_Vel.y > 0))
 		m_Input.m_Jump = 1;
 
 	const bool IsCollide = GS()->Collision()->IntersectLine(m_Pos, m_Pos + vec2(m_Input.m_Direction, 0) * 150, &m_WallPos, 0x0);
