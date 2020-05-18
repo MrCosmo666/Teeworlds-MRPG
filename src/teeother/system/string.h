@@ -17,9 +17,8 @@
 #define __SHARED_SYSTEM_STRING__
 
 #include <cstdlib>
-/* BEGIN EDIT *********************************************************/
 #include <base/math.h>
-/* END EDIT ***********************************************************/
+#include <base/system.h>
 
 //String contained in a fixed length array
 template<int SIZE>
