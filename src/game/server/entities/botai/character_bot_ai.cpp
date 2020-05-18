@@ -329,7 +329,7 @@ void CCharacterBotAI::Move()
 {
 	int Index = -1;
 	int ActiveWayPoints = 0;
-	for(int i = 0; i < m_pBotPlayer->m_PathSize && i < 30 && !GS()->Collision()->IntersectLine(m_pBotPlayer->m_WayPoints[i], m_Pos, 0x0, 0x0); i++)
+	for(int i = 0; i < m_pBotPlayer->m_PathSize && i < 30 && !GS()->Collision()->IntersectLineWithInvisible(m_pBotPlayer->m_WayPoints[i], m_Pos, 0, 0); i++)
 	{
 		Index = i;
 		ActiveWayPoints = i;
@@ -492,7 +492,7 @@ CPlayer *CCharacterBotAI::SearchPlayer(int Distance)
 		if(!GS()->m_apPlayers[i] 
 			|| !GS()->m_apPlayers[i]->GetCharacter() 
 			|| distance(m_Core.m_Pos, GS()->m_apPlayers[i]->GetCharacter()->m_Core.m_Pos) > Distance
-			|| GS()->Collision()->IntersectLine(GS()->m_apPlayers[i]->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0)
+			|| GS()->Collision()->IntersectLineWithInvisible(GS()->m_apPlayers[i]->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0)
 			|| Server()->GetWorldID(i) != GS()->GetWorldID())
 			continue;
 		return GS()->m_apPlayers[i];
@@ -515,7 +515,7 @@ CPlayer *CCharacterBotAI::SearchTenacityPlayer(float Distance)
 	// сбрасываем агрессию если игрок далеко
 	CPlayer* pPlayer = GS()->GetPlayer(m_BotTargetID, true, true);
 	if (ActiveTargetID && (!pPlayer 
-		|| (pPlayer && (distance(m_Core.m_Pos, pPlayer->GetCharacter()->m_Core.m_Pos) > 800.0f || Server()->GetWorldID(m_BotTargetID) != GS()->GetWorldID()))))
+		|| (pPlayer && (distance(pPlayer->GetCharacter()->GetPos(), m_Pos) > 800.0f || Server()->GetWorldID(m_BotTargetID) != GS()->GetWorldID()))))
 		ClearTarget();
 
 	// не враждебные мобы
@@ -523,7 +523,7 @@ CPlayer *CCharacterBotAI::SearchTenacityPlayer(float Distance)
 		return nullptr; 
 
 	// сбрасываем время жизни таргета
-	m_BotTargetCollised = GS()->Collision()->IntersectLine(pPlayer->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0);
+	m_BotTargetCollised = GS()->Collision()->IntersectLineWithInvisible(pPlayer->GetCharacter()->GetPos(), m_Pos, 0, 0);
 	if (m_BotTargetLife && m_BotTargetCollised)
 	{
 		m_BotTargetLife--;
@@ -544,7 +544,7 @@ CPlayer *CCharacterBotAI::SearchTenacityPlayer(float Distance)
 			continue;
 
 		// проверяем есть ли вкуснее игрокв для бота
-		const bool FinderCollised = (bool)GS()->Collision()->IntersectLine(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0);
+		const bool FinderCollised = (bool)GS()->Collision()->IntersectLineWithInvisible(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0);
 		if (!FinderCollised && ((m_BotTargetLife <= 10 && m_BotTargetCollised)
 			|| pFinderHard->GetAttributeCount(Stats::StHardness, true) > pPlayer->GetAttributeCount(Stats::StHardness, true)))
 			SetTarget(i);

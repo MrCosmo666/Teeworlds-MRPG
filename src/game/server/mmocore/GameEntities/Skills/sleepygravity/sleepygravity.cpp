@@ -71,7 +71,7 @@ void CSleepyGravity::Tick()
 			continue;
 
 		vec2 Dir = normalize(p->m_Core.m_Pos - m_Pos);
-		if(distance(m_Pos, p->m_Core.m_Pos) < 20.0f)
+		if(distance(m_Pos, p->m_Core.m_Pos) < 24.0f)
 			continue;
 
 		p->m_Core.m_Vel -= Dir * (1.50f);

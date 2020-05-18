@@ -274,15 +274,15 @@ void CCharacter::FireWeapon()
 
 			bool Hits = false;
 			const float PlayerRadius = (float)m_pPlayer->GetAttributeCount(Stats::StHammerPower, true);
-			const float Radius = clamp(PlayerRadius / 5.0f, 1.2f, 7.0f);
+			const float Radius = clamp(PlayerRadius / 5.0f, 1.7f, 8.0f);
 			GS()->CreateSound(m_Pos, SOUND_HAMMER_FIRE);
 			
 			CCharacter *apEnts[MAX_CLIENTS];
 			int Num = GS()->m_World.FindEntities(ProjStartPos, GetProximityRadius()* Radius, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
 			for (int i = 0; i < Num; ++i)
 			{
-				CCharacter *pTarget = apEnts[i];
-				if ((pTarget == this)  || GS()->Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, nullptr, nullptr))
+				CCharacter* pTarget = apEnts[i];
+				if((pTarget == this) || GS()->Collision()->IntersectLineWithInvisible(ProjStartPos, pTarget->m_Pos, 0, 0))
 					continue;
 
 				if (StartConversation(pTarget->GetPlayer()))

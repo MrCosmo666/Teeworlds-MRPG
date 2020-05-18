@@ -51,11 +51,12 @@ void CPlayer::Tick()
 	if(!m_pCharacter && GetTeam() == TEAM_SPECTATORS)
 		m_ViewPos -= vec2(clamp(m_ViewPos.x - m_LatestActivity.m_TargetX, -500.0f, 500.0f), clamp(m_ViewPos.y - m_LatestActivity.m_TargetY, -400.0f, 400.0f));
 
+	// # # # # # ДАЛЬШЕ АВТОРИЗОВАННЫМ # # # # # #
 	if(!IsAuthed())
 		return;
 
 	Server()->SetClientScore(m_ClientID, Acc().Level);
-	{ // вычисление пинга и установка данных клиенту
+	{
 		IServer::CClientInfo Info;
 		if (Server()->GetClientInfo(m_ClientID, &Info))
 		{
@@ -72,7 +73,6 @@ void CPlayer::Tick()
 		}
 	}
 
-	// # # # # # ДАЛЬШЕ АВТОРИЗОВАННЫМ # # # # # #
 	if (m_pCharacter && !m_pCharacter->IsAlive())
 	{
 		delete m_pCharacter;

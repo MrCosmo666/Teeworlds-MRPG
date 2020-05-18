@@ -62,7 +62,7 @@ void CProjectile::Tick()
 	float Ct = (Server()->Tick() - m_StartTick) / (float)Server()->TickSpeed();
 	vec2 PrevPos = GetPos(Pt);
 	vec2 CurPos = GetPos(Ct);
-	if (!GS()->m_apPlayers[m_Owner] || !GS()->m_apPlayers[m_Owner]->GetCharacter() || GS()->Collision()->GetParseTilesAt(CurPos.x, CurPos.y) == TILE_DESTROY_PROJ)
+	if (!GS()->m_apPlayers[m_Owner] || !GS()->m_apPlayers[m_Owner]->GetCharacter())
 	{
 		if (m_Explosive)
 			GS()->CreateExplosion(CurPos, -1, m_Weapon, m_Damage);
@@ -70,8 +70,7 @@ void CProjectile::Tick()
 		GS()->m_World.DestroyEntity(this);
 		return;
 	}
-
-	int Collide = GS()->Collision()->IntersectLine(PrevPos, CurPos, &CurPos, 0);
+	bool Collide = GS()->Collision()->IntersectLineWithInvisible(PrevPos, CurPos, &CurPos, 0);
 	CCharacter* OwnerChar = GS()->GetPlayerChar(m_Owner);
 	CCharacter* TargetChr = GS()->m_World.IntersectCharacter(PrevPos, CurPos, 6.0f, CurPos, OwnerChar);
 

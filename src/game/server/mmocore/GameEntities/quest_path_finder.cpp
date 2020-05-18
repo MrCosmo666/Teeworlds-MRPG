@@ -10,7 +10,6 @@
 CQuestPathFinder::CQuestPathFinder(CGameWorld *pGameWorld, vec2 Pos, int ClientID, int QuestID, int QuestProgress, vec2 TargetPos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_FINDQUEST, Pos)
 {
-	m_Pos = Pos;
 	m_QuestID = QuestID;
 	m_QuestProgress = QuestProgress;
 	m_ClientID = ClientID;

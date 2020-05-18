@@ -87,7 +87,7 @@ void CLaser::Reset()
 
 void CLaser::Tick()
 {
-	if(GS()->Collision()->GetParseTilesAt(m_Pos.x, m_Pos.y) == TILE_DESTROY_PROJ)
+	if(GS()->Collision()->GetParseTilesAt(m_Pos.x, m_Pos.y) == TILE_INVISIBLE_WALL)
 	{
 		Reset();
 		return;
