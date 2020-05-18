@@ -405,7 +405,7 @@ void HouseJob::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
 		return;
 	}
 	Home[HouseID].m_Bank = Bank - TakeCount;
-	GS()->Chat(ClientID, _("You take gold in the safe (+{VAL}){VAL}!"), &TakeCount, &Home[HouseID].m_Bank);
+	GS()->Chat(ClientID, "You take gold in the safe (+{VAL}){VAL}!", &TakeCount, &Home[HouseID].m_Bank);
 	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", Home[HouseID].m_Bank, HouseID);
 }
 
@@ -420,7 +420,7 @@ void HouseJob::AddSafeDeposit(CPlayer *pPlayer, int Balance)
 
 	const int HouseID = RES->getInt("ID");
 	Home[HouseID].m_Bank = RES->getInt("HouseBank") + Balance;            
-	GS()->Chat(ClientID, _("You put gold in the safe (+{VAL}){VAL}!"), &Balance, &Home[HouseID].m_Bank);
+	GS()->Chat(ClientID, "You put gold in the safe (+{VAL}){VAL}!", &Balance, &Home[HouseID].m_Bank);
 	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", Home[HouseID].m_Bank, HouseID);
 }
 

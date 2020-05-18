@@ -3,11 +3,10 @@
 #include <engine/shared/config.h>
 
 #include "entities/botai/character_bot_ai.h"
-
 #include "gamecontext.h"
-#include "playerbot.h"
-
 #include "mmocore/PathFinder.h"
+
+#include "playerbot.h"
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayerBot, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
 

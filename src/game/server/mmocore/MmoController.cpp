@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <thread>
 #include <engine/shared/config.h>
+#include <teeother/system/string.h>
 
 #include <game/server/gamecontext.h>
 #include "MmoController.h"

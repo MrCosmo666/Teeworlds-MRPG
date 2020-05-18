@@ -1,10 +1,12 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
-#include <game/server/gamecontext.h>
-#include <game/server/mmocore/GameEntities/Items/drop_quest_items.h>
+#include <teeother/system/string.h>
 
+#include <game/server/gamecontext.h>
 #include "QuestJob.h"
+
+#include <game/server/mmocore/GameEntities/Items/drop_quest_items.h>
 
 std::map < int , QuestJob::StructQuestData > QuestJob::QuestsData;
 std::map < int , std::map < int , QuestJob::StructQuest > > QuestJob::Quests;

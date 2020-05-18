@@ -4,9 +4,9 @@
 #include <thread>
 #include <algorithm>
 
+#include <engine/map.h>
 #include <engine/shared/config.h>
 #include <engine/shared/memheap.h>
-#include <engine/map.h>
 
 #include <generated/server_data.h>
 #include <game/version.h>
@@ -17,17 +17,13 @@
 #include "gamemodes/main.h"
 #include "gamemodes/dungeon.h"
 
-// object entities
 #include "mmocore/GameEntities/Items/drop_bonuses.h"
 #include "mmocore/GameEntities/Items/drop_items.h"
 #include "mmocore/GameEntities/loltext.h"
-
-// информационные данные
 #include "mmocore/CommandProcessor.h"
-#include "mmocore/ComponentsCore/GuildJob.h"
-
-// поиск пути
 #include "mmocore/PathFinder.h"
+
+#include <teeother/components/localization.h>
 
 // Безопасные структуры хоть и прожорливо но работает (Прежде всего всегда их при выходе игрока Отрезаем)
 std::map < int , CGS::StructAttribut > CGS::AttributInfo;

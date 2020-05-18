@@ -3,27 +3,21 @@
 #ifndef GAME_SERVER_GAMECONTEXT_H
 #define GAME_SERVER_GAMECONTEXT_H
 
-#include <base/another/kurhelper.h>
-
-#include <engine/server.h>
-#include <engine/storage.h>
 #include <engine/console.h>
+#include <engine/server.h>
+
+#include <base/another/kurhelper.h>
 #include <engine/shared/memheap.h>
-#include <teeother/components/localization.h>
-#include <game/server/enum_context.h>
-#include <game/commands.h>
 #include <game/layers.h>
 #include <game/voting.h>
 
-#include "eventhandler.h"
 #include "gamecontroller.h"
+#include "eventhandler.h"
 #include "gameworld.h"
-
 #include "playerbot.h"
 #include "player.h"
 
-#include <game/server/mmocore/MmoController.h>
-
+#include "mmocore/MmoController.h"
 
 #ifdef _MSC_VER
 typedef __int32 int32_t;

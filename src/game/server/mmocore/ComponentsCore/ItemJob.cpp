@@ -1,6 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
+#include <teeother/components/localization.h>
+
 #include <game/server/gamecontext.h>
 #include "ItemJob.h"
 
@@ -13,20 +15,20 @@ void ItemJob::OnInit()
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_items_list", "WHERE ItemID > '0'"));
 	while(RES->next())
 	{
-		int ItemID = (int)RES->getInt("ItemID");
+		const int ItemID = (int)RES->getInt("ItemID");
 		str_copy(ItemsInfo[ItemID].Name, RES->getString("Name").c_str(), sizeof(ItemsInfo[ItemID].Name));
 		str_copy(ItemsInfo[ItemID].Desc, RES->getString("Description").c_str(), sizeof(ItemsInfo[ItemID].Desc));
 		str_copy(ItemsInfo[ItemID].Icon, RES->getString("Icon").c_str(), sizeof(ItemsInfo[ItemID].Icon));
 		ItemsInfo[ItemID].Type = (int)RES->getInt("Type");
 		ItemsInfo[ItemID].Function = (int)RES->getInt("Function");
 		ItemsInfo[ItemID].Dysenthis = (int)RES->getInt("Desynthesis");
-		ItemsInfo[ItemID].MinimalPrice = (int)RES->getInt("AuctionPrice");
+		ItemsInfo[ItemID].MinimalPrice = (int)RES->getInt("Selling");
 		for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 		{
 			char aBuf[32];
-			str_format(aBuf, sizeof(aBuf), "Attribute_%d", i);
+			str_format(aBuf, sizeof(aBuf), "Stat_%d", i);
 			ItemsInfo[ItemID].Attribute[i] = (int)RES->getInt(aBuf);
-			str_format(aBuf, sizeof(aBuf), "AttributeCount_%d", i);
+			str_format(aBuf, sizeof(aBuf), "StatCount_%d", i);
 			ItemsInfo[ItemID].AttributeCount[i] = (int)RES->getInt(aBuf);
 		}
 		ItemsInfo[ItemID].MaximalEnchant = (int)RES->getInt("EnchantMax");

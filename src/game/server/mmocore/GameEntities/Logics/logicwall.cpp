@@ -1,8 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <game/server/gamecontext.h>
 #include <engine/shared/config.h>
 
+#include <game/server/gamecontext.h>
 #include "logicwall.h"
 
 CLogicWall::CLogicWall(CGameWorld *pGameWorld, vec2 Pos)
@@ -298,7 +298,7 @@ void CLogicDoorKey::Tick()
 		if (Distance <= g_Config.m_SvDoorRadiusHit)
 		{
 			pChar->m_DoorHit = true;
-			GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_WARNING, 100, _("You need {STR}"), GS()->GetItemInfo(m_ItemID).GetName(pChar->GetPlayer()));
+			GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_WARNING, 100, "You need {STR}", GS()->GetItemInfo(m_ItemID).GetName(pChar->GetPlayer()));
 		}
 	}
 }
