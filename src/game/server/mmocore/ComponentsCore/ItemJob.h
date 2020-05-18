@@ -15,7 +15,6 @@ class ItemJob : public MmoComponent
 		char Icon[16];
 		int Type;
 		int Function;
-		bool Notify;
 		int Dysenthis;
 		int MinimalPrice;
 		short Attribute[STATS_MAX_FOR_ITEM];

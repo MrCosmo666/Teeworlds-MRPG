@@ -19,7 +19,6 @@ void ItemJob::OnInit()
 		str_copy(ItemsInfo[ItemID].Icon, RES->getString("Icon").c_str(), sizeof(ItemsInfo[ItemID].Icon));
 		ItemsInfo[ItemID].Type = (int)RES->getInt("Type");
 		ItemsInfo[ItemID].Function = (int)RES->getInt("Function");
-		ItemsInfo[ItemID].Notify = (bool)RES->getBoolean("Message");
 		ItemsInfo[ItemID].Dysenthis = (int)RES->getInt("Desynthesis");
 		ItemsInfo[ItemID].MinimalPrice = (int)RES->getInt("AuctionPrice");
 		for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
@@ -723,10 +722,10 @@ bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 		return true;
 
 	// информация о получении себе предмета
-	if(Info().Type != -1 && itemid_ != itGold)
-		GameServer->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(m_pPlayer), &arg_count);
-	else if(Info().Notify)
+	if(Info().Type == ItemType::TYPE_EQUIP || Info().Type == ItemType::TYPE_MODULE)
 		GameServer->Chat(-1, "{STR} got of the {STR}x{INT}!", GameServer->Server()->ClientName(ClientID), Info().GetName(), &arg_count);
+	else if(Info().Type != -1)
+		GameServer->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(m_pPlayer), &arg_count);
 
 	return true;
 }
