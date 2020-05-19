@@ -314,18 +314,16 @@ void CCharacter::FireWeapon()
 
 		case WEAPON_GUN:
 		{
-			new CProjectile(GameWorld(), WEAPON_GUN,
-				m_pPlayer->GetCID(),
-				ProjStartPos,
-				Direction,
-				(int)(Server()->TickSpeed()*GS()->Tuning()->m_GunLifetime),
-				g_pData->m_Weapons.m_Gun.m_pBase->m_Damage, false, 0, -1, WEAPON_GUN);
+			const bool IsExplosive = m_pPlayer->GetItem(itExplosiveGun).IsEquipped();
+			new CProjectile(GameWorld(), WEAPON_GUN, m_pPlayer->GetCID(), ProjStartPos, Direction, (int)(Server()->TickSpeed()*GS()->Tuning()->m_GunLifetime),
+				g_pData->m_Weapons.m_Gun.m_pBase->m_Damage, IsExplosive, 0, -1, WEAPON_GUN);
 
 			GS()->CreateSound(m_Pos, SOUND_GUN_FIRE);
 		} break;
 
 		case WEAPON_SHOTGUN:
 		{
+			const bool IsExplosive = m_pPlayer->GetItem(itExplosiveShotgun).IsEquipped();
 			const int EnchantSpread = IsBot ? 2+BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadShotgun);
 			const int ShotSpread = clamp(1+EnchantSpread, 1, 36);
 			CMsgPacker Msg(NETMSGTYPE_SV_EXTRAPROJECTILE);
@@ -339,7 +337,7 @@ void CCharacter::FireWeapon()
 					ProjStartPos,
 					vec2(cosf(a), sinf(a))*1.2f,
 					(int)(Server()->TickSpeed()*GS()->Tuning()->m_ShotgunLifetime),
-					g_pData->m_Weapons.m_Shotgun.m_pBase->m_Damage, false, 0, 15, WEAPON_SHOTGUN);
+					g_pData->m_Weapons.m_Shotgun.m_pBase->m_Damage, IsExplosive, 0, 15, WEAPON_SHOTGUN);
 			}
 			Server()->SendMsg(&Msg, MSGFLAG_VITAL, m_pPlayer->GetCID());
 			GS()->CreateSound(m_Pos, SOUND_SHOTGUN_FIRE);
@@ -402,7 +400,7 @@ void CCharacter::HandleWeapons()
 
 	if(m_aWeapons[m_ActiveWeapon].m_Ammo >= 0)
 	{
-		const int AmmoRegenTime = (m_ActiveWeapon == (int)WEAPON_GUN ? (Server()->TickSpeed()) : (max(5000 - m_AmmoRegen, 1000)) / 10);
+		const int AmmoRegenTime = (m_ActiveWeapon == (int)WEAPON_GUN ? (Server()->TickSpeed() / 2) : (max(5000 - m_AmmoRegen, 1000)) / 10);
 		if (m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart < 0)
 			m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart = Server()->Tick() + AmmoRegenTime;
 
@@ -770,16 +768,19 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 		m_Health -= Dmg;
 		m_pPlayer->ShowInformationStats();
 	}
-
+	
 	// create healthmod indicator
-	GS()->CreateDamage(m_Pos, m_pPlayer->GetCID(), OldHealth-m_Health, OldArmor-m_Armor, false);
+	GS()->CreateDamage(m_Pos, m_pPlayer->GetCID(), OldHealth-m_Health, false);
 
 	if(From != m_pPlayer->GetCID())
 		GS()->CreatePlayerSound(From, SOUND_HIT);
 
 	// перекинуть на BotAI
-	if (m_pPlayer->IsBot())
-		return (bool)(m_Health <= 0);
+	if(m_pPlayer->IsBot())
+	{
+		bool IsDie = (bool)(m_Health <= 0);
+		return IsDie;
+	}
 
 	// автозелье здоровья
 	if(m_Health <= m_pPlayer->GetStartHealth()/3)
@@ -925,7 +926,7 @@ void CCharacter::GiveRandomMobEffect(int FromID)
 	CPlayer* pFrom = GS()->GetPlayer(FromID);
 	if(!pFrom || !pFrom->IsBot() || pFrom->GetBotType() != BotsTypes::TYPE_BOT_MOB || BotJob::MobBot[pFrom->GetBotSub()].Effect[0] == '\0')
 		return;
-	m_pPlayer->GiveEffect(BotJob::MobBot[pFrom->GetBotSub()].Effect, 3+rand()%3, 30);
+	m_pPlayer->GiveEffect(BotJob::MobBot[pFrom->GetBotSub()].Effect, 3+rand()%3, 40);
 }
 
 bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)

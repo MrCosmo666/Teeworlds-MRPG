@@ -60,6 +60,11 @@ void CSleepyGravity::Tick()
 			vec2 VertexPos = m_Pos + vec2(m_Radius * cos(AngleStep * i), m_Radius * sin(AngleStep * i));
 			if(!m_LifeSpan)
 				GS()->CreateExplosion(VertexPos, m_pPlayer->GetCID(), WEAPON_GRENADE, m_PowerLevel);
+			else if(m_LifeSpan && TimeLeft == i)
+			{
+				GS()->CreateDamage(m_Pos, m_pPlayer->GetCID(), 1, true);
+				break;
+			}
 		}
 		if(!m_LifeSpan)
 			GS()->CreateExplosion(m_Pos, m_pPlayer->GetCID(), WEAPON_GRENADE, m_PowerLevel);

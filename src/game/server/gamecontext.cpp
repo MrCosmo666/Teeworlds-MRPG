@@ -167,17 +167,27 @@ const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const
 	EVENTS 
 ######################################################################### */
 // Отправить запрос на рендер Урона
-void CGS::CreateDamage(vec2 Pos, int ClientID, int HealthAmount, int ArmorAmount, bool OnlyVanilla)
+void CGS::CreateDamage(vec2 Pos, int ClientID, int Amount, bool OnlyVanilla)
 {
+
 	CNetEvent_Damage* pEventVanilla = (CNetEvent_Damage*)m_Events.Create(NETEVENTTYPE_DAMAGE, sizeof(CNetEvent_Damage));
 	if(pEventVanilla)
 	{
+		int AmountDamageVanilla = Amount;
+		if(ClientID >= 0 && ClientID < MAX_CLIENTS && m_apPlayers[ClientID])
+		{
+			CPlayer* pPlayer = m_apPlayers[ClientID];
+			const int HealthStart = pPlayer->GetStartHealth();
+			const float DamageTranslate = (float)Amount / (float)HealthStart * 6.0f;
+			AmountDamageVanilla = clamp((int)DamageTranslate, 1, 6);
+		}
+
 		pEventVanilla->m_X = (int)Pos.x;
 		pEventVanilla->m_Y = (int)Pos.y;
 		pEventVanilla->m_ClientID = ClientID;
 		pEventVanilla->m_Angle = 0;
-		pEventVanilla->m_HealthAmount = HealthAmount;
-		pEventVanilla->m_ArmorAmount = ArmorAmount;
+		pEventVanilla->m_HealthAmount = AmountDamageVanilla;
+		pEventVanilla->m_ArmorAmount = 0;
 		pEventVanilla->m_Self = 0;
 	}
 
@@ -190,7 +200,7 @@ void CGS::CreateDamage(vec2 Pos, int ClientID, int HealthAmount, int ArmorAmount
 		pEventMmo->m_X = (int)Pos.x;
 		pEventMmo->m_Y = (int)Pos.y;
 		pEventMmo->m_ClientID = ClientID;
-		pEventMmo->m_DamageCount = HealthAmount + ArmorAmount;
+		pEventMmo->m_DamageCount = Amount;
 	}
 }
 
@@ -2110,17 +2120,16 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 			continue;
 	
 		// если апгрейды стоят дешево то они имеют деление ральных статистик
+		const int SumingAt = pPlayer->GetAttributeCount(at.first);
 		if(at.second.UpgradePrice < 10)
 		{
-			const int SumingAt = pPlayer->GetAttributeCount(at.first);
 			const int RealSum = pPlayer->GetAttributeCount(at.first, true);
 			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} (+{INT}) - {STR}", &SumingAt, &RealSum, AtributeName(at.first));
 			continue;
 		}
 
 		// если апгрейды дорогие они имеют 1 статистики
-		int RealSum = pPlayer->GetAttributeCount(at.first);
-		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "+{INT} - {STR}", &RealSum, AtributeName(at.first));
+		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "+{INT} - {STR}", &SumingAt, AtributeName(at.first));
 	}
 
 	AVM(ClientID, "null", NOPE, NOPE, "Player Upgrade Point: {INT}P", &pPlayer->Acc().Upgrade);
@@ -2218,12 +2227,6 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 	// если бот не активен не у одного игрока, но игрок найден удаляем
 	if (!ActiveBot && QuestBotClientID >= MAX_PLAYERS)
 	{
-		CNetMsg_Sv_ClientDrop Msg;
-		Msg.m_ClientID = QuestBotClientID;
-		Msg.m_pReason = "\0";
-		Msg.m_Silent = true;
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1, CheckPlayerMessageWorldID(QuestBotClientID));
-
 		delete m_apPlayers[QuestBotClientID];
 		m_apPlayers[QuestBotClientID] = nullptr;
 	}

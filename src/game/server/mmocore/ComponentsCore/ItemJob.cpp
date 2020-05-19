@@ -88,7 +88,7 @@ void ItemJob::FormatAttributes(InventoryItem& pItem, int size, char* pformat)
 			continue;
 
 		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "%s +%d ", GS()->AtributeName(BonusID), BonusCount);
+		str_format(aBuf, sizeof(aBuf), "%s+%d ", GS()->AtributeName(BonusID), BonusCount);
 		Buffer.append_at(Buffer.length(), aBuf);
 	}
 	str_copy(pformat, Buffer.buffer(), size);
@@ -106,7 +106,7 @@ void ItemJob::FormatAttributes(ItemInformation& pInfoItem, int Enchant, int size
 			continue;
 
 		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "%s +%d ", GS()->AtributeName(BonusID), BonusCount);
+		str_format(aBuf, sizeof(aBuf), "%s+%d ", GS()->AtributeName(BonusID), BonusCount);
 		Buffer.append_at(Buffer.length(), aBuf);
 	}
 	str_copy(pformat, Buffer.buffer(), size);

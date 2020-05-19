@@ -158,7 +158,7 @@ void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 	const int BonusSkill = GetSkillBonus(ClientID, SkillID) + SkillData[SkillID].m_BonusCount;
 	const bool Passive = SkillData[SkillID].m_Passive;
 	const int HideID = NUM_TAB_MENU + ItemJob::ItemsInfo.size() + SkillID;
-	GS()->AVHI(ClientID, "skill", HideID, LIGHT_BLUE_COLOR, "{STR} :: {INT}SP ({INT}/{INT})", SkillData[SkillID].m_SkillName, &SkillData[SkillID].m_SkillPrice, &LevelOwn, &SkillData[SkillID].m_SkillMaxLevel);
+	GS()->AVHI(ClientID, "skill", HideID, LIGHT_BLUE_COLOR, "{STR} - {INT}SP ({INT}/{INT})", SkillData[SkillID].m_SkillName, &SkillData[SkillID].m_SkillPrice, &LevelOwn, &SkillData[SkillID].m_SkillMaxLevel);
 	if(Passive)
 	{
 		GS()->AVM(ClientID, "null", NOPE, HideID, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].m_SkillBonusInfo);
@@ -263,8 +263,8 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 		for(int i = 0; i < MAX_PLAYERS; i++)
 		{
 			CPlayer* pPlayerSearch = GS()->GetPlayer(i, true, true);
-			if(!pPlayerSearch || GS()->Server()->GetWorldID(i) != GS()->Server()->GetWorldID(ClientID) || distance(PlayerPosition, pPlayerSearch->GetCharacter()->GetPos()) > 800 
-				|| pPlayerSearch->GetCharacter()->IsAllowedPVP(ClientID))
+			if(!pPlayerSearch || GS()->Server()->GetWorldID(i) != GS()->GetWorldID() || distance(PlayerPosition, pPlayerSearch->GetCharacter()->GetPos()) > 800 
+				|| (pPlayerSearch->GetCharacter()->IsAllowedPVP(ClientID) && i != ClientID))
 				continue;
 
 			const int RealAmmo = 10 + pPlayerSearch->GetAttributeCount(Stats::StAmmo);

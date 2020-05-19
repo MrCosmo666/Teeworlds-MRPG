@@ -227,6 +227,8 @@ enum
 	itCapsuleSurvivalExperience = 16,	// Дает 10-50 опыта
 	itLittleBagGold = 17,				// Дает 10-50 золота
 	itPotionResurrection = 25,			// Зелье воскрешения
+	itExplosiveGun = 33,				// Модуль взрыва для пистолета
+	itExplosiveShotgun = 34,			// Модуль взрыва для шотгана
 
 	/*
 		Все листы сортировок что существуют на сервере

@@ -15,11 +15,11 @@ IServer* CPlayer::Server() const { return m_pGS->Server(); };
 CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint)
 : CPlayer(pGS, ClientID), m_BotType(SpawnPoint), m_BotID(BotID), m_SubBotID(SubBotID), m_BotHealth(0)
 {
+	SendInformationBot();
+
 	m_Spawned = true;
 	m_DungeonAllowedSpawn = false;
 	m_PlayerTick[TickState::Respawn] = Server()->Tick();
-
-	SendInformationBot();
 }
 
 CPlayerBot::~CPlayerBot() 
@@ -258,6 +258,12 @@ const char* CPlayerBot::GetStatusBot()
 
 void CPlayerBot::SendInformationBot()
 {
+	CNetMsg_Sv_ClientDrop Msg;
+	Msg.m_ClientID = m_ClientID;
+	Msg.m_pReason = "\0";
+	Msg.m_Silent = true;
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1, GS()->CheckPlayerMessageWorldID(m_ClientID));
+
 	CNetMsg_Sv_ClientInfo ClientInfoMsg;
 	ClientInfoMsg.m_ClientID = m_ClientID;
 	ClientInfoMsg.m_Local = 0;

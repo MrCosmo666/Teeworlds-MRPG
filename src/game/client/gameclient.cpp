@@ -1122,7 +1122,9 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 	else if(MsgId == NETMSGTYPE_SV_AFTERISMMOSERVER)
 	{
 		m_ConnectedMmoServer = true;
-		m_pMenus->SetAuthState(true);
+
+		if(g_Config.m_ClShowAuthMenu)
+			m_pMenus->SetAuthState(true);
 	}
 }
 

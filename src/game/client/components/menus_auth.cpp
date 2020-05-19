@@ -93,7 +93,7 @@ void CMenus::RenderAuthWindow()
 	{ // main
 		Basic.HMargin(170.0f, &MainBox);
 		MainBox.VMargin(25.0f, &MainBox);
-		RenderTools()->DrawUIRect(&MainBox, vec4(0.0f, 0.0f, 0.0f, 0.2f), CUI::CORNER_ALL, 5.0f);
+		RenderTools()->DrawUIRect(&MainBox, vec4(0.1f, 0.1f, 0.1f, 0.5f), CUI::CORNER_ALL, 5.0f);
 	}
 
 	CUIRect BackLeft = BasicLeft;
@@ -129,17 +129,13 @@ void CMenus::RenderAuthWindow()
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
-	static bool s_PlayerAcceptRules = false;
-
-
 	// --------------------- RULES SIDE --------------------------
-	// -----------------------------------------------------------
+	static bool s_PlayerAcceptRules = false;
 	{
-
 		// ----------------- BACKGROUND RULES ----------------
 		CUIRect BackRules;
 		BackLeft.Margin(5.0f, &BackRules);
-		RenderTools()->DrawUIRect(&BackRules, HexToRgba(0x2B3A4186), CUI::CORNER_ALL, 5.0f);
+		RenderTools()->DrawUIRect(&BackRules, vec4(0.2f, 0.2f, 0.2f, 0.75f), CUI::CORNER_ALL, 5.0f);
 
 		// ------------------ RULES --------------------------
 
@@ -187,7 +183,7 @@ void CMenus::RenderAuthWindow()
 		{ // left
 			CUIRect BackLogin;
 			BasicLogin.Margin(5.0f, &BackLogin);
-			RenderTools()->DrawUIRect(&BackLogin, HexToRgba(0x925F3F), CUI::CORNER_ALL, 5.0f);
+			RenderTools()->DrawUIRect(&BackLogin, vec4(0.17f, 0.52f, 0.12f, 0.5f), CUI::CORNER_ALL, 5.0f);
 		}
 
 		{ // right

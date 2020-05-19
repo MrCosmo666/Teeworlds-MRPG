@@ -113,7 +113,7 @@ public:
 	/* #########################################################################
 		EVENTS 
 	######################################################################### */
-	void CreateDamage(vec2 Pos, int ClientID, int HealthAmount, int ArmorAmount, bool OnlyVanilla);
+	void CreateDamage(vec2 Pos, int ClientID, int Amount, bool OnlyVanilla);
 	void CreateHammerHit(vec2 Pos);
 	void CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamage);
 	void CreatePlayerSpawn(vec2 Pos);

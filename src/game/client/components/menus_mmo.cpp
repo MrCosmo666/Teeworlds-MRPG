@@ -96,14 +96,14 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
 		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
 		static int s_ButtonDmgInd = 0;
-		if (DoButton_CheckBox(&s_ButtonDmgInd, Localize("Mmo Damage Ind (Vanilla)"), g_Config.m_ClMmoDamageInd, &Button))
-			g_Config.m_ClMmoDamageInd ^= 1;
+		if (DoButton_CheckBox(&s_ButtonDmgInd, Localize("Show auth menu (MRPG)"), g_Config.m_ClShowAuthMenu, &Button))
+			g_Config.m_ClShowAuthMenu ^= 1;
 
 		// show colored
 		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
 		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
 		static int s_ButtonColorVote = 0;
-		if (DoButton_CheckBox(&s_ButtonColorVote, Localize("Show Colored Vote (MmoTee)"), g_Config.m_ClShowColoreVote, &Button))
+		if (DoButton_CheckBox(&s_ButtonColorVote, Localize("Show Colored Vote (MRPG)"), g_Config.m_ClShowColoreVote, &Button))
 			g_Config.m_ClShowColoreVote ^= 1;
 
 		// --------------------- RIGHT SIDE --------------------------

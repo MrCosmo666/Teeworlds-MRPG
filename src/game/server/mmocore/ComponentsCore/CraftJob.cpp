@@ -95,7 +95,7 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 		int LastPrice = clamp(cr.second.Price - Discount, 0, cr.second.Price);
 		if (InfoGetItem.IsEnchantable())
 		{
-			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} :: {INT} gold",
+			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} - {INT} gold",
 				(pPlayer->GetItem(cr.second.GetItemID).Count ? "✔ " : "\0"), InfoGetItem.GetName(pPlayer), &LastPrice);
 
 			char aAttributes[128];
