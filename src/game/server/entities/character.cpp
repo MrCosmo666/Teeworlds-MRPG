@@ -762,7 +762,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 		GiveRandomMobEffect(From);
 	}
 
-	int OldHealth = m_Health, OldArmor = m_Armor;
+	int OldHealth = m_Health;
 	if(Dmg)
 	{
 		m_Health -= Dmg;
