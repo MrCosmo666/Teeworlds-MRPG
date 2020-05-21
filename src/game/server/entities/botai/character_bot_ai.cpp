@@ -85,7 +85,7 @@ void CCharacterBotAI::ShowProgress()
 bool CCharacterBotAI::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 {
 	CPlayer* pFrom = GS()->GetPlayer(From, true);
-	if (!pFrom)
+	if (!pFrom || !m_BotActive)
 		return false;
 
 	if(m_pBotPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB || pFrom->IsBot())
@@ -218,10 +218,13 @@ bool CCharacterBotAI::GiveWeapon(int Weapon, int GiveAmmo)
 
 void CCharacterBotAI::Tick()
 {
-	if(!GS()->CheckPlayersDistance(m_Core.m_Pos, 1000.0f) || !IsAlive())
+	m_BotActive = GS()->CheckPlayersDistance(m_Core.m_Pos, 1000.0f);
+	if(!m_BotActive || !IsAlive())
 		return;
 
-	EngineBots();
+	if(IsAlive())
+		EngineBots();
+
 	CCharacter::Tick();
 }
 
@@ -298,7 +301,6 @@ void CCharacterBotAI::EngineQuestMob()
 // Интерактивы мобов враждебных
 void CCharacterBotAI::EngineMobs()
 {
-	SetAim(m_pBotPlayer->m_TargetPos - m_Pos);
 	const int MobID = m_pBotPlayer->GetBotSub();
 	bool WeaponedBot = (BotJob::MobBot[MobID].Spread >= 1);
 	if(WeaponedBot)
@@ -327,6 +329,8 @@ void CCharacterBotAI::EngineMobs()
 
 void CCharacterBotAI::Move()
 {
+	SetAim(m_pBotPlayer->m_TargetPos - m_Pos);
+	
 	int Index = -1;
 	int ActiveWayPoints = 0;
 	for(int i = 0; i < m_pBotPlayer->m_PathSize && i < 30 && !GS()->Collision()->IntersectLineWithInvisible(m_pBotPlayer->m_WayPoints[i], m_Pos, 0, 0); i++)
@@ -366,15 +370,14 @@ void CCharacterBotAI::Move()
 	if(m_Input.m_Jump == 1 && (WayDir.y >= 0 || ActiveWayPoints < 3))
 		m_Input.m_Jump = 0;
 
-	// jump over friend
-	vec2 IncreasePos;
-	CCharacter* pChar = GameWorld()->IntersectCharacter(GetPos(), GetPos() + vec2(m_Input.m_Direction, 0) * 150, 16.0f, IncreasePos, (CCharacter*)this);
-	if(pChar)
+	// jump over character
+	vec2 IntersectPos;
+	CCharacter* pChar = GameWorld()->IntersectCharacter(GetPos(), GetPos() + vec2(m_Input.m_Direction, 0) * 128, 16.0f, IntersectPos, (CCharacter*)this);
+	if (pChar && (pChar->GetPos().x < GetPos().x || !pChar->GetPlayer()->IsBot()))
 		m_Input.m_Jump = 1;
-	
-	// hook
-	if(ActiveWayPoints > 2 && !m_Input.m_Hook && (WayDir.x != 0 || WayDir.y != 0) && !pChar)
-	{
+
+	if(ActiveWayPoints > 2 && !m_Input.m_Hook && (WayDir.x != 0 || WayDir.y != 0))
+	{	
 		if(m_Core.m_HookState == HOOK_GRABBED && m_Core.m_HookedPlayer == -1)
 		{
 			vec2 HookVel = normalize(m_Core.m_HookPos - GetPos()) * GS()->Tuning()->m_HookDragAccel;
@@ -398,6 +401,7 @@ void CCharacterBotAI::Move()
 			int NumDir = 32;
 			vec2 HookDir(0.0f, 0.0f);
 			float MaxForce = 0;
+
 			for(int i = 0; i < NumDir; i++)
 			{
 				float a = 2 * i * pi / NumDir;

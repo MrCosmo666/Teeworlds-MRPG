@@ -1822,9 +1822,11 @@ void CGS::AVHI(int To, const char *Icon, const int ID, vec3 Color, const char* p
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
 		if(ID > TAB_SETTINGS_MODULES && ID < NUM_TAB_MENU) { Buffer.append(" (Press me for help)"); }
 
-		m_apPlayers[To]->m_Colored = { Color.r, Color.g, Color.b };
+		m_apPlayers[To]->m_Colored = Color;
 		AV(To, "HIDEN", Buffer.buffer(), ID, -1, Icon);
-		m_apPlayers[To]->m_Colored = { Color.r / 4, Color.g / 4, Color.b / 4 };
+		if(length(m_apPlayers[To]->m_Colored) > 1.0f)
+			m_apPlayers[To]->m_Colored /= 4.0f;
+			
 		Buffer.clear();
 		va_end(VarArgs);
 	}

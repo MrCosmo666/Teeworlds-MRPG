@@ -51,13 +51,6 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Ожидание данжа
 	if (State == DUNGEON_WAITING)
 	{
-		for (int i = 0; i < MAX_PLAYERS; i++)
-		{
-			if (!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID)
-				continue;
-
-			GS()->m_apPlayers[i]->GetTempData().TempTimeDungeon = 0;
-		}
 		DungeonJob::Dungeon[m_DungeonID].Progress = 0;
 		m_MaximumTick = 0;
 		m_FinishedTick = 0;
@@ -80,11 +73,18 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Начало данжа
 	else if (State == DUNGEON_STARTED)
 	{
+		for (int i = 0; i < MAX_PLAYERS; i++)
+		{
+			if (!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID)
+				continue;
+
+			GS()->m_apPlayers[i]->GetTempData().TempTimeDungeon = 0;
+		}
 		m_StartedPlayers = PlayersNum();
-		m_MaximumTick = Server()->TickSpeed() * 600;
+		m_MaximumTick = Server()->TickSpeed() * 900;
 		m_SafeTick = Server()->TickSpeed() * 30;
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The security timer is enabled for 30 seconds!");
-		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "You are given 10 minutes to complete of dungeon!");
+		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "You are given 15 minutes to complete of dungeon!");
 		GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon started!");
 		SetMobsSpawn(true);
 		KillAllPlayers();
@@ -95,7 +95,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	else if (State == DUNGEON_WAITING_FINISH)
 	{
 		m_SafeTick = 0;
-		m_FinishedTick = Server()->TickSpeed() * 10;
+		m_FinishedTick = Server()->TickSpeed() * 20;
 		SetMobsSpawn(false);
 
 		// элемент RACE
@@ -132,10 +132,6 @@ void CGameControllerDungeon::StateTick()
 	const int Players = PlayersNum();
 	if (Players < 1 && m_StateDungeon != DUNGEON_WAITING)
 		ChangeState(DUNGEON_WAITING);
-
-	// уменьшить время если игроков больше одного
-	if(Players > 1 && m_StartingTick > Server()->TickSpeed() * 120)
-		m_StartingTick = Server()->TickSpeed() * 120;
 
 	// обновлять информацию каждую секунду
 	if (Server()->Tick() % Server()->TickSpeed() == 0)
@@ -385,11 +381,11 @@ int CGameControllerDungeon::GetDungeonSync(CPlayer* pPlayer, int BonusID) const
 	else
 	{
 		if(ParsePlayerStatsClass == AtributType::AtTank)
-			Procent = 3;
-		else if(ParsePlayerStatsClass == AtributType::AtHealer)
 			Procent = 4;
+		else if(ParsePlayerStatsClass == AtributType::AtHealer)
+			Procent = 6;
 		else if(ParsePlayerStatsClass == AtributType::AtDps)
-			Procent = 3;
+			Procent = 4;
 
 	}
 

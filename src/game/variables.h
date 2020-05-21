@@ -162,10 +162,6 @@ MACRO_CONFIG_STR(SvDiscordInviteGroup, sv_discord_invite_group, 32, "nope", CFGF
 MACRO_CONFIG_STR(SvGenerateURL, sv_discord_generateurl, 128, "nope", CFGFLAG_SERVER, "Path folder generate image. Example 'submodules/generator'.")
 MACRO_CONFIG_STR(SvSiteUrl, sv_site_url, 128, "nope", CFGFLAG_SERVER, "Url site. Example 'https://teeworlds.space'")
 
-MACRO_CONFIG_INT(SvDiscordRewardItemID, sv_discord_reward_itemid, 0, 0, 1000, CFGFLAG_SERVER, "Discord reward !mjoinreward.")
-MACRO_CONFIG_INT(SvDiscordRewardCount, sv_discord_reward_count, 1, 1, 1000000, CFGFLAG_SERVER, "Discord reward !mjoinreward.")
-MACRO_CONFIG_STR(SvDiscordRewardImage, sv_discord_reward_image, 256, "random", CFGFLAG_SERVER, "Discord reward !mjoinrewardrver.")
-
 MACRO_CONFIG_STR(SvDiscordColorWarning, sv_discord_color_warning, 32, "13183530", CFGFLAG_SERVER, "Discord embed color warning.")
 MACRO_CONFIG_STR(SvDiscordColorServerChat, sv_discord_color_server, 32, "11253955", CFGFLAG_SERVER, "Discord embed color server chat.")
 MACRO_CONFIG_STR(SvDiscordColorJoinLeave, sv_discord_color_joinleave, 32, "14494801", CFGFLAG_SERVER, "Discord embed color enter exit.")

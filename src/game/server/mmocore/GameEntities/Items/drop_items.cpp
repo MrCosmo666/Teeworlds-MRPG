@@ -22,7 +22,7 @@ CDropItem::CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForc
 	m_DropItem.Settings = 0;
 	m_Flashing = false;
 	m_StartTick = Server()->Tick();
-	m_LifeSpan = Server()->TickSpeed() * 15;
+	m_LifeSpan = Server()->TickSpeed() * 20;
 
 	GameWorld()->InsertEntity(this);
 	for(int i=0; i<NUM_IDS; i++)

@@ -22,7 +22,7 @@ CDropBonuses::CDropBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float Ang
 	m_FlashTimer = 0;
 	m_Flashing = false;
 	m_StartTick = Server()->Tick();
-	m_LifeSpan = Server()->TickSpeed() * 10;
+	m_LifeSpan = Server()->TickSpeed() * 15;
 	GameWorld()->InsertEntity(this);
 }
 

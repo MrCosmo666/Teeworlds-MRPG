@@ -196,7 +196,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		if ((sscanf(Msg->m_pMessage, "/sd %d", &size)) != 1)
 			return GS->ChatFollow(ClientID, "Please use: /sd <idsound>");
 
-		pPlayer->Acc().Level = size;
 		int soundid = clamp(size, 0, 40);
 		if (GS->GetPlayerChar(ClientID))
 			GS->CreateSound(pPlayer->GetCharacter()->m_Core.m_Pos, soundid);

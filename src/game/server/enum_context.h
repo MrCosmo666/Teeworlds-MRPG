@@ -71,7 +71,8 @@ enum AtributType
 	AtHealer,
 	AtDps,
 	AtWeapon,
-	AtHardtype
+	AtHardtype,
+	AtJobs
 };
 
 enum ToplistTypes
@@ -213,7 +214,7 @@ enum
 
 
 	NOPE = -1,
-	itGold = 1,						// Деньги обычная валюта
+	itGold = 1,							// Деньги обычная валюта
 	itHammer = 2,						// Снаряжение Молоток | Молоток
 	itMaterial = 7,						// Материал для зачирования вещей
 	itTicketGuild = 8,					// Билет для создания гильдии
@@ -229,6 +230,8 @@ enum
 	itPotionResurrection = 25,			// Зелье воскрешения
 	itExplosiveGun = 33,				// Модуль взрыва для пистолета
 	itExplosiveShotgun = 34,			// Модуль взрыва для шотгана
+	itTicketResetUpgrades = 38,			// Билет для сброса статистика апгрейдов
+	itModePVP = 39,						// Настройка PVP режима
 
 	/*
 		Все листы сортировок что существуют на сервере

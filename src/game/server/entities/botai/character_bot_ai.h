@@ -32,6 +32,7 @@ private:
 	int m_EmotionsStyle;
 
 	// target system
+	bool m_BotActive;
 	int m_BotTargetID;
 	int m_BotTargetLife;
 	bool m_BotTargetCollised;

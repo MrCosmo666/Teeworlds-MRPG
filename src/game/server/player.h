@@ -86,8 +86,6 @@ private:
 	######################################################################### */
 	void TickOnlinePlayer();
 	void TickSystemTalk();
-
-	void HandleTuningParams();
 public:
 	CPlayer(CGS* pGS, int ClientID);
 	virtual ~CPlayer();
@@ -112,6 +110,7 @@ public:
 	virtual void Snap(int SnappingClient);
 	virtual int GetEquippedItem(int EquipID, int SkipItemID = -1) const;
 	
+	void HandleTuningParams();
 private:
 	virtual void TryRespawn();
 

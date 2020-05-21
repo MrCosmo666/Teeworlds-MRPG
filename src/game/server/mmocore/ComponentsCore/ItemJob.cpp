@@ -614,6 +614,28 @@ void ItemJob::UseItem(int ClientID, int ItemID, int Count)
 		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} gold.", GS()->Server()->ClientName(ClientID), PlItem.Info().GetName(), &Count, &Getting);
 		pPlayer->AddMoney(Getting);
 	}
+
+	if(ItemID == itTicketResetUpgrades && PlItem.Remove(Count, 0))
+	{
+		int BackUpgrades = 0;
+		for(const auto& at : CGS::AttributInfo)
+		{
+			if(str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0 || pPlayer->Acc().Stats[at.first] <= 0)
+				continue;
+
+			// skip weapon spreading
+			if(at.second.AtType == AtributType::AtWeapon)
+				continue;
+
+			BackUpgrades += (int)(pPlayer->Acc().Stats[at.first] * at.second.UpgradePrice);
+			pPlayer->Acc().Stats[at.first] = 0;
+		}
+
+		GS()->Chat(-1, "{STR} used {STR} returned {INT} upgrades.", GS()->Server()->ClientName(ClientID), PlItem.Info().GetName(), &BackUpgrades);
+		pPlayer->Acc().Upgrade += BackUpgrades;
+		Job()->SaveAccount(pPlayer, SaveType::SAVE_UPGRADES);
+	}
+
 	GS()->VResetVotes(ClientID, MenuList::MENU_INVENTORY);
 	return;
 }
@@ -654,16 +676,24 @@ bool ItemJob::ClassItemInformation::IsEnchantable() const
 
 int ItemJob::ClassItems::EnchantPrice() const
 {
-	int AttributeCount = 0;
+	int CompressedPrice = 0;
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if(Info().Attribute[i] > 0 && Info().AttributeCount[i] > 0 && CGS::AttributInfo.find(Info().Attribute[i]) != CGS::AttributInfo.end())
-		{
-			const int UpgradePrice = max(5, CGS::AttributInfo[Info().Attribute[i]].UpgradePrice) * 2;
-			AttributeCount += (Info().AttributeCount[i] * UpgradePrice);
-		}
+		if(Info().Attribute[i] <= 0 || Info().AttributeCount[i] <= 0 || CGS::AttributInfo.find(Info().Attribute[i]) == CGS::AttributInfo.end())
+			continue;
+		
+		int UpgradePrice;
+		const int AttType = CGS::AttributInfo[Info().Attribute[i]].AtType;
+		if(AttType == AtributType::AtHardtype || Info().Attribute[i] == Stats::StStrength)
+			UpgradePrice = max(8, CGS::AttributInfo[Info().Attribute[i]].UpgradePrice) * 12;
+		else if(AttType == AtributType::AtJobs || AttType == AtributType::AtWeapon)
+			UpgradePrice = max(20, CGS::AttributInfo[Info().Attribute[i]].UpgradePrice) * 12;
+		else
+			UpgradePrice = max(6, CGS::AttributInfo[Info().Attribute[i]].UpgradePrice) * 5;
+
+		CompressedPrice += (Info().AttributeCount[i] * UpgradePrice);
 	}
-	return AttributeCount * (Enchant + 1);
+	return CompressedPrice * (Enchant + 1);
 }
 
 bool ItemJob::ClassItems::SetEnchant(int arg_enchantlevel)

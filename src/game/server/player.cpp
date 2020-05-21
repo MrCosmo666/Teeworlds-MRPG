@@ -248,7 +248,10 @@ void CPlayer::TryRespawn()
 {
 	vec2 SpawnPos;
 	int SpawnType = SPAWN_HUMAN;
-	if(GetTempData().TempActiveSafeSpawn)
+
+	if(GS()->IsDungeon() && GetTempData().TempActiveSafeSpawn)
+		GetTempData().TempActiveSafeSpawn = false;
+	else if(GetTempData().TempActiveSafeSpawn)
 	{
 		const int SafezoneWorldID = GS()->GetRespawnWorld();
 		if(SafezoneWorldID >= 0 && !GS()->IsClientEqualWorldID(m_ClientID, SafezoneWorldID))

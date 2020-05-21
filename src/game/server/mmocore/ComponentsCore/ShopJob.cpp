@@ -284,8 +284,6 @@ bool ShopJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 
 		const int SlotCount = pPlayer->GetTempData().SellItem.a_count;
 		const int MinimalPrice = SlotCount * pInformationSellItem.MinimalPrice;
-		
-		pPlayer->GetTempData().SellItem.a_price = MinimalPrice;
 		const int SlotPrice = pPlayer->GetTempData().SellItem.a_price;
 		const int SlotEnchant = pPlayer->GetTempData().SellItem.a_enchant;
 
@@ -331,7 +329,7 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 			Get = 1;
 
 		// если сбрасываем цену если не хватает
-		const int c_minimalprice = Get* pPlayerSellItem.Info().MinimalPrice;
+		const int c_minimalprice = (Get * pPlayerSellItem.Info().MinimalPrice);
 		if(pPlayer->GetTempData().SellItem.a_price < c_minimalprice)
 			pPlayer->GetTempData().SellItem.a_price = c_minimalprice;
 			
@@ -344,8 +342,7 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	// аукцион установить цену
 	if(PPSTR(CMD, "AUCTIONPRICE") == 0)
 	{
-		ItemJob::ItemInformation &pInformationSellItem = GS()->GetItemInfo(VoteID);
-		const int c_minimalprice = pInformationSellItem.MinimalPrice * pPlayer->GetTempData().SellItem.a_count;
+		const int c_minimalprice = (pPlayer->GetTempData().SellItem.a_count * GS()->GetItemInfo(VoteID).MinimalPrice);
 		if(Get < c_minimalprice) 
 			Get = c_minimalprice;
 

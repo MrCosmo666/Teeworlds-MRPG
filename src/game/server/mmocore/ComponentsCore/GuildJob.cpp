@@ -113,7 +113,7 @@ bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	}
 	if (pChr->GetHelper()->BoolIndex(TILE_GUILD_CHAIRS))
 	{
-		if (GS()->Server()->Tick() % GS()->Server()->TickSpeed() == 0)
+		if (GS()->Server()->Tick() % (GS()->Server()->TickSpeed() * 5) == 0)
 		{
 			const int HouseID = GetPosHouseID(pChr->m_Core.m_Pos);
 			const int GuildID = GetHouseGuildID(HouseID);

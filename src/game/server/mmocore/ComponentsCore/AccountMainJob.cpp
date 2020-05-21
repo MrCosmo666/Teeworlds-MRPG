@@ -146,12 +146,13 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	GS()->Server()->SendDiscordGenerateMessage("16757248", pLoggin, pMsg);
 #endif
 
+	pPlayer->GetTempData().TempActiveSafeSpawn = true;
 	if (!pPlayer->GetItem(itHammer).Count)
-	{
 		pPlayer->GetItem(itHammer).Add(1);
-		pPlayer->ChangeWorld(NEWBIE_ZERO_WORLD);
-		return;
-	}
+	
+	// settings
+	if(!pPlayer->GetItem(itModePVP).Count)
+		pPlayer->GetItem(itModePVP).Add(1, 1);
 
 	if(pPlayer->Acc().WorldID != GS()->GetWorldID())
 	{

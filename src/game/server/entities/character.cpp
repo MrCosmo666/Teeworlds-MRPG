@@ -559,8 +559,9 @@ void CCharacter::TickDefered()
 	}
 
 	if(m_pPlayer->IsBot())
-	{
-		m_Core.Move();
+	{	
+		CCharacterCore::CParams CoreTickParams(&m_pPlayer->m_NextTuningParams);
+		m_Core.Move(&CoreTickParams);
 		m_Core.Quantize();
 		m_Pos = m_Core.m_Pos;		
 		return;
@@ -568,14 +569,16 @@ void CCharacter::TickDefered()
 		
 	// advance the dummy
 	{
+		CCharacterCore::CParams CoreTickParams(&GameWorld()->m_Core.m_Tuning);
 		CWorldCore TempWorld;
 		m_ReckoningCore.Init(&TempWorld, GS()->Collision());
-		m_ReckoningCore.Tick(false);
-		m_ReckoningCore.Move();
+		m_ReckoningCore.Tick(false, &CoreTickParams);
+		m_ReckoningCore.Move(&CoreTickParams);
 		m_ReckoningCore.Quantize();
 	}
 
-	m_Core.Move();
+	CCharacterCore::CParams CoreTickParams(&m_pPlayer->m_NextTuningParams);
+	m_Core.Move(&CoreTickParams);
 	m_Core.Quantize();
 	m_Pos = m_Core.m_Pos;
 	m_TriggeredEvents |= m_Core.m_TriggeredEvents;
@@ -973,9 +976,8 @@ void CCharacter::InteractiveRifle(vec2 Direction, vec2 ProjStartPos)
 
 void CCharacter::HandleTunning()
 {
-	CTuningParams* pTuningParams = &m_pPlayer->m_NextTuningParams;
-	
 	// тюнинг воды
+	CTuningParams* pTuningParams = &m_pPlayer->m_NextTuningParams;
 	if(m_pHelper->BoolIndex(TILE_WATER))
 	{
 		pTuningParams->m_Gravity = -0.05f;
@@ -1085,15 +1087,37 @@ bool CCharacter::IsAllowedPVP(int FromID)
 	CPlayer* pFrom = GS()->m_apPlayers[FromID];
 	if(!pFrom || !pFrom->GetCharacter())
 		return false;
-	if(pFrom->IsBot() && m_pPlayer->IsBot())
+	// anti pvp no allowed damage
+	if(m_NoAllowDamage || pFrom->GetCharacter()->m_NoAllowDamage)
 		return false;
-	if(!pFrom->IsBot() && !m_pPlayer->IsBot() && (!GS()->IsAllowedPVP() || GS()->IsDungeon()))
+	// anti pvp for bots
+	if(m_pPlayer->IsBot() && pFrom->IsBot())
 		return false;
+	// pvp only for mobs
 	if((m_pPlayer->IsBot() && m_pPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB) || (pFrom->IsBot() && pFrom->GetBotType() != BotsTypes::TYPE_BOT_MOB))
 		return false;
-	if(pFrom->GetCharacter()->m_NoAllowDamage || m_NoAllowDamage)
-		return false;
 
+	// players anti pvp
+	if(!m_pPlayer->IsBot() && !pFrom->IsBot())
+	{
+		// anti settings pvp
+		if(pFrom->GetItem(itModePVP).IsEquipped() || m_pPlayer->GetItem(itModePVP).IsEquipped())
+			return false;
+
+		// anti pvp on safe world or dungeon
+		if(!GS()->IsAllowedPVP() || GS()->IsDungeon())
+			return false;
+
+		// anti pvp for guild players
+		if(pFrom->Acc().GuildID > 0 && pFrom->Acc().GuildID == m_pPlayer->Acc().GuildID)
+			return false;
+
+		// anti pvp disallow
+		if(g_Config.m_SvStrongAntiPVP <= 0)
+			return false;
+	}
+
+	// anti pvp strong
 	const int FromAttributeLevel = pFrom->GetLevelDisciple(AtributType::AtDps) + pFrom->GetLevelDisciple(AtributType::AtTank) + pFrom->GetAttributeCount(AtributType::AtHealer);
 	const int PlayerAttributeLevel = m_pPlayer->GetLevelDisciple(AtributType::AtDps) + m_pPlayer->GetLevelDisciple(AtributType::AtTank) + m_pPlayer->GetAttributeCount(AtributType::AtHealer);
 	if(!pFrom->IsBot() && !m_pPlayer->IsBot() && ((FromAttributeLevel - PlayerAttributeLevel > g_Config.m_SvStrongAntiPVP) || (PlayerAttributeLevel - FromAttributeLevel > g_Config.m_SvStrongAntiPVP)))
