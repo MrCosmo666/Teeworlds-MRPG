@@ -21,22 +21,24 @@ public:
 	CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint);
 	virtual ~CPlayerBot() override;
 
-	void GenerateNick(char* buffer, int size_buffer);
+	int GetBotID() override { return m_BotID; };
+	int GetBotType() override { return m_BotType; };
+	int GetBotSub() override { return m_SubBotID; };
+	int GetHealth() override { return m_BotHealth; };
+	int GetMana() override { return 999; };
+	int GetTeam() override { return TEAM_BLUE; };
+	int GetStartHealth() override;
+	int GetPlayerWorldID() const override;
 
-	int GetBotID()													override { return m_BotID; };
-	int GetBotType()												override { return m_BotType; };
-	int GetBotSub()													override { return m_SubBotID; };
-	int GetHealth() 												override { return m_BotHealth; };
-	int GetMana() 													override { return 999; };
-	int GetTeam()													override { return TEAM_BLUE; };
-	void UpdateTempData(int Health, int Mana)						override { m_BotHealth = Health; };
-	void SetDungeonAllowedSpawn(bool Spawn)							override { m_DungeonAllowedSpawn = Spawn; };
-	int GetEquippedItem(int EquipID, int SkipItemID = -1) const		override;
-	void Tick()														override;
-	int GetStartHealth()											override;
+	void SetDungeonAllowedSpawn(bool Spawn) override { m_DungeonAllowedSpawn = Spawn; };
+	void UpdateTempData(int Health, int Mana) override { m_BotHealth = Health; };
+	int IsActiveSnappingBot(int SnappingClient) override;
 	int GetAttributeCount(int BonusID, bool Really = false, bool SearchClass = false) override;
-	void Snap(int SnappingClient)									override;
-	int IsActiveSnappingBot(int SnappingClient)						override;
+	void SendClientInfo(int TargetID) override;
+	int GetEquippedItem(int EquipID, int SkipItemID = -1) const override;
+
+	void Tick() override;
+	void Snap(int SnappingClient) override;
 
 	int m_LastPosTick;
 	int m_PathSize;
@@ -45,11 +47,12 @@ public:
 	std::map<int, vec2> m_WayPoints;
 
 private:
-	void TryRespawn()												override;
+	void TryRespawn() override;
+
+	void GenerateNick(char* buffer, int size_buffer);
 	int GetBotLevel() const;
 	bool IsActiveQuests(int SnapClientID);
 	const char* GetStatusBot();
-	void SendInformationBot();
 	int GetMoodState(int SnappingClient);
 
 	// threading path finder

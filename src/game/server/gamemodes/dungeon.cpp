@@ -273,7 +273,7 @@ int CGameControllerDungeon::CountMobs() const
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
+		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && m_WorldID == GS()->GetClientWorldID(i))
 			countMobs++;
 	}
 	return countMobs;
@@ -296,7 +296,7 @@ int CGameControllerDungeon::LeftMobsToWin() const
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && BotPlayer->GetCharacter() && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
+		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && BotPlayer->GetCharacter() && m_WorldID == GS()->GetClientWorldID(i))
 			leftMobs++;
 	}
 	return leftMobs;
@@ -307,7 +307,7 @@ void CGameControllerDungeon::SetMobsSpawn(bool AllowedSpawn)
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && GS()->CheckPlayerMessageWorldID(i) == m_WorldID)
+		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && m_WorldID == GS()->GetClientWorldID(i))
 		{
 			BotPlayer->SetDungeonAllowedSpawn(AllowedSpawn);
 			if (!AllowedSpawn && BotPlayer->GetCharacter())
@@ -381,7 +381,7 @@ int CGameControllerDungeon::GetDungeonSync(CPlayer* pPlayer, int BonusID) const
 	else
 	{
 		if(ParsePlayerStatsClass == AtributType::AtTank)
-			Procent = 4;
+			Procent = 3;
 		else if(ParsePlayerStatsClass == AtributType::AtHealer)
 			Procent = 6;
 		else if(ParsePlayerStatsClass == AtributType::AtDps)

@@ -888,3 +888,32 @@ void CPlayer::ChangeWorld(int WorldID)
 	}
 	Server()->ChangeWorld(m_ClientID, WorldID);
 }
+
+void CPlayer::SendClientInfo(int TargetID)
+{	
+	if(TargetID != -1 && (TargetID < 0 || TargetID >= MAX_PLAYERS || !Server()->ClientIngame(TargetID)))
+		return;
+		
+	CNetMsg_Sv_ClientInfo ClientInfoMsg;
+	ClientInfoMsg.m_ClientID = m_ClientID;
+	ClientInfoMsg.m_Local = (bool)(m_ClientID == TargetID);
+	ClientInfoMsg.m_Team = GetTeam();
+	ClientInfoMsg.m_pName = Server()->ClientName(m_ClientID);
+	ClientInfoMsg.m_pClan = Server()->ClientClan(m_ClientID);
+	ClientInfoMsg.m_Country = Server()->ClientCountry(m_ClientID);
+	ClientInfoMsg.m_Silent = (bool)(IsAuthed());
+	for (int p = 0; p < 6; p++)
+	{
+		ClientInfoMsg.m_apSkinPartNames[p] = Acc().m_aaSkinPartNames[p];
+		ClientInfoMsg.m_aUseCustomColors[p] = Acc().m_aUseCustomColors[p];
+		ClientInfoMsg.m_aSkinPartColors[p] = Acc().m_aSkinPartColors[p];
+	}
+
+	// player data it static have accept it all worlds
+	Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID);
+}
+
+int CPlayer::GetPlayerWorldID() const
+{
+	return Server()->GetWorldID(m_ClientID);
+}

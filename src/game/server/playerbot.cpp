@@ -18,7 +18,7 @@ CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int Spaw
 	m_Spawned = true;
 	m_DungeonAllowedSpawn = false;
 	m_PlayerTick[TickState::Respawn] = Server()->Tick();
-	SendInformationBot();
+	SendClientInfo(-1);
 }
 
 CPlayerBot::~CPlayerBot() 
@@ -27,7 +27,7 @@ CPlayerBot::~CPlayerBot()
 	Msg.m_ClientID = m_ClientID;
 	Msg.m_pReason = "\0";
 	Msg.m_Silent = true;
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1, GS()->CheckPlayerMessageWorldID(m_ClientID));
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1, GetPlayerWorldID());
 
 	delete m_pCharacter;
 	m_pCharacter = nullptr;
@@ -86,7 +86,7 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 
 		// all hardtypews and strength lowered
 		if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
-			Power /= BotJob::MobBot[m_SubBotID].Boss ? 250 : 50;
+			Power /= BotJob::MobBot[m_SubBotID].Boss ? 300 : 50;
 		// lowered hardness 
 		else if(BonusID != Stats::StHardness)
 			Power /= 5;
@@ -263,25 +263,6 @@ const char* CPlayerBot::GetStatusBot()
 	return "\0";
 }
 
-void CPlayerBot::SendInformationBot()
-{
-	CNetMsg_Sv_ClientInfo ClientInfoMsg;
-	ClientInfoMsg.m_ClientID = m_ClientID;
-	ClientInfoMsg.m_Local = 0;
-	ClientInfoMsg.m_Team = GetTeam();
-	ClientInfoMsg.m_pName = BotJob::DataBot[m_BotID].NameBot;
-	ClientInfoMsg.m_pClan = "::Bots::";
-	ClientInfoMsg.m_Country = 0;
-	ClientInfoMsg.m_Silent = true;
-	for (int p = 0; p < 6; p++)
-	{
-		ClientInfoMsg.m_apSkinPartNames[p] = BotJob::DataBot[m_BotID].SkinNameBot[p];
-		ClientInfoMsg.m_aUseCustomColors[p] = BotJob::DataBot[m_BotID].UseCustomBot[p];
-		ClientInfoMsg.m_aSkinPartColors[p] = BotJob::DataBot[m_BotID].SkinColorBot[p];
-	}
-	Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1, GS()->CheckPlayerMessageWorldID(m_ClientID));
-}
-
 void CPlayerBot::GenerateNick(char* buffer, int size_buffer)
 {
 	if(GetBotType() == BotsTypes::TYPE_BOT_MOB && BotJob::MobBot[m_SubBotID].Spread > 0)
@@ -314,4 +295,41 @@ void CPlayerBot::TickThreadMobsPathFinder()
 			GS()->Mmo()->BotsData()->GetThreadRandomWaypointTarget(this);
 		}
 	}
+}
+
+void CPlayerBot::SendClientInfo(int TargetID)
+{
+	if(TargetID != -1 && (TargetID < 0 || TargetID >= MAX_PLAYERS || !Server()->ClientIngame(TargetID)))
+		return;
+
+	CNetMsg_Sv_ClientInfo ClientInfoMsg;
+	ClientInfoMsg.m_ClientID = m_ClientID;
+	ClientInfoMsg.m_Local = (bool)(m_ClientID == TargetID);
+	ClientInfoMsg.m_Team = GetTeam();
+
+	char aNickname[24];
+	GenerateNick(aNickname, sizeof(aNickname));
+	ClientInfoMsg.m_pName = aNickname;
+	ClientInfoMsg.m_pClan = "::Bots::";
+	ClientInfoMsg.m_Country = 0;
+	ClientInfoMsg.m_Silent = true;
+	for (int p = 0; p < 6; p++)
+	{
+		ClientInfoMsg.m_apSkinPartNames[p] = BotJob::DataBot[m_BotID].SkinNameBot[p];
+		ClientInfoMsg.m_aUseCustomColors[p] = BotJob::DataBot[m_BotID].UseCustomBot[p];
+		ClientInfoMsg.m_aSkinPartColors[p] = BotJob::DataBot[m_BotID].SkinColorBot[p];
+	}
+
+	// bot data it non static have accept it only world where it
+	Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID, GetPlayerWorldID());
+}
+
+int CPlayerBot::GetPlayerWorldID() const
+{
+	if(m_BotType == BotsTypes::TYPE_BOT_MOB) 
+		return BotJob::MobBot[m_SubBotID].WorldID;
+	else if(m_BotType == BotsTypes::TYPE_BOT_NPC) 
+		return BotJob::NpcBot[m_SubBotID].WorldID;
+
+	return BotJob::QuestBot[m_SubBotID].WorldID;
 }

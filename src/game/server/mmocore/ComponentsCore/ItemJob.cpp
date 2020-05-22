@@ -832,7 +832,8 @@ bool ItemJob::ClassItems::Save()
 {
 	if (m_pPlayer && m_pPlayer->IsAuthed())
 	{
-		SJK.UD("tw_accounts_items", "Count = '%d', Settings = '%d', Enchant = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", Count, Settings, Enchant, m_pPlayer->Acc().AuthID, itemid_);
+		SJK.UD("tw_accounts_items", "Count = '%d', Settings = '%d', Enchant = '%d', Durability = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", 
+			Count, Settings, Enchant, Durability, m_pPlayer->Acc().AuthID, itemid_);
 		return true;
 	}
 	return false;

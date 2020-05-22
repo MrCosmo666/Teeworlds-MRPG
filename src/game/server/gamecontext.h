@@ -184,11 +184,12 @@ public:
 	void SendChatCommands(int ClientID);
 	void SendRemoveChatCommand(const CCommandManager::CCommand* pCommand, int ClientID);
 
+	void SendClientInfo(int ClientID, int TargetID);
 	void SendTuningParams(int ClientID);
 	void SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char *Message, int Style = -1, int TalkingEmote = -1);
 	void SendProgressBar(int ClientID, int Count, int Request, const char *Message);
 	void ClearTalkText(int ClientID);
-	int CheckPlayerMessageWorldID(int ClientID) const;
+	int GetClientWorldID(int ClientID) const;
 
 	/* #########################################################################
 		ENGINE GAMECONTEXT 
@@ -298,10 +299,6 @@ public:
 	bool CheckPlayersDistance(vec2 Pos, float Distance) const;
 	void SetRespawnWorld(int WorldID) { m_RespawnWorld = WorldID; }
 	int GetRespawnWorld() const { return m_RespawnWorld; }
-
-
-	void FindThreadPathBot(int ClientID, vec2 StartPosition, vec2 EndPosition);
-	void GetThreadRandomWaypointTargetBot(int ClientID);
 
 private:
 	void UpdateZoneDungeon();

@@ -786,7 +786,7 @@ void CGS::SendEquipItem(int ClientID, int TargetID)
 			Msg.m_EquipID[k] = EquipItem;
 			Msg.m_EnchantItem[k] = EnchantItem;
 		}
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, TargetID, CheckPlayerMessageWorldID(ClientID));
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, TargetID, GetClientWorldID(ClientID));
 		return;
 	}
 
@@ -885,6 +885,25 @@ void CGS::SendRemoveChatCommand(const CCommandManager::CCommand* pCommand, int C
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
+// Отправить информацию о клиенте
+void CGS::SendClientInfo(int ClientID, int TargetID)
+{
+	if(TargetID != -1 && (TargetID < 0 || TargetID >= MAX_PLAYERS || !Server()->ClientIngame(TargetID)))
+		return;
+
+	CPlayer* pPlayer = m_apPlayers[ClientID];
+	if(!pPlayer)
+		return;
+
+	if(pPlayer->IsBot())
+	{
+		CPlayerBot *pPlayerBot = static_cast<CPlayerBot*>(pPlayer);
+		pPlayerBot->SendClientInfo(TargetID);
+		return;
+	}
+	pPlayer->SendClientInfo(TargetID);
+}
+
 // Отправить тюннинг
 void CGS::SendTuningParams(int ClientID)
 {
@@ -932,24 +951,12 @@ void CGS::ClearTalkText(int ClientID)
 }
 
 // Помощь в поиске мира бота и отправки его
-int CGS::CheckPlayerMessageWorldID(int ClientID) const
+int CGS::GetClientWorldID(int ClientID) const
 {
-	if(ClientID < 0 || ClientID >= MAX_CLIENTS || !m_apPlayers[ClientID])
+	if(ClientID < 0 || ClientID >= MAX_CLIENTS || !m_apPlayers[ClientID] || !Server()->ClientIngame(ClientID))
 		return -1;
 
-	if(ClientID >= MAX_PLAYERS)
-	{
-		CPlayerBot* pPlayer = static_cast<CPlayerBot *>(m_apPlayers[ClientID]);
-		int SubBotID = pPlayer->GetBotSub();
-		if(pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB) 
-			return BotJob::MobBot[SubBotID].WorldID;
-		else if(pPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC) 
-			return BotJob::NpcBot[SubBotID].WorldID;
-		else 
-			return BotJob::QuestBot[SubBotID].WorldID;
-	}
-	else 
-		return Server()->GetWorldID(ClientID);
+	return m_apPlayers[ClientID]->GetPlayerWorldID();
 }
 
 /* #########################################################################
@@ -1056,7 +1063,7 @@ void CGS::OnTick()
 	m_pController->Tick();
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
-		if(m_apPlayers[i] && m_WorldID == CheckPlayerMessageWorldID(i))
+		if(m_apPlayers[i] && m_WorldID == GetClientWorldID(i))
 		{
 			m_apPlayers[i]->Tick();
 			if(i < MAX_PLAYERS)
@@ -1093,7 +1100,7 @@ void CGS::OnTickLocalWorld()
 // Рисование вывод всех объектов 
 void CGS::OnSnap(int ClientID)
 {
-	if(CheckPlayerMessageWorldID(ClientID) != GetWorldID())
+	if(GetClientWorldID(ClientID) != GetWorldID())
 		return;
 
 	m_World.Snap(ClientID);
@@ -1361,7 +1368,7 @@ void CGS::OnClientConnected(int ClientID)
 {
 	if(!m_apPlayers[ClientID])
 	{
-		int savecidmem = ClientID+m_WorldID*MAX_CLIENTS;
+		const int savecidmem = ClientID+m_WorldID*MAX_CLIENTS;
 		m_apPlayers[ClientID] = new(savecidmem) CPlayer(this, ClientID);
 	}
 
@@ -1380,69 +1387,17 @@ void CGS::OnClientEnter(int ClientID)
 
 	m_pController->OnPlayerConnect(pPlayer);
 	SendChatCommands(ClientID);
-
-	// update client infos (others before local)
-	CNetMsg_Sv_ClientInfo NewClientInfoMsg;
-	NewClientInfoMsg.m_ClientID = ClientID;
-	NewClientInfoMsg.m_Local = 0;
-	NewClientInfoMsg.m_Team = pPlayer->GetTeam();
-	NewClientInfoMsg.m_pName = Server()->ClientName(ClientID);
-	NewClientInfoMsg.m_pClan = Server()->ClientClan(ClientID);
-	NewClientInfoMsg.m_Country = Server()->ClientCountry(ClientID);
-	NewClientInfoMsg.m_Silent = pPlayer->IsAuthed();
-	for(int p = 0; p < 6; p++)
-	{
-		NewClientInfoMsg.m_apSkinPartNames[p] = pPlayer->Acc().m_aaSkinPartNames[p];
-		NewClientInfoMsg.m_aUseCustomColors[p] = pPlayer->Acc().m_aUseCustomColors[p];
-		NewClientInfoMsg.m_aSkinPartColors[p] = pPlayer->Acc().m_aSkinPartColors[p];
-	}
-
+	SendClientInfo(ClientID, -1);
 	for(int i = 0; i < MAX_CLIENTS; ++i)
 	{
 		if(i == ClientID || !m_apPlayers[i] || !Server()->ClientIngame(i))
 			continue;
 
-		// new info for others
-		if(i < MAX_PLAYERS)
-			Server()->SendPackMsg(&NewClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, i);
-
-		// existing infos for new player
-		CNetMsg_Sv_ClientInfo ClientInfoMsg;
-		ClientInfoMsg.m_ClientID = i;
-		ClientInfoMsg.m_Local = 0;
-		ClientInfoMsg.m_Team = m_apPlayers[i]->GetTeam();
-
-		// имя
-		const bool Bot = m_apPlayers[i]->IsBot();
-		if(Bot)
-		{
-			CPlayerBot* pBotPlayer = static_cast<CPlayerBot*>(m_apPlayers[i]);
-			char aNickname[24];
-			pBotPlayer->GenerateNick(aNickname, sizeof(aNickname));
-			ClientInfoMsg.m_pName = aNickname;
-		}
-		else
-			ClientInfoMsg.m_pName = Server()->ClientName(i);
-
-		ClientInfoMsg.m_pClan = Server()->ClientClan(i);
-		ClientInfoMsg.m_Country = Server()->ClientCountry(i);
-		ClientInfoMsg.m_Silent = false;
-
-		const int BotID = m_apPlayers[i]->GetBotID();
-		for(int p = 0; p < 6; p++)
-		{
-			ClientInfoMsg.m_apSkinPartNames[p] = Bot ? BotJob::DataBot[BotID].SkinNameBot[p] : m_apPlayers[i]->Acc().m_aaSkinPartNames[p];
-			ClientInfoMsg.m_aUseCustomColors[p] = Bot ? BotJob::DataBot[BotID].UseCustomBot[p] : m_apPlayers[i]->Acc().m_aUseCustomColors[p];
-			ClientInfoMsg.m_aSkinPartColors[p] = Bot ? BotJob::DataBot[BotID].SkinColorBot[p] : m_apPlayers[i]->Acc().m_aSkinPartColors[p];
-		}
-		Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
+		SendClientInfo(i, ClientID);		
 	}
-	// local info
-	NewClientInfoMsg.m_Local = 1;
-	Server()->SendPackMsg(&NewClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
+	SendClientInfo(ClientID, ClientID);
 
 	// another
-	ResetVotes(ClientID, MenuList::MAIN_MENU);
 	if(!pPlayer->IsAuthed())
 	{
 		// информируем о смене команды
@@ -1459,9 +1414,9 @@ void CGS::OnClientEnter(int ClientID)
 
 	// fail check client
 	if(!CheckClient(ClientID))
-	{
 		SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 1000, "Vanilla client.\nSpecial client for MRPG.\n\"{STR}\"", g_Config.m_SvDiscordInviteGroup);
-	}
+
+	ResetVotes(ClientID, MenuList::MAIN_MENU);
 }
 
 // Выход игрока
@@ -1537,7 +1492,7 @@ void CGS::ChangeWorld(int ClientID)
 		delete m_apPlayers[ClientID];
 		m_apPlayers[ClientID] = nullptr;
 	}
-	int savecidmem = ClientID+m_WorldID*MAX_CLIENTS;
+	const int savecidmem = ClientID+m_WorldID*MAX_CLIENTS;
 	m_apPlayers[ClientID] = new(savecidmem) CPlayer(this, ClientID);
 }
 
@@ -2185,13 +2140,12 @@ void CGS::CreateBot(short BotType, int BotID, int SubID)
 	int BotClientID = MAX_PLAYERS;
 	while(BotClientID < MAX_CLIENTS && m_apPlayers[BotClientID])
 		BotClientID++;
-
 	if (BotClientID >= MAX_CLIENTS)
 		return;
 
-	int savecidmem = BotClientID+m_WorldID*MAX_CLIENTS;
-	m_apPlayers[BotClientID] = new(savecidmem) CPlayerBot(this, BotClientID, BotID, SubID, BotType);
 	Server()->InitClientBot(BotClientID);
+	const int savecidmem = BotClientID+m_WorldID*MAX_CLIENTS;
+	m_apPlayers[BotClientID] = new(savecidmem) CPlayerBot(this, BotClientID, BotID, SubID, BotType);
 }
 
 // Удалить ботов что не активны у людей для квестов
@@ -2215,15 +2169,14 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 	{
 		if(!m_apPlayers[i] || m_apPlayers[i]->GetBotType() != BotsTypes::TYPE_BOT_QUEST || m_apPlayers[i]->GetBotSub() != FindBot->SubBotID) 
 			continue;
-
 		QuestBotClientID = i;
 	}
 
 	// ищем есть ли активный бот у всех игроков
-	bool ActiveBot = Mmo()->Quest()->IsActiveQuestBot(QuestID, Step);
+	const bool ActiveBot = Mmo()->Quest()->IsActiveQuestBot(QuestID, Step);
 	if(ActiveBot && QuestBotClientID <= -1)
 	{
-		dbg_msg("test", "herte");
+		dbg_msg("test", "herte %d worldid", GetWorldID());
 		CreateBot(BotsTypes::TYPE_BOT_QUEST, FindBot->BotID, FindBot->SubBotID);
 	}
 	// если бот не активен не у одного игрока, но игрок найден удаляем
@@ -2376,7 +2329,7 @@ void CGS::UpdateZonePVP()
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && CheckPlayerMessageWorldID(i) == m_WorldID)
+		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && GetClientWorldID(i) == m_WorldID)
 			CountMobs++;
 	}
 	m_AllowedPVP = (bool)(CountMobs >= 3);
@@ -2396,7 +2349,7 @@ bool CGS::CheckPlayersDistance(vec2 Pos, float Distance) const
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(!m_apPlayers[i] || CheckPlayerMessageWorldID(i) != GetWorldID() || distance(Pos, m_apPlayers[i]->m_ViewPos) > Distance)
+		if(!m_apPlayers[i] || GetClientWorldID(i) != GetWorldID() || distance(Pos, m_apPlayers[i]->m_ViewPos) > Distance)
 			continue;
 		return true;
 	}

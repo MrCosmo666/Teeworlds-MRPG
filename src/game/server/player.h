@@ -94,21 +94,24 @@ public:
 	{
 		return (bool)(m_ClientID >= MAX_PLAYERS && m_ClientID < MAX_CLIENTS);
 	};
+	virtual int GetTeam();
 	virtual int GetBotID() { return -1; };
 	virtual int GetBotType() { return -1; };
 	virtual int GetBotSub() { return -1; };
-	virtual int IsActiveSnappingBot(int SnappingClient) { return 2; };
+	virtual int GetStartHealth();
 	virtual	int GetHealth() { return GetTempData().TempHealth; };
 	virtual	int GetMana() { return GetTempData().TempMana; };
+	virtual	int GetPlayerWorldID() const;
+
+	virtual int IsActiveSnappingBot(int SnappingClient) { return 2; };
 	virtual void SetDungeonAllowedSpawn(bool Spawn) { return; };
+	virtual int GetEquippedItem(int EquipID, int SkipItemID = -1) const;
+	virtual int GetAttributeCount(int BonusID, bool Really = false, bool Searchclass = false);
 	virtual void UpdateTempData(int Health, int Mana);
+	virtual void SendClientInfo(int TargetID);
 
 	virtual void Tick();
-	virtual int GetTeam();
-	virtual int GetStartHealth();
-	virtual int GetAttributeCount(int BonusID, bool Really = false, bool Searchclass = false);
 	virtual void Snap(int SnappingClient);
-	virtual int GetEquippedItem(int EquipID, int SkipItemID = -1) const;
 	
 	void HandleTuningParams();
 private:

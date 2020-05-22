@@ -86,7 +86,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_OldPos = Pos;
 	m_NoAllowDamage = false;
 	m_Event = TILE_CLEAR_EVENTS;
-	m_Core.m_WorldID = GS()->CheckPlayerMessageWorldID(m_pPlayer->GetCID());
+	m_Core.m_WorldID = GS()->GetClientWorldID(m_pPlayer->GetCID());
 	if(!m_pPlayer->IsBot())
 	{
 		m_pPlayer->m_MoodState = m_pPlayer->GetMoodState();
@@ -1101,7 +1101,7 @@ bool CCharacter::IsAllowedPVP(int FromID)
 	if(!m_pPlayer->IsBot() && !pFrom->IsBot())
 	{
 		// anti settings pvp
-		if(pFrom->GetItem(itModePVP).IsEquipped() || m_pPlayer->GetItem(itModePVP).IsEquipped())
+		if(!pFrom->GetItem(itModePVP).IsEquipped() || !m_pPlayer->GetItem(itModePVP).IsEquipped())
 			return false;
 
 		// anti pvp on safe world or dungeon
@@ -1121,10 +1121,8 @@ bool CCharacter::IsAllowedPVP(int FromID)
 	const int FromAttributeLevel = pFrom->GetLevelDisciple(AtributType::AtDps) + pFrom->GetLevelDisciple(AtributType::AtTank) + pFrom->GetAttributeCount(AtributType::AtHealer);
 	const int PlayerAttributeLevel = m_pPlayer->GetLevelDisciple(AtributType::AtDps) + m_pPlayer->GetLevelDisciple(AtributType::AtTank) + m_pPlayer->GetAttributeCount(AtributType::AtHealer);
 	if(!pFrom->IsBot() && !m_pPlayer->IsBot() && ((FromAttributeLevel - PlayerAttributeLevel > g_Config.m_SvStrongAntiPVP) || (PlayerAttributeLevel - FromAttributeLevel > g_Config.m_SvStrongAntiPVP)))
-	{
-		GS()->Chat(FromID, "Battle PVP and so clear. Denied, some of you are weak.");
 		return false;
-	}
+
 	return true;
 }
 
