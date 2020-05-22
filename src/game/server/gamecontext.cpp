@@ -2175,10 +2175,7 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 	// ищем есть ли активный бот у всех игроков
 	const bool ActiveBot = Mmo()->Quest()->IsActiveQuestBot(QuestID, Step);
 	if(ActiveBot && QuestBotClientID <= -1)
-	{
-		dbg_msg("test", "herte %d worldid", GetWorldID());
 		CreateBot(BotsTypes::TYPE_BOT_QUEST, FindBot->BotID, FindBot->SubBotID);
-	}
 	// если бот не активен не у одного игрока, но игрок найден удаляем
 	if (!ActiveBot && QuestBotClientID >= MAX_PLAYERS)
 	{

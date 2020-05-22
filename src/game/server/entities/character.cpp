@@ -515,10 +515,14 @@ void CCharacter::ResetInput()
 
 void CCharacter::Tick()
 {
+	if(!IsAlive())
+		return;
+
 	HandleTunning();
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true, &m_pPlayer->m_NextTuningParams);
 	m_pPlayer->UpdateTempData(m_Health, m_Mana);
+
 	if(GameLayerClipped(m_Pos))
 		Die(m_pPlayer->GetCID(), WEAPON_SELF);
 
@@ -529,13 +533,14 @@ void CCharacter::Tick()
 	}
 
 	// запретить дальше НПС и Квестовым
-	if (m_pPlayer->IsBot() && m_pPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB)
+	const bool IsBot = m_pPlayer->IsBot();
+	if (IsBot && m_pPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB)
 		return;
 
 	HandleWeapons();
 
 	// запретить дальше Мобам
-	if (m_pPlayer->IsBot() || IsLockedWorld())
+	if (IsBot || IsLockedWorld())
 		return;
 
 	// another function
@@ -549,9 +554,9 @@ void CCharacter::Tick()
 
 void CCharacter::TickDefered()
 {
-	if(m_pPlayer->IsBot() && !GS()->CheckPlayersDistance(m_Core.m_Pos, 1000.0f))
+	if(!IsAlive())
 		return;
-
+	
 	if (m_DoorHit)
 	{
 		ResetDoorPos();

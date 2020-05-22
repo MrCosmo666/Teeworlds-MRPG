@@ -49,7 +49,6 @@ void WorldSwapJob::OnInitWorld(const char* pWhereLocalWorld)
 	{
 		const int RespawnWorld = (int)RES->getInt("RespawnWorld");
 		SJK.UD("ENUM_WORLDS", "Name = '%s' WHERE WorldID = '%d'", world_name.cstr(), WorldID);
-		dbg_msg("test", "for world %d respawn world %d", WorldID, RespawnWorld);
 		GS()->SetRespawnWorld(RespawnWorld);
 		return;
 	}

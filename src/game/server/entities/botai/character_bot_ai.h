@@ -20,11 +20,11 @@ public:
 
 	int GetBotTarget() const { return m_BotTargetID; };
 
-
 private: 
 	class CPlayerBot* m_pBotPlayer;
 	
 	// bot ai
+	bool m_BotActive;
 	int m_MoveTick;
 	int m_PrevDirection;
 	vec2 m_PrevPos;
@@ -32,7 +32,6 @@ private:
 	int m_EmotionsStyle;
 
 	// target system
-	bool m_BotActive;
 	int m_BotTargetID;
 	int m_BotTargetLife;
 	bool m_BotTargetCollised;
@@ -40,6 +39,7 @@ private:
 
 	virtual bool Spawn(class CPlayer *pPlayer, vec2 Pos);
 	virtual void Tick();
+	virtual void TickDefered();
 	virtual bool TakeDamage(vec2 Force, int Dmg, int From, int Weapon);
 	virtual void Die(int Killer, int Weapon);
 	virtual bool GiveWeapon(int Weapon, int GiveAmmo);

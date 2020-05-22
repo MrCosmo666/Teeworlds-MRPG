@@ -157,13 +157,11 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 	Buffer.clear();
 
 	// дальше уже организуем крафт
-
 	int Discount = (int)kurosio::translate_to_procent_rest(Craft[CraftID].Price, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount));
 	int LastPrice = clamp(Craft[CraftID].Price - Discount, 0, Craft[CraftID].Price);
 	if(pPlayer->CheckFailMoney(LastPrice))
 		return;
 
-	dbg_msg("testy", "here");
 	for(int i = 0; i < 3; i++) 
 	{
 		int SearchItemID = Craft[CraftID].ItemNeedID[i]; 

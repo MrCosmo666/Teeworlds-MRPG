@@ -27,7 +27,7 @@ bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 	if(!m_pBotPlayer)
 		return false;
 
-	if(!CCharacter::Spawn(pPlayer, Pos))
+	if(!CCharacter::Spawn(m_pBotPlayer, Pos))
 		return false;
 
 	ClearTarget();
@@ -226,6 +226,14 @@ void CCharacterBotAI::Tick()
 		EngineBots();
 
 	CCharacter::Tick();
+}
+
+void CCharacterBotAI::TickDefered()
+{
+	if(!m_BotActive || !IsAlive())
+		return;
+
+	CCharacter::TickDefered();
 }
 
 // Интерактивы ботов
