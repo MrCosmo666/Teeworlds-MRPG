@@ -126,7 +126,7 @@ MACRO_CONFIG_INT(SvInactiveKickTime, sv_inactivekick_time, 3, 0, 1000, CFGFLAG_S
 MACRO_CONFIG_INT(SvInactiveKick, sv_inactivekick, 2, 0, 3, CFGFLAG_SERVER, "How to deal with inactive clients (0=move player to spectator, 1=move player to spectator and kick spectator, 2=move to free spectator slot/kick, 3=kick)")
 
 // another config
-MACRO_CONFIG_INT(SvPriceTeleport, sv_price_teleport, 120, 0, 10000, CFGFLAG_SERVER, "Price for teleport*WorldID")
+MACRO_CONFIG_INT(SvPriceTeleport, sv_price_teleport, 20, 0, 10000, CFGFLAG_SERVER, "Price for teleport*WorldID")
 MACRO_CONFIG_INT(SvDoorRadiusHit, sv_door_radius_hit, 16, 16, 1000, CFGFLAG_SERVER, "Door radius hit.")
 
 // auction

@@ -233,7 +233,7 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 				m_ShowedTankingInfo = true;
 				pChr->GetPlayer()->m_MoodState = MOOD_PLAYER_TANK;
 				if(m_SelectedWithVotes)
-					GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank is assigned to {STR} with {INT} votes..", 
+					GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank is assigned to {STR} with {INT} votes!", 
 						Server()->ClientName(ClientID), &pChr->GetPlayer()->GetTempData().TempTankVotingDungeon);
 				else
 				{
@@ -248,6 +248,15 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 				GS()->Chat(ClientID, "You were thrown out of dungeon!");
 				pChr->GetPlayer()->ChangeWorld(pChr->GetPlayer()->Acc().LastWorldID);
 				return false;
+			}
+		}
+		else
+		{
+			for(int i = 0; i < MAX_PLAYERS; i++)
+			{
+				if(!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID)
+					continue;
+				GS()->VResetVotes(i, MenuList::MENU_DUNGEONS);
 			}
 		}
 	}

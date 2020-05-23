@@ -99,7 +99,6 @@ void DungeonJob::ShowTankVotingDungeon(CPlayer* pPlayer)
 
 		GS()->AVM(ClientID, "DUNGEONVOTE", i, NOPE, "Vote for {STR} (Votes: {INT})", GS()->Server()->ClientName(i), &pSearchPlayer->GetTempData().TempTankVotingDungeon);
 	}
-	GS()->AVL(ClientID, "DUNGEONREFRESH", "Refresh voting list");
 }
 
 void DungeonJob::CheckQuestingOpened(CPlayer *pPlayer, int QuestID)
@@ -209,12 +208,6 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 		GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
-	else if(PPSTR(CMD, "DUNGEONREFRESH") == 0)
-	{
-		GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-		return true;
-	}
-
 	return false;
 }
 
