@@ -34,6 +34,7 @@ void MailBoxJob::InteractiveInbox(CPlayer *pPlayer, int InboxID)
 // показываем список писем
 void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 {
+	int LetterID = 0;
 	bool EmptyMailBox = true;
 	const int ClientID = pPlayer->GetCID();
 	int HideID = (int)(NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 200);
@@ -42,25 +43,29 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 	{
 		// получаем информацию для создания предмета
 		const int MailID = RES->getInt("ID"), ItemID = RES->getInt("ItemID");
-		const int Count = RES->getInt("Count"); HideID++;
+		const int Count = RES->getInt("Count"); HideID++; LetterID++;
 		const int Enchant = RES->getInt("Enchant");
 		EmptyMailBox = false;
 
 		// добавляем меню голосования
-		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "✉ Mail Name ID {INT}: {STR}", &MailID, RES->getString("MailName").c_str());
-		GS()->AVM(ClientID, "null", NOPE, HideID, "Desc: {STR}", RES->getString("MailDesc").c_str());
+		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "✉ Letter({INT}) {STR}", &LetterID, RES->getString("MailName").c_str());
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", RES->getString("MailDesc").c_str());
 
 		// проверяем мы читаем или получаем предмет
 		if(ItemID <= 0 || Count <= 0)
-			GS()->AVM(ClientID, "MAIL", MailID, HideID, "I readed (delete email) MID {INT}", &MailID);
+			GS()->AVM(ClientID, "MAIL", MailID, HideID, "I read it (L{INT})", &LetterID);
 		// зачарованный предмет
-		else if(Enchant > 0)
-			GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive and delete email [{STR}+{INT}x{INT}] MID {INT}", 
-				GS()->GetItemInfo(ItemID).GetName(pPlayer), &Enchant, &Count, &MailID);
+		else if(GS()->GetItemInfo(ItemID).IsEnchantable())
+		{
+			char aEnchantSize[16];
+			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);
+			GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive {STR}{STR} (L{INT})",
+				GS()->GetItemInfo(ItemID).GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &LetterID);
+		}
 		// обычный предмет
 		else
-			GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive and delete email [{STR}x{INT}] MID {INT}",
-				GS()->GetItemInfo(ItemID).GetName(pPlayer), &Count, &MailID);
+			GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive {STR}x{INT} (L{INT})",
+				GS()->GetItemInfo(ItemID).GetName(pPlayer), &Count, &LetterID);
 	}
 
 	// если пустой inbox
@@ -85,7 +90,7 @@ void MailBoxJob::SendInbox(int AuthID, const char* Name, const char* Desc, int I
 	CSqlString<64> cDesc = CSqlString<64>(Desc);
 
 	// проверяем игрока онлайн
-	GS()->ChatAccountID(AuthID, "You have a new [{STR}] mail!", cName.cstr());
+	GS()->ChatAccountID(AuthID, "[Mailbox] New letter ({STR})!", cName.cstr());
 	if (ItemID <= 0)
 	{
 		SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, OwnerID) VALUES ('%s', '%s', '%d');", cName.cstr(), cDesc.cstr(), AuthID);

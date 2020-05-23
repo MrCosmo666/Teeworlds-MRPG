@@ -76,7 +76,7 @@ void CHealthHealer::Tick()
 	{
 		char aBuf[16];
 		str_format(aBuf, sizeof(aBuf), "%dHP", HealthRestore);
-		GS()->CreateText(NULL, false, vec2(m_Pos.x, m_Pos.y - 96.0f), vec2(0, 0), 40, aBuf, GS()->GetWorldID());
+		GS()->CreateText(NULL, false, vec2(m_Pos.x, m_Pos.y - 96.0f), vec2(0, 0), 40, aBuf);
 	}
 }
 

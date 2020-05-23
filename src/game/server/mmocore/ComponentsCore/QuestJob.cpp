@@ -170,7 +170,7 @@ void QuestJob::CollectItem(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData)
 	for(int i = 0; i < 2; i++)
 	{
 		const int ItemID = BotData.ItemGives[i];
-		const int Count = BotData.ItemGivesCount[i] - pPlayer->GetItem(ItemID).Count;
+		const int Count = BotData.ItemGivesCount[i];
 		if(ItemID > 0 && Count > 0)
 		{
 			if(antiStressing)
@@ -178,6 +178,13 @@ void QuestJob::CollectItem(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData)
 				Job()->Item()->AddItemSleep(pPlayer->Acc().AuthID, ItemID, Count, 300);
 				continue;
 			}
+
+			if(pPlayer->GetItem(ItemID).Info().IsEnchantable() && pPlayer->GetItem(ItemID).Count >= 1)
+			{
+				GS()->SendInbox(pPlayer->GetCID(), "No place for item", "You already have this item, but we can't put it in inventory", ItemID, 1);
+				continue;
+			}
+
 			pPlayer->GetItem(ItemID).Add(Count);
 		}
 	}	
@@ -384,8 +391,8 @@ bool QuestJob::CheckNewStories(CPlayer *pPlayer, int CheckQuestID)
 
 void QuestJob::ShowQuestList(CPlayer* pPlayer, int StateQuest)
 {
-	char storyLineSave[32];
-	bool foundQuests = false;
+	char aStoryLineSave[32];
+	bool FoundQuests = false;
 	const int ClientID = pPlayer->GetCID();
 
 	pPlayer->m_Colored = GOLDEN_COLOR;
@@ -399,16 +406,16 @@ void QuestJob::ShowQuestList(CPlayer* pPlayer, int StateQuest)
 
 		if (StateQuest != QuestState::QUEST_FINISHED)
 		{
-			if (str_comp(storyLineSave, qd.second.StoryLine) == 0)
+			if (str_comp(aStoryLineSave, qd.second.StoryLine) == 0)
 				continue;
 
-			str_copy(storyLineSave, qd.second.StoryLine, sizeof(storyLineSave));
+			str_copy(aStoryLineSave, qd.second.StoryLine, sizeof(aStoryLineSave));
 		}
 		ShowQuestID(pPlayer, questID);
-		foundQuests = true;
+		FoundQuests = true;
 	}
 
-	if (!foundQuests)
+	if (!FoundQuests)
 	{
 		pPlayer->m_Colored = LIGHT_GOLDEN_COLOR;
 		GS()->AV(ClientID, "null", "This list is empty");
@@ -442,7 +449,6 @@ bool QuestJob::ShowAdventureActiveNPC(CPlayer* pPlayer)
 {
 	bool activeNPC = false;
 	const int clientID = pPlayer->GetCID();
-
 	pPlayer->m_Colored = BLUE_COLOR;
 	GS()->AVM(clientID, "null", NOPE, NOPE, "Active NPC for current quests");
 
@@ -459,10 +465,10 @@ bool QuestJob::ShowAdventureActiveNPC(CPlayer* pPlayer)
 
 		// если нашли выводим информацию
 		int HideID = (NUM_TAB_MENU + 12500 + BotInfo->QuestID);
-		int PosX = BotInfo->PositionX / 32, PosY = BotInfo->PositionY / 32;
-		GS()->AVH(clientID, HideID, LIGHT_BLUE_COLOR, "[{STR}] {STR} {STR}(x:{INT} y:{INT})", GetStoryName(qq.first), BotInfo->GetName(), GS()->Server()->GetWorldName(BotInfo->WorldID), &PosX, &PosY);
+		const int PosX = BotInfo->PositionX / 32, PosY = BotInfo->PositionY / 32;
+		GS()->AVH(clientID, HideID, LIGHT_BLUE_COLOR, "[{STR}] {STR} {STR}(x{INT} y{INT})", GetStoryName(qq.first), BotInfo->GetName(), GS()->Server()->GetWorldName(BotInfo->WorldID), &PosX, &PosY);
 
-		bool interactiveNeed = false;
+		bool JustTalk = true;
 		for (int i = 0; i < 2; i++)
 		{
 			const int botID = BotInfo->NeedMob[i];
@@ -470,7 +476,7 @@ bool QuestJob::ShowAdventureActiveNPC(CPlayer* pPlayer)
 			if(botID > 0 && killNeed > 0 && Job()->BotsData()->IsDataBotValid(botID))
 			{
 				GS()->AVM(clientID, "null", NOPE, HideID, "- Defeat {STR} [{INT}/{INT}]", BotJob::DataBot[botID].NameBot, &qq.second.MobProgress[i], &killNeed);
-				interactiveNeed = true;
+				JustTalk = false;
 			}
 
 			const int itemID = BotInfo->ItemSearch[i];
@@ -481,7 +487,7 @@ bool QuestJob::ShowAdventureActiveNPC(CPlayer* pPlayer)
 				int ownCount = clamp(PlayerSearchItem.Count, 0, itemCount);
 
 				GS()->AVMI(clientID, PlayerSearchItem.Info().GetIcon(), "null", NOPE, HideID, "- Item {STR} [{INT}/{INT}]", PlayerSearchItem.Info().GetName(pPlayer), &ownCount, &itemCount);
-				interactiveNeed = true;
+				JustTalk = false;
 			}
 		}
 		for(int i = 0; i < 2; i++)
@@ -492,12 +498,12 @@ bool QuestJob::ShowAdventureActiveNPC(CPlayer* pPlayer)
 			{
 				ItemJob::ItemInformation GivedInfItem = GS()->GetItemInfo(itemID);
 				GS()->AVMI(clientID, GivedInfItem.GetIcon(), "null", NOPE, HideID, "- Receive {STR}x{INT}", GivedInfItem.GetName(pPlayer), &itemCount);
-				interactiveNeed = true;
+				JustTalk = false;
 			}
 		}
 
 		// если не нашли ничего что он делает
-		if (!interactiveNeed)
+		if (JustTalk)
 			GS()->AVM(clientID, "null", NOPE, HideID, "You just need to talk.");
 
 		activeNPC = true;
@@ -563,7 +569,7 @@ void QuestJob::QuestTableShowRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &Bo
 	}
 
 	// показываем все информацию
-	GS()->Motd(ClientID, "{STR}\n\n {STR}{STR}\n\n", TextTalk, (ShowItemNeeded ? "- Task" : "\0"), Buffer.buffer());
+	GS()->Motd(ClientID, "{STR}\n\n{STR}{STR}\n\n", TextTalk, (ShowItemNeeded ? "### Task" : "\0"), Buffer.buffer());
 	pPlayer->ClearFormatQuestText();
 	Buffer.clear();
 }

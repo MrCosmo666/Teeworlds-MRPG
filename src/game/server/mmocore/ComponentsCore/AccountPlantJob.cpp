@@ -94,7 +94,7 @@ void AccountPlantJob::Work(CPlayer* pPlayer, int Level)
 		{
 			GS()->CreateSound(pPlayer->GetCharacter()->m_Core.m_Pos, 4);
 			GS()->CreateDeath(pPlayer->GetCharacter()->m_Core.m_Pos, ClientID);
-			GS()->CreateText(pPlayer->GetCharacter(), false, vec2(0, -40), vec2(0, -1), 40, "plants up", GS()->Server()->GetWorldID(ClientID));
+			GS()->CreateText(pPlayer->GetCharacter(), false, vec2(0, -40), vec2(0, -1), 40, "plants up");
 		}
 		GS()->ChatFollow(ClientID, "Plants Level UP. Now Level {INT}!", &pPlayer->Acc().Plant[PlLevel]);
 	}

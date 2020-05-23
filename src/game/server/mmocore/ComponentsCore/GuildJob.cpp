@@ -578,7 +578,7 @@ void GuildJob::OnTick()
 
 void GuildJob::TickHousingText()
 {
-	if (GS()->Server()->Tick() % (GS()->Server()->TickSpeed()) != 0)
+	if (GS()->Server()->Tick() % (GS()->Server()->TickSpeed() * 2) != 0)
 		return;
 
 	for (const auto& mh : HouseGuild)
@@ -586,14 +586,14 @@ void GuildJob::TickHousingText()
 		if (mh.second.m_WorldID != GS()->GetWorldID())
 			continue;
 
-		const int LifeTime = GS()->Server()->TickSpeed() - 5;
+		const int LifeTime = (GS()->Server()->TickSpeed() * 2) - 5;
 		const int GuildID = mh.second.m_GuildID;
 		if (GuildID > 0)
 		{
-			GS()->CreateText(NULL, false, vec2(mh.second.m_TextX, mh.second.m_TextY), vec2(0, 0), LifeTime, Guild[GuildID].m_Name, mh.second.m_WorldID);
+			GS()->CreateText(NULL, false, vec2(mh.second.m_TextX, mh.second.m_TextY), vec2(0, 0), LifeTime, Guild[GuildID].m_Name);
 			continue;
 		}
-		GS()->CreateText(NULL, false, vec2(mh.second.m_TextX, mh.second.m_TextY), vec2(0, 0), LifeTime, "GUILD HOUSE", mh.second.m_WorldID);
+		GS()->CreateText(NULL, false, vec2(mh.second.m_TextX, mh.second.m_TextY), vec2(0, 0), LifeTime, "GUILD HOUSE");
 	}
 }
 

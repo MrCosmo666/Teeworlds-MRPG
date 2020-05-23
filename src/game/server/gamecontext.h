@@ -184,7 +184,6 @@ public:
 	void SendChatCommands(int ClientID);
 	void SendRemoveChatCommand(const CCommandManager::CCommand* pCommand, int ClientID);
 
-	void SendClientInfo(int ClientID, int TargetID);
 	void SendTuningParams(int ClientID);
 	void SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char *Message, int Style = -1, int TalkingEmote = -1);
 	void SendProgressBar(int ClientID, int Count, int Request, const char *Message);
@@ -274,7 +273,7 @@ public:
 		MMO GAMECONTEXT 
 	######################################################################### */
 	void CreateBot(short BotType, int BotID, int SubID);
-	void CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, int WorldID);
+	void CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText);
 	void CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop = 1, vec2 Force = vec2(0.0f, 0.0f));
 	void CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant = 0, vec2 Force = vec2(0.0f, 0.0f));
 	void CreateDropItem(vec2 Pos, int ClientID, ItemJob::InventoryItem &pPlayerItem, int Count, vec2 Force = vec2(0.0f, 0.0f));
@@ -301,8 +300,8 @@ public:
 	int GetRespawnWorld() const { return m_RespawnWorld; }
 
 private:
-	void UpdateZoneDungeon();
 	void UpdateZonePVP();
+	void UpdateZoneDungeon();
 
 	/* #########################################################################
 		FUNCTIONS PLAYER ITEMS

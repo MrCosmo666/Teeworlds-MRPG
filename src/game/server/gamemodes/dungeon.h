@@ -29,6 +29,7 @@ class CGameControllerDungeon : public IGameController
 	int m_Time[MAX_PLAYERS];
 	bool m_ShowedTankingInfo;
 	int m_StartedPlayers;
+	int m_TankClientID;
 
 public:
 	CGameControllerDungeon(class CGS* pGameServer);

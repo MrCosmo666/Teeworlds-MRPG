@@ -155,12 +155,12 @@ const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const
 	{
 		if(HidenTabs)
 			return ID >= NUM_TAB_MENU ? ("▵ ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("▼ :: ") : ("▲ :: "));
-		return ID >= NUM_TAB_MENU ? ("▿  ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("▲ :: ") : ("▼ :: "));
+		return ID >= NUM_TAB_MENU ? ("▿ ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("▲ :: ") : ("▼ :: "));
 	}
 
 	if(HidenTabs)
-		return ID >= NUM_TAB_MENU ? ("/\\ :: ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("\\/ :: ") : ("/\\ :: "));
-	return ID >= NUM_TAB_MENU ? ("\\/ :: ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("/\\ :: ") : ("\\/ :: "));
+		return ID >= NUM_TAB_MENU ? ("/\\ # ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("\\/ # ") : ("/\\ # "));
+	return ID >= NUM_TAB_MENU ? ("\\/ # ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("/\\ # ") : ("\\/ # "));
 }
 
 /* #########################################################################
@@ -885,25 +885,6 @@ void CGS::SendRemoveChatCommand(const CCommandManager::CCommand* pCommand, int C
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
-// Отправить информацию о клиенте
-void CGS::SendClientInfo(int ClientID, int TargetID)
-{
-	if(TargetID != -1 && (TargetID < 0 || TargetID >= MAX_PLAYERS || !Server()->ClientIngame(TargetID)))
-		return;
-
-	CPlayer* pPlayer = m_apPlayers[ClientID];
-	if(!pPlayer)
-		return;
-
-	if(pPlayer->IsBot())
-	{
-		CPlayerBot *pPlayerBot = static_cast<CPlayerBot*>(pPlayer);
-		pPlayerBot->SendClientInfo(TargetID);
-		return;
-	}
-	pPlayer->SendClientInfo(TargetID);
-}
-
 // Отправить тюннинг
 void CGS::SendTuningParams(int ClientID)
 {
@@ -1087,11 +1068,11 @@ void CGS::OnTickLocalWorld()
 	// получить и отправить измененный день
 	if(m_DayEnumType != Server()->GetEnumTypeDay())
 	{
-		Chat(-1, "{STR} came! Good {STR}!", Server()->GetStringTypeDay(), Server()->GetStringTypeDay());
-
-		m_DayEnumType = Server()->GetEnumTypeDay();
-		if (m_DayEnumType == DayType::NIGHTTYPE)
+		m_DayEnumType = Server()->GetEnumTypeDay(); 
+		if(m_DayEnumType == DayType::NIGHTTYPE)
 			m_RaidExp = 100 + rand() % 200;
+		else if(m_DayEnumType == DayType::MORNINGTYPE)
+			m_RaidExp = 100;
 	
 		SendDayInfo(-1);
 	}
@@ -1387,15 +1368,15 @@ void CGS::OnClientEnter(int ClientID)
 
 	m_pController->OnPlayerConnect(pPlayer);
 	SendChatCommands(ClientID);
-	SendClientInfo(ClientID, -1);
+	pPlayer->SendClientInfo(-1);
 	for(int i = 0; i < MAX_CLIENTS; ++i)
 	{
 		if(i == ClientID || !m_apPlayers[i] || !Server()->ClientIngame(i))
 			continue;
 
-		SendClientInfo(i, ClientID);		
+		m_apPlayers[i]->SendClientInfo(ClientID);
 	}
-	SendClientInfo(ClientID, ClientID);
+	pPlayer->SendClientInfo(ClientID);
 
 	// another
 	if(!pPlayer->IsAuthed())
@@ -1414,7 +1395,7 @@ void CGS::OnClientEnter(int ClientID)
 
 	// fail check client
 	if(!CheckClient(ClientID))
-		SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 1000, "Vanilla client.\nSpecial client for MRPG.\n\"{STR}\"", g_Config.m_SvDiscordInviteGroup);
+		SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 1000, "Special client for MRPG.\n\"{STR}\"", g_Config.m_SvDiscordInviteGroup);
 
 	ResetVotes(ClientID, MenuList::MAIN_MENU);
 }
@@ -1899,7 +1880,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AV(ClientID, "null", "");
 
 		// меню информации
-		AVH(ClientID, TAB_INFORMATION, BLUE_COLOR, "# SUB MENU INFORMATION");
+		AVH(ClientID, TAB_INFORMATION, BLUE_COLOR, "√ SUB MENU INFORMATION");
 		AVM(ClientID, "MENU", MenuList::MENU_GUIDEDROP, TAB_INFORMATION, "Loots, mobs on your zone");
 		AVM(ClientID, "MENU", MenuList::MENU_TOP_LIST, TAB_INFORMATION, "Ranking guilds and players");
 		AV(ClientID, "null", "");
@@ -1995,7 +1976,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	else if (MenuList == MenuList::MENU_TOP_LIST)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
-
 		AVH(ClientID, TAB_INFO_TOP, GREEN_COLOR, "Top list Information");
 		AVM(ClientID, "null", NOPE, TAB_INFO_TOP, "Here you can see top server Guilds, Players.");
 		AV(ClientID, "null", "");
@@ -2009,7 +1989,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	else if(MenuList == MenuList::MENU_GUIDEDROP) 
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
-
 		AVH(ClientID, TAB_INFO_LOOT, GREEN_COLOR, "Chance & Loot Information");
 		AVM(ClientID, "null", NOPE, TAB_INFO_LOOT, "Here you can see chance loot, mobs, on YOUR ZONE.");
 		AV(ClientID, "null", "");
@@ -2022,8 +2001,8 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 				continue;
 
 			const int HideID = (NUM_TAB_MENU+12500+mobs.first);
-			int PosX = mobs.second.PositionX/32, PosY = mobs.second.PositionY/32;
-			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} {STR}(x: {INT} y: {INT})", mobs.second.GetName(), Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY);
+			const int PosX = mobs.second.PositionX/32, PosY = mobs.second.PositionY/32;
+			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} {STR}(x{INT} y{INT})", mobs.second.GetName(), Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY);
 	
 			for(int i = 0; i < 6; i++)
 			{
@@ -2185,14 +2164,14 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 }
 
 // Создать Лол текст в мире
-void CGS::CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, int WorldID)
+void CGS::CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText)
 {
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
 		if (m_apPlayers[i] && distance(m_apPlayers[i]->m_ViewPos, Pos) < 800.0f)
 		{
 			CLoltext Text;
-			Text.Create(this, &m_World, pParent, Pos, Vel, Lifespan, pText, true, Follow, WorldID);
+			Text.Create(&m_World, pParent, Pos, Vel, Lifespan, pText, true, Follow);
 			return;
 		}
 	}
@@ -2238,7 +2217,7 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, ItemJob::InventoryItem &pPlayer
 bool CGS::TakeItemCharacter(int ClientID)
 {
 	CPlayer *pPlayer = GetPlayer(ClientID, true);
-	if(!pPlayer || !pPlayer->GetCharacter() /*|| pChar->m_ReloadTimer*/)
+	if(!pPlayer || !pPlayer->GetCharacter())
 		return false;
 
 	CDropItem *pDrop = (CDropItem*)m_World.ClosestEntity(pPlayer->GetCharacter()->m_Core.m_Pos, 64, CGameWorld::ENTTYPE_DROPITEM, nullptr);
@@ -2259,27 +2238,18 @@ void CGS::SendInbox(int ClientID, const char* Name, const char* Desc, int ItemID
 // отправить информацию о дне
 void CGS::SendDayInfo(int ClientID)
 {
+	Chat(-1, "{STR} came! Good {STR}!", Server()->GetStringTypeDay(), Server()->GetStringTypeDay());
 	if(m_DayEnumType == DayType::NIGHTTYPE)
-	{
-		if(ClientID == -1) { m_RaidExp = 100+rand()%200; } // для всех значит глобально
 		Chat(ClientID, "Night increase to experience {INT}%", &m_RaidExp);
-
-	}
 	else if(m_DayEnumType == DayType::MORNINGTYPE)
-	{
-		if(ClientID == -1) { m_RaidExp = 100; } // для всех значит глобально
 		Chat(ClientID, "Day, experience was downgraded to 100%");
-	}
 }
 
 // Сменить Снаряжение автоматически найти тип по Предмету
 void CGS::ChangeEquipSkin(int ClientID, int ItemID)
 {
 	CPlayer *pPlayer = GetPlayer(ClientID, true);
-	if(!pPlayer)
-		return;
-	
-	if (GetItemInfo(ItemID).Type != ItemType::TYPE_EQUIP || GetItemInfo(ItemID).Function == EQUIP_DISCORD || GetItemInfo(ItemID).Function == EQUIP_MINER)
+	if(!pPlayer || GetItemInfo(ItemID).Type != ItemType::TYPE_EQUIP || GetItemInfo(ItemID).Function == EQUIP_DISCORD || GetItemInfo(ItemID).Function == EQUIP_MINER)
 		return;
 
 	SendEquipItem(ClientID, -1);
@@ -2289,56 +2259,55 @@ void CGS::ChangeEquipSkin(int ClientID, int ItemID)
 int CGS::IncreaseCountRaid(int IncreaseCount) const
 {
 	if(IsDungeon())
-		return (int)kurosio::translate_to_procent_rest(IncreaseCount, 200);
+		return (int)kurosio::translate_to_procent_rest(IncreaseCount, 150);
 	return (int)kurosio::translate_to_procent_rest(IncreaseCount, m_RaidExp);
-}
-
-// Проверяем данж ли этот мир или нет
-void CGS::UpdateZoneDungeon()
-{
-	for(const auto& dd : DungeonJob::Dungeon)
-	{
-		if (m_WorldID == dd.second.WorldID)
-		{
-			m_DungeonID = dd.first;
-			return;
-		}
-	}
-	m_DungeonID = 0;
-}
-
-bool CGS::IsClientEqualWorldID(int ClientID, int WorldID) const
-{
-	if (WorldID <= -1)
-		return (bool)(Server()->GetWorldID(ClientID) == m_WorldID);
-	return (bool)(Server()->GetWorldID(ClientID) == WorldID);
 }
 
 void CGS::UpdateZonePVP()
 {
-	if (IsDungeon())
+	if(IsDungeon())
 	{
 		m_AllowedPVP = false;
 		return;
 	}
 
 	int CountMobs = 0;
-	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
+	for(int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && GetClientWorldID(i) == m_WorldID)
+		if(BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && GetClientWorldID(i) == m_WorldID)
 			CountMobs++;
 	}
 	m_AllowedPVP = (bool)(CountMobs >= 3);
 }
 
+void CGS::UpdateZoneDungeon()
+{
+	for(const auto& dd : DungeonJob::Dungeon)
+	{
+		if(m_WorldID != dd.second.WorldID)
+			continue;
+		
+		m_DungeonID = dd.first;
+		return;
+	}
+	m_DungeonID = 0;
+}
+
+bool CGS::IsClientEqualWorldID(int ClientID, int WorldID) const
+{
+	if(!m_apPlayers[ClientID])
+		return false;
+
+	if (WorldID <= -1)
+		return (bool)(m_apPlayers[ClientID]->GetPlayerWorldID() == m_WorldID);
+	return (bool)(m_apPlayers[ClientID]->GetPlayerWorldID() == WorldID);
+}
+
 const char* CGS::AtributeName(int BonusID) const
 {
-	for (const auto& at : CGS::AttributInfo)
-	{
-		if (at.first == BonusID)
-			return at.second.Name;
-	}
+	if(CGS::AttributInfo.find(BonusID) != CGS::AttributInfo.end())
+		return CGS::AttributInfo[BonusID].Name;
 	return "Has no stats";
 }
 

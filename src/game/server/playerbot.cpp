@@ -330,6 +330,5 @@ int CPlayerBot::GetPlayerWorldID() const
 		return BotJob::MobBot[m_SubBotID].WorldID;
 	else if(m_BotType == BotsTypes::TYPE_BOT_NPC) 
 		return BotJob::NpcBot[m_SubBotID].WorldID;
-
 	return BotJob::QuestBot[m_SubBotID].WorldID;
 }

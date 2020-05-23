@@ -440,7 +440,7 @@ void CPlayer::AddExp(int Exp)
 
 		GS()->CreateDeath(m_pCharacter->m_Core.m_Pos, m_ClientID);
 		GS()->CreateSound(m_pCharacter->m_Core.m_Pos, 4);
-		GS()->CreateText(m_pCharacter, false, vec2(0, -40), vec2(0, -1), 30, "level", Server()->GetWorldID(m_ClientID));
+		GS()->CreateText(m_pCharacter, false, vec2(0, -40), vec2(0, -1), 30, "level");
 		GS()->ChatFollow(m_ClientID, "Level UP. Now Level {INT}!", &Acc().Level);
 		if(Acc().Exp < ExpNeed(Acc().Level))
 		{
@@ -862,21 +862,7 @@ void CPlayer::ClearFormatQuestText()
 
 int CPlayer::GetMoodState()
 {
-	if (!GS()->IsDungeon())
-		return MOOD_NORMAL;
-
-	const int MaximalHealth = GetLevelDisciple(AtributType::AtTank, true);
-	for (int i = 0; i < MAX_PLAYERS; i++)
-	{
-		CPlayer* pPlayer = GS()->m_apPlayers[i];
-		if (!pPlayer || Server()->GetWorldID(m_ClientID) != Server()->GetWorldID(i))
-			continue;
-
-		const int FinderHardness = pPlayer->GetLevelDisciple(AtributType::AtTank, true);
-		if (FinderHardness > MaximalHealth)
-			return MOOD_NORMAL;
-	}
-	return MOOD_PLAYER_TANK;
+	return MOOD_NORMAL;
 }
 
 void CPlayer::ChangeWorld(int WorldID)

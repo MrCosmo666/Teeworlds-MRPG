@@ -27,7 +27,7 @@ private:
 	bool HasRepr(char c);
 public:
 	vec2 TextSize(const char *pText);
-	void Create(CGS *pGs, CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, bool Center, bool Follow, int WorldID);
+	void Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, bool Center, bool Follow);
 };
 
 #endif

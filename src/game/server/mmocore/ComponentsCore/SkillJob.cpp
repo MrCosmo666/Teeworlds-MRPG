@@ -277,7 +277,7 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 			}
 		}
 
-		GS()->CreateText(NULL, false, vec2(PlayerPosition.x, PlayerPosition.y - 96.0f), vec2(0, 0), 40, "RECOVERY AMMO", GS()->GetWorldID());
+		GS()->CreateText(NULL, false, vec2(PlayerPosition.x, PlayerPosition.y - 96.0f), vec2(0, 0), 40, "RECOVERY AMMO");
 		return true;
 	}
 

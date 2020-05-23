@@ -97,7 +97,7 @@ void CLogicWallFire::Tick()
 		if(distance(m_Pos, IntersectPos) < 15)
 		{
 			p->TakeDamage();
-			GS()->CreateText(NULL, false, m_Pos, vec2(0, 0), 100, std::to_string(p->GetHealth()).c_str(), GS()->GetWorldID());
+			GS()->CreateText(NULL, false, m_Pos, vec2(0, 0), 100, std::to_string(p->GetHealth()).c_str());
 			if(p->GetHealth() <= 0) 
 			{
 				pLogicWall->SetDestroy(120);

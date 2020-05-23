@@ -7,6 +7,12 @@
 
 class ItemJob : public MmoComponent
 {
+	struct RandomBox
+	{
+		int ItemID;
+		float Chance;
+	};
+
 	class ClassItemInformation
 	{
 	public:

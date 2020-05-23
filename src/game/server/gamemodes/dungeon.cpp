@@ -17,6 +17,7 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	m_WorldID = GS()->GetWorldID();
 	m_GameFlags = 0;
 	m_StartedPlayers = 0;
+	m_TankClientID = -1;
 	m_ShowedTankingInfo = false;
 
 	// создание двери для ожидания начала
@@ -56,6 +57,7 @@ void CGameControllerDungeon::ChangeState(int State)
 		m_FinishedTick = 0;
 		m_StartingTick = 0;
 		m_SafeTick = 0;
+		m_TankClientID = -1;
 		m_ShowedTankingInfo = false;
 		SetMobsSpawn(false);
 		ResetDoorKeyState();
@@ -73,13 +75,22 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Начало данжа
 	else if (State == DUNGEON_STARTED)
 	{
+		// reset time and select tank
+		int MaximalHardness = 0;
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
-			if (!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID)
+			CPlayer* pPlayer = GS()->m_apPlayers[i];
+			if(!pPlayer || Server()->GetWorldID(i) != m_WorldID)
 				continue;
 
-			GS()->m_apPlayers[i]->GetTempData().TempTimeDungeon = 0;
+			pPlayer->GetTempData().TempTimeDungeon = 0;
+			if(pPlayer->GetLevelDisciple(AtributType::AtTank, true) > MaximalHardness)
+			{
+				m_TankClientID = i;
+				MaximalHardness = pPlayer->GetLevelDisciple(AtributType::AtTank, true);
+			}
 		}
+
 		m_StartedPlayers = PlayersNum();
 		m_MaximumTick = Server()->TickSpeed() * 900;
 		m_SafeTick = Server()->TickSpeed() * 30;
@@ -233,12 +244,14 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 	if(m_StateDungeon >= DUNGEON_STARTED)
 	{
 		const int ClientID = pChr->GetPlayer()->GetCID();
-		if(pChr->GetPlayer()->m_MoodState == MOOD_PLAYER_TANK && !m_ShowedTankingInfo)
+		if(ClientID == m_TankClientID && !m_ShowedTankingInfo)
 		{
 			m_ShowedTankingInfo = true;
+			pChr->GetPlayer()->m_MoodState = MOOD_PLAYER_TANK;
 			const int StrengthTank = pChr->GetPlayer()->GetLevelDisciple(AtributType::AtTank, true);
 			GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned with class strength {INT}p!", Server()->ClientName(ClientID), &StrengthTank);
 		}
+		
 		if(!m_SafeTick)
 		{
 			GS()->Chat(ClientID, "You were thrown out of dungeon!");
@@ -383,7 +396,7 @@ int CGameControllerDungeon::GetDungeonSync(CPlayer* pPlayer, int BonusID) const
 		if(ParsePlayerStatsClass == AtributType::AtTank)
 			Procent = 3;
 		else if(ParsePlayerStatsClass == AtributType::AtHealer)
-			Procent = 6;
+			Procent = 5;
 		else if(ParsePlayerStatsClass == AtributType::AtDps)
 			Procent = 4;
 

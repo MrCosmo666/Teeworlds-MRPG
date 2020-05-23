@@ -61,11 +61,8 @@ vec2 CLoltext::TextSize(const char *pText)
 	return vec2(Count*g_Config.m_SvLoltextHspace*4.0f, g_Config.m_SvLoltextVspace);
 }
 
-void CLoltext::Create(CGS *pGs, CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, bool Center, bool Follow, int WorldID)
+void CLoltext::Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, bool Center, bool Follow)
 {
-	if(pGs->GetWorldID() != WorldID)
-		return;
-
 	char c;
 	vec2 CurPos = Pos;
 	if (Center)
