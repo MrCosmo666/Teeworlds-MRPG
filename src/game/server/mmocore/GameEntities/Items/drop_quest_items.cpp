@@ -20,7 +20,7 @@ CDropQuestItem::CDropQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float
 	m_OwnerID = OwnerID;
 	m_QuestBot = BotData;
 	m_Flashing = false;
-	m_LifeSpan = Server()->TickSpeed() * 15;
+	m_LifeSpan = Server()->TickSpeed() * 30;
 	m_StartTick = Server()->Tick();
 
 	GameWorld()->InsertEntity(this);
