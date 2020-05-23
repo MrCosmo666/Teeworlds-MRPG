@@ -53,6 +53,7 @@ private:
 
 	void UpdateDoorKeyState();
 	void ResetDoorKeyState();
+	void SelectTankPlayer();
 };
 
 class DungeonDoor : public CEntity

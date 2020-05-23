@@ -69,6 +69,10 @@ public:
 		int TempTeleportX;
 		int TempTeleportY;
 		int TempTimeDungeon;
+
+		// dungeon
+		int TempTankVotingDungeon;
+		bool TempAlreadyVotedDungeon;
 	};
 	static std::map < int, StructTempPlayerData > PlayerTempData;
 

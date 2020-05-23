@@ -867,6 +867,11 @@ int CPlayer::GetMoodState()
 
 void CPlayer::ChangeWorld(int WorldID)
 {
+	// reset dungeon temp data
+	GetTempData().TempAlreadyVotedDungeon = false;
+	GetTempData().TempTankVotingDungeon = 0;
+	GetTempData().TempTimeDungeon = 0;
+
 	if(m_pCharacter)
 	{
 		GS()->m_World.DestroyEntity(m_pCharacter);

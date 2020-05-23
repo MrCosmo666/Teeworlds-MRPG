@@ -75,27 +75,12 @@ void CGameControllerDungeon::ChangeState(int State)
 	// Используется при смене статуса в Начало данжа
 	else if (State == DUNGEON_STARTED)
 	{
-		// reset time and select tank
-		int MaximalHardness = 0;
-		for (int i = 0; i < MAX_PLAYERS; i++)
-		{
-			CPlayer* pPlayer = GS()->m_apPlayers[i];
-			if(!pPlayer || Server()->GetWorldID(i) != m_WorldID)
-				continue;
-
-			pPlayer->GetTempData().TempTimeDungeon = 0;
-			if(pPlayer->GetLevelDisciple(AtributType::AtTank, true) > MaximalHardness)
-			{
-				m_TankClientID = i;
-				MaximalHardness = pPlayer->GetLevelDisciple(AtributType::AtTank, true);
-			}
-		}
-
+		SelectTankPlayer();
 		m_StartedPlayers = PlayersNum();
-		m_MaximumTick = Server()->TickSpeed() * 900;
+		m_MaximumTick = Server()->TickSpeed() * 720;
 		m_SafeTick = Server()->TickSpeed() * 30;
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The security timer is enabled for 30 seconds!");
-		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "You are given 15 minutes to complete of dungeon!");
+		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "You are given 12 minutes to complete of dungeon!");
 		GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon started!");
 		SetMobsSpawn(true);
 		KillAllPlayers();
@@ -239,26 +224,27 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 	{
 		pChr->GetPlayer()->m_SyncDungeon = GS()->Mmo()->Dungeon()->SyncFactor();
 		pChr->GetPlayer()->m_SyncPlayers = m_StartedPlayers;
+
+		if(m_StateDungeon >= DUNGEON_STARTED)
+		{
+			const int ClientID = pChr->GetPlayer()->GetCID();
+			if(ClientID == m_TankClientID && !m_ShowedTankingInfo)
+			{
+				m_ShowedTankingInfo = true;
+				pChr->GetPlayer()->m_MoodState = MOOD_PLAYER_TANK;
+				const int StrengthTank = pChr->GetPlayer()->GetLevelDisciple(AtributType::AtTank, true);
+				GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned with class strength {INT}p!", Server()->ClientName(ClientID), &StrengthTank);
+			}
+
+			if(!m_SafeTick)
+			{
+				GS()->Chat(ClientID, "You were thrown out of dungeon!");
+				pChr->GetPlayer()->ChangeWorld(pChr->GetPlayer()->Acc().LastWorldID);
+				return false;
+			}
+		}
 	}
 
-	if(m_StateDungeon >= DUNGEON_STARTED)
-	{
-		const int ClientID = pChr->GetPlayer()->GetCID();
-		if(ClientID == m_TankClientID && !m_ShowedTankingInfo)
-		{
-			m_ShowedTankingInfo = true;
-			pChr->GetPlayer()->m_MoodState = MOOD_PLAYER_TANK;
-			const int StrengthTank = pChr->GetPlayer()->GetLevelDisciple(AtributType::AtTank, true);
-			GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned with class strength {INT}p!", Server()->ClientName(ClientID), &StrengthTank);
-		}
-		
-		if(!m_SafeTick)
-		{
-			GS()->Chat(ClientID, "You were thrown out of dungeon!");
-			pChr->GetPlayer()->ChangeWorld(pChr->GetPlayer()->Acc().LastWorldID);
-			return false;
-		}
-	}
 	IGameController::OnCharacterSpawn(pChr);
 	return true;
 }
@@ -325,6 +311,30 @@ void CGameControllerDungeon::SetMobsSpawn(bool AllowedSpawn)
 			BotPlayer->SetDungeonAllowedSpawn(AllowedSpawn);
 			if (!AllowedSpawn && BotPlayer->GetCharacter())
 				BotPlayer->GetCharacter()->Die(i, WEAPON_WORLD);
+		}
+	}
+}
+
+void CGameControllerDungeon::SelectTankPlayer()
+{
+	int MaximalVotes = 0;
+	int MaximalHardness = 0;
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		CPlayer* pPlayer = GS()->m_apPlayers[i];
+		if(!pPlayer || Server()->GetWorldID(i) != m_WorldID)
+			continue;
+
+		if(pPlayer->GetTempData().TempTankVotingDungeon > MaximalVotes)
+			MaximalVotes = pPlayer->GetTempData().TempTankVotingDungeon;
+
+		if(MaximalVotes)
+			continue;
+
+		if(pPlayer->GetLevelDisciple(AtributType::AtTank, true) > MaximalHardness)
+		{
+			m_TankClientID = i;
+			MaximalHardness = pPlayer->GetLevelDisciple(AtributType::AtTank, true);
 		}
 	}
 }

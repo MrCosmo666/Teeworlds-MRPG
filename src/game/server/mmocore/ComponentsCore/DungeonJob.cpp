@@ -73,9 +73,33 @@ void DungeonJob::ShowDungeonsList(CPlayer* pPlayer)
 	if (GS()->IsDungeon())
 	{
 		GS()->AV(ClientID, "null", "");
+		ShowTankVotingDungeon(pPlayer);
+		GS()->AV(ClientID, "null", "");
+
 		pPlayer->m_Colored = { 30, 8, 8 };
 		GS()->AVL(ClientID, "DUNGEONEXIT", "Exit dungeon {STR} (warning)", Dungeon[GS()->DungeonID()].Name);
 	}
+}
+
+void DungeonJob::ShowTankVotingDungeon(CPlayer* pPlayer)
+{
+	if(!GS()->IsDungeon())
+		return;
+
+	const int ClientID = pPlayer->GetCID();
+	const int DungeonWorldID = Dungeon[GS()->DungeonID()].WorldID;
+	pPlayer->m_Colored = GRAY_COLOR;
+	GS()->AVL(ClientID, "null", "Voting for the choice of tank!");
+	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		CPlayer* pSearchPlayer = GS()->GetPlayer(i, true);
+		if(!pSearchPlayer || pSearchPlayer->GetPlayerWorldID() != DungeonWorldID)
+			continue;
+
+		GS()->AVM(ClientID, "DUNGEONVOTE", i, NULL, "Vote for {STR} (Votes: {INT})", GS()->Server()->ClientName(i), &pSearchPlayer->GetTempData().TempTankVotingDungeon);
+	}
+	GS()->AVL(ClientID, "DUNGEONREFRESH", "Refresh list");
 }
 
 void DungeonJob::CheckQuestingOpened(CPlayer *pPlayer, int QuestID)
@@ -95,7 +119,6 @@ bool DungeonJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMe
 	{
 		return false;
 	}
-
 
 	if (Menulist == MenuList::MENU_DUNGEONS)
 	{
@@ -146,13 +169,41 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 			pPlayer->GetTempData().TempTeleportX = pPlayer->GetCharacter()->m_Core.m_Pos.x;
 			pPlayer->GetTempData().TempTeleportY = pPlayer->GetCharacter()->m_Core.m_Pos.y;
 		}
+
 		GS()->Chat(-1, "{STR} joined to Dungeon {STR}!", GS()->Server()->ClientName(ClientID), Dungeon[VoteID].Name);
 		pPlayer->ChangeWorld(Dungeon[VoteID].WorldID);
 		return true;
 	}
 	else if (PPSTR(CMD, "DUNGEONEXIT") == 0)
 	{
-		GS()->Server()->ChangeWorld(ClientID, pPlayer->Acc().LastWorldID);
+		pPlayer->ChangeWorld(pPlayer->Acc().LastWorldID);
+		return true;
+	}
+	else if(PPSTR(CMD, "DUNGEONVOTE") == 0)
+	{
+		CPlayer* pSearchPlayer = GS()->GetPlayer(VoteID, true);
+		if(pPlayer->GetTempData().TempAlreadyVotedDungeon)
+		{
+			GS()->Chat(ClientID, "Have you already voted!");
+			GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			return true;
+		}
+
+		if(!pSearchPlayer)
+		{
+			GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			return true;
+		}
+
+		pPlayer->GetTempData().TempAlreadyVotedDungeon = true;
+		pSearchPlayer->GetTempData().TempTankVotingDungeon++;
+		GS()->ChatWorldID(pPlayer->GetPlayerWorldID(), "[Dungeon]", "Voted for {STR}.", GS()->Server()->ClientName(VoteID));
+		GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		return true;
+	}
+	else if(PPSTR(CMD, "DUNGEONREFRESH") == 0)
+	{
+		GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 
