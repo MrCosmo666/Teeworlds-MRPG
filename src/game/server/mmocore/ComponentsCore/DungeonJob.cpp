@@ -99,7 +99,7 @@ void DungeonJob::ShowTankVotingDungeon(CPlayer* pPlayer)
 
 		GS()->AVM(ClientID, "DUNGEONVOTE", i, NULL, "Vote for {STR} (Votes: {INT})", GS()->Server()->ClientName(i), &pSearchPlayer->GetTempData().TempTankVotingDungeon);
 	}
-	GS()->AVL(ClientID, "DUNGEONREFRESH", "Refresh list");
+	GS()->AVL(ClientID, "DUNGEONREFRESH", "Refresh voting list");
 }
 
 void DungeonJob::CheckQuestingOpened(CPlayer *pPlayer, int QuestID)
