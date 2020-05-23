@@ -97,7 +97,7 @@ void DungeonJob::ShowTankVotingDungeon(CPlayer* pPlayer)
 		if(!pSearchPlayer || pSearchPlayer->GetPlayerWorldID() != DungeonWorldID)
 			continue;
 
-		GS()->AVM(ClientID, "DUNGEONVOTE", i, NULL, "Vote for {STR} (Votes: {INT})", GS()->Server()->ClientName(i), &pSearchPlayer->GetTempData().TempTankVotingDungeon);
+		GS()->AVM(ClientID, "DUNGEONVOTE", i, NOPE, "Vote for {STR} (Votes: {INT})", GS()->Server()->ClientName(i), &pSearchPlayer->GetTempData().TempTankVotingDungeon);
 	}
 	GS()->AVL(ClientID, "DUNGEONREFRESH", "Refresh voting list");
 }
@@ -171,6 +171,7 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 		}
 
 		GS()->Chat(-1, "{STR} joined to Dungeon {STR}!", GS()->Server()->ClientName(ClientID), Dungeon[VoteID].Name);
+		GS()->Chat(ClientID, "You can vote for the choice of tank (Dungeon Tab)!");
 		pPlayer->ChangeWorld(Dungeon[VoteID].WorldID);
 		return true;
 	}
