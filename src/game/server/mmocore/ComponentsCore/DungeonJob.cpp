@@ -182,6 +182,13 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 	else if(PPSTR(CMD, "DUNGEONVOTE") == 0)
 	{
 		CPlayer* pSearchPlayer = GS()->GetPlayer(VoteID, true);
+		if(VoteID == ClientID)
+		{
+			GS()->Chat(ClientID, "You can't vote for yourself!");
+			GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			return true;
+		}
+
 		if(pPlayer->GetTempData().TempAlreadyVotedDungeon)
 		{
 			GS()->Chat(ClientID, "Have you already voted!");
