@@ -615,7 +615,7 @@ void ItemJob::UseItem(int ClientID, int ItemID, int Count)
 		pPlayer->AddMoney(Getting);
 	}
 
-	if(ItemID == itTicketResetUpgrades && PlItem.Remove(Count, 0))
+	if(ItemID == itTicketResetClassStats && PlItem.Remove(Count, 0))
 	{
 		int BackUpgrades = 0;
 		for(const auto& at : CGS::AttributInfo)
@@ -629,6 +629,36 @@ void ItemJob::UseItem(int ClientID, int ItemID, int Count)
 
 			BackUpgrades += (int)(pPlayer->Acc().Stats[at.first] * at.second.UpgradePrice);
 			pPlayer->Acc().Stats[at.first] = 0;
+		}
+
+		GS()->Chat(-1, "{STR} used {STR} returned {INT} upgrades.", GS()->Server()->ClientName(ClientID), PlItem.Info().GetName(), &BackUpgrades);
+		pPlayer->Acc().Upgrade += BackUpgrades;
+		Job()->SaveAccount(pPlayer, SaveType::SAVE_UPGRADES);
+	}
+
+	if(ItemID == itTicketResetWeaponStats && PlItem.Remove(Count, 0))
+	{
+		int BackUpgrades = 0;
+		for(const auto& at : CGS::AttributInfo)
+		{
+			if(str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0 || pPlayer->Acc().Stats[at.first] <= 0)
+				continue;
+
+			// skip all stats allow only weapons
+			if(at.second.AtType != AtributType::AtWeapon)
+				continue;
+
+			int BackCount = pPlayer->Acc().Stats[at.first];
+			if(at.first == Stats::StSpreadShotgun)
+				BackCount = pPlayer->Acc().Stats[at.first] - 3;
+			else if(at.first == Stats::StSpreadGrenade || at.first == Stats::StSpreadRifle)
+				BackCount = pPlayer->Acc().Stats[at.first] - 1;
+
+			if(BackCount <= 0)
+				continue;
+
+			BackUpgrades += (int)(BackCount * at.second.UpgradePrice);
+			pPlayer->Acc().Stats[at.first] -= BackCount;
 		}
 
 		GS()->Chat(-1, "{STR} used {STR} returned {INT} upgrades.", GS()->Server()->ClientName(ClientID), PlItem.Info().GetName(), &BackUpgrades);

@@ -273,6 +273,7 @@ void CCharacter::FireWeapon()
 			}
 
 			bool Hits = false;
+			bool StartedTalking = false;
 			const float PlayerRadius = (float)m_pPlayer->GetAttributeCount(Stats::StHammerPower, true);
 			const float Radius = clamp(PlayerRadius / 5.0f, 1.7f, 8.0f);
 			GS()->CreateSound(m_Pos, SOUND_HAMMER_FIRE);
@@ -285,11 +286,12 @@ void CCharacter::FireWeapon()
 				if((pTarget == this) || GS()->Collision()->IntersectLineWithInvisible(ProjStartPos, pTarget->m_Pos, 0, 0))
 					continue;
 
-				if (StartConversation(pTarget->GetPlayer()))
+				if (!StartedTalking && StartConversation(pTarget->GetPlayer()))
 				{
 					m_pPlayer->ClearTalking();
 					m_pPlayer->SetTalking(pTarget->GetPlayer()->GetCID(), false);
 					GS()->CreateHammerHit(ProjStartPos);
+					StartedTalking = true;
 					continue;
 				}
 

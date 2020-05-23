@@ -30,6 +30,7 @@ class CGameControllerDungeon : public IGameController
 	bool m_ShowedTankingInfo;
 	int m_StartedPlayers;
 	int m_TankClientID;
+	bool m_SelectedWithVotes;
 
 public:
 	CGameControllerDungeon(class CGS* pGameServer);

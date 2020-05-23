@@ -230,8 +230,9 @@ enum
 	itPotionResurrection = 25,			// Зелье воскрешения
 	itExplosiveGun = 33,				// Модуль взрыва для пистолета
 	itExplosiveShotgun = 34,			// Модуль взрыва для шотгана
-	itTicketResetUpgrades = 38,			// Билет для сброса статистика апгрейдов
+	itTicketResetClassStats = 38,		// Билет для сброса статистики классовых апгрейдов
 	itModePVP = 39,						// Настройка PVP режима
+	itTicketResetWeaponStats = 40,		// Билет для сброса статистики патрон апгрейдов
 
 	/*
 		Все листы сортировок что существуют на сервере

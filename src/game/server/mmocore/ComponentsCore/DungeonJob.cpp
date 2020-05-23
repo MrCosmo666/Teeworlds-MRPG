@@ -205,7 +205,7 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 
 		pPlayer->GetTempData().TempAlreadyVotedDungeon = true;
 		pSearchPlayer->GetTempData().TempTankVotingDungeon++;
-		GS()->ChatWorldID(pPlayer->GetPlayerWorldID(), "[Dungeon]", "Voted for {STR}.", GS()->Server()->ClientName(VoteID));
+		GS()->ChatWorldID(pPlayer->GetPlayerWorldID(), "[Dungeon]", "{STR} voted for {STR}.", GS()->Server()->ClientName(ClientID), GS()->Server()->ClientName(VoteID));
 		GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}

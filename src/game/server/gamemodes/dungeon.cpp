@@ -232,8 +232,15 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 			{
 				m_ShowedTankingInfo = true;
 				pChr->GetPlayer()->m_MoodState = MOOD_PLAYER_TANK;
-				const int StrengthTank = pChr->GetPlayer()->GetLevelDisciple(AtributType::AtTank, true);
-				GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned with class strength {INT}p!", Server()->ClientName(ClientID), &StrengthTank);
+				if(m_SelectedWithVotes)
+					GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank is assigned to {STR} with {INT} votes..", 
+						Server()->ClientName(ClientID), &pChr->GetPlayer()->GetTempData().TempTankVotingDungeon);
+				else
+				{
+					const int StrengthTank = pChr->GetPlayer()->GetLevelDisciple(AtributType::AtTank, true);
+					GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned with class strength {INT}p!", 
+						Server()->ClientName(ClientID), &StrengthTank);
+				}
 			}
 
 			if(!m_SafeTick)
@@ -255,7 +262,7 @@ void CGameControllerDungeon::UpdateDoorKeyState()
 		pDoor; pDoor = (CLogicDungeonDoorKey*)pDoor->TypeNext())
 	{
 		if (pDoor->SyncStateChanges())
-			GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Scr... Scrr... Opened door somewhere!");
+			GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Door creaking.. Opened door somewhere!");
 	}
 }
 
@@ -319,18 +326,30 @@ void CGameControllerDungeon::SelectTankPlayer()
 {
 	int MaximalVotes = 0;
 	int MaximalHardness = 0;
+	m_SelectedWithVotes = false;
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pPlayer = GS()->m_apPlayers[i];
 		if(!pPlayer || Server()->GetWorldID(i) != m_WorldID)
 			continue;
 
-		if(pPlayer->GetTempData().TempTankVotingDungeon > MaximalVotes)
-			MaximalVotes = pPlayer->GetTempData().TempTankVotingDungeon;
+		// small random set new tank where Votes equal
+		if(MaximalVotes && pPlayer->GetTempData().TempTankVotingDungeon == MaximalVotes && random_int() % 2 == 0)
+			m_TankClientID = i;
 
-		if(MaximalVotes)
+		// select tank what have more votes
+		if(pPlayer->GetTempData().TempTankVotingDungeon > MaximalVotes)
+		{
+			m_TankClientID = i;
+			MaximalVotes = pPlayer->GetTempData().TempTankVotingDungeon;
+			m_SelectedWithVotes = true;
+		}
+
+		// skip here if it selected on votes
+		if(MaximalVotes > 0)
 			continue;
 
+		// select hardness tank
 		if(pPlayer->GetLevelDisciple(AtributType::AtTank, true) > MaximalHardness)
 		{
 			m_TankClientID = i;
