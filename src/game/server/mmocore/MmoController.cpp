@@ -241,14 +241,15 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	if(TypeID == ToplistTypes::GUILDS_LEVELING)
 	{
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "ORDER BY Level DESC LIMIT 10"));
+		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "ORDER BY Level DESC, Experience DESC LIMIT 10"));
 		while (RES->next())
 		{
 			char NameGuild[64];
 			const int Rank = RES->getRow();
 			const int Level = RES->getInt("Level");
+			const int Experience = RES->getInt("Experience");
 			str_copy(NameGuild, RES->getString("GuildName").c_str(), sizeof(NameGuild));
-			GS()->AVL(ClientID, "null", "{INT}. {STR} : Level {INT}", &Rank, NameGuild, &Level);
+			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Level {INT} : Exp {INT}", &Rank, NameGuild, &Level, &Experience);
 		}
 	}
 	else if (TypeID == ToplistTypes::GUILDS_WEALTHY)
@@ -260,19 +261,20 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 			const int Rank = RES->getRow();
 			const int Gold = RES->getInt("Bank");
 			str_copy(NameGuild, RES->getString("GuildName").c_str(), sizeof(NameGuild));
-			GS()->AVL(ClientID, "null", "{INT}. {STR} : Gold {INT}", &Rank, NameGuild, &Gold);
+			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Gold {INT}", &Rank, NameGuild, &Gold);
 		}
 	}
 	else if (TypeID == ToplistTypes::PLAYERS_LEVELING)
 	{
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_data", "ORDER BY Level DESC LIMIT 10"));
+		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_data", "ORDER BY Level DESC, Exp DESC LIMIT 10"));
 		while (RES->next())
 		{
 			char Nick[64];
 			const int Rank = RES->getRow();
 			const int Level = RES->getInt("Level");
+			const int Experience = RES->getInt("Exp");
 			str_copy(Nick, RES->getString("Nick").c_str(), sizeof(Nick));
-			GS()->AVL(ClientID, "null", "{INT}. {STR} : Level {INT}", &Rank, Nick, &Level);
+			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Level {INT} : Exp {INT}", &Rank, Nick, &Level, &Experience);
 		}
 	}
 }

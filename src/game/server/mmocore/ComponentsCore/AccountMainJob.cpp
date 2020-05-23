@@ -180,7 +180,7 @@ void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)
 int AccountMainJob::GetRank(int AuthID)
 {
 	int Rank = 0;
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_accounts_data", "ORDER BY Level DESC"));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_accounts_data", "ORDER BY Level DESC, Exp DESC"));
 	while(RES->next())
 	{
 		Rank++;
