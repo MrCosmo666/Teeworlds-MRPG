@@ -228,18 +228,21 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 		if(m_StateDungeon >= DUNGEON_STARTED)
 		{
 			const int ClientID = pChr->GetPlayer()->GetCID();
-			if(ClientID == m_TankClientID && !m_ShowedTankingInfo)
+			if(ClientID == m_TankClientID)
 			{
-				m_ShowedTankingInfo = true;
-				pChr->GetPlayer()->m_MoodState = MOOD_PLAYER_TANK;
-				if(m_SelectedWithVotes)
-					GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank is assigned to {STR} with {INT} votes!", 
-						Server()->ClientName(ClientID), &pChr->GetPlayer()->GetTempData().TempTankVotingDungeon);
-				else
+				pChr->GetPlayer()->m_MoodState = MOOD_PLAYER_TANK;	
+				if(!m_ShowedTankingInfo)
 				{
-					const int StrengthTank = pChr->GetPlayer()->GetLevelDisciple(AtributType::AtTank, true);
-					GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned with class strength {INT}p!", 
-						Server()->ClientName(ClientID), &StrengthTank);
+					m_ShowedTankingInfo = true;
+					if(m_SelectedWithVotes)
+						GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank is assigned to {STR} with {INT} votes!", 
+							Server()->ClientName(ClientID), &pChr->GetPlayer()->GetTempData().TempTankVotingDungeon);
+					else
+					{
+						const int StrengthTank = pChr->GetPlayer()->GetLevelDisciple(AtributType::AtTank, true);
+						GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned with class strength {INT}p!", 
+							Server()->ClientName(ClientID), &StrengthTank);
+					}
 				}
 			}
 
