@@ -334,7 +334,7 @@ void CPlayer::OnPredictedInput(CNetObj_PlayerInput *NewInput)
 }
 
 // Получить команду игрока
-int CPlayer::GetTeam() 
+int CPlayer::GetTeam()
 {
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID)) 
 		return Acc().Team;
@@ -510,7 +510,7 @@ int CPlayer::GetStartTeam()
 	return TEAM_SPECTATORS;
 }
 
-int CPlayer::ExpNeed(int Level)
+int CPlayer::ExpNeed(int Level) const
 {
 	return kurosio::computeExperience(Level);
 }
@@ -858,11 +858,6 @@ void CPlayer::FormatTextQuest(int DataBotID, const char *pText)
 void CPlayer::ClearFormatQuestText()
 {
 	mem_zero(m_FormatTalkQuest, sizeof(m_FormatTalkQuest));
-}
-
-int CPlayer::GetMoodState()
-{
-	return MOOD_NORMAL;
 }
 
 void CPlayer::ChangeWorld(int WorldID)

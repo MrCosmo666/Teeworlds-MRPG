@@ -90,20 +90,19 @@ public:
 	CPlayer(CGS* pGS, int ClientID);
 	virtual ~CPlayer();
 
-	bool IsBot()
-	{
-		return (bool)(m_ClientID >= MAX_PLAYERS && m_ClientID < MAX_CLIENTS);
-	};
+	bool IsBot() const { return (bool)(m_ClientID >= MAX_PLAYERS && m_ClientID < MAX_CLIENTS); }
 	virtual int GetTeam();
-	virtual int GetBotID() { return -1; };
-	virtual int GetBotType() { return -1; };
-	virtual int GetBotSub() { return -1; };
-	virtual int GetStartHealth();
-	virtual	int GetHealth() { return GetTempData().TempHealth; };
-	virtual	int GetMana() { return GetTempData().TempMana; };
+	virtual int GetBotID() const { return -1; };
+	virtual int GetBotType() const { return -1; };
+	virtual int GetBotSub() const { return -1; };
 	virtual	int GetPlayerWorldID() const;
 
-	virtual int IsActiveSnappingBot(int SnappingClient) { return 2; };
+	virtual int GetStartHealth();
+	int GetStartMana();
+	virtual	int GetHealth() { return GetTempData().TempHealth; };
+	virtual	int GetMana() { return GetTempData().TempMana; };
+
+	virtual int IsActiveSnappingBot(int SnappingClient) const { return 2; };
 	virtual void SetDungeonAllowedSpawn(bool Spawn) { return; };
 	virtual int GetEquippedItem(int EquipID, int SkipItemID = -1) const;
 	virtual int GetAttributeCount(int BonusID, bool Really = false, bool Searchclass = false);
@@ -111,15 +110,15 @@ public:
 	virtual void SendClientInfo(int TargetID);
 
 	virtual void Tick();
+	void PostTick();
+
 	virtual void Snap(int SnappingClient);
-	
 	void HandleTuningParams();
+	
 private:
 	virtual void TryRespawn();
 
 public:
-	void PostTick();
-
 	CCharacter *GetCharacter();
 
 	void KillCharacter(int Weapon = WEAPON_WORLD);
@@ -133,7 +132,6 @@ public:
 	######################################################################### */
 	void ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp);
 	bool Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade, const char *UpgradeName);
-	int GetDungeonSync(int BonusID);
 
 	/* #########################################################################
 		FUNCTIONS PLAYER ACCOUNT 
@@ -150,8 +148,7 @@ public:
 	int EnchantAttributes(int BonusID) const;
 	int GetStartTeam();
 
-	int ExpNeed(int Level);
-	int GetStartMana();
+	int ExpNeed(int Level) const;
 	const char* GetLanguage();
 	void ShowInformationStats();
 
@@ -183,7 +180,7 @@ public:
 	void FormatTextQuest(int DataBotID, const char *pText);
 	void ClearFormatQuestText();
 
-	int GetMoodState();
+	int GetMoodState() const { return MOOD_NORMAL; }
 
 	void ChangeWorld(int WorldID);
 };

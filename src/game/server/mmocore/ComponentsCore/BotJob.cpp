@@ -251,6 +251,7 @@ void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 		QuestBot[MobID].NeedMob[1] = (int)RES->getInt("mob_1");
 		QuestBot[MobID].InteractiveType = (int)RES->getInt("interactive_type");
 		QuestBot[MobID].InteractiveTemp = (int)RES->getInt("interactive_temp");
+		QuestBot[MobID].GenerateNick = (bool)RES->getBoolean("generate_nick");
 
 		sscanf(RES->getString("it_count").c_str(), "|%d|%d|%d|%d|%d|%d|",
 			&QuestBot[MobID].ItemSearchCount[0], &QuestBot[MobID].ItemSearchCount[1],

@@ -21,21 +21,23 @@ public:
 	CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint);
 	virtual ~CPlayerBot() override;
 
-	int GetBotID() override { return m_BotID; };
-	int GetBotType() override { return m_BotType; };
-	int GetBotSub() override { return m_SubBotID; };
+	int GetBotID() const override { return m_BotID; };
+	int GetBotType() const override { return m_BotType; };
+	int GetBotSub() const override { return m_SubBotID; };
+	int GetTeam() override { return TEAM_BLUE; };
+	int GetPlayerWorldID() const override;
+
+	int GetStartHealth() override;
 	int GetHealth() override { return m_BotHealth; };
 	int GetMana() override { return 999; };
-	int GetTeam() override { return TEAM_BLUE; };
-	int GetStartHealth() override;
-	int GetPlayerWorldID() const override;
 
 	void SetDungeonAllowedSpawn(bool Spawn) override { m_DungeonAllowedSpawn = Spawn; };
 	void UpdateTempData(int Health, int Mana) override { m_BotHealth = Health; };
-	int IsActiveSnappingBot(int SnappingClient) override;
-	int GetAttributeCount(int BonusID, bool Really = false, bool SearchClass = false) override;
 	void SendClientInfo(int TargetID) override;
+	
+	int IsActiveSnappingBot(int SnappingClient) const override;
 	int GetEquippedItem(int EquipID, int SkipItemID = -1) const override;
+	int GetAttributeCount(int BonusID, bool Really = false, bool SearchClass = false) override;
 
 	void Tick() override;
 	void Snap(int SnappingClient) override;
@@ -49,13 +51,12 @@ public:
 private:
 	void TryRespawn() override;
 
-	void GenerateNick(char* buffer, int size_buffer);
 	int GetBotLevel() const;
-	bool IsActiveQuests(int SnapClientID);
-	const char* GetStatusBot();
-	int GetMoodState(int SnappingClient);
+	const char* GetStatusBot() const;
+	int GetMoodState(int SnappingClient) const;
+	bool IsActiveQuests(int SnapClientID) const;
 
-	// threading path finder
+	void GenerateNick(char* buffer, int size_buffer);
 	void TickThreadMobsPathFinder();
 };
 

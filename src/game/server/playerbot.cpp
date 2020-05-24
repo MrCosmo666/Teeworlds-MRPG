@@ -135,7 +135,7 @@ void CPlayerBot::TryRespawn()
 	1 - is active draw only bot
 	2 - is active draw bot and entities
 */
-int CPlayerBot::IsActiveSnappingBot(int SnappingClient)
+int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 {
 	if(m_BotType == BotsTypes::TYPE_BOT_NPC)
 	{
@@ -194,7 +194,7 @@ void CPlayerBot::Snap(int SnappingClient)
 	StrToInts(pClientInfo->m_StateName, 6, GetStatusBot());
 }
 
-int CPlayerBot::GetMoodState(int SnappingClient)
+int CPlayerBot::GetMoodState(int SnappingClient) const
 {
 	if(GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
@@ -221,7 +221,7 @@ int CPlayerBot::GetBotLevel() const
 	return (m_BotType == BotsTypes::TYPE_BOT_MOB ? BotJob::MobBot[m_SubBotID].Level : 1);
 }
 
-bool CPlayerBot::IsActiveQuests(int SnapClientID)
+bool CPlayerBot::IsActiveQuests(int SnapClientID) const
 {
 	if (SnapClientID >= MAX_PLAYERS || SnapClientID < 0)
 		return false;
@@ -231,7 +231,7 @@ bool CPlayerBot::IsActiveQuests(int SnapClientID)
 
 	if(m_BotType == BotsTypes::TYPE_BOT_NPC)
 	{
-		int GivesQuest = GS()->Mmo()->BotsData()->IsGiveQuestNPC(m_SubBotID);
+		const int GivesQuest = GS()->Mmo()->BotsData()->IsGiveQuestNPC(m_SubBotID);
 		if(BotJob::NpcBot[m_SubBotID].Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST && 
 			GS()->Mmo()->Quest()->GetState(SnapClientID, GivesQuest) == QuestState::QUEST_NO_ACCEPT)
 			return true;
@@ -247,7 +247,7 @@ int CPlayerBot::GetEquippedItem(int EquipID, int SkipItemID) const
 	return BotJob::DataBot[m_BotID].EquipSlot[EquipID];
 }
 
-const char* CPlayerBot::GetStatusBot()
+const char* CPlayerBot::GetStatusBot() const
 {
 	if (m_BotType == BotsTypes::TYPE_BOT_QUEST)
 	{
@@ -265,18 +265,23 @@ const char* CPlayerBot::GetStatusBot()
 
 void CPlayerBot::GenerateNick(char* buffer, int size_buffer)
 {
+	static const int SIZE_GENERATE = 10;
+	const char* FirstPos[SIZE_GENERATE] = { "Ja", "Qu", "Je", "Di", "Xo", "Us", "St", "Th", "Ge", "Re" };
+	const char* LastPos[SIZE_GENERATE] = { "de", "sa", "ul", "ma", "sa", "py", "as", "al", "ly", "in" };
 	if(GetBotType() == BotsTypes::TYPE_BOT_MOB && BotJob::MobBot[m_SubBotID].Spread > 0)
 	{
-		static const int SIZE_GENERATE = 10;
-		const char* FirstPos[SIZE_GENERATE] = { "Ja", "Qu", "Je", "Di", "Xo", "Us", "St", "Th", "Ge", "Re" };
-		const char* LastPos[SIZE_GENERATE] = { "de", "sa", "ul", "ma", "sa", "py", "as", "al", "ly", "in" };
-
 		char aBuf[24];
 		str_format(aBuf, sizeof(aBuf), "%s %s%s", BotJob::DataBot[m_BotID].NameBot, FirstPos[random_int() % SIZE_GENERATE], LastPos[random_int() % SIZE_GENERATE]);
 		str_copy(buffer, aBuf, size_buffer);
-		return;
 	}
-	str_copy(buffer, BotJob::DataBot[m_BotID].NameBot, size_buffer);
+	else if(GetBotType() == BotsTypes::TYPE_BOT_QUEST && BotJob::QuestBot[m_SubBotID].GenerateNick)
+	{
+		char aBuf[24];
+		str_format(aBuf, sizeof(aBuf), "%s %s%s", BotJob::DataBot[m_BotID].NameBot, FirstPos[random_int() % SIZE_GENERATE], LastPos[random_int() % SIZE_GENERATE]);
+		str_copy(buffer, aBuf, size_buffer);
+	}
+	else
+		str_copy(buffer, BotJob::DataBot[m_BotID].NameBot, size_buffer);
 }
 
 // thread path finder
