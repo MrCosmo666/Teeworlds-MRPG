@@ -18,7 +18,7 @@ typedef websocketpp::client<websocketpp::config::asio_tls_client> _client;
 namespace SleepyDiscord {
 	class WebsocketppDiscordClient : public BaseDiscordClient {
 	public:
-		WebsocketppDiscordClient() : maxNumOfThreads(0) {}
+		WebsocketppDiscordClient() {}
 		WebsocketppDiscordClient(const std::string token, const char numOfThreads = 0);
 		~WebsocketppDiscordClient();
 
@@ -39,7 +39,6 @@ namespace SleepyDiscord {
 		websocketpp::connection_hdl handle;
 
 		void onWebSocketMessage(websocketpp::connection_hdl hdl, websocketpp::config::asio_client::message_type::ptr msg);
-		const char maxNumOfThreads;
 		SLEEPY_LOCK_CLIENT_FUNCTIONS
 	};
 	typedef WebsocketppDiscordClient DiscordClient;

@@ -1054,7 +1054,7 @@ void CGS::OnTick()
 			}
 		}
 	}
-
+	
 	OnTickLocalWorld();
 	Mmo()->OnTick();
 }

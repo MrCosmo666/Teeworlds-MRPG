@@ -3,48 +3,48 @@
 
 namespace SleepyDiscord {
 
-	WebsocketppDiscordClient::WebsocketppDiscordClient(const std::string token, const char numOfThreads) :
-		maxNumOfThreads(0), _thread(nullptr)
+	WebsocketppDiscordClient::WebsocketppDiscordClient(const std::string token, const char numOfThreads) : _thread(nullptr)
 	{
 		init();
 		start(token, 0);
 	}
 
-	WebsocketppDiscordClient::~WebsocketppDiscordClient() {
-		if (_thread != nullptr && _thread->joinable()) _thread->join();
-		else _thread.reset();
+	WebsocketppDiscordClient::~WebsocketppDiscordClient() 
+	{
+		if (_thread != nullptr && _thread->joinable()) 
+			_thread->join();
+		else 
+			_thread.reset();
 	}
 
-	void WebsocketppDiscordClient::init() {
+	void WebsocketppDiscordClient::init() 
+	{
 		// set up access channels to only log interesting things
 		this_client.clear_access_channels(websocketpp::log::alevel::all);
 		this_client.set_access_channels(websocketpp::log::alevel::connect);
 		this_client.set_access_channels(websocketpp::log::alevel::disconnect);
 		this_client.set_access_channels(websocketpp::log::alevel::app);
-
-		this_client.set_tls_init_handler([](websocketpp::connection_hdl) {
+		this_client.set_tls_init_handler([](websocketpp::connection_hdl) 
+		{
 			return websocketpp::lib::make_shared<asio::ssl::context>(asio::ssl::context::tlsv1);
 		});
 
 		// Initialize the Asio transport policy
 		this_client.init_asio();
-
 		this_client.set_message_handler(std::bind(&WebsocketppDiscordClient::onWebSocketMessage, this, websocketpp::lib::placeholders::_1, websocketpp::lib::placeholders::_2));
-		
-		this_client.set_close_handler(std::bind(&WebsocketppDiscordClient::onClose, this,
-			websocketpp::lib::placeholders::_1));
-
-		this_client.set_fail_handler(std::bind(&WebsocketppDiscordClient::onFail, this,
-			websocketpp::lib::placeholders::_1));
+		this_client.set_close_handler(std::bind(&WebsocketppDiscordClient::onClose, this, websocketpp::lib::placeholders::_1));
+		this_client.set_fail_handler(std::bind(&WebsocketppDiscordClient::onFail, this, websocketpp::lib::placeholders::_1));
 	}
 
-	bool WebsocketppDiscordClient::connect(const std::string & uri) {
+	bool WebsocketppDiscordClient::connect(const std::string & uri) 
+	{
 		// Create a new connection to the given URI
 		websocketpp::lib::error_code ec;
 		// Note: there's might be a memory leak caused by get_connection
 		_client::connection_ptr con = this_client.get_connection(uri, ec);
 
-		if (ec) {
+		if (ec) 
+		{
 			onError(GENERAL_ERROR, "Connect initialization: " + ec.message());
 			return false;
 		}
@@ -60,15 +60,22 @@ namespace SleepyDiscord {
 
 	void WebsocketppDiscordClient::run() 
 	{
-		this_client.run();
+		do 
+		{
+			this_client.run();
+		} 
+		while (!isQuiting());
 	}
 
-	void handleTimers(const websocketpp::lib::error_code &ec, std::function<void()>& code) {
-		if (ec == websocketpp::transport::error::operation_aborted) return;
+	void handleTimers(const websocketpp::lib::error_code &ec, std::function<void()>& code) 
+	{
+		if (ec == websocketpp::transport::error::operation_aborted) 
+			return;
 		else code();
 	}
 
-	Timer WebsocketppDiscordClient::schedule(std::function<void()> code, const time_t milliseconds) {
+	Timer WebsocketppDiscordClient::schedule(std::function<void()> code, const time_t milliseconds) 
+	{
 		auto timer = this_client.set_timer(
 			milliseconds,
 			websocketpp::lib::bind(&handleTimers, websocketpp::lib::placeholders::_1, code)
@@ -78,34 +85,42 @@ namespace SleepyDiscord {
 		});
 	}
 
-	void WebsocketppDiscordClient::runAsync() {
-		if (!_thread) _thread.reset(new websocketpp::lib::thread(&WebsocketppDiscordClient::run, this));
+	void WebsocketppDiscordClient::runAsync() 
+	{
+		if (!_thread) 
+			_thread.reset(new websocketpp::lib::thread(&WebsocketppDiscordClient::run, this));
 	}
 
-	void WebsocketppDiscordClient::onFail(websocketpp::connection_hdl handle) {
+	void WebsocketppDiscordClient::onFail(websocketpp::connection_hdl handle) 
+	{
 		handleFailToConnect();
 	}
 
-	void WebsocketppDiscordClient::send(std::string message) {
+	void WebsocketppDiscordClient::send(std::string message) 
+	{
 		websocketpp::lib::error_code error;
 		this_client.send(handle, message, websocketpp::frame::opcode::text, error);
 		//temp solution
 		//Besides the library can detect bad connections by itself anyway
 	}
 
-	void WebsocketppDiscordClient::onWebSocketMessage(websocketpp::connection_hdl, websocketpp::config::asio_client::message_type::ptr msg) {
+	void WebsocketppDiscordClient::onWebSocketMessage(websocketpp::connection_hdl, websocketpp::config::asio_client::message_type::ptr msg) 
+	{
 		processMessage(msg->get_payload());
 	}
 	
-	void WebsocketppDiscordClient::disconnect(unsigned int code, const std::string reason) {
-		if (!handle.expired()) {
+	void WebsocketppDiscordClient::disconnect(unsigned int code, const std::string reason) 
+	{
+		if (!handle.expired()) 
+		{
 			websocketpp::lib::error_code error;
 			this_client.close(handle, code, reason, error);
 			//temp fix ignore errors
 		}
 	}
 
-	void WebsocketppDiscordClient::onClose(websocketpp::connection_hdl handle) {
+	void WebsocketppDiscordClient::onClose(websocketpp::connection_hdl handle) 
+	{
 		_client::connection_ptr con = this_client.get_con_from_hdl(handle);
 		const int16_t closeCode = con->get_remote_close_code();
 		std::cout << "Close " << closeCode << ' ' << con->get_remote_close_reason() << '\n'; 
