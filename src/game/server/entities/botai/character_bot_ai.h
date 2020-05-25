@@ -55,6 +55,7 @@ private:
 	void EmoteActions(int EmotionStyle);
 	void SetAim(vec2 Dir);
 
+	bool SearchTalkedPlayer();
 	void EngineBots();
 	void EngineNPC();
 	void EngineMobs();

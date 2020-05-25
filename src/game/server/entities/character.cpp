@@ -85,6 +85,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_Mana = 0;
 	m_OldPos = Pos;
 	m_NoAllowDamage = false;
+	m_Core.m_LostData = false;
 	m_Event = TILE_CLEAR_EVENTS;
 	m_Core.m_WorldID = GS()->GetClientWorldID(m_pPlayer->GetCID());
 	if(!m_pPlayer->IsBot())
@@ -553,6 +554,9 @@ void CCharacter::Tick()
 		HandleEvents();
 		HandleTilesets();
 	}
+	
+	m_Core.m_LostData = false;
+	m_NoAllowDamage = false;
 }
 
 void CCharacter::TickDefered()
@@ -574,7 +578,7 @@ void CCharacter::TickDefered()
 		m_Pos = m_Core.m_Pos;		
 		return;
 	}
-		
+
 	// advance the dummy
 	{
 		CCharacterCore::CParams CoreTickParams(&GameWorld()->m_Core.m_Tuning);
@@ -998,6 +1002,11 @@ void CCharacter::HandleTunning()
 		SetEmote(EMOTE_BLINK, 1);	
 	}
 
+	if(m_Core.m_LostData)
+	{
+		pTuningParams->m_PlayerCollision = 0;
+		pTuningParams->m_PlayerHooking = 0;
+	}
 	// боты тюнинг
 	if(m_pPlayer->IsBot())
 		return;

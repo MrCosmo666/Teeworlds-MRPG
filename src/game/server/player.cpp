@@ -90,8 +90,8 @@ void CPlayer::Tick()
 	else if (m_Spawned && m_PlayerTick[TickState::Respawn] + Server()->TickSpeed() * 3 <= Server()->Tick())
 		TryRespawn();
 
-	HandleTuningParams();
 	TickOnlinePlayer();
+	HandleTuningParams();
 }
 
 void CPlayer::PotionsTick()

@@ -104,7 +104,7 @@ public:
 
 	vec2 m_OldPos;
 	vec2 m_OlderPos;
-	int m_DoorHit;
+	bool m_DoorHit;
 
 protected:
 	struct WeaponStat

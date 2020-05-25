@@ -1733,7 +1733,8 @@ void CGS::AVH(int To, const int ID, vec3 Color, const char* pText, ...)
 
 		m_apPlayers[To]->m_Colored = { Color.r, Color.g, Color.b };
 		AV(To, "HIDEN", Buffer.buffer(), ID);
-		m_apPlayers[To]->m_Colored = { Color.r/4, Color.g/4, Color.b/4 };
+		if(length(m_apPlayers[To]->m_Colored) > 1.0f)
+			m_apPlayers[To]->m_Colored /= 4.0f;
 		Buffer.clear();
 		va_end(VarArgs);
 	}

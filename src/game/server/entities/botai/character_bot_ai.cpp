@@ -54,7 +54,6 @@ bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 	else if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
 		m_Core.m_LostData = true;
-
 		const int Function = BotJob::NpcBot[SubBotID].Function;
 		if(Function == FunctionsNPC::FUNCTION_NPC_NURSE)
 			new CEntityFunctionNurse(&GS()->m_World, m_pBotPlayer->GetCID(), m_Core.m_Pos);
@@ -292,21 +291,7 @@ void CCharacterBotAI::EngineQuestMob()
 		m_Input.m_TargetY = random_int()%4- random_int()%8;
 	m_Input.m_TargetX = (m_Input.m_Direction*10+1);
 	EmoteActions(EMOTE_BLINK);
-
-	for (int i = 0; i < MAX_PLAYERS; i++)
-	{
-		CPlayer* pFind = GS()->GetPlayer(i, true, true);
-		if (pFind && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f
-			&& !GS()->Collision()->IntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) && m_pBotPlayer->IsActiveSnappingBot(i))
-		{
-			if (!(BotJob::QuestBot[MobID].m_Talk).empty())
-				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Start dialog with NPC [attack hammer]");
-
-			m_Input.m_TargetX = round_to_int(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
-			m_Input.m_TargetY = round_to_int(pFind->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
-			m_Input.m_Direction = 0;
-		}
-	}
+	SearchTalkedPlayer();
 }
 
 // Интерактивы мобов враждебных
@@ -564,6 +549,32 @@ CPlayer *CCharacterBotAI::SearchTenacityPlayer(float Distance)
 	return pPlayer;
 }
 
+bool CCharacterBotAI::SearchTalkedPlayer()
+{
+	bool PlayerFinding = false;
+	const int MobID = m_pBotPlayer->GetBotSub();
+	const bool DialoguesNotEmpty = (bool)(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST && !(BotJob::QuestBot[MobID].m_Talk).empty() 
+				|| m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC && !(BotJob::NpcBot[MobID].m_Talk).empty());
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		CPlayer* pFindPlayer = GS()->GetPlayer(i, true, true);
+		if(pFindPlayer && distance(pFindPlayer->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f &&
+			!GS()->Collision()->IntersectLine(pFindPlayer->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) && m_pBotPlayer->IsActiveSnappingBot(i))
+		{
+			if (DialoguesNotEmpty)
+				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Start dialog with NPC [attack hammer]");
+
+			pFindPlayer->GetCharacter()->m_NoAllowDamage = true;
+			pFindPlayer->GetCharacter()->m_Core.m_LostData = true;
+			m_Input.m_TargetX = static_cast<int>(pFindPlayer->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
+			m_Input.m_TargetY = static_cast<int>(pFindPlayer->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
+			m_Input.m_Direction = 0;
+			PlayerFinding = true;
+		}
+	}
+	return PlayerFinding;
+}
+
 void CCharacterBotAI::EmoteActions(int EmotionStyle)
 {
 	if (EmotionStyle < EMOTE_PAIN || EmotionStyle > EMOTE_BLINK)
@@ -599,23 +610,7 @@ void CCharacterBotAI::EmoteActions(int EmotionStyle)
 // - - - - - - - - - - - - - - - - - - - BASE FUNCTION
 bool CCharacterBotAI::BaseFunctionNPC()
 {
-	bool PlayerFinding = false;
-	const int SubBotID = m_pBotPlayer->GetBotSub();
-	for(int i = 0; i < MAX_PLAYERS; i++)
-	{
-		CPlayer* pFind = GS()->GetPlayer(i, true, true);
-		if(pFind && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f &&
-			!GS()->Collision()->IntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) && m_pBotPlayer->IsActiveSnappingBot(i))
-		{
-			if(!(BotJob::NpcBot[SubBotID].m_Talk).empty())
-				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Start dialog with NPC [attack hammer]");
-
-			m_Input.m_TargetX = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
-			m_Input.m_TargetY = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
-			m_Input.m_Direction = 0;
-			PlayerFinding = true;
-		}
-	}
+	const bool PlayerFinding = SearchTalkedPlayer();
 	return PlayerFinding;
 }
 
