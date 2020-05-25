@@ -1002,11 +1002,10 @@ void CCharacter::HandleTunning()
 		SetEmote(EMOTE_BLINK, 1);	
 	}
 
+	// smooth skip collision
 	if(m_Core.m_LostData)
-	{
 		pTuningParams->m_PlayerCollision = 0;
-		pTuningParams->m_PlayerHooking = 0;
-	}
+		
 	// боты тюнинг
 	if(m_pPlayer->IsBot())
 		return;

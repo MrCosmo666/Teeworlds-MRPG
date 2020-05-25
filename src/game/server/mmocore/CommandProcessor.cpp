@@ -19,9 +19,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 			GS->Chat(ClientID, "You already authed.");
 			return;
 		}
-		if (pPlayer->m_PlayerTick[TickState::CheckClient] &&
-			pPlayer->m_PlayerTick[TickState::CheckClient] + GS->Server()->TickSpeed() * 5 > GS->Server()->Tick())
-			return GS->Chat(ClientID, "Please wait your client check repeat after 1-4 sec!");
 
 		// если аргументы не совпадают
 		char Username[256], Password[256];
@@ -42,9 +39,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 			GS->Chat(ClientID, "Logout account and create!");
 			return;
 		}
-		if (pPlayer->m_PlayerTick[TickState::CheckClient] &&
-			pPlayer->m_PlayerTick[TickState::CheckClient] + GS->Server()->TickSpeed() * 5 > GS->Server()->Tick())
-			return GS->Chat(ClientID, "Please wait your client check repeat after 1-4 sec!");
 
 		// если аргументы не совпадают
 		char Username[256], Password[256];

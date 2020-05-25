@@ -15,7 +15,6 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 		SortTab = 0;
 
 	m_PlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed();
-	m_PlayerTick[TickState::CheckClient] = Server()->Tick();
 	m_PlayerTick[TickState::Die] = Server()->Tick();
 	m_Spawned = true;
 	m_LastVoteMenu = NOPE;
