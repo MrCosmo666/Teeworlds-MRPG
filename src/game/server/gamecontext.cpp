@@ -2234,7 +2234,8 @@ void CGS::SendInbox(int ClientID, const char* Name, const char* Desc, int ItemID
 // отправить информацию о дне
 void CGS::SendDayInfo(int ClientID)
 {
-	Chat(-1, "{STR} came! Good {STR}!", Server()->GetStringTypeDay(), Server()->GetStringTypeDay());
+	if(ClientID == -1)
+		Chat(-1, "{STR} came! Good {STR}!", Server()->GetStringTypeDay(), Server()->GetStringTypeDay());
 	if(m_DayEnumType == DayType::NIGHTTYPE)
 		Chat(ClientID, "Night increase to experience {INT}%", &m_RaidExp);
 	else if(m_DayEnumType == DayType::MORNINGTYPE)
