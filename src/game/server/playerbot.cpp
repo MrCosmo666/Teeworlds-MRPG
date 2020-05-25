@@ -137,26 +137,39 @@ void CPlayerBot::TryRespawn()
 */
 int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 {
-	if(m_BotType == BotsTypes::TYPE_BOT_NPC)
-	{
-		if(IsActiveQuests(SnappingClient))
-			return 2;
-		else 
-			return 1;
-	}
+	if(!m_pCharacter || !m_pCharacter->IsAlive())
+		return 0;
 
 	if(m_BotType == BotsTypes::TYPE_BOT_QUEST)
 	{
+		// [first] quest bot non-active for player
+		BotJob::DataBot[m_BotID].AlreadySnapQuestBot[SnappingClient] = false;
+
 		const int QuestID = BotJob::QuestBot[m_SubBotID].QuestID;
-		const int TalkProgress = BotJob::QuestBot[m_SubBotID].Progress;
 		if(QuestJob::Quests[SnappingClient].find(QuestID) == QuestJob::Quests[SnappingClient].end()) 
 			return 0;
-
 		if(QuestJob::Quests[SnappingClient][QuestID].State == QuestState::QUEST_FINISHED)
 			return 0;
-
+		const int TalkProgress = BotJob::QuestBot[m_SubBotID].Progress;
 		if(TalkProgress != QuestJob::Quests[SnappingClient][QuestID].Progress)
 			return 0;
+		
+		// [second] quest bot active for player
+		BotJob::DataBot[m_BotID].AlreadySnapQuestBot[SnappingClient] = true;
+	}
+
+	if(m_BotType == BotsTypes::TYPE_BOT_NPC)
+	{
+		// [third] skip snapping already snap on quest state
+		m_pCharacter->m_Core.m_LostData = false;
+		if(BotJob::DataBot[m_BotID].AlreadySnapQuestBot[SnappingClient])
+		{
+			m_pCharacter->m_Core.m_LostData = true;
+			return 0;
+		}
+
+		if(!IsActiveQuests(SnappingClient))
+			return 1;
 	}
 	return 2;
 }

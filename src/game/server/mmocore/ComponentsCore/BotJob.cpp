@@ -219,6 +219,10 @@ void BotJob::LoadMainInformationBots()
 			if(DataBot[BotID].SkinColorBot[j] != 0)
 				DataBot[BotID].UseCustomBot[j] = true;
 		}
+
+		for(int i = 0; i < MAX_PLAYERS; i++)
+			DataBot[BotID].AlreadySnapQuestBot[i] = false;
+
 		DataBot[BotID].EquipSlot[EQUIP_HAMMER] = RES->getInt("SlotHammer");
 		DataBot[BotID].EquipSlot[EQUIP_GUN] = RES->getInt("SlotGun");
 		DataBot[BotID].EquipSlot[EQUIP_SHOTGUN] = RES->getInt("SlotShotgun");
