@@ -104,9 +104,9 @@ class BotJob : public MmoComponent
 		int WorldID;
 		char Effect[16];
 
-		int DropItem[6];
-		int CountItem[6];
-		int RandomItem[6];
+		int DropItem[MAX_DROPPED_FROM_MOBS];
+		int CountItem[MAX_DROPPED_FROM_MOBS];
+		float RandomItem[MAX_DROPPED_FROM_MOBS];
 		int BotID;
 	};
 

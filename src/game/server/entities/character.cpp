@@ -96,7 +96,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 
 		m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
 		m_pPlayer->ShowInformationStats();
-		GS()->VResetVotes(m_pPlayer->GetCID(), m_pPlayer->m_OpenVoteMenu);
+		GS()->ResetVotes(m_pPlayer->GetCID(), m_pPlayer->m_OpenVoteMenu);
 	}
 
 	const bool Spawned = GS()->m_pController->OnCharacterSpawn(this);
@@ -886,8 +886,8 @@ void CCharacter::PostSnap()
 void CCharacter::HandleTilesets()
 {
 	// get index tileset char pos
-	int Index = GS()->Collision()->GetParseTilesAt(m_Core.m_Pos.x, m_Core.m_Pos.y);
-	if(GS()->Mmo()->OnPlayerHandleTile(this, Index))
+	const int Index = GS()->Collision()->GetParseTilesAt(m_Core.m_Pos.x, m_Core.m_Pos.y);
+	if(!m_pPlayer->IsBot() && GS()->Mmo()->OnPlayerHandleTile(this, Index))
 		return;
 
 	// инвенты

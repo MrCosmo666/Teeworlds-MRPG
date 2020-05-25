@@ -21,8 +21,6 @@ class CCharacter : public CEntity
 	void FireWeapon();
 	bool DecoInteractive();
 
-	void HandleTilesets();
-	void HandleEvents();
 
 	void HandleWeapons();
 
@@ -116,6 +114,8 @@ protected:
 		bool m_Got;
 
 	} m_aWeapons[NUM_WEAPONS];
+	void HandleTilesets();
+	void HandleEvents();
 
 private:
 	bool m_Alive;

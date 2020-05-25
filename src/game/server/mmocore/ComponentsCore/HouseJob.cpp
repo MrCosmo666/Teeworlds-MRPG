@@ -311,16 +311,16 @@ bool HouseJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 			const int PriceHouse = GS()->Mmo()->House()->GetHousePrice(HouseID);
 			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 200, "House Price: {INT}gold \n"
 				" Owner: {STR}.\nInformation load in vote.", &PriceHouse, GS()->Mmo()->House()->OwnerName(HouseID));
-			GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		}
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_PLAYER_HOUSE))
 	{
 		GS()->Chat(ClientID, "You have left the active zone, menu is restored!");
-		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 
@@ -336,7 +336,7 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		if (!pChr || !pChr->IsAlive())
 			return false;
 
-		if (Menulist == MenuList::MAIN_MENU && pChr->GetHelper()->BoolIndex(TILE_PLAYER_HOUSE))
+		if (pChr->GetHelper()->BoolIndex(TILE_PLAYER_HOUSE))
 		{
 			const int HouseID = GetHouse(pChr->m_Core.m_Pos);
 			if (HouseID > 0)

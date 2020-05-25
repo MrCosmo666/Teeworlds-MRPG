@@ -35,14 +35,14 @@ bool ShopJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	{
 		GS()->Chat(ClientID, "You can see list of auctions items in the votes!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
-		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_AUCTION))
 	{
 		GS()->Chat(ClientID, "You have left the active zone, menu is restored!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
-		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 
@@ -257,7 +257,8 @@ bool ShopJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 	if (ReplaceMenu)
 	{
 		CCharacter* pChr = pPlayer->GetCharacter();
-		if (!pChr) return false;
+		if (!pChr || !pChr->IsAlive())
+			return false;
 
 		if (pChr->GetHelper()->BoolIndex(TILE_AUCTION))
 		{

@@ -44,15 +44,15 @@ bool CraftJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_CRAFT_ZONE))
 	{
 		GS()->Chat(ClientID, "List of your craft's, you can see on vote!");
-		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_CRAFT_ZONE))
 	{
 		GS()->Chat(ClientID, "You have left the active zone, menu is restored!");
-		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	return false;
@@ -200,12 +200,11 @@ bool CraftJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 	if (ReplaceMenu)
 	{
 		CCharacter* pChr = pPlayer->GetCharacter();
-		if (!pChr) 
+		if (!pChr || !pChr->IsAlive()) 
 			return false;
 
-		if (Menulist == MenuList::MAIN_MENU && pChr->GetHelper()->BoolIndex(TILE_CRAFT_ZONE))
+		if (pChr->GetHelper()->BoolIndex(TILE_CRAFT_ZONE))
 		{
-			pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 			GS()->AVH(ClientID, TAB_INFO_CRAFT, GREEN_COLOR, "Crafting Information");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_CRAFT, "If you will not have enough items for crafting");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_CRAFT, "You will write those and the amount that is still required");

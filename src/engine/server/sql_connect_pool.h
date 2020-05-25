@@ -36,12 +36,14 @@ public:
 
 	// функция просто обновит данные что будут указаны
 	void UD(const char *Table, const char *Buffer, ...);
+	void UDS(int Milliseconds, const char *Table, const char *Buffer, ...);
 
 	// функция удаляет что либо из бд
 	void DD(const char *Table, const char *Buffer, ...);
 
 	// функция просто вставляет данные
 	void ID(const char *Table, const char *Buffer, ...);
+	void IDS(int Milliseconds, const char *Table, const char *Buffer, ...);
 };
 
 #endif

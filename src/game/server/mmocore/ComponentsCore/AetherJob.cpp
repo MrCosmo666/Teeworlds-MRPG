@@ -70,14 +70,14 @@ bool AetherJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 		GS()->Chat(ClientID, "List of your aether's, you can see on vote!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
 		UnlockLocation(pChr->GetPlayer(), pChr->m_Core.m_Pos);
-		GS()->VResetVotes(ClientID, MenuList::MAIN_MENU);
+		GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_AETHER_TELEPORT))
 	{
 		GS()->Chat(ClientID, "You have left the active zone, menu is restored!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
-		GS()->VResetVotes(ClientID, MenuList::MAIN_MENU);
+		GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 
@@ -92,7 +92,7 @@ bool AetherJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMen
 		if (!pChr || !pChr->IsAlive()) 
 			return false;
 
-		if (Menulist == MenuList::MAIN_MENU && pChr->GetHelper()->BoolIndex(TILE_AETHER_TELEPORT))
+		if (pChr->GetHelper()->BoolIndex(TILE_AETHER_TELEPORT))
 		{
 			ShowTeleportList(pChr);
 			return true;

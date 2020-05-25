@@ -475,7 +475,7 @@ bool QuestJob::ShowAdventureActiveNPC(CPlayer* pPlayer)
 			const int killNeed = BotInfo->NeedMobCount[i];
 			if(botID > 0 && killNeed > 0 && Job()->BotsData()->IsDataBotValid(botID))
 			{
-				GS()->AVM(clientID, "null", NOPE, HideID, "- Defeat {STR} [{INT}/{INT}]", BotJob::DataBot[botID].NameBot, &qq.second.MobProgress[i], &killNeed);
+				GS()->AVMI(clientID, "broken_h", "null", NOPE, HideID, "- Defeat {STR} [{INT}/{INT}]", BotJob::DataBot[botID].NameBot, &qq.second.MobProgress[i], &killNeed);
 				JustTalk = false;
 			}
 

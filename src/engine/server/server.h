@@ -189,6 +189,7 @@ public:
 	int m_RconClientID;
 	int m_RconAuthLevel;
 	int m_PrintCBIndex;
+	int m_BotsCount;
 
 	// map
 	enum
@@ -237,6 +238,7 @@ public:
 
 	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText);
 	virtual void SendDiscordGenerateMessage(const char *pColor, const char *pTitle, const char *pMsg);
+	virtual void AddInformationBotsCount(int Count);
 
 	void Kick(int ClientID, const char *pReason);
 

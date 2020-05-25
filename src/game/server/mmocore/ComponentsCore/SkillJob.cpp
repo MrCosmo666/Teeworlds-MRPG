@@ -54,10 +54,10 @@ bool SkillJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 	if (ReplaceMenu)
 	{
 		CCharacter* pChr = pPlayer->GetCharacter();
-		if (!pChr) 
+		if (!pChr || !pChr->IsAlive()) 
 			return false;
 
-		if (Menulist == MenuList::MAIN_MENU && pChr->GetHelper()->BoolIndex(TILE_LEARN_SKILL))
+		if (pChr->GetHelper()->BoolIndex(TILE_LEARN_SKILL))
 		{
 			const int ClientID = pPlayer->GetCID();
 			GS()->AVH(ClientID, TAB_INFO_SKILL, GREEN_COLOR, "Skill Learn Information");
@@ -82,14 +82,14 @@ bool SkillJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	{
 		GS()->Chat(ClientID, "You can see list of available skills in the voting!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
-		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_LEARN_SKILL))
 	{
 		GS()->Chat(ClientID, "You have left the active zone, menu is restored!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
-		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 

@@ -59,6 +59,8 @@ enum
 	LOCALWORLD = 0,							// локальный мир
 	COUNT_WORLD = 8,						// кол-во миров
 	LAST_WORLD = COUNT_WORLD - 1,			// последний мир
+
+	MAX_DROPPED_FROM_MOBS = 5,
 };
 
 #endif

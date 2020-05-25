@@ -11,9 +11,9 @@ void AccountMinerJob::ShowMenu(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
 	int ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().Miner[MnrLevel]);
-	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "[Miner Point: {INT}] Level: {INT} Exp: {INT}/{INT}", 
+	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Miner Point: {INT} :: Level: {INT} Exp: {INT}/{INT}", 
 		&pPlayer->Acc().Miner[MnrUpgrade], &pPlayer->Acc().Miner[MnrLevel], &pPlayer->Acc().Miner[MnrExp], &ExperienceNeed);
-	GS()->AVD(ClientID, "MINERUPGRADE", MnrCount, 20, TAB_UPGR_JOB, "[Price 20P]Mining bonus +1(Active {INT})", &pPlayer->Acc().Miner[MnrCount]);
+	GS()->AVD(ClientID, "MINERUPGRADE", MnrCount, 20, TAB_UPGR_JOB, "Quantity +{INT} (Price 20P)", &pPlayer->Acc().Miner[MnrCount]);
 }
 
 int AccountMinerJob::GetOreLevel(vec2 Pos) const

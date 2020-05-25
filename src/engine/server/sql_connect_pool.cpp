@@ -135,6 +135,41 @@ void CConectionPool::UD(const char *Table, const char *Buffer, ...)
 	t.detach();
 }
 
+void CConectionPool::UDS(int Milliseconds, const char *Table, const char *Buffer, ...)
+{
+	char aBuf[1024];
+	va_list VarArgs;
+	va_start(VarArgs, Buffer);
+	#if defined(CONF_FAMILY_WINDOWS)
+	_vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
+	#else
+	vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
+	#endif
+	va_end(VarArgs);
+	aBuf[sizeof(aBuf) - 1] = '\0';
+
+	std::string Buf = "UPDATE " + std::string(Table) + " SET " + std::string(aBuf) + ";";
+	dbg_msg("sql", "%s", Buf.c_str());
+
+	std::thread t([Buf, Milliseconds]()
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
+		Connection* pConn = nullptr;
+		try
+		{
+			pConn = SJK.CreateConnection();
+			std::shared_ptr<Statement> STMT(pConn->createStatement());
+			STMT->execute(Buf.c_str());
+		}
+		catch(sql::SQLException &e)
+		{
+			dbg_msg("sql", "%s", e.what());
+		}
+		SJK.DisconnectConnection(pConn);
+	});
+	t.detach();
+}
+
 void CConectionPool::DD(const char *Table, const char *Buffer, ...)
 {
 	char aBuf[256];
@@ -187,6 +222,41 @@ void CConectionPool::ID(const char *Table, const char *Buffer, ...)
 
 	std::thread t([Buf]()
 	{
+		Connection* pConn = nullptr;
+		try
+		{
+			pConn = SJK.CreateConnection();
+			std::shared_ptr<Statement> STMT(pConn->createStatement());
+			STMT->execute(Buf.c_str());
+		}
+		catch (sql::SQLException & e)
+		{
+			dbg_msg("sql", "%s", e.what());
+		}
+		SJK.DisconnectConnection(pConn);
+	});
+	t.detach();
+}
+
+void CConectionPool::IDS(int Milliseconds, const char *Table, const char *Buffer, ...)
+{
+	char aBuf[1024];
+	va_list VarArgs; 
+	va_start(VarArgs, Buffer);
+#if defined(CONF_FAMILY_WINDOWS)
+	_vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
+#else
+	vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
+#endif
+	va_end(VarArgs);
+
+	aBuf[sizeof(aBuf) - 1] = '\0';
+	std::string Buf = "INSERT INTO " + std::string(Table) + " " + std::string(aBuf) + ";";
+	dbg_msg("sql", "%s", Buf.c_str());
+
+	std::thread t([Buf, Milliseconds]()
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
 		Connection* pConn = nullptr;
 		try
 		{

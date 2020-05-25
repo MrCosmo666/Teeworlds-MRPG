@@ -380,8 +380,6 @@ bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int Maxi
 	return true;
 }
 
-// Именна бонусов статистик
-
 /* #########################################################################
 	FUNCTIONS PLAYER ACCOUNT 
 ######################################################################### */

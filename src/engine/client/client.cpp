@@ -286,7 +286,7 @@ CClient::CClient() : m_DemoPlayer(&m_SnapshotDelta), m_DemoRecorder(&m_SnapshotD
 	m_MapdownloadTotalsize = -1;
 
 	//mmotee
-	m_pMmoInfoTask = NULL;
+	m_pMmoInfoTask = nullptr;
 	m_aNews[0] = '\0';
 
 	m_CurrentInput = 0;
@@ -833,7 +833,7 @@ void CClient::LoadMmoInfo()
 void CClient::RequestMmoInfo()
 {
 	char aUrl[256];
-	str_copy(aUrl, "http://teeworlds.space/update/info", sizeof(aUrl));
+	str_copy(aUrl, "https://teeworlds.space/update/info", sizeof(aUrl));
 
 	m_pMmoInfoTask = std::make_shared<CGetFile>(Storage(), aUrl, MMOTEE_INFO, IStorage::TYPE_SAVE, true);
 	Engine()->AddJob(m_pMmoInfoTask);
@@ -1314,6 +1314,7 @@ void CClient::ProcessServerPacket(CNetChunk* pPacket)
 				m_MapdownloadAmount = 0;
 				m_MapdownloadTotalsize = -1;
 
+				Storage()->RemoveFile(m_aMapdownloadFilename, IStorage::TYPE_SAVE);
 				Storage()->RenameFile(m_aMapdownloadFilenameTemp, m_aMapdownloadFilename, IStorage::TYPE_SAVE);
 
 				// load map

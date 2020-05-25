@@ -450,6 +450,11 @@ void CServer::SendDiscordMessage(const char *pChanel, const char* pColor, const 
 	#endif
 }
 
+void CServer::AddInformationBotsCount(int Count)
+{
+	m_BotsCount += Count;
+}
+
 void CServer::Kick(int ClientID, const char *pReason)
 {
 	if(ClientID < 0 || ClientID >= MAX_PLAYERS || m_aClients[ClientID].m_State == CClient::STATE_EMPTY)
@@ -488,6 +493,7 @@ int64 CServer::TickStartTime(int Tick)
 
 int CServer::Init()
 {
+	m_BotsCount = 0;
 	WorldSec = 0;
 	WorldHour = 0;
 	m_CurrentGameTick = 0;
@@ -1230,7 +1236,7 @@ void CServer::GenerateServerInfo(CPacker *pPacker, int Token)
 	if(g_Config.m_SvShowSvNameTime)
 	{
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "%s %s", GetStringTypeDay(), g_Config.m_SvName);
+		str_format(aBuf, sizeof(aBuf), "%s %s : Active mobs %d on %d zones", GetStringTypeDay(), g_Config.m_SvName, m_BotsCount, COUNT_WORLD);
 		pPacker->AddString(aBuf, 64);
 	}
 	else
@@ -1795,7 +1801,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		return;
 	}
 
-	if (message.startsWith("!mconnect"))
+	else if (message.startsWith("!mconnect"))
 	{	
 		// получаем Айди пользователя
 		SleepyDiscord::Snowflake<SleepyDiscord::User> userAuth = getUser(message.author).cast();
@@ -1829,7 +1835,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	}
 
 	// ВРЕМЯ СЕРВЕРА
-	if (message.startsWith("!mtime"))
+	else if (message.startsWith("!mtime"))
 	{
 		char aBuf[128];
 		int Hour = Server()->GetHourWorld();
@@ -1839,7 +1845,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	}
 
 	// ПОКАЗАТЬ ВСЕХ ИГРОКОВ
-	if (message.startsWith("!monline"))
+	else if (message.startsWith("!monline"))
 	{
 		dynamic_string Buffer;
 		for(int i = 0; i < MAX_PLAYERS; i++) 
@@ -1860,9 +1866,8 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		Buffer.clear();
 		return;
 	}
-
 	// ПОМОЩЬ
-	if (message.startsWith("!mhelp"))
+	else if (message.startsWith("!mhelp"))
 	{
 		sendEmbedMessage(message.channelID, DC_DISCORD_INFO, "Commands / Information", 
 		"`!mtime` - Tee time in server."

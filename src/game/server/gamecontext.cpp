@@ -1054,7 +1054,6 @@ void CGS::OnTick()
 			}
 		}
 	}
-	
 	OnTickLocalWorld();
 	Mmo()->OnTick();
 }
@@ -1647,9 +1646,6 @@ void CGS::ConchainGameinfoUpdate(IConsole::IResult *pResult, void *pUserData, IC
 	pfnCallback(pResult, pCallbackUserData);
 	if(pResult->NumArguments())
 	{
-		//CGS *pSelf = (CGS *)pUserData;
-		//if(pSelf->m_pController)
-		//	pSelf->m_pController->CheckGameInfo();
 	}
 }
 
@@ -1848,7 +1844,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	if (Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList, true))
 	{
 		m_apPlayers[ClientID]->m_Colored = { 20,7,15 };
-		AV(ClientID, "null", "↑ The main menu will return as soon as you leave this zone!");
+		AV(ClientID, "null", "The main menu will return as soon as you leave this zone!");
 		return;
 	}
 
@@ -1858,7 +1854,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		// меню статистики
 		int NeedExp = pPlayer->ExpNeed(pPlayer->Acc().Level);
-		AVH(ClientID, TAB_STAT, PURPLE_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().LastLogin);
+		AVH(ClientID, TAB_STAT, GREEN_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().LastLogin);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Discord: \"{STR}\". Ideas, bugs, rewards", g_Config.m_SvDiscordInviteGroup);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Level {INT} : Exp {INT}/{INT}", &pPlayer->Acc().Level, &pPlayer->Acc().Exp, &NeedExp);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Money {INT} gold", &pPlayer->GetItem(itGold).Count);
@@ -1929,7 +1925,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			if(at.second.AtType != AtributType::AtDps || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_DPS, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], AtributeName(at.first));
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_DPS, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().Stats[at.first], &at.second.UpgradePrice);
 		}
 		AV(ClientID, "null", "");
 
@@ -1941,7 +1937,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			if(at.second.AtType != AtributType::AtTank || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_TANK, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], AtributeName(at.first));
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_TANK, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().Stats[at.first], &at.second.UpgradePrice);
 		}
 		AV(ClientID, "null", "");
 
@@ -1953,7 +1949,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			if(at.second.AtType != AtributType::AtHealer || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_HEALER, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], AtributeName(at.first));
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_HEALER, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().Stats[at.first], &at.second.UpgradePrice);
 		}
 		AV(ClientID, "null", "");
 
@@ -1964,7 +1960,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			if(at.second.AtType != AtributType::AtWeapon || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
 	
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_WEAPON, "[Price {INT}] {INT}P {STR}", &at.second.UpgradePrice, &pPlayer->Acc().Stats[at.first], AtributeName(at.first));
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_WEAPON, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().Stats[at.first], &at.second.UpgradePrice);
 		}
 
 		AV(ClientID, "null", ""), 
@@ -2004,12 +2000,12 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			const int PosX = mobs.second.PositionX/32, PosY = mobs.second.PositionY/32;
 			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} {STR}(x{INT} y{INT})", mobs.second.GetName(), Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY);
 	
-			for(int i = 0; i < 6; i++)
+			for(int i = 0; i < MAX_DROPPED_FROM_MOBS; i++)
 			{
 				if(mobs.second.DropItem[i] <= 0 || mobs.second.CountItem[i] <= 0)
 					continue;
 			
-				double Chance = mobs.second.RandomItem[i] <= 0 ? 100.0f : (1.0f / (double)mobs.second.RandomItem[i]) * 100;
+				double Chance = (double)mobs.second.RandomItem[i];
 				ItemJob::ItemInformation &InfoDropItem = GetItemInfo(mobs.second.DropItem[i]);
 				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%", InfoDropItem.GetName(pPlayer), mobs.second.CountItem[i], Chance);
 				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, "{STR}", aBuf);

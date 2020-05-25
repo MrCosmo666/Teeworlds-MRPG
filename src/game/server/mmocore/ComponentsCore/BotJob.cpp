@@ -270,6 +270,8 @@ void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 			str_copy(LoadTalk.m_TalkingText, RES->getString("TalkText").c_str(), sizeof(LoadTalk.m_TalkingText));
 			QuestBot[MobID].m_Talk.push_back(LoadTalk);
 		}
+
+		GS()->Server()->AddInformationBotsCount(1);
 	}
 
 	for(auto& qparseprogress : QuestBot)
@@ -320,6 +322,8 @@ void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 			if(LoadTalk.m_GivingQuest > 0)
 				NpcBot[MobID].Function = FunctionsNPC::FUNCTION_NPC_GIVE_QUEST;
 		}
+
+		GS()->Server()->AddInformationBotsCount(CountMobs);
 	}
 }
 
@@ -343,23 +347,25 @@ void BotJob::LoadMobsBots(const char* pWhereLocalWorld)
 		str_copy(MobBot[MobID].Effect, RES->getString("Effect").c_str(), sizeof(MobBot[MobID].Effect));
 
 		char aBuf[32];
-		for(int i = 0; i < 6; i++)
+		for(int i = 0; i < MAX_DROPPED_FROM_MOBS; i++)
 		{
 			str_format(aBuf, sizeof(aBuf), "it_drop_%d", i);
 			MobBot[MobID].DropItem[i] = RES->getInt(aBuf);
 		}
 
-		sscanf(RES->getString("it_count").c_str(), "|%d|%d|%d|%d|%d|%d|",
+		sscanf(RES->getString("it_drop_count").c_str(), "|%d|%d|%d|%d|%d|",
 			&MobBot[MobID].CountItem[0], &MobBot[MobID].CountItem[1], &MobBot[MobID].CountItem[2],
-			&MobBot[MobID].CountItem[3], &MobBot[MobID].CountItem[4], &MobBot[MobID].CountItem[5]);
+			&MobBot[MobID].CountItem[3], &MobBot[MobID].CountItem[4]);
 
-		sscanf(RES->getString("it_random").c_str(), "|%d|%d|%d|%d|%d|%d|",
+		sscanf(RES->getString("it_drop_chance").c_str(), "|%f|%f|%f|%f|%f|",
 			&MobBot[MobID].RandomItem[0], &MobBot[MobID].RandomItem[1], &MobBot[MobID].RandomItem[2],
-			&MobBot[MobID].RandomItem[3], &MobBot[MobID].RandomItem[4], &MobBot[MobID].RandomItem[5]);
+			&MobBot[MobID].RandomItem[3], &MobBot[MobID].RandomItem[4]);
 
 		const int CountMobs = RES->getInt("Count");
 		for(int c = 0; c < CountMobs; c++)
 			GS()->CreateBot(BotsTypes::TYPE_BOT_MOB, BotID, MobID);
+			
+		GS()->Server()->AddInformationBotsCount(CountMobs);
 	}
 }
 

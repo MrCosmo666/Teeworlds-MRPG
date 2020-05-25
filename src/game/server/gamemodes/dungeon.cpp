@@ -429,8 +429,9 @@ int CGameControllerDungeon::GetDungeonSync(CPlayer* pPlayer, int BonusID) const
 	{
 		if(ParsePlayerStatsClass == AtributType::AtTank)
 			Procent = 12;
+
 		if(ParsePlayerStatsClass == AtributType::AtHealer || ParsePlayerStatsClass == AtributType::AtDps)
-			Delay = 60;
+			Delay = 100;
 	}
 	else
 	{
@@ -439,10 +440,10 @@ int CGameControllerDungeon::GetDungeonSync(CPlayer* pPlayer, int BonusID) const
 		else if(ParsePlayerStatsClass == AtributType::AtHealer)
 			Procent = 5;
 		else if(ParsePlayerStatsClass == AtributType::AtDps)
-			Procent = 4;
+			Procent = 3;
 
 	}
-
+	
 	if(ParsePlayerStatsClass == AtributType::AtHardtype || BonusID == Stats::StStrength)
 		Delay = 50;
 

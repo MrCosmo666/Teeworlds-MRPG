@@ -148,8 +148,8 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		}
 
 		const int SelectedAccountID = VoteID;
-		SJK.UD("tw_guilds", "OwnerID = '%d' WHERE ID = '%d'", SelectedAccountID, GuildID);
 		Guild[GuildID].m_OwnerID = SelectedAccountID;
+		SJK.UD("tw_guilds", "OwnerID = '%d' WHERE ID = '%d'", SelectedAccountID, GuildID);
 
 		AddHistoryGuild(GuildID, "New guild leader '%s'.", Job()->PlayerName(SelectedAccountID));
 		GS()->ChatGuild(GuildID, "Change leader {STR}->{STR}", GS()->Server()->ClientName(ClientID), Job()->PlayerName(SelectedAccountID));
@@ -704,28 +704,34 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 
 	// проверяем находимся ли уже в организации
 	if(pPlayer->Acc().GuildID > 0) 
-		return GS()->Chat(ClientID, "You already in guild group!");
+	{
+		GS()->Chat(ClientID, "You already in guild group!");
+		return;
+	}
 
 	// проверяем доступность имени организации
 	CSqlString<64> cGuildName = CSqlString<64>(GuildName);
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds", "WHERE GuildName = '%s'", cGuildName.cstr()));
 	if(RES->next()) 
-		return GS()->Chat(ClientID, "This guild name already useds!");
-	
+	{
+		GS()->Chat(ClientID, "This guild name already useds!");
+		return;
+	}
+
 	// проверяем тикет забераем и создаем
 	if(pPlayer->GetItem(itTicketGuild).Count > 0 && pPlayer->GetItem(itTicketGuild).Remove(1))
 	{
 		// получаем Айди для инициализации
 		boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_guilds", "ORDER BY ID DESC LIMIT 1"));
-		int InitID = RES2->next() ? RES2->getInt("ID")+1 : 1; // TODO: thread save ? hm need for table all time auto increment = 1; NEED FIX IT
+		const int InitID = RES2->next() ? RES2->getInt("ID")+1 : 1; // TODO: thread save ? hm need for table all time auto increment = 1; NEED FIX IT
 		
 		// инициализируем гильдию
+		str_copy(Guild[InitID].m_Name, cGuildName.cstr(), sizeof(Guild[InitID].m_Name));
 		Guild[InitID].m_OwnerID = pPlayer->Acc().AuthID;
 		Guild[InitID].m_Level = 1;
 		Guild[InitID].m_Exp = 0;
 		Guild[InitID].m_Bank = 0;
 		Guild[InitID].m_Score = 0;
-		str_copy(Guild[InitID].m_Name, cGuildName.cstr(), sizeof(Guild[InitID].m_Name));
 		Guild[InitID].m_Upgrades[EMEMBERUPGRADE::AvailableNSTSlots] = 2;
 		Guild[InitID].m_Upgrades[EMEMBERUPGRADE::ChairNSTExperience] = 1;
 		Guild[InitID].m_Upgrades[EMEMBERUPGRADE::ChairNSTMoney] = 1;
@@ -733,7 +739,7 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 
 		// создаем в таблице гильдию
 		SJK.ID("tw_guilds", "(ID, GuildName, OwnerID) VALUES ('%d', '%s', '%d')", InitID, cGuildName.cstr(), pPlayer->Acc().AuthID);
-		SJK.UD("tw_accounts_data", "GuildID = '%d' WHERE ID = '%d'", InitID, pPlayer->Acc().AuthID);
+		SJK.UDS(1000, "tw_accounts_data", "GuildID = '%d' WHERE ID = '%d'", InitID, pPlayer->Acc().AuthID);
 		GS()->Chat(-1, "New guilds [{STR}] have been created!", cGuildName.cstr());
 	}
 	else 
@@ -744,11 +750,12 @@ void GuildJob::JoinGuild(int AuthID, int GuildID)
 {
 	// проверяем клан есть или нет у этого и грока
 	const char *PlayerName = Job()->PlayerName(AuthID);
-	boost::scoped_ptr<ResultSet> CheckJoinRES(SJK.SD("ID", "tw_accounts_data", "WHERE ID = '%d' AND GuildID > '0'", AuthID));
+	boost::scoped_ptr<ResultSet> CheckJoinRES(SJK.SD("ID", "tw_accounts_data", "WHERE ID = '%d' AND GuildID IS NOT NULL", AuthID));
 	if(CheckJoinRES->next())
 	{
 		GS()->ChatAccountID(AuthID, "You already in guild group!");
-		return GS()->ChatGuild(GuildID, "{STR} already joined your or another guilds", PlayerName);
+		GS()->ChatGuild(GuildID, "{STR} already joined your or another guilds", PlayerName);
+		return;
 	}
 
 	// проверяем количество слотов доступных
@@ -756,11 +763,12 @@ void GuildJob::JoinGuild(int AuthID, int GuildID)
 	if((int)CheckSlotsRES->rowsCount() >= Guild[GuildID].m_Upgrades[EMEMBERUPGRADE::AvailableNSTSlots])
 	{
 		GS()->ChatAccountID(AuthID, "You don't joined [No slots for join]");
-		return GS()->ChatGuild(GuildID, "{STR} don't joined [No slots for join]", PlayerName);
+		GS()->ChatGuild(GuildID, "{STR} don't joined [No slots for join]", PlayerName);
+		return;
 	}
 
 	// обновляем и получаем данные
-	int ClientID = Job()->Account()->CheckOnlineAccount(AuthID);
+	const int ClientID = Job()->Account()->CheckOnlineAccount(AuthID);
 	if(ClientID >= 0 && ClientID < MAX_PLAYERS)
 	{
 		AccountMainJob::Data[ClientID].GuildID = GuildID;
@@ -776,7 +784,10 @@ void GuildJob::ExitGuild(int AuthID)
 	// проверяем если покидает лидер клан
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds", "WHERE OwnerID = '%d'", AuthID));
 	if (RES->next())
-		return GS()->ChatAccountID(AuthID, "A leader cannot leave his guild group!");
+	{
+		GS()->ChatAccountID(AuthID, "A leader cannot leave his guild group!");
+		return;
+	}
 
 	// проверяем аккаунт и его организацию и устанавливаем
 	boost::scoped_ptr<ResultSet> RES2(SJK.SD("GuildID", "tw_accounts_data", "WHERE ID = '%d'", AuthID));
@@ -788,11 +799,11 @@ void GuildJob::ExitGuild(int AuthID)
 		AddHistoryGuild(GuildID, "'%s' exit or kicked.", Job()->PlayerName(AuthID));
 
 		// обновляем информацию игроку
-		int ClientID = Job()->Account()->CheckOnlineAccount(AuthID);
+		const int ClientID = Job()->Account()->CheckOnlineAccount(AuthID);
 		if(ClientID >= 0 && ClientID < MAX_PLAYERS)
 		{
-			GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 			AccountMainJob::Data[ClientID].GuildID = 0;
+			GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		}
 		SJK.UD("tw_accounts_data", "GuildID = NULL, GuildRank = NULL, GuildDeposit = '0' WHERE ID = '%d'", AuthID);
 	}

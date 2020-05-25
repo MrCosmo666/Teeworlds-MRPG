@@ -132,13 +132,15 @@ void CCharacterBotAI::Die(int Killer, int Weapon)
 	CCharacter::Die(Killer, Weapon);
 }
 
-void CCharacterBotAI::CreateRandomDropItem(int DropCID, int Random, int ItemID, int Count, vec2 Force)
+void CCharacterBotAI::CreateRandomDropItem(int DropCID, float Random, int ItemID, int Count, vec2 Force)
 {
 	if (DropCID < 0 || DropCID >= MAX_PLAYERS || !GS()->m_apPlayers[DropCID] || !GS()->m_apPlayers[DropCID]->GetCharacter() || !IsAlive())
 		return;
 
-	const int RandomDrop = (Random == 0 ? 0 : random_int() % Random);
-	if (RandomDrop == 0)
+	const float RandomDrop = frandom()*100.0f;
+	dbg_msg("Test", "get random %f / %f", RandomDrop, Random);
+
+	if (RandomDrop < Random)
 		GS()->CreateDropItem(m_Core.m_Pos, DropCID, ItemID, Count, 0, Force);
 	return;
 }
@@ -152,14 +154,14 @@ void CCharacterBotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 	if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 		GS()->Mmo()->Quest()->AddMobProgress(pPlayer, BotID);
 
-	for (int i = 0; i < 6; i++)
+	for (int i = 0; i < 5; i++)
 	{
 		const int DropItem = BotJob::MobBot[SubID].DropItem[i];
 		const int CountItem = BotJob::MobBot[SubID].CountItem[i];
 		if (DropItem <= 0 || CountItem <= 0)
 			continue;
 
-		const int RandomDrop = BotJob::MobBot[SubID].RandomItem[i];
+		const float RandomDrop = BotJob::MobBot[SubID].RandomItem[i];
 		CreateRandomDropItem(ClientID, RandomDrop, DropItem, CountItem, ForceDies);
 	}
 
@@ -223,8 +225,11 @@ void CCharacterBotAI::Tick()
 		return;
 
 	if(IsAlive())
+	{
 		EngineBots();
-
+		HandleEvents();
+		HandleTilesets();
+	}
 	CCharacter::Tick();
 }
 

@@ -45,7 +45,7 @@ private:
 	virtual bool GiveWeapon(int Weapon, int GiveAmmo);
 	virtual int GetSnapFullID() const;
 
-	void CreateRandomDropItem(int DropCID, int Random, int ItemID, int Count, vec2 Force);
+	void CreateRandomDropItem(int DropCID, float Random, int ItemID, int Count, vec2 Force);
 	void DieRewardPlayer(CPlayer *pPlayer, vec2 ForceDies);
 	
 	void ClearTarget();

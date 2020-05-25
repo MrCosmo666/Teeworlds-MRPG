@@ -64,9 +64,9 @@ void AccountPlantJob::ShowMenu(int ClientID)
 		return;
 
 	int ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().Plant[PlLevel]);
-	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "[Plants Point: {INT}] Level: {INT} Exp: {INT}/{INT}", 
+	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Plants Point: {INT} :: Level: {INT} Exp: {INT}/{INT}", 
 		&pPlayer->Acc().Plant[PlUpgrade], &pPlayer->Acc().Plant[PlLevel], &pPlayer->Acc().Plant[PlExp], &ExperienceNeed);
-	GS()->AVD(ClientID, "PLANTUPGRADE", PlCounts, 20, TAB_UPGR_JOB, "[Price 20P]Plants bonus +1(Active {INT})", &pPlayer->Acc().Plant[PlCounts]);
+	GS()->AVD(ClientID, "PLANTUPGRADE", PlCounts, 20, TAB_UPGR_JOB, "Quantity +{INT} (Price 20P)", &pPlayer->Acc().Plant[PlCounts]);
 }
 
 void AccountPlantJob::ShowPlantsItems(int ClientID)
