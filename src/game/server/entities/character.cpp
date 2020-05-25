@@ -286,6 +286,7 @@ void CCharacter::FireWeapon()
 				if((pTarget == this) || GS()->Collision()->IntersectLineWithInvisible(ProjStartPos, pTarget->m_Pos, 0, 0))
 					continue;
 
+				// talking wth bot
 				if (!StartedTalking && StartConversation(pTarget->GetPlayer()))
 				{
 					m_pPlayer->ClearTalking();
@@ -1196,17 +1197,9 @@ bool CCharacter::StartConversation(CPlayer *pTarget)
 		return false;
 
 	CPlayerBot* pTargetBot = static_cast<CPlayerBot*>(pTarget);
-	if (!pTargetBot || pTargetBot->GetBotType() == TYPE_BOT_NPC)
-		return true;
-
-	const int MobID = pTargetBot->GetBotSub();
-	if (pTargetBot->GetBotType() != TYPE_BOT_QUEST || GS()->Mmo()->Quest()->GetState(m_pPlayer->GetCID(), BotJob::QuestBot[MobID].QuestID) != QUEST_ACCEPT)
+	if (!pTargetBot || !pTargetBot->IsActiveSnappingBot(m_pPlayer->GetCID()))
 		return false;
 
-	const int ClientID = m_pPlayer->GetCID();
-	const int QuestID = BotJob::QuestBot[MobID].QuestID;
-	if(!GS()->Mmo()->Quest()->IsValidQuest(QuestID, ClientID) || QuestJob::Quests[ClientID][QuestID].Progress != BotJob::QuestBot[MobID].Progress)
-		return false;
 	return true;
 }
 

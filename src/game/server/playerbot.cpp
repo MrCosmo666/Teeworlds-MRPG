@@ -161,12 +161,8 @@ int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 	if(m_BotType == BotsTypes::TYPE_BOT_NPC)
 	{
 		// [third] skip snapping already snap on quest state
-		m_pCharacter->m_Core.m_LostData = false;
 		if(BotJob::DataBot[m_BotID].AlreadySnapQuestBot[SnappingClient])
-		{
-			m_pCharacter->m_Core.m_LostData = true;
 			return 0;
-		}
 
 		if(!IsActiveQuests(SnappingClient))
 			return 1;

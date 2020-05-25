@@ -53,8 +53,7 @@ bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 	}
 	else if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
-		m_NoAllowDamage = true;
-		m_Core.m_ProtectHooked = true;
+		m_Core.m_LostData = true;
 
 		const int Function = BotJob::NpcBot[SubBotID].Function;
 		if(Function == FunctionsNPC::FUNCTION_NPC_NURSE)
@@ -298,8 +297,7 @@ void CCharacterBotAI::EngineQuestMob()
 	{
 		CPlayer* pFind = GS()->GetPlayer(i, true, true);
 		if (pFind && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f
-			&& !GS()->Collision()->IntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0)
-			&& m_pBotPlayer->IsActiveSnappingBot(i))
+			&& !GS()->Collision()->IntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) && m_pBotPlayer->IsActiveSnappingBot(i))
 		{
 			if (!(BotJob::QuestBot[MobID].m_Talk).empty())
 				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Start dialog with NPC [attack hammer]");
@@ -607,7 +605,7 @@ bool CCharacterBotAI::BaseFunctionNPC()
 	{
 		CPlayer* pFind = GS()->GetPlayer(i, true, true);
 		if(pFind && distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f &&
-			!GS()->Collision()->IntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0))
+			!GS()->Collision()->IntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) && m_pBotPlayer->IsActiveSnappingBot(i))
 		{
 			if(!(BotJob::NpcBot[SubBotID].m_Talk).empty())
 				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Start dialog with NPC [attack hammer]");
