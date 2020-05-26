@@ -564,7 +564,6 @@ bool CCharacterBotAI::SearchTalkedPlayer()
 			if (DialoguesNotEmpty)
 				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Start dialog with NPC [attack hammer]");
 
-			pFindPlayer->GetCharacter()->m_NoAllowDamage = true;
 			pFindPlayer->GetCharacter()->m_Core.m_LostData = true;
 			m_Input.m_TargetX = static_cast<int>(pFindPlayer->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
 			m_Input.m_TargetY = static_cast<int>(pFindPlayer->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
@@ -617,19 +616,8 @@ bool CCharacterBotAI::BaseFunctionNPC()
 // - - - - - - - - - - - - - - - - - - - FUNCTION NURSE
 bool CCharacterBotAI::FunctionNurseNPC()
 {
-	bool PlayerFinding = false;
-	if(Server()->Tick() % Server()->TickSpeed() != 0)
-	{
-		CPlayer* pFindPlayer = SearchPlayer(256.0f);
-		if(pFindPlayer && pFindPlayer->GetCharacter() && pFindPlayer->GetHealth() < pFindPlayer->GetStartHealth())
-		{
-			m_Input.m_TargetX = static_cast<int>(pFindPlayer->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
-			m_Input.m_TargetY = static_cast<int>(pFindPlayer->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
-		}
-		return true;
-	}
-
 	char aBuf[16];
+	bool PlayerFinding = false;
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pFindPlayer = GS()->GetPlayer(i, true, true);
@@ -637,14 +625,25 @@ bool CCharacterBotAI::FunctionNurseNPC()
 			GS()->Collision()->IntersectLine(pFindPlayer->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0))
 			continue;
 
+		// disable collision with players
+		if(distance(pFindPlayer->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f)
+			pFindPlayer->GetCharacter()->m_Core.m_LostData = true;
+
+		// skip full health
 		if(pFindPlayer->GetHealth() >= pFindPlayer->GetStartHealth())
 			continue;
 
+		// set target to player
 		m_Input.m_TargetX = static_cast<int>(pFindPlayer->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
 		m_Input.m_TargetY = static_cast<int>(pFindPlayer->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
 		m_LatestInput.m_TargetX = m_Input.m_TargetX;
 		m_LatestInput.m_TargetY = m_Input.m_TargetX;
 
+		// health every sec
+		if(Server()->Tick() % Server()->TickSpeed() != 0)	
+			continue;
+
+		// increase health for player
 		const int Health = max(pFindPlayer->GetStartHealth() / 20, 1);
 		vec2 DrawPosition = vec2(pFindPlayer->GetCharacter()->m_Core.m_Pos.x, pFindPlayer->GetCharacter()->m_Core.m_Pos.y - 90.0f);
 		str_format(aBuf, sizeof(aBuf), "%dHP", Health);
