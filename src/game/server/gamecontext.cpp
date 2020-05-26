@@ -280,21 +280,6 @@ void CGS::CreateSound(vec2 Pos, int Sound, int64 Mask)
 	}
 }
 
-void CGS::CreateWorldSound(vec2 Pos, int Sound)
-{
-	// fix for vanilla unterstand SoundID
-	if(Sound < 0 || Sound > 40)
-		return;
-
-	CNetEvent_SoundWorld *pEvent = (CNetEvent_SoundWorld *)m_Events.Create(NETEVENTTYPE_SOUNDWORLD, sizeof(CNetEvent_SoundWorld), MaskWorldID());
-	if(pEvent)
-	{
-		pEvent->m_X = (int)Pos.x;
-		pEvent->m_Y = (int)Pos.y;
-		pEvent->m_SoundID = Sound;
-	}
-}
-
 void CGS::CreatePlayerSound(int ClientID, int Sound)
 {
 	// fix for vanilla unterstand SoundID
@@ -312,8 +297,7 @@ void CGS::CreatePlayerSound(int ClientID, int Sound)
 
 void CGS::SendMmoEffect(vec2 Pos, int EffectID, int ClientID)
 {
-	int64 Mask = (int64)(ClientID >= 0 && ClientID < MAX_PLAYERS ? MaskWorldID() : CmaskOne(ClientID));
-	CNetEvent_EffectMmo *pEvent = (CNetEvent_EffectMmo *)m_Events.Create(NETEVENTTYPE_EFFECTMMO, sizeof(CNetEvent_EffectMmo), Mask);
+	CNetEvent_EffectMmo *pEvent = (CNetEvent_EffectMmo *)m_Events.Create(NETEVENTTYPE_EFFECTMMO, sizeof(CNetEvent_EffectMmo));
 	if(pEvent)
 	{
 		pEvent->m_X = (int)Pos.x;
@@ -2301,18 +2285,6 @@ bool CGS::CheckPlayersDistance(vec2 Pos, float Distance) const
 		return true;
 	}
 	return false;
-}
-
-// MASK
-int64 CGS::MaskWorldID()
-{
-	int64 Mask = -1;
-	for(int i = 0; i < MAX_PLAYERS; i++)
-	{
-		if(IsClientEqualWorldID(i))
-			Mask |= CmaskOne(i);
-	}
-	return Mask;
 }
 
 IGameServer *CreateGameServer() { return new CGS; }

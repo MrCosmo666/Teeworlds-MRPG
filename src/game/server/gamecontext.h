@@ -119,7 +119,6 @@ public:
 	void CreatePlayerSpawn(vec2 Pos);
 	void CreateDeath(vec2 Pos, int Who);
 	void CreateSound(vec2 Pos, int Sound, int64 Mask=-1);
-	void CreateWorldSound(vec2 Pos, int Sound);
 	void CreatePlayerSound(int ClientID, int Sound);
 	void SendMmoEffect(vec2 Pos, int EffectID, int ClientID = -1);
 	void SendMmoPotion(vec2 Pos, const char *Potion, bool Added);
@@ -309,8 +308,6 @@ private:
 	bool m_AllowedPVP;
 	int m_DayEnumType;
 	static int m_RaidExp;
-
-	int64 MaskWorldID();
 };
 
 inline int64 CmaskAll() { return -1; }

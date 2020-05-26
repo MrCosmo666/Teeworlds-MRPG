@@ -272,7 +272,7 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 			for(int i = WEAPON_GUN; i <= WEAPON_LASER; i++)
 			{
 				pPlayerSearch->GetCharacter()->GiveWeapon(i, RestoreAmmo);
-				GS()->CreateWorldSound(PlayerPosition, SOUND_CTF_GRAB_PL);
+				GS()->CreateSound(PlayerPosition, SOUND_CTF_GRAB_PL);
 				GS()->CreateDeath(PlayerPosition, i);
 			}
 		}
