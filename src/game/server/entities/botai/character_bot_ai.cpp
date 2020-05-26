@@ -136,8 +136,6 @@ void CCharacterBotAI::CreateRandomDropItem(int DropCID, float Random, int ItemID
 		return;
 
 	const float RandomDrop = frandom()*100.0f;
-	dbg_msg("Test", "get random %f / %f", RandomDrop, Random);
-
 	if (RandomDrop < Random)
 		GS()->CreateDropItem(m_Core.m_Pos, DropCID, ItemID, Count, 0, Force);
 	return;

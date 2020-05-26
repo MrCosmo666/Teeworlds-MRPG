@@ -256,6 +256,7 @@ void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 		QuestBot[MobID].InteractiveType = (int)RES->getInt("interactive_type");
 		QuestBot[MobID].InteractiveTemp = (int)RES->getInt("interactive_temp");
 		QuestBot[MobID].GenerateNick = (bool)RES->getBoolean("generate_nick");
+		QuestBot[MobID].IdenticalLastProgress = (bool)RES->getBoolean("identical_last_progress");
 
 		sscanf(RES->getString("it_count").c_str(), "|%d|%d|%d|%d|%d|%d|",
 			&QuestBot[MobID].ItemSearchCount[0], &QuestBot[MobID].ItemSearchCount[1],
@@ -287,7 +288,9 @@ void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 				continue;
 			if(qbots.first == qparseprogress.first)
 				break;
-			qparseprogress.second.Progress++;
+
+			if(!qparseprogress.second.IdenticalLastProgress)
+				qparseprogress.second.Progress++;
 		}
 	}
 }

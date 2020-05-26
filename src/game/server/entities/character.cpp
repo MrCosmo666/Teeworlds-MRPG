@@ -553,10 +553,10 @@ void CCharacter::Tick()
 		HandleAuthedPlayer();
 		HandleEvents();
 		HandleTilesets();
+
+		m_Core.m_LostData = false;
+		m_NoAllowDamage = false;
 	}
-	
-	m_Core.m_LostData = false;
-	m_NoAllowDamage = false;
 }
 
 void CCharacter::TickDefered()
