@@ -1233,10 +1233,10 @@ void CServer::GenerateServerInfo(CPacker *pPacker, int Token)
 
 	pPacker->AddString(GameServer()->Version(), 32);
 
-	if(g_Config.m_SvShowSvNameTime)
+	if(g_Config.m_SvShowWorldInformation)
 	{
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "%s %s : Active mobs %d on %d zones", GetStringTypeDay(), g_Config.m_SvName, m_BotsCount, COUNT_WORLD);
+		str_format(aBuf, sizeof(aBuf), "%s : Active mobs %d on %d zones", g_Config.m_SvName, m_BotsCount, COUNT_WORLD);
 		pPacker->AddString(aBuf, 64);
 	}
 	else

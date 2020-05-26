@@ -137,9 +137,6 @@ void CPlayerBot::TryRespawn()
 */
 int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 {
-	if(!m_pCharacter || !m_pCharacter->IsAlive())
-		return 0;
-
 	if(m_BotType == BotsTypes::TYPE_BOT_QUEST)
 	{
 		// [first] quest bot non-active for player
@@ -163,7 +160,6 @@ int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 		// [third] skip snapping already snap on quest state
 		if(BotJob::DataBot[m_BotID].AlreadySnapQuestBot[SnappingClient])
 			return 0;
-
 		if(!IsActiveQuests(SnappingClient))
 			return 1;
 	}

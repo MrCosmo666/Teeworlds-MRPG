@@ -1168,8 +1168,11 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				}
 
 				// отправить обычное сообщение в чат
-				ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ClientID), pMsg->m_pMessage);
 				SendChat(ClientID, Mode, pMsg->m_Target, pMsg->m_pMessage);						
+
+				// отправить чат дискорд пропуская Whisper
+				if(Mode != CHAT_WHISPER)
+					ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ClientID), pMsg->m_pMessage);
 			}
 		}
 		else if (MsgID == NETMSGTYPE_CL_COMMAND)

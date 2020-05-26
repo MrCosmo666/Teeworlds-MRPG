@@ -553,8 +553,8 @@ bool CCharacterBotAI::SearchTalkedPlayer()
 {
 	bool PlayerFinding = false;
 	const int MobID = m_pBotPlayer->GetBotSub();
-	const bool DialoguesNotEmpty = (bool)(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST && !(BotJob::QuestBot[MobID].m_Talk).empty() 
-				|| m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC && !(BotJob::NpcBot[MobID].m_Talk).empty());
+	const bool DialoguesNotEmpty = ((bool)(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST && !(BotJob::QuestBot[MobID].m_Talk).empty())
+				|| (m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC && !(BotJob::NpcBot[MobID].m_Talk).empty()));
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pFindPlayer = GS()->GetPlayer(i, true, true);
@@ -620,11 +620,11 @@ bool CCharacterBotAI::FunctionNurseNPC()
 	bool PlayerFinding = false;
 	if(Server()->Tick() % Server()->TickSpeed() != 0)
 	{
-		CPlayer* pFind = SearchPlayer(256.0f);
-		if(pFind && pFind->GetCharacter() && pFind->GetHealth() < pFind->GetStartHealth())
+		CPlayer* pFindPlayer = SearchPlayer(256.0f);
+		if(pFindPlayer && pFindPlayer->GetCharacter() && pFindPlayer->GetHealth() < pFindPlayer->GetStartHealth())
 		{
-			m_Input.m_TargetX = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
-			m_Input.m_TargetY = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
+			m_Input.m_TargetX = static_cast<int>(pFindPlayer->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
+			m_Input.m_TargetY = static_cast<int>(pFindPlayer->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
 		}
 		return true;
 	}
@@ -632,22 +632,24 @@ bool CCharacterBotAI::FunctionNurseNPC()
 	char aBuf[16];
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		CPlayer* pFind = GS()->GetPlayer(i, true, true);
-		if(!pFind || pFind->GetHealth() >= pFind->GetStartHealth() ||
-			distance(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) >= 256.0f ||
-			GS()->Collision()->IntersectLine(pFind->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0))
+		CPlayer* pFindPlayer = GS()->GetPlayer(i, true, true);
+		if(!pFindPlayer || distance(pFindPlayer->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) >= 256.0f ||
+			GS()->Collision()->IntersectLine(pFindPlayer->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0))
 			continue;
 
-		m_Input.m_TargetX = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
-		m_Input.m_TargetY = static_cast<int>(pFind->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
+		if(pFindPlayer->GetHealth() >= pFindPlayer->GetStartHealth())
+			continue;
+
+		m_Input.m_TargetX = static_cast<int>(pFindPlayer->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
+		m_Input.m_TargetY = static_cast<int>(pFindPlayer->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
 		m_LatestInput.m_TargetX = m_Input.m_TargetX;
 		m_LatestInput.m_TargetY = m_Input.m_TargetX;
 
-		const int Health = max(pFind->GetStartHealth() / 20, 1);
-		vec2 DrawPosition = vec2(pFind->GetCharacter()->m_Core.m_Pos.x, pFind->GetCharacter()->m_Core.m_Pos.y - 90.0f);
+		const int Health = max(pFindPlayer->GetStartHealth() / 20, 1);
+		vec2 DrawPosition = vec2(pFindPlayer->GetCharacter()->m_Core.m_Pos.x, pFindPlayer->GetCharacter()->m_Core.m_Pos.y - 90.0f);
 		str_format(aBuf, sizeof(aBuf), "%dHP", Health);
 		GS()->CreateText(NULL, false, DrawPosition, vec2(0, 0), 40, aBuf);
-		new CHearth(&GS()->m_World, m_Pos, pFind, Health, pFind->GetCharacter()->m_Core.m_Vel);
+		new CHearth(&GS()->m_World, m_Pos, pFindPlayer, Health, pFindPlayer->GetCharacter()->m_Core.m_Vel);
 
 		m_Input.m_Direction = 0;
 		PlayerFinding = true;

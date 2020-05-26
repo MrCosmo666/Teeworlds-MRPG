@@ -1205,7 +1205,7 @@ bool CCharacter::StartConversation(CPlayer *pTarget)
 		return false;
 
 	CPlayerBot* pTargetBot = static_cast<CPlayerBot*>(pTarget);
-	if (!pTargetBot || !pTargetBot->IsActiveSnappingBot(m_pPlayer->GetCID()))
+	if (!pTargetBot || pTargetBot->GetBotType() == BotsTypes::TYPE_BOT_MOB || !pTargetBot->IsActiveSnappingBot(m_pPlayer->GetCID()))
 		return false;
 
 	return true;
@@ -1220,9 +1220,7 @@ void CCharacter::CreateSnapProj(int SnapID, int Count, int TypeID, bool Dynamic,
 		pSnapItem->AddItem(Count, TypeID, Projectile, Dynamic, SnapID);
 		return;
 	}
-
-	if(m_Alive)
-		new CSnapFull(&GS()->m_World, m_Core.m_Pos, SnapID, m_pPlayer->GetCID(), Count, TypeID, Dynamic, Projectile);
+	new CSnapFull(&GS()->m_World, m_Core.m_Pos, SnapID, m_pPlayer->GetCID(), Count, TypeID, Dynamic, Projectile);
 }
 
 void CCharacter::RemoveSnapProj(int Count, int SnapID, bool Effect)
