@@ -112,9 +112,7 @@ CPlayer *CGS::GetPlayer(int ClientID, bool CheckAuthed, bool CheckCharacter)
 	if(ClientID >= 0 && ClientID < MAX_CLIENTS && m_apPlayers[ClientID]) 
 	{
 		CPlayer *pPlayer = m_apPlayers[ClientID];
-		if(!CheckCharacter && !CheckAuthed)
-			return pPlayer;
-		else if((CheckAuthed && pPlayer->IsAuthed()) || !CheckAuthed)
+		if((CheckAuthed && pPlayer->IsAuthed()) || !CheckAuthed)
 		{
 			if(CheckCharacter && !pPlayer->GetCharacter())
 				return nullptr;
