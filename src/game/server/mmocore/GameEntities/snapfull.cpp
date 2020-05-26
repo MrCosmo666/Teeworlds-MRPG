@@ -9,6 +9,7 @@ CSnapFull::CSnapFull(CGameWorld *pGameWorld, vec2 Pos, int SnapID, int Owner, in
 {
 	m_Pos = Pos;
 	m_Owner = Owner;
+	m_SnapItem.clear();
 	m_LoadingTick = Server()->TickSpeed();
 	GameWorld()->InsertEntity(this);
 	
@@ -21,11 +22,6 @@ CSnapFull::~CSnapFull()
 		Server()->SnapFreeID(items.m_ID);
 
 	m_SnapItem.clear();
-}
-
-void CSnapFull::Reset()
-{
-	GS()->m_World.DestroyEntity(this);
 }
 
 void CSnapFull::AddItem(int Count, int Type, bool Projectile, bool Dynamic, int SnapID)
@@ -94,23 +90,28 @@ void CSnapFull::Tick()
 void CSnapFull::Snap(int SnappingClient)
 {
 	CPlayer *pOwner = GS()->m_apPlayers[m_Owner];
-	if(NetworkClipped(SnappingClient) || !pOwner->GetCharacter() || pOwner->IsActiveSnappingBot(SnappingClient) != 2)
+	if(NetworkClipped(SnappingClient) || !pOwner->GetCharacter())
 		return;
 
-	float AngleStart = (2.0f * pi * Server()->Tick()/static_cast<float>(Server()->TickSpeed()))/10.0f;
+	// skip non interactive bot
+	if(pOwner->IsActiveSnappingBot(SnappingClient) != 2)
+		return;
+
+	float AngleStart = (2.0f * pi * Server()->Tick()/static_cast<float>(Server()->TickSpeed()))/3.0f;
 	float AngleStep = 2.0f * pi / m_SnapItem.size();
-	AngleStart = AngleStart*2.0f;
 
 	int idsize = 0;
 	for(auto items : m_SnapItem)
 	{
-		float R = 60.0f + (items.m_Changing ? m_LoadingTick : 0.0f);
-		vec2 PosStart = m_Pos + vec2(R * cos(AngleStart + AngleStep*idsize), R * sin(AngleStart + AngleStep*idsize));
+		float Radius = 48.0f + (items.m_Changing ? m_LoadingTick : 0.0f);
+		vec2 PosStart = m_Pos + vec2(Radius * cos(AngleStart + AngleStep*idsize), Radius * sin(AngleStart + AngleStep*idsize));
+		idsize++;
+
 		if(items.m_Projectile)
 		{
 			CNetObj_Projectile *pObj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, items.m_ID, sizeof(CNetObj_Projectile)));
 			if(!pObj)
-				return;
+				continue;
 
 			pObj->m_X = (int)PosStart.x;
 			pObj->m_Y = (int)PosStart.y;
@@ -118,17 +119,15 @@ void CSnapFull::Snap(int SnappingClient)
 			pObj->m_VelY = 0;
 			pObj->m_StartTick = Server()->Tick()-1;
 			pObj->m_Type = items.m_Type;
+			continue;
 		}
-		else
-		{
-			CNetObj_Pickup *pObj = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, items.m_ID, sizeof(CNetObj_Pickup)));
-			if(!pObj)
-				return;
 
-			pObj->m_X = (int)PosStart.x;
-			pObj->m_Y = (int)PosStart.y;
-			pObj->m_Type = items.m_Type;		
-		}
-		idsize++;
+		CNetObj_Pickup *pObj = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, items.m_ID, sizeof(CNetObj_Pickup)));
+		if(!pObj)
+			continue;
+
+		pObj->m_X = (int)PosStart.x;
+		pObj->m_Y = (int)PosStart.y;
+		pObj->m_Type = items.m_Type;		
 	}
 }

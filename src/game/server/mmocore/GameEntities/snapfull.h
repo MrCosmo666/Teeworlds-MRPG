@@ -14,7 +14,6 @@ public:
 
 	virtual void Snap(int SnappingClient);
 	virtual void Tick();
-	virtual void Reset();
 
 	int GetOwner() const { return m_Owner; }
 	void AddItem(int Count, int Type, bool Projectile, bool Dynamic, int SnapID);

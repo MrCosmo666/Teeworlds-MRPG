@@ -753,16 +753,17 @@ void CGS::SendSettings(int ClientID)
 // Отправить смену скинна
 void CGS::SendSkinChange(int ClientID, int TargetID)
 {
-	if(!m_apPlayers[ClientID])
+	CPlayer *pPlayer = GetPlayer(ClientID, true);
+	if(!pPlayer)
 		return;
 
 	CNetMsg_Sv_SkinChange Msg;
 	Msg.m_ClientID = ClientID;
 	for(int p = 0; p < NUM_SKINPARTS; p++)
 	{
-		Msg.m_apSkinPartNames[p] = m_apPlayers[ClientID]->Acc().m_aaSkinPartNames[p];
-		Msg.m_aUseCustomColors[p] = m_apPlayers[ClientID]->Acc().m_aUseCustomColors[p];
-		Msg.m_aSkinPartColors[p] = m_apPlayers[ClientID]->Acc().m_aSkinPartColors[p];
+		Msg.m_apSkinPartNames[p] = pPlayer->Acc().m_aaSkinPartNames[p];
+		Msg.m_aUseCustomColors[p] = pPlayer->Acc().m_aUseCustomColors[p];
+		Msg.m_aSkinPartColors[p] = pPlayer->Acc().m_aSkinPartColors[p];
 	}
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID);
 }
@@ -770,41 +771,23 @@ void CGS::SendSkinChange(int ClientID, int TargetID)
 // Отправить Equip Items
 void CGS::SendEquipItem(int ClientID, int TargetID)
 {
-	if((TargetID != -1 && !CheckClient(TargetID)) || !m_apPlayers[ClientID])
+	CPlayer *pPlayer = GetPlayer(ClientID);
+	if((TargetID != -1 && !CheckClient(TargetID)) || !pPlayer)
 		return;
 
-	// - - отправляем снаряжение ботов - -
-	if (ClientID >= MAX_PLAYERS && ClientID < MAX_CLIENTS)
-	{
-		CPlayerBot* pBotPlayer = static_cast<CPlayerBot*>(m_apPlayers[ClientID]);
-		CNetMsg_Sv_EquipItems Msg;
-		Msg.m_ClientID = ClientID;
-		for (int k = 0; k < EQUIP_MAX_BOTS; k++)
-		{
-			int EquipItem = pBotPlayer->GetEquippedItem(k);
-			bool EnchantItem = false;
-			Msg.m_EquipID[k] = EquipItem;
-			Msg.m_EnchantItem[k] = EnchantItem;
-		}
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, TargetID, GetClientWorldID(ClientID));
-		return;
-	}
-
-	// - - отправляем снаряжение игроков - -
-	if (ClientID < 0 || ClientID >= MAX_PLAYERS || !m_apPlayers[ClientID]->IsAuthed())
-		return;
-
-	CPlayer* pPlayer = m_apPlayers[ClientID];
+	// send players equiping global bots local on world
+	const int WorldID = (pPlayer->IsBot() ? GetClientWorldID(ClientID) : -1);
+	
 	CNetMsg_Sv_EquipItems Msg;
 	Msg.m_ClientID = ClientID;
 	for(int k = 0; k < NUM_EQUIPS; k++)
 	{
-		int EquipItem = pPlayer->GetEquippedItem(k);
-		bool EnchantItem = pPlayer->GetItem(EquipItem).Enchant >= pPlayer->GetItem(EquipItem).Info().MaximalEnchant;
+		const int EquipItem = pPlayer->GetEquippedItem(k);
+		const bool EnchantItem = (pPlayer->IsBot() ? false : (bool)pPlayer->GetItem(EquipItem).Enchant >= pPlayer->GetItem(EquipItem).Info().MaximalEnchant);
 		Msg.m_EquipID[k] = EquipItem;
 		Msg.m_EnchantItem[k] = EnchantItem;
 	}
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID);
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID, WorldID);
 }
 
 // Отправить снаряжение в радиусе

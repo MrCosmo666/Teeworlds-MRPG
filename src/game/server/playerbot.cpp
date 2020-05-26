@@ -143,9 +143,7 @@ int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 		BotJob::DataBot[m_BotID].AlreadySnapQuestBot[SnappingClient] = false;
 
 		const int QuestID = BotJob::QuestBot[m_SubBotID].QuestID;
-		if(QuestJob::Quests[SnappingClient].find(QuestID) == QuestJob::Quests[SnappingClient].end()) 
-			return 0;
-		if(QuestJob::Quests[SnappingClient][QuestID].State == QuestState::QUEST_FINISHED)
+		if(GS()->Mmo()->Quest()->IsComplectedQuest(SnappingClient, QuestID)) 
 			return 0;
 		const int TalkProgress = BotJob::QuestBot[m_SubBotID].Progress;
 		if(TalkProgress != QuestJob::Quests[SnappingClient][QuestID].Progress)
