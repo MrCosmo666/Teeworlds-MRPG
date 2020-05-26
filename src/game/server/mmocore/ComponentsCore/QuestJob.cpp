@@ -47,11 +47,10 @@ const char *QuestJob::GetStateName(int Type) const
 {
 	switch (Type)
 	{
-		case QuestState::QUEST_NO_ACCEPT: return "Not active";
 		case QuestState::QUEST_ACCEPT: return "Active";
 		case QuestState::QUEST_FINISHED: return "Finished";
 	}
-	return "unknow";
+	return "Not active";
 }
 
 bool QuestJob::IsDefeatMobsComplete(int ClientID, int QuestID) const
@@ -95,7 +94,7 @@ BotJob::QuestBotInfo *QuestJob::GetQuestBot(int QuestID, int Progress) const
 {
 	for(auto& qb : BotJob::QuestBot)
 	{
-		if(QuestID == qb.second.QuestID && Progress == qb.second.Progress)
+		if(QuestID == qb.second.QuestID && Progress == qb.second.Progress && !qb.second.NextEqualProgress)
 			return &qb.second;
 	}
 	return nullptr;
@@ -105,10 +104,9 @@ bool QuestJob::IsActiveQuestBot(int QuestID, int Progress) const
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		int PlayerState = GetState(i, QuestID);
+		const int PlayerState = GetState(i, QuestID);
 		if(PlayerState != QuestState::QUEST_ACCEPT || Quests[i][QuestID].Progress != Progress)
 			continue;
-
 		return true;
 	}
 	return false;
@@ -232,6 +230,7 @@ void QuestJob::AddProgress(CPlayer *pPlayer, int QuestID)
 	const int NewProgress = talkQuestPlayer.Progress;
 	GS()->UpdateQuestsBot(QuestID, OldProgress);
 	GS()->UpdateQuestsBot(QuestID, NewProgress);
+
 }
 
 bool QuestJob::AcceptQuest(int QuestID, CPlayer* pPlayer)
@@ -259,6 +258,10 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotDa
 	if (!pPlayer || !pPlayer->GetCharacter())
 		return false;
 
+	// запретить мобам для красоты запрашивать что-либо
+	if(BotData.NextEqualProgress)
+		return true;
+
 	const int ClientID = pPlayer->GetCID();
 	const int QuestID = BotData.QuestID;
 	if (!IsCollectItemComplete(pPlayer, BotData) || !IsDefeatMobsComplete(ClientID, QuestID))
@@ -279,6 +282,9 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotDa
 	CollectItem(pPlayer, BotData);
 	GS()->VResetVotes(ClientID, MenuList::MENU_JOURNAL_MAIN);
 	GS()->Mmo()->Quest()->AddProgress(pPlayer, QuestID);
+
+	// сбросить рисовку между (Quest NPC / NPC)
+	BotJob::DataBot[BotData.BotID].AlreadySnapQuestBot[ClientID] = false;
 	return true;
 }
 
@@ -513,6 +519,10 @@ bool QuestJob::ShowAdventureActiveNPC(CPlayer* pPlayer)
 
 void QuestJob::QuestTableShowRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData, const char* TextTalk)
 {
+	// запретить мобам для красоты запрашивать что-либо
+	if(BotData.NextEqualProgress)
+		return;
+
 	// показываем текст завершения квеста
 	const int ClientID = pPlayer->GetCID();
 	if (GS()->CheckClient(ClientID))
@@ -724,12 +734,12 @@ void QuestJob::OnInit()
 		str_copy(QuestsData[QUID].StoryLine, RES->getString("StoryLine").c_str(), sizeof(QuestsData[QUID].StoryLine));
 		QuestsData[QUID].Money = (int)RES->getInt("Money");
 		QuestsData[QUID].Exp = (int)RES->getInt("Exp");
-		QuestsData[QUID].ProgressSize = 1;
 
 		// load talking progress size
+		QuestsData[QUID].ProgressSize = 1;
 		for (const auto& qb : BotJob::QuestBot)
 		{
-			if (qb.second.QuestID == QUID)
+			if (qb.second.QuestID == QUID && !qb.second.NextEqualProgress)
 				QuestsData[QUID].ProgressSize++;
 		}
 	}

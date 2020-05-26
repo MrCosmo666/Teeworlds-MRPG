@@ -2094,36 +2094,38 @@ void CGS::CreateBot(short BotType, int BotID, int SubID)
 // Удалить ботов что не активны у людей для квестов
 void CGS::UpdateQuestsBot(int QuestID, int Step)
 {
-	// собираем все данные о ботах
-	BotJob::QuestBotInfo *FindBot = Mmo()->Quest()->GetQuestBot(QuestID, Step);
-	if(!FindBot)
-		return;
-
-	// перекидываем recheck на мир моба
-	if(FindBot->WorldID != GetWorldID())
+	for(auto& FindBot : BotJob::QuestBot)
 	{
-		Server()->QuestBotUpdateOnWorld(FindBot->WorldID, QuestID, Step);
-		return;
-	}
-
-	// ищем есть ли такой бот
-	int QuestBotClientID = -1;
-	for(int i = MAX_PLAYERS ; i < MAX_CLIENTS; i++)
-	{
-		if(!m_apPlayers[i] || m_apPlayers[i]->GetBotType() != BotsTypes::TYPE_BOT_QUEST || m_apPlayers[i]->GetBotSub() != FindBot->SubBotID) 
+		if(QuestID != FindBot.second.QuestID || Step != FindBot.second.Progress)
 			continue;
-		QuestBotClientID = i;
-	}
 
-	// ищем есть ли активный бот у всех игроков
-	const bool ActiveBot = Mmo()->Quest()->IsActiveQuestBot(QuestID, Step);
-	if(ActiveBot && QuestBotClientID <= -1)
-		CreateBot(BotsTypes::TYPE_BOT_QUEST, FindBot->BotID, FindBot->SubBotID);
-	// если бот не активен не у одного игрока, но игрок найден удаляем
-	if (!ActiveBot && QuestBotClientID >= MAX_PLAYERS)
-	{
-		delete m_apPlayers[QuestBotClientID];
-		m_apPlayers[QuestBotClientID] = nullptr;
+		// перекидываем recheck на мир моба
+		if(FindBot.second.WorldID != GetWorldID())
+		{
+			Server()->QuestBotUpdateOnWorld(FindBot.second.WorldID, QuestID, Step);
+			continue;
+		}
+
+		// ищем есть ли такой бот
+		int QuestBotClientID = -1;
+		for(int i = MAX_PLAYERS ; i < MAX_CLIENTS; i++)
+		{
+			if(!m_apPlayers[i] || m_apPlayers[i]->GetBotType() != BotsTypes::TYPE_BOT_QUEST || m_apPlayers[i]->GetBotSub() != FindBot.second.SubBotID) 
+				continue;
+			QuestBotClientID = i;
+		}
+
+		// ищем есть ли активный бот у всех игроков
+		const bool ActiveBot = Mmo()->Quest()->IsActiveQuestBot(QuestID, Step);
+		if(ActiveBot && QuestBotClientID <= -1)
+			CreateBot(BotsTypes::TYPE_BOT_QUEST, FindBot.second.BotID, FindBot.second.SubBotID);
+
+		// если бот не активен не у одного игрока, но игрок найден удаляем
+		if (!ActiveBot && QuestBotClientID >= MAX_PLAYERS)
+		{
+			delete m_apPlayers[QuestBotClientID];
+			m_apPlayers[QuestBotClientID] = nullptr;
+		}
 	}
 }
 

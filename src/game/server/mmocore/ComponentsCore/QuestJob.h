@@ -22,7 +22,6 @@ class QuestJob : public MmoComponent
 		int MobProgress[2];
 		int Progress;
 	};
-
 	static std::map < int, StructQuestData > QuestsData;
 
 public:

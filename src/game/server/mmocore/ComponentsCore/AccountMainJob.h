@@ -45,12 +45,12 @@ public:
 
 	struct StructTempPlayerData
 	{
-		// обычные что не можно раскидать на все
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅ
 		int TempDecoractionID;
 		int TempDecorationType;
 		int TempID3;
 
-		// остальное все
+		// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ
 		ShopJob::AuctionSlot SellItem;
 
 		// temp rankname for guild rank settings

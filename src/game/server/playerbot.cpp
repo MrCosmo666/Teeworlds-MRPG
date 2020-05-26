@@ -158,6 +158,7 @@ int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 		// [third] skip snapping already snap on quest state
 		if(BotJob::DataBot[m_BotID].AlreadySnapQuestBot[SnappingClient])
 			return 0;
+			
 		if(!IsActiveQuests(SnappingClient))
 			return 1;
 	}

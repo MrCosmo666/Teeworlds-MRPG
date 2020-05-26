@@ -84,7 +84,7 @@ class BotJob : public MmoComponent
 		int InteractiveType;
 		int InteractiveTemp;
 		bool GenerateNick;
-		bool IdenticalLastProgress
+		bool NextEqualProgress;
 		std::vector < TalkingData > m_Talk;
 	};
 
