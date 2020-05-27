@@ -6,9 +6,8 @@
 #include "logicwall.h"
 
 CLogicWall::CLogicWall(CGameWorld *pGameWorld, vec2 Pos)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_EYES, Pos, 14)
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_EYES, Pos)
 {
-	m_Pos = Pos;
 	m_RespawnTick = Server()->TickSpeed()*10;
 	pLogicWallLine = new CLogicWallLine(&GS()->m_World, m_Pos);
 	GameWorld()->InsertEntity(this);
@@ -18,17 +17,18 @@ void CLogicWall::SetDestroy(int Sec)
 {
 	m_RespawnTick = Server()->TickSpeed()*Sec;
 	if(pLogicWallLine) 
+	{
 		pLogicWallLine->Respawn(false);
-
+	}
 }
 
 CPlayer *CLogicWall::FindPlayerAI(float Distance)
 {
-	for(int i = 0; i < MAX_PLAYERS; i++) {
+	for(int i = 0; i < MAX_PLAYERS; i++) 
+	{
 		CPlayer *pPlayer = GS()->GetPlayer(i, true, true);
 		if(!pPlayer || distance(pPlayer->GetCharacter()->m_Core.m_Pos, m_Pos) > Distance)
 			continue;
-
 		return pPlayer;
 	}
 	return NULL;
@@ -39,7 +39,8 @@ void CLogicWall::Tick()
 	if(m_RespawnTick)
 	{
 		m_RespawnTick--;
-		if(!m_RespawnTick) {
+		if(!m_RespawnTick) 
+		{
 			if(pLogicWallLine) 
 				pLogicWallLine->Respawn(true);
 		}
@@ -69,11 +70,6 @@ void CLogicWall::Snap(int SnappingClient)
 	pP->m_Type = 1;
 }
 
-
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
 /////////////////////////////////////////
 CLogicWallFire::CLogicWallFire(CGameWorld *pGameWorld, vec2 Pos, vec2 Direction, CLogicWall *Eyes)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_EYES, Pos, 14)
@@ -139,26 +135,19 @@ void CLogicWallFire::Snap(int SnappingClient)
 }
 
 /////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
-/////////////////////////////////////////
 CLogicWallWall::CLogicWallWall(CGameWorld *pGameWorld, vec2 Pos, int Mode, int Health)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_EYESWALL, Pos, 14)
 {
 	m_SaveHealth = m_Health = Health;
-	m_Pos = Pos;
-	m_To = Pos;
-
 	if(Mode == 0)
 	{
 		m_Pos.y += 30;
-		m_To = GS()->Collision()->FindDirCollision(100, m_To, 'y', '-');
+		m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, 'y', '-');
 	}
 	else 
 	{
 		m_Pos.x += 30;
-		m_To = GS()->Collision()->FindDirCollision(100, m_To, 'x', '+');
+		m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, 'x', '+');
 	}
 	
 	m_RespawnTick = Server()->TickSpeed()*10;
@@ -182,7 +171,7 @@ void CLogicWallWall::Tick()
 	{
 		for (CCharacter* pChar = (CCharacter*)GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter*)pChar->TypeNext())
 		{
-			vec2 IntersectPos = closest_point_on_line(m_Pos, m_To, pChar->m_Core.m_Pos);
+			vec2 IntersectPos = closest_point_on_line(m_Pos, m_PosTo, pChar->m_Core.m_Pos);
 			float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);
 			if (Distance <= g_Config.m_SvDoorRadiusHit)
 				pChar->m_DoorHit = true;
@@ -201,8 +190,8 @@ void CLogicWallWall::Snap(int SnappingClient)
 
 	pObj->m_X = int(m_Pos.x);
 	pObj->m_Y = int(m_Pos.y);
-	pObj->m_FromX = int(m_To.x);
-	pObj->m_FromY = int(m_To.y);
+	pObj->m_FromX = int(m_PosTo.x);
+	pObj->m_FromY = int(m_PosTo.y);
 	pObj->m_StartTick = Server()->Tick()-2;
 }
 
@@ -214,8 +203,6 @@ void CLogicWallWall::Snap(int SnappingClient)
 CLogicWallLine::CLogicWallLine(CGameWorld *pGameWorld, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER, Pos, 14)
 {
-	m_Pos = Pos;
-	m_To = Pos;
 	m_ClientID = -1;
 	m_Spawned = false;
 	GameWorld()->InsertEntity(this);
@@ -227,19 +214,19 @@ void CLogicWallLine::Tick()
 {
 	if(m_ClientID < 0 || m_ClientID > MAX_PLAYERS || !GS()->m_apPlayers[m_ClientID] || !GS()->m_apPlayers[m_ClientID]->GetCharacter())
 	{
-		m_To = m_Pos;
+		m_PosTo = m_Pos;
 		return;
 	}
 
 	vec2 PositionPlayer = GS()->m_apPlayers[m_ClientID]->GetCharacter()->m_Core.m_Pos;
 	if(m_Spawned && distance(m_Pos, PositionPlayer) < 300)
 	{
-		m_To = PositionPlayer;
+		m_PosTo = PositionPlayer;
 		if(Server()->Tick() % Server()->TickSpeed() == 0)
 			GS()->m_apPlayers[m_ClientID]->GetCharacter()->TakeDamage(vec2(0,0), 1, -1, WEAPON_WORLD);
 		return;
 	}
-	m_To = m_Pos;
+	m_PosTo = m_Pos;
 }
 
 void CLogicWallLine::Snap(int SnappingClient)
@@ -253,8 +240,8 @@ void CLogicWallLine::Snap(int SnappingClient)
 
 	pObj->m_X = int(m_Pos.x);
 	pObj->m_Y = int(m_Pos.y);
-	pObj->m_FromX = int(m_To.x);
-	pObj->m_FromY = int(m_To.y);
+	pObj->m_FromX = int(m_PosTo.x);
+	pObj->m_FromY = int(m_PosTo.y);
 	pObj->m_StartTick = Server()->Tick()-5;
 }
 
@@ -267,19 +254,16 @@ void CLogicWallLine::Snap(int SnappingClient)
 CLogicDoorKey::CLogicDoorKey(CGameWorld *pGameWorld, vec2 Pos, int ItemID, int Mode)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER, Pos, 14)
 {
-	m_Pos = Pos;
-	m_To = Pos;
-
 	if(Mode == 0)
 	{
 		m_Pos.y += 30;
-		m_To = GS()->Collision()->FindDirCollision(100, m_To, 'y', '-');
+		m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, 'y', '-');
 
 	}
 	else 
 	{
 		m_Pos.x -= 30;
-		m_To = GS()->Collision()->FindDirCollision(100, m_To, 'x', '+');
+		m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, 'x', '+');
 	}
 	m_ItemID = ItemID;
 	GameWorld()->InsertEntity(this);
@@ -293,7 +277,7 @@ void CLogicDoorKey::Tick()
 		if (pPlayer->GetItem(m_ItemID).Count)
 			continue;
 
-		vec2 IntersectPos = closest_point_on_line(m_Pos, m_To, pChar->m_Core.m_Pos);
+		vec2 IntersectPos = closest_point_on_line(m_Pos, m_PosTo, pChar->m_Core.m_Pos);
 		float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);
 		if (Distance <= g_Config.m_SvDoorRadiusHit)
 		{
@@ -314,8 +298,8 @@ void CLogicDoorKey::Snap(int SnappingClient)
 
 	pObj->m_X = int(m_Pos.x);
 	pObj->m_Y = int(m_Pos.y);
-	pObj->m_FromX = int(m_To.x);
-	pObj->m_FromY = int(m_To.y);
+	pObj->m_FromX = int(m_PosTo.x);
+	pObj->m_FromY = int(m_PosTo.y);
 	pObj->m_StartTick = Server()->Tick()-3;
 }
 
@@ -325,11 +309,11 @@ void CLogicDoorKey::Snap(int SnappingClient)
 /////////////////////////////////////////
 /////////////////////////////////////////
 CLogicDungeonDoorKey::CLogicDungeonDoorKey(CGameWorld *pGameWorld, vec2 Pos, int BotID)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_DUNGEONKEYDOOR, Pos, 14)
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_DUNGEON_PROGRESS_DOOR, Pos, 14)
 {
 	m_Pos.y += 30;
-	m_To = Pos;
-	m_To = GS()->Collision()->FindDirCollision(100, m_To, 'y', '-');
+	m_PosTo = Pos;
+	m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, 'y', '-');
 	m_OpenedDoor = false;
 	m_BotID = BotID;
 
@@ -343,7 +327,7 @@ void CLogicDungeonDoorKey::Tick()
 
 	for (CCharacter* pChar = (CCharacter*)GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter*)pChar->TypeNext())
 	{
-		vec2 IntersectPos = closest_point_on_line(m_Pos, m_To, pChar->m_Core.m_Pos);
+		vec2 IntersectPos = closest_point_on_line(m_Pos, m_PosTo, pChar->m_Core.m_Pos);
 		float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);
 		if (Distance <= 64.0f)
 			pChar->m_DoorHit = true;
@@ -384,7 +368,7 @@ void CLogicDungeonDoorKey::Snap(int SnappingClient)
 
 	pObj->m_X = int(m_Pos.x);
 	pObj->m_Y = int(m_Pos.y);
-	pObj->m_FromX = int(m_To.x);
-	pObj->m_FromY = int(m_To.y);
+	pObj->m_FromX = int(m_PosTo.x);
+	pObj->m_FromY = int(m_PosTo.y);
 	pObj->m_StartTick = Server()->Tick()-3;
 }

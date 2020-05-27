@@ -15,10 +15,10 @@ CEntity::CEntity(CGameWorld *pGameWorld, int ObjType, vec2 Pos, int ProximityRad
 	m_ObjType = ObjType;
 
 	m_ProximityRadius = ProximityRadius;
-
 	m_MarkedForDestroy = false;
-	m_Pos = Pos;
 
+	m_Pos = Pos;
+	m_PosTo = Pos;
 	m_WorldID = GS()->GetWorldID();
 }
 

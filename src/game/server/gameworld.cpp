@@ -8,7 +8,6 @@
 #include <utility>
 #include <engine/shared/config.h>
 
-
 //////////////////////////////////////////////////
 // game world
 //////////////////////////////////////////////////
@@ -219,6 +218,31 @@ CCharacter *CGameWorld::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, v
 	return pClosest;
 }
 
+bool CGameWorld::IntersectClosestEntity(vec2 Pos, float Radius, int EnttypeID)
+{
+	for(CEntity *pDoor = (CEntity *)FindFirst(EnttypeID); pDoor; pDoor = (CEntity *)pDoor->TypeNext())
+ 	{	
+		vec2 IntersectPos = pDoor->m_PosTo;
+		if(pDoor->m_Pos != pDoor->m_PosTo)
+			IntersectPos = closest_point_on_line(pDoor->m_Pos, pDoor->m_PosTo, Pos);
+		if (distance(IntersectPos, Pos) <= Radius)
+			return true;
+	}
+	return false;
+}
+
+bool CGameWorld::IntersectClosestDoorEntity(vec2 Pos, float Radius)
+{
+	if(IntersectClosestEntity(Pos, Radius, ENTTYPE_DUNGEON_DOOR))
+		return true;
+	else if(IntersectClosestEntity(Pos, Radius, ENTTYPE_DUNGEON_PROGRESS_DOOR))
+		return true;
+	else if(IntersectClosestEntity(Pos, Radius, ENTTYPE_GUILD_HOUSE_DOOR))
+		return true;
+	else if(IntersectClosestEntity(Pos, Radius, ENTTYPE_PLAYER_HOUSE_DOOR))
+		return true;
+	return false;
+}
 
 CEntity *CGameWorld::ClosestEntity(vec2 Pos, float Radius, int Type, CEntity *pNotThis)
 {

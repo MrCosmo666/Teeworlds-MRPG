@@ -7,9 +7,8 @@
 #include "npcwall.h"
 
 CNPCWall::CNPCWall(CGameWorld *pGameWorld, vec2 Pos, bool Left)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_NPCWALL, Pos)
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_NPC_DOOR, Pos)
 {
-	m_To = Pos;
 	// прячем точку стены
 	if(!Left) 
 		m_Pos.y += 30;
@@ -17,7 +16,7 @@ CNPCWall::CNPCWall(CGameWorld *pGameWorld, vec2 Pos, bool Left)
 		m_Pos.x -= 30;
 
 	// эффект поиска крыши
-	m_To = GS()->Collision()->FindDirCollision(100, m_To, (Left ? 'x' : 'y'), (Left ? '+' : '-'));
+	m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, (Left ? 'x' : 'y'), (Left ? '+' : '-'));
 	m_Active = false; 
 
 	GameWorld()->InsertEntity(this);
@@ -32,7 +31,7 @@ void CNPCWall::Tick()
 	{
 		if (pChar->GetPlayer()->IsBot())
 		{
-			vec2 IntersectPos = closest_point_on_line(m_Pos, m_To, pChar->m_Core.m_Pos);
+			vec2 IntersectPos = closest_point_on_line(m_Pos, m_PosTo, pChar->m_Core.m_Pos);
 			float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);
 			if (Distance <= g_Config.m_SvDoorRadiusHit)
 				pChar->m_DoorHit = true;
@@ -51,7 +50,7 @@ void CNPCWall::Snap(int SnappingClient)
 
 	pObj->m_X = (int)m_Pos.x;
 	pObj->m_Y = (int)m_Pos.y;
-	pObj->m_FromX = (int)m_To.x;
-	pObj->m_FromY = (int)m_To.y;
+	pObj->m_FromX = (int)m_PosTo.x;
+	pObj->m_FromY = (int)m_PosTo.y;
 	pObj->m_StartTick = Server()->Tick()-6; 
 }

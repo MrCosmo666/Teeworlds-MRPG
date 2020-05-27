@@ -115,7 +115,7 @@ bool WorldSwapJob::ChangeWorld(CPlayer *pPlayer, vec2 Pos)
 	{
 		const int ClientID = pPlayer->GetCID();
 		int StoryQuestNeeded = WorldSwap[WID].OpenQuestID;
-		if (StoryQuestNeeded > 0 && !GS()->Mmo()->Quest()->IsComplectedQuest(ClientID, StoryQuestNeeded))
+		if (StoryQuestNeeded > 0 && !GS()->Mmo()->Quest()->IsCompletedQuest(ClientID, StoryQuestNeeded))
 		{
 			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Requires quest '{STR}' completion!", GS()->Mmo()->Quest()->GetQuestName(StoryQuestNeeded));
 			return false;

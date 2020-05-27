@@ -1079,12 +1079,12 @@ void GuildJob::ChangeRankAccess(int RankID)
 {
 	if(RankGuild.find(RankID) != RankGuild.end())
 	{
-		RankGuild[ RankID ].Access++;
-		if(RankGuild[ RankID ].Access > GuildAccess::ACCESS_FULL)
-			RankGuild[ RankID ].Access = GuildAccess::ACCESS_NO;
+		RankGuild[RankID].Access++;
+		if(RankGuild[RankID].Access > GuildAccess::ACCESS_FULL)
+			RankGuild[RankID].Access = GuildAccess::ACCESS_NO;
 
 		const int GuildID = RankGuild[RankID].GuildID;
-		SJK.UD("tw_guilds_ranks", "Access = '%d' WHERE ID = '%d' AND GuildID = '%d'", RankGuild[ RankID ].Access, RankID, GuildID);
+		SJK.UD("tw_guilds_ranks", "Access = '%d' WHERE ID = '%d' AND GuildID = '%d'", RankGuild[RankID].Access, RankID, GuildID);
 		GS()->ChatGuild(GuildID, "Rank [{STR}] changes [{STR}]!", RankGuild[RankID].Rank, AccessNames(RankGuild[RankID].Access));
 	}	
 }
@@ -1275,7 +1275,7 @@ int GuildJob::GetPosHouseID(vec2 Pos) const
 
 bool GuildJob::GetGuildDoor(int GuildID) const
 {
-	int HouseID = GetGuildHouseID(GuildID);
+	const int HouseID = GetGuildHouseID(GuildID);
 	if(HouseID > 0 && HouseGuild.find(HouseID) != HouseGuild.end())
 		return (bool)HouseGuild[HouseID].m_Door;
 	return false;
@@ -1284,7 +1284,7 @@ bool GuildJob::GetGuildDoor(int GuildID) const
 // получаем позицию дома организации
 vec2 GuildJob::GetPositionHouse(int GuildID) const
 {
-	int HouseID = GetGuildHouseID(GuildID);
+	const int HouseID = GetGuildHouseID(GuildID);
 	if(HouseID > 0 && HouseGuild.find(HouseID) != HouseGuild.end())
 		return vec2(HouseGuild[HouseID].m_PosX, HouseGuild[HouseID].m_PosY);
 	return vec2(0, 0);
@@ -1304,34 +1304,36 @@ int GuildJob::GetGuildHouseID(int GuildID) const
 // Покупка дома организации
 void GuildJob::BuyGuildHouse(int GuildID, int HouseID)
 {
-	if(GetGuildHouseID(GuildID) > 0 || HouseID <= 0 || HouseGuild[ HouseID ].m_GuildID > 0) 
+	if(GetGuildHouseID(GuildID) > 0 || HouseID <= 0 || HouseGuild[HouseID].m_GuildID > 0) 
 		return;
 
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_houses", "WHERE ID = '%d'", HouseID));
-	if(!RES->next()) return;
+	if(!RES->next()) 
+		return;
 
 	const int Price = RES->getInt("Price");
-	if( Guild[ GuildID ].m_Bank < Price)
+	if(Guild[GuildID].m_Bank < Price)
 	{
 		GS()->ChatGuild(GuildID, "This Guild house requires {INT}gold!", &Price);
 		return;
 	}
 
-	HouseGuild[ HouseID ].m_GuildID = GuildID;
+	HouseGuild[HouseID].m_GuildID = GuildID;
 	SJK.UD("tw_guilds_houses", "OwnerMID = '%d' WHERE ID = '%d'", GuildID, HouseID);
 	
-	Guild[ GuildID ].m_Bank -= Price;
-	SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[ GuildID ].m_Bank, GuildID);
+	Guild[GuildID].m_Bank -= Price;
+	SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, GuildID);
 	
-	GS()->Chat(-1, "{STR} buyight guild house on {STR}!", Guild[ GuildID ].m_Name, GS()->Server()->GetWorldName(GS()->GetWorldID()));
-	GS()->ChatDiscord(DC_SERVER_INFO, "Information", "{STR} buyight guild house on {STR}!", Guild[ GuildID ].m_Name, GS()->Server()->GetWorldName(GS()->GetWorldID()));
-	AddHistoryGuild(GuildID, "Bought a house on '%s'.", GS()->Server()->GetWorldName(GS()->GetWorldID()));
+	const char *WorldName = GS()->Server()->GetWorldName(HouseGuild[HouseID].m_WorldID);
+	GS()->Chat(-1, "{STR} buyight guild house on {STR}!", Guild[GuildID].m_Name, WorldName);
+	GS()->ChatDiscord(DC_SERVER_INFO, "Information", "{STR} buyight guild house on {STR}!", Guild[GuildID].m_Name, WorldName);
+	AddHistoryGuild(GuildID, "Bought a house on '%s'.", WorldName);
 }
 
 // продажа дома организации
 void GuildJob::SellGuildHouse(int GuildID)
 {
-	int HouseID = GetGuildHouseID(GuildID);
+	const int HouseID = GetGuildHouseID(GuildID);
 	if(HouseID <= 0) 
 		return;	
 
@@ -1344,19 +1346,19 @@ void GuildJob::SellGuildHouse(int GuildID)
 		delete HouseGuild[HouseID].m_Door;
 		HouseGuild[HouseID].m_Door = 0;
 	}
-	HouseGuild[ HouseID ].m_GuildID = 0;
+	HouseGuild[HouseID].m_GuildID = 0;
 	SJK.UD("tw_guilds_houses", "OwnerMID = NULL WHERE ID = '%d'", HouseID);
 	
 	// возращаем деньги
-	const int SoldBack = HouseGuild[ HouseID ].m_Price;
-	Guild[ GuildID ].m_Bank += SoldBack;
-	SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[ GuildID ].m_Bank, GuildID);
-	GS()->ChatGuild(GuildID, "House sold, {INT}gold returned in bank", &SoldBack);
-	AddHistoryGuild(GuildID, "Lost a house on '%s'.", GS()->Server()->GetWorldName(GS()->GetWorldID()));
+	const int ReturnedGold = HouseGuild[HouseID].m_Price;
+	Guild[GuildID].m_Bank += ReturnedGold;
+	SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, GuildID);
+	GS()->ChatGuild(GuildID, "House sold, {INT}gold returned in bank", &ReturnedGold);
+	AddHistoryGuild(GuildID, "Lost a house on '%s'.", GS()->Server()->GetWorldName(HouseGuild[HouseID].m_WorldID));
 }
 
 // меню продажи дома
-void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int MID)
+void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 {
 	const int ClientID = pPlayer->GetCID();
 	const int GuildID = pPlayer->Acc().GuildID;
@@ -1364,20 +1366,17 @@ void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int MID)
 	GS()->AVH(ClientID, TAB_INFO_GUILD_HOUSE, GREEN_COLOR, "Information Member Housing");
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_GUILD_HOUSE, "Buying a house you will need to constantly the Treasury");
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_GUILD_HOUSE, "In the intervals of time will be paid house");
+	
 	pPlayer->m_Colored = { 20, 20, 20 };
-	
-	if(GuildID == MID)
-		GS()->AVM(ClientID, "null", NOPE, NOPE, "Guild Bank: {INT} Price: {INT}", &Guild[ GuildID ].m_Bank, &HouseGuild[MID].m_Price);
-	
-	if(Leader && GuildID != HouseGuild[MID].m_GuildID)
-		GS()->AVM(ClientID, "BUYMEMBERHOUSE", MID, NOPE, "Buy this guild house! Price: {INT}", &HouseGuild[MID].m_Price);
+	const int GuildHouseOwner = HouseGuild[HouseID].m_GuildID;
+	if(GuildHouseOwner > 0)
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "Guild owner house: {STR}", Guild[GuildHouseOwner].m_Name);
+	else
+		GS()->AVM(ClientID, "BUYMEMBERHOUSE", HouseID, NOPE, "Buy this guild house! Price: {INT}", &HouseGuild[HouseID].m_Price);
 }
 
 void GuildJob::ChangeStateDoor(int GuildID)
 {
-	if(Guild.find(GuildID) == Guild.end()) 
-		return;
-	
 	const int HouseID = GetGuildHouseID(GuildID);
 	if(HouseGuild.find(HouseID) == HouseGuild.end()) 
 		return;
@@ -1394,21 +1393,22 @@ void GuildJob::ChangeStateDoor(int GuildID)
 		HouseGuild[HouseID].m_Door = 0;
 	}
 	else
+	{
 		HouseGuild[HouseID].m_Door = new GuildDoor(&GS()->m_World, vec2(HouseGuild[HouseID].m_DoorX, HouseGuild[HouseID].m_DoorY), GuildID);
-
-	const bool StateDoor = (HouseGuild[HouseID].m_Door);
+	}
+	
+	const bool StateDoor = (bool)(HouseGuild[HouseID].m_Door);
 	GS()->ChatGuild(GuildID, "{STR} the house for others.", (StateDoor ? "closed" : "opened"));
 }
 
 GuildDoor::GuildDoor(CGameWorld *pGameWorld, vec2 Pos, int GuildID)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_HOUSEDOOR, Pos), m_To(Pos)
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_GUILD_HOUSE_DOOR, Pos)
 {
 	m_Pos.y += 30;
-	m_To = GS()->Collision()->FindDirCollision(100, m_To, 'y', '-');
+	m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, 'y', '-');
 	m_GuildID = GuildID;
 	GameWorld()->InsertEntity(this);
 }
-
 GuildDoor::~GuildDoor() {}
 
 void GuildDoor::Tick()
@@ -1419,7 +1419,7 @@ void GuildDoor::Tick()
 		if (m_GuildID == pPlayer->Acc().GuildID)
 			continue;
 
-		vec2 IntersectPos = closest_point_on_line(m_Pos, m_To, pChar->m_Core.m_Pos);
+		vec2 IntersectPos = closest_point_on_line(m_Pos, m_PosTo, pChar->m_Core.m_Pos);
 		float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);
 		if (Distance <= g_Config.m_SvDoorRadiusHit)
 			pChar->m_DoorHit = true;
@@ -1437,7 +1437,7 @@ void GuildDoor::Snap(int SnappingClient)
 
 	pObj->m_X = int(m_Pos.x);
 	pObj->m_Y = int(m_Pos.y);
-	pObj->m_FromX = int(m_To.x);
-	pObj->m_FromY = int(m_To.y);
+	pObj->m_FromX = int(m_PosTo.x);
+	pObj->m_FromY = int(m_PosTo.y);
 	pObj->m_StartTick = Server()->Tick()-2;
 }

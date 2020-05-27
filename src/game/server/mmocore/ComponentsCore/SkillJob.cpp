@@ -230,11 +230,11 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 	{
 		for(CHealthHealer *pHh = (CHealthHealer*)GS()->m_World.FindFirst(CGameWorld::ENTYPE_SKILLTURRETHEART); pHh; pHh = (CHealthHealer *)pHh->TypeNext())
 		{
-			if(pHh->m_pPlayer->GetCID() == pPlayer->GetCID())
-			{
-				pHh->Reset();
-				break;
-			}
+			if(pHh->m_pPlayer->GetCID() != ClientID)
+				continue;
+
+			pHh->Reset();
+			break;
 		}
 		const int PowerLevel = ManaPrice;
 		new CHealthHealer(&GS()->m_World, pPlayer, SkillBonus, PowerLevel, PlayerPosition);
@@ -246,11 +246,11 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 	{
 		for(CSleepyGravity *pHh = (CSleepyGravity*)GS()->m_World.FindFirst(CGameWorld::ENTYPE_SLEEPYGRAVITY); pHh; pHh = (CSleepyGravity *)pHh->TypeNext())
 		{
-			if(pHh->m_pPlayer->GetCID() == pPlayer->GetCID())
-			{
-				pHh->Reset();
-				break;
-			}
+			if(pHh->m_pPlayer->GetCID() != ClientID)
+				continue;
+		
+			pHh->Reset();
+			break;
 		}
 		const int PowerLevel = ManaPrice;
 		new CSleepyGravity(&GS()->m_World, pPlayer, SkillBonus, PowerLevel, PlayerPosition);
@@ -286,7 +286,10 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 
 void SkillJob::ParseEmoticionSkill(CPlayer *pPlayer, int EmoticionID)
 {
-	int ClientID = pPlayer->GetCID();
+	if(!pPlayer || !pPlayer->GetCharacter()) 
+		return;
+
+	const int ClientID = pPlayer->GetCID();
 	for (const auto& skillplayer : Skill[ClientID])
 	{
 		if (skillplayer.second.m_SelectedEmoticion == EmoticionID)

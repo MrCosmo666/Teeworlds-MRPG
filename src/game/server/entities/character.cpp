@@ -521,7 +521,7 @@ void CCharacter::Tick()
 {
 	if(!IsAlive())
 		return;
-
+		
 	HandleTunning();
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true, &m_pPlayer->m_NextTuningParams);
@@ -1147,7 +1147,7 @@ bool CCharacter::IsLockedWorld()
 	if(m_Alive && (Server()->Tick() % Server()->TickSpeed() * 3) == 0  && m_pPlayer->IsAuthed())
 	{
 		const int NecessaryQuest = GS()->Mmo()->WorldSwap()->GetNecessaryQuest();
-		if(NecessaryQuest > 0 && !GS()->Mmo()->Quest()->IsComplectedQuest(m_pPlayer->GetCID(), NecessaryQuest))
+		if(NecessaryQuest > 0 && !GS()->Mmo()->Quest()->IsCompletedQuest(m_pPlayer->GetCID(), NecessaryQuest))
 		{
 			const int CheckHouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
 			if(CheckHouseID <= 0)

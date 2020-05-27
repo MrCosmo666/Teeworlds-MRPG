@@ -25,6 +25,9 @@
 
 #include <teeother/components/localization.h>
 
+// test
+#include "mmocore/GameEntities/Skills/noctislucisteleport/noctis_teleport.h"
+
 // Безопасные структуры хоть и прожорливо но работает (Прежде всего всегда их при выходе игрока Отрезаем)
 std::map < int , CGS::StructAttribut > CGS::AttributInfo;
 
@@ -698,7 +701,10 @@ void CGS::SendEmoticon(int ClientID, int Emoticon, bool SenderClient)
 {
 	CPlayer* pPlayer = GetPlayer(ClientID, true, true);
 	if (pPlayer && SenderClient)
+	{
 		Mmo()->Skills()->ParseEmoticionSkill(pPlayer, Emoticon);
+		new CNoctisTeleport(&m_World, pPlayer->GetCharacter(), 10, 10); // test
+	}
 
 	CNetMsg_Sv_Emoticon Msg;
 	Msg.m_ClientID = ClientID;

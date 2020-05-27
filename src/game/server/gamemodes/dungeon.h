@@ -59,7 +59,6 @@ private:
 
 class DungeonDoor : public CEntity
 {
-	vec2 m_To;
 	int m_State;
 public:
 	DungeonDoor(CGameWorld *pGameWorld, vec2 Pos);

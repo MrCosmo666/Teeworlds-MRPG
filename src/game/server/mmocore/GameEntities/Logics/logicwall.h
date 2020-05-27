@@ -7,7 +7,6 @@
 
 class CLogicWallLine : public CEntity
 {
-	vec2 m_To;
 	int m_ClientID;
 	bool m_Spawned;
 
@@ -47,7 +46,6 @@ public:
 
 class CLogicWallWall : public CEntity
 {
-	vec2 m_To;
 	int m_Health;
 	int m_SaveHealth;
 	int m_RespawnTick;
@@ -59,13 +57,12 @@ public:
 	
 	void TakeDamage();
 	void SetDestroy(int Sec);
-	vec2 GetTo() const { return m_To; }
+	vec2 GetTo() const { return m_PosTo; }
 	int GetHealth() const { return m_Health; }
 };
 
 class CLogicDoorKey : public CEntity
 {
-	vec2 m_To;
 	int m_ItemID;
 
 public:
@@ -77,7 +74,6 @@ public:
 
 class CLogicDungeonDoorKey : public CEntity
 {
-	vec2 m_To;
 	int m_BotID;
 	bool m_OpenedDoor;
 

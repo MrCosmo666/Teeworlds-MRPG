@@ -9,7 +9,7 @@ std::map < int , ShopJob::ShopPersonal > ShopJob::Shop;
 
 void ShopJob::OnInit()
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop"));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, StorageID", "tw_mailshop"));
 	while(RES->next())
 	{
 		int ID = RES->getInt("ID");

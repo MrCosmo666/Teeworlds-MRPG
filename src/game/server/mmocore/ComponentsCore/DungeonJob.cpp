@@ -64,7 +64,7 @@ void DungeonJob::ShowDungeonsList(CPlayer* pPlayer)
 		ShowDungeonTop(pPlayer, dungeon.first, HideID);
 
 		const int NeededQuestID = dungeon.second.OpenQuestID;
-		if(NeededQuestID <= 0 || Job()->Quest()->IsComplectedQuest(ClientID, NeededQuestID))
+		if(NeededQuestID <= 0 || Job()->Quest()->IsCompletedQuest(ClientID, NeededQuestID))
 			GS()->AVM(ClientID, "DUNGEONJOIN", dungeon.first, HideID, "Join dungeon {STR}", dungeon.second.Name);
 		else
 			GS()->AVM(ClientID, "null", NOPE, HideID, "You need to complete {STR}", Job()->Quest()->GetQuestName(NeededQuestID));

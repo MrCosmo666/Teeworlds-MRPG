@@ -127,15 +127,13 @@ public:
 
 	void BuyGuildHouse(int GuildID, int HouseID);
 	void SellGuildHouse(int GuildID);
-	void ShowBuyHouse(CPlayer *pPlayer, int MID);
+	void ShowBuyHouse(CPlayer *pPlayer, int HouseID);
 	void ChangeStateDoor(int GuildID);
 };
 
 class GuildDoor : public CEntity
 {
 	int m_GuildID;
-	vec2 m_To;
-	
 public:
 	GuildDoor(CGameWorld *pGameWorld, vec2 Pos, int HouseID);
 	~GuildDoor();

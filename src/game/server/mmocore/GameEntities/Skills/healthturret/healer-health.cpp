@@ -17,7 +17,7 @@ CHealthHealer::CHealthHealer(CGameWorld *pGameWorld, CPlayer* pPlayer, int Skill
 	// обычные настройки без передачи аргументов
 	m_LifeSpan = (10 + SkillBonus)*Server()->TickSpeed();
 	m_ReloadTick = 2*Server()->TickSpeed();
-	GameWorld()->InsertEntity(this);	
+	GameWorld()->InsertEntity(this);
 	for(int i=0; i<NUM_IDS; i++)
 	{
 		m_IDs[i] = Server()->SnapNewID();

@@ -648,10 +648,10 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 
 // Двери
 HouseDoor::HouseDoor(CGameWorld *pGameWorld, vec2 Pos)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_HOUSEDOOR, Pos), m_To(Pos)
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_PLAYER_HOUSE_DOOR, Pos)
 {
 	m_Pos.y += 30;
-	m_To = GS()->Collision()->FindDirCollision(100, m_To, 'y', '-');
+	m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, 'y', '-');
 	GameWorld()->InsertEntity(this);
 }
 
@@ -659,7 +659,7 @@ void HouseDoor::Tick()
 {
 	for(CCharacter *pChar = (CCharacter*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter *)pChar->TypeNext())
 	{
-		vec2 IntersectPos = closest_point_on_line(m_Pos, m_To, pChar->m_Core.m_Pos);
+		vec2 IntersectPos = closest_point_on_line(m_Pos, m_PosTo, pChar->m_Core.m_Pos);
 		float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);
 		if (Distance <= g_Config.m_SvDoorRadiusHit)
 			pChar->m_DoorHit = true;
@@ -677,7 +677,7 @@ void HouseDoor::Snap(int SnappingClient)
 
 	pObj->m_X = int(m_Pos.x);
 	pObj->m_Y = int(m_Pos.y);
-	pObj->m_FromX = int(m_To.x);
-	pObj->m_FromY = int(m_To.y);
+	pObj->m_FromX = int(m_PosTo.x);
+	pObj->m_FromY = int(m_PosTo.y);
 	pObj->m_StartTick = Server()->Tick()-2;
 }

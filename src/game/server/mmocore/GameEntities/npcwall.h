@@ -14,7 +14,6 @@ public:
 	virtual void Snap(int SnappingClient);
 
 private:
-	vec2 m_To;
 	bool m_Active;
 };
 

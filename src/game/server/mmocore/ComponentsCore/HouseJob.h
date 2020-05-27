@@ -97,7 +97,6 @@ public:
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class HouseDoor : public CEntity
 {
-	vec2 m_To;
 public:
 	HouseDoor(CGameWorld *pGameWorld, vec2 Pos);
 

@@ -37,7 +37,7 @@ public:
 		}
 		return false;
 	}
-	bool IsComplectedQuest(int ClientID, int QuestID) const;
+	bool IsCompletedQuest(int ClientID, int QuestID) const;
 	int GetState(int ClientID, int QuestID) const;
 	const char *GetQuestName(int QuestID) const;
 	const char *GetStoryName(int QuestID) const;

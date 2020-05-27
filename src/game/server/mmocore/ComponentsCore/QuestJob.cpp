@@ -18,7 +18,7 @@ int QuestJob::GetState(int ClientID, int QuestID) const
 	return QuestState::QUEST_NO_ACCEPT;
 }
 
-bool QuestJob::IsComplectedQuest(int ClientID, int QuestID) const
+bool QuestJob::IsCompletedQuest(int ClientID, int QuestID) const
 {
 	return (bool)(GetState(ClientID, QuestID) == QuestState::QUEST_FINISHED);
 }
@@ -94,7 +94,11 @@ BotJob::QuestBotInfo *QuestJob::GetQuestBot(int QuestID, int Progress) const
 {
 	for(auto& qb : BotJob::QuestBot)
 	{
-		if(QuestID == qb.second.QuestID && Progress == qb.second.Progress && !qb.second.NextEqualProgress)
+		// skip decorative quest npc
+		if(qb.second.NextEqualProgress)
+			continue;
+
+		if(QuestID == qb.second.QuestID && Progress == qb.second.Progress)
 			return &qb.second;
 	}
 	return nullptr;
@@ -152,6 +156,7 @@ void QuestJob::FinishQuest(CPlayer *pPlayer, int QuestID)
 
 void QuestJob::CollectItem(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData)
 {
+	// anti stressing with double thread sql result what work one (item)
 	bool antiStressing = false;
 	for (int i = 0; i < 2; i++)
 	{
@@ -196,7 +201,6 @@ bool QuestJob::IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &Bot
 		const int Count = BotData.ItemSearchCount[i];
 		if(ItemID <= 0 || Count <= 0)
 			continue;
-
 		if(pPlayer->GetItem(ItemID).Count < Count)
 			return false;
 	}
@@ -792,7 +796,7 @@ void QuestJob::OnMessage(int MsgID, void* pRawMsg, int ClientID)
 
 bool QuestJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	if (ReplaceMenu)
 	{
 		CCharacter* pChr = pPlayer->GetCharacter();

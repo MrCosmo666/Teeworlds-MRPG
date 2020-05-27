@@ -45,10 +45,11 @@ protected:
 	/* State */
 
 	/*
-		Variable: m_Pos
+		Variable: m_Pos, m_PosTo
 			Contains the current posititon of the entity.
 	*/
 	vec2 m_Pos;
+	vec2 m_PosTo;
 
 	/* Getters */
 	int GetID() const					{ return m_ID; }

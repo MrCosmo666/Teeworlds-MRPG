@@ -26,11 +26,7 @@ public:
 		ENTTYPE_DROPBONUS,
 		ENTTYPE_DROPITEM,
 		ENTTYPE_DROPQUEST,
-		ENTTYPE_HOUSEDOOR,
-		ENTTYPE_DUNGEONDOOR,
-		ENTTYPE_DUNGEONKEYDOOR,
 		ENTTYPE_FINDQUEST,
-		ENTTYPE_NPCWALL,
 		ENTTYPE_JOBITEMS,
 		ENTTYPE_SNAPEFFECT,
 		ENTTYPE_MOBS,
@@ -40,12 +36,19 @@ public:
 		// unused
 		ENTTYPE_EVENTS,
 
-		// skills
+		// door's
+		ENTTYPE_DUNGEON_DOOR,
+		ENTTYPE_DUNGEON_PROGRESS_DOOR,
+		ENTTYPE_GUILD_HOUSE_DOOR,
+		ENTTYPE_PLAYER_HOUSE_DOOR,
+		ENTTYPE_NPC_DOOR,
+
+		// skill's
 		ENTYPE_SKILLTURRETHEART,
 		ENTYPE_HEARTLIFE,
-		// sleepy gravity
 		ENTYPE_SLEEPYGRAVITY,
 		ENTYPE_SLEEPYLINE,
+		ENTYPE_NOCTIS_TELEPORT,
 
 		NUM_ENTTYPES
 	};
@@ -122,6 +125,15 @@ public:
 			Returns a pointer to the closest hit or NULL of there is no intersection.
 	*/
 	class CCharacter *IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, vec2 &NewPos, class CEntity *pNotThis = 0);
+
+
+	/*
+		Function: IntersectClosestEntity
+			Finds the closest Door that intersects the line.
+	*/
+	bool IntersectClosestEntity(vec2 Pos, float Radius, int EnttypeID);
+	bool IntersectClosestDoorEntity(vec2 Pos, float Radius);
+
 
 	/*
 		Function: insert_entity
