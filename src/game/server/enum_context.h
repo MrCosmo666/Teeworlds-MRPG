@@ -62,6 +62,7 @@ enum Skill
 	SkillCraftDiscount = 3, // скидка на крафт
 	SkillMasterWeapon = 4, // автоматический огонь с оружий
 	SkillBlessingGodWar = 5, // восстановить патроны
+	SkillNoctisTeleport = 6, // телепорт скилл ноктиса
 };
 
 enum AtributType

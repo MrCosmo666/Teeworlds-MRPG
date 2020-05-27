@@ -6,6 +6,7 @@
 
 #include <game/server/mmocore/GameEntities/Skills/healthturret/healer-health.h>
 #include <game/server/mmocore/GameEntities/Skills/sleepygravity/sleepygravity.h>
+#include <game/server/mmocore/GameEntities/Skills/noctislucisteleport/noctis_teleport.h>
 
 using namespace sqlstr;
 
@@ -256,7 +257,14 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 		new CSleepyGravity(&GS()->m_World, pPlayer, SkillBonus, PowerLevel, PlayerPosition);
 		return true;
 	}
-	
+
+	// скилл турель гравитации
+	if(SkillID == Skill::SkillNoctisTeleport)
+	{
+		new CNoctisTeleport(&GS()->m_World, pChr, SkillBonus);
+		return true;
+	}
+		
 	// скилл восстановить патроны
 	if(SkillID == Skill::SkillBlessingGodWar)
 	{

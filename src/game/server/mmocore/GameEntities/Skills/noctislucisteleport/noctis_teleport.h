@@ -1,14 +1,14 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#ifndef GAME_SERVER_ENTITIES_SLEEPYGRAVITY_H
-#define GAME_SERVER_ENTITIES_SLEEPYGRAVITY_H
+#ifndef GAME_SERVER_ENTITIES_NOCTISTELEPORT_H
+#define GAME_SERVER_ENTITIES_NOCTISTELEPORT_H
 
 #include <game/server/entity.h>
 
 class CNoctisTeleport : public CEntity
 {
 public:
-	CNoctisTeleport(CGameWorld *pGameWorld, CCharacter* pPlayerChar, int SkillBonus, int PowerLevel);
+	CNoctisTeleport(CGameWorld *pGameWorld, CCharacter* pPlayerChar, int SkillBonus);
 	virtual ~CNoctisTeleport();
 
 	virtual void Snap(int SnappingClient);
@@ -17,8 +17,7 @@ public:
 
 private:
 	int m_LifeSpan;
-	int m_Radius;
-	int m_PowerLevel;
+	int m_SkillBonus;
 	vec2 m_Direction;
 
 public:
