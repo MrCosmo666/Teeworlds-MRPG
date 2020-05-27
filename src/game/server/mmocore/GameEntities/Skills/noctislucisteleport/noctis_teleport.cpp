@@ -72,19 +72,23 @@ void CNoctisTeleport::Tick()
 		Reset();
 		return;
 	}
+	m_PosTo = m_Pos;
 	m_Pos += normalize(m_Direction) * 20.0f;
 }
 
 void CNoctisTeleport::Snap(int SnappingClient)
 {
-	if (NetworkClipped(SnappingClient))
+	if(NetworkClipped(SnappingClient))
 		return;
-	
-	CNetObj_Pickup *pObj = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
+
+	CNetObj_Laser *pObj = static_cast<CNetObj_Laser *>(Server()->SnapNewItem(NETOBJTYPE_LASER, GetID(), sizeof(CNetObj_Laser)));
 	if(!pObj)
 		return;
 
-	pObj->m_X = (int)m_Pos.x;
-	pObj->m_Y = (int)m_Pos.y;
-	pObj->m_Type = 0;
+	pObj->m_X = (int)m_PosTo.x;
+	pObj->m_Y = (int)m_PosTo.y;
+	pObj->m_FromX = (int)m_Pos.x;
+	pObj->m_FromY = (int)m_Pos.y;
+	pObj->m_StartTick = Server()->Tick();
+
 }

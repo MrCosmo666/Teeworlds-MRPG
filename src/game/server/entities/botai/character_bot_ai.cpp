@@ -284,7 +284,6 @@ void CCharacterBotAI::EngineNPC()
 // Интерактивы квестовых мобов
 void CCharacterBotAI::EngineQuestMob()
 {
-	const int MobID = m_pBotPlayer->GetBotSub();
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
 		m_Input.m_TargetY = random_int()%4- random_int()%8;
 	m_Input.m_TargetX = (m_Input.m_Direction*10+1);

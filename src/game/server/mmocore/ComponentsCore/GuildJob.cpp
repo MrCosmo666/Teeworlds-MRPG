@@ -1361,8 +1361,6 @@ void GuildJob::SellGuildHouse(int GuildID)
 void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 {
 	const int ClientID = pPlayer->GetCID();
-	const int GuildID = pPlayer->Acc().GuildID;
-	const bool Leader = IsLeaderPlayer(pPlayer);
 	GS()->AVH(ClientID, TAB_INFO_GUILD_HOUSE, GREEN_COLOR, "Information Member Housing");
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_GUILD_HOUSE, "Buying a house you will need to constantly the Treasury");
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_GUILD_HOUSE, "In the intervals of time will be paid house");
