@@ -372,16 +372,15 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 	}
 	if (Menulist == MenuList::MENU_HOUSE_PLANTS)
 	{
+		pPlayer->m_LastVoteMenu = MenuList::MENU_HOUSE;
 		const int HouseID = OwnerHouseID(pPlayer->Acc().AuthID);
 		const int PlantItemID = GetPlantsID(HouseID);
-		pPlayer->m_LastVoteMenu = MenuList::MENU_HOUSE;
 
 		GS()->AVH(ClientID, TAB_INFO_HOUSE_PLANT, GREEN_COLOR, "Plants Information");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE_PLANT, "Select item and in tab select 'To plant'");
 		GS()->AV(ClientID, "null", "");
 
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "Housing Active Plants: {STR}", GS()->GetItemInfo(PlantItemID).GetName(pPlayer));
-
 		GS()->Mmo()->Item()->ListInventory(pPlayer, FUNCTION_PLANTS, true);
 		GS()->AddBack(ClientID);
 		return true;

@@ -40,7 +40,8 @@ void CNoctisTeleport::Tick()
 	vec2 To = m_Pos + normalize(m_Direction) * GetProximityRadius();
 	vec2 Size = vec2(GetProximityRadius()/2, GetProximityRadius()/2);
 	CCharacter *pSearchChar = (CCharacter*)GS()->m_World.ClosestEntity(To, 64.0f, CGameWorld::ENTTYPE_CHARACTER, nullptr);
-	if(!m_LifeSpan || GS()->Collision()->TestBox(To, Size) || (pSearchChar && pSearchChar != m_pPlayerChar) || GS()->m_World.IntersectClosestDoorEntity(To, GetProximityRadius()))
+	if(!m_LifeSpan || GS()->Collision()->TestBox(To, Size) || GS()->m_World.IntersectClosestDoorEntity(To, GetProximityRadius()) 
+		|| (pSearchChar && pSearchChar != m_pPlayerChar && pSearchChar->IsAllowedPVP(m_pPlayerChar->GetPlayer()->GetCID())))
 	{
 		GS()->CreateSound(m_pPlayerChar->GetPos(), SOUND_NINJA_FIRE);
 

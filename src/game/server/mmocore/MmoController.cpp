@@ -210,7 +210,7 @@ void MmoController::LoadLogicWorld()
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_logicworld", "WHERE WorldID = '%d'", GS()->GetWorldID()));
 	while(RES->next())
 	{
-		int Type = (int)RES->getInt("MobID"), Mode = (int)RES->getInt("Mode"), Health = (int)RES->getInt("ParseInt");
+		const int Type = (int)RES->getInt("MobID"), Mode = (int)RES->getInt("Mode"), Health = (int)RES->getInt("ParseInt");
 		vec2 Position = vec2(RES->getInt("PosX"), RES->getInt("PosY"));
 		GS()->m_pController->CreateLogic(Type, Mode, Position, Health);
 	}
