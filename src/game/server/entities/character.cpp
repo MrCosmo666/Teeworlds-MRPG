@@ -1043,7 +1043,7 @@ void CCharacter::HandleTunning()
 		m_Core.m_Vel += Direction * 0.001f;
 	}
 
-	// effects slimes
+	// effects buff
 	if(m_pPlayer->CheckEffect("Slowdown"))
 	{
 		pTuningParams->m_Gravity = 0.35f;
@@ -1057,6 +1057,8 @@ void CCharacter::HandleTunning()
 		pTuningParams->m_AirJumpImpulse = 3.0f;
 		pTuningParams->m_HookLength = 0.0f;
 	}
+
+	// poison's
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
 	{
 		if(m_pPlayer->CheckEffect("Fire"))
@@ -1081,7 +1083,6 @@ void CCharacter::HandleTunning()
 			IncreaseMana(RestoreMana);
 		}
 	}
-
 }
 
 void CCharacter::UpdateEquipingStats(int ItemID)

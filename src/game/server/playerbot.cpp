@@ -89,7 +89,7 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 
 		// all hardtypews and strength lowered
 		if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
-			Power /= BotJob::MobBot[m_SubBotID].Boss ? 500 : 50;
+			Power /= BotJob::MobBot[m_SubBotID].Boss ? 320 : 50;
 		// lowered hardness 
 		else if(BonusID != Stats::StHardness)
 			Power /= 5;

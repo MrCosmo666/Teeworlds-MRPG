@@ -1156,18 +1156,16 @@ void CMenus::RenderMenubar(CUIRect Rect)
 	// settings page
 	if((Client()->State() == IClient::STATE_OFFLINE && m_MenuPage == PAGE_SETTINGS) || (Client()->State() == IClient::STATE_ONLINE && m_GamePage == PAGE_SETTINGS))
 	{
-		float Spacing = 0.0f;
-		float ButtonWidth = (Box.w / 7.0f) - (Spacing * 5.0) / 7.0f;
+		float ButtonWidth = (Box.w / 7.0f);
 		float NotActiveAlpha = Client()->State() == IClient::STATE_ONLINE ? 0.5f : 1.0f;
 		const int CornerRange = 8.0f;
 		int Corners = 0;
 
 		// render header background
 		if(Client()->State() == IClient::STATE_OFFLINE)
-			RenderBackgroundShadow(&Box, false);
+			RenderBackgroundShadow(&Box, false, CornerRange);
 
 		Box.HSplitBottom(25.0f, 0, &Box);
-
 		Box.VSplitLeft(ButtonWidth, &Button, &Box);
 		static CButtonContainer s_GeneralButton;
 		if(DoButton_MenuTabTop(&s_GeneralButton, Localize("General"), Client()->State() == IClient::STATE_OFFLINE && g_Config.m_UiSettingsPage==SETTINGS_GENERAL, &Button,
@@ -1177,7 +1175,6 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			g_Config.m_UiSettingsPage = SETTINGS_GENERAL;
 		}
 
-		Box.VSplitLeft(Spacing, 0, &Box); // little space
 		Box.VSplitLeft(ButtonWidth, &Button, &Box);
 		{
 			static CButtonContainer s_PlayerButton;
@@ -1189,7 +1186,6 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			}
 		}
 
-		Box.VSplitLeft(Spacing, 0, &Box); // little space
 		Box.VSplitLeft(ButtonWidth, &Button, &Box);
 		{
 			static CButtonContainer s_TeeButton;
@@ -1201,7 +1197,6 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			}
 		}
 
-		Box.VSplitLeft(Spacing, 0, &Box); // little space
 		Box.VSplitLeft(ButtonWidth, &Button, &Box);
 		static CButtonContainer s_ControlsButton;
 		if(DoButton_MenuTabTop(&s_ControlsButton, Localize("Controls"), Client()->State() == IClient::STATE_OFFLINE && g_Config.m_UiSettingsPage==SETTINGS_CONTROLS, &Button,
@@ -1211,7 +1206,6 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			g_Config.m_UiSettingsPage = SETTINGS_CONTROLS;
 		}
 
-		Box.VSplitLeft(Spacing, 0, &Box); // little space
 		Box.VSplitLeft(ButtonWidth, &Button, &Box);
 		static CButtonContainer s_GraphicsButton;
 		if(DoButton_MenuTabTop(&s_GraphicsButton, Localize("Graphics"), Client()->State() == IClient::STATE_OFFLINE && g_Config.m_UiSettingsPage==SETTINGS_GRAPHICS, &Button,
@@ -1221,7 +1215,6 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			g_Config.m_UiSettingsPage = SETTINGS_GRAPHICS;
 		}
 
-		Box.VSplitLeft(Spacing, 0, &Box); // little space
 		Box.VSplitLeft(ButtonWidth, &Button, &Box);
 		static CButtonContainer s_SoundButton;
 		if(DoButton_MenuTabTop(&s_SoundButton, Localize("Sound"), Client()->State() == IClient::STATE_OFFLINE && g_Config.m_UiSettingsPage==SETTINGS_SOUND, &Button,
@@ -1232,7 +1225,6 @@ void CMenus::RenderMenubar(CUIRect Rect)
 		}
 
 		// mmotee
-		Box.VSplitLeft(Spacing, 0, &Box); // little space
 		Box.VSplitLeft(ButtonWidth, &Button, &Box);
 		static CButtonContainer s_MmoButton;
 		if(DoButton_MenuTabTop(&s_MmoButton, Localize("MRPG"), Client()->State() == IClient::STATE_OFFLINE && g_Config.m_UiSettingsPage == SETTINGS_MMO, &Button,

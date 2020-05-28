@@ -1823,26 +1823,16 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		{
 			// пишем хорошее подключение
 			Nick = RES->getString("Nick").c_str();
-			sendEmbedMessage(message.channelID, DC_DISCORD_BOT, "Good work :)", "**Good connect! Connect nickname: " + Nick + "**");
+			sendEmbedMessage(message.channelID, DC_DISCORD_BOT, "Good work :)", "**Your account is enabled: Nickname in-game: " + Nick + "**");
 			founds = true;
 		}
 
 		// завершаем подключение
 		if(!founds)
 		{
-			sendEmbedMessage(message.channelID, DC_SERVER_WARNING, "Fail in work :(", "**Fail connect! No connect! See !mconnect.\\nUse in-game /discord_connect <DID>..**");
+			sendEmbedMessage(message.channelID, DC_SERVER_WARNING, "Fail in work :(", "**Fail connect. See !mconnect.\\nUse in-game /discord_connect <DID>..**");
 		}
 		return;
-	}
-
-	// ВРЕМЯ СЕРВЕРА
-	else if (message.startsWith("!mtime"))
-	{
-		char aBuf[128];
-		int Hour = Server()->GetHourWorld();
-		int Minutes = Server()->GetSecWorld();
-		str_format(aBuf, sizeof(aBuf), "```%s %d:%d```", Server()->GetStringTypeDay(), Hour, Minutes);
-		sendEmbedMessage(message.channelID, DC_DISCORD_BOT, "World Time", aBuf);
 	}
 
 	// ПОКАЗАТЬ ВСЕХ ИГРОКОВ
@@ -1854,9 +1844,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 			if(!Server()->ClientIngame(i)) 
 				continue;
 
-			char aBuf[48];
-			str_format(aBuf, sizeof(aBuf), "\\n%s - Ingame", Server()->ClientName(i));
-			Buffer.append_at(Buffer.length(), aBuf);
+			Buffer.append_at(Buffer.length(), Server()->ClientName(i));
 		}
 		if(Buffer.length() <= 0)
 		{
@@ -1871,8 +1859,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	else if (message.startsWith("!mhelp"))
 	{
 		sendEmbedMessage(message.channelID, DC_DISCORD_INFO, "Commands / Information", 
-		"`!mtime` - Tee time in server."
-		"\\n`!mconnect` - Info for connect your discord and account in game."
+		"`!mconnect` - Info for connect your discord and account in game."
 		"\\n`!mstats <symbol>` - See stats players. Minimal 4 symbols."
 		"\\n`!monline` - Show players ingame.");
 	}
