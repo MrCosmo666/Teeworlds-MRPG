@@ -353,6 +353,7 @@ void BotJob::LoadMobsBots(const char* pWhereLocalWorld)
 		MobBot[MobID].RespawnTick = RES->getInt("Respawn");
 		MobBot[MobID].BotID = BotID;
 		str_copy(MobBot[MobID].Effect, RES->getString("Effect").c_str(), sizeof(MobBot[MobID].Effect));
+		str_copy(MobBot[MobID].Behavior, RES->getString("Behavior").c_str(), sizeof(MobBot[MobID].Behavior));
 
 		char aBuf[32];
 		for(int i = 0; i < MAX_DROPPED_FROM_MOBS; i++)

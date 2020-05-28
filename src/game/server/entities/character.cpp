@@ -1021,8 +1021,8 @@ void CCharacter::HandleTunning()
 		m_Core.m_Vel += Direction * 0.001f;
 	}
 
-	// effects
-	if(m_pPlayer->CheckEffect("Slowdown"))
+	// effects slimes
+	if(m_pPlayer->CheckEffect("Slime"))
 	{
 		pTuningParams->m_Gravity = 0.35f;
 		pTuningParams->m_GroundFriction = 0.30f;

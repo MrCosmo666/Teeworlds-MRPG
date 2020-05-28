@@ -105,6 +105,7 @@ class BotJob : public MmoComponent
 		int DungeonDoorID;
 		int WorldID;
 		char Effect[16];
+		char Behavior[32];
 
 		int DropItem[MAX_DROPPED_FROM_MOBS];
 		int CountItem[MAX_DROPPED_FROM_MOBS];

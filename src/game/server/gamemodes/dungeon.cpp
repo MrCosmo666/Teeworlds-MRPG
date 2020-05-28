@@ -428,7 +428,7 @@ int CGameControllerDungeon::GetDungeonSync(CPlayer* pPlayer, int BonusID) const
 	if(pPlayer->m_MoodState == MOOD_PLAYER_TANK)
 	{
 		if(ParsePlayerStatsClass == AtributType::AtTank)
-			Procent = 12;
+			Procent = 10;
 
 		if(ParsePlayerStatsClass == AtributType::AtHealer || ParsePlayerStatsClass == AtributType::AtDps)
 			Delay = 100;
