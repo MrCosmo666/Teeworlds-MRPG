@@ -240,12 +240,13 @@ void CCharacterBotAI::TickDefered()
 // Интерактивы ботов
 void CCharacterBotAI::EngineBots()
 {
-	ResetInput();
 	if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
 		const int tx = m_Pos.x + m_Input.m_Direction * 45.0f;
-		if(tx < 0)  m_Input.m_Direction = 1;
-		else if(tx >= GS()->Collision()->GetWidth() * 32.0f) m_Input.m_Direction = -1;
+		if(tx < 0)  
+			m_Input.m_Direction = 1;
+		else if(tx >= GS()->Collision()->GetWidth() * 32.0f) 
+			m_Input.m_Direction = -1;
 
 		m_LatestPrevInput = m_LatestInput;
 		m_LatestInput = m_Input;
@@ -277,8 +278,16 @@ void CCharacterBotAI::EngineNPC()
 		PlayerFinding = BaseFunctionNPC();
 
 	const bool StaticBot = BotJob::NpcBot[MobID].Static;
-	if (!PlayerFinding && !StaticBot && Server()->Tick() % (Server()->TickSpeed() * (m_Input.m_Direction == 0 ? 5 : 1)) == 0)
-		m_Input.m_Direction = -1 + random_int() % 3;
+	if (!PlayerFinding && !StaticBot)
+	{
+		if(random_int() % 50 == 0)
+		{
+			const int RandomDirection = random_int()%6;
+			if(RandomDirection == 0 || RandomDirection == 2)
+				m_Input.m_Direction = -1 + RandomDirection;
+			else m_Input.m_Direction = 0;
+		}
+	}
 }
 
 // Интерактивы квестовых мобов
@@ -294,6 +303,7 @@ void CCharacterBotAI::EngineQuestMob()
 // Интерактивы мобов враждебных
 void CCharacterBotAI::EngineMobs()
 {
+	ResetInput();
 	const int MobID = m_pBotPlayer->GetBotSub();
 	bool WeaponedBot = (BotJob::MobBot[MobID].Spread >= 1);
 	if(WeaponedBot)

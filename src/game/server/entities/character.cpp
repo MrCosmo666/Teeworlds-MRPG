@@ -1009,10 +1009,15 @@ void CCharacter::HandleTunning()
 	// боты тюнинг
 	if(m_pPlayer->IsBot())
 	{
+		const int MobID = m_pPlayer->GetBotSub();
 		// behavior mobs
-		if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
+		if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC || m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 		{
-			int MobID = m_pPlayer->GetBotSub();
+			pTuningParams->m_GroundControlSpeed = 5.0f;
+			pTuningParams->m_GroundControlAccel = 1.0f;
+		}
+		else if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
+		{
 			if(str_comp(BotJob::MobBot[MobID].Behavior, "Slime") == 0)
 			{
 				pTuningParams->m_Gravity = 0.25f;
