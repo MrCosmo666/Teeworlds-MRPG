@@ -1182,9 +1182,9 @@ void GuildJob::ShowFinderGuilds(int ClientID)
 	if(!pPlayer)
 		return;
 
-	GS()->AVL(ClientID, "null", "You are not in guild, or select member");
-	GS()->AV(ClientID, "null", "Use reason how enter Value, Click fields!"); 	
-	GS()->AV(ClientID, "null", "Example: Find guild: [], in reason name, and use this");
+	GS()->AVL(ClientID, "null", "You are not in guild!");
+	GS()->AV(ClientID, "null", "Use reason how Value."); 	
+	GS()->AV(ClientID, "null", "Example: Find guild: [], in reason name.");
 	GS()->AV(ClientID, "null", "");
 	GS()->AVM(ClientID, "MINVITENAME", 1, NOPE, "Find guild: {STR}", pPlayer->GetTempData().m_aGuildSearchBuf);
 

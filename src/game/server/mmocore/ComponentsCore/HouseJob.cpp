@@ -404,9 +404,11 @@ void HouseJob::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
 		GS()->Chat(ClientID, "Acceptable for take {INT}gold", &Bank);
 		return;
 	}
+
+	pPlayer->AddMoney(TakeCount);
 	Home[HouseID].m_Bank = Bank - TakeCount;
-	GS()->Chat(ClientID, "You take gold in the safe (+{VAL}){VAL}!", &TakeCount, &Home[HouseID].m_Bank);
 	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", Home[HouseID].m_Bank, HouseID);
+	GS()->Chat(ClientID, "You take gold in the safe (+{VAL}){VAL}!", &TakeCount, &Home[HouseID].m_Bank);
 }
 
 
