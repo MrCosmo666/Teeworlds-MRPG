@@ -1008,8 +1008,30 @@ void CCharacter::HandleTunning()
 		
 	// боты тюнинг
 	if(m_pPlayer->IsBot())
-		return;
+	{
+		// behavior mobs
+		if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
+		{
+			int MobID = m_pPlayer->GetBotSub();
+			if(str_comp(BotJob::MobBot[MobID].Behavior, "Slime") == 0)
+			{
+				pTuningParams->m_Gravity = 0.25f;
+				pTuningParams->m_GroundJumpImpulse = 8.0f;
 
+				pTuningParams->m_AirFriction = 0.75f;
+				pTuningParams->m_AirControlAccel = 1.0f;
+				pTuningParams->m_AirControlSpeed = 3.75f;
+				pTuningParams->m_AirJumpImpulse = 8.0f;
+
+				pTuningParams->m_HookFireSpeed = 30.0f;
+				pTuningParams->m_HookDragAccel = 1.5f;
+				pTuningParams->m_HookDragSpeed = 8.0f;
+				pTuningParams->m_PlayerHooking = 0;
+			}
+		}
+		return;
+	}
+	
 	// режим полета
 	if(m_pPlayer->m_Flymode && m_pPlayer->GetEquippedItem(EQUIP_WINGS) > 0)
 	{
@@ -1022,7 +1044,7 @@ void CCharacter::HandleTunning()
 	}
 
 	// effects slimes
-	if(m_pPlayer->CheckEffect("Slime"))
+	if(m_pPlayer->CheckEffect("Slowdown"))
 	{
 		pTuningParams->m_Gravity = 0.35f;
 		pTuningParams->m_GroundFriction = 0.30f;
