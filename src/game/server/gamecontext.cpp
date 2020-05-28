@@ -1368,7 +1368,7 @@ void CGS::OnClientEnter(int ClientID)
 // Выход игрока
 void CGS::OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld)
 {
-	if(!m_apPlayers[ClientID])
+	if(!m_apPlayers[ClientID] || m_apPlayers[ClientID]->IsBot())
 		return;
 
 	if(ChangeWorld)
@@ -1470,6 +1470,9 @@ void CGS::ClearClientData(int ClientID)
 
 	if(Effects.find(ClientID) != Effects.end()) 
 		Effects.erase(ClientID);
+
+	for(auto& databot : BotJob::DataBot)
+		databot.second.AlreadySnapQuestBot[ClientID] = false;
 }
 
 int CGS::GetRank(int AuthID)

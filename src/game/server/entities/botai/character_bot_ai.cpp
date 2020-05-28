@@ -277,8 +277,7 @@ void CCharacterBotAI::EngineNPC()
 	else
 		PlayerFinding = BaseFunctionNPC();
 
-	const bool StaticBot = BotJob::NpcBot[MobID].Static;
-	if (!PlayerFinding && !StaticBot)
+	if (!PlayerFinding && !BotJob::NpcBot[MobID].Static)
 	{
 		if(random_int() % 50 == 0)
 		{
