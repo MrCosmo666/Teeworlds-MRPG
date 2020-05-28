@@ -146,7 +146,7 @@ int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 	if(m_BotType == BotsTypes::TYPE_BOT_QUEST)
 	{
 		const int QuestID = BotJob::QuestBot[m_SubBotID].QuestID;
-		if(GS()->Mmo()->Quest()->IsCompletedQuest(SnappingClient, QuestID)) 
+		if(GS()->Mmo()->Quest()->GetState(SnappingClient, QuestID) != QuestState::QUEST_ACCEPT) 
 			return 0;
 		const int TalkProgress = BotJob::QuestBot[m_SubBotID].Progress;
 		if(TalkProgress != QuestJob::Quests[SnappingClient][QuestID].Progress)
