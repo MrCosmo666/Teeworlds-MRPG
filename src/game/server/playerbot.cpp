@@ -23,6 +23,9 @@ CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int Spaw
 
 CPlayerBot::~CPlayerBot() 
 {
+	for(int i = 0; i < MAX_PLAYERS; i++)
+		BotJob::DataBot[m_BotID].AlreadySnapQuestBot[i] = false;
+
 	CNetMsg_Sv_ClientDrop Msg;
 	Msg.m_ClientID = m_ClientID;
 	Msg.m_pReason = "\0";
@@ -86,7 +89,7 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 
 		// all hardtypews and strength lowered
 		if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
-			Power /= BotJob::MobBot[m_SubBotID].Boss ? 300 : 50;
+			Power /= BotJob::MobBot[m_SubBotID].Boss ? 500 : 50;
 		// lowered hardness 
 		else if(BonusID != Stats::StHardness)
 			Power /= 5;
@@ -137,11 +140,11 @@ void CPlayerBot::TryRespawn()
 */
 int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 {
+	if(SnappingClient < 0 || SnappingClient >= MAX_PLAYERS)
+		return 0;
+
 	if(m_BotType == BotsTypes::TYPE_BOT_QUEST)
 	{
-		// [first] quest bot non-active for player
-		BotJob::DataBot[m_BotID].AlreadySnapQuestBot[SnappingClient] = false;
-
 		const int QuestID = BotJob::QuestBot[m_SubBotID].QuestID;
 		if(GS()->Mmo()->Quest()->IsCompletedQuest(SnappingClient, QuestID)) 
 			return 0;
@@ -149,13 +152,13 @@ int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 		if(TalkProgress != QuestJob::Quests[SnappingClient][QuestID].Progress)
 			return 0;
 		
-		// [second] quest bot active for player
+		// [first] quest bot active for player
 		BotJob::DataBot[m_BotID].AlreadySnapQuestBot[SnappingClient] = true;
 	}
 
 	if(m_BotType == BotsTypes::TYPE_BOT_NPC)
 	{
-		// [third] skip snapping already snap on quest state
+		// [second] skip snapping already snap on quest state
 		if(BotJob::DataBot[m_BotID].AlreadySnapQuestBot[SnappingClient])
 			return 0;
 			

@@ -386,7 +386,7 @@ bool CPlayer::CheckFailMoney(int Price, int ItemID, bool CheckOnly)
 {
 	if (ItemID < 0)
 		return true;
-	if (Price < 0)
+	if (Price <= 0)
 		return false;
 
 	ItemJob::InventoryItem &pPlayerItem = GetItem(ItemID);

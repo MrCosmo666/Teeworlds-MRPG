@@ -16,7 +16,6 @@ private:
 	int m_BotHealth;
 	int m_DungeonAllowedSpawn;
 
-
 public:
 	CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint);
 	virtual ~CPlayerBot() override;

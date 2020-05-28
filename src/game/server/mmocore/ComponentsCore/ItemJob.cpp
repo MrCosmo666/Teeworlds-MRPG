@@ -601,6 +601,12 @@ void ItemJob::UseItem(int ClientID, int ItemID, int Count)
 		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", PlItem.Info().GetName(pPlayer), &Count);
 	}
 
+	if(ItemID == itTicketDiscountCraft)
+	{
+		GS()->Chat(ClientID, "This item can only be used (Auto Use, and then craft).");
+		return;
+	}
+
 	if(ItemID == itCapsuleSurvivalExperience && PlItem.Remove(Count, 0)) 
 	{
 		int Getting = randomRangecount(10, 50, Count);

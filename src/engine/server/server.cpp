@@ -381,6 +381,7 @@ const char *CServer::GetWorldName(int WorldID)
 		case 5: return "Elfinia occupation of goblins";
 		case 6: return "Elfinia Abandoned mine";
 		case 7: return "Diana home room";
+		case 8: return "Noctis Resonance";
 	}
 	return "unknow";
 }

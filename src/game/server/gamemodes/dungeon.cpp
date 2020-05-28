@@ -346,7 +346,7 @@ void CGameControllerDungeon::SelectTankPlayer()
 			continue;
 
 		// small random set new tank where Votes equal
-		if(MaximalVotes && pPlayer->GetTempData().TempTankVotingDungeon == MaximalVotes && random_int() % 2 == 0)
+		if(MaximalVotes > 0 && pPlayer->GetTempData().TempTankVotingDungeon == MaximalVotes && random_int() % 2 == 0)
 			m_TankClientID = i;
 
 		// select tank what have more votes

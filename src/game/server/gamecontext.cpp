@@ -1148,23 +1148,22 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		else if(MsgID == NETMSGTYPE_CL_CALLVOTE)
 		{
 			CNetMsg_Cl_CallVote *pMsg = (CNetMsg_Cl_CallVote *)pRawMsg;
-			if (str_comp_nocase(pMsg->m_Type, "option") != 0 || Server()->Tick() < (pPlayer->m_PlayerTick[TickState::LastVoteTry] + Server()->TickSpeed()) / 2)
+			if (str_comp_nocase(pMsg->m_Type, "option") != 0 || Server()->Tick() < (pPlayer->m_PlayerTick[TickState::LastVoteTry] + (Server()->TickSpeed() / 2)))
 				return;
 			
-			int InteractiveCount = string_to_number(pMsg->m_Reason, 1, 10000000);
-			const auto& item = std::find_if(m_PlayerVotes[ClientID].begin(), m_PlayerVotes[ClientID].end(), [&](const CVoteOptions& vote)
+			pPlayer->m_PlayerTick[TickState::LastVoteTry] = Server()->Tick();
+			const auto& item = std::find_if(m_PlayerVotes[ClientID].begin(), m_PlayerVotes[ClientID].end(), [pMsg](const CVoteOptions& vote)
 			{
 				return (str_comp_nocase(pMsg->m_Value, vote.m_aDescription) == 0);
 			});
 
-			if (item == m_PlayerVotes[ClientID].end())
+			if (item != m_PlayerVotes[ClientID].end())
 			{
-				ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+				const int InteractiveCount = string_to_number(pMsg->m_Reason, 1, 10000000);
+				ParseVote(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveCount, pMsg->m_Reason);
 				return;
 			}
-
-			if(ParseVote(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveCount, pMsg->m_Reason))
-				pPlayer->m_PlayerTick[TickState::LastVoteTry] = Server()->Tick();
+			ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		}
 		else if(MsgID == NETMSGTYPE_CL_VOTE)
 		{
@@ -1716,11 +1715,12 @@ void CGS::AVHI(int To, const char *Icon, const int ID, vec3 Color, const char* p
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		bool HidenTabs = (ID >= TAB_STAT) ? m_apPlayers[To]->GetHidenMenu(ID) : false;
+		bool HidenTabs = (bool)(ID >= TAB_STAT ? m_apPlayers[To]->GetHidenMenu(ID) : false);
 		Buffer.append(GetSymbolHandleMenu(To, HidenTabs, ID));
 
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
-		if(ID > TAB_SETTINGS_MODULES && ID < NUM_TAB_MENU) { Buffer.append(" (Press me for help)"); }
+		if(ID > TAB_SETTINGS_MODULES && ID < NUM_TAB_MENU)
+			Buffer.append(" (Press me for help)");
 
 		m_apPlayers[To]->m_Colored = Color;
 		AV(To, "HIDEN", Buffer.buffer(), ID, -1, Icon);

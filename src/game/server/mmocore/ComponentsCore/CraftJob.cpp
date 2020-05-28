@@ -92,7 +92,10 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 			continue;
 
 		int Discount = (int)kurosio::translate_to_procent_rest(cr.second.Price, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount));
-		int LastPrice = clamp(cr.second.Price - Discount, 0, cr.second.Price);
+		if(pPlayer->GetItem(itTicketDiscountCraft).IsEquipped())
+			Discount += (int)kurosio::translate_to_procent_rest(cr.second.Price, 20);
+		
+		const int LastPrice = max(cr.second.Price - Discount, 0);
 		if (InfoGetItem.IsEnchantable())
 		{
 			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} - {INT} gold",
@@ -127,8 +130,8 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 {
 	const int ClientID = pPlayer->GetCID();
-	ItemJob::InventoryItem& PlayerItem = pPlayer->GetItem(Craft[CraftID].GetItemID);
-	if (PlayerItem.Info().IsEnchantable() && PlayerItem.Count > 0)
+	ItemJob::InventoryItem& PlayerCraftItem = pPlayer->GetItem(Craft[CraftID].GetItemID);
+	if (PlayerCraftItem.Info().IsEnchantable() && PlayerCraftItem.Count > 0)
 	{
 		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");
 		return;
@@ -156,11 +159,23 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 	}
 	Buffer.clear();
 
+	dbg_msg("test", "here craft left");
+
 	// дальше уже организуем крафт
 	int Discount = (int)kurosio::translate_to_procent_rest(Craft[CraftID].Price, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount));
-	int LastPrice = clamp(Craft[CraftID].Price - Discount, 0, Craft[CraftID].Price);
+	bool TickedDiscountCraft = pPlayer->GetItem(itTicketDiscountCraft).IsEquipped();
+	if(TickedDiscountCraft)
+		Discount += (int)kurosio::translate_to_procent_rest(Craft[CraftID].Price, 20);
+
+	const int LastPrice = max(Craft[CraftID].Price - Discount, 0);
 	if(pPlayer->CheckFailMoney(LastPrice))
 		return;
+
+	if(TickedDiscountCraft)
+	{
+		pPlayer->GetItem(itTicketDiscountCraft).Remove(1);
+		GS()->Chat(ClientID, "You used item {STR} and get discount 25%.", GS()->GetItemInfo(itTicketDiscountCraft).Name);
+	}
 
 	for(int i = 0; i < 3; i++) 
 	{
@@ -172,14 +187,14 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 		pPlayer->GetItem(SearchItemID).Remove(SearchCount);
 	}
 
-	int CraftGetCount = Craft[CraftID].GetItemCount;
-	PlayerItem.Add(CraftGetCount);
-	if(PlayerItem.Info().IsEnchantable())
+	const int CraftGetCount = Craft[CraftID].GetItemCount;
+	PlayerCraftItem.Add(CraftGetCount);
+	if(PlayerCraftItem.Info().IsEnchantable())
 	{
-		GS()->Chat(-1, "{STR} crafted [{STR}x{INT}].", GS()->Server()->ClientName(ClientID), PlayerItem.Info().GetName(), &CraftGetCount);
+		GS()->Chat(-1, "{STR} crafted [{STR}x{INT}].", GS()->Server()->ClientName(ClientID), PlayerCraftItem.Info().GetName(), &CraftGetCount);
 		return;
 	}
-	GS()->Chat(ClientID, "You crafted [{STR}x{INT}].", PlayerItem.Info().GetName(pPlayer), &CraftGetCount);
+	GS()->Chat(ClientID, "You crafted [{STR}x{INT}].", PlayerCraftItem.Info().GetName(pPlayer), &CraftGetCount);
 	GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 }
 

@@ -40,7 +40,7 @@ void CNoctisTeleport::Tick()
 	vec2 To = m_Pos + normalize(m_Direction) * GetProximityRadius();
 	vec2 Size = vec2(GetProximityRadius()/2, GetProximityRadius()/2);
 	CCharacter *pSearchChar = (CCharacter*)GS()->m_World.ClosestEntity(To, 64.0f, CGameWorld::ENTTYPE_CHARACTER, nullptr);
-	if(!m_LifeSpan || GS()->Collision()->TestBox(To, Size) || (pSearchChar && pSearchChar != m_pPlayerChar) || GS()->m_World.IntersectClosestDoorEntity(To, GetProximityRadius()/2))
+	if(!m_LifeSpan || GS()->Collision()->TestBox(To, Size) || (pSearchChar && pSearchChar != m_pPlayerChar) || GS()->m_World.IntersectClosestDoorEntity(To, GetProximityRadius()))
 	{
 		GS()->CreateSound(m_pPlayerChar->GetPos(), SOUND_NINJA_FIRE);
 
@@ -54,7 +54,8 @@ void CNoctisTeleport::Tick()
 		{
 			CPlayer *pSearchPlayer = GS()->GetPlayer(i, false, true);
 			if(ClientID == i || !pSearchPlayer || !pSearchPlayer->GetCharacter()->IsAllowedPVP(ClientID) 
-				|| distance(OldPosition, pSearchPlayer->GetCharacter()->GetPos()) > 320)
+				|| distance(OldPosition, pSearchPlayer->GetCharacter()->GetPos()) > 320 
+				|| GS()->Collision()->IntersectLineWithInvisible(OldPosition, pSearchPlayer->GetCharacter()->GetPos(), 0, 0))
 				continue;
 
 			// change position to player
@@ -62,9 +63,11 @@ void CNoctisTeleport::Tick()
 			m_pPlayerChar->ChangePosition(SearchPos);
 
 			// take damage
-			GS()->CreateSound(SearchPos, SOUND_NINJA_HIT);
-			pSearchPlayer->GetCharacter()->TakeDamage(vec2(0,0), MaximalDamageSize, ClientID, WEAPON_NINJA);
+			vec2 Diff = SearchPos - OldPosition;
+			vec2 Force = normalize(Diff) * 16.0f;
+			pSearchPlayer->GetCharacter()->TakeDamage(Force * 24.0f, MaximalDamageSize, ClientID, WEAPON_NINJA);
 			GS()->CreateExplosion(SearchPos, m_pPlayerChar->GetPlayer()->GetCID(), WEAPON_GRENADE, 0);
+			GS()->CreateSound(SearchPos, SOUND_NINJA_HIT);
 		}
 		m_pPlayerChar->ChangePosition(OldPosition);
 

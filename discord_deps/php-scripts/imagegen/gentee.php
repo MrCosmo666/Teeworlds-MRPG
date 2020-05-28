@@ -40,11 +40,11 @@
 
 	if (strlen($player) >= 12)
 		$font_size = 30;
-
+	
 	// создаём новое изображение из файла
 	$img = imagecreatefrompng("images/$discordcard.png"); 
-	$whitecolor  = imagecolorallocatealpha($img, 255, 255, 255, 20);
-	$randomcolor  = imagecolorallocatealpha($img, rand(140, 255), rand(140, 255), rand(140, 255), 20);
+	$whitecolor  = imagecolorallocatealpha($img, 255, 255, 255, 60);
+	$randomcolor  = imagecolorallocatealpha($img, rand(140, 255), rand(140, 255), rand(140, 255), 60);
 	
 	// обычный текст не динамический
 	imagettftext($img, $font_size_desc, 0, 20, 40, $randomcolor, $font, "DISCORD MMO TEE CARD");
