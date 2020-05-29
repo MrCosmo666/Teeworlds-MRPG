@@ -908,6 +908,28 @@ int CGS::GetClientWorldID(int ClientID) const
 /* #########################################################################
 	ENGINE GAMECONTEXT 
 ######################################################################### */
+void CGS::UpdateDiscordStatus()
+{
+	if(Server()->Tick() % (Server()->TickSpeed() * 8) != 0 || m_WorldID != LOCALWORLD)
+		return;
+
+	int Players = 0;
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if(Server()->ClientIngame(i))
+			Players++;
+	}
+
+	if(Players > 0)
+	{
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "%d players play MRPG!", Players);
+		Server()->SendDiscordStatus(aBuf, 3);
+		return;
+	}
+	Server()->SendDiscordStatus("and expects players.", 3);
+}
+
 void CGS::NewCommandHook(const CCommandManager::CCommand* pCommand, void* pContext)
 {
 	CGS* pSelf = (CGS*)pContext;
@@ -1040,6 +1062,8 @@ void CGS::OnTickLocalWorld()
 	
 		SendDayInfo(-1);
 	}
+
+	UpdateDiscordStatus();
 }
 
 // Рисование вывод всех объектов 

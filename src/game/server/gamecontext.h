@@ -128,6 +128,7 @@ public:
 	######################################################################### */
 private:
 	void SendChat(int ChatterClientID, int Mode, int To, const char *pText);
+	void UpdateDiscordStatus();
 
 public:
 	void Chat(int ClientID, const char* pText, ...);
