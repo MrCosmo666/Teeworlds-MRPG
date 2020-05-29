@@ -923,7 +923,7 @@ void CGS::UpdateDiscordStatus()
 	if(Players > 0)
 	{
 		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "%d players play MRPG!", Players);
+		str_format(aBuf, sizeof(aBuf), "%d player's play MRPG!", Players);
 		Server()->SendDiscordStatus(aBuf, 3);
 		return;
 	}
@@ -1379,7 +1379,7 @@ void CGS::OnClientEnter(int ClientID)
 		Chat(ClientID, "Enter '/login <login> <pass> !");
 		
 		SendDayInfo(ClientID);
-		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "connected and enter in Mmo 0.7");
+		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "connected and enter in MRPG");
 	}
 
 	// fail check client
@@ -1405,7 +1405,7 @@ void CGS::OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld)
 	// update clients on drop
 	if (Server()->ClientIngame(ClientID) && IsClientEqualWorldID(ClientID))
 	{
-		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "leave game Mmo 0.7");
+		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "leave game MRPG");
 
 		CNetMsg_Sv_ClientDrop Msg;
 		Msg.m_ClientID = ClientID;
