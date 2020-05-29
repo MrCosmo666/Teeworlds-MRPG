@@ -41,7 +41,7 @@ void CQuestPathFinder::Snap(int SnappingClient)
 	if(NetworkClipped(SnappingClient) || m_TargetPos == vec2(0.0f, 0.0f) || SnappingClient != m_ClientID)
 		return;
 
-	// проверка клиента если чекнут дальше не рисуем
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 	if (GS()->CheckClient(SnappingClient))
 	{
 		vec2 Direction = normalize(m_Pos - m_TargetPos);

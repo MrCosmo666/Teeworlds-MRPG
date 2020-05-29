@@ -1377,8 +1377,6 @@ void CGS::OnClientEnter(int ClientID)
 		Chat(ClientID, "You need to create an account, or log in if you already have.");
 		Chat(ClientID, "Register: \"/register <login> <pass>\"");
 		Chat(ClientID, "Log in: \"/login <login> <pass>\"");
-
-		Chat(ClientID, "- - - - - - - [Game information] - - - - - - -");
 		SendDayInfo(ClientID);
 		
 		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "connected and enter in MRPG");
