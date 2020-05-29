@@ -115,7 +115,6 @@ void CConectionPool::UD(const char *Table, const char *Buffer, ...)
 	aBuf[sizeof(aBuf) - 1] = '\0';
 
 	std::string Buf = "UPDATE " + std::string(Table) + " SET " + std::string(aBuf) + ";";
-	dbg_msg("sql", "%s", Buf.c_str());
 
 	std::thread t([Buf]()
 	{
@@ -149,7 +148,6 @@ void CConectionPool::UDS(int Milliseconds, const char *Table, const char *Buffer
 	aBuf[sizeof(aBuf) - 1] = '\0';
 
 	std::string Buf = "UPDATE " + std::string(Table) + " SET " + std::string(aBuf) + ";";
-	dbg_msg("sql", "%s", Buf.c_str());
 
 	std::thread t([Buf, Milliseconds]()
 	{
@@ -184,7 +182,6 @@ void CConectionPool::DD(const char *Table, const char *Buffer, ...)
 	aBuf[sizeof(aBuf) - 1] = '\0';
 
 	std::string Buf = "DELETE FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
-	dbg_msg("sql", "%s", Buf.c_str());
 
 	std::thread t([Buf]()
 	{
@@ -218,7 +215,6 @@ void CConectionPool::ID(const char *Table, const char *Buffer, ...)
 
 	aBuf[sizeof(aBuf) - 1] = '\0';
 	std::string Buf = "INSERT INTO " + std::string(Table) + " " + std::string(aBuf) + ";";
-	dbg_msg("sql", "%s", Buf.c_str());
 
 	std::thread t([Buf]()
 	{
@@ -252,7 +248,6 @@ void CConectionPool::IDS(int Milliseconds, const char *Table, const char *Buffer
 
 	aBuf[sizeof(aBuf) - 1] = '\0';
 	std::string Buf = "INSERT INTO " + std::string(Table) + " " + std::string(aBuf) + ";";
-	dbg_msg("sql", "%s", Buf.c_str());
 
 	std::thread t([Buf, Milliseconds]()
 	{
@@ -287,7 +282,6 @@ ResultSet *CConectionPool::SD(const char *Select, const char *Table, const char 
 
 	aBuf[sizeof(aBuf) - 1] = '\0';
 	std::string Buf = "SELECT " + std::string(Select) + " FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
-	dbg_msg("sql", "%s", Buf.c_str());
 
 	Connection* pConn = nullptr;
 	ResultSet* m_results = nullptr;
