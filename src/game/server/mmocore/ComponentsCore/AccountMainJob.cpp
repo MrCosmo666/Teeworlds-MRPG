@@ -145,13 +145,18 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	GS()->Server()->SendDiscordGenerateMessage("16757248", pLoggin, pMsg);
 #endif
 
+	// настройки
+	if(!pPlayer->GetItem(itModePVP).Count)
+		pPlayer->GetItem(itModePVP).Add(1, 1);
+
+	// включить спавн в безопасной зоне
 	pPlayer->GetTempData().TempActiveSafeSpawn = true;
 	if (!pPlayer->GetItem(itHammer).Count)
 		pPlayer->GetItem(itHammer).Add(1);
-	
-	// settings
-	if(!pPlayer->GetItem(itModePVP).Count)
-		pPlayer->GetItem(itModePVP).Add(1, 1);
+
+	// информация что можно использовать специальный клиент
+	if(!GS()->CheckClient(ClientID))
+		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 1000, "Special client for MRPG.\n\"{STR}\"", g_Config.m_SvDiscordInviteGroup);
 
 	if(pPlayer->Acc().WorldID != GS()->GetWorldID())
 	{

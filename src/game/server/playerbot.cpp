@@ -112,8 +112,8 @@ void CPlayerBot::TryRespawn()
 	const int SpawnType = m_BotType;
 	if(SpawnType == BotsTypes::TYPE_BOT_MOB)
 	{
-		vec2 MobPos = vec2(BotJob::MobBot[m_SubBotID].PositionX, BotJob::MobBot[m_SubBotID].PositionY);
-		if(!GS()->m_pController->CanSpawn(m_BotType, &SpawnPos, MobPos))
+		vec2 MobRespawnPosition = vec2(BotJob::MobBot[m_SubBotID].PositionX, BotJob::MobBot[m_SubBotID].PositionY);
+		if(!GS()->m_pController->CanSpawn(m_BotType, &SpawnPos, MobRespawnPosition))
 			return;
 	}
 	else if(SpawnType == BotsTypes::TYPE_BOT_NPC)
@@ -123,7 +123,7 @@ void CPlayerBot::TryRespawn()
 	
 	
 	// создаем бота
-	int savecidmem = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
+	const int savecidmem = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
 	m_pCharacter = new(savecidmem) CCharacterBotAI(&GS()->m_World);
 	m_pCharacter->Spawn(this, SpawnPos);
 

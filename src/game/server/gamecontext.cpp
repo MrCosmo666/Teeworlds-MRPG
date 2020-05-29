@@ -910,7 +910,7 @@ int CGS::GetClientWorldID(int ClientID) const
 ######################################################################### */
 void CGS::UpdateDiscordStatus()
 {
-	if(Server()->Tick() % (Server()->TickSpeed() * 8) != 0 || m_WorldID != LOCALWORLD)
+	if(Server()->Tick() % (Server()->TickSpeed() * 10) != 0 || m_WorldID != LOCALWORLD)
 		return;
 
 	int Players = 0;
@@ -1374,15 +1374,15 @@ void CGS::OnClientEnter(int ClientID)
 		SendTeam(ClientID, TEAM_SPECTATORS, false, -1);
 
 		// информация
-		Chat(ClientID, "Welcome to MRPG");
-		Chat(ClientID, "You need to register '/register <login> <pass> or");
-		Chat(ClientID, "Enter '/login <login> <pass> !");
-		
+		Chat(ClientID, "- - - - - - - [Welcome to MRPG] - - - - - - -");
+		Chat(ClientID, "You need to create an account, or log in if you already have.");
+		Chat(ClientID, "Register: \"/register <login> <pass>\"");
+		Chat(ClientID, "Log in: \"/login <login> <pass>\"");
+
+		Chat(ClientID, "- - - - - - - [Game information] - - - - - - -");
 		SendDayInfo(ClientID);
-		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "connected and enter in MRPG");
 		
-		if(!CheckClient(ClientID))
-			SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 1000, "Special client for MRPG.\n\"{STR}\"", g_Config.m_SvDiscordInviteGroup);
+		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "connected and enter in MRPG");
 	}
 
 
