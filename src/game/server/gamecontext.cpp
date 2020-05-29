@@ -1380,11 +1380,11 @@ void CGS::OnClientEnter(int ClientID)
 		
 		SendDayInfo(ClientID);
 		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "connected and enter in MRPG");
+		
+		if(!CheckClient(ClientID))
+			SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 1000, "Special client for MRPG.\n\"{STR}\"", g_Config.m_SvDiscordInviteGroup);
 	}
 
-	// fail check client
-	if(!CheckClient(ClientID))
-		SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 1000, "Special client for MRPG.\n\"{STR}\"", g_Config.m_SvDiscordInviteGroup);
 
 	ResetVotes(ClientID, MenuList::MAIN_MENU);
 }

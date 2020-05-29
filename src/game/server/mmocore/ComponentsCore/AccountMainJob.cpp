@@ -123,7 +123,6 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
-	GS()->AddBroadcast(ClientID, GS()->Server()->GetWorldName(GS()->GetWorldID()), 200, 500);
 	if(!FirstInitilize)
 	{
 		const int CountMessageInbox = Job()->Inbox()->GetActiveInbox(pPlayer);
@@ -132,6 +131,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		GS()->SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
+		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, GS()->Server()->GetWorldName(GS()->GetWorldID()));
 		return;
 	}
 
