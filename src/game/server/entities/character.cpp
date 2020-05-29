@@ -244,7 +244,6 @@ void CCharacter::FireWeapon()
 		return;
 
 	const bool IsBot = m_pPlayer->IsBot();
-	const int SubBotID = GetPlayer()->GetBotSub();
 	if(!IsBot)
 	{
 		if(DecoInteractive())
