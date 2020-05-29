@@ -88,7 +88,7 @@ bool BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 		if(!GS()->CheckClient(ClientID))
 		{
 			str_format(reformTalkedText, sizeof(reformTalkedText), "( 1 of 1 ) %s:\n- %s", NpcBot[MobID].GetName(), pPlayer->FormatedTalkedText());
-			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 50, "Press 'F4' to continue the dialog!");
+			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 		}
 		else
 		{
@@ -105,7 +105,7 @@ bool BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 	{
 		const char* TalkedNick = (PlayerTalked ? GS()->Server()->ClientName(ClientID) : NpcBot[MobID].GetName());
 		str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) %s:\n- %s", (1 + Progress), sizeTalking, TalkedNick, pPlayer->FormatedTalkedText());
-		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 50, "Press 'F4' to continue the dialog!");
+		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 	}
 	else
 	{
@@ -135,7 +135,7 @@ bool BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int Talk
 	{
 		const char* TalkedNick = (PlayerTalked ? GS()->Server()->ClientName(ClientID) : QuestBot[MobID].GetName());
 		str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) %s:\n- %s", (1 + Progress), sizeTalking, TalkedNick, pPlayer->FormatedTalkedText());
-		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 50, "Press 'F4' to continue the dialog!");
+		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 	}
 	else
 	{
