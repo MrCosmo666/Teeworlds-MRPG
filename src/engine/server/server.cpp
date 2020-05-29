@@ -441,12 +441,23 @@ void CServer::SendDiscordGenerateMessage(const char *pColor, const char *pTitle,
 void CServer::SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText)
 {
 	#ifdef CONF_DISCORD
-		char Text[512], Title[256], Color[16];
-		str_copy(Text, pText, sizeof(Text));
-		str_copy(Title, pTitle, sizeof(Title));
-		str_copy(Color, pColor, sizeof(Color));
+		char aText[512], aTitle[256], aColor[16];
+		str_copy(aText, pText, sizeof(aText));
+		str_copy(aTitle, pTitle, sizeof(aTitle));
+		str_copy(aColor, pColor, sizeof(aColor));
 
-		std::thread t([=]() { m_pDiscord->SendMessage(pChanel, Color, Title, Text); });
+		std::thread t([=]() { m_pDiscord->SendMessage(pChanel, aColor, aTitle, aText); });
+		t.detach();
+	#endif
+}
+
+void CServer::SendDiscordStatus(const char *pStatus, int Type)
+{
+	#ifdef CONF_DISCORD
+		char aStatus[128];		
+		int StatusType = Type;
+		str_copy(aStatus, pStatus, sizeof(aStatus));
+		std::thread t([=]() { m_pDiscord->SendStatus(aStatus, StatusType); });
 		t.detach();
 	#endif
 }
@@ -1845,6 +1856,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 				continue;
 
 			Buffer.append_at(Buffer.length(), Server()->ClientName(i));
+			Buffer.append_at(Buffer.length(), "\\n");
 		}
 		if(Buffer.length() <= 0)
 		{
@@ -1863,6 +1875,12 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		"\\n`!mstats <symbol>` - See stats players. Minimal 4 symbols."
 		"\\n`!monline` - Show players ingame.");
 	}
+}
+
+void DiscordJob::SendStatus(const char *Status, int Type)
+{
+	if(!g_Config.m_SvCreateDiscordBot) return;
+	this->updateStatus(Status, Type);
 }
 
 void DiscordJob::SendGenerateMessage(const char *Color, const char *Title, const char *pMsg)

@@ -78,6 +78,7 @@ public:
 
 	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText) = 0;
 	virtual void SendDiscordGenerateMessage(const char *pColor, const char *pTitle, const char *pMsg) = 0;
+	virtual void SendDiscordStatus(const char *pStatus, int Type) = 0;
 	virtual void AddInformationBotsCount(int Count) = 0;
 	
 	// Bots

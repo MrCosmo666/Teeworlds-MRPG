@@ -228,6 +228,7 @@ void CCharacter::FireWeapon()
 		return;
 
 	DoWeaponSwitch();
+
 	bool FullAuto = false;
 	if(GS()->Mmo()->Skills()->GetSkillLevel(m_pPlayer->GetCID(), SkillMasterWeapon))
 		FullAuto = true;
@@ -328,19 +329,17 @@ void CCharacter::FireWeapon()
 		case WEAPON_SHOTGUN:
 		{
 			const bool IsExplosive = m_pPlayer->GetItem(itExplosiveShotgun).IsEquipped();
-			const int EnchantSpread = IsBot ? 2+BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadShotgun);
-			const int ShotSpread = clamp(1+EnchantSpread, 1, 36);
+			const int ShotSpread = min(2 + m_pPlayer->GetAttributeCount(Stats::StSpreadShotgun), 36);
 			CMsgPacker Msg(NETMSGTYPE_SV_EXTRAPROJECTILE);
 			Msg.AddInt(ShotSpread);
 			for (int i = 1; i <= ShotSpread; ++i)
 			{
 				float Spreading = ((0.0058945f*(9.0f*ShotSpread)/2)) - (0.0058945f*(9.0f*i));
 				float a = GetAngle(Direction) + Spreading;
-				new CProjectile(GameWorld(), WEAPON_SHOTGUN,
-					m_pPlayer->GetCID(),
-					ProjStartPos,
-					vec2(cosf(a), sinf(a))*1.2f,
-					(int)(Server()->TickSpeed()*GS()->Tuning()->m_ShotgunLifetime),
+				float Speed = (float)GS()->Tuning()->m_ShotgunSpeeddiff + frandom()*0.2f;
+				new CProjectile(GameWorld(), WEAPON_SHOTGUN, m_pPlayer->GetCID(), ProjStartPos,
+					vec2(cosf(a), sinf(a))*Speed,
+					(int)(Server()->TickSpeed() * GS()->Tuning()->m_ShotgunLifetime),
 					g_pData->m_Weapons.m_Shotgun.m_pBase->m_Damage, IsExplosive, 0, 15, WEAPON_SHOTGUN);
 			}
 			Server()->SendMsg(&Msg, MSGFLAG_VITAL, m_pPlayer->GetCID());
@@ -349,15 +348,15 @@ void CCharacter::FireWeapon()
 
 		case WEAPON_GRENADE:
 		{
-			const int EnchantSpread = IsBot ? BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadGrenade);
-			const int ShotSpread = clamp(1 + EnchantSpread, 1, 21);
+			const int ShotSpread = min(1 + m_pPlayer->GetAttributeCount(Stats::StSpreadGrenade), 21);
 			CMsgPacker Msg(NETMSGTYPE_SV_EXTRAPROJECTILE);
 			Msg.AddInt(ShotSpread);
 			for (int i = 1; i < ShotSpread; ++i)
 			{
 				float Spreading = ((0.0058945f*(9.0f*ShotSpread)/2)) - (0.0058945f*(9.0f*i));
 				float a = GetAngle(Direction) + Spreading;
-				new CProjectile(GameWorld(), WEAPON_GRENADE, m_pPlayer->GetCID(), ProjStartPos, vec2(cosf(a), sinf(a))*1.0f,
+				new CProjectile(GameWorld(), WEAPON_GRENADE, m_pPlayer->GetCID(), ProjStartPos, 
+					vec2(cosf(a), sinf(a)),
 					(int)(Server()->TickSpeed()*GS()->Tuning()->m_GrenadeLifetime),
 					g_pData->m_Weapons.m_Grenade.m_pBase->m_Damage, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE);
 			}
@@ -367,8 +366,7 @@ void CCharacter::FireWeapon()
 
 		case WEAPON_LASER:
 		{
-			const int EnchantSpread = IsBot ? 2 + BotJob::MobBot[SubBotID].Spread : m_pPlayer->GetAttributeCount(Stats::StSpreadRifle);
-			const int ShotSpread = clamp(1 + EnchantSpread, 1, 36);
+			const int ShotSpread = min(1 + m_pPlayer->GetAttributeCount(Stats::StSpreadRifle), 36);
 			for (int i = 1; i < ShotSpread; ++i)
 			{
 				float Spreading = ((0.0058945f*(9.0f*ShotSpread)/2)) - (0.0058945f*(9.0f*i));
@@ -522,7 +520,7 @@ void CCharacter::Tick()
 	if(!IsAlive())
 		return;
 		
-	HandleTunning();
+	HandleTuning();
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true, &m_pPlayer->m_NextTuningParams);
 	m_pPlayer->UpdateTempData(m_Health, m_Mana);
@@ -986,10 +984,14 @@ void CCharacter::InteractiveRifle(vec2 Direction, vec2 ProjStartPos)
 
 }
 
-void CCharacter::HandleTunning()
+void CCharacter::HandleTuning()
 {
 	// тюнинг воды
 	CTuningParams* pTuningParams = &m_pPlayer->m_NextTuningParams;
+
+	if(m_Core.m_LostData)
+		pTuningParams->m_PlayerCollision = 0;
+
 	if(m_pHelper->BoolIndex(TILE_WATER))
 	{
 		pTuningParams->m_Gravity = -0.05f;
@@ -1001,23 +1003,20 @@ void CCharacter::HandleTunning()
 		pTuningParams->m_AirControlAccel = 1.5f;
 		SetEmote(EMOTE_BLINK, 1);	
 	}
-
-	// smooth skip collision
-	if(m_Core.m_LostData)
-		pTuningParams->m_PlayerCollision = 0;
 		
-	// боты тюнинг
 	if(m_pPlayer->IsBot())
 	{
-		const int MobID = m_pPlayer->GetBotSub();
 		// behavior mobs
+		const int MobID = m_pPlayer->GetBotSub();
 		if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC || m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 		{
+			// walk effect
 			pTuningParams->m_GroundControlSpeed = 5.0f;
 			pTuningParams->m_GroundControlAccel = 1.0f;
 		}
 		else if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 		{
+			// effect slower
 			if(str_comp(BotJob::MobBot[MobID].Behavior, "Slime") == 0)
 			{
 				pTuningParams->m_Gravity = 0.25f;
@@ -1048,24 +1047,29 @@ void CCharacter::HandleTunning()
 		m_Core.m_Vel += Direction * 0.001f;
 	}
 
-	// effects buff
+	// зелья и баффы разные
+	HandleBuff(pTuningParams);
+}
+
+void CCharacter::HandleBuff(CTuningParams* TuningParams)
+{
 	if(m_pPlayer->CheckEffect("Slowdown"))
 	{
-		pTuningParams->m_Gravity = 0.35f;
-		pTuningParams->m_GroundFriction = 0.30f;
-		pTuningParams->m_GroundControlSpeed = 60.0f / Server()->TickSpeed();
-		pTuningParams->m_GroundControlAccel = 0.4f;
-		pTuningParams->m_GroundJumpImpulse = 3.0f;
-		pTuningParams->m_AirFriction = 0.4f;
-		pTuningParams->m_AirControlSpeed = 60.0f / Server()->TickSpeed();
-		pTuningParams->m_AirControlAccel = 0.4f;
-		pTuningParams->m_AirJumpImpulse = 3.0f;
-		pTuningParams->m_HookLength = 0.0f;
+		TuningParams->m_Gravity = 0.35f;
+		TuningParams->m_GroundFriction = 0.30f;
+		TuningParams->m_GroundControlSpeed = 60.0f / Server()->TickSpeed();
+		TuningParams->m_GroundControlAccel = 0.4f;
+		TuningParams->m_GroundJumpImpulse = 3.0f;
+		TuningParams->m_AirFriction = 0.4f;
+		TuningParams->m_AirControlSpeed = 60.0f / Server()->TickSpeed();
+		TuningParams->m_AirControlAccel = 0.4f;
+		TuningParams->m_AirJumpImpulse = 3.0f;
+		TuningParams->m_HookLength = 0.0f;
 	}
 
 	// poison's
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
-	{
+	{	
 		if(m_pPlayer->CheckEffect("Fire"))
 		{
 			const int ExplodeDamageSize = kurosio::translate_to_procent_rest(m_pPlayer->GetStartHealth(), 3);

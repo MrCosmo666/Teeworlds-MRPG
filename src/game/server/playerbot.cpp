@@ -87,10 +87,13 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 			Power += ItemBonusCount;
 		}
 
-		// all hardtypews and strength lowered
+		// all damage stats
 		if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
 			Power /= BotJob::MobBot[m_SubBotID].Boss ? 320 : 50;
-		// lowered hardness 
+		// spread weapons
+		else if(BonusID == Stats::StSpreadShotgun || BonusID == Stats::StSpreadGrenade || BonusID == Stats::StSpreadRifle)
+			Power = BotJob::MobBot[m_SubBotID].Spread;
+		// all another stats 
 		else if(BonusID != Stats::StHardness)
 			Power /= 5;
 		return Power;

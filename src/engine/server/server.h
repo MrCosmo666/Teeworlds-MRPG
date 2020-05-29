@@ -89,6 +89,7 @@ public:
 
 	void SendMessage(const char *pChanal, const char *Color, const char *Title, const char *pMsg);
 	void SendGenerateMessage(const char *Color, const char *Title, const char *pMsg);
+	void SendStatus(const char* Status, int Type);
 };
 #endif
 
@@ -238,6 +239,7 @@ public:
 
 	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText);
 	virtual void SendDiscordGenerateMessage(const char *pColor, const char *pTitle, const char *pMsg);
+	virtual void SendDiscordStatus(const char *pStatus, int Type);
 	virtual void AddInformationBotsCount(int Count);
 
 	void Kick(int ClientID, const char *pReason);

@@ -32,7 +32,8 @@ class CCharacter : public CEntity
 	void InteractiveShotgun(vec2 Direction, vec2 ProjStartPos);
 	void InteractiveGrenade(vec2 Direction, vec2 ProjStartPos);
 	void InteractiveRifle(vec2 Direction, vec2 ProjStartPos);
-	void HandleTunning();
+	void HandleTuning();
+	void HandleBuff(CTuningParams* TuningParams);
 	void HandleAuthedPlayer();
 	bool IsLockedWorld();
 

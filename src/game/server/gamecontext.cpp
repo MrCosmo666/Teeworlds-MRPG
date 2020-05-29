@@ -1471,6 +1471,7 @@ void CGS::ClearClientData(int ClientID)
 	if(Effects.find(ClientID) != Effects.end()) 
 		Effects.erase(ClientID);
 
+	// clear active snap bots for player
 	for(auto& databot : BotJob::DataBot)
 		databot.second.AlreadySnapQuestBot[ClientID] = false;
 }
@@ -1824,10 +1825,10 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
 		// меню статистики
-		int NeedExp = pPlayer->ExpNeed(pPlayer->Acc().Level);
+		const int ExpForLevel = pPlayer->ExpNeed(pPlayer->Acc().Level);
 		AVH(ClientID, TAB_STAT, GREEN_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().LastLogin);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Discord: \"{STR}\". Ideas, bugs, rewards", g_Config.m_SvDiscordInviteGroup);
-		AVM(ClientID, "null", NOPE, TAB_STAT, "Level {INT} : Exp {INT}/{INT}", &pPlayer->Acc().Level, &pPlayer->Acc().Exp, &NeedExp);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Level {INT} : Exp {INT}/{INT}", &pPlayer->Acc().Level, &pPlayer->Acc().Exp, &ExpForLevel);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Money {INT} gold", &pPlayer->GetItem(itGold).Count);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Skill Point {INT}SP", &pPlayer->GetItem(itSkillPoint).Count);
 		AV(ClientID, "null", "");
@@ -1895,7 +1896,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		{
 			if(at.second.AtType != AtributType::AtDps || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
-	
 			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_DPS, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().Stats[at.first], &at.second.UpgradePrice);
 		}
 		AV(ClientID, "null", "");
@@ -1907,7 +1907,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		{
 			if(at.second.AtType != AtributType::AtTank || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
-	
 			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_TANK, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().Stats[at.first], &at.second.UpgradePrice);
 		}
 		AV(ClientID, "null", "");
@@ -1919,7 +1918,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		{
 			if(at.second.AtType != AtributType::AtHealer || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
-	
 			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_HEALER, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().Stats[at.first], &at.second.UpgradePrice);
 		}
 		AV(ClientID, "null", "");
@@ -1930,7 +1928,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		{
 			if(at.second.AtType != AtributType::AtWeapon || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
-	
 			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_WEAPON, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().Stats[at.first], &at.second.UpgradePrice);
 		}
 
@@ -2023,16 +2020,16 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 			continue;
 	
 		// если апгрейды стоят дешево то они имеют деление ральных статистик
-		const int SumingAt = pPlayer->GetAttributeCount(at.first);
+		const int AttributeSize = pPlayer->GetAttributeCount(at.first);
 		if(at.second.UpgradePrice < 10)
 		{
-			const int RealSum = pPlayer->GetAttributeCount(at.first, true);
-			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} (+{INT}) - {STR}", &SumingAt, &RealSum, AtributeName(at.first));
+			const int AttributeRealSize = pPlayer->GetAttributeCount(at.first, true);
+			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} (+{INT}) - {STR}", &AttributeSize, &AttributeRealSize, AtributeName(at.first));
 			continue;
 		}
 
 		// если апгрейды дорогие они имеют 1 статистики
-		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "+{INT} - {STR}", &SumingAt, AtributeName(at.first));
+		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "+{INT} - {STR}", &AttributeSize, AtributeName(at.first));
 	}
 
 	AVM(ClientID, "null", NOPE, NOPE, "Player Upgrade Point: {INT}P", &pPlayer->Acc().Upgrade);
@@ -2043,8 +2040,8 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text)
 {
 	// проверка на игрока
-	CPlayer *pPlayer = m_apPlayers[ClientID];
-	if(!pPlayer || !pPlayer->GetCharacter())
+	CPlayer *pPlayer = GetPlayer(ClientID, false, true);
+	if(!pPlayer)
 	{
 		Chat(ClientID, "Use it when you're not dead!");
 		return true;
@@ -2052,25 +2049,24 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 
 	if(PPSTR(CMD, "null") == 0) 
 		return true;
-	if(PPSTR(CMD, "BACK") == 0)
+	else if(PPSTR(CMD, "BACK") == 0)
 	{
 		ResetVotes(ClientID, pPlayer->m_LastVoteMenu);
 		return true;
 	}
-	if(PPSTR(CMD, "MENU") == 0)
+	else if(PPSTR(CMD, "MENU") == 0)
 	{
 		ResetVotes(ClientID, VoteID);
 		return true;
 	}
-	if (PPSTR(CMD, "SELECTEDTOP") == 0)
+	else if (PPSTR(CMD, "SELECTEDTOP") == 0)
 	{
 		ResetVotes(ClientID, MenuList::MENU_TOP_LIST);
 		AV(ClientID, "null", "\0");
 		Mmo()->ShowTopList(pPlayer, VoteID);
 		return true;
 	}
-
-	if(pPlayer->ParseVoteUpgrades(CMD, VoteID, VoteID2, Get)) 
+	else if(pPlayer->ParseVoteUpgrades(CMD, VoteID, VoteID2, Get)) 
 		return true;
 
 	// парсинг всего остального
@@ -2135,15 +2131,12 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 // Создать Лол текст в мире
 void CGS::CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText)
 {
-	for (int i = 0; i < MAX_PLAYERS; i++)
-	{
-		if (m_apPlayers[i] && distance(m_apPlayers[i]->m_ViewPos, Pos) < 800.0f)
-		{
-			CLoltext Text;
-			Text.Create(&m_World, pParent, Pos, Vel, Lifespan, pText, true, Follow);
-			return;
-		}
-	}
+	if(!CheckPlayersDistance(Pos, 800))
+		return;
+
+	CLoltext Text;
+	Text.Create(&m_World, pParent, Pos, Vel, Lifespan, pText, true, Follow);
+	return;
 }
 
 // Саздает бонус в позиции Типа и Количества и Их самих кол-ва
@@ -2152,7 +2145,7 @@ void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop, vec2 For
 	for(int i = 0; i < NumDrop; i++) 
 	{
 		vec2 Vel = Force + vec2(frandom() * 15.0, frandom() * 15.0);
-		float Angle = Force.x * (0.15f + frandom() * 0.1f);
+		const float Angle = Force.x * (0.15f + frandom() * 0.1f);
 		new CDropBonuses(&m_World, Pos, Vel, Angle, Type, Count);
 	}
 }
@@ -2165,7 +2158,7 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Ench
 	DropItem.Enchant = Enchant;
 
 	vec2 Vel = Force + vec2(frandom() * 15.0, frandom() * 15.0);
-	float Angle = Force.x * (0.15f + frandom() * 0.1f);
+	const float Angle = Force.x * (0.15f + frandom() * 0.1f);
 	new CDropItem(&m_World, Pos, Vel, Angle, DropItem, ClientID);
 }
 
@@ -2177,7 +2170,7 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, ItemJob::InventoryItem &pPlayer
 
 	if (pPlayerItem.Remove(Count))
 	{
-		float Angle = Force.x * (0.15f + frandom() * 0.1f);
+		const float Angle = Force.x * (0.15f + frandom() * 0.1f);
 		new CDropItem(&m_World, Pos, Force, Angle, CopyItem, ClientID);
 	}
 }
@@ -2185,8 +2178,8 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, ItemJob::InventoryItem &pPlayer
 // Проверить чекнуть и подобрать предмет Если он будет найден
 bool CGS::TakeItemCharacter(int ClientID)
 {
-	CPlayer *pPlayer = GetPlayer(ClientID, true);
-	if(!pPlayer || !pPlayer->GetCharacter())
+	CPlayer *pPlayer = GetPlayer(ClientID, true, true);
+	if(!pPlayer)
 		return false;
 
 	CDropItem *pDrop = (CDropItem*)m_World.ClosestEntity(pPlayer->GetCharacter()->m_Core.m_Pos, 64, CGameWorld::ENTTYPE_DROPITEM, nullptr);

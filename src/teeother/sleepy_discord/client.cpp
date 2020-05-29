@@ -126,15 +126,18 @@ namespace SleepyDiscord
 		schedule(request, timeTilRetry);
 	}
 
-	void BaseDiscordClient::updateStatus(std::string gameName, uint64_t idleSince) 
+	void BaseDiscordClient::updateStatus(const char *StatusName, int Type) 
 	{
 		sendL(json::createJSON({
 			{ "op", json::integer(STATUS_UPDATE) },
 			{ "d", json::createJSON({
-				{"idle_since", idleSince != 0 ? json::UInteger(idleSince) : "null"},
-				{"game", gameName != "" ? json::createJSON({
-					{"name", json::string(gameName)}
-				}) : "null"}
+				{"since", "null" },
+				{"game", json::createJSON({
+					{"name", json::string(std::string(StatusName)) },
+					{"type", json::integer(Type) }
+				})},
+				{"status", json::string("online") },
+				{"afk", json::integer(0) }
 			})}
 		}));
 	}
