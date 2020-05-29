@@ -1344,7 +1344,6 @@ void CGS::OnClientConnected(int ClientID)
 
 	SendMotd(ClientID);
 	SendSettings(ClientID);
-
 	m_BroadcastStates[ClientID] = {};
 }
 
@@ -1383,9 +1382,11 @@ void CGS::OnClientEnter(int ClientID)
 		SendDayInfo(ClientID);
 		
 		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "connected and enter in MRPG");
+		return;
 	}
 
-
+	// если уже авторизован прогрузка аккаунта
+	Mmo()->Account()->LoadAccount(pPlayer, false);
 	ResetVotes(ClientID, MenuList::MAIN_MENU);
 }
 

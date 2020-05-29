@@ -123,11 +123,13 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
+	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 200, "You are located {STR}", GS()->Server()->GetWorldName(GS()->GetWorldID()));
+
 	if(!FirstInitilize)
 	{
 		const int CountMessageInbox = Job()->Inbox()->GetActiveInbox(pPlayer);
 		if (CountMessageInbox > 0)
-			GS()->Chat(ClientID, "You have unread [{INT} emails]. Check your Mailbox!", &CountMessageInbox);
+			GS()->Chat(ClientID, "You have {INT} unread messages. Check your Mailbox!", &CountMessageInbox);
 
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		GS()->SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
@@ -153,10 +155,6 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	pPlayer->GetTempData().TempActiveSafeSpawn = true;
 	if (!pPlayer->GetItem(itHammer).Count)
 		pPlayer->GetItem(itHammer).Add(1);
-
-	// информация что можно использовать специальный клиент
-	if(!GS()->CheckClient(ClientID))
-		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 1000, "Special client for MRPG.\n\"{STR}\"", g_Config.m_SvDiscordInviteGroup);
 
 	if(pPlayer->Acc().WorldID != GS()->GetWorldID())
 	{

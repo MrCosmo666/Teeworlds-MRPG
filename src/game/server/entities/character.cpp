@@ -715,7 +715,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 {
 	// force
 	m_Core.m_Vel += Force;
-	const float NormalizeVel = GS()->IsDungeon() ? 12.0f : 32.0f;
+	const float NormalizeVel = GS()->IsDungeon() ? 16.0f : 32.0f;
 	if(length(m_Core.m_Vel) > NormalizeVel)
 		m_Core.m_Vel = normalize(m_Core.m_Vel) * NormalizeVel;
 

@@ -568,7 +568,7 @@ bool CCharacterBotAI::SearchTalkedPlayer()
 			!GS()->Collision()->IntersectLine(pFindPlayer->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) && m_pBotPlayer->IsActiveSnappingBot(i))
 		{
 			if (DialoguesNotEmpty)
-				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "To begin dialog: \"hammer hit\"");
+				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Begin dialog: \"hammer hit\"");
 
 			pFindPlayer->GetCharacter()->m_Core.m_LostData = true;
 			m_Input.m_TargetX = static_cast<int>(pFindPlayer->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
