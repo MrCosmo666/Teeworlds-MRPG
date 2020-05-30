@@ -90,7 +90,7 @@ void CDropItem::Tick()
 	}
 
 	m_Vel.y += 0.5f;
-	bool Grounded = (bool)GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5) || GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5);
+	const bool Grounded = (bool)GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5) || GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5);
 	if (Grounded)
 	{
 		m_AngleForce += (m_Vel.x - 0.74f * 6.0f - m_AngleForce) / 2.0f;
@@ -104,7 +104,7 @@ void CDropItem::Tick()
 	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(24.0f, 24.0f), 0.4f);
 
 	// проверить точно ли на земле уже после MoveBox
-	bool GroundedDouble = (bool)GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5) || GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5);
+	const bool GroundedDouble = (bool)GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5) || GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5);
 	if (GroundedDouble && m_Angle != 0.0f)
 		m_Angle = 0.0f;
 
@@ -155,40 +155,42 @@ void CDropItem::Snap(int SnappingClient)
 
 	if(GS()->CheckClient(SnappingClient))
 	{
-		CNetObj_MmoPickup *pObj = static_cast<CNetObj_MmoPickup*>(Server()->SnapNewItem(NETOBJTYPE_MMOPICKUP, GetID(), sizeof(CNetObj_MmoPickup)));
-		if(!pObj)
+		CNetObj_MmoPickup *pMmoPickup = static_cast<CNetObj_MmoPickup*>(Server()->SnapNewItem(NETOBJTYPE_MMOPICKUP, GetID(), sizeof(CNetObj_MmoPickup)));
+		if(!pMmoPickup)
 			return;
 
-		pObj->m_X = (int)m_Pos.x;
-		pObj->m_Y = (int)m_Pos.y;
-		pObj->m_Type = MMO_PICKUP_BOX;
-		pObj->m_Angle = (int)(m_Angle * 256.0f);
+		pMmoPickup->m_X = (int)m_Pos.x;
+		pMmoPickup->m_Y = (int)m_Pos.y;
+		pMmoPickup->m_Type = MMO_PICKUP_BOX;
+		pMmoPickup->m_Angle = (int)(m_Angle * 256.0f);
 		return;
 	}
 
-	float AngleStart = (2.0f * pi * Server()->Tick()/static_cast<float>(Server()->TickSpeed()))/10.0f;
-	float AngleStep = 2.0f * pi / CDropItem::BODY;
-	float Radius = 30.0f;
-	for(int i=0; i<CDropItem::BODY; i++)
+	CNetObj_Pickup *pPickup = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
+	if(!pPickup)
+		return;
+
+	pPickup->m_X = (int)m_Pos.x;
+	pPickup->m_Y = (int)m_Pos.y;
+	pPickup->m_Type = PICKUP_GUN;
+
+	static const float Radius = 24.0f;
+	float AngleStart = (pi/4.0f) + (2.0f * pi * m_Angle);
+	float AngleStep = 2.0f * pi / CDropItem::NUM_IDS;
+	vec2 LastPosition = m_Pos - vec2(Radius * cos(AngleStart + AngleStep), Radius * sin(AngleStart + AngleStep));
+
+	for(int i = 0; i < CDropItem::NUM_IDS; i++)
 	{
-		vec2 PosStart = m_Pos + vec2(Radius * cos(AngleStart + AngleStep*i), Radius * sin(AngleStart + AngleStep*i));
-		CNetObj_Projectile *pObj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, m_IDs[i], sizeof(CNetObj_Projectile)));
-		if(!pObj)
+		CNetObj_Laser *pRifleObj = static_cast<CNetObj_Laser *>(Server()->SnapNewItem(NETOBJTYPE_LASER, m_IDs[i], sizeof(CNetObj_Laser)));
+		if(!pRifleObj)
 			return;
 
-		pObj->m_X = (int)PosStart.x;
-		pObj->m_Y = (int)PosStart.y;
-		pObj->m_VelX = 0;
-		pObj->m_VelY = 0;
-		pObj->m_StartTick = Server()->Tick()-1;
-		pObj->m_Type = WEAPON_LASER;
+		vec2 PosStart = m_Pos + vec2(Radius * cos(AngleStart + AngleStep * i), Radius * sin(AngleStart + AngleStep * i));
+		pRifleObj->m_X = (int)PosStart.x;
+		pRifleObj->m_Y = (int)PosStart.y;
+		pRifleObj->m_FromX = (int)LastPosition.x;
+		pRifleObj->m_FromY = (int)LastPosition.y;
+		pRifleObj->m_StartTick = Server()->Tick() - 3;
+		LastPosition = PosStart;
 	}
-
-	CNetObj_Pickup *pP = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_IDs[BODY], sizeof(CNetObj_Pickup)));
-	if(!pP)
-		return;
-
-	pP->m_X = (int)m_Pos.x;
-	pP->m_Y = (int)m_Pos.y;
-	pP->m_Type = 0;
 } 

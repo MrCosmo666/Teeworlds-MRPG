@@ -7,9 +7,7 @@ class CDropItem : public CEntity
 {
 	enum
 	{
-		PERSPECT = 1,
-		BODY,
-		NUM_IDS,
+		NUM_IDS = 4,
 	};
 
 	vec2 m_Vel;
@@ -24,6 +22,8 @@ class CDropItem : public CEntity
 	ItemJob::InventoryItem m_DropItem;
 	int m_OwnerID;
 	int m_IDs[NUM_IDS];
+
+	
 
 public:
 	CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, ItemJob::InventoryItem DropItem, int OwnerID);

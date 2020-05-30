@@ -33,28 +33,32 @@ int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char 
 {
 	if(str_length(Login) > 12 || str_length(Login) < 4 || str_length(Password) > 12 || str_length(Password) < 4)
 	{
-		GS()->ChatFollow(ClientID, "Username / Password must contain 4-12 characters");
+		GS()->Chat(ClientID, "Username / Password must contain 4-12 characters");
 		return SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
 	}
-
 	CSqlString<32> clear_Nick = CSqlString<32>(GS()->Server()->ClientName(ClientID));
 	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
 	if(RES2->next())
 	{
-		GS()->Chat(ClientID, "Your nick already used change and try again!");
+		GS()->Chat(ClientID, "- - - - [Your nickname is already registered] - - - -");
+		GS()->Chat(ClientID, "Your nick is a unique identifier, and it has already been used!");
+		GS()->Chat(ClientID, "You can restore access by contacting support, or change nick.");
+		GS()->Chat(ClientID, "Discord group \"{STR}\".", g_Config.m_SvDiscordInviteGroup);
 		return SendAuthCode(ClientID, AUTH_REGISTER_ERROR_NICK);
 	}
 
 	boost::scoped_ptr<ResultSet> RES4(SJK.SD("ID", "tw_accounts", "ORDER BY ID DESC LIMIT 1"));
-	int InitID = RES4->next() ? RES4->getInt("ID")+1 : 1; // thread save ? hm need for table all time auto increment = 1; NEED FIX IT
+	const int InitID = RES4->next() ? RES4->getInt("ID")+1 : 1; // thread save ? hm need for table all time auto increment = 1; NEED FIX IT
 
 	CSqlString<32> clear_Login = CSqlString<32>(Login);
 	CSqlString<32> clear_Pass = CSqlString<32>(Password);
 	SJK.ID("tw_accounts", "(ID, Username, Password, RegisterDate) VALUES ('%d', '%s', '%s', UTC_TIMESTAMP())", InitID, clear_Login.cstr(), clear_Pass.cstr());
 	SJK.IDS(100, "tw_accounts_data", "(ID, Nick) VALUES ('%d', '%s')", InitID, clear_Nick.cstr());
 
-	GS()->Chat(ClientID, "Discord group \"{STR}\"", g_Config.m_SvDiscordInviteGroup);
-	GS()->Chat(ClientID, "You can log in: /login <login> <pass>!");
+	GS()->Chat(ClientID, "- - - - - - - [Successful registered] - - - - - - -");
+	GS()->Chat(ClientID, "Don't forget your data, have a nice game!");
+	GS()->Chat(ClientID, "# Your nickname is a unique identifier!");
+	GS()->Chat(ClientID, "# Log in: \"/login {STR} {STR}\"", clear_Login.cstr(), clear_Pass.cstr());
 	return SendAuthCode(ClientID, AUTH_REGISTER_GOOD);
 }
 
@@ -105,7 +109,6 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 			if (str_comp_nocase(at.second.FieldName, "unfield") == 0) continue;
 			pPlayer->Acc().Stats[at.first] = ACCOUNTDATA->getInt(at.second.FieldName);
 		}
-
 
 		GS()->Chat(ClientID, "- - - - - - - [Successful login] - - - - - - -");
 		GS()->Chat(ClientID, "Player menu is available in votes!");
