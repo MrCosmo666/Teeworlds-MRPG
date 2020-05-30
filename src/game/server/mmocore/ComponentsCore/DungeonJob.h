@@ -25,6 +25,7 @@ class DungeonJob : public MmoComponent
 		int Players;
 		int Progress;
 		int State;
+		bool Story;
 	};
 
 
@@ -39,7 +40,7 @@ public:
 
 	void SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds);
 	void ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID);
-	void ShowDungeonsList(CPlayer* pPlayer);
+	void ShowDungeonsList(CPlayer* pPlayer, bool Story);
 	void CheckQuestingOpened(CPlayer* pPlayer, int QuestID);
 	void ShowTankVotingDungeon(CPlayer* pPlayer);
 	int SyncFactor();

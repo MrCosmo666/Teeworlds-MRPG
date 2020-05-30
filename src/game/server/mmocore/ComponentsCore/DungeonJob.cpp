@@ -21,6 +21,7 @@ DungeonJob::DungeonJob()
 		Dungeon[ID].DoorY = RES->getInt("DoorY");
 		Dungeon[ID].OpenQuestID = RES->getInt("OpenQuestID");
 		Dungeon[ID].WorldID = RES->getInt("WorldID");
+		Dungeon[ID].Story = (bool)RES->getBoolean("Story");
 	}
 }
 
@@ -52,13 +53,16 @@ void DungeonJob::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
 	}
 }
 
-void DungeonJob::ShowDungeonsList(CPlayer* pPlayer)
+void DungeonJob::ShowDungeonsList(CPlayer* pPlayer, bool Story)
 {
 	const int ClientID = pPlayer->GetCID();
 	for (const auto& dungeon : Dungeon)
 	{
+		if(dungeon.second.Story != Story)
+			continue;
+
 		const int HideID = 7500 + dungeon.first;
-		GS()->AVH(ClientID, HideID, GOLDEN_COLOR, "Lvl{INT} {STR} : Players {INT} : {STR} [{INT}%]",
+		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "Lvl{INT} {STR} : Players {INT} : {STR} [{INT}%]",
 			&dungeon.second.Level, dungeon.second.Name, &dungeon.second.Players, (dungeon.second.State > 1 ? "Active dungeon" : "Waiting players"), &dungeon.second.Progress);
 
 		ShowDungeonTop(pPlayer, dungeon.first, HideID);
@@ -125,9 +129,18 @@ bool DungeonJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMe
 		GS()->AVH(ClientID, TAB_INFO_DUNGEON, GREEN_COLOR, "Dungeons Information");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DUNGEON, "In this section you can choose a dungeon");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DUNGEON, "View the fastest players on the passage");
-
 		GS()->AV(ClientID, "null", "");
-		ShowDungeonsList(pPlayer);
+
+		pPlayer->m_Colored = GOLDEN_COLOR;
+		GS()->AVL(ClientID, "null", "Story dungeon's");
+		ShowDungeonsList(pPlayer, true);
+		GS()->AV(ClientID, "null", "");
+
+		pPlayer->m_Colored = GOLDEN_COLOR;
+		GS()->AVL(ClientID, "null", "Non story dungeon's");
+		ShowDungeonsList(pPlayer, false);
+		GS()->AV(ClientID, "null", "");
+
 		GS()->AddBack(ClientID);
 		return true;
 	}
