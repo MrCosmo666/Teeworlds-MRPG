@@ -13,8 +13,6 @@ class CDropItem : public CEntity
 	vec2 m_Vel;
 	float m_Angle;
 	float m_AngleForce;
-
-	int m_StartTick;
 	bool m_Flashing;
 	int m_LifeSpan;
 	int m_FlashTimer;
@@ -30,7 +28,6 @@ public:
 	~CDropItem();
 
 	virtual void Tick();
-	virtual void TickPaused(); 
 	virtual void Snap(int SnappingClient);
 
 	bool TakeItem(int ClientID);

@@ -10,7 +10,7 @@
 #include "drop_items.h"
 
 CDropItem::CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, ItemJob::InventoryItem DropItem, int OwnerID)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPITEM, Pos)
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPITEM, Pos, 12.0f)
 {
 	m_Pos = Pos;
 	m_Vel = Vel;
@@ -21,9 +21,8 @@ CDropItem::CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForc
 	m_DropItem = DropItem;
 	m_DropItem.Settings = 0;
 	m_Flashing = false;
-	m_StartTick = Server()->Tick();
 	m_LifeSpan = Server()->TickSpeed() * 20;
-
+	
 	GameWorld()->InsertEntity(this);
 	for(int i=0; i<NUM_IDS; i++)
 	{
@@ -68,6 +67,7 @@ bool CDropItem::TakeItem(int ClientID)
 
 void CDropItem::Tick()
 {
+	m_LifeSpan--;
 	if(m_LifeSpan < 0)
 	{
 		GS()->CreatePlayerSpawn(m_Pos);
@@ -75,7 +75,6 @@ void CDropItem::Tick()
 		return;
 	}
 
-	m_LifeSpan--;
 	if(m_LifeSpan < 150)
 	{
 		m_FlashTimer--;
@@ -89,8 +88,11 @@ void CDropItem::Tick()
 		}
 	}
 
+	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(28.0f, 28.0f), 0.5f);
 	m_Vel.y += 0.5f;
-	const bool Grounded = (bool)GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5) || GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5);
+
+	const bool Grounded = (bool)GS()->Collision()->CheckPoint(m_Pos.x - GetProximityRadius(), m_Pos.y + GetProximityRadius() + 5) 
+		|| GS()->Collision()->CheckPoint(m_Pos.x + GetProximityRadius(), m_Pos.y + GetProximityRadius() + 5);
 	if (Grounded)
 	{
 		m_AngleForce += (m_Vel.x - 0.74f * 6.0f - m_AngleForce) / 2.0f;
@@ -101,13 +103,12 @@ void CDropItem::Tick()
 		m_Angle += clamp(m_AngleForce * 0.04f, -0.6f, 0.6f);
 		m_Vel.x *= 0.99f;
 	}
-	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(24.0f, 24.0f), 0.4f);
 
-	// проверить точно ли на земле уже после MoveBox
-	const bool GroundedDouble = (bool)GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5) || GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5);
-	if (GroundedDouble && m_Angle != 0.0f)
+	if(length(m_Vel) < 0.3f && m_AngleForce < 0.3f)
+	{
+		m_AngleForce += (m_Vel.x - 0.74f * 6.0f - m_AngleForce) / 10.0f;
 		m_Angle = 0.0f;
-
+	}
 	// Проверяем есть ли игрок которому предназначен предмет нету то делаем публичным
 	if(m_OwnerID != -1)
 	{
@@ -143,11 +144,6 @@ void CDropItem::Tick()
 		pPlayerDroppedItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.Enchant, (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0"));
 }
 
-void CDropItem::TickPaused()
-{
-	m_StartTick++;
-}
-
 void CDropItem::Snap(int SnappingClient)
 {
 	if(m_Flashing || NetworkClipped(SnappingClient))
@@ -175,17 +171,16 @@ void CDropItem::Snap(int SnappingClient)
 	pPickup->m_Type = PICKUP_GUN;
 
 	static const float Radius = 24.0f;
-	float AngleStart = (pi/4.0f) + (2.0f * pi * m_Angle);
+	float AngleStart = (pi/4.0f) + (2.0f * pi * m_Angle) / 3.0f;
 	float AngleStep = 2.0f * pi / CDropItem::NUM_IDS;
-	vec2 LastPosition = m_Pos - vec2(Radius * cos(AngleStart + AngleStep), Radius * sin(AngleStart + AngleStep));
-
+	vec2 LastPosition = m_Pos + vec2(Radius * cos(AngleStart + AngleStep), Radius * sin(AngleStart + AngleStep));
 	for(int i = 0; i < CDropItem::NUM_IDS; i++)
 	{
 		CNetObj_Laser *pRifleObj = static_cast<CNetObj_Laser *>(Server()->SnapNewItem(NETOBJTYPE_LASER, m_IDs[i], sizeof(CNetObj_Laser)));
 		if(!pRifleObj)
 			return;
 
-		vec2 PosStart = m_Pos + vec2(Radius * cos(AngleStart + AngleStep * i), Radius * sin(AngleStart + AngleStep * i));
+		vec2 PosStart = m_Pos - vec2(Radius * cos(AngleStart + AngleStep * i), Radius * sin(AngleStart + AngleStep * i));
 		pRifleObj->m_X = (int)PosStart.x;
 		pRifleObj->m_Y = (int)PosStart.y;
 		pRifleObj->m_FromX = (int)LastPosition.x;
