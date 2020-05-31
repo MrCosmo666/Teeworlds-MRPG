@@ -151,7 +151,6 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	GS()->Server()->SendDiscordGenerateMessage("16757248", pLoggin, pMsg);
 #endif
 
-	// first log in
 	if (!pPlayer->GetItem(itHammer).Count)
 	{
 		pPlayer->GetItem(itHammer).Add(1);
