@@ -267,6 +267,7 @@ public:
 	void VResetVotes(int ClientID, int MenuID);
 	void AddBack(int ClientID);
 	void ShowPlayerStats(CPlayer *pPlayer);
+	void ShowValueInformation(CPlayer *pPlayer, int ItemID = itGold);
 	bool ParseVote(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text);
 
 	/* #########################################################################

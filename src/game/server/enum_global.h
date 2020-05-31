@@ -15,6 +15,7 @@
 #define BLUE_COLOR vec3(10, 22, 40)
 #define LIGHT_BLUE_COLOR vec3(2, 7, 16)
 #define PURPLE_COLOR vec3(32, 10, 40)
+#define LIGHT_PURPLE_COLOR vec3(16, 5, 20)
 #define GREEN_COLOR vec3(15, 40, 15)
 #define LIGHT_GREEN_COLOR vec3(0, 16, 0)
 

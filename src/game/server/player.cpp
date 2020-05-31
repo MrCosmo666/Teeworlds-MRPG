@@ -22,12 +22,14 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	m_PrevTuningParams = *pGS->Tuning();
 	m_NextTuningParams = m_PrevTuningParams;
 	m_MoodState = MOOD_NORMAL;
-
 	SetLanguage(Server()->GetClientLanguage(ClientID));
 	GS()->SendTuningParams(ClientID);
 
-	ClearParsing();
-	Acc().Team = GetStartTeam();
+	if(!IsBot())
+	{
+		ClearParsing();
+		Acc().Team = GetStartTeam();
+	}
 }
 
 CPlayer::~CPlayer()

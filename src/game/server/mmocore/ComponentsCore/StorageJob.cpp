@@ -29,6 +29,10 @@ void StorageJob::ShowStorageMenu(CPlayer* pPlayer, int StorageID)
 	}
 	GS()->AVH(ClientID, TAB_STORAGE, GOLDEN_COLOR, "Shop :: {STR}", Storage[StorageID].Name);
 	GS()->AVM(ClientID, "REPAIRITEMS", StorageID, TAB_STORAGE, "Repair all items - FREE");
+	
+	GS()->AV(ClientID, "null", "");
+	GS()->ShowValueInformation(pPlayer, Storage[StorageID].Currency);
+	GS()->AV(ClientID, "null", "");
 }
 
 void StorageJob::OnInit()
@@ -39,6 +43,7 @@ void StorageJob::OnInit()
 		const int ID = (int)RES->getInt("ID");
 		Storage[ID].PosX = (int)RES->getInt("PosX");
 		Storage[ID].PosY = (int)RES->getInt("PosY");
+		Storage[ID].Currency = (int)RES->getInt("Currency");
 		Storage[ID].WorldID = (int)RES->getInt("WorldID");
 		str_copy(Storage[ID].Name, RES->getString("Name").c_str(), sizeof(Storage[ID].Name));
 	}

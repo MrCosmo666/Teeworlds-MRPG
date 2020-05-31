@@ -74,31 +74,30 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 	if(CGS::AttributInfo.find(BonusID) == CGS::AttributInfo.end()) 
 		return 0;
 
-	if(m_BotType == BotsTypes::TYPE_BOT_MOB)
+	if(m_BotType != BotsTypes::TYPE_BOT_MOB)
+		return 10;
+
+	int Power = BotJob::MobBot[m_SubBotID].Power;
+	for (int i = 0; i < EQUIP_MAX_BOTS; i++)
 	{
-		int Power = BotJob::MobBot[m_SubBotID].Power;
-		for (int i = 0; i < EQUIP_MAX_BOTS; i++)
-		{
-			const int ItemID = GetEquippedItem(i);
-			const int ItemBonusCount = GS()->GetItemInfo(ItemID).GetStatsBonus(BonusID);
-			if (ItemID <= 0 || ItemBonusCount < 0)
-				continue;
+		const int ItemID = GetEquippedItem(i);
+		const int ItemBonusCount = GS()->GetItemInfo(ItemID).GetStatsBonus(BonusID);
+		if (ItemID <= 0 || ItemBonusCount < 0)
+			continue;
 
-			Power += ItemBonusCount;
-		}
-
-		// all damage stats
-		if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
-			Power /= BotJob::MobBot[m_SubBotID].Boss ? 320 : 50;
-		// spread weapons
-		else if(BonusID == Stats::StSpreadShotgun || BonusID == Stats::StSpreadGrenade || BonusID == Stats::StSpreadRifle)
-			Power = BotJob::MobBot[m_SubBotID].Spread;
-		// all another stats 
-		else if(BonusID != Stats::StHardness)
-			Power /= 5;
-		return Power;
+		Power += ItemBonusCount;
 	}
-	return 10;
+
+	// all damage stats
+	if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
+		Power /= BotJob::MobBot[m_SubBotID].Boss ? 320 : 50;
+	// spread weapons
+	else if(BonusID == Stats::StSpreadShotgun || BonusID == Stats::StSpreadGrenade || BonusID == Stats::StSpreadRifle)
+		Power = BotJob::MobBot[m_SubBotID].Spread;
+	// all another stats 
+	else if(BonusID != Stats::StHardness)
+		Power /= 5;
+	return Power;
 }
 
 // Спавн игрока
@@ -120,7 +119,6 @@ void CPlayerBot::TryRespawn()
 		SpawnPos = vec2(BotJob::NpcBot[m_SubBotID].PositionX, BotJob::NpcBot[m_SubBotID].PositionY);
 	else if(SpawnType == BotsTypes::TYPE_BOT_QUEST)
 		SpawnPos = vec2(BotJob::QuestBot[m_SubBotID].PositionX, BotJob::QuestBot[m_SubBotID].PositionY);
-	
 	
 	// создаем бота
 	const int savecidmem = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;

@@ -10,8 +10,8 @@
 
 #include <generated/server_data.h>
 #include <game/version.h>
-
 #include "gamecontext.h"
+
 #include <game/collision.h>
 #include <game/gamecore.h>
 #include "gamemodes/main.h"
@@ -25,10 +25,7 @@
 
 #include <teeother/components/localization.h>
 
-// Безопасные структуры хоть и прожорливо но работает (Прежде всего всегда их при выходе игрока Отрезаем)
 std::map < int , CGS::StructAttribut > CGS::AttributInfo;
-
-// Структуры игроков
 std::map < int , CGS::StructParsing > CGS::Interactive;
 std::map < int , std::map < std::string , int > > CGS::Effects;
 int CGS::m_RaidExp = 100;
@@ -1031,14 +1028,14 @@ void CGS::OnTick()
 	m_pController->Tick();
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
-		if(m_apPlayers[i] && m_WorldID == GetClientWorldID(i))
+		if(!m_apPlayers[i] || m_WorldID != GetClientWorldID(i))
+			continue;
+
+		m_apPlayers[i]->Tick();
+		if(i < MAX_PLAYERS)
 		{
-			m_apPlayers[i]->Tick();
-			if(i < MAX_PLAYERS)
-			{
-				m_apPlayers[i]->PostTick();
-				BroadcastTick(i);
-			}
+			m_apPlayers[i]->PostTick();
+			BroadcastTick(i);
 		}
 	}
 	OnTickLocalWorld();
@@ -1314,7 +1311,6 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			Server()->SetClientName(ClientID, pMsg->m_pName);
 			Server()->SetClientClan(ClientID, pMsg->m_pClan);
 			Server()->SetClientCountry(ClientID, pMsg->m_Country);
-
 			for(int p = 0; p < 6; p++)
 			{
 				str_copy(pPlayer->Acc().m_aaSkinPartNames[p], pMsg->m_apSkinPartNames[p], 24);
@@ -1828,11 +1824,11 @@ void CGS::AVD(int To, const char* Type, const int ID, const int ID2, const int H
 // Все основные меню для работы в сервере
 void CGS::ResetVotes(int ClientID, int MenuList)
 {	
-	if(!GetPlayer(ClientID, true))
+	CPlayer *pPlayer = GetPlayer(ClientID, true);
+	if(!pPlayer)
 		return;
 
 	kurosio::kpause(3);	
-	CPlayer *pPlayer = m_apPlayers[ClientID];
 	pPlayer->m_OpenVoteMenu = MenuList;
 	ClearVotes(ClientID);
 
@@ -2059,6 +2055,14 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 	AV(ClientID, "null", "");
 }
 
+// Вывести информацию по голде
+void CGS::ShowValueInformation(CPlayer *pPlayer, int ItemID)
+{
+	const int ClientID = pPlayer->GetCID();
+	pPlayer->m_Colored = LIGHT_PURPLE_COLOR;
+	AVMI(ClientID, GetItemInfo(ItemID).GetIcon(), "null", NOPE, NOPE, "You have {INT} {STR}", &pPlayer->GetItem(ItemID).Count, GetItemInfo(ItemID).GetName());
+}
+
 // Парсинг голосований всех функций методов действий
 bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text)
 {
@@ -2251,31 +2255,30 @@ int CGS::IncreaseCountRaid(int IncreaseCount) const
 
 void CGS::UpdateZonePVP()
 {
+	m_AllowedPVP = false;
 	if(IsDungeon())
-	{
-		m_AllowedPVP = false;
 		return;
-	}
-
-	int CountMobs = 0;
+	
 	for(int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(m_apPlayers[i]);
 		if(BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && GetClientWorldID(i) == m_WorldID)
-			CountMobs++;
+		{
+			m_AllowedPVP = true;
+			return;
+		}
 	}
-	m_AllowedPVP = (bool)(CountMobs >= 3);
 }
 
 void CGS::UpdateZoneDungeon()
 {
 	for(const auto& dd : DungeonJob::Dungeon)
 	{
-		if(m_WorldID != dd.second.WorldID)
-			continue;
-		
-		m_DungeonID = dd.first;
-		return;
+		if(m_WorldID == dd.second.WorldID)
+		{
+			m_DungeonID = dd.first;
+			return;
+		}
 	}
 	m_DungeonID = 0;
 }
@@ -2301,9 +2304,8 @@ bool CGS::CheckPlayersDistance(vec2 Pos, float Distance) const
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(!m_apPlayers[i] || GetClientWorldID(i) != GetWorldID() || distance(Pos, m_apPlayers[i]->m_ViewPos) > Distance)
-			continue;
-		return true;
+		if(m_apPlayers[i] && GetClientWorldID(i) == GetWorldID() && distance(Pos, m_apPlayers[i]->m_ViewPos) <= Distance)
+			return true;
 	}
 	return false;
 }

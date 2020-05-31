@@ -124,8 +124,10 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 {
 	CPlayer* pPlayer = pChar->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
-
-	GS()->AVH(ClientID, TAB_AETHER, GOLDEN_COLOR, "Available aether's");
+	GS()->ShowValueInformation(pPlayer);
+	GS()->AV(ClientID, "null", "");
+	
+	GS()->AVH(ClientID, TAB_AETHER, GOLDEN_COLOR, "Available aethers : Your gold {INT}", &pPlayer->GetItem(itGold).Count);
 	if (Job()->Member()->GetGuildHouseID(pPlayer->Acc().GuildID) >= 1)
 		GS()->AVM(ClientID, "MSPAWN", NOPE, TAB_AETHER, "Move to Guild House - free");
 	if (Job()->House()->PlayerHouseID(pPlayer) >= 1)
@@ -148,4 +150,5 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 		GS()->AVD(ClientID, "TELEPORT", tl.first, Price, TAB_AETHER, "{STR} {STR} - {INT}gold",
 			tl.second.TeleName, GS()->Server()->GetWorldName(tl.second.WorldID), &Price);
 	}
+	GS()->AV(ClientID, "null", "");
 }

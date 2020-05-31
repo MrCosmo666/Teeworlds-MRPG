@@ -77,7 +77,7 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 		return;
 
 	// добавляем голосования
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "{STR}", TypeName);
 
@@ -223,6 +223,8 @@ bool CraftJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 			GS()->AVH(ClientID, TAB_INFO_CRAFT, GREEN_COLOR, "Crafting Information");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_CRAFT, "If you will not have enough items for crafting");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_CRAFT, "You will write those and the amount that is still required");
+			GS()->AV(ClientID, "null", "");
+			GS()->ShowValueInformation(pPlayer);
 			GS()->AV(ClientID, "null", "");
 
 			ShowCraftList(pPlayer, "Craft | Can be used's", TYPE_USED);

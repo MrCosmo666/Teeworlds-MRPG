@@ -13,6 +13,7 @@ class StorageJob : public MmoComponent
 		int PosX;
 		int PosY;
 		int Count;
+		int Currency;
 		int WorldID;
 	};
 	static std::map < int, SturctStorage > Storage;

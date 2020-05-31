@@ -52,8 +52,6 @@ bool ShopJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 {
 	const int ClientID = pPlayer->GetCID();
-	GS()->AV(ClientID, "null", "");
-
 	int HideID = NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 300;
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE StorageID = '%d' ORDER BY Price", StorageID));
 	while(RES->next())
@@ -89,6 +87,7 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		GS()->AVM(ClientID, "SHOP", ID, HideID, "Exchange {STR}x{INT} to {STR}x{INT}", NeededItem.GetName(pPlayer), &Price, BuyightItem.GetName(pPlayer), &Count);
 		HideID++;
 	}
+	GS()->AV(ClientID, "null", "");
 }
 
 // Показываем аукцион
@@ -97,6 +96,8 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 	const int ClientID = pPlayer->GetCID();
 	GS()->AVH(ClientID, TAB_INFO_AUCTION, GREEN_COLOR, "Auction Information");
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_AUCTION, "To create a slot, see inventory item interact.");
+	GS()->AV(ClientID, "null", "");
+	GS()->ShowValueInformation(pPlayer);
 	GS()->AV(ClientID, "null", "");
 
 	bool FoundItems = false;
@@ -138,6 +139,8 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 	}
 	if(!FoundItems)
 		GS()->AVL(ClientID, "null", "Currently there are no products.");
+		
+	GS()->AV(ClientID, "null", "");
 }
 
 void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)

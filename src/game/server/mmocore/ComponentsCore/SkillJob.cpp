@@ -65,7 +65,9 @@ bool SkillJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_SKILL, "Here you can learn passive and active skills");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_SKILL, "You can bind active skill any button using the console");
 			GS()->AV(ClientID, "null", "");
-
+			GS()->ShowValueInformation(pPlayer, itSkillPoint);
+			GS()->AV(ClientID, "null", "");
+			
 			ShowMailSkillList(pPlayer, false);
 			ShowMailSkillList(pPlayer, true);
 			return true;
@@ -93,7 +95,6 @@ bool SkillJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
-
 	return false;
 }
 
@@ -140,7 +141,7 @@ void SkillJob::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
 {
 	int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = BLUE_COLOR;
-	GS()->AVL(ClientID, "null", "{STR} skill's | You have  [{INT}SP]", (Passive ? "Passive" : "Active"), &pPlayer->GetItem(itSkillPoint).Count);
+	GS()->AVL(ClientID, "null", "{STR} skill's", (Passive ? "Passive" : "Active"));
 	for (const auto& sk : SkillData)
 	{
 		if(sk.second.m_Passive == Passive)
@@ -258,7 +259,7 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 		return true;
 	}
 
-	// скилл турель гравитации
+	// скилл ноктис телепорт
 	if(SkillID == Skill::SkillNoctisTeleport)
 	{
 		new CNoctisTeleport(&GS()->m_World, pChr, SkillBonus);

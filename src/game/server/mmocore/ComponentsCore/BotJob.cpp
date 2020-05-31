@@ -29,23 +29,23 @@ void BotJob::ConAddCharacterBot(int ClientID, const char *pCharacter)
 {
 	// если нет игрока то не продолжаем
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
-	if(!pPlayer) return;
+	if(!pPlayer) 
+		return;
 
 	// собираем данные со скина игрока
 	char SkinPart[256], SkinColor[256];
 	str_format(SkinPart, sizeof(SkinPart), "%s %s %s %s %s %s", pPlayer->Acc().m_aaSkinPartNames[0], pPlayer->Acc().m_aaSkinPartNames[1], 
 		pPlayer->Acc().m_aaSkinPartNames[2], pPlayer->Acc().m_aaSkinPartNames[3], pPlayer->Acc().m_aaSkinPartNames[4], pPlayer->Acc().m_aaSkinPartNames[5]);
-
 	str_format(SkinColor, sizeof(SkinColor), "%d %d %d %d %d %d", pPlayer->Acc().m_aSkinPartColors[0], pPlayer->Acc().m_aSkinPartColors[1], 
 		pPlayer->Acc().m_aSkinPartColors[2], pPlayer->Acc().m_aSkinPartColors[3], pPlayer->Acc().m_aSkinPartColors[4], pPlayer->Acc().m_aSkinPartColors[5]);
 
 	// проверяем ник если есть обновим нет добавим
 	CSqlString<16> cNick = CSqlString<16>(pCharacter);
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_world", "WHERE BotName = '%s' AND ID > '0'", cNick.cstr()));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_world", "WHERE BotName = '%s'", cNick.cstr()));
 	if(RES->next())
 	{
 		// если ник не верен из базы данных
-		int ID = RES->getInt("ID");
+		const int ID = RES->getInt("ID");
 		SJK.UD("tw_bots_world", "SkinName = '%s', SkinColor = '%s' WHERE ID = '%d'", SkinPart, SkinColor, ID);
 		GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "parseskin", "Updated character bot!");
 		return;	
@@ -69,7 +69,7 @@ void BotJob::ProcessingTalkingNPC(int OwnID, int TalkingID, bool PlayerTalked, c
 
 bool BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char *pText)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	if (!IsNpcBotValid(MobID) || Progress >= (int)NpcBot[MobID].m_Talk.size())
 	{
 		GS()->ClearTalkText(ClientID);

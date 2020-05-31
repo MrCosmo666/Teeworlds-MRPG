@@ -51,6 +51,7 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 CCharacter::~CCharacter()
 {
 	delete m_pHelper;
+	m_pHelper = nullptr;
 	GS()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCID()] = nullptr;
 }
 
@@ -87,7 +88,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_NoAllowDamage = false;
 	m_Core.m_LostData = false;
 	m_Event = TILE_CLEAR_EVENTS;
-	m_Core.m_WorldID = GS()->GetClientWorldID(m_pPlayer->GetCID());
+	m_Core.m_WorldID = m_pPlayer->GetPlayerWorldID();
 	if(!m_pPlayer->IsBot())
 	{
 		m_pPlayer->m_MoodState = m_pPlayer->GetMoodState();
@@ -96,8 +97,8 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 			GS()->Chat(m_pPlayer->GetCID(), "There are new stories of familiar NPCs");
 
 		m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
-		m_pPlayer->ShowInformationStats();
 		GS()->ResetVotes(m_pPlayer->GetCID(), m_pPlayer->m_OpenVoteMenu);
+		m_pPlayer->ShowInformationStats();
 	}
 
 	const bool Spawned = GS()->m_pController->OnCharacterSpawn(this);
@@ -294,6 +295,7 @@ void CCharacter::FireWeapon()
 					m_pPlayer->SetTalking(pTarget->GetPlayer()->GetCID(), false);
 					GS()->CreateHammerHit(ProjStartPos);
 					StartedTalking = true;
+					Hits = true;
 					continue;
 				}
 
@@ -516,9 +518,6 @@ void CCharacter::ResetInput()
 
 void CCharacter::Tick()
 {
-	if(!IsAlive())
-		return;
-		
 	HandleTuning();
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true, &m_pPlayer->m_NextTuningParams);
@@ -532,27 +531,17 @@ void CCharacter::Tick()
 		m_OlderPos = m_OldPos;
 		m_OldPos = m_Core.m_Pos;
 	}
-
-	// запретить дальше НПС и Квестовым
-	const bool IsBot = m_pPlayer->IsBot();
-	if (IsBot && m_pPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB)
-		return;
-
 	HandleWeapons();
 
 	// запретить дальше Мобам
-	if (IsBot || IsLockedWorld())
+	if (m_pPlayer->IsBot() || IsLockedWorld())
 		return;
 
-	// another function
 	if(IsAlive())
 	{
 		HandleAuthedPlayer();
-		HandleEvents();
 		HandleTilesets();
-
 		m_Core.m_LostData = false;
-		m_NoAllowDamage = false;
 	}
 }
 
@@ -887,15 +876,14 @@ void CCharacter::PostSnap()
 	m_TriggeredEvents = 0;
 }
 
-// another function
 void CCharacter::HandleTilesets()
 {
-	// get index tileset char pos
+	// get index tileset char pos component items
 	const int Index = GS()->Collision()->GetParseTilesAt(m_Core.m_Pos.x, m_Core.m_Pos.y);
 	if(!m_pPlayer->IsBot() && GS()->Mmo()->OnPlayerHandleTile(this, Index))
 		return;
 
-	// инвенты
+	// next for all bots & players
 	for (int i = TILE_CLEAR_EVENTS; i <= TILE_EVENT_HEALTH; i++)
 	{
 		if (m_pHelper->TileEnter(Index, i))
@@ -903,7 +891,6 @@ void CCharacter::HandleTilesets()
 		else if (m_pHelper->TileExit(Index, i)) {}
 	}
 
-	// вода
 	if (m_pHelper->TileEnter(Index, TILE_WATER))
 		GS()->CreateDeath(m_Pos, m_pPlayer->GetCID());
 	else if (m_pHelper->TileExit(Index, TILE_WATER))
@@ -912,22 +899,16 @@ void CCharacter::HandleTilesets()
 
 void CCharacter::HandleEvents() 
 {
-	if(m_pPlayer->IsBot())
-		return;
-
-	// тайл инвента
-	int ClientID = m_pPlayer->GetCID();
 	if(m_Event == TILE_EVENT_PARTY)
 	{
 		SetEmote(EMOTE_HAPPY, 1);
 		if(rand() % 50 == 0)
 		{
-			GS()->SendEmoticon(ClientID, 1 + rand() % 2);
-			GS()->CreateDeath(m_Core.m_Pos, ClientID);
+			GS()->SendEmoticon(m_pPlayer->GetCID(), 1 + rand() % 2);
+			GS()->CreateDeath(m_Core.m_Pos, m_pPlayer->GetCID());
 		}
 	}
 
-	// тайл инвента
 	if(m_Event == TILE_EVENT_LIKE)
 	{
 		SetEmote(EMOTE_HAPPY, 1);
@@ -1118,33 +1099,31 @@ void CCharacter::UpdateEquipingStats(int ItemID)
 
 void CCharacter::HandleAuthedPlayer()
 {
-	if(!IsAlive() || !m_pPlayer->IsAuthed())
+	if(!m_Alive || !m_pPlayer->IsAuthed())
 		return;
 
-	// мана прибавка
+	// recovery mana
 	if(m_Mana < m_pPlayer->GetStartMana() && Server()->Tick() % (Server()->TickSpeed() * 3) == 0)
 	{
 		IncreaseMana(m_pPlayer->GetStartMana() / 20);
 		m_pPlayer->ShowInformationStats();
 	}
+	HandleEvents();
 }
 
 bool CCharacter::IsAllowedPVP(int FromID)
 {
-	if(FromID < 0 || FromID >= MAX_CLIENTS)
+	CPlayer* pFrom = GS()->GetPlayer(FromID, false, true);
+	if(!pFrom || (m_NoAllowDamage || pFrom->GetCharacter()->m_NoAllowDamage) || (m_pPlayer->IsBot() && pFrom->IsBot()))
 		return false;
-
-	CPlayer* pFrom = GS()->m_apPlayers[FromID];
-	if(!pFrom || !pFrom->GetCharacter())
-		return false;
-	// anti pvp no allowed damage
-	if(m_NoAllowDamage || pFrom->GetCharacter()->m_NoAllowDamage)
-		return false;
-	// anti pvp for bots
-	if(m_pPlayer->IsBot() && pFrom->IsBot())
-		return false;
+	
 	// pvp only for mobs
 	if((m_pPlayer->IsBot() && m_pPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB) || (pFrom->IsBot() && pFrom->GetBotType() != BotsTypes::TYPE_BOT_MOB))
+		return false;
+
+	// disable damage on invisible wall
+	if((m_pPlayer->IsBot() && GS()->Collision()->GetParseTilesAt(GetPos().x * 32, GetPos().y * 32) == TILE_INVISIBLE_WALL) 
+		|| (pFrom->IsBot() && GS()->Collision()->GetParseTilesAt(pFrom->GetCharacter()->GetPos().x * 32, pFrom->GetCharacter()->GetPos().y * 32) == TILE_INVISIBLE_WALL))
 		return false;
 
 	// players anti pvp
@@ -1160,10 +1139,6 @@ bool CCharacter::IsAllowedPVP(int FromID)
 
 		// anti pvp for guild players
 		if(pFrom->Acc().GuildID > 0 && pFrom->Acc().GuildID == m_pPlayer->Acc().GuildID)
-			return false;
-
-		// anti pvp disallow
-		if(g_Config.m_SvStrongAntiPVP <= 0)
 			return false;
 	}
 
