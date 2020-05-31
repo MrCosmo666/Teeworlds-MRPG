@@ -151,14 +151,20 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	GS()->Server()->SendDiscordGenerateMessage("16757248", pLoggin, pMsg);
 #endif
 
+	// first log in
+	if (!pPlayer->GetItem(itHammer).Count)
+	{
+		pPlayer->GetItem(itHammer).Add(1);
+		GS()->Chat(ClientID, "Quest NPCs are marked with an aura Heart and Shield.");
+		GS()->Chat(ClientID, "Shield around you indicates location of active quest.");
+	}
+	
 	// настройки
 	if(!pPlayer->GetItem(itModePVP).Count)
 		pPlayer->GetItem(itModePVP).Add(1, 1);
 
 	// включить спавн в безопасной зоне
 	pPlayer->GetTempData().TempActiveSafeSpawn = true;
-	if (!pPlayer->GetItem(itHammer).Count)
-		pPlayer->GetItem(itHammer).Add(1);
 
 	if(pPlayer->Acc().WorldID != GS()->GetWorldID())
 	{
