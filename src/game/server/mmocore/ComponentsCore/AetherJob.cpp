@@ -127,7 +127,7 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 	GS()->ShowValueInformation(pPlayer);
 	GS()->AV(ClientID, "null", "");
 	
-	GS()->AVH(ClientID, TAB_AETHER, GOLDEN_COLOR, "Available aethers : Your gold {INT}", &pPlayer->GetItem(itGold).Count);
+	GS()->AVH(ClientID, TAB_AETHER, GOLDEN_COLOR, "Available aethers");
 	if (Job()->Member()->GetGuildHouseID(pPlayer->Acc().GuildID) >= 1)
 		GS()->AVM(ClientID, "MSPAWN", NOPE, TAB_AETHER, "Move to Guild House - free");
 	if (Job()->House()->PlayerHouseID(pPlayer) >= 1)
@@ -142,12 +142,12 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 			distance(pPlayer->GetCharacter()->m_Core.m_Pos, vec2(tl.second.TeleX, tl.second.TeleY)) < 120);
 		if (LocalTeleport)
 		{
-			GS()->AVM(ClientID, "null", tl.first, TAB_AETHER, "[Local] {STR} :: {STR}", tl.second.TeleName, GS()->Server()->GetWorldName(tl.second.WorldID));
+			GS()->AVM(ClientID, "null", tl.first, TAB_AETHER, "[Local {STR}] : {STR}", tl.second.TeleName, GS()->Server()->GetWorldName(tl.second.WorldID));
 			continue;
 		}
 
 		int Price = g_Config.m_SvPriceTeleport * (tl.second.WorldID + 1);
-		GS()->AVD(ClientID, "TELEPORT", tl.first, Price, TAB_AETHER, "{STR} {STR} - {INT}gold",
+		GS()->AVD(ClientID, "TELEPORT", tl.first, Price, TAB_AETHER, "[{STR}] : {STR} - {INT}gold",
 			tl.second.TeleName, GS()->Server()->GetWorldName(tl.second.WorldID), &Price);
 	}
 	GS()->AV(ClientID, "null", "");
