@@ -5,12 +5,16 @@
 
 class CDropQuestItem : public CEntity
 {
+	enum 
+	{
+		NUM_IDS = 3
+	};
+	int m_IDs[NUM_IDS];
+
 	vec2 m_Vel;
 	float m_Angle;
 	float m_AngleForce;
-
 	int m_StartTick;
-
 	bool m_Collide;
 	bool m_Flashing;
 	int m_LifeSpan;
@@ -24,7 +28,6 @@ public:
 	BotJob::QuestBotInfo m_QuestBot;
 
 	virtual void Tick();
-	virtual void TickPaused(); 
 	virtual void Snap(int SnappingClient);
 
 };

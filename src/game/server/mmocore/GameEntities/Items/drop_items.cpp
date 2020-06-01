@@ -67,6 +67,7 @@ bool CDropItem::TakeItem(int ClientID)
 
 void CDropItem::Tick()
 {
+	// lifetime dk
 	m_LifeSpan--;
 	if(m_LifeSpan < 0)
 	{
@@ -88,9 +89,12 @@ void CDropItem::Tick()
 		}
 	}
 
+
+	// physic
 	m_Vel.y += 0.5f;
-	const bool Grounded = (bool)GS()->Collision()->CheckPoint(m_Pos.x - (GetProximityRadius()/2.0f), m_Pos.y + (GetProximityRadius()/2.0f) + 5) 
-		|| GS()->Collision()->CheckPoint(m_Pos.x + (GetProximityRadius()/2.0f), m_Pos.y + (GetProximityRadius()/2.0f) + 5);
+	static const float CheckSize = (GetProximityRadius()/2.0f);
+	const bool Grounded = (bool)GS()->Collision()->CheckPoint(m_Pos.x - CheckSize, m_Pos.y + CheckSize + 5) 
+		|| GS()->Collision()->CheckPoint(m_Pos.x + CheckSize, m_Pos.y + CheckSize + 5);
 	if (Grounded)
 	{
 		m_AngleForce += (m_Vel.x - 0.74f * 6.0f - m_AngleForce) / 2.0f;
@@ -106,7 +110,8 @@ void CDropItem::Tick()
 	if(length(m_Vel) < 0.3f)
 		m_Angle = 0.0f;
 
-	// Проверяем есть ли игрок которому предназначен предмет нету то делаем публичным
+
+	// interactive
 	if(m_OwnerID != -1 && !GS()->GetPlayer(m_OwnerID, true, true))
 		m_OwnerID = -1;
 
@@ -129,7 +134,6 @@ void CDropItem::Tick()
 			m_DropItem.Info().GetName(pChar->GetPlayer()),
 			&pPlayerDroppedItem.Enchant, &m_DropItem.Enchant,
 			(m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0"));
-
 		return;
 	}
 
@@ -142,6 +146,7 @@ void CDropItem::Snap(int SnappingClient)
 	if(m_Flashing || NetworkClipped(SnappingClient))
 		return;
 
+	// mrpg
 	if(GS()->CheckClient(SnappingClient))
 	{
 		CNetObj_MmoPickup *pMmoPickup = static_cast<CNetObj_MmoPickup*>(Server()->SnapNewItem(NETOBJTYPE_MMOPICKUP, GetID(), sizeof(CNetObj_MmoPickup)));
@@ -155,30 +160,30 @@ void CDropItem::Snap(int SnappingClient)
 		return;
 	}
 
+	// vanilla
 	CNetObj_Pickup *pPickup = static_cast<CNetObj_Pickup *>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
-	if(!pPickup)
-		return;
-
-	pPickup->m_X = (int)m_Pos.x;
-	pPickup->m_Y = (int)m_Pos.y;
-	pPickup->m_Type = PICKUP_GUN;
+	if(pPickup)
+	{
+		pPickup->m_X = (int)m_Pos.x;
+		pPickup->m_Y = (int)m_Pos.y;
+		pPickup->m_Type = PICKUP_GUN;
+	}
 
 	static const float Radius = 24.0f;
-	float AngleStart = (pi/4.0f) + (2.0f * pi * m_Angle) / 3.0f;
-	float AngleStep = 2.0f * pi / CDropItem::NUM_IDS;
-	vec2 LastPosition = m_Pos + vec2(Radius * cos(AngleStart + AngleStep), Radius * sin(AngleStart + AngleStep));
+	const float AngleStep = 2.0f * pi / CDropItem::NUM_IDS;
+	const float AngleStart = (pi / CDropItem::NUM_IDS) + (2.0f * pi * m_Angle) / 5.0f;
 	for(int i = 0; i < CDropItem::NUM_IDS; i++)
 	{
 		CNetObj_Laser *pRifleObj = static_cast<CNetObj_Laser *>(Server()->SnapNewItem(NETOBJTYPE_LASER, m_IDs[i], sizeof(CNetObj_Laser)));
 		if(!pRifleObj)
 			return;
 
-		vec2 PosStart = m_Pos - vec2(Radius * cos(AngleStart + AngleStep * i), Radius * sin(AngleStart + AngleStep * i));
-		pRifleObj->m_X = (int)PosStart.x;
-		pRifleObj->m_Y = (int)PosStart.y;
-		pRifleObj->m_FromX = (int)LastPosition.x;
-		pRifleObj->m_FromY = (int)LastPosition.y;
+		vec2 Pos = m_Pos + vec2(Radius * cos(AngleStart + AngleStep * i), Radius * sin(AngleStart + AngleStep * i));
+		vec2 PosTo = m_Pos + vec2(Radius * cos(AngleStart + AngleStep * (i+1)), Radius * sin(AngleStart + AngleStep * (i+1)));
+		pRifleObj->m_X = (int)Pos.x;
+		pRifleObj->m_Y = (int)Pos.y;
+		pRifleObj->m_FromX = (int)PosTo.x;
+		pRifleObj->m_FromY = (int)PosTo.y;
 		pRifleObj->m_StartTick = Server()->Tick() - 3;
-		LastPosition = PosStart;
 	}
 } 

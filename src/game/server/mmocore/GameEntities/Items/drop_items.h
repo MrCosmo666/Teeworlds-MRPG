@@ -9,6 +9,7 @@ class CDropItem : public CEntity
 	{
 		NUM_IDS = 4,
 	};
+	int m_IDs[NUM_IDS];
 
 	vec2 m_Vel;
 	float m_Angle;
@@ -19,7 +20,6 @@ class CDropItem : public CEntity
 
 	ItemJob::InventoryItem m_DropItem;
 	int m_OwnerID;
-	int m_IDs[NUM_IDS];
 
 	
 
