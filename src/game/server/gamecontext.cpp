@@ -36,7 +36,6 @@ enum
 	NO_RESET
 };
 
-// Конструктор сервера
 void CGS::Construct(int Resetting)
 {
 	for (auto & apPlayer : m_apPlayers)
@@ -44,38 +43,32 @@ void CGS::Construct(int Resetting)
 
 	m_Resetting = false;
 	m_pServer = nullptr;
-	m_pController = 0;
+	m_pController = nullptr;
 
 	if(Resetting==NO_RESET)
 		pMmoController = nullptr;
 }
 
-// Конструктор сервера
 CGS::CGS(int Resetting)
 {
 	Construct(Resetting);
 }
 
-// Конструктор сервера
 CGS::CGS()
 {
 	Construct(NO_RESET);
 }
 
-// Дискруктор сервера
 CGS::~CGS()
 {
 	for(auto & apPlayer : m_apPlayers)
 		delete apPlayer;
-
 	if(pMmoController)  
 		delete pMmoController;
-
 	if(m_pPathFinder)
 		delete m_pPathFinder;
 }
 
-// Очистка сервера  
 void CGS::Clear()
 {
 	CTuningParams Tuning = m_Tuning;         
@@ -95,7 +88,6 @@ void CGS::Clear()
 	m_Tuning = Tuning;
 }
 
-// Получить Character по ClientID
 class CCharacter *CGS::GetPlayerChar(int ClientID)
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || !m_apPlayers[ClientID])
@@ -106,15 +98,15 @@ class CCharacter *CGS::GetPlayerChar(int ClientID)
 // Легкое получение игрока (ClientID, Авторизации, Чарактора)
 CPlayer *CGS::GetPlayer(int ClientID, bool CheckAuthed, bool CheckCharacter)
 {
-	if(ClientID >= 0 && ClientID < MAX_CLIENTS && m_apPlayers[ClientID]) 
+	if(ClientID < 0 || ClientID >= MAX_CLIENTS || !m_apPlayers[ClientID])
+		return nullptr;
+
+	CPlayer *pPlayer = m_apPlayers[ClientID];
+	if((CheckAuthed && pPlayer->IsAuthed()) || !CheckAuthed)
 	{
-		CPlayer *pPlayer = m_apPlayers[ClientID];
-		if((CheckAuthed && pPlayer->IsAuthed()) || !CheckAuthed)
-		{
-			if(CheckCharacter && !pPlayer->GetCharacter())
-				return nullptr;
-			return pPlayer;
-		}
+		if(CheckCharacter && !pPlayer->GetCharacter())
+			return nullptr;
+		return pPlayer;	
 	}
 	return nullptr;
 }
@@ -141,8 +133,6 @@ char* CGS::LevelString(int MaxValue, int CurrentValue, int Step, char toValue, c
 		Buf[i] = fromValue;
 	return Buf;
 }
-// получить объект предмета
-ItemJob::ItemInformation &CGS::GetItemInfo(int ItemID) const { return ItemJob::ItemsInfo[ItemID]; }
 
 const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const
 {
@@ -152,11 +142,13 @@ const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const
 			return ID >= NUM_TAB_MENU ? ("▵ ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("▼ :: ") : ("▲ :: "));
 		return ID >= NUM_TAB_MENU ? ("▿ ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("▲ :: ") : ("▼ :: "));
 	}
-
 	if(HidenTabs)
 		return ID >= NUM_TAB_MENU ? ("/\\ # ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("\\/ # ") : ("/\\ # "));
 	return ID >= NUM_TAB_MENU ? ("\\/ # ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("/\\ # ") : ("\\/ # "));
 }
+
+// получить информацию предмета
+ItemJob::ItemInformation &CGS::GetItemInfo(int ItemID) const { return ItemJob::ItemsInfo[ItemID]; }
 
 /* #########################################################################
 	EVENTS 
@@ -164,7 +156,6 @@ const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const
 // Отправить запрос на рендер Урона
 void CGS::CreateDamage(vec2 Pos, int ClientID, int Amount, bool OnlyVanilla)
 {
-
 	CNetEvent_Damage* pEventVanilla = (CNetEvent_Damage*)m_Events.Create(NETEVENTTYPE_DAMAGE, sizeof(CNetEvent_Damage));
 	if(pEventVanilla)
 	{
@@ -334,7 +325,6 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 		str_copy(aBufMode, "teamchat", sizeof(aBufMode));
 	else
 		str_copy(aBufMode, "chat", sizeof(aBufMode));
-
 	Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, aBufMode, aBuf);
 
 	CNetMsg_Sv_Chat Msg;
@@ -375,7 +365,6 @@ void CGS::Chat(int ClientID, const char* pText, ...)
 
 			Msg.m_TargetID = i;
 			Msg.m_pMessage = Buffer.buffer();
-
 			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, i);
 			Buffer.clear();
 		}
@@ -404,7 +393,6 @@ void CGS::ChatFollow(int ClientID, const char* pText, ...)
 
 			Msg.m_TargetID = i;
 			Msg.m_pMessage = Buffer.buffer();
-
 			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, i);
 			Buffer.clear();
 		}
@@ -433,7 +421,6 @@ void CGS::ChatAccountID(int AccountID, const char* pText, ...)
 		
 		Msg.m_TargetID = ClientID;
 		Msg.m_pMessage = Buffer.buffer();
-
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 		Buffer.clear();
 	}
@@ -907,6 +894,7 @@ int CGS::GetClientWorldID(int ClientID) const
 ######################################################################### */
 void CGS::UpdateDiscordStatus()
 {
+#ifdef CONF_DISCORD
 	if(Server()->Tick() % (Server()->TickSpeed() * 10) != 0 || m_WorldID != LOCALWORLD)
 		return;
 
@@ -925,6 +913,7 @@ void CGS::UpdateDiscordStatus()
 		return;
 	}
 	Server()->SendDiscordStatus("and expects players.", 3);
+#endif
 }
 
 void CGS::NewCommandHook(const CCommandManager::CCommand* pCommand, void* pContext)

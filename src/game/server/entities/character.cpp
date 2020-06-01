@@ -1122,8 +1122,8 @@ bool CCharacter::IsAllowedPVP(int FromID)
 		return false;
 
 	// disable damage on invisible wall
-	if((m_pPlayer->IsBot() && GS()->Collision()->GetParseTilesAt(GetPos().x * 32, GetPos().y * 32) == TILE_INVISIBLE_WALL) 
-		|| (pFrom->IsBot() && GS()->Collision()->GetParseTilesAt(pFrom->GetCharacter()->GetPos().x * 32, pFrom->GetCharacter()->GetPos().y * 32) == TILE_INVISIBLE_WALL))
+	if(GS()->Collision()->GetParseTilesAt(GetPos().x, GetPos().y) == TILE_INVISIBLE_WALL 
+		|| GS()->Collision()->GetParseTilesAt(pFrom->GetCharacter()->GetPos().x, pFrom->GetCharacter()->GetPos().y) == TILE_INVISIBLE_WALL)
 		return false;
 
 	// players anti pvp

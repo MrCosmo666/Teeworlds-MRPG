@@ -73,16 +73,6 @@ void DungeonJob::ShowDungeonsList(CPlayer* pPlayer, bool Story)
 		else
 			GS()->AVM(ClientID, "null", NOPE, HideID, "You need to complete {STR}", Job()->Quest()->GetQuestName(NeededQuestID));
 	}
-
-	if (GS()->IsDungeon())
-	{
-		GS()->AV(ClientID, "null", "");
-		ShowTankVotingDungeon(pPlayer);
-		GS()->AV(ClientID, "null", "");
-
-		pPlayer->m_Colored = { 30, 8, 8 };
-		GS()->AVL(ClientID, "DUNGEONEXIT", "Exit dungeon {STR} (warning)", Dungeon[GS()->DungeonID()].Name);
-	}
 }
 
 void DungeonJob::ShowTankVotingDungeon(CPlayer* pPlayer)
@@ -141,6 +131,13 @@ bool DungeonJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMe
 		ShowDungeonsList(pPlayer, false);
 		GS()->AV(ClientID, "null", "");
 
+		if (GS()->IsDungeon())
+		{
+			ShowTankVotingDungeon(pPlayer);
+			GS()->AV(ClientID, "null", "");
+			pPlayer->m_Colored = { 30, 8, 8 };
+			GS()->AVL(ClientID, "DUNGEONEXIT", "Exit dungeon {STR} (warning)", Dungeon[GS()->DungeonID()].Name);
+		}
 		GS()->AddBack(ClientID);
 		return true;
 	}
