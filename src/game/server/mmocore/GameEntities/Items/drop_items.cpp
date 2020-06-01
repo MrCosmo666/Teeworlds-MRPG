@@ -10,7 +10,7 @@
 #include "drop_items.h"
 
 CDropItem::CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, ItemJob::InventoryItem DropItem, int OwnerID)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPITEM, Pos, 12.0f)
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPITEM, Pos, 28.0f)
 {
 	m_Pos = Pos;
 	m_Vel = Vel;
@@ -40,8 +40,8 @@ CDropItem::~CDropItem()
 
 bool CDropItem::TakeItem(int ClientID)
 {
-	CPlayer *pPlayer = GS()->m_apPlayers[ClientID];
-	if(!pPlayer || !pPlayer->GetCharacter() || (m_OwnerID >= 0 && m_OwnerID != ClientID))
+	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true, true);
+	if(!pPlayer || (m_OwnerID >= 0 && m_OwnerID != ClientID))
 		return false;
 
 	// размен зачарованных предметов
@@ -88,11 +88,9 @@ void CDropItem::Tick()
 		}
 	}
 
-	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(28.0f, 28.0f), 0.5f);
 	m_Vel.y += 0.5f;
-
-	const bool Grounded = (bool)GS()->Collision()->CheckPoint(m_Pos.x - GetProximityRadius(), m_Pos.y + GetProximityRadius() + 5) 
-		|| GS()->Collision()->CheckPoint(m_Pos.x + GetProximityRadius(), m_Pos.y + GetProximityRadius() + 5);
+	const bool Grounded = (bool)GS()->Collision()->CheckPoint(m_Pos.x - (GetProximityRadius()/2.0f), m_Pos.y + (GetProximityRadius()/2.0f) + 5) 
+		|| GS()->Collision()->CheckPoint(m_Pos.x + (GetProximityRadius()/2.0f), m_Pos.y + (GetProximityRadius()/2.0f) + 5);
 	if (Grounded)
 	{
 		m_AngleForce += (m_Vel.x - 0.74f * 6.0f - m_AngleForce) / 2.0f;
@@ -104,21 +102,16 @@ void CDropItem::Tick()
 		m_Vel.x *= 0.99f;
 	}
 
-	if(length(m_Vel) < 0.3f && m_AngleForce < 0.3f)
-	{
-		m_AngleForce += (m_Vel.x - 0.74f * 6.0f - m_AngleForce) / 10.0f;
+	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(GetProximityRadius(), GetProximityRadius()), 0.5f);
+	if(length(m_Vel) < 0.3f)
 		m_Angle = 0.0f;
-	}
+
 	// Проверяем есть ли игрок которому предназначен предмет нету то делаем публичным
-	if(m_OwnerID != -1)
-	{
-		CPlayer* pOwnerPlayer = GS()->GetPlayer(m_OwnerID, true, true);
-		if(!pOwnerPlayer)
-			m_OwnerID = -1;
-	}
+	if(m_OwnerID != -1 && !GS()->GetPlayer(m_OwnerID, true, true))
+		m_OwnerID = -1;
 
 	CCharacter *pChar = (CCharacter*)GameWorld()->ClosestEntity(m_Pos, 64, CGameWorld::ENTTYPE_CHARACTER, 0);
-	if(!pChar || !pChar->GetPlayer() || pChar->GetPlayer()->IsBot())
+	if(!pChar || pChar->GetPlayer()->IsBot())
 		return;
 
 	// если не зачарованный предмет
