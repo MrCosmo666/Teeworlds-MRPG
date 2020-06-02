@@ -71,7 +71,7 @@ void DungeonJob::ShowDungeonsList(CPlayer* pPlayer, bool Story)
 		if(NeededQuestID <= 0 || Job()->Quest()->IsCompletedQuest(ClientID, NeededQuestID))
 			GS()->AVM(ClientID, "DUNGEONJOIN", dungeon.first, HideID, "Join dungeon {STR}", dungeon.second.Name);
 		else
-			GS()->AVM(ClientID, "null", NOPE, HideID, "You need to complete {STR}", Job()->Quest()->GetQuestName(NeededQuestID));
+			GS()->AVM(ClientID, "null", NOPE, HideID, "Need to complete quest {STR}", Job()->Quest()->GetQuestName(NeededQuestID));
 	}
 }
 
