@@ -50,9 +50,11 @@ int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char 
 	boost::scoped_ptr<ResultSet> RES4(SJK.SD("ID", "tw_accounts", "ORDER BY ID DESC LIMIT 1"));
 	const int InitID = RES4->next() ? RES4->getInt("ID")+1 : 1; // thread save ? hm need for table all time auto increment = 1; NEED FIX IT
 
+	char aAddrStr[64];
 	CSqlString<32> clear_Login = CSqlString<32>(Login);
 	CSqlString<32> clear_Pass = CSqlString<32>(Password);
-	SJK.ID("tw_accounts", "(ID, Username, Password, RegisterDate) VALUES ('%d', '%s', '%s', UTC_TIMESTAMP())", InitID, clear_Login.cstr(), clear_Pass.cstr());
+	GS()->Server()->GetClientAddr(ClientID, aAddrStr, sizeof(aAddrStr));
+	SJK.ID("tw_accounts", "(ID, Username, Password, RegisterDate, RegisteredIP) VALUES ('%d', '%s', '%s', UTC_TIMESTAMP(), '%s')", InitID, clear_Login.cstr(), clear_Pass.cstr(), aAddrStr);
 	SJK.IDS(100, "tw_accounts_data", "(ID, Nick) VALUES ('%d', '%s')", InitID, clear_Nick.cstr());
 
 	GS()->Chat(ClientID, "- - - - - - - [Successful registered] - - - - - - -");
@@ -81,7 +83,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 	if(ACCOUNTDATA->next())
 	{
 		const int UserID = ACCOUNTDATA->getInt("ID");
-		boost::scoped_ptr<ResultSet> CHECKACCESS(SJK.SD("ID", "tw_accounts", "WHERE Username = '%s' AND Password = '%s' AND ID = '%d'", clear_Login.cstr(), clear_Pass.cstr(), UserID));
+		boost::scoped_ptr<ResultSet> CHECKACCESS(SJK.SD("ID, LoginDate", "tw_accounts", "WHERE Username = '%s' AND Password = '%s' AND ID = '%d'", clear_Login.cstr(), clear_Pass.cstr(), UserID));
 		if (!CHECKACCESS->next())
 		{
 			GS()->Chat(ClientID, "Wrong login or password!");
@@ -94,6 +96,10 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 			return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
 		}
 
+		str_copy(pPlayer->Acc().Login, clear_Login.cstr(), sizeof(pPlayer->Acc().Login));
+		str_copy(pPlayer->Acc().Password, clear_Pass.cstr(), sizeof(pPlayer->Acc().Password));
+		str_copy(pPlayer->Acc().LastLogin, CHECKACCESS->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().LastLogin));
+
 		pPlayer->Acc().AuthID = UserID;
 		pPlayer->Acc().Level = ACCOUNTDATA->getInt("Level");
 		pPlayer->Acc().Exp = ACCOUNTDATA->getInt("Exp");
@@ -101,9 +107,6 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		pPlayer->Acc().Upgrade = ACCOUNTDATA->getInt("Upgrade");
 		pPlayer->Acc().GuildRank = ACCOUNTDATA->getInt("GuildRank");
 		pPlayer->Acc().WorldID = ACCOUNTDATA->getInt("WorldID");
-		str_copy(pPlayer->Acc().Login, clear_Login.cstr(), sizeof(pPlayer->Acc().Login));
-		str_copy(pPlayer->Acc().Password, clear_Pass.cstr(), sizeof(pPlayer->Acc().Password));
-		str_copy(pPlayer->Acc().LastLogin, ACCOUNTDATA->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().LastLogin));
 		for (const auto& at : CGS::AttributInfo)
 		{
 			if (str_comp_nocase(at.second.FieldName, "unfield") == 0) continue;
@@ -113,7 +116,10 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		GS()->Chat(ClientID, "- - - - - - - [Successful login] - - - - - - -");
 		GS()->Chat(ClientID, "Player menu is available in votes!");
 		GS()->m_pController->DoTeamChange(pPlayer, false);
-		SJK.UD("tw_accounts_data", "LoginDate = CURRENT_TIMESTAMP WHERE ID = '%d'", UserID);
+
+		char aAddrStr[64];
+		GS()->Server()->GetClientAddr(ClientID, aAddrStr, sizeof(aAddrStr));
+		SJK.UD("tw_accounts", "LoginDate = CURRENT_TIMESTAMP, LoginIP = '%s' WHERE ID = '%d'", aAddrStr, UserID);
 		return SendAuthCode(ClientID, AUTH_LOGIN_GOOD);
 	}
 

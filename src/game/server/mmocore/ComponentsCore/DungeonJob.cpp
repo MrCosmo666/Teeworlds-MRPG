@@ -13,9 +13,8 @@ DungeonJob::DungeonJob()
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons"));
 	while (RES->next())
 	{
-		int ID = RES->getInt("ID");
+		const int ID = RES->getInt("ID");
 		str_copy(Dungeon[ID].Name, RES->getString("Name").c_str(), sizeof(Dungeon[ID].Name));
-
 		Dungeon[ID].Level = RES->getInt("Level");
 		Dungeon[ID].DoorX = RES->getInt("DoorX");
 		Dungeon[ID].DoorY = RES->getInt("DoorY");
