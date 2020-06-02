@@ -733,7 +733,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	
 		// Vampirism пополнить здоровье
 		int TempInt = pFrom->GetAttributeCount(Stats::StVampirism, true);
-		if(rand()%5000 < clamp(TempInt, 100, 3000))
+		if(random_int()%5000 < min(TempInt, 3000))
 		{
 			pFrom->GetCharacter()->IncreaseHealth(max(1, Dmg/2));
 			GS()->SendEmoticon(From, EMOTICON_DROP);
@@ -741,7 +741,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 		
 		// lucky пропустить урон
 		TempInt = pFrom->GetAttributeCount(Stats::StLucky, true);
-		if(!pFrom->IsBot() && rand()%5000 < clamp(TempInt, 100, 3000))
+		if(!pFrom->IsBot() && random_int()%5000 < min(TempInt, 3000))
 		{
 			Dmg = 0;
 			GS()->SendEmoticon(From, EMOTICON_HEARTS);
@@ -749,10 +749,10 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 		
 		// Критический урон
 		TempInt = pFrom->GetAttributeCount(Stats::StDirectCriticalHit, true);
-		if(!pFrom->IsBot() && rand()%5000 < clamp(TempInt, 100, 2200))
+		if(!pFrom->IsBot() && random_int()%5000 < min(TempInt, 2200))
 		{
 			const int CritDamage = pFrom->GetAttributeCount(Stats::StCriticalHit, true);
-			Dmg = Dmg*2+(CritDamage+rand()%9);
+			Dmg = Dmg * 2 + (CritDamage + random_int()%9);
 			pFrom->GetCharacter()->SetEmote(EMOTE_ANGRY, 2);
 			GS()->SendEmoticon(From, EMOTICON_EXCLAMATION);
 		}
