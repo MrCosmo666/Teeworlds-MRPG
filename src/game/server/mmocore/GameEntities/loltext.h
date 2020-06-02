@@ -13,7 +13,6 @@ class CLolPlasma : public CEntity
 	CEntity *m_pParent;
 
 public:
-	//position relative to pParent->m_Pos. if pParent is NULL, Pos is absolute. lifespan in ticks
 	CLolPlasma(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan);
 
 	virtual void Tick();

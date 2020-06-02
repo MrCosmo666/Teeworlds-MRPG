@@ -8,6 +8,7 @@ class CQuestPathFinder : public CEntity
 	int m_ClientID;
 	int m_QuestID;
 	int m_QuestProgress;
+	bool m_MainScenario;
 
 public:
 	CQuestPathFinder(CGameWorld* pGameWorld, vec2 Pos, int ClientID, int QuestID, int QuestProgress, vec2 TargetPos);

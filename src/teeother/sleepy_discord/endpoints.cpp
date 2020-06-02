@@ -27,7 +27,7 @@ namespace SleepyDiscord {
 				"},"
 				"\"author\": "
 				"{"
-					" \"name\": \"MMOTEE\", "
+					" \"name\": \"MRPG - Personal card\", "
 					" \"url\": \"%s\", "
 					" \"icon_url\": \"%s/%s/dimg/icon.png\" "
 				"}"

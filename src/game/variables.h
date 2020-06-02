@@ -179,7 +179,7 @@ MACRO_CONFIG_INT(SvMySqlPort, sv_sql_port, 3306, 0, 65000, CFGFLAG_SERVER, "MySQ
 MACRO_CONFIG_INT(SvMySqlMaxPool, sv_sql_maxpool, 30, 20, 100, CFGFLAG_SERVER, "MySQL Pool Threads")
 
 MACRO_CONFIG_INT(SvLoltextHspace, sv_loltext_hspace, 7, 7, 25, CFGFLAG_SERVER, "horizontal offset between loltext 'pixels'")
-MACRO_CONFIG_INT(SvLoltextVspace, sv_loltext_vspace, 9, 7, 25, CFGFLAG_SERVER, "vertical offset between loltext 'pixels'")
+MACRO_CONFIG_INT(SvLoltextVspace, sv_loltext_vspace, 7, 7, 25, CFGFLAG_SERVER, "vertical offset between loltext 'pixels'")
 
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly

@@ -14,13 +14,14 @@ CQuestPathFinder::CQuestPathFinder(CGameWorld *pGameWorld, vec2 Pos, int ClientI
 	m_QuestProgress = QuestProgress;
 	m_ClientID = ClientID;
 	m_TargetPos = TargetPos;
+	m_MainScenario = str_startswith(GS()->Mmo()->Quest()->GetStoryName(m_QuestID), "Main:") != nullptr;
 	GameWorld()->InsertEntity(this);
 }
 
 void CQuestPathFinder::Tick() 
 {
 	CPlayer* pPlayer = GS()->GetPlayer(m_ClientID, true, true);
-	if (!pPlayer || QuestJob::Quests[m_ClientID][m_QuestID].Progress != m_QuestProgress || QuestJob::Quests[m_ClientID][m_QuestID].State != QuestState::QUEST_ACCEPT)
+	if (m_TargetPos == vec2(0.0f, 0.0f) || !pPlayer || QuestJob::Quests[m_ClientID][m_QuestID].Progress != m_QuestProgress || QuestJob::Quests[m_ClientID][m_QuestID].State != QuestState::QUEST_ACCEPT)
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;
@@ -38,10 +39,9 @@ void CQuestPathFinder::Finish()
 
 void CQuestPathFinder::Snap(int SnappingClient)
 {
-	if(NetworkClipped(SnappingClient) || m_TargetPos == vec2(0.0f, 0.0f) || SnappingClient != m_ClientID)
+	if(NetworkClipped(SnappingClient) || SnappingClient != m_ClientID)
 		return;
 
-	// �������� ������� ���� ������ ������ �� ������
 	if (GS()->CheckClient(SnappingClient))
 	{
 		vec2 Direction = normalize(m_Pos - m_TargetPos);
@@ -62,5 +62,5 @@ void CQuestPathFinder::Snap(int SnappingClient)
 
 	pP->m_X = (int)m_Pos.x;
 	pP->m_Y = (int)m_Pos.y;
-	pP->m_Type = PICKUP_ARMOR;
+	pP->m_Type = (m_MainScenario ? (int)PICKUP_HEALTH : (int)PICKUP_ARMOR);
 } 

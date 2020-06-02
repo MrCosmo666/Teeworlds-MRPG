@@ -8,7 +8,7 @@ CLolPlasma::CLolPlasma(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 
 {
 	m_LocalPos = vec2(0.0f, 0.0f);
 	m_StartOff = Pos;
-	CEntity::m_Pos = (pParent?pParent->GetPos():vec2(0.0f,0.0f)) + m_StartOff;
+	m_Pos = (pParent ? pParent->GetPos() : vec2(0.0f,0.0f)) + m_StartOff;
 	m_Vel = Vel;
 	m_Life = Lifespan;
 	m_StartTick = Server()->Tick();
@@ -18,14 +18,13 @@ CLolPlasma::CLolPlasma(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 
 
 void CLolPlasma::Tick()
 {
+	m_Life--;
 	if (m_Life < 0)
 	{
 		GameWorld()->DestroyEntity(this);
 		return;
 	}
-	m_Life--;
-
-	CEntity::m_Pos = (m_pParent?m_pParent->GetPos():vec2(0.0f,0.0f)) + m_StartOff + (m_LocalPos += m_Vel);
+	m_Pos = (m_pParent ? m_pParent->GetPos() : vec2(0.0f,0.0f)) + m_StartOff + (m_LocalPos += m_Vel);
 }
 
 void CLolPlasma::Snap(int SnappingClient)
@@ -41,15 +40,15 @@ void CLolPlasma::Snap(int SnappingClient)
 	pObj->m_Y = (int)m_Pos.y;
 	pObj->m_VelX = 0;
 	pObj->m_VelY = 0;
-	pObj->m_StartTick = Server()->Tick()-1;
+	pObj->m_StartTick = Server()->Tick();
 	pObj->m_Type = WEAPON_HAMMER;
 }
 
 
 vec2 CLoltext::TextSize(const char *pText)
 {
-	int Count = 0;
 	char c;
+	int Count = 0;
 	while((c = *pText++))
 	{
 		if (c >= 'a' && c <= 'z')
@@ -63,7 +62,6 @@ vec2 CLoltext::TextSize(const char *pText)
 
 void CLoltext::Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, bool Center, bool Follow)
 {
-	char c;
 	vec2 CurPos = Pos;
 	if (Center)
 		CurPos -= TextSize(pText)*0.5f;
@@ -74,6 +72,7 @@ void CLoltext::Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 V
 		pParent = 0;
 	}
 
+	char c;
 	while((c = *pText++))
 	{
 		if (c >= 'a' && c <= 'z')

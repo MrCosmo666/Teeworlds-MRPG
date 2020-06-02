@@ -718,7 +718,7 @@ void QuestJob::CreateQuestingItems(CPlayer *pPlayer, BotJob::QuestBotInfo &BotDa
 			return;
 	}
 
-	const int Count = 5 + BotData.ItemSearchCount[0];
+	const int Count = 3 + BotData.ItemSearchCount[0];
 	vec2 Pos = vec2(BotData.PositionX, BotData.PositionY);
 	for (int i = 0; i < Count; i++)
 	{

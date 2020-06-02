@@ -284,14 +284,14 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, b
 	if (pPlayerItem.Info().IsEnchantable())
 	{
 		const int Price = pPlayerItem.EnchantPrice();
-		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR} ({INT} material)", NameItem, &Price);
+		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR} ({INT} materials)", NameItem, &Price);
 	}
 
 	if (ItemID == itHammer)
 		return;
 
 	if (pPlayerItem.Info().Dysenthis > 0)
-		GS()->AVM(ClientID, "IDESYNTHESIS", ItemID, HideID, "Disassemble {STR} (+{INT}mat - 1 item)", NameItem, &pPlayerItem.Info().Dysenthis);
+		GS()->AVM(ClientID, "IDESYNTHESIS", ItemID, HideID, "Disassemble {STR} (+{INT} materials)", NameItem, &pPlayerItem.Info().Dysenthis);
 
 	GS()->AVM(ClientID, "IDROP", ItemID, HideID, "Drop {STR}", NameItem);
 
