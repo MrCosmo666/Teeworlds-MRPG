@@ -1,6 +1,270 @@
 {"translation":[
 	{
-		"key": "",
-		"value": ""
+		"key": "The main menu will return as soon as you leave this zone!",
+		"value": "Мeню вернется после выхода из зоны!"
+	},
+	{
+		"key": "Hi, {STR} Last log in {STR}",
+		"value": "Hi, {STR} Last log in {STR}"
+	},
+	{
+		"key": "Discord: \"{STR}\". Ideas, bugs, rewards",
+		"value": "Discord: \"{STR}\". Ideas, bugs, rewards"
+	},
+	{
+		"key": "Level {INT} : Exp {INT}/{INT}",
+		"value": "Уровень {INT} : Опыт {INT}/{INT}"
+	},
+	{
+		"key": "Skill Point {INT}SP",
+		"value": "Skill Point {INT}SP"
+	},
+	{
+		"key": "Gold: {INT}",
+		"value": "Золото: {INT}"
+	},
+	{
+		"key": "☪ SUB MENU PERSONAL",
+		"value": "☪ ПЕРСОНАЛЬНОЕ МЕНЮ"
+	},
+	{
+		"key": "Inventory",
+		"value": "Инвентарь"
+	},
+	{
+		"key": "Equipment",
+		"value": "Снаряжение"
+	},
+	{
+		"key": "Upgrades({INT}p)",
+		"value": "Улучшения({INT}p)"
+	},
+	{
+		"key": "Dungeons",
+		"value": "Dungeons"
+	},
+	{
+		"key": "Settings",
+		"value": "Настройки"
+	},
+	{
+		"key": "Mailbox",
+		"value": "Почтовый ящик"
+	},
+	{
+		"key": "Journal",
+		"value": "Журнал"
+	},
+	{
+		"key": "Guild",
+		"value": "Гильдия"
+	},
+	{
+		"key": "House",
+		"value": "Дом"
+	},
+	{
+		"key": "√ SUB MENU INFORMATION",
+		"value": "√ МЕНЮ ИНФОРМАЦИИ"
+	},
+	{
+		"key": "Loots, mobs on your zone",
+		"value": "Лут, мобы в твоей зоне"
+	},
+	{
+		"key": "Ranking guilds and players",
+		"value": "Рейтинг гильдий и игроков"
+	},
+	{
+		"key": "Upgrades Information",
+		"value": "Улучшения инфо"
+	},
+	{
+		"key": "Select upgrades type in Reason, write count.",
+		"value": "В причину можно написать кол-во"
+	},
+	{
+		"key": "Disciple of War. Level Power {INT}",
+		"value": "Disciple of War. Level Power {INT}"
+	},
+	{
+		"key": "Disciple of Tank. Level Power {INT}",
+		"value": "Disciple of Tank. Level Power {INT}"
+	},
+	{
+		"key": "Disciple of Healer. Level Power {INT}",
+		"value": "Disciple of Healer. Level Power {INT}"
+	},
+	{
+		"key": "Disciple of Jobs",
+		"value": "Disciple of Jobs"
+	},
+	{
+		"key": "{STR} {INT}P (Price {INT}P)",
+		"value": "{STR} {INT}P (Цена {INT}P)"
+	},
+	{
+		"key": "Top list Information",
+		"value": "Рейтинг инфо"
+	},
+	{
+		"key": "Here you can see top server Guilds, Players.",
+		"value": "Here you can see top server Guilds, Players."
+	},
+	{
+		"key": "Top 10 guilds leveling",
+		"value": "Топ 10 гильдий по уровню"
+	},
+	{
+		"key": "Top 10 guilds wealthy",
+		"value": "Топ 10 гильдий по золоту"
+	},
+	{
+		"key": "Top 10 players leveling",
+		"value": "Топ 10 игроков по уровню"
+	},
+	{
+		"key": "Chance & Loot Information",
+		"value": "Chance & Loot Information"
+	},
+	{
+		"key": "Here you can see chance loot, mobs, on YOUR ZONE.",
+		"value": "Here you can see chance loot, mobs, on YOUR ZONE."
+	},
+	{
+		"key": "There are no active mobs in your zone!",
+		"value": "В вашей зоне нет активных мобов!"
+	},
+	{
+		"key": "Backpage",
+		"value": "Вернутся"
+	},
+	{
+		"key": "Player Stats {STR}",
+		"value": "Статистика игрока {STR}"
+	},
+	{
+		"key": "Player Upgrade Point: {INT}P",
+		"value": "Очки улучшений: {INT}P"
+	},
+	{
+		"key": "You have {INT} {STR}",
+		"value": "У вас {INT} {STR}"
+	},
+	{
+		"key": "Use it when you're not dead!",
+		"value": "Используйте это когда вы живы!"
+	},
+	{
+		"key": "Level UP. Now Level {INT}!",
+		"value": "Уровень повышен. Уровень {INT}!"
+	},
+	{
+		"key": "Press 'F4' to continue the dialog!",
+		"value": "Нажми 'F4' для продолжения диалога!"
+	},
+	{
+		"key": "You got the effect {STR} time {INT}sec.",
+		"value": "Получен бафф {STR} время {INT}сек."
+	},
+	{
+		"key": "You lost the effect {STR}.",
+		"value": "Закончен бафф {STR}."
+	},
+	{
+		"key": "Repair all items - FREE",
+		"value": "Починить предметы - БЕСПЛАТНО"
+	},
+	{
+		"key": "Shop :: {STR}",
+		"value": "Магазин :: {STR}"
+	},
+	{
+		"key": "List of completed quests",
+		"value": "Список завершеных квестов"
+	},
+	{
+		"key": "Active NPC for current quests",
+		"value": "Активные NPC в текущих квестах"
+	},
+	{
+		"key": "Your mailbox is empty",
+		"value": "Ваш почтовый ящик пуст"
+	},
+	{
+		"key": "Available aethers",
+		"value": "Доступные эфиры"
+	},
+	{
+		"key": "Move to Guild House - free",
+		"value": "Переместится в дом гильдии"
+	},
+	{
+		"key": "Move to Your House - free",
+		"value": "Переместится в личный дом"
+	},
+	{
+		"key": "Inventory Select List",
+		"value": "Инвентарь выбери список"
+	},
+	{
+		"key": "Used ({INT})",
+		"value": "Используемые ({INT})"
+	},
+	{
+		"key": "Craft ({INT})",
+		"value": "Крафт ({INT})"
+	},
+	{
+		"key": "Modules ({INT})",
+		"value": "Модули ({INT})"
+	},
+	{
+		"key": "Potion ({INT})",
+		"value": "Зелья ({INT})"
+	},
+	{
+		"key": "Other ({INT})",
+		"value": "Прочие ({INT})"
+	},
+	{
+		"key": "Story dungeon's",
+		"value": "Сюжетные темницы"
+	},
+	{
+		"key": "Alternative story dungeon's",
+		"value": "Альтернативные сюжетные темницы"
+	},
+	{
+		"key": "You are already in this dungeon!",
+		"value": "Вы уже находитесь в этой темнице!"
+	},
+	{
+		"key": "At the moment players are passing this dungeon!",
+		"value": "В данный момент кто-то проходит эту тенмицу!"
+	},
+	{
+		"key": "Your level is low to pass this dungeon!",
+		"value": "Ваш уровень мал для начала этой темницы!"
+	},
+	{
+		"key": "{STR} joined to Dungeon {STR}!",
+		"value": "{STR} присоеденился к Темнице {STR}!"
+	},
+	{
+		"key": "You can vote for the choice of tank (Dungeon Tab)!",
+		"value": "Вы можете голосовать за выбор танка (Dungeon Tab)!"
+	},
+	{
+		"key": "You can't vote for yourself!",
+		"value": "Вы не можете голосовать за себя!"
+	},
+	{
+		"key": "You already voted!",
+		"value": "Вы уже проголосовали!"
+	},
+	{
+		"key": "{STR} voted for {STR}.",
+		"value": "{STR} проголосовал за {STR}."
 	}
 ]}

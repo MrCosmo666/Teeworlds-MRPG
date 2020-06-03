@@ -200,7 +200,7 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 
 		if(pPlayer->GetTempData().TempAlreadyVotedDungeon)
 		{
-			GS()->Chat(ClientID, "Have you already voted!");
+			GS()->Chat(ClientID, "You already voted!");
 			GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 			return true;
 		}

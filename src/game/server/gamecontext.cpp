@@ -1823,8 +1823,8 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 	if (Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList, true))
 	{
-		m_apPlayers[ClientID]->m_Colored = { 20,7,15 };
-		AV(ClientID, "null", "The main menu will return as soon as you leave this zone!");
+		m_apPlayers[ClientID]->m_Colored = { 20, 7, 15 };
+		AVL(ClientID, "null", "The main menu will return as soon as you leave this zone!");
 		return;
 	}
 
@@ -1837,8 +1837,8 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVH(ClientID, TAB_STAT, GREEN_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().LastLogin);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Discord: \"{STR}\". Ideas, bugs, rewards", g_Config.m_SvDiscordInviteGroup);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Level {INT} : Exp {INT}/{INT}", &pPlayer->Acc().Level, &pPlayer->Acc().Exp, &ExpForLevel);
-		AVM(ClientID, "null", NOPE, TAB_STAT, "Money {INT} gold", &pPlayer->GetItem(itGold).Count);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Skill Point {INT}SP", &pPlayer->GetItem(itSkillPoint).Count);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Gold: {INT}", &pPlayer->GetItem(itGold).Count);
 		AV(ClientID, "null", "");
 
 		// меню персонал
@@ -1948,7 +1948,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	else if (MenuList == MenuList::MENU_TOP_LIST)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
-		AVH(ClientID, TAB_INFO_TOP, GREEN_COLOR, "Top list Information");
+		AVH(ClientID, TAB_INFO_TOP, GREEN_COLOR, "Ranking Information");
 		AVM(ClientID, "null", NOPE, TAB_INFO_TOP, "Here you can see top server Guilds, Players.");
 		AV(ClientID, "null", "");
 

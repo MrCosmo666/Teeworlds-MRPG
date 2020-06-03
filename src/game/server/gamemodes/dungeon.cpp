@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
 #include <engine/shared/config.h>
+#include <teeother/system/string.h>
 #include <game/server/gamecontext.h>
 
 #include <game/server/mmocore/GameEntities/jobitems.h>
@@ -95,19 +96,23 @@ void CGameControllerDungeon::ChangeState(int State)
 		SetMobsSpawn(false);
 
 		// элемент RACE
+		int Seconds = -1;
+		dynamic_string Buffer;
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			if (!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID)
 				continue;
 
-			const int Seconds = GS()->m_apPlayers[i]->GetTempData().TempTimeDungeon / Server()->TickSpeed();
+			Buffer.append(", ");
+			Buffer.append(Server()->ClientName(i));
+			Seconds = GS()->m_apPlayers[i]->GetTempData().TempTimeDungeon / Server()->TickSpeed();
 			GS()->Mmo()->Dungeon()->SaveDungeonRecord(GS()->m_apPlayers[i], m_DungeonID, Seconds);
 			GS()->m_apPlayers[i]->GetTempData().TempTimeDungeon = 0;
-
-			char aTimeFormat[64];
-			str_format(aTimeFormat, sizeof(aTimeFormat), "Time: %d minute(s) %d second(s)", Seconds / 60, Seconds - (Seconds / 60 * 60));
-			GS()->Chat(-1, "{STR} finished {STR} {STR}", Server()->ClientName(i), DungeonJob::Dungeon[m_DungeonID].Name, aTimeFormat);
 		}
+		char aTimeFormat[64];
+		str_format(aTimeFormat, sizeof(aTimeFormat), "Time: %d minute(s) %d second(s)", Seconds / 60, Seconds - (Seconds / 60 * 60));
+		GS()->Chat(-1, "Group{STR}!", Buffer.buffer());
+		GS()->Chat(-1, "{STR} finished {STR}!", DungeonJob::Dungeon[m_DungeonID].Name, aTimeFormat);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -

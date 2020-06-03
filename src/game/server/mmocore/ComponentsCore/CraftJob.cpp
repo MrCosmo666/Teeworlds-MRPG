@@ -149,7 +149,7 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 		char aBuf[48];
 		int ItemLeft = SearchCount - pPlayer->GetItem(SearchItemID).Count;
 		str_format(aBuf, sizeof(aBuf), "%sx%d ", GS()->GetItemInfo(SearchItemID).GetName(pPlayer), ItemLeft);
-		Buffer.append_at(Buffer.length(), aBuf);
+		Buffer.append((const char*)aBuf);
 	}
 	if(Buffer.length() > 0) 
 	{

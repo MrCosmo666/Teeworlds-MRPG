@@ -500,19 +500,19 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		int SizeItems;
 		GS()->AVH(ClientID, TAB_INVENTORY_SELECT, RED_COLOR, "Inventory Select List");
 		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_USED); 
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_USED, TAB_INVENTORY_SELECT, "Used Items ({INT})", &SizeItems);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_USED, TAB_INVENTORY_SELECT, "Used ({INT})", &SizeItems);
 
 		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_CRAFT);
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_CRAFT, TAB_INVENTORY_SELECT, "Craft Items ({INT})", &SizeItems);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_CRAFT, TAB_INVENTORY_SELECT, "Craft ({INT})", &SizeItems);
 		
 		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_MODULE);
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_MODULE, TAB_INVENTORY_SELECT, "Modules Items ({INT})", &SizeItems);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_MODULE, TAB_INVENTORY_SELECT, "Modules ({INT})", &SizeItems);
 
 		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_POTION);
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_POTION, TAB_INVENTORY_SELECT, "Potion Items ({INT})", &SizeItems);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_POTION, TAB_INVENTORY_SELECT, "Potion ({INT})", &SizeItems);
 
 		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_OTHER);
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_OTHER, TAB_INVENTORY_SELECT, "Other Items ({INT})", &SizeItems);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_OTHER, TAB_INVENTORY_SELECT, "Other ({INT})", &SizeItems);
 		if (pPlayer->m_SortTabs[SORTINVENTORY])	
 			ListInventory(pPlayer, pPlayer->m_SortTabs[SORTINVENTORY]);
 

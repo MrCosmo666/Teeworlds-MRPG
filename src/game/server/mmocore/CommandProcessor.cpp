@@ -1,6 +1,7 @@
 #include <engine/shared/config.h>
 #include <engine/server.h>
 
+#include <teeother/components/localization.h>
 #include "game/server/gamecontext.h"
 #include "CommandProcessor.h"
 
@@ -234,7 +235,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		return;
 	}
 
-	/*else if(!strncmp(Msg->m_pMessage, "/lang", 5))
+	else if(str_comp_num(Msg->m_pMessage, "/lang", 5) == 0)
 	{	
 		char pLanguageCode[128];
 		char aFinalLanguageCode[8];
@@ -242,15 +243,10 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 
 		if(sscanf(Msg->m_pMessage, "/lang %s", pLanguageCode) == 1)
 		{ 
-			if(str_comp_num_nocase(pLanguageCode, "ua") == 0)
-				str_copy(aFinalLanguageCode, "uk", sizeof(aFinalLanguageCode));
-			else
+			for(int i=0; i < GS->Server()->Localization()->m_pLanguages.size(); i++)
 			{
-				for(int i=0; i< GS->Server()->Localization()->m_pLanguages.size(); i++)
-				{
-					if(str_comp_num_nocase(pLanguageCode, GS->Server()->Localization()->m_pLanguages[i]->GetFilename()) == 0)
-						str_copy(aFinalLanguageCode, pLanguageCode, sizeof(aFinalLanguageCode));
-				}
+				if(str_comp_nocase(pLanguageCode, GS->Server()->Localization()->m_pLanguages[i]->GetFilename()) == 0)
+					str_copy(aFinalLanguageCode, pLanguageCode, sizeof(aFinalLanguageCode));
 			}
 		}
 		
@@ -258,31 +254,32 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		{
 			GS->Server()->SetClientLanguage(ClientID, aFinalLanguageCode);
 			if(pPlayer)
+			{
 				pPlayer->SetLanguage(aFinalLanguageCode);
-				
-			if(GS->Server()->ISCientLogged(ClientID)) GS->ResetVotes(ClientID, AUTH);
-			else GS->ResetVotes(ClientID, NOAUTH);
+				GS->ResetVotes(ClientID, MenuList::MAIN_MENU);
+			}
 		}
 		else
 		{
 			const char* pLanguage = pPlayer->GetLanguage();
 			dynamic_string BufferList;
 			int BufferIter = 0;
-			for(int i=0; i< GS->Server()->Localization()->m_pLanguages.size(); i++)
+			for(int i=0; i < GS->Server()->Localization()->m_pLanguages.size(); i++)
 			{
-				if(i>0)
+				if(i > 0)
 					BufferIter = BufferList.append_at(BufferIter, ", ");
 				BufferIter = BufferList.append_at(BufferIter, GS->Server()->Localization()->m_pLanguages[i]->GetFilename());
 			}
 			
 			dynamic_string Buffer;
-			GS->Server()->Localization()->Format_L(Buffer, pLanguage, _("Available languages: {str:ListOfLanguage}"), 
-				"ListOfLanguage", BufferList.buffer(), NULL);
-			GS->SendChatTarget(pPlayer->GetCID(), Buffer.buffer());
+			GS->Server()->Localization()->Format_L(Buffer, pLanguage, "Available languages: {STR}", BufferList.buffer());
+			GS->Chat(pPlayer->GetCID(), Buffer.buffer());
 			Buffer.clear();
 		}
+
+		dbg_msg("test", "%s", GS->Server()->GetClientLanguage(ClientID));
 		return;
-	}*/
+	}
  
 	if(str_comp_num(Msg->m_pMessage, "/", 1) == 0)
 	{
