@@ -1,0 +1,270 @@
+{"translation":[
+	{
+		"key": "The main menu will return as soon as you leave this zone!",
+		"value": "Das Menü kehrt nach dem verlassen der Zone zurück!"
+	},
+	{
+		"key": "Hi, {STR} Last log in {STR}",
+		"value": "Hi, {STR} Last log in {STR}"
+	},
+	{
+		"key": "Discord: \"{STR}\". Ideas, bugs, rewards",
+		"value": "Discord: \"{STR}\". Ideas, bugs, rewards"
+	},
+	{
+		"key": "Level {INT} : Exp {INT}/{INT}",
+		"value": "Ebene {INT}: Erfahrung {INT}/{INT}"
+	},
+	{
+		"key": "Skill Point {INT}SP",
+		"value": "Skill Point {INT}SP"
+	},
+	{
+		"key": "Gold: {INT}",
+		"value": "Gold: {INT}"
+	},
+	{
+		"key": "☪ SUB MENU PERSONAL",
+		"value": "☪ PERSÖNLICHES MENÜ"
+	},
+	{
+		"key": "Inventory",
+		"value": "Inventar"
+	},
+	{
+		"key": "Equipment",
+		"value": "Ausrüstung"
+	},
+	{
+		"key": "Upgrades({INT}p)",
+		"value": "Verbesserungen({INT}p)"
+	},
+	{
+		"key": "Dungeons",
+		"value": "Dungeons"
+	},
+	{
+		"key": "Settings",
+		"value": "Einstellungen"
+	},
+	{
+		"key": "Mailbox",
+		"value": "Postfach"
+	},
+	{
+		"key": "Journal",
+		"value": "Zeitschrift"
+	},
+	{
+		"key": "Guild",
+		"value": "Gilde"
+	},
+	{
+		"key": "House",
+		"value": "Haus"
+	},
+	{
+		"key": "√ SUB MENU INFORMATION",
+		"value": "√ MENÜ INFORMATIONEN"
+	},
+	{
+		"key": "Loots, mobs on your zone",
+		"value": "Loot, Mobs in deiner Zone"
+	},
+	{
+		"key": "Ranking guilds and players",
+		"value": "Gilden-und spielerbewertung"
+	},
+	{
+		"key": "Upgrades Information",
+		"value": "Verbesserungen info"
+	},
+	{
+		"key": "Select upgrades type in Reason, write count.",
+		"value": "Select upgrades type in Reason, write count."
+	},
+	{
+		"key": "Disciple of War. Level Power {INT}",
+		"value": "Disciple of War. Level Power {INT}"
+	},
+	{
+		"key": "Disciple of Tank. Level Power {INT}",
+		"value": "Disciple of Tank. Level Power {INT}"
+	},
+	{
+		"key": "Disciple of Healer. Level Power {INT}",
+		"value": "Disciple of Healer. Level Power {INT}"
+	},
+	{
+		"key": "Disciple of Jobs",
+		"value": "Disciple of Jobs"
+	},
+	{
+		"key": "{STR} {INT}P (Price {INT}P)",
+		"value": "{STR} {INT}P (Preis {INT}P)"
+	},
+	{
+		"key": "Ranking Information",
+		"value": "Ranking Informationen"
+	},
+	{
+		"key": "Here you can see top server Guilds, Players.",
+		"value": "Here you can see top server Guilds, Players."
+	},
+	{
+		"key": "Top 10 guilds leveling",
+		"value": "Top 10 Gilden nach Level"
+	},
+	{
+		"key": "Top 10 guilds wealthy",
+		"value": "Top 10 Gilden nach Gold"
+	},
+	{
+		"key": "Top 10 players leveling",
+		"value": "Top 10 Spieler nach Level"
+	},
+	{
+		"key": "Chance & Loot Information",
+		"value": "Chance & Beute Informationen"
+	},
+	{
+		"key": "Here you can see chance loot, mobs, on YOUR ZONE.",
+		"value": "Here you can see chance loot, mobs, on YOUR ZONE."
+	},
+	{
+		"key": "There are no active mobs in your zone!",
+		"value": "Es gibt keine aktiven Mobs in deiner Zone!"
+	},
+	{
+		"key": "Backpage",
+		"value": "Zurückkehren"
+	},
+	{
+		"key": "Player Stats {STR}",
+		"value": "Player Stats {STR}"
+	},
+	{
+		"key": "Player Upgrade Point: {INT}P",
+		"value": "Player Upgrade Point: {INT}P"
+	},
+	{
+		"key": "You have {INT} {STR}",
+		"value": "Bei euch {INT} {STR}"
+	},
+	{
+		"key": "Use it when you're not dead!",
+		"value": "Verwenden Sie dies, wenn Sie am Leben sind!"
+	},
+	{
+		"key": "Level UP. Now Level {INT}!",
+		"value": "Stufe erhöht. Ebene {INT}!"
+	},
+	{
+		"key": "Press 'F4' to continue the dialog!",
+		"value": "Drücken Sie 'F4', um den Dialog fortzusetzen!"
+	},
+	{
+		"key": "You got the effect {STR} time {INT}sec.",
+		"value": "Empfangen buff {STR} Zeit {INT}Sekunden."
+	},
+	{
+		"key": "You lost the effect {STR}.",
+		"value": "Beendet buff {STR}."
+	},
+	{
+		"key": "Repair all items - FREE",
+		"value": "Gegenstände reparieren-KOSTENLOS"
+	},
+	{
+		"key": "Shop :: {STR}",
+		"value": "Geschäft :: {STR}"
+	},
+	{
+		"key": "List of completed quests",
+		"value": "Liste der abgeschlossenen Quests"
+	},
+	{
+		"key": "Active NPC for current quests",
+		"value": "Aktive NPCs in aktuellen Quests"
+	},
+	{
+		"key": "Your mailbox is empty",
+		"value": "Ihr Posteingang ist leer"
+	},
+	{
+		"key": "Available aethers",
+		"value": "Verfügbare Ester"
+	},
+	{
+		"key": "Move to Guild House - free",
+		"value": "Umzug ins Gildehaus"
+	},
+	{
+		"key": "Move to Your House - free",
+		"value": "Umzug ins Privathaus"
+	},
+	{
+		"key": "Inventory Select List",
+		"value": "Inventar wählen Sie eine Liste"
+	},
+	{
+		"key": "Used ({INT})",
+		"value": "Verwendbar ({INT})"
+	},
+	{
+		"key": "Craft ({INT})",
+		"value": "Handwerk ({INT})"
+	},
+	{
+		"key": "Modules ({INT})",
+		"value": "Modules ({INT})"
+	},
+	{
+		"key": "Potion ({INT})",
+		"value": "Trank ({INT})"
+	},
+	{
+		"key": "Other ({INT})",
+		"value": "Ander ({INT})"
+	},
+	{
+		"key": "Story dungeon's",
+		"value": "Story dungeon's"
+	},
+	{
+		"key": "Alternative story dungeon's",
+		"value": "Alternative story dungeon's"
+	},
+	{
+		"key": "You are already in this dungeon!",
+		"value": "Sie sind bereits in diesem Verlies!"
+	},
+	{
+		"key": "At the moment players are passing this dungeon!",
+		"value": "Im Moment passiert jemand diese dungeon!"
+	},
+	{
+		"key": "Your level is low to pass this dungeon!",
+		"value": "Ihr Niveau ist klein, um dieses Verlies zu starten!"
+	},
+	{
+		"key": "{STR} joined to Dungeon {STR}!",
+		"value": "{STR} dem Kerker beigetreten {STR}!"
+	},
+	{
+		"key": "You can vote for the choice of tank (Dungeon Tab)!",
+		"value": "Sie können für die Wahl des Tanks (Dungeon Tab) Stimmen!"
+	},
+	{
+		"key": "You can't vote for yourself!",
+		"value": "Sie können nicht für sich selbst Stimmen!"
+	},
+	{
+		"key": "You already voted!",
+		"value": "Sie haben bereits gewählt!"
+	},
+	{
+		"key": "{STR} voted for {STR}.",
+		"value": "{STR} gestimmt für {STR}."
+	}
+]}

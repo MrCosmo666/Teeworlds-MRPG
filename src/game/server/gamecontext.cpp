@@ -1356,7 +1356,6 @@ void CGS::OnClientEnter(int ClientID)
 	{
 		// информируем о смене команды
 		SendTeam(ClientID, TEAM_SPECTATORS, false, -1);
-
 		// информация
 		Chat(ClientID, "- - - - - - - [Welcome to MRPG] - - - - - - -");
 		Chat(ClientID, "You need to create an account, or log in if you already have.");
@@ -1365,6 +1364,7 @@ void CGS::OnClientEnter(int ClientID)
 		SendDayInfo(ClientID);
 		
 		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "connected and enter in MRPG");
+		ResetVotesNewbieInformation(ClientID);
 		return;
 	}
 
@@ -1827,7 +1827,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVL(ClientID, "null", "The main menu will return as soon as you leave this zone!");
 		return;
 	}
-
+	
 	if(MenuList == MenuList::MAIN_MENU)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
@@ -1996,6 +1996,52 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	}
 		
 	Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList, false);
+}
+
+// Информация для неавтаризованных
+void CGS::ResetVotesNewbieInformation(int ClientID)
+{
+	CPlayer *pPlayer = GetPlayer(ClientID);
+	if(!pPlayer)
+		return;
+		
+	AVL(ClientID, "null", "#### Hi, new adventurer! ####");
+	AVL(ClientID, "null", "This server is a mmo server. You'll have to finish");
+	AVL(ClientID, "null", "quests to continue the game. In these quests,");
+	AVL(ClientID, "null", "you'll have to get items to give to quest npcs.");
+	AVL(ClientID, "null", "To get a quest, you need to talk to NPCs.");
+	AVL(ClientID, "null", "You talk to them by hammering them.");
+	AVL(ClientID, "null", "You give these items by talking them again. ");
+	AVL(ClientID, "null", "Hearts and Shields around you show the position");
+	AVL(ClientID, "null", "quests' npcs. Hearts show Main quest, Shields show Others.");
+	AVL(ClientID, "null", "Don't ask other people to give you the items,");
+	AVL(ClientID, "null", "but you can ask for some help. Keep in mind that");
+	AVL(ClientID, "null", "it is hard for everyone too. You can see that your shield");
+	AVL(ClientID, "null", "(below your health bar) doesn't protect you,");
+	AVL(ClientID, "null", "it's because it's not shield, it's mana.");
+	AVL(ClientID, "null", "It is used for active skills, which you will need to buy");
+	AVL(ClientID, "null", "in the future. Active skills use mana, but they use \% of mana.");
+	AV(ClientID, "null", "");
+	AVL(ClientID, "null", "#### Some Informations ####");
+	AVL(ClientID, "null", "Brown Slimes drop Glue and Gel (lower chance to drop Gel)");
+	AVL(ClientID, "null", "Green Slimes drop Glue");
+	AVL(ClientID, "null", "Blue Slimes drop Gel");
+	AVL(ClientID, "null", "Pink Slime drop 3 Gels and 3 Glue");
+	AVL(ClientID, "null", "Goblins drop Goblin Ingots");
+	AVL(ClientID, "null", "Orc Warrior drop Goblin Ingot and Torn Cloth Clothes of Orc");
+	AVL(ClientID, "null", "- A more accurate drop can be found in the menu");
+	AV(ClientID, "null", "");
+	AVL(ClientID, "null", "#### The upgrades now ####");
+	AVL(ClientID, "null", "- Strength : Damage");
+	AVL(ClientID, "null", "- Dexterity : Shooting speed");
+	AVL(ClientID, "null", "- Crit Dmg : Damage dealt by critical hits");
+	AVL(ClientID, "null", "- Direct Crit Dmg : Critical chance");
+	AVL(ClientID, "null", "- Hardness : Health");
+	AVL(ClientID, "null", "- Lucky : Chance to avoid damage");
+	AVL(ClientID, "null", "- Piety : Mana");
+	AVL(ClientID, "null", "- Vampirism : Damage dealt converted into health");
+	AVL(ClientID, "null", "All things you need is in Vote.");
+	AVL(ClientID, "null", "Good game !");
 }
 
 // Созданно для апдейта меню если именно оно находится в открытых

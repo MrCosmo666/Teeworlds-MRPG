@@ -263,6 +263,7 @@ public:
 	void AVMI(int To, const char *Icon, const char *Type, const int ID, const int HideID, const char *pText, ...);
 	void AVD(int To, const char* Type, const int ID, const int ID2, const int HideID, const char* pText, ...);
 
+	void ResetVotesNewbieInformation(int ClientID);
 	void ResetVotes(int ClientID, int MenuList);
 	void VResetVotes(int ClientID, int MenuID);
 	void AddBack(int ClientID);

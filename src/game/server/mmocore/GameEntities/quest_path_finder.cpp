@@ -23,7 +23,7 @@ void CQuestPathFinder::Tick()
 	CPlayer* pPlayer = GS()->GetPlayer(m_ClientID, true, true);
 	if (m_TargetPos == vec2(0.0f, 0.0f) || !pPlayer || QuestJob::Quests[m_ClientID][m_QuestID].Progress != m_QuestProgress || QuestJob::Quests[m_ClientID][m_QuestID].State != QuestState::QUEST_ACCEPT)
 	{
-		GS()->m_World.DestroyEntity(this);
+		Finish();
 		return;
 	}
 	vec2 Direction = normalize(GS()->m_apPlayers[m_ClientID]->GetCharacter()->m_Core.m_Pos - m_TargetPos);
@@ -32,7 +32,10 @@ void CQuestPathFinder::Tick()
 
 void CQuestPathFinder::Finish()
 {
-	GS()->CreateDeath(m_Pos, m_ClientID);
+	if(GS()->GetPlayer(m_ClientID, true, true))
+	{
+		GS()->CreateDeath(m_Pos, m_ClientID);
+	}
 	GS()->m_World.DestroyEntity(this);
 	return;
 }
