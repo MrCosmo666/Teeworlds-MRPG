@@ -334,7 +334,29 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 	Msg.m_TargetID = -1;
 
 	if(Mode == CHAT_ALL)
+	{
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
+		ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
+	}
+	else if(Mode == CHAT_TEAM)
+	{
+		const int GuildID = m_apPlayers[ChatterClientID]->Acc().GuildID;
+		if(GuildID <= 0)
+		{
+			Chat(ChatterClientID, "This chat is intended for team / guilds!");
+			return;
+		}
+
+		// pack one for the recording only
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOSEND, -1);
+		ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
+		for(int i = 0; i < MAX_PLAYERS; i++)
+		{
+			CPlayer *pSearchPlayer = GetPlayer(i, true);
+			if(pSearchPlayer && pSearchPlayer->Acc().GuildID == GuildID)
+				Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, i);
+		}
+	}
 	else if(Mode == CHAT_WHISPER)
 	{
 		Msg.m_TargetID = To;
@@ -1131,7 +1153,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 			pPlayer->m_PlayerTick[TickState::LastChat] = Server()->Tick();
 
-			int Mode = pMsg->m_Mode;
+			const int Mode = pMsg->m_Mode;
 			if(Mode != CHAT_NONE)
 			{
 				// команды сервера
@@ -1144,10 +1166,6 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 				// отправить обычное сообщение в чат
 				SendChat(ClientID, Mode, pMsg->m_Target, pMsg->m_pMessage);						
-
-				// отправить чат дискорд пропуская Whisper
-				if(Mode != CHAT_WHISPER)
-					ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ClientID), pMsg->m_pMessage);
 			}
 		}
 		else if (MsgID == NETMSGTYPE_CL_COMMAND)
@@ -2020,7 +2038,7 @@ void CGS::ResetVotesNewbieInformation(int ClientID)
 	AVL(ClientID, "null", "(below your health bar) doesn't protect you,");
 	AVL(ClientID, "null", "it's because it's not shield, it's mana.");
 	AVL(ClientID, "null", "It is used for active skills, which you will need to buy");
-	AVL(ClientID, "null", "in the future. Active skills use mana, but they use \% of mana.");
+	AVL(ClientID, "null", "in the future. Active skills use mana, but they use %% of mana.");
 	AV(ClientID, "null", "");
 	AVL(ClientID, "null", "#### Some Informations ####");
 	AVL(ClientID, "null", "Brown Slimes drop Glue and Gel (lower chance to drop Gel)");
