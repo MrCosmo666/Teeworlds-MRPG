@@ -435,38 +435,33 @@ namespace SleepyDiscord
 	{
 		setError(code);
 
-		switch (code) {
-		//Just reconnect
-		case 1006:
-		case UNKNOWN_ERROR:
-		case UNKNOWN_OPCODE:
-		case DECODE_ERROR:
-		case NOT_AUTHENTICATED:
-		case ALREADY_AUTHENTICATED:
-		case RATE_LIMITED:
-		case SESSION_TIMEOUT:
-		default:
-			break;
-
-		case SESSION_NO_LONGER_VALID:
-		case INVALID_SEQ:
-		case 1000:
-			if (!isQuiting()) 
-			{
-				//restart with new session
-				sessionID = {};
-				lastSReceived = 0;
+		switch (code) 
+		{
+			case 1006:
+			case UNKNOWN_ERROR:
+			case UNKNOWN_OPCODE:
+			case DECODE_ERROR:
+			case NOT_AUTHENTICATED:
+			case ALREADY_AUTHENTICATED:
+			case RATE_LIMITED:
+			case SESSION_TIMEOUT:
+			default:
 				break;
-			}
-			//else fall through
 
-		//Might be Unrecoveralbe
-		//We may need to stop to prevent a restart loop.
-		case AUTHENTICATION_FAILED:
-		case INVALID_SHARD:
-		case SHARDING_REQUIRED:
-			return quit(false, true);
-			break;
+			case SESSION_NO_LONGER_VALID:
+			case INVALID_SEQ:
+			case 1000:
+				if (!isQuiting()) 
+				{
+					sessionID = {};
+					lastSReceived = 0;
+					break;
+				}
+
+			case AUTHENTICATION_FAILED:
+			case INVALID_SHARD:
+			case SHARDING_REQUIRED:
+				break;
 		}
 		resetHeartbeatValues();
 		reconnect(1001);

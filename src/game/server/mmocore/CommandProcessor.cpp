@@ -231,6 +231,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		GS->ChatFollow(ClientID, "Command List / Help");
 		GS->ChatFollow(ClientID, "/register <name> <pass> - new account.");
 		GS->ChatFollow(ClientID, "/login <name> <pass> - log in account.");
+		GS->ChatFollow(ClientID, "/lang <codes iso> - language (translation is not complete).");
 		GS->ChatFollow(ClientID, "Another information see Wiki Page.");
 		return;
 	}
