@@ -103,7 +103,7 @@ public:
 	class IGameServer *GameServer(int id = 0) { return m_pGameServer[id]; }
 	class IConsole *Console() { return m_pConsole; }
 	class IStorage *Storage() { return m_pStorage; }
-	class DiscordJob *m_pDiscord;
+	DiscordJob *m_pDiscord;
 
 	enum
 	{

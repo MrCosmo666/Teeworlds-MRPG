@@ -19,52 +19,74 @@ namespace SleepyDiscord {
 
 	void WebsocketppDiscordClient::init() 
 	{
-		// set up access channels to only log interesting things
-		this_client.clear_access_channels(websocketpp::log::alevel::all);
-		this_client.set_access_channels(websocketpp::log::alevel::connect);
-		this_client.set_access_channels(websocketpp::log::alevel::disconnect);
-		this_client.set_access_channels(websocketpp::log::alevel::app);
-		this_client.set_tls_init_handler([](websocketpp::connection_hdl) 
+		try 
 		{
-			return websocketpp::lib::make_shared<asio::ssl::context>(asio::ssl::context::tlsv1);
-		});
+			// set up access channels to only log interesting things
+			this_client.clear_access_channels(websocketpp::log::alevel::all);
+			this_client.set_access_channels(websocketpp::log::alevel::connect);
+			this_client.set_access_channels(websocketpp::log::alevel::disconnect);
+			this_client.set_access_channels(websocketpp::log::alevel::app);
+		
+			// Initialize the Asio transport policy
+			this_client.init_asio();	
+			this_client.set_tls_init_handler([](websocketpp::connection_hdl) 
+			{
+				return websocketpp::lib::make_shared<asio::ssl::context>(asio::ssl::context::tlsv1);
+			});
 
-		// Initialize the Asio transport policy
-		this_client.init_asio();
-		this_client.set_message_handler(std::bind(&WebsocketppDiscordClient::onWebSocketMessage, this, websocketpp::lib::placeholders::_1, websocketpp::lib::placeholders::_2));
-		this_client.set_close_handler(std::bind(&WebsocketppDiscordClient::onClose, this, websocketpp::lib::placeholders::_1));
-		this_client.set_fail_handler(std::bind(&WebsocketppDiscordClient::onFail, this, websocketpp::lib::placeholders::_1));
+			this_client.set_message_handler(std::bind(&WebsocketppDiscordClient::onWebSocketMessage, this, websocketpp::lib::placeholders::_1, websocketpp::lib::placeholders::_2));
+			this_client.set_close_handler(std::bind(&WebsocketppDiscordClient::onClose, this, websocketpp::lib::placeholders::_1));
+			this_client.set_fail_handler(std::bind(&WebsocketppDiscordClient::onFail, this, websocketpp::lib::placeholders::_1));    
+		}
+		catch (websocketpp::exception const & er)
+		{
+			onError(GENERAL_ERROR, er.what());
+		}
 	}
 
 	bool WebsocketppDiscordClient::connect(const std::string & uri) 
 	{
-		// Create a new connection to the given URI
-		websocketpp::lib::error_code ec;
-		// Note: there's might be a memory leak caused by get_connection
-		_client::connection_ptr con = this_client.get_connection(uri, ec);
-
-		if (ec) 
+		try 
 		{
-			onError(GENERAL_ERROR, "Connect initialization: " + ec.message());
-			return false;
-		}
-		// Grab a handle for this connection so we can talk to it in a thread 
-		// safe manor after the event loop starts.
-		handle = con->get_handle();
+			// Create a new connection to the given URI
+			websocketpp::lib::error_code ec;
+			// Note: there's might be a memory leak caused by get_connection
+			_client::connection_ptr con = this_client.get_connection(uri, ec);
 
-		// Queue the connection. No DNS queries or network connections will be
-		// made until the io_service event loop is run.
-		this_client.connect(con);
+			if (ec) 
+			{
+				onError(GENERAL_ERROR, "Connect initialization: " + ec.message());
+				return false;
+			}
+			// Grab a handle for this connection so we can talk to it in a thread 
+			// safe manor after the event loop starts.
+			handle = con->get_handle();
+
+			// Queue the connection. No DNS queries or network connections will be
+			// made until the io_service event loop is run.
+			this_client.connect(con);		
+		}
+		catch (websocketpp::exception const & er)
+		{
+			onError(GENERAL_ERROR, er.what());
+		}
 		return true;
 	}
 
 	void WebsocketppDiscordClient::run() 
 	{
-		do 
+		try 
 		{
-			this_client.run();
-		} 
-		while (!isQuiting());
+			do 
+			{
+				this_client.run();
+			}
+			while (!isQuiting());
+		}
+		catch (websocketpp::exception const & er)
+		{
+			onError(GENERAL_ERROR, er.what());
+		}
 	}
 
 	void handleTimers(const websocketpp::lib::error_code &ec, std::function<void()>& code) 
