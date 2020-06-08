@@ -51,7 +51,7 @@ void CMenus::RenderSettingsMmo(CUIRect MainView)
 
 	// рисуем меню вкладок
 	const int TAB_SIZE = 4;
-	const char* Tabs[TAB_SIZE] = { "Visual", "General", "Gamer", "Credits" };
+	const char* Tabs[TAB_SIZE] = { "General", "Visual", "Gamer", "Credits" };
 	const int Corner[TAB_SIZE] = { CUI::CORNER_TL, 0, 0, CUI::CORNER_TR };
 	for (int i = 0; i < TAB_SIZE; i++)
 	{
@@ -64,10 +64,12 @@ void CMenus::RenderSettingsMmo(CUIRect MainView)
 
 	// рисуем текст информации
 	MainView.HSplitTop(400.0f, &MainView, &Label);
-	const char* Information[TAB_SIZE] = { "Setting up the visual part of the client",
+	const char* Information[TAB_SIZE] = { 
 											"Setting up the general part of the client",
+											"Setting up the visual part of the client",
 											"Features of the Gamer(Dune)",
-											"Information & Credits" };
+											"Information & Credits" 
+										};
 	UI()->DoLabel(&Label, Information[s_SettingsPage], 14.0f, CUI::ALIGN_CENTER);
 	RenderSettingsMmoGeneral(MainView, s_SettingsPage);
 }
@@ -79,11 +81,8 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 	CUIRect Button;
 	RenderTools()->DrawUIRect4(&MainView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), 0, 5.0f);
 
-	// visual
-	if(Page == 0)
-		RenderMmoSettingsTexture(MainView, MainView);
 	// general
-	else if (Page == 1)
+	if (Page == 0)
 	{
 		CUIRect BasicLeft, BasicRight;
 		PreparationLeftRightSide("Basic settings", MainView, &BasicLeft, &BasicRight, Spacing, ButtonHeight);
@@ -144,6 +143,9 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		BasicRight.HSplitTop(ButtonHeight, &Button, &BasicRight);
 		DoScrollbarOption(&g_Config.m_ClDialogsSpeedNPC, &g_Config.m_ClDialogsSpeedNPC, &Button, Localize("Dialogs speed with NPC (MRPG)"), 50, 100, &LogarithmicScrollbarScale);
 	}
+	// visual
+	else if(Page == 1)
+		RenderMmoSettingsTexture(MainView, MainView);
 	// gamer dune
 	else if(Page == 2)
 	{

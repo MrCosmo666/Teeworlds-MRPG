@@ -71,9 +71,6 @@ int CPlayerBot::GetStartHealth()
 
 int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 {
-	if(CGS::AttributInfo.find(BonusID) == CGS::AttributInfo.end()) 
-		return 0;
-
 	if(m_BotType != BotsTypes::TYPE_BOT_MOB)
 		return 10;
 
@@ -84,7 +81,6 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 		const int ItemBonusCount = GS()->GetItemInfo(ItemID).GetStatsBonus(BonusID);
 		if (ItemID <= 0 || ItemBonusCount < 0)
 			continue;
-
 		Power += ItemBonusCount;
 	}
 

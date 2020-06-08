@@ -95,8 +95,8 @@ public:
 
 	// Основное
 	void ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction = false);
-	void GiveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant);
-	void RemoveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Count, int Settings);
+	int GiveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant);
+	int RemoveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings);
 	void ItemSelected(CPlayer *pPlayer, const InventoryItem& pPlayerItem, bool Dress = false);
 	int ActionItemCountAllowed(CPlayer* pPlayer, int ItemID);
 

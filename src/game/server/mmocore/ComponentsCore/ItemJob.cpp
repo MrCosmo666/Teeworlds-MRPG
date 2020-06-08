@@ -132,16 +132,16 @@ void ItemJob::ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction)
 }
 
 // Выдаем предмет обработка повторная
-void ItemJob::GiveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant)
+int ItemJob::GiveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant)
 {
-	// проверяем выдан ли и вправду предмет
 	const int ClientID = pPlayer->GetCID();
-	*SecureCode = SecureCheck(pPlayer, ItemID, Count, Settings, Enchant);
-	if(*SecureCode == 1)
+	const int SecureID = SecureCheck(pPlayer, ItemID, Count, Settings, Enchant);
+	if(SecureID == 1)
 	{
 		SJK.UD("tw_accounts_items", "Count = '%d', Settings = '%d', Enchant = '%d' WHERE ItemID = '%d' AND OwnerID = '%d'",
 			Items[ClientID][ItemID].Count, Items[ClientID][ItemID].Settings, Items[ClientID][ItemID].Enchant, ItemID, pPlayer->Acc().AuthID);
 	}
+	return SecureID;
 }
 
 // Выдаем предмет обработка первичная
@@ -168,11 +168,12 @@ int ItemJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, 
 }
 
 // удаляем предмет второстепенная обработка
-void ItemJob::RemoveItem(short *SecureCode, CPlayer *pPlayer, int ItemID, int Count, int Settings)
+int ItemJob::RemoveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings)
 {
-	*SecureCode = DeSecureCheck(pPlayer, ItemID, Count, Settings);
-	if(*SecureCode == 1)
+	const int SecureID = DeSecureCheck(pPlayer, ItemID, Count, Settings);
+	if(SecureID == 1)
 		SJK.UD("tw_accounts_items", "Count = Count - '%d', Settings = Settings - '%d' WHERE ItemID = '%d' AND OwnerID = '%d'", Count, Settings, ItemID, pPlayer->Acc().AuthID);
+	return SecureID;
 }
 
 // удаление предмета первостепенная обработка
@@ -773,11 +774,10 @@ bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 	}
 
 	// выдаем предмет
-	GameServer->Mmo()->Item()->GiveItem(&m_pPlayer->m_SecurCheckCode, m_pPlayer, itemid_, arg_count, (AutoEquip ? 1 : arg_settings), arg_enchant);
-	if(m_pPlayer->m_SecurCheckCode <= 0) 
+	const int Code = GameServer->Mmo()->Item()->GiveItem(m_pPlayer, itemid_, arg_count, (AutoEquip ? 1 : arg_settings), arg_enchant);
+	if(Code <= 0)
 		return false;
-
-	// отправить смену скина
+		
 	if(AutoEquip)
 	{
 		if(m_pPlayer->GetCharacter())
@@ -813,8 +813,8 @@ bool ItemJob::ClassItems::Remove(int arg_removecount, int arg_settings)
 		m_pPlayer->GS()->ChangeEquipSkin(ClientID, itemid_);
 	}
 
-	m_pPlayer->GS()->Mmo()->Item()->RemoveItem(&m_pPlayer->m_SecurCheckCode, m_pPlayer, itemid_, arg_removecount, arg_settings);
-	return (bool)(m_pPlayer->m_SecurCheckCode > 0);
+	const int Code = m_pPlayer->GS()->Mmo()->Item()->RemoveItem(m_pPlayer, itemid_, arg_removecount, arg_settings);
+	return (bool)(Code > 0);
 }
 
 bool ItemJob::ClassItems::SetSettings(int arg_settings)

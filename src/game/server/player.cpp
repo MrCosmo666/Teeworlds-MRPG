@@ -708,9 +708,6 @@ int CPlayer::GetEquippedItem(int EquipID, int SkipItemID) const
 // Общий уровень атрибутов Реальный и Обычный
 int CPlayer::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 {
-	if (CGS::AttributInfo.find(BonusID) == CGS::AttributInfo.end()) 
-		return 0;
-
 	// обычная передача если нет сохранения и нет процентов
 	int AttributEx = EnchantAttributes(BonusID);
 	const bool SaveData = (str_comp_nocase(CGS::AttributInfo[BonusID].FieldName, "unfield") != 0);
