@@ -153,9 +153,6 @@ public:
 	/* #########################################################################
 		FUNCTIONS PLAYER PARSING 
 	######################################################################### */
-	bool SetParsing(int Sec, int InviteID, int SaveInt, const char* Interact);
-	void ClearParsing(bool ClearVote = false, bool VotePass = true);
-	bool ParseInteractive(int Vote);
 	bool ParseItemsF3F4(int Vote);
   	bool ParseVoteUpgrades(const char *CMD, const int VoteID, const int VoteID2, int Get);
 

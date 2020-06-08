@@ -70,39 +70,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 
 /////////////////////////////////////// MEMBER COMMAN //////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////
-	else if(str_comp_num(Msg->m_pMessage, "/ginvite", 8) == 0)
-	{
-		if(!pPlayer->IsAuthed())
-			return;
-
-		// check leader account
-		if(pPlayer->Acc().GuildID > 0)
-		{
-			if(!IsLeaderPlayer(GS, pPlayer, GuildAccess::ACCESS_INVITE_KICK))
-				return GS->Chat(ClientID, "You have no access.");
-
-			int CID;
-			if(sscanf(Msg->m_pMessage, "/ginvite %d", &CID) != 1) 
-				return GS->Chat(ClientID, "Use: /ginvite <ClientID>");
-
-			CPlayer *pPlayerCID = GS->m_apPlayers[CID];
-			if(CID < 0 || CID > MAX_CLIENTS || !pPlayerCID || !pPlayerCID->IsAuthed() || ClientID == CID)
-				return GS->Chat(ClientID, "Not entered the correct ID of the player.");
-			
-			// check member group player		
-			if(pPlayerCID->Acc().GuildID > 0)
-				return GS->Chat(ClientID, "Player already in member group.");
-
-			// start parsing
-			int GuildID = pPlayer->Acc().GuildID;
-			if(pPlayerCID->SetParsing(10, ClientID, GuildID, "Member"))
-			{
-				GS->Chat(ClientID, "You invite in member {STR}.", GS->Server()->ClientName(CID));
-				GS->Chat(ClientID, "{STR} offered enter in member {STR}.", GS->Server()->ClientName(ClientID), GS->Mmo()->Member()->GuildName(GuildID));
-			}
-		}
-		return;
-	}
 	else if(str_comp_num(Msg->m_pMessage, "/gexit", 5) == 0)
 	{
 		if(!pPlayer->IsAuthed())

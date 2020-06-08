@@ -26,7 +26,6 @@
 #include <teeother/components/localization.h>
 
 std::map < int , CGS::StructAttribut > CGS::AttributInfo;
-std::map < int , CGS::StructParsing > CGS::Interactive;
 std::map < int , std::map < std::string , int > > CGS::Effects;
 int CGS::m_RaidExp = 100;
 
@@ -1196,7 +1195,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		else if(MsgID == NETMSGTYPE_CL_VOTE)
 		{
 			CNetMsg_Cl_Vote *pMsg = (CNetMsg_Cl_Vote *)pRawMsg;
-			if(pPlayer->ParseInteractive(pMsg->m_Vote))
+			if(pPlayer->ParseItemsF3F4(pMsg->m_Vote))
 				return;
 		}
 		else if(MsgID == NETMSGTYPE_CL_SETTEAM)
@@ -1491,9 +1490,6 @@ const char *CGS::NetVersion() const { return GAME_NETVERSION; }
 void CGS::ClearClientData(int ClientID)
 {
 	Mmo()->ResetClientData(ClientID);
-	if(Interactive.find(ClientID) != Interactive.end()) 
-		Interactive.erase(ClientID);
-
 	if(Effects.find(ClientID) != Effects.end()) 
 		Effects.erase(ClientID);
 

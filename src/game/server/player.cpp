@@ -27,7 +27,6 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 
 	if(!IsBot())
 	{
-		ClearParsing();
 		Acc().Team = GetStartTeam();
 	}
 }
@@ -124,22 +123,6 @@ void CPlayer::PostTick()
 // Тик авторизированного в ::Tick
 void CPlayer::TickOnlinePlayer()
 {
-	// интерактив принятия F3 или F4
-	if(CGS::Interactive[m_ClientID].ParsingLifeTick > 0)
-	{
-		CGS::Interactive[m_ClientID].ParsingLifeTick--;
-		if(!CGS::Interactive[m_ClientID].ParsingLifeTick)
-		{
-			const int SaveCID = CGS::Interactive[m_ClientID].ParsingClientID;
-			if(SaveCID >= 0 && SaveCID < MAX_PLAYERS && GS()->m_apPlayers[SaveCID])
-			{
-				GS()->Chat(SaveCID, "Your invite {STR} refused {STR}.", CGS::Interactive[m_ClientID].ParsingType, Server()->ClientName(m_ClientID));
-			}
-			GS()->Chat(m_ClientID, "Action {STR} timed out.", CGS::Interactive[m_ClientID].ParsingType);
-			ClearParsing(true, false);
-		}
-	}
-
 	TickSystemTalk();
 }
 
@@ -543,78 +526,6 @@ void CPlayer::ShowInformationStats()
 /* #########################################################################
 	FUNCTIONS PLAYER PARSING 
 ######################################################################### */
-// Создание нового действия приглашения
-bool CPlayer::SetParsing(int Sec, int InviteID, int SaveInt, const char* Interact)
-{
-	if(CGS::Interactive[m_ClientID].ParsingLifeTick >= 0 || InviteID < 0 || InviteID > MAX_PLAYERS || !GS()->m_apPlayers[InviteID])
-		return false;
-
-	CGS::Interactive[m_ClientID].ParsingLifeTick = Sec*m_pGS->Server()->TickSpeed();
-	CGS::Interactive[m_ClientID].ParsingClientID = InviteID;
-	CGS::Interactive[m_ClientID].ParsingSaveInt = SaveInt;
-	str_copy(CGS::Interactive[m_ClientID].ParsingType, Interact, sizeof(CGS::Interactive[m_ClientID].ParsingType));
-
-	char aBuf[64];
-	str_format(aBuf, sizeof(aBuf), "%s %s", Server()->ClientName(InviteID), Interact);
-
-	CNetMsg_Sv_VoteSet Msg;
-	Msg.m_Type = VOTE_UNKNOWN;
-	Msg.m_Timeout = Sec;
-	Msg.m_ClientID = m_ClientID;
-	Msg.m_pDescription = "";
-	Msg.m_pReason = aBuf;
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, m_ClientID);	
-	return true;
-}
-// Очиста парсинга приглашений
-void CPlayer::ClearParsing(bool ClearVote, bool VotePass)
-{
-	CGS::Interactive[m_ClientID].ParsingLifeTick = -1;
-	CGS::Interactive[m_ClientID].ParsingClientID = -1;
-	CGS::Interactive[m_ClientID].ParsingSaveInt = -1;
-	str_copy(CGS::Interactive[m_ClientID].ParsingType, "null", sizeof(CGS::Interactive[m_ClientID].ParsingType));
-	if(ClearVote)
-	{
-		CNetMsg_Sv_VoteSet Msg;
-		Msg.m_Type = VotePass ? (int)VOTE_END_PASS : (int)VOTE_END_FAIL;
-		Msg.m_Timeout = 0;
-		Msg.m_ClientID = m_ClientID;
-		Msg.m_pDescription = "";
-		Msg.m_pReason = "";
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, m_ClientID);	
-	}
-}
-// Парсинг F3 или F4 всех Приглашений
-bool CPlayer::ParseInteractive(int Vote)
-{
-	if(ParseItemsF3F4(Vote) || CGS::Interactive[m_ClientID].ParsingLifeTick < 0)
-		return false;
-
-	const int SaveCID = CGS::Interactive[m_ClientID].ParsingClientID;
-	CPlayer *pSavePlayer = GS()->m_apPlayers[SaveCID];
-	if(!pSavePlayer)
-		return false;
-
-	// проверяем если нажата F3
-	if(Vote == 1)
-	{
-		if(!str_comp(CGS::Interactive[m_ClientID].ParsingType, "Member"))
-		{
-			const int GuildID = CGS::Interactive[m_ClientID].ParsingSaveInt;
-			GS()->Mmo()->Member()->JoinGuild(Acc().AuthID, GuildID);
-		}
-		return true;
-	}
-	else // если игрок нажал F4
-	{
-		GS()->Chat(m_ClientID, "You refused the request player {STR}", Server()->ClientName(SaveCID));
-		GS()->Chat(SaveCID, "Player {STR} refused the request", Server()->ClientName(m_ClientID));
-		ClearParsing(true);
-		return true;
-	}
-	return false;
-}
-
 bool CPlayer::ParseItemsF3F4(int Vote)
 {
 	if (!m_pCharacter)

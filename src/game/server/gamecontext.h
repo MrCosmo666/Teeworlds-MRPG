@@ -34,6 +34,8 @@ class CGS : public IGameServer
 		VAR AND OBJECT GAMECONTEX DATA 
 	######################################################################### */
 	int m_WorldID;
+	int m_DungeonID;
+
 	int m_RespawnWorld;
 	class MmoController *pMmoController;
 
@@ -51,8 +53,6 @@ class CGS : public IGameServer
 	bool m_Resetting;
 
 	class CPathfinder* m_pPathFinder;
-	int m_DungeonID;
-
 public:
 	IServer *Server() const { return m_pServer; }
 	class IConsole *Console() { return m_pConsole; }
@@ -68,7 +68,7 @@ public:
 
 	CEventHandler m_Events;
 	CPlayer *m_apPlayers[MAX_CLIENTS];
-	class IGameController *m_pController;
+	IGameController *m_pController;
 	CGameWorld m_World;
 	CCommandManager m_CommandManager;
 	CCommandManager* CommandManager() { return &m_CommandManager; }
@@ -77,18 +77,6 @@ public:
 	/* #########################################################################
 		SWAP GAMECONTEX DATA 
 	######################################################################### */
-
-
-	// - - - - - - - - - - - -
-	struct StructParsing
-	{
-		int ParsingLifeTick;
-		int ParsingClientID;
-		int ParsingSaveInt;
-		char ParsingType[32];
-	};
-	static std::map < int, StructParsing > Interactive;
-
 	// - - - - - - - - - - - -
 	static std::map < int, std::map < std::string, int > > Effects;
 	// - - - - - - - - - - - -
