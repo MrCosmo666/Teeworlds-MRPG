@@ -1440,7 +1440,6 @@ void CMenus::RenderSettingsTee(CUIRect MainView)
 				g_Config.m_PlayerSkin[0] = 0;
 				m_SkinModified = true;
 			}
-
 		}
 
 		BottomView.VSplitLeft(SpacingW, 0, &BottomView);

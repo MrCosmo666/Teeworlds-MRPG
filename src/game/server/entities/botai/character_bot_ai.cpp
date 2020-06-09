@@ -591,13 +591,11 @@ void CCharacterBotAI::EmoteActions(int EmotionStyle)
 		{
 			SetEmote(EMOTE_BLINK, 1 + random_int() % 2);
 			GS()->SendEmoticon(m_pBotPlayer->GetCID(), EMOTICON_DOTDOT);
-
 		}
 		else if (EmotionStyle == EMOTE_HAPPY)
 		{
 			SetEmote(EMOTE_HAPPY, 1 + random_int() % 2);
 			GS()->SendEmoticon(m_pBotPlayer->GetCID(), (random_int() % 2 == 0 ? (int)EMOTICON_HEARTS : (int)EMOTICON_EYES));
-
 		}
 		else if (EmotionStyle == EMOTE_ANGRY)
 		{

@@ -1714,7 +1714,6 @@ void CGameClient::OnPredict()
 			}
 			else
 				World.m_apCharacters[c]->Tick(false);
-
 		}
 
 		// move all players and quantize their data
