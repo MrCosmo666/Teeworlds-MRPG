@@ -14,6 +14,7 @@ public:
 		char Login[64];
 		char Password[64];
 		char LastLogin[64];
+		char Language[8];
 		int AuthID;
 		int Level;
 		int Exp; 
@@ -94,6 +95,8 @@ public:
 		return (bool)(Data.find(ClientID) != Data.end());
 	}
 
+	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 	virtual void OnResetClient(int ClientID);
 };
 

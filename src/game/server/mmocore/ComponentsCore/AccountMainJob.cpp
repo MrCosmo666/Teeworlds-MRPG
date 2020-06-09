@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
+#include <teeother/components/localization.h>
 #include "AccountMainJob.h"
 
 using namespace sqlstr;
@@ -83,7 +84,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 	if(ACCOUNTDATA->next())
 	{
 		const int UserID = ACCOUNTDATA->getInt("ID");
-		boost::scoped_ptr<ResultSet> CHECKACCESS(SJK.SD("ID, LoginDate", "tw_accounts", "WHERE Username = '%s' AND Password = '%s' AND ID = '%d'", clear_Login.cstr(), clear_Pass.cstr(), UserID));
+		boost::scoped_ptr<ResultSet> CHECKACCESS(SJK.SD("ID, LoginDate, Language", "tw_accounts", "WHERE Username = '%s' AND Password = '%s' AND ID = '%d'", clear_Login.cstr(), clear_Pass.cstr(), UserID));
 		if (!CHECKACCESS->next())
 		{
 			GS()->Chat(ClientID, "Wrong login or password!");
@@ -95,6 +96,10 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 			GS()->Chat(ClientID, "The account is already in the game!");
 			return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
 		}
+
+		const char *pPlayerLanguage = CHECKACCESS->getString("Language").c_str();
+		GS()->Server()->SetClientLanguage(ClientID, pPlayerLanguage);
+		pPlayer->SetLanguage(pPlayerLanguage);
 
 		str_copy(pPlayer->Acc().Login, clear_Login.cstr(), sizeof(pPlayer->Acc().Login));
 		str_copy(pPlayer->Acc().Password, clear_Pass.cstr(), sizeof(pPlayer->Acc().Password));
@@ -206,6 +211,52 @@ int AccountMainJob::GetRank(int AuthID)
 			return Rank;
 	}
 	return -1;
+}
+
+bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+{
+	const int ClientID = pPlayer->GetCID();
+	if (ReplaceMenu)
+	{
+		return false;
+	}
+
+	if (Menulist == MenuList::MENU_SELECT_LANGUAGE)
+	{
+		pPlayer->m_LastVoteMenu = MenuList::MENU_SETTINGS;
+		GS()->AVH(ClientID, TAB_INFO_LANGUAGES, GREEN_COLOR, "Languages Information");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_LANGUAGES, "Here you can choose the language.");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_LANGUAGES, "Note: translation is not complete.");
+		GS()->AV(ClientID, "null", "");
+
+		const char* pPlayerLanguage = pPlayer->GetLanguage();
+		GS()->AVH(ClientID, TAB_LANGUAGES, GRAY_COLOR, "Active language: {STR}", pPlayerLanguage);
+		for(int i = 0; i < GS()->Server()->Localization()->m_pLanguages.size(); i++)
+		{
+			const char *pLanguageName = GS()->Server()->Localization()->m_pLanguages[i]->GetFilename();
+			if(str_comp(pPlayerLanguage, pLanguageName) == 0)
+				continue;
+			GS()->AVM(ClientID, "SELECTLANGUAGE", i, TAB_LANGUAGES, "Select language \"{STR}\"", pLanguageName);
+		}
+		GS()->AddBack(ClientID);
+		return true;
+	}
+}
+
+bool AccountMainJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+{
+	const int ClientID = pPlayer->GetCID();
+	if (PPSTR(CMD, "SELECTLANGUAGE") == 0)
+	{
+		const char *pSelectedLanguage = GS()->Server()->Localization()->m_pLanguages[VoteID]->GetFilename();
+		GS()->Server()->SetClientLanguage(ClientID, pSelectedLanguage);
+		pPlayer->SetLanguage(pSelectedLanguage);
+		GS()->Chat(ClientID, "You chosen a language \"{STR}\".", pSelectedLanguage);
+		GS()->VResetVotes(ClientID, MenuList::MENU_SELECT_LANGUAGE);
+		Job()->SaveAccount(pPlayer, SaveType::SAVE_LANGUAGE);
+		return true;
+	}
+
 }
 
 void AccountMainJob::OnResetClient(int ClientID)

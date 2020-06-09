@@ -266,5 +266,33 @@
 	{
 		"key": "{STR} voted for {STR}.",
 		"value": "{STR} проголосовал за {STR}."
+	},
+	{
+		"key": "Languages Information",
+		"value": "Локализация инфо"
+	},
+	{
+		"key": "Here you can choose the language.",
+		"value": "Здесь можно выбрать язык."
+	},
+	{
+		"key": "Note: translation is not complete.",
+		"value": "Важно: перевод не полный."
+	},
+	{
+		"key": "Active language: {STR}",
+		"value": "Активный язык: {STR}"
+	},
+	{
+		"key": "Select language \"{STR}\"",
+		"value": "Выбрать язык \"{STR}\""
+	},
+	{
+		"key": "You chosen a language \"{STR}\".",
+		"value": "Вы выбрали язык \"{STR}\"."
+	},
+	{
+		"key": "Settings language",
+		"value": "Настройка языка"
 	}
 ]}

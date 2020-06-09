@@ -450,24 +450,18 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
 		// Настройки
-		bool FoundSettings = false;
 		GS()->AVH(ClientID, TAB_SETTINGS, RED_COLOR, "Some of the settings becomes valid after death");
+		GS()->AVM(ClientID, "MENU", MenuList::MENU_SELECT_LANGUAGE, TAB_SETTINGS, "Settings language");
 		for (const auto& it : Items[ClientID])
 		{
 			const InventoryItem ItemData = it.second;
 			if (ItemData.Info().Type != ItemType::TYPE_SETTINGS || ItemData.Count <= 0)
 				continue;
-
 			GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
-			FoundSettings = true;
-		}
-		if (!FoundSettings)
-		{
-			GS()->AVM(ClientID, "null", NOPE, TAB_SETTINGS, "The list of settings is empty");
 		}
 
 		// Снаряжение
-		FoundSettings = false;
+		bool FoundSettings = false;
 		GS()->AV(ClientID, "null", "");
 		GS()->AVH(ClientID, TAB_SETTINGS_MODULES, GREEN_COLOR, "Sub items settings.");
 		for (const auto& it : Items[ClientID])
