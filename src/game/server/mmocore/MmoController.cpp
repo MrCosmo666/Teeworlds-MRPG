@@ -202,7 +202,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	// сохранение языка игрока
 	else if(Table == SaveType::SAVE_LANGUAGE)
 	{
-		SJK.UD("tw_accounts", "Language = '%d' WHERE ID = '%d'", pPlayer->GetLanguage(), pPlayer->Acc().AuthID);
+		SJK.UD("tw_accounts", "Language = '%s' WHERE ID = '%d'", pPlayer->GetLanguage(), pPlayer->Acc().AuthID);
 		return;		
 	}
 	else
