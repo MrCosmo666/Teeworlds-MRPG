@@ -1,4 +1,9 @@
-import shutil, optparse, os, re, sys, zipfile
+import shutil 
+import optparse 
+import os 
+import re 
+import sys 
+import zipfile
 from distutils.dir_util import copy_tree
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])) + "/..")
 import twlib
