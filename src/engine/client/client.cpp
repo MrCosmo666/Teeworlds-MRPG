@@ -122,7 +122,6 @@ void CGraph::Render(IGraphics* pGraphics, IGraphics::CTextureHandle FontTexture,
 		pGraphics->SetColorVertex(aColorVertices, 2);
 		IGraphics::CLineItem LineItem(x + a0 * w, y + h - v0 * h, x + a1 * w, y + h - v1 * h);
 		pGraphics->LinesDraw(&LineItem, 1);
-
 	}
 	pGraphics->LinesEnd();
 

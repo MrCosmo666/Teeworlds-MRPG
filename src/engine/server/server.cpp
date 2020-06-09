@@ -564,7 +564,6 @@ const char *CServer::ClientName(int ClientID) const
 		return m_aClients[ClientID].m_aName;
 	else
 		return "(connecting)";
-
 }
 
 const char *CServer::ClientClan(int ClientID) const
@@ -1796,7 +1795,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		while(RES->next())
 		{
 			const int AuthID = RES->getInt("ID");
-			const int RandomColor = 1000+rand()%10000000;
+			const int RandomColor = 1000+random_int()%10000000;
 			const int Rank = Server()->GameServer()->GetRank(AuthID);
 
 			char aBuf[256];
@@ -1898,7 +1897,6 @@ void DiscordJob::SendMessage(const char *pChanal, const char *Color, const char 
 
 int main(int argc, const char **argv) // ignore_convention
 {
-
 #if defined(CONF_FAMILY_WINDOWS)
 	for(int i = 1; i < argc; i++) // ignore_convention
 	{

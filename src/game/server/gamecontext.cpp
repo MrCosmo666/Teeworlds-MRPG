@@ -1636,6 +1636,7 @@ void CGS::ConchainGameinfoUpdate(IConsole::IResult *pResult, void *pUserData, IC
 	pfnCallback(pResult, pCallbackUserData);
 	if(pResult->NumArguments())
 	{
+		return;
 	}
 }
 
