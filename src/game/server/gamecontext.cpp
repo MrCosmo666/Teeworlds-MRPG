@@ -1062,7 +1062,7 @@ void CGS::OnTickLocalWorld()
 	{
 		m_DayEnumType = Server()->GetEnumTypeDay(); 
 		if(m_DayEnumType == DayType::NIGHTTYPE)
-			m_RaidExp = 100 + rand() % 200;
+			m_RaidExp = 100 + random_int() % 200;
 		else if(m_DayEnumType == DayType::MORNINGTYPE)
 			m_RaidExp = 100;
 	
@@ -1207,7 +1207,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		}
 		else if (MsgID == NETMSGTYPE_CL_SETSPECTATORMODE)
 		{
-
+			return;
 		}
 		else if (MsgID == NETMSGTYPE_CL_EMOTICON)
 		{
@@ -1229,7 +1229,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		}
 		else if (MsgID == NETMSGTYPE_CL_READYCHANGE)
 		{
-
+			return;
 		}
 		else if(MsgID == NETMSGTYPE_CL_SKINCHANGE)
 		{
@@ -1526,7 +1526,6 @@ void CGS::ConParseSkin(IConsole::IResult *pResult, void *pUserData)
 			pPlayer->Acc().m_aSkinPartColors[5]);
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "parseskin", aBuf);
 	}
-
 }
 
 // Выдать предмет игроку
