@@ -133,8 +133,8 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
-	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 200, "You are located {STR}", GS()->Server()->GetWorldName(GS()->GetWorldID()));
-
+	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 200, "You are located {STR} ({STR})", 
+		GS()->Server()->GetWorldName(GS()->GetWorldID()), GS()->IsAllowedPVP() ? "Zone PVP" : "Safe zone");
 	if(!FirstInitilize)
 	{
 		const int CountMessageInbox = Job()->Inbox()->GetActiveInbox(pPlayer);

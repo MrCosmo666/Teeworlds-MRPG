@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: localhost:3306
--- Время создания: Май 19 2020 г., 15:03
--- Версия сервера: 5.7.30-0ubuntu0.18.04.1
--- Версия PHP: 7.2.24-0ubuntu0.18.04.4
+-- Время создания: Июн 09 2020 г., 11:09
+-- Версия сервера: 10.1.44-MariaDB-0ubuntu0.18.04.1
+-- Версия PHP: 7.2.24-0ubuntu0.18.04.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -17,8 +17,27 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- База данных: `worldmmo`
+-- База данных: `MRPG`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `ENUM_BEHAVIOR_MOBS`
+--
+
+CREATE TABLE `ENUM_BEHAVIOR_MOBS` (
+  `ID` int(11) NOT NULL,
+  `Behavior` varchar(32) NOT NULL DEFAULT 'Standard'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Дамп данных таблицы `ENUM_BEHAVIOR_MOBS`
+--
+
+INSERT INTO `ENUM_BEHAVIOR_MOBS` (`ID`, `Behavior`) VALUES
+(2, 'Slime'),
+(1, 'Standard');
 
 -- --------------------------------------------------------
 
@@ -36,7 +55,7 @@ CREATE TABLE `ENUM_CRAFT_TABS` (
 --
 
 INSERT INTO `ENUM_CRAFT_TABS` (`TabID`, `Name`) VALUES
-(1, 'Basic craft'),
+(1, 'Used\'s craft'),
 (2, 'Artifact craft'),
 (3, 'Modules craft'),
 (4, 'Buff craft'),
@@ -226,14 +245,15 @@ CREATE TABLE `ENUM_WORLDS` (
 --
 
 INSERT INTO `ENUM_WORLDS` (`WorldID`, `Name`, `RespawnWorld`) VALUES
-(0, 'Pier Elfinia', 0),
-(1, 'Way to the Elfinia', 0),
+(0, 'Pier Elfinia', NULL),
+(1, 'Way to the Elfinia', 1),
 (2, 'Elfinia', 2),
 (3, 'Elfinia Deep cave', 2),
 (4, 'Elfia home room', 2),
 (5, 'Elfinia occupation of goblins', 5),
 (6, 'Elfinia Abandoned mine', NULL),
-(7, 'Diana home room', 2);
+(7, 'Diana home room', 2),
+(8, 'Noctis Resonance', NULL);
 
 -- --------------------------------------------------------
 
@@ -245,17 +265,11 @@ CREATE TABLE `tw_accounts` (
   `ID` int(11) NOT NULL,
   `Username` varchar(64) NOT NULL,
   `Password` varchar(64) NOT NULL,
-  `RegisterDate` varchar(64) NOT NULL
+  `RegisterDate` varchar(64) NOT NULL,
+  `LoginDate` varchar(64) NOT NULL DEFAULT 'First log in',
+  `RegisteredIP` varchar(64) NOT NULL DEFAULT '0.0.0.0',
+  `LoginIP` varchar(64) NOT NULL DEFAULT '0.0.0.0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Дамп данных таблицы `tw_accounts`
---
-
-INSERT INTO `tw_accounts` (`ID`, `Username`, `Password`, `RegisterDate`) VALUES
-(1, 'kuro', '123123', '2020-05-19 08:24:28');
-
--- --------------------------------------------------------
 
 --
 -- Структура таблицы `tw_accounts_data`
@@ -288,18 +302,8 @@ CREATE TABLE `tw_accounts_data` (
   `AmmoRegen` int(11) NOT NULL DEFAULT '0',
   `Ammo` int(11) NOT NULL DEFAULT '0',
   `Efficiency` int(11) NOT NULL DEFAULT '0',
-  `Extraction` int(11) NOT NULL DEFAULT '0',
-  `LoginDate` varchar(64) NOT NULL DEFAULT 'First login'
+  `Extraction` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Дамп данных таблицы `tw_accounts_data`
---
-
-INSERT INTO `tw_accounts_data` (`ID`, `Nick`, `DiscordID`, `WorldID`, `Level`, `Exp`, `GuildID`, `GuildDeposit`, `GuildRank`, `Upgrade`, `DiscordEquip`, `SpreadShotgun`, `SpreadGrenade`, `SpreadRifle`, `Strength`, `Dexterity`, `CriticalHit`, `DirectCriticalHit`, `Hardness`, `Tenacity`, `Lucky`, `Piety`, `Vampirism`, `AmmoRegen`, `Ammo`, `Efficiency`, `Extraction`, `LoginDate`) VALUES
-(1, 'Kurosio5', 'null', 2, 3, 140, NULL, 0, NULL, 0, -1, 3, 1, 1, 0, 0, 0, 0, 20, 0, 0, 0, 0, 0, 0, 0, 0, '2020-05-19 13:20:27');
-
--- --------------------------------------------------------
 
 --
 -- Структура таблицы `tw_accounts_inbox`
@@ -314,8 +318,6 @@ CREATE TABLE `tw_accounts_inbox` (
   `MailDesc` varchar(64) NOT NULL,
   `OwnerID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
 
 --
 -- Структура таблицы `tw_accounts_items`
@@ -332,22 +334,6 @@ CREATE TABLE `tw_accounts_items` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ROW_FORMAT=DYNAMIC;
 
 --
--- Дамп данных таблицы `tw_accounts_items`
---
-
-INSERT INTO `tw_accounts_items` (`ID`, `ItemID`, `Count`, `Settings`, `Enchant`, `Durability`, `OwnerID`) VALUES
-(150, 2, 1, 1, 0, 100, 1),
-(153, 3, 1, 1, 0, 100, 1),
-(154, 1, 146, 0, 0, 100, 1),
-(156, 27, 1, 1, 0, 100, 1),
-(157, 36, 1, 1, 0, 100, 1),
-(159, 21, 10, 0, 0, 100, 1),
-(160, 30, 20, 0, 0, 100, 1),
-(161, 32, 1, 1, 0, 100, 1);
-
--- --------------------------------------------------------
-
---
 -- Структура таблицы `tw_accounts_locations`
 --
 
@@ -356,16 +342,6 @@ CREATE TABLE `tw_accounts_locations` (
   `OwnerID` int(11) NOT NULL,
   `TeleportID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Дамп данных таблицы `tw_accounts_locations`
---
-
-INSERT INTO `tw_accounts_locations` (`ID`, `OwnerID`, `TeleportID`) VALUES
-(6, 1, 2),
-(7, 1, 1);
-
--- --------------------------------------------------------
 
 --
 -- Структура таблицы `tw_accounts_miner`
@@ -380,15 +356,6 @@ CREATE TABLE `tw_accounts_miner` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
--- Дамп данных таблицы `tw_accounts_miner`
---
-
-INSERT INTO `tw_accounts_miner` (`AccountID`, `MnrLevel`, `MnrExp`, `MnrUpgrade`, `MnrCount`) VALUES
-(1, 1, 0, 0, 1);
-
--- --------------------------------------------------------
-
---
 -- Структура таблицы `tw_accounts_plants`
 --
 
@@ -399,15 +366,6 @@ CREATE TABLE `tw_accounts_plants` (
   `PlCounts` int(11) NOT NULL DEFAULT '1',
   `PlUpgrade` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Дамп данных таблицы `tw_accounts_plants`
---
-
-INSERT INTO `tw_accounts_plants` (`AccountID`, `PlLevel`, `PlExp`, `PlCounts`, `PlUpgrade`) VALUES
-(1, 1, 0, 1, 0);
-
--- --------------------------------------------------------
 
 --
 -- Структура таблицы `tw_accounts_quests`
@@ -423,29 +381,6 @@ CREATE TABLE `tw_accounts_quests` (
   `Type` int(11) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Дамп данных таблицы `tw_accounts_quests`
---
-
-INSERT INTO `tw_accounts_quests` (`ID`, `QuestID`, `OwnerID`, `Progress`, `Mob1Progress`, `Mob2Progress`, `Type`) VALUES
-(159, 5, 1, 2, 0, 0, 1),
-(160, 1, 1, 6, 0, 0, 2),
-(161, 2, 1, 4, 12, 0, 2),
-(162, 3, 1, 1, 16, 0, 1),
-(163, 10, 1, 7, 0, 0, 2),
-(164, 6, 1, 1, 0, 0, 2),
-(165, 7, 1, 1, 0, 0, 1),
-(166, 11, 1, 3, 0, 0, 2),
-(167, 12, 1, 2, 0, 0, 2),
-(168, 13, 1, 3, 0, 0, 2),
-(169, 14, 1, 1, 0, 0, 2),
-(170, 15, 1, 2, 0, 0, 2),
-(171, 8, 1, 1, 0, 0, 1),
-(172, 16, 1, 3, 0, 0, 1);
-
--- --------------------------------------------------------
-
---
 -- Структура таблицы `tw_accounts_skills`
 --
 
@@ -456,8 +391,6 @@ CREATE TABLE `tw_accounts_skills` (
   `SkillLevel` int(11) NOT NULL,
   `SelectedEmoticion` int(11) DEFAULT '-1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
 
 --
 -- Структура таблицы `tw_aethers`
@@ -491,7 +424,7 @@ CREATE TABLE `tw_attributs` (
   `name` varchar(32) NOT NULL,
   `field_name` varchar(32) NOT NULL DEFAULT 'unfield',
   `price` int(11) NOT NULL,
-  `at_type` int(11) NOT NULL COMMENT '0.tank1.healer2.dps3.weapon4.hard'
+  `at_type` int(11) NOT NULL COMMENT '0.tank1.healer2.dps3.weapon4.hard5.jobs'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -504,16 +437,16 @@ INSERT INTO `tw_attributs` (`ID`, `name`, `field_name`, `price`, `at_type`) VALU
 (3, 'Rifle Spread', 'SpreadRifle', 100, 3),
 (4, 'Strength', 'Strength', 1, 2),
 (5, 'Dexterity', 'Dexterity', 1, 2),
-(6, 'Crit Hit', 'CriticalHit', 1, 2),
-(7, 'Direct Crit Hit', 'DirectCriticalHit', 1, 2),
+(6, 'Crit Dmg', 'CriticalHit', 1, 2),
+(7, 'Direct Crit Dmg', 'DirectCriticalHit', 1, 2),
 (8, 'Hardness', 'Hardness', 1, 0),
 (9, 'Lucky', 'Lucky', 1, 0),
 (10, 'Piety', 'Piety', 1, 1),
 (11, 'Vampirism', 'Vampirism', 1, 1),
 (12, 'Ammo Regen', 'AmmoRegen', 1, 3),
 (13, 'Ammo', 'Ammo', 30, 3),
-(14, 'Efficiency', 'unfield', -1, -1),
-(15, 'Extraction', 'unfield', -1, -1),
+(14, 'Efficiency', 'unfield', -1, 5),
+(15, 'Extraction', 'unfield', -1, 5),
 (16, 'Hammer Power', 'unfield', -1, 4),
 (17, 'Gun Power', 'unfield', -1, 4),
 (18, 'Shotgun Power', 'unfield', -1, 4),
@@ -532,39 +465,45 @@ CREATE TABLE `tw_bots_mobs` (
   `WorldID` int(11) DEFAULT NULL,
   `PositionX` int(11) NOT NULL,
   `PositionY` int(11) NOT NULL,
+  `Effect` varchar(16) DEFAULT NULL,
+  `Behavior` varchar(32) NOT NULL DEFAULT 'Standard',
   `Level` int(11) NOT NULL DEFAULT '1',
   `Power` int(11) NOT NULL DEFAULT '10',
   `Spread` int(11) NOT NULL DEFAULT '0',
   `Count` int(11) NOT NULL DEFAULT '1',
   `Respawn` int(11) NOT NULL DEFAULT '1',
   `Boss` tinyint(1) NOT NULL DEFAULT '0',
-  `Effect` varchar(16) DEFAULT NULL,
   `it_drop_0` int(11) DEFAULT NULL,
   `it_drop_1` int(11) DEFAULT NULL,
   `it_drop_2` int(11) DEFAULT NULL,
   `it_drop_3` int(11) DEFAULT NULL,
   `it_drop_4` int(11) DEFAULT NULL,
-  `it_drop_5` int(11) DEFAULT NULL,
-  `it_count` varchar(64) NOT NULL DEFAULT '|0|0|0|0|0|0|',
-  `it_random` varchar(64) NOT NULL DEFAULT '|0|0|0|0|0|0|'
+  `it_drop_count` varchar(64) NOT NULL DEFAULT '[0][0][0][0][0]',
+  `it_drop_chance` varchar(64) NOT NULL DEFAULT '[0][0][0][0][0]'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Дамп данных таблицы `tw_bots_mobs`
 --
 
-INSERT INTO `tw_bots_mobs` (`ID`, `BotID`, `WorldID`, `PositionX`, `PositionY`, `Level`, `Power`, `Spread`, `Count`, `Respawn`, `Boss`, `Effect`, `it_drop_0`, `it_drop_1`, `it_drop_2`, `it_drop_3`, `it_drop_4`, `it_drop_5`, `it_count`, `it_random`) VALUES
-(1, 9, 1, 4049, 890, 2, 8, 0, 5, 5, 0, 'Slowdown', 22, NULL, NULL, NULL, NULL, NULL, '|1|0|0|0|0|0|', '|160|0|0|0|0|0|'),
-(2, 23, 3, 3057, 2577, 4, 18, 0, 12, 5, 0, 'Slowdown', 29, NULL, NULL, NULL, NULL, NULL, '|1|0|0|0|0|0|', '|150|0|0|0|0|0|'),
-(3, 9, 3, 1890, 1160, 2, 10, 0, 12, 5, 0, 'Slowdown', 22, NULL, NULL, NULL, NULL, NULL, '|1|0|0|0|0|0|', '|140|0|0|0|0|0|'),
-(4, 28, 3, 3057, 2577, 10, 240, 0, 1, 320, 1, 'Slowdown', 29, 22, NULL, NULL, NULL, NULL, '|2|2|0|0|0|0|', '|0|0|0|0|0|0|'),
-(5, 22, 5, 1280, 2860, 8, 15, 1, 10, 5, 0, NULL, 30, NULL, NULL, NULL, NULL, NULL, '|1|0|0|0|0|0|', '|150|0|0|0|0|0|'),
-(7, 29, 6, 2825, 2430, 12, 50, 1, 10, 1, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', '|0|0|0|0|0|0|'),
-(8, 30, 6, 4840, 2560, 12, 80, 2, 8, 1, 0, 'Fire', 30, NULL, NULL, NULL, NULL, NULL, '|1|0|0|0|0|0|', '|30|0|0|0|0|0|'),
-(9, 31, 6, 1150, 3700, 12, 50, 1, 10, 1, 0, 'Poison', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', '|0|0|0|0|0|0|'),
-(10, 22, 6, 1440, 5100, 12, 60, 1, 10, 1, 0, NULL, 30, NULL, NULL, NULL, NULL, NULL, '|1|0|0|0|0|0|', '|40|0|0|0|0|0|'),
-(11, 32, 6, 3960, 4595, 15, 800, 1, 1, 1, 1, 'Fire', 37, NULL, NULL, NULL, NULL, NULL, '|1|0|0|0|0|0|', '|5|0|0|0|0|0|'),
-(12, 34, 3, 1570, 2915, 6, 27, 0, 8, 5, 0, NULL, 35, NULL, NULL, NULL, NULL, NULL, '|1|0|0|0|0|0|', '|120|0|0|0|0|0|');
+INSERT INTO `tw_bots_mobs` (`ID`, `BotID`, `WorldID`, `PositionX`, `PositionY`, `Effect`, `Behavior`, `Level`, `Power`, `Spread`, `Count`, `Respawn`, `Boss`, `it_drop_0`, `it_drop_1`, `it_drop_2`, `it_drop_3`, `it_drop_4`, `it_drop_count`, `it_drop_chance`) VALUES
+(1, 36, 1, 4049, 890, 'Slowdown', 'Slime', 2, 8, 0, 5, 5, 0, 22, 29, NULL, NULL, NULL, '|1|1|0|0|0|', '|1.08|1.08|0|0|0|'),
+(2, 23, 3, 3057, 2577, 'Slowdown', 'Slime', 4, 18, 0, 12, 5, 0, 29, NULL, NULL, NULL, NULL, '|1|0|0|0|0|', '|3.2|0|0|0|0|'),
+(3, 9, 3, 1890, 1160, 'Slowdown', 'Slime', 2, 10, 0, 12, 5, 0, 22, NULL, NULL, NULL, NULL, '|1|0|0|0|0|', '|3.2|0|0|0|0|'),
+(4, 28, 3, 3057, 2577, 'Slowdown', 'Slime', 10, 240, 0, 1, 320, 1, 29, 22, NULL, NULL, NULL, '|3|3|0|0|0|', '|100|100|0|0|0|'),
+(5, 22, 5, 1345, 2600, NULL, 'Standard', 8, 15, 1, 14, 5, 0, 30, NULL, NULL, NULL, NULL, '|1|0|0|0|0|', '|1.56|0|0|0|0|'),
+(7, 29, 6, 2825, 2430, NULL, 'Standard', 12, 50, 1, 10, 1, 0, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|', '|0|0|0|0|0|'),
+(8, 30, 6, 4840, 2560, 'Fire', 'Standard', 12, 80, 2, 8, 1, 0, 30, NULL, NULL, NULL, NULL, '|1|0|0|0|0|', '|4.56|0|0|0|0|'),
+(9, 31, 6, 1150, 3700, 'Poison', 'Standard', 12, 50, 1, 10, 1, 0, 42, NULL, NULL, NULL, NULL, '|1|0|0|0|0|', '|3.47|0|0|0|0|'),
+(10, 22, 6, 1440, 5100, NULL, 'Standard', 12, 60, 1, 10, 1, 0, 30, NULL, NULL, NULL, NULL, '|1|0|0|0|0|', '|3.96|0|0|0|0|'),
+(11, 32, 6, 3960, 4595, 'Fire', 'Standard', 15, 800, 1, 1, 1, 1, 37, 42, NULL, NULL, NULL, '|1|1|0|0|0|', '|50|75|0|0|0|'),
+(12, 34, 3, 1570, 2915, NULL, 'Standard', 6, 27, 0, 8, 5, 0, 35, NULL, NULL, NULL, NULL, '|1|0|0|0|0|', '|4.1|0|0|0|0|'),
+(13, 35, 5, 1345, 2600, NULL, 'Standard', 14, 620, 1, 1, 400, 1, 30, 42, NULL, NULL, NULL, '|1|1|0|0|0|', '|100|25|0|0|0|'),
+(14, 40, 8, 3665, 390, 'Fire', 'Standard', 18, 100, 1, 10, 1, 0, 44, NULL, NULL, NULL, NULL, '|1|0|0|0|0|', '|7.5|0|0|0|0|'),
+(15, 41, 8, 5610, 2865, 'Poison', 'Standard', 19, 120, 1, 10, 1, 0, 44, NULL, NULL, NULL, NULL, '|1|0|0|0|0|', '|3.5|0|0|0|0|'),
+(16, 42, 8, 2400, 3150, 'Fire', 'Standard', 20, 110, 1, 12, 1, 0, 44, NULL, NULL, NULL, NULL, '|1|0|0|0|0|', '|5.25|0|0|0|0|'),
+(17, 43, 8, 1720, 3180, 'Fire', 'Standard', 20, 115, 1, 10, 1, 0, 44, NULL, NULL, NULL, NULL, '|1|0|0|0|0|', '|7.5|0|0|0|0|'),
+(18, 44, 8, 2800, 1640, 'Fire', 'Standard', 25, 2090, 1, 1, 1, 1, 44, NULL, NULL, NULL, NULL, '|3|0|0|0|0|', '|100|0|0|0|0|');
 
 -- --------------------------------------------------------
 
@@ -593,19 +532,21 @@ INSERT INTO `tw_bots_npc` (`ID`, `BotID`, `PositionX`, `PositionY`, `Function`, 
 (2, 2, 1022, 1073, -1, 0, 5, 2, 0),
 (3, 3, 2691, 1009, -1, 1, 0, 1, 0),
 (4, 4, 5312, 1073, -1, 1, 0, 1, 0),
-(5, 11, 10092, 8561, -1, 1, 0, 1, 2),
+(5, 11, 10092, 8561, -1, 0, 0, 1, 2),
 (6, 12, 5693, 8369, -1, 0, 0, 1, 2),
-(7, 13, 6471, 7569, -1, 1, 0, 1, 2),
+(7, 13, 6471, 7569, -1, 0, 0, 1, 2),
 (8, 14, 6451, 7345, 0, 1, 2, 1, 2),
-(9, 15, 9464, 6833, -1, 1, 4, 1, 2),
-(10, 16, 264, 1009, -1, 1, 4, 1, 1),
+(9, 15, 9464, 6833, -1, 0, 4, 1, 2),
+(10, 16, 264, 1009, -1, 0, 4, 1, 1),
 (11, 2, 1234, 689, -1, 1, 1, 1, 0),
-(12, 14, 2321, 977, 0, 1, 2, 1, 0),
+(12, 14, 419, 1009, 0, 1, 2, 1, 1),
 (13, 19, 5739, 7473, -1, 1, 0, 1, 2),
 (14, 20, 3759, 8209, -1, 1, 0, 1, 2),
 (15, 21, 6218, 6417, -1, 1, 0, 1, 2),
 (16, 27, 4590, 977, -1, 1, 2, 1, 4),
-(17, 14, 1468, 4433, 0, 1, 2, 1, 5);
+(17, 14, 1448, 4433, 0, 1, 2, 1, 5),
+(18, 37, 7781, 7921, -1, 1, 4, 1, 2),
+(19, 39, 2851, 3473, -1, 1, 3, 1, 5);
 
 -- --------------------------------------------------------
 
@@ -618,6 +559,8 @@ CREATE TABLE `tw_bots_quest` (
   `BotID` int(11) NOT NULL DEFAULT '-1',
   `QuestID` int(11) NOT NULL DEFAULT '-1',
   `WorldID` int(11) DEFAULT NULL,
+  `next_equal_progress` tinyint(4) NOT NULL DEFAULT '0' COMMENT 'set to 1 it will have the same progress as the next mob',
+  `generate_nick` tinyint(4) NOT NULL DEFAULT '0',
   `pos_x` int(11) NOT NULL,
   `pos_y` int(11) NOT NULL,
   `it_need_0` int(11) DEFAULT NULL,
@@ -635,53 +578,75 @@ CREATE TABLE `tw_bots_quest` (
 -- Дамп данных таблицы `tw_bots_quest`
 --
 
-INSERT INTO `tw_bots_quest` (`ID`, `BotID`, `QuestID`, `WorldID`, `pos_x`, `pos_y`, `it_need_0`, `it_need_1`, `it_reward_0`, `it_reward_1`, `mob_0`, `mob_1`, `it_count`, `interactive_type`, `interactive_temp`) VALUES
-(1, 5, 1, 0, 3925, 1169, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(2, 5, 1, 0, 5599, 1009, 23, NULL, 23, NULL, NULL, NULL, '|12|0|12|0|0|0|', 2, NULL),
-(3, 4, 1, 0, 4121, 1137, 23, NULL, NULL, NULL, NULL, NULL, '|4|0|0|0|0|0|', NULL, NULL),
-(4, 4, 1, 0, 6489, 1137, 23, NULL, NULL, NULL, NULL, NULL, '|4|0|0|0|0|0|', NULL, NULL),
-(5, 4, 1, 0, 2430, 977, 23, NULL, NULL, NULL, NULL, NULL, '|4|0|0|0|0|0|', NULL, NULL),
-(6, 5, 1, 0, 6742, 1041, NULL, NULL, 3, NULL, NULL, NULL, '|0|0|1|0|0|0|', NULL, NULL),
-(7, 6, 2, 1, 841, 977, NULL, NULL, 21, NULL, NULL, NULL, '|0|0|1|0|0|0|', NULL, NULL),
-(8, 8, 2, 0, 411, 1009, 21, NULL, NULL, NULL, NULL, NULL, '|1|0|0|0|0|0|', NULL, NULL),
-(9, 6, 2, 1, 841, 977, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(10, 6, 2, 1, 2207, 465, NULL, NULL, NULL, NULL, 9, NULL, '|0|0|0|0|12|0|', NULL, NULL),
-(11, 17, 3, 1, 525, 1009, NULL, NULL, 15, 14, 9, NULL, '|0|0|3|3|16|0|', NULL, NULL),
-(12, 18, 5, 2, 5215, 7409, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(13, 18, 5, 0, 2390, 977, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(14, 2, 5, 0, 2162, 977, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(15, 19, 6, 2, 7915, 8401, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(16, 19, 7, 2, 9859, 8561, 26, NULL, 26, NULL, NULL, NULL, '|1|0|1|0|0|0|', NULL, NULL),
-(17, 6, 10, 2, 6615, 8433, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(18, 6, 10, 2, 9953, 8561, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(19, 6, 10, 2, 8574, 7665, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(20, 6, 10, 2, 8123, 7089, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(21, 6, 10, 2, 6815, 7569, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(22, 6, 10, 2, 6364, 7345, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(23, 6, 10, 2, 5021, 7441, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(24, 6, 11, 2, 6834, 7569, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(25, 6, 11, 2, 5722, 6353, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(26, 10, 11, 2, 5325, 6289, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(27, 25, 12, 2, 5421, 8273, NULL, NULL, 27, NULL, NULL, NULL, '|0|0|1|0|0|0|', NULL, NULL),
-(28, 25, 12, 2, 10822, 6737, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(29, 25, 13, 3, 676, 1169, NULL, NULL, NULL, NULL, 9, NULL, '|0|0|0|0|32|0|', NULL, NULL),
-(30, 26, 13, 3, 500, 1361, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(31, 17, 4, 1, 1530, 1073, 29, NULL, 25, NULL, NULL, NULL, '|12|0|8|0|0|0|', NULL, NULL),
-(32, 26, 13, 2, 3780, 6449, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(33, 27, 8, 4, 4235, 945, NULL, NULL, NULL, NULL, 23, NULL, '|0|0|0|0|50|0|', NULL, NULL),
-(34, 27, 8, 2, 7975, 7089, NULL, NULL, 32, NULL, NULL, NULL, '|0|0|1|0|0|0|', NULL, NULL),
-(35, 27, 9, 4, 4243, 945, NULL, NULL, NULL, NULL, 28, NULL, '|0|0|0|0|1|0|', NULL, NULL),
-(36, 10, 14, 4, 4391, 977, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(37, 6, 15, 2, 8081, 7889, 20, NULL, NULL, NULL, NULL, NULL, '|10|0|0|0|0|0|', 2, NULL),
-(38, 6, 15, 2, 8193, 6065, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(39, 6, 16, 7, 4454, 881, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(40, 6, 16, 7, 4671, 881, 29, NULL, NULL, NULL, NULL, NULL, '|10|0|0|0|0|0|', NULL, NULL),
-(41, 6, 16, 7, 4590, 881, 35, NULL, NULL, NULL, NULL, NULL, '|8|0|0|0|0|0|', NULL, NULL),
-(42, 8, 16, 7, 4142, 881, NULL, NULL, NULL, NULL, NULL, NULL, '|8|0|0|0|0|0|', NULL, NULL),
-(43, 6, 16, 7, 4590, 881, NULL, NULL, NULL, NULL, NULL, NULL, '|8|0|0|0|0|0|', NULL, NULL),
-(44, 25, 17, 2, 8128, 7889, NULL, NULL, NULL, NULL, NULL, NULL, '|8|0|0|0|0|0|', NULL, NULL),
-(45, 25, 17, 3, 762, 1169, NULL, NULL, NULL, NULL, 23, NULL, '|8|0|0|0|32|0|', NULL, NULL),
-(46, 25, 17, 2, 6316, 7569, NULL, NULL, 9, NULL, NULL, NULL, '|0|0|50|0|0|0|', NULL, NULL);
+INSERT INTO `tw_bots_quest` (`ID`, `BotID`, `QuestID`, `WorldID`, `next_equal_progress`, `generate_nick`, `pos_x`, `pos_y`, `it_need_0`, `it_need_1`, `it_reward_0`, `it_reward_1`, `mob_0`, `mob_1`, `it_count`, `interactive_type`, `interactive_temp`) VALUES
+(1, 5, 1, 0, 0, 0, 3925, 1169, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(2, 5, 1, 0, 0, 0, 5599, 1009, 23, NULL, 23, NULL, NULL, NULL, '|12|0|12|0|0|0|', 2, NULL),
+(3, 4, 1, 0, 0, 1, 4121, 1137, 23, NULL, NULL, NULL, NULL, NULL, '|4|0|0|0|0|0|', NULL, NULL),
+(4, 4, 1, 0, 0, 1, 6489, 1137, 23, NULL, NULL, NULL, NULL, NULL, '|4|0|0|0|0|0|', NULL, NULL),
+(5, 4, 1, 0, 0, 1, 2430, 977, 23, NULL, NULL, NULL, NULL, NULL, '|4|0|0|0|0|0|', NULL, NULL),
+(6, 5, 1, 0, 0, 0, 6742, 1041, NULL, NULL, 3, NULL, NULL, NULL, '|0|0|1|0|0|0|', NULL, NULL),
+(7, 6, 2, 1, 0, 0, 841, 977, NULL, NULL, 21, NULL, NULL, NULL, '|0|0|1|0|0|0|', NULL, NULL),
+(8, 8, 2, 0, 0, 0, 411, 1009, 21, NULL, NULL, NULL, NULL, NULL, '|1|0|0|0|0|0|', NULL, NULL),
+(9, 6, 2, 1, 0, 0, 841, 977, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(10, 6, 2, 1, 0, 0, 2207, 465, NULL, NULL, NULL, NULL, 36, NULL, '|0|0|0|0|12|0|', NULL, NULL),
+(11, 16, 3, 1, 0, 0, 525, 1009, NULL, NULL, 15, 14, 36, NULL, '|0|0|3|3|16|0|', NULL, NULL),
+(12, 18, 5, 2, 0, 0, 5215, 7409, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(13, 18, 5, 0, 0, 0, 2390, 977, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(14, 2, 5, 0, 0, 0, 2162, 977, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(15, 19, 6, 2, 0, 0, 7915, 8401, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(16, 19, 7, 2, 0, 0, 9859, 8561, 26, NULL, 26, NULL, NULL, NULL, '|1|0|1|0|0|0|', NULL, NULL),
+(17, 6, 10, 2, 0, 0, 6615, 8433, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(18, 6, 10, 2, 0, 0, 9953, 8561, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(19, 6, 10, 2, 0, 0, 8574, 7665, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(20, 6, 10, 2, 0, 0, 8123, 7089, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(21, 6, 10, 2, 0, 0, 6815, 7569, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(22, 6, 10, 2, 0, 0, 6364, 7345, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(23, 6, 10, 2, 0, 0, 5021, 7441, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(24, 6, 11, 2, 0, 0, 6834, 7569, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(25, 6, 11, 2, 0, 0, 5722, 6353, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(26, 10, 11, 2, 0, 0, 5325, 6289, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(27, 25, 12, 2, 0, 0, 5421, 8273, NULL, NULL, 27, NULL, NULL, NULL, '|0|0|1|0|0|0|', NULL, NULL),
+(28, 25, 12, 2, 0, 0, 10822, 6737, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(29, 25, 13, 3, 0, 0, 676, 1169, NULL, NULL, NULL, NULL, 9, NULL, '|0|0|0|0|32|0|', NULL, NULL),
+(30, 26, 13, 3, 0, 0, 500, 1361, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(31, 16, 4, 1, 0, 0, 1530, 1073, 29, NULL, 25, NULL, NULL, NULL, '|18|0|8|0|0|0|', NULL, NULL),
+(32, 26, 13, 2, 0, 0, 3780, 6449, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(33, 27, 8, 4, 0, 0, 4235, 945, NULL, NULL, NULL, NULL, 23, NULL, '|0|0|0|0|50|0|', NULL, NULL),
+(34, 27, 8, 2, 0, 0, 7975, 7089, NULL, NULL, 32, NULL, NULL, NULL, '|0|0|1|0|0|0|', NULL, NULL),
+(35, 27, 9, 4, 0, 0, 4243, 945, NULL, NULL, NULL, NULL, 28, NULL, '|0|0|0|0|1|0|', NULL, NULL),
+(36, 10, 14, 4, 0, 0, 4391, 977, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(37, 6, 15, 2, 0, 0, 8081, 7889, 20, NULL, NULL, NULL, NULL, NULL, '|10|0|0|0|0|0|', 2, NULL),
+(38, 6, 15, 2, 0, 0, 8193, 6065, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(39, 6, 16, 7, 0, 0, 4454, 881, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(40, 6, 16, 7, 0, 0, 4671, 881, 29, NULL, NULL, NULL, NULL, NULL, '|18|0|0|0|0|0|', NULL, NULL),
+(41, 6, 16, 7, 0, 0, 4590, 881, 35, NULL, NULL, NULL, NULL, NULL, '|14|0|0|0|0|0|', NULL, NULL),
+(42, 8, 16, 7, 0, 0, 4142, 881, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(43, 6, 16, 7, 0, 0, 4590, 881, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(44, 25, 17, 2, 0, 0, 8128, 7889, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(45, 25, 17, 3, 0, 0, 762, 1169, NULL, NULL, NULL, NULL, 23, NULL, '|0|0|0|0|32|0|', NULL, NULL),
+(46, 25, 17, 2, 0, 0, 6316, 7569, NULL, NULL, 9, NULL, NULL, NULL, '|0|0|50|0|0|0|', NULL, NULL),
+(47, 27, 18, 2, 0, 0, 5244, 6289, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|1|0|', NULL, NULL),
+(48, 10, 18, 4, 0, 0, 4453, 977, NULL, NULL, 16, NULL, 34, NULL, '|0|0|3|0|32|0|', NULL, NULL),
+(49, 25, 19, 4, 0, 0, 4727, 977, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(50, 25, 19, 2, 0, 0, 9079, 8305, 29, 22, 15, 14, 23, 9, '|16|16|8|8|40|40|', NULL, NULL),
+(51, 25, 19, 3, 0, 0, 4509, 1265, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(52, 37, 50, 2, 0, 0, 7781, 7921, 29, 35, NULL, NULL, NULL, NULL, '|20|20|0|0|0|0|', NULL, NULL),
+(53, 38, 50, 2, 1, 0, 7671, 7921, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(54, 37, 50, 2, 0, 0, 7781, 7921, NULL, NULL, 43, NULL, NULL, NULL, '|0|0|5|0|0|0|', NULL, NULL),
+(55, 15, 55, 2, 0, 0, 9463, 6833, 31, NULL, NULL, NULL, NULL, NULL, '|50|0|0|0|0|0|', NULL, NULL),
+(56, 39, 60, 5, 0, 0, 2852, 3473, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(57, 39, 60, 5, 0, 0, 3216, 3537, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(58, 39, 61, 5, 0, 0, 2944, 3505, 31, 35, NULL, NULL, NULL, NULL, '|40|40|0|0|0|0|', NULL, NULL),
+(59, 39, 62, 5, 0, 0, 2944, 3505, 41, 37, NULL, NULL, NULL, NULL, '|1|8|0|0|0|0|', NULL, NULL),
+(60, 39, 62, 5, 0, 0, 4566, 4273, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(61, 46, 20, 5, 1, 0, 2528, 4305, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(62, 25, 20, 5, 0, 0, 2409, 4305, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(63, 46, 20, 5, 0, 0, 2528, 4305, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(64, 46, 20, 5, 0, 0, 3867, 3089, NULL, NULL, NULL, NULL, 35, 22, '|0|0|0|0|5|30|', NULL, NULL),
+(65, 46, 20, 5, 0, 0, 122, 3377, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(66, 46, 21, 6, 0, 0, 881, 1521, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(67, 46, 21, 6, 0, 0, 3121, 4114, NULL, NULL, NULL, NULL, 32, NULL, '|0|0|0|0|1|0|', NULL, NULL),
+(68, 46, 21, 5, 0, 0, 1714, 4433, NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|1|0|', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -707,9 +672,9 @@ CREATE TABLE `tw_bots_world` (
 --
 
 INSERT INTO `tw_bots_world` (`ID`, `BotName`, `SkinName`, `SkinColor`, `SlotHammer`, `SlotGun`, `SlotShotgun`, `SlotGrenade`, `SlotRifle`, `SlotWings`) VALUES
-(1, 'Captain', 'flokes  unipento standard standard sunglasses', '16711922 -970932064 0 1082745 1114231 1507328', 10010, NULL, NULL, NULL, NULL, NULL),
+(1, 'Captain', 'puar warstripes hair standard standard standardreal', '16187160 -16645889 131327 16177260 7624169 65408', 10010, NULL, NULL, NULL, NULL, NULL),
 (2, 'Sailor', 'standard bear hair standard standard standard', '1082745 -15634776 65408 1082745 1147174 65408', NULL, NULL, NULL, NULL, NULL, NULL),
-(3, 'Carpenter', 'standard belly1 twinbopp standard standard standard', '13583205 -15661127 13514071 1048622 1117573 65408', NULL, NULL, NULL, NULL, NULL, NULL),
+(3, 'Carpenter', 'puar tiger2  duotone standard moustache', '15007529 -14563483 65408 3827951 1310537 65422', NULL, NULL, NULL, NULL, NULL, NULL),
 (4, 'Worker', 'standard cammostripes  standard standard standard', '1821867 -14840320 65408 750848 1944919 65408', NULL, NULL, NULL, NULL, NULL, NULL),
 (5, 'Mr. Worker', 'trela cammostripes  standard standard standard', '1662583 -14840320 65408 750848 1944919 65408', NULL, NULL, NULL, NULL, NULL, NULL),
 (6, 'Diana', 'raccoon coonfluff  standard standard standard', '965254 -15235151 65408 1769643 1305243 1085234', NULL, NULL, NULL, NULL, NULL, NULL),
@@ -720,14 +685,13 @@ INSERT INTO `tw_bots_world` (`ID`, `BotName`, `SkinName`, `SkinColor`, `SlotHamm
 (11, 'Craftsman', 'bear tiger1 twinpen duotone standard colorable', '12770027 828507979 11162385 6849346 44458 8581506', NULL, NULL, NULL, NULL, NULL, NULL),
 (12, 'Auctionist', 'kitty saddo twinbopp duotone standard colorable', '12201075 -855657567 2205432 3349551 6943484 13531062', NULL, NULL, NULL, NULL, NULL, NULL),
 (13, 'Teacher', 'mouse purelove unibop duotone standard moustache', '8467692 -1394954365 12408709 11534535 3010026 5627093', NULL, NULL, NULL, NULL, NULL, NULL),
-(14, 'Nurse', 'kitty toptri twinpen duotone standard colorable', '15672283 -2012161487 3858792 7940502 3052250 1873584', NULL, NULL, NULL, NULL, NULL, NULL),
-(15, 'Gunsmith Eric', 'kitty twinbelly hair duotone standard standard', '9778522 -208509303 9813768 10102581 4298037 6156206', NULL, NULL, NULL, NULL, NULL, NULL),
-(16, 'Mr. Sentry', 'kitty cammo2 hair2 duotone standard colorable', '10598472 -580149911 15528239 3610230 8475852 70818', NULL, NULL, NULL, NULL, NULL, NULL),
-(17, 'Sentry', 'kitty cammo2 hair2 duotone standard colorable', '10568082 -580149911 15528239 3610230 8475852 70818', NULL, NULL, NULL, NULL, NULL, NULL),
+(14, 'Nurse', 'flokes downdony hair duotone standard standard', '15920331 1593835335 4147122 3795484 16279737 10976418', NULL, NULL, NULL, NULL, NULL, NULL),
+(15, 'Gunsmith Eric', 'kitty cammostripes hair duotone standard standard', '5209108 1463395762 12628238 8169037 3830859 2771259', NULL, NULL, NULL, NULL, NULL, NULL),
+(16, 'Mr. Sentry', 'raccoon tripledon hair duotone standard standard', '10060032 1690185928 11278269 5677608 886610 13831075', NULL, NULL, NULL, NULL, NULL, NULL),
 (18, 'Daughter Sailor', 'kitty whisker hair duotone standard standard', '3981441 -18874784 5313052 14500779 8614329 6321790', NULL, NULL, NULL, NULL, NULL, NULL),
 (19, 'Miner', 'standard toptri hair duotone standard colorable', '16718165 -2012161487 3858792 7940502 3052250 1873584', NULL, NULL, NULL, NULL, NULL, NULL),
 (20, 'Customs officer', 'kitty cammo1 hair duotone standard standardreal', '6083870 -2125570185 6324018 7470633 16541982 2000684', NULL, NULL, NULL, NULL, NULL, NULL),
-(21, 'Seller artifact', 'flokes belly1  duotone standard colorable', '4325407 -1400836299 1777019 3269995 16520019 11906960', NULL, NULL, NULL, NULL, NULL, NULL),
+(21, 'Seller artifact', 'flokes saddo hair duotone standard colorable', '13769006 -35537528 12473004 465468 14009515 803609', NULL, NULL, NULL, NULL, NULL, NULL),
 (22, 'Goblin', 'bear hipbel  duotone standard standard', '6301461 -1695632164 12254015 3972544 9710385 7470034', NULL, NULL, NULL, NULL, NULL, NULL),
 (23, 'Blue slime', 'bear bear  duotone standard standard', '9610633 -1695632164 12254015 3972544 9729630 7470034', NULL, NULL, NULL, NULL, NULL, NULL),
 (25, 'Adventurer Koto', 'bear belly1 hair2 duotone standard standardreal', '2307609 -167295050 13142259 5885245 9371648 7807949', NULL, NULL, NULL, NULL, NULL, NULL),
@@ -739,7 +703,19 @@ INSERT INTO `tw_bots_world` (`ID`, `BotName`, `SkinName`, `SkinColor`, `SlotHamm
 (31, 'Orc', 'bear downdony  duotone standard standard', '4136201 -406977393 5258828 12493916 2359072 5233408', NULL, NULL, NULL, NULL, NULL, NULL),
 (32, 'Leader Orcs', 'monkey twinbelly  duotone standard standardreal', '16495882 -1326302539 9549353 8668187 2063263 1406656', 10019, 10020, 10021, 10022, 10023, 10016),
 (33, 'Twins', 'bear bear  duotone standard standard', '9683673 672388260 12653934 1134912 4360420 8598003', NULL, NULL, NULL, NULL, NULL, NULL),
-(34, 'Kappa', 'standard sidemarks unibop duotone standard colorable', '4821534 821909703 1852219 1132310 5264192 15588285', NULL, NULL, NULL, NULL, NULL, NULL);
+(34, 'Kappa', 'standard sidemarks unibop duotone standard colorable', '4821534 821909703 1852219 1132310 5264192 15588285', NULL, NULL, NULL, NULL, NULL, NULL),
+(35, 'Orc warrior', 'fox cammostripes  standard zilly!0007 zilly!0007', '65408 -16711808 65408 65408 65408 65408', NULL, NULL, NULL, NULL, NULL, NULL),
+(36, 'Brown slime', 'bear duodonny hair duotone standard standard', '1091872 -394592059 12674866 8116231 1151 14198436', NULL, NULL, NULL, NULL, NULL, NULL),
+(37, 'Officer Henry', 'flokes warstripes hair2 duotone standard standard', '5482497 -1837124528 15809857 10752857 7539007 3358899', NULL, NULL, NULL, NULL, NULL, NULL),
+(38, 'Daughter Maria', 'flokes duodonny hair duotone standard standardreal', '2653584 -36345458 3470770 9908420 14444105 738196', NULL, NULL, NULL, NULL, NULL, NULL),
+(39, 'Noctis', 'kitty mice hair duotone standard standard', '11017984 1596522751 5772960 14417927 5570560 9381961', 10010, NULL, NULL, NULL, NULL, 10017),
+(40, 'Chocobo', 'kitty bear hair duotone standard standard', '2490221 -1792213144 2096979 2157678 1735229 1103953', NULL, NULL, NULL, NULL, NULL, NULL),
+(41, 'Benny', 'bear tricircular hair duotone standard colorable', '16066652 -1087601154 3829858 1314019 641021 1376511', NULL, NULL, NULL, NULL, NULL, NULL),
+(42, 'Rogalia', 'monkey donny unibop duotone standard colorable', '8347469 -852808362 15666037 15456343 5845918 7003270', NULL, NULL, NULL, NULL, NULL, NULL),
+(43, 'Kengo', 'monkey donny unibop duotone standard colorable', '8347469 -852808362 15666037 15456343 5845918 7003270', NULL, NULL, NULL, NULL, NULL, NULL),
+(44, 'Goshii', 'bear whisker hair2 duotone standard standard', '10571316 -1915300733 1789119 12372457 338092 9300965', 10019, 10020, 10021, 10022, 10023, 10018),
+(45, 'Maid', 'flokes downdony twinmello duotone standard standardreal', '4260095 -1698513476 10819474 1784648 14990515 10338195', NULL, NULL, NULL, NULL, NULL, NULL),
+(46, 'Yasue San', 'mouse flokes unibop duotone standard colorable', '8925949 -1578020608 9437184 14815652 862504 8671829', NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -765,16 +741,18 @@ CREATE TABLE `tw_craft_list` (
 --
 
 INSERT INTO `tw_craft_list` (`ID`, `GetItem`, `GetItemCount`, `ItemNeed0`, `ItemNeed1`, `ItemNeed2`, `ItemNeedCount`, `Price`, `Type`, `WorldID`) VALUES
-(1, 15, 3, 22, 29, 18, '3 3 8', 50, 4, 2),
-(2, 26, 1, 30, NULL, NULL, '16 0 0', 150, 5, 2),
-(3, 33, 1, 37, 31, NULL, '3 30 0', 240, 3, 2),
-(4, 34, 1, 37, 31, NULL, '5 50 0', 240, 3, 2),
-(5, 10019, 1, 37, 30, 31, '16 42 24', 320, 5, 2),
-(6, 10020, 1, 37, 30, 31, '12 32 18', 320, 5, 2),
-(7, 10021, 1, 37, 30, 31, '12 32 18', 320, 5, 2),
-(8, 10022, 1, 37, 30, 31, '12 32 18', 320, 5, 2),
-(9, 10023, 1, 37, 30, 31, '12 32 18', 320, 5, 2),
-(10, 10016, 1, 37, NULL, NULL, '40 0 0', 640, 5, 2);
+(1, 15, 3, 22, 29, 18, '9 9 8', 50, 8, 2),
+(2, 26, 1, 30, NULL, NULL, '24 0 0', 150, 6, 2),
+(3, 33, 1, 37, 31, NULL, '3 30 0', 2500, 3, 2),
+(4, 34, 1, 37, 31, NULL, '8 50 0', 2700, 3, 2),
+(5, 10019, 1, 37, 30, 31, '18 48 24', 7200, 6, 2),
+(6, 10020, 1, 37, 30, 31, '14 38 18', 7200, 6, 2),
+(7, 10021, 1, 37, 30, 31, '14 38 18', 7200, 6, 2),
+(8, 10022, 1, 37, 30, 31, '14 38 18', 7200, 6, 2),
+(9, 10023, 1, 37, 30, 31, '14 38 18', 7200, 6, 2),
+(10, 10016, 1, 37, NULL, NULL, '40 0 0', 14400, 6, 2),
+(11, 14, 3, 22, 29, 18, '9 9 8', 50, 8, 2),
+(12, 41, 1, 42, 30, 18, '32 16 64', 3600, 3, 2);
 
 -- --------------------------------------------------------
 
@@ -789,6 +767,7 @@ CREATE TABLE `tw_dungeons` (
   `DoorX` int(11) NOT NULL DEFAULT '0',
   `DoorY` int(11) NOT NULL DEFAULT '0',
   `OpenQuestID` int(11) NOT NULL DEFAULT '-1',
+  `Story` tinyint(4) NOT NULL DEFAULT '0',
   `WorldID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -796,8 +775,9 @@ CREATE TABLE `tw_dungeons` (
 -- Дамп данных таблицы `tw_dungeons`
 --
 
-INSERT INTO `tw_dungeons` (`ID`, `Name`, `Level`, `DoorX`, `DoorY`, `OpenQuestID`, `WorldID`) VALUES
-(1, 'Abandoned mine', 10, 1105, 1521, -1, 6);
+INSERT INTO `tw_dungeons` (`ID`, `Name`, `Level`, `DoorX`, `DoorY`, `OpenQuestID`, `Story`, `WorldID`) VALUES
+(1, 'Abandoned mine', 10, 1105, 1521, 20, 1, 6),
+(2, 'Resonance Noctis', 18, 1157, 528, 62, 0, 8);
 
 -- --------------------------------------------------------
 
@@ -822,7 +802,11 @@ INSERT INTO `tw_dungeons_door` (`ID`, `Name`, `PosX`, `PosY`, `BotID`, `DungeonI
 (1, 'Write here name dungeon', 4302, 1940, 29, 1),
 (2, 'Write here name dungeon', 1808, 3600, 30, 1),
 (3, 'Write here name dungeon', 750, 4850, 31, 1),
-(4, 'Write here name dungeon', 2255, 4850, 28, 1);
+(4, 'Write here name dungeon', 2255, 4850, 22, 1),
+(5, 'Write here name dungeon', 5233, 530, 40, 2),
+(6, 'Write here name dungeon', 4432, 2929, 41, 2),
+(7, 'Write here name dungeon', 1550, 1970, 42, 2),
+(8, 'Write here name dungeon', 1647, 1970, 43, 2);
 
 -- --------------------------------------------------------
 
@@ -836,8 +820,6 @@ CREATE TABLE `tw_dungeons_records` (
   `DungeonID` int(11) NOT NULL,
   `Seconds` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
 
 --
 -- Структура таблицы `tw_guilds`
@@ -855,8 +837,6 @@ CREATE TABLE `tw_guilds` (
   `ChairExperience` int(11) NOT NULL DEFAULT '1',
   `ChairMoney` int(11) NOT NULL DEFAULT '1'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
 
 --
 -- Структура таблицы `tw_guilds_decorations`
@@ -884,8 +864,6 @@ CREATE TABLE `tw_guilds_history` (
   `Time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
 --
 -- Структура таблицы `tw_guilds_houses`
 --
@@ -908,7 +886,7 @@ CREATE TABLE `tw_guilds_houses` (
 --
 
 INSERT INTO `tw_guilds_houses` (`ID`, `OwnerMID`, `WorldID`, `PosX`, `PosY`, `DoorX`, `DoorY`, `TextX`, `TextY`, `Price`) VALUES
-(1, NULL, 2, 4250, 6352, 4496, 6461, 4206, 6224, 50000);
+(1, NULL, 2, 4250, 6352, 4496, 6461, 4206, 6224, 240000);
 
 -- --------------------------------------------------------
 
@@ -922,8 +900,6 @@ CREATE TABLE `tw_guilds_invites` (
   `OwnerID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- --------------------------------------------------------
-
 --
 -- Структура таблицы `tw_guilds_ranks`
 --
@@ -934,8 +910,6 @@ CREATE TABLE `tw_guilds_ranks` (
   `Name` varchar(32) NOT NULL DEFAULT 'Rank name',
   `GuildID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
 
 --
 -- Структура таблицы `tw_houses`
@@ -962,7 +936,7 @@ CREATE TABLE `tw_houses` (
 --
 
 INSERT INTO `tw_houses` (`ID`, `OwnerID`, `PosX`, `PosY`, `DoorX`, `DoorY`, `Class`, `Price`, `HouseBank`, `PlantID`, `PlantX`, `PlantY`, `WorldID`) VALUES
-(1, 447, 8995, 7672, 8752, 7740, 'Elven class', 92000, 313956, 20, 9456, 7766, 2);
+(1, 0, 8995, 7672, 8752, 7740, 'Elven class', 150000, 3100, 20, 9456, 7766, 2);
 
 -- --------------------------------------------------------
 
@@ -1008,30 +982,30 @@ CREATE TABLE `tw_items_list` (
 
 INSERT INTO `tw_items_list` (`ItemID`, `Name`, `Description`, `Icon`, `Type`, `Function`, `Desynthesis`, `Selling`, `Stat_0`, `Stat_1`, `StatCount_0`, `StatCount_1`, `EnchantMax`, `ProjectileID`) VALUES
 (1, 'Gold', 'Major currency', 'gold', -1, -1, 0, 0, 16, NULL, 0, 0, 0, -1),
-(2, 'Hammer', 'A normal hammer', 'hammer', 6, 0, 0, 0, 16, 6, 10, 3, 5, -1),
-(3, 'Gun', 'Conventional weapon', 'gun', 6, 1, 0, 10, 17, NULL, 10, 0, 5, -1),
-(4, 'Shotgun', 'Conventional weapon', 'shotgun', 6, 2, 0, 10, 18, NULL, 5, 0, 5, -1),
-(5, 'Grenade', 'Conventional weapon', 'grenade', 6, 3, 0, 10, 19, NULL, 10, 0, 5, -1),
-(6, 'Rifle', 'Conventional weapon', 'rifle', 6, 4, 200, 10, 20, NULL, 10, 0, 5, -1),
+(2, 'Hammer', 'A normal hammer', 'hammer', 6, 0, 0, 0, 16, 6, 10, 3, 3, -1),
+(3, 'Gun', 'Conventional weapon', 'gun', 6, 1, 0, 10, 17, NULL, 10, 0, 2, -1),
+(4, 'Shotgun', 'Conventional weapon', 'shotgun', 6, 2, 0, 10, 18, NULL, 5, 0, 2, -1),
+(5, 'Grenade', 'Conventional weapon', 'grenade', 6, 3, 0, 10, 19, NULL, 10, 0, 3, -1),
+(6, 'Rifle', 'Conventional weapon', 'rifle', 6, 4, 0, 10, 20, NULL, 10, 0, 3, -1),
 (7, 'Material', 'Required to improve weapons', 'material', 4, -1, 0, 10, NULL, NULL, 0, 0, 0, -1),
-(8, 'Ticket Guild', 'Required to create guilds', 'ticket', 4, -1, 500, 10, NULL, NULL, 0, 0, 0, -1),
+(8, 'Ticket guild', 'Command: /gcreate <name>', 'ticket', 4, -1, 0, 10, NULL, NULL, 0, 0, 0, -1),
 (9, 'Skill Point', 'Skill point', 'skill_point', -1, -1, 0, 10, NULL, NULL, 0, 0, 0, -1),
-(10, 'Decoration Armor', 'Decoration for house!', 'deco_house', 7, -1, 1500, 10, NULL, NULL, 0, 0, 0, -1),
-(11, 'Decoration Hearth Elite', 'Decoration for house!', 'deco_house', 7, -1, 3000, 10, NULL, NULL, 0, 0, 0, -1),
-(12, 'Decoration Ninja Elite', 'Decoration for house!', 'deco_house', 7, -1, 3000, 10, NULL, NULL, 0, 0, 0, -1),
-(13, 'Decoration Hearth', 'Decoration for house!', 'deco_house', 7, -1, 1500, 10, NULL, NULL, 0, 0, 0, -1),
-(14, 'Potion mana regen', 'Regenerate +5%, 15sec every sec.\n', 'potion_b', 8, 8, 30, 10, NULL, NULL, 0, 0, 0, -1),
-(15, 'Potion health regen', 'Regenerate +3% health, 15sec every sec.', 'potion_r', 8, 8, 30, 10, NULL, NULL, 0, 0, 0, -1),
+(10, 'Decoration Armor', 'Decoration for house!', 'deco_house', 7, -1, 0, 10, NULL, NULL, 0, 0, 0, -1),
+(11, 'Decoration Hearth Elite', 'Decoration for house!', 'deco_house', 7, -1, 0, 10, NULL, NULL, 0, 0, 0, -1),
+(12, 'Decoration Ninja Elite', 'Decoration for house!', 'deco_house', 7, -1, 0, 10, NULL, NULL, 0, 0, 0, -1),
+(13, 'Decoration Hearth', 'Decoration for house!', 'deco_house', 7, -1, 0, 10, NULL, NULL, 0, 0, 0, -1),
+(14, 'Potion mana regen', 'Regenerate +5%, 15sec every sec.\n', 'potion_b', 8, 8, 20, 10, NULL, NULL, 0, 0, 0, -1),
+(15, 'Potion health regen', 'Regenerate +3% health, 15sec every sec.', 'potion_r', 8, 8, 20, 10, NULL, NULL, 0, 0, 0, -1),
 (16, 'Capsule survival experience', 'You got 10-50 experience survival', 'potion_g', 1, 9, 0, 10, NULL, NULL, 0, 0, 0, -1),
 (17, 'Little bag of gold', 'You got 10-50 gold', 'pouch', 1, 9, 0, 10, NULL, NULL, 0, 0, 0, -1),
-(18, 'Mirt', 'Information added later.', 'some1', 4, 11, 5, 10, NULL, NULL, 0, 0, 0, -1),
-(20, 'Potato', 'Material need for craft!', 'potato', 4, 11, 8, 10, NULL, NULL, 0, 0, 0, -1),
-(21, 'Notebook', 'In it, something is written', 'paper', 4, -1, 1, 10, NULL, NULL, 0, 0, 0, -1),
+(18, 'Mirt', 'Information added later.', 'some1', 4, 11, 2, 10, NULL, NULL, 0, 0, 0, -1),
+(20, 'Potato', 'Material need for craft!', 'potato', 4, 11, 2, 10, NULL, NULL, 0, 0, 0, -1),
+(21, 'Notebook', 'In it, something is written', 'paper', 4, -1, 0, 10, NULL, NULL, 0, 0, 0, -1),
 (22, 'Glue', 'I wonder what it\'s for?', 'some4', 4, -1, 0, 10, NULL, NULL, 0, 0, 0, -1),
 (23, 'Board', 'Plain Board', 'board', 4, -1, 0, 10, NULL, NULL, 0, 0, 0, -1),
-(24, 'Mushroom', 'Material need for craft!', 'mushroom', 4, 11, 3, 10, NULL, NULL, 0, 0, 0, -1),
+(24, 'Mushroom', 'Material need for craft!', 'mushroom', 4, 11, 2, 10, NULL, NULL, 0, 0, 0, -1),
 (25, 'Potion resurrection', 'Resuscitates in the zone where you died!', 'potion_p', 8, -1, 0, 10, NULL, NULL, 0, 0, 0, -1),
-(26, 'Goblin Pickaxe', 'It happens sometimes', 'pickaxe', 6, 5, 300, 10, 14, 15, 2, 3, 8, -1),
+(26, 'Goblin Pickaxe', 'It happens sometimes', 'pickaxe', 6, 5, 0, 10, 14, 15, 2, 3, 8, -1),
 (27, 'Young fighter\'s ring', 'It happens sometimes', 'ring', 3, 10, 0, 10, 8, NULL, 125, 0, 3, -1),
 (28, 'Small ammo bag', 'Adds a small amount of ammunition', 'pouch', 3, 10, 0, 10, 13, NULL, 3, 0, 5, -1),
 (29, 'Gel', 'I wonder what it\'s for?', 'some4', 4, -1, 0, 10, NULL, NULL, 0, 0, 0, -1),
@@ -1041,8 +1015,15 @@ INSERT INTO `tw_items_list` (`ItemID`, `Name`, `Description`, `Icon`, `Type`, `F
 (33, 'Explosive module for gun', 'It happens sometimes', 'module', 3, 10, 0, 10, 17, NULL, 5, 0, 3, -1),
 (34, 'Explosive module for shotgun', 'It happens sometimes', 'module', 3, 10, 0, 10, 18, NULL, 5, 0, 3, -1),
 (35, 'Kappa meat', 'Information added later.', 'meat', 4, -1, 0, 10, NULL, NULL, 0, 0, 0, -1),
-(36, 'Ring of Arvida', 'It happens sometimes', 'ring_light', 3, 10, 0, 10, 11, 10, 10, 10, 3, -1),
+(36, 'Ring of Arvida', 'It happens sometimes', 'ring_light', 3, 10, 0, 10, 11, 10, 5, 10, 3, -1),
 (37, 'Relic of the Orc Lord', 'Information added later.', 'lucky_r', 4, -1, 0, 10, NULL, NULL, 0, 0, 0, -1),
+(38, 'Ticket reset class stats', 'Resets only class stats(Dps, Tank, Healer).', 'ticket', 1, 8, 0, 10, NULL, NULL, 0, 0, 0, -1),
+(39, 'Mode PVP', 'Settings game.', 'without', 5, 10, 0, 0, NULL, NULL, 0, 0, 0, -1),
+(40, 'Ticket reset weapon stats', 'Resets only ammo stats(Ammo).', 'ticket', 1, 8, 0, 10, NULL, NULL, 0, 0, 0, -1),
+(41, 'Orc\'s Belt', 'You can feel the light power of mana.', 'mantle', 3, 10, 0, 10, 10, 5, 25, 40, 2, -1),
+(42, 'Torn cloth clothes of orcs', 'Information added later.', 'some2', 4, -1, 0, 10, NULL, NULL, 0, 0, 0, -1),
+(43, 'Blessing for discount craft', 'Need dress it, -20% craft price', 'book', 8, 8, 0, 10, NULL, NULL, 0, 0, 0, -1),
+(44, 'Noctis fragment', 'Event Final Fantasy.', 'dark_crst', 4, -1, 0, 10, NULL, NULL, 0, 0, 0, -1),
 (10000, 'Heavenly hammer', 'Reinforced kick', 'h_heaven', 6, 0, 0, 10, 16, NULL, 1, 0, 5, -1),
 (10001, 'Heavenly gun', 'It look doesn\'t bad', 'g_heaven', 6, 1, 0, 10, 17, NULL, 10, 0, 5, 3),
 (10002, 'Heavenly shotgun', 'It look doesn\'t bad', 's_heaven', 6, 2, 0, 10, 18, NULL, 10, 0, 5, 4),
@@ -1058,18 +1039,18 @@ INSERT INTO `tw_items_list` (`ItemID`, `Name`, `Description`, `Icon`, `Type`, `F
 (10012, 'Magitech shotgun', 'It look doesn\'t bad', 's_magitech', 6, 2, 0, 10, 18, NULL, 10, 0, 5, 1),
 (10013, 'Magitech grenade', 'It look doesn\'t bad', 'gr_magitech', 6, 3, 0, 10, 19, NULL, 10, 0, 5, 2),
 (10014, 'Magitech rifle', 'It look doesn\'t bad', 'r_magitech', 6, 4, 0, 10, 20, NULL, 10, 0, 15, -1),
-(10015, 'Stars wings', 'Covered in secrets', 'wings', 6, 6, 0, 10, 8, NULL, 720, 0, 5, -1),
-(10016, 'Bat wings', 'Covered in secrets', 'wings', 6, 6, 0, 10, 8, NULL, 270, 0, 5, -1),
-(10017, 'Little eagle wings', 'Covered in secrets', 'wings', 6, 6, 0, 10, 8, NULL, 720, 0, 5, -1),
-(10018, 'Necromante wings', 'Covered in secrets', 'wings', 6, 6, 0, 10, 8, NULL, 720, 0, 5, -1),
-(10019, 'Goblin hammer', 'Reinforced kick', 'h_goblin', 6, 0, 0, 10, 16, NULL, 30, 0, 5, -1),
-(10020, 'Goblin gun', 'It look doesn\'t bad', 'g_goblin', 6, 1, 0, 10, 17, NULL, 30, 0, 5, 6),
-(10021, 'Goblin shotgun', 'It look doesn\'t bad', 's_goblin', 6, 2, 0, 10, 18, NULL, 20, 0, 5, 7),
-(10022, 'Goblin grenade', 'It look doesn\'t bad', 'gr_goblin', 6, 3, 0, 10, 19, NULL, 30, 0, 5, 8),
-(10023, 'Goblin rifle', 'It look doesn\'t bad', 'r_goblin', 6, 4, 0, 10, 20, NULL, 30, 0, 5, -1),
-(10024, 'Scythe', 'Reinforced kick', 'h_scythe', 6, 0, 300, 10, 16, NULL, 1, 0, 10, -1),
+(10015, 'Stars wings', 'Covered in secrets', 'wings', 6, 6, 0, 10, 8, NULL, 720, 0, 3, -1),
+(10016, 'Bat wings', 'Covered in secrets', 'wings', 6, 6, 0, 10, 8, NULL, 270, 0, 3, -1),
+(10017, 'Little eagle wings', 'Covered in secrets', 'wings', 6, 6, 0, 10, 8, NULL, 300, 0, 3, -1),
+(10018, 'Necromante wings', 'Covered in secrets', 'wings', 6, 6, 0, 10, 8, NULL, 720, 0, 3, -1),
+(10019, 'Goblin hammer', 'Reinforced kick', 'h_goblin', 6, 0, 0, 10, 16, NULL, 25, 0, 3, -1),
+(10020, 'Goblin gun', 'It look doesn\'t bad', 'g_goblin', 6, 1, 0, 10, 17, NULL, 25, 0, 3, 6),
+(10021, 'Goblin shotgun', 'It look doesn\'t bad', 's_goblin', 6, 2, 0, 10, 18, NULL, 15, 0, 3, 7),
+(10022, 'Goblin grenade', 'It look doesn\'t bad', 'gr_goblin', 6, 3, 0, 10, 19, NULL, 25, 0, 3, 8),
+(10023, 'Goblin rifle', 'It look doesn\'t bad', 'r_goblin', 6, 4, 0, 10, 20, NULL, 25, 0, 3, -1),
+(10024, 'Scythe', 'Reinforced kick', 'h_scythe', 6, 0, 0, 10, 16, NULL, 1, 0, 10, -1),
 (15000, 'Theme Couple', 'Strictly limited as the theme', 'ticket', 6, 7, 0, 10, 8, NULL, 147, 0, 18, -1),
-(15001, 'Theme Final Fantasy', 'Strictly limited as the theme', 'ticket', 6, 7, 0, 10, 9, NULL, 181, 0, 15, -1),
+(15001, 'Theme Final Fantasy', 'Strictly limited as the theme', 'ticket', 6, 7, 0, 10, 5, NULL, 100, 0, 3, -1),
 (15002, 'Theme Aion', 'Strictly limited as the theme', 'ticket', 6, 7, 0, 10, 6, NULL, 165, 0, 15, -1),
 (15003, 'Theme Dragon Nest', 'Strictly limited as the theme', 'ticket', 6, 7, 0, 10, 8, NULL, 180, 0, 12, -1);
 
@@ -1113,13 +1094,17 @@ CREATE TABLE `tw_mailshop` (
 --
 
 INSERT INTO `tw_mailshop` (`ID`, `ItemID`, `Count`, `NeedItem`, `Price`, `OwnerID`, `Enchant`, `StorageID`, `Time`) VALUES
-(1, 3, 1, 1, 80, 0, 0, 1, '2020-05-10 18:36:16'),
-(2, 4, 1, 1, 240, 0, 0, 1, '2020-05-10 18:36:16'),
-(3, 5, 1, 1, 250, 0, 0, 1, '2020-05-10 18:36:16'),
-(4, 6, 1, 1, 300, 0, 0, 1, '2020-05-10 18:36:16'),
-(5, 28, 1, 1, 920, 0, 0, 2, '2020-05-13 21:19:28'),
-(6, 36, 1, 1, 420, 0, 0, 2, '2020-05-13 21:19:28'),
-(7, 8, 1, 1, 3800, 0, 0, 2, '2020-05-13 21:19:28');
+(1, 3, 1, 1, 120, 0, 0, 1, '2020-05-10 18:36:16'),
+(2, 4, 1, 1, 310, 0, 0, 1, '2020-05-10 18:36:16'),
+(3, 5, 1, 1, 320, 0, 0, 1, '2020-05-10 18:36:16'),
+(4, 6, 1, 1, 400, 0, 0, 1, '2020-05-10 18:36:16'),
+(5, 28, 1, 1, 980, 0, 0, 2, '2020-05-13 21:19:28'),
+(6, 36, 1, 1, 690, 0, 0, 2, '2020-05-13 21:19:28'),
+(7, 8, 1, 1, 3800, 0, 0, 2, '2020-05-13 21:19:28'),
+(19, 38, 1, 1, 3200, 0, 0, 2, '2020-05-13 21:19:28'),
+(22, 40, 1, 1, 2500, 0, 0, 2, '2020-05-13 21:19:28'),
+(42, 15001, 1, 44, 300, 0, 0, 3, '2020-05-13 21:19:28'),
+(43, 10017, 1, 44, 300, 0, 0, 3, '2020-05-13 21:19:28');
 
 -- --------------------------------------------------------
 
@@ -1189,8 +1174,8 @@ CREATE TABLE `tw_quests_list` (
 --
 
 INSERT INTO `tw_quests_list` (`ID`, `Name`, `Money`, `Exp`, `StoryLine`) VALUES
-(1, 'Help for workers', 15, 20, 'Zero: Arrival'),
-(2, 'Helping a girl', 15, 20, 'Zero: Arrival'),
+(1, 'Help for workers', 15, 20, 'Main: Arrival'),
+(2, 'Helping a girl', 15, 20, 'Main: Arrival'),
 (3, 'The fight with slime!', 25, 20, 'Trader Sentry'),
 (4, 'Gel? Why do you need it?', 25, 20, 'Trader Sentry'),
 (5, 'Search for a daughter', 40, 30, 'Sailor'),
@@ -1198,14 +1183,23 @@ INSERT INTO `tw_quests_list` (`ID`, `Name`, `Money`, `Exp`, `StoryLine`) VALUES
 (7, 'My first pickaxe', 100, 30, 'Mining'),
 (8, 'Help destruction of dirt', 80, 50, 'Deputy'),
 (9, 'Raid on the dirt', 80, 50, 'Deputy'),
-(10, 'Acquaintance', 15, 20, 'One: Apostle Elfia'),
-(11, 'Apostle', 20, 20, 'One: Apostle Elfia'),
-(12, 'Adventurer?', 50, 40, 'One: Apostle Elfia'),
-(13, 'Something is starting', 10, 20, 'One: Apostle Elfia'),
-(14, 'History from Apostle', 10, 20, 'One: Apostle Elfia'),
-(15, 'Diana has a problem', 20, 30, 'One: Apostle Elfia'),
-(16, 'Mmm delicious', 50, 30, 'One: Apostle Elfia'),
-(17, 'Time learn something', 60, 50, 'One: Apostle Elfia');
+(10, 'Acquaintance', 15, 20, 'Main: Apostle Elfia'),
+(11, 'Apostle', 20, 20, 'Main: Apostle Elfia'),
+(12, 'Adventurer', 50, 40, 'Main: Apostle Elfia'),
+(13, 'Something is starting', 10, 20, 'Main: Apostle Elfia'),
+(14, 'History from Apostle', 10, 20, 'Main: Apostle Elfia'),
+(15, 'Diana has a problem', 20, 30, 'Main: Apostle Elfia'),
+(16, 'Mmm delicious', 50, 30, 'Main: Apostle Elfia'),
+(17, 'Time learn something', 60, 50, 'Main: Apostle Elfia'),
+(18, 'Here are the goblins', 60, 50, 'Main: Apostle Elfia'),
+(19, 'Occupation of goblins', 60, 50, 'Main: Apostle Elfia'),
+(20, 'Yasue San', 60, 50, 'Main: Apostle Elfia'),
+(21, 'Abandoned mine', 60, 50, 'Main: Apostle Elfia'),
+(50, 'Officer\'s disputes!', 60, 50, 'Officer Henry'),
+(55, 'Erik\'s way saying help.', 110, 70, 'Gunsmith Eric'),
+(60, 'Why are you here Noctis', 100, 50, 'Final fantasy'),
+(61, 'First assignment', 100, 50, 'Final fantasy'),
+(62, 'Resonance', 100, 50, 'Final fantasy');
 
 -- --------------------------------------------------------
 
@@ -1234,7 +1228,8 @@ INSERT INTO `tw_skills_list` (`ID`, `SkillName`, `SkillDesc`, `BonusInfo`, `Bonu
 (2, 'Sleepy Gravity', 'Magnet mobs to itself', 'radius', 20, 25, 28, 10, 0),
 (3, 'Craft Discount', 'Will give discount on the price of craft items', '% discount gold for craft item', 1, 0, 28, 50, 1),
 (4, 'Proficiency with weapons', 'You can perform an automatic fire', 'can perform an auto fire with all types of weapons', 1, 0, 120, 1, 1),
-(5, 'Blessing of God of war', 'The blessing restores ammo', '% recovers ammo within a radius of 800', 25, 50, 28, 4, 0);
+(5, 'Blessing of God of war', 'The blessing restores ammo', '% recovers ammo within a radius of 800', 25, 50, 28, 4, 0),
+(6, 'Noctis Lucis Attack Teleport', 'An attacking teleport that deals damage to all mobs radius', '% your strength', 25, 10, 100, 4, 0);
 
 -- --------------------------------------------------------
 
@@ -1247,6 +1242,7 @@ CREATE TABLE `tw_storages` (
   `Name` varchar(32) NOT NULL DEFAULT '''Bussines name''',
   `PosX` int(11) NOT NULL,
   `PosY` int(11) NOT NULL,
+  `Currency` int(11) NOT NULL DEFAULT '1',
   `WorldID` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -1254,9 +1250,10 @@ CREATE TABLE `tw_storages` (
 -- Дамп данных таблицы `tw_storages`
 --
 
-INSERT INTO `tw_storages` (`ID`, `Name`, `PosX`, `PosY`, `WorldID`) VALUES
-(1, 'Weapons for young adventurers', 9417, 6817, 2),
-(2, 'Elfinia Artifacts', 6256, 6417, 2);
+INSERT INTO `tw_storages` (`ID`, `Name`, `PosX`, `PosY`, `Currency`, `WorldID`) VALUES
+(1, 'Weapons for young adventurers', 9417, 6817, 1, 2),
+(2, 'Elfinia Artifacts', 6256, 6417, 1, 2),
+(3, 'Noctis Lucis Caelum', 3200, 3520, 44, 5);
 
 -- --------------------------------------------------------
 
@@ -1290,10 +1287,6 @@ INSERT INTO `tw_talk_other_npc` (`ID`, `MobID`, `PlayerTalked`, `Style`, `Talkin
 (9, 3, 1, 2, 2, NULL, 'What you need help with, I\'m good at dealing with predators without meat you will not leave! *laughter*'),
 (10, 3, 0, 0, 5, NULL, 'Oh, you\'re a Joker, no thanks go a little further guys will explain everything to you!'),
 (11, 3, 1, 0, 0, 1, 'OK, thanks!'),
-(12, 9, 0, 0, 5, NULL, 'Hi [Player], buy something!'),
-(13, 9, 1, 0, 5, NULL, 'Hmm weapons. Where do you get it from?'),
-(14, 9, 0, 0, 0, NULL, 'My father is a craftsman, so he made it. The quality is good, I guarantee it.'),
-(15, 9, 1, 0, 0, NULL, 'Yes, of course I will see what you have.'),
 (16, 10, 1, 0, 0, NULL, 'Hi my name is [Player], [Talked] are you working?'),
 (17, 10, 0, 0, 0, NULL, 'Hello [Player], Yes, I am on duty as a guard, and I also trade a little'),
 (18, 10, 1, 0, 5, NULL, 'Can you tell me how difficult it is to get into the service?'),
@@ -1321,7 +1314,20 @@ INSERT INTO `tw_talk_other_npc` (`ID`, `MobID`, `PlayerTalked`, `Style`, `Talkin
 (45, 16, 1, 0, 0, NULL, 'Which one?'),
 (46, 16, 0, 0, 0, NULL, 'Help in the southern part to win over the monsters. We can\'t drive them away but we can scare them away.'),
 (47, 16, 1, 0, 0, 8, 'Of course I will.'),
-(48, 16, 0, 2, 2, NULL, 'Thank\'s [Player]');
+(48, 16, 0, 2, 2, NULL, 'Thank\'s [Player]'),
+(49, 18, 1, 0, 0, NULL, 'You look awful today, [Talked]! What happend?'),
+(50, 18, 0, 1, 4, NULL, 'Oh.. don\'t you worry about me, boy..'),
+(51, 18, 1, 0, 5, NULL, 'But I DO worry!'),
+(52, 18, 0, 0, 5, NULL, 'I\'m tired of these fight I have with my wife, it\'s personal bussiness.'),
+(53, 18, 1, 0, 5, NULL, 'I didn\'t want to be a pain to you, Officer. I will leave you to your problems now.'),
+(54, 18, 0, 0, 5, 50, 'No! Wait!'),
+(55, 9, 0, 1, 4, NULL, 'Hey, pst! You, yes, you!'),
+(56, 9, 1, 0, 5, NULL, 'Yeah? How can I help?'),
+(57, 9, 0, 0, 5, 55, 'You cannot help me, kid! I just need...to TEST you, yes...!'),
+(58, 19, 0, 0, 0, NULL, 'Hello [Player], I have come to you from the Final Fantasy universe, my name is [Talked].'),
+(59, 19, 0, 0, 0, NULL, 'I can\'t say for sure how long I will be here, but for now I will be happy to know your world, and I will be happy to show my world'),
+(60, 19, 1, 0, 5, NULL, 'Are you serious? Did the author smoke dope?'),
+(61, 19, 0, 0, 0, 60, 'Maybe so, I have a couple of things that you can get from me, but not for free. I\'ll need the fragments I lost');
 
 -- --------------------------------------------------------
 
@@ -1519,7 +1525,7 @@ INSERT INTO `tw_talk_quest_npc` (`ID`, `MobID`, `RequestComplete`, `Style`, `Tal
 (185, 30, 1, 0, 0, 0, 'Please follow me to village, I will be waiting for you there'),
 (186, 30, 0, 0, 0, 1, 'Okay, I\'m coming'),
 (187, 31, 0, 0, 0, 0, 'Listen there\'s another request!'),
-(188, 31, 1, 0, 0, 0, '[Player] if you come across a gel, I\'ll be happy to exchange it. You can take your time I\'ll wait!'),
+(188, 31, 1, 0, 0, 0, '[Player] if you find some gel, I\'ll be happy to exchange them. Brown Slimes,Blue Slimes and Pink Slime drop Gel. You can take your time, i\'ll wait!'),
 (189, 31, 0, 0, 0, 1, 'Here, it wasn\'t easy but I got it [Talked].'),
 (190, 31, 0, 2, 2, 0, 'Thank you very much for your help. All right I\'ll go back to my post, good luck to you [Player]!'),
 (191, 31, 0, 2, 2, 1, 'Thank\'s [Talked]'),
@@ -1598,7 +1604,107 @@ INSERT INTO `tw_talk_quest_npc` (`ID`, `MobID`, `RequestComplete`, `Style`, `Tal
 (279, 46, 0, 0, 3, 1, '**You were surprised by the gift provided**: Oh, thank you very much. Do I owe you something?'),
 (280, 46, 0, 0, 5, 0, 'I hope you make it to the end, at least I hope you do. I didn\'t think you\'d be Apostle\'s favorite.'),
 (281, 46, 0, 0, 3, 1, 'Favorite [Talked]?'),
-(282, 46, 0, 1, 4, 0, '**He said very rudely**: I\'ll go, meet you later.');
+(282, 46, 0, 1, 4, 0, '**He said very rudely**: I\'ll go, meet you later.'),
+(283, 47, 0, 0, 0, 0, 'Hello [Player]. Are you free?'),
+(284, 47, 0, 0, 0, 1, 'Yes, of course. Everything okay?'),
+(285, 47, 0, 0, 0, 0, 'Apostle asked you to see her!'),
+(286, 47, 1, 0, 0, 1, 'Well!'),
+(287, 47, 0, 0, 0, 0, 'Thank you, I\'m going for a walk!'),
+(288, 48, 0, 0, 1, 0, '**She speaks in fear**: Hello [Player]. Today I received news that in the southern part of our village, goblins attacked. '),
+(289, 48, 0, 0, 1, 0, 'And it\'s not just goblins. This must be the army. The leader brought them.'),
+(290, 48, 0, 0, 3, 1, 'Maybe they kidnapped the residents and terrorized you, and now they decided to attack?'),
+(291, 48, 1, 0, 0, 0, 'I think so too. Anyway, I talked to Koko. About your appointment as an adventurer. We should prepare for resistance. Communication nodes they need to be destroyed'),
+(292, 48, 0, 0, 0, 1, 'Well, I did the job [Talked]!'),
+(293, 48, 0, 0, 0, 0, 'Good job thank\'s, you should meet with Koko, he will explain everything to you, good luck!'),
+(294, 48, 0, 0, 0, 1, 'Well, thank you!'),
+(295, 49, 0, 0, 0, 0, 'Get ready let\'s go to the Goblin-occupied zone.'),
+(296, 49, 0, 0, 0, 1, 'I\'m ready to sort of out right now.'),
+(297, 49, 0, 2, 2, 0, 'Well [Player], you\'re fun, Yes, but it\'s worth getting ready.'),
+(298, 49, 1, 0, 5, 1, 'Well, what do need [Talked]?'),
+(299, 49, 0, 0, 0, 0, 'I\'ll be waiting for you next to Craftsman.'),
+(300, 50, 0, 0, 0, 0, 'So first we need potions.'),
+(301, 50, 1, 0, 0, 0, 'Go get supplies, and at the same time exterminate a few slugs so that we can get there without any problems.'),
+(302, 50, 0, 0, 1, 1, '**You sound very tired**: We can all move, but the problem is that I\'m tired..'),
+(303, 50, 0, 1, 5, 0, 'Nothing to worry about [Player]. You need to toughen up. All right let\'s move out.'),
+(304, 51, 1, 0, 0, 0, 'We\'ll get to the guard post now. We\'ll move out there to exterminate the goblins.'),
+(305, 51, 0, 0, 0, 1, 'Well [Talked].'),
+(306, 52, 0, 0, 5, 1, '**Grinning**: Huh?'),
+(307, 52, 0, 0, 1, 0, 'We can\'t heal her..'),
+(308, 52, 0, 0, 5, 1, 'I don\'t understand..'),
+(309, 52, 0, 0, 1, 0, 'Our daughter, Maria.. She\'s sick!'),
+(310, 52, 0, 0, 0, 0, 'Why don\'t you take her to the Nurse?!'),
+(311, 52, 1, 0, 1, 0, 'I tried, but she said she can\'t do anything.. I found something in an old book of mine.. A gel treatment. But I also need Kappa Meat for it..'),
+(312, 52, 0, 0, 2, 0, 'Tha..nk.. You..'),
+(313, 52, 0, 0, 5, 0, 'Well.. don\'t look at me, heal Maria!'),
+(314, 53, 0, 0, 1, 0, 'F..Father?'),
+(315, 54, 0, 2, 2, 0, 'MARIA! You\'re well!'),
+(316, 54, 0, 0, 2, 1, '*with joy* Hi, Maria!'),
+(317, 54, 0, 0, 0, 0, 'How can I ever make it up to you?'),
+(318, 54, 1, 0, 0, 1, 'Well Sir.. I might need a discount from your old friend, the Craftsman.'),
+(319, 54, 0, 0, 2, 0, 'Sure, I\'ll.. let him know you deserve it!'),
+(320, 55, 0, 0, 5, 1, 'Sure..What can I do?\r\n'),
+(321, 55, 0, 0, 5, 0, 'I heard you helped the craftsman with his deliveries..I have no time for small things like mining cooper, can you do it for me? I have to save the world in the main time..'),
+(322, 55, 1, 0, 5, 1, ' *a bit angry* Ok, I will do it.'),
+(323, 55, 0, 0, 2, 0, 'Oh, it\'s you kid!\r\n'),
+(324, 55, 0, 1, 4, 1, '*you can\'t control yourself* HEY. I\'M NOT A KID!'),
+(325, 55, 0, 0, 0, 0, 'Hey.. easy, just a joke, did you get what I wanted?'),
+(326, 55, 0, 0, 5, 1, 'Yes.. *puts a heavy cooper bag on Erik\'s table*'),
+(327, 55, 0, 1, 4, 0, 'Good, now get out of here!'),
+(328, 55, 0, 1, 4, 1, 'Wait.. YOU NOT GONNA PAY ME??'),
+(329, 55, 0, 1, 4, 0, 'Haha! I am messing with you.'),
+(330, 56, 0, 0, 0, 1, 'So can you tell me how you got here?'),
+(331, 56, 0, 0, 5, 0, '**He\'s stuttered**: A long story..'),
+(332, 56, 0, 0, 5, 0, 'We tried a new potion mixed with ether, but something went wrong, my hiccups are part of this experiment, and I ended up here after I drank it'),
+(333, 56, 0, 0, 0, 0, '**Sound in the tablet**: Noctis... Noctiis. Do you hear me?'),
+(334, 56, 0, 0, 0, 0, '**Noctis**: I can hear you, how do I get out of here?'),
+(335, 56, 0, 0, 0, 0, '**Sound in the tablet**: Collect all the fragments that ended up here. The connection is lost....'),
+(336, 56, 0, 0, 0, 1, 'What were you talking to just now?'),
+(337, 56, 1, 0, 0, 0, 'A tablet made from a magic crystal. In General, as I thought I need your help in collecting fragments'),
+(338, 56, 0, 0, 0, 1, 'Of course I\'ll help'),
+(339, 57, 0, 0, 0, 0, 'Look at what I can give you in return for your help. (Vote menu shop list)'),
+(340, 57, 0, 0, 0, 1, 'Wow, [Talked] where can I find them?'),
+(341, 57, 0, 0, 0, 0, 'In a distorted dimension.'),
+(342, 57, 1, 0, 5, 1, 'Where is it? How do I get there?'),
+(343, 57, 0, 0, 0, 0, '[Player] way, so we\'ll be preparing to get there.'),
+(344, 58, 1, 0, 0, 0, 'So first [Player], I\'ll need these things from you. They resonate between our worlds'),
+(345, 58, 0, 0, 0, 1, 'Take it [Talked].'),
+(346, 58, 0, 0, 0, 0, 'Well thank you, it will be a little easier now.'),
+(347, 58, 0, 0, 0, 0, '**Sound in the tablet**: Noctis. How you to get the fragments we will be able to pick you up.'),
+(348, 58, 0, 0, 0, 0, '**Noctis**: Okay, Sid..'),
+(349, 59, 1, 0, 0, 0, 'Next thing I need to create a resonance. Bring me these items.'),
+(350, 59, 0, 0, 0, 1, 'Everything is ready?. [Talked] take it'),
+(351, 59, 0, 0, 0, 0, '[Player] yes.. almost, follow me and we\'ll start resonating.'),
+(352, 60, 0, 0, 0, 0, 'All ready.'),
+(353, 60, 0, 0, 0, 0, 'Resonance received. I will wait for you with fragments'),
+(354, 60, 1, 0, 5, 1, 'Can come to resonance?'),
+(355, 60, 0, 0, 0, 0, 'Yes. Don\'t worry nothing will happen to you.'),
+(356, 61, 1, 2, 2, 0, 'I welcome you [Talked], nice to meet you.'),
+(357, 61, 0, 2, 2, 0, 'Glad to meet you, i\'am [Player]!'),
+(358, 62, 0, 0, 0, 0, 'Him you will spend time here. I have to go to the village.'),
+(359, 62, 1, 2, 2, 0, 'Need to stand on defense in the village, good luck to you I will wait for good news from you.'),
+(360, 62, 0, 0, 2, 0, 'Good luck to you [Talked].'),
+(361, 63, 0, 0, 0, 0, 'I came from a far Eastern country, I have some problems in the country so I need to become stronger.'),
+(362, 63, 0, 0, 0, 1, 'I came for similar purposes. But I would like to visit your country.'),
+(363, 63, 0, 0, 2, 0, '**He speaks with a smile**: If you wish I will be sailing back soon I can take you with me'),
+(364, 63, 1, 0, 0, 1, 'I\'d love to, but I don\'t know, i have here made friends. We\'ll see.'),
+(365, 63, 0, 0, 5, 0, 'Well, if we still live of course. And the got to talking and drive away goblins need.'),
+(366, 64, 1, 0, 0, 0, 'To begin with, we must exterminate many of them as possible. To get to them in zone'),
+(367, 64, 0, 0, 1, 1, '**Very tired voice**: [Talked]. I\'m so tired, there are so many of them.....'),
+(368, 64, 0, 0, 1, 0, '**He sounds very tired**: Yes, I am also very tired, but we have to deal with it.'),
+(369, 64, 0, 0, 0, 0, 'All right let\'s keep going before they pile up again.'),
+(370, 65, 0, 0, 0, 0, 'Hmmm.. I see a passageway. I think we can go through there and find out where they\'re coming from.'),
+(371, 65, 1, 0, 5, 1, 'I\'m worried about something.. Where did this hole?'),
+(372, 65, 0, 0, 5, 0, 'I don\'t know either, honestly. Maybe the goblins have dug through and are coming out. In any case we need to find out.'),
+(373, 66, 0, 0, 0, 0, 'I think this is where they live. '),
+(374, 66, 0, 0, 0, 0, 'In any case, if we can not cope with them, there is an option to block the way. But I think they\'ll dig it up again in time.'),
+(375, 66, 1, 1, 5, 1, '**In anger**: LET\'S BREAK UP THESE FREAKS ALREADY... '),
+(376, 66, 0, 1, 2, 0, 'I\'m only for your idea. Let\'s go!'),
+(377, 67, 1, 0, 0, 0, 'And here is their leader.'),
+(378, 67, 0, 2, 2, 1, 'Did we manage?'),
+(379, 67, 0, 0, 5, 0, 'We don\'t know yet we need to get out of here....'),
+(380, 67, 0, 0, 0, 0, 'I\'ll be waiting for you where we fought the goblins.'),
+(384, 68, 1, 0, 0, 1, 'Finally we got out how do you think we managed?'),
+(385, 68, 0, 0, 5, 0, 'I don\'t know [Player], we have to report this news to the village.');
 
 -- --------------------------------------------------------
 
@@ -1626,12 +1732,19 @@ INSERT INTO `tw_world_swap` (`ID`, `OpenQuestID`, `WorldID`, `PositionX`, `Posit
 (2, 2, 1, 4605, 1067, 2, 3570, 7950),
 (3, 12, 2, 13760, 6680, 3, 400, 1260),
 (4, 13, 2, 3510, 6340, 4, 4740, 900),
-(5, NULL, 3, 4560, 1205, 5, 610, 4500),
+(5, 19, 3, 4560, 1205, 5, 610, 4500),
 (6, 15, 2, 8328, 6020, 7, 4135, 840);
 
 --
 -- Индексы сохранённых таблиц
 --
+
+--
+-- Индексы таблицы `ENUM_BEHAVIOR_MOBS`
+--
+ALTER TABLE `ENUM_BEHAVIOR_MOBS`
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `Behavior` (`Behavior`);
 
 --
 -- Индексы таблицы `ENUM_CRAFT_TABS`
@@ -1713,7 +1826,8 @@ ALTER TABLE `tw_accounts_data`
   ADD KEY `DiscordID` (`DiscordID`),
   ADD KEY `tw_accounts_data_ibfk_3` (`WorldID`),
   ADD KEY `GuildRank` (`GuildRank`),
-  ADD KEY `Level` (`Level`);
+  ADD KEY `Level` (`Level`),
+  ADD KEY `Exp` (`Exp`);
 
 --
 -- Индексы таблицы `tw_accounts_inbox`
@@ -1799,9 +1913,9 @@ ALTER TABLE `tw_bots_mobs`
   ADD KEY `it_drop_2` (`it_drop_2`),
   ADD KEY `it_drop_3` (`it_drop_3`),
   ADD KEY `it_drop_4` (`it_drop_4`),
-  ADD KEY `it_drop_5` (`it_drop_5`),
   ADD KEY `WorldID` (`WorldID`),
-  ADD KEY `Effect` (`Effect`);
+  ADD KEY `Effect` (`Effect`),
+  ADD KEY `Behavior` (`Behavior`);
 
 --
 -- Индексы таблицы `tw_bots_npc`
@@ -1886,7 +2000,8 @@ ALTER TABLE `tw_guilds`
   ADD UNIQUE KEY `ID` (`ID`),
   ADD KEY `OwnerID` (`OwnerID`),
   ADD KEY `Bank` (`Bank`),
-  ADD KEY `Level` (`Level`);
+  ADD KEY `Level` (`Level`),
+  ADD KEY `Experience` (`Experience`);
 
 --
 -- Индексы таблицы `tw_guilds_decorations`
@@ -2024,7 +2139,8 @@ ALTER TABLE `tw_skills_list`
 ALTER TABLE `tw_storages`
   ADD PRIMARY KEY (`ID`),
   ADD UNIQUE KEY `ID` (`ID`),
-  ADD KEY `WorldID` (`WorldID`);
+  ADD KEY `WorldID` (`WorldID`),
+  ADD KEY `Currency` (`Currency`);
 
 --
 -- Индексы таблицы `tw_talk_other_npc`
@@ -2060,6 +2176,11 @@ ALTER TABLE `tw_world_swap`
 --
 
 --
+-- AUTO_INCREMENT для таблицы `ENUM_BEHAVIOR_MOBS`
+--
+ALTER TABLE `ENUM_BEHAVIOR_MOBS`
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+--
 -- AUTO_INCREMENT для таблицы `ENUM_CRAFT_TABS`
 --
 ALTER TABLE `ENUM_CRAFT_TABS`
@@ -2088,37 +2209,37 @@ ALTER TABLE `ENUM_TALK_STYLES`
 -- AUTO_INCREMENT для таблицы `tw_accounts`
 --
 ALTER TABLE `tw_accounts`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=455;
 --
 -- AUTO_INCREMENT для таблицы `tw_accounts_data`
 --
 ALTER TABLE `tw_accounts_data`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=455;
 --
 -- AUTO_INCREMENT для таблицы `tw_accounts_inbox`
 --
 ALTER TABLE `tw_accounts_inbox`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=140;
 --
 -- AUTO_INCREMENT для таблицы `tw_accounts_items`
 --
 ALTER TABLE `tw_accounts_items`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=163;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4385;
 --
 -- AUTO_INCREMENT для таблицы `tw_accounts_locations`
 --
 ALTER TABLE `tw_accounts_locations`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=529;
 --
 -- AUTO_INCREMENT для таблицы `tw_accounts_quests`
 --
 ALTER TABLE `tw_accounts_quests`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=173;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2864;
 --
 -- AUTO_INCREMENT для таблицы `tw_accounts_skills`
 --
 ALTER TABLE `tw_accounts_skills`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=82;
 --
 -- AUTO_INCREMENT для таблицы `tw_aethers`
 --
@@ -2128,47 +2249,47 @@ ALTER TABLE `tw_aethers`
 -- AUTO_INCREMENT для таблицы `tw_bots_mobs`
 --
 ALTER TABLE `tw_bots_mobs`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 --
 -- AUTO_INCREMENT для таблицы `tw_bots_npc`
 --
 ALTER TABLE `tw_bots_npc`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 --
 -- AUTO_INCREMENT для таблицы `tw_bots_quest`
 --
 ALTER TABLE `tw_bots_quest`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 --
 -- AUTO_INCREMENT для таблицы `tw_bots_world`
 --
 ALTER TABLE `tw_bots_world`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=35;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
 --
 -- AUTO_INCREMENT для таблицы `tw_craft_list`
 --
 ALTER TABLE `tw_craft_list`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 --
 -- AUTO_INCREMENT для таблицы `tw_dungeons`
 --
 ALTER TABLE `tw_dungeons`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
 -- AUTO_INCREMENT для таблицы `tw_dungeons_door`
 --
 ALTER TABLE `tw_dungeons_door`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 --
 -- AUTO_INCREMENT для таблицы `tw_dungeons_records`
 --
 ALTER TABLE `tw_dungeons_records`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 --
 -- AUTO_INCREMENT для таблицы `tw_guilds`
 --
 ALTER TABLE `tw_guilds`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 --
 -- AUTO_INCREMENT для таблицы `tw_guilds_decorations`
 --
@@ -2178,7 +2299,7 @@ ALTER TABLE `tw_guilds_decorations`
 -- AUTO_INCREMENT для таблицы `tw_guilds_history`
 --
 ALTER TABLE `tw_guilds_history`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=246;
 --
 -- AUTO_INCREMENT для таблицы `tw_guilds_houses`
 --
@@ -2188,12 +2309,12 @@ ALTER TABLE `tw_guilds_houses`
 -- AUTO_INCREMENT для таблицы `tw_guilds_invites`
 --
 ALTER TABLE `tw_guilds_invites`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 --
 -- AUTO_INCREMENT для таблицы `tw_guilds_ranks`
 --
 ALTER TABLE `tw_guilds_ranks`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 --
 -- AUTO_INCREMENT для таблицы `tw_houses`
 --
@@ -2218,7 +2339,7 @@ ALTER TABLE `tw_logicworld`
 -- AUTO_INCREMENT для таблицы `tw_mailshop`
 --
 ALTER TABLE `tw_mailshop`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=44;
 --
 -- AUTO_INCREMENT для таблицы `tw_position_miner`
 --
@@ -2233,27 +2354,27 @@ ALTER TABLE `tw_position_plant`
 -- AUTO_INCREMENT для таблицы `tw_quests_list`
 --
 ALTER TABLE `tw_quests_list`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 --
 -- AUTO_INCREMENT для таблицы `tw_skills_list`
 --
 ALTER TABLE `tw_skills_list`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 --
 -- AUTO_INCREMENT для таблицы `tw_storages`
 --
 ALTER TABLE `tw_storages`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 --
 -- AUTO_INCREMENT для таблицы `tw_talk_other_npc`
 --
 ALTER TABLE `tw_talk_other_npc`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 --
 -- AUTO_INCREMENT для таблицы `tw_talk_quest_npc`
 --
 ALTER TABLE `tw_talk_quest_npc`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=283;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=386;
 --
 -- AUTO_INCREMENT для таблицы `tw_world_swap`
 --
@@ -2267,10 +2388,9 @@ ALTER TABLE `tw_world_swap`
 -- Ограничения внешнего ключа таблицы `tw_accounts_data`
 --
 ALTER TABLE `tw_accounts_data`
-  ADD CONSTRAINT `tw_accounts_data_ibfk_1` FOREIGN KEY (`ID`) REFERENCES `tw_accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `tw_accounts_data_ibfk_2` FOREIGN KEY (`GuildID`) REFERENCES `tw_guilds` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `tw_accounts_data_ibfk_3` FOREIGN KEY (`WorldID`) REFERENCES `ENUM_WORLDS` (`WorldID`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `tw_accounts_data_ibfk_4` FOREIGN KEY (`GuildRank`) REFERENCES `tw_guilds_ranks` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE;
+  ADD CONSTRAINT `tw_accounts_data_ibfk_4` FOREIGN KEY (`GuildRank`) REFERENCES `tw_guilds_ranks` (`ID`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `tw_accounts_data_ibfk_5` FOREIGN KEY (`ID`) REFERENCES `tw_accounts` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Ограничения внешнего ключа таблицы `tw_accounts_inbox`
@@ -2334,8 +2454,8 @@ ALTER TABLE `tw_bots_mobs`
   ADD CONSTRAINT `tw_bots_mobs_ibfk_11` FOREIGN KEY (`it_drop_2`) REFERENCES `tw_items_list` (`ItemID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `tw_bots_mobs_ibfk_12` FOREIGN KEY (`it_drop_3`) REFERENCES `tw_items_list` (`ItemID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `tw_bots_mobs_ibfk_13` FOREIGN KEY (`it_drop_4`) REFERENCES `tw_items_list` (`ItemID`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `tw_bots_mobs_ibfk_14` FOREIGN KEY (`it_drop_5`) REFERENCES `tw_items_list` (`ItemID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `tw_bots_mobs_ibfk_15` FOREIGN KEY (`Effect`) REFERENCES `ENUM_EFFECTS_LIST` (`Name`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `tw_bots_mobs_ibfk_16` FOREIGN KEY (`Behavior`) REFERENCES `ENUM_BEHAVIOR_MOBS` (`Behavior`) ON DELETE NO ACTION ON UPDATE CASCADE,
   ADD CONSTRAINT `tw_bots_mobs_ibfk_8` FOREIGN KEY (`WorldID`) REFERENCES `ENUM_WORLDS` (`WorldID`) ON DELETE NO ACTION ON UPDATE CASCADE,
   ADD CONSTRAINT `tw_bots_mobs_ibfk_9` FOREIGN KEY (`it_drop_0`) REFERENCES `tw_items_list` (`ItemID`) ON DELETE SET NULL ON UPDATE CASCADE;
 
@@ -2381,7 +2501,7 @@ ALTER TABLE `tw_craft_list`
   ADD CONSTRAINT `tw_craft_list_ibfk_2` FOREIGN KEY (`ItemNeed0`) REFERENCES `tw_items_list` (`ItemID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `tw_craft_list_ibfk_3` FOREIGN KEY (`ItemNeed1`) REFERENCES `tw_items_list` (`ItemID`) ON DELETE SET NULL ON UPDATE CASCADE,
   ADD CONSTRAINT `tw_craft_list_ibfk_4` FOREIGN KEY (`ItemNeed2`) REFERENCES `tw_items_list` (`ItemID`) ON DELETE SET NULL ON UPDATE CASCADE,
-  ADD CONSTRAINT `tw_craft_list_ibfk_5` FOREIGN KEY (`Type`) REFERENCES `ENUM_CRAFT_TABS` (`TabID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  ADD CONSTRAINT `tw_craft_list_ibfk_5` FOREIGN KEY (`Type`) REFERENCES `ENUM_ITEMS_TYPES` (`TypeID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   ADD CONSTRAINT `tw_craft_list_ibfk_6` FOREIGN KEY (`WorldID`) REFERENCES `ENUM_WORLDS` (`WorldID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
@@ -2502,7 +2622,8 @@ ALTER TABLE `tw_position_plant`
 -- Ограничения внешнего ключа таблицы `tw_storages`
 --
 ALTER TABLE `tw_storages`
-  ADD CONSTRAINT `tw_storages_ibfk_2` FOREIGN KEY (`WorldID`) REFERENCES `ENUM_WORLDS` (`WorldID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `tw_storages_ibfk_2` FOREIGN KEY (`WorldID`) REFERENCES `ENUM_WORLDS` (`WorldID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `tw_storages_ibfk_3` FOREIGN KEY (`Currency`) REFERENCES `tw_items_list` (`ItemID`) ON DELETE NO ACTION ON UPDATE CASCADE;
 
 --
 -- Ограничения внешнего ключа таблицы `tw_talk_other_npc`

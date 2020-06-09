@@ -969,6 +969,7 @@ void CGS::OnInit(int WorldID)
 	pMmoController = new MmoController(this);
 	pMmoController->LoadLogicWorld();
 	UpdateZoneDungeon();
+	UpdateZonePVP();
 
 	// создаем все гейм обьекты для сервера
 	if(IsDungeon())
@@ -996,8 +997,6 @@ void CGS::OnInit(int WorldID)
 	
 	// инициализируем pathfinder
 	m_pPathFinder = new CPathfinder(&m_Layers, &m_Collision);
-
-	UpdateZonePVP();
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
 }
 
@@ -1013,7 +1012,7 @@ void CGS::OnConsoleInit()
 	Console()->Register("tune_reset", "", CFGFLAG_SERVER, ConTuneReset, this, "Reset tuning");
 	Console()->Register("tune_dump", "", CFGFLAG_SERVER, ConTuneDump, this, "Dump tuning");
 	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, this, "Say in chat");
-	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, this, "Add new bot on datatable <clientid> <nick name>");
+	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, this, "(Warning) Add new bot on database or update if finding <clientid> <bot name>");
 }
 
 // Отключение сервера
