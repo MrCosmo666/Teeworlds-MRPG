@@ -244,8 +244,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 			GS->Chat(pPlayer->GetCID(), Buffer.buffer());
 			Buffer.clear();
 		}
-
-		dbg_msg("test", "%s", GS->Server()->GetClientLanguage(ClientID));
 		return;
 	}
  

@@ -97,10 +97,13 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 			return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
 		}
 
+		const char *pPlayerLanguage = CHECKACCESS->getString("Language").c_str();
+		GS()->Server()->SetClientLanguage(ClientID, pPlayerLanguage);
+		pPlayer->SetLanguage(pPlayerLanguage);
+
 		str_copy(pPlayer->Acc().Login, clear_Login.cstr(), sizeof(pPlayer->Acc().Login));
 		str_copy(pPlayer->Acc().Password, clear_Pass.cstr(), sizeof(pPlayer->Acc().Password));
 		str_copy(pPlayer->Acc().LastLogin, CHECKACCESS->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().LastLogin));
-		pPlayer->SetLanguage(CHECKACCESS->getString("Language").c_str());
 
 		pPlayer->Acc().AuthID = UserID;
 		pPlayer->Acc().Level = ACCOUNTDATA->getInt("Level");
@@ -246,6 +249,7 @@ bool AccountMainJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int V
 	if (PPSTR(CMD, "SELECTLANGUAGE") == 0)
 	{
 		const char *pSelectedLanguage = GS()->Server()->Localization()->m_pLanguages[VoteID]->GetFilename();
+		GS()->Server()->SetClientLanguage(ClientID, pSelectedLanguage);
 		pPlayer->SetLanguage(pSelectedLanguage);
 		GS()->Chat(ClientID, "You have chosen a language \"{STR}\".", pSelectedLanguage);
 		GS()->VResetVotes(ClientID, MenuList::MENU_SELECT_LANGUAGE);
