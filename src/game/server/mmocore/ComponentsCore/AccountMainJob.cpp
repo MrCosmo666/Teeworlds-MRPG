@@ -236,7 +236,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 			const char *pLanguageName = GS()->Server()->Localization()->m_pLanguages[i]->GetFilename();
 			if(str_comp(pPlayerLanguage, pLanguageName) == 0)
 				continue;
-			GS()->AVM(ClientID, "SELECTLANGUAGE", i, TAB_LANGUAGES, "Select language {STR}", pLanguageName);
+			GS()->AVM(ClientID, "SELECTLANGUAGE", i, TAB_LANGUAGES, "Select language \"{STR}\"", pLanguageName);
 		}
 		GS()->AddBack(ClientID);
 		return true;
@@ -251,7 +251,7 @@ bool AccountMainJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int V
 		const char *pSelectedLanguage = GS()->Server()->Localization()->m_pLanguages[VoteID]->GetFilename();
 		GS()->Server()->SetClientLanguage(ClientID, pSelectedLanguage);
 		pPlayer->SetLanguage(pSelectedLanguage);
-		GS()->Chat(ClientID, "You have chosen a language \"{STR}\".", pSelectedLanguage);
+		GS()->Chat(ClientID, "You chosen a language \"{STR}\".", pSelectedLanguage);
 		GS()->VResetVotes(ClientID, MenuList::MENU_SELECT_LANGUAGE);
 		Job()->SaveAccount(pPlayer, SaveType::SAVE_LANGUAGE);
 		return true;

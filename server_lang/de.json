@@ -266,5 +266,33 @@
 	{
 		"key": "{STR} voted for {STR}.",
 		"value": "{STR} gestimmt für {STR}."
+	},
+	{
+		"key": "Languages Information",
+		"value": "Sprachen Informationen"
+	},
+	{
+		"key": "Here you can choose the language.",
+		"value": "Hier können Sie die Sprache wählen."
+	},
+	{
+		"key": "Note: translation is not complete.",
+		"value": "Die übersetzung ist nicht vollständig."
+	},
+	{
+		"key": "Active language: {STR}",
+		"value": "Aktive Sprache: {STR}"
+	},
+	{
+		"key": "Select language \"{STR}\"",
+		"value": "Sprache auswählen \"{STR}\""
+	},
+	{
+		"key": "You chosen a language \"{STR}\".",
+		"value": "Sie haben eine Sprache \"{STR}\" gewählt."
+	},
+	{
+		"key": "Settings language",
+		"value": "Einstellungen Sprache"
 	}
 ]}
