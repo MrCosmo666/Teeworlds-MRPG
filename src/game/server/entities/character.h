@@ -28,10 +28,10 @@ class CCharacter : public CEntity
 	void DoWeaponSwitch();
 
 	bool InteractiveHammer(vec2 Direction, vec2 ProjStartPos);
-	void InteractiveGun(vec2 Direction, vec2 ProjStartPos);
-	void InteractiveShotgun(vec2 Direction, vec2 ProjStartPos);
-	void InteractiveGrenade(vec2 Direction, vec2 ProjStartPos);
-	void InteractiveRifle(vec2 Direction, vec2 ProjStartPos);
+	//void InteractiveGun(vec2 Direction, vec2 ProjStartPos);
+	//void InteractiveShotgun(vec2 Direction, vec2 ProjStartPos);
+	//void InteractiveGrenade(vec2 Direction, vec2 ProjStartPos);
+	//void InteractiveRifle(vec2 Direction, vec2 ProjStartPos);
 	void HandleTuning();
 	void HandleBuff(CTuningParams* TuningParams);
 	void HandleAuthedPlayer();

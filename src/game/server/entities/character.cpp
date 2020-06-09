@@ -902,9 +902,9 @@ void CCharacter::HandleEvents()
 	if(m_Event == TILE_EVENT_PARTY)
 	{
 		SetEmote(EMOTE_HAPPY, 1);
-		if(rand() % 50 == 0)
+		if(random_int() % 50 == 0)
 		{
-			GS()->SendEmoticon(m_pPlayer->GetCID(), 1 + rand() % 2);
+			GS()->SendEmoticon(m_pPlayer->GetCID(), 1 + random_int() % 2);
 			GS()->CreateDeath(m_Core.m_Pos, m_pPlayer->GetCID());
 		}
 	}
@@ -922,7 +922,7 @@ void CCharacter::GiveRandomMobEffect(int FromID)
 	CPlayer* pFrom = GS()->GetPlayer(FromID);
 	if(!pFrom || !pFrom->IsBot() || pFrom->GetBotType() != BotsTypes::TYPE_BOT_MOB || BotJob::MobBot[pFrom->GetBotSub()].Effect[0] == '\0')
 		return;
-	m_pPlayer->GiveEffect(BotJob::MobBot[pFrom->GetBotSub()].Effect, 3+rand()%3, 40);
+	m_pPlayer->GiveEffect(BotJob::MobBot[pFrom->GetBotSub()].Effect, 3+random_int()%3, 40);
 }
 
 bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)
@@ -946,27 +946,27 @@ bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)
 	}
 	return false;
 }
-
+/*
 void CCharacter::InteractiveGun(vec2 Direction, vec2 ProjStartPos)
 {
-
+	return;
 }
 
 void CCharacter::InteractiveShotgun(vec2 Direction, vec2 ProjStartPos)
 {
-
+	return;
 }
 
 void CCharacter::InteractiveGrenade(vec2 Direction, vec2 ProjStartPos)
 {
-
+	return;
 }
 
 void CCharacter::InteractiveRifle(vec2 Direction, vec2 ProjStartPos)
 {
-
+	return;
 }
-
+*/
 void CCharacter::HandleTuning()
 {
 	// тюнинг воды
