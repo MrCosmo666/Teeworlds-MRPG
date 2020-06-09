@@ -241,6 +241,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		GS()->AddBack(ClientID);
 		return true;
 	}
+	return false;
 }
 
 bool AccountMainJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
@@ -256,7 +257,7 @@ bool AccountMainJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int V
 		Job()->SaveAccount(pPlayer, SaveType::SAVE_LANGUAGE);
 		return true;
 	}
-
+	return false;
 }
 
 void AccountMainJob::OnResetClient(int ClientID)
