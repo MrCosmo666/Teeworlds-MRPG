@@ -84,7 +84,7 @@ def unzip(filename, where):
 	part_2 = "[^/\n]+(?=\n)"
 	regular_expression = r"%s%s" % (part_1, part_2)
 	main_directory = re.search(regular_expression, list)
-	while main_directory == None:
+	while main_directory is None:
 		part_1 += directory
 		regular_expression = r"%s%s" % (part_1, part_2)
 		main_directory = re.search(regular_expression, list)
@@ -112,7 +112,7 @@ def search_object(directory, object):
 	directory = os.listdir(directory)
 	for entry in directory:
 		match = re.search(object, entry)
-		if match != None:
+		if match is not None:
 			return entry
 
 # clean
@@ -151,7 +151,7 @@ if flag_download:
 # unpack
 if flag_unpack:
 	print("*** unpacking source ***")
-	if hasattr(locals(), 'src_package_bam') == False:
+	if hasattr(locals(), 'src_package_bam') is False:
 		src_package_bam = search_object(work_dir, r"bam.*?\.")
 		if not src_package_bam:
 			bail("couldn't find bam source package")
@@ -159,7 +159,7 @@ if flag_unpack:
 	if not src_dir_bam:
 		bail("couldn't unpack bam source package")
 
-	if hasattr(locals(), 'src_package_teeworlds') == False:
+	if hasattr(locals(), 'src_package_teeworlds') is False:
 		src_package_teeworlds = search_object(work_dir, r"teeworlds.*?\.")
 		if not src_package_bam:
 			bail("couldn't find %s source package" % name)
@@ -178,18 +178,18 @@ if flag_build_bam:
 		else:
 			print("using cl")
 			os.system("make_win32_msvc.bat")
-		if file_exists("%sbam.exe" % bam_execution_path) == False:
+		if file_exists("%sbam.exe" % bam_execution_path) is False:
 			bail("failed to build bam")
 	else:
 		os.system("sh make_unix.sh")
-		if file_exists("%sbam" % bam_execution_path) == False:
+		if file_exists("%sbam" % bam_execution_path) is False:
 			bail("failed to build bam")
 	os.chdir(work_dir)
 
 # build the game
 if flag_build_teeworlds:
 	print("*** building %s ***" % name)
-	if hasattr(locals(), 'src_dir_bam') == False:
+	if hasattr(locals(), 'src_dir_bam') is False:
 		src_dir_bam = search_object(work_dir, r"bam[^\.]*$") + os.sep
 		if src_dir_bam:
 			directory = src_dir_bam + bam_execution_path
@@ -200,7 +200,7 @@ if flag_build_teeworlds:
 				bail("couldn't find bam")
 		else:
 			bail("couldn't find bam")
-	if hasattr(locals(), 'src_dir_teeworlds') == False:
+	if hasattr(locals(), 'src_dir_teeworlds') is False:
 		src_dir_teeworlds = search_object(work_dir, r"teeworlds[^\.]*$")
 		if not src_dir_teeworlds:
 			bail("couldn't find %s source" % name)
@@ -240,7 +240,7 @@ if flag_build_teeworlds:
 # make release
 if flag_make_release:
 	print("*** making release ***")
-	if hasattr(locals(), 'src_dir_teeworlds') == False:
+	if hasattr(locals(), 'src_dir_teeworlds') is False:
 		src_dir_teeworlds = search_object(work_dir, r"teeworlds[^\.]*$")
 		if not src_dir_teeworlds:
 			bail("couldn't find %s source" % name)
