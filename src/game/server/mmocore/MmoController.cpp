@@ -198,6 +198,13 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", GS()->Server()->GetWorldID(ClientID), pPlayer->Acc().AuthID);
 		return;
 	}
+
+	// сохранение языка игрока
+	else if(Table == SaveType::SAVE_LANGUAGE)
+	{
+		SJK.UD("tw_accounts", "Language = '%d' WHERE ID = '%d'", pPlayer->GetLanguage(), pPlayer->Acc().AuthID);
+		return;		
+	}
 	else
 	{
 		SJK.UD("tw_accounts", "Username = '%s', Password = '%s' WHERE ID = '%d'", pPlayer->Acc().Login, pPlayer->Acc().Password, pPlayer->Acc().AuthID);
