@@ -203,50 +203,6 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		return;
 	}
 
-	else if(str_comp_num(Msg->m_pMessage, "/lang", 5) == 0)
-	{	
-		char pLanguageCode[128];
-		char aFinalLanguageCode[8];
-		aFinalLanguageCode[0] = 0;
-
-		if(sscanf(Msg->m_pMessage, "/lang %s", pLanguageCode) == 1)
-		{ 
-			for(int i=0; i < GS->Server()->Localization()->m_pLanguages.size(); i++)
-			{
-				if(str_comp_nocase(pLanguageCode, GS->Server()->Localization()->m_pLanguages[i]->GetFilename()) == 0)
-					str_copy(aFinalLanguageCode, pLanguageCode, sizeof(aFinalLanguageCode));
-			}
-		}
-		
-		if(aFinalLanguageCode[0])
-		{
-			GS->Server()->SetClientLanguage(ClientID, aFinalLanguageCode);
-			if(pPlayer)
-			{
-				pPlayer->SetLanguage(aFinalLanguageCode);
-				GS->ResetVotes(ClientID, MenuList::MAIN_MENU);
-			}
-		}
-		else
-		{
-			const char* pLanguage = pPlayer->GetLanguage();
-			dynamic_string BufferList;
-			int BufferIter = 0;
-			for(int i=0; i < GS->Server()->Localization()->m_pLanguages.size(); i++)
-			{
-				if(i > 0)
-					BufferIter = BufferList.append_at(BufferIter, ", ");
-				BufferIter = BufferList.append_at(BufferIter, GS->Server()->Localization()->m_pLanguages[i]->GetFilename());
-			}
-			
-			dynamic_string Buffer;
-			GS->Server()->Localization()->Format_L(Buffer, pLanguage, "Available languages: {STR}", BufferList.buffer());
-			GS->Chat(pPlayer->GetCID(), Buffer.buffer());
-			Buffer.clear();
-		}
-		return;
-	}
- 
 	if(str_comp_num(Msg->m_pMessage, "/", 1) == 0)
 	{
 		GS->ChatFollow(ClientID, "Command {STR} not found!", Msg->m_pMessage);
