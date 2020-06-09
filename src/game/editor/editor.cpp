@@ -1149,7 +1149,6 @@ void CEditor::DoToolbar(CUIRect ToolBar)
 		TB_Bottom.VSplitLeft(24.0f, &Button, &TB_Bottom);
 		RenderTools()->DrawUIRect(&Button, m_SelectedColor, 0, 0.0f);
 	}
-
 }
 
 static void Rotate(const CPoint *pCenter, CPoint *pPoint, float Rotation)
@@ -2067,7 +2066,6 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 									if(pEditLayers[k]->m_Type == m_Brush.m_lLayers[0]->m_Type)
 										pEditLayers[k]->BrushPlace(m_Brush.m_lLayers[0], wx, wy);
 								}
-
 							}
 
 							CLayerTiles *pLayer = (CLayerTiles*)GetSelectedLayerType(0, LAYERTYPE_TILES);
@@ -2233,7 +2231,6 @@ void CEditor::DoMapEditor(CUIRect View, CUIRect ToolBar)
 				// leave pipette mode on right-click
 				if(UI()->MouseButton(1))
 					m_MouseEdMode = MOUSE_EDIT;
-
 			} break;
 		}
 
@@ -2923,7 +2920,6 @@ void CEditor::RenderImages(CUIRect ToolBox, CUIRect ToolBar, CUIRect View)
 			break;
 		else if(ImageCur >= ImageStartAt)
 		{
-
 			ToolBox.HSplitTop(15.0f, &Slot, &ToolBox);
 			if(e == 0)
 				UI()->DoLabel(&Slot, "Embedded", 12.0f, CUI::ALIGN_CENTER);
@@ -4112,7 +4108,6 @@ void CEditor::RenderEnvelopeEditor(CUIRect View)
 																 Final.x+Final.w, Final.y+Final.h, Final.x, Final.y+Final.h);
 							Graphics()->QuadsDrawFreeform(&FreeformItem, 1);
 						}
-
 					}
 				}
 			}

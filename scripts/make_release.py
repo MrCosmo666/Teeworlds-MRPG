@@ -12,8 +12,8 @@ if len(sys.argv) != 3:
 	print("wrong number of arguments")
 	print(sys.argv[0], "VERSION PLATFORM")
 	sys.exit(-1)
-if options.source_dir != None:
-	if os.path.exists(options.source_dir) == False:
+if options.source_dir is not None:
+	if os.path.exists(options.source_dir) is False:
 		print("Source directory " + options.source_dir + " doesn't exist")
 		exit(1)
 	os.chdir(options.source_dir)

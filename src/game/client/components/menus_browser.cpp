@@ -590,7 +590,6 @@ int CMenus::DoBrowserEntry(const void *pID, CUIRect View, const CServerInfo *pEn
 					Num -= pEntry->m_NumBotSpectators;
 					Max -= pEntry->m_NumBotSpectators;
 				}
-
 			}
 			static float RenderOffset = 0.0f;
 			if(RenderOffset == 0.0f)
@@ -1350,7 +1349,6 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 					if(Input()->MouseDoubleClick())
 						Client()->Connect(GetServerBrowserAddress());
 				}
-				
 			}
 			if(m_AddressSelection & ADDR_SELECTION_RESET_SERVER_IF_NOT_FOUND)
 			{
@@ -1787,7 +1785,6 @@ void CMenus::RenderServerbrowserFriendTab(CUIRect View)
 			IsPlayer ? Localize("Are you sure that you want to remove the player '%s' from your friends list?") : Localize("Are you sure that you want to remove the clan '%s' from your friends list?"),
 			IsPlayer ? m_pDeleteFriend->m_aName : m_pDeleteFriend->m_aClan);
 		PopupConfirm(Localize("Remove friend"), aBuf, Localize("Yes"), Localize("No"), &CMenus::PopupConfirmRemoveFriend);
-
 	}
 }
 
@@ -2132,7 +2129,6 @@ void CMenus::RenderDetailInfo(CUIRect View, const CServerInfo *pInfo)
 
 		for(unsigned int i = 0; i < sizeof(s_aLabels) / sizeof(s_aLabels[0]); i++)
 		{
-
 			LeftColumn.HSplitTop(15.0f, &Row, &LeftColumn);
 			UI()->DoLabel(&Row, s_aLabels[i], FontSize, CUI::ALIGN_LEFT, Row.w, false);
 		}
