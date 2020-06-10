@@ -1516,6 +1516,11 @@ void str_utf8_trim_whitespaces_right(char *str);
 int str_utf8_rewind(const char *str, int cursor);
 
 /*
+	Function: Pfffff
+*/
+void str_translation_utf8_to_cp(char *str);
+
+/*
 	Function: str_utf8_forward
 		Moves a cursor forwards in an utf8 string
 

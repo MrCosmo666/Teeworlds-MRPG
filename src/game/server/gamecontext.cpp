@@ -1659,15 +1659,49 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 	if(To < 0 || To > MAX_PLAYERS || !m_apPlayers[To])
 		return;
 
+	// trim right and set maximum length to 64 utf8-characters
+	char aDesc[128]; // buffer x2 with unicode
+	str_copy(aDesc, Desc, sizeof(aDesc));
+	str_translation_utf8_to_cp(aDesc);
+	
 	CVoteOptions Vote;	
-	str_copy(Vote.m_aDescription, Desc, sizeof(Vote.m_aDescription));
+	str_copy(Vote.m_aDescription, aDesc, sizeof(Vote.m_aDescription));
 	str_copy(Vote.m_aCommand, Cmd, sizeof(Vote.m_aCommand));
 	Vote.m_TempID = ID;
-	Vote.m_TempID2 = ID2;
+	Vote.m_TempID2 = ID2; 
+
+	// trim right and set maximum length to 64 utf8-characters
+	int Length = 0;
+	const char *p = Vote.m_aDescription;
+	const char *pEnd = nullptr;
+	while(*p)
+	{
+		const char *pStrOld = p;
+		int Code = str_utf8_decode(&p);
+
+		// check if unicode is not empty
+		if(Code > 0x20 && Code != 0xA0 && Code != 0x034F && (Code < 0x2000 || Code > 0x200F) && (Code < 0x2028 || Code > 0x202F) &&
+			(Code < 0x205F || Code > 0x2064) && (Code < 0x206A || Code > 0x206F) && (Code < 0xFE00 || Code > 0xFE0F) &&
+			Code != 0xFEFF && (Code < 0xFFF9 || Code > 0xFFFC))
+		{
+			pEnd = nullptr;
+		}
+		else if(pEnd == nullptr)
+			pEnd = pStrOld;
+
+		if(++Length >= 63)
+		{
+			*(const_cast<char *>(p)) = 0;
+			break;
+		}
+	}
+	if(pEnd != nullptr)
+		*(const_cast<char *>(pEnd)) = 0;
+	
 	m_PlayerVotes[To].push_back(Vote);
 
 	// отправить клиентам что имеют клиент ммо
-	if(CheckClient(To))
+	if(CheckClient(To)) 
 	{
 		if (str_length(Vote.m_aDescription) < 1)
 			m_apPlayers[To]->m_Colored = { 0, 0, 0 };
