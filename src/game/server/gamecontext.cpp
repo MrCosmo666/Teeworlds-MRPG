@@ -1659,7 +1659,6 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 	if(To < 0 || To > MAX_PLAYERS || !m_apPlayers[To])
 		return;
 
-	// trim right and set maximum length to 64 utf8-characters
 	char aDesc[128]; // buffer x2 with unicode
 	str_copy(aDesc, Desc, sizeof(aDesc));
 	str_translation_utf8_to_cp(aDesc);
