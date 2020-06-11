@@ -380,9 +380,10 @@ void BotJob::LoadMobsBots(const char* pWhereLocalWorld)
 
 const char* BotJob::GetMeaninglessDialog()
 {
-	const char* pTalking[2] = { "[Player], do you have any questions? I'm sorry I can't help you.", 
-								"What a beautiful [Time], we already talked. I don't have anything for you [Player]." };
-	return pTalking[random_int()%2];
+	const char* pTalking[3] = { "[Player], do you have any questions? I'm sorry I can't help you.", 
+								"What a beautiful [Time]. I don't have anything for you [Player].", 
+								"[Player] are you interested something? I'm sorry, don't want to talk right now." };
+	return pTalking[random_int()%3];
 }
 
 // threading CPathFinderThread botai ? TODO: protect BotPlayer?
