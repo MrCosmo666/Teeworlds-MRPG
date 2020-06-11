@@ -664,20 +664,22 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 	const int MobID = BotPlayer->GetBotSub();
 	if (BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
+		// Очистка конца диалогов или диалога который был бесмысленный
 		const int sizeTalking = BotJob::NpcBot[MobID].m_Talk.size();
-		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
+		const bool isTalkingEmpty = BotJob::NpcBot[MobID].m_Talk.empty();
+		if ((isTalkingEmpty && m_TalkingNPC.m_TalkedProgress == 999) || (!isTalkingEmpty && m_TalkingNPC.m_TalkedProgress >= sizeTalking))
 		{
 			ClearTalking();
 			GS()->ClearTalkText(m_ClientID);
 			return;
 		}
 
-		// Узнать вообщем получен ли квест или если диалога нет выдавать рандомный диалог
+		// Узнать вообщем получен если квест выдавать рандомный бесмысленный диалог
 		int GivingQuestID = GS()->Mmo()->BotsData()->GetQuestNPC(MobID);
-		if (sizeTalking <= 0 || GS()->Mmo()->Quest()->GetState(m_ClientID, GivingQuestID) >= QuestState::QUEST_ACCEPT)
+		if (isTalkingEmpty || GS()->Mmo()->Quest()->GetState(m_ClientID, GivingQuestID) >= QuestState::QUEST_ACCEPT)
 		{
-			const char* RandomEmptyDialog = GS()->Mmo()->BotsData()->GetMeaninglessDialog();
-			GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID, RandomEmptyDialog);
+			const char* MeaninglessDialog = GS()->Mmo()->BotsData()->GetMeaninglessDialog();
+			GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, -1, TalkedID, MeaninglessDialog);
 			m_TalkingNPC.m_TalkedProgress = 999;
 			return;
 		}
