@@ -294,5 +294,33 @@
 	{
 		"key": "Settings language",
 		"value": "Einstellungen Sprache"
+	},
+	{
+		"key": "Required {INT}, but you have only {INT} {STR}!",
+		"value": "Erforderlich {INT}, aber Sie haben nur {INT} {STR}!"
+	},
+	{
+		"key": "Not upgrade points for +{INT}. Required {INT}."
+		"value": "Keine upgrade-Punkte für +{INT}. Erforderlich {INT}."
+	},
+	{
+		"key": "Upgrade has a maximum level."
+		"value": "Upgrade hat ein maximales Niveau."
+	},
+	{
+		"key": "This chat is intended for team / guilds!"
+		"value": "Dieser chat ist für team / Gilden gedacht!"
+	},
+	{
+		"key": "{STR} came! Good {STR}!"
+		"value": "{STR} kam! Gute {STR}!"
+	},
+	{
+		"key": "Nighttime experience was increase to {INT}%"
+		"value": "Nachtzeit Erfahrung wurde erhöht {INT}%"
+	},
+	{
+		"key": "Daytime experience was downgraded to 100%"
+		"value": "Täglich Erfahrung wurde auf herabgestuft 100%"
 	}
 ]}

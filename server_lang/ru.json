@@ -294,5 +294,33 @@
 	{
 		"key": "Settings language",
 		"value": "Настройка языка"
+	},
+	{
+		"key": "Required {INT}, but you have only {INT} {STR}!",
+		"value": "Требуется {INT}, но у вас есть только {INT} {STR}!"
+	},
+	{
+		"key": "Not upgrade points for +{INT}. Required {INT}."
+		"value": "Нет очков улучшения для +{INT}. Нужно {INT}."
+	},
+	{
+		"key": "Upgrade has a maximum level."
+		"value": "Улучшение имеет максимальный уровень."
+	},
+	{
+		"key": "This chat is intended for team / guilds!"
+		"value": "Этот чат нужен для гильдий или команд!"
+	},
+	{
+		"key": "{STR} came! Good {STR}!"
+		"value": "{STR} наступил(а)! Удачного(ой) {STR}!"
+	},
+	{
+		"key": "Nighttime experience was increase to {INT}%"
+		"value": "Ночной опыт повышен до {INT}%"
+	},
+	{
+		"key": "Daytime experience was downgraded to 100%"
+		"value": "Дневной опыт понижен до 100%"
 	}
 ]}

@@ -2309,9 +2309,9 @@ void CGS::SendDayInfo(int ClientID)
 	if(ClientID == -1)
 		Chat(-1, "{STR} came! Good {STR}!", Server()->GetStringTypeDay(), Server()->GetStringTypeDay());
 	if(m_DayEnumType == DayType::NIGHTTYPE)
-		Chat(ClientID, "Night increase to experience {INT}%", &m_RaidExp);
+		Chat(ClientID, "Nighttime experience was increase to {INT}%", &m_RaidExp);
 	else if(m_DayEnumType == DayType::MORNINGTYPE)
-		Chat(ClientID, "Day, experience was downgraded to 100%");
+		Chat(ClientID, "Daytime experience was downgraded to 100%");
 }
 
 // Сменить Снаряжение автоматически найти тип по Предмету

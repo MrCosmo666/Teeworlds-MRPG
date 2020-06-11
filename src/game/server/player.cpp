@@ -349,12 +349,12 @@ bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int Maxi
 	int UpgradeNeed = Price*Count;
 	if((*Upgrade + Count) > MaximalUpgrade)
 	{
-		GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "This upgrades maximal.");
+		GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Upgrade has a maximum level.");
 		return false;		
 	}
 	if(*Useless < UpgradeNeed)
 	{
-		GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Have no upgrade points for upgrade +{INT}. Need {INT}.", &Count, &UpgradeNeed);
+		GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Not upgrade points for +{INT}. Required {INT}.", &Count, &UpgradeNeed);
 		return false;
 	}
 	*Useless -= UpgradeNeed;
@@ -375,7 +375,7 @@ bool CPlayer::CheckFailMoney(int Price, int ItemID, bool CheckOnly)
 	ItemJob::InventoryItem &pPlayerItem = GetItem(ItemID);
 	if(pPlayerItem.Count < Price)
 	{
-		GS()->Chat(m_ClientID,"Sorry, need {INT} but you have only {INT} {STR}!", &Price, &pPlayerItem.Count, pPlayerItem.Info().GetName(this), NULL);
+		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", &Price, &pPlayerItem.Count, pPlayerItem.Info().GetName(this), NULL);
 		return true;
 	}
 
