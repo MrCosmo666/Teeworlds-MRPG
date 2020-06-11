@@ -233,7 +233,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		GS()->AVH(ClientID, TAB_LANGUAGES, GRAY_COLOR, "Active language: {STR}", pPlayerLanguage);
 		for(int i = 0; i < GS()->Server()->Localization()->m_pLanguages.size(); i++)
 		{
-			const char *pLanguageName = GS()->Server()->Localization()->m_pLanguages[i]->GetFilename();
+			const char *pLanguageName = GS()->Server()->Localization()->m_pLanguages[i]->GetName();
 			if(str_comp(pPlayerLanguage, pLanguageName) == 0)
 				continue;
 			GS()->AVM(ClientID, "SELECTLANGUAGE", i, TAB_LANGUAGES, "Select language \"{STR}\"", pLanguageName);

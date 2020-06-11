@@ -629,7 +629,7 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 	if(Iter > 0 && ParamTypeStart == -1)
 		BufferIter = Buffer.append_at_num(BufferIter, pText+Start, Iter-Start);
 	
-	if(pLanguage && pLanguage->GetWritingDirection() == DIRECTION_RTL)
+	if(pLanguage->GetWritingDirection() == DIRECTION_RTL)
 		ArabicShaping(Buffer, BufferStart);
 }
 
