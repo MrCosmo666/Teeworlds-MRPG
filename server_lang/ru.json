@@ -358,5 +358,9 @@
 	{
 		"key": "Skill already have maximum level!",
 		"value": "Навык уже имеет максимальный уровень!"
+	},
+	{
+		"key": "Menu is available in call-votes!",
+		"value": "Меню доступно в голосованиях!"
 	}
 ]}

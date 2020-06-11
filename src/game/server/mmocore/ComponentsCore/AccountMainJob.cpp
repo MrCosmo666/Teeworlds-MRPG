@@ -119,7 +119,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		}
 
 		GS()->Chat(ClientID, "- - - - - - - [Successful login] - - - - - - -");
-		GS()->Chat(ClientID, "Menu is available in votes!");
+		GS()->Chat(ClientID, "Menu is available in call-votes!");
 		GS()->m_pController->DoTeamChange(pPlayer, false);
 
 		char aAddrStr[64];
