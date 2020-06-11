@@ -293,7 +293,6 @@ void CCharacter::FireWeapon()
 				{
 					m_pPlayer->ClearTalking();
 					m_pPlayer->SetTalking(pTarget->GetPlayer()->GetCID(), false);
-					GS()->CreatePlayerSound(m_pPlayer->GetCID(), SOUND_TEE_CRY);
 					GS()->CreateHammerHit(ProjStartPos);
 					StartedTalking = true;
 					Hits = true;
