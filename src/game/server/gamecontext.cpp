@@ -1273,9 +1273,6 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				return;
 			}
 
-			// пишем клиент успешно прочекан 	
-			SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Successfully checks client.");
-
 			// отправим что прошли проверку на стороне сервера
 			CNetMsg_Sv_AfterIsMmoServer GoodCheck;
 			Server()->SendPackMsg(&GoodCheck, MSGFLAG_VITAL|MSGFLAG_FLUSH|MSGFLAG_NORECORD, ClientID);
