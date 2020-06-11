@@ -222,6 +222,7 @@ void QuestJob::AddProgress(CPlayer *pPlayer, int QuestID)
 	{
 		FinishQuest(pPlayer, QuestID);
 		GS()->VResetVotes(ClientID, MenuList::MENU_JOURNAL_MAIN);
+		GS()->VResetVotes(ClientID, MenuList::MAIN_MENU);
 	}
 	else
 	{
