@@ -177,7 +177,7 @@ void BotJob::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 	GS()->Mmo()->Quest()->QuestTableShowRequired(pPlayer, BotJob::QuestBot[MobID], "\0");
 }
 
-int BotJob::IsGiveQuestNPC(int MobID) const
+int BotJob::GetQuestNPC(int MobID) const
 {
 	if (!IsNpcBotValid(MobID))
 		return -1;
@@ -376,6 +376,13 @@ void BotJob::LoadMobsBots(const char* pWhereLocalWorld)
 			
 		GS()->Server()->AddInformationBotsCount(CountMobs);
 	}
+}
+
+const char* BotJob::GetMeaninglessDialog()
+{
+	const char* pTalking[2] = { "[Player], do you have any questions? I'm sorry I can't help you.", 
+								"What a beautiful [Time], we already talked. I don't have anything for you [Player]." };
+	return pTalking[random_int()%2];
 }
 
 // threading CPathFinderThread botai ? TODO: protect BotPlayer?

@@ -1219,12 +1219,6 @@ bool CCharacter::StartConversation(CPlayer *pTarget)
 	CPlayerBot* pTargetBot = static_cast<CPlayerBot*>(pTarget);
 	if (!pTargetBot || pTargetBot->GetBotType() == BotsTypes::TYPE_BOT_MOB || !pTargetBot->IsActiveSnappingBot(m_pPlayer->GetCID()))
 		return false;
-
-	// пропустить если нпс не имеет диалогов
-	const int MobID = pTargetBot->GetBotSub();
-	if(BotJob::NpcBot[MobID].m_Talk.empty())
-		return false;
-
 	return true;
 }
 

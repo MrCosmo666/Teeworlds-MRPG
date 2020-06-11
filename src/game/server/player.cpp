@@ -672,16 +672,17 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			return;
 		}
 
-		int GivingQuestID = GS()->Mmo()->BotsData()->IsGiveQuestNPC(MobID);
-		if (GS()->Mmo()->Quest()->GetState(m_ClientID, GivingQuestID) >= QuestState::QUEST_ACCEPT)
+		// Узнать вообщем получен ли квест или если диалога нет выдавать рандомный диалог
+		int GivingQuestID = GS()->Mmo()->BotsData()->GetQuestNPC(MobID);
+		if (sizeTalking <= 0 || GS()->Mmo()->Quest()->GetState(m_ClientID, GivingQuestID) >= QuestState::QUEST_ACCEPT)
 		{
-			const char* pTalking[2] = { "[Player], do you have any questions? I'm sorry I can't help you.", 
-										"What a beautiful [Time], we already talked. I don't have anything for you [Player]." };
-			GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID, pTalking[random_int()%2]);
+			const char* RandomEmptyDialog = GS()->Mmo()->BotsData()->GetMeaninglessDialog();
+			GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID, RandomEmptyDialog);
 			m_TalkingNPC.m_TalkedProgress = 999;
 			return;
 		}
 
+		// Получить квест по прогрессу диалога если он есть в данном прогрессе то принимаем квест
 		GivingQuestID = BotJob::NpcBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
 		if (GivingQuestID >= 1)
 		{
