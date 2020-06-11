@@ -153,7 +153,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 
 	Job()->OnInitAccount(ClientID);
 	const int Rank = GetRank(pPlayer->Acc().AuthID);
-	GS()->Chat(-1, "{STR} joined to Mmo server Rank #{INT}", GS()->Server()->ClientName(ClientID), &Rank);
+	GS()->Chat(-1, "{STR} joined to Mmo server. Rank #{INT}", GS()->Server()->ClientName(ClientID), &Rank);
 #ifdef CONF_DISCORD
 	char pMsg[256], pLoggin[64];
 	str_format(pLoggin, sizeof(pLoggin), "%s logged in Account ID %d", GS()->Server()->ClientName(ClientID), pPlayer->Acc().AuthID);

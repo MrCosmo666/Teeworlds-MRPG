@@ -300,43 +300,59 @@
 		"value": "Требуется {INT}, но у вас есть только {INT} {STR}!"
 	},
 	{
-		"key": "Not upgrade points for +{INT}. Required {INT}."
+		"key": "Not upgrade points for +{INT}. Required {INT}.",
 		"value": "Нет очков улучшения для +{INT}. Нужно {INT}."
 	},
 	{
-		"key": "Upgrade has a maximum level."
+		"key": "Upgrade has a maximum level.",
 		"value": "Улучшение имеет максимальный уровень."
 	},
 	{
-		"key": "This chat is intended for team / guilds!"
+		"key": "This chat is intended for team / guilds!",
 		"value": "Этот чат нужен для гильдий или команд!"
 	},
 	{
-		"key": "{STR} came! Good {STR}!"
+		"key": "{STR} came! Good {STR}!",
 		"value": "{STR} наступил(а)! Удачного(ой) {STR}!"
 	},
 	{
-		"key": "Nighttime experience was increase to {INT}%"
+		"key": "Nighttime experience was increase to {INT}%",
 		"value": "Ночной опыт повышен до {INT}%"
 	},
 	{
-		"key": "Daytime experience was downgraded to 100%"
+		"key": "Daytime experience was downgraded to 100%",
 		"value": "Дневной опыт понижен до 100%"
 	},
 	{
-		"key": "{STR} opened zone ({STR})!"
+		"key": "{STR} opened zone ({STR})!",
 		"value": "{STR} открыл зону ({STR})!"
 	},
 	{
-		"key": "Requires quest completion '{STR}'!"
+		"key": "Requires quest completion '{STR}'!",
 		"value": "Требуется завершение квеста '{STR}'!"
 	},
 	{
-		"key": "You can see menu in the votes!"
+		"key": "You can see menu in the votes!",
 		"value": "Вы можете увидеть меню в голосовании!"
 	},
 	{
-		"key": "You left the active zone, menu is restored!"
+		"key": "You left the active zone, menu is restored!",
 		"value": "Вы вышли из активной зоны, меню восстановлено!"
+	},
+	{
+		"key": "{STR} joined to Mmo server. Rank #{INT}",
+		"value": "{STR} подключился к Mmo server. Ранг #{INT}"
+	},
+	{
+		"key": "Account",
+		"value": "Аккаунт"
+	},
+	{
+		"key": "Miner",
+		"value": "Шахтер"
+	},
+	{
+		"key": "Plants",
+		"value": "Растения"
 	}
 ]}

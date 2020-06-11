@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
+#include <teeother/components/localization.h>
 #include "AccountMinerJob.h"
 
 using namespace sqlstr;
@@ -70,7 +71,7 @@ void AccountMinerJob::Work(CPlayer *pPlayer, int Level)
 		}
 		GS()->ChatFollow(ClientID, "Miner Level UP. Now Level {INT}!", &pPlayer->Acc().Miner[MnrLevel]);
 	}
-	pPlayer->ProgressBar("Miner", pPlayer->Acc().Miner[MnrLevel], pPlayer->Acc().Miner[MnrExp], ExperienceNeed, MultiplierExperience);
+	pPlayer->ProgressBar(GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), "Miner"), pPlayer->Acc().Miner[MnrLevel], pPlayer->Acc().Miner[MnrExp], ExperienceNeed, MultiplierExperience);
 	Job()->SaveAccount(pPlayer, SAVE_MINER_DATA);
 }
 

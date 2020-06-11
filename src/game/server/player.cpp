@@ -429,7 +429,7 @@ void CPlayer::AddExp(int Exp)
 			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_UPGRADES);
 		}
 	}
-	ProgressBar("Account", Acc().Level, Acc().Exp, ExpNeed(Acc().Level), Exp);
+	ProgressBar(GS()->Server()->Localization()->Localize(GetLanguage(), _("Account")), Acc().Level, Acc().Exp, ExpNeed(Acc().Level), Exp);
 
 	if (rand() % 5 == 0)
 		GS()->Mmo()->SaveAccount(this, SaveType::SAVE_STATS);

@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
+#include <teeother/components/localization.h>
 #include "AccountPlantJob.h"
 
 using namespace sqlstr;
@@ -98,7 +99,7 @@ void AccountPlantJob::Work(CPlayer* pPlayer, int Level)
 		}
 		GS()->ChatFollow(ClientID, "Plants Level UP. Now Level {INT}!", &pPlayer->Acc().Plant[PlLevel]);
 	}
-	pPlayer->ProgressBar("Plants", pPlayer->Acc().Plant[PlLevel], pPlayer->Acc().Plant[PlExp], ExperienceNeed, MultiplierExperience);
+	pPlayer->ProgressBar(GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), "Plants"), pPlayer->Acc().Plant[PlLevel], pPlayer->Acc().Plant[PlExp], ExperienceNeed, MultiplierExperience);
 	Job()->SaveAccount(pPlayer, SAVE_PLANT_DATA);
 }
 
