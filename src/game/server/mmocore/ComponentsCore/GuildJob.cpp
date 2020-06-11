@@ -87,14 +87,15 @@ bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 		const int HouseID = GetPosHouseID(pChr->m_Core.m_Pos);
 		if (HouseID > 0)
 		{
+			GS()->Chat(ClientID, "You can see menu in the votes!");
 			GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
-			GS()->Chat(ClientID, "Information load in Vote!");
 		}
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_GUILD_HOUSE))
 	{
+		GS()->Chat(ClientID, "You left the active zone, menu is restored!");
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		return true;

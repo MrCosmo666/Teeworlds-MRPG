@@ -322,5 +322,21 @@
 	{
 		"key": "Daytime experience was downgraded to 100%"
 		"value": "Täglich Erfahrung wurde auf herabgestuft 100%"
+	},
+	{
+		"key": "{STR} opened zone ({STR})!"
+		"value": "{STR} öffnete zone ({STR})!"
+	},
+	{
+		"key": "Requires quest completion '{STR}'!"
+		"value": "Erfordert quest-Abschluss '{STR}'!"
+	},
+	{
+		"key": "You can see menu in the votes!"
+		"value": "Sie können Menü in den Stimmen sehen!"
+	},
+	{
+		"key": "You left the active zone, menu is restored!"
+		"value": "Du hast die aktive zone verlassen, das Menü ist wiederhergestellt!"
 	}
 ]}

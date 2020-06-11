@@ -322,5 +322,21 @@
 	{
 		"key": "Daytime experience was downgraded to 100%"
 		"value": "Дневной опыт понижен до 100%"
+	},
+	{
+		"key": "{STR} opened zone ({STR})!"
+		"value": "{STR} открыл зону ({STR})!"
+	},
+	{
+		"key": "Requires quest completion '{STR}'!"
+		"value": "Требуется завершение квеста '{STR}'!"
+	},
+	{
+		"key": "You can see menu in the votes!"
+		"value": "Вы можете увидеть меню в голосовании!"
+	},
+	{
+		"key": "You left the active zone, menu is restored!"
+		"value": "Вы вышли из активной зоны, меню восстановлено!"
 	}
 ]}
