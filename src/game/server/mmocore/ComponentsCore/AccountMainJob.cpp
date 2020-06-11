@@ -230,9 +230,8 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		for (const auto& it : ItemJob::Items[ClientID])
 		{
 			const ItemJob::InventoryItem ItemData = it.second;
-			if (ItemData.Info().Type != ItemType::TYPE_SETTINGS || ItemData.Count <= 0)
-				continue;
-			GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
+			if (ItemData.Info().Type == ItemType::TYPE_SETTINGS && ItemData.Count > 0)
+				GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
 		}
 
 		// Снаряжение
@@ -242,19 +241,20 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		for (const auto& it : ItemJob::Items[ClientID])
 		{
 			ItemJob::InventoryItem ItemData = it.second;
-			if (ItemData.Count <= 0 || ItemData.Info().Type != ItemType::TYPE_MODULE)
-				continue;
+			if (ItemData.Info().Type == ItemType::TYPE_MODULE && ItemData.Count > 0)
+			{
+				char aAttributes[128];
+				Job()->Item()->FormatAttributes(ItemData, sizeof(aAttributes), aAttributes);
+				GS()->AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, TAB_SETTINGS_MODULES, "{STR} {STR}{STR}",
+					ItemData.Info().GetName(pPlayer), aAttributes, (ItemData.Settings ? "✔ " : "\0"));
+				FoundSettings = true;
+			}
+		}
 
-			char aAttributes[128];
-			Job()->Item()->FormatAttributes(ItemData, sizeof(aAttributes), aAttributes);
-			GS()->AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, TAB_SETTINGS_MODULES, "{STR} {STR}{STR}",
-				ItemData.Info().GetName(pPlayer), aAttributes, (ItemData.Settings ? "✔ " : "\0"));
-			FoundSettings = true;
-		}
+		// Если не найдены настройки модулей
 		if (!FoundSettings)
-		{
 			GS()->AVM(ClientID, "null", NOPE, TAB_SETTINGS_MODULES, "The list of equipment sub upgrades is empty");
-		}
+	
 		GS()->AddBack(ClientID);
 		return true;
 	}
@@ -272,10 +272,12 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		GS()->AVH(ClientID, TAB_LANGUAGES, GRAY_COLOR, "Active language: [{STR}]", pPlayerLanguage);
 		for(int i = 0; i < GS()->Server()->Localization()->m_pLanguages.size(); i++)
 		{
+			// Не показывать в списках выбора язык который выбран уже у игрока
 			const char *pLanguageFile = GS()->Server()->Localization()->m_pLanguages[i]->GetFilename();
 			if(str_comp(pPlayerLanguage, pLanguageFile) == 0)
 				continue;
 
+			// Добавить выбор языка
 			const char *pLanguageName = GS()->Server()->Localization()->m_pLanguages[i]->GetName();
 			GS()->AVM(ClientID, "SELECTLANGUAGE", i, TAB_LANGUAGES, "Select language \"{STR}\"", pLanguageName);
 		}
