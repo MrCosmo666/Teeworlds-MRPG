@@ -342,5 +342,21 @@
 	{
 		"key": "{STR} joined to Mmo server. Rank #{INT}",
 		"value": "{STR} подключился к Mmo server. Ранг #{INT}"
+	},
+	{
+		"key": "You repaired all items.",
+		"value": "Вы починили все предметы."
+	},
+	{
+		"key": "Learned a new skill [{STR}]",
+		"value": "Новый навык усвоен [{STR}]"
+	},
+	{
+		"key": "Increased the skill [{STR} level to {INT}]",
+		"value": "Повышен уровень навыка [{STR} до {INT}]"
+	},
+	{
+		"key": "Skill already have maximum level!",
+		"value": "Навык уже имеет максимальный уровень!"
 	}
 ]}

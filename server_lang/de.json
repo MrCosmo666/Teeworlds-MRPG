@@ -342,5 +342,21 @@
 	{
 		"key": "{STR} joined to Mmo server. Rank #{INT}",
 		"value": "{STR} verbunden mit Mmo-server. Rang #{INT}"
+	},
+	{
+		"key": "You repaired all items.",
+		"value": "Reparierten alle Artikel."
+	},
+	{
+		"key": "Learned a new skill [{STR}]",
+		"value": "Eine neue Fähigkeit gelernt [{STR}]"
+	},
+	{
+		"key": "Increased the skill [{STR} level to {INT}]",
+		"value": "Erhöhte die skill [{STR} - Ebene auf {INT}]"
+	},
+	{
+		"key": "Skill already have maximum level!",
+		"value": "Fähigkeiten haben bereits maximale Ebene!"
 	}
 ]}
