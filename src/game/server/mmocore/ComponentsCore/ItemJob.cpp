@@ -82,8 +82,8 @@ void ItemJob::FormatAttributes(InventoryItem& pItem, int size, char* pformat)
 	dynamic_string Buffer;
 	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		int BonusID = pItem.Info().Attribute[i];
-		int BonusCount = pItem.Info().AttributeCount[i] * (pItem.Enchant + 1);
+		const int BonusID = pItem.Info().Attribute[i];
+		const int BonusCount = pItem.Info().AttributeCount[i] * (pItem.Enchant + 1);
 		if (BonusID <= 0 || BonusCount <= 0)
 			continue;
 
