@@ -453,9 +453,8 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_INVENTORY, "After, need select item to interact");
 		GS()->AV(ClientID, "null", "");
 
-		int SizeItems;
 		GS()->AVH(ClientID, TAB_INVENTORY_SELECT, RED_COLOR, "Inventory Select List");
-		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_USED); 
+		int SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_USED); 
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_USED, TAB_INVENTORY_SELECT, "Used ({INT})", &SizeItems);
 
 		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_CRAFT);
