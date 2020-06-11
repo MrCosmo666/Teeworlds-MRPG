@@ -337,7 +337,7 @@
 	},
 	{
 		"key": "You left the active zone, menu is restored!",
-		"value": "Du hast die aktive zone verlassen, das Menü ist wiederhergestellt!"
+		"value": "Du hast die aktive zone verlassen!"
 	},
 	{
 		"key": "{STR} joined to Mmo server. Rank #{INT}",
@@ -358,5 +358,9 @@
 	{
 		"key": "Skill already have maximum level!",
 		"value": "Fähigkeiten haben bereits maximale Ebene!"
+	},
+	{
+		"key": "Menu is available in votes!",
+		"value": "Menü verfügbar in Abstimmungen!"
 	}
 ]}

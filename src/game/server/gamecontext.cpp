@@ -1658,7 +1658,7 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 
 	char aDesc[128]; // buffer x2 with unicode
 	str_copy(aDesc, Desc, sizeof(aDesc));
-	if(str_comp(m_apPlayers[To]->GetLanguage(), "en") != 0)
+	if(str_comp(m_apPlayers[To]->GetLanguage(), "ru") == 0 || str_comp(m_apPlayers[To]->GetLanguage(), "uk") == 0)
 		str_translation_utf8_to_cp(aDesc);
 	
 	CVoteOptions Vote;	

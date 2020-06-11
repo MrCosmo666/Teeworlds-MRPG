@@ -280,7 +280,6 @@ CLocalization::~CLocalization()
 bool CLocalization::InitConfig(int argc, const char** argv)
 {
 	m_Cfg_MainLanguage.copy("en");
-	
 	return true;
 }
 

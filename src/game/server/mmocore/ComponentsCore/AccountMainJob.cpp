@@ -119,7 +119,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		}
 
 		GS()->Chat(ClientID, "- - - - - - - [Successful login] - - - - - - -");
-		GS()->Chat(ClientID, "Player menu is available in votes!");
+		GS()->Chat(ClientID, "Menu is available in votes!");
 		GS()->m_pController->DoTeamChange(pPlayer, false);
 
 		char aAddrStr[64];
@@ -230,12 +230,14 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		GS()->AV(ClientID, "null", "");
 
 		const char* pPlayerLanguage = pPlayer->GetLanguage();
-		GS()->AVH(ClientID, TAB_LANGUAGES, GRAY_COLOR, "Active language: {STR}", pPlayerLanguage);
+		GS()->AVH(ClientID, TAB_LANGUAGES, GRAY_COLOR, "Active language: [{STR}]", pPlayerLanguage);
 		for(int i = 0; i < GS()->Server()->Localization()->m_pLanguages.size(); i++)
 		{
-			const char *pLanguageName = GS()->Server()->Localization()->m_pLanguages[i]->GetName();
-			if(str_comp(pPlayerLanguage, pLanguageName) == 0)
+			const char *pLanguageFile = GS()->Server()->Localization()->m_pLanguages[i]->GetFilename();
+			if(str_comp(pPlayerLanguage, pLanguageFile) == 0)
 				continue;
+
+			const char *pLanguageName = GS()->Server()->Localization()->m_pLanguages[i]->GetName();
 			GS()->AVM(ClientID, "SELECTLANGUAGE", i, TAB_LANGUAGES, "Select language \"{STR}\"", pLanguageName);
 		}
 		GS()->AddBack(ClientID);
