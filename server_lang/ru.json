@@ -362,5 +362,9 @@
 	{
 		"key": "Menu is available in call-votes!",
 		"value": "Меню доступно в голосованиях!"
+	},
+	{
+		"key": "You start dialogue with {STR}!",
+		"value": "Вы начали ввести диалог с {STR}!"
 	}
 ]}

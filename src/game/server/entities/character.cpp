@@ -297,6 +297,9 @@ void CCharacter::FireWeapon()
 					GS()->CreateHammerHit(ProjStartPos);
 					StartedTalking = true;
 					Hits = true;
+
+					const int BotID = pTarget->GetPlayer()->GetBotID();
+					GS()->ChatFollow(m_pPlayer->GetCID(), "You start dialogue with {STR}!", BotJob::DataBot[BotID].NameBot);
 					continue;
 				}
 
