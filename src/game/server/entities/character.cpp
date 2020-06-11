@@ -293,6 +293,7 @@ void CCharacter::FireWeapon()
 				{
 					m_pPlayer->ClearTalking();
 					m_pPlayer->SetTalking(pTarget->GetPlayer()->GetCID(), false);
+					GS()->CreatePlayerSound(m_pPlayer->GetCID(), SOUND_TEE_CRY);
 					GS()->CreateHammerHit(ProjStartPos);
 					StartedTalking = true;
 					Hits = true;
@@ -1214,8 +1215,14 @@ bool CCharacter::StartConversation(CPlayer *pTarget)
 	if (!m_pPlayer || m_pPlayer->IsBot() || !pTarget->IsBot())
 		return false;
 
+	// пропустить если не НПС, или он не рисуется
 	CPlayerBot* pTargetBot = static_cast<CPlayerBot*>(pTarget);
 	if (!pTargetBot || pTargetBot->GetBotType() == BotsTypes::TYPE_BOT_MOB || !pTargetBot->IsActiveSnappingBot(m_pPlayer->GetCID()))
+		return false;
+
+	// пропустить если нпс не имеет диалогов
+	const int MobID = pTargetBot->GetBotSub();
+	if(BotJob::NpcBot[MobID].m_Talk.empty())
 		return false;
 
 	return true;
