@@ -71,7 +71,7 @@ void AccountMinerJob::Work(CPlayer *pPlayer, int Level)
 		}
 		GS()->ChatFollow(ClientID, "Miner Level UP. Now Level {INT}!", &pPlayer->Acc().Miner[MnrLevel]);
 	}
-	pPlayer->ProgressBar(GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), "Miner"), pPlayer->Acc().Miner[MnrLevel], pPlayer->Acc().Miner[MnrExp], ExperienceNeed, MultiplierExperience);
+	pPlayer->ProgressBar("Miner", pPlayer->Acc().Miner[MnrLevel], pPlayer->Acc().Miner[MnrExp], ExperienceNeed, MultiplierExperience);
 	Job()->SaveAccount(pPlayer, SAVE_MINER_DATA);
 }
 

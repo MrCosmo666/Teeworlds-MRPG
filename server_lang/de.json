@@ -342,17 +342,5 @@
 	{
 		"key": "{STR} joined to Mmo server. Rank #{INT}",
 		"value": "{STR} verbunden mit Mmo-server. Rang #{INT}"
-	},
-	{
-		"key": "Account",
-		"value": "Konto"
-	},
-	{
-		"key": "Miner",
-		"value": "Miner"
-	},
-	{
-		"key": "Plants",
-		"value": "Pflanzen"
 	}
 ]}

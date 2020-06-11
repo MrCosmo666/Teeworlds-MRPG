@@ -99,7 +99,7 @@ void AccountPlantJob::Work(CPlayer* pPlayer, int Level)
 		}
 		GS()->ChatFollow(ClientID, "Plants Level UP. Now Level {INT}!", &pPlayer->Acc().Plant[PlLevel]);
 	}
-	pPlayer->ProgressBar(GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), "Plants"), pPlayer->Acc().Plant[PlLevel], pPlayer->Acc().Plant[PlExp], ExperienceNeed, MultiplierExperience);
+	pPlayer->ProgressBar("Plants", pPlayer->Acc().Plant[PlLevel], pPlayer->Acc().Plant[PlExp], ExperienceNeed, MultiplierExperience);
 	Job()->SaveAccount(pPlayer, SAVE_PLANT_DATA);
 }
 

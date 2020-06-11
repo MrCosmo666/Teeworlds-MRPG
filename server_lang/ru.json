@@ -342,17 +342,5 @@
 	{
 		"key": "{STR} joined to Mmo server. Rank #{INT}",
 		"value": "{STR} подключился к Mmo server. Ранг #{INT}"
-	},
-	{
-		"key": "Account",
-		"value": "Аккаунт"
-	},
-	{
-		"key": "Miner",
-		"value": "Шахтер"
-	},
-	{
-		"key": "Plants",
-		"value": "Растения"
 	}
 ]}
