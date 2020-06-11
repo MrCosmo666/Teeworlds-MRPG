@@ -496,7 +496,7 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 
 			char aAttributes[128];
 			FormatAttributes(pPlayerItem, sizeof(aAttributes), aAttributes);
-			GS()->AVMI(ClientID, pPlayerItem.Info().GetIcon(), "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], GS()->GetItemInfo(ItemID).GetName(pPlayer), aAttributes);
+			GS()->AVMI(ClientID, pPlayerItem.Info().GetIcon(), "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], pPlayerItem.Info().GetName(pPlayer), aAttributes);
 		}
 
 		// все Equip слоты предемтов
