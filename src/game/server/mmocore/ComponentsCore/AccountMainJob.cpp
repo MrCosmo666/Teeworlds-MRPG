@@ -221,6 +221,45 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		return false;
 	}
 
+	// Настройки
+	if (Menulist == MenuList::MENU_SETTINGS)
+	{
+		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
+		GS()->AVH(ClientID, TAB_SETTINGS, RED_COLOR, "Some of the settings becomes valid after death");
+		GS()->AVM(ClientID, "MENU", MenuList::MENU_SELECT_LANGUAGE, TAB_SETTINGS, "Settings language");
+		for (const auto& it : ItemJob::Items[ClientID])
+		{
+			const ItemJob::InventoryItem ItemData = it.second;
+			if (ItemData.Info().Type != ItemType::TYPE_SETTINGS || ItemData.Count <= 0)
+				continue;
+			GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
+		}
+
+		// Снаряжение
+		bool FoundSettings = false;
+		GS()->AV(ClientID, "null", "");
+		GS()->AVH(ClientID, TAB_SETTINGS_MODULES, GREEN_COLOR, "Sub items settings.");
+		for (const auto& it : ItemJob::Items[ClientID])
+		{
+			ItemJob::InventoryItem ItemData = it.second;
+			if (ItemData.Count <= 0 || ItemData.Info().Type != ItemType::TYPE_MODULE)
+				continue;
+
+			char aAttributes[128];
+			Job()->Item()->FormatAttributes(ItemData, sizeof(aAttributes), aAttributes);
+			GS()->AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, TAB_SETTINGS_MODULES, "{STR} {STR}{STR}",
+				ItemData.Info().GetName(pPlayer), aAttributes, (ItemData.Settings ? "✔ " : "\0"));
+			FoundSettings = true;
+		}
+		if (!FoundSettings)
+		{
+			GS()->AVM(ClientID, "null", NOPE, TAB_SETTINGS_MODULES, "The list of equipment sub upgrades is empty");
+		}
+		GS()->AddBack(ClientID);
+		return true;
+	}
+
+	// Выбор языка
 	if (Menulist == MenuList::MENU_SELECT_LANGUAGE)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_SETTINGS;
