@@ -137,7 +137,8 @@ public:
 	bool TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char *pText = "empty");
 	bool TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID);
 	void ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress);
-	int IsGiveQuestNPC(int MobID) const;
+	int GetQuestNPC(int MobID) const;
+	const char *GetMeaninglessDialog();
 
 	// ------------------ CHECK VALID DATA --------------------
 	bool IsDataBotValid(int BotID) const { return (DataBot.find(BotID) != DataBot.end()); }

@@ -2465,6 +2465,18 @@ void str_utf8_trim_whitespaces_right(char *str)
 	}
 }
 
+void str_translation_utf8_to_cp(char *str)
+{
+	// const char because the utf character can have different sizes in bytes
+	const char *translate_from[] = { "А", "а", "С", "с", "Е", "е", "О", "о", "М", "Х", "х", "В", "К", "у", "Т", "Р", "р", "З", "Д", "и" }; // utf rus / uk / kaz, and other
+	const char *translate_to[] =   { "A", "a", "C", "c", "E", "e", "O", "o", "M", "X", "x", "B", "K", "y", "T", "P", "p", "3", "D", "u" };
+	for(int i = 0; i < 20; i++)
+	{
+		// TODO: correct it, this construction runs on one line more than 20 times
+		str_replace(str, translate_from[i], translate_to[i]);
+	}
+}
+
 int str_utf8_rewind(const char *str, int cursor)
 {
 	while(cursor)

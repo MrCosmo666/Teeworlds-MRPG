@@ -235,7 +235,7 @@ bool CPlayerBot::IsActiveQuests(int SnapClientID) const
 
 	if(m_BotType == BotsTypes::TYPE_BOT_NPC)
 	{
-		const int GivesQuest = GS()->Mmo()->BotsData()->IsGiveQuestNPC(m_SubBotID);
+		const int GivesQuest = GS()->Mmo()->BotsData()->GetQuestNPC(m_SubBotID);
 		if(BotJob::NpcBot[m_SubBotID].Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST && 
 			GS()->Mmo()->Quest()->GetState(SnapClientID, GivesQuest) == QuestState::QUEST_NO_ACCEPT)
 			return true;

@@ -294,5 +294,77 @@
 	{
 		"key": "Settings language",
 		"value": "Einstellungen Sprache"
+	},
+	{
+		"key": "Required {INT}, but you have only {INT} {STR}!",
+		"value": "Erforderlich {INT}, aber Sie haben nur {INT} {STR}!"
+	},
+	{
+		"key": "Not upgrade points for +{INT}. Required {INT}.",
+		"value": "Keine upgrade-Punkte für +{INT}. Erforderlich {INT}."
+	},
+	{
+		"key": "Upgrade has a maximum level.",
+		"value": "Upgrade hat ein maximales Niveau."
+	},
+	{
+		"key": "This chat is intended for team / guilds!",
+		"value": "Dieser chat ist für team / Gilden gedacht!"
+	},
+	{
+		"key": "{STR} came! Good {STR}!",
+		"value": "{STR} kam! Gute {STR}!"
+	},
+	{
+		"key": "Nighttime experience was increase to {INT}%",
+		"value": "Nachtzeit Erfahrung wurde erhöht {INT}%"
+	},
+	{
+		"key": "Daytime experience was downgraded to 100%",
+		"value": "Täglich Erfahrung wurde auf herabgestuft 100%"
+	},
+	{
+		"key": "{STR} opened zone ({STR})!",
+		"value": "{STR} öffnete zone ({STR})!"
+	},
+	{
+		"key": "Requires quest completion '{STR}'!",
+		"value": "Erfordert quest-Abschluss '{STR}'!"
+	},
+	{
+		"key": "You can see menu in the votes!",
+		"value": "Sie können Menü in den Stimmen sehen!"
+	},
+	{
+		"key": "You left the active zone, menu is restored!",
+		"value": "Du hast die aktive zone verlassen!"
+	},
+	{
+		"key": "{STR} joined to Mmo server. Rank #{INT}",
+		"value": "{STR} verbunden mit Mmo-server. Rang #{INT}"
+	},
+	{
+		"key": "You repaired all items.",
+		"value": "Reparierten alle Artikel."
+	},
+	{
+		"key": "Learned a new skill [{STR}]",
+		"value": "Eine neue Fähigkeit gelernt [{STR}]"
+	},
+	{
+		"key": "Increased the skill [{STR} level to {INT}]",
+		"value": "Erhöhte die skill [{STR} - Ebene auf {INT}]"
+	},
+	{
+		"key": "Skill already have maximum level!",
+		"value": "Fähigkeiten haben bereits maximale Ebene!"
+	},
+	{
+		"key": "Menu is available in call-votes!",
+		"value": "Menü verfügbar in Abstimmungen!"
+	},
+	{
+		"key": "You start dialogue with {STR}!",
+		"value": "Du begannen einen Dialog mit {STR}!"
 	}
 ]}

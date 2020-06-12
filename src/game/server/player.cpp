@@ -349,12 +349,12 @@ bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int Maxi
 	int UpgradeNeed = Price*Count;
 	if((*Upgrade + Count) > MaximalUpgrade)
 	{
-		GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "This upgrades maximal.");
+		GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Upgrade has a maximum level.");
 		return false;		
 	}
 	if(*Useless < UpgradeNeed)
 	{
-		GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Have no upgrade points for upgrade +{INT}. Need {INT}.", &Count, &UpgradeNeed);
+		GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Not upgrade points for +{INT}. Required {INT}.", &Count, &UpgradeNeed);
 		return false;
 	}
 	*Useless -= UpgradeNeed;
@@ -375,7 +375,7 @@ bool CPlayer::CheckFailMoney(int Price, int ItemID, bool CheckOnly)
 	ItemJob::InventoryItem &pPlayerItem = GetItem(ItemID);
 	if(pPlayerItem.Count < Price)
 	{
-		GS()->Chat(m_ClientID,"Sorry, need {INT} but you have only {INT} {STR}!", &Price, &pPlayerItem.Count, pPlayerItem.Info().GetName(this), NULL);
+		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", &Price, &pPlayerItem.Count, pPlayerItem.Info().GetName(this), NULL);
 		return true;
 	}
 
@@ -664,24 +664,27 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 	const int MobID = BotPlayer->GetBotSub();
 	if (BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
+		// Очистка конца диалогов или диалога который был бесмысленный
 		const int sizeTalking = BotJob::NpcBot[MobID].m_Talk.size();
-		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
+		const bool isTalkingEmpty = BotJob::NpcBot[MobID].m_Talk.empty();
+		if ((isTalkingEmpty && m_TalkingNPC.m_TalkedProgress == 999) || (!isTalkingEmpty && m_TalkingNPC.m_TalkedProgress >= sizeTalking))
 		{
 			ClearTalking();
 			GS()->ClearTalkText(m_ClientID);
 			return;
 		}
 
-		int GivingQuestID = GS()->Mmo()->BotsData()->IsGiveQuestNPC(MobID);
-		if (GS()->Mmo()->Quest()->GetState(m_ClientID, GivingQuestID) >= QuestState::QUEST_ACCEPT)
+		// Узнать вообщем получен если квест выдавать рандомный бесмысленный диалог
+		int GivingQuestID = GS()->Mmo()->BotsData()->GetQuestNPC(MobID);
+		if (isTalkingEmpty || GS()->Mmo()->Quest()->GetState(m_ClientID, GivingQuestID) >= QuestState::QUEST_ACCEPT)
 		{
-			const char* pTalking[2] = { "[Player], do you have any questions? I'm sorry I can't help you.", 
-										"What a beautiful [Time], we already talked. I don't have anything for you [Player]." };
-			GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID, pTalking[random_int()%2]);
+			const char* MeaninglessDialog = GS()->Mmo()->BotsData()->GetMeaninglessDialog();
+			GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, -1, TalkedID, MeaninglessDialog);
 			m_TalkingNPC.m_TalkedProgress = 999;
 			return;
 		}
 
+		// Получить квест по прогрессу диалога если он есть в данном прогрессе то принимаем квест
 		GivingQuestID = BotJob::NpcBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
 		if (GivingQuestID >= 1)
 		{

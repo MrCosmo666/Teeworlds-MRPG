@@ -26,10 +26,9 @@ void CNPCWall::Tick()
 {
 	// ищем ботов игроков
 	m_Active = false;	
-
 	for (CCharacter* pChar = (CCharacter*)GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter*)pChar->TypeNext())
 	{
-		if (pChar->GetPlayer()->IsBot())
+		if (pChar->GetPlayer()->IsBot() && pChar->GetPlayer()->GetBotType() != BotsTypes::TYPE_BOT_MOB)
 		{
 			vec2 IntersectPos = closest_point_on_line(m_Pos, m_PosTo, pChar->m_Core.m_Pos);
 			float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);

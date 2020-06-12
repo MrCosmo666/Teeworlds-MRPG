@@ -100,7 +100,7 @@ void DungeonJob::CheckQuestingOpened(CPlayer *pPlayer, int QuestID)
 	for (const auto& dungeon : Dungeon)
 	{
 		if (QuestID == dungeon.second.OpenQuestID)
-			GS()->Chat(-1, "{STR} opened access new dungeon ({STR})!", GS()->Server()->ClientName(ClientID), dungeon.second.Name);
+			GS()->Chat(-1, "{STR} opened dungeon ({STR})!", GS()->Server()->ClientName(ClientID), dungeon.second.Name);
 	}
 }
 

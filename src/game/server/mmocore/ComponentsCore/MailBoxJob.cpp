@@ -7,34 +7,40 @@
 using namespace sqlstr;
 
 // действие над письмом
-void MailBoxJob::InteractiveInbox(CPlayer *pPlayer, int InboxID)
+void MailBoxJob::ReceiveInbox(CPlayer *pPlayer, int InboxID)
 {
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Enchant", "tw_accounts_inbox", "WHERE ID = '%d'", InboxID));
-	if(RES->next())
+	if(!RES->next())
+		return;
+	
+	// получаем информацию о письме
+	const int ItemID = RES->getInt("ItemID");
+	const int Count = RES->getInt("Count");
+	
+	// empty
+	if(ItemID <= 0 || Count <= 0)
 	{
-		// получаем информацию о письме
-		const int ItemID = RES->getInt("ItemID"), Count = RES->getInt("Count");
-		if(ItemID > 0 && Count > 0)
-		{
-			// если уже имеется такой зачарованный предмет
-			if(GS()->GetItemInfo(ItemID).IsEnchantable() && pPlayer->GetItem(ItemID).Count > 0)
-			{
-				GS()->Chat(pPlayer->GetCID(), "Enchant item maximal count x1 in a backpack!");
-				return;
-			}
-			const int Enchant = RES->getInt("Enchant");
-			pPlayer->GetItem(ItemID).Add(Count, 0, Enchant);
-		}
-
-		// удаляем письмо
 		SJK.DD("tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
+		return;
 	}
+
+	// recivie
+	if(GS()->GetItemInfo(ItemID).IsEnchantable() && pPlayer->GetItem(ItemID).Count > 0)
+	{
+		GS()->Chat(pPlayer->GetCID(), "Enchant item maximal count x1 in a backpack!");
+		return;
+	}
+	SJK.DD("tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
+
+	const int Enchant = RES->getInt("Enchant");
+	pPlayer->GetItem(ItemID).Add(Count, 0, Enchant);
+	GS()->Chat(pPlayer->GetCID(), "You received an attached item [{STR}].", GS()->GetItemInfo(ItemID).GetName(pPlayer));
 }
 
 // показываем список писем
 void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 {
-	int LetterID = 0;
+	int ShowLetterID = 0;
 	bool EmptyMailBox = true;
 	const int ClientID = pPlayer->GetCID();
 	int HideID = (int)(NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 200);
@@ -42,36 +48,35 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 	while(RES->next())
 	{
 		// получаем информацию для создания предмета
-		const int MailID = RES->getInt("ID"), ItemID = RES->getInt("ItemID");
-		const int Count = RES->getInt("Count"); HideID++; LetterID++;
+		const int MailID = RES->getInt("ID");
+		const int ItemID = RES->getInt("ItemID");
+		const int Count = RES->getInt("Count"); 
 		const int Enchant = RES->getInt("Enchant");
 		EmptyMailBox = false;
+		ShowLetterID++;
+		HideID++;
 
 		// добавляем меню голосования
-		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "✉ Letter({INT}) {STR}", &LetterID, RES->getString("MailName").c_str());
+		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "✉ Letter({INT}) {STR}", &ShowLetterID, RES->getString("MailName").c_str());
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", RES->getString("MailDesc").c_str());
-
-		// проверяем мы читаем или получаем предмет
 		if(ItemID <= 0 || Count <= 0)
-			GS()->AVM(ClientID, "MAIL", MailID, HideID, "I read it (L{INT})", &LetterID);
-		// зачарованный предмет
+			GS()->AVM(ClientID, "MAIL", MailID, HideID, "I read it (L{INT})", &ShowLetterID);
 		else if(GS()->GetItemInfo(ItemID).IsEnchantable())
 		{
 			char aEnchantSize[16];
 			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);
 			GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive {STR}{STR} (L{INT})",
-				GS()->GetItemInfo(ItemID).GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &LetterID);
+				GS()->GetItemInfo(ItemID).GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &ShowLetterID);
 		}
-		// обычный предмет
 		else
-			GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive {STR}x{INT} (L{INT})",
-				GS()->GetItemInfo(ItemID).GetName(pPlayer), &Count, &LetterID);
+		{
+			GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive {STR}x{INT} (L{INT})", GS()->GetItemInfo(ItemID).GetName(pPlayer), &Count, &ShowLetterID);
+		}
 	}
-
-	// если пустой inbox
 	if(EmptyMailBox)
+	{
 		GS()->AVL(ClientID, "null", "Your mailbox is empty");
-	return;
+	}
 }
 
 // проверить сообщения имеются ли
@@ -88,17 +93,14 @@ void MailBoxJob::SendInbox(int AuthID, const char* Name, const char* Desc, int I
 	// clear str and connection
 	CSqlString<64> cName = CSqlString<64>(Name);
 	CSqlString<64> cDesc = CSqlString<64>(Desc);
-
-	// проверяем игрока онлайн
-	GS()->ChatAccountID(AuthID, "[Mailbox] New letter ({STR})!", cName.cstr());
 	if (ItemID <= 0)
 	{
 		SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, OwnerID) VALUES ('%s', '%s', '%d');", cName.cstr(), cDesc.cstr(), AuthID);
 		return;
 	}
-
 	SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, ItemID, Count, Enchant, OwnerID) VALUES ('%s', '%s', '%d', '%d', '%d', '%d');",
 		 cName.cstr(), cDesc.cstr(), ItemID, Count, Enchant, AuthID);
+	GS()->ChatAccountID(AuthID, "[Mailbox] New letter ({STR})!", cName.cstr());
 }
 
 bool MailBoxJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
@@ -106,10 +108,10 @@ bool MailBoxJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteI
 	const int ClientID = pPlayer->GetCID();
 	if(PPSTR(CMD, "MAIL") == 0)
 	{
-		InteractiveInbox(pPlayer, VoteID);
+		ReceiveInbox(pPlayer, VoteID);
 		GS()->VResetVotes(ClientID, MenuList::MENU_INBOX);
 		return true;
-	} 
+	}
 
 	return false;
 }

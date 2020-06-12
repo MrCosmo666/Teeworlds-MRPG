@@ -43,14 +43,14 @@ bool CraftJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 
 	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_CRAFT_ZONE))
 	{
-		GS()->Chat(ClientID, "List of your craft's, you can see on vote!");
+		GS()->Chat(ClientID, "You can see menu in the votes!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_CRAFT_ZONE))
 	{
-		GS()->Chat(ClientID, "You have left the active zone, menu is restored!");
+		GS()->Chat(ClientID, "You left the active zone, menu is restored!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;

@@ -62,7 +62,7 @@ bool StorageJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_SHOP_ZONE))
 	{
-		GS()->Chat(ClientID, "You have left the active zone, menu is restored!");
+		GS()->Chat(ClientID, "You left the active zone, menu is restored!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
@@ -77,7 +77,7 @@ bool StorageJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 	if (PPSTR(CMD, "REPAIRITEMS") == 0)
 	{
 		Job()->Item()->RepairDurabilityFull(pPlayer);
-		GS()->Chat(ClientID, "You repaired all your items.");
+		GS()->Chat(ClientID, "You repaired all items.");
 		return true;
 	}
 
