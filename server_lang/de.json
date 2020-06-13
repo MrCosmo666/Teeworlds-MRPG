@@ -366,5 +366,13 @@
 	{
 		"key": "You start dialogue with {STR}!",
 		"value": "Du begannen einen Dialog mit {STR}!"
+	},
+	{
+		"key": "{INT}. {STR} : Time: {INT} minute(s) {INT} second(s)",
+		"value": "{INT}. {STR} : Zeit: {INT} minute(s) {INT} second(s)"
+	},
+	{
+		"key": "Need to complete quest {STR}",
+		"value": "Müssen quest abschließen {STR}"
 	}
 ]}

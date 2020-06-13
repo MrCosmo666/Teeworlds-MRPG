@@ -5,11 +5,11 @@
 	},
 	{
 		"key": "Hi, {STR} Last log in {STR}",
-		"value": "Пpивeт, {STR} Пocлeдний вxoд {STR}"
+		"value": "Пpивeт, {STR} Вxoд {STR}"
 	},
 	{
 		"key": "Discord: \"{STR}\". Ideas, bugs, rewards",
-		"value": "Discord: \"{STR}\". Идеи, баги, награды"
+		"value": "Discord: \"{STR}\". Идеи, баги, нагр."
 	},
 	{
 		"key": "Level {INT} : Exp {INT}/{INT}",
@@ -366,5 +366,13 @@
 	{
 		"key": "You start dialogue with {STR}!",
 		"value": "Вы начали ввести диалог с {STR}!"
+	},
+	{
+		"key": "{INT}. {STR} : Time: {INT} minute(s) {INT} second(s)",
+		"value": "{INT}. {STR} : Время: {INT} мин {INT} сек"
+	},
+	{
+		"key": "Need to complete quest {STR}",
+		"value": "Требуется квест {STR}"
 	}
 ]}
