@@ -171,7 +171,7 @@ public:
 	int GetTalkedID() const { return m_TalkingNPC.m_TalkedID; };
 
 	// форматирование текста функции
-	const char *FormatedTalkedText() const { return m_FormatTalkQuest; };
+	const char *FormatedTalkedText();
 	void FormatTextQuest(int DataBotID, const char *pText);
 	void ClearFormatQuestText();
 
