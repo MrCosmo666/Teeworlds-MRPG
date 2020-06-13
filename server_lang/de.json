@@ -374,5 +374,17 @@
 	{
 		"key": "Need to complete quest {STR}",
 		"value": "Müssen quest abschließen {STR}"
+	},
+	{
+		"key": "Voting for the choice of tank!",
+		"value": "Voting für die Wahl des tanks!"
+	},
+	{
+		"key": "Vote for {STR} (Votes: {INT})",
+		"value": "Vote für {STR} (Votes: {INT})"
+	},
+	{
+		"key": "You have {INT} unread messages!",
+		"value": "Sie haben {INT} ungelesene Nachrichten!"
 	}
 ]}

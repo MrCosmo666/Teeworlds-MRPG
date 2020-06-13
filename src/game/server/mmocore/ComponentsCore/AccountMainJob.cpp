@@ -144,7 +144,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	{
 		const int CountMessageInbox = Job()->Inbox()->GetActiveInbox(pPlayer);
 		if (CountMessageInbox > 0)
-			GS()->Chat(ClientID, "You have {INT} unread messages. Check your Mailbox!", &CountMessageInbox);
+			GS()->Chat(ClientID, "You have {INT} unread messages!", &CountMessageInbox);
 
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		GS()->SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);

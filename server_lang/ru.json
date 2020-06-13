@@ -253,7 +253,7 @@
 	},
 	{
 		"key": "You can vote for the choice of tank (Dungeon Tab)!",
-		"value": "Вы можете голосовать за выбор танка (Dungeon Tab)!"
+		"value": "Вы можете голосовать за выбор танка (вкладка Темницы)!"
 	},
 	{
 		"key": "You can't vote for yourself!",
@@ -374,5 +374,17 @@
 	{
 		"key": "Need to complete quest {STR}",
 		"value": "Требуется квест {STR}"
+	},
+	{
+		"key": "Voting for the choice of tank!",
+		"value": "Голосование за выбор танка!"
+	},
+	{
+		"key": "Vote for {STR} (Votes: {INT})",
+		"value": "Голос за {STR} (Голосов: {INT})"
+	},
+	{
+		"key": "You have {INT} unread messages!",
+		"value": "Вы имеете {INT} непрочитанных сообщений!"
 	}
 ]}
