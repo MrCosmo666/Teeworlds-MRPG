@@ -83,14 +83,14 @@ bool SkillJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	const int ClientID = pPlayer->GetCID();
 	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_LEARN_SKILL))
 	{
-		GS()->Chat(ClientID, "You can see list of available skills in the voting!");
+		GS()->Chat(ClientID, "You can see menu in the votes!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_LEARN_SKILL))
 	{
-		GS()->Chat(ClientID, "You have left the active zone, menu is restored!");
+		GS()->Chat(ClientID, "You left the active zone, menu is restored!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
@@ -189,7 +189,7 @@ bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 	{
 		if (Skill[ClientID][SkillID].m_SkillLevel >= SkillData[SkillID].m_SkillMaxLevel)
 		{
-			GS()->Chat(ClientID, "This a skill already maximum level");
+			GS()->Chat(ClientID, "Skill already maximum level!");
 			return false;
 		}
 
@@ -198,7 +198,7 @@ bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 
 		Skill[ClientID][SkillID].m_SkillLevel++;
 		SJK.UD("tw_accounts_skills", "SkillLevel = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", Skill[ClientID][SkillID].m_SkillLevel, SkillID, pPlayer->Acc().AuthID);
-		GS()->Chat(ClientID, "You have increased the skill [{STR} level to {INT}]!", SkillData[SkillID].m_SkillName, &Skill[ClientID][SkillID].m_SkillLevel);
+		GS()->Chat(ClientID, "Increased the skill [{STR} level to {INT}]", SkillData[SkillID].m_SkillName, &Skill[ClientID][SkillID].m_SkillLevel);
 		return true;
 	}
 
@@ -208,7 +208,7 @@ bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 	Skill[ClientID][SkillID].m_SkillLevel = 1;
 	Skill[ClientID][SkillID].m_SelectedEmoticion = -1;
 	SJK.ID("tw_accounts_skills", "(SkillID, OwnerID, SkillLevel) VALUES ('%d', '%d', '1');", SkillID, pPlayer->Acc().AuthID);
-	GS()->Chat(ClientID, "You have learned a new skill [{STR}]", SkillData[SkillID].m_SkillName);
+	GS()->Chat(ClientID, "Learned a new skill [{STR}]", SkillData[SkillID].m_SkillName);
 	return true;
 }
 

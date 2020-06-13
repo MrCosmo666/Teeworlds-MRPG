@@ -1273,9 +1273,6 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				return;
 			}
 
-			// пишем клиент успешно прочекан 	
-			SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Successfully checks client.");
-
 			// отправим что прошли проверку на стороне сервера
 			CNetMsg_Sv_AfterIsMmoServer GoodCheck;
 			Server()->SendPackMsg(&GoodCheck, MSGFLAG_VITAL|MSGFLAG_FLUSH|MSGFLAG_NORECORD, ClientID);
@@ -1659,15 +1656,49 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 	if(To < 0 || To > MAX_PLAYERS || !m_apPlayers[To])
 		return;
 
+	char aDesc[128]; // buffer x2 with unicode
+	str_copy(aDesc, Desc, sizeof(aDesc));
+	if(str_comp(m_apPlayers[To]->GetLanguage(), "ru") == 0 || str_comp(m_apPlayers[To]->GetLanguage(), "uk") == 0)
+		str_translation_utf8_to_cp(aDesc);
+	
 	CVoteOptions Vote;	
-	str_copy(Vote.m_aDescription, Desc, sizeof(Vote.m_aDescription));
+	str_copy(Vote.m_aDescription, aDesc, sizeof(Vote.m_aDescription));
 	str_copy(Vote.m_aCommand, Cmd, sizeof(Vote.m_aCommand));
 	Vote.m_TempID = ID;
-	Vote.m_TempID2 = ID2;
+	Vote.m_TempID2 = ID2; 
+
+	// trim right and set maximum length to 64 utf8-characters
+	int Length = 0;
+	const char *p = Vote.m_aDescription;
+	const char *pEnd = nullptr;
+	while(*p)
+	{
+		const char *pStrOld = p;
+		int Code = str_utf8_decode(&p);
+
+		// check if unicode is not empty
+		if(Code > 0x20 && Code != 0xA0 && Code != 0x034F && (Code < 0x2000 || Code > 0x200F) && (Code < 0x2028 || Code > 0x202F) &&
+			(Code < 0x205F || Code > 0x2064) && (Code < 0x206A || Code > 0x206F) && (Code < 0xFE00 || Code > 0xFE0F) &&
+			Code != 0xFEFF && (Code < 0xFFF9 || Code > 0xFFFC))
+		{
+			pEnd = nullptr;
+		}
+		else if(pEnd == nullptr)
+			pEnd = pStrOld;
+
+		if(++Length >= 63)
+		{
+			*(const_cast<char *>(p)) = 0;
+			break;
+		}
+	}
+	if(pEnd != nullptr)
+		*(const_cast<char *>(pEnd)) = 0;
+	
 	m_PlayerVotes[To].push_back(Vote);
 
 	// отправить клиентам что имеют клиент ммо
-	if(CheckClient(To))
+	if(CheckClient(To)) 
 	{
 		if (str_length(Vote.m_aDescription) < 1)
 			m_apPlayers[To]->m_Colored = { 0, 0, 0 };
@@ -2278,9 +2309,9 @@ void CGS::SendDayInfo(int ClientID)
 	if(ClientID == -1)
 		Chat(-1, "{STR} came! Good {STR}!", Server()->GetStringTypeDay(), Server()->GetStringTypeDay());
 	if(m_DayEnumType == DayType::NIGHTTYPE)
-		Chat(ClientID, "Night increase to experience {INT}%", &m_RaidExp);
+		Chat(ClientID, "Nighttime experience was increase to {INT}%", &m_RaidExp);
 	else if(m_DayEnumType == DayType::MORNINGTYPE)
-		Chat(ClientID, "Day, experience was downgraded to 100%");
+		Chat(ClientID, "Daytime experience was downgraded to 100%");
 }
 
 // Сменить Снаряжение автоматически найти тип по Предмету

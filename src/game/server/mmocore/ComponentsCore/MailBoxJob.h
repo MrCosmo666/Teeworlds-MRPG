@@ -7,7 +7,7 @@
 
 class MailBoxJob : public MmoComponent
 {
-	void InteractiveInbox(CPlayer *pPlayer, int InboxID);
+	void ReceiveInbox(CPlayer *pPlayer, int InboxID);
 
 public:
 	int GetActiveInbox(CPlayer* pPlayer);

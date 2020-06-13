@@ -119,7 +119,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		}
 
 		GS()->Chat(ClientID, "- - - - - - - [Successful login] - - - - - - -");
-		GS()->Chat(ClientID, "Player menu is available in votes!");
+		GS()->Chat(ClientID, "Menu is available in call-votes!");
 		GS()->m_pController->DoTeamChange(pPlayer, false);
 
 		char aAddrStr[64];
@@ -153,7 +153,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 
 	Job()->OnInitAccount(ClientID);
 	const int Rank = GetRank(pPlayer->Acc().AuthID);
-	GS()->Chat(-1, "{STR} joined to Mmo server Rank #{INT}", GS()->Server()->ClientName(ClientID), &Rank);
+	GS()->Chat(-1, "{STR} joined to Mmo server. Rank #{INT}", GS()->Server()->ClientName(ClientID), &Rank);
 #ifdef CONF_DISCORD
 	char pMsg[256], pLoggin[64];
 	str_format(pLoggin, sizeof(pLoggin), "%s logged in Account ID %d", GS()->Server()->ClientName(ClientID), pPlayer->Acc().AuthID);
@@ -221,6 +221,45 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		return false;
 	}
 
+	// Настройки
+	if (Menulist == MenuList::MENU_SETTINGS)
+	{
+		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
+		GS()->AVH(ClientID, TAB_SETTINGS, RED_COLOR, "Some of the settings becomes valid after death");
+		GS()->AVM(ClientID, "MENU", MenuList::MENU_SELECT_LANGUAGE, TAB_SETTINGS, "Settings language");
+		for (const auto& it : ItemJob::Items[ClientID])
+		{
+			const ItemJob::InventoryItem ItemData = it.second;
+			if (ItemData.Info().Type == ItemType::TYPE_SETTINGS && ItemData.Count > 0)
+				GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
+		}
+
+		// Снаряжение
+		bool FoundSettings = false;
+		GS()->AV(ClientID, "null", "");
+		GS()->AVH(ClientID, TAB_SETTINGS_MODULES, GREEN_COLOR, "Sub items settings.");
+		for (const auto& it : ItemJob::Items[ClientID])
+		{
+			ItemJob::InventoryItem ItemData = it.second;
+			if (ItemData.Info().Type == ItemType::TYPE_MODULE && ItemData.Count > 0)
+			{
+				char aAttributes[128];
+				Job()->Item()->FormatAttributes(ItemData, sizeof(aAttributes), aAttributes);
+				GS()->AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, TAB_SETTINGS_MODULES, "{STR} {STR}{STR}",
+					ItemData.Info().GetName(pPlayer), aAttributes, (ItemData.Settings ? "✔ " : "\0"));
+				FoundSettings = true;
+			}
+		}
+
+		// Если не найдены настройки модулей
+		if (!FoundSettings)
+			GS()->AVM(ClientID, "null", NOPE, TAB_SETTINGS_MODULES, "The list of equipment sub upgrades is empty");
+	
+		GS()->AddBack(ClientID);
+		return true;
+	}
+
+	// Выбор языка
 	if (Menulist == MenuList::MENU_SELECT_LANGUAGE)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_SETTINGS;
@@ -230,12 +269,16 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		GS()->AV(ClientID, "null", "");
 
 		const char* pPlayerLanguage = pPlayer->GetLanguage();
-		GS()->AVH(ClientID, TAB_LANGUAGES, GRAY_COLOR, "Active language: {STR}", pPlayerLanguage);
+		GS()->AVH(ClientID, TAB_LANGUAGES, GRAY_COLOR, "Active language: [{STR}]", pPlayerLanguage);
 		for(int i = 0; i < GS()->Server()->Localization()->m_pLanguages.size(); i++)
 		{
-			const char *pLanguageName = GS()->Server()->Localization()->m_pLanguages[i]->GetFilename();
-			if(str_comp(pPlayerLanguage, pLanguageName) == 0)
+			// Не показывать в списках выбора язык который выбран уже у игрока
+			const char *pLanguageFile = GS()->Server()->Localization()->m_pLanguages[i]->GetFilename();
+			if(str_comp(pPlayerLanguage, pLanguageFile) == 0)
 				continue;
+
+			// Добавить выбор языка
+			const char *pLanguageName = GS()->Server()->Localization()->m_pLanguages[i]->GetName();
 			GS()->AVM(ClientID, "SELECTLANGUAGE", i, TAB_LANGUAGES, "Select language \"{STR}\"", pLanguageName);
 		}
 		GS()->AddBack(ClientID);

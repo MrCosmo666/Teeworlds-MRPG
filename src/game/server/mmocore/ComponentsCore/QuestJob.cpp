@@ -222,6 +222,7 @@ void QuestJob::AddProgress(CPlayer *pPlayer, int QuestID)
 	{
 		FinishQuest(pPlayer, QuestID);
 		GS()->VResetVotes(ClientID, MenuList::MENU_JOURNAL_MAIN);
+		GS()->VResetVotes(ClientID, MenuList::MAIN_MENU);
 	}
 	else
 	{
@@ -343,7 +344,7 @@ void QuestJob::AddMobProgress(CPlayer* pPlayer, int BotID)
 			qp.second.MobProgress[i]++;
 			if(qp.second.MobProgress[i] >= FindBot->NeedMobCount[i])
 			{
-				GS()->Chat(ClientID, "You killed {STR} the required amount for NPC {STR}", BotJob::DataBot[BotID].NameBot, FindBot->GetName());
+				GS()->Chat(ClientID, "You killed {STR} required amount for NPC {STR}", BotJob::DataBot[BotID].NameBot, FindBot->GetName());
 			}
 			SJK.UD("tw_accounts_quests", "Mob1Progress = '%d', Mob2Progress = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'",
 				qp.second.MobProgress[0], qp.second.MobProgress[1], questID, pPlayer->Acc().AuthID);

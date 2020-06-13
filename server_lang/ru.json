@@ -294,5 +294,77 @@
 	{
 		"key": "Settings language",
 		"value": "Настройка языка"
+	},
+	{
+		"key": "Required {INT}, but you have only {INT} {STR}!",
+		"value": "Требуется {INT}, но у вас есть только {INT} {STR}!"
+	},
+	{
+		"key": "Not upgrade points for +{INT}. Required {INT}.",
+		"value": "Нет очков улучшения для +{INT}. Нужно {INT}."
+	},
+	{
+		"key": "Upgrade has a maximum level.",
+		"value": "Улучшение имеет максимальный уровень."
+	},
+	{
+		"key": "This chat is intended for team / guilds!",
+		"value": "Этот чат нужен для гильдий или команд!"
+	},
+	{
+		"key": "{STR} came! Good {STR}!",
+		"value": "{STR} наступил(а)! Удачного(ой) {STR}!"
+	},
+	{
+		"key": "Nighttime experience was increase to {INT}%",
+		"value": "Ночной опыт повышен до {INT}%"
+	},
+	{
+		"key": "Daytime experience was downgraded to 100%",
+		"value": "Дневной опыт понижен до 100%"
+	},
+	{
+		"key": "{STR} opened zone ({STR})!",
+		"value": "{STR} открыл зону ({STR})!"
+	},
+	{
+		"key": "Requires quest completion '{STR}'!",
+		"value": "Требуется завершение квеста '{STR}'!"
+	},
+	{
+		"key": "You can see menu in the votes!",
+		"value": "Вы можете увидеть меню в голосовании!"
+	},
+	{
+		"key": "You left the active zone, menu is restored!",
+		"value": "Вы вышли из активной зоны, меню восстановлено!"
+	},
+	{
+		"key": "{STR} joined to Mmo server. Rank #{INT}",
+		"value": "{STR} подключился к Mmo server. Ранг #{INT}"
+	},
+	{
+		"key": "You repaired all items.",
+		"value": "Вы починили все предметы."
+	},
+	{
+		"key": "Learned a new skill [{STR}]",
+		"value": "Новый навык усвоен [{STR}]"
+	},
+	{
+		"key": "Increased the skill [{STR} level to {INT}]",
+		"value": "Повышен уровень навыка [{STR} до {INT}]"
+	},
+	{
+		"key": "Skill already have maximum level!",
+		"value": "Навык уже имеет максимальный уровень!"
+	},
+	{
+		"key": "Menu is available in call-votes!",
+		"value": "Меню доступно в голосованиях!"
+	},
+	{
+		"key": "You start dialogue with {STR}!",
+		"value": "Вы начали ввести диалог с {STR}!"
 	}
 ]}

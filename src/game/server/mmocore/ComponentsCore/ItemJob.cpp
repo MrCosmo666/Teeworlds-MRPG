@@ -82,8 +82,8 @@ void ItemJob::FormatAttributes(InventoryItem& pItem, int size, char* pformat)
 	dynamic_string Buffer;
 	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		int BonusID = pItem.Info().Attribute[i];
-		int BonusCount = pItem.Info().AttributeCount[i] * (pItem.Enchant + 1);
+		const int BonusID = pItem.Info().Attribute[i];
+		const int BonusCount = pItem.Info().AttributeCount[i] * (pItem.Enchant + 1);
 		if (BonusID <= 0 || BonusCount <= 0)
 			continue;
 
@@ -445,45 +445,6 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		return false;
 	}
 
-	if (Menulist == MenuList::MENU_SETTINGS)
-	{
-		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
-
-		// Настройки
-		GS()->AVH(ClientID, TAB_SETTINGS, RED_COLOR, "Some of the settings becomes valid after death");
-		GS()->AVM(ClientID, "MENU", MenuList::MENU_SELECT_LANGUAGE, TAB_SETTINGS, "Settings language");
-		for (const auto& it : Items[ClientID])
-		{
-			const InventoryItem ItemData = it.second;
-			if (ItemData.Info().Type != ItemType::TYPE_SETTINGS || ItemData.Count <= 0)
-				continue;
-			GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
-		}
-
-		// Снаряжение
-		bool FoundSettings = false;
-		GS()->AV(ClientID, "null", "");
-		GS()->AVH(ClientID, TAB_SETTINGS_MODULES, GREEN_COLOR, "Sub items settings.");
-		for (const auto& it : Items[ClientID])
-		{
-			InventoryItem ItemData = it.second;
-			if (ItemData.Count <= 0 || ItemData.Info().Type != ItemType::TYPE_MODULE)
-				continue;
-
-			char aAttributes[128];
-			FormatAttributes(ItemData, sizeof(aAttributes), aAttributes);
-			GS()->AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, TAB_SETTINGS_MODULES, "{STR} {STR}{STR}",
-				ItemData.Info().GetName(pPlayer), aAttributes, (ItemData.Settings ? "✔ " : "\0"));
-			FoundSettings = true;
-		}
-		if (!FoundSettings)
-		{
-			GS()->AVM(ClientID, "null", NOPE, TAB_SETTINGS_MODULES, "The list of equipment sub upgrades is empty");
-		}
-		GS()->AddBack(ClientID);
-		return true;
-	}
-
 	if (Menulist == MenuList::MENU_INVENTORY)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
@@ -492,9 +453,8 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_INVENTORY, "After, need select item to interact");
 		GS()->AV(ClientID, "null", "");
 
-		int SizeItems;
 		GS()->AVH(ClientID, TAB_INVENTORY_SELECT, RED_COLOR, "Inventory Select List");
-		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_USED); 
+		int SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_USED); 
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_USED, TAB_INVENTORY_SELECT, "Used ({INT})", &SizeItems);
 
 		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_CRAFT);
@@ -536,7 +496,7 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 
 			char aAttributes[128];
 			FormatAttributes(pPlayerItem, sizeof(aAttributes), aAttributes);
-			GS()->AVMI(ClientID, pPlayerItem.Info().GetIcon(), "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], GS()->GetItemInfo(ItemID).GetName(pPlayer), aAttributes);
+			GS()->AVMI(ClientID, pPlayerItem.Info().GetIcon(), "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], pPlayerItem.Info().GetName(pPlayer), aAttributes);
 		}
 
 		// все Equip слоты предемтов

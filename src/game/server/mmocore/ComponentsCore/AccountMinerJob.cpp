@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
+#include <teeother/components/localization.h>
 #include "AccountMinerJob.h"
 
 using namespace sqlstr;

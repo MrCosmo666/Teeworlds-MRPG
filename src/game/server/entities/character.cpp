@@ -296,6 +296,9 @@ void CCharacter::FireWeapon()
 					GS()->CreateHammerHit(ProjStartPos);
 					StartedTalking = true;
 					Hits = true;
+
+					const int BotID = pTarget->GetPlayer()->GetBotID();
+					GS()->ChatFollow(m_pPlayer->GetCID(), "You start dialogue with {STR}!", BotJob::DataBot[BotID].NameBot);
 					continue;
 				}
 
@@ -665,6 +668,7 @@ void CCharacter::Die(int Killer, int Weapon)
 	if(Weapon != WEAPON_WORLD && !GS()->IsDungeon())
 	{
 		m_pPlayer->UpdateTempData(0, 0);
+		CGS::Effects[ClientID].clear();
 		const int SafezoneWorldID = GS()->GetRespawnWorld();
 		if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot() && GS()->m_apPlayers[Killer])
 		{
@@ -1213,10 +1217,10 @@ bool CCharacter::StartConversation(CPlayer *pTarget)
 	if (!m_pPlayer || m_pPlayer->IsBot() || !pTarget->IsBot())
 		return false;
 
+	// пропустить если не НПС, или он не рисуется
 	CPlayerBot* pTargetBot = static_cast<CPlayerBot*>(pTarget);
 	if (!pTargetBot || pTargetBot->GetBotType() == BotsTypes::TYPE_BOT_MOB || !pTargetBot->IsActiveSnappingBot(m_pPlayer->GetCID()))
 		return false;
-
 	return true;
 }
 

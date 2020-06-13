@@ -93,7 +93,7 @@ void WorldSwapJob::CheckQuestingOpened(CPlayer* pPlayer, int QuestID)
 	for (const auto& sw : WorldSwap)
 	{
 		if (QuestID == sw.second.OpenQuestID)
-			GS()->Chat(-1, "{STR} opened access zone ({STR})!", GS()->Server()->ClientName(ClientID), GS()->Server()->GetWorldName(sw.second.TwoWorldID));
+			GS()->Chat(-1, "{STR} opened zone ({STR})!", GS()->Server()->ClientName(ClientID), GS()->Server()->GetWorldName(sw.second.TwoWorldID));
 	}
 }
 
@@ -117,7 +117,7 @@ bool WorldSwapJob::ChangeWorld(CPlayer *pPlayer, vec2 Pos)
 		int StoryQuestNeeded = WorldSwap[WID].OpenQuestID;
 		if (StoryQuestNeeded > 0 && !GS()->Mmo()->Quest()->IsCompletedQuest(ClientID, StoryQuestNeeded))
 		{
-			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Requires quest '{STR}' completion!", GS()->Mmo()->Quest()->GetQuestName(StoryQuestNeeded));
+			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Requires quest completion '{STR}'!", GS()->Mmo()->Quest()->GetQuestName(StoryQuestNeeded));
 			return false;
 		}
 

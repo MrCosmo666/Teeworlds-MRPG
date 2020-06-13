@@ -22,7 +22,7 @@ m_pPluralRules(NULL), m_pValueFormater(NULL), m_pNumberFormater(NULL), m_pPercen
 	str_copy(m_aFilename, pFilename, sizeof(m_aFilename));
 	str_copy(m_aParentFilename, pParentFilename, sizeof(m_aParentFilename));
 	
-	// - - - - - ÈÍÈÖÈÀËÈÇÈÐÓÅÌ ÔÎÐÌÀÒÈÐÎÂÀÍÈß ICU
+	// - - - - - Ð˜ÐÐ˜Ð¦Ð˜ÐÐ›Ð˜Ð—Ð˜Ð Ð£Ð•Ðœ Ð¤ÐžÐ ÐœÐÐ¢Ð˜Ð ÐžÐ’ÐÐÐ˜Ð¯ ICU
 	UErrorCode Status;
 	Status = U_ZERO_ERROR;
 	m_pValueFormater = unum_open(UNUM_DECIMAL_COMPACT_SHORT, NULL, -1, m_aFilename, NULL, &Status);
@@ -36,7 +36,7 @@ m_pPluralRules(NULL), m_pValueFormater(NULL), m_pNumberFormater(NULL), m_pPercen
 		dbg_msg("Localization", "Can't create value formater for %s (error #%d)", m_aFilename, Status);
 	}	
 
-	// - - - - - ÈÍÈÖÈÀËÈÇÈÐÓÅÌ ÔÎÐÌÀÒÈÐÎÂÀÍÈß ICU
+	// - - - - - Ð˜ÐÐ˜Ð¦Ð˜ÐÐ›Ð˜Ð—Ð˜Ð Ð£Ð•Ðœ Ð¤ÐžÐ ÐœÐÐ¢Ð˜Ð ÐžÐ’ÐÐÐ˜Ð¯ ICU
 	Status = U_ZERO_ERROR;
 	m_pNumberFormater = unum_open(UNUM_DECIMAL, NULL, -1, m_aFilename, NULL, &Status);
 	if(U_FAILURE(Status))
@@ -49,7 +49,7 @@ m_pPluralRules(NULL), m_pValueFormater(NULL), m_pNumberFormater(NULL), m_pPercen
 		dbg_msg("Localization", "Can't create number formater for %s (error #%d)", m_aFilename, Status);
 	}
 
-	// - - - - - ÈÍÈÖÈÀËÈÇÈÐÓÅÌ ÔÎÐÌÀÒÈÐÎÂÀÍÈß ICU
+	// - - - - - Ð˜ÐÐ˜Ð¦Ð˜ÐÐ›Ð˜Ð—Ð˜Ð Ð£Ð•Ðœ Ð¤ÐžÐ ÐœÐÐ¢Ð˜Ð ÐžÐ’ÐÐÐ˜Ð¯ ICU
 	Status = U_ZERO_ERROR;
 	m_pPercentFormater = unum_open(UNUM_PERCENT, NULL, -1, m_aFilename, NULL, &Status);
 	if(U_FAILURE(Status))
@@ -62,7 +62,7 @@ m_pPluralRules(NULL), m_pValueFormater(NULL), m_pNumberFormater(NULL), m_pPercen
 		dbg_msg("Localization", "Can't create percent formater for %s (error #%d)", m_aFilename, Status);
 	}
 	
-	// - - - - - ÈÍÈÖÈÀËÈÇÈÐÓÅÌ ÔÎÐÌÀÒÈÐÎÂÀÍÈß ICU
+	// - - - - - Ð˜ÐÐ˜Ð¦Ð˜ÐÐ›Ð˜Ð—Ð˜Ð Ð£Ð•Ðœ Ð¤ÐžÐ ÐœÐÐ¢Ð˜Ð ÐžÐ’ÐÐÐ˜Ð¯ ICU
 	Status = U_ZERO_ERROR;
 	m_pPluralRules = uplrules_openForType(m_aFilename, UPLURAL_TYPE_CARDINAL, &Status);
 	if(U_FAILURE(Status))
@@ -280,7 +280,6 @@ CLocalization::~CLocalization()
 bool CLocalization::InitConfig(int argc, const char** argv)
 {
 	m_Cfg_MainLanguage.copy("en");
-	
 	return true;
 }
 
@@ -557,20 +556,20 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 		return;
 	}
 	
-	// ïàðàìåòðû íà÷àëà êîíöà ñòðîêè èìåíè è òèïà
+	// Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ñ‹ Ð½Ð°Ñ‡Ð°Ð»Ð° ÐºÐ¾Ð½Ñ†Ð° ÑÑ‚Ñ€Ð¾ÐºÐ¸ Ð¸Ð¼ÐµÐ½Ð¸ Ð¸ Ñ‚Ð¸Ð¿Ð°
 	int ParamTypeStart = -1;
 	int BufferStart = Buffer.length();
 	int BufferIter = BufferStart;
 
-	// ïàðñèíã àðãóìåíòîâ
+	// Ð¿Ð°Ñ€ÑÐ¸Ð½Ð³ Ð°Ñ€Ð³ÑƒÐ¼ÐµÐ½Ñ‚Ð¾Ð²
 	va_list VarArgsIter;
 	va_copy(VarArgsIter, VarArgs);
 
-	// ïîçèöèè ñèìâîëîâ
+	// Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¸ ÑÐ¸Ð¼Ð²Ð¾Ð»Ð¾Ð²
 	int Iter = 0;
 	int Start = Iter;
 
-	// ïàðñèì òåêñò äëÿ ïîèñêà ïîçèöèé
+	// Ð¿Ð°Ñ€ÑÐ¸Ð¼ Ñ‚ÐµÐºÑÑ‚ Ð´Ð»Ñ Ð¿Ð¾Ð¸ÑÐºÐ° Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ð¹
 	while(pText[Iter])
 	{
 
@@ -582,7 +581,7 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 				continue;
 			}
 
-			// ïîëó÷àåì äàííûå ñ àðãóìåíòà ïàðñèì àðãóìåíòû
+			// Ð¿Ð¾Ð»ÑƒÑ‡Ð°ÐµÐ¼ Ð´Ð°Ð½Ð½Ñ‹Ðµ Ñ Ð°Ñ€Ð³ÑƒÐ¼ÐµÐ½Ñ‚Ð° Ð¿Ð°Ñ€ÑÐ¸Ð¼ Ð°Ñ€Ð³ÑƒÐ¼ÐµÐ½Ñ‚Ñ‹
 			const void* pVarArgValue = va_arg(VarArgsIter, const void*);
 			if(str_comp_num("STR", pText + ParamTypeStart, 3) == 0)
 			{
@@ -609,7 +608,7 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 			ParamTypeStart = -1;
 		}
 
-		// íà÷àëà ïàðñèíãà ïàðàìåòðà
+		// Ð½Ð°Ñ‡Ð°Ð»Ð° Ð¿Ð°Ñ€ÑÐ¸Ð½Ð³Ð° Ð¿Ð°Ñ€Ð°Ð¼ÐµÑ‚Ñ€Ð°
 		else
 		{
 			if(pText[Iter] == '{')
@@ -623,13 +622,13 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 		Iter = str_utf8_forward(pText, Iter);
 	}
 
-	// çàâåðøàåì ìàêðîñ àðãóìåíòîâ
+	// Ð·Ð°Ð²ÐµÑ€ÑˆÐ°ÐµÐ¼ Ð¼Ð°ÐºÑ€Ð¾Ñ Ð°Ñ€Ð³ÑƒÐ¼ÐµÐ½Ñ‚Ð¾Ð²
 	va_end(VarArgsIter);
 
 	if(Iter > 0 && ParamTypeStart == -1)
 		BufferIter = Buffer.append_at_num(BufferIter, pText+Start, Iter-Start);
 	
-	if(pLanguage && pLanguage->GetWritingDirection() == DIRECTION_RTL)
+	if(pLanguage->GetWritingDirection() == DIRECTION_RTL)
 		ArabicShaping(Buffer, BufferStart);
 }
 
