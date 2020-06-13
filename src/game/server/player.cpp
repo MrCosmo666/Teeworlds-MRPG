@@ -752,6 +752,10 @@ void CPlayer::ClearTalking()
 }
 
 // - - - - - - F O R M A T - - - - - T E X T - - - - - - - - - 
+const char *CPlayer::FormatedTalkedText() 
+{ 
+	return GS()->Server()->Localization()->Localize(GetLanguage(), m_FormatTalkQuest); 
+}
 void CPlayer::FormatTextQuest(int DataBotID, const char *pText)
 {
 	if(!GS()->Mmo()->BotsData()->IsDataBotValid(DataBotID) || m_FormatTalkQuest[0] != '\0') 
