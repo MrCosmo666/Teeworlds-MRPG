@@ -31,16 +31,6 @@ CScoreboard::CScoreboard()
 	OnReset();
 }
 
-
-void CScoreboard::RenderTimeDown()
-{
-	char aTime[80];
-	time_t rawtime = time(NULL);
-	struct tm *timeinfo = localtime(&rawtime);
-	strftime(aTime, 80, "%H:%M:%S", timeinfo);
-	TextRender()->Text(0, 365.0f, 4.0f, 6, aTime, -1);
-}
-
 void CScoreboard::ConKeyScoreboard(IConsole::IResult *pResult, void *pUserData)
 {
 	CScoreboard *pScoreboard = (CScoreboard *)pUserData;
@@ -693,8 +683,15 @@ void CScoreboard::RenderRecordingNotification(float x, float w)
 
 void CScoreboard::RenderNetworkQuality(float x, float w)
 {
+	// get width string & format
+	char aTime[80];
+	time_t rawtime = time(NULL);
+	struct tm* timeinfo = localtime(&rawtime);
+	strftime(aTime, 80, "%H:%M:%S", timeinfo);
+	const float tw = TextRender()->TextWidth(0, 20.0f, aTime, -1, -1.0f);
+
 	//draw the box
-	CUIRect RectBox = { x, 0.0f, w, 50.0f };
+	CUIRect RectBox = { x, 0.0f, w + tw, 50.0f };
 	vec4 Color = vec4(0.0f, 0.0f, 0.0f, 0.4f);
 	const float LineHeight = 17.0f;
 	int Score = Client()->GetInputtimeMarginStabilityScore();
@@ -721,6 +718,10 @@ void CScoreboard::RenderNetworkQuality(float x, float w)
 		6.0f,
 		LineHeight
 	};
+
+	// draw time
+	x += 55.0f;
+	TextRender()->Text(0, x, 10.0f, 20.0f, aTime, -1);
 
 	for(int Bar = 0; Bar < NumBars && Score <= ScoreThresolds[Bar]; Bar++)
 	{
@@ -752,9 +753,6 @@ void CScoreboard::OnRender()
 	// if statboard active don't show scoreboard
 	if (!IsActive())
 		return;
-
-	// another
-	RenderTimeDown();
 
 	CUIRect Screen = *UI()->Screen();
 	Graphics()->MapScreen(Screen.x, Screen.y, Screen.w, Screen.h);

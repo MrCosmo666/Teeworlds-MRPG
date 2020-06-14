@@ -11,7 +11,6 @@ class CScoreboard : public CComponent
 	float RenderScoreboard(float x, float y, float w, int Team, const char *pTitle, int Align);
 	void RenderRecordingNotification(float x, float w);
 	void RenderNetworkQuality(float x, float w);
-	void RenderTimeDown();
 
 	static void ConKeyScoreboard(IConsole::IResult *pResult, void *pUserData);
 
