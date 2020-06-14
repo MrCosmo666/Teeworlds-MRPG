@@ -364,15 +364,26 @@ void CItems::RenderMmoPickups(const CNetObj_MmoPickup* pPrev, const CNetObj_MmoP
 	vec2 Curr = vec2(pCurrent->m_X, pCurrent->m_Y);
 	vec2 Pos = mix(Prev, Curr, Client()->IntraGameTick());
 	float Angle = mix((float)pPrev->m_Angle, (float)pCurrent->m_Angle, Client()->IntraGameTick()) / 256.0f;
-	const int c[] = { SPRITE_MMO_GAME_BOX, SPRITE_MMO_GAME_EXPERIENCE, SPRITE_MMO_GAME_PLANT, SPRITE_MMO_GAME_ORES, SPRITE_MMO_GAME_ARROW, SPRITE_MMO_GAME_DROP };
+	const int c[] = 
+		{ 
+			SPRITE_MMO_GAME_BOX, 
+			SPRITE_MMO_GAME_EXPERIENCE, 
+			SPRITE_MMO_GAME_PLANT, 
+			SPRITE_MMO_GAME_ORES, 
+			SPRITE_MMO_GAME_SIDE_ARROW, 
+			SPRITE_MMO_GAME_MAIN_ARROW,
+			SPRITE_MMO_GAME_DROP };
 
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAME].m_Id);
 	Graphics()->QuadsBegin();
 	RenderTools()->SelectSprite(c[pCurrent->m_Type]);
-	if (pCurrent->m_Type == MMO_PICKUP_ARROW || pCurrent->m_Type == MMO_PICKUP_BOX || pCurrent->m_Type == MMO_PICKUP_DROP)
+	if (pCurrent->m_Type == MMO_PICKUP_SIDE_ARROW || pCurrent->m_Type == MMO_PICKUP_MAIN_ARROW || 
+		pCurrent->m_Type == MMO_PICKUP_BOX || pCurrent->m_Type == MMO_PICKUP_DROP)
 	{
-		if (pCurrent->m_Type == MMO_PICKUP_ARROW)
+		if(pCurrent->m_Type == MMO_PICKUP_SIDE_ARROW)
 			Size = 48.0f;
+		else if(pCurrent->m_Type == MMO_PICKUP_MAIN_ARROW)
+			Size = 64.0f;
 
 		Graphics()->QuadsSetRotation(Angle);
 		RenderTools()->DrawSprite(Pos.x, Pos.y, Size);

@@ -719,10 +719,6 @@ void CScoreboard::RenderNetworkQuality(float x, float w)
 		LineHeight
 	};
 
-	// draw time
-	x += 55.0f;
-	TextRender()->Text(0, x, 10.0f, 20.0f, aTime, -1);
-
 	for(int Bar = 0; Bar < NumBars && Score <= ScoreThresolds[Bar]; Bar++)
 	{
 		BarRect.x += BarRect.w + 3.0f;
@@ -731,6 +727,10 @@ void CScoreboard::RenderNetworkQuality(float x, float w)
 		LocalBarRect.y = BarRect.y + BarRect.h - LocalBarRect.h;
 		RenderTools()->DrawUIRect(&LocalBarRect, vec4(0.9f, 0.9f, 0.9f, 1.0f), 0, 0);
 	}
+
+	// draw time
+	x += 56.0f;
+	TextRender()->Text(0, x, 10.0f, 20.0f, aTime, -1);
 }
 
 void CScoreboard::OnRender()

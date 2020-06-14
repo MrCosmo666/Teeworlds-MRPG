@@ -71,7 +71,9 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 	if(!pPlayer) 
 		return SendAuthCode(ClientID, AUTH_ALL_UNKNOWN);
 	
-	if(str_length(Login) > 12 || str_length(Login) < 4 || str_length(Password) > 12 || str_length(Password) < 4)
+	const int LengthLogin = str_length(Login);
+	const int LengthPassword = str_length(Password);
+	if(LengthLogin > 12 || LengthLogin < 4 || LengthPassword > 12 || LengthPassword < 4)
 	{
 		GS()->ChatFollow(ClientID, "Username / Password must contain 4-12 characters");
 		return SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
@@ -97,13 +99,11 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 			return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
 		}
 
-		const char *pPlayerLanguage = CHECKACCESS->getString("Language").c_str();
-		GS()->Server()->SetClientLanguage(ClientID, pPlayerLanguage);
-		pPlayer->SetLanguage(pPlayerLanguage);
-
 		str_copy(pPlayer->Acc().Login, clear_Login.cstr(), sizeof(pPlayer->Acc().Login));
 		str_copy(pPlayer->Acc().Password, clear_Pass.cstr(), sizeof(pPlayer->Acc().Password));
 		str_copy(pPlayer->Acc().LastLogin, CHECKACCESS->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().LastLogin));
+		GS()->Server()->SetClientLanguage(ClientID, CHECKACCESS->getString("Language").c_str());
+		pPlayer->SetLanguage(CHECKACCESS->getString("Language").c_str());
 
 		pPlayer->Acc().AuthID = UserID;
 		pPlayer->Acc().Level = ACCOUNTDATA->getInt("Level");
@@ -114,8 +114,8 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		pPlayer->Acc().WorldID = ACCOUNTDATA->getInt("WorldID");
 		for (const auto& at : CGS::AttributInfo)
 		{
-			if (str_comp_nocase(at.second.FieldName, "unfield") == 0) continue;
-			pPlayer->Acc().Stats[at.first] = ACCOUNTDATA->getInt(at.second.FieldName);
+			if (str_comp_nocase(at.second.FieldName, "unfield") != 0)
+				pPlayer->Acc().Stats[at.first] = ACCOUNTDATA->getInt(at.second.FieldName);
 		}
 
 		GS()->Chat(ClientID, "- - - - - - - [Successful login] - - - - - - -");

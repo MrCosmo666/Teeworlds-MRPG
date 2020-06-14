@@ -10,7 +10,7 @@
 	#define GAME_NETVERSION "0.7 " GAME_NETVERSION_HASH_FORCED
 	#define CLIENT_VERSION 0x0705
 	// версия клиента релиза
-	#define GAME_RELEASE_VERSION "1.1.1"
+	#define GAME_RELEASE_VERSION "1.1.2"
 
 	// весрсия под сервер
 	#define CLIENT_VERSION_MOLD 1012
