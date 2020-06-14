@@ -138,7 +138,6 @@ void CUpdater::FetchFile(const char *pFile, const char *pDestPath)
 bool CUpdater::MoveFile(const char *pFile)
 {
 	char aBuf[256];
-	size_t len = str_length(pFile);
 	bool Success = true;
 	m_pStorage->RemoveBinaryFile(pFile);
 
