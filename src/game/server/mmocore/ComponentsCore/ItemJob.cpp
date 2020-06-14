@@ -276,8 +276,8 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, b
 		{
 			if(PlantItemID != ItemID)
 			{
-				const int random_change = random_int() % 250;
-				GS()->AVD(ClientID, "HOMEPLANTSET", ItemID, random_change, HideID, "To plant {STR}, to house (chance 0.25%)", NameItem);
+				const int random_change = random_int() % 300;
+				GS()->AVD(ClientID, "HOMEPLANTSET", ItemID, random_change, HideID, "To plant {STR}, to house (chance 0.15%)", NameItem);
 			}
 		}
 	}

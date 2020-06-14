@@ -14,6 +14,6 @@
 
 	// весрсия под сервер
 	#define CLIENT_VERSION_MOLD 1012
-	#define CLIENT_VERSION_MMO 1018
+	#define CLIENT_VERSION_MMO 1019
 
 #endif
