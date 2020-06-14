@@ -383,7 +383,7 @@ void CItems::RenderMmoPickups(const CNetObj_MmoPickup* pPrev, const CNetObj_MmoP
 		if(pCurrent->m_Type == MMO_PICKUP_SIDE_ARROW)
 			Size = 48.0f;
 		else if(pCurrent->m_Type == MMO_PICKUP_MAIN_ARROW)
-			Size = 64.0f;
+			Size = 56.0f;
 
 		Graphics()->QuadsSetRotation(Angle);
 		RenderTools()->DrawSprite(Pos.x, Pos.y, Size);
