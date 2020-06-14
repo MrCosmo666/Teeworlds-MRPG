@@ -2360,7 +2360,7 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 	char aBuf[256];
 
 	// Update Button
-	int State = m_pClient->Updater()->GetCurrentState();
+	const int State = m_pClient->Updater()->GetCurrentState();
 	if (NeedUpdate && State <= IUpdater::CLEAN)
 	{
 		str_format(aBuf, sizeof(aBuf), Localize("Mmotee %s is available"), Client()->LatestVersion());
@@ -2376,6 +2376,11 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 		char aCurrentFile[64];
 		m_pClient->Updater()->GetCurrentFile(aCurrentFile, sizeof(aCurrentFile));
 		str_format(aBuf, sizeof(aBuf), Localize("Downloading %s"), aCurrentFile);
+
+		// update now
+		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
+		static CButtonContainer s_ButtonUpdate;
+		DoButton_Menu(&s_ButtonUpdate, Localize("Updating ..."), 1, &Button);
 	}
 	else if (State == IUpdater::NEED_RESTART)
 	{
@@ -2399,12 +2404,6 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 			Client()->RequestMmoInfo();
 	}
 
-	// text information
-	MainView.HSplitTop(30.0f, 0, &Label); // text for update
-	Label.VSplitRight(g_Config.m_ClGBrowser ? 435.0f : 350.0f, 0, &Label);
-	UI()->DoLabel(&Label, aBuf, 11.0f, CUI::ALIGN_CENTER);
-	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-
 	// refresh
 	MainView.VSplitLeft(Spacing, 0, &MainView); // little space
 	MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
@@ -2418,6 +2417,11 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 		else if (m_MenuPage == PAGE_FAVORITES)
 			ServerBrowser()->Refresh(IServerBrowser::REFRESHFLAG_INTERNET);
 	}
+
+	// text information
+	Button.HSplitTop(30.0f, 0, &Label); // text for update
+	UI()->DoLabel(&Label, aBuf, 11.0f, CUI::ALIGN_CENTER);
+	TextRender()->TextColor(CUI::ms_DefaultTextColor);
 
 	// connect
 	MainView.VSplitLeft(Spacing, 0, &MainView); // little space
