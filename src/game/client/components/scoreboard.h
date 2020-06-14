@@ -9,7 +9,8 @@ class CScoreboard : public CComponent
 	void RenderGoals(float x, float y, float w);
 	float RenderSpectators(float x, float y, float w);
 	float RenderScoreboard(float x, float y, float w, int Team, const char *pTitle, int Align);
-	void RenderRecordingNotification(float x);
+	void RenderRecordingNotification(float x, float w);
+	void RenderNetworkQuality(float x, float w);
 	void RenderTimeDown();
 
 	static void ConKeyScoreboard(IConsole::IResult *pResult, void *pUserData);
