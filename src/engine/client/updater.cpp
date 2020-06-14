@@ -140,28 +140,10 @@ bool CUpdater::MoveFile(const char *pFile)
 	char aBuf[256];
 	size_t len = str_length(pFile);
 	bool Success = true;
+	m_pStorage->RemoveBinaryFile(pFile);
 
-#if !defined(CONF_FAMILY_WINDOWS)
-	if(!str_comp_nocase(pFile + len - 4, ".dll"))
-		return Success;
-#endif
-
-	if(!str_comp_nocase(pFile + len - 4, ".dll") || !str_comp_nocase(pFile + len - 4, ".ttf"))
-	{
-		str_format(aBuf, sizeof(aBuf), "%s.old", pFile);
-		Success &= m_pStorage->RenameBinaryFile(pFile, aBuf);
-
-		str_format(aBuf, sizeof(aBuf), "update/%s", pFile);
-		Success &= m_pStorage->RenameBinaryFile(aBuf, pFile);
-	}
-	else
-	{
-		m_pStorage->RemoveBinaryFile(pFile);
-
-		str_format(aBuf, sizeof(aBuf), "update/%s", pFile);
-		Success &= m_pStorage->RenameBinaryFile(aBuf, pFile);
-	}
-
+	str_format(aBuf, sizeof(aBuf), "update/%s", pFile);
+	Success &= m_pStorage->RenameBinaryFile(aBuf, pFile);
 	return Success;
 }
 
@@ -189,8 +171,6 @@ bool CUpdater::ReplaceClient()
 {
 	dbg_msg("updater", "replacing " PLAT_CLIENT_EXEC);
 	bool Success = true;
-
-	// Replace running executable by renaming twice...
 	if(!m_IsWinXP)
 	{
 		m_pStorage->RemoveBinaryFile("mmoteeworlds.old");
@@ -228,7 +208,7 @@ void CUpdater::ParseUpdate()
 	{
 		const json_value* pVersionString = json_object_get(pVersion, "version");
 		if(str_comp(json_string_get(pVersionString), GAME_RELEASE_VERSION))
-			m_ClientUpdate = true;
+			m_ArchiveUpdate = true;
 		else
 			m_State = FAIL;
 	}
@@ -248,7 +228,7 @@ void CUpdater::PerformUpdate()
 
 	const char *aLastFile;
 	aLastFile = "";
-	if(m_ClientUpdate)
+	if(m_ArchiveUpdate)
 	{
 		FetchFile(PLAT_CLIENT_DOWN, "mmoteeworlds.tmp");
 		aLastFile = "mmoteeworlds.tmp";
@@ -264,7 +244,7 @@ void CUpdater::CommitUpdate()
 		if(it->second)
 			Success &= MoveFile(it->first.c_str());
 
-	if(m_ClientUpdate)
+	if(m_ArchiveUpdate)
 		Success &= ReplaceClient();
 	if(!Success)
 		m_State = FAIL;

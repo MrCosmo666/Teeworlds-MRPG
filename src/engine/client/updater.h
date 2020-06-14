@@ -39,7 +39,7 @@ class CUpdater : public IUpdater
 	int m_Percent;
 	char m_aLastFile[256];
 
-	bool m_ClientUpdate;
+	bool m_ArchiveUpdate;
 
 	std::map<std::string, bool> m_FileJobs;
 
