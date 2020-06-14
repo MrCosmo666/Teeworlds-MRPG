@@ -61,7 +61,7 @@ void CUpdaterFetchTask::OnCompletion()
 		if(*a == '/')
 			b = a + 1;
 	b = b ? b : Dest();
-	if(!str_comp(b, "update.json"))
+	if(!str_comp(b, "mmotee-info.json"))
 	{
 		if(State() == HTTP_DONE)
 			m_pUpdater->SetCurrentState(IUpdater::GOT_MANIFEST);
@@ -193,9 +193,9 @@ bool CUpdater::ReplaceClient()
 	// Replace running executable by renaming twice...
 	if(!m_IsWinXP)
 	{
-		m_pStorage->RemoveBinaryFile("mmoclient.old");
-		Success &= m_pStorage->RenameBinaryFile(PLAT_CLIENT_EXEC, "mmoclient.old");
-		Success &= m_pStorage->RenameBinaryFile("update/mmoclient.tmp", PLAT_CLIENT_EXEC);
+		m_pStorage->RemoveBinaryFile("mmoteeworlds.old");
+		Success &= m_pStorage->RenameBinaryFile(PLAT_CLIENT_EXEC, "mmoteeworlds.old");
+		Success &= m_pStorage->RenameBinaryFile("update/mmoteeworlds.tmp", PLAT_CLIENT_EXEC);
 	}
 	#if !defined(CONF_FAMILY_WINDOWS)
 		char aPath[512];
@@ -214,7 +214,7 @@ bool CUpdater::ReplaceClient()
 void CUpdater::ParseUpdate()
 {
 	char aPath[512];
-	IOHANDLE File = m_pStorage->OpenFile(m_pStorage->GetBinaryPath("update/update.json", aPath, sizeof aPath), IOFLAG_READ, IStorage::TYPE_ALL);
+	IOHANDLE File = m_pStorage->OpenFile(m_pStorage->GetBinaryPath("mmotee-info.json", aPath, sizeof aPath), IOFLAG_READ, IStorage::TYPE_ALL);
 	if(!File)
 		return;
 
@@ -223,91 +223,36 @@ void CUpdater::ParseUpdate()
 	io_read(File, aBuf, sizeof(aBuf));
 	io_close(File);
 
-	json_value *pVersions = json_parse(aBuf, sizeof(aBuf));
-	if(pVersions && pVersions->type == json_array)
+	json_value *pVersion = json_parse(aBuf, sizeof(aBuf));
+	if(pVersion && pVersion->type == json_object)
 	{
-		for(int i = 0; i < json_array_length(pVersions); i++)
-		{
-			const json_value *pTemp;
-			const json_value *pCurrent = json_array_get(pVersions, i);
-			if(str_comp(json_string_get(json_object_get(pCurrent, "version")), GAME_RELEASE_VERSION))
-			{
-				if(json_boolean_get(json_object_get(pCurrent, "client")))
-					m_ClientUpdate = true;
-				if((pTemp = json_object_get(pCurrent, "download"))->type == json_array)
-				{
-					for(int j = 0; j < json_array_length(pTemp); j++)
-						AddFileJob(json_string_get(json_array_get(pTemp, j)), true);
-				}
-				if((pTemp = json_object_get(pCurrent, "remove"))->type == json_array)
-				{
-					for(int j = 0; j < json_array_length(pTemp); j++)
-						AddFileJob(json_string_get(json_array_get(pTemp, j)), false);
-				}
-			}
-			else
-				break;
-		}
+		const json_value* pVersionString = json_object_get(pVersion, "version");
+		if(str_comp(json_string_get(pVersionString), GAME_RELEASE_VERSION))
+			m_ClientUpdate = true;
+		else
+			m_State = FAIL;
 	}
 }
 
 void CUpdater::InitiateUpdate()
 {
-	m_State = GETTING_MANIFEST;
-	FetchFile("update.json");
+	m_State = GOT_MANIFEST;
 }
 
 void CUpdater::PerformUpdate()
 {
 	m_State = PARSING_UPDATE;
-	dbg_msg("updater", "parsing update.json");
+	dbg_msg("updater", "parsing mmotee-info.json");
 	ParseUpdate();
 	m_State = DOWNLOADING;
 
 	const char *aLastFile;
 	aLastFile = "";
-	for(map<string, bool>::reverse_iterator it = m_FileJobs.rbegin(); it != m_FileJobs.rend(); ++it)
-	{
-		if(it->second)
-		{
-			aLastFile = it->first.c_str();
-			break;
-		}
-	}
-
-	for(map<string, bool>::iterator it = m_FileJobs.begin(); it != m_FileJobs.end(); ++it)
-	{
-		if(it->second)
-		{
-			const char *pFile = it->first.c_str();
-			size_t len = str_length(pFile);
-			if(!str_comp_nocase(pFile + len - 4, ".dll"))
-			{
-#if defined(CONF_FAMILY_WINDOWS)
-				char aBuf[512];
-				str_copy(aBuf, pFile, sizeof(aBuf)); // SDL
-				str_copy(aBuf + len - 4, "-" PLAT_NAME, sizeof(aBuf) - len + 4); // -win32
-				str_append(aBuf, pFile + len - 4, sizeof(aBuf)); // .dll
-				FetchFile(aBuf, pFile);
-#endif
-				// Ignore DLL downloads on other platforms, on Linux we statically link anyway
-			}
-			else
-			{
-				FetchFile(pFile);
-			}
-			aLastFile = pFile;
-		}
-		else
-			m_pStorage->RemoveBinaryFile(it->first.c_str());
-	}
-
 	if(m_ClientUpdate)
 	{
-		FetchFile(PLAT_CLIENT_DOWN, "mmoclient.tmp");
-		aLastFile = "mmoclient.tmp";
+		FetchFile(PLAT_CLIENT_DOWN, "mmoteeworlds.tmp");
+		aLastFile = "mmoteeworlds.tmp";
 	}
-
 	str_copy(m_aLastFile, aLastFile, sizeof(m_aLastFile));
 }
 

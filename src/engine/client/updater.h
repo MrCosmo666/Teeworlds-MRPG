@@ -6,20 +6,14 @@
 #include <map>
 #include <string>
 
-#define CLIENT_EXEC "mmoclient"
+#define CLIENT_EXEC "mmoteeworlds"
 
 #if defined(CONF_FAMILY_WINDOWS)
 	#define PLAT_EXT ".zip"
 	#define PLAT_NAME CONF_PLATFORM_STRING
 #elif defined(CONF_FAMILY_UNIX)
 	#define PLAT_EXT ".tar.gz"
-	#if defined(CONF_ARCH_IA32)
-		#define PLAT_NAME CONF_PLATFORM_STRING "-x86"
-	#elif defined(CONF_ARCH_AMD64)
-		#define PLAT_NAME CONF_PLATFORM_STRING "-x86_64"
-	#else
-		#define PLAT_NAME CONF_PLATFORM_STRING "-unsupported"
-	#endif
+	#define PLAT_NAME CONF_PLATFORM_STRING "_x86_64"
 #else
 	#define PLAT_EXT ""
 	#define PLAT_NAME "unsupported-unsupported"

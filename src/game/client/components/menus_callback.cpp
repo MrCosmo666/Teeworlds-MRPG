@@ -142,6 +142,7 @@ float CMenus::RenderSettingsControlsMouse(CUIRect View)
 	View.HSplitTop(Spacing, 0, &View);
 	View.HSplitTop(ButtonHeight, &Button, &View);
 	DoScrollbarOption(&g_Config.m_InpMousesens, &g_Config.m_InpMousesens, &Button, Localize("Ingame mouse sens."), 1, 500, &LogarithmicScrollbarScale);
+
 	View.HSplitTop(Spacing, 0, &View);
 	View.HSplitTop(ButtonHeight, &Button, &View);
 	DoScrollbarOption(&g_Config.m_UiMousesens, &g_Config.m_UiMousesens, &Button, Localize("Menu mouse sens."), 1, 500, &LogarithmicScrollbarScale);
@@ -391,11 +392,19 @@ void CMenus::DoJoystickAxisPicker(CUIRect View)
 		// Bind to X,Y
 		Row.VSplitLeft(2 * StatusMargin, 0, &Row);
 		Row.VSplitLeft(BindWidth, &Button, &Row);
-		if(DoButton_CheckBox(&s_aActive[i][0], "X", g_Config.m_JoystickX == i, &Button, g_Config.m_JoystickY == i))
+		if(DoButton_CheckBox(&s_aActive[i][0], "X", g_Config.m_JoystickX == i, &Button))
+		{
+			if(g_Config.m_JoystickY == i)
+				g_Config.m_JoystickY = g_Config.m_JoystickX;
 			g_Config.m_JoystickX = i;
+		}
 		Row.VSplitLeft(BindWidth, &Button, &Row);
-		if(DoButton_CheckBox(&s_aActive[i][1], "Y", g_Config.m_JoystickY == i, &Button, g_Config.m_JoystickX == i))
+		if(DoButton_CheckBox(&s_aActive[i][1], "Y", g_Config.m_JoystickY == i, &Button))
+		{
+			if(g_Config.m_JoystickX == i)
+				g_Config.m_JoystickX = g_Config.m_JoystickY;
 			g_Config.m_JoystickY = i;
+		}
 		Row.VSplitLeft(StatusMargin, 0, &Row);
 	}
 }
