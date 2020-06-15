@@ -1374,9 +1374,19 @@ void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 	GS()->AVH(ClientID, TAB_INFO_GUILD_HOUSE, GREEN_COLOR, "Information Member Housing");
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_GUILD_HOUSE, "Buying a house you will need to constantly the Treasury");
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_GUILD_HOUSE, "In the intervals of time will be paid house");
+
+	// показать кол-во золота в гильдии
+	if(pPlayer->Acc().IsGuild())
+	{
+		GS()->AV(ClientID, "null", "");
+		const int GuildBank = Guild[pPlayer->Acc().GuildID].m_Bank;
+		pPlayer->m_Colored = LIGHT_PURPLE_COLOR;
+		GS()->AVMI(ClientID, GS()->GetItemInfo(itGold).GetIcon(), "null", NOPE, NOPE, "Your guild have {INT} Gold", &GuildBank);
+	}
+
+	// показать основное меню гильдии
 	GS()->AV(ClientID, "null", "");
-	
-	pPlayer->m_Colored = { 20, 20, 20 };
+	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	const int GuildHouseOwner = HouseGuild[HouseID].m_GuildID;
 	if(GuildHouseOwner > 0)
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "Guild owner house: {STR}", Guild[GuildHouseOwner].m_Name);

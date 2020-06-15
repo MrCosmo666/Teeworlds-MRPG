@@ -453,13 +453,20 @@ void HouseJob::ShowHouseMenu(CPlayer *pPlayer, int HouseID)
 	const int ClientID = pPlayer->GetCID();
 	GS()->AVH(ClientID, TAB_INFO_HOUSE, GREEN_COLOR, "House {INT} . {STR}", &HouseID, Home[HouseID].m_Class);
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE, "Owner House: {STR}", Job()->PlayerName(Home[HouseID].m_OwnerID));
-	GS()->AV(ClientID, "null", "");
 
+	// показать кол-во Золота у игрока
+	GS()->AV(ClientID, "null", "");
+	GS()->ShowValueInformation(pPlayer, itGold);
+	GS()->AV(ClientID, "null", "");
+	
+	// показать основное меню
+	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	if(Home[HouseID].m_OwnerID <= 0)
 		GS()->AVM(ClientID, "BUYHOUSE", HouseID, NOPE, "Buy this house. Price {INT}gold", &Home[HouseID].m_Price);
 	else
 		GS()->AVM(ClientID, "null", HouseID, NOPE, "This house has already been purchased!");
-	
+
+	GS()->AV(ClientID, "null", "");
 }
 // Показ меню дома персонально
 void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
