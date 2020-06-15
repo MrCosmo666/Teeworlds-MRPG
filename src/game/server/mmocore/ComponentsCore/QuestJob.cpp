@@ -557,7 +557,7 @@ void QuestJob::QuestTableShowRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &Bo
 		if(ItemID > 0 && CountItem > 0)
 		{
 			ItemJob::InventoryItem PlayerQuestItem = pPlayer->GetItem(ItemID);
-			str_format(aBuf, sizeof(aBuf), "\n- Item %s [%d/%d]", PlayerQuestItem.Info().GetName(pPlayer), PlayerQuestItem.Count, CountItem);
+			str_format(aBuf, sizeof(aBuf), "\n- Need %s [%d/%d]", PlayerQuestItem.Info().GetName(pPlayer), PlayerQuestItem.Count, CountItem);
 			Buffer.append_at(Buffer.length(), aBuf);
 			ShowItemNeeded = true;
 		}

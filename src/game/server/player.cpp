@@ -116,7 +116,7 @@ void CPlayer::PostTick()
 {
 	// update latency value
 	if (Server()->ClientIngame(m_ClientID) && GS()->IsClientEqualWorldID(m_ClientID) && IsAuthed())
-		GetTempData().TempLatencyPing = m_Latency.m_Min;
+		GetTempData().TempLatencyPing = (short)m_Latency.m_Min;
 }
 
 // Тик авторизированного в ::Tick
@@ -333,12 +333,11 @@ void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed,
 		return;
 	}
 
-	int NeedXp = ExpNeed;
-	float getlv = (MyExp * 100.0) / NeedXp;
-	float getexp = (GivedExp * 100.0) / NeedXp;
-	char *Level = GS()->LevelString(100, (int)getlv, 10, ':', ' ');
+	const float GetLevelProgress = (float)(MyExp * 100.0) / (float)ExpNeed;
+	const float GetExpProgress = (float)(GivedExp * 100.0) / (float)ExpNeed;
+	char *Level = GS()->LevelString(100, (int)GetLevelProgress, 10, ':', ' ');
 	char BufferInBroadcast[128];
-	str_format(BufferInBroadcast, sizeof(BufferInBroadcast), "^235Lv%d %s%s %0.2f%%+%0.3f%%(%d)XP\n", MyLevel, Name, Level, getlv, getexp, GivedExp);
+	str_format(BufferInBroadcast, sizeof(BufferInBroadcast), "^235Lv%d %s%s %0.2f%%+%0.3f%%(%d)XP\n", MyLevel, Name, Level, GetLevelProgress, GetExpProgress, GivedExp);
 	GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, BufferInBroadcast);
 	mem_zero(Level, sizeof(Level));
 }
