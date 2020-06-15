@@ -44,11 +44,11 @@ void DungeonJob::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
 	{
 		const int Rank = RES->getRow();
 		const int OwnerID = RES->getInt("OwnerID");
-		const int Seconds = RES->getDouble("Seconds");
+		const int BaseSeconds = RES->getDouble("Seconds");
 
-		char aTimeFormat[64];
-		str_format(aTimeFormat, sizeof(aTimeFormat), "Time: %d minute(s) %d second(s)", Seconds / 60, Seconds - (Seconds / 60 * 60));
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{INT}. {STR} : {STR}", &Rank, Job()->PlayerName(OwnerID), aTimeFormat);
+		const int Minutes = BaseSeconds / 60;
+		const int Seconds = BaseSeconds - (BaseSeconds / 60 * 60);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{INT}. {STR} : Time: {INT} minute(s) {INT} second(s)", &Rank, Job()->PlayerName(OwnerID), &Minutes, &Seconds);
 	}
 }
 
@@ -222,9 +222,6 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 
 int DungeonJob::SyncFactor()
 {
-	if (!GS()->IsDungeon())
-		return 0;
-
 	int Factor = 0;
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
