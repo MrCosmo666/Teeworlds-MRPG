@@ -677,7 +677,7 @@ int ItemJob::ClassItems::EnchantPrice() const
 		const int AttType = CGS::AttributInfo[Info().Attribute[i]].AtType;
 		if(AttType == AtributType::AtHardtype || Info().Attribute[i] == Stats::StStrength)
 			UpgradePrice = max(8, CGS::AttributInfo[Info().Attribute[i]].UpgradePrice) * 12;
-		else if(AttType == AtributType::AtJobs || AttType == AtributType::AtWeapon)
+		else if(AttType == AtributType::AtJob || AttType == AtributType::AtWeapon)
 			UpgradePrice = max(20, CGS::AttributInfo[Info().Attribute[i]].UpgradePrice) * 12;
 		else
 			UpgradePrice = max(6, CGS::AttributInfo[Info().Attribute[i]].UpgradePrice) * 5;
