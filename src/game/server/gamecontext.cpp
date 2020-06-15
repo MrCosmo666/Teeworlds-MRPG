@@ -1904,17 +1904,6 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVM(ClientID, "MENU", MenuList::MENU_GUIDEDROP, TAB_INFORMATION, "Loots, mobs on your zone");
 		AVM(ClientID, "MENU", MenuList::MENU_TOP_LIST, TAB_INFORMATION, "Ranking guilds and players");
 		AV(ClientID, "null", "");
-
-		// чекаем местонахождение
-		CCharacter* pChar = pPlayer->GetCharacter();
-		if(!pChar || !pChar->IsAlive())
-			return;
-
-		if (pChar->GetHelper()->BoolIndex(TILE_GUILD_HOUSE))
-		{
-			const int HouseID = Mmo()->Member()->GetPosHouseID(pChar->m_Core.m_Pos);
-			Mmo()->Member()->ShowBuyHouse(pPlayer, HouseID);
-		}
 	}
 	else if(MenuList == MenuList::MENU_JOURNAL_MAIN)
 	{

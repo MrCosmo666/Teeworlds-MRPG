@@ -304,14 +304,7 @@ bool HouseJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 
 	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_PLAYER_HOUSE))
 	{
-		const int HouseID = GS()->Mmo()->House()->GetHouse(pChr->m_Core.m_Pos);
-		if (HouseID > 0)
-		{
-			GS()->Chat(ClientID, "You can see menu in the votes!");
-			const int PriceHouse = GS()->Mmo()->House()->GetHousePrice(HouseID);
-			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 200, "House Price: {INT}gold \n"
-				" Owner: {STR}.\nInformation load in vote.", &PriceHouse, GS()->Mmo()->House()->OwnerName(HouseID));
-		}
+		GS()->Chat(ClientID, "You can see menu in the votes!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
@@ -341,7 +334,6 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 			const int HouseID = GetHouse(pChr->m_Core.m_Pos);
 			if (HouseID > 0)
 				ShowHouseMenu(pPlayer, HouseID);
-
 			return true;
 		}
 		return false;
