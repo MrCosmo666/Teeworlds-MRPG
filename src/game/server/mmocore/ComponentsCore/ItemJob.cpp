@@ -674,15 +674,17 @@ int ItemJob::ClassItems::EnchantPrice() const
 			continue;
 		
 		int UpgradePrice;
-		const int AttType = CGS::AttributInfo[Info().Attribute[i]].AtType;
-		if(AttType == AtributType::AtHardtype || Info().Attribute[i] == Stats::StStrength)
-			UpgradePrice = max(8, CGS::AttributInfo[Info().Attribute[i]].UpgradePrice) * 12;
-		else if(AttType == AtributType::AtJob || AttType == AtributType::AtWeapon)
-			UpgradePrice = max(20, CGS::AttributInfo[Info().Attribute[i]].UpgradePrice) * 12;
+		const int Attribute = Info().Attribute[i];
+		const int TypeAttribute = CGS::AttributInfo[Attribute].AtType;
+		if(TypeAttribute == AtributType::AtHardtype || Attribute == Stats::StStrength)
+			UpgradePrice = max(8, CGS::AttributInfo[Attribute].UpgradePrice) * 12;
+		else if(TypeAttribute == AtributType::AtJob || TypeAttribute == AtributType::AtWeapon || Attribute == Stats::StLuckyDropItem)
+			UpgradePrice = max(20, CGS::AttributInfo[Attribute].UpgradePrice) * 12;
 		else
-			UpgradePrice = max(6, CGS::AttributInfo[Info().Attribute[i]].UpgradePrice) * 5;
+			UpgradePrice = max(6, CGS::AttributInfo[Attribute].UpgradePrice) * 5;
 
-		CompressedPrice += (Info().AttributeCount[i] * UpgradePrice);
+		const int AttributeCount = Info().AttributeCount[i];
+		CompressedPrice += (AttributeCount * UpgradePrice);
 	}
 	return CompressedPrice * (Enchant + 1);
 }

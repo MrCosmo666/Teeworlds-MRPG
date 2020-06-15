@@ -2000,6 +2000,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		char aBuf[128];
 		bool FoundedBots = false;
+		const float LuckyDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
 		for(const auto& mobs : BotJob::MobBot)
 		{
 			if (!IsClientEqualWorldID(ClientID, mobs.second.WorldID))
@@ -2007,16 +2008,17 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 			const int HideID = (NUM_TAB_MENU+12500+mobs.first);
 			const int PosX = mobs.second.PositionX/32, PosY = mobs.second.PositionY/32;
-			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} {STR}(x{INT} y{INT})", mobs.second.GetName(), Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY);
+			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} {STR}[x{INT} y{INT}]", mobs.second.GetName(), Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY);
 	
 			for(int i = 0; i < MAX_DROPPED_FROM_MOBS; i++)
 			{
 				if(mobs.second.DropItem[i] <= 0 || mobs.second.CountItem[i] <= 0)
 					continue;
 			
-				double Chance = (double)mobs.second.RandomItem[i];
+				const float Chance = mobs.second.RandomItem[i];
+				const float AddedChance = LuckyDrop;
 				ItemJob::ItemInformation &InfoDropItem = GetItemInfo(mobs.second.DropItem[i]);
-				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%", InfoDropItem.GetName(pPlayer), mobs.second.CountItem[i], Chance);
+				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%(+%0.2f%%)", InfoDropItem.GetName(pPlayer), mobs.second.CountItem[i], Chance, AddedChance);
 				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, "{STR}", aBuf);
 				FoundedBots = true;
 			}
