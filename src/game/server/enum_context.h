@@ -39,6 +39,7 @@ enum Stats
 	StShotgunPower			= 18,
 	StGrenadePower			= 19,
 	StRiflePower			= 20,
+	StLuckyDropItem			= 21,
 };
  
 // Таймеры Игрока
@@ -72,7 +73,8 @@ enum AtributType
 	AtDps,
 	AtWeapon,
 	AtHardtype,
-	AtJobs
+	AtJob,
+	AtOther,
 };
 
 enum ToplistTypes

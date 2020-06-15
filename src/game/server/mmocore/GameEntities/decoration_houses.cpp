@@ -3,7 +3,7 @@
 #include <game/server/gamecontext.h>
 #include "decoration_houses.h"
 
-// Декорации
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 CDecorationHouses::CDecorationHouses(CGameWorld* pGameWorld, vec2 Pos, int HouseID, int DecoID)
 	: CEntity(pGameWorld, CGameWorld::ENTTYPE_DECOHOUSE, Pos)
 {
@@ -12,14 +12,16 @@ CDecorationHouses::CDecorationHouses(CGameWorld* pGameWorld, vec2 Pos, int House
 
 	GameWorld()->InsertEntity(this);
 
-	if (SwitchToObject(true) >= 0) {
+	if (SwitchToObject(true) >= 0) 
+	{
 		for (int i = 0; i < NUM_IDS; i++)
 			m_IDs[i] = Server()->SnapNewID();
 	}
 }
 CDecorationHouses::~CDecorationHouses()
 {
-	if (SwitchToObject(true) >= 0) {
+	if (SwitchToObject(true) >= 0) 
+	{
 		for (int i = 0; i < NUM_IDS; i++)
 			Server()->SnapFreeID(m_IDs[i]);
 	}

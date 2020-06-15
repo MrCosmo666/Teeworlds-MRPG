@@ -17,7 +17,7 @@ class CInput : public IEngineInput
 	void InitJoysticks();
 	void CloseJoysticks();
 
-	int m_InputGrabbed;
+	bool m_MouseInputRelative;
 	char* m_pClipboardText;
 
 	int m_PreviousHat;
