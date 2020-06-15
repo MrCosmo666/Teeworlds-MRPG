@@ -155,7 +155,7 @@ public:
 		// names update
 		char m_aName[MAX_NAME_LENGTH];
 		char m_aClan[MAX_CLAN_LENGTH];
-		char m_aLanguage[16];
+		char m_aLanguage[MAX_LANGUAGE_LENGTH];
 
 		int m_Version;
 		int m_Country;
@@ -234,7 +234,7 @@ public:
 	virtual int GetClientVersion(int ClientID);
 
 	virtual void SetClientLanguage(int ClientID, const char* pLanguage);
-	virtual const char* GetClientLanguage(int ClientID);
+	virtual const char* GetClientLanguage(int ClientID) const;
 	virtual const char* GetWorldName(int WorldID);
 
 	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText);

@@ -22,7 +22,6 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	m_PrevTuningParams = *pGS->Tuning();
 	m_NextTuningParams = m_PrevTuningParams;
 	m_MoodState = MOOD_NORMAL;
-	SetLanguage(Server()->GetClientLanguage(ClientID));
 	GS()->SendTuningParams(ClientID);
 
 	if(!IsBot())
@@ -401,7 +400,12 @@ void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
 
 void CPlayer::SetLanguage(const char* pLanguage)
 {
-	str_copy(m_aLanguage, pLanguage, sizeof(m_aLanguage));
+	Server()->SetClientLanguage(m_ClientID, pLanguage);
+}
+
+const char *CPlayer::GetLanguage() const
+{
+	return Server()->GetClientLanguage(m_ClientID);
 }
 
 void CPlayer::UpdateTempData(int Health, int Mana)
@@ -504,11 +508,6 @@ int CPlayer::GetStartMana()
 {
 	int EnchantBonus = GetAttributeCount(Stats::StPiety, true);
 	return 10 + EnchantBonus;
-}
-
-const char* CPlayer::GetLanguage()
-{
-	return m_aLanguage;
 }
 
 void CPlayer::ShowInformationStats()

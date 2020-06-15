@@ -146,6 +146,7 @@ void CCharacterBotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 	const int ClientID = pPlayer->GetCID();
 	const int BotID = m_pBotPlayer->GetBotID();
 	const int SubID = m_pBotPlayer->GetBotSub();
+	const float LuckyDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
 
 	if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 		GS()->Mmo()->Quest()->AddMobProgress(pPlayer, BotID);
@@ -157,7 +158,6 @@ void CCharacterBotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 		if (DropItem <= 0 || CountItem <= 0)
 			continue;
 
-		const float LuckyDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
 		const float RandomDrop = clamp(BotJob::MobBot[SubID].RandomItem[i] + LuckyDrop, 0.0f, 100.0f);
 		CreateRandomDropItem(ClientID, RandomDrop, DropItem, CountItem, ForceDies);
 	}

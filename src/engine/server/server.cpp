@@ -386,7 +386,7 @@ const char *CServer::GetWorldName(int WorldID)
 	return "unknow";
 }
 
-const char* CServer::GetClientLanguage(int ClientID)
+const char* CServer::GetClientLanguage(int ClientID) const
 {
 	if (ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
 		return "unknow";
