@@ -149,7 +149,7 @@ bool BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int Talk
 
 void BotJob::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	if (!IsQuestBotValid(MobID) || Progress >= (int)QuestBot[MobID].m_Talk.size())
 	{
 		GS()->ClearTalkText(ClientID);
@@ -194,7 +194,7 @@ int BotJob::GetQuestNPC(int MobID) const
 // Загрузка основной информации о ботах
 void BotJob::LoadMainInformationBots()
 {
-	if(DataBot.size() > 0)
+	if(!(DataBot.empty()))
 		return;
 
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_world"));

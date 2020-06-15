@@ -43,7 +43,7 @@ bool AetherJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID
 		if(Price > 0 && pPlayer->CheckFailMoney(Price))
 			return true;
 
-		vec2 Position = vec2(Teleport[TeleportID].TeleX, Teleport[TeleportID].TeleY);
+		const vec2 Position = vec2(Teleport[TeleportID].TeleX, Teleport[TeleportID].TeleY);
 		if(Teleport[TeleportID].WorldID != GS()->Server()->GetWorldID(ClientID))
 		{
 			pPlayer->GetTempData().TempTeleportX = Position.x;
@@ -138,7 +138,7 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 		if (pPlayer->Acc().AetherLocation.find(tl.first) == pPlayer->Acc().AetherLocation.end())
 			continue;
 
-		bool LocalTeleport = (tl.second.WorldID == GS()->Server()->GetWorldID(ClientID) &&
+		const bool LocalTeleport = (tl.second.WorldID == GS()->Server()->GetWorldID(ClientID) &&
 			distance(pPlayer->GetCharacter()->m_Core.m_Pos, vec2(tl.second.TeleX, tl.second.TeleY)) < 120);
 		if (LocalTeleport)
 		{
