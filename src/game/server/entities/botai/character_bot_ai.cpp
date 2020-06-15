@@ -166,10 +166,10 @@ void CCharacterBotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 	const int MultiplierRaid = clamp(GS()->IncreaseCountRaid(MultiplierExperience), 1, GS()->IncreaseCountRaid(MultiplierExperience));
 	pPlayer->AddExp(MultiplierRaid);
 
-	const int MultiplierDrops = clamp(MultiplierRaid / 2, 1, MultiplierRaid);
+	const int MultiplierDrops = max(MultiplierRaid / 2, 1);
 	GS()->CreateDropBonuses(m_Core.m_Pos, 1, MultiplierDrops, (1+random_int() % 2), ForceDies);
 
-	const int MultiplierGolds = BotJob::MobBot[SubID].Power / g_Config.m_SvStrongGold;
+	const int MultiplierGolds = max(BotJob::MobBot[SubID].Power / g_Config.m_SvStrongGold, 1);
 	pPlayer->AddMoney(MultiplierGolds);
 	if (random_int() % 80 == 0)
 	{
