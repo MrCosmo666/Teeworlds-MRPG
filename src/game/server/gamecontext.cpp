@@ -268,6 +268,16 @@ void CGS::CreateSound(vec2 Pos, int Sound, int64 Mask)
 	}
 }
 
+void CGS::UpdateWorldMusic(int ClientID, int MusicID)
+{
+	if(!CheckClient(ClientID) || MusicID < 40)
+		return;
+
+	CNetMsg_Sv_WorldMusic Msg;
+	Msg.m_pSoundID = MusicID;
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
+}
+
 void CGS::CreatePlayerSound(int ClientID, int Sound)
 {
 	// fix for vanilla unterstand SoundID

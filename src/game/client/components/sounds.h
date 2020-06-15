@@ -45,6 +45,7 @@ public:
 		CHN_WORLD,
 		CHN_GLOBAL,
 		CHN_MMORPG,
+		CHN_MMORPG_ATMOSPHERE,
 	};
 
 	virtual int GetInitAmount() const;

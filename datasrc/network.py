@@ -632,4 +632,10 @@ Messages = [
 		NetIntAny("m_pRequires"),
 	]),
 
+    # music on map
+	NetMessage("Sv_WorldMusic",
+	[
+		NetIntAny("m_pSoundID"),
+	]),
+
 ]

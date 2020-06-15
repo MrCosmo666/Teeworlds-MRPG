@@ -469,6 +469,7 @@ void CGameClient::OnInit()
 	m_IsEasterDay = time_iseasterday();
 	m_pMenus->RenderLoading();	
 	m_InitComplete = true;
+	m_WorldMusicID = -1;
 
 	int64 End = time_get();
 	char aBuf[256];
@@ -503,6 +504,9 @@ void CGameClient::OnUpdate()
 				break;
 		}
 	}
+
+	// mmo world music
+	UpdateStateMmoMusic();
 }
 
 int CGameClient::OnSnapInput(int *pData)
@@ -1119,12 +1123,17 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 	}
 
 	// mmotee
-	else if(MsgId == NETMSGTYPE_SV_AFTERISMMOSERVER)
+	else if(MsgId == NETMSGTYPE_SV_AFTERISMMOSERVER && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 	{
 		m_ConnectedMmoServer = true;
 
 		if(g_Config.m_ClShowAuthMenu)
 			m_pMenus->SetAuthState(true);
+	}
+	else if(MsgId == NETMSGTYPE_SV_WORLDMUSIC && Client()->State() != IClient::STATE_DEMOPLAYBACK)
+	{
+		CNetMsg_Sv_WorldMusic* pMsg = (CNetMsg_Sv_WorldMusic*)pRawMsg;
+		m_WorldMusicID = pMsg->m_pSoundID;
 	}
 }
 
@@ -1916,6 +1925,18 @@ void CGameClient::SendAuthPack(const char* Login, const char* Password, bool Sta
 	Msg.m_Password = Password;
 	Msg.m_SelectRegister = StateRegistered;
 	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
+}
+
+void CGameClient::UpdateStateMmoMusic()
+{
+	if(m_WorldMusicID < SOUND_MENU)
+		return;
+
+	const bool ShouldPlay = Client()->State() == IClient::STATE_ONLINE && g_Config.m_SndEnableMusicMRPG;
+	if(ShouldPlay && !m_pSounds->IsPlaying(m_WorldMusicID))
+		m_pSounds->Play(CSounds::CHN_MMORPG_ATMOSPHERE, m_WorldMusicID, 0.15f);
+	else if(!ShouldPlay && m_pSounds->IsPlaying(m_WorldMusicID))
+		m_pSounds->Stop(m_WorldMusicID);
 }
 
 void CGameClient::DoEnterMessage(const char *pName, int ClientID, int Team)
