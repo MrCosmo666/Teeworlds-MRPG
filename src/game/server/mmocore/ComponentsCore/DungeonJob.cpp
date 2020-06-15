@@ -128,10 +128,10 @@ bool DungeonJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMe
 		pPlayer->m_Colored = GOLDEN_COLOR;
 		GS()->AVL(ClientID, "null", "Alternative story dungeon's");
 		ShowDungeonsList(pPlayer, false);
-		GS()->AV(ClientID, "null", "");
 
 		if (GS()->IsDungeon())
 		{
+			GS()->AV(ClientID, "null", "");
 			ShowTankVotingDungeon(pPlayer);
 			GS()->AV(ClientID, "null", "");
 			pPlayer->m_Colored = { 30, 8, 8 };
