@@ -25,6 +25,7 @@
 
 #include <teeother/components/localization.h>
 
+// статичные данные которые имеют одно значение в разных объектах
 std::map < int , CGS::StructAttribut > CGS::AttributInfo;
 std::map < int , std::map < std::string , int > > CGS::Effects;
 int CGS::m_RaidExp = 100;
