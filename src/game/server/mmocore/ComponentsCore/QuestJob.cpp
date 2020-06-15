@@ -11,6 +11,16 @@
 std::map < int , QuestJob::StructQuestData > QuestJob::QuestsData;
 std::map < int , std::map < int , QuestJob::StructQuest > > QuestJob::Quests;
 
+static char* GetStateName(int Type)
+{
+	switch(Type)
+	{
+		case QuestState::QUEST_ACCEPT: return "Active";
+		case QuestState::QUEST_FINISHED: return "Finished";
+		default: return "Not active";
+	}
+}
+
 int QuestJob::GetState(int ClientID, int QuestID) const
 {
 	if(IsValidQuest(QuestID, ClientID))
@@ -41,16 +51,6 @@ int QuestJob::GetStoryCount(const char *StoryName, int CountFromQuestID) const
 		}
 	}
 	return Count;
-}
-
-const char *QuestJob::GetStateName(int Type) const
-{
-	switch (Type)
-	{
-		case QuestState::QUEST_ACCEPT: return "Active";
-		case QuestState::QUEST_FINISHED: return "Finished";
-	}
-	return "Not active";
 }
 
 bool QuestJob::IsDefeatMobsComplete(int ClientID, int QuestID) const
