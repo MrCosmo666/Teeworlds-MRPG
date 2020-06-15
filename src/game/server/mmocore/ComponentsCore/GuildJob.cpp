@@ -522,6 +522,7 @@ bool GuildJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		{
 			const int GuildHouseID = GetPosHouseID(pChr->m_Core.m_Pos);
 			Job()->Member()->ShowBuyHouse(pPlayer, GuildHouseID);
+			return true;
 		}
 		return false;
 	}
@@ -829,7 +830,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Maximal available player count: {INT}", &Guild[GuildID].m_Upgrades[EMEMBERUPGRADE::AvailableNSTSlots]);
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Leader: {STR}", Job()->PlayerName(Guild[GuildID].m_OwnerID));
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "- - - - - - - - - -");
-	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "/gexit - leave of guild group (for all members)");
+	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "/gexit - leave of guild group.");
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "- - - - - - - - - -");
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Guild Bank: {INT}gold", &Guild[GuildID].m_Bank);
 	GS()->AV(ClientID, "null", "");
@@ -912,24 +913,26 @@ void GuildJob::ShowGuildPlayers(CPlayer* pPlayer)
 
 void GuildJob::AddExperience(int GuildID)
 {
-	bool UpdateTable = false;
-	
 	Guild[GuildID].m_Exp += 1;
+
+	bool UpdateTable = false;
 	int ExperienceNeed = kurosio::computeExperience(Guild[GuildID].m_Level);
 	for( ; Guild[GuildID].m_Exp >= ExperienceNeed; )
 	{
-		Guild[GuildID].m_Exp -= ExperienceNeed, Guild[GuildID].m_Level++;
+		Guild[GuildID].m_Exp -= ExperienceNeed; 
+		Guild[GuildID].m_Level++;
+
+		ExperienceNeed = kurosio::computeExperience(Guild[GuildID].m_Level);
+		if(Guild[GuildID].m_Exp < ExperienceNeed)
+			UpdateTable = true;
+
 		GS()->Chat(-1, "Guild {STR} raised the level up to {INT}", Guild[GuildID].m_Name, &Guild[GuildID].m_Level);
 		GS()->ChatDiscord(DC_SERVER_INFO, "Information", "Guild {STR} raised the level up to {INT}", Guild[GuildID].m_Name, &Guild[GuildID].m_Level);
 		AddHistoryGuild(GuildID, "Guild raised level to '%d'.", Guild[GuildID].m_Level);
+	}
 
-		if(Guild[GuildID].m_Exp < ExperienceNeed)
-			UpdateTable = true;
-	}
-	if(rand()%10 == 2 || UpdateTable)
-	{
+	if(random_int()%10 == 2 || UpdateTable)
 		SJK.UD("tw_guilds", "Level = '%d', Experience = '%d' WHERE ID = '%d'", Guild[GuildID].m_Level, Guild[GuildID].m_Exp, GuildID);
-	}
 }
 
 bool GuildJob::AddMoneyBank(int GuildID, int Money)
@@ -1371,6 +1374,7 @@ void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 	GS()->AVH(ClientID, TAB_INFO_GUILD_HOUSE, GREEN_COLOR, "Information Member Housing");
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_GUILD_HOUSE, "Buying a house you will need to constantly the Treasury");
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_GUILD_HOUSE, "In the intervals of time will be paid house");
+	GS()->AV(ClientID, "null", "");
 	
 	pPlayer->m_Colored = { 20, 20, 20 };
 	const int GuildHouseOwner = HouseGuild[HouseID].m_GuildID;
@@ -1378,6 +1382,8 @@ void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "Guild owner house: {STR}", Guild[GuildHouseOwner].m_Name);
 	else
 		GS()->AVM(ClientID, "BUYMEMBERHOUSE", HouseID, NOPE, "Buy this guild house! Price: {INT}", &HouseGuild[HouseID].m_Price);
+		
+	GS()->AV(ClientID, "null", "");
 }
 
 void GuildJob::ChangeStateDoor(int GuildID)

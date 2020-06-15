@@ -457,6 +457,9 @@ void HouseJob::ShowHouseMenu(CPlayer *pPlayer, int HouseID)
 
 	if(Home[HouseID].m_OwnerID <= 0)
 		GS()->AVM(ClientID, "BUYHOUSE", HouseID, NOPE, "Buy this house. Price {INT}gold", &Home[HouseID].m_Price);
+	else
+		GS()->AVM(ClientID, "null", HouseID, NOPE, "This house has already been purchased!");
+	
 }
 // Показ меню дома персонально
 void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
