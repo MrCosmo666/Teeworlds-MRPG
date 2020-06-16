@@ -268,7 +268,7 @@ void CGS::CreateSound(vec2 Pos, int Sound, int64 Mask)
 	}
 }
 
-void CGS::UpdateWorldMusic(int ClientID, int MusicID)
+void CGS::SendMapMusic(int ClientID, int MusicID)
 {
 	if(!CheckClient(ClientID) || MusicID < 40)
 		return;

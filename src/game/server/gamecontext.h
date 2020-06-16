@@ -107,7 +107,7 @@ public:
 	void CreatePlayerSpawn(vec2 Pos);
 	void CreateDeath(vec2 Pos, int Who);
 	void CreateSound(vec2 Pos, int Sound, int64 Mask=-1);
-	void UpdateWorldMusic(int ClientID, int MusicID);
+	void SendMapMusic(int ClientID, int MusicID);
 	void CreatePlayerSound(int ClientID, int Sound);
 	void SendMmoEffect(vec2 Pos, int EffectID, int ClientID = -1);
 	void SendMmoPotion(vec2 Pos, const char *Potion, bool Added);

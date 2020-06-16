@@ -74,7 +74,7 @@ void CSounds::OnInit()
 	Sound()->SetChannelVolume(CSounds::CHN_WORLD, 0.9f);
 	Sound()->SetChannelVolume(CSounds::CHN_GLOBAL, 1.0f);
 	Sound()->SetChannelVolume(CSounds::CHN_MMORPG, 0.7f);
-	Sound()->SetChannelVolume(CSounds::CHN_MMORPG_ATMOSPHERE, 0.15f);
+	Sound()->SetChannelVolume(CSounds::CHN_MMORPG_ATMOSPHERE, 0.2f);
 	
 	Sound()->SetListenerPos(0.0f, 0.0f);
 
@@ -172,8 +172,13 @@ void CSounds::Play(int Chn, int SetId, float Vol)
 		return;
 
 	int Flags = 0;
-	if(Chn == CHN_MUSIC || Chn == CHN_MMORPG || Chn == CHN_MMORPG_ATMOSPHERE)
+	if(Chn == CHN_MUSIC || Chn == CHN_MMORPG)
 		Flags = ISound::FLAG_LOOP;
+	else if(Chn == CHN_MMORPG_ATMOSPHERE)
+	{
+		Flags = ISound::FLAG_LOOP;
+		Sound()->SetChannelVolume(CSounds::CHN_MMORPG_ATMOSPHERE, Vol);
+	}
 	
 	Sound()->Play(Chn, SampleId, Flags);
 }

@@ -1932,9 +1932,9 @@ void CGameClient::UpdateStateMmoMusic()
 	if(m_WorldMusicID < SOUND_MENU)
 		return;
 
-	const bool ShouldPlay = (Client()->State() == IClient::STATE_ONLINE && m_LocalClientID >= 0 && m_aClients[m_LocalClientID].m_Team != TEAM_SPECTATORS  && g_Config.m_SndEnableMusicMRPG);
+	const bool ShouldPlay = (Client()->State() == IClient::STATE_ONLINE && MmoServer() && m_LocalClientID >= 0 && m_aClients[m_LocalClientID].m_Team != TEAM_SPECTATORS  && g_Config.m_SndEnableMusicMRPG);
 	if(ShouldPlay && !m_pSounds->IsPlaying(m_WorldMusicID))
-		m_pSounds->Play(CSounds::CHN_MMORPG_ATMOSPHERE, m_WorldMusicID, 0.15f);
+		m_pSounds->Play(CSounds::CHN_MMORPG_ATMOSPHERE, m_WorldMusicID, 0.2f);
 	else if(!ShouldPlay && m_pSounds->IsPlaying(m_WorldMusicID))
 		m_pSounds->Stop(m_WorldMusicID);
 }
