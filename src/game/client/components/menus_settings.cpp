@@ -2172,6 +2172,7 @@ void CMenus::ResetSettingsSound()
 	g_Config.m_SndEnable = 1;
 	g_Config.m_SndInit = 1;
 	g_Config.m_SndMusic = 1;
+	g_Config.m_SndEnableMusicMRPG = 1;
 	g_Config.m_SndNonactiveMute = 0;
 	g_Config.m_SndRate = 48000;
 	g_Config.m_SndVolume = 100;

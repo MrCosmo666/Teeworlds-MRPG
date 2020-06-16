@@ -1234,7 +1234,7 @@ void CGameClient::ProcessEvents()
 			CNetEvent_MmoDamage* ev = (CNetEvent_MmoDamage*)pData;
 
 			char aBuf[8];
-			int Damage = ev->m_DamageCount;
+			const int Damage = ev->m_DamageCount;
 			str_format(aBuf, sizeof(aBuf), "%d", Damage);
 			m_pEffects->DamageMmoInd(vec2(ev->m_X, ev->m_Y), aBuf);
 		}
@@ -1935,7 +1935,7 @@ void CGameClient::UpdateStateMmoMusic()
 		return;
 
 	const bool ShouldPlay = (Client()->State() == IClient::STATE_ONLINE && MmoServer() && m_LocalClientID >= 0 
-							&& m_aClients[m_LocalClientID].m_Team != TEAM_SPECTATORS  && g_Config.m_SndEnableMusicMRPG);
+							&& m_aClients[m_LocalClientID].m_Team != TEAM_SPECTATORS  && g_Config.m_SndEnable && g_Config.m_SndEnableMusicMRPG);
 	if(ShouldPlay && !m_pSounds->IsPlaying(m_WorldMusicID))
 		m_pSounds->Play(CSounds::CHN_MMORPG_ATMOSPHERE, m_WorldMusicID, (float)(m_WorldMusicVolume / 10.0f));
 	else if(!ShouldPlay && m_pSounds->IsPlaying(m_WorldMusicID))
