@@ -105,14 +105,17 @@ bool CCharacterBotAI::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	// проверка при смерте
 	if(BotDie)
 	{
-		for(const auto& ld : m_ListDmgPlayers)
+		if(Weapon != WEAPON_SELF && Weapon != WEAPON_WORLD)
 		{
-			const int ParseClientID = ld.first;
-			CPlayer* pPlayer = GS()->GetPlayer(ParseClientID, true, true);
-			if(!pPlayer || ParseClientID == m_pBotPlayer->GetCID() || distance(pPlayer->m_ViewPos, m_Core.m_Pos) > 1000.0f)
-				continue;
+			for(const auto& ld : m_ListDmgPlayers)
+			{
+				const int ParseClientID = ld.first;
+				CPlayer* pPlayer = GS()->GetPlayer(ParseClientID, true, true);
+				if(!pPlayer || ParseClientID == m_pBotPlayer->GetCID() || distance(pPlayer->m_ViewPos, m_Core.m_Pos) > 1000.0f)
+					continue;
 
-			DieRewardPlayer(pPlayer, Force);
+				DieRewardPlayer(pPlayer, Force);
+			}
 		}
 		m_ListDmgPlayers.clear();
 		ClearTarget();

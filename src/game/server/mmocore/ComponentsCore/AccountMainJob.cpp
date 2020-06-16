@@ -99,10 +99,10 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 			return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
 		}
 
+		pPlayer->SetLanguage(CHECKACCESS->getString("Language").c_str());
 		str_copy(pPlayer->Acc().Login, clear_Login.cstr(), sizeof(pPlayer->Acc().Login));
 		str_copy(pPlayer->Acc().Password, clear_Pass.cstr(), sizeof(pPlayer->Acc().Password));
 		str_copy(pPlayer->Acc().LastLogin, CHECKACCESS->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().LastLogin));
-		pPlayer->SetLanguage(CHECKACCESS->getString("Language").c_str());
 
 		pPlayer->Acc().AuthID = UserID;
 		pPlayer->Acc().Level = ACCOUNTDATA->getInt("Level");
