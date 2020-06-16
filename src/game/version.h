@@ -10,10 +10,10 @@
 	#define GAME_NETVERSION "0.7 " GAME_NETVERSION_HASH_FORCED
 	#define CLIENT_VERSION 0x0705
 	// версия клиента релиза
-	#define GAME_RELEASE_VERSION "1.1.4"
+	#define GAME_RELEASE_VERSION "1.1.5"
 
 	// весрсия под сервер
 	#define CLIENT_VERSION_MOLD 1012
-	#define CLIENT_VERSION_MMO 1020
+	#define CLIENT_VERSION_MMO 1021
 
 #endif
