@@ -1235,8 +1235,8 @@ void CGameClient::ProcessEvents()
 
 			char aBuf[8];
 			const int Damage = ev->m_DamageCount;
-			str_format(aBuf, sizeof(aBuf), "%d", Damage);
-			m_pEffects->DamageMmoInd(vec2(ev->m_X, ev->m_Y), aBuf);
+			str_format(aBuf, sizeof(aBuf), "%d",  Damage);
+			m_pEffects->DamageMmoInd(vec2(ev->m_X, ev->m_Y), aBuf, ev->m_CritDamage, (bool)(ev->m_ClientID == m_LocalClientID));
 		}
 	}
 }

@@ -154,7 +154,7 @@ ItemJob::ItemInformation &CGS::GetItemInfo(int ItemID) const { return ItemJob::I
 	EVENTS 
 ######################################################################### */
 // Отправить запрос на рендер Урона
-void CGS::CreateDamage(vec2 Pos, int ClientID, int Amount, bool OnlyVanilla)
+void CGS::CreateDamage(vec2 Pos, int ClientID, int Amount, bool CritDamage, bool OnlyVanilla)
 {
 	CNetEvent_Damage* pEventVanilla = (CNetEvent_Damage*)m_Events.Create(NETEVENTTYPE_DAMAGE, sizeof(CNetEvent_Damage));
 	if(pEventVanilla)
@@ -187,6 +187,7 @@ void CGS::CreateDamage(vec2 Pos, int ClientID, int Amount, bool OnlyVanilla)
 		pEventMmo->m_Y = (int)Pos.y;
 		pEventMmo->m_ClientID = ClientID;
 		pEventMmo->m_DamageCount = Amount;
+		pEventMmo->m_CritDamage = CritDamage;
 	}
 }
 
