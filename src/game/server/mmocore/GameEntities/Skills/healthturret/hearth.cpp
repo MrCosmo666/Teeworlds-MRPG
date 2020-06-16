@@ -42,6 +42,7 @@ void CHearth::Tick()
 	GS()->CreateSound(m_Pos, 15);
 	pChar->IncreaseHealth(m_Health);
 
+	
 	// уничтожаем обьект
 	GS()->m_World.DestroyEntity(this);
 	return;

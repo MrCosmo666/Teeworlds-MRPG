@@ -83,10 +83,10 @@ void CGameControllerDungeon::ChangeState(int State)
 	{
 		SelectTankPlayer();
 		m_StartedPlayers = PlayersNum();
-		m_MaximumTick = Server()->TickSpeed() * 720;
+		m_MaximumTick = Server()->TickSpeed() * 600;
 		m_SafeTick = Server()->TickSpeed() * 30;
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The security timer is enabled for 30 seconds!");
-		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "You are given 12 minutes to complete of dungeon!");
+		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "You are given 10 minutes to complete of dungeon!");
 		GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon started!");
 		SetMobsSpawn(true);
 		KillAllPlayers(true);

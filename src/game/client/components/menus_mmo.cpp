@@ -105,13 +105,6 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		if (DoButton_CheckBox(&s_ButtonColorVote, Localize("Show Colored Vote (MRPG)"), g_Config.m_ClShowColoreVote, &Button))
 			g_Config.m_ClShowColoreVote ^= 1;
 
-		// enable mmorpg atmosphere music
-		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
-		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
-		static int s_ButtonSndMusicMRPG = 0;
-		if(DoButton_CheckBox(&s_ButtonSndMusicMRPG, Localize("Enable atmosphere music (MRPG)"), g_Config.m_SndEnableMusicMRPG, &Button))
-			g_Config.m_SndEnableMusicMRPG ^= 1;
-
 		// --------------------- RIGHT SIDE --------------------------
 		UI()->DoLabel(&BasicRight, "Customize", 12.0f, CUI::ALIGN_CENTER);
 		BasicRight.HSplitTop(14.0f, &Button, &BasicRight);
