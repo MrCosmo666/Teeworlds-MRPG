@@ -1,2 +1,9 @@
-Town Theme RPG(music_mrpg_fantasy) converted to WavPack - CC0 1.0(No Copyright)
-Enchanted Festival / Author: Matthew Pablo (music_mrpg_festival) converted to WavPack - CC-BY 3.0
+Town Theme RPG(music_mrpg_fantasy) - CC0 1.0(No Copyright)
+https://opengameart.org/content/town-theme-rpg
+Converted to WavPack 
+Author: cynicmusic
+
+Enchanted Festival(music_mrpg_festival) - CC-BY 3.0
+https://opengameart.org/content/enchanted-festival
+Converted to WavPack was also cropped to 0:23 sec
+Author: Matthew Pablo 
