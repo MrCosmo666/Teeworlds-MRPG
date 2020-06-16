@@ -1874,7 +1874,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	if(!pPlayer)
 		return;
 
-	kurosio::kpause(3);	
+	kurosio::kpause(3);
 	pPlayer->m_OpenVoteMenu = MenuList;
 	ClearVotes(ClientID);
 
@@ -2161,11 +2161,13 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 		return true;
 	else if(PPSTR(CMD, "BACK") == 0)
 	{
+		CreatePlayerSound(ClientID, SOUND_BOOK_FLIP);
 		ResetVotes(ClientID, pPlayer->m_LastVoteMenu);
 		return true;
 	}
 	else if(PPSTR(CMD, "MENU") == 0)
 	{
+		CreatePlayerSound(ClientID, SOUND_BOOK_FLIP);
 		ResetVotes(ClientID, VoteID);
 		return true;
 	}

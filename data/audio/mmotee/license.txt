@@ -18,12 +18,17 @@ https://opengameart.org/content/colossal-boss-battle-theme
 Converted to WavPack
 Author: Matthew Pablo 
 
-Loop - House In a Forest(music_mrpg_house) - CC-BY 3.0
-https://opengameart.org/content/loop-house-in-a-forest
-Converted to WavPack
-Author: HorrorPen
-
 Meloncholy Town(music_mrpg_forest) - CC-BY 3.0
 https://opengameart.org/content/meloncholy-town
 Converted to WavPack
 Author: VWolfdog
+
+Inventory Sound Effects(item_pickup, item_equip, item_sell_buy) - CC-BY 3.0
+https://opengameart.org/content/inventory-sound-effects
+Converted to WavPack 
+Author: artisticdude (Submitted by Ogrebane)
+
+50 RPG sound effects(book_flip) - CC0 1.0(No Copyright)
+https://opengameart.org/content/50-rpg-sound-effects
+Converted to WavPack 
+Author: Kenney
