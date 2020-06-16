@@ -245,6 +245,7 @@ container.sounds.Add(SoundSet("music_mrpg_fantasy", ["audio/mmotee/music_mrpg_fa
 container.sounds.Add(SoundSet("music_mrpg_house", ["audio/mmotee/music_mrpg_house.wv"]))
 container.sounds.Add(SoundSet("music_mrpg_forest", ["audio/mmotee/music_mrpg_forest.wv"]))
 container.sounds.Add(SoundSet("music_mrpg_colossus", ["audio/mmotee/music_mrpg_colossus.wv"]))
+container.sounds.Add(SoundSet("music_mrpg_dungeon", ["audio/mmotee/music_mrpg_dungeon.wv"]))
 
 ###############################################################################
 ###############################################################################

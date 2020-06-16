@@ -275,7 +275,7 @@ void CGS::SendMapMusic(int ClientID, int MusicID)
 
 	CNetMsg_Sv_WorldMusic Msg;
 	Msg.m_pSoundID = (MusicID != 0 ? MusicID : m_MusicID);
-	Msg.m_pVolume = (IsDungeon() ? 10 : 2);
+	Msg.m_pVolume = (IsDungeon() ? 8 : 2);
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
 }
 
