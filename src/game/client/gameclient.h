@@ -227,6 +227,7 @@ public:
 	bool m_IsEasterDay;
 	bool m_InitComplete;
 	int m_WorldMusicID;
+	int m_WorldMusicVolume;
 
 	int RacePrecision() const { return m_Snap.m_pGameDataRace ? m_Snap.m_pGameDataRace->m_Precision : 3; }
 

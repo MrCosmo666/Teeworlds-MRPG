@@ -139,7 +139,9 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	const int ClientID = pPlayer->GetCID();
 	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 200, "You are located {STR} ({STR})", 
 		GS()->Server()->GetWorldName(GS()->GetWorldID()), (GS()->IsAllowedPVP() ? "Zone PVP" : "Safe zone"));
-	GS()->SendMapMusic(ClientID, SOUND_MUSIC_MRPG_FESTIVAL + rand() % 2);
+
+	// поставить муызку если не данж в данже появится музыка после открытия дверей а не по приходу в зону // 0 отправить музыку с CGS m_MusicID
+	GS()->SendMapMusic(ClientID, (GS()->IsDungeon() ? -1 : 0));
 	if(!FirstInitilize)
 	{
 		const int CountMessageInbox = Job()->Inbox()->GetActiveInbox(pPlayer);

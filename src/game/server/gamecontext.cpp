@@ -270,11 +270,12 @@ void CGS::CreateSound(vec2 Pos, int Sound, int64 Mask)
 
 void CGS::SendMapMusic(int ClientID, int MusicID)
 {
-	if(!CheckClient(ClientID) || MusicID < 40)
+	if(!CheckClient(ClientID))
 		return;
 
 	CNetMsg_Sv_WorldMusic Msg;
-	Msg.m_pSoundID = MusicID;
+	Msg.m_pSoundID = (MusicID != 0 ? MusicID : m_MusicID);
+	Msg.m_pVolume = (IsDungeon() ? 10 : 2);
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
 }
 
@@ -970,6 +971,7 @@ void CGS::OnInit(int WorldID)
 	m_CommandManager.Init(m_pConsole, this, NewCommandHook, RemoveCommandHook);
 	m_WorldID = WorldID;
 	m_RespawnWorld = -1;
+	m_MusicID = -1;
 
 	for(int i = 0; i < NUM_NETOBJTYPES; i++)
 		Server()->SnapSetStaticsize(i, m_NetObjHandler.GetObjSize(i));

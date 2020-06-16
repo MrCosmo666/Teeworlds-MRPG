@@ -636,6 +636,7 @@ Messages = [
 	NetMessage("Sv_WorldMusic",
 	[
 		NetIntAny("m_pSoundID"),
+		NetIntRange("m_pVolume", 1, 10),
 	]),
 
 ]

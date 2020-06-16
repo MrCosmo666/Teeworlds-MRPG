@@ -36,12 +36,17 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	}
 }
 
-void CGameControllerDungeon::KillAllPlayers()
+void CGameControllerDungeon::KillAllPlayers(bool StartDungeonMusic)
 {
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter() && Server()->GetWorldID(i) == m_WorldID)
-			GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_WORLD);
+		if(GS()->m_apPlayers[i] && Server()->GetWorldID(i) == m_WorldID)
+		{
+			if(StartDungeonMusic)
+				GS()->SendMapMusic(i);
+			if(GS()->m_apPlayers[i]->GetCharacter())
+				GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_WORLD);
+		}
 	}
 }
 
@@ -84,7 +89,7 @@ void CGameControllerDungeon::ChangeState(int State)
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "You are given 12 minutes to complete of dungeon!");
 		GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon started!");
 		SetMobsSpawn(true);
-		KillAllPlayers();
+		KillAllPlayers(true);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -

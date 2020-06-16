@@ -242,6 +242,9 @@ container.sounds.Add(SoundSet("item_equip", ["audio/mmotee/item_equip.wv"]))
 container.sounds.Add(SoundSet("item_pickup", ["audio/mmotee/item_pickup.wv"]))
 container.sounds.Add(SoundSet("music_mrpg_festival", ["audio/mmotee/music_mrpg_festival.wv"]))
 container.sounds.Add(SoundSet("music_mrpg_fantasy", ["audio/mmotee/music_mrpg_fantasy.wv"]))
+container.sounds.Add(SoundSet("music_mrpg_house", ["audio/mmotee/music_mrpg_house.wv"]))
+container.sounds.Add(SoundSet("music_mrpg_forest", ["audio/mmotee/music_mrpg_forest.wv"]))
+container.sounds.Add(SoundSet("music_mrpg_colossus", ["audio/mmotee/music_mrpg_colossus.wv"]))
 
 ###############################################################################
 ###############################################################################

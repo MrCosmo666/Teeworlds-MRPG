@@ -470,6 +470,7 @@ void CGameClient::OnInit()
 	m_pMenus->RenderLoading();	
 	m_InitComplete = true;
 	m_WorldMusicID = -1;
+	m_WorldMusicVolume = 2;
 
 	int64 End = time_get();
 	char aBuf[256];
@@ -1134,6 +1135,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 	{
 		CNetMsg_Sv_WorldMusic* pMsg = (CNetMsg_Sv_WorldMusic*)pRawMsg;
 		m_WorldMusicID = pMsg->m_pSoundID;
+		m_WorldMusicVolume = pMsg->m_pVolume;
 	}
 }
 
@@ -1935,7 +1937,7 @@ void CGameClient::UpdateStateMmoMusic()
 	const bool ShouldPlay = (Client()->State() == IClient::STATE_ONLINE && MmoServer() && m_LocalClientID >= 0 
 							&& m_aClients[m_LocalClientID].m_Team != TEAM_SPECTATORS  && g_Config.m_SndEnableMusicMRPG);
 	if(ShouldPlay && !m_pSounds->IsPlaying(m_WorldMusicID))
-		m_pSounds->Play(CSounds::CHN_MMORPG_ATMOSPHERE, m_WorldMusicID, 0.2f);
+		m_pSounds->Play(CSounds::CHN_MMORPG_ATMOSPHERE, m_WorldMusicID, (float)(m_WorldMusicVolume / 10.0f));
 	else if(!ShouldPlay && m_pSounds->IsPlaying(m_WorldMusicID))
 		m_pSounds->Stop(m_WorldMusicID);
 }

@@ -37,6 +37,7 @@ class CGS : public IGameServer
 	int m_DungeonID;
 
 	int m_RespawnWorld;
+	int m_MusicID;
 	class MmoController *pMmoController;
 
 	IServer *m_pServer;
@@ -107,7 +108,7 @@ public:
 	void CreatePlayerSpawn(vec2 Pos);
 	void CreateDeath(vec2 Pos, int Who);
 	void CreateSound(vec2 Pos, int Sound, int64 Mask=-1);
-	void SendMapMusic(int ClientID, int MusicID);
+	void SendMapMusic(int ClientID, int MusicID = 0);
 	void CreatePlayerSound(int ClientID, int Sound);
 	void SendMmoEffect(vec2 Pos, int EffectID, int ClientID = -1);
 	void SendMmoPotion(vec2 Pos, const char *Potion, bool Added);
@@ -288,6 +289,7 @@ public:
 
 	bool CheckPlayersDistance(vec2 Pos, float Distance) const;
 	void SetRespawnWorld(int WorldID) { m_RespawnWorld = WorldID; }
+	void SetMapMusic(int SoundID) { m_MusicID = SoundID; }
 	int GetRespawnWorld() const { return m_RespawnWorld; }
 
 private:
