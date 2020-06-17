@@ -1613,6 +1613,7 @@ void CMenus::OnInit()
 	Console()->Chain("remove_friend", ConchainFriendlistUpdate, this);
 	Console()->Chain("snd_enable", ConchainUpdateMusicState, this);
 	Console()->Chain("snd_enable_music", ConchainUpdateMusicState, this);
+	Console()->Chain("snd_enable_music_mrpg", ConchainUpdateMusicState, this);
 
 	RenderLoading(1);	
 	ServerBrowser()->SetType(g_Config.m_UiBrowserPage == PAGE_LAN ? IServerBrowser::TYPE_LAN : IServerBrowser::TYPE_INTERNET);
@@ -2241,18 +2242,27 @@ int CMenus::Render()
 
 void CMenus::SetAuthState(bool ShowWindowAuth)
 {
+	// disable auth menu after connection to mrpg
+	if(!g_Config.m_ClShowAuthMenu)
+		return;
+
+	// settings auth menu for mrpg client / enabled auth menu
 	m_ShowAuthWindow = ShowWindowAuth;
-	if(!m_ShowAuthWindow)
+	if(m_ShowAuthWindow)
 	{
-		m_pClient->m_pSounds->Stop(SOUND_MUSIC_MRPG_FESTIVAL);
-		SetActive(EMenuState::NOACTIVE);
-		mem_zero(aAuthResultReason, sizeof(aAuthResultReason));
-	}
-	else
-	{
-		m_pClient->m_pSounds->Play(CSounds::CHN_MMORPG, SOUND_MUSIC_MRPG_FESTIVAL, 0.3f);
+		if(!m_pClient->m_pSounds->IsPlaying(SOUND_MUSIC_MRPG_FESTIVAL))
+			m_pClient->m_pSounds->Play(CSounds::CHN_MMORPG, SOUND_MUSIC_MRPG_FESTIVAL, 0.3f);
+
 		SetActive(EMenuState::AUTHSTATE);
+		return;
 	}
+
+	// disabled auth menu
+	if(m_pClient->m_pSounds->IsPlaying(SOUND_MUSIC_MRPG_FESTIVAL))
+		m_pClient->m_pSounds->Stop(SOUND_MUSIC_MRPG_FESTIVAL);
+
+	SetActive(EMenuState::NOACTIVE);
+	mem_zero(aAuthResultReason, sizeof(aAuthResultReason));
 }
 
 void CMenus::SetActive(int ActiveID)
@@ -2593,6 +2603,7 @@ void CMenus::ConchainUpdateMusicState(IConsole::IResult* pResult, void* pUserDat
 	if(pResult->NumArguments())
 	{
 		pSelf->UpdateMusicState();
+		pSelf->m_pClient->UpdateStateMmoMusic();
 	}
 }
 
@@ -2603,9 +2614,6 @@ void CMenus::UpdateMusicState()
 		m_pClient->m_pSounds->Enqueue(CSounds::CHN_MUSIC, SOUND_MENU);
 	else if(!ShouldPlay && m_pClient->m_pSounds->IsPlaying(SOUND_MENU))
 		m_pClient->m_pSounds->Stop(SOUND_MENU);
-
-	// atmosphere rpg music
-	m_pClient->UpdateStateMmoMusic();
 }
 
 void CMenus::SetMenuPage(int NewPage)

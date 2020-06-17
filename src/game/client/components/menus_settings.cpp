@@ -2019,9 +2019,12 @@ void CMenus::RenderSettingsSound(CUIRect MainView)
 		Sound.HSplitTop(ButtonHeight, &Button, &Sound);
 		Button.VSplitLeft(ButtonHeight, 0, &Button);
 		static int s_ButtonSndMusicMRPG = 0;
-		if(DoButton_CheckBox(&s_ButtonSndMusicMRPG, Localize("Enable atmosphere music (MRPG)"), g_Config.m_SndEnableMusicMRPG, &Button))
-			g_Config.m_SndEnableMusicMRPG ^= 1;
-
+		if(DoButton_CheckBox(&s_ButtonSndMusicMRPG, Localize("Enable atmosphere music (MRPG)"), g_Config.m_SndMusicMRPG, &Button))
+		{
+			g_Config.m_SndMusicMRPG ^= 1;
+			m_pClient->UpdateStateMmoMusic();
+		}
+		
 		Sound.HSplitTop(Spacing, 0, &Sound);
 		Sound.HSplitTop(ButtonHeight, &Button, &Sound);
 		Button.VSplitLeft(ButtonHeight, 0, &Button);
@@ -2099,6 +2102,7 @@ void CMenus::RenderSettingsSound(CUIRect MainView)
 			g_Config.m_SndInit = 1;
 		}
 		UpdateMusicState();
+		m_pClient->UpdateStateMmoMusic();
 	}
 
 	// reset button
@@ -2172,11 +2176,12 @@ void CMenus::ResetSettingsSound()
 	g_Config.m_SndEnable = 1;
 	g_Config.m_SndInit = 1;
 	g_Config.m_SndMusic = 1;
-	g_Config.m_SndEnableMusicMRPG = 1;
+	g_Config.m_SndMusicMRPG = 1;
 	g_Config.m_SndNonactiveMute = 0;
 	g_Config.m_SndRate = 48000;
 	g_Config.m_SndVolume = 100;
 	UpdateMusicState();
+	m_pClient->UpdateStateMmoMusic();
 }
 
 void CMenus::RenderSettings(CUIRect MainView)

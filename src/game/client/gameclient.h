@@ -227,7 +227,6 @@ public:
 	bool m_IsEasterDay;
 	bool m_InitComplete;
 	int m_WorldMusicID;
-	int m_WorldMusicVolume;
 
 	int RacePrecision() const { return m_Snap.m_pGameDataRace ? m_Snap.m_pGameDataRace->m_Precision : 3; }
 
@@ -296,6 +295,7 @@ public:
 	//
 	bool MmoServer()  const { return m_ConnectedMmoServer; }
 	void SendAuthPack(const char* Login, const char* Password, bool StateRegistered);
+	void SetAtmosphereMusicMRPG(int SoundID, float Vol);
 	void UpdateStateMmoMusic();
 
 	//

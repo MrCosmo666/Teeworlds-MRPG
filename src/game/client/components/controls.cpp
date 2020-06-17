@@ -39,7 +39,7 @@ void CControls::OnReset(bool FullRelease)
 
 void CControls::OnRelease()
 {
-	OnReset(false);
+	OnReset(true);
 }
 
 void CControls::OnPlayerDeath()

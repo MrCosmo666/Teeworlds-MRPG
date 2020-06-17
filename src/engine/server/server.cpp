@@ -1030,7 +1030,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 		}
 		else if(Msg == NETMSG_ENTERGAME)
 		{
-			int MapID = m_aClients[ClientID].m_MapID;
+			const int MapID = m_aClients[ClientID].m_MapID;
 			if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && m_aClients[ClientID].m_State == CClient::STATE_READY && GameServer(MapID)->IsClientReady(ClientID))
 			{
 				SendServerInfo(ClientID);
