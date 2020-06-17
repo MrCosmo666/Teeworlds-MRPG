@@ -356,11 +356,11 @@ void CEffects::DamageMmoInd(vec2 Pos, int DamageCount, bool CritDamage)
 	p.SetDefault();
 	p.m_Pos = Pos;
 	p.m_Vel = vec2(-5 + rand() % 10, -5 + rand() % 10) * 50 * (40 * 0.025f);
-	p.m_LifeSpan = 1.0f + IncreaseSize * 0.025f;
+	p.m_LifeSpan = 1.8f;
 	p.m_Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	p.m_Rot = 0;
 	p.m_Rotspeed = 0;
-	p.m_Gravity = 0;
+	p.m_Gravity = 0.7f;
 	p.m_FlowAffected = 0.0f;
 	p.m_Friction = 0.9f;
 	
