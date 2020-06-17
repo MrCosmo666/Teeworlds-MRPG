@@ -386,5 +386,9 @@
 	{
 		"key": "You have {INT} unread messages!",
 		"value": "Sie haben {INT} ungelesene Nachrichten!"
+	},
+	{
+		"key": "Task has not been completed yet!",
+		"value": "Aufgabe ist noch nicht abgeschlossen!"
 	}
 ]}

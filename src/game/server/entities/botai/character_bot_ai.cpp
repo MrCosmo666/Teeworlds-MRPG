@@ -166,7 +166,7 @@ void CCharacterBotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 	}
 
 	const int MultiplierExperience = kurosio::computeExperience(BotJob::MobBot[SubID].Level) / g_Config.m_SvKillmobsIncreaseLevel;
-	const int MultiplierRaid = clamp(GS()->IncreaseCountRaid(MultiplierExperience), 1, GS()->IncreaseCountRaid(MultiplierExperience));
+	const int MultiplierRaid = clamp(GS()->IncreaseExperienceRaid(MultiplierExperience), 1, GS()->IncreaseExperienceRaid(MultiplierExperience));
 	pPlayer->AddExp(MultiplierRaid);
 
 	const int MultiplierDrops = max(MultiplierRaid / 2, 1);

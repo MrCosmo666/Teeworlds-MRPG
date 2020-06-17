@@ -178,7 +178,6 @@ public:
 	void SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char *Message, int Style = -1, int TalkingEmote = -1);
 	void SendProgressBar(int ClientID, int Count, int Request, const char *Message);
 	void ClearTalkText(int ClientID);
-	int GetClientWorldID(int ClientID) const;
 
 	/* #########################################################################
 		ENGINE GAMECONTEXT 
@@ -282,7 +281,7 @@ public:
 	int GetWorldID() const { return m_WorldID; }
 	int DungeonID() const { return m_DungeonID; }
 	bool IsDungeon() const { return (m_DungeonID > 0); }
-	int IncreaseCountRaid(int IncreaseCount) const;
+	int IncreaseExperienceRaid(int IncreaseCount) const;
 	bool IsClientEqualWorldID(int ClientID, int WorldID = -1) const;
 	bool IsAllowedPVP() const { return m_AllowedPVP; }
 	const char* AtributeName(int BonusID) const;

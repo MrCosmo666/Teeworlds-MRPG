@@ -226,7 +226,7 @@ int DungeonJob::SyncFactor()
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && GS()->GetClientWorldID(i) == GS()->GetWorldID())
+		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && BotPlayer->GetPlayerWorldID() == GS()->GetWorldID())
 			Factor += BotPlayer->GetStartHealth();
 	}
 	return Factor;

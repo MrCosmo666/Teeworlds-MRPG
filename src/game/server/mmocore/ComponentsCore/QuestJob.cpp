@@ -271,7 +271,7 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotDa
 	const int QuestID = BotData.QuestID;
 	if (!IsCollectItemComplete(pPlayer, BotData) || !IsDefeatMobsComplete(ClientID, QuestID))
 	{
-		GS()->Chat(ClientID, "Not all criteria to complete!");
+		GS()->Chat(ClientID, "Task has not been completed yet!");
 		return false;
 	}
 
