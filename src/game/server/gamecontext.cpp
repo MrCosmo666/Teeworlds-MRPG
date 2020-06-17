@@ -185,7 +185,6 @@ void CGS::CreateDamage(vec2 Pos, int ClientID, int Amount, bool CritDamage, bool
 	{
 		pEventMmo->m_X = (int)Pos.x;
 		pEventMmo->m_Y = (int)Pos.y;
-		pEventMmo->m_ClientID = ClientID;
 		pEventMmo->m_DamageCount = Amount;
 		pEventMmo->m_CritDamage = CritDamage;
 	}

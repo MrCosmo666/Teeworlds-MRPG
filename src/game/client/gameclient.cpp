@@ -505,9 +505,6 @@ void CGameClient::OnUpdate()
 				break;
 		}
 	}
-
-	// mmo world music
-	UpdateStateMmoMusic();
 }
 
 int CGameClient::OnSnapInput(int *pData)
@@ -1133,9 +1130,15 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 	}
 	else if(MsgId == NETMSGTYPE_SV_WORLDMUSIC && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 	{
+		const int OldMusicID = m_WorldMusicID;
+		const int OldMusicVolume = m_WorldMusicVolume;
+		
 		CNetMsg_Sv_WorldMusic* pMsg = (CNetMsg_Sv_WorldMusic*)pRawMsg;
 		m_WorldMusicID = pMsg->m_pSoundID;
 		m_WorldMusicVolume = pMsg->m_pVolume;
+		
+		if(OldMusicID != m_WorldMusicID || OldMusicVolume != m_WorldMusicVolume)
+			UpdateStateMmoMusic();
 	}
 }
 
@@ -1232,11 +1235,7 @@ void CGameClient::ProcessEvents()
 		else if (Item.m_Type == NETEVENTTYPE_MMODAMAGE)
 		{
 			CNetEvent_MmoDamage* ev = (CNetEvent_MmoDamage*)pData;
-
-			char aBuf[8];
-			const int Damage = ev->m_DamageCount;
-			str_format(aBuf, sizeof(aBuf), "%d",  Damage);
-			m_pEffects->DamageMmoInd(vec2(ev->m_X, ev->m_Y), aBuf, ev->m_CritDamage, (bool)(ev->m_ClientID == m_LocalClientID));
+			m_pEffects->DamageMmoInd(vec2(ev->m_X, ev->m_Y), ev->m_DamageCount, ev->m_CritDamage);
 		}
 	}
 }

@@ -2603,6 +2603,9 @@ void CMenus::UpdateMusicState()
 		m_pClient->m_pSounds->Enqueue(CSounds::CHN_MUSIC, SOUND_MENU);
 	else if(!ShouldPlay && m_pClient->m_pSounds->IsPlaying(SOUND_MENU))
 		m_pClient->m_pSounds->Stop(SOUND_MENU);
+
+	// atmosphere rpg music
+	m_pClient->UpdateStateMmoMusic();
 }
 
 void CMenus::SetMenuPage(int NewPage)
