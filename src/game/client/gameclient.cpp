@@ -554,7 +554,7 @@ void CGameClient::OnReset()
 	m_LastFlagCarrierBlue = FLAG_MISSING;
 
 	// mmotee reset state only on discconnect mrpg / or not connected to mrpg
-	if(m_ConnectedMmoServer && Client()->State() == IClient::STATE_OFFLINE || !m_ConnectedMmoServer)
+	if((m_ConnectedMmoServer && Client()->State() == IClient::STATE_OFFLINE) || !m_ConnectedMmoServer)
 	{
 		m_MmoMsgSent = false;
 		m_ConnectedMmoServer = false;
