@@ -23,7 +23,7 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	m_NextTuningParams = m_PrevTuningParams;
 	m_MoodState = MOOD_NORMAL;
 	GS()->SendTuningParams(ClientID);
-
+	// helo xd
 	if(!IsBot())
 	{
 		Acc().Team = GetStartTeam();
