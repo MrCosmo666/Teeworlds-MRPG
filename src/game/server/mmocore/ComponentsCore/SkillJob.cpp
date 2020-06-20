@@ -262,10 +262,10 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 	// скилл ноктис телепорт
 	if(SkillID == Skill::SkillNoctisTeleport)
 	{
-		new CNoctisTeleport(&GS()->m_World, pChr->GetPos(), pChr, SkillBonus);
+		new CNoctisTeleport(&GS()->m_World, PlayerPosition, pChr, SkillBonus);
 		return true;
 	}
-		
+
 	// скилл восстановить патроны
 	if(SkillID == Skill::SkillBlessingGodWar)
 	{

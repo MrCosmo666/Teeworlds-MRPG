@@ -10,20 +10,15 @@ CNoctisTeleport::CNoctisTeleport(CGameWorld *pGameWorld, vec2 Pos, CCharacter* p
 {
 	// переданные аргументы
 	m_pPlayerChar = pPlayerChar;
-	m_Direction = vec2(m_pPlayerChar->m_Core.m_Input.m_TargetX, m_pPlayerChar->m_Core.m_Input.m_TargetY);
+	m_Direction = (m_pPlayerChar ? vec2(m_pPlayerChar->m_Core.m_Input.m_TargetX, m_pPlayerChar->m_Core.m_Input.m_TargetY) : vec2(0, 0));
 	m_SkillBonus = SkillBonus;
 	m_LifeSpan = Server()->TickSpeed();
 	GameWorld()->InsertEntity(this);
 }
 
-CNoctisTeleport::~CNoctisTeleport() {}
-
 void CNoctisTeleport::Reset()
 {
-	if(m_pPlayerChar && m_pPlayerChar->IsAlive())
-		GS()->CreateSound(m_Pos, SOUND_GRENADE_EXPLODE);
-
-	// уничтожаем обьект
+	GS()->CreateSound(m_Pos, SOUND_GRENADE_EXPLODE);
 	GS()->m_World.DestroyEntity(this);
 	return;
 }
@@ -41,7 +36,7 @@ void CNoctisTeleport::Tick()
 	vec2 Size = vec2(GetProximityRadius()/2, GetProximityRadius()/2);
 	CCharacter *pSearchChar = (CCharacter*)GS()->m_World.ClosestEntity(To, 64.0f, CGameWorld::ENTTYPE_CHARACTER, nullptr);
 	if(!m_LifeSpan || GS()->Collision()->TestBox(To, Size) || GS()->m_World.IntersectClosestDoorEntity(To, GetProximityRadius()) 
-		|| (pSearchChar && pSearchChar != m_pPlayerChar && pSearchChar->IsAllowedPVP(m_pPlayerChar->GetPlayer()->GetCID())))
+		|| (pSearchChar && pSearchChar->IsAlive() && pSearchChar != m_pPlayerChar && pSearchChar->IsAllowedPVP(m_pPlayerChar->GetPlayer()->GetCID())))
 	{
 		GS()->CreateSound(m_pPlayerChar->GetPos(), SOUND_NINJA_FIRE);
 

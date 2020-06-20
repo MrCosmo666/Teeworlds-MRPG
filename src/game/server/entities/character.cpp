@@ -683,7 +683,6 @@ void CCharacter::Die(int Killer, int Weapon)
 		}
 	}
 
-	m_Alive = false;
 	m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed() / 2;
 	if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
@@ -697,6 +696,7 @@ void CCharacter::Die(int Killer, int Weapon)
 	m_pPlayer->ClearTalking();
 
 	// respawn
+	m_Alive = false;
 	m_pPlayer->m_PlayerTick[TickState::Die] = Server()->Tick()/2;
 	m_pPlayer->m_Spawned = true;
 	GS()->m_World.RemoveEntity(this);

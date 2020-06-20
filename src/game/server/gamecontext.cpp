@@ -104,7 +104,7 @@ CPlayer *CGS::GetPlayer(int ClientID, bool CheckAuthed, bool CheckCharacter)
 	CPlayer *pPlayer = m_apPlayers[ClientID];
 	if((CheckAuthed && pPlayer->IsAuthed()) || !CheckAuthed)
 	{
-		if(CheckCharacter && !pPlayer->GetCharacter())
+		if(CheckCharacter && (!pPlayer->GetCharacter() || !pPlayer->GetCharacter()->IsAlive()))
 			return nullptr;
 		return pPlayer;	
 	}
