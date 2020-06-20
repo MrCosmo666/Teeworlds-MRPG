@@ -1280,7 +1280,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			*/
 			if(!CheckClient(ClientID))
 			{
-				Server()->Kick(ClientID, "Update Mmo-Client use udapter or download in discord.");
+				Server()->Kick(ClientID, "Update Mmo-Client use updater or download in discord.");
 				return;
 			}
 

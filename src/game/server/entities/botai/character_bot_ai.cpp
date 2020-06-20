@@ -322,8 +322,10 @@ void CCharacterBotAI::EngineMobs()
 	if(m_BotTargetID == m_pBotPlayer->GetCID() && str_comp(BotJob::MobBot[MobID].Behavior, "Sleepy") == 0)
 	{
 		if(Server()->Tick() % (Server()->TickSpeed() / 2) == 0)
+		{
 			GS()->SendEmoticon(m_pBotPlayer->GetCID(), EMOTICON_ZZZ);
-		EmoteActions(EMOTE_BLINK);
+			SetEmote(EMOTE_BLINK, 1);
+		}
 		return;
 	}
 
