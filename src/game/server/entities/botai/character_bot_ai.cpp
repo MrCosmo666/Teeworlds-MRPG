@@ -308,15 +308,6 @@ void CCharacterBotAI::EngineQuestMob()
 void CCharacterBotAI::EngineMobs()
 {
 	ResetInput();
-	const int MobID = m_pBotPlayer->GetBotSub();
-	bool WeaponedBot = (BotJob::MobBot[MobID].Spread >= 1);
-	if(WeaponedBot)
-	{
-		if(BotJob::MobBot[MobID].Boss)
-			ShowProgress();
-		ChangeWeapons();
-	}
-
 	CPlayer* pPlayer = SearchTenacityPlayer(1000.0f);
 	if(pPlayer && pPlayer->GetCharacter())
 	{
@@ -326,7 +317,25 @@ void CCharacterBotAI::EngineMobs()
 	else if(Server()->Tick() > m_pBotPlayer->m_LastPosTick)
 		m_pBotPlayer->m_TargetPos = vec2(0, 0);
 
+	// effect sleppy
+	const int MobID = m_pBotPlayer->GetBotSub();
+	if(m_BotTargetID == m_pBotPlayer->GetCID() && str_comp(BotJob::MobBot[MobID].Behavior, "Sleepy") == 0)
+	{
+		if(Server()->Tick() % (Server()->TickSpeed() / 2) == 0)
+			GS()->SendEmoticon(m_pBotPlayer->GetCID(), EMOTICON_ZZZ);
+		EmoteActions(EMOTE_BLINK);
+		return;
+	}
+
+	bool WeaponedBot = (BotJob::MobBot[MobID].Spread >= 1);
+	if(WeaponedBot)
+	{
+		if(BotJob::MobBot[MobID].Boss)
+			ShowProgress();
+		ChangeWeapons();
+	}
 	Move();
+		
 	m_PrevPos = m_Pos;
 	if(m_Input.m_Direction)
 		m_PrevDirection = m_Input.m_Direction;
