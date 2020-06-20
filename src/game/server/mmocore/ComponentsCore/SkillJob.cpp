@@ -262,7 +262,7 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 	// скилл ноктис телепорт
 	if(SkillID == Skill::SkillNoctisTeleport)
 	{
-		new CNoctisTeleport(&GS()->m_World, pChr, SkillBonus);
+		new CNoctisTeleport(&GS()->m_World, pChr->GetPos(), pChr, SkillBonus);
 		return true;
 	}
 		

@@ -5,8 +5,8 @@
 
 #include "noctis_teleport.h"
 
-CNoctisTeleport::CNoctisTeleport(CGameWorld *pGameWorld, CCharacter* pPlayerChar, int SkillBonus)
-: CEntity(pGameWorld, CGameWorld::ENTYPE_NOCTIS_TELEPORT, pPlayerChar->GetPos(), 64.0f)
+CNoctisTeleport::CNoctisTeleport(CGameWorld *pGameWorld, vec2 Pos, CCharacter* pPlayerChar, int SkillBonus)
+: CEntity(pGameWorld, CGameWorld::ENTYPE_NOCTIS_TELEPORT, Pos, 64.0f)
 {
 	// переданные аргументы
 	m_pPlayerChar = pPlayerChar;
