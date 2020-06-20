@@ -664,6 +664,7 @@ bool CCharacter::IncreaseMana(int Amount)
 void CCharacter::Die(int Killer, int Weapon)
 {
 	// change to safe zone
+	m_Alive = false;
 	const int ClientID = m_pPlayer->GetCID();
 	if(Weapon != WEAPON_WORLD && !GS()->IsDungeon())
 	{
@@ -696,7 +697,6 @@ void CCharacter::Die(int Killer, int Weapon)
 	m_pPlayer->ClearTalking();
 
 	// respawn
-	m_Alive = false;
 	m_pPlayer->m_PlayerTick[TickState::Die] = Server()->Tick()/2;
 	m_pPlayer->m_Spawned = true;
 	GS()->m_World.RemoveEntity(this);

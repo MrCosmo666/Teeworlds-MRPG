@@ -225,7 +225,6 @@ void CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKil
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The dungeon is completed on [{INT}%]", &Progress);
 		UpdateDoorKeyState();
 	}
-	return;
 }
 
 bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
