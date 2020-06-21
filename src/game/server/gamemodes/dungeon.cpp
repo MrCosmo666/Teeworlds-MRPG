@@ -434,34 +434,38 @@ int CGameControllerDungeon::GetDungeonSync(CPlayer* pPlayer, int BonusID) const
 	int Delay = 0;
 
 	const int ParsePlayerStatsClass = CGS::AttributInfo[BonusID].AtType;
+	if (BonusID == Stats::StStrength || ParsePlayerStatsClass == AtributType::AtHardtype)
+		Delay = 50;
+
+	// - - - - - - - - -- - - -
+	// tanks
 	if(pPlayer->m_MoodState == MOOD_PLAYER_TANK)
 	{
 		if(ParsePlayerStatsClass == AtributType::AtTank)
-			Procent = 10;
-
-		if(ParsePlayerStatsClass == AtributType::AtHealer || ParsePlayerStatsClass == AtributType::AtDps)
+			Procent = 11;
+		else if(ParsePlayerStatsClass == AtributType::AtHealer || ParsePlayerStatsClass == AtributType::AtDps)
 			Delay = 100;
-	}
-	else
-	{
-		if(ParsePlayerStatsClass == AtributType::AtTank)
-			Procent = 3;
-		else if(ParsePlayerStatsClass == AtributType::AtHealer)
-			Procent = 5;
-		else if(ParsePlayerStatsClass == AtributType::AtDps)
-			Procent = 3;
 
+		const int AttributeSyncProcent = kurosio::translate_to_procent_rest(pPlayer->m_SyncDungeon, Procent);
+		int AttributeCount = max(AttributeSyncProcent, 1);
+
+		if(ParsePlayerStatsClass == AtributType::AtTank)
+			return AttributeCount;
+
+		AttributeCount /= max((pPlayer->m_SyncPlayers + Delay), 1);
+		return AttributeCount;
 	}
-	
-	if(ParsePlayerStatsClass == AtributType::AtHardtype || BonusID == Stats::StStrength)
-		Delay = 50;
+
+	// - - - - - - - - -- - - -
+	// supports / healers / dps
+	if(ParsePlayerStatsClass == AtributType::AtTank)
+		Procent = 4;
+	else if(ParsePlayerStatsClass == AtributType::AtHealer)
+		Procent = 6;
 
 	const int AttributeSyncProcent = kurosio::translate_to_procent_rest(pPlayer->m_SyncDungeon, Procent);
 	int AttributeCount = max(AttributeSyncProcent, 1);
-
-	if(pPlayer->m_MoodState == MOOD_PLAYER_TANK && ParsePlayerStatsClass == AtributType::AtTank)
-		return AttributeCount;
-
+	
 	AttributeCount /= max((pPlayer->m_SyncPlayers + Delay), 1);
 	return AttributeCount;
 }

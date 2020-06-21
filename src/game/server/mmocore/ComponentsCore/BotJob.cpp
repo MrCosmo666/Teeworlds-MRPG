@@ -390,6 +390,9 @@ const char* BotJob::GetMeaninglessDialog()
 std::mutex lockingPath;
 void BotJob::FindThreadPath(class CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos)
 {
+	if((int)StartPos.x <= 0 || (int)StartPos.y <= 0 || (int)SearchPos.x <= 0 || (int)SearchPos.y <= 0)
+		return;
+
 	std::thread([pBotPlayer, StartPos, SearchPos]()
 		{
 			lockingPath.lock();
