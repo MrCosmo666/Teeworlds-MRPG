@@ -2,9 +2,12 @@
 #ifndef NONEXISTENT_WEBSOCKETPP
 #include <future>
 
-namespace SleepyDiscord {
-	void handleTimer(const websocketpp::lib::error_code &ec, std::function<void()>& code) {
-		if (ec != websocketpp::transport::error::operation_aborted) {
+namespace SleepyDiscord 
+{
+	void handleTimer(const websocketpp::lib::error_code ec, TimedTask code) 
+	{
+		if (ec != websocketpp::transport::error::operation_aborted) 
+		{
 			code();
 		}
 	}
@@ -27,7 +30,8 @@ namespace SleepyDiscord {
 		start(token, numOfThreads);
 	}
 
-	WebsocketppDiscordClient::~WebsocketppDiscordClient() {
+	WebsocketppDiscordClient::~WebsocketppDiscordClient() 
+	{
 		if (_thread != nullptr && _thread->joinable()) _thread->join();
 		else _thread.reset();
 	}
@@ -98,12 +102,13 @@ namespace SleepyDiscord {
 		this_client.run();
 	}
 
-	void handleTimers(const websocketpp::lib::error_code &ec, std::function<void()>& code, _client::timer_ptr timer) {
+	/*void handleTimers(const websocketpp::lib::error_code &ec, std::function<void()>& code, _client::timer_ptr timer) 
+	{
 		if (ec != websocketpp::transport::error::operation_aborted) {
 			code();
 		}
 	}
-
+	
 	template<class Client>
 	void rerunTimer(_client::timer_ptr timer, TimedTask code, Client& c) {
 		timer->async_wait(
@@ -111,17 +116,16 @@ namespace SleepyDiscord {
 				&_client::type::handle_timer,
 				c.this_client,
 				timer,
-				std::bind(
-					&handleTimers, websocketpp::lib::placeholders::_1, code, timer),
+				std::bind(&handleTimers, websocketpp::lib::placeholders::_1, code, timer),
 				websocketpp::lib::placeholders::_1
 			)
 		);
 	}
 
-	Timer WebsocketppDiscordClient::schedule(TimedTask code, const time_t milliseconds) {
+	Timer WebsocketppDiscordClient::schedule(TimedTask code, const time_t milliseconds) 
+	{
 		_client::timer_ptr timer;
-		auto callback = std::bind(
-			&handleTimers, websocketpp::lib::placeholders::_1, code, timer);
+		auto callback = std::bind(&handleTimers, websocketpp::lib::placeholders::_1, code, timer);
 		timer = this_client.set_timer(
 			static_cast<long>(milliseconds),
 			callback
@@ -133,7 +137,7 @@ namespace SleepyDiscord {
 			}
 		);
 	}
-
+*/
 	void WebsocketppDiscordClient::runAsync() {
 		if (!_thread) _thread.reset(new websocketpp::lib::thread(&WebsocketppDiscordClient::run, this));
 	}

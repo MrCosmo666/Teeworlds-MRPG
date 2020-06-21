@@ -37,7 +37,6 @@ namespace SleepyDiscord {
 		using TimerPointer = std::weak_ptr<websocketpp::lib::asio::steady_timer>;
 
 		void run() override;
-		Timer schedule(TimedTask code, const time_t milliseconds) override;
 		void postTask(PostableTask code) override {
 			asio::post(code);
 		}

@@ -1759,7 +1759,7 @@ static CServer *CreateServer() { return new CServer(); }
 
 
 #ifdef CONF_DISCORD
-DiscordJob::DiscordJob(const char *token, int threads) : SleepyDiscord::DiscordClient(token, threads)
+DiscordJob::DiscordJob(const char *token, int threads) : SleepyDiscord::DiscordClient(token, SleepyDiscord::USER_CONTROLED_THREADS)
 {
 	std::thread t1(&DiscordJob::run, this);
 	t1.detach();
