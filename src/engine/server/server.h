@@ -87,8 +87,8 @@ public:
 	void SetServer(CServer *pServer);
 	void SetGameServer(CGS *pGameServer);
 
-	void SendMessage(const char *pChanal, const char *Color, const char *Title, const char *pMsg);
-	void SendGenerateMessage(const char *Color, const char *Title, const char *pMsg);
+	void SendMessage(const char *pChanal, const char *Color, const char *Title, std::string pMsg);
+	void SendGenerateMessage(const char *Color, const char *Title, const char *pPhpArg);
 	void SendStatus(const char* Status, int Type);
 };
 #endif

@@ -1782,8 +1782,8 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		std::string messagecont = message.content;
 		if(messagecont.size() <= 8)
 		{
-			sendEmbedMessage(message.channelID, DC_SERVER_WARNING, "Not right!",
-			"Use **!mstats <nick full or not>. Minimal symbols 1.**!!!");
+			SendMessage(std::string(message.channelID).c_str(), DC_SERVER_WARNING, "Not right!",
+			std::string("Use **!mstats <nick full or not>. Minimal symbols 1.**!!!"));
 			return;
 		}
 
@@ -1802,13 +1802,13 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 
 			char aBuf[256];
 			str_format(aBuf, sizeof(aBuf), "?player=%s&rank=%d&dicid=%d", RES->getString("Nick").c_str(), Rank, RES->getInt("DiscordEquip"));
-			generateSendmmo(message.channelID, std::to_string(RandomColor), "Discord MRPG Card", aBuf);
+			//generateSendmmo(message.channelID, std::to_string(RandomColor), "Discord MRPG Card", aBuf);
 			founds = true;
 		}
 
 		if(!founds)
 		{
-			sendEmbedMessage(message.channelID, DC_SERVER_WARNING, "Sorry!",
+			SendMessage(std::string(message.channelID).c_str(), DC_SERVER_WARNING, "Sorry!",
 				"**This account not found in database!**");
 		}
 		return;
@@ -1818,8 +1818,8 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	{	
 		// получаем Айди пользователя
 		SleepyDiscord::Snowflake<SleepyDiscord::User> userAuth = getUser(message.author).cast();
-		sendEmbedMessage(message.channelID, DC_DISCORD_INFO, "Connector Information",  
-			"```ini\\n[Warning] Do not connect other people's discords to your account in the game\\nThis is similar to hacking your account in the game\\n# Use in-game for connect your personal discord:\\n# Did '" + userAuth + "'\\n# Command in-game: /discord_connect <did>```");
+		SendMessage(std::string(message.channelID).c_str(), DC_DISCORD_INFO, "Connector Information",  
+			"```ini\n[Warning] Do not connect other people's discords to your account in the game\nThis is similar to hacking your account in the game\n# Use in-game for connect your personal discord:\n# Did '" + userAuth + "'\n# Command in-game: /discord_connect <did>```");
 
 		// проверяем на поиск пользователя
 		std::string Nick = "Refresh please.";
@@ -1835,14 +1835,14 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		{
 			// пишем хорошее подключение
 			Nick = RES->getString("Nick").c_str();
-			sendEmbedMessage(message.channelID, DC_DISCORD_BOT, "Good work :)", "**Your account is enabled: Nickname in-game: " + Nick + "**");
+			SendMessage(std::string(message.channelID).c_str(), DC_DISCORD_BOT, "Good work :)", "**Your account is enabled: Nickname in-game: " + Nick + "**");
 			founds = true;
 		}
 
 		// завершаем подключение
 		if(!founds)
 		{
-			sendEmbedMessage(message.channelID, DC_SERVER_WARNING, "Fail in work :(", "**Fail connect. See !mconnect.\\nUse in-game /discord_connect <DID>..**");
+			SendMessage(std::string(message.channelID).c_str(), DC_SERVER_WARNING, "Fail in work :(", "**Fail connect. See !mconnect.\\nUse in-game /discord_connect <DID>..**");
 		}
 		return;
 	}
@@ -1861,20 +1861,20 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		}
 		if(Buffer.length() <= 0)
 		{
-			sendEmbedMessage(message.channelID, DC_DISCORD_BOT, "Online Server", "Server is empty");
+			SendMessage(std::string(message.channelID).c_str(), DC_DISCORD_BOT, "Online Server", "Server is empty");
 			return;
 		}
-		sendEmbedMessage(message.channelID, DC_DISCORD_BOT, "Online Server", Buffer.buffer());
+		SendMessage(std::string(message.channelID).c_str(), DC_DISCORD_BOT, "Online Server", Buffer.buffer());
 		Buffer.clear();
 		return;
 	}
 	// ПОМОЩЬ
 	else if (message.startsWith("!mhelp"))
 	{
-		sendEmbedMessage(message.channelID, DC_DISCORD_INFO, "Commands / Information", 
+		SendMessage(std::string(message.channelID).c_str(), DC_DISCORD_INFO, "Commands / Information", 
 		"`!mconnect` - Info for connect your discord and account in game."
-		"\\n`!mstats <symbol>` - See stats players. Minimal 4 symbols."
-		"\\n`!monline` - Show players ingame.");
+		"\n`!mstats <symbol>` - See stats players. Minimal 4 symbols."
+		"\n`!monline` - Show players ingame.");
 	}
 }
 
@@ -1884,21 +1884,41 @@ void DiscordJob::SendStatus(const char *Status, int Type)
 	this->updateStatus(Status, Type);
 }
 
-void DiscordJob::SendGenerateMessage(const char *Color, const char *Title, const char *pMsg)
+void DiscordJob::SendGenerateMessage(const char *Color, const char *Title, const char *pPhpArg)
 {
 	if(!g_Config.m_SvCreateDiscordBot) return;
-	this->generateSendmmo(g_Config.m_SvDiscordChanal, Color, Title, pMsg);
+
+	SleepyDiscord::Embed embed;
+	embed.title = std::string(Title);
+	embed.color = string_to_number(Color, 0, 1410065407);
+
+	SleepyDiscord::EmbedImage embedimage;
+	char aBuf[128];
+	str_format(aBuf, sizeof(aBuf), "%s/%s/gentee.php%s", g_Config.m_SvSiteUrl, g_Config.m_SvGenerateURL, pPhpArg);
+	dbg_msg("test", "%s", aBuf);
+	embedimage.height = 800;
+	embedimage.width = 600;
+	embedimage.url = std::string(aBuf);
+	embedimage.proxyUrl = std::string(aBuf);
+	embed.image = embedimage;
+	this->sendMessage(g_Config.m_SvDiscordChanal, "\0", embed);
 }
 
-void DiscordJob::SendMessage(const char *pChanal, const char *Color, const char *Title, const char *pMsg)
+void DiscordJob::SendMessage(const char *pChanal, const char *Color, const char *Title, std::string pMsg)
 {
 	if(!g_Config.m_SvCreateDiscordBot) return;
-	this->sendEmbedMessage(pChanal, Color, Title, pMsg);
+
+	SleepyDiscord::Embed embed;
+	embed.title = std::string(Title);
+	embed.color = string_to_number(Color, 0, 1410065407);
+	embed.description = pMsg;
+	this->sendMessage(pChanal, "\0", embed);
 }
 #endif
 
 int main(int argc, const char **argv) // ignore_convention
 {
+
 #if defined(CONF_FAMILY_WINDOWS)
 	for(int i = 1; i < argc; i++) // ignore_convention
 	{
