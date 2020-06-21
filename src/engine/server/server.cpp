@@ -435,7 +435,7 @@ void CServer::SendDiscordGenerateMessage(const char *pColor, const char *pTitle,
 		str_copy(Title, pTitle, sizeof(Title));
 		str_copy(Msg, pMsg, sizeof(Msg));
 
-		std::thread t([=]() { m_pDiscord->SendGenerateMessage(Color, Title, Msg); });
+		std::thread t([=]() { m_pDiscord->SendGenerateMessage(g_Config.m_SvDiscordChanal, Color, Title, Msg); });
 		t.detach();
 	#endif
 }
@@ -1802,7 +1802,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 
 			char aBuf[256];
 			str_format(aBuf, sizeof(aBuf), "?player=%s&rank=%d&dicid=%d", RES->getString("Nick").c_str(), Rank, RES->getInt("DiscordEquip"));
-			//generateSendmmo(message.channelID, std::to_string(RandomColor), "Discord MRPG Card", aBuf);
+			SendGenerateMessage(std::string(message.channelID).c_str(), std::to_string(RandomColor).c_str(), "Discord MRPG Card", aBuf);
 			founds = true;
 		}
 
@@ -1884,7 +1884,7 @@ void DiscordJob::SendStatus(const char *Status, int Type)
 	this->updateStatus(Status, Type);
 }
 
-void DiscordJob::SendGenerateMessage(const char *Color, const char *Title, const char *pPhpArg)
+void DiscordJob::SendGenerateMessage(const char *pChanal, const char *Color, const char *Title, const char *pPhpArg)
 {
 	if(!g_Config.m_SvCreateDiscordBot) return;
 
@@ -1892,16 +1892,16 @@ void DiscordJob::SendGenerateMessage(const char *Color, const char *Title, const
 	embed.title = std::string(Title);
 	embed.color = string_to_number(Color, 0, 1410065407);
 
-	SleepyDiscord::EmbedImage embedimage;
 	char aBuf[128];
 	str_format(aBuf, sizeof(aBuf), "%s/%s/gentee.php%s", g_Config.m_SvSiteUrl, g_Config.m_SvGenerateURL, pPhpArg);
-	dbg_msg("test", "%s", aBuf);
+
+	SleepyDiscord::EmbedImage embedimage;
 	embedimage.height = 800;
 	embedimage.width = 600;
 	embedimage.url = std::string(aBuf);
 	embedimage.proxyUrl = std::string(aBuf);
 	embed.image = embedimage;
-	this->sendMessage(g_Config.m_SvDiscordChanal, "\0", embed);
+	this->sendMessage(pChanal, "\0", embed);
 }
 
 void DiscordJob::SendMessage(const char *pChanal, const char *Color, const char *Title, std::string pMsg)
