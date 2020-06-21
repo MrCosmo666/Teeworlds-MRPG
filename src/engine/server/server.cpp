@@ -1842,7 +1842,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		// завершаем подключение
 		if(!founds)
 		{
-			SendMessage(std::string(message.channelID).c_str(), DC_SERVER_WARNING, "Fail in work :(", "**Fail connect. See !mconnect.\\nUse in-game /discord_connect <DID>..**");
+			SendMessage(std::string(message.channelID).c_str(), DC_SERVER_WARNING, "Fail in work :(", "**Fail connect. See !mconnect.\nUse in-game /discord_connect <DID>..**");
 		}
 		return;
 	}
