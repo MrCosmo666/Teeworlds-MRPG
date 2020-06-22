@@ -36,12 +36,17 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	}
 }
 
-void CGameControllerDungeon::KillAllPlayers()
+void CGameControllerDungeon::KillAllPlayers(bool StartDungeonMusic)
 {
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if (GS()->m_apPlayers[i] && GS()->m_apPlayers[i]->GetCharacter() && Server()->GetWorldID(i) == m_WorldID)
-			GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_WORLD);
+		if(GS()->m_apPlayers[i] && Server()->GetWorldID(i) == m_WorldID)
+		{
+			if(StartDungeonMusic)
+				GS()->SendMapMusic(i);
+			if(GS()->m_apPlayers[i]->GetCharacter())
+				GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_WORLD);
+		}
 	}
 }
 
@@ -78,13 +83,13 @@ void CGameControllerDungeon::ChangeState(int State)
 	{
 		SelectTankPlayer();
 		m_StartedPlayers = PlayersNum();
-		m_MaximumTick = Server()->TickSpeed() * 720;
+		m_MaximumTick = Server()->TickSpeed() * 600;
 		m_SafeTick = Server()->TickSpeed() * 30;
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The security timer is enabled for 30 seconds!");
-		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "You are given 12 minutes to complete of dungeon!");
+		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "You are given 10 minutes to complete of dungeon!");
 		GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon started!");
 		SetMobsSpawn(true);
-		KillAllPlayers();
+		KillAllPlayers(true);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
@@ -220,7 +225,6 @@ void CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKil
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The dungeon is completed on [{INT}%]", &Progress);
 		UpdateDoorKeyState();
 	}
-	return;
 }
 
 bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
@@ -296,7 +300,7 @@ int CGameControllerDungeon::CountMobs() const
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && m_WorldID == GS()->GetClientWorldID(i))
+		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && m_WorldID == BotPlayer->GetPlayerWorldID())
 			countMobs++;
 	}
 	return countMobs;
@@ -319,7 +323,7 @@ int CGameControllerDungeon::LeftMobsToWin() const
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && BotPlayer->GetCharacter() && m_WorldID == GS()->GetClientWorldID(i))
+		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && BotPlayer->GetCharacter() && m_WorldID == BotPlayer->GetPlayerWorldID())
 			leftMobs++;
 	}
 	return leftMobs;
@@ -330,7 +334,7 @@ void CGameControllerDungeon::SetMobsSpawn(bool AllowedSpawn)
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && m_WorldID == GS()->GetClientWorldID(i))
+		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && m_WorldID == BotPlayer->GetPlayerWorldID())
 		{
 			BotPlayer->SetDungeonAllowedSpawn(AllowedSpawn);
 			if (!AllowedSpawn && BotPlayer->GetCharacter())
@@ -430,34 +434,38 @@ int CGameControllerDungeon::GetDungeonSync(CPlayer* pPlayer, int BonusID) const
 	int Delay = 0;
 
 	const int ParsePlayerStatsClass = CGS::AttributInfo[BonusID].AtType;
+	if (BonusID == Stats::StStrength || ParsePlayerStatsClass == AtributType::AtHardtype)
+		Delay = 50;
+
+	// - - - - - - - - -- - - -
+	// tanks
 	if(pPlayer->m_MoodState == MOOD_PLAYER_TANK)
 	{
 		if(ParsePlayerStatsClass == AtributType::AtTank)
-			Procent = 10;
-
-		if(ParsePlayerStatsClass == AtributType::AtHealer || ParsePlayerStatsClass == AtributType::AtDps)
+			Procent = 11;
+		else if(ParsePlayerStatsClass == AtributType::AtHealer || ParsePlayerStatsClass == AtributType::AtDps)
 			Delay = 100;
-	}
-	else
-	{
-		if(ParsePlayerStatsClass == AtributType::AtTank)
-			Procent = 3;
-		else if(ParsePlayerStatsClass == AtributType::AtHealer)
-			Procent = 5;
-		else if(ParsePlayerStatsClass == AtributType::AtDps)
-			Procent = 3;
 
+		const int AttributeSyncProcent = kurosio::translate_to_procent_rest(pPlayer->m_SyncDungeon, Procent);
+		int AttributeCount = max(AttributeSyncProcent, 1);
+
+		if(ParsePlayerStatsClass == AtributType::AtTank)
+			return AttributeCount;
+
+		AttributeCount /= max((pPlayer->m_SyncPlayers + Delay), 1);
+		return AttributeCount;
 	}
-	
-	if(ParsePlayerStatsClass == AtributType::AtHardtype || BonusID == Stats::StStrength)
-		Delay = 50;
+
+	// - - - - - - - - -- - - -
+	// supports / healers / dps
+	if(ParsePlayerStatsClass == AtributType::AtTank)
+		Procent = 4;
+	else if(ParsePlayerStatsClass == AtributType::AtHealer)
+		Procent = 6;
 
 	const int AttributeSyncProcent = kurosio::translate_to_procent_rest(pPlayer->m_SyncDungeon, Procent);
 	int AttributeCount = max(AttributeSyncProcent, 1);
-
-	if(pPlayer->m_MoodState == MOOD_PLAYER_TANK && ParsePlayerStatsClass == AtributType::AtTank)
-		return AttributeCount;
-
+	
 	AttributeCount /= max((pPlayer->m_SyncPlayers + Delay), 1);
 	return AttributeCount;
 }

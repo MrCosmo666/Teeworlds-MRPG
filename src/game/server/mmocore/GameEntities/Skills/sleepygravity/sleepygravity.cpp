@@ -62,7 +62,7 @@ void CSleepyGravity::Tick()
 				GS()->CreateExplosion(VertexPos, m_pPlayer->GetCID(), WEAPON_GRENADE, m_PowerLevel);
 			else if(m_LifeSpan && TimeLeft == i)
 			{
-				GS()->CreateDamage(m_Pos, m_pPlayer->GetCID(), 1, true);
+				GS()->CreateDamage(m_Pos, m_pPlayer->GetCID(), 1, false, true);
 				break;
 			}
 		}

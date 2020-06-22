@@ -1,13 +1,9 @@
 #include "client.h"
 
-namespace SleepyDiscord 
-{
-	void BaseDiscordClient::setError(int errorCode) 
-	{
+namespace SleepyDiscord {
+	void BaseDiscordClient::setError(int errorCode) {
 		ErrorCode code = static_cast<ErrorCode>(errorCode);
-		switch (errorCode) 
-		{
-
+		switch (errorCode) {
 		//HTTP Response/Error Codes
 		case OK                 : onError(code, "The request completed successfully"                                             ); break;
 		case CREATED            : onError(code, "The entity was created successfully"                                            ); break;
@@ -22,11 +18,10 @@ namespace SleepyDiscord
 		case GATEWAY_UNAVAILABLE: onError(code, "There was not a gateway available to process your request. Wait a bit and retry"); break;
 		default:
 			if (500 <= errorCode && errorCode < 600) onError(code, "The server had an error processing your request (these are rare)");
-			else onError(code, "Unknown");
-		break;
+			else onError(code, "Unknown " + std::to_string(errorCode));
+			break;
 
 		//JSON Error Response
-		case 5005: onError(code, "Fail"                                                           				                                   ); break;
 		case 10001: onError(code, "Unknown account"                                                                                                ); break;
 		case 10002: onError(code, "Unknown application"                                                                                            ); break;
 		case 10003: onError(code, "Unknown channel"                                                                                                ); break;
@@ -83,16 +78,21 @@ namespace SleepyDiscord
 		case INVALID_SHARD          : onError(code, "invalid shard - You sent us an invalid shard when identifying."                                                                     ); break;
 		case SHARDING_REQUIRED      : onError(code, "sharding required - The session would have handled too many guilds - you are required to shard your connection in order to connect."); break;
 		case UNKNOWN_PROTOCOL       : onError(code, "We didn't recognize the protocol you sent."                                                                                         ); break;
-		case DISCONNECTED           : onError(code, "Oh no! You've been disconnected! Try resuming."                                                                                     ); break;
+		case INVALID_INTENTS        : onError(code, "You sent an invalid intent for a Gateway Intent."                                                                                   ); break;
+		case DISALLOWED_INTENTS     : onError(code, "You sent a disallowed intent for a Gateway Intent. You may have tried to specify an intent that you have not enabled for."          ); break;
 		case VOICE_SERVER_CRASHED   : onError(code, "The server crashed. Our bad! Try resuming."                                                                                         ); break;
 		case UNKNOWN_ENCRYPTION_MODE: onError(code, "We didn't recognize your encryption."                                                                                               ); break;
 
 		//Sleepy Errors
-		case CONNECT_FAILED: onError(code, "Failed to connect to the Discord api after 4 trys"                ); break;
-		case EVENT_UNKNOWN : onError(code, "Unexpected or unknown event occurred"                             ); break;
-		case GATEWAY_FAILED: onError(code, "Could not get the gateway"                                        ); break;
-		case GENERAL_ERROR : onError(code, "A wild error appeared"                                            ); break;
-		case LAZY_ERROR    : onError(code, "The programmer was too lazy to give this error a code and message"); break;
+		case CONNECT_FAILED : onError(code, "Failed to connect to the Discord api after 4 trys"                ); break;
+		case EVENT_UNKNOWN  : onError(code, "Unexpected or unknown event occurred"                             ); break;
+		case GATEWAY_FAILED : onError(code, "Could not get the gateway"                                        ); break;
+		case GENERAL_ERROR  : onError(code, "A wild error appeared"                                            ); break;
+		case LAZY_ERROR     : onError(code, "The programmer was too lazy to give this error a code and message"); break;
+		case ERROR_NOTE     : onError(code, "This is subposed to be a note"                                    ); break;
+		case VOICE_NO_SODIUM: onError(code, "Failed to init libsodium. Try linking libsodium?"                 ); break;
+		case VOICE_NO_OPUS  : onError(code, "Failed to init libopus. Try linking libopus?"                     ); break;
+		case CANT_SCHEDULE  : onError(code, "The Discord Client's scheduleHandler is not set"                  ); break;
 		}
 	}
 }

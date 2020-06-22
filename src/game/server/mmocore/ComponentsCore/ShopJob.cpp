@@ -315,8 +315,11 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	// купить предмет
 	if(PPSTR(CMD, "SHOP") == 0)
 	{
-		if(BuyShopItem(pPlayer, VoteID))	
+		if(BuyShopItem(pPlayer, VoteID))
+		{
+			GS()->CreatePlayerSound(ClientID, SOUND_ITEM_SELL_BUY);
 			GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
+		}
 		return true;
 	} 
 

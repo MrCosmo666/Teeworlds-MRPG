@@ -288,7 +288,7 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, b
 		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR} ({INT} materials)", NameItem, &Price);
 	}
 
-	if (ItemID == itHammer)
+	if (ItemID == pPlayer->GetEquippedItem(EQUIP_HAMMER))
 		return;
 
 	if (pPlayerItem.Info().Dysenthis > 0)

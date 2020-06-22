@@ -128,10 +128,10 @@ bool DungeonJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMe
 		pPlayer->m_Colored = GOLDEN_COLOR;
 		GS()->AVL(ClientID, "null", "Alternative story dungeon's");
 		ShowDungeonsList(pPlayer, false);
-		GS()->AV(ClientID, "null", "");
 
 		if (GS()->IsDungeon())
 		{
+			GS()->AV(ClientID, "null", "");
 			ShowTankVotingDungeon(pPlayer);
 			GS()->AV(ClientID, "null", "");
 			pPlayer->m_Colored = { 30, 8, 8 };
@@ -226,7 +226,7 @@ int DungeonJob::SyncFactor()
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && GS()->GetClientWorldID(i) == GS()->GetWorldID())
+		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && BotPlayer->GetPlayerWorldID() == GS()->GetWorldID())
 			Factor += BotPlayer->GetStartHealth();
 	}
 	return Factor;

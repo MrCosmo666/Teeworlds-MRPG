@@ -70,7 +70,7 @@ void CTalkText::OnRender()
 	// --------------------------------------------------------
 	CUIRect BackgroundOther;
 	{
-		vec4 ColorBackground = vec4(0.15f, 0.25f, 0.6f, 0.85f);
+		vec4 ColorBackground = vec4(0.15f, 0.2f, 0.6f, 0.85f);
 		vec4 ColorBackgroundOther = vec4(0.1f, 0.1f, 0.1f, 0.50f);
 		if (m_Style == TALK_STYLE_AGRESSIVE)
 		{
@@ -188,7 +188,7 @@ bool CTalkText::OnInput(IInput::CEvent Event)
 
 	if(IsActive() && Event.m_Flags&IInput::FLAG_PRESS && Event.m_Key == KEY_TAB)
 	{
-		m_pClient->m_pSounds->Play(CSounds::CHN_WORLD, SOUND_KEY_PRESS, 100.00f);
+		m_pClient->m_pSounds->Play(CSounds::CHN_WORLD, SOUND_BUTTON_CLICK, 1.0f);
 		ClientPressed();
 		return true;
 	}

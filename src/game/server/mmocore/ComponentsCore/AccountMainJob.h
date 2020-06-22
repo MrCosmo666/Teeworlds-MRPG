@@ -85,7 +85,6 @@ public:
 	int RegisterAccount(int ClientID, const char *Login, const char *Password);
 	int LoginAccount(int ClientID, const char *Login, const char *Password);
 	void LoadAccount(CPlayer *pPlayer, bool FirstInitilize = false);
-
 	void ShowDiscordCard(int ClientID);
 	void DiscordConnect(int ClientID, const char *pDID);
 	

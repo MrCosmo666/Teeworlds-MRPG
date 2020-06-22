@@ -25,6 +25,7 @@
 
 #include <teeother/components/localization.h>
 
+// статичные данные которые имеют одно значение в разных объектах
 std::map < int , CGS::StructAttribut > CGS::AttributInfo;
 std::map < int , std::map < std::string , int > > CGS::Effects;
 int CGS::m_RaidExp = 100;
@@ -103,7 +104,7 @@ CPlayer *CGS::GetPlayer(int ClientID, bool CheckAuthed, bool CheckCharacter)
 	CPlayer *pPlayer = m_apPlayers[ClientID];
 	if((CheckAuthed && pPlayer->IsAuthed()) || !CheckAuthed)
 	{
-		if(CheckCharacter && !pPlayer->GetCharacter())
+		if(CheckCharacter && (!pPlayer->GetCharacter() || !pPlayer->GetCharacter()->IsAlive()))
 			return nullptr;
 		return pPlayer;	
 	}
@@ -135,12 +136,15 @@ char* CGS::LevelString(int MaxValue, int CurrentValue, int Step, char toValue, c
 
 const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const
 {
+	// mrpg client
 	if(CheckClient(ClientID))
 	{
 		if(HidenTabs)
 			return ID >= NUM_TAB_MENU ? ("▵ ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("▼ :: ") : ("▲ :: "));
 		return ID >= NUM_TAB_MENU ? ("▿ ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("▲ :: ") : ("▼ :: "));
 	}
+
+	// vanilla
 	if(HidenTabs)
 		return ID >= NUM_TAB_MENU ? ("/\\ # ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("\\/ # ") : ("/\\ # "));
 	return ID >= NUM_TAB_MENU ? ("\\/ # ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("/\\ # ") : ("\\/ # "));
@@ -152,8 +156,8 @@ ItemJob::ItemInformation &CGS::GetItemInfo(int ItemID) const { return ItemJob::I
 /* #########################################################################
 	EVENTS 
 ######################################################################### */
-// Отправить запрос на рендер Урона
-void CGS::CreateDamage(vec2 Pos, int ClientID, int Amount, bool OnlyVanilla)
+// Отправить запрос на эффект Урона
+void CGS::CreateDamage(vec2 Pos, int ClientID, int Amount, bool CritDamage, bool OnlyVanilla)
 {
 	CNetEvent_Damage* pEventVanilla = (CNetEvent_Damage*)m_Events.Create(NETEVENTTYPE_DAMAGE, sizeof(CNetEvent_Damage));
 	if(pEventVanilla)
@@ -166,7 +170,6 @@ void CGS::CreateDamage(vec2 Pos, int ClientID, int Amount, bool OnlyVanilla)
 			const float DamageTranslate = (float)Amount / (float)HealthStart * 6.0f;
 			AmountDamageVanilla = clamp((int)DamageTranslate, 1, 6);
 		}
-
 		pEventVanilla->m_X = (int)Pos.x;
 		pEventVanilla->m_Y = (int)Pos.y;
 		pEventVanilla->m_ClientID = ClientID;
@@ -184,12 +187,12 @@ void CGS::CreateDamage(vec2 Pos, int ClientID, int Amount, bool OnlyVanilla)
 	{
 		pEventMmo->m_X = (int)Pos.x;
 		pEventMmo->m_Y = (int)Pos.y;
-		pEventMmo->m_ClientID = ClientID;
 		pEventMmo->m_DamageCount = Amount;
+		pEventMmo->m_CritDamage = CritDamage;
 	}
 }
 
-// Отправить запрос на рендер Удара молотка
+// Отправить запрос на эффект Удара молотка
 void CGS::CreateHammerHit(vec2 Pos)
 {
 	CNetEvent_HammerHit *pEvent = (CNetEvent_HammerHit *)m_Events.Create(NETEVENTTYPE_HAMMERHIT, sizeof(CNetEvent_HammerHit));
@@ -200,7 +203,7 @@ void CGS::CreateHammerHit(vec2 Pos)
 	}
 }
 
-// Отправить запрос на рендер Взрыв и Сделать урон в радиусе
+// Отправить запрос на эффект Взрыв и Сделать урон в радиусе
 void CGS::CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamage)
 {
 	// create the event
@@ -212,18 +215,18 @@ void CGS::CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamage)
 	}
 
 	CCharacter *apEnts[MAX_CLIENTS];
-	float Radius = g_pData->m_Explosion.m_Radius;
-	float InnerRadius = 48.0f;
-	float MaxForce = g_pData->m_Explosion.m_MaxForce;
+	const float Radius = g_pData->m_Explosion.m_Radius;
+	const float InnerRadius = 48.0f;
+	const float MaxForce = g_pData->m_Explosion.m_MaxForce;
 	int Num = m_World.FindEntities(Pos, Radius, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
 	for(int i = 0; i < Num; i++)
 	{
 		vec2 Diff = apEnts[i]->GetPos() - Pos;
 		vec2 Force(0, MaxForce);
-		float l = length(Diff);
+		const float l = length(Diff);
 		if(l)
 			Force = normalize(Diff) * MaxForce;
-		float Factor = 1 - clamp((l-InnerRadius)/(Radius-InnerRadius), 0.0f, 1.0f);
+		const float Factor = 1 - clamp((l-InnerRadius)/(Radius-InnerRadius), 0.0f, 1.0f);
 		if ((int)(Factor * MaxDamage))
 		{
 			apEnts[i]->TakeDamage(Force * Factor, (int)(Factor * MaxDamage), Owner, Weapon);
@@ -231,6 +234,7 @@ void CGS::CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamage)
 	}
 }
 
+// Отправить запрос на эффект Спавн игрока
 void CGS::CreatePlayerSpawn(vec2 Pos)
 {
 	CNetEvent_Spawn *ev = (CNetEvent_Spawn *)m_Events.Create(NETEVENTTYPE_SPAWN, sizeof(CNetEvent_Spawn));
@@ -241,6 +245,7 @@ void CGS::CreatePlayerSpawn(vec2 Pos)
 	}
 }
 
+// Отправить запрос на эффект Смерть игрока
 void CGS::CreateDeath(vec2 Pos, int ClientID)
 {
 	CNetEvent_Death *pEvent = (CNetEvent_Death *)m_Events.Create(NETEVENTTYPE_DEATH, sizeof(CNetEvent_Death));
@@ -252,6 +257,7 @@ void CGS::CreateDeath(vec2 Pos, int ClientID)
 	}
 }
 
+// Отправить запрос на создание Звука
 void CGS::CreateSound(vec2 Pos, int Sound, int64 Mask)
 {
 	// fix for vanilla unterstand SoundID
@@ -267,6 +273,19 @@ void CGS::CreateSound(vec2 Pos, int Sound, int64 Mask)
 	}
 }
 
+// Отправить пакет на обновление музыки Atmosphere MRPG
+void CGS::SendMapMusic(int ClientID, int MusicID)
+{
+	if(!CheckClient(ClientID))
+		return;
+
+	CNetMsg_Sv_WorldMusic Msg;
+	Msg.m_pSoundID = (MusicID != 0 ? MusicID : m_MusicID);
+	Msg.m_pVolume = (IsDungeon() ? 8 : 2);
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
+}
+
+// Отправить запрос на создание Звука по маске для игрока
 void CGS::CreatePlayerSound(int ClientID, int Sound)
 {
 	// fix for vanilla unterstand SoundID
@@ -763,7 +782,7 @@ void CGS::SendEquipItem(int ClientID, int TargetID)
 		return;
 
 	// send players equiping global bots local on world
-	const int WorldID = (pPlayer->IsBot() ? GetClientWorldID(ClientID) : -1);
+	const int WorldID = (pPlayer->IsBot() ? pPlayer->GetPlayerWorldID() : -1);
 	
 	CNetMsg_Sv_EquipItems Msg;
 	Msg.m_ClientID = ClientID;
@@ -901,15 +920,6 @@ void CGS::ClearTalkText(int ClientID)
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
-// Помощь в поиске мира бота и отправки его
-int CGS::GetClientWorldID(int ClientID) const
-{
-	if(ClientID < 0 || ClientID >= MAX_CLIENTS || !m_apPlayers[ClientID] || !Server()->ClientIngame(ClientID))
-		return -1;
-
-	return m_apPlayers[ClientID]->GetPlayerWorldID();
-}
-
 /* #########################################################################
 	ENGINE GAMECONTEXT 
 ######################################################################### */
@@ -959,6 +969,7 @@ void CGS::OnInit(int WorldID)
 	m_CommandManager.Init(m_pConsole, this, NewCommandHook, RemoveCommandHook);
 	m_WorldID = WorldID;
 	m_RespawnWorld = -1;
+	m_MusicID = -1;
 
 	for(int i = 0; i < NUM_NETOBJTYPES; i++)
 		Server()->SnapSetStaticsize(i, m_NetObjHandler.GetObjSize(i));
@@ -1037,7 +1048,7 @@ void CGS::OnTick()
 	m_pController->Tick();
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
-		if(!m_apPlayers[i] || m_WorldID != GetClientWorldID(i))
+		if(!m_apPlayers[i] || m_apPlayers[i]->GetPlayerWorldID() != m_WorldID)
 			continue;
 
 		m_apPlayers[i]->Tick();
@@ -1075,7 +1086,7 @@ void CGS::OnTickLocalWorld()
 // Рисование вывод всех объектов 
 void CGS::OnSnap(int ClientID)
 {
-	if(GetClientWorldID(ClientID) != GetWorldID())
+	if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->GetPlayerWorldID() != GetWorldID())
 		return;
 
 	m_World.Snap(ClientID);
@@ -1269,7 +1280,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			*/
 			if(!CheckClient(ClientID))
 			{
-				Server()->Kick(ClientID, "Update Mmo-Client use udapter or download in discord.");
+				Server()->Kick(ClientID, "Update client use updater or download in discord.");
 				return;
 			}
 
@@ -1861,7 +1872,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	if(!pPlayer)
 		return;
 
-	kurosio::kpause(3);	
+	kurosio::kpause(3);
 	pPlayer->m_OpenVoteMenu = MenuList;
 	ClearVotes(ClientID);
 
@@ -2148,11 +2159,13 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 		return true;
 	else if(PPSTR(CMD, "BACK") == 0)
 	{
+		CreatePlayerSound(ClientID, SOUND_BOOK_FLIP);
 		ResetVotes(ClientID, pPlayer->m_LastVoteMenu);
 		return true;
 	}
 	else if(PPSTR(CMD, "MENU") == 0)
 	{
+		CreatePlayerSound(ClientID, SOUND_BOOK_FLIP);
 		ResetVotes(ClientID, VoteID);
 		return true;
 	}
@@ -2294,7 +2307,7 @@ void CGS::SendInbox(int ClientID, const char* Name, const char* Desc, int ItemID
 	Mmo()->Inbox()->SendInbox(pPlayer->Acc().AuthID, Name, Desc, ItemID, Count, Enchant);
 } 
 
-// отправить информацию о дне
+// Отправить информацию о дне
 void CGS::SendDayInfo(int ClientID)
 {
 	if(ClientID == -1)
@@ -2316,7 +2329,7 @@ void CGS::ChangeEquipSkin(int ClientID, int ItemID)
 }
 
 // Повышем кол-во для определеннго значения как рейд
-int CGS::IncreaseCountRaid(int IncreaseCount) const
+int CGS::IncreaseExperienceRaid(int IncreaseCount) const
 {
 	if(IsDungeon())
 		return (int)kurosio::translate_to_procent_rest(IncreaseCount, 150);
@@ -2332,7 +2345,7 @@ void CGS::UpdateZonePVP()
 	for(int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(m_apPlayers[i]);
-		if(BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && GetClientWorldID(i) == m_WorldID)
+		if(BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && BotPlayer->GetPlayerWorldID() == m_WorldID)
 		{
 			m_AllowedPVP = true;
 			return;
@@ -2342,15 +2355,15 @@ void CGS::UpdateZonePVP()
 
 void CGS::UpdateZoneDungeon()
 {
+	m_DungeonID = 0;
 	for(const auto& dd : DungeonJob::Dungeon)
 	{
-		if(m_WorldID == dd.second.WorldID)
-		{
-			m_DungeonID = dd.first;
-			return;
-		}
+		if(m_WorldID != dd.second.WorldID)
+			continue;
+		
+		m_DungeonID = dd.first;
+		return;
 	}
-	m_DungeonID = 0;
 }
 
 bool CGS::IsClientEqualWorldID(int ClientID, int WorldID) const
@@ -2374,7 +2387,7 @@ bool CGS::CheckPlayersDistance(vec2 Pos, float Distance) const
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(m_apPlayers[i] && GetClientWorldID(i) == GetWorldID() && distance(Pos, m_apPlayers[i]->m_ViewPos) <= Distance)
+		if(m_apPlayers[i] && m_apPlayers[i]->GetPlayerWorldID() == GetWorldID() && distance(Pos, m_apPlayers[i]->m_ViewPos) <= Distance)
 			return true;
 	}
 	return false;

@@ -45,6 +45,7 @@ public:
 		CHN_WORLD,
 		CHN_GLOBAL,
 		CHN_MMORPG,
+		CHN_MMORPG_ATMOSPHERE,
 	};
 
 	virtual int GetInitAmount() const;
@@ -54,6 +55,7 @@ public:
 	virtual void OnRender();
 
 	void ClearQueue();
+	void SetChannelVolume(int Channel, float Vol);
 	void Enqueue(int Channel, int SetId);
 	void Play(int Channel, int SetId, float Vol);
 	void PlayAt(int Channel, int SetId, float Vol, vec2 Pos);

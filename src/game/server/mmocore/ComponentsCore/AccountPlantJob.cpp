@@ -82,7 +82,7 @@ void AccountPlantJob::ShowPlantsItems(int ClientID)
 void AccountPlantJob::Work(CPlayer* pPlayer, int Level)
 {
 	const int ClientID = pPlayer->GetCID();
-	int MultiplierExperience = kurosio::computeExperience(Level) / g_Config.m_SvPlantingIncreaseLevel;
+	const int MultiplierExperience = kurosio::computeExperience(Level) / g_Config.m_SvPlantingIncreaseLevel;
 	pPlayer->Acc().Plant[MnrExp] += clamp(MultiplierExperience, 1, MultiplierExperience);
 
 	int ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().Plant[PlLevel]);
@@ -97,6 +97,7 @@ void AccountPlantJob::Work(CPlayer* pPlayer, int Level)
 			GS()->CreateDeath(pPlayer->GetCharacter()->m_Core.m_Pos, ClientID);
 			GS()->CreateText(pPlayer->GetCharacter(), false, vec2(0, -40), vec2(0, -1), 40, "plants up");
 		}
+		ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().Plant[PlLevel]);
 		GS()->ChatFollow(ClientID, "Plants Level UP. Now Level {INT}!", &pPlayer->Acc().Plant[PlLevel]);
 	}
 	pPlayer->ProgressBar("Plants", pPlayer->Acc().Plant[PlLevel], pPlayer->Acc().Plant[PlExp], ExperienceNeed, MultiplierExperience);
@@ -105,7 +106,7 @@ void AccountPlantJob::Work(CPlayer* pPlayer, int Level)
 
 bool AccountPlantJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
-	int ClientID = pPlayer->GetCID();	
+	const int ClientID = pPlayer->GetCID();	
 	if(PPSTR(CMD, "PLANTUPGRADE") == 0)
 	{
 		char aBuf[32];
