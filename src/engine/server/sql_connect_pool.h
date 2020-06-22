@@ -1,14 +1,7 @@
 #ifndef ENGINE_SERVER_SQL_CONNECTIONPOOL_H
 #define ENGINE_SERVER_SQL_CONNECTIONPOOL_H
 
-#include <thread>
-#include <stdarg.h>
-#include <base/detect.h>
-
-#include <mysql_connection.h>
-
-#include <cppconn/driver.h>
-#include <cppconn/exception.h>
+#include <boost/scoped_ptr.hpp>
 #include <cppconn/statement.h>
 
 using namespace sql;
@@ -17,8 +10,8 @@ using namespace sql;
 class CConectionPool 
 {
 	static std::shared_ptr<CConectionPool> m_Instance;
-	std::list<Connection*>m_connlist;
-	Driver *m_pdriver;
+	std::list<class Connection*>m_connlist;
+	class Driver *m_pdriver;
 
 	CConectionPool();
 
@@ -26,13 +19,13 @@ class CConectionPool
 public:
 	~CConectionPool();
 
-	Connection* CreateConnection();
-	void DisconnectConnection(Connection* pConn);
+	class Connection* CreateConnection();
+	void DisconnectConnection(class Connection* pConn);
 	void DisconnectConnectionHeap();
 	static CConectionPool& GetInstance();
 
 	// функция выборка с бд данных
-	ResultSet* SD(const char *Select, const char *Table, const char *Buffer = "", ...);
+	class ResultSet* SD(const char *Select, const char *Table, const char *Buffer = "", ...);
 
 	// функция просто обновит данные что будут указаны
 	void UD(const char *Table, const char *Buffer, ...);
