@@ -194,6 +194,8 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 		GS()->Chat(-1, "{STR} crafted [{STR}x{INT}].", GS()->Server()->ClientName(ClientID), PlayerCraftItem.Info().GetName(), &CraftGetCount);
 		return;
 	}
+
+	GS()->CreatePlayerSound(ClientID, SOUND_ITEM_SELL_BUY);
 	GS()->Chat(ClientID, "You crafted [{STR}x{INT}].", PlayerCraftItem.Info().GetName(pPlayer), &CraftGetCount);
 	GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 }

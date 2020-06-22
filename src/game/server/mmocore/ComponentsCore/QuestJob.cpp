@@ -11,6 +11,16 @@
 std::map < int , QuestJob::StructQuestData > QuestJob::QuestsData;
 std::map < int , std::map < int , QuestJob::StructQuest > > QuestJob::Quests;
 
+static const char* GetStateName(int Type)
+{
+	switch(Type)
+	{
+		case QuestState::QUEST_ACCEPT: return "Active";
+		case QuestState::QUEST_FINISHED: return "Finished";
+		default: return "Not active";
+	}
+}
+
 int QuestJob::GetState(int ClientID, int QuestID) const
 {
 	if(IsValidQuest(QuestID, ClientID))
@@ -41,16 +51,6 @@ int QuestJob::GetStoryCount(const char *StoryName, int CountFromQuestID) const
 		}
 	}
 	return Count;
-}
-
-const char *QuestJob::GetStateName(int Type) const
-{
-	switch (Type)
-	{
-		case QuestState::QUEST_ACCEPT: return "Active";
-		case QuestState::QUEST_FINISHED: return "Finished";
-	}
-	return "Not active";
 }
 
 bool QuestJob::IsDefeatMobsComplete(int ClientID, int QuestID) const
@@ -271,7 +271,7 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotDa
 	const int QuestID = BotData.QuestID;
 	if (!IsCollectItemComplete(pPlayer, BotData) || !IsDefeatMobsComplete(ClientID, QuestID))
 	{
-		GS()->Chat(ClientID, "Not all criteria to complete!");
+		GS()->Chat(ClientID, "Task has not been completed yet!");
 		return false;
 	}
 
@@ -298,7 +298,7 @@ bool QuestJob::InteractiveTypeQuest(CPlayer* pPlayer, BotJob::QuestBotInfo& BotD
 	const int ClientID = pPlayer->GetCID();
 	if (BotData.InteractiveType == (int)QuestInteractive::QUEST_INT_RANDOM_ACCEPT_ITEM && BotData.InteractiveTemp > 0)
 	{
-		bool Succesful = random_int() % BotData.InteractiveTemp == 0;
+		const bool Succesful = random_int() % BotData.InteractiveTemp == 0;
 		for(int i = 0; i < 2; i++)
 		{
 			const int ItemID = BotData.ItemSearch[i];
@@ -368,17 +368,16 @@ void QuestJob::UpdateArrowStep(int ClientID)
 
 bool QuestJob::CheckNewStories(CPlayer *pPlayer, int CheckQuestID)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	if (CheckQuestID > 0)
 	{
-		int NextQuestID = CheckQuestID + 1;
-		bool ActiveNextStories = (bool)(IsValidQuest(NextQuestID) && str_comp(QuestsData[CheckQuestID].StoryLine, QuestsData[NextQuestID].StoryLine) == 0);
+		const int NextQuestID = CheckQuestID + 1;
+		const bool ActiveNextStories = (bool)(IsValidQuest(NextQuestID) && str_comp(QuestsData[CheckQuestID].StoryLine, QuestsData[NextQuestID].StoryLine) == 0);
 		if(ActiveNextStories)
 			AcceptQuest(NextQuestID, pPlayer);
-
+		
 		return ActiveNextStories;
 	}
-
 
 	bool ActiveNextStories = false;
 	for (const auto& qp : Quests[ClientID])
@@ -475,7 +474,7 @@ bool QuestJob::ShowAdventureActiveNPC(CPlayer* pPlayer)
 			continue;
 
 		// если нашли выводим информацию
-		int HideID = (NUM_TAB_MENU + 12500 + BotInfo->QuestID);
+		const int HideID = (NUM_TAB_MENU + 12500 + BotInfo->QuestID);
 		const int PosX = BotInfo->PositionX / 32, PosY = BotInfo->PositionY / 32;
 		GS()->AVH(clientID, HideID, LIGHT_BLUE_COLOR, "[{STR}] {STR} {STR}(x{INT} y{INT})", GetStoryName(qq.first), BotInfo->GetName(), GS()->Server()->GetWorldName(BotInfo->WorldID), &PosX, &PosY);
 
@@ -557,7 +556,7 @@ void QuestJob::QuestTableShowRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &Bo
 		if(ItemID > 0 && CountItem > 0)
 		{
 			ItemJob::InventoryItem PlayerQuestItem = pPlayer->GetItem(ItemID);
-			str_format(aBuf, sizeof(aBuf), "\n- Item %s [%d/%d]", PlayerQuestItem.Info().GetName(pPlayer), PlayerQuestItem.Count, CountItem);
+			str_format(aBuf, sizeof(aBuf), "\n- Need %s [%d/%d]", PlayerQuestItem.Info().GetName(pPlayer), PlayerQuestItem.Count, CountItem);
 			Buffer.append_at(Buffer.length(), aBuf);
 			ShowItemNeeded = true;
 		}
@@ -604,7 +603,7 @@ void QuestJob::QuestTableShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& Bo
 
 		if(BotData.InteractiveType == (int)QuestInteractive::QUEST_INT_RANDOM_ACCEPT_ITEM)
 		{
-			double Chance = BotData.InteractiveTemp <= 0 ? 100.0f : (1.0f / (double)BotData.InteractiveTemp) * 100;
+			const float Chance = BotData.InteractiveTemp <= 0 ? 100.0f : (1.0f / (float)BotData.InteractiveTemp) * 100;
 			str_format(aBuf, sizeof(aBuf), "%s [takes %0.2f%%]", aBuf, Chance);
 		}
 		else
@@ -644,7 +643,7 @@ void QuestJob::QuestTableAddItem(int ClientID, const char* pText, int Requires, 
 	if (!pPlayer || ItemID < itGold || !GS()->CheckClient(ClientID))
 		return;
 
-	ItemJob::InventoryItem PlayerSelectedItem = pPlayer->GetItem(ItemID);
+	const ItemJob::InventoryItem PlayerSelectedItem = pPlayer->GetItem(ItemID);
 
 	CNetMsg_Sv_AddQuestingProcessing Msg;
 	Msg.m_pText = pText;
@@ -681,7 +680,7 @@ void QuestJob::QuestTableClear(int ClientID)
 int QuestJob::QuestingAllowedItemsCount(CPlayer *pPlayer, int ItemID)
 {
 	const int ClientID = pPlayer->GetCID();
-	ItemJob::InventoryItem PlayerSearchItem = pPlayer->GetItem(ItemID);
+	const ItemJob::InventoryItem PlayerSearchItem = pPlayer->GetItem(ItemID);
 	for (const auto& qq : Quests[ClientID])
 	{
 		if (qq.second.State != QuestState::QUEST_ACCEPT)
@@ -700,7 +699,7 @@ int QuestJob::QuestingAllowedItemsCount(CPlayer *pPlayer, int ItemID)
 			if (needItemID <= 0 || numNeed <= 0 || ItemID != needItemID)
 				continue;
 
-			int AvailableCount = clamp(PlayerSearchItem.Count - numNeed, 0, PlayerSearchItem.Count);
+			const int AvailableCount = clamp(PlayerSearchItem.Count - numNeed, 0, PlayerSearchItem.Count);
 			return AvailableCount;
 		}
 	}
@@ -720,11 +719,11 @@ void QuestJob::CreateQuestingItems(CPlayer *pPlayer, BotJob::QuestBotInfo &BotDa
 	}
 
 	const int Count = 3 + BotData.ItemSearchCount[0];
-	vec2 Pos = vec2(BotData.PositionX, BotData.PositionY);
+	const vec2 Pos = vec2(BotData.PositionX, BotData.PositionY);
 	for (int i = 0; i < Count; i++)
 	{
-		vec2 Vel = vec2(frandom() * 40.0f - frandom() * 80.0f, frandom() * 40.0f - frandom() * 80.0f);
-		float AngleForce = Vel.x * (0.15f + frandom() * 0.1f);
+		const vec2 Vel = vec2(frandom() * 40.0f - frandom() * 80.0f, frandom() * 40.0f - frandom() * 80.0f);
+		const float AngleForce = Vel.x * (0.15f + frandom() * 0.1f);
 		new CDropQuestItem(&GS()->m_World, Pos, Vel, AngleForce, BotData, ClientID);
 	}
 }

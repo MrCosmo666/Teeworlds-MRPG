@@ -37,6 +37,7 @@ class CGS : public IGameServer
 	int m_DungeonID;
 
 	int m_RespawnWorld;
+	int m_MusicID;
 	class MmoController *pMmoController;
 
 	IServer *m_pServer;
@@ -101,12 +102,13 @@ public:
 	/* #########################################################################
 		EVENTS 
 	######################################################################### */
-	void CreateDamage(vec2 Pos, int ClientID, int Amount, bool OnlyVanilla);
+	void CreateDamage(vec2 Pos, int ClientID, int Amount, bool CritDamage, bool OnlyVanilla);
 	void CreateHammerHit(vec2 Pos);
 	void CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamage);
 	void CreatePlayerSpawn(vec2 Pos);
 	void CreateDeath(vec2 Pos, int Who);
 	void CreateSound(vec2 Pos, int Sound, int64 Mask=-1);
+	void SendMapMusic(int ClientID, int MusicID = 0);
 	void CreatePlayerSound(int ClientID, int Sound);
 	void SendMmoEffect(vec2 Pos, int EffectID, int ClientID = -1);
 	void SendMmoPotion(vec2 Pos, const char *Potion, bool Added);
@@ -176,7 +178,6 @@ public:
 	void SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char *Message, int Style = -1, int TalkingEmote = -1);
 	void SendProgressBar(int ClientID, int Count, int Request, const char *Message);
 	void ClearTalkText(int ClientID);
-	int GetClientWorldID(int ClientID) const;
 
 	/* #########################################################################
 		ENGINE GAMECONTEXT 
@@ -280,13 +281,14 @@ public:
 	int GetWorldID() const { return m_WorldID; }
 	int DungeonID() const { return m_DungeonID; }
 	bool IsDungeon() const { return (m_DungeonID > 0); }
-	int IncreaseCountRaid(int IncreaseCount) const;
+	int IncreaseExperienceRaid(int IncreaseCount) const;
 	bool IsClientEqualWorldID(int ClientID, int WorldID = -1) const;
 	bool IsAllowedPVP() const { return m_AllowedPVP; }
 	const char* AtributeName(int BonusID) const;
 
 	bool CheckPlayersDistance(vec2 Pos, float Distance) const;
 	void SetRespawnWorld(int WorldID) { m_RespawnWorld = WorldID; }
+	void SetMapMusic(int SoundID) { m_MusicID = SoundID; }
 	int GetRespawnWorld() const { return m_RespawnWorld; }
 
 private:

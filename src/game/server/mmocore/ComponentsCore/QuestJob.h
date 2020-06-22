@@ -46,7 +46,6 @@ public:
 
 private:
 	int GetStoryCount(const char* StoryName, int CountFromQuestID = -1) const;
-	const char* GetStateName(int Type) const;
 	bool IsDefeatMobsComplete(int ClientID, int QuestID) const;
 
 	void ShowQuestID(CPlayer *pPlayer, int QuestID);

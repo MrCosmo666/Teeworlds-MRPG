@@ -289,8 +289,8 @@ Objects = [
     
     ## mmotee events
 	NetEvent("MmoDamage:Common", [
-		NetIntRange("m_ClientID", 0, 'MAX_CLIENTS-1'),
 		NetIntAny("m_DamageCount"),
+		NetBool("m_CritDamage"),
 	]),
 
 	NetEvent("EffectMmo:Common", [
@@ -630,6 +630,13 @@ Messages = [
 		NetStringStrict("m_pText"),
 		NetIntAny("m_pCount"),
 		NetIntAny("m_pRequires"),
+	]),
+
+    # music on map
+	NetMessage("Sv_WorldMusic",
+	[
+		NetIntAny("m_pSoundID"),
+		NetIntRange("m_pVolume", 1, 10),
 	]),
 
 ]

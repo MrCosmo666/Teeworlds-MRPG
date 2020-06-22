@@ -44,12 +44,14 @@ void WorldSwapJob::OnInitWorld(const char* pWhereLocalWorld)
 {
 	const int WorldID = GS()->GetWorldID();
 	CSqlString<32> world_name = CSqlString<32>(GS()->Server()->GetWorldName(WorldID));
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("RespawnWorld", "ENUM_WORLDS", pWhereLocalWorld));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("RespawnWorld, MusicID", "ENUM_WORLDS", pWhereLocalWorld));
 	if(RES->next())
 	{
 		const int RespawnWorld = (int)RES->getInt("RespawnWorld");
+		const int MusicID = (int)RES->getInt("MusicID");
 		SJK.UD("ENUM_WORLDS", "Name = '%s' WHERE WorldID = '%d'", world_name.cstr(), WorldID);
 		GS()->SetRespawnWorld(RespawnWorld);
+		GS()->SetMapMusic(MusicID);
 		return;
 	}
 	SJK.ID("ENUM_WORLDS", "(WorldID, Name) VALUES ('%d', '%s')", WorldID, world_name.cstr());

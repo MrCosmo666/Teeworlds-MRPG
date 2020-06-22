@@ -76,7 +76,6 @@ public:
 
 private:
 	char m_FormatTalkQuest[512];
-	char m_aLanguage[16];
 	std::map < int, bool > m_HidenMenu;
 
 	/* #########################################################################
@@ -137,6 +136,7 @@ public:
 	bool CheckFailMoney(int Price, int ItemID = 1, bool CheckOnly = false);
 	void GiveEffect(const char* Potion, int Sec, int Random = 0);
 	void SetLanguage(const char* pLanguage);
+	const char* GetLanguage() const;
 	void AddExp(int Exp);
 	void AddMoney(int Money);
 
@@ -147,7 +147,6 @@ public:
 	int GetStartTeam();
 
 	int ExpNeed(int Level) const;
-	const char* GetLanguage();
 	void ShowInformationStats();
 
 	/* #########################################################################

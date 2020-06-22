@@ -467,8 +467,9 @@ void CGameClient::OnInit()
 
 	m_IsXmasDay = time_isxmasday();
 	m_IsEasterDay = time_iseasterday();
-	m_pMenus->RenderLoading();	
+	m_pMenus->RenderLoading();
 	m_InitComplete = true;
+	m_WorldMusicID = -1;
 
 	int64 End = time_get();
 	char aBuf[256];
@@ -552,9 +553,12 @@ void CGameClient::OnReset()
 	m_LastFlagCarrierRed = FLAG_MISSING;
 	m_LastFlagCarrierBlue = FLAG_MISSING;
 
-	//mmotee
-	m_ConnectedMmoServer = false;
-	m_MmoMsgSent = false;
+	// mmotee reset state only on discconnect mrpg / or not connected to mrpg
+	if((m_ConnectedMmoServer && Client()->State() == IClient::STATE_OFFLINE) || !m_ConnectedMmoServer)
+	{
+		m_MmoMsgSent = false;
+		m_ConnectedMmoServer = false;
+	}
 }
 
 void CGameClient::UpdatePositions()
@@ -1089,11 +1093,11 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		Client()->EnterGame();
 
 		// send information what used client
-		if (!m_MmoMsgSent)
+		if (!m_MmoMsgSent && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 		{
 			CNetMsg_Cl_IsMmoServer Msg;
 			Msg.m_Version = CLIENT_VERSION_MMO;
-			Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
+			Client()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD);
 			m_MmoMsgSent = true;
 		}
 	}
@@ -1119,12 +1123,15 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 	}
 
 	// mmotee
-	else if(MsgId == NETMSGTYPE_SV_AFTERISMMOSERVER)
+	else if(MsgId == NETMSGTYPE_SV_AFTERISMMOSERVER && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 	{
 		m_ConnectedMmoServer = true;
-
-		if(g_Config.m_ClShowAuthMenu)
-			m_pMenus->SetAuthState(true);
+		m_pMenus->SetAuthState(true);
+	}
+	else if(MsgId == NETMSGTYPE_SV_WORLDMUSIC && Client()->State() != IClient::STATE_DEMOPLAYBACK)
+	{
+		CNetMsg_Sv_WorldMusic* pMsg = (CNetMsg_Sv_WorldMusic*)pRawMsg;
+		SetAtmosphereMusicMRPG(pMsg->m_pSoundID, (float)(pMsg->m_pVolume / 10.0f));
 	}
 }
 
@@ -1133,10 +1140,13 @@ void CGameClient::OnStateChange(int NewState, int OldState)
 	// reset everything when not already connected (to keep gathered stuff)
 	if(NewState < IClient::STATE_ONLINE)
 		OnReset();
-
+	
 	// then change the state
 	for(int i = 0; i < m_All.m_Num; i++)
 		m_All.m_paComponents[i]->OnStateChange(NewState, OldState);
+
+	// update state atmosphere music mrpg
+	UpdateStateMmoMusic();
 }
 
 void CGameClient::OnShutdown()
@@ -1221,11 +1231,7 @@ void CGameClient::ProcessEvents()
 		else if (Item.m_Type == NETEVENTTYPE_MMODAMAGE)
 		{
 			CNetEvent_MmoDamage* ev = (CNetEvent_MmoDamage*)pData;
-
-			char aBuf[8];
-			int Damage = ev->m_DamageCount;
-			str_format(aBuf, sizeof(aBuf), "%d", Damage);
-			m_pEffects->DamageMmoInd(vec2(ev->m_X, ev->m_Y), aBuf);
+			m_pEffects->DamageMmoInd(vec2(ev->m_X, ev->m_Y), ev->m_DamageCount, ev->m_CritDamage);
 		}
 	}
 }
@@ -1916,6 +1922,29 @@ void CGameClient::SendAuthPack(const char* Login, const char* Password, bool Sta
 	Msg.m_Password = Password;
 	Msg.m_SelectRegister = StateRegistered;
 	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
+}
+
+void CGameClient::SetAtmosphereMusicMRPG(int SoundID, float Vol)
+{
+	if(SoundID == -1 && m_WorldMusicID != -1 && m_pSounds->IsPlaying(m_WorldMusicID))
+		m_pSounds->Stop(m_WorldMusicID);
+	
+	m_WorldMusicID = SoundID;
+	m_pSounds->SetChannelVolume(CSounds::CHN_MMORPG_ATMOSPHERE, Vol);
+	UpdateStateMmoMusic();
+}
+
+void CGameClient::UpdateStateMmoMusic()
+{
+	if(m_WorldMusicID == -1)
+		return;
+	
+	// update state active music
+	const bool ShouldPlay = Client()->State() == IClient::STATE_ONLINE && MmoServer() && g_Config.m_SndEnable && g_Config.m_SndMusicMRPG;
+	if(ShouldPlay && !m_pSounds->IsPlaying(m_WorldMusicID))
+		m_pSounds->Enqueue(CSounds::CHN_MMORPG_ATMOSPHERE, m_WorldMusicID);
+	else if(!ShouldPlay && m_pSounds->IsPlaying(m_WorldMusicID))
+		m_pSounds->Stop(m_WorldMusicID);
 }
 
 void CGameClient::DoEnterMessage(const char *pName, int ClientID, int Team)

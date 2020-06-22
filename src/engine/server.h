@@ -74,7 +74,7 @@ public:
 	virtual int GetClientVersion(int ClientID) = 0;
 
 	virtual void SetClientLanguage(int ClientID, const char* pLanguage) = 0;
-	virtual const char* GetClientLanguage(int ClientID) = 0;
+	virtual const char* GetClientLanguage(int ClientID) const = 0;
 
 	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText) = 0;
 	virtual void SendDiscordGenerateMessage(const char *pColor, const char *pTitle, const char *pMsg) = 0;

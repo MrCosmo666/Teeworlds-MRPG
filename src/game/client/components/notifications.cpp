@@ -29,6 +29,7 @@ void CNotifications::Con_SndToggle(IConsole::IResult *pResult, void *pUserData)
 	CNotifications *pSelf = (CNotifications *)pUserData;
 
 	g_Config.m_SndEnable ^= 1;
+	pSelf->m_pClient->UpdateStateMmoMusic();
 	pSelf->m_SoundToggleTime = pSelf->Client()->LocalTime();
 }
 

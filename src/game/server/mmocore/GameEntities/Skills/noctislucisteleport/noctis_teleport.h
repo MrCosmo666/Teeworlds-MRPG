@@ -8,8 +8,7 @@
 class CNoctisTeleport : public CEntity
 {
 public:
-	CNoctisTeleport(CGameWorld *pGameWorld, CCharacter* pPlayerChar, int SkillBonus);
-	virtual ~CNoctisTeleport();
+	CNoctisTeleport(CGameWorld *pGameWorld, vec2 Pos, CCharacter* pPlayerChar, int SkillBonus);
 
 	virtual void Snap(int SnappingClient);
 	virtual void Reset();

@@ -19,7 +19,7 @@ public:
 
 	CControls();
 
-	virtual void OnReset();
+	virtual void OnReset(bool FullRelease = true);
 	virtual void OnRelease();
 	virtual void OnRender();
 	virtual void OnMessage(int MsgType, void *pRawMsg);
