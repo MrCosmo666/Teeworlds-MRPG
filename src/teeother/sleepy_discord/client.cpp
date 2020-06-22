@@ -136,8 +136,11 @@ namespace SleepyDiscord {
 					//{ "code", "message" });	//parse json to get code and message
 					rapidjson::Document document;
 					document.Parse(response.text.c_str());
-						if (!document.IsObject()) {
+						if (!document.IsObject()) 
+						{
 							onError(GENERAL_ERROR, "No error code or message from Discord");
+							restart();
+							return;
 						}
 
 					auto errorCode = document.FindMember("code");
@@ -246,7 +249,7 @@ namespace SleepyDiscord {
 		session.setUrl("https://discordapp.com/api/gateway");
 		Response a = session.request(Get);	//todo change this back to a post
 		if (!a.text.length()) {	//error check
-			quit(false, true);
+			restart();
 			return setError(GATEWAY_FAILED);
 		}
 		if (!theGateway.empty())
@@ -368,7 +371,8 @@ namespace SleepyDiscord {
 		if (quiting) onQuit();
 	}
 
-	void BaseDiscordClient::restart() {
+	void BaseDiscordClient::restart() 
+	{
 		quit(true);
 		connect(theGateway, this, connection);
 		onRestart();
@@ -662,7 +666,7 @@ namespace SleepyDiscord {
 		case SHARDING_REQUIRED:
 		case INVALID_INTENTS:
 		case DISALLOWED_INTENTS:
-			return quit(false, true);
+			return restart();
 			break;
 		}
 		reconnect(1001);
