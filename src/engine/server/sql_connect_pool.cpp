@@ -22,6 +22,9 @@
 	but this implementation is not very narrowly focused
 */
 
+// #####################################################
+// SQL CONNECTION POOL
+// #####################################################
 std::mutex tlock;
 std::shared_ptr<CConectionPool> CConectionPool::m_Instance;
 CConectionPool::CConectionPool()
@@ -52,8 +55,6 @@ CConectionPool& CConectionPool::GetInstance()
 Connection* CConectionPool::CreateConnection()
 {
 	tlock.lock();
-	//
-
 	Connection *pConn = nullptr;
 	while(pConn == nullptr)
 	{
@@ -71,8 +72,6 @@ Connection* CConectionPool::CreateConnection()
 		}
 	}
 	m_connlist.push_back(pConn);
-	
-	//
 	tlock.unlock();
 	return pConn;
 }
@@ -88,8 +87,6 @@ void CConectionPool::DisconnectConnectionHeap()
 void CConectionPool::DisconnectConnection(Connection *pConn)
 {
 	tlock.lock();
-	//
-
 	if (pConn)
 	{
 		try
@@ -104,35 +101,38 @@ void CConectionPool::DisconnectConnection(Connection *pConn)
 	m_connlist.remove(pConn);
 	delete pConn;
 	pConn = nullptr;
-
-	//
 	tlock.unlock();
 }
 
-// выполнить операцию INSERT без задержки по времени
+// #####################################################
+// INSERT SQL
+// #####################################################
 void CConectionPool::ID(const char *Table, const char *Buffer, ...)
 {
 	va_list args;
 	va_start(args, Buffer);
-	IDS(0, Table, Buffer, args);
+	InsertFormated(0, Table, Buffer, args);
 	va_end(args);
 }
 
-// выполнить операцию INSERT после определенного времени
 void CConectionPool::IDS(int Milliseconds, const char *Table, const char *Buffer, ...)
 {
+	va_list args;
+	va_start(args, Buffer);
+	InsertFormated(Milliseconds, Table, Buffer, args);
+	va_end(args);	
+}
+
+void CConectionPool::InsertFormated(int Milliseconds, const char *Table, const char *Buffer, va_list args)
+{
 	char aBuf[1024];
-	va_list VarArgs; 
-	va_start(VarArgs, Buffer);
 	#if defined(CONF_FAMILY_WINDOWS)
-	_vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
+	_vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
 	#else
-	vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
+	vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
 	#endif
-	va_end(VarArgs);
 	aBuf[sizeof(aBuf) - 1] = '\0';
 	std::string Buf = "INSERT INTO " + std::string(Table) + " " + std::string(aBuf) + ";";
-
 	std::thread t([Buf, Milliseconds]()
 	{
 		if(Milliseconds > 0)
@@ -154,30 +154,35 @@ void CConectionPool::IDS(int Milliseconds, const char *Table, const char *Buffer
 	t.detach();
 }
 
-// выполнить операцию UPDATE без задержки по времени
+// #####################################################
+// UPDATE SQL
+// #####################################################
 void CConectionPool::UD(const char *Table, const char *Buffer, ...)
 {
 	va_list args;
 	va_start(args, Buffer);
-	UDS(0, Table, Buffer, args);
+	UpdateFormated(0, Table, Buffer, args);
 	va_end(args);
 }
 
-// выполнить операцию UPDATE после определенного времени
 void CConectionPool::UDS(int Milliseconds, const char *Table, const char *Buffer, ...)
 {
+	va_list args;
+	va_start(args, Buffer);
+	UpdateFormated(Milliseconds, Table, Buffer, args);
+	va_end(args);
+}
+
+void CConectionPool::UpdateFormated(int Milliseconds, const char *Table, const char *Buffer, va_list args)
+{
 	char aBuf[1024];
-	va_list VarArgs;
-	va_start(VarArgs, Buffer);
 	#if defined(CONF_FAMILY_WINDOWS)
-	_vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
+	_vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
 	#else
-	vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
+	vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
 	#endif
-	va_end(VarArgs);
 	aBuf[sizeof(aBuf) - 1] = '\0';
 	std::string Buf = "UPDATE " + std::string(Table) + " SET " + std::string(aBuf) + ";";
-	
 	std::thread t([Buf, Milliseconds]()
 	{
 		if(Milliseconds > 0)
@@ -199,23 +204,40 @@ void CConectionPool::UDS(int Milliseconds, const char *Table, const char *Buffer
 	t.detach();
 }
 
-// выполнить операцию DELETE без задержки по времени
+// #####################################################
+// DELETE SQL
+// #####################################################
 void CConectionPool::DD(const char *Table, const char *Buffer, ...)
 {
+	va_list args;
+	va_start(args, Buffer);
+	DeleteFormated(0, Table, Buffer, args);
+	va_end(args);
+}
+
+void CConectionPool::DDS(int Milliseconds, const char *Table, const char *Buffer, ...)
+{
+	va_list args;
+	va_start(args, Buffer);
+	DeleteFormated(Milliseconds, Table, Buffer, args);
+	va_end(args);
+}
+
+void CConectionPool::DeleteFormated(int Milliseconds, const char *Table, const char *Buffer, va_list args)
+{
 	char aBuf[256];
-	va_list VarArgs;
-	va_start(VarArgs, Buffer);
 	#if defined(CONF_FAMILY_WINDOWS)
-	_vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
+	_vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
 	#else
-	vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
+	vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
 	#endif
-	va_end(VarArgs);
 	aBuf[sizeof(aBuf) - 1] = '\0';
 	std::string Buf = "DELETE FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
-
-	std::thread t([Buf]()
+	std::thread t([Buf, Milliseconds]()
 	{
+		if(Milliseconds > 0)
+			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
+		
 		Connection* pConn = nullptr;
 		try
 		{
@@ -232,7 +254,9 @@ void CConectionPool::DD(const char *Table, const char *Buffer, ...)
 	t.detach();
 }
 
-// выполнить операцию SELECT без потоков
+// #####################################################
+// SELECT SQL
+// #####################################################
 ResultSet *CConectionPool::SD(const char *Select, const char *Table, const char *Buffer, ...)
 {
 	char aBuf[1024];
@@ -246,7 +270,6 @@ ResultSet *CConectionPool::SD(const char *Select, const char *Table, const char 
 	va_end(VarArgs);
 	aBuf[sizeof(aBuf) - 1] = '\0';
 	std::string Buf = "SELECT " + std::string(Select) + " FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
-
 	Connection* pConn = nullptr;
 	ResultSet* m_results = nullptr;
 	try
