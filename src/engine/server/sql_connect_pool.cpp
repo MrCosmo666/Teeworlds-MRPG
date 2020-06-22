@@ -20,6 +20,13 @@
 	And in General, you should review the SQL system, 
 	it works (and has been tested by time and tests), 
 	but this implementation is not very narrowly focused
+
+	This approach works if the old query is not executed before,
+	 a new query it will create a reserve.
+
+	 It may seem that it does not use Pool, 
+	 but in fact it is and is created as a reserve when running
+	 <tlock>
 */
 
 // #####################################################
