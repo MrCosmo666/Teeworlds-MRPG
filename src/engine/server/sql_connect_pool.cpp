@@ -113,9 +113,9 @@ void CConectionPool::DisconnectConnection(Connection *pConn)
 void CConectionPool::ID(const char *Table, const char *Buffer, ...)
 {
 	va_list args;
-    va_start(args, Buffer);
+	va_start(args, Buffer);
 	IDS(0, Table, Buffer, args);
-    va_end(args);
+	va_end(args);
 }
 
 // выполнить операцию INSERT после определенного времени
@@ -158,15 +158,14 @@ void CConectionPool::IDS(int Milliseconds, const char *Table, const char *Buffer
 void CConectionPool::UD(const char *Table, const char *Buffer, ...)
 {
 	va_list args;
-    va_start(args, Buffer);
+	va_start(args, Buffer);
 	UDS(0, Table, Buffer, args);
-    va_end(args);
+	va_end(args);
 }
 
 // выполнить операцию UPDATE после определенного времени
 void CConectionPool::UDS(int Milliseconds, const char *Table, const char *Buffer, ...)
 {
-	// форматируем и передаем уже целый указать чтобы не потерять входные данные
 	char aBuf[1024];
 	va_list VarArgs;
 	va_start(VarArgs, Buffer);
@@ -179,14 +178,11 @@ void CConectionPool::UDS(int Milliseconds, const char *Table, const char *Buffer
 	aBuf[sizeof(aBuf) - 1] = '\0';
 	std::string Buf = "UPDATE " + std::string(Table) + " SET " + std::string(aBuf) + ";";
 	
-	// начинаем поток
 	std::thread t([Buf, Milliseconds]()
 	{
-		// sleep
 		if(Milliseconds > 0)
 			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
 		
-		// получить подключение
 		Connection* pConn = nullptr;
 		try
 		{
@@ -206,7 +202,6 @@ void CConectionPool::UDS(int Milliseconds, const char *Table, const char *Buffer
 // выполнить операцию DELETE без задержки по времени
 void CConectionPool::DD(const char *Table, const char *Buffer, ...)
 {
-	// форматируем и передаем уже целый указать чтобы не потерять входные данные
 	char aBuf[256];
 	va_list VarArgs;
 	va_start(VarArgs, Buffer);
@@ -219,10 +214,8 @@ void CConectionPool::DD(const char *Table, const char *Buffer, ...)
 	aBuf[sizeof(aBuf) - 1] = '\0';
 	std::string Buf = "DELETE FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
 
-	// начинаем поток
 	std::thread t([Buf]()
 	{
-		// получить подключение
 		Connection* pConn = nullptr;
 		try
 		{
@@ -245,19 +238,17 @@ ResultSet *CConectionPool::SD(const char *Select, const char *Table, const char 
 	char aBuf[1024];
 	va_list VarArgs;
 	va_start(VarArgs, Buffer);
-#if defined(CONF_FAMILY_WINDOWS)
+	#if defined(CONF_FAMILY_WINDOWS)
 	_vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
-#else
+	#else
 	vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
-#endif  
+	#endif  
 	va_end(VarArgs);
-
 	aBuf[sizeof(aBuf) - 1] = '\0';
 	std::string Buf = "SELECT " + std::string(Select) + " FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
 
 	Connection* pConn = nullptr;
 	ResultSet* m_results = nullptr;
-
 	try
 	{
 		pConn = SJK.CreateConnection();
