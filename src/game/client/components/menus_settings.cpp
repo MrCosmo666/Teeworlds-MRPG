@@ -728,17 +728,18 @@ void CMenus::RenderLanguageSelection(CUIRect MainView, bool Header)
 			Rect.HMargin(3.0f, &Rect);
 			vec4 Color(1.0f, 1.0f, 1.0f, 1.0f);
 			m_pClient->m_pCountryFlags->Render(r.front().m_CountryCode, &Color, Rect.x, Rect.y, Rect.w, Rect.h, true);
-			Item.m_Rect.y += 2.0f;
 			if(Item.m_Selected)
 			{
-				TextRender()->TextColor(0.0f, 0.0f, 0.0f, 1.0f);
-				TextRender()->TextOutlineColor(1.0f, 1.0f, 1.0f, 0.25f);
-				UI()->DoLabel(&Item.m_Rect, r.front().m_Name, Item.m_Rect.h*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
-				TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-				TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
+				TextRender()->TextColor(CUI::ms_HighlightTextColor);
+				TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
 			}
-			else
-				UI()->DoLabel(&Item.m_Rect, r.front().m_Name, Item.m_Rect.h*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
+			Item.m_Rect.y += 2.0f;
+			UI()->DoLabel(&Item.m_Rect, r.front().m_Name, Item.m_Rect.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_LEFT);
+			if(Item.m_Selected)
+			{
+				TextRender()->TextColor(CUI::ms_DefaultTextColor);
+				TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+			}
 		}
 	}
 
@@ -805,32 +806,30 @@ void CMenus::RenderThemeSelection(CUIRect MainView, bool Header)
 				Graphics()->QuadsEnd();
 			}
 
-			Item.m_Rect.y += 2.0f;
 			char aName[128];
-			if(r.front().m_Name[0])
-			{
-				if(r.front().m_HasDay && r.front().m_HasNight)
-					str_format(aName, sizeof(aName), "%s", r.front().m_Name.cstr());
-				else if(r.front().m_HasDay && !r.front().m_HasNight)
-					str_format(aName, sizeof(aName), "%s (day)", r.front().m_Name.cstr());
-				else if(!r.front().m_HasDay && r.front().m_HasNight)
-					str_format(aName, sizeof(aName), "%s (night)", r.front().m_Name.cstr());
-				else // generic
-					str_format(aName, sizeof(aName), "%s", r.front().m_Name.cstr());
-			}
-			else
+			if(!r.front().m_Name[0])
 				str_copy(aName, "(none)", sizeof(aName));
+			else if(r.front().m_HasDay && r.front().m_HasNight)
+				str_format(aName, sizeof(aName), "%s", r.front().m_Name.cstr());
+			else if(r.front().m_HasDay && !r.front().m_HasNight)
+				str_format(aName, sizeof(aName), "%s (day)", r.front().m_Name.cstr());
+			else if(!r.front().m_HasDay && r.front().m_HasNight)
+				str_format(aName, sizeof(aName), "%s (night)", r.front().m_Name.cstr());
+			else // generic
+				str_format(aName, sizeof(aName), "%s", r.front().m_Name.cstr());
 
 			if(Item.m_Selected)
 			{
-				TextRender()->TextColor(0.0f, 0.0f, 0.0f, 1.0f);
-				TextRender()->TextOutlineColor(1.0f, 1.0f, 1.0f, 0.25f);
-				UI()->DoLabel(&Item.m_Rect, aName, Item.m_Rect.h*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
-				TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-				TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
+				TextRender()->TextColor(CUI::ms_HighlightTextColor);
+				TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
 			}
-			else
-				UI()->DoLabel(&Item.m_Rect, aName, Item.m_Rect.h*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
+			Item.m_Rect.y += 2.0f;
+			UI()->DoLabel(&Item.m_Rect, aName, Item.m_Rect.h* ms_FontmodHeight * 0.8f, CUI::ALIGN_LEFT);
+			if(Item.m_Selected)
+			{
+				TextRender()->TextColor(CUI::ms_DefaultTextColor);
+				TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+			}
 		}
 	}
 
@@ -1151,14 +1150,15 @@ void CMenus::RenderSettingsPlayer(CUIRect MainView)
 			Graphics()->QuadsEnd();
 			if(Item.m_Selected)
 			{
-				TextRender()->TextColor(0.0f, 0.0f, 0.0f, 1.0f);
-				TextRender()->TextOutlineColor(1.0f, 1.0f, 1.0f, 0.25f);
-				UI()->DoLabel(&Label, pEntry->m_aCountryCodeString, 10.0f, CUI::ALIGN_CENTER);
-				TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-				TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
+				TextRender()->TextColor(CUI::ms_HighlightTextColor);
+				TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
 			}
-			else
-				UI()->DoLabel(&Label, pEntry->m_aCountryCodeString, 10.0f, CUI::ALIGN_CENTER);
+			UI()->DoLabel(&Label, pEntry->m_aCountryCodeString, 10.0f, CUI::ALIGN_CENTER);
+			if(Item.m_Selected)
+			{
+				TextRender()->TextColor(CUI::ms_DefaultTextColor);
+				TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+			}
 		}
 	}
 
@@ -1662,19 +1662,15 @@ bool CMenus::DoResolutionList(CUIRect* pRect, CListBox* pListBox,
 
 			if(Item.m_Selected)
 			{
-				TextRender()->TextColor(0.0f, 0.0f, 0.0f, 1.0f);
-				TextRender()->TextOutlineColor(1.0f, 1.0f, 1.0f, 0.25f);
-				Item.m_Rect.y += 2.0f;
-				UI()->DoLabel(&Item.m_Rect, aBuf, Item.m_Rect.h*ms_FontmodHeight*0.8f,
-									CUI::ALIGN_CENTER);
-				TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-				TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
+				TextRender()->TextColor(CUI::ms_HighlightTextColor);
+				TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
 			}
-			else
+			Item.m_Rect.y += 2.0f;
+			UI()->DoLabel(&Item.m_Rect, aBuf, Item.m_Rect.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_CENTER);
+			if(Item.m_Selected)
 			{
-				Item.m_Rect.y += 2.0f;
-				UI()->DoLabel(&Item.m_Rect, aBuf, Item.m_Rect.h*ms_FontmodHeight*0.8f,
-									CUI::ALIGN_CENTER);
+				TextRender()->TextColor(CUI::ms_DefaultTextColor);
+				TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
 			}
 		}
 	}
@@ -1953,7 +1949,7 @@ void CMenus::RenderSettingsSound(CUIRect MainView)
 	CUIRect Label, Button, Sound, Detail, BottomView, Background;
 
 	// render sound menu background
-	int NumOptions = g_Config.m_SndEnable ? 5 : 2;
+	int NumOptions = g_Config.m_SndEnable ? 6 : 2;
 	float ButtonHeight = 20.0f;
 	float Spacing = 2.0f;
 	float BackgroundHeight = (float)(NumOptions+1)*ButtonHeight+(float)NumOptions*Spacing;
@@ -2019,6 +2015,16 @@ void CMenus::RenderSettingsSound(CUIRect MainView)
 			UpdateMusicState();
 		}
 
+		Sound.HSplitTop(Spacing, 0, &Sound);
+		Sound.HSplitTop(ButtonHeight, &Button, &Sound);
+		Button.VSplitLeft(ButtonHeight, 0, &Button);
+		static int s_ButtonSndMusicMRPG = 0;
+		if(DoButton_CheckBox(&s_ButtonSndMusicMRPG, Localize("Enable atmosphere music (MRPG)"), g_Config.m_SndMusicMRPG, &Button))
+		{
+			g_Config.m_SndMusicMRPG ^= 1;
+			m_pClient->UpdateStateMmoMusic();
+		}
+		
 		Sound.HSplitTop(Spacing, 0, &Sound);
 		Sound.HSplitTop(ButtonHeight, &Button, &Sound);
 		Button.VSplitLeft(ButtonHeight, 0, &Button);
@@ -2096,6 +2102,7 @@ void CMenus::RenderSettingsSound(CUIRect MainView)
 			g_Config.m_SndInit = 1;
 		}
 		UpdateMusicState();
+		m_pClient->UpdateStateMmoMusic();
 	}
 
 	// reset button
@@ -2169,10 +2176,12 @@ void CMenus::ResetSettingsSound()
 	g_Config.m_SndEnable = 1;
 	g_Config.m_SndInit = 1;
 	g_Config.m_SndMusic = 1;
+	g_Config.m_SndMusicMRPG = 1;
 	g_Config.m_SndNonactiveMute = 0;
 	g_Config.m_SndRate = 48000;
 	g_Config.m_SndVolume = 100;
 	UpdateMusicState();
+	m_pClient->UpdateStateMmoMusic();
 }
 
 void CMenus::RenderSettings(CUIRect MainView)

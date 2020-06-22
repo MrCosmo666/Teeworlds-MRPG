@@ -208,8 +208,8 @@ int CMenus::DoButton_Menu(CButtonContainer *pBC, const char *pText, int Checked,
 	UI()->DoLabel(&Text, pText, Text.h*ms_FontmodHeight, CUI::ALIGN_CENTER);
 	if(TextFade)
 	{
-		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-		TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
+		TextRender()->TextColor(CUI::ms_DefaultTextColor);
+		TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
 	}
 
 	// UI sounds
@@ -237,8 +237,8 @@ void CMenus::DoButton_KeySelect(CButtonContainer *pBC, const char *pText, int Ch
 	TextRender()->TextColor(1.0f-FadeVal, 1.0f-FadeVal, 1.0f-FadeVal, 1.0f);
 	TextRender()->TextOutlineColor(0.0f+FadeVal, 0.0f+FadeVal, 0.0f+FadeVal, 0.25f);
 	UI()->DoLabel(&Temp, pText, Temp.h*ms_FontmodHeight, CUI::ALIGN_CENTER);
-	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-	TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
+	TextRender()->TextColor(CUI::ms_DefaultTextColor);
+	TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
 }
 
 int CMenus::DoButton_MenuTab(const void *pID, const char *pText, int Checked, const CUIRect *pRect, int Corners)
@@ -255,7 +255,7 @@ int CMenus::DoButton_MenuTab(const void *pID, const char *pText, int Checked, co
 	pRect->HMargin(pRect->h>=20.0f?2.0f:1.0f, &Temp);
 	UI()->DoLabel(&Temp, pText, Temp.h*ms_FontmodHeight, CUI::ALIGN_CENTER);
 
-	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+	TextRender()->TextColor(CUI::ms_DefaultTextColor);
 
 	// UI sounds
 	const void* pLastActiveItem = UI()->GetActiveItem();
@@ -285,8 +285,8 @@ int CMenus::DoButton_MenuTabTop(CButtonContainer *pBC, const char *pText, int Ch
 	TextRender()->TextColor(1.0f-FadeVal, 1.0f-FadeVal, 1.0f-FadeVal, FontAlpha);
 	TextRender()->TextOutlineColor(0.0f+FadeVal, 0.0f+FadeVal, 0.0f+FadeVal, 0.25f*FontAlpha);
 	UI()->DoLabel(&Temp, pText, Temp.h*ms_FontmodHeight, CUI::ALIGN_CENTER);
-	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-	TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
+	TextRender()->TextColor(CUI::ms_DefaultTextColor);
+	TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
 
 	// UI sounds
 	const void* pLastActiveItem = UI()->GetActiveItem();
@@ -322,8 +322,8 @@ int CMenus::DoButton_GridHeader(const void *pID, const char *pText, int Checked,
 
 	if(Checked)
 	{
-		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-		TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
+		TextRender()->TextColor(CUI::ms_DefaultTextColor);
+		TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
 	}
 
 	return UI()->DoButtonLogic(pID, pRect);
@@ -380,7 +380,7 @@ int CMenus::DoButton_CheckBox(const void *pID, const char *pText, int Checked, c
 	{
 		TextRender()->TextColor(0.5f, 0.5f, 0.5f, 1.0f);
 		DoButton_CheckBox_Common(pID, pText, "", pRect, Checked, Locked);
-		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+		TextRender()->TextColor(CUI::ms_DefaultTextColor);
 		return false;
 	}
 	return DoButton_CheckBox_Common(pID, pText, "", pRect, Checked, Locked);
@@ -1355,8 +1355,8 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			TextRender()->TextColor(0.0f, 0.0f, 0.0f, 1.0f);
 			TextRender()->TextOutlineColor(1.0f, 1.0f, 1.0f, 0.25f);
 			UI()->DoLabel(&Box, Localize("Demos"), Box.h*ms_FontmodHeight, CUI::ALIGN_CENTER);
-			TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-			TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
+			TextRender()->TextColor(CUI::ms_DefaultTextColor);
+			TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
 		}
 	}
 
@@ -1404,22 +1404,22 @@ void CMenus::RenderLoading(int WorkedAmount)
 	RenderBackground((Now - s_LoadingStart) / Freq);
 
 	CUIRect Screen = *UI()->Screen();
-	float w = 700;
-	float h = 200;
-	float x = Screen.w/2-w/2;
-	float y = Screen.h/2-h/2;
-	CUIRect Rect = {x, y, w, h};
+	const float w = 700;
+	const float h = 200;
+	const float x = Screen.w / 2 - w / 2;
+	const float y = Screen.h / 2 - h / 2;
+	CUIRect Rect = { x, y, w, h };
 
 	Graphics()->BlendNormal();
 	RenderTools()->DrawRoundRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.5f), 40.0f);
 
 	Rect.y += 20;
-	TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
-	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+	TextRender()->TextColor(CUI::ms_DefaultTextColor);
+	TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
 	UI()->DoLabel(&Rect, "Teeworlds", 48.0f, CUI::ALIGN_CENTER);
 
-	float Percent = m_LoadCurrent / (float)m_LoadTotal;
-	float Spacing = 40.0f;
+	const float Percent = m_LoadCurrent / (float)m_LoadTotal;
+	const float Spacing = 40.0f;
 
 	char aBuf[16];
 	str_format(aBuf, sizeof(aBuf), "%d%%", (int)(100 * Percent));
@@ -1613,6 +1613,7 @@ void CMenus::OnInit()
 	Console()->Chain("remove_friend", ConchainFriendlistUpdate, this);
 	Console()->Chain("snd_enable", ConchainUpdateMusicState, this);
 	Console()->Chain("snd_enable_music", ConchainUpdateMusicState, this);
+	Console()->Chain("snd_enable_music_mrpg", ConchainUpdateMusicState, this);
 
 	RenderLoading(1);	
 	ServerBrowser()->SetType(g_Config.m_UiBrowserPage == PAGE_LAN ? IServerBrowser::TYPE_LAN : IServerBrowser::TYPE_INTERNET);
@@ -2058,14 +2059,15 @@ int CMenus::Render()
 					Graphics()->QuadsEnd();
 					if(i == OldSelected)
 					{
-						TextRender()->TextColor(0.0f, 0.0f, 0.0f, 1.0f);
-						TextRender()->TextOutlineColor(1.0f, 1.0f, 1.0f, 0.25f);
-						UI()->DoLabel(&Label, pEntry->m_aCountryCodeString, 10.0f, CUI::ALIGN_CENTER);
-						TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-						TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
+						TextRender()->TextColor(CUI::ms_HighlightTextColor);
+						TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
 					}
-					else
-						UI()->DoLabel(&Label, pEntry->m_aCountryCodeString, 10.0f, CUI::ALIGN_CENTER);
+					UI()->DoLabel(&Label, pEntry->m_aCountryCodeString, 10.0f, CUI::ALIGN_CENTER);
+					if(i == OldSelected)
+					{
+						TextRender()->TextColor(CUI::ms_DefaultTextColor);
+						TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+					}
 				}
 			}
 
@@ -2240,18 +2242,27 @@ int CMenus::Render()
 
 void CMenus::SetAuthState(bool ShowWindowAuth)
 {
+	// disable auth menu after connection to mrpg
+	if(!g_Config.m_ClShowAuthMenu)
+		return;
+
+	// settings auth menu for mrpg client / enabled auth menu
 	m_ShowAuthWindow = ShowWindowAuth;
-	if(!m_ShowAuthWindow)
+	if(m_ShowAuthWindow)
 	{
-		m_pClient->m_pSounds->Stop(SOUND_MUSIC_MRPG_FESTIVAL);
-		SetActive(EMenuState::NOACTIVE);
-		mem_zero(aAuthResultReason, sizeof(aAuthResultReason));
-	}
-	else
-	{
-		m_pClient->m_pSounds->Play(CSounds::CHN_MMORPG, SOUND_MUSIC_MRPG_FESTIVAL, 0.3f);
+		if(!m_pClient->m_pSounds->IsPlaying(SOUND_MUSIC_MRPG_FESTIVAL))
+			m_pClient->m_pSounds->Play(CSounds::CHN_MMORPG, SOUND_MUSIC_MRPG_FESTIVAL, 0.3f);
+
 		SetActive(EMenuState::AUTHSTATE);
+		return;
 	}
+
+	// disabled auth menu
+	if(m_pClient->m_pSounds->IsPlaying(SOUND_MUSIC_MRPG_FESTIVAL))
+		m_pClient->m_pSounds->Stop(SOUND_MUSIC_MRPG_FESTIVAL);
+
+	SetActive(EMenuState::NOACTIVE);
+	mem_zero(aAuthResultReason, sizeof(aAuthResultReason));
 }
 
 void CMenus::SetActive(int ActiveID)
@@ -2592,6 +2603,7 @@ void CMenus::ConchainUpdateMusicState(IConsole::IResult* pResult, void* pUserDat
 	if(pResult->NumArguments())
 	{
 		pSelf->UpdateMusicState();
+		pSelf->m_pClient->UpdateStateMmoMusic();
 	}
 }
 

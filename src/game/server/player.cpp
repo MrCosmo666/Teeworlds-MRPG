@@ -22,9 +22,7 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	m_PrevTuningParams = *pGS->Tuning();
 	m_NextTuningParams = m_PrevTuningParams;
 	m_MoodState = MOOD_NORMAL;
-	SetLanguage(Server()->GetClientLanguage(ClientID));
 	GS()->SendTuningParams(ClientID);
-
 	if(!IsBot())
 	{
 		Acc().Team = GetStartTeam();
@@ -117,7 +115,7 @@ void CPlayer::PostTick()
 {
 	// update latency value
 	if (Server()->ClientIngame(m_ClientID) && GS()->IsClientEqualWorldID(m_ClientID) && IsAuthed())
-		GetTempData().TempLatencyPing = m_Latency.m_Min;
+		GetTempData().TempLatencyPing = (short)m_Latency.m_Min;
 }
 
 // Тик авторизированного в ::Tick
@@ -334,14 +332,13 @@ void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed,
 		return;
 	}
 
-	int NeedXp = ExpNeed;
-	float getlv = (MyExp * 100.0) / NeedXp;
-	float getexp = (GivedExp * 100.0) / NeedXp;
-	char *Level = GS()->LevelString(100, (int)getlv, 10, ':', ' ');
+	const float GetLevelProgress = (float)(MyExp * 100.0) / (float)ExpNeed;
+	const float GetExpProgress = (float)(GivedExp * 100.0) / (float)ExpNeed;
+	char *Level = GS()->LevelString(100, (int)GetLevelProgress, 10, ':', ' ');
 	char BufferInBroadcast[128];
-	str_format(BufferInBroadcast, sizeof(BufferInBroadcast), "^235Lv%d %s%s %0.2f%%+%0.3f%%(%d)XP\n", MyLevel, Name, Level, getlv, getexp, GivedExp);
+	str_format(BufferInBroadcast, sizeof(BufferInBroadcast), "^235Lv%d %s%s %0.2f%%+%0.3f%%(%d)XP\n", MyLevel, Name, Level, GetLevelProgress, GetExpProgress, GivedExp);
 	GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, BufferInBroadcast);
-	mem_zero(Level, sizeof(Level));
+	delete Level;
 }
 
 bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade, const char *UpgradeName)
@@ -401,7 +398,12 @@ void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
 
 void CPlayer::SetLanguage(const char* pLanguage)
 {
-	str_copy(m_aLanguage, pLanguage, sizeof(m_aLanguage));
+	Server()->SetClientLanguage(m_ClientID, pLanguage);
+}
+
+const char *CPlayer::GetLanguage() const
+{
+	return Server()->GetClientLanguage(m_ClientID);
 }
 
 void CPlayer::UpdateTempData(int Health, int Mana)
@@ -504,11 +506,6 @@ int CPlayer::GetStartMana()
 {
 	int EnchantBonus = GetAttributeCount(Stats::StPiety, true);
 	return 10 + EnchantBonus;
-}
-
-const char* CPlayer::GetLanguage()
-{
-	return m_aLanguage;
 }
 
 void CPlayer::ShowInformationStats()

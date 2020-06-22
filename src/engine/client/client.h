@@ -37,6 +37,7 @@ class CSmoothTime
 	CGraph m_Graph;
 
 	int m_SpikeCounter;
+	int m_BadnessScore; // ranges between -100 (perfect) and MAX_INT
 
 	float m_aAdjustSpeed[2]; // 0 = down, 1 = up
 public:
@@ -44,6 +45,7 @@ public:
 	void SetAdjustSpeed(int Direction, float Value);
 
 	int64 Get(int64 Now);
+	inline int GetStabilityScore() const { return m_BadnessScore; }
 
 	void UpdateInt(int64 Target);
 	void Update(CGraph* pGraph, int64 Target, int TimeLeft, int AdjustDirection);
@@ -224,6 +226,7 @@ public:
 	virtual void Rcon(const char* pCmd);
 
 	virtual bool ConnectionProblems() const;
+	virtual int GetInputtimeMarginStabilityScore();
 
 	virtual bool SoundInitFailed() const { return m_SoundInitFailed; }
 

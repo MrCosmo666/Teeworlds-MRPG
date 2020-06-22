@@ -50,7 +50,7 @@ private:
 	void ChangeState(int State);
 	void StateTick();
 	void SetMobsSpawn(bool AllowedSpawn);
-	void KillAllPlayers();
+	void KillAllPlayers(bool StartDungeonMusic = false);
 
 	void UpdateDoorKeyState();
 	void ResetDoorKeyState();

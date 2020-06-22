@@ -366,5 +366,29 @@
 	{
 		"key": "You start dialogue with {STR}!",
 		"value": "Du begannen einen Dialog mit {STR}!"
+	},
+	{
+		"key": "{INT}. {STR} : Time: {INT} minute(s) {INT} second(s)",
+		"value": "{INT}. {STR} : Zeit: {INT} minute(s) {INT} second(s)"
+	},
+	{
+		"key": "Need to complete quest {STR}",
+		"value": "Müssen quest abschließen {STR}"
+	},
+	{
+		"key": "Voting for the choice of tank!",
+		"value": "Voting für die Wahl des tanks!"
+	},
+	{
+		"key": "Vote for {STR} (Votes: {INT})",
+		"value": "Vote für {STR} (Votes: {INT})"
+	},
+	{
+		"key": "You have {INT} unread messages!",
+		"value": "Sie haben {INT} ungelesene Nachrichten!"
+	},
+	{
+		"key": "Task has not been completed yet!",
+		"value": "Aufgabe ist noch nicht abgeschlossen!"
 	}
 ]}

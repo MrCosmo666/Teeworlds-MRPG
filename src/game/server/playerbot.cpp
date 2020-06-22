@@ -18,7 +18,7 @@ CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int Spaw
 	m_Spawned = true;
 	m_DungeonAllowedSpawn = false;
 	m_PlayerTick[TickState::Respawn] = Server()->Tick();
-	SendClientInfo(-1);
+	(this)->SendClientInfo(-1);
 }
 
 CPlayerBot::~CPlayerBot() 
@@ -30,7 +30,7 @@ CPlayerBot::~CPlayerBot()
 	Msg.m_ClientID = m_ClientID;
 	Msg.m_pReason = "\0";
 	Msg.m_Silent = true;
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1, GetPlayerWorldID());
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1, (this)->GetPlayerWorldID());
 
 	delete m_pCharacter;
 	m_pCharacter = nullptr;

@@ -1,60 +1,208 @@
 #include "client.h"
 
+#if _MSC_VER && !__INTEL_COMPILER
+#pragma warning( disable: 4100 ) //warns about unused parameters with names
+#pragma warning( disable: 4458 ) //warns about variables that hide class members
+#endif
+
 namespace SleepyDiscord {
-	void BaseDiscordClient::onReady(std::string* jsonMessage) { return; }
-	void BaseDiscordClient::onResumed(std::string * jsonMessage) { return; }
-	void BaseDiscordClient::onDeleteServer(std::string * jsonMessage) { return; }
-	void BaseDiscordClient::onEditServer(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onBan(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onUnban(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onMember(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onRemoveMember(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onDeleteMember(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onEditMember(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onRole(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onDeleteRole(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onEditRole(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onEditEmojis(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onMemberChunk(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onDeleteChannel(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onEditChannel(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onPinMessage(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onPresenceUpdate(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onEditUser(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onEditUserNote(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onEditUserSettings(std::string * jsonMessage)  { return; }
-	void BaseDiscordClient::onEditVoiceState(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onTyping(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onDeleteMessage(std::string * jsonMessage)  { return; }
-	void BaseDiscordClient::onEditMessage(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onBulkDelete(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onEditVoiceServer(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onServerSync(std::string * jsonMessage)  { return; }
-	void BaseDiscordClient::onRelationship(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onRemoveRelationship(std::string * jsonMessage)  { return; }
-	void BaseDiscordClient::onDeleteRelationship(std::string * jsonMessage)  { return; }
-	void BaseDiscordClient::onReaction(std::string * jsonMessage)  { return; }
-	void BaseDiscordClient::onRemoveReaction(std::string * jsonMessage)  { return; }
-	void BaseDiscordClient::onDeleteReaction(std::string * jsonMessage)  { return; }
-	void BaseDiscordClient::onRemoveAllReaction(std::string * jsonMessage)  { return; }
-	void BaseDiscordClient::onDeleteAllReaction(std::string * jsonMessage)  { return; }
-	void BaseDiscordClient::onMessage(Message message)  { return; }
-	void BaseDiscordClient::onEditedMessage(std::string* jsonMessage)  { return; }
-	void BaseDiscordClient::onHeartbeat()  { return; }
-	void BaseDiscordClient::onHeartbeatAck()  { return; } 
-	void BaseDiscordClient::onServer(Server jsonMessage)  { return; } 
-	void BaseDiscordClient::onChannel(std::string* jsonMessage)  { return; } 
-	void BaseDiscordClient::onEditedRole(std::string* jsonMessage)  { return; } 
-	void BaseDiscordClient::onDispatch(std::string * jsonMessage)  { return; } 
-	void BaseDiscordClient::onInvaldSession()  { return; } 
-	void BaseDiscordClient::onDisconnect()  { return; } 
-	void BaseDiscordClient::onResume()  { return; } 
-	void BaseDiscordClient::runAsync()  { return; } 
-	void BaseDiscordClient::run()  { return; } 
-	void BaseDiscordClient::onQuit()  { return; } 
-	void SleepyDiscord::BaseDiscordClient::onResponse(Response response)  { return; } 
-	void BaseDiscordClient::sleep(const unsigned int milliseconds)  { return; } 
-	void BaseDiscordClient::fileRead(const char* path, std::string*const file)  { return; } 
-	void BaseDiscordClient::tick(float deltaTime)  { return; } 
-	void BaseDiscordClient::onError(ErrorCode errorCode, std::string errorMessage)  { return; } 
+	void BaseDiscordClient::onReady(Ready readyData) {
+
+	}
+
+	void BaseDiscordClient::onResumed() {
+
+	}
+
+	void BaseDiscordClient::onDeleteServer(UnavailableServer server) {
+
+	}
+
+	void BaseDiscordClient::onEditServer(Server server) {
+
+	}
+
+	void BaseDiscordClient::onBan(Snowflake<Server> serverID, User user) {
+
+	}
+
+	void BaseDiscordClient::onUnban(Snowflake<Server> serverID, User user) {
+
+	}
+
+	void BaseDiscordClient::onMember(Snowflake<Server> serverID, ServerMember member) {
+
+	}
+
+	void BaseDiscordClient::onRemoveMember(Snowflake<Server> serverID, User user) {
+
+	}
+
+
+	void BaseDiscordClient::onEditMember(Snowflake<Server> serverID, User user, std::vector<Snowflake<Role>> roles, std::string nick) {
+
+	}
+
+	void BaseDiscordClient::onRole(Snowflake<Server> serverID, Role role) {
+
+	}
+
+	void BaseDiscordClient::onDeleteRole(Snowflake<Server> serverID, Snowflake<Role> roleID) {
+
+	}
+
+	void BaseDiscordClient::onEditRole(Snowflake<Server> serverID, Role role) {
+
+	}
+
+	void BaseDiscordClient::onEditEmojis(Snowflake<Server> serverID, std::vector<Emoji> emojis) {
+
+	}
+
+	void BaseDiscordClient::onMemberChunk(Snowflake<Server> serverID, std::vector<ServerMember> members) {
+
+	}
+
+	void BaseDiscordClient::onDeleteChannel(Channel channel) {
+
+	}
+
+	void BaseDiscordClient::onEditChannel(Channel channel) {
+
+	}
+
+	void BaseDiscordClient::onPinMessage(Snowflake<Channel> channelID, std::string lastPinTimestamp) {
+
+	}
+
+	void BaseDiscordClient::onPresenceUpdate(PresenceUpdate presenseUpdate) {
+
+	}
+
+	void BaseDiscordClient::onEditUser(User user) {
+
+	}
+
+	void BaseDiscordClient::onEditUserNote(const json::Value& jsonMessage) {
+
+	}
+
+	void BaseDiscordClient::onEditUserSettings(const json::Value& jsonMessage) {
+
+	}
+
+	void BaseDiscordClient::onEditVoiceState(VoiceState& state) {
+
+	}
+
+	void BaseDiscordClient::onTyping(Snowflake<Channel> channelID, Snowflake<User> userID, time_t timestamp) {
+
+	}
+
+	void BaseDiscordClient::onDeleteMessages(Snowflake<Channel> channelID, std::vector<Snowflake<Message>> messages) {
+
+	}
+
+	void BaseDiscordClient::onEditMessage(MessageRevisions revisioins) {
+
+	}
+
+	void BaseDiscordClient::onEditVoiceServer(VoiceServerUpdate& voiceServerUpdate) {
+
+	}
+
+	void BaseDiscordClient::onServerSync(const json::Value& jsonMessage) {
+
+	}
+
+	void BaseDiscordClient::onRelationship(const json::Value& jsonMessage) {
+
+	}
+
+	void BaseDiscordClient::onDeleteRelationship(const json::Value& jsonMessage) {
+
+	}
+
+	void BaseDiscordClient::onReaction(Snowflake<User> userID, Snowflake<Channel> channelID, Snowflake<Message> messageID, Emoji emoji) {
+
+	}
+
+	void BaseDiscordClient::onDeleteReaction(Snowflake<User> userID, Snowflake<Channel> channelID, Snowflake<Message> messageID, Emoji emoji) {
+
+	}
+
+	void BaseDiscordClient::onDeleteAllReaction(Snowflake<Server> serverID, Snowflake<Channel> channelID, Snowflake<Message> messageID) {
+
+	}
+
+	void BaseDiscordClient::onMessage(Message message) {
+		
+	}
+
+	void BaseDiscordClient::onHeartbeat() {
+
+	}
+
+	void BaseDiscordClient::onHeartbeatAck() {
+
+	}
+
+	void BaseDiscordClient::onServer(Server jsonMessage) {
+	
+	}
+
+	void BaseDiscordClient::onChannel(Channel channel) {
+
+	}
+
+	void BaseDiscordClient::onDispatch(const json::Value& jsonMessage) {
+
+	}
+
+	void BaseDiscordClient::onInvaldSession() {
+
+	}
+
+	void BaseDiscordClient::onDisconnect() {
+
+	}
+
+	void BaseDiscordClient::onResume() {
+
+	}
+
+	void BaseDiscordClient::runAsync() {
+
+	}
+
+	void BaseDiscordClient::run() {
+
+	}
+
+	void BaseDiscordClient::onQuit() {
+
+	}
+
+	void SleepyDiscord::BaseDiscordClient::onResponse(Response response) {
+	}
+
+	void BaseDiscordClient::sleep(const unsigned int milliseconds) {
+	
+	}
+	
+	void BaseDiscordClient::fileRead(const char* path, std::string*const file) {
+
+	}
+
+	void BaseDiscordClient::tick(float deltaTime) {
+	
+	}
+	
+	void BaseDiscordClient::onError(ErrorCode errorCode, std::string errorMessage) {
+		
+	}
+
+	Timer BaseDiscordClient::schedule(TimedTask code, const time_t millisecondsTilDueTime) {
+		return Timer([]() {});
+	}
 }

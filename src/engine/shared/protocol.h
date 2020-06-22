@@ -92,6 +92,7 @@ enum
 
 	MAX_NAME_LENGTH=16,
 	MAX_CLAN_LENGTH=12,
+	MAX_LANGUAGE_LENGTH=8,
 
 	// message packing
 	MSGFLAG_VITAL=1,

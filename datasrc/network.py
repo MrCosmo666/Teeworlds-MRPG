@@ -24,7 +24,7 @@ GameMsgIDs = Enum("GAMEMSG", ["TEAM_SWAP", "SPEC_INVALIDID", "TEAM_SHUFFLE", "TE
 WorldType = Enum("WORLD", ["STANDARD", "CUTSCENE", "DUNGEON"])
 TalkedStyles = Enum("TALK_STYLE", ["STANDARD", "AGRESSIVE", "HAPPED"])
 MoodType = Enum("MOOD", ["ANGRY", "AGRESSED_TANK", "AGRESSED_OTHER", "NORMAL", "FRIENDLY", "QUESTING", "PLAYER_TANK"])
-MmoPickups = Enum("MMO_PICKUP", ["BOX", "EXPERIENCE", "PLANT", "ORE", "ARROW", "DROP"])
+MmoPickups = Enum("MMO_PICKUP", ["BOX", "EXPERIENCE", "PLANT", "ORE", "SIDE_ARROW", "MAIN_ARROW", "DROP"])
 Equip = Enum("EQUIP", ["HAMMER", "GUN", "SHOTGUN", "GRENADE", "RIFLE", "MINER", "WINGS", "DISCORD"])
 Effects = Enum("EFFECT", ["SPASALON", "TELEPORT"])
 AuthCodes = Enum("AUTH", ["ALL_UNKNOWN", "ALL_MUSTCHAR", "REGISTER_GOOD", "LOGIN_GOOD", "LOGIN_ALREADY", 
@@ -289,8 +289,8 @@ Objects = [
     
     ## mmotee events
 	NetEvent("MmoDamage:Common", [
-		NetIntRange("m_ClientID", 0, 'MAX_CLIENTS-1'),
 		NetIntAny("m_DamageCount"),
+		NetBool("m_CritDamage"),
 	]),
 
 	NetEvent("EffectMmo:Common", [
@@ -630,6 +630,13 @@ Messages = [
 		NetStringStrict("m_pText"),
 		NetIntAny("m_pCount"),
 		NetIntAny("m_pRequires"),
+	]),
+
+    # music on map
+	NetMessage("Sv_WorldMusic",
+	[
+		NetIntAny("m_pSoundID"),
+		NetIntRange("m_pVolume", 1, 10),
 	]),
 
 ]

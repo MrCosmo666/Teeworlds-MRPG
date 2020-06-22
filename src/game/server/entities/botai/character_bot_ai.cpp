@@ -105,14 +105,17 @@ bool CCharacterBotAI::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	// проверка при смерте
 	if(BotDie)
 	{
-		for(const auto& ld : m_ListDmgPlayers)
+		if(Weapon != WEAPON_SELF && Weapon != WEAPON_WORLD)
 		{
-			const int ParseClientID = ld.first;
-			CPlayer* pPlayer = GS()->GetPlayer(ParseClientID, true, true);
-			if(!pPlayer || ParseClientID == m_pBotPlayer->GetCID() || distance(pPlayer->m_ViewPos, m_Core.m_Pos) > 1000.0f)
-				continue;
+			for(const auto& ld : m_ListDmgPlayers)
+			{
+				const int ParseClientID = ld.first;
+				CPlayer* pPlayer = GS()->GetPlayer(ParseClientID, true, true);
+				if(!pPlayer || ParseClientID == m_pBotPlayer->GetCID() || distance(pPlayer->m_ViewPos, m_Core.m_Pos) > 1000.0f)
+					continue;
 
-			DieRewardPlayer(pPlayer, Force);
+				DieRewardPlayer(pPlayer, Force);
+			}
 		}
 		m_ListDmgPlayers.clear();
 		ClearTarget();
@@ -146,6 +149,7 @@ void CCharacterBotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 	const int ClientID = pPlayer->GetCID();
 	const int BotID = m_pBotPlayer->GetBotID();
 	const int SubID = m_pBotPlayer->GetBotSub();
+	const float LuckyDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
 
 	if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 		GS()->Mmo()->Quest()->AddMobProgress(pPlayer, BotID);
@@ -157,19 +161,20 @@ void CCharacterBotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 		if (DropItem <= 0 || CountItem <= 0)
 			continue;
 
-		const float RandomDrop = BotJob::MobBot[SubID].RandomItem[i];
+		const float RandomDrop = clamp(BotJob::MobBot[SubID].RandomItem[i] + LuckyDrop, 0.0f, 100.0f);
 		CreateRandomDropItem(ClientID, RandomDrop, DropItem, CountItem, ForceDies);
 	}
 
 	const int MultiplierExperience = kurosio::computeExperience(BotJob::MobBot[SubID].Level) / g_Config.m_SvKillmobsIncreaseLevel;
-	const int MultiplierRaid = clamp(GS()->IncreaseCountRaid(MultiplierExperience), 1, GS()->IncreaseCountRaid(MultiplierExperience));
+	const int MultiplierRaid = clamp(GS()->IncreaseExperienceRaid(MultiplierExperience), 1, GS()->IncreaseExperienceRaid(MultiplierExperience));
 	pPlayer->AddExp(MultiplierRaid);
 
-	const int MultiplierDrops = clamp(MultiplierRaid / 2, 1, MultiplierRaid);
+	const int MultiplierDrops = max(MultiplierRaid / 2, 1);
 	GS()->CreateDropBonuses(m_Core.m_Pos, 1, MultiplierDrops, (1+random_int() % 2), ForceDies);
 
-	const int MultiplierGolds = BotJob::MobBot[SubID].Power / g_Config.m_SvStrongGold;
+	const int MultiplierGolds = max(BotJob::MobBot[SubID].Power / g_Config.m_SvStrongGold, 1);
 	pPlayer->AddMoney(MultiplierGolds);
+	
 	if (random_int() % 80 == 0)
 	{
 		pPlayer->GetItem(itSkillPoint).Add(1);
@@ -303,15 +308,6 @@ void CCharacterBotAI::EngineQuestMob()
 void CCharacterBotAI::EngineMobs()
 {
 	ResetInput();
-	const int MobID = m_pBotPlayer->GetBotSub();
-	bool WeaponedBot = (BotJob::MobBot[MobID].Spread >= 1);
-	if(WeaponedBot)
-	{
-		if(BotJob::MobBot[MobID].Boss)
-			ShowProgress();
-		ChangeWeapons();
-	}
-
 	CPlayer* pPlayer = SearchTenacityPlayer(1000.0f);
 	if(pPlayer && pPlayer->GetCharacter())
 	{
@@ -321,7 +317,27 @@ void CCharacterBotAI::EngineMobs()
 	else if(Server()->Tick() > m_pBotPlayer->m_LastPosTick)
 		m_pBotPlayer->m_TargetPos = vec2(0, 0);
 
+	// effect sleppy
+	const int MobID = m_pBotPlayer->GetBotSub();
+	if(m_BotTargetID == m_pBotPlayer->GetCID() && str_comp(BotJob::MobBot[MobID].Behavior, "Sleepy") == 0)
+	{
+		if(Server()->Tick() % (Server()->TickSpeed() / 2) == 0)
+		{
+			GS()->SendEmoticon(m_pBotPlayer->GetCID(), EMOTICON_ZZZ);
+			SetEmote(EMOTE_BLINK, 1);
+		}
+		return;
+	}
+
+	bool WeaponedBot = (BotJob::MobBot[MobID].Spread >= 1);
+	if(WeaponedBot)
+	{
+		if(BotJob::MobBot[MobID].Boss)
+			ShowProgress();
+		ChangeWeapons();
+	}
 	Move();
+		
 	m_PrevPos = m_Pos;
 	if(m_Input.m_Direction)
 		m_PrevDirection = m_Input.m_Direction;

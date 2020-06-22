@@ -705,8 +705,8 @@ int CMenus::DoBrowserEntry(const void *pID, CUIRect View, const CServerInfo *pEn
 		UI()->ClipDisable();
 	}
 
-	TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
-	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+	TextRender()->TextColor(CUI::ms_DefaultTextColor);
+	TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
 
 	return ReturnValue;
 }
@@ -882,8 +882,8 @@ void CMenus::RenderServerbrowserOverlay()
 		CUIRect Screen = *UI()->Screen();
 		float ButtonHeight = 20.0f;
 
-		TextRender()->TextOutlineColor(1.0f, 1.0f, 1.0f, 0.25f);
-		TextRender()->TextColor(0.0f, 0.0f, 0.0f, 1.0f);
+		TextRender()->TextColor(CUI::ms_HighlightTextColor);
+		TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
 
 		if(pInfo && pInfo->m_NumClients)
 		{
@@ -1009,8 +1009,8 @@ void CMenus::RenderServerbrowserOverlay()
 			UI()->DoLabel(&View, Localize("no players", "server browser message"), View.h*ms_FontmodHeight*0.8f, CUI::ALIGN_CENTER);
 		}
 
-		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-		TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
+		TextRender()->TextColor(CUI::ms_DefaultTextColor);
+		TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
 	}
 
 	// deactivate it
@@ -1413,7 +1413,7 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 	UI()->DoLabel(&Label, Localize("Search:"), FontSize, CUI::ALIGN_LEFT);
 	EditBox.VSplitRight(EditBox.h, &EditBox, &Button);
 	static float s_ClearOffset = 0.0f;
-	if(DoEditBox(&g_Config.m_BrFilterString, &EditBox, g_Config.m_BrFilterString, sizeof(g_Config.m_BrFilterString), FontSize, &s_ClearOffset, false, CUI::CORNER_ALL))
+	if(DoEditBox(&g_Config.m_BrFilterString, &EditBox, g_Config.m_BrFilterString, sizeof(g_Config.m_BrFilterString), FontSize, &s_ClearOffset, false, CUI::CORNER_L))
 	{
 		Client()->ServerBrowserUpdate();
 		ServerBrowserFilterOnUpdate();
@@ -1421,7 +1421,7 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 	// clear button
 	{
 		static CButtonContainer s_ClearButton;
-		if(DoButton_SpriteID(&s_ClearButton, IMAGE_TOOLICONS, SPRITE_TOOL_X_A, false, &Button, CUI::CORNER_ALL, 5.0f, true))
+		if(DoButton_SpriteID(&s_ClearButton, IMAGE_TOOLICONS, SPRITE_TOOL_X_A, false, &Button, CUI::CORNER_R, 5.0f, true))
 		{
 			g_Config.m_BrFilterString[0] = 0;
 			UI()->SetActiveItem(&g_Config.m_BrFilterString);
@@ -1953,7 +1953,7 @@ void CMenus::RenderServerbrowserFilterTab(CUIRect View)
 	static char s_aGametype[16] = { 0 };
 	static float s_OffsetGametype = 0.0f;
 	Button.VSplitRight(Button.h, &Label, &Button);
-	DoEditBox(&s_OffsetGametype, &Label, s_aGametype, sizeof(s_aGametype), FontSize, &s_OffsetGametype);
+	DoEditBox(&s_OffsetGametype, &Label, s_aGametype, sizeof(s_aGametype), FontSize, &s_OffsetGametype, false, CUI::CORNER_L);
 	RenderTools()->DrawUIRect(&Button, vec4(1.0f, 1.0f, 1.0f, 0.25f), CUI::CORNER_R, 5.0f);
 	DoIcon(IMAGE_FRIENDICONS, UI()->MouseInside(&Button) ? SPRITE_FRIEND_PLUS_A : SPRITE_FRIEND_PLUS_B, &Button);
 	static CButtonContainer s_AddGametype;
@@ -2277,9 +2277,9 @@ void CMenus::RenderDetailScoreboard(CUIRect View, const CServerInfo* pInfo, int 
 			if(s)
 			{
 				TextRender()->TextEx(&Cursor, pName, (int)(s - pName));
-				TextRender()->TextColor(TextHighlightColor.r, TextHighlightColor.g, TextHighlightColor.b, TextColor.a);
+				TextRender()->TextColor(CUI::ms_HighlightTextColor);
 				TextRender()->TextEx(&Cursor, s, str_length(g_Config.m_BrFilterString));
-				TextRender()->TextColor(TextColor);
+				TextRender()->TextColor(CUI::ms_DefaultTextColor);
 				TextRender()->TextEx(&Cursor, s + str_length(g_Config.m_BrFilterString), -1);
 			}
 			else
@@ -2299,9 +2299,9 @@ void CMenus::RenderDetailScoreboard(CUIRect View, const CServerInfo* pInfo, int 
 			if(s)
 			{
 				TextRender()->TextEx(&Cursor, pClan, (int)(s - pClan));
-				TextRender()->TextColor(TextHighlightColor.r, TextHighlightColor.g, TextHighlightColor.b, TextColor.a);
+				TextRender()->TextColor(CUI::ms_HighlightTextColor);
 				TextRender()->TextEx(&Cursor, s, str_length(g_Config.m_BrFilterString));
-				TextRender()->TextColor(TextColor);
+				TextRender()->TextColor(CUI::ms_DefaultTextColor);
 				TextRender()->TextEx(&Cursor, s + str_length(g_Config.m_BrFilterString), -1);
 			}
 			else
@@ -2335,7 +2335,7 @@ void CMenus::RenderServerbrowserServerDetail(CUIRect View, const CServerInfo *pI
 	RenderTools()->DrawUIRect(&ServerHeader, vec4(1, 1, 1, 0.25f), CUI::CORNER_T, 4.0f);
 	ServerHeader.HMargin(2.0f, &ServerHeader);
 	UI()->DoLabel(&ServerHeader, Localize("Scoreboard"), 12.0f, CUI::ALIGN_CENTER);
-	RenderDetailScoreboard(ServerScoreboard, pInfo, 0, vec4(1.0f, 1.0f, 1.0f, 1.0f), vec4(0.0f, 0.0f, 0.0f, 0.3f));
+	RenderDetailScoreboard(ServerScoreboard, pInfo, 0, CUI::ms_DefaultTextColor, CUI::ms_DefaultTextOutlineColor);
 }
 
 void CMenus::FriendlistOnUpdate()
@@ -2360,7 +2360,7 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 	char aBuf[256];
 
 	// Update Button
-	int State = m_pClient->Updater()->GetCurrentState();
+	const int State = m_pClient->Updater()->GetCurrentState();
 	if (NeedUpdate && State <= IUpdater::CLEAN)
 	{
 		str_format(aBuf, sizeof(aBuf), Localize("Mmotee %s is available"), Client()->LatestVersion());
@@ -2376,6 +2376,11 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 		char aCurrentFile[64];
 		m_pClient->Updater()->GetCurrentFile(aCurrentFile, sizeof(aCurrentFile));
 		str_format(aBuf, sizeof(aBuf), Localize("Downloading %s"), aCurrentFile);
+
+		// update now
+		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
+		static CButtonContainer s_ButtonUpdate;
+		DoButton_Menu(&s_ButtonUpdate, Localize("Updating ..."), 1, &Button);
 	}
 	else if (State == IUpdater::NEED_RESTART)
 	{
@@ -2399,12 +2404,6 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 			Client()->RequestMmoInfo();
 	}
 
-	// text information
-	MainView.HSplitTop(30.0f, 0, &Label); // text for update
-	Label.VSplitRight(g_Config.m_ClGBrowser ? 435.0f : 350.0f, 0, &Label);
-	UI()->DoLabel(&Label, aBuf, 11.0f, CUI::ALIGN_CENTER);
-	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
-
 	// refresh
 	MainView.VSplitLeft(Spacing, 0, &MainView); // little space
 	MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
@@ -2418,6 +2417,11 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 		else if (m_MenuPage == PAGE_FAVORITES)
 			ServerBrowser()->Refresh(IServerBrowser::REFRESHFLAG_INTERNET);
 	}
+
+	// text information
+	Button.HSplitTop(30.0f, 0, &Label); // text for update
+	UI()->DoLabel(&Label, aBuf, 11.0f, CUI::ALIGN_CENTER);
+	TextRender()->TextColor(CUI::ms_DefaultTextColor);
 
 	// connect
 	MainView.VSplitLeft(Spacing, 0, &MainView); // little space

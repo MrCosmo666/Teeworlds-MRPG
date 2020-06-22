@@ -71,7 +71,9 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 	if(!pPlayer) 
 		return SendAuthCode(ClientID, AUTH_ALL_UNKNOWN);
 	
-	if(str_length(Login) > 12 || str_length(Login) < 4 || str_length(Password) > 12 || str_length(Password) < 4)
+	const int LengthLogin = str_length(Login);
+	const int LengthPassword = str_length(Password);
+	if(LengthLogin > 12 || LengthLogin < 4 || LengthPassword > 12 || LengthPassword < 4)
 	{
 		GS()->ChatFollow(ClientID, "Username / Password must contain 4-12 characters");
 		return SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
@@ -97,10 +99,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 			return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
 		}
 
-		const char *pPlayerLanguage = CHECKACCESS->getString("Language").c_str();
-		GS()->Server()->SetClientLanguage(ClientID, pPlayerLanguage);
-		pPlayer->SetLanguage(pPlayerLanguage);
-
+		pPlayer->SetLanguage(CHECKACCESS->getString("Language").c_str());
 		str_copy(pPlayer->Acc().Login, clear_Login.cstr(), sizeof(pPlayer->Acc().Login));
 		str_copy(pPlayer->Acc().Password, clear_Pass.cstr(), sizeof(pPlayer->Acc().Password));
 		str_copy(pPlayer->Acc().LastLogin, CHECKACCESS->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().LastLogin));
@@ -114,8 +113,8 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		pPlayer->Acc().WorldID = ACCOUNTDATA->getInt("WorldID");
 		for (const auto& at : CGS::AttributInfo)
 		{
-			if (str_comp_nocase(at.second.FieldName, "unfield") == 0) continue;
-			pPlayer->Acc().Stats[at.first] = ACCOUNTDATA->getInt(at.second.FieldName);
+			if (str_comp_nocase(at.second.FieldName, "unfield") != 0)
+				pPlayer->Acc().Stats[at.first] = ACCOUNTDATA->getInt(at.second.FieldName);
 		}
 
 		GS()->Chat(ClientID, "- - - - - - - [Successful login] - - - - - - -");
@@ -140,11 +139,14 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	const int ClientID = pPlayer->GetCID();
 	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 200, "You are located {STR} ({STR})", 
 		GS()->Server()->GetWorldName(GS()->GetWorldID()), (GS()->IsAllowedPVP() ? "Zone PVP" : "Safe zone"));
+
+	// поставить муызку если не данж в данже появится музыка после открытия дверей а не по приходу в зону // 0 отправить музыку с CGS::m_MusicID
+	GS()->SendMapMusic(ClientID, (GS()->IsDungeon() ? -1 : 0));
 	if(!FirstInitilize)
 	{
 		const int CountMessageInbox = Job()->Inbox()->GetActiveInbox(pPlayer);
 		if (CountMessageInbox > 0)
-			GS()->Chat(ClientID, "You have {INT} unread messages. Check your Mailbox!", &CountMessageInbox);
+			GS()->Chat(ClientID, "You have {INT} unread messages!", &CountMessageInbox);
 
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		GS()->SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
@@ -293,7 +295,6 @@ bool AccountMainJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int V
 	if (PPSTR(CMD, "SELECTLANGUAGE") == 0)
 	{
 		const char *pSelectedLanguage = GS()->Server()->Localization()->m_pLanguages[VoteID]->GetFilename();
-		GS()->Server()->SetClientLanguage(ClientID, pSelectedLanguage);
 		pPlayer->SetLanguage(pSelectedLanguage);
 		GS()->Chat(ClientID, "You chosen a language \"{STR}\".", pSelectedLanguage);
 		GS()->VResetVotes(ClientID, MenuList::MENU_SELECT_LANGUAGE);

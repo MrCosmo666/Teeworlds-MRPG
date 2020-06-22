@@ -50,6 +50,7 @@ MACRO_CONFIG_INT(SndAsyncLoading, snd_async_loading, 1, 0, 1, CFGFLAG_CLIENT | C
 MACRO_CONFIG_INT(SndEnableUI, snd_enable_ui, 1, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Enable interface sounds")
 MACRO_CONFIG_INT(SndEnableUIHover, snd_enable_ui_hover, 1, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Enable on-hover interface sounds")
 MACRO_CONFIG_INT(SndEnableRace, snd_enable_race, 1, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Enable race sounds (checkpoints)")
+MACRO_CONFIG_INT(SndMusicMRPG, snd_enable_music_mrpg, 1, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Enable MMORPG music")
 
 MACRO_CONFIG_INT(GfxScreen, gfx_screen, 0, 0, 0, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Screen index")
 MACRO_CONFIG_INT(GfxScreenWidth, gfx_screen_width, 0, 0, 0, CFGFLAG_SAVE|CFGFLAG_CLIENT, "Screen resolution width")

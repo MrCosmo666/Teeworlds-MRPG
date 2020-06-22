@@ -53,7 +53,7 @@ int AccountMinerJob::GetOreHealth(vec2 Pos) const
 void AccountMinerJob::Work(CPlayer *pPlayer, int Level)
 {
 	const int ClientID = pPlayer->GetCID();
-	int MultiplierExperience = kurosio::computeExperience(Level) / g_Config.m_SvMiningIncreaseLevel;
+	const int MultiplierExperience = kurosio::computeExperience(Level) / g_Config.m_SvMiningIncreaseLevel;
 	pPlayer->Acc().Miner[MnrExp] += clamp(MultiplierExperience, 1, MultiplierExperience);
 
 	int ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().Miner[MnrLevel]);
@@ -69,6 +69,7 @@ void AccountMinerJob::Work(CPlayer *pPlayer, int Level)
 			GS()->CreateDeath(pPlayer->GetCharacter()->m_Core.m_Pos, ClientID);
 			GS()->CreateText(pPlayer->GetCharacter(), false, vec2(0, -40), vec2(0, -1), 40, "miner up");
 		}
+		ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().Miner[MnrLevel]);
 		GS()->ChatFollow(ClientID, "Miner Level UP. Now Level {INT}!", &pPlayer->Acc().Miner[MnrLevel]);
 	}
 	pPlayer->ProgressBar("Miner", pPlayer->Acc().Miner[MnrLevel], pPlayer->Acc().Miner[MnrExp], ExperienceNeed, MultiplierExperience);

@@ -348,25 +348,36 @@ void CEffects::MmoEffectPotion(vec2 Pos, const char* Potion, bool Added)
 	m_pClient->m_pParticles->Add(CParticles::GROUP_DAMAGEMMO, &p);
 }
 
-void CEffects::DamageMmoInd(vec2 Pos, const char* pText, int Type)
+void CEffects::DamageMmoInd(vec2 Pos, int DamageCount, bool CritDamage)
 {
-	const int Damage = string_to_number(pText, 1, 10000000);
-	const int IncreaseSizeDamage = min(Damage, 30);
-
+	const int IncreaseSize = min(DamageCount, 28);
+	
 	CParticle p;
 	p.SetDefault();
 	p.m_Pos = Pos;
-	p.m_Vel = vec2(-5 + rand() % 10, -5 + rand() % 10) * 50 * (1 + IncreaseSizeDamage * 0.025f);
-	p.m_LifeSpan = 1.0f + IncreaseSizeDamage * 0.025f;
-	p.m_StartSize = 18.0f + IncreaseSizeDamage * 0.5f;
-	p.m_EndSize = 18.0f + IncreaseSizeDamage * 0.3f;
+	p.m_Vel = vec2(-5 + rand() % 10, -5 + rand() % 10) * 50 * (40 * 0.025f);
+	p.m_LifeSpan = 1.8f;
 	p.m_Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	p.m_Rot = 0;
 	p.m_Rotspeed = 0;
-	p.m_Gravity = 0;
-	p.m_Friction = 0.9f;
+	p.m_Gravity = 0.7f;
 	p.m_FlowAffected = 0.0f;
-	str_copy(p.m_TextBuf, pText, sizeof(p.m_TextBuf));
+	p.m_Friction = 0.9f;
+	
+	if(CritDamage)
+	{
+		p.m_StartSize = 22.0f + IncreaseSize * 0.5f;
+		p.m_EndSize = 22.0f + IncreaseSize * 0.3f;
+		p.m_Color = vec4(1.0f, 0.80f, 0.2f, 1.0f);
+		str_format(p.m_TextBuf, sizeof(p.m_TextBuf), "Crit %d", DamageCount);
+	}
+	else
+	{
+		p.m_StartSize = 18.0f + IncreaseSize * 0.5f;
+		p.m_EndSize = 18.0f + IncreaseSize * 0.3f;
+		p.m_Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		str_format(p.m_TextBuf, sizeof(p.m_TextBuf), "%d", DamageCount);
+	}
 	m_pClient->m_pParticles->Add(CParticles::GROUP_DAMAGEMMO, &p);
 }
 

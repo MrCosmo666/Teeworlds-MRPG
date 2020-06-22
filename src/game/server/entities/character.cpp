@@ -664,6 +664,7 @@ bool CCharacter::IncreaseMana(int Amount)
 void CCharacter::Die(int Killer, int Weapon)
 {
 	// change to safe zone
+	m_Alive = false;
 	const int ClientID = m_pPlayer->GetCID();
 	if(Weapon != WEAPON_WORLD && !GS()->IsDungeon())
 	{
@@ -683,7 +684,6 @@ void CCharacter::Die(int Killer, int Weapon)
 		}
 	}
 
-	m_Alive = false;
 	m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed() / 2;
 	if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
@@ -718,6 +718,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 	Dmg = (From == m_pPlayer->GetCID() ? max(1, Dmg/2) : max(1, Dmg));
 
+	int CritDamage = 0;
 	CPlayer* pFrom = GS()->GetPlayer(From);
 	if(From != m_pPlayer->GetCID() && pFrom->GetCharacter())
 	{
@@ -755,7 +756,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 		TempInt = pFrom->GetAttributeCount(Stats::StDirectCriticalHit, true);
 		if(!pFrom->IsBot() && random_int()%5000 < min(TempInt, 2200))
 		{
-			const int CritDamage = pFrom->GetAttributeCount(Stats::StCriticalHit, true);
+			CritDamage = max(pFrom->GetAttributeCount(Stats::StCriticalHit, true), 1);
 			Dmg = Dmg * 2 + (CritDamage + random_int()%9);
 			pFrom->GetCharacter()->SetEmote(EMOTE_ANGRY, 2);
 			GS()->SendEmoticon(From, EMOTICON_EXCLAMATION);
@@ -778,7 +779,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	}
 	
 	// create healthmod indicator
-	GS()->CreateDamage(m_Pos, m_pPlayer->GetCID(), OldHealth-m_Health, false);
+	GS()->CreateDamage(m_Pos, m_pPlayer->GetCID(), OldHealth-m_Health, (bool)(CritDamage > 0), false);
 
 	if(From != m_pPlayer->GetCID())
 		GS()->CreatePlayerSound(From, SOUND_HIT);

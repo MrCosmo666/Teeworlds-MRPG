@@ -72,7 +72,6 @@ void CPathfinder::SetStart(vec2 Pos)
 void CPathfinder::SetEnd(vec2 Pos)
 {
 	int Index = GetIndex((int)(Pos.x / 32), (int)(Pos.y / 32));
-
 	m_lNodes[Index].m_Parent = END;
 	m_EndIndex = Index;
 }
