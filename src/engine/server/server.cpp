@@ -1857,7 +1857,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 				continue;
 
 			Buffer.append_at(Buffer.length(), Server()->ClientName(i));
-			Buffer.append_at(Buffer.length(), "\\n");
+			Buffer.append_at(Buffer.length(), "\n");
 		}
 		if(Buffer.length() <= 0)
 		{
