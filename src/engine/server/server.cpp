@@ -1873,7 +1873,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	{
 		SendMessage(std::string(message.channelID).c_str(), DC_DISCORD_INFO, "Commands / Information", 
 		"`!mconnect` - Info for connect your discord and account in game."
-		"\n`!mstats <symbol>` - See stats players. Minimal 4 symbols."
+		"\n`!mstats <symbol>` - See stats players. Minimal 1 symbols."
 		"\n`!monline` - Show players ingame.");
 	}
 	// отправить из дискорд чата на сервер
@@ -1882,7 +1882,12 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		std::string Nickname("D|" + message.author.username);
 		m_pServer->GameServer(FREE_SLOTS_WORLD)->FakeChat(Nickname.c_str(), message.content.c_str());
 	}
-
+	// добавить реакцию в ideas-voting
+	else if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordIdeasChanal) == 0)
+	{
+		addReaction(message.channelID, message, "%E2%9C%85");
+		addReaction(message.channelID, message, "%E2%9D%8C");
+	}
 }
 
 void DiscordJob::SendStatus(const char *Status, int Type)
