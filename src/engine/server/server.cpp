@@ -1879,9 +1879,8 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	// отправить из дискорд чата на сервер
 	else if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordChanal) == 0)
 	{
-		char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "Discord(%s#%s): %s", message.author.username.c_str(), message.author.discriminator.c_str(), message.content.c_str());
-		m_pServer->GameServer(0)->Chat(-1, aBuf);
+		std::string Nickname("D|" + message.author.username);
+		m_pServer->GameServer(FREE_SLOTS_WORLD)->FakeChat(Nickname.c_str(), message.content.c_str());
 	}
 
 }

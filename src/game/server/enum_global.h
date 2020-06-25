@@ -60,6 +60,7 @@ enum
 	LOCALWORLD = 0,							// локальный мир
 	COUNT_WORLD = 11,						// кол-во миров
 	LAST_WORLD = COUNT_WORLD - 1,			// последний мир
+	FREE_SLOTS_WORLD = 7,					// мир в котором есть слоты для фейк мобов
 
 	MAX_DROPPED_FROM_MOBS = 5,
 };

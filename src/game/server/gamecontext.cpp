@@ -354,7 +354,10 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 	if(Mode == CHAT_ALL)
 	{
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
-		ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
+		
+		// send discord chat only from players
+		if(ChatterClientID < MAX_PLAYERS)
+			ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
 	}
 	else if(Mode == CHAT_TEAM)
 	{
@@ -367,7 +370,11 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 
 		// pack one for the recording only
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOSEND, -1);
-		ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
+
+		// send discord chat only from players
+		if(ChatterClientID < MAX_PLAYERS)
+			ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
+
 		for(int i = 0; i < MAX_PLAYERS; i++)
 		{
 			CPlayer *pSearchPlayer = GetPlayer(i, true);
@@ -381,6 +388,44 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ChatterClientID);
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, To);
 	}
+}
+
+// Fake чат тип игрок в игре
+void CGS::FakeChat(const char *pName, const char *pText)
+{
+	const int FakeClientID = CreateBot(BotsTypes::TYPE_BOT_FAKE, 1, 1);
+	if(FakeClientID < 0 || FakeClientID > MAX_CLIENTS || !m_apPlayers[FakeClientID])
+		return;
+
+	// выкинуть игрока
+	CNetMsg_Sv_ClientDrop LeaveMsg;
+	LeaveMsg.m_ClientID = FakeClientID;
+	LeaveMsg.m_pReason = "\0";
+	LeaveMsg.m_Silent = true;
+	Server()->SendPackMsg(&LeaveMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
+
+	// обновить информацию
+	CNetMsg_Sv_ClientInfo ClientInfoMsg;
+	ClientInfoMsg.m_ClientID = FakeClientID;
+	ClientInfoMsg.m_Local = false;
+	ClientInfoMsg.m_Team = TEAM_BLUE;
+	ClientInfoMsg.m_pName = pName;
+	ClientInfoMsg.m_pClan = "::Bots::";
+	ClientInfoMsg.m_Country = 137;
+	ClientInfoMsg.m_Silent = true;
+	for (int p = 0; p < 6; p++)
+	{
+		ClientInfoMsg.m_apSkinPartNames[p] = "standard";
+		ClientInfoMsg.m_aUseCustomColors[p] = true;
+		ClientInfoMsg.m_aSkinPartColors[p] = 0;
+	}
+	Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
+
+	// отправить чат и удалить игрока и выкинуть игрока
+	SendChat(FakeClientID, CHAT_ALL, -1, pText);
+	delete m_apPlayers[FakeClientID];
+	m_apPlayers[FakeClientID] = 0;
+	Server()->SendPackMsg(&LeaveMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
 }
 
 // Отправить форматированное сообщение
@@ -2187,17 +2232,18 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 /* #########################################################################
 	MMO GAMECONTEXT 
 ######################################################################### */
-void CGS::CreateBot(short BotType, int BotID, int SubID)
+int CGS::CreateBot(short BotType, int BotID, int SubID)
 {
 	int BotClientID = MAX_PLAYERS;
 	while(BotClientID < MAX_CLIENTS && m_apPlayers[BotClientID])
 		BotClientID++;
 	if (BotClientID >= MAX_CLIENTS)
-		return;
+		return -1;
 
 	Server()->InitClientBot(BotClientID);
 	const int savecidmem = BotClientID+m_WorldID*MAX_CLIENTS;
 	m_apPlayers[BotClientID] = new(savecidmem) CPlayerBot(this, BotClientID, BotID, SubID, BotType);
+	return BotClientID;
 }
 
 // Удалить ботов что не активны у людей для квестов

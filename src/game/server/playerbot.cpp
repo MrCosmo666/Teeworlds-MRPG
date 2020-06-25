@@ -308,7 +308,7 @@ void CPlayerBot::TickThreadMobsPathFinder()
 
 void CPlayerBot::SendClientInfo(int TargetID)
 {
-	if(TargetID != -1 && (TargetID < 0 || TargetID >= MAX_PLAYERS || !Server()->ClientIngame(TargetID)))
+	if(TargetID != -1 && (TargetID < 0 || TargetID >= MAX_PLAYERS || !Server()->ClientIngame(TargetID)) || m_BotType == BotsTypes::TYPE_BOT_FAKE)
 		return;
 
 	CNetMsg_Sv_ClientInfo ClientInfoMsg;

@@ -286,6 +286,7 @@ enum BotsTypes
 	TYPE_BOT_MOB = 1,
 	TYPE_BOT_QUEST = 2,
 	TYPE_BOT_NPC = 3,
+	TYPE_BOT_FAKE = 4,
 };
 
 enum
