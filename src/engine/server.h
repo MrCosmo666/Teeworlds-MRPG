@@ -129,6 +129,7 @@ public:
 
 	virtual bool IsClientReady(int ClientID) const = 0;
 	virtual bool IsClientPlayer(int ClientID) const = 0;
+	virtual void Chat(int ClientID, const char* pText, ...) = 0;
 
 	virtual const char *GameType() const = 0;
 	virtual const char *Version() const = 0;

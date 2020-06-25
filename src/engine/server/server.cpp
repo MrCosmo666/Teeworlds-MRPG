@@ -1876,6 +1876,14 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		"\n`!mstats <symbol>` - See stats players. Minimal 4 symbols."
 		"\n`!monline` - Show players ingame.");
 	}
+	// отправить из дискорд чата на сервер
+	else if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordChanal) == 0)
+	{
+		char aBuf[256];
+		str_format(aBuf, sizeof(aBuf), "Discord(%s#%s): %s", message.author.username.c_str(), message.author.discriminator.c_str(), message.content.c_str());
+		m_pServer->GameServer(0)->Chat(-1, aBuf);
+	}
+
 }
 
 void DiscordJob::SendStatus(const char *Status, int Type)
