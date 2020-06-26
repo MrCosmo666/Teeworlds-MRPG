@@ -28,7 +28,7 @@ using namespace std;
 
 	 It may seem that it does not use Pool, 
 	 but in fact it is and is created as a reserve when running
-	 <ThreadLock>
+	 <tlock>
 */
 
 // #####################################################
