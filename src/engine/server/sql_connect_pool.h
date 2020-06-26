@@ -13,8 +13,8 @@ class CConectionPool
 	CConectionPool();
 	
 	static std::shared_ptr<CConectionPool> m_Instance;
-	std::list<class Connection*>m_connlist;
-	class Driver *m_pdriver;
+	std::list<class Connection*>m_ConnList;
+	class Driver *m_pDriver;
 
 	void InsertFormated(int Milliseconds, const char *Table, const char *Buffer, va_list args);
 	void UpdateFormated(int Milliseconds, const char *Table, const char *Buffer, va_list args);
@@ -24,7 +24,7 @@ public:
 	~CConectionPool();
 
 	class Connection* CreateConnection();
-	void DisconnectConnection(class Connection* pConn);
+	void DisconnectConnection(class Connection* pConnection);
 	void DisconnectConnectionHeap();
 	static CConectionPool& GetInstance();
 
