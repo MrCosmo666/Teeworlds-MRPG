@@ -170,6 +170,7 @@ public:
 	void SendGameMsg(int GameMsgID, int ClientID);
 	void SendGameMsg(int GameMsgID, int ParaI1, int ClientID);
 	void SendGameMsg(int GameMsgID, int ParaI1, int ParaI2, int ParaI3, int ClientID);
+	void UpdateClientInformation(int ClientID);
 
 	void SendChatCommand(const CCommandManager::CCommand* pCommand, int ClientID);
 	void SendChatCommands(int ClientID);

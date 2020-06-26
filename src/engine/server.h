@@ -83,6 +83,7 @@ public:
 	
 	// Bots
 	virtual void InitClientBot(int ClientID) = 0;
+	virtual void BackInformationFakeClient(int FakeClientID) = 0;
 
 	virtual int SnapNewID() = 0;
 	virtual void SnapFreeID(int ID) = 0;
@@ -120,6 +121,7 @@ public:
 
 	virtual void ChangeWorld(int ClientID) = 0;
 	virtual void UpdateQuestsBot(int QuestID, int Step) = 0;
+	virtual void UpdateClientInformation(int FakeClientID) = 0;
 
 	virtual void OnClientConnected(int ClientID) = 0;
 	virtual void OnClientEnter(int ClientID) = 0;

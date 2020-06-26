@@ -419,6 +419,12 @@ void CServer::QuestBotUpdateOnWorld(int WorldID, int QuestID, int Step)
 	GameServer(WorldID)->UpdateQuestsBot(QuestID, Step);
 }
 
+void CServer::BackInformationFakeClient(int FakeClientID)
+{
+	for(int i = 0; i < COUNT_WORLD; i++)
+		GameServer(i)->UpdateClientInformation(FakeClientID);
+}
+
 int CServer::GetWorldID(int ClientID)
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)

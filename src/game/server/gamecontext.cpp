@@ -420,12 +420,13 @@ void CGS::FakeChat(const char *pName, const char *pText)
 		ClientInfoMsg.m_aSkinPartColors[p] = 0;
 	}
 	Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
-
+	
 	// отправить чат и удалить игрока и выкинуть игрока
 	SendChat(FakeClientID, CHAT_ALL, -1, pText);
 	delete m_apPlayers[FakeClientID];
 	m_apPlayers[FakeClientID] = 0;
 	Server()->SendPackMsg(&LeaveMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
+	Server()->BackInformationFakeClient(FakeClientID);
 }
 
 // Отправить форматированное сообщение
@@ -891,6 +892,16 @@ void CGS::SendGameMsg(int GameMsgID, int ParaI1, int ParaI2, int ParaI3, int Cli
 	Msg.AddInt(ParaI2);
 	Msg.AddInt(ParaI3);
 	Server()->SendMsg(&Msg, MSGFLAG_VITAL, ClientID);
+}
+
+// Отправить информацию о клиенте
+void CGS::UpdateClientInformation(int ClientID)
+{
+	CPlayer *pPlayer = GetPlayer(ClientID, false, false);
+	if(!pPlayer)
+		return;
+	
+	pPlayer->SendClientInfo(-1);
 }
 
 void CGS::SendChatCommand(const CCommandManager::CCommand* pCommand, int ClientID)

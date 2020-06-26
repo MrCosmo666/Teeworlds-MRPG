@@ -236,6 +236,7 @@ public:
 	virtual void ChangeWorld(int ClientID, int WorldID);
 	virtual void QuestBotUpdateOnWorld(int WorldID, int QuestID, int Step);
 	virtual int GetWorldID(int ClientID);
+	virtual void BackInformationFakeClient(int FakeClientID);
 
 	virtual void SetClientVersion(int ClientID, int Version);
 	virtual int GetClientVersion(int ClientID);
