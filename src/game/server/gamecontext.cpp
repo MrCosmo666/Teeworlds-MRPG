@@ -902,6 +902,7 @@ void CGS::UpdateClientInformation(int ClientID)
 		return;
 	
 	pPlayer->SendClientInfo(-1);
+	SendEquipItem(ClientID, -1);
 }
 
 void CGS::SendChatCommand(const CCommandManager::CCommand* pCommand, int ClientID)
