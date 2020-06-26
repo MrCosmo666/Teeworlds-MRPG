@@ -79,6 +79,13 @@ class DiscordJob : public SleepyDiscord::DiscordClient
 	std::vector<SleepyDiscord::Role> RoleList;
 
 	void onMessage(SleepyDiscord::Message message) override;
+	void onReaction(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
+						SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID, SleepyDiscord::Emoji emoji) override;
+	void onDeleteReaction(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
+						SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID, SleepyDiscord::Emoji emoji) override;
+	void UpdateMessageIdeas(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
+						SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID);
+
 
 public:
 	using SleepyDiscord::DiscordClient::DiscordClient;

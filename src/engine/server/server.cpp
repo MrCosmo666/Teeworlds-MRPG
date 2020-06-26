@@ -1772,7 +1772,7 @@ void DiscordJob::SetServer(CServer *pServer)
 
 void DiscordJob::onMessage(SleepyDiscord::Message message) 
 {
-	if(message.length() <= 0 || !g_Config.m_SvCreateDiscordBot)
+	if(message.length() <= 0 || !g_Config.m_SvCreateDiscordBot || message.author == getCurrentUser().cast())
 	 	return;
 
 	// статистика
@@ -1882,12 +1882,48 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		std::string Nickname("D|" + message.author.username);
 		m_pServer->GameServer(FREE_SLOTS_WORLD)->FakeChat(Nickname.c_str(), message.content.c_str());
 	}
-	// добавить реакцию в ideas-voting
+	// контрорирование ideas-voting
 	else if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordIdeasChanal) == 0)
 	{
-		addReaction(message.channelID, message, "%E2%9C%85");
-		addReaction(message.channelID, message, "%E2%9D%8C");
+		deleteMessage(message.channelID, message);
+
+		SleepyDiscord::Embed embed;
+		embed.title = std::string("Suggestion");
+		embed.color = 431050;
+
+		SleepyDiscord::EmbedThumbnail embedthumb;
+		embedthumb.url = message.author.avatarUrl();
+		embedthumb.proxyUrl = message.author.avatarUrl();
+		embed.thumbnail = embedthumb;
+
+		SleepyDiscord::EmbedFooter embedfooter;
+		embedfooter.text = "Use reactions for voting!";
+		embedfooter.iconUrl = message.author.avatarUrl();
+		embedfooter.proxyIconUrl = message.author.avatarUrl();
+		embed.footer = embedfooter;
+		embed.description = "From:" + message.author.showUser() + "!\n" + message.content;
+
+		SleepyDiscord::Message pMessage = sendMessage(message.channelID, "\0", embed);
+		addReaction(message.channelID, pMessage, "%E2%9C%85");
+		addReaction(message.channelID, pMessage, "%E2%9D%8C");
 	}
+}
+
+void DiscordJob::onReaction(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
+SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID, SleepyDiscord::Emoji emoji)
+{ 
+}
+
+void DiscordJob::onDeleteReaction(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
+SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID, SleepyDiscord::Emoji emoji)
+{
+}
+
+void DiscordJob::UpdateMessageIdeas(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
+SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID)
+{
+	if(userID == getCurrentUser().cast())
+		return;
 }
 
 void DiscordJob::SendStatus(const char *Status, int Type)
