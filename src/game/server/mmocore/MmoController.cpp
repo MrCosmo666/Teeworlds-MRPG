@@ -284,4 +284,17 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Level {INT} : Exp {INT}", &Rank, Nick, &Level, &Experience);
 		}
 	}
+	else if (TypeID == ToplistTypes::PLAYERS_WEALTHY)
+	{
+		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_items", "WHERE ItemID = '%d' ORDER BY Count DESC LIMIT 10", (int)itGold));
+		while (RES->next())
+		{
+			char Nick[64];
+			const int Rank = RES->getRow();
+			const int Gold = RES->getInt("Count");
+			const int OwnerID = RES->getInt("OwnerID");
+			str_copy(Nick, PlayerName(OwnerID), sizeof(Nick));
+			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Gold {INT}", &Rank, Nick, &Gold);
+		}
+	}
 }
