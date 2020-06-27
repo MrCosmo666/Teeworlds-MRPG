@@ -1089,6 +1089,7 @@ void GuildJob::ChangeRankAccess(int RankID)
 			RankGuild[RankID].Access = GuildAccess::ACCESS_NO;
 
 		const int GuildID = RankGuild[RankID].GuildID;
+		AddHistoryGuild(GuildID, "Rank '%s' access updated to '%s'.", RankGuild[RankID].Rank, AccessNames(RankGuild[RankID].Access));
 		SJK.UD("tw_guilds_ranks", "Access = '%d' WHERE ID = '%d' AND GuildID = '%d'", RankGuild[RankID].Access, RankID, GuildID);
 		GS()->ChatGuild(GuildID, "Rank [{STR}] changes [{STR}]!", RankGuild[RankID].Rank, AccessNames(RankGuild[RankID].Access));
 	}	
