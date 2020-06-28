@@ -1,7 +1,6 @@
 #ifndef ENGINE_SERVER_SQL_CONNECTIONPOOL_H
 #define ENGINE_SERVER_SQL_CONNECTIONPOOL_H
 
-#include <stdarg.h>
 #include <boost/scoped_ptr.hpp>
 #include <cppconn/statement.h>
 

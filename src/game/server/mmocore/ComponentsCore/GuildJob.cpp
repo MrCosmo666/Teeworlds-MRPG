@@ -374,9 +374,10 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			return true;
 		}
 
-		if (str_length(pPlayer->GetTempData().m_aRankGuildBuf) < 2)
+		const int lenRank = str_length(pPlayer->GetTempData().m_aRankGuildBuf);
+		if (lenRank < 2 || lenRank > 16)
 		{
-			GS()->Chat(ClientID, "Minimal symbols 2.");
+			GS()->Chat(ClientID, "Minimal 2, maximal 16 symbols.");
 			return true;
 		}
 
