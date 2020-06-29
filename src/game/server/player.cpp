@@ -538,7 +538,7 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 		if(GS()->IsDungeon())
 		{
 			GetTempData().TempDungeonReady ^= true;
-			GS()->Chat(m_ClientID, "You have set the ready mode to {STR}!", GetTempData().TempDungeonReady ? "ready" : "not ready");
+			GS()->Chat(m_ClientID, "You change the ready mode to {STR}!", GetTempData().TempDungeonReady ? "ready" : "not ready");
 			return true;
 		}
 	}
