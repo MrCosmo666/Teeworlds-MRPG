@@ -237,8 +237,6 @@ void CServerBan::ConBanExt(IConsole::IResult *pResult, void *pUser)
 
 void CServer::CClient::Reset()
 {
-	str_copy(m_aLanguage, "en", sizeof(m_aLanguage));
-
 	// reset input
 	for(int i = 0; i < 200; i++)
 		m_aInputs[i].m_GameTick = -1;
@@ -391,7 +389,7 @@ const char *CServer::GetWorldName(int WorldID)
 const char* CServer::GetClientLanguage(int ClientID) const
 {
 	if (ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
-		return "unknow";
+		return "en";
 	return m_aClients[ClientID].m_aLanguage;
 }
 
@@ -793,6 +791,7 @@ void CServer::DoSnapshot(int WorldID)
 int CServer::NewClientCallback(int ClientID, void *pUser)
 {
 	CServer *pThis = (CServer *)pUser;
+	str_copy(pThis->m_aClients[ClientID].m_aLanguage, "en", sizeof(pThis->m_aClients[ClientID].m_aLanguage));
 	pThis->GameServer(LOCALWORLD)->ClearClientData(ClientID);
 	pThis->m_aClients[ClientID].m_State = CClient::STATE_AUTH;
 	pThis->m_aClients[ClientID].m_aName[0] = 0;
