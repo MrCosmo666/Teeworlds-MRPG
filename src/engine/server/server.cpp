@@ -518,6 +518,7 @@ int CServer::Init()
 	WorldCheckTime = false;
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
+		str_copy(m_aClients[i].m_aLanguage, "en", sizeof(m_aClients[i].m_aLanguage));
 		m_aClients[i].m_State = CClient::STATE_EMPTY;
 		m_aClients[i].m_aName[0] = 0;
 		m_aClients[i].m_aClan[0] = 0;

@@ -646,13 +646,13 @@ int ItemJob::GetCountItemsType(CPlayer *pPlayer, int Type) const
 const char *ItemJob::ClassItemInformation::GetName(CPlayer *pPlayer) const
 {
 	if(!pPlayer) return Name;
-	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), _(Name));	
+	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), Name);	
 }
 
 const char *ItemJob::ClassItemInformation::GetDesc(CPlayer *pPlayer) const
 {
 	if(!pPlayer) return Desc;
-	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), _(Desc));	
+	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), Desc);	
 }
 
 bool ItemJob::ClassItemInformation::IsEnchantable() const

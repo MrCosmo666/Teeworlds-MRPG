@@ -275,8 +275,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		for(int i = 0; i < GS()->Server()->Localization()->m_pLanguages.size(); i++)
 		{
 			// Не показывать в списках выбора язык который выбран уже у игрока
-			const char *pLanguageFile = GS()->Server()->Localization()->m_pLanguages[i]->GetFilename();
-			if(str_comp(pPlayerLanguage, pLanguageFile) == 0)
+			if(str_comp(pPlayerLanguage, GS()->Server()->Localization()->m_pLanguages[i]->GetFilename()) == 0)
 				continue;
 
 			// Добавить выбор языка
