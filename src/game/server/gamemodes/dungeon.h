@@ -22,6 +22,7 @@ class CGameControllerDungeon : public IGameController
 	int m_StateDungeon;
 	int m_DungeonID;
 	int m_WorldID;
+	int m_LastStartingTick;
 	int m_StartingTick;
 	int m_FinishedTick;
 	int m_SafeTick;

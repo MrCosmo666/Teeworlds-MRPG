@@ -61,6 +61,7 @@ void CGameControllerDungeon::ChangeState(int State)
 		m_MaximumTick = 0;
 		m_FinishedTick = 0;
 		m_StartingTick = 0;
+		m_LastStartingTick = 0;
 		m_SafeTick = 0;
 		m_TankClientID = -1;
 		m_ShowedTankingInfo = false;
@@ -168,10 +169,16 @@ void CGameControllerDungeon::StateTick()
 					continue;
 				ReadyPlayers++;
 			}
-			if(m_StartedPlayers == ReadyPlayers && m_StartingTick > 10 * Server()->TickSpeed())
+			if(ReadyPlayers >= m_StartedPlayers && m_StartingTick > 10 * Server()->TickSpeed())
 			{
-				GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Time was reduce to 10 seconds. Players are ready!");
+				m_LastStartingTick = m_StartingTick;
 				m_StartingTick = 10 * Server()->TickSpeed();
+			}
+			else if(ReadyPlayers < m_StartedPlayers && m_LastStartingTick > 0)
+			{
+				const int SkippedTick = 10 * Server()->TickSpeed() - m_StartingTick;
+				m_StartingTick = m_LastStartingTick - SkippedTick;
+				m_LastStartingTick = 0;
 			}
 
 			// показать время до начала
