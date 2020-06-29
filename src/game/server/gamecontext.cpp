@@ -990,7 +990,7 @@ void CGS::UpdateDiscordStatus()
 	int Players = 0;
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(Server()->ClientIngame(i))
+		if(m_apPlayers[i])
 			Players++;
 	}
 
@@ -2301,7 +2301,7 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 // Создать Лол текст в мире
 void CGS::CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText)
 {
-	if(!CheckPlayersDistance(Pos, 800))
+	if(!CheckingPlayersDistance(Pos, 800))
 		return;
 
 	CLoltext Text;
@@ -2443,7 +2443,7 @@ const char* CGS::AtributeName(int BonusID) const
 	return "Has no stats";
 }
 
-bool CGS::CheckPlayersDistance(vec2 Pos, float Distance) const
+bool CGS::CheckingPlayersDistance(vec2 Pos, float Distance) const
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{

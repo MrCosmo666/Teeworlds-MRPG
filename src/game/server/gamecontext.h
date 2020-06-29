@@ -288,7 +288,7 @@ public:
 	bool IsAllowedPVP() const { return m_AllowedPVP; }
 	const char* AtributeName(int BonusID) const;
 
-	bool CheckPlayersDistance(vec2 Pos, float Distance) const;
+	bool CheckingPlayersDistance(vec2 Pos, float Distance) const;
 	void SetRespawnWorld(int WorldID) { m_RespawnWorld = WorldID; }
 	void SetMapMusic(int SoundID) { m_MusicID = SoundID; }
 	int GetRespawnWorld() const { return m_RespawnWorld; }

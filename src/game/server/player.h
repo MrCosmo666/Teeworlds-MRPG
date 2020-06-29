@@ -100,7 +100,6 @@ public:
 	virtual	int GetMana() { return GetTempData().TempMana; };
 
 	virtual int IsActiveSnappingBot(int SnappingClient) const { return 2; };
-	virtual void SetDungeonAllowedSpawn(bool Spawn) { return; };
 	virtual int GetEquippedItem(int EquipID, int SkipItemID = -1) const;
 	virtual int GetAttributeCount(int BonusID, bool Really = false, bool Searchclass = false);
 	virtual void UpdateTempData(int Health, int Mana);

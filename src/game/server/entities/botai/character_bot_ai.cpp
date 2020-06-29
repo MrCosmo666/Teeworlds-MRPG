@@ -221,7 +221,7 @@ bool CCharacterBotAI::GiveWeapon(int Weapon, int GiveAmmo)
 
 void CCharacterBotAI::Tick()
 {
-	m_BotActive = GS()->CheckPlayersDistance(m_Core.m_Pos, 1000.0f);
+	m_BotActive = GS()->CheckingPlayersDistance(m_Core.m_Pos, 1000.0f);
 	if(!m_BotActive || !IsAlive())
 		return;
 
