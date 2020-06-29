@@ -55,9 +55,7 @@ bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 	{
 		m_Core.m_LostData = true;
 		const int Function = BotJob::NpcBot[SubBotID].Function;
-		if(Function == FunctionsNPC::FUNCTION_NPC_NURSE)
-			new CEntityFunctionNurse(&GS()->m_World, m_pBotPlayer->GetCID(), m_Core.m_Pos);
-		else if(Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST)
+		if(Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST)
 			CreateSnapProj(GetSnapFullID(), 3, PICKUP_ARMOR, false, false);
 	}
 	return true;
@@ -674,36 +672,4 @@ bool CCharacterBotAI::FunctionNurseNPC()
 		PlayerFinding = true;
 	}
 	return PlayerFinding;
-}
-
-CEntityFunctionNurse::CEntityFunctionNurse(CGameWorld* pGameWorld, int ClientID, vec2 Pos)
-	: CEntity(pGameWorld, CGameWorld::ENTTYPE_EVENTS, Pos)
-{
-	m_OwnerID = ClientID;
-	GameWorld()->InsertEntity(this);
-}
-void CEntityFunctionNurse::Tick()
-{
-	if(!GS()->m_apPlayers[m_OwnerID] || !GS()->m_apPlayers[m_OwnerID]->GetCharacter())
-	{
-		GS()->m_World.DestroyEntity(this);
-		return;
-	}
-
-	CCharacter* pOwnerChar = GS()->m_apPlayers[m_OwnerID]->GetCharacter();
-	vec2 Direction = normalize(vec2(pOwnerChar->m_LatestInput.m_TargetX, pOwnerChar->m_LatestInput.m_TargetY));
-	m_Pos = pOwnerChar->m_Core.m_Pos + normalize(Direction) * (28.0f);
-}
-void CEntityFunctionNurse::Snap(int SnappingClient)
-{
-	if(NetworkClipped(SnappingClient))
-		return;
-
-	CNetObj_Pickup* pP = static_cast<CNetObj_Pickup*>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
-	if(!pP)
-		return;
-
-	pP->m_X = (int)m_Pos.x;
-	pP->m_Y = (int)m_Pos.y;
-	pP->m_Type = PICKUP_HEALTH;
 }
