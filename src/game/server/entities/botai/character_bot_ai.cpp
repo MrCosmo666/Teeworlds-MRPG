@@ -667,7 +667,7 @@ bool CCharacterBotAI::FunctionNurseNPC()
 		str_format(aBuf, sizeof(aBuf), "%dHP", Health);
 		GS()->CreateText(NULL, false, DrawPosition, vec2(0, 0), 40, aBuf);
 		new CHearth(&GS()->m_World, m_Pos, pFindPlayer, Health, pFindPlayer->GetCharacter()->m_Core.m_Vel);
-
+	
 		m_Input.m_Direction = 0;
 		PlayerFinding = true;
 	}

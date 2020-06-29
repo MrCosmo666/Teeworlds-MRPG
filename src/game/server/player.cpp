@@ -534,6 +534,11 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 	// - - - - - F3- - - - - - -
 	if (Vote == 1)
 	{
+		if(GS()->IsDungeon())
+		{
+			GetTempData().TempDungeonReady ^= true;
+			GS()->Chat(m_ClientID, "You have set the ready mode to {STR}!", GetTempData().TempDungeonReady ? "ready" : "not ready");
+		}
 	}
 	// - - - - - F4- - - - - - -
 	else
@@ -773,6 +778,7 @@ void CPlayer::ChangeWorld(int WorldID)
 {
 	// reset dungeon temp data
 	GetTempData().TempAlreadyVotedDungeon = false;
+	GetTempData().TempDungeonReady = false;
 	GetTempData().TempTankVotingDungeon = 0;
 	GetTempData().TempTimeDungeon = 0;
 
