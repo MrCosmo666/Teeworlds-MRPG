@@ -447,7 +447,7 @@ bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)
 
 	const int GotAmmo = (int)(IsHammer ? -1 : (m_aWeapons[WeaponID].m_Got ? min(m_aWeapons[WeaponID].m_Ammo + GiveAmmo, MaximalAmmo) : min(GiveAmmo, MaximalAmmo)));
 	m_aWeapons[WeaponID].m_Got = true;
-	m_aWeapons[WeaponID].m_Ammo = (Weapon == (int)WEAPON_HAMMER ? -1 : min(m_aWeapons[WeaponID].m_Ammo + GiveAmmo, MaximalAmmo));
+	m_aWeapons[WeaponID].m_Ammo = GotAmmo;
 	return true;
 }
 
