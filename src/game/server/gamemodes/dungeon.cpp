@@ -170,13 +170,13 @@ void CGameControllerDungeon::StateTick()
 			}
 			if(m_StartedPlayers == ReadyPlayers && m_StartingTick > 10 * Server()->TickSpeed())
 			{
-				GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The time was reset to 10 seconds. All players are ready!");
+				GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Time was reduce to 10 seconds. All players are ready!");
 				m_StartingTick = 10 * Server()->TickSpeed();
 			}
 
 			// показать время до начала
 			const int Time = m_StartingTick / Server()->TickSpeed();
-			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon waiting {INT} sec!", &Time);
+			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon waiting {INT} sec!\nPlayers are ready to start right now {INT} of {INT}!", &Time, &ReadyPlayers, &Players);
 			m_StartingTick--;
 			if (!m_StartingTick)
 				ChangeState(DUNGEON_STARTED);
