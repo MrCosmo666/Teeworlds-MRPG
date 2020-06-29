@@ -537,8 +537,13 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 		// режим готовности в темницах
 		if(GS()->IsDungeon())
 		{
-			GetTempData().TempDungeonReady ^= true;
-			GS()->Chat(m_ClientID, "You change the ready mode to {STR}!", GetTempData().TempDungeonReady ? "ready" : "not ready");
+			const int DungeonID = GS()->DungeonID();
+			const bool IsDungeonActive = DungeonJob::Dungeon[DungeonID].State > 1;
+			if(!IsDungeonActive)
+			{
+				GetTempData().TempDungeonReady ^= true;
+				GS()->Chat(m_ClientID, "You change the ready mode to {STR}!", GetTempData().TempDungeonReady ? "ready" : "not ready");
+			}
 			return true;
 		}
 	}
