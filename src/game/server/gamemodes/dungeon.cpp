@@ -169,12 +169,12 @@ void CGameControllerDungeon::StateTick()
 					continue;
 				ReadyPlayers++;
 			}
-			if(ReadyPlayers >= m_StartedPlayers && m_StartingTick > 10 * Server()->TickSpeed())
+			if(ReadyPlayers >= Players && m_StartingTick > 10 * Server()->TickSpeed())
 			{
 				m_LastStartingTick = m_StartingTick;
 				m_StartingTick = 10 * Server()->TickSpeed();
 			}
-			else if(ReadyPlayers < m_StartedPlayers && m_LastStartingTick > 0)
+			else if(ReadyPlayers < Players && m_LastStartingTick > 0)
 			{
 				const int SkippedTick = 10 * Server()->TickSpeed() - m_StartingTick;
 				m_StartingTick = m_LastStartingTick - SkippedTick;
