@@ -23,7 +23,7 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	// создание двери для ожидания начала
 	vec2 PosDoor = vec2(DungeonJob::Dungeon[m_DungeonID].DoorX, DungeonJob::Dungeon[m_DungeonID].DoorY);
 	m_DungeonDoor = new DungeonDoor(&GS()->m_World, PosDoor);
-	ChangeState(DUNGEON_WAITING_READY_STATE);
+	ChangeState(DUNGEON_WAITING);
 
 	// создание ключевых дверей
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_door", "WHERE DungeonID = '%d'", m_DungeonID));
@@ -55,7 +55,7 @@ void CGameControllerDungeon::ChangeState(int State)
 
 	// - - - - - - - - - - - - - - - - - - - - - -
 	// Используется при смене статуса в Ожидание данжа
-	if (State == DUNGEON_WAITING_READY_STATE)
+	if (State == DUNGEON_WAITING)
 	{
 		DungeonJob::Dungeon[m_DungeonID].Progress = 0;
 		m_MaximumTick = 0;
@@ -135,8 +135,8 @@ void CGameControllerDungeon::StateTick()
 {
 	// сбросить данж
 	const int Players = PlayersNum();
-	if (Players < 1 && m_StateDungeon != DUNGEON_WAITING_READY_STATE)
-		ChangeState(DUNGEON_WAITING_READY_STATE);
+	if (Players < 1 && m_StateDungeon != DUNGEON_WAITING)
+		ChangeState(DUNGEON_WAITING);
 
 	// обновлять информацию каждую секунду
 	if (Server()->Tick() % Server()->TickSpeed() == 0)
@@ -147,7 +147,7 @@ void CGameControllerDungeon::StateTick()
 
 	// - - - - - - - - - - - - - - - - - - - - - -
 	// Используется в тике когда Ожидание данжа
-	if (m_StateDungeon == DUNGEON_WAITING_READY_STATE)
+	if (m_StateDungeon == DUNGEON_WAITING)
 	{
 		m_StartedPlayers = Players;
 		if (Players >= 1)
@@ -168,7 +168,7 @@ void CGameControllerDungeon::StateTick()
 					continue;
 				ReadyPlayers++;
 			}
-			if(m_StartedPlayers == Players && m_StartingTick > 10 * Server()->TickSpeed())
+			if(m_StartedPlayers == ReadyPlayers && m_StartingTick > 10 * Server()->TickSpeed())
 			{
 				GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The time was reset to 10 seconds. All players are ready!");
 				m_StartingTick = 10 * Server()->TickSpeed();
@@ -490,7 +490,7 @@ DungeonDoor::DungeonDoor(CGameWorld *pGameWorld, vec2 Pos)
 	m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, 'y', '-');
 	m_Pos.y += 30;
 
-	m_State = DUNGEON_WAITING_READY_STATE;
+	m_State = DUNGEON_WAITING;
 	GameWorld()->InsertEntity(this);
 }
 
