@@ -44,6 +44,7 @@ public:
 	int GetDungeonSync(class CPlayer* pPlayer, int BonusID) const;
 
 private:
+	int PlayersReady() const;
 	int PlayersNum() const;
 	int LeftMobsToWin() const;
 	int CountMobs() const;

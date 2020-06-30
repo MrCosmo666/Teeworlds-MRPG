@@ -134,11 +134,13 @@ void CGameControllerDungeon::ChangeState(int State)
 
 void CGameControllerDungeon::StateTick()
 {
+	// - - - - - - - - - - - - - - - - - - - - - -
 	// сбросить данж
 	const int Players = PlayersNum();
 	if (Players < 1 && m_StateDungeon != DUNGEON_WAITING)
 		ChangeState(DUNGEON_WAITING);
 
+	// - - - - - - - - - - - - - - - - - - - - - -
 	// обновлять информацию каждую секунду
 	if (Server()->Tick() % Server()->TickSpeed() == 0)
 	{
@@ -162,28 +164,24 @@ void CGameControllerDungeon::StateTick()
 		if (m_StartingTick)
 		{
 			// готовность игроков
-			int ReadyPlayers = 0;
-			for(int i = 0; i < MAX_PLAYERS; i++)
-			{
-				if (!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID || !GS()->m_apPlayers[i]->GetTempData().TempDungeonReady)
-					continue;
-				ReadyPlayers++;
-			}
-			if(ReadyPlayers >= Players && m_StartingTick > 10 * Server()->TickSpeed())
+			const int PlayersReadyState = PlayersReady();
+			if(PlayersReadyState >= Players && m_StartingTick > 10 * Server()->TickSpeed())
 			{
 				m_LastStartingTick = m_StartingTick;
 				m_StartingTick = 10 * Server()->TickSpeed();
 			}
-			else if(ReadyPlayers < Players && m_LastStartingTick > 0)
+			else if(PlayersReadyState < Players && m_LastStartingTick > 0)
 			{
 				const int SkippedTick = 10 * Server()->TickSpeed() - m_StartingTick;
 				m_StartingTick = m_LastStartingTick - SkippedTick;
 				m_LastStartingTick = 0;
 			}
 
-			// показать время до начала
+			// показать время до начала // if(m_StartingTick % Server()->TickSpeed() == 0)
 			const int Time = m_StartingTick / Server()->TickSpeed();
-			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon waiting {INT} sec!\nPlayer's are ready to start right now {INT} of {INT}!\nYou can change state with 'Vote yes'", &Time, &ReadyPlayers, &Players);
+			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon waiting {INT} sec!\nPlayer's are ready to start right now {INT} of {INT}!\nYou can change state with 'Vote yes'", &Time, &PlayersReadyState, &Players);
+
+			// отчет и смена статы тенмицы при наступлении
 			m_StartingTick--;
 			if (!m_StartingTick)
 				ChangeState(DUNGEON_STARTED);
@@ -325,6 +323,18 @@ int CGameControllerDungeon::CountMobs() const
 			countMobs++;
 	}
 	return countMobs;
+}
+
+int CGameControllerDungeon::PlayersReady() const
+{
+	int readyPlayers = 0;
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if(!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID || !GS()->m_apPlayers[i]->GetTempData().TempDungeonReady)
+			continue;
+		readyPlayers++;
+	}
+	return readyPlayers;
 }
 
 int CGameControllerDungeon::PlayersNum() const

@@ -61,7 +61,7 @@ void CNoctisTeleport::Tick()
 			// take damage
 			vec2 Diff = SearchPos - OldPosition;
 			vec2 Force = normalize(Diff) * 16.0f;
-			pSearchPlayer->GetCharacter()->TakeDamage(Force * 24.0f, MaximalDamageSize, ClientID, WEAPON_NINJA);
+			pSearchPlayer->GetCharacter()->TakeDamage(Force * 12.0f, MaximalDamageSize, ClientID, WEAPON_NINJA);
 			GS()->CreateExplosion(SearchPos, m_pPlayerChar->GetPlayer()->GetCID(), WEAPON_GRENADE, 0);
 			GS()->CreateSound(SearchPos, SOUND_NINJA_HIT);
 		}
