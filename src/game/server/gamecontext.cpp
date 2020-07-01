@@ -1977,7 +1977,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	else if(MenuList == MenuList::MENU_JOURNAL_MAIN)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
-
+		
 		Mmo()->Quest()->ShowFullQuestLift(pPlayer);
 		AddBack(ClientID);
 	}
@@ -1999,7 +1999,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		ShowPlayerStats(pPlayer);
 
-		// Улучшения класса DPS дамаг
+		// DPS UPGRADES
 		int Range = pPlayer->GetLevelDisciple(AtributType::AtDps);
 		AVH(ClientID, TAB_UPGR_DPS, RED_COLOR, "Disciple of War. Level Power {INT}", &Range);
 		for(const auto& at : AttributInfo)
@@ -2010,7 +2010,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		}
 		AV(ClientID, "null", "");
 
-		// Улучшения класса TANK танк
+		// TANK UPGRADES
 		Range = pPlayer->GetLevelDisciple(AtributType::AtTank);
 		AVH(ClientID, TAB_UPGR_TANK, BLUE_COLOR, "Disciple of Tank. Level Power {INT}", &Range);
 		for(const auto& at : AttributInfo)
@@ -2021,7 +2021,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		}
 		AV(ClientID, "null", "");
 
-		// Улучшения класса HEALER хил
+		// HEALER UPGRADES
 		Range = pPlayer->GetLevelDisciple(AtributType::AtHealer);
 		AVH(ClientID, TAB_UPGR_HEALER, GREEN_COLOR, "Disciple of Healer. Level Power {INT}", &Range);
 		for(const auto& at : AttributInfo)
@@ -2032,7 +2032,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		}
 		AV(ClientID, "null", "");
 
-		// Улучшения WEAPONS оружия
+		// WEAPONS UPGRADES
 		AVH(ClientID, TAB_UPGR_WEAPON, GRAY_COLOR, "Upgrades Weapons / Ammo");
 		for(const auto& at : AttributInfo)
 		{
@@ -2078,7 +2078,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 			const int HideID = (NUM_TAB_MENU+12500+mobs.first);
 			const int PosX = mobs.second.PositionX/32, PosY = mobs.second.PositionY/32;
-			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} {STR}[x{INT} y{INT}]", mobs.second.GetName(), Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY);
+			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} [x{INT} y{INT}]", mobs.second.GetName(), &PosX, &PosY);
 	
 			for(int i = 0; i < MAX_DROPPED_FROM_MOBS; i++)
 			{
