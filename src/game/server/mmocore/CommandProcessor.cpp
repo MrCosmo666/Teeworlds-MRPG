@@ -145,7 +145,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		if ((sscanf(Msg->m_pMessage, "/sd %d", &size)) != 1)
 			return GS->ChatFollow(ClientID, "Please use: /sd <idsound>");
 
-		int soundid = clamp(size, 0, 40);
+		const int soundid = clamp(size, 0, 40);
 		if (GS->GetPlayerChar(ClientID))
 			GS->CreateSound(pPlayer->GetCharacter()->m_Core.m_Pos, soundid);
 		return;
@@ -159,6 +159,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		int sitemid = 0;
 		if ((sscanf(Msg->m_pMessage, "/useitem %d", &sitemid)) != 1)
 			return GS->ChatFollow(ClientID, "Please use: /useitem <itemid>");
+		
 		UseItems(GS, ClientID, sitemid, 1);
 		return;
 	}
@@ -172,9 +173,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		if ((sscanf(Msg->m_pMessage, "/useskill %d", &sskillid)) != 1)
 			return GS->ChatFollow(ClientID, "Please use: /useitem <itemid>");
 
-		int sizeskills = GS->Mmo()->Skills()->SkillsSize();
-		int skillid = clamp(sskillid, 0, sizeskills);
-		UseSkill(GS, pPlayer, skillid);
+		UseSkill(GS, pPlayer, sskillid);
 		return;
 	}
 
