@@ -6,13 +6,15 @@
 #include "CommandProcessor.h"
 
 /*
-	Later lead to quality standard code
+	Later lead to quality
 */
 
 void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 {
 	LastChat(GS, pPlayer);
 	const int ClientID = pPlayer->GetCID();
+
+	// АВТОРИЗАЦИЯ
 	if(str_comp_num(Msg->m_pMessage, "/login", 6) == 0)
 	{
 		if (pPlayer->IsAuthed())
@@ -21,18 +23,16 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 			return;
 		}
 
-		// если аргументы не совпадают
 		char Username[256], Password[256];
 		if (sscanf(Msg->m_pMessage, "/login %s %s", Username, Password) != 2)
 			return GS->ChatFollow(ClientID, "Use: /login <username> <password>");
 
-		// загружаем аккаунт и данные если он загрузился
 		if (GS->Mmo()->Account()->LoginAccount(ClientID, Username, Password) == AUTH_LOGIN_GOOD)
 			GS->Mmo()->Account()->LoadAccount(pPlayer, true);
 		return;
 	}
 
-	// регистрация аккаунта
+	// РЕГИСТРАЦИЯ
 	else if(str_comp_num(Msg->m_pMessage, "/register", 9) == 0)
 	{
 		if (pPlayer->IsAuthed())
@@ -41,12 +41,10 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 			return;
 		}
 
-		// если аргументы не совпадают
 		char Username[256], Password[256];
 		if (sscanf(Msg->m_pMessage, "/register %s %s", Username, Password) != 2)
 			return GS->ChatFollow(ClientID, "Use: /register <username> <password>");
 
-		// регестрируем аккаунт
 		GS->Mmo()->Account()->RegisterAccount(ClientID, Username, Password);
 		return;
 	}
@@ -75,8 +73,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		if(!pPlayer->IsAuthed())
 			return;
 
-		// start parsing
-		if(pPlayer->Acc().GuildID > 0)
+		if(pPlayer->Acc().IsGuild())
 		{
 			int AuthID = pPlayer->Acc().AuthID;
 			ExitGuild(GS, AuthID);
@@ -88,8 +85,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		if(!pPlayer->IsAuthed())
 			return;
 
-		// create member
-		if(pPlayer->Acc().GuildID <= 0)
+		if(!pPlayer->Acc().IsGuild())
 		{
 			char GuildName[256];
 			if(sscanf(Msg->m_pMessage, "/gcreate %s", GuildName) != 1) 
@@ -109,7 +105,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		if(!pPlayer->IsAuthed())
 			return;
 
-		int HouseID = PlayerHouseID(GS, pPlayer);
+		const int HouseID = PlayerHouseID(GS, pPlayer);
 		ChangeStateDoor(GS, HouseID);
 		return;
 	}
@@ -119,10 +115,12 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 			return;
 
 		// check owner house id
-		int HouseID = PlayerHouseID(GS, pPlayer);
+		const int HouseID = PlayerHouseID(GS, pPlayer);
 		if(HouseID < 0)
-			return GS->Chat(ClientID, "You have no home.");
-
+		{
+			GS->Chat(ClientID, "You have no home.");
+			return;
+		}
 		// sell house
 		GS->Mmo()->House()->SellHouse(HouseID);
 		return;

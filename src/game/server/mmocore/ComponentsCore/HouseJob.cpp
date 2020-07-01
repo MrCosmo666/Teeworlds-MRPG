@@ -481,7 +481,6 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 	const bool StateDoor = GetHouseDoor(HouseID);
 	GS()->AVH(ClientID, TAB_HOUSE_STAT, BLUE_COLOR, "House stats {INT} Class {STR} Door [{STR}]", &HouseID, Home[HouseID].m_Class, StateDoor ? "Closed" : "Opened");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "/doorhouse - interactive with door.");
-	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "/sellhouse - sell house to world.");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "- - - - - - - - - -");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "Notes: Minimal operation house balance 100gold");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "In your safe is: {INT}gold", &Home[HouseID].m_Bank);
@@ -499,6 +498,7 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVM(ClientID, "HOUSEDOOR", HouseID, NOPE, "Change state to [\"{STR} door\"]", StateDoor ? "Open" : "Close");
 	GS()->AVM(ClientID, "HSPAWN", 1, NOPE, "Teleport to your house");
+	GS()->AVM(ClientID, "HSELL", HouseID, NOPE, "Sell your house (in reason 777)");
 	if(Home[HouseID].m_WorldID == GS()->Server()->GetWorldID(ClientID))
 	{
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_HOUSE_DECORATION, NOPE, "Settings Decorations");
@@ -543,6 +543,21 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 			return true;
 		}
 		pPlayer->GetCharacter()->ChangePosition(Position);
+		return true;
+	}
+
+	// Продажа дома
+	if (PPSTR(CMD, "HSELL") == 0)
+	{
+		const int HouseID = VoteID;
+		if (HouseID <= 0 || Get != 777)
+		{
+			GS()->Chat(ClientID, "A verification number was entered incorrectly.");
+			return true;
+		}
+
+		SellHouse(HouseID);
+		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		return true;
 	}
 
