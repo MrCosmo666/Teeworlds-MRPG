@@ -456,7 +456,7 @@ void HouseJob::ShowHouseMenu(CPlayer *pPlayer, int HouseID)
 
 	// показать кол-во Золота у игрока
 	GS()->AV(ClientID, "null", "");
-	GS()->ShowValueInformation(pPlayer, itGold);
+	GS()->ShowItemValueInformation(pPlayer, itGold);
 	GS()->AV(ClientID, "null", "");
 	
 	// показать основное меню

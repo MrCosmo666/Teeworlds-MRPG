@@ -124,7 +124,7 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 {
 	CPlayer* pPlayer = pChar->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
-	GS()->ShowValueInformation(pPlayer);
+	GS()->ShowItemValueInformation(pPlayer);
 	GS()->AV(ClientID, "null", "");
 	
 	GS()->AVH(ClientID, TAB_AETHER, GOLDEN_COLOR, "Available aethers");

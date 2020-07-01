@@ -31,7 +31,7 @@ void StorageJob::ShowStorageMenu(CPlayer* pPlayer, int StorageID)
 	GS()->AVM(ClientID, "REPAIRITEMS", StorageID, TAB_STORAGE, "Repair all items - FREE");
 	
 	GS()->AV(ClientID, "null", "");
-	GS()->ShowValueInformation(pPlayer, Storage[StorageID].Currency);
+	GS()->ShowItemValueInformation(pPlayer, Storage[StorageID].Currency);
 	GS()->AV(ClientID, "null", "");
 }
 

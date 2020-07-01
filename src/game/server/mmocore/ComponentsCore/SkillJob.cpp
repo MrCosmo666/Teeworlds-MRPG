@@ -65,7 +65,7 @@ bool SkillJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_SKILL, "Here you can learn passive and active skills");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_SKILL, "You can bind active skill any button using the console");
 			GS()->AV(ClientID, "null", "");
-			GS()->ShowValueInformation(pPlayer, itSkillPoint);
+			GS()->ShowItemValueInformation(pPlayer, itSkillPoint);
 			GS()->AV(ClientID, "null", "");
 			
 			ShowMailSkillList(pPlayer, false);

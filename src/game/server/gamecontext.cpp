@@ -2205,8 +2205,8 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 	AV(ClientID, "null", "");
 }
 
-// Вывести информацию по голде
-void CGS::ShowValueInformation(CPlayer *pPlayer, int ItemID)
+// Вывести информацию по валютам
+void CGS::ShowItemValueInformation(CPlayer *pPlayer, int ItemID)
 {
 	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = LIGHT_PURPLE_COLOR;
@@ -2249,7 +2249,7 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 		return true;
 
 	// парсинг всего остального
-	sqlstr::CSqlString<64> FormatText = sqlstr::CSqlString<64>(Text);
+	const sqlstr::CSqlString<64> FormatText = sqlstr::CSqlString<64>(Text);
 	return (bool)(Mmo()->OnParseFullVote(pPlayer, CMD, VoteID, VoteID2, Get, FormatText.cstr()));
 }
 
@@ -2414,8 +2414,7 @@ void CGS::UpdateZonePVP()
 	
 	for(int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
-		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(m_apPlayers[i]);
-		if(BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && BotPlayer->GetPlayerWorldID() == m_WorldID)
+		if(m_apPlayers[i] && m_apPlayers[i]->GetBotType() == BotsTypes::TYPE_BOT_MOB && m_apPlayers[i]->GetPlayerWorldID() == m_WorldID)
 		{
 			m_AllowedPVP = true;
 			return;
