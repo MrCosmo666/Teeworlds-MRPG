@@ -252,6 +252,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 
 		BuyGuildHouse(GuildID, VoteID);
 		GS()->VResetVotes(ClientID, MenuList::MAIN_MENU);
+		GS()->VResetVotes(MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -266,7 +267,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		}
 
 		SellGuildHouse(GuildID);
-		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD);
+		GS()->VResetVotes(MenuList::MENU_GUILD);
 		return true;
 	}
 

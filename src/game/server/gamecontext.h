@@ -257,6 +257,7 @@ public:
 	void ResetVotesNewbieInformation(int ClientID);
 	void ResetVotes(int ClientID, int MenuList);
 	void VResetVotes(int ClientID, int MenuID);
+	void VResetVotes(int MenuID);
 	void AddBack(int ClientID);
 	void ShowPlayerStats(CPlayer *pPlayer);
 	void ShowValueInformation(CPlayer *pPlayer, int ItemID = itGold);

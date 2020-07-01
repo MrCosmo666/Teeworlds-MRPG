@@ -2156,6 +2156,16 @@ void CGS::VResetVotes(int ClientID, int MenuID)
 		ResetVotes(ClientID, MenuID);
 }
 
+// Обновить голосования всем у кого открыто меню
+void CGS::VResetVotes(int MenuID)
+{
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if(m_apPlayers[i] && m_apPlayers[i]->m_OpenVoteMenu == MenuID)
+			ResetVotes(i, MenuID);
+	}
+}
+
 // Кнопка назад добавляет кнопку назад в меню (Но нужно не забывать указывать ID последнего меню)
 void CGS::AddBack(int ClientID)
 {	
