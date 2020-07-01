@@ -109,7 +109,7 @@ bool MailBoxJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteI
 	if(PPSTR(CMD, "MAIL") == 0)
 	{
 		ReceiveInbox(pPlayer, VoteID);
-		GS()->VResetVotes(ClientID, MenuList::MENU_INBOX);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_INBOX);
 		return true;
 	}
 

@@ -105,7 +105,7 @@ bool SkillJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 	{
 		const int SkillID = VoteID;
 		if (UpgradeSkill(pPlayer, SkillID))
-			GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 
@@ -117,7 +117,7 @@ bool SkillJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			Skill[ClientID][SkillID].m_SelectedEmoticion = -1;
 
 		SJK.UD("tw_accounts_skills", "SelectedEmoticion = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", Skill[ClientID][SkillID].m_SelectedEmoticion, SkillID, pPlayer->Acc().AuthID);
-		GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	return false;

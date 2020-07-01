@@ -2150,19 +2150,19 @@ void CGS::ResetVotesNewbieInformation(int ClientID)
 }
 
 // Созданно для апдейта меню если именно оно находится в открытых
-void CGS::VResetVotes(int ClientID, int MenuID)
+void CGS::UpdateVotes(int ClientID, int MenuList)
 {
-	if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_OpenVoteMenu == MenuID)
-		ResetVotes(ClientID, MenuID);
+	if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_OpenVoteMenu == MenuList)
+		ResetVotes(ClientID, MenuList);
 }
 
 // Обновить голосования всем у кого открыто меню
-void CGS::VResetVotes(int MenuID)
+void CGS::UpdateVotes(int MenuList)
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(m_apPlayers[i] && m_apPlayers[i]->m_OpenVoteMenu == MenuID)
-			ResetVotes(i, MenuID);
+		if(m_apPlayers[i] && m_apPlayers[i]->m_OpenVoteMenu == MenuList)
+			ResetVotes(i, MenuList);
 	}
 }
 

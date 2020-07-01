@@ -568,7 +568,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 			return true;
 
 		AddSafeDeposit(pPlayer, Get);
-		GS()->VResetVotes(ClientID, MenuList::MENU_HOUSE);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE);
 		return true;
 	}
 
@@ -579,7 +579,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 			return true;
 
 		TakeFromSafeDeposit(pPlayer, Get);
-		GS()->VResetVotes(ClientID, MenuList::MENU_HOUSE);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE);
 		return true;
 	}
 
@@ -587,7 +587,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 	if(PPSTR(CMD, "HOUSEDOOR") == 0)
 	{
 		ChangeStateDoor(VoteID);
-		GS()->VResetVotes(ClientID, MenuList::MENU_HOUSE);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE);
 		return true;		
 	}
 
@@ -625,7 +625,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
 			PlDecoItem.Add(1);
 		}
-		GS()->VResetVotes(ClientID, MenuList::MENU_HOUSE_DECORATION);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE_DECORATION);
 		return true;
 	}
 

@@ -342,7 +342,7 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 			
 		// устанавливаем кол-во предметов
 		pPlayer->GetTempData().SellItem.a_count = Get;
-		GS()->VResetVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
 		return true;
 	}
 
@@ -354,7 +354,7 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 			Get = c_minimalprice;
 
 		pPlayer->GetTempData().SellItem.a_price = Get;
-		GS()->VResetVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);		
+		GS()->UpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);		
 		return true;
 	}
 
@@ -381,7 +381,7 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 			GS()->ResetVotes(ClientID, MenuList::MENU_INVENTORY);
 			return true;
 		}
-		GS()->VResetVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
 		return true;
 	}
 

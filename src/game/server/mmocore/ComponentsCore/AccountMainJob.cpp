@@ -296,7 +296,7 @@ bool AccountMainJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int V
 		const char *pSelectedLanguage = GS()->Server()->Localization()->m_pLanguages[VoteID]->GetFilename();
 		pPlayer->SetLanguage(pSelectedLanguage);
 		GS()->Chat(ClientID, "You chosen a language \"{STR}\".", pSelectedLanguage);
-		GS()->VResetVotes(ClientID, MenuList::MENU_SELECT_LANGUAGE);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_SELECT_LANGUAGE);
 		Job()->SaveAccount(pPlayer, SaveType::SAVE_LANGUAGE);
 		return true;
 	}

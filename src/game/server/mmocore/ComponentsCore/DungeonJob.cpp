@@ -154,20 +154,20 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 		if(GS()->IsClientEqualWorldID(ClientID, Dungeon[VoteID].WorldID))
 		{
 			GS()->Chat(ClientID, "You are already in this dungeon!");
-			GS()->VResetVotes(ClientID, MenuList::MENU_DUNGEONS);
+			GS()->UpdateVotes(ClientID, MenuList::MENU_DUNGEONS);
 			return true;
 		}
 		if (Dungeon[VoteID].State > 1)
 		{
 			GS()->Chat(ClientID, "At the moment players are passing this dungeon!");
-			GS()->VResetVotes(ClientID, MenuList::MENU_DUNGEONS);
+			GS()->UpdateVotes(ClientID, MenuList::MENU_DUNGEONS);
 			return true;
 		}
 
 		if (pPlayer->Acc().Level < Dungeon[VoteID].Level)
 		{
 			GS()->Chat(ClientID, "Your level is low to pass this dungeon!");
-			GS()->VResetVotes(ClientID, MenuList::MENU_DUNGEONS);
+			GS()->UpdateVotes(ClientID, MenuList::MENU_DUNGEONS);
 			return true;
 		}
 
@@ -194,27 +194,27 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 		if(VoteID == ClientID)
 		{
 			GS()->Chat(ClientID, "You can't vote for yourself!");
-			GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 			return true;
 		}
 
 		if(pPlayer->GetTempData().TempAlreadyVotedDungeon)
 		{
 			GS()->Chat(ClientID, "You already voted!");
-			GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 			return true;
 		}
 
 		if(!pSearchPlayer)
 		{
-			GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 			return true;
 		}
 
 		pPlayer->GetTempData().TempAlreadyVotedDungeon = true;
 		pSearchPlayer->GetTempData().TempTankVotingDungeon++;
 		GS()->ChatWorldID(pPlayer->GetPlayerWorldID(), "[Dungeon]", "{STR} voted for {STR}.", GS()->Server()->ClientName(ClientID), GS()->Server()->ClientName(VoteID));
-		GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	return false;

@@ -114,7 +114,7 @@ bool AccountPlantJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int 
 		if(pPlayer->Upgrade(Get, &pPlayer->Acc().Plant[VoteID], &pPlayer->Acc().Plant[PlUpgrade], VoteID2, 3, aBuf))
 		{
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_PLANT_DATA);
-			GS()->VResetVotes(ClientID, MenuList::MENU_UPGRADE);
+			GS()->UpdateVotes(ClientID, MenuList::MENU_UPGRADE);
 		}
 		return true;
 	}	

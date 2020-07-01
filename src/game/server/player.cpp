@@ -426,7 +426,7 @@ void CPlayer::AddExp(int Exp)
 		GS()->ChatFollow(m_ClientID, "Level UP. Now Level {INT}!", &Acc().Level);
 		if(Acc().Exp < ExpNeed(Acc().Level))
 		{
-			GS()->VResetVotes(m_ClientID, MenuList::MAIN_MENU);
+			GS()->UpdateVotes(m_ClientID, MenuList::MAIN_MENU);
 			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_STATS);
 			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_UPGRADES);
 		}

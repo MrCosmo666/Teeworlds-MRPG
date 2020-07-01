@@ -308,7 +308,7 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	if(PPSTR(CMD, "SORTEDINVENTORY") == 0)
 	{
 		pPlayer->m_SortTabs[SORTINVENTORY] = VoteID;
-		GS()->VResetVotes(ClientID, MenuList::MENU_INVENTORY);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
 		return true;
 	}
 
@@ -430,7 +430,7 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	if(PPSTR(CMD, "SORTEDEQUIP") == 0)
 	{
 		pPlayer->m_SortTabs[SORTEQUIP] = VoteID;
-		GS()->VResetVotes(ClientID, MenuList::MENU_EQUIPMENT);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
 		return true;				
 	}
 
@@ -627,7 +627,7 @@ void ItemJob::UseItem(int ClientID, int ItemID, int Count)
 		Job()->SaveAccount(pPlayer, SaveType::SAVE_UPGRADES);
 	}
 
-	GS()->VResetVotes(ClientID, MenuList::MENU_INVENTORY);
+	GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
 	return;
 }
 
