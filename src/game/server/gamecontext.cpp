@@ -64,15 +64,14 @@ CGS::~CGS()
 {
 	for(auto & apPlayer : m_apPlayers)
 		delete apPlayer;
-	if(pMmoController)  
-		delete pMmoController;
-	if(m_pPathFinder)
-		delete m_pPathFinder;
+	
+	delete pMmoController;
+	delete m_pPathFinder;
 }
 
 void CGS::Clear()
 {
-	CTuningParams Tuning = m_Tuning;         
+	const CTuningParams Tuning = m_Tuning;         
 	m_Resetting = true;
 	this->~CGS();
 	mem_zero(this, sizeof(*this));
@@ -362,8 +361,7 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 	}
 	else if(Mode == CHAT_TEAM)
 	{
-		const int GuildID = m_apPlayers[ChatterClientID]->Acc().GuildID;
-		if(GuildID <= 0)
+		if(ChatterClientID <= 0 || (m_apPlayers[ChatterClientID] && m_apPlayers[ChatterClientID]->Acc().GuildID <= 0))
 		{
 			Chat(ChatterClientID, "This chat is intended for team / guilds!");
 			return;
@@ -376,6 +374,8 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 		if(ChatterClientID < MAX_PLAYERS)
 			ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
 
+		// send chat to guild team
+		const int GuildID = m_apPlayers[ChatterClientID]->Acc().GuildID <= 0;
 		for(int i = 0; i < MAX_PLAYERS; i++)
 		{
 			CPlayer *pSearchPlayer = GetPlayer(i, true);

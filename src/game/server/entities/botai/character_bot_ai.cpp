@@ -70,7 +70,7 @@ void CCharacterBotAI::ShowProgress()
 		{
 			int Health = m_pBotPlayer->GetHealth();
 			int StartHealth = m_pBotPlayer->GetStartHealth();
-			float gethp = ( Health * 100.0 ) / StartHealth;
+			const float gethp = ( Health * 100.0 ) / StartHealth;
 			char *Progress = GS()->LevelString(100, (int)gethp, 10, ':', ' ');
 			GS()->SBL(ListDmgPlayer.first, BroadcastPriority::BROADCAST_GAME_PRIORITY, 10, "Health {STR}({INT}/{INT})", Progress, &Health, &StartHealth);
 			delete Progress;
@@ -89,7 +89,7 @@ bool CCharacterBotAI::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 	// до урона и после урона здоровье
 	int StableDamage = Health();
-	bool BotDie = CCharacter::TakeDamage(Force, Dmg, From, Weapon);
+	const bool BotDie = CCharacter::TakeDamage(Force, Dmg, From, Weapon);
 	StableDamage -= Health();
 
 	// установить агрессию на того от кого пришел урон
@@ -327,7 +327,7 @@ void CCharacterBotAI::EngineMobs()
 		return;
 	}
 
-	bool WeaponedBot = (BotJob::MobBot[MobID].Spread >= 1);
+	const bool WeaponedBot = (BotJob::MobBot[MobID].Spread >= 1);
 	if(WeaponedBot)
 	{
 		if(BotJob::MobBot[MobID].Boss)

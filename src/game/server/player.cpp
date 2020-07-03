@@ -334,8 +334,8 @@ void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed,
 
 	const float GetLevelProgress = (float)(MyExp * 100.0) / (float)ExpNeed;
 	const float GetExpProgress = (float)(GivedExp * 100.0) / (float)ExpNeed;
-	char *Level = GS()->LevelString(100, (int)GetLevelProgress, 10, ':', ' ');
 	char BufferInBroadcast[128];
+	char* Level = GS()->LevelString(100, (int)GetLevelProgress, 10, ':', ' ');
 	str_format(BufferInBroadcast, sizeof(BufferInBroadcast), "^235Lv%d %s%s %0.2f%%+%0.3f%%(%d)XP\n", MyLevel, Name, Level, GetLevelProgress, GetExpProgress, GivedExp);
 	GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, BufferInBroadcast);
 	delete Level;
