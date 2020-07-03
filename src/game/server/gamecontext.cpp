@@ -376,7 +376,7 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 			ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
 
 		// send chat to guild team
-		const int GuildID = m_apPlayers[ChatterClientID]->Acc().GuildID <= 0;
+		const int GuildID = pChatterPlayer->Acc().GuildID;
 		for(int i = 0; i < MAX_PLAYERS; i++)
 		{
 			CPlayer *pSearchPlayer = GetPlayer(i, true);
