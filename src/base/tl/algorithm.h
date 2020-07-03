@@ -107,6 +107,11 @@ void sort_quick(R range)
 	concept_index::check(range);
 }*/
 
+template<class R, class Cmp>
+void sort(R range, Cmp cmp)
+{
+	std::stable_sort(&range.front(), &range.back() + 1, cmp);
+}
 
 template<class R>
 void sort(R range)
