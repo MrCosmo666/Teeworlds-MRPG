@@ -861,7 +861,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 		GS()->AVL(ClientID, "null", "⌂ Housing system", &pPlayer->GetItem(itGold).Count);
 		pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_HOUSE_DECORATION, NOPE, "Settings Decoration(s)");
-		GS()->AVL(ClientID, "MDOOR", "Change state (\"{STR} door\")", GetGuildDoor(GuildID) ? "Open" : "Close");
+		GS()->AVL(ClientID, "MDOOR", "Change state (\"{STR}\")", GetGuildDoor(GuildID) ? "OPEN" : "CLOSED");
 		GS()->AVL(ClientID, "MSPAWN", "Teleport to guild house");
 		GS()->AVL(ClientID, "MHOUSESELL", "Sell your guild house (in reason 777)");
 	}

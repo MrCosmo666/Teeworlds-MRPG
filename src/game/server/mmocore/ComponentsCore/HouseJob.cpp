@@ -408,7 +408,7 @@ void HouseJob::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
 	pPlayer->AddMoney(TakeCount);
 	Home[HouseID].m_Bank = Bank - TakeCount;
 	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", Home[HouseID].m_Bank, HouseID);
-	GS()->Chat(ClientID, "You take gold in the safe (+{VAL}){VAL}!", &TakeCount, &Home[HouseID].m_Bank);
+	GS()->Chat(ClientID, "You take {VAL} gold in the safe {VAL}!", &TakeCount, &Home[HouseID].m_Bank);
 }
 
 
@@ -422,7 +422,7 @@ void HouseJob::AddSafeDeposit(CPlayer *pPlayer, int Balance)
 
 	const int HouseID = RES->getInt("ID");
 	Home[HouseID].m_Bank = RES->getInt("HouseBank") + Balance;            
-	GS()->Chat(ClientID, "You put gold in the safe (+{VAL}){VAL}!", &Balance, &Home[HouseID].m_Bank);
+	GS()->Chat(ClientID, "You put {VAL} gold in the safe {VAL}!", &Balance, &Home[HouseID].m_Bank);
 	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", Home[HouseID].m_Bank, HouseID);
 }
 
@@ -505,7 +505,7 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "▤ House system");
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
-	GS()->AVM(ClientID, "HOUSEDOOR", HouseID, NOPE, "Change state to [\"{STR} door\"]", StateDoor ? "Open" : "Close");
+	GS()->AVM(ClientID, "HOUSEDOOR", HouseID, NOPE, "Change state to [\"{STR}\"]", StateDoor ? "OPEN" : "CLOSED");
 	GS()->AVM(ClientID, "HSPAWN", 1, NOPE, "Teleport to your house");
 	GS()->AVM(ClientID, "HSELL", HouseID, NOPE, "Sell your house (in reason 777)");
 	if(Home[HouseID].m_WorldID == GS()->Server()->GetWorldID(ClientID))
@@ -567,7 +567,13 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 	// Оплата дома
 	if(PPSTR(CMD, "HOUSEADD") == 0)
 	{
-		if(Get < 100 || pPlayer->CheckFailMoney(Get))
+		if(Get < 100)
+		{
+			GS()->Chat(ClientID, "Minimal operation house balance 100gold!");
+			return true;
+		}
+		
+		if(pPlayer->CheckFailMoney(Get))
 			return true;
 
 		AddSafeDeposit(pPlayer, Get);
@@ -579,8 +585,11 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 	if(PPSTR(CMD, "HOUSETAKE") == 0)
 	{
 		if(Get < 100)
+		{
+			GS()->Chat(ClientID, "Minimal operation house balance 100gold!");
 			return true;
-
+		}
+		
 		TakeFromSafeDeposit(pPlayer, Get);
 		GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE);
 		return true;
