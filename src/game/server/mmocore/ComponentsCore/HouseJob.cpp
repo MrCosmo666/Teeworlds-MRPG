@@ -652,12 +652,13 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		const int ChanceSuccesful = VoteID2;
 		if(ChanceSuccesful != 0)
 		{
-			GS()->Chat(ClientID, "Unfortunately the plant did not take root!");
+			GS()->Chat(ClientID, "Unfortunately plant did not take root!");
 			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 			return true;
 		}
 
-		ChangePlantsID(HouseID, VoteID);
+		GS()->Chat(-1, "Congratulations {STR}, planted at home {STR}!", GS()->Server()->ClientName(ClientID), GS()->GetItemInfo(ItemID).Name);
+		ChangePlantsID(HouseID, ItemID);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 	}
 
