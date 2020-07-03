@@ -251,7 +251,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		}
 
 		BuyGuildHouse(GuildID, VoteID);
-		GS()->UpdateVotes(ClientID, MenuList::MAIN_MENU);
 		GS()->UpdateVotes(MenuList::MENU_GUILD);
 		return true;
 	}
@@ -1312,63 +1311,75 @@ int GuildJob::GetGuildHouseID(int GuildID) const
 // Покупка дома организации
 void GuildJob::BuyGuildHouse(int GuildID, int HouseID)
 {
-	if(HouseID <= 0 || HouseGuild[HouseID].m_GuildID > 0) 
-		return;
-
+	// проверить есть ли дом у гильдии
 	if(GetGuildHouseID(GuildID) > 0)
 	{
 		GS()->ChatGuild(GuildID, "Your Guild can't have 2 houses. Purchase canceled!");
 		return;
 	}
 
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_houses", "WHERE ID = '%d'", HouseID));
-	if(!RES->next()) 
-		return;
-
-	const int Price = RES->getInt("Price");
-	if(Guild[GuildID].m_Bank < Price)
+	// покупка дома
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_houses", "WHERE ID = '%d' AND OwnerMID IS NULL", HouseID));
+	if(RES->next())
 	{
-		GS()->ChatGuild(GuildID, "This Guild house requires {INT}gold!", &Price);
-		return;
+		// снятие золота
+		const int Price = RES->getInt("Price");
+		if(Guild[GuildID].m_Bank < Price)
+		{
+			GS()->ChatGuild(GuildID, "This Guild house requires {INT}gold!", &Price);
+			return;
+		}
+		Guild[GuildID].m_Bank -= Price;
+		SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, GuildID);
+
+		// обновление владельца
+		HouseGuild[HouseID].m_GuildID = GuildID;
+		SJK.UD("tw_guilds_houses", "OwnerMID = '%d' WHERE ID = '%d'", GuildID, HouseID);
+
+		// информация 
+		const char* WorldName = GS()->Server()->GetWorldName(HouseGuild[HouseID].m_WorldID);
+		GS()->Chat(-1, "{STR} buyight guild house on {STR}!", Guild[GuildID].m_Name, WorldName);
+		GS()->ChatDiscord(DC_SERVER_INFO, "Information", "{STR} buyight guild house on {STR}!", Guild[GuildID].m_Name, WorldName);
+		AddHistoryGuild(GuildID, "Bought a house on '%s'.", WorldName);
 	}
 
-	HouseGuild[HouseID].m_GuildID = GuildID;
-	SJK.UD("tw_guilds_houses", "OwnerMID = '%d' WHERE ID = '%d'", GuildID, HouseID);
-	
-	Guild[GuildID].m_Bank -= Price;
-	SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, GuildID);
-	
-	const char *WorldName = GS()->Server()->GetWorldName(HouseGuild[HouseID].m_WorldID);
-	GS()->Chat(-1, "{STR} buyight guild house on {STR}!", Guild[GuildID].m_Name, WorldName);
-	GS()->ChatDiscord(DC_SERVER_INFO, "Information", "{STR} buyight guild house on {STR}!", Guild[GuildID].m_Name, WorldName);
-	AddHistoryGuild(GuildID, "Bought a house on '%s'.", WorldName);
+	// информация что дом уже куплен
+	GS()->ChatGuild(GuildID, "House has already been purchased!");
 }
 
 // продажа дома организации
 void GuildJob::SellGuildHouse(int GuildID)
 {
+	// узнать ид дома гильдии
 	const int HouseID = GetGuildHouseID(GuildID);
-	if(HouseID <= 0) 
-		return;	
-
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("OwnerMID", "tw_guilds_houses", "WHERE ID = '%d'", HouseID));
-	if(!RES->next()) 
+	if(HouseID <= 0)
+	{
+		GS()->ChatGuild(GuildID, "Your Guild doesn't have a home!");
 		return;
+	}
 
+	// продажа гильдии дома по айди дома
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_houses", "WHERE ID = '%d' AND OwnerID IS NOT NULL", HouseID));
+	if(RES->next())
+	{
+		// сбросить владельца
+		SJK.UD("tw_guilds_houses", "OwnerMID = NULL WHERE ID = '%d'", HouseID);
+
+		// возращаем деньги
+		const int ReturnedGold = HouseGuild[HouseID].m_Price;
+		Guild[GuildID].m_Bank += ReturnedGold;
+		SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, GuildID);
+		GS()->ChatGuild(GuildID, "House sold, {INT}gold returned in bank", &ReturnedGold);
+		AddHistoryGuild(GuildID, "Lost a house on '%s'.", GS()->Server()->GetWorldName(HouseGuild[HouseID].m_WorldID));
+	}
+
+	// открыть и освободить дом
 	if(HouseGuild[HouseID].m_Door)
 	{
 		delete HouseGuild[HouseID].m_Door;
 		HouseGuild[HouseID].m_Door = 0;
 	}
-	HouseGuild[HouseID].m_GuildID = 0;
-	SJK.UD("tw_guilds_houses", "OwnerMID = NULL WHERE ID = '%d'", HouseID);
-	
-	// возращаем деньги
-	const int ReturnedGold = HouseGuild[HouseID].m_Price;
-	Guild[GuildID].m_Bank += ReturnedGold;
-	SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, GuildID);
-	GS()->ChatGuild(GuildID, "House sold, {INT}gold returned in bank", &ReturnedGold);
-	AddHistoryGuild(GuildID, "Lost a house on '%s'.", GS()->Server()->GetWorldName(HouseGuild[HouseID].m_WorldID));
+	HouseGuild[HouseID].m_GuildID = -1;
 }
 
 // меню продажи дома
