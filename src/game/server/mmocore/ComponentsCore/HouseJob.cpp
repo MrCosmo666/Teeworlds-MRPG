@@ -264,7 +264,6 @@ void HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 		// информация о покупки
 		GS()->Chat(-1, "{STR} becomes the owner of the house class {STR}", GS()->Server()->ClientName(ClientID), Home[HouseID].m_Class);
 		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**{STR} becomes the owner of the house class {STR}**", GS()->Server()->ClientName(ClientID), Home[HouseID].m_Class);
-		GS()->ChatFollow(ClientID, "Do not forget to top up the balance at home, now the balance {INT}G", &Home[HouseID].m_Bank);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return;
 	}
