@@ -237,31 +237,40 @@ const char *HouseJob::OwnerName(int HouseID)
 	FUNCTIONS HOUSES 
 ######################################################################### */
 // Покупка дома
-bool HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
+void HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 {
-	int ClientID = pPlayer->GetCID();
+	// проверить есть ли дом у игрока
+	const int ClientID = pPlayer->GetCID();
 	if(PlayerHouseID(pPlayer) > 0)
 	{
 		GS()->Chat(ClientID, "You already have a home.");		
-		return false;
+		return;
 	}
 
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("OwnerID, Price", "tw_houses", "WHERE ID = '%d';", HouseID));
+	// покупка дома
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("OwnerID, Price", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NULL", HouseID));
 	if(RES->next())
 	{
-		if(RES->getInt("OwnerID") > 0) 
-			return false;
-
+		// покупка снятие золота
 		const int Price = RES->getInt("Price");
 		if(pPlayer->CheckFailMoney(Price))	
-			return false;
+			return;
 
+		// обновление информации
 		Home[HouseID].m_Bank = 0;
 		Home[HouseID].m_OwnerID = pPlayer->Acc().AuthID;
 		SJK.UD("tw_houses", "OwnerID = '%d', HouseBank = '0' WHERE ID = '%d'", Home[HouseID].m_OwnerID, HouseID);
-		return true;
-	}	
-	return false;
+
+		// информация о покупки
+		GS()->Chat(-1, "{STR} becomes the owner of the house class {STR}", GS()->Server()->ClientName(ClientID), Home[HouseID].m_Class);
+		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**{STR} becomes the owner of the house class {STR}**", GS()->Server()->ClientName(ClientID), Home[HouseID].m_Class);
+		GS()->ChatFollow(ClientID, "Do not forget to top up the balance at home, now the balance {INT}G", &Home[HouseID].m_Bank);
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		return;
+	}
+
+	// информация что дом уже куплен
+	GS()->Chat(ClientID, "House has already been purchased!");
 }
 
 // Продажа дома
@@ -518,13 +527,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 	if(PPSTR(CMD, "BUYHOUSE") == 0)
 	{
 		const int HouseID = VoteID;
-		if(BuyHouse(HouseID, pPlayer))
-		{
-			GS()->Chat(-1, "{STR} becomes the owner of the house class {STR}", GS()->Server()->ClientName(ClientID), Home[VoteID].m_Class);
-			GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**{STR} becomes the owner of the house class {STR}**", GS()->Server()->ClientName(ClientID), Home[HouseID].m_Class);
-			GS()->ChatFollow(ClientID, "Do not forget to top up the balance at home, now the balance {INT}G", &Home[HouseID].m_Bank);
-			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-		}
+		BuyHouse(HouseID, pPlayer);
 		return true;
 	}
 	// переместится домой

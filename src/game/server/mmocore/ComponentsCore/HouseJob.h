@@ -78,7 +78,7 @@ public:
 	/* #########################################################################
 		FUNCTIONS HOUSES 
 	######################################################################### */
-	bool BuyHouse(int HouseID, CPlayer *pPlayer);
+	void BuyHouse(int HouseID, CPlayer *pPlayer);
 	void SellHouse(int HouseID);
 
 	void TakeFromSafeDeposit(CPlayer *pPlayer, int TakeCount);
