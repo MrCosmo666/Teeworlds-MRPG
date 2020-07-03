@@ -251,7 +251,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		}
 
 		BuyGuildHouse(GuildID, VoteID);
-		GS()->UpdateVotes(MenuList::MENU_GUILD);
+		GS()->UpdateVotes(MenuList::MAIN_MENU);
 		return true;
 	}
 
@@ -1341,6 +1341,7 @@ void GuildJob::BuyGuildHouse(int GuildID, int HouseID)
 		GS()->Chat(-1, "{STR} buyight guild house on {STR}!", Guild[GuildID].m_Name, WorldName);
 		GS()->ChatDiscord(DC_SERVER_INFO, "Information", "{STR} buyight guild house on {STR}!", Guild[GuildID].m_Name, WorldName);
 		AddHistoryGuild(GuildID, "Bought a house on '%s'.", WorldName);
+		return;
 	}
 
 	// информация что дом уже куплен
@@ -1359,7 +1360,7 @@ void GuildJob::SellGuildHouse(int GuildID)
 	}
 
 	// продажа гильдии дома по айди дома
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_houses", "WHERE ID = '%d' AND OwnerID IS NOT NULL", HouseID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_houses", "WHERE ID = '%d' AND OwnerMID IS NOT NULL", HouseID));
 	if(RES->next())
 	{
 		// сбросить владельца

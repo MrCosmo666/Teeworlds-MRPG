@@ -331,7 +331,7 @@ bool HouseJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 
 bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	if (ReplaceMenu)
 	{
 		CCharacter* pChr = pPlayer->GetCharacter();
@@ -569,7 +569,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 	{
 		if(Get < 100)
 		{
-			GS()->Chat(ClientID, "Minimal operation house balance 100gold!");
+			GS()->Chat(ClientID, "Minimal 100 gold.");
 			return true;
 		}
 		
@@ -586,7 +586,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 	{
 		if(Get < 100)
 		{
-			GS()->Chat(ClientID, "Minimal operation house balance 100gold!");
+			GS()->Chat(ClientID, "Minimal 100 gold.");
 			return true;
 		}
 		
