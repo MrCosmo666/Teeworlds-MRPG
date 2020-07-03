@@ -267,33 +267,31 @@ bool HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 // Продажа дома
 void HouseJob::SellHouse(int HouseID)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("OwnerID", "tw_houses", "WHERE ID = '%d'", HouseID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("OwnerID", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NOT NULL", HouseID));
 	if(RES->next())
 	{
-		const int OwnerID = RES->getInt("OwnerID");
-		const int ClientID = Job()->Account()->CheckOnlineAccount(OwnerID);
-		if(ClientID >= 0)
-		{
-			GS()->ChatFollow(ClientID, "Your House is sold !");
-			GS()->Chat(-1, "House: {INT} have been is released!", &HouseID);
-			GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**[House: {INT}] have been sold!**", &HouseID);
-		}
-		const int Price = Home[HouseID].m_Price;
-		Job()->Inbox()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itGold, Price, 0);
-
 		if(Home[HouseID].m_Door)
 		{
 			delete Home[HouseID].m_Door;
 			Home[HouseID].m_Door = 0;
 		}
-		Home[HouseID].m_Bank = 50000;
+		Home[HouseID].m_Bank = 0;
 		Home[HouseID].m_OwnerID = -1;
-		
-		// обновить голосования
-		if(ClientID >= 0)
-			GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 
+		const int OwnerID = RES->getInt("OwnerID");
+		const int Price = Home[HouseID].m_Price;
+		Job()->Inbox()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itGold, Price, 0);
 		SJK.UD("tw_houses", "OwnerID = NULL, HouseBank = '50000' WHERE ID = '%d'", HouseID);
+
+		// информация о продаже
+		const int ClientID = Job()->Account()->CheckOnlineAccount(OwnerID);
+		if(ClientID >= 0)
+		{
+			GS()->ChatFollow(ClientID, "Your House is sold!");
+			GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
+		}
+		GS()->Chat(-1, "House: {INT} have been is released!", &HouseID);
+		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**[House: {INT}] have been sold!**", &HouseID);
 	}
 }
 
