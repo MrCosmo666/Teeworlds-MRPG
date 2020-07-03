@@ -372,7 +372,7 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOSEND, -1);
 
 		// send discord chat only from players
-		if(ChatterClientID < MAX_PLAYERS)
+		if(pChatterPlayer)
 			ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
 
 		// send chat to guild team
@@ -426,7 +426,7 @@ void CGS::FakeChat(const char *pName, const char *pText)
 	// отправить чат и удалить игрока и выкинуть игрока
 	SendChat(FakeClientID, CHAT_ALL, -1, pText);
 	delete m_apPlayers[FakeClientID];
-	m_apPlayers[FakeClientID] = 0;
+	m_apPlayers[FakeClientID] = nullptr;
 	Server()->SendPackMsg(&LeaveMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
 	Server()->BackInformationFakeClient(FakeClientID);
 }
@@ -434,8 +434,8 @@ void CGS::FakeChat(const char *pName, const char *pText)
 // Отправить форматированное сообщение
 void CGS::Chat(int ClientID, const char* pText, ...)
 {
-	int Start = (ClientID < 0 ? 0 : ClientID);
-	int End = (ClientID < 0 ? MAX_CLIENTS : ClientID + 1);
+	const int Start = (ClientID < 0 ? 0 : ClientID);
+	const int End = (ClientID < 0 ? MAX_CLIENTS : ClientID + 1);
 
 	CNetMsg_Sv_Chat Msg;
 	Msg.m_Mode = CHAT_ALL;
@@ -830,7 +830,7 @@ void CGS::SendEquipItem(int ClientID, int TargetID)
 		return;
 
 	// send players equiping global bots local on world
-	const int WorldID = (pPlayer->IsBot() ? pPlayer->GetPlayerWorldID() : -1);
+	const int MsgWorldID = (pPlayer->IsBot() ? pPlayer->GetPlayerWorldID() : -1);
 	
 	CNetMsg_Sv_EquipItems Msg;
 	Msg.m_ClientID = ClientID;
@@ -841,7 +841,7 @@ void CGS::SendEquipItem(int ClientID, int TargetID)
 		Msg.m_EquipID[k] = EquipItem;
 		Msg.m_EnchantItem[k] = EnchantItem;
 	}
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID, WorldID);
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID, MsgWorldID);
 }
 
 // Отправить снаряжение в радиусе
@@ -1744,7 +1744,7 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 	while(*p)
 	{
 		const char *pStrOld = p;
-		int Code = str_utf8_decode(&p);
+		const int Code = str_utf8_decode(&p);
 
 		// check if unicode is not empty
 		if(Code > 0x20 && Code != 0xA0 && Code != 0x034F && (Code < 0x2000 || Code > 0x200F) && (Code < 0x2028 || Code > 0x202F) &&
@@ -1770,7 +1770,7 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 	// отправить клиентам что имеют клиент ммо
 	if(CheckClient(To)) 
 	{
-		if (str_length(Vote.m_aDescription) < 1)
+		if (Vote.m_aDescription[0] == '\0')
 			m_apPlayers[To]->m_Colored = { 0, 0, 0 };
 
 		CNetMsg_Sv_VoteMmoOptionAdd OptionMsg;
