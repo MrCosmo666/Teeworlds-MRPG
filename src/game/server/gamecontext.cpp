@@ -361,7 +361,8 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 	}
 	else if(Mode == CHAT_TEAM)
 	{
-		if(ChatterClientID <= 0 || (m_apPlayers[ChatterClientID] && m_apPlayers[ChatterClientID]->Acc().GuildID <= 0))
+		CPlayer* pChatterPlayer = GetPlayer(ChatterClientID, true);
+		if(!pChatterPlayer || pChatterPlayer->Acc().GuildID <= 0)
 		{
 			Chat(ChatterClientID, "This chat is intended for team / guilds!");
 			return;
