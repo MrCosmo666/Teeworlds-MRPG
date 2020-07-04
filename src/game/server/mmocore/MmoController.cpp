@@ -126,7 +126,6 @@ void MmoController::ResetClientData(int ClientID)
 // Сохранение аккаунта
 void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 {
-	const int ClientID = pPlayer->GetCID();
 	if(!pPlayer->IsAuthed()) 
 		return;
 	
