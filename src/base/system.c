@@ -1951,11 +1951,11 @@ void str_append_num(char* dst, const char* src, int dst_size, int num)
 int str_replace(char* line, const char* search, const char* replace)
 {
 	int count;
-	count = 1;
 	char* sp; // start of pattern
 	const int sLen = str_length(search);
 	const int rLen = str_length(replace);
 
+	count = 1;
 	if ((sp = strstr(line, search)) == NULL)
 	{
 		return 0;
