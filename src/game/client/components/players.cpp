@@ -636,7 +636,7 @@ void CPlayers::OnInit()
 		
 	/* WINGS */
 	m_aEquipInfo.add({ itShadowWings, vec4(1.75f, 0.0f, 0.0f, 0.003f), vec2(100, 60), vec2(180, 120), 0.0f, IMAGE_SHADOW_WINGS, ANIM_WINGS_LENGTH });
-	m_aEquipInfo.add({ itNeptuneWings, vec4(0.2f, 0.2f, 1.75f, 0.003f), vec2(110, 50), vec2(180, 100), 0.0f, IMAGE_NEPTUNE_WINGS, ANIM_WINGS_LENGTH });
+	m_aEquipInfo.add({ itNeptuneWings, vec4(0.2f, 0.2f, 1.75f, 0.003f), vec2(110, 60), vec2(180, 100), 0.0f, IMAGE_NEPTUNE_WINGS, ANIM_WINGS_STATIC });
 	m_aEquipInfo.add({ itAngelWings,  vec4(0.2f, 0.2f, 1.75f, 0.003f), vec2(115, 64), vec2(200, 100), 0.0f, IMAGE_ANGEL_WINGS, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itHeavenlyWings, vec4(1.0f, 0.85f, 0.0f, 0.003f), vec2(170, 100), vec2(280, 150), 0.0f, IMAGE_HEAVENLY_WINGS, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itRainbowWings, vec4(0.1f, 0.1f, 0.1f, 0.003f), vec2(115, 70), vec2(200, 100), 0.9f, IMAGE_RAINBOW_WINGS, ANIM_WINGS_LENGTH });
