@@ -1,7 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <thread>
-#include <engine/shared/config.h>
 #include <teeother/system/string.h>
 
 #include <game/server/gamecontext.h>
@@ -218,7 +217,7 @@ void MmoController::LoadLogicWorld()
 	while(RES->next())
 	{
 		const int Type = (int)RES->getInt("MobID"), Mode = (int)RES->getInt("Mode"), Health = (int)RES->getInt("ParseInt");
-		vec2 Position = vec2(RES->getInt("PosX"), RES->getInt("PosY"));
+		const vec2 Position = vec2(RES->getInt("PosX"), RES->getInt("PosY"));
 		GS()->m_pController->CreateLogic(Type, Mode, Position, Health);
 	}
 }

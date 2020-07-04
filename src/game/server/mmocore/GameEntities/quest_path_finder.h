@@ -3,6 +3,8 @@
 #ifndef GAME_SERVER_ENTITIES_QUESTAI_H
 #define GAME_SERVER_ENTITIES_QUESTAI_H
 
+#include <game/server/entity.h>
+
 class CQuestPathFinder : public CEntity
 {
 	int m_ClientID;

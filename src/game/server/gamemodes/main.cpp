@@ -1,13 +1,12 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 
-#include "main.h"
-
 #include <game/server/gamecontext.h>
-
 #include <game/server/mmocore/GameEntities/npcwall.h>
 #include <game/server/mmocore/GameEntities/jobitems.h>
 #include <game/server/mmocore/GameEntities/Logics/logicwall.h>
+
+#include "main.h"
 
 CGameControllerMain::CGameControllerMain(class CGS *pGS)
 : IGameController(pGS)

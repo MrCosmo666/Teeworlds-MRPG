@@ -5,9 +5,7 @@
 
 #include <base/vmath.h>
 #include <game/commands.h>
-
 #include <game/server/enum_context.h>
-#include <generated/protocol.h>
 
 /*
 	Class: Game Controller

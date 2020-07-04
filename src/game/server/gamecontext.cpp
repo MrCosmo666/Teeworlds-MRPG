@@ -7,7 +7,6 @@
 #include <base/math.h>
 #include <engine/map.h>
 #include <engine/shared/config.h>
-#include <engine/shared/memheap.h>
 
 #include <generated/server_data.h>
 #include <game/version.h>

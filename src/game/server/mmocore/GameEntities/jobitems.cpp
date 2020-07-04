@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <generated/server_data.h>
 #include <game/server/gamecontext.h>
 
 #include "jobitems.h"

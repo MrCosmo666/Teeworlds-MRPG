@@ -2,9 +2,9 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 #include <teeother/system/string.h>
+#include <game/server/entity.h>
 #include <game/server/gamecontext.h>
 
-#include <game/server/mmocore/GameEntities/jobitems.h>
 #include <game/server/mmocore/GameEntities/npcwall.h>
 #include <game/server/mmocore/GameEntities/Logics/logicwall.h>
 

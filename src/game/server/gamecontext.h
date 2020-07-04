@@ -7,7 +7,6 @@
 #include <engine/server.h>
 
 #include <base/another/kurhelper.h>
-#include <engine/shared/memheap.h>
 #include <game/layers.h>
 #include <game/voting.h>
 

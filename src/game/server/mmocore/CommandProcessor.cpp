@@ -1,4 +1,3 @@
-#include <engine/shared/config.h>
 #include <engine/server.h>
 
 #include <teeother/components/localization.h>
