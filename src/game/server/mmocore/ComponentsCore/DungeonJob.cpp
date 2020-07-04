@@ -173,9 +173,9 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 
 		if(!GS()->IsDungeon())
 		{
-			pPlayer->Acc().LastWorldID = GS()->GetWorldID();
 			pPlayer->GetTempData().TempTeleportX = pPlayer->GetCharacter()->m_Core.m_Pos.x;
 			pPlayer->GetTempData().TempTeleportY = pPlayer->GetCharacter()->m_Core.m_Pos.y;
+			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_POSITION);
 		}
 
 		GS()->Chat(-1, "{STR} joined to Dungeon {STR}!", GS()->Server()->ClientName(ClientID), Dungeon[VoteID].Name);

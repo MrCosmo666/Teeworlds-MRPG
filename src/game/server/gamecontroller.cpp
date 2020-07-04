@@ -113,7 +113,7 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 void IGameController::OnPlayerConnect(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	if(Server()->ClientIngame(ClientID))
+	if(Server()->ClientIngame(ClientID) && pPlayer->GetPlayerWorldID() == GS()->GetWorldID())
 	{
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "team_join player='%d:%s' team=%d", ClientID, Server()->ClientName(ClientID), pPlayer->GetTeam());
@@ -125,14 +125,14 @@ void IGameController::OnPlayerConnect(CPlayer *pPlayer)
 void IGameController::OnPlayerDisconnect(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	if(Server()->ClientIngame(ClientID))
+	if(Server()->ClientIngame(ClientID) && pPlayer->GetPlayerWorldID() == GS()->GetWorldID())
 	{
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "leave player='%d:%s'", ClientID, Server()->ClientName(ClientID));
 		GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "game", aBuf);
+		GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_POSITION);
 	}
 
-	GS()->Mmo()->SaveAccount(pPlayer, SAVE_POSITION);
 	pPlayer->OnDisconnect();
 }
 

@@ -782,6 +782,7 @@ void CPlayer::ClearFormatQuestText()
 void CPlayer::ChangeWorld(int WorldID)
 {
 	// reset dungeon temp data
+	Acc().LastWorldID = GS()->GetWorldID();
 	GetTempData().TempAlreadyVotedDungeon = false;
 	GetTempData().TempDungeonReady = false;
 	GetTempData().TempTankVotingDungeon = 0;

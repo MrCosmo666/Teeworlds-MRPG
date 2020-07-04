@@ -193,9 +193,10 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	}
 
 	// сохранение мира позиции
-	else if(Table == SaveType::SAVE_POSITION && !GS()->IsDungeon())
+	else if(Table == SaveType::SAVE_POSITION)
 	{
-		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", GS()->Server()->GetWorldID(ClientID), pPlayer->Acc().AuthID);
+		if(!GS()->IsDungeon())
+			SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", pPlayer->GetPlayerWorldID(), pPlayer->Acc().AuthID);
 		return;
 	}
 

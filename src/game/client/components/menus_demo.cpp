@@ -374,8 +374,8 @@ int CMenus::DemolistFetchCallback(const char* pName, time_t Date, int IsDir, int
 	{
 		str_truncate(Item.m_aName, sizeof(Item.m_aName), pName, str_length(pName) - 5);
 		Item.m_InfosLoaded = false;
+		Item.m_Date = Date;
 	}
-	Item.m_Date = Date;
 	Item.m_IsDir = IsDir != 0;
 	Item.m_StorageType = StorageType;
 	pSelf->m_lDemos.add_unsorted(Item);
@@ -473,10 +473,7 @@ void CMenus::RenderDemoList(CUIRect MainView)
 			Headers.VSplitLeft(ms_aDemoCols[i].m_Width, &ms_aDemoCols[i].m_Rect, &Headers);
 
 			if(i + 1 < NumCols)
-			{
-				//Cols[i].flags |= SPACER;
 				Headers.VSplitLeft(2, &ms_aDemoCols[i].m_Spacer, &Headers);
-			}
 		}
 	}
 
@@ -552,11 +549,14 @@ void CMenus::RenderDemoList(CUIRect MainView)
 			}
 			Item.m_Rect.y += 2.0f;
 			UI()->DoLabel(&Item.m_Rect, DemoItem.m_aName, Item.m_Rect.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_LEFT);
-			char aDate[64];
-			str_timestamp_ex(DemoItem.m_Date, aDate, sizeof(aDate), FORMAT_SPACE);
-			if(!Item.m_Selected)
-				TextRender()->TextColor(CUI::ms_TransparentTextColor);
-			UI()->DoLabel(&Item.m_Rect, aDate, Item.m_Rect.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_RIGHT);
+			if(!DemoItem.m_IsDir)
+			{
+				char aDate[64];
+				str_timestamp_ex(DemoItem.m_Date, aDate, sizeof(aDate), FORMAT_SPACE);
+				if(!Item.m_Selected)
+					TextRender()->TextColor(CUI::ms_TransparentTextColor);
+				UI()->DoLabel(&Item.m_Rect, aDate, Item.m_Rect.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_RIGHT);
+			}
 			TextRender()->TextColor(CUI::ms_DefaultTextColor);
 			if(Item.m_Selected)
 				TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
