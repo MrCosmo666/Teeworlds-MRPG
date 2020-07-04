@@ -974,16 +974,14 @@ bool GuildJob::UpgradeGuild(int GuildID, int Field)
 	{
 		Guild[GuildID].m_Bank = RES->getInt("Bank");
 		Guild[GuildID].m_Upgrades[Field] = RES->getInt(UpgradeNames(Field, true).c_str());
-
 		const int UpgradePrice = (Field == EMEMBERUPGRADE::AvailableNSTSlots ? g_Config.m_SvPriceUpgradeGuildSlot : g_Config.m_SvPriceUpgradeGuildAnother);
 		const int PriceAvailable = Guild[GuildID].m_Upgrades[Field]*UpgradePrice;
 		if(PriceAvailable > Guild[GuildID].m_Bank)
 			return false;
 
-		Guild[ GuildID ].m_Upgrades[ Field ]++;
-		Guild[ GuildID ].m_Bank -= PriceAvailable;
-		SJK.UD("tw_guilds", "Bank = '%d', %s = '%d' WHERE ID = '%d'", 
-			Guild[GuildID].m_Bank, UpgradeNames(Field, true).c_str(), Guild[GuildID].m_Upgrades[ Field ], GuildID);
+		Guild[GuildID].m_Upgrades[Field]++;
+		Guild[GuildID].m_Bank -= PriceAvailable;
+		SJK.UD("tw_guilds", "Bank = '%d', %s = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, UpgradeNames(Field, true).c_str(), Guild[GuildID].m_Upgrades[ Field ], GuildID);
 		return true;
 	}
 	return false;

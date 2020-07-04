@@ -23,10 +23,9 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	m_NextTuningParams = m_PrevTuningParams;
 	m_MoodState = MOOD_NORMAL;
 	GS()->SendTuningParams(ClientID);
+
 	if(!IsBot())
-	{
 		Acc().Team = GetStartTeam();
-	}
 }
 
 CPlayer::~CPlayer()
@@ -192,7 +191,7 @@ void CPlayer::Snap(int SnappingClient)
 	for (auto& eff : CGS::Effects[m_ClientID])
 	{
 		char aBuf[32];
-		bool Minutes = eff.second >= 60;
+		const bool Minutes = eff.second >= 60;
 		str_format(aBuf, sizeof(aBuf), "%s %d%s ", eff.first.c_str(), Minutes ? eff.second / 60 : eff.second, Minutes ? "m" : "");
 		Buffer.append_at(Buffer.length(), aBuf);
 	}
@@ -203,7 +202,7 @@ void CPlayer::Snap(int SnappingClient)
 	StrToInts(pClientInfo->m_Gold, 6, Buffer.buffer());
 	Buffer.clear();
 
-	if(Acc().GuildID > 0)
+	if(Acc().IsGuild())
 	{
 		const int GuildID = Acc().GuildID;
 
@@ -488,7 +487,6 @@ int CPlayer::GetStartTeam()
 {
 	if(Acc().AuthID)
 		return TEAM_RED;
-
 	return TEAM_SPECTATORS;
 }
 
@@ -676,7 +674,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		// Очистка конца диалогов или диалога который был бесмысленный
 		const int sizeTalking = BotJob::NpcBot[MobID].m_Talk.size();
 		const bool isTalkingEmpty = BotJob::NpcBot[MobID].m_Talk.empty();
-		if ((isTalkingEmpty && m_TalkingNPC.m_TalkedProgress == 999) || (!isTalkingEmpty && m_TalkingNPC.m_TalkedProgress >= sizeTalking))
+		if ((isTalkingEmpty && m_TalkingNPC.m_TalkedProgress == IS_TALKING_EMPTY) || (!isTalkingEmpty && m_TalkingNPC.m_TalkedProgress >= sizeTalking))
 		{
 			ClearTalking();
 			GS()->ClearTalkText(m_ClientID);
@@ -689,7 +687,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		{
 			const char* MeaninglessDialog = GS()->Mmo()->BotsData()->GetMeaninglessDialog();
 			GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, -1, TalkedID, MeaninglessDialog);
-			m_TalkingNPC.m_TalkedProgress = 999;
+			m_TalkingNPC.m_TalkedProgress = IS_TALKING_EMPTY;
 			return;
 		}
 

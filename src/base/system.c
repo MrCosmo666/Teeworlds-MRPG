@@ -1950,17 +1950,16 @@ void str_append_num(char* dst, const char* src, int dst_size, int num)
 
 int str_replace(char* line, const char* search, const char* replace)
 {
-	int count;
 	char* sp; // start of pattern
-	int sLen = str_length(search);
-	int rLen = str_length(replace);
+	const int sLen = str_length(search);
+	const int rLen = str_length(replace);
 
 	if ((sp = strstr(line, search)) == NULL)
 	{
 		return 0;
 	}
 
-	count = 1;
+	int count = 1;
 	if (sLen > rLen)
 	{
 		// move from right to left

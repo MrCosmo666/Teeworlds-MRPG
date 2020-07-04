@@ -13,7 +13,6 @@
 #include <game/client/animstate.h>
 #include <game/client/gameclient.h>
 
-#include "binds.h"
 #include "console.h"
 #include "menus.h"
 #include "sounds.h"

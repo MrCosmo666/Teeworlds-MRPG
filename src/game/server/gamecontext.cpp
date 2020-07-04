@@ -985,7 +985,7 @@ void CGS::ClearTalkText(int ClientID)
 void CGS::UpdateDiscordStatus()
 {
 #ifdef CONF_DISCORD
-	if(Server()->Tick() % (Server()->TickSpeed() * 10) != 0 || m_WorldID != LOCALWORLD)
+	if(Server()->Tick() % (Server()->TickSpeed() * 10) != 0 || m_WorldID != LOCAL_WORLD)
 		return;
 
 	int Players = 0;
@@ -1124,7 +1124,7 @@ void CGS::OnTick()
 // Таймер в OnTick-=
 void CGS::OnTickLocalWorld()
 {
-	if(m_WorldID != LOCALWORLD) 
+	if(m_WorldID != LOCAL_WORLD) 
 		return;
 
 	// получить и отправить измененный день

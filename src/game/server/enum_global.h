@@ -41,7 +41,11 @@ STRINGABLE_ENUM_DECL(PLANT)
     F(ChairNSTExperience) \
 	F(ChairNSTMoney)
 STRINGABLE_ENUM_DECL(EMEMBERUPGRADE)
- 
+
+/*
+	Основные настройки сервера ядра
+	Здесь хранятся самые основные настройки сервера
+*/
 enum DayType
 {
 	NIGHTTYPE = 1,
@@ -50,19 +54,14 @@ enum DayType
 	EVENINGTYPE
 };
 
-/*
-	Основные настройки сервера ядра
-	Здесь хранятся самые основные настройки сервера
-*/
 enum
 {
 	NEWBIE_ZERO_WORLD = 0,
-	LOCALWORLD = 0,							// локальный мир
+	LOCAL_WORLD = 0,						// локальный мир
 	COUNT_WORLD = 11,						// кол-во миров
 	LAST_WORLD = COUNT_WORLD - 1,			// последний мир
 	FREE_SLOTS_WORLD = 7,					// мир в котором есть слоты для фейк мобов
-
-	MAX_DROPPED_FROM_MOBS = 5,
+	MAX_DROPPED_FROM_MOBS = 5,				// максимальное кол-во предметов что может дропать моб
 };
 
 #endif

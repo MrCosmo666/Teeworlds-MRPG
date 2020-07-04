@@ -403,7 +403,7 @@ void CItems::RenderMmoPickups(const CNetObj_MmoPickup* pPrev, const CNetObj_MmoP
 	// дальше эффект что они двигаются
 	static float s_Time = 0.0f;
 	static float s_LastLocalTime = Client()->LocalTime();
-	float Offset = Pos.y / 32.0f + Pos.x / 32.0f;
+	const float Offset = Pos.y / 32.0f + Pos.x / 32.0f;
 	if (Client()->State() == IClient::STATE_DEMOPLAYBACK) 
 	{
 		const IDemoPlayer::CInfo* pInfo = DemoPlayer()->BaseInfo();
