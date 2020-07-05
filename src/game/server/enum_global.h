@@ -58,7 +58,7 @@ enum
 {
 	NEWBIE_ZERO_WORLD = 0,					// мир начальный
 	LOCAL_WORLD = 0,						// локальный мир
-	COUNT_WORLD = 11,						// кол-во миров
+	COUNT_WORLD = 12,						// кол-во миров
 	LAST_WORLD = COUNT_WORLD - 1,			// последний мир
 	FREE_SLOTS_WORLD = 7,					// мир в котором есть слоты для фейк мобов
 	MAX_DROPPED_FROM_MOBS = 5,				// максимальное кол-во предметов что может дропать моб

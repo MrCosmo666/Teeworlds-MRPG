@@ -74,7 +74,7 @@ public:
 	int GetMemberChairBonus(int GuildID, int Field) const;
 
 	void CreateGuild(int ClientID, const char *GuildName);
-	void JoinGuild(int AuthID, int GuildID);
+	bool JoinGuild(int AuthID, int GuildID);
 	void ExitGuild(int AuthID);
 
 private:

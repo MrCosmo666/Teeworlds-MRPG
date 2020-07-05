@@ -382,6 +382,7 @@ const char *CServer::GetWorldName(int WorldID)
 		case 8: return "Noctis Resonance";
 		case 9: return "Departure";
 		case 10: return "Underwater of Neptune";
+		case 11: return "Kugan";
 	}
 	return "unknow";
 }

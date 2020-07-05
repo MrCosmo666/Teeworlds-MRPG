@@ -296,10 +296,12 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		}
 
 		const int SenderID = VoteID;
-		SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
-		Job()->Inbox()->SendInbox(SenderID, Guild[GuildID].m_Name, "You were accepted to join guild");
-		JoinGuild(SenderID, GuildID);
-		GS()->ResetVotes(ClientID, MenuList::MENU_GUILD);
+		if(JoinGuild(SenderID, GuildID))
+		{
+			SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
+			Job()->Inbox()->SendInbox(SenderID, Guild[GuildID].m_Name, "You were accepted to join guild");
+			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		}
 		return true;
 	}
 
@@ -753,7 +755,7 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 		GS()->Chat(ClientID, "You need first buy guild ticket on shop!");
 }
 
-void GuildJob::JoinGuild(int AuthID, int GuildID)
+bool GuildJob::JoinGuild(int AuthID, int GuildID)
 {
 	// проверяем клан есть или нет у этого и грока
 	const char *PlayerName = Job()->PlayerName(AuthID);
@@ -762,7 +764,7 @@ void GuildJob::JoinGuild(int AuthID, int GuildID)
 	{
 		GS()->ChatAccountID(AuthID, "You already in guild group!");
 		GS()->ChatGuild(GuildID, "{STR} already joined your or another guilds", PlayerName);
-		return;
+		return false;
 	}
 
 	// проверяем количество слотов доступных
@@ -771,7 +773,7 @@ void GuildJob::JoinGuild(int AuthID, int GuildID)
 	{
 		GS()->ChatAccountID(AuthID, "You don't joined [No slots for join]");
 		GS()->ChatGuild(GuildID, "{STR} don't joined [No slots for join]", PlayerName);
-		return;
+		return false;
 	}
 
 	// обновляем и получаем данные
@@ -784,6 +786,7 @@ void GuildJob::JoinGuild(int AuthID, int GuildID)
 	}
 	SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = NULL WHERE ID = '%d'", GuildID, AuthID);
 	GS()->ChatGuild(GuildID, "Player {STR} join in your guild!", PlayerName);
+	return true;
 }
 
 void GuildJob::ExitGuild(int AuthID)

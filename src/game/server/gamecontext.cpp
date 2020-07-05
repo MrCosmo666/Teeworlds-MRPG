@@ -1077,9 +1077,6 @@ void CGS::OnConsoleInit()
 
 	Console()->Register("parseskin", "i[cid]", CFGFLAG_SERVER, ConParseSkin, this, "Parse skin on console. Easy for devlop bots.");
 	Console()->Register("giveitem", "i[cid]i[itemid]i[count]i[ench]i[mail]", CFGFLAG_SERVER, ConGiveItem, this, "Give item <clientid> <itemid> <count> <enchant> <mail 1=yes 0=no>");
-	Console()->Register("tune", "s[tuning] i[value]", CFGFLAG_SERVER, ConTuneParam, this, "Tune variable to value");
-	Console()->Register("tune_reset", "", CFGFLAG_SERVER, ConTuneReset, this, "Reset tuning");
-	Console()->Register("tune_dump", "", CFGFLAG_SERVER, ConTuneDump, this, "Dump tuning");
 	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, this, "Say in chat");
 	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, this, "(Warning) Add new bot on database or update if finding <clientid> <bot name>");
 }
@@ -1597,11 +1594,11 @@ void CGS::ConParseSkin(IConsole::IResult *pResult, void *pUserData)
 // Выдать предмет игроку
 void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 {
-	int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS - 1);
-	int ItemID = pResult->GetInteger(1);
-	int Count = pResult->GetInteger(2);
-	int Enchant = pResult->GetInteger(3);
-	int Mail = pResult->GetInteger(4);
+	const int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS - 1);
+	const int ItemID = pResult->GetInteger(1);
+	const int Count = pResult->GetInteger(2);
+	const int Enchant = pResult->GetInteger(3);
+	const int Mail = pResult->GetInteger(4);
 
 	CGS *pSelf = (CGS *)pUserData;	
 	CPlayer *pPlayer = pSelf->GetPlayer(ClientID, true);
@@ -1613,48 +1610,6 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 			return;
 		}
 		pSelf->SendInbox(ClientID, "The sender heavens", "Sent from console", ItemID, Count, Enchant);
-	}
-}
-
-// Изменить параметр тюнинга
-void CGS::ConTuneParam(IConsole::IResult *pResult, void *pUserData)
-{
-	CGS *pSelf = (CGS *)pUserData;
-	const char *pParamName = pResult->GetString(0);
-	float NewValue = pResult->GetFloat(1);
-
-	if(pSelf->Tuning()->Set(pParamName, NewValue))
-	{
-		char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "%s changed to %.2f", pParamName, NewValue);
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", aBuf);
-		pSelf->SendTuningParams(-1);
-	}
-	else
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", "No such tuning parameter");
-}
-
-// Сбросить тюннинг
-void CGS::ConTuneReset(IConsole::IResult *pResult, void *pUserData)
-{
-	CGS *pSelf = (CGS *)pUserData;
-	CTuningParams TuningParams;
-	*pSelf->Tuning() = TuningParams;
-	pSelf->SendTuningParams(-1);
-	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", "Tuning reset");
-}
-
-// ДюмпТюннинга
-void CGS::ConTuneDump(IConsole::IResult *pResult, void *pUserData)
-{
-	CGS *pSelf = (CGS *)pUserData;
-	char aBuf[256];
-	for(int i = 0; i < pSelf->Tuning()->Num(); i++)
-	{
-		float v;
-		pSelf->Tuning()->Get(i, &v);
-		str_format(aBuf, sizeof(aBuf), "%s %.2f", pSelf->Tuning()->m_apNames[i], v);
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", aBuf);
 	}
 }
 
@@ -1773,7 +1728,7 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 			m_apPlayers[To]->m_Colored = { 0, 0, 0 };
 
 		CNetMsg_Sv_VoteMmoOptionAdd OptionMsg;
-		vec3 ToHexColor = m_apPlayers[To]->m_Colored;
+		const vec3 ToHexColor = m_apPlayers[To]->m_Colored;
 		OptionMsg.m_pHexColor = ((int)ToHexColor.r << 16) + ((int)ToHexColor.g << 8) + (int)ToHexColor.b;
 		OptionMsg.m_pDescription = Vote.m_aDescription;
 		StrToInts(OptionMsg.m_pIcon, 4, Icon);
@@ -1816,7 +1771,7 @@ void CGS::AVH(int To, const int ID, vec3 Color, const char* pText, ...)
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		bool HidenTabs = (ID >= TAB_STAT) ? m_apPlayers[To]->GetHidenMenu(ID) : false;
+		const bool HidenTabs = (ID >= TAB_STAT) ? m_apPlayers[To]->GetHidenMenu(ID) : false;
 		Buffer.append(GetSymbolHandleMenu(To, HidenTabs, ID));
 
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
@@ -1840,7 +1795,7 @@ void CGS::AVHI(int To, const char *Icon, const int ID, vec3 Color, const char* p
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		bool HidenTabs = (bool)(ID >= TAB_STAT ? m_apPlayers[To]->GetHidenMenu(ID) : false);
+		const bool HidenTabs = (bool)(ID >= TAB_STAT ? m_apPlayers[To]->GetHidenMenu(ID) : false);
 		Buffer.append(GetSymbolHandleMenu(To, HidenTabs, ID));
 
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
