@@ -427,33 +427,31 @@ void HouseJob::AddSafeDeposit(CPlayer *pPlayer, int Balance)
 }
 
 // Действия над дверью
-void HouseJob::ChangeStateDoor(int HouseID)
+bool HouseJob::ChangeStateDoor(int HouseID)
 {
-	if(Home.find(HouseID) == Home.end() || Home[HouseID].m_OwnerID <= 0) return;
+	if(Home.find(HouseID) == Home.end() || Home[HouseID].m_OwnerID <= 0) 
+		return false;
 
-	// если мир не равен данному
 	if(Home[HouseID].m_WorldID != GS()->GetWorldID())
 	{
 		GS()->ChatAccountID(Home[HouseID].m_OwnerID, "Change state door can only near your house.");
-		return;
+		return false;
 	}
 
-	// изменяем стату двери
 	if(Home[HouseID].m_Door) 
 	{
-		// дверь удаляем
 		delete Home[HouseID].m_Door;
 		Home[HouseID].m_Door = 0;
 	}
 	else
 	{
-		// создаем дверь
 		Home[HouseID].m_Door = new HouseDoor(&GS()->m_World, vec2(Home[HouseID].m_DoorX, Home[HouseID].m_DoorY));
 	}
 
 	// надпись если найдется игрок
-	bool StateDoor = (Home[HouseID].m_Door);
+	const bool StateDoor = (Home[HouseID].m_Door);
 	GS()->ChatAccountID(Home[HouseID].m_OwnerID, "You {STR} the house.", (StateDoor ? "closed" : "opened"));
+	return true;
 }
 
 // Показ меню дома
@@ -598,16 +596,16 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 	// Дверь дома
 	if(PPSTR(CMD, "HOUSEDOOR") == 0)
 	{
-		ChangeStateDoor(VoteID);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE);
+		if(ChangeStateDoor(VoteID))
+			GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE);
 		return true;		
 	}
 
 	// начала расстановки декорации
 	if(PPSTR(CMD, "DECOSTART") == 0)
 	{
-		int HouseID = PlayerHouseID(pPlayer);
-		vec2 PositionHouse = GetPositionHouse(HouseID);
+		const int HouseID = PlayerHouseID(pPlayer);
+		const vec2 PositionHouse = GetPositionHouse(HouseID);
 		if(HouseID <= 0 || distance(PositionHouse, pPlayer->GetCharacter()->m_Core.m_Pos) > 600)
 		{
 			GS()->Chat(ClientID, "Long distance from the house, or you do not own the house!");
@@ -630,7 +628,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 	if(PPSTR(CMD, "DECODELETE") == 0)
 	{
 		// дом проверка
-		int HouseID = PlayerHouseID(pPlayer);
+		const int HouseID = PlayerHouseID(pPlayer);
 		if(HouseID > 0 && DeleteDecorationHouse(VoteID))
 		{
 			ItemJob::InventoryItem &PlDecoItem = pPlayer->GetItem(VoteID2);

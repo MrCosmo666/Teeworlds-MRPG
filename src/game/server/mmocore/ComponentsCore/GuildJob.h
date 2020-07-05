@@ -128,7 +128,7 @@ public:
 	void BuyGuildHouse(int GuildID, int HouseID);
 	void SellGuildHouse(int GuildID);
 	void ShowBuyHouse(CPlayer *pPlayer, int HouseID);
-	void ChangeStateDoor(int GuildID);
+	bool ChangeStateDoor(int GuildID);
 };
 
 class GuildDoor : public CEntity

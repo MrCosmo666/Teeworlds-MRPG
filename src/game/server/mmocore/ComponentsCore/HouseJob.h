@@ -84,7 +84,7 @@ public:
 	void TakeFromSafeDeposit(CPlayer *pPlayer, int TakeCount);
 	void AddSafeDeposit(CPlayer *pPlayer, int Balance);
 	
-	void ChangeStateDoor(int HouseID);
+	bool ChangeStateDoor(int HouseID);
 
 	/* #########################################################################
 		PARSING HOUSES 

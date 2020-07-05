@@ -280,8 +280,8 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			return true;
 		}
 
-		ChangeStateDoor(GuildID);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
+		if(ChangeStateDoor(GuildID))
+			GS()->UpdateVotes(MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -301,7 +301,9 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
 			Job()->Inbox()->SendInbox(SenderID, Guild[GuildID].m_Name, "You were accepted to join guild");
 			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			return true;
 		}
+		GS()->Chat(ClientID, "You can't accept (there are no free slot or he is already in Guild).");
 		return true;
 	}
 
@@ -362,7 +364,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		}
 
 		str_copy(pPlayer->GetTempData().m_aRankGuildBuf, GetText, sizeof(pPlayer->GetTempData().m_aRankGuildBuf));
-		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD_RANK);
+		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -384,7 +386,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		}
 
 		AddRank(GuildID, pPlayer->GetTempData().m_aRankGuildBuf);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD_RANK);
+		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -400,7 +402,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 
 		const int RankID = VoteID;
 		DeleteRank(RankID, GuildID);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD_RANK);
+		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -416,7 +418,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 
 		const int RankID = VoteID;
 		ChangeRankAccess(RankID);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD_RANK);
+		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -438,7 +440,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 
 		const int RankID = VoteID;
 		ChangeRank(RankID, GuildID, pPlayer->GetTempData().m_aRankGuildBuf);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD_RANK);
+		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -454,7 +456,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 
 		// меняем ранг и очишаем меню интерактивов
 		ChangePlayerRank(VoteID, VoteID2);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
+		GS()->UpdateVotes(MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -470,7 +472,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			return true;
 		}
 
-		vec2 PositionHouse = GetPositionHouse(GuildID);
+		const vec2 PositionHouse = GetPositionHouse(GuildID);
 		if (distance(PositionHouse, pPlayer->GetCharacter()->m_Core.m_Pos) > 600)
 		{
 			GS()->Chat(ClientID, "Maximum distance between your home 600!");
@@ -515,7 +517,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 
 bool GuildJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	if (ReplaceMenu)
 	{
 		CCharacter* pChr = pPlayer->GetCharacter();
@@ -1413,16 +1415,16 @@ void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 	GS()->AV(ClientID, "null", "");
 }
 
-void GuildJob::ChangeStateDoor(int GuildID)
+bool GuildJob::ChangeStateDoor(int GuildID)
 {
 	const int HouseID = GetGuildHouseID(GuildID);
 	if(HouseGuild.find(HouseID) == HouseGuild.end()) 
-		return;
+		return false;
 
 	if(HouseGuild[HouseID].m_WorldID != GS()->GetWorldID())
 	{
 		GS()->ChatGuild(GuildID, "Change state door can only near your house.");	
-		return;
+		return false;
 	}
 
 	if(HouseGuild[HouseID].m_Door) 
@@ -1437,6 +1439,7 @@ void GuildJob::ChangeStateDoor(int GuildID)
 	
 	const bool StateDoor = (bool)(HouseGuild[HouseID].m_Door);
 	GS()->ChatGuild(GuildID, "{STR} the house for others.", (StateDoor ? "closed" : "opened"));
+	return true;
 }
 
 GuildDoor::GuildDoor(CGameWorld *pGameWorld, vec2 Pos, int GuildID)
