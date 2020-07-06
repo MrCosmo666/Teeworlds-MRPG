@@ -1480,7 +1480,6 @@ void CGS::OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld)
 	// очистка данных
 	delete m_apPlayers[ClientID];
 	m_apPlayers[ClientID] = nullptr;
-	ClearClientData(ClientID);
 }
 
 // Input проверить и отправить
