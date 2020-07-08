@@ -219,7 +219,7 @@ void CServerBan::ConBanExt(IConsole::IResult *pResult, void *pUser)
 	CServerBan *pThis = static_cast<CServerBan *>(pUser);
 
 	const char *pStr = pResult->GetString(0);
-	int Minutes = pResult->NumArguments()>1 ? clamp(pResult->GetInteger(1), 0, 44640) : 30;
+	const int Minutes = pResult->NumArguments()>1 ? clamp(pResult->GetInteger(1), 0, 44640) : 30;
 	const char *pReason = pResult->NumArguments()>2 ? pResult->GetString(2) : "No reason given";
 
 	if(!str_is_number(pStr))
@@ -233,7 +233,7 @@ void CServerBan::ConBanExt(IConsole::IResult *pResult, void *pUser)
 			char aAddrStr[NETADDR_MAXSTRSIZE];
 			net_addr_str(pThis->Server()->m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), true);
 			str_format(aBuf, sizeof(aBuf), "Player %s IP(%s). Banned for %d minutes!", pThis->Server()->ClientName(ClientID), aAddrStr, Minutes);
-			pThis->Server()->SendDiscordMessage(g_Config.m_SvDiscordAdminChanal, DC_SERVER_WARNING, pThis->Server()->ClientName(ClientID), aBuf);
+			pThis->Server()->SendDiscordMessage(g_Config.m_SvDiscordAdminChanal, DC_SERVER_WARNING, "Bans information!", aBuf);
 			pThis->BanAddr(pThis->Server()->m_NetServer.ClientAddr(ClientID), Minutes*60, pReason);
 		}
 	}
