@@ -15,20 +15,21 @@ std::map < int , std::map < int , SkillJob::StructSkills > > SkillJob::Skill;
 // Инициализация класса
 void SkillJob::OnInit()
 { 
-	// загрузить список скиллов
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_skills_list"));
-	while(RES->next())
+	SJK.SDT("*", "tw_skills_list", [&](ResultSet* RES)
 	{
-		const int SkillID = (int)RES->getInt("ID");
-		str_copy(SkillData[SkillID].m_SkillName, RES->getString("SkillName").c_str(), sizeof(SkillData[SkillID].m_SkillName));
-		str_copy(SkillData[SkillID].m_SkillDesc, RES->getString("SkillDesc").c_str(), sizeof(SkillData[SkillID].m_SkillDesc));
-		str_copy(SkillData[SkillID].m_SkillBonusInfo, RES->getString("BonusInfo").c_str(), sizeof(SkillData[SkillID].m_SkillBonusInfo));
-		SkillData[SkillID].m_ManaProcent = (int)RES->getInt("ManaProcent");
-		SkillData[SkillID].m_SkillPrice = (int)RES->getInt("Price");
-		SkillData[SkillID].m_SkillMaxLevel = (int)RES->getInt("MaxLevel");
-		SkillData[SkillID].m_BonusCount = (int)RES->getInt("BonusCount");
-		SkillData[SkillID].m_Passive = (bool)RES->getBoolean("Passive");
-	}
+		while(RES->next())
+		{
+			const int SkillID = (int)RES->getInt("ID");
+			str_copy(SkillData[SkillID].m_SkillName, RES->getString("SkillName").c_str(), sizeof(SkillData[SkillID].m_SkillName));
+			str_copy(SkillData[SkillID].m_SkillDesc, RES->getString("SkillDesc").c_str(), sizeof(SkillData[SkillID].m_SkillDesc));
+			str_copy(SkillData[SkillID].m_SkillBonusInfo, RES->getString("BonusInfo").c_str(), sizeof(SkillData[SkillID].m_SkillBonusInfo));
+			SkillData[SkillID].m_ManaProcent = (int)RES->getInt("ManaProcent");
+			SkillData[SkillID].m_SkillPrice = (int)RES->getInt("Price");
+			SkillData[SkillID].m_SkillMaxLevel = (int)RES->getInt("MaxLevel");
+			SkillData[SkillID].m_BonusCount = (int)RES->getInt("BonusCount");
+			SkillData[SkillID].m_Passive = (bool)RES->getBoolean("Passive");
+		}
+	});
 }
 
 void SkillJob::OnInitAccount(CPlayer *pPlayer)

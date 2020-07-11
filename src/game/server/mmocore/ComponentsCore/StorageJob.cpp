@@ -35,16 +35,18 @@ void StorageJob::ShowStorageMenu(CPlayer* pPlayer, int StorageID)
 
 void StorageJob::OnInit()
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_storages"));
-	while (RES->next())
+	SJK.SDT("*", "tw_storages", [&](ResultSet* RES)
 	{
-		const int ID = (int)RES->getInt("ID");
-		Storage[ID].PosX = (int)RES->getInt("PosX");
-		Storage[ID].PosY = (int)RES->getInt("PosY");
-		Storage[ID].Currency = (int)RES->getInt("Currency");
-		Storage[ID].WorldID = (int)RES->getInt("WorldID");
-		str_copy(Storage[ID].Name, RES->getString("Name").c_str(), sizeof(Storage[ID].Name));
-	}
+		while(RES->next())
+		{
+			const int ID = (int)RES->getInt("ID");
+			Storage[ID].PosX = (int)RES->getInt("PosX");
+			Storage[ID].PosY = (int)RES->getInt("PosY");
+			Storage[ID].Currency = (int)RES->getInt("Currency");
+			Storage[ID].WorldID = (int)RES->getInt("WorldID");
+			str_copy(Storage[ID].Name, RES->getString("Name").c_str(), sizeof(Storage[ID].Name));
+		}
+	});
 }
 
 bool StorageJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
