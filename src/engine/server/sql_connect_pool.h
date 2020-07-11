@@ -1,9 +1,7 @@
 #ifndef ENGINE_SERVER_SQL_CONNECTIONPOOL_H
 #define ENGINE_SERVER_SQL_CONNECTIONPOOL_H
 
-#include <mysql_connection.h>
-#include <cppconn/exception.h>
-#include <cppconn/driver.h>
+#include <boost/scoped_ptr.hpp>
 #include <cppconn/statement.h>
 #include <functional>
 
@@ -15,8 +13,8 @@ class CConectionPool
 	CConectionPool();
 	
 	static std::shared_ptr<CConectionPool> m_Instance;
-	std::list<Connection*>m_ConnList;
-	Driver *m_pDriver;
+	std::list<class Connection*>m_ConnList;
+	class Driver *m_pDriver;
 
 	void InsertFormated(int Milliseconds, const char *Table, const char *Buffer, va_list args);
 	void UpdateFormated(int Milliseconds, const char *Table, const char *Buffer, va_list args);
@@ -26,7 +24,7 @@ public:
 	~CConectionPool();
 
 	class Connection* CreateConnection();
-	void DisconnectConnection(Connection* pConnection);
+	void DisconnectConnection(class Connection* pConnection);
 	void DisconnectConnectionHeap();
 	static CConectionPool& GetInstance();
 
@@ -43,10 +41,8 @@ public:
 	void DDS(int Milliseconds, const char *Table, const char *Buffer, ...);
 
 	// функция выборка с бд данных
-	ResultSet* SD(const char *Select, const char *Table, const char *Buffer = "", ...);
-	
-	// функция выборка с бд данных в потоке через лямбду
-	void SDT(const char* Select, const char* Table, std::function<void(ResultSet*)> func, const char* Buffer = "", ...);
+	class ResultSet* SD(const char *Select, const char *Table, const char *Buffer = "", ...);
+	void SDT(const char* Select, const char* Table, std::function<void(class ResultSet*)> func, const char* Buffer = "", ...);
 };
 
 #endif

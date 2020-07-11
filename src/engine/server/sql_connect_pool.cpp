@@ -2,6 +2,10 @@
 #include <thread>
 #include <stdarg.h>
 
+#include <mysql_connection.h>
+#include <cppconn/exception.h>
+#include <cppconn/driver.h>
+
 #include <base/system.h>
 #include <engine/shared/config.h>
 #include "sql_connect_pool.h"
