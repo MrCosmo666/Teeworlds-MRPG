@@ -12,70 +12,77 @@ std::map < int , GuildJob::GuildStructRank > GuildJob::RankGuild;
 
 void GuildJob::LoadGuildRank(int GuildID)
 {
+	// загрузка рангов
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_ranks", "WHERE ID > '0' AND GuildID = '%d'", GuildID));
-	while (RES->next())
+	while(RES->next())
 	{
-		int ID = RES->getInt("ID");
-		RankGuild[ID].GuildID = GuildID;
-		RankGuild[ID].Access = RES->getInt("Access");
-		str_copy(RankGuild[ID].Rank, RES->getString("Name").c_str(), sizeof(RankGuild[ID].Rank));
+			int ID = RES->getInt("ID");
+			RankGuild[ID].GuildID = GuildID;
+			RankGuild[ID].Access = RES->getInt("Access");
+			str_copy(RankGuild[ID].Rank, RES->getString("Name").c_str(), sizeof(RankGuild[ID].Rank));
 	}
 }
 
 void GuildJob::OnInit()
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds"));
-	while (RES->next())
+	SJK.SDT("*", "tw_guilds", [&](ResultSet* RES)
 	{
-		int GuildID = RES->getInt("ID");
-		Guild[GuildID].m_OwnerID = RES->getInt("OwnerID");
-		Guild[GuildID].m_Level = RES->getInt("Level");
-		Guild[GuildID].m_Exp = RES->getInt("Experience");
-		Guild[GuildID].m_Bank = RES->getInt("Bank");
-		Guild[GuildID].m_Score = RES->getInt("Score");
-		str_copy(Guild[GuildID].m_Name, RES->getString("GuildName").c_str(), sizeof(Guild[GuildID].m_Name));
+		while(RES->next())
+		{
+			int GuildID = RES->getInt("ID");
+			Guild[GuildID].m_OwnerID = RES->getInt("OwnerID");
+			Guild[GuildID].m_Level = RES->getInt("Level");
+			Guild[GuildID].m_Exp = RES->getInt("Experience");
+			Guild[GuildID].m_Bank = RES->getInt("Bank");
+			Guild[GuildID].m_Score = RES->getInt("Score");
+			str_copy(Guild[GuildID].m_Name, RES->getString("GuildName").c_str(), sizeof(Guild[GuildID].m_Name));
 
-		for (int i = 0; i < EMEMBERUPGRADE::NUM_EMEMBERUPGRADE; i++)
-			Guild[GuildID].m_Upgrades[i] = RES->getInt(UpgradeNames(i, true).c_str());
+			for(int i = 0; i < EMEMBERUPGRADE::NUM_EMEMBERUPGRADE; i++)
+				Guild[GuildID].m_Upgrades[i] = RES->getInt(UpgradeNames(i, true).c_str());
 
-		LoadGuildRank(GuildID);
-	}
-	Job()->ShowLoadingProgress("Guilds", Guild.size());
+			LoadGuildRank(GuildID);
+		}
+		Job()->ShowLoadingProgress("Guilds", Guild.size());
+	});
 }
 
 void GuildJob::OnInitWorld(const char* pWhereLocalWorld) 
 { 
 	// загрузка домов
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_houses", pWhereLocalWorld));
-	while(RES->next())
+	SJK.SDT("*", "tw_guilds_houses", [&](ResultSet* RES)
 	{
-		int HouseID = RES->getInt("ID");
-		HouseGuild[HouseID].m_DoorX = RES->getInt("DoorX");
-		HouseGuild[HouseID].m_DoorY = RES->getInt("DoorY");	
-		HouseGuild[HouseID].m_GuildID = RES->getInt("OwnerMID");
-		HouseGuild[HouseID].m_PosX = RES->getInt("PosX");
-		HouseGuild[HouseID].m_PosY = RES->getInt("PosY");
-		HouseGuild[HouseID].m_Price = RES->getInt("Price");
-		HouseGuild[HouseID].m_WorldID = RES->getInt("WorldID");
-		HouseGuild[HouseID].m_TextX = RES->getInt("TextX");
-		HouseGuild[HouseID].m_TextY = RES->getInt("TextY");
-		if (HouseGuild[HouseID].m_GuildID > 0 && !HouseGuild[HouseID].m_Door)
+		while(RES->next())
 		{
-			HouseGuild[HouseID].m_Door = 0;
-			HouseGuild[HouseID].m_Door = new GuildDoor(&GS()->m_World, vec2(HouseGuild[HouseID].m_DoorX, HouseGuild[HouseID].m_DoorY), HouseGuild[HouseID].m_GuildID);
+			int HouseID = RES->getInt("ID");
+			HouseGuild[HouseID].m_DoorX = RES->getInt("DoorX");
+			HouseGuild[HouseID].m_DoorY = RES->getInt("DoorY");
+			HouseGuild[HouseID].m_GuildID = RES->getInt("OwnerMID");
+			HouseGuild[HouseID].m_PosX = RES->getInt("PosX");
+			HouseGuild[HouseID].m_PosY = RES->getInt("PosY");
+			HouseGuild[HouseID].m_Price = RES->getInt("Price");
+			HouseGuild[HouseID].m_WorldID = RES->getInt("WorldID");
+			HouseGuild[HouseID].m_TextX = RES->getInt("TextX");
+			HouseGuild[HouseID].m_TextY = RES->getInt("TextY");
+			if(HouseGuild[HouseID].m_GuildID > 0 && !HouseGuild[HouseID].m_Door)
+			{
+				HouseGuild[HouseID].m_Door = 0;
+				HouseGuild[HouseID].m_Door = new GuildDoor(&GS()->m_World, vec2(HouseGuild[HouseID].m_DoorX, HouseGuild[HouseID].m_DoorY), HouseGuild[HouseID].m_GuildID);
+			}
 		}
-	}
+		Job()->ShowLoadingProgress("Guilds Houses", HouseGuild.size());
+	}, pWhereLocalWorld);
 
 	// загрузка декораций
-	boost::scoped_ptr<ResultSet> DecoLoadingRES(SJK.SD("*", "tw_guilds_decorations", pWhereLocalWorld));
-	while (DecoLoadingRES->next())
+	SJK.SDT("*", "tw_guilds_decorations", [&](ResultSet* DecoRES)
 	{
-		const int DecoID = DecoLoadingRES->getInt("ID");
-		m_DecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(DecoLoadingRES->getInt("X"),
-			DecoLoadingRES->getInt("Y")), DecoLoadingRES->getInt("HouseID"), DecoLoadingRES->getInt("DecoID"));
-	}
-	Job()->ShowLoadingProgress("Guilds Houses", HouseGuild.size());
-	Job()->ShowLoadingProgress("Guilds Houses Decorations", m_DecorationHouse.size());
+		while(DecoRES->next())
+		{
+			const int DecoID = DecoRES->getInt("ID");
+			m_DecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(DecoRES->getInt("X"),
+				DecoRES->getInt("Y")), DecoRES->getInt("HouseID"), DecoRES->getInt("DecoID"));
+		}
+		Job()->ShowLoadingProgress("Guilds Houses Decorations", m_DecorationHouse.size());
+	}, pWhereLocalWorld);
 }
 
 bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)

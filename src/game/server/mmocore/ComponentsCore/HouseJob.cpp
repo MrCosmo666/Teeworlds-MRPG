@@ -11,44 +11,48 @@ std::map < int , HouseJob::HouseList > HouseJob::Home;
 
 // Инициализация класса
 void HouseJob::OnInitWorld(const char* pWhereLocalWorld) 
-{ 
+{
 	// загрузка домов
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_houses", pWhereLocalWorld));
-	while(RES->next())
+	SJK.SDT("*", "tw_houses", [&](ResultSet* RES)
 	{
-		int HouseID = RES->getInt("ID");
-		Home[HouseID].m_DoorX = RES->getInt("DoorX");
-		Home[HouseID].m_DoorY = RES->getInt("DoorY");
-		Home[HouseID].m_PosX = RES->getInt("PosX");
-		Home[HouseID].m_PosY = RES->getInt("PosY");
-		Home[HouseID].m_OwnerID = RES->getInt("OwnerID");
-		Home[HouseID].m_Price = RES->getInt("Price");
-		Home[HouseID].m_Bank = RES->getInt("HouseBank");
-		Home[HouseID].m_WorldID = RES->getInt("WorldID");
-		str_copy(Home[HouseID].m_Class, RES->getString("Class").c_str(), sizeof(Home[HouseID].m_Class));
-		Home[HouseID].m_PlantID = RES->getInt("PlantID");
-		Home[HouseID].m_PlantPosX = RES->getInt("PlantX");
-		Home[HouseID].m_PlantPosY = RES->getInt("PlantY");
-		if (GS()->GetWorldID() == Home[HouseID].m_WorldID && Home[HouseID].m_OwnerID > 0 && !Home[HouseID].m_Door)
+		while(RES->next())
 		{
-			Home[HouseID].m_Door = 0;
-			Home[HouseID].m_Door = new HouseDoor(&GS()->m_World, vec2(Home[HouseID].m_DoorX, Home[HouseID].m_DoorY));
+			const int HouseID = RES->getInt("ID");
+			Home[HouseID].m_DoorX = RES->getInt("DoorX");
+			Home[HouseID].m_DoorY = RES->getInt("DoorY");
+			Home[HouseID].m_PosX = RES->getInt("PosX");
+			Home[HouseID].m_PosY = RES->getInt("PosY");
+			Home[HouseID].m_OwnerID = RES->getInt("OwnerID");
+			Home[HouseID].m_Price = RES->getInt("Price");
+			Home[HouseID].m_Bank = RES->getInt("HouseBank");
+			Home[HouseID].m_WorldID = RES->getInt("WorldID");
+			str_copy(Home[HouseID].m_Class, RES->getString("Class").c_str(), sizeof(Home[HouseID].m_Class));
+			Home[HouseID].m_PlantID = RES->getInt("PlantID");
+			Home[HouseID].m_PlantPosX = RES->getInt("PlantX");
+			Home[HouseID].m_PlantPosY = RES->getInt("PlantY");
+			if(GS()->GetWorldID() == Home[HouseID].m_WorldID && Home[HouseID].m_OwnerID > 0 && !Home[HouseID].m_Door)
+			{
+				Home[HouseID].m_Door = 0;
+				Home[HouseID].m_Door = new HouseDoor(&GS()->m_World, vec2(Home[HouseID].m_DoorX, Home[HouseID].m_DoorY));
+			}
 		}
-	}
+		Job()->ShowLoadingProgress("Houses", Home.size());
+	}, pWhereLocalWorld);
 
 	// загружаем декорации
-	if (m_DecorationHouse.size() <= 0)
+	if(m_DecorationHouse.empty())
 	{
-		boost::scoped_ptr<ResultSet> DecoLoadingRES(SJK.SD("*", "tw_houses_decorations", pWhereLocalWorld));
-		while (DecoLoadingRES->next())
+		SJK.SDT("*", "tw_houses_decorations", [&](ResultSet* DecoRES)
 		{
-			const int DecoID = DecoLoadingRES->getInt("ID");
-			m_DecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(DecoLoadingRES->getInt("X"),
-				DecoLoadingRES->getInt("Y")), DecoLoadingRES->getInt("HouseID"), DecoLoadingRES->getInt("DecoID"));
-		}
+			while(DecoRES->next())
+			{
+				const int DecoID = DecoRES->getInt("ID");
+				m_DecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(DecoRES->getInt("X"),
+					DecoRES->getInt("Y")), DecoRES->getInt("HouseID"), DecoRES->getInt("DecoID"));
+			}
+			Job()->ShowLoadingProgress("Houses Decorations", m_DecorationHouse.size());
+		}, pWhereLocalWorld);
 	}
-	Job()->ShowLoadingProgress("Houses", Home.size());
-	Job()->ShowLoadingProgress("Houses Decorations", m_DecorationHouse.size());
 }
 
 /*

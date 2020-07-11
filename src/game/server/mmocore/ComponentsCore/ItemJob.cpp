@@ -11,45 +11,48 @@ std::map < int , ItemJob::ItemInformation > ItemJob::ItemsInfo;
 
 void ItemJob::OnInit()
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_items_list", "WHERE ItemID > '0'"));
-	while(RES->next())
+	SJK.SDT("*", "tw_items_list", [&](ResultSet* RES)
 	{
-		const int ItemID = (int)RES->getInt("ItemID");
-		str_copy(ItemsInfo[ItemID].Name, RES->getString("Name").c_str(), sizeof(ItemsInfo[ItemID].Name));
-		str_copy(ItemsInfo[ItemID].Desc, RES->getString("Description").c_str(), sizeof(ItemsInfo[ItemID].Desc));
-		str_copy(ItemsInfo[ItemID].Icon, RES->getString("Icon").c_str(), sizeof(ItemsInfo[ItemID].Icon));
-		ItemsInfo[ItemID].Type = (int)RES->getInt("Type");
-		ItemsInfo[ItemID].Function = (int)RES->getInt("Function");
-		ItemsInfo[ItemID].Dysenthis = (int)RES->getInt("Desynthesis");
-		ItemsInfo[ItemID].MinimalPrice = (int)RES->getInt("Selling");
-		for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
+		while(RES->next())
 		{
-			char aBuf[32];
-			str_format(aBuf, sizeof(aBuf), "Stat_%d", i);
-			ItemsInfo[ItemID].Attribute[i] = (int)RES->getInt(aBuf);
-			str_format(aBuf, sizeof(aBuf), "StatCount_%d", i);
-			ItemsInfo[ItemID].AttributeCount[i] = (int)RES->getInt(aBuf);
+			const int ItemID = (int)RES->getInt("ItemID");
+			str_copy(ItemsInfo[ItemID].Name, RES->getString("Name").c_str(), sizeof(ItemsInfo[ItemID].Name));
+			str_copy(ItemsInfo[ItemID].Desc, RES->getString("Description").c_str(), sizeof(ItemsInfo[ItemID].Desc));
+			str_copy(ItemsInfo[ItemID].Icon, RES->getString("Icon").c_str(), sizeof(ItemsInfo[ItemID].Icon));
+			ItemsInfo[ItemID].Type = (int)RES->getInt("Type");
+			ItemsInfo[ItemID].Function = (int)RES->getInt("Function");
+			ItemsInfo[ItemID].Dysenthis = (int)RES->getInt("Desynthesis");
+			ItemsInfo[ItemID].MinimalPrice = (int)RES->getInt("Selling");
+			for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
+			{
+				char aBuf[32];
+				str_format(aBuf, sizeof(aBuf), "Stat_%d", i);
+				ItemsInfo[ItemID].Attribute[i] = (int)RES->getInt(aBuf);
+				str_format(aBuf, sizeof(aBuf), "StatCount_%d", i);
+				ItemsInfo[ItemID].AttributeCount[i] = (int)RES->getInt(aBuf);
+			}
+			ItemsInfo[ItemID].MaximalEnchant = (int)RES->getInt("EnchantMax");
+			ItemsInfo[ItemID].ProjID = (int)RES->getInt("ProjectileID");
 		}
-		ItemsInfo[ItemID].MaximalEnchant = (int)RES->getInt("EnchantMax");
-		ItemsInfo[ItemID].ProjID = (int)RES->getInt("ProjectileID");
-	}
+	});
 
-	// загрузить аттрибуты
-	boost::scoped_ptr<ResultSet> AttributsLoadRES(SJK.SD("*", "tw_attributs", "WHERE ID > '0'"));
-	while(AttributsLoadRES->next())
+	SJK.SDT("*", "tw_attributs", [&](ResultSet* RES)
 	{
-		int AttID = AttributsLoadRES->getInt("ID");
-		str_copy(CGS::AttributInfo[AttID].Name, AttributsLoadRES->getString("name").c_str(), sizeof(CGS::AttributInfo[AttID].Name));
-		str_copy(CGS::AttributInfo[AttID].FieldName, AttributsLoadRES->getString("field_name").c_str(), sizeof(CGS::AttributInfo[AttID].FieldName));
-		CGS::AttributInfo[AttID].UpgradePrice = AttributsLoadRES->getInt("price");
-		CGS::AttributInfo[AttID].AtType = AttributsLoadRES->getInt("at_type");
-	}
+		while(RES->next())
+		{
+			const int AttID = RES->getInt("ID");
+			str_copy(CGS::AttributInfo[AttID].Name, RES->getString("name").c_str(), sizeof(CGS::AttributInfo[AttID].Name));
+			str_copy(CGS::AttributInfo[AttID].FieldName, RES->getString("field_name").c_str(), sizeof(CGS::AttributInfo[AttID].FieldName));
+			CGS::AttributInfo[AttID].UpgradePrice = RES->getInt("price");
+			CGS::AttributInfo[AttID].AtType = RES->getInt("at_type");
+		}
+	});
 }
 
 // Загрузка данных игрока
 void ItemJob::OnInitAccount(CPlayer *pPlayer)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Settings, Enchant, Durability", "tw_accounts_items", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	while(RES->next())
 	{
@@ -761,8 +764,7 @@ bool ItemJob::ClassItems::Remove(int arg_removecount, int arg_settings)
 	if (IsEquipped())
 	{
 		Settings = 0;
-		int ClientID = m_pPlayer->GetCID();
-		m_pPlayer->GS()->ChangeEquipSkin(ClientID, itemid_);
+		m_pPlayer->GS()->ChangeEquipSkin(m_pPlayer->GetCID(), itemid_);
 	}
 
 	const int Code = m_pPlayer->GS()->Mmo()->Item()->RemoveItem(m_pPlayer, itemid_, arg_removecount, arg_settings);
