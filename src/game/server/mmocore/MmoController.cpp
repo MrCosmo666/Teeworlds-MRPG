@@ -10,7 +10,6 @@
 
 using namespace sqlstr;
 
-// список хранения всех компонентов Sql Work
 MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 {
 	// order
@@ -134,7 +133,6 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		const int EquipDiscord = pPlayer->GetEquippedItem(EQUIP_DISCORD);
 		SJK.UD("tw_accounts_data", "Level = '%d', Exp = '%d', DiscordEquip = '%d' WHERE ID = '%d'",
 			pPlayer->Acc().Level, pPlayer->Acc().Exp, EquipDiscord, pPlayer->Acc().AuthID);
-		return;
 	}
 
 	// сохранение апгрейдов
@@ -152,7 +150,6 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 
 		SJK.UD("tw_accounts_data", "Upgrade = '%d' %s WHERE ID = '%d'", pPlayer->Acc().Upgrade, Buffer.buffer(), pPlayer->Acc().AuthID);
 		Buffer.clear();
-		return;
 	}
 
 	// сохранение плант аккаунта
@@ -166,7 +163,6 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		}
 		SJK.UD("tw_accounts_plants", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().AuthID);
 		Buffer.clear();
-		return;
 	}
 
 	// сохранение минер аккаунта
@@ -180,34 +176,28 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		}
 		SJK.UD("tw_accounts_miner", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().AuthID);
 		Buffer.clear();
-		return;		
 	}
 
 	// сохранение гильдии даты
 	else if(Table == SaveType::SAVE_GUILD_DATA)
 	{
-		SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '%d' WHERE ID = '%d'", pPlayer->Acc().GuildID, pPlayer->Acc().GuildRank, pPlayer->Acc().AuthID);
-		return;			
+		SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '%d' WHERE ID = '%d'", pPlayer->Acc().GuildID, pPlayer->Acc().GuildRank, pPlayer->Acc().AuthID);	
 	}
 
 	// сохранение мира позиции
-	else if(Table == SaveType::SAVE_POSITION)
+	else if(Table == SaveType::SAVE_POSITION && !GS()->IsDungeon())
 	{
-		if(!GS()->IsDungeon())
-			SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", pPlayer->GetPlayerWorldID(), pPlayer->Acc().AuthID);
-		return;
+		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", pPlayer->GetPlayerWorldID(), pPlayer->Acc().AuthID);
 	}
 
 	// сохранение языка игрока
 	else if(Table == SaveType::SAVE_LANGUAGE)
 	{
 		SJK.UD("tw_accounts", "Language = '%s' WHERE ID = '%d'", pPlayer->GetLanguage(), pPlayer->Acc().AuthID);
-		return;		
 	}
 	else
 	{
 		SJK.UD("tw_accounts", "Username = '%s', Password = '%s' WHERE ID = '%d'", pPlayer->Acc().Login, pPlayer->Acc().Password, pPlayer->Acc().AuthID);
-		return;
 	}
 }
 
@@ -234,10 +224,10 @@ const char* MmoController::PlayerName(int AccountID)
 	return "No found!";
 }
 
-void MmoController::ShowLoadingProgress(const char *Loading, int LoadCount)
+void MmoController::ShowLoadingProgress(const char* pLoading, int Size)
 {
 	char aLoadingBuf[128];
-	str_format(aLoadingBuf, sizeof(aLoadingBuf), "Loaded %d %s | CK WorldID %d.", LoadCount, Loading, GS()->GetWorldID());
+	str_format(aLoadingBuf, sizeof(aLoadingBuf), "Loaded %d %s | CK WorldID %d.", Size, pLoading, GS()->GetWorldID());
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "LOAD DB", aLoadingBuf);
 }
 

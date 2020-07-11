@@ -2,15 +2,9 @@
 #include <thread>
 #include <stdarg.h>
 
-#include <mysql_connection.h>
-#include <cppconn/exception.h>
-#include <cppconn/driver.h>
-
 #include <base/system.h>
 #include <engine/shared/config.h>
 #include "sql_connect_pool.h"
-
-using namespace std;
 
 /*
 	I don't see the point in using SELECT operations in the thread, 
@@ -34,8 +28,8 @@ using namespace std;
 // #####################################################
 // SQL CONNECTION POOL
 // #####################################################
-mutex ThreadLock;
-shared_ptr<CConectionPool> CConectionPool::m_Instance;
+std::mutex ThreadLock;
+std::shared_ptr<CConectionPool> CConectionPool::m_Instance;
 CConectionPool::CConectionPool()
 {
 	try
@@ -141,17 +135,17 @@ void CConectionPool::InsertFormated(int Milliseconds, const char *Table, const c
 	vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
 	#endif
 	aBuf[sizeof(aBuf) - 1] = '\0';
-	string Buf = "INSERT INTO " + string(Table) + " " + string(aBuf) + ";";
-	thread Thread([Buf, Milliseconds]()
+	std::string Buf = "INSERT INTO " + std::string(Table) + " " + std::string(aBuf) + ";";
+	std::thread Thread([Buf, Milliseconds]()
 	{
 		if(Milliseconds > 0)
-			this_thread::sleep_for(chrono::milliseconds(Milliseconds));
+			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
 
 		Connection* pConnection = nullptr;
 		try
 		{
 			pConnection = SJK.CreateConnection();
-			shared_ptr<Statement> STMT(pConnection->createStatement());
+			std::shared_ptr<Statement> STMT(pConnection->createStatement());
 			STMT->execute(Buf.c_str());
 		}
 		catch (SQLException & e)
@@ -191,17 +185,17 @@ void CConectionPool::UpdateFormated(int Milliseconds, const char *Table, const c
 	vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
 	#endif
 	aBuf[sizeof(aBuf) - 1] = '\0';
-	string Query = "UPDATE " + string(Table) + " SET " + string(aBuf) + ";";
-	thread Thread([Query, Milliseconds]()
+	std::string Query = "UPDATE " + std::string(Table) + " SET " + std::string(aBuf) + ";";
+	std::thread Thread([Query, Milliseconds]()
 	{
 		if(Milliseconds > 0)
-			this_thread::sleep_for(chrono::milliseconds(Milliseconds));
+			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
 		
 		Connection* pConnection = nullptr;
 		try
 		{
 			pConnection = SJK.CreateConnection();
-			shared_ptr<Statement> STMT(pConnection->createStatement());
+			std::shared_ptr<Statement> STMT(pConnection->createStatement());
 			STMT->execute(Query.c_str());
 		}
 		catch(SQLException &e)
@@ -241,17 +235,17 @@ void CConectionPool::DeleteFormated(int Milliseconds, const char *Table, const c
 	vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
 	#endif
 	aBuf[sizeof(aBuf) - 1] = '\0';
-	string Query = "DELETE FROM " + string(Table) + " " + string(aBuf) + ";";
-	thread Thread([Query, Milliseconds]()
+	std::string Query = "DELETE FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
+	std::thread Thread([Query, Milliseconds]()
 	{
 		if(Milliseconds > 0)
-			this_thread::sleep_for(chrono::milliseconds(Milliseconds));
+			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
 		
 		Connection* pConnection = nullptr;
 		try
 		{
 			pConnection = SJK.CreateConnection();
-			shared_ptr<Statement> STMT(pConnection->createStatement());
+			std::shared_ptr<Statement> STMT(pConnection->createStatement());
 			STMT->execute(Query.c_str());
 		}
 		catch (SQLException & e)
@@ -278,13 +272,13 @@ ResultSet *CConectionPool::SD(const char *Select, const char *Table, const char 
 	#endif  
 	va_end(VarArgs);
 	aBuf[sizeof(aBuf) - 1] = '\0';
-	string Query = "SELECT " + string(Select) + " FROM " + string(Table) + " " + string(aBuf) + ";";
+	std::string Query = "SELECT " + std::string(Select) + " FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
 	Connection* pConnection = nullptr;
 	ResultSet* pResult = nullptr;
 	try
 	{
 		pConnection = SJK.CreateConnection();
-		shared_ptr<Statement> STMT(pConnection->createStatement());
+		std::shared_ptr<Statement> STMT(pConnection->createStatement());
 		pResult = STMT->executeQuery(Query.c_str());
 	}
 	catch (SQLException & e)
@@ -293,4 +287,35 @@ ResultSet *CConectionPool::SD(const char *Select, const char *Table, const char 
 	}
 	SJK.DisconnectConnection(pConnection);
 	return pResult;
+}
+
+void CConectionPool::SDT(const char* Select, const char* Table, std::function<void(ResultSet*)> func, const char* Buffer, ...)
+{
+	char aBuf[1024];
+	va_list VarArgs;
+	va_start(VarArgs, Buffer);
+#if defined(CONF_FAMILY_WINDOWS)
+	_vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
+#else
+	vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
+#endif  
+	va_end(VarArgs);
+	aBuf[sizeof(aBuf) - 1] = '\0';
+	const std::string Query = "SELECT " + std::string(Select) + " FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
+	std::thread Thread([Query, func]()
+	{
+		Connection* pConnection = nullptr;
+		try
+		{
+			pConnection = SJK.CreateConnection();
+			std::shared_ptr<Statement> STMT(pConnection->createStatement());
+			func(STMT->executeQuery(Query.c_str()));
+		}
+		catch(SQLException& e)
+		{
+			dbg_msg("sql", "%s", e.what());
+		}
+		SJK.DisconnectConnection(pConnection);
+	});
+	Thread.detach();
 }

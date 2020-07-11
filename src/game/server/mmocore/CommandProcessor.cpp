@@ -184,10 +184,20 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		GS->ChatFollow(ClientID, "/register <name> <pass> - new account.");
 		GS->ChatFollow(ClientID, "/login <name> <pass> - log in account.");
 		GS->ChatFollow(ClientID, "/lang <codes iso> - language (translation is not complete).");
+		GS->ChatFollow(ClientID, "/rules - server rules.");
 		GS->ChatFollow(ClientID, "Another information see Wiki Page.");
 		return;
 	}
-
+	else if(str_comp_num(Msg->m_pMessage, "/rules", 6) == 0)
+	{
+		GS->ChatFollow(ClientID, "Server rules");
+		GS->ChatFollow(ClientID, "- Don't use bugs");
+		GS->ChatFollow(ClientID, "- Don't use bots and other hack soft");
+		GS->ChatFollow(ClientID, "- Don't use dummy multi-account's");
+		GS->ChatFollow(ClientID, "- Don't share self account data (login, password)");
+		GS->ChatFollow(ClientID, "- Do not use ads, that is not part of the game");
+		return;
+	}
 	if(str_comp_num(Msg->m_pMessage, "/", 1) == 0)
 	{
 		GS->ChatFollow(ClientID, "Command {STR} not found!", Msg->m_pMessage);

@@ -10,7 +10,7 @@ int StorageJob::GetStorageID(vec2 Pos) const
 {
 	for (const auto& st : Storage)
 	{
-		vec2 PosStorage = vec2(st.second.PosX, st.second.PosY);
+		const vec2 PosStorage(st.second.PosX, st.second.PosY);
 		if (distance(PosStorage, Pos) < 200) 
 			return st.first;
 	}

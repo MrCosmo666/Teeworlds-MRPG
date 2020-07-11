@@ -104,7 +104,7 @@ void CPlayer::PotionsTick()
 			ieffect = CGS::Effects[m_ClientID].erase(ieffect);
 			continue;
 		}
-		ieffect++;
+		++ieffect;
 	}	
 }
 
@@ -176,8 +176,8 @@ void CPlayer::Snap(int SnappingClient)
 	if(!pClientInfo)
 		return;
 
-	bool local_ClientID = (m_ClientID == SnappingClient);
-	pClientInfo->m_Local = local_ClientID;
+	const bool localClient = (bool)(m_ClientID == SnappingClient);
+	pClientInfo->m_Local = localClient;
 	pClientInfo->m_WorldType = GS()->Mmo()->WorldSwap()->GetWorldType();
 	pClientInfo->m_MoodType = m_MoodState;
 	pClientInfo->m_Level = Acc().Level;
@@ -203,9 +203,8 @@ void CPlayer::Snap(int SnappingClient)
 
 	if(Acc().IsGuild())
 	{
-		const int GuildID = Acc().GuildID;
-
 		char aBuf[24];
+		const int GuildID = Acc().GuildID;
 		str_format(aBuf, sizeof(aBuf), "%s %s", GS()->Mmo()->Member()->GetGuildRank(GuildID, Acc().GuildRank), GS()->Mmo()->Member()->GuildName(GuildID));
 		StrToInts(pClientInfo->m_StateName, 6, aBuf);
 	}
@@ -460,7 +459,7 @@ bool CPlayer::GetHidenMenu(int HideID) const
 bool CPlayer::IsAuthed()
 { 
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID))
-		return Acc().AuthID; 
+		return Acc().AuthID;
 	return false; 
 }
 
