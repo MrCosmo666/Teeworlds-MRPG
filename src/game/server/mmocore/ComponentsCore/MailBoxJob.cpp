@@ -15,8 +15,6 @@ void MailBoxJob::ReceiveInbox(CPlayer *pPlayer, int InboxID)
 	// получаем информацию о письме
 	const int ItemID = RES->getInt("ItemID");
 	const int Count = RES->getInt("Count");
-	
-	// empty
 	if(ItemID <= 0 || Count <= 0)
 	{
 		SJK.DD("tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
@@ -90,8 +88,8 @@ int MailBoxJob::GetActiveInbox(CPlayer *pPlayer)
 void MailBoxJob::SendInbox(int AuthID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
 {
 	// clear str and connection
-	CSqlString<64> cName = CSqlString<64>(Name);
-	CSqlString<64> cDesc = CSqlString<64>(Desc);
+	const CSqlString<64> cName = CSqlString<64>(Name);
+	const CSqlString<64> cDesc = CSqlString<64>(Desc);
 	if (ItemID <= 0)
 	{
 		SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, OwnerID) VALUES ('%s', '%s', '%d');", cName.cstr(), cDesc.cstr(), AuthID);

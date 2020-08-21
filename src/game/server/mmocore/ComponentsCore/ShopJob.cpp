@@ -13,7 +13,7 @@ void ShopJob::OnInit()
 	while(RES->next())
 	{
 		int ID = RES->getInt("ID");
-		Shop[ ID ].StorageID = RES->getInt("StorageID");
+		Shop[ID].StorageID = RES->getInt("StorageID");
 	}
 }
 
@@ -30,7 +30,6 @@ bool ShopJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 {
 	CPlayer* pPlayer = pChr->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
-
 	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_AUCTION))
 	{
 		GS()->Chat(ClientID, "You can see menu in the votes!");
@@ -56,12 +55,12 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE StorageID = '%d' ORDER BY Price", StorageID));
 	while(RES->next())
 	{
-		int ID = RES->getInt("ID");
-		int ItemID = RES->getInt("ItemID");
-		int Price = RES->getInt("Price");
-		int Enchant = RES->getInt("Enchant");
-		int Count = RES->getInt("Count");
-		int NeedItemID = RES->getInt("NeedItem");
+		const int ID = RES->getInt("ID");
+		const int ItemID = RES->getInt("ItemID");
+		const int Price = RES->getInt("Price");
+		const int Enchant = RES->getInt("Enchant");
+		const int Count = RES->getInt("Count");
+		const int NeedItemID = RES->getInt("NeedItem");
 		ItemJob::ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
 		ItemJob::ItemInformation &NeededItem = GS()->GetItemInfo(NeedItemID);
 		
@@ -105,15 +104,15 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 ORDER BY Price"));
 	while(RES->next())
 	{
-		int ID = RES->getInt("ID");
-		int ItemID = RES->getInt("ItemID");
-		int Price = RES->getInt("Price");
-		int Enchant = RES->getInt("Enchant");
-		int Count = RES->getInt("Count");
-		int OwnerID = RES->getInt("OwnerID");
+		const int ID = RES->getInt("ID");
+		const int ItemID = RES->getInt("ItemID");
+		const int Price = RES->getInt("Price");
+		const int Enchant = RES->getInt("Enchant");
+		const int Count = RES->getInt("Count");
+		const int OwnerID = RES->getInt("OwnerID");
+		ItemJob::ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
 
 		// зачеровыванный или нет
-		ItemJob::ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
 		if (BuyightItem.IsEnchantable())
 		{
 			char aEnchantSize[16];
@@ -145,8 +144,8 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 
 void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
 {
-	int ItemID = AuSellItem.a_itemid;
-	int ClientID = pPlayer->GetCID();
+	const int ItemID = AuSellItem.a_itemid;
+	const int ClientID = pPlayer->GetCID();
 	ItemJob::InventoryItem &pPlayerAuctionItem = pPlayer->GetItem(ItemID);
 
 	// проверяем кол-во слотов занято ли все или нет
@@ -156,13 +155,14 @@ void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
 
 	// проверяем кол-во своих слотов
 	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_mailshop", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().AuthID, g_Config.m_SvMaxAuctionSlots));
-	int CountSlot = RES2->rowsCount();
+	const int CountSlot = RES2->rowsCount();
 	if(CountSlot >= g_Config.m_SvMaxAuctionSlots)
 		return GS()->Chat(ClientID, "You use all open the slots in your auction!");
 
 	// проверяем есть ли такой предмет в аукционе
 	boost::scoped_ptr<ResultSet> RES3(SJK.SD("ID", "tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
-	if(RES3->next()) return GS()->Chat(ClientID, "Your same item found in the database, need reopen the slot!");
+	if(RES3->next()) 
+		return GS()->Chat(ClientID, "Your same item found in the database, need reopen the slot!");
 
 	// если снялись деньги за оплату аукцион слота
 	if(pPlayer->CheckFailMoney(g_Config.m_SvAuctionPriceSlot))	
@@ -174,19 +174,19 @@ void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
 		SJK.ID("tw_mailshop", "(ItemID, Price, Count, OwnerID, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d')", 
 			ItemID, AuSellItem.a_price, AuSellItem.a_count, pPlayer->Acc().AuthID, AuSellItem.a_enchant);
 
-		int AvailableSlot = (g_Config.m_SvMaxAuctionSlots - CountSlot) - 1;
+		const int AvailableSlot = (g_Config.m_SvMaxAuctionSlots - CountSlot) - 1;
 		GS()->Chat(-1, "{STR} created a slot [{STR}x{INT}] auction.", 
 			GS()->Server()->ClientName(ClientID), pPlayerAuctionItem.Info().GetName(pPlayer), &AuSellItem.a_count);
 		GS()->ChatFollow(ClientID, "Still available {INT} slots!", &AvailableSlot);
 	}
-	return;
 }
 
 bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 {
 	const int ClientID = pPlayer->GetCID();
 	boost::scoped_ptr<ResultSet> SHOPITEM(SJK.SD("*", "tw_mailshop", "WHERE ID = '%d'", ID));
-	if (!SHOPITEM->next()) return false;
+	if (!SHOPITEM->next())
+		return false;
 
 	const int ItemID = SHOPITEM->getInt("ItemID");
 	ItemJob::InventoryItem &pPlayerBuyightItem = pPlayer->GetItem(ItemID);
@@ -251,7 +251,6 @@ void ShopJob::CheckAuctionTime()
 	}
 	if(ReleaseSlots) 
 		GS()->ChatFollow(-1, "Auction {INT} slots has been released!", &ReleaseSlots);
-	return;
 }
 
 bool ShopJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)

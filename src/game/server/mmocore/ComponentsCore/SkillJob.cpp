@@ -139,7 +139,7 @@ int SkillJob::GetSkillLevel(int ClientID, int SkillID) const
 
 void SkillJob::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = BLUE_COLOR;
 	GS()->AVL(ClientID, "null", "{STR} skill's", (Passive ? "Passive" : "Active"));
 	for (const auto& sk : SkillData)
