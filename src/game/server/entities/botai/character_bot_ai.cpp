@@ -175,7 +175,7 @@ void CCharacterBotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 	const int MultiplierGolds = max(BotJob::MobBot[SubID].Power / g_Config.m_SvStrongGold, 1);
 	pPlayer->AddMoney(MultiplierGolds);
 	
-	if (random_int() % 80 == 0)
+	if (random_int() % 40 == 0)
 	{
 		pPlayer->GetItem(itSkillPoint).Add(1);
 		GS()->Chat(ClientID, "Skill points increased. Now ({INT}SP)", &pPlayer->GetItem(itSkillPoint).Count);
