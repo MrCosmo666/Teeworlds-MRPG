@@ -118,9 +118,8 @@ bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 				return true;
 
 			const int Exp = GetMemberChairBonus(GuildID, EMEMBERUPGRADE::ChairNSTExperience);
-			const int Money = GetMemberChairBonus(GuildID, EMEMBERUPGRADE::ChairNSTMoney);
+
 			pPlayer->AddExp(Exp);
-			pPlayer->AddMoney(Money);
 		}
 		return true;
 	}
@@ -739,7 +738,6 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 		Guild[InitID].m_Score = 0;
 		Guild[InitID].m_Upgrades[EMEMBERUPGRADE::AvailableNSTSlots] = 2;
 		Guild[InitID].m_Upgrades[EMEMBERUPGRADE::ChairNSTExperience] = 1;
-		Guild[InitID].m_Upgrades[EMEMBERUPGRADE::ChairNSTMoney] = 1;
 		pPlayer->Acc().GuildID = InitID;
 
 		// создаем в таблице гильдию
