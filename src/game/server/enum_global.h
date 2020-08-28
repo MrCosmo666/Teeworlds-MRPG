@@ -38,8 +38,7 @@ STRINGABLE_ENUM_DECL(PLANT)
 // Улучшения организациям по полям
 #define EMEMBERUPGRADE(F) \
     F(AvailableNSTSlots) \
-    F(ChairNSTExperience) \
-	F(ChairNSTMoney)
+    F(ChairNSTExperience)
 STRINGABLE_ENUM_DECL(EMEMBERUPGRADE)
 
 /*
