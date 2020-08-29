@@ -55,9 +55,7 @@ bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 	{
 		m_Core.m_LostData = true;
 		const int Function = BotJob::NpcBot[SubBotID].Function;
-		if(Function == FunctionsNPC::FUNCTION_NPC_NURSE)
-			new CEntityFunctionNurse(&GS()->m_World, m_pBotPlayer->GetCID(), m_Core.m_Pos);
-		else if(Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST)
+		if(Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST)
 			CreateSnapProj(GetSnapFullID(), 3, PICKUP_ARMOR, false, false);
 	}
 	return true;
@@ -72,7 +70,7 @@ void CCharacterBotAI::ShowProgress()
 		{
 			int Health = m_pBotPlayer->GetHealth();
 			int StartHealth = m_pBotPlayer->GetStartHealth();
-			float gethp = ( Health * 100.0 ) / StartHealth;
+			const float gethp = ( Health * 100.0 ) / StartHealth;
 			char *Progress = GS()->LevelString(100, (int)gethp, 10, ':', ' ');
 			GS()->SBL(ListDmgPlayer.first, BroadcastPriority::BROADCAST_GAME_PRIORITY, 10, "Health {STR}({INT}/{INT})", Progress, &Health, &StartHealth);
 			delete Progress;
@@ -91,7 +89,7 @@ bool CCharacterBotAI::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 	// до урона и после урона здоровье
 	int StableDamage = Health();
-	bool BotDie = CCharacter::TakeDamage(Force, Dmg, From, Weapon);
+	const bool BotDie = CCharacter::TakeDamage(Force, Dmg, From, Weapon);
 	StableDamage -= Health();
 
 	// установить агрессию на того от кого пришел урон
@@ -221,7 +219,7 @@ bool CCharacterBotAI::GiveWeapon(int Weapon, int GiveAmmo)
 
 void CCharacterBotAI::Tick()
 {
-	m_BotActive = GS()->CheckPlayersDistance(m_Core.m_Pos, 1000.0f);
+	m_BotActive = GS()->CheckingPlayersDistance(m_Core.m_Pos, 1000.0f);
 	if(!m_BotActive || !IsAlive())
 		return;
 
@@ -329,7 +327,7 @@ void CCharacterBotAI::EngineMobs()
 		return;
 	}
 
-	bool WeaponedBot = (BotJob::MobBot[MobID].Spread >= 1);
+	const bool WeaponedBot = (BotJob::MobBot[MobID].Spread >= 1);
 	if(WeaponedBot)
 	{
 		if(BotJob::MobBot[MobID].Boss)
@@ -669,41 +667,9 @@ bool CCharacterBotAI::FunctionNurseNPC()
 		str_format(aBuf, sizeof(aBuf), "%dHP", Health);
 		GS()->CreateText(NULL, false, DrawPosition, vec2(0, 0), 40, aBuf);
 		new CHearth(&GS()->m_World, m_Pos, pFindPlayer, Health, pFindPlayer->GetCharacter()->m_Core.m_Vel);
-
+	
 		m_Input.m_Direction = 0;
 		PlayerFinding = true;
 	}
 	return PlayerFinding;
-}
-
-CEntityFunctionNurse::CEntityFunctionNurse(CGameWorld* pGameWorld, int ClientID, vec2 Pos)
-	: CEntity(pGameWorld, CGameWorld::ENTTYPE_EVENTS, Pos)
-{
-	m_OwnerID = ClientID;
-	GameWorld()->InsertEntity(this);
-}
-void CEntityFunctionNurse::Tick()
-{
-	if(!GS()->m_apPlayers[m_OwnerID] || !GS()->m_apPlayers[m_OwnerID]->GetCharacter())
-	{
-		GS()->m_World.DestroyEntity(this);
-		return;
-	}
-
-	CCharacter* pOwnerChar = GS()->m_apPlayers[m_OwnerID]->GetCharacter();
-	vec2 Direction = normalize(vec2(pOwnerChar->m_LatestInput.m_TargetX, pOwnerChar->m_LatestInput.m_TargetY));
-	m_Pos = pOwnerChar->m_Core.m_Pos + normalize(Direction) * (28.0f);
-}
-void CEntityFunctionNurse::Snap(int SnappingClient)
-{
-	if(NetworkClipped(SnappingClient))
-		return;
-
-	CNetObj_Pickup* pP = static_cast<CNetObj_Pickup*>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, GetID(), sizeof(CNetObj_Pickup)));
-	if(!pP)
-		return;
-
-	pP->m_X = (int)m_Pos.x;
-	pP->m_Y = (int)m_Pos.y;
-	pP->m_Type = PICKUP_HEALTH;
 }

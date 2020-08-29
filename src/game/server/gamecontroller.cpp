@@ -1,13 +1,16 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
 #include <game/mapitems.h>
-#include <game/version.h>
 
 #include "entities/pickup.h"
 #include "gamecontext.h"
 
 #include "gamecontroller.h"
+
+/*
+	Here you need to put it in order make more events
+	For modes that each map can have one of them
+*/
 
 IGameController::IGameController(CGS *pGS)
 {
@@ -38,25 +41,27 @@ bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 		return true;
 	}
 
-	// если спавним игрока
+	// ЗДОРОВЬЕ
 	int StartHealth = pChr->GetPlayer()->GetStartHealth();
 	if(pChr->GetPlayer()->GetTempData().TempActiveSafeSpawn == true)
 	{
 		pChr->GetPlayer()->GetTempData().TempActiveSafeSpawn = false;
 		StartHealth /= 2;
 	}
-
 	if(GS()->IsDungeon())
 		StartHealth = pChr->GetPlayer()->GetStartHealth();
 	else if(pChr->GetPlayer()->GetTempData().TempHealth > 0)
 		StartHealth = pChr->GetPlayer()->GetTempData().TempHealth;
 	pChr->IncreaseHealth(StartHealth);
+
+	// МАНА
 	if(pChr->GetPlayer()->GetTempData().TempMana > 0)
 	{
 		const int StartMana = pChr->GetPlayer()->GetTempData().TempMana;
 		pChr->IncreaseMana(StartMana);
 	}
 
+	// ПАТРОНЫ
 	const int StartAmmo = 10 + pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo);
 	pChr->GiveWeapon(WEAPON_HAMMER, -1);
 	for(int i = 1; i < NUM_WEAPONS-1; i++)
@@ -106,7 +111,7 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 void IGameController::OnPlayerConnect(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	if(Server()->ClientIngame(ClientID))
+	if(Server()->ClientIngame(ClientID) && pPlayer->GetPlayerWorldID() == GS()->GetWorldID())
 	{
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "team_join player='%d:%s' team=%d", ClientID, Server()->ClientName(ClientID), pPlayer->GetTeam());
@@ -117,16 +122,16 @@ void IGameController::OnPlayerConnect(CPlayer *pPlayer)
 
 void IGameController::OnPlayerDisconnect(CPlayer *pPlayer)
 {
-	GS()->Mmo()->SaveAccount(pPlayer, SAVE_POSITION);
-	pPlayer->OnDisconnect();
-
 	const int ClientID = pPlayer->GetCID();
-	if(Server()->ClientIngame(ClientID))
+	if(Server()->ClientIngame(ClientID) && pPlayer->GetPlayerWorldID() == GS()->GetWorldID())
 	{
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "leave player='%d:%s'", ClientID, Server()->ClientName(ClientID));
 		GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "game", aBuf);
+		GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_POSITION);
 	}
+
+	pPlayer->OnDisconnect();
 }
 
 void IGameController::OnPlayerInfoChange(CPlayer *pPlayer, int WorldID) {}

@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
 #include <teeother/components/localization.h>
 
 #include "gamemodes/dungeon.h"
@@ -23,10 +22,9 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	m_NextTuningParams = m_PrevTuningParams;
 	m_MoodState = MOOD_NORMAL;
 	GS()->SendTuningParams(ClientID);
+
 	if(!IsBot())
-	{
 		Acc().Team = GetStartTeam();
-	}
 }
 
 CPlayer::~CPlayer()
@@ -106,7 +104,7 @@ void CPlayer::PotionsTick()
 			ieffect = CGS::Effects[m_ClientID].erase(ieffect);
 			continue;
 		}
-		ieffect++;
+		++ieffect;
 	}	
 }
 
@@ -178,8 +176,8 @@ void CPlayer::Snap(int SnappingClient)
 	if(!pClientInfo)
 		return;
 
-	bool local_ClientID = (m_ClientID == SnappingClient);
-	pClientInfo->m_Local = local_ClientID;
+	const bool localClient = (bool)(m_ClientID == SnappingClient);
+	pClientInfo->m_Local = localClient;
 	pClientInfo->m_WorldType = GS()->Mmo()->WorldSwap()->GetWorldType();
 	pClientInfo->m_MoodType = m_MoodState;
 	pClientInfo->m_Level = Acc().Level;
@@ -192,7 +190,7 @@ void CPlayer::Snap(int SnappingClient)
 	for (auto& eff : CGS::Effects[m_ClientID])
 	{
 		char aBuf[32];
-		bool Minutes = eff.second >= 60;
+		const bool Minutes = eff.second >= 60;
 		str_format(aBuf, sizeof(aBuf), "%s %d%s ", eff.first.c_str(), Minutes ? eff.second / 60 : eff.second, Minutes ? "m" : "");
 		Buffer.append_at(Buffer.length(), aBuf);
 	}
@@ -203,11 +201,10 @@ void CPlayer::Snap(int SnappingClient)
 	StrToInts(pClientInfo->m_Gold, 6, Buffer.buffer());
 	Buffer.clear();
 
-	if(Acc().GuildID > 0)
+	if(Acc().IsGuild())
 	{
-		const int GuildID = Acc().GuildID;
-
 		char aBuf[24];
+		const int GuildID = Acc().GuildID;
 		str_format(aBuf, sizeof(aBuf), "%s %s", GS()->Mmo()->Member()->GetGuildRank(GuildID, Acc().GuildRank), GS()->Mmo()->Member()->GuildName(GuildID));
 		StrToInts(pClientInfo->m_StateName, 6, aBuf);
 	}
@@ -334,8 +331,8 @@ void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed,
 
 	const float GetLevelProgress = (float)(MyExp * 100.0) / (float)ExpNeed;
 	const float GetExpProgress = (float)(GivedExp * 100.0) / (float)ExpNeed;
-	char *Level = GS()->LevelString(100, (int)GetLevelProgress, 10, ':', ' ');
 	char BufferInBroadcast[128];
+	char* Level = GS()->LevelString(100, (int)GetLevelProgress, 10, ':', ' ');
 	str_format(BufferInBroadcast, sizeof(BufferInBroadcast), "^235Lv%d %s%s %0.2f%%+%0.3f%%(%d)XP\n", MyLevel, Name, Level, GetLevelProgress, GetExpProgress, GivedExp);
 	GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, BufferInBroadcast);
 	delete Level;
@@ -426,7 +423,7 @@ void CPlayer::AddExp(int Exp)
 		GS()->ChatFollow(m_ClientID, "Level UP. Now Level {INT}!", &Acc().Level);
 		if(Acc().Exp < ExpNeed(Acc().Level))
 		{
-			GS()->VResetVotes(m_ClientID, MenuList::MAIN_MENU);
+			GS()->UpdateVotes(m_ClientID, MenuList::MAIN_MENU);
 			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_STATS);
 			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_UPGRADES);
 		}
@@ -462,7 +459,7 @@ bool CPlayer::GetHidenMenu(int HideID) const
 bool CPlayer::IsAuthed()
 { 
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID))
-		return Acc().AuthID; 
+		return Acc().AuthID;
 	return false; 
 }
 
@@ -488,7 +485,6 @@ int CPlayer::GetStartTeam()
 {
 	if(Acc().AuthID)
 		return TEAM_RED;
-
 	return TEAM_SPECTATORS;
 }
 
@@ -534,6 +530,18 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 	// - - - - - F3- - - - - - -
 	if (Vote == 1)
 	{
+		// режим готовности в темницах
+		if(GS()->IsDungeon())
+		{
+			const int DungeonID = GS()->DungeonID();
+			const bool IsDungeonActive = DungeonJob::Dungeon[DungeonID].State > 1;
+			if(!IsDungeonActive)
+			{
+				GetTempData().TempDungeonReady ^= true;
+				GS()->Chat(m_ClientID, "You change the ready mode to {STR}!", GetTempData().TempDungeonReady ? "ready" : "not ready");
+			}
+			return true;
+		}
 	}
 	// - - - - - F4- - - - - - -
 	else
@@ -664,7 +672,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		// Очистка конца диалогов или диалога который был бесмысленный
 		const int sizeTalking = BotJob::NpcBot[MobID].m_Talk.size();
 		const bool isTalkingEmpty = BotJob::NpcBot[MobID].m_Talk.empty();
-		if ((isTalkingEmpty && m_TalkingNPC.m_TalkedProgress == 999) || (!isTalkingEmpty && m_TalkingNPC.m_TalkedProgress >= sizeTalking))
+		if ((isTalkingEmpty && m_TalkingNPC.m_TalkedProgress == IS_TALKING_EMPTY) || (!isTalkingEmpty && m_TalkingNPC.m_TalkedProgress >= sizeTalking))
 		{
 			ClearTalking();
 			GS()->ClearTalkText(m_ClientID);
@@ -677,7 +685,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		{
 			const char* MeaninglessDialog = GS()->Mmo()->BotsData()->GetMeaninglessDialog();
 			GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, -1, TalkedID, MeaninglessDialog);
-			m_TalkingNPC.m_TalkedProgress = 999;
+			m_TalkingNPC.m_TalkedProgress = IS_TALKING_EMPTY;
 			return;
 		}
 
@@ -772,7 +780,9 @@ void CPlayer::ClearFormatQuestText()
 void CPlayer::ChangeWorld(int WorldID)
 {
 	// reset dungeon temp data
+	Acc().LastWorldID = GS()->GetWorldID();
 	GetTempData().TempAlreadyVotedDungeon = false;
+	GetTempData().TempDungeonReady = false;
 	GetTempData().TempTankVotingDungeon = 0;
 	GetTempData().TempTimeDungeon = 0;
 

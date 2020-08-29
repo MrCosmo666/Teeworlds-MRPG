@@ -124,6 +124,10 @@
 		"value": "Топ 10 игроков по уровню"
 	},
 	{
+		"key": "Top 10 players wealthy",
+		"value": "Топ 10 игроков по золоту"
+	},
+	{
 		"key": "Chance & Loot Information",
 		"value": "Инфopмaция o шaнcax и дoбычe"
 	},

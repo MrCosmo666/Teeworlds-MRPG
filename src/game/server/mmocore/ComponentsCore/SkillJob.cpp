@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 #include "SkillJob.h"
 
@@ -16,20 +15,21 @@ std::map < int , std::map < int , SkillJob::StructSkills > > SkillJob::Skill;
 // Инициализация класса
 void SkillJob::OnInit()
 { 
-	// загрузить список скиллов
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_skills_list"));
-	while(RES->next())
+	SJK.SDT("*", "tw_skills_list", [&](ResultSet* RES)
 	{
-		const int SkillID = (int)RES->getInt("ID");
-		str_copy(SkillData[SkillID].m_SkillName, RES->getString("SkillName").c_str(), sizeof(SkillData[SkillID].m_SkillName));
-		str_copy(SkillData[SkillID].m_SkillDesc, RES->getString("SkillDesc").c_str(), sizeof(SkillData[SkillID].m_SkillDesc));
-		str_copy(SkillData[SkillID].m_SkillBonusInfo, RES->getString("BonusInfo").c_str(), sizeof(SkillData[SkillID].m_SkillBonusInfo));
-		SkillData[SkillID].m_ManaProcent = (int)RES->getInt("ManaProcent");
-		SkillData[SkillID].m_SkillPrice = (int)RES->getInt("Price");
-		SkillData[SkillID].m_SkillMaxLevel = (int)RES->getInt("MaxLevel");
-		SkillData[SkillID].m_BonusCount = (int)RES->getInt("BonusCount");
-		SkillData[SkillID].m_Passive = (bool)RES->getBoolean("Passive");
-	}
+		while(RES->next())
+		{
+			const int SkillID = (int)RES->getInt("ID");
+			str_copy(SkillData[SkillID].m_SkillName, RES->getString("SkillName").c_str(), sizeof(SkillData[SkillID].m_SkillName));
+			str_copy(SkillData[SkillID].m_SkillDesc, RES->getString("SkillDesc").c_str(), sizeof(SkillData[SkillID].m_SkillDesc));
+			str_copy(SkillData[SkillID].m_SkillBonusInfo, RES->getString("BonusInfo").c_str(), sizeof(SkillData[SkillID].m_SkillBonusInfo));
+			SkillData[SkillID].m_ManaProcent = (int)RES->getInt("ManaProcent");
+			SkillData[SkillID].m_SkillPrice = (int)RES->getInt("Price");
+			SkillData[SkillID].m_SkillMaxLevel = (int)RES->getInt("MaxLevel");
+			SkillData[SkillID].m_BonusCount = (int)RES->getInt("BonusCount");
+			SkillData[SkillID].m_Passive = (bool)RES->getBoolean("Passive");
+		}
+	});
 }
 
 void SkillJob::OnInitAccount(CPlayer *pPlayer)
@@ -65,7 +65,7 @@ bool SkillJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_SKILL, "Here you can learn passive and active skills");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_SKILL, "You can bind active skill any button using the console");
 			GS()->AV(ClientID, "null", "");
-			GS()->ShowValueInformation(pPlayer, itSkillPoint);
+			GS()->ShowItemValueInformation(pPlayer, itSkillPoint);
 			GS()->AV(ClientID, "null", "");
 			
 			ShowMailSkillList(pPlayer, false);
@@ -105,7 +105,7 @@ bool SkillJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 	{
 		const int SkillID = VoteID;
 		if (UpgradeSkill(pPlayer, SkillID))
-			GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 
@@ -117,7 +117,7 @@ bool SkillJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			Skill[ClientID][SkillID].m_SelectedEmoticion = -1;
 
 		SJK.UD("tw_accounts_skills", "SelectedEmoticion = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", Skill[ClientID][SkillID].m_SelectedEmoticion, SkillID, pPlayer->Acc().AuthID);
-		GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	return false;
@@ -139,7 +139,7 @@ int SkillJob::GetSkillLevel(int ClientID, int SkillID) const
 
 void SkillJob::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = BLUE_COLOR;
 	GS()->AVL(ClientID, "null", "{STR} skill's", (Passive ? "Passive" : "Active"));
 	for (const auto& sk : SkillData)

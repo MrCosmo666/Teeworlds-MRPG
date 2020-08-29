@@ -1,4 +1,3 @@
-#include <engine/shared/config.h>
 #include <generated/protocol.h>
 #include <game/server/gamecontext.h>
 #include "decoration_houses.h"

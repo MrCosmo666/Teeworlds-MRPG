@@ -105,6 +105,13 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		if (DoButton_CheckBox(&s_ButtonColorVote, Localize("Show Colored Vote (MRPG)"), g_Config.m_ClShowColoreVote, &Button))
 			g_Config.m_ClShowColoreVote ^= 1;
 
+		// эффекты
+		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
+		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
+		static int s_ButtonMmoEffects = 0;
+		if(DoButton_CheckBox(&s_ButtonMmoEffects, Localize("Disable effects (MRPG)"), g_Config.m_ClShowMEffects, &Button))
+			g_Config.m_ClShowMEffects ^= 1;
+
 		// --------------------- RIGHT SIDE --------------------------
 		UI()->DoLabel(&BasicRight, "Customize", 12.0f, CUI::ALIGN_CENTER);
 		BasicRight.HSplitTop(14.0f, &Button, &BasicRight);
@@ -115,31 +122,21 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		RenderTools()->DrawUIRect(&BackgroundExpBar, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 80.0f), CUI::CORNER_ALL, 5.0f);
 		
 		// expbar
-		CUIRect ExpBar;
-		BasicRight.VMargin(10.0f, &ExpBar);
+		CUIRect ExpBar = BasicRight;
+		ExpBar.VMargin(10.0f, &ExpBar);
 		ExpBar.HMargin(5.0f, &ExpBar), ExpBar.h = 20.0f;
-		vec4 ProgressColor((g_Config.m_HdColorProgress >> 16) / 255.0f,
-			((g_Config.m_HdColorProgress >> 8) & 0xff) / 255.0f, (g_Config.m_HdColorProgress & 0xff) / 255.0f, 0.8f);
+		const vec4 ProgressColor((g_Config.m_HdColorProgress >> 16) / 255.0f, ((g_Config.m_HdColorProgress >> 8) & 0xff) / 255.0f, (g_Config.m_HdColorProgress & 0xff) / 255.0f, 0.8f);
 		RenderTools()->DrawUIBar(TextRender(), ExpBar, ProgressColor, 50, 100, "Experience Bar", 20, 5.0f, 2.0f);
 		BasicRight.HSplitTop(10.0f, &ExpBar, &BasicRight);
 
-		int hri, hgi, hbi;
-		hri = g_Config.m_HdColorProgress >> 16;
-		hgi = (g_Config.m_HdColorProgress >> 8) & 0xff;
-		hbi = g_Config.m_HdColorProgress & 0xff;
+		int hri = g_Config.m_HdColorProgress >> 16;
+		int hgi = (g_Config.m_HdColorProgress >> 8) & 0xff;
+		int hbi = g_Config.m_HdColorProgress & 0xff;
 		BasicRight.HSplitTop(15.0f, &Button, &BasicRight);
 		RenderRgbSliders(&BasicRight, &Button, hri, hgi, hbi, true);
 		g_Config.m_HdColorProgress = (hri<<16) + (hgi<<8) + hbi;
 
-		// эффекты
-		BasicRight.HSplitTop(ButtonHeight, &Button, &BasicRight);
-		const char* Name[4] = { "All Effects", "Only Enchant Effects", "Only Item Effects", "Off Effects" };
-		UI()->DoLabel(&BasicRight, Name[g_Config.m_ClShowMEffects], 12.0f, CUI::ALIGN_CENTER);
 		BasicRight.HSplitTop(14.0f, 0, &BasicRight);
-	
-		BasicRight.HSplitTop(ButtonHeight, &Button, &BasicRight);
-		DoScrollbarOption(&g_Config.m_ClShowMEffects, &g_Config.m_ClShowMEffects, &Button, "Effects (MRPG)", 0, 3);
-
 		BasicRight.HSplitTop(ButtonHeight, &Button, &BasicRight);
 		DoScrollbarOption(&g_Config.m_ClDialogsSpeedNPC, &g_Config.m_ClDialogsSpeedNPC, &Button, Localize("Dialogs speed with NPC (MRPG)"), 50, 100, &LogarithmicScrollbarScale);
 	}

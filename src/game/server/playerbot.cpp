@@ -1,7 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
-
 #include "entities/botai/character_bot_ai.h"
 #include "gamecontext.h"
 #include "mmocore/PathFinder.h"
@@ -50,7 +48,7 @@ void CPlayerBot::Tick()
 
 	if(m_pCharacter)
 	{
-		if(m_pCharacter->IsAlive() && GS()->CheckPlayersDistance(m_pCharacter->GetPos(), 1000.0f))
+		if(m_pCharacter->IsAlive() && GS()->CheckingPlayersDistance(m_pCharacter->GetPos(), 1000.0f))
 		{
 			TickThreadMobsPathFinder();
 			m_ViewPos = m_pCharacter->GetPos();
@@ -308,7 +306,7 @@ void CPlayerBot::TickThreadMobsPathFinder()
 
 void CPlayerBot::SendClientInfo(int TargetID)
 {
-	if(TargetID != -1 && (TargetID < 0 || TargetID >= MAX_PLAYERS || !Server()->ClientIngame(TargetID)))
+	if((TargetID != -1 && (TargetID < 0 || TargetID >= MAX_PLAYERS || !Server()->ClientIngame(TargetID))) || m_BotType == BotsTypes::TYPE_BOT_FAKE)
 		return;
 
 	CNetMsg_Sv_ClientInfo ClientInfoMsg;

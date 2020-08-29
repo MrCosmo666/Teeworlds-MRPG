@@ -4,9 +4,6 @@
 #include "gameworld.h"
 #include "entity.h"
 #include "gamecontext.h"
-#include <algorithm>
-#include <utility>
-#include <engine/shared/config.h>
 
 //////////////////////////////////////////////////
 // game world

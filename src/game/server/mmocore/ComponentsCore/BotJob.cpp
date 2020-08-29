@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 #include "BotJob.h"
 
@@ -394,27 +393,27 @@ void BotJob::FindThreadPath(class CPlayerBot* pBotPlayer, vec2 StartPos, vec2 Se
 		return;
 
 	std::thread([pBotPlayer, StartPos, SearchPos]()
-		{
-			lockingPath.lock();
-			pBotPlayer->GS()->PathFinder()->Init();
-			pBotPlayer->GS()->PathFinder()->SetStart(StartPos);
-			pBotPlayer->GS()->PathFinder()->SetEnd(SearchPos);
-			pBotPlayer->GS()->PathFinder()->FindPath();
-			pBotPlayer->m_PathSize = pBotPlayer->GS()->PathFinder()->m_FinalSize;
-			for(int i = pBotPlayer->m_PathSize - 1, j = 0; i >= 0; i--, j++)
-				pBotPlayer->m_WayPoints[j] = vec2(pBotPlayer->GS()->PathFinder()->m_lFinalPath[i].m_Pos.x * 32 + 16, pBotPlayer->GS()->PathFinder()->m_lFinalPath[i].m_Pos.y * 32 + 16);
-	
-			lockingPath.unlock();
-		}).detach();
+	{
+		lockingPath.lock();
+		pBotPlayer->GS()->PathFinder()->Init();
+		pBotPlayer->GS()->PathFinder()->SetStart(StartPos);
+		pBotPlayer->GS()->PathFinder()->SetEnd(SearchPos);
+		pBotPlayer->GS()->PathFinder()->FindPath();
+		pBotPlayer->m_PathSize = pBotPlayer->GS()->PathFinder()->m_FinalSize;
+		for(int i = pBotPlayer->m_PathSize - 1, j = 0; i >= 0; i--, j++)
+			pBotPlayer->m_WayPoints[j] = vec2(pBotPlayer->GS()->PathFinder()->m_lFinalPath[i].m_Pos.x * 32 + 16, pBotPlayer->GS()->PathFinder()->m_lFinalPath[i].m_Pos.y * 32 + 16);
+
+		lockingPath.unlock();
+	}).detach();
 }
 
 void BotJob::GetThreadRandomWaypointTarget(class CPlayerBot* pBotPlayer)
 {
 	std::thread([this, pBotPlayer]()
-		{
-			lockingPath.lock();
-			vec2 TargetPos = pBotPlayer->GS()->PathFinder()->GetRandomWaypoint();
-			pBotPlayer->m_TargetPos = vec2(TargetPos.x * 32, TargetPos.y * 32);
-			lockingPath.unlock();
-		}).detach();
+	{
+		lockingPath.lock();
+		vec2 TargetPos = pBotPlayer->GS()->PathFinder()->GetRandomWaypoint();
+		pBotPlayer->m_TargetPos = vec2(TargetPos.x * 32, TargetPos.y * 32);
+		lockingPath.unlock();
+	}).detach();
 }

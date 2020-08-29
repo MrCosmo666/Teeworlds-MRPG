@@ -7,7 +7,6 @@
 #include <engine/server.h>
 
 #include <base/another/kurhelper.h>
-#include <engine/shared/memheap.h>
 #include <game/layers.h>
 #include <game/voting.h>
 
@@ -121,6 +120,7 @@ private:
 	void UpdateDiscordStatus();
 
 public:
+	void FakeChat(const char *pName, const char *pText);
 	void Chat(int ClientID, const char* pText, ...);
 	void ChatFollow(int ClientID, const char* pText, ...);
 	void ChatAccountID(int AccountID, const char* pText, ...);
@@ -169,6 +169,7 @@ public:
 	void SendGameMsg(int GameMsgID, int ClientID);
 	void SendGameMsg(int GameMsgID, int ParaI1, int ClientID);
 	void SendGameMsg(int GameMsgID, int ParaI1, int ParaI2, int ParaI3, int ClientID);
+	void UpdateClientInformation(int ClientID);
 
 	void SendChatCommand(const CCommandManager::CCommand* pCommand, int ClientID);
 	void SendChatCommands(int ClientID);
@@ -217,9 +218,6 @@ public:
 private:
 	static void ConParseSkin(IConsole::IResult *pResult, void *pUserData);
 	static void ConGiveItem(IConsole::IResult *pResult, void *pUserData);
-	static void ConTuneParam(IConsole::IResult *pResult, void *pUserData);
-	static void ConTuneReset(IConsole::IResult *pResult, void *pUserData);
-	static void ConTuneDump(IConsole::IResult *pResult, void *pUserData);
 	static void ConSay(IConsole::IResult *pResult, void *pUserData);
 	static void ConAddCharacter(IConsole::IResult *pResult, void *pUserData);
 	static void ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
@@ -242,7 +240,6 @@ private:
 	std::list<CVoteOptions> m_PlayerVotes[MAX_PLAYERS];
 
 public:
-	void ClearVotes(int ClientID);
 	void AV(int To, const char *Cmd, const char *Desc, const int ID = -1, const int ID2 = -1, const char *Icon = "unused");
 	void AVL(int To, const char* aCmd, const char* pText, ...);
 	void AVH(int To, const int ID, vec3 Color, const char* pText, ...);
@@ -252,18 +249,20 @@ public:
 	void AVMI(int To, const char *Icon, const char *Type, const int ID, const int HideID, const char *pText, ...);
 	void AVD(int To, const char* Type, const int ID, const int ID2, const int HideID, const char* pText, ...);
 
+	void ClearVotes(int ClientID);
 	void ResetVotesNewbieInformation(int ClientID);
 	void ResetVotes(int ClientID, int MenuList);
-	void VResetVotes(int ClientID, int MenuID);
+	void UpdateVotes(int ClientID, int MenuList);
+	void UpdateVotes(int MenuList);
 	void AddBack(int ClientID);
 	void ShowPlayerStats(CPlayer *pPlayer);
-	void ShowValueInformation(CPlayer *pPlayer, int ItemID = itGold);
+	void ShowItemValueInformation(CPlayer *pPlayer, int ItemID = itGold);
 	bool ParseVote(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text);
 
 	/* #########################################################################
 		MMO GAMECONTEXT 
 	######################################################################### */
-	void CreateBot(short BotType, int BotID, int SubID);
+	int CreateBot(short BotType, int BotID, int SubID);
 	void CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText);
 	void CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop = 1, vec2 Force = vec2(0.0f, 0.0f));
 	void CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant = 0, vec2 Force = vec2(0.0f, 0.0f));
@@ -286,7 +285,7 @@ public:
 	bool IsAllowedPVP() const { return m_AllowedPVP; }
 	const char* AtributeName(int BonusID) const;
 
-	bool CheckPlayersDistance(vec2 Pos, float Distance) const;
+	bool CheckingPlayersDistance(vec2 Pos, float Distance) const;
 	void SetRespawnWorld(int WorldID) { m_RespawnWorld = WorldID; }
 	void SetMapMusic(int SoundID) { m_MusicID = SoundID; }
 	int GetRespawnWorld() const { return m_RespawnWorld; }

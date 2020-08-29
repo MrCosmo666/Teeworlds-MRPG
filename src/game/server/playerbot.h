@@ -30,7 +30,6 @@ public:
 	int GetHealth() override { return m_BotHealth; };
 	int GetMana() override { return 999; };
 
-	void SetDungeonAllowedSpawn(bool Spawn) override { m_DungeonAllowedSpawn = Spawn; };
 	void UpdateTempData(int Health, int Mana) override { m_BotHealth = Health; };
 	void SendClientInfo(int TargetID) override;
 	
@@ -47,6 +46,8 @@ public:
 	vec2 m_TargetPos;
 	std::map<int, vec2> m_WayPoints;
 
+	void SetDungeonAllowedSpawn(bool Spawn) { m_DungeonAllowedSpawn = Spawn; };
+	
 private:
 	void TryRespawn() override;
 

@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 #include "MailBoxJob.h"
 
@@ -16,8 +15,6 @@ void MailBoxJob::ReceiveInbox(CPlayer *pPlayer, int InboxID)
 	// получаем информацию о письме
 	const int ItemID = RES->getInt("ItemID");
 	const int Count = RES->getInt("Count");
-	
-	// empty
 	if(ItemID <= 0 || Count <= 0)
 	{
 		SJK.DD("tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
@@ -91,8 +88,8 @@ int MailBoxJob::GetActiveInbox(CPlayer *pPlayer)
 void MailBoxJob::SendInbox(int AuthID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
 {
 	// clear str and connection
-	CSqlString<64> cName = CSqlString<64>(Name);
-	CSqlString<64> cDesc = CSqlString<64>(Desc);
+	const CSqlString<64> cName = CSqlString<64>(Name);
+	const CSqlString<64> cDesc = CSqlString<64>(Desc);
 	if (ItemID <= 0)
 	{
 		SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, OwnerID) VALUES ('%s', '%s', '%d');", cName.cstr(), cDesc.cstr(), AuthID);
@@ -109,7 +106,7 @@ bool MailBoxJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteI
 	if(PPSTR(CMD, "MAIL") == 0)
 	{
 		ReceiveInbox(pPlayer, VoteID);
-		GS()->VResetVotes(ClientID, MenuList::MENU_INBOX);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_INBOX);
 		return true;
 	}
 

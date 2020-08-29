@@ -46,17 +46,17 @@ void CItems::RenderProjectile(const CNetObj_Projectile *pCurrent, int ItemID)
 	if(Ct < 0)
 		return; // projectile havn't been shot yet
 
-	vec2 StartPos(pCurrent->m_X, pCurrent->m_Y);
-	vec2 StartVel(pCurrent->m_VelX/100.0f, pCurrent->m_VelY/100.0f);
-	vec2 Pos = CalcPos(StartPos, StartVel, Curvature, Speed, Ct);
-	vec2 PrevPos = CalcPos(StartPos, StartVel, Curvature, Speed, Ct-0.001f);
+	const vec2 StartPos(pCurrent->m_X, pCurrent->m_Y);
+	const vec2 StartVel(pCurrent->m_VelX/100.0f, pCurrent->m_VelY/100.0f);
+	const vec2 Pos = CalcPos(StartPos, StartVel, Curvature, Speed, Ct);
+	const vec2 PrevPos = CalcPos(StartPos, StartVel, Curvature, Speed, Ct-0.001f);
 
 
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 	Graphics()->QuadsBegin();
 
 	RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[clamp(pCurrent->m_Type, 0, NUM_WEAPONS-1)].m_pSpriteProj);
-	vec2 Vel = Pos-PrevPos;
+	const vec2 Vel = Pos-PrevPos;
 
 	// add particle for this projectile
 	if(pCurrent->m_Type == WEAPON_GRENADE)
@@ -309,10 +309,10 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 	float Ct = (Client()->PrevGameTick() - pCurrent->m_StartTick) / (float)SERVER_TICK_SPEED + s_LastGameTickTime;
 	if (Ct < 0) return; // projectile havn't been shot yet
 
-	vec2 StartPos(pCurrent->m_X, pCurrent->m_Y);
-	vec2 StartVel(pCurrent->m_VelX / 100.0f, pCurrent->m_VelY / 100.0f);
-	vec2 Pos = CalcPos(StartPos, StartVel, Curvature, Speed, Ct);
-	vec2 PrevPos = CalcPos(StartPos, StartVel, Curvature, Speed, Ct - 0.001f);
+	const vec2 StartPos(pCurrent->m_X, pCurrent->m_Y);
+	const vec2 StartVel(pCurrent->m_VelX / 100.0f, pCurrent->m_VelY / 100.0f);
+	const vec2 Pos = CalcPos(StartPos, StartVel, Curvature, Speed, Ct);
+	const vec2 PrevPos = CalcPos(StartPos, StartVel, Curvature, Speed, Ct - 0.001f);
 
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAME].m_Id);
 	Graphics()->QuadsBegin();
@@ -321,7 +321,7 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 	RenderTools()->SelectSprite(citem);
 
 	// добавить эффект проджектайлу
-	vec2 Vel = Pos - PrevPos;
+	const vec2 Vel = Pos - PrevPos;
 	if (pCurrent->m_Weapon == WEAPON_GRENADE)
 	{
 		m_pClient->m_pEffects->SmokeTrail(Pos, Vel * -1);
@@ -360,10 +360,10 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 void CItems::RenderMmoPickups(const CNetObj_MmoPickup* pPrev, const CNetObj_MmoPickup* pCurrent)
 {
 	float Size = 64.0f;
-	vec2 Prev = vec2(pPrev->m_X, pPrev->m_Y);
-	vec2 Curr = vec2(pCurrent->m_X, pCurrent->m_Y);
+	const vec2 Prev = vec2(pPrev->m_X, pPrev->m_Y);
+	const vec2 Curr = vec2(pCurrent->m_X, pCurrent->m_Y);
 	vec2 Pos = mix(Prev, Curr, Client()->IntraGameTick());
-	float Angle = mix((float)pPrev->m_Angle, (float)pCurrent->m_Angle, Client()->IntraGameTick()) / 256.0f;
+	const float Angle = mix((float)pPrev->m_Angle, (float)pCurrent->m_Angle, Client()->IntraGameTick()) / 256.0f;
 	const int c[] = 
 		{ 
 			SPRITE_MMO_GAME_BOX, 
@@ -374,17 +374,25 @@ void CItems::RenderMmoPickups(const CNetObj_MmoPickup* pPrev, const CNetObj_MmoP
 			SPRITE_MMO_GAME_MAIN_ARROW,
 			SPRITE_MMO_GAME_DROP };
 
+	switch(pCurrent->m_Type)
+	{
+		case MMO_PICKUP_MAIN_ARROW:
+			Size = 56.0f;
+			break;
+		case MMO_PICKUP_SIDE_ARROW:
+			Size = 48.0f;
+			break;
+		default:
+			break;
+	}
+	
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAME].m_Id);
 	Graphics()->QuadsBegin();
 	RenderTools()->SelectSprite(c[pCurrent->m_Type]);
-	if (pCurrent->m_Type == MMO_PICKUP_SIDE_ARROW || pCurrent->m_Type == MMO_PICKUP_MAIN_ARROW || 
-		pCurrent->m_Type == MMO_PICKUP_BOX || pCurrent->m_Type == MMO_PICKUP_DROP)
+	const bool IsAngleItem = (bool)(pCurrent->m_Type == MMO_PICKUP_SIDE_ARROW || pCurrent->m_Type == MMO_PICKUP_MAIN_ARROW || 
+									pCurrent->m_Type == MMO_PICKUP_BOX || pCurrent->m_Type == MMO_PICKUP_DROP);
+	if (IsAngleItem)
 	{
-		if(pCurrent->m_Type == MMO_PICKUP_SIDE_ARROW)
-			Size = 48.0f;
-		else if(pCurrent->m_Type == MMO_PICKUP_MAIN_ARROW)
-			Size = 56.0f;
-
 		Graphics()->QuadsSetRotation(Angle);
 		RenderTools()->DrawSprite(Pos.x, Pos.y, Size);
 		Graphics()->QuadsSetRotation(0);
@@ -395,7 +403,7 @@ void CItems::RenderMmoPickups(const CNetObj_MmoPickup* pPrev, const CNetObj_MmoP
 	// дальше эффект что они двигаются
 	static float s_Time = 0.0f;
 	static float s_LastLocalTime = Client()->LocalTime();
-	float Offset = Pos.y / 32.0f + Pos.x / 32.0f;
+	const float Offset = Pos.y / 32.0f + Pos.x / 32.0f;
 	if (Client()->State() == IClient::STATE_DEMOPLAYBACK) 
 	{
 		const IDemoPlayer::CInfo* pInfo = DemoPlayer()->BaseInfo();

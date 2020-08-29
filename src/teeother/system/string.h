@@ -77,7 +77,7 @@ private:
 
 public:
 	_dynamic_string_core() :
-		m_pBuffer(NULL),
+		m_pBuffer(nullptr),
 		m_MaxSize(0)
 	{
 		resize_buffer(INITIALSIZE);
@@ -133,8 +133,8 @@ public:
 	
 	inline int append_at(int Pos, const char* pBuffer)
 	{
-		int BufferSize = str_length(pBuffer);
-		int Size = Pos+BufferSize+1;
+		const int BufferSize = str_length(pBuffer);
+		const int Size = Pos+BufferSize+1;
 		if(Size > m_MaxSize)
 		{
 			int NewSize = m_MaxSize*2;
@@ -151,7 +151,7 @@ public:
 	
 	inline int append_at_num(int Pos, const char* pBuffer, int Num)
 	{
-		int Size = Pos+Num+1;
+		const int Size = Pos+Num+1;
 		if(Size > m_MaxSize)
 		{
 			int NewSize = m_MaxSize*2;

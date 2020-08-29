@@ -74,7 +74,7 @@ public:
 	int GetMemberChairBonus(int GuildID, int Field) const;
 
 	void CreateGuild(int ClientID, const char *GuildName);
-	void JoinGuild(int AuthID, int GuildID);
+	bool JoinGuild(int AuthID, int GuildID);
 	void ExitGuild(int AuthID);
 
 private:
@@ -128,7 +128,7 @@ public:
 	void BuyGuildHouse(int GuildID, int HouseID);
 	void SellGuildHouse(int GuildID);
 	void ShowBuyHouse(CPlayer *pPlayer, int HouseID);
-	void ChangeStateDoor(int GuildID);
+	bool ChangeStateDoor(int GuildID);
 };
 
 class GuildDoor : public CEntity

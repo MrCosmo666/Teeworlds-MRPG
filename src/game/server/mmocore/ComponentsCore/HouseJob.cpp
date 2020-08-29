@@ -11,44 +11,48 @@ std::map < int , HouseJob::HouseList > HouseJob::Home;
 
 // Инициализация класса
 void HouseJob::OnInitWorld(const char* pWhereLocalWorld) 
-{ 
+{
 	// загрузка домов
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_houses", pWhereLocalWorld));
-	while(RES->next())
+	SJK.SDT("*", "tw_houses", [&](ResultSet* RES)
 	{
-		int HouseID = RES->getInt("ID");
-		Home[HouseID].m_DoorX = RES->getInt("DoorX");
-		Home[HouseID].m_DoorY = RES->getInt("DoorY");
-		Home[HouseID].m_PosX = RES->getInt("PosX");
-		Home[HouseID].m_PosY = RES->getInt("PosY");
-		Home[HouseID].m_OwnerID = RES->getInt("OwnerID");
-		Home[HouseID].m_Price = RES->getInt("Price");
-		Home[HouseID].m_Bank = RES->getInt("HouseBank");
-		Home[HouseID].m_WorldID = RES->getInt("WorldID");
-		str_copy(Home[HouseID].m_Class, RES->getString("Class").c_str(), sizeof(Home[HouseID].m_Class));
-		Home[HouseID].m_PlantID = RES->getInt("PlantID");
-		Home[HouseID].m_PlantPosX = RES->getInt("PlantX");
-		Home[HouseID].m_PlantPosY = RES->getInt("PlantY");
-		if (GS()->GetWorldID() == Home[HouseID].m_WorldID && Home[HouseID].m_OwnerID > 0 && !Home[HouseID].m_Door)
+		while(RES->next())
 		{
-			Home[HouseID].m_Door = 0;
-			Home[HouseID].m_Door = new HouseDoor(&GS()->m_World, vec2(Home[HouseID].m_DoorX, Home[HouseID].m_DoorY));
+			const int HouseID = RES->getInt("ID");
+			Home[HouseID].m_DoorX = RES->getInt("DoorX");
+			Home[HouseID].m_DoorY = RES->getInt("DoorY");
+			Home[HouseID].m_PosX = RES->getInt("PosX");
+			Home[HouseID].m_PosY = RES->getInt("PosY");
+			Home[HouseID].m_OwnerID = RES->getInt("OwnerID");
+			Home[HouseID].m_Price = RES->getInt("Price");
+			Home[HouseID].m_Bank = RES->getInt("HouseBank");
+			Home[HouseID].m_WorldID = RES->getInt("WorldID");
+			str_copy(Home[HouseID].m_Class, RES->getString("Class").c_str(), sizeof(Home[HouseID].m_Class));
+			Home[HouseID].m_PlantID = RES->getInt("PlantID");
+			Home[HouseID].m_PlantPosX = RES->getInt("PlantX");
+			Home[HouseID].m_PlantPosY = RES->getInt("PlantY");
+			if(GS()->GetWorldID() == Home[HouseID].m_WorldID && Home[HouseID].m_OwnerID > 0 && !Home[HouseID].m_Door)
+			{
+				Home[HouseID].m_Door = 0;
+				Home[HouseID].m_Door = new HouseDoor(&GS()->m_World, vec2(Home[HouseID].m_DoorX, Home[HouseID].m_DoorY));
+			}
 		}
-	}
+		Job()->ShowLoadingProgress("Houses", Home.size());
+	}, pWhereLocalWorld);
 
 	// загружаем декорации
-	if (m_DecorationHouse.size() <= 0)
+	if(m_DecorationHouse.empty())
 	{
-		boost::scoped_ptr<ResultSet> DecoLoadingRES(SJK.SD("*", "tw_houses_decorations", pWhereLocalWorld));
-		while (DecoLoadingRES->next())
+		SJK.SDT("*", "tw_houses_decorations", [&](ResultSet* DecoRES)
 		{
-			const int DecoID = DecoLoadingRES->getInt("ID");
-			m_DecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(DecoLoadingRES->getInt("X"),
-				DecoLoadingRES->getInt("Y")), DecoLoadingRES->getInt("HouseID"), DecoLoadingRES->getInt("DecoID"));
-		}
+			while(DecoRES->next())
+			{
+				const int DecoID = DecoRES->getInt("ID");
+				m_DecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(DecoRES->getInt("X"),
+					DecoRES->getInt("Y")), DecoRES->getInt("HouseID"), DecoRES->getInt("DecoID"));
+			}
+			Job()->ShowLoadingProgress("Houses Decorations", m_DecorationHouse.size());
+		}, pWhereLocalWorld);
 	}
-	Job()->ShowLoadingProgress("Houses", Home.size());
-	Job()->ShowLoadingProgress("Houses Decorations", m_DecorationHouse.size());
 }
 
 /*
@@ -237,64 +241,73 @@ const char *HouseJob::OwnerName(int HouseID)
 	FUNCTIONS HOUSES 
 ######################################################################### */
 // Покупка дома
-bool HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
+void HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 {
-	int ClientID = pPlayer->GetCID();
+	// проверить есть ли дом у игрока
+	const int ClientID = pPlayer->GetCID();
 	if(PlayerHouseID(pPlayer) > 0)
 	{
 		GS()->Chat(ClientID, "You already have a home.");		
-		return false;
+		return;
 	}
 
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("OwnerID, Price", "tw_houses", "WHERE ID = '%d';", HouseID));
+	// покупка дома
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("OwnerID, Price", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NULL", HouseID));
 	if(RES->next())
 	{
-		if(RES->getInt("OwnerID") > 0) 
-			return false;
-
+		// покупка снятие золота
 		const int Price = RES->getInt("Price");
 		if(pPlayer->CheckFailMoney(Price))	
-			return false;
+			return;
 
+		// обновление информации
 		Home[HouseID].m_Bank = 0;
 		Home[HouseID].m_OwnerID = pPlayer->Acc().AuthID;
 		SJK.UD("tw_houses", "OwnerID = '%d', HouseBank = '0' WHERE ID = '%d'", Home[HouseID].m_OwnerID, HouseID);
-		return true;
-	}	
-	return false;
+
+		// информация о покупки
+		GS()->Chat(-1, "{STR} becomes the owner of the house class {STR}", GS()->Server()->ClientName(ClientID), Home[HouseID].m_Class);
+		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**{STR} becomes the owner of the house class {STR}**", GS()->Server()->ClientName(ClientID), Home[HouseID].m_Class);
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		return;
+	}
+
+	// информация что дом уже куплен
+	GS()->Chat(ClientID, "House has already been purchased!");
 }
 
 // Продажа дома
 void HouseJob::SellHouse(int HouseID)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("OwnerID", "tw_houses", "WHERE ID = '%d'", HouseID));
+	// найти и обновить информацию в бд
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("Bank, OwnerID", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NOT NULL", HouseID));
 	if(RES->next())
 	{
+		// обновление информации
 		const int OwnerID = RES->getInt("OwnerID");
+		const int Price = Home[HouseID].m_Price + RES->getInt("Bank");
+		Job()->Inbox()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itGold, Price, 0);
+		SJK.UD("tw_houses", "OwnerID = NULL, Bank = '0' WHERE ID = '%d'", HouseID);
+
+		// информация о продаже
 		const int ClientID = Job()->Account()->CheckOnlineAccount(OwnerID);
 		if(ClientID >= 0)
 		{
-			GS()->ChatFollow(ClientID, "Your House is sold !");
-			GS()->Chat(-1, "House: {INT} have been is released!", &HouseID);
-			GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**[House: {INT}] have been sold!**", &HouseID);
-		}
-		const int Price = Home[HouseID].m_Price;
-		Job()->Inbox()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itGold, Price, 0);
-
-		if(Home[HouseID].m_Door)
-		{
-			delete Home[HouseID].m_Door;
-			Home[HouseID].m_Door = 0;
-		}
-		Home[HouseID].m_Bank = 50000;
-		Home[HouseID].m_OwnerID = -1;
-		
-		// обновить голосования
-		if(ClientID >= 0)
+			GS()->ChatFollow(ClientID, "Your House is sold!");
 			GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
-
-		SJK.UD("tw_houses", "OwnerID = NULL, HouseBank = '50000' WHERE ID = '%d'", HouseID);
+		}
+		GS()->Chat(-1, "House: {INT} have been is released!", &HouseID);
+		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**[House: {INT}] have been sold!**", &HouseID);
 	}
+
+	// открыть и освободить дом
+	if(Home[HouseID].m_Door)
+	{
+		delete Home[HouseID].m_Door;
+		Home[HouseID].m_Door = 0;
+	}
+	Home[HouseID].m_OwnerID = -1;
+	Home[HouseID].m_Bank = 0;
 }
 
 bool HouseJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
@@ -322,7 +335,7 @@ bool HouseJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 
 bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	if (ReplaceMenu)
 	{
 		CCharacter* pChr = pPlayer->GetCharacter();
@@ -399,7 +412,7 @@ void HouseJob::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
 	pPlayer->AddMoney(TakeCount);
 	Home[HouseID].m_Bank = Bank - TakeCount;
 	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", Home[HouseID].m_Bank, HouseID);
-	GS()->Chat(ClientID, "You take gold in the safe (+{VAL}){VAL}!", &TakeCount, &Home[HouseID].m_Bank);
+	GS()->Chat(ClientID, "You take {INT} gold in the safe {INT}!", &TakeCount, &Home[HouseID].m_Bank);
 }
 
 
@@ -413,38 +426,36 @@ void HouseJob::AddSafeDeposit(CPlayer *pPlayer, int Balance)
 
 	const int HouseID = RES->getInt("ID");
 	Home[HouseID].m_Bank = RES->getInt("HouseBank") + Balance;            
-	GS()->Chat(ClientID, "You put gold in the safe (+{VAL}){VAL}!", &Balance, &Home[HouseID].m_Bank);
+	GS()->Chat(ClientID, "You put {INT} gold in the safe {INT}!", &Balance, &Home[HouseID].m_Bank);
 	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", Home[HouseID].m_Bank, HouseID);
 }
 
 // Действия над дверью
-void HouseJob::ChangeStateDoor(int HouseID)
+bool HouseJob::ChangeStateDoor(int HouseID)
 {
-	if(Home.find(HouseID) == Home.end() || Home[HouseID].m_OwnerID <= 0) return;
+	if(Home.find(HouseID) == Home.end() || Home[HouseID].m_OwnerID <= 0) 
+		return false;
 
-	// если мир не равен данному
 	if(Home[HouseID].m_WorldID != GS()->GetWorldID())
 	{
 		GS()->ChatAccountID(Home[HouseID].m_OwnerID, "Change state door can only near your house.");
-		return;
+		return false;
 	}
 
-	// изменяем стату двери
 	if(Home[HouseID].m_Door) 
 	{
-		// дверь удаляем
 		delete Home[HouseID].m_Door;
 		Home[HouseID].m_Door = 0;
 	}
 	else
 	{
-		// создаем дверь
 		Home[HouseID].m_Door = new HouseDoor(&GS()->m_World, vec2(Home[HouseID].m_DoorX, Home[HouseID].m_DoorY));
 	}
 
 	// надпись если найдется игрок
-	bool StateDoor = (Home[HouseID].m_Door);
+	const bool StateDoor = (Home[HouseID].m_Door);
 	GS()->ChatAccountID(Home[HouseID].m_OwnerID, "You {STR} the house.", (StateDoor ? "closed" : "opened"));
+	return true;
 }
 
 // Показ меню дома
@@ -456,7 +467,7 @@ void HouseJob::ShowHouseMenu(CPlayer *pPlayer, int HouseID)
 
 	// показать кол-во Золота у игрока
 	GS()->AV(ClientID, "null", "");
-	GS()->ShowValueInformation(pPlayer, itGold);
+	GS()->ShowItemValueInformation(pPlayer, itGold);
 	GS()->AV(ClientID, "null", "");
 	
 	// показать основное меню
@@ -481,7 +492,6 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 	const bool StateDoor = GetHouseDoor(HouseID);
 	GS()->AVH(ClientID, TAB_HOUSE_STAT, BLUE_COLOR, "House stats {INT} Class {STR} Door [{STR}]", &HouseID, Home[HouseID].m_Class, StateDoor ? "Closed" : "Opened");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "/doorhouse - interactive with door.");
-	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "/sellhouse - sell house to world.");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "- - - - - - - - - -");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "Notes: Minimal operation house balance 100gold");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "In your safe is: {INT}gold", &Home[HouseID].m_Bank);
@@ -497,8 +507,9 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "▤ House system");
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
-	GS()->AVM(ClientID, "HOUSEDOOR", HouseID, NOPE, "Change state to [\"{STR} door\"]", StateDoor ? "Open" : "Close");
+	GS()->AVM(ClientID, "HOUSEDOOR", HouseID, NOPE, "Change state to [\"{STR}\"]", StateDoor ? "OPEN" : "CLOSED");
 	GS()->AVM(ClientID, "HSPAWN", 1, NOPE, "Teleport to your house");
+	GS()->AVM(ClientID, "HSELL", HouseID, NOPE, "Sell your house (in reason 777)");
 	if(Home[HouseID].m_WorldID == GS()->Server()->GetWorldID(ClientID))
 	{
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_HOUSE_DECORATION, NOPE, "Settings Decorations");
@@ -517,13 +528,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 	if(PPSTR(CMD, "BUYHOUSE") == 0)
 	{
 		const int HouseID = VoteID;
-		if(BuyHouse(HouseID, pPlayer))
-		{
-			GS()->Chat(-1, "{STR} becomes the owner of the house class {STR}", GS()->Server()->ClientName(ClientID), Home[VoteID].m_Class);
-			GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**{STR} becomes the owner of the house class {STR}**", GS()->Server()->ClientName(ClientID), Home[HouseID].m_Class);
-			GS()->ChatFollow(ClientID, "Do not forget to top up the balance at home, now the balance {INT}G", &Home[HouseID].m_Bank);
-			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-		}
+		BuyHouse(HouseID, pPlayer);
 		return true;
 	}
 	// переместится домой
@@ -546,14 +551,35 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		return true;
 	}
 
+	// Продажа дома
+	if (PPSTR(CMD, "HSELL") == 0)
+	{
+		const int HouseID = VoteID;
+		if (HouseID <= 0 || Get != 777)
+		{
+			GS()->Chat(ClientID, "A verification number was entered incorrectly.");
+			return true;
+		}
+
+		SellHouse(HouseID);
+		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
+		return true;
+	}
+
 	// Оплата дома
 	if(PPSTR(CMD, "HOUSEADD") == 0)
 	{
-		if(Get < 100 || pPlayer->CheckFailMoney(Get))
+		if(Get < 100)
+		{
+			GS()->Chat(ClientID, "Minimal 100 gold.");
+			return true;
+		}
+		
+		if(pPlayer->CheckFailMoney(Get))
 			return true;
 
 		AddSafeDeposit(pPlayer, Get);
-		GS()->VResetVotes(ClientID, MenuList::MENU_HOUSE);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE);
 		return true;
 	}
 
@@ -561,26 +587,29 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 	if(PPSTR(CMD, "HOUSETAKE") == 0)
 	{
 		if(Get < 100)
+		{
+			GS()->Chat(ClientID, "Minimal 100 gold.");
 			return true;
-
+		}
+		
 		TakeFromSafeDeposit(pPlayer, Get);
-		GS()->VResetVotes(ClientID, MenuList::MENU_HOUSE);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE);
 		return true;
 	}
 
 	// Дверь дома
 	if(PPSTR(CMD, "HOUSEDOOR") == 0)
 	{
-		ChangeStateDoor(VoteID);
-		GS()->VResetVotes(ClientID, MenuList::MENU_HOUSE);
+		if(ChangeStateDoor(VoteID))
+			GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE);
 		return true;		
 	}
 
 	// начала расстановки декорации
 	if(PPSTR(CMD, "DECOSTART") == 0)
 	{
-		int HouseID = PlayerHouseID(pPlayer);
-		vec2 PositionHouse = GetPositionHouse(HouseID);
+		const int HouseID = PlayerHouseID(pPlayer);
+		const vec2 PositionHouse = GetPositionHouse(HouseID);
 		if(HouseID <= 0 || distance(PositionHouse, pPlayer->GetCharacter()->m_Core.m_Pos) > 600)
 		{
 			GS()->Chat(ClientID, "Long distance from the house, or you do not own the house!");
@@ -603,14 +632,14 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 	if(PPSTR(CMD, "DECODELETE") == 0)
 	{
 		// дом проверка
-		int HouseID = PlayerHouseID(pPlayer);
+		const int HouseID = PlayerHouseID(pPlayer);
 		if(HouseID > 0 && DeleteDecorationHouse(VoteID))
 		{
 			ItemJob::InventoryItem &PlDecoItem = pPlayer->GetItem(VoteID2);
 			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
 			PlDecoItem.Add(1);
 		}
-		GS()->VResetVotes(ClientID, MenuList::MENU_HOUSE_DECORATION);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE_DECORATION);
 		return true;
 	}
 
@@ -637,12 +666,13 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		const int ChanceSuccesful = VoteID2;
 		if(ChanceSuccesful != 0)
 		{
-			GS()->Chat(ClientID, "Unfortunately the plant did not take root!");
+			GS()->Chat(ClientID, "Unfortunately plant did not take root!");
 			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 			return true;
 		}
 
-		ChangePlantsID(HouseID, VoteID);
+		GS()->Chat(-1, "Congratulations {STR}, planted at home {STR}!", GS()->Server()->ClientName(ClientID), GS()->GetItemInfo(ItemID).Name);
+		ChangePlantsID(HouseID, ItemID);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 	}
 
@@ -663,7 +693,7 @@ void HouseDoor::Tick()
 	for(CCharacter *pChar = (CCharacter*) GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter *)pChar->TypeNext())
 	{
 		vec2 IntersectPos = closest_point_on_line(m_Pos, m_PosTo, pChar->m_Core.m_Pos);
-		float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);
+		const float Distance = distance(IntersectPos, pChar->m_Core.m_Pos);
 		if (Distance <= g_Config.m_SvDoorRadiusHit)
 			pChar->m_DoorHit = true;
 	}

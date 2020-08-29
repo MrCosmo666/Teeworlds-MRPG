@@ -155,7 +155,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 
 	Job()->OnInitAccount(ClientID);
 	const int Rank = GetRank(pPlayer->Acc().AuthID);
-	GS()->Chat(-1, "{STR} joined to Mmo server. Rank #{INT}", GS()->Server()->ClientName(ClientID), &Rank);
+	GS()->Chat(-1, "{STR} logged to account. Rank #{INT}", GS()->Server()->ClientName(ClientID), &Rank);
 #ifdef CONF_DISCORD
 	char pMsg[256], pLoggin[64];
 	str_format(pLoggin, sizeof(pLoggin), "%s logged in Account ID %d", GS()->Server()->ClientName(ClientID), pPlayer->Acc().AuthID);
@@ -275,8 +275,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		for(int i = 0; i < GS()->Server()->Localization()->m_pLanguages.size(); i++)
 		{
 			// Не показывать в списках выбора язык который выбран уже у игрока
-			const char *pLanguageFile = GS()->Server()->Localization()->m_pLanguages[i]->GetFilename();
-			if(str_comp(pPlayerLanguage, pLanguageFile) == 0)
+			if(str_comp(pPlayerLanguage, GS()->Server()->Localization()->m_pLanguages[i]->GetFilename()) == 0)
 				continue;
 
 			// Добавить выбор языка
@@ -297,7 +296,7 @@ bool AccountMainJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int V
 		const char *pSelectedLanguage = GS()->Server()->Localization()->m_pLanguages[VoteID]->GetFilename();
 		pPlayer->SetLanguage(pSelectedLanguage);
 		GS()->Chat(ClientID, "You chosen a language \"{STR}\".", pSelectedLanguage);
-		GS()->VResetVotes(ClientID, MenuList::MENU_SELECT_LANGUAGE);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_SELECT_LANGUAGE);
 		Job()->SaveAccount(pPlayer, SaveType::SAVE_LANGUAGE);
 		return true;
 	}

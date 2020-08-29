@@ -1,16 +1,9 @@
 #ifndef __SHARED_LOCALIZATION__
 #define __SHARED_LOCALIZATION__
 
-/* BEGIN EDIT *********************************************************/
+#include <unicode/tmutfmt.h>
 #include <teeother/tl/hashtable.h>
 #define CStorage IStorage
-/* END EDIT ***********************************************************/
-#include <unicode/ucnv.h>
-#include <unicode/numfmt.h>
-#include <unicode/upluralrules.h>
-#include <unicode/tmutfmt.h>
-
-#include <stdarg.h>
 
 struct CLocalizableString
 {
@@ -21,18 +14,14 @@ struct CLocalizableString
 	{ }
 };
 
-/* BEGIN EDIT *********************************************************/
-#define _(TEXT) TEXT
 #define _P(TEXT_SINGULAR, TEXT_PLURAL) TEXT_PLURAL
-/* END EDIT ***********************************************************/
 
-/* BEGIN EDIT *********************************************************/
 class CLocalization
 {
 private:
 	class CStorage* m_pStorage;
 	inline class CStorage* Storage() { return m_pStorage; }
-/* END EDIT ***********************************************************/
+	
 public:
 	enum
 	{
@@ -63,7 +52,7 @@ public:
 			CEntry()
 			{
 				for(int i=0; i<NUM_PLURALTYPES; i++)
-					m_apVersions[i] = NULL;
+					m_apVersions[i] = nullptr;
 			}
 			
 			void Free()
@@ -131,14 +120,10 @@ protected:
 	void AppendPercent(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, double Number);
 
 public:
-/* BEGIN EDIT *********************************************************/
 	CLocalization(class CStorage* pStorage);
-/* END EDIT ***********************************************************/
 	virtual ~CLocalization();
 	
 	virtual bool InitConfig(int argc, const char** argv);
-/* BEGIN EDIT *********************************************************/
-/* END EDIT ***********************************************************/
 	virtual bool Init();
 	virtual bool PreUpdate();
 	
@@ -166,4 +151,3 @@ public:
 };
 
 #endif
- 

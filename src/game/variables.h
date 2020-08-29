@@ -23,15 +23,15 @@ MACRO_CONFIG_INT(ClWarningTeambalance, cl_warning_teambalance, 1, 0, 1, CFGFLAG_
 MACRO_CONFIG_INT(ClDynamicCamera, cl_dynamic_camera, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Switches camera mode. 0=static camera, 1=dynamic camera")
 MACRO_CONFIG_INT(ClMouseDeadzone, cl_mouse_deadzone, 300, 0, 0, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Zone that doesn't trigger the dynamic camera")
 MACRO_CONFIG_INT(ClMouseFollowfactor, cl_mouse_followfactor, 60, 0, 200, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Trigger amount for the dynamic camera")
-MACRO_CONFIG_INT(ClMouseMaxDistanceDynamic, cl_mouse_max_distance_dynamic, 1000, 0, 0, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Mouse max distance, in dynamic camera mode")
-MACRO_CONFIG_INT(ClMouseMaxDistanceStatic, cl_mouse_max_distance_static, 400, 0, 0, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Mouse max distance, in static camera mode")
+MACRO_CONFIG_INT(ClMouseMaxDistanceDynamic, cl_mouse_max_distance_dynamic, 1000, 1, 2000, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Mouse max distance, in dynamic camera mode")
+MACRO_CONFIG_INT(ClMouseMaxDistanceStatic, cl_mouse_max_distance_static, 400, 1, 2000, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Mouse max distance, in static camera mode")
 
 MACRO_CONFIG_INT(ClCustomizeSkin, cl_customize_skin, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Use a customized skin")
 MACRO_CONFIG_INT(ClShowUserId, cl_show_user_id, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Show the ID for every user")
 
 // MRPG
 MACRO_CONFIG_INT(ClDialogsSpeedNPC, cl_mmo_dialogs_speeed_npc, 60, 50, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "dialoges speed with npc (mrpg)")
-MACRO_CONFIG_INT(ClShowMEffects, cl_mmo_effects, 0, 0, 3, CFGFLAG_CLIENT | CFGFLAG_SAVE, "effects: 0=all, 1=only enchant, 2=only another items, 3= disable")
+MACRO_CONFIG_INT(ClShowMEffects, cl_mmo_effects, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Disable effects (mrpg)")
 MACRO_CONFIG_INT(ClShowAuthMenu, cl_mmo_show_auth_menu, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show auth menu (mrpg)")
 MACRO_CONFIG_INT(ClShowColoreVote, cl_colored_votes_inmmoserver, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show colored votes in mmo server")
 MACRO_CONFIG_STR(GameTexture, mmo_game_texture, 255, "\0", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Gameskin texture")
@@ -115,7 +115,7 @@ MACRO_CONFIG_INT(ClSkipStartMenu, cl_skip_start_menu, 0, 0, 1, CFGFLAG_CLIENT|CF
 
 MACRO_CONFIG_INT(ClStatboardInfos, cl_statboard_infos, 1259, 1, 2047, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Mask of info to display on the global statboard")
 
-MACRO_CONFIG_INT(ClLastVersionPlayed, cl_last_version_played, 0x0703, 0, 0, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Last version of the game that was played")
+MACRO_CONFIG_INT(ClLastVersionPlayed, cl_last_version_played, PREV_CLIENT_VERSION, 0, 0, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Last version of the game that was played")
 
 // server
 MACRO_CONFIG_STR(SvMotd, sv_motd, 900, "", CFGFLAG_SERVER, "Message of the day to display for the clients")
@@ -158,6 +158,8 @@ MACRO_CONFIG_INT(SvLimitDecoration, sv_limit_decorations, 10, 5, 20, CFGFLAG_SER
 MACRO_CONFIG_INT(SvCreateDiscordBot, sv_discord_bot, 1, 0, 1, CFGFLAG_SERVER, "Create discord bot")
 MACRO_CONFIG_STR(SvDiscordToken, sv_discord_token, 256, "", CFGFLAG_SERVER, "Discord Token")
 MACRO_CONFIG_STR(SvDiscordChanal, sv_discord_server_chanel, 128, "", CFGFLAG_SERVER, "Discord Server Chanel")
+MACRO_CONFIG_STR(SvDiscordIdeasChanal, sv_discord_ideas_chanel, 128, "", CFGFLAG_SERVER, "Discord Ideas Chanel")
+MACRO_CONFIG_STR(SvDiscordAdminChanal, sv_discord_admin_chanel, 128, "", CFGFLAG_SERVER, "Discord Admin Chanel")
 MACRO_CONFIG_STR(SvDiscordInviteGroup, sv_discord_invite_group, 32, "nope", CFGFLAG_SERVER, "Discord group.")
 MACRO_CONFIG_STR(SvGenerateURL, sv_discord_generateurl, 128, "nope", CFGFLAG_SERVER, "Path folder generate image. Example 'submodules/generator'.")
 MACRO_CONFIG_STR(SvSiteUrl, sv_site_url, 128, "nope", CFGFLAG_SERVER, "Url site. Example 'https://teeworlds.space'")

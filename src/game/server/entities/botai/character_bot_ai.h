@@ -70,13 +70,4 @@ private:
 	void Action();
 };
 
-class CEntityFunctionNurse : public CEntity
-{
-	int m_OwnerID;
-public:
-	CEntityFunctionNurse(CGameWorld* pGameWorld, int ClientID, vec2 Pos);
-	virtual void Tick();
-	virtual void Snap(int SnappingClient);
-};
-
 #endif

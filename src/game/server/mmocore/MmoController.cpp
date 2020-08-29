@@ -1,7 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <thread>
-#include <engine/shared/config.h>
 #include <teeother/system/string.h>
 
 #include <game/server/gamecontext.h>
@@ -11,7 +10,6 @@
 
 using namespace sqlstr;
 
-// список хранения всех компонентов Sql Work
 MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 {
 	// order
@@ -126,7 +124,6 @@ void MmoController::ResetClientData(int ClientID)
 // Сохранение аккаунта
 void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 {
-	const int ClientID = pPlayer->GetCID();
 	if(!pPlayer->IsAuthed()) 
 		return;
 	
@@ -136,7 +133,6 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		const int EquipDiscord = pPlayer->GetEquippedItem(EQUIP_DISCORD);
 		SJK.UD("tw_accounts_data", "Level = '%d', Exp = '%d', DiscordEquip = '%d' WHERE ID = '%d'",
 			pPlayer->Acc().Level, pPlayer->Acc().Exp, EquipDiscord, pPlayer->Acc().AuthID);
-		return;
 	}
 
 	// сохранение апгрейдов
@@ -154,7 +150,6 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 
 		SJK.UD("tw_accounts_data", "Upgrade = '%d' %s WHERE ID = '%d'", pPlayer->Acc().Upgrade, Buffer.buffer(), pPlayer->Acc().AuthID);
 		Buffer.clear();
-		return;
 	}
 
 	// сохранение плант аккаунта
@@ -168,7 +163,6 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		}
 		SJK.UD("tw_accounts_plants", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().AuthID);
 		Buffer.clear();
-		return;
 	}
 
 	// сохранение минер аккаунта
@@ -182,33 +176,28 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		}
 		SJK.UD("tw_accounts_miner", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().AuthID);
 		Buffer.clear();
-		return;		
 	}
 
 	// сохранение гильдии даты
 	else if(Table == SaveType::SAVE_GUILD_DATA)
 	{
-		SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '%d' WHERE ID = '%d'", pPlayer->Acc().GuildID, pPlayer->Acc().GuildRank, pPlayer->Acc().AuthID);
-		return;			
+		SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '%d' WHERE ID = '%d'", pPlayer->Acc().GuildID, pPlayer->Acc().GuildRank, pPlayer->Acc().AuthID);	
 	}
 
 	// сохранение мира позиции
 	else if(Table == SaveType::SAVE_POSITION && !GS()->IsDungeon())
 	{
-		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", GS()->Server()->GetWorldID(ClientID), pPlayer->Acc().AuthID);
-		return;
+		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", pPlayer->GetPlayerWorldID(), pPlayer->Acc().AuthID);
 	}
 
 	// сохранение языка игрока
 	else if(Table == SaveType::SAVE_LANGUAGE)
 	{
 		SJK.UD("tw_accounts", "Language = '%s' WHERE ID = '%d'", pPlayer->GetLanguage(), pPlayer->Acc().AuthID);
-		return;		
 	}
 	else
 	{
 		SJK.UD("tw_accounts", "Username = '%s', Password = '%s' WHERE ID = '%d'", pPlayer->Acc().Login, pPlayer->Acc().Password, pPlayer->Acc().AuthID);
-		return;
 	}
 }
 
@@ -218,7 +207,7 @@ void MmoController::LoadLogicWorld()
 	while(RES->next())
 	{
 		const int Type = (int)RES->getInt("MobID"), Mode = (int)RES->getInt("Mode"), Health = (int)RES->getInt("ParseInt");
-		vec2 Position = vec2(RES->getInt("PosX"), RES->getInt("PosY"));
+		const vec2 Position = vec2(RES->getInt("PosX"), RES->getInt("PosY"));
 		GS()->m_pController->CreateLogic(Type, Mode, Position, Health);
 	}
 }
@@ -235,10 +224,10 @@ const char* MmoController::PlayerName(int AccountID)
 	return "No found!";
 }
 
-void MmoController::ShowLoadingProgress(const char *Loading, int LoadCount)
+void MmoController::ShowLoadingProgress(const char* pLoading, int Size)
 {
 	char aLoadingBuf[128];
-	str_format(aLoadingBuf, sizeof(aLoadingBuf), "Loaded %d %s | CK WorldID %d.", LoadCount, Loading, GS()->GetWorldID());
+	str_format(aLoadingBuf, sizeof(aLoadingBuf), "Loaded %d %s | CK WorldID %d.", Size, pLoading, GS()->GetWorldID());
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "LOAD DB", aLoadingBuf);
 }
 
@@ -282,6 +271,19 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 			const int Experience = RES->getInt("Exp");
 			str_copy(Nick, RES->getString("Nick").c_str(), sizeof(Nick));
 			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Level {INT} : Exp {INT}", &Rank, Nick, &Level, &Experience);
+		}
+	}
+	else if (TypeID == ToplistTypes::PLAYERS_WEALTHY)
+	{
+		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_items", "WHERE ItemID = '%d' ORDER BY Count DESC LIMIT 10", (int)itGold));
+		while (RES->next())
+		{
+			char Nick[64];
+			const int Rank = RES->getRow();
+			const int Gold = RES->getInt("Count");
+			const int OwnerID = RES->getInt("OwnerID");
+			str_copy(Nick, PlayerName(OwnerID), sizeof(Nick));
+			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Gold {INT}", &Rank, Nick, &Gold);
 		}
 	}
 }

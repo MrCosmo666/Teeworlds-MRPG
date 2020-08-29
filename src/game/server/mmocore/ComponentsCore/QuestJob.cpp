@@ -221,8 +221,8 @@ void QuestJob::AddProgress(CPlayer *pPlayer, int QuestID)
 	if (FinishedProgress)
 	{
 		FinishQuest(pPlayer, QuestID);
-		GS()->VResetVotes(ClientID, MenuList::MENU_JOURNAL_MAIN);
-		GS()->VResetVotes(ClientID, MenuList::MAIN_MENU);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_JOURNAL_MAIN);
+		GS()->UpdateVotes(ClientID, MenuList::MAIN_MENU);
 	}
 	else
 	{
@@ -285,7 +285,7 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotDa
 		return false;
 
 	CollectItem(pPlayer, BotData);
-	GS()->VResetVotes(ClientID, MenuList::MENU_JOURNAL_MAIN);
+	GS()->UpdateVotes(ClientID, MenuList::MENU_JOURNAL_MAIN);
 	GS()->Mmo()->Quest()->AddProgress(pPlayer, QuestID);
 
 	// сбросить рисовку между (Quest NPC / NPC)

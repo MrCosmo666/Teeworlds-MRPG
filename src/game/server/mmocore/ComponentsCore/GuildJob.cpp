@@ -1,5 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <stdarg.h>
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 #include "GuildJob.h"
@@ -11,70 +12,77 @@ std::map < int , GuildJob::GuildStructRank > GuildJob::RankGuild;
 
 void GuildJob::LoadGuildRank(int GuildID)
 {
+	// загрузка рангов
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_ranks", "WHERE ID > '0' AND GuildID = '%d'", GuildID));
-	while (RES->next())
+	while(RES->next())
 	{
-		int ID = RES->getInt("ID");
-		RankGuild[ID].GuildID = GuildID;
-		RankGuild[ID].Access = RES->getInt("Access");
-		str_copy(RankGuild[ID].Rank, RES->getString("Name").c_str(), sizeof(RankGuild[ID].Rank));
+			int ID = RES->getInt("ID");
+			RankGuild[ID].GuildID = GuildID;
+			RankGuild[ID].Access = RES->getInt("Access");
+			str_copy(RankGuild[ID].Rank, RES->getString("Name").c_str(), sizeof(RankGuild[ID].Rank));
 	}
 }
 
 void GuildJob::OnInit()
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds"));
-	while (RES->next())
+	SJK.SDT("*", "tw_guilds", [&](ResultSet* RES)
 	{
-		int GuildID = RES->getInt("ID");
-		Guild[GuildID].m_OwnerID = RES->getInt("OwnerID");
-		Guild[GuildID].m_Level = RES->getInt("Level");
-		Guild[GuildID].m_Exp = RES->getInt("Experience");
-		Guild[GuildID].m_Bank = RES->getInt("Bank");
-		Guild[GuildID].m_Score = RES->getInt("Score");
-		str_copy(Guild[GuildID].m_Name, RES->getString("GuildName").c_str(), sizeof(Guild[GuildID].m_Name));
+		while(RES->next())
+		{
+			int GuildID = RES->getInt("ID");
+			Guild[GuildID].m_OwnerID = RES->getInt("OwnerID");
+			Guild[GuildID].m_Level = RES->getInt("Level");
+			Guild[GuildID].m_Exp = RES->getInt("Experience");
+			Guild[GuildID].m_Bank = RES->getInt("Bank");
+			Guild[GuildID].m_Score = RES->getInt("Score");
+			str_copy(Guild[GuildID].m_Name, RES->getString("GuildName").c_str(), sizeof(Guild[GuildID].m_Name));
 
-		for (int i = 0; i < EMEMBERUPGRADE::NUM_EMEMBERUPGRADE; i++)
-			Guild[GuildID].m_Upgrades[i] = RES->getInt(UpgradeNames(i, true).c_str());
+			for(int i = 0; i < EMEMBERUPGRADE::NUM_EMEMBERUPGRADE; i++)
+				Guild[GuildID].m_Upgrades[i] = RES->getInt(UpgradeNames(i, true).c_str());
 
-		LoadGuildRank(GuildID);
-	}
-	Job()->ShowLoadingProgress("Guilds", Guild.size());
+			LoadGuildRank(GuildID);
+		}
+		Job()->ShowLoadingProgress("Guilds", Guild.size());
+	});
 }
 
 void GuildJob::OnInitWorld(const char* pWhereLocalWorld) 
 { 
 	// загрузка домов
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_houses", pWhereLocalWorld));
-	while(RES->next())
+	SJK.SDT("*", "tw_guilds_houses", [&](ResultSet* RES)
 	{
-		int HouseID = RES->getInt("ID");
-		HouseGuild[HouseID].m_DoorX = RES->getInt("DoorX");
-		HouseGuild[HouseID].m_DoorY = RES->getInt("DoorY");	
-		HouseGuild[HouseID].m_GuildID = RES->getInt("OwnerMID");
-		HouseGuild[HouseID].m_PosX = RES->getInt("PosX");
-		HouseGuild[HouseID].m_PosY = RES->getInt("PosY");
-		HouseGuild[HouseID].m_Price = RES->getInt("Price");
-		HouseGuild[HouseID].m_WorldID = RES->getInt("WorldID");
-		HouseGuild[HouseID].m_TextX = RES->getInt("TextX");
-		HouseGuild[HouseID].m_TextY = RES->getInt("TextY");
-		if (HouseGuild[HouseID].m_GuildID > 0 && !HouseGuild[HouseID].m_Door)
+		while(RES->next())
 		{
-			HouseGuild[HouseID].m_Door = 0;
-			HouseGuild[HouseID].m_Door = new GuildDoor(&GS()->m_World, vec2(HouseGuild[HouseID].m_DoorX, HouseGuild[HouseID].m_DoorY), HouseGuild[HouseID].m_GuildID);
+			int HouseID = RES->getInt("ID");
+			HouseGuild[HouseID].m_DoorX = RES->getInt("DoorX");
+			HouseGuild[HouseID].m_DoorY = RES->getInt("DoorY");
+			HouseGuild[HouseID].m_GuildID = RES->getInt("OwnerMID");
+			HouseGuild[HouseID].m_PosX = RES->getInt("PosX");
+			HouseGuild[HouseID].m_PosY = RES->getInt("PosY");
+			HouseGuild[HouseID].m_Price = RES->getInt("Price");
+			HouseGuild[HouseID].m_WorldID = RES->getInt("WorldID");
+			HouseGuild[HouseID].m_TextX = RES->getInt("TextX");
+			HouseGuild[HouseID].m_TextY = RES->getInt("TextY");
+			if(HouseGuild[HouseID].m_GuildID > 0 && !HouseGuild[HouseID].m_Door)
+			{
+				HouseGuild[HouseID].m_Door = 0;
+				HouseGuild[HouseID].m_Door = new GuildDoor(&GS()->m_World, vec2(HouseGuild[HouseID].m_DoorX, HouseGuild[HouseID].m_DoorY), HouseGuild[HouseID].m_GuildID);
+			}
 		}
-	}
+		Job()->ShowLoadingProgress("Guilds Houses", HouseGuild.size());
+	}, pWhereLocalWorld);
 
 	// загрузка декораций
-	boost::scoped_ptr<ResultSet> DecoLoadingRES(SJK.SD("*", "tw_guilds_decorations", pWhereLocalWorld));
-	while (DecoLoadingRES->next())
+	SJK.SDT("*", "tw_guilds_decorations", [&](ResultSet* DecoRES)
 	{
-		const int DecoID = DecoLoadingRES->getInt("ID");
-		m_DecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(DecoLoadingRES->getInt("X"),
-			DecoLoadingRES->getInt("Y")), DecoLoadingRES->getInt("HouseID"), DecoLoadingRES->getInt("DecoID"));
-	}
-	Job()->ShowLoadingProgress("Guilds Houses", HouseGuild.size());
-	Job()->ShowLoadingProgress("Guilds Houses Decorations", m_DecorationHouse.size());
+		while(DecoRES->next())
+		{
+			const int DecoID = DecoRES->getInt("ID");
+			m_DecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(DecoRES->getInt("X"),
+				DecoRES->getInt("Y")), DecoRES->getInt("HouseID"), DecoRES->getInt("DecoID"));
+		}
+		Job()->ShowLoadingProgress("Guilds Houses Decorations", m_DecorationHouse.size());
+	}, pWhereLocalWorld);
 }
 
 bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
@@ -149,7 +157,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 
 		AddHistoryGuild(GuildID, "New guild leader '%s'.", Job()->PlayerName(SelectedAccountID));
 		GS()->ChatGuild(GuildID, "Change leader {STR}->{STR}", GS()->Server()->ClientName(ClientID), Job()->PlayerName(SelectedAccountID));
-		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -184,7 +192,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			return true;
 		}
 		ExitGuild(VoteID);
-		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -204,7 +212,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			const int GuildCount = Guild[GuildID].m_Upgrades[UpgradeID];
 			GS()->ChatGuild(GuildID, "Improved to {INT} {STR} in {STR}!", &GuildCount, UpgradeNames(UpgradeID).c_str(), Guild[GuildID].m_Name);
 			AddHistoryGuild(GuildID, "'%s' level up to '%d'.", UpgradeNames(UpgradeID).c_str(), GuildCount);
-			GS()->VResetVotes(ClientID, MenuList::MENU_GUILD);
+			GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
 			return true;
 
 		}
@@ -233,7 +241,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			SJK.UD("tw_accounts_data", "GuildDeposit = GuildDeposit + '%d' WHERE ID = '%d'", Get, pPlayer->Acc().AuthID);
 			GS()->ChatGuild(GuildID, "{STR} deposit in treasury {INT}gold.", GS()->Server()->ClientName(ClientID), &Get);
 			AddHistoryGuild(GuildID, "'%s' added to bank %dgold.", GS()->Server()->ClientName(ClientID), Get);
-			GS()->VResetVotes(ClientID, MenuList::MENU_GUILD);
+			GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
 		}
 		return true;
 	}
@@ -249,7 +257,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		}
 
 		BuyGuildHouse(GuildID, VoteID);
-		GS()->VResetVotes(ClientID, MenuList::MAIN_MENU);
+		GS()->UpdateVotes(MenuList::MAIN_MENU);
 		return true;
 	}
 
@@ -264,7 +272,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		}
 
 		SellGuildHouse(GuildID);
-		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD);
+		GS()->UpdateVotes(MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -278,8 +286,8 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			return true;
 		}
 
-		ChangeStateDoor(GuildID);
-		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD);
+		if(ChangeStateDoor(GuildID))
+			GS()->UpdateVotes(MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -294,10 +302,14 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		}
 
 		const int SenderID = VoteID;
-		SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
-		Job()->Inbox()->SendInbox(SenderID, Guild[GuildID].m_Name, "You were accepted to join guild");
-		JoinGuild(SenderID, GuildID);
-		GS()->ResetVotes(ClientID, MenuList::MENU_GUILD);
+		if(JoinGuild(SenderID, GuildID))
+		{
+			SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
+			Job()->Inbox()->SendInbox(SenderID, Guild[GuildID].m_Name, "You were accepted to join guild");
+			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			return true;
+		}
+		GS()->Chat(ClientID, "You can't accept (there are no free slot or he is already in Guild).");
 		return true;
 	}
 
@@ -330,7 +342,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		}
 
 		str_copy(pPlayer->GetTempData().m_aGuildSearchBuf, GetText, sizeof(pPlayer->GetTempData().m_aGuildSearchBuf));
-		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -358,7 +370,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		}
 
 		str_copy(pPlayer->GetTempData().m_aRankGuildBuf, GetText, sizeof(pPlayer->GetTempData().m_aRankGuildBuf));
-		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD_RANK);
+		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -372,14 +384,15 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			return true;
 		}
 
-		if (str_length(pPlayer->GetTempData().m_aRankGuildBuf) < 2)
+		const int lenRank = str_length(pPlayer->GetTempData().m_aRankGuildBuf);
+		if (lenRank < 2 || lenRank > 16)
 		{
-			GS()->Chat(ClientID, "Minimal symbols 2.");
+			GS()->Chat(ClientID, "Minimal 2, maximal 16 symbols.");
 			return true;
 		}
 
 		AddRank(GuildID, pPlayer->GetTempData().m_aRankGuildBuf);
-		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD_RANK);
+		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -395,7 +408,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 
 		const int RankID = VoteID;
 		DeleteRank(RankID, GuildID);
-		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD_RANK);
+		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -411,7 +424,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 
 		const int RankID = VoteID;
 		ChangeRankAccess(RankID);
-		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD_RANK);
+		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -433,7 +446,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 
 		const int RankID = VoteID;
 		ChangeRank(RankID, GuildID, pPlayer->GetTempData().m_aRankGuildBuf);
-		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD_RANK);
+		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -449,7 +462,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 
 		// меняем ранг и очишаем меню интерактивов
 		ChangePlayerRank(VoteID, VoteID2);
-		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD);
+		GS()->UpdateVotes(MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -465,7 +478,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			return true;
 		}
 
-		vec2 PositionHouse = GetPositionHouse(GuildID);
+		const vec2 PositionHouse = GetPositionHouse(GuildID);
 		if (distance(PositionHouse, pPlayer->GetCharacter()->m_Core.m_Pos) > 600)
 		{
 			GS()->Chat(ClientID, "Maximum distance between your home 600!");
@@ -502,7 +515,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
 			PlDecoItem.Add(1);
 		}
-		GS()->VResetVotes(ClientID, MenuList::MENU_GUILD_HOUSE_DECORATION);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD_HOUSE_DECORATION);
 		return true;
 	}
 	return false;
@@ -510,7 +523,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 
 bool GuildJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	if (ReplaceMenu)
 	{
 		CCharacter* pChr = pPlayer->GetCharacter();
@@ -749,7 +762,7 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 		GS()->Chat(ClientID, "You need first buy guild ticket on shop!");
 }
 
-void GuildJob::JoinGuild(int AuthID, int GuildID)
+bool GuildJob::JoinGuild(int AuthID, int GuildID)
 {
 	// проверяем клан есть или нет у этого и грока
 	const char *PlayerName = Job()->PlayerName(AuthID);
@@ -758,7 +771,7 @@ void GuildJob::JoinGuild(int AuthID, int GuildID)
 	{
 		GS()->ChatAccountID(AuthID, "You already in guild group!");
 		GS()->ChatGuild(GuildID, "{STR} already joined your or another guilds", PlayerName);
-		return;
+		return false;
 	}
 
 	// проверяем количество слотов доступных
@@ -767,7 +780,7 @@ void GuildJob::JoinGuild(int AuthID, int GuildID)
 	{
 		GS()->ChatAccountID(AuthID, "You don't joined [No slots for join]");
 		GS()->ChatGuild(GuildID, "{STR} don't joined [No slots for join]", PlayerName);
-		return;
+		return false;
 	}
 
 	// обновляем и получаем данные
@@ -780,6 +793,7 @@ void GuildJob::JoinGuild(int AuthID, int GuildID)
 	}
 	SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = NULL WHERE ID = '%d'", GuildID, AuthID);
 	GS()->ChatGuild(GuildID, "Player {STR} join in your guild!", PlayerName);
+	return true;
 }
 
 void GuildJob::ExitGuild(int AuthID)
@@ -857,7 +871,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 		GS()->AVL(ClientID, "null", "⌂ Housing system", &pPlayer->GetItem(itGold).Count);
 		pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_HOUSE_DECORATION, NOPE, "Settings Decoration(s)");
-		GS()->AVL(ClientID, "MDOOR", "Change state (\"{STR} door\")", GetGuildDoor(GuildID) ? "Open" : "Close");
+		GS()->AVL(ClientID, "MDOOR", "Change state (\"{STR}\")", GetGuildDoor(GuildID) ? "OPEN" : "CLOSED");
 		GS()->AVL(ClientID, "MSPAWN", "Teleport to guild house");
 		GS()->AVL(ClientID, "MHOUSESELL", "Sell your guild house (in reason 777)");
 	}
@@ -970,16 +984,14 @@ bool GuildJob::UpgradeGuild(int GuildID, int Field)
 	{
 		Guild[GuildID].m_Bank = RES->getInt("Bank");
 		Guild[GuildID].m_Upgrades[Field] = RES->getInt(UpgradeNames(Field, true).c_str());
-
 		const int UpgradePrice = (Field == EMEMBERUPGRADE::AvailableNSTSlots ? g_Config.m_SvPriceUpgradeGuildSlot : g_Config.m_SvPriceUpgradeGuildAnother);
 		const int PriceAvailable = Guild[GuildID].m_Upgrades[Field]*UpgradePrice;
 		if(PriceAvailable > Guild[GuildID].m_Bank)
 			return false;
 
-		Guild[ GuildID ].m_Upgrades[ Field ]++;
-		Guild[ GuildID ].m_Bank -= PriceAvailable;
-		SJK.UD("tw_guilds", "Bank = '%d', %s = '%d' WHERE ID = '%d'", 
-			Guild[GuildID].m_Bank, UpgradeNames(Field, true).c_str(), Guild[GuildID].m_Upgrades[ Field ], GuildID);
+		Guild[GuildID].m_Upgrades[Field]++;
+		Guild[GuildID].m_Bank -= PriceAvailable;
+		SJK.UD("tw_guilds", "Bank = '%d', %s = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, UpgradeNames(Field, true).c_str(), Guild[GuildID].m_Upgrades[ Field ], GuildID);
 		return true;
 	}
 	return false;
@@ -1086,6 +1098,7 @@ void GuildJob::ChangeRankAccess(int RankID)
 			RankGuild[RankID].Access = GuildAccess::ACCESS_NO;
 
 		const int GuildID = RankGuild[RankID].GuildID;
+		AddHistoryGuild(GuildID, "Rank '%s' access updated to '%s'.", RankGuild[RankID].Rank, AccessNames(RankGuild[RankID].Access));
 		SJK.UD("tw_guilds_ranks", "Access = '%d' WHERE ID = '%d' AND GuildID = '%d'", RankGuild[RankID].Access, RankID, GuildID);
 		GS()->ChatGuild(GuildID, "Rank [{STR}] changes [{STR}]!", RankGuild[RankID].Rank, AccessNames(RankGuild[RankID].Access));
 	}	
@@ -1306,63 +1319,76 @@ int GuildJob::GetGuildHouseID(int GuildID) const
 // Покупка дома организации
 void GuildJob::BuyGuildHouse(int GuildID, int HouseID)
 {
-	if(HouseID <= 0 || HouseGuild[HouseID].m_GuildID > 0) 
-		return;
-
+	// проверить есть ли дом у гильдии
 	if(GetGuildHouseID(GuildID) > 0)
 	{
 		GS()->ChatGuild(GuildID, "Your Guild can't have 2 houses. Purchase canceled!");
 		return;
 	}
 
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_houses", "WHERE ID = '%d'", HouseID));
-	if(!RES->next()) 
-		return;
-
-	const int Price = RES->getInt("Price");
-	if(Guild[GuildID].m_Bank < Price)
+	// покупка дома
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_houses", "WHERE ID = '%d' AND OwnerMID IS NULL", HouseID));
+	if(RES->next())
 	{
-		GS()->ChatGuild(GuildID, "This Guild house requires {INT}gold!", &Price);
+		// снятие золота
+		const int Price = RES->getInt("Price");
+		if(Guild[GuildID].m_Bank < Price)
+		{
+			GS()->ChatGuild(GuildID, "This Guild house requires {INT}gold!", &Price);
+			return;
+		}
+		Guild[GuildID].m_Bank -= Price;
+		SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, GuildID);
+
+		// обновление владельца
+		HouseGuild[HouseID].m_GuildID = GuildID;
+		SJK.UD("tw_guilds_houses", "OwnerMID = '%d' WHERE ID = '%d'", GuildID, HouseID);
+
+		// информация 
+		const char* WorldName = GS()->Server()->GetWorldName(HouseGuild[HouseID].m_WorldID);
+		GS()->Chat(-1, "{STR} buyight guild house on {STR}!", Guild[GuildID].m_Name, WorldName);
+		GS()->ChatDiscord(DC_SERVER_INFO, "Information", "{STR} buyight guild house on {STR}!", Guild[GuildID].m_Name, WorldName);
+		AddHistoryGuild(GuildID, "Bought a house on '%s'.", WorldName);
 		return;
 	}
 
-	HouseGuild[HouseID].m_GuildID = GuildID;
-	SJK.UD("tw_guilds_houses", "OwnerMID = '%d' WHERE ID = '%d'", GuildID, HouseID);
-	
-	Guild[GuildID].m_Bank -= Price;
-	SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, GuildID);
-	
-	const char *WorldName = GS()->Server()->GetWorldName(HouseGuild[HouseID].m_WorldID);
-	GS()->Chat(-1, "{STR} buyight guild house on {STR}!", Guild[GuildID].m_Name, WorldName);
-	GS()->ChatDiscord(DC_SERVER_INFO, "Information", "{STR} buyight guild house on {STR}!", Guild[GuildID].m_Name, WorldName);
-	AddHistoryGuild(GuildID, "Bought a house on '%s'.", WorldName);
+	// информация что дом уже куплен
+	GS()->ChatGuild(GuildID, "House has already been purchased!");
 }
 
 // продажа дома организации
 void GuildJob::SellGuildHouse(int GuildID)
 {
+	// узнать ид дома гильдии
 	const int HouseID = GetGuildHouseID(GuildID);
-	if(HouseID <= 0) 
-		return;	
-
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("OwnerMID", "tw_guilds_houses", "WHERE ID = '%d'", HouseID));
-	if(!RES->next()) 
+	if(HouseID <= 0)
+	{
+		GS()->ChatGuild(GuildID, "Your Guild doesn't have a home!");
 		return;
+	}
 
+	// продажа гильдии дома по айди дома
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_houses", "WHERE ID = '%d' AND OwnerMID IS NOT NULL", HouseID));
+	if(RES->next())
+	{
+		// сбросить владельца
+		SJK.UD("tw_guilds_houses", "OwnerMID = NULL WHERE ID = '%d'", HouseID);
+
+		// возращаем деньги
+		const int ReturnedGold = HouseGuild[HouseID].m_Price;
+		Guild[GuildID].m_Bank += ReturnedGold;
+		SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, GuildID);
+		GS()->ChatGuild(GuildID, "House sold, {INT}gold returned in bank", &ReturnedGold);
+		AddHistoryGuild(GuildID, "Lost a house on '%s'.", GS()->Server()->GetWorldName(HouseGuild[HouseID].m_WorldID));
+	}
+
+	// открыть и освободить дом
 	if(HouseGuild[HouseID].m_Door)
 	{
 		delete HouseGuild[HouseID].m_Door;
 		HouseGuild[HouseID].m_Door = 0;
 	}
-	HouseGuild[HouseID].m_GuildID = 0;
-	SJK.UD("tw_guilds_houses", "OwnerMID = NULL WHERE ID = '%d'", HouseID);
-	
-	// возращаем деньги
-	const int ReturnedGold = HouseGuild[HouseID].m_Price;
-	Guild[GuildID].m_Bank += ReturnedGold;
-	SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, GuildID);
-	GS()->ChatGuild(GuildID, "House sold, {INT}gold returned in bank", &ReturnedGold);
-	AddHistoryGuild(GuildID, "Lost a house on '%s'.", GS()->Server()->GetWorldName(HouseGuild[HouseID].m_WorldID));
+	HouseGuild[HouseID].m_GuildID = -1;
 }
 
 // меню продажи дома
@@ -1394,16 +1420,16 @@ void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 	GS()->AV(ClientID, "null", "");
 }
 
-void GuildJob::ChangeStateDoor(int GuildID)
+bool GuildJob::ChangeStateDoor(int GuildID)
 {
 	const int HouseID = GetGuildHouseID(GuildID);
 	if(HouseGuild.find(HouseID) == HouseGuild.end()) 
-		return;
+		return false;
 
 	if(HouseGuild[HouseID].m_WorldID != GS()->GetWorldID())
 	{
 		GS()->ChatGuild(GuildID, "Change state door can only near your house.");	
-		return;
+		return false;
 	}
 
 	if(HouseGuild[HouseID].m_Door) 
@@ -1418,6 +1444,7 @@ void GuildJob::ChangeStateDoor(int GuildID)
 	
 	const bool StateDoor = (bool)(HouseGuild[HouseID].m_Door);
 	GS()->ChatGuild(GuildID, "{STR} the house for others.", (StateDoor ? "closed" : "opened"));
+	return true;
 }
 
 GuildDoor::GuildDoor(CGameWorld *pGameWorld, vec2 Pos, int GuildID)

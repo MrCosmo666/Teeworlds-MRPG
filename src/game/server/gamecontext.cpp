@@ -1,12 +1,12 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/math.h>
+#include <stdarg.h>
 #include <thread>
 #include <algorithm>
 
+#include <base/math.h>
 #include <engine/map.h>
 #include <engine/shared/config.h>
-#include <engine/shared/memheap.h>
 
 #include <generated/server_data.h>
 #include <game/version.h>
@@ -63,15 +63,14 @@ CGS::~CGS()
 {
 	for(auto & apPlayer : m_apPlayers)
 		delete apPlayer;
-	if(pMmoController)  
-		delete pMmoController;
-	if(m_pPathFinder)
-		delete m_pPathFinder;
+	
+	delete pMmoController;
+	delete m_pPathFinder;
 }
 
 void CGS::Clear()
 {
-	CTuningParams Tuning = m_Tuning;         
+	const CTuningParams Tuning = m_Tuning;         
 	m_Resetting = true;
 	this->~CGS();
 	mem_zero(this, sizeof(*this));
@@ -354,12 +353,15 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 	if(Mode == CHAT_ALL)
 	{
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
-		ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
+		
+		// send discord chat only from players
+		if(ChatterClientID < MAX_PLAYERS)
+			ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
 	}
 	else if(Mode == CHAT_TEAM)
 	{
-		const int GuildID = m_apPlayers[ChatterClientID]->Acc().GuildID;
-		if(GuildID <= 0)
+		CPlayer* pChatterPlayer = GetPlayer(ChatterClientID, true);
+		if(!pChatterPlayer || pChatterPlayer->Acc().GuildID <= 0)
 		{
 			Chat(ChatterClientID, "This chat is intended for team / guilds!");
 			return;
@@ -367,7 +369,13 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 
 		// pack one for the recording only
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOSEND, -1);
-		ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
+
+		// send discord chat only from players
+		if(pChatterPlayer)
+			ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
+
+		// send chat to guild team
+		const int GuildID = pChatterPlayer->Acc().GuildID;
 		for(int i = 0; i < MAX_PLAYERS; i++)
 		{
 			CPlayer *pSearchPlayer = GetPlayer(i, true);
@@ -383,11 +391,50 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 	}
 }
 
+// Fake чат тип игрок в игре
+void CGS::FakeChat(const char *pName, const char *pText)
+{
+	const int FakeClientID = CreateBot(BotsTypes::TYPE_BOT_FAKE, 1, 1);
+	if(FakeClientID < 0 || FakeClientID > MAX_CLIENTS || !m_apPlayers[FakeClientID])
+		return;
+
+	// выкинуть игрока
+	CNetMsg_Sv_ClientDrop LeaveMsg;
+	LeaveMsg.m_ClientID = FakeClientID;
+	LeaveMsg.m_pReason = "\0";
+	LeaveMsg.m_Silent = true;
+	Server()->SendPackMsg(&LeaveMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
+
+	// обновить информацию
+	CNetMsg_Sv_ClientInfo ClientInfoMsg;
+	ClientInfoMsg.m_ClientID = FakeClientID;
+	ClientInfoMsg.m_Local = false;
+	ClientInfoMsg.m_Team = TEAM_BLUE;
+	ClientInfoMsg.m_pName = pName;
+	ClientInfoMsg.m_pClan = "::Bots::";
+	ClientInfoMsg.m_Country = 137;
+	ClientInfoMsg.m_Silent = true;
+	for (int p = 0; p < 6; p++)
+	{
+		ClientInfoMsg.m_apSkinPartNames[p] = "standard";
+		ClientInfoMsg.m_aUseCustomColors[p] = true;
+		ClientInfoMsg.m_aSkinPartColors[p] = 0;
+	}
+	Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
+	
+	// отправить чат и удалить игрока и выкинуть игрока
+	SendChat(FakeClientID, CHAT_ALL, -1, pText);
+	delete m_apPlayers[FakeClientID];
+	m_apPlayers[FakeClientID] = nullptr;
+	Server()->SendPackMsg(&LeaveMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
+	Server()->BackInformationFakeClient(FakeClientID);
+}
+
 // Отправить форматированное сообщение
 void CGS::Chat(int ClientID, const char* pText, ...)
 {
-	int Start = (ClientID < 0 ? 0 : ClientID);
-	int End = (ClientID < 0 ? MAX_CLIENTS : ClientID + 1);
+	const int Start = (ClientID < 0 ? 0 : ClientID);
+	const int End = (ClientID < 0 ? MAX_CLIENTS : ClientID + 1);
 
 	CNetMsg_Sv_Chat Msg;
 	Msg.m_Mode = CHAT_ALL;
@@ -782,7 +829,7 @@ void CGS::SendEquipItem(int ClientID, int TargetID)
 		return;
 
 	// send players equiping global bots local on world
-	const int WorldID = (pPlayer->IsBot() ? pPlayer->GetPlayerWorldID() : -1);
+	const int MsgWorldID = (pPlayer->IsBot() ? pPlayer->GetPlayerWorldID() : -1);
 	
 	CNetMsg_Sv_EquipItems Msg;
 	Msg.m_ClientID = ClientID;
@@ -793,7 +840,7 @@ void CGS::SendEquipItem(int ClientID, int TargetID)
 		Msg.m_EquipID[k] = EquipItem;
 		Msg.m_EnchantItem[k] = EnchantItem;
 	}
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID, WorldID);
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID, MsgWorldID);
 }
 
 // Отправить снаряжение в радиусе
@@ -846,6 +893,17 @@ void CGS::SendGameMsg(int GameMsgID, int ParaI1, int ParaI2, int ParaI3, int Cli
 	Msg.AddInt(ParaI2);
 	Msg.AddInt(ParaI3);
 	Server()->SendMsg(&Msg, MSGFLAG_VITAL, ClientID);
+}
+
+// Отправить информацию о клиенте
+void CGS::UpdateClientInformation(int ClientID)
+{
+	CPlayer *pPlayer = GetPlayer(ClientID, false, false);
+	if(!pPlayer)
+		return;
+	
+	pPlayer->SendClientInfo(-1);
+	SendEquipItem(ClientID, -1);
 }
 
 void CGS::SendChatCommand(const CCommandManager::CCommand* pCommand, int ClientID)
@@ -926,13 +984,13 @@ void CGS::ClearTalkText(int ClientID)
 void CGS::UpdateDiscordStatus()
 {
 #ifdef CONF_DISCORD
-	if(Server()->Tick() % (Server()->TickSpeed() * 10) != 0 || m_WorldID != LOCALWORLD)
+	if(Server()->Tick() % (Server()->TickSpeed() * 10) != 0 || m_WorldID != LOCAL_WORLD)
 		return;
 
 	int Players = 0;
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(Server()->ClientIngame(i))
+		if(m_apPlayers[i])
 			Players++;
 	}
 
@@ -1019,9 +1077,6 @@ void CGS::OnConsoleInit()
 
 	Console()->Register("parseskin", "i[cid]", CFGFLAG_SERVER, ConParseSkin, this, "Parse skin on console. Easy for devlop bots.");
 	Console()->Register("giveitem", "i[cid]i[itemid]i[count]i[ench]i[mail]", CFGFLAG_SERVER, ConGiveItem, this, "Give item <clientid> <itemid> <count> <enchant> <mail 1=yes 0=no>");
-	Console()->Register("tune", "s[tuning] i[value]", CFGFLAG_SERVER, ConTuneParam, this, "Tune variable to value");
-	Console()->Register("tune_reset", "", CFGFLAG_SERVER, ConTuneReset, this, "Reset tuning");
-	Console()->Register("tune_dump", "", CFGFLAG_SERVER, ConTuneDump, this, "Dump tuning");
 	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, this, "Say in chat");
 	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, this, "(Warning) Add new bot on database or update if finding <clientid> <bot name>");
 }
@@ -1065,7 +1120,7 @@ void CGS::OnTick()
 // Таймер в OnTick-=
 void CGS::OnTickLocalWorld()
 {
-	if(m_WorldID != LOCALWORLD) 
+	if(m_WorldID != LOCAL_WORLD) 
 		return;
 
 	// получить и отправить измененный день
@@ -1425,7 +1480,6 @@ void CGS::OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld)
 	// очистка данных
 	delete m_apPlayers[ClientID];
 	m_apPlayers[ClientID] = nullptr;
-	ClearClientData(ClientID);
 }
 
 // Input проверить и отправить
@@ -1539,11 +1593,11 @@ void CGS::ConParseSkin(IConsole::IResult *pResult, void *pUserData)
 // Выдать предмет игроку
 void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 {
-	int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS - 1);
-	int ItemID = pResult->GetInteger(1);
-	int Count = pResult->GetInteger(2);
-	int Enchant = pResult->GetInteger(3);
-	int Mail = pResult->GetInteger(4);
+	const int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS - 1);
+	const int ItemID = pResult->GetInteger(1);
+	const int Count = pResult->GetInteger(2);
+	const int Enchant = pResult->GetInteger(3);
+	const int Mail = pResult->GetInteger(4);
 
 	CGS *pSelf = (CGS *)pUserData;	
 	CPlayer *pPlayer = pSelf->GetPlayer(ClientID, true);
@@ -1555,48 +1609,6 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 			return;
 		}
 		pSelf->SendInbox(ClientID, "The sender heavens", "Sent from console", ItemID, Count, Enchant);
-	}
-}
-
-// Изменить параметр тюнинга
-void CGS::ConTuneParam(IConsole::IResult *pResult, void *pUserData)
-{
-	CGS *pSelf = (CGS *)pUserData;
-	const char *pParamName = pResult->GetString(0);
-	float NewValue = pResult->GetFloat(1);
-
-	if(pSelf->Tuning()->Set(pParamName, NewValue))
-	{
-		char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "%s changed to %.2f", pParamName, NewValue);
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", aBuf);
-		pSelf->SendTuningParams(-1);
-	}
-	else
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", "No such tuning parameter");
-}
-
-// Сбросить тюннинг
-void CGS::ConTuneReset(IConsole::IResult *pResult, void *pUserData)
-{
-	CGS *pSelf = (CGS *)pUserData;
-	CTuningParams TuningParams;
-	*pSelf->Tuning() = TuningParams;
-	pSelf->SendTuningParams(-1);
-	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", "Tuning reset");
-}
-
-// ДюмпТюннинга
-void CGS::ConTuneDump(IConsole::IResult *pResult, void *pUserData)
-{
-	CGS *pSelf = (CGS *)pUserData;
-	char aBuf[256];
-	for(int i = 0; i < pSelf->Tuning()->Num(); i++)
-	{
-		float v;
-		pSelf->Tuning()->Get(i, &v);
-		str_format(aBuf, sizeof(aBuf), "%s %.2f", pSelf->Tuning()->m_apNames[i], v);
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", aBuf);
 	}
 }
 
@@ -1685,7 +1697,7 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 	while(*p)
 	{
 		const char *pStrOld = p;
-		int Code = str_utf8_decode(&p);
+		const int Code = str_utf8_decode(&p);
 
 		// check if unicode is not empty
 		if(Code > 0x20 && Code != 0xA0 && Code != 0x034F && (Code < 0x2000 || Code > 0x200F) && (Code < 0x2028 || Code > 0x202F) &&
@@ -1711,11 +1723,11 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 	// отправить клиентам что имеют клиент ммо
 	if(CheckClient(To)) 
 	{
-		if (str_length(Vote.m_aDescription) < 1)
+		if (Vote.m_aDescription[0] == '\0')
 			m_apPlayers[To]->m_Colored = { 0, 0, 0 };
 
 		CNetMsg_Sv_VoteMmoOptionAdd OptionMsg;
-		vec3 ToHexColor = m_apPlayers[To]->m_Colored;
+		const vec3 ToHexColor = m_apPlayers[To]->m_Colored;
 		OptionMsg.m_pHexColor = ((int)ToHexColor.r << 16) + ((int)ToHexColor.g << 8) + (int)ToHexColor.b;
 		OptionMsg.m_pDescription = Vote.m_aDescription;
 		StrToInts(OptionMsg.m_pIcon, 4, Icon);
@@ -1758,7 +1770,7 @@ void CGS::AVH(int To, const int ID, vec3 Color, const char* pText, ...)
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		bool HidenTabs = (ID >= TAB_STAT) ? m_apPlayers[To]->GetHidenMenu(ID) : false;
+		const bool HidenTabs = (ID >= TAB_STAT) ? m_apPlayers[To]->GetHidenMenu(ID) : false;
 		Buffer.append(GetSymbolHandleMenu(To, HidenTabs, ID));
 
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
@@ -1782,7 +1794,7 @@ void CGS::AVHI(int To, const char *Icon, const int ID, vec3 Color, const char* p
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		bool HidenTabs = (bool)(ID >= TAB_STAT ? m_apPlayers[To]->GetHidenMenu(ID) : false);
+		const bool HidenTabs = (bool)(ID >= TAB_STAT ? m_apPlayers[To]->GetHidenMenu(ID) : false);
 		Buffer.append(GetSymbolHandleMenu(To, HidenTabs, ID));
 
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
@@ -1919,7 +1931,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	else if(MenuList == MenuList::MENU_JOURNAL_MAIN)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
-
+		
 		Mmo()->Quest()->ShowFullQuestLift(pPlayer);
 		AddBack(ClientID);
 	}
@@ -1941,7 +1953,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		ShowPlayerStats(pPlayer);
 
-		// Улучшения класса DPS дамаг
+		// DPS UPGRADES
 		int Range = pPlayer->GetLevelDisciple(AtributType::AtDps);
 		AVH(ClientID, TAB_UPGR_DPS, RED_COLOR, "Disciple of War. Level Power {INT}", &Range);
 		for(const auto& at : AttributInfo)
@@ -1952,7 +1964,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		}
 		AV(ClientID, "null", "");
 
-		// Улучшения класса TANK танк
+		// TANK UPGRADES
 		Range = pPlayer->GetLevelDisciple(AtributType::AtTank);
 		AVH(ClientID, TAB_UPGR_TANK, BLUE_COLOR, "Disciple of Tank. Level Power {INT}", &Range);
 		for(const auto& at : AttributInfo)
@@ -1963,7 +1975,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		}
 		AV(ClientID, "null", "");
 
-		// Улучшения класса HEALER хил
+		// HEALER UPGRADES
 		Range = pPlayer->GetLevelDisciple(AtributType::AtHealer);
 		AVH(ClientID, TAB_UPGR_HEALER, GREEN_COLOR, "Disciple of Healer. Level Power {INT}", &Range);
 		for(const auto& at : AttributInfo)
@@ -1974,7 +1986,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		}
 		AV(ClientID, "null", "");
 
-		// Улучшения WEAPONS оружия
+		// WEAPONS UPGRADES
 		AVH(ClientID, TAB_UPGR_WEAPON, GRAY_COLOR, "Upgrades Weapons / Ammo");
 		for(const auto& at : AttributInfo)
 		{
@@ -2000,6 +2012,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVM(ClientID, "SELECTEDTOP", ToplistTypes::GUILDS_LEVELING, NOPE, "Top 10 guilds leveling");
 		AVM(ClientID, "SELECTEDTOP", ToplistTypes::GUILDS_WEALTHY, NOPE, "Top 10 guilds wealthy");
 		AVM(ClientID, "SELECTEDTOP", ToplistTypes::PLAYERS_LEVELING, NOPE, "Top 10 players leveling");
+		AVM(ClientID, "SELECTEDTOP", ToplistTypes::PLAYERS_WEALTHY, NOPE, "Top 10 players wealthy");
 		AddBack(ClientID);
 	}
 	else if(MenuList == MenuList::MENU_GUIDEDROP) 
@@ -2019,7 +2032,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 			const int HideID = (NUM_TAB_MENU+12500+mobs.first);
 			const int PosX = mobs.second.PositionX/32, PosY = mobs.second.PositionY/32;
-			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} {STR}[x{INT} y{INT}]", mobs.second.GetName(), Server()->GetWorldName(mobs.second.WorldID), &PosX, &PosY);
+			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} [x{INT} y{INT}]", mobs.second.GetName(), &PosX, &PosY);
 	
 			for(int i = 0; i < MAX_DROPPED_FROM_MOBS; i++)
 			{
@@ -2091,10 +2104,20 @@ void CGS::ResetVotesNewbieInformation(int ClientID)
 }
 
 // Созданно для апдейта меню если именно оно находится в открытых
-void CGS::VResetVotes(int ClientID, int MenuID)
+void CGS::UpdateVotes(int ClientID, int MenuList)
 {
-	if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_OpenVoteMenu == MenuID)
-		ResetVotes(ClientID, MenuID);
+	if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_OpenVoteMenu == MenuList)
+		ResetVotes(ClientID, MenuList);
+}
+
+// Обновить голосования всем у кого открыто меню
+void CGS::UpdateVotes(int MenuList)
+{
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if(m_apPlayers[i] && m_apPlayers[i]->m_OpenVoteMenu == MenuList)
+			ResetVotes(i, MenuList);
+	}
 }
 
 // Кнопка назад добавляет кнопку назад в меню (Но нужно не забывать указывать ID последнего меню)
@@ -2136,8 +2159,8 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 	AV(ClientID, "null", "");
 }
 
-// Вывести информацию по голде
-void CGS::ShowValueInformation(CPlayer *pPlayer, int ItemID)
+// Вывести информацию по валютам
+void CGS::ShowItemValueInformation(CPlayer *pPlayer, int ItemID)
 {
 	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = LIGHT_PURPLE_COLOR;
@@ -2180,24 +2203,25 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 		return true;
 
 	// парсинг всего остального
-	sqlstr::CSqlString<64> FormatText = sqlstr::CSqlString<64>(Text);
+	const sqlstr::CSqlString<64> FormatText = sqlstr::CSqlString<64>(Text);
 	return (bool)(Mmo()->OnParseFullVote(pPlayer, CMD, VoteID, VoteID2, Get, FormatText.cstr()));
 }
 
 /* #########################################################################
 	MMO GAMECONTEXT 
 ######################################################################### */
-void CGS::CreateBot(short BotType, int BotID, int SubID)
+int CGS::CreateBot(short BotType, int BotID, int SubID)
 {
 	int BotClientID = MAX_PLAYERS;
 	while(BotClientID < MAX_CLIENTS && m_apPlayers[BotClientID])
 		BotClientID++;
 	if (BotClientID >= MAX_CLIENTS)
-		return;
+		return -1;
 
 	Server()->InitClientBot(BotClientID);
 	const int savecidmem = BotClientID+m_WorldID*MAX_CLIENTS;
 	m_apPlayers[BotClientID] = new(savecidmem) CPlayerBot(this, BotClientID, BotID, SubID, BotType);
+	return BotClientID;
 }
 
 // Удалить ботов что не активны у людей для квестов
@@ -2241,7 +2265,7 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 // Создать Лол текст в мире
 void CGS::CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText)
 {
-	if(!CheckPlayersDistance(Pos, 800))
+	if(!CheckingPlayersDistance(Pos, 800))
 		return;
 
 	CLoltext Text;
@@ -2344,8 +2368,7 @@ void CGS::UpdateZonePVP()
 	
 	for(int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
-		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(m_apPlayers[i]);
-		if(BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && BotPlayer->GetPlayerWorldID() == m_WorldID)
+		if(m_apPlayers[i] && m_apPlayers[i]->GetBotType() == BotsTypes::TYPE_BOT_MOB && m_apPlayers[i]->GetPlayerWorldID() == m_WorldID)
 		{
 			m_AllowedPVP = true;
 			return;
@@ -2383,7 +2406,7 @@ const char* CGS::AtributeName(int BonusID) const
 	return "Has no stats";
 }
 
-bool CGS::CheckPlayersDistance(vec2 Pos, float Distance) const
+bool CGS::CheckingPlayersDistance(vec2 Pos, float Distance) const
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{

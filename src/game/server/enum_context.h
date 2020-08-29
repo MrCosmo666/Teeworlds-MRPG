@@ -82,6 +82,7 @@ enum ToplistTypes
 	GUILDS_LEVELING,
 	GUILDS_WEALTHY,
 	PLAYERS_LEVELING,
+	PLAYERS_WEALTHY,
 };
 
 
@@ -186,26 +187,8 @@ enum
 	*/
 	MIN_SKINCHANGE_CLIENTVERSION = 0x0703,	// минимальная версия клиента для смены скина
 	MIN_RACE_CLIENTVERSION = 0x0704,		// минимальная версия клиента для типа гонки
-	MAX_INBOX_LIST = 30,						// максимальное кол-во писем что выводится
-
-
-	/*
-		Список вкладок что можно скрыть и раскрыть
-		Передается в качестве AVH как ID, а последющие в качестве HideID
-	*/
-
-
-	/*
-		Список вкладок в меню крафта: Некая сортировка по типу крафта
-		Передается исключительно в ShowMenuCraft( int )
-	*/
+	MAX_INBOX_LIST = 30,					// максимальное кол-во писем что выводится
 	STATS_MAX_FOR_ITEM = 2,
-
-	/*
-		Парсинг голосований
-		Передается как действие в парсер
-	*/
-	PARSEINVITEMEMBER = 1,
 
 	/*
 		Все функции предметов
@@ -253,6 +236,9 @@ enum
 
 	// максимальные слоты снаражения ботов
 	EQUIP_MAX_BOTS = EQUIP_WINGS + 1,
+
+	// диалоги ботов
+	IS_TALKING_EMPTY = 999,
 };
 
 enum GuildAccess
@@ -286,6 +272,7 @@ enum BotsTypes
 	TYPE_BOT_MOB = 1,
 	TYPE_BOT_QUEST = 2,
 	TYPE_BOT_NPC = 3,
+	TYPE_BOT_FAKE = 4,
 };
 
 enum

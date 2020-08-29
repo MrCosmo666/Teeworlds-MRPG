@@ -17,9 +17,7 @@
 
 #include <engine/shared/compression.h>
 #include <engine/shared/config.h>
-#include <engine/shared/datafile.h>
 #include <engine/shared/econ.h>
-#include <engine/shared/filecollection.h>
 #include <engine/shared/mapchecker.h>
 #include <engine/shared/netban.h>
 #include <engine/shared/network.h>
@@ -219,16 +217,23 @@ void CServerBan::ConBanExt(IConsole::IResult *pResult, void *pUser)
 	CServerBan *pThis = static_cast<CServerBan *>(pUser);
 
 	const char *pStr = pResult->GetString(0);
-	int Minutes = pResult->NumArguments()>1 ? clamp(pResult->GetInteger(1), 0, 44640) : 30;
+	const int Minutes = pResult->NumArguments()>1 ? clamp(pResult->GetInteger(1), 0, 44640) : 30;
 	const char *pReason = pResult->NumArguments()>2 ? pResult->GetString(2) : "No reason given";
 
 	if(!str_is_number(pStr))
 	{
-		int ClientID = str_toint(pStr);
+		const int ClientID = str_toint(pStr);
 		if(ClientID < 0 || ClientID >= MAX_PLAYERS || pThis->Server()->m_aClients[ClientID].m_State == CServer::CClient::STATE_EMPTY)
 			pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "net_ban", "ban error (invalid client id)");
 		else
+		{
+			char aBuf[128];
+			char aAddrStr[NETADDR_MAXSTRSIZE];
+			net_addr_str(pThis->Server()->m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), true);
+			str_format(aBuf, sizeof(aBuf), "Player %s IP(%s). Banned for %d minutes!", pThis->Server()->ClientName(ClientID), aAddrStr, Minutes);
+			pThis->Server()->SendDiscordMessage(g_Config.m_SvDiscordAdminChanal, DC_SERVER_WARNING, "Bans information!", aBuf);
 			pThis->BanAddr(pThis->Server()->m_NetServer.ClientAddr(ClientID), Minutes*60, pReason);
+		}
 	}
 	else
 		ConBan(pResult, pUser);
@@ -237,8 +242,6 @@ void CServerBan::ConBanExt(IConsole::IResult *pResult, void *pUser)
 
 void CServer::CClient::Reset()
 {
-	str_copy(m_aLanguage, "en", sizeof(m_aLanguage));
-
 	// reset input
 	for(int i = 0; i < 200; i++)
 		m_aInputs[i].m_GameTick = -1;
@@ -384,6 +387,7 @@ const char *CServer::GetWorldName(int WorldID)
 		case 8: return "Noctis Resonance";
 		case 9: return "Departure";
 		case 10: return "Underwater of Neptune";
+		case 11: return "Kugan";
 	}
 	return "unknow";
 }
@@ -391,7 +395,7 @@ const char *CServer::GetWorldName(int WorldID)
 const char* CServer::GetClientLanguage(int ClientID) const
 {
 	if (ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
-		return "unknow";
+		return "en";
 	return m_aClients[ClientID].m_aLanguage;
 }
 
@@ -417,6 +421,12 @@ void CServer::QuestBotUpdateOnWorld(int WorldID, int QuestID, int Step)
 		return;
 
 	GameServer(WorldID)->UpdateQuestsBot(QuestID, Step);
+}
+
+void CServer::BackInformationFakeClient(int FakeClientID)
+{
+	for(int i = 0; i < COUNT_WORLD; i++)
+		GameServer(i)->UpdateClientInformation(FakeClientID);
 }
 
 int CServer::GetWorldID(int ClientID)
@@ -514,6 +524,7 @@ int CServer::Init()
 	WorldCheckTime = false;
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
+		str_copy(m_aClients[i].m_aLanguage, "en", sizeof(m_aClients[i].m_aLanguage));
 		m_aClients[i].m_State = CClient::STATE_EMPTY;
 		m_aClients[i].m_aName[0] = 0;
 		m_aClients[i].m_aClan[0] = 0;
@@ -787,7 +798,8 @@ void CServer::DoSnapshot(int WorldID)
 int CServer::NewClientCallback(int ClientID, void *pUser)
 {
 	CServer *pThis = (CServer *)pUser;
-	pThis->GameServer(LOCALWORLD)->ClearClientData(ClientID);
+	pThis->GameServer(LOCAL_WORLD)->ClearClientData(ClientID);
+	str_copy(pThis->m_aClients[ClientID].m_aLanguage, "en", sizeof(pThis->m_aClients[ClientID].m_aLanguage));
 	pThis->m_aClients[ClientID].m_State = CClient::STATE_AUTH;
 	pThis->m_aClients[ClientID].m_aName[0] = 0;
 	pThis->m_aClients[ClientID].m_aClan[0] = 0;
@@ -818,6 +830,7 @@ int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 	// notify the mod about the drop
 	if(pThis->m_aClients[ClientID].m_State >= CClient::STATE_READY)
 	{
+		pThis->GameServer(LOCAL_WORLD)->ClearClientData(ClientID);
 		for (int i = 0; i < COUNT_WORLD; i++)
 		{
 			pThis->m_aClients[ClientID].m_Quitting = true;
@@ -971,6 +984,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 
 				m_aClients[ClientID].m_Version = Unpacker.GetInt();
 				m_aClients[ClientID].m_State = CClient::STATE_CONNECTING;
+				GameServer(LOCAL_WORLD)->ClearClientData(ClientID);
 				SendMap(ClientID);
 			}
 		}
@@ -1772,7 +1786,7 @@ void DiscordJob::SetServer(CServer *pServer)
 
 void DiscordJob::onMessage(SleepyDiscord::Message message) 
 {
-	if(message.length() <= 0 || !g_Config.m_SvCreateDiscordBot)
+	if(message.length() <= 0 || !g_Config.m_SvCreateDiscordBot || message.author == getCurrentUser().cast())
 	 	return;
 
 	// статистика
@@ -1857,7 +1871,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 				continue;
 
 			Buffer.append_at(Buffer.length(), Server()->ClientName(i));
-			Buffer.append_at(Buffer.length(), "\\n");
+			Buffer.append_at(Buffer.length(), "\n");
 		}
 		if(Buffer.length() <= 0)
 		{
@@ -1873,9 +1887,57 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	{
 		SendMessage(std::string(message.channelID).c_str(), DC_DISCORD_INFO, "Commands / Information", 
 		"`!mconnect` - Info for connect your discord and account in game."
-		"\n`!mstats <symbol>` - See stats players. Minimal 4 symbols."
+		"\n`!mstats <symbol>` - See stats players. Minimal 1 symbols."
 		"\n`!monline` - Show players ingame.");
 	}
+	// отправить из дискорд чата на сервер
+	else if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordChanal) == 0)
+	{
+		std::string Nickname("D|" + message.author.username);
+		m_pServer->GameServer(FREE_SLOTS_WORLD)->FakeChat(Nickname.c_str(), message.content.c_str());
+	}
+	// контрорирование ideas-voting
+	else if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordIdeasChanal) == 0)
+	{
+		deleteMessage(message.channelID, message);
+
+		SleepyDiscord::Embed embed;
+		embed.title = std::string("Suggestion");
+		embed.color = 431050;
+
+		SleepyDiscord::EmbedThumbnail embedthumb;
+		embedthumb.url = message.author.avatarUrl();
+		embedthumb.proxyUrl = message.author.avatarUrl();
+		embed.thumbnail = embedthumb;
+
+		SleepyDiscord::EmbedFooter embedfooter;
+		embedfooter.text = "Use reactions for voting!";
+		embedfooter.iconUrl = message.author.avatarUrl();
+		embedfooter.proxyIconUrl = message.author.avatarUrl();
+		embed.footer = embedfooter;
+		embed.description = "From:" + message.author.showUser() + "!\n" + message.content;
+
+		SleepyDiscord::Message pMessage = sendMessage(message.channelID, "\0", embed);
+		addReaction(message.channelID, pMessage, "%E2%9C%85");
+		addReaction(message.channelID, pMessage, "%E2%9D%8C");
+	}
+}
+
+void DiscordJob::onReaction(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
+SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID, SleepyDiscord::Emoji emoji)
+{ 
+}
+
+void DiscordJob::onDeleteReaction(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
+SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID, SleepyDiscord::Emoji emoji)
+{
+}
+
+void DiscordJob::UpdateMessageIdeas(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
+SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID)
+{
+	if(userID == getCurrentUser().cast())
+		return;
 }
 
 void DiscordJob::SendStatus(const char *Status, int Type)

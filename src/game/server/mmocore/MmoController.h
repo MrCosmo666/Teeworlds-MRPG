@@ -100,9 +100,9 @@ public:
 
 	// 
 	void LoadLogicWorld();
-	const char* PlayerName(int AccountID);
+	static const char* PlayerName(int AccountID);
 	void SaveAccount(CPlayer *pPlayer, int Table);
-	void ShowLoadingProgress(const char *Loading, int LoadCount);
+	void ShowLoadingProgress(const char* pLoading, int Size);
 	void ShowTopList(CPlayer* pPlayer, int TypeID);
 };
 

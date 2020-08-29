@@ -70,6 +70,7 @@ public:
 		int TempTeleportX;
 		int TempTeleportY;
 		int TempTimeDungeon;
+		bool TempDungeonReady;
 
 		// dungeon
 		int TempTankVotingDungeon;

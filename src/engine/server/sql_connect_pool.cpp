@@ -1,5 +1,9 @@
 #include <mutex>
-
+#include <thread>
+#include <stdarg.h>
+#include <mysql_connection.h>
+#include <cppconn/exception.h>
+#include <cppconn/driver.h>
 #include <base/system.h>
 #include <engine/shared/config.h>
 #include "sql_connect_pool.h"
@@ -14,18 +18,29 @@
 	And in General, you should review the SQL system, 
 	it works (and has been tested by time and tests), 
 	but this implementation is not very narrowly focused
+
+	This approach works if the old query is not executed before,
+	 a new query it will create a reserve.
+
+	 It may seem that it does not use Pool, 
+	 but in fact it is and is created as a reserve when running
+	 <tlock>
 */
 
-std::mutex tlock;
+// #####################################################
+// SQL CONNECTION POOL
+// #####################################################
+std::mutex ThreadLock;
 std::shared_ptr<CConectionPool> CConectionPool::m_Instance;
 CConectionPool::CConectionPool()
 {
 	try
 	{
-		m_pdriver = get_driver_instance();
+		m_pDriver = get_driver_instance();
 	}
-	catch(sql::SQLException) 
-	{
+	catch(SQLException &e) 
+	{ 
+		dbg_msg("Sql Exception", "%s", e.what());
 		exit(0);
 	}
 }
@@ -44,231 +59,239 @@ CConectionPool& CConectionPool::GetInstance()
 
 Connection* CConectionPool::CreateConnection()
 {
-	tlock.lock();
-	//
-
-	Connection *pConn = nullptr;
-	while(pConn == nullptr)
+	ThreadLock.lock();
+	Connection *pConnection = nullptr;
+	while(pConnection == nullptr)
 	{
 		try
 		{
-			pConn = m_pdriver->connect(g_Config.m_SvMySqlHost, g_Config.m_SvMySqlLogin, g_Config.m_SvMySqlPassword);
-			pConn->setClientOption("OPT_CHARSET_NAME", "utf8mb4");
-			pConn->setSchema(g_Config.m_SvMySqlDatabase);
+			pConnection = m_pDriver->connect(g_Config.m_SvMySqlHost, g_Config.m_SvMySqlLogin, g_Config.m_SvMySqlPassword);
+			pConnection->setClientOption("OPT_CHARSET_NAME", "utf8mb4");
+			pConnection->setSchema(g_Config.m_SvMySqlDatabase);
 		}
-		catch(sql::SQLException &e) 
-		{ 
+		catch(SQLException &e) 
+		{
 			dbg_msg("Sql Exception", "%s", e.what());
-			DisconnectConnection(pConn);
-			pConn = nullptr;
+			DisconnectConnection(pConnection);
+			pConnection = nullptr;
 		}
 	}
-	m_connlist.push_back(pConn);
-	
-	//
-	tlock.unlock();
-	return pConn;
+	m_ConnList.push_back(pConnection);
+	ThreadLock.unlock();
+	return pConnection;
 }
 
 void CConectionPool::DisconnectConnectionHeap()
 {
-	for(auto& iconn : m_connlist)
+	for(auto& iconn : m_ConnList)
 		DisconnectConnection(iconn);
-	m_connlist.clear();
+		
+	m_ConnList.clear();
 }
 
-void CConectionPool::DisconnectConnection(Connection *pConn)
+void CConectionPool::DisconnectConnection(Connection *pConnection)
 {
-	tlock.lock();
-	//
-
-	if (pConn)
+	ThreadLock.lock();
+	if (pConnection)
 	{
 		try
 		{
-			pConn->close();
+			pConnection->close();
 		}
-		catch(sql::SQLException &e) 
+		catch(SQLException &e) 
 		{ 
 			dbg_msg("Sql Exception", "%s", e.what());		
 		}	
 	}
-	m_connlist.remove(pConn);
-	delete pConn;
-	pConn = nullptr;
-
-	//
-	tlock.unlock();
+	m_ConnList.remove(pConnection);
+	delete pConnection;
+	pConnection = nullptr;
+	ThreadLock.unlock();
 }
 
-void CConectionPool::UD(const char *Table, const char *Buffer, ...)
-{
-	char aBuf[1024];
-	va_list VarArgs;
-	va_start(VarArgs, Buffer);
-	#if defined(CONF_FAMILY_WINDOWS)
-	_vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
-	#else
-	vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
-	#endif
-	va_end(VarArgs);
-	aBuf[sizeof(aBuf) - 1] = '\0';
-
-	std::string Buf = "UPDATE " + std::string(Table) + " SET " + std::string(aBuf) + ";";
-
-	std::thread t([Buf]()
-	{
-		Connection* pConn = nullptr;
-		try
-		{
-			pConn = SJK.CreateConnection();
-			std::shared_ptr<Statement> STMT(pConn->createStatement());
-			STMT->execute(Buf.c_str());
-		}
-		catch(sql::SQLException &e)
-		{
-			dbg_msg("sql", "%s", e.what());
-		}
-		SJK.DisconnectConnection(pConn);
-	});
-	t.detach();
-}
-
-void CConectionPool::UDS(int Milliseconds, const char *Table, const char *Buffer, ...)
-{
-	char aBuf[1024];
-	va_list VarArgs;
-	va_start(VarArgs, Buffer);
-	#if defined(CONF_FAMILY_WINDOWS)
-	_vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
-	#else
-	vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
-	#endif
-	va_end(VarArgs);
-	aBuf[sizeof(aBuf) - 1] = '\0';
-
-	std::string Buf = "UPDATE " + std::string(Table) + " SET " + std::string(aBuf) + ";";
-
-	std::thread t([Buf, Milliseconds]()
-	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
-		Connection* pConn = nullptr;
-		try
-		{
-			pConn = SJK.CreateConnection();
-			std::shared_ptr<Statement> STMT(pConn->createStatement());
-			STMT->execute(Buf.c_str());
-		}
-		catch(sql::SQLException &e)
-		{
-			dbg_msg("sql", "%s", e.what());
-		}
-		SJK.DisconnectConnection(pConn);
-	});
-	t.detach();
-}
-
-void CConectionPool::DD(const char *Table, const char *Buffer, ...)
-{
-	char aBuf[256];
-	va_list VarArgs;
-	va_start(VarArgs, Buffer);
-	#if defined(CONF_FAMILY_WINDOWS)
-	_vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
-	#else
-	vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
-	#endif
-	va_end(VarArgs);
-	aBuf[sizeof(aBuf) - 1] = '\0';
-
-	std::string Buf = "DELETE FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
-
-	std::thread t([Buf]()
-	{
-		Connection* pConn = nullptr;
-		try
-		{
-			pConn = SJK.CreateConnection();
-			std::shared_ptr<Statement> STMT(pConn->createStatement());
-			STMT->execute(Buf.c_str());
-		}
-		catch (sql::SQLException & e)
-		{
-			dbg_msg("sql", "%s", e.what());
-		}
-		SJK.DisconnectConnection(pConn);
-	});
-	t.detach();
-}
-
+// #####################################################
+// INSERT SQL
+// #####################################################
 void CConectionPool::ID(const char *Table, const char *Buffer, ...)
 {
-	char aBuf[1024];
-	va_list VarArgs; 
-	va_start(VarArgs, Buffer);
-#if defined(CONF_FAMILY_WINDOWS)
-	_vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
-#else
-	vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
-#endif
-	va_end(VarArgs);
-
-	aBuf[sizeof(aBuf) - 1] = '\0';
-	std::string Buf = "INSERT INTO " + std::string(Table) + " " + std::string(aBuf) + ";";
-
-	std::thread t([Buf]()
-	{
-		Connection* pConn = nullptr;
-		try
-		{
-			pConn = SJK.CreateConnection();
-			std::shared_ptr<Statement> STMT(pConn->createStatement());
-			STMT->execute(Buf.c_str());
-		}
-		catch (sql::SQLException & e)
-		{
-			dbg_msg("sql", "%s", e.what());
-		}
-		SJK.DisconnectConnection(pConn);
-	});
-	t.detach();
+	va_list Arguments;
+	va_start(Arguments, Buffer);
+	InsertFormated(0, Table, Buffer, Arguments);
+	va_end(Arguments);
 }
 
 void CConectionPool::IDS(int Milliseconds, const char *Table, const char *Buffer, ...)
 {
-	char aBuf[1024];
-	va_list VarArgs; 
-	va_start(VarArgs, Buffer);
-#if defined(CONF_FAMILY_WINDOWS)
-	_vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
-#else
-	vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
-#endif
-	va_end(VarArgs);
+	va_list Arguments;
+	va_start(Arguments, Buffer);
+	InsertFormated(Milliseconds, Table, Buffer, Arguments);
+	va_end(Arguments);	
+}
 
+void CConectionPool::InsertFormated(int Milliseconds, const char *Table, const char *Buffer, va_list args)
+{
+	char aBuf[1024];
+	#if defined(CONF_FAMILY_WINDOWS)
+	_vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
+	#else
+	vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
+	#endif
 	aBuf[sizeof(aBuf) - 1] = '\0';
 	std::string Buf = "INSERT INTO " + std::string(Table) + " " + std::string(aBuf) + ";";
-
-	std::thread t([Buf, Milliseconds]()
+	std::thread Thread([Buf, Milliseconds]()
 	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
-		Connection* pConn = nullptr;
+		if(Milliseconds > 0)
+			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
+
+		Connection* pConnection = nullptr;
 		try
 		{
-			pConn = SJK.CreateConnection();
-			std::shared_ptr<Statement> STMT(pConn->createStatement());
+			pConnection = SJK.CreateConnection();
+			std::shared_ptr<Statement> STMT(pConnection->createStatement());
 			STMT->execute(Buf.c_str());
 		}
-		catch (sql::SQLException & e)
+		catch (SQLException & e)
 		{
 			dbg_msg("sql", "%s", e.what());
 		}
-		SJK.DisconnectConnection(pConn);
+		SJK.DisconnectConnection(pConnection);
 	});
-	t.detach();
+	Thread.detach();
 }
 
+// #####################################################
+// UPDATE SQL
+// #####################################################
+void CConectionPool::UD(const char *Table, const char *Buffer, ...)
+{
+	va_list Arguments;
+	va_start(Arguments, Buffer);
+	UpdateFormated(0, Table, Buffer, Arguments);
+	va_end(Arguments);
+}
+
+void CConectionPool::UDS(int Milliseconds, const char *Table, const char *Buffer, ...)
+{
+	va_list Arguments;
+	va_start(Arguments, Buffer);
+	UpdateFormated(Milliseconds, Table, Buffer, Arguments);
+	va_end(Arguments);
+}
+
+void CConectionPool::UpdateFormated(int Milliseconds, const char *Table, const char *Buffer, va_list args)
+{
+	char aBuf[1024];
+	#if defined(CONF_FAMILY_WINDOWS)
+	_vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
+	#else
+	vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
+	#endif
+	aBuf[sizeof(aBuf) - 1] = '\0';
+	std::string Query = "UPDATE " + std::string(Table) + " SET " + std::string(aBuf) + ";";
+	std::thread Thread([Query, Milliseconds]()
+	{
+		if(Milliseconds > 0)
+			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
+		
+		Connection* pConnection = nullptr;
+		try
+		{
+			pConnection = SJK.CreateConnection();
+			std::shared_ptr<Statement> STMT(pConnection->createStatement());
+			STMT->execute(Query.c_str());
+		}
+		catch(SQLException &e)
+		{
+			dbg_msg("sql", "%s", e.what());
+		}
+		SJK.DisconnectConnection(pConnection);
+	});
+	Thread.detach();
+}
+
+// #####################################################
+// DELETE SQL
+// #####################################################
+void CConectionPool::DD(const char *Table, const char *Buffer, ...)
+{
+	va_list Arguments;
+	va_start(Arguments, Buffer);
+	DeleteFormated(0, Table, Buffer, Arguments);
+	va_end(Arguments);
+}
+
+void CConectionPool::DDS(int Milliseconds, const char *Table, const char *Buffer, ...)
+{
+	va_list Arguments;
+	va_start(Arguments, Buffer);
+	DeleteFormated(Milliseconds, Table, Buffer, Arguments);
+	va_end(Arguments);
+}
+
+void CConectionPool::DeleteFormated(int Milliseconds, const char *Table, const char *Buffer, va_list args)
+{
+	char aBuf[256];
+	#if defined(CONF_FAMILY_WINDOWS)
+	_vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
+	#else
+	vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
+	#endif
+	aBuf[sizeof(aBuf) - 1] = '\0';
+	std::string Query = "DELETE FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
+	std::thread Thread([Query, Milliseconds]()
+	{
+		if(Milliseconds > 0)
+			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
+		
+		Connection* pConnection = nullptr;
+		try
+		{
+			pConnection = SJK.CreateConnection();
+			std::shared_ptr<Statement> STMT(pConnection->createStatement());
+			STMT->execute(Query.c_str());
+		}
+		catch (SQLException & e)
+		{
+			dbg_msg("sql", "%s", e.what());
+		}
+		SJK.DisconnectConnection(pConnection);
+	});
+	Thread.detach();
+}
+
+// #####################################################
+// SELECT SQL
+// #####################################################
 ResultSet *CConectionPool::SD(const char *Select, const char *Table, const char *Buffer, ...)
+{
+	char aBuf[1024];
+	va_list VarArgs;
+	va_start(VarArgs, Buffer);
+	#if defined(CONF_FAMILY_WINDOWS)
+	_vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
+	#else
+	vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
+	#endif  
+	va_end(VarArgs);
+	aBuf[sizeof(aBuf) - 1] = '\0';
+	std::string Query = "SELECT " + std::string(Select) + " FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
+	Connection* pConnection = nullptr;
+	ResultSet* pResult = nullptr;
+	try
+	{
+		pConnection = SJK.CreateConnection();
+		std::shared_ptr<Statement> STMT(pConnection->createStatement());
+		pResult = STMT->executeQuery(Query.c_str());
+	}
+	catch (SQLException & e)
+	{
+		dbg_msg("sql", "%s", e.what());
+	}
+	SJK.DisconnectConnection(pConnection);
+	return pResult;
+}
+
+void CConectionPool::SDT(const char* Select, const char* Table, std::function<void(ResultSet*)> func, const char* Buffer, ...)
 {
 	char aBuf[1024];
 	va_list VarArgs;
@@ -279,23 +302,22 @@ ResultSet *CConectionPool::SD(const char *Select, const char *Table, const char 
 	vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
 #endif  
 	va_end(VarArgs);
-
 	aBuf[sizeof(aBuf) - 1] = '\0';
-	std::string Buf = "SELECT " + std::string(Select) + " FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
-
-	Connection* pConn = nullptr;
-	ResultSet* m_results = nullptr;
-
-	try
+	const std::string Query = "SELECT " + std::string(Select) + " FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
+	std::thread Thread([Query, func]()
 	{
-		pConn = SJK.CreateConnection();
-		std::shared_ptr<Statement> STMT(pConn->createStatement());
-		m_results = STMT->executeQuery(Buf.c_str());
-	}
-	catch (sql::SQLException & e)
-	{
-		dbg_msg("sql", "%s", e.what());
-	}
-	SJK.DisconnectConnection(pConn);
-	return m_results;
+		Connection* pConnection = nullptr;
+		try
+		{
+			pConnection = SJK.CreateConnection();
+			std::shared_ptr<Statement> STMT(pConnection->createStatement());
+			func(STMT->executeQuery(Query.c_str()));
+		}
+		catch(SQLException& e)
+		{
+			dbg_msg("sql", "%s", e.what());
+		}
+		SJK.DisconnectConnection(pConnection);
+	});
+	Thread.detach();
 }

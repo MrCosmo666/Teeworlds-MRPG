@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 #include "DungeonJob.h"
 
@@ -154,28 +153,28 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 		if(GS()->IsClientEqualWorldID(ClientID, Dungeon[VoteID].WorldID))
 		{
 			GS()->Chat(ClientID, "You are already in this dungeon!");
-			GS()->VResetVotes(ClientID, MenuList::MENU_DUNGEONS);
+			GS()->UpdateVotes(ClientID, MenuList::MENU_DUNGEONS);
 			return true;
 		}
 		if (Dungeon[VoteID].State > 1)
 		{
 			GS()->Chat(ClientID, "At the moment players are passing this dungeon!");
-			GS()->VResetVotes(ClientID, MenuList::MENU_DUNGEONS);
+			GS()->UpdateVotes(ClientID, MenuList::MENU_DUNGEONS);
 			return true;
 		}
 
 		if (pPlayer->Acc().Level < Dungeon[VoteID].Level)
 		{
 			GS()->Chat(ClientID, "Your level is low to pass this dungeon!");
-			GS()->VResetVotes(ClientID, MenuList::MENU_DUNGEONS);
+			GS()->UpdateVotes(ClientID, MenuList::MENU_DUNGEONS);
 			return true;
 		}
 
 		if(!GS()->IsDungeon())
 		{
-			pPlayer->Acc().LastWorldID = GS()->GetWorldID();
 			pPlayer->GetTempData().TempTeleportX = pPlayer->GetCharacter()->m_Core.m_Pos.x;
 			pPlayer->GetTempData().TempTeleportY = pPlayer->GetCharacter()->m_Core.m_Pos.y;
+			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_POSITION);
 		}
 
 		GS()->Chat(-1, "{STR} joined to Dungeon {STR}!", GS()->Server()->ClientName(ClientID), Dungeon[VoteID].Name);
@@ -194,27 +193,27 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 		if(VoteID == ClientID)
 		{
 			GS()->Chat(ClientID, "You can't vote for yourself!");
-			GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 			return true;
 		}
 
 		if(pPlayer->GetTempData().TempAlreadyVotedDungeon)
 		{
 			GS()->Chat(ClientID, "You already voted!");
-			GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 			return true;
 		}
 
 		if(!pSearchPlayer)
 		{
-			GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 			return true;
 		}
 
 		pPlayer->GetTempData().TempAlreadyVotedDungeon = true;
 		pSearchPlayer->GetTempData().TempTankVotingDungeon++;
 		GS()->ChatWorldID(pPlayer->GetPlayerWorldID(), "[Dungeon]", "{STR} voted for {STR}.", GS()->Server()->ClientName(ClientID), GS()->Server()->ClientName(VoteID));
-		GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	return false;

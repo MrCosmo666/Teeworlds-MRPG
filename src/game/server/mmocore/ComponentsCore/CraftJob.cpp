@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
 #include <teeother/system/string.h>
 
 #include <game/server/gamecontext.h>
@@ -226,7 +225,7 @@ bool CraftJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_CRAFT, "If you will not have enough items for crafting");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_CRAFT, "You will write those and the amount that is still required");
 			GS()->AV(ClientID, "null", "");
-			GS()->ShowValueInformation(pPlayer);
+			GS()->ShowItemValueInformation(pPlayer);
 			GS()->AV(ClientID, "null", "");
 
 			ShowCraftList(pPlayer, "Craft | Can be used's", TYPE_USED);
