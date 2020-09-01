@@ -280,14 +280,14 @@ void HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 void HouseJob::SellHouse(int HouseID)
 {
 	// найти и обновить информацию в бд
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("Bank, OwnerID", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NOT NULL", HouseID));
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("HouseBank, OwnerID", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NOT NULL", HouseID));
 	if(RES->next())
 	{
 		// обновление информации
 		const int OwnerID = RES->getInt("OwnerID");
-		const int Price = Home[HouseID].m_Price + RES->getInt("Bank");
+		const int Price = Home[HouseID].m_Price + RES->getInt("HouseBank");
 		Job()->Inbox()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itGold, Price, 0);
-		SJK.UD("tw_houses", "OwnerID = NULL, Bank = '0' WHERE ID = '%d'", HouseID);
+		SJK.UD("tw_houses", "OwnerID = NULL, HouseBank = '0' WHERE ID = '%d'", HouseID);
 
 		// информация о продаже
 		const int ClientID = Job()->Account()->CheckOnlineAccount(OwnerID);
