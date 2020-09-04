@@ -162,7 +162,7 @@ MACRO_CONFIG_STR(SvDiscordIdeasChanal, sv_discord_ideas_chanel, 128, "", CFGFLAG
 MACRO_CONFIG_STR(SvDiscordAdminChanal, sv_discord_admin_chanel, 128, "", CFGFLAG_SERVER, "Discord Admin Chanel")
 MACRO_CONFIG_STR(SvDiscordInviteGroup, sv_discord_invite_group, 32, "nope", CFGFLAG_SERVER, "Discord group.")
 MACRO_CONFIG_STR(SvGenerateURL, sv_discord_generateurl, 128, "nope", CFGFLAG_SERVER, "Path folder generate image. Example 'submodules/generator'.")
-MACRO_CONFIG_STR(SvSiteUrl, sv_site_url, 128, "nope", CFGFLAG_SERVER, "Url site. Example 'https://teeworlds.space'")
+MACRO_CONFIG_STR(SvSiteUrl, sv_site_url, 128, "nope", CFGFLAG_SERVER, "Url site. Example 'https://mrpg.teeworlds.dev'")
 
 MACRO_CONFIG_STR(SvDiscordColorWarning, sv_discord_color_warning, 32, "13183530", CFGFLAG_SERVER, "Discord embed color warning.")
 MACRO_CONFIG_STR(SvDiscordColorServerChat, sv_discord_color_server, 32, "11253955", CFGFLAG_SERVER, "Discord embed color server chat.")

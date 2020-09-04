@@ -290,7 +290,7 @@ CClient::CClient() : m_DemoPlayer(&m_SnapshotDelta), m_DemoRecorder(&m_SnapshotD
 	m_MapdownloadAmount = -1;
 	m_MapdownloadTotalsize = -1;
 
-	//mmotee
+	// mmotee
 	m_pMmoInfoTask = nullptr;
 	m_aNews[0] = '\0';
 
@@ -768,7 +768,7 @@ void CClient::DebugRender()
 	}
 }
 
-//mmotee
+// mmotee
 void CClient::ResetMmoInfo()
 {
 	if (m_pMmoInfoTask)
@@ -843,7 +843,7 @@ void CClient::LoadMmoInfo()
 void CClient::RequestMmoInfo()
 {
 	char aUrl[256];
-	str_copy(aUrl, "https://teeworlds.space/update/info", sizeof(aUrl));
+	str_copy(aUrl, "https://mrpg.teeworlds.dev/update/info.json", sizeof(aUrl));
 
 	m_pMmoInfoTask = std::make_shared<CGetFile>(Storage(), aUrl, MMOTEE_INFO, IStorage::TYPE_SAVE, true);
 	Engine()->AddJob(m_pMmoInfoTask);
