@@ -49,7 +49,7 @@ void CMenus::RenderSettingsMmo(CUIRect MainView)
 	MainView.HSplitTop(20.0f, 0, &MainView);
 	MainView.HSplitTop(20.0f, &Tabbar, &MainView);
 
-	// рисуем меню вкладок
+	// draw tab menu
 	const int TAB_SIZE = 4;
 	const char* Tabs[TAB_SIZE] = { "General", "Visual", "Gamer", "Credits" };
 	const int Corner[TAB_SIZE] = { CUI::CORNER_TL, 0, 0, CUI::CORNER_TR };
@@ -62,12 +62,12 @@ void CMenus::RenderSettingsMmo(CUIRect MainView)
 			s_SettingsPage = i;
 	}
 
-	// рисуем текст информации
+	// draw information
 	MainView.HSplitTop(400.0f, &MainView, &Label);
 	const char* Information[TAB_SIZE] = { 
 											"Setting up the general part of the client",
 											"Setting up the visual part of the client",
-											"Features of the Gamer(Dune)",
+											"Features of the Gamer Client (Dune)",
 											"Information & Credits" 
 										};
 	UI()->DoLabel(&Label, Information[s_SettingsPage], 14.0f, CUI::ALIGN_CENTER);
@@ -105,7 +105,7 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		if (DoButton_CheckBox(&s_ButtonColorVote, Localize("Show Colored Vote (MRPG)"), g_Config.m_ClShowColoreVote, &Button))
 			g_Config.m_ClShowColoreVote ^= 1;
 
-		// эффекты
+		// effects
 		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
 		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
 		static int s_ButtonMmoEffects = 0;
@@ -219,7 +219,8 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 	CUIRect Button, TabBar;
 
 	static int TextureMenu = 0;
-	{ // меню выбора скинов
+	{
+		// skin menu
 		MainView.HSplitTop(20.0f, &TabBar, &MainView);
 
 		TabBar.VSplitLeft(TabBar.w / 6, &Button, &TabBar);
@@ -252,7 +253,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			TextureMenu = 5;
 	}
 
-	// замена скинов game.png
+	// game.png skin replacement
 	if (TextureMenu == 0)
 	{
 		if (!m_pClient->m_pSkinChanger->m_GameSkins.IsLoaded())
@@ -261,7 +262,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		RenderSettingsMmoChangerGeneric(MainView, &m_pClient->m_pSkinChanger->m_GameSkins, g_Config.m_GameTexture, "Gameskins", 3, 2.0f);
 	}
 
-	// замена скинов emoticion
+	// emoticion skin replacement
 	else if (TextureMenu == 1)
 	{
 		if (!m_pClient->m_pSkinChanger->m_Emoticons.IsLoaded())
@@ -270,7 +271,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		RenderSettingsMmoChangerGeneric(MainView, &m_pClient->m_pSkinChanger->m_Emoticons, g_Config.m_GameEmoticons, "Emoticons", 5, 1.0f);
 	}
 
-	// замена скинов cursors
+	// cursors replacement
 	else if (TextureMenu == 2)
 	{
 		if (!m_pClient->m_pSkinChanger->m_Cursors.IsLoaded())
@@ -279,7 +280,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		RenderSettingsMmoChangerGeneric(MainView, &m_pClient->m_pSkinChanger->m_Cursors, g_Config.m_GameCursor, "Cursors", 16, 1.0f);
 	}
 
-	// замена скинов particles
+	// particles replacement
 	else if (TextureMenu == 3)
 	{
 		if (!m_pClient->m_pSkinChanger->m_Particles.IsLoaded())
@@ -288,7 +289,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		RenderSettingsMmoChangerGeneric(MainView, &m_pClient->m_pSkinChanger->m_Particles, g_Config.m_GameParticles, "Particles", 5, 1.0f);
 	}
 
-	// замена скинов entities
+	// entities replacement
 	else if (TextureMenu == 4)
 	{
 		if (!m_pClient->m_pSkinChanger->m_Entities.IsLoaded())

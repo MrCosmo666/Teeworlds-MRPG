@@ -32,7 +32,7 @@ bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 
 	ClearTarget();
 
-	// информация о зарождении моба
+	// mob information
 	const int SubBotID = m_pBotPlayer->GetBotSub();
 	if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && BotJob::MobBot[SubBotID].Boss)
 	{
@@ -87,12 +87,12 @@ bool CCharacterBotAI::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	if(m_pBotPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB || pFrom->IsBot())
 		return false;
 
-	// до урона и после урона здоровье
+	// before and after damage to health
 	int StableDamage = Health();
 	const bool BotDie = CCharacter::TakeDamage(Force, Dmg, From, Weapon);
 	StableDamage -= Health();
 
-	// установить агрессию на того от кого пришел урон
+	// set up an aggression against the person who caused the damage
 	if (From != m_pBotPlayer->GetCID())
 	{
 		m_ListDmgPlayers[From] += StableDamage;
@@ -100,7 +100,7 @@ bool CCharacterBotAI::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 			SetTarget(From);
 	}
 
-	// проверка при смерте
+	// death
 	if(BotDie)
 	{
 		if(Weapon != WEAPON_SELF && Weapon != WEAPON_WORLD)
@@ -240,7 +240,7 @@ void CCharacterBotAI::TickDefered()
 	CCharacter::TickDefered();
 }
 
-// Интерактивы ботов
+// interactive bots
 void CCharacterBotAI::EngineBots()
 {
 	if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
@@ -262,7 +262,7 @@ void CCharacterBotAI::EngineBots()
 		EngineQuestMob();
 }
 
-// Интерактивы NPC
+// interactive NPC
 void CCharacterBotAI::EngineNPC()
 {
 	const int MobID = m_pBotPlayer->GetBotSub();
@@ -292,7 +292,7 @@ void CCharacterBotAI::EngineNPC()
 	}
 }
 
-// Интерактивы квестовых мобов
+// Interactives of quest mobiles
 void CCharacterBotAI::EngineQuestMob()
 {
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
@@ -302,7 +302,7 @@ void CCharacterBotAI::EngineQuestMob()
 	SearchTalkedPlayer();
 }
 
-// Интерактивы мобов враждебных
+// Interactive mobs hostile
 void CCharacterBotAI::EngineMobs()
 {
 	ResetInput();
@@ -359,7 +359,7 @@ void CCharacterBotAI::Move()
 	if(Index > -1)
 		WayDir = normalize(m_pBotPlayer->m_WayPoints[Index] - GetPos());
 
-	// установить направление
+	// set the direction
 	if(WayDir.x < 0 && ActiveWayPoints > 3)
 		m_Input.m_Direction = -1;
 	else if(WayDir.x > 0 && ActiveWayPoints > 3)
@@ -470,7 +470,6 @@ void CCharacterBotAI::Action()
 	if(m_BotTargetID == m_pBotPlayer->GetCID() || !pPlayer || m_BotTargetCollised)
 		return;
 
-
 	if((m_Input.m_Hook && m_Core.m_HookState == HOOK_IDLE) || m_ReloadTimer != 0)
 		return;
 
@@ -500,7 +499,7 @@ void CCharacterBotAI::SetAim(vec2 Dir)
 	m_LatestInput.m_TargetY = (int)Dir.y;
 }
 
-// Поиск игрока среди людей
+// searching for a player among people
 CPlayer *CCharacterBotAI::SearchPlayer(int Distance)
 {
 	for(int i = 0 ; i < MAX_PLAYERS; i ++)
@@ -516,7 +515,7 @@ CPlayer *CCharacterBotAI::SearchPlayer(int Distance)
 	return nullptr;
 }
 
-// Поиск игрока среди людей который имеет ярость выше всех
+// finding a player among people who have the highest fury
 CPlayer *CCharacterBotAI::SearchTenacityPlayer(float Distance)
 {
 	const bool ActiveTargetID = m_BotTargetID != m_pBotPlayer->GetCID();
@@ -528,17 +527,17 @@ CPlayer *CCharacterBotAI::SearchTenacityPlayer(float Distance)
 		return pPlayer;
 	}
 
-	// сбрасываем агрессию если игрок далеко
+	// throw off aggression if the player is far away
 	CPlayer* pPlayer = GS()->GetPlayer(m_BotTargetID, true, true);
 	if (ActiveTargetID && (!pPlayer 
 		|| (pPlayer && (distance(pPlayer->GetCharacter()->GetPos(), m_Pos) > 800.0f || Server()->GetWorldID(m_BotTargetID) != GS()->GetWorldID()))))
 		ClearTarget();
 
-	// не враждебные мобы
+	// non-hostile mobs
 	if (!ActiveTargetID || !pPlayer)
 		return nullptr; 
 
-	// сбрасываем время жизни таргета
+	// throw off the lifetime of a target
 	m_BotTargetCollised = GS()->Collision()->IntersectLineWithInvisible(pPlayer->GetCharacter()->GetPos(), m_Pos, 0, 0);
 	if (m_BotTargetLife && m_BotTargetCollised)
 	{
@@ -551,15 +550,15 @@ CPlayer *CCharacterBotAI::SearchTenacityPlayer(float Distance)
 		m_BotTargetLife = Server()->TickSpeed() * 3;
 	}
 
-	// ищем более сильного
+	// looking for a stronger
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
-		// проверяем на дистанцию игрока
+		// check the distance of the player
 		CPlayer* pFinderHard = GS()->GetPlayer(i, true, true);
 		if (!pFinderHard || distance(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) > 800.0f)
 			continue;
 
-		// проверяем есть ли вкуснее игрокв для бота
+		// check if the player is tastier for the bot
 		const bool FinderCollised = (bool)GS()->Collision()->IntersectLineWithInvisible(pFinderHard->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0);
 		if (!FinderCollised && ((m_BotTargetLife <= 10 && m_BotTargetCollised)
 			|| pFinderHard->GetAttributeCount(Stats::StHardness, true) > pPlayer->GetAttributeCount(Stats::StHardness, true)))

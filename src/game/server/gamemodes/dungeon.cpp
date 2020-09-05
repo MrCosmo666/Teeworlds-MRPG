@@ -20,12 +20,12 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	m_TankClientID = -1;
 	m_ShowedTankingInfo = false;
 
-	// создание двери для ожидания начала
+	// door creation to start
 	vec2 PosDoor = vec2(DungeonJob::Dungeon[m_DungeonID].DoorX, DungeonJob::Dungeon[m_DungeonID].DoorY);
 	m_DungeonDoor = new DungeonDoor(&GS()->m_World, PosDoor);
 	ChangeState(DUNGEON_WAITING);
 
-	// создание ключевых дверей
+	// key door construction
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_door", "WHERE DungeonID = '%d'", m_DungeonID));
 	while (RES->next())
 	{
@@ -54,7 +54,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	m_StateDungeon = State;
 
 	// - - - - - - - - - - - - - - - - - - - - - -
-	// Используется при смене статуса в Ожидание данжа
+	// used when changing state to waiting
 	if (State == DUNGEON_WAITING)
 	{
 		DungeonJob::Dungeon[m_DungeonID].Progress = 0;
@@ -70,7 +70,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
-	// Используется при смене статуса в Ожидание данжа
+	// used when changing state to waiting start
 	else if (State == DUNGEON_WAITING_START)
 	{
 		m_StartingTick = Server()->TickSpeed() * g_Config.m_SvTimeWaitingsDungeon;
@@ -78,7 +78,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
-	// Используется при смене статуса в Начало данжа
+	// used when changing state to start
 	else if (State == DUNGEON_STARTED)
 	{
 		SelectTankPlayer();
@@ -93,14 +93,13 @@ void CGameControllerDungeon::ChangeState(int State)
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
-	// Используется при смене статуса в Ожидание финиша данжа
+	// used when changing state to waiting finish
 	else if (State == DUNGEON_WAITING_FINISH)
 	{
 		m_SafeTick = 0;
 		m_FinishedTick = Server()->TickSpeed() * 20;
 		SetMobsSpawn(false);
 
-		// элемент RACE
 		int Seconds = -1;
 		dynamic_string Buffer;
 		for (int i = 0; i < MAX_PLAYERS; i++)
@@ -121,27 +120,27 @@ void CGameControllerDungeon::ChangeState(int State)
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
-	// Используется при смене статуса в Завершение данжа
+	// used when changing state to finished
 	else if (State == DUNGEON_FINISHED)
 	{
 		SetMobsSpawn(false);
 		KillAllPlayers();
 	}
 
-	// установить статус дверям
+	// door state
 	m_DungeonDoor->SetState(State);
 }
 
 void CGameControllerDungeon::StateTick()
 {
 	// - - - - - - - - - - - - - - - - - - - - - -
-	// сбросить данж
+	// dungeon
 	const int Players = PlayersNum();
 	if (Players < 1 && m_StateDungeon != DUNGEON_WAITING)
 		ChangeState(DUNGEON_WAITING);
 
 	// - - - - - - - - - - - - - - - - - - - - - -
-	// обновлять информацию каждую секунду
+	// update every second
 	if (Server()->Tick() % Server()->TickSpeed() == 0)
 	{
 		DungeonJob::Dungeon[m_DungeonID].Players = Players;
@@ -149,7 +148,7 @@ void CGameControllerDungeon::StateTick()
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
-	// Используется в тике когда Ожидание данжа
+	// used in tick when waiting
 	if (m_StateDungeon == DUNGEON_WAITING)
 	{
 		m_StartedPlayers = Players;
@@ -158,12 +157,12 @@ void CGameControllerDungeon::StateTick()
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
-	// Используется в тике когда Отчет начала данжа
+	// used in the tick when the waiting started
 	else if (m_StateDungeon == DUNGEON_WAITING_START)
 	{
 		if (m_StartingTick)
 		{
-			// готовность игроков
+			// player availability
 			const int PlayersReadyState = PlayersReady();
 			if(PlayersReadyState >= Players && m_StartingTick > 10 * Server()->TickSpeed())
 			{
@@ -177,11 +176,10 @@ void CGameControllerDungeon::StateTick()
 				m_LastStartingTick = 0;
 			}
 
-			// показать время до начала // if(m_StartingTick % Server()->TickSpeed() == 0)
+			// run up to speed // if(m_StartingTick % Server()->TickSpeed() == 0)
 			const int Time = m_StartingTick / Server()->TickSpeed();
 			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon waiting {INT} sec!\nPlayer's are ready to start right now {INT} of {INT}!\nYou can change state with 'Vote yes'", &Time, &PlayersReadyState, &Players);
 
-			// отчет и смена статы тенмицы при наступлении
 			m_StartingTick--;
 			if (!m_StartingTick)
 				ChangeState(DUNGEON_STARTED);
@@ -189,10 +187,9 @@ void CGameControllerDungeon::StateTick()
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
-	// Используется в тике когда Данж начат
+	// used in tick when dunegon is started
 	else if (m_StateDungeon == DUNGEON_STARTED)
 	{
-		// элемент RACE
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			if (!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID)
@@ -201,7 +198,7 @@ void CGameControllerDungeon::StateTick()
 			GS()->m_apPlayers[i]->GetTempData().TempTimeDungeon++;
 		}
 
-		// тик безопасности в течении какого времени игрок не вернется в старый мир
+		// security tick during which time the player will not return to the old world
 		if (m_SafeTick)
 		{
 			m_SafeTick--;
@@ -209,13 +206,13 @@ void CGameControllerDungeon::StateTick()
 				GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The security timer is over, be careful!");
 		}
 
-		// завершаем данж когда успешно данж завершен
+		// finish the dungeon when the dungeon is successfully completed
 		if (LeftMobsToWin() <= 0)
 			ChangeState(DUNGEON_WAITING_FINISH);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
-	// Используется в тике когда Отчет начала данжа
+	// used in the tick when the waiting is finished
 	else if (m_StateDungeon == DUNGEON_WAITING_FINISH)
 	{
 		if (m_FinishedTick)
@@ -412,7 +409,6 @@ void CGameControllerDungeon::SelectTankPlayer()
 
 void CGameControllerDungeon::Tick()
 {
-	// тик максимально местонахождения там
 	if (m_MaximumTick)
 	{
 		m_MaximumTick--;
@@ -427,17 +423,13 @@ void CGameControllerDungeon::Tick()
 void CGameControllerDungeon::CreateLogic(int Type, int Mode, vec2 Pos, int ParseInt)
 {
 	if(Type == 1)
-	{
 		new CLogicWall(&GS()->m_World, Pos);
-	}
+
 	if(Type == 2)
-	{
 		new CLogicWallWall(&GS()->m_World, Pos, Mode, ParseInt);
-	}
+
 	if(Type == 3)
-	{
 		new CLogicDoorKey(&GS()->m_World, Pos, ParseInt, Mode);
-	}
 }
 
 bool CGameControllerDungeon::OnEntity(int Index, vec2 Pos)
@@ -450,11 +442,13 @@ bool CGameControllerDungeon::OnEntity(int Index, vec2 Pos)
 		new CNPCWall(&GS()->m_World, Pos, false);
 		return true;
 	}
+
 	if(Index == ENTITY_NPC_WALLLEFT)
 	{
 		new CNPCWall(&GS()->m_World, Pos, true);
 		return true;
 	}
+	
 	return false;
 }
 

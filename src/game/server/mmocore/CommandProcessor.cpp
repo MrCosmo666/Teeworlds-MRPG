@@ -13,7 +13,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 	LastChat(GS, pPlayer);
 	const int ClientID = pPlayer->GetCID();
 
-	// АВТОРИЗАЦИЯ
+	// AUTHORISATION
 	if(str_comp_num(Msg->m_pMessage, "/login", 6) == 0)
 	{
 		if (pPlayer->IsAuthed())
@@ -31,7 +31,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		return;
 	}
 
-	// РЕГИСТРАЦИЯ
+	// REGISTRATION
 	else if(str_comp_num(Msg->m_pMessage, "/register", 9) == 0)
 	{
 		if (pPlayer->IsAuthed())
@@ -120,6 +120,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 			GS->Chat(ClientID, "You have no home.");
 			return;
 		}
+		
 		// sell house
 		GS->Mmo()->House()->SellHouse(HouseID);
 		return;

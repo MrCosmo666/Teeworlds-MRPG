@@ -48,7 +48,6 @@ void CEventHandler::Snap(int SnappingClient)
 
 	for(int i = 0; i < m_NumEvents; i++)
 	{
-		// если инвент больше базового что не поддерживает ваннила и клиент не проверен пропускаем
 		if(m_aTypes[i] > NETEVENTTYPE_DAMAGE && !GS()->CheckClient(SnappingClient))
 			continue;
 

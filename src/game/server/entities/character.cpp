@@ -528,7 +528,6 @@ void CCharacter::Tick()
 	}
 	HandleWeapons();
 
-	// запретить дальше Мобам
 	if (m_pPlayer->IsBot() || IsLockedWorld())
 		return;
 
@@ -728,7 +727,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 		const int EnchantBonus = pFrom->GetAttributeCount(Stats::StStrength, true);
 		Dmg += EnchantBonus;
 	
-		// Vampirism пополнить здоровье
+		// vampirism replenish your health
 		int TempInt = pFrom->GetAttributeCount(Stats::StVampirism, true);
 		if(random_int()%5000 < min(TempInt, 3000))
 		{
@@ -736,7 +735,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 			GS()->SendEmoticon(From, EMOTICON_DROP);
 		}
 		
-		// lucky пропустить урон
+		// miss out on damage
 		TempInt = pFrom->GetAttributeCount(Stats::StLucky, true);
 		if(!pFrom->IsBot() && random_int()%5000 < min(TempInt, 3000))
 		{
@@ -744,7 +743,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 			GS()->SendEmoticon(From, EMOTICON_HEARTS);
 		}
 		
-		// Критический урон
+		// critical damage
 		TempInt = pFrom->GetAttributeCount(Stats::StDirectCriticalHit, true);
 		if(!pFrom->IsBot() && random_int()%5000 < min(TempInt, 2200))
 		{
@@ -754,7 +753,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 			GS()->SendEmoticon(From, EMOTICON_EXCLAMATION);
 		}
 
-		// Фикс быстрого уйбиства спредом игроков
+		// fix quick killer spread players
 		if(pFrom->GetCharacter()->m_ActiveWeapon != WEAPON_HAMMER && 
 			distance(m_Core.m_Pos, pFrom->GetCharacter()->m_Core.m_Pos) < ms_PhysSize+90.0f)
 			Dmg = max(1, Dmg/3);
@@ -776,21 +775,21 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	if(From != m_pPlayer->GetCID())
 		GS()->CreatePlayerSound(From, SOUND_HIT);
 
-	// перекинуть на BotAI
+	// moved to BotAI
 	if(m_pPlayer->IsBot())
 	{
 		bool IsDie = (bool)(m_Health <= 0);
 		return IsDie;
 	}
 
-	// автозелье здоровья
+	// health pool
 	if(m_Health <= m_pPlayer->GetStartHealth()/3)
 	{
 		if(!m_pPlayer->CheckEffect("RegenHealth") && m_pPlayer->GetItem(itPotionHealthRegen).IsEquipped())
 			GS()->Mmo()->Item()->UseItem(m_pPlayer->GetCID(), itPotionHealthRegen, 1);
 	}
 
-	// Проверка при смерти если игрок погиб
+	// verify death
 	if(m_Health <= 0)
 	{
 		m_Health = 0;
@@ -927,11 +926,9 @@ bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)
 	if (m_pPlayer->IsBot())
 		return false;
 
-	// подбор предмета
 	if (GS()->TakeItemCharacter(m_pPlayer->GetCID()))
 		return true;
 
-	// работа
 	vec2 PosJob = vec2(0, 0);
 	CJobItems* pJobItem = (CJobItems*)GameWorld()->ClosestEntity(m_Pos, 15, CGameWorld::ENTTYPE_JOBITEMS, 0);
 	if(pJobItem)
@@ -966,7 +963,7 @@ void CCharacter::InteractiveRifle(vec2 Direction, vec2 ProjStartPos)
 */
 void CCharacter::HandleTuning()
 {
-	// тюнинг воды
+	// water tuning
 	CTuningParams* pTuningParams = &m_pPlayer->m_NextTuningParams;
 
 	if(m_Core.m_LostData)
@@ -1016,7 +1013,7 @@ void CCharacter::HandleTuning()
 		return;
 	}
 	
-	// режим полета
+	// flight mode
 	if(m_pPlayer->m_Flymode && m_pPlayer->GetEquippedItem(EQUIP_WINGS) > 0)
 	{
 		pTuningParams->m_Gravity = 0.00f;
@@ -1027,7 +1024,7 @@ void CCharacter::HandleTuning()
 		m_Core.m_Vel += Direction * 0.001f;
 	}
 
-	// зелья и баффы разные
+	// potions and buffs are different
 	HandleBuff(pTuningParams);
 }
 
@@ -1047,7 +1044,7 @@ void CCharacter::HandleBuff(CTuningParams* TuningParams)
 		TuningParams->m_HookLength = 0.0f;
 	}
 
-	// poison's
+	// poisons
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
 	{	
 		if(m_pPlayer->CheckEffect("Fire"))
@@ -1210,7 +1207,7 @@ bool CCharacter::StartConversation(CPlayer *pTarget)
 	if (!m_pPlayer || m_pPlayer->IsBot() || !pTarget->IsBot())
 		return false;
 
-	// пропустить если не НПС, или он не рисуется
+	// skip if not NPS, or it is not drawn
 	CPlayerBot* pTargetBot = static_cast<CPlayerBot*>(pTarget);
 	if (!pTargetBot || pTargetBot->GetBotType() == BotsTypes::TYPE_BOT_MOB || !pTargetBot->IsActiveSnappingBot(m_pPlayer->GetCID()))
 		return false;

@@ -12,7 +12,7 @@ std::map < int , GuildJob::GuildStructRank > GuildJob::RankGuild;
 
 void GuildJob::LoadGuildRank(int GuildID)
 {
-	// загрузка рангов
+	// rank loading
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_ranks", "WHERE ID > '0' AND GuildID = '%d'", GuildID));
 	while(RES->next())
 	{
@@ -48,7 +48,7 @@ void GuildJob::OnInit()
 
 void GuildJob::OnInitWorld(const char* pWhereLocalWorld) 
 { 
-	// загрузка домов
+	// load houses
 	SJK.SDT("*", "tw_guilds_houses", [&](ResultSet* RES)
 	{
 		while(RES->next())
@@ -72,7 +72,7 @@ void GuildJob::OnInitWorld(const char* pWhereLocalWorld)
 		Job()->ShowLoadingProgress("Guilds Houses", HouseGuild.size());
 	}, pWhereLocalWorld);
 
-	// загрузка декораций
+	// load decorations
 	SJK.SDT("*", "tw_guilds_decorations", [&](ResultSet* DecoRES)
 	{
 		while(DecoRES->next())
@@ -104,7 +104,6 @@ bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		return true;
 	}
-
 
 	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_GUILD_CHAIRS))
 	{
@@ -138,7 +137,6 @@ bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 /* #########################################################################
 	GLOBAL MEMBER
 ######################################################################### */
-// парсинг голосований для меню
 bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
@@ -161,7 +159,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// переместится домой
 	if (PPSTR(CMD, "MSPAWN") == 0)
 	{
 		const int GuildID = pPlayer->Acc().GuildID;
@@ -182,7 +179,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// кикнуть игрока из организации
 	if (PPSTR(CMD, "MKICK") == 0)
 	{
 		const int GuildID = pPlayer->Acc().GuildID;
@@ -196,7 +192,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// покупка улучшения стула
 	if (PPSTR(CMD, "MUPGRADE") == 0)
 	{
 		const int GuildID = pPlayer->Acc().GuildID;
@@ -220,7 +215,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// добавка денег в банк организации
 	if (PPSTR(CMD, "MMONEY") == 0)
 	{
 		const int GuildID = pPlayer->Acc().GuildID;
@@ -246,7 +240,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// покупка дома
 	if (PPSTR(CMD, "BUYMEMBERHOUSE") == 0)
 	{
 		const int GuildID = pPlayer->Acc().GuildID;
@@ -261,7 +254,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// продажа дома
 	if (PPSTR(CMD, "MHOUSESELL") == 0)
 	{
 		const int GuildID = pPlayer->Acc().GuildID;
@@ -276,7 +268,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// дверь дома организации
 	if (PPSTR(CMD, "MDOOR") == 0)
 	{
 		const int GuildID = pPlayer->Acc().GuildID;
@@ -291,7 +282,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// принять приглошение
 	if (PPSTR(CMD, "MINVITEACCEPT") == 0)
 	{
 		const int GuildID = pPlayer->Acc().GuildID;
@@ -313,7 +303,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// отклонить приглашение
 	if (PPSTR(CMD, "MINVITEREJECT") == 0)
 	{
 		const int GuildID = pPlayer->Acc().GuildID;
@@ -331,8 +320,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// - - - - - - -
-	// Поиск гильдии
 	if (PPSTR(CMD, "MINVITENAME") == 0)
 	{
 		if (PPSTR(GetText, "NULL") == 0)
@@ -346,7 +333,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// создать новое приглашение в гильдию
 	if (PPSTR(CMD, "MINVITESEND") == 0)
 	{
 		if (!AddInviteGuild(VoteID, pPlayer->Acc().AuthID))
@@ -359,8 +345,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// - - - - - - РАНГИ - - - - 
-	// изменить поле ранга имени
 	if (PPSTR(CMD, "MRANKNAME") == 0)
 	{
 		if (PPSTR(GetText, "NULL") == 0)
@@ -374,7 +358,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// создать ранг
 	if (PPSTR(CMD, "MRANKCREATE") == 0)
 	{
 		const int GuildID = pPlayer->Acc().GuildID;
@@ -396,7 +379,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// удалить ранг
 	if (PPSTR(CMD, "MRANKDELETE") == 0)
 	{
 		const int GuildID = pPlayer->Acc().GuildID;
@@ -412,7 +394,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// изменить доступ рангу
 	if (PPSTR(CMD, "MRANKACCESS") == 0)
 	{
 		const int GuildID = pPlayer->Acc().GuildID;
@@ -428,7 +409,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// установить ранг
 	if (PPSTR(CMD, "MRANKSET") == 0)
 	{
 		const int GuildID = pPlayer->Acc().GuildID;
@@ -450,7 +430,6 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		return true;
 	}
 
-	// изменить имя ранга
 	if (PPSTR(CMD, "MRANKCHANGE") == 0)
 	{
 		const int GuildID = pPlayer->Acc().GuildID;
@@ -460,14 +439,12 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			return true;
 		}
 
-		// меняем ранг и очишаем меню интерактивов
+		// change rank and clear the menu
 		ChangePlayerRank(VoteID, VoteID2);
 		GS()->UpdateVotes(MenuList::MENU_GUILD);
 		return true;
 	}
 
-
-	// начала расстановки декорации
 	if (PPSTR(CMD, "DECOGUILDSTART") == 0)
 	{
 		const int GuildID = pPlayer->Acc().GuildID;
@@ -518,6 +495,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD_HOUSE_DECORATION);
 		return true;
 	}
+
 	return false;
 }
 
@@ -719,14 +697,14 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 	if (!pPlayer)
 		return;
 
-	// проверяем находимся ли уже в организации
+	// check whether we are already in the guild
 	if(pPlayer->Acc().GuildID > 0) 
 	{
 		GS()->Chat(ClientID, "You already in guild group!");
 		return;
 	}
 
-	// проверяем доступность имени организации
+	// we check the availability of the guild's name
 	CSqlString<64> cGuildName = CSqlString<64>(GuildName);
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds", "WHERE GuildName = '%s'", cGuildName.cstr()));
 	if(RES->next()) 
@@ -735,14 +713,14 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 		return;
 	}
 
-	// проверяем тикет забераем и создаем
+	// we check the ticket, we take it and create
 	if(pPlayer->GetItem(itTicketGuild).Count > 0 && pPlayer->GetItem(itTicketGuild).Remove(1))
 	{
-		// получаем Айди для инициализации
+		// get ID for initialization
 		boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_guilds", "ORDER BY ID DESC LIMIT 1"));
-		const int InitID = RES2->next() ? RES2->getInt("ID")+1 : 1; // TODO: thread save ? hm need for table all time auto increment = 1; NEED FIX IT
+		const int InitID = RES2->next() ? RES2->getInt("ID")+1 : 1; // TODO: thread save ? hm need for table all time auto increment = 1; NEED FIX IT -- use some kind of uuid
 		
-		// инициализируем гильдию
+		// initialize the guild
 		str_copy(Guild[InitID].m_Name, cGuildName.cstr(), sizeof(Guild[InitID].m_Name));
 		Guild[InitID].m_OwnerID = pPlayer->Acc().AuthID;
 		Guild[InitID].m_Level = 1;
@@ -753,7 +731,7 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 		Guild[InitID].m_Upgrades[EMEMBERUPGRADE::ChairNSTExperience] = 1;
 		pPlayer->Acc().GuildID = InitID;
 
-		// создаем в таблице гильдию
+		// we create a guild in the table
 		SJK.ID("tw_guilds", "(ID, GuildName, OwnerID) VALUES ('%d', '%s', '%d')", InitID, cGuildName.cstr(), pPlayer->Acc().AuthID);
 		SJK.UDS(1000, "tw_accounts_data", "GuildID = '%d' WHERE ID = '%d'", InitID, pPlayer->Acc().AuthID);
 		GS()->Chat(-1, "New guilds [{STR}] have been created!", cGuildName.cstr());
@@ -764,7 +742,6 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 
 bool GuildJob::JoinGuild(int AuthID, int GuildID)
 {
-	// проверяем клан есть или нет у этого и грока
 	const char *PlayerName = Job()->PlayerName(AuthID);
 	boost::scoped_ptr<ResultSet> CheckJoinRES(SJK.SD("ID", "tw_accounts_data", "WHERE ID = '%d' AND GuildID IS NOT NULL", AuthID));
 	if(CheckJoinRES->next())
@@ -774,7 +751,7 @@ bool GuildJob::JoinGuild(int AuthID, int GuildID)
 		return false;
 	}
 
-	// проверяем количество слотов доступных
+	// check the number of slots available
 	boost::scoped_ptr<ResultSet> CheckSlotsRES(SJK.SD("ID", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID));
 	if((int)CheckSlotsRES->rowsCount() >= Guild[GuildID].m_Upgrades[EMEMBERUPGRADE::AvailableNSTSlots])
 	{
@@ -783,7 +760,7 @@ bool GuildJob::JoinGuild(int AuthID, int GuildID)
 		return false;
 	}
 
-	// обновляем и получаем данные
+	// we update and get the data
 	const int ClientID = Job()->Account()->CheckOnlineAccount(AuthID);
 	if(ClientID >= 0 && ClientID < MAX_PLAYERS)
 	{
@@ -798,7 +775,7 @@ bool GuildJob::JoinGuild(int AuthID, int GuildID)
 
 void GuildJob::ExitGuild(int AuthID)
 {
-	// проверяем если покидает лидер клан
+	// we check if the clan leader leaves
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds", "WHERE OwnerID = '%d'", AuthID));
 	if (RES->next())
 	{
@@ -806,16 +783,16 @@ void GuildJob::ExitGuild(int AuthID)
 		return;
 	}
 
-	// проверяем аккаунт и его организацию и устанавливаем
+	// we check the account and its guild
 	boost::scoped_ptr<ResultSet> RES2(SJK.SD("GuildID", "tw_accounts_data", "WHERE ID = '%d'", AuthID));
 	if (RES2->next())
 	{
-		// пишим гильдии что игрок покинул гильдию
+		// we write to the guild that the player has left the guild
 		const int GuildID = RES2->getInt("GuildID");
 		GS()->ChatGuild(GuildID, "{STR} left the Guild!", Job()->PlayerName(AuthID));
 		AddHistoryGuild(GuildID, "'%s' exit or kicked.", Job()->PlayerName(AuthID));
 
-		// обновляем информацию игроку
+		// we update the player's information
 		const int ClientID = Job()->Account()->CheckOnlineAccount(AuthID);
 		if(ClientID >= 0 && ClientID < MAX_PLAYERS)
 		{
@@ -828,13 +805,13 @@ void GuildJob::ExitGuild(int AuthID)
 
 void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 {
-	// если не нашли гильдии такой то показывает 'Поиск гильдий'
+	// if you haven't found a guild like this, then 'Search for guilds'
 	const int ClientID = pPlayer->GetCID();
 	const int GuildID = pPlayer->Acc().GuildID;
 	if(Guild.find(GuildID) == Guild.end()) 
 		return ShowFinderGuilds(ClientID);
 	
-	// показываем само меню
+	// show the menu itself
 	const int GuildHouse = GetGuildHouseID(GuildID);
 	const int ExpNeed = kurosio::computeExperience(Guild[GuildID].m_Level);
 	GS()->AVH(ClientID, TAB_GUILD_STAT, BLUE_COLOR, "Guild name: {STR}", Guild[GuildID].m_Name);
@@ -953,7 +930,7 @@ bool GuildJob::AddMoneyBank(int GuildID, int Money)
 	if(!RES->next()) 
 		return false;
 	
-	// добавить деньги
+	// add money
 	Guild[GuildID].m_Bank = RES->getInt("Bank") + Money;
 	SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, GuildID);
 	return true;
@@ -965,18 +942,18 @@ bool GuildJob::RemoveMoneyBank(int GuildID, int Money)
 	if(!RES->next()) 
 		return false;
 	
-	// проверяем хватает ли в банке на оплату
+	// check if the bank has enough to pay
 	Guild[GuildID].m_Bank = RES->getInt("Bank");
 	if(Money > Guild[GuildID].m_Bank)
 		return false;
 
-	// оплата
+	// payment
 	Guild[GuildID].m_Bank -= Money;
 	SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, GuildID);
 	return true;
 }
 
-// покупка улучшения максимальное количество слотов
+// purchase of upgrade maximum number of slots
 bool GuildJob::UpgradeGuild(int GuildID, int Field)
 {
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "WHERE ID = '%d'", GuildID));
@@ -1000,7 +977,7 @@ bool GuildJob::UpgradeGuild(int GuildID, int Field)
 /* #########################################################################
 	GET CHECK MEMBER RANK MEMBER 
 ######################################################################### */
-// именна доступов
+// access name
 const char *GuildJob::AccessNames(int Access)
 {
 	switch(Access) 
@@ -1012,7 +989,7 @@ const char *GuildJob::AccessNames(int Access)
 	}
 }
 
-// получить имя ранга
+// get a rank name
 const char *GuildJob::GetGuildRank(int GuildID, int RankID)
 {
 	if(RankGuild.find(RankID) != RankGuild.end() && GuildID == RankGuild[RankID].GuildID)
@@ -1020,7 +997,7 @@ const char *GuildJob::GetGuildRank(int GuildID, int RankID)
 	return "Member";
 }
 
-// найти ранг по имени и организации
+// find rank by name and organization
 int GuildJob::FindGuildRank(int GuildID, const char *Rank) const
 {
 	for(auto mr: RankGuild)
@@ -1034,7 +1011,7 @@ int GuildJob::FindGuildRank(int GuildID, const char *Rank) const
 /* #########################################################################
 	FUNCTIONS MEMBER RANK MEMBER 
 ######################################################################### */
-// добавить ранг
+// add rank
 void GuildJob::AddRank(int GuildID, const char *Rank)
 {
 	const int FindRank = FindGuildRank(GuildID, Rank);
@@ -1045,8 +1022,7 @@ void GuildJob::AddRank(int GuildID, const char *Rank)
 	if(RES->rowsCount() >= 5) return;
 
 	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_guilds_ranks", "ORDER BY ID DESC LIMIT 1"));
-	const int InitID = RES2->next() ? RES2->getInt("ID")+1 : 1; 
-	// thread save ? hm need for table all time auto increment = 1; NEED FIX IT
+	const int InitID = RES2->next() ? RES2->getInt("ID")+1 : 1; // thread save ? hm need for table all time auto increment = 1; NEED FIX IT
 
 	CSqlString<64> cGuildRank = CSqlString<64>(Rank);
 	SJK.ID("tw_guilds_ranks", "(ID, GuildID, Name) VALUES ('%d', '%d', '%s')", InitID, GuildID, cGuildRank.cstr());
@@ -1057,7 +1033,7 @@ void GuildJob::AddRank(int GuildID, const char *Rank)
 	str_copy(RankGuild[InitID].Rank, Rank, sizeof(RankGuild[InitID].Rank));
 }
 
-// удалить ранг
+// unrank
 void GuildJob::DeleteRank(int RankID, int GuildID)
 {
 	if(RankGuild.find(RankID) != RankGuild.end())
@@ -1070,7 +1046,7 @@ void GuildJob::DeleteRank(int RankID, int GuildID)
 	}
 }
 
-// изменить ранг
+// change rank
 void GuildJob::ChangeRank(int RankID, int GuildID, const char *NewRank)
 {
 	const int FindRank = FindGuildRank(GuildID, NewRank);
@@ -1088,7 +1064,7 @@ void GuildJob::ChangeRank(int RankID, int GuildID, const char *NewRank)
 	}
 }
 
-// изменить доступ
+// change access rank
 void GuildJob::ChangeRankAccess(int RankID)
 {
 	if(RankGuild.find(RankID) != RankGuild.end())
@@ -1104,7 +1080,7 @@ void GuildJob::ChangeRankAccess(int RankID)
 	}	
 }
 
-// изменить игроку ранг
+// change player rank
 void GuildJob::ChangePlayerRank(int AuthID, int RankID)
 {
 	const int ClientID = Job()->Account()->CheckOnlineAccount(AuthID);
@@ -1115,7 +1091,7 @@ void GuildJob::ChangePlayerRank(int AuthID, int RankID)
 	SJK.UD("tw_accounts_data", "GuildRank = '%d' WHERE ID = '%d'", RankID, AuthID);
 }
 
-// показывае меню рангов
+// rank menu display
 void GuildJob::ShowMenuRank(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
@@ -1160,7 +1136,7 @@ int GuildJob::GetGuildPlayerCount(int GuildID)
 /* #########################################################################
 	FUNCTIONS MEMBER INVITE MEMBER 
 ######################################################################### */
-// добавить приглашение игрока в гильдию
+// add a player to the guild
 bool GuildJob::AddInviteGuild(int GuildID, int OwnerID)
 {
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'",  GuildID, OwnerID));
@@ -1171,7 +1147,7 @@ bool GuildJob::AddInviteGuild(int GuildID, int OwnerID)
 	return true;
 }
 
-// показать лист приглашений в нашу гильдию
+// show the invitation sheet to our guild
 void GuildJob::ShowInvitesGuilds(int ClientID, int GuildID)
 {
 	int HideID = NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 1900;
@@ -1190,7 +1166,7 @@ void GuildJob::ShowInvitesGuilds(int ClientID, int GuildID)
 	GS()->AddBack(ClientID);
 }
 
-// показать топ гильдии и позваться к ним
+// show the guild's top and call on them
 void GuildJob::ShowFinderGuilds(int ClientID)
 {
 	CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
@@ -1224,10 +1200,10 @@ void GuildJob::ShowFinderGuilds(int ClientID)
 /* #########################################################################
 	FUNCTIONS MEMBER HISTORY MEMBER 
 ######################################################################### */
-// показать список историй
+// list of stories
 void GuildJob::ShowHistoryGuild(int ClientID, int GuildID)
 {
-	// ищем в базе данных всю историю гильдии
+	// looking for the entire history of the guild in the database
 	char aBuf[128];
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_history", "WHERE GuildID = '%d' ORDER BY ID DESC LIMIT 20", GuildID));
 	while(RES->next()) 
@@ -1238,7 +1214,7 @@ void GuildJob::ShowHistoryGuild(int ClientID, int GuildID)
 	GS()->AddBack(ClientID);	
 }
 
-// добавить в гильдию историю
+// add to the guild history
 void GuildJob::AddHistoryGuild(int GuildID, const char *Buffer, ...)
 {
 	char aBuf[512];
@@ -1258,7 +1234,7 @@ void GuildJob::AddHistoryGuild(int GuildID, const char *Buffer, ...)
 /* #########################################################################
 	GET CHECK MEMBER HOUSING MEMBER 
 ######################################################################### */
-// айди дома организации
+// guild house
 int GuildJob::GetHouseGuildID(int HouseID) const	
 {	
 	if(HouseGuild.find(HouseID) != HouseGuild.end())
@@ -1273,7 +1249,7 @@ int GuildJob::GetHouseWorldID(int HouseID) const
 	return -1;
 }
 
-// поиск владельца дома в позиции
+// search by position
 int GuildJob::GetPosHouseID(vec2 Pos) const
 {
 	for(const auto& m: HouseGuild)
@@ -1296,7 +1272,6 @@ bool GuildJob::GetGuildDoor(int GuildID) const
 	return false;
 }
 
-// получаем позицию дома организации
 vec2 GuildJob::GetPositionHouse(int GuildID) const
 {
 	const int HouseID = GetGuildHouseID(GuildID);
@@ -1305,7 +1280,6 @@ vec2 GuildJob::GetPositionHouse(int GuildID) const
 	return vec2(0, 0);
 }
 
-// получаем ид дома организации
 int GuildJob::GetGuildHouseID(int GuildID) const
 {
 	for(const auto& imh : HouseGuild)
@@ -1316,21 +1290,19 @@ int GuildJob::GetGuildHouseID(int GuildID) const
 	return -1;
 }
 
-// Покупка дома организации
+// buying a guild house
 void GuildJob::BuyGuildHouse(int GuildID, int HouseID)
 {
-	// проверить есть ли дом у гильдии
+	// check if the guild has a house
 	if(GetGuildHouseID(GuildID) > 0)
 	{
 		GS()->ChatGuild(GuildID, "Your Guild can't have 2 houses. Purchase canceled!");
 		return;
 	}
 
-	// покупка дома
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_houses", "WHERE ID = '%d' AND OwnerMID IS NULL", HouseID));
 	if(RES->next())
 	{
-		// снятие золота
 		const int Price = RES->getInt("Price");
 		if(Guild[GuildID].m_Bank < Price)
 		{
@@ -1340,11 +1312,9 @@ void GuildJob::BuyGuildHouse(int GuildID, int HouseID)
 		Guild[GuildID].m_Bank -= Price;
 		SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, GuildID);
 
-		// обновление владельца
 		HouseGuild[HouseID].m_GuildID = GuildID;
 		SJK.UD("tw_guilds_houses", "OwnerMID = '%d' WHERE ID = '%d'", GuildID, HouseID);
 
-		// информация 
 		const char* WorldName = GS()->Server()->GetWorldName(HouseGuild[HouseID].m_WorldID);
 		GS()->Chat(-1, "{STR} buyight guild house on {STR}!", Guild[GuildID].m_Name, WorldName);
 		GS()->ChatDiscord(DC_SERVER_INFO, "Information", "{STR} buyight guild house on {STR}!", Guild[GuildID].m_Name, WorldName);
@@ -1352,14 +1322,12 @@ void GuildJob::BuyGuildHouse(int GuildID, int HouseID)
 		return;
 	}
 
-	// информация что дом уже куплен
 	GS()->ChatGuild(GuildID, "House has already been purchased!");
 }
 
-// продажа дома организации
+// guild house sale
 void GuildJob::SellGuildHouse(int GuildID)
 {
-	// узнать ид дома гильдии
 	const int HouseID = GetGuildHouseID(GuildID);
 	if(HouseID <= 0)
 	{
@@ -1367,14 +1335,11 @@ void GuildJob::SellGuildHouse(int GuildID)
 		return;
 	}
 
-	// продажа гильдии дома по айди дома
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_houses", "WHERE ID = '%d' AND OwnerMID IS NOT NULL", HouseID));
 	if(RES->next())
 	{
-		// сбросить владельца
 		SJK.UD("tw_guilds_houses", "OwnerMID = NULL WHERE ID = '%d'", HouseID);
 
-		// возращаем деньги
 		const int ReturnedGold = HouseGuild[HouseID].m_Price;
 		Guild[GuildID].m_Bank += ReturnedGold;
 		SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", Guild[GuildID].m_Bank, GuildID);
@@ -1382,16 +1347,15 @@ void GuildJob::SellGuildHouse(int GuildID)
 		AddHistoryGuild(GuildID, "Lost a house on '%s'.", GS()->Server()->GetWorldName(HouseGuild[HouseID].m_WorldID));
 	}
 
-	// открыть и освободить дом
 	if(HouseGuild[HouseID].m_Door)
 	{
 		delete HouseGuild[HouseID].m_Door;
 		HouseGuild[HouseID].m_Door = 0;
 	}
+
 	HouseGuild[HouseID].m_GuildID = -1;
 }
 
-// меню продажи дома
 void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 {
 	const int ClientID = pPlayer->GetCID();
@@ -1399,7 +1363,6 @@ void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_GUILD_HOUSE, "Buying a house you will need to constantly the Treasury");
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_GUILD_HOUSE, "In the intervals of time will be paid house");
 
-	// показать кол-во золота в гильдии
 	if(pPlayer->Acc().IsGuild())
 	{
 		GS()->AV(ClientID, "null", "");
@@ -1408,7 +1371,6 @@ void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 		GS()->AVMI(ClientID, GS()->GetItemInfo(itGold).GetIcon(), "null", NOPE, NOPE, "Your guild have {INT} Gold", &GuildBank);
 	}
 
-	// показать основное меню гильдии
 	GS()->AV(ClientID, "null", "");
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	const int GuildHouseOwner = HouseGuild[HouseID].m_GuildID;
@@ -1438,9 +1400,7 @@ bool GuildJob::ChangeStateDoor(int GuildID)
 		HouseGuild[HouseID].m_Door = 0;
 	}
 	else
-	{
 		HouseGuild[HouseID].m_Door = new GuildDoor(&GS()->m_World, vec2(HouseGuild[HouseID].m_DoorX, HouseGuild[HouseID].m_DoorY), GuildID);
-	}
 	
 	const bool StateDoor = (bool)(HouseGuild[HouseID].m_Door);
 	GS()->ChatGuild(GuildID, "{STR} the house for others.", (StateDoor ? "closed" : "opened"));

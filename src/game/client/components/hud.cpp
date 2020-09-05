@@ -697,7 +697,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	if (!pClientStats || !pCharacter || pClientStats->m_WorldType == WORLD_CUTSCENE)
 		return;
 
-	// рисуем бордюры
+	// edges
 	CUIRect Rect = { 5, 15, 106, 36.0f };
 	Graphics()->BlendNormal();
 	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.10f), CUI::CORNER_ALL, 5.0f);
@@ -705,12 +705,12 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	Rect = { 5, 15, 28, 25.0f };
 	RenderTools()->DrawUIRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.10f), CUI::CORNER_ALL, 5.0f);
 
-	// переменные
+	// variables
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "%s. x%d, y%d", Client()->GetCurrentMapName(), pCharacter->m_X / 32, pCharacter->m_Y / 32);
 	TextRender()->Text(0, 2, 5, 4.5f, aBuf, -1);
 
-	// рисуем инфу золота
+	// info gold
 	IntsToStr(pClientStats->m_Gold, 6, aBuf);
 	float textWidth = TextRender()->TextWidth(0, 5.0f, aBuf, -1, -1.0);
 	Rect = { 5, 57.0f, textWidth + 16.0f, 9.0f };
@@ -720,7 +720,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	Rect.VSplitLeft(13.0f, 0, &Rect);
 	TextRender()->Text(0, Rect.x, 57.0f, 5.0f, aBuf, -1);
 
-	// рисуем инфу зелей эффектов
+	// draw info effects
 	IntsToStr(pClientStats->m_Potions, 12, aBuf);
 	textWidth = TextRender()->TextWidth(0, 5.0f, aBuf, -1, -1.0);
 	if (textWidth > 2.0)
@@ -732,7 +732,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 		TextRender()->Text(0, Rect.x, 72.0f, 5.0f, aBuf, -1);
 	}
 
-	// хюд
+	// hud
 	{
 		int ExpNeeded = (int)kurosio::computeExperience(pClientStats->m_Level);
 		str_format(aBuf, sizeof(aBuf), "Level: %d Exp: %d/%d", pClientStats->m_Level, pClientStats->m_Exp, ExpNeeded);
@@ -748,14 +748,13 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 		Graphics()->QuadsBegin();
 
-		// выбраное оружие
+		// selected weapons
 		int Weapon = pCharacter->m_Weapon;
 		RenderTools()->SelectSprite(g_pData->m_Weapons.m_aId[Weapon % NUM_WEAPONS].m_pSpriteProj);
 		Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
 		Used[0] = IGraphics::CQuadItem(23, 17.50f, 10, 10);
 		Graphics()->QuadsDrawTL(&Used[0], 1);
 
-		// ������
 		int WeaponSprite = SPRITE_WEAPON_HAMMER_BODY;
 		float SizeWeapon = 13.5f;
 		switch (Weapon)
@@ -785,7 +784,6 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 		Graphics()->QuadsEnd();
 		Graphics()->WrapNormal();
 
-		// �����
 		CTextCursor Cursor;
 		char type[64];
 		if (Weapon != WEAPON_HAMMER && Weapon != WEAPON_NINJA)
@@ -819,7 +817,7 @@ void CHud::RenderHealthAndAmmo(const CNetObj_Character *pCharacter)
 	if(!pCharacter)
 		return;
 
-	//  mmotee
+	// mmotee
 	if(m_pClient->MmoServer() && m_pClient->m_aClients[m_pClient->m_LocalClientID].m_pLocalStats)
 	{
 		RenderMmoHud(m_pClient->m_aClients[m_pClient->m_LocalClientID].m_pLocalStats, pCharacter);

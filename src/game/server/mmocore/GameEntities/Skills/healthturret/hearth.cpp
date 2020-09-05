@@ -6,27 +6,26 @@
 CHearth::CHearth(CGameWorld *pGameWorld, vec2 Pos, CPlayer *pPlayer, int Health, vec2 InitialVel)
 : CEntity(pGameWorld, CGameWorld::ENTYPE_HEARTLIFE, Pos)
 {
-	// устанавливаем значения по аргументам
+	// set the values by arguments
 	m_Pos = Pos;
 	m_InitialVel = InitialVel/2;
 	m_pPlayer = pPlayer;
 	m_InitialAmount = 1.0f;
 	m_Health = Health;
 
-	// создаем обьект
 	GameWorld()->InsertEntity(this);
 }
 
 void CHearth::Tick()
 {
-	// проверяем есть ли игрок или нет для использования его функций
+	// check if there is a player or not to use his functions
 	if(!m_pPlayer || !m_pPlayer->GetCharacter())
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;
 	}
 
-	// если дистанция больше 24.0
+	// if the distance is greater than 24.0
 	CCharacter *pChar = m_pPlayer->GetCharacter();
 	float Dist = distance(m_Pos, pChar->m_Core.m_Pos);
 	if(Dist > 24.0f)
@@ -38,12 +37,10 @@ void CHearth::Tick()
 		return;
 	}
 
-	// выдаем все или создаем эффект что полное здоровье
+	// create the effect
 	GS()->CreateSound(m_Pos, 15);
 	pChar->IncreaseHealth(m_Health);
 
-	
-	// уничтожаем обьект
 	GS()->m_World.DestroyEntity(this);
 	return;
 }

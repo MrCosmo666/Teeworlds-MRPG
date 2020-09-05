@@ -8,39 +8,31 @@
 CHealthHealer::CHealthHealer(CGameWorld *pGameWorld, CPlayer* pPlayer, int SkillBonus, int PowerLevel, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTYPE_SKILLTURRETHEART, Pos)
 {
-	// переданные аргументы
 	m_Pos = Pos;
 	m_pPlayer = pPlayer;
 	m_PowerLevel = PowerLevel;
 
-	// обычные настройки без передачи аргументов
 	m_LifeSpan = (10 + SkillBonus)*Server()->TickSpeed();
 	m_ReloadTick = 2*Server()->TickSpeed();
+
 	GameWorld()->InsertEntity(this);
+
 	for(int i=0; i<NUM_IDS; i++)
-	{
 		m_IDs[i] = Server()->SnapNewID();
-	}
 }
 
 CHealthHealer::~CHealthHealer()
 {
-	// освобождаем все при уничтожении
-	for(int i=0; i<NUM_IDS; i++)
-	{
+	for(int i = 0; i < NUM_IDS; i++)
 		Server()->SnapFreeID(m_IDs[i]);
-	}
 }
 
 void CHealthHealer::Reset()
 {
-	// если игрок есть создаем эффекты
+	// if the player is eating, we create effects
 	if(m_pPlayer && m_pPlayer->GetCharacter())
-	{
 		GS()->CreateSound(m_Pos, SOUND_GRENADE_EXPLODE);
-	}
 
-	// уничтожаем обьект
 	GS()->m_World.DestroyEntity(this);
 	return;
 }
@@ -53,6 +45,7 @@ void CHealthHealer::Tick()
 		Reset();
 		return;
 	}
+
 	if(m_ReloadTick)
 	{
 		m_ReloadTick--;
@@ -69,6 +62,7 @@ void CHealthHealer::Tick()
 			new CHearth(&GS()->m_World, m_Pos, p->GetPlayer(), HealthRestore, p->m_Core.m_Vel);
 		}
 	}
+	
 	m_ReloadTick = 2 * Server()->TickSpeed();
 
 	if(ShowHealthRestore)

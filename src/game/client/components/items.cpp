@@ -320,7 +320,6 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 	const int citem = SPRITE_MMO_FIRE_MAGITECH_GUN + pCurrent->m_Type;
 	RenderTools()->SelectSprite(citem);
 
-	// добавить эффект проджектайлу
 	const vec2 Vel = Pos - PrevPos;
 	if (pCurrent->m_Weapon == WEAPON_GRENADE)
 	{
@@ -400,7 +399,6 @@ void CItems::RenderMmoPickups(const CNetObj_MmoPickup* pPrev, const CNetObj_MmoP
 		return;
 	}
 
-	// дальше эффект что они двигаются
 	static float s_Time = 0.0f;
 	static float s_LastLocalTime = Client()->LocalTime();
 	const float Offset = Pos.y / 32.0f + Pos.x / 32.0f;

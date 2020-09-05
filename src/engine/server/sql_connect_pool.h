@@ -28,19 +28,19 @@ public:
 	void DisconnectConnectionHeap();
 	static CConectionPool& GetInstance();
 
-	// функция просто вставляет данные
+	// simply inserts data
 	void ID(const char *Table, const char *Buffer, ...);
 	void IDS(int Milliseconds, const char *Table, const char *Buffer, ...);
 	
-	// функция просто обновит данные что будут указаны
+	// simply update the data that will be specified
 	void UD(const char *Table, const char *Buffer, ...);
 	void UDS(int Milliseconds, const char *Table, const char *Buffer, ...);
 	
-	// функция просто удаляет данные что будут указаны
+	// simply deletes the data that will be specified
 	void DD(const char *Table, const char *Buffer, ...);
 	void DDS(int Milliseconds, const char *Table, const char *Buffer, ...);
 
-	// функция выборка с бд данных
+	// database extraction function
 	class ResultSet* SD(const char *Select, const char *Table, const char *Buffer = "", ...);
 	void SDT(const char* Select, const char* Table, std::function<void(class ResultSet*)> func, const char* Buffer = "", ...);
 };

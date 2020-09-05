@@ -34,11 +34,11 @@ namespace kurosio
         t.join();
     }
 
-    // вывести от числа процент пример ((100, 10%) = 10)
+    // derive from the number of percent e.g. ((100, 10%) = 10)
     template <typename T>
     inline float translate_to_procent_rest(T count, T procent) { return (((float)count/(float)100.0f)*(float)procent); }
 
-    // прибавить к числу процент пример ((100, 10%) = 110)
+    // add to the number a percentage e.g. ((100, 10%) = 110)
     template <typename T>
     inline float add_procent_to_source(T *count, float procent)
     {
@@ -46,7 +46,7 @@ namespace kurosio
 		return (float)(*count);
     }
 
-    // перевести от первого числа второе в проценты пример ((10, 5) = 50%)
+    // translate from the first to the second in percent e.g. ((10, 5) = 50%)
     template <typename T>
     inline float translate_to_procent(T count, T count2) { return (((float)count2 /(float)count)*(float)100.0f); }
 

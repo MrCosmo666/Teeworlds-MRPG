@@ -31,7 +31,7 @@ void IGameController::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKiller, in
 
 bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 {
-	// если спавним бота
+	// if we spawn the bot
 	if(pChr->GetPlayer()->IsBot())
 	{
 		pChr->IncreaseHealth(pChr->GetPlayer()->GetStartHealth());
@@ -41,7 +41,7 @@ bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 		return true;
 	}
 
-	// ЗДОРОВЬЕ
+	// HEALTH
 	int StartHealth = pChr->GetPlayer()->GetStartHealth();
 	if(pChr->GetPlayer()->GetTempData().TempActiveSafeSpawn == true)
 	{
@@ -54,14 +54,14 @@ bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 		StartHealth = pChr->GetPlayer()->GetTempData().TempHealth;
 	pChr->IncreaseHealth(StartHealth);
 
-	// МАНА
+	// MANA
 	if(pChr->GetPlayer()->GetTempData().TempMana > 0)
 	{
 		const int StartMana = pChr->GetPlayer()->GetTempData().TempMana;
 		pChr->IncreaseMana(StartMana);
 	}
 
-	// ПАТРОНЫ
+	// AMMO
 	const int StartAmmo = 10 + pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo);
 	pChr->GiveWeapon(WEAPON_HAMMER, -1);
 	for(int i = 1; i < NUM_WEAPONS-1; i++)
@@ -75,36 +75,38 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 
 	switch(Index)
 	{
-		case ENTITY_SPAWN:
+	case ENTITY_SPAWN:
 		m_aaSpawnPoints[SpawnTypes::SPAWN_HUMAN][m_aNumSpawnPoints[0]++] = Pos;
 		break;
-		case ENTITY_SPAWN_MOBS:
+	case ENTITY_SPAWN_MOBS:
 		m_aaSpawnPoints[SpawnTypes::SPAWN_BOT][m_aNumSpawnPoints[1]++] = Pos;
 		break;
-		case ENTITY_SPAWN_SAFE:
+	case ENTITY_SPAWN_SAFE:
 		m_aaSpawnPoints[SpawnTypes::SPAWN_HUMAN_SAFE][m_aNumSpawnPoints[2]++] = Pos;
 		break;
-		case ENTITY_ARMOR_1:
+	case ENTITY_ARMOR_1:
 		Type = PICKUP_ARMOR;
 		break;
-		case ENTITY_HEALTH_1:
+	case ENTITY_HEALTH_1:
 		Type = PICKUP_HEALTH;
 		break;
-		case ENTITY_PICKUP_SHOTGUN:
+	case ENTITY_PICKUP_SHOTGUN:
 		Type = PICKUP_SHOTGUN;
 		break;
-		case ENTITY_PICKUP_GRENADE:
+	case ENTITY_PICKUP_GRENADE:
 		Type = PICKUP_GRENADE;
 		break;
-		case ENTITY_PICKUP_LASER:
+	case ENTITY_PICKUP_LASER:
 		Type = PICKUP_LASER;
 		break;
 	}
+
 	if(Type != -1)
 	{
 		new CPickup(&GS()->m_World, Type, Pos);
 		return true;
 	}
+
 	return false;
 }
 
@@ -263,7 +265,7 @@ void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type, vec2 BotPos
 			}
 		}
 		if(Result == -1)
-			continue;	// try next spawn point
+			continue; // try next spawn point
 
 		const vec2 P = m_aaSpawnPoints[Type][i]+Positions[Result];
 		const float S = EvaluateSpawnPos(pEval, P);

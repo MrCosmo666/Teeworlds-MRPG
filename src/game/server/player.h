@@ -163,12 +163,12 @@ public:
 
 	int GetLevelDisciple(int Class, bool SearchClass = false);
 
-	// разговоры с нпс функции
+	// npc conversations
 	void SetTalking(int TalkedID, bool ToProgress);
 	void ClearTalking();
 	int GetTalkedID() const { return m_TalkingNPC.m_TalkedID; };
 
-	// форматирование текста функции
+	// text formatting
 	const char *FormatedTalkedText();
 	void FormatTextQuest(int DataBotID, const char *pText);
 	void ClearFormatQuestText();

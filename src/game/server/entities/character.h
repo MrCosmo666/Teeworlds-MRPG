@@ -17,11 +17,9 @@ class CCharacter : public CEntity
 	class CPlayer *m_pPlayer;
 	class TileHandle *m_pHelper;
 
-	// Ядро неследование этого думаю не потребуется
 	void FireWeapon();
 	bool DecoInteractive();
-
-
+	
 	void HandleWeapons();
 
 	void HandleWeaponSwitch();

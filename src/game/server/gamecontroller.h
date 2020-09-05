@@ -65,7 +65,6 @@ public:
 	void OnPlayerInfoChange(class CPlayer *pPlayer, int WorldID);
 	void OnReset();
 
-	// хуй манал
 	virtual void CreateLogic(int Type, int Mode, vec2 Pos, int Health) = 0;
 	
 	// general

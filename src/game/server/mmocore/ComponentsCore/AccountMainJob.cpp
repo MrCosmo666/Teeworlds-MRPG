@@ -140,7 +140,6 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 200, "You are located {STR} ({STR})", 
 		GS()->Server()->GetWorldName(GS()->GetWorldID()), (GS()->IsAllowedPVP() ? "Zone PVP" : "Safe zone"));
 
-	// поставить муызку если не данж в данже появится музыка после открытия дверей а не по приходу в зону // 0 отправить музыку с CGS::m_MusicID
 	GS()->SendMapMusic(ClientID, (GS()->IsDungeon() ? -1 : 0));
 	if(!FirstInitilize)
 	{
@@ -171,11 +170,10 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		GS()->Chat(ClientID, "Shield around you indicates location of active quest.");
 	}
 	
-	// настройки
+	// settings
 	if(!pPlayer->GetItem(itModePVP).Count)
 		pPlayer->GetItem(itModePVP).Add(1, 1);
 
-	// включить спавн в безопасной зоне
 	pPlayer->GetTempData().TempActiveSafeSpawn = true;
 
 	if(pPlayer->Acc().WorldID != GS()->GetWorldID())
@@ -192,7 +190,6 @@ void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true);
 	if(!pPlayer) return;	
 
-	// переменные
 	CSqlString<64> cDID = CSqlString<64>(pDID);
 	SJK.UD("tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", cDID.cstr(), pPlayer->Acc().AuthID);
 
@@ -223,7 +220,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		return false;
 	}
 
-	// Настройки
+	// settings
 	if (Menulist == MenuList::MENU_SETTINGS)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
@@ -236,7 +233,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 				GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
 		}
 
-		// Снаряжение
+		// Equipment
 		bool FoundSettings = false;
 		GS()->AV(ClientID, "null", "");
 		GS()->AVH(ClientID, TAB_SETTINGS_MODULES, GREEN_COLOR, "Sub items settings.");
@@ -253,7 +250,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 			}
 		}
 
-		// Если не найдены настройки модулей
+		// if no settings are found
 		if (!FoundSettings)
 			GS()->AVM(ClientID, "null", NOPE, TAB_SETTINGS_MODULES, "The list of equipment sub upgrades is empty");
 	
@@ -261,7 +258,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		return true;
 	}
 
-	// Выбор языка
+	// language selection
 	if (Menulist == MenuList::MENU_SELECT_LANGUAGE)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_SETTINGS;
@@ -274,11 +271,11 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		GS()->AVH(ClientID, TAB_LANGUAGES, GRAY_COLOR, "Active language: [{STR}]", pPlayerLanguage);
 		for(int i = 0; i < GS()->Server()->Localization()->m_pLanguages.size(); i++)
 		{
-			// Не показывать в списках выбора язык который выбран уже у игрока
+			// do not show the language already selected by the player in the selection lists
 			if(str_comp(pPlayerLanguage, GS()->Server()->Localization()->m_pLanguages[i]->GetFilename()) == 0)
 				continue;
 
-			// Добавить выбор языка
+			// add language selection
 			const char *pLanguageName = GS()->Server()->Localization()->m_pLanguages[i]->GetName();
 			GS()->AVM(ClientID, "SELECTLANGUAGE", i, TAB_LANGUAGES, "Select language \"{STR}\"", pLanguageName);
 		}

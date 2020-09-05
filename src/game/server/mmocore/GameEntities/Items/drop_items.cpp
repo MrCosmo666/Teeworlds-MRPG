@@ -42,7 +42,7 @@ bool CDropItem::TakeItem(int ClientID)
 	if(!pPlayer || (m_OwnerID >= 0 && m_OwnerID != ClientID))
 		return false;
 
-	// размен зачарованных предметов
+	// change of enchanted objects
 	GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 	ItemJob::InventoryItem &pPlayerDroppedItem = pPlayer->GetItem(m_DropItem.GetID());
 	if(pPlayerDroppedItem.Count > 0 && pPlayerDroppedItem.Info().IsEnchantable())
@@ -54,7 +54,7 @@ bool CDropItem::TakeItem(int ClientID)
 		return true;
 	}
 	
-	// выдача просто предмета
+	// simple subject delivery
 	pPlayerDroppedItem.Add(m_DropItem.Count, 0, m_DropItem.Enchant);
 	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 10, "\0");
 	GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
@@ -117,7 +117,7 @@ void CDropItem::Tick()
 	if(!pChar || pChar->GetPlayer()->IsBot())
 		return;
 
-	// если не зачарованный предмет
+	// if not an enchanted object
 	const ItemJob::InventoryItem pPlayerDroppedItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
 	if(!pPlayerDroppedItem.Info().IsEnchantable())
 	{

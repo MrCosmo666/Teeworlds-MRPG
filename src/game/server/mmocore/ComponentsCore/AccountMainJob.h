@@ -46,12 +46,10 @@ public:
 
 	struct StructTempPlayerData
 	{
-		// ������� ��� �� ����� ��������� �� ���
 		int TempDecoractionID;
 		int TempDecorationType;
 		int TempID3;
 
-		// ��������� ���
 		ShopJob::AuctionSlot SellItem;
 
 		// temp rankname for guild rank settings

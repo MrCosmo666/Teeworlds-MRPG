@@ -12,7 +12,6 @@ using namespace sqlstr;
 std::map < int , SkillJob::StructSkillInformation > SkillJob::SkillData;
 std::map < int , std::map < int , SkillJob::StructSkills > > SkillJob::Skill;
 
-// Инициализация класса
 void SkillJob::OnInit()
 { 
 	SJK.SDT("*", "tw_skills_list", [&](ResultSet* RES)
@@ -169,7 +168,6 @@ void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 		return;
 	}
 
-	// если обычный скилл
 	GS()->AVM(ClientID, "null", NOPE, HideID, "Mana required (-{INT}%)", &SkillData[SkillID].m_ManaProcent);
 	GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", SkillData[SkillID].m_SkillDesc);
 	GS()->AVM(ClientID, "null", NOPE, HideID, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].m_SkillBonusInfo);
@@ -217,14 +215,13 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 	if(!pPlayer || !pPlayer->GetCharacter() || GetSkillLevel(pPlayer->GetCID(), SkillID) <= 0) 
 		return false;
 
-	// проверяем ману
+	// mana check
 	const int SkillProcent = SkillData[SkillID].m_ManaProcent;
 	const int ManaPrice = kurosio::translate_to_procent_rest(pPlayer->GetStartMana(), SkillProcent);
 	CCharacter* pChr = pPlayer->GetCharacter();
 	if(ManaPrice > 0 && pChr->CheckFailMana(ManaPrice))
 		return false;
 
-	// скилл турель здоровья
 	const vec2 PlayerPosition = pChr->GetPos();
 	const int ClientID = pPlayer->GetCID();
 	const int SkillBonus = GetSkillBonus(ClientID, SkillID);
@@ -243,7 +240,6 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 		return true;
 	}
 
-	// скилл турель гравитации
 	if(SkillID == Skill::SkillSleepyGravity)
 	{
 		for(CSleepyGravity *pHh = (CSleepyGravity*)GS()->m_World.FindFirst(CGameWorld::ENTYPE_SLEEPYGRAVITY); pHh; pHh = (CSleepyGravity *)pHh->TypeNext())
@@ -259,14 +255,12 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 		return true;
 	}
 
-	// скилл ноктис телепорт
 	if(SkillID == Skill::SkillNoctisTeleport)
 	{
 		new CNoctisTeleport(&GS()->m_World, PlayerPosition, pChr, SkillBonus);
 		return true;
 	}
 
-	// скилл восстановить патроны
 	if(SkillID == Skill::SkillBlessingGodWar)
 	{
 		for(int i = 0; i < MAX_PLAYERS; i++)

@@ -7,12 +7,11 @@
 #include <game/server/mmocore/GameEntities/jobitems.h>
 
 using namespace sqlstr;
-std::map < int , HouseJob::HouseList > HouseJob::Home;
+std::map <int, HouseJob::HouseList> HouseJob::Home;
 
-// Инициализация класса
 void HouseJob::OnInitWorld(const char* pWhereLocalWorld) 
 {
-	// загрузка домов
+	// load house
 	SJK.SDT("*", "tw_houses", [&](ResultSet* RES)
 	{
 		while(RES->next())
@@ -39,7 +38,7 @@ void HouseJob::OnInitWorld(const char* pWhereLocalWorld)
 		Job()->ShowLoadingProgress("Houses", Home.size());
 	}, pWhereLocalWorld);
 
-	// загружаем декорации
+	// load decoration
 	if(m_DecorationHouse.empty())
 	{
 		SJK.SDT("*", "tw_houses_decorations", [&](ResultSet* DecoRES)
@@ -61,7 +60,6 @@ void HouseJob::OnInitWorld(const char* pWhereLocalWorld)
 /* #########################################################################
 	FUNCTIONS HOUSES PLANTS
 ######################################################################### */
-// Изменить расстения у дома
 void HouseJob::ChangePlantsID(int HouseID, int PlantID)
 {
 	if(Home.find(HouseID) == Home.end())
@@ -76,6 +74,7 @@ void HouseJob::ChangePlantsID(int HouseID, int PlantID)
 			Changes = true;
 		}
 	}
+
 	if(Changes) 
 	{
 		Home[HouseID].m_PlantID = PlantID;
@@ -86,7 +85,6 @@ void HouseJob::ChangePlantsID(int HouseID, int PlantID)
 /* #########################################################################
 	FUNCTIONS HOUSES DECORATION
 ######################################################################### */
-// добавить декорацию для дома
 bool HouseJob::AddDecorationHouse(int DecoID, int HouseID, vec2 Position)
 {
 	if(HouseID <= 0)
@@ -108,7 +106,7 @@ bool HouseJob::AddDecorationHouse(int DecoID, int HouseID, vec2 Position)
 	m_DecorationHouse[InitID] = new CDecorationHouses(&GS()->m_World, Position, HouseID, DecoID);
 	return true;
 }
-// Удалить декорацию
+
 bool HouseJob::DeleteDecorationHouse(int ID)
 {
 	if(m_DecorationHouse.find(ID) != m_DecorationHouse.end())
@@ -124,7 +122,7 @@ bool HouseJob::DeleteDecorationHouse(int ID)
 	}
 	return false;
 }
-// Показать меню декораций
+
 void HouseJob::ShowDecorationList(CPlayer *pPlayer)
 {
 	int HouseID = PlayerHouseID(pPlayer);
@@ -149,14 +147,13 @@ int HouseJob::GetOwnerHouse(int HouseID)
 	return -1;
 }
 
-// Узнать мир где находится дом
 int HouseJob::GetWorldID(int HouseID) const
 {
 	if(Home.find(HouseID) != Home.end())
 		return Home.at(HouseID).m_WorldID;
 	return -1;
 }
-// Получить дом по позиции
+
 int HouseJob::GetHouse(vec2 Pos, bool Plants)
 {
 	float Distance = (Plants ? 300.0f : 128.0f);
@@ -171,7 +168,7 @@ int HouseJob::GetHouse(vec2 Pos, bool Plants)
 	}
 	return -1;
 }
-// Узнать стоимость дома по айди дома
+
 int HouseJob::GetHousePrice(int HouseID) const	
 {	 
 	if(Home.find(HouseID) != Home.end()) 
@@ -179,7 +176,6 @@ int HouseJob::GetHousePrice(int HouseID) const
  	return -1;
 }
 
-// Проверить открыта дверь или нет по айди дома
 bool HouseJob::GetHouseDoor(int HouseID) const	
 {	 
 	if(Home.find(HouseID) != Home.end())	
@@ -189,7 +185,7 @@ bool HouseJob::GetHouseDoor(int HouseID) const
 	}
 	return false;
 }
-// Позиция дома
+
 vec2 HouseJob::GetPositionHouse(int HouseID) const	
 { 	
 	if(Home.find(HouseID) != Home.end()) 
@@ -197,7 +193,7 @@ vec2 HouseJob::GetPositionHouse(int HouseID) const
 
 	return vec2(0, 0);
 }
-// Узнать имеет ли игрок дом
+
 int HouseJob::PlayerHouseID(CPlayer *pPlayer) const
 {
 	for (auto ihome = Home.begin(); ihome != Home.end(); ihome++) {
@@ -206,7 +202,7 @@ int HouseJob::PlayerHouseID(CPlayer *pPlayer) const
 	}
 	return -1;
 }
-// Узнать имеет ли игрок под айди дом
+
 int HouseJob::OwnerHouseID(int AuthID) const
 {
 	for (auto ihome = Home.begin(); ihome != Home.end(); ihome++) {
@@ -215,21 +211,21 @@ int HouseJob::OwnerHouseID(int AuthID) const
 	}
 	return -1;
 }
-// Узнать имеет ли игрок под айди дом
+
 int HouseJob::GetPlantsID(int HouseID) const
 {
 	if(Home.find(HouseID) != Home.end()) 
 		return Home.at(HouseID).m_PlantID;
 	return -1;
 }
-// Класс дома
+
 const char *HouseJob::ClassName(int HouseID) const	
 {	
 	if(Home.find(HouseID) != Home.end()) 
 		return Home.at(HouseID).m_Class; 
 	return "None";
 }
-// Владелец дома
+
 const char *HouseJob::OwnerName(int HouseID) 
 {	
 	if(Home.find(HouseID) != Home.end())
@@ -240,10 +236,8 @@ const char *HouseJob::OwnerName(int HouseID)
 /* #########################################################################
 	FUNCTIONS HOUSES 
 ######################################################################### */
-// Покупка дома
 void HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 {
-	// проверить есть ли дом у игрока
 	const int ClientID = pPlayer->GetCID();
 	if(PlayerHouseID(pPlayer) > 0)
 	{
@@ -251,45 +245,36 @@ void HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 		return;
 	}
 
-	// покупка дома
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("OwnerID, Price", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NULL", HouseID));
 	if(RES->next())
 	{
-		// покупка снятие золота
 		const int Price = RES->getInt("Price");
 		if(pPlayer->CheckFailMoney(Price))	
 			return;
 
-		// обновление информации
 		Home[HouseID].m_Bank = 0;
 		Home[HouseID].m_OwnerID = pPlayer->Acc().AuthID;
 		SJK.UD("tw_houses", "OwnerID = '%d', HouseBank = '0' WHERE ID = '%d'", Home[HouseID].m_OwnerID, HouseID);
 
-		// информация о покупки
 		GS()->Chat(-1, "{STR} becomes the owner of the house class {STR}", GS()->Server()->ClientName(ClientID), Home[HouseID].m_Class);
 		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**{STR} becomes the owner of the house class {STR}**", GS()->Server()->ClientName(ClientID), Home[HouseID].m_Class);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return;
 	}
 
-	// информация что дом уже куплен
 	GS()->Chat(ClientID, "House has already been purchased!");
 }
 
-// Продажа дома
 void HouseJob::SellHouse(int HouseID)
 {
-	// найти и обновить информацию в бд
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("HouseBank, OwnerID", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NOT NULL", HouseID));
 	if(RES->next())
 	{
-		// обновление информации
 		const int OwnerID = RES->getInt("OwnerID");
 		const int Price = Home[HouseID].m_Price + RES->getInt("HouseBank");
 		Job()->Inbox()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itGold, Price, 0);
 		SJK.UD("tw_houses", "OwnerID = NULL, HouseBank = '0' WHERE ID = '%d'", HouseID);
 
-		// информация о продаже
 		const int ClientID = Job()->Account()->CheckOnlineAccount(OwnerID);
 		if(ClientID >= 0)
 		{
@@ -300,12 +285,12 @@ void HouseJob::SellHouse(int HouseID)
 		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**[House: {INT}] have been sold!**", &HouseID);
 	}
 
-	// открыть и освободить дом
 	if(Home[HouseID].m_Door)
 	{
 		delete Home[HouseID].m_Door;
 		Home[HouseID].m_Door = 0;
 	}
+
 	Home[HouseID].m_OwnerID = -1;
 	Home[HouseID].m_Bank = 0;
 }
@@ -367,6 +352,7 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		GS()->AddBack(ClientID);
 		return true;
 	}
+
 	if (Menulist == MenuList::MENU_HOUSE)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
@@ -375,6 +361,7 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		GS()->AddBack(ClientID);
 		return true;
 	}
+
 	if (Menulist == MenuList::MENU_HOUSE_PLANTS)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_HOUSE;
@@ -390,10 +377,10 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		GS()->AddBack(ClientID);
 		return true;
 	}
+
 	return false;
 }
 
-// Снять баланс с фарм счета
 void HouseJob::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
 {
 	const int ClientID = pPlayer->GetCID();
@@ -415,8 +402,6 @@ void HouseJob::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
 	GS()->Chat(ClientID, "You take {INT} gold in the safe {INT}!", &TakeCount, &Home[HouseID].m_Bank);
 }
 
-
-// Добавление баланса
 void HouseJob::AddSafeDeposit(CPlayer *pPlayer, int Balance)
 {
 	const int ClientID = pPlayer->GetCID();
@@ -430,7 +415,6 @@ void HouseJob::AddSafeDeposit(CPlayer *pPlayer, int Balance)
 	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", Home[HouseID].m_Bank, HouseID);
 }
 
-// Действия над дверью
 bool HouseJob::ChangeStateDoor(int HouseID)
 {
 	if(Home.find(HouseID) == Home.end() || Home[HouseID].m_OwnerID <= 0) 
@@ -448,29 +432,23 @@ bool HouseJob::ChangeStateDoor(int HouseID)
 		Home[HouseID].m_Door = 0;
 	}
 	else
-	{
 		Home[HouseID].m_Door = new HouseDoor(&GS()->m_World, vec2(Home[HouseID].m_DoorX, Home[HouseID].m_DoorY));
-	}
 
-	// надпись если найдется игрок
 	const bool StateDoor = (Home[HouseID].m_Door);
 	GS()->ChatAccountID(Home[HouseID].m_OwnerID, "You {STR} the house.", (StateDoor ? "closed" : "opened"));
 	return true;
 }
 
-// Показ меню дома
 void HouseJob::ShowHouseMenu(CPlayer *pPlayer, int HouseID)
 {
 	const int ClientID = pPlayer->GetCID();
 	GS()->AVH(ClientID, TAB_INFO_HOUSE, GREEN_COLOR, "House {INT} . {STR}", &HouseID, Home[HouseID].m_Class);
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE, "Owner House: {STR}", Job()->PlayerName(Home[HouseID].m_OwnerID));
 
-	// показать кол-во Золота у игрока
 	GS()->AV(ClientID, "null", "");
 	GS()->ShowItemValueInformation(pPlayer, itGold);
 	GS()->AV(ClientID, "null", "");
 	
-	// показать основное меню
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	if(Home[HouseID].m_OwnerID <= 0)
 		GS()->AVM(ClientID, "BUYHOUSE", HouseID, NOPE, "Buy this house. Price {INT}gold", &Home[HouseID].m_Price);
@@ -479,7 +457,7 @@ void HouseJob::ShowHouseMenu(CPlayer *pPlayer, int HouseID)
 
 	GS()->AV(ClientID, "null", "");
 }
-// Показ меню дома персонально
+
 void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
@@ -489,6 +467,7 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 		GS()->AVL(ClientID, "null", "You not owner home!");
 		return;
 	}
+
 	const bool StateDoor = GetHouseDoor(HouseID);
 	GS()->AVH(ClientID, TAB_HOUSE_STAT, BLUE_COLOR, "House stats {INT} Class {STR} Door [{STR}]", &HouseID, Home[HouseID].m_Class, StateDoor ? "Closed" : "Opened");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "/doorhouse - interactive with door.");
@@ -516,12 +495,9 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_HOUSE_PLANTS, NOPE, "Settings Plants");
 	}
 	else
-	{
 		GS()->AVM(ClientID, "null", MenuList::MENU_HOUSE_DECORATION, NOPE, "More settings allow, only on house zone");
-	}
 }
 
-// Парсинг голосований
 bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	const int ClientID = pPlayer->GetCID();
@@ -531,7 +507,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		BuyHouse(HouseID, pPlayer);
 		return true;
 	}
-	// переместится домой
+
 	if(PPSTR(CMD, "HSPAWN") == 0)
 	{
 		if(!pPlayer->GetCharacter())
@@ -551,7 +527,6 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		return true;
 	}
 
-	// Продажа дома
 	if (PPSTR(CMD, "HSELL") == 0)
 	{
 		const int HouseID = VoteID;
@@ -566,7 +541,6 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		return true;
 	}
 
-	// Оплата дома
 	if(PPSTR(CMD, "HOUSEADD") == 0)
 	{
 		if(Get < 100)
@@ -583,7 +557,6 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		return true;
 	}
 
-	// Снятие сбережения
 	if(PPSTR(CMD, "HOUSETAKE") == 0)
 	{
 		if(Get < 100)
@@ -597,7 +570,6 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		return true;
 	}
 
-	// Дверь дома
 	if(PPSTR(CMD, "HOUSEDOOR") == 0)
 	{
 		if(ChangeStateDoor(VoteID))
@@ -605,7 +577,6 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		return true;		
 	}
 
-	// начала расстановки декорации
 	if(PPSTR(CMD, "DECOSTART") == 0)
 	{
 		const int HouseID = PlayerHouseID(pPlayer);
@@ -616,7 +587,6 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 			return true;
 		}
 
-		// информация
 		GS()->ClearVotes(ClientID);
 		GS()->AV(ClientID, "null", "Please close vote and press Left Mouse,");
 		GS()->AV(ClientID, "null", "on position where add decoration!");
@@ -628,10 +598,8 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		return true;
 	}
 
-	// декорации
 	if(PPSTR(CMD, "DECODELETE") == 0)
 	{
-		// дом проверка
 		const int HouseID = PlayerHouseID(pPlayer);
 		if(HouseID > 0 && DeleteDecorationHouse(VoteID))
 		{
@@ -643,7 +611,6 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		return true;
 	}
 
-	// смена расстения дома
 	if(PPSTR(CMD, "HOMEPLANTSET") == 0)
 	{
 		const int HouseID = PlayerHouseID(pPlayer);
@@ -679,7 +646,6 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 	return false;
 }
 
-// Двери
 HouseDoor::HouseDoor(CGameWorld *pGameWorld, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_PLAYER_HOUSE_DOOR, Pos)
 {

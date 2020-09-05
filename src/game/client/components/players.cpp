@@ -608,10 +608,8 @@ enum ItemList
 
 void CPlayers::OnInit()
 {
-	// загружаем всю информацию о equip item's
 	/* UNSET */
 	m_aEquipInfo.add({ itScytheHammer, vec4(1.0f, 1.0f, 1.0f, 0.003f), vec2(0,0), vec2(110, 110), 0.0f, SPRITE_MMO_HAMMER_SCYTHE, 0 });
-
 
 	/* SET HEAVEN */
 	m_aEquipInfo.add({ itHeavenlyHammer, vec4(1.0f, 1.0f, 1.0f, 0.003f), vec2(0,0), vec2(100, 100), 0.0f, SPRITE_MMO_HAMMER_HEAVEN, 0 });
@@ -649,7 +647,6 @@ void CPlayers::OnInit()
 
 bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int ClientID)
 {
-	// - - - молоток
 	if (Player.m_Weapon == WEAPON_HAMMER)
 	{
 		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_HAMMER];
@@ -667,7 +664,7 @@ bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAn
 		RenderHammer(pAnim, Angle, Position, pEquipInfo->SpriteID, pEquipInfo->Size.x);
 		return true;
 	}
-	// - - - пистолет
+
 	else if (Player.m_Weapon == WEAPON_GUN)
 	{
 		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_GUN];
@@ -685,7 +682,7 @@ bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAn
 		RenderGun(Player, pAnim, Angle, Position, pEquipInfo->SpriteID);
 		return true;
 	}
-	// - - - шотган
+
 	else if (Player.m_Weapon == WEAPON_SHOTGUN)
 	{
 		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_SHOTGUN];
@@ -703,7 +700,7 @@ bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAn
 		RenderShotgun(Player, pAnim, Angle, Position, pEquipInfo->SpriteID);
 		return true;
 	}
-	// - - - гранаты
+
 	else if (Player.m_Weapon == WEAPON_GRENADE)
 	{
 		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_GRENADE];
@@ -721,7 +718,7 @@ bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAn
 		RenderGrenade(pAnim, Angle, Position, pEquipInfo->SpriteID);
 		return true;
 	}
-	// - - - лазер
+
 	else if (Player.m_Weapon == WEAPON_LASER)
 	{
 		int EquipID = m_pClient->m_aClients[ClientID].m_aEquipItem[EQUIP_RIFLE];
@@ -899,7 +896,6 @@ void CPlayers::RenderWings(const CTeeRenderInfo& RenderInfo, const CNetObj_Chara
 	if (!pEquipInfo || pEquipInfo->SpriteID <= 0)
 		return;
 
-	// - - - - - - - - - - - - - АНИМАЦИИ КРЫЛЬЕВ - - - - - - - - - - - -
 	m_pClient->m_aClients[ClientID].m_AnimWings += 0.59f / Client()->ClientFPS();
 	bool InAir = !Collision()->CheckPoint(Player.m_X, Player.m_Y + 16);
 	int AnimationID = pEquipInfo->AnimationID;
@@ -934,7 +930,6 @@ void CPlayers::RenderWings(const CTeeRenderInfo& RenderInfo, const CNetObj_Chara
 	}
 	pAnimWings->Add(&g_pData->m_aAnimations[AnimationID], m_pClient->m_aClients[ClientID].m_AnimWings, 1.0f);
 	
-	// - - - - - - - - - - - - - РИСУЕМ КРЫЛЬЯ - - - - - - - - - - - - - - - - -
 	bool WingsEnchantItem = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_WINGS];
 	if (g_Config.m_ClShowMEffects != 2 && WingsEnchantItem)
 	{

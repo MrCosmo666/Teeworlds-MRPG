@@ -504,7 +504,7 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 // item icons
 bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect, float Size)
 {
-	// первая загрузка иконок предметов
+	// first loading of icons
 	static bool s_Init = true;
 	if (m_pClient->MmoServer() && s_Init)
 	{
@@ -512,12 +512,12 @@ bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect, float Size)
 		s_Init = false;
 	}
 
-	// форматируем под иконку предмета
+	// formatted as an object icon
 	char aNameBuf[128];
 	str_format(aNameBuf, sizeof(aNameBuf), "icon_%s", pItem);
 	str_sanitize_filename(aNameBuf);
 
-	// ищим иконку предмета
+	// looking for an object icon
 	bool IconFound = false;
 	IGraphics::CTextureHandle Tex;
 	for (int i = 0; i < m_lItemIcons.size(); ++i)
@@ -530,7 +530,7 @@ bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect, float Size)
 		}
 	}
 
-	// рисуем иконку предмета
+	// draw an icon of an object
 	if (IconFound)
 	{
 		// draw icon
@@ -545,11 +545,10 @@ bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect, float Size)
 		Graphics()->QuadsEnd();
 	}
 
-	// возращаем результат
 	return IconFound;
 }
 
-// сканируем ищем иконки предметов
+// scanning for object icons
 int CMenus::ItemIconScan(const char *pName, int IsDir, int DirType, void *pUser)
 {
 	CMenus *pSelf = (CMenus *)pUser;
@@ -566,7 +565,7 @@ int CMenus::ItemIconScan(const char *pName, int IsDir, int DirType, void *pUser)
 	char aBuf[512];
 	str_format(aBuf, sizeof(aBuf), "mmotee/itemicons/%s", pName);
 
-	// загружаем иконки
+	// load icons
 	CImageInfo Info;
 	if (!pSelf->Graphics()->LoadPNG(&Info, aBuf, DirType) || Info.m_Width != CItemIcon::ITEMICON_SIZE || (Info.m_Height != CItemIcon::ITEMICON_SIZE && Info.m_Height != CItemIcon::ITEMICON_OLDHEIGHT))
 	{
@@ -575,18 +574,18 @@ int CMenus::ItemIconScan(const char *pName, int IsDir, int DirType, void *pUser)
 		return 0;
 	}
 
-	// выводим в консоль
+	// output to console
 	CItemIcon ItemIcon(aItemIconName);
 	str_format(aBuf, sizeof(aBuf), "loaded item icon '%s'", aItemIconName);
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "game", aBuf);
 
-	// устанавливаем и добовляем предмет в массив
+	// install and add the object to the array
 	ItemIcon.m_IconTexture = pSelf->Graphics()->LoadTextureRaw(CItemIcon::ITEMICON_SIZE, CItemIcon::ITEMICON_SIZE, Info.m_Format, Info.m_pData, Info.m_Format, IGraphics::TEXLOAD_LINEARMIPMAPS);
 	pSelf->m_lItemIcons.add(ItemIcon);
 	return 0;
 }
 
-// Рисуем контроль панель
+// draw control panel
 bool CMenus::RenderServerControlServer(CUIRect MainView)
 {
 	static CListBox s_ListBox;
@@ -991,7 +990,6 @@ void CMenus::RenderServerControlMRPG(CUIRect MainView)
 	if (m_pClient->m_LocalClientID == -1)
 		return;
 
-	// затемнить и чуть обрезать
 	MainView.HSplitBottom(80.0f, &MainView, 0);
 	RenderTools()->DrawUIRect(&MainView, vec4(0.0f, 0.0f, 0.0f, 0.60f), CUI::CORNER_ALL, 5.0f);
 
@@ -1001,13 +999,12 @@ void CMenus::RenderServerControlMRPG(CUIRect MainView)
 	RenderTools()->DrawUIRect(&Extended, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
 	bool doCallVote = RenderServerControlServer(MainView) && m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team != TEAM_SPECTATORS;
 
-	// нижняя граница
+	// lower bottom
 	Extended.Margin(5.0f, &Extended);
 	Extended.HSplitTop(20.0f, &Bottom, &Extended);
 	{
 		CUIRect Reason, Search, Label;
 
-		// - - - - - - - - - - ПОИСК - - - - - - - - - -
 		Bottom.VSplitLeft(15.0f, 0, &Bottom);
 		Bottom.VSplitLeft(260.0f, &Search, &Bottom);
 
@@ -1020,7 +1017,6 @@ void CMenus::RenderServerControlMRPG(CUIRect MainView)
 		if (DoEditBox(&m_aFilterString, &Search, m_aFilterString, sizeof(m_aFilterString), Search.h * ms_FontmodHeight * 0.8f, &s_SearchOffset))
 			m_CallvoteSelectedOption = 0;
 
-		// - - - - - - - - - - ИНТЕРАКТИВЫ - - - - - - - - - -
 		Bottom.VSplitLeft(30.0f, 0, &Bottom);
 		Bottom.VSplitLeft(260.0f, &Reason, &Bottom);
 		const char* pReasonLabel = Localize("Interaction:");
@@ -1031,7 +1027,6 @@ void CMenus::RenderServerControlMRPG(CUIRect MainView)
 		static float s_ReasonOffset = 0.0f;
 		DoEditBox(&m_aCallvoteReason, &Reason, m_aCallvoteReason, sizeof(m_aCallvoteReason), Reason.h * ms_FontmodHeight * 0.8f, &s_ReasonOffset, false, CUI::CORNER_ALL);
 
-		// - - - - - - - - - - ГОЛОСОВАНИЯ - - - - - - - - - -
 		Bottom.VSplitLeft(15.0f, 0, &Bottom);
 		Bottom.VSplitLeft(110.0f, &Button, &Bottom);
 		static CButtonContainer s_CallVoteButton;

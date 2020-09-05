@@ -26,7 +26,7 @@ m_pPluralRules(nullptr), m_pValueFormater(nullptr), m_pNumberFormater(nullptr), 
 	str_copy(m_aFilename, pFilename, sizeof(m_aFilename));
 	str_copy(m_aParentFilename, pParentFilename, sizeof(m_aParentFilename));
 	
-	// - - - - - ИНИЦИАЛИЗИРУЕМ ФОРМАТИРОВАНИЯ ICU
+	// - - - - - INITIALIZE ICU FORMATTING
 	UErrorCode Status;
 	Status = U_ZERO_ERROR;
 	m_pValueFormater = unum_open(UNUM_DECIMAL_COMPACT_SHORT, nullptr, -1, m_aFilename, nullptr, &Status);
@@ -40,7 +40,7 @@ m_pPluralRules(nullptr), m_pValueFormater(nullptr), m_pNumberFormater(nullptr), 
 		dbg_msg("Localization", "Can't create value formater for %s (error #%d)", m_aFilename, Status);
 	}	
 
-	// - - - - - ИНИЦИАЛИЗИРУЕМ ФОРМАТИРОВАНИЯ ICU
+	// - - - - - INITIALIZE ICU FORMATTING
 	Status = U_ZERO_ERROR;
 	m_pNumberFormater = unum_open(UNUM_DECIMAL, nullptr, -1, m_aFilename, nullptr, &Status);
 	if(U_FAILURE(Status))
@@ -53,7 +53,7 @@ m_pPluralRules(nullptr), m_pValueFormater(nullptr), m_pNumberFormater(nullptr), 
 		dbg_msg("Localization", "Can't create number formater for %s (error #%d)", m_aFilename, Status);
 	}
 
-	// - - - - - ИНИЦИАЛИЗИРУЕМ ФОРМАТИРОВАНИЯ ICU
+	// - - - - - INITIALIZE ICU FORMATTING
 	Status = U_ZERO_ERROR;
 	m_pPercentFormater = unum_open(UNUM_PERCENT, nullptr, -1, m_aFilename, nullptr, &Status);
 	if(U_FAILURE(Status))
@@ -66,7 +66,7 @@ m_pPluralRules(nullptr), m_pValueFormater(nullptr), m_pNumberFormater(nullptr), 
 		dbg_msg("Localization", "Can't create percent formater for %s (error #%d)", m_aFilename, Status);
 	}
 	
-	// - - - - - ИНИЦИАЛИЗИРУЕМ ФОРМАТИРОВАНИЯ ICU
+	// - - - - - INITIALIZE ICU FORMATTING
 	Status = U_ZERO_ERROR;
 	m_pPluralRules = uplrules_openForType(m_aFilename, UPLURAL_TYPE_CARDINAL, &Status);
 	if(U_FAILURE(Status))
@@ -154,7 +154,7 @@ bool CLocalization::CLanguage::Load(CLocalization* pLocalization, CStorage* pSto
 				}
 				else
 				{
-					//Zero
+					// zero
 					const char* pPlural = rStart[i]["zero"];
 					if(pPlural && pPlural[PLURALTYPE_ZERO])
 					{
@@ -162,7 +162,8 @@ bool CLocalization::CLanguage::Load(CLocalization* pLocalization, CStorage* pSto
 						pEntry->m_apVersions[PLURALTYPE_ZERO] = new char[Length];
 						str_copy(pEntry->m_apVersions[PLURALTYPE_ZERO], pPlural, Length);
 					}
-					//One
+
+					// one
 					pPlural = rStart[i]["one"];
 					if(pPlural && pPlural[PLURALTYPE_ONE])
 					{
@@ -170,7 +171,8 @@ bool CLocalization::CLanguage::Load(CLocalization* pLocalization, CStorage* pSto
 						pEntry->m_apVersions[PLURALTYPE_ONE] = new char[Length];
 						str_copy(pEntry->m_apVersions[PLURALTYPE_ONE], pPlural, Length);
 					}
-					//Two
+
+					// two
 					pPlural = rStart[i]["two"];
 					if(pPlural && pPlural[PLURALTYPE_TWO])
 					{
@@ -178,7 +180,8 @@ bool CLocalization::CLanguage::Load(CLocalization* pLocalization, CStorage* pSto
 						pEntry->m_apVersions[PLURALTYPE_TWO] = new char[Length];
 						str_copy(pEntry->m_apVersions[PLURALTYPE_TWO], pPlural, Length);
 					}
-					//Few
+
+					// few
 					pPlural = rStart[i]["few"];
 					if(pPlural && pPlural[PLURALTYPE_FEW])
 					{
@@ -186,7 +189,8 @@ bool CLocalization::CLanguage::Load(CLocalization* pLocalization, CStorage* pSto
 						pEntry->m_apVersions[PLURALTYPE_FEW] = new char[Length];
 						str_copy(pEntry->m_apVersions[PLURALTYPE_FEW], pPlural, Length);
 					}
-					//Many
+
+					// many
 					pPlural = rStart[i]["many"];
 					if(pPlural && pPlural[PLURALTYPE_MANY])
 					{
@@ -194,7 +198,8 @@ bool CLocalization::CLanguage::Load(CLocalization* pLocalization, CStorage* pSto
 						pEntry->m_apVersions[PLURALTYPE_MANY] = new char[Length];
 						str_copy(pEntry->m_apVersions[PLURALTYPE_MANY], pPlural, Length);
 					}
-					//Other
+
+					// other
 					pPlural = rStart[i]["other"];
 					if(pPlural && pPlural[PLURALTYPE_OTHER])
 					{
@@ -238,19 +243,19 @@ const char* CLocalization::CLanguage::Localize_P(int Number, const char* pText) 
 	
 	int PluralCode = PLURALTYPE_NONE;
 	
-	if(aPluralKeyWord[0] == 0x007A) //z
+	if(aPluralKeyWord[0] == 0x007A) // z
 		PluralCode = PLURALTYPE_ZERO;
-	else if(aPluralKeyWord[0] == 0x0074) //t
+	else if(aPluralKeyWord[0] == 0x0074) // t
 		PluralCode = PLURALTYPE_TWO;
-	else if(aPluralKeyWord[0] == 0x0066) //f
+	else if(aPluralKeyWord[0] == 0x0066) // f
 		PluralCode = PLURALTYPE_FEW;
-	else if(aPluralKeyWord[0] == 0x006D) //m
+	else if(aPluralKeyWord[0] == 0x006D) // m
 		PluralCode = PLURALTYPE_MANY;
-	else if(aPluralKeyWord[0] == 0x006F) //o
+	else if(aPluralKeyWord[0] == 0x006F) // o
 	{
-		if(aPluralKeyWord[1] == 0x0074) //t
+		if(aPluralKeyWord[1] == 0x0074) // t
 			PluralCode = PLURALTYPE_OTHER;
-		else if(aPluralKeyWord[1] == 0x006E) //n
+		else if(aPluralKeyWord[1] == 0x006E) // n
 			PluralCode = PLURALTYPE_ONE;
 	}
 	
@@ -314,7 +319,7 @@ bool CLocalization::Init()
 	if(pJsonData == nullptr)
 	{
 		delete[] pFileData;
-		return true; //return true because it's not a critical error
+		return true; // return true because it's not a critical error
 	}
 
 	// extract data
@@ -466,7 +471,7 @@ void CLocalization::AppendNumber(dynamic_string& Buffer, int& BufferIter, CLangu
 		BufferIter = Buffer.append_at(BufferIter, "_NUMBER_");
 	else
 	{
-		//Update buffer size
+		// update buffer size
 		const int SrcLength = u_strlen(aBufUtf16);
 		const int NeededSize = UCNV_GET_MAX_BYTES_FOR_STRING(SrcLength, ucnv_getMaxCharSize(m_pUtf8Converter));
 		
@@ -491,7 +496,7 @@ void CLocalization::AppendValue(dynamic_string& Buffer, int& BufferIter, CLangua
 		BufferIter = Buffer.append_at(BufferIter, "_VALUE_");
 	else
 	{
-		//Update buffer size
+		// update buffer size
 		const int SrcLength = u_strlen(aBufUtf16);
 		const int NeededSize = UCNV_GET_MAX_BYTES_FOR_STRING(SrcLength, ucnv_getMaxCharSize(m_pUtf8Converter));
 		
@@ -516,7 +521,7 @@ void CLocalization::AppendPercent(dynamic_string& Buffer, int& BufferIter, CLang
 		BufferIter = Buffer.append_at(BufferIter, "_PERCENT_");
 	else
 	{
-		//Update buffer size
+		// update buffer size
 		const int SrcLength = u_strlen(aBufUtf16);
 		const int NeededSize = UCNV_GET_MAX_BYTES_FOR_STRING(SrcLength, ucnv_getMaxCharSize(m_pUtf8Converter));
 		
@@ -545,26 +550,27 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 			break;
 		}
 	}
+	
 	if(!pLanguage)
 	{
 		Buffer.append(pText);
 		return;
 	}
 	
-	// параметры начала конца строки имени и типа
+	// start parameters of the end of the name and type string
 	const int BufferStart = Buffer.length();
 	int BufferIter = BufferStart;
 	int ParamTypeStart = -1;
 
-	// парсинг аргументов
+	// argument parsing
 	va_list VarArgsIter;
 	va_copy(VarArgsIter, VarArgs);
 
-	// позиции символов
+	// character positions
 	int Iter = 0;
 	int Start = 0;
 
-	// парсим текст для поиска позиций
+	// parse text to search for positions
 	while(pText[Iter])
 	{
 		if(ParamTypeStart >= 0)
@@ -575,7 +581,7 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 				continue;
 			}
 
-			// получаем данные с аргумента парсим аргументы
+			// we get data from an argument parsing arguments
 			const void* pVarArgValue = va_arg(VarArgsIter, const void*);
 			if(str_comp_num("STR", pText + ParamTypeStart, 3) == 0)
 			{
@@ -602,7 +608,7 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 			ParamTypeStart = -1;
 		}
 
-		// начала парсинга параметра
+		// parameter parsing start
 		else
 		{
 			if(pText[Iter] == '{')
@@ -616,7 +622,7 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 		Iter = str_utf8_forward(pText, Iter);
 	}
 
-	// завершаем макрос аргументов
+	// close the argument macro
 	va_end(VarArgsIter);
 
 	if(Iter > 0 && ParamTypeStart == -1)
