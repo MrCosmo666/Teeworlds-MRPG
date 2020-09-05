@@ -64,14 +64,16 @@ void CMenus::RenderSettingsMmo(CUIRect MainView)
 
 	// draw information
 	MainView.HSplitTop(400.0f, &MainView, &Label);
-	const char* Information[TAB_SIZE] = { 
-											"Setting up the general part of the client",
-											"Setting up the visual part of the client",
-											"Features of the Gamer Client (Dune)",
-											"Information & Credits" 
-										};
-	UI()->DoLabel(&Label, Information[s_SettingsPage], 14.0f, CUI::ALIGN_CENTER);
 	RenderSettingsMmoGeneral(MainView, s_SettingsPage);
+
+	const char* apInformation[TAB_SIZE] = {
+		"Setting up the general part of the client",
+		"Setting up the visual part of the client",
+		"Features of the Gamer Client (Dune)",
+		"Information & Credits"
+	};
+	Label.HSplitTop(10.0f, 0, &Label);
+	UI()->DoLabel(&Label, apInformation[s_SettingsPage], 14.0f, CUI::ALIGN_CENTER);
 }
 
 void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
@@ -141,8 +143,10 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		DoScrollbarOption(&g_Config.m_ClDialogsSpeedNPC, &g_Config.m_ClDialogsSpeedNPC, &Button, Localize("Dialogs speed with NPC (MRPG)"), 50, 100, &LogarithmicScrollbarScale);
 	}
 	// visual
-	else if(Page == 1)
+	else if (Page == 1)
+	{
 		RenderMmoSettingsTexture(MainView, MainView);
+	}
 	// gamer dune
 	else if(Page == 2)
 	{
@@ -159,7 +163,23 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 	}
 	// information
 	else if (Page == 3)
-		UI()->DoLabel(&MainView, "Uses open source client codes:\n*Teeworlds by (Teeworlds team)\n*DDRaceNetwork Client by (DDNet team)\n*Gamer Client by (Dune)\n*MRPG Client by (Kurosio)", 16.0f, CUI::ALIGN_LEFT);
+	{
+		UI()->DoLabel(&MainView, Localize("MRPG Credits"), 14.0f, CUI::ALIGN_CENTER);
+
+		MainView.HSplitTop(ButtonHeight, 0, &MainView);
+		MainView.VMargin(Spacing * 2.0f, &MainView);
+		RenderTools()->DrawUIRect(&MainView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), CUI::CORNER_ALL, 5.0f);
+
+		MainView.Margin(5.0f, &MainView);
+		UI()->DoLabel(&MainView, "Contains code of the following projects:", 16.0f, CUI::ALIGN_CENTER); MainView.HSplitTop(20.0f, 0, &MainView);
+		UI()->DoLabel(&MainView, "Teeworlds by the Teeworlds team", 12.0f, CUI::ALIGN_CENTER); MainView.HSplitTop(16.0f, 0, &MainView);
+		UI()->DoLabel(&MainView, "DDRaceNetwork Client by the DDNet team", 12.0f, CUI::ALIGN_CENTER); MainView.HSplitTop(16.0f, 0, &MainView);
+		UI()->DoLabel(&MainView, "Gamer Client by Dune", 12.0f, CUI::ALIGN_CENTER); MainView.HSplitTop(16.0f, 0, &MainView);
+		UI()->DoLabel(&MainView, "MRPG Client by Kurosio", 12.0f, CUI::ALIGN_CENTER); MainView.HSplitTop(16.0f, 0, &MainView);
+
+		MainView.HSplitTop(40.0f, 0, &MainView);
+		UI()->DoLabel(&MainView, "Discord: https://mrpg.teeworlds.dev", 12.0f, CUI::ALIGN_CENTER); MainView.HSplitTop(16.0f, 0, &MainView);
+	}
 }
 
 void CMenus::RenderSettingsMmoChangerGeneric(CUIRect MainView, CCSkinChanger::CTextureEntity* pEntities, char* pConfigStr, const char* pLabel, int ItemsPerRow, float Ratio)
