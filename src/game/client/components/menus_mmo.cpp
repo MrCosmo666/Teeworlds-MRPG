@@ -114,6 +114,13 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		if(DoButton_CheckBox(&s_ButtonMmoEffects, Localize("Disable effects (MRPG)"), g_Config.m_ClShowMEffects, &Button))
 			g_Config.m_ClShowMEffects ^= 1;
 
+		// chat highlight notify window
+		BasicLeft.HSplitTop(25.0f, 0, &BasicLeft);
+		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
+		static int s_ButtonChatNotifyWindow = 0;
+		if (DoButton_CheckBox(&s_ButtonChatNotifyWindow, Localize("Notify window on chat highlight"), g_Config.m_ClNotifyWindow, &Button))
+			g_Config.m_ClNotifyWindow ^= 1;
+
 		// --------------------- RIGHT SIDE --------------------------
 		UI()->DoLabel(&BasicRight, "Customize", 12.0f, CUI::ALIGN_CENTER);
 		BasicRight.HSplitTop(14.0f, &Button, &BasicRight);

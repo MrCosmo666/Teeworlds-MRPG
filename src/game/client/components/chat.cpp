@@ -724,6 +724,7 @@ void CChat::AddLine(const char* pLine, int ClientID, int Mode, int TargetID)
 			{
 				m_pClient->m_pSounds->Play(CSounds::CHN_GUI, SOUND_CHAT_HIGHLIGHT, 0);
 				m_aLastSoundPlayed[CHAT_HIGHLIGHT] = Now;
+				Client()->NotifyWindow();
 			}
 		}
 		else

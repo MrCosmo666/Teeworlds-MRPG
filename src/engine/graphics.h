@@ -181,11 +181,12 @@ public:
 	virtual void Swap() = 0;
 	virtual int GetNumScreens() const = 0;
 
-
 	// syncronization
 	virtual void InsertSignal(class semaphore *pSemaphore) = 0;
 	virtual bool IsIdle() const = 0;
 	virtual void WaitForIdle() = 0;
+
+	virtual void NotifyWindow() = 0;
 
 protected:
 	inline CTextureHandle CreateTextureHandle(int Index)

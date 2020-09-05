@@ -183,6 +183,9 @@ MACRO_CONFIG_INT(SvMySqlMaxPool, sv_sql_maxpool, 30, 20, 100, CFGFLAG_SERVER, "M
 MACRO_CONFIG_INT(SvLoltextHspace, sv_loltext_hspace, 7, 7, 25, CFGFLAG_SERVER, "horizontal offset between loltext 'pixels'")
 MACRO_CONFIG_INT(SvLoltextVspace, sv_loltext_vspace, 7, 7, 25, CFGFLAG_SERVER, "vertical offset between loltext 'pixels'")
 
+// ui
+MACRO_CONFIG_INT(ClNotifyWindow, cl_notify_window, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Allow client to notify you on chat highlights")
+
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
 MACRO_CONFIG_INT(DbgDummies, dbg_dummies, 0, 0, MAX_CLIENTS - 1, CFGFLAG_SERVER, "")

@@ -2854,3 +2854,11 @@ int main(int argc, const char** argv) // ignore_convention
 
 	return 0;
 }
+
+void CClient::NotifyWindow()
+{
+	if (m_pGraphics->WindowActive() || !g_Config.m_ClNotifyWindow)
+		return;
+
+	Graphics()->NotifyWindow();
+}

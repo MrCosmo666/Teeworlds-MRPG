@@ -163,6 +163,10 @@ public:
 	virtual bool ConnectionProblems() const = 0;
 
 	virtual bool SoundInitFailed() const = 0;
+
+	// mrpg
+public:
+	virtual void NotifyWindow() = 0;
 };
 
 class IGameClient : public IInterface
