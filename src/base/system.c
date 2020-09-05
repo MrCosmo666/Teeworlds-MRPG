@@ -2843,6 +2843,21 @@ void uint_to_bytes_be(unsigned char* bytes, unsigned value)
 	bytes[3] = value & 0xff;
 }
 
+int open_link(const char* link)
+{
+	char aBuf[512];
+#if defined(CONF_FAMILY_WINDOWS)
+	str_format(aBuf, sizeof(aBuf), "start %s", link);
+	return (uintptr_t)ShellExecuteA(NULL, "open", link, NULL, NULL, SW_SHOWDEFAULT) > 32;
+#elif defined(CONF_PLATFORM_LINUX)
+	str_format(aBuf, sizeof(aBuf), "xdg-open %s >/dev/null 2>&1 &", link);
+	return system(aBuf) == 0;
+#elif defined(CONF_FAMILY_UNIX)
+	str_format(aBuf, sizeof(aBuf), "open %s &", link);
+	return system(aBuf) == 0;
+#endif
+}
+
 #if defined(__cplusplus)
 }
 #endif

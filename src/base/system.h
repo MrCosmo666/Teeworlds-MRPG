@@ -1678,6 +1678,21 @@ unsigned bytes_be_to_uint(const unsigned char* bytes);
 */
 void uint_to_bytes_be(unsigned char* bytes, unsigned value);
 
+/*
+	Function: open_link
+		Opens a link in the browser.
+
+	Parameters:
+		link - The link to open in a browser.
+
+	Returns:
+		Returns 1 on success, 0 on failure.
+
+	Remarks:
+		This may not be called with untrusted input or it'll result in arbitrary code execution.
+*/
+int open_link(const char* link);
+
 #ifdef __cplusplus
 }
 #endif

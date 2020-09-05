@@ -178,7 +178,27 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		UI()->DoLabel(&MainView, "MRPG Client by Kurosio", 12.0f, CUI::ALIGN_CENTER); MainView.HSplitTop(16.0f, 0, &MainView);
 
 		MainView.HSplitTop(40.0f, 0, &MainView);
-		UI()->DoLabel(&MainView, "Discord: https://mrpg.teeworlds.dev", 12.0f, CUI::ALIGN_CENTER); MainView.HSplitTop(16.0f, 0, &MainView);
+		UI()->DoLabel(&MainView, "Discord:", 12.0f, CUI::ALIGN_CENTER); MainView.HSplitTop(16.0f, 0, &MainView);
+
+		// discord url
+		CUIRect DiscordLink;
+		static CButtonContainer s_ButtonDiscord;
+		MainView.HSplitTop(16.0f, &DiscordLink, &MainView);
+		const char* pURL = "https://mrpg.teeworlds.dev";
+		float TextWidth = TextRender()->TextWidth(0, 12.0f, pURL, -1, -1);
+		DiscordLink.x = DiscordLink.x + (DiscordLink.w / 2.0f) - (TextWidth / 2.0f);
+		DiscordLink.w = TextWidth;
+
+		TextRender()->TextColor(51.0f / 255.0f, 122.0f / 255.0f, 183.0f / 255.0f, 1.0f);
+		if (UI()->MouseInside(&DiscordLink))
+		{
+			if(UI()->DoButtonLogic(s_ButtonDiscord.GetID(), &DiscordLink))
+				open_link(pURL);
+
+			TextRender()->TextColor(91.0f / 255.0f, 192.0f / 255.0f, 222.0f / 255.0f, 1.0f);
+		}
+		UI()->DoLabel(&DiscordLink, pURL, 12.0f, CUI::ALIGN_LEFT);
+		TextRender()->TextColor(CUI::ms_DefaultTextColor);
 	}
 }
 
