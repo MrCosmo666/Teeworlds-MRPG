@@ -1526,30 +1526,23 @@ void CMenus::RenderServerbrowserSidebar(CUIRect View)
 	// header
 	View.HSplitTop(GetListHeaderHeight(), &Header, &View);
 	float Width = Header.w;
-	Header.VSplitLeft(Width*(0.30f + 0.30f*(g_Config.m_ClGBrowser == 2)), &Button, &Header);
+	Header.VSplitLeft(Width*0.30f, &Button, &Header);
 	static CButtonContainer s_TabInfo;
 	if(DoButton_SpriteID(&s_TabInfo, IMAGE_SIDEBARICONS, m_SidebarTab != SIDEBAR_TAB_INFO ? SPRITE_SIDEBAR_INFO_A : SPRITE_SIDEBAR_INFO_B, m_SidebarTab == SIDEBAR_TAB_INFO, &Button, CUI::CORNER_TL, 5.0f, true))
 	{
 		m_SidebarTab = SIDEBAR_TAB_INFO;
 	}
 	Header.VSplitLeft(Width*0.30f, &Button, &Header);
-	if (g_Config.m_ClGBrowser != 2)
+	static CButtonContainer s_TabFilter;
+	if(DoButton_SpriteID(&s_TabFilter, IMAGE_SIDEBARICONS, m_SidebarTab != SIDEBAR_TAB_FILTER ? SPRITE_SIDEBAR_FILTER_A : SPRITE_SIDEBAR_FILTER_B, m_SidebarTab == SIDEBAR_TAB_FILTER, &Button, 0, 0.0f, true))
 	{
-		Header.VSplitLeft(Width*0.30f, &Button, &Header);
-		static CButtonContainer s_TabFilter;
-		if(DoButton_SpriteID(&s_TabFilter, IMAGE_SIDEBARICONS, m_SidebarTab != SIDEBAR_TAB_FILTER ? SPRITE_SIDEBAR_FILTER_A : SPRITE_SIDEBAR_FILTER_B, m_SidebarTab == SIDEBAR_TAB_FILTER, &Button, 0, 0.0f, true))
-		{
-			m_SidebarTab = SIDEBAR_TAB_FILTER;
-		}
+		m_SidebarTab = SIDEBAR_TAB_FILTER;
 	}
 	static CButtonContainer s_TabFriends;
 	if(DoButton_SpriteID(&s_TabFriends, IMAGE_SIDEBARICONS, m_SidebarTab != SIDEBAR_TAB_FRIEND ? SPRITE_SIDEBAR_FRIEND_A : SPRITE_SIDEBAR_FRIEND_B, m_SidebarTab == SIDEBAR_TAB_FRIEND, &Header, CUI::CORNER_TR, 5.0f, true))
 	{
 		m_SidebarTab = SIDEBAR_TAB_FRIEND;
 	}
-
-	if (g_Config.m_ClGBrowser == 2 && m_SidebarTab == 1)
-		m_SidebarTab = 2;
 
 	// tabs
 	switch(m_SidebarTab)
@@ -2511,12 +2504,6 @@ void CMenus::RenderServerbrowser(CUIRect MainView)
 	MainView.HSplitBottom(80.0f, &MainView, &BottomBox);
 	MainView.VSplitRight(20.0f, &ServerList, &SidebarButton);
 
-	if (g_Config.m_ClGBrowser == 2)
-	{
-		MainView.VSplitRight(150.0f, &MainView, &Filterbar);
-		MainView.VSplitRight(30.0f, &MainView, 0); // Margin
-	}
-
 	if(m_SidebarActive)
 		ServerList.VSplitRight(150.0f, &ServerList, &Sidebar);
 
@@ -2526,8 +2513,6 @@ void CMenus::RenderServerbrowser(CUIRect MainView)
 	// sidebar
 	if(m_SidebarActive)
 		RenderServerbrowserSidebar(Sidebar);
-	if (g_Config.m_ClGBrowser == 2)
-		RenderServerbrowserFilterbar(Filterbar);
 
 	// sidebar button
 	SidebarButton.HMargin(150.0f, &SidebarButton);
