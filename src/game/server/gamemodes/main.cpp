@@ -46,14 +46,15 @@ bool CGameControllerMain::OnEntity(int Index, vec2 Pos)
 		new CNPCWall(&GS()->m_World, Pos, false);
 		return true;
 	}
+
 	if(Index == ENTITY_NPC_WALLLEFT)
 	{
 		new CNPCWall(&GS()->m_World, Pos, true);
 		return true;
 	}
+
 	if(Index == ENTITY_PLANTS)
 	{
-		// домашние расстения
 		const int HouseID = GS()->Mmo()->House()->GetHouse(Pos, true);
 		const int PlantsID = GS()->Mmo()->House()->GetPlantsID(HouseID);
 		if(HouseID > 0 && PlantsID > 0)
@@ -61,13 +62,14 @@ bool CGameControllerMain::OnEntity(int Index, vec2 Pos)
 			new CJobItems(&GS()->m_World, PlantsID, 1, Pos, 0, 100, HouseID);
 			return true;
 		}
-		// расстения по миру
+
 		const int ItemID = GS()->Mmo()->PlantsAcc()->GetPlantItemID(Pos), Level = GS()->Mmo()->PlantsAcc()->GetPlantLevel(Pos);
 		if(ItemID > 0)
 			new CJobItems(&GS()->m_World, ItemID, Level, Pos, 0, 100);
 	
 		return true;
 	}
+
 	if(Index == ENTITY_MINER)
 	{
 		const int ItemID = GS()->Mmo()->MinerAcc()->GetOreItemID(Pos), Level = GS()->Mmo()->MinerAcc()->GetOreLevel(Pos);
@@ -76,7 +78,9 @@ bool CGameControllerMain::OnEntity(int Index, vec2 Pos)
 			const int Health = GS()->Mmo()->MinerAcc()->GetOreHealth(Pos);
 			new CJobItems(&GS()->m_World, ItemID, Level, Pos, 1, Health);
 		}
+
 		return true;
 	}
+
 	return false;
 }

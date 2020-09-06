@@ -36,7 +36,6 @@ CPlayer::~CPlayer()
 /* #########################################################################
 	FUNCTIONS PLAYER ENGINE 
 ######################################################################### */
-// Тик игрока
 void CPlayer::Tick()
 {
 	if (!Server()->ClientIngame(m_ClientID))
@@ -45,7 +44,6 @@ void CPlayer::Tick()
 	if(!m_pCharacter && GetTeam() == TEAM_SPECTATORS)
 		m_ViewPos -= vec2(clamp(m_ViewPos.x - m_LatestActivity.m_TargetX, -500.0f, 500.0f), clamp(m_ViewPos.y - m_LatestActivity.m_TargetY, -400.0f, 400.0f));
 
-	// # # # # # ДАЛЬШЕ АВТОРИЗОВАННЫМ # # # # # #
 	if(!IsAuthed())
 		return;
 
@@ -108,7 +106,6 @@ void CPlayer::PotionsTick()
 	}	
 }
 
-// Пост тик
 void CPlayer::PostTick()
 {
 	// update latency value
@@ -116,7 +113,6 @@ void CPlayer::PostTick()
 		GetTempData().TempLatencyPing = (short)m_Latency.m_Min;
 }
 
-// Тик авторизированного в ::Tick
 void CPlayer::TickOnlinePlayer()
 {
 	TickSystemTalk();
@@ -132,7 +128,6 @@ void CPlayer::TickSystemTalk()
 		ClearTalking();
 }
 
-// Персональный тюннинг игрока
 void CPlayer::HandleTuningParams()
 {
 	if(!(m_PrevTuningParams == m_NextTuningParams))
@@ -150,7 +145,6 @@ void CPlayer::HandleTuningParams()
 	m_NextTuningParams = *GS()->Tuning();
 }
 
-// Рисовка игрока
 void CPlayer::Snap(int SnappingClient)
 {
 	if(!Server()->ClientIngame(m_ClientID))
@@ -212,7 +206,6 @@ void CPlayer::Snap(int SnappingClient)
 		StrToInts(pClientInfo->m_StateName, 6, "\0");
 }
 
-// Получить черактера игрока
 CCharacter *CPlayer::GetCharacter()
 {
 	if(m_pCharacter && m_pCharacter->IsAlive())
@@ -220,7 +213,6 @@ CCharacter *CPlayer::GetCharacter()
 	return nullptr;
 }
 
-// Спавн игрока
 void CPlayer::TryRespawn()
 {
 	vec2 SpawnPos;
@@ -236,6 +228,7 @@ void CPlayer::TryRespawn()
 			ChangeWorld(SafezoneWorldID);
 			return;
 		}
+
 		SpawnType = SPAWN_HUMAN_SAFE;
 	}
 
@@ -247,6 +240,7 @@ void CPlayer::TryRespawn()
 		SpawnPos = vec2(GetTempData().TempTeleportX, GetTempData().TempTeleportY);
 		GetTempData().TempTeleportX = GetTempData().TempTeleportY = -1;
 	}
+
 	int savecidmem = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
 	m_pCharacter = new(savecidmem) CCharacter(&GS()->m_World);
 	m_pCharacter->Spawn(this, SpawnPos);
@@ -310,7 +304,6 @@ void CPlayer::OnPredictedInput(CNetObj_PlayerInput *NewInput)
 		m_pCharacter->OnPredictedInput(NewInput);
 }
 
-// Получить команду игрока
 int CPlayer::GetTeam()
 {
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID)) 
@@ -346,11 +339,13 @@ bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int Maxi
 		GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Upgrade has a maximum level.");
 		return false;		
 	}
+
 	if(*Useless < UpgradeNeed)
 	{
 		GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Not upgrade points for +{INT}. Required {INT}.", &Count, &UpgradeNeed);
 		return false;
 	}
+
 	*Useless -= UpgradeNeed;
 	*Upgrade += Count;
 	return true;
@@ -375,8 +370,10 @@ bool CPlayer::CheckFailMoney(int Price, int ItemID, bool CheckOnly)
 
 	if (CheckOnly)
 		return false;
+
 	if (!pPlayerItem.Remove(Price))
 		return true;
+
 	return false;
 }
 
@@ -446,6 +443,7 @@ bool CPlayer::CheckEffect(const char* Potion)
 {
 	if(CGS::Effects[m_ClientID].find(Potion) != CGS::Effects[m_ClientID].end())
 		return true;
+
 	return false;
 }
 
@@ -453,6 +451,7 @@ bool CPlayer::GetHidenMenu(int HideID) const
 {
 	if(m_HidenMenu.find(HideID) != m_HidenMenu.end())
 		return m_HidenMenu.at(HideID);
+
 	return false;
 }
 
@@ -460,6 +459,7 @@ bool CPlayer::IsAuthed()
 { 
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID))
 		return Acc().AuthID;
+
 	return false; 
 }
 
@@ -478,6 +478,7 @@ int CPlayer::EnchantAttributes(int BonusID) const
 			BonusAttributes += PlayerBonusCount;
 		}
 	}
+
 	return BonusAttributes;
 }
 
@@ -485,6 +486,7 @@ int CPlayer::GetStartTeam()
 {
 	if(Acc().AuthID)
 		return TEAM_RED;
+
 	return TEAM_SPECTATORS;
 }
 
@@ -530,7 +532,6 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 	// - - - - - F3- - - - - - -
 	if (Vote == 1)
 	{
-		// режим готовности в темницах
 		if(GS()->IsDungeon())
 		{
 			const int DungeonID = GS()->DungeonID();
@@ -546,7 +547,6 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 	// - - - - - F4- - - - - - -
 	else
 	{
-		// смена режима полета
 		if(m_PlayerFlags & PLAYERFLAG_SCOREBOARD && GetEquippedItem(EQUIP_WINGS) > 0)
 		{
 			m_Flymode ^= true;
@@ -554,7 +554,7 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 			return true;
 		}
 
-		// общение на диалогах для ванильных клиентов
+		// conversations for vanilla clients
 		if(GetTalkedID() > 0 && !GS()->CheckClient(m_ClientID))
 		{
 			if(m_PlayerTick[TickState::LastDialog] && m_PlayerTick[TickState::LastDialog] > GS()->Server()->Tick())
@@ -567,7 +567,7 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 	}
 	return false;
 }
-// Парсинг голосований и улучшение статистик
+// vote parsing and improving statistics
 bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int VoteID2, int Get)
 {
 	if(PPSTR(CMD, "UPGRADE") == 0)
@@ -609,7 +609,6 @@ ItemJob::InventoryItem &CPlayer::GetItem(int ItemID)
 	return ItemJob::Items[m_ClientID][ItemID];
 }
 
-// Получить одетый предмет
 int CPlayer::GetEquippedItem(int EquipID, int SkipItemID) const
 {
 	for(const auto& it : ItemJob::Items[m_ClientID])
@@ -621,16 +620,13 @@ int CPlayer::GetEquippedItem(int EquipID, int SkipItemID) const
 	return -1;
 }
 
-// Общий уровень атрибутов Реальный и Обычный
 int CPlayer::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 {
-	// обычная передача если нет сохранения и нет процентов
 	int AttributEx = EnchantAttributes(BonusID);
 	const bool SaveData = (str_comp_nocase(CGS::AttributInfo[BonusID].FieldName, "unfield") != 0);
 	if (SaveData)
 		AttributEx += Acc().Stats[BonusID];
 
-	// если реальная стата то делим
 	if (Really && CGS::AttributInfo[BonusID].UpgradePrice < 10) 
 	{ 
 		if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
@@ -639,13 +635,11 @@ int CPlayer::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 			AttributEx /= 5; 
 	}
 
-	// если тип мира данж
 	if(GS()->IsDungeon() && !SearchClass && CGS::AttributInfo[BonusID].UpgradePrice < 10)
 		AttributEx = static_cast<CGameControllerDungeon*>(GS()->m_pController)->GetDungeonSync(this, BonusID);
 	return AttributEx;
 }
 
-// Получить уровень Классов по атрибутам
 int CPlayer::GetLevelDisciple(int Class, bool SearchClass)
 {
 	int Atributs = 0;
@@ -669,7 +663,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 	const int MobID = BotPlayer->GetBotSub();
 	if (BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
-		// Очистка конца диалогов или диалога который был бесмысленный
+		// clearing the end of dialogs or a dialog that was meaningless
 		const int sizeTalking = BotJob::NpcBot[MobID].m_Talk.size();
 		const bool isTalkingEmpty = BotJob::NpcBot[MobID].m_Talk.empty();
 		if ((isTalkingEmpty && m_TalkingNPC.m_TalkedProgress == IS_TALKING_EMPTY) || (!isTalkingEmpty && m_TalkingNPC.m_TalkedProgress >= sizeTalking))
@@ -679,7 +673,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			return;
 		}
 
-		// Узнать вообщем получен если квест выдавать рандомный бесмысленный диалог
+		// you get to know in general if the quest is to give out a random senseless dialog
 		int GivingQuestID = GS()->Mmo()->BotsData()->GetQuestNPC(MobID);
 		if (isTalkingEmpty || GS()->Mmo()->Quest()->GetState(m_ClientID, GivingQuestID) >= QuestState::QUEST_ACCEPT)
 		{
@@ -689,7 +683,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			return;
 		}
 
-		// Получить квест по прогрессу диалога если он есть в данном прогрессе то принимаем квест
+		// get a quest for the progress of dialogue if it is in this progress we accept the quest
 		GivingQuestID = BotJob::NpcBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
 		if (GivingQuestID >= 1)
 		{
@@ -700,7 +694,6 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 				return;
 			}
 
-			// принимаем квест
 			GS()->Mmo()->Quest()->AcceptQuest(GivingQuestID, this);
 			m_TalkingNPC.m_TalkedProgress++;
 		}
@@ -739,12 +732,12 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 				return;
 			}
 			else
-			{
 				m_TalkingNPC.m_TalkedProgress++;
-			}
 		}
+
 		GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
 	}
+
 	m_TalkingNPC.m_TalkedProgress++;
 }
 
@@ -761,6 +754,7 @@ const char *CPlayer::FormatedTalkedText()
 { 
 	return GS()->Server()->Localization()->Localize(GetLanguage(), m_FormatTalkQuest); 
 }
+
 void CPlayer::FormatTextQuest(int DataBotID, const char *pText)
 {
 	if(!GS()->Mmo()->BotsData()->IsDataBotValid(DataBotID) || m_FormatTalkQuest[0] != '\0') 
@@ -772,6 +766,7 @@ void CPlayer::FormatTextQuest(int DataBotID, const char *pText)
 	str_replace(m_FormatTalkQuest, "[Time]", GS()->Server()->GetStringTypeDay());
 	str_replace(m_FormatTalkQuest, "[Here]", GS()->Server()->GetWorldName(GS()->GetWorldID()));
 }
+
 void CPlayer::ClearFormatQuestText()
 {
 	mem_zero(m_FormatTalkQuest, sizeof(m_FormatTalkQuest));
@@ -791,6 +786,7 @@ void CPlayer::ChangeWorld(int WorldID)
 		GS()->m_World.DestroyEntity(m_pCharacter);
 		GS()->m_World.m_Core.m_apCharacters[m_ClientID] = 0;
 	}
+	
 	Server()->ChangeWorld(m_ClientID, WorldID);
 }
 

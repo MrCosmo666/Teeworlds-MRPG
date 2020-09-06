@@ -120,9 +120,52 @@ void CServerBrowser::LoadMmoInfoJson()
 	}
 }
 
+void CServerBrowser::LoadMmoServers()
+{
+	if (!m_pMmoInfo)
+		return;
+
+	// parse JSON
+	const json_value* pServers = json_object_get(m_pMmoInfo, "servers");
+	if (!pServers || pServers->type != json_array)
+		return;
+
+	m_MRPGNet.Reset();
+
+	for (int i = 0; i < json_array_length(pServers); i++, m_MRPGNet.m_NumServers++)
+	{
+		const json_value* pAddr = json_array_get(pServers, i);
+		if (pAddr->type != json_string)
+			continue;
+
+		const char* pStr = json_string_get(pAddr);
+		net_addr_from_str(&m_MRPGNet.m_aServers[m_MRPGNet.m_NumServers], pStr);
+	}
+}
+
+void CServerBrowser::RecheckMRPGServers()
+{
+	for (int j = 0; j < m_MRPGNet.m_NumServers; j++)
+	{
+		CServerEntry* pEntry = Find(TYPE_INTERNET, m_MRPGNet.m_aServers[j]);
+		if (pEntry)
+		{
+			pEntry->m_Info.m_MRPG = true;
+			// dbg_msg("mrpg", "'%s' is an official MRPG server", pEntry->m_Info.m_aName);
+		}
+	}
+}
+
 const json_value *CServerBrowser::LoadMmoInfo()
 {
 	LoadMmoInfoJson();
+	LoadMmoServers();
+
+	if (m_aServerlist[TYPE_INTERNET].m_NumServers == 0)
+		Refresh(IServerBrowser::REFRESHFLAG_INTERNET);
+	else
+		RecheckMRPGServers();
+
 	return m_pMmoInfo;
 }
 

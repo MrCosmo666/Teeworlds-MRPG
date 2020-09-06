@@ -89,10 +89,9 @@ void CDropQuestItem::Tick()
 		return;
 	}
 
-	// подбор предмета
 	if (m_Collide && pOwnerPlayer->GetCharacter() && distance(m_Pos, pOwnerPlayer->GetCharacter()->m_Core.m_Pos) < 32.0f)
 	{
-		// текст подбора предмета
+		// item selection text
 		GS()->SBL(m_OwnerID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Press 'Fire' for pick Quest Item");
 		if (pOwnerPlayer->GetCharacter()->m_ReloadTimer)
 		{

@@ -203,7 +203,6 @@ void CParticles::RenderGroup(int Group)
 // mmotee
 void CParticles::RenderMmoEffect(int Group)
 {
-	// Текст урона
 	if (Group == GROUP_DAMAGEMMO)
 	{
 		int i = m_aFirstPart[Group];
@@ -222,7 +221,7 @@ void CParticles::RenderMmoEffect(int Group)
 		}
 		return;
 	}
-	// Ммо эффекты
+
 	if (Group == GROUP_MMOEFFECTS)
 	{
 		Graphics()->BlendNormal();
@@ -250,6 +249,7 @@ void CParticles::RenderMmoEffect(int Group)
 		Graphics()->BlendNormal();
 		return;
 	}
+	
 	if (Group == GROUP_TELEPORT)
 	{
 		Graphics()->BlendNormal();

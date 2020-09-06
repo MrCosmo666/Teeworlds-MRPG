@@ -71,7 +71,6 @@ public:
 	CGS *m_pGameServer;
 	CGS *GS() const { return m_pGameServer; }
 
-	// ссылки на объекты класса Sql Work
 	AccountMainJob *Account() const { return m_pAccMain; }
 	BotJob *BotsData() const { return m_pBotsInfo; }
 	ItemJob *Item() const { return m_pItemWork; }

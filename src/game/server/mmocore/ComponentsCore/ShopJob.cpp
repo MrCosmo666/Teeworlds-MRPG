@@ -64,7 +64,6 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		ItemJob::ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
 		ItemJob::ItemInformation &NeededItem = GS()->GetItemInfo(NeedItemID);
 		
-		// зачеровыванный или нет
 		if (BuyightItem.IsEnchantable())
 		{
 			char aEnchantSize[16];
@@ -89,7 +88,7 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 	GS()->AV(ClientID, "null", "");
 }
 
-// Показываем аукцион
+// show auction
 void ShopJob::ShowAuction(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
@@ -112,7 +111,6 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 		const int OwnerID = RES->getInt("OwnerID");
 		ItemJob::ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
 
-		// зачеровыванный или нет
 		if (BuyightItem.IsEnchantable())
 		{
 			char aEnchantSize[16];
@@ -148,27 +146,27 @@ void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
 	const int ClientID = pPlayer->GetCID();
 	ItemJob::InventoryItem &pPlayerAuctionItem = pPlayer->GetItem(ItemID);
 
-	// проверяем кол-во слотов занято ли все или нет
+	// check the number of slots whether everything is occupied or not
 	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_mailshop", "WHERE OwnerID > '0' LIMIT %d", g_Config.m_SvMaxMasiveAuctionSlots));
 	if((int)RES->rowsCount() >= g_Config.m_SvMaxMasiveAuctionSlots)
 		return GS()->Chat(ClientID, "Auction has run out of slots, wait for the release of slots!");
 
-	// проверяем кол-во своих слотов
+	// check your slots
 	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_mailshop", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().AuthID, g_Config.m_SvMaxAuctionSlots));
 	const int CountSlot = RES2->rowsCount();
 	if(CountSlot >= g_Config.m_SvMaxAuctionSlots)
 		return GS()->Chat(ClientID, "You use all open the slots in your auction!");
 
-	// проверяем есть ли такой предмет в аукционе
+	// we check if the item is in the auction
 	boost::scoped_ptr<ResultSet> RES3(SJK.SD("ID", "tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
 	if(RES3->next()) 
 		return GS()->Chat(ClientID, "Your same item found in the database, need reopen the slot!");
 
-	// если снялись деньги за оплату аукцион слота
+	// if the money for the slot auction is withdrawn
 	if(pPlayer->CheckFailMoney(g_Config.m_SvAuctionPriceSlot))	
 		return;
 
-	// забираем предмет и добавляем слот
+	// pick up the item and add a slot
 	if(pPlayerAuctionItem.Count >= AuSellItem.a_count && pPlayerAuctionItem.Remove(AuSellItem.a_count))
 	{
 		SJK.ID("tw_mailshop", "(ItemID, Price, Count, OwnerID, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d')", 
@@ -203,7 +201,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 	const int Enchant = SHOPITEM->getInt("Enchant");
 	if (OwnerID > 0)
 	{
-		// забираем свой слот
+		// take out your slot
 		if (OwnerID == pPlayer->Acc().AuthID)
 		{
 			GS()->Chat(ClientID, "You closed auction slot!");
@@ -311,7 +309,6 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 {
 	const int ClientID = pPlayer->GetCID();
 
-	// купить предмет
 	if(PPSTR(CMD, "SHOP") == 0)
 	{
 		if(BuyShopItem(pPlayer, VoteID))
@@ -322,30 +319,26 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 		return true;
 	} 
 
-	// аукцион установить кол-во
 	if(PPSTR(CMD, "AUCTIONCOUNT") == 0)
 	{
-		// если предметов меньше установленно ставим кол-во что есть
+		// if there are fewer items installed, we set the number of items.
 		ItemJob::InventoryItem &pPlayerSellItem = pPlayer->GetItem(VoteID);
 		if(Get > pPlayerSellItem.Count)
 			Get = pPlayerSellItem.Count;
 
-		// если предмет можно кол-во
+		// if it is possible to number
 		if(pPlayerSellItem.Info().IsEnchantable())
 			Get = 1;
 
-		// если сбрасываем цену если не хватает
 		const int c_minimalprice = (Get * pPlayerSellItem.Info().MinimalPrice);
 		if(pPlayer->GetTempData().SellItem.a_price < c_minimalprice)
 			pPlayer->GetTempData().SellItem.a_price = c_minimalprice;
-			
-		// устанавливаем кол-во предметов
+
 		pPlayer->GetTempData().SellItem.a_count = Get;
 		GS()->UpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
 		return true;
 	}
 
-	// аукцион установить цену
 	if(PPSTR(CMD, "AUCTIONPRICE") == 0)
 	{
 		const int c_minimalprice = (pPlayer->GetTempData().SellItem.a_count * GS()->GetItemInfo(VoteID).MinimalPrice);
@@ -357,7 +350,6 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 		return true;
 	}
 
-	// аукцион установить предмет слот
 	if(PPSTR(CMD, "AUCTIONSLOT") == 0)
 	{
 		int AvailableCount = Job()->Item()->ActionItemCountAllowed(pPlayer, VoteID);
@@ -370,7 +362,6 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 		return true;
 	}
 
-	// принять аукцион слот
 	if(PPSTR(CMD, "AUCTIONACCEPT") == 0)
 	{
 		ItemJob::InventoryItem &pPlayerSellItem = pPlayer->GetItem(VoteID);

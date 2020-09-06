@@ -7,36 +7,27 @@
 CSleepyGravity::CSleepyGravity(CGameWorld *pGameWorld, CPlayer* pPlayer, int SkillBonus, int PowerLevel, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTYPE_SLEEPYGRAVITY, Pos)
 {
-	// переданные аргументы
+	// transmitted arguments
 	m_pPlayer = pPlayer;
 	m_PowerLevel = PowerLevel;
 	m_Radius = min(200 + SkillBonus, 400);
 	m_LifeSpan = 10 * Server()->TickSpeed();
 	GameWorld()->InsertEntity(this);	
-	for(int i=0; i<NUM_IDS; i++)
-	{
+	for(int i = 0; i < NUM_IDS; i++)
 		m_IDs[i] = Server()->SnapNewID();
-	}
 }
 
 CSleepyGravity::~CSleepyGravity()
 {
-	// освобождаем все при уничтожении
-	for(int i=0; i<NUM_IDS; i++)
-	{
+	for(int i = 0; i < NUM_IDS; i++)
 		Server()->SnapFreeID(m_IDs[i]);
-	}
 }
 
 void CSleepyGravity::Reset()
 {
-	// если игрок есть создаем эффекты
 	if(m_pPlayer && m_pPlayer->GetCharacter())
-	{
 		GS()->CreateSound(m_Pos, SOUND_GRENADE_EXPLODE);
-	}
 
-	// уничтожаем обьект
 	GS()->m_World.DestroyEntity(this);
 	return;
 }
@@ -65,6 +56,7 @@ void CSleepyGravity::Tick()
 				break;
 			}
 		}
+		
 		if(!m_LifeSpan)
 			GS()->CreateExplosion(m_Pos, m_pPlayer->GetCID(), WEAPON_GRENADE, m_PowerLevel);
 	}

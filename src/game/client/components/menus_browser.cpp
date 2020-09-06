@@ -370,13 +370,13 @@ void CMenus::InitDefaultFilters()
 	{
 		switch(m_lFilters[i].Custom())
 		{
-			case CBrowserFilter::FILTER_STANDARD:
+		case CBrowserFilter::FILTER_STANDARD:
 			FilterStandard = true;
 			break;
-			case CBrowserFilter::FILTER_FAVORITES:
+		case CBrowserFilter::FILTER_FAVORITES:
 			FilterFav = true;
 			break;
-			case CBrowserFilter::FILTER_ALL:
+		case CBrowserFilter::FILTER_ALL:
 			FilterAll = true;
 		}
 	}
@@ -1290,6 +1290,10 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 			{
 				const CServerInfo* pItem = pFilter->SortedGet(ServerIndex);
 
+				// todo: use weird 0.7 filter system for this
+				if (((Client()->State() == IClient::STATE_ONLINE && m_GamePage == PAGE_MRPG) || (Client()->State() == IClient::STATE_OFFLINE && m_MenuPage == PAGE_MRPG)) && !pItem->m_MRPG)
+					continue;
+
 				// select server if address changed and match found
 				bool IsSelected = m_aSelectedFilters[BrowserType] == FilterIndex && m_aSelectedServers[BrowserType] == ServerIndex;
 				if(!(m_AddressSelection & ADDR_SELECTION_UPDATE_ADDRESS) && !str_comp(pItem->m_aAddress, pAddress))
@@ -1377,7 +1381,7 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 		if(!s_ScrollRegion.IsRectClipped(MsgBox))
 		{
 			const char* pImportantMessage;
-			if(m_ActivePage == PAGE_INTERNET && ServerBrowser()->IsRefreshingMasters())
+			if((m_ActivePage == PAGE_INTERNET || m_ActivePage == PAGE_MRPG) && ServerBrowser()->IsRefreshingMasters())
 				pImportantMessage = Localize("Refreshing master servers");
 			else if(SelectedFilter == -1)
 				pImportantMessage = Localize("No filter category is selected");
@@ -1526,30 +1530,23 @@ void CMenus::RenderServerbrowserSidebar(CUIRect View)
 	// header
 	View.HSplitTop(GetListHeaderHeight(), &Header, &View);
 	float Width = Header.w;
-	Header.VSplitLeft(Width*(0.30f + 0.30f*(g_Config.m_ClGBrowser == 2)), &Button, &Header);
+	Header.VSplitLeft(Width*0.30f, &Button, &Header);
 	static CButtonContainer s_TabInfo;
 	if(DoButton_SpriteID(&s_TabInfo, IMAGE_SIDEBARICONS, m_SidebarTab != SIDEBAR_TAB_INFO ? SPRITE_SIDEBAR_INFO_A : SPRITE_SIDEBAR_INFO_B, m_SidebarTab == SIDEBAR_TAB_INFO, &Button, CUI::CORNER_TL, 5.0f, true))
 	{
 		m_SidebarTab = SIDEBAR_TAB_INFO;
 	}
 	Header.VSplitLeft(Width*0.30f, &Button, &Header);
-	if (g_Config.m_ClGBrowser != 2)
+	static CButtonContainer s_TabFilter;
+	if(DoButton_SpriteID(&s_TabFilter, IMAGE_SIDEBARICONS, m_SidebarTab != SIDEBAR_TAB_FILTER ? SPRITE_SIDEBAR_FILTER_A : SPRITE_SIDEBAR_FILTER_B, m_SidebarTab == SIDEBAR_TAB_FILTER, &Button, 0, 0.0f, true))
 	{
-		Header.VSplitLeft(Width*0.30f, &Button, &Header);
-		static CButtonContainer s_TabFilter;
-		if(DoButton_SpriteID(&s_TabFilter, IMAGE_SIDEBARICONS, m_SidebarTab != SIDEBAR_TAB_FILTER ? SPRITE_SIDEBAR_FILTER_A : SPRITE_SIDEBAR_FILTER_B, m_SidebarTab == SIDEBAR_TAB_FILTER, &Button, 0, 0.0f, true))
-		{
-			m_SidebarTab = SIDEBAR_TAB_FILTER;
-		}
+		m_SidebarTab = SIDEBAR_TAB_FILTER;
 	}
 	static CButtonContainer s_TabFriends;
 	if(DoButton_SpriteID(&s_TabFriends, IMAGE_SIDEBARICONS, m_SidebarTab != SIDEBAR_TAB_FRIEND ? SPRITE_SIDEBAR_FRIEND_A : SPRITE_SIDEBAR_FRIEND_B, m_SidebarTab == SIDEBAR_TAB_FRIEND, &Header, CUI::CORNER_TR, 5.0f, true))
 	{
 		m_SidebarTab = SIDEBAR_TAB_FRIEND;
 	}
-
-	if (g_Config.m_ClGBrowser == 2 && m_SidebarTab == 1)
-		m_SidebarTab = 2;
 
 	// tabs
 	switch(m_SidebarTab)
@@ -2363,7 +2360,7 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 	const int State = m_pClient->Updater()->GetCurrentState();
 	if (NeedUpdate && State <= IUpdater::CLEAN)
 	{
-		str_format(aBuf, sizeof(aBuf), Localize("Mmotee %s is available"), Client()->LatestVersion());
+		str_format(aBuf, sizeof(aBuf), Localize("MRPG Version %s is available"), Client()->LatestVersion());
 
 		// update now
 		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
@@ -2384,18 +2381,19 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 	}
 	else if (State == IUpdater::NEED_RESTART)
 	{
-		str_format(aBuf, sizeof(aBuf), Localize("Mmotee Client updated! Archive downloading to client folder!"));
+		str_format(aBuf, sizeof(aBuf), Localize("MRPG Client updated! Archive is available in the client folder!"));
 		m_NeedRestartUpdate = true;
 
 		// restart
 		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
 		static CButtonContainer s_ButtonUpdate;
-		if (DoButton_Menu(&s_ButtonUpdate, Localize("Client Archive"), 0, &Button))
+		if (DoButton_Menu(&s_ButtonUpdate, Localize("Open update files"), 0, &Button))
 			Client()->OpenUpdateArchive();
 	}
 	else
 	{
-		str_format(aBuf, sizeof(aBuf), Localize("No updates available"));
+		// str_format(aBuf, sizeof(aBuf), Localize("No updates available"));
+		str_format(aBuf, sizeof(aBuf), Localize("MRPG Client is up to date"));
 
 		// check now
 		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
@@ -2410,12 +2408,16 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 	static CButtonContainer s_RefreshButton;
 	if(DoButton_Menu(&s_RefreshButton, Localize("Refresh"), 0, &Button) || (Input()->KeyPress(KEY_R) && (Input()->KeyIsPressed(KEY_LCTRL) || Input()->KeyIsPressed(KEY_RCTRL))))
 	{
-		if(m_MenuPage == PAGE_INTERNET)
+		if(m_MenuPage == PAGE_INTERNET || m_MenuPage == PAGE_FAVORITES)
 			ServerBrowser()->Refresh(IServerBrowser::REFRESHFLAG_INTERNET);
 		else if(m_MenuPage == PAGE_LAN)
 			ServerBrowser()->Refresh(IServerBrowser::REFRESHFLAG_LAN);
-		else if (m_MenuPage == PAGE_FAVORITES)
+		else if (m_MenuPage == PAGE_MRPG)
+		{
+			// start a new serverlist request
+			Client()->RequestMmoInfo();
 			ServerBrowser()->Refresh(IServerBrowser::REFRESHFLAG_INTERNET);
+		}
 	}
 
 	// text information
@@ -2504,18 +2506,12 @@ void CMenus::RenderServerbrowser(CUIRect MainView)
 		+------+       +------------+
 	*/
 
-	CUIRect ServerList, Sidebar, Filterbar, BottomBox, SidebarButton;
+	CUIRect ServerList, Sidebar, BottomBox, SidebarButton;
 
 	if(Client()->State() == IClient::STATE_OFFLINE)
 		MainView.HSplitTop(20.0f, 0, &MainView);
 	MainView.HSplitBottom(80.0f, &MainView, &BottomBox);
 	MainView.VSplitRight(20.0f, &ServerList, &SidebarButton);
-
-	if (g_Config.m_ClGBrowser == 2)
-	{
-		MainView.VSplitRight(150.0f, &MainView, &Filterbar);
-		MainView.VSplitRight(30.0f, &MainView, 0); // Margin
-	}
 
 	if(m_SidebarActive)
 		ServerList.VSplitRight(150.0f, &ServerList, &Sidebar);
@@ -2526,8 +2522,6 @@ void CMenus::RenderServerbrowser(CUIRect MainView)
 	// sidebar
 	if(m_SidebarActive)
 		RenderServerbrowserSidebar(Sidebar);
-	if (g_Config.m_ClGBrowser == 2)
-		RenderServerbrowserFilterbar(Filterbar);
 
 	// sidebar button
 	SidebarButton.HMargin(150.0f, &SidebarButton);

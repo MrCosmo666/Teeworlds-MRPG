@@ -1028,4 +1028,9 @@ int CGraphics_Threaded::GetVideoModes(CVideoMode* pModes, int MaxModes, int Scre
 	return NumModes;
 }
 
+void CGraphics_Threaded::NotifyWindow()
+{
+	return m_pBackend->NotifyWindow();
+}
+
 extern IEngineGraphics* CreateEngineGraphicsThreaded() { return new CGraphics_Threaded(); }

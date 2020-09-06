@@ -7,7 +7,7 @@
 CNoctisTeleport::CNoctisTeleport(CGameWorld *pGameWorld, vec2 Pos, CCharacter* pPlayerChar, int SkillBonus)
 : CEntity(pGameWorld, CGameWorld::ENTYPE_NOCTIS_TELEPORT, Pos, 64.0f)
 {
-	// переданные аргументы
+	// transmitted arguments
 	m_pPlayerChar = pPlayerChar;
 	m_Direction = (m_pPlayerChar ? vec2(m_pPlayerChar->m_Core.m_Input.m_TargetX, m_pPlayerChar->m_Core.m_Input.m_TargetY) : vec2(0, 0));
 	m_SkillBonus = SkillBonus;
@@ -88,5 +88,4 @@ void CNoctisTeleport::Snap(int SnappingClient)
 	pObj->m_FromX = (int)m_Pos.x;
 	pObj->m_FromY = (int)m_Pos.y;
 	pObj->m_StartTick = Server()->Tick();
-
 }

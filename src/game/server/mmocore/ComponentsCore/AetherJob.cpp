@@ -37,7 +37,7 @@ bool AetherJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID
 {
 	const int ClientID = pPlayer->GetCID();
 
-	// телепорт
+	// teleport
 	if(PPSTR(CMD, "TELEPORT") == 0)
 	{
 		const int TeleportID = VoteID;

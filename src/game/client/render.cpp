@@ -716,7 +716,7 @@ void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color,
 
 	// Processing and centralizing the text by bar
 	const float FakeToScreenY = (Graphics()->ScreenHeight() / (ScreenY1 - ScreenY0));
-	const float FontSize = (float)(BackgroundProgress.h * FakeToScreenY) / FakeToScreenY;
+	const float FontSize = ((float)(BackgroundProgress.h * FakeToScreenY) / FakeToScreenY) - 1.5f;
 	const float TextWeidth = (float)pTextRender->TextWidth(nullptr, FontSize, pText, -1, -1.0f);
 	if (TextWeidth > Rect.w)
 	{

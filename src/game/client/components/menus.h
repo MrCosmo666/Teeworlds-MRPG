@@ -306,6 +306,7 @@ private:
 		PAGE_SERVER_INFO,
 		PAGE_CALLVOTE,
 		PAGE_INTERNET,
+		PAGE_MRPG,
 		PAGE_FAVORITES,
 		PAGE_LAN,
 		PAGE_DEMOS,
@@ -651,7 +652,7 @@ private:
 			FILTER_CUSTOM=0,
 			FILTER_ALL,
 			FILTER_STANDARD,
-			FILTER_FAVORITES,
+			FILTER_FAVORITES
 		};
 		// buttons var
 		int m_SwitchButton;

@@ -346,5 +346,12 @@ public:
 	void ToggleFullscreen();
 	void ToggleWindowBordered();
 	void ToggleWindowVSync();
+
+	// mrpg
+private:
+
+public:
+
+	void NotifyWindow();
 };
 #endif

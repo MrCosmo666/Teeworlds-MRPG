@@ -19,7 +19,7 @@
 #define GREEN_COLOR vec3(15, 40, 15)
 #define LIGHT_GREEN_COLOR vec3(0, 16, 0)
 
-// Аккаунт Data Miner
+// Miner data
 #define MINER(F) \
 	F(MnrLevel) \
 	F(MnrExp) \
@@ -27,7 +27,7 @@
 	F(MnrCount)
 STRINGABLE_ENUM_DECL(MINER)
 
-// Аккаунт Data Plants
+// Plant data
 #define PLANT(F) \
 	F(PlLevel) \
 	F(PlExp) \
@@ -35,15 +35,15 @@ STRINGABLE_ENUM_DECL(MINER)
 	F(PlUpgrade)
 STRINGABLE_ENUM_DECL(PLANT)
 
-// Улучшения организациям по полям
+// Improvements to organizations by field
 #define EMEMBERUPGRADE(F) \
     F(AvailableNSTSlots) \
     F(ChairNSTExperience)
 STRINGABLE_ENUM_DECL(EMEMBERUPGRADE)
 
 /*
-	Основные настройки сервера ядра
-	Здесь хранятся самые основные настройки сервера
+	Basic kernel server settings
+	This is where the most basic server settings are stored
 */
 enum DayType
 {
@@ -55,12 +55,12 @@ enum DayType
 
 enum
 {
-	NEWBIE_ZERO_WORLD = 0,					// мир начальный
-	LOCAL_WORLD = 0,						// локальный мир
-	COUNT_WORLD = 12,						// кол-во миров
-	LAST_WORLD = COUNT_WORLD - 1,			// последний мир
-	FREE_SLOTS_WORLD = 7,					// мир в котором есть слоты для фейк мобов
-	MAX_DROPPED_FROM_MOBS = 5,				// максимальное кол-во предметов что может дропать моб
+	NEWBIE_ZERO_WORLD = 0,					// initial world
+	LOCAL_WORLD = 0,						// local world
+	COUNT_WORLD = 12,						// number of worlds
+	LAST_WORLD = COUNT_WORLD - 1,			// last world
+	FREE_SLOTS_WORLD = 7,					// world where there are slots for fake mobs
+	MAX_DROPPED_FROM_MOBS = 5,				// maximum number of items that can be dropped by mobs
 };
 
 #endif

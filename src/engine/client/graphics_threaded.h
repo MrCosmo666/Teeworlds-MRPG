@@ -336,6 +336,8 @@ public:
 	virtual void RunBuffer(CCommandBuffer* pBuffer) = 0;
 	virtual bool IsIdle() const = 0;
 	virtual void WaitForIdle() = 0;
+
+	virtual void NotifyWindow() = 0;
 };
 
 class CGraphics_Threaded : public IEngineGraphics
@@ -471,6 +473,8 @@ public:
 	virtual void InsertSignal(semaphore* pSemaphore);
 	virtual bool IsIdle() const;
 	virtual void WaitForIdle();
+
+	virtual void NotifyWindow();
 };
 
 extern IGraphicsBackend* CreateGraphicsBackend();

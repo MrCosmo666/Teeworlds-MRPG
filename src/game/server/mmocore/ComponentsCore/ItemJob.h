@@ -93,7 +93,7 @@ public:
 	void FormatAttributes(InventoryItem& pItem, int size, char* pformat);
 	void FormatAttributes(ItemInformation& pInfoItem, int Enchant, int size, char* pformat);
 
-	// Основное
+	// primary
 	void ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction = false);
 	int GiveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant);
 	int RemoveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings);

@@ -49,7 +49,7 @@ void CMenus::RenderSettingsMmo(CUIRect MainView)
 	MainView.HSplitTop(20.0f, 0, &MainView);
 	MainView.HSplitTop(20.0f, &Tabbar, &MainView);
 
-	// рисуем меню вкладок
+	// draw tab menu
 	const int TAB_SIZE = 4;
 	const char* Tabs[TAB_SIZE] = { "General", "Visual", "Gamer", "Credits" };
 	const int Corner[TAB_SIZE] = { CUI::CORNER_TL, 0, 0, CUI::CORNER_TR };
@@ -62,16 +62,18 @@ void CMenus::RenderSettingsMmo(CUIRect MainView)
 			s_SettingsPage = i;
 	}
 
-	// рисуем текст информации
+	// draw information
 	MainView.HSplitTop(400.0f, &MainView, &Label);
-	const char* Information[TAB_SIZE] = { 
-											"Setting up the general part of the client",
-											"Setting up the visual part of the client",
-											"Features of the Gamer(Dune)",
-											"Information & Credits" 
-										};
-	UI()->DoLabel(&Label, Information[s_SettingsPage], 14.0f, CUI::ALIGN_CENTER);
 	RenderSettingsMmoGeneral(MainView, s_SettingsPage);
+
+	const char* apInformation[TAB_SIZE] = {
+		"Setting up the general part of the client",
+		"Setting up the visual part of the client",
+		"Features of the Gamer Client (Dune)",
+		"Information & Credits"
+	};
+	Label.HSplitTop(10.0f, 0, &Label);
+	UI()->DoLabel(&Label, apInformation[s_SettingsPage], 14.0f, CUI::ALIGN_CENTER);
 }
 
 void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
@@ -105,12 +107,19 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		if (DoButton_CheckBox(&s_ButtonColorVote, Localize("Show Colored Vote (MRPG)"), g_Config.m_ClShowColoreVote, &Button))
 			g_Config.m_ClShowColoreVote ^= 1;
 
-		// эффекты
+		// effects
 		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
 		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
 		static int s_ButtonMmoEffects = 0;
 		if(DoButton_CheckBox(&s_ButtonMmoEffects, Localize("Disable effects (MRPG)"), g_Config.m_ClShowMEffects, &Button))
 			g_Config.m_ClShowMEffects ^= 1;
+
+		// chat highlight notify window
+		BasicLeft.HSplitTop(25.0f, 0, &BasicLeft);
+		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
+		static int s_ButtonChatNotifyWindow = 0;
+		if (DoButton_CheckBox(&s_ButtonChatNotifyWindow, Localize("Notify window on chat highlight"), g_Config.m_ClNotifyWindow, &Button))
+			g_Config.m_ClNotifyWindow ^= 1;
 
 		// --------------------- RIGHT SIDE --------------------------
 		UI()->DoLabel(&BasicRight, "Customize", 12.0f, CUI::ALIGN_CENTER);
@@ -141,8 +150,10 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		DoScrollbarOption(&g_Config.m_ClDialogsSpeedNPC, &g_Config.m_ClDialogsSpeedNPC, &Button, Localize("Dialogs speed with NPC (MRPG)"), 50, 100, &LogarithmicScrollbarScale);
 	}
 	// visual
-	else if(Page == 1)
+	else if (Page == 1)
+	{
 		RenderMmoSettingsTexture(MainView, MainView);
+	}
 	// gamer dune
 	else if(Page == 2)
 	{
@@ -159,7 +170,43 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 	}
 	// information
 	else if (Page == 3)
-		UI()->DoLabel(&MainView, "Uses open source client codes:\n*Teeworlds by (Teeworlds team)\n*DDRaceNetwork Client by (DDNet team)\n*Gamer Client by (Dune)\n*MRPG Client by (Kurosio)", 16.0f, CUI::ALIGN_LEFT);
+	{
+		UI()->DoLabel(&MainView, Localize("MRPG Credits"), 14.0f, CUI::ALIGN_CENTER);
+
+		MainView.HSplitTop(ButtonHeight, 0, &MainView);
+		MainView.VMargin(Spacing * 2.0f, &MainView);
+		RenderTools()->DrawUIRect(&MainView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), CUI::CORNER_ALL, 5.0f);
+
+		MainView.Margin(5.0f, &MainView);
+		UI()->DoLabel(&MainView, "Contains code of the following projects:", 16.0f, CUI::ALIGN_CENTER); MainView.HSplitTop(20.0f, 0, &MainView);
+		UI()->DoLabel(&MainView, "Teeworlds by the Teeworlds team", 12.0f, CUI::ALIGN_CENTER); MainView.HSplitTop(16.0f, 0, &MainView);
+		UI()->DoLabel(&MainView, "DDRaceNetwork Client by the DDNet team", 12.0f, CUI::ALIGN_CENTER); MainView.HSplitTop(16.0f, 0, &MainView);
+		UI()->DoLabel(&MainView, "Gamer Client by Dune", 12.0f, CUI::ALIGN_CENTER); MainView.HSplitTop(16.0f, 0, &MainView);
+		UI()->DoLabel(&MainView, "MRPG Client by Kurosio", 12.0f, CUI::ALIGN_CENTER); MainView.HSplitTop(16.0f, 0, &MainView);
+
+		MainView.HSplitTop(40.0f, 0, &MainView);
+		UI()->DoLabel(&MainView, "Discord:", 12.0f, CUI::ALIGN_CENTER); MainView.HSplitTop(16.0f, 0, &MainView);
+
+		// discord url
+		CUIRect DiscordLink;
+		static CButtonContainer s_ButtonDiscord;
+		MainView.HSplitTop(16.0f, &DiscordLink, &MainView);
+		const char* pURL = "https://mrpg.teeworlds.dev";
+		float TextWidth = TextRender()->TextWidth(0, 12.0f, pURL, -1, -1);
+		DiscordLink.x = DiscordLink.x + (DiscordLink.w / 2.0f) - (TextWidth / 2.0f);
+		DiscordLink.w = TextWidth;
+
+		TextRender()->TextColor(51.0f / 255.0f, 122.0f / 255.0f, 183.0f / 255.0f, 1.0f);
+		if (UI()->MouseInside(&DiscordLink))
+		{
+			if(UI()->DoButtonLogic(s_ButtonDiscord.GetID(), &DiscordLink))
+				open_link(pURL);
+
+			TextRender()->TextColor(91.0f / 255.0f, 192.0f / 255.0f, 222.0f / 255.0f, 1.0f);
+		}
+		UI()->DoLabel(&DiscordLink, pURL, 12.0f, CUI::ALIGN_LEFT);
+		TextRender()->TextColor(CUI::ms_DefaultTextColor);
+	}
 }
 
 void CMenus::RenderSettingsMmoChangerGeneric(CUIRect MainView, CCSkinChanger::CTextureEntity* pEntities, char* pConfigStr, const char* pLabel, int ItemsPerRow, float Ratio)
@@ -219,7 +266,8 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 	CUIRect Button, TabBar;
 
 	static int TextureMenu = 0;
-	{ // меню выбора скинов
+	{
+		// skin menu
 		MainView.HSplitTop(20.0f, &TabBar, &MainView);
 
 		TabBar.VSplitLeft(TabBar.w / 6, &Button, &TabBar);
@@ -252,7 +300,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 			TextureMenu = 5;
 	}
 
-	// замена скинов game.png
+	// game.png skin replacement
 	if (TextureMenu == 0)
 	{
 		if (!m_pClient->m_pSkinChanger->m_GameSkins.IsLoaded())
@@ -261,7 +309,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		RenderSettingsMmoChangerGeneric(MainView, &m_pClient->m_pSkinChanger->m_GameSkins, g_Config.m_GameTexture, "Gameskins", 3, 2.0f);
 	}
 
-	// замена скинов emoticion
+	// emoticion skin replacement
 	else if (TextureMenu == 1)
 	{
 		if (!m_pClient->m_pSkinChanger->m_Emoticons.IsLoaded())
@@ -270,7 +318,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		RenderSettingsMmoChangerGeneric(MainView, &m_pClient->m_pSkinChanger->m_Emoticons, g_Config.m_GameEmoticons, "Emoticons", 5, 1.0f);
 	}
 
-	// замена скинов cursors
+	// cursors replacement
 	else if (TextureMenu == 2)
 	{
 		if (!m_pClient->m_pSkinChanger->m_Cursors.IsLoaded())
@@ -279,7 +327,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		RenderSettingsMmoChangerGeneric(MainView, &m_pClient->m_pSkinChanger->m_Cursors, g_Config.m_GameCursor, "Cursors", 16, 1.0f);
 	}
 
-	// замена скинов particles
+	// particles replacement
 	else if (TextureMenu == 3)
 	{
 		if (!m_pClient->m_pSkinChanger->m_Particles.IsLoaded())
@@ -288,7 +336,7 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 		RenderSettingsMmoChangerGeneric(MainView, &m_pClient->m_pSkinChanger->m_Particles, g_Config.m_GameParticles, "Particles", 5, 1.0f);
 	}
 
-	// замена скинов entities
+	// entities replacement
 	else if (TextureMenu == 4)
 	{
 		if (!m_pClient->m_pSkinChanger->m_Entities.IsLoaded())

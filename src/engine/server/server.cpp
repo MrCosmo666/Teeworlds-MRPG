@@ -1789,10 +1789,10 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	if(message.length() <= 0 || !g_Config.m_SvCreateDiscordBot || message.author == getCurrentUser().cast())
 	 	return;
 
-	// статистика
+	// statistics
 	if (message.startsWith("!mstats"))
 	{
-		// если количество символов меньше нужного
+		// if the number of characters is less than the required
 		std::string messagecont = message.content;
 		if(messagecont.size() <= 8)
 		{
@@ -1801,12 +1801,12 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 			return;
 		}
 
-		// информация для поиска
-		bool founds = false; int Limit = 0;
+		// search data
+		bool Found = false; int Limit = 0;
 		std::string input = "%" + messagecont.substr(8, messagecont.length() - 8) + "%";
 		sqlstr::CSqlString<64> cDiscordIDorNick = sqlstr::CSqlString<64>(input.c_str());
 
-		// ищим пользователя
+		// user lookup
 		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_data", "WHERE Nick LIKE '%s'LIMIT 5", cDiscordIDorNick.cstr()));
 		while(RES->next())
 		{
@@ -1817,10 +1817,10 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 			char aBuf[256];
 			str_format(aBuf, sizeof(aBuf), "?player=%s&rank=%d&dicid=%d", RES->getString("Nick").c_str(), Rank, RES->getInt("DiscordEquip"));
 			SendGenerateMessage(std::string(message.channelID).c_str(), std::to_string(RandomColor).c_str(), "Discord MRPG Card", aBuf);
-			founds = true;
+			Found = true;
 		}
 
-		if(!founds)
+		if(!Found)
 		{
 			SendMessage(std::string(message.channelID).c_str(), DC_SERVER_WARNING, "Sorry!",
 				"**This account not found in database!**");
@@ -1830,38 +1830,36 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 
 	else if (message.startsWith("!mconnect"))
 	{	
-		// получаем Айди пользователя
+		// get the user's ID
 		SleepyDiscord::Snowflake<SleepyDiscord::User> userAuth = getUser(message.author).cast();
 		SendMessage(std::string(message.channelID).c_str(), DC_DISCORD_INFO, "Connector Information",  
 			"```ini\n[Warning] Do not connect other people's discords to your account in the game\nThis is similar to hacking your account in the game\n# Use in-game for connect your personal discord:\n# Did '" + userAuth + "'\n# Command in-game: /discord_connect <did>```");
 
-		// проверяем на поиск пользователя
+		// check for user search
 		std::string Nick = "Refresh please.";
 		std::string UserID = userAuth;
 
-		// информация для поиска
-		bool founds = false;
+		// search criteria
+		bool Found = false;
 		sqlstr::CSqlString<64> cDiscordID = sqlstr::CSqlString<64>(UserID.c_str());
 
-		// получаем подключение
+		// get connected
 		boost::scoped_ptr<ResultSet> RES(SJK.SD("Nick", "tw_accounts_data", "WHERE DiscordID = '%s'", cDiscordID.cstr()));
 		while(RES->next())
 		{
-			// пишем хорошее подключение
+			// send a connected message
 			Nick = RES->getString("Nick").c_str();
 			SendMessage(std::string(message.channelID).c_str(), DC_DISCORD_BOT, "Good work :)", "**Your account is enabled: Nickname in-game: " + Nick + "**");
-			founds = true;
+			Found = true;
 		}
 
-		// завершаем подключение
-		if(!founds)
-		{
+		// end connection
+		if(!Found)
 			SendMessage(std::string(message.channelID).c_str(), DC_SERVER_WARNING, "Fail in work :(", "**Fail connect. See !mconnect.\nUse in-game /discord_connect <DID>..**");
-		}
 		return;
 	}
 
-	// ПОКАЗАТЬ ВСЕХ ИГРОКОВ
+	// list all players
 	else if (message.startsWith("!monline"))
 	{
 		dynamic_string Buffer;
@@ -1882,7 +1880,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		Buffer.clear();
 		return;
 	}
-	// ПОМОЩЬ
+	// help
 	else if (message.startsWith("!mhelp"))
 	{
 		SendMessage(std::string(message.channelID).c_str(), DC_DISCORD_INFO, "Commands / Information", 
@@ -1890,13 +1888,13 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		"\n`!mstats <symbol>` - See stats players. Minimal 1 symbols."
 		"\n`!monline` - Show players ingame.");
 	}
-	// отправить из дискорд чата на сервер
+	// send from the discord chat to server chat
 	else if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordChanal) == 0)
 	{
 		std::string Nickname("D|" + message.author.username);
 		m_pServer->GameServer(FREE_SLOTS_WORLD)->FakeChat(Nickname.c_str(), message.content.c_str());
 	}
-	// контрорирование ideas-voting
+	// ideas-voting
 	else if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordIdeasChanal) == 0)
 	{
 		deleteMessage(message.channelID, message);

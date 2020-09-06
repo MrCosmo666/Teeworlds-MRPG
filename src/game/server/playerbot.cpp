@@ -94,7 +94,6 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 	return Power;
 }
 
-// Спавн игрока
 void CPlayerBot::TryRespawn()
 {
 	// close spawn mobs on non allowed spawn dungeon
@@ -114,16 +113,15 @@ void CPlayerBot::TryRespawn()
 	else if(SpawnType == BotsTypes::TYPE_BOT_QUEST)
 		SpawnPos = vec2(BotJob::QuestBot[m_SubBotID].PositionX, BotJob::QuestBot[m_SubBotID].PositionY);
 	
-	// создаем бота
 	const int savecidmem = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
 	m_pCharacter = new(savecidmem) CCharacterBotAI(&GS()->m_World);
 	m_pCharacter->Spawn(this, SpawnPos);
 
-	// чтобы не было видно эффектов что НПС не видемый для одного игрока был видем другому
+	// so that no effects can be seen that an NPC that is not visible to one player is visible to another player
 	if(SpawnType != BotsTypes::TYPE_BOT_QUEST)
 		GS()->CreatePlayerSpawn(SpawnPos);
 
-	// сбросить респавн в данжах если он был разрешен
+	// reset the dungeon, if allowed
 	if (SpawnType == BotsTypes::TYPE_BOT_MOB && GS()->IsDungeon() && m_DungeonAllowedSpawn)
 		m_DungeonAllowedSpawn = false;
 }
@@ -163,7 +161,6 @@ int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 	return 2;
 }
 
-// Рисовка игрока как бота
 void CPlayerBot::Snap(int SnappingClient)
 {
 	if(!Server()->ClientIngame(m_ClientID) || !IsActiveSnappingBot(SnappingClient))
@@ -239,6 +236,7 @@ bool CPlayerBot::IsActiveQuests(int SnapClientID) const
 			return true;
 		return false;
 	}
+
 	return false;
 }
 
@@ -246,6 +244,7 @@ int CPlayerBot::GetEquippedItem(int EquipID, int SkipItemID) const
 {
 	if (EquipID < EQUIP_HAMMER || EquipID > EQUIP_WINGS || EquipID == EQUIP_MINER)
 		return -1;
+
 	return BotJob::DataBot[m_BotID].EquipSlot[EquipID];
 }
 
@@ -260,8 +259,10 @@ const char* CPlayerBot::GetStatusBot() const
 	{
 		if (GS()->IsDungeon())
 			return "Boss";
+		
 		return "Raid";
 	}
+
 	return "\0";
 }
 

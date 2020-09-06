@@ -121,21 +121,18 @@ void MmoController::ResetClientData(int ClientID)
 		component->OnResetClient(ClientID);
 }
 
-// Сохранение аккаунта
+// saving account
 void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 {
 	if(!pPlayer->IsAuthed()) 
 		return;
 	
-	// сохранение статистики
 	if(Table == SaveType::SAVE_STATS)
 	{
 		const int EquipDiscord = pPlayer->GetEquippedItem(EQUIP_DISCORD);
 		SJK.UD("tw_accounts_data", "Level = '%d', Exp = '%d', DiscordEquip = '%d' WHERE ID = '%d'",
 			pPlayer->Acc().Level, pPlayer->Acc().Exp, EquipDiscord, pPlayer->Acc().AuthID);
 	}
-
-	// сохранение апгрейдов
 	else if(Table == SaveType::SAVE_UPGRADES)
 	{
 		char aBuf[64];
@@ -151,8 +148,6 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		SJK.UD("tw_accounts_data", "Upgrade = '%d' %s WHERE ID = '%d'", pPlayer->Acc().Upgrade, Buffer.buffer(), pPlayer->Acc().AuthID);
 		Buffer.clear();
 	}
-
-	// сохранение плант аккаунта
 	else if(Table == SaveType::SAVE_PLANT_DATA)
 	{
 		char aBuf[64];
@@ -164,8 +159,6 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		SJK.UD("tw_accounts_plants", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().AuthID);
 		Buffer.clear();
 	}
-
-	// сохранение минер аккаунта
 	else if(Table == SaveType::SAVE_MINER_DATA)
 	{
 		char aBuf[64];
@@ -177,20 +170,14 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		SJK.UD("tw_accounts_miner", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().AuthID);
 		Buffer.clear();
 	}
-
-	// сохранение гильдии даты
 	else if(Table == SaveType::SAVE_GUILD_DATA)
 	{
 		SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '%d' WHERE ID = '%d'", pPlayer->Acc().GuildID, pPlayer->Acc().GuildRank, pPlayer->Acc().AuthID);	
 	}
-
-	// сохранение мира позиции
 	else if(Table == SaveType::SAVE_POSITION && !GS()->IsDungeon())
 	{
 		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", pPlayer->GetPlayerWorldID(), pPlayer->Acc().AuthID);
 	}
-
-	// сохранение языка игрока
 	else if(Table == SaveType::SAVE_LANGUAGE)
 	{
 		SJK.UD("tw_accounts", "Language = '%s' WHERE ID = '%d'", pPlayer->GetLanguage(), pPlayer->Acc().AuthID);
