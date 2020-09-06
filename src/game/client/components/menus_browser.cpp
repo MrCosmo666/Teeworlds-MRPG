@@ -370,13 +370,13 @@ void CMenus::InitDefaultFilters()
 	{
 		switch(m_lFilters[i].Custom())
 		{
-			case CBrowserFilter::FILTER_STANDARD:
+		case CBrowserFilter::FILTER_STANDARD:
 			FilterStandard = true;
 			break;
-			case CBrowserFilter::FILTER_FAVORITES:
+		case CBrowserFilter::FILTER_FAVORITES:
 			FilterFav = true;
 			break;
-			case CBrowserFilter::FILTER_ALL:
+		case CBrowserFilter::FILTER_ALL:
 			FilterAll = true;
 		}
 	}
@@ -1290,6 +1290,10 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 			{
 				const CServerInfo* pItem = pFilter->SortedGet(ServerIndex);
 
+				// todo: use weird 0.7 filter system for this
+				if (((Client()->State() == IClient::STATE_ONLINE && m_GamePage == PAGE_MRPG) || (Client()->State() == IClient::STATE_OFFLINE && m_MenuPage == PAGE_MRPG)) && !pItem->m_MRPG)
+					continue;
+
 				// select server if address changed and match found
 				bool IsSelected = m_aSelectedFilters[BrowserType] == FilterIndex && m_aSelectedServers[BrowserType] == ServerIndex;
 				if(!(m_AddressSelection & ADDR_SELECTION_UPDATE_ADDRESS) && !str_comp(pItem->m_aAddress, pAddress))
@@ -1377,7 +1381,7 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 		if(!s_ScrollRegion.IsRectClipped(MsgBox))
 		{
 			const char* pImportantMessage;
-			if(m_ActivePage == PAGE_INTERNET && ServerBrowser()->IsRefreshingMasters())
+			if((m_ActivePage == PAGE_INTERNET || m_ActivePage == PAGE_MRPG) && ServerBrowser()->IsRefreshingMasters())
 				pImportantMessage = Localize("Refreshing master servers");
 			else if(SelectedFilter == -1)
 				pImportantMessage = Localize("No filter category is selected");
@@ -2403,12 +2407,16 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 	static CButtonContainer s_RefreshButton;
 	if(DoButton_Menu(&s_RefreshButton, Localize("Refresh"), 0, &Button) || (Input()->KeyPress(KEY_R) && (Input()->KeyIsPressed(KEY_LCTRL) || Input()->KeyIsPressed(KEY_RCTRL))))
 	{
-		if(m_MenuPage == PAGE_INTERNET)
+		if(m_MenuPage == PAGE_INTERNET || m_MenuPage == PAGE_FAVORITES)
 			ServerBrowser()->Refresh(IServerBrowser::REFRESHFLAG_INTERNET);
 		else if(m_MenuPage == PAGE_LAN)
 			ServerBrowser()->Refresh(IServerBrowser::REFRESHFLAG_LAN);
-		else if (m_MenuPage == PAGE_FAVORITES)
+		else if (m_MenuPage == PAGE_MRPG)
+		{
+			// start a new serverlist request
+			Client()->RequestMmoInfo();
 			ServerBrowser()->Refresh(IServerBrowser::REFRESHFLAG_INTERNET);
+		}
 	}
 
 	// text information

@@ -71,6 +71,8 @@ public:
 	char m_aVersion[32];
 	char m_aAddress[NETADDR_MAXSTRSIZE];
 	CClient m_aClients[MAX_CLIENTS];
+
+	bool m_MRPG;
 };
 
 class CServerFilterInfo
@@ -149,7 +151,7 @@ public:
 		FILTER_COMPAT_VERSION=2048,
 		FILTER_PURE=4096,
 		FILTER_PURE_MAP=8192,
-		FILTER_COUNTRY= 16384,
+		FILTER_COUNTRY=16384
 	};
 
 	virtual int GetType() = 0;
