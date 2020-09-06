@@ -1,4 +1,11 @@
 #include <base/detect.h>
+
+#if defined(CONF_FAMILY_WINDOWS)
+	// For FlashWindowEx, FLASHWINFO, FLASHW_TRAY
+	#define _WIN32_WINNT 0x0501
+	#define WINVER 0x0501
+#endif
+
 #include "SDL.h"
 #include "SDL_opengl.h"
 
@@ -8,6 +15,11 @@
 #include "backend_sdl.h"
 
 #include "SDL_syswm.h"
+
+#if defined(SDL_VIDEO_DRIVER_X11)
+	#include <X11/Xutil.h>
+	#include <X11/Xlib.h>
+#endif
 
 #if defined(CONF_FAMILY_WINDOWS)
 PFNGLTEXIMAGE3DPROC glTexImage3DInternal;
