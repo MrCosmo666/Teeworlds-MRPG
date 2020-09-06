@@ -2360,7 +2360,7 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 	const int State = m_pClient->Updater()->GetCurrentState();
 	if (NeedUpdate && State <= IUpdater::CLEAN)
 	{
-		str_format(aBuf, sizeof(aBuf), Localize("Mmotee %s is available"), Client()->LatestVersion());
+		str_format(aBuf, sizeof(aBuf), Localize("MRPG Version %s is available"), Client()->LatestVersion());
 
 		// update now
 		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
@@ -2381,18 +2381,19 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 	}
 	else if (State == IUpdater::NEED_RESTART)
 	{
-		str_format(aBuf, sizeof(aBuf), Localize("Mmotee Client updated! Archive downloading to client folder!"));
+		str_format(aBuf, sizeof(aBuf), Localize("MRPG Client updated! Archive is available in the client folder!"));
 		m_NeedRestartUpdate = true;
 
 		// restart
 		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
 		static CButtonContainer s_ButtonUpdate;
-		if (DoButton_Menu(&s_ButtonUpdate, Localize("Client Archive"), 0, &Button))
+		if (DoButton_Menu(&s_ButtonUpdate, Localize("Open update files"), 0, &Button))
 			Client()->OpenUpdateArchive();
 	}
 	else
 	{
-		str_format(aBuf, sizeof(aBuf), Localize("No updates available"));
+		// str_format(aBuf, sizeof(aBuf), Localize("No updates available"));
+		str_format(aBuf, sizeof(aBuf), Localize("MRPG Client is up to date"));
 
 		// check now
 		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
