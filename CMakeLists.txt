@@ -652,6 +652,7 @@ set_src(ENGINE_INTERFACE GLOB src/engine
   console.h
   contacts.h
   demo.h
+  discord.h
   editor.h
   engine.h
   graphics.h
