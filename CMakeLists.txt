@@ -109,7 +109,7 @@ find_package(PythonInterp)
 if(DOWNLOAD_DEPENDENCIES)
   if(PYTHON_EXECUTABLE AND TARGET_OS AND TARGET_BITS)
     set(DOWNLOADS)
-    foreach(sdep boost curl freetype icu mysql sdl)
+    foreach(sdep boost curl freetype icu mysql sdl discordgamesdk)
       if(NOT EXISTS "${PROJECT_SOURCE_DIR}/other/${sdep}/${TARGET_OS}/lib${TARGET_BITS}")
         list(APPEND DOWNLOADS ${sdep})
       endif()
@@ -289,6 +289,7 @@ find_package(Curl)
 find_package(Crypto)
 find_package(ICU)
 find_package(MySQL)
+find_package(DiscordGameSDK)
 
 if(TARGET_OS AND TARGET_OS STREQUAL "linux")
   find_package(Boost 1.36.0)
@@ -334,6 +335,7 @@ set(CLIENT_LIBRARIES
   ${PNGLITE_LIBRARIES} 
   ${SDL2_LIBRARIES} 
   ${WAVPACK_LIBRARIES}
+  ${DISCORDGAMESDK_LIBRARIES}
 )
 
 # client includes
@@ -343,6 +345,7 @@ set(CLIENT_INCLUDES_DIRS
   ${PNGLITE_INCLUDE_DIRS} 
   ${SDL2_INCLUDE_DIRS} 
   ${WAVPACK_INCLUDE_DIRS}
+  ${DISCORDGAMESDK_INCLUDE_DIRS}
 )
 
 # server lib
@@ -396,6 +399,7 @@ elseif(COMPILE_CLIENT)
   show_dependency_status("SDL2" SDL2)
   show_dependency_status("Wavpack" WAVPACK)
   show_dependency_status("Zlib" ZLIB)
+  show_dependency_status("DiscordGameSDK" DISCORDGAMESDK)
 endif()
 
 if(NOT(PYTHONINTERP_FOUND))
@@ -417,6 +421,9 @@ if(CLIENT_COMPILE AND NOT(FREETYPE_FOUND))
 endif()
 if(CLIENT_COMPILE AND NOT(SDL2_FOUND))
   message(SEND_ERROR "You must install SDL2 to compile Teeworlds MMO(Client)")
+endif()
+if(CLIENT_COMPILE AND NOT(DISCORDGAMESDK_FOUND))
+  message(SEND_ERROR "You must install Discord GameSDK to compile Teeworlds MMO(Client)")
 endif()
 
 if(NOT(GTEST_FOUND))
@@ -535,6 +542,7 @@ set(COPY_FILES_CLIENT
   ${FREETYPE_COPY_FILES}
   ${SDL2_COPY_FILES}
   ${FFMPEG_COPY_FILES}
+  ${DISCORDGAMESDK_COPY_FILES}
 )
 
 set(COPY_FILES_SERVER
@@ -757,7 +765,7 @@ if(CLIENT_COMPILE)
     src/generated/client_data.h
   )
   set(CLIENT_SRC ${PLATFORM_CLIENT} ${ENGINE_CLIENT} ${GAME_CLIENT} ${GAME_EDITOR} ${GAME_GENERATED_CLIENT})
-  set(DEPS_CLIENT ${DEPS} ${PNGLITE_DEP} ${WAVPACK_DEP})
+  set(DEPS_CLIENT ${DEPS} ${PNGLITE_DEP} ${WAVPACK_DEP} ${DISCORDGAMESDK_DEP})
 
   if(TARGET_OS STREQUAL "windows")
     set(CLIENT_ICON "other/icons/${CLIENT_EXECUTABLE}.rc")
