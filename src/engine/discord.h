@@ -15,7 +15,8 @@ class IDiscord : public IInterface
 {
 	MACRO_INTERFACE("discord", 0)
 public:
-	struct DiscordState {
+	struct DiscordState
+	{
 		bool m_UserFound;
 
 		discord::User m_CurrentUser;
