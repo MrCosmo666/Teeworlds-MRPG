@@ -6,6 +6,7 @@
 class CDiscord : public IDiscord
 {
 	class IClient* m_pClient;
+	class IGameClient* m_pGameClient;
 
 	struct
 	{
@@ -28,6 +29,7 @@ public:
 	CDiscord();
 
 	class IClient* Client() { return m_pClient; }
+	class IGameClient* GameClient() { return m_pGameClient; }
 
 	virtual void Init();
 	virtual void Update();

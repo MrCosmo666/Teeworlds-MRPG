@@ -7,6 +7,10 @@
 #include <engine/discord.h>
 #include <engine/serverbrowser.h>
 
+#include <generated/protocol.h>
+
+#include <game/gamecore.h>
+
 #include "discord.h"
 
 #define APPLICATION_ID 753325967778381955
@@ -56,6 +60,7 @@ CDiscord::CDiscord()
 void CDiscord::Init()
 {
 	m_pClient = Kernel()->RequestInterface<IClient>();
+	m_pGameClient = Kernel()->RequestInterface<IGameClient>();
 }
 
 void CDiscord::OnLog(discord::LogLevel Level, const char* pMessage)
@@ -128,9 +133,22 @@ void CDiscord::HandleActivity()
 		if (!Info.m_aName[0])
 			return;
 
-		if (Info.m_MRPG)
+		const CNetObj_Mmo_ClientInfo* pInfo = GameClient()->GetMMOInfo();
+		if (pInfo)
 		{
-			
+			char aGold[32];
+			IntsToStr(pInfo->m_Gold, 6, aGold);
+			dbg_msg("lol", "%s", aGold);
+
+			char aBuf[64];
+			str_format(aBuf, sizeof(aBuf), "Lvl. %d | Gold: %s", pInfo->m_Level, aGold);
+			pActivity->SetDetails(aBuf);
+
+			str_format(aBuf, sizeof(aBuf), "Playing on %s", Client()->GetCurrentMapName());
+			pActivity->SetState(aBuf);
+
+			pActivity->GetParty().GetSize().SetCurrentSize(Info.m_NumClients);
+			pActivity->GetParty().GetSize().SetMaxSize(Info.m_MaxClients);
 		}
 		else
 		{
@@ -150,7 +168,7 @@ void CDiscord::HandleActivity()
 		/*pActivity->GetAssets().SetSmallImage("nodes_icon");
 		pActivity->GetAssets().SetSmallText("Nodes");*/
 	}
-	else
+	else if(m_ActivityData.m_LastState != IClient::STATE_LOADING && m_ActivityData.m_LastState != IClient::STATE_CONNECTING) // don't update while changing map
 	{
 		pActivity->SetState("In Main Menu");
 	}

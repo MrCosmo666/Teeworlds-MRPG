@@ -298,6 +298,8 @@ public:
 	void SetAtmosphereMusicMRPG(int SoundID, float Vol);
 	void UpdateStateMmoMusic();
 
+	virtual CNetObj_Mmo_ClientInfo* GetMMOInfo() const;
+
 	//
 	void DoEnterMessage(const char *pName, int ClientID, int Team);
 	void DoLeaveMessage(const char *pName, int ClientID, const char *pReason);
