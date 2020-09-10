@@ -25,7 +25,6 @@ class CDiscord : public IDiscord
 	void OnActivityInvite(discord::ActivityActionType ActivityActionType, discord::User const& User, discord::Activity const& Activity);
 
 public:
-
 	CDiscord();
 
 	class IClient* Client() { return m_pClient; }

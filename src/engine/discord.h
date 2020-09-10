@@ -14,10 +14,7 @@
 class IDiscord : public IInterface
 {
 	MACRO_INTERFACE("discord", 0)
-protected:
-
 public:
-
 	struct DiscordState {
 		bool m_UserFound;
 
