@@ -126,6 +126,8 @@ void CServerBrowserFilter::CServerFilter::Filter()
 			Filtered = 1;
 		else if(m_FilterInfo.IsLevelFiltered(m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_ServerLevel))
 			Filtered = 1;
+		else if (m_FilterInfo.m_SortHash & IServerBrowser::FILTER_MRPG && !m_pServerBrowserFilter->m_ppServerlist[i]->m_Info.m_MRPG)
+			Filtered = 1;
 		else
 		{
 			if(m_FilterInfo.m_aGametype[0][0])
@@ -236,6 +238,7 @@ int CServerBrowserFilter::CServerFilter::GetSortHash() const
 	if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_PURE) i |= 1 << 12;
 	if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_PURE_MAP) i |= 1 << 13;
 	if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_COUNTRY) i |= 1 << 14;
+	if(m_FilterInfo.m_SortHash & IServerBrowser::FILTER_MRPG) i |= 1 << 15;
 	return i;
 }
 

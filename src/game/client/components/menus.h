@@ -644,6 +644,7 @@ private:
 
 		static CServerFilterInfo ms_FilterStandard;
 		static CServerFilterInfo ms_FilterFavorites;
+		static CServerFilterInfo ms_FilterMRPG;
 		static CServerFilterInfo ms_FilterAll;
 
 	public:
@@ -652,7 +653,8 @@ private:
 			FILTER_CUSTOM=0,
 			FILTER_ALL,
 			FILTER_STANDARD,
-			FILTER_FAVORITES
+			FILTER_FAVORITES,
+			FILTER_MRPG
 		};
 		// buttons var
 		int m_SwitchButton;
