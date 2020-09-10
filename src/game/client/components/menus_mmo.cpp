@@ -131,12 +131,12 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		RenderTools()->DrawUIRect(&BackgroundExpBar, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 80.0f), CUI::CORNER_ALL, 5.0f);
 		
 		// expbar
-		CUIRect ExpBar = BasicRight;
-		ExpBar.VMargin(10.0f, &ExpBar);
-		ExpBar.HMargin(5.0f, &ExpBar), ExpBar.h = 20.0f;
+		CUIRect ExpBar;
+		BasicRight.HSplitTop(5.0f, 0, &BasicRight);
+		BasicRight.HSplitTop(15.0f, &ExpBar, &BasicRight);
+		ExpBar.VMargin(5.0f, &ExpBar);
 		const vec4 ProgressColor((g_Config.m_HdColorProgress >> 16) / 255.0f, ((g_Config.m_HdColorProgress >> 8) & 0xff) / 255.0f, (g_Config.m_HdColorProgress & 0xff) / 255.0f, 0.8f);
-		RenderTools()->DrawUIBar(TextRender(), ExpBar, ProgressColor, 50, 100, "Experience Bar", 20, 5.0f, 2.0f);
-		BasicRight.HSplitTop(10.0f, &ExpBar, &BasicRight);
+		RenderTools()->DrawUIBar(TextRender(), ExpBar, ProgressColor, 50, 100, "Experience Bar", 5, 2.0f, 1.0f, 2.5f);
 
 		int hri = g_Config.m_HdColorProgress >> 16;
 		int hgi = (g_Config.m_HdColorProgress >> 8) & 0xff;
