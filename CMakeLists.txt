@@ -185,7 +185,12 @@ if(NOT MSVC)
   add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wno-unused-parameter)
   add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wno-missing-field-initializers)
   add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wformat=2) # Warn about format strings.
-  add_c_compiler_flag_if_supported(OUR_FLAGS_DEP -Wno-implicit-function-declaration)
+
+  # sry, discord sdk is broken somehow and throws this error on linux
+  if (NOT TARGET_OS STREQUAL "linux")
+    add_c_compiler_flag_if_supported(OUR_FLAGS_DEP -Wno-implicit-function-declaration)
+  endif()
+  
   add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wduplicated-cond)
   add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wduplicated-branches)
   add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wlogical-op)
