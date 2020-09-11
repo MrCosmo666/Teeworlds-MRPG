@@ -138,7 +138,6 @@ void CDiscord::HandleActivity()
 		{
 			char aGold[32];
 			IntsToStr(pInfo->m_Gold, 6, aGold);
-			dbg_msg("lol", "%s", aGold);
 
 			char aBuf[64];
 			str_format(aBuf, sizeof(aBuf), "Lvl. %d | Gold: %s", pInfo->m_Level, aGold);

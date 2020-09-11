@@ -12,10 +12,10 @@
 #define PREV_CLIENT_VERSION 0x0704
 
 // release client version
-#define GAME_RELEASE_VERSION "1.1.7"
+#define GAME_RELEASE_VERSION "1.1.8"
 
 // server version
 #define CLIENT_VERSION_MOLD 1012
-#define CLIENT_VERSION_MMO 1023
+#define CLIENT_VERSION_MMO 1024
 
 #endif
