@@ -52,6 +52,8 @@ def downloadAll(targets):
 		copy_tree(libs_dir + "/sdl/", "other/sdl/")
 	if "discordgamesdk" in targets:
 		copy_tree(libs_dir + "/discordgamesdk/", "other/discordgamesdk/")
+	if "openssl" in targets:
+		copy_tree(libs_dir + "/openssl/", "other/openssl/")
 
 	# cleanup
 	try:
@@ -63,7 +65,7 @@ def main():
     import argparse
     p = argparse.ArgumentParser(description="Download dep library and header files for Windows.")
     p.add_argument("targets", metavar="TARGET", nargs='+', 
-        choices=["boost", "curl", "freetype", "icu", "mysql", "openssl", "opus", "sdl", "discordgamesdk"], 
+        choices=["boost", "curl", "freetype", "icu", "mysql", "openssl", "opus", "sdl", "discordgamesdk", "openssl"], 
         help='Target to download.'
     )
     args = p.parse_args()

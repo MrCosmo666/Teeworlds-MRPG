@@ -109,7 +109,7 @@ find_package(PythonInterp)
 if(DOWNLOAD_DEPENDENCIES)
   if(PYTHON_EXECUTABLE AND TARGET_OS AND TARGET_BITS)
     set(DOWNLOADS)
-    foreach(sdep boost curl freetype icu mysql sdl discordgamesdk)
+    foreach(sdep boost curl freetype icu mysql sdl discordgamesdk openssl)
       if(NOT EXISTS "${PROJECT_SOURCE_DIR}/other/${sdep}/${TARGET_OS}/lib${TARGET_BITS}")
         list(APPEND DOWNLOADS ${sdep})
       endif()
@@ -417,6 +417,9 @@ endif()
 if(SERVER_COMPILE AND NOT(ICU_FOUND))
   message(SEND_ERROR "You must install ICU to compile Teeworlds MMO(Server)")
 endif()
+if(SERVER_COMPILE AND NOT(CRYPTO_FOUND))
+  message(SEND_ERROR "You must install OpenSSL to compile Teeworlds MMO(Server)")
+endif()
 
 if(CLIENT_COMPILE AND NOT(CURL_FOUND))
   message(SEND_ERROR "You must install Curl to compile Teeworlds MMO(Client)")
@@ -553,6 +556,7 @@ set(COPY_FILES_CLIENT
 set(COPY_FILES_SERVER
   ${ICU_COPY_FILES}
   ${MYSQL_COPY_FILES}
+  ${OPENSSL_COPY_FILES}
 )
 
 file(COPY ${COPY_FILES_CLIENT} ${COPY_FILES_SERVER} DESTINATION .)
