@@ -1429,7 +1429,7 @@ void CMenus::RenderLoading(int WorkedAmount)
 	Rect.y += 20;
 	TextRender()->TextColor(CUI::ms_DefaultTextColor);
 	TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
-	UI()->DoLabel(&Rect, "MRPG Teeworlds", 48.0f, CUI::ALIGN_CENTER);
+	UI()->DoLabel(&Rect, "Teeworlds MRPG", 48.0f, CUI::ALIGN_CENTER);
 
 	const float Percent = m_LoadCurrent / (float)m_LoadTotal;
 	const float Spacing = 40.0f;
