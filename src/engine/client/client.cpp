@@ -22,6 +22,7 @@
 #include <engine/sound.h>
 #include <engine/storage.h>
 #include <engine/textrender.h>
+#include <engine/discord.h>
 
 #include <engine/client/http.h>
 #include <engine/external/json-parser/json.h>
@@ -1959,6 +1960,7 @@ void CClient::InitInterfaces()
 	m_pMasterServer = Kernel()->RequestInterface<IEngineMasterServer>();
 	m_pStorage = Kernel()->RequestInterface<IStorage>();
 	m_pUpdater = Kernel()->RequestInterface<IUpdater>();
+	m_pDiscord = Kernel()->RequestInterface<IDiscord>();
 
 	//
 	m_ServerBrowser.Init(&m_ContactClient, m_pGameClient->NetVersion());
@@ -2165,6 +2167,7 @@ void CClient::Run()
 			break;	// SDL_QUIT
 
 		Updater()->Update();
+		Discord()->Update();
 
 		// update sound
 		Sound()->Update();
@@ -2737,6 +2740,7 @@ int main(int argc, const char** argv) // ignore_convention
 	IEngineTextRender* pEngineTextRender = CreateEngineTextRender();
 	IEngineMap* pEngineMap = CreateEngineMap();
 	IEngineMasterServer* pEngineMasterServer = CreateEngineMasterServer();
+	IDiscord* pDiscord = CreateDiscordWrapper();
 
 	{
 		bool RegisterFail = false;
@@ -2764,6 +2768,8 @@ int main(int argc, const char** argv) // ignore_convention
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(CreateGameClient());
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pStorage);
 
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pDiscord);
+
 		if (RegisterFail)
 			return -1;
 	}
@@ -2772,6 +2778,7 @@ int main(int argc, const char** argv) // ignore_convention
 	pConfig->Init(FlagMask);
 	pEngineMasterServer->Init();
 	pEngineMasterServer->Load();
+	pDiscord->Init();
 
 	// register all console commands
 	pClient->RegisterCommands();
@@ -2851,6 +2858,7 @@ int main(int argc, const char** argv) // ignore_convention
 	delete pEngineTextRender;
 	delete pEngineMap;
 	delete pEngineMasterServer;
+	delete pDiscord;
 
 	return 0;
 }

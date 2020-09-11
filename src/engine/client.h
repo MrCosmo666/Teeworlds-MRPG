@@ -7,6 +7,8 @@
 #include "message.h"
 #include "graphics.h"
 
+#include <generated/protocol.h>
+
 class IClient : public IInterface
 {
 	MACRO_INTERFACE("client", 0)
@@ -199,6 +201,7 @@ public:
 	virtual const char *NetVersionHashReal() const = 0;
 	virtual int ClientVersion() const = 0;
 
+	virtual CNetObj_Mmo_ClientInfo* GetMMOInfo() const = 0;
 };
 
 extern IGameClient *CreateGameClient();
