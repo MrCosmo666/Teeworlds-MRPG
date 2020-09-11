@@ -37,6 +37,7 @@ CMenus::CColumn CMenus::ms_aBrowserCols[] = {  // Localize("Server"); Localize("
 
 CServerFilterInfo CMenus::CBrowserFilter::ms_FilterStandard = {IServerBrowser::FILTER_COMPAT_VERSION|IServerBrowser::FILTER_PURE|IServerBrowser::FILTER_PURE_MAP, 999, -1, 0, {{0}}, {0}};
 CServerFilterInfo CMenus::CBrowserFilter::ms_FilterFavorites = {IServerBrowser::FILTER_COMPAT_VERSION|IServerBrowser::FILTER_FAVORITE, 999, -1, 0, {{0}}, {0}};
+CServerFilterInfo CMenus::CBrowserFilter::ms_FilterMRPG = { IServerBrowser::FILTER_COMPAT_VERSION | IServerBrowser::FILTER_MRPG, 999, -1, 0, {{0}}, {0} };
 CServerFilterInfo CMenus::CBrowserFilter::ms_FilterAll = {IServerBrowser::FILTER_COMPAT_VERSION, 999, -1, 0, {{0}}, {0}};
 
 vec3 TextHighlightColor = vec3(0.4f, 0.4f, 1.0f);
@@ -56,6 +57,9 @@ CMenus::CBrowserFilter::CBrowserFilter(int Custom, const char* pName, IServerBro
 	case CBrowserFilter::FILTER_FAVORITES:
 		m_Filter = m_pServerBrowser->AddFilter(&ms_FilterFavorites);
 		break;
+	case CBrowserFilter::FILTER_MRPG:
+		m_Filter = m_pServerBrowser->AddFilter(&ms_FilterMRPG);
+		break;
 	default:
 		m_Filter = m_pServerBrowser->AddFilter(&ms_FilterAll);
 	}
@@ -73,6 +77,9 @@ void CMenus::CBrowserFilter::Reset()
 		break;
 	case CBrowserFilter::FILTER_FAVORITES:
 		SetFilter(&ms_FilterFavorites);
+		break;
+	case CBrowserFilter::FILTER_MRPG:
+		SetFilter(&ms_FilterMRPG);
 		break;
 	default:
 		SetFilter(&ms_FilterAll);
@@ -365,6 +372,7 @@ void CMenus::InitDefaultFilters()
 	bool UseDefaultFilters = !m_lFilters.size();
 	bool FilterStandard = false;
 	bool FilterFav = false;
+	bool FilterMRPG = false;
 	bool FilterAll = false;
 	for(int i = 0; i < m_lFilters.size(); i++)
 	{
@@ -375,6 +383,10 @@ void CMenus::InitDefaultFilters()
 			break;
 		case CBrowserFilter::FILTER_FAVORITES:
 			FilterFav = true;
+			break;
+		case CBrowserFilter::FILTER_MRPG:
+			if(!str_comp_nocase(m_lFilters[i].Name(), "MRPG")) // only allow filters that are actually mrpg filters
+				FilterMRPG = true;
 			break;
 		case CBrowserFilter::FILTER_ALL:
 			FilterAll = true;
@@ -390,6 +402,8 @@ void CMenus::InitDefaultFilters()
 	}
 	if(!FilterFav)
 		m_lFilters.add(CBrowserFilter(CBrowserFilter::FILTER_FAVORITES, Localize("Favorites"), ServerBrowser()));
+	if (!FilterMRPG)
+		m_lFilters.add(CBrowserFilter(CBrowserFilter::FILTER_MRPG, Localize("MRPG"), ServerBrowser()));
 	if(!FilterAll)
 		m_lFilters.add(CBrowserFilter(CBrowserFilter::FILTER_ALL, Localize("All"), ServerBrowser()));
 	// expand the all filter tab by default
@@ -1263,6 +1277,18 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 				else if(!pFilter->Extended())
 					pFilter->Switch();
 			}
+			else if (m_ActivePage == PAGE_MRPG)
+			{
+				// if (pFilter->Custom() != CBrowserFilter::FILTER_MRPG)
+				if (str_comp_nocase(pFilter->Name(), "MRPG"))
+				{
+					if (pFilter->Extended())
+						pFilter->Switch();
+					continue;
+				}
+				else if (!pFilter->Extended())
+					pFilter->Switch();
+			}
 			else if (pFilter->Custom() != CBrowserFilter::FILTER_ALL)
 			{
 				if (pFilter->Extended())
@@ -1289,10 +1315,6 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 			for(int ServerIndex = 0; ServerIndex < pFilter->NumSortedServers(); ServerIndex++)
 			{
 				const CServerInfo* pItem = pFilter->SortedGet(ServerIndex);
-
-				// todo: use weird 0.7 filter system for this
-				if (((Client()->State() == IClient::STATE_ONLINE && m_GamePage == PAGE_MRPG) || (Client()->State() == IClient::STATE_OFFLINE && m_MenuPage == PAGE_MRPG)) && !pItem->m_MRPG)
-					continue;
 
 				// select server if address changed and match found
 				bool IsSelected = m_aSelectedFilters[BrowserType] == FilterIndex && m_aSelectedServers[BrowserType] == ServerIndex;
