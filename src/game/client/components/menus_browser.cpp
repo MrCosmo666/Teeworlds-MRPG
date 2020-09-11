@@ -151,7 +151,7 @@ void CMenus::CBrowserFilter::SetFilter(const CServerFilterInfo *pFilterInfo)
 void CMenus::LoadFilters()
 {
 	// read file data into buffer
-	const char *pFilename = "ui_settings.json";
+	const char *pFilename = "ui_settings_mrpg.json";
 	IOHANDLE File = Storage()->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_ALL);
 	if(!File)
 		return;
@@ -253,7 +253,7 @@ void CMenus::LoadFilters()
 
 void CMenus::SaveFilters()
 {
-	IOHANDLE File = Storage()->OpenFile("ui_settings.json", IOFLAG_WRITE, IStorage::TYPE_SAVE);
+	IOHANDLE File = Storage()->OpenFile("ui_settings_mrpg.json", IOFLAG_WRITE, IStorage::TYPE_SAVE);
 	if(!File)
 		return;
 
@@ -385,8 +385,7 @@ void CMenus::InitDefaultFilters()
 			FilterFav = true;
 			break;
 		case CBrowserFilter::FILTER_MRPG:
-			if(!str_comp_nocase(m_lFilters[i].Name(), "MRPG")) // only allow filters that are actually mrpg filters
-				FilterMRPG = true;
+			FilterMRPG = true;
 			break;
 		case CBrowserFilter::FILTER_ALL:
 			FilterAll = true;
@@ -402,10 +401,11 @@ void CMenus::InitDefaultFilters()
 	}
 	if(!FilterFav)
 		m_lFilters.add(CBrowserFilter(CBrowserFilter::FILTER_FAVORITES, Localize("Favorites"), ServerBrowser()));
-	if (!FilterMRPG)
-		m_lFilters.add(CBrowserFilter(CBrowserFilter::FILTER_MRPG, Localize("MRPG"), ServerBrowser()));
 	if(!FilterAll)
 		m_lFilters.add(CBrowserFilter(CBrowserFilter::FILTER_ALL, Localize("All"), ServerBrowser()));
+	if(!FilterMRPG)
+		m_lFilters.add(CBrowserFilter(CBrowserFilter::FILTER_MRPG, Localize("MRPG"), ServerBrowser()));
+
 	// expand the all filter tab by default
 	if(UseDefaultFilters)
 		m_lFilters[m_lFilters.size() - 1].Switch();
