@@ -61,17 +61,7 @@ int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char 
 	char aSalt[32] = { 0 };
 	secure_random_password(aSalt, sizeof(aSalt), 24);
 
-	char aPlaintext[128] = { 0 };
-	SHA256_CTX Sha256Ctx;
-	sha256_init(&Sha256Ctx);
-	str_format(aPlaintext, sizeof(aPlaintext), "%s%s%s", aSalt, clear_Pass.cstr(), aSalt);
-	sha256_update(&Sha256Ctx, aPlaintext, str_length(aPlaintext));
-	SHA256_DIGEST Digest = sha256_finish(&Sha256Ctx);
-
-	char aHash[SHA256_MAXSTRSIZE];
-	sha256_str(Digest, aHash, sizeof(aHash));
-
-	SJK.ID("tw_accounts", "(ID, Username, Password, PasswordSalt, RegisterDate, RegisteredIP) VALUES ('%d', '%s', '%s', '%s', UTC_TIMESTAMP(), '%s')", InitID, clear_Login.cstr(), aHash, aSalt, aAddrStr);
+	SJK.ID("tw_accounts", "(ID, Username, Password, PasswordSalt, RegisterDate, RegisteredIP) VALUES ('%d', '%s', '%s', '%s', UTC_TIMESTAMP(), '%s')", InitID, clear_Login.cstr(), HashPassword(clear_Pass.cstr(), aSalt).c_str(), aSalt, aAddrStr);
 	SJK.IDS(100, "tw_accounts_data", "(ID, Nick) VALUES ('%d', '%s')", InitID, clear_Nick.cstr());
 
 	GS()->Chat(ClientID, "- - - - - - - [Successful registered] - - - - - - -");
@@ -107,18 +97,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		bool LoginSuccess = false;
 		if (CHECKACCESS->next())
 		{
-			char aPlaintext[128] = { 0 };
-			str_format(aPlaintext, sizeof(aPlaintext), "%s%s%s", CHECKACCESS->getString("PasswordSalt").c_str(), clear_Pass.cstr(), CHECKACCESS->getString("PasswordSalt").c_str());
-
-			SHA256_CTX Sha256Ctx;
-			sha256_init(&Sha256Ctx);
-			sha256_update(&Sha256Ctx, aPlaintext, str_length(aPlaintext));
-			SHA256_DIGEST Digest = sha256_finish(&Sha256Ctx);
-
-			char aHash[SHA256_MAXSTRSIZE];
-			sha256_str(Digest, aHash, sizeof(aHash));
-
-			if (!str_comp(CHECKACCESS->getString("Password").c_str(), aHash))
+			if (!str_comp(CHECKACCESS->getString("Password").c_str(), HashPassword(clear_Pass.cstr(), CHECKACCESS->getString("PasswordSalt").c_str()).c_str()))
 				LoginSuccess = true;
 		}
 		
@@ -341,4 +320,18 @@ void AccountMainJob::OnResetClient(int ClientID)
 
 	if (Data.find(ClientID) != Data.end())
 		Data.erase(ClientID);
+}
+
+std::string AccountMainJob::HashPassword(const char* pPassword, const char* pSalt)
+{
+	char aPlaintext[128] = { 0 };
+	SHA256_CTX Sha256Ctx;
+	sha256_init(&Sha256Ctx);
+	str_format(aPlaintext, sizeof(aPlaintext), "%s%s%s", pSalt, pPassword, pSalt);
+	sha256_update(&Sha256Ctx, aPlaintext, str_length(aPlaintext));
+	SHA256_DIGEST Digest = sha256_finish(&Sha256Ctx);
+
+	char aHash[SHA256_MAXSTRSIZE];
+	sha256_str(Digest, aHash, sizeof(aHash));
+	return std::string(aHash);
 }
