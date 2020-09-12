@@ -12,7 +12,7 @@ public:
 	struct StructData
 	{
 		char Login[64];
-		char Password[64];
+		// char Password[64];
 		char LastLogin[64];
 		char Language[8];
 		int AuthID;

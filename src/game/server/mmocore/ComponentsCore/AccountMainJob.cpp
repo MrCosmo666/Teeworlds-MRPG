@@ -136,7 +136,6 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 
 		pPlayer->SetLanguage(CHECKACCESS->getString("Language").c_str());
 		str_copy(pPlayer->Acc().Login, clear_Login.cstr(), sizeof(pPlayer->Acc().Login));
-		str_copy(pPlayer->Acc().Password, clear_Pass.cstr(), sizeof(pPlayer->Acc().Password));
 		str_copy(pPlayer->Acc().LastLogin, CHECKACCESS->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().LastLogin));
 
 		pPlayer->Acc().AuthID = UserID;

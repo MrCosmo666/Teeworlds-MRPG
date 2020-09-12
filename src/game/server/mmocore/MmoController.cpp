@@ -184,7 +184,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	}
 	else
 	{
-		SJK.UD("tw_accounts", "Username = '%s', Password = '%s' WHERE ID = '%d'", pPlayer->Acc().Login, pPlayer->Acc().Password, pPlayer->Acc().AuthID);
+		SJK.UD("tw_accounts", "Username = '%s' WHERE ID = '%d'", pPlayer->Acc().Login, pPlayer->Acc().AuthID);
 	}
 }
 
