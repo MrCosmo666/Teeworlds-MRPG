@@ -1,18 +1,11 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <openssl/evp.h>
+#include <stdio.h>
+#include <stdarg.h>
+
+#include <base/hash_ctxt.h>
 #include <base/math.h>
 #include <base/system.h>
-
-// https://github.com/Anti-weakpasswords/PBKDF2-GCC-OpenSSL-library/blob/master/pbkdf2_openssl.c
-void hash_password(const char* pString, const unsigned char* pSalt, int32_t Iterations, char* pHexResult)
-{
-	unsigned int i;
-	unsigned char aDigest[32]; // SHA-256 <= 32
-	PKCS5_PBKDF2_HMAC(pString, str_length((char*)pString), pSalt, str_length((char*)pSalt), Iterations, EVP_sha256(), 32, aDigest);
-	for (i = 0; i < sizeof(aDigest); i++)
-		sprintf(pHexResult + (i * 2), "%02x", 255 & aDigest[i]);
-}
 
 void dbg_print(const char* sys, const char* fmt, ...)
 {
@@ -63,8 +56,20 @@ int main(int argc, char** argv)
 	char aSalt[32] = { 0 };
 	secure_random_password(aSalt, sizeof(aSalt), 24);
 
-	char aHash[128] = { 0 };
-	hash_password(aPassword, (const unsigned char*)aSalt, 16384, aHash);
+	// char aHash[128] = { 0 };
+	// hash_password(aPassword, (const unsigned char*)aSalt, 16384, aHash);
+
+	SHA256_CTX Sha256Ctx;
+	sha256_init(&Sha256Ctx);
+
+	char aPlaintext[128];
+	str_format(aPlaintext, sizeof(aPlaintext), "%s%s%s", aSalt, aPassword, aSalt);
+
+	sha256_update(&Sha256Ctx, aPlaintext, str_length(aPlaintext));
+	SHA256_DIGEST Digest = sha256_finish(&Sha256Ctx);
+
+	char aHash[SHA256_MAXSTRSIZE];
+	sha256_str(Digest, aHash, sizeof(aHash));
 
 	dbg_print("plain", aPassword);
 	dbg_print("hash", aHash);
