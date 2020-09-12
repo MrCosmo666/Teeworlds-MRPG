@@ -1,5 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/hash_ctxt.h>
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 #include <teeother/components/localization.h>
@@ -51,11 +52,26 @@ int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char 
 	boost::scoped_ptr<ResultSet> RES4(SJK.SD("ID", "tw_accounts", "ORDER BY ID DESC LIMIT 1"));
 	const int InitID = RES4->next() ? RES4->getInt("ID")+1 : 1; // thread save ? hm need for table all time auto increment = 1; NEED FIX IT
 
-	char aAddrStr[64];
 	CSqlString<32> clear_Login = CSqlString<32>(Login);
 	CSqlString<32> clear_Pass = CSqlString<32>(Password);
+
+	char aAddrStr[64];
 	GS()->Server()->GetClientAddr(ClientID, aAddrStr, sizeof(aAddrStr));
-	SJK.ID("tw_accounts", "(ID, Username, Password, RegisterDate, RegisteredIP) VALUES ('%d', '%s', '%s', UTC_TIMESTAMP(), '%s')", InitID, clear_Login.cstr(), clear_Pass.cstr(), aAddrStr);
+
+	char aSalt[32] = { 0 };
+	secure_random_password(aSalt, sizeof(aSalt), 24);
+
+	char aPlaintext[128] = { 0 };
+	SHA256_CTX Sha256Ctx;
+	sha256_init(&Sha256Ctx);
+	str_format(aPlaintext, sizeof(aPlaintext), "%s%s%s", aSalt, clear_Pass.cstr(), aSalt);
+	sha256_update(&Sha256Ctx, aPlaintext, str_length(aPlaintext));
+	SHA256_DIGEST Digest = sha256_finish(&Sha256Ctx);
+
+	char aHash[SHA256_MAXSTRSIZE];
+	sha256_str(Digest, aHash, sizeof(aHash));
+
+	SJK.ID("tw_accounts", "(ID, Username, Password, PasswordSalt, RegisterDate, RegisteredIP) VALUES ('%d', '%s', '%s', '%s', UTC_TIMESTAMP(), '%s')", InitID, clear_Login.cstr(), aHash, aSalt, aAddrStr);
 	SJK.IDS(100, "tw_accounts_data", "(ID, Nick) VALUES ('%d', '%s')", InitID, clear_Nick.cstr());
 
 	GS()->Chat(ClientID, "- - - - - - - [Successful registered] - - - - - - -");
@@ -86,8 +102,27 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 	if(ACCOUNTDATA->next())
 	{
 		const int UserID = ACCOUNTDATA->getInt("ID");
-		boost::scoped_ptr<ResultSet> CHECKACCESS(SJK.SD("ID, LoginDate, Language", "tw_accounts", "WHERE Username = '%s' AND Password = '%s' AND ID = '%d'", clear_Login.cstr(), clear_Pass.cstr(), UserID));
-		if (!CHECKACCESS->next())
+		boost::scoped_ptr<ResultSet> CHECKACCESS(SJK.SD("ID, LoginDate, Language, Password, PasswordSalt", "tw_accounts", "WHERE Username = '%s' AND ID = '%d'", clear_Login.cstr(), UserID));
+
+		bool LoginSuccess = false;
+		if (CHECKACCESS->next())
+		{
+			char aPlaintext[128] = { 0 };
+			str_format(aPlaintext, sizeof(aPlaintext), "%s%s%s", CHECKACCESS->getString("PasswordSalt").c_str(), clear_Pass.cstr(), CHECKACCESS->getString("PasswordSalt").c_str());
+
+			SHA256_CTX Sha256Ctx;
+			sha256_init(&Sha256Ctx);
+			sha256_update(&Sha256Ctx, aPlaintext, str_length(aPlaintext));
+			SHA256_DIGEST Digest = sha256_finish(&Sha256Ctx);
+
+			char aHash[SHA256_MAXSTRSIZE];
+			sha256_str(Digest, aHash, sizeof(aHash));
+
+			if (!str_comp(CHECKACCESS->getString("Password").c_str(), aHash))
+				LoginSuccess = true;
+		}
+		
+		if(!LoginSuccess)
 		{
 			GS()->Chat(ClientID, "Wrong login or password!");
 			return SendAuthCode(ClientID, AUTH_LOGIN_WRONG);
