@@ -12,7 +12,7 @@ void dbg_print(const char* sys, const char* fmt, ...)
 	va_list args;
 	char str[1024 * 4];
 	char* msg;
-	int i, len;
+	int len;
 
 	str_format(str, sizeof(str), "[%s]: ", sys);
 	len = str_length(str);
