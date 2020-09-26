@@ -69,7 +69,7 @@ public:
 	CTuningParams m_NextTuningParams;
 
 	bool m_Spawned;
-	short m_SortTabs[NUMTABSORT];
+	short m_SortTabs[NUM_SORT_TAB];
 	short m_OpenVoteMenu;
 	short m_LastVoteMenu;
 	vec3 m_Colored;

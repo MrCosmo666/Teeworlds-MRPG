@@ -33,13 +33,12 @@ MACRO_CONFIG_INT(ClShowUserId, cl_show_user_id, 0, 0, 1, CFGFLAG_CLIENT|CFGFLAG_
 MACRO_CONFIG_INT(ClDialogsSpeedNPC, cl_mmo_dialogs_speeed_npc, 60, 50, 100, CFGFLAG_CLIENT | CFGFLAG_SAVE, "dialoges speed with npc (mrpg)")
 MACRO_CONFIG_INT(ClShowMEffects, cl_mmo_effects, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Disable effects (mrpg)")
 MACRO_CONFIG_INT(ClShowAuthMenu, cl_mmo_show_auth_menu, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show auth menu (mrpg)")
-MACRO_CONFIG_INT(ClShowColoreVote, cl_colored_votes_inmmoserver, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show colored votes in mmo server")
+MACRO_CONFIG_INT(ClShowVoteColor, cl_show_vote_color, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Show colored votes in mmo server")
 MACRO_CONFIG_STR(GameTexture, mmo_game_texture, 255, "\0", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Gameskin texture")
 MACRO_CONFIG_STR(GameParticles, mmo_particle_texture, 255, "\0", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Particle texture")
 MACRO_CONFIG_STR(GameEmoticons, mmo_emoticons_texture, 255, "\0", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Emoticons texture")
 MACRO_CONFIG_STR(GameCursor, mmo_cursor_texture, 255, "\0", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Cursor texture")
 MACRO_CONFIG_STR(GameEntities, mmo_entities_texture, 255, "\0", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Entities texture")
-MACRO_CONFIG_INT(Texture, mmo_texture_page, 4, 0, 4, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Texture page")
 MACRO_CONFIG_INT(ClGBrowser, cl_gbrowser, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Gamer server browser")
 MACRO_CONFIG_INT(HdColorProgress, hud_color_progress, 48127, 0, 16777215, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Color progress bar hud")
 
@@ -178,7 +177,6 @@ MACRO_CONFIG_STR(SvMySqlDatabase, sv_sql_database, 32, "nope", CFGFLAG_SERVER, "
 MACRO_CONFIG_STR(SvMySqlLogin, sv_sql_login, 32, "nope", CFGFLAG_SERVER, "MySQL Login")
 MACRO_CONFIG_STR(SvMySqlPassword, sv_sql_password, 32, "nope", CFGFLAG_SERVER, "MySQL Password")
 MACRO_CONFIG_INT(SvMySqlPort, sv_sql_port, 3306, 0, 65000, CFGFLAG_SERVER, "MySQL Port")
-MACRO_CONFIG_INT(SvMySqlMaxPool, sv_sql_maxpool, 30, 20, 100, CFGFLAG_SERVER, "MySQL Pool Threads")
 
 MACRO_CONFIG_INT(SvLoltextHspace, sv_loltext_hspace, 7, 7, 25, CFGFLAG_SERVER, "horizontal offset between loltext 'pixels'")
 MACRO_CONFIG_INT(SvLoltextVspace, sv_loltext_vspace, 7, 7, 25, CFGFLAG_SERVER, "vertical offset between loltext 'pixels'")

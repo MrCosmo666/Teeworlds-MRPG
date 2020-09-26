@@ -63,17 +63,16 @@ bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 
 void CCharacterBotAI::ShowProgress()
 {
-	for(const auto & ListDmgPlayer : m_ListDmgPlayers)
+	for(const auto & pPlayerDamage : a_ListDmgPlayers)
 	{
-		CPlayer *pPlayer = GS()->GetPlayer(ListDmgPlayer.first, true);
+		CPlayer *pPlayer = GS()->GetPlayer(pPlayerDamage.first, true);
 		if(pPlayer)
 		{
-			int Health = m_pBotPlayer->GetHealth();
-			int StartHealth = m_pBotPlayer->GetStartHealth();
-			const float gethp = ( Health * 100.0 ) / StartHealth;
-			char *Progress = GS()->LevelString(100, (int)gethp, 10, ':', ' ');
-			GS()->SBL(ListDmgPlayer.first, BroadcastPriority::BROADCAST_GAME_PRIORITY, 10, "Health {STR}({INT}/{INT})", Progress, &Health, &StartHealth);
-			delete Progress;
+			const int Health = m_pBotPlayer->GetHealth();
+			const int StartHealth = m_pBotPlayer->GetStartHealth();
+			const float gethp = (Health * 100.0) / StartHealth;
+			std::unique_ptr<char[]> Progress = std::move(GS()->LevelString(100, (int)gethp, 10, ':', ' '));
+			GS()->SBL(pPlayerDamage.first, BroadcastPriority::BROADCAST_GAME_PRIORITY, 10, "Health {STR}({INT}/{INT})", Progress.get(), &Health, &StartHealth);
 		}
 	}	
 }
@@ -95,7 +94,7 @@ bool CCharacterBotAI::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	// set up an aggression against the person who caused the damage
 	if (From != m_pBotPlayer->GetCID())
 	{
-		m_ListDmgPlayers[From] += StableDamage;
+		a_ListDmgPlayers[From] += StableDamage;
 		if (m_BotTargetID == m_pBotPlayer->GetCID())
 			SetTarget(From);
 	}
@@ -105,7 +104,7 @@ bool CCharacterBotAI::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	{
 		if(Weapon != WEAPON_SELF && Weapon != WEAPON_WORLD)
 		{
-			for(const auto& ld : m_ListDmgPlayers)
+			for(const auto& ld : a_ListDmgPlayers)
 			{
 				const int ParseClientID = ld.first;
 				CPlayer* pPlayer = GS()->GetPlayer(ParseClientID, true, true);
@@ -115,7 +114,7 @@ bool CCharacterBotAI::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 				DieRewardPlayer(pPlayer, Force);
 			}
 		}
-		m_ListDmgPlayers.clear();
+		a_ListDmgPlayers.clear();
 		ClearTarget();
 		Die(From, Weapon);
 		return true;
@@ -269,7 +268,7 @@ void CCharacterBotAI::EngineNPC()
 	const int EmoteBot = BotJob::NpcBot[MobID].Emote;
 	EmoteActions(EmoteBot);
 
-	// направление глаз
+	// direction eyes
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
 		m_Input.m_TargetY = random_int()%4- random_int()%8;
 	m_Input.m_TargetX = (m_Input.m_Direction*10+1);

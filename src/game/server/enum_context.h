@@ -9,13 +9,6 @@
 #include <list>
 #include <map>
 
-enum QuestInteractive
-{
-	QUEST_INT_RANDOM_ACCEPT_ITEM = 1,
-	QUEST_INT_DROP_AND_TAKE_IT = 2,
-
-};
-
 // weapons and player harky
 enum Stats
 {
@@ -174,7 +167,7 @@ enum TabHideList
 	TAB_INFO_LANGUAGES,
 	TAB_INFO_AUCTION,
 	TAB_INFO_AUCTION_BIND,
-	TAB_EQUIP_INFO,
+	TAB_INFO_EQUIP,
 	NUM_TAB_MENU,
 };
 
@@ -224,16 +217,16 @@ enum
 	itTicketDiscountCraft = 43,			// Discount ticket for crafting
 
 	// sll sorting sheets that exist on the server
-	SORTINVENTORY = 1,
-	SORTEQUIP,
-	NUMTABSORT,
+	SORT_INVENTORY = 1,
+	SORT_EQUIPING,
+	NUM_SORT_TAB,
 
 	// type of decorations
 	DECOTYPE_HOUSE = 0,
 	DECOTYPE_GUILD_HOUSE,
 
 	// maximum bot slots
-	EQUIP_MAX_BOTS = EQUIP_WINGS + 1,
+	MAX_EQUIPPED_SLOTS_BOTS = EQUIP_WINGS + 1,
 
 	// bot dialogues
 	IS_TALKING_EMPTY = 999,

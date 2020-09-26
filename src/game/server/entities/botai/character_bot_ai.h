@@ -35,7 +35,7 @@ private:
 	int m_BotTargetID;
 	int m_BotTargetLife;
 	bool m_BotTargetCollised;
-	std::map < int, int > m_ListDmgPlayers;
+	std::map < int, int > a_ListDmgPlayers;
 
 	virtual bool Spawn(class CPlayer *pPlayer, vec2 Pos);
 	virtual void Tick();

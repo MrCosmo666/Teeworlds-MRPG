@@ -104,8 +104,8 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
 		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
 		static int s_ButtonColorVote = 0;
-		if (DoButton_CheckBox(&s_ButtonColorVote, Localize("Show Colored Vote (MRPG)"), g_Config.m_ClShowColoreVote, &Button))
-			g_Config.m_ClShowColoreVote ^= 1;
+		if (DoButton_CheckBox(&s_ButtonColorVote, Localize("Show Colored Vote (MRPG)"), g_Config.m_ClShowVoteColor, &Button))
+			g_Config.m_ClShowVoteColor ^= 1;
 
 		// effects
 		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);

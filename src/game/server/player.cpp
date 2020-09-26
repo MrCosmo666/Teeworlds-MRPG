@@ -322,13 +322,12 @@ void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed,
 		return;
 	}
 
+	char BufferInBroadcast[128];
 	const float GetLevelProgress = (float)(MyExp * 100.0) / (float)ExpNeed;
 	const float GetExpProgress = (float)(GivedExp * 100.0) / (float)ExpNeed;
-	char BufferInBroadcast[128];
-	char* Level = GS()->LevelString(100, (int)GetLevelProgress, 10, ':', ' ');
-	str_format(BufferInBroadcast, sizeof(BufferInBroadcast), "^235Lv%d %s%s %0.2f%%+%0.3f%%(%d)XP\n", MyLevel, Name, Level, GetLevelProgress, GetExpProgress, GivedExp);
+	std::unique_ptr<char[]> Level = std::move(GS()->LevelString(100, (int)GetLevelProgress, 10, ':', ' '));
+	str_format(BufferInBroadcast, sizeof(BufferInBroadcast), "^235Lv%d %s%s %0.2f%%+%0.3f%%(%d)XP\n", MyLevel, Name, Level.get(), GetLevelProgress, GetExpProgress, GivedExp);
 	GS()->SBL(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, BufferInBroadcast);
-	delete Level;
 }
 
 bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade, const char *UpgradeName)
