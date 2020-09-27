@@ -1059,6 +1059,7 @@ void CGS::OnConsoleInit()
 	Console()->Register("giveitem", "i[cid]i[itemid]i[count]i[ench]i[mail]", CFGFLAG_SERVER, ConGiveItem, this, "Give item <clientid> <itemid> <count> <enchant> <mail 1=yes 0=no>");
 	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, this, "Say in chat");
 	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, this, "(Warning) Add new bot on database or update if finding <clientid> <bot name>");
+	Console()->Register("convert_passwords", "", CFGFLAG_SERVER, ConConvertPasswords, this, "Convert existing plaintext passwords into hashed passwords");
 }
 
 void CGS::OnShutdown()
@@ -1590,6 +1591,23 @@ void CGS::ConAddCharacter(IConsole::IResult *pResult, void *pUserData)
 	
 	// add a new kind of bot
 	pSelf->Mmo()->BotsData()->ConAddCharacterBot(ClientID, pResult->GetString(1));
+}
+
+void CGS::ConConvertPasswords(IConsole::IResult* pResult, void* pUserData)
+{
+	CGS* pSelf = (CGS*)pUserData;
+
+	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, Password", "tw_accounts", "WHERE PasswordSalt IS NULL OR PasswordSalt = ''"));
+	while(RES->next())
+	{
+		char aSalt[32] = { 0 };
+		secure_random_password(aSalt, sizeof(aSalt), 24);
+
+		std::string Password = pSelf->Mmo()->Account()->HashPassword(RES->getString("Password").c_str(), aSalt);
+
+		SJK.UD("tw_accounts", "Password = '%s', PasswordSalt = '%s' WHERE ID = %d", Password.c_str(), aSalt, RES->getInt("ID"));
+		dbg_msg("mrpg", "%d: %s -> %s", RES->getInt("ID"), RES->getString("Password").c_str(), Password.c_str());
+	}
 }
 
 void CGS::ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
