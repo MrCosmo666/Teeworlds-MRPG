@@ -322,7 +322,6 @@ void CConectionPool::DeleteFormated(int Milliseconds, const char *Table, const c
 			std::shared_ptr<Statement> STMT(pConnection->createStatement());
 			STMT->execute(pr_Query.c_str());
 			SJK.ReleaseConnection(pConnection);
-
 		}
 		catch (SQLException & e)
 		{

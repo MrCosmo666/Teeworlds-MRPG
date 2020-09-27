@@ -9,7 +9,6 @@ enum QuestInteractive
 {
 	INTERACTIVE_RANDOM_ACCEPT_ITEM = 1,
 	INTERACTIVE_DROP_AND_TAKE_IT = 2,
-
 };
 
 class QuestJob : public MmoComponent
