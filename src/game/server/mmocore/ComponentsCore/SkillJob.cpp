@@ -34,7 +34,7 @@ void SkillJob::OnInit()
 void SkillJob::OnInitAccount(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("SkillID, SkillLevel, SelectedEmoticion", "tw_accounts_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("SkillID, SkillLevel, SelectedEmoticion", "tw_accounts_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	while(RES->next())
 	{
 		const int SkillID = (int)RES->getInt("SkillID");
@@ -182,7 +182,7 @@ void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 {
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_skills", "WHERE SkillID = '%d' AND OwnerID = '%d'", SkillID, pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_skills", "WHERE SkillID = '%d' AND OwnerID = '%d'", SkillID, pPlayer->Acc().AuthID));
 	if (RES->next())
 	{
 		if (Skill[ClientID][SkillID].m_SkillLevel >= SkillData[SkillID].m_SkillMaxLevel)

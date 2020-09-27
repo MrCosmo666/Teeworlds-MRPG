@@ -52,7 +52,7 @@ void ItemJob::OnInit()
 void ItemJob::OnInitAccount(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Settings, Enchant, Durability", "tw_accounts_items", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Settings, Enchant, Durability", "tw_accounts_items", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	while(RES->next())
 	{
 		int ItemID = (int)RES->getInt("ItemID");
@@ -148,7 +148,7 @@ int ItemJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, 
 {
 	// check initialize and add the item
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
 	if(RES->next())
 	{
 		Items[ClientID][ItemID].Count = RES->getInt("Count")+Count;
@@ -179,7 +179,7 @@ int ItemJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings
 {
 	// we check the database
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
 	if(RES->next())
 	{
 		// update if there is more
@@ -834,7 +834,7 @@ void ItemJob::AddItemSleep(int AccountID, int ItemID, int GiveCount, int Millise
 				return;
 			}
 
-			boost::scoped_ptr<ResultSet> RES(SJK.SD("Count", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, AccountID));
+			std::shared_ptr<ResultSet> RES(SJK.SD("Count", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, AccountID));
 			if(RES->next())
 			{
 				const int ReallyCount = (int)RES->getInt("Count") + GiveCount;

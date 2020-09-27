@@ -113,11 +113,10 @@ CPlayer *CGS::GetPlayer(int ClientID, bool CheckAuthed, bool CheckCharacter)
 // Level String by Matodor (Progress Bar) creates some sort of bar progress
 std::unique_ptr<char[]> CGS::LevelString(int MaxValue, int CurrentValue, int Step, char toValue, char fromValue)
 {
-    if (CurrentValue < 0) CurrentValue = 0;
-    if (CurrentValue > MaxValue) CurrentValue = MaxValue;
+	CurrentValue = clamp(CurrentValue, 0, MaxValue);
 
 	size_t Size = (size_t)3 + MaxValue / Step;
-	std::unique_ptr<char[]> Buf(new char[Size], std::default_delete<char[]>());
+	std::unique_ptr<char[]> Buf(new char[Size]);
 	Buf[0] = '[';
 	Buf[Size - 2] = ']';
 	Buf[Size - 1] = '\0';
@@ -131,7 +130,7 @@ std::unique_ptr<char[]> CGS::LevelString(int MaxValue, int CurrentValue, int Ste
 	for (int bi = 0; bi < b || i < Size - 2; bi++, i++)
 		Buf[i] = fromValue;
 	
-	return std::move(Buf);
+	return Buf;
 }
 
 const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const

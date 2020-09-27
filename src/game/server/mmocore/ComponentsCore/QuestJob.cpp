@@ -719,7 +719,7 @@ void QuestJob::CreateQuestingItems(CPlayer *pPlayer, BotJob::QuestBotInfo &BotDa
 
 void QuestJob::OnInit()
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_quests_list"));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_quests_list"));
 	while (RES->next())
 	{
 		const int QUID = RES->getInt("ID");
@@ -741,7 +741,7 @@ void QuestJob::OnInit()
 void QuestJob::OnInitAccount(CPlayer* pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_quests", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_quests", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	while (RES->next())
 	{
 		const int QuestID = RES->getInt("QuestID");

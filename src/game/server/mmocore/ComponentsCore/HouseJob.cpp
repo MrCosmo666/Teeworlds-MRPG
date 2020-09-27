@@ -94,10 +94,10 @@ bool HouseJob::AddDecorationHouse(int DecoID, int HouseID, vec2 Position)
 	if(distance(PositionHouse, Position) > 400.0f)
 		return false;
 
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_houses_decorations", "WHERE HouseID = '%d'", HouseID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_houses_decorations", "WHERE HouseID = '%d'", HouseID));
 	if((int)RES->rowsCount() >= g_Config.m_SvLimitDecoration) return false;
 
-	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_houses_decorations", "ORDER BY ID DESC LIMIT 1"));
+	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_houses_decorations", "ORDER BY ID DESC LIMIT 1"));
 	int InitID = (RES2->next() ? RES2->getInt("ID")+1 : 1); 
 
 	SJK.ID("tw_houses_decorations", "(ID, DecoID, HouseID, X, Y, WorldID) VALUES ('%d', '%d', '%d', '%d', '%d', '%d')", 
@@ -245,7 +245,7 @@ void HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 		return;
 	}
 
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("OwnerID, Price", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NULL", HouseID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("OwnerID, Price", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NULL", HouseID));
 	if(RES->next())
 	{
 		const int Price = RES->getInt("Price");
@@ -267,7 +267,7 @@ void HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 
 void HouseJob::SellHouse(int HouseID)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("HouseBank, OwnerID", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NOT NULL", HouseID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("HouseBank, OwnerID", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NOT NULL", HouseID));
 	if(RES->next())
 	{
 		const int OwnerID = RES->getInt("OwnerID");
@@ -384,7 +384,7 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 void HouseJob::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
 {
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	if(!RES->next())
 		return;
 
@@ -405,7 +405,7 @@ void HouseJob::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
 void HouseJob::AddSafeDeposit(CPlayer *pPlayer, int Balance)
 {
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	if(!RES->next())
 		return;
 

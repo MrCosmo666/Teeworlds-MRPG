@@ -38,7 +38,7 @@ int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char 
 		return SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
 	}
 	CSqlString<32> clear_Nick = CSqlString<32>(GS()->Server()->ClientName(ClientID));
-	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
+	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
 	if(RES2->next())
 	{
 		GS()->Chat(ClientID, "- - - - [Your nickname is already registered] - - - -");
@@ -48,7 +48,7 @@ int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char 
 		return SendAuthCode(ClientID, AUTH_REGISTER_ERROR_NICK);
 	}
 
-	boost::scoped_ptr<ResultSet> RES4(SJK.SD("ID", "tw_accounts", "ORDER BY ID DESC LIMIT 1"));
+	std::shared_ptr<ResultSet> RES4(SJK.SD("ID", "tw_accounts", "ORDER BY ID DESC LIMIT 1"));
 	const int InitID = RES4->next() ? RES4->getInt("ID")+1 : 1; // thread save ? hm need for table all time auto increment = 1; NEED FIX IT
 
 	char aAddrStr[64];
@@ -82,11 +82,11 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 	CSqlString<32> clear_Login = CSqlString<32>(Login);
 	CSqlString<32> clear_Pass = CSqlString<32>(Password);
 	CSqlString<32> clear_Nick = CSqlString<32>(GS()->Server()->ClientName(ClientID));
-	boost::scoped_ptr<ResultSet> ACCOUNTDATA(SJK.SD("*", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
+	std::shared_ptr<ResultSet> ACCOUNTDATA(SJK.SD("*", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
 	if(ACCOUNTDATA->next())
 	{
 		const int UserID = ACCOUNTDATA->getInt("ID");
-		boost::scoped_ptr<ResultSet> CHECKACCESS(SJK.SD("ID, LoginDate, Language", "tw_accounts", "WHERE Username = '%s' AND Password = '%s' AND ID = '%d'", clear_Login.cstr(), clear_Pass.cstr(), UserID));
+		std::shared_ptr<ResultSet> CHECKACCESS(SJK.SD("ID, LoginDate, Language", "tw_accounts", "WHERE Username = '%s' AND Password = '%s' AND ID = '%d'", clear_Login.cstr(), clear_Pass.cstr(), UserID));
 		if (!CHECKACCESS->next())
 		{
 			GS()->Chat(ClientID, "Wrong login or password!");
@@ -201,7 +201,7 @@ void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)
 int AccountMainJob::GetRank(int AuthID)
 {
 	int Rank = 0;
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_accounts_data", "ORDER BY Level DESC, Exp DESC"));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_accounts_data", "ORDER BY Level DESC, Exp DESC"));
 	while(RES->next())
 	{
 		Rank++;

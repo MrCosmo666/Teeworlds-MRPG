@@ -190,7 +190,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 
 void MmoController::LoadLogicWorld()
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_logicworld", "WHERE WorldID = '%d'", GS()->GetWorldID()));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_logicworld", "WHERE WorldID = '%d'", GS()->GetWorldID()));
 	while(RES->next())
 	{
 		const int Type = (int)RES->getInt("MobID"), Mode = (int)RES->getInt("Mode"), Health = (int)RES->getInt("ParseInt");
@@ -202,7 +202,7 @@ void MmoController::LoadLogicWorld()
 char SaveNick[32];
 const char* MmoController::PlayerName(int AccountID)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("Nick", "tw_accounts_data", "WHERE ID = '%d'", AccountID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("Nick", "tw_accounts_data", "WHERE ID = '%d'", AccountID));
 	if(RES->next())
 	{
 		str_copy(SaveNick, RES->getString("Nick").c_str(), sizeof(SaveNick));
@@ -224,7 +224,7 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	if(TypeID == ToplistTypes::GUILDS_LEVELING)
 	{
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "ORDER BY Level DESC, Experience DESC LIMIT 10"));
+		std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "ORDER BY Level DESC, Experience DESC LIMIT 10"));
 		while (RES->next())
 		{
 			char NameGuild[64];
@@ -237,7 +237,7 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 	}
 	else if (TypeID == ToplistTypes::GUILDS_WEALTHY)
 	{
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "ORDER BY Bank DESC LIMIT 10"));
+		std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "ORDER BY Bank DESC LIMIT 10"));
 		while (RES->next())
 		{
 			char NameGuild[64];
@@ -249,7 +249,7 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 	}
 	else if (TypeID == ToplistTypes::PLAYERS_LEVELING)
 	{
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_data", "ORDER BY Level DESC, Exp DESC LIMIT 10"));
+		std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_data", "ORDER BY Level DESC, Exp DESC LIMIT 10"));
 		while (RES->next())
 		{
 			char Nick[64];
@@ -262,7 +262,7 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 	}
 	else if (TypeID == ToplistTypes::PLAYERS_WEALTHY)
 	{
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_items", "WHERE ItemID = '%d' ORDER BY Count DESC LIMIT 10", (int)itGold));
+		std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_items", "WHERE ItemID = '%d' ORDER BY Count DESC LIMIT 10", (int)itGold));
 		while (RES->next())
 		{
 			char Nick[64];

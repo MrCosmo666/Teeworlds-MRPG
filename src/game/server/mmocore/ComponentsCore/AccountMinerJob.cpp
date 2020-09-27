@@ -77,7 +77,7 @@ void AccountMinerJob::Work(CPlayer *pPlayer, int Level)
 
 void AccountMinerJob::OnInitAccount(CPlayer* pPlayer)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_miner", "WHERE AccountID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_miner", "WHERE AccountID = '%d'", pPlayer->Acc().AuthID));
 	if (RES->next())
 	{
 		for (int i = 0; i < NUM_MINER; i++)
@@ -91,7 +91,7 @@ void AccountMinerJob::OnInitAccount(CPlayer* pPlayer)
 
 void AccountMinerJob::OnInitWorld(const char* pWhereLocalWorld)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_position_miner", pWhereLocalWorld));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_position_miner", pWhereLocalWorld));
 	while (RES->next())
 	{
 		const int ID = RES->getInt("ID");

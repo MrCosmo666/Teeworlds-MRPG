@@ -9,7 +9,7 @@ std::map < int , ShopJob::ShopPersonal > ShopJob::Shop;
 
 void ShopJob::OnInit()
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, StorageID", "tw_mailshop"));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID, StorageID", "tw_mailshop"));
 	while(RES->next())
 	{
 		int ID = RES->getInt("ID");
@@ -52,7 +52,7 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 {
 	const int ClientID = pPlayer->GetCID();
 	int HideID = NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 300;
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE StorageID = '%d' ORDER BY Price", StorageID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE StorageID = '%d' ORDER BY Price", StorageID));
 	while(RES->next())
 	{
 		const int ID = RES->getInt("ID");
@@ -100,7 +100,7 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 
 	bool FoundItems = false;
 	int HideID = (int)(NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 400);
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 ORDER BY Price"));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 ORDER BY Price"));
 	while(RES->next())
 	{
 		const int ID = RES->getInt("ID");
@@ -147,18 +147,18 @@ void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
 	ItemJob::InventoryItem &pPlayerAuctionItem = pPlayer->GetItem(ItemID);
 
 	// check the number of slots whether everything is occupied or not
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_mailshop", "WHERE OwnerID > '0' LIMIT %d", g_Config.m_SvMaxMasiveAuctionSlots));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_mailshop", "WHERE OwnerID > '0' LIMIT %d", g_Config.m_SvMaxMasiveAuctionSlots));
 	if((int)RES->rowsCount() >= g_Config.m_SvMaxMasiveAuctionSlots)
 		return GS()->Chat(ClientID, "Auction has run out of slots, wait for the release of slots!");
 
 	// check your slots
-	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_mailshop", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().AuthID, g_Config.m_SvMaxAuctionSlots));
+	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_mailshop", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().AuthID, g_Config.m_SvMaxAuctionSlots));
 	const int CountSlot = RES2->rowsCount();
 	if(CountSlot >= g_Config.m_SvMaxAuctionSlots)
 		return GS()->Chat(ClientID, "You use all open the slots in your auction!");
 
 	// we check if the item is in the auction
-	boost::scoped_ptr<ResultSet> RES3(SJK.SD("ID", "tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES3(SJK.SD("ID", "tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
 	if(RES3->next()) 
 		return GS()->Chat(ClientID, "Your same item found in the database, need reopen the slot!");
 
@@ -182,7 +182,7 @@ void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
 bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 {
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> SHOPITEM(SJK.SD("*", "tw_mailshop", "WHERE ID = '%d'", ID));
+	std::shared_ptr<ResultSet> SHOPITEM(SJK.SD("*", "tw_mailshop", "WHERE ID = '%d'", ID));
 	if (!SHOPITEM->next())
 		return false;
 
@@ -235,7 +235,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 
 void ShopJob::CheckAuctionTime()
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 AND DATE_SUB(NOW(),INTERVAL %d MINUTE) > Time", g_Config.m_SvTimeAuctionSlot));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 AND DATE_SUB(NOW(),INTERVAL %d MINUTE) > Time", g_Config.m_SvTimeAuctionSlot));
 	int ReleaseSlots = (int)RES->rowsCount();
 	while(RES->next())
 	{

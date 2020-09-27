@@ -9,7 +9,7 @@ std::map < int , DungeonJob::StructDungeon > DungeonJob::Dungeon;
 
 DungeonJob::DungeonJob()
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons"));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons"));
 	while (RES->next())
 	{
 		const int ID = RES->getInt("ID");
@@ -25,7 +25,7 @@ DungeonJob::DungeonJob()
 
 void DungeonJob::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "WHERE OwnerID = '%d' AND DungeonID = '%d'", pPlayer->Acc().AuthID, DungeonID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "WHERE OwnerID = '%d' AND DungeonID = '%d'", pPlayer->Acc().AuthID, DungeonID));
 	if (RES->next())
 	{
 		if (RES->getInt("Seconds") > Seconds)
@@ -38,7 +38,7 @@ void DungeonJob::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds)
 void DungeonJob::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
 {
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "WHERE DungeonID = '%d' ORDER BY Seconds ASC LIMIT 5", DungeonID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "WHERE DungeonID = '%d' ORDER BY Seconds ASC LIMIT 5", DungeonID));
 	while (RES->next())
 	{
 		const int Rank = RES->getRow();

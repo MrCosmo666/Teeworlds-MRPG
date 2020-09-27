@@ -8,7 +8,7 @@ using namespace sqlstr;
 // mails
 void MailBoxJob::ReceiveInbox(CPlayer *pPlayer, int InboxID)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Enchant", "tw_accounts_inbox", "WHERE ID = '%d'", InboxID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Enchant", "tw_accounts_inbox", "WHERE ID = '%d'", InboxID));
 	if(!RES->next())
 		return;
 	
@@ -41,7 +41,7 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 	bool EmptyMailBox = true;
 	const int ClientID = pPlayer->GetCID();
 	int HideID = (int)(NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 200);
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().AuthID, MAX_INBOX_LIST));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().AuthID, MAX_INBOX_LIST));
 	while(RES->next())
 	{
 		// get the information to create an object
@@ -76,7 +76,7 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 // check whether messages are available
 int MailBoxJob::GetActiveInbox(CPlayer *pPlayer)
 {
-	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	const int MailCount = RES2->rowsCount();
 	return MailCount;
 }

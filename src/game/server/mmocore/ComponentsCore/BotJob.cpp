@@ -38,7 +38,7 @@ void BotJob::ConAddCharacterBot(int ClientID, const char *pCharacter)
 
 	// check the nick
 	CSqlString<16> cNick = CSqlString<16>(pCharacter);
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_world", "WHERE BotName = '%s'", cNick.cstr()));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_world", "WHERE BotName = '%s'", cNick.cstr()));
 	if(RES->next())
 	{
 		// if the nickname is not in the database
@@ -194,7 +194,7 @@ void BotJob::LoadMainInformationBots()
 	if(!(DataBot.empty()))
 		return;
 
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_world"));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_world"));
 	while(RES->next())
 	{
 		const int BotID = (int)RES->getInt("ID");
@@ -233,7 +233,7 @@ void BotJob::LoadMainInformationBots()
 // load quest bots
 void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_quest", pWhereLocalWorld));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_quest", pWhereLocalWorld));
 	while(RES->next())
 	{
 		// it for every world initilize quest progress size
@@ -261,7 +261,7 @@ void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 			&QuestBot[MobID].NeedMobCount[0], &QuestBot[MobID].NeedMobCount[1]);
 
 		// load NPC
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_quest_npc", "WHERE MobID = '%d'", MobID));
+		std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_quest_npc", "WHERE MobID = '%d'", MobID));
 		while(RES->next())
 		{
 			TalkingData LoadTalk;
@@ -296,7 +296,7 @@ void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 // load NPC
 void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_npc", pWhereLocalWorld));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_npc", pWhereLocalWorld));
 	while(RES->next())
 	{
 		const int MobID = (int)RES->getInt("ID");
@@ -312,7 +312,7 @@ void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 		for(int c = 0; c < CountMobs; c++)
 			GS()->CreateBot(BotsTypes::TYPE_BOT_NPC, NpcBot[MobID].BotID, MobID);
 
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_other_npc", "WHERE MobID = '%d'", MobID));
+		std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_other_npc", "WHERE MobID = '%d'", MobID));
 		while(RES->next())
 		{
 			TalkingData LoadTalk;
@@ -334,7 +334,7 @@ void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 // load mobs
 void BotJob::LoadMobsBots(const char* pWhereLocalWorld)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_mobs", pWhereLocalWorld));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_mobs", pWhereLocalWorld));
 	while(RES->next())
 	{
 		const int MobID = (int)RES->getInt("ID");
