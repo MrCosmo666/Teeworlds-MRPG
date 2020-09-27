@@ -10,7 +10,7 @@ std::map < int , CraftJob::CraftStruct > CraftJob::Craft;
 
 void CraftJob::OnInit()
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_craft_list"));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_craft_list"));
 	while(RES->next())
 	{
 		const int ID = RES->getInt("ID");

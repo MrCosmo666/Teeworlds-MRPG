@@ -26,7 +26,7 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	ChangeState(DUNGEON_WAITING);
 
 	// key door construction
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_door", "WHERE DungeonID = '%d'", m_DungeonID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_door", "WHERE DungeonID = '%d'", m_DungeonID));
 	while (RES->next())
 	{
 		const int DungeonBotID = RES->getInt("BotID");

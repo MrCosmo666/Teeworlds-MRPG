@@ -294,7 +294,7 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotDa
 bool QuestJob::InteractiveTypeQuest(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData)
 {
 	const int ClientID = pPlayer->GetCID();
-	if (BotData.InteractiveType == (int)QuestInteractive::QUEST_INT_RANDOM_ACCEPT_ITEM && BotData.InteractiveTemp > 0)
+	if (BotData.InteractiveType == (int)QuestInteractive::INTERACTIVE_RANDOM_ACCEPT_ITEM && BotData.InteractiveTemp > 0)
 	{
 		const bool Succesful = random_int() % BotData.InteractiveTemp == 0;
 		for(int i = 0; i < 2; i++)
@@ -555,7 +555,7 @@ void QuestJob::QuestTableShowRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &Bo
 	}
 
 	// type random accept item's
-	if(BotData.InteractiveType == (int)QuestInteractive::QUEST_INT_RANDOM_ACCEPT_ITEM)
+	if(BotData.InteractiveType == (int)QuestInteractive::INTERACTIVE_RANDOM_ACCEPT_ITEM)
 	{
 		const double Chance = BotData.InteractiveTemp <= 0 ? 100.0f : (1.0f / (double)BotData.InteractiveTemp) * 100;
 		str_format(aBuf, sizeof(aBuf), "\nChance that item he'll like [%0.2f%%]\n", Chance);
@@ -592,7 +592,7 @@ void QuestJob::QuestTableShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& Bo
 		if(ItemID <= 0 || CountItem <= 0)
 			continue;
 
-		if(BotData.InteractiveType == (int)QuestInteractive::QUEST_INT_RANDOM_ACCEPT_ITEM)
+		if(BotData.InteractiveType == (int)QuestInteractive::INTERACTIVE_RANDOM_ACCEPT_ITEM)
 		{
 			const float Chance = BotData.InteractiveTemp <= 0 ? 100.0f : (1.0f / (float)BotData.InteractiveTemp) * 100;
 			str_format(aBuf, sizeof(aBuf), "%s [takes %0.2f%%]", aBuf, Chance);
@@ -697,7 +697,7 @@ int QuestJob::QuestingAllowedItemsCount(CPlayer *pPlayer, int ItemID)
 
 void QuestJob::CreateQuestingItems(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData)
 {
-	if (!pPlayer || !pPlayer->GetCharacter() || BotData.InteractiveType != (int)QuestInteractive::QUEST_INT_DROP_AND_TAKE_IT)
+	if (!pPlayer || !pPlayer->GetCharacter() || BotData.InteractiveType != (int)QuestInteractive::INTERACTIVE_DROP_AND_TAKE_IT)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
@@ -719,7 +719,7 @@ void QuestJob::CreateQuestingItems(CPlayer *pPlayer, BotJob::QuestBotInfo &BotDa
 
 void QuestJob::OnInit()
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_quests_list"));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_quests_list"));
 	while (RES->next())
 	{
 		const int QUID = RES->getInt("ID");
@@ -741,7 +741,7 @@ void QuestJob::OnInit()
 void QuestJob::OnInitAccount(CPlayer* pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_quests", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_quests", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	while (RES->next())
 	{
 		const int QuestID = RES->getInt("QuestID");

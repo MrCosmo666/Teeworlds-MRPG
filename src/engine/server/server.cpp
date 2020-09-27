@@ -1807,7 +1807,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		sqlstr::CSqlString<64> cDiscordIDorNick = sqlstr::CSqlString<64>(input.c_str());
 
 		// user lookup
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_data", "WHERE Nick LIKE '%s'LIMIT 5", cDiscordIDorNick.cstr()));
+		std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_data", "WHERE Nick LIKE '%s'LIMIT 5", cDiscordIDorNick.cstr()));
 		while(RES->next())
 		{
 			const int AuthID = RES->getInt("ID");
@@ -1844,7 +1844,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		sqlstr::CSqlString<64> cDiscordID = sqlstr::CSqlString<64>(UserID.c_str());
 
 		// get connected
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("Nick", "tw_accounts_data", "WHERE DiscordID = '%s'", cDiscordID.cstr()));
+		std::shared_ptr<ResultSet> RES(SJK.SD("Nick", "tw_accounts_data", "WHERE DiscordID = '%s'", cDiscordID.cstr()));
 		while(RES->next())
 		{
 			// send a connected message

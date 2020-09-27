@@ -13,6 +13,7 @@ class CConectionPool
 	CConectionPool();
 	
 	static std::shared_ptr<CConectionPool> m_Instance;
+
 	std::list<class Connection*>m_ConnList;
 	class Driver *m_pDriver;
 
@@ -23,7 +24,9 @@ class CConectionPool
 public:
 	~CConectionPool();
 
+	class Connection* GetConnection();
 	class Connection* CreateConnection();
+	void ReleaseConnection(class Connection* pConnection);
 	void DisconnectConnection(class Connection* pConnection);
 	void DisconnectConnectionHeap();
 	static CConectionPool& GetInstance();
@@ -41,7 +44,7 @@ public:
 	void DDS(int Milliseconds, const char *Table, const char *Buffer, ...);
 
 	// database extraction function
-	class ResultSet* SD(const char *Select, const char *Table, const char *Buffer = "", ...);
+	std::shared_ptr<class ResultSet> SD(const char *Select, const char *Table, const char *Buffer = "", ...);
 	void SDT(const char* Select, const char* Table, std::function<void(class ResultSet*)> func, const char* Buffer = "", ...);
 };
 

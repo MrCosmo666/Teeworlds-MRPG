@@ -73,7 +73,7 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 		return 10;
 
 	int Power = BotJob::MobBot[m_SubBotID].Power;
-	for (int i = 0; i < EQUIP_MAX_BOTS; i++)
+	for (int i = 0; i < MAX_EQUIPPED_SLOTS_BOTS; i++)
 	{
 		const int ItemID = GetEquippedItem(i);
 		const int ItemBonusCount = GS()->GetItemInfo(ItemID).GetStatsBonus(BonusID);

@@ -13,7 +13,7 @@ std::map < int , GuildJob::GuildStructRank > GuildJob::RankGuild;
 void GuildJob::LoadGuildRank(int GuildID)
 {
 	// rank loading
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_ranks", "WHERE ID > '0' AND GuildID = '%d'", GuildID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_ranks", "WHERE ID > '0' AND GuildID = '%d'", GuildID));
 	while(RES->next())
 	{
 			int ID = RES->getInt("ID");
@@ -646,11 +646,11 @@ bool GuildJob::AddDecorationHouse(int DecoID, int GuildID, vec2 Position)
 		return false;
 
 	int HouseID = GetGuildHouseID(GuildID);
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_decorations", "WHERE HouseID = '%d'", HouseID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_decorations", "WHERE HouseID = '%d'", HouseID));
 	if ((int)RES->rowsCount() >= g_Config.m_SvLimitDecoration) 
 		return false;
 
-	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_guilds_decorations", "ORDER BY ID DESC LIMIT 1"));
+	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_guilds_decorations", "ORDER BY ID DESC LIMIT 1"));
 	int InitID = (RES2->next() ? RES2->getInt("ID") + 1 : 1);
 	SJK.ID("tw_guilds_decorations", "(ID, DecoID, HouseID, X, Y, WorldID) VALUES ('%d', '%d', '%d', '%d', '%d', '%d')",
 		InitID, DecoID, HouseID, (int)Position.x, (int)Position.y, GS()->GetWorldID());
@@ -706,7 +706,7 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 
 	// we check the availability of the guild's name
 	CSqlString<64> cGuildName = CSqlString<64>(GuildName);
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds", "WHERE GuildName = '%s'", cGuildName.cstr()));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds", "WHERE GuildName = '%s'", cGuildName.cstr()));
 	if(RES->next()) 
 	{
 		GS()->Chat(ClientID, "This guild name already useds!");
@@ -717,7 +717,7 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 	if(pPlayer->GetItem(itTicketGuild).Count > 0 && pPlayer->GetItem(itTicketGuild).Remove(1))
 	{
 		// get ID for initialization
-		boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_guilds", "ORDER BY ID DESC LIMIT 1"));
+		std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_guilds", "ORDER BY ID DESC LIMIT 1"));
 		const int InitID = RES2->next() ? RES2->getInt("ID")+1 : 1; // TODO: thread save ? hm need for table all time auto increment = 1; NEED FIX IT -- use some kind of uuid
 		
 		// initialize the guild
@@ -743,7 +743,7 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 bool GuildJob::JoinGuild(int AuthID, int GuildID)
 {
 	const char *PlayerName = Job()->PlayerName(AuthID);
-	boost::scoped_ptr<ResultSet> CheckJoinRES(SJK.SD("ID", "tw_accounts_data", "WHERE ID = '%d' AND GuildID IS NOT NULL", AuthID));
+	std::shared_ptr<ResultSet> CheckJoinRES(SJK.SD("ID", "tw_accounts_data", "WHERE ID = '%d' AND GuildID IS NOT NULL", AuthID));
 	if(CheckJoinRES->next())
 	{
 		GS()->ChatAccountID(AuthID, "You already in guild group!");
@@ -752,7 +752,7 @@ bool GuildJob::JoinGuild(int AuthID, int GuildID)
 	}
 
 	// check the number of slots available
-	boost::scoped_ptr<ResultSet> CheckSlotsRES(SJK.SD("ID", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID));
+	std::shared_ptr<ResultSet> CheckSlotsRES(SJK.SD("ID", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID));
 	if((int)CheckSlotsRES->rowsCount() >= Guild[GuildID].m_Upgrades[EMEMBERUPGRADE::AvailableNSTSlots])
 	{
 		GS()->ChatAccountID(AuthID, "You don't joined [No slots for join]");
@@ -776,7 +776,7 @@ bool GuildJob::JoinGuild(int AuthID, int GuildID)
 void GuildJob::ExitGuild(int AuthID)
 {
 	// we check if the clan leader leaves
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds", "WHERE OwnerID = '%d'", AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds", "WHERE OwnerID = '%d'", AuthID));
 	if (RES->next())
 	{
 		GS()->ChatAccountID(AuthID, "A leader cannot leave his guild group!");
@@ -784,7 +784,7 @@ void GuildJob::ExitGuild(int AuthID)
 	}
 
 	// we check the account and its guild
-	boost::scoped_ptr<ResultSet> RES2(SJK.SD("GuildID", "tw_accounts_data", "WHERE ID = '%d'", AuthID));
+	std::shared_ptr<ResultSet> RES2(SJK.SD("GuildID", "tw_accounts_data", "WHERE ID = '%d'", AuthID));
 	if (RES2->next())
 	{
 		// we write to the guild that the player has left the guild
@@ -877,7 +877,7 @@ void GuildJob::ShowGuildPlayers(CPlayer* pPlayer)
 	const int ClientID = pPlayer->GetCID();
 	const int GuildID = pPlayer->Acc().GuildID;
 	int HideID = NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 1000;
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, Nick, GuildRank, GuildDeposit", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID, Nick, GuildRank, GuildDeposit", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID));
 	while (RES->next())
 	{
 		const int AuthID = RES->getInt("ID");
@@ -926,7 +926,7 @@ void GuildJob::AddExperience(int GuildID)
 
 bool GuildJob::AddMoneyBank(int GuildID, int Money)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, Bank", "tw_guilds", "WHERE ID = '%d'", GuildID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID, Bank", "tw_guilds", "WHERE ID = '%d'", GuildID));
 	if(!RES->next()) 
 		return false;
 	
@@ -938,7 +938,7 @@ bool GuildJob::AddMoneyBank(int GuildID, int Money)
 
 bool GuildJob::RemoveMoneyBank(int GuildID, int Money)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, Bank", "tw_guilds", "WHERE ID = '%d'", GuildID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID, Bank", "tw_guilds", "WHERE ID = '%d'", GuildID));
 	if(!RES->next()) 
 		return false;
 	
@@ -956,7 +956,7 @@ bool GuildJob::RemoveMoneyBank(int GuildID, int Money)
 // purchase of upgrade maximum number of slots
 bool GuildJob::UpgradeGuild(int GuildID, int Field)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "WHERE ID = '%d'", GuildID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "WHERE ID = '%d'", GuildID));
 	if(RES->next())
 	{
 		Guild[GuildID].m_Bank = RES->getInt("Bank");
@@ -1018,10 +1018,10 @@ void GuildJob::AddRank(int GuildID, const char *Rank)
 	if(RankGuild.find(FindRank) != RankGuild.end())
 		return GS()->ChatGuild(GuildID, "Found this rank in your table, change name");
 
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_ranks", "WHERE GuildID = '%d'", GuildID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_ranks", "WHERE GuildID = '%d'", GuildID));
 	if(RES->rowsCount() >= 5) return;
 
-	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_guilds_ranks", "ORDER BY ID DESC LIMIT 1"));
+	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_guilds_ranks", "ORDER BY ID DESC LIMIT 1"));
 	const int InitID = RES2->next() ? RES2->getInt("ID")+1 : 1; // thread save ? hm need for table all time auto increment = 1; NEED FIX IT
 
 	CSqlString<64> cGuildRank = CSqlString<64>(Rank);
@@ -1128,7 +1128,7 @@ void GuildJob::ShowMenuRank(CPlayer *pPlayer)
 int GuildJob::GetGuildPlayerCount(int GuildID)
 {
 	int MemberPlayers = -1;
-	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID));
+	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID));
 		MemberPlayers = RES2->rowsCount();
 	return MemberPlayers;
 }
@@ -1139,7 +1139,7 @@ int GuildJob::GetGuildPlayerCount(int GuildID)
 // add a player to the guild
 bool GuildJob::AddInviteGuild(int GuildID, int OwnerID)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'",  GuildID, OwnerID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'",  GuildID, OwnerID));
 	if(RES->rowsCount() >= 1) return false;
 
 	SJK.ID("tw_guilds_invites", "(GuildID, OwnerID) VALUES ('%d', '%d')", GuildID, OwnerID);
@@ -1151,7 +1151,7 @@ bool GuildJob::AddInviteGuild(int GuildID, int OwnerID)
 void GuildJob::ShowInvitesGuilds(int ClientID, int GuildID)
 {
 	int HideID = NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 1900;
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_invites", "WHERE GuildID = '%d'", GuildID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_invites", "WHERE GuildID = '%d'", GuildID));
 	while(RES->next())
 	{
 		const int SenderID = RES->getInt("OwnerID");
@@ -1181,7 +1181,7 @@ void GuildJob::ShowFinderGuilds(int ClientID)
 
 	int HideID = NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 1800;
 	CSqlString<64> cGuildName = CSqlString<64>(pPlayer->GetTempData().m_aGuildSearchBuf);
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "WHERE GuildName LIKE '%%%s%%'", cGuildName.cstr()));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "WHERE GuildName LIKE '%%%s%%'", cGuildName.cstr()));
 	while(RES->next())
 	{
 		const int GuildID = RES->getInt("ID");
@@ -1205,7 +1205,7 @@ void GuildJob::ShowHistoryGuild(int ClientID, int GuildID)
 {
 	// looking for the entire history of the guild in the database
 	char aBuf[128];
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_history", "WHERE GuildID = '%d' ORDER BY ID DESC LIMIT 20", GuildID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_history", "WHERE GuildID = '%d' ORDER BY ID DESC LIMIT 20", GuildID));
 	while(RES->next()) 
 	{
 		str_format(aBuf, sizeof(aBuf), "[%s] %s", RES->getString("Time").c_str(), RES->getString("Text").c_str());
@@ -1300,7 +1300,7 @@ void GuildJob::BuyGuildHouse(int GuildID, int HouseID)
 		return;
 	}
 
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_houses", "WHERE ID = '%d' AND OwnerMID IS NULL", HouseID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_houses", "WHERE ID = '%d' AND OwnerMID IS NULL", HouseID));
 	if(RES->next())
 	{
 		const int Price = RES->getInt("Price");
@@ -1335,7 +1335,7 @@ void GuildJob::SellGuildHouse(int GuildID)
 		return;
 	}
 
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_houses", "WHERE ID = '%d' AND OwnerMID IS NOT NULL", HouseID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_houses", "WHERE ID = '%d' AND OwnerMID IS NOT NULL", HouseID));
 	if(RES->next())
 	{
 		SJK.UD("tw_guilds_houses", "OwnerMID = NULL WHERE ID = '%d'", HouseID);

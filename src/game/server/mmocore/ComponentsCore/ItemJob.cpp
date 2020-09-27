@@ -52,7 +52,7 @@ void ItemJob::OnInit()
 void ItemJob::OnInitAccount(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Settings, Enchant, Durability", "tw_accounts_items", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Settings, Enchant, Durability", "tw_accounts_items", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	while(RES->next())
 	{
 		int ItemID = (int)RES->getInt("ItemID");
@@ -148,7 +148,7 @@ int ItemJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, 
 {
 	// check initialize and add the item
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
 	if(RES->next())
 	{
 		Items[ClientID][ItemID].Count = RES->getInt("Count")+Count;
@@ -179,7 +179,7 @@ int ItemJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings
 {
 	// we check the database
 	const int ClientID = pPlayer->GetCID();
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
 	if(RES->next())
 	{
 		// update if there is more
@@ -303,7 +303,7 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 
 	if(PPSTR(CMD, "SORTEDINVENTORY") == 0)
 	{
-		pPlayer->m_SortTabs[SORTINVENTORY] = VoteID;
+		pPlayer->m_SortTabs[SORT_INVENTORY] = VoteID;
 		GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
 		return true;
 	}
@@ -419,7 +419,7 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 
 	if(PPSTR(CMD, "SORTEDEQUIP") == 0)
 	{
-		pPlayer->m_SortTabs[SORTEQUIP] = VoteID;
+		pPlayer->m_SortTabs[SORT_EQUIPING] = VoteID;
 		GS()->UpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
 		return true;				
 	}
@@ -456,8 +456,8 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 
 		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_OTHER);
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_OTHER, TAB_INVENTORY_SELECT, "Other ({INT})", &SizeItems);
-		if (pPlayer->m_SortTabs[SORTINVENTORY])	
-			ListInventory(pPlayer, pPlayer->m_SortTabs[SORTINVENTORY]);
+		if (pPlayer->m_SortTabs[SORT_INVENTORY])	
+			ListInventory(pPlayer, pPlayer->m_SortTabs[SORT_INVENTORY]);
 
 		GS()->AddBack(ClientID);
 		return true;
@@ -466,8 +466,8 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 	if (Menulist == MenuList::MENU_EQUIPMENT)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
-		GS()->AVH(ClientID, TAB_EQUIP_INFO, GREEN_COLOR, "Equip / Armor Information");
-		GS()->AVM(ClientID, "null", NOPE, TAB_EQUIP_INFO, "Select tab and select armor.");
+		GS()->AVH(ClientID, TAB_INFO_EQUIP, GREEN_COLOR, "Equip / Armor Information");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_EQUIP, "Select tab and select armor.");
 		GS()->AV(ClientID, "null", "");
 
 		GS()->AVH(ClientID, TAB_EQUIP_SELECT, RED_COLOR, "Equip Select Slot");
@@ -491,7 +491,7 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		bool FindItem = false;
 		for (const auto& it : ItemJob::Items[ClientID])
 		{
-			if (!it.second.Count || it.second.Info().Function != pPlayer->m_SortTabs[SORTEQUIP])
+			if (!it.second.Count || it.second.Info().Function != pPlayer->m_SortTabs[SORT_EQUIPING])
 				continue;
 
 			ItemSelected(pPlayer, it.second, true);
@@ -834,7 +834,7 @@ void ItemJob::AddItemSleep(int AccountID, int ItemID, int GiveCount, int Millise
 				return;
 			}
 
-			boost::scoped_ptr<ResultSet> RES(SJK.SD("Count", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, AccountID));
+			std::shared_ptr<ResultSet> RES(SJK.SD("Count", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, AccountID));
 			if(RES->next())
 			{
 				const int ReallyCount = (int)RES->getInt("Count") + GiveCount;

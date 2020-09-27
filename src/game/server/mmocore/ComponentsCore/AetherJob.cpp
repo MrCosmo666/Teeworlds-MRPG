@@ -25,7 +25,7 @@ void AetherJob::OnInit()
 
 void AetherJob::OnInitAccount(CPlayer *pPlayer)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_locations", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_locations", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	while(RES->next())
 	{
 		int TeleportID = RES->getInt("TeleportID");

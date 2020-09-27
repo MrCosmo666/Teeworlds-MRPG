@@ -9,7 +9,7 @@ std::map < int , AccountPlantJob::StructPlants > AccountPlantJob::Plants;
 
 void AccountPlantJob::OnInitWorld(const char* pWhereLocalWorld)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_position_plant", pWhereLocalWorld));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_position_plant", pWhereLocalWorld));
 	while(RES->next())
 	{
 		const int ID = RES->getInt("ID");
@@ -23,7 +23,7 @@ void AccountPlantJob::OnInitWorld(const char* pWhereLocalWorld)
 
 void AccountPlantJob::OnInitAccount(CPlayer *pPlayer)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_plants", "WHERE AccountID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_plants", "WHERE AccountID = '%d'", pPlayer->Acc().AuthID));
 	if(RES->next())
 	{
 		for(int i = 0; i < NUM_PLANT; i++)

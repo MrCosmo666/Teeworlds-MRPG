@@ -94,7 +94,7 @@ public:
 	######################################################################### */
 	class CCharacter *GetPlayerChar(int ClientID);
 	CPlayer *GetPlayer(int ClientID, bool CheckAuthed = false, bool CheckCharacter = false);
-	char* LevelString(int max, int value, int step, char ch1, char ch2);
+	std::unique_ptr<char[]> CGS::LevelString(int MaxValue, int CurrentValue, int Step, char toValue, char fromValue);
 	ItemJob::ItemInformation &GetItemInfo(int ItemID) const;
 	const char* GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const;
 
