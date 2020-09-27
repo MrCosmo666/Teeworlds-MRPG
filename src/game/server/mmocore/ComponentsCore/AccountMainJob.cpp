@@ -7,8 +7,8 @@
 #include "AccountMainJob.h"
 
 using namespace sqlstr;
-std::map < int, AccountMainJob::StructData > AccountMainJob::Data;
-std::map < int, AccountMainJob::StructTempPlayerData > AccountMainJob::PlayerTempData;
+std::map < int, AccountMainJob::StructData > AccountMainJob::ms_aData;
+std::map < int, AccountMainJob::StructTempPlayerData > AccountMainJob::ms_aPlayerTempData;
 
 int AccountMainJob::SendAuthCode(int ClientID, int Code)
 {
@@ -23,9 +23,9 @@ int AccountMainJob::SendAuthCode(int ClientID, int Code)
 
 int AccountMainJob::CheckOnlineAccount(int AuthID) const
 {
-	for (const auto& dt : AccountMainJob::Data)
+	for (const auto& dt : AccountMainJob::ms_aData)
 	{
-		if (dt.second.AuthID == AuthID && GS()->m_apPlayers[dt.first])
+		if (dt.second.m_AuthID == AuthID && GS()->m_apPlayers[dt.first])
 			return dt.first;
 	}
 	return -1;
@@ -106,20 +106,20 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		}
 
 		pPlayer->SetLanguage(CHECKACCESS->getString("Language").c_str());
-		str_copy(pPlayer->Acc().Login, clear_Login.cstr(), sizeof(pPlayer->Acc().Login));
-		str_copy(pPlayer->Acc().LastLogin, CHECKACCESS->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().LastLogin));
+		str_copy(pPlayer->Acc().m_aLogin, clear_Login.cstr(), sizeof(pPlayer->Acc().m_aLogin));
+		str_copy(pPlayer->Acc().m_aLastLogin, CHECKACCESS->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().m_aLastLogin));
 
-		pPlayer->Acc().AuthID = UserID;
-		pPlayer->Acc().Level = ACCOUNTDATA->getInt("Level");
-		pPlayer->Acc().Exp = ACCOUNTDATA->getInt("Exp");
-		pPlayer->Acc().GuildID = ACCOUNTDATA->getInt("GuildID");
-		pPlayer->Acc().Upgrade = ACCOUNTDATA->getInt("Upgrade");
-		pPlayer->Acc().GuildRank = ACCOUNTDATA->getInt("GuildRank");
-		pPlayer->Acc().WorldID = ACCOUNTDATA->getInt("WorldID");
+		pPlayer->Acc().m_AuthID = UserID;
+		pPlayer->Acc().m_Level = ACCOUNTDATA->getInt("Level");
+		pPlayer->Acc().m_Exp = ACCOUNTDATA->getInt("Exp");
+		pPlayer->Acc().m_GuildID = ACCOUNTDATA->getInt("GuildID");
+		pPlayer->Acc().m_Upgrade = ACCOUNTDATA->getInt("Upgrade");
+		pPlayer->Acc().m_GuildRank = ACCOUNTDATA->getInt("GuildRank");
+		pPlayer->Acc().m_WorldID = ACCOUNTDATA->getInt("WorldID");
 		for (const auto& at : CGS::AttributInfo)
 		{
 			if (str_comp_nocase(at.second.FieldName, "unfield") != 0)
-				pPlayer->Acc().Stats[at.first] = ACCOUNTDATA->getInt(at.second.FieldName);
+				pPlayer->Acc().m_aStats[at.first] = ACCOUNTDATA->getInt(at.second.FieldName);
 		}
 
 		GS()->Chat(ClientID, "- - - - - - - [Successful login] - - - - - - -");
@@ -158,17 +158,17 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	}
 
 	Job()->OnInitAccount(ClientID);
-	const int Rank = GetRank(pPlayer->Acc().AuthID);
+	const int Rank = GetRank(pPlayer->Acc().m_AuthID);
 	GS()->Chat(-1, "{STR} logged to account. Rank #{INT}", GS()->Server()->ClientName(ClientID), &Rank);
 #ifdef CONF_DISCORD
 	char pMsg[256], pLoggin[64];
-	str_format(pLoggin, sizeof(pLoggin), "%s logged in Account ID %d", GS()->Server()->ClientName(ClientID), pPlayer->Acc().AuthID);
+	str_format(pLoggin, sizeof(pLoggin), "%s logged in Account ID %d", GS()->Server()->ClientName(ClientID), pPlayer->Acc().m_AuthID);
 	str_format(pMsg, sizeof(pMsg), "?player=%s&rank=%d&dicid=%d",
 		GS()->Server()->ClientName(ClientID), Rank, pPlayer->GetEquippedItem(EQUIP_DISCORD));
 	GS()->Server()->SendDiscordGenerateMessage("16757248", pLoggin, pMsg);
 #endif
 
-	if (!pPlayer->GetItem(itHammer).Count)
+	if (!pPlayer->GetItem(itHammer).m_Count)
 	{
 		pPlayer->GetItem(itHammer).Add(1);
 		GS()->Chat(ClientID, "Quest NPCs are marked with an aura Heart and Shield.");
@@ -176,14 +176,14 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	}
 	
 	// settings
-	if(!pPlayer->GetItem(itModePVP).Count)
+	if(!pPlayer->GetItem(itModePVP).m_Count)
 		pPlayer->GetItem(itModePVP).Add(1, 1);
 
-	pPlayer->GetTempData().TempActiveSafeSpawn = true;
+	pPlayer->GetTempData().m_TempSafeSpawn = true;
 
-	if(pPlayer->Acc().WorldID != GS()->GetWorldID())
+	if(pPlayer->Acc().m_WorldID != GS()->GetWorldID())
 	{
-		pPlayer->ChangeWorld(pPlayer->Acc().WorldID);
+		pPlayer->ChangeWorld(pPlayer->Acc().m_WorldID);
 		return;
 	}
 	GS()->SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
@@ -196,7 +196,7 @@ void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)
 	if(!pPlayer) return;	
 
 	CSqlString<64> cDID = CSqlString<64>(pDID);
-	SJK.UD("tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", cDID.cstr(), pPlayer->Acc().AuthID);
+	SJK.UD("tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", cDID.cstr(), pPlayer->Acc().m_AuthID);
 
 	GS()->Chat(ClientID, "Update DiscordID.");
 	GS()->Chat(ClientID, "Check connect status in Discord \"!mconnect\".");
@@ -231,26 +231,26 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 		GS()->AVH(ClientID, TAB_SETTINGS, RED_COLOR, "Some of the settings becomes valid after death");
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_SELECT_LANGUAGE, TAB_SETTINGS, "Settings language");
-		for (const auto& it : ItemJob::Items[ClientID])
+		for (const auto& it : ItemJob::ms_aItems[ClientID])
 		{
 			const ItemJob::InventoryItem ItemData = it.second;
-			if (ItemData.Info().Type == ItemType::TYPE_SETTINGS && ItemData.Count > 0)
-				GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
+			if (ItemData.Info().m_Type == ItemType::TYPE_SETTINGS && ItemData.m_Count > 0)
+				GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.m_Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
 		}
 
 		// Equipment
 		bool FoundSettings = false;
 		GS()->AV(ClientID, "null", "");
 		GS()->AVH(ClientID, TAB_SETTINGS_MODULES, GREEN_COLOR, "Sub items settings.");
-		for (const auto& it : ItemJob::Items[ClientID])
+		for (const auto& it : ItemJob::ms_aItems[ClientID])
 		{
 			ItemJob::InventoryItem ItemData = it.second;
-			if (ItemData.Info().Type == ItemType::TYPE_MODULE && ItemData.Count > 0)
+			if (ItemData.Info().m_Type == ItemType::TYPE_MODULE && ItemData.m_Count > 0)
 			{
 				char aAttributes[128];
 				Job()->Item()->FormatAttributes(ItemData, sizeof(aAttributes), aAttributes);
 				GS()->AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, TAB_SETTINGS_MODULES, "{STR} {STR}{STR}",
-					ItemData.Info().GetName(pPlayer), aAttributes, (ItemData.Settings ? "✔ " : "\0"));
+					ItemData.Info().GetName(pPlayer), aAttributes, (ItemData.m_Settings ? "✔ " : "\0"));
 				FoundSettings = true;
 			}
 		}
@@ -307,11 +307,11 @@ bool AccountMainJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int V
 
 void AccountMainJob::OnResetClient(int ClientID)
 {
-	if(PlayerTempData.find(ClientID) != PlayerTempData.end())
-		PlayerTempData.erase(ClientID);
+	if(ms_aPlayerTempData.find(ClientID) != ms_aPlayerTempData.end())
+		ms_aPlayerTempData.erase(ClientID);
 
-	if (Data.find(ClientID) != Data.end())
-		Data.erase(ClientID);
+	if (ms_aData.find(ClientID) != ms_aData.end())
+		ms_aData.erase(ClientID);
 }
 
 std::string AccountMainJob::HashPassword(const char* pPassword, const char* pSalt)

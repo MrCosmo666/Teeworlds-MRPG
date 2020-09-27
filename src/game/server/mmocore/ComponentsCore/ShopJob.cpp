@@ -280,13 +280,13 @@ bool ShopJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 	if (Menulist == MenuList::MENU_AUCTION_CREATE_SLOT)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
-		const int ItemID = pPlayer->GetTempData().SellItem.m_ItemID;
+		const int ItemID = pPlayer->GetTempData().m_SellItem.m_ItemID;
 		ItemJob::ItemInformation& pInformationSellItem = GS()->GetItemInfo(ItemID);
 
-		const int SlotCount = pPlayer->GetTempData().SellItem.m_Count;
+		const int SlotCount = pPlayer->GetTempData().m_SellItem.m_Count;
 		const int MinimalPrice = SlotCount * pInformationSellItem.m_MinimalPrice;
-		const int SlotPrice = pPlayer->GetTempData().SellItem.m_Price;
-		const int SlotEnchant = pPlayer->GetTempData().SellItem.m_Enchant;
+		const int SlotPrice = pPlayer->GetTempData().m_SellItem.m_Price;
+		const int SlotEnchant = pPlayer->GetTempData().m_SellItem.m_Enchant;
 
 		GS()->AVH(ClientID, TAB_INFO_AUCTION_BIND, GREEN_COLOR, "Information Auction Slot");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_AUCTION_BIND, "The reason for write the number for each row");
@@ -331,21 +331,21 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 			Get = 1;
 
 		const int c_minimalprice = (Get * pPlayerSellItem.Info().m_MinimalPrice);
-		if(pPlayer->GetTempData().SellItem.m_Price < c_minimalprice)
-			pPlayer->GetTempData().SellItem.m_Price = c_minimalprice;
+		if(pPlayer->GetTempData().m_SellItem.m_Price < c_minimalprice)
+			pPlayer->GetTempData().m_SellItem.m_Price = c_minimalprice;
 
-		pPlayer->GetTempData().SellItem.m_Count = Get;
+		pPlayer->GetTempData().m_SellItem.m_Count = Get;
 		GS()->UpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
 		return true;
 	}
 
 	if(PPSTR(CMD, "AUCTIONPRICE") == 0)
 	{
-		const int c_minimalprice = (pPlayer->GetTempData().SellItem.m_Count * GS()->GetItemInfo(VoteID).m_MinimalPrice);
+		const int c_minimalprice = (pPlayer->GetTempData().m_SellItem.m_Count * GS()->GetItemInfo(VoteID).m_MinimalPrice);
 		if(Get < c_minimalprice) 
 			Get = c_minimalprice;
 
-		pPlayer->GetTempData().SellItem.m_Price = Get;
+		pPlayer->GetTempData().m_SellItem.m_Price = Get;
 		GS()->UpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);		
 		return true;
 	}
@@ -356,8 +356,8 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 		if (AvailableCount <= 0)
 			return true;
 
-		pPlayer->GetTempData().SellItem.m_ItemID = VoteID;
-		pPlayer->GetTempData().SellItem.m_Enchant = pPlayer->GetItem(VoteID).m_Enchant;
+		pPlayer->GetTempData().m_SellItem.m_ItemID = VoteID;
+		pPlayer->GetTempData().m_SellItem.m_Enchant = pPlayer->GetItem(VoteID).m_Enchant;
 		GS()->ResetVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
 		return true;
 	}
@@ -365,9 +365,9 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	if(PPSTR(CMD, "AUCTIONACCEPT") == 0)
 	{
 		ItemJob::InventoryItem &pPlayerSellItem = pPlayer->GetItem(VoteID);
-		if(pPlayerSellItem.m_Count >= pPlayer->GetTempData().SellItem.m_Count && pPlayer->GetTempData().SellItem.m_Price >= 10)
+		if(pPlayerSellItem.m_Count >= pPlayer->GetTempData().m_SellItem.m_Count && pPlayer->GetTempData().m_SellItem.m_Price >= 10)
 		{
-			CreateAuctionSlot(pPlayer, pPlayer->GetTempData().SellItem);
+			CreateAuctionSlot(pPlayer, pPlayer->GetTempData().m_SellItem);
 			GS()->ResetVotes(ClientID, MenuList::MENU_INVENTORY);
 			return true;
 		}

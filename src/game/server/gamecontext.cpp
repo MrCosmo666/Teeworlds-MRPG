@@ -1597,7 +1597,7 @@ void CGS::ConConvertPasswords(IConsole::IResult* pResult, void* pUserData)
 {
 	CGS* pSelf = (CGS*)pUserData;
 
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID, Password", "tw_accounts", "WHERE PasswordSalt IS NULL OR PasswordSalt = ''"));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID, Password", "tw_accounts", "WHERE PasswordSalt IS NULL OR PasswordSalt = ''"));
 	while(RES->next())
 	{
 		char aSalt[32] = { 0 };
