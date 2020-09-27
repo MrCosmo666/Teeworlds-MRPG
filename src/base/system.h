@@ -1693,6 +1693,34 @@ void uint_to_bytes_be(unsigned char* bytes, unsigned value);
 */
 int open_link(const char* link);
 
+/*
+	Function: generate_password
+		Generates a null-termineted password of length `2 *
+		random_length`.
+
+	Parameters:
+		buffer - Pointer to the start of the output buffer.
+		length - Length of the buffer.
+		random - Pointer to a randomly-initialized array of shorts.
+		random_length - Length of the short array.
+*/
+void generate_password(char* buffer, unsigned length, unsigned short* random, unsigned random_length);
+
+/*
+	Function: secure_random_password
+		Fills the buffer with the specified amount of random password
+		characters.
+
+		The desired password length must be greater or equal to 6, even
+		and smaller or equal to 128.
+
+	Parameters:
+		buffer - Pointer to the start of the buffer.
+		length - Length of the buffer.
+		pw_length - Length of the desired password.
+*/
+void secure_random_password(char* buffer, unsigned length, unsigned pw_length);
+
 #ifdef __cplusplus
 }
 #endif
