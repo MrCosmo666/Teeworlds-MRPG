@@ -183,13 +183,13 @@ void CCharacter::HandleWeaponSwitch()
 bool CCharacter::DecoInteractive()
 {
 	const int ClientID = m_pPlayer->GetCID();
-	if(m_pPlayer->GetTempData().TempDecoractionID > 0)
+	if(m_pPlayer->GetTempData().m_TempDecoractionID > 0)
 	{
-		const int DecoID = m_pPlayer->GetTempData().TempDecoractionID;
-		const int InteractiveType = m_pPlayer->GetTempData().TempDecorationType;
-		m_pPlayer->GetTempData().TempDecoractionID = -1;
-		m_pPlayer->GetTempData().TempDecorationType = -1;
-		if(m_pPlayer->GetItem(DecoID).Count <= 0 || GS()->GetItemInfo(DecoID).Type != ItemType::TYPE_DECORATION)
+		const int DecoID = m_pPlayer->GetTempData().m_TempDecoractionID;
+		const int InteractiveType = m_pPlayer->GetTempData().m_TempDecorationType;
+		m_pPlayer->GetTempData().m_TempDecoractionID = -1;
+		m_pPlayer->GetTempData().m_TempDecorationType = -1;
+		if(m_pPlayer->GetItem(DecoID).m_Count <= 0 || GS()->GetItemInfo(DecoID).m_Type != ItemType::TYPE_DECORATION)
 			return false;
 
 		if (InteractiveType == DECOTYPE_HOUSE)
@@ -205,7 +205,7 @@ bool CCharacter::DecoInteractive()
 		}
 		else if (InteractiveType == DECOTYPE_GUILD_HOUSE)
 		{
-			const int GuildID = m_pPlayer->Acc().GuildID;
+			const int GuildID = m_pPlayer->Acc().m_GuildID;
 			if (GS()->Mmo()->Member()->AddDecorationHouse(DecoID, GuildID, m_pHelper->MousePos()))
 			{
 				GS()->Chat(ClientID, "You added {STR}, to your guild house!", GS()->GetItemInfo(DecoID).GetName(m_pPlayer));
@@ -298,7 +298,7 @@ void CCharacter::FireWeapon()
 					Hits = true;
 
 					const int BotID = pTarget->GetPlayer()->GetBotID();
-					GS()->ChatFollow(m_pPlayer->GetCID(), "You start dialogue with {STR}!", BotJob::DataBot[BotID].NameBot);
+					GS()->ChatFollow(m_pPlayer->GetCID(), "You start dialogue with {STR}!", BotJob::ms_aDataBot[BotID].m_aNameBot);
 					continue;
 				}
 
@@ -423,10 +423,10 @@ void CCharacter::CreateQuestsStep(int QuestID)
 {
 	const int ClientID = m_pPlayer->GetCID();
 	vec2 Pos = GS()->Mmo()->WorldSwap()->GetPositionQuestBot(ClientID, QuestID);
-	if (QuestJob::Quests[ClientID].find(QuestID) == QuestJob::Quests[ClientID].end() || (Pos.x == 0.0f && Pos.y == 0.0f))
+	if (QuestJob::ms_aQuests[ClientID].find(QuestID) == QuestJob::ms_aQuests[ClientID].end() || (Pos.x == 0.0f && Pos.y == 0.0f))
 		return;
 
-	const int Progress = QuestJob::Quests[ClientID][QuestID].Progress;
+	const int Progress = QuestJob::ms_aQuests[ClientID][QuestID].m_Progress;
 	new CQuestPathFinder(GameWorld(), m_Core.m_Pos, ClientID, QuestID, Progress, Pos);
 }
 
@@ -670,7 +670,7 @@ void CCharacter::Die(int Killer, int Weapon)
 			else
 			{
 				GS()->Chat(ClientID, "You are dead, you will be treated in {STR}", Server()->GetWorldName(SafezoneWorldID));
-				m_pPlayer->GetTempData().TempActiveSafeSpawn = true;
+				m_pPlayer->GetTempData().m_TempSafeSpawn = true;
 			}
 		}
 	}
@@ -679,7 +679,7 @@ void CCharacter::Die(int Killer, int Weapon)
 	if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
 		int SubBotID = m_pPlayer->GetBotSub();
-		m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick()+BotJob::MobBot[SubBotID].RespawnTick*Server()->TickSpeed();
+		m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick()+BotJob::ms_aMobBot[SubBotID].m_RespawnTick*Server()->TickSpeed();
 	}
 
 	// a nice sound
@@ -916,9 +916,9 @@ void CCharacter::HandleEvents()
 void CCharacter::GiveRandomMobEffect(int FromID)
 {
 	CPlayer* pFrom = GS()->GetPlayer(FromID);
-	if(!pFrom || !pFrom->IsBot() || pFrom->GetBotType() != BotsTypes::TYPE_BOT_MOB || BotJob::MobBot[pFrom->GetBotSub()].Effect[0] == '\0')
+	if(!pFrom || !pFrom->IsBot() || pFrom->GetBotType() != BotsTypes::TYPE_BOT_MOB || BotJob::ms_aMobBot[pFrom->GetBotSub()].m_aEffect[0] == '\0')
 		return;
-	m_pPlayer->GiveEffect(BotJob::MobBot[pFrom->GetBotSub()].Effect, 3+random_int()%3, 40);
+	m_pPlayer->GiveEffect(BotJob::ms_aMobBot[pFrom->GetBotSub()].m_aEffect, 3+random_int()%3, 40);
 }
 
 bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)
@@ -994,7 +994,7 @@ void CCharacter::HandleTuning()
 		else if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 		{
 			// effect slower
-			if(str_comp(BotJob::MobBot[MobID].Behavior, "Slime") == 0)
+			if(str_comp(BotJob::ms_aMobBot[MobID].m_aBehavior, "Slime") == 0)
 			{
 				pTuningParams->m_Gravity = 0.25f;
 				pTuningParams->m_GroundJumpImpulse = 8.0f;
@@ -1084,8 +1084,8 @@ void CCharacter::UpdateEquipingStats(int ItemID)
 	}
 
 	const ItemJob::ItemInformation pInformationItem = GS()->GetItemInfo(ItemID);
-	if((pInformationItem.Function >= EQUIP_HAMMER && pInformationItem.Function <= EQUIP_RIFLE))
-		m_pPlayer->GetCharacter()->GiveWeapon(pInformationItem.Function, 3);
+	if((pInformationItem.m_Function >= EQUIP_HAMMER && pInformationItem.m_Function <= EQUIP_RIFLE))
+		m_pPlayer->GetCharacter()->GiveWeapon(pInformationItem.m_Function, 3);
 
 	if(pInformationItem.GetStatsBonus(Stats::StAmmoRegen) > 0)
 		m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
@@ -1132,7 +1132,7 @@ bool CCharacter::IsAllowedPVP(int FromID)
 			return false;
 
 		// anti pvp for guild players
-		if(pFrom->Acc().GuildID > 0 && pFrom->Acc().GuildID == m_pPlayer->Acc().GuildID)
+		if(pFrom->Acc().m_GuildID > 0 && pFrom->Acc().m_GuildID == m_pPlayer->Acc().m_GuildID)
 			return false;
 	}
 
@@ -1155,7 +1155,7 @@ bool CCharacter::IsLockedWorld()
 			const int CheckHouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
 			if(CheckHouseID <= 0)
 			{
-				m_pPlayer->GetTempData().TempTeleportX = m_pPlayer->GetTempData().TempTeleportY = -1;
+				m_pPlayer->GetTempData().m_TempTeleportX = m_pPlayer->GetTempData().m_TempTeleportY = -1;
 				GS()->Chat(m_pPlayer->GetCID(), "This chapter is still closed, you magically transported first zone!");
 				m_pPlayer->ChangeWorld(NEWBIE_ZERO_WORLD);
 				return true;

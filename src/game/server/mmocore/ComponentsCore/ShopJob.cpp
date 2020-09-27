@@ -5,7 +5,7 @@
 #include "ShopJob.h"
 
 using namespace sqlstr;
-std::map < int , ShopJob::ShopPersonal > ShopJob::Shop;
+std::map < int , ShopJob::ShopPersonal > ShopJob::ms_aShopList;
 
 void ShopJob::OnInit()
 {
@@ -13,7 +13,7 @@ void ShopJob::OnInit()
 	while(RES->next())
 	{
 		int ID = RES->getInt("ID");
-		Shop[ID].StorageID = RES->getInt("StorageID");
+		ms_aShopList[ID].m_StorageID = RES->getInt("StorageID");
 	}
 }
 
@@ -51,7 +51,7 @@ bool ShopJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 {
 	const int ClientID = pPlayer->GetCID();
-	int HideID = NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 300;
+	int HideID = NUM_TAB_MENU + ItemJob::ms_aItemsInfo.size() + 300;
 	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE StorageID = '%d' ORDER BY Price", StorageID));
 	while(RES->next())
 	{
@@ -69,7 +69,7 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 			char aEnchantSize[16];
 			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);
 			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR}{STR} - {INT} {STR}",
-				(pPlayer->GetItem(ItemID).Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price, NeededItem.GetName(pPlayer));
+				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price, NeededItem.GetName(pPlayer));
 
 			char aAttributes[128];
 			Job()->Item()->FormatAttributes(BuyightItem, Enchant, sizeof(aAttributes), aAttributes);
@@ -78,7 +78,7 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		else
 		{
 			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) - {INT} {STR}",
-				BuyightItem.GetName(pPlayer), &Count, &pPlayer->GetItem(ItemID).Count, &Price, NeededItem.GetName(pPlayer));
+				BuyightItem.GetName(pPlayer), &Count, &pPlayer->GetItem(ItemID).m_Count, &Price, NeededItem.GetName(pPlayer));
 		}
 
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", BuyightItem.GetDesc(pPlayer));
@@ -99,7 +99,7 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 	GS()->AV(ClientID, "null", "");
 
 	bool FoundItems = false;
-	int HideID = (int)(NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 400);
+	int HideID = (int)(NUM_TAB_MENU + ItemJob::ms_aItemsInfo.size() + 400);
 	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 ORDER BY Price"));
 	while(RES->next())
 	{
@@ -116,7 +116,7 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 			char aEnchantSize[16];
 			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);
 			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR}{STR} - {INT} gold",
-				(pPlayer->GetItem(ItemID).Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price);
+				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price);
 
 			char aAttributes[128];
 			Job()->Item()->FormatAttributes(BuyightItem, Enchant, sizeof(aAttributes), aAttributes);
@@ -125,7 +125,7 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 		else
 		{
 			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) - {INT} gold",
-				BuyightItem.GetName(pPlayer), &Count, &pPlayer->GetItem(ItemID).Count, &Price);
+				BuyightItem.GetName(pPlayer), &Count, &pPlayer->GetItem(ItemID).m_Count, &Price);
 		}
 
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", BuyightItem.GetDesc(pPlayer));
@@ -142,7 +142,7 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 
 void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
 {
-	const int ItemID = AuSellItem.a_itemid;
+	const int ItemID = AuSellItem.m_ItemID;
 	const int ClientID = pPlayer->GetCID();
 	ItemJob::InventoryItem &pPlayerAuctionItem = pPlayer->GetItem(ItemID);
 
@@ -152,13 +152,13 @@ void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
 		return GS()->Chat(ClientID, "Auction has run out of slots, wait for the release of slots!");
 
 	// check your slots
-	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_mailshop", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().AuthID, g_Config.m_SvMaxAuctionSlots));
+	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_mailshop", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AuthID, g_Config.m_SvMaxAuctionSlots));
 	const int CountSlot = RES2->rowsCount();
 	if(CountSlot >= g_Config.m_SvMaxAuctionSlots)
 		return GS()->Chat(ClientID, "You use all open the slots in your auction!");
 
 	// we check if the item is in the auction
-	std::shared_ptr<ResultSet> RES3(SJK.SD("ID", "tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES3(SJK.SD("ID", "tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AuthID));
 	if(RES3->next()) 
 		return GS()->Chat(ClientID, "Your same item found in the database, need reopen the slot!");
 
@@ -167,14 +167,14 @@ void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
 		return;
 
 	// pick up the item and add a slot
-	if(pPlayerAuctionItem.Count >= AuSellItem.a_count && pPlayerAuctionItem.Remove(AuSellItem.a_count))
+	if(pPlayerAuctionItem.m_Count >= AuSellItem.m_Count && pPlayerAuctionItem.Remove(AuSellItem.m_Count))
 	{
 		SJK.ID("tw_mailshop", "(ItemID, Price, Count, OwnerID, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d')", 
-			ItemID, AuSellItem.a_price, AuSellItem.a_count, pPlayer->Acc().AuthID, AuSellItem.a_enchant);
+			ItemID, AuSellItem.m_Price, AuSellItem.m_Count, pPlayer->Acc().m_AuthID, AuSellItem.m_Enchant);
 
 		const int AvailableSlot = (g_Config.m_SvMaxAuctionSlots - CountSlot) - 1;
 		GS()->Chat(-1, "{STR} created a slot [{STR}x{INT}] auction.", 
-			GS()->Server()->ClientName(ClientID), pPlayerAuctionItem.Info().GetName(pPlayer), &AuSellItem.a_count);
+			GS()->Server()->ClientName(ClientID), pPlayerAuctionItem.Info().GetName(pPlayer), &AuSellItem.m_Count);
 		GS()->ChatFollow(ClientID, "Still available {INT} slots!", &AvailableSlot);
 	}
 }
@@ -188,7 +188,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 
 	const int ItemID = SHOPITEM->getInt("ItemID");
 	ItemJob::InventoryItem &pPlayerBuyightItem = pPlayer->GetItem(ItemID);
-	if (pPlayerBuyightItem.Count > 0 && pPlayerBuyightItem.Info().IsEnchantable())
+	if (pPlayerBuyightItem.m_Count > 0 && pPlayerBuyightItem.Info().IsEnchantable())
 	{
 		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");
 		return false;
@@ -202,7 +202,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 	if (OwnerID > 0)
 	{
 		// take out your slot
-		if (OwnerID == pPlayer->Acc().AuthID)
+		if (OwnerID == pPlayer->Acc().m_AuthID)
 		{
 			GS()->Chat(ClientID, "You closed auction slot!");
 			GS()->SendInbox(ClientID, "Auction Alert", "You have bought a item, or canceled your slot", ItemID, Count, Enchant);
@@ -280,13 +280,13 @@ bool ShopJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 	if (Menulist == MenuList::MENU_AUCTION_CREATE_SLOT)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
-		const int ItemID = pPlayer->GetTempData().SellItem.a_itemid;
+		const int ItemID = pPlayer->GetTempData().SellItem.m_ItemID;
 		ItemJob::ItemInformation& pInformationSellItem = GS()->GetItemInfo(ItemID);
 
-		const int SlotCount = pPlayer->GetTempData().SellItem.a_count;
-		const int MinimalPrice = SlotCount * pInformationSellItem.MinimalPrice;
-		const int SlotPrice = pPlayer->GetTempData().SellItem.a_price;
-		const int SlotEnchant = pPlayer->GetTempData().SellItem.a_enchant;
+		const int SlotCount = pPlayer->GetTempData().SellItem.m_Count;
+		const int MinimalPrice = SlotCount * pInformationSellItem.m_MinimalPrice;
+		const int SlotPrice = pPlayer->GetTempData().SellItem.m_Price;
+		const int SlotEnchant = pPlayer->GetTempData().SellItem.m_Enchant;
 
 		GS()->AVH(ClientID, TAB_INFO_AUCTION_BIND, GREEN_COLOR, "Information Auction Slot");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_AUCTION_BIND, "The reason for write the number for each row");
@@ -323,29 +323,29 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	{
 		// if there are fewer items installed, we set the number of items.
 		ItemJob::InventoryItem &pPlayerSellItem = pPlayer->GetItem(VoteID);
-		if(Get > pPlayerSellItem.Count)
-			Get = pPlayerSellItem.Count;
+		if(Get > pPlayerSellItem.m_Count)
+			Get = pPlayerSellItem.m_Count;
 
 		// if it is possible to number
 		if(pPlayerSellItem.Info().IsEnchantable())
 			Get = 1;
 
-		const int c_minimalprice = (Get * pPlayerSellItem.Info().MinimalPrice);
-		if(pPlayer->GetTempData().SellItem.a_price < c_minimalprice)
-			pPlayer->GetTempData().SellItem.a_price = c_minimalprice;
+		const int c_minimalprice = (Get * pPlayerSellItem.Info().m_MinimalPrice);
+		if(pPlayer->GetTempData().SellItem.m_Price < c_minimalprice)
+			pPlayer->GetTempData().SellItem.m_Price = c_minimalprice;
 
-		pPlayer->GetTempData().SellItem.a_count = Get;
+		pPlayer->GetTempData().SellItem.m_Count = Get;
 		GS()->UpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
 		return true;
 	}
 
 	if(PPSTR(CMD, "AUCTIONPRICE") == 0)
 	{
-		const int c_minimalprice = (pPlayer->GetTempData().SellItem.a_count * GS()->GetItemInfo(VoteID).MinimalPrice);
+		const int c_minimalprice = (pPlayer->GetTempData().SellItem.m_Count * GS()->GetItemInfo(VoteID).m_MinimalPrice);
 		if(Get < c_minimalprice) 
 			Get = c_minimalprice;
 
-		pPlayer->GetTempData().SellItem.a_price = Get;
+		pPlayer->GetTempData().SellItem.m_Price = Get;
 		GS()->UpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);		
 		return true;
 	}
@@ -356,8 +356,8 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 		if (AvailableCount <= 0)
 			return true;
 
-		pPlayer->GetTempData().SellItem.a_itemid = VoteID;
-		pPlayer->GetTempData().SellItem.a_enchant = pPlayer->GetItem(VoteID).Enchant;
+		pPlayer->GetTempData().SellItem.m_ItemID = VoteID;
+		pPlayer->GetTempData().SellItem.m_Enchant = pPlayer->GetItem(VoteID).m_Enchant;
 		GS()->ResetVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
 		return true;
 	}
@@ -365,7 +365,7 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	if(PPSTR(CMD, "AUCTIONACCEPT") == 0)
 	{
 		ItemJob::InventoryItem &pPlayerSellItem = pPlayer->GetItem(VoteID);
-		if(pPlayerSellItem.Count >= pPlayer->GetTempData().SellItem.a_count && pPlayer->GetTempData().SellItem.a_price >= 10)
+		if(pPlayerSellItem.m_Count >= pPlayer->GetTempData().SellItem.m_Count && pPlayer->GetTempData().SellItem.m_Price >= 10)
 		{
 			CreateAuctionSlot(pPlayer, pPlayer->GetTempData().SellItem);
 			GS()->ResetVotes(ClientID, MenuList::MENU_INVENTORY);

@@ -142,7 +142,7 @@ int CProjectile::GetOwnerProjID(int ClientID)
 		if (EquipID <= 0)
 			return -1;
 
-		return GS()->GetItemInfo(EquipID).ProjID;
+		return GS()->GetItemInfo(EquipID).m_ProjID;
 	}
 	case WEAPON_SHOTGUN:
 	{
@@ -150,7 +150,7 @@ int CProjectile::GetOwnerProjID(int ClientID)
 		if (EquipID <= 0)
 			return -1;
 
-		return GS()->GetItemInfo(EquipID).ProjID;
+		return GS()->GetItemInfo(EquipID).m_ProjID;
 	}
 	case WEAPON_GRENADE:
 	{
@@ -158,7 +158,7 @@ int CProjectile::GetOwnerProjID(int ClientID)
 		if (EquipID <= 0)
 			return -1;
 
-		return GS()->GetItemInfo(EquipID).ProjID;
+		return GS()->GetItemInfo(EquipID).m_ProjID;
 	}
 	}
 	return -1;

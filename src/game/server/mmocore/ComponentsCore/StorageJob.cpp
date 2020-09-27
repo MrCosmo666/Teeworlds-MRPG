@@ -4,13 +4,13 @@
 #include "StorageJob.h"
 
 using namespace sqlstr;
-std::map < int, StorageJob::SturctStorage > StorageJob::Storage;
+std::map < int, StorageJob::SturctStorage > StorageJob::ms_aStorage;
 
 int StorageJob::GetStorageID(vec2 Pos) const
 {
-	for (const auto& st : Storage)
+	for (const auto& st : ms_aStorage)
 	{
-		const vec2 PosStorage(st.second.PosX, st.second.PosY);
+		const vec2 PosStorage(st.second.m_PosX, st.second.m_PosY);
 		if (distance(PosStorage, Pos) < 200) 
 			return st.first;
 	}
@@ -20,16 +20,16 @@ int StorageJob::GetStorageID(vec2 Pos) const
 void StorageJob::ShowStorageMenu(CPlayer* pPlayer, int StorageID)
 {
 	const int ClientID = pPlayer->GetCID();
-	if(Storage.find(StorageID) == Storage.end())
+	if(ms_aStorage.find(StorageID) == ms_aStorage.end())
 	{
 		GS()->AV(ClientID, "null", "Storage Don't work");
 		return;
 	}
 	
-	GS()->AVH(ClientID, TAB_STORAGE, GOLDEN_COLOR, "Shop :: {STR}", Storage[StorageID].Name);
+	GS()->AVH(ClientID, TAB_STORAGE, GOLDEN_COLOR, "Shop :: {STR}", ms_aStorage[StorageID].m_aName);
 	GS()->AVM(ClientID, "REPAIRITEMS", StorageID, TAB_STORAGE, "Repair all items - FREE");
 	GS()->AV(ClientID, "null", "");
-	GS()->ShowItemValueInformation(pPlayer, Storage[StorageID].Currency);
+	GS()->ShowItemValueInformation(pPlayer, ms_aStorage[StorageID].m_Currency);
 	GS()->AV(ClientID, "null", "");
 }
 
@@ -40,11 +40,11 @@ void StorageJob::OnInit()
 		while(RES->next())
 		{
 			const int ID = (int)RES->getInt("ID");
-			Storage[ID].PosX = (int)RES->getInt("PosX");
-			Storage[ID].PosY = (int)RES->getInt("PosY");
-			Storage[ID].Currency = (int)RES->getInt("Currency");
-			Storage[ID].WorldID = (int)RES->getInt("WorldID");
-			str_copy(Storage[ID].Name, RES->getString("Name").c_str(), sizeof(Storage[ID].Name));
+			ms_aStorage[ID].m_PosX = (int)RES->getInt("PosX");
+			ms_aStorage[ID].m_PosY = (int)RES->getInt("PosY");
+			ms_aStorage[ID].m_Currency = (int)RES->getInt("Currency");
+			ms_aStorage[ID].m_WorldID = (int)RES->getInt("WorldID");
+			str_copy(ms_aStorage[ID].m_aName, RES->getString("Name").c_str(), sizeof(ms_aStorage[ID].m_aName));
 		}
 	});
 }

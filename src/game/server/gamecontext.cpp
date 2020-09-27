@@ -149,7 +149,7 @@ const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const
 	return ID >= NUM_TAB_MENU ? ("\\/ # ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("/\\ # ") : ("\\/ # "));
 }
 
-ItemJob::ItemInformation &CGS::GetItemInfo(int ItemID) const { return ItemJob::ItemsInfo[ItemID]; }
+ItemJob::ItemInformation &CGS::GetItemInfo(int ItemID) const { return ItemJob::ms_aItemsInfo[ItemID]; }
 
 /* #########################################################################
 	EVENTS 
@@ -351,7 +351,7 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 	else if(Mode == CHAT_TEAM)
 	{
 		CPlayer* pChatterPlayer = GetPlayer(ChatterClientID, true);
-		if(!pChatterPlayer || pChatterPlayer->Acc().GuildID <= 0)
+		if(!pChatterPlayer || pChatterPlayer->Acc().m_GuildID <= 0)
 		{
 			Chat(ChatterClientID, "This chat is intended for team / guilds!");
 			return;
@@ -365,11 +365,11 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 			ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
 
 		// send chat to guild team
-		const int GuildID = pChatterPlayer->Acc().GuildID;
+		const int GuildID = pChatterPlayer->Acc().m_GuildID;
 		for(int i = 0; i < MAX_PLAYERS; i++)
 		{
 			CPlayer *pSearchPlayer = GetPlayer(i, true);
-			if(pSearchPlayer && pSearchPlayer->Acc().GuildID == GuildID)
+			if(pSearchPlayer && pSearchPlayer->Acc().m_GuildID == GuildID)
 				Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, i);
 		}
 	}
@@ -521,7 +521,7 @@ void CGS::ChatGuild(int GuildID, const char* pText, ...)
 	for(int i = 0 ; i < MAX_PLAYERS ; i ++)
 	{
 		CPlayer *pPlayer = GetPlayer(i, true);
-		if(pPlayer && pPlayer->Acc().IsGuild() && pPlayer->Acc().GuildID == GuildID)
+		if(pPlayer && pPlayer->Acc().IsGuild() && pPlayer->Acc().m_GuildID == GuildID)
 		{
 			Buffer.append("[Guild]");
 			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
@@ -823,7 +823,7 @@ void CGS::SendEquipItem(int ClientID, int TargetID)
 	for(int k = 0; k < NUM_EQUIPS; k++)
 	{
 		const int EquipItem = pPlayer->GetEquippedItem(k);
-		const bool EnchantItem = (pPlayer->IsBot() ? false : (bool)(pPlayer->GetItem(EquipItem).Enchant >= pPlayer->GetItem(EquipItem).Info().MaximalEnchant));
+		const bool EnchantItem = (pPlayer->IsBot() ? false : (bool)(pPlayer->GetItem(EquipItem).m_Enchant >= pPlayer->GetItem(EquipItem).Info().m_MaximalEnchant));
 		Msg.m_EquipID[k] = EquipItem;
 		Msg.m_EnchantItem[k] = EnchantItem;
 	}
@@ -1516,8 +1516,8 @@ void CGS::ClearClientData(int ClientID)
 		Effects.erase(ClientID);
 
 	// clear active snap bots for player
-	for(auto& databot : BotJob::DataBot)
-		databot.second.AlreadySnapQuestBot[ClientID] = false;
+	for(auto& databot : BotJob::ms_aDataBot)
+		databot.second.m_aAlreadySnapQuestBot[ClientID] = false;
 }
 
 int CGS::GetRank(int AuthID)
@@ -1859,19 +1859,19 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
 		// statistics menu
-		const int ExpForLevel = pPlayer->ExpNeed(pPlayer->Acc().Level);
-		AVH(ClientID, TAB_STAT, GREEN_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().LastLogin);
+		const int ExpForLevel = pPlayer->ExpNeed(pPlayer->Acc().m_Level);
+		AVH(ClientID, TAB_STAT, GREEN_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().m_aLastLogin);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Discord: \"{STR}\". Ideas, bugs, rewards", g_Config.m_SvDiscordInviteGroup);
-		AVM(ClientID, "null", NOPE, TAB_STAT, "Level {INT} : Exp {INT}/{INT}", &pPlayer->Acc().Level, &pPlayer->Acc().Exp, &ExpForLevel);
-		AVM(ClientID, "null", NOPE, TAB_STAT, "Skill Point {INT}SP", &pPlayer->GetItem(itSkillPoint).Count);
-		AVM(ClientID, "null", NOPE, TAB_STAT, "Gold: {INT}", &pPlayer->GetItem(itGold).Count);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Level {INT} : Exp {INT}/{INT}", &pPlayer->Acc().m_Level, &pPlayer->Acc().m_Exp, &ExpForLevel);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Skill Point {INT}SP", &pPlayer->GetItem(itSkillPoint).m_Count);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Gold: {INT}", &pPlayer->GetItem(itGold).m_Count);
 		AV(ClientID, "null", "");
 
 		// personal menu
 		AVH(ClientID, TAB_PERSONAL, GRAY_COLOR, "☪ SUB MENU PERSONAL");
 		AVM(ClientID, "MENU", MenuList::MENU_INVENTORY, TAB_PERSONAL, "Inventory"); 
 		AVM(ClientID, "MENU", MenuList::MENU_EQUIPMENT, TAB_PERSONAL, "Equipment");
-		AVM(ClientID, "MENU", MenuList::MENU_UPGRADE, TAB_PERSONAL, "Upgrades({INT}p)", &pPlayer->Acc().Upgrade);
+		AVM(ClientID, "MENU", MenuList::MENU_UPGRADE, TAB_PERSONAL, "Upgrades({INT}p)", &pPlayer->Acc().m_Upgrade);
 		AVM(ClientID, "MENU", MenuList::MENU_DUNGEONS, TAB_PERSONAL, "Dungeons");
 		AVM(ClientID, "MENU", MenuList::MENU_SETTINGS, TAB_PERSONAL, "Settings");
 		AVM(ClientID, "MENU", MenuList::MENU_INBOX, TAB_PERSONAL, "Mailbox");
@@ -1919,7 +1919,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		{
 			if(at.second.AtType != AtributType::AtDps || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_DPS, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().Stats[at.first], &at.second.UpgradePrice);
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_DPS, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().m_aStats[at.first], &at.second.UpgradePrice);
 		}
 		AV(ClientID, "null", "");
 
@@ -1930,7 +1930,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		{
 			if(at.second.AtType != AtributType::AtTank || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_TANK, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().Stats[at.first], &at.second.UpgradePrice);
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_TANK, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().m_aStats[at.first], &at.second.UpgradePrice);
 		}
 		AV(ClientID, "null", "");
 
@@ -1941,7 +1941,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		{
 			if(at.second.AtType != AtributType::AtHealer || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_HEALER, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().Stats[at.first], &at.second.UpgradePrice);
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_HEALER, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().m_aStats[at.first], &at.second.UpgradePrice);
 		}
 		AV(ClientID, "null", "");
 
@@ -1951,7 +1951,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		{
 			if(at.second.AtType != AtributType::AtWeapon || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_WEAPON, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().Stats[at.first], &at.second.UpgradePrice);
+			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_WEAPON, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().m_aStats[at.first], &at.second.UpgradePrice);
 		}
 
 		AV(ClientID, "null", ""), 
@@ -1984,24 +1984,24 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		char aBuf[128];
 		bool FoundedBots = false;
 		const float LuckyDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
-		for(const auto& mobs : BotJob::MobBot)
+		for(const auto& mobs : BotJob::ms_aMobBot)
 		{
-			if (!IsClientEqualWorldID(ClientID, mobs.second.WorldID))
+			if (!IsClientEqualWorldID(ClientID, mobs.second.m_WorldID))
 				continue;
 
 			const int HideID = (NUM_TAB_MENU+12500+mobs.first);
-			const int PosX = mobs.second.PositionX/32, PosY = mobs.second.PositionY/32;
+			const int PosX = mobs.second.m_PositionX/32, PosY = mobs.second.m_PositionY/32;
 			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} [x{INT} y{INT}]", mobs.second.GetName(), &PosX, &PosY);
 	
 			for(int i = 0; i < MAX_DROPPED_FROM_MOBS; i++)
 			{
-				if(mobs.second.DropItem[i] <= 0 || mobs.second.CountItem[i] <= 0)
+				if(mobs.second.m_aDropItem[i] <= 0 || mobs.second.m_aCountItem[i] <= 0)
 					continue;
 			
-				const float Chance = mobs.second.RandomItem[i];
+				const float Chance = mobs.second.m_aRandomItem[i];
 				const float AddedChance = LuckyDrop;
-				ItemJob::ItemInformation &InfoDropItem = GetItemInfo(mobs.second.DropItem[i]);
-				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%(+%0.2f%%)", InfoDropItem.GetName(pPlayer), mobs.second.CountItem[i], Chance, AddedChance);
+				ItemJob::ItemInformation &InfoDropItem = GetItemInfo(mobs.second.m_aDropItem[i]);
+				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%(+%0.2f%%)", InfoDropItem.GetName(pPlayer), mobs.second.m_aCountItem[i], Chance, AddedChance);
 				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, "{STR}", aBuf);
 				FoundedBots = true;
 			}
@@ -2113,7 +2113,7 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "+{INT} - {STR}", &AttributeSize, AtributeName(at.first));
 	}
 
-	AVM(ClientID, "null", NOPE, NOPE, "Player Upgrade Point: {INT}P", &pPlayer->Acc().Upgrade);
+	AVM(ClientID, "null", NOPE, NOPE, "Player Upgrade Point: {INT}P", &pPlayer->Acc().m_Upgrade);
 	AV(ClientID, "null", "");
 }
 
@@ -2122,7 +2122,7 @@ void CGS::ShowItemValueInformation(CPlayer *pPlayer, int ItemID)
 {
 	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = LIGHT_PURPLE_COLOR;
-	AVMI(ClientID, GetItemInfo(ItemID).GetIcon(), "null", NOPE, NOPE, "You have {INT} {STR}", &pPlayer->GetItem(ItemID).Count, GetItemInfo(ItemID).GetName());
+	AVMI(ClientID, GetItemInfo(ItemID).GetIcon(), "null", NOPE, NOPE, "You have {INT} {STR}", &pPlayer->GetItem(ItemID).m_Count, GetItemInfo(ItemID).GetName());
 }
 
 // vote parsing of all functions of action methods
@@ -2184,15 +2184,15 @@ int CGS::CreateBot(short BotType, int BotID, int SubID)
 // remove bots that are not active in people for quests
 void CGS::UpdateQuestsBot(int QuestID, int Step)
 {
-	for(auto& FindBot : BotJob::QuestBot)
+	for(auto& FindBot : BotJob::ms_aQuestBot)
 	{
-		if(QuestID != FindBot.second.QuestID || Step != FindBot.second.Progress)
+		if(QuestID != FindBot.second.m_QuestID || Step != FindBot.second.m_Progress)
 			continue;
 
 		// throw a recheck on the world
-		if(FindBot.second.WorldID != GetWorldID())
+		if(FindBot.second.m_WorldID != GetWorldID())
 		{
-			Server()->QuestBotUpdateOnWorld(FindBot.second.WorldID, QuestID, Step);
+			Server()->QuestBotUpdateOnWorld(FindBot.second.m_WorldID, QuestID, Step);
 			continue;
 		}
 
@@ -2200,7 +2200,7 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 		int QuestBotClientID = -1;
 		for(int i = MAX_PLAYERS ; i < MAX_CLIENTS; i++)
 		{
-			if(!m_apPlayers[i] || m_apPlayers[i]->GetBotType() != BotsTypes::TYPE_BOT_QUEST || m_apPlayers[i]->GetBotSub() != FindBot.second.SubBotID) 
+			if(!m_apPlayers[i] || m_apPlayers[i]->GetBotType() != BotsTypes::TYPE_BOT_QUEST || m_apPlayers[i]->GetBotSub() != FindBot.second.m_SubBotID) 
 				continue;
 			QuestBotClientID = i;
 		}
@@ -2208,7 +2208,7 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 		// seek if all players have an active bot
 		const bool ActiveBot = Mmo()->Quest()->IsActiveQuestBot(QuestID, Step);
 		if(ActiveBot && QuestBotClientID <= -1)
-			CreateBot(BotsTypes::TYPE_BOT_QUEST, FindBot.second.BotID, FindBot.second.SubBotID);
+			CreateBot(BotsTypes::TYPE_BOT_QUEST, FindBot.second.m_BotID, FindBot.second.m_SubBotID);
 
 		// if the bot is not active for more than one player
 		if (!ActiveBot && QuestBotClientID >= MAX_PLAYERS)
@@ -2245,8 +2245,8 @@ void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop, vec2 For
 void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant, vec2 Force)
 {
 	ItemJob::InventoryItem DropItem(nullptr, ItemID);
-	DropItem.Count = Count;
-	DropItem.Enchant = Enchant;
+	DropItem.m_Count = Count;
+	DropItem.m_Enchant = Enchant;
 
 	vec2 Vel = Force + vec2(frandom() * 15.0, frandom() * 15.0);
 	const float Angle = Force.x * (0.15f + frandom() * 0.1f);
@@ -2257,7 +2257,7 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Ench
 void CGS::CreateDropItem(vec2 Pos, int ClientID, ItemJob::InventoryItem &pPlayerItem, int Count, vec2 Force)
 {
 	ItemJob::InventoryItem CopyItem = pPlayerItem;
-	CopyItem.Count = Count;
+	CopyItem.m_Count = Count;
 
 	if (pPlayerItem.Remove(Count))
 	{
@@ -2284,7 +2284,7 @@ void CGS::SendInbox(int ClientID, const char* Name, const char* Desc, int ItemID
 	if(!pPlayer) 
 		return;
 
-	Mmo()->Inbox()->SendInbox(pPlayer->Acc().AuthID, Name, Desc, ItemID, Count, Enchant);
+	Mmo()->Inbox()->SendInbox(pPlayer->Acc().m_AuthID, Name, Desc, ItemID, Count, Enchant);
 } 
 
 // send day information
@@ -2301,7 +2301,7 @@ void CGS::SendDayInfo(int ClientID)
 void CGS::ChangeEquipSkin(int ClientID, int ItemID)
 {
 	CPlayer *pPlayer = GetPlayer(ClientID, true);
-	if(!pPlayer || GetItemInfo(ItemID).Type != ItemType::TYPE_EQUIP || GetItemInfo(ItemID).Function == EQUIP_DISCORD || GetItemInfo(ItemID).Function == EQUIP_MINER)
+	if(!pPlayer || GetItemInfo(ItemID).m_Type != ItemType::TYPE_EQUIP || GetItemInfo(ItemID).m_Function == EQUIP_DISCORD || GetItemInfo(ItemID).m_Function == EQUIP_MINER)
 		return;
 
 	SendEquipItem(ClientID, -1);
@@ -2335,7 +2335,7 @@ void CGS::UpdateZoneDungeon()
 	m_DungeonID = 0;
 	for(const auto& dd : DungeonJob::Dungeon)
 	{
-		if(m_WorldID != dd.second.WorldID)
+		if(m_WorldID != dd.second.m_WorldID)
 			continue;
 		
 		m_DungeonID = dd.first;

@@ -7,39 +7,33 @@
 
 class ItemJob : public MmoComponent
 {
-	struct RandomBox
-	{
-		int ItemID;
-		float Chance;
-	};
-
 	class ClassItemInformation
 	{
 	public:
-		char Name[32];
-		char Desc[64];
-		char Icon[16];
-		int Type;
-		int Function;
-		int Dysenthis;
-		int MinimalPrice;
-		short Attribute[STATS_MAX_FOR_ITEM];
-		int AttributeCount[STATS_MAX_FOR_ITEM];
-		int MaximalEnchant;
-		int ProjID;
+		char m_aName[32];
+		char m_aDesc[64];
+		char m_aIcon[16];
+		int m_Type;
+		int m_Function;
+		int m_Dysenthis;
+		int m_MinimalPrice;
+		short m_aAttribute[STATS_MAX_FOR_ITEM];
+		int m_aAttributeCount[STATS_MAX_FOR_ITEM];
+		int m_MaximalEnchant;
+		int m_ProjID;
 		
 		int GetStatsBonus(int AttributeID) const
 		{
 			for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 			{
-				if(Attribute[i] == AttributeID)
-					return AttributeCount[i];
+				if(m_aAttribute[i] == AttributeID)
+					return m_aAttributeCount[i];
 			}
 			return -1;
 		}
 		const char* GetName(CPlayer* pPlayer = NULL) const;
 		const char* GetDesc(CPlayer* pPlayer = NULL) const;
-		const char* GetIcon() const { return Icon; };
+		const char* GetIcon() const { return m_aIcon; };
 		bool IsEnchantable() const;
 	};
 
@@ -48,7 +42,7 @@ class ItemJob : public MmoComponent
 
 public:
 	typedef ClassItemInformation ItemInformation;
-	static std::map < int , ItemInformation > ItemsInfo;
+	static std::map < int , ItemInformation > ms_aItemsInfo;
 
 	// TODO: Change it bad
 	class ClassItems
@@ -57,14 +51,14 @@ public:
 		int itemid_;
 
 	public:
-		ClassItems() : Count(0), Settings(0), Enchant(0), Durability(0) {};
-		ClassItems(CPlayer* pPlayer, int ItemID) : m_pPlayer(pPlayer), itemid_(ItemID), Count(0), Settings(0), Enchant(0), Durability(0) {};
+		ClassItems() : m_Count(0), m_Settings(0), m_Enchant(0), m_Durability(0) {};
+		ClassItems(CPlayer* pPlayer, int ItemID) : m_pPlayer(pPlayer), itemid_(ItemID), m_Count(0), m_Settings(0), m_Enchant(0), m_Durability(0) {};
 		void SetPlayer(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
 
-		int Count;
-		int Settings;
-		int Enchant;
-		int Durability;
+		int m_Count;
+		int m_Settings;
+		int m_Enchant;
+		int m_Durability;
 
 		bool SetDurability(int arg_durability);
 		bool SetEnchant(int arg_enchantlevel);
@@ -77,12 +71,12 @@ public:
 
 		int EnchantPrice() const;
 		int GetID() const { return itemid_; }
-		bool IsEquipped() const { return Count > 0 && Settings > 0 && (Info().Type == ItemType::TYPE_POTION || Info().Type == ItemType::TYPE_SETTINGS || Info().Type == ItemType::TYPE_MODULE || Info().Type == ItemType::TYPE_EQUIP); }
-		ItemInformation& Info() const { return ItemsInfo[itemid_]; };
+		bool IsEquipped() const { return m_Count > 0 && m_Settings > 0 && (Info().m_Type == ItemType::TYPE_POTION || Info().m_Type == ItemType::TYPE_SETTINGS || Info().m_Type == ItemType::TYPE_MODULE || Info().m_Type == ItemType::TYPE_EQUIP); }
+		ItemInformation& Info() const { return ms_aItemsInfo[itemid_]; };
 	};
 
 	typedef ClassItems InventoryItem;
-	static std::map < int, std::map < int, InventoryItem > > Items;
+	static std::map < int, std::map < int, InventoryItem > > ms_aItems;
 
 	virtual void OnInit();
 	virtual void OnInitAccount(CPlayer *pPlayer);

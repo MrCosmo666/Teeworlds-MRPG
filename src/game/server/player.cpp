@@ -24,7 +24,7 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	GS()->SendTuningParams(ClientID);
 
 	if(!IsBot())
-		Acc().Team = GetStartTeam();
+		Acc().m_Team = GetStartTeam();
 }
 
 CPlayer::~CPlayer()
@@ -47,7 +47,7 @@ void CPlayer::Tick()
 	if(!IsAuthed())
 		return;
 
-	Server()->SetClientScore(m_ClientID, Acc().Level);
+	Server()->SetClientScore(m_ClientID, Acc().m_Level);
 	{
 		IServer::CClientInfo Info;
 		if (Server()->GetClientInfo(m_ClientID, &Info))
@@ -110,7 +110,7 @@ void CPlayer::PostTick()
 {
 	// update latency value
 	if (Server()->ClientIngame(m_ClientID) && GS()->IsClientEqualWorldID(m_ClientID) && IsAuthed())
-		GetTempData().TempLatencyPing = (short)m_Latency.m_Min;
+		GetTempData().m_TempPing = (short)m_Latency.m_Min;
 }
 
 void CPlayer::TickOnlinePlayer()
@@ -159,8 +159,8 @@ void CPlayer::Snap(int SnappingClient)
 	if(Server()->IsAuthed(m_ClientID))
 		pPlayerInfo->m_PlayerFlags |= PLAYERFLAG_ADMIN;
 
-	pPlayerInfo->m_Latency = (SnappingClient == -1 ? m_Latency.m_Min : GetTempData().TempLatencyPing);
-	pPlayerInfo->m_Score = Acc().Level;
+	pPlayerInfo->m_Latency = (SnappingClient == -1 ? m_Latency.m_Min : GetTempData().m_TempPing);
+	pPlayerInfo->m_Score = Acc().m_Level;
 
 	// --------------------- CUSTOM ----------------------
 	if(!GS()->CheckClient(SnappingClient) || GetTeam() == TEAM_SPECTATORS || !IsAuthed())
@@ -174,8 +174,8 @@ void CPlayer::Snap(int SnappingClient)
 	pClientInfo->m_Local = localClient;
 	pClientInfo->m_WorldType = GS()->Mmo()->WorldSwap()->GetWorldType();
 	pClientInfo->m_MoodType = m_MoodState;
-	pClientInfo->m_Level = Acc().Level;
-	pClientInfo->m_Exp = Acc().Exp;
+	pClientInfo->m_Level = Acc().m_Level;
+	pClientInfo->m_Exp = Acc().m_Exp;
 	pClientInfo->m_Health = GetHealth();
 	pClientInfo->m_HealthStart = GetStartHealth();
 	pClientInfo->m_Armor = GetMana();
@@ -191,15 +191,15 @@ void CPlayer::Snap(int SnappingClient)
 	StrToInts(pClientInfo->m_Potions, 12, Buffer.buffer());
 	Buffer.clear();
 
-	Server()->Localization()->Format(Buffer, GetLanguage(), "{INT}", &GetItem(itGold).Count);
+	Server()->Localization()->Format(Buffer, GetLanguage(), "{INT}", &GetItem(itGold).m_Count);
 	StrToInts(pClientInfo->m_Gold, 6, Buffer.buffer());
 	Buffer.clear();
 
 	if(Acc().IsGuild())
 	{
 		char aBuf[24];
-		const int GuildID = Acc().GuildID;
-		str_format(aBuf, sizeof(aBuf), "%s %s", GS()->Mmo()->Member()->GetGuildRank(GuildID, Acc().GuildRank), GS()->Mmo()->Member()->GuildName(GuildID));
+		const int GuildID = Acc().m_GuildID;
+		str_format(aBuf, sizeof(aBuf), "%s %s", GS()->Mmo()->Member()->GetGuildRank(GuildID, Acc().m_GuildRank), GS()->Mmo()->Member()->GuildName(GuildID));
 		StrToInts(pClientInfo->m_StateName, 6, aBuf);
 	}
 	else
@@ -218,9 +218,9 @@ void CPlayer::TryRespawn()
 	vec2 SpawnPos;
 	int SpawnType = SPAWN_HUMAN;
 
-	if(GS()->IsDungeon() && GetTempData().TempActiveSafeSpawn)
-		GetTempData().TempActiveSafeSpawn = false;
-	else if(GetTempData().TempActiveSafeSpawn)
+	if(GS()->IsDungeon() && GetTempData().m_TempSafeSpawn)
+		GetTempData().m_TempSafeSpawn = false;
+	else if(GetTempData().m_TempSafeSpawn)
 	{
 		const int SafezoneWorldID = GS()->GetRespawnWorld();
 		if(SafezoneWorldID >= 0 && !GS()->IsClientEqualWorldID(m_ClientID, SafezoneWorldID))
@@ -235,10 +235,10 @@ void CPlayer::TryRespawn()
 	if(!GS()->m_pController->CanSpawn(SpawnType, &SpawnPos, vec2(-1, -1)))
 		return;
 
-	if(!GS()->IsDungeon() && (GetTempData().TempTeleportX > 1 || GetTempData().TempTeleportY > 1))
+	if(!GS()->IsDungeon() && (GetTempData().m_TempTeleportX > 1 || GetTempData().m_TempTeleportY > 1))
 	{
-		SpawnPos = vec2(GetTempData().TempTeleportX, GetTempData().TempTeleportY);
-		GetTempData().TempTeleportX = GetTempData().TempTeleportY = -1;
+		SpawnPos = vec2(GetTempData().m_TempTeleportX, GetTempData().m_TempTeleportY);
+		GetTempData().m_TempTeleportX = GetTempData().m_TempTeleportY = -1;
 	}
 
 	int savecidmem = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
@@ -307,7 +307,7 @@ void CPlayer::OnPredictedInput(CNetObj_PlayerInput *NewInput)
 int CPlayer::GetTeam()
 {
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID)) 
-		return Acc().Team;
+		return Acc().m_Team;
 	return TEAM_SPECTATORS;
 }
 
@@ -361,9 +361,9 @@ bool CPlayer::CheckFailMoney(int Price, int ItemID, bool CheckOnly)
 		return false;
 
 	ItemJob::InventoryItem &pPlayerItem = GetItem(ItemID);
-	if(pPlayerItem.Count < Price)
+	if(pPlayerItem.m_Count < Price)
 	{
-		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", &Price, &pPlayerItem.Count, pPlayerItem.Info().GetName(this), NULL);
+		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", &Price, &pPlayerItem.m_Count, pPlayerItem.Info().GetName(this), NULL);
 		return true;
 	}
 
@@ -401,36 +401,36 @@ const char *CPlayer::GetLanguage() const
 
 void CPlayer::UpdateTempData(int Health, int Mana)
 {
-	GetTempData().TempHealth = Health;
-	GetTempData().TempMana = Mana;
+	GetTempData().m_TempHealth = Health;
+	GetTempData().m_TempMana = Mana;
 }
 
 void CPlayer::AddExp(int Exp)
 {
-	Acc().Exp += Exp;
-	for( ; Acc().Exp >= ExpNeed(Acc().Level); ) 
+	Acc().m_Exp += Exp;
+	for( ; Acc().m_Exp >= ExpNeed(Acc().m_Level); ) 
 	{
-		Acc().Exp -= ExpNeed(Acc().Level), Acc().Level++;
-		Acc().Upgrade += 10;
+		Acc().m_Exp -= ExpNeed(Acc().m_Level), Acc().m_Level++;
+		Acc().m_Upgrade += 10;
 
 		GS()->CreateDeath(m_pCharacter->m_Core.m_Pos, m_ClientID);
 		GS()->CreateSound(m_pCharacter->m_Core.m_Pos, 4);
 		GS()->CreateText(m_pCharacter, false, vec2(0, -40), vec2(0, -1), 30, "level");
-		GS()->ChatFollow(m_ClientID, "Level UP. Now Level {INT}!", &Acc().Level);
-		if(Acc().Exp < ExpNeed(Acc().Level))
+		GS()->ChatFollow(m_ClientID, "Level UP. Now Level {INT}!", &Acc().m_Level);
+		if(Acc().m_Exp < ExpNeed(Acc().m_Level))
 		{
 			GS()->UpdateVotes(m_ClientID, MenuList::MAIN_MENU);
 			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_STATS);
 			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_UPGRADES);
 		}
 	}
-	ProgressBar("Account", Acc().Level, Acc().Exp, ExpNeed(Acc().Level), Exp);
+	ProgressBar("Account", Acc().m_Level, Acc().m_Exp, ExpNeed(Acc().m_Level), Exp);
 
 	if (rand() % 5 == 0)
 		GS()->Mmo()->SaveAccount(this, SaveType::SAVE_STATS);
 
 	if (Acc().IsGuild())
-		GS()->Mmo()->Member()->AddExperience(Acc().GuildID);
+		GS()->Mmo()->Member()->AddExperience(Acc().m_GuildID);
 }
 
 void CPlayer::AddMoney(int Money) 
@@ -457,7 +457,7 @@ bool CPlayer::GetHidenMenu(int HideID) const
 bool CPlayer::IsAuthed()
 { 
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID))
-		return Acc().AuthID;
+		return Acc().m_AuthID;
 
 	return false; 
 }
@@ -465,7 +465,7 @@ bool CPlayer::IsAuthed()
 int CPlayer::EnchantAttributes(int BonusID) const
 {
 	int BonusAttributes = 0;
-	for (const auto& it : ItemJob::Items[m_ClientID])
+	for (const auto& it : ItemJob::ms_aItems[m_ClientID])
 	{
 		if(!it.second.IsEquipped()) 
 			continue;
@@ -473,7 +473,7 @@ int CPlayer::EnchantAttributes(int BonusID) const
 		const int BonusCount = it.second.Info().GetStatsBonus(BonusID);
 		if (BonusCount > 0)
 		{
-			const int PlayerBonusCount = BonusCount * (it.second.Enchant + 1);
+			const int PlayerBonusCount = BonusCount * (it.second.m_Enchant + 1);
 			BonusAttributes += PlayerBonusCount;
 		}
 	}
@@ -483,7 +483,7 @@ int CPlayer::EnchantAttributes(int BonusID) const
 
 int CPlayer::GetStartTeam()
 {
-	if(Acc().AuthID)
+	if(Acc().m_AuthID)
 		return TEAM_RED;
 
 	return TEAM_SPECTATORS;
@@ -534,11 +534,11 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 		if(GS()->IsDungeon())
 		{
 			const int DungeonID = GS()->DungeonID();
-			const bool IsDungeonActive = DungeonJob::Dungeon[DungeonID].State > 1;
+			const bool IsDungeonActive = DungeonJob::Dungeon[DungeonID].m_State > 1;
 			if(!IsDungeonActive)
 			{
-				GetTempData().TempDungeonReady ^= true;
-				GS()->Chat(m_ClientID, "You change the ready mode to {STR}!", GetTempData().TempDungeonReady ? "ready" : "not ready");
+				GetTempData().m_TempDungeonReady ^= true;
+				GS()->Chat(m_ClientID, "You change the ready mode to {STR}!", GetTempData().m_TempDungeonReady ? "ready" : "not ready");
 			}
 			return true;
 		}
@@ -571,7 +571,7 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 {
 	if(PPSTR(CMD, "UPGRADE") == 0)
 	{
-		if(Upgrade(Get, &Acc().Stats[VoteID], &Acc().Upgrade, VoteID2, 1000, GS()->AtributeName(VoteID))) 
+		if(Upgrade(Get, &Acc().m_aStats[VoteID], &Acc().m_Upgrade, VoteID2, 1000, GS()->AtributeName(VoteID))) 
 		{
 			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_UPGRADES);
 			GS()->ResetVotes(m_ClientID, MenuList::MENU_UPGRADE);
@@ -601,18 +601,18 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 
 ItemJob::InventoryItem &CPlayer::GetItem(int ItemID) 
 {
-	if(ItemJob::Items[m_ClientID].find(ItemID) == ItemJob::Items[m_ClientID].end())
-		ItemJob::Items[m_ClientID][ItemID] = ItemJob::InventoryItem(this, ItemID);
+	if(ItemJob::ms_aItems[m_ClientID].find(ItemID) == ItemJob::ms_aItems[m_ClientID].end())
+		ItemJob::ms_aItems[m_ClientID][ItemID] = ItemJob::InventoryItem(this, ItemID);
 
-	ItemJob::Items[m_ClientID][ItemID].SetPlayer(this);
-	return ItemJob::Items[m_ClientID][ItemID];
+	ItemJob::ms_aItems[m_ClientID][ItemID].SetPlayer(this);
+	return ItemJob::ms_aItems[m_ClientID][ItemID];
 }
 
 int CPlayer::GetEquippedItem(int EquipID, int SkipItemID) const
 {
-	for(const auto& it : ItemJob::Items[m_ClientID])
+	for(const auto& it : ItemJob::ms_aItems[m_ClientID])
 	{
-		if(!it.second.Count || !it.second.Settings || it.second.Info().Function != EquipID || it.first == SkipItemID) 
+		if(!it.second.m_Count || !it.second.m_Settings || it.second.Info().m_Function != EquipID || it.first == SkipItemID)
 			continue;
 		return it.first;
 	}
@@ -624,7 +624,7 @@ int CPlayer::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 	int AttributEx = EnchantAttributes(BonusID);
 	const bool SaveData = (str_comp_nocase(CGS::AttributInfo[BonusID].FieldName, "unfield") != 0);
 	if (SaveData)
-		AttributEx += Acc().Stats[BonusID];
+		AttributEx += Acc().m_aStats[BonusID];
 
 	if (Really && CGS::AttributInfo[BonusID].UpgradePrice < 10) 
 	{ 
@@ -663,8 +663,8 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 	if (BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
 		// clearing the end of dialogs or a dialog that was meaningless
-		const int sizeTalking = BotJob::NpcBot[MobID].m_Talk.size();
-		const bool isTalkingEmpty = BotJob::NpcBot[MobID].m_Talk.empty();
+		const int sizeTalking = BotJob::ms_aNpcBot[MobID].m_aTalk.size();
+		const bool isTalkingEmpty = BotJob::ms_aNpcBot[MobID].m_aTalk.empty();
 		if ((isTalkingEmpty && m_TalkingNPC.m_TalkedProgress == IS_TALKING_EMPTY) || (!isTalkingEmpty && m_TalkingNPC.m_TalkedProgress >= sizeTalking))
 		{
 			ClearTalking();
@@ -683,7 +683,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		}
 
 		// get a quest for the progress of dialogue if it is in this progress we accept the quest
-		GivingQuestID = BotJob::NpcBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
+		GivingQuestID = BotJob::ms_aNpcBot[MobID].m_aTalk[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
 		if (GivingQuestID >= 1)
 		{
 			if (!m_TalkingNPC.m_FreezedProgress)
@@ -702,21 +702,21 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 
 	else if (BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 	{
-		const int sizeTalking = BotJob::QuestBot[MobID].m_Talk.size();
+		const int sizeTalking = BotJob::ms_aQuestBot[MobID].m_aTalk.size();
 		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
 		{
 			ClearTalking();
 			GS()->ClearTalkText(m_ClientID);
-			GS()->Mmo()->Quest()->InteractiveQuestNPC(this, BotJob::QuestBot[MobID], true);
+			GS()->Mmo()->Quest()->InteractiveQuestNPC(this, BotJob::ms_aQuestBot[MobID], true);
 			return;
 		}
 
-		bool RequiestQuestTask = BotJob::QuestBot[MobID].m_Talk[m_TalkingNPC.m_TalkedProgress].m_RequestComplete;
+		bool RequiestQuestTask = BotJob::ms_aQuestBot[MobID].m_aTalk[m_TalkingNPC.m_TalkedProgress].m_RequestComplete;
 		if (RequiestQuestTask)
 		{
 			if (!m_TalkingNPC.m_FreezedProgress)
 			{
-				GS()->Mmo()->Quest()->CreateQuestingItems(this, BotJob::QuestBot[MobID]);
+				GS()->Mmo()->Quest()->CreateQuestingItems(this, BotJob::ms_aQuestBot[MobID]);
 				GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
 				GS()->Mmo()->BotsData()->ShowBotQuestTaskInfo(this, MobID, m_TalkingNPC.m_TalkedProgress);
 				m_TalkingNPC.m_FreezedProgress = true;
@@ -724,7 +724,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			}
 
 			// skip non complete dialog quest
-			if (!GS()->Mmo()->Quest()->InteractiveQuestNPC(this, BotJob::QuestBot[MobID], false))
+			if (!GS()->Mmo()->Quest()->InteractiveQuestNPC(this, BotJob::ms_aQuestBot[MobID], false))
 			{
 				GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
 				GS()->Mmo()->BotsData()->ShowBotQuestTaskInfo(this, MobID, m_TalkingNPC.m_TalkedProgress);
@@ -761,7 +761,7 @@ void CPlayer::FormatTextQuest(int DataBotID, const char *pText)
 
 	str_copy(m_FormatTalkQuest, pText, sizeof(m_FormatTalkQuest));
 	str_replace(m_FormatTalkQuest, "[Player]", GS()->Server()->ClientName(m_ClientID));
-	str_replace(m_FormatTalkQuest, "[Talked]", BotJob::DataBot[DataBotID].NameBot);
+	str_replace(m_FormatTalkQuest, "[Talked]", BotJob::ms_aDataBot[DataBotID].m_aNameBot);
 	str_replace(m_FormatTalkQuest, "[Time]", GS()->Server()->GetStringTypeDay());
 	str_replace(m_FormatTalkQuest, "[Here]", GS()->Server()->GetWorldName(GS()->GetWorldID()));
 }
@@ -774,11 +774,11 @@ void CPlayer::ClearFormatQuestText()
 void CPlayer::ChangeWorld(int WorldID)
 {
 	// reset dungeon temp data
-	Acc().LastWorldID = GS()->GetWorldID();
-	GetTempData().TempAlreadyVotedDungeon = false;
-	GetTempData().TempDungeonReady = false;
-	GetTempData().TempTankVotingDungeon = 0;
-	GetTempData().TempTimeDungeon = 0;
+	Acc().m_LastWorldID = GS()->GetWorldID();
+	GetTempData().m_TempAlreadyVotedDungeon = false;
+	GetTempData().m_TempDungeonReady = false;
+	GetTempData().m_TempTankVotingDungeon = 0;
+	GetTempData().m_TempTimeDungeon = 0;
 
 	if(m_pCharacter)
 	{

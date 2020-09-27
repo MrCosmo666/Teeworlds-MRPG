@@ -39,12 +39,11 @@ CConectionPool::CConectionPool()
 {
 	try
 	{
-		Connection* pConnection = nullptr;
 		m_pDriver = get_driver_instance();
 
 		SqlConnectionLock.lock();
 		for(int i = 0; i < g_Config.m_SvMySqlPoolSize; ++i) 
-			pConnection = this->CreateConnection();
+			this->CreateConnection();
 
 		SqlConnectionLock.unlock();
 	}
@@ -107,7 +106,7 @@ Connection* CConectionPool::GetConnection()
 			pConnection = this->CreateConnection();
 		}
 
-		dbg_msg("sql", "connection is established %d pool size", m_ConnList.size());
+		dbg_msg("sql", "connection is established %d pool size", (int)m_ConnList.size());
 		SqlConnectionLock.unlock();
 		return pConnection;
 	}

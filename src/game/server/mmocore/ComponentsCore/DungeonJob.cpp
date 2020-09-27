@@ -13,26 +13,26 @@ DungeonJob::DungeonJob()
 	while (RES->next())
 	{
 		const int ID = RES->getInt("ID");
-		str_copy(Dungeon[ID].Name, RES->getString("Name").c_str(), sizeof(Dungeon[ID].Name));
-		Dungeon[ID].Level = RES->getInt("Level");
-		Dungeon[ID].DoorX = RES->getInt("DoorX");
-		Dungeon[ID].DoorY = RES->getInt("DoorY");
-		Dungeon[ID].OpenQuestID = RES->getInt("OpenQuestID");
-		Dungeon[ID].WorldID = RES->getInt("WorldID");
-		Dungeon[ID].Story = (bool)RES->getBoolean("Story");
+		str_copy(Dungeon[ID].m_aName, RES->getString("Name").c_str(), sizeof(Dungeon[ID].m_aName));
+		Dungeon[ID].m_Level = RES->getInt("Level");
+		Dungeon[ID].m_DoorX = RES->getInt("DoorX");
+		Dungeon[ID].m_DoorY = RES->getInt("DoorY");
+		Dungeon[ID].m_OpenQuestID = RES->getInt("OpenQuestID");
+		Dungeon[ID].m_WorldID = RES->getInt("WorldID");
+		Dungeon[ID].m_IsStory = (bool)RES->getBoolean("Story");
 	}
 }
 
 void DungeonJob::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "WHERE OwnerID = '%d' AND DungeonID = '%d'", pPlayer->Acc().AuthID, DungeonID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "WHERE OwnerID = '%d' AND DungeonID = '%d'", pPlayer->Acc().m_AuthID, DungeonID));
 	if (RES->next())
 	{
 		if (RES->getInt("Seconds") > Seconds)
-			SJK.UD("tw_dungeons_records", "Seconds = '%d' WHERE OwnerID = '%d' AND DungeonID = '%d'", Seconds, pPlayer->Acc().AuthID, DungeonID);
+			SJK.UD("tw_dungeons_records", "Seconds = '%d' WHERE OwnerID = '%d' AND DungeonID = '%d'", Seconds, pPlayer->Acc().m_AuthID, DungeonID);
 		return;
 	}
-	SJK.ID("tw_dungeons_records", "(OwnerID, DungeonID, Seconds) VALUES ('%d', '%d', '%d')", pPlayer->Acc().AuthID, DungeonID, Seconds);
+	SJK.ID("tw_dungeons_records", "(OwnerID, DungeonID, Seconds) VALUES ('%d', '%d', '%d')", pPlayer->Acc().m_AuthID, DungeonID, Seconds);
 }
 
 void DungeonJob::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
@@ -56,18 +56,18 @@ void DungeonJob::ShowDungeonsList(CPlayer* pPlayer, bool Story)
 	const int ClientID = pPlayer->GetCID();
 	for (const auto& dungeon : Dungeon)
 	{
-		if(dungeon.second.Story != Story)
+		if(dungeon.second.m_IsStory != Story)
 			continue;
 
 		const int HideID = 7500 + dungeon.first;
 		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "Lvl{INT} {STR} : Players {INT} : {STR} [{INT}%]",
-			&dungeon.second.Level, dungeon.second.Name, &dungeon.second.Players, (dungeon.second.State > 1 ? "Active dungeon" : "Waiting players"), &dungeon.second.Progress);
+			&dungeon.second.m_Level, dungeon.second.m_aName, &dungeon.second.m_Players, (dungeon.second.m_State > 1 ? "Active dungeon" : "Waiting players"), &dungeon.second.m_Progress);
 
 		ShowDungeonTop(pPlayer, dungeon.first, HideID);
 
-		const int NeededQuestID = dungeon.second.OpenQuestID;
+		const int NeededQuestID = dungeon.second.m_OpenQuestID;
 		if(NeededQuestID <= 0 || Job()->Quest()->IsCompletedQuest(ClientID, NeededQuestID))
-			GS()->AVM(ClientID, "DUNGEONJOIN", dungeon.first, HideID, "Join dungeon {STR}", dungeon.second.Name);
+			GS()->AVM(ClientID, "DUNGEONJOIN", dungeon.first, HideID, "Join dungeon {STR}", dungeon.second.m_aName);
 		else
 			GS()->AVM(ClientID, "null", NOPE, HideID, "Need to complete quest {STR}", Job()->Quest()->GetQuestName(NeededQuestID));
 	}
@@ -79,7 +79,7 @@ void DungeonJob::ShowTankVotingDungeon(CPlayer* pPlayer)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
-	const int DungeonWorldID = Dungeon[GS()->DungeonID()].WorldID;
+	const int DungeonWorldID = Dungeon[GS()->DungeonID()].m_WorldID;
 	pPlayer->m_Colored = GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "Voting for the choice of tank!");
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
@@ -89,7 +89,7 @@ void DungeonJob::ShowTankVotingDungeon(CPlayer* pPlayer)
 		if(!pSearchPlayer || pSearchPlayer->GetPlayerWorldID() != DungeonWorldID)
 			continue;
 
-		GS()->AVM(ClientID, "DUNGEONVOTE", i, NOPE, "Vote for {STR} (Votes: {INT})", GS()->Server()->ClientName(i), &pSearchPlayer->GetTempData().TempTankVotingDungeon);
+		GS()->AVM(ClientID, "DUNGEONVOTE", i, NOPE, "Vote for {STR} (Votes: {INT})", GS()->Server()->ClientName(i), &pSearchPlayer->GetTempData().m_TempTankVotingDungeon);
 	}
 }
 
@@ -98,8 +98,8 @@ void DungeonJob::CheckQuestingOpened(CPlayer *pPlayer, int QuestID)
 	const int ClientID = pPlayer->GetCID();
 	for (const auto& dungeon : Dungeon)
 	{
-		if (QuestID == dungeon.second.OpenQuestID)
-			GS()->Chat(-1, "{STR} opened dungeon ({STR})!", GS()->Server()->ClientName(ClientID), dungeon.second.Name);
+		if (QuestID == dungeon.second.m_OpenQuestID)
+			GS()->Chat(-1, "{STR} opened dungeon ({STR})!", GS()->Server()->ClientName(ClientID), dungeon.second.m_aName);
 	}
 }
 
@@ -134,7 +134,7 @@ bool DungeonJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMe
 			ShowTankVotingDungeon(pPlayer);
 			GS()->AV(ClientID, "null", "");
 			pPlayer->m_Colored = { 30, 8, 8 };
-			GS()->AVL(ClientID, "DUNGEONEXIT", "Exit dungeon {STR} (warning)", Dungeon[GS()->DungeonID()].Name);
+			GS()->AVL(ClientID, "DUNGEONEXIT", "Exit dungeon {STR} (warning)", Dungeon[GS()->DungeonID()].m_aName);
 		}
 		GS()->AddBack(ClientID);
 		return true;
@@ -150,20 +150,20 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 
 	if (PPSTR(CMD, "DUNGEONJOIN") == 0)
 	{
-		if(GS()->IsClientEqualWorldID(ClientID, Dungeon[VoteID].WorldID))
+		if(GS()->IsClientEqualWorldID(ClientID, Dungeon[VoteID].m_WorldID))
 		{
 			GS()->Chat(ClientID, "You are already in this dungeon!");
 			GS()->UpdateVotes(ClientID, MenuList::MENU_DUNGEONS);
 			return true;
 		}
-		if (Dungeon[VoteID].State > 1)
+		if (Dungeon[VoteID].m_State > 1)
 		{
 			GS()->Chat(ClientID, "At the moment players are passing this dungeon!");
 			GS()->UpdateVotes(ClientID, MenuList::MENU_DUNGEONS);
 			return true;
 		}
 
-		if (pPlayer->Acc().Level < Dungeon[VoteID].Level)
+		if (pPlayer->Acc().m_Level < Dungeon[VoteID].m_Level)
 		{
 			GS()->Chat(ClientID, "Your level is low to pass this dungeon!");
 			GS()->UpdateVotes(ClientID, MenuList::MENU_DUNGEONS);
@@ -172,19 +172,19 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 
 		if(!GS()->IsDungeon())
 		{
-			pPlayer->GetTempData().TempTeleportX = pPlayer->GetCharacter()->m_Core.m_Pos.x;
-			pPlayer->GetTempData().TempTeleportY = pPlayer->GetCharacter()->m_Core.m_Pos.y;
+			pPlayer->GetTempData().m_TempTeleportX = pPlayer->GetCharacter()->m_Core.m_Pos.x;
+			pPlayer->GetTempData().m_TempTeleportY = pPlayer->GetCharacter()->m_Core.m_Pos.y;
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_POSITION);
 		}
 
-		GS()->Chat(-1, "{STR} joined to Dungeon {STR}!", GS()->Server()->ClientName(ClientID), Dungeon[VoteID].Name);
+		GS()->Chat(-1, "{STR} joined to Dungeon {STR}!", GS()->Server()->ClientName(ClientID), Dungeon[VoteID].m_aName);
 		GS()->Chat(ClientID, "You can vote for the choice of tank (Dungeon Tab)!");
-		pPlayer->ChangeWorld(Dungeon[VoteID].WorldID);
+		pPlayer->ChangeWorld(Dungeon[VoteID].m_WorldID);
 		return true;
 	}
 	else if (PPSTR(CMD, "DUNGEONEXIT") == 0)
 	{
-		pPlayer->ChangeWorld(pPlayer->Acc().LastWorldID);
+		pPlayer->ChangeWorld(pPlayer->Acc().m_LastWorldID);
 		return true;
 	}
 	else if(PPSTR(CMD, "DUNGEONVOTE") == 0)
@@ -197,7 +197,7 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 			return true;
 		}
 
-		if(pPlayer->GetTempData().TempAlreadyVotedDungeon)
+		if(pPlayer->GetTempData().m_TempAlreadyVotedDungeon)
 		{
 			GS()->Chat(ClientID, "You already voted!");
 			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
@@ -210,8 +210,8 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 			return true;
 		}
 
-		pPlayer->GetTempData().TempAlreadyVotedDungeon = true;
-		pSearchPlayer->GetTempData().TempTankVotingDungeon++;
+		pPlayer->GetTempData().m_TempAlreadyVotedDungeon = true;
+		pSearchPlayer->GetTempData().m_TempTankVotingDungeon++;
 		GS()->ChatWorldID(pPlayer->GetPlayerWorldID(), "[Dungeon]", "{STR} voted for {STR}.", GS()->Server()->ClientName(ClientID), GS()->Server()->ClientName(VoteID));
 		GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;

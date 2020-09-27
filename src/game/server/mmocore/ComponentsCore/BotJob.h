@@ -9,16 +9,16 @@ class BotJob : public MmoComponent
 {
 	~BotJob()
 	{
-		DataBot.clear();
-		QuestBot.clear();
-		NpcBot.clear();
-		MobBot.clear();
+		ms_aDataBot.clear();
+		ms_aQuestBot.clear();
+		ms_aNpcBot.clear();
+		ms_aMobBot.clear();
 	};
 
 	// bots talking data
 	struct TalkingData
 	{
-		char m_TalkingText[512];
+		char m_aTalkingText[512];
 		int m_Style;
 		int m_Emote;
 		int m_GivingQuest;
@@ -29,12 +29,12 @@ class BotJob : public MmoComponent
 	// main bots information
 	struct DescDataBot
 	{
-		char NameBot[16];
-		char SkinNameBot[6][24];
-		int UseCustomBot[6];
-		int SkinColorBot[6];
-		int EquipSlot[MAX_EQUIPPED_SLOTS_BOTS];
-		bool AlreadySnapQuestBot[MAX_PLAYERS];
+		char m_aNameBot[16];
+		char m_aaSkinNameBot[6][24];
+		int m_aUseCustomBot[6];
+		int m_aSkinColorBot[6];
+		int m_aEquipSlot[MAX_EQUIPPED_SLOTS_BOTS];
+		bool m_aAlreadySnapQuestBot[MAX_PLAYERS];
 	};
 
 	// types bots information
@@ -42,75 +42,74 @@ class BotJob : public MmoComponent
 	{
 		const char* GetName() const
 		{
-			dbg_assert(DataBot.find(BotID) != DataBot.end(), "Name bot it invalid");
-			return DataBot[BotID].NameBot;
+			dbg_assert(ms_aDataBot.find(m_BotID) != ms_aDataBot.end(), "Name bot it invalid");
+			return ms_aDataBot[m_BotID].m_aNameBot;
 		}
 
-		bool Static;
-		int PositionX;
-		int PositionY;
-		int Emote;
-		int WorldID;
-		int BotID;
+		bool m_Static;
+		int m_PositionX;
+		int m_PositionY;
+		int m_Emote;
+		int m_WorldID;
+		int m_BotID;
 		int Function;
-		std::vector < TalkingData > m_Talk;
+		std::vector < TalkingData > m_aTalk;
 	};
 
 	struct ClassQuestBot
 	{
 		const char* GetName() const
 		{
-			dbg_assert(DataBot.find(BotID) != DataBot.end(), "Name bot it invalid");
-			return DataBot[BotID].NameBot;
+			dbg_assert(ms_aDataBot.find(m_BotID) != ms_aDataBot.end(), "Name bot it invalid");
+			return ms_aDataBot[m_BotID].m_aNameBot;
 		}
 
-		int PositionX;
-		int PositionY;
-		int QuestID;
-		int Progress;
-		int WorldID;
-		int BotID;
-		int SubBotID;
+		int m_PositionX;
+		int m_PositionY;
+		int m_QuestID;
+		int m_Progress;
+		int m_WorldID;
+		int m_BotID;
+		int m_SubBotID;
 
-		int ItemSearch[2];
-		int ItemSearchCount[2];
+		int m_aItemSearch[2];
+		int m_aItemSearchCount[2];
 
-		int ItemGives[2];
-		int ItemGivesCount[2];
+		int m_aItemGives[2];
+		int m_aItemGivesCount[2];
 
-		int NeedMob[2];
-		int NeedMobCount[2];
+		int m_aNeedMob[2];
+		int m_aNeedMobCount[2];
 
-		int InteractiveType;
-		int InteractiveTemp;
-		bool GenerateNick;
-		bool NextEqualProgress;
-		std::vector < TalkingData > m_Talk;
+		int m_InteractiveType;
+		int m_InteractiveTemp;
+		bool m_GenerateNick;
+		bool m_NextEqualProgress;
+		std::vector < TalkingData > m_aTalk;
 	};
 
 	struct ClassMobsBot
 	{
 		const char* GetName() const
 		{
-			dbg_assert(DataBot.find(BotID) != DataBot.end(), "Name bot it invalid");
-			return DataBot[BotID].NameBot;
+			dbg_assert(ms_aDataBot.find(m_BotID) != ms_aDataBot.end(), "Name bot it invalid");
+			return ms_aDataBot[m_BotID].m_aNameBot;
 		}
-		bool Boss;
-		int Power;
-		int Spread;
-		int PositionX;
-		int PositionY;
-		int Level;
-		int RespawnTick;
-		int DungeonDoorID;
-		int WorldID;
-		char Effect[16];
-		char Behavior[32];
+		bool m_Boss;
+		int m_Power;
+		int m_Spread;
+		int m_PositionX;
+		int m_PositionY;
+		int m_Level;
+		int m_RespawnTick;
+		int m_WorldID;
+		char m_aEffect[16];
+		char m_aBehavior[32];
 
-		int DropItem[MAX_DROPPED_FROM_MOBS];
-		int CountItem[MAX_DROPPED_FROM_MOBS];
-		float RandomItem[MAX_DROPPED_FROM_MOBS];
-		int BotID;
+		int m_aDropItem[MAX_DROPPED_FROM_MOBS];
+		int m_aCountItem[MAX_DROPPED_FROM_MOBS];
+		float m_aRandomItem[MAX_DROPPED_FROM_MOBS];
+		int m_BotID;
 	};
 
 	void LoadMainInformationBots();
@@ -121,16 +120,16 @@ public:
 	virtual void OnInitWorld(const char* pWhereLocalWorld);
 
 	typedef DescDataBot DataBotInfo;
-	static std::map < int , DataBotInfo > DataBot;
+	static std::map < int , DataBotInfo > ms_aDataBot;
 
 	typedef ClassQuestBot QuestBotInfo;
-	static std::map < int , QuestBotInfo > QuestBot;
+	static std::map < int , QuestBotInfo > ms_aQuestBot;
 
 	typedef ClassNpcBot NpcBotInfo;
-	static std::map < int , NpcBotInfo > NpcBot;
+	static std::map < int , NpcBotInfo > ms_aNpcBot;
 
 	typedef ClassMobsBot MobBotInfo;
-	static std::map < int , MobBotInfo > MobBot;
+	static std::map < int , MobBotInfo > ms_aMobBot;
 
 	void ConAddCharacterBot(int ClientID, const char *pCharacter);
 	void ProcessingTalkingNPC(int OwnID, int TalkingID, bool PlayerTalked, const char *Message, int Style, int TalkingEmote);
@@ -141,23 +140,23 @@ public:
 	const char *GetMeaninglessDialog();
 
 	// ------------------ CHECK VALID DATA --------------------
-	bool IsDataBotValid(int BotID) const { return (DataBot.find(BotID) != DataBot.end()); }
+	bool IsDataBotValid(int BotID) const { return (ms_aDataBot.find(BotID) != ms_aDataBot.end()); }
 	bool IsNpcBotValid(int MobID) const 
 	{ 
-		if(NpcBot.find(MobID) != NpcBot.end() && IsDataBotValid(NpcBot[MobID].BotID))
+		if(ms_aNpcBot.find(MobID) != ms_aNpcBot.end() && IsDataBotValid(ms_aNpcBot[MobID].m_BotID))
 			return true;
 		return false; 
 	}
 	bool IsMobBotValid(int MobID) const 
 	{ 
-		if(MobBot.find(MobID) != MobBot.end() && IsDataBotValid(MobBot[MobID].BotID))
+		if(ms_aMobBot.find(MobID) != ms_aMobBot.end() && IsDataBotValid(ms_aMobBot[MobID].m_BotID))
 			return true;
 		return false;
 	}
 	
 	bool IsQuestBotValid(int MobID) const 
 	{ 
-		if(QuestBot.find(MobID) != QuestBot.end() && IsDataBotValid(QuestBot[MobID].BotID))
+		if(ms_aQuestBot.find(MobID) != ms_aQuestBot.end() && IsDataBotValid(ms_aQuestBot[MobID].m_BotID))
 			return true;
 		return false;
 	}

@@ -131,7 +131,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	{
 		const int EquipDiscord = pPlayer->GetEquippedItem(EQUIP_DISCORD);
 		SJK.UD("tw_accounts_data", "Level = '%d', Exp = '%d', DiscordEquip = '%d' WHERE ID = '%d'",
-			pPlayer->Acc().Level, pPlayer->Acc().Exp, EquipDiscord, pPlayer->Acc().AuthID);
+			pPlayer->Acc().m_Level, pPlayer->Acc().m_Exp, EquipDiscord, pPlayer->Acc().m_AuthID);
 	}
 	else if(Table == SaveType::SAVE_UPGRADES)
 	{
@@ -141,11 +141,11 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		{
 			if(str_comp_nocase(at.second.FieldName, "unfield") == 0) 
 				continue;
-			str_format(aBuf, sizeof(aBuf), ", %s = '%d' ", at.second.FieldName, pPlayer->Acc().Stats[at.first]);
+			str_format(aBuf, sizeof(aBuf), ", %s = '%d' ", at.second.FieldName, pPlayer->Acc().m_aStats[at.first]);
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
 
-		SJK.UD("tw_accounts_data", "Upgrade = '%d' %s WHERE ID = '%d'", pPlayer->Acc().Upgrade, Buffer.buffer(), pPlayer->Acc().AuthID);
+		SJK.UD("tw_accounts_data", "Upgrade = '%d' %s WHERE ID = '%d'", pPlayer->Acc().m_Upgrade, Buffer.buffer(), pPlayer->Acc().m_AuthID);
 		Buffer.clear();
 	}
 	else if(Table == SaveType::SAVE_PLANT_DATA)
@@ -153,10 +153,10 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		char aBuf[64];
 		dynamic_string Buffer;
 		for(int i = 0; i < PLANT::NUM_PLANT; i++) {
-			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", str_PLANT((PLANT) i), pPlayer->Acc().Plant[i], (i == NUM_PLANT-1 ? "" : ", "));
+			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", str_PLANT((PLANT) i), pPlayer->Acc().m_aPlant[i], (i == NUM_PLANT-1 ? "" : ", "));
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
-		SJK.UD("tw_accounts_plants", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().AuthID);
+		SJK.UD("tw_accounts_plants", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().m_AuthID);
 		Buffer.clear();
 	}
 	else if(Table == SaveType::SAVE_MINER_DATA)
@@ -164,27 +164,27 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		char aBuf[64];
 		dynamic_string Buffer;
 		for(int i = 0; i < MINER::NUM_MINER; i++) {
-			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", str_MINER((MINER) i), pPlayer->Acc().Miner[i], (i == NUM_MINER-1 ? "" : ", "));
+			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", str_MINER((MINER) i), pPlayer->Acc().m_aMiner[i], (i == NUM_MINER-1 ? "" : ", "));
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
-		SJK.UD("tw_accounts_miner", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().AuthID);
+		SJK.UD("tw_accounts_miner", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().m_AuthID);
 		Buffer.clear();
 	}
 	else if(Table == SaveType::SAVE_GUILD_DATA)
 	{
-		SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '%d' WHERE ID = '%d'", pPlayer->Acc().GuildID, pPlayer->Acc().GuildRank, pPlayer->Acc().AuthID);	
+		SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '%d' WHERE ID = '%d'", pPlayer->Acc().m_GuildID, pPlayer->Acc().m_GuildRank, pPlayer->Acc().m_AuthID);	
 	}
 	else if(Table == SaveType::SAVE_POSITION && !GS()->IsDungeon())
 	{
-		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", pPlayer->GetPlayerWorldID(), pPlayer->Acc().AuthID);
+		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", pPlayer->GetPlayerWorldID(), pPlayer->Acc().m_AuthID);
 	}
 	else if(Table == SaveType::SAVE_LANGUAGE)
 	{
-		SJK.UD("tw_accounts", "Language = '%s' WHERE ID = '%d'", pPlayer->GetLanguage(), pPlayer->Acc().AuthID);
+		SJK.UD("tw_accounts", "Language = '%s' WHERE ID = '%d'", pPlayer->GetLanguage(), pPlayer->Acc().m_AuthID);
 	}
 	else
 	{
-		SJK.UD("tw_accounts", "Username = '%s', Password = '%s' WHERE ID = '%d'", pPlayer->Acc().Login, pPlayer->Acc().Password, pPlayer->Acc().AuthID);
+		SJK.UD("tw_accounts", "Username = '%s', Password = '%s' WHERE ID = '%d'", pPlayer->Acc().m_aLogin, pPlayer->Acc().m_aPassword, pPlayer->Acc().m_AuthID);
 	}
 }
 

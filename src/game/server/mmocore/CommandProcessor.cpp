@@ -74,7 +74,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 
 		if(pPlayer->Acc().IsGuild())
 		{
-			int AuthID = pPlayer->Acc().AuthID;
+			int AuthID = pPlayer->Acc().m_AuthID;
 			ExitGuild(GS, AuthID);
 		}
 		return;

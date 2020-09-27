@@ -8,8 +8,8 @@
 
 #include <game/server/mmocore/GameEntities/Items/drop_quest_items.h>
 
-std::map < int , QuestJob::StructQuestData > QuestJob::QuestsData;
-std::map < int , std::map < int , QuestJob::StructQuest > > QuestJob::Quests;
+std::map < int , QuestJob::StructQuestData > QuestJob::ms_aQuestsData;
+std::map < int , std::map < int , QuestJob::StructQuest > > QuestJob::ms_aQuests;
 
 static const char* GetStateName(int Type)
 {
@@ -24,7 +24,7 @@ static const char* GetStateName(int Type)
 int QuestJob::GetState(int ClientID, int QuestID) const
 {
 	if(IsValidQuest(QuestID, ClientID))
-		return Quests[ClientID][QuestID].State;
+		return ms_aQuests[ClientID][QuestID].m_State;
 	return QuestState::QUEST_NO_ACCEPT;
 }
 
@@ -36,17 +36,17 @@ bool QuestJob::IsCompletedQuest(int ClientID, int QuestID) const
 int QuestJob::GetStoryCount(const char *StoryName, int CountFromQuestID) const
 {
 	int Count = 0;
-	for(const auto& qd : QuestsData)
+	for(const auto& qd : ms_aQuestsData)
 	{
-		if(str_comp(qd.second.StoryLine, StoryName) == 0)
+		if(str_comp(qd.second.m_aStoryLine, StoryName) == 0)
 			Count++;
 	}
 	
 	if(CountFromQuestID > 0)
 	{
-		for (auto qquest = QuestsData.find(CountFromQuestID); qquest != QuestsData.end(); qquest++)
+		for (auto qquest = ms_aQuestsData.find(CountFromQuestID); qquest != ms_aQuestsData.end(); qquest++)
 		{
-			if(str_comp(qquest->second.StoryLine, StoryName) == 0)
+			if(str_comp(qquest->second.m_aStoryLine, StoryName) == 0)
 				Count--;
 		}
 	}
@@ -58,19 +58,19 @@ bool QuestJob::IsDefeatMobsComplete(int ClientID, int QuestID) const
 	if(!IsValidQuest(QuestID, ClientID)) 
 		return false;
 
-	const int playerProgress = Quests[ClientID][QuestID].Progress;
+	const int playerProgress = ms_aQuests[ClientID][QuestID].m_Progress;
 	BotJob::QuestBotInfo* pFindBot = GetQuestBot(QuestID, playerProgress);
 	if (!pFindBot)
 		return false;
 
 	for (int i = 0; i < 2; i++)
 	{
-		const int MobID = pFindBot->NeedMob[i];
-		const int Count = pFindBot->NeedMobCount[i];
+		const int MobID = pFindBot->m_aNeedMob[i];
+		const int Count = pFindBot->m_aNeedMobCount[i];
 		if(MobID <= 0 || Count <= 0) 
 			continue;
 
-		if(Quests[ClientID][QuestID].MobProgress[i] < Count)
+		if(ms_aQuests[ClientID][QuestID].m_aMobProgress[i] < Count)
 			return false;
 	}
 	return true;
@@ -79,26 +79,26 @@ bool QuestJob::IsDefeatMobsComplete(int ClientID, int QuestID) const
 const char *QuestJob::GetQuestName(int QuestID) const
 {
 	if(IsValidQuest(QuestID))
-		return QuestsData[QuestID].Name;
+		return ms_aQuestsData[QuestID].m_aName;
 	return "Unknown";
 }
 
 const char *QuestJob::GetStoryName(int QuestID) const
 {
 	if(IsValidQuest(QuestID))
-		return QuestsData[QuestID].StoryLine;
+		return ms_aQuestsData[QuestID].m_aStoryLine;
 	return "Unknown";
 }
 
 BotJob::QuestBotInfo *QuestJob::GetQuestBot(int QuestID, int Progress) const
 {
-	for(auto& qb : BotJob::QuestBot)
+	for(auto& qb : BotJob::ms_aQuestBot)
 	{
 		// skip decorative quest npc
-		if(qb.second.NextEqualProgress)
+		if(qb.second.m_NextEqualProgress)
 			continue;
 
-		if(QuestID == qb.second.QuestID && Progress == qb.second.Progress)
+		if(QuestID == qb.second.m_QuestID && Progress == qb.second.m_Progress)
 			return &qb.second;
 	}
 	return nullptr;
@@ -109,7 +109,7 @@ bool QuestJob::IsActiveQuestBot(int QuestID, int Progress) const
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		const int PlayerState = GetState(i, QuestID);
-		if(PlayerState != QuestState::QUEST_ACCEPT || Quests[i][QuestID].Progress != Progress)
+		if(PlayerState != QuestState::QUEST_ACCEPT || ms_aQuests[i][QuestID].m_Progress != Progress)
 			continue;
 		return true;
 	}
@@ -120,12 +120,12 @@ void QuestJob::ShowQuestID(CPlayer *pPlayer, int QuestID)
 {
 	const int ClientID = pPlayer->GetCID();
 	const int HideID = NUM_TAB_MENU + 10500 + QuestID;
-	const int CountQuest = GetStoryCount(QuestsData[QuestID].StoryLine);
-	const int LineQuest = GetStoryCount(QuestsData[QuestID].StoryLine, QuestID)+1;
+	const int CountQuest = GetStoryCount(ms_aQuestsData[QuestID].m_aStoryLine);
+	const int LineQuest = GetStoryCount(ms_aQuestsData[QuestID].m_aStoryLine, QuestID)+1;
 
-	GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "{INT}/{INT} {STR}: {STR}", &LineQuest, &CountQuest, QuestsData[QuestID].StoryLine, QuestsData[QuestID].Name);
+	GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "{INT}/{INT} {STR}: {STR}", &LineQuest, &CountQuest, ms_aQuestsData[QuestID].m_aStoryLine, ms_aQuestsData[QuestID].m_aName);
 	GS()->AVM(ClientID, "null", NOPE, HideID, "You will receive a reward");
-	GS()->AVM(ClientID, "null", NOPE, HideID, "Gold: {INT} Exp: {INT}", &QuestsData[QuestID].Money, &QuestsData[QuestID].Exp);
+	GS()->AVM(ClientID, "null", NOPE, HideID, "Gold: {INT} Exp: {INT}", &ms_aQuestsData[QuestID].m_Gold, &ms_aQuestsData[QuestID].m_Exp);
 	GS()->AVM(ClientID, "null", NOPE, HideID, " ");
 }
 
@@ -136,16 +136,16 @@ void QuestJob::FinishQuest(CPlayer *pPlayer, int QuestID)
 		return;
 	
 	// quest stats
-	Quests[ClientID][QuestID].State = QuestState::QUEST_FINISHED;
-	SJK.UD("tw_accounts_quests", "Type = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'", Quests[ClientID][QuestID].State, QuestID, pPlayer->Acc().AuthID);
+	ms_aQuests[ClientID][QuestID].m_State = QuestState::QUEST_FINISHED;
+	SJK.UD("tw_accounts_quests", "Type = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'", ms_aQuests[ClientID][QuestID].m_State, QuestID, pPlayer->Acc().m_AuthID);
 
 	// issue awards and write about completion
-	const StructQuestData finishQuestData = QuestsData[QuestID];
-	pPlayer->AddMoney(finishQuestData.Money);
-	pPlayer->AddExp(finishQuestData.Exp);
+	const StructQuestData finishQuestData = ms_aQuestsData[QuestID];
+	pPlayer->AddMoney(finishQuestData.m_Gold);
+	pPlayer->AddExp(finishQuestData.m_Exp);
 
-	GS()->Chat(-1, "{STR} completed: {STR} - {STR}!", GS()->Server()->ClientName(ClientID), finishQuestData.StoryLine, finishQuestData.Name);
-	GS()->ChatDiscord(DC_PLAYER_INFO, GS()->Server()->ClientName(ClientID), "Completed ({STR} - {STR})", finishQuestData.StoryLine, finishQuestData.Name);
+	GS()->Chat(-1, "{STR} completed: {STR} - {STR}!", GS()->Server()->ClientName(ClientID), finishQuestData.m_aStoryLine, finishQuestData.m_aName);
+	GS()->ChatDiscord(DC_PLAYER_INFO, GS()->Server()->ClientName(ClientID), "Completed ({STR} - {STR})", finishQuestData.m_aStoryLine, finishQuestData.m_aName);
 	Job()->SaveAccount(pPlayer, SaveType::SAVE_STATS);
 	CheckNewStories(pPlayer, QuestID);
 
@@ -159,29 +159,29 @@ void QuestJob::CollectItem(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData)
 	bool antiStressing = false;
 	for (int i = 0; i < 2; i++)
 	{
-		const int ItemID = BotData.ItemSearch[i];
-		const int Count = BotData.ItemSearchCount[i];
+		const int ItemID = BotData.m_aItemSearch[i];
+		const int Count = BotData.m_aItemSearchCount[i];
 		if (ItemID > 0 && Count > 0)
 		{
 			GS()->Chat(pPlayer->GetCID(), "You used quest item {STR}x{INT}!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer), &Count);
-			antiStressing = (bool)(ItemID == BotData.ItemGives[0] || ItemID == BotData.ItemGives[1]);
+			antiStressing = (bool)(ItemID == BotData.m_aItemGives[0] || ItemID == BotData.m_aItemGives[1]);
 			pPlayer->GetItem(ItemID).Remove(Count);
 		}
 	}
 
 	for(int i = 0; i < 2; i++)
 	{
-		const int ItemID = BotData.ItemGives[i];
-		const int Count = BotData.ItemGivesCount[i];
+		const int ItemID = BotData.m_aItemGives[i];
+		const int Count = BotData.m_aItemGivesCount[i];
 		if(ItemID > 0 && Count > 0)
 		{
 			if(antiStressing)
 			{
-				Job()->Item()->AddItemSleep(pPlayer->Acc().AuthID, ItemID, Count, 300);
+				Job()->Item()->AddItemSleep(pPlayer->Acc().m_AuthID, ItemID, Count, 300);
 				continue;
 			}
 
-			if(pPlayer->GetItem(ItemID).Info().IsEnchantable() && pPlayer->GetItem(ItemID).Count >= 1)
+			if(pPlayer->GetItem(ItemID).Info().IsEnchantable() && pPlayer->GetItem(ItemID).m_Count >= 1)
 			{
 				GS()->SendInbox(pPlayer->GetCID(), "No place for item", "You already have this item, but we can't put it in inventory", ItemID, 1);
 				continue;
@@ -196,12 +196,12 @@ bool QuestJob::IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &Bot
 {
 	for(int i = 0; i < 2; i++)
 	{
-		const int ItemID = BotData.ItemSearch[i];
-		const int Count = BotData.ItemSearchCount[i];
+		const int ItemID = BotData.m_aItemSearch[i];
+		const int Count = BotData.m_aItemSearchCount[i];
 		if(ItemID <= 0 || Count <= 0)
 			continue;
 
-		if(pPlayer->GetItem(ItemID).Count < Count)
+		if(pPlayer->GetItem(ItemID).m_Count < Count)
 			return false;
 	}
 
@@ -214,11 +214,11 @@ void QuestJob::AddProgress(CPlayer *pPlayer, int QuestID)
 	if(!IsValidQuest(QuestID, ClientID) || !pPlayer->GetCharacter()) 
 		return;
 
-	StructQuest &talkQuestPlayer = Quests[ClientID][QuestID];
-	talkQuestPlayer.Progress++;
-	talkQuestPlayer.MobProgress[0] = 0;
-	talkQuestPlayer.MobProgress[1] = 0;
-	const bool FinishedProgress = (talkQuestPlayer.Progress >= QuestsData[QuestID].ProgressSize);
+	StructQuest &talkQuestPlayer = ms_aQuests[ClientID][QuestID];
+	talkQuestPlayer.m_Progress++;
+	talkQuestPlayer.m_aMobProgress[0] = 0;
+	talkQuestPlayer.m_aMobProgress[1] = 0;
+	const bool FinishedProgress = (talkQuestPlayer.m_Progress >= ms_aQuestsData[QuestID].m_ProgressSize);
 	if (FinishedProgress)
 	{
 		FinishQuest(pPlayer, QuestID);
@@ -229,11 +229,11 @@ void QuestJob::AddProgress(CPlayer *pPlayer, int QuestID)
 	{
 		pPlayer->GetCharacter()->CreateQuestsStep(QuestID);
 		SJK.UD("tw_accounts_quests", "Progress = '%d', Mob1Progress = '%d', Mob2Progress = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'",
-			talkQuestPlayer.Progress, talkQuestPlayer.MobProgress[0], talkQuestPlayer.MobProgress[1], QuestID, pPlayer->Acc().AuthID);
+			talkQuestPlayer.m_Progress, talkQuestPlayer.m_aMobProgress[0], talkQuestPlayer.m_aMobProgress[1], QuestID, pPlayer->Acc().m_AuthID);
 	}
 
-	const int OldProgress = talkQuestPlayer.Progress - 1;
-	const int NewProgress = talkQuestPlayer.Progress;
+	const int OldProgress = talkQuestPlayer.m_Progress - 1;
+	const int NewProgress = talkQuestPlayer.m_Progress;
 	GS()->UpdateQuestsBot(QuestID, OldProgress);
 	GS()->UpdateQuestsBot(QuestID, NewProgress);
 }
@@ -244,15 +244,15 @@ bool QuestJob::AcceptQuest(int QuestID, CPlayer* pPlayer)
 		return false;
 
 	const int ClientID = pPlayer->GetCID();
-	Quests[ClientID][QuestID].Progress = 1;
-	Quests[ClientID][QuestID].State = QuestState::QUEST_ACCEPT;
-	GS()->UpdateQuestsBot(QuestID, Quests[ClientID][QuestID].Progress);
-	SJK.ID("tw_accounts_quests", "(QuestID, OwnerID, Type) VALUES ('%d', '%d', '%d')", QuestID, pPlayer->Acc().AuthID, QuestState::QUEST_ACCEPT);
+	ms_aQuests[ClientID][QuestID].m_Progress = 1;
+	ms_aQuests[ClientID][QuestID].m_State = QuestState::QUEST_ACCEPT;
+	GS()->UpdateQuestsBot(QuestID, ms_aQuests[ClientID][QuestID].m_Progress);
+	SJK.ID("tw_accounts_quests", "(QuestID, OwnerID, Type) VALUES ('%d', '%d', '%d')", QuestID, pPlayer->Acc().m_AuthID, QuestState::QUEST_ACCEPT);
 
-	const int StorySize = GetStoryCount(QuestsData[QuestID].StoryLine);
-	const int StoryProgress = GetStoryCount(QuestsData[QuestID].StoryLine, QuestID + 1);
-	GS()->Chat(ClientID, "Quest: {STR} - {STR} {INT}/{INT}!", QuestsData[QuestID].StoryLine, QuestsData[QuestID].Name, &StoryProgress, &StorySize);
-	GS()->Chat(ClientID, "Receive a reward Gold {INT}, Experience {INT}", &QuestsData[QuestID].Money, &QuestsData[QuestID].Exp);
+	const int StorySize = GetStoryCount(ms_aQuestsData[QuestID].m_aStoryLine);
+	const int StoryProgress = GetStoryCount(ms_aQuestsData[QuestID].m_aStoryLine, QuestID + 1);
+	GS()->Chat(ClientID, "Quest: {STR} - {STR} {INT}/{INT}!", ms_aQuestsData[QuestID].m_aStoryLine, ms_aQuestsData[QuestID].m_aName, &StoryProgress, &StorySize);
+	GS()->Chat(ClientID, "Receive a reward Gold {INT}, Experience {INT}", &ms_aQuestsData[QuestID].m_Gold, &ms_aQuestsData[QuestID].m_Exp);
 	pPlayer->GetCharacter()->CreateQuestsStep(QuestID);
 	GS()->CreatePlayerSound(ClientID, SOUND_CTF_CAPTURE);
 	return true;
@@ -263,11 +263,11 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotDa
 	if (!pPlayer || !pPlayer->GetCharacter())
 		return false;
 
-	if(BotData.NextEqualProgress)
+	if(BotData.m_NextEqualProgress)
 		return true;
 
 	const int ClientID = pPlayer->GetCID();
-	const int QuestID = BotData.QuestID;
+	const int QuestID = BotData.m_QuestID;
 	if (!IsCollectItemComplete(pPlayer, BotData) || !IsDefeatMobsComplete(ClientID, QuestID))
 	{
 		GS()->Chat(ClientID, "Task has not been completed yet!");
@@ -287,20 +287,20 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotDa
 	GS()->UpdateVotes(ClientID, MenuList::MENU_JOURNAL_MAIN);
 	GS()->Mmo()->Quest()->AddProgress(pPlayer, QuestID);
 
-	BotJob::DataBot[BotData.BotID].AlreadySnapQuestBot[ClientID] = false;
+	BotJob::ms_aDataBot[BotData.m_BotID].m_aAlreadySnapQuestBot[ClientID] = false;
 	return true;
 }
 
 bool QuestJob::InteractiveTypeQuest(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData)
 {
 	const int ClientID = pPlayer->GetCID();
-	if (BotData.InteractiveType == (int)QuestInteractive::INTERACTIVE_RANDOM_ACCEPT_ITEM && BotData.InteractiveTemp > 0)
+	if (BotData.m_InteractiveType == (int)QuestInteractive::INTERACTIVE_RANDOM_ACCEPT_ITEM && BotData.m_InteractiveTemp > 0)
 	{
-		const bool Succesful = random_int() % BotData.InteractiveTemp == 0;
+		const bool Succesful = random_int() % BotData.m_InteractiveTemp == 0;
 		for(int i = 0; i < 2; i++)
 		{
-			const int ItemID = BotData.ItemSearch[i];
-			const int Count = BotData.ItemSearchCount[i];
+			const int ItemID = BotData.m_aItemSearch[i];
+			const int Count = BotData.m_aItemSearchCount[i];
 			if(ItemID > 0 && Count > 0)
 				pPlayer->GetItem(ItemID).Remove(Count);
 		}
@@ -320,15 +320,15 @@ void QuestJob::AddMobProgress(CPlayer* pPlayer, int BotID)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
-	for (auto& qp : Quests[ClientID])
+	for (auto& qp : ms_aQuests[ClientID])
 	{
 		// if the quest is accepted
-		if (qp.second.State != QuestState::QUEST_ACCEPT)
+		if (qp.second.m_State != QuestState::QUEST_ACCEPT)
 			continue;
 
 		// get active npc
 		const int questID = qp.first;
-		const int playerProgress = qp.second.Progress;
+		const int playerProgress = qp.second.m_Progress;
 		BotJob::QuestBotInfo *FindBot = GetQuestBot(questID, playerProgress);
 		if (!FindBot)
 			continue;
@@ -336,16 +336,16 @@ void QuestJob::AddMobProgress(CPlayer* pPlayer, int BotID)
 		// looking for a Mob
 		for (int i = 0; i < 2; i++)
 		{
-			if (BotID != FindBot->NeedMob[i] || qp.second.MobProgress[i] >= FindBot->NeedMobCount[i])
+			if (BotID != FindBot->m_aNeedMob[i] || qp.second.m_aMobProgress[i] >= FindBot->m_aNeedMobCount[i])
 				continue;
 
-			qp.second.MobProgress[i]++;
-			if(qp.second.MobProgress[i] >= FindBot->NeedMobCount[i])
+			qp.second.m_aMobProgress[i]++;
+			if(qp.second.m_aMobProgress[i] >= FindBot->m_aNeedMobCount[i])
 			{
-				GS()->Chat(ClientID, "You killed {STR} required amount for NPC {STR}", BotJob::DataBot[BotID].NameBot, FindBot->GetName());
+				GS()->Chat(ClientID, "You killed {STR} required amount for NPC {STR}", BotJob::ms_aDataBot[BotID].m_aNameBot, FindBot->GetName());
 			}
 			SJK.UD("tw_accounts_quests", "Mob1Progress = '%d', Mob2Progress = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'",
-				qp.second.MobProgress[0], qp.second.MobProgress[1], questID, pPlayer->Acc().AuthID);
+				qp.second.m_aMobProgress[0], qp.second.m_aMobProgress[1], questID, pPlayer->Acc().m_AuthID);
 			break;
 		}
 	}
@@ -357,9 +357,9 @@ void QuestJob::UpdateArrowStep(int ClientID)
 	if (!pPlayer)
 		return;
 
-	for (const auto& qp : Quests[ClientID])
+	for (const auto& qp : ms_aQuests[ClientID])
 	{
-		if (qp.second.State == QuestState::QUEST_ACCEPT)
+		if (qp.second.m_State == QuestState::QUEST_ACCEPT)
 			pPlayer->GetCharacter()->CreateQuestsStep(qp.first);
 	}
 }
@@ -370,7 +370,7 @@ bool QuestJob::CheckNewStories(CPlayer *pPlayer, int CheckQuestID)
 	if (CheckQuestID > 0)
 	{
 		const int NextQuestID = CheckQuestID + 1;
-		const bool ActiveNextStories = (bool)(IsValidQuest(NextQuestID) && str_comp(QuestsData[CheckQuestID].StoryLine, QuestsData[NextQuestID].StoryLine) == 0);
+		const bool ActiveNextStories = (bool)(IsValidQuest(NextQuestID) && str_comp(ms_aQuestsData[CheckQuestID].m_aStoryLine, ms_aQuestsData[NextQuestID].m_aStoryLine) == 0);
 		if(ActiveNextStories)
 			AcceptQuest(NextQuestID, pPlayer);
 		
@@ -378,16 +378,16 @@ bool QuestJob::CheckNewStories(CPlayer *pPlayer, int CheckQuestID)
 	}
 
 	bool ActiveNextStories = false;
-	for (const auto& qp : Quests[ClientID])
+	for (const auto& qp : ms_aQuests[ClientID])
 	{
-		if (qp.second.State != QuestState::QUEST_FINISHED)
+		if (qp.second.m_State != QuestState::QUEST_FINISHED)
 			continue;
 
 		int NextQuestID = qp.first + 1, QuestID = qp.first;
-		if (!IsValidQuest(NextQuestID) || Quests[ClientID][NextQuestID].State != QuestState::QUEST_NO_ACCEPT)
+		if (!IsValidQuest(NextQuestID) || ms_aQuests[ClientID][NextQuestID].m_State != QuestState::QUEST_NO_ACCEPT)
 			continue;
 
-		if (str_comp(QuestsData[QuestID].StoryLine, QuestsData[NextQuestID].StoryLine) == 0)
+		if (str_comp(ms_aQuestsData[QuestID].m_aStoryLine, ms_aQuestsData[NextQuestID].m_aStoryLine) == 0)
 		{
 			AcceptQuest(NextQuestID, pPlayer);
 			ActiveNextStories = true;
@@ -406,7 +406,7 @@ void QuestJob::ShowQuestList(CPlayer* pPlayer, int StateQuest)
 	pPlayer->m_Colored = GOLDEN_COLOR;
 	GS()->AVL(ClientID, "null", "★ {STR} quests", GetStateName(StateQuest));
 
-	for (const auto& qd : QuestsData)
+	for (const auto& qd : ms_aQuestsData)
 	{
 		int questID = qd.first;
 		if (GetState(ClientID, questID) != StateQuest)
@@ -414,10 +414,10 @@ void QuestJob::ShowQuestList(CPlayer* pPlayer, int StateQuest)
 
 		if (StateQuest != QuestState::QUEST_FINISHED)
 		{
-			if (str_comp(aStoryLineSave, qd.second.StoryLine) == 0)
+			if (str_comp(aStoryLineSave, qd.second.m_aStoryLine) == 0)
 				continue;
 
-			str_copy(aStoryLineSave, qd.second.StoryLine, sizeof(aStoryLineSave));
+			str_copy(aStoryLineSave, qd.second.m_aStoryLine, sizeof(aStoryLineSave));
 		}
 		ShowQuestID(pPlayer, questID);
 		FoundQuests = true;
@@ -460,36 +460,36 @@ bool QuestJob::ShowAdventureActiveNPC(CPlayer* pPlayer)
 	pPlayer->m_Colored = BLUE_COLOR;
 	GS()->AVM(clientID, "null", NOPE, NOPE, "Active NPC for current quests");
 
-	for (const auto& qq : Quests[clientID])
+	for (const auto& qq : ms_aQuests[clientID])
 	{
-		if (qq.second.State != QuestState::QUEST_ACCEPT)
+		if (qq.second.m_State != QuestState::QUEST_ACCEPT)
 			continue;
 
-		BotJob::QuestBotInfo *BotInfo = GetQuestBot(qq.first, qq.second.Progress);
+		BotJob::QuestBotInfo *BotInfo = GetQuestBot(qq.first, qq.second.m_Progress);
 		if (!BotInfo)
 			continue;
 
-		const int HideID = (NUM_TAB_MENU + 12500 + BotInfo->QuestID);
-		const int PosX = BotInfo->PositionX / 32, PosY = BotInfo->PositionY / 32;
-		GS()->AVH(clientID, HideID, LIGHT_BLUE_COLOR, "[{STR}] {STR} {STR}(x{INT} y{INT})", GetStoryName(qq.first), BotInfo->GetName(), GS()->Server()->GetWorldName(BotInfo->WorldID), &PosX, &PosY);
+		const int HideID = (NUM_TAB_MENU + 12500 + BotInfo->m_QuestID);
+		const int PosX = BotInfo->m_PositionX / 32, PosY = BotInfo->m_PositionY / 32;
+		GS()->AVH(clientID, HideID, LIGHT_BLUE_COLOR, "[{STR}] {STR} {STR}(x{INT} y{INT})", GetStoryName(qq.first), BotInfo->GetName(), GS()->Server()->GetWorldName(BotInfo->m_WorldID), &PosX, &PosY);
 
 		bool JustTalk = true;
 		for (int i = 0; i < 2; i++)
 		{
-			const int botID = BotInfo->NeedMob[i];
-			const int killNeed = BotInfo->NeedMobCount[i];
+			const int botID = BotInfo->m_aNeedMob[i];
+			const int killNeed = BotInfo->m_aNeedMobCount[i];
 			if(botID > 0 && killNeed > 0 && Job()->BotsData()->IsDataBotValid(botID))
 			{
-				GS()->AVMI(clientID, "broken_h", "null", NOPE, HideID, "- Defeat {STR} [{INT}/{INT}]", BotJob::DataBot[botID].NameBot, &qq.second.MobProgress[i], &killNeed);
+				GS()->AVMI(clientID, "broken_h", "null", NOPE, HideID, "- Defeat {STR} [{INT}/{INT}]", BotJob::ms_aDataBot[botID].m_aNameBot, &qq.second.m_aMobProgress[i], &killNeed);
 				JustTalk = false;
 			}
 
-			const int itemID = BotInfo->ItemSearch[i];
-			const int itemCount = BotInfo->ItemSearchCount[i];
+			const int itemID = BotInfo->m_aItemSearch[i];
+			const int itemCount = BotInfo->m_aItemSearchCount[i];
 			if(itemID > 0 && itemCount > 0)
 			{
 				ItemJob::InventoryItem PlayerSearchItem = pPlayer->GetItem(itemID);
-				int ownCount = clamp(PlayerSearchItem.Count, 0, itemCount);
+				int ownCount = clamp(PlayerSearchItem.m_Count, 0, itemCount);
 
 				GS()->AVMI(clientID, PlayerSearchItem.Info().GetIcon(), "null", NOPE, HideID, "- Item {STR} [{INT}/{INT}]", PlayerSearchItem.Info().GetName(pPlayer), &ownCount, &itemCount);
 				JustTalk = false;
@@ -497,8 +497,8 @@ bool QuestJob::ShowAdventureActiveNPC(CPlayer* pPlayer)
 		}
 		for(int i = 0; i < 2; i++)
 		{
-			const int itemID = BotInfo->ItemGives[i];
-			const int itemCount = BotInfo->ItemGivesCount[i];
+			const int itemID = BotInfo->m_aItemGives[i];
+			const int itemCount = BotInfo->m_aItemGivesCount[i];
 			if(itemID > 0 && itemCount > 0)
 			{
 				ItemJob::ItemInformation GivedInfItem = GS()->GetItemInfo(itemID);
@@ -517,7 +517,7 @@ bool QuestJob::ShowAdventureActiveNPC(CPlayer* pPlayer)
 
 void QuestJob::QuestTableShowRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData, const char* TextTalk)
 {
-	if(BotData.NextEqualProgress)
+	if(BotData.m_NextEqualProgress)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
@@ -530,34 +530,34 @@ void QuestJob::QuestTableShowRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &Bo
 	char aBuf[64];
 	dynamic_string Buffer;
 	bool ShowItemNeeded = false;
-	const int QuestID = BotData.QuestID;
+	const int QuestID = BotData.m_QuestID;
 
 	// search item's and mob's
 	for(int i = 0; i < 2; i++)
 	{
-		const int BotID = BotData.NeedMob[i];
-		const int CountMob = BotData.NeedMobCount[i];
+		const int BotID = BotData.m_aNeedMob[i];
+		const int CountMob = BotData.m_aNeedMobCount[i];
 		if(BotID > 0 && CountMob > 0 && Job()->BotsData()->IsDataBotValid(BotID))
 		{
-			str_format(aBuf, sizeof(aBuf), "\n- Defeat %s [%d/%d]", BotJob::DataBot[BotID].NameBot, Quests[ClientID][QuestID].MobProgress[i], CountMob);
+			str_format(aBuf, sizeof(aBuf), "\n- Defeat %s [%d/%d]", BotJob::ms_aDataBot[BotID].m_aNameBot, ms_aQuests[ClientID][QuestID].m_aMobProgress[i], CountMob);
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
 
-		const int ItemID = BotData.ItemSearch[i];
-		const int CountItem = BotData.ItemSearchCount[i];
+		const int ItemID = BotData.m_aItemSearch[i];
+		const int CountItem = BotData.m_aItemSearchCount[i];
 		if(ItemID > 0 && CountItem > 0)
 		{
 			ItemJob::InventoryItem PlayerQuestItem = pPlayer->GetItem(ItemID);
-			str_format(aBuf, sizeof(aBuf), "\n- Need %s [%d/%d]", PlayerQuestItem.Info().GetName(pPlayer), PlayerQuestItem.Count, CountItem);
+			str_format(aBuf, sizeof(aBuf), "\n- Need %s [%d/%d]", PlayerQuestItem.Info().GetName(pPlayer), PlayerQuestItem.m_Count, CountItem);
 			Buffer.append_at(Buffer.length(), aBuf);
 			ShowItemNeeded = true;
 		}
 	}
 
 	// type random accept item's
-	if(BotData.InteractiveType == (int)QuestInteractive::INTERACTIVE_RANDOM_ACCEPT_ITEM)
+	if(BotData.m_InteractiveType == (int)QuestInteractive::INTERACTIVE_RANDOM_ACCEPT_ITEM)
 	{
-		const double Chance = BotData.InteractiveTemp <= 0 ? 100.0f : (1.0f / (double)BotData.InteractiveTemp) * 100;
+		const double Chance = BotData.m_InteractiveTemp <= 0 ? 100.0f : (1.0f / (double)BotData.m_InteractiveTemp) * 100;
 		str_format(aBuf, sizeof(aBuf), "\nChance that item he'll like [%0.2f%%]\n", Chance);
 		Buffer.append_at(Buffer.length(), aBuf);
 	}
@@ -565,8 +565,8 @@ void QuestJob::QuestTableShowRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &Bo
 	// reward item's
 	for(int i = 0; i < 2; i++)
 	{
-		const int ItemID = BotData.ItemGives[i];
-		const int CountItem = BotData.ItemGivesCount[i];
+		const int ItemID = BotData.m_aItemGives[i];
+		const int CountItem = BotData.m_aItemGivesCount[i];
 		if(ItemID > 0 && CountItem > 0)
 		{
 			str_format(aBuf, sizeof(aBuf), "\n- Receive %s [%d]", GS()->GetItemInfo(ItemID).GetName(pPlayer), CountItem);
@@ -587,14 +587,14 @@ void QuestJob::QuestTableShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& Bo
 	// search item's
 	for (int i = 0; i < 2; i++)
 	{
-		const int ItemID = BotData.ItemSearch[i];
-		const int CountItem = BotData.ItemSearchCount[i];
+		const int ItemID = BotData.m_aItemSearch[i];
+		const int CountItem = BotData.m_aItemSearchCount[i];
 		if(ItemID <= 0 || CountItem <= 0)
 			continue;
 
-		if(BotData.InteractiveType == (int)QuestInteractive::INTERACTIVE_RANDOM_ACCEPT_ITEM)
+		if(BotData.m_InteractiveType == (int)QuestInteractive::INTERACTIVE_RANDOM_ACCEPT_ITEM)
 		{
-			const float Chance = BotData.InteractiveTemp <= 0 ? 100.0f : (1.0f / (float)BotData.InteractiveTemp) * 100;
+			const float Chance = BotData.m_InteractiveTemp <= 0 ? 100.0f : (1.0f / (float)BotData.m_InteractiveTemp) * 100;
 			str_format(aBuf, sizeof(aBuf), "%s [takes %0.2f%%]", aBuf, Chance);
 		}
 		else
@@ -606,20 +606,20 @@ void QuestJob::QuestTableShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& Bo
 	// search mob's
 	for (int i = 0; i < 2; i++)
 	{
-		const int BotID = BotData.NeedMob[i];
-		const int CountMob = BotData.NeedMobCount[i];
+		const int BotID = BotData.m_aNeedMob[i];
+		const int CountMob = BotData.m_aNeedMobCount[i];
 		if (BotID <= 0 || CountMob <= 0 || !GS()->Mmo()->BotsData()->IsDataBotValid(BotID))
 			continue;
 
-		str_format(aBuf, sizeof(aBuf), "Defeat %s", BotJob::DataBot[BotID].NameBot);
-		GS()->Mmo()->Quest()->QuestTableAddInfo(ClientID, aBuf, CountMob, QuestJob::Quests[ClientID][BotData.QuestID].MobProgress[i]);
+		str_format(aBuf, sizeof(aBuf), "Defeat %s", BotJob::ms_aDataBot[BotID].m_aNameBot);
+		GS()->Mmo()->Quest()->QuestTableAddInfo(ClientID, aBuf, CountMob, QuestJob::ms_aQuests[ClientID][BotData.m_QuestID].m_aMobProgress[i]);
 	}
 
 	// reward item's
 	for (int i = 0; i < 2; i++)
 	{
-		const int ItemID = BotData.ItemGives[i];
-		const int CountItem = BotData.ItemGivesCount[i];
+		const int ItemID = BotData.m_aItemGives[i];
+		const int CountItem = BotData.m_aItemGivesCount[i];
 		if (ItemID <= 0 || CountItem <= 0)
 			continue;
 
@@ -639,7 +639,7 @@ void QuestJob::QuestTableAddItem(int ClientID, const char* pText, int Requires, 
 	CNetMsg_Sv_AddQuestingProcessing Msg;
 	Msg.m_pText = pText;
 	Msg.m_pRequiresNum = Requires;
-	Msg.m_pHaveNum = clamp(PlayerSelectedItem.Count, 0, Requires);
+	Msg.m_pHaveNum = clamp(PlayerSelectedItem.m_Count, 0, Requires);
 	Msg.m_pGivingTable = GivingTable;
 	StrToInts(Msg.m_pIcon, 4, PlayerSelectedItem.Info().GetIcon());
 	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
@@ -672,43 +672,43 @@ int QuestJob::QuestingAllowedItemsCount(CPlayer *pPlayer, int ItemID)
 {
 	const int ClientID = pPlayer->GetCID();
 	const ItemJob::InventoryItem PlayerSearchItem = pPlayer->GetItem(ItemID);
-	for (const auto& qq : Quests[ClientID])
+	for (const auto& qq : ms_aQuests[ClientID])
 	{
-		if (qq.second.State != QuestState::QUEST_ACCEPT)
+		if (qq.second.m_State != QuestState::QUEST_ACCEPT)
 			continue;
 
-		BotJob::QuestBotInfo *BotInfo = GetQuestBot(qq.first, qq.second.Progress);
+		BotJob::QuestBotInfo *BotInfo = GetQuestBot(qq.first, qq.second.m_Progress);
 		if (!BotInfo)
 			continue;
 
 		for (int i = 0; i < 2; i++)
 		{
-			const int needItemID = BotInfo->ItemSearch[i];
-			const int numNeed = BotInfo->ItemSearchCount[i];
+			const int needItemID = BotInfo->m_aItemSearch[i];
+			const int numNeed = BotInfo->m_aItemSearchCount[i];
 			if (needItemID <= 0 || numNeed <= 0 || ItemID != needItemID)
 				continue;
 
-			const int AvailableCount = clamp(PlayerSearchItem.Count - numNeed, 0, PlayerSearchItem.Count);
+			const int AvailableCount = clamp(PlayerSearchItem.m_Count - numNeed, 0, PlayerSearchItem.m_Count);
 			return AvailableCount;
 		}
 	}
-	return PlayerSearchItem.Count;
+	return PlayerSearchItem.m_Count;
 }
 
 void QuestJob::CreateQuestingItems(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData)
 {
-	if (!pPlayer || !pPlayer->GetCharacter() || BotData.InteractiveType != (int)QuestInteractive::INTERACTIVE_DROP_AND_TAKE_IT)
+	if (!pPlayer || !pPlayer->GetCharacter() || BotData.m_InteractiveType != (int)QuestInteractive::INTERACTIVE_DROP_AND_TAKE_IT)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
 	for (CDropQuestItem* pHh = (CDropQuestItem*)GS()->m_World.FindFirst(CGameWorld::ENTTYPE_DROPQUEST); pHh; pHh = (CDropQuestItem*)pHh->TypeNext())
 	{
-		if (pHh->m_OwnerID == ClientID && pHh->m_QuestBot.QuestID == BotData.QuestID)
+		if (pHh->m_OwnerID == ClientID && pHh->m_QuestBot.m_QuestID == BotData.m_QuestID)
 			return;
 	}
 
-	const int Count = 3 + BotData.ItemSearchCount[0];
-	const vec2 Pos = vec2(BotData.PositionX, BotData.PositionY);
+	const int Count = 3 + BotData.m_aItemSearchCount[0];
+	const vec2 Pos = vec2(BotData.m_PositionX, BotData.m_PositionY);
 	for (int i = 0; i < Count; i++)
 	{
 		const vec2 Vel = vec2(frandom() * 40.0f - frandom() * 80.0f, frandom() * 40.0f - frandom() * 80.0f);
@@ -723,17 +723,17 @@ void QuestJob::OnInit()
 	while (RES->next())
 	{
 		const int QUID = RES->getInt("ID");
-		str_copy(QuestsData[QUID].Name, RES->getString("Name").c_str(), sizeof(QuestsData[QUID].Name));
-		str_copy(QuestsData[QUID].StoryLine, RES->getString("StoryLine").c_str(), sizeof(QuestsData[QUID].StoryLine));
-		QuestsData[QUID].Money = (int)RES->getInt("Money");
-		QuestsData[QUID].Exp = (int)RES->getInt("Exp");
+		str_copy(ms_aQuestsData[QUID].m_aName, RES->getString("Name").c_str(), sizeof(ms_aQuestsData[QUID].m_aName));
+		str_copy(ms_aQuestsData[QUID].m_aStoryLine, RES->getString("StoryLine").c_str(), sizeof(ms_aQuestsData[QUID].m_aStoryLine));
+		ms_aQuestsData[QUID].m_Gold = (int)RES->getInt("Money");
+		ms_aQuestsData[QUID].m_Exp = (int)RES->getInt("Exp");
 
 		// load talking progress size
-		QuestsData[QUID].ProgressSize = 1;
-		for (const auto& qb : BotJob::QuestBot)
+		ms_aQuestsData[QUID].m_ProgressSize = 1;
+		for (const auto& qb : BotJob::ms_aQuestBot)
 		{
-			if (qb.second.QuestID == QUID && !qb.second.NextEqualProgress)
-				QuestsData[QUID].ProgressSize++;
+			if (qb.second.m_QuestID == QUID && !qb.second.m_NextEqualProgress)
+				ms_aQuestsData[QUID].m_ProgressSize++;
 		}
 	}
 }
@@ -741,29 +741,29 @@ void QuestJob::OnInit()
 void QuestJob::OnInitAccount(CPlayer* pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_quests", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_quests", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID));
 	while (RES->next())
 	{
 		const int QuestID = RES->getInt("QuestID");
-		Quests[ClientID][QuestID].State = (int)RES->getInt("Type");
-		Quests[ClientID][QuestID].Progress = (int)RES->getInt("Progress");
-		Quests[ClientID][QuestID].MobProgress[0] = (int)RES->getInt("Mob1Progress");
-		Quests[ClientID][QuestID].MobProgress[1] = (int)RES->getInt("Mob2Progress");
-		GS()->UpdateQuestsBot(QuestID, Quests[ClientID][QuestID].Progress);
+		ms_aQuests[ClientID][QuestID].m_State = (int)RES->getInt("Type");
+		ms_aQuests[ClientID][QuestID].m_Progress = (int)RES->getInt("Progress");
+		ms_aQuests[ClientID][QuestID].m_aMobProgress[0] = (int)RES->getInt("Mob1Progress");
+		ms_aQuests[ClientID][QuestID].m_aMobProgress[1] = (int)RES->getInt("Mob2Progress");
+		GS()->UpdateQuestsBot(QuestID, ms_aQuests[ClientID][QuestID].m_Progress);
 	}
 }
 
 void QuestJob::OnResetClient(int ClientID)
 {
-	if (Quests.find(ClientID) != Quests.end())
+	if (ms_aQuests.find(ClientID) != ms_aQuests.end())
 	{
 		std::map < int, int > m_talkcheck;
-		for (const auto& qp : Quests[ClientID])
+		for (const auto& qp : ms_aQuests[ClientID])
 		{
-			if (qp.second.State != QuestState::QUEST_FINISHED)
-				m_talkcheck[qp.first] = qp.second.Progress;
+			if (qp.second.m_State != QuestState::QUEST_FINISHED)
+				m_talkcheck[qp.first] = qp.second.m_Progress;
 		}
-		Quests.erase(ClientID);
+		ms_aQuests.erase(ClientID);
 
 		for (const auto& qst : m_talkcheck)
 			GS()->UpdateQuestsBot(qst.first, qst.second);
