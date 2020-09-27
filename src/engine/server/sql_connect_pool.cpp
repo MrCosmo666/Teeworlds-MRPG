@@ -11,7 +11,7 @@
 /*
 	I don't see the point in using SELECT operations in the thread, 
 	since this will lead to unnecessary code, which may cause confusion, 
-	and by calculations if (SQL server / server) = localhoset, 
+	and by calculations if (SQL server / server) = localhost, 
 	this will not do any harm (but after the release is complete, 
 	it is advisable to use the Thread function with Callback)
 
@@ -196,7 +196,7 @@ void CConectionPool::InsertFormated(int Milliseconds, const char *Table, const c
 	std::string Query = "INSERT INTO " + std::string(Table) + " " + std::string(aBuf) + ";";
 	std::thread Thread([Query, Milliseconds]()
 	{
-		int pr_Milliseconds = Milliseconds;
+		const int pr_Milliseconds = Milliseconds;
 		std::string pr_Query = Query;
 
 		SqlThreadRecursiveLock.lock();
@@ -252,7 +252,7 @@ void CConectionPool::UpdateFormated(int Milliseconds, const char *Table, const c
 	std::string Query = "UPDATE " + std::string(Table) + " SET " + std::string(aBuf) + ";";
 	std::thread Thread([Query, Milliseconds]()
 	{
-		int pr_Milliseconds = Milliseconds;
+		const int pr_Milliseconds = Milliseconds;
 		std::string pr_Query = Query;
 
 		SqlThreadRecursiveLock.lock();
@@ -308,7 +308,7 @@ void CConectionPool::DeleteFormated(int Milliseconds, const char *Table, const c
 	std::string Query = "DELETE FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
 	std::thread Thread([Query, Milliseconds]()
 	{
-		int pr_Milliseconds = Milliseconds;
+		const int pr_Milliseconds = Milliseconds;
 		std::string pr_Query = Query;
 
 		SqlThreadRecursiveLock.lock();
@@ -358,7 +358,7 @@ std::shared_ptr<ResultSet> CConectionPool::SD(const char* Select, const char* Ta
 		pConnection = SJK.GetConnection();
 		std::shared_ptr<Statement> STMT(pConnection->createStatement());
 		pResult.reset(STMT->executeQuery(Query.c_str()));
-		ReleaseConnection(pConnection);
+		SJK.ReleaseConnection(pConnection);
 	}
 	catch(SQLException& e)
 	{
