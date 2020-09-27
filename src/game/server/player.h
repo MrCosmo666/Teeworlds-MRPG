@@ -68,8 +68,8 @@ public:
 	CTuningParams m_PrevTuningParams;
 	CTuningParams m_NextTuningParams;
 
-	short m_SortTabs[NUMTABSORT];
 	bool m_Spawned;
+	short m_SortTabs[NUM_SORT_TAB];
 	short m_OpenVoteMenu;
 	short m_LastVoteMenu;
 	vec3 m_Colored;
@@ -100,7 +100,6 @@ public:
 	virtual	int GetMana() { return GetTempData().TempMana; };
 
 	virtual int IsActiveSnappingBot(int SnappingClient) const { return 2; };
-	virtual void SetDungeonAllowedSpawn(bool Spawn) { return; };
 	virtual int GetEquippedItem(int EquipID, int SkipItemID = -1) const;
 	virtual int GetAttributeCount(int BonusID, bool Really = false, bool Searchclass = false);
 	virtual void UpdateTempData(int Health, int Mana);
@@ -164,12 +163,12 @@ public:
 
 	int GetLevelDisciple(int Class, bool SearchClass = false);
 
-	// разговоры с нпс функции
+	// npc conversations
 	void SetTalking(int TalkedID, bool ToProgress);
 	void ClearTalking();
 	int GetTalkedID() const { return m_TalkingNPC.m_TalkedID; };
 
-	// форматирование текста функции
+	// text formatting
 	const char *FormatedTalkedText();
 	void FormatTextQuest(int DataBotID, const char *pText);
 	void ClearFormatQuestText();

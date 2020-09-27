@@ -9,14 +9,7 @@
 #include <list>
 #include <map>
 
-enum QuestInteractive
-{
-	QUEST_INT_RANDOM_ACCEPT_ITEM = 1,
-	QUEST_INT_DROP_AND_TAKE_IT = 2,
-
-};
-
-// Статы оружия и хар-ки игрока
+// weapons and player harky
 enum Stats
 {
 	StSpreadShotgun			= 1,
@@ -58,12 +51,12 @@ enum TickState
 
 enum Skill
 {
-	SkillHeartTurret = 1,	// турель восстановления здоровья
-	SkillSleepyGravity = 2, // притягивает мобов вокруг себя
-	SkillCraftDiscount = 3, // скидка на крафт
-	SkillMasterWeapon = 4, // автоматический огонь с оружий
-	SkillBlessingGodWar = 5, // восстановить патроны
-	SkillNoctisTeleport = 6, // телепорт скилл ноктиса
+	SkillHeartTurret = 1,	// health recovery turret
+	SkillSleepyGravity = 2, // mobbing
+	SkillCraftDiscount = 3, // discount on crafting
+	SkillMasterWeapon = 4, // automatic gunfire
+	SkillBlessingGodWar = 5, // refill ammunition
+	SkillNoctisTeleport = 6, // ?knockout? teleport
 };
 
 enum AtributType
@@ -82,6 +75,7 @@ enum ToplistTypes
 	GUILDS_LEVELING,
 	GUILDS_WEALTHY,
 	PLAYERS_LEVELING,
+	PLAYERS_WEALTHY,
 };
 
 
@@ -173,43 +167,25 @@ enum TabHideList
 	TAB_INFO_LANGUAGES,
 	TAB_INFO_AUCTION,
 	TAB_INFO_AUCTION_BIND,
-	TAB_EQUIP_INFO,
+	TAB_INFO_EQUIP,
 	NUM_TAB_MENU,
 };
 
-// Основное
+// primary
 enum
 {
 	/*
-		Основные настройки сервера ядра
-		Здесь хранятся самые основные настройки сервера
+		Basic kernel server settings
+		This is where the most basic server settings are stored
 	*/
-	MIN_SKINCHANGE_CLIENTVERSION = 0x0703,	// минимальная версия клиента для смены скина
-	MIN_RACE_CLIENTVERSION = 0x0704,		// минимальная версия клиента для типа гонки
-	MAX_INBOX_LIST = 30,						// максимальное кол-во писем что выводится
-
-
-	/*
-		Список вкладок что можно скрыть и раскрыть
-		Передается в качестве AVH как ID, а последющие в качестве HideID
-	*/
-
-
-	/*
-		Список вкладок в меню крафта: Некая сортировка по типу крафта
-		Передается исключительно в ShowMenuCraft( int )
-	*/
+	MIN_SKINCHANGE_CLIENTVERSION = 0x0703,	// minimum client version for skin change
+	MIN_RACE_CLIENTVERSION = 0x0704,		// minimum client version for race type
+	MAX_INBOX_LIST = 30,					// maximum number of emails what is displayed
 	STATS_MAX_FOR_ITEM = 2,
 
 	/*
-		Парсинг голосований
-		Передается как действие в парсер
-	*/
-	PARSEINVITEMEMBER = 1,
-
-	/*
-		Все функции предметов
-		Это сортируется в вкладках
+		All functions of items
+		This is sorted in the tabs
 	*/
 	FUNCTION_ONE_USED = NUM_EQUIPS,
 	FUNCTION_USED,
@@ -219,40 +195,41 @@ enum
 
 
 	NOPE = -1,
-	itGold = 1,							// Деньги обычная валюта
-	itHammer = 2,						// Снаряжение Молоток | Молоток
-	itMaterial = 7,						// Материал для зачирования вещей
-	itTicketGuild = 8,					// Билет для создания гильдии
-	itSkillPoint = 9,					// Скилл поинт
-	itDecoArmor = 10,					// Декорация Щит
-	itEliteDecoHealth = 11,				// Декорация элитная сердце
-	itEliteDecoNinja = 12,				// Декорация элитная ниндзя
-	itDecoHealth = 13,					// Декорация Сердце
-	itPotionManaRegen = 14,				// Зелье регенерации маны
-	itPotionHealthRegen = 15,			// Зелье регенерации здоровья
-	itCapsuleSurvivalExperience = 16,	// Дает 10-50 опыта
-	itLittleBagGold = 17,				// Дает 10-50 золота
-	itPotionResurrection = 25,			// Зелье воскрешения
-	itExplosiveGun = 33,				// Модуль взрыва для пистолета
-	itExplosiveShotgun = 34,			// Модуль взрыва для шотгана
-	itTicketResetClassStats = 38,		// Билет для сброса статистики классовых апгрейдов
-	itModePVP = 39,						// Настройка PVP режима
-	itTicketResetWeaponStats = 40,		// Билет для сброса статистики патрон апгрейдов
-	itTicketDiscountCraft = 43,			// Билет скидки для крафта
+	itGold = 1,							// Money ordinary currency
+	itHammer = 2,						// Equipment Hammers
+	itMaterial = 7,						// Scraping material
+	itTicketGuild = 8,					// Ticket for the creation of the guild
+	itSkillPoint = 9,					// Skillpoint
+	itDecoArmor = 10,					// Shield Decoration
+	itEliteDecoHealth = 11,				// Elite Heart Decoration
+	itEliteDecoNinja = 12,				// Elite Ninja Decoration
+	itDecoHealth = 13,					// Decoration Heart
+	itPotionManaRegen = 14,				// Mana regeneration potion
+	itPotionHealthRegen = 15,			// Health regeneration potion
+	itCapsuleSurvivalExperience = 16,	// Gives 10-50 experience
+	itLittleBagGold = 17,				// Gives 10-50 gold
+	itPotionResurrection = 25,			// Resurrection potion
+	itExplosiveGun = 33,				// Explosion for gun
+	itExplosiveShotgun = 34,			// Explosion for shotgun
+	itTicketResetClassStats = 38,		// Ticket to reset the statistics of class upgrades
+	itModePVP = 39,						// PVP mode setting
+	itTicketResetWeaponStats = 40,		// Ticket to reset the statistics cartridge upgrade
+	itTicketDiscountCraft = 43,			// Discount ticket for crafting
 
-	/*
-		Все листы сортировок что существуют на сервере
-	*/
-	SORTINVENTORY = 1,
-	SORTEQUIP,
-	NUMTABSORT,
+	// sll sorting sheets that exist on the server
+	SORT_INVENTORY = 1,
+	SORT_EQUIPING,
+	NUM_SORT_TAB,
 
-	/* Вид декораций */
+	// type of decorations
 	DECOTYPE_HOUSE = 0,
 	DECOTYPE_GUILD_HOUSE,
 
-	// максимальные слоты снаражения ботов
-	EQUIP_MAX_BOTS = EQUIP_WINGS + 1,
+	// maximum bot slots
+	MAX_EQUIPPED_SLOTS_BOTS = EQUIP_WINGS + 1,
+
+	// bot dialogues
+	IS_TALKING_EMPTY = 999,
 };
 
 enum GuildAccess
@@ -286,6 +263,7 @@ enum BotsTypes
 	TYPE_BOT_MOB = 1,
 	TYPE_BOT_QUEST = 2,
 	TYPE_BOT_NPC = 3,
+	TYPE_BOT_FAKE = 4,
 };
 
 enum

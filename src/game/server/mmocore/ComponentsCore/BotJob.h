@@ -33,7 +33,7 @@ class BotJob : public MmoComponent
 		char SkinNameBot[6][24];
 		int UseCustomBot[6];
 		int SkinColorBot[6];
-		int EquipSlot[EQUIP_MAX_BOTS];
+		int EquipSlot[MAX_EQUIPPED_SLOTS_BOTS];
 		bool AlreadySnapQuestBot[MAX_PLAYERS];
 	};
 

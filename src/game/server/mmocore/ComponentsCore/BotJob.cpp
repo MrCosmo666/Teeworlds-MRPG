@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 #include "BotJob.h"
 
@@ -8,50 +7,48 @@
 
 using namespace sqlstr;
 
-// Структуры ботов
-std::map < int , BotJob::DescDataBot > BotJob::DataBot;
-std::map < int , BotJob::QuestBotInfo > BotJob::QuestBot;
-std::map < int , BotJob::NpcBotInfo > BotJob::NpcBot;
-std::map < int , BotJob::MobBotInfo > BotJob::MobBot;
+// bot structures
+std::map <int, BotJob::DescDataBot> BotJob::DataBot;
+std::map <int, BotJob::QuestBotInfo> BotJob::QuestBot;
+std::map <int, BotJob::NpcBotInfo> BotJob::NpcBot;
+std::map <int, BotJob::MobBotInfo> BotJob::MobBot;
 
-// Загрузка всех скинов и мобов что потом использовать для свзяей с другими ботами
+// loading of all skins and mobs to use for connection with other bots
 void BotJob::OnInitWorld(const char* pWhereLocalWorld)
 {
-	// загружаем связанных ботов
 	LoadMainInformationBots();
 	LoadQuestBots(pWhereLocalWorld);
 	LoadNpcBots(pWhereLocalWorld);
 	LoadMobsBots(pWhereLocalWorld);
 }
 
-// добавить нового бота
+// add a new bot
 void BotJob::ConAddCharacterBot(int ClientID, const char *pCharacter)
 {
-	// если нет игрока то не продолжаем
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
 	if(!pPlayer) 
 		return;
 
-	// собираем данные со скина игрока
+	// collect data from a player's skin
 	char SkinPart[256], SkinColor[256];
 	str_format(SkinPart, sizeof(SkinPart), "%s %s %s %s %s %s", pPlayer->Acc().m_aaSkinPartNames[0], pPlayer->Acc().m_aaSkinPartNames[1], 
 		pPlayer->Acc().m_aaSkinPartNames[2], pPlayer->Acc().m_aaSkinPartNames[3], pPlayer->Acc().m_aaSkinPartNames[4], pPlayer->Acc().m_aaSkinPartNames[5]);
 	str_format(SkinColor, sizeof(SkinColor), "%d %d %d %d %d %d", pPlayer->Acc().m_aSkinPartColors[0], pPlayer->Acc().m_aSkinPartColors[1], 
 		pPlayer->Acc().m_aSkinPartColors[2], pPlayer->Acc().m_aSkinPartColors[3], pPlayer->Acc().m_aSkinPartColors[4], pPlayer->Acc().m_aSkinPartColors[5]);
 
-	// проверяем ник если есть обновим нет добавим
+	// check the nick
 	CSqlString<16> cNick = CSqlString<16>(pCharacter);
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_world", "WHERE BotName = '%s'", cNick.cstr()));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_world", "WHERE BotName = '%s'", cNick.cstr()));
 	if(RES->next())
 	{
-		// если ник не верен из базы данных
+		// if the nickname is not in the database
 		const int ID = RES->getInt("ID");
 		SJK.UD("tw_bots_world", "SkinName = '%s', SkinColor = '%s' WHERE ID = '%d'", SkinPart, SkinColor, ID);
 		GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "parseskin", "Updated character bot!");
 		return;	
 	}
 
-	// добавляем нового бота
+	// add a new bot
 	SJK.ID("tw_bots_world", "(BotName, SkinName, SkinColor) VALUES ('%s', '%s', '%s')", cNick.cstr(), SkinPart, SkinColor);
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "parseskin", "Added new character bot!");
 }
@@ -191,13 +188,13 @@ int BotJob::GetQuestNPC(int MobID) const
 }
 
 
-// Загрузка основной информации о ботах
+// load basic information about bots
 void BotJob::LoadMainInformationBots()
 {
 	if(!(DataBot.empty()))
 		return;
 
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_world"));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_world"));
 	while(RES->next())
 	{
 		const int BotID = (int)RES->getInt("ID");
@@ -233,10 +230,10 @@ void BotJob::LoadMainInformationBots()
 	}
 }
 
-// Загрузка Quest Bots
+// load quest bots
 void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_quest", pWhereLocalWorld));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_quest", pWhereLocalWorld));
 	while(RES->next())
 	{
 		// it for every world initilize quest progress size
@@ -263,8 +260,8 @@ void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 			&QuestBot[MobID].ItemGivesCount[0], &QuestBot[MobID].ItemGivesCount[1],
 			&QuestBot[MobID].NeedMobCount[0], &QuestBot[MobID].NeedMobCount[1]);
 
-		// загрузить разговоры NPC
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_quest_npc", "WHERE MobID = '%d'", MobID));
+		// load NPC
+		std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_quest_npc", "WHERE MobID = '%d'", MobID));
 		while(RES->next())
 		{
 			TalkingData LoadTalk;
@@ -296,10 +293,10 @@ void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 	}
 }
 
-// Загрузка обычных NPC
+// load NPC
 void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_npc", pWhereLocalWorld));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_npc", pWhereLocalWorld));
 	while(RES->next())
 	{
 		const int MobID = (int)RES->getInt("ID");
@@ -315,8 +312,7 @@ void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 		for(int c = 0; c < CountMobs; c++)
 			GS()->CreateBot(BotsTypes::TYPE_BOT_NPC, NpcBot[MobID].BotID, MobID);
 
-		// загрузить разговоры NPC
-		boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_other_npc", "WHERE MobID = '%d'", MobID));
+		std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_other_npc", "WHERE MobID = '%d'", MobID));
 		while(RES->next())
 		{
 			TalkingData LoadTalk;
@@ -335,10 +331,10 @@ void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 	}
 }
 
-// Загрузка мобов
+// load mobs
 void BotJob::LoadMobsBots(const char* pWhereLocalWorld)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_mobs", pWhereLocalWorld));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_mobs", pWhereLocalWorld));
 	while(RES->next())
 	{
 		const int MobID = (int)RES->getInt("ID");
@@ -394,27 +390,27 @@ void BotJob::FindThreadPath(class CPlayerBot* pBotPlayer, vec2 StartPos, vec2 Se
 		return;
 
 	std::thread([pBotPlayer, StartPos, SearchPos]()
-		{
-			lockingPath.lock();
-			pBotPlayer->GS()->PathFinder()->Init();
-			pBotPlayer->GS()->PathFinder()->SetStart(StartPos);
-			pBotPlayer->GS()->PathFinder()->SetEnd(SearchPos);
-			pBotPlayer->GS()->PathFinder()->FindPath();
-			pBotPlayer->m_PathSize = pBotPlayer->GS()->PathFinder()->m_FinalSize;
-			for(int i = pBotPlayer->m_PathSize - 1, j = 0; i >= 0; i--, j++)
-				pBotPlayer->m_WayPoints[j] = vec2(pBotPlayer->GS()->PathFinder()->m_lFinalPath[i].m_Pos.x * 32 + 16, pBotPlayer->GS()->PathFinder()->m_lFinalPath[i].m_Pos.y * 32 + 16);
-	
-			lockingPath.unlock();
-		}).detach();
+	{
+		lockingPath.lock();
+		pBotPlayer->GS()->PathFinder()->Init();
+		pBotPlayer->GS()->PathFinder()->SetStart(StartPos);
+		pBotPlayer->GS()->PathFinder()->SetEnd(SearchPos);
+		pBotPlayer->GS()->PathFinder()->FindPath();
+		pBotPlayer->m_PathSize = pBotPlayer->GS()->PathFinder()->m_FinalSize;
+		for(int i = pBotPlayer->m_PathSize - 1, j = 0; i >= 0; i--, j++)
+			pBotPlayer->m_WayPoints[j] = vec2(pBotPlayer->GS()->PathFinder()->m_lFinalPath[i].m_Pos.x * 32 + 16, pBotPlayer->GS()->PathFinder()->m_lFinalPath[i].m_Pos.y * 32 + 16);
+
+		lockingPath.unlock();
+	}).detach();
 }
 
 void BotJob::GetThreadRandomWaypointTarget(class CPlayerBot* pBotPlayer)
 {
 	std::thread([this, pBotPlayer]()
-		{
-			lockingPath.lock();
-			vec2 TargetPos = pBotPlayer->GS()->PathFinder()->GetRandomWaypoint();
-			pBotPlayer->m_TargetPos = vec2(TargetPos.x * 32, TargetPos.y * 32);
-			lockingPath.unlock();
-		}).detach();
+	{
+		lockingPath.lock();
+		vec2 TargetPos = pBotPlayer->GS()->PathFinder()->GetRandomWaypoint();
+		pBotPlayer->m_TargetPos = vec2(TargetPos.x * 32, TargetPos.y * 32);
+		lockingPath.unlock();
+	}).detach();
 }

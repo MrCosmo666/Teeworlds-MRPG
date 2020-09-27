@@ -1,14 +1,13 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <game/server/gamecontext.h>
-#include <engine/shared/config.h>
 
 #include "noctis_teleport.h"
 
 CNoctisTeleport::CNoctisTeleport(CGameWorld *pGameWorld, vec2 Pos, CCharacter* pPlayerChar, int SkillBonus)
 : CEntity(pGameWorld, CGameWorld::ENTYPE_NOCTIS_TELEPORT, Pos, 64.0f)
 {
-	// переданные аргументы
+	// transmitted arguments
 	m_pPlayerChar = pPlayerChar;
 	m_Direction = (m_pPlayerChar ? vec2(m_pPlayerChar->m_Core.m_Input.m_TargetX, m_pPlayerChar->m_Core.m_Input.m_TargetY) : vec2(0, 0));
 	m_SkillBonus = SkillBonus;
@@ -61,7 +60,7 @@ void CNoctisTeleport::Tick()
 			// take damage
 			vec2 Diff = SearchPos - OldPosition;
 			vec2 Force = normalize(Diff) * 16.0f;
-			pSearchPlayer->GetCharacter()->TakeDamage(Force * 24.0f, MaximalDamageSize, ClientID, WEAPON_NINJA);
+			pSearchPlayer->GetCharacter()->TakeDamage(Force * 12.0f, MaximalDamageSize, ClientID, WEAPON_NINJA);
 			GS()->CreateExplosion(SearchPos, m_pPlayerChar->GetPlayer()->GetCID(), WEAPON_GRENADE, 0);
 			GS()->CreateSound(SearchPos, SOUND_NINJA_HIT);
 		}
@@ -89,5 +88,4 @@ void CNoctisTeleport::Snap(int SnappingClient)
 	pObj->m_FromX = (int)m_Pos.x;
 	pObj->m_FromY = (int)m_Pos.y;
 	pObj->m_StartTick = Server()->Tick();
-
 }

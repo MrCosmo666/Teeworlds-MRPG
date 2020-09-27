@@ -21,7 +21,7 @@ def unzip(filename, where):
 
 def downloadAll(targets):
 	version = "master"
-	url = "https://github.com/kurosio/MmoTee-Libs/archive/{}.zip".format(version)
+	url = "https://github.com/MrCosmoTW/MmoTee-Libs/archive/{}.zip".format(version)
 
 	# download and unzip
 	src_package_libs = twlib.fetch_file(url)
@@ -50,6 +50,8 @@ def downloadAll(targets):
 		copy_tree(libs_dir + "/opus/", "other/opus/")
 	if "sdl" in targets:
 		copy_tree(libs_dir + "/sdl/", "other/sdl/")
+	if "discordgamesdk" in targets:
+		copy_tree(libs_dir + "/discordgamesdk/", "other/discordgamesdk/")
 
 	# cleanup
 	try:
@@ -61,7 +63,7 @@ def main():
     import argparse
     p = argparse.ArgumentParser(description="Download dep library and header files for Windows.")
     p.add_argument("targets", metavar="TARGET", nargs='+', 
-        choices=["boost", "curl", "freetype", "icu", "mysql", "openssl", "opus", "sdl"], 
+        choices=["boost", "curl", "freetype", "icu", "mysql", "openssl", "opus", "sdl", "discordgamesdk"], 
         help='Target to download.'
     )
     args = p.parse_args()

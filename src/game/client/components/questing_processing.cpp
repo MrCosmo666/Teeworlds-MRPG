@@ -35,7 +35,7 @@ void CQuestingProcessing::OnStateChange(int NewState, int OldState)
 void CQuestingProcessing::ProcessingRenderTable(int TableID, CUIRect &Box)
 {
 	CUIRect Table = Box;
-	float Space = TableID * 60.0f;
+	const float Space = TableID * 60.0f;
 	Table.h = 40.0f;
 	Table.y = Box.y + Space + 30.0f;
 
@@ -56,7 +56,7 @@ void CQuestingProcessing::ProcessingRenderTable(int TableID, CUIRect &Box)
 	}
 
 	//  ICON
-	float SizeIcon = 70.0f;
+	const float SizeIcon = 70.0f;
 	Table.VSplitRight(50.0f, 0, &Table);
 	Table.HSplitBottom(55.0f, 0, &Table);
 	m_pClient->m_pMenus->DoItemIcon(QuestTable[TableID].m_aIcon, Table, SizeIcon);
@@ -78,18 +78,17 @@ void CQuestingProcessing::OnRender()
 	if(!IsActive())
 		return;
 
-	int tabsize = TableSize();
-	float Width = 400 * 3.0f * Graphics()->ScreenAspect();
-	float Height = 400 * 3.0f;
+	const int tabsize = TableSize();
+	const float Width = 400 * 3.0f * Graphics()->ScreenAspect();
+	const float Height = 400 * 3.0f;
 	Graphics()->MapScreen(0, 0, Width, Height);
 
 	// --------------------- BACKGROUND -----------------------
 	// --------------------------------------------------------
-	float tx = Width / 3.0f, ty = Height / 2.5f, tw = Width / 3.0f, th = 60.0f;
+	const float tx = Width / 3.0f, ty = Height / 2.5f, tw = Width / 3.0f, th = 60.0f;
 	CUIRect BackgroundMain = { tx, ty - tabsize * (60.0f), tw, (45.0f + th * tabsize) };
 	BackgroundMain.Margin(5.0f, &BackgroundMain);
 	RenderTools()->DrawUIRect4(&BackgroundMain, COLOR_BACKGROUND, COLOR_BACKGROUND, COLOR_BACKGROUND / 1.2f, COLOR_BACKGROUND / 1.2f, CUI::CORNER_ALL, 30.0f);
-
 	BackgroundMain.VMargin(20.0f, &BackgroundMain);
 
 	// --------------------- DRAW TABLES ----------------------

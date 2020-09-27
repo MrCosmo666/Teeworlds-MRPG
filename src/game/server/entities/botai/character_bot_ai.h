@@ -35,7 +35,7 @@ private:
 	int m_BotTargetID;
 	int m_BotTargetLife;
 	bool m_BotTargetCollised;
-	std::map < int, int > m_ListDmgPlayers;
+	std::map < int, int > a_ListDmgPlayers;
 
 	virtual bool Spawn(class CPlayer *pPlayer, vec2 Pos);
 	virtual void Tick();
@@ -68,15 +68,6 @@ private:
 	bool BaseFunctionNPC();
 	void Move();
 	void Action();
-};
-
-class CEntityFunctionNurse : public CEntity
-{
-	int m_OwnerID;
-public:
-	CEntityFunctionNurse(CGameWorld* pGameWorld, int ClientID, vec2 Pos);
-	virtual void Tick();
-	virtual void Snap(int SnappingClient);
 };
 
 #endif

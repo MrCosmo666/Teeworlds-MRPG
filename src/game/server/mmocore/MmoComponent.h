@@ -3,8 +3,6 @@
 #ifndef GAME_SERVER_MMO_COMPONENT_H
 #define GAME_SERVER_MMO_COMPONENT_H
 
-#include <game/server/enum_context.h>
-
 class MmoComponent
 {
 protected:

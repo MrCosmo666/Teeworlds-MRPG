@@ -71,7 +71,6 @@ public:
 	CGS *m_pGameServer;
 	CGS *GS() const { return m_pGameServer; }
 
-	// ссылки на объекты класса Sql Work
 	AccountMainJob *Account() const { return m_pAccMain; }
 	BotJob *BotsData() const { return m_pBotsInfo; }
 	ItemJob *Item() const { return m_pItemWork; }
@@ -100,9 +99,9 @@ public:
 
 	// 
 	void LoadLogicWorld();
-	const char* PlayerName(int AccountID);
+	static const char* PlayerName(int AccountID);
 	void SaveAccount(CPlayer *pPlayer, int Table);
-	void ShowLoadingProgress(const char *Loading, int LoadCount);
+	void ShowLoadingProgress(const char* pLoading, int Size);
 	void ShowTopList(CPlayer* pPlayer, int TypeID);
 };
 

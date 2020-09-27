@@ -9,6 +9,8 @@
 /other/*/mac
 /other/*/windows
 __pycache__/
+*.dll
+*.dmg
 *.pyc
 *.pyo
 scripts/work/

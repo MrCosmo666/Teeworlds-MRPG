@@ -49,7 +49,6 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 		CTextCursor Cursor;
 		if (m_pClient->MmoServer() && m_pClient->m_aClients[ClientID].m_pLocalStats && a > 0.001f)
 		{
-			// ïåðåìåííûå
 			char aBuf[64], aIconPlayerType[32]; aIconPlayerType[0] = '\0';
 			vec4 ColorNameplates = vec4(1.0f, 1.0f, 1.0f, a);
 			vec4 OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.5f * a);
@@ -83,8 +82,6 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 					break;
 			}
 
-			// - - - - - - - - - - - - - - - -ÏÐÎÃÐÅÑÑ ÁÀÐ - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			bool ShowedProgressBar = false;
 			str_format(aBuf, sizeof(aBuf), "L%d%s", pClientStats->m_Level, aName);
 			float tw = TextRender()->TextWidth(0, FontSize, aBuf, -1, -1.0f);
@@ -98,8 +95,6 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 				ShowedProgressBar = true;
 			}
 
-			// - - - - - - - - - - - - - - -ÃÈËÜÄÈß ÈÃÐÎÊÀ - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			{
 				IntsToStr(pClientStats->m_StateName, 6, aBuf);
 				if (str_length(aBuf) > 3)
@@ -115,8 +110,6 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 				}
 			}
 
-			// - - - - - - - - - - -  - - - ÓÐÎÂÅÍÜ ÈÃÐÎÊÀ - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			{
 				TextRender()->TextColor(ColorNameplates.r, ColorNameplates.g, ColorNameplates.b, ColorNameplates.a);
 				TextRender()->TextOutlineColor(OutlineNameplates.r, OutlineNameplates.g, OutlineNameplates.b, OutlineNameplates.a);
@@ -127,24 +120,19 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 					vec4(ColorNameplates.r, ColorNameplates.g, ColorNameplates.b, ColorNameplates.a / 3.0f), vec4(1.0f, 1.0f, 1.0f, 1.0f), FontSize);
 				TextRender()->TextEx(&Cursor, aName, -1);
 			}
-			// - - - - - - - - - - - - -  ÇÍÀ×ÎÊ ÒÈÏÀ ÈÃÐÎÊÀ - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
-			if(aIconPlayerType[0] != '\0') // çíà÷îê òèïà
+
+			if(aIconPlayerType[0] != '\0')
 			{ 
 				CUIRect IconRect = { Cursor.m_X, Cursor.m_Y + FontSize / 5.0f, 16.0f, 16.0f };
 				m_pClient->m_pMenus->DoItemIcon(aIconPlayerType, IconRect, FontSize);
 			}
-						
-			// - - - - - - - - - - - - - - ÇÍÀ×ÎÊ ÊÂÅÑÒÎÂ  - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
-			if(pClientStats->m_ActiveQuest) // çíà÷îê êâåñòîâ
+
+			if(pClientStats->m_ActiveQuest)
 			{ 
 				CUIRect IconRect = { Position.x - 64.0f / 2.0f, Cursor.m_Y - 65.0f, 16.0f, 16.0f };
 				m_pClient->m_pMenus->DoItemIcon("quest_a", IconRect, 64.0f);
 			}
-
-			// - - - - - - - - - - - - - - -  ÒÈÏ ÀÃÐÅÑÑÈß - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
+			
 			{
 				const float FontSizeAgressed = FontSize - 8.0f;
 				const float twAgressed = TextRender()->TextWidth(0, FontSizeAgressed, GetMoodName(pClientStats->m_MoodType), -1, -1.0f);

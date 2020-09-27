@@ -749,7 +749,7 @@ int CGraphics_Threaded::IssueInit()
 	if (g_Config.m_DbgResizable) Flags |= IGraphicsBackend::INITFLAG_RESIZABLE;
 	if (g_Config.m_GfxUseX11XRandRWM) Flags |= IGraphicsBackend::INITFLAG_X11XRANDR;
 
-	return m_pBackend->Init("Teeworlds", &g_Config.m_GfxScreen, &g_Config.m_GfxScreenWidth,
+	return m_pBackend->Init("Teeworlds MRPG", &g_Config.m_GfxScreen, &g_Config.m_GfxScreenWidth,
 		&g_Config.m_GfxScreenHeight, &m_ScreenWidth, &m_ScreenHeight, g_Config.m_GfxFsaaSamples,
 		Flags, &m_DesktopScreenWidth, &m_DesktopScreenHeight);
 }
@@ -1026,6 +1026,11 @@ int CGraphics_Threaded::GetVideoModes(CVideoMode* pModes, int MaxModes, int Scre
 	KickCommandBuffer();
 	WaitForIdle();
 	return NumModes;
+}
+
+void CGraphics_Threaded::NotifyWindow()
+{
+	return m_pBackend->NotifyWindow();
 }
 
 extern IEngineGraphics* CreateEngineGraphicsThreaded() { return new CGraphics_Threaded(); }

@@ -336,7 +336,7 @@ void CLogicDungeonDoorKey::Tick()
 
 bool CLogicDungeonDoorKey::SyncStateChanges()
 {
-	// синхронизировать с живыми ботами
+	// sync with bots
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);

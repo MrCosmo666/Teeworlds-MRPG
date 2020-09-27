@@ -7,7 +7,7 @@
  
 class CraftJob : public MmoComponent
 {
- 	// создаем экземпляр класса лишь 1 шт так что можно использовать глобально
+ 	// create an instance of the class so that you can use it globally
 	struct CraftStruct
 	{
 		int ItemNeedID[3];
@@ -17,7 +17,7 @@ class CraftJob : public MmoComponent
 		int Price;
 		int WorldID;
 	};
-	typedef std::map < int , CraftStruct > CraftType;
+	typedef std::map <int, CraftStruct> CraftType;
 	static CraftType Craft;
 
 	void CraftItem(CPlayer* pPlayer, int CraftID);

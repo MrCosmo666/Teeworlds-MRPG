@@ -1,7 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
-#include <generated/server_data.h>
 #include <game/server/gamecontext.h>
 
 #include "npcwall.h"
@@ -9,13 +8,11 @@
 CNPCWall::CNPCWall(CGameWorld *pGameWorld, vec2 Pos, bool Left)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_NPC_DOOR, Pos)
 {
-	// прячем точку стены
 	if(!Left) 
 		m_Pos.y += 30;
 	else 
 		m_Pos.x -= 30;
 
-	// эффект поиска крыши
 	m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, (Left ? 'x' : 'y'), (Left ? '+' : '-'));
 	m_Active = false; 
 
@@ -24,7 +21,7 @@ CNPCWall::CNPCWall(CGameWorld *pGameWorld, vec2 Pos, bool Left)
 
 void CNPCWall::Tick()
 {
-	// ищем ботов игроков
+	// We're looking for bots
 	m_Active = false;	
 	for (CCharacter* pChar = (CCharacter*)GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter*)pChar->TypeNext())
 	{

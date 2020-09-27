@@ -1,4 +1,11 @@
 #include <base/detect.h>
+
+#if defined(CONF_FAMILY_WINDOWS)
+	// For FlashWindowEx, FLASHWINFO, FLASHW_TRAY
+	#define _WIN32_WINNT 0x0501
+	#define WINVER 0x0501
+#endif
+
 #include "SDL.h"
 #include "SDL_opengl.h"
 
@@ -6,6 +13,13 @@
 
 #include "graphics_threaded.h"
 #include "backend_sdl.h"
+
+#include "SDL_syswm.h"
+
+#if defined(SDL_VIDEO_DRIVER_X11)
+	#include <X11/Xutil.h>
+	#include <X11/Xlib.h>
+#endif
 
 #if defined(CONF_FAMILY_WINDOWS)
 PFNGLTEXIMAGE3DPROC glTexImage3DInternal;
@@ -881,5 +895,43 @@ int CGraphicsBackend_SDL_OpenGL::WindowOpen()
 
 }
 
+void CGraphicsBackend_SDL_OpenGL::NotifyWindow()
+{
+	// get window handle
+	SDL_SysWMinfo info;
+	SDL_VERSION(&info.version);
+	if (!SDL_GetWindowWMInfo(m_pWindow, &info))
+	{
+		dbg_msg("gfx", "unable to obtain window handle");
+		return;
+	}
+
+#if defined(CONF_FAMILY_WINDOWS)
+	FLASHWINFO desc;
+	desc.cbSize = sizeof(desc);
+	desc.hwnd = info.info.win.window;
+	desc.dwFlags = FLASHW_TRAY;
+	desc.uCount = 3; // flash 3 times
+	desc.dwTimeout = 0;
+
+	FlashWindowEx(&desc);
+#elif defined(SDL_VIDEO_DRIVER_X11) && !defined(CONF_PLATFORM_MACOSX)
+	Display* dpy = info.info.x11.display;
+	Window win = info.info.x11.window;
+
+	// Old hints
+	XWMHints* wmhints;
+	wmhints = XAllocWMHints();
+	wmhints->flags = XUrgencyHint;
+	XSetWMHints(dpy, win, wmhints);
+	XFree(wmhints);
+
+	// More modern way of notifying
+	static Atom demandsAttention = XInternAtom(dpy, "_NET_WM_STATE_DEMANDS_ATTENTION", true);
+	static Atom wmState = XInternAtom(dpy, "_NET_WM_STATE", true);
+	XChangeProperty(dpy, win, wmState, XA_ATOM, 32, PropModeReplace,
+		(unsigned char*)&demandsAttention, 1);
+#endif
+}
 
 IGraphicsBackend* CreateGraphicsBackend() { return new CGraphicsBackend_SDL_OpenGL; }

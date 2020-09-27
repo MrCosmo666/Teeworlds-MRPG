@@ -63,7 +63,7 @@ namespace SleepyDiscord {
 	}
 
 	Response BaseDiscordClient::request(const RequestMethod method, Route path, const std::string jsonParameters,
-		const std::vector<Part>& multipartParameters, RequestCallback callback, RequestMode mode
+		const std::vector<Part>& multipartParameters, RequestCallback callback, const RequestMode mode
 	) {
 		//check if rate limited
 		Response response;
@@ -128,34 +128,34 @@ namespace SleepyDiscord {
 					);
 				}
 			default:
-				{		//error
+				{		
+					//error
 					const ErrorCode code = static_cast<ErrorCode>(response.statusCode);
-					setError(code);		//https error
-					if (!response.text.empty()) {
-					//json::Values values = json::getValues(response.text.c_str(),
-					//{ "code", "message" });	//parse json to get code and message
-					rapidjson::Document document;
-					document.Parse(response.text.c_str());
-					if (!document.IsObject()) 
+					setError(code);	//https error
+					if (!response.text.empty()) 
 					{
-						onError(GENERAL_ERROR, "No error code or message from Discord");
-					}
-					else
-					{
-						auto errorCode = document.FindMember("code");
-						auto errorMessage = document.FindMember("message");
-						if (errorCode != document.MemberEnd())
-							onError(
-								static_cast<ErrorCode>(errorCode->value.GetInt()),
-								{ errorMessage != document.MemberEnd() ? errorMessage->value.GetString() : "" }
-						);
-						else if (!response.text.empty())
-							onError(ERROR_NOTE, response.text);
-					}
-//#if defined(__cpp_exceptions) || defined(__EXCEPTIONS)
-//						if (static_cast<int>(mode) & static_cast<int>(ThrowError))
-//							throw code;
-//#endif
+						rapidjson::Document document;
+						document.Parse(response.text.c_str());
+						if (!document.IsObject()) 
+						{
+							onError(GENERAL_ERROR, "No error code or message from Discord");
+						}
+						else
+						{
+							auto errorCode = document.FindMember("code");
+							auto errorMessage = document.FindMember("message");
+							if (errorCode != document.MemberEnd())
+								onError(
+									static_cast<ErrorCode>(errorCode->value.GetInt()),
+									{ errorMessage != document.MemberEnd() ? errorMessage->value.GetString() : "" }
+							);
+							else if (!response.text.empty())
+								onError(ERROR_NOTE, response.text);
+						}
+	//#if defined(__cpp_exceptions) || defined(__EXCEPTIONS)
+	//						if (static_cast<int>(mode) & static_cast<int>(ThrowError))
+	//							throw code;
+	//#endif
 					}
 				} break;
 			}
@@ -826,7 +826,7 @@ namespace SleepyDiscord {
 			//the +1 and -1 removes the { and }
 			const std::string identifier = path.substr(start + 1, end - start - 1);
 
-			auto foundParam = majorParameters.find(identifier.c_str());
+			auto foundParam = majorParameters.find(identifier);
 			if (foundParam != majorParameters.end()) {
 				foundParam->second = replacement;
 			}

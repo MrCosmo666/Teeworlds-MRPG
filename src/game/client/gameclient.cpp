@@ -1947,6 +1947,14 @@ void CGameClient::UpdateStateMmoMusic()
 		m_pSounds->Stop(m_WorldMusicID);
 }
 
+CNetObj_Mmo_ClientInfo* CGameClient::GetMMOInfo() const
+{
+	if (Client()->State() != IClient::STATE_ONLINE || !MmoServer() || m_LocalClientID < 0 || m_LocalClientID >= MAX_CLIENTS || !m_aClients[m_LocalClientID].m_pLocalStats)
+		return 0x0;
+
+	return (CNetObj_Mmo_ClientInfo *)m_aClients[m_LocalClientID].m_pLocalStats;
+}
+
 void CGameClient::DoEnterMessage(const char *pName, int ClientID, int Team)
 {
 	char aBuf[128], aLabel[64];

@@ -36,6 +36,21 @@ public:
 	// mmotee
 	const json_value *LoadMmoInfo();
 	void LoadMmoInfoJson();
+	void LoadMmoServers();
+	void RecheckMRPGServers();
+
+	struct CMRPGServers
+	{
+		enum
+		{
+			MAX_SERVERS = 1024
+		};
+
+		NETADDR m_aServers[MAX_SERVERS];
+		int m_NumServers;
+
+		void Reset() { m_NumServers = 0; };
+	} m_MRPGNet;
 
 	int NumServers() const { return m_aServerlist[m_ActServerlistType].m_NumServers; }
 	int NumPlayers() const { return m_aServerlist[m_ActServerlistType].m_NumPlayers; }

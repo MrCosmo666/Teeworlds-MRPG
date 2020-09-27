@@ -8,22 +8,24 @@ using namespace sqlstr;
 std::map < int , AetherJob::StructTeleport > AetherJob::Teleport;
 
 void AetherJob::OnInit()
-{ 
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_aethers"));
-	while(RES->next())
+{
+	SJK.SDT("*", "tw_aethers", [&](ResultSet* RES)
 	{
-		const int ID = RES->getInt("ID");
-		str_copy(Teleport[ID].TeleName, RES->getString("TeleName").c_str(), sizeof(Teleport[ID].TeleName));
-		Teleport[ID].TeleX = RES->getInt("TeleX");
-		Teleport[ID].TeleY = RES->getInt("TeleY");
-		Teleport[ID].WorldID = RES->getInt("WorldID");
-	}
-	Job()->ShowLoadingProgress("Aethers", Teleport.size());	
+		while(RES->next())
+		{
+			const int ID = RES->getInt("ID");
+			str_copy(Teleport[ID].TeleName, RES->getString("TeleName").c_str(), sizeof(Teleport[ID].TeleName));
+			Teleport[ID].TeleX = RES->getInt("TeleX");
+			Teleport[ID].TeleY = RES->getInt("TeleY");
+			Teleport[ID].WorldID = RES->getInt("WorldID");
+		}
+		Job()->ShowLoadingProgress("Aethers", Teleport.size());
+	});
 }
 
 void AetherJob::OnInitAccount(CPlayer *pPlayer)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_locations", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_locations", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
 	while(RES->next())
 	{
 		int TeleportID = RES->getInt("TeleportID");
@@ -35,7 +37,7 @@ bool AetherJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID
 {
 	const int ClientID = pPlayer->GetCID();
 
-	// телепорт
+	// teleport
 	if(PPSTR(CMD, "TELEPORT") == 0)
 	{
 		const int TeleportID = VoteID;
@@ -70,14 +72,14 @@ bool AetherJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 		GS()->Chat(ClientID, "You can see menu in the votes!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
 		UnlockLocation(pChr->GetPlayer(), pChr->m_Core.m_Pos);
-		GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_AETHER_TELEPORT))
 	{
 		GS()->Chat(ClientID, "You left the active zone, menu is restored!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
-		GS()->VResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 
@@ -124,7 +126,7 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 {
 	CPlayer* pPlayer = pChar->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
-	GS()->ShowValueInformation(pPlayer);
+	GS()->ShowItemValueInformation(pPlayer);
 	GS()->AV(ClientID, "null", "");
 	
 	GS()->AVH(ClientID, TAB_AETHER, GOLDEN_COLOR, "Available aethers");

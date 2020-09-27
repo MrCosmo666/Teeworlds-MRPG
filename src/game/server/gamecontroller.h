@@ -5,9 +5,7 @@
 
 #include <base/vmath.h>
 #include <game/commands.h>
-
 #include <game/server/enum_context.h>
-#include <generated/protocol.h>
 
 /*
 	Class: Game Controller
@@ -67,7 +65,6 @@ public:
 	void OnPlayerInfoChange(class CPlayer *pPlayer, int WorldID);
 	void OnReset();
 
-	// хуй манал
 	virtual void CreateLogic(int Type, int Mode, vec2 Pos, int Health) = 0;
 	
 	// general

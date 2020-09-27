@@ -306,6 +306,7 @@ private:
 		PAGE_SERVER_INFO,
 		PAGE_CALLVOTE,
 		PAGE_INTERNET,
+		PAGE_MRPG,
 		PAGE_FAVORITES,
 		PAGE_LAN,
 		PAGE_DEMOS,
@@ -510,12 +511,19 @@ private:
 	int *m_pActiveDropdown;
 
 	// demo
+	enum
+	{
+		SORT_DEMONAME = 0,
+		SORT_DATE,
+	};
+
 	struct CDemoItem
 	{
 		char m_aFilename[128];
 		char m_aName[128];
 		bool m_IsDir;
 		int m_StorageType;
+		time_t m_Date;
 
 		bool m_InfosLoaded;
 		bool m_Valid;
@@ -541,6 +549,39 @@ private:
 		}
 	};
 
+	class CDemoComparator
+	{
+		int m_Type;
+		int m_Order;
+	public:
+		CDemoComparator(int Type, int Order)
+		{
+			m_Type = Type;
+			m_Order = Order;
+		}
+
+		bool operator()(const CDemoItem& Self, const CDemoItem& Other)
+		{
+			if(!str_comp(Self.m_aFilename, ".."))
+				return true;
+			if(!str_comp(Other.m_aFilename, ".."))
+				return false;
+			if(Self.m_IsDir && !Other.m_IsDir)
+				return true;
+			if(!Self.m_IsDir && Other.m_IsDir)
+				return false;
+
+			const CDemoItem& Left = m_Order ? Other : Self;
+			const CDemoItem& Right = m_Order ? Self : Other;
+
+			if(m_Type == SORT_DEMONAME)
+				return str_comp_nocase(Left.m_aFilename, Right.m_aFilename) < 0;
+			else if(m_Type == SORT_DATE)
+				return Left.m_Date < Right.m_Date;
+			return false;
+		}
+	};
+	
 	sorted_array<CDemoItem> m_lDemos;
 	char m_aCurrentDemoFolder[256];
 	char m_aCurrentDemoFile[64];
@@ -552,7 +593,7 @@ private:
 
 	void DemolistOnUpdate(bool Reset);
 	void DemolistPopulate();
-	static int DemolistFetchCallback(const char *pName, int IsDir, int StorageType, void *pUser);
+	static int DemolistFetchCallback(const char* pName, time_t Date, int IsDir, int StorageType, void* pUser);
 
 	// friends
 	class CFriendItem
@@ -603,6 +644,7 @@ private:
 
 		static CServerFilterInfo ms_FilterStandard;
 		static CServerFilterInfo ms_FilterFavorites;
+		static CServerFilterInfo ms_FilterMRPG;
 		static CServerFilterInfo ms_FilterAll;
 
 	public:
@@ -612,6 +654,7 @@ private:
 			FILTER_ALL,
 			FILTER_STANDARD,
 			FILTER_FAVORITES,
+			FILTER_MRPG
 		};
 		// buttons var
 		int m_SwitchButton;
@@ -690,6 +733,11 @@ private:
 		COL_BROWSER_PING,
 		NUM_BROWSER_COLS,
 
+		COL_DEMO_ICON = 0,
+		COL_DEMO_NAME,
+		COL_DEMO_DATE,
+		NUM_DEMO_COLS,
+
 		SIDEBAR_TAB_INFO = 0,
 		SIDEBAR_TAB_FILTER,
 		SIDEBAR_TAB_FRIEND,
@@ -709,6 +757,7 @@ private:
 	int m_aSelectedServers[IServerBrowser::NUM_TYPES]; // -1 if none selected
 	int m_AddressSelection;
 	static CColumn ms_aBrowserCols[NUM_BROWSER_COLS];
+	static CColumn ms_aDemoCols[NUM_DEMO_COLS];
 
 	CBrowserFilter* GetSelectedBrowserFilter()
 	{

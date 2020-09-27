@@ -1,7 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
-
 #include <base/math.h>
 #include <base/vmath.h>
 #include <generated/protocol.h>
@@ -89,7 +87,7 @@ void CDropBonuses::Snap(int SnappingClient)
 	if(m_Flashing || NetworkClipped(SnappingClient))
 		return;
 
-	// проверка клиента если чекнут дальше не рисуем
+	// client verification if the check is not drawn anymore
 	if(GS()->CheckClient(SnappingClient))
 	{
 		CNetObj_MmoPickup* pObj = static_cast<CNetObj_MmoPickup*>(Server()->SnapNewItem(NETOBJTYPE_MMOPICKUP, GetID(), sizeof(CNetObj_MmoPickup)));

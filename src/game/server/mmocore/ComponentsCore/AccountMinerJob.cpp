@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
-#include <teeother/components/localization.h>
 #include "AccountMinerJob.h"
 
 using namespace sqlstr;
@@ -78,7 +77,7 @@ void AccountMinerJob::Work(CPlayer *pPlayer, int Level)
 
 void AccountMinerJob::OnInitAccount(CPlayer* pPlayer)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_miner", "WHERE AccountID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_miner", "WHERE AccountID = '%d'", pPlayer->Acc().AuthID));
 	if (RES->next())
 	{
 		for (int i = 0; i < NUM_MINER; i++)
@@ -92,7 +91,7 @@ void AccountMinerJob::OnInitAccount(CPlayer* pPlayer)
 
 void AccountMinerJob::OnInitWorld(const char* pWhereLocalWorld)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_position_miner", pWhereLocalWorld));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_position_miner", pWhereLocalWorld));
 	while (RES->next())
 	{
 		const int ID = RES->getInt("ID");
@@ -115,7 +114,7 @@ bool AccountMinerJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int 
 		if (pPlayer->Upgrade(Get, &pPlayer->Acc().Miner[VoteID], &pPlayer->Acc().Miner[MnrUpgrade], VoteID2, 3, aBuf))
 		{
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_MINER_DATA);
-			GS()->VResetVotes(ClientID, MenuList::MENU_UPGRADE);
+			GS()->UpdateVotes(ClientID, MenuList::MENU_UPGRADE);
 		}
 		return true;
 	}

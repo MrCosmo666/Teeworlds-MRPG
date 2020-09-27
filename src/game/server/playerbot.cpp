@@ -1,7 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
-
 #include "entities/botai/character_bot_ai.h"
 #include "gamecontext.h"
 #include "mmocore/PathFinder.h"
@@ -50,7 +48,7 @@ void CPlayerBot::Tick()
 
 	if(m_pCharacter)
 	{
-		if(m_pCharacter->IsAlive() && GS()->CheckPlayersDistance(m_pCharacter->GetPos(), 1000.0f))
+		if(m_pCharacter->IsAlive() && GS()->CheckingPlayersDistance(m_pCharacter->GetPos(), 1000.0f))
 		{
 			TickThreadMobsPathFinder();
 			m_ViewPos = m_pCharacter->GetPos();
@@ -75,7 +73,7 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 		return 10;
 
 	int Power = BotJob::MobBot[m_SubBotID].Power;
-	for (int i = 0; i < EQUIP_MAX_BOTS; i++)
+	for (int i = 0; i < MAX_EQUIPPED_SLOTS_BOTS; i++)
 	{
 		const int ItemID = GetEquippedItem(i);
 		const int ItemBonusCount = GS()->GetItemInfo(ItemID).GetStatsBonus(BonusID);
@@ -96,7 +94,6 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 	return Power;
 }
 
-// Спавн игрока
 void CPlayerBot::TryRespawn()
 {
 	// close spawn mobs on non allowed spawn dungeon
@@ -116,16 +113,15 @@ void CPlayerBot::TryRespawn()
 	else if(SpawnType == BotsTypes::TYPE_BOT_QUEST)
 		SpawnPos = vec2(BotJob::QuestBot[m_SubBotID].PositionX, BotJob::QuestBot[m_SubBotID].PositionY);
 	
-	// создаем бота
 	const int savecidmem = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
 	m_pCharacter = new(savecidmem) CCharacterBotAI(&GS()->m_World);
 	m_pCharacter->Spawn(this, SpawnPos);
 
-	// чтобы не было видно эффектов что НПС не видемый для одного игрока был видем другому
+	// so that no effects can be seen that an NPC that is not visible to one player is visible to another player
 	if(SpawnType != BotsTypes::TYPE_BOT_QUEST)
 		GS()->CreatePlayerSpawn(SpawnPos);
 
-	// сбросить респавн в данжах если он был разрешен
+	// reset the dungeon, if allowed
 	if (SpawnType == BotsTypes::TYPE_BOT_MOB && GS()->IsDungeon() && m_DungeonAllowedSpawn)
 		m_DungeonAllowedSpawn = false;
 }
@@ -165,7 +161,6 @@ int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 	return 2;
 }
 
-// Рисовка игрока как бота
 void CPlayerBot::Snap(int SnappingClient)
 {
 	if(!Server()->ClientIngame(m_ClientID) || !IsActiveSnappingBot(SnappingClient))
@@ -241,6 +236,7 @@ bool CPlayerBot::IsActiveQuests(int SnapClientID) const
 			return true;
 		return false;
 	}
+
 	return false;
 }
 
@@ -248,6 +244,7 @@ int CPlayerBot::GetEquippedItem(int EquipID, int SkipItemID) const
 {
 	if (EquipID < EQUIP_HAMMER || EquipID > EQUIP_WINGS || EquipID == EQUIP_MINER)
 		return -1;
+
 	return BotJob::DataBot[m_BotID].EquipSlot[EquipID];
 }
 
@@ -262,8 +259,10 @@ const char* CPlayerBot::GetStatusBot() const
 	{
 		if (GS()->IsDungeon())
 			return "Boss";
+		
 		return "Raid";
 	}
+
 	return "\0";
 }
 
@@ -308,7 +307,7 @@ void CPlayerBot::TickThreadMobsPathFinder()
 
 void CPlayerBot::SendClientInfo(int TargetID)
 {
-	if(TargetID != -1 && (TargetID < 0 || TargetID >= MAX_PLAYERS || !Server()->ClientIngame(TargetID)))
+	if((TargetID != -1 && (TargetID < 0 || TargetID >= MAX_PLAYERS || !Server()->ClientIngame(TargetID))) || m_BotType == BotsTypes::TYPE_BOT_FAKE)
 		return;
 
 	CNetMsg_Sv_ClientInfo ClientInfoMsg;

@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
-#include <teeother/components/localization.h>
 #include "AccountPlantJob.h"
 
 using namespace sqlstr;
@@ -10,7 +9,7 @@ std::map < int , AccountPlantJob::StructPlants > AccountPlantJob::Plants;
 
 void AccountPlantJob::OnInitWorld(const char* pWhereLocalWorld)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_position_plant", pWhereLocalWorld));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_position_plant", pWhereLocalWorld));
 	while(RES->next())
 	{
 		const int ID = RES->getInt("ID");
@@ -24,7 +23,7 @@ void AccountPlantJob::OnInitWorld(const char* pWhereLocalWorld)
 
 void AccountPlantJob::OnInitAccount(CPlayer *pPlayer)
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_plants", "WHERE AccountID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_plants", "WHERE AccountID = '%d'", pPlayer->Acc().AuthID));
 	if(RES->next())
 	{
 		for(int i = 0; i < NUM_PLANT; i++)
@@ -114,7 +113,7 @@ bool AccountPlantJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int 
 		if(pPlayer->Upgrade(Get, &pPlayer->Acc().Plant[VoteID], &pPlayer->Acc().Plant[PlUpgrade], VoteID2, 3, aBuf))
 		{
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_PLANT_DATA);
-			GS()->VResetVotes(ClientID, MenuList::MENU_UPGRADE);
+			GS()->UpdateVotes(ClientID, MenuList::MENU_UPGRADE);
 		}
 		return true;
 	}	

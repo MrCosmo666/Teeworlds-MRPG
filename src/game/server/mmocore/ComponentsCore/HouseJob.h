@@ -78,13 +78,13 @@ public:
 	/* #########################################################################
 		FUNCTIONS HOUSES 
 	######################################################################### */
-	bool BuyHouse(int HouseID, CPlayer *pPlayer);
+	void BuyHouse(int HouseID, CPlayer *pPlayer);
 	void SellHouse(int HouseID);
 
 	void TakeFromSafeDeposit(CPlayer *pPlayer, int TakeCount);
 	void AddSafeDeposit(CPlayer *pPlayer, int Balance);
 	
-	void ChangeStateDoor(int HouseID);
+	bool ChangeStateDoor(int HouseID);
 
 	/* #########################################################################
 		PARSING HOUSES 

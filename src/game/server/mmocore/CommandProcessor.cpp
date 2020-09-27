@@ -1,4 +1,3 @@
-#include <engine/shared/config.h>
 #include <engine/server.h>
 
 #include <teeother/components/localization.h>
@@ -6,13 +5,15 @@
 #include "CommandProcessor.h"
 
 /*
-	Later lead to quality standard code
+	Later lead to quality
 */
 
 void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 {
 	LastChat(GS, pPlayer);
 	const int ClientID = pPlayer->GetCID();
+
+	// AUTHORISATION
 	if(str_comp_num(Msg->m_pMessage, "/login", 6) == 0)
 	{
 		if (pPlayer->IsAuthed())
@@ -21,18 +22,16 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 			return;
 		}
 
-		// если аргументы не совпадают
 		char Username[256], Password[256];
 		if (sscanf(Msg->m_pMessage, "/login %s %s", Username, Password) != 2)
 			return GS->ChatFollow(ClientID, "Use: /login <username> <password>");
 
-		// загружаем аккаунт и данные если он загрузился
 		if (GS->Mmo()->Account()->LoginAccount(ClientID, Username, Password) == AUTH_LOGIN_GOOD)
 			GS->Mmo()->Account()->LoadAccount(pPlayer, true);
 		return;
 	}
 
-	// регистрация аккаунта
+	// REGISTRATION
 	else if(str_comp_num(Msg->m_pMessage, "/register", 9) == 0)
 	{
 		if (pPlayer->IsAuthed())
@@ -41,12 +40,10 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 			return;
 		}
 
-		// если аргументы не совпадают
 		char Username[256], Password[256];
 		if (sscanf(Msg->m_pMessage, "/register %s %s", Username, Password) != 2)
 			return GS->ChatFollow(ClientID, "Use: /register <username> <password>");
 
-		// регестрируем аккаунт
 		GS->Mmo()->Account()->RegisterAccount(ClientID, Username, Password);
 		return;
 	}
@@ -75,8 +72,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		if(!pPlayer->IsAuthed())
 			return;
 
-		// start parsing
-		if(pPlayer->Acc().GuildID > 0)
+		if(pPlayer->Acc().IsGuild())
 		{
 			int AuthID = pPlayer->Acc().AuthID;
 			ExitGuild(GS, AuthID);
@@ -88,8 +84,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		if(!pPlayer->IsAuthed())
 			return;
 
-		// create member
-		if(pPlayer->Acc().GuildID <= 0)
+		if(!pPlayer->Acc().IsGuild())
 		{
 			char GuildName[256];
 			if(sscanf(Msg->m_pMessage, "/gcreate %s", GuildName) != 1) 
@@ -109,7 +104,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		if(!pPlayer->IsAuthed())
 			return;
 
-		int HouseID = PlayerHouseID(GS, pPlayer);
+		const int HouseID = PlayerHouseID(GS, pPlayer);
 		ChangeStateDoor(GS, HouseID);
 		return;
 	}
@@ -119,10 +114,13 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 			return;
 
 		// check owner house id
-		int HouseID = PlayerHouseID(GS, pPlayer);
+		const int HouseID = PlayerHouseID(GS, pPlayer);
 		if(HouseID < 0)
-			return GS->Chat(ClientID, "You have no home.");
-
+		{
+			GS->Chat(ClientID, "You have no home.");
+			return;
+		}
+		
 		// sell house
 		GS->Mmo()->House()->SellHouse(HouseID);
 		return;
@@ -135,21 +133,10 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		if(!pPlayer->GetCharacter())
 			return;
 
-		int PosX = pPlayer->GetCharacter()->m_Core.m_Pos.x/32;
-		int PosY = pPlayer->GetCharacter()->m_Core.m_Pos.y/32;
+		const int PosX = pPlayer->GetCharacter()->m_Core.m_Pos.x/32;
+		const int PosY = pPlayer->GetCharacter()->m_Core.m_Pos.y/32;
 		GS->Chat(ClientID, "[{STR}] Position X: {INT} Y: {INT}.", GS->Server()->GetWorldName(GS->GetWorldID()), &PosX, &PosY);
 		dbg_msg("test", "%0.f %0.f WorldID: %d", pPlayer->GetCharacter()->m_Core.m_Pos.x, pPlayer->GetCharacter()->m_Core.m_Pos.y, GS->GetWorldID());
-		return;
-	}
-
-	else if (str_comp_num(Msg->m_pMessage, "/test", 5) == 0)
-	{
-		char GuildName[256];
-		if (sscanf(Msg->m_pMessage, "/test %s", GuildName) != 1)
-			return GS->ChatFollow(ClientID, "Use: /test <effect>");
-
-
-		pPlayer->GiveEffect(GuildName, 10, 0);
 		return;
 	}
 	else if (str_comp_num(Msg->m_pMessage, "/sd", 3) == 0 && GS->Server()->IsAuthed(ClientID))
@@ -158,7 +145,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		if ((sscanf(Msg->m_pMessage, "/sd %d", &size)) != 1)
 			return GS->ChatFollow(ClientID, "Please use: /sd <idsound>");
 
-		int soundid = clamp(size, 0, 40);
+		const int soundid = clamp(size, 0, 40);
 		if (GS->GetPlayerChar(ClientID))
 			GS->CreateSound(pPlayer->GetCharacter()->m_Core.m_Pos, soundid);
 		return;
@@ -172,6 +159,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		int sitemid = 0;
 		if ((sscanf(Msg->m_pMessage, "/useitem %d", &sitemid)) != 1)
 			return GS->ChatFollow(ClientID, "Please use: /useitem <itemid>");
+		
 		UseItems(GS, ClientID, sitemid, 1);
 		return;
 	}
@@ -185,9 +173,7 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		if ((sscanf(Msg->m_pMessage, "/useskill %d", &sskillid)) != 1)
 			return GS->ChatFollow(ClientID, "Please use: /useitem <itemid>");
 
-		int sizeskills = GS->Mmo()->Skills()->SkillsSize();
-		int skillid = clamp(sskillid, 0, sizeskills);
-		UseSkill(GS, pPlayer, skillid);
+		UseSkill(GS, pPlayer, sskillid);
 		return;
 	}
 
@@ -199,10 +185,20 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		GS->ChatFollow(ClientID, "/register <name> <pass> - new account.");
 		GS->ChatFollow(ClientID, "/login <name> <pass> - log in account.");
 		GS->ChatFollow(ClientID, "/lang <codes iso> - language (translation is not complete).");
+		GS->ChatFollow(ClientID, "/rules - server rules.");
 		GS->ChatFollow(ClientID, "Another information see Wiki Page.");
 		return;
 	}
-
+	else if(str_comp_num(Msg->m_pMessage, "/rules", 6) == 0)
+	{
+		GS->ChatFollow(ClientID, "Server rules");
+		GS->ChatFollow(ClientID, "- Don't use bugs");
+		GS->ChatFollow(ClientID, "- Don't use bots and other hack soft");
+		GS->ChatFollow(ClientID, "- Don't use dummy multi-account's");
+		GS->ChatFollow(ClientID, "- Don't share self account data (login, password)");
+		GS->ChatFollow(ClientID, "- Do not use ads, that is not part of the game");
+		return;
+	}
 	if(str_comp_num(Msg->m_pMessage, "/", 1) == 0)
 	{
 		GS->ChatFollow(ClientID, "Command {STR} not found!", Msg->m_pMessage);

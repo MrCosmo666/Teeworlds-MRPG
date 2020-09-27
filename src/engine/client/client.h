@@ -66,6 +66,7 @@ class CClient : public IClient, public CDemoPlayer::IListener
 	IStorage* m_pStorage;
 	IUpdater* m_pUpdater;
 	IEngineMasterServer* m_pMasterServer;
+	IDiscord* m_pDiscord;
 
 	enum
 	{
@@ -205,6 +206,7 @@ public:
 	IEngineMasterServer* MasterServer() { return m_pMasterServer; }
 	IStorage* Storage() { return m_pStorage; }
 	IUpdater* Updater() { return m_pUpdater; }
+	IDiscord* Discord() { return m_pDiscord; }
 
 	CClient();
 
@@ -346,5 +348,12 @@ public:
 	void ToggleFullscreen();
 	void ToggleWindowBordered();
 	void ToggleWindowVSync();
+
+	// mrpg
+private:
+
+public:
+
+	void NotifyWindow();
 };
 #endif

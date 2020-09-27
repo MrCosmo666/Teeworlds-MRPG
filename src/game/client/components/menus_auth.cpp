@@ -70,13 +70,12 @@ void CMenus::RenderAuthWindow()
 	CUIRect MainView = *UI()->Screen();
 	Graphics()->MapScreen(MainView.x, MainView.y, MainView.w, MainView.h);
 
-	// устанавливаем стороны
 	CUIRect Basic = MainView, BasicLeft, BasicRight, Label;
 	Basic.VSplitMid(&BasicLeft, &BasicRight);
 	BasicLeft.VSplitLeft(30.0f, 0, &BasicLeft);
 	BasicRight.VSplitRight(30.0f, &BasicRight, 0);
 
-	{ // рисуем фон лого
+	{
 		CUIRect BackgroundLogo;
 		Basic.VMargin(25.0f, &BackgroundLogo);
 		BackgroundLogo.HMargin(100.0f, &BackgroundLogo);
@@ -174,7 +173,6 @@ void CMenus::RenderAuthWindow()
 	// --------------------- REGISTER / LOGIN SIDE --------------------------
 	// -----------------------------------------------------------
 	{
-		// устанавливаем стороны
 		CUIRect BasicLogin, BasicRegister;
 		BackRight.VSplitMid(&BasicLogin, &BasicRegister);
 		BackRight.Margin(10.0f, &BackRight);
@@ -199,12 +197,9 @@ void CMenus::RenderAuthWindow()
 		// ----------------- LOGIN SIDE ( LEFT ) ----------------
 		// ------------------------------------------------------
 		{
-			// - авторизация название
 			BasicLogin.HSplitTop(25.0f, &Label, &BasicLogin);
 			UI()->DoLabel(&Label, Localize("Log in to account"), 16.0f, CUI::ALIGN_LEFT);
 
-			// - - - - - - - - - - - - - - - - - - ЛОГИН - - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			BasicLogin.HSplitTop(15.0f, &Label, &BasicLogin);
 			UI()->DoLabel(&Label, Localize("Login"), 12.0f, CUI::ALIGN_LEFT);
 			{
@@ -214,8 +209,6 @@ void CMenus::RenderAuthWindow()
 				DoEditBox(&s_boxAccountLogin, &Button, g_Config.m_AccountMRPG, sizeof(g_Config.m_AccountMRPG), Button.h * ms_FontmodHeight * 0.8f, &s_OffsetUsername);
 			}
 
-			// - - - - - - - - - - - - - - - - - -ПАРОЛЬ - - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			BasicLogin.HSplitTop(10.0f, 0, &BasicLogin); // spacer
 			BasicLogin.HSplitTop(15.0f, &Label, &BasicLogin);
 			UI()->DoLabel(&Label, Localize("Password"), 12.0f, CUI::ALIGN_LEFT);
@@ -226,8 +219,6 @@ void CMenus::RenderAuthWindow()
 				DoEditBox(&s_boxPasswordLogin, &Button, g_Config.m_PasswordMRPG, sizeof(g_Config.m_PasswordMRPG), Button.h* ms_FontmodHeight * 0.8f, &s_OffsetPassword, true);
 			}
 
-			// - - - - - - - - - - - - - - - - - -КНОПКИ - - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			BasicLogin.HSplitTop(60.0f, 0, &BasicLogin); // spacer
 			BasicLogin.HSplitTop(25.0f, &Button, &BasicLogin);
 			static CButtonContainer s_LoginButton;
@@ -239,17 +230,13 @@ void CMenus::RenderAuthWindow()
 		// ----------------- REGISTER SIDE ( RIGHT ) ----------------
 		// ----------------------------------------------------------
 		{
-			// - регистрация инфомрация
 			BasicRegister.HSplitTop(25.0f, &Label, &BasicRegister);
 			UI()->DoLabel(&Label, Localize("Register account"), 16.0f, CUI::ALIGN_LEFT);
 			
-			// - переменные
 			static char s_aAccount[64];
 			static char s_aPassword[64];
 			static char s_aRepeatPassword[64];
 
-			// - - - - - - - - - - - - - - - - - - ЛОГИН - - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			BasicRegister.HSplitTop(15.0f, &Label, &BasicRegister);
 			UI()->DoLabel(&Label, Localize("Login"), 12.0f, CUI::ALIGN_LEFT);
 			BasicRegister.HSplitTop(25.0f, &Button, &BasicRegister);
@@ -259,8 +246,6 @@ void CMenus::RenderAuthWindow()
 				DoEditBox(&s_boxAccountLogin, &Button, s_aAccount, sizeof(s_aAccount), Button.h * ms_FontmodHeight * 0.8f, &s_OffsetUsername);
 			}
 
-			// - - - - - - - - - - - - - - - - - -ПАРОЛЬ - - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			BasicRegister.HSplitTop(10.0f, 0, &BasicRegister); // spacer
 			BasicRegister.HSplitTop(15.0f, &Label, &BasicRegister);
 			UI()->DoLabel(&Label, Localize("Password"), 12.0f, CUI::ALIGN_LEFT);
@@ -270,8 +255,6 @@ void CMenus::RenderAuthWindow()
 				DoEditBox(&s_aPassword, &Button, s_aPassword, sizeof(s_aPassword), Button.h * ms_FontmodHeight * 0.8f, &s_OffsetPassword, true);
 			}
 
-			// - - - - - - - - - - - - - - ПОВТОР ПАРОЛЯ - - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			BasicRegister.HSplitTop(10.0f, 0, &BasicRegister); // spacer
 			BasicRegister.HSplitTop(15.0f, &Label, &BasicRegister);
 			UI()->DoLabel(&Label, Localize("Repeat password"), 12.0f, CUI::ALIGN_LEFT);
@@ -281,8 +264,6 @@ void CMenus::RenderAuthWindow()
 				DoEditBox(&s_aRepeatPassword, &Button, s_aRepeatPassword, sizeof(s_aRepeatPassword), Button.h * ms_FontmodHeight * 0.8f, &s_OffsetRepeatPassword, true);
 			}
 
-			// - - - - - - - - - - - - - - - - - -КНОПКИ - - - - - - - - - - - - - - - //
-			// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - //
 			BasicRegister.HSplitTop(10.0f, 0, &BasicRegister); // spacer
 			BasicRegister.HSplitTop(25.0f, &Button, &BasicRegister);
 			static CButtonContainer s_LoginButton;

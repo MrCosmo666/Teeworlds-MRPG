@@ -705,7 +705,7 @@ void CRenderTools::DrawUIText(ITextRender* pTextRender, CTextCursor* pCursor, co
 	pTextRender->TextShadowed(pCursor, pText, -1, vec2(0, 0), vec4(0, 0, 0, 0), TextColor);
 }
 
-void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color, int Num, int Max, const char* pText, const int Shares, const float Rounding, const float MarginSize)
+void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color, int Num, int Max, const char* pText, const int Shares, const float Rounding, const float MarginSize, float FontOffset)
 {
 	float ScreenX0, ScreenY0, ScreenX1, ScreenY1;
 	Graphics()->GetScreen(&ScreenX0, &ScreenY0, &ScreenX1, &ScreenY1);
@@ -716,7 +716,7 @@ void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color,
 
 	// Processing and centralizing the text by bar
 	const float FakeToScreenY = (Graphics()->ScreenHeight() / (ScreenY1 - ScreenY0));
-	const float FontSize = (float)(BackgroundProgress.h * FakeToScreenY) / FakeToScreenY;
+	const float FontSize = ((float)(BackgroundProgress.h * FakeToScreenY) / FakeToScreenY) - FontOffset;
 	const float TextWeidth = (float)pTextRender->TextWidth(nullptr, FontSize, pText, -1, -1.0f);
 	if (TextWeidth > Rect.w)
 	{

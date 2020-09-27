@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
 #include <teeother/system/string.h>
 
 #include <game/server/gamecontext.h>
@@ -9,10 +8,9 @@
 using namespace sqlstr;
 std::map < int , CraftJob::CraftStruct > CraftJob::Craft;
 
-// Инициализация класса
 void CraftJob::OnInit()
 {
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_craft_list"));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_craft_list"));
 	while(RES->next())
 	{
 		const int ID = RES->getInt("ID");
@@ -29,7 +27,7 @@ void CraftJob::OnInit()
 		if (!sscanf(aBuf, "%d %d %d", &Craft[ID].ItemNeedCount[0], &Craft[ID].ItemNeedCount[1], &Craft[ID].ItemNeedCount[2]))
 			dbg_msg("Error", "Error on scanf in Crafting");
 
-		// устанавливаем обычные переменные
+		// set the variables
 		Craft[ID].Price = RES->getInt("Price");
 		Craft[ID].WorldID = RES->getInt("WorldID");
 	}
@@ -69,14 +67,11 @@ bool CraftJob::ItEmptyType(int SelectType) const
 	return true;
 }
 
-// показать лист крафтов
 void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectType)
 {
-	// скипаем пустой список
 	if (ItEmptyType(SelectType))
 		return;
 
-	// добавляем голосования
 	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "{STR}", TypeName);
@@ -137,7 +132,7 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 		return;
 	}
 
-	// первая подбивка устанавливаем что доступно и требуется для снятия
+	// first podding set what is available and required for removal
 	dynamic_string Buffer;
 	for(int i = 0; i < 3; i++) 
 	{
@@ -161,7 +156,7 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 
 	dbg_msg("test", "here craft left");
 
-	// дальше уже организуем крафт
+	// we are already organizing the crafting
 	int Discount = (int)kurosio::translate_to_procent_rest(Craft[CraftID].Price, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount));
 	bool TickedDiscountCraft = pPlayer->GetItem(itTicketDiscountCraft).IsEquipped();
 	if(TickedDiscountCraft)
@@ -226,7 +221,7 @@ bool CraftJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_CRAFT, "If you will not have enough items for crafting");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_CRAFT, "You will write those and the amount that is still required");
 			GS()->AV(ClientID, "null", "");
-			GS()->ShowValueInformation(pPlayer);
+			GS()->ShowItemValueInformation(pPlayer);
 			GS()->AV(ClientID, "null", "");
 
 			ShowCraftList(pPlayer, "Craft | Can be used's", TYPE_USED);

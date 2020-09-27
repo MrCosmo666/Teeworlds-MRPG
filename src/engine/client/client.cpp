@@ -22,6 +22,7 @@
 #include <engine/sound.h>
 #include <engine/storage.h>
 #include <engine/textrender.h>
+#include <engine/discord.h>
 
 #include <engine/client/http.h>
 #include <engine/external/json-parser/json.h>
@@ -290,7 +291,7 @@ CClient::CClient() : m_DemoPlayer(&m_SnapshotDelta), m_DemoRecorder(&m_SnapshotD
 	m_MapdownloadAmount = -1;
 	m_MapdownloadTotalsize = -1;
 
-	//mmotee
+	// mmotee
 	m_pMmoInfoTask = nullptr;
 	m_aNews[0] = '\0';
 
@@ -768,7 +769,7 @@ void CClient::DebugRender()
 	}
 }
 
-//mmotee
+// mmotee
 void CClient::ResetMmoInfo()
 {
 	if (m_pMmoInfoTask)
@@ -843,7 +844,7 @@ void CClient::LoadMmoInfo()
 void CClient::RequestMmoInfo()
 {
 	char aUrl[256];
-	str_copy(aUrl, "https://teeworlds.space/update/info", sizeof(aUrl));
+	str_copy(aUrl, "https://mrpg.teeworlds.dev/update/info.json", sizeof(aUrl));
 
 	m_pMmoInfoTask = std::make_shared<CGetFile>(Storage(), aUrl, MMOTEE_INFO, IStorage::TYPE_SAVE, true);
 	Engine()->AddJob(m_pMmoInfoTask);
@@ -1959,6 +1960,7 @@ void CClient::InitInterfaces()
 	m_pMasterServer = Kernel()->RequestInterface<IEngineMasterServer>();
 	m_pStorage = Kernel()->RequestInterface<IStorage>();
 	m_pUpdater = Kernel()->RequestInterface<IUpdater>();
+	m_pDiscord = Kernel()->RequestInterface<IDiscord>();
 
 	//
 	m_ServerBrowser.Init(&m_ContactClient, m_pGameClient->NetVersion());
@@ -2165,6 +2167,7 @@ void CClient::Run()
 			break;	// SDL_QUIT
 
 		Updater()->Update();
+		Discord()->Update();
 
 		// update sound
 		Sound()->Update();
@@ -2737,6 +2740,7 @@ int main(int argc, const char** argv) // ignore_convention
 	IEngineTextRender* pEngineTextRender = CreateEngineTextRender();
 	IEngineMap* pEngineMap = CreateEngineMap();
 	IEngineMasterServer* pEngineMasterServer = CreateEngineMasterServer();
+	IDiscord* pDiscord = CreateDiscordWrapper();
 
 	{
 		bool RegisterFail = false;
@@ -2764,6 +2768,8 @@ int main(int argc, const char** argv) // ignore_convention
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(CreateGameClient());
 		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pStorage);
 
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pDiscord);
+
 		if (RegisterFail)
 			return -1;
 	}
@@ -2772,6 +2778,7 @@ int main(int argc, const char** argv) // ignore_convention
 	pConfig->Init(FlagMask);
 	pEngineMasterServer->Init();
 	pEngineMasterServer->Load();
+	pDiscord->Init();
 
 	// register all console commands
 	pClient->RegisterCommands();
@@ -2851,6 +2858,15 @@ int main(int argc, const char** argv) // ignore_convention
 	delete pEngineTextRender;
 	delete pEngineMap;
 	delete pEngineMasterServer;
+	delete pDiscord;
 
 	return 0;
+}
+
+void CClient::NotifyWindow()
+{
+	if (m_pGraphics->WindowActive() || !g_Config.m_ClNotifyWindow)
+		return;
+
+	Graphics()->NotifyWindow();
 }

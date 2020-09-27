@@ -37,6 +37,7 @@ CMenus::CColumn CMenus::ms_aBrowserCols[] = {  // Localize("Server"); Localize("
 
 CServerFilterInfo CMenus::CBrowserFilter::ms_FilterStandard = {IServerBrowser::FILTER_COMPAT_VERSION|IServerBrowser::FILTER_PURE|IServerBrowser::FILTER_PURE_MAP, 999, -1, 0, {{0}}, {0}};
 CServerFilterInfo CMenus::CBrowserFilter::ms_FilterFavorites = {IServerBrowser::FILTER_COMPAT_VERSION|IServerBrowser::FILTER_FAVORITE, 999, -1, 0, {{0}}, {0}};
+CServerFilterInfo CMenus::CBrowserFilter::ms_FilterMRPG = { IServerBrowser::FILTER_COMPAT_VERSION | IServerBrowser::FILTER_MRPG, 999, -1, 0, {{0}}, {0} };
 CServerFilterInfo CMenus::CBrowserFilter::ms_FilterAll = {IServerBrowser::FILTER_COMPAT_VERSION, 999, -1, 0, {{0}}, {0}};
 
 vec3 TextHighlightColor = vec3(0.4f, 0.4f, 1.0f);
@@ -56,6 +57,9 @@ CMenus::CBrowserFilter::CBrowserFilter(int Custom, const char* pName, IServerBro
 	case CBrowserFilter::FILTER_FAVORITES:
 		m_Filter = m_pServerBrowser->AddFilter(&ms_FilterFavorites);
 		break;
+	case CBrowserFilter::FILTER_MRPG:
+		m_Filter = m_pServerBrowser->AddFilter(&ms_FilterMRPG);
+		break;
 	default:
 		m_Filter = m_pServerBrowser->AddFilter(&ms_FilterAll);
 	}
@@ -73,6 +77,9 @@ void CMenus::CBrowserFilter::Reset()
 		break;
 	case CBrowserFilter::FILTER_FAVORITES:
 		SetFilter(&ms_FilterFavorites);
+		break;
+	case CBrowserFilter::FILTER_MRPG:
+		SetFilter(&ms_FilterMRPG);
 		break;
 	default:
 		SetFilter(&ms_FilterAll);
@@ -144,7 +151,7 @@ void CMenus::CBrowserFilter::SetFilter(const CServerFilterInfo *pFilterInfo)
 void CMenus::LoadFilters()
 {
 	// read file data into buffer
-	const char *pFilename = "ui_settings.json";
+	const char *pFilename = "ui_settings_mrpg.json";
 	IOHANDLE File = Storage()->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_ALL);
 	if(!File)
 		return;
@@ -246,7 +253,7 @@ void CMenus::LoadFilters()
 
 void CMenus::SaveFilters()
 {
-	IOHANDLE File = Storage()->OpenFile("ui_settings.json", IOFLAG_WRITE, IStorage::TYPE_SAVE);
+	IOHANDLE File = Storage()->OpenFile("ui_settings_mrpg.json", IOFLAG_WRITE, IStorage::TYPE_SAVE);
 	if(!File)
 		return;
 
@@ -365,18 +372,22 @@ void CMenus::InitDefaultFilters()
 	bool UseDefaultFilters = !m_lFilters.size();
 	bool FilterStandard = false;
 	bool FilterFav = false;
+	bool FilterMRPG = false;
 	bool FilterAll = false;
 	for(int i = 0; i < m_lFilters.size(); i++)
 	{
 		switch(m_lFilters[i].Custom())
 		{
-			case CBrowserFilter::FILTER_STANDARD:
+		case CBrowserFilter::FILTER_STANDARD:
 			FilterStandard = true;
 			break;
-			case CBrowserFilter::FILTER_FAVORITES:
+		case CBrowserFilter::FILTER_FAVORITES:
 			FilterFav = true;
 			break;
-			case CBrowserFilter::FILTER_ALL:
+		case CBrowserFilter::FILTER_MRPG:
+			FilterMRPG = true;
+			break;
+		case CBrowserFilter::FILTER_ALL:
 			FilterAll = true;
 		}
 	}
@@ -392,6 +403,9 @@ void CMenus::InitDefaultFilters()
 		m_lFilters.add(CBrowserFilter(CBrowserFilter::FILTER_FAVORITES, Localize("Favorites"), ServerBrowser()));
 	if(!FilterAll)
 		m_lFilters.add(CBrowserFilter(CBrowserFilter::FILTER_ALL, Localize("All"), ServerBrowser()));
+	if(!FilterMRPG)
+		m_lFilters.add(CBrowserFilter(CBrowserFilter::FILTER_MRPG, Localize("MRPG"), ServerBrowser()));
+
 	// expand the all filter tab by default
 	if(UseDefaultFilters)
 		m_lFilters[m_lFilters.size() - 1].Switch();
@@ -608,7 +622,7 @@ int CMenus::DoBrowserEntry(const void *pID, CUIRect View, const CServerInfo *pEn
 			if(Num < 10)
 				Button.x += RenderOffset;
 			if(!Num)
-				TextRender()->TextColor(1.0f, 1.0f, 1.0f, 0.5f);
+				TextRender()->TextColor(CUI::ms_TransparentTextColor);
 			UI()->DoLabel(&Button, aTemp, 12.0f, CUI::ALIGN_LEFT);
 			Button.x += TextRender()->TextWidth(0, 12.0f, aTemp, -1, -1.0f);
 		}
@@ -1263,6 +1277,18 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 				else if(!pFilter->Extended())
 					pFilter->Switch();
 			}
+			else if (m_ActivePage == PAGE_MRPG)
+			{
+				// if (pFilter->Custom() != CBrowserFilter::FILTER_MRPG)
+				if (str_comp_nocase(pFilter->Name(), "MRPG"))
+				{
+					if (pFilter->Extended())
+						pFilter->Switch();
+					continue;
+				}
+				else if (!pFilter->Extended())
+					pFilter->Switch();
+			}
 			else if (pFilter->Custom() != CBrowserFilter::FILTER_ALL)
 			{
 				if (pFilter->Extended())
@@ -1377,7 +1403,7 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 		if(!s_ScrollRegion.IsRectClipped(MsgBox))
 		{
 			const char* pImportantMessage;
-			if(m_ActivePage == PAGE_INTERNET && ServerBrowser()->IsRefreshingMasters())
+			if((m_ActivePage == PAGE_INTERNET || m_ActivePage == PAGE_MRPG) && ServerBrowser()->IsRefreshingMasters())
 				pImportantMessage = Localize("Refreshing master servers");
 			else if(SelectedFilter == -1)
 				pImportantMessage = Localize("No filter category is selected");
@@ -1526,30 +1552,23 @@ void CMenus::RenderServerbrowserSidebar(CUIRect View)
 	// header
 	View.HSplitTop(GetListHeaderHeight(), &Header, &View);
 	float Width = Header.w;
-	Header.VSplitLeft(Width*(0.30f + 0.30f*(g_Config.m_ClGBrowser == 2)), &Button, &Header);
+	Header.VSplitLeft(Width*0.30f, &Button, &Header);
 	static CButtonContainer s_TabInfo;
 	if(DoButton_SpriteID(&s_TabInfo, IMAGE_SIDEBARICONS, m_SidebarTab != SIDEBAR_TAB_INFO ? SPRITE_SIDEBAR_INFO_A : SPRITE_SIDEBAR_INFO_B, m_SidebarTab == SIDEBAR_TAB_INFO, &Button, CUI::CORNER_TL, 5.0f, true))
 	{
 		m_SidebarTab = SIDEBAR_TAB_INFO;
 	}
 	Header.VSplitLeft(Width*0.30f, &Button, &Header);
-	if (g_Config.m_ClGBrowser != 2)
+	static CButtonContainer s_TabFilter;
+	if(DoButton_SpriteID(&s_TabFilter, IMAGE_SIDEBARICONS, m_SidebarTab != SIDEBAR_TAB_FILTER ? SPRITE_SIDEBAR_FILTER_A : SPRITE_SIDEBAR_FILTER_B, m_SidebarTab == SIDEBAR_TAB_FILTER, &Button, 0, 0.0f, true))
 	{
-		Header.VSplitLeft(Width*0.30f, &Button, &Header);
-		static CButtonContainer s_TabFilter;
-		if(DoButton_SpriteID(&s_TabFilter, IMAGE_SIDEBARICONS, m_SidebarTab != SIDEBAR_TAB_FILTER ? SPRITE_SIDEBAR_FILTER_A : SPRITE_SIDEBAR_FILTER_B, m_SidebarTab == SIDEBAR_TAB_FILTER, &Button, 0, 0.0f, true))
-		{
-			m_SidebarTab = SIDEBAR_TAB_FILTER;
-		}
+		m_SidebarTab = SIDEBAR_TAB_FILTER;
 	}
 	static CButtonContainer s_TabFriends;
 	if(DoButton_SpriteID(&s_TabFriends, IMAGE_SIDEBARICONS, m_SidebarTab != SIDEBAR_TAB_FRIEND ? SPRITE_SIDEBAR_FRIEND_A : SPRITE_SIDEBAR_FRIEND_B, m_SidebarTab == SIDEBAR_TAB_FRIEND, &Header, CUI::CORNER_TR, 5.0f, true))
 	{
 		m_SidebarTab = SIDEBAR_TAB_FRIEND;
 	}
-
-	if (g_Config.m_ClGBrowser == 2 && m_SidebarTab == 1)
-		m_SidebarTab = 2;
 
 	// tabs
 	switch(m_SidebarTab)
@@ -2363,7 +2382,7 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 	const int State = m_pClient->Updater()->GetCurrentState();
 	if (NeedUpdate && State <= IUpdater::CLEAN)
 	{
-		str_format(aBuf, sizeof(aBuf), Localize("Mmotee %s is available"), Client()->LatestVersion());
+		str_format(aBuf, sizeof(aBuf), Localize("MRPG Version %s is available"), Client()->LatestVersion());
 
 		// update now
 		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
@@ -2384,18 +2403,19 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 	}
 	else if (State == IUpdater::NEED_RESTART)
 	{
-		str_format(aBuf, sizeof(aBuf), Localize("Mmotee Client updated! Archive downloading to client folder!"));
+		str_format(aBuf, sizeof(aBuf), Localize("MRPG Client updated! Archive is available in the client folder!"));
 		m_NeedRestartUpdate = true;
 
 		// restart
 		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
 		static CButtonContainer s_ButtonUpdate;
-		if (DoButton_Menu(&s_ButtonUpdate, Localize("Client Archive"), 0, &Button))
+		if (DoButton_Menu(&s_ButtonUpdate, Localize("Open update files"), 0, &Button))
 			Client()->OpenUpdateArchive();
 	}
 	else
 	{
-		str_format(aBuf, sizeof(aBuf), Localize("No updates available"));
+		// str_format(aBuf, sizeof(aBuf), Localize("No updates available"));
+		str_format(aBuf, sizeof(aBuf), Localize("MRPG Client is up to date"));
 
 		// check now
 		MainView.VSplitLeft(ButtonWidth, &Button, &MainView);
@@ -2410,12 +2430,16 @@ void CMenus::RenderServerbrowserBottomBox(CUIRect MainView)
 	static CButtonContainer s_RefreshButton;
 	if(DoButton_Menu(&s_RefreshButton, Localize("Refresh"), 0, &Button) || (Input()->KeyPress(KEY_R) && (Input()->KeyIsPressed(KEY_LCTRL) || Input()->KeyIsPressed(KEY_RCTRL))))
 	{
-		if(m_MenuPage == PAGE_INTERNET)
+		if(m_MenuPage == PAGE_INTERNET || m_MenuPage == PAGE_FAVORITES)
 			ServerBrowser()->Refresh(IServerBrowser::REFRESHFLAG_INTERNET);
 		else if(m_MenuPage == PAGE_LAN)
 			ServerBrowser()->Refresh(IServerBrowser::REFRESHFLAG_LAN);
-		else if (m_MenuPage == PAGE_FAVORITES)
+		else if (m_MenuPage == PAGE_MRPG)
+		{
+			// start a new serverlist request
+			Client()->RequestMmoInfo();
 			ServerBrowser()->Refresh(IServerBrowser::REFRESHFLAG_INTERNET);
+		}
 	}
 
 	// text information
@@ -2504,18 +2528,12 @@ void CMenus::RenderServerbrowser(CUIRect MainView)
 		+------+       +------------+
 	*/
 
-	CUIRect ServerList, Sidebar, Filterbar, BottomBox, SidebarButton;
+	CUIRect ServerList, Sidebar, BottomBox, SidebarButton;
 
 	if(Client()->State() == IClient::STATE_OFFLINE)
 		MainView.HSplitTop(20.0f, 0, &MainView);
 	MainView.HSplitBottom(80.0f, &MainView, &BottomBox);
 	MainView.VSplitRight(20.0f, &ServerList, &SidebarButton);
-
-	if (g_Config.m_ClGBrowser == 2)
-	{
-		MainView.VSplitRight(150.0f, &MainView, &Filterbar);
-		MainView.VSplitRight(30.0f, &MainView, 0); // Margin
-	}
 
 	if(m_SidebarActive)
 		ServerList.VSplitRight(150.0f, &ServerList, &Sidebar);
@@ -2526,8 +2544,6 @@ void CMenus::RenderServerbrowser(CUIRect MainView)
 	// sidebar
 	if(m_SidebarActive)
 		RenderServerbrowserSidebar(Sidebar);
-	if (g_Config.m_ClGBrowser == 2)
-		RenderServerbrowserFilterbar(Filterbar);
 
 	// sidebar button
 	SidebarButton.HMargin(150.0f, &SidebarButton);

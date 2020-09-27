@@ -1,13 +1,16 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
 #include <game/mapitems.h>
-#include <game/version.h>
 
 #include "entities/pickup.h"
 #include "gamecontext.h"
 
 #include "gamecontroller.h"
+
+/*
+	Here you need to put it in order make more events
+	For modes that each map can have one of them
+*/
 
 IGameController::IGameController(CGS *pGS)
 {
@@ -28,7 +31,7 @@ void IGameController::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKiller, in
 
 bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 {
-	// если спавним бота
+	// if we spawn the bot
 	if(pChr->GetPlayer()->IsBot())
 	{
 		pChr->IncreaseHealth(pChr->GetPlayer()->GetStartHealth());
@@ -38,25 +41,27 @@ bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 		return true;
 	}
 
-	// если спавним игрока
+	// HEALTH
 	int StartHealth = pChr->GetPlayer()->GetStartHealth();
 	if(pChr->GetPlayer()->GetTempData().TempActiveSafeSpawn == true)
 	{
 		pChr->GetPlayer()->GetTempData().TempActiveSafeSpawn = false;
 		StartHealth /= 2;
 	}
-
 	if(GS()->IsDungeon())
 		StartHealth = pChr->GetPlayer()->GetStartHealth();
 	else if(pChr->GetPlayer()->GetTempData().TempHealth > 0)
 		StartHealth = pChr->GetPlayer()->GetTempData().TempHealth;
 	pChr->IncreaseHealth(StartHealth);
+
+	// MANA
 	if(pChr->GetPlayer()->GetTempData().TempMana > 0)
 	{
 		const int StartMana = pChr->GetPlayer()->GetTempData().TempMana;
 		pChr->IncreaseMana(StartMana);
 	}
 
+	// AMMO
 	const int StartAmmo = 10 + pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo);
 	pChr->GiveWeapon(WEAPON_HAMMER, -1);
 	for(int i = 1; i < NUM_WEAPONS-1; i++)
@@ -70,43 +75,45 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 
 	switch(Index)
 	{
-		case ENTITY_SPAWN:
+	case ENTITY_SPAWN:
 		m_aaSpawnPoints[SpawnTypes::SPAWN_HUMAN][m_aNumSpawnPoints[0]++] = Pos;
 		break;
-		case ENTITY_SPAWN_MOBS:
+	case ENTITY_SPAWN_MOBS:
 		m_aaSpawnPoints[SpawnTypes::SPAWN_BOT][m_aNumSpawnPoints[1]++] = Pos;
 		break;
-		case ENTITY_SPAWN_SAFE:
+	case ENTITY_SPAWN_SAFE:
 		m_aaSpawnPoints[SpawnTypes::SPAWN_HUMAN_SAFE][m_aNumSpawnPoints[2]++] = Pos;
 		break;
-		case ENTITY_ARMOR_1:
+	case ENTITY_ARMOR_1:
 		Type = PICKUP_ARMOR;
 		break;
-		case ENTITY_HEALTH_1:
+	case ENTITY_HEALTH_1:
 		Type = PICKUP_HEALTH;
 		break;
-		case ENTITY_PICKUP_SHOTGUN:
+	case ENTITY_PICKUP_SHOTGUN:
 		Type = PICKUP_SHOTGUN;
 		break;
-		case ENTITY_PICKUP_GRENADE:
+	case ENTITY_PICKUP_GRENADE:
 		Type = PICKUP_GRENADE;
 		break;
-		case ENTITY_PICKUP_LASER:
+	case ENTITY_PICKUP_LASER:
 		Type = PICKUP_LASER;
 		break;
 	}
+
 	if(Type != -1)
 	{
 		new CPickup(&GS()->m_World, Type, Pos);
 		return true;
 	}
+
 	return false;
 }
 
 void IGameController::OnPlayerConnect(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	if(Server()->ClientIngame(ClientID))
+	if(Server()->ClientIngame(ClientID) && pPlayer->GetPlayerWorldID() == GS()->GetWorldID())
 	{
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "team_join player='%d:%s' team=%d", ClientID, Server()->ClientName(ClientID), pPlayer->GetTeam());
@@ -117,16 +124,16 @@ void IGameController::OnPlayerConnect(CPlayer *pPlayer)
 
 void IGameController::OnPlayerDisconnect(CPlayer *pPlayer)
 {
-	GS()->Mmo()->SaveAccount(pPlayer, SAVE_POSITION);
-	pPlayer->OnDisconnect();
-
 	const int ClientID = pPlayer->GetCID();
-	if(Server()->ClientIngame(ClientID))
+	if(Server()->ClientIngame(ClientID) && pPlayer->GetPlayerWorldID() == GS()->GetWorldID())
 	{
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "leave player='%d:%s'", ClientID, Server()->ClientName(ClientID));
 		GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "game", aBuf);
+		GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_POSITION);
 	}
+
+	pPlayer->OnDisconnect();
 }
 
 void IGameController::OnPlayerInfoChange(CPlayer *pPlayer, int WorldID) {}
@@ -258,7 +265,7 @@ void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type, vec2 BotPos
 			}
 		}
 		if(Result == -1)
-			continue;	// try next spawn point
+			continue; // try next spawn point
 
 		const vec2 P = m_aaSpawnPoints[Type][i]+Positions[Result];
 		const float S = EvaluateSpawnPos(pEval, P);

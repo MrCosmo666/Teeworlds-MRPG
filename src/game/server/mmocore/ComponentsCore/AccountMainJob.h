@@ -12,7 +12,7 @@ public:
 	struct StructData
 	{
 		char Login[64];
-		char Password[64];
+		// char Password[64];
 		char LastLogin[64];
 		char Language[8];
 		int AuthID;
@@ -46,12 +46,10 @@ public:
 
 	struct StructTempPlayerData
 	{
-		// ������� ��� �� ����� ��������� �� ���
 		int TempDecoractionID;
 		int TempDecorationType;
 		int TempID3;
 
-		// ��������� ���
 		ShopJob::AuctionSlot SellItem;
 
 		// temp rankname for guild rank settings
@@ -70,6 +68,7 @@ public:
 		int TempTeleportX;
 		int TempTeleportY;
 		int TempTimeDungeon;
+		bool TempDungeonReady;
 
 		// dungeon
 		int TempTankVotingDungeon;
@@ -78,14 +77,11 @@ public:
 	static std::map < int, StructTempPlayerData > PlayerTempData;
 
 	int SendAuthCode(int ClientID, int Code);
-
-public:
 	int CheckOnlineAccount(int AuthID) const;
 
 	int RegisterAccount(int ClientID, const char *Login, const char *Password);
 	int LoginAccount(int ClientID, const char *Login, const char *Password);
 	void LoadAccount(CPlayer *pPlayer, bool FirstInitilize = false);
-	void ShowDiscordCard(int ClientID);
 	void DiscordConnect(int ClientID, const char *pDID);
 	
 	int GetRank(int AuthID);
@@ -93,6 +89,8 @@ public:
 	{
 		return (bool)(Data.find(ClientID) != Data.end());
 	}
+
+	std::string HashPassword(const char* pPassword, const char* pSalt);
 
 	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);

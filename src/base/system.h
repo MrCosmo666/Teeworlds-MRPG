@@ -1257,6 +1257,9 @@ int str_span(const char* str, const char* set);
 typedef int (*FS_LISTDIR_CALLBACK)(const char *name, int is_dir, int dir_type, void *user);
 void fs_listdir(const char *dir, FS_LISTDIR_CALLBACK cb, int type, void *user);
 
+typedef int (*FS_LISTDIR_INFO_CALLBACK)(const char* name, time_t date, int is_dir, int dir_type, void* user);
+int fs_listdir_info(const char* dir, FS_LISTDIR_INFO_CALLBACK cb, int type, void* user);
+
 /*
 	Function: fs_makedir
 		Creates a directory
@@ -1319,6 +1322,13 @@ int fs_storage_path(const char *appname, char *path, int max);
 */
 int fs_is_dir(const char *path);
 
+
+/*
+	Function: fs_getmtime
+		Gets the modification time of a file
+*/
+time_t fs_getmtime(const char* path);
+	
 /*
 	Function: fs_chdir
 		Changes current working directory
@@ -1667,6 +1677,49 @@ unsigned bytes_be_to_uint(const unsigned char* bytes);
 		- Assumes unsigned is 4 bytes
 */
 void uint_to_bytes_be(unsigned char* bytes, unsigned value);
+
+/*
+	Function: open_link
+		Opens a link in the browser.
+
+	Parameters:
+		link - The link to open in a browser.
+
+	Returns:
+		Returns 1 on success, 0 on failure.
+
+	Remarks:
+		This may not be called with untrusted input or it'll result in arbitrary code execution.
+*/
+int open_link(const char* link);
+
+/*
+	Function: generate_password
+		Generates a null-termineted password of length `2 *
+		random_length`.
+
+	Parameters:
+		buffer - Pointer to the start of the output buffer.
+		length - Length of the buffer.
+		random - Pointer to a randomly-initialized array of shorts.
+		random_length - Length of the short array.
+*/
+void generate_password(char* buffer, unsigned length, unsigned short* random, unsigned random_length);
+
+/*
+	Function: secure_random_password
+		Fills the buffer with the specified amount of random password
+		characters.
+
+		The desired password length must be greater or equal to 6, even
+		and smaller or equal to 128.
+
+	Parameters:
+		buffer - Pointer to the start of the buffer.
+		length - Length of the buffer.
+		pw_length - Length of the desired password.
+*/
+void secure_random_password(char* buffer, unsigned length, unsigned pw_length);
 
 #ifdef __cplusplus
 }

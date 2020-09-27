@@ -1,5 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/hash_ctxt.h>
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 #include <teeother/components/localization.h>
@@ -38,7 +39,7 @@ int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char 
 		return SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
 	}
 	CSqlString<32> clear_Nick = CSqlString<32>(GS()->Server()->ClientName(ClientID));
-	boost::scoped_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
+	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
 	if(RES2->next())
 	{
 		GS()->Chat(ClientID, "- - - - [Your nickname is already registered] - - - -");
@@ -48,14 +49,19 @@ int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char 
 		return SendAuthCode(ClientID, AUTH_REGISTER_ERROR_NICK);
 	}
 
-	boost::scoped_ptr<ResultSet> RES4(SJK.SD("ID", "tw_accounts", "ORDER BY ID DESC LIMIT 1"));
+	std::shared_ptr<ResultSet> RES4(SJK.SD("ID", "tw_accounts", "ORDER BY ID DESC LIMIT 1"));
 	const int InitID = RES4->next() ? RES4->getInt("ID")+1 : 1; // thread save ? hm need for table all time auto increment = 1; NEED FIX IT
 
-	char aAddrStr[64];
 	CSqlString<32> clear_Login = CSqlString<32>(Login);
 	CSqlString<32> clear_Pass = CSqlString<32>(Password);
+
+	char aAddrStr[64];
 	GS()->Server()->GetClientAddr(ClientID, aAddrStr, sizeof(aAddrStr));
-	SJK.ID("tw_accounts", "(ID, Username, Password, RegisterDate, RegisteredIP) VALUES ('%d', '%s', '%s', UTC_TIMESTAMP(), '%s')", InitID, clear_Login.cstr(), clear_Pass.cstr(), aAddrStr);
+
+	char aSalt[32] = { 0 };
+	secure_random_password(aSalt, sizeof(aSalt), 24);
+
+	SJK.ID("tw_accounts", "(ID, Username, Password, PasswordSalt, RegisterDate, RegisteredIP) VALUES ('%d', '%s', '%s', '%s', UTC_TIMESTAMP(), '%s')", InitID, clear_Login.cstr(), HashPassword(clear_Pass.cstr(), aSalt).c_str(), aSalt, aAddrStr);
 	SJK.IDS(100, "tw_accounts_data", "(ID, Nick) VALUES ('%d', '%s')", InitID, clear_Nick.cstr());
 
 	GS()->Chat(ClientID, "- - - - - - - [Successful registered] - - - - - - -");
@@ -82,11 +88,11 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 	CSqlString<32> clear_Login = CSqlString<32>(Login);
 	CSqlString<32> clear_Pass = CSqlString<32>(Password);
 	CSqlString<32> clear_Nick = CSqlString<32>(GS()->Server()->ClientName(ClientID));
-	boost::scoped_ptr<ResultSet> ACCOUNTDATA(SJK.SD("*", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
+	std::shared_ptr<ResultSet> ACCOUNTDATA(SJK.SD("*", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
 	if(ACCOUNTDATA->next())
 	{
 		const int UserID = ACCOUNTDATA->getInt("ID");
-		boost::scoped_ptr<ResultSet> CHECKACCESS(SJK.SD("ID, LoginDate, Language", "tw_accounts", "WHERE Username = '%s' AND Password = '%s' AND ID = '%d'", clear_Login.cstr(), clear_Pass.cstr(), UserID));
+		std::shared_ptr<ResultSet> CHECKACCESS(SJK.SD("ID, LoginDate, Language", "tw_accounts", "WHERE Username = '%s' AND Password = '%s' AND ID = '%d'", clear_Login.cstr(), clear_Pass.cstr(), UserID));
 		if (!CHECKACCESS->next())
 		{
 			GS()->Chat(ClientID, "Wrong login or password!");
@@ -101,7 +107,6 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 
 		pPlayer->SetLanguage(CHECKACCESS->getString("Language").c_str());
 		str_copy(pPlayer->Acc().Login, clear_Login.cstr(), sizeof(pPlayer->Acc().Login));
-		str_copy(pPlayer->Acc().Password, clear_Pass.cstr(), sizeof(pPlayer->Acc().Password));
 		str_copy(pPlayer->Acc().LastLogin, CHECKACCESS->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().LastLogin));
 
 		pPlayer->Acc().AuthID = UserID;
@@ -140,7 +145,6 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 200, "You are located {STR} ({STR})", 
 		GS()->Server()->GetWorldName(GS()->GetWorldID()), (GS()->IsAllowedPVP() ? "Zone PVP" : "Safe zone"));
 
-	// поставить муызку если не данж в данже появится музыка после открытия дверей а не по приходу в зону // 0 отправить музыку с CGS::m_MusicID
 	GS()->SendMapMusic(ClientID, (GS()->IsDungeon() ? -1 : 0));
 	if(!FirstInitilize)
 	{
@@ -155,7 +159,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 
 	Job()->OnInitAccount(ClientID);
 	const int Rank = GetRank(pPlayer->Acc().AuthID);
-	GS()->Chat(-1, "{STR} joined to Mmo server. Rank #{INT}", GS()->Server()->ClientName(ClientID), &Rank);
+	GS()->Chat(-1, "{STR} logged to account. Rank #{INT}", GS()->Server()->ClientName(ClientID), &Rank);
 #ifdef CONF_DISCORD
 	char pMsg[256], pLoggin[64];
 	str_format(pLoggin, sizeof(pLoggin), "%s logged in Account ID %d", GS()->Server()->ClientName(ClientID), pPlayer->Acc().AuthID);
@@ -171,11 +175,10 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		GS()->Chat(ClientID, "Shield around you indicates location of active quest.");
 	}
 	
-	// настройки
+	// settings
 	if(!pPlayer->GetItem(itModePVP).Count)
 		pPlayer->GetItem(itModePVP).Add(1, 1);
 
-	// включить спавн в безопасной зоне
 	pPlayer->GetTempData().TempActiveSafeSpawn = true;
 
 	if(pPlayer->Acc().WorldID != GS()->GetWorldID())
@@ -192,7 +195,6 @@ void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true);
 	if(!pPlayer) return;	
 
-	// переменные
 	CSqlString<64> cDID = CSqlString<64>(pDID);
 	SJK.UD("tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", cDID.cstr(), pPlayer->Acc().AuthID);
 
@@ -204,7 +206,7 @@ void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)
 int AccountMainJob::GetRank(int AuthID)
 {
 	int Rank = 0;
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("ID", "tw_accounts_data", "ORDER BY Level DESC, Exp DESC"));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_accounts_data", "ORDER BY Level DESC, Exp DESC"));
 	while(RES->next())
 	{
 		Rank++;
@@ -223,7 +225,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		return false;
 	}
 
-	// Настройки
+	// settings
 	if (Menulist == MenuList::MENU_SETTINGS)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
@@ -236,7 +238,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 				GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
 		}
 
-		// Снаряжение
+		// Equipment
 		bool FoundSettings = false;
 		GS()->AV(ClientID, "null", "");
 		GS()->AVH(ClientID, TAB_SETTINGS_MODULES, GREEN_COLOR, "Sub items settings.");
@@ -253,7 +255,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 			}
 		}
 
-		// Если не найдены настройки модулей
+		// if no settings are found
 		if (!FoundSettings)
 			GS()->AVM(ClientID, "null", NOPE, TAB_SETTINGS_MODULES, "The list of equipment sub upgrades is empty");
 	
@@ -261,7 +263,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		return true;
 	}
 
-	// Выбор языка
+	// language selection
 	if (Menulist == MenuList::MENU_SELECT_LANGUAGE)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_SETTINGS;
@@ -274,12 +276,11 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		GS()->AVH(ClientID, TAB_LANGUAGES, GRAY_COLOR, "Active language: [{STR}]", pPlayerLanguage);
 		for(int i = 0; i < GS()->Server()->Localization()->m_pLanguages.size(); i++)
 		{
-			// Не показывать в списках выбора язык который выбран уже у игрока
-			const char *pLanguageFile = GS()->Server()->Localization()->m_pLanguages[i]->GetFilename();
-			if(str_comp(pPlayerLanguage, pLanguageFile) == 0)
+			// do not show the language already selected by the player in the selection lists
+			if(str_comp(pPlayerLanguage, GS()->Server()->Localization()->m_pLanguages[i]->GetFilename()) == 0)
 				continue;
 
-			// Добавить выбор языка
+			// add language selection
 			const char *pLanguageName = GS()->Server()->Localization()->m_pLanguages[i]->GetName();
 			GS()->AVM(ClientID, "SELECTLANGUAGE", i, TAB_LANGUAGES, "Select language \"{STR}\"", pLanguageName);
 		}
@@ -297,7 +298,7 @@ bool AccountMainJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int V
 		const char *pSelectedLanguage = GS()->Server()->Localization()->m_pLanguages[VoteID]->GetFilename();
 		pPlayer->SetLanguage(pSelectedLanguage);
 		GS()->Chat(ClientID, "You chosen a language \"{STR}\".", pSelectedLanguage);
-		GS()->VResetVotes(ClientID, MenuList::MENU_SELECT_LANGUAGE);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_SELECT_LANGUAGE);
 		Job()->SaveAccount(pPlayer, SaveType::SAVE_LANGUAGE);
 		return true;
 	}
@@ -311,4 +312,18 @@ void AccountMainJob::OnResetClient(int ClientID)
 
 	if (Data.find(ClientID) != Data.end())
 		Data.erase(ClientID);
+}
+
+std::string AccountMainJob::HashPassword(const char* pPassword, const char* pSalt)
+{
+	char aPlaintext[128] = { 0 };
+	SHA256_CTX Sha256Ctx;
+	sha256_init(&Sha256Ctx);
+	str_format(aPlaintext, sizeof(aPlaintext), "%s%s%s", pSalt, pPassword, pSalt);
+	sha256_update(&Sha256Ctx, aPlaintext, str_length(aPlaintext));
+	SHA256_DIGEST Digest = sha256_finish(&Sha256Ctx);
+
+	char aHash[SHA256_MAXSTRSIZE];
+	sha256_str(Digest, aHash, sizeof(aHash));
+	return std::string(aHash);
 }

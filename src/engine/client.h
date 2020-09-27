@@ -7,6 +7,8 @@
 #include "message.h"
 #include "graphics.h"
 
+#include <generated/protocol.h>
+
 class IClient : public IInterface
 {
 	MACRO_INTERFACE("client", 0)
@@ -163,6 +165,10 @@ public:
 	virtual bool ConnectionProblems() const = 0;
 
 	virtual bool SoundInitFailed() const = 0;
+
+	// mrpg
+public:
+	virtual void NotifyWindow() = 0;
 };
 
 class IGameClient : public IInterface
@@ -195,6 +201,7 @@ public:
 	virtual const char *NetVersionHashReal() const = 0;
 	virtual int ClientVersion() const = 0;
 
+	virtual CNetObj_Mmo_ClientInfo* GetMMOInfo() const = 0;
 };
 
 extern IGameClient *CreateGameClient();

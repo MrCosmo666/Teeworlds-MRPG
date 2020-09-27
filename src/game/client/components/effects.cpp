@@ -304,7 +304,7 @@ void CEffects::MmoEffects(vec2 Pos, int EffectID)
 		m_pClient->m_pParticles->Add(CParticles::GROUP_MMOEFFECTS, &p);
 		return;
 	}
-	// эффект телепорта
+	
 	p.m_Spr = SPRITE_TELEPORT1;
 	p.m_Frames = 8;
 	p.m_Pos = Pos;

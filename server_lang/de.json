@@ -124,6 +124,10 @@
 		"value": "Top 10 Spieler nach Level"
 	},
 	{
+		"key": "Top 10 players wealthy",
+		"value": "Top 10 Spieler nach Gold"
+	},
+	{
 		"key": "Chance & Loot Information",
 		"value": "Chance & Beute Informationen"
 	},

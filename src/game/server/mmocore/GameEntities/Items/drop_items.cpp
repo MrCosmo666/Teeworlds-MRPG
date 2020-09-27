@@ -1,7 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
-
 #include <base/math.h>
 #include <base/vmath.h>
 #include <generated/protocol.h>
@@ -44,23 +42,23 @@ bool CDropItem::TakeItem(int ClientID)
 	if(!pPlayer || (m_OwnerID >= 0 && m_OwnerID != ClientID))
 		return false;
 
-	// размен зачарованных предметов
+	// change of enchanted objects
 	GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 	ItemJob::InventoryItem &pPlayerDroppedItem = pPlayer->GetItem(m_DropItem.GetID());
 	if(pPlayerDroppedItem.Count > 0 && pPlayerDroppedItem.Info().IsEnchantable())
 	{
 		tl_swap(pPlayerDroppedItem, m_DropItem);
 		GS()->Chat(ClientID, "You now own {STR}(+{INT})", pPlayerDroppedItem.Info().GetName(pPlayer), &pPlayerDroppedItem.Enchant);
-		GS()->VResetVotes(ClientID, MenuList::MENU_INVENTORY);
-		GS()->VResetVotes(ClientID, MenuList::MENU_EQUIPMENT);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
+		GS()->UpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
 		return true;
 	}
 	
-	// выдача просто предмета
+	// simple subject delivery
 	pPlayerDroppedItem.Add(m_DropItem.Count, 0, m_DropItem.Enchant);
 	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 10, "\0");
-	GS()->VResetVotes(ClientID, MenuList::MENU_INVENTORY);
-	GS()->VResetVotes(ClientID, MenuList::MENU_EQUIPMENT);
+	GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
+	GS()->UpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
 	GS()->m_World.DestroyEntity(this);
 	return true;
 }
@@ -119,7 +117,7 @@ void CDropItem::Tick()
 	if(!pChar || pChar->GetPlayer()->IsBot())
 		return;
 
-	// если не зачарованный предмет
+	// if not an enchanted object
 	const ItemJob::InventoryItem pPlayerDroppedItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
 	if(!pPlayerDroppedItem.Info().IsEnchantable())
 	{

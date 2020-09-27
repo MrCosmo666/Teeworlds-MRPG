@@ -7,6 +7,9 @@
 #include <ctype.h>
 #include <time.h>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
 #include "system.h"
 
 #if defined(CONF_FAMILY_UNIX)
@@ -14,8 +17,6 @@
 	#include <unistd.h>
 
 	/* unix net includes */
-	#include <sys/stat.h>
-	#include <sys/types.h>
 	#include <sys/socket.h>
 	#include <sys/ioctl.h>
 	#include <errno.h>
@@ -1466,6 +1467,59 @@ int net_init()
 	return 0;
 }
 
+int fs_listdir_info(const char* dir, FS_LISTDIR_INFO_CALLBACK cb, int type, void* user)
+{
+#if defined(CONF_FAMILY_WINDOWS)
+	WIN32_FIND_DATA finddata;
+	HANDLE handle;
+	char buffer[1024 * 2];
+	int length;
+	str_format(buffer, sizeof(buffer), "%s/*", dir);
+
+	handle = FindFirstFileA(buffer, &finddata);
+
+	if(handle == INVALID_HANDLE_VALUE)
+		return 0;
+
+	str_format(buffer, sizeof(buffer), "%s/", dir);
+	length = str_length(buffer);
+
+	/* add all the entries */
+	do
+	{
+		str_copy(buffer + length, finddata.cFileName, (int)sizeof(buffer) - length);
+		if(cb(finddata.cFileName, fs_getmtime(buffer), fs_is_dir(buffer), type, user))
+			break;
+	}
+	while(FindNextFileA(handle, &finddata));
+
+	FindClose(handle);
+	return 0;
+#else
+	struct dirent* entry;
+	char buffer[1024 * 2];
+	int length;
+	DIR* d = opendir(dir);
+
+	if(!d)
+		return 0;
+
+	str_format(buffer, sizeof(buffer), "%s/", dir);
+	length = str_length(buffer);
+
+	while((entry = readdir(d)) != NULL)
+	{
+		str_copy(buffer + length, entry->d_name, (int)sizeof(buffer) - length);
+		if(cb(entry->d_name, fs_getmtime(buffer), fs_is_dir(buffer), type, user))
+			break;
+	}
+
+	/* close the directory and return */
+	closedir(d);
+	return 0;
+#endif
+}
+
 void fs_listdir(const char *dir, FS_LISTDIR_CALLBACK cb, int type, void *user)
 {
 #if defined(CONF_FAMILY_WINDOWS)
@@ -1658,6 +1712,15 @@ int fs_is_dir(const char *path)
 	else
 		return 0;
 #endif
+}
+
+time_t fs_getmtime(const char* path)
+{
+	struct stat sb;
+	if(stat(path, &sb) == -1)
+		return 0;
+
+	return sb.st_mtime;
 }
 
 int fs_chdir(const char *path)
@@ -1889,15 +1952,15 @@ int str_replace(char* line, const char* search, const char* replace)
 {
 	int count;
 	char* sp; // start of pattern
-	int sLen = str_length(search);
-	int rLen = str_length(replace);
+	const int sLen = str_length(search);
+	const int rLen = str_length(replace);
 
+	count = 1;
 	if ((sp = strstr(line, search)) == NULL)
 	{
 		return 0;
 	}
 
-	count = 1;
 	if (sLen > rLen)
 	{
 		// move from right to left
@@ -1908,7 +1971,7 @@ int str_replace(char* line, const char* search, const char* replace)
 	else if (sLen < rLen)
 	{
 		// move from left to right
-		int tLen = str_length(sp) - sLen;
+		const int tLen = str_length(sp) - sLen;
 		char* stop = sp + rLen;
 		char* src = sp + sLen + tLen;
 		char* dst = sp + rLen + tLen;
@@ -2351,11 +2414,10 @@ int str_is_number(const char* str)
 #endif
 void str_timestamp_ex(time_t time_data, char* buffer, int buffer_size, const char* format)
 {
-	struct tm *time_info;
-
+	struct tm* time_info;
 	time_info = localtime(&time_data);
 	strftime(buffer, buffer_size, format, time_info);
-	buffer[buffer_size-1] = 0;	/* assure null termination */
+	buffer[buffer_size - 1] = 0;	/* assure null termination */
 }
 
 void str_timestamp_format(char* buffer, int buffer_size, const char* format)
@@ -2780,6 +2842,55 @@ void uint_to_bytes_be(unsigned char* bytes, unsigned value)
 	bytes[2] = (value >> 8) & 0xff;
 	bytes[3] = value & 0xff;
 }
+
+int open_link(const char* link)
+{
+	char aBuf[512];
+#if defined(CONF_FAMILY_WINDOWS)
+	str_format(aBuf, sizeof(aBuf), "start %s", link);
+	return (uintptr_t)ShellExecuteA(NULL, "open", link, NULL, NULL, SW_SHOWDEFAULT) > 32;
+#elif defined(CONF_PLATFORM_LINUX)
+	str_format(aBuf, sizeof(aBuf), "xdg-open %s >/dev/null 2>&1 &", link);
+	return system(aBuf) == 0;
+#elif defined(CONF_FAMILY_UNIX)
+	str_format(aBuf, sizeof(aBuf), "open %s &", link);
+	return system(aBuf) == 0;
+#endif
+}
+
+void generate_password(char* buffer, unsigned length, unsigned short* random, unsigned random_length)
+{
+	static const char VALUES[] = "ABCDEFGHKLMNPRSTUVWXYZabcdefghjkmnopqt23456789";
+	static const size_t NUM_VALUES = sizeof(VALUES) - 1; // Disregard the '\0'.
+	unsigned i;
+	dbg_assert(length >= random_length * 2 + 1, "too small buffer");
+	dbg_assert(NUM_VALUES * NUM_VALUES >= 2048, "need at least 2048 possibilities for 2-character sequences");
+
+	buffer[random_length * 2] = 0;
+
+	for (i = 0; i < random_length; i++)
+	{
+		unsigned short random_number = random[i] % 2048;
+		buffer[2 * i + 0] = VALUES[random_number / NUM_VALUES];
+		buffer[2 * i + 1] = VALUES[random_number % NUM_VALUES];
+	}
+}
+
+#define MAX_PASSWORD_LENGTH 128
+void secure_random_password(char* buffer, unsigned length, unsigned pw_length)
+{
+	unsigned short random[MAX_PASSWORD_LENGTH / 2];
+	// With 6 characters, we get a password entropy of log(2048) * 6/2 = 33bit.
+	dbg_assert(length >= pw_length + 1, "too small buffer");
+	dbg_assert(pw_length >= 6, "too small password length");
+	dbg_assert(pw_length % 2 == 0, "need an even password length");
+	dbg_assert(pw_length <= MAX_PASSWORD_LENGTH, "too large password length");
+
+	secure_random_fill(random, pw_length);
+
+	generate_password(buffer, length, random, pw_length / 2);
+}
+#undef MAX_PASSWORD_LENGTH
 
 #if defined(__cplusplus)
 }

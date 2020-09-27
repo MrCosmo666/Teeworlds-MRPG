@@ -1080,8 +1080,8 @@ void CMenus::RenderMenubar(CUIRect Rect)
 	const float InactiveAlpha = 0.25f;
 
 	// if page top on browser select server
-	bool TopOfflineBrowserButtom = (m_MenuPage == PAGE_INTERNET || m_MenuPage == PAGE_LAN || m_MenuPage == PAGE_NEWS || m_MenuPage == PAGE_FAVORITES);
-	bool TopOnlineBrowserButtom = (m_GamePage == PAGE_INTERNET || m_GamePage == PAGE_LAN || m_GamePage == PAGE_FAVORITES);
+	bool TopOfflineBrowserButtom = (m_MenuPage == PAGE_INTERNET || m_MenuPage == PAGE_MRPG || m_MenuPage == PAGE_LAN || m_MenuPage == PAGE_NEWS || m_MenuPage == PAGE_FAVORITES);
+	bool TopOnlineBrowserButtom = (m_GamePage == PAGE_INTERNET || m_GamePage == PAGE_MRPG || m_GamePage == PAGE_LAN || m_GamePage == PAGE_FAVORITES);
 
 	m_ActivePage = m_MenuPage;
 	int NewPage = -1;
@@ -1140,7 +1140,7 @@ void CMenus::RenderMenubar(CUIRect Rect)
 		Left.VSplitLeft(Spacing, 0, &Left); // little space
 		Left.VSplitLeft(ButtonWidth, &Button, &Left);
 		static CButtonContainer s_ServerBrowserButton;
-		if(DoButton_MenuTabTop(&s_ServerBrowserButton, Localize("Browser"),  m_GamePage == PAGE_INTERNET || m_GamePage == PAGE_LAN || m_GamePage == PAGE_FAVORITES, &Button, Alpha, Alpha) || CheckHotKey(KEY_B))
+		if(DoButton_MenuTabTop(&s_ServerBrowserButton, Localize("Browser"),  m_GamePage == PAGE_INTERNET || m_GamePage == PAGE_MRPG || m_GamePage == PAGE_LAN || m_GamePage == PAGE_FAVORITES, &Button, Alpha, Alpha) || CheckHotKey(KEY_B))
 			NewPage = PAGE_INTERNET;
 
 		// settings
@@ -1249,7 +1249,7 @@ void CMenus::RenderMenubar(CUIRect Rect)
 		if(Client()->State() == IClient::STATE_OFFLINE)
 			RenderBackgroundShadow(&Left, false);
 
-		// news buttom
+		// news button
 		Left.HSplitBottom(25.0f, 0, &Left);
 		Left.VSplitLeft(ButtonWidth, &Button, &Left);
 		if(ClientStateOffline)
@@ -1262,11 +1262,24 @@ void CMenus::RenderMenubar(CUIRect Rect)
 				g_Config.m_UiBrowserPage = PAGE_NEWS;
 			}
 
-			// global buttom
+			// global button
 			Left.VSplitLeft(Spacing, 0, &Left); // little space
 			Left.VSplitLeft(ButtonWidth, &Button, &Left);
 		}
 		
+		// mrpg button
+		static CButtonContainer s_MRPGButton;
+		if (DoButton_MenuTabTop(&s_MRPGButton, Localize("MRPG"), m_ActivePage == PAGE_MRPG, &Button))
+		{
+			m_pClient->m_pCamera->ChangePosition(CCamera::POS_SETTINGS_TEE); // just use something else
+			ServerBrowser()->SetType(IServerBrowser::TYPE_INTERNET);
+			NewPage = PAGE_MRPG;
+			g_Config.m_UiBrowserPage = PAGE_MRPG;
+		}
+
+		// global button
+		Left.VSplitLeft(Spacing, 0, &Left); // little space
+		Left.VSplitLeft(ButtonWidth, &Button, &Left);
 		static CButtonContainer s_InternetButton;
 		if(DoButton_MenuTabTop(&s_InternetButton, Localize("Global"), m_ActivePage == PAGE_INTERNET, &Button) || CheckHotKey(KEY_G))
 		{
@@ -1276,7 +1289,7 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			g_Config.m_UiBrowserPage = PAGE_INTERNET;
 		}
 
-		// lan buttom
+		// lan button
 		Left.VSplitLeft(Spacing, 0, &Left); // little space
 		Left.VSplitLeft(ButtonWidth, &Button, &Left);
 		static CButtonContainer s_LanButton;
@@ -1416,7 +1429,7 @@ void CMenus::RenderLoading(int WorkedAmount)
 	Rect.y += 20;
 	TextRender()->TextColor(CUI::ms_DefaultTextColor);
 	TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
-	UI()->DoLabel(&Rect, "Teeworlds", 48.0f, CUI::ALIGN_CENTER);
+	UI()->DoLabel(&Rect, "Teeworlds MRPG", 48.0f, CUI::ALIGN_CENTER);
 
 	const float Percent = m_LoadCurrent / (float)m_LoadTotal;
 	const float Spacing = 40.0f;
@@ -1732,7 +1745,7 @@ int CMenus::Render()
 					m_Popup = POPUP_QUIT;
 
 				// settings button
-				if(Client()->State() == IClient::STATE_OFFLINE && (m_MenuPage == PAGE_INTERNET || m_MenuPage == PAGE_LAN || m_MenuPage == PAGE_FAVORITES || m_MenuPage == PAGE_DEMOS))
+				if(Client()->State() == IClient::STATE_OFFLINE && (m_MenuPage == PAGE_INTERNET || m_MenuPage == PAGE_MRPG || m_MenuPage == PAGE_LAN || m_MenuPage == PAGE_FAVORITES || m_MenuPage == PAGE_DEMOS))
 				{
 					Row.VSplitRight(5.0f, &Row, 0);
 					Row.VSplitRight(TopOffset, &Row, &Button);
@@ -1764,6 +1777,8 @@ int CMenus::Render()
 					RenderServerbrowser(MainView);
 				else if(m_GamePage == PAGE_FAVORITES)
 					RenderServerbrowser(MainView);
+				else if (m_GamePage == PAGE_MRPG)
+					RenderServerbrowser(MainView);
 			}
 			else
 			{
@@ -1774,6 +1789,8 @@ int CMenus::Render()
 				else if(m_MenuPage == PAGE_LAN)
 					RenderServerbrowser(MainView);
 				else if(m_MenuPage == PAGE_FAVORITES)
+					RenderServerbrowser(MainView);
+				else if(m_MenuPage == PAGE_MRPG)
 					RenderServerbrowser(MainView);
 				else if(m_MenuPage == PAGE_DEMOS)
 					RenderDemoList(MainView);
@@ -2633,6 +2650,7 @@ void CMenus::SetMenuPage(int NewPage)
 		case PAGE_DEMOS: CameraPos = CCamera::POS_DEMOS; break;
 		case PAGE_SETTINGS: CameraPos = CCamera::POS_SETTINGS_GENERAL+g_Config.m_UiSettingsPage; break;
 		case PAGE_INTERNET: CameraPos = CCamera::POS_INTERNET; break;
+		case PAGE_MRPG: CameraPos = CCamera::POS_SETTINGS_TEE; break; // use something else
 		case PAGE_LAN: CameraPos = CCamera::POS_LAN; break;
 		case PAGE_FAVORITES: CameraPos = CCamera::POS_LAN; break;
 		case PAGE_NEWS: CameraPos = CCamera::POS_DEMOS;

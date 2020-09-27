@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 #include "WorldSwapJob.h"
 
@@ -9,52 +8,56 @@ std::map < int , WorldSwapJob::StructSwapWorld > WorldSwapJob::WorldSwap;
 std::list < WorldSwapJob::StructPositionLogic > WorldSwapJob::WorldPositionLogic;
 
 void WorldSwapJob::OnInit()
-{ 
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("*", "tw_world_swap"));
-	while(RES->next())
+{
+	SJK.SDT("*", "tw_world_swap", [&](ResultSet* RES)
 	{
-		const int ID = RES->getInt("ID");
-		WorldSwap[ID].OpenQuestID = RES->getInt("OpenQuestID");
-		WorldSwap[ID].PositionX = RES->getInt("PositionX");
-		WorldSwap[ID].PositionY = RES->getInt("PositionY");
-		WorldSwap[ID].WorldID = RES->getInt("WorldID");		
-		WorldSwap[ID].TwoPositionX = RES->getInt("TwoPositionX");
-		WorldSwap[ID].TwoPositionY = RES->getInt("TwoPositionY");
-		WorldSwap[ID].TwoWorldID = RES->getInt("TwoWorldID");
-	}
+		while(RES->next())
+		{
+			const int ID = RES->getInt("ID");
+			WorldSwap[ID].OpenQuestID = RES->getInt("OpenQuestID");
+			WorldSwap[ID].PositionX = RES->getInt("PositionX");
+			WorldSwap[ID].PositionY = RES->getInt("PositionY");
+			WorldSwap[ID].WorldID = RES->getInt("WorldID");
+			WorldSwap[ID].TwoPositionX = RES->getInt("TwoPositionX");
+			WorldSwap[ID].TwoPositionY = RES->getInt("TwoPositionY");
+			WorldSwap[ID].TwoWorldID = RES->getInt("TwoWorldID");
+		}
 
-	for(const auto& swapw : WorldSwap)
-	{
-		StructPositionLogic pPositionLogic;
-		pPositionLogic.BaseWorldID = swapw.second.WorldID;
-		pPositionLogic.FindWorldID = swapw.second.TwoWorldID;
-		pPositionLogic.Position = vec2(swapw.second.TwoPositionX, swapw.second.TwoPositionY);
-		WorldPositionLogic.push_back(pPositionLogic);
-			
-		pPositionLogic.BaseWorldID = swapw.second.TwoWorldID;
-		pPositionLogic.FindWorldID = swapw.second.WorldID;
-		pPositionLogic.Position = vec2(swapw.second.PositionX, swapw.second.PositionY);
-		WorldPositionLogic.push_back(pPositionLogic);
-	}
-	Job()->ShowLoadingProgress("Worlds Swap", WorldSwap.size());
-	Job()->ShowLoadingProgress("Worlds Swap Logic", WorldPositionLogic.size());
+		for(const auto& swapw : WorldSwap)
+		{
+			StructPositionLogic pPositionLogic;
+			pPositionLogic.BaseWorldID = swapw.second.WorldID;
+			pPositionLogic.FindWorldID = swapw.second.TwoWorldID;
+			pPositionLogic.Position = vec2(swapw.second.TwoPositionX, swapw.second.TwoPositionY);
+			WorldPositionLogic.push_back(pPositionLogic);
+
+			pPositionLogic.BaseWorldID = swapw.second.TwoWorldID;
+			pPositionLogic.FindWorldID = swapw.second.WorldID;
+			pPositionLogic.Position = vec2(swapw.second.PositionX, swapw.second.PositionY);
+			WorldPositionLogic.push_back(pPositionLogic);
+		}
+		Job()->ShowLoadingProgress("Worlds Swap Logic", WorldPositionLogic.size());
+		Job()->ShowLoadingProgress("Worlds Swap", WorldSwap.size());
+	});
 }
 
 void WorldSwapJob::OnInitWorld(const char* pWhereLocalWorld)
 {
 	const int WorldID = GS()->GetWorldID();
-	CSqlString<32> world_name = CSqlString<32>(GS()->Server()->GetWorldName(WorldID));
-	boost::scoped_ptr<ResultSet> RES(SJK.SD("RespawnWorld, MusicID", "ENUM_WORLDS", pWhereLocalWorld));
-	if(RES->next())
+	const CSqlString<32> world_name = CSqlString<32>(GS()->Server()->GetWorldName(WorldID));
+	SJK.SDT("RespawnWorld, MusicID", "ENUM_WORLDS", [&](ResultSet* RES)
 	{
-		const int RespawnWorld = (int)RES->getInt("RespawnWorld");
-		const int MusicID = (int)RES->getInt("MusicID");
-		SJK.UD("ENUM_WORLDS", "Name = '%s' WHERE WorldID = '%d'", world_name.cstr(), WorldID);
-		GS()->SetRespawnWorld(RespawnWorld);
-		GS()->SetMapMusic(MusicID);
-		return;
-	}
-	SJK.ID("ENUM_WORLDS", "(WorldID, Name) VALUES ('%d', '%s')", WorldID, world_name.cstr());
+		if(RES->next())
+		{
+			const int RespawnWorld = (int)RES->getInt("RespawnWorld");
+			const int MusicID = (int)RES->getInt("MusicID");
+			SJK.UD("ENUM_WORLDS", "Name = '%s' WHERE WorldID = '%d'", world_name.cstr(), WorldID);
+			GS()->SetRespawnWorld(RespawnWorld);
+			GS()->SetMapMusic(MusicID);
+			return;
+		}
+		SJK.ID("ENUM_WORLDS", "(WorldID, Name) VALUES ('%d', '%s')", WorldID, world_name.cstr());
+	}, pWhereLocalWorld);
 }
 
 bool WorldSwapJob::OnHandleTile(CCharacter *pChr, int IndexCollision)
@@ -116,7 +119,7 @@ bool WorldSwapJob::ChangeWorld(CPlayer *pPlayer, vec2 Pos)
 	if (WorldSwap.find(WID) != WorldSwap.end())
 	{
 		const int ClientID = pPlayer->GetCID();
-		int StoryQuestNeeded = WorldSwap[WID].OpenQuestID;
+		const int StoryQuestNeeded = WorldSwap[WID].OpenQuestID;
 		if (StoryQuestNeeded > 0 && !GS()->Mmo()->Quest()->IsCompletedQuest(ClientID, StoryQuestNeeded))
 		{
 			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Requires quest completion '{STR}'!", GS()->Mmo()->Quest()->GetQuestName(StoryQuestNeeded));
