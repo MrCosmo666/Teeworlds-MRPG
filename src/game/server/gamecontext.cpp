@@ -114,8 +114,8 @@ CPlayer *CGS::GetPlayer(int ClientID, bool CheckAuthed, bool CheckCharacter)
 std::unique_ptr<char[]> CGS::LevelString(int MaxValue, int CurrentValue, int Step, char toValue, char fromValue)
 {
 	CurrentValue = clamp(CurrentValue, 0, MaxValue);
-
-	size_t Size = (size_t)3 + MaxValue / Step;
+	 
+	int Size = 3 + MaxValue / Step;
 	std::unique_ptr<char[]> Buf(new char[Size]);
 	Buf[0] = '[';
 	Buf[Size - 2] = ']';
