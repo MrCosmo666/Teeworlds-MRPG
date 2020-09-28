@@ -97,7 +97,7 @@ Connection* CConectionPool::GetConnection()
 	{
 		pConnection = m_ConnList.front();
 		m_ConnList.pop_front();
-		dbg_msg("sql", "got connection. checking for availability!");
+		dbg_msg("sql", "got connection from front. checking for availability!");
 		if(pConnection->isClosed())
 		{
 			dbg_msg("sql", "connection closed. re-creation!");
@@ -198,10 +198,10 @@ void CConectionPool::InsertFormated(int Milliseconds, const char *Table, const c
 		const int pr_Milliseconds = Milliseconds;
 		std::string pr_Query = Query;
 
-		SqlThreadRecursiveLock.lock();
 		if(Milliseconds > 0)
 			std::this_thread::sleep_for(std::chrono::milliseconds(pr_Milliseconds));
 
+		SqlThreadRecursiveLock.lock();
 		Connection* pConnection = nullptr;
 		try
 		{
@@ -254,10 +254,10 @@ void CConectionPool::UpdateFormated(int Milliseconds, const char *Table, const c
 		const int pr_Milliseconds = Milliseconds;
 		std::string pr_Query = Query;
 
-		SqlThreadRecursiveLock.lock();
 		if(pr_Milliseconds > 0)
 			std::this_thread::sleep_for(std::chrono::milliseconds(pr_Milliseconds));
-		
+
+		SqlThreadRecursiveLock.lock();
 		Connection* pConnection = nullptr;
 		try
 		{
@@ -310,10 +310,10 @@ void CConectionPool::DeleteFormated(int Milliseconds, const char *Table, const c
 		const int pr_Milliseconds = Milliseconds;
 		std::string pr_Query = Query;
 
-		SqlThreadRecursiveLock.lock();
 		if(Milliseconds > 0)
 			std::this_thread::sleep_for(std::chrono::milliseconds(pr_Milliseconds));
-		
+
+		SqlThreadRecursiveLock.lock();
 		Connection* pConnection = nullptr;
 		try
 		{
