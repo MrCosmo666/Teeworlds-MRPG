@@ -17,8 +17,7 @@ class CraftJob : public MmoComponent
 		int m_Price;
 		int m_WorldID;
 	};
-	typedef std::map <int, CraftStruct> CraftType;
-	static CraftType ms_aCraft;
+	static std::map <int, CraftStruct> ms_aCraft;
 
 	void CraftItem(CPlayer* pPlayer, int CraftID);
 	

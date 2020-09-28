@@ -9,19 +9,19 @@ class SkillJob : public MmoComponent
 {
 	struct StructSkillInformation
 	{
-		char m_aSkillName[32];
-		char m_aSkillDesc[64];
-		char m_aSkillBonusInfo[64];
+		char m_aName[32];
+		char m_aDesc[64];
+		char m_aBonusInfo[64];
 		int m_BonusCount;
 		int m_ManaProcent;
-		int m_SkillPrice;
-		int m_SkillMaxLevel;
+		int m_PriceSP;
+		int m_MaxLevel;
 		bool m_Passive;
 	};
 	struct StructSkills
 	{
 		int m_SelectedEmoticion;
-		int m_SkillLevel;
+		int m_Level;
 	};
 
 	static std::map < int, StructSkillInformation > ms_aSkillsData;
