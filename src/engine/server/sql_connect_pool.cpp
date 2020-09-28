@@ -25,6 +25,11 @@
 	 It may seem that it does not use Pool, 
 	 but in fact it is and is created as a reserve when running
 	 <tlock>
+
+	 Usage is performed in turn following synchronously 
+	 working running through each request in order
+
+	 This pool is not asynchronous
 */
 // sql pool connections mutex
 std::mutex SqlConnectionLock;
