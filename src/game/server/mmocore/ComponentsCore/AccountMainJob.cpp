@@ -92,8 +92,16 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 	if(ACCOUNTDATA->next())
 	{
 		const int UserID = ACCOUNTDATA->getInt("ID");
-		std::shared_ptr<ResultSet> CHECKACCESS(SJK.SD("ID, LoginDate, Language", "tw_accounts", "WHERE Username = '%s' AND Password = '%s' AND ID = '%d'", clear_Login.cstr(), clear_Pass.cstr(), UserID));
-		if (!CHECKACCESS->next())
+		std::shared_ptr<ResultSet> CHECKACCESS(SJK.SD("ID, LoginDate, Language, Password, PasswordSalt", "tw_accounts", "WHERE Username = '%s' AND ID = '%d'", clear_Login.cstr(), UserID));
+
+		bool LoginSuccess = false;
+		if(CHECKACCESS->next())
+		{
+			if(!str_comp(CHECKACCESS->getString("Password").c_str(), HashPassword(clear_Pass.cstr(), CHECKACCESS->getString("PasswordSalt").c_str()).c_str()))
+				LoginSuccess = true;
+		}
+
+		if(!LoginSuccess)
 		{
 			GS()->Chat(ClientID, "Wrong login or password!");
 			return SendAuthCode(ClientID, AUTH_LOGIN_WRONG);

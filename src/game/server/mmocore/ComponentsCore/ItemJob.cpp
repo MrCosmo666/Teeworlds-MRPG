@@ -719,15 +719,15 @@ bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 		GameServer->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 	}
 
-	const int Code = GameServer->Mmo()->Item()->GiveItem(m_pPlayer, itemid_, arg_count, (AutoEquip ? 1 : arg_settings), arg_enchant);
+	const int Code = GameServer->Mmo()->Item()->GiveItem(m_pPlayer, m_ItemID, arg_count, (AutoEquip ? 1 : arg_settings), arg_enchant);
 	if(Code <= 0)
 		return false;
 		
 	if(AutoEquip)
 	{
 		if(m_pPlayer->GetCharacter())
-			m_pPlayer->GetCharacter()->UpdateEquipingStats(itemid_);
-		GameServer->ChangeEquipSkin(ClientID, itemid_);
+			m_pPlayer->GetCharacter()->UpdateEquipingStats(m_ItemID);
+		GameServer->ChangeEquipSkin(ClientID, m_ItemID);
 	}
 
 	if(!arg_message || Info().m_Type == ItemType::TYPE_SETTINGS) 
@@ -752,10 +752,10 @@ bool ItemJob::ClassItems::Remove(int arg_removecount, int arg_settings)
 	if (IsEquipped())
 	{
 		m_Settings = 0;
-		m_pPlayer->GS()->ChangeEquipSkin(m_pPlayer->GetCID(), itemid_);
+		m_pPlayer->GS()->ChangeEquipSkin(m_pPlayer->GetCID(), m_ItemID);
 	}
 
-	const int Code = m_pPlayer->GS()->Mmo()->Item()->RemoveItem(m_pPlayer, itemid_, arg_removecount, arg_settings);
+	const int Code = m_pPlayer->GS()->Mmo()->Item()->RemoveItem(m_pPlayer, m_ItemID, arg_removecount, arg_settings);
 	return (bool)(Code > 0);
 }
 
@@ -785,22 +785,22 @@ bool ItemJob::ClassItems::Equip()
 	if(Info().m_Type == ItemType::TYPE_EQUIP)
 	{
 		const int EquipID = Info().m_Function;
-		int EquipItemID = m_pPlayer->GetEquippedItem(EquipID, itemid_);
+		int EquipItemID = m_pPlayer->GetEquippedItem(EquipID, m_ItemID);
 		while (EquipItemID >= 1)
 		{
 			ItemJob::InventoryItem &EquipItem = m_pPlayer->GetItem(EquipItemID);
 			EquipItem.m_Settings = 0;
 			EquipItem.SetSettings(0);
-			EquipItemID = m_pPlayer->GetEquippedItem(EquipID, itemid_);
+			EquipItemID = m_pPlayer->GetEquippedItem(EquipID, m_ItemID);
 		}
 	}
 
 	m_Settings ^= true;
 	if(Info().m_Type == ItemType::TYPE_EQUIP)
-		m_pPlayer->GS()->ChangeEquipSkin(m_pPlayer->GetCID(), itemid_);
+		m_pPlayer->GS()->ChangeEquipSkin(m_pPlayer->GetCID(), m_ItemID);
 
 	if(m_pPlayer->GetCharacter())
-		m_pPlayer->GetCharacter()->UpdateEquipingStats(itemid_);
+		m_pPlayer->GetCharacter()->UpdateEquipingStats(m_ItemID);
 
 	m_pPlayer->ShowInformationStats();
 	return Save();
@@ -811,7 +811,7 @@ bool ItemJob::ClassItems::Save()
 	if (m_pPlayer && m_pPlayer->IsAuthed())
 	{
 		SJK.UD("tw_accounts_items", "Count = '%d', Settings = '%d', Enchant = '%d', Durability = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", 
-			m_Count, m_Settings, m_Enchant, m_Durability, m_pPlayer->Acc().m_AuthID, itemid_);
+			m_Count, m_Settings, m_Enchant, m_Durability, m_pPlayer->Acc().m_AuthID, m_ItemID);
 		return true;
 	}
 	return false;

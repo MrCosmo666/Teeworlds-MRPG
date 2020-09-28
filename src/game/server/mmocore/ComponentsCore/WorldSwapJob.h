@@ -17,14 +17,14 @@ class WorldSwapJob : public MmoComponent
 		int m_TwoPositionY;
 		int m_TwoWorldID;
 	};
-	static std::map < int, StructSwapWorld > ms_aWorldSwap;
-
 	struct StructPositionLogic
 	{
 		int m_BaseWorldID;
 		int m_FindWorldID;
 		vec2 m_Position;
 	};
+
+	static std::map < int, StructSwapWorld > ms_aWorldSwap;
 	static std::list < StructPositionLogic > ms_aWorldPositionLogic;
 public:
 	virtual void OnInit();

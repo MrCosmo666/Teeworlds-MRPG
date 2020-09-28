@@ -48,11 +48,11 @@ public:
 	class ClassItems
 	{
 		CPlayer* m_pPlayer;
-		int itemid_;
+		int m_ItemID;
 
 	public:
 		ClassItems() : m_Count(0), m_Settings(0), m_Enchant(0), m_Durability(0) {};
-		ClassItems(CPlayer* pPlayer, int ItemID) : m_pPlayer(pPlayer), itemid_(ItemID), m_Count(0), m_Settings(0), m_Enchant(0), m_Durability(0) {};
+		ClassItems(CPlayer* pPlayer, int ItemID) : m_pPlayer(pPlayer), m_ItemID(ItemID), m_Count(0), m_Settings(0), m_Enchant(0), m_Durability(0) {};
 		void SetPlayer(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
 
 		int m_Count;
@@ -70,9 +70,9 @@ public:
 		bool Save();
 
 		int EnchantPrice() const;
-		int GetID() const { return itemid_; }
+		int GetID() const { return m_ItemID; }
 		bool IsEquipped() const { return m_Count > 0 && m_Settings > 0 && (Info().m_Type == ItemType::TYPE_POTION || Info().m_Type == ItemType::TYPE_SETTINGS || Info().m_Type == ItemType::TYPE_MODULE || Info().m_Type == ItemType::TYPE_EQUIP); }
-		ItemInformation& Info() const { return ms_aItemsInfo[itemid_]; };
+		ItemInformation& Info() const { return ms_aItemsInfo[m_ItemID]; };
 	};
 
 	typedef ClassItems InventoryItem;
