@@ -21,7 +21,7 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	m_ShowedTankingInfo = false;
 
 	// door creation to start
-	vec2 PosDoor = vec2(DungeonJob::Dungeon[m_DungeonID].DoorX, DungeonJob::Dungeon[m_DungeonID].DoorY);
+	vec2 PosDoor = vec2(DungeonJob::Dungeon[m_DungeonID].m_DoorX, DungeonJob::Dungeon[m_DungeonID].m_DoorY);
 	m_DungeonDoor = new DungeonDoor(&GS()->m_World, PosDoor);
 	ChangeState(DUNGEON_WAITING);
 
@@ -57,7 +57,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	// used when changing state to waiting
 	if (State == DUNGEON_WAITING)
 	{
-		DungeonJob::Dungeon[m_DungeonID].Progress = 0;
+		DungeonJob::Dungeon[m_DungeonID].m_Progress = 0;
 		m_MaximumTick = 0;
 		m_FinishedTick = 0;
 		m_StartingTick = 0;
@@ -109,14 +109,14 @@ void CGameControllerDungeon::ChangeState(int State)
 
 			Buffer.append(", ");
 			Buffer.append(Server()->ClientName(i));
-			Seconds = GS()->m_apPlayers[i]->GetTempData().TempTimeDungeon / Server()->TickSpeed();
+			Seconds = GS()->m_apPlayers[i]->GetTempData().m_TempTimeDungeon / Server()->TickSpeed();
 			GS()->Mmo()->Dungeon()->SaveDungeonRecord(GS()->m_apPlayers[i], m_DungeonID, Seconds);
-			GS()->m_apPlayers[i]->GetTempData().TempTimeDungeon = 0;
+			GS()->m_apPlayers[i]->GetTempData().m_TempTimeDungeon = 0;
 		}
 		char aTimeFormat[64];
 		str_format(aTimeFormat, sizeof(aTimeFormat), "Time: %d minute(s) %d second(s)", Seconds / 60, Seconds - (Seconds / 60 * 60));
 		GS()->Chat(-1, "Group{STR}!", Buffer.buffer());
-		GS()->Chat(-1, "{STR} finished {STR}!", DungeonJob::Dungeon[m_DungeonID].Name, aTimeFormat);
+		GS()->Chat(-1, "{STR} finished {STR}!", DungeonJob::Dungeon[m_DungeonID].m_aName, aTimeFormat);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
@@ -143,8 +143,8 @@ void CGameControllerDungeon::StateTick()
 	// update every second
 	if (Server()->Tick() % Server()->TickSpeed() == 0)
 	{
-		DungeonJob::Dungeon[m_DungeonID].Players = Players;
-		DungeonJob::Dungeon[m_DungeonID].State = m_StateDungeon;
+		DungeonJob::Dungeon[m_DungeonID].m_Players = Players;
+		DungeonJob::Dungeon[m_DungeonID].m_State = m_StateDungeon;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
@@ -195,7 +195,7 @@ void CGameControllerDungeon::StateTick()
 			if (!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID)
 				continue;
 
-			GS()->m_apPlayers[i]->GetTempData().TempTimeDungeon++;
+			GS()->m_apPlayers[i]->GetTempData().m_TempTimeDungeon++;
 		}
 
 		// security tick during which time the player will not return to the old world
@@ -237,7 +237,7 @@ void CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKil
 	if (KillerID != VictimID && pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
 		const int Progress = 100 - (int)kurosio::translate_to_procent(CountMobs(), LeftMobsToWin());
-		DungeonJob::Dungeon[m_DungeonID].Progress = Progress;
+		DungeonJob::Dungeon[m_DungeonID].m_Progress = Progress;
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The dungeon is completed on [{INT}%]", &Progress);
 		UpdateDoorKeyState();
 	}
@@ -261,7 +261,7 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 					m_ShowedTankingInfo = true;
 					if(m_SelectedWithVotes)
 						GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank is assigned to {STR} with {INT} votes!", 
-							Server()->ClientName(ClientID), &pChr->GetPlayer()->GetTempData().TempTankVotingDungeon);
+							Server()->ClientName(ClientID), &pChr->GetPlayer()->GetTempData().m_TempTankVotingDungeon);
 					else
 					{
 						const int StrengthTank = pChr->GetPlayer()->GetLevelDisciple(AtributType::AtTank, true);
@@ -274,7 +274,7 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 			if(!m_SafeTick)
 			{
 				GS()->Chat(ClientID, "You were thrown out of dungeon!");
-				pChr->GetPlayer()->ChangeWorld(pChr->GetPlayer()->Acc().LastWorldID);
+				pChr->GetPlayer()->ChangeWorld(pChr->GetPlayer()->Acc().m_LastWorldID);
 				return false;
 			}
 		}
@@ -327,7 +327,7 @@ int CGameControllerDungeon::PlayersReady() const
 	int readyPlayers = 0;
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID || !GS()->m_apPlayers[i]->GetTempData().TempDungeonReady)
+		if(!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID || !GS()->m_apPlayers[i]->GetTempData().m_TempDungeonReady)
 			continue;
 		readyPlayers++;
 	}
@@ -383,14 +383,14 @@ void CGameControllerDungeon::SelectTankPlayer()
 			continue;
 
 		// small random set new tank where Votes equal
-		if(MaximalVotes > 0 && pPlayer->GetTempData().TempTankVotingDungeon == MaximalVotes && random_int() % 2 == 0)
+		if(MaximalVotes > 0 && pPlayer->GetTempData().m_TempTankVotingDungeon == MaximalVotes && random_int() % 2 == 0)
 			m_TankClientID = i;
 
 		// select tank what have more votes
-		if(pPlayer->GetTempData().TempTankVotingDungeon > MaximalVotes)
+		if(pPlayer->GetTempData().m_TempTankVotingDungeon > MaximalVotes)
 		{
 			m_TankClientID = i;
-			MaximalVotes = pPlayer->GetTempData().TempTankVotingDungeon;
+			MaximalVotes = pPlayer->GetTempData().m_TempTankVotingDungeon;
 			m_SelectedWithVotes = true;
 		}
 

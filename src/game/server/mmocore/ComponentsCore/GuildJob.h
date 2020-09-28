@@ -11,7 +11,7 @@ class GuildJob : public MmoComponent
 {
 	struct GuildStruct
 	{
-		char m_Name[32];
+		char m_aName[32];
 		int m_Level;
 		int m_Exp;
 		int m_OwnerID;
@@ -32,24 +32,24 @@ class GuildJob : public MmoComponent
 		int m_Price;
 		int m_Payment;
 		int m_GuildID;
-		GuildDoor *m_Door;
+		GuildDoor *m_pDoor;
 	};
 
 	struct GuildStructRank
 	{
-		char Rank[32];
-		int GuildID;
-		int Access;
+		char m_aRank[32];
+		int m_GuildID;
+		int m_Access;
 	};
 
 	typedef std::map < int , GuildStruct > GuildType;
-	static GuildType Guild;
+	static GuildType ms_aGuild;
 
 	typedef std::map < int , GuildStructHouse > GuildHouseType;
-	static GuildHouseType HouseGuild;
+	static GuildHouseType ms_aHouseGuild;
 
 	typedef std::map < int , GuildStructRank > GuildRankType;
-	static GuildRankType RankGuild;
+	static GuildRankType ms_aRankGuild;
 
 	std::map < int, CDecorationHouses* > m_DecorationHouse;
 

@@ -17,7 +17,7 @@ CDropItem::CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForc
 
 	m_OwnerID = OwnerID;
 	m_DropItem = DropItem;
-	m_DropItem.Settings = 0;
+	m_DropItem.m_Settings = 0;
 	m_Flashing = false;
 	m_LifeSpan = Server()->TickSpeed() * 20;
 	
@@ -45,17 +45,17 @@ bool CDropItem::TakeItem(int ClientID)
 	// change of enchanted objects
 	GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 	ItemJob::InventoryItem &pPlayerDroppedItem = pPlayer->GetItem(m_DropItem.GetID());
-	if(pPlayerDroppedItem.Count > 0 && pPlayerDroppedItem.Info().IsEnchantable())
+	if(pPlayerDroppedItem.m_Count > 0 && pPlayerDroppedItem.Info().IsEnchantable())
 	{
 		tl_swap(pPlayerDroppedItem, m_DropItem);
-		GS()->Chat(ClientID, "You now own {STR}(+{INT})", pPlayerDroppedItem.Info().GetName(pPlayer), &pPlayerDroppedItem.Enchant);
+		GS()->Chat(ClientID, "You now own {STR}(+{INT})", pPlayerDroppedItem.Info().GetName(pPlayer), &pPlayerDroppedItem.m_Enchant);
 		GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
 		GS()->UpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
 		return true;
 	}
 	
 	// simple subject delivery
-	pPlayerDroppedItem.Add(m_DropItem.Count, 0, m_DropItem.Enchant);
+	pPlayerDroppedItem.Add(m_DropItem.m_Count, 0, m_DropItem.m_Enchant);
 	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 10, "\0");
 	GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
 	GS()->UpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
@@ -122,21 +122,21 @@ void CDropItem::Tick()
 	if(!pPlayerDroppedItem.Info().IsEnchantable())
 	{
 		GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}x{INT} {STR}",
-			m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.Count, (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0"));
+			m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.m_Count, (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0"));
 		return;
 	}
 
-	if (pPlayerDroppedItem.Count > 0)
+	if (pPlayerDroppedItem.m_Count > 0)
 	{
 		GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) -> (+{INT}) {STR}", 
 			m_DropItem.Info().GetName(pChar->GetPlayer()),
-			&pPlayerDroppedItem.Enchant, &m_DropItem.Enchant,
+			&pPlayerDroppedItem.m_Enchant, &m_DropItem.m_Enchant,
 			(m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0"));
 		return;
 	}
 
 	GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) {STR}",
-		pPlayerDroppedItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.Enchant, (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0"));
+		pPlayerDroppedItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.m_Enchant, (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0"));
 }
 
 void CDropItem::Snap(int SnappingClient)

@@ -20,7 +20,7 @@ class HouseJob : public MmoComponent
 		int m_DoorX;
 		int m_DoorY;
 		int m_Price;
-		char m_Class[32];
+		char m_aClass[32];
 		int m_OwnerID;
 		int m_Bank;
 		int m_PlantID;
@@ -31,9 +31,9 @@ class HouseJob : public MmoComponent
 		HouseDoor *m_Door;
 	};
 	typedef std::map < int , HouseList > HouseType;
-	static HouseType Home;
+	static HouseType ms_aHouse;
 
-	std::map < int , CDecorationHouses * > m_DecorationHouse;
+	std::map < int , CDecorationHouses * > ms_aDecorationHouse;
 public:
 	virtual void OnInitWorld(const char* pWhereLocalWorld);
 	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);

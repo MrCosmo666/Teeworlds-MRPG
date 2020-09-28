@@ -9,8 +9,8 @@
 
 using namespace sqlstr;
 
-std::map < int , SkillJob::StructSkillInformation > SkillJob::SkillData;
-std::map < int , std::map < int , SkillJob::StructSkills > > SkillJob::Skill;
+std::map < int , SkillJob::StructSkillInformation > SkillJob::ms_aSkillsData;
+std::map < int , std::map < int , SkillJob::StructSkills > > SkillJob::ms_aSkills;
 
 void SkillJob::OnInit()
 { 
@@ -19,14 +19,14 @@ void SkillJob::OnInit()
 		while(RES->next())
 		{
 			const int SkillID = (int)RES->getInt("ID");
-			str_copy(SkillData[SkillID].m_SkillName, RES->getString("SkillName").c_str(), sizeof(SkillData[SkillID].m_SkillName));
-			str_copy(SkillData[SkillID].m_SkillDesc, RES->getString("SkillDesc").c_str(), sizeof(SkillData[SkillID].m_SkillDesc));
-			str_copy(SkillData[SkillID].m_SkillBonusInfo, RES->getString("BonusInfo").c_str(), sizeof(SkillData[SkillID].m_SkillBonusInfo));
-			SkillData[SkillID].m_ManaProcent = (int)RES->getInt("ManaProcent");
-			SkillData[SkillID].m_SkillPrice = (int)RES->getInt("Price");
-			SkillData[SkillID].m_SkillMaxLevel = (int)RES->getInt("MaxLevel");
-			SkillData[SkillID].m_BonusCount = (int)RES->getInt("BonusCount");
-			SkillData[SkillID].m_Passive = (bool)RES->getBoolean("Passive");
+			str_copy(ms_aSkillsData[SkillID].m_aSkillName, RES->getString("SkillName").c_str(), sizeof(ms_aSkillsData[SkillID].m_aSkillName));
+			str_copy(ms_aSkillsData[SkillID].m_aSkillDesc, RES->getString("SkillDesc").c_str(), sizeof(ms_aSkillsData[SkillID].m_aSkillDesc));
+			str_copy(ms_aSkillsData[SkillID].m_aSkillBonusInfo, RES->getString("BonusInfo").c_str(), sizeof(ms_aSkillsData[SkillID].m_aSkillBonusInfo));
+			ms_aSkillsData[SkillID].m_ManaProcent = (int)RES->getInt("ManaProcent");
+			ms_aSkillsData[SkillID].m_SkillPrice = (int)RES->getInt("Price");
+			ms_aSkillsData[SkillID].m_SkillMaxLevel = (int)RES->getInt("MaxLevel");
+			ms_aSkillsData[SkillID].m_BonusCount = (int)RES->getInt("BonusCount");
+			ms_aSkillsData[SkillID].m_Passive = (bool)RES->getBoolean("Passive");
 		}
 	});
 }
@@ -34,19 +34,19 @@ void SkillJob::OnInit()
 void SkillJob::OnInitAccount(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	std::shared_ptr<ResultSet> RES(SJK.SD("SkillID, SkillLevel, SelectedEmoticion", "tw_accounts_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("SkillID, SkillLevel, SelectedEmoticion", "tw_accounts_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID));
 	while(RES->next())
 	{
 		const int SkillID = (int)RES->getInt("SkillID");
-		Skill[ClientID][SkillID].m_SkillLevel = (int)RES->getInt("SkillLevel");
-		Skill[ClientID][SkillID].m_SelectedEmoticion = (int)RES->getInt("SelectedEmoticion");
+		ms_aSkills[ClientID][SkillID].m_SkillLevel = (int)RES->getInt("SkillLevel");
+		ms_aSkills[ClientID][SkillID].m_SelectedEmoticion = (int)RES->getInt("SelectedEmoticion");
 	}		
 }
 
 void SkillJob::OnResetClient(int ClientID)
 {
-	if (Skill.find(ClientID) != Skill.end())
-		Skill.erase(ClientID);
+	if (ms_aSkills.find(ClientID) != ms_aSkills.end())
+		ms_aSkills.erase(ClientID);
 }
 
 bool SkillJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
@@ -111,11 +111,11 @@ bool SkillJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 	if (PPSTR(CMD, "SKILLCHANGEEMOTICION") == 0)
 	{
 		const int SkillID = VoteID;
-		Skill[ClientID][SkillID].m_SelectedEmoticion++;
-		if (Skill[ClientID][SkillID].m_SelectedEmoticion >= NUM_EMOTICONS)
-			Skill[ClientID][SkillID].m_SelectedEmoticion = -1;
+		ms_aSkills[ClientID][SkillID].m_SelectedEmoticion++;
+		if (ms_aSkills[ClientID][SkillID].m_SelectedEmoticion >= NUM_EMOTICONS)
+			ms_aSkills[ClientID][SkillID].m_SelectedEmoticion = -1;
 
-		SJK.UD("tw_accounts_skills", "SelectedEmoticion = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", Skill[ClientID][SkillID].m_SelectedEmoticion, SkillID, pPlayer->Acc().AuthID);
+		SJK.UD("tw_accounts_skills", "SelectedEmoticion = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", ms_aSkills[ClientID][SkillID].m_SelectedEmoticion, SkillID, pPlayer->Acc().m_AuthID);
 		GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
@@ -124,15 +124,15 @@ bool SkillJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 
 int SkillJob::GetSkillBonus(int ClientID, int SkillID) const
 {
-	if(Skill[ClientID].find(SkillID) != Skill[ClientID].end())
-		return (Skill[ClientID][SkillID].m_SkillLevel * SkillData[SkillID].m_BonusCount);
+	if(ms_aSkills[ClientID].find(SkillID) != ms_aSkills[ClientID].end())
+		return (ms_aSkills[ClientID][SkillID].m_SkillLevel * ms_aSkillsData[SkillID].m_BonusCount);
 	return 0;
 }
 
 int SkillJob::GetSkillLevel(int ClientID, int SkillID) const
 {
-	if(Skill[ClientID].find(SkillID) != Skill[ClientID].end())
-		return Skill[ClientID][SkillID].m_SkillLevel;
+	if(ms_aSkills[ClientID].find(SkillID) != ms_aSkills[ClientID].end())
+		return ms_aSkills[ClientID][SkillID].m_SkillLevel;
 	return 0;
 }
 
@@ -141,7 +141,7 @@ void SkillJob::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
 	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = BLUE_COLOR;
 	GS()->AVL(ClientID, "null", "{STR} skill's", (Passive ? "Passive" : "Active"));
-	for (const auto& sk : SkillData)
+	for (const auto& sk : ms_aSkillsData)
 	{
 		if(sk.second.m_Passive == Passive)
 			SkillSelected(pPlayer, sk.first);
@@ -151,62 +151,62 @@ void SkillJob::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
 
 void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 {
-	if(SkillData.find(SkillID) == SkillData.end()) 
+	if(ms_aSkillsData.find(SkillID) == ms_aSkillsData.end()) 
 		return;
 
 	const int ClientID = pPlayer->GetCID();
 	const int LevelOwn = GetSkillLevel(ClientID, SkillID);
-	const int BonusSkill = GetSkillBonus(ClientID, SkillID) + SkillData[SkillID].m_BonusCount;
-	const bool Passive = SkillData[SkillID].m_Passive;
-	const int HideID = NUM_TAB_MENU + ItemJob::ItemsInfo.size() + SkillID;
-	GS()->AVHI(ClientID, "skill", HideID, LIGHT_BLUE_COLOR, "{STR} - {INT}SP ({INT}/{INT})", SkillData[SkillID].m_SkillName, &SkillData[SkillID].m_SkillPrice, &LevelOwn, &SkillData[SkillID].m_SkillMaxLevel);
+	const int BonusSkill = GetSkillBonus(ClientID, SkillID) + ms_aSkillsData[SkillID].m_BonusCount;
+	const bool Passive = ms_aSkillsData[SkillID].m_Passive;
+	const int HideID = NUM_TAB_MENU + ItemJob::ms_aItemsInfo.size() + SkillID;
+	GS()->AVHI(ClientID, "skill", HideID, LIGHT_BLUE_COLOR, "{STR} - {INT}SP ({INT}/{INT})", ms_aSkillsData[SkillID].m_aSkillName, &ms_aSkillsData[SkillID].m_SkillPrice, &LevelOwn, &ms_aSkillsData[SkillID].m_SkillMaxLevel);
 	if(Passive)
 	{
-		GS()->AVM(ClientID, "null", NOPE, HideID, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].m_SkillBonusInfo);
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", SkillData[SkillID].m_SkillDesc);
-		GS()->AVM(ClientID, "SKILLLEARN", SkillID, HideID, "Learn {STR}", SkillData[SkillID].m_SkillName);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "Next level +{INT} {STR}", &BonusSkill, ms_aSkillsData[SkillID].m_aSkillBonusInfo);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", ms_aSkillsData[SkillID].m_aSkillDesc);
+		GS()->AVM(ClientID, "SKILLLEARN", SkillID, HideID, "Learn {STR}", ms_aSkillsData[SkillID].m_aSkillName);
 		return;
 	}
 
-	GS()->AVM(ClientID, "null", NOPE, HideID, "Mana required (-{INT}%)", &SkillData[SkillID].m_ManaProcent);
-	GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", SkillData[SkillID].m_SkillDesc);
-	GS()->AVM(ClientID, "null", NOPE, HideID, "Next level +{INT} {STR}", &BonusSkill, SkillData[SkillID].m_SkillBonusInfo);
+	GS()->AVM(ClientID, "null", NOPE, HideID, "Mana required (-{INT}%)", &ms_aSkillsData[SkillID].m_ManaProcent);
+	GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", ms_aSkillsData[SkillID].m_aSkillDesc);
+	GS()->AVM(ClientID, "null", NOPE, HideID, "Next level +{INT} {STR}", &BonusSkill, ms_aSkillsData[SkillID].m_aSkillBonusInfo);
 	if (LevelOwn >= 1)
 	{
 		GS()->AVM(ClientID, "null", NOPE, HideID, "F1 Bind: (bind 'key' say \"/useskill {INT}\")", &SkillID);
-		GS()->AVM(ClientID, "SKILLCHANGEEMOTICION", SkillID, HideID, "Used on {STR}", GetSelectedEmoticion(Skill[ClientID][SkillID].m_SelectedEmoticion));
+		GS()->AVM(ClientID, "SKILLCHANGEEMOTICION", SkillID, HideID, "Used on {STR}", GetSelectedEmoticion(ms_aSkills[ClientID][SkillID].m_SelectedEmoticion));
 	}
-	GS()->AVM(ClientID, "SKILLLEARN", SkillID, HideID, "Learn {STR}", SkillData[SkillID].m_SkillName);
+	GS()->AVM(ClientID, "SKILLLEARN", SkillID, HideID, "Learn {STR}", ms_aSkillsData[SkillID].m_aSkillName);
 }
 
 bool SkillJob::UpgradeSkill(CPlayer *pPlayer, int SkillID)
 {
 	const int ClientID = pPlayer->GetCID();
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_skills", "WHERE SkillID = '%d' AND OwnerID = '%d'", SkillID, pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_skills", "WHERE SkillID = '%d' AND OwnerID = '%d'", SkillID, pPlayer->Acc().m_AuthID));
 	if (RES->next())
 	{
-		if (Skill[ClientID][SkillID].m_SkillLevel >= SkillData[SkillID].m_SkillMaxLevel)
+		if (ms_aSkills[ClientID][SkillID].m_SkillLevel >= ms_aSkillsData[SkillID].m_SkillMaxLevel)
 		{
 			GS()->Chat(ClientID, "Skill already maximum level!");
 			return false;
 		}
 
-		if (pPlayer->CheckFailMoney(SkillData[SkillID].m_SkillPrice, itSkillPoint))
+		if (pPlayer->CheckFailMoney(ms_aSkillsData[SkillID].m_SkillPrice, itSkillPoint))
 			return false;
 
-		Skill[ClientID][SkillID].m_SkillLevel++;
-		SJK.UD("tw_accounts_skills", "SkillLevel = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", Skill[ClientID][SkillID].m_SkillLevel, SkillID, pPlayer->Acc().AuthID);
-		GS()->Chat(ClientID, "Increased the skill [{STR} level to {INT}]", SkillData[SkillID].m_SkillName, &Skill[ClientID][SkillID].m_SkillLevel);
+		ms_aSkills[ClientID][SkillID].m_SkillLevel++;
+		SJK.UD("tw_accounts_skills", "SkillLevel = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", ms_aSkills[ClientID][SkillID].m_SkillLevel, SkillID, pPlayer->Acc().m_AuthID);
+		GS()->Chat(ClientID, "Increased the skill [{STR} level to {INT}]", ms_aSkillsData[SkillID].m_aSkillName, &ms_aSkills[ClientID][SkillID].m_SkillLevel);
 		return true;
 	}
 
-	if (pPlayer->CheckFailMoney(SkillData[SkillID].m_SkillPrice, itSkillPoint))
+	if (pPlayer->CheckFailMoney(ms_aSkillsData[SkillID].m_SkillPrice, itSkillPoint))
 		return false;
 
-	Skill[ClientID][SkillID].m_SkillLevel = 1;
-	Skill[ClientID][SkillID].m_SelectedEmoticion = -1;
-	SJK.ID("tw_accounts_skills", "(SkillID, OwnerID, SkillLevel) VALUES ('%d', '%d', '1');", SkillID, pPlayer->Acc().AuthID);
-	GS()->Chat(ClientID, "Learned a new skill [{STR}]", SkillData[SkillID].m_SkillName);
+	ms_aSkills[ClientID][SkillID].m_SkillLevel = 1;
+	ms_aSkills[ClientID][SkillID].m_SelectedEmoticion = -1;
+	SJK.ID("tw_accounts_skills", "(SkillID, OwnerID, SkillLevel) VALUES ('%d', '%d', '1');", SkillID, pPlayer->Acc().m_AuthID);
+	GS()->Chat(ClientID, "Learned a new skill [{STR}]", ms_aSkillsData[SkillID].m_aSkillName);
 	return true;
 }
 
@@ -216,7 +216,7 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 		return false;
 
 	// mana check
-	const int SkillProcent = SkillData[SkillID].m_ManaProcent;
+	const int SkillProcent = ms_aSkillsData[SkillID].m_ManaProcent;
 	const int ManaPrice = kurosio::translate_to_procent_rest(pPlayer->GetStartMana(), SkillProcent);
 	CCharacter* pChr = pPlayer->GetCharacter();
 	if(ManaPrice > 0 && pChr->CheckFailMana(ManaPrice))
@@ -293,7 +293,7 @@ void SkillJob::ParseEmoticionSkill(CPlayer *pPlayer, int EmoticionID)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
-	for (const auto& skillplayer : Skill[ClientID])
+	for (const auto& skillplayer : ms_aSkills[ClientID])
 	{
 		if (skillplayer.second.m_SelectedEmoticion == EmoticionID)
 			UseSkill(pPlayer, skillplayer.first);

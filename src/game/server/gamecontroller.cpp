@@ -43,21 +43,21 @@ bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 
 	// HEALTH
 	int StartHealth = pChr->GetPlayer()->GetStartHealth();
-	if(pChr->GetPlayer()->GetTempData().TempActiveSafeSpawn == true)
+	if(pChr->GetPlayer()->GetTempData().m_TempSafeSpawn == true)
 	{
-		pChr->GetPlayer()->GetTempData().TempActiveSafeSpawn = false;
+		pChr->GetPlayer()->GetTempData().m_TempSafeSpawn = false;
 		StartHealth /= 2;
 	}
 	if(GS()->IsDungeon())
 		StartHealth = pChr->GetPlayer()->GetStartHealth();
-	else if(pChr->GetPlayer()->GetTempData().TempHealth > 0)
-		StartHealth = pChr->GetPlayer()->GetTempData().TempHealth;
+	else if(pChr->GetPlayer()->GetTempData().m_TempHealth > 0)
+		StartHealth = pChr->GetPlayer()->GetTempData().m_TempHealth;
 	pChr->IncreaseHealth(StartHealth);
 
 	// MANA
-	if(pChr->GetPlayer()->GetTempData().TempMana > 0)
+	if(pChr->GetPlayer()->GetTempData().m_TempMana > 0)
 	{
-		const int StartMana = pChr->GetPlayer()->GetTempData().TempMana;
+		const int StartMana = pChr->GetPlayer()->GetTempData().m_TempMana;
 		pChr->IncreaseMana(StartMana);
 	}
 
@@ -285,7 +285,7 @@ void IGameController::DoTeamChange(CPlayer *pPlayer, bool DoChatMsg)
 	if(Team == pPlayer->GetTeam())
 		return;
 
-	pPlayer->Acc().Team = Team;
+	pPlayer->Acc().m_Team = Team;
 	GS()->SendTeam(ClientID, Team, DoChatMsg, -1);
 
 	char aBuf[128];

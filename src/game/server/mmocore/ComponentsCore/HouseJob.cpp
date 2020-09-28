@@ -7,7 +7,7 @@
 #include <game/server/mmocore/GameEntities/jobitems.h>
 
 using namespace sqlstr;
-std::map <int, HouseJob::HouseList> HouseJob::Home;
+std::map <int, HouseJob::HouseList> HouseJob::ms_aHouse;
 
 void HouseJob::OnInitWorld(const char* pWhereLocalWorld) 
 {
@@ -17,39 +17,39 @@ void HouseJob::OnInitWorld(const char* pWhereLocalWorld)
 		while(RES->next())
 		{
 			const int HouseID = RES->getInt("ID");
-			Home[HouseID].m_DoorX = RES->getInt("DoorX");
-			Home[HouseID].m_DoorY = RES->getInt("DoorY");
-			Home[HouseID].m_PosX = RES->getInt("PosX");
-			Home[HouseID].m_PosY = RES->getInt("PosY");
-			Home[HouseID].m_OwnerID = RES->getInt("OwnerID");
-			Home[HouseID].m_Price = RES->getInt("Price");
-			Home[HouseID].m_Bank = RES->getInt("HouseBank");
-			Home[HouseID].m_WorldID = RES->getInt("WorldID");
-			str_copy(Home[HouseID].m_Class, RES->getString("Class").c_str(), sizeof(Home[HouseID].m_Class));
-			Home[HouseID].m_PlantID = RES->getInt("PlantID");
-			Home[HouseID].m_PlantPosX = RES->getInt("PlantX");
-			Home[HouseID].m_PlantPosY = RES->getInt("PlantY");
-			if(GS()->GetWorldID() == Home[HouseID].m_WorldID && Home[HouseID].m_OwnerID > 0 && !Home[HouseID].m_Door)
+			ms_aHouse[HouseID].m_DoorX = RES->getInt("DoorX");
+			ms_aHouse[HouseID].m_DoorY = RES->getInt("DoorY");
+			ms_aHouse[HouseID].m_PosX = RES->getInt("PosX");
+			ms_aHouse[HouseID].m_PosY = RES->getInt("PosY");
+			ms_aHouse[HouseID].m_OwnerID = RES->getInt("OwnerID");
+			ms_aHouse[HouseID].m_Price = RES->getInt("Price");
+			ms_aHouse[HouseID].m_Bank = RES->getInt("HouseBank");
+			ms_aHouse[HouseID].m_WorldID = RES->getInt("WorldID");
+			str_copy(ms_aHouse[HouseID].m_aClass, RES->getString("Class").c_str(), sizeof(ms_aHouse[HouseID].m_aClass));
+			ms_aHouse[HouseID].m_PlantID = RES->getInt("PlantID");
+			ms_aHouse[HouseID].m_PlantPosX = RES->getInt("PlantX");
+			ms_aHouse[HouseID].m_PlantPosY = RES->getInt("PlantY");
+			if(GS()->GetWorldID() == ms_aHouse[HouseID].m_WorldID && ms_aHouse[HouseID].m_OwnerID > 0 && !ms_aHouse[HouseID].m_Door)
 			{
-				Home[HouseID].m_Door = 0;
-				Home[HouseID].m_Door = new HouseDoor(&GS()->m_World, vec2(Home[HouseID].m_DoorX, Home[HouseID].m_DoorY));
+				ms_aHouse[HouseID].m_Door = 0;
+				ms_aHouse[HouseID].m_Door = new HouseDoor(&GS()->m_World, vec2(ms_aHouse[HouseID].m_DoorX, ms_aHouse[HouseID].m_DoorY));
 			}
 		}
-		Job()->ShowLoadingProgress("Houses", Home.size());
+		Job()->ShowLoadingProgress("Houses", ms_aHouse.size());
 	}, pWhereLocalWorld);
 
 	// load decoration
-	if(m_DecorationHouse.empty())
+	if(ms_aDecorationHouse.empty())
 	{
 		SJK.SDT("*", "tw_houses_decorations", [&](ResultSet* DecoRES)
 		{
 			while(DecoRES->next())
 			{
 				const int DecoID = DecoRES->getInt("ID");
-				m_DecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(DecoRES->getInt("X"),
+				ms_aDecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(DecoRES->getInt("X"),
 					DecoRES->getInt("Y")), DecoRES->getInt("HouseID"), DecoRES->getInt("DecoID"));
 			}
-			Job()->ShowLoadingProgress("Houses Decorations", m_DecorationHouse.size());
+			Job()->ShowLoadingProgress("Houses Decorations", ms_aDecorationHouse.size());
 		}, pWhereLocalWorld);
 	}
 }
@@ -62,7 +62,7 @@ void HouseJob::OnInitWorld(const char* pWhereLocalWorld)
 ######################################################################### */
 void HouseJob::ChangePlantsID(int HouseID, int PlantID)
 {
-	if(Home.find(HouseID) == Home.end())
+	if(ms_aHouse.find(HouseID) == ms_aHouse.end())
 		return;
 
 	bool Changes = false;
@@ -77,7 +77,7 @@ void HouseJob::ChangePlantsID(int HouseID, int PlantID)
 
 	if(Changes) 
 	{
-		Home[HouseID].m_PlantID = PlantID;
+		ms_aHouse[HouseID].m_PlantID = PlantID;
 		SJK.UD("tw_houses", "PlantID = '%d' WHERE ID = '%d'", PlantID, HouseID);
 	}
 }
@@ -103,20 +103,20 @@ bool HouseJob::AddDecorationHouse(int DecoID, int HouseID, vec2 Position)
 	SJK.ID("tw_houses_decorations", "(ID, DecoID, HouseID, X, Y, WorldID) VALUES ('%d', '%d', '%d', '%d', '%d', '%d')", 
 		InitID, DecoID, HouseID, (int)Position.x, (int)Position.y, GS()->GetWorldID());
 
-	m_DecorationHouse[InitID] = new CDecorationHouses(&GS()->m_World, Position, HouseID, DecoID);
+	ms_aDecorationHouse[InitID] = new CDecorationHouses(&GS()->m_World, Position, HouseID, DecoID);
 	return true;
 }
 
 bool HouseJob::DeleteDecorationHouse(int ID)
 {
-	if(m_DecorationHouse.find(ID) != m_DecorationHouse.end())
+	if(ms_aDecorationHouse.find(ID) != ms_aDecorationHouse.end())
 	{
-		if(m_DecorationHouse.at(ID))
+		if(ms_aDecorationHouse.at(ID))
 		{
-			delete m_DecorationHouse.at(ID);
-			m_DecorationHouse.at(ID) = 0;
+			delete ms_aDecorationHouse.at(ID);
+			ms_aDecorationHouse.at(ID) = 0;
 		}
-		m_DecorationHouse.erase(ID);
+		ms_aDecorationHouse.erase(ID);
 		SJK.DD("tw_houses_decorations", "WHERE ID = '%d'", ID);
 		return true;
 	}
@@ -127,7 +127,7 @@ void HouseJob::ShowDecorationList(CPlayer *pPlayer)
 {
 	int HouseID = PlayerHouseID(pPlayer);
 	int ClientID = pPlayer->GetCID();
-	for (auto deco = m_DecorationHouse.begin(); deco != m_DecorationHouse.end(); deco++)
+	for (auto deco = ms_aDecorationHouse.begin(); deco != ms_aDecorationHouse.end(); deco++)
 	{
 		if(deco->second && deco->second->m_HouseID == HouseID) 
 		{
@@ -142,22 +142,22 @@ void HouseJob::ShowDecorationList(CPlayer *pPlayer)
 ######################################################################### */
 int HouseJob::GetOwnerHouse(int HouseID)
 {
-	if(Home.find(HouseID) != Home.end())
-		return Home[HouseID].m_OwnerID;
+	if(ms_aHouse.find(HouseID) != ms_aHouse.end())
+		return ms_aHouse[HouseID].m_OwnerID;
 	return -1;
 }
 
 int HouseJob::GetWorldID(int HouseID) const
 {
-	if(Home.find(HouseID) != Home.end())
-		return Home.at(HouseID).m_WorldID;
+	if(ms_aHouse.find(HouseID) != ms_aHouse.end())
+		return ms_aHouse.at(HouseID).m_WorldID;
 	return -1;
 }
 
 int HouseJob::GetHouse(vec2 Pos, bool Plants)
 {
 	float Distance = (Plants ? 300.0f : 128.0f);
-	for(const auto& ihome : Home)
+	for(const auto& ihome : ms_aHouse)
 	{
 		if (ihome.second.m_WorldID != GS()->GetWorldID())
 			continue;
@@ -171,16 +171,16 @@ int HouseJob::GetHouse(vec2 Pos, bool Plants)
 
 int HouseJob::GetHousePrice(int HouseID) const	
 {	 
-	if(Home.find(HouseID) != Home.end()) 
-		return Home.at(HouseID).m_Price;
+	if(ms_aHouse.find(HouseID) != ms_aHouse.end()) 
+		return ms_aHouse.at(HouseID).m_Price;
  	return -1;
 }
 
 bool HouseJob::GetHouseDoor(int HouseID) const	
 {	 
-	if(Home.find(HouseID) != Home.end())	
+	if(ms_aHouse.find(HouseID) != ms_aHouse.end())	
 	{
-		bool DoorClose = (Home.at(HouseID).m_Door);
+		bool DoorClose = (ms_aHouse.at(HouseID).m_Door);
 		return DoorClose;
 	}
 	return false;
@@ -188,16 +188,16 @@ bool HouseJob::GetHouseDoor(int HouseID) const
 
 vec2 HouseJob::GetPositionHouse(int HouseID) const	
 { 	
-	if(Home.find(HouseID) != Home.end()) 
-		return vec2(Home.at(HouseID).m_PosX, Home.at(HouseID).m_PosY); 
+	if(ms_aHouse.find(HouseID) != ms_aHouse.end()) 
+		return vec2(ms_aHouse.at(HouseID).m_PosX, ms_aHouse.at(HouseID).m_PosY); 
 
 	return vec2(0, 0);
 }
 
 int HouseJob::PlayerHouseID(CPlayer *pPlayer) const
 {
-	for (auto ihome = Home.begin(); ihome != Home.end(); ihome++) {
-		if(Home.at(ihome->first).m_OwnerID == pPlayer->Acc().AuthID)
+	for (auto ihome = ms_aHouse.begin(); ihome != ms_aHouse.end(); ihome++) {
+		if(ms_aHouse.at(ihome->first).m_OwnerID == pPlayer->Acc().m_AuthID)
 			return ihome->first;
 	}
 	return -1;
@@ -205,8 +205,8 @@ int HouseJob::PlayerHouseID(CPlayer *pPlayer) const
 
 int HouseJob::OwnerHouseID(int AuthID) const
 {
-	for (auto ihome = Home.begin(); ihome != Home.end(); ihome++) {
-		if(Home.at(ihome->first).m_OwnerID == AuthID)
+	for (auto ihome = ms_aHouse.begin(); ihome != ms_aHouse.end(); ihome++) {
+		if(ms_aHouse.at(ihome->first).m_OwnerID == AuthID)
 			return ihome->first;
 	}
 	return -1;
@@ -214,22 +214,22 @@ int HouseJob::OwnerHouseID(int AuthID) const
 
 int HouseJob::GetPlantsID(int HouseID) const
 {
-	if(Home.find(HouseID) != Home.end()) 
-		return Home.at(HouseID).m_PlantID;
+	if(ms_aHouse.find(HouseID) != ms_aHouse.end()) 
+		return ms_aHouse.at(HouseID).m_PlantID;
 	return -1;
 }
 
 const char *HouseJob::ClassName(int HouseID) const	
 {	
-	if(Home.find(HouseID) != Home.end()) 
-		return Home.at(HouseID).m_Class; 
+	if(ms_aHouse.find(HouseID) != ms_aHouse.end()) 
+		return ms_aHouse.at(HouseID).m_aClass; 
 	return "None";
 }
 
 const char *HouseJob::OwnerName(int HouseID) 
 {	
-	if(Home.find(HouseID) != Home.end())
-		return Job()->PlayerName(Home[HouseID].m_OwnerID);
+	if(ms_aHouse.find(HouseID) != ms_aHouse.end())
+		return Job()->PlayerName(ms_aHouse[HouseID].m_OwnerID);
 	return "No owner";
 }
 
@@ -252,12 +252,12 @@ void HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 		if(pPlayer->CheckFailMoney(Price))	
 			return;
 
-		Home[HouseID].m_Bank = 0;
-		Home[HouseID].m_OwnerID = pPlayer->Acc().AuthID;
-		SJK.UD("tw_houses", "OwnerID = '%d', HouseBank = '0' WHERE ID = '%d'", Home[HouseID].m_OwnerID, HouseID);
+		ms_aHouse[HouseID].m_Bank = 0;
+		ms_aHouse[HouseID].m_OwnerID = pPlayer->Acc().m_AuthID;
+		SJK.UD("tw_houses", "OwnerID = '%d', HouseBank = '0' WHERE ID = '%d'", ms_aHouse[HouseID].m_OwnerID, HouseID);
 
-		GS()->Chat(-1, "{STR} becomes the owner of the house class {STR}", GS()->Server()->ClientName(ClientID), Home[HouseID].m_Class);
-		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**{STR} becomes the owner of the house class {STR}**", GS()->Server()->ClientName(ClientID), Home[HouseID].m_Class);
+		GS()->Chat(-1, "{STR} becomes the owner of the house class {STR}", GS()->Server()->ClientName(ClientID), ms_aHouse[HouseID].m_aClass);
+		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**{STR} becomes the owner of the house class {STR}**", GS()->Server()->ClientName(ClientID), ms_aHouse[HouseID].m_aClass);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return;
 	}
@@ -271,7 +271,7 @@ void HouseJob::SellHouse(int HouseID)
 	if(RES->next())
 	{
 		const int OwnerID = RES->getInt("OwnerID");
-		const int Price = Home[HouseID].m_Price + RES->getInt("HouseBank");
+		const int Price = ms_aHouse[HouseID].m_Price + RES->getInt("HouseBank");
 		Job()->Inbox()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itGold, Price, 0);
 		SJK.UD("tw_houses", "OwnerID = NULL, HouseBank = '0' WHERE ID = '%d'", HouseID);
 
@@ -285,14 +285,14 @@ void HouseJob::SellHouse(int HouseID)
 		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**[House: {INT}] have been sold!**", &HouseID);
 	}
 
-	if(Home[HouseID].m_Door)
+	if(ms_aHouse[HouseID].m_Door)
 	{
-		delete Home[HouseID].m_Door;
-		Home[HouseID].m_Door = 0;
+		delete ms_aHouse[HouseID].m_Door;
+		ms_aHouse[HouseID].m_Door = 0;
 	}
 
-	Home[HouseID].m_OwnerID = -1;
-	Home[HouseID].m_Bank = 0;
+	ms_aHouse[HouseID].m_OwnerID = -1;
+	ms_aHouse[HouseID].m_Bank = 0;
 }
 
 bool HouseJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
@@ -365,7 +365,7 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 	if (Menulist == MenuList::MENU_HOUSE_PLANTS)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_HOUSE;
-		const int HouseID = OwnerHouseID(pPlayer->Acc().AuthID);
+		const int HouseID = OwnerHouseID(pPlayer->Acc().m_AuthID);
 		const int PlantItemID = GetPlantsID(HouseID);
 
 		GS()->AVH(ClientID, TAB_INFO_HOUSE_PLANT, GREEN_COLOR, "Plants Information");
@@ -384,7 +384,7 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 void HouseJob::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
 {
 	const int ClientID = pPlayer->GetCID();
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID));
 	if(!RES->next())
 		return;
 
@@ -397,61 +397,61 @@ void HouseJob::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
 	}
 
 	pPlayer->AddMoney(TakeCount);
-	Home[HouseID].m_Bank = Bank - TakeCount;
-	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", Home[HouseID].m_Bank, HouseID);
-	GS()->Chat(ClientID, "You take {INT} gold in the safe {INT}!", &TakeCount, &Home[HouseID].m_Bank);
+	ms_aHouse[HouseID].m_Bank = Bank - TakeCount;
+	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", ms_aHouse[HouseID].m_Bank, HouseID);
+	GS()->Chat(ClientID, "You take {INT} gold in the safe {INT}!", &TakeCount, &ms_aHouse[HouseID].m_Bank);
 }
 
 void HouseJob::AddSafeDeposit(CPlayer *pPlayer, int Balance)
 {
 	const int ClientID = pPlayer->GetCID();
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID));
 	if(!RES->next())
 		return;
 
 	const int HouseID = RES->getInt("ID");
-	Home[HouseID].m_Bank = RES->getInt("HouseBank") + Balance;            
-	GS()->Chat(ClientID, "You put {INT} gold in the safe {INT}!", &Balance, &Home[HouseID].m_Bank);
-	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", Home[HouseID].m_Bank, HouseID);
+	ms_aHouse[HouseID].m_Bank = RES->getInt("HouseBank") + Balance;            
+	GS()->Chat(ClientID, "You put {INT} gold in the safe {INT}!", &Balance, &ms_aHouse[HouseID].m_Bank);
+	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", ms_aHouse[HouseID].m_Bank, HouseID);
 }
 
 bool HouseJob::ChangeStateDoor(int HouseID)
 {
-	if(Home.find(HouseID) == Home.end() || Home[HouseID].m_OwnerID <= 0) 
+	if(ms_aHouse.find(HouseID) == ms_aHouse.end() || ms_aHouse[HouseID].m_OwnerID <= 0) 
 		return false;
 
-	if(Home[HouseID].m_WorldID != GS()->GetWorldID())
+	if(ms_aHouse[HouseID].m_WorldID != GS()->GetWorldID())
 	{
-		GS()->ChatAccountID(Home[HouseID].m_OwnerID, "Change state door can only near your house.");
+		GS()->ChatAccountID(ms_aHouse[HouseID].m_OwnerID, "Change state door can only near your house.");
 		return false;
 	}
 
-	if(Home[HouseID].m_Door) 
+	if(ms_aHouse[HouseID].m_Door) 
 	{
-		delete Home[HouseID].m_Door;
-		Home[HouseID].m_Door = 0;
+		delete ms_aHouse[HouseID].m_Door;
+		ms_aHouse[HouseID].m_Door = 0;
 	}
 	else
-		Home[HouseID].m_Door = new HouseDoor(&GS()->m_World, vec2(Home[HouseID].m_DoorX, Home[HouseID].m_DoorY));
+		ms_aHouse[HouseID].m_Door = new HouseDoor(&GS()->m_World, vec2(ms_aHouse[HouseID].m_DoorX, ms_aHouse[HouseID].m_DoorY));
 
-	const bool StateDoor = (Home[HouseID].m_Door);
-	GS()->ChatAccountID(Home[HouseID].m_OwnerID, "You {STR} the house.", (StateDoor ? "closed" : "opened"));
+	const bool StateDoor = (ms_aHouse[HouseID].m_Door);
+	GS()->ChatAccountID(ms_aHouse[HouseID].m_OwnerID, "You {STR} the house.", (StateDoor ? "closed" : "opened"));
 	return true;
 }
 
 void HouseJob::ShowHouseMenu(CPlayer *pPlayer, int HouseID)
 {
 	const int ClientID = pPlayer->GetCID();
-	GS()->AVH(ClientID, TAB_INFO_HOUSE, GREEN_COLOR, "House {INT} . {STR}", &HouseID, Home[HouseID].m_Class);
-	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE, "Owner House: {STR}", Job()->PlayerName(Home[HouseID].m_OwnerID));
+	GS()->AVH(ClientID, TAB_INFO_HOUSE, GREEN_COLOR, "House {INT} . {STR}", &HouseID, ms_aHouse[HouseID].m_aClass);
+	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE, "Owner House: {STR}", Job()->PlayerName(ms_aHouse[HouseID].m_OwnerID));
 
 	GS()->AV(ClientID, "null", "");
 	GS()->ShowItemValueInformation(pPlayer, itGold);
 	GS()->AV(ClientID, "null", "");
 	
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
-	if(Home[HouseID].m_OwnerID <= 0)
-		GS()->AVM(ClientID, "BUYHOUSE", HouseID, NOPE, "Buy this house. Price {INT}gold", &Home[HouseID].m_Price);
+	if(ms_aHouse[HouseID].m_OwnerID <= 0)
+		GS()->AVM(ClientID, "BUYHOUSE", HouseID, NOPE, "Buy this house. Price {INT}gold", &ms_aHouse[HouseID].m_Price);
 	else
 		GS()->AVM(ClientID, "null", HouseID, NOPE, "This house has already been purchased!");
 
@@ -469,15 +469,15 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 	}
 
 	const bool StateDoor = GetHouseDoor(HouseID);
-	GS()->AVH(ClientID, TAB_HOUSE_STAT, BLUE_COLOR, "House stats {INT} Class {STR} Door [{STR}]", &HouseID, Home[HouseID].m_Class, StateDoor ? "Closed" : "Opened");
+	GS()->AVH(ClientID, TAB_HOUSE_STAT, BLUE_COLOR, "House stats {INT} Class {STR} Door [{STR}]", &HouseID, ms_aHouse[HouseID].m_aClass, StateDoor ? "Closed" : "Opened");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "/doorhouse - interactive with door.");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "- - - - - - - - - -");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "Notes: Minimal operation house balance 100gold");
-	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "In your safe is: {INT}gold", &Home[HouseID].m_Bank);
+	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "In your safe is: {INT}gold", &ms_aHouse[HouseID].m_Bank);
 	GS()->AV(ClientID, "null", "");
 	//
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
-	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", &pPlayer->GetItem(itGold).Count);
+	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", &pPlayer->GetItem(itGold).m_Count);
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVM(ClientID, "HOUSEADD", 1, NOPE, "Add to the safe gold. (Amount in a reason)");
 	GS()->AVM(ClientID, "HOUSETAKE", 1, NOPE, "Take the safe gold. (Amount in a reason)");
@@ -489,7 +489,7 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 	GS()->AVM(ClientID, "HOUSEDOOR", HouseID, NOPE, "Change state to [\"{STR}\"]", StateDoor ? "OPEN" : "CLOSED");
 	GS()->AVM(ClientID, "HSPAWN", 1, NOPE, "Teleport to your house");
 	GS()->AVM(ClientID, "HSELL", HouseID, NOPE, "Sell your house (in reason 777)");
-	if(Home[HouseID].m_WorldID == GS()->Server()->GetWorldID(ClientID))
+	if(ms_aHouse[HouseID].m_WorldID == GS()->Server()->GetWorldID(ClientID))
 	{
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_HOUSE_DECORATION, NOPE, "Settings Decorations");
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_HOUSE_PLANTS, NOPE, "Settings Plants");
@@ -518,8 +518,8 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		vec2 Position = GetPositionHouse(HouseID);
 		if(!GS()->IsClientEqualWorldID(ClientID, HouseWorldID))
 		{
-			pPlayer->GetTempData().TempTeleportX = Position.x;
-			pPlayer->GetTempData().TempTeleportY = Position.y;
+			pPlayer->GetTempData().m_TempTeleportX = Position.x;
+			pPlayer->GetTempData().m_TempTeleportY = Position.y;
 			pPlayer->ChangeWorld(HouseWorldID);
 			return true;
 		}
@@ -593,8 +593,8 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		GS()->AddBack(ClientID);
 
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
-		pPlayer->GetTempData().TempDecoractionID = VoteID;
-		pPlayer->GetTempData().TempDecorationType = DECOTYPE_HOUSE;
+		pPlayer->GetTempData().m_TempDecoractionID = VoteID;
+		pPlayer->GetTempData().m_TempDecorationType = DECOTYPE_HOUSE;
 		return true;
 	}
 
@@ -638,7 +638,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 			return true;
 		}
 
-		GS()->Chat(-1, "Congratulations {STR}, planted at home {STR}!", GS()->Server()->ClientName(ClientID), GS()->GetItemInfo(ItemID).Name);
+		GS()->Chat(-1, "Congratulations {STR}, planted at home {STR}!", GS()->Server()->ClientName(ClientID), GS()->GetItemInfo(ItemID).m_aName);
 		ChangePlantsID(HouseID, ItemID);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 	}

@@ -9,9 +9,9 @@ class SkillJob : public MmoComponent
 {
 	struct StructSkillInformation
 	{
-		char m_SkillName[32];
-		char m_SkillDesc[64];
-		char m_SkillBonusInfo[64];
+		char m_aSkillName[32];
+		char m_aSkillDesc[64];
+		char m_aSkillBonusInfo[64];
 		int m_BonusCount;
 		int m_ManaProcent;
 		int m_SkillPrice;
@@ -24,8 +24,8 @@ class SkillJob : public MmoComponent
 		int m_SkillLevel;
 	};
 
-	static std::map < int, StructSkillInformation > SkillData;
-	static std::map < int, std::map < int, StructSkills > > Skill;
+	static std::map < int, StructSkillInformation > ms_aSkillsData;
+	static std::map < int, std::map < int, StructSkills > > ms_aSkills;
 
 public:
 	void OnInit() override;
@@ -37,7 +37,7 @@ public:
 
 	int GetSkillBonus(int ClientID, int SkillID) const;
 	int GetSkillLevel(int ClientID, int SkillID) const;
-	int SkillsSize() const { return SkillData.size(); };
+	int SkillsSize() const { return ms_aSkillsData.size(); };
 	bool UseSkill(CPlayer *pPlayer, int SkillID);
 	void ParseEmoticionSkill(CPlayer* pPlayer, int EmoticionID);
 

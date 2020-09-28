@@ -8,10 +8,10 @@
 using namespace sqlstr;
 
 // bot structures
-std::map <int, BotJob::DescDataBot> BotJob::DataBot;
-std::map <int, BotJob::QuestBotInfo> BotJob::QuestBot;
-std::map <int, BotJob::NpcBotInfo> BotJob::NpcBot;
-std::map <int, BotJob::MobBotInfo> BotJob::MobBot;
+std::map <int, BotJob::DescDataBot> BotJob::ms_aDataBot;
+std::map <int, BotJob::QuestBotInfo> BotJob::ms_aQuestBot;
+std::map <int, BotJob::NpcBotInfo> BotJob::ms_aNpcBot;
+std::map <int, BotJob::MobBotInfo> BotJob::ms_aMobBot;
 
 // loading of all skins and mobs to use for connection with other bots
 void BotJob::OnInitWorld(const char* pWhereLocalWorld)
@@ -67,7 +67,7 @@ void BotJob::ProcessingTalkingNPC(int OwnID, int TalkingID, bool PlayerTalked, c
 bool BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char *pText)
 {
 	const int ClientID = pPlayer->GetCID();
-	if (!IsNpcBotValid(MobID) || Progress >= (int)NpcBot[MobID].m_Talk.size())
+	if (!IsNpcBotValid(MobID) || Progress >= (int)ms_aNpcBot[MobID].m_aTalk.size())
 	{
 		GS()->ClearTalkText(ClientID);
 		return false;
@@ -77,14 +77,14 @@ bool BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 
 	char reformTalkedText[512];
-	const int BotID = NpcBot[MobID].BotID;
-	const int sizeTalking = NpcBot[MobID].m_Talk.size();
+	const int BotID = ms_aNpcBot[MobID].m_BotID;
+	const int sizeTalking = ms_aNpcBot[MobID].m_aTalk.size();
 	if (str_comp_nocase(pText, "empty") != 0)
 	{
 		pPlayer->FormatTextQuest(BotID, pText);
 		if(!GS()->CheckClient(ClientID))
 		{
-			str_format(reformTalkedText, sizeof(reformTalkedText), "( 1 of 1 ) %s:\n- %s", NpcBot[MobID].GetName(), pPlayer->FormatedTalkedText());
+			str_format(reformTalkedText, sizeof(reformTalkedText), "( 1 of 1 ) %s:\n- %s", ms_aNpcBot[MobID].GetName(), pPlayer->FormatedTalkedText());
 			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 		}
 		else
@@ -96,11 +96,11 @@ bool BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 		return true;
 	}
 
-	const bool PlayerTalked = NpcBot[MobID].m_Talk[Progress].m_PlayerTalked;
-	pPlayer->FormatTextQuest(BotID, NpcBot[MobID].m_Talk[Progress].m_TalkingText);
+	const bool PlayerTalked = ms_aNpcBot[MobID].m_aTalk[Progress].m_PlayerTalked;
+	pPlayer->FormatTextQuest(BotID, ms_aNpcBot[MobID].m_aTalk[Progress].m_aTalkingText);
 	if(!GS()->CheckClient(ClientID))
 	{
-		const char* TalkedNick = (PlayerTalked ? GS()->Server()->ClientName(ClientID) : NpcBot[MobID].GetName());
+		const char* TalkedNick = (PlayerTalked ? GS()->Server()->ClientName(ClientID) : ms_aNpcBot[MobID].GetName());
 		str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) %s:\n- %s", (1 + Progress), sizeTalking, TalkedNick, pPlayer->FormatedTalkedText());
 		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 	}
@@ -110,27 +110,27 @@ bool BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 	}
 	pPlayer->ClearFormatQuestText();
 	GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID,
-		PlayerTalked, reformTalkedText, NpcBot[MobID].m_Talk[Progress].m_Style, NpcBot[MobID].m_Talk[Progress].m_Emote);
+		PlayerTalked, reformTalkedText, ms_aNpcBot[MobID].m_aTalk[Progress].m_Style, ms_aNpcBot[MobID].m_aTalk[Progress].m_Emote);
 	return true;
 }
 
 bool BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID)
 {
 	const int ClientID = pPlayer->GetCID();
-	if (!IsQuestBotValid(MobID) || Progress >= (int)QuestBot[MobID].m_Talk.size())
+	if (!IsQuestBotValid(MobID) || Progress >= (int)ms_aQuestBot[MobID].m_aTalk.size())
 	{
 		GS()->ClearTalkText(ClientID);
 		return false;
 	}
 
 	char reformTalkedText[512];
-	const int BotID = QuestBot[MobID].BotID;
-	const int sizeTalking = QuestBot[MobID].m_Talk.size();
-	const bool PlayerTalked = QuestBot[MobID].m_Talk[Progress].m_PlayerTalked;
-	pPlayer->FormatTextQuest(BotID, QuestBot[MobID].m_Talk[Progress].m_TalkingText);
+	const int BotID = ms_aQuestBot[MobID].m_BotID;
+	const int sizeTalking = ms_aQuestBot[MobID].m_aTalk.size();
+	const bool PlayerTalked = ms_aQuestBot[MobID].m_aTalk[Progress].m_PlayerTalked;
+	pPlayer->FormatTextQuest(BotID, ms_aQuestBot[MobID].m_aTalk[Progress].m_aTalkingText);
 	if(!GS()->CheckClient(ClientID))
 	{
-		const char* TalkedNick = (PlayerTalked ? GS()->Server()->ClientName(ClientID) : QuestBot[MobID].GetName());
+		const char* TalkedNick = (PlayerTalked ? GS()->Server()->ClientName(ClientID) : ms_aQuestBot[MobID].GetName());
 		str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) %s:\n- %s", (1 + Progress), sizeTalking, TalkedNick, pPlayer->FormatedTalkedText());
 		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 	}
@@ -140,38 +140,38 @@ bool BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int Talk
 	}
 	pPlayer->ClearFormatQuestText();
 	GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID,
-		PlayerTalked, reformTalkedText, QuestBot[MobID].m_Talk[Progress].m_Style, QuestBot[MobID].m_Talk[Progress].m_Emote);
+		PlayerTalked, reformTalkedText, ms_aQuestBot[MobID].m_aTalk[Progress].m_Style, ms_aQuestBot[MobID].m_aTalk[Progress].m_Emote);
 	return true;
 }
 
 void BotJob::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 {
 	const int ClientID = pPlayer->GetCID();
-	if (!IsQuestBotValid(MobID) || Progress >= (int)QuestBot[MobID].m_Talk.size())
+	if (!IsQuestBotValid(MobID) || Progress >= (int)ms_aQuestBot[MobID].m_aTalk.size())
 	{
 		GS()->ClearTalkText(ClientID);
 		return;
 	}
 
 	// vanila clients
-	const int BotID = BotJob::QuestBot[MobID].BotID;
-	const int sizeTalking = BotJob::QuestBot[MobID].m_Talk.size();
+	const int BotID = BotJob::ms_aQuestBot[MobID].m_BotID;
+	const int sizeTalking = BotJob::ms_aQuestBot[MobID].m_aTalk.size();
 	if (!GS()->CheckClient(ClientID))
 	{
-		const bool PlayerTalked = QuestBot[MobID].m_Talk[Progress].m_PlayerTalked;
-		const char* TalkedNick = (PlayerTalked ? GS()->Server()->ClientName(ClientID) : QuestBot[MobID].GetName());
+		const bool PlayerTalked = ms_aQuestBot[MobID].m_aTalk[Progress].m_PlayerTalked;
+		const char* TalkedNick = (PlayerTalked ? GS()->Server()->ClientName(ClientID) : ms_aQuestBot[MobID].GetName());
 
 		char reformTalkedText[512];
-		pPlayer->FormatTextQuest(BotID, BotJob::QuestBot[MobID].m_Talk[Progress].m_TalkingText);
+		pPlayer->FormatTextQuest(BotID, BotJob::ms_aQuestBot[MobID].m_aTalk[Progress].m_aTalkingText);
 		str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) %s:\n- %s", (1 + Progress), sizeTalking, TalkedNick, pPlayer->FormatedTalkedText());
 		pPlayer->ClearFormatQuestText();
 
-		GS()->Mmo()->Quest()->QuestTableShowRequired(pPlayer, BotJob::QuestBot[MobID], reformTalkedText);
+		GS()->Mmo()->Quest()->QuestTableShowRequired(pPlayer, BotJob::ms_aQuestBot[MobID], reformTalkedText);
 		return;
 	}
 
 	// mmo clients
-	GS()->Mmo()->Quest()->QuestTableShowRequired(pPlayer, BotJob::QuestBot[MobID], "\0");
+	GS()->Mmo()->Quest()->QuestTableShowRequired(pPlayer, BotJob::ms_aQuestBot[MobID], "\0");
 }
 
 int BotJob::GetQuestNPC(int MobID) const
@@ -179,7 +179,7 @@ int BotJob::GetQuestNPC(int MobID) const
 	if (!IsNpcBotValid(MobID))
 		return -1;
 		
-	for (const auto& npc : NpcBot[MobID].m_Talk)
+	for (const auto& npc : ms_aNpcBot[MobID].m_aTalk)
 	{
 		if (npc.m_GivingQuest > 0)
 			return npc.m_GivingQuest;
@@ -191,42 +191,42 @@ int BotJob::GetQuestNPC(int MobID) const
 // load basic information about bots
 void BotJob::LoadMainInformationBots()
 {
-	if(!(DataBot.empty()))
+	if(!(ms_aDataBot.empty()))
 		return;
 
 	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_bots_world"));
 	while(RES->next())
 	{
 		const int BotID = (int)RES->getInt("ID");
-		str_copy(DataBot[BotID].NameBot, RES->getString("BotName").c_str(), sizeof(DataBot[BotID].NameBot));
+		str_copy(ms_aDataBot[BotID].m_aNameBot, RES->getString("BotName").c_str(), sizeof(ms_aDataBot[BotID].m_aNameBot));
 
 		if(!sscanf(RES->getString("SkinName").c_str(), "%s %s %s %s %s %s",
-			DataBot[BotID].SkinNameBot[SKINPART_BODY], DataBot[BotID].SkinNameBot[SKINPART_MARKING],
-			DataBot[BotID].SkinNameBot[SKINPART_DECORATION], DataBot[BotID].SkinNameBot[SKINPART_HANDS],
-			DataBot[BotID].SkinNameBot[SKINPART_FEET], DataBot[BotID].SkinNameBot[SKINPART_EYES]))
+			ms_aDataBot[BotID].m_aaSkinNameBot[SKINPART_BODY], ms_aDataBot[BotID].m_aaSkinNameBot[SKINPART_MARKING],
+			ms_aDataBot[BotID].m_aaSkinNameBot[SKINPART_DECORATION], ms_aDataBot[BotID].m_aaSkinNameBot[SKINPART_HANDS],
+			ms_aDataBot[BotID].m_aaSkinNameBot[SKINPART_FEET], ms_aDataBot[BotID].m_aaSkinNameBot[SKINPART_EYES]))
 			dbg_msg("Error", "Mised bots information");
 
 		if(!sscanf(RES->getString("SkinColor").c_str(), "%d %d %d %d %d %d",
-			&DataBot[BotID].SkinColorBot[SKINPART_BODY], &DataBot[BotID].SkinColorBot[SKINPART_MARKING],
-			&DataBot[BotID].SkinColorBot[SKINPART_DECORATION], &DataBot[BotID].SkinColorBot[SKINPART_HANDS],
-			&DataBot[BotID].SkinColorBot[SKINPART_FEET], &DataBot[BotID].SkinColorBot[SKINPART_EYES]))
+			&ms_aDataBot[BotID].m_aSkinColorBot[SKINPART_BODY], &ms_aDataBot[BotID].m_aSkinColorBot[SKINPART_MARKING],
+			&ms_aDataBot[BotID].m_aSkinColorBot[SKINPART_DECORATION], &ms_aDataBot[BotID].m_aSkinColorBot[SKINPART_HANDS],
+			&ms_aDataBot[BotID].m_aSkinColorBot[SKINPART_FEET], &ms_aDataBot[BotID].m_aSkinColorBot[SKINPART_EYES]))
 			dbg_msg("Error", "Mised bots information");
 
 		for(int j = SKINPART_BODY; j < NUM_SKINPARTS; j++) {
-			if(DataBot[BotID].SkinColorBot[j] != 0)
-				DataBot[BotID].UseCustomBot[j] = true;
+			if(ms_aDataBot[BotID].m_aSkinColorBot[j] != 0)
+				ms_aDataBot[BotID].m_aUseCustomBot[j] = true;
 		}
 
 		for(int i = 0; i < MAX_PLAYERS; i++)
-			DataBot[BotID].AlreadySnapQuestBot[i] = false;
+			ms_aDataBot[BotID].m_aAlreadySnapQuestBot[i] = false;
 
-		DataBot[BotID].EquipSlot[EQUIP_HAMMER] = RES->getInt("SlotHammer");
-		DataBot[BotID].EquipSlot[EQUIP_GUN] = RES->getInt("SlotGun");
-		DataBot[BotID].EquipSlot[EQUIP_SHOTGUN] = RES->getInt("SlotShotgun");
-		DataBot[BotID].EquipSlot[EQUIP_GRENADE] = RES->getInt("SlotGrenade");
-		DataBot[BotID].EquipSlot[EQUIP_RIFLE] = RES->getInt("SlotRifle");
-		DataBot[BotID].EquipSlot[EQUIP_MINER] = 0;
-		DataBot[BotID].EquipSlot[EQUIP_WINGS] = RES->getInt("SlotWings");
+		ms_aDataBot[BotID].m_aEquipSlot[EQUIP_HAMMER] = RES->getInt("SlotHammer");
+		ms_aDataBot[BotID].m_aEquipSlot[EQUIP_GUN] = RES->getInt("SlotGun");
+		ms_aDataBot[BotID].m_aEquipSlot[EQUIP_SHOTGUN] = RES->getInt("SlotShotgun");
+		ms_aDataBot[BotID].m_aEquipSlot[EQUIP_GRENADE] = RES->getInt("SlotGrenade");
+		ms_aDataBot[BotID].m_aEquipSlot[EQUIP_RIFLE] = RES->getInt("SlotRifle");
+		ms_aDataBot[BotID].m_aEquipSlot[EQUIP_MINER] = 0;
+		ms_aDataBot[BotID].m_aEquipSlot[EQUIP_WINGS] = RES->getInt("SlotWings");
 	}
 }
 
@@ -238,27 +238,27 @@ void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 	{
 		// it for every world initilize quest progress size
 		const int MobID = (int)RES->getInt("ID");
-		QuestBot[MobID].SubBotID = MobID;
-		QuestBot[MobID].BotID = (int)RES->getInt("BotID");
-		QuestBot[MobID].QuestID = RES->getInt("QuestID");
-		QuestBot[MobID].WorldID = (int)RES->getInt("WorldID");;
-		QuestBot[MobID].PositionX = (int)RES->getInt("pos_x");
-		QuestBot[MobID].PositionY = (int)RES->getInt("pos_y") + 1;
-		QuestBot[MobID].ItemSearch[0] = (int)RES->getInt("it_need_0");
-		QuestBot[MobID].ItemSearch[1] = (int)RES->getInt("it_need_1");
-		QuestBot[MobID].ItemGives[0] = (int)RES->getInt("it_reward_0");
-		QuestBot[MobID].ItemGives[1] = (int)RES->getInt("it_reward_1");
-		QuestBot[MobID].NeedMob[0] = (int)RES->getInt("mob_0");
-		QuestBot[MobID].NeedMob[1] = (int)RES->getInt("mob_1");
-		QuestBot[MobID].InteractiveType = (int)RES->getInt("interactive_type");
-		QuestBot[MobID].InteractiveTemp = (int)RES->getInt("interactive_temp");
-		QuestBot[MobID].GenerateNick = (bool)RES->getBoolean("generate_nick");
-		QuestBot[MobID].NextEqualProgress = (bool)RES->getBoolean("next_equal_progress");
+		ms_aQuestBot[MobID].m_SubBotID = MobID;
+		ms_aQuestBot[MobID].m_BotID = (int)RES->getInt("BotID");
+		ms_aQuestBot[MobID].m_QuestID = RES->getInt("QuestID");
+		ms_aQuestBot[MobID].m_WorldID = (int)RES->getInt("WorldID");;
+		ms_aQuestBot[MobID].m_PositionX = (int)RES->getInt("pos_x");
+		ms_aQuestBot[MobID].m_PositionY = (int)RES->getInt("pos_y") + 1;
+		ms_aQuestBot[MobID].m_aItemSearch[0] = (int)RES->getInt("it_need_0");
+		ms_aQuestBot[MobID].m_aItemSearch[1] = (int)RES->getInt("it_need_1");
+		ms_aQuestBot[MobID].m_aItemGives[0] = (int)RES->getInt("it_reward_0");
+		ms_aQuestBot[MobID].m_aItemGives[1] = (int)RES->getInt("it_reward_1");
+		ms_aQuestBot[MobID].m_aNeedMob[0] = (int)RES->getInt("mob_0");
+		ms_aQuestBot[MobID].m_aNeedMob[1] = (int)RES->getInt("mob_1");
+		ms_aQuestBot[MobID].m_InteractiveType = (int)RES->getInt("interactive_type");
+		ms_aQuestBot[MobID].m_InteractiveTemp = (int)RES->getInt("interactive_temp");
+		ms_aQuestBot[MobID].m_GenerateNick = (bool)RES->getBoolean("generate_nick");
+		ms_aQuestBot[MobID].m_NextEqualProgress = (bool)RES->getBoolean("next_equal_progress");
 
 		sscanf(RES->getString("it_count").c_str(), "|%d|%d|%d|%d|%d|%d|",
-			&QuestBot[MobID].ItemSearchCount[0], &QuestBot[MobID].ItemSearchCount[1],
-			&QuestBot[MobID].ItemGivesCount[0], &QuestBot[MobID].ItemGivesCount[1],
-			&QuestBot[MobID].NeedMobCount[0], &QuestBot[MobID].NeedMobCount[1]);
+			&ms_aQuestBot[MobID].m_aItemSearchCount[0], &ms_aQuestBot[MobID].m_aItemSearchCount[1],
+			&ms_aQuestBot[MobID].m_aItemGivesCount[0], &ms_aQuestBot[MobID].m_aItemGivesCount[1],
+			&ms_aQuestBot[MobID].m_aNeedMobCount[0], &ms_aQuestBot[MobID].m_aNeedMobCount[1]);
 
 		// load NPC
 		std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_quest_npc", "WHERE MobID = '%d'", MobID));
@@ -269,26 +269,26 @@ void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 			LoadTalk.m_Style = RES->getInt("Style");
 			LoadTalk.m_PlayerTalked = RES->getBoolean("PlayerTalked");
 			LoadTalk.m_RequestComplete = RES->getBoolean("RequestComplete");
-			str_copy(LoadTalk.m_TalkingText, RES->getString("TalkText").c_str(), sizeof(LoadTalk.m_TalkingText));
-			QuestBot[MobID].m_Talk.push_back(LoadTalk);
+			str_copy(LoadTalk.m_aTalkingText, RES->getString("TalkText").c_str(), sizeof(LoadTalk.m_aTalkingText));
+			ms_aQuestBot[MobID].m_aTalk.push_back(LoadTalk);
 		}
 
 		GS()->Server()->AddInformationBotsCount(1);
 	}
 
-	for(auto& qparseprogress : QuestBot)
+	for(auto& qparseprogress : ms_aQuestBot)
 	{
-		qparseprogress.second.Progress = 1;
-		for(const auto& qbots : QuestBot)
+		qparseprogress.second.m_Progress = 1;
+		for(const auto& qbots : ms_aQuestBot)
 		{
-			if(qbots.second.QuestID != qparseprogress.second.QuestID)
+			if(qbots.second.m_QuestID != qparseprogress.second.m_QuestID)
 				continue;
 			if(qbots.first == qparseprogress.first)
 				break;
-			if(qbots.second.NextEqualProgress)
+			if(qbots.second.m_NextEqualProgress)
 				continue;
 
-			qparseprogress.second.Progress++;
+			qparseprogress.second.m_Progress++;
 		}
 	}
 }
@@ -300,17 +300,17 @@ void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 	while(RES->next())
 	{
 		const int MobID = (int)RES->getInt("ID");
-		NpcBot[MobID].WorldID = RES->getInt("WorldID");
-		NpcBot[MobID].Static = RES->getBoolean("Static");
-		NpcBot[MobID].PositionX = RES->getInt("PositionX");
-		NpcBot[MobID].PositionY = (NpcBot[MobID].Static ? RES->getInt("PositionY") + 1 : RES->getInt("PositionY"));
-		NpcBot[MobID].Emote = RES->getInt("Emote");
-		NpcBot[MobID].BotID = RES->getInt("BotID");
-		NpcBot[MobID].Function = RES->getInt("Function");
+		ms_aNpcBot[MobID].m_WorldID = RES->getInt("WorldID");
+		ms_aNpcBot[MobID].m_Static = RES->getBoolean("Static");
+		ms_aNpcBot[MobID].m_PositionX = RES->getInt("PositionX");
+		ms_aNpcBot[MobID].m_PositionY = (ms_aNpcBot[MobID].m_Static ? RES->getInt("PositionY") + 1 : RES->getInt("PositionY"));
+		ms_aNpcBot[MobID].m_Emote = RES->getInt("Emote");
+		ms_aNpcBot[MobID].m_BotID = RES->getInt("BotID");
+		ms_aNpcBot[MobID].Function = RES->getInt("Function");
 
 		const int CountMobs = RES->getInt("Count");
 		for(int c = 0; c < CountMobs; c++)
-			GS()->CreateBot(BotsTypes::TYPE_BOT_NPC, NpcBot[MobID].BotID, MobID);
+			GS()->CreateBot(BotsTypes::TYPE_BOT_NPC, ms_aNpcBot[MobID].m_BotID, MobID);
 
 		std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_talk_other_npc", "WHERE MobID = '%d'", MobID));
 		while(RES->next())
@@ -320,11 +320,11 @@ void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 			LoadTalk.m_Style = RES->getInt("Style");
 			LoadTalk.m_PlayerTalked = RES->getBoolean("PlayerTalked");
 			LoadTalk.m_GivingQuest = RES->getInt("GivingQuest");
-			str_copy(LoadTalk.m_TalkingText, RES->getString("TalkText").c_str(), sizeof(LoadTalk.m_TalkingText));
-			NpcBot[MobID].m_Talk.push_back(LoadTalk);
+			str_copy(LoadTalk.m_aTalkingText, RES->getString("TalkText").c_str(), sizeof(LoadTalk.m_aTalkingText));
+			ms_aNpcBot[MobID].m_aTalk.push_back(LoadTalk);
 
 			if(LoadTalk.m_GivingQuest > 0)
-				NpcBot[MobID].Function = FunctionsNPC::FUNCTION_NPC_GIVE_QUEST;
+				ms_aNpcBot[MobID].Function = FunctionsNPC::FUNCTION_NPC_GIVE_QUEST;
 		}
 
 		GS()->Server()->AddInformationBotsCount(CountMobs);
@@ -339,32 +339,32 @@ void BotJob::LoadMobsBots(const char* pWhereLocalWorld)
 	{
 		const int MobID = (int)RES->getInt("ID");
 		const int BotID = RES->getInt("BotID");
-		MobBot[MobID].WorldID = RES->getInt("WorldID");
-		MobBot[MobID].PositionX = RES->getInt("PositionX");
-		MobBot[MobID].PositionY = RES->getInt("PositionY");
-		MobBot[MobID].Power = RES->getInt("Power");
-		MobBot[MobID].Spread = RES->getInt("Spread");
-		MobBot[MobID].Boss = RES->getBoolean("Boss");
-		MobBot[MobID].Level = RES->getInt("Level");
-		MobBot[MobID].RespawnTick = RES->getInt("Respawn");
-		MobBot[MobID].BotID = BotID;
-		str_copy(MobBot[MobID].Effect, RES->getString("Effect").c_str(), sizeof(MobBot[MobID].Effect));
-		str_copy(MobBot[MobID].Behavior, RES->getString("Behavior").c_str(), sizeof(MobBot[MobID].Behavior));
+		ms_aMobBot[MobID].m_WorldID = RES->getInt("WorldID");
+		ms_aMobBot[MobID].m_PositionX = RES->getInt("PositionX");
+		ms_aMobBot[MobID].m_PositionY = RES->getInt("PositionY");
+		ms_aMobBot[MobID].m_Power = RES->getInt("Power");
+		ms_aMobBot[MobID].m_Spread = RES->getInt("Spread");
+		ms_aMobBot[MobID].m_Boss = RES->getBoolean("Boss");
+		ms_aMobBot[MobID].m_Level = RES->getInt("Level");
+		ms_aMobBot[MobID].m_RespawnTick = RES->getInt("Respawn");
+		ms_aMobBot[MobID].m_BotID = BotID;
+		str_copy(ms_aMobBot[MobID].m_aEffect, RES->getString("Effect").c_str(), sizeof(ms_aMobBot[MobID].m_aEffect));
+		str_copy(ms_aMobBot[MobID].m_aBehavior, RES->getString("Behavior").c_str(), sizeof(ms_aMobBot[MobID].m_aBehavior));
 
 		char aBuf[32];
 		for(int i = 0; i < MAX_DROPPED_FROM_MOBS; i++)
 		{
 			str_format(aBuf, sizeof(aBuf), "it_drop_%d", i);
-			MobBot[MobID].DropItem[i] = RES->getInt(aBuf);
+			ms_aMobBot[MobID].m_aDropItem[i] = RES->getInt(aBuf);
 		}
 
 		sscanf(RES->getString("it_drop_count").c_str(), "|%d|%d|%d|%d|%d|",
-			&MobBot[MobID].CountItem[0], &MobBot[MobID].CountItem[1], &MobBot[MobID].CountItem[2],
-			&MobBot[MobID].CountItem[3], &MobBot[MobID].CountItem[4]);
+			&ms_aMobBot[MobID].m_aCountItem[0], &ms_aMobBot[MobID].m_aCountItem[1], &ms_aMobBot[MobID].m_aCountItem[2],
+			&ms_aMobBot[MobID].m_aCountItem[3], &ms_aMobBot[MobID].m_aCountItem[4]);
 
 		sscanf(RES->getString("it_drop_chance").c_str(), "|%f|%f|%f|%f|%f|",
-			&MobBot[MobID].RandomItem[0], &MobBot[MobID].RandomItem[1], &MobBot[MobID].RandomItem[2],
-			&MobBot[MobID].RandomItem[3], &MobBot[MobID].RandomItem[4]);
+			&ms_aMobBot[MobID].m_aRandomItem[0], &ms_aMobBot[MobID].m_aRandomItem[1], &ms_aMobBot[MobID].m_aRandomItem[2],
+			&ms_aMobBot[MobID].m_aRandomItem[3], &ms_aMobBot[MobID].m_aRandomItem[4]);
 
 		const int CountMobs = RES->getInt("Count");
 		for(int c = 0; c < CountMobs; c++)

@@ -6,7 +6,7 @@
 #include "CraftJob.h"
 
 using namespace sqlstr;
-std::map < int , CraftJob::CraftStruct > CraftJob::Craft;
+std::map < int , CraftJob::CraftStruct > CraftJob::ms_aCraft;
 
 void CraftJob::OnInit()
 {
@@ -14,24 +14,24 @@ void CraftJob::OnInit()
 	while(RES->next())
 	{
 		const int ID = RES->getInt("ID");
-		Craft[ID].GetItemID = RES->getInt("GetItem");
-		Craft[ID].GetItemCount = RES->getInt("GetItemCount");
+		ms_aCraft[ID].m_ReceivedItemID = RES->getInt("GetItem");
+		ms_aCraft[ID].m_ReceivedItemCount = RES->getInt("GetItemCount");
 
 		char aBuf[32];
 		for(int i = 0; i < 3; i ++)
 		{
 			str_format(aBuf, sizeof(aBuf), "ItemNeed%d", i);
-			Craft[ID].ItemNeedID[i] = RES->getInt(aBuf);
+			ms_aCraft[ID].m_aItemNeedID[i] = RES->getInt(aBuf);
 		}
 		str_copy(aBuf, RES->getString("ItemNeedCount").c_str(), sizeof(aBuf));
-		if (!sscanf(aBuf, "%d %d %d", &Craft[ID].ItemNeedCount[0], &Craft[ID].ItemNeedCount[1], &Craft[ID].ItemNeedCount[2]))
+		if (!sscanf(aBuf, "%d %d %d", &ms_aCraft[ID].m_aItemNeedCount[0], &ms_aCraft[ID].m_aItemNeedCount[1], &ms_aCraft[ID].m_aItemNeedCount[2]))
 			dbg_msg("Error", "Error on scanf in Crafting");
 
 		// set the variables
-		Craft[ID].Price = RES->getInt("Price");
-		Craft[ID].WorldID = RES->getInt("WorldID");
+		ms_aCraft[ID].m_Price = RES->getInt("Price");
+		ms_aCraft[ID].m_WorldID = RES->getInt("WorldID");
 	}
-	Job()->ShowLoadingProgress("Crafts", Craft.size());	
+	Job()->ShowLoadingProgress("Crafts", ms_aCraft.size());	
 }
 
 bool CraftJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
@@ -58,9 +58,9 @@ bool CraftJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 
 bool CraftJob::ItEmptyType(int SelectType) const
 {
-	for (const auto& foundtype : Craft)
+	for (const auto& foundtype : ms_aCraft)
 	{
-		if (foundtype.second.WorldID != GS()->GetWorldID() || GS()->GetItemInfo(foundtype.second.GetItemID).Type != SelectType)
+		if (foundtype.second.m_WorldID != GS()->GetWorldID() || GS()->GetItemInfo(foundtype.second.m_ReceivedItemID).m_Type != SelectType)
 			continue;
 		return false;
 	}
@@ -76,25 +76,25 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 	pPlayer->m_Colored = GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "{STR}", TypeName);
 
-	for(const auto& cr : Craft)
+	for(const auto& cr : ms_aCraft)
     {
-		if(cr.second.WorldID != GS()->GetWorldID())
+		if(cr.second.m_WorldID != GS()->GetWorldID())
 			continue;
 
-		int HideID = NUM_TAB_MENU + ItemJob::ItemsInfo.size() + cr.first;
-		ItemJob::ItemInformation &InfoGetItem = GS()->GetItemInfo(cr.second.GetItemID);
-		if (InfoGetItem.Type != SelectType)
+		int HideID = NUM_TAB_MENU + ItemJob::ms_aItemsInfo.size() + cr.first;
+		ItemJob::ItemInformation &InfoGetItem = GS()->GetItemInfo(cr.second.m_ReceivedItemID);
+		if (InfoGetItem.m_Type != SelectType)
 			continue;
 
-		int Discount = (int)kurosio::translate_to_procent_rest(cr.second.Price, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount));
+		int Discount = (int)kurosio::translate_to_procent_rest(cr.second.m_Price, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount));
 		if(pPlayer->GetItem(itTicketDiscountCraft).IsEquipped())
-			Discount += (int)kurosio::translate_to_procent_rest(cr.second.Price, 20);
+			Discount += (int)kurosio::translate_to_procent_rest(cr.second.m_Price, 20);
 		
-		const int LastPrice = max(cr.second.Price - Discount, 0);
+		const int LastPrice = max(cr.second.m_Price - Discount, 0);
 		if (InfoGetItem.IsEnchantable())
 		{
 			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} - {INT} gold",
-				(pPlayer->GetItem(cr.second.GetItemID).Count ? "✔ " : "\0"), InfoGetItem.GetName(pPlayer), &LastPrice);
+				(pPlayer->GetItem(cr.second.m_ReceivedItemID).m_Count ? "✔ " : "\0"), InfoGetItem.GetName(pPlayer), &LastPrice);
 
 			char aAttributes[128];
 			Job()->Item()->FormatAttributes(InfoGetItem, 0, sizeof(aAttributes), aAttributes);
@@ -103,19 +103,19 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 		else
 		{
 			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) :: {INT} gold",
-				InfoGetItem.GetName(pPlayer), &cr.second.GetItemCount, &pPlayer->GetItem(cr.second.GetItemID).Count, &LastPrice);
+				InfoGetItem.GetName(pPlayer), &cr.second.m_ReceivedItemCount, &pPlayer->GetItem(cr.second.m_ReceivedItemID).m_Count, &LastPrice);
 		}
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", InfoGetItem.GetDesc(pPlayer));
 
 		for(int i = 0; i < 3; i++)
 		{
-			int SearchItemID = cr.second.ItemNeedID[i];
-			int SearchCount = cr.second.ItemNeedCount[i];
+			int SearchItemID = cr.second.m_aItemNeedID[i];
+			int SearchCount = cr.second.m_aItemNeedCount[i];
 			if(SearchItemID <= 0 || SearchCount <= 0) 
 				continue;
 			
 			ItemJob::InventoryItem &PlSearchItem = pPlayer->GetItem(SearchItemID);
-			GS()->AVMI(ClientID, PlSearchItem.Info().GetIcon(), "null", NOPE, HideID, "{STR} {INT}({INT})", PlSearchItem.Info().GetName(pPlayer), &SearchCount, &PlSearchItem.Count);
+			GS()->AVMI(ClientID, PlSearchItem.Info().GetIcon(), "null", NOPE, HideID, "{STR} {INT}({INT})", PlSearchItem.Info().GetName(pPlayer), &SearchCount, &PlSearchItem.m_Count);
 		}
 		GS()->AVM(ClientID, "CRAFT", cr.first, HideID, "Craft {STR}", InfoGetItem.GetName(pPlayer));
 	}
@@ -125,8 +125,8 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 {
 	const int ClientID = pPlayer->GetCID();
-	ItemJob::InventoryItem& PlayerCraftItem = pPlayer->GetItem(Craft[CraftID].GetItemID);
-	if (PlayerCraftItem.Info().IsEnchantable() && PlayerCraftItem.Count > 0)
+	ItemJob::InventoryItem& PlayerCraftItem = pPlayer->GetItem(ms_aCraft[CraftID].m_ReceivedItemID);
+	if (PlayerCraftItem.Info().IsEnchantable() && PlayerCraftItem.m_Count > 0)
 	{
 		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");
 		return;
@@ -136,13 +136,13 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 	dynamic_string Buffer;
 	for(int i = 0; i < 3; i++) 
 	{
-		int SearchItemID = Craft[CraftID].ItemNeedID[i]; 
-		int SearchCount = Craft[CraftID].ItemNeedCount[i];
-		if(SearchItemID <= 0 || SearchCount <= 0 || pPlayer->GetItem(SearchItemID).Count >= SearchCount) 
+		int SearchItemID = ms_aCraft[CraftID].m_aItemNeedID[i]; 
+		int SearchCount = ms_aCraft[CraftID].m_aItemNeedCount[i];
+		if(SearchItemID <= 0 || SearchCount <= 0 || pPlayer->GetItem(SearchItemID).m_Count >= SearchCount) 
 			continue;
 
 		char aBuf[48];
-		int ItemLeft = SearchCount - pPlayer->GetItem(SearchItemID).Count;
+		int ItemLeft = SearchCount - pPlayer->GetItem(SearchItemID).m_Count;
 		str_format(aBuf, sizeof(aBuf), "%sx%d ", GS()->GetItemInfo(SearchItemID).GetName(pPlayer), ItemLeft);
 		Buffer.append((const char*)aBuf);
 	}
@@ -157,32 +157,32 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 	dbg_msg("test", "here craft left");
 
 	// we are already organizing the crafting
-	int Discount = (int)kurosio::translate_to_procent_rest(Craft[CraftID].Price, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount));
+	int Discount = (int)kurosio::translate_to_procent_rest(ms_aCraft[CraftID].m_Price, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount));
 	bool TickedDiscountCraft = pPlayer->GetItem(itTicketDiscountCraft).IsEquipped();
 	if(TickedDiscountCraft)
-		Discount += (int)kurosio::translate_to_procent_rest(Craft[CraftID].Price, 20);
+		Discount += (int)kurosio::translate_to_procent_rest(ms_aCraft[CraftID].m_Price, 20);
 
-	const int LastPrice = max(Craft[CraftID].Price - Discount, 0);
+	const int LastPrice = max(ms_aCraft[CraftID].m_Price - Discount, 0);
 	if(pPlayer->CheckFailMoney(LastPrice))
 		return;
 
 	if(TickedDiscountCraft)
 	{
 		pPlayer->GetItem(itTicketDiscountCraft).Remove(1);
-		GS()->Chat(ClientID, "You used item {STR} and get discount 25%.", GS()->GetItemInfo(itTicketDiscountCraft).Name);
+		GS()->Chat(ClientID, "You used item {STR} and get discount 25%.", GS()->GetItemInfo(itTicketDiscountCraft).m_aName);
 	}
 
 	for(int i = 0; i < 3; i++) 
 	{
-		int SearchItemID = Craft[CraftID].ItemNeedID[i]; 
-		int SearchCount = Craft[CraftID].ItemNeedCount[i];
+		int SearchItemID = ms_aCraft[CraftID].m_aItemNeedID[i]; 
+		int SearchCount = ms_aCraft[CraftID].m_aItemNeedCount[i];
 		if(SearchItemID <= 0 || SearchCount <= 0) 
 			continue;
 
 		pPlayer->GetItem(SearchItemID).Remove(SearchCount);
 	}
 
-	const int CraftGetCount = Craft[CraftID].GetItemCount;
+	const int CraftGetCount = ms_aCraft[CraftID].m_ReceivedItemCount;
 	PlayerCraftItem.Add(CraftGetCount);
 	if(PlayerCraftItem.Info().IsEnchantable())
 	{
