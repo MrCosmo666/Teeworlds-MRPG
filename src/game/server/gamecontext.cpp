@@ -1909,7 +1909,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 		
-		Mmo()->Quest()->ShowFullQuestLift(pPlayer);
+		Mmo()->Quest()->ShowQuestsMainList(pPlayer);
 		AddBack(ClientID);
 	}
 	else if(MenuList == MenuList::MENU_INBOX) 

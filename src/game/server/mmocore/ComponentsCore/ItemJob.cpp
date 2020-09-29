@@ -223,15 +223,15 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, b
 	const int ClientID = pPlayer->GetCID();
 	const int ItemID = pPlayerItem.GetID();
 	const int HideID = NUM_TAB_MENU + ItemID;
-	const char* NameItem = pPlayerItem.Info().GetName(pPlayer);
+	const char* pNameItem = pPlayerItem.Info().GetName(pPlayer);
 
 	// overwritten or not
 	if (pPlayerItem.Info().IsEnchantable())
 	{
-		char aEnchantSize[16];
-		str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", pPlayerItem.m_Enchant);
-		GS()->AVHI(ClientID, pPlayerItem.Info().GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} {STR}",
-			NameItem, (pPlayerItem.m_Enchant > 0 ? aEnchantSize : "\0"), (pPlayerItem.m_Settings ? " ✔" : "\0"));
+		char aEnchantBuf[16];
+		pPlayerItem.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf));
+		GS()->AVHI(ClientID, pPlayerItem.Info().GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR} {STR}{STR}",
+			pNameItem, (pPlayerItem.m_Enchant > 0 ? aEnchantBuf : "\0"), (pPlayerItem.m_Settings ? " ✔" : "\0"));
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pPlayerItem.Info().GetDesc(pPlayer));
 
 		char aAttributes[64];
@@ -241,7 +241,7 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, b
 	else
 	{
 		GS()->AVHI(ClientID, pPlayerItem.Info().GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} x{INT}",
-			(pPlayerItem.m_Settings ? "Dressed - " : "\0"), NameItem, &pPlayerItem.m_Count);
+			(pPlayerItem.m_Settings ? "Dressed - " : "\0"), pNameItem, &pPlayerItem.m_Count);
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pPlayerItem.Info().GetDesc(pPlayer));
 	}
 
@@ -250,22 +250,22 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, b
 		char aBuf[64];
 		str_format(aBuf, sizeof(aBuf), "Bind command \"/useitem %d'\"", ItemID);
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aBuf);
-		GS()->AVM(ClientID, "IUSE", ItemID, HideID, "Use {STR}", NameItem);
+		GS()->AVM(ClientID, "IUSE", ItemID, HideID, "Use {STR}", pNameItem);
 	}
 
 	if (pPlayerItem.Info().m_Type == ItemType::TYPE_POTION)
-		GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "Auto use {STR} - {STR}", NameItem, (pPlayerItem.m_Settings ? "Enable" : "Disable"));
+		GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "Auto use {STR} - {STR}", pNameItem, (pPlayerItem.m_Settings ? "Enable" : "Disable"));
 	else if (pPlayerItem.Info().m_Type == ItemType::TYPE_DECORATION)
 	{
-		GS()->AVM(ClientID, "DECOSTART", ItemID, HideID, "Added {STR} to your house", NameItem);
-		GS()->AVM(ClientID, "DECOGUILDSTART", ItemID, HideID, "Added {STR} to your guild house", NameItem);
+		GS()->AVM(ClientID, "DECOSTART", ItemID, HideID, "Added {STR} to your house", pNameItem);
+		GS()->AVM(ClientID, "DECOGUILDSTART", ItemID, HideID, "Added {STR} to your guild house", pNameItem);
 	}
 	else if(pPlayerItem.Info().m_Type == ItemType::TYPE_EQUIP || pPlayerItem.Info().m_Function == FUNCTION_SETTINGS)
 	{
 		if((pPlayerItem.Info().m_Function == EQUIP_HAMMER && pPlayerItem.IsEquipped()))
-			GS()->AVM(ClientID, "null", NOPE, HideID, "You can not undress equiping hammer", NameItem);
+			GS()->AVM(ClientID, "null", NOPE, HideID, "You can not undress equiping hammer", pNameItem);
 		else
-			GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "{STR} {STR}", (pPlayerItem.m_Settings ? "Undress" : "Equip"), NameItem);
+			GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "{STR} {STR}", (pPlayerItem.m_Settings ? "Undress" : "Equip"), pNameItem);
 	}
 
 	if (pPlayerItem.Info().m_Function == FUNCTION_PLANTS)
@@ -275,26 +275,26 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, b
 		if(HouseID > 0 && PlantItemID != ItemID)
 		{
 			const int random_change = random_int() % 900;
-			GS()->AVD(ClientID, "HOMEPLANTSET", ItemID, random_change, HideID, "To plant {STR}, to house (0.06%)", NameItem);
+			GS()->AVD(ClientID, "HOMEPLANTSET", ItemID, random_change, HideID, "To plant {STR}, to house (0.06%)", pNameItem);
 		}
 	}
 
 	if (pPlayerItem.Info().IsEnchantable() && !pPlayerItem.IsEnchantMaxLevel())
 	{
 		const int Price = pPlayerItem.GetEnchantPrice();
-		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR} ({INT} materials)", NameItem, &Price);
+		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR} ({INT} materials)", pNameItem, &Price);
 	}
 
 	if (ItemID == pPlayer->GetEquippedItem(EQUIP_HAMMER))
 		return;
 
 	if (pPlayerItem.Info().m_Dysenthis > 0)
-		GS()->AVM(ClientID, "IDESYNTHESIS", ItemID, HideID, "Disassemble {STR} (+{INT} materials)", NameItem, &pPlayerItem.Info().m_Dysenthis);
+		GS()->AVM(ClientID, "IDESYNTHESIS", ItemID, HideID, "Disassemble {STR} (+{INT} materials)", pNameItem, &pPlayerItem.Info().m_Dysenthis);
 
-	GS()->AVM(ClientID, "IDROP", ItemID, HideID, "Drop {STR}", NameItem);
+	GS()->AVM(ClientID, "IDROP", ItemID, HideID, "Drop {STR}", pNameItem);
 
 	if (pPlayerItem.Info().m_MinimalPrice > 0)
-		GS()->AVM(ClientID, "AUCTIONSLOT", ItemID, HideID, "Create Slot Auction {STR}", NameItem);
+		GS()->AVM(ClientID, "AUCTIONSLOT", ItemID, HideID, "Create Slot Auction {STR}", pNameItem);
 }
 
 bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
@@ -409,9 +409,12 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 			if (pPlayerSelectedItem.IsEnchantMaxLevel())
 				GS()->SendEquipItem(ClientID, -1);
 
+			char aEnchantBuf[16];
+			pPlayerSelectedItem.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf));
+
 			char aAttributes[128];
 			FormatAttributes(pPlayerSelectedItem, sizeof(aAttributes), aAttributes);
-			GS()->Chat(-1, "{STR} enchant {STR}+{INT} {STR}", GS()->Server()->ClientName(ClientID), pPlayerSelectedItem.Info().GetName(), &EnchantLevel, aAttributes);
+			GS()->Chat(-1, "{STR} enchant {STR} {STR} {STR}", GS()->Server()->ClientName(ClientID), pPlayerSelectedItem.Info().GetName(), aEnchantBuf, aAttributes);
 			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		}
 		return true;
@@ -648,10 +651,36 @@ bool ItemJob::ClassItemInformation::IsEnchantable() const
 {
 	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if (CGS::AttributInfo.find(m_aAttribute[i]) != CGS::AttributInfo.end() && m_aAttribute[i] > 0 && m_aAttributeCount[i] > 0)
+		if (CGS::AttributInfo.find(m_aAttribute[i]) != CGS::AttributInfo.end() && m_aAttributeCount[i] > 0)
 			return true;
 	}
 	return false;
+}
+
+bool ItemJob::ClassItemInformation::IsEnchantMaxLevel(int Enchant) const
+{
+	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
+	{
+		if(CGS::AttributInfo.find(m_aAttribute[i]) == CGS::AttributInfo.end())
+			continue;
+
+		const int EnchantMax = m_aAttributeCount[i] + (int)kurosio::translate_to_procent_rest(m_aAttributeCount[i], PERCENT_MAXIMUM_ENCHANT);
+		if(GetInfoEnchantStats(m_aAttribute[i], Enchant) > EnchantMax)
+			return true;
+	}
+	return false;
+}
+
+void ItemJob::ClassItemInformation::FormatEnchantLevel(char* pBuffer, int Size, int Enchant) const
+{
+	if(Enchant > 0)
+	{
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "[%s]", IsEnchantMaxLevel(Enchant) ? "Max" : std::string("+" + std::to_string(Enchant)).c_str());
+		str_copy(pBuffer, aBuf, Size);
+		return;
+	}
+	str_copy(pBuffer, "\0", Size);
 }
 
 int ItemJob::ClassItems::GetEnchantPrice() const
@@ -668,20 +697,19 @@ int ItemJob::ClassItems::GetEnchantPrice() const
 
 		if(TypeAttribute == AtributType::AtHardtype || Attribute == Stats::StStrength)
 		{
-			UpgradePrice = max(8, CGS::AttributInfo[Attribute].UpgradePrice) * 20;
+			UpgradePrice = max(12, CGS::AttributInfo[Attribute].UpgradePrice) * 14;
 		}
 		else if(TypeAttribute == AtributType::AtJob || TypeAttribute == AtributType::AtWeapon || Attribute == Stats::StLuckyDropItem)
 		{
-			UpgradePrice = max(20, CGS::AttributInfo[Attribute].UpgradePrice) * 30;
+			UpgradePrice = max(20, CGS::AttributInfo[Attribute].UpgradePrice) * 14;
 		}
 		else
 		{
-			UpgradePrice = max(6, CGS::AttributInfo[Attribute].UpgradePrice) * 10;
+			UpgradePrice = max(4, CGS::AttributInfo[Attribute].UpgradePrice) * 5;
 		}
 
 		const int PercentEnchant = max(1, (int)kurosio::translate_to_procent_rest(Info().m_aAttributeCount[i], PERCENT_OF_ENCHANT));
-		const int FromCalculating = PercentEnchant * (1 + m_Enchant);
-		FinishedPrice += (FromCalculating * UpgradePrice);
+		FinishedPrice += UpgradePrice * (PercentEnchant * (1 + m_Enchant));
 	}
 	return FinishedPrice;
 }
@@ -721,7 +749,7 @@ bool ItemJob::ClassItems::Add(int Count, int Settings, int Enchant, bool Message
 			GameServer->Mmo()->SaveAccount(m_pPlayer, SaveType::SAVE_STATS);
 
 		char aAttributes[128];
-		GameServer->Mmo()->Item()->FormatAttributes(*this, sizeof(aAttributes), aAttributes);
+		GameServer->Mmo()->Item()->FormatAttributes(Info(), Enchant, sizeof(aAttributes), aAttributes);
 		GameServer->Chat(ClientID, "Auto equip {STR} - {STR}", Info().GetName(m_pPlayer), aAttributes);
 		GameServer->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 	}
@@ -796,7 +824,6 @@ bool ItemJob::ClassItems::Equip()
 		while (EquipItemID >= 1)
 		{
 			ItemJob::InventoryItem &EquipItem = m_pPlayer->GetItem(EquipItemID);
-			EquipItem.m_Settings = 0;
 			EquipItem.SetSettings(0);
 			EquipItemID = m_pPlayer->GetEquippedItem(EquipID, m_ItemID);
 		}

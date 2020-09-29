@@ -51,6 +51,8 @@ class ItemJob : public MmoComponent
 			return EnchantStat;
 		}
 		bool IsEnchantable() const;
+		bool IsEnchantMaxLevel(int Enchant) const;
+		void FormatEnchantLevel(char* pBuffer, int Size, int Enchant) const;
 
 		const char* GetName(CPlayer* pPlayer = NULL) const;
 		const char* GetDesc(CPlayer* pPlayer = NULL) const;
@@ -88,17 +90,9 @@ public:
 		bool Equip();
 		bool Save();
 
-		bool IsEnchantMaxLevel() const 
-		{
-			for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
-			{
-				const int EnchantMax = Info().m_aAttributeCount[i] + (int)kurosio::translate_to_procent_rest(Info().m_aAttributeCount[i], PERCENT_MAXIMUM_ENCHANT);
-				if(GetEnchantStats(Info().m_aAttribute[i]) > EnchantMax)
-					return true;
-			}
-			return false;
-		}
 		bool IsEquipped() const { return m_Count > 0 && m_Settings > 0 && (Info().m_Type == ItemType::TYPE_POTION || Info().m_Type == ItemType::TYPE_SETTINGS || Info().m_Type == ItemType::TYPE_MODULE || Info().m_Type == ItemType::TYPE_EQUIP); }
+		bool IsEnchantMaxLevel() const { return Info().IsEnchantMaxLevel(m_Enchant); }
+		void FormatEnchantLevel(char* pBuffer, int Size) const { Info().FormatEnchantLevel(pBuffer, Size, m_Enchant); }
 
 		int GetID() const { return m_ItemID; }
 		int GetEnchantStats(int AttributeID) const { return Info().GetInfoEnchantStats(AttributeID, m_Enchant); }

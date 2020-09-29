@@ -397,7 +397,7 @@ bool QuestJob::CheckNewStories(CPlayer *pPlayer, int CheckQuestID)
 	return ActiveNextStories;
 }
 
-void QuestJob::ShowQuestList(CPlayer* pPlayer, int StateQuest)
+void QuestJob::ShowQuestsTabList(CPlayer* pPlayer, int StateQuest)
 {
 	char aStoryLineSave[32];
 	bool FoundQuests = false;
@@ -432,11 +432,11 @@ void QuestJob::ShowQuestList(CPlayer* pPlayer, int StateQuest)
 }
 
 // post all quests the whole list
-void QuestJob::ShowFullQuestLift(CPlayer* pPlayer)
+void QuestJob::ShowQuestsMainList(CPlayer* pPlayer)
 {
 	// show all active npc
 	const int ClientID = pPlayer->GetCID();
-	if (!ShowAdventureActiveNPC(pPlayer))
+	if (!ShowQuestsActiveNPC(pPlayer))
 	{
 		pPlayer->m_Colored = LIGHT_BLUE_COLOR;
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "In current quests there is no interaction with NPC");
@@ -444,8 +444,8 @@ void QuestJob::ShowFullQuestLift(CPlayer* pPlayer)
 	GS()->AV(ClientID, "null", "");
 
 	// show the questsheet
-	ShowQuestList(pPlayer, QuestState::QUEST_ACCEPT);
-	ShowQuestList(pPlayer, QuestState::QUEST_NO_ACCEPT);
+	ShowQuestsTabList(pPlayer, QuestState::QUEST_ACCEPT);
+	ShowQuestsTabList(pPlayer, QuestState::QUEST_NO_ACCEPT);
 
 	// show the completed menu
 	pPlayer->m_Colored = BLUE_COLOR;
@@ -453,7 +453,7 @@ void QuestJob::ShowFullQuestLift(CPlayer* pPlayer)
 }
 
 // Adventure active npc information display
-bool QuestJob::ShowAdventureActiveNPC(CPlayer* pPlayer)
+bool QuestJob::ShowQuestsActiveNPC(CPlayer* pPlayer)
 {
 	bool activeNPC = false;
 	const int clientID = pPlayer->GetCID();
@@ -798,7 +798,7 @@ bool QuestJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 	if (Menulist == MenuList::MENU_JOURNAL_FINISHED)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_JOURNAL_MAIN;
-		ShowQuestList(pPlayer, QuestState::QUEST_FINISHED);
+		ShowQuestsTabList(pPlayer, QuestState::QUEST_FINISHED);
 		GS()->AddBack(ClientID);
 		return true;
 	}

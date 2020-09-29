@@ -1207,7 +1207,7 @@ bool CCharacter::StartConversation(CPlayer *pTarget)
 	if (!m_pPlayer || m_pPlayer->IsBot() || !pTarget->IsBot())
 		return false;
 
-	// skip if not NPS, or it is not drawn
+	// skip if not NPC, or it is not drawn
 	CPlayerBot* pTargetBot = static_cast<CPlayerBot*>(pTarget);
 	if (!pTargetBot || pTargetBot->GetBotType() == BotsTypes::TYPE_BOT_MOB || !pTargetBot->IsActiveSnappingBot(m_pPlayer->GetCID()))
 		return false;

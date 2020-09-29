@@ -59,9 +59,9 @@ private:
 	bool IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData) const;
 	void CollectItem(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData);
 	void AddProgress(CPlayer *pPlayer, int QuestID);
-	bool ShowAdventureActiveNPC(CPlayer *pPlayer);
+	bool ShowQuestsActiveNPC(CPlayer *pPlayer);
 	void QuestTableShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData);
-	void ShowQuestList(CPlayer* pPlayer, int StateQuest);
+	void ShowQuestsTabList(CPlayer* pPlayer, int StateQuest);
 	void QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID, bool Giving);
 	void QuestTableAddInfo(int ClientID, const char* pText, int Requires, int Have);
 	bool InteractiveTypeQuest(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData);
@@ -73,7 +73,7 @@ public:
 	void UpdateArrowStep(int ClientID);
 	bool CheckNewStories(CPlayer* pPlayer, int CheckQuestID = -1);
 	bool InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData, bool LastDialog);
-	void ShowFullQuestLift(CPlayer* pPlayer);
+	void ShowQuestsMainList(CPlayer* pPlayer);
 	void QuestTableClear(int ClientID);
 	int QuestingAllowedItemsCount(CPlayer* pPlayer, int ItemID);
 	void CreateQuestingItems(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData);
