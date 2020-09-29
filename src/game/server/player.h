@@ -142,7 +142,7 @@ public:
 	bool CheckEffect(const char* Potion);
 	bool GetHidenMenu(int HideID) const;
 	bool IsAuthed();
-	int EnchantAttributes(int BonusID) const;
+	int EnchantAttributes(int AttributeID) const;
 	int GetStartTeam();
 
 	int ExpNeed(int Level) const;

@@ -31,7 +31,6 @@ void ItemJob::OnInit()
 				str_format(aBuf, sizeof(aBuf), "StatCount_%d", i);
 				ms_aItemsInfo[ItemID].m_aAttributeCount[i] = (int)RES->getInt(aBuf);
 			}
-			ms_aItemsInfo[ItemID].m_MaximalEnchant = (int)RES->getInt("EnchantMax");
 			ms_aItemsInfo[ItemID].m_ProjID = (int)RES->getInt("ProjectileID");
 		}
 	});
@@ -84,8 +83,8 @@ void ItemJob::FormatAttributes(InventoryItem& pItem, int size, char* pformat)
 	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
 		const int BonusID = pItem.Info().m_aAttribute[i];
-		const int BonusCount = pItem.Info().m_aAttributeCount[i] * (pItem.m_Enchant + 1);
-		if (BonusID <= 0 || BonusCount <= 0)
+		const int BonusCount = pItem.GetEnchantStats(BonusID);
+		if (BonusID <= 0)
 			continue;
 
 		char aBuf[64];
@@ -102,7 +101,7 @@ void ItemJob::FormatAttributes(ItemInformation& pInfoItem, int Enchant, int size
 	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
 		int BonusID = pInfoItem.m_aAttribute[i];
-		int BonusCount = pInfoItem.m_aAttributeCount[i] * (Enchant + 1);
+		int BonusCount = pInfoItem.GetInfoEnchantStats(BonusID, Enchant);
 		if (BonusID <= 0 || BonusCount <= 0)
 			continue;
 
@@ -280,9 +279,9 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, b
 		}
 	}
 
-	if (pPlayerItem.Info().IsEnchantable())
+	if (pPlayerItem.Info().IsEnchantable() && !pPlayerItem.IsEnchantMaxLevel())
 	{
-		const int Price = pPlayerItem.EnchantPrice();
+		const int Price = pPlayerItem.GetEnchantPrice();
 		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR} ({INT} materials)", NameItem, &Price);
 	}
 
@@ -389,13 +388,13 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	if(PPSTR(CMD, "IENCHANT") == 0)
 	{
 		InventoryItem &pPlayerSelectedItem = pPlayer->GetItem(VoteID);
-		if(pPlayerSelectedItem.m_Enchant >= pPlayerSelectedItem.Info().m_MaximalEnchant)
+		if(pPlayerSelectedItem.IsEnchantMaxLevel())
 		{
 			GS()->Chat(ClientID, "You enchant max level for this item!");
 			return true;			
 		}
 
-		const int Price = pPlayerSelectedItem.EnchantPrice();
+		const int Price = pPlayerSelectedItem.GetEnchantPrice();
 		InventoryItem &pPlayerMaterialItem = pPlayer->GetItem(itMaterial);
 		if(Price > pPlayerMaterialItem.m_Count)
 		{
@@ -407,7 +406,7 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 		{
 			const int EnchantLevel = pPlayerSelectedItem.m_Enchant+1;
 			pPlayerSelectedItem.SetEnchant(EnchantLevel);
-			if (EnchantLevel >= EFFECTENCHANT)
+			if (pPlayerSelectedItem.IsEnchantMaxLevel())
 				GS()->SendEquipItem(ClientID, -1);
 
 			char aAttributes[128];
@@ -649,49 +648,57 @@ bool ItemJob::ClassItemInformation::IsEnchantable() const
 {
 	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if (CGS::AttributInfo.find(m_aAttribute[i]) != CGS::AttributInfo.end() && m_aAttribute[i] > 0 && m_aAttributeCount[i] > 0 && m_MaximalEnchant > 0)
+		if (CGS::AttributInfo.find(m_aAttribute[i]) != CGS::AttributInfo.end() && m_aAttribute[i] > 0 && m_aAttributeCount[i] > 0)
 			return true;
 	}
 	return false;
 }
 
-int ItemJob::ClassItems::EnchantPrice() const
+int ItemJob::ClassItems::GetEnchantPrice() const
 {
-	int CompressedPrice = 0;
+	int FinishedPrice = 0;
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if(Info().m_aAttribute[i] <= 0 || Info().m_aAttributeCount[i] <= 0 || CGS::AttributInfo.find(Info().m_aAttribute[i]) == CGS::AttributInfo.end())
+		if(CGS::AttributInfo.find(Info().m_aAttribute[i]) == CGS::AttributInfo.end())
 			continue;
-		
+
 		int UpgradePrice;
 		const int Attribute = Info().m_aAttribute[i];
 		const int TypeAttribute = CGS::AttributInfo[Attribute].AtType;
-		if(TypeAttribute == AtributType::AtHardtype || Attribute == Stats::StStrength)
-			UpgradePrice = max(8, CGS::AttributInfo[Attribute].UpgradePrice) * 12;
-		else if(TypeAttribute == AtributType::AtJob || TypeAttribute == AtributType::AtWeapon || Attribute == Stats::StLuckyDropItem)
-			UpgradePrice = max(20, CGS::AttributInfo[Attribute].UpgradePrice) * 12;
-		else
-			UpgradePrice = max(6, CGS::AttributInfo[Attribute].UpgradePrice) * 5;
 
-		const int AttributeCount = Info().m_aAttributeCount[i];
-		CompressedPrice += (AttributeCount * UpgradePrice);
+		if(TypeAttribute == AtributType::AtHardtype || Attribute == Stats::StStrength)
+		{
+			UpgradePrice = max(8, CGS::AttributInfo[Attribute].UpgradePrice) * 20;
+		}
+		else if(TypeAttribute == AtributType::AtJob || TypeAttribute == AtributType::AtWeapon || Attribute == Stats::StLuckyDropItem)
+		{
+			UpgradePrice = max(20, CGS::AttributInfo[Attribute].UpgradePrice) * 30;
+		}
+		else
+		{
+			UpgradePrice = max(6, CGS::AttributInfo[Attribute].UpgradePrice) * 10;
+		}
+
+		const int PercentEnchant = max(1, (int)kurosio::translate_to_procent_rest(Info().m_aAttributeCount[i], PERCENT_OF_ENCHANT));
+		const int FromCalculating = PercentEnchant * (1 + m_Enchant);
+		FinishedPrice += (FromCalculating * UpgradePrice);
 	}
-	return CompressedPrice * (m_Enchant + 1);
+	return FinishedPrice;
 }
 
-bool ItemJob::ClassItems::SetEnchant(int arg_enchantlevel)
+bool ItemJob::ClassItems::SetEnchant(int Enchant)
 {
 	if (m_Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
 		return false;
 
-	m_Enchant = arg_enchantlevel;
+	m_Enchant = Enchant;
 	bool Successful = Save();
 	return Successful;
 }
 
-bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, bool arg_message)
+bool ItemJob::ClassItems::Add(int Count, int Settings, int Enchant, bool Message)
 {
-	if(arg_count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed()) 
+	if(Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
 		return false;
 
 	CGS* GameServer = m_pPlayer->GS();
@@ -703,7 +710,7 @@ bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 			m_pPlayer->GS()->Chat(ClientID, "This item cannot have more than 1 item");
 			return false;
 		}
-		arg_count = 1;
+		Count = 1;
 	}
 
 	// check the empty slot if yes then put the item on
@@ -719,7 +726,7 @@ bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 		GameServer->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 	}
 
-	const int Code = GameServer->Mmo()->Item()->GiveItem(m_pPlayer, m_ItemID, arg_count, (AutoEquip ? 1 : arg_settings), arg_enchant);
+	const int Code = GameServer->Mmo()->Item()->GiveItem(m_pPlayer, m_ItemID, Count, (AutoEquip ? 1 : Settings), Enchant);
 	if(Code <= 0)
 		return false;
 		
@@ -730,24 +737,24 @@ bool ItemJob::ClassItems::Add(int arg_count, int arg_settings, int arg_enchant, 
 		GameServer->ChangeEquipSkin(ClientID, m_ItemID);
 	}
 
-	if(!arg_message || Info().m_Type == ItemType::TYPE_SETTINGS) 
+	if(!Message || Info().m_Type == ItemType::TYPE_SETTINGS) 
 		return true;
 
 	if(Info().m_Type == ItemType::TYPE_EQUIP || Info().m_Type == ItemType::TYPE_MODULE)
-		GameServer->Chat(-1, "{STR} got of the {STR}x{INT}!", GameServer->Server()->ClientName(ClientID), Info().GetName(), &arg_count);
+		GameServer->Chat(-1, "{STR} got of the {STR}x{INT}!", GameServer->Server()->ClientName(ClientID), Info().GetName(), &Count);
 	else if(Info().m_Type != -1)
-		GameServer->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(m_pPlayer), &arg_count);
+		GameServer->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(m_pPlayer), &Count);
 
 	return true;
 }
 
-bool ItemJob::ClassItems::Remove(int arg_removecount, int arg_settings)
+bool ItemJob::ClassItems::Remove(int Count, int Settings)
 {
-	if(m_Count <= 0 || arg_removecount < 1 || !m_pPlayer) 
+	if(m_Count <= 0 || Count < 1 || !m_pPlayer) 
 		return false;
 
-	if(m_Count < arg_removecount)
-		arg_removecount = m_Count;
+	if(m_Count < Count)
+		Count = m_Count;
 
 	if (IsEquipped())
 	{
@@ -755,25 +762,25 @@ bool ItemJob::ClassItems::Remove(int arg_removecount, int arg_settings)
 		m_pPlayer->GS()->ChangeEquipSkin(m_pPlayer->GetCID(), m_ItemID);
 	}
 
-	const int Code = m_pPlayer->GS()->Mmo()->Item()->RemoveItem(m_pPlayer, m_ItemID, arg_removecount, arg_settings);
+	const int Code = m_pPlayer->GS()->Mmo()->Item()->RemoveItem(m_pPlayer, m_ItemID, Count, Settings);
 	return (bool)(Code > 0);
 }
 
-bool ItemJob::ClassItems::SetSettings(int arg_settings)
+bool ItemJob::ClassItems::SetSettings(int Settings)
 {
 	if (m_Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
 		return false;
 
-	m_Settings = arg_settings;
+	m_Settings = Settings;
 	return Save();
 }
 
-bool ItemJob::ClassItems::SetDurability(int arg_durability)
+bool ItemJob::ClassItems::SetDurability(int Durability)
 {
 	if(m_Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
 		return false;
 
-	m_Durability = arg_durability;
+	m_Durability = Durability;
 	return Save();
 }
 

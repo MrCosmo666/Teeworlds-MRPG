@@ -1087,7 +1087,7 @@ void CCharacter::UpdateEquipingStats(int ItemID)
 	if((pInformationItem.m_Function >= EQUIP_HAMMER && pInformationItem.m_Function <= EQUIP_RIFLE))
 		m_pPlayer->GetCharacter()->GiveWeapon(pInformationItem.m_Function, 3);
 
-	if(pInformationItem.GetStatsBonus(Stats::StAmmoRegen) > 0)
+	if(pInformationItem.GetInfoEnchantStats(Stats::StAmmoRegen) > 0)
 		m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
 }
 

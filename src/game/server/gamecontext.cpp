@@ -823,7 +823,7 @@ void CGS::SendEquipItem(int ClientID, int TargetID)
 	for(int k = 0; k < NUM_EQUIPS; k++)
 	{
 		const int EquipItem = pPlayer->GetEquippedItem(k);
-		const bool EnchantItem = (pPlayer->IsBot() ? false : (bool)(pPlayer->GetItem(EquipItem).m_Enchant >= pPlayer->GetItem(EquipItem).Info().m_MaximalEnchant));
+		const bool EnchantItem = pPlayer->IsBot() ? false : pPlayer->GetItem(EquipItem).IsEnchantMaxLevel();
 		Msg.m_EquipID[k] = EquipItem;
 		Msg.m_EnchantItem[k] = EnchantItem;
 	}

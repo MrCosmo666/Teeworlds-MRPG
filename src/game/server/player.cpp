@@ -462,22 +462,17 @@ bool CPlayer::IsAuthed()
 	return false; 
 }
 
-int CPlayer::EnchantAttributes(int BonusID) const
+// TODO: not optimized algorithm
+int CPlayer::EnchantAttributes(int AttributeID) const
 {
 	int BonusAttributes = 0;
 	for (const auto& it : ItemJob::ms_aItems[m_ClientID])
 	{
-		if(!it.second.IsEquipped()) 
+		if(!it.second.IsEquipped() || !it.second.Info().IsEnchantable() || !it.second.Info().GetInfoEnchantStats(AttributeID))
 			continue;
-		
-		const int BonusCount = it.second.Info().GetStatsBonus(BonusID);
-		if (BonusCount > 0)
-		{
-			const int PlayerBonusCount = BonusCount * (it.second.m_Enchant + 1);
-			BonusAttributes += PlayerBonusCount;
-		}
-	}
 
+		BonusAttributes += it.second.GetEnchantStats(AttributeID);
+	}
 	return BonusAttributes;
 }
 

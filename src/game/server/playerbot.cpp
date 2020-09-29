@@ -76,7 +76,7 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 	for (int i = 0; i < MAX_EQUIPPED_SLOTS_BOTS; i++)
 	{
 		const int ItemID = GetEquippedItem(i);
-		const int ItemBonusCount = GS()->GetItemInfo(ItemID).GetStatsBonus(BonusID);
+		const int ItemBonusCount = GS()->GetItemInfo(ItemID).GetInfoEnchantStats(BonusID);
 		if (ItemID <= 0 || ItemBonusCount < 0)
 			continue;
 		Power += ItemBonusCount;
