@@ -18,13 +18,13 @@ class CDropItem : public CEntity
 	int m_LifeSpan;
 	int m_FlashTimer;
 
-	ItemJob::InventoryItem m_DropItem;
+	InventoryItem m_DropItem;
 	int m_OwnerID;
 
 	
 
 public:
-	CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, ItemJob::InventoryItem DropItem, int OwnerID);
+	CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, InventoryItem DropItem, int OwnerID);
 	~CDropItem();
 
 	virtual void Tick();

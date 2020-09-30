@@ -603,7 +603,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		const int HouseID = PlayerHouseID(pPlayer);
 		if(HouseID > 0 && DeleteDecorationHouse(VoteID))
 		{
-			ItemJob::InventoryItem &PlDecoItem = pPlayer->GetItem(VoteID2);
+			InventoryItem &PlDecoItem = pPlayer->GetItem(VoteID2);
 			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
 			PlDecoItem.Add(1);
 		}

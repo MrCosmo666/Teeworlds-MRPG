@@ -81,8 +81,8 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 		if(cr.second.m_WorldID != GS()->GetWorldID())
 			continue;
 
-		int HideID = NUM_TAB_MENU + ItemJob::ms_aItemsInfo.size() + cr.first;
-		ItemJob::ItemInformation &InfoGetItem = GS()->GetItemInfo(cr.second.m_ReceivedItemID);
+		int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + cr.first;
+		ItemInformation &InfoGetItem = GS()->GetItemInfo(cr.second.m_ReceivedItemID);
 		if (InfoGetItem.m_Type != SelectType)
 			continue;
 
@@ -114,7 +114,7 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 			if(SearchItemID <= 0 || SearchCount <= 0) 
 				continue;
 			
-			ItemJob::InventoryItem &PlSearchItem = pPlayer->GetItem(SearchItemID);
+			InventoryItem &PlSearchItem = pPlayer->GetItem(SearchItemID);
 			GS()->AVMI(ClientID, PlSearchItem.Info().GetIcon(), "null", NOPE, HideID, "{STR} {INT}({INT})", PlSearchItem.Info().GetName(pPlayer), &SearchCount, &PlSearchItem.m_Count);
 		}
 		GS()->AVM(ClientID, "CRAFT", cr.first, HideID, "Craft {STR}", InfoGetItem.GetName(pPlayer));
@@ -125,7 +125,7 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 {
 	const int ClientID = pPlayer->GetCID();
-	ItemJob::InventoryItem& PlayerCraftItem = pPlayer->GetItem(ms_aCraft[CraftID].m_ReceivedItemID);
+	InventoryItem& PlayerCraftItem = pPlayer->GetItem(ms_aCraft[CraftID].m_ReceivedItemID);
 	if (PlayerCraftItem.Info().IsEnchantable() && PlayerCraftItem.m_Count > 0)
 	{
 		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");

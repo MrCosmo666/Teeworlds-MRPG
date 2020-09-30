@@ -488,7 +488,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		const int DecoItemID = VoteID2;
 		if (DeleteDecorationHouse(DecoID))
 		{
-			ItemJob::InventoryItem& PlDecoItem = pPlayer->GetItem(DecoItemID);
+			InventoryItem& PlDecoItem = pPlayer->GetItem(DecoItemID);
 			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
 			PlDecoItem.Add(1);
 		}
@@ -876,7 +876,7 @@ void GuildJob::ShowGuildPlayers(CPlayer* pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
 	const int GuildID = pPlayer->Acc().m_GuildID;
-	int HideID = NUM_TAB_MENU + ItemJob::ms_aItemsInfo.size() + 1000;
+	int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 1000;
 	std::shared_ptr<ResultSet> RES(SJK.SD("ID, Nick, GuildRank, GuildDeposit", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID));
 	while (RES->next())
 	{
@@ -1095,7 +1095,7 @@ void GuildJob::ChangePlayerRank(int AuthID, int RankID)
 void GuildJob::ShowMenuRank(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	int HideID = NUM_TAB_MENU + ItemJob::ms_aItemsInfo.size() + 1300;
+	int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 1300;
 	pPlayer->m_LastVoteMenu = MenuList::MENU_GUILD;
 
 	GS()->AV(ClientID, "null", "Use reason how enter Value, Click fields!");
@@ -1150,7 +1150,7 @@ bool GuildJob::AddInviteGuild(int GuildID, int OwnerID)
 // show the invitation sheet to our guild
 void GuildJob::ShowInvitesGuilds(int ClientID, int GuildID)
 {
-	int HideID = NUM_TAB_MENU + ItemJob::ms_aItemsInfo.size() + 1900;
+	int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 1900;
 	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_invites", "WHERE GuildID = '%d'", GuildID));
 	while(RES->next())
 	{
@@ -1179,7 +1179,7 @@ void GuildJob::ShowFinderGuilds(int ClientID)
 	GS()->AV(ClientID, "null", "");
 	GS()->AVM(ClientID, "MINVITENAME", 1, NOPE, "Find guild: {STR}", pPlayer->GetTempData().m_aGuildSearchBuf);
 
-	int HideID = NUM_TAB_MENU + ItemJob::ms_aItemsInfo.size() + 1800;
+	int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 1800;
 	CSqlString<64> cGuildName = CSqlString<64>(pPlayer->GetTempData().m_aGuildSearchBuf);
 	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "WHERE GuildName LIKE '%%%s%%'", cGuildName.cstr()));
 	while(RES->next())

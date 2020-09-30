@@ -14,7 +14,7 @@ MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 {
 	// order
 	m_Components.add(m_pBotsInfo = new BotJob());
-	m_Components.add(m_pItemWork = new ItemJob());
+	m_Components.add(m_pItemWork = new InventoryJob());
 	m_Components.add(m_pCraftJob = new CraftJob());
 	m_Components.add(m_pStorageWork = new StorageJob());
 	m_Components.add(m_pShopmail = new ShopJob());

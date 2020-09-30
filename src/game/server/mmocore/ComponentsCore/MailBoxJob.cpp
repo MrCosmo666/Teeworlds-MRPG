@@ -40,7 +40,7 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 	int ShowLetterID = 0;
 	bool EmptyMailBox = true;
 	const int ClientID = pPlayer->GetCID();
-	int HideID = (int)(NUM_TAB_MENU + ItemJob::ms_aItemsInfo.size() + 200);
+	int HideID = (int)(NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 200);
 	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AuthID, MAX_INBOX_LIST));
 	while(RES->next())
 	{

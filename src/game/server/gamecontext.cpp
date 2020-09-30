@@ -149,7 +149,7 @@ const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const
 	return ID >= NUM_TAB_MENU ? ("\\/ # ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("/\\ # ") : ("\\/ # "));
 }
 
-ItemJob::ItemInformation &CGS::GetItemInfo(int ItemID) const { return ItemJob::ms_aItemsInfo[ItemID]; }
+ItemInformation &CGS::GetItemInfo(int ItemID) const { return InventoryJob::ms_aItemsInfo[ItemID]; }
 
 /* #########################################################################
 	EVENTS 
@@ -2018,7 +2018,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			
 				const float Chance = mobs.second.m_aRandomItem[i];
 				const float AddedChance = LuckyDrop;
-				ItemJob::ItemInformation &InfoDropItem = GetItemInfo(mobs.second.m_aDropItem[i]);
+				ItemInformation &InfoDropItem = GetItemInfo(mobs.second.m_aDropItem[i]);
 				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%(+%0.2f%%)", InfoDropItem.GetName(pPlayer), mobs.second.m_aCountItem[i], Chance, AddedChance);
 				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, "{STR}", aBuf);
 				FoundedBots = true;
@@ -2262,7 +2262,8 @@ void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop, vec2 For
 // lands items in the position type and quantity and their number themselves
 void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant, vec2 Force)
 {
-	ItemJob::InventoryItem DropItem(nullptr, ItemID);
+	InventoryItem DropItem;
+	DropItem.m_ItemID = ItemID;
 	DropItem.m_Count = Count;
 	DropItem.m_Enchant = Enchant;
 
@@ -2272,9 +2273,9 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Ench
 }
 
 // lands items in the position type and quantity and their number themselves
-void CGS::CreateDropItem(vec2 Pos, int ClientID, ItemJob::InventoryItem &pPlayerItem, int Count, vec2 Force)
+void CGS::CreateDropItem(vec2 Pos, int ClientID, InventoryItem &pPlayerItem, int Count, vec2 Force)
 {
-	ItemJob::InventoryItem CopyItem = pPlayerItem;
+	InventoryItem CopyItem = pPlayerItem;
 	CopyItem.m_Count = Count;
 
 	if (pPlayerItem.Remove(Count))

@@ -1083,7 +1083,7 @@ void CCharacter::UpdateEquipingStats(int ItemID)
 		m_Health = m_pPlayer->GetStartHealth();
 	}
 
-	const ItemJob::ItemInformation pInformationItem = GS()->GetItemInfo(ItemID);
+	const ItemInformation pInformationItem = GS()->GetItemInfo(ItemID);
 	if((pInformationItem.m_Function >= EQUIP_HAMMER && pInformationItem.m_Function <= EQUIP_RIFLE))
 		m_pPlayer->GetCharacter()->GiveWeapon(pInformationItem.m_Function, 3);
 

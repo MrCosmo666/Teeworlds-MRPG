@@ -7,7 +7,7 @@
 
 #include "drop_items.h"
 
-CDropItem::CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, ItemJob::InventoryItem DropItem, int OwnerID)
+CDropItem::CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, InventoryItem DropItem, int OwnerID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPITEM, Pos, 28.0f)
 {
 	m_Pos = Pos;
@@ -44,7 +44,7 @@ bool CDropItem::TakeItem(int ClientID)
 
 	// change of enchanted objects
 	GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
-	ItemJob::InventoryItem &pPlayerDroppedItem = pPlayer->GetItem(m_DropItem.GetID());
+	InventoryItem &pPlayerDroppedItem = pPlayer->GetItem(m_DropItem.GetID());
 	if(pPlayerDroppedItem.m_Count > 0 && pPlayerDroppedItem.Info().IsEnchantable())
 	{
 		tl_swap(pPlayerDroppedItem, m_DropItem);
@@ -118,7 +118,7 @@ void CDropItem::Tick()
 		return;
 
 	// if not an enchanted object
-	const ItemJob::InventoryItem pPlayerDroppedItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
+	const InventoryItem pPlayerDroppedItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
 	if(!pPlayerDroppedItem.Info().IsEnchantable())
 	{
 		GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}x{INT} {STR}",

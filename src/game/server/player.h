@@ -4,7 +4,7 @@
 #define GAME_SERVER_PLAYER_H
 
 #include "mmocore/ComponentsCore/AccountMainJob.h"
-#include "mmocore/ComponentsCore/ItemJob.h"
+#include "mmocore/ComponentsCore/InventoryJob/ItemInventory.h"
 #include "mmocore/ComponentsCore/BotJob.h"
 
 #include "entities/character.h"
@@ -157,7 +157,7 @@ public:
 	/* #########################################################################
 		FUNCTIONS PLAYER ITEMS 
 	######################################################################### */
-	ItemJob::InventoryItem& GetItem(int ItemID);
+	InventoryItem& GetItem(int ItemID);
 	AccountMainJob::StructTempPlayerData& GetTempData() { return AccountMainJob::ms_aPlayerTempData[m_ClientID]; }
 	AccountMainJob::StructData& Acc() { return AccountMainJob::ms_aData[m_ClientID]; }
 

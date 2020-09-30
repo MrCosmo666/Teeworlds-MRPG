@@ -239,9 +239,9 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 		GS()->AVH(ClientID, TAB_SETTINGS, RED_COLOR, "Some of the settings becomes valid after death");
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_SELECT_LANGUAGE, TAB_SETTINGS, "Settings language");
-		for (const auto& it : ItemJob::ms_aItems[ClientID])
+		for (const auto& it : InventoryJob::ms_aItems[ClientID])
 		{
-			const ItemJob::InventoryItem ItemData = it.second;
+			const InventoryItem ItemData = it.second;
 			if (ItemData.Info().m_Type == ItemType::TYPE_SETTINGS && ItemData.m_Count > 0)
 				GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.m_Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
 		}
@@ -250,9 +250,9 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		bool FoundSettings = false;
 		GS()->AV(ClientID, "null", "");
 		GS()->AVH(ClientID, TAB_SETTINGS_MODULES, GREEN_COLOR, "Sub items settings.");
-		for (const auto& it : ItemJob::ms_aItems[ClientID])
+		for (const auto& it : InventoryJob::ms_aItems[ClientID])
 		{
-			ItemJob::InventoryItem ItemData = it.second;
+			InventoryItem ItemData = it.second;
 			if (ItemData.Info().m_Type == ItemType::TYPE_MODULE && ItemData.m_Count > 0)
 			{
 				char aAttributes[128];

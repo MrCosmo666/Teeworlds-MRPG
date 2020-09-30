@@ -360,7 +360,7 @@ bool CPlayer::CheckFailMoney(int Price, int ItemID, bool CheckOnly)
 	if (Price <= 0)
 		return false;
 
-	ItemJob::InventoryItem &pPlayerItem = GetItem(ItemID);
+	InventoryItem &pPlayerItem = GetItem(ItemID);
 	if(pPlayerItem.m_Count < Price)
 	{
 		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", &Price, &pPlayerItem.m_Count, pPlayerItem.Info().GetName(this), NULL);
@@ -466,7 +466,7 @@ bool CPlayer::IsAuthed()
 int CPlayer::EnchantAttributes(int AttributeID) const
 {
 	int BonusAttributes = 0;
-	for (const auto& it : ItemJob::ms_aItems[m_ClientID])
+	for (const auto& it : InventoryJob::ms_aItems[m_ClientID])
 	{
 		if(!it.second.IsEquipped() || !it.second.Info().IsEnchantable() || !it.second.Info().GetInfoEnchantStats(AttributeID))
 			continue;
@@ -594,18 +594,15 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 	return false;
 }
 
-ItemJob::InventoryItem &CPlayer::GetItem(int ItemID) 
+InventoryItem &CPlayer::GetItem(int ItemID) 
 {
-	if(ItemJob::ms_aItems[m_ClientID].find(ItemID) == ItemJob::ms_aItems[m_ClientID].end())
-		ItemJob::ms_aItems[m_ClientID][ItemID] = ItemJob::InventoryItem(this, ItemID);
-
-	ItemJob::ms_aItems[m_ClientID][ItemID].SetPlayer(this);
-	return ItemJob::ms_aItems[m_ClientID][ItemID];
+	InventoryJob::ms_aItems[m_ClientID][ItemID].SetItemOwner(this);
+	return InventoryJob::ms_aItems[m_ClientID][ItemID];
 }
 
 int CPlayer::GetEquippedItem(int EquipID, int SkipItemID) const
 {
-	for(const auto& it : ItemJob::ms_aItems[m_ClientID])
+	for(const auto& it : InventoryJob::ms_aItems[m_ClientID])
 	{
 		if(!it.second.m_Count || !it.second.m_Settings || it.second.Info().m_Function != EquipID || it.first == SkipItemID)
 			continue;

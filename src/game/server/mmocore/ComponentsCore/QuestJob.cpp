@@ -488,7 +488,7 @@ bool QuestJob::ShowQuestsActiveNPC(CPlayer* pPlayer)
 			const int itemCount = BotInfo->m_aItemSearchCount[i];
 			if(itemID > 0 && itemCount > 0)
 			{
-				ItemJob::InventoryItem PlayerSearchItem = pPlayer->GetItem(itemID);
+				InventoryItem PlayerSearchItem = pPlayer->GetItem(itemID);
 				int ownCount = clamp(PlayerSearchItem.m_Count, 0, itemCount);
 
 				GS()->AVMI(clientID, PlayerSearchItem.Info().GetIcon(), "null", NOPE, HideID, "- Item {STR} [{INT}/{INT}]", PlayerSearchItem.Info().GetName(pPlayer), &ownCount, &itemCount);
@@ -501,7 +501,7 @@ bool QuestJob::ShowQuestsActiveNPC(CPlayer* pPlayer)
 			const int itemCount = BotInfo->m_aItemGivesCount[i];
 			if(itemID > 0 && itemCount > 0)
 			{
-				ItemJob::ItemInformation GivedInfItem = GS()->GetItemInfo(itemID);
+				ItemInformation GivedInfItem = GS()->GetItemInfo(itemID);
 				GS()->AVMI(clientID, GivedInfItem.GetIcon(), "null", NOPE, HideID, "- Receive {STR}x{INT}", GivedInfItem.GetName(pPlayer), &itemCount);
 				JustTalk = false;
 			}
@@ -547,7 +547,7 @@ void QuestJob::QuestTableShowRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &Bo
 		const int CountItem = BotData.m_aItemSearchCount[i];
 		if(ItemID > 0 && CountItem > 0)
 		{
-			ItemJob::InventoryItem PlayerQuestItem = pPlayer->GetItem(ItemID);
+			InventoryItem PlayerQuestItem = pPlayer->GetItem(ItemID);
 			str_format(aBuf, sizeof(aBuf), "\n- Need %s [%d/%d]", PlayerQuestItem.Info().GetName(pPlayer), PlayerQuestItem.m_Count, CountItem);
 			Buffer.append_at(Buffer.length(), aBuf);
 			ShowItemNeeded = true;
@@ -634,7 +634,7 @@ void QuestJob::QuestTableAddItem(int ClientID, const char* pText, int Requires, 
 	if (!pPlayer || ItemID < itGold || !GS()->CheckClient(ClientID))
 		return;
 
-	const ItemJob::InventoryItem PlayerSelectedItem = pPlayer->GetItem(ItemID);
+	const InventoryItem PlayerSelectedItem = pPlayer->GetItem(ItemID);
 
 	CNetMsg_Sv_AddQuestingProcessing Msg;
 	Msg.m_pText = pText;
@@ -671,7 +671,7 @@ void QuestJob::QuestTableClear(int ClientID)
 int QuestJob::QuestingAllowedItemsCount(CPlayer *pPlayer, int ItemID)
 {
 	const int ClientID = pPlayer->GetCID();
-	const ItemJob::InventoryItem PlayerSearchItem = pPlayer->GetItem(ItemID);
+	const InventoryItem PlayerSearchItem = pPlayer->GetItem(ItemID);
 	for (const auto& qq : ms_aQuests[ClientID])
 	{
 		if (qq.second.m_State != QuestState::QUEST_ACCEPT)

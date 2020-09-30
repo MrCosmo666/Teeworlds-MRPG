@@ -3,13 +3,13 @@
 #include <teeother/components/localization.h>
 
 #include <game/server/gamecontext.h>
-#include "ItemJob.h"
+#include "InventoryJob.h"
 
 using namespace sqlstr;
-std::map < int , std::map < int , ItemJob::InventoryItem > > ItemJob::ms_aItems;
-std::map < int , ItemJob::ItemInformation > ItemJob::ms_aItemsInfo;
+std::map < int , std::map < int , InventoryItem > > InventoryJob::ms_aItems;
+std::map < int , ItemInformation > InventoryJob::ms_aItemsInfo;
 
-void ItemJob::OnInit()
+void InventoryJob::OnInit()
 {
 	SJK.SDT("*", "tw_items_list", [&](ResultSet* RES)
 	{
@@ -48,14 +48,15 @@ void ItemJob::OnInit()
 	});
 }
 
-void ItemJob::OnInitAccount(CPlayer *pPlayer)
+void InventoryJob::OnInitAccount(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
 	std::shared_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Settings, Enchant, Durability", "tw_accounts_items", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID));
 	while(RES->next())
 	{
 		int ItemID = (int)RES->getInt("ItemID");
-		ms_aItems[ClientID][ItemID] = InventoryItem(pPlayer, ItemID);
+		ms_aItems[ClientID][ItemID].SetItemOwner(pPlayer);
+		ms_aItems[ClientID][ItemID].m_ItemID = ItemID;
 		ms_aItems[ClientID][ItemID].m_Count = (int)RES->getInt("Count");
 		ms_aItems[ClientID][ItemID].m_Settings = (int)RES->getInt("Settings");
 		ms_aItems[ClientID][ItemID].m_Enchant = (int)RES->getInt("Enchant");
@@ -63,13 +64,13 @@ void ItemJob::OnInitAccount(CPlayer *pPlayer)
 	}		
 }
 
-void ItemJob::OnResetClient(int ClientID)
+void InventoryJob::OnResetClient(int ClientID)
 {
 	if (ms_aItems.find(ClientID) != ms_aItems.end())
 		ms_aItems.erase(ClientID);
 }
 
-void ItemJob::RepairDurabilityFull(CPlayer *pPlayer)
+void InventoryJob::RepairDurabilityFull(CPlayer *pPlayer)
 { 
 	int ClientID = pPlayer->GetCID();
 	SJK.UD("tw_accounts_items", "Durability = '100' WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
@@ -77,7 +78,7 @@ void ItemJob::RepairDurabilityFull(CPlayer *pPlayer)
 		it.second.m_Durability = 100;
 }
 
-void ItemJob::FormatAttributes(InventoryItem& pItem, int size, char* pformat)
+void InventoryJob::FormatAttributes(InventoryItem& pItem, int size, char* pformat)
 {
 	dynamic_string Buffer;
 	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
@@ -95,7 +96,7 @@ void ItemJob::FormatAttributes(InventoryItem& pItem, int size, char* pformat)
 	Buffer.clear();
 }
 
-void ItemJob::FormatAttributes(ItemInformation& pInfoItem, int Enchant, int size, char* pformat)
+void InventoryJob::FormatAttributes(ItemInformation& pInfoItem, int Enchant, int size, char* pformat)
 {
 	dynamic_string Buffer;
 	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
@@ -113,7 +114,7 @@ void ItemJob::FormatAttributes(ItemInformation& pInfoItem, int Enchant, int size
 	Buffer.clear();
 }
 
-void ItemJob::ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction)
+void InventoryJob::ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction)
 {
 	const int ClientID = pPlayer->GetCID();
 	GS()->AV(ClientID, "null", "");
@@ -132,7 +133,7 @@ void ItemJob::ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction)
 	if(!Found) GS()->AVL(ClientID, "null", "There are no items in this tab");
 }
 
-int ItemJob::GiveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant)
+int InventoryJob::GiveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant)
 {
 	const int ClientID = pPlayer->GetCID();
 	const int SecureID = SecureCheck(pPlayer, ItemID, Count, Settings, Enchant);
@@ -144,7 +145,7 @@ int ItemJob::GiveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings, int
 	return SecureID;
 }
 
-int ItemJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant)
+int InventoryJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant)
 {
 	// check initialize and add the item
 	const int ClientID = pPlayer->GetCID();
@@ -167,7 +168,7 @@ int ItemJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, 
 	return 2;
 }
 
-int ItemJob::RemoveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings)
+int InventoryJob::RemoveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings)
 {
 	const int SecureID = DeSecureCheck(pPlayer, ItemID, Count, Settings);
 	if(SecureID == 1)
@@ -175,7 +176,7 @@ int ItemJob::RemoveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings)
 	return SecureID;
 }
 
-int ItemJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings)
+int InventoryJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings)
 {
 	// we check the database
 	const int ClientID = pPlayer->GetCID();
@@ -204,7 +205,7 @@ int ItemJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings
 	return 0;		
 }
 
-int ItemJob::ActionItemCountAllowed(CPlayer *pPlayer, int ItemID)
+int InventoryJob::ActionItemCountAllowed(CPlayer *pPlayer, int ItemID)
 {
 	const int ClientID = pPlayer->GetCID();
 	const int AvailableCount = Job()->Quest()->QuestingAllowedItemsCount(pPlayer, ItemID);
@@ -218,7 +219,7 @@ int ItemJob::ActionItemCountAllowed(CPlayer *pPlayer, int ItemID)
 	return AvailableCount;
 }
 
-void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, bool Dress)
+void InventoryJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, bool Dress)
 {
 	const int ClientID = pPlayer->GetCID();
 	const int ItemID = pPlayerItem.GetID();
@@ -297,7 +298,7 @@ void ItemJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pPlayerItem, b
 		GS()->AVM(ClientID, "AUCTIONSLOT", ItemID, HideID, "Create Slot Auction {STR}", pNameItem);
 }
 
-bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool InventoryJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 
@@ -430,7 +431,7 @@ bool ItemJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	return false;
 }
 
-bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+bool InventoryJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (ReplaceMenu)
@@ -478,7 +479,7 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		for (int i = 0; i < NUM_EQUIPS; i++)
 		{
 			const int ItemID = pPlayer->GetEquippedItem(i);
-			ItemJob::InventoryItem& pPlayerItem = pPlayer->GetItem(ItemID);
+			InventoryItem& pPlayerItem = pPlayer->GetItem(ItemID);
 			if (ItemID <= 0 || !pPlayerItem.IsEquipped())
 			{
 				GS()->AVM(ClientID, "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} Not equipped", pType[i]);
@@ -492,7 +493,7 @@ bool ItemJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 
 		GS()->AV(ClientID, "null", "");
 		bool FindItem = false;
-		for (const auto& it : ItemJob::ms_aItems[ClientID])
+		for (const auto& it : ms_aItems[ClientID])
 		{
 			if (!it.second.m_Count || it.second.Info().m_Function != pPlayer->m_SortTabs[SORT_EQUIPING])
 				continue;
@@ -522,7 +523,7 @@ int randomRangecount(int startrandom, int endrandom, int count)
 	return result;
 }
 
-void ItemJob::UseItem(int ClientID, int ItemID, int Count)
+void InventoryJob::UseItem(int ClientID, int ItemID, int Count)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true, true);
 	if(!pPlayer || pPlayer->GetItem(ItemID).m_Count < Count) 
@@ -623,7 +624,7 @@ void ItemJob::UseItem(int ClientID, int ItemID, int Count)
 	return;
 }
 
-int ItemJob::GetCountItemsType(CPlayer *pPlayer, int Type) const
+int InventoryJob::GetCountItemsType(CPlayer *pPlayer, int Type) const
 {
 	int SizeItems = 0;
 	const int ClientID = pPlayer->GetCID();
@@ -635,225 +636,9 @@ int ItemJob::GetCountItemsType(CPlayer *pPlayer, int Type) const
 	return SizeItems;
 }
 
-const char *ItemJob::ClassItemInformation::GetName(CPlayer *pPlayer) const
-{
-	if(!pPlayer) return m_aName;
-	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), m_aName);
-}
-
-const char *ItemJob::ClassItemInformation::GetDesc(CPlayer *pPlayer) const
-{
-	if(!pPlayer) return m_aDesc;
-	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), m_aDesc);	
-}
-
-bool ItemJob::ClassItemInformation::IsEnchantable() const
-{
-	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
-	{
-		if (CGS::AttributInfo.find(m_aAttribute[i]) != CGS::AttributInfo.end() && m_aAttributeCount[i] > 0)
-			return true;
-	}
-	return false;
-}
-
-bool ItemJob::ClassItemInformation::IsEnchantMaxLevel(int Enchant) const
-{
-	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
-	{
-		if(CGS::AttributInfo.find(m_aAttribute[i]) == CGS::AttributInfo.end())
-			continue;
-
-		const int EnchantMax = m_aAttributeCount[i] + (int)kurosio::translate_to_procent_rest(m_aAttributeCount[i], PERCENT_MAXIMUM_ENCHANT);
-		if(GetInfoEnchantStats(m_aAttribute[i], Enchant) > EnchantMax)
-			return true;
-	}
-	return false;
-}
-
-void ItemJob::ClassItemInformation::FormatEnchantLevel(char* pBuffer, int Size, int Enchant) const
-{
-	if(Enchant > 0)
-	{
-		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "[%s]", IsEnchantMaxLevel(Enchant) ? "Max" : std::string("+" + std::to_string(Enchant)).c_str());
-		str_copy(pBuffer, aBuf, Size);
-		return;
-	}
-	str_copy(pBuffer, "\0", Size);
-}
-
-int ItemJob::ClassItems::GetEnchantPrice() const
-{
-	int FinishedPrice = 0;
-	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
-	{
-		if(CGS::AttributInfo.find(Info().m_aAttribute[i]) == CGS::AttributInfo.end())
-			continue;
-
-		int UpgradePrice;
-		const int Attribute = Info().m_aAttribute[i];
-		const int TypeAttribute = CGS::AttributInfo[Attribute].AtType;
-
-		if(TypeAttribute == AtributType::AtHardtype || Attribute == Stats::StStrength)
-		{
-			UpgradePrice = max(12, CGS::AttributInfo[Attribute].UpgradePrice) * 14;
-		}
-		else if(TypeAttribute == AtributType::AtJob || TypeAttribute == AtributType::AtWeapon || Attribute == Stats::StLuckyDropItem)
-		{
-			UpgradePrice = max(20, CGS::AttributInfo[Attribute].UpgradePrice) * 14;
-		}
-		else
-		{
-			UpgradePrice = max(4, CGS::AttributInfo[Attribute].UpgradePrice) * 5;
-		}
-
-		const int PercentEnchant = max(1, (int)kurosio::translate_to_procent_rest(Info().m_aAttributeCount[i], PERCENT_OF_ENCHANT));
-		FinishedPrice += UpgradePrice * (PercentEnchant * (1 + m_Enchant));
-	}
-	return FinishedPrice;
-}
-
-bool ItemJob::ClassItems::SetEnchant(int Enchant)
-{
-	if (m_Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
-		return false;
-
-	m_Enchant = Enchant;
-	bool Successful = Save();
-	return Successful;
-}
-
-bool ItemJob::ClassItems::Add(int Count, int Settings, int Enchant, bool Message)
-{
-	if(Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
-		return false;
-
-	CGS* GameServer = m_pPlayer->GS();
-	const int ClientID = m_pPlayer->GetCID();
-	if(Info().IsEnchantable())
-	{
-		if(m_Count > 0) 
-		{
-			m_pPlayer->GS()->Chat(ClientID, "This item cannot have more than 1 item");
-			return false;
-		}
-		Count = 1;
-	}
-
-	// check the empty slot if yes then put the item on
-	const bool AutoEquip = (Info().m_Type == ItemType::TYPE_EQUIP && m_pPlayer->GetEquippedItem(Info().m_Function) <= 0) || (Info().m_Function == FUNCTION_SETTINGS && Info().IsEnchantable());
-	if(AutoEquip)
-	{
-		if(Info().m_Function == EQUIP_DISCORD)  
-			GameServer->Mmo()->SaveAccount(m_pPlayer, SaveType::SAVE_STATS);
-
-		char aAttributes[128];
-		GameServer->Mmo()->Item()->FormatAttributes(Info(), Enchant, sizeof(aAttributes), aAttributes);
-		GameServer->Chat(ClientID, "Auto equip {STR} - {STR}", Info().GetName(m_pPlayer), aAttributes);
-		GameServer->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
-	}
-
-	const int Code = GameServer->Mmo()->Item()->GiveItem(m_pPlayer, m_ItemID, Count, (AutoEquip ? 1 : Settings), Enchant);
-	if(Code <= 0)
-		return false;
-		
-	if(AutoEquip)
-	{
-		if(m_pPlayer->GetCharacter())
-			m_pPlayer->GetCharacter()->UpdateEquipingStats(m_ItemID);
-		GameServer->ChangeEquipSkin(ClientID, m_ItemID);
-	}
-
-	if(!Message || Info().m_Type == ItemType::TYPE_SETTINGS) 
-		return true;
-
-	if(Info().m_Type == ItemType::TYPE_EQUIP || Info().m_Type == ItemType::TYPE_MODULE)
-		GameServer->Chat(-1, "{STR} got of the {STR}x{INT}!", GameServer->Server()->ClientName(ClientID), Info().GetName(), &Count);
-	else if(Info().m_Type != -1)
-		GameServer->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(m_pPlayer), &Count);
-
-	return true;
-}
-
-bool ItemJob::ClassItems::Remove(int Count, int Settings)
-{
-	if(m_Count <= 0 || Count < 1 || !m_pPlayer) 
-		return false;
-
-	if(m_Count < Count)
-		Count = m_Count;
-
-	if (IsEquipped())
-	{
-		m_Settings = 0;
-		m_pPlayer->GS()->ChangeEquipSkin(m_pPlayer->GetCID(), m_ItemID);
-	}
-
-	const int Code = m_pPlayer->GS()->Mmo()->Item()->RemoveItem(m_pPlayer, m_ItemID, Count, Settings);
-	return (bool)(Code > 0);
-}
-
-bool ItemJob::ClassItems::SetSettings(int Settings)
-{
-	if (m_Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
-		return false;
-
-	m_Settings = Settings;
-	return Save();
-}
-
-bool ItemJob::ClassItems::SetDurability(int Durability)
-{
-	if(m_Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
-		return false;
-
-	m_Durability = Durability;
-	return Save();
-}
-
-bool ItemJob::ClassItems::Equip()
-{
-	if (m_Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
-		return false;
-
-	if(Info().m_Type == ItemType::TYPE_EQUIP)
-	{
-		const int EquipID = Info().m_Function;
-		int EquipItemID = m_pPlayer->GetEquippedItem(EquipID, m_ItemID);
-		while (EquipItemID >= 1)
-		{
-			ItemJob::InventoryItem &EquipItem = m_pPlayer->GetItem(EquipItemID);
-			EquipItem.SetSettings(0);
-			EquipItemID = m_pPlayer->GetEquippedItem(EquipID, m_ItemID);
-		}
-	}
-
-	m_Settings ^= true;
-	if(Info().m_Type == ItemType::TYPE_EQUIP)
-		m_pPlayer->GS()->ChangeEquipSkin(m_pPlayer->GetCID(), m_ItemID);
-
-	if(m_pPlayer->GetCharacter())
-		m_pPlayer->GetCharacter()->UpdateEquipingStats(m_ItemID);
-
-	m_pPlayer->ShowInformationStats();
-	return Save();
-}
-
-bool ItemJob::ClassItems::Save()
-{
-	if (m_pPlayer && m_pPlayer->IsAuthed())
-	{
-		SJK.UD("tw_accounts_items", "Count = '%d', Settings = '%d', Enchant = '%d', Durability = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", 
-			m_Count, m_Settings, m_Enchant, m_Durability, m_pPlayer->Acc().m_AuthID, m_ItemID);
-		return true;
-	}
-	return false;
-}
-
 // TODO: FIX IT (lock .. unlock)
 static std::map<int, std::mutex > lock_sleep;
-void ItemJob::AddItemSleep(int AccountID, int ItemID, int GiveCount, int Milliseconds)
+void InventoryJob::AddItemSleep(int AccountID, int ItemID, int GiveCount, int Milliseconds)
 {
 	std::thread([this, AccountID, ItemID, GiveCount, Milliseconds]()
 		{
