@@ -19,9 +19,8 @@ class CraftJob : public MmoComponent
 	};
 	static std::map <int, CraftStruct> ms_aCraft;
 
+	int GetFinalPrice(CPlayer* pPlayer, int CraftID) const;
 	void CraftItem(CPlayer* pPlayer, int CraftID);
-	
-	bool ItEmptyType(int SelectType) const;
 	void ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectType);
 
 public:
