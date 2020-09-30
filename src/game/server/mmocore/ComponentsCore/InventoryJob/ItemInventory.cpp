@@ -3,7 +3,10 @@
 #include <game/server/gamecontext.h>
 #include "ItemInformation.h"
 
-using namespace sqlstr;
+ItemInformation& CInventoryItem::Info() const
+{
+	return InventoryJob::ms_aItemsInfo[m_ItemID];
+};
 
 int CInventoryItem::GetEnchantPrice() const
 {
@@ -36,11 +39,6 @@ int CInventoryItem::GetEnchantPrice() const
 	return FinishedPrice;
 }
 
-ItemInformation& CInventoryItem::Info() const
-{
-	return InventoryJob::ms_aItemsInfo[m_ItemID];
-};
-
 bool CInventoryItem::SetEnchant(int Enchant)
 {
 	if(m_Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
@@ -49,6 +47,24 @@ bool CInventoryItem::SetEnchant(int Enchant)
 	m_Enchant = Enchant;
 	bool Successful = Save();
 	return Successful;
+}
+
+bool CInventoryItem::SetSettings(int Settings)
+{
+	if(m_Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
+		return false;
+
+	m_Settings = Settings;
+	return Save();
+}
+
+bool CInventoryItem::SetDurability(int Durability)
+{
+	if(m_Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
+		return false;
+
+	m_Durability = Durability;
+	return Save();
 }
 
 bool CInventoryItem::Add(int Count, int Settings, int Enchant, bool Message)
@@ -119,24 +135,6 @@ bool CInventoryItem::Remove(int Count, int Settings)
 
 	const int Code = m_pPlayer->GS()->Mmo()->Item()->RemoveItem(m_pPlayer, m_ItemID, Count, Settings);
 	return (bool)(Code > 0);
-}
-
-bool CInventoryItem::SetSettings(int Settings)
-{
-	if(m_Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
-		return false;
-
-	m_Settings = Settings;
-	return Save();
-}
-
-bool CInventoryItem::SetDurability(int Durability)
-{
-	if(m_Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
-		return false;
-
-	m_Durability = Durability;
-	return Save();
 }
 
 bool CInventoryItem::Equip()

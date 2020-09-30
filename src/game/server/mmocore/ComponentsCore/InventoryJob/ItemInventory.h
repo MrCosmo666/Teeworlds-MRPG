@@ -25,24 +25,28 @@ public:
 		m_Durability = 0;
 	};
 
-	void SetItemOwner(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
-	bool SetDurability(int Durability);
-	bool SetEnchant(int Enchant);
-	bool SetSettings(int Settings);
-	bool Remove(int Count, int Settings = 0);
-	bool Add(int Count, int Settings = 0, int Enchant = 0, bool Message = true);
-	bool Equip();
-	bool Save();
-
-	bool IsEquipped() const { return m_Count > 0 && m_Settings > 0 && (Info().m_Type == ItemType::TYPE_POTION || Info().m_Type == ItemType::TYPE_SETTINGS || Info().m_Type == ItemType::TYPE_MODULE || Info().m_Type == ItemType::TYPE_EQUIP); }
-	bool IsEnchantMaxLevel() const { return Info().IsEnchantMaxLevel(m_Enchant); }
-	void FormatEnchantLevel(char* pBuffer, int Size) const { Info().FormatEnchantLevel(pBuffer, Size, m_Enchant); }
-
+	ItemInformation& Info() const;
 	int GetID() const { return m_ItemID; }
 	int GetEnchantStats(int AttributeID) const { return Info().GetInfoEnchantStats(AttributeID, m_Enchant); }
 	int GetEnchantPrice() const;
+	bool IsEquipped() const { return m_Count > 0 && m_Settings > 0 && (Info().m_Type == ItemType::TYPE_POTION || Info().m_Type == ItemType::TYPE_SETTINGS || Info().m_Type == ItemType::TYPE_MODULE || Info().m_Type == ItemType::TYPE_EQUIP); }
+	bool IsEnchantMaxLevel() const { return Info().IsEnchantMaxLevel(m_Enchant); }
 
-	ItemInformation& Info() const;
+	void FormatEnchantLevel(char* pBuffer, int Size) const { Info().FormatEnchantLevel(pBuffer, Size, m_Enchant); }
+	void SetItemOwner(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
+
+	bool SetEnchant(int Enchant);
+	bool SetSettings(int Settings);
+	bool SetDurability(int Durability);
+
+	bool Add(int Count, int Settings = 0, int Enchant = 0, bool Message = true);
+	bool Remove(int Count, int Settings = 0);
+	bool Equip();
+	bool Save();
+
+
+
+
 };
 typedef CInventoryItem InventoryItem;
 

@@ -17,42 +17,21 @@ public:
 	int m_Function;
 	int m_Dysenthis;
 	int m_MinimalPrice;
-	short m_aAttribute[STATS_MAX_FOR_ITEM];
+	int m_aAttribute[STATS_MAX_FOR_ITEM];
 	int m_aAttributeCount[STATS_MAX_FOR_ITEM];
 	int m_ProjID;
-
-	int GetInfoEnchantStats(int AttributeID) const
-	{
-		for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
-		{
-			if(m_aAttribute[i] > 0 && m_aAttribute[i] == AttributeID)
-				return m_aAttributeCount[i];
-		}
-		return 0;
-	}
-
-	int GetInfoEnchantStats(int AttributeID, int Enchant) const
-	{
-		const int StatSize = GetInfoEnchantStats(AttributeID);
-		if(StatSize <= 0)
-			return 0;
-
-		const int PercentEnchant = (int)kurosio::translate_to_procent_rest(StatSize, PERCENT_OF_ENCHANT);
-		int EnchantStat = StatSize + PercentEnchant * (1 + Enchant);
-
-		// the case when with percent will back 0
-		if(PercentEnchant <= 0)
-			EnchantStat += Enchant;
-
-		return EnchantStat;
-	}
-	bool IsEnchantable() const;
-	bool IsEnchantMaxLevel(int Enchant) const;
-	void FormatEnchantLevel(char* pBuffer, int Size, int Enchant) const;
 
 	const char* GetName(class CPlayer* pPlayer = nullptr) const;
 	const char* GetDesc(class CPlayer* pPlayer = nullptr) const;
 	const char* GetIcon() const { return m_aIcon; };
+
+	int GetInfoEnchantStats(int AttributeID) const;
+	int GetInfoEnchantStats(int AttributeID, int Enchant) const;
+
+	bool IsEnchantable() const;
+	bool IsEnchantMaxLevel(int Enchant) const;
+
+	void FormatEnchantLevel(char* pBuffer, int Size, int Enchant) const;
 };
 typedef CItemInformation ItemInformation;
 

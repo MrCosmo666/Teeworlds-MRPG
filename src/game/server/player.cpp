@@ -596,6 +596,7 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 
 InventoryItem &CPlayer::GetItem(int ItemID) 
 {
+	InventoryJob::ms_aItems[m_ClientID][ItemID].m_ItemID = ItemID;
 	InventoryJob::ms_aItems[m_ClientID][ItemID].SetItemOwner(this);
 	return InventoryJob::ms_aItems[m_ClientID][ItemID];
 }
