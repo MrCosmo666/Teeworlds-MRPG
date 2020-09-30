@@ -72,7 +72,7 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), &Price, NeededItem.GetName(pPlayer));
 
 			char aAttributes[128];
-			Job()->Item()->FormatAttributes(BuyightItem, Enchant, sizeof(aAttributes), aAttributes);
+			BuyightItem.FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 		}
 		else
@@ -119,7 +119,7 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), &Price);
 
 			char aAttributes[128];
-			Job()->Item()->FormatAttributes(BuyightItem, Enchant, sizeof(aAttributes), aAttributes);
+			BuyightItem.FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 		}
 		else

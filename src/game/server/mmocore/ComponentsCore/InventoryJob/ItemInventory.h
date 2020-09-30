@@ -35,6 +35,7 @@ public:
 	bool IsEnchantMaxLevel() const { return Info().IsEnchantMaxLevel(m_Enchant); }
 
 	void FormatEnchantLevel(char* pBuffer, int Size) const { Info().FormatEnchantLevel(pBuffer, Size, m_Enchant); }
+	void FormatAttributes(char* pBuffer, int Size) const { Info().FormatAttributes(pBuffer, Size, m_Enchant); }
 	void SetItemOwner(CPlayer* pPlayer);
 
 	bool SetEnchant(int Enchant);

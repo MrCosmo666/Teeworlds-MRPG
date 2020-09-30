@@ -23,9 +23,6 @@ public:
 	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 
-	void FormatAttributes(InventoryItem& pItem, int size, char* pformat);
-	void FormatAttributes(ItemInformation& pInfoItem, int Enchant, int size, char* pformat);
-
 	// primary
 	void ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction = false);
 	int GiveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant);

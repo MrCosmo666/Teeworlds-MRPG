@@ -256,7 +256,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 			if (ItemData.Info().m_Type == ItemType::TYPE_MODULE && ItemData.m_Count > 0)
 			{
 				char aAttributes[128];
-				Job()->Item()->FormatAttributes(ItemData, sizeof(aAttributes), aAttributes);
+				ItemData.FormatAttributes(aAttributes, sizeof(aAttributes));
 				GS()->AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, TAB_SETTINGS_MODULES, "{STR} {STR}{STR}",
 					ItemData.Info().GetName(pPlayer), aAttributes, (ItemData.m_Settings ? "✔ " : "\0"));
 				FoundSettings = true;

@@ -78,3 +78,21 @@ void CItemInformation::FormatEnchantLevel(char* pBuffer, int Size, int Enchant) 
 	}
 	str_copy(pBuffer, "\0", Size);
 }
+
+void CItemInformation::FormatAttributes(char* pBuffer, int Size, int Enchant) const
+{
+	dynamic_string Buffer;
+	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
+	{
+		int BonusID = m_aAttribute[i];
+		int BonusCount = GetInfoEnchantStats(BonusID, Enchant);
+		if(BonusID <= 0 || BonusCount <= 0)
+			continue;
+
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "%s+%d ", CGS::AttributInfo[BonusID].Name, BonusCount);
+		Buffer.append_at(Buffer.length(), aBuf);
+	}
+	str_copy(pBuffer, Buffer.buffer(), Size);
+	Buffer.clear();
+}

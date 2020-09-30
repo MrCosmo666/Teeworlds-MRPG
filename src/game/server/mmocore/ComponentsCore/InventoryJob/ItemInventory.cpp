@@ -62,8 +62,7 @@ bool CInventoryItem::SetEnchant(int Enchant)
 		return false;
 
 	m_Enchant = Enchant;
-	bool Successful = Save();
-	return Successful;
+	return Save();
 }
 
 bool CInventoryItem::SetSettings(int Settings)
@@ -108,7 +107,7 @@ bool CInventoryItem::Add(int Count, int Settings, int Enchant, bool Message)
 			GS()->Mmo()->SaveAccount(m_pPlayer, SaveType::SAVE_STATS);
 
 		char aAttributes[128];
-		GS()->Mmo()->Item()->FormatAttributes(Info(), Enchant, sizeof(aAttributes), aAttributes);
+		Info().FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
 		GS()->Chat(ClientID, "Auto equip {STR} - {STR}", Info().GetName(m_pPlayer), aAttributes);
 		GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 	}

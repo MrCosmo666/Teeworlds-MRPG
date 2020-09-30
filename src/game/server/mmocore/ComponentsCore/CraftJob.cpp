@@ -97,7 +97,7 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 				(pPlayer->GetItem(cr.second.m_ReceivedItemID).m_Count ? "✔ " : "\0"), InfoGetItem.GetName(pPlayer), &LastPrice);
 
 			char aAttributes[128];
-			Job()->Item()->FormatAttributes(InfoGetItem, 0, sizeof(aAttributes), aAttributes);
+			InfoGetItem.FormatAttributes(aAttributes, sizeof(aAttributes), 0);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 		}
 		else

@@ -78,42 +78,6 @@ void InventoryJob::RepairDurabilityFull(CPlayer *pPlayer)
 		it.second.m_Durability = 100;
 }
 
-void InventoryJob::FormatAttributes(InventoryItem& pItem, int size, char* pformat)
-{
-	dynamic_string Buffer;
-	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
-	{
-		const int BonusID = pItem.Info().m_aAttribute[i];
-		const int BonusCount = pItem.GetEnchantStats(BonusID);
-		if (BonusID <= 0)
-			continue;
-
-		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "%s+%d ", GS()->AtributeName(BonusID), BonusCount);
-		Buffer.append_at(Buffer.length(), aBuf);
-	}
-	str_copy(pformat, Buffer.buffer(), size);
-	Buffer.clear();
-}
-
-void InventoryJob::FormatAttributes(ItemInformation& pInfoItem, int Enchant, int size, char* pformat)
-{
-	dynamic_string Buffer;
-	for (int i = 0; i < STATS_MAX_FOR_ITEM; i++)
-	{
-		int BonusID = pInfoItem.m_aAttribute[i];
-		int BonusCount = pInfoItem.GetInfoEnchantStats(BonusID, Enchant);
-		if (BonusID <= 0 || BonusCount <= 0)
-			continue;
-
-		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "%s+%d ", GS()->AtributeName(BonusID), BonusCount);
-		Buffer.append_at(Buffer.length(), aBuf);
-	}
-	str_copy(pformat, Buffer.buffer(), size);
-	Buffer.clear();
-}
-
 void InventoryJob::ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction)
 {
 	const int ClientID = pPlayer->GetCID();
@@ -236,7 +200,7 @@ void InventoryJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pItemPlay
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pItemPlayer.Info().GetDesc(pPlayer));
 
 		char aAttributes[64];
-		FormatAttributes(pItemPlayer.Info(), pItemPlayer.m_Enchant, sizeof(aAttributes), aAttributes);
+		pItemPlayer.FormatAttributes(aAttributes, sizeof(aAttributes));
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 	}
 	else
@@ -414,7 +378,7 @@ bool InventoryJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 			pPlayerSelectedItem.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf));
 
 			char aAttributes[128];
-			FormatAttributes(pPlayerSelectedItem, sizeof(aAttributes), aAttributes);
+			pPlayerSelectedItem.FormatAttributes(aAttributes, sizeof(aAttributes));
 			GS()->Chat(-1, "{STR} enchant {STR} {STR} {STR}", GS()->Server()->ClientName(ClientID), pPlayerSelectedItem.Info().GetName(), aEnchantBuf, aAttributes);
 			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		}
@@ -487,7 +451,7 @@ bool InventoryJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 			}
 
 			char aAttributes[128];
-			FormatAttributes(pItemPlayer, sizeof(aAttributes), aAttributes);
+			pItemPlayer.FormatAttributes(aAttributes, sizeof(aAttributes));
 			GS()->AVMI(ClientID, pItemPlayer.Info().GetIcon(), "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], pItemPlayer.Info().GetName(pPlayer), aAttributes);
 		}
 
