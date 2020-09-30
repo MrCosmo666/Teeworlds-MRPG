@@ -267,7 +267,7 @@ public:
 	void CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText);
 	void CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop = 1, vec2 Force = vec2(0.0f, 0.0f));
 	void CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant = 0, vec2 Force = vec2(0.0f, 0.0f));
-	void CreateDropItem(vec2 Pos, int ClientID, InventoryItem &pPlayerItem, int Count, vec2 Force = vec2(0.0f, 0.0f));
+	void CreateDropItem(vec2 Pos, int ClientID, InventoryItem &pItemPlayer, int Count, vec2 Force = vec2(0.0f, 0.0f));
 	bool TakeItemCharacter(int ClientID);
 	void SendInbox(int ClientID, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
 

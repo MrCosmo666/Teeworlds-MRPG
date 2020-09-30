@@ -159,8 +159,8 @@ void CommandProcessor::ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer)
 		int sitemid = 0;
 		if ((sscanf(Msg->m_pMessage, "/useitem %d", &sitemid)) != 1)
 			return GS->ChatFollow(ClientID, "Please use: /useitem <itemid>");
-		
-		UseItems(GS, ClientID, sitemid, 1);
+
+		pPlayer->GetItem(sitemid).Use(1);
 		return;
 	}
 
@@ -235,11 +235,6 @@ void CommandProcessor::ChangeStateDoor(CGS *GS, int HouseID)
 int CommandProcessor::PlayerHouseID(CGS *GS, CPlayer *pPlayer) const
 {
 	return GS->Mmo()->House()->PlayerHouseID(pPlayer);
-}
-
-void CommandProcessor::UseItems(CGS *GS, int ClientID, int ItemID, int Count)
-{
-	GS->Mmo()->Item()->UseItem(ClientID, ItemID, Count);
 }
 
 bool CommandProcessor::UseSkill(CGS *GS, CPlayer *pPlayer, int SkillID) const

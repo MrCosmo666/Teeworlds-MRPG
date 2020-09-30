@@ -665,8 +665,9 @@ void CCharacter::Die(int Killer, int Weapon)
 		if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot() && GS()->m_apPlayers[Killer])
 		{
 			// potion resurrection
-			if(m_pPlayer->GetItem(itPotionResurrection).IsEquipped())
-				GS()->Mmo()->Item()->UseItem(ClientID, itPotionResurrection, 1);
+			InventoryItem& pItemPlayer = m_pPlayer->GetItem(itPotionResurrection);
+			if(pItemPlayer.IsEquipped())
+				pItemPlayer.Use(1);
 			else
 			{
 				GS()->Chat(ClientID, "You are dead, you will be treated in {STR}", Server()->GetWorldName(SafezoneWorldID));
@@ -785,8 +786,9 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	// health pool
 	if(m_Health <= m_pPlayer->GetStartHealth()/3)
 	{
-		if(!m_pPlayer->CheckEffect("RegenHealth") && m_pPlayer->GetItem(itPotionHealthRegen).IsEquipped())
-			GS()->Mmo()->Item()->UseItem(m_pPlayer->GetCID(), itPotionHealthRegen, 1);
+		InventoryItem& pItemPlayer = m_pPlayer->GetItem(itPotionHealthRegen);
+		if(!m_pPlayer->CheckEffect("RegenHealth") && pItemPlayer.IsEquipped())
+			pItemPlayer.Use(1);
 	}
 
 	// verify death
@@ -1174,8 +1176,8 @@ bool CCharacter::CheckFailMana(int Mana)
 	}
 
 	m_Mana -= Mana;
-	if(m_Mana <= m_pPlayer->GetStartMana() / 5  && !m_pPlayer->CheckEffect("RegenMana") && m_pPlayer->GetItem(itPotionManaRegen).IsEquipped())
-		GS()->Mmo()->Item()->UseItem(m_pPlayer->GetCID(), itPotionManaRegen, 1);
+	if(m_Mana <= m_pPlayer->GetStartMana() / 5 && !m_pPlayer->CheckEffect("RegenMana") && m_pPlayer->GetItem(itPotionManaRegen).IsEquipped())
+		m_pPlayer->GetItem(itPotionManaRegen).Use(1);
 
 	m_pPlayer->ShowInformationStats();
 	return false;	

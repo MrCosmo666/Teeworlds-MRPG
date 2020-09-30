@@ -7,6 +7,7 @@
 
 class CInventoryItem
 {
+	CGS* m_pGS;
 	CPlayer* m_pPlayer;
 
 public:
@@ -25,6 +26,7 @@ public:
 		m_Durability = 0;
 	};
 
+	CGS* GS() { return m_pGS; }
 	ItemInformation& Info() const;
 	int GetID() const { return m_ItemID; }
 	int GetEnchantStats(int AttributeID) const { return Info().GetInfoEnchantStats(AttributeID, m_Enchant); }
@@ -33,7 +35,7 @@ public:
 	bool IsEnchantMaxLevel() const { return Info().IsEnchantMaxLevel(m_Enchant); }
 
 	void FormatEnchantLevel(char* pBuffer, int Size) const { Info().FormatEnchantLevel(pBuffer, Size, m_Enchant); }
-	void SetItemOwner(CPlayer* pPlayer) { m_pPlayer = pPlayer; }
+	void SetItemOwner(CPlayer* pPlayer);
 
 	bool SetEnchant(int Enchant);
 	bool SetSettings(int Settings);
@@ -42,11 +44,8 @@ public:
 	bool Add(int Count, int Settings = 0, int Enchant = 0, bool Message = true);
 	bool Remove(int Count, int Settings = 0);
 	bool Equip();
+	bool Use(int Count);
 	bool Save();
-
-
-
-
 };
 typedef CInventoryItem InventoryItem;
 

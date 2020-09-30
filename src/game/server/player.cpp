@@ -360,17 +360,17 @@ bool CPlayer::CheckFailMoney(int Price, int ItemID, bool CheckOnly)
 	if (Price <= 0)
 		return false;
 
-	InventoryItem &pPlayerItem = GetItem(ItemID);
-	if(pPlayerItem.m_Count < Price)
+	InventoryItem &pItemPlayer = GetItem(ItemID);
+	if(pItemPlayer.m_Count < Price)
 	{
-		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", &Price, &pPlayerItem.m_Count, pPlayerItem.Info().GetName(this), NULL);
+		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", &Price, &pItemPlayer.m_Count, pItemPlayer.Info().GetName(this), NULL);
 		return true;
 	}
 
 	if (CheckOnly)
 		return false;
 
-	if (!pPlayerItem.Remove(Price))
+	if (!pItemPlayer.Remove(Price))
 		return true;
 
 	return false;
