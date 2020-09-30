@@ -830,12 +830,12 @@ int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 	// notify the mod about the drop
 	if(pThis->m_aClients[ClientID].m_State >= CClient::STATE_READY)
 	{
-		pThis->GameServer(LOCAL_WORLD)->ClearClientData(ClientID);
 		for (int i = 0; i < COUNT_WORLD; i++)
 		{
 			pThis->m_aClients[ClientID].m_Quitting = true;
 			pThis->GameServer(i)->OnClientDrop(ClientID, pReason);
 		}
+		pThis->GameServer(LOCAL_WORLD)->ClearClientData(ClientID);
 	}
 	
 	pThis->m_aClients[ClientID].m_State = CClient::STATE_EMPTY;
