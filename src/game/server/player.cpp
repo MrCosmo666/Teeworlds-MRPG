@@ -163,7 +163,7 @@ void CPlayer::Snap(int SnappingClient)
 	pPlayerInfo->m_Score = Acc().m_Level;
 
 	// --------------------- CUSTOM ----------------------
-	if(!GS()->CheckClient(SnappingClient) || GetTeam() == TEAM_SPECTATORS || !IsAuthed())
+	if(!GS()->IsMmoClient(SnappingClient) || GetTeam() == TEAM_SPECTATORS || !IsAuthed())
 		return;
 
 	CNetObj_Mmo_ClientInfo *pClientInfo = static_cast<CNetObj_Mmo_ClientInfo *>(Server()->SnapNewItem(NETOBJTYPE_MMO_CLIENTINFO, m_ClientID, sizeof(CNetObj_Mmo_ClientInfo)));
@@ -316,7 +316,7 @@ int CPlayer::GetTeam()
 ######################################################################### */
 void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp)
 {
-	if (GS()->CheckClient(m_ClientID))
+	if (GS()->IsMmoClient(m_ClientID))
 	{
 		GS()->SendProgressBar(m_ClientID, MyExp, ExpNeed, Name);
 		return;
@@ -549,7 +549,7 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 		}
 
 		// conversations for vanilla clients
-		if(GetTalkedID() > 0 && !GS()->CheckClient(m_ClientID))
+		if(GetTalkedID() > 0 && !GS()->IsMmoClient(m_ClientID))
 		{
 			if(m_PlayerTick[TickState::LastDialog] && m_PlayerTick[TickState::LastDialog] > GS()->Server()->Tick())
 				return true;

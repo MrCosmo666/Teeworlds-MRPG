@@ -175,7 +175,7 @@ void CPlayerBot::Snap(int SnappingClient)
 	pPlayerInfo->m_Score = (m_BotType == BotsTypes::TYPE_BOT_MOB ? BotJob::ms_aMobBot[m_SubBotID].m_Level : 1);
 
 	// --------------------- CUSTOM ----------------------
-	if(!GS()->CheckClient(SnappingClient))
+	if(!GS()->IsMmoClient(SnappingClient))
 		return;
 
 	CNetObj_Mmo_ClientInfo *pClientInfo = static_cast<CNetObj_Mmo_ClientInfo *>(Server()->SnapNewItem(NETOBJTYPE_MMO_CLIENTINFO, m_ClientID, sizeof(CNetObj_Mmo_ClientInfo)));

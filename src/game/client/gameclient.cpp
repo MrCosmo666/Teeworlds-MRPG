@@ -1096,7 +1096,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		if (!m_MmoMsgSent && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 		{
 			CNetMsg_Cl_IsMmoServer Msg;
-			Msg.m_Version = CLIENT_VERSION_MMO;
+			Msg.m_Version = PROTOCOL_VERSION_MMO;
 			Client()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD);
 			m_MmoMsgSent = true;
 		}

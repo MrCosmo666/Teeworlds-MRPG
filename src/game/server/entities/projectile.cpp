@@ -103,7 +103,7 @@ void CProjectile::Snap(int SnappingClient)
 	if (NetworkClipped(SnappingClient, GetPos(Ct)))
 		return;
 
-	if(GS()->CheckClient(SnappingClient) && m_OwnerMmoProjType >= 0)
+	if(GS()->IsMmoClient(SnappingClient) && m_OwnerMmoProjType >= 0)
 	{
 	 	CNetObj_MmoProj *pProj = static_cast<CNetObj_MmoProj *>(Server()->SnapNewItem(NETOBJTYPE_MMOPROJ, GetID(), sizeof(CNetObj_MmoProj)));
 	 	if(!pProj)

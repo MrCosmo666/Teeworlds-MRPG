@@ -48,7 +48,7 @@ void CEventHandler::Snap(int SnappingClient)
 
 	for(int i = 0; i < m_NumEvents; i++)
 	{
-		if(m_aTypes[i] > NETEVENTTYPE_DAMAGE && !GS()->CheckClient(SnappingClient))
+		if(m_aTypes[i] > NETEVENTTYPE_DAMAGE && !GS()->IsMmoClient(SnappingClient))
 			continue;
 
 		if(SnappingClient == -1 || CmaskIsSet(m_aClientMasks[i], SnappingClient))

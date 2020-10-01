@@ -112,7 +112,7 @@ void CDropQuestItem::Snap(int SnappingClient)
 		return;
 
 	// mrpg
-	if (GS()->CheckClient(SnappingClient))
+	if (GS()->IsMmoClient(SnappingClient))
 	{
 		CNetObj_MmoPickup* pObj = static_cast<CNetObj_MmoPickup*>(Server()->SnapNewItem(NETOBJTYPE_MMOPICKUP, GetID(), sizeof(CNetObj_MmoPickup)));
 		if (!pObj)

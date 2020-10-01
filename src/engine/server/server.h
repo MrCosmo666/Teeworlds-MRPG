@@ -238,8 +238,8 @@ public:
 	virtual int GetWorldID(int ClientID);
 	virtual void BackInformationFakeClient(int FakeClientID);
 
-	virtual void SetClientVersion(int ClientID, int Version);
-	virtual int GetClientVersion(int ClientID);
+	virtual void SetClientProtocolVersion(int ClientID, int Version);
+	virtual int GetClientProtocolVersion(int ClientID);
 
 	virtual void SetClientLanguage(int ClientID, const char* pLanguage);
 	virtual const char* GetClientLanguage(int ClientID) const;

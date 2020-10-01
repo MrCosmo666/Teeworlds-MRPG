@@ -103,7 +103,7 @@ CPlayer *CGS::GetPlayer(int ClientID, bool CheckAuthed, bool CheckCharacter)
 	CPlayer *pPlayer = m_apPlayers[ClientID];
 	if((CheckAuthed && pPlayer->IsAuthed()) || !CheckAuthed)
 	{
-		if(CheckCharacter && (!pPlayer->GetCharacter() || !pPlayer->GetCharacter()->IsAlive()))
+		if(CheckCharacter && !pPlayer->GetCharacter())
 			return nullptr;
 		return pPlayer;	
 	}
@@ -136,7 +136,7 @@ std::unique_ptr<char[]> CGS::LevelString(int MaxValue, int CurrentValue, int Ste
 const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const
 {
 	// mrpg client
-	if(CheckClient(ClientID))
+	if(IsMmoClient(ClientID))
 	{
 		if(HidenTabs)
 			return ID >= NUM_TAB_MENU ? ("▵ ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("▼ :: ") : ("▲ :: "));
@@ -265,9 +265,9 @@ void CGS::CreateSound(vec2 Pos, int Sound, int64 Mask)
 	}
 }
 
-void CGS::SendMapMusic(int ClientID, int MusicID)
+void CGS::SendWorldMusic(int ClientID, int MusicID)
 {
-	if(!CheckClient(ClientID))
+	if(!IsMmoClient(ClientID))
 		return;
 
 	CNetMsg_Sv_WorldMusic Msg;
@@ -279,7 +279,7 @@ void CGS::SendMapMusic(int ClientID, int MusicID)
 void CGS::CreatePlayerSound(int ClientID, int Sound)
 {
 	// fix for vanilla unterstand SoundID
-	if(!m_apPlayers[ClientID] || (!CheckClient(ClientID) && (Sound < 0 || Sound > 40)))
+	if(!m_apPlayers[ClientID] || (!IsMmoClient(ClientID) && (Sound < 0 || Sound > 40)))
 		return;
 
 	CNetEvent_SoundWorld* pEvent = (CNetEvent_SoundWorld*)m_Events.Create(NETEVENTTYPE_SOUNDWORLD, sizeof(CNetEvent_SoundWorld), CmaskOne(ClientID));
@@ -812,7 +812,7 @@ void CGS::SendSkinChange(int ClientID, int TargetID)
 void CGS::SendEquipItem(int ClientID, int TargetID)
 {
 	CPlayer *pPlayer = GetPlayer(ClientID);
-	if((TargetID != -1 && !CheckClient(TargetID)) || !pPlayer)
+	if((TargetID != -1 && !IsMmoClient(TargetID)) || !pPlayer)
 		return;
 
 	// send players equiping global bots local on world
@@ -833,7 +833,7 @@ void CGS::SendEquipItem(int ClientID, int TargetID)
 // Send equipment in radius
 void CGS::SendRangeEquipItem(int TargetID, int StartSenderClientID, int EndSenderClientID)
 {
-	if (!CheckClient(TargetID) || StartSenderClientID < 0 || EndSenderClientID > MAX_CLIENTS || StartSenderClientID >= EndSenderClientID)
+	if (!IsMmoClient(TargetID) || StartSenderClientID < 0 || EndSenderClientID > MAX_CLIENTS || StartSenderClientID >= EndSenderClientID)
 		return;
 
 	for (int i = StartSenderClientID; i < EndSenderClientID; i++)
@@ -927,7 +927,7 @@ void CGS::SendTuningParams(int ClientID)
 // Send a conversation package with someone
 void CGS::SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char *Message, int Style, int TalkingEmote)
 {
-	if (!CheckClient(ClientID))
+	if (!IsMmoClient(ClientID))
 		return;
 
 	CNetMsg_Sv_TalkText Msg;
@@ -941,7 +941,7 @@ void CGS::SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const cha
 
 void CGS::SendProgressBar(int ClientID, int Count, int Request, const char* Message)
 {
-	if (!CheckClient(ClientID))
+	if (!IsMmoClient(ClientID))
 		return;
 
 	CNetMsg_Sv_ProgressBar Msg;
@@ -953,7 +953,7 @@ void CGS::SendProgressBar(int ClientID, int Count, int Request, const char* Mess
 
 void CGS::ClearTalkText(int ClientID)
 {
-	if(!CheckClient(ClientID))
+	if(!IsMmoClient(ClientID))
 		return;
 
 	CNetMsg_Sv_ClearTalkText Msg;
@@ -1289,7 +1289,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			// update all clients
 			for(int i = 0; i < MAX_CLIENTS; ++i)
 			{
-				if(!m_apPlayers[i] || Server()->GetClientVersion(i) < MIN_SKINCHANGE_CLIENTVERSION)
+				if(!m_apPlayers[i] || Server()->GetClientProtocolVersion(i) < MIN_SKINCHANGE_CLIENTVERSION)
 					continue;
 
 				SendSkinChange(pPlayer->GetCID(), i);
@@ -1301,13 +1301,13 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		else if (MsgID == NETMSGTYPE_CL_ISMMOSERVER)
 		{
 			CNetMsg_Cl_IsMmoServer *pMsg = (CNetMsg_Cl_IsMmoServer *)pRawMsg;
-			Server()->SetClientVersion(ClientID, pMsg->m_Version);
+			Server()->SetClientProtocolVersion(ClientID, pMsg->m_Version);
 
 			/*
 				receive information about the client if the old version is written and prohibit the use of all client functions
 				to avoid crashes between package sizes
 			*/
-			if(!CheckClient(ClientID))
+			if(!IsMmoClient(ClientID))
 			{
 				Server()->Kick(ClientID, "Update client use updater or download in discord.");
 				return;
@@ -1501,9 +1501,9 @@ bool CGS::IsClientPlayer(int ClientID) const
 {
 	return m_apPlayers[ClientID] && m_apPlayers[ClientID]->GetTeam() == TEAM_SPECTATORS ? false : true;
 }
-bool CGS::CheckClient(int ClientID) const
+bool CGS::IsMmoClient(int ClientID) const
 {
-	return (bool)((Server()->GetClientVersion(ClientID) == CLIENT_VERSION_MMO) || (ClientID >= MAX_PLAYERS && ClientID < MAX_CLIENTS)); 
+	return (bool)((Server()->GetClientProtocolVersion(ClientID) == PROTOCOL_VERSION_MMO) || (ClientID >= MAX_PLAYERS && ClientID < MAX_CLIENTS)); 
 }
 const char *CGS::GameType() const { return m_pController && m_pController->GetGameType() ? m_pController->GetGameType() : ""; }
 const char *CGS::Version() const { return GAME_VERSION; }
@@ -1699,7 +1699,7 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 	m_PlayerVotes[To].push_back(Vote);
 
 	// send to customers that have a mmo client
-	if(CheckClient(To)) 
+	if(IsMmoClient(To)) 
 	{
 		if (Vote.m_aDescription[0] == '\0')
 			m_apPlayers[To]->m_Colored = { 0, 0, 0 };

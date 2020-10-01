@@ -348,14 +348,14 @@ void CServer::SetClientScore(int ClientID, int Score)
 	m_aClients[ClientID].m_Score = Score;
 }
 
-void CServer::SetClientVersion(int ClientID, int Version)
+void CServer::SetClientProtocolVersion(int ClientID, int Version)
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
 		return;
 	m_aClients[ClientID].m_ClientVersion = Version;
 }
 
-int CServer::GetClientVersion(int ClientID)
+int CServer::GetClientProtocolVersion(int ClientID)
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
 		return 0;

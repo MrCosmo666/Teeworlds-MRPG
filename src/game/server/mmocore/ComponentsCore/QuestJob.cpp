@@ -521,7 +521,7 @@ void QuestJob::QuestTableShowRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &Bo
 		return;
 
 	const int ClientID = pPlayer->GetCID();
-	if (GS()->CheckClient(ClientID))
+	if (GS()->IsMmoClient(ClientID))
 	{
 		QuestTableShowRequired(pPlayer, BotData);
 		return;
@@ -631,7 +631,7 @@ void QuestJob::QuestTableShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& Bo
 void QuestJob::QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID, bool GivingTable)
 {
 	CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
-	if (!pPlayer || ItemID < itGold || !GS()->CheckClient(ClientID))
+	if (!pPlayer || ItemID < itGold || !GS()->IsMmoClient(ClientID))
 		return;
 
 	const InventoryItem PlayerSelectedItem = pPlayer->GetItem(ItemID);
@@ -647,7 +647,7 @@ void QuestJob::QuestTableAddItem(int ClientID, const char* pText, int Requires, 
 
 void QuestJob::QuestTableAddInfo(int ClientID, const char *pText, int Requires, int Have)
 {
-	if (ClientID < 0 || ClientID >= MAX_PLAYERS || !GS()->CheckClient(ClientID))
+	if (ClientID < 0 || ClientID >= MAX_PLAYERS || !GS()->IsMmoClient(ClientID))
 		return;
 
 	CNetMsg_Sv_AddQuestingProcessing Msg;
@@ -661,7 +661,7 @@ void QuestJob::QuestTableAddInfo(int ClientID, const char *pText, int Requires, 
 
 void QuestJob::QuestTableClear(int ClientID)
 {
-	if (ClientID < 0 || ClientID >= MAX_PLAYERS || !GS()->CheckClient(ClientID))
+	if (ClientID < 0 || ClientID >= MAX_PLAYERS || !GS()->IsMmoClient(ClientID))
 		return;
 	
 	CNetMsg_Sv_ClearQuestingProcessing Msg;

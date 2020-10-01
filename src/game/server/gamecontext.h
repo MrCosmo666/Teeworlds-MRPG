@@ -107,7 +107,7 @@ public:
 	void CreatePlayerSpawn(vec2 Pos);
 	void CreateDeath(vec2 Pos, int Who);
 	void CreateSound(vec2 Pos, int Sound, int64 Mask=-1);
-	void SendMapMusic(int ClientID, int MusicID = 0);
+	void SendWorldMusic(int ClientID, int MusicID = 0);
 	void CreatePlayerSound(int ClientID, int Sound);
 	void SendMmoEffect(vec2 Pos, int EffectID, int ClientID = -1);
 	void SendMmoPotion(vec2 Pos, const char *Potion, bool Added);
@@ -277,7 +277,7 @@ private:
 public:
 	void ChangeEquipSkin(int ClientID, int ItemID);
 
-	bool CheckClient(int ClientID) const;
+	bool IsMmoClient(int ClientID) const;
 	int GetWorldID() const { return m_WorldID; }
 	int DungeonID() const { return m_DungeonID; }
 	bool IsDungeon() const { return (m_DungeonID > 0); }

@@ -12,7 +12,7 @@ std::map < int, AccountMainJob::StructTempPlayerData > AccountMainJob::ms_aPlaye
 
 int AccountMainJob::SendAuthCode(int ClientID, int Code)
 {
-	if (GS()->CheckClient(ClientID))
+	if (GS()->IsMmoClient(ClientID))
 	{
 		CNetMsg_Sv_ClientProgressAuth ProgressMsg;
 		ProgressMsg.m_Code = Code;
@@ -153,7 +153,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 200, "You are located {STR} ({STR})", 
 		GS()->Server()->GetWorldName(GS()->GetWorldID()), (GS()->IsAllowedPVP() ? "Zone PVP" : "Safe zone"));
 
-	GS()->SendMapMusic(ClientID, (GS()->IsDungeon() ? -1 : 0));
+	GS()->SendWorldMusic(ClientID, (GS()->IsDungeon() ? -1 : 0));
 	if(!FirstInitilize)
 	{
 		const int CountMessageInbox = Job()->Inbox()->GetActiveInbox(pPlayer);
