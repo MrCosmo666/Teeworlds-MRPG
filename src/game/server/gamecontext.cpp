@@ -2275,11 +2275,11 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Ench
 // lands items in the position type and quantity and their number themselves
 void CGS::CreateDropItem(vec2 Pos, int ClientID, InventoryItem &pItemPlayer, int Count, vec2 Force)
 {
+	InventoryItem DropItem = pItemPlayer;
+	DropItem.m_Count = Count;
+
 	if (pItemPlayer.Remove(Count))
 	{
-		InventoryItem DropItem = pItemPlayer;
-		DropItem.m_Count = Count;
-
 		const float Angle = Force.x * (0.15f + frandom() * 0.1f);
 		new CDropItem(&m_World, Pos, Force, Angle, DropItem, ClientID);
 	}

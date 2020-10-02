@@ -14,46 +14,15 @@ int randomRangecount(int startrandom, int endrandom, int count)
 	return result;
 }
 
-void CInventoryItem::SetItemOwner(CPlayer* pPlayer)
-{
-	m_pPlayer = pPlayer; 
-	m_pGS = m_pPlayer->GS();
-}
-
 ItemInformation& CInventoryItem::Info() const
 {
 	return InventoryJob::ms_aItemsInfo[m_ItemID];
 };
 
-int CInventoryItem::GetEnchantPrice() const
+void CInventoryItem::SetItemOwner(CPlayer* pPlayer)
 {
-	int FinishedPrice = 0;
-	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
-	{
-		if(CGS::AttributInfo.find(Info().m_aAttribute[i]) == CGS::AttributInfo.end())
-			continue;
-
-		int UpgradePrice;
-		const int Attribute = Info().m_aAttribute[i];
-		const int TypeAttribute = CGS::AttributInfo[Attribute].AtType;
-
-		if(TypeAttribute == AtributType::AtHardtype || Attribute == Stats::StStrength)
-		{
-			UpgradePrice = max(12, CGS::AttributInfo[Attribute].UpgradePrice) * 14;
-		}
-		else if(TypeAttribute == AtributType::AtJob || TypeAttribute == AtributType::AtWeapon || Attribute == Stats::StLuckyDropItem)
-		{
-			UpgradePrice = max(20, CGS::AttributInfo[Attribute].UpgradePrice) * 14;
-		}
-		else
-		{
-			UpgradePrice = max(4, CGS::AttributInfo[Attribute].UpgradePrice) * 5;
-		}
-
-		const int PercentEnchant = max(1, (int)kurosio::translate_to_procent_rest(Info().m_aAttributeCount[i], PERCENT_OF_ENCHANT));
-		FinishedPrice += UpgradePrice * (PercentEnchant * (1 + m_Enchant));
-	}
-	return FinishedPrice;
+	m_pPlayer = pPlayer;
+	m_pGS = m_pPlayer->GS();
 }
 
 bool CInventoryItem::SetEnchant(int Enchant)
@@ -99,12 +68,14 @@ bool CInventoryItem::Add(int Count, int Settings, int Enchant, bool Message)
 		Count = 1;
 	}
 
+	GS()->Mmo()->Item()->GiveItem(m_pPlayer, m_ItemID, Count, Settings, Enchant);
+
 	// check the empty slot if yes then put the item on
-	const bool AutoEquip = (Info().m_Type == ItemType::TYPE_EQUIP && m_pPlayer->GetEquippedItem(Info().m_Function) <= 0) || (Info().m_Function == FUNCTION_SETTINGS && Info().IsEnchantable());
+	const bool AutoEquip = (Info().m_Type == ItemType::TYPE_EQUIP && m_pPlayer->GetEquippedItem(Info().m_Function) <= 0) || Info().m_Type == TYPE_MODULE;
 	if(AutoEquip)
 	{
-		if(Info().m_Function == EQUIP_DISCORD)
-			GS()->Mmo()->SaveAccount(m_pPlayer, SaveType::SAVE_STATS);
+		if(!IsEquipped())
+			Equip();
 
 		char aAttributes[128];
 		Info().FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
@@ -112,23 +83,12 @@ bool CInventoryItem::Add(int Count, int Settings, int Enchant, bool Message)
 		GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 	}
 
-	const int Code = GS()->Mmo()->Item()->GiveItem(m_pPlayer, m_ItemID, Count, (AutoEquip ? 1 : Settings), Enchant);
-	if(Code <= 0)
-		return false;
-
-	if(AutoEquip)
-	{
-		if(m_pPlayer->GetCharacter())
-			m_pPlayer->GetCharacter()->UpdateEquipingStats(m_ItemID);
-		GS()->ChangeEquipSkin(ClientID, m_ItemID);
-	}
-
 	if(!Message || Info().m_Type == ItemType::TYPE_SETTINGS)
 		return true;
 
 	if(Info().m_Type == ItemType::TYPE_EQUIP || Info().m_Type == ItemType::TYPE_MODULE)
 		GS()->Chat(-1, "{STR} got of the {STR}x{INT}!", GS()->Server()->ClientName(ClientID), Info().GetName(), &Count);
-	else if(Info().m_Type != -1)
+	else if(Info().m_Type != ItemType::TYPE_INVISIBLE)
 		GS()->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(m_pPlayer), &Count);
 
 	return true;
@@ -143,10 +103,7 @@ bool CInventoryItem::Remove(int Count, int Settings)
 		Count = m_Count;
 
 	if(IsEquipped())
-	{
-		m_Settings = 0;
-		GS()->ChangeEquipSkin(m_pPlayer->GetCID(), m_ItemID);
-	}
+		Equip();
 
 	const int Code = GS()->Mmo()->Item()->RemoveItem(m_pPlayer, m_ItemID, Count, Settings);
 	return (bool)(Code > 0);
@@ -156,6 +113,8 @@ bool CInventoryItem::Equip()
 {
 	if(m_Count < 1 || !m_pPlayer || !m_pPlayer->IsAuthed())
 		return false;
+
+	m_Settings ^= true;
 
 	if(Info().m_Type == ItemType::TYPE_EQUIP)
 	{
@@ -167,11 +126,12 @@ bool CInventoryItem::Equip()
 			EquipItem.SetSettings(0);
 			EquipItemID = m_pPlayer->GetEquippedItem(EquipID, m_ItemID);
 		}
-	}
 
-	m_Settings ^= true;
-	if(Info().m_Type == ItemType::TYPE_EQUIP)
+		if(Info().m_Function == EQUIP_DISCORD)
+			GS()->Mmo()->SaveAccount(m_pPlayer, SaveType::SAVE_STATS);
+
 		GS()->ChangeEquipSkin(m_pPlayer->GetCID(), m_ItemID);
+	}
 
 	if(m_pPlayer->GetCharacter())
 		m_pPlayer->GetCharacter()->UpdateEquipingStats(m_ItemID);
@@ -288,4 +248,35 @@ bool CInventoryItem::Save()
 		return true;
 	}
 	return false;
+}
+
+int CInventoryItem::GetEnchantPrice() const
+{
+	int FinishedPrice = 0;
+	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
+	{
+		if(CGS::AttributInfo.find(Info().m_aAttribute[i]) == CGS::AttributInfo.end())
+			continue;
+
+		int UpgradePrice;
+		const int Attribute = Info().m_aAttribute[i];
+		const int TypeAttribute = CGS::AttributInfo[Attribute].AtType;
+
+		if(TypeAttribute == AtributType::AtHardtype || Attribute == Stats::StStrength)
+		{
+			UpgradePrice = max(12, CGS::AttributInfo[Attribute].UpgradePrice) * 14;
+		}
+		else if(TypeAttribute == AtributType::AtJob || TypeAttribute == AtributType::AtWeapon || Attribute == Stats::StLuckyDropItem)
+		{
+			UpgradePrice = max(20, CGS::AttributInfo[Attribute].UpgradePrice) * 14;
+		}
+		else
+		{
+			UpgradePrice = max(4, CGS::AttributInfo[Attribute].UpgradePrice) * 5;
+		}
+
+		const int PercentEnchant = max(1, (int)kurosio::translate_to_procent_rest(Info().m_aAttributeCount[i], PERCENT_OF_ENCHANT));
+		FinishedPrice += UpgradePrice * (PercentEnchant * (1 + m_Enchant));
+	}
+	return FinishedPrice;
 }

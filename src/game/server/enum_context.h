@@ -35,7 +35,7 @@ enum Stats
 	StLuckyDropItem			= 21,
 };
  
-// Таймеры Игрока
+// player ticks
 enum TickState
 {
 	Die = 1,
@@ -81,6 +81,7 @@ enum ToplistTypes
 
 enum ItemType
 {
+	TYPE_INVISIBLE = -1,
 	TYPE_USED = 1,
 	TYPE_CRAFT,
 	TYPE_MODULE,

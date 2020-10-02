@@ -21,10 +21,12 @@ public:
 	int m_aAttributeCount[STATS_MAX_FOR_ITEM];
 	int m_ProjID;
 
+	// main functions
 	const char* GetName(class CPlayer* pPlayer = nullptr) const;
 	const char* GetDesc(class CPlayer* pPlayer = nullptr) const;
 	const char* GetIcon() const { return m_aIcon; };
 
+	// equip modules types functions
 	int GetInfoEnchantStats(int AttributeID) const;
 	int GetInfoEnchantStats(int AttributeID, int Enchant) const;
 

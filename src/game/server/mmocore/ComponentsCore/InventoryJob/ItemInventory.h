@@ -29,15 +29,9 @@ public:
 	CGS* GS() { return m_pGS; }
 	ItemInformation& Info() const;
 	int GetID() const { return m_ItemID; }
-	int GetEnchantStats(int AttributeID) const { return Info().GetInfoEnchantStats(AttributeID, m_Enchant); }
-	int GetEnchantPrice() const;
-	bool IsEquipped() const { return m_Count > 0 && m_Settings > 0 && (Info().m_Type == ItemType::TYPE_POTION || Info().m_Type == ItemType::TYPE_SETTINGS || Info().m_Type == ItemType::TYPE_MODULE || Info().m_Type == ItemType::TYPE_EQUIP); }
-	bool IsEnchantMaxLevel() const { return Info().IsEnchantMaxLevel(m_Enchant); }
 
-	void FormatEnchantLevel(char* pBuffer, int Size) const { Info().FormatEnchantLevel(pBuffer, Size, m_Enchant); }
-	void FormatAttributes(char* pBuffer, int Size) const { Info().FormatAttributes(pBuffer, Size, m_Enchant); }
+	// main functions	
 	void SetItemOwner(CPlayer* pPlayer);
-
 	bool SetEnchant(int Enchant);
 	bool SetSettings(int Settings);
 	bool SetDurability(int Durability);
@@ -47,6 +41,16 @@ public:
 	bool Equip();
 	bool Use(int Count);
 	bool Save();
+
+	// equip modules types functions
+	int GetEnchantStats(int AttributeID) const { return Info().GetInfoEnchantStats(AttributeID, m_Enchant); }
+	int GetEnchantPrice() const;
+
+	bool IsEquipped() const { return m_Count > 0 && m_Settings > 0 && (Info().m_Type == ItemType::TYPE_POTION || Info().m_Type == ItemType::TYPE_SETTINGS || Info().m_Type == ItemType::TYPE_MODULE || Info().m_Type == ItemType::TYPE_EQUIP); }
+	bool IsEnchantMaxLevel() const { return Info().IsEnchantMaxLevel(m_Enchant); }
+
+	void FormatEnchantLevel(char* pBuffer, int Size) const { Info().FormatEnchantLevel(pBuffer, Size, m_Enchant); }
+	void FormatAttributes(char* pBuffer, int Size) const { Info().FormatAttributes(pBuffer, Size, m_Enchant); }
 };
 typedef CInventoryItem InventoryItem;
 

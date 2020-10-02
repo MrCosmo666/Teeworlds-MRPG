@@ -342,8 +342,6 @@ bool InventoryJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 
 		InventoryItem& pPlayerSelectedItem = pPlayer->GetItem(VoteID);
 		pPlayerSelectedItem.Equip();
-		if(pPlayerSelectedItem.Info().m_Function == EQUIP_DISCORD)
-			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_STATS);
 
 		GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);

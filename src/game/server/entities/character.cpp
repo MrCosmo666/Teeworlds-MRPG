@@ -1075,7 +1075,7 @@ void CCharacter::HandleBuff(CTuningParams* TuningParams)
 
 void CCharacter::UpdateEquipingStats(int ItemID)
 {
-	if(!IsAlive() || !m_pPlayer->IsAuthed())
+	if(!m_Alive || !m_pPlayer->IsAuthed())
 		return;
 
 	if(m_Health > m_pPlayer->GetStartHealth())
