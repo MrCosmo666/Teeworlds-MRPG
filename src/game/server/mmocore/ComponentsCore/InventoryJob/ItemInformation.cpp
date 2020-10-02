@@ -7,13 +7,15 @@
 
 const char* CItemInformation::GetName(CPlayer* pPlayer) const
 {
-	if(!pPlayer) return m_aName;
+	if(!pPlayer) 
+		return m_aName;
 	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), m_aName);
 }
 
 const char* CItemInformation::GetDesc(CPlayer* pPlayer) const
 {
-	if(!pPlayer) return m_aDesc;
+	if(!pPlayer) 
+		return m_aDesc;
 	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), m_aDesc);
 }
 
@@ -21,7 +23,7 @@ int CItemInformation::GetInfoEnchantStats(int AttributeID) const
 {
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if(m_aAttribute[i] > 0 && m_aAttribute[i] == AttributeID)
+		if(CGS::AttributInfo.find(m_aAttribute[i]) != CGS::AttributInfo.end() && m_aAttribute[i] == AttributeID)
 			return m_aAttributeCount[i];
 	}
 	return 0;
@@ -57,7 +59,7 @@ bool CItemInformation::IsEnchantMaxLevel(int Enchant) const
 {
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if(CGS::AttributInfo.find(m_aAttribute[i]) == CGS::AttributInfo.end())
+		if(CGS::AttributInfo.find(m_aAttribute[i]) == CGS::AttributInfo.end() || m_aAttributeCount[i] <= 0)
 			continue;
 
 		const int EnchantMax = m_aAttributeCount[i] + (int)kurosio::translate_to_procent_rest(m_aAttributeCount[i], PERCENT_MAXIMUM_ENCHANT);
@@ -67,27 +69,16 @@ bool CItemInformation::IsEnchantMaxLevel(int Enchant) const
 	return false;
 }
 
-void CItemInformation::FormatEnchantLevel(char* pBuffer, int Size, int Enchant) const
-{
-	if(Enchant > 0)
-	{
-		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "[%s]", IsEnchantMaxLevel(Enchant) ? "Max" : std::string("+" + std::to_string(Enchant)).c_str());
-		str_copy(pBuffer, aBuf, Size);
-		return;
-	}
-	str_copy(pBuffer, "\0", Size);
-}
-
 void CItemInformation::FormatAttributes(char* pBuffer, int Size, int Enchant) const
 {
 	dynamic_string Buffer;
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		int BonusID = m_aAttribute[i];
-		int BonusCount = GetInfoEnchantStats(BonusID, Enchant);
-		if(BonusID <= 0 || BonusCount <= 0)
+		if(CGS::AttributInfo.find(m_aAttribute[i]) == CGS::AttributInfo.end() || m_aAttributeCount[i] <= 0)
 			continue;
+
+		const int BonusID = m_aAttribute[i];
+		const int BonusCount = GetInfoEnchantStats(BonusID, Enchant);
 
 		char aBuf[64];
 		str_format(aBuf, sizeof(aBuf), "%s+%d ", CGS::AttributInfo[BonusID].Name, BonusCount);
@@ -95,4 +86,14 @@ void CItemInformation::FormatAttributes(char* pBuffer, int Size, int Enchant) co
 	}
 	str_copy(pBuffer, Buffer.buffer(), Size);
 	Buffer.clear();
+}
+
+void CItemInformation::FormatEnchantLevel(char* pBuffer, int Size, int Enchant) const
+{
+	if(Enchant > 0)
+	{
+		str_format(pBuffer, Size, "[%s]", IsEnchantMaxLevel(Enchant) ? "Max" : std::string("+" + std::to_string(Enchant)).c_str());
+		return;
+	}
+	str_copy(pBuffer, "\0", Size);
 }

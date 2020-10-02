@@ -33,8 +33,8 @@ public:
 	bool IsEnchantable() const;
 	bool IsEnchantMaxLevel(int Enchant) const;
 
-	void FormatEnchantLevel(char* pBuffer, int Size, int Enchant) const;
 	void FormatAttributes(char* pBuffer, int Size, int Enchant) const;
+	void FormatEnchantLevel(char* pBuffer, int Size, int Enchant) const;
 };
 typedef CItemInformation ItemInformation;
 
