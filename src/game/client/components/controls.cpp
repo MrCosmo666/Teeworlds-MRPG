@@ -32,10 +32,10 @@ void CControls::OnReset(bool FullRelease)
 		m_InputDirectionLeft = 0;
 		m_InputDirectionRight = 0;
 	}
+
 	m_LastData.m_Fire &= INPUT_STATE_MASK;
 	m_LastData.m_Jump = 0;
 	m_InputData = m_LastData;
-
 }
 
 void CControls::OnRelease()
@@ -133,9 +133,12 @@ int CControls::SnapInput(int *pData)
 	m_LastData.m_PlayerFlags = m_InputData.m_PlayerFlags;
 
 	// we freeze the input if chat or menu is activated
-	if(m_pClient->m_pChat->IsActive() || m_pClient->m_pMenus->IsActive() || m_pClient->m_pGameConsole->IsConsoleActive())
+	if(m_pClient->m_pChat->IsActive() || 
+		m_pClient->m_pMenus->IsActive() || 
+		m_pClient->m_pGameConsole->IsConsoleActive() || 
+		!Client()->IsWindowActive())
 	{
-		OnReset();
+		OnReset(true); // OnReset();
 
 		mem_copy(pData, &m_InputData, sizeof(m_InputData));
 

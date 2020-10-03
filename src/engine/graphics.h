@@ -215,7 +215,7 @@ public:
 
 	virtual int WindowActive() = 0;
 	virtual int WindowOpen() = 0;
-
+	virtual int WindowMinimized() = 0;
 };
 
 extern IEngineGraphics *CreateEngineGraphics(); // NOTE: not used
