@@ -37,10 +37,10 @@ class CGS : public IGameServer
 
 	int m_RespawnWorld;
 	int m_MusicID;
-	class MmoController *pMmoController;
 
 	IServer *m_pServer;
 	class IConsole *m_pConsole;
+	MmoController* m_pMmoController;
 
 	CLayers m_Layers;
 	CCollision m_Collision;
@@ -56,15 +56,14 @@ class CGS : public IGameServer
 public:
 	IServer *Server() const { return m_pServer; }
 	class IConsole *Console() { return m_pConsole; }
+	MmoController* Mmo() { return m_pMmoController; }
 
 	CCollision *Collision() { return &m_Collision; }
 	CTuningParams *Tuning() { return &m_Tuning; }
-	
+
 	CGS();
 	~CGS();
 	void Clear();
-
-	MmoController *Mmo() { return pMmoController; }
 
 	CEventHandler m_Events;
 	CPlayer *m_apPlayers[MAX_CLIENTS];
@@ -78,7 +77,7 @@ public:
 		SWAP GAMECONTEX DATA 
 	######################################################################### */
 	// - - - - - - - - - - - -
-	static std::map < int, std::map < std::string, int > > Effects;
+	static std::map < int, std::map < std::string, int > > ms_aEffects;
 	// - - - - - - - - - - - -
 	struct StructAttribut
 	{
@@ -87,7 +86,7 @@ public:
 		int UpgradePrice;
 		int AtType;
 	};
-	static std::map < int, StructAttribut > AttributInfo;
+	static std::map < int, StructAttribut > ms_aAttributsInfo;
 
 	/* #########################################################################
 		HELPER PLAYER FUNCTION 
@@ -137,16 +136,16 @@ private:
 	struct CBroadcastState
 	{
 		int m_NoChangeTick;
-		char m_PrevMessage[1024];
+		char m_aPrevMessage[1024];
 		
 		int m_Priority;
-		char m_NextMessage[1024];
+		char m_aNextMessage[1024];
 		
 		int m_LifeSpanTick;
 		int m_TimedPriority;
-		char m_TimedMessage[1024];
+		char m_aTimedMessage[1024];
 	};
-	CBroadcastState m_BroadcastStates[MAX_PLAYERS];
+	CBroadcastState m_aBroadcastStates[MAX_PLAYERS];
 
 public:
 	void AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSpan);
@@ -238,7 +237,7 @@ private:
 		int m_TempID;
 		int m_TempID2;
 	};
-	std::list<CVoteOptions> m_PlayerVotes[MAX_PLAYERS];
+	std::list<CVoteOptions> m_aPlayerVotes[MAX_PLAYERS];
 
 public:
 	void AV(int To, const char *Cmd, const char *Desc, const int ID = -1, const int ID2 = -1, const char *Icon = "unused");

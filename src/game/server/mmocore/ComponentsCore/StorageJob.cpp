@@ -76,7 +76,7 @@ bool StorageJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 	const int ClientID = pPlayer->GetCID();
 	if (PPSTR(CMD, "REPAIRITEMS") == 0)
 	{
-		Job()->Item()->RepairDurabilityFull(pPlayer);
+		Job()->Item()->RepairDurabilityItems(pPlayer);
 		GS()->Chat(ClientID, "You repaired all items.");
 		return true;
 	}

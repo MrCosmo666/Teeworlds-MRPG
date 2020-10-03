@@ -23,7 +23,7 @@ int CItemInformation::GetInfoEnchantStats(int AttributeID) const
 {
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if(CGS::AttributInfo.find(m_aAttribute[i]) != CGS::AttributInfo.end() && m_aAttribute[i] == AttributeID)
+		if(CGS::ms_aAttributsInfo.find(m_aAttribute[i]) != CGS::ms_aAttributsInfo.end() && m_aAttribute[i] == AttributeID)
 			return m_aAttributeCount[i];
 	}
 	return 0;
@@ -49,7 +49,7 @@ bool CItemInformation::IsEnchantable() const
 {
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if(CGS::AttributInfo.find(m_aAttribute[i]) != CGS::AttributInfo.end() && m_aAttributeCount[i] > 0)
+		if(CGS::ms_aAttributsInfo.find(m_aAttribute[i]) != CGS::ms_aAttributsInfo.end() && m_aAttributeCount[i] > 0)
 			return true;
 	}
 	return false;
@@ -59,7 +59,7 @@ bool CItemInformation::IsEnchantMaxLevel(int Enchant) const
 {
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if(CGS::AttributInfo.find(m_aAttribute[i]) == CGS::AttributInfo.end() || m_aAttributeCount[i] <= 0)
+		if(CGS::ms_aAttributsInfo.find(m_aAttribute[i]) == CGS::ms_aAttributsInfo.end() || m_aAttributeCount[i] <= 0)
 			continue;
 
 		const int EnchantMax = m_aAttributeCount[i] + (int)kurosio::translate_to_procent_rest(m_aAttributeCount[i], PERCENT_MAXIMUM_ENCHANT);
@@ -74,14 +74,14 @@ void CItemInformation::FormatAttributes(char* pBuffer, int Size, int Enchant) co
 	dynamic_string Buffer;
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if(CGS::AttributInfo.find(m_aAttribute[i]) == CGS::AttributInfo.end() || m_aAttributeCount[i] <= 0)
+		if(CGS::ms_aAttributsInfo.find(m_aAttribute[i]) == CGS::ms_aAttributsInfo.end() || m_aAttributeCount[i] <= 0)
 			continue;
 
 		const int BonusID = m_aAttribute[i];
 		const int BonusCount = GetInfoEnchantStats(BonusID, Enchant);
 
 		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "%s+%d ", CGS::AttributInfo[BonusID].Name, BonusCount);
+		str_format(aBuf, sizeof(aBuf), "%s+%d ", CGS::ms_aAttributsInfo[BonusID].Name, BonusCount);
 		Buffer.append_at(Buffer.length(), aBuf);
 	}
 	str_copy(pBuffer, Buffer.buffer(), Size);

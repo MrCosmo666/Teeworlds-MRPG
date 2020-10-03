@@ -137,7 +137,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	{
 		char aBuf[64];
 		dynamic_string Buffer;
-		for(const auto& at : CGS::AttributInfo)
+		for(const auto& at : CGS::ms_aAttributsInfo)
 		{
 			if(str_comp_nocase(at.second.FieldName, "unfield") == 0) 
 				continue;

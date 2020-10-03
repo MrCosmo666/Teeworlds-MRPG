@@ -187,7 +187,7 @@ bool CInventoryItem::Use(int Count)
 	if(m_ItemID == itTicketResetClassStats && Remove(Count, 0))
 	{
 		int BackUpgrades = 0;
-		for(const auto& at : CGS::AttributInfo)
+		for(const auto& at : CGS::ms_aAttributsInfo)
 		{
 			if(str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0 || m_pPlayer->Acc().m_aStats[at.first] <= 0)
 				continue;
@@ -208,7 +208,7 @@ bool CInventoryItem::Use(int Count)
 	if(m_ItemID == itTicketResetWeaponStats && Remove(Count, 0))
 	{
 		int BackUpgrades = 0;
-		for(const auto& at : CGS::AttributInfo)
+		for(const auto& at : CGS::ms_aAttributsInfo)
 		{
 			if(str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0 || m_pPlayer->Acc().m_aStats[at.first] <= 0)
 				continue;
@@ -255,24 +255,24 @@ int CInventoryItem::GetEnchantPrice() const
 	int FinishedPrice = 0;
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if(CGS::AttributInfo.find(Info().m_aAttribute[i]) == CGS::AttributInfo.end())
+		if(CGS::ms_aAttributsInfo.find(Info().m_aAttribute[i]) == CGS::ms_aAttributsInfo.end())
 			continue;
 
 		int UpgradePrice;
 		const int Attribute = Info().m_aAttribute[i];
-		const int TypeAttribute = CGS::AttributInfo[Attribute].AtType;
+		const int TypeAttribute = CGS::ms_aAttributsInfo[Attribute].AtType;
 
 		if(TypeAttribute == AtributType::AtHardtype || Attribute == Stats::StStrength)
 		{
-			UpgradePrice = max(12, CGS::AttributInfo[Attribute].UpgradePrice) * 14;
+			UpgradePrice = max(12, CGS::ms_aAttributsInfo[Attribute].UpgradePrice) * 14;
 		}
 		else if(TypeAttribute == AtributType::AtJob || TypeAttribute == AtributType::AtWeapon || Attribute == Stats::StLuckyDropItem)
 		{
-			UpgradePrice = max(20, CGS::AttributInfo[Attribute].UpgradePrice) * 14;
+			UpgradePrice = max(20, CGS::ms_aAttributsInfo[Attribute].UpgradePrice) * 14;
 		}
 		else
 		{
-			UpgradePrice = max(4, CGS::AttributInfo[Attribute].UpgradePrice) * 5;
+			UpgradePrice = max(4, CGS::ms_aAttributsInfo[Attribute].UpgradePrice) * 5;
 		}
 
 		const int PercentEnchant = max(1, (int)kurosio::translate_to_procent_rest(Info().m_aAttributeCount[i], PERCENT_OF_ENCHANT));

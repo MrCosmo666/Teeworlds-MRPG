@@ -92,14 +92,14 @@ void CPlayer::PotionsTick()
 		return;
 
 	// TODO: change it
-	for (auto ieffect = CGS::Effects[m_ClientID].begin(); ieffect != CGS::Effects[m_ClientID].end();)
+	for (auto ieffect = CGS::ms_aEffects[m_ClientID].begin(); ieffect != CGS::ms_aEffects[m_ClientID].end();)
 	{
 		ieffect->second--;
 		if (ieffect->second <= 0)
 		{
 			GS()->Chat(m_ClientID, "You lost the effect {STR}.", ieffect->first.c_str());
 			GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, ieffect->first.c_str(), false);
-			ieffect = CGS::Effects[m_ClientID].erase(ieffect);
+			ieffect = CGS::ms_aEffects[m_ClientID].erase(ieffect);
 			continue;
 		}
 		++ieffect;
@@ -181,7 +181,7 @@ void CPlayer::Snap(int SnappingClient)
 	pClientInfo->m_Armor = GetMana();
 
 	dynamic_string Buffer;
-	for (auto& eff : CGS::Effects[m_ClientID])
+	for (auto& eff : CGS::ms_aEffects[m_ClientID])
 	{
 		char aBuf[32];
 		const bool Minutes = eff.second >= 60;
@@ -384,7 +384,7 @@ void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
 	if((Random && rand()%Random == 0) || !Random)
 	{
 		GS()->Chat(m_ClientID, "You got the effect {STR} time {INT}sec.", Potion, &Sec);
-		CGS::Effects[m_ClientID][Potion] = Sec;
+		CGS::ms_aEffects[m_ClientID][Potion] = Sec;
 		GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, Potion, true);
 	}
 }
@@ -440,7 +440,7 @@ void CPlayer::AddMoney(int Money)
 
 bool CPlayer::CheckEffect(const char* Potion)
 {
-	if(CGS::Effects[m_ClientID].find(Potion) != CGS::Effects[m_ClientID].end())
+	if(CGS::ms_aEffects[m_ClientID].find(Potion) != CGS::ms_aEffects[m_ClientID].end())
 		return true;
 
 	return false;
@@ -458,7 +458,6 @@ bool CPlayer::IsAuthed()
 { 
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID))
 		return Acc().m_AuthID;
-
 	return false; 
 }
 
@@ -615,19 +614,19 @@ int CPlayer::GetEquippedItem(int EquipID, int SkipItemID) const
 int CPlayer::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 {
 	int AttributEx = EnchantAttributes(BonusID);
-	const bool SaveData = (str_comp_nocase(CGS::AttributInfo[BonusID].FieldName, "unfield") != 0);
+	const bool SaveData = (str_comp_nocase(CGS::ms_aAttributsInfo[BonusID].FieldName, "unfield") != 0);
 	if (SaveData)
 		AttributEx += Acc().m_aStats[BonusID];
 
-	if (Really && CGS::AttributInfo[BonusID].UpgradePrice < 10) 
+	if (Really && CGS::ms_aAttributsInfo[BonusID].UpgradePrice < 10) 
 	{ 
-		if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
+		if (BonusID == Stats::StStrength || CGS::ms_aAttributsInfo[BonusID].AtType == AtHardtype)
 			AttributEx /= 10;
 		else
 			AttributEx /= 5; 
 	}
 
-	if(GS()->IsDungeon() && !SearchClass && CGS::AttributInfo[BonusID].UpgradePrice < 10)
+	if(GS()->IsDungeon() && !SearchClass && CGS::ms_aAttributsInfo[BonusID].UpgradePrice < 10)
 		AttributEx = static_cast<CGameControllerDungeon*>(GS()->m_pController)->GetDungeonSync(this, BonusID);
 	return AttributEx;
 }
@@ -635,7 +634,7 @@ int CPlayer::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 int CPlayer::GetLevelDisciple(int Class, bool SearchClass)
 {
 	int Atributs = 0;
-	for (const auto& at : CGS::AttributInfo)
+	for (const auto& at : CGS::ms_aAttributsInfo)
 	{
 		if (at.second.AtType == Class)
 			Atributs += GetAttributeCount(at.first, true, SearchClass);

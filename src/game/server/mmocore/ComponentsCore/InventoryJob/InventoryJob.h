@@ -30,7 +30,7 @@ public:
 	void ItemSelected(CPlayer *pPlayer, const InventoryItem& pItemPlayer, bool Dress = false);
 	int ActionItemCountAllowed(CPlayer* pPlayer, int ItemID);
 
-	void RepairDurabilityFull(CPlayer *pPlayer);
+	void RepairDurabilityItems(CPlayer *pPlayer);
 	int GetCountItemsType(CPlayer* pPlayer, int Type) const;
 
 	// TODO: FIX IT (lock .. unlock)

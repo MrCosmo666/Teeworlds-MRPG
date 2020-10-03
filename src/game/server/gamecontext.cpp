@@ -26,8 +26,8 @@
 #include <teeother/components/localization.h>
 
 // static data that have the same value in different objects
-std::map < int , CGS::StructAttribut > CGS::AttributInfo;
-std::map < int , std::map < std::string , int > > CGS::Effects;
+std::map < int , CGS::StructAttribut > CGS::ms_aAttributsInfo;
+std::map < int , std::map < std::string , int > > CGS::ms_aEffects;
 int CGS::m_RaidExp = 100;
 
 enum
@@ -46,7 +46,7 @@ void CGS::Construct(int Resetting)
 	m_pController = nullptr;
 
 	if(Resetting==NO_RESET)
-		pMmoController = nullptr;
+		m_pMmoController = nullptr;
 }
 
 CGS::CGS(int Resetting)
@@ -64,7 +64,7 @@ CGS::~CGS()
 	for(auto & apPlayer : m_apPlayers)
 		delete apPlayer;
 	
-	delete pMmoController;
+	delete m_pMmoController;
 	delete m_pPathFinder;
 }
 
@@ -76,13 +76,13 @@ void CGS::Clear()
 	mem_zero(this, sizeof(*this));
 	new (this) CGS(RESET);
 
-	for(auto & BroadcastState : m_BroadcastStates)
+	for(auto & BroadcastState : m_aBroadcastStates)
 	{
 		BroadcastState.m_NoChangeTick = 0;
 		BroadcastState.m_LifeSpanTick = 0;
 		BroadcastState.m_Priority = 0;
-		BroadcastState.m_PrevMessage[0] = 0;
-		BroadcastState.m_NextMessage[0] = 0;
+		BroadcastState.m_aPrevMessage[0] = 0;
+		BroadcastState.m_aNextMessage[0] = 0;
 	}
 	m_Tuning = Tuning;
 }
@@ -643,20 +643,20 @@ void CGS::AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSp
 
 	if(LifeSpan > 0)
 	{
-		if(m_BroadcastStates[ClientID].m_TimedPriority > Priority)
+		if(m_aBroadcastStates[ClientID].m_TimedPriority > Priority)
 			return;
 				
-		str_copy(m_BroadcastStates[ClientID].m_TimedMessage, pText, sizeof(m_BroadcastStates[ClientID].m_TimedMessage));
-		m_BroadcastStates[ClientID].m_LifeSpanTick = LifeSpan;
-		m_BroadcastStates[ClientID].m_TimedPriority = Priority;
+		str_copy(m_aBroadcastStates[ClientID].m_aTimedMessage, pText, sizeof(m_aBroadcastStates[ClientID].m_aTimedMessage));
+		m_aBroadcastStates[ClientID].m_LifeSpanTick = LifeSpan;
+		m_aBroadcastStates[ClientID].m_TimedPriority = Priority;
 	}
 	else
 	{
-		if(m_BroadcastStates[ClientID].m_Priority > Priority)
+		if(m_aBroadcastStates[ClientID].m_Priority > Priority)
 			return;
 				
-		str_copy(m_BroadcastStates[ClientID].m_NextMessage, pText, sizeof(m_BroadcastStates[ClientID].m_NextMessage));
-		m_BroadcastStates[ClientID].m_Priority = Priority;
+		str_copy(m_aBroadcastStates[ClientID].m_aNextMessage, pText, sizeof(m_aBroadcastStates[ClientID].m_aNextMessage));
+		m_aBroadcastStates[ClientID].m_Priority = Priority;
 	}
 }
 
@@ -709,43 +709,43 @@ void CGS::BroadcastTick(int ClientID)
 
 	if(m_apPlayers[ClientID] && IsClientEqualWorldID(ClientID))
 	{
-		if(m_BroadcastStates[ClientID].m_LifeSpanTick > 0 && m_BroadcastStates[ClientID].m_TimedPriority > m_BroadcastStates[ClientID].m_Priority)
-			str_copy(m_BroadcastStates[ClientID].m_NextMessage, m_BroadcastStates[ClientID].m_TimedMessage, sizeof(m_BroadcastStates[ClientID].m_NextMessage));
+		if(m_aBroadcastStates[ClientID].m_LifeSpanTick > 0 && m_aBroadcastStates[ClientID].m_TimedPriority > m_aBroadcastStates[ClientID].m_Priority)
+			str_copy(m_aBroadcastStates[ClientID].m_aNextMessage, m_aBroadcastStates[ClientID].m_aTimedMessage, sizeof(m_aBroadcastStates[ClientID].m_aNextMessage));
 		
 		// send broadcast only if the message is different, or to fight auto-fading
-		if(str_comp(m_BroadcastStates[ClientID].m_PrevMessage, m_BroadcastStates[ClientID].m_NextMessage) != 0 ||
-			m_BroadcastStates[ClientID].m_NoChangeTick > Server()->TickSpeed())
+		if(str_comp(m_aBroadcastStates[ClientID].m_aPrevMessage, m_aBroadcastStates[ClientID].m_aNextMessage) != 0 ||
+			m_aBroadcastStates[ClientID].m_NoChangeTick > Server()->TickSpeed())
 		{
 			CNetMsg_Sv_Broadcast Msg;
-			Msg.m_pMessage = m_BroadcastStates[ClientID].m_NextMessage;
+			Msg.m_pMessage = m_aBroadcastStates[ClientID].m_aNextMessage;
 			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-			str_copy(m_BroadcastStates[ClientID].m_PrevMessage, m_BroadcastStates[ClientID].m_NextMessage, sizeof(m_BroadcastStates[ClientID].m_PrevMessage));
-			m_BroadcastStates[ClientID].m_NoChangeTick = 0;
+			str_copy(m_aBroadcastStates[ClientID].m_aPrevMessage, m_aBroadcastStates[ClientID].m_aNextMessage, sizeof(m_aBroadcastStates[ClientID].m_aPrevMessage));
+			m_aBroadcastStates[ClientID].m_NoChangeTick = 0;
 		}
 		else
-			m_BroadcastStates[ClientID].m_NoChangeTick++;
+			m_aBroadcastStates[ClientID].m_NoChangeTick++;
 		
 		// update broadcast state
-		if(m_BroadcastStates[ClientID].m_LifeSpanTick > 0)
-			m_BroadcastStates[ClientID].m_LifeSpanTick--;
+		if(m_aBroadcastStates[ClientID].m_LifeSpanTick > 0)
+			m_aBroadcastStates[ClientID].m_LifeSpanTick--;
 		
-		if(m_BroadcastStates[ClientID].m_LifeSpanTick <= 0)
+		if(m_aBroadcastStates[ClientID].m_LifeSpanTick <= 0)
 		{
-			m_BroadcastStates[ClientID].m_TimedMessage[0] = 0;
-			m_BroadcastStates[ClientID].m_TimedPriority = 0;
+			m_aBroadcastStates[ClientID].m_aTimedMessage[0] = 0;
+			m_aBroadcastStates[ClientID].m_TimedPriority = 0;
 		}
-		m_BroadcastStates[ClientID].m_NextMessage[0] = 0;
-		m_BroadcastStates[ClientID].m_Priority = 0;
+		m_aBroadcastStates[ClientID].m_aNextMessage[0] = 0;
+		m_aBroadcastStates[ClientID].m_Priority = 0;
 	}
 	else
 	{
-		m_BroadcastStates[ClientID].m_NoChangeTick = 0;
-		m_BroadcastStates[ClientID].m_LifeSpanTick = 0;
-		m_BroadcastStates[ClientID].m_Priority = 0;
-		m_BroadcastStates[ClientID].m_TimedPriority = 0;
-		m_BroadcastStates[ClientID].m_PrevMessage[0] = 0;
-		m_BroadcastStates[ClientID].m_NextMessage[0] = 0;
-		m_BroadcastStates[ClientID].m_TimedMessage[0] = 0;
+		m_aBroadcastStates[ClientID].m_NoChangeTick = 0;
+		m_aBroadcastStates[ClientID].m_LifeSpanTick = 0;
+		m_aBroadcastStates[ClientID].m_Priority = 0;
+		m_aBroadcastStates[ClientID].m_TimedPriority = 0;
+		m_aBroadcastStates[ClientID].m_aPrevMessage[0] = 0;
+		m_aBroadcastStates[ClientID].m_aNextMessage[0] = 0;
+		m_aBroadcastStates[ClientID].m_aTimedMessage[0] = 0;
 	}
 }
 
@@ -1016,8 +1016,8 @@ void CGS::OnInit(int WorldID)
 	// create controller
 	m_Layers.Init(Kernel(), nullptr, WorldID);
 	m_Collision.Init(&m_Layers);
-	pMmoController = new MmoController(this);
-	pMmoController->LoadLogicWorld();
+	m_pMmoController = new MmoController(this);
+	m_pMmoController->LoadLogicWorld();
 	UpdateZoneDungeon();
 	UpdateZonePVP();
 
@@ -1067,8 +1067,8 @@ void CGS::OnShutdown()
 	delete m_pController;
 	m_pController = nullptr;
 
-	delete pMmoController;
-	pMmoController = nullptr;
+	delete m_pMmoController;
+	m_pMmoController = nullptr;
 	Clear();
 }
 
@@ -1218,12 +1218,12 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				return;
 			
 			pPlayer->m_PlayerTick[TickState::LastVoteTry] = Server()->Tick();
-			const auto& item = std::find_if(m_PlayerVotes[ClientID].begin(), m_PlayerVotes[ClientID].end(), [pMsg](const CVoteOptions& vote)
+			const auto& item = std::find_if(m_aPlayerVotes[ClientID].begin(), m_aPlayerVotes[ClientID].end(), [pMsg](const CVoteOptions& vote)
 			{
 				return (str_comp_nocase(pMsg->m_Value, vote.m_aDescription) == 0);
 			});
 
-			if (item != m_PlayerVotes[ClientID].end())
+			if (item != m_aPlayerVotes[ClientID].end())
 			{
 				const int InteractiveCount = string_to_number(pMsg->m_Reason, 1, 10000000);
 				ParseVote(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveCount, pMsg->m_Reason);
@@ -1380,7 +1380,7 @@ void CGS::OnClientConnected(int ClientID)
 
 	SendMotd(ClientID);
 	SendSettings(ClientID);
-	m_BroadcastStates[ClientID] = {};
+	m_aBroadcastStates[ClientID] = {};
 }
 
 void CGS::OnClientEnter(int ClientID)
@@ -1513,8 +1513,8 @@ const char *CGS::NetVersion() const { return GAME_NETVERSION; }
 void CGS::ClearClientData(int ClientID)
 {
 	Mmo()->ResetClientData(ClientID);
-	if(Effects.find(ClientID) != Effects.end()) 
-		Effects.erase(ClientID);
+	if(ms_aEffects.find(ClientID) != ms_aEffects.end()) 
+		ms_aEffects.erase(ClientID);
 
 	// clear active snap bots for player
 	for(auto& databot : BotJob::ms_aDataBot)
@@ -1644,7 +1644,7 @@ void CGS::ConchainGameinfoUpdate(IConsole::IResult *pResult, void *pUserData, IC
 ######################################################################### */
 void CGS::ClearVotes(int ClientID)
 {
-	m_PlayerVotes[ClientID].clear();
+	m_aPlayerVotes[ClientID].clear();
 	
 	// send vote options
 	CNetMsg_Sv_VoteClearOptions ClearMsg;
@@ -1696,7 +1696,7 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 	if(pEnd != nullptr)
 		*(const_cast<char *>(pEnd)) = 0;
 	
-	m_PlayerVotes[To].push_back(Vote);
+	m_aPlayerVotes[To].push_back(Vote);
 
 	// send to customers that have a mmo client
 	if(IsMmoClient(To)) 
@@ -1933,7 +1933,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		// DPS UPGRADES
 		int Range = pPlayer->GetLevelDisciple(AtributType::AtDps);
 		AVH(ClientID, TAB_UPGR_DPS, RED_COLOR, "Disciple of War. Level Power {INT}", &Range);
-		for(const auto& at : AttributInfo)
+		for(const auto& at : ms_aAttributsInfo)
 		{
 			if(at.second.AtType != AtributType::AtDps || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
@@ -1944,7 +1944,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		// TANK UPGRADES
 		Range = pPlayer->GetLevelDisciple(AtributType::AtTank);
 		AVH(ClientID, TAB_UPGR_TANK, BLUE_COLOR, "Disciple of Tank. Level Power {INT}", &Range);
-		for(const auto& at : AttributInfo)
+		for(const auto& at : ms_aAttributsInfo)
 		{
 			if(at.second.AtType != AtributType::AtTank || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
@@ -1955,7 +1955,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		// HEALER UPGRADES
 		Range = pPlayer->GetLevelDisciple(AtributType::AtHealer);
 		AVH(ClientID, TAB_UPGR_HEALER, GREEN_COLOR, "Disciple of Healer. Level Power {INT}", &Range);
-		for(const auto& at : AttributInfo)
+		for(const auto& at : ms_aAttributsInfo)
 		{
 			if(at.second.AtType != AtributType::AtHealer || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
@@ -1965,7 +1965,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		// WEAPONS UPGRADES
 		AVH(ClientID, TAB_UPGR_WEAPON, GRAY_COLOR, "Upgrades Weapons / Ammo");
-		for(const auto& at : AttributInfo)
+		for(const auto& at : ms_aAttributsInfo)
 		{
 			if(at.second.AtType != AtributType::AtWeapon || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
 				continue;
@@ -2114,7 +2114,7 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
 	AVH(ClientID, TAB_INFO_STAT, BLUE_COLOR, "Player Stats {STR}", IsDungeon() ? "(Sync)" : "\0");
-	for(const auto& at : AttributInfo)
+	for(const auto& at : ms_aAttributsInfo)
 	{
 		if(str_comp_nocase(at.second.FieldName, "unfield") == 0) 
 			continue;
@@ -2374,8 +2374,8 @@ bool CGS::IsClientEqualWorldID(int ClientID, int WorldID) const
 
 const char* CGS::AtributeName(int BonusID) const
 {
-	if(CGS::AttributInfo.find(BonusID) != CGS::AttributInfo.end())
-		return CGS::AttributInfo[BonusID].Name;
+	if(CGS::ms_aAttributsInfo.find(BonusID) != CGS::ms_aAttributsInfo.end())
+		return CGS::ms_aAttributsInfo[BonusID].Name;
 	return "Has no stats";
 }
 

@@ -83,7 +83,7 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 	}
 
 	// all damage stats
-	if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
+	if (BonusID == Stats::StStrength || CGS::ms_aAttributsInfo[BonusID].AtType == AtHardtype)
 		Power /= BotJob::ms_aMobBot[m_SubBotID].m_Boss ? 300 : 50;
 	// spread weapons
 	else if(BonusID == Stats::StSpreadShotgun || BonusID == Stats::StSpreadGrenade || BonusID == Stats::StSpreadRifle)

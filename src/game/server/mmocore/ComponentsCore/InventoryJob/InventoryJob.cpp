@@ -40,10 +40,10 @@ void InventoryJob::OnInit()
 		while(RES->next())
 		{
 			const int AttID = RES->getInt("ID");
-			str_copy(CGS::AttributInfo[AttID].Name, RES->getString("name").c_str(), sizeof(CGS::AttributInfo[AttID].Name));
-			str_copy(CGS::AttributInfo[AttID].FieldName, RES->getString("field_name").c_str(), sizeof(CGS::AttributInfo[AttID].FieldName));
-			CGS::AttributInfo[AttID].UpgradePrice = RES->getInt("price");
-			CGS::AttributInfo[AttID].AtType = RES->getInt("at_type");
+			str_copy(CGS::ms_aAttributsInfo[AttID].Name, RES->getString("name").c_str(), sizeof(CGS::ms_aAttributsInfo[AttID].Name));
+			str_copy(CGS::ms_aAttributsInfo[AttID].FieldName, RES->getString("field_name").c_str(), sizeof(CGS::ms_aAttributsInfo[AttID].FieldName));
+			CGS::ms_aAttributsInfo[AttID].UpgradePrice = RES->getInt("price");
+			CGS::ms_aAttributsInfo[AttID].AtType = RES->getInt("at_type");
 		}
 	});
 }
@@ -70,9 +70,9 @@ void InventoryJob::OnResetClient(int ClientID)
 		ms_aItems.erase(ClientID);
 }
 
-void InventoryJob::RepairDurabilityFull(CPlayer *pPlayer)
+void InventoryJob::RepairDurabilityItems(CPlayer *pPlayer)
 { 
-	int ClientID = pPlayer->GetCID();
+	const int ClientID = pPlayer->GetCID();
 	SJK.UD("tw_accounts_items", "Durability = '100' WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
 	for(auto& it : ms_aItems[ClientID])
 		it.second.m_Durability = 100;
@@ -84,7 +84,7 @@ void InventoryJob::ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunc
 	GS()->AV(ClientID, "null", "");
 
 	// show a list of items to the player
-	bool Found = false;	
+	bool Found = false;
 	for(const auto& it : ms_aItems[ClientID])
 	{
 		if(!it.second.m_Count || ((SortedFunction && it.second.Info().m_Function != TypeList) 
@@ -94,7 +94,8 @@ void InventoryJob::ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunc
 		ItemSelected(pPlayer, it.second);
 		Found = true;
 	}
-	if(!Found) GS()->AVL(ClientID, "null", "There are no items in this tab");
+	if(!Found)
+		GS()->AVL(ClientID, "null", "There are no items in this tab");
 }
 
 int InventoryJob::GiveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant)
@@ -136,7 +137,10 @@ int InventoryJob::RemoveItem(CPlayer *pPlayer, int ItemID, int Count, int Settin
 {
 	const int SecureID = DeSecureCheck(pPlayer, ItemID, Count, Settings);
 	if(SecureID == 1)
-		SJK.UD("tw_accounts_items", "Count = Count - '%d', Settings = Settings - '%d' WHERE ItemID = '%d' AND OwnerID = '%d'", Count, Settings, ItemID, pPlayer->Acc().m_AuthID);
+	{
+		SJK.UD("tw_accounts_items", "Count = Count - '%d', Settings = Settings - '%d' WHERE ItemID = '%d' AND OwnerID = '%d'",
+			Count, Settings, ItemID, pPlayer->Acc().m_AuthID);
+	}
 	return SecureID;
 }
 
@@ -228,12 +232,12 @@ void InventoryJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pItemPlay
 	else if(pItemPlayer.Info().m_Type == ItemType::TYPE_EQUIP || pItemPlayer.Info().m_Function == FUNCTION_SETTINGS)
 	{
 		if((pItemPlayer.Info().m_Function == EQUIP_HAMMER && pItemPlayer.IsEquipped()))
-			GS()->AVM(ClientID, "null", NOPE, HideID, "You can not undress equiping hammer", pNameItem);
+			GS()->AVM(ClientID, "null", NOPE, HideID, "You can not undress equipping hammer", pNameItem);
 		else
 			GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "{STR} {STR}", (pItemPlayer.m_Settings ? "Undress" : "Equip"), pNameItem);
 	}
 
-	if (pItemPlayer.Info().m_Function == FUNCTION_PLANTS)
+	if(pItemPlayer.Info().m_Function == FUNCTION_PLANTS)
 	{
 		const int HouseID = Job()->House()->OwnerHouseID(pPlayer->Acc().m_AuthID);
 		const int PlantItemID = Job()->House()->GetPlantsID(HouseID);
@@ -250,6 +254,7 @@ void InventoryJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pItemPlay
 		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR} ({INT} materials)", pNameItem, &Price);
 	}
 
+	// not allowed drop equipped hammer
 	if (ItemID == pPlayer->GetEquippedItem(EQUIP_HAMMER))
 		return;
 
@@ -491,28 +496,29 @@ static std::map<int, std::mutex > lock_sleep;
 void InventoryJob::AddItemSleep(int AccountID, int ItemID, int GiveCount, int Milliseconds)
 {
 	std::thread([this, AccountID, ItemID, GiveCount, Milliseconds]()
-		{
+	{
+		if(Milliseconds > 0)
 			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
 
-			lock_sleep[AccountID].lock();
-			const int ClientID = Job()->Account()->CheckOnlineAccount(AccountID);
-			CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
-			if(pPlayer)
-			{
-				pPlayer->GetItem(ItemID).Add(GiveCount);
-				lock_sleep[AccountID].unlock();
-				return;
-			}
-
-			std::shared_ptr<ResultSet> RES(SJK.SD("Count", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, AccountID));
-			if(RES->next())
-			{
-				const int ReallyCount = (int)RES->getInt("Count") + GiveCount;
-				SJK.UD("tw_accounts_items", "Count = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", ReallyCount, AccountID, ItemID);
-				lock_sleep[AccountID].unlock();
-				return;
-			}
-			SJK.ID("tw_accounts_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '0', '0')", ItemID, AccountID, GiveCount);
+		lock_sleep[AccountID].lock();
+		const int ClientID = Job()->Account()->CheckOnlineAccount(AccountID);
+		CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
+		if(pPlayer)
+		{
+			pPlayer->GetItem(ItemID).Add(GiveCount);
 			lock_sleep[AccountID].unlock();
-		}).detach();
+			return;
+		}
+
+		std::shared_ptr<ResultSet> RES(SJK.SD("Count", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, AccountID));
+		if(RES->next())
+		{
+			const int ReallyCount = (int)RES->getInt("Count") + GiveCount;
+			SJK.UD("tw_accounts_items", "Count = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", ReallyCount, AccountID, ItemID);
+			lock_sleep[AccountID].unlock();
+			return;
+		}
+		SJK.ID("tw_accounts_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '0', '0')", ItemID, AccountID, GiveCount);
+		lock_sleep[AccountID].unlock();
+	}).detach();
 }

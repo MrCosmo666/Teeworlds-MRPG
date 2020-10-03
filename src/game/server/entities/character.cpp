@@ -660,7 +660,7 @@ void CCharacter::Die(int Killer, int Weapon)
 	if(Weapon != WEAPON_WORLD && !GS()->IsDungeon())
 	{
 		m_pPlayer->UpdateTempData(0, 0);
-		CGS::Effects[ClientID].clear();
+		CGS::ms_aEffects[ClientID].clear();
 		const int SafezoneWorldID = GS()->GetRespawnWorld();
 		if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot() && GS()->m_apPlayers[Killer])
 		{
