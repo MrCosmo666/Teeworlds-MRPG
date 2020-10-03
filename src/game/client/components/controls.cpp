@@ -10,6 +10,7 @@
 #include <game/client/components/chat.h>
 #include <game/client/components/menus.h>
 #include <game/client/components/scoreboard.h>
+#include <game/client/components/console.h>
 
 #include "controls.h"
 
@@ -132,7 +133,7 @@ int CControls::SnapInput(int *pData)
 	m_LastData.m_PlayerFlags = m_InputData.m_PlayerFlags;
 
 	// we freeze the input if chat or menu is activated
-	if(m_pClient->m_pChat->IsActive() || m_pClient->m_pMenus->IsActive())
+	if(m_pClient->m_pChat->IsActive() || m_pClient->m_pMenus->IsActive() || m_pClient->m_pGameConsole->IsConsoleActive())
 	{
 		OnReset();
 
