@@ -7,13 +7,12 @@ class CCommandProcessor
 
 	void LastChat(CGS* pGS, CPlayer* pPlayer);
 
-	bool IsLeaderPlayer(CGS* pGS, CPlayer* pPlayer, int Access) const;
-	void ExitGuild(CGS* pGS, int AccountID);
-	void CreateGuild(CGS* pGS, int ClientID, const char* pName);
-	void ChangeStateDoor(CGS* pGS, int HouseID);
-	int PlayerHouseID(CGS* pGS, CPlayer* pPlayer) const;
+	void ExitGuild(int AccountID);
+	void CreateGuild(int ClientID, const char* pName);
+	void ChangeStateDoor(int HouseID);
+	int PlayerHouseID(CPlayer* pPlayer);
 
-	bool UseSkill(CGS* pGS, CPlayer* pPlayer, int SkillID) const;
+	bool UseSkill(CPlayer* pPlayer, int SkillID);
 
 public:
 	CCommandProcessor(CGS* pGS);
@@ -24,6 +23,21 @@ public:
 	void AddCommand(const char* pName, const char* pParams, IConsole::FCommandCallback pfnFunc, void* pUser, const char* pHelp);
 
 	static void ConChatLogin(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatRegister(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatGuildExit(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatGuildCreate(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatDoorHouse(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatSellHouse(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatPosition(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatSound(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatUseItem(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatUseSkill(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatCmdList(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatRules(IConsole::IResult* pResult, void* pUserData);
+
+#ifdef CONF_DISCORD
+	static void ConChatDiscordConnect(IConsole::IResult* pResult, void* pUserData);
+#endif
 };
 
 #endif
