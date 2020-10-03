@@ -12,8 +12,21 @@
 #include "console.h"
 #include "linereader.h"
 
-// todo: rework this
+int CConsole::CResult::GetClientID() { return m_ClientID; }
+bool CConsole::IsCommand(const char* pStr, int FlagMask)
+{
+	for (CCommand* pCommand = m_pFirstCommand; pCommand; pCommand = pCommand->m_pNext)
+	{
+		if (pCommand->m_Flags & FlagMask)
+		{
+			if (str_comp_nocase(pCommand->m_pName, pStr) == 0)
+				return true;
+		}
+	}
+	return false;
+}
 
+// todo: rework this
 const char *CConsole::CResult::GetString(unsigned Index)
 {
 	if (Index >= m_NumArgs)
@@ -301,11 +314,13 @@ bool CConsole::LineIsValid(const char *pStr)
 	return true;
 }
 
-void CConsole::ExecuteLineStroked(int Stroke, const char *pStr)
+void CConsole::ExecuteLineStroked(int Stroke, const char *pStr, int ClientID, bool InterpretSemicolons)
 {
 	while(pStr && *pStr)
 	{
 		CResult Result;
+		Result.m_ClientID = ClientID;
+
 		const char *pEnd = pStr;
 		const char *pNextPart = 0;
 		int InString = 0;
@@ -319,7 +334,7 @@ void CConsole::ExecuteLineStroked(int Stroke, const char *pStr)
 				if(pEnd[1] == '"')
 					pEnd++;
 			}
-			else if(!InString)
+			else if (!InString && InterpretSemicolons)
 			{
 				if(*pEnd == ';') // command separator
 				{
@@ -424,17 +439,17 @@ CConsole::CCommand *CConsole::FindCommand(const char *pName, int FlagMask)
 	return 0x0;
 }
 
-void CConsole::ExecuteLine(const char *pStr)
+void CConsole::ExecuteLine(const char *pStr, int ClientID, bool InterpretSemicolons)
 {
-	CConsole::ExecuteLineStroked(1, pStr); // press it
-	CConsole::ExecuteLineStroked(0, pStr); // then release it
+	CConsole::ExecuteLineStroked(1, pStr, ClientID, InterpretSemicolons); // press it
+	CConsole::ExecuteLineStroked(0, pStr, ClientID, InterpretSemicolons); // then release it
 }
 
-void CConsole::ExecuteLineFlag(const char *pStr, int FlagMask)
+void CConsole::ExecuteLineFlag(const char *pStr, int FlagMask, int ClientID, bool InterpretSemicolons)
 {
 	int Temp = m_FlagMask;
 	m_FlagMask = FlagMask;
-	ExecuteLine(pStr);
+	ExecuteLine(pStr, ClientID, InterpretSemicolons);
 	m_FlagMask = Temp;
 }
 
