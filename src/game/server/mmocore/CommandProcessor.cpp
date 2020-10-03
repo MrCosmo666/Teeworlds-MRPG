@@ -183,7 +183,7 @@ void CCommandProcessor::ConChatGuildExit(IConsole::IResult* pResult, void* pUser
 		return;
 
 	int AuthID = pPlayer->Acc().m_AuthID;
-	pGS->CommandProcessor()->ExitGuild(AuthID);
+	pGS->Mmo()->Member()->ExitGuild(AuthID);
 }
 
 void CCommandProcessor::ConChatGuildCreate(IConsole::IResult* pResult, void* pUser)
@@ -216,7 +216,7 @@ void CCommandProcessor::ConChatGuildCreate(IConsole::IResult* pResult, void* pUs
 		return;
 	}
 
-	pGS->CommandProcessor()->CreateGuild(ClientID, aGuildName);
+	pGS->Mmo()->Member()->CreateGuild(ClientID, aGuildName);
 }
 
 void CCommandProcessor::ConChatDoorHouse(IConsole::IResult* pResult, void* pUser)
@@ -231,8 +231,8 @@ void CCommandProcessor::ConChatDoorHouse(IConsole::IResult* pResult, void* pUser
 	if (!pPlayer->IsAuthed())
 		return;
 
-	int HouseID = pGS->CommandProcessor()->PlayerHouseID(pPlayer);
-	pGS->CommandProcessor()->ChangeStateDoor(HouseID);
+	int HouseID = pGS->Mmo()->House()->PlayerHouseID(pPlayer);
+	pGS->Mmo()->House()->ChangeStateDoor(HouseID);
 }
 
 void CCommandProcessor::ConChatSellHouse(IConsole::IResult* pResult, void* pUser)
@@ -248,7 +248,7 @@ void CCommandProcessor::ConChatSellHouse(IConsole::IResult* pResult, void* pUser
 		return;
 
 	// check owner house id
-	int HouseID = pGS->CommandProcessor()->PlayerHouseID(pPlayer);
+	int HouseID = pGS->Mmo()->House()->PlayerHouseID(pPlayer);
 	if(HouseID < 0)
 	{
 		pGS->Chat(ClientID, "You have no home.");
@@ -334,7 +334,7 @@ void CCommandProcessor::ConChatUseSkill(IConsole::IResult* pResult, void* pUser)
 	}
 
 	int SkillID = pResult->GetInteger(0);
-	pGS->CommandProcessor()->UseSkill(pPlayer, SkillID);
+	pGS->Mmo()->Skills()->UseSkill(pPlayer, SkillID);
 }
 
 void CCommandProcessor::ConChatCmdList(IConsole::IResult* pResult, void* pUser)
@@ -375,29 +375,4 @@ void CCommandProcessor::LastChat(CGS *pGS, CPlayer *pPlayer)
 {
 	if(pPlayer->m_PlayerTick[TickState::LastChat] + pGS->Server()->TickSpeed() <= pGS->Server()->Tick())
 		pPlayer->m_PlayerTick[TickState::LastChat] = pGS->Server()->Tick();
-}
-
-void CCommandProcessor::ExitGuild(int AccountID)
-{
-	GS()->Mmo()->Member()->ExitGuild(AccountID);
-}
-
-void CCommandProcessor::CreateGuild(int ClientID, const char *pName)
-{
-	GS()->Mmo()->Member()->CreateGuild(ClientID, pName);
-}
-
-void CCommandProcessor::ChangeStateDoor(int HouseID)
-{
-	GS()->Mmo()->House()->ChangeStateDoor(HouseID);
-}
-
-int CCommandProcessor::PlayerHouseID(CPlayer *pPlayer)
-{
-	return GS()->Mmo()->House()->PlayerHouseID(pPlayer);
-}
-
-bool CCommandProcessor::UseSkill(CPlayer *pPlayer, int SkillID)
-{
-	return GS()->Mmo()->Skills()->UseSkill(pPlayer, SkillID);
 }

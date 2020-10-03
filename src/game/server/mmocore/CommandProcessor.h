@@ -7,13 +7,6 @@ class CCommandProcessor
 
 	void LastChat(CGS* pGS, CPlayer* pPlayer);
 
-	void ExitGuild(int AccountID);
-	void CreateGuild(int ClientID, const char* pName);
-	void ChangeStateDoor(int HouseID);
-	int PlayerHouseID(CPlayer* pPlayer);
-
-	bool UseSkill(CPlayer* pPlayer, int SkillID);
-
 public:
 	CCommandProcessor(CGS* pGS);
 
