@@ -185,6 +185,9 @@ MACRO_CONFIG_INT(SvLoltextVspace, sv_loltext_vspace, 7, 7, 25, CFGFLAG_SERVER, "
 // ui
 MACRO_CONFIG_INT(ClNotifyWindow, cl_notify_window, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Allow client to notify you on chat highlights")
 
+// performance
+MACRO_CONFIG_INT(ClInactiveRendering, cl_inactive_rendering, 1, 0, 2, CFGFLAG_CLIENT, "0 = Always render, 1 = Stop rendering when minimized, 2 = Stop rendering when window is inactive")
+
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly
 MACRO_CONFIG_INT(DbgDummies, dbg_dummies, 0, 0, MAX_CLIENTS - 1, CFGFLAG_SERVER, "")
