@@ -40,7 +40,7 @@ public:
 
 		int m_Team;
 		std::map < int , bool > m_aAetherLocation;
-		bool IsGuild() { return (m_GuildID > 0); }
+		bool IsGuild() const { return m_GuildID > 0; }
 	};
 	static std::map < int, StructData > ms_aData;
 

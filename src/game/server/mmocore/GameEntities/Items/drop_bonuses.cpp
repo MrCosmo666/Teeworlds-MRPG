@@ -88,7 +88,7 @@ void CDropBonuses::Snap(int SnappingClient)
 		return;
 
 	// client verification if the check is not drawn anymore
-	if(GS()->CheckClient(SnappingClient))
+	if(GS()->IsMmoClient(SnappingClient))
 	{
 		CNetObj_MmoPickup* pObj = static_cast<CNetObj_MmoPickup*>(Server()->SnapNewItem(NETOBJTYPE_MMOPICKUP, GetID(), sizeof(CNetObj_MmoPickup)));
 		if (!pObj)

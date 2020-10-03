@@ -111,7 +111,7 @@ void CLogicWallFire::Snap(int SnappingClient)
 	if(NetworkClipped(SnappingClient))
 		return;
 
-	if(GS()->CheckClient(SnappingClient))
+	if(GS()->IsMmoClient(SnappingClient))
 	{
 		CNetObj_MmoProj *pProj = static_cast<CNetObj_MmoProj *>(Server()->SnapNewItem(NETOBJTYPE_MMOPROJ, GetID(), sizeof(CNetObj_MmoProj)));
 		if(!pProj)

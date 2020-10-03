@@ -44,7 +44,7 @@ void CQuestPathFinder::Snap(int SnappingClient)
 	if(NetworkClipped(SnappingClient) || SnappingClient != m_ClientID)
 		return;
 
-	if (GS()->CheckClient(SnappingClient))
+	if (GS()->IsMmoClient(SnappingClient))
 	{
 		vec2 Direction = normalize(m_Pos - m_TargetPos);
 		CNetObj_MmoPickup* pMmoP = static_cast<CNetObj_MmoPickup*>(Server()->SnapNewItem(NETOBJTYPE_MMOPICKUP, GetID(), sizeof(CNetObj_MmoPickup)));

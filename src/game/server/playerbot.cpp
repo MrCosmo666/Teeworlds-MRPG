@@ -76,14 +76,14 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 	for (int i = 0; i < MAX_EQUIPPED_SLOTS_BOTS; i++)
 	{
 		const int ItemID = GetEquippedItem(i);
-		const int ItemBonusCount = GS()->GetItemInfo(ItemID).GetStatsBonus(BonusID);
+		const int ItemBonusCount = GS()->GetItemInfo(ItemID).GetInfoEnchantStats(BonusID);
 		if (ItemID <= 0 || ItemBonusCount < 0)
 			continue;
 		Power += ItemBonusCount;
 	}
 
 	// all damage stats
-	if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
+	if (BonusID == Stats::StStrength || CGS::ms_aAttributsInfo[BonusID].AtType == AtHardtype)
 		Power /= BotJob::ms_aMobBot[m_SubBotID].m_Boss ? 300 : 50;
 	// spread weapons
 	else if(BonusID == Stats::StSpreadShotgun || BonusID == Stats::StSpreadGrenade || BonusID == Stats::StSpreadRifle)
@@ -175,7 +175,7 @@ void CPlayerBot::Snap(int SnappingClient)
 	pPlayerInfo->m_Score = (m_BotType == BotsTypes::TYPE_BOT_MOB ? BotJob::ms_aMobBot[m_SubBotID].m_Level : 1);
 
 	// --------------------- CUSTOM ----------------------
-	if(!GS()->CheckClient(SnappingClient))
+	if(!GS()->IsMmoClient(SnappingClient))
 		return;
 
 	CNetObj_Mmo_ClientInfo *pClientInfo = static_cast<CNetObj_Mmo_ClientInfo *>(Server()->SnapNewItem(NETOBJTYPE_MMO_CLIENTINFO, m_ClientID, sizeof(CNetObj_Mmo_ClientInfo)));

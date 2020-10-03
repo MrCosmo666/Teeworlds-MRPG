@@ -16,6 +16,8 @@ void CraftJob::OnInit()
 		const int ID = RES->getInt("ID");
 		ms_aCraft[ID].m_ReceivedItemID = RES->getInt("GetItem");
 		ms_aCraft[ID].m_ReceivedItemCount = RES->getInt("GetItemCount");
+		ms_aCraft[ID].m_Price = RES->getInt("Price");
+		ms_aCraft[ID].m_WorldID = RES->getInt("WorldID");
 
 		char aBuf[32];
 		for(int i = 0; i < 3; i ++)
@@ -27,9 +29,6 @@ void CraftJob::OnInit()
 		if (!sscanf(aBuf, "%d %d %d", &ms_aCraft[ID].m_aItemNeedCount[0], &ms_aCraft[ID].m_aItemNeedCount[1], &ms_aCraft[ID].m_aItemNeedCount[2]))
 			dbg_msg("Error", "Error on scanf in Crafting");
 
-		// set the variables
-		ms_aCraft[ID].m_Price = RES->getInt("Price");
-		ms_aCraft[ID].m_WorldID = RES->getInt("WorldID");
 	}
 	Job()->ShowLoadingProgress("Crafts", ms_aCraft.size());	
 }
@@ -56,76 +55,76 @@ bool CraftJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	return false;
 }
 
-bool CraftJob::ItEmptyType(int SelectType) const
+int CraftJob::GetFinalPrice(CPlayer* pPlayer, int CraftID) const
 {
-	for (const auto& foundtype : ms_aCraft)
-	{
-		if (foundtype.second.m_WorldID != GS()->GetWorldID() || GS()->GetItemInfo(foundtype.second.m_ReceivedItemID).m_Type != SelectType)
-			continue;
-		return false;
-	}
-	return true;
+	if(!pPlayer)
+		return ms_aCraft[CraftID].m_Price;
+
+	const int ClientID = pPlayer->GetCID();
+	int Discount = (int)kurosio::translate_to_procent_rest(ms_aCraft[CraftID].m_Price, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount));
+	if(pPlayer->GetItem(itTicketDiscountCraft).IsEquipped())
+		Discount += (int)kurosio::translate_to_procent_rest(ms_aCraft[CraftID].m_Price, 20);
+
+	return max(ms_aCraft[CraftID].m_Price - Discount, 0);
 }
 
 void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectType)
 {
-	if (ItEmptyType(SelectType))
-		return;
-
+	bool IsNotEmpty = false;
 	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = GRAY_COLOR;
-	GS()->AVL(ClientID, "null", "{STR}", TypeName);
 
 	for(const auto& cr : ms_aCraft)
-    {
-		if(cr.second.m_WorldID != GS()->GetWorldID())
+	{
+		ItemInformation& InfoGetItem = GS()->GetItemInfo(cr.second.m_ReceivedItemID);
+		if(InfoGetItem.m_Type != SelectType || cr.second.m_WorldID != GS()->GetWorldID())
 			continue;
 
-		int HideID = NUM_TAB_MENU + ItemJob::ms_aItemsInfo.size() + cr.first;
-		ItemJob::ItemInformation &InfoGetItem = GS()->GetItemInfo(cr.second.m_ReceivedItemID);
-		if (InfoGetItem.m_Type != SelectType)
-			continue;
+		if(!IsNotEmpty)
+		{
+			GS()->AVL(ClientID, "null", "{STR}", TypeName);
+			IsNotEmpty = true;
+		}
 
-		int Discount = (int)kurosio::translate_to_procent_rest(cr.second.m_Price, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount));
-		if(pPlayer->GetItem(itTicketDiscountCraft).IsEquipped())
-			Discount += (int)kurosio::translate_to_procent_rest(cr.second.m_Price, 20);
-		
-		const int LastPrice = max(cr.second.m_Price - Discount, 0);
+		const int Price = GetFinalPrice(pPlayer, cr.first);
+		int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + cr.first;
 		if (InfoGetItem.IsEnchantable())
 		{
 			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} - {INT} gold",
-				(pPlayer->GetItem(cr.second.m_ReceivedItemID).m_Count ? "✔ " : "\0"), InfoGetItem.GetName(pPlayer), &LastPrice);
+				(pPlayer->GetItem(cr.second.m_ReceivedItemID).m_Count ? "✔ " : "\0"), InfoGetItem.GetName(pPlayer), &Price);
 
 			char aAttributes[128];
-			Job()->Item()->FormatAttributes(InfoGetItem, 0, sizeof(aAttributes), aAttributes);
+			InfoGetItem.FormatAttributes(aAttributes, sizeof(aAttributes), 0);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 		}
 		else
 		{
 			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) :: {INT} gold",
-				InfoGetItem.GetName(pPlayer), &cr.second.m_ReceivedItemCount, &pPlayer->GetItem(cr.second.m_ReceivedItemID).m_Count, &LastPrice);
+				InfoGetItem.GetName(pPlayer), &cr.second.m_ReceivedItemCount, &pPlayer->GetItem(cr.second.m_ReceivedItemID).m_Count, &Price);
 		}
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", InfoGetItem.GetDesc(pPlayer));
 
 		for(int i = 0; i < 3; i++)
 		{
-			int SearchItemID = cr.second.m_aItemNeedID[i];
-			int SearchCount = cr.second.m_aItemNeedCount[i];
+			const int SearchItemID = cr.second.m_aItemNeedID[i];
+			const int SearchCount = cr.second.m_aItemNeedCount[i];
 			if(SearchItemID <= 0 || SearchCount <= 0) 
 				continue;
 			
-			ItemJob::InventoryItem &PlSearchItem = pPlayer->GetItem(SearchItemID);
+			InventoryItem &PlSearchItem = pPlayer->GetItem(SearchItemID);
 			GS()->AVMI(ClientID, PlSearchItem.Info().GetIcon(), "null", NOPE, HideID, "{STR} {INT}({INT})", PlSearchItem.Info().GetName(pPlayer), &SearchCount, &PlSearchItem.m_Count);
 		}
 		GS()->AVM(ClientID, "CRAFT", cr.first, HideID, "Craft {STR}", InfoGetItem.GetName(pPlayer));
 	}
-	GS()->AV(ClientID, "null", "");
+
+	if(IsNotEmpty)
+		GS()->AV(ClientID, "null", "");
 }
 
 void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 {
 	const int ClientID = pPlayer->GetCID();
-	ItemJob::InventoryItem& PlayerCraftItem = pPlayer->GetItem(ms_aCraft[CraftID].m_ReceivedItemID);
+	InventoryItem& PlayerCraftItem = pPlayer->GetItem(ms_aCraft[CraftID].m_ReceivedItemID);
 	if (PlayerCraftItem.Info().IsEnchantable() && PlayerCraftItem.m_Count > 0)
 	{
 		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");
@@ -154,18 +153,13 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 	}
 	Buffer.clear();
 
-	dbg_msg("test", "here craft left");
-
 	// we are already organizing the crafting
-	int Discount = (int)kurosio::translate_to_procent_rest(ms_aCraft[CraftID].m_Price, Job()->Skills()->GetSkillLevel(ClientID, SkillCraftDiscount));
-	bool TickedDiscountCraft = pPlayer->GetItem(itTicketDiscountCraft).IsEquipped();
-	if(TickedDiscountCraft)
-		Discount += (int)kurosio::translate_to_procent_rest(ms_aCraft[CraftID].m_Price, 20);
-
-	const int LastPrice = max(ms_aCraft[CraftID].m_Price - Discount, 0);
-	if(pPlayer->CheckFailMoney(LastPrice))
+	const int Price = GetFinalPrice(pPlayer, CraftID);
+	if(pPlayer->CheckFailMoney(Price))
 		return;
 
+	// delete ticket if equipped  
+	bool TickedDiscountCraft = pPlayer->GetItem(itTicketDiscountCraft).IsEquipped();
 	if(TickedDiscountCraft)
 	{
 		pPlayer->GetItem(itTicketDiscountCraft).Remove(1);

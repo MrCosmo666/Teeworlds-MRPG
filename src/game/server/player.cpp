@@ -92,14 +92,14 @@ void CPlayer::PotionsTick()
 		return;
 
 	// TODO: change it
-	for (auto ieffect = CGS::Effects[m_ClientID].begin(); ieffect != CGS::Effects[m_ClientID].end();)
+	for (auto ieffect = CGS::ms_aEffects[m_ClientID].begin(); ieffect != CGS::ms_aEffects[m_ClientID].end();)
 	{
 		ieffect->second--;
 		if (ieffect->second <= 0)
 		{
 			GS()->Chat(m_ClientID, "You lost the effect {STR}.", ieffect->first.c_str());
 			GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, ieffect->first.c_str(), false);
-			ieffect = CGS::Effects[m_ClientID].erase(ieffect);
+			ieffect = CGS::ms_aEffects[m_ClientID].erase(ieffect);
 			continue;
 		}
 		++ieffect;
@@ -163,7 +163,7 @@ void CPlayer::Snap(int SnappingClient)
 	pPlayerInfo->m_Score = Acc().m_Level;
 
 	// --------------------- CUSTOM ----------------------
-	if(!GS()->CheckClient(SnappingClient) || GetTeam() == TEAM_SPECTATORS || !IsAuthed())
+	if(!GS()->IsMmoClient(SnappingClient) || GetTeam() == TEAM_SPECTATORS || !IsAuthed())
 		return;
 
 	CNetObj_Mmo_ClientInfo *pClientInfo = static_cast<CNetObj_Mmo_ClientInfo *>(Server()->SnapNewItem(NETOBJTYPE_MMO_CLIENTINFO, m_ClientID, sizeof(CNetObj_Mmo_ClientInfo)));
@@ -181,7 +181,7 @@ void CPlayer::Snap(int SnappingClient)
 	pClientInfo->m_Armor = GetMana();
 
 	dynamic_string Buffer;
-	for (auto& eff : CGS::Effects[m_ClientID])
+	for (auto& eff : CGS::ms_aEffects[m_ClientID])
 	{
 		char aBuf[32];
 		const bool Minutes = eff.second >= 60;
@@ -316,7 +316,7 @@ int CPlayer::GetTeam()
 ######################################################################### */
 void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp)
 {
-	if (GS()->CheckClient(m_ClientID))
+	if (GS()->IsMmoClient(m_ClientID))
 	{
 		GS()->SendProgressBar(m_ClientID, MyExp, ExpNeed, Name);
 		return;
@@ -360,17 +360,17 @@ bool CPlayer::CheckFailMoney(int Price, int ItemID, bool CheckOnly)
 	if (Price <= 0)
 		return false;
 
-	ItemJob::InventoryItem &pPlayerItem = GetItem(ItemID);
-	if(pPlayerItem.m_Count < Price)
+	InventoryItem &pItemPlayer = GetItem(ItemID);
+	if(pItemPlayer.m_Count < Price)
 	{
-		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", &Price, &pPlayerItem.m_Count, pPlayerItem.Info().GetName(this), NULL);
+		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", &Price, &pItemPlayer.m_Count, pItemPlayer.Info().GetName(this), NULL);
 		return true;
 	}
 
 	if (CheckOnly)
 		return false;
 
-	if (!pPlayerItem.Remove(Price))
+	if (!pItemPlayer.Remove(Price))
 		return true;
 
 	return false;
@@ -384,7 +384,7 @@ void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
 	if((Random && rand()%Random == 0) || !Random)
 	{
 		GS()->Chat(m_ClientID, "You got the effect {STR} time {INT}sec.", Potion, &Sec);
-		CGS::Effects[m_ClientID][Potion] = Sec;
+		CGS::ms_aEffects[m_ClientID][Potion] = Sec;
 		GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, Potion, true);
 	}
 }
@@ -440,7 +440,7 @@ void CPlayer::AddMoney(int Money)
 
 bool CPlayer::CheckEffect(const char* Potion)
 {
-	if(CGS::Effects[m_ClientID].find(Potion) != CGS::Effects[m_ClientID].end())
+	if(CGS::ms_aEffects[m_ClientID].find(Potion) != CGS::ms_aEffects[m_ClientID].end())
 		return true;
 
 	return false;
@@ -458,26 +458,20 @@ bool CPlayer::IsAuthed()
 { 
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID))
 		return Acc().m_AuthID;
-
 	return false; 
 }
 
-int CPlayer::EnchantAttributes(int BonusID) const
+// TODO: not optimized algorithm
+int CPlayer::EnchantAttributes(int AttributeID) const
 {
 	int BonusAttributes = 0;
-	for (const auto& it : ItemJob::ms_aItems[m_ClientID])
+	for (const auto& it : InventoryJob::ms_aItems[m_ClientID])
 	{
-		if(!it.second.IsEquipped()) 
+		if(!it.second.IsEquipped() || !it.second.Info().IsEnchantable() || !it.second.Info().GetInfoEnchantStats(AttributeID))
 			continue;
-		
-		const int BonusCount = it.second.Info().GetStatsBonus(BonusID);
-		if (BonusCount > 0)
-		{
-			const int PlayerBonusCount = BonusCount * (it.second.m_Enchant + 1);
-			BonusAttributes += PlayerBonusCount;
-		}
-	}
 
+		BonusAttributes += it.second.GetEnchantStats(AttributeID);
+	}
 	return BonusAttributes;
 }
 
@@ -554,7 +548,7 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 		}
 
 		// conversations for vanilla clients
-		if(GetTalkedID() > 0 && !GS()->CheckClient(m_ClientID))
+		if(GetTalkedID() > 0 && !GS()->IsMmoClient(m_ClientID))
 		{
 			if(m_PlayerTick[TickState::LastDialog] && m_PlayerTick[TickState::LastDialog] > GS()->Server()->Tick())
 				return true;
@@ -599,18 +593,16 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 	return false;
 }
 
-ItemJob::InventoryItem &CPlayer::GetItem(int ItemID) 
+InventoryItem &CPlayer::GetItem(int ItemID) 
 {
-	if(ItemJob::ms_aItems[m_ClientID].find(ItemID) == ItemJob::ms_aItems[m_ClientID].end())
-		ItemJob::ms_aItems[m_ClientID][ItemID] = ItemJob::InventoryItem(this, ItemID);
-
-	ItemJob::ms_aItems[m_ClientID][ItemID].SetPlayer(this);
-	return ItemJob::ms_aItems[m_ClientID][ItemID];
+	InventoryJob::ms_aItems[m_ClientID][ItemID].m_ItemID = ItemID;
+	InventoryJob::ms_aItems[m_ClientID][ItemID].SetItemOwner(this);
+	return InventoryJob::ms_aItems[m_ClientID][ItemID];
 }
 
 int CPlayer::GetEquippedItem(int EquipID, int SkipItemID) const
 {
-	for(const auto& it : ItemJob::ms_aItems[m_ClientID])
+	for(const auto& it : InventoryJob::ms_aItems[m_ClientID])
 	{
 		if(!it.second.m_Count || !it.second.m_Settings || it.second.Info().m_Function != EquipID || it.first == SkipItemID)
 			continue;
@@ -622,19 +614,19 @@ int CPlayer::GetEquippedItem(int EquipID, int SkipItemID) const
 int CPlayer::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 {
 	int AttributEx = EnchantAttributes(BonusID);
-	const bool SaveData = (str_comp_nocase(CGS::AttributInfo[BonusID].FieldName, "unfield") != 0);
+	const bool SaveData = (str_comp_nocase(CGS::ms_aAttributsInfo[BonusID].FieldName, "unfield") != 0);
 	if (SaveData)
 		AttributEx += Acc().m_aStats[BonusID];
 
-	if (Really && CGS::AttributInfo[BonusID].UpgradePrice < 10) 
+	if (Really && CGS::ms_aAttributsInfo[BonusID].UpgradePrice < 10) 
 	{ 
-		if (BonusID == Stats::StStrength || CGS::AttributInfo[BonusID].AtType == AtHardtype)
+		if (BonusID == Stats::StStrength || CGS::ms_aAttributsInfo[BonusID].AtType == AtHardtype)
 			AttributEx /= 10;
 		else
 			AttributEx /= 5; 
 	}
 
-	if(GS()->IsDungeon() && !SearchClass && CGS::AttributInfo[BonusID].UpgradePrice < 10)
+	if(GS()->IsDungeon() && !SearchClass && CGS::ms_aAttributsInfo[BonusID].UpgradePrice < 10)
 		AttributEx = static_cast<CGameControllerDungeon*>(GS()->m_pController)->GetDungeonSync(this, BonusID);
 	return AttributEx;
 }
@@ -642,7 +634,7 @@ int CPlayer::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
 int CPlayer::GetLevelDisciple(int Class, bool SearchClass)
 {
 	int Atributs = 0;
-	for (const auto& at : CGS::AttributInfo)
+	for (const auto& at : CGS::ms_aAttributsInfo)
 	{
 		if (at.second.AtType == Class)
 			Atributs += GetAttributeCount(at.first, true, SearchClass);

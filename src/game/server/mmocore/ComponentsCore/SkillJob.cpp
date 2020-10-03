@@ -158,7 +158,7 @@ void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 	const int LevelOwn = GetSkillLevel(ClientID, SkillID);
 	const int BonusSkill = GetSkillBonus(ClientID, SkillID) + ms_aSkillsData[SkillID].m_BonusCount;
 	const bool Passive = ms_aSkillsData[SkillID].m_Passive;
-	const int HideID = NUM_TAB_MENU + ItemJob::ms_aItemsInfo.size() + SkillID;
+	const int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + SkillID;
 	GS()->AVHI(ClientID, "skill", HideID, LIGHT_BLUE_COLOR, "{STR} - {INT}SP ({INT}/{INT})", ms_aSkillsData[SkillID].m_aName, &ms_aSkillsData[SkillID].m_PriceSP, &LevelOwn, &ms_aSkillsData[SkillID].m_MaxLevel);
 	if(Passive)
 	{

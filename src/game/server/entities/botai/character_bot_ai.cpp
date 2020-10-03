@@ -172,10 +172,13 @@ void CCharacterBotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
 	const int MultiplierGolds = max(BotJob::ms_aMobBot[SubID].m_Power / g_Config.m_SvStrongGold, 1);
 	pPlayer->AddMoney(MultiplierGolds);
 	
-	if (random_int() % 40 == 0)
+	// TODO: balance depending on the difficulty, not just the level
+	const int CalculateSP = (pPlayer->Acc().m_Level > BotJob::ms_aMobBot[SubID].m_Level ? 40 + min(40, (pPlayer->Acc().m_Level - BotJob::ms_aMobBot[SubID].m_Level)*2) : 40);
+	if (random_int() % CalculateSP == 0)
 	{
-		pPlayer->GetItem(itSkillPoint).Add(1);
-		GS()->Chat(ClientID, "Skill points increased. Now ({INT}SP)", &pPlayer->GetItem(itSkillPoint).m_Count);
+		InventoryItem& pItemSkillPlayer = pPlayer->GetItem(itSkillPoint);
+		pItemSkillPlayer.Add(1);
+		GS()->Chat(ClientID, "Skill points increased. Now ({INT}SP)", &pItemSkillPlayer.m_Count);
 	}
 }
 

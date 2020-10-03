@@ -12,7 +12,7 @@
 #include "ComponentsCore/AccountMinerJob.h"
 #include "ComponentsCore/AccountPlantJob.h"
 #include "ComponentsCore/BotJob.h"
-#include "ComponentsCore/ItemJob.h"
+#include "ComponentsCore/InventoryJob/InventoryJob.h"
 #include "ComponentsCore/QuestJob.h"
 #include "ComponentsCore/ShopJob.h"
 #include "ComponentsCore/StorageJob.h"
@@ -49,7 +49,7 @@ class MmoController
 
 	class AccountMainJob *m_pAccMain;
 	class BotJob *m_pBotsInfo;
-	class ItemJob *m_pItemWork;
+	class InventoryJob *m_pItemWork;
 	class AccountMinerJob *m_pAccMiner;
 	class AccountPlantJob *m_pAccPlant;
 	class QuestJob *m_pQuest;
@@ -73,7 +73,7 @@ public:
 
 	AccountMainJob *Account() const { return m_pAccMain; }
 	BotJob *BotsData() const { return m_pBotsInfo; }
-	ItemJob *Item() const { return m_pItemWork; }
+	InventoryJob *Item() const { return m_pItemWork; }
 	AccountMinerJob *MinerAcc() const { return m_pAccMiner; }
 	AccountPlantJob *PlantsAcc() const { return m_pAccPlant; }
 	QuestJob *Quest() const { return m_pQuest; }

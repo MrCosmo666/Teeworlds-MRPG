@@ -12,7 +12,7 @@ std::map < int, AccountMainJob::StructTempPlayerData > AccountMainJob::ms_aPlaye
 
 int AccountMainJob::SendAuthCode(int ClientID, int Code)
 {
-	if (GS()->CheckClient(ClientID))
+	if (GS()->IsMmoClient(ClientID))
 	{
 		CNetMsg_Sv_ClientProgressAuth ProgressMsg;
 		ProgressMsg.m_Code = Code;
@@ -124,7 +124,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		pPlayer->Acc().m_Upgrade = ACCOUNTDATA->getInt("Upgrade");
 		pPlayer->Acc().m_GuildRank = ACCOUNTDATA->getInt("GuildRank");
 		pPlayer->Acc().m_WorldID = ACCOUNTDATA->getInt("WorldID");
-		for (const auto& at : CGS::AttributInfo)
+		for (const auto& at : CGS::ms_aAttributsInfo)
 		{
 			if (str_comp_nocase(at.second.FieldName, "unfield") != 0)
 				pPlayer->Acc().m_aStats[at.first] = ACCOUNTDATA->getInt(at.second.FieldName);
@@ -153,7 +153,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 200, "You are located {STR} ({STR})", 
 		GS()->Server()->GetWorldName(GS()->GetWorldID()), (GS()->IsAllowedPVP() ? "Zone PVP" : "Safe zone"));
 
-	GS()->SendMapMusic(ClientID, (GS()->IsDungeon() ? -1 : 0));
+	GS()->SendWorldMusic(ClientID, (GS()->IsDungeon() ? -1 : 0));
 	if(!FirstInitilize)
 	{
 		const int CountMessageInbox = Job()->Inbox()->GetActiveInbox(pPlayer);
@@ -237,35 +237,37 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 	if (Menulist == MenuList::MENU_SETTINGS)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
+
+		// settings
 		GS()->AVH(ClientID, TAB_SETTINGS, RED_COLOR, "Some of the settings becomes valid after death");
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_SELECT_LANGUAGE, TAB_SETTINGS, "Settings language");
-		for (const auto& it : ItemJob::ms_aItems[ClientID])
+		for (const auto& it : InventoryJob::ms_aItems[ClientID])
 		{
-			const ItemJob::InventoryItem ItemData = it.second;
+			const InventoryItem ItemData = it.second;
 			if (ItemData.Info().m_Type == ItemType::TYPE_SETTINGS && ItemData.m_Count > 0)
 				GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.m_Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
 		}
 
-		// Equipment
-		bool FoundSettings = false;
+		// equipment modules
+		bool IsFoundModules = false;
 		GS()->AV(ClientID, "null", "");
-		GS()->AVH(ClientID, TAB_SETTINGS_MODULES, GREEN_COLOR, "Sub items settings.");
-		for (const auto& it : ItemJob::ms_aItems[ClientID])
+		GS()->AVH(ClientID, TAB_SETTINGS_MODULES, GREEN_COLOR, "Modules settings");
+		for (const auto& it : InventoryJob::ms_aItems[ClientID])
 		{
-			ItemJob::InventoryItem ItemData = it.second;
+			const InventoryItem ItemData = it.second;
 			if (ItemData.Info().m_Type == ItemType::TYPE_MODULE && ItemData.m_Count > 0)
 			{
 				char aAttributes[128];
-				Job()->Item()->FormatAttributes(ItemData, sizeof(aAttributes), aAttributes);
+				ItemData.FormatAttributes(aAttributes, sizeof(aAttributes));
 				GS()->AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, TAB_SETTINGS_MODULES, "{STR} {STR}{STR}",
-					ItemData.Info().GetName(pPlayer), aAttributes, (ItemData.m_Settings ? "✔ " : "\0"));
-				FoundSettings = true;
+					ItemData.Info().GetName(pPlayer), aAttributes, (ItemData.m_Settings ? "✔" : "\0"));
+				IsFoundModules = true;
 			}
 		}
 
-		// if no settings are found
-		if (!FoundSettings)
-			GS()->AVM(ClientID, "null", NOPE, TAB_SETTINGS_MODULES, "The list of equipment sub upgrades is empty");
+		// if no modules are found
+		if (!IsFoundModules)
+			GS()->AVM(ClientID, "null", NOPE, TAB_SETTINGS_MODULES, "The list of modules equipment is empty.");
 	
 		GS()->AddBack(ClientID);
 		return true;

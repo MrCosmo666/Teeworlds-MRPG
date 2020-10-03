@@ -660,13 +660,14 @@ void CCharacter::Die(int Killer, int Weapon)
 	if(Weapon != WEAPON_WORLD && !GS()->IsDungeon())
 	{
 		m_pPlayer->UpdateTempData(0, 0);
-		CGS::Effects[ClientID].clear();
+		CGS::ms_aEffects[ClientID].clear();
 		const int SafezoneWorldID = GS()->GetRespawnWorld();
 		if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot() && GS()->m_apPlayers[Killer])
 		{
 			// potion resurrection
-			if(m_pPlayer->GetItem(itPotionResurrection).IsEquipped())
-				GS()->Mmo()->Item()->UseItem(ClientID, itPotionResurrection, 1);
+			InventoryItem& pItemPlayer = m_pPlayer->GetItem(itPotionResurrection);
+			if(pItemPlayer.IsEquipped())
+				pItemPlayer.Use(1);
 			else
 			{
 				GS()->Chat(ClientID, "You are dead, you will be treated in {STR}", Server()->GetWorldName(SafezoneWorldID));
@@ -785,8 +786,9 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	// health pool
 	if(m_Health <= m_pPlayer->GetStartHealth()/3)
 	{
-		if(!m_pPlayer->CheckEffect("RegenHealth") && m_pPlayer->GetItem(itPotionHealthRegen).IsEquipped())
-			GS()->Mmo()->Item()->UseItem(m_pPlayer->GetCID(), itPotionHealthRegen, 1);
+		InventoryItem& pItemPlayer = m_pPlayer->GetItem(itPotionHealthRegen);
+		if(!m_pPlayer->CheckEffect("RegenHealth") && pItemPlayer.IsEquipped())
+			pItemPlayer.Use(1);
 	}
 
 	// verify death
@@ -1073,7 +1075,7 @@ void CCharacter::HandleBuff(CTuningParams* TuningParams)
 
 void CCharacter::UpdateEquipingStats(int ItemID)
 {
-	if(!IsAlive() || !m_pPlayer->IsAuthed())
+	if(!m_Alive || !m_pPlayer->IsAuthed())
 		return;
 
 	if(m_Health > m_pPlayer->GetStartHealth())
@@ -1083,11 +1085,11 @@ void CCharacter::UpdateEquipingStats(int ItemID)
 		m_Health = m_pPlayer->GetStartHealth();
 	}
 
-	const ItemJob::ItemInformation pInformationItem = GS()->GetItemInfo(ItemID);
+	const ItemInformation pInformationItem = GS()->GetItemInfo(ItemID);
 	if((pInformationItem.m_Function >= EQUIP_HAMMER && pInformationItem.m_Function <= EQUIP_RIFLE))
 		m_pPlayer->GetCharacter()->GiveWeapon(pInformationItem.m_Function, 3);
 
-	if(pInformationItem.GetStatsBonus(Stats::StAmmoRegen) > 0)
+	if(pInformationItem.GetInfoEnchantStats(Stats::StAmmoRegen) > 0)
 		m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
 }
 
@@ -1174,8 +1176,8 @@ bool CCharacter::CheckFailMana(int Mana)
 	}
 
 	m_Mana -= Mana;
-	if(m_Mana <= m_pPlayer->GetStartMana() / 5  && !m_pPlayer->CheckEffect("RegenMana") && m_pPlayer->GetItem(itPotionManaRegen).IsEquipped())
-		GS()->Mmo()->Item()->UseItem(m_pPlayer->GetCID(), itPotionManaRegen, 1);
+	if(m_Mana <= m_pPlayer->GetStartMana() / 5 && !m_pPlayer->CheckEffect("RegenMana") && m_pPlayer->GetItem(itPotionManaRegen).IsEquipped())
+		m_pPlayer->GetItem(itPotionManaRegen).Use(1);
 
 	m_pPlayer->ShowInformationStats();
 	return false;	
@@ -1207,7 +1209,7 @@ bool CCharacter::StartConversation(CPlayer *pTarget)
 	if (!m_pPlayer || m_pPlayer->IsBot() || !pTarget->IsBot())
 		return false;
 
-	// skip if not NPS, or it is not drawn
+	// skip if not NPC, or it is not drawn
 	CPlayerBot* pTargetBot = static_cast<CPlayerBot*>(pTarget);
 	if (!pTargetBot || pTargetBot->GetBotType() == BotsTypes::TYPE_BOT_MOB || !pTargetBot->IsActiveSnappingBot(m_pPlayer->GetCID()))
 		return false;

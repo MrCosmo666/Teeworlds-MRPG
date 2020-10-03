@@ -821,7 +821,7 @@ void CClient::LoadMmoInfo()
 		char aNewVersionStr[64];
 		str_copy(aNewVersionStr, json_string_get(pVersion), sizeof(aNewVersionStr));
 		char aCurVersionStr[64];
-		str_copy(aCurVersionStr, GAME_RELEASE_VERSION, sizeof(aCurVersionStr));
+		str_copy(aCurVersionStr, CLIENT_RELEASE_VERSION, sizeof(aCurVersionStr));
 		if (ToVersion(aNewVersionStr) > ToVersion(aCurVersionStr))
 		{
 			str_copy(m_aVersionStr, json_string_get(pVersion), sizeof(m_aVersionStr));
@@ -1101,14 +1101,14 @@ void CClient::ProcessConnlessPacket(CNetChunk* pPacket)
 	if (m_VersionInfo.m_State == CVersionInfo::STATE_READY && net_addr_comp(&pPacket->m_Address, &m_VersionInfo.m_VersionServeraddr.m_Addr) == 0)
 	{
 		// version info
-		if (pPacket->m_DataSize == (int)(sizeof(VERSIONSRV_VERSION) + sizeof(GAME_RELEASE_VERSION)) &&
+		if (pPacket->m_DataSize == (int)(sizeof(VERSIONSRV_VERSION) + sizeof(CLIENT_RELEASE_VERSION)) &&
 			mem_comp(pPacket->m_pData, VERSIONSRV_VERSION, sizeof(VERSIONSRV_VERSION)) == 0)
 
 		{
 			char* pVersionData = (char*)pPacket->m_pData + sizeof(VERSIONSRV_VERSION);
-			int VersionMatch = !mem_comp(pVersionData, GAME_RELEASE_VERSION, sizeof(GAME_RELEASE_VERSION));
+			int VersionMatch = !mem_comp(pVersionData, CLIENT_RELEASE_VERSION, sizeof(CLIENT_RELEASE_VERSION));
 
-			char aVersion[sizeof(GAME_RELEASE_VERSION)];
+			char aVersion[sizeof(CLIENT_RELEASE_VERSION)];
 			str_copy(aVersion, pVersionData, sizeof(aVersion));
 
 			char aBuf[256];

@@ -51,7 +51,7 @@ bool ShopJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 {
 	const int ClientID = pPlayer->GetCID();
-	int HideID = NUM_TAB_MENU + ItemJob::ms_aItemsInfo.size() + 300;
+	int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 300;
 	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE StorageID = '%d' ORDER BY Price", StorageID));
 	while(RES->next())
 	{
@@ -61,18 +61,18 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		const int Enchant = RES->getInt("Enchant");
 		const int Count = RES->getInt("Count");
 		const int NeedItemID = RES->getInt("NeedItem");
-		ItemJob::ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
-		ItemJob::ItemInformation &NeededItem = GS()->GetItemInfo(NeedItemID);
+		ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
+		ItemInformation &NeededItem = GS()->GetItemInfo(NeedItemID);
 		
 		if (BuyightItem.IsEnchantable())
 		{
-			char aEnchantSize[16];
-			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR}{STR} - {INT} {STR}",
-				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price, NeededItem.GetName(pPlayer));
+			char aEnchantBuf[16];
+			BuyightItem.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf), Enchant);
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} {STR} - {INT} {STR}",
+				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), &Price, NeededItem.GetName(pPlayer));
 
 			char aAttributes[128];
-			Job()->Item()->FormatAttributes(BuyightItem, Enchant, sizeof(aAttributes), aAttributes);
+			BuyightItem.FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 		}
 		else
@@ -99,7 +99,7 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 	GS()->AV(ClientID, "null", "");
 
 	bool FoundItems = false;
-	int HideID = (int)(NUM_TAB_MENU + ItemJob::ms_aItemsInfo.size() + 400);
+	int HideID = (int)(NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 400);
 	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 ORDER BY Price"));
 	while(RES->next())
 	{
@@ -109,17 +109,17 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 		const int Enchant = RES->getInt("Enchant");
 		const int Count = RES->getInt("Count");
 		const int OwnerID = RES->getInt("OwnerID");
-		ItemJob::ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
+		ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
 
 		if (BuyightItem.IsEnchantable())
 		{
-			char aEnchantSize[16];
-			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR}{STR} - {INT} gold",
-				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &Price);
+			char aEnchantBuf[16];
+			BuyightItem.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf), Enchant);
+			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} {STR} - {INT} gold",
+				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), &Price);
 
 			char aAttributes[128];
-			Job()->Item()->FormatAttributes(BuyightItem, Enchant, sizeof(aAttributes), aAttributes);
+			BuyightItem.FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 		}
 		else
@@ -144,7 +144,7 @@ void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
 {
 	const int ItemID = AuSellItem.m_ItemID;
 	const int ClientID = pPlayer->GetCID();
-	ItemJob::InventoryItem &pPlayerAuctionItem = pPlayer->GetItem(ItemID);
+	InventoryItem &pPlayerAuctionItem = pPlayer->GetItem(ItemID);
 
 	// check the number of slots whether everything is occupied or not
 	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_mailshop", "WHERE OwnerID > '0' LIMIT %d", g_Config.m_SvMaxMasiveAuctionSlots));
@@ -187,7 +187,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 		return false;
 
 	const int ItemID = SHOPITEM->getInt("ItemID");
-	ItemJob::InventoryItem &pPlayerBuyightItem = pPlayer->GetItem(ItemID);
+	InventoryItem &pPlayerBuyightItem = pPlayer->GetItem(ItemID);
 	if (pPlayerBuyightItem.m_Count > 0 && pPlayerBuyightItem.Info().IsEnchantable())
 	{
 		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");
@@ -281,7 +281,7 @@ bool ShopJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
 		const int ItemID = pPlayer->GetTempData().m_SellItem.m_ItemID;
-		ItemJob::ItemInformation& pInformationSellItem = GS()->GetItemInfo(ItemID);
+		ItemInformation& pInformationSellItem = GS()->GetItemInfo(ItemID);
 
 		const int SlotCount = pPlayer->GetTempData().m_SellItem.m_Count;
 		const int MinimalPrice = SlotCount * pInformationSellItem.m_MinimalPrice;
@@ -322,7 +322,7 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 	if(PPSTR(CMD, "AUCTIONCOUNT") == 0)
 	{
 		// if there are fewer items installed, we set the number of items.
-		ItemJob::InventoryItem &pPlayerSellItem = pPlayer->GetItem(VoteID);
+		InventoryItem &pPlayerSellItem = pPlayer->GetItem(VoteID);
 		if(Get > pPlayerSellItem.m_Count)
 			Get = pPlayerSellItem.m_Count;
 
@@ -364,7 +364,7 @@ bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, 
 
 	if(PPSTR(CMD, "AUCTIONACCEPT") == 0)
 	{
-		ItemJob::InventoryItem &pPlayerSellItem = pPlayer->GetItem(VoteID);
+		InventoryItem &pPlayerSellItem = pPlayer->GetItem(VoteID);
 		if(pPlayerSellItem.m_Count >= pPlayer->GetTempData().m_SellItem.m_Count && pPlayer->GetTempData().m_SellItem.m_Price >= 10)
 		{
 			CreateAuctionSlot(pPlayer, pPlayer->GetTempData().m_SellItem);

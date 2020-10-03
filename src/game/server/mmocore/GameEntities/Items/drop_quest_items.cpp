@@ -82,7 +82,7 @@ void CDropQuestItem::Tick()
 	const int Count = m_QuestBot.m_aItemSearchCount[0];
 	const int QuestID = m_QuestBot.m_QuestID;
 	CPlayer* pOwnerPlayer = GS()->m_apPlayers[m_OwnerID];
-	ItemJob::InventoryItem& pPlayerQuestItem = pOwnerPlayer->GetItem(m_QuestBot.m_aItemSearch[0]);
+	InventoryItem& pPlayerQuestItem = pOwnerPlayer->GetItem(m_QuestBot.m_aItemSearch[0]);
 	if (QuestJob::ms_aQuests[m_OwnerID][QuestID].m_Progress != m_QuestBot.m_Progress || pPlayerQuestItem.m_Count >= Count)
 	{
 		GS()->m_World.DestroyEntity(this);
@@ -112,7 +112,7 @@ void CDropQuestItem::Snap(int SnappingClient)
 		return;
 
 	// mrpg
-	if (GS()->CheckClient(SnappingClient))
+	if (GS()->IsMmoClient(SnappingClient))
 	{
 		CNetObj_MmoPickup* pObj = static_cast<CNetObj_MmoPickup*>(Server()->SnapNewItem(NETOBJTYPE_MMOPICKUP, GetID(), sizeof(CNetObj_MmoPickup)));
 		if (!pObj)

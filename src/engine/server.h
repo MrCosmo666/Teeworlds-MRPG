@@ -70,8 +70,8 @@ public:
 	virtual int GetWorldID(int ClientID) = 0;
 	virtual const char* GetWorldName(int WorldID) = 0;
 
-	virtual void SetClientVersion(int ClientID, int Version) = 0;
-	virtual int GetClientVersion(int ClientID) = 0;
+	virtual void SetClientProtocolVersion(int ClientID, int Version) = 0;
+	virtual int GetClientProtocolVersion(int ClientID) = 0;
 
 	virtual void SetClientLanguage(int ClientID, const char* pLanguage) = 0;
 	virtual const char* GetClientLanguage(int ClientID) const = 0;

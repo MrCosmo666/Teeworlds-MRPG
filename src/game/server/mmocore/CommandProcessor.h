@@ -14,7 +14,6 @@ private:
 	void ChangeStateDoor(CGS *GS, int HouseID);
 	int PlayerHouseID(CGS *GS, CPlayer *pPlayer) const;
 
-	void UseItems(CGS *GS, int ClientID, int ItemID, int Count);
 	bool UseSkill(CGS *GS, CPlayer *pPlayer, int SkillID) const;
 };
 

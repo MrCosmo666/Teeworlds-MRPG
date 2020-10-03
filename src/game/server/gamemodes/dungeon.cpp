@@ -42,7 +42,7 @@ void CGameControllerDungeon::KillAllPlayers(bool StartDungeonMusic)
 		if(GS()->m_apPlayers[i] && Server()->GetWorldID(i) == m_WorldID)
 		{
 			if(StartDungeonMusic)
-				GS()->SendMapMusic(i);
+				GS()->SendWorldMusic(i);
 			if(GS()->m_apPlayers[i]->GetCharacter())
 				GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_WORLD);
 		}
@@ -458,7 +458,7 @@ int CGameControllerDungeon::GetDungeonSync(CPlayer* pPlayer, int BonusID) const
 	int Procent = 1;
 	int Delay = 0;
 
-	const int ParsePlayerStatsClass = CGS::AttributInfo[BonusID].AtType;
+	const int ParsePlayerStatsClass = CGS::ms_aAttributsInfo[BonusID].AtType;
 	if (BonusID == Stats::StStrength || ParsePlayerStatsClass == AtributType::AtHardtype)
 		Delay = 50;
 
