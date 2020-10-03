@@ -349,7 +349,6 @@ void CCommandProcessor::ConChatCmdList(IConsole::IResult* pResult, void* pUser)
 	pGS->ChatFollow(ClientID, "Command List / Help");
 	pGS->ChatFollow(ClientID, "/register <name> <pass> - new account.");
 	pGS->ChatFollow(ClientID, "/login <name> <pass> - log in account.");
-	// pGS->ChatFollow(ClientID, "/lang <codes iso> - language (translation is not complete)."); // think it's moved to vote menu?
 	pGS->ChatFollow(ClientID, "/rules - server rules.");
 	pGS->ChatFollow(ClientID, "Another information see Wiki Page.");
 }
