@@ -121,6 +121,14 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		if (DoButton_CheckBox(&s_ButtonChatNotifyWindow, Localize("Notify window on chat highlight"), g_Config.m_ClNotifyWindow, &Button))
 			g_Config.m_ClNotifyWindow ^= 1;
 
+		// smooth rendering
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "%s: %s", Localize("Smooth rendering"), g_Config.m_ClInactiveRendering == 2 ? "No rendering when inactive" : g_Config.m_ClInactiveRendering == 1 ? "No rendering when minimized" : "Always render");
+		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
+		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
+		if (DoButton_CheckBox_Number(&g_Config.m_ClInactiveRendering, aBuf, g_Config.m_ClInactiveRendering, &Button))
+			g_Config.m_ClInactiveRendering = (g_Config.m_ClInactiveRendering + 1) % 3;
+
 		// --------------------- RIGHT SIDE --------------------------
 		UI()->DoLabel(&BasicRight, "Customize", 12.0f, CUI::ALIGN_CENTER);
 		BasicRight.HSplitTop(14.0f, &Button, &BasicRight);

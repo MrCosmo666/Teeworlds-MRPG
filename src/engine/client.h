@@ -169,6 +169,8 @@ public:
 	// mrpg
 public:
 	virtual void NotifyWindow() = 0;
+
+	virtual bool IsWindowActive() = 0;
 };
 
 class IGameClient : public IInterface

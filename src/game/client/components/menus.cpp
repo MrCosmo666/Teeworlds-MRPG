@@ -359,7 +359,8 @@ int CMenus::DoButton_CheckBox_Common(const void *pID, const char *pText, const c
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
 
-	t.y += (c.w / 2.0f) - (ms_FontmodHeight * (ms_FontmodHeight * 10.0f)); 
+	t.y += (c.w / 2.0f) - (ms_FontmodHeight * (ms_FontmodHeight * 10.0f));
+	c.y += (c.w / 2.0f) - (ms_FontmodHeight * (ms_FontmodHeight * 11.0f));
 	UI()->DoLabel(&c, pBoxText, pRect->h*ms_FontmodHeight*0.6f, CUI::ALIGN_CENTER);
 	UI()->DoLabel(&t, pText, pRect->h*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
 

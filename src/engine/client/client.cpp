@@ -2264,8 +2264,11 @@ void CClient::Run()
 				// when we are stress testing only render every 10th frame
 				if (!g_Config.m_DbgStress || (m_RenderFrames % 10) == 0)
 				{
-					Render();
-					m_pGraphics->Swap();
+					if (!((g_Config.m_ClInactiveRendering == 1 && m_pGraphics->WindowMinimized()) || (g_Config.m_ClInactiveRendering == 2 && !m_pGraphics->WindowActive())))
+					{
+						Render();
+						m_pGraphics->Swap();
+					}
 				}
 			}
 		}

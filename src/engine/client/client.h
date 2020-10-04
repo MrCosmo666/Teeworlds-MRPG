@@ -355,5 +355,7 @@ private:
 public:
 
 	void NotifyWindow();
+
+	bool IsWindowActive() { return m_pGraphics->WindowActive(); }
 };
 #endif
