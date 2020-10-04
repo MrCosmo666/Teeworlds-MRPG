@@ -44,6 +44,7 @@ void CGS::Construct(int Resetting)
 	m_Resetting = false;
 	m_pServer = nullptr;
 	m_pController = nullptr;
+	m_pCommandProcessor = nullptr;
 
 	if(Resetting==NO_RESET)
 		m_pMmoController = nullptr;
@@ -901,16 +902,33 @@ void CGS::SendChatCommand(const CCommandManager::CCommand* pCommand, int ClientI
 
 void CGS::SendChatCommands(int ClientID)
 {
+	// remove default commands from client
+	SendRemoveChatCommand("all", ClientID);
+	SendRemoveChatCommand("friend", ClientID);
+	SendRemoveChatCommand("m", ClientID);
+	SendRemoveChatCommand("mute", ClientID);
+	SendRemoveChatCommand("r", ClientID);
+	SendRemoveChatCommand("team", ClientID);
+	SendRemoveChatCommand("w", ClientID);
+	SendRemoveChatCommand("whisper", ClientID);
+
+	// send our commands
 	for (int i = 0; i < CommandManager()->CommandCount(); i++)
-	{
 		SendChatCommand(CommandManager()->GetCommand(i), ClientID);
-	}
 }
 
 void CGS::SendRemoveChatCommand(const CCommandManager::CCommand* pCommand, int ClientID)
 {
 	CNetMsg_Sv_CommandInfoRemove Msg;
 	Msg.m_Name = pCommand->m_aName;
+
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+}
+
+void CGS::SendRemoveChatCommand(const char* pCommand, int ClientID)
+{
+	CNetMsg_Sv_CommandInfoRemove Msg;
+	Msg.m_Name = pCommand;
 
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
@@ -1027,6 +1045,7 @@ void CGS::OnInit(int WorldID)
 	else
 		m_pController = new CGameControllerMain(this);
 
+	m_pCommandProcessor = new CCommandProcessor(this);
 	m_pController->RegisterChatCommands(CommandManager());
 
 	// initialize layers
@@ -1069,6 +1088,10 @@ void CGS::OnShutdown()
 
 	delete m_pMmoController;
 	m_pMmoController = nullptr;
+
+	delete m_pCommandProcessor;
+	m_pCommandProcessor = nullptr;
+
 	Clear();
 }
 
@@ -1196,10 +1219,9 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			const int Mode = pMsg->m_Mode;
 			if(Mode != CHAT_NONE)
 			{
-				if(pMsg->m_pMessage[0]=='/')
+				if(pMsg->m_pMessage[0] == '/')
 				{
-					CommandProcessor pChat;
-					pChat.ChatCmd(pMsg, this, pPlayer);
+					CommandProcessor()->ChatCmd(pMsg, pPlayer);
 					return;
 				}
 
@@ -1208,8 +1230,62 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		}
 		else if (MsgID == NETMSGTYPE_CL_COMMAND)
 		{
+			if (g_Config.m_SvSpamprotection && pPlayer->m_PlayerTick[TickState::LastChat] && pPlayer->m_PlayerTick[TickState::LastChat] + Server()->TickSpeed() > Server()->Tick())
+				return;
+
 			CNetMsg_Cl_Command *pMsg = (CNetMsg_Cl_Command*)pRawMsg;
-			CommandManager()->OnCommand(pMsg->m_Name, pMsg->m_Arguments, ClientID);
+
+			if (!pMsg->m_Name[0])
+				return;
+
+			char aFullMsg[256];
+			str_format(aFullMsg, sizeof(aFullMsg), "/%s %s", pMsg->m_Name, pMsg->m_Arguments);
+
+			if (pMsg->m_Arguments[0])
+			{
+				// trim right and set maximum length to 128 utf8-characters
+				int Length = 0;
+				const char* p = pMsg->m_Arguments;
+				const char* pEnd = nullptr;
+				while (*p)
+				{
+					const char* pStrOld = p;
+					int Code = str_utf8_decode(&p);
+
+					// check if unicode is not empty
+					if (Code > 0x20 && Code != 0xA0 && Code != 0x034F && (Code < 0x2000 || Code > 0x200F) && (Code < 0x2028 || Code > 0x202F) &&
+						(Code < 0x205F || Code > 0x2064) && (Code < 0x206A || Code > 0x206F) && (Code < 0xFE00 || Code > 0xFE0F) &&
+						Code != 0xFEFF && (Code < 0xFFF9 || Code > 0xFFFC))
+					{
+						pEnd = nullptr;
+					}
+					else if (pEnd == nullptr)
+						pEnd = pStrOld;
+
+					if (++Length >= 127)
+					{
+						*(const_cast<char*>(p)) = 0;
+						break;
+					}
+				}
+				if (pEnd != nullptr)
+					*(const_cast<char*>(pEnd)) = 0;
+
+				// drop empty and autocreated spam messages (more than 20 characters per second)
+				if (Length == 0)
+					return;
+			}
+
+			pPlayer->m_PlayerTick[TickState::LastChat] = Server()->Tick();
+
+			if (Console()->IsCommand(pMsg->m_Name, CFGFLAG_CHAT))
+			{
+				Console()->ExecuteLineFlag(aFullMsg + 1, CFGFLAG_CHAT, ClientID, false);
+				return;
+			}
+
+			ChatFollow(ClientID, "Command {STR} not found!", pMsg->m_Name);
+			// CommandManager()->OnCommand(pMsg->m_Name, pMsg->m_Arguments, ClientID);
 		}
 		else if(MsgID == NETMSGTYPE_CL_CALLVOTE)
 		{

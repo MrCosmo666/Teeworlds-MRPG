@@ -42,6 +42,8 @@ public:
 		virtual float GetFloat(unsigned Index) = 0;
 		virtual const char *GetString(unsigned Index) = 0;
 
+		virtual int GetClientID() = 0;
+
 		int NumArguments() const { return m_NumArgs; }
 	};
 
@@ -84,9 +86,9 @@ public:
 
 	virtual bool ArgStringIsValid(const char* pFormat) = 0;
 	virtual bool LineIsValid(const char *pStr) = 0;
-	virtual void ExecuteLine(const char *pStr) = 0;
-	virtual void ExecuteLineFlag(const char *pStr, int FlagMask) = 0;
-	virtual void ExecuteLineStroked(int Stroke, const char *pStr) = 0;
+	virtual void ExecuteLine(const char *pStr, int ClientID = -1, bool InterpretSemicolons = true) = 0;
+	virtual void ExecuteLineFlag(const char *pStr, int FlagMask, int ClientID = -1, bool InterpretSemicolons = true) = 0;
+	virtual void ExecuteLineStroked(int Stroke, const char *pStr, int ClientID = -1, bool InterpretSemicolons = true) = 0;
 	virtual bool ExecuteFile(const char *pFilename) = 0;
 
 	virtual int RegisterPrintCallback(int OutputLevel, FPrintCallback pfnPrintCallback, void *pUserData) = 0;
@@ -96,6 +98,9 @@ public:
 	virtual int ParseCommandArgs(const char* pArgs, const char* pFormat, FCommandCallback pfnCallback, void* pContext) = 0;
 
 	virtual void SetAccessLevel(int AccessLevel) = 0;
+
+	// mrpg
+	virtual bool IsCommand(const char* pStr, int FlagMask) = 0;
 };
 
 extern IConsole *CreateConsole(int FlagMask);

@@ -17,6 +17,7 @@
 #include "player.h"
 
 #include "mmocore/MmoController.h"
+#include "mmocore/CommandProcessor.h"
 
 #ifdef _MSC_VER
 typedef __int32 int32_t;
@@ -172,6 +173,7 @@ public:
 
 	void SendChatCommand(const CCommandManager::CCommand* pCommand, int ClientID);
 	void SendChatCommands(int ClientID);
+	void SendRemoveChatCommand(const char* pCommand, int ClientID);
 	void SendRemoveChatCommand(const CCommandManager::CCommand* pCommand, int ClientID);
 
 	void SendTuningParams(int ClientID);
@@ -273,6 +275,8 @@ public:
 private:
 	void SendDayInfo(int ClientID);
 
+	CCommandProcessor *m_pCommandProcessor;
+
 public:
 	void ChangeEquipSkin(int ClientID, int ItemID);
 
@@ -289,6 +293,8 @@ public:
 	void SetRespawnWorld(int WorldID) { m_RespawnWorld = WorldID; }
 	void SetMapMusic(int SoundID) { m_MusicID = SoundID; }
 	int GetRespawnWorld() const { return m_RespawnWorld; }
+
+	CCommandProcessor* CommandProcessor() { return m_pCommandProcessor; }
 
 private:
 	void UpdateZonePVP();
