@@ -57,7 +57,7 @@ int CDemoRecorder::Start(class IStorage* pStorage, class IConsole* pConsole, con
 	if (!MapFile)
 	{
 		// search for the map within subfolders
-		char aBuf[512];
+		char aBuf[IO_MAX_PATH_LENGTH];
 		str_format(aMapFilename, sizeof(aMapFilename), "%s.map", pMap);
 		if (pStorage->FindFile(aMapFilename, "maps", IStorage::TYPE_ALL, aBuf, sizeof(aBuf)))
 			MapFile = pStorage->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL, 0, 0, CDataFileReader::CheckSha256, &Sha256);
@@ -332,7 +332,6 @@ void CDemoPlayer::SetListener(IListener* pListener)
 	m_pListener = pListener;
 }
 
-
 int CDemoPlayer::ReadChunkHeader(int* pType, int* pSize, int* pTick)
 {
 	unsigned char Chunk = 0;
@@ -568,10 +567,9 @@ void CDemoPlayer::DoTick()
 				m_Info.m_NextTick = ChunkTick;
 				break;
 			}
-			else if (ChunkType == CHUNKTYPE_MESSAGE)
+			else if (ChunkType == CHUNKTYPE_MESSAGE && m_pListener && m_LastSnapshotDataSize != -1)
 			{
-				if(m_pListener)
-					m_pListener->OnDemoPlayerMessage(aData, DataSize);
+				m_pListener->OnDemoPlayerMessage(aData, DataSize);
 			}
 		}
 	}
@@ -624,7 +622,7 @@ const char* CDemoPlayer::Load(class IStorage* pStorage, class IConsole* pConsole
 		return m_aErrorMsg;
 	}
 
-	if (m_Info.m_Header.m_Version < gs_ActVersion)
+	if (m_Info.m_Header.m_Version != gs_ActVersion)
 	{
 		str_format(m_aErrorMsg, sizeof(m_aErrorMsg), "demo version %d is not supported", m_Info.m_Header.m_Version);
 		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_player", m_aErrorMsg);
