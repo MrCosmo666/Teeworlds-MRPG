@@ -2497,6 +2497,10 @@ void CClient::DemoRecorder_Start(const char* pFilename, bool WithTimestamp)
 		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demorec/record", "client is not online");
 	else
 	{
+		CServerInfo Info = { 0 };
+		GetServerInfo(&Info);
+		bool IsMMO = Info.m_MRPG || !str_comp_nocase(Info.m_aGameType, "M-RPG");
+
 		char aFilename[128];
 		if (WithTimestamp)
 		{
@@ -2506,7 +2510,8 @@ void CClient::DemoRecorder_Start(const char* pFilename, bool WithTimestamp)
 		}
 		else
 			str_format(aFilename, sizeof(aFilename), "demos/%s.demo", pFilename);
-		m_DemoRecorder.Start(Storage(), m_pConsole, aFilename, GameClient()->NetVersion(), m_aCurrentMap, m_CurrentMapSha256, m_CurrentMapCrc, "client");
+
+		m_DemoRecorder.Start(Storage(), m_pConsole, aFilename, GameClient()->NetVersion(), m_aCurrentMap, m_CurrentMapSha256, m_CurrentMapCrc, "client", IsMMO);
 	}
 }
 

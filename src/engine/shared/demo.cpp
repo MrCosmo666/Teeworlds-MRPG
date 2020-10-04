@@ -18,6 +18,10 @@ static const unsigned char gs_ActVersion = 4;
 static const int gs_LengthOffset = 152;
 static const int gs_NumMarkersOffset = 176;
 
+// mmo demo's are not compatible to tw demo's, we should use another header for our demo files
+static const unsigned char gs_aHeaderMarkerMMO[7] = { 'M', 'M', 'O', 'D', 'E', 'M', 'O' };
+static const unsigned char gs_ActVersionMMO = 101;
+
 CDemoRecorder::CDemoRecorder(class CSnapshotDelta* pSnapshotDelta)
 {
 	m_File = 0;
@@ -27,7 +31,7 @@ CDemoRecorder::CDemoRecorder(class CSnapshotDelta* pSnapshotDelta)
 }
 
 // Record
-int CDemoRecorder::Start(class IStorage* pStorage, class IConsole* pConsole, const char* pFilename, const char* pNetVersion, const char* pMap, SHA256_DIGEST Sha256, unsigned Crc, const char* pType)
+int CDemoRecorder::Start(class IStorage* pStorage, class IConsole* pConsole, const char* pFilename, const char* pNetVersion, const char* pMap, SHA256_DIGEST Sha256, unsigned Crc, const char* pType, bool IsMMO)
 {
 	CDemoHeader Header;
 	if (m_File)
@@ -83,8 +87,8 @@ int CDemoRecorder::Start(class IStorage* pStorage, class IConsole* pConsole, con
 
 	// write header
 	mem_zero(&Header, sizeof(Header));
-	mem_copy(Header.m_aMarker, gs_aHeaderMarker, sizeof(Header.m_aMarker));
-	Header.m_Version = gs_ActVersion;
+	mem_copy(Header.m_aMarker, IsMMO ? gs_aHeaderMarkerMMO : gs_aHeaderMarker, sizeof(Header.m_aMarker));
+	Header.m_Version = IsMMO ? gs_ActVersionMMO : gs_ActVersion;
 	str_copy(Header.m_aNetversion, pNetVersion, sizeof(Header.m_aNetversion));
 	str_copy(Header.m_aMapName, pMap, sizeof(Header.m_aMapName));
 	unsigned MapSize = io_length(MapFile);
@@ -613,7 +617,7 @@ const char* CDemoPlayer::Load(class IStorage* pStorage, class IConsole* pConsole
 
 	// read the header
 	io_read(m_File, &m_Info.m_Header, sizeof(m_Info.m_Header));
-	if (mem_comp(m_Info.m_Header.m_aMarker, gs_aHeaderMarker, sizeof(gs_aHeaderMarker)) != 0)
+	if (mem_comp(m_Info.m_Header.m_aMarker, gs_aHeaderMarker, sizeof(gs_aHeaderMarker)) != 0 && mem_comp(m_Info.m_Header.m_aMarker, gs_aHeaderMarkerMMO, sizeof(gs_aHeaderMarkerMMO)) != 0)
 	{
 		str_format(m_aErrorMsg, sizeof(m_aErrorMsg), "'%s' is not a demo file", pFilename);
 		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_player", m_aErrorMsg);
@@ -622,7 +626,7 @@ const char* CDemoPlayer::Load(class IStorage* pStorage, class IConsole* pConsole
 		return m_aErrorMsg;
 	}
 
-	if (m_Info.m_Header.m_Version != gs_ActVersion)
+	if (m_Info.m_Header.m_Version != gs_ActVersion && m_Info.m_Header.m_Version != gs_ActVersionMMO)
 	{
 		str_format(m_aErrorMsg, sizeof(m_aErrorMsg), "demo version %d is not supported", m_Info.m_Header.m_Version);
 		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demo_player", m_aErrorMsg);
@@ -841,7 +845,8 @@ bool CDemoPlayer::GetDemoInfo(class IStorage* pStorage, const char* pFilename, i
 
 	io_read(File, pDemoHeader, sizeof(CDemoHeader));
 	
-	bool Valid = mem_comp(pDemoHeader->m_aMarker, gs_aHeaderMarker, sizeof(gs_aHeaderMarker)) == 0 && pDemoHeader->m_Version == gs_ActVersion;
+	bool Valid = (mem_comp(pDemoHeader->m_aMarker, gs_aHeaderMarker, sizeof(gs_aHeaderMarker)) == 0 && pDemoHeader->m_Version == gs_ActVersion) || 
+				(mem_comp(pDemoHeader->m_aMarker, gs_aHeaderMarkerMMO, sizeof(gs_aHeaderMarkerMMO)) == 0 && pDemoHeader->m_Version == gs_ActVersionMMO);
 	io_close(File);
 	return Valid;
 }
