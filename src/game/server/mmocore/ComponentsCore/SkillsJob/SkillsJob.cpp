@@ -1,14 +1,14 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <game/server/gamecontext.h>
-#include "SkillJob.h"
+#include "SkillsJob.h"
 
 using namespace sqlstr;
 
-std::map < int , CSkillInformation > SkillJob::ms_aSkillsData;
-std::map < int , std::map < int , CSkillPlayer > > SkillJob::ms_aSkills;
+std::map < int , CSkillInformation > SkillsJob::ms_aSkillsData;
+std::map < int , std::map < int , CSkillPlayer > > SkillsJob::ms_aSkills;
 
-void SkillJob::OnInit()
+void SkillsJob::OnInit()
 { 
 	SJK.SDT("*", "tw_skills_list", [&](ResultSet* RES)
 	{
@@ -27,7 +27,7 @@ void SkillJob::OnInit()
 	});
 }
 
-void SkillJob::OnInitAccount(CPlayer *pPlayer)
+void SkillsJob::OnInitAccount(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
 	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID));
@@ -41,13 +41,13 @@ void SkillJob::OnInitAccount(CPlayer *pPlayer)
 	}		
 }
 
-void SkillJob::OnResetClient(int ClientID)
+void SkillsJob::OnResetClient(int ClientID)
 {
 	if (ms_aSkills.find(ClientID) != ms_aSkills.end())
 		ms_aSkills.erase(ClientID);
 }
 
-bool SkillJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+bool SkillsJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
 	if (ReplaceMenu)
 	{
@@ -74,7 +74,7 @@ bool SkillJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 	return false;
 }
 
-bool SkillJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
+bool SkillsJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 {
 	CPlayer* pPlayer = pChr->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
@@ -95,7 +95,7 @@ bool SkillJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	return false;
 }
 
-bool SkillJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool SkillsJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (PPSTR(CMD, "SKILLLEARN") == 0)
@@ -116,7 +116,7 @@ bool SkillJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 	return false;
 }
 
-void SkillJob::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
+void SkillsJob::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
 {
 	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = BLUE_COLOR;
@@ -129,7 +129,7 @@ void SkillJob::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
 	GS()->AV(ClientID, "null", "");
 }
 
-void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
+void SkillsJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 {
 	CSkillPlayer& pSkill = pPlayer->GetSkill(SkillID);
 	const int ClientID = pPlayer->GetCID();
@@ -165,7 +165,7 @@ void SkillJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 		GS()->AVM(ClientID, "SKILLLEARN", SkillID, HideID, "Learn {STR}", pSkill.Info().m_aName);
 }
 
-void SkillJob::ParseEmoticionSkill(CPlayer *pPlayer, int EmoticionID)
+void SkillsJob::ParseEmoticionSkill(CPlayer *pPlayer, int EmoticionID)
 {
 	if(!pPlayer || !pPlayer->IsAuthed() || !pPlayer->GetCharacter())
 		return;

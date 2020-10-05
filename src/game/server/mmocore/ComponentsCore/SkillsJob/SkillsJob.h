@@ -8,7 +8,7 @@
 
 #include <game/server/mmocore/MmoComponent.h>
 
-class SkillJob : public MmoComponent
+class SkillsJob : public MmoComponent
 {
 public:
 	static std::map < int, CSkillInformation > ms_aSkillsData;

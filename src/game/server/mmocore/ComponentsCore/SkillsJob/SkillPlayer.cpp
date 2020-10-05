@@ -10,7 +10,7 @@
 
 CSkillInformation& CSkillPlayer::Info() const 
 { 
-	return SkillJob::ms_aSkillsData[m_SkillID]; 
+	return SkillsJob::ms_aSkillsData[m_SkillID]; 
 }
 
 void CSkillPlayer::SetSkillOwner(CPlayer* pPlayer)

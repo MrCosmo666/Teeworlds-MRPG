@@ -602,9 +602,9 @@ InventoryItem &CPlayer::GetItem(int ItemID)
 
 CSkillPlayer &CPlayer::GetSkill(int SkillID)
 {
-	SkillJob::ms_aSkills[m_ClientID][SkillID].m_SkillID = SkillID;
-	SkillJob::ms_aSkills[m_ClientID][SkillID].SetSkillOwner(this);
-	return SkillJob::ms_aSkills[m_ClientID][SkillID];
+	SkillsJob::ms_aSkills[m_ClientID][SkillID].m_SkillID = SkillID;
+	SkillsJob::ms_aSkills[m_ClientID][SkillID].SetSkillOwner(this);
+	return SkillsJob::ms_aSkills[m_ClientID][SkillID];
 }
 
 int CPlayer::GetEquippedItem(int EquipID, int SkipItemID) const
