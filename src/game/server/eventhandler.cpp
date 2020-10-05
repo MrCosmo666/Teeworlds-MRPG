@@ -43,7 +43,7 @@ void CEventHandler::Clear()
 
 void CEventHandler::Snap(int SnappingClient)
 {
-	if(!GS()->IsClientEqualWorldID(SnappingClient))
+	if(!GS()->IsPlayerEqualWorldID(SnappingClient))
 		return;
 
 	for(int i = 0; i < m_NumEvents; i++)

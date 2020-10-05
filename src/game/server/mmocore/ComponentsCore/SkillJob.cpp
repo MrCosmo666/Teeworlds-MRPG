@@ -266,7 +266,7 @@ bool SkillJob::UseSkill(CPlayer *pPlayer, int SkillID)
 		for(int i = 0; i < MAX_PLAYERS; i++)
 		{
 			CPlayer* pPlayerSearch = GS()->GetPlayer(i, true, true);
-			if(!pPlayerSearch || !GS()->IsClientEqualWorldID(ClientID) || distance(PlayerPosition, pPlayerSearch->GetCharacter()->GetPos()) > 800
+			if(!pPlayerSearch || !GS()->IsPlayerEqualWorldID(ClientID) || distance(PlayerPosition, pPlayerSearch->GetCharacter()->GetPos()) > 800
 				|| (pPlayerSearch->GetCharacter()->IsAllowedPVP(ClientID) && i != ClientID))
 				continue;
 

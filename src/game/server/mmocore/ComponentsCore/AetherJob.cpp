@@ -46,7 +46,7 @@ bool AetherJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID
 			return true;
 
 		const vec2 Position = vec2(ms_aTeleport[TeleportID].m_TeleX, ms_aTeleport[TeleportID].m_TeleY);
-		if(!GS()->IsClientEqualWorldID(ClientID, ms_aTeleport[TeleportID].m_WorldID))
+		if(!GS()->IsPlayerEqualWorldID(ClientID, ms_aTeleport[TeleportID].m_WorldID))
 		{
 			pPlayer->GetTempData().m_TempTeleportX = Position.x;
 			pPlayer->GetTempData().m_TempTeleportY = Position.y;
@@ -140,7 +140,7 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 		if (pPlayer->Acc().m_aAetherLocation.find(tl.first) == pPlayer->Acc().m_aAetherLocation.end())
 			continue;
 
-		const bool LocalTeleport = (GS()->IsClientEqualWorldID(ClientID, tl.second.m_WorldID) &&
+		const bool LocalTeleport = (GS()->IsPlayerEqualWorldID(ClientID, tl.second.m_WorldID) &&
 			distance(pPlayer->GetCharacter()->m_Core.m_Pos, vec2(tl.second.m_TeleX, tl.second.m_TeleY)) < 120);
 		if (LocalTeleport)
 		{

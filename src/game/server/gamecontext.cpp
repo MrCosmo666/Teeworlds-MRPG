@@ -551,7 +551,7 @@ void CGS::ChatWorldID(int WorldID, const char* Suffix, const char* pText, ...)
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pPlayer = GetPlayer(i, true);
-		if(!pPlayer || !IsClientEqualWorldID(i, WorldID))
+		if(!pPlayer || !IsPlayerEqualWorldID(i, WorldID))
 			continue;
 
 		Buffer.append(Suffix);
@@ -690,7 +690,7 @@ void CGS::BroadcastWorldID(int WorldID, int Priority, int LifeSpan, const char *
 	va_start(VarArgs, pText);
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(m_apPlayers[i] && IsClientEqualWorldID(i, WorldID))
+		if(m_apPlayers[i] && IsPlayerEqualWorldID(i, WorldID))
 		{
 			dynamic_string Buffer;
 			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
@@ -708,7 +708,7 @@ void CGS::BroadcastTick(int ClientID)
 	if (ClientID < 0 || ClientID >= MAX_PLAYERS)
 		return;
 
-	if(m_apPlayers[ClientID] && IsClientEqualWorldID(ClientID))
+	if(m_apPlayers[ClientID] && IsPlayerEqualWorldID(ClientID))
 	{
 		if(m_aBroadcastStates[ClientID].m_LifeSpanTick > 0 && m_aBroadcastStates[ClientID].m_TimedPriority > m_aBroadcastStates[ClientID].m_Priority)
 			str_copy(m_aBroadcastStates[ClientID].m_aNextMessage, m_aBroadcastStates[ClientID].m_aTimedMessage, sizeof(m_aBroadcastStates[ClientID].m_aNextMessage));
@@ -1509,7 +1509,7 @@ void CGS::OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld)
 	m_pController->OnPlayerDisconnect(m_apPlayers[ClientID]);
 
 	// update clients on drop
-	if (Server()->ClientIngame(ClientID) && IsClientEqualWorldID(ClientID))
+	if (Server()->ClientIngame(ClientID) && IsPlayerEqualWorldID(ClientID))
 	{
 		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "leave game MRPG");
 
@@ -2087,7 +2087,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		const float LuckyDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
 		for(const auto& mobs : BotJob::ms_aMobBot)
 		{
-			if (!IsClientEqualWorldID(ClientID, mobs.second.m_WorldID))
+			if (!IsPlayerEqualWorldID(ClientID, mobs.second.m_WorldID))
 				continue;
 
 			const int HideID = (NUM_TAB_MENU+12500+mobs.first);
@@ -2445,7 +2445,7 @@ void CGS::UpdateZoneDungeon()
 	}
 }
 
-bool CGS::IsClientEqualWorldID(int ClientID, int WorldID) const
+bool CGS::IsPlayerEqualWorldID(int ClientID, int WorldID) const
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || !m_apPlayers[ClientID])
 		return false;

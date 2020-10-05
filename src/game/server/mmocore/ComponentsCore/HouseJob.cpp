@@ -489,7 +489,7 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 	GS()->AVM(ClientID, "HOUSEDOOR", HouseID, NOPE, "Change state to [\"{STR}\"]", StateDoor ? "OPEN" : "CLOSED");
 	GS()->AVM(ClientID, "HSPAWN", 1, NOPE, "Teleport to your house");
 	GS()->AVM(ClientID, "HSELL", HouseID, NOPE, "Sell your house (in reason 777)");
-	if(GS()->IsClientEqualWorldID(ClientID, ms_aHouse[HouseID].m_WorldID))
+	if(GS()->IsPlayerEqualWorldID(ClientID, ms_aHouse[HouseID].m_WorldID))
 	{
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_HOUSE_DECORATION, NOPE, "Settings Decorations");
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_HOUSE_PLANTS, NOPE, "Settings Plants");
@@ -516,7 +516,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		int HouseID = PlayerHouseID(pPlayer);
 		int HouseWorldID = GetWorldID(HouseID);
 		vec2 Position = GetPositionHouse(HouseID);
-		if(!GS()->IsClientEqualWorldID(ClientID, HouseWorldID))
+		if(!GS()->IsPlayerEqualWorldID(ClientID, HouseWorldID))
 		{
 			pPlayer->GetTempData().m_TempTeleportX = Position.x;
 			pPlayer->GetTempData().m_TempTeleportY = Position.y;
