@@ -39,7 +39,7 @@ void CGameControllerDungeon::KillAllPlayers(bool StartDungeonMusic)
 {
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(GS()->m_apPlayers[i] && Server()->GetWorldID(i) == m_WorldID)
+		if(GS()->m_apPlayers[i] && Server()->GetClientWorldID(i) == m_WorldID)
 		{
 			if(StartDungeonMusic)
 				GS()->SendWorldMusic(i);
@@ -104,7 +104,7 @@ void CGameControllerDungeon::ChangeState(int State)
 		dynamic_string Buffer;
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
-			if (!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID)
+			if (!GS()->m_apPlayers[i] || Server()->GetClientWorldID(i) != m_WorldID)
 				continue;
 
 			Buffer.append(", ");
@@ -192,7 +192,7 @@ void CGameControllerDungeon::StateTick()
 	{
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
-			if (!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID)
+			if (!GS()->m_apPlayers[i] || Server()->GetClientWorldID(i) != m_WorldID)
 				continue;
 
 			GS()->m_apPlayers[i]->GetTempData().m_TempTimeDungeon++;
@@ -282,7 +282,7 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 		{
 			for(int i = 0; i < MAX_PLAYERS; i++)
 			{
-				if(!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID)
+				if(!GS()->m_apPlayers[i] || Server()->GetClientWorldID(i) != m_WorldID)
 					continue;
 				GS()->UpdateVotes(i, MenuList::MENU_DUNGEONS);
 			}
@@ -327,7 +327,7 @@ int CGameControllerDungeon::PlayersReady() const
 	int readyPlayers = 0;
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(!GS()->m_apPlayers[i] || Server()->GetWorldID(i) != m_WorldID || !GS()->m_apPlayers[i]->GetTempData().m_TempDungeonReady)
+		if(!GS()->m_apPlayers[i] || Server()->GetClientWorldID(i) != m_WorldID || !GS()->m_apPlayers[i]->GetTempData().m_TempDungeonReady)
 			continue;
 		readyPlayers++;
 	}
@@ -339,7 +339,7 @@ int CGameControllerDungeon::PlayersNum() const
 	int playIt = 0;
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(Server()->GetWorldID(i) == m_WorldID)
+		if(Server()->GetClientWorldID(i) == m_WorldID)
 			playIt++;
 	}
 	return playIt;
@@ -379,7 +379,7 @@ void CGameControllerDungeon::SelectTankPlayer()
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pPlayer = GS()->m_apPlayers[i];
-		if(!pPlayer || Server()->GetWorldID(i) != m_WorldID)
+		if(!pPlayer || Server()->GetClientWorldID(i) != m_WorldID)
 			continue;
 
 		// small random set new tank where Votes equal

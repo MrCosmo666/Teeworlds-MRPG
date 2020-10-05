@@ -429,7 +429,7 @@ void CServer::BackInformationFakeClient(int FakeClientID)
 		GameServer(i)->UpdateClientInformation(FakeClientID);
 }
 
-int CServer::GetWorldID(int ClientID)
+int CServer::GetClientWorldID(int ClientID)
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
 		return -1;

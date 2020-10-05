@@ -510,7 +510,7 @@ CPlayer *CCharacterBotAI::SearchPlayer(int Distance)
 			|| !GS()->m_apPlayers[i]->GetCharacter() 
 			|| distance(m_Core.m_Pos, GS()->m_apPlayers[i]->GetCharacter()->m_Core.m_Pos) > Distance
 			|| GS()->Collision()->IntersectLineWithInvisible(GS()->m_apPlayers[i]->GetCharacter()->m_Core.m_Pos, m_Pos, 0, 0)
-			|| Server()->GetWorldID(i) != GS()->GetWorldID())
+			|| Server()->GetClientWorldID(i) != GS()->GetWorldID())
 			continue;
 		return GS()->m_apPlayers[i];
 	}
@@ -532,7 +532,7 @@ CPlayer *CCharacterBotAI::SearchTenacityPlayer(float Distance)
 	// throw off aggression if the player is far away
 	CPlayer* pPlayer = GS()->GetPlayer(m_BotTargetID, true, true);
 	if (ActiveTargetID && (!pPlayer 
-		|| (pPlayer && (distance(pPlayer->GetCharacter()->GetPos(), m_Pos) > 800.0f || Server()->GetWorldID(m_BotTargetID) != GS()->GetWorldID()))))
+		|| (pPlayer && (distance(pPlayer->GetCharacter()->GetPos(), m_Pos) > 800.0f || Server()->GetClientWorldID(m_BotTargetID) != GS()->GetWorldID()))))
 		ClearTarget();
 
 	// non-hostile mobs

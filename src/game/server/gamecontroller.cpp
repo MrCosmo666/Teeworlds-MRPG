@@ -194,7 +194,7 @@ void IGameController::UpdateGameInfo(int ClientID)
 			if((!GS()->IsMmoClient(i) && Server()->GetClientProtocolVersion(i) < MIN_RACE_CLIENTVERSION))
 				GameInfoMsg.m_GameFlags &= ~GAMEFLAG_RACE;
 
-			Server()->SendPackMsg(&GameInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, i, Server()->GetWorldID(ClientID));
+			Server()->SendPackMsg(&GameInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, i, Server()->GetClientWorldID(ClientID));
 		}
 	}
 	else
@@ -202,7 +202,7 @@ void IGameController::UpdateGameInfo(int ClientID)
 		if((!GS()->IsMmoClient(ClientID) && Server()->GetClientProtocolVersion(ClientID) < MIN_RACE_CLIENTVERSION))
 			GameInfoMsg.m_GameFlags &= ~GAMEFLAG_RACE;
 
-		Server()->SendPackMsg(&GameInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID, Server()->GetWorldID(ClientID));
+		Server()->SendPackMsg(&GameInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID, Server()->GetClientWorldID(ClientID));
 	}
 }
 

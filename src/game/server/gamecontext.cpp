@@ -1609,7 +1609,7 @@ void CGS::ConParseSkin(IConsole::IResult *pResult, void *pUserData)
 {
 	int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS-1);
 	IServer* pServer = (IServer*)pUserData;
-	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetWorldID(ClientID));
+	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
 	CPlayer *pPlayer = pSelf->GetPlayer(ClientID, true);
 	if(pPlayer)
@@ -1639,7 +1639,7 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 	const int Mail = pResult->GetInteger(4);
 
 	IServer* pServer = (IServer*)pUserData;
-	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetWorldID(ClientID));
+	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
 	CPlayer *pPlayer = pSelf->GetPlayer(ClientID, true);
 	if(pPlayer)
@@ -1665,7 +1665,7 @@ void CGS::ConAddCharacter(IConsole::IResult *pResult, void *pUserData)
 {
 	const int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS - 1);
 	IServer* pServer = (IServer*)pUserData;
-	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetWorldID(ClientID));
+	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
 	// we check if there is a player
 	if(ClientID < 0 || ClientID >= MAX_PLAYERS || !pSelf->m_apPlayers[ClientID])

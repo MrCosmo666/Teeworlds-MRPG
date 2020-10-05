@@ -69,7 +69,7 @@ public:
 
 	virtual void ChangeWorld(int ClientID, int WorldID) = 0;
 	virtual void QuestBotUpdateOnWorld(int WorldID, int QuestID, int Step) = 0;
-	virtual int GetWorldID(int ClientID) = 0;
+	virtual int GetClientWorldID(int ClientID) = 0;
 	virtual const char* GetWorldName(int WorldID) = 0;
 
 	virtual void SetClientProtocolVersion(int ClientID, int Version) = 0;

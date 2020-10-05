@@ -807,5 +807,5 @@ void CPlayer::SendClientInfo(int TargetID)
 
 int CPlayer::GetPlayerWorldID() const
 {
-	return Server()->GetWorldID(m_ClientID);
+	return Server()->GetClientWorldID(m_ClientID);
 }
