@@ -5,6 +5,7 @@
 
 #include "mmocore/ComponentsCore/AccountMainJob.h"
 #include "mmocore/ComponentsCore/InventoryJob/ItemInventory.h"
+#include "mmocore/ComponentsCore/SkillsJob/SkillPlayer.h"
 #include "mmocore/ComponentsCore/BotJob.h"
 
 #include "entities/character.h"
@@ -158,6 +159,7 @@ public:
 		FUNCTIONS PLAYER ITEMS 
 	######################################################################### */
 	InventoryItem& GetItem(int ItemID);
+	CSkillPlayer &GetSkill(int SkillID);
 	AccountMainJob::StructTempPlayerData& GetTempData() { return AccountMainJob::ms_aPlayerTempData[m_ClientID]; }
 	AccountMainJob::StructData& Acc() { return AccountMainJob::ms_aData[m_ClientID]; }
 

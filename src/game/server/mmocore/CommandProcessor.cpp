@@ -334,7 +334,7 @@ void CCommandProcessor::ConChatUseSkill(IConsole::IResult* pResult, void* pUser)
 	}
 
 	int SkillID = pResult->GetInteger(0);
-	pGS->Mmo()->Skills()->UseSkill(pPlayer, SkillID);
+	pPlayer->GetSkill(SkillID).Use();
 }
 
 void CCommandProcessor::ConChatCmdList(IConsole::IResult* pResult, void* pUser)

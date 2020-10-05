@@ -17,7 +17,7 @@
 #include "ComponentsCore/ShopJob.h"
 #include "ComponentsCore/StorageJob.h"
 
-#include "ComponentsCore/SkillJob.h"
+#include "ComponentsCore/SkillsJob/SkillJob.h"
 #include "ComponentsCore/WorldSwapJob.h"
 #include "ComponentsCore/CraftJob.h"
 #include "ComponentsCore/DungeonJob.h"

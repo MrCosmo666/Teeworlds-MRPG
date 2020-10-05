@@ -1,7 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <teeother/components/localization.h>
-
 #include <game/server/gamecontext.h>
 #include "InventoryJob.h"
 
@@ -51,7 +49,7 @@ void InventoryJob::OnInit()
 void InventoryJob::OnInitAccount(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	std::shared_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Settings, Enchant, Durability", "tw_accounts_items", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_items", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID));
 	while(RES->next())
 	{
 		int ItemID = (int)RES->getInt("ItemID");
