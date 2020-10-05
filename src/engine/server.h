@@ -23,6 +23,8 @@ protected:
 	float WorldTime;
 
 public:
+	virtual class IGameServer* GameServer(int id = 0) = 0;
+
 	class CLocalization* m_pLocalization;
 	inline class CLocalization* Localization() { return m_pLocalization; }
 

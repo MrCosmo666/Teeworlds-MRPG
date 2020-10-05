@@ -1074,11 +1074,11 @@ void CGS::OnConsoleInit()
 	m_pServer = Kernel()->RequestInterface<IServer>();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 
-	Console()->Register("parseskin", "i[cid]", CFGFLAG_SERVER, ConParseSkin, this, "Parse skin on console. Easy for devlop bots.");
-	Console()->Register("giveitem", "i[cid]i[itemid]i[count]i[ench]i[mail]", CFGFLAG_SERVER, ConGiveItem, this, "Give item <clientid> <itemid> <count> <enchant> <mail 1=yes 0=no>");
-	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, this, "Say in chat");
-	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, this, "(Warning) Add new bot on database or update if finding <clientid> <bot name>");
-	Console()->Register("convert_passwords", "", CFGFLAG_SERVER, ConConvertPasswords, this, "Convert existing plaintext passwords into hashed passwords");
+	Console()->Register("parseskin", "i[cid]", CFGFLAG_SERVER, ConParseSkin, m_pServer, "Parse skin on console. Easy for devlop bots.");
+	Console()->Register("giveitem", "i[cid]i[itemid]i[count]i[ench]i[mail]", CFGFLAG_SERVER, ConGiveItem, m_pServer, "Give item <clientid> <itemid> <count> <enchant> <mail 1=yes 0=no>");
+	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, m_pServer, "Say in chat");
+	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, m_pServer, "(Warning) Add new bot on database or update if finding <clientid> <bot name>");
+	Console()->Register("convert_passwords", "", CFGFLAG_SERVER, ConConvertPasswords, m_pServer, "Convert existing plaintext passwords into hashed passwords");
 }
 
 void CGS::OnShutdown()
@@ -1607,8 +1607,10 @@ int CGS::GetRank(int AuthID)
 ######################################################################### */
 void CGS::ConParseSkin(IConsole::IResult *pResult, void *pUserData)
 {
-	CGS *pSelf = (CGS *)pUserData;
 	int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS-1);
+	IServer* pServer = (IServer*)pUserData;
+	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetWorldID(ClientID));
+
 	CPlayer *pPlayer = pSelf->GetPlayer(ClientID, true);
 	if(pPlayer)
 	{
@@ -1636,7 +1638,9 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 	const int Enchant = pResult->GetInteger(3);
 	const int Mail = pResult->GetInteger(4);
 
-	CGS *pSelf = (CGS *)pUserData;	
+	IServer* pServer = (IServer*)pUserData;
+	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetWorldID(ClientID));
+
 	CPlayer *pPlayer = pSelf->GetPlayer(ClientID, true);
 	if(pPlayer)
 	{
@@ -1658,10 +1662,11 @@ void CGS::ConSay(IConsole::IResult *pResult, void *pUserData)
 // add a new bot player to the database
 void CGS::ConAddCharacter(IConsole::IResult *pResult, void *pUserData)
 {
-	CGS *pSelf = (CGS *)pUserData;
+	const int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS - 1);
+	IServer* pServer = (IServer*)pUserData;
+	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetWorldID(ClientID));
 
 	// we check if there is a player
-	int ClientID = pResult->GetInteger(0);
 	if(ClientID < 0 || ClientID >= MAX_PLAYERS || !pSelf->m_apPlayers[ClientID])
 		return;
 	
