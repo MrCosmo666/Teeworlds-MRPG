@@ -3,9 +3,6 @@
 #ifndef GAME_SERVER_SQLITEM_H
 #define GAME_SERVER_SQLITEM_H
 
-#include "ItemInformation.h"
-#include "ItemInventory.h"
-
 #include <game/server/mmocore/MmoComponent.h>
 
 class InventoryJob : public MmoComponent

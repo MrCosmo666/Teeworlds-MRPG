@@ -9,6 +9,7 @@ class CInventoryItem
 {
 	CGS* m_pGS;
 	CPlayer* m_pPlayer;
+	CGS* GS() { return m_pGS; }
 
 public:
 	int m_ItemID;
@@ -26,7 +27,6 @@ public:
 		m_Durability = 0;
 	};
 
-	CGS* GS() { return m_pGS; }
 	ItemInformation& Info() const;
 	int GetID() const { return m_ItemID; }
 

@@ -17,7 +17,7 @@
 #include "ComponentsCore/ShopJob.h"
 #include "ComponentsCore/StorageJob.h"
 
-#include "ComponentsCore/SkillJob.h"
+#include "ComponentsCore/SkillsJob/SkillsJob.h"
 #include "ComponentsCore/WorldSwapJob.h"
 #include "ComponentsCore/CraftJob.h"
 #include "ComponentsCore/DungeonJob.h"
@@ -61,7 +61,7 @@ class MmoController
 	class DungeonJob* m_pDungeonJob;
 	class HouseJob* m_pHouseJob;
 	class MailBoxJob* m_pMailBoxJob;
-	class SkillJob* m_pSkillJob;
+	class SkillsJob* m_pSkillJob;
 	class WorldSwapJob* m_pWorldSwapJob;
 
 public:
@@ -85,7 +85,7 @@ public:
 	HouseJob* House() const { return m_pHouseJob; }
 	MailBoxJob* Inbox() const { return m_pMailBoxJob; }
 	GuildJob* Member() const { return m_pGuildJob; }
-	SkillJob* Skills() const { return m_pSkillJob; }
+	SkillsJob* Skills() const { return m_pSkillJob; }
 	WorldSwapJob *WorldSwap() const { return m_pWorldSwapJob; }
 
 	// global systems

@@ -24,7 +24,7 @@ MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 	m_Components.add(m_pWorldSwapJob = new WorldSwapJob());
 	m_Components.add(m_pHouseJob = new HouseJob());
 	m_Components.add(m_pGuildJob = new GuildJob());
-	m_Components.add(m_pSkillJob = new SkillJob());
+	m_Components.add(m_pSkillJob = new SkillsJob());
 	m_Components.add(m_pAccMain = new AccountMainJob());
 	m_Components.add(m_pAccMiner = new AccountMinerJob());
 	m_Components.add(m_pAccPlant = new AccountPlantJob());

@@ -600,6 +600,13 @@ InventoryItem &CPlayer::GetItem(int ItemID)
 	return InventoryJob::ms_aItems[m_ClientID][ItemID];
 }
 
+CSkill &CPlayer::GetSkill(int SkillID)
+{
+	SkillsJob::ms_aSkills[m_ClientID][SkillID].m_SkillID = SkillID;
+	SkillsJob::ms_aSkills[m_ClientID][SkillID].SetSkillOwner(this);
+	return SkillsJob::ms_aSkills[m_ClientID][SkillID];
+}
+
 int CPlayer::GetEquippedItem(int EquipID, int SkipItemID) const
 {
 	for(const auto& it : InventoryJob::ms_aItems[m_ClientID])
