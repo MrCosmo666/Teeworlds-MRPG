@@ -489,7 +489,7 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 	GS()->AVM(ClientID, "HOUSEDOOR", HouseID, NOPE, "Change state to [\"{STR}\"]", StateDoor ? "OPEN" : "CLOSED");
 	GS()->AVM(ClientID, "HSPAWN", 1, NOPE, "Teleport to your house");
 	GS()->AVM(ClientID, "HSELL", HouseID, NOPE, "Sell your house (in reason 777)");
-	if(ms_aHouse[HouseID].m_WorldID == GS()->Server()->GetClientWorldID(ClientID))
+	if(GS()->IsClientEqualWorldID(ClientID, ms_aHouse[HouseID].m_WorldID))
 	{
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_HOUSE_DECORATION, NOPE, "Settings Decorations");
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_HOUSE_PLANTS, NOPE, "Settings Plants");

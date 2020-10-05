@@ -2447,12 +2447,12 @@ void CGS::UpdateZoneDungeon()
 
 bool CGS::IsClientEqualWorldID(int ClientID, int WorldID) const
 {
-	if(!m_apPlayers[ClientID])
+	if(ClientID < 0 || ClientID >= MAX_CLIENTS || !m_apPlayers[ClientID])
 		return false;
 
 	if (WorldID <= -1)
-		return (bool)(m_apPlayers[ClientID]->GetPlayerWorldID() == m_WorldID);
-	return (bool)(m_apPlayers[ClientID]->GetPlayerWorldID() == WorldID);
+		return m_apPlayers[ClientID]->GetPlayerWorldID() == m_WorldID;
+	return m_apPlayers[ClientID]->GetPlayerWorldID() == WorldID;
 }
 
 const char* CGS::AtributeName(int BonusID) const
