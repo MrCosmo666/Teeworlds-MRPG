@@ -107,7 +107,7 @@ class CServer : public IServer
 	class IStorage *m_pStorage;
 
 public:
-	class IGameServer *GameServer(int id = 0) { return m_pGameServer[id]; }
+	virtual class IGameServer *GameServer(int id = 0) { return m_pGameServer[id]; }
 	class IConsole *Console() { return m_pConsole; }
 	class IStorage *Storage() { return m_pStorage; }
 	class DiscordJob *m_pDiscord;
@@ -235,7 +235,7 @@ public:
 
 	virtual void ChangeWorld(int ClientID, int WorldID);
 	virtual void QuestBotUpdateOnWorld(int WorldID, int QuestID, int Step);
-	virtual int GetWorldID(int ClientID);
+	virtual int GetClientWorldID(int ClientID);
 	virtual void BackInformationFakeClient(int FakeClientID);
 
 	virtual void SetClientProtocolVersion(int ClientID, int Version);

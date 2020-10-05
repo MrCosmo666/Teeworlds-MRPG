@@ -551,7 +551,7 @@ void CGS::ChatWorldID(int WorldID, const char* Suffix, const char* pText, ...)
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pPlayer = GetPlayer(i, true);
-		if(!pPlayer || !IsClientEqualWorldID(i, WorldID))
+		if(!pPlayer || !IsPlayerEqualWorldID(i, WorldID))
 			continue;
 
 		Buffer.append(Suffix);
@@ -690,7 +690,7 @@ void CGS::BroadcastWorldID(int WorldID, int Priority, int LifeSpan, const char *
 	va_start(VarArgs, pText);
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(m_apPlayers[i] && IsClientEqualWorldID(i, WorldID))
+		if(m_apPlayers[i] && IsPlayerEqualWorldID(i, WorldID))
 		{
 			dynamic_string Buffer;
 			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
@@ -708,7 +708,7 @@ void CGS::BroadcastTick(int ClientID)
 	if (ClientID < 0 || ClientID >= MAX_PLAYERS)
 		return;
 
-	if(m_apPlayers[ClientID] && IsClientEqualWorldID(ClientID))
+	if(m_apPlayers[ClientID] && IsPlayerEqualWorldID(ClientID))
 	{
 		if(m_aBroadcastStates[ClientID].m_LifeSpanTick > 0 && m_aBroadcastStates[ClientID].m_TimedPriority > m_aBroadcastStates[ClientID].m_Priority)
 			str_copy(m_aBroadcastStates[ClientID].m_aNextMessage, m_aBroadcastStates[ClientID].m_aTimedMessage, sizeof(m_aBroadcastStates[ClientID].m_aNextMessage));
@@ -1074,11 +1074,11 @@ void CGS::OnConsoleInit()
 	m_pServer = Kernel()->RequestInterface<IServer>();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 
-	Console()->Register("parseskin", "i[cid]", CFGFLAG_SERVER, ConParseSkin, this, "Parse skin on console. Easy for devlop bots.");
-	Console()->Register("giveitem", "i[cid]i[itemid]i[count]i[ench]i[mail]", CFGFLAG_SERVER, ConGiveItem, this, "Give item <clientid> <itemid> <count> <enchant> <mail 1=yes 0=no>");
-	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, this, "Say in chat");
-	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, this, "(Warning) Add new bot on database or update if finding <clientid> <bot name>");
-	Console()->Register("convert_passwords", "", CFGFLAG_SERVER, ConConvertPasswords, this, "Convert existing plaintext passwords into hashed passwords");
+	Console()->Register("parseskin", "i[cid]", CFGFLAG_SERVER, ConParseSkin, m_pServer, "Parse skin on console. Easy for devlop bots.");
+	Console()->Register("giveitem", "i[cid]i[itemid]i[count]i[ench]i[mail]", CFGFLAG_SERVER, ConGiveItem, m_pServer, "Give item <clientid> <itemid> <count> <enchant> <mail 1=yes 0=no>");
+	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, m_pServer, "Say in chat");
+	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, m_pServer, "(Warning) Add new bot on database or update if finding <clientid> <bot name>");
+	Console()->Register("convert_passwords", "", CFGFLAG_SERVER, ConConvertPasswords, m_pServer, "Convert existing plaintext passwords into hashed passwords");
 }
 
 void CGS::OnShutdown()
@@ -1509,7 +1509,7 @@ void CGS::OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld)
 	m_pController->OnPlayerDisconnect(m_apPlayers[ClientID]);
 
 	// update clients on drop
-	if (Server()->ClientIngame(ClientID) && IsClientEqualWorldID(ClientID))
+	if (Server()->ClientIngame(ClientID) && IsPlayerEqualWorldID(ClientID))
 	{
 		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "leave game MRPG");
 
@@ -1607,8 +1607,10 @@ int CGS::GetRank(int AuthID)
 ######################################################################### */
 void CGS::ConParseSkin(IConsole::IResult *pResult, void *pUserData)
 {
-	CGS *pSelf = (CGS *)pUserData;
 	int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS-1);
+	IServer* pServer = (IServer*)pUserData;
+	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
+
 	CPlayer *pPlayer = pSelf->GetPlayer(ClientID, true);
 	if(pPlayer)
 	{
@@ -1636,7 +1638,9 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 	const int Enchant = pResult->GetInteger(3);
 	const int Mail = pResult->GetInteger(4);
 
-	CGS *pSelf = (CGS *)pUserData;	
+	IServer* pServer = (IServer*)pUserData;
+	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
+
 	CPlayer *pPlayer = pSelf->GetPlayer(ClientID, true);
 	if(pPlayer)
 	{
@@ -1651,17 +1655,19 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 
 void CGS::ConSay(IConsole::IResult *pResult, void *pUserData)
 {
-	CGS *pSelf = (CGS *)pUserData;
+	IServer* pServer = (IServer*)pUserData;
+	CGS* pSelf = (CGS*)pServer->GameServer(LOCAL_WORLD);
 	pSelf->SendChat(-1, CHAT_ALL, -1, pResult->GetString(0));
 }
 
 // add a new bot player to the database
 void CGS::ConAddCharacter(IConsole::IResult *pResult, void *pUserData)
 {
-	CGS *pSelf = (CGS *)pUserData;
+	const int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS - 1);
+	IServer* pServer = (IServer*)pUserData;
+	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
 	// we check if there is a player
-	int ClientID = pResult->GetInteger(0);
 	if(ClientID < 0 || ClientID >= MAX_PLAYERS || !pSelf->m_apPlayers[ClientID])
 		return;
 	
@@ -1671,7 +1677,8 @@ void CGS::ConAddCharacter(IConsole::IResult *pResult, void *pUserData)
 
 void CGS::ConConvertPasswords(IConsole::IResult* pResult, void* pUserData)
 {
-	CGS* pSelf = (CGS*)pUserData;
+	IServer* pServer = (IServer*)pUserData;
+	CGS* pSelf = (CGS*)pServer->GameServer(LOCAL_WORLD);
 
 	std::shared_ptr<ResultSet> RES(SJK.SD("ID, Password", "tw_accounts", "WHERE PasswordSalt IS NULL OR PasswordSalt = ''"));
 	while(RES->next())
@@ -2080,7 +2087,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		const float LuckyDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
 		for(const auto& mobs : BotJob::ms_aMobBot)
 		{
-			if (!IsClientEqualWorldID(ClientID, mobs.second.m_WorldID))
+			if (!IsPlayerEqualWorldID(ClientID, mobs.second.m_WorldID))
 				continue;
 
 			const int HideID = (NUM_TAB_MENU+12500+mobs.first);
@@ -2438,14 +2445,14 @@ void CGS::UpdateZoneDungeon()
 	}
 }
 
-bool CGS::IsClientEqualWorldID(int ClientID, int WorldID) const
+bool CGS::IsPlayerEqualWorldID(int ClientID, int WorldID) const
 {
-	if(!m_apPlayers[ClientID])
+	if(ClientID < 0 || ClientID >= MAX_CLIENTS || !m_apPlayers[ClientID])
 		return false;
 
 	if (WorldID <= -1)
-		return (bool)(m_apPlayers[ClientID]->GetPlayerWorldID() == m_WorldID);
-	return (bool)(m_apPlayers[ClientID]->GetPlayerWorldID() == WorldID);
+		return m_apPlayers[ClientID]->GetPlayerWorldID() == m_WorldID;
+	return m_apPlayers[ClientID]->GetPlayerWorldID() == WorldID;
 }
 
 const char* CGS::AtributeName(int BonusID) const

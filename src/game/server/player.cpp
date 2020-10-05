@@ -109,7 +109,7 @@ void CPlayer::PotionsTick()
 void CPlayer::PostTick()
 {
 	// update latency value
-	if (Server()->ClientIngame(m_ClientID) && GS()->IsClientEqualWorldID(m_ClientID) && IsAuthed())
+	if (Server()->ClientIngame(m_ClientID) && GS()->IsPlayerEqualWorldID(m_ClientID) && IsAuthed())
 		GetTempData().m_TempPing = (short)m_Latency.m_Min;
 }
 
@@ -223,7 +223,7 @@ void CPlayer::TryRespawn()
 	else if(GetTempData().m_TempSafeSpawn)
 	{
 		const int SafezoneWorldID = GS()->GetRespawnWorld();
-		if(SafezoneWorldID >= 0 && !GS()->IsClientEqualWorldID(m_ClientID, SafezoneWorldID))
+		if(SafezoneWorldID >= 0 && !GS()->IsPlayerEqualWorldID(m_ClientID, SafezoneWorldID))
 		{
 			ChangeWorld(SafezoneWorldID);
 			return;
@@ -814,5 +814,5 @@ void CPlayer::SendClientInfo(int TargetID)
 
 int CPlayer::GetPlayerWorldID() const
 {
-	return Server()->GetWorldID(m_ClientID);
+	return Server()->GetClientWorldID(m_ClientID);
 }

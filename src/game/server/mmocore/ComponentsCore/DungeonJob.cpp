@@ -150,7 +150,7 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 
 	if (PPSTR(CMD, "DUNGEONJOIN") == 0)
 	{
-		if(GS()->IsClientEqualWorldID(ClientID, Dungeon[VoteID].m_WorldID))
+		if(GS()->IsPlayerEqualWorldID(ClientID, Dungeon[VoteID].m_WorldID))
 		{
 			GS()->Chat(ClientID, "You are already in this dungeon!");
 			GS()->UpdateVotes(ClientID, MenuList::MENU_DUNGEONS);

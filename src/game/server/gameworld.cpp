@@ -102,7 +102,7 @@ void CGameWorld::RemoveEntity(CEntity *pEnt)
 //
 void CGameWorld::Snap(int SnappingClient)
 {
-	if(!GS()->IsClientEqualWorldID(SnappingClient))
+	if(!GS()->IsPlayerEqualWorldID(SnappingClient))
 		return;
 		
 	for(int i = 0; i < NUM_ENTTYPES; i++)

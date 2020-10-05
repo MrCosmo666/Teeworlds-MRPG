@@ -146,7 +146,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 
 void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 {
-	if(!pPlayer || !pPlayer->IsAuthed() || !GS()->IsClientEqualWorldID(pPlayer->GetCID()))
+	if(!pPlayer || !pPlayer->IsAuthed() || !GS()->IsPlayerEqualWorldID(pPlayer->GetCID()))
 		return;
 
 	const int ClientID = pPlayer->GetCID();
