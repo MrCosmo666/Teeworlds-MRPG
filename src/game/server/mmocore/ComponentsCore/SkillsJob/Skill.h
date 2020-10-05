@@ -5,14 +5,14 @@
 
 #include "SkillInformation.h"
 
-class CSkillPlayer
+class CSkill
 {
 	CGS* m_pGS;
 	CPlayer* m_pPlayer;
 	CGS* GS() { return m_pGS; }
 
 public:
-	CSkillPlayer() : m_pPlayer(nullptr)
+	CSkill() : m_pPlayer(nullptr)
 	{
 		m_SkillID = 0;
 		m_Level = 0;

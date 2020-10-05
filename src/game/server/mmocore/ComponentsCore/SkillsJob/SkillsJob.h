@@ -3,18 +3,15 @@
 #ifndef GAME_SERVER_SKILLJOB_H
 #define GAME_SERVER_SKILLJOB_H
 
-#include "SkillPlayer.h"
-#include "SkillInformation.h"
-
 #include <game/server/mmocore/MmoComponent.h>
 
 class SkillsJob : public MmoComponent
 {
 public:
 	static std::map < int, CSkillInformation > ms_aSkillsData;
-	static std::map < int, std::map < int, CSkillPlayer > > ms_aSkills;
+	static std::map < int, std::map < int, CSkill > > ms_aSkills;
 
-	void OnInit() override;
+	virtual void OnInit();
 	virtual void OnInitAccount(CPlayer *pPlayer);
 	virtual void OnResetClient(int ClientID);
 	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);

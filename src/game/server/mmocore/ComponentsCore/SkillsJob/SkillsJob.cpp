@@ -1,12 +1,13 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <game/server/gamecontext.h>
+
 #include "SkillsJob.h"
 
 using namespace sqlstr;
 
 std::map < int , CSkillInformation > SkillsJob::ms_aSkillsData;
-std::map < int , std::map < int , CSkillPlayer > > SkillsJob::ms_aSkills;
+std::map < int , std::map < int , CSkill > > SkillsJob::ms_aSkills;
 
 void SkillsJob::OnInit()
 { 
@@ -131,7 +132,7 @@ void SkillsJob::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
 
 void SkillsJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 {
-	CSkillPlayer& pSkill = pPlayer->GetSkill(SkillID);
+	CSkill& pSkill = pPlayer->GetSkill(SkillID);
 	const int ClientID = pPlayer->GetCID();
 	const bool Passive = pSkill.Info().m_Passive;
 	const bool IsMaxLevel = pSkill.m_Level >= pSkill.Info().m_MaxLevel;
@@ -173,7 +174,7 @@ void SkillsJob::ParseEmoticionSkill(CPlayer *pPlayer, int EmoticionID)
 	const int ClientID = pPlayer->GetCID();
 	for (auto& skillplayer : ms_aSkills[ClientID])
 	{
-		CSkillPlayer& pSkill = pPlayer->GetSkill(skillplayer.first);
+		CSkill& pSkill = pPlayer->GetSkill(skillplayer.first);
 		if (pSkill.m_SelectedEmoticion == EmoticionID)
 			pSkill.Use();
 	}

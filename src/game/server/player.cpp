@@ -600,7 +600,7 @@ InventoryItem &CPlayer::GetItem(int ItemID)
 	return InventoryJob::ms_aItems[m_ClientID][ItemID];
 }
 
-CSkillPlayer &CPlayer::GetSkill(int SkillID)
+CSkill &CPlayer::GetSkill(int SkillID)
 {
 	SkillsJob::ms_aSkills[m_ClientID][SkillID].m_SkillID = SkillID;
 	SkillsJob::ms_aSkills[m_ClientID][SkillID].SetSkillOwner(this);
