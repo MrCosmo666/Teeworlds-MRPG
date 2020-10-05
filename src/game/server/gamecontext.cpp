@@ -1655,7 +1655,8 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 
 void CGS::ConSay(IConsole::IResult *pResult, void *pUserData)
 {
-	CGS *pSelf = (CGS *)pUserData;
+	IServer* pServer = (IServer*)pUserData;
+	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetWorldID(LOCAL_WORLD));
 	pSelf->SendChat(-1, CHAT_ALL, -1, pResult->GetString(0));
 }
 
@@ -1676,7 +1677,8 @@ void CGS::ConAddCharacter(IConsole::IResult *pResult, void *pUserData)
 
 void CGS::ConConvertPasswords(IConsole::IResult* pResult, void* pUserData)
 {
-	CGS* pSelf = (CGS*)pUserData;
+	IServer* pServer = (IServer*)pUserData;
+	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetWorldID(LOCAL_WORLD));
 
 	std::shared_ptr<ResultSet> RES(SJK.SD("ID, Password", "tw_accounts", "WHERE PasswordSalt IS NULL OR PasswordSalt = ''"));
 	while(RES->next())
