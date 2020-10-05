@@ -18,7 +18,6 @@ public:
 	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 
-	int SkillsSize() const { return ms_aSkillsData.size(); };
 	void ParseEmoticionSkill(CPlayer* pPlayer, int EmoticionID);
 
 private:

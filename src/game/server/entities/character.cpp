@@ -231,7 +231,7 @@ void CCharacter::FireWeapon()
 	DoWeaponSwitch();
 
 	bool FullAuto = false;
-	if(m_pPlayer->GetSkill(SkillMasterWeapon).m_Level)
+	if(m_pPlayer->GetSkill(SkillMasterWeapon).IsLearned())
 		FullAuto = true;
 
 	bool WillFire = false;
