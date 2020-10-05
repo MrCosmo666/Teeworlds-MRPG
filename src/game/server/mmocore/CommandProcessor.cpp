@@ -29,7 +29,7 @@ CCommandProcessor::CCommandProcessor(CGS *pGS)
 	AddCommand("rules", "", ConChatRules, pServer, "");
 
 #ifdef CONF_DISCORD
-	AddCommand("discord_connect", "?s[DID]", ConChatDiscordConnect, pServer(), "");
+	AddCommand("discord_connect", "?s[DID]", ConChatDiscordConnect, pServer, "");
 #endif
 }
 
