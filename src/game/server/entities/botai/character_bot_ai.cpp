@@ -156,13 +156,14 @@ void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force)
 	const float ActiveLuckyDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
 	for(int i = 0; i < 5; i++)
 	{
-		const int DropItem = BotJob::ms_aMobBot[SubID].m_aDropItem[i];
-		const int CountItem = BotJob::ms_aMobBot[SubID].m_aCountItem[i];
-		if(DropItem <= 0 || CountItem <= 0)
+		InventoryItem DropItem;
+		DropItem.m_ItemID = BotJob::ms_aMobBot[SubID].m_aDropItem[i];
+		DropItem.m_Count = BotJob::ms_aMobBot[SubID].m_aCountItem[i];
+		if(DropItem.m_ItemID <= 0 || DropItem.m_Count <= 0)
 			continue;
 
 		const float RandomDrop = clamp(BotJob::ms_aMobBot[SubID].m_aRandomItem[i] + ActiveLuckyDrop, 0.0f, 100.0f);
-		CreateRandomDropItem(ClientID, RandomDrop, DropItem, CountItem, Force);
+		GS()->CreateRandomDropItem(m_Core.m_Pos, ClientID, RandomDrop, DropItem, Force);
 	}
 
 	// skill point
@@ -174,17 +175,6 @@ void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force)
 		pItemSkillPlayer.Add(1);
 		GS()->Chat(ClientID, "Skill points increased. Now ({INT}SP)", &pItemSkillPlayer.m_Count);
 	}
-}
-
-void CCharacterBotAI::CreateRandomDropItem(int DropCID, float Random, int ItemID, int Count, vec2 Force)
-{
-	if (DropCID < 0 || DropCID >= MAX_PLAYERS || !GS()->m_apPlayers[DropCID] || !GS()->m_apPlayers[DropCID]->GetCharacter() || !IsAlive())
-		return;
-
-	const float RandomDrop = frandom()*100.0f;
-	if (RandomDrop < Random)
-		GS()->CreateDropItem(m_Core.m_Pos, DropCID, ItemID, Count, 0, Force);
-	return;
 }
 
 void CCharacterBotAI::ChangeWeapons()

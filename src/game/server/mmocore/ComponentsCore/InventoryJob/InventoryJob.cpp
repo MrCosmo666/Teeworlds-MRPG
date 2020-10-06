@@ -285,17 +285,11 @@ bool InventoryJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 		if (AvailableCount <= 0)
 			return true;
 
-		if (Get > AvailableCount)
-			Get = AvailableCount;
+		Get = min(AvailableCount, Get);
+		InventoryItem& pItemPlayer = pPlayer->GetItem(VoteID);
+		pItemPlayer.Drop(Get);
 
-		InventoryItem& pPlayerDropItem = pPlayer->GetItem(VoteID);
-		vec2 Force(pPlayer->GetCharacter()->m_Core.m_Input.m_TargetX, pPlayer->GetCharacter()->m_Core.m_Input.m_TargetY);
-		if(length(Force) > 8.0f)
-			Force = normalize(Force) * 8.0f;
-
-		GS()->CreateDropItem(pPlayer->GetCharacter()->m_Core.m_Pos, -1, pPlayerDropItem, Get, Force);
-
-		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "You drop {STR}x{INT}", pPlayerDropItem.Info().GetName(pPlayer), &Get);
+		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "You drop {STR}x{INT}", pItemPlayer.Info().GetName(pPlayer), &Get);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
@@ -306,9 +300,7 @@ bool InventoryJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 		if (AvailableCount <= 0)
 			return true;
 
-		if (Get > AvailableCount)
-			Get = AvailableCount;
-
+		Get = min(AvailableCount, Get);
 		InventoryItem& pItemPlayer = pPlayer->GetItem(VoteID);
 		if(pItemPlayer.Info().m_Function == FUNCTION_ONE_USED)
 			Get = 1;
@@ -323,9 +315,7 @@ bool InventoryJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 		if (AvailableCount <= 0)
 			return true;
 
-		if (Get > AvailableCount)
-			Get = AvailableCount;
-
+		Get = min(AvailableCount, Get);
 		InventoryItem &pPlayerSelectedItem = pPlayer->GetItem(VoteID);
 		InventoryItem &pPlayerMaterialItem = pPlayer->GetItem(itMaterial);
 		const int DesCount = pPlayerSelectedItem.Info().m_Dysenthis * Get;

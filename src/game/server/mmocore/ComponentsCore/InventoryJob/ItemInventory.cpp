@@ -96,11 +96,9 @@ bool CInventoryItem::Add(int Count, int Settings, int Enchant, bool Message)
 
 bool CInventoryItem::Remove(int Count, int Settings)
 {
-	if(m_Count <= 0 || Count < 1 || !m_pPlayer)
+	Count = min(Count, m_Count);
+	if(Count <= 0 || !m_pPlayer)
 		return false;
-
-	if(m_Count < Count)
-		Count = m_Count;
 
 	if(IsEquipped())
 		Equip();
@@ -142,7 +140,8 @@ bool CInventoryItem::Equip()
 
 bool CInventoryItem::Use(int Count)
 {
-	if(m_Count < Count || !m_pPlayer || !m_pPlayer->IsAuthed())
+	Count = min(Count, m_Count);
+	if(Count <= 0 || !m_pPlayer || !m_pPlayer->IsAuthed())
 		return false;
 
 	const int ClientID = m_pPlayer->GetCID();
@@ -237,6 +236,27 @@ bool CInventoryItem::Use(int Count)
 
 	GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
 	return true;
+}
+
+bool CInventoryItem::Drop(int Count)
+{
+	Count = min(Count, m_Count);
+	if(Count <= 0 || !m_pPlayer || !m_pPlayer->IsAuthed() || !m_pPlayer->GetCharacter())
+		return false;
+
+	CCharacter* m_pCharacter = m_pPlayer->GetCharacter();
+	vec2 Force = vec2(m_pCharacter->m_Core.m_Input.m_TargetX, m_pCharacter->m_Core.m_Input.m_TargetY);
+	if(length(Force) > 8.0f)
+		Force = normalize(Force) * 8.0f;
+
+	CInventoryItem DropItem = *this;
+	DropItem.m_Count = Count;
+	if(Remove(Count))
+	{
+		GS()->CreateDropItem(m_pCharacter->m_Core.m_Pos, -1, DropItem, Force);
+		return true;
+	}
+	return false;
 }
 
 bool CInventoryItem::Save()

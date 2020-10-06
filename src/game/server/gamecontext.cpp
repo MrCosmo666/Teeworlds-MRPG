@@ -2343,29 +2343,23 @@ void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop, vec2 For
 }
 
 // lands items in the position type and quantity and their number themselves
-void CGS::CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant, vec2 Force)
+void CGS::CreateDropItem(vec2 Pos, int ClientID, InventoryItem DropItem, vec2 Force)
 {
-	InventoryItem DropItem;
-	DropItem.m_ItemID = ItemID;
-	DropItem.m_Count = Count;
-	DropItem.m_Enchant = Enchant;
+	if(DropItem.m_ItemID <= 0 || DropItem.m_Count <= 0)
+		return;
 
 	vec2 Vel = Force + vec2(frandom() * 15.0, frandom() * 15.0);
 	const float Angle = Force.x * (0.15f + frandom() * 0.1f);
 	new CDropItem(&m_World, Pos, Vel, Angle, DropItem, ClientID);
 }
 
-// lands items in the position type and quantity and their number themselves
-void CGS::CreateDropItem(vec2 Pos, int ClientID, InventoryItem &pItemPlayer, int Count, vec2 Force)
+// random drop of the item with percentage
+void CGS::CreateRandomDropItem(vec2 Pos, int ClientID, float Random, InventoryItem DropItem, vec2 Force)
 {
-	InventoryItem DropItem = pItemPlayer;
-	DropItem.m_Count = Count;
-
-	if (pItemPlayer.Remove(Count))
-	{
-		const float Angle = Force.x * (0.15f + frandom() * 0.1f);
-		new CDropItem(&m_World, Pos, Force, Angle, DropItem, ClientID);
-	}
+	const float RandomDrop = frandom() * 100.0f;
+	if(RandomDrop < Random)
+		CreateDropItem(Pos, ClientID, DropItem, Force);
+	return;
 }
 
 bool CGS::TakeItemCharacter(int ClientID)
