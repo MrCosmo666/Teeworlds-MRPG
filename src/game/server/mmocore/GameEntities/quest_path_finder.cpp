@@ -20,7 +20,7 @@ CQuestPathFinder::CQuestPathFinder(CGameWorld *pGameWorld, vec2 Pos, int ClientI
 void CQuestPathFinder::Tick() 
 {
 	CPlayer* pPlayer = GS()->GetPlayer(m_ClientID, true, true);
-	if (m_TargetPos == vec2(0.0f, 0.0f) || !pPlayer || QuestJob::Quests[m_ClientID][m_QuestID].Progress != m_QuestProgress || QuestJob::Quests[m_ClientID][m_QuestID].State != QuestState::QUEST_ACCEPT)
+	if (m_TargetPos == vec2(0.0f, 0.0f) || !pPlayer || QuestJob::ms_aQuests[m_ClientID][m_QuestID].m_Progress != m_QuestProgress || QuestJob::ms_aQuests[m_ClientID][m_QuestID].m_State != QuestState::QUEST_ACCEPT)
 	{
 		Finish();
 		return;
@@ -44,7 +44,7 @@ void CQuestPathFinder::Snap(int SnappingClient)
 	if(NetworkClipped(SnappingClient) || SnappingClient != m_ClientID)
 		return;
 
-	if (GS()->CheckClient(SnappingClient))
+	if (GS()->IsMmoClient(SnappingClient))
 	{
 		vec2 Direction = normalize(m_Pos - m_TargetPos);
 		CNetObj_MmoPickup* pMmoP = static_cast<CNetObj_MmoPickup*>(Server()->SnapNewItem(NETOBJTYPE_MMOPICKUP, GetID(), sizeof(CNetObj_MmoPickup)));

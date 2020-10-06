@@ -9,23 +9,23 @@ class WorldSwapJob : public MmoComponent
 {
 	struct StructSwapWorld
 	{
-		int OpenQuestID;
-		int PositionX;
-		int PositionY;
-		int WorldID;
-		int TwoPositionX;
-		int TwoPositionY;
-		int TwoWorldID;
+		int m_OpenQuestID;
+		int m_PositionX;
+		int m_PositionY;
+		int m_WorldID;
+		int m_TwoPositionX;
+		int m_TwoPositionY;
+		int m_TwoWorldID;
 	};
-	static std::map < int, StructSwapWorld > WorldSwap;
-
 	struct StructPositionLogic
 	{
-		int BaseWorldID;
-		int FindWorldID;
-		vec2 Position;
+		int m_BaseWorldID;
+		int m_FindWorldID;
+		vec2 m_Position;
 	};
-	static std::list < StructPositionLogic > WorldPositionLogic;
+
+	static std::map < int, StructSwapWorld > ms_aWorldSwap;
+	static std::list < StructPositionLogic > ms_aWorldPositionLogic;
 public:
 	virtual void OnInit();
 	virtual void OnInitWorld(const char* pWhereLocalWorld);

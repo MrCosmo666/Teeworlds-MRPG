@@ -22,7 +22,7 @@ void MailBoxJob::ReceiveInbox(CPlayer *pPlayer, int InboxID)
 	}
 
 	// recieve
-	if(GS()->GetItemInfo(ItemID).IsEnchantable() && pPlayer->GetItem(ItemID).Count > 0)
+	if(GS()->GetItemInfo(ItemID).IsEnchantable() && pPlayer->GetItem(ItemID).m_Count > 0)
 	{
 		GS()->Chat(pPlayer->GetCID(), "Enchant item maximal count x1 in a backpack!");
 		return;
@@ -40,8 +40,8 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 	int ShowLetterID = 0;
 	bool EmptyMailBox = true;
 	const int ClientID = pPlayer->GetCID();
-	int HideID = (int)(NUM_TAB_MENU + ItemJob::ItemsInfo.size() + 200);
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().AuthID, MAX_INBOX_LIST));
+	int HideID = (int)(NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 200);
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AuthID, MAX_INBOX_LIST));
 	while(RES->next())
 	{
 		// get the information to create an object
@@ -60,10 +60,10 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 			GS()->AVM(ClientID, "MAIL", MailID, HideID, "I read it (L{INT})", &ShowLetterID);
 		else if(GS()->GetItemInfo(ItemID).IsEnchantable())
 		{
-			char aEnchantSize[16];
-			str_format(aEnchantSize, sizeof(aEnchantSize), " [+%d]", Enchant);
-			GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive {STR}{STR} (L{INT})",
-				GS()->GetItemInfo(ItemID).GetName(pPlayer), (Enchant > 0 ? aEnchantSize : "\0"), &ShowLetterID);
+			char aEnchantBuf[16];
+			GS()->GetItemInfo(ItemID).FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf), Enchant);
+			GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive {STR} {STR} (L{INT})",
+				GS()->GetItemInfo(ItemID).GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), &ShowLetterID);
 		}
 		else
 			GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive {STR}x{INT} (L{INT})", GS()->GetItemInfo(ItemID).GetName(pPlayer), &Count, &ShowLetterID);
@@ -76,7 +76,7 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 // check whether messages are available
 int MailBoxJob::GetActiveInbox(CPlayer *pPlayer)
 {
-	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID));
 	const int MailCount = RES2->rowsCount();
 	return MailCount;
 }

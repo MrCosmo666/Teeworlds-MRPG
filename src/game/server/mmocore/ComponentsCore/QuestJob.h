@@ -15,30 +15,30 @@ class QuestJob : public MmoComponent
 {
 	struct StructQuestData
 	{
-		char Name[24];
-		char StoryLine[24];
+		char m_aName[24];
+		char m_aStoryLine[24];
 
-		int Money;
-		int Exp;
-		int ProgressSize;
+		int m_Gold;
+		int m_Exp;
+		int m_ProgressSize;
 	};
 	struct StructQuest
 	{
-		int State;
-		int MobProgress[2];
-		int Progress;
+		int m_State;
+		int m_aMobProgress[2];
+		int m_Progress;
 	};
-	static std::map < int, StructQuestData > QuestsData;
+	static std::map < int, StructQuestData > ms_aQuestsData;
 
 public:
-	static std::map < int, std::map < int, StructQuest > > Quests;
+	static std::map < int, std::map < int, StructQuest > > ms_aQuests;
 	bool IsValidQuest(int QuestID, int ClientID = -1) const
 	{
-		if (QuestsData.find(QuestID) != QuestsData.end())
+		if (ms_aQuestsData.find(QuestID) != ms_aQuestsData.end())
 		{
 			if (ClientID < 0 || ClientID >= MAX_PLAYERS)
 				return true;
-			if (Quests[ClientID].find(QuestID) != Quests[ClientID].end())
+			if (ms_aQuests[ClientID].find(QuestID) != ms_aQuests[ClientID].end())
 				return true;
 		}
 		return false;
@@ -59,9 +59,9 @@ private:
 	bool IsCollectItemComplete(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData) const;
 	void CollectItem(CPlayer *pPlayer, BotJob::QuestBotInfo &BotData);
 	void AddProgress(CPlayer *pPlayer, int QuestID);
-	bool ShowAdventureActiveNPC(CPlayer *pPlayer);
+	bool ShowQuestsActiveNPC(CPlayer *pPlayer);
 	void QuestTableShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData);
-	void ShowQuestList(CPlayer* pPlayer, int StateQuest);
+	void ShowQuestsTabList(CPlayer* pPlayer, int StateQuest);
 	void QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID, bool Giving);
 	void QuestTableAddInfo(int ClientID, const char* pText, int Requires, int Have);
 	bool InteractiveTypeQuest(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData);
@@ -73,7 +73,7 @@ public:
 	void UpdateArrowStep(int ClientID);
 	bool CheckNewStories(CPlayer* pPlayer, int CheckQuestID = -1);
 	bool InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData, bool LastDialog);
-	void ShowFullQuestLift(CPlayer* pPlayer);
+	void ShowQuestsMainList(CPlayer* pPlayer);
 	void QuestTableClear(int ClientID);
 	int QuestingAllowedItemsCount(CPlayer* pPlayer, int ItemID);
 	void CreateQuestingItems(CPlayer* pPlayer, BotJob::QuestBotInfo& BotData);

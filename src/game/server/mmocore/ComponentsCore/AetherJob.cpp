@@ -5,7 +5,7 @@
 #include "AetherJob.h"
 
 using namespace sqlstr;
-std::map < int , AetherJob::StructTeleport > AetherJob::Teleport;
+std::map < int , AetherJob::StructTeleport > AetherJob::ms_aTeleport;
 
 void AetherJob::OnInit()
 {
@@ -14,22 +14,22 @@ void AetherJob::OnInit()
 		while(RES->next())
 		{
 			const int ID = RES->getInt("ID");
-			str_copy(Teleport[ID].TeleName, RES->getString("TeleName").c_str(), sizeof(Teleport[ID].TeleName));
-			Teleport[ID].TeleX = RES->getInt("TeleX");
-			Teleport[ID].TeleY = RES->getInt("TeleY");
-			Teleport[ID].WorldID = RES->getInt("WorldID");
+			str_copy(ms_aTeleport[ID].m_aTeleName, RES->getString("TeleName").c_str(), sizeof(ms_aTeleport[ID].m_aTeleName));
+			ms_aTeleport[ID].m_TeleX = RES->getInt("TeleX");
+			ms_aTeleport[ID].m_TeleY = RES->getInt("TeleY");
+			ms_aTeleport[ID].m_WorldID = RES->getInt("WorldID");
 		}
-		Job()->ShowLoadingProgress("Aethers", Teleport.size());
+		Job()->ShowLoadingProgress("Aethers", ms_aTeleport.size());
 	});
 }
 
 void AetherJob::OnInitAccount(CPlayer *pPlayer)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_locations", "WHERE OwnerID = '%d'", pPlayer->Acc().AuthID));
+	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_locations", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID));
 	while(RES->next())
 	{
 		int TeleportID = RES->getInt("TeleportID");
-		pPlayer->Acc().AetherLocation[TeleportID] = true;
+		pPlayer->Acc().m_aAetherLocation[TeleportID] = true;
 	}
 }
 
@@ -45,12 +45,12 @@ bool AetherJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID
 		if(Price > 0 && pPlayer->CheckFailMoney(Price))
 			return true;
 
-		const vec2 Position = vec2(Teleport[TeleportID].TeleX, Teleport[TeleportID].TeleY);
-		if(Teleport[TeleportID].WorldID != GS()->Server()->GetWorldID(ClientID))
+		const vec2 Position = vec2(ms_aTeleport[TeleportID].m_TeleX, ms_aTeleport[TeleportID].m_TeleY);
+		if(!GS()->IsPlayerEqualWorldID(ClientID, ms_aTeleport[TeleportID].m_WorldID))
 		{
-			pPlayer->GetTempData().TempTeleportX = Position.x;
-			pPlayer->GetTempData().TempTeleportY = Position.y;
-			pPlayer->ChangeWorld(Teleport[TeleportID].WorldID);
+			pPlayer->GetTempData().m_TempTeleportX = Position.x;
+			pPlayer->GetTempData().m_TempTeleportY = Position.y;
+			pPlayer->ChangeWorld(ms_aTeleport[TeleportID].m_WorldID);
 			return true;
 		}
 
@@ -108,16 +108,16 @@ bool AetherJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMen
 void AetherJob::UnlockLocation(CPlayer *pPlayer, vec2 Pos)
 {
 	const int ClientID = pPlayer->GetCID();
-	for (const auto& tl : Teleport)
+	for (const auto& tl : ms_aTeleport)
 	{
-		if (distance(vec2(tl.second.TeleX, tl.second.TeleY), Pos) > 100 || pPlayer->Acc().AetherLocation.find(tl.first) != pPlayer->Acc().AetherLocation.end())
+		if (distance(vec2(tl.second.m_TeleX, tl.second.m_TeleY), Pos) > 100 || pPlayer->Acc().m_aAetherLocation.find(tl.first) != pPlayer->Acc().m_aAetherLocation.end())
 			continue;
 
-		SJK.ID("tw_accounts_locations", "(OwnerID, TeleportID) VALUES ('%d', '%d')", pPlayer->Acc().AuthID, tl.first);
-		GS()->Chat(ClientID, "You unlock aether {STR}!", Teleport[tl.first].TeleName);
-		GS()->ChatDiscord("14671083", GS()->Server()->ClientName(ClientID), "Adventure unlock aether {STR}", Teleport[tl.first].TeleName);
+		SJK.ID("tw_accounts_locations", "(OwnerID, TeleportID) VALUES ('%d', '%d')", pPlayer->Acc().m_AuthID, tl.first);
+		GS()->Chat(ClientID, "You unlock aether {STR}!", ms_aTeleport[tl.first].m_aTeleName);
+		GS()->ChatDiscord("14671083", GS()->Server()->ClientName(ClientID), "Adventure unlock aether {STR}", ms_aTeleport[tl.first].m_aTeleName);
 
-		pPlayer->Acc().AetherLocation[tl.first] = true;
+		pPlayer->Acc().m_aAetherLocation[tl.first] = true;
 		return;
 	}
 }
@@ -130,27 +130,27 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 	GS()->AV(ClientID, "null", "");
 	
 	GS()->AVH(ClientID, TAB_AETHER, GOLDEN_COLOR, "Available aethers");
-	if (Job()->Member()->GetGuildHouseID(pPlayer->Acc().GuildID) >= 1)
+	if (Job()->Member()->GetGuildHouseID(pPlayer->Acc().m_GuildID) >= 1)
 		GS()->AVM(ClientID, "MSPAWN", NOPE, TAB_AETHER, "Move to Guild House - free");
 	if (Job()->House()->PlayerHouseID(pPlayer) >= 1)
 		GS()->AVM(ClientID, "HSPAWN", NOPE, TAB_AETHER, "Move to Your House - free");
 
-	for (const auto& tl : Teleport)
+	for (const auto& tl : ms_aTeleport)
 	{
-		if (pPlayer->Acc().AetherLocation.find(tl.first) == pPlayer->Acc().AetherLocation.end())
+		if (pPlayer->Acc().m_aAetherLocation.find(tl.first) == pPlayer->Acc().m_aAetherLocation.end())
 			continue;
 
-		const bool LocalTeleport = (tl.second.WorldID == GS()->Server()->GetWorldID(ClientID) &&
-			distance(pPlayer->GetCharacter()->m_Core.m_Pos, vec2(tl.second.TeleX, tl.second.TeleY)) < 120);
+		const bool LocalTeleport = (GS()->IsPlayerEqualWorldID(ClientID, tl.second.m_WorldID) &&
+			distance(pPlayer->GetCharacter()->m_Core.m_Pos, vec2(tl.second.m_TeleX, tl.second.m_TeleY)) < 120);
 		if (LocalTeleport)
 		{
-			GS()->AVM(ClientID, "null", tl.first, TAB_AETHER, "[Local {STR}] : {STR}", tl.second.TeleName, GS()->Server()->GetWorldName(tl.second.WorldID));
+			GS()->AVM(ClientID, "null", tl.first, TAB_AETHER, "[Local {STR}] : {STR}", tl.second.m_aTeleName, GS()->Server()->GetWorldName(tl.second.m_WorldID));
 			continue;
 		}
 
-		int Price = g_Config.m_SvPriceTeleport * (tl.second.WorldID + 1);
+		int Price = g_Config.m_SvPriceTeleport * (tl.second.m_WorldID + 1);
 		GS()->AVD(ClientID, "TELEPORT", tl.first, Price, TAB_AETHER, "[{STR}] : {STR} - {INT}gold",
-			tl.second.TeleName, GS()->Server()->GetWorldName(tl.second.WorldID), &Price);
+			tl.second.m_aTeleName, GS()->Server()->GetWorldName(tl.second.m_WorldID), &Price);
 	}
 	GS()->AV(ClientID, "null", "");
 }

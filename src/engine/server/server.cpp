@@ -348,14 +348,14 @@ void CServer::SetClientScore(int ClientID, int Score)
 	m_aClients[ClientID].m_Score = Score;
 }
 
-void CServer::SetClientVersion(int ClientID, int Version)
+void CServer::SetClientProtocolVersion(int ClientID, int Version)
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
 		return;
 	m_aClients[ClientID].m_ClientVersion = Version;
 }
 
-int CServer::GetClientVersion(int ClientID)
+int CServer::GetClientProtocolVersion(int ClientID)
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
 		return 0;
@@ -429,7 +429,7 @@ void CServer::BackInformationFakeClient(int FakeClientID)
 		GameServer(i)->UpdateClientInformation(FakeClientID);
 }
 
-int CServer::GetWorldID(int ClientID)
+int CServer::GetClientWorldID(int ClientID)
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
 		return -1;
@@ -830,12 +830,12 @@ int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 	// notify the mod about the drop
 	if(pThis->m_aClients[ClientID].m_State >= CClient::STATE_READY)
 	{
-		pThis->GameServer(LOCAL_WORLD)->ClearClientData(ClientID);
 		for (int i = 0; i < COUNT_WORLD; i++)
 		{
 			pThis->m_aClients[ClientID].m_Quitting = true;
 			pThis->GameServer(i)->OnClientDrop(ClientID, pReason);
 		}
+		pThis->GameServer(LOCAL_WORLD)->ClearClientData(ClientID);
 	}
 	
 	pThis->m_aClients[ClientID].m_State = CClient::STATE_EMPTY;
@@ -1918,6 +1918,34 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		SleepyDiscord::Message pMessage = sendMessage(message.channelID, "\0", embed);
 		addReaction(message.channelID, pMessage, "%E2%9C%85");
 		addReaction(message.channelID, pMessage, "%E2%9D%8C");
+	}
+
+	// ranking
+	else if (message.startsWith("!mranking") || message.startsWith("!mgoldranking"))
+	{
+		SleepyDiscord::Embed embed;
+		embed.title = message.startsWith("!mgoldranking") ? "Ranking by Gold" : "Ranking by Level";
+		embed.color = 422353;
+
+		int Rank = 1;
+		std::string Names = "";
+		std::string Levels = "";
+		std::string GoldValues = "";
+		std::shared_ptr<ResultSet> RES(SJK.SD("a.ID, ad.Nick AS `Nick`, ad.Level AS `Level`, g.Count AS `Gold`", "tw_accounts a", "JOIN tw_accounts_data ad ON a.ID = ad.ID LEFT JOIN tw_accounts_items g ON a.ID = g.OwnerID AND g.ItemID = 1 ORDER BY %s LIMIT 10", (message.startsWith("!mgoldranking") ? "g.Count DESC, ad.Level DESC" : "ad.Level DESC, g.Count DESC")));
+		while (RES->next())
+		{
+			Names += std::to_string(Rank) + ". **" + RES->getString("Nick").c_str() + "**\n";
+			Rank++;
+
+			Levels += std::to_string(RES->getInt("Level")) + "\n";
+			GoldValues += std::to_string(RES->getInt("Gold")) + "\n";
+		}
+
+		embed.fields.push_back(SleepyDiscord::EmbedField("Name", Names, true));
+		embed.fields.push_back(SleepyDiscord::EmbedField("Level", Levels, true));
+		embed.fields.push_back(SleepyDiscord::EmbedField("Gold", GoldValues, true));
+
+		SleepyDiscord::Message pMessage = sendMessage(message.channelID, "\0", embed);
 	}
 }
 

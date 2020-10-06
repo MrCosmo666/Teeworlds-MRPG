@@ -43,12 +43,12 @@ void CEventHandler::Clear()
 
 void CEventHandler::Snap(int SnappingClient)
 {
-	if(!GS()->IsClientEqualWorldID(SnappingClient))
+	if(!GS()->IsPlayerEqualWorldID(SnappingClient))
 		return;
 
 	for(int i = 0; i < m_NumEvents; i++)
 	{
-		if(m_aTypes[i] > NETEVENTTYPE_DAMAGE && !GS()->CheckClient(SnappingClient))
+		if(m_aTypes[i] > NETEVENTTYPE_DAMAGE && !GS()->IsMmoClient(SnappingClient))
 			continue;
 
 		if(SnappingClient == -1 || CmaskIsSet(m_aClientMasks[i], SnappingClient))

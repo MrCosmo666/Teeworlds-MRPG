@@ -9,18 +9,17 @@ class ShopJob : public MmoComponent
 {
 	struct StructAuctionItem
 	{
-		int a_itemid;
-		int a_count;
-		int a_price;
-		int a_enchant;
+		int m_ItemID;
+		int m_Count;
+		int m_Price;
+		int m_Enchant;
 	};
 
 	struct ShopPersonal
 	{
-		int StorageID;
+		int m_StorageID;
 	};
-	typedef std::map < int , ShopPersonal > ShopType;
-	static ShopType Shop;
+	static std::map < int, ShopPersonal > ms_aShopList;
 
 	bool BuyShopItem(CPlayer* pPlayer, int ID);
 	void ShowAuction(CPlayer* pPlayer);

@@ -14,18 +14,18 @@ class DungeonJob : public MmoComponent
 
 	struct StructDungeon
 	{
-		char Name[64];
-		int Level;
-		int OpenQuestID;
-		int WorldID;
+		char m_aName[64];
+		int m_Level;
+		int m_OpenQuestID;
+		int m_WorldID;
 
-		int DoorX;
-		int DoorY;
+		int m_DoorX;
+		int m_DoorY;
 
-		int Players;
-		int Progress;
-		int State;
-		bool Story;
+		int m_Players;
+		int m_Progress;
+		int m_State;
+		bool m_IsStory;
 	};
 
 

@@ -4,8 +4,10 @@
 #define GAME_SERVER_PLAYER_H
 
 #include "mmocore/ComponentsCore/AccountMainJob.h"
-#include "mmocore/ComponentsCore/ItemJob.h"
 #include "mmocore/ComponentsCore/BotJob.h"
+
+#include "mmocore/ComponentsCore/InventoryJob/ItemInventory.h"
+#include "mmocore/ComponentsCore/SkillsJob/Skill.h"
 
 #include "entities/character.h"
 
@@ -96,8 +98,8 @@ public:
 
 	virtual int GetStartHealth();
 	int GetStartMana();
-	virtual	int GetHealth() { return GetTempData().TempHealth; };
-	virtual	int GetMana() { return GetTempData().TempMana; };
+	virtual	int GetHealth() { return GetTempData().m_TempHealth; };
+	virtual	int GetMana() { return GetTempData().m_TempMana; };
 
 	virtual int IsActiveSnappingBot(int SnappingClient) const { return 2; };
 	virtual int GetEquippedItem(int EquipID, int SkipItemID = -1) const;
@@ -142,7 +144,7 @@ public:
 	bool CheckEffect(const char* Potion);
 	bool GetHidenMenu(int HideID) const;
 	bool IsAuthed();
-	int EnchantAttributes(int BonusID) const;
+	int EnchantAttributes(int AttributeID) const;
 	int GetStartTeam();
 
 	int ExpNeed(int Level) const;
@@ -157,9 +159,10 @@ public:
 	/* #########################################################################
 		FUNCTIONS PLAYER ITEMS 
 	######################################################################### */
-	ItemJob::InventoryItem& GetItem(int ItemID);
-	AccountMainJob::StructTempPlayerData& GetTempData() { return AccountMainJob::PlayerTempData[m_ClientID]; }
-	AccountMainJob::StructData& Acc() { return AccountMainJob::Data[m_ClientID]; }
+	InventoryItem& GetItem(int ItemID);
+	CSkill &GetSkill(int SkillID);
+	AccountMainJob::StructTempPlayerData& GetTempData() { return AccountMainJob::ms_aPlayerTempData[m_ClientID]; }
+	AccountMainJob::StructData& Acc() { return AccountMainJob::ms_aData[m_ClientID]; }
 
 	int GetLevelDisciple(int Class, bool SearchClass = false);
 

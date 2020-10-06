@@ -17,6 +17,7 @@
 #include "player.h"
 
 #include "mmocore/MmoController.h"
+#include "mmocore/CommandProcessor.h"
 
 #ifdef _MSC_VER
 typedef __int32 int32_t;
@@ -37,10 +38,10 @@ class CGS : public IGameServer
 
 	int m_RespawnWorld;
 	int m_MusicID;
-	class MmoController *pMmoController;
 
 	IServer *m_pServer;
 	class IConsole *m_pConsole;
+	MmoController* m_pMmoController;
 
 	CLayers m_Layers;
 	CCollision m_Collision;
@@ -56,15 +57,14 @@ class CGS : public IGameServer
 public:
 	IServer *Server() const { return m_pServer; }
 	class IConsole *Console() { return m_pConsole; }
+	MmoController* Mmo() { return m_pMmoController; }
 
 	CCollision *Collision() { return &m_Collision; }
 	CTuningParams *Tuning() { return &m_Tuning; }
-	
+
 	CGS();
 	~CGS();
 	void Clear();
-
-	MmoController *Mmo() { return pMmoController; }
 
 	CEventHandler m_Events;
 	CPlayer *m_apPlayers[MAX_CLIENTS];
@@ -78,7 +78,7 @@ public:
 		SWAP GAMECONTEX DATA 
 	######################################################################### */
 	// - - - - - - - - - - - -
-	static std::map < int, std::map < std::string, int > > Effects;
+	static std::map < int, std::map < std::string, int > > ms_aEffects;
 	// - - - - - - - - - - - -
 	struct StructAttribut
 	{
@@ -87,15 +87,15 @@ public:
 		int UpgradePrice;
 		int AtType;
 	};
-	static std::map < int, StructAttribut > AttributInfo;
+	static std::map < int, StructAttribut > ms_aAttributsInfo;
 
 	/* #########################################################################
 		HELPER PLAYER FUNCTION 
 	######################################################################### */
 	class CCharacter *GetPlayerChar(int ClientID);
 	CPlayer *GetPlayer(int ClientID, bool CheckAuthed = false, bool CheckCharacter = false);
-	std::unique_ptr<char[]> CGS::LevelString(int MaxValue, int CurrentValue, int Step, char toValue, char fromValue);
-	ItemJob::ItemInformation &GetItemInfo(int ItemID) const;
+	std::unique_ptr<char[]> LevelString(int MaxValue, int CurrentValue, int Step, char toValue, char fromValue);
+	ItemInformation &GetItemInfo(int ItemID) const;
 	const char* GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const;
 
 	/* #########################################################################
@@ -107,7 +107,7 @@ public:
 	void CreatePlayerSpawn(vec2 Pos);
 	void CreateDeath(vec2 Pos, int Who);
 	void CreateSound(vec2 Pos, int Sound, int64 Mask=-1);
-	void SendMapMusic(int ClientID, int MusicID = 0);
+	void SendWorldMusic(int ClientID, int MusicID = 0);
 	void CreatePlayerSound(int ClientID, int Sound);
 	void SendMmoEffect(vec2 Pos, int EffectID, int ClientID = -1);
 	void SendMmoPotion(vec2 Pos, const char *Potion, bool Added);
@@ -137,16 +137,16 @@ private:
 	struct CBroadcastState
 	{
 		int m_NoChangeTick;
-		char m_PrevMessage[1024];
+		char m_aPrevMessage[1024];
 		
 		int m_Priority;
-		char m_NextMessage[1024];
+		char m_aNextMessage[1024];
 		
 		int m_LifeSpanTick;
 		int m_TimedPriority;
-		char m_TimedMessage[1024];
+		char m_aTimedMessage[1024];
 	};
-	CBroadcastState m_BroadcastStates[MAX_PLAYERS];
+	CBroadcastState m_aBroadcastStates[MAX_PLAYERS];
 
 public:
 	void AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSpan);
@@ -173,6 +173,7 @@ public:
 
 	void SendChatCommand(const CCommandManager::CCommand* pCommand, int ClientID);
 	void SendChatCommands(int ClientID);
+	void SendRemoveChatCommand(const char* pCommand, int ClientID);
 	void SendRemoveChatCommand(const CCommandManager::CCommand* pCommand, int ClientID);
 
 	void SendTuningParams(int ClientID);
@@ -238,7 +239,7 @@ private:
 		int m_TempID;
 		int m_TempID2;
 	};
-	std::list<CVoteOptions> m_PlayerVotes[MAX_PLAYERS];
+	std::list<CVoteOptions> m_aPlayerVotes[MAX_PLAYERS];
 
 public:
 	void AV(int To, const char *Cmd, const char *Desc, const int ID = -1, const int ID2 = -1, const char *Icon = "unused");
@@ -267,22 +268,24 @@ public:
 	void CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText);
 	void CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop = 1, vec2 Force = vec2(0.0f, 0.0f));
 	void CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant = 0, vec2 Force = vec2(0.0f, 0.0f));
-	void CreateDropItem(vec2 Pos, int ClientID, ItemJob::InventoryItem &pPlayerItem, int Count, vec2 Force = vec2(0.0f, 0.0f));
+	void CreateDropItem(vec2 Pos, int ClientID, InventoryItem &pItemPlayer, int Count, vec2 Force = vec2(0.0f, 0.0f));
 	bool TakeItemCharacter(int ClientID);
 	void SendInbox(int ClientID, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
 
 private:
 	void SendDayInfo(int ClientID);
 
+	CCommandProcessor *m_pCommandProcessor;
+
 public:
 	void ChangeEquipSkin(int ClientID, int ItemID);
 
-	bool CheckClient(int ClientID) const;
+	bool IsMmoClient(int ClientID) const;
 	int GetWorldID() const { return m_WorldID; }
 	int DungeonID() const { return m_DungeonID; }
 	bool IsDungeon() const { return (m_DungeonID > 0); }
 	int IncreaseExperienceRaid(int IncreaseCount) const;
-	bool IsClientEqualWorldID(int ClientID, int WorldID = -1) const;
+	bool IsPlayerEqualWorldID(int ClientID, int WorldID = -1) const;
 	bool IsAllowedPVP() const { return m_AllowedPVP; }
 	const char* AtributeName(int BonusID) const;
 
@@ -290,6 +293,8 @@ public:
 	void SetRespawnWorld(int WorldID) { m_RespawnWorld = WorldID; }
 	void SetMapMusic(int SoundID) { m_MusicID = SoundID; }
 	int GetRespawnWorld() const { return m_RespawnWorld; }
+
+	CCommandProcessor* CommandProcessor() { return m_pCommandProcessor; }
 
 private:
 	void UpdateZonePVP();

@@ -892,7 +892,11 @@ int CGraphicsBackend_SDL_OpenGL::WindowActive()
 int CGraphicsBackend_SDL_OpenGL::WindowOpen()
 {
 	return SDL_GetWindowFlags(m_pWindow) & SDL_WINDOW_SHOWN;
+}
 
+int CGraphicsBackend_SDL_OpenGL::WindowMinimized()
+{
+	return SDL_GetWindowFlags(m_pWindow) & SDL_WINDOW_MINIMIZED;
 }
 
 void CGraphicsBackend_SDL_OpenGL::NotifyWindow()

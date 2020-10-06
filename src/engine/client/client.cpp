@@ -821,7 +821,7 @@ void CClient::LoadMmoInfo()
 		char aNewVersionStr[64];
 		str_copy(aNewVersionStr, json_string_get(pVersion), sizeof(aNewVersionStr));
 		char aCurVersionStr[64];
-		str_copy(aCurVersionStr, GAME_RELEASE_VERSION, sizeof(aCurVersionStr));
+		str_copy(aCurVersionStr, CLIENT_RELEASE_VERSION, sizeof(aCurVersionStr));
 		if (ToVersion(aNewVersionStr) > ToVersion(aCurVersionStr))
 		{
 			str_copy(m_aVersionStr, json_string_get(pVersion), sizeof(m_aVersionStr));
@@ -1101,14 +1101,14 @@ void CClient::ProcessConnlessPacket(CNetChunk* pPacket)
 	if (m_VersionInfo.m_State == CVersionInfo::STATE_READY && net_addr_comp(&pPacket->m_Address, &m_VersionInfo.m_VersionServeraddr.m_Addr) == 0)
 	{
 		// version info
-		if (pPacket->m_DataSize == (int)(sizeof(VERSIONSRV_VERSION) + sizeof(GAME_RELEASE_VERSION)) &&
+		if (pPacket->m_DataSize == (int)(sizeof(VERSIONSRV_VERSION) + sizeof(CLIENT_RELEASE_VERSION)) &&
 			mem_comp(pPacket->m_pData, VERSIONSRV_VERSION, sizeof(VERSIONSRV_VERSION)) == 0)
 
 		{
 			char* pVersionData = (char*)pPacket->m_pData + sizeof(VERSIONSRV_VERSION);
-			int VersionMatch = !mem_comp(pVersionData, GAME_RELEASE_VERSION, sizeof(GAME_RELEASE_VERSION));
+			int VersionMatch = !mem_comp(pVersionData, CLIENT_RELEASE_VERSION, sizeof(CLIENT_RELEASE_VERSION));
 
-			char aVersion[sizeof(GAME_RELEASE_VERSION)];
+			char aVersion[sizeof(CLIENT_RELEASE_VERSION)];
 			str_copy(aVersion, pVersionData, sizeof(aVersion));
 
 			char aBuf[256];
@@ -2264,8 +2264,11 @@ void CClient::Run()
 				// when we are stress testing only render every 10th frame
 				if (!g_Config.m_DbgStress || (m_RenderFrames % 10) == 0)
 				{
-					Render();
-					m_pGraphics->Swap();
+					if (!((g_Config.m_ClInactiveRendering == 1 && m_pGraphics->WindowMinimized()) || (g_Config.m_ClInactiveRendering == 2 && !m_pGraphics->WindowActive())))
+					{
+						Render();
+						m_pGraphics->Swap();
+					}
 				}
 			}
 		}
@@ -2494,16 +2497,30 @@ void CClient::DemoRecorder_Start(const char* pFilename, bool WithTimestamp)
 		m_pConsole->Print(IConsole::OUTPUT_LEVEL_STANDARD, "demorec/record", "client is not online");
 	else
 	{
+		CServerInfo Info = { 0 };
+		GetServerInfo(&Info);
+		bool IsMMO = Info.m_MRPG || !str_comp_nocase(Info.m_aGameType, "M-RPG");
+
 		char aFilename[128];
 		if (WithTimestamp)
 		{
 			char aDate[20];
 			str_timestamp(aDate, sizeof(aDate));
-			str_format(aFilename, sizeof(aFilename), "demos/%s_%s.demo", pFilename, aDate);
+
+			if(IsMMO)
+				str_format(aFilename, sizeof(aFilename), "demos/mrpg/%s_%s.demo", pFilename, aDate);
+			else
+				str_format(aFilename, sizeof(aFilename), "demos/%s_%s.demo", pFilename, aDate);
 		}
 		else
-			str_format(aFilename, sizeof(aFilename), "demos/%s.demo", pFilename);
-		m_DemoRecorder.Start(Storage(), m_pConsole, aFilename, GameClient()->NetVersion(), m_aCurrentMap, m_CurrentMapSha256, m_CurrentMapCrc, "client");
+		{
+			if (IsMMO)
+				str_format(aFilename, sizeof(aFilename), "demos/mrpg/%s.demo", pFilename);
+			else
+				str_format(aFilename, sizeof(aFilename), "demos/%s.demo", pFilename);
+		}
+
+		m_DemoRecorder.Start(Storage(), m_pConsole, aFilename, GameClient()->NetVersion(), m_aCurrentMap, m_CurrentMapSha256, m_CurrentMapCrc, "client", IsMMO);
 	}
 }
 

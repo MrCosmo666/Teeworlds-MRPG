@@ -11,46 +11,46 @@ class AccountMainJob : public MmoComponent
 public:
 	struct StructData
 	{
-		char Login[64];
-		// char Password[64];
-		char LastLogin[64];
-		char Language[8];
-		int AuthID;
-		int Level;
-		int Exp; 
-		int GuildID;
-		int GuildRank;
+		char m_aLogin[64];
+		// ðåchar Password[64];
+		char m_aLastLogin[64];
+		char m_aLanguage[8];
+		int m_AuthID;
+		int m_Level;
+		int m_Exp; 
+		int m_GuildID;
+		int m_GuildRank;
 
 		// upgrades
-		int Upgrade;
-		std::map < int, int > Stats;
+		int m_Upgrade;
+		std::map < int, int > m_aStats;
 
 		// jobs
-		int Plant[PLANT::NUM_PLANT];
-		int Miner[MINER::NUM_MINER];
+		int m_aPlant[PLANT::NUM_PLANT];
+		int m_aMiner[MINER::NUM_MINER];
 
 		// world
-		short WorldID;
-		short LastWorldID;
+		short m_WorldID;
+		short m_LastWorldID;
 
 		// skins
 		char m_aaSkinPartNames[6][24];
 		int m_aUseCustomColors[6];
 		int m_aSkinPartColors[6];
 
-		int Team;
-		std::map < int , bool > AetherLocation;
-		bool IsGuild() { return (GuildID > 0); }
+		int m_Team;
+		std::map < int , bool > m_aAetherLocation;
+		bool IsGuild() const { return m_GuildID > 0; }
 	};
-	static std::map < int, StructData > Data;
+	static std::map < int, StructData > ms_aData;
 
 	struct StructTempPlayerData
 	{
-		int TempDecoractionID;
-		int TempDecorationType;
-		int TempID3;
+		int m_TempDecoractionID;
+		int m_TempDecorationType;
+		int m_TempID3;
 
-		ShopJob::AuctionSlot SellItem;
+		ShopJob::AuctionSlot m_SellItem;
 
 		// temp rankname for guild rank settings
 		char m_aRankGuildBuf[32];
@@ -59,22 +59,22 @@ public:
 		char m_aGuildSearchBuf[32];
 
 		// player stats
-		int TempHealth;
-		int TempMana;
-		short TempLatencyPing;
+		int m_TempHealth;
+		int m_TempMana;
+		short m_TempPing;
 
 		// save pos teleport
-		bool TempActiveSafeSpawn;
-		int TempTeleportX;
-		int TempTeleportY;
-		int TempTimeDungeon;
-		bool TempDungeonReady;
+		bool m_TempSafeSpawn;
+		int m_TempTeleportX;
+		int m_TempTeleportY;
 
 		// dungeon
-		int TempTankVotingDungeon;
-		bool TempAlreadyVotedDungeon;
+		int m_TempTimeDungeon;
+		bool m_TempDungeonReady;
+		int m_TempTankVotingDungeon;
+		bool m_TempAlreadyVotedDungeon;
 	};
-	static std::map < int, StructTempPlayerData > PlayerTempData;
+	static std::map < int, StructTempPlayerData > ms_aPlayerTempData;
 
 	int SendAuthCode(int ClientID, int Code);
 	int CheckOnlineAccount(int AuthID) const;
@@ -87,7 +87,7 @@ public:
 	int GetRank(int AuthID);
 	bool IsActive(int ClientID) const
 	{
-		return (bool)(Data.find(ClientID) != Data.end());
+		return (bool)(ms_aData.find(ClientID) != ms_aData.end());
 	}
 
 	std::string HashPassword(const char* pPassword, const char* pSalt);

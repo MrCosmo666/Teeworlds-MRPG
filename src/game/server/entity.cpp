@@ -35,7 +35,7 @@ int CEntity::NetworkClipped(int SnappingClient)
 
 int CEntity::NetworkClipped(int SnappingClient, vec2 CheckPos)
 {
-	if(SnappingClient == -1 || !GS()->IsClientEqualWorldID(SnappingClient, m_WorldID))
+	if(SnappingClient == -1 || !GS()->IsPlayerEqualWorldID(SnappingClient, m_WorldID))
 		return 0;
 
 	float dx = GS()->m_apPlayers[SnappingClient]->m_ViewPos.x-CheckPos.x;

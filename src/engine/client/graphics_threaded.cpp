@@ -913,7 +913,11 @@ int CGraphics_Threaded::WindowActive()
 int CGraphics_Threaded::WindowOpen()
 {
 	return m_pBackend->WindowOpen();
+}
 
+int CGraphics_Threaded::WindowMinimized()
+{
+	return m_pBackend->WindowMinimized();
 }
 
 void CGraphics_Threaded::ReadBackbuffer(unsigned char** ppPixels, int x, int y, int w, int h)

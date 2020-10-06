@@ -12,12 +12,12 @@
 #include "ComponentsCore/AccountMinerJob.h"
 #include "ComponentsCore/AccountPlantJob.h"
 #include "ComponentsCore/BotJob.h"
-#include "ComponentsCore/ItemJob.h"
+#include "ComponentsCore/InventoryJob/InventoryJob.h"
 #include "ComponentsCore/QuestJob.h"
 #include "ComponentsCore/ShopJob.h"
 #include "ComponentsCore/StorageJob.h"
 
-#include "ComponentsCore/SkillJob.h"
+#include "ComponentsCore/SkillsJob/SkillsJob.h"
 #include "ComponentsCore/WorldSwapJob.h"
 #include "ComponentsCore/CraftJob.h"
 #include "ComponentsCore/DungeonJob.h"
@@ -49,7 +49,7 @@ class MmoController
 
 	class AccountMainJob *m_pAccMain;
 	class BotJob *m_pBotsInfo;
-	class ItemJob *m_pItemWork;
+	class InventoryJob *m_pItemWork;
 	class AccountMinerJob *m_pAccMiner;
 	class AccountPlantJob *m_pAccPlant;
 	class QuestJob *m_pQuest;
@@ -61,7 +61,7 @@ class MmoController
 	class DungeonJob* m_pDungeonJob;
 	class HouseJob* m_pHouseJob;
 	class MailBoxJob* m_pMailBoxJob;
-	class SkillJob* m_pSkillJob;
+	class SkillsJob* m_pSkillJob;
 	class WorldSwapJob* m_pWorldSwapJob;
 
 public:
@@ -73,7 +73,7 @@ public:
 
 	AccountMainJob *Account() const { return m_pAccMain; }
 	BotJob *BotsData() const { return m_pBotsInfo; }
-	ItemJob *Item() const { return m_pItemWork; }
+	InventoryJob *Item() const { return m_pItemWork; }
 	AccountMinerJob *MinerAcc() const { return m_pAccMiner; }
 	AccountPlantJob *PlantsAcc() const { return m_pAccPlant; }
 	QuestJob *Quest() const { return m_pQuest; }
@@ -85,7 +85,7 @@ public:
 	HouseJob* House() const { return m_pHouseJob; }
 	MailBoxJob* Inbox() const { return m_pMailBoxJob; }
 	GuildJob* Member() const { return m_pGuildJob; }
-	SkillJob* Skills() const { return m_pSkillJob; }
+	SkillsJob* Skills() const { return m_pSkillJob; }
 	WorldSwapJob *WorldSwap() const { return m_pWorldSwapJob; }
 
 	// global systems

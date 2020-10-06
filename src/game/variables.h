@@ -177,13 +177,16 @@ MACRO_CONFIG_STR(SvMySqlDatabase, sv_sql_database, 32, "nope", CFGFLAG_SERVER, "
 MACRO_CONFIG_STR(SvMySqlLogin, sv_sql_login, 32, "nope", CFGFLAG_SERVER, "MySQL Login")
 MACRO_CONFIG_STR(SvMySqlPassword, sv_sql_password, 32, "nope", CFGFLAG_SERVER, "MySQL Password")
 MACRO_CONFIG_INT(SvMySqlPort, sv_sql_port, 3306, 0, 65000, CFGFLAG_SERVER, "MySQL Port")
-MACRO_CONFIG_INT(SvMySqlPoolSize, sv_sql_pool_size, 5, 1, 20, CFGFLAG_SERVER, "MySQL Pool size");
+MACRO_CONFIG_INT(SvMySqlPoolSize, sv_sql_pool_size, 3, 1, 12, CFGFLAG_SERVER, "MySQL Pool size");
 
 MACRO_CONFIG_INT(SvLoltextHspace, sv_loltext_hspace, 7, 7, 25, CFGFLAG_SERVER, "horizontal offset between loltext 'pixels'")
 MACRO_CONFIG_INT(SvLoltextVspace, sv_loltext_vspace, 7, 7, 25, CFGFLAG_SERVER, "vertical offset between loltext 'pixels'")
 
 // ui
 MACRO_CONFIG_INT(ClNotifyWindow, cl_notify_window, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Allow client to notify you on chat highlights")
+
+// performance
+MACRO_CONFIG_INT(ClInactiveRendering, cl_inactive_rendering, 1, 0, 2, CFGFLAG_CLIENT, "0 = Always render, 1 = Stop rendering when minimized, 2 = Stop rendering when window is inactive")
 
 // debug
 #ifdef CONF_DEBUG // this one can crash the server if not used correctly

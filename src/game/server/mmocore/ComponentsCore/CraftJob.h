@@ -10,19 +10,17 @@ class CraftJob : public MmoComponent
  	// create an instance of the class so that you can use it globally
 	struct CraftStruct
 	{
-		int ItemNeedID[3];
-		int	ItemNeedCount[3];
-		int GetItemID;
-		int GetItemCount;
-		int Price;
-		int WorldID;
+		int m_aItemNeedID[3];
+		int	m_aItemNeedCount[3];
+		int m_ReceivedItemID;
+		int m_ReceivedItemCount;
+		int m_Price;
+		int m_WorldID;
 	};
-	typedef std::map <int, CraftStruct> CraftType;
-	static CraftType Craft;
+	static std::map <int, CraftStruct> ms_aCraft;
 
+	int GetFinalPrice(CPlayer* pPlayer, int CraftID) const;
 	void CraftItem(CPlayer* pPlayer, int CraftID);
-	
-	bool ItEmptyType(int SelectType) const;
 	void ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectType);
 
 public:

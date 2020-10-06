@@ -91,7 +91,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 
 	// version
 	char aBuf[32];
-	str_format(aBuf, sizeof(aBuf), "Mmo-Client %s", GAME_RELEASE_VERSION);
+	str_format(aBuf, sizeof(aBuf), "Mmo-Client %s", CLIENT_RELEASE_VERSION);
 	UI()->DoLabel(&Version, aBuf, 12.0f, CUI::ALIGN_RIGHT);
 
 	if(NewPage != -1)

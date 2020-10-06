@@ -1,21 +1,36 @@
-#ifndef GAME_SERVER_CMD_H
-#define GAME_SERVER_CMD_H
+#ifndef GAME_SERVER_MMOCORE_COMMAND_PROCESSOR_H
+#define GAME_SERVER_MMOCORE_COMMAND_PROCESSOR_H
 
-class CommandProcessor
+class CCommandProcessor
 {
+	CGS* m_pGS;
+
+	void LastChat(CGS* pGS, CPlayer* pPlayer);
+
 public:
-	void ChatCmd(CNetMsg_Cl_Say *Msg, CGS *GS, CPlayer *pPlayer);
-private:
-	void LastChat(CGS *GS, CPlayer *pPlayer); 
+	CCommandProcessor(CGS* pGS);
 
-	bool IsLeaderPlayer(CGS *GS, CPlayer *pPlayer, int Access) const;
-	void ExitGuild(CGS *GS, int AccountID);
-	void CreateGuild(CGS *GS, int ClientID, const char *pName);
-	void ChangeStateDoor(CGS *GS, int HouseID);
-	int PlayerHouseID(CGS *GS, CPlayer *pPlayer) const;
+	CGS* GS() { return m_pGS; }
 
-	void UseItems(CGS *GS, int ClientID, int ItemID, int Count);
-	bool UseSkill(CGS *GS, CPlayer *pPlayer, int SkillID) const;
+	void ChatCmd(CNetMsg_Cl_Say *pMsg, CPlayer *pPlayer);
+	void AddCommand(const char* pName, const char* pParams, IConsole::FCommandCallback pfnFunc, void* pUser, const char* pHelp);
+
+	static void ConChatLogin(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatRegister(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatGuildExit(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatGuildCreate(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatDoorHouse(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatSellHouse(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatPosition(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatSound(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatUseItem(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatUseSkill(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatCmdList(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatRules(IConsole::IResult* pResult, void* pUserData);
+
+#ifdef CONF_DISCORD
+	static void ConChatDiscordConnect(IConsole::IResult* pResult, void* pUserData);
+#endif
 };
 
 #endif

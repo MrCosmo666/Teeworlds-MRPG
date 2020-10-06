@@ -411,7 +411,7 @@ void CGameClient::OnInit()
 	m_pMenus->InitLoading(TotalWorkAmount);
 	m_pMenus->RenderLoading(4);
 
-	// загружаем шрифт
+	// loading font
 	char aFontName[256];
 	static CFont *pDefaultFont = 0;
 	str_format(aFontName, sizeof(aFontName), "fonts/%s", g_Config.m_ClFontfile);
@@ -429,7 +429,7 @@ void CGameClient::OnInit()
 	}
 	else
 	{
-		// загружаем стандартный фонт
+		// loading standard font
 		IOHANDLE File = Storage()->OpenFile("fonts/DejaVuSans.ttf", IOFLAG_READ, IStorage::TYPE_ALL, aFontName, sizeof(aFontName));
 		if (File)
 		{
@@ -1096,7 +1096,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		if (!m_MmoMsgSent && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 		{
 			CNetMsg_Cl_IsMmoServer Msg;
-			Msg.m_Version = CLIENT_VERSION_MMO;
+			Msg.m_Version = PROTOCOL_VERSION_MMO;
 			Client()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD);
 			m_MmoMsgSent = true;
 		}

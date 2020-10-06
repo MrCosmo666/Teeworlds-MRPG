@@ -25,6 +25,11 @@
 	 It may seem that it does not use Pool, 
 	 but in fact it is and is created as a reserve when running
 	 <tlock>
+
+	 Usage is performed in turn following synchronously 
+	 working running through each request in order
+
+	 This pool is not asynchronous
 */
 // sql pool connections mutex
 std::mutex SqlConnectionLock;
@@ -39,12 +44,11 @@ CConectionPool::CConectionPool()
 {
 	try
 	{
-		Connection* pConnection = nullptr;
 		m_pDriver = get_driver_instance();
 
 		SqlConnectionLock.lock();
 		for(int i = 0; i < g_Config.m_SvMySqlPoolSize; ++i) 
-			pConnection = this->CreateConnection();
+			this->CreateConnection();
 
 		SqlConnectionLock.unlock();
 	}
@@ -98,7 +102,7 @@ Connection* CConectionPool::GetConnection()
 	{
 		pConnection = m_ConnList.front();
 		m_ConnList.pop_front();
-		dbg_msg("sql", "got connection. checking for availability!");
+		dbg_msg("sql", "got connection from front. checking for availability!");
 		if(pConnection->isClosed())
 		{
 			dbg_msg("sql", "connection closed. re-creation!");
@@ -107,7 +111,7 @@ Connection* CConectionPool::GetConnection()
 			pConnection = this->CreateConnection();
 		}
 
-		dbg_msg("sql", "connection is established %d pool size", m_ConnList.size());
+		dbg_msg("sql", "connection is established %d pool size", (int)m_ConnList.size());
 		SqlConnectionLock.unlock();
 		return pConnection;
 	}
@@ -199,10 +203,10 @@ void CConectionPool::InsertFormated(int Milliseconds, const char *Table, const c
 		const int pr_Milliseconds = Milliseconds;
 		std::string pr_Query = Query;
 
-		SqlThreadRecursiveLock.lock();
 		if(Milliseconds > 0)
 			std::this_thread::sleep_for(std::chrono::milliseconds(pr_Milliseconds));
 
+		SqlThreadRecursiveLock.lock();
 		Connection* pConnection = nullptr;
 		try
 		{
@@ -255,10 +259,10 @@ void CConectionPool::UpdateFormated(int Milliseconds, const char *Table, const c
 		const int pr_Milliseconds = Milliseconds;
 		std::string pr_Query = Query;
 
-		SqlThreadRecursiveLock.lock();
 		if(pr_Milliseconds > 0)
 			std::this_thread::sleep_for(std::chrono::milliseconds(pr_Milliseconds));
-		
+
+		SqlThreadRecursiveLock.lock();
 		Connection* pConnection = nullptr;
 		try
 		{
@@ -311,10 +315,10 @@ void CConectionPool::DeleteFormated(int Milliseconds, const char *Table, const c
 		const int pr_Milliseconds = Milliseconds;
 		std::string pr_Query = Query;
 
-		SqlThreadRecursiveLock.lock();
 		if(Milliseconds > 0)
 			std::this_thread::sleep_for(std::chrono::milliseconds(pr_Milliseconds));
-		
+
+		SqlThreadRecursiveLock.lock();
 		Connection* pConnection = nullptr;
 		try
 		{

@@ -215,6 +215,7 @@ public:
 	virtual bool GetDesktopResolution(int Index, int* pDesktopWidth, int* pDesktopHeight);
 	virtual int WindowActive();
 	virtual int WindowOpen();
+	virtual int WindowMinimized();
 
 	virtual void NotifyWindow();
 };

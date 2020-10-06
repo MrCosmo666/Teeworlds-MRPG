@@ -9,14 +9,14 @@ class AccountMinerJob : public MmoComponent
 {
 	struct StructOres
 	{
-		int ItemID;
-		int Level;
-		int Health;
-		int PositionX;
-		int PositionY;
-		int Distance;
+		int m_ItemID;
+		int m_Level;
+		int m_Health;
+		int m_PositionX;
+		int m_PositionY;
+		int m_Distance;
 	};
-	static std::map < int, StructOres > Ore;
+	static std::map < int, StructOres > ms_aOre;
 
 public:
 	int GetOreLevel(vec2 Pos) const;

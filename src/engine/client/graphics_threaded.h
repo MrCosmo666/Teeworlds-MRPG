@@ -332,6 +332,7 @@ public:
 	virtual int GetWindowScreen() = 0;
 	virtual int WindowActive() = 0;
 	virtual int WindowOpen() = 0;
+	virtual int WindowMinimized() = 0;
 
 	virtual void RunBuffer(CCommandBuffer* pBuffer) = 0;
 	virtual bool IsIdle() const = 0;
@@ -458,6 +459,7 @@ public:
 
 	virtual int WindowActive();
 	virtual int WindowOpen();
+	virtual int WindowMinimized();
 
 	virtual int Init();
 	virtual void Shutdown();

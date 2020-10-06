@@ -9,14 +9,13 @@ class StorageJob : public MmoComponent
 {
 	struct SturctStorage
 	{
-		char Name[32];
-		int PosX;
-		int PosY;
-		int Count;
-		int Currency;
-		int WorldID;
+		char m_aName[32];
+		int m_PosX;
+		int m_PosY;
+		int m_Currency;
+		int m_WorldID;
 	};
-	static std::map < int, SturctStorage > Storage;
+	static std::map < int, SturctStorage > ms_aStorage;
 
 public:
 	virtual void OnInit();

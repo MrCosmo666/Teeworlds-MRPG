@@ -9,12 +9,12 @@ class AetherJob : public MmoComponent
 {
 	struct StructTeleport
 	{
-		int TeleX;
-		int TeleY;
-		int WorldID;
-		char TeleName[64];
+		int m_TeleX;
+		int m_TeleY;
+		int m_WorldID;
+		char m_aTeleName[64];
 	};
-	static std::map < int, StructTeleport > Teleport;
+	static std::map < int, StructTeleport > ms_aTeleport;
 
 public:
 	virtual void OnInit();

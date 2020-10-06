@@ -9,13 +9,13 @@ class AccountPlantJob : public MmoComponent
 {
 	struct StructPlants
 	{
-		int ItemID;
-		int Level;
-		int PositionX;
-		int PositionY;
-		int Distance;
+		int m_ItemID;
+		int m_Level;
+		int m_PositionX;
+		int m_PositionY;
+		int m_Distance;
 	};
-	static std::map < int, StructPlants > Plants;
+	static std::map < int, StructPlants > ms_aPlants;
 
 public:
 	virtual void OnInitWorld(const char* pWhereLocalWorld);
