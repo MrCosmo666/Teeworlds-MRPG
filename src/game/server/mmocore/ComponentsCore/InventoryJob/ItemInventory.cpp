@@ -140,7 +140,7 @@ bool CInventoryItem::Equip()
 
 bool CInventoryItem::Use(int Count)
 {
-	Count = min(Count, m_Count);
+	Count = Info().m_Function == FUNCTION_ONE_USED ? 1 : min(Count, m_Count);
 	if(Count <= 0 || !m_pPlayer || !m_pPlayer->IsAuthed())
 		return false;
 

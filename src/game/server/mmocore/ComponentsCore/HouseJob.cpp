@@ -249,7 +249,7 @@ void HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 	if(RES->next())
 	{
 		const int Price = RES->getInt("Price");
-		if(pPlayer->CheckFailMoney(Price))	
+		if(!pPlayer->SpendCurrency(Price))	
 			return;
 
 		ms_aHouse[HouseID].m_Bank = 0;
@@ -549,11 +549,11 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 			return true;
 		}
 		
-		if(pPlayer->CheckFailMoney(Get))
-			return true;
-
-		AddSafeDeposit(pPlayer, Get);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE);
+		if(pPlayer->SpendCurrency(Get))
+		{
+			AddSafeDeposit(pPlayer, Get);
+			GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE);
+		}
 		return true;
 	}
 
@@ -627,7 +627,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		}
 
 		const int ItemID = VoteID;
-		if(pPlayer->CheckFailMoney(1, ItemID))
+		if(!pPlayer->SpendCurrency(1, ItemID))
 			return true;
 
 		const int ChanceSuccesful = VoteID2;

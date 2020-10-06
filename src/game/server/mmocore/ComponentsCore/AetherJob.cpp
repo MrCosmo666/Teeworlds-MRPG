@@ -42,7 +42,7 @@ bool AetherJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID
 	{
 		const int TeleportID = VoteID;
 		const int Price = VoteID2;
-		if(Price > 0 && pPlayer->CheckFailMoney(Price))
+		if(Price > 0 && !pPlayer->SpendCurrency(Price))
 			return true;
 
 		const vec2 Position = vec2(ms_aTeleport[TeleportID].m_TeleX, ms_aTeleport[TeleportID].m_TeleY);

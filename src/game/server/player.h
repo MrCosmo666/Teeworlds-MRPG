@@ -134,7 +134,7 @@ public:
 	/* #########################################################################
 		FUNCTIONS PLAYER ACCOUNT 
 	######################################################################### */
-	bool CheckFailMoney(int Price, int ItemID = 1, bool CheckOnly = false);
+	bool SpendCurrency(int Price, int ItemID = 1);
 	void GiveEffect(const char* Potion, int Sec, int Random = 0);
 	void SetLanguage(const char* pLanguage);
 	const char* GetLanguage() const;

@@ -154,7 +154,7 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 
 	// we are already organizing the crafting
 	const int Price = GetFinalPrice(pPlayer, CraftID);
-	if(pPlayer->CheckFailMoney(Price))
+	if(!pPlayer->SpendCurrency(Price))
 		return;
 
 	// delete ticket if equipped  

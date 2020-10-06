@@ -163,7 +163,7 @@ void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
 		return GS()->Chat(ClientID, "Your same item found in the database, need reopen the slot!");
 
 	// if the money for the slot auction is withdrawn
-	if(pPlayer->CheckFailMoney(g_Config.m_SvAuctionPriceSlot))	
+	if(!pPlayer->SpendCurrency(g_Config.m_SvAuctionPriceSlot))	
 		return;
 
 	// pick up the item and add a slot
@@ -211,7 +211,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 		}
 
 		const int NeedItem = SHOPITEM->getInt("NeedItem");
-		if (pPlayer->CheckFailMoney(Price, NeedItem))
+		if (!pPlayer->SpendCurrency(Price, NeedItem))
 			return false;
 
 		char aBuf[128];
@@ -225,7 +225,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 
 	// - - - - - - - - - - - -SHOP - - - - - - - - - - - - -
 	const int NeedItem = SHOPITEM->getInt("NeedItem");
-	if (pPlayer->CheckFailMoney(Price, NeedItem))
+	if (!pPlayer->SpendCurrency(Price, NeedItem))
 		return false;
 
 	pPlayerBuyightItem.Add(Count, 0, Enchant);

@@ -301,11 +301,7 @@ bool InventoryJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 			return true;
 
 		Get = min(AvailableCount, Get);
-		InventoryItem& pItemPlayer = pPlayer->GetItem(VoteID);
-		if(pItemPlayer.Info().m_Function == FUNCTION_ONE_USED)
-			Get = 1;
-
-		pItemPlayer.Use(Get);
+		pPlayer->GetItem(VoteID).Use(Get);
 		return true;
 	}
 
@@ -333,9 +329,7 @@ bool InventoryJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 		if(!pPlayer->GetCharacter())
 			return true;
 
-		InventoryItem& pPlayerSelectedItem = pPlayer->GetItem(VoteID);
-		pPlayerSelectedItem.Equip();
-
+		pPlayer->GetItem(VoteID).Equip();
 		GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
@@ -343,36 +337,29 @@ bool InventoryJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int Vot
 
 	if(PPSTR(CMD, "IENCHANT") == 0)
 	{
-		InventoryItem &pPlayerSelectedItem = pPlayer->GetItem(VoteID);
-		if(pPlayerSelectedItem.IsEnchantMaxLevel())
+		InventoryItem &pItemPlayer = pPlayer->GetItem(VoteID);
+		if(pItemPlayer.IsEnchantMaxLevel())
 		{
 			GS()->Chat(ClientID, "You enchant max level for this item!");
 			return true;			
 		}
 
-		const int Price = pPlayerSelectedItem.GetEnchantPrice();
-		InventoryItem &pPlayerMaterialItem = pPlayer->GetItem(itMaterial);
-		if(Price > pPlayerMaterialItem.m_Count)
-		{
-			GS()->Chat(ClientID, "You need {INT} Your {INT} materials!", &Price, &pPlayerMaterialItem.m_Count);
+		const int Price = pItemPlayer.GetEnchantPrice();
+		if(!pPlayer->SpendCurrency(Price, itMaterial))
 			return true;
-		}
 
-		if(pPlayerMaterialItem.Remove(Price, 0))
-		{
-			const int EnchantLevel = pPlayerSelectedItem.m_Enchant+1;
-			pPlayerSelectedItem.SetEnchant(EnchantLevel);
-			if (pPlayerSelectedItem.IsEnchantMaxLevel())
-				GS()->SendEquipItem(ClientID, -1);
+		const int EnchantLevel = pItemPlayer.m_Enchant + 1;
+		pItemPlayer.SetEnchant(EnchantLevel);
+		if(pItemPlayer.IsEnchantMaxLevel())
+			GS()->SendEquipItem(ClientID, -1);
 
-			char aEnchantBuf[16];
-			pPlayerSelectedItem.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf));
+		char aEnchantBuf[16];
+		pItemPlayer.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf));
 
-			char aAttributes[128];
-			pPlayerSelectedItem.FormatAttributes(aAttributes, sizeof(aAttributes));
-			GS()->Chat(-1, "{STR} enchant {STR} {STR} {STR}", GS()->Server()->ClientName(ClientID), pPlayerSelectedItem.Info().GetName(), aEnchantBuf, aAttributes);
-			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-		}
+		char aAttributes[128];
+		pItemPlayer.FormatAttributes(aAttributes, sizeof(aAttributes));
+		GS()->Chat(-1, "{STR} enchant {STR} {STR} {STR}", GS()->Server()->ClientName(ClientID), pItemPlayer.Info().GetName(), aEnchantBuf, aAttributes);
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 

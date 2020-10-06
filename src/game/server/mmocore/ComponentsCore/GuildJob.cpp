@@ -227,7 +227,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			return true;
 		}
 
-		if (pPlayer->CheckFailMoney(Get))
+		if(!pPlayer->SpendCurrency(Get))
 			return true;
 
 		if (AddMoneyBank(GuildID, Get))

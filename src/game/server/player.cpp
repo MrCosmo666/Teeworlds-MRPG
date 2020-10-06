@@ -353,27 +353,18 @@ bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int Maxi
 /* #########################################################################
 	FUNCTIONS PLAYER ACCOUNT 
 ######################################################################### */
-bool CPlayer::CheckFailMoney(int Price, int ItemID, bool CheckOnly)
+bool CPlayer::SpendCurrency(int Price, int ItemID)
 {
-	if (ItemID < 0)
-		return true;
 	if (Price <= 0)
-		return false;
+		return true;
 
 	InventoryItem &pItemPlayer = GetItem(ItemID);
 	if(pItemPlayer.m_Count < Price)
 	{
 		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", &Price, &pItemPlayer.m_Count, pItemPlayer.Info().GetName(this), NULL);
-		return true;
-	}
-
-	if (CheckOnly)
 		return false;
-
-	if (!pItemPlayer.Remove(Price))
-		return true;
-
-	return false;
+	}
+	return pItemPlayer.Remove(Price);
 }
 
 void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
