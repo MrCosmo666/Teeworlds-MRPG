@@ -1076,7 +1076,7 @@ void CGS::OnConsoleInit()
 
 	Console()->Register("parseskin", "i[cid]", CFGFLAG_SERVER, ConParseSkin, m_pServer, "Parse skin on console. Easy for devlop bots.");
 	Console()->Register("giveitem", "i[cid]i[itemid]i[count]i[ench]i[mail]", CFGFLAG_SERVER, ConGiveItem, m_pServer, "Give item <clientid> <itemid> <count> <enchant> <mail 1=yes 0=no>");
-	Console()->Register("removeitem", "i[cid]i[itemid]i[count]", CFGFLAG_SERVER, ConRemItem, m_pServer, "Give item <clientid> <itemid> <count>");
+	Console()->Register("removeitem", "i[cid]i[itemid]i[count]", CFGFLAG_SERVER, ConRemItem, m_pServer, "Remove item <clientid> <itemid> <count>");
 	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, m_pServer, "Say in chat");
 	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, m_pServer, "(Warning) Add new bot on database or update if finding <clientid> <bot name>");
 	Console()->Register("convert_passwords", "", CFGFLAG_SERVER, ConConvertPasswords, m_pServer, "Convert existing plaintext passwords into hashed passwords");
