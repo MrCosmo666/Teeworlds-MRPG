@@ -84,16 +84,16 @@ bool CCharacterBotAI::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	if(m_pBotPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB || pFrom->IsBot())
 		return false;
 
-	// damage received or he already has a negative health value
+	// damage receive
 	CCharacter::TakeDamage(Force, Dmg, From, Weapon);
 
-	// set up an aggression against the person who caused the damage
+	// if the bot doesn't have target player, set to from
+	if(IsBotTargetEmpty())
+		SetTarget(From);
+
+	// add (from player) to the list of those who caused damage
 	if(m_aListDmgPlayers.find(From) == m_aListDmgPlayers.end())
-	{
 		m_aListDmgPlayers[From] = true;
-		if(IsBotTargetEmpty())
-			SetTarget(From);
-	}
 
 	// verify death
 	if(m_Health <= 0)

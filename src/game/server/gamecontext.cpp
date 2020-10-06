@@ -28,7 +28,7 @@
 // static data that have the same value in different objects
 std::map < int , CGS::StructAttribut > CGS::ms_aAttributsInfo;
 std::map < int , std::map < std::string , int > > CGS::ms_aEffects;
-int CGS::m_RaidExp = 100;
+int CGS::m_MultiplierExp = 100;
 
 enum
 {
@@ -1128,9 +1128,9 @@ void CGS::OnTickLocalWorld()
 	{
 		m_DayEnumType = Server()->GetEnumTypeDay(); 
 		if(m_DayEnumType == DayType::NIGHTTYPE)
-			m_RaidExp = 100 + random_int() % 200;
+			m_MultiplierExp = 100 + random_int() % 200;
 		else if(m_DayEnumType == DayType::MORNINGTYPE)
-			m_RaidExp = 100;
+			m_MultiplierExp = 100;
 	
 		SendDayInfo(-1);
 	}
@@ -2395,7 +2395,7 @@ void CGS::SendDayInfo(int ClientID)
 	if(ClientID == -1)
 		Chat(-1, "{STR} came! Good {STR}!", Server()->GetStringTypeDay(), Server()->GetStringTypeDay());
 	if(m_DayEnumType == DayType::NIGHTTYPE)
-		Chat(ClientID, "Nighttime experience was increase to {INT}%", &m_RaidExp);
+		Chat(ClientID, "Nighttime experience was increase to {INT}%", &m_MultiplierExp);
 	else if(m_DayEnumType == DayType::MORNINGTYPE)
 		Chat(ClientID, "Daytime experience was downgraded to 100%");
 }
@@ -2413,7 +2413,7 @@ int CGS::GetExperienceMultiplier(int Experience) const
 {
 	if(IsDungeon())
 		return (int)kurosio::translate_to_procent_rest(Experience, g_Config.m_SvMultiplierExpRaidDungeon);
-	return (int)kurosio::translate_to_procent_rest(Experience, m_RaidExp);
+	return (int)kurosio::translate_to_procent_rest(Experience, m_MultiplierExp);
 }
 
 void CGS::UpdateZonePVP()

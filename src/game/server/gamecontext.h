@@ -305,7 +305,7 @@ private:
 	######################################################################### */
 	bool m_AllowedPVP;
 	int m_DayEnumType;
-	static int m_RaidExp;
+	static int m_MultiplierExp;
 };
 
 inline int64 CmaskAll() { return -1; }
