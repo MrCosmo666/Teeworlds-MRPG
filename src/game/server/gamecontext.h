@@ -284,7 +284,7 @@ public:
 	int GetWorldID() const { return m_WorldID; }
 	int DungeonID() const { return m_DungeonID; }
 	bool IsDungeon() const { return (m_DungeonID > 0); }
-	int IncreaseExperienceRaid(int IncreaseCount) const;
+	int GetExperienceMultiplier(int IncreaseCount) const;
 	bool IsPlayerEqualWorldID(int ClientID, int WorldID = -1) const;
 	bool IsAllowedPVP() const { return m_AllowedPVP; }
 	const char* AtributeName(int BonusID) const;

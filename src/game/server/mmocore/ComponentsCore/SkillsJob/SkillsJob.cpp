@@ -134,7 +134,7 @@ void SkillsJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 {
 	CSkill& pSkill = pPlayer->GetSkill(SkillID);
 	const int ClientID = pPlayer->GetCID();
-	const bool Passive = pSkill.Info().m_Passive;
+	const bool IsPassive = pSkill.Info().m_Passive;
 	const bool IsMaxLevel = pSkill.m_Level >= pSkill.Info().m_MaxLevel;
 	const int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + SkillID;
 
@@ -151,11 +151,10 @@ void SkillsJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 	}
 	GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pSkill.Info().m_aDesc);
 
-	if(!Passive)
+	if(!IsPassive)
 	{
 		GS()->AVM(ClientID, "null", NOPE, HideID, "Mana required {INT}%", &pSkill.Info().m_ManaProcent);
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pSkill.Info().m_aDesc);
-		if(pSkill.m_Level >= 1)
+		if(pSkill.IsLearned())
 		{
 			GS()->AVM(ClientID, "null", NOPE, HideID, "F1 Bind: (bind 'key' say \"/useskill {INT}\")", &SkillID);
 			GS()->AVM(ClientID, "SKILLCHANGEEMOTICION", SkillID, HideID, "Used on {STR}", pSkill.GetControlEmoteStateName());

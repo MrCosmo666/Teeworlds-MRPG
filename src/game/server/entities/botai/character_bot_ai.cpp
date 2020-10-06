@@ -24,9 +24,6 @@ int CCharacterBotAI::GetSnapFullID() const { return m_pBotPlayer->GetCID() * SNA
 bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 {
 	m_pBotPlayer = static_cast<CPlayerBot*>(pPlayer);
-	if(!m_pBotPlayer)
-		return false;
-
 	if(!CCharacter::Spawn(m_pBotPlayer, Pos))
 		return false;
 
@@ -61,18 +58,19 @@ bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 	return true;
 }
 
-void CCharacterBotAI::ShowProgress()
+void CCharacterBotAI::ShowProgressHealth()
 {
-	for(const auto & pPlayerDamage : a_ListDmgPlayers)
+	for(const auto & pPlayerDamage : m_aListDmgPlayers)
 	{
 		CPlayer *pPlayer = GS()->GetPlayer(pPlayerDamage.first, true);
 		if(pPlayer)
 		{
+			const int BotID = m_pBotPlayer->GetBotID();
 			const int Health = m_pBotPlayer->GetHealth();
 			const int StartHealth = m_pBotPlayer->GetStartHealth();
-			const float gethp = (Health * 100.0) / StartHealth;
-			std::unique_ptr<char[]> Progress = std::move(GS()->LevelString(100, (int)gethp, 10, ':', ' '));
-			GS()->SBL(pPlayerDamage.first, BroadcastPriority::BROADCAST_GAME_PRIORITY, 10, "Health {STR}({INT}/{INT})", Progress.get(), &Health, &StartHealth);
+			std::unique_ptr<char[]> Progress = std::move(GS()->LevelString(StartHealth, Health, 10, ':', ' '));
+			GS()->SBL(pPlayerDamage.first, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "{STR} {STR}({INT}/{INT})", 
+				BotJob::ms_aDataBot[BotID].m_aNameBot, Progress.get(), &Health, &StartHealth);
 		}
 	}	
 }
@@ -86,40 +84,41 @@ bool CCharacterBotAI::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	if(m_pBotPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB || pFrom->IsBot())
 		return false;
 
-	// before and after damage to health
-	int StableDamage = Health();
-	const bool BotDie = CCharacter::TakeDamage(Force, Dmg, From, Weapon);
-	StableDamage -= Health();
+	// damage received or he already has a negative health value
+	CCharacter::TakeDamage(Force, Dmg, From, Weapon);
 
 	// set up an aggression against the person who caused the damage
-	if (From != m_pBotPlayer->GetCID())
+	if(m_aListDmgPlayers.find(From) == m_aListDmgPlayers.end())
 	{
-		a_ListDmgPlayers[From] += StableDamage;
-		if (m_BotTargetID == m_pBotPlayer->GetCID())
+		m_aListDmgPlayers[From] = true;
+		if(IsBotTargetEmpty())
 			SetTarget(From);
 	}
 
-	// death
-	if(BotDie)
+	// verify death
+	if(m_Health <= 0)
 	{
 		if(Weapon != WEAPON_SELF && Weapon != WEAPON_WORLD)
 		{
-			for(const auto& ld : a_ListDmgPlayers)
+			for(const auto& ld : m_aListDmgPlayers)
 			{
-				const int ParseClientID = ld.first;
-				CPlayer* pPlayer = GS()->GetPlayer(ParseClientID, true, true);
-				if(!pPlayer || ParseClientID == m_pBotPlayer->GetCID() || distance(pPlayer->m_ViewPos, m_Core.m_Pos) > 1000.0f)
+				const int ClientID = ld.first;
+				CPlayer* pPlayer = GS()->GetPlayer(ClientID, true, true);
+				if(!pPlayer || !GS()->IsPlayerEqualWorldID(ClientID, m_pBotPlayer->GetPlayerWorldID())
+					|| distance(pPlayer->m_ViewPos, m_Core.m_Pos) > 1000.0f)
 					continue;
 
-				DieRewardPlayer(pPlayer, Force);
+				RewardPlayer(pPlayer, Force);
 			}
 		}
-		a_ListDmgPlayers.clear();
+		m_aListDmgPlayers.clear();
 		ClearTarget();
+
 		Die(From, Weapon);
-		return true;
+		return false;
 	}
-	return false;
+
+	return true;
 }
 
 void CCharacterBotAI::Die(int Killer, int Weapon)
@@ -128,6 +127,53 @@ void CCharacterBotAI::Die(int Killer, int Weapon)
 		return;
 
 	CCharacter::Die(Killer, Weapon);
+}
+
+void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force)
+{
+	const int ClientID = pPlayer->GetCID();
+	const int BotID = m_pBotPlayer->GetBotID();
+	const int SubID = m_pBotPlayer->GetBotSub();
+
+	// quest mob progress
+	if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
+		GS()->Mmo()->Quest()->AddMobProgress(pPlayer, BotID);
+
+	// golds
+	const int Golds = max(BotJob::ms_aMobBot[SubID].m_Power / g_Config.m_SvStrongGold, 1);
+	pPlayer->AddMoney(Golds);
+
+	// experience
+	const int ExperienceMob = kurosio::computeExperience(BotJob::ms_aMobBot[SubID].m_Level) / g_Config.m_SvKillmobsIncreaseLevel;
+	const int ExperienceWithMultiplier = max(1, GS()->GetExperienceMultiplier(ExperienceMob));
+	pPlayer->AddExp(ExperienceWithMultiplier);
+
+	// drop experience
+	const int ExperienceDrop = max(ExperienceWithMultiplier / 2, 1);
+	GS()->CreateDropBonuses(m_Core.m_Pos, 1, ExperienceDrop, (1 + random_int() % 2), Force);
+
+	// drop item's
+	const float ActiveLuckyDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
+	for(int i = 0; i < 5; i++)
+	{
+		const int DropItem = BotJob::ms_aMobBot[SubID].m_aDropItem[i];
+		const int CountItem = BotJob::ms_aMobBot[SubID].m_aCountItem[i];
+		if(DropItem <= 0 || CountItem <= 0)
+			continue;
+
+		const float RandomDrop = clamp(BotJob::ms_aMobBot[SubID].m_aRandomItem[i] + ActiveLuckyDrop, 0.0f, 100.0f);
+		CreateRandomDropItem(ClientID, RandomDrop, DropItem, CountItem, Force);
+	}
+
+	// skill point
+	// TODO: balance depending on the difficulty, not just the level
+	const int CalculateSP = (pPlayer->Acc().m_Level > BotJob::ms_aMobBot[SubID].m_Level ? 40 + min(40, (pPlayer->Acc().m_Level - BotJob::ms_aMobBot[SubID].m_Level) * 2) : 40);
+	if(random_int() % CalculateSP == 0)
+	{
+		InventoryItem& pItemSkillPlayer = pPlayer->GetItem(itSkillPoint);
+		pItemSkillPlayer.Add(1);
+		GS()->Chat(ClientID, "Skill points increased. Now ({INT}SP)", &pItemSkillPlayer.m_Count);
+	}
 }
 
 void CCharacterBotAI::CreateRandomDropItem(int DropCID, float Random, int ItemID, int Count, vec2 Force)
@@ -139,66 +185,6 @@ void CCharacterBotAI::CreateRandomDropItem(int DropCID, float Random, int ItemID
 	if (RandomDrop < Random)
 		GS()->CreateDropItem(m_Core.m_Pos, DropCID, ItemID, Count, 0, Force);
 	return;
-}
-
-void CCharacterBotAI::DieRewardPlayer(CPlayer* pPlayer, vec2 ForceDies)
-{
-	const int ClientID = pPlayer->GetCID();
-	const int BotID = m_pBotPlayer->GetBotID();
-	const int SubID = m_pBotPlayer->GetBotSub();
-	const float LuckyDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
-
-	if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
-		GS()->Mmo()->Quest()->AddMobProgress(pPlayer, BotID);
-
-	for (int i = 0; i < 5; i++)
-	{
-		const int DropItem = BotJob::ms_aMobBot[SubID].m_aDropItem[i];
-		const int CountItem = BotJob::ms_aMobBot[SubID].m_aCountItem[i];
-		if (DropItem <= 0 || CountItem <= 0)
-			continue;
-
-		const float RandomDrop = clamp(BotJob::ms_aMobBot[SubID].m_aRandomItem[i] + LuckyDrop, 0.0f, 100.0f);
-		CreateRandomDropItem(ClientID, RandomDrop, DropItem, CountItem, ForceDies);
-	}
-
-	const int MultiplierExperience = kurosio::computeExperience(BotJob::ms_aMobBot[SubID].m_Level) / g_Config.m_SvKillmobsIncreaseLevel;
-	const int MultiplierRaid = clamp(GS()->IncreaseExperienceRaid(MultiplierExperience), 1, GS()->IncreaseExperienceRaid(MultiplierExperience));
-	pPlayer->AddExp(MultiplierRaid);
-
-	const int MultiplierDrops = max(MultiplierRaid / 2, 1);
-	GS()->CreateDropBonuses(m_Core.m_Pos, 1, MultiplierDrops, (1+random_int() % 2), ForceDies);
-
-	const int MultiplierGolds = max(BotJob::ms_aMobBot[SubID].m_Power / g_Config.m_SvStrongGold, 1);
-	pPlayer->AddMoney(MultiplierGolds);
-	
-	// TODO: balance depending on the difficulty, not just the level
-	const int CalculateSP = (pPlayer->Acc().m_Level > BotJob::ms_aMobBot[SubID].m_Level ? 40 + min(40, (pPlayer->Acc().m_Level - BotJob::ms_aMobBot[SubID].m_Level)*2) : 40);
-	if (random_int() % CalculateSP == 0)
-	{
-		InventoryItem& pItemSkillPlayer = pPlayer->GetItem(itSkillPoint);
-		pItemSkillPlayer.Add(1);
-		GS()->Chat(ClientID, "Skill points increased. Now ({INT}SP)", &pItemSkillPlayer.m_Count);
-	}
-}
-
-void CCharacterBotAI::ClearTarget()
-{
-	const int FromID = m_pBotPlayer->GetCID();
-	if (m_BotTargetID != FromID)
-	{
-		m_pBotPlayer->m_TargetPos = vec2(0, 0);
-		m_EmotionsStyle = 1 + random_int() % 5;
-		m_BotTargetID = FromID;
-		m_BotTargetLife = 0;
-		m_BotTargetCollised = 0;
-	}
-}
-
-void CCharacterBotAI::SetTarget(int ClientID)
-{
-	m_EmotionsStyle = EMOTE_ANGRY;
-	m_BotTargetID = ClientID;
 }
 
 void CCharacterBotAI::ChangeWeapons()
@@ -264,12 +250,12 @@ void CCharacterBotAI::EngineBots()
 		EngineQuestMob();
 }
 
-// interactive NPC
+// interactive of NPC
 void CCharacterBotAI::EngineNPC()
 {
 	const int MobID = m_pBotPlayer->GetBotSub();
 	const int EmoteBot = BotJob::ms_aNpcBot[MobID].m_Emote;
-	EmoteActions(EmoteBot);
+	EmotesAction(EmoteBot);
 
 	// direction eyes
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
@@ -282,29 +268,27 @@ void CCharacterBotAI::EngineNPC()
 	else
 		PlayerFinding = BaseFunctionNPC();
 
-	if (!PlayerFinding && !BotJob::ms_aNpcBot[MobID].m_Static)
+	// walking for npc
+	if(!PlayerFinding && !BotJob::ms_aNpcBot[MobID].m_Static && random_int() % 50 == 0)
 	{
-		if(random_int() % 50 == 0)
-		{
-			const int RandomDirection = random_int()%6;
-			if(RandomDirection == 0 || RandomDirection == 2)
-				m_Input.m_Direction = -1 + RandomDirection;
-			else m_Input.m_Direction = 0;
-		}
+		const int RandomDirection = random_int() % 6;
+		if(RandomDirection == 0 || RandomDirection == 2)
+			m_Input.m_Direction = -1 + RandomDirection;
+		else m_Input.m_Direction = 0;
 	}
 }
 
-// Interactives of quest mobiles
+// interactive of Quest bots
 void CCharacterBotAI::EngineQuestMob()
 {
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
 		m_Input.m_TargetY = random_int()%4- random_int()%8;
 	m_Input.m_TargetX = (m_Input.m_Direction*10+1);
-	EmoteActions(EMOTE_BLINK);
+	EmotesAction(EMOTE_BLINK);
 	SearchTalkedPlayer();
 }
 
-// Interactive mobs hostile
+// interactive of Mobs
 void CCharacterBotAI::EngineMobs()
 {
 	ResetInput();
@@ -317,9 +301,9 @@ void CCharacterBotAI::EngineMobs()
 	else if(Server()->Tick() > m_pBotPlayer->m_LastPosTick)
 		m_pBotPlayer->m_TargetPos = vec2(0, 0);
 
-	// effect sleppy
+	// behavior sleppy
 	const int MobID = m_pBotPlayer->GetBotSub();
-	if(m_BotTargetID == m_pBotPlayer->GetCID() && str_comp(BotJob::ms_aMobBot[MobID].m_aBehavior, "Sleepy") == 0)
+	if(IsBotTargetEmpty() && str_comp(BotJob::ms_aMobBot[MobID].m_aBehavior, "Sleepy") == 0)
 	{
 		if(Server()->Tick() % (Server()->TickSpeed() / 2) == 0)
 		{
@@ -329,20 +313,20 @@ void CCharacterBotAI::EngineMobs()
 		return;
 	}
 
+	if(BotJob::ms_aMobBot[MobID].m_Boss)
+		ShowProgressHealth();
+
 	const bool WeaponedBot = (BotJob::ms_aMobBot[MobID].m_Spread >= 1);
 	if(WeaponedBot)
-	{
-		if(BotJob::ms_aMobBot[MobID].m_Boss)
-			ShowProgress();
 		ChangeWeapons();
-	}
+
 	Move();
 		
 	m_PrevPos = m_Pos;
 	if(m_Input.m_Direction)
 		m_PrevDirection = m_Input.m_Direction;
 
-	EmoteActions(m_EmotionsStyle);
+	EmotesAction(m_EmotionsStyle);
 }
 
 void CCharacterBotAI::Move()
@@ -469,7 +453,7 @@ void CCharacterBotAI::Move()
 void CCharacterBotAI::Action()
 {
 	CPlayer* pPlayer = GS()->GetPlayer(m_BotTargetID, true, true);
-	if(m_BotTargetID == m_pBotPlayer->GetCID() || !pPlayer || m_BotTargetCollised)
+	if(IsBotTargetEmpty() || !pPlayer || m_BotTargetCollised)
 		return;
 
 	if((m_Input.m_Hook && m_Core.m_HookState == HOOK_IDLE) || m_ReloadTimer != 0)
@@ -520,8 +504,7 @@ CPlayer *CCharacterBotAI::SearchPlayer(int Distance)
 // finding a player among people who have the highest fury
 CPlayer *CCharacterBotAI::SearchTenacityPlayer(float Distance)
 {
-	const bool ActiveTargetID = m_BotTargetID != m_pBotPlayer->GetCID();
-	if(!ActiveTargetID && (GS()->IsDungeon() || random_int() % 30 == 0))
+	if(IsBotTargetEmpty() && (GS()->IsDungeon() || random_int() % 30 == 0))
 	{
 		CPlayer *pPlayer = SearchPlayer(Distance);
 		if(pPlayer && pPlayer->GetCharacter()) 
@@ -531,12 +514,12 @@ CPlayer *CCharacterBotAI::SearchTenacityPlayer(float Distance)
 
 	// throw off aggression if the player is far away
 	CPlayer* pPlayer = GS()->GetPlayer(m_BotTargetID, true, true);
-	if (ActiveTargetID && (!pPlayer 
+	if (!IsBotTargetEmpty() && (!pPlayer 
 		|| (pPlayer && (distance(pPlayer->GetCharacter()->GetPos(), m_Pos) > 800.0f || !GS()->IsPlayerEqualWorldID(m_BotTargetID)))))
 		ClearTarget();
 
 	// non-hostile mobs
-	if (!ActiveTargetID || !pPlayer)
+	if (IsBotTargetEmpty() || !pPlayer)
 		return nullptr; 
 
 	// throw off the lifetime of a target
@@ -595,7 +578,7 @@ bool CCharacterBotAI::SearchTalkedPlayer()
 	return PlayerFinding;
 }
 
-void CCharacterBotAI::EmoteActions(int EmotionStyle)
+void CCharacterBotAI::EmotesAction(int EmotionStyle)
 {
 	if (EmotionStyle < EMOTE_PAIN || EmotionStyle > EMOTE_BLINK)
 		return;
@@ -625,14 +608,38 @@ void CCharacterBotAI::EmoteActions(int EmotionStyle)
 	}
 }
 
-// - - - - - - - - - - - - - - - - - - - BASE FUNCTION
+// - - - - - - - - - - - - - - - - - - - - - Target bot system
+bool CCharacterBotAI::IsBotTargetEmpty() const
+{
+	return m_BotTargetID == m_pBotPlayer->GetCID();
+}
+
+void CCharacterBotAI::ClearTarget()
+{
+	const int FromID = m_pBotPlayer->GetCID();
+	if(m_BotTargetID != FromID)
+	{
+		m_pBotPlayer->m_TargetPos = vec2(0, 0);
+		m_EmotionsStyle = 1 + random_int() % 5;
+		m_BotTargetID = FromID;
+		m_BotTargetLife = 0;
+		m_BotTargetCollised = 0;
+	}
+}
+
+void CCharacterBotAI::SetTarget(int ClientID)
+{
+	m_EmotionsStyle = EMOTE_ANGRY;
+	m_BotTargetID = ClientID;
+}
+
+// - - - - - - - - - - - - - - - - - - - - - Npc functions
 bool CCharacterBotAI::BaseFunctionNPC()
 {
 	const bool PlayerFinding = SearchTalkedPlayer();
 	return PlayerFinding;
 }
 
-// - - - - - - - - - - - - - - - - - - - FUNCTION NURSE
 bool CCharacterBotAI::FunctionNurseNPC()
 {
 	char aBuf[16];
@@ -659,7 +666,7 @@ bool CCharacterBotAI::FunctionNurseNPC()
 		m_LatestInput.m_TargetY = m_Input.m_TargetX;
 
 		// health every sec
-		if(Server()->Tick() % Server()->TickSpeed() != 0)	
+		if(Server()->Tick() % Server()->TickSpeed() != 0)
 			continue;
 
 		// increase health for player
@@ -668,7 +675,7 @@ bool CCharacterBotAI::FunctionNurseNPC()
 		str_format(aBuf, sizeof(aBuf), "%dHP", Health);
 		GS()->CreateText(NULL, false, DrawPosition, vec2(0, 0), 40, aBuf);
 		new CHearth(&GS()->m_World, m_Pos, pFindPlayer, Health, pFindPlayer->GetCharacter()->m_Core.m_Vel);
-	
+
 		m_Input.m_Direction = 0;
 		PlayerFinding = true;
 	}

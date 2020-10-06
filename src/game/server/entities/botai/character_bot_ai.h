@@ -35,7 +35,7 @@ private:
 	int m_BotTargetID;
 	int m_BotTargetLife;
 	bool m_BotTargetCollised;
-	std::map < int, int > a_ListDmgPlayers;
+	std::map < int, bool > m_aListDmgPlayers;
 
 	virtual bool Spawn(class CPlayer *pPlayer, vec2 Pos);
 	virtual void Tick();
@@ -46,13 +46,11 @@ private:
 	virtual int GetSnapFullID() const;
 
 	void CreateRandomDropItem(int DropCID, float Random, int ItemID, int Count, vec2 Force);
-	void DieRewardPlayer(CPlayer *pPlayer, vec2 ForceDies);
-	
-	void ClearTarget();
-	void SetTarget(int ClientID);
+	void RewardPlayer(CPlayer *pPlayer, vec2 ForceDies);
+
 	void ChangeWeapons();
-	void ShowProgress();
-	void EmoteActions(int EmotionStyle);
+	void ShowProgressHealth();
+	void EmotesAction(int EmotionStyle);
 	void SetAim(vec2 Dir);
 
 	bool SearchTalkedPlayer();
@@ -64,10 +62,17 @@ private:
 	CPlayer *SearchPlayer(int Distance);
     CPlayer *SearchTenacityPlayer(float Distance);
 
-	bool FunctionNurseNPC();
-	bool BaseFunctionNPC();
 	void Move();
 	void Action();
+
+	// Target bot system
+	void ClearTarget();
+	void SetTarget(int ClientID);
+	bool IsBotTargetEmpty() const;
+
+	// Bots functions
+	bool FunctionNurseNPC();
+	bool BaseFunctionNPC();
 };
 
 #endif

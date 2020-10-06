@@ -1506,9 +1506,9 @@ void CGS::OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld)
 		m_apPlayers[ClientID]->KillCharacter();
 		return;
 	}
-	m_pController->OnPlayerDisconnect(m_apPlayers[ClientID]);
 
 	// update clients on drop
+	m_pController->OnPlayerDisconnect(m_apPlayers[ClientID]);
 	if (Server()->ClientIngame(ClientID) && IsPlayerEqualWorldID(ClientID))
 	{
 		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "leave game MRPG");
@@ -2409,11 +2409,11 @@ void CGS::ChangeEquipSkin(int ClientID, int ItemID)
 	SendEquipItem(ClientID, -1);
 }
 
-int CGS::IncreaseExperienceRaid(int IncreaseCount) const
+int CGS::GetExperienceMultiplier(int Experience) const
 {
 	if(IsDungeon())
-		return (int)kurosio::translate_to_procent_rest(IncreaseCount, 150);
-	return (int)kurosio::translate_to_procent_rest(IncreaseCount, m_RaidExp);
+		return (int)kurosio::translate_to_procent_rest(Experience, g_Config.m_SvMultiplierExpRaidDungeon);
+	return (int)kurosio::translate_to_procent_rest(Experience, m_RaidExp);
 }
 
 void CGS::UpdateZonePVP()
@@ -2466,7 +2466,7 @@ bool CGS::CheckingPlayersDistance(vec2 Pos, float Distance) const
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(m_apPlayers[i] && m_apPlayers[i]->GetPlayerWorldID() == GetWorldID() && distance(Pos, m_apPlayers[i]->m_ViewPos) <= Distance)
+		if(m_apPlayers[i] && IsPlayerEqualWorldID(i) && distance(Pos, m_apPlayers[i]->m_ViewPos) <= Distance)
 			return true;
 	}
 	return false;

@@ -776,37 +776,32 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	if(From != m_pPlayer->GetCID())
 		GS()->CreatePlayerSound(From, SOUND_HIT);
 
-	// moved to BotAI
-	if(m_pPlayer->IsBot())
+	// verify death
+	if(m_Health <= 0)
 	{
-		bool IsDie = (bool)(m_Health <= 0);
-		return IsDie;
+		if(From != m_pPlayer->GetCID() && pFrom->GetCharacter())
+			pFrom->GetCharacter()->SetEmote(EMOTE_HAPPY, 1);
+
+		// do not kill the bot it is still running in CCharacterBotAI::TakeDamage
+		if(m_pPlayer->IsBot())
+			return false;
+
+		m_Health = 0;
+		m_pPlayer->ShowInformationStats();
+		Die(From, Weapon);
+		return false;
 	}
 
-	// health pool
-	if(m_Health <= m_pPlayer->GetStartHealth()/3)
+	// health recovery potion
+	if(!m_pPlayer->IsBot() && m_Health <= m_pPlayer->GetStartHealth() / 3)
 	{
 		InventoryItem& pItemPlayer = m_pPlayer->GetItem(itPotionHealthRegen);
 		if(!m_pPlayer->CheckEffect("RegenHealth") && pItemPlayer.IsEquipped())
 			pItemPlayer.Use(1);
 	}
 
-	// verify death
-	if(m_Health <= 0)
-	{
-		m_Health = 0;
-		m_pPlayer->ShowInformationStats();
-		Die(From, Weapon);
-		if (From != m_pPlayer->GetCID() && pFrom->GetCharacter()) 
-			pFrom->GetCharacter()->SetEmote(EMOTE_HAPPY, 1);
-		return false;
-	}
-
-	if (Dmg > 2) 
-		GS()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_LONG);
-	else 
-		GS()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_SHORT);
-
+	const bool IsHardDamage = (CritDamage > 0);
+	GS()->CreateSound(m_Pos, IsHardDamage ? (int)SOUND_PLAYER_PAIN_LONG : (int)SOUND_PLAYER_PAIN_SHORT);
 	m_EmoteType = EMOTE_PAIN;
 	m_EmoteStop = Server()->Tick() + 500 * Server()->TickSpeed() / 1000;
 	return true;
