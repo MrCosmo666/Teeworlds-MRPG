@@ -2084,7 +2084,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		char aBuf[128];
 		bool FoundedBots = false;
-		const float AddedСhanceDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
+		const float AddedChanceDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
 		for(const auto& mobs : BotJob::ms_aMobBot)
 		{
 			if (!IsPlayerEqualWorldID(ClientID, mobs.second.m_WorldID))
