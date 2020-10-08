@@ -1134,8 +1134,8 @@ bool CCharacter::IsAllowedPVP(int FromID)
 	}
 
 	// anti pvp strong
-	const int FromAttributeLevel = pFrom->GetLevelDisciple(AtributType::AtDps) + pFrom->GetLevelDisciple(AtributType::AtTank) + pFrom->GetAttributeCount(AtributType::AtHealer);
-	const int PlayerAttributeLevel = m_pPlayer->GetLevelDisciple(AtributType::AtDps) + m_pPlayer->GetLevelDisciple(AtributType::AtTank) + m_pPlayer->GetAttributeCount(AtributType::AtHealer);
+	const int FromAttributeLevel = pFrom->GetLevelAllAttributes();
+	const int PlayerAttributeLevel = m_pPlayer->GetLevelAllAttributes();
 	if(!pFrom->IsBot() && !m_pPlayer->IsBot() && ((FromAttributeLevel - PlayerAttributeLevel > g_Config.m_SvStrongAntiPVP) || (PlayerAttributeLevel - FromAttributeLevel > g_Config.m_SvStrongAntiPVP)))
 		return false;
 

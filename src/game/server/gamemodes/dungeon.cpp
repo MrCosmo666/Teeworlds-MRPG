@@ -18,7 +18,7 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	m_GameFlags = 0;
 	m_StartedPlayers = 0;
 	m_TankClientID = -1;
-	m_ShowedTankingInfo = false;
+	m_ClassesAlreadySelected = false;
 
 	// door creation to start
 	vec2 PosDoor = vec2(DungeonJob::Dungeon[m_DungeonID].m_DoorX, DungeonJob::Dungeon[m_DungeonID].m_DoorY);
@@ -64,7 +64,7 @@ void CGameControllerDungeon::ChangeState(int State)
 		m_LastStartingTick = 0;
 		m_SafeTick = 0;
 		m_TankClientID = -1;
-		m_ShowedTankingInfo = false;
+		m_ClassesAlreadySelected = false;
 		SetMobsSpawn(false);
 		ResetDoorKeyState();
 	}
@@ -73,6 +73,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	// used when changing state to waiting start
 	else if (State == DUNGEON_WAITING_START)
 	{
+		m_SyncDungeon = GS()->Mmo()->Dungeon()->SyncFactor();
 		m_StartingTick = Server()->TickSpeed() * g_Config.m_SvTimeWaitingsDungeon;
 		SetMobsSpawn(false);
 	}
@@ -247,25 +248,21 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 {
 	if(!pChr->GetPlayer()->IsBot())
 	{
-		pChr->GetPlayer()->m_SyncDungeon = GS()->Mmo()->Dungeon()->SyncFactor();
-		pChr->GetPlayer()->m_SyncPlayers = m_StartedPlayers;
-
 		if(m_StateDungeon >= DUNGEON_STARTED)
 		{
 			const int ClientID = pChr->GetPlayer()->GetCID();
 			if(ClientID == m_TankClientID)
 			{
 				pChr->GetPlayer()->m_MoodState = MOOD_PLAYER_TANK;	
-				if(!m_ShowedTankingInfo)
+				if(!m_ClassesAlreadySelected)
 				{
-					m_ShowedTankingInfo = true;
 					if(m_SelectedWithVotes)
 						GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank is assigned to {STR} with {INT} votes!", 
 							Server()->ClientName(ClientID), &pChr->GetPlayer()->GetTempData().m_TempTankVotingDungeon);
 					else
 					{
-						const int StrengthTank = pChr->GetPlayer()->GetLevelDisciple(AtributType::AtTank, true);
-						GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned with class strength {INT}p!", 
+						const int StrengthTank = pChr->GetPlayer()->GetLevelTypeAttribute(AtributType::AtTank);
+						GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned with class strength {INT}p!",
 							Server()->ClientName(ClientID), &StrengthTank);
 					}
 				}
@@ -277,6 +274,7 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 				pChr->GetPlayer()->ChangeWorld(pChr->GetPlayer()->Acc().m_LastWorldID);
 				return false;
 			}
+			m_ClassesAlreadySelected = true;
 		}
 		else
 		{
@@ -399,10 +397,10 @@ void CGameControllerDungeon::SelectTankPlayer()
 			continue;
 
 		// select hardness tank
-		if(pPlayer->GetLevelDisciple(AtributType::AtTank, true) > MaximalHardness)
+		if(pPlayer->GetLevelTypeAttribute(AtributType::AtTank) > MaximalHardness)
 		{
 			m_TankClientID = i;
-			MaximalHardness = pPlayer->GetLevelDisciple(AtributType::AtTank, true);
+			MaximalHardness = pPlayer->GetLevelTypeAttribute(AtributType::AtTank);
 		}
 	}
 }
@@ -453,46 +451,35 @@ bool CGameControllerDungeon::OnEntity(int Index, vec2 Pos)
 }
 
 // TODO: something to do with the balance
-int CGameControllerDungeon::GetDungeonSync(CPlayer* pPlayer, int BonusID) const
+int CGameControllerDungeon::GetAttributeDungeonSync(CPlayer* pPlayer, int BonusID) const
 {
-	int Procent = 1;
-	int Delay = 0;
-
-	const int ParsePlayerStatsClass = CGS::ms_aAttributsInfo[BonusID].AtType;
-	if (BonusID == Stats::StStrength || ParsePlayerStatsClass == AtributType::AtHardtype)
-		Delay = 50;
+	float Percent = 0.0f;
+	int AttributeType = CGS::ms_aAttributsInfo[BonusID].m_Type;
 
 	// - - - - - - - - -- - - -
-	// tanks
+	// balance tanks
 	if(pPlayer->m_MoodState == MOOD_PLAYER_TANK)
 	{
-		if(ParsePlayerStatsClass == AtributType::AtTank)
-			Procent = 11;
-		else if(ParsePlayerStatsClass == AtributType::AtHealer || ParsePlayerStatsClass == AtributType::AtDps)
-			Delay = 100;
+		float ActiveAttribute = m_SyncDungeon / 2.0f;
+		if(AttributeType == AtributType::AtTank)
+			Percent = 25.0f;
 
-		const int AttributeSyncProcent = kurosio::translate_to_procent_rest(pPlayer->m_SyncDungeon, Procent);
-		int AttributeCount = max(AttributeSyncProcent, 1);
-
-		if(ParsePlayerStatsClass == AtributType::AtTank)
-			return AttributeCount;
-
-		AttributeCount /= max((pPlayer->m_SyncPlayers + Delay), 1);
-		return AttributeCount;
+		const int AttributeSyncProcent = kurosio::translate_to_procent_rest(ActiveAttribute, Percent);
+		return max(AttributeSyncProcent, 1);
 	}
 
 	// - - - - - - - - -- - - -
-	// supports / healers / dps
-	if(ParsePlayerStatsClass == AtributType::AtTank)
-		Procent = 4;
-	else if(ParsePlayerStatsClass == AtributType::AtHealer)
-		Procent = 6;
+	// balance healer damage divides the average attribute into the number of players
+	float ActiveAttribute = m_SyncDungeon / m_StartedPlayers;
+	if(AttributeType == AtributType::AtHealer)
+		Percent = min(20.0f + (m_StartedPlayers * 2.0f), 35.0f);
+	else if(AttributeType == AtributType::AtTank)
+		Percent = 5.0f;
+	else if(AttributeType == AtributType::AtHardtype || AttributeType == AtributType::AtDps)
+		Percent = 0.1f;
 
-	const int AttributeSyncProcent = kurosio::translate_to_procent_rest(pPlayer->m_SyncDungeon, Procent);
-	int AttributeCount = max(AttributeSyncProcent, 1);
-	
-	AttributeCount /= max((pPlayer->m_SyncPlayers + Delay), 1);
-	return AttributeCount;
+	const int AttributeSyncProcent = kurosio::translate_to_procent_rest(ActiveAttribute, Percent);
+	return max(AttributeSyncProcent, 1);
 }
 
 DungeonDoor::DungeonDoor(CGameWorld *pGameWorld, vec2 Pos)

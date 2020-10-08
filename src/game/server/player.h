@@ -103,7 +103,8 @@ public:
 
 	virtual int IsActiveSnappingBot(int SnappingClient) const { return 2; };
 	virtual int GetEquippedItem(int EquipID, int SkipItemID = -1) const;
-	virtual int GetAttributeCount(int BonusID, bool Really = false, bool Searchclass = false);
+	virtual int GetAttributeCount(int BonusID, bool ActiveFinalStats = false);
+	int GetItemsAttributeCount(int AttributeID) const;
 	virtual void UpdateTempData(int Health, int Mana);
 	virtual void SendClientInfo(int TargetID);
 
@@ -144,7 +145,6 @@ public:
 	bool CheckEffect(const char* Potion);
 	bool GetHidenMenu(int HideID) const;
 	bool IsAuthed();
-	int EnchantAttributes(int AttributeID) const;
 	int GetStartTeam();
 
 	int ExpNeed(int Level) const;
@@ -164,7 +164,8 @@ public:
 	AccountMainJob::StructTempPlayerData& GetTempData() { return AccountMainJob::ms_aPlayerTempData[m_ClientID]; }
 	AccountMainJob::StructData& Acc() { return AccountMainJob::ms_aData[m_ClientID]; }
 
-	int GetLevelDisciple(int Class, bool SearchClass = false);
+	int GetLevelTypeAttribute(int Class);
+	int GetLevelAllAttributes();
 
 	// npc conversations
 	void SetTalking(int TalkedID, bool ToProgress);

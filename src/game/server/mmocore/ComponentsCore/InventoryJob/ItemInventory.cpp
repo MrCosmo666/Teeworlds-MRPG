@@ -188,14 +188,14 @@ bool CInventoryItem::Use(int Count)
 		int BackUpgrades = 0;
 		for(const auto& at : CGS::ms_aAttributsInfo)
 		{
-			if(str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0 || m_pPlayer->Acc().m_aStats[at.first] <= 0)
+			if(str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0 || m_pPlayer->Acc().m_aStats[at.first] <= 0)
 				continue;
 
 			// skip weapon spreading
-			if(at.second.AtType == AtributType::AtWeapon)
+			if(at.second.m_Type == AtributType::AtWeapon)
 				continue;
 
-			BackUpgrades += (int)(m_pPlayer->Acc().m_aStats[at.first] * at.second.UpgradePrice);
+			BackUpgrades += (int)(m_pPlayer->Acc().m_aStats[at.first] * at.second.m_UpgradePrice);
 			m_pPlayer->Acc().m_aStats[at.first] = 0;
 		}
 
@@ -209,11 +209,11 @@ bool CInventoryItem::Use(int Count)
 		int BackUpgrades = 0;
 		for(const auto& at : CGS::ms_aAttributsInfo)
 		{
-			if(str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0 || m_pPlayer->Acc().m_aStats[at.first] <= 0)
+			if(str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0 || m_pPlayer->Acc().m_aStats[at.first] <= 0)
 				continue;
 
 			// skip all stats allow only weapons
-			if(at.second.AtType != AtributType::AtWeapon)
+			if(at.second.m_Type != AtributType::AtWeapon)
 				continue;
 
 			int BackCount = m_pPlayer->Acc().m_aStats[at.first];
@@ -225,7 +225,7 @@ bool CInventoryItem::Use(int Count)
 			if(BackCount <= 0)
 				continue;
 
-			BackUpgrades += (int)(BackCount * at.second.UpgradePrice);
+			BackUpgrades += (int)(BackCount * at.second.m_UpgradePrice);
 			m_pPlayer->Acc().m_aStats[at.first] -= BackCount;
 		}
 
@@ -280,19 +280,19 @@ int CInventoryItem::GetEnchantPrice() const
 
 		int UpgradePrice;
 		const int Attribute = Info().m_aAttribute[i];
-		const int TypeAttribute = CGS::ms_aAttributsInfo[Attribute].AtType;
+		const int TypeAttribute = CGS::ms_aAttributsInfo[Attribute].m_Type;
 
 		if(TypeAttribute == AtributType::AtHardtype || Attribute == Stats::StStrength)
 		{
-			UpgradePrice = max(12, CGS::ms_aAttributsInfo[Attribute].UpgradePrice) * 14;
+			UpgradePrice = max(12, CGS::ms_aAttributsInfo[Attribute].m_UpgradePrice) * 14;
 		}
 		else if(TypeAttribute == AtributType::AtJob || TypeAttribute == AtributType::AtWeapon || Attribute == Stats::StLuckyDropItem)
 		{
-			UpgradePrice = max(20, CGS::ms_aAttributsInfo[Attribute].UpgradePrice) * 14;
+			UpgradePrice = max(20, CGS::ms_aAttributsInfo[Attribute].m_UpgradePrice) * 14;
 		}
 		else
 		{
-			UpgradePrice = max(4, CGS::ms_aAttributsInfo[Attribute].UpgradePrice) * 5;
+			UpgradePrice = max(4, CGS::ms_aAttributsInfo[Attribute].m_UpgradePrice) * 5;
 		}
 
 		const int PercentEnchant = max(1, (int)kurosio::translate_to_procent_rest(Info().m_aAttributeCount[i], PERCENT_OF_ENCHANT));

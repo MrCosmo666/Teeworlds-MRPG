@@ -139,9 +139,9 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		dynamic_string Buffer;
 		for(const auto& at : CGS::ms_aAttributsInfo)
 		{
-			if(str_comp_nocase(at.second.FieldName, "unfield") == 0) 
+			if(str_comp_nocase(at.second.m_aFieldName, "unfield") == 0) 
 				continue;
-			str_format(aBuf, sizeof(aBuf), ", %s = '%d' ", at.second.FieldName, pPlayer->Acc().m_aStats[at.first]);
+			str_format(aBuf, sizeof(aBuf), ", %s = '%d' ", at.second.m_aFieldName, pPlayer->Acc().m_aStats[at.first]);
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
 

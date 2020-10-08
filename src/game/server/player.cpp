@@ -452,20 +452,6 @@ bool CPlayer::IsAuthed()
 	return false; 
 }
 
-// TODO: not optimized algorithm
-int CPlayer::EnchantAttributes(int AttributeID) const
-{
-	int BonusAttributes = 0;
-	for (const auto& it : InventoryJob::ms_aItems[m_ClientID])
-	{
-		if(!it.second.IsEquipped() || !it.second.Info().IsEnchantable() || !it.second.Info().GetInfoEnchantStats(AttributeID))
-			continue;
-
-		BonusAttributes += it.second.GetEnchantStats(AttributeID);
-	}
-	return BonusAttributes;
-}
-
 int CPlayer::GetStartTeam()
 {
 	if(Acc().m_AuthID)
@@ -609,34 +595,59 @@ int CPlayer::GetEquippedItem(int EquipID, int SkipItemID) const
 	return -1;
 }
 
-int CPlayer::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
+int CPlayer::GetAttributeCount(int BonusID, bool ActiveFinalStats)
 {
-	int AttributEx = EnchantAttributes(BonusID);
-	const bool SaveData = (str_comp_nocase(CGS::ms_aAttributsInfo[BonusID].FieldName, "unfield") != 0);
-	if (SaveData)
+	int AttributEx = GetItemsAttributeCount(BonusID);
+
+	// if the attribute has the value of player upgrades we sum up
+	if (str_comp_nocase(CGS::ms_aAttributsInfo[BonusID].m_aFieldName, "unfield") != 0)
 		AttributEx += Acc().m_aStats[BonusID];
 
-	if (Really && CGS::ms_aAttributsInfo[BonusID].UpgradePrice < 10) 
-	{ 
-		if (BonusID == Stats::StStrength || CGS::ms_aAttributsInfo[BonusID].AtType == AtHardtype)
-			AttributEx /= 10;
-		else
-			AttributEx /= 5; 
-	}
+	// to the final active attribute stats for the player
+	if (ActiveFinalStats && CGS::ms_aAttributsInfo[BonusID].m_Devide > 0)
+		AttributEx /= CGS::ms_aAttributsInfo[BonusID].m_Devide;
 
-	if(GS()->IsDungeon() && !SearchClass && CGS::ms_aAttributsInfo[BonusID].UpgradePrice < 10)
-		AttributEx = static_cast<CGameControllerDungeon*>(GS()->m_pController)->GetDungeonSync(this, BonusID);
+	// if the best tank class is selected among the players we return the sync dungeon stats
+	if(GS()->IsDungeon() && CGS::ms_aAttributsInfo[BonusID].m_UpgradePrice < 10)
+	{
+		CGameControllerDungeon* pDungeon = static_cast<CGameControllerDungeon*>(GS()->m_pController);
+		if(pDungeon->m_ClassesAlreadySelected)
+			return pDungeon->GetAttributeDungeonSync(this, BonusID);
+	}
 	return AttributEx;
 }
 
-int CPlayer::GetLevelDisciple(int Class, bool SearchClass)
+// TODO: not optimized algorithm
+int CPlayer::GetItemsAttributeCount(int AttributeID) const
+{
+	int SummingSize = 0;
+	for(const auto& it : InventoryJob::ms_aItems[m_ClientID])
+	{
+		if(!it.second.IsEquipped() || !it.second.Info().IsEnchantable() || !it.second.Info().GetInfoEnchantStats(AttributeID))
+			continue;
+
+		SummingSize += it.second.GetEnchantStats(AttributeID);
+	}
+	return SummingSize;
+}
+
+int CPlayer::GetLevelTypeAttribute(int Class)
 {
 	int Atributs = 0;
 	for (const auto& at : CGS::ms_aAttributsInfo)
 	{
-		if (at.second.AtType == Class)
-			Atributs += GetAttributeCount(at.first, true, SearchClass);
+		if (at.second.m_Type == Class)
+			Atributs += GetAttributeCount(at.first, true);
 	}
+	return Atributs;
+}
+
+int CPlayer::GetLevelAllAttributes()
+{
+	int Atributs = 0;
+	for(const auto& at : CGS::ms_aAttributsInfo)
+		Atributs += GetAttributeCount(at.first, true);
+
 	return Atributs;
 }
 
@@ -648,9 +659,9 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 
 	m_TalkingNPC.m_TalkedID = TalkedID;
 	GS()->Mmo()->Quest()->QuestTableClear(m_ClientID);
-	CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[TalkedID]);
-	const int MobID = BotPlayer->GetBotSub();
-	if (BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
+	CPlayerBot* pBotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[TalkedID]);
+	const int MobID = pBotPlayer->GetBotSub();
+	if (pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
 		// clearing the end of dialogs or a dialog that was meaningless
 		const int sizeTalking = BotJob::ms_aNpcBot[MobID].m_aTalk.size();
@@ -690,7 +701,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
 	}
 
-	else if (BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
+	else if (pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 	{
 		const int sizeTalking = BotJob::ms_aQuestBot[MobID].m_aTalk.size();
 		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
@@ -764,7 +775,6 @@ void CPlayer::ClearFormatQuestText()
 void CPlayer::ChangeWorld(int WorldID)
 {
 	// reset dungeon temp data
-	Acc().m_LastWorldID = GS()->GetWorldID();
 	GetTempData().m_TempAlreadyVotedDungeon = false;
 	GetTempData().m_TempDungeonReady = false;
 	GetTempData().m_TempTankVotingDungeon = 0;
@@ -775,7 +785,8 @@ void CPlayer::ChangeWorld(int WorldID)
 		GS()->m_World.DestroyEntity(m_pCharacter);
 		GS()->m_World.m_Core.m_apCharacters[m_ClientID] = 0;
 	}
-	
+
+	Acc().m_LastWorldID = GS()->GetWorldID();
 	Server()->ChangeWorld(m_ClientID, WorldID);
 }
 

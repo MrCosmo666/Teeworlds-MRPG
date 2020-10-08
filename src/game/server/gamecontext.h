@@ -82,10 +82,11 @@ public:
 	// - - - - - - - - - - - -
 	struct StructAttribut
 	{
-		char Name[32];
-		char FieldName[32];
-		int UpgradePrice;
-		int AtType;
+		char m_aName[32];
+		char m_aFieldName[32];
+		int m_UpgradePrice;
+		int m_Type;
+		int m_Devide;
 	};
 	static std::map < int, StructAttribut > ms_aAttributsInfo;
 

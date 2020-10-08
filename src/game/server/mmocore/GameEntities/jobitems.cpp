@@ -80,7 +80,7 @@ void CJobItems::Work(int ClientID)
 		if (rand() % 10 == 0)
 			pPlayerEquippedItem.SetDurability(Durability - 1);
 
-		m_Progress += 3+pPlayer->EnchantAttributes(Stats::StEfficiency);
+		m_Progress += 3+pPlayer->GetItemsAttributeCount(Stats::StEfficiency);
 		GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
 		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P] : {STR} ({INT}/100%)", 

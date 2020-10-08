@@ -126,8 +126,8 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		pPlayer->Acc().m_WorldID = ACCOUNTDATA->getInt("WorldID");
 		for (const auto& at : CGS::ms_aAttributsInfo)
 		{
-			if (str_comp_nocase(at.second.FieldName, "unfield") != 0)
-				pPlayer->Acc().m_aStats[at.first] = ACCOUNTDATA->getInt(at.second.FieldName);
+			if (str_comp_nocase(at.second.m_aFieldName, "unfield") != 0)
+				pPlayer->Acc().m_aStats[at.first] = ACCOUNTDATA->getInt(at.second.m_aFieldName);
 		}
 
 		GS()->Chat(ClientID, "- - - - - - - [Successful login] - - - - - - -");

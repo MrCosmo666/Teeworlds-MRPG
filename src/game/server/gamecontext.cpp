@@ -2014,35 +2014,35 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		ShowPlayerStats(pPlayer);
 
 		// DPS UPGRADES
-		int Range = pPlayer->GetLevelDisciple(AtributType::AtDps);
+		int Range = pPlayer->GetLevelTypeAttribute(AtributType::AtDps);
 		AVH(ClientID, TAB_UPGR_DPS, RED_COLOR, "Disciple of War. Level Power {INT}", &Range);
 		for(const auto& at : ms_aAttributsInfo)
 		{
-			if(at.second.AtType != AtributType::AtDps || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
+			if(at.second.m_Type != AtributType::AtDps || str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0) 
 				continue;
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_DPS, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().m_aStats[at.first], &at.second.UpgradePrice);
+			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_DPS, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, &pPlayer->Acc().m_aStats[at.first], &at.second.m_UpgradePrice);
 		}
 		AV(ClientID, "null", "");
 
 		// TANK UPGRADES
-		Range = pPlayer->GetLevelDisciple(AtributType::AtTank);
+		Range = pPlayer->GetLevelTypeAttribute(AtributType::AtTank);
 		AVH(ClientID, TAB_UPGR_TANK, BLUE_COLOR, "Disciple of Tank. Level Power {INT}", &Range);
 		for(const auto& at : ms_aAttributsInfo)
 		{
-			if(at.second.AtType != AtributType::AtTank || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
+			if(at.second.m_Type != AtributType::AtTank || str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0) 
 				continue;
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_TANK, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().m_aStats[at.first], &at.second.UpgradePrice);
+			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_TANK, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, &pPlayer->Acc().m_aStats[at.first], &at.second.m_UpgradePrice);
 		}
 		AV(ClientID, "null", "");
 
 		// HEALER UPGRADES
-		Range = pPlayer->GetLevelDisciple(AtributType::AtHealer);
+		Range = pPlayer->GetLevelTypeAttribute(AtributType::AtHealer);
 		AVH(ClientID, TAB_UPGR_HEALER, GREEN_COLOR, "Disciple of Healer. Level Power {INT}", &Range);
 		for(const auto& at : ms_aAttributsInfo)
 		{
-			if(at.second.AtType != AtributType::AtHealer || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
+			if(at.second.m_Type != AtributType::AtHealer || str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0) 
 				continue;
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_HEALER, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().m_aStats[at.first], &at.second.UpgradePrice);
+			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_HEALER, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, &pPlayer->Acc().m_aStats[at.first], &at.second.m_UpgradePrice);
 		}
 		AV(ClientID, "null", "");
 
@@ -2050,9 +2050,9 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVH(ClientID, TAB_UPGR_WEAPON, GRAY_COLOR, "Upgrades Weapons / Ammo");
 		for(const auto& at : ms_aAttributsInfo)
 		{
-			if(at.second.AtType != AtributType::AtWeapon || str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0) 
+			if(at.second.m_Type != AtributType::AtWeapon || str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0) 
 				continue;
-			AVD(ClientID, "UPGRADE", at.first, at.second.UpgradePrice, TAB_UPGR_WEAPON, "{STR} {INT}P (Price {INT}P)", at.second.Name, &pPlayer->Acc().m_aStats[at.first], &at.second.UpgradePrice);
+			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_WEAPON, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, &pPlayer->Acc().m_aStats[at.first], &at.second.m_UpgradePrice);
 		}
 
 		AV(ClientID, "null", ""), 
@@ -2084,7 +2084,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		char aBuf[128];
 		bool FoundedBots = false;
-		const float LuckyDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
+		const float AddedСhanceDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
 		for(const auto& mobs : BotJob::ms_aMobBot)
 		{
 			if (!IsPlayerEqualWorldID(ClientID, mobs.second.m_WorldID))
@@ -2100,9 +2100,8 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 					continue;
 			
 				const float Chance = mobs.second.m_aRandomItem[i];
-				const float AddedChance = LuckyDrop;
 				ItemInformation &InfoDropItem = GetItemInfo(mobs.second.m_aDropItem[i]);
-				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%(+%0.2f%%)", InfoDropItem.GetName(pPlayer), mobs.second.m_aCountItem[i], Chance, AddedChance);
+				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%(+%0.2f%%)", InfoDropItem.GetName(pPlayer), mobs.second.m_aCountItem[i], Chance, AddedСhanceDrop);
 				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, "{STR}", aBuf);
 				FoundedBots = true;
 			}
@@ -2199,12 +2198,12 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 	AVH(ClientID, TAB_INFO_STAT, BLUE_COLOR, "Player Stats {STR}", IsDungeon() ? "(Sync)" : "\0");
 	for(const auto& at : ms_aAttributsInfo)
 	{
-		if(str_comp_nocase(at.second.FieldName, "unfield") == 0) 
+		if(str_comp_nocase(at.second.m_aFieldName, "unfield") == 0) 
 			continue;
 	
 		// if upgrades are cheap, they have a division of statistics
 		const int AttributeSize = pPlayer->GetAttributeCount(at.first);
-		if(at.second.UpgradePrice < 10)
+		if(at.second.m_UpgradePrice < 10)
 		{
 			const int AttributeRealSize = pPlayer->GetAttributeCount(at.first, true);
 			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} (+{INT}) - {STR}", &AttributeSize, &AttributeRealSize, AtributeName(at.first));
@@ -2452,7 +2451,7 @@ bool CGS::IsPlayerEqualWorldID(int ClientID, int WorldID) const
 const char* CGS::AtributeName(int BonusID) const
 {
 	if(CGS::ms_aAttributsInfo.find(BonusID) != CGS::ms_aAttributsInfo.end())
-		return CGS::ms_aAttributsInfo[BonusID].Name;
+		return CGS::ms_aAttributsInfo[BonusID].m_aName;
 	return "Has no stats";
 }
 

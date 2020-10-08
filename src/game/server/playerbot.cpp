@@ -67,31 +67,34 @@ int CPlayerBot::GetStartHealth()
 	return 10;	
 }
 
-int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
+int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 {
 	if(m_BotType != BotsTypes::TYPE_BOT_MOB)
 		return 10;
 
-	int Power = BotJob::ms_aMobBot[m_SubBotID].m_Power;
+	// get stats from the bot's equipment
+	int AttributeEx = BotJob::ms_aMobBot[m_SubBotID].m_Power;
 	for (int i = 0; i < MAX_EQUIPPED_SLOTS_BOTS; i++)
 	{
 		const int ItemID = GetEquippedItem(i);
 		const int ItemBonusCount = GS()->GetItemInfo(ItemID).GetInfoEnchantStats(BonusID);
-		if (ItemID <= 0 || ItemBonusCount < 0)
-			continue;
-		Power += ItemBonusCount;
+		if (ItemID > 0 && ItemBonusCount > 0)
+			AttributeEx += ItemBonusCount;
+	}
+	
+	// spread weapons
+	if(BonusID == Stats::StSpreadShotgun || BonusID == Stats::StSpreadGrenade || BonusID == Stats::StSpreadRifle)
+		AttributeEx = BotJob::ms_aMobBot[m_SubBotID].m_Spread;
+
+	// all attribute stats without hardness
+	else if(BonusID != Stats::StHardness && CGS::ms_aAttributsInfo[BonusID].m_Devide > 0)
+	{
+		AttributeEx /= CGS::ms_aAttributsInfo[BonusID].m_Devide;
+		if(CGS::ms_aAttributsInfo[BonusID].m_Type == AtHardtype)
+			AttributeEx /= BotJob::ms_aMobBot[m_SubBotID].m_Boss ? 30 : 2;
 	}
 
-	// all damage stats
-	if (BonusID == Stats::StStrength || CGS::ms_aAttributsInfo[BonusID].AtType == AtHardtype)
-		Power /= BotJob::ms_aMobBot[m_SubBotID].m_Boss ? 300 : 50;
-	// spread weapons
-	else if(BonusID == Stats::StSpreadShotgun || BonusID == Stats::StSpreadGrenade || BonusID == Stats::StSpreadRifle)
-		Power = BotJob::ms_aMobBot[m_SubBotID].m_Spread;
-	// all another stats 
-	else if(BonusID != Stats::StHardness)
-		Power /= 5;
-	return Power;
+	return AttributeEx;
 }
 
 void CPlayerBot::TryRespawn()

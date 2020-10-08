@@ -221,12 +221,17 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 
 int DungeonJob::SyncFactor()
 {
-	int Factor = 0;
+	int MaxFactor = 0;
+	int MinFactor = INT_MAX;
 	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
-		CPlayerBot* BotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && BotPlayer->GetPlayerWorldID() == GS()->GetWorldID())
-			Factor += BotPlayer->GetStartHealth();
+		CPlayerBot* pBotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
+		if(!pBotPlayer || pBotPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB || pBotPlayer->GetPlayerWorldID() != GS()->GetWorldID())
+			continue;
+
+		int LevelDisciple = pBotPlayer->GetLevelAllAttributes();
+		MinFactor = min(MinFactor, LevelDisciple);
+		MaxFactor = max(MaxFactor, LevelDisciple);
 	}
-	return Factor;
+	return (MaxFactor + MinFactor) / 2;
 }

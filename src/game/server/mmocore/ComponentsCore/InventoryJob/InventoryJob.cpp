@@ -38,10 +38,11 @@ void InventoryJob::OnInit()
 		while(RES->next())
 		{
 			const int AttID = RES->getInt("ID");
-			str_copy(CGS::ms_aAttributsInfo[AttID].Name, RES->getString("name").c_str(), sizeof(CGS::ms_aAttributsInfo[AttID].Name));
-			str_copy(CGS::ms_aAttributsInfo[AttID].FieldName, RES->getString("field_name").c_str(), sizeof(CGS::ms_aAttributsInfo[AttID].FieldName));
-			CGS::ms_aAttributsInfo[AttID].UpgradePrice = RES->getInt("price");
-			CGS::ms_aAttributsInfo[AttID].AtType = RES->getInt("at_type");
+			str_copy(CGS::ms_aAttributsInfo[AttID].m_aName, RES->getString("name").c_str(), sizeof(CGS::ms_aAttributsInfo[AttID].m_aName));
+			str_copy(CGS::ms_aAttributsInfo[AttID].m_aFieldName, RES->getString("field_name").c_str(), sizeof(CGS::ms_aAttributsInfo[AttID].m_aFieldName));
+			CGS::ms_aAttributsInfo[AttID].m_UpgradePrice = RES->getInt("price");
+			CGS::ms_aAttributsInfo[AttID].m_Type = RES->getInt("at_type");
+			CGS::ms_aAttributsInfo[AttID].m_Devide = RES->getInt("divide");
 		}
 	});
 }
