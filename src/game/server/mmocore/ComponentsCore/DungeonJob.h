@@ -17,15 +17,15 @@ class DungeonJob : public MmoComponent
 		char m_aName[64];
 		int m_Level;
 		int m_OpenQuestID;
-		int m_WorldID;
-
 		int m_DoorX;
 		int m_DoorY;
-
+		int m_WorldID;
 		int m_Players;
 		int m_Progress;
 		int m_State;
 		bool m_IsStory;
+
+		bool IsDungeonPlaying() const { return m_State > 1; };
 	};
 
 

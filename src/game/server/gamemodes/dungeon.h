@@ -30,12 +30,11 @@ class CGameControllerDungeon : public IGameController
 	int m_Time[MAX_PLAYERS];
 	int m_StartedPlayers;
 	int m_TankClientID;
+	bool m_ClassesAlreadySelected;
 	bool m_SelectedWithVotes;
 	int m_SyncDungeon;
 
 public:
-	bool m_ClassesAlreadySelected;
-
 	CGameControllerDungeon(class CGS* pGameServer);
 
 	virtual void Tick();

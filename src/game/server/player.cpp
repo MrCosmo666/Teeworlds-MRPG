@@ -505,8 +505,7 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 		if(GS()->IsDungeon())
 		{
 			const int DungeonID = GS()->DungeonID();
-			const bool IsDungeonActive = DungeonJob::Dungeon[DungeonID].m_State > 1;
-			if(!IsDungeonActive)
+			if(!DungeonJob::Dungeon[DungeonID].IsDungeonPlaying())
 			{
 				GetTempData().m_TempDungeonReady ^= true;
 				GS()->Chat(m_ClientID, "You change the ready mode to {STR}!", GetTempData().m_TempDungeonReady ? "ready" : "not ready");
@@ -608,11 +607,10 @@ int CPlayer::GetAttributeCount(int BonusID, bool ActiveFinalStats)
 		AttributEx /= CGS::ms_aAttributsInfo[BonusID].m_Devide;
 
 	// if the best tank class is selected among the players we return the sync dungeon stats
-	if(GS()->IsDungeon() && CGS::ms_aAttributsInfo[BonusID].m_UpgradePrice < 10)
+	if(GS()->IsDungeon() && CGS::ms_aAttributsInfo[BonusID].m_UpgradePrice < 10 && DungeonJob::Dungeon[GS()->DungeonID()].IsDungeonPlaying())
 	{
 		CGameControllerDungeon* pDungeon = static_cast<CGameControllerDungeon*>(GS()->m_pController);
-		if(pDungeon->m_ClassesAlreadySelected)
-			return pDungeon->GetAttributeDungeonSync(this, BonusID);
+		return pDungeon->GetAttributeDungeonSync(this, BonusID);
 	}
 	return AttributEx;
 }

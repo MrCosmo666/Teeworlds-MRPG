@@ -61,7 +61,7 @@ void DungeonJob::ShowDungeonsList(CPlayer* pPlayer, bool Story)
 
 		const int HideID = 7500 + dungeon.first;
 		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "Lvl{INT} {STR} : Players {INT} : {STR} [{INT}%]",
-			&dungeon.second.m_Level, dungeon.second.m_aName, &dungeon.second.m_Players, (dungeon.second.m_State > 1 ? "Active dungeon" : "Waiting players"), &dungeon.second.m_Progress);
+			&dungeon.second.m_Level, dungeon.second.m_aName, &dungeon.second.m_Players, (dungeon.second.IsDungeonPlaying() ? "Active dungeon" : "Waiting players"), &dungeon.second.m_Progress);
 
 		ShowDungeonTop(pPlayer, dungeon.first, HideID);
 
@@ -156,7 +156,7 @@ bool DungeonJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteI
 			GS()->UpdateVotes(ClientID, MenuList::MENU_DUNGEONS);
 			return true;
 		}
-		if (Dungeon[VoteID].m_State > 1)
+		if (Dungeon[VoteID].IsDungeonPlaying())
 		{
 			GS()->Chat(ClientID, "At the moment players are passing this dungeon!");
 			GS()->UpdateVotes(ClientID, MenuList::MENU_DUNGEONS);

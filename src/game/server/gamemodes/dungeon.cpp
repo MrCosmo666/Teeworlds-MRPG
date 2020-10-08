@@ -252,21 +252,7 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 		{
 			const int ClientID = pChr->GetPlayer()->GetCID();
 			if(ClientID == m_TankClientID)
-			{
-				pChr->GetPlayer()->m_MoodState = MOOD_PLAYER_TANK;	
-				if(!m_ClassesAlreadySelected)
-				{
-					if(m_SelectedWithVotes)
-						GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank is assigned to {STR} with {INT} votes!", 
-							Server()->ClientName(ClientID), &pChr->GetPlayer()->GetTempData().m_TempTankVotingDungeon);
-					else
-					{
-						const int StrengthTank = pChr->GetPlayer()->GetLevelTypeAttribute(AtributType::AtTank);
-						GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned with class strength {INT}p!",
-							Server()->ClientName(ClientID), &StrengthTank);
-					}
-				}
-			}
+				pChr->GetPlayer()->m_MoodState = MOOD_PLAYER_TANK;
 
 			if(!m_SafeTick)
 			{
@@ -274,7 +260,6 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 				pChr->GetPlayer()->ChangeWorld(pChr->GetPlayer()->Acc().m_LastWorldID);
 				return false;
 			}
-			m_ClassesAlreadySelected = true;
 		}
 		else
 		{
@@ -402,6 +387,22 @@ void CGameControllerDungeon::SelectTankPlayer()
 			m_TankClientID = i;
 			MaximalHardness = pPlayer->GetLevelTypeAttribute(AtributType::AtTank);
 		}
+	}
+
+	// show information about tank
+	CPlayer* pTankPlayer = GS()->GetPlayer(m_TankClientID, true);
+	if(!m_ClassesAlreadySelected)
+	{
+		if(m_SelectedWithVotes)
+			GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank is assigned to {STR} with {INT} votes!",
+				Server()->ClientName(m_TankClientID), &pTankPlayer->GetTempData().m_TempTankVotingDungeon);
+		else
+		{
+			const int StrengthTank = pTankPlayer->GetLevelTypeAttribute(AtributType::AtTank);
+			GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned with class strength {INT}p!",
+				Server()->ClientName(m_TankClientID), &StrengthTank);
+		}
+		m_ClassesAlreadySelected = true;
 	}
 }
 
