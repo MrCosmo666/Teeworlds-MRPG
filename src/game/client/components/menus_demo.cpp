@@ -613,39 +613,15 @@ void CMenus::RenderDemoList(CUIRect MainView)
 	// demo buttons
 	int NumButtons = m_DemolistSelectedIsDir ? 3 : 5;
 	float Spacing = 3.0f;
-	float ButtonWidth = (BottomView.w/6.0f)-(Spacing*5.0)/6.0f;
-	float BackgroundWidth = ButtonWidth*(float)NumButtons+(float)(NumButtons-1)*Spacing;
+	float ButtonWidth = (BottomView.w / 6.0f) - (Spacing * 5.0) / 6.0f;
+	float BackgroundWidth = ButtonWidth * (float)NumButtons + (float)(NumButtons - 1) * Spacing;
 
 	BottomView.VSplitRight(BackgroundWidth, 0, &BottomView);
 	RenderBackgroundShadow(&BottomView, true);
 
-	BottomView.VSplitLeft(Spacing, 0, &BottomView);
-	BottomView.VSplitLeft(ButtonWidth, &Button, &BottomView);
-	static CButtonContainer s_FetchButton;
-	if(DoButton_Menu(&s_FetchButton, Localize("Fetch Info"), 0, &Button))
-	{
-		for(sorted_array<CDemoItem>::range r = m_lDemos.all(); !r.empty(); r.pop_front())
-		{
-			if(str_comp(r.front().m_aFilename, ".."))
-				FetchHeader(&r.front());
-		}
-		m_lDemos.sort_range_by(CDemoComparator(
-			g_Config.m_BrDemoSort, g_Config.m_BrDemoSortOrder
-		));
-	}
-
 	BottomView.HSplitTop(25.0f, &BottomView, 0);
-	BottomView.VSplitLeft(ButtonWidth, &Button, &BottomView);
-	static CButtonContainer s_RefreshButton;
-	if(DoButton_Menu(&s_RefreshButton, Localize("Refresh"), 0, &Button) || (Input()->KeyPress(KEY_R) && (Input()->KeyIsPressed(KEY_LCTRL) || Input()->KeyIsPressed(KEY_RCTRL))))
-	{
-		DemolistPopulate();
-		DemolistOnUpdate(false);
-	}
-
 	if(!m_DemolistSelectedIsDir)
 	{
-		BottomView.VSplitLeft(Spacing, 0, &BottomView);
 		BottomView.VSplitLeft(ButtonWidth, &Button, &BottomView);
 		static CButtonContainer s_DeleteButton;
 		if(DoButton_Menu(&s_DeleteButton, Localize("Delete"), 0, &Button) || m_DeletePressed)
@@ -673,6 +649,30 @@ void CMenus::RenderDemoList(CUIRect MainView)
 				return;
 			}
 		}
+		BottomView.VSplitLeft(Spacing, 0, &BottomView);
+	}
+
+	BottomView.VSplitLeft(ButtonWidth, &Button, &BottomView);
+	static CButtonContainer s_RefreshButton;
+	if(DoButton_Menu(&s_RefreshButton, Localize("Refresh"), 0, &Button) || (Input()->KeyPress(KEY_R) && (Input()->KeyIsPressed(KEY_LCTRL) || Input()->KeyIsPressed(KEY_RCTRL))))
+	{
+		DemolistPopulate();
+		DemolistOnUpdate(false);
+	}
+
+	BottomView.VSplitLeft(Spacing, 0, &BottomView);
+	BottomView.VSplitLeft(ButtonWidth, &Button, &BottomView);
+	static CButtonContainer s_FetchButton;
+	if(DoButton_Menu(&s_FetchButton, Localize("Fetch Info"), 0, &Button))
+	{
+		for(sorted_array<CDemoItem>::range r = m_lDemos.all(); !r.empty(); r.pop_front())
+		{
+			if(str_comp(r.front().m_aFilename, ".."))
+				FetchHeader(&r.front());
+		}
+		m_lDemos.sort_range_by(CDemoComparator(
+			g_Config.m_BrDemoSort, g_Config.m_BrDemoSortOrder
+		));
 	}
 
 	BottomView.VSplitLeft(Spacing, 0, &BottomView);
@@ -688,7 +688,7 @@ void CMenus::RenderDemoList(CUIRect MainView)
 					fs_parent_dir(m_aCurrentDemoFolder);
 				else	// sub folder
 				{
-					char aTemp[256];
+					char aTemp[IO_MAX_PATH_LENGTH];
 					str_copy(aTemp, m_aCurrentDemoFolder, sizeof(aTemp));
 					str_format(m_aCurrentDemoFolder, sizeof(m_aCurrentDemoFolder), "%s/%s", aTemp, m_lDemos[m_DemolistSelectedIndex].m_aFilename);
 					m_DemolistStorageType = m_lDemos[m_DemolistSelectedIndex].m_StorageType;
@@ -698,9 +698,9 @@ void CMenus::RenderDemoList(CUIRect MainView)
 			}
 			else // file
 			{
-				char aBuf[512];
+				char aBuf[IO_MAX_PATH_LENGTH];
 				str_format(aBuf, sizeof(aBuf), "%s/%s", m_aCurrentDemoFolder, m_lDemos[m_DemolistSelectedIndex].m_aFilename);
-				const char *pError = Client()->DemoPlayer_Play(aBuf, m_lDemos[m_DemolistSelectedIndex].m_StorageType);
+				const char* pError = Client()->DemoPlayer_Play(aBuf, m_lDemos[m_DemolistSelectedIndex].m_StorageType);
 				if(pError)
 					PopupMessage(Localize("Error loading demo"), pError, Localize("Ok"));
 				else
