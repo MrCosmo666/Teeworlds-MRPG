@@ -54,7 +54,7 @@ void CParticles::Add(int Group, CParticle *pPart)
 	}
 	else
 	{
-		if(m_pClient->m_Snap.m_pGameData && m_pClient->m_Snap.m_pGameData->m_GameStateFlags&GAMESTATEFLAG_PAUSED)
+		if(m_pClient->IsWorldPaused())
 			return;
 	}
 
@@ -157,7 +157,7 @@ void CParticles::OnRender()
 	}
 	else
 	{
-		if(m_pClient->m_Snap.m_pGameData && !(m_pClient->m_Snap.m_pGameData->m_GameStateFlags & GAMESTATEFLAG_PAUSED))
+		if(!m_pClient->IsWorldPaused())
 			Update((float)((Now - s_LastTime) / (double)time_freq()));
 	}
 

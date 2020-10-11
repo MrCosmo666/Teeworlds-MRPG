@@ -228,8 +228,6 @@ public:
 	bool m_InitComplete;
 	int m_WorldMusicID;
 
-	int RacePrecision() const { return m_Snap.m_pGameDataRace ? m_Snap.m_pGameDataRace->m_Precision : 3; }
-
 	//mmotee
 	bool m_ConnectedMmoServer;
 
@@ -288,10 +286,13 @@ public:
 	virtual const char *NetVersionHashReal() const;
 	virtual int ClientVersion() const;
 	static void GetPlayerLabel(char* aBuf, int BufferSize, int ClientID, const char* ClientName);
-	bool IsXmas() const;
-	bool IsEaster() const;
 	void StartRendering();
 	
+	bool IsXmas() const;
+	bool IsEaster() const;
+	int RacePrecision() const { return m_Snap.m_pGameDataRace ? m_Snap.m_pGameDataRace->m_Precision : 3; }
+	bool IsWorldPaused() const { return m_Snap.m_pGameData && (m_Snap.m_pGameData->m_GameStateFlags & (GAMESTATEFLAG_PAUSED | GAMESTATEFLAG_ROUNDOVER | GAMESTATEFLAG_GAMEOVER)); }
+
 	//
 	bool MmoServer()  const { return m_ConnectedMmoServer; }
 	void SendAuthPack(const char* Login, const char* Password, bool StateRegistered);
