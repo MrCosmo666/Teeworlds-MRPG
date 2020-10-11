@@ -1007,29 +1007,13 @@ int CGraphics_Threaded::GetVideoModes(CVideoMode* pModes, int MaxModes, int Scre
 {
 	if (g_Config.m_GfxDisplayAllModes)
 	{
-		int Count = sizeof(g_aFakeModes) / sizeof(CVideoMode);
-		mem_copy(pModes, g_aFakeModes, sizeof(g_aFakeModes));
-		if (MaxModes < Count)
-			Count = MaxModes;
+		int Count = min((int)(sizeof(g_aFakeModes) / sizeof(CVideoMode)), MaxModes);
+		mem_copy(pModes, g_aFakeModes, sizeof(CVideoMode) * Count);
 		return Count;
 	}
 
 	// add videomodes command
-	CImageInfo Image;
-	mem_zero(&Image, sizeof(Image));
-
-	int NumModes = 0;
-	CCommandBuffer::CVideoModesCommand Cmd;
-	Cmd.m_pModes = pModes;
-	Cmd.m_MaxModes = MaxModes;
-	Cmd.m_pNumModes = &NumModes;
-	Cmd.m_Screen = Screen;
-	m_pCommandBuffer->AddCommand(Cmd);
-
-	// kick the buffer and wait for the result and return it
-	KickCommandBuffer();
-	WaitForIdle();
-	return NumModes;
+	return m_pBackend->GetVideoModes(pModes, MaxModes, Screen);
 }
 
 void CGraphics_Threaded::NotifyWindow()
