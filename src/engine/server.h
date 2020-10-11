@@ -3,6 +3,8 @@
 #ifndef ENGINE_SERVER_H
 #define ENGINE_SERVER_H
 
+#include <game/version.h>
+
 #include "kernel.h"
 #include "message.h"
 
@@ -44,15 +46,42 @@ public:
 	virtual int GetClientInfo(int ClientID, CClientInfo *pInfo) const = 0;
 	virtual void GetClientAddr(int ClientID, char *pAddrStr, int Size) const = 0;
 
-	virtual int SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int WorldID = -1) = 0;
+	virtual int SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int64 Mask = -1, int WorldID = -1) = 0;
 
 	template<class T>
-	int SendPackMsg(T *pMsg, int Flags, int ClientID, int WorldID = -1)
+	int SendPackMsgMask(T* pMsg, int Flags, int ClientID, int64 Mask, int WorldID = -1)
 	{
 		CMsgPacker Packer(pMsg->MsgID(), false);
 		if(pMsg->Pack(&Packer))
 			return -1;
-		return SendMsg(&Packer, Flags, ClientID, WorldID);
+		return SendMsg(&Packer, Flags, ClientID, Mask, WorldID);
+	}
+
+	template<class T>
+	int SendPackMsg(T* pMsg, int Flags, int ClientID, int WorldID = -1)
+	{
+		CMsgPacker Packer(pMsg->MsgID(), false);
+		if(pMsg->Pack(&Packer))
+			return -1;
+
+		auto IsNotVanilaMsg = [=](int CID) -> bool // first mmo msg
+		{
+			return  GetClientProtocolVersion(CID) == PROTOCOL_VERSION_MMO && pMsg->MsgID() >= NETMSGTYPE_CL_ISMMOSERVER;
+		};
+
+		int64 Mask = -1;
+		if(ClientID == -1)
+		{
+			for(int i = 0; i < MAX_PLAYERS; i++)
+			{
+				if(ClientIngame(i) && (IsNotVanilaMsg(i) || pMsg->MsgID() < NETMSGTYPE_CL_ISMMOSERVER))
+					Mask |= (int64)1 << i;
+			}
+		}
+		else if(ClientIngame(ClientID) && (IsNotVanilaMsg(ClientID) || pMsg->MsgID() < NETMSGTYPE_CL_ISMMOSERVER))
+			Mask |= (int64)1 << ClientID;
+
+		return SendMsg(&Packer, Flags, ClientID, Mask, WorldID);
 	}
 
 	// World Time

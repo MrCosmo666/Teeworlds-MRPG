@@ -12,7 +12,7 @@ std::map < int, AccountMainJob::StructTempPlayerData > AccountMainJob::ms_aPlaye
 
 int AccountMainJob::SendAuthCode(int ClientID, int Code)
 {
-	if (GS()->IsMmoClient(ClientID))
+	if(GS()->IsMmoClient(ClientID))
 	{
 		CNetMsg_Sv_ClientProgressAuth ProgressMsg;
 		ProgressMsg.m_Code = Code;
@@ -161,7 +161,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 			GS()->Chat(ClientID, "You have {INT} unread messages!", &CountMessageInbox);
 
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
-		GS()->SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
+		GS()->SendCompleteEquippingItems(ClientID);
 		return;
 	}
 
@@ -194,7 +194,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		pPlayer->ChangeWorld(pPlayer->Acc().m_WorldID);
 		return;
 	}
-	GS()->SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
+	GS()->SendCompleteEquippingItems(ClientID);
 }
 
 void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)

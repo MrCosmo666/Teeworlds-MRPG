@@ -268,9 +268,6 @@ void CGS::CreateSound(vec2 Pos, int Sound, int64 Mask)
 
 void CGS::SendWorldMusic(int ClientID, int MusicID)
 {
-	if(!IsMmoClient(ClientID))
-		return;
-
 	CNetMsg_Sv_WorldMusic Msg;
 	Msg.m_pSoundID = (MusicID != 0 ? MusicID : m_MusicID);
 	Msg.m_pVolume = (IsDungeon() ? 8 : 2);
@@ -813,12 +810,9 @@ void CGS::SendSkinChange(int ClientID, int TargetID)
 void CGS::SendEquipItem(int ClientID, int TargetID)
 {
 	CPlayer *pPlayer = GetPlayer(ClientID);
-	if((TargetID != -1 && !IsMmoClient(TargetID)) || !pPlayer)
+	if(!pPlayer)
 		return;
 
-	// send players equiping global bots local on world
-	const int MsgWorldID = (pPlayer->IsBot() ? pPlayer->GetPlayerWorldID() : -1);
-	
 	CNetMsg_Sv_EquipItems Msg;
 	Msg.m_ClientID = ClientID;
 	for(int k = 0; k < NUM_EQUIPS; k++)
@@ -828,17 +822,17 @@ void CGS::SendEquipItem(int ClientID, int TargetID)
 		Msg.m_EquipID[k] = EquipItem;
 		Msg.m_EnchantItem[k] = EnchantItem;
 	}
+
+	// send players equipping global bots local on world
+	const int MsgWorldID = (pPlayer->IsBot() ? pPlayer->GetPlayerWorldID() : -1);
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID, MsgWorldID);
 }
 
 // Send equipment in radius
-void CGS::SendRangeEquipItem(int TargetID, int StartSenderClientID, int EndSenderClientID)
+void CGS::SendCompleteEquippingItems(int TargetID)
 {
-	if (!IsMmoClient(TargetID) || StartSenderClientID < 0 || EndSenderClientID > MAX_CLIENTS || StartSenderClientID >= EndSenderClientID)
-		return;
-
-	for (int i = StartSenderClientID; i < EndSenderClientID; i++)
-		SendEquipItem(i, TargetID);
+	for (int i = 0; i < MAX_CLIENTS; i++)
+			SendEquipItem(i, TargetID);
 
 	SendEquipItem(TargetID, TargetID);
 	SendEquipItem(TargetID, -1);
@@ -945,9 +939,6 @@ void CGS::SendTuningParams(int ClientID)
 // Send a conversation package with someone
 void CGS::SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char *Message, int Style, int TalkingEmote)
 {
-	if (!IsMmoClient(ClientID))
-		return;
-
 	CNetMsg_Sv_TalkText Msg;
 	Msg.m_PlayerTalked = PlayerTalked;
 	Msg.m_pTalkClientID = TalkingID;
@@ -959,9 +950,6 @@ void CGS::SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const cha
 
 void CGS::SendProgressBar(int ClientID, int Count, int Request, const char* Message)
 {
-	if (!IsMmoClient(ClientID))
-		return;
-
 	CNetMsg_Sv_ProgressBar Msg;
 	Msg.m_pText = Message;
 	Msg.m_pCount = Count;
@@ -1394,7 +1382,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			Server()->SendPackMsg(&GoodCheck, MSGFLAG_VITAL|MSGFLAG_FLUSH|MSGFLAG_NORECORD, ClientID);
 
 			// loading of all parts of players' data
-			SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
+			SendCompleteEquippingItems(ClientID);
 		}
 		else if(MsgID == NETMSGTYPE_CL_CLIENTAUTH)
 		{
@@ -2206,11 +2194,11 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 		if(at.second.m_UpgradePrice < 10)
 		{
 			const int AttributeRealSize = pPlayer->GetAttributeCount(at.first, true);
-			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} (+{INT}) - {STR}", &AttributeSize, &AttributeRealSize, AtributeName(at.first));
+			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} (+{INT}) - {STR}", &AttributeSize, &AttributeRealSize, at.second.m_aName);
 			continue;
 		}
 
-		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "+{INT} - {STR}", &AttributeSize, AtributeName(at.first));
+		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "+{INT} - {STR}", &AttributeSize, at.second.m_aName);
 	}
 
 	AVM(ClientID, "null", NOPE, NOPE, "Player Upgrade Point: {INT}P", &pPlayer->Acc().m_Upgrade);
@@ -2446,13 +2434,6 @@ bool CGS::IsPlayerEqualWorldID(int ClientID, int WorldID) const
 	if (WorldID <= -1)
 		return m_apPlayers[ClientID]->GetPlayerWorldID() == m_WorldID;
 	return m_apPlayers[ClientID]->GetPlayerWorldID() == WorldID;
-}
-
-const char* CGS::AtributeName(int BonusID) const
-{
-	if(CGS::ms_aAttributsInfo.find(BonusID) != CGS::ms_aAttributsInfo.end())
-		return CGS::ms_aAttributsInfo[BonusID].m_aName;
-	return "Has no stats";
 }
 
 bool CGS::CheckingPlayersDistance(vec2 Pos, float Distance) const

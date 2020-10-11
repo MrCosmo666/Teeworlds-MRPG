@@ -18,7 +18,6 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	m_GameFlags = 0;
 	m_StartedPlayers = 0;
 	m_TankClientID = -1;
-	m_ClassesAlreadySelected = false;
 
 	// door creation to start
 	vec2 PosDoor = vec2(DungeonJob::Dungeon[m_DungeonID].m_DoorX, DungeonJob::Dungeon[m_DungeonID].m_DoorY);
@@ -35,14 +34,12 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	}
 }
 
-void CGameControllerDungeon::KillAllPlayers(bool StartDungeonMusic)
+void CGameControllerDungeon::KillAllPlayers()
 {
 	for (int i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(GS()->m_apPlayers[i] && GS()->IsPlayerEqualWorldID(i, m_WorldID))
 		{
-			if(StartDungeonMusic)
-				GS()->SendWorldMusic(i);
 			if(GS()->m_apPlayers[i]->GetCharacter())
 				GS()->m_apPlayers[i]->GetCharacter()->Die(i, WEAPON_WORLD);
 		}
@@ -64,7 +61,6 @@ void CGameControllerDungeon::ChangeState(int State)
 		m_LastStartingTick = 0;
 		m_SafeTick = 0;
 		m_TankClientID = -1;
-		m_ClassesAlreadySelected = false;
 		SetMobsSpawn(false);
 		ResetDoorKeyState();
 	}
@@ -90,7 +86,8 @@ void CGameControllerDungeon::ChangeState(int State)
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "You are given 10 minutes to complete of dungeon!");
 		GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon started!");
 		SetMobsSpawn(true);
-		KillAllPlayers(true);
+		KillAllPlayers();
+		GS()->SendWorldMusic(-1);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
@@ -359,6 +356,7 @@ void CGameControllerDungeon::SelectTankPlayer()
 	int MaximalVotes = 0;
 	int MaximalHardness = 0;
 	m_SelectedWithVotes = false;
+
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pPlayer = GS()->m_apPlayers[i];
@@ -391,7 +389,7 @@ void CGameControllerDungeon::SelectTankPlayer()
 
 	// show information about tank
 	CPlayer* pTankPlayer = GS()->GetPlayer(m_TankClientID, true);
-	if(!m_ClassesAlreadySelected)
+	if(pTankPlayer)
 	{
 		if(m_SelectedWithVotes)
 			GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank is assigned to {STR} with {INT} votes!",
@@ -402,7 +400,6 @@ void CGameControllerDungeon::SelectTankPlayer()
 			GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned with class strength {INT}p!",
 				Server()->ClientName(m_TankClientID), &StrengthTank);
 		}
-		m_ClassesAlreadySelected = true;
 	}
 }
 

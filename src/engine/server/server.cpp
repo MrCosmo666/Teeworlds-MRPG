@@ -634,7 +634,7 @@ void CServer::InitRconPasswordIfUnset()
 	m_GeneratedRconPassword = 1;
 }
 
-int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int WorldID)
+int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int64 Mask, int WorldID)
 {
 	if (!pMsg)
 		return -1;
@@ -661,6 +661,10 @@ int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int WorldID)
 			{
 				if (m_aClients[i].m_State == CClient::STATE_INGAME && !m_aClients[i].m_Quitting)
 				{
+					// skip what is not included in the mask
+					if(Mask != -1 && (Mask & ((int64)1 << ClientID)) == 0)
+						continue;
+
 					if (WorldID != -1)
 					{
 						if (m_aClients[i].m_MapID == WorldID)
@@ -670,6 +674,7 @@ int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int WorldID)
 						}
 						continue;
 					}
+
 					Packet.m_ClientID = i;
 					m_NetServer.Send(&Packet);
 				}

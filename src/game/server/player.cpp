@@ -541,7 +541,7 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 {
 	if(PPSTR(CMD, "UPGRADE") == 0)
 	{
-		if(Upgrade(Get, &Acc().m_aStats[VoteID], &Acc().m_Upgrade, VoteID2, 1000, GS()->AtributeName(VoteID))) 
+		if(Upgrade(Get, &Acc().m_aStats[VoteID], &Acc().m_Upgrade, VoteID2, 1000, CGS::ms_aAttributsInfo[VoteID].m_aName)) 
 		{
 			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_UPGRADES);
 			GS()->ResetVotes(m_ClientID, MenuList::MENU_UPGRADE);

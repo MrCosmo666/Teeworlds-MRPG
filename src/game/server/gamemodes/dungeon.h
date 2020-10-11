@@ -30,7 +30,6 @@ class CGameControllerDungeon : public IGameController
 	int m_Time[MAX_PLAYERS];
 	int m_StartedPlayers;
 	int m_TankClientID;
-	bool m_ClassesAlreadySelected;
 	bool m_SelectedWithVotes;
 	int m_SyncDungeon;
 
@@ -53,7 +52,7 @@ private:
 	void ChangeState(int State);
 	void StateTick();
 	void SetMobsSpawn(bool AllowedSpawn);
-	void KillAllPlayers(bool StartDungeonMusic = false);
+	void KillAllPlayers();
 
 	void UpdateDoorKeyState();
 	void ResetDoorKeyState();
