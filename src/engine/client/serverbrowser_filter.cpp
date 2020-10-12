@@ -47,7 +47,7 @@ CServerBrowserFilter::CServerFilter::CServerFilter()
 
 CServerBrowserFilter::CServerFilter::~CServerFilter()
 {
-	a(m_pSortedServerlist)
+	if(m_pSortedServerlist)
 		mem_free(m_pSortedServerlist);
 }
 
@@ -434,6 +434,7 @@ void CServerBrowserFilter::SetFilter(int Index, const CServerFilterInfo* pFilter
 	pFilter->m_FilterInfo.m_Ping = pFilterInfo->m_Ping;
 	pFilter->m_FilterInfo.m_Country = pFilterInfo->m_Country;
 	pFilter->m_FilterInfo.m_ServerLevel = pFilterInfo->m_ServerLevel;
+	for(int i = 0; i < CServerFilterInfo::MAX_GAMETYPES; ++i)
 	{
 		str_copy(pFilter->m_FilterInfo.m_aGametype[i], pFilterInfo->m_aGametype[i], sizeof(pFilter->m_FilterInfo.m_aGametype[i]));
 		pFilter->m_FilterInfo.m_aGametypeExclusive[i] = pFilterInfo->m_aGametypeExclusive[i];

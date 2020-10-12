@@ -1323,14 +1323,6 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 		{
 			View.HSplitTop(20.0f, &Header, &View);
 			s_ScrollRegion.AddRect(Header);
-			if(f < m_lFriendList[i].size() - 1)
-			{
-				CUIRect Space;
-				View.HSplitTop(SpacingH, &Space, &View);
-				s_ScrollRegion.AddRect(Space);
-			}
-			if(s_ScrollRegion.IsRectClipped(Rect))
-				continue;
 
 			// render header
 			RenderFilterHeader(Header, FilterIndex);
@@ -1711,6 +1703,14 @@ void CMenus::RenderServerbrowserFriendTab(CUIRect View)
 			{
 				View.HSplitTop((i == FRIEND_OFF ? 8.0f : 20.0f) + HeaderHeight, &Rect, &View);
 				s_ScrollRegion.AddRect(Rect);
+				if(f < m_lFriendList[i].size() - 1)
+				{
+					CUIRect Space;
+					View.HSplitTop(SpacingH, &Space, &View);
+					s_ScrollRegion.AddRect(Space);
+				}
+				if(s_ScrollRegion.IsRectClipped(Rect))
+					continue;
 
 				const bool Inside = UI()->MouseInside(&Rect);
 				bool ButtonResult = UI()->DoButtonLogic(&(s_FriendButtons[ButtonId % 20]), &Rect);

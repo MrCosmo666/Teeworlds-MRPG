@@ -77,7 +77,7 @@ public:
 	virtual void MouseModeRelative() = 0;
 	virtual void MouseModeAbsolute() = 0;
 	virtual int MouseDoubleClick() = 0;
-	virtual void MouseRelative(float* x, float* y) = 0;
+	virtual bool MouseRelative(float* pX, float* pY) = 0;
 
 	// clipboard
 	virtual const char* GetClipboardText() = 0;

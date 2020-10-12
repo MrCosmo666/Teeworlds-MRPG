@@ -39,7 +39,7 @@ void CMapLayers::OnStateChange(int NewState, int OldState)
 
 void CMapLayers::LoadBackgroundMap()
 {
-	const char* pMenuMap = Config()->m_ClMenuMap;
+	const char* pMenuMap = g_Config.m_ClMenuMap;
 	if(str_comp(pMenuMap, "auto") == 0)
 	{
 		switch(time_season())
