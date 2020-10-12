@@ -256,7 +256,6 @@ void CPlayers::RenderPlayer(const CNetObj_Character *pPrevChar, const CNetObj_Ch
 				}
 				RenderTools()->DrawSprite(p.x, p.y, g_pData->m_Weapons.m_aId[iw].m_VisualSize);
 			}
-	
 		}
 		else if (Player.m_Weapon == WEAPON_NINJA)
 		{

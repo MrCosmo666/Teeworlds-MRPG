@@ -209,8 +209,8 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			AddHistoryGuild(GuildID, "'%s' level up to '%d'.", UpgradeNames(UpgradeID).c_str(), GuildCount);
 			GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
 			return true;
-
 		}
+
 		GS()->Chat(ClientID, "You don't have that much money in the Bank.");
 		return true;
 	}
@@ -897,7 +897,6 @@ void GuildJob::ShowGuildPlayers(CPlayer* pPlayer)
 			GS()->AVM(ClientID, "MLEADER", AuthID, HideID, "Give Leader (in reason 134)");
 		HideID++;
 	}
-
 }
 
 void GuildJob::AddExperience(int GuildID)

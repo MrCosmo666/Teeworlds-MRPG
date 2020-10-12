@@ -174,7 +174,6 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		static int s_ButtonAddaptivePickupInd = 0;
 		if(DoButton_CheckBox(&s_ButtonAddaptivePickupInd, Localize("Make pickups grey when you don't need them"), g_Config.m_ClAdaptivePickups, &Button))
 			g_Config.m_ClAdaptivePickups ^= 1;
-
 	}
 	// information
 	else if (Page == 3)

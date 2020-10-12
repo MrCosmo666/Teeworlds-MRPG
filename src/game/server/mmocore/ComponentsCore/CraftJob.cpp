@@ -28,8 +28,8 @@ void CraftJob::OnInit()
 		str_copy(aBuf, RES->getString("ItemNeedCount").c_str(), sizeof(aBuf));
 		if (!sscanf(aBuf, "%d %d %d", &ms_aCraft[ID].m_aItemNeedCount[0], &ms_aCraft[ID].m_aItemNeedCount[1], &ms_aCraft[ID].m_aItemNeedCount[2]))
 			dbg_msg("Error", "Error on scanf in Crafting");
-
 	}
+
 	Job()->ShowLoadingProgress("Crafts", ms_aCraft.size());	
 }
 
