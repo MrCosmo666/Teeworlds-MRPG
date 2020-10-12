@@ -27,7 +27,7 @@ void CMenus::CScrollRegion::Begin(CUIRect* pClipRect, vec2* pOutOffset, const CS
 		m_Params = *pParams;
 
 	const bool ContentOverflows = m_ContentH > pClipRect->h;
-	const bool ForceShowScrollbar = m_Params.m_Flags&CScrollRegionParams::FLAG_CONTENT_STATIC_WIDTH;
+	const bool ForceShowScrollbar = m_Params.m_Flags & CScrollRegionParams::FLAG_CONTENT_STATIC_WIDTH;
 
 	CUIRect ScrollBarBg;
 	CUIRect* pModifyRect = (ContentOverflows || ForceShowScrollbar) ? pClipRect : 0;
@@ -40,7 +40,7 @@ void CMenus::CScrollRegion::Begin(CUIRect* pClipRect, vec2* pOutOffset, const CS
 		if(m_Params.m_ScrollbarBgColor.a > 0)
 			m_pRenderTools->DrawRoundRect(&ScrollBarBg, m_Params.m_ScrollbarBgColor, 4.0f);
 		if(m_Params.m_RailBgColor.a > 0)
-			m_pRenderTools->DrawRoundRect(&m_RailRect, m_Params.m_RailBgColor, m_RailRect.w/2.0f);
+			m_pRenderTools->DrawRoundRect(&m_RailRect, m_Params.m_RailBgColor, m_RailRect.w / 2.0f);
 	}
 	if(!ContentOverflows)
 		m_ContentScrollOff.y = 0;
@@ -75,7 +75,7 @@ void CMenus::CScrollRegion::End()
 	}
 
 	const float SliderHeight = max(m_Params.m_SliderMinHeight,
-		m_ClipRect.h/m_ContentH * m_RailRect.h);
+		m_ClipRect.h / m_ContentH * m_RailRect.h);
 
 	CUIRect Slider = m_RailRect;
 	Slider.h = SliderHeight;
@@ -83,7 +83,7 @@ void CMenus::CScrollRegion::End()
 
 	if(m_RequestScrollY >= 0)
 	{
-		m_ScrollY = m_RequestScrollY/(m_ContentH - m_ClipRect.h) * MaxScroll;
+		m_ScrollY = m_RequestScrollY / (m_ContentH - m_ClipRect.h) * MaxScroll;
 		m_RequestScrollY = -1;
 	}
 
@@ -93,9 +93,10 @@ void CMenus::CScrollRegion::End()
 	bool Hovered = false;
 	bool Grabbed = false;
 	const void* pID = &m_ScrollY;
-	int Inside = m_pUI->MouseInside(&Slider);
+	const bool InsideSlider = m_pUI->MouseInside(&Slider);
+	const bool InsideRail = m_pUI->MouseInside(&m_RailRect);
 
-	if(Inside)
+	if(InsideSlider)
 	{
 		m_pUI->SetHotItem(pID);
 
@@ -107,30 +108,38 @@ void CMenus::CScrollRegion::End()
 
 		Hovered = true;
 	}
-
-	if(m_pUI->CheckActiveItem(pID) && !m_pUI->MouseButton(0))
+	else if(InsideRail && m_pUI->MouseButtonClicked(0))
+	{
+		m_ScrollY += m_pUI->MouseY() - (Slider.y + Slider.h / 2);
+		m_pUI->SetActiveItem(pID);
+		m_MouseGrabStart.y = m_pUI->MouseY();
+		Hovered = true;
+	}
+	else if(m_pUI->CheckActiveItem(pID) && !m_pUI->MouseButton(0))
+	{
 		m_pUI->SetActiveItem(0);
+	}
 
 	// move slider
 	if(m_pUI->CheckActiveItem(pID) && m_pUI->MouseButton(0))
 	{
-		float my = m_pUI->MouseY();
-		m_ScrollY += my - m_MouseGrabStart.y;
-		m_MouseGrabStart.y = my;
-
+		float MouseY = m_pUI->MouseY();
+		m_ScrollY += MouseY - m_MouseGrabStart.y;
+		m_MouseGrabStart.y = MouseY;
 		Grabbed = true;
 	}
 
 	m_ScrollY = clamp(m_ScrollY, 0.0f, MaxScroll);
-	m_ContentScrollOff.y = -m_ScrollY/MaxScroll * (m_ContentH - m_ClipRect.h);
+	m_ContentScrollOff.y = -m_ScrollY / MaxScroll * (m_ContentH - m_ClipRect.h);
 
-	vec4 SliderColor = m_Params.m_SliderColor;
+	vec4 SliderColor;
 	if(Grabbed)
 		SliderColor = m_Params.m_SliderColorGrabbed;
 	else if(Hovered)
 		SliderColor = m_Params.m_SliderColorHover;
-
-	m_pRenderTools->DrawRoundRect(&Slider, SliderColor, Slider.w/2.0f);
+	else
+		SliderColor = m_Params.m_SliderColor;
+	m_pRenderTools->DrawRoundRect(&Slider, SliderColor, Slider.w / 2.0f);
 }
 
 void CMenus::CScrollRegion::AddRect(CUIRect Rect)
@@ -163,7 +172,7 @@ void CMenus::CScrollRegion::ScrollHere(int Option)
 
 			if(dy < 0)
 				m_RequestScrollY = TopScroll;
-			else if(dy > (m_ClipRect.h-MinHeight))
+			else if(dy > (m_ClipRect.h - MinHeight))
 				m_RequestScrollY = TopScroll - (m_ClipRect.h - MinHeight);
 		} break;
 	}
