@@ -126,7 +126,7 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		str_format(aBuf, sizeof(aBuf), "%s: %s", Localize("Smooth rendering"), g_Config.m_ClInactiveRendering == 2 ? "No rendering when inactive" : g_Config.m_ClInactiveRendering == 1 ? "No rendering when minimized" : "Always render");
 		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
 		BasicLeft.HSplitTop(ButtonHeight, &Button, &BasicLeft);
-		if (DoButton_CheckBox_Number(&g_Config.m_ClInactiveRendering, aBuf, g_Config.m_ClInactiveRendering, &Button))
+		if (DoButton_CheckBox(&g_Config.m_ClInactiveRendering, aBuf, g_Config.m_ClInactiveRendering, &Button))
 			g_Config.m_ClInactiveRendering = (g_Config.m_ClInactiveRendering + 1) % 3;
 
 		// --------------------- RIGHT SIDE --------------------------
@@ -280,31 +280,31 @@ void CMenus::RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background)
 
 		TabBar.VSplitLeft(TabBar.w / 6, &Button, &TabBar);
 		static CButtonContainer s_ButtonGameSkins;
-		if (DoButton_MenuTab(&s_ButtonGameSkins, Localize("Gameskin"), TextureMenu == 0, &Button, 0))
+		if (DoButton_Menu(&s_ButtonGameSkins, Localize("Gameskin"), TextureMenu == 0, &Button, 0))
 			TextureMenu = 0;
 
 		TabBar.VSplitLeft(TabBar.w / 5, &Button, &TabBar);
 		static CButtonContainer s_ButtonEmoticons;
-		if (DoButton_MenuTab(&s_ButtonEmoticons, Localize("Emoticons"), TextureMenu == 1, &Button, 0))
+		if (DoButton_Menu(&s_ButtonEmoticons, Localize("Emoticons"), TextureMenu == 1, &Button, 0))
 			TextureMenu = 1;
 
 		TabBar.VSplitLeft(TabBar.w / 4, &Button, &TabBar);
 		static CButtonContainer s_ButtonCursors;
-		if (DoButton_MenuTab(&s_ButtonCursors, Localize("Cursor"), TextureMenu == 2, &Button, 0))
+		if (DoButton_Menu(&s_ButtonCursors, Localize("Cursor"), TextureMenu == 2, &Button, 0))
 			TextureMenu = 2;
 
 		TabBar.VSplitLeft(TabBar.w / 3, &Button, &TabBar);
 		static CButtonContainer s_ButtonParticles;
-		if (DoButton_MenuTab(&s_ButtonParticles, Localize("Particles"), TextureMenu == 3, &Button, 0))
+		if (DoButton_Menu(&s_ButtonParticles, Localize("Particles"), TextureMenu == 3, &Button, 0))
 			TextureMenu = 3;
 
 		TabBar.VSplitLeft(TabBar.w / 2, &Button, &TabBar);
 		static CButtonContainer s_ButtonEntities;
-		if (DoButton_MenuTab(&s_ButtonEntities, Localize("Entities"), TextureMenu == 4, &Button, 0))
+		if (DoButton_Menu(&s_ButtonEntities, Localize("Entities"), TextureMenu == 4, &Button, 0))
 			TextureMenu = 4;
 
 		static CButtonContainer s_ButtonFonts;
-		if (DoButton_MenuTab(&s_ButtonFonts, Localize("Fonts"), TextureMenu == 5, &TabBar, 0))
+		if (DoButton_Menu(&s_ButtonFonts, Localize("Fonts"), TextureMenu == 5, &TabBar, 0))
 			TextureMenu = 5;
 	}
 

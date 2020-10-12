@@ -4168,7 +4168,7 @@ void CEditor::Render()
 	// basic start
 	Graphics()->Clear(1.0f, 0.0f, 1.0f);
 	CUIRect View = *UI()->Screen();
-	Graphics()->MapScreen(UI()->Screen()->x, UI()->Screen()->y, UI()->Screen()->w, UI()->Screen()->h);
+	Graphics()->MapScreen(View.x, View.y, View.w, View.h);
 
 	float Width = View.w;
 	float Height = View.h;
@@ -4275,7 +4275,7 @@ void CEditor::Render()
 	else if(m_Mode == MODE_IMAGES)
 		RenderImages(ToolBox, ToolBar, View);
 
-	Graphics()->MapScreen(UI()->Screen()->x, UI()->Screen()->y, UI()->Screen()->w, UI()->Screen()->h);
+	Graphics()->MapScreen(View.x, View.y, View.w, View.h);
 
 	if(m_GuiActive)
 	{
@@ -4536,7 +4536,7 @@ void CEditor::Init()
 	m_pStorage = Kernel()->RequestInterface<IStorage>();
 	m_RenderTools.m_pGraphics = m_pGraphics;
 	m_RenderTools.m_pUI = &m_UI;
-	m_UI.SetGraphics(m_pGraphics, m_pTextRender);
+	m_UI.Init(m_pGraphics, m_pInput, m_pTextRender);
 	m_Map.m_pEditor = this;
 
 	m_CheckerTexture = Graphics()->LoadTexture("editor/checker.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
@@ -4693,7 +4693,6 @@ void CEditor::UpdateAndRender()
 
 	// handle cursor movement
 	{
-		float mx, my, Mwx, Mwy, Mdx, Mdy;
 		float rx = 0.0f, ry = 0.0f;
 		int CursorType = Input()->CursorRelative(&rx, &ry);
 		UI()->ConvertCursorMove(&rx, &ry, CursorType);
@@ -4708,19 +4707,19 @@ void CEditor::UpdateAndRender()
 		s_MouseY = clamp(s_MouseY, 0.0f, (float)Graphics()->ScreenHeight());
 
 		// update the ui
-		mx = (s_MouseX/(float)Graphics()->ScreenWidth())*UI()->Screen()->w;
-		my = (s_MouseY/(float)Graphics()->ScreenHeight())*UI()->Screen()->h;
-		Mdx = (m_MouseDeltaX/(float)Graphics()->ScreenWidth())*UI()->Screen()->w;
-		Mdy = (m_MouseDeltaY/(float)Graphics()->ScreenHeight())*UI()->Screen()->h;
-		Mwx = 0;
-		Mwy = 0;
+		float mx = (s_MouseX / (float)Graphics()->ScreenWidth()) * UI()->Screen()->w;
+		float my = (s_MouseY / (float)Graphics()->ScreenHeight()) * UI()->Screen()->h;
+		float Mdx = (m_MouseDeltaX / (float)Graphics()->ScreenWidth()) * UI()->Screen()->w;
+		float Mdy = (m_MouseDeltaY / (float)Graphics()->ScreenHeight()) * UI()->Screen()->h;
+		float Mwx = 0;
+		float Mwy = 0;
 
 		// fix correct world x and y
-		CLayerGroup *g = GetSelectedGroup();
-		if(g)
+		CLayerGroup* pSelectedGroup = GetSelectedGroup();
+		if(pSelectedGroup)
 		{
 			float aPoints[4];
-			g->Mapping(aPoints);
+			pSelectedGroup->Mapping(aPoints);
 
 			float WorldWidth = aPoints[2]-aPoints[0];
 			float WorldHeight = aPoints[3]-aPoints[1];
@@ -4731,12 +4730,7 @@ void CEditor::UpdateAndRender()
 			m_MouseDeltaWy = Mdy*(WorldHeight / UI()->Screen()->h);
 		}
 
-		int Buttons = 0;
-		if(Input()->KeyIsPressed(KEY_MOUSE_1)) Buttons |= 1;
-		if(Input()->KeyIsPressed(KEY_MOUSE_2)) Buttons |= 2;
-		if(Input()->KeyIsPressed(KEY_MOUSE_3)) Buttons |= 4;
-
-		UI()->Update(mx,my,Mwx,Mwy,Buttons);
+		UI()->Update(mx, my, Mwx, Mwy);
 	}
 
 	// toggle gui

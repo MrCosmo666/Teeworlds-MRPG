@@ -381,7 +381,7 @@ void CGameClient::OnInit()
 	m_pGraphics = Kernel()->RequestInterface<IGraphics>();
 
 	// propagate pointers
-	m_UI.SetGraphics(Graphics(), TextRender());
+	m_UI.Init(Graphics(), Input(), TextRender());
 	m_RenderTools.m_pGraphics = Graphics();
 	m_RenderTools.m_pUI = UI();
 

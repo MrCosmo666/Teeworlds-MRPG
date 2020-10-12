@@ -136,8 +136,6 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 		UI()->DoLabel(&SeekBar, aBuffer, SeekBar.h*0.70f, CUI::ALIGN_CENTER);
 
 		// do the logic
-		int Inside = UI()->MouseInside(&SeekBar);
-
 		if(UI()->CheckActiveItem(&s_PrevAmount))
 		{
 			if(!UI()->MouseButton(0))
@@ -168,7 +166,7 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 			}
 		}
 
-		if(Inside)
+		if(UI()->MouseHovered(&SeekBar))
 			UI()->SetHotItem(&s_PrevAmount);
 	}
 
@@ -546,7 +544,7 @@ void CMenus::RenderDemoList(CUIRect MainView)
 					IconColor = vec4(0.5, 1, 0.5, 1);
 			}
 
-			DoIconColor(IMAGE_FILEICONS, DemoItem.m_IsDir ? SPRITE_FILE_FOLDER : SPRITE_FILE_DEMO1, &FileIcon, IconColor);
+			DoIcon(IMAGE_FILEICONS, DemoItem.m_IsDir ? SPRITE_FILE_FOLDER : SPRITE_FILE_DEMO1, & FileIcon, & IconColor);
 
 			for(int c = 0; c < NumCols; c++)
 			{
