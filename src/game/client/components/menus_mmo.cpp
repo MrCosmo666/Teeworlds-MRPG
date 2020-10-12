@@ -226,7 +226,7 @@ void CMenus::RenderSettingsMmoChangerGeneric(CUIRect MainView, CCSkinChanger::CT
 	s_ListBox.DoHeader(&MainView, aBuf, 20.0f, 2.0f);
 
 	const int Num = pEntities->Num();
-	s_ListBox.DoStart(MainView.w / (float)ItemsPerRow / Ratio, Num, ItemsPerRow, OldSelected);
+	s_ListBox.DoStart(MainView.w / (float)ItemsPerRow / Ratio, Num, ItemsPerRow, 1, OldSelected);
 
 	for (int i = 0; i < Num + 1; ++i) // first is default
 	{
@@ -407,7 +407,7 @@ void CMenus::RenderFontSelection(CUIRect MainView)
 
 	int OldSelectedFont = s_SelectedFont;
 	s_ListBox.DoHeader(&MainView, Localize("Fonts"), 20.0f, 2.0f);
-	s_ListBox.DoStart(20.0f, s_Fonts.size(), 1, s_SelectedFont);
+	s_ListBox.DoStart(20.0f, s_Fonts.size(), 1, 1, s_SelectedFont);
 	for (sorted_array<CFontFile>::range r = s_Fonts.all(); !r.empty(); r.pop_front())
 	{
 		CListboxItem Item = s_ListBox.DoNextItem(&r.front());
