@@ -438,7 +438,7 @@ bool CMenus::DoEditBox(void* pID, const CUIRect* pRect, char* pStr, unsigned Str
 			UI()->ClearLastActiveItem();
 		}
 
-		if(UI()->LastActiveItem() == pID && !m_pClient->m_pGameConsole->IsConsoleActive())
+		if(UI()->LastActiveItem() == pID && UI()->Enabled())
 		{
 			m_ActiveEditbox = true;
 			for(int i = 0; i < Input()->NumEvents(); i++)
@@ -2238,7 +2238,7 @@ bool CMenus::OnInput(IInput::CEvent e)
 			// special for popups
 			if(e.m_Key == KEY_RETURN || e.m_Key == KEY_KP_ENTER)
 				m_EnterPressed = true;
-			else if(e.m_Key == KEY_TAB && !Input()->KeyPress(KEY_LALT) && !Input()->KeyPress(KEY_RALT))
+			else if(e.m_Key == KEY_TAB && !Input()->KeyIsPressed(KEY_LALT) && !Input()->KeyIsPressed(KEY_RALT))
 				m_TabPressed = true;
 			else if(e.m_Key == KEY_DELETE)
 				m_DeletePressed = true;
@@ -2391,9 +2391,11 @@ void CMenus::OnRender()
 
 bool CMenus::CheckHotKey(int Key) const
 {
-	return !m_KeyReaderIsActive && !m_KeyReaderWasActive && !m_PrevCursorActive && !m_PopupActive &&
-		!Input()->KeyIsPressed(KEY_LSHIFT) && !Input()->KeyIsPressed(KEY_RSHIFT) && !Input()->KeyIsPressed(KEY_LCTRL) && !Input()->KeyIsPressed(KEY_RCTRL) && !Input()->KeyIsPressed(KEY_LALT) && // no modifier
-		Input()->KeyIsPressed(Key) && !m_pClient->m_pGameConsole->IsConsoleActive();
+	return !m_KeyReaderIsActive && !m_KeyReaderWasActive && !m_PrevCursorActive && !m_PopupActive
+		&& !Input()->KeyIsPressed(KEY_LSHIFT) && !Input()->KeyIsPressed(KEY_RSHIFT)
+		&& !Input()->KeyIsPressed(KEY_LCTRL) && !Input()->KeyIsPressed(KEY_RCTRL)
+		&& !Input()->KeyIsPressed(KEY_LALT)
+		&& UI()->KeyIsPressed(Key);
 }
 
 void CMenus::RenderCursor(int ImageID, vec4 Color)
