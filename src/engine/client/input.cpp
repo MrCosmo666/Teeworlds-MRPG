@@ -197,31 +197,42 @@ int CInput::GetJoystickNumAxes()
 	return SDL_JoystickNumAxes(pJoystick);
 }
 
-void CInput::MouseRelative(float* x, float* y)
+bool CInput::JoystickRelative(float* pX, float* pY)
 {
 	if(!m_MouseInputRelative)
-		return;
+		return false;
 
-	int MouseX = 0, MouseY = 0;
-	SDL_GetRelativeMouseState(&MouseX, &MouseY);
-
-	vec2 JoystickPos = vec2(0.0f, 0.0f);
 	if(g_Config.m_JoystickEnable && GetActiveJoystick())
 	{
 		const vec2 RawJoystickPos = vec2(GetJoystickAxisValue(g_Config.m_JoystickX), GetJoystickAxisValue(g_Config.m_JoystickY));
 		const float Len = length(RawJoystickPos);
 		const float DeadZone = g_Config.m_JoystickTolerance / 50.0f;
-		const float JoystickSens = g_Config.m_JoystickSens / 100.0f;
-		if(Len >= DeadZone) // >= to allow max tolerance value
+		if(Len > DeadZone)
 		{
-			JoystickPos = RawJoystickPos * (JoystickSens * max(Len - DeadZone, 0.001f) / Len);
+			const float Factor = 0.1f * max((Len - DeadZone) / (1 - DeadZone), 0.001f) / Len;
+			*pX = RawJoystickPos.x * Factor;
+			*pY = RawJoystickPos.y * Factor;
+			return true;
 		}
 	}
 
-	const float MouseSens = g_Config.m_InpMousesens / 100.0f;
+	return false;
+}
 
-	*x = MouseX * MouseSens + JoystickPos.x;
-	*y = MouseY * MouseSens + JoystickPos.y;
+bool CInput::MouseRelative(float* pX, float* pY)
+{
+	if(!m_MouseInputRelative)
+		return false;
+
+	int MouseX = 0, MouseY = 0;
+	SDL_GetRelativeMouseState(&MouseX, &MouseY);
+	if(MouseX || MouseY)
+	{
+		*pX = MouseX;
+		*pY = MouseY;
+		return true;
+	}
+	return false;
 }
 
 void CInput::MouseModeAbsolute()

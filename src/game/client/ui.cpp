@@ -5,6 +5,7 @@
 #include <engine/shared/config.h>
 #include <engine/graphics.h>
 #include <engine/textrender.h>
+#include <engine/input.h>
 #include "ui.h"
 
 /********************************************************
@@ -65,11 +66,20 @@ bool CUI::MouseInsideClip() const
 	return !IsClipped() || MouseInside(ClipArea()) == 1;
 }
 
-void CUI::ConvertMouseMove(float *x, float *y) const
+void CUI::ConvertCursorMove(float* pX, float* pY, int CursorType) const
 {
-	const float Fac = g_Config.m_UiMousesens / float(g_Config.m_InpMousesens);
-	*x = *x * Fac;
-	*y = *y * Fac;
+	float Factor = 1.0f;
+	switch(CursorType)
+	{
+	case IInput::CURSOR_MOUSE:
+		Factor = g_Config.m_UiMousesens / 100.0f;
+		break;
+	case IInput::CURSOR_JOYSTICK:
+		Factor = g_Config.m_UiJoystickSens / 100.0f;
+		break;
+	}
+	*pX *= Factor;
+	*pY *= Factor;
 }
 
 CUIRect *CUI::Screen()

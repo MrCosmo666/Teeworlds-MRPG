@@ -984,6 +984,6 @@ public:
 	int GetNewESCState() const;
 	virtual bool OnInput(IInput::CEvent Event);
 
-	virtual bool OnMouseMove(float x, float y);
+	virtual bool OnCursorMove(float x, float y, int CursorType);
 };
 #endif

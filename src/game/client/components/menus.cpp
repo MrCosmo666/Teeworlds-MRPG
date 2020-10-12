@@ -2320,7 +2320,7 @@ void CMenus::OnReset()
 	mem_zero(aAuthResultReason, sizeof(aAuthResultReason));
 }
 
-bool CMenus::OnMouseMove(float x, float y)
+bool CMenus::OnCursorMove(float x, float y, int CursorType)
 {
 	m_LastInput = time_get();
 
@@ -2330,7 +2330,7 @@ bool CMenus::OnMouseMove(float x, float y)
 	// prev mouse position
 	m_PrevMousePos = m_MousePos;
 
-	UI()->ConvertMouseMove(&x, &y);
+	UI()->ConvertCursorMove(&x, &y, CursorType);
 	m_MousePos.x += x;
 	m_MousePos.y += y;
 	if(m_MousePos.x < 0) m_MousePos.x = 0;

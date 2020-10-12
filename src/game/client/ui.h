@@ -116,7 +116,7 @@ public:
 
 	int MouseInside(const CUIRect *pRect) const;
 	bool MouseInsideClip() const;
-	void ConvertMouseMove(float *x, float *y) const;
+	void ConvertCursorMove(float* pX, float* pY, int CursorType) const;
 
 	CUIRect *Screen();
 	float PixelSize();
