@@ -157,20 +157,20 @@ void CSounds::SetChannelVolume(int Channel, float Vol)
 
 void CSounds::Enqueue(int Channel, int SetId)
 {
+	if(m_pClient->m_SuppressEvents || m_QueuePos >= QUEUE_SIZE)
+		return;
+
 	// add sound to the queue
-	if(m_QueuePos < QUEUE_SIZE)
+	if(Channel == CHN_MUSIC || Channel == CHN_MMORPG || !g_Config.m_ClEditor)
 	{
-		if(Channel == CHN_MUSIC || Channel == CHN_MMORPG || !g_Config.m_ClEditor)
-		{
-			m_aQueue[m_QueuePos].m_Channel = Channel;
-			m_aQueue[m_QueuePos++].m_SetId = SetId;
-		}
+		m_aQueue[m_QueuePos].m_Channel = Channel;
+		m_aQueue[m_QueuePos++].m_SetId = SetId;
 	}
 }
 
 void CSounds::Play(int Chn, int SetId, float Vol)
 {
-	if(Chn == CHN_MUSIC && !g_Config.m_SndMusic)
+	if(m_pClient->m_SuppressEvents || (Chn == CHN_MUSIC && !g_Config.m_SndMusic))
 		return;
 
 	ISound::CSampleHandle SampleId = GetSampleId(SetId);
@@ -186,7 +186,7 @@ void CSounds::Play(int Chn, int SetId, float Vol)
 
 void CSounds::PlayAt(int Chn, int SetId, float Vol, vec2 Pos)
 {
-	if(Chn == CHN_MUSIC && !g_Config.m_SndMusic)
+	if(m_pClient->m_SuppressEvents || (Chn == CHN_MUSIC && !g_Config.m_SndMusic))
 		return;
 	
 	ISound::CSampleHandle SampleId = GetSampleId(SetId);
