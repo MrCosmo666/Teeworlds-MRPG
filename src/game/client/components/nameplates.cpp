@@ -178,7 +178,6 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 
 	TextRender()->TextColor(CUI::ms_DefaultTextColor);
 	TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
-
 }
 
 void CNamePlates::OnRender()

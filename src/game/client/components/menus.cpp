@@ -167,7 +167,6 @@ bool CMenus::DoButton_Menu(CButtonContainer* pBC, const char* pText, bool Checke
 		const CMenuImage* pImage = FindMenuImage(pImageName);
 		if(pImage)
 		{
-
 			Graphics()->TextureSet(pImage->m_GreyTexture);
 			Graphics()->WrapClamp();
 			Graphics()->QuadsBegin();

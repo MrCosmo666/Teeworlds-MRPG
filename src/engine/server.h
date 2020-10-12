@@ -3,10 +3,12 @@
 #ifndef ENGINE_SERVER_H
 #define ENGINE_SERVER_H
 
-#include <game/version.h>
-
 #include "kernel.h"
 #include "message.h"
+
+#include <engine/shared/protocol.h>
+#include <generated/protocol.h>
+#include <game/version.h>
 
 #define DC_SERVER_INFO g_Config.m_SvDiscordColorServerInfo
 #define DC_PLAYER_INFO g_Config.m_SvDiscordColorPlayerInfo
