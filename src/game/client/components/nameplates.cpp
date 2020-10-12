@@ -32,8 +32,17 @@ const char* CNamePlates::GetMoodName(int MoodType)
 void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNetObj_Character *pPlayerChar,
 	const CNetObj_PlayerInfo *pPlayerInfo, int ClientID)
 {
-	float IntraTick = Client()->IntraGameTick();
-	vec2 Position = mix(vec2(pPrevChar->m_X, pPrevChar->m_Y), vec2(pPlayerChar->m_X, pPlayerChar->m_Y), IntraTick);
+	vec2 Position;
+	if(m_pClient->ShouldUsePredicted() &&
+		m_pClient->ShouldUsePredictedChar(ClientID))
+	{
+		Position = m_pClient->PredictedCharPos(ClientID);
+	}
+	else
+	{
+		Position = m_pClient->UnpredictedCharPos(ClientID);
+	}
+
 	float FontSize = 18.0f + 20.0f * g_Config.m_ClNameplatesSize / 100.0f;
 
 	// render name plate

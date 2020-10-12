@@ -569,6 +569,13 @@ void CCharacter::TickDefered()
 		m_ReckoningCore.Quantize();
 	}
 
+	// apply drag velocity when the player is not firing ninja
+	// and set it back to 0 for the next tick
+	if(m_ActiveWeapon != WEAPON_NINJA)
+		m_Core.AddDragVelocity();
+	m_Core.ResetDragVelocity();
+
+
 	CCharacterCore::CParams CoreTickParams(&m_pPlayer->m_NextTuningParams);
 	m_Core.Move(&CoreTickParams);
 	m_Core.Quantize();
