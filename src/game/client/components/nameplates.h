@@ -9,11 +9,10 @@ class CNamePlates : public CComponent
 	void RenderNameplate(
 		const CNetObj_Character *pPrevChar,
 		const CNetObj_Character *pPlayerChar,
-		const CNetObj_PlayerInfo *pPlayerInfo,
 		int ClientID
-	);
+	) const;
 
-	const char* GetMoodName(int MoodType);
+	const char* GetMoodName(int MoodType) const;
 
 public:
 	virtual void OnRender();

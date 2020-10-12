@@ -228,8 +228,8 @@ public:
 	void AddDragVelocity();
 	void ResetDragVelocity();
 
-	void Read(const CNetObj_CharacterCore *pObjCore);
-	void Write(CNetObj_CharacterCore *pObjCore);
+	void Read(const CNetObj_CharacterCore* pObjCore);
+	void Write(CNetObj_CharacterCore* pObjCore) const;
 	void Quantize();
 };
 

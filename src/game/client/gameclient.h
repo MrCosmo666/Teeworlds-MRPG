@@ -122,41 +122,26 @@ public:
 
 	vec2 m_LocalCharacterPos;
 
-	// predicted players
-	CCharacterCore m_aPredictedPrevChars[MAX_CLIENTS];
-	CCharacterCore m_aPredictedChars[MAX_CLIENTS];
-
-	bool ShouldUsePredicted();
 	// Whether we should use/render predicted entities. Depends on client
 	// and game state.
-private:
-	bool ShouldUsePredictedLocalChar();
-	// Whether we should use/render the predicted local character. Depends
-	// on config and snap state. Should check `ShouldUsePredicted` before
-	// checking this.
-	bool ShouldUsePredictedNonLocalChars();
-	// Whether we should use/render predicted entities for non-local
-	// characters. Depends on config. Should check `ShouldUsePredicted`
-	// before checking this.
-public:
-	bool ShouldUsePredictedChar(int ClientID);
+	bool ShouldUsePredicted() const;
+
 	// Whether we should use/render predictions for a specific `ClientID`.
 	// Should check `ShouldUsePredicted` before checking this.
+	bool ShouldUsePredictedChar(int ClientID) const;
+
+	// Replaces `pPrevChar`, `pPlayerChar`, and `IntraTick` with their predicted
+	// counterparts for `ClientID`. Should check `ShouldUsePredictedChar`
+	// before using this.
 
 	void UsePredictedChar(
 		CNetObj_Character* pPrevChar,
 		CNetObj_Character* pPlayerChar,
 		float* IntraTick,
 		int ClientID
-	);
-	// Replaces `pPrevChar`, `pPlayerChar`, and `IntraTick` with their predicted
-	// counterparts for `ClientID`. Should check `ShouldUsePredictedChar`
-	// before using this.
+	) const;
 
-	vec2 PredictedCharPos(int ClientID);
-	// Return the interpolated, predicted position for `ClientID`
-	vec2 UnpredictedCharPos(int ClientID);
-	// Return the interpolated, unpredicted position for `ClientID`
+	vec2 GetCharPos(int ClientID, bool Predicted = false) const;
 
 // ---
 
@@ -232,6 +217,7 @@ public:
 		int m_Emoticon;
 		int m_EmoticonStart;
 		CCharacterCore m_Predicted;
+		CCharacterCore m_PrevPredicted;
 
 		CTeeRenderInfo m_SkinInfo; // this is what the server reports
 		CTeeRenderInfo m_RenderInfo; // this is what we use
