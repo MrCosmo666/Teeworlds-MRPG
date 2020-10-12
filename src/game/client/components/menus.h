@@ -229,6 +229,7 @@ private:
 		void ScrollHere(int Option = CScrollRegion::SCROLLHERE_KEEP_IN_VIEW);
 		bool IsRectClipped(const CUIRect& Rect) const;
 		bool IsScrollbarShown() const;
+		bool IsAnimating() const;
 	};
 
 	// Listbox : found in menus_listbox.cpp
@@ -860,7 +861,7 @@ private:
 	void RenderServerbrowserOverlay();
 	void RenderFilterHeader(CUIRect View, int FilterIndex);
 	void PopupConfirmRemoveFilter();
-	int DoBrowserEntry(const void* pID, CUIRect View, const CServerInfo* pEntry, const CBrowserFilter* pFilter, bool Selected, bool ShowServerInfo);
+	int DoBrowserEntry(const void* pID, CUIRect View, const CServerInfo* pEntry, const CBrowserFilter* pFilter, bool Selected, bool ShowServerInfo, CScrollRegion* pScroll = 0);
 	void RenderServerbrowser(CUIRect MainView);
 	static void ConchainConnect(IConsole::IResult* pResult, void* pUserData, IConsole::FCommandCallback pfnCallback, void* pCallbackUserData);
 	static void ConchainFriendlistUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
