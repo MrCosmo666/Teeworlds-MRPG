@@ -104,7 +104,7 @@ public:
 		bool m_CleanBackground;
 		float m_FadeStartTime;
 	public:
-		CButtonContainer(bool CleanBackground = false) { m_CleanBackground = CleanBackground; }
+		CButtonContainer(bool CleanBackground = false) : m_FadeStartTime(0.0f) { m_CleanBackground = CleanBackground; }
 		const void* GetID() const { return &m_FadeStartTime; }
 		float GetFade(bool Checked = false, float Seconds = 0.6f);
 		bool IsCleanBackground() const { return m_CleanBackground; }
@@ -237,6 +237,7 @@ private:
 	{
 		bool m_Visible;
 		bool m_Selected;
+		bool m_Disabled;
 		CUIRect m_Rect;
 	};
 
@@ -274,6 +275,7 @@ private:
 		void DoStart(float RowHeight, int NumItems, int ItemsPerRow, int RowsPerScroll, int SelectedIndex,
 			const CUIRect* pRect = 0, bool Background = true, bool* pActive = 0);
 		CListboxItem DoNextItem(const void* pID, bool Selected = false, bool* pActive = 0);
+		CListboxItem DoSubheader();
 		int DoEnd();
 		bool FilterMatches(const char* pNeedle) const;
 		bool WasItemActivated() const { return m_ListBoxItemActivated; };
