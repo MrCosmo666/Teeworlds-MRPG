@@ -771,6 +771,18 @@ void CMenus::PopupConfirmRemoveFilter()
 	}
 }
 
+void CMenus::PopupConfirmCountryFilter()
+{
+	CBrowserFilter* pFilter = GetSelectedBrowserFilter();
+	CServerFilterInfo FilterInfo;
+	pFilter->GetFilter(&FilterInfo);
+
+	if(m_PopupSelection != -2)
+		FilterInfo.m_Country = m_PopupSelection;
+
+	pFilter->SetFilter(&FilterInfo);
+}
+
 static void FormatScore(char* pBuf, int BufSize, bool TimeScore, const CServerInfo::CClient* pClient)
 {
 	if (TimeScore)
@@ -2026,7 +2038,7 @@ void CMenus::RenderServerbrowserFilterTab(CUIRect View)
 
 		static int s_BrFilterCountryIndex = 0;
 		if((FilterInfo.m_SortHash & IServerBrowser::FILTER_COUNTRY) && UI()->DoButtonLogic(&s_BrFilterCountryIndex, &Rect))
-			m_Popup = POPUP_COUNTRY;
+			PopupCountry(FilterInfo.m_Country, &CMenus::PopupConfirmCountryFilter);
 	}
 
 	// level
