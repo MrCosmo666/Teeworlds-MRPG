@@ -121,7 +121,7 @@ private:
 	bool DoButton_CheckBox(const void* pID, const char* pText, bool Checked, const CUIRect* pRect, bool Locked = false);
 
 	void DoIcon(int ImageId, int SpriteId, const CUIRect* pRect, const vec4* pColor = 0);
-	bool DoButton_GridHeader(const void* pID, const char* pText, bool Checked, CUI::EAlignment Align, const CUIRect* pRect);
+	bool DoButton_GridHeader(const void* pID, const char* pText, bool Checked, CUI::EAlignment Align, const CUIRect* pRect, int Corners = CUI::CORNER_ALL);
 
 public:
 	bool DoEditBox(void* pID, const CUIRect* pRect, char* pStr, unsigned StrSize, float FontSize, float* pOffset, bool Hidden = false, int Corners = CUI::CORNER_ALL);
@@ -268,6 +268,7 @@ private:
 		CListBox();
 
 		void DoHeader(const CUIRect* pRect, const char* pTitle, float HeaderHeight = 20.0f, float Spacing = 2.0f);
+		void DoSubHeader(float HeaderHeight = 20.0f, float Spacing = 2.0f);
 		bool DoFilter(float FilterHeight = 20.0f, float Spacing = 2.0f);
 		void DoFooter(const char* pBottomText, float FooterHeight = 20.0f); // call before DoStart to create a footer
 		void DoStart(float RowHeight, int NumItems, int ItemsPerRow, int RowsPerScroll, int SelectedIndex,
@@ -276,6 +277,7 @@ private:
 		int DoEnd();
 		bool FilterMatches(const char* pNeedle) const;
 		bool WasItemActivated() const { return m_ListBoxItemActivated; };
+		float GetScrollBarWidth() const { return m_ScrollRegion.IsScrollbarShown() ? 20 : 0; } // defined in menus_scrollregion.cpp
 	};
 
 	enum
@@ -740,8 +742,7 @@ private:
 		COL_BROWSER_PING,
 		NUM_BROWSER_COLS,
 
-		COL_DEMO_ICON = 0,
-		COL_DEMO_NAME,
+		COL_DEMO_NAME = 0,
 		COL_DEMO_LENGTH,
 		COL_DEMO_DATE,
 		NUM_DEMO_COLS,
