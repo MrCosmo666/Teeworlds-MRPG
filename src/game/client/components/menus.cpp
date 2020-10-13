@@ -953,8 +953,9 @@ void CMenus::RenderMenubar(CUIRect Rect)
 	// state online
 	if(Client()->State() == IClient::STATE_ONLINE)
 	{
+		int NumButtons = 6;
 		float Spacing = 3.0f;
-		float ButtonWidth = (Box.w / 6.0f) - (Spacing*5.0) / 6.0f;
+		float ButtonWidth = (Box.w / NumButtons) - (Spacing * 5.0) / NumButtons;
 		float Alpha = 1.0f;
 		if(m_GamePage == PAGE_SETTINGS)
 			Alpha = InactiveAlpha;
@@ -1015,7 +1016,9 @@ void CMenus::RenderMenubar(CUIRect Rect)
 	// settings page
 	if((Client()->State() == IClient::STATE_OFFLINE && m_MenuPage == PAGE_SETTINGS) || (Client()->State() == IClient::STATE_ONLINE && m_GamePage == PAGE_SETTINGS))
 	{
-		float ButtonWidth = (Box.w / 7.0f);
+		int NumButtons = 5;
+		float Spacing = 3.0f;
+		float ButtonWidth = (Box.w / NumButtons) - (Spacing * 5.0) / NumButtons;
 		float NotActiveAlpha = Client()->State() == IClient::STATE_ONLINE ? 0.5f : 1.0f;
 		const int CornerRange = 8.0f;
 		int Corners = 0;
@@ -1046,16 +1049,17 @@ void CMenus::RenderMenubar(CUIRect Rect)
 		}
 
 		// TODO: replace tee page to something else
-		Box.VSplitLeft(ButtonWidth, &Button, &Box);
-		{
-			static CButtonContainer s_TeeButton;
-			if(DoButton_MenuTabTop(&s_TeeButton, Localize("TBD"), Client()->State() == IClient::STATE_OFFLINE && g_Config.m_UiSettingsPage == SETTINGS_TBD, &Button,
-				g_Config.m_UiSettingsPage == SETTINGS_TBD ? 1.0f : NotActiveAlpha, 1.0f, Corners))
-			{
-				m_pClient->m_pCamera->ChangePosition(CCamera::POS_SETTINGS_TBD);
-				g_Config.m_UiSettingsPage = SETTINGS_TBD;
-			}
-		}
+		// Box.VSplitLeft(Spacing, 0, &Box); // little space
+		// Box.VSplitLeft(ButtonWidth, &Button, &Box);
+		// {
+		// 	static CButtonContainer s_TeeButton;
+		// 	if(DoButton_MenuTabTop(&s_TeeButton, Localize("TBD"), Client()->State() == IClient::STATE_OFFLINE && Config()->m_UiSettingsPage == SETTINGS_TBD, &Button,
+		// 		Config()->m_UiSettingsPage == SETTINGS_TBD ? 1.0f : NotActiveAlpha, 1.0f, Corners))
+		// 	{
+		// 		m_pClient->m_pCamera->ChangePosition(CCamera::POS_SETTINGS_TBD);
+		// 		Config()->m_UiSettingsPage = SETTINGS_TBD;
+		// 	}
+		// }
 
 		Box.VSplitLeft(ButtonWidth, &Button, &Box);
 		static CButtonContainer s_ControlsButton;
