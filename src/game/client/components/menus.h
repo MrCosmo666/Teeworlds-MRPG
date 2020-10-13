@@ -478,7 +478,7 @@ private:
 	bool m_NeedRestartSound;
 	bool m_NeedRestartUpdate;
 	int m_TeePartSelected;
-	char m_aSaveSkinName[24];
+	char m_aSaveSkinName[MAX_SKIN_LENGTH];
 
 	bool m_RefreshSkinSelector;
 	const CSkins::CSkin *m_pSelectedSkin;
@@ -963,7 +963,7 @@ public:
 	};
 	void GetSwitchTeamInfo(CSwitchTeamInfo *pInfo);
 
-	static CMenusKeyBinder m_Binder;
+	CMenusKeyBinder m_Binder;
 
 	CMenus();
 

@@ -34,9 +34,9 @@ public:
 		short m_LastWorldID;
 
 		// skins
-		char m_aaSkinPartNames[6][24];
-		int m_aUseCustomColors[6];
-		int m_aSkinPartColors[6];
+		char m_aaSkinPartNames[NUM_SKINPARTS][MAX_SKIN_LENGTH];
+		int m_aUseCustomColors[NUM_SKINPARTS];
+		int m_aSkinPartColors[NUM_SKINPARTS];
 
 		int m_Team;
 		std::map < int , bool > m_aAetherLocation;
