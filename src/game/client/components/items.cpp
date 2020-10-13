@@ -40,7 +40,7 @@ void CItems::RenderProjectile(const CNetObj_Projectile *pCurrent, int ItemID)
 	}
 
 	static float s_LastGameTickTime = Client()->GameTickTime();
-	if(!m_pClient->IsWorldPaused())
+	if(!m_pClient->IsWorldPaused() && !m_pClient->IsDemoPlaybackPaused())
 		s_LastGameTickTime = Client()->GameTickTime();
 	float Ct;
 	if(m_pClient->ShouldUsePredicted() && g_Config.m_ClPredictProjectiles)
@@ -70,18 +70,7 @@ void CItems::RenderProjectile(const CNetObj_Projectile *pCurrent, int ItemID)
 		static float s_Time = 0.0f;
 		static float s_LastLocalTime = Now;
 
-		if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
-		{
-			const IDemoPlayer::CInfo* pInfo = DemoPlayer()->BaseInfo();
-			if(!pInfo->m_Paused && !m_pClient->IsWorldPaused())
-				s_Time += (Now - s_LastLocalTime) * pInfo->m_Speed;
-		}
-		else
-		{
-			if(!m_pClient->IsWorldPaused())
-				s_Time += Now - s_LastLocalTime;
-		}
-
+		s_Time += (Now - s_LastLocalTime) * m_pClient->GetAnimationPlaybackSpeed();
 		Graphics()->QuadsSetRotation(s_Time * pi * 2 * 2 + ItemID);
 		s_LastLocalTime = Now;
 	}
@@ -161,18 +150,8 @@ void CItems::RenderPickup(const CNetObj_Pickup *pPrev, const CNetObj_Pickup *pCu
 	const float Now = Client()->LocalTime();
 	static float s_Time = 0.0f;
 	static float s_LastLocalTime = Now;
-	float Offset = Pos.y/32.0f + Pos.x/32.0f;
-	if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
-	{
-		const IDemoPlayer::CInfo* pInfo = DemoPlayer()->BaseInfo();
-		if(!pInfo->m_Paused && !m_pClient->IsWorldPaused())
-			s_Time += (Now - s_LastLocalTime) * pInfo->m_Speed;
-	}
-	else
-	{
-		if(!m_pClient->IsWorldPaused())
-			s_Time += Now - s_LastLocalTime;
- 	}
+	s_Time += (Now - s_LastLocalTime) * m_pClient->GetAnimationPlaybackSpeed();
+	const float Offset = Pos.y / 32.0f + Pos.x / 32.0f;
 	Pos.x += cosf(s_Time*2.0f+Offset)*2.5f;
 	Pos.y += sinf(s_Time * 2.0f + Offset) * 2.5f;
 	s_LastLocalTime = Now;
@@ -314,7 +293,7 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 	}
 
 	static float s_LastGameTickTime = Client()->GameTickTime();
-	if(!m_pClient->IsWorldPaused())
+	if(!m_pClient->IsWorldPaused() && !m_pClient->IsDemoPlaybackPaused())
 		s_LastGameTickTime = Client()->GameTickTime();
 	float Ct;
 	if(m_pClient->ShouldUsePredicted() && g_Config.m_ClPredictProjectiles)
@@ -343,17 +322,7 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 		const float Now = Client()->LocalTime();
 		static float s_Time = 0.0f;
 		static float s_LastLocalTime = Now;
-		if (Client()->State() == IClient::STATE_DEMOPLAYBACK) 
-		{
-			const IDemoPlayer::CInfo* pInfo = DemoPlayer()->BaseInfo();
-			if(!pInfo->m_Paused && !m_pClient->IsWorldPaused())
-				s_Time += (Now - s_LastLocalTime) * pInfo->m_Speed;
-		}
-		else 
-		{
-			if(!m_pClient->IsWorldPaused())
-				s_Time += Now - s_LastLocalTime;
-		}
+		s_Time += (Now - s_LastLocalTime) * m_pClient->GetAnimationPlaybackSpeed();
 		Graphics()->QuadsSetRotation(s_Time * pi * 2 * 2 + ItemID);
 		s_LastLocalTime = Now;
 	}
@@ -419,19 +388,8 @@ void CItems::RenderMmoPickups(const CNetObj_MmoPickup* pPrev, const CNetObj_MmoP
 	const float Now = Client()->LocalTime();
 	static float s_Time = 0.0f;
 	static float s_LastLocalTime = Now;
+	s_Time += (Now - s_LastLocalTime) * m_pClient->GetAnimationPlaybackSpeed();
 	const float Offset = Pos.y / 32.0f + Pos.x / 32.0f;
-	if (Client()->State() == IClient::STATE_DEMOPLAYBACK) 
-	{
-		const IDemoPlayer::CInfo* pInfo = DemoPlayer()->BaseInfo();
-		if(!pInfo->m_Paused && !m_pClient->IsWorldPaused())
-			s_Time += (Now - s_LastLocalTime) * pInfo->m_Speed;
-	}
-	else 
-	{
-		if(!m_pClient->IsWorldPaused())
-			s_Time += Now - s_LastLocalTime;
-	}
-
 	Pos.x += cosf(s_Time * 2.0f + Offset) * 2.5f;
 	Pos.y += sinf(s_Time * 2.0f + Offset) * 2.5f;
 	s_LastLocalTime = Now;
