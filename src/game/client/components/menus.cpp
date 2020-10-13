@@ -1535,7 +1535,7 @@ void CMenus::PopupCountry(int Selection, FPopupButtonCallback pfnOkButtonCallbac
 	m_Popup = POPUP_COUNTRY;
 }
 
-int CMenus::Render()
+void CMenus::Render()
 {
 	CUIRect Screen = *UI()->Screen();
 	Graphics()->MapScreen(Screen.x, Screen.y, Screen.w, Screen.h);
@@ -1561,10 +1561,6 @@ int CMenus::Render()
 	// render background only if needed
 	if(IsBackgroundNeeded())
 		RenderBackground(Client()->LocalTime());
-
-	CUIRect TabBar, MainView;
-	// some margin around the screen
-	//Screen.Margin(10.0f, &Screen);
 
 	static bool s_SoundCheck = false;
 	if(!s_SoundCheck && m_Popup == POPUP_NONE)
@@ -1592,10 +1588,12 @@ int CMenus::Render()
 			if(g_Config.m_ClGBrowser)
 				VMargin = 40.0f;
 
+			CUIRect TabBar, MainView;
 			Screen.VMargin(VMargin, &MainView);
 			MainView.HSplitTop(BarHeight, &TabBar, &MainView);
 			RenderMenubar(TabBar);
 
+			// render top buttons
 			{
 				// quit button
 				CUIRect Button, Row;
@@ -2116,8 +2114,6 @@ int CMenus::Render()
 		if(m_Popup == POPUP_NONE)
 			UI()->SetActiveItem(0);
 	}
-
-	return 0;
 }
 
 void CMenus::SetAuthState(bool ShowWindowAuth)
