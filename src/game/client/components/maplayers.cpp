@@ -23,8 +23,6 @@
 CMapLayers::CMapLayers(int Type)
 {
 	m_Type = Type;
-	m_CurrentLocalTick = 0;
-	m_LastLocalTick = 0;
 	m_pMenuMap = 0;
 	m_pMenuLayers = 0;
 	m_OnlineStartTime = 0;
@@ -194,16 +192,6 @@ void CMapLayers::LoadEnvPoints(const CLayers *pLayers, array<CEnvPoint>& lEnvPoi
 	}
 }
 
-void CMapLayers::EnvelopeUpdate()
-{
-	if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
-	{
-		const IDemoPlayer::CInfo *pInfo = DemoPlayer()->BaseInfo();
-		m_CurrentLocalTick = pInfo->m_CurrentTick;
-		m_LastLocalTick = pInfo->m_CurrentTick;
-	}
-}
-
 void CMapLayers::EnvelopeEval(float TimeOffset, int Env, float *pChannels, void *pUser)
 {
 	CMapLayers *pThis = (CMapLayers *)pUser;
@@ -232,22 +220,8 @@ void CMapLayers::EnvelopeEval(float TimeOffset, int Env, float *pChannels, void 
 		return;
 
 	const CMapItemEnvelope* pItem = (CMapItemEnvelope*)pLayers->Map()->GetItem(Start + Env, 0, 0);
-	const float TickSpeed = (float)pThis->Client()->GameTickSpeed();
 	static float s_Time = 0.0f;
-	if(pThis->Client()->State() == IClient::STATE_DEMOPLAYBACK)
-	{
-		const IDemoPlayer::CInfo* pInfo = pThis->DemoPlayer()->BaseInfo();
-		if(pThis->m_CurrentLocalTick != pInfo->m_CurrentTick)
-		{
-			pThis->m_LastLocalTick = pThis->m_CurrentLocalTick;
-			pThis->m_CurrentLocalTick = pInfo->m_CurrentTick;
-		}
-		s_Time = mix(
-			pThis->m_LastLocalTick - pInfo->m_FirstTick,
-			pThis->m_CurrentLocalTick - pInfo->m_FirstTick,
-			pThis->Client()->IntraGameTick()) / TickSpeed;
-	}
-	else if(pThis->Client()->State() == IClient::STATE_ONLINE)
+	if(pThis->Client()->State() == IClient::STATE_ONLINE || pThis->Client()->State() == IClient::STATE_DEMOPLAYBACK)
 	{
 		if(pThis->m_pClient->m_Snap.m_pGameData && !pThis->m_pClient->IsWorldPaused())
 		{
@@ -256,7 +230,7 @@ void CMapLayers::EnvelopeEval(float TimeOffset, int Env, float *pChannels, void 
 				s_Time = mix(
 					pThis->Client()->PrevGameTick() - pThis->m_pClient->m_Snap.m_pGameData->m_GameStartTick,
 					pThis->Client()->GameTick() - pThis->m_pClient->m_Snap.m_pGameData->m_GameStartTick,
-					pThis->Client()->IntraGameTick()) / TickSpeed;
+					pThis->Client()->IntraGameTick()) / (float)pThis->Client()->GameTickSpeed();
 			}
 			else
 				s_Time = pThis->Client()->LocalTime() - pThis->m_OnlineStartTime;
