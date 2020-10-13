@@ -247,6 +247,7 @@ public:
 	float m_TeamChangeTime;
 	bool m_IsXmasDay;
 	float m_LastSkinChangeTime;
+	int m_IdentityState;
 	bool m_IsEasterDay;
 	bool m_InitComplete;
 	int m_WorldMusicID;

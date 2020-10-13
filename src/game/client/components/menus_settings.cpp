@@ -310,6 +310,7 @@ void CMenus::RenderHSLPicker(CUIRect MainView)
 
 void CMenus::RenderSkinSelection(CUIRect MainView)
 {
+	static float s_LastSelectionTime = -10.0f;
 	static sorted_array<const CSkins::CSkin*> s_paSkinList;
 	static CListBox s_ListBox;
 	if(m_RefreshSkinSelector)
@@ -364,7 +365,11 @@ void CMenus::RenderSkinSelection(CUIRect MainView)
 
 			Info.m_Size = 50.0f;
 			Item.m_Rect.HSplitTop(5.0f, 0, &Item.m_Rect); // some margin from the top
-			RenderTools()->RenderTee(CAnimState::GetIdle(), &Info, 0, vec2(1.0f, 0.0f), vec2(Item.m_Rect.x + Item.m_Rect.w / 2, Item.m_Rect.y + Item.m_Rect.h / 2));
+			{
+				// interactive tee: tee is happy to be selected
+				int TeeEmote = (Item.m_Selected && s_LastSelectionTime + 0.75f > Client()->LocalTime()) ? EMOTE_HAPPY : EMOTE_NORMAL;
+				RenderTools()->RenderTee(CAnimState::GetIdle(), &Info, TeeEmote, vec2(1.0f, 0.0f), vec2(Item.m_Rect.x + Item.m_Rect.w / 2, Item.m_Rect.y + Item.m_Rect.h / 2));
+			}
 
 			CUIRect Label;
 			Item.m_Rect.Margin(5.0f, &Item.m_Rect);
@@ -387,6 +392,7 @@ void CMenus::RenderSkinSelection(CUIRect MainView)
 	const int NewSelected = s_ListBox.DoEnd();
 	if(NewSelected != -1 && NewSelected != OldSelected)
 	{
+		s_LastSelectionTime = Client()->LocalTime();
 		m_pSelectedSkin = s_paSkinList[NewSelected];
 		mem_copy(g_Config.m_PlayerSkin, m_pSelectedSkin->m_aName, sizeof(g_Config.m_PlayerSkin));
 		for(int p = 0; p < NUM_SKINPARTS; p++)
@@ -1130,15 +1136,15 @@ void CMenus::RenderSettingsTeeCustom(CUIRect MainView)
 void CMenus::RenderSettingsPlayer(CUIRect MainView)
 {
 	static bool s_CustomSkinMenu = false;
+	static int s_PlayerCountry = 0;
 	static char s_aPlayerName[256] = { 0 };
 	static char s_aPlayerClan[256] = { 0 };
 	static char s_aPlayerSkin[256] = { 0 };
-	if(!s_aPlayerName[0])
-		str_copy(s_aPlayerName, g_Config.m_PlayerName, sizeof(s_aPlayerName));
-	if(!s_aPlayerClan[0])
-		str_copy(s_aPlayerClan, g_Config.m_PlayerClan, sizeof(s_aPlayerClan));
-	if(!s_aPlayerSkin[0])
-		str_copy(s_aPlayerSkin, g_Config.m_PlayerSkin, sizeof(s_aPlayerSkin));
+	if(m_pClient->m_IdentityState < 0)
+	{
+		s_PlayerCountry = g_Config.m_PlayerCountry;
+		m_pClient->m_IdentityState = 0;
+	}
 
 	CUIRect Button, Label, TopView, BottomView, Background, Left, Right;
 
@@ -1152,6 +1158,7 @@ void CMenus::RenderSettingsPlayer(CUIRect MainView)
 	const float ButtonHeight = 20.0f;
 	const float SkinHeight = 50.0f;
 	const float BackgroundHeight = (ButtonHeight + SpacingH) + SkinHeight * 2;
+	const vec2 MousePosition = vec2(UI()->MouseX(), UI()->MouseY());
 
 	if(this->Client()->State() == IClient::STATE_ONLINE)
 		Background = MainView;
@@ -1223,7 +1230,17 @@ void CMenus::RenderSettingsPlayer(CUIRect MainView)
 
 		RenderTools()->DrawUIRect(&Top, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
 
-		RenderTools()->RenderTee(CAnimState::GetIdle(), &OwnSkinInfo, 0, vec2(1, 0), vec2(Top.x + Top.w / 2.0f, Top.y + Top.h / 2.0f + 6.0f));
+		{
+			// interactive tee: tee looking towards cursor, and it is happy when you touch it
+			vec2 TeePosition = vec2(Top.x + Top.w / 2.0f, Top.y + Top.h / 2.0f + 6.0f);
+			vec2 DeltaPosition = MousePosition - TeePosition;
+			float Distance = length(DeltaPosition);
+			vec2 TeeDirection = Distance < 20.0f ? normalize(vec2(DeltaPosition.x, max(DeltaPosition.y, 0.5f))) : normalize(DeltaPosition);
+			int TeeEmote = Distance < 20.0f ? EMOTE_HAPPY : EMOTE_NORMAL;
+			RenderTools()->RenderTee(CAnimState::GetIdle(), &OwnSkinInfo, TeeEmote, TeeDirection, TeePosition);
+			if(Distance < 20.0f && UI()->MouseButtonClicked(0))
+				m_pClient->m_pSounds->Play(CSounds::CHN_GUI, SOUND_PLAYER_SPAWN, 0);
+		}
 
 		// handle right (team skins)
 		// validate skin parts for team game mode
@@ -1280,7 +1297,7 @@ void CMenus::RenderSettingsPlayer(CUIRect MainView)
 			int TeamColor = m_pClient->m_pSkins->GetTeamColor(aUCCVars[p], aColorVars[p], TEAM_BLUE, p);
 			TeamSkinInfo.m_aColors[p] = m_pClient->m_pSkins->GetColorV4(TeamColor, p == SKINPART_MARKING);
 		}
-		RenderTools()->RenderTee(CAnimState::GetIdle(), &TeamSkinInfo, 0, vec2(1, 0), vec2(TeeRight.x + TeeRight.w / 2.0f, TeeRight.y + TeeRight.h / 2.0f + 6.0f));
+		RenderTools()->RenderTee(CAnimState::GetIdle(), &TeamSkinInfo, 0, vec2(-1, 0), vec2(TeeRight.x + TeeRight.w / 2.0f, TeeRight.y + TeeRight.h / 2.0f + 6.0f));
 	}
 
 	Right.HSplitTop(ButtonHeight, &Label, &Right);
@@ -1412,6 +1429,14 @@ void CMenus::RenderSettingsPlayer(CUIRect MainView)
 	{
 		s_CustomSkinMenu = !s_CustomSkinMenu;
 	}
+
+	// check if the new settings require a server reload
+	m_NeedRestartPlayer = !(
+		s_PlayerCountry == g_Config.m_PlayerCountry &&
+		!str_comp(s_aPlayerClan, g_Config.m_PlayerClan) &&
+		!str_comp(s_aPlayerName, g_Config.m_PlayerName)
+		);
+	m_pClient->m_IdentityState = m_NeedRestartPlayer ? 1 : 0;
 }
 
 void CMenus::PopupConfirmDeleteSkin()
@@ -2141,8 +2166,8 @@ void CMenus::RenderSettings(CUIRect MainView)
 		RenderSettingsGeneral(MainView);
 	else if(g_Config.m_UiSettingsPage == SETTINGS_PLAYER)
 		RenderSettingsPlayer(MainView);
-	else if(g_Config.m_UiSettingsPage == SETTINGS_TBD) {}
-	// RenderSettingsTee(MainView);
+	else if(g_Config.m_UiSettingsPage == SETTINGS_TBD) {} // TODO: replace removed tee page to something else
+		// RenderSettingsTBD(MainView);
 	else if(g_Config.m_UiSettingsPage == SETTINGS_CONTROLS)
 		RenderSettingsControls(MainView);
 	else if(g_Config.m_UiSettingsPage == SETTINGS_GRAPHICS)
