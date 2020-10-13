@@ -1715,7 +1715,6 @@ void CMenus::RenderSettingsGraphics(CUIRect MainView)
 	{
 		ScreenLeft.HSplitTop(Spacing, 0, &ScreenLeft);
 		ScreenLeft.HSplitTop(ButtonHeight, &Button, &ScreenLeft);
-		Button.VSplitLeft(ButtonHeight, 0, &Button);
 		static int s_ButtonGfxBorderless = 0;
 		if(DoButton_CheckBox(&s_ButtonGfxBorderless, Localize("Borderless window"), g_Config.m_GfxBorderless, &Button))
 			Client()->ToggleWindowBordered();
