@@ -665,8 +665,6 @@ private:
 			FILTER_FAVORITES,
 			FILTER_MRPG
 		};
-		// buttons var
-		int m_SwitchButton;
 		CButtonContainer m_DeleteButtonContainer;
 		CButtonContainer m_UpButtonContainer;
 		CButtonContainer m_DownButtonContainer;
