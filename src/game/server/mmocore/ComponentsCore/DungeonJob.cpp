@@ -119,12 +119,12 @@ bool DungeonJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMe
 		GS()->AVH(ClientID, TAB_INFO_DUNGEON, GREEN_COLOR, "Dungeons Information");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DUNGEON, "In this section you can choose a dungeon");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DUNGEON, "View the fastest players on the passage");
-		GS()->AV(ClientID, "null", "");
+		GS()->AV(ClientID, "null");
 
 		pPlayer->m_Colored = GOLDEN_COLOR;
 		GS()->AVL(ClientID, "null", "Story dungeon's");
 		ShowDungeonsList(pPlayer, true);
-		GS()->AV(ClientID, "null", "");
+		GS()->AV(ClientID, "null");
 
 		pPlayer->m_Colored = GOLDEN_COLOR;
 		GS()->AVL(ClientID, "null", "Alternative story dungeon's");
@@ -132,13 +132,13 @@ bool DungeonJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMe
 
 		if (GS()->IsDungeon())
 		{
-			GS()->AV(ClientID, "null", "");
+			GS()->AV(ClientID, "null");
 			ShowTankVotingDungeon(pPlayer);
-			GS()->AV(ClientID, "null", "");
+			GS()->AV(ClientID, "null");
 			pPlayer->m_Colored = { 30, 8, 8 };
 			GS()->AVL(ClientID, "DUNGEONEXIT", "Exit dungeon {STR} (warning)", Dungeon[GS()->DungeonID()].m_aName);
 		}
-		GS()->AddBack(ClientID);
+		GS()->AddBackpage(ClientID);
 		return true;
 	}
 	return false;

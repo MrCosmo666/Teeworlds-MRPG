@@ -80,7 +80,7 @@ void InventoryJob::RepairDurabilityItems(CPlayer *pPlayer)
 void InventoryJob::ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction)
 {
 	const int ClientID = pPlayer->GetCID();
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 
 	// show a list of items to the player
 	bool Found = false;
@@ -386,7 +386,7 @@ bool InventoryJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 		GS()->AVH(ClientID, TAB_INFO_INVENTORY, GREEN_COLOR, "Inventory Information");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_INVENTORY, "Choose the type of items you want to show");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_INVENTORY, "After, need select item to interact");
-		GS()->AV(ClientID, "null", "");
+		GS()->AV(ClientID, "null");
 
 		GS()->AVH(ClientID, TAB_INVENTORY_SELECT, RED_COLOR, "Inventory Select List");
 		int SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_USED); 
@@ -406,7 +406,7 @@ bool InventoryJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 		if (pPlayer->m_SortTabs[SORT_INVENTORY])	
 			ListInventory(pPlayer, pPlayer->m_SortTabs[SORT_INVENTORY]);
 
-		GS()->AddBack(ClientID);
+		GS()->AddBackpage(ClientID);
 		return true;
 	}
 
@@ -415,7 +415,7 @@ bool InventoryJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 		GS()->AVH(ClientID, TAB_INFO_EQUIP, GREEN_COLOR, "Equip / Armor Information");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_EQUIP, "Select tab and select armor.");
-		GS()->AV(ClientID, "null", "");
+		GS()->AV(ClientID, "null");
 
 		GS()->AVH(ClientID, TAB_EQUIP_SELECT, RED_COLOR, "Equip Select Slot");
 		const char* pType[NUM_EQUIPS] = { "Hammer", "Gun", "Shotgun", "Grenade", "Rifle", "Pickaxe", "Wings", "Discord" };
@@ -434,7 +434,7 @@ bool InventoryJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 			GS()->AVMI(ClientID, pItemPlayer.Info().GetIcon(), "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], pItemPlayer.Info().GetName(pPlayer), aAttributes);
 		}
 
-		GS()->AV(ClientID, "null", "");
+		GS()->AV(ClientID, "null");
 		bool FindItem = false;
 		for (const auto& it : ms_aItems[ClientID])
 		{
@@ -448,7 +448,7 @@ bool InventoryJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 		if (!FindItem)
 			GS()->AVL(ClientID, "null", "There are no items in this tab");
 
-		GS()->AddBack(ClientID);
+		GS()->AddBackpage(ClientID);
 		return true;
 	}
 

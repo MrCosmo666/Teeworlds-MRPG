@@ -85,7 +85,7 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		GS()->AVM(ClientID, "SHOP", ID, HideID, "Exchange {STR}x{INT} to {STR}x{INT}", NeededItem.GetName(pPlayer), &Price, BuyightItem.GetName(pPlayer), &Count);
 		HideID++;
 	}
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 }
 
 // show auction
@@ -94,9 +94,9 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 	const int ClientID = pPlayer->GetCID();
 	GS()->AVH(ClientID, TAB_INFO_AUCTION, GREEN_COLOR, "Auction Information");
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_AUCTION, "To create a slot, see inventory item interact.");
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 	GS()->ShowItemValueInformation(pPlayer);
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 
 	bool FoundItems = false;
 	int HideID = (int)(NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 400);
@@ -137,7 +137,7 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 	if(!FoundItems)
 		GS()->AVL(ClientID, "null", "Currently there are no products.");
 		
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 }
 
 void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
@@ -299,7 +299,7 @@ bool ShopJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		GS()->AVM(ClientID, "AUCTIONCOUNT", ItemID, NOPE, "Item Count: {INT}", &SlotCount);
 		GS()->AVM(ClientID, "AUCTIONPRICE", ItemID, NOPE, "Item Price: {INT}", &SlotPrice);
 		GS()->AVM(ClientID, "AUCTIONACCEPT", ItemID, NOPE, "Add {STR}x{INT} {INT}gold", pInformationSellItem.GetName(pPlayer), &SlotCount, &SlotPrice);
-		GS()->AddBack(ClientID);
+		GS()->AddBackpage(ClientID);
 		return true;
 	}
 	return false;

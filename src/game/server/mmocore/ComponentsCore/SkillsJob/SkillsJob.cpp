@@ -62,9 +62,9 @@ bool SkillsJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMen
 			GS()->AVH(ClientID, TAB_INFO_SKILL, GREEN_COLOR, "Skill Learn Information");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_SKILL, "Here you can learn passive and active skills");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_SKILL, "You can bind active skill any button using the console");
-			GS()->AV(ClientID, "null", "");
+			GS()->AV(ClientID, "null");
 			GS()->ShowItemValueInformation(pPlayer, itSkillPoint);
-			GS()->AV(ClientID, "null", "");
+			GS()->AV(ClientID, "null");
 			
 			ShowMailSkillList(pPlayer, false);
 			ShowMailSkillList(pPlayer, true);
@@ -127,7 +127,7 @@ void SkillsJob::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
 		if(sk.second.m_Passive == Passive)
 			SkillSelected(pPlayer, sk.first);
 	}
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 }
 
 void SkillsJob::SkillSelected(CPlayer *pPlayer, int SkillID)

@@ -127,7 +127,7 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 	CPlayer* pPlayer = pChar->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
 	GS()->ShowItemValueInformation(pPlayer);
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 	
 	GS()->AVH(ClientID, TAB_AETHER, GOLDEN_COLOR, "Available aethers");
 	if (Job()->Member()->GetGuildHouseID(pPlayer->Acc().m_GuildID) >= 1)
@@ -152,5 +152,5 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 		GS()->AVD(ClientID, "TELEPORT", tl.first, Price, TAB_AETHER, "[{STR}] : {STR} - {INT}gold",
 			tl.second.m_aTeleName, GS()->Server()->GetWorldName(tl.second.m_WorldID), &Price);
 	}
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 }

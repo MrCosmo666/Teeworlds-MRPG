@@ -1772,7 +1772,7 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 	// send to customers that have a mmo client
 	if(IsMmoClient(To)) 
 	{
-		if (Vote.m_aDescription[0] == '\0')
+		if(Vote.m_aDescription[0] == '\0')
 			m_apPlayers[To]->m_Colored = { 0, 0, 0 };
 
 		CNetMsg_Sv_VoteMmoOptionAdd OptionMsg;
@@ -1783,6 +1783,9 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 		Server()->SendPackMsg(&OptionMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, To);
 		return;
 	}
+
+	if(Vote.m_aDescription[0] == '\0')
+		str_copy(Vote.m_aDescription, "———————————", sizeof(Vote.m_aDescription));
 
 	// send to vanilla clients
 	CNetMsg_Sv_VoteOptionAdd OptionMsg;	
@@ -1954,7 +1957,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Level {INT} : Exp {INT}/{INT}", &pPlayer->Acc().m_Level, &pPlayer->Acc().m_Exp, &ExpForLevel);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Skill Point {INT}SP", &pPlayer->GetItem(itSkillPoint).m_Count);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Gold: {INT}", &pPlayer->GetItem(itGold).m_Count);
-		AV(ClientID, "null", "");
+		AV(ClientID, "null");
 
 		// personal menu
 		AVH(ClientID, TAB_PERSONAL, GRAY_COLOR, "☪ SUB MENU PERSONAL");
@@ -1968,27 +1971,26 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVM(ClientID, "MENU", MenuList::MENU_GUILD, TAB_PERSONAL, "Guild");
 		if(Mmo()->House()->PlayerHouseID(pPlayer) > 0)
 			AVM(ClientID, "MENU", MenuList::MENU_HOUSE, TAB_PERSONAL, "House");
-		AV(ClientID, "null", "");
+		AV(ClientID, "null");
 
 		// info menu
 		AVH(ClientID, TAB_INFORMATION, BLUE_COLOR, "√ SUB MENU INFORMATION");
 		AVM(ClientID, "MENU", MenuList::MENU_GUIDEDROP, TAB_INFORMATION, "Loots, mobs on your zone");
 		AVM(ClientID, "MENU", MenuList::MENU_TOP_LIST, TAB_INFORMATION, "Ranking guilds and players");
-		AV(ClientID, "null", "");
 	}
 	else if(MenuList == MenuList::MENU_JOURNAL_MAIN)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 		
 		Mmo()->Quest()->ShowQuestsMainList(pPlayer);
-		AddBack(ClientID);
+		AddBackpage(ClientID);
 	}
 	else if(MenuList == MenuList::MENU_INBOX) 
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
-		AddBack(ClientID);
-		AV(ClientID, "null", "");
+		AddBackpage(ClientID);
+		AV(ClientID, "null");
 		Mmo()->Inbox()->GetInformationInbox(pPlayer);
 	}
 	else if(MenuList == MenuList::MENU_UPGRADE) 
@@ -1997,7 +1999,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		AVH(ClientID, TAB_INFO_UPGR, GREEN_COLOR, "Upgrades Information");
 		AVM(ClientID, "null", NOPE, TAB_INFO_UPGR, "Select upgrades type in Reason, write count.");
-		AV(ClientID, "null", "");
+		AV(ClientID, "null");
 
 		ShowPlayerStats(pPlayer);
 
@@ -2010,7 +2012,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 				continue;
 			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_DPS, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, &pPlayer->Acc().m_aStats[at.first], &at.second.m_UpgradePrice);
 		}
-		AV(ClientID, "null", "");
+		AV(ClientID, "null");
 
 		// TANK UPGRADES
 		Range = pPlayer->GetLevelTypeAttribute(AtributType::AtTank);
@@ -2021,7 +2023,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 				continue;
 			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_TANK, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, &pPlayer->Acc().m_aStats[at.first], &at.second.m_UpgradePrice);
 		}
-		AV(ClientID, "null", "");
+		AV(ClientID, "null");
 
 		// HEALER UPGRADES
 		Range = pPlayer->GetLevelTypeAttribute(AtributType::AtHealer);
@@ -2032,7 +2034,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 				continue;
 			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_HEALER, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, &pPlayer->Acc().m_aStats[at.first], &at.second.m_UpgradePrice);
 		}
-		AV(ClientID, "null", "");
+		AV(ClientID, "null");
 
 		// WEAPONS UPGRADES
 		AVH(ClientID, TAB_UPGR_WEAPON, GRAY_COLOR, "Upgrades Weapons / Ammo");
@@ -2043,32 +2045,32 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_WEAPON, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, &pPlayer->Acc().m_aStats[at.first], &at.second.m_UpgradePrice);
 		}
 
-		AV(ClientID, "null", ""), 
+		AV(ClientID, "null"), 
 		AVH(ClientID, TAB_UPGR_JOB, GOLDEN_COLOR, "Disciple of Jobs");
 		Mmo()->PlantsAcc()->ShowMenu(ClientID);
 		Mmo()->MinerAcc()->ShowMenu(pPlayer);
-		AddBack(ClientID);
+		AddBackpage(ClientID);
 	}
 	else if (MenuList == MenuList::MENU_TOP_LIST)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 		AVH(ClientID, TAB_INFO_TOP, GREEN_COLOR, "Ranking Information");
 		AVM(ClientID, "null", NOPE, TAB_INFO_TOP, "Here you can see top server Guilds, Players.");
-		AV(ClientID, "null", "");
+		AV(ClientID, "null");
 
 		m_apPlayers[ClientID]->m_Colored = { 20,7,15 };
 		AVM(ClientID, "SELECTEDTOP", ToplistTypes::GUILDS_LEVELING, NOPE, "Top 10 guilds leveling");
 		AVM(ClientID, "SELECTEDTOP", ToplistTypes::GUILDS_WEALTHY, NOPE, "Top 10 guilds wealthy");
 		AVM(ClientID, "SELECTEDTOP", ToplistTypes::PLAYERS_LEVELING, NOPE, "Top 10 players leveling");
 		AVM(ClientID, "SELECTEDTOP", ToplistTypes::PLAYERS_WEALTHY, NOPE, "Top 10 players wealthy");
-		AddBack(ClientID);
+		AddBackpage(ClientID);
 	}
 	else if(MenuList == MenuList::MENU_GUIDEDROP) 
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 		AVH(ClientID, TAB_INFO_LOOT, GREEN_COLOR, "Chance & Loot Information");
 		AVM(ClientID, "null", NOPE, TAB_INFO_LOOT, "Here you can see chance loot, mobs, on YOUR ZONE.");
-		AV(ClientID, "null", "");
+		AV(ClientID, "null");
 
 		char aBuf[128];
 		bool FoundedBots = false;
@@ -2098,7 +2100,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		if (!FoundedBots)
 			AVL(ClientID, "null", "There are no active mobs in your zone!");
 
-		AddBack(ClientID);
+		AddBackpage(ClientID);
 	}
 		
 	Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList, false);
@@ -2127,7 +2129,7 @@ void CGS::ResetVotesNewbieInformation(int ClientID)
 	AVL(ClientID, "null", "it's because it's not shield, it's mana.");
 	AVL(ClientID, "null", "It is used for active skills, which you will need to buy");
 	AVL(ClientID, "null", "in the future. Active skills use mana, but they use %% of mana.");
-	AV(ClientID, "null", "");
+	AV(ClientID, "null");
 	AVL(ClientID, "null", "#### Some Informations ####");
 	AVL(ClientID, "null", "Brown Slimes drop Glue and Gel (lower chance to drop Gel)");
 	AVL(ClientID, "null", "Green Slimes drop Glue");
@@ -2136,7 +2138,7 @@ void CGS::ResetVotesNewbieInformation(int ClientID)
 	AVL(ClientID, "null", "Goblins drop Goblin Ingots");
 	AVL(ClientID, "null", "Orc Warrior drop Goblin Ingot and Torn Cloth Clothes of Orc");
 	AVL(ClientID, "null", "- A more accurate drop can be found in the menu");
-	AV(ClientID, "null", "");
+	AV(ClientID, "null");
 	AVL(ClientID, "null", "#### The upgrades now ####");
 	AVL(ClientID, "null", "- Strength : Damage");
 	AVL(ClientID, "null", "- Dexterity : Shooting speed");
@@ -2168,12 +2170,12 @@ void CGS::UpdateVotes(int MenuList)
 }
 
 // the back button adds a back button to the menu (But remember to specify the last menu ID).
-void CGS::AddBack(int ClientID)
+void CGS::AddBackpage(int ClientID)
 {	
 	if(!m_apPlayers[ClientID]) 
 		return;
 
-	AV(ClientID, "null", "");
+	AV(ClientID, "null");
 	m_apPlayers[ClientID]->m_Colored = RED_COLOR;
 	AVL(ClientID, "BACK", "Backpage");
 	m_apPlayers[ClientID]->m_Colored = {0,0,0};
@@ -2202,7 +2204,7 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 	}
 
 	AVM(ClientID, "null", NOPE, NOPE, "Player Upgrade Point: {INT}P", &pPlayer->Acc().m_Upgrade);
-	AV(ClientID, "null", "");
+	AV(ClientID, "null");
 }
 
 // display information by currency

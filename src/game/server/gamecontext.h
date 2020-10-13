@@ -243,7 +243,7 @@ private:
 	std::list<CVoteOptions> m_aPlayerVotes[MAX_PLAYERS];
 
 public:
-	void AV(int To, const char *Cmd, const char *Desc, const int ID = -1, const int ID2 = -1, const char *Icon = "unused");
+	void AV(int To, const char *Cmd, const char *Desc = "\0", const int ID = -1, const int ID2 = -1, const char *Icon = "unused");
 	void AVL(int To, const char* aCmd, const char* pText, ...);
 	void AVH(int To, const int ID, vec3 Color, const char* pText, ...);
 	void AVHI(int To, const char *Icon, const int ID, vec3 Color, const char* pText, ...);
@@ -257,7 +257,7 @@ public:
 	void ResetVotes(int ClientID, int MenuList);
 	void UpdateVotes(int ClientID, int MenuList);
 	void UpdateVotes(int MenuList);
-	void AddBack(int ClientID);
+	void AddBackpage(int ClientID);
 	void ShowPlayerStats(CPlayer *pPlayer);
 	void ShowItemValueInformation(CPlayer *pPlayer, int ItemID = itGold);
 	bool ParseVote(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text);

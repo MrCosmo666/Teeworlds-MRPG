@@ -28,9 +28,9 @@ void StorageJob::ShowStorageMenu(CPlayer* pPlayer, int StorageID)
 	
 	GS()->AVH(ClientID, TAB_STORAGE, GOLDEN_COLOR, "Shop :: {STR}", ms_aStorage[StorageID].m_aName);
 	GS()->AVM(ClientID, "REPAIRITEMS", StorageID, TAB_STORAGE, "Repair all items - FREE");
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 	GS()->ShowItemValueInformation(pPlayer, ms_aStorage[StorageID].m_Currency);
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 }
 
 void StorageJob::OnInit()

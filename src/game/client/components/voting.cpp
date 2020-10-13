@@ -134,14 +134,13 @@ void CVoting::AddOption(const char *pDescription, vec3 Color, const char *Icon)
 	if(g_Config.m_Debug)
 		dbg_msg("voting", "added option '%s' with depth='%d'", pDescription, pOption->m_Depth);
 
-	// mmotee
+	// mrpg
 	vec3 ColorVote = g_Config.m_ClShowVoteColor ? Color : vec3(0.0f, 0.0f, 0.0f);
 	pOption->m_Colored[0] = ColorVote.x;
 	pOption->m_Colored[1] = ColorVote.y;
 	pOption->m_Colored[2] = ColorVote.z;
 
 	str_copy(pOption->m_Icon, Icon, sizeof(pOption->m_Icon));
-	str_copy(pOption->m_aDescription, pDescription, sizeof(pOption->m_aDescription));
 	++m_NumVoteOptions;
 }
 

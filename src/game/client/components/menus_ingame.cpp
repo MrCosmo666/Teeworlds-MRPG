@@ -592,6 +592,7 @@ int CMenus::ItemIconScan(const char *pName, int IsDir, int DirType, void *pUser)
 // draw control panel
 bool CMenus::RenderServerControlServer(CUIRect MainView)
 {
+	const bool IsMmoServer = m_pClient->MmoServer();
 	static CListBox s_ListBox;
 	CUIRect List = MainView;
 	s_ListBox.DoHeader(&List, Localize("Option"), GetListHeaderHeight());
@@ -601,19 +602,18 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 		if(m_aFilterString[0] && !pOption->m_IsSubheader && !str_find_nocase(pOption->m_aDescription, m_aFilterString))
 			continue; // no match found
 
-		if(!pOption->m_aDescription[0])
+		if(!pOption->m_aDescription[0] && !IsMmoServer)
 			continue; // depth resets
 
 		CListboxItem Item = pOption->m_IsSubheader ? s_ListBox.DoSubheader() : s_ListBox.DoNextItem(pOption);
 		float OldFontSize = Item.m_Rect.h * ms_FontmodHeight * 0.8f;
 		float FontSize = OldFontSize;
 
-		if (m_pClient->MmoServer())
+		if (IsMmoServer)
 		{
-			int SizeColors = max(pOption->m_Colored[0], pOption->m_Colored[1], pOption->m_Colored[2]);
-			if (SizeColors > 15)
-				TextRender()->TextColor(1, 1, 1, 0.90f);
-			else
+			const int SizeColors = max(pOption->m_Colored[0], pOption->m_Colored[1], pOption->m_Colored[2]);
+			TextRender()->TextColor(1, 1, 1, 0.90f);
+			if(SizeColors <= 15)
 			{
 				FontSize = Item.m_Rect.h * ms_FontmodHeight * 0.73f;
 				TextRender()->TextColor(1, 1, 1, 0.80f);
@@ -640,7 +640,6 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 				Item.m_Rect.VMargin((Icon ? 25.0f : 5.0f), &Item.m_Rect);
 				Item.m_Rect.y += 2.0f;
 			}
-
 
 			for(int i = pOption->m_IsSubheader ? 1 : 0; i < pOption->m_Depth; i++)
 				Item.m_Rect.VSplitLeft(10.0f, 0, &Item.m_Rect);
@@ -738,7 +737,7 @@ void CMenus::HandleCallvote(int Page, bool Force)
 			if(m_aFilterString[0] && !pOption->m_IsSubheader && !str_find_nocase(pOption->m_aDescription, m_aFilterString))
 				continue; // no match found
 
-			if(!pOption->m_aDescription[0])
+			if(!pOption->m_aDescription[0] && !m_pClient->MmoServer())
 				continue; // depth reset
 
 			if (FilteredIndex == m_CallvoteSelectedOption)

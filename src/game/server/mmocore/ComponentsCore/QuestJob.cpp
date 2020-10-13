@@ -428,7 +428,7 @@ void QuestJob::ShowQuestsTabList(CPlayer* pPlayer, int StateQuest)
 		pPlayer->m_Colored = LIGHT_GOLDEN_COLOR;
 		GS()->AV(ClientID, "null", "This list is empty");
 	}
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 }
 
 // post all quests the whole list
@@ -441,7 +441,7 @@ void QuestJob::ShowQuestsMainList(CPlayer* pPlayer)
 		pPlayer->m_Colored = LIGHT_BLUE_COLOR;
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "In current quests there is no interaction with NPC");
 	}
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 
 	// show the questsheet
 	ShowQuestsTabList(pPlayer, QuestState::QUEST_ACCEPT);
@@ -529,7 +529,7 @@ void QuestJob::QuestTableShowRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &Bo
 
 	char aBuf[64];
 	dynamic_string Buffer;
-	bool ShowItemNeeded = false;
+	bool IsActiveTask = false;
 	const int QuestID = BotData.m_QuestID;
 
 	// search item's and mob's
@@ -541,6 +541,7 @@ void QuestJob::QuestTableShowRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &Bo
 		{
 			str_format(aBuf, sizeof(aBuf), "\n- Defeat %s [%d/%d]", BotJob::ms_aDataBot[BotID].m_aNameBot, ms_aQuests[ClientID][QuestID].m_aMobProgress[i], CountMob);
 			Buffer.append_at(Buffer.length(), aBuf);
+			IsActiveTask = true;
 		}
 
 		const int ItemID = BotData.m_aItemSearch[i];
@@ -550,7 +551,7 @@ void QuestJob::QuestTableShowRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &Bo
 			InventoryItem PlayerQuestItem = pPlayer->GetItem(ItemID);
 			str_format(aBuf, sizeof(aBuf), "\n- Need %s [%d/%d]", PlayerQuestItem.Info().GetName(pPlayer), PlayerQuestItem.m_Count, CountItem);
 			Buffer.append_at(Buffer.length(), aBuf);
-			ShowItemNeeded = true;
+			IsActiveTask = true;
 		}
 	}
 
@@ -574,7 +575,7 @@ void QuestJob::QuestTableShowRequired(CPlayer *pPlayer, BotJob::QuestBotInfo &Bo
 		}
 	}
 
-	GS()->Motd(ClientID, "{STR}\n\n{STR}{STR}\n\n", TextTalk, (ShowItemNeeded ? "### Task" : "\0"), Buffer.buffer());
+	GS()->Motd(ClientID, "{STR}\n\n{STR}{STR}\n\n", TextTalk, (IsActiveTask ? "### Task" : "\0"), Buffer.buffer());
 	pPlayer->ClearFormatQuestText();
 	Buffer.clear();
 }
@@ -799,7 +800,7 @@ bool QuestJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_JOURNAL_MAIN;
 		ShowQuestsTabList(pPlayer, QuestState::QUEST_FINISHED);
-		GS()->AddBack(ClientID);
+		GS()->AddBackpage(ClientID);
 		return true;
 	}
 
