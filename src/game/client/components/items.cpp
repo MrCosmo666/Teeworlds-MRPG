@@ -65,24 +65,25 @@ void CItems::RenderProjectile(const CNetObj_Projectile *pCurrent, int ItemID)
 	// add particle for this projectile
 	if(pCurrent->m_Type == WEAPON_GRENADE)
 	{
-		m_pClient->m_pEffects->SmokeTrail(Pos, Vel*-1);
+		m_pClient->m_pEffects->SmokeTrail(Pos, Vel * -1);
+		const float Now = Client()->LocalTime();
 		static float s_Time = 0.0f;
-		static float s_LastLocalTime = Client()->LocalTime();
+		static float s_LastLocalTime = Now;
 
 		if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
 		{
-			const IDemoPlayer::CInfo *pInfo = DemoPlayer()->BaseInfo();
-			if(!pInfo->m_Paused)
-				s_Time += (Client()->LocalTime()-s_LastLocalTime)*pInfo->m_Speed;
+			const IDemoPlayer::CInfo* pInfo = DemoPlayer()->BaseInfo();
+			if(!pInfo->m_Paused && !m_pClient->IsWorldPaused())
+				s_Time += (Now - s_LastLocalTime) * pInfo->m_Speed;
 		}
 		else
 		{
 			if(!m_pClient->IsWorldPaused())
-				s_Time += Client()->LocalTime()-s_LastLocalTime;
+				s_Time += Now - s_LastLocalTime;
 		}
 
-		Graphics()->QuadsSetRotation(s_Time*pi*2*2 + ItemID);
-		s_LastLocalTime = Client()->LocalTime();
+		Graphics()->QuadsSetRotation(s_Time * pi * 2 * 2 + ItemID);
+		s_LastLocalTime = Now;
 	}
 	else
 	{
@@ -157,23 +158,24 @@ void CItems::RenderPickup(const CNetObj_Pickup *pPrev, const CNetObj_Pickup *pCu
 
 	Graphics()->QuadsSetRotation(Angle);
 
+	const float Now = Client()->LocalTime();
 	static float s_Time = 0.0f;
-	static float s_LastLocalTime = Client()->LocalTime();
+	static float s_LastLocalTime = Now;
 	float Offset = Pos.y/32.0f + Pos.x/32.0f;
 	if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
 	{
-		const IDemoPlayer::CInfo *pInfo = DemoPlayer()->BaseInfo();
-		if(!pInfo->m_Paused)
-			s_Time += (Client()->LocalTime()-s_LastLocalTime)*pInfo->m_Speed;
+		const IDemoPlayer::CInfo* pInfo = DemoPlayer()->BaseInfo();
+		if(!pInfo->m_Paused && !m_pClient->IsWorldPaused())
+			s_Time += (Now - s_LastLocalTime) * pInfo->m_Speed;
 	}
 	else
 	{
 		if(!m_pClient->IsWorldPaused())
-			s_Time += Client()->LocalTime()-s_LastLocalTime;
+			s_Time += Now - s_LastLocalTime;
  	}
 	Pos.x += cosf(s_Time*2.0f+Offset)*2.5f;
-	Pos.y += sinf(s_Time*2.0f+Offset)*2.5f;
-	s_LastLocalTime = Client()->LocalTime();
+	Pos.y += sinf(s_Time * 2.0f + Offset) * 2.5f;
+	s_LastLocalTime = Now;
 	RenderTools()->DrawSprite(Pos.x, Pos.y, Size);
 	Graphics()->QuadsEnd();
 }
@@ -338,20 +340,22 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 	{
 		m_pClient->m_pEffects->SmokeTrail(Pos, Vel * -1);
 
+		const float Now = Client()->LocalTime();
 		static float s_Time = 0.0f;
-		static float s_LastLocalTime = Client()->LocalTime();
+		static float s_LastLocalTime = Now;
 		if (Client()->State() == IClient::STATE_DEMOPLAYBACK) 
 		{
 			const IDemoPlayer::CInfo* pInfo = DemoPlayer()->BaseInfo();
-			if (!pInfo->m_Paused) s_Time += (Client()->LocalTime() - s_LastLocalTime) * pInfo->m_Speed;
+			if(!pInfo->m_Paused && !m_pClient->IsWorldPaused())
+				s_Time += (Now - s_LastLocalTime) * pInfo->m_Speed;
 		}
 		else 
 		{
 			if(!m_pClient->IsWorldPaused())
-				s_Time += Client()->LocalTime() - s_LastLocalTime;
+				s_Time += Now - s_LastLocalTime;
 		}
 		Graphics()->QuadsSetRotation(s_Time * pi * 2 * 2 + ItemID);
-		s_LastLocalTime = Client()->LocalTime();
+		s_LastLocalTime = Now;
 	}
 	else 
 	{
@@ -412,24 +416,25 @@ void CItems::RenderMmoPickups(const CNetObj_MmoPickup* pPrev, const CNetObj_MmoP
 		return;
 	}
 
+	const float Now = Client()->LocalTime();
 	static float s_Time = 0.0f;
-	static float s_LastLocalTime = Client()->LocalTime();
+	static float s_LastLocalTime = Now;
 	const float Offset = Pos.y / 32.0f + Pos.x / 32.0f;
 	if (Client()->State() == IClient::STATE_DEMOPLAYBACK) 
 	{
 		const IDemoPlayer::CInfo* pInfo = DemoPlayer()->BaseInfo();
-		if (!pInfo->m_Paused) 
-			s_Time += (Client()->LocalTime() - s_LastLocalTime) * pInfo->m_Speed;
+		if(!pInfo->m_Paused && !m_pClient->IsWorldPaused())
+			s_Time += (Now - s_LastLocalTime) * pInfo->m_Speed;
 	}
 	else 
 	{
 		if(!m_pClient->IsWorldPaused())
-			s_Time += Client()->LocalTime() - s_LastLocalTime;
+			s_Time += Now - s_LastLocalTime;
 	}
 
 	Pos.x += cosf(s_Time * 2.0f + Offset) * 2.5f;
 	Pos.y += sinf(s_Time * 2.0f + Offset) * 2.5f;
-	s_LastLocalTime = Client()->LocalTime();
+	s_LastLocalTime = Now;
 
 	Graphics()->QuadsSetRotation(Angle);
 	RenderTools()->DrawSprite(Pos.x, Pos.y, Size);
