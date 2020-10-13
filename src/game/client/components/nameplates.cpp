@@ -31,8 +31,6 @@ const char* CNamePlates::GetMoodName(int MoodType) const
 
 void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNetObj_Character *pPlayerChar, int ClientID) const
 {
-	const CGameClient::CClientData* pClientData = &m_pClient->m_aClients[ClientID];
-
 	bool Predicted = m_pClient->ShouldUsePredicted() && m_pClient->ShouldUsePredictedChar(ClientID);
 	vec2 Position = m_pClient->GetCharPos(ClientID, Predicted);
 
