@@ -810,7 +810,7 @@ private:
 	void UpdateVideoModeSettings();
 
 	// found in menus.cpp
-	int Render();
+	void Render();
 	void RenderMenubar(CUIRect r);
 	void RenderNews(CUIRect MainView);
 	void RenderBackButton(CUIRect MainView);
