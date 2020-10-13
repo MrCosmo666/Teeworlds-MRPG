@@ -222,7 +222,7 @@ bool CControls::OnCursorMove(float x, float y, int CursorType)
 		return false;
 
 	if(CursorType == IInput::CURSOR_JOYSTICK
-		&& Config()->m_JoystickAbsolute
+		&& g_Config.m_JoystickAbsolute
 		&& m_pClient->m_Snap.m_pGameData
 		&& !m_pClient->m_Snap.m_SpecInfo.m_Active)
 	{
