@@ -1018,7 +1018,7 @@ void CMenus::RenderMenubar(CUIRect Rect)
 	// settings page
 	if((Client()->State() == IClient::STATE_OFFLINE && m_MenuPage == PAGE_SETTINGS) || (Client()->State() == IClient::STATE_ONLINE && m_GamePage == PAGE_SETTINGS))
 	{
-		int NumButtons = 5;
+		int NumButtons = 6;
 		float Spacing = 3.0f;
 		float ButtonWidth = (Box.w / NumButtons) - (Spacing * (NumButtons - 1)) / NumButtons;
 		float NotActiveAlpha = Client()->State() == IClient::STATE_ONLINE ? 0.5f : 1.0f;

@@ -241,8 +241,6 @@ int CRegister::RegisterProcessPacket(CNetChunk *pPacket, TOKEN Token)
 	bool Valid = false;
 	for(int i = 0; i < IMasterServer::MAX_MASTERSERVERS; i++)
 	{
-		NETADDR Addr2 = m_aMasterserverInfo[i].m_Addr;
-		Addr2.port = 0;
 		if(net_addr_comp(&pPacket->m_Address, &m_aMasterserverInfo[i].m_Addr, false) == 0)
 		{
 			Valid = true;

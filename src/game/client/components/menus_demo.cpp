@@ -447,7 +447,7 @@ void CMenus::RenderDemoList(CUIRect MainView)
 	const float ButtonHeight = 20.0f;
 	const float ButtonSpacing = 2.0f;
 	const float HMargin = 5.0f;
-	const float BackgroundHeight = s_DemoDetailsActive ? (float)(NumOptions+1)*ButtonHeight+(float)NumOptions*ButtonSpacing : ButtonHeight;
+	const float BackgroundHeight = s_DemoDetailsActive ? (float)(NumOptions + 1) * ButtonHeight + (float)NumOptions * ButtonSpacing : ButtonHeight;
 
 	CUIRect ListBox, Button, FileIcon;
 	MainView.HSplitTop(MainView.h - BackgroundHeight - 2 * HMargin, &ListBox, &MainView);
@@ -473,7 +473,9 @@ void CMenus::RenderDemoList(CUIRect MainView)
 			Headers.VSplitLeft(ms_aDemoCols[i].m_Width, &ms_aDemoCols[i].m_Rect, &Headers);
 
 			if(i + 1 < NumCols)
+			{
 				Headers.VSplitLeft(2, &ms_aDemoCols[i].m_Spacer, &Headers);
+			}
 		}
 	}
 
@@ -488,6 +490,8 @@ void CMenus::RenderDemoList(CUIRect MainView)
 
 	for(int i = 0; i < NumCols; i++)
 	{
+		if(ms_aDemoCols[i].m_Direction == 0)
+			ms_aDemoCols[i].m_Rect = Headers;
 		if(i == NumCols - 1)
 			ms_aDemoCols[i].m_Rect.w -= s_ListBox.GetScrollBarWidth();
 	}

@@ -1137,7 +1137,6 @@ void CMenus::RenderSettingsPlayer(CUIRect MainView)
 	static int s_PlayerCountry = 0;
 	static char s_aPlayerName[256] = { 0 };
 	static char s_aPlayerClan[256] = { 0 };
-	static char s_aPlayerSkin[256] = { 0 };
 	if(m_pClient->m_IdentityState < 0)
 	{
 		s_PlayerCountry = g_Config.m_PlayerCountry;
