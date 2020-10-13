@@ -55,6 +55,7 @@ public:
 	int GetJoystickNumAxes();
 	float GetJoystickAxisValue(int Axis);
 	bool JoystickRelative(float* pX, float* pY);
+	bool JoystickAbsolute(float* pX, float* pY);
 
 	void MouseModeRelative();
 	void MouseModeAbsolute();

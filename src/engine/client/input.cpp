@@ -219,6 +219,22 @@ bool CInput::JoystickRelative(float* pX, float* pY)
 	return false;
 }
 
+bool CInput::JoystickAbsolute(float* pX, float* pY)
+{
+	if(m_pConfig->m_JoystickEnable && GetActiveJoystick())
+	{
+		const vec2 RawJoystickPos = vec2(GetJoystickAxisValue(m_pConfig->m_JoystickX), GetJoystickAxisValue(m_pConfig->m_JoystickY));
+		const float DeadZone = m_pConfig->m_JoystickTolerance / 50.0f;
+		if(length(RawJoystickPos) > DeadZone)
+		{
+			*pX = RawJoystickPos.x;
+			*pY = RawJoystickPos.y;
+			return true;
+		}
+	}
+	return false;
+}
+
 bool CInput::MouseRelative(float* pX, float* pY)
 {
 	if(!m_MouseInputRelative)

@@ -29,5 +29,6 @@ public:
 
 	int SnapInput(int *pData);
 	void ClampMousePos();
+	float GetMaxMouseDistance() const;
 };
 #endif

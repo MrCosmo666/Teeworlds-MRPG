@@ -221,6 +221,17 @@ bool CControls::OnCursorMove(float x, float y, int CursorType)
 	if(m_pClient->IsWorldPaused() || (m_pClient->m_Snap.m_SpecInfo.m_Active && m_pClient->m_pChat->IsActive()))
 		return false;
 
+	if(CursorType == IInput::CURSOR_JOYSTICK
+		&& Config()->m_JoystickAbsolute
+		&& m_pClient->m_Snap.m_pGameData
+		&& !m_pClient->m_Snap.m_SpecInfo.m_Active)
+	{
+		float absX = 0.0f, absY = 0.0f;
+		if(Input()->JoystickAbsolute(&absX, &absY))
+			m_MousePos = vec2(absX, absY) * GetMaxMouseDistance();
+		return true;
+	}
+
 	float Factor = 1.0f;
 	switch(CursorType)
 	{
@@ -245,17 +256,20 @@ void CControls::ClampMousePos()
 	}
 	else
 	{
-		float MouseMax;
-		if(g_Config.m_ClDynamicCamera)
-		{
-			float CameraMaxDistance = 200.0f;
-			float FollowFactor = g_Config.m_ClMouseFollowfactor/100.0f;
-			MouseMax = min(CameraMaxDistance/FollowFactor + g_Config.m_ClMouseDeadzone, (float)g_Config.m_ClMouseMaxDistanceDynamic);
-		}
-		else
-			MouseMax = (float)g_Config.m_ClMouseMaxDistanceStatic;
-
+		const float MouseMax = GetMaxMouseDistance();
 		if(length(m_MousePos) > MouseMax)
 			m_MousePos = normalize(m_MousePos)*MouseMax;
 	}
+}
+
+float CControls::GetMaxMouseDistance() const
+{
+	if(g_Config.m_ClDynamicCamera)
+	{
+		float CameraMaxDistance = 200.0f;
+		float FollowFactor = g_Config.m_ClMouseFollowfactor / 100.0f;
+		return min(CameraMaxDistance / FollowFactor + g_Config.m_ClMouseDeadzone, (float)g_Config.m_ClMouseMaxDistanceDynamic);
+	}
+	else
+		return (float)g_Config.m_ClMouseMaxDistanceStatic;
 }
