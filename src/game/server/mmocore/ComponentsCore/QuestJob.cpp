@@ -46,7 +46,7 @@ int QuestJob::GetStoryCount(const char *StoryName, int CountFromQuestID) const
 	// get the number of quests storyline from the quest
 	if(CountFromQuestID > 0)
 	{
-		for (auto& qquest = ms_aQuestsData.find(CountFromQuestID); qquest != ms_aQuestsData.end(); qquest++)
+		for (auto qquest = ms_aQuestsData.find(CountFromQuestID); qquest != ms_aQuestsData.end(); qquest++)
 		{
 			if(str_comp(qquest->second.m_aStoryLine, StoryName) == 0)
 				Count--;
@@ -375,7 +375,7 @@ void QuestJob::UpdateArrowStep(int ClientID)
 void QuestJob::AcceptNextStoryQuestStep(CPlayer *pPlayer, int CheckQuestID)
 {
 	const StructQuestData CheckingQuest = ms_aQuestsData[CheckQuestID];
-	for (auto& pQuestData = ms_aQuestsData.find(CheckQuestID); pQuestData != ms_aQuestsData.end(); pQuestData++)
+	for (auto pQuestData = ms_aQuestsData.find(CheckQuestID); pQuestData != ms_aQuestsData.end(); pQuestData++)
 	{
 		// search next quest story step
 		if(str_comp_nocase(CheckingQuest.m_aStoryLine, pQuestData->second.m_aStoryLine) == 0)

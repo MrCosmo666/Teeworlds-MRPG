@@ -59,7 +59,7 @@ enum
 	LOCAL_WORLD = 0,						// local world
 	COUNT_WORLD = 12,						// number of worlds
 	LAST_WORLD = COUNT_WORLD - 1,			// last world
-	FREE_SLOTS_WORLD = 7,					// world where there are slots for fake mobs
+	FAKE_CHAT_DISCORD_WORLD = 7,			// fake world id discord chat
 	MAX_DROPPED_FROM_MOBS = 5,				// maximum number of items that can be dropped by mobs
 };
 

@@ -1895,7 +1895,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	else if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordChanal) == 0)
 	{
 		std::string Nickname("D|" + message.author.username);
-		m_pServer->GameServer(FREE_SLOTS_WORLD)->FakeChat(Nickname.c_str(), message.content.c_str());
+		m_pServer->GameServer(FAKE_CHAT_DISCORD_WORLD)->FakeChat(Nickname.c_str(), message.content.c_str());
 	}
 	// ideas-voting
 	else if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordIdeasChanal) == 0)

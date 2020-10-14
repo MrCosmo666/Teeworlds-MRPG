@@ -106,7 +106,12 @@ class CServer : public IServer
 	class IStorage *m_pStorage;
 
 public:
-	virtual class IGameServer *GameServer(int id = 0) { return m_pGameServer[id]; }
+	virtual class IGameServer *GameServer(int WorldID = 0) 
+	{ 
+		if(WorldID < 0 || WorldID >= COUNT_WORLD)
+			return nullptr;
+		return m_pGameServer[WorldID];
+	}
 	class IConsole *Console() { return m_pConsole; }
 	class IStorage *Storage() { return m_pStorage; }
 	class DiscordJob *m_pDiscord;
