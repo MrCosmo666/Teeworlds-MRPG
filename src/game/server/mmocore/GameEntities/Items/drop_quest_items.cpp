@@ -83,7 +83,7 @@ void CDropQuestItem::Tick()
 	const int QuestID = m_QuestBot.m_QuestID;
 	CPlayer* pOwnerPlayer = GS()->m_apPlayers[m_OwnerID];
 	InventoryItem& pPlayerQuestItem = pOwnerPlayer->GetItem(m_QuestBot.m_aItemSearch[0]);
-	if (QuestJob::ms_aQuests[m_OwnerID][QuestID].m_Progress != m_QuestBot.m_Progress || pPlayerQuestItem.m_Count >= Count)
+	if (QuestJob::ms_aQuests[m_OwnerID][QuestID].m_Step != m_QuestBot.m_Step || pPlayerQuestItem.m_Count >= Count)
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;

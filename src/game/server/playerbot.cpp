@@ -144,8 +144,8 @@ int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 		const int QuestID = BotJob::ms_aQuestBot[m_SubBotID].m_QuestID;
 		if(GS()->Mmo()->Quest()->GetState(SnappingClient, QuestID) != QuestState::QUEST_ACCEPT) 
 			return 0;
-		const int TalkProgress = BotJob::ms_aQuestBot[m_SubBotID].m_Progress;
-		if(TalkProgress != QuestJob::ms_aQuests[SnappingClient][QuestID].m_Progress)
+		const int TalkProgress = BotJob::ms_aQuestBot[m_SubBotID].m_Step;
+		if(TalkProgress != QuestJob::ms_aQuests[SnappingClient][QuestID].m_Step)
 			return 0;
 		
 		// [first] quest bot active for player
@@ -234,7 +234,7 @@ bool CPlayerBot::IsActiveQuests(int SnapClientID) const
 	if(m_BotType == BotsTypes::TYPE_BOT_NPC)
 	{
 		const int GivesQuest = GS()->Mmo()->BotsData()->GetQuestNPC(m_SubBotID);
-		if(BotJob::ms_aNpcBot[m_SubBotID].Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST && 
+		if(BotJob::ms_aNpcBot[m_SubBotID].m_Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST && 
 			GS()->Mmo()->Quest()->GetState(SnapClientID, GivesQuest) == QuestState::QUEST_NO_ACCEPT)
 			return true;
 		return false;

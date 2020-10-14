@@ -51,7 +51,7 @@ bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 	else if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
 		m_Core.m_LostData = true;
-		const int Function = BotJob::ms_aNpcBot[SubBotID].Function;
+		const int Function = BotJob::ms_aNpcBot[SubBotID].m_Function;
 		if(Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST)
 			CreateSnapProj(GetSnapFullID(), 3, PICKUP_ARMOR, false, false);
 	}
@@ -254,7 +254,7 @@ void CCharacterBotAI::EngineNPC()
 	m_Input.m_TargetX = (m_Input.m_Direction*10+1);
 
 	bool PlayerFinding = false;
-	if(BotJob::ms_aNpcBot[MobID].Function == FunctionsNPC::FUNCTION_NPC_NURSE)
+	if(BotJob::ms_aNpcBot[MobID].m_Function == FunctionsNPC::FUNCTION_NPC_NURSE)
 		PlayerFinding = FunctionNurseNPC();
 	else
 		PlayerFinding = BaseFunctionNPC();

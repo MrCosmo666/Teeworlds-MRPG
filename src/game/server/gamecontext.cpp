@@ -2276,35 +2276,31 @@ void CGS::UpdateQuestsBot(int QuestID, int Step)
 {
 	for(auto& FindBot : BotJob::ms_aQuestBot)
 	{
-		if(QuestID != FindBot.second.m_QuestID || Step != FindBot.second.m_Progress)
+		CGS* pBotGS = (CGS*)Server()->GameServer(FindBot.second.m_WorldID);
+		if(QuestID != FindBot.second.m_QuestID || Step != FindBot.second.m_Step || !pBotGS)
 			continue;
 
-		// throw a recheck on the world
-		if(FindBot.second.m_WorldID != GetWorldID())
-		{
-			Server()->QuestBotUpdateOnWorld(FindBot.second.m_WorldID, QuestID, Step);
-			continue;
-		}
-
-		// check if there's a bot
-		int QuestBotClientID = -1;
+		// check it's if there's a active bot
+		int BotClientID = -1;
 		for(int i = MAX_PLAYERS ; i < MAX_CLIENTS; i++)
 		{
-			if(!m_apPlayers[i] || m_apPlayers[i]->GetBotType() != BotsTypes::TYPE_BOT_QUEST || m_apPlayers[i]->GetBotSub() != FindBot.second.m_SubBotID) 
+			if(!pBotGS->m_apPlayers[i] || pBotGS->m_apPlayers[i]->GetBotType() != BotsTypes::TYPE_BOT_QUEST 
+				|| pBotGS->m_apPlayers[i]->GetBotSub() != FindBot.second.m_SubBotID)
 				continue;
-			QuestBotClientID = i;
+
+			BotClientID = i;
 		}
 
 		// seek if all players have an active bot
-		const bool ActiveBot = Mmo()->Quest()->IsActiveQuestBot(QuestID, Step);
-		if(ActiveBot && QuestBotClientID <= -1)
-			CreateBot(BotsTypes::TYPE_BOT_QUEST, FindBot.second.m_BotID, FindBot.second.m_SubBotID);
+		const bool ActiveBot = pBotGS->Mmo()->Quest()->IsActiveQuestBot(QuestID, Step);
+		if(ActiveBot && BotClientID <= -1)
+			pBotGS->CreateBot(BotsTypes::TYPE_BOT_QUEST, FindBot.second.m_BotID, FindBot.second.m_SubBotID);
 
 		// if the bot is not active for more than one player
-		if (!ActiveBot && QuestBotClientID >= MAX_PLAYERS)
+		if (!ActiveBot && BotClientID >= MAX_PLAYERS)
 		{
-			delete m_apPlayers[QuestBotClientID];
-			m_apPlayers[QuestBotClientID] = nullptr;
+			delete pBotGS->m_apPlayers[BotClientID];
+			pBotGS->m_apPlayers[BotClientID] = nullptr;
 		}
 	}
 }

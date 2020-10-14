@@ -417,14 +417,6 @@ void CServer::ChangeWorld(int ClientID, int MapID)
 	SendMap(ClientID);
 }
 
-void CServer::QuestBotUpdateOnWorld(int WorldID, int QuestID, int Step)
-{
-	if (WorldID < 0 || WorldID >= COUNT_WORLD)
-		return;
-
-	GameServer(WorldID)->UpdateQuestsBot(QuestID, Step);
-}
-
 void CServer::BackInformationFakeClient(int FakeClientID)
 {
 	for(int i = 0; i < COUNT_WORLD; i++)

@@ -5,7 +5,7 @@
 
 // define for quick fine-tuning of enchantment
 #define PERCENT_OF_ENCHANT 8
-#define PERCENT_MAXIMUM_ENCHANT 50
+#define PERCENT_MAXIMUM_ENCHANT 40
 
 class CItemInformation
 {

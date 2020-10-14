@@ -93,8 +93,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	{
 		m_pPlayer->m_MoodState = m_pPlayer->GetMoodState();
 		GS()->Mmo()->Quest()->UpdateArrowStep(m_pPlayer->GetCID());
-		if(GS()->Mmo()->Quest()->CheckNewStories(m_pPlayer))
-			GS()->Chat(m_pPlayer->GetCID(), "There are new stories of familiar NPCs");
+		GS()->Mmo()->Quest()->AcceptNextStoryQuestStep(m_pPlayer);
 
 		m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
 		GS()->ResetVotes(m_pPlayer->GetCID(), m_pPlayer->m_OpenVoteMenu);
@@ -426,7 +425,7 @@ void CCharacter::CreateQuestsStep(int QuestID)
 	if (QuestJob::ms_aQuests[ClientID].find(QuestID) == QuestJob::ms_aQuests[ClientID].end() || (Pos.x == 0.0f && Pos.y == 0.0f))
 		return;
 
-	const int Progress = QuestJob::ms_aQuests[ClientID][QuestID].m_Progress;
+	const int Progress = QuestJob::ms_aQuests[ClientID][QuestID].m_Step;
 	new CQuestPathFinder(GameWorld(), m_Core.m_Pos, ClientID, QuestID, Progress, Pos);
 }
 

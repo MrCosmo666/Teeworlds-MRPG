@@ -92,7 +92,6 @@ public:
 	DiscordJob(const char *token, int threads);
 
 	void SetServer(CServer *pServer);
-	void SetGameServer(CGS *pGameServer);
 
 	void SendMessage(const char *pChanal, const char *Color, const char *Title, std::string pMsg);
 	void SendGenerateMessage(const char *pChanal, const char *Color, const char *Title, const char *pPhpArg);
@@ -234,7 +233,6 @@ public:
 	virtual void SetClientScore(int ClientID, int Score);
 
 	virtual void ChangeWorld(int ClientID, int WorldID);
-	virtual void QuestBotUpdateOnWorld(int WorldID, int QuestID, int Step);
 	virtual int GetClientWorldID(int ClientID);
 	virtual void BackInformationFakeClient(int FakeClientID);
 

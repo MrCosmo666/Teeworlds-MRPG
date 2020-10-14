@@ -198,7 +198,7 @@ public:
 	void OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID) override;
 	void OnClientConnected(int ClientID) override;
 	void ChangeWorld(int ClientID) override;
-	void UpdateQuestsBot(int QuestID, int Step) override;
+	void UpdateQuestsBot(int QuestID, int Step);
 
 	void OnClientEnter(int ClientID) override;
 	void OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld = false) override;

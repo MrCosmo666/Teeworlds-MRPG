@@ -144,7 +144,7 @@ bool WorldSwapJob::ChangeWorld(CPlayer *pPlayer, vec2 Pos)
 
 vec2 WorldSwapJob::GetPositionQuestBot(int ClientID, int QuestID)
 {
-	const int playerTalkProgress = QuestJob::ms_aQuests[ClientID][QuestID].m_Progress;
+	const int playerTalkProgress = QuestJob::ms_aQuests[ClientID][QuestID].m_Step;
 	BotJob::QuestBotInfo *FindBot = Job()->Quest()->GetQuestBot(QuestID, playerTalkProgress);
 	if(FindBot)
 	{

@@ -278,7 +278,7 @@ void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 
 	for(auto& qparseprogress : ms_aQuestBot)
 	{
-		qparseprogress.second.m_Progress = 1;
+		qparseprogress.second.m_Step = 1;
 		for(const auto& qbots : ms_aQuestBot)
 		{
 			if(qbots.second.m_QuestID != qparseprogress.second.m_QuestID)
@@ -288,7 +288,7 @@ void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 			if(qbots.second.m_NextEqualProgress)
 				continue;
 
-			qparseprogress.second.m_Progress++;
+			qparseprogress.second.m_Step++;
 		}
 	}
 }
@@ -306,7 +306,7 @@ void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 		ms_aNpcBot[MobID].m_PositionY = (ms_aNpcBot[MobID].m_Static ? RES->getInt("PositionY") + 1 : RES->getInt("PositionY"));
 		ms_aNpcBot[MobID].m_Emote = RES->getInt("Emote");
 		ms_aNpcBot[MobID].m_BotID = RES->getInt("BotID");
-		ms_aNpcBot[MobID].Function = RES->getInt("Function");
+		ms_aNpcBot[MobID].m_Function = RES->getInt("Function");
 
 		const int CountMobs = RES->getInt("Count");
 		for(int c = 0; c < CountMobs; c++)
@@ -324,7 +324,7 @@ void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 			ms_aNpcBot[MobID].m_aTalk.push_back(LoadTalk);
 
 			if(LoadTalk.m_GivingQuest > 0)
-				ms_aNpcBot[MobID].Function = FunctionsNPC::FUNCTION_NPC_GIVE_QUEST;
+				ms_aNpcBot[MobID].m_Function = FunctionsNPC::FUNCTION_NPC_GIVE_QUEST;
 		}
 
 		GS()->Server()->AddInformationBotsCount(CountMobs);
