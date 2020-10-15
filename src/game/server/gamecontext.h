@@ -189,7 +189,7 @@ public:
 	void OnShutdown() override;
 
 	void OnTick() override;
-	void OnTickLatestWorld() override;
+	void OnTickMainWorld() override;
 	void OnPreSnap() override;
 	void OnSnap(int ClientID) override;
 	void OnPostSnap() override;

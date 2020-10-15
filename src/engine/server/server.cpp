@@ -797,7 +797,7 @@ void CServer::DoSnapshot(int WorldID)
 int CServer::NewClientCallback(int ClientID, void *pUser)
 {
 	CServer *pThis = (CServer *)pUser;
-	pThis->GameServer(LOCAL_WORLD)->ClearClientData(ClientID);
+	pThis->GameServer(MAIN_WORLD)->ClearClientData(ClientID);
 	str_copy(pThis->m_aClients[ClientID].m_aLanguage, "en", sizeof(pThis->m_aClients[ClientID].m_aLanguage));
 	pThis->m_aClients[ClientID].m_State = CClient::STATE_AUTH;
 	pThis->m_aClients[ClientID].m_aName[0] = 0;
@@ -834,7 +834,7 @@ int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 			pThis->m_aClients[ClientID].m_Quitting = true;
 			pThis->GameServer(i)->OnClientDrop(ClientID, pReason);
 		}
-		pThis->GameServer(LOCAL_WORLD)->ClearClientData(ClientID);
+		pThis->GameServer(MAIN_WORLD)->ClearClientData(ClientID);
 	}
 	
 	pThis->m_aClients[ClientID].m_State = CClient::STATE_EMPTY;
@@ -983,7 +983,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 
 				m_aClients[ClientID].m_Version = Unpacker.GetInt();
 				m_aClients[ClientID].m_State = CClient::STATE_CONNECTING;
-				GameServer(LOCAL_WORLD)->ClearClientData(ClientID);
+				GameServer(MAIN_WORLD)->ClearClientData(ClientID);
 				SendMap(ClientID);
 			}
 		}
@@ -1546,8 +1546,8 @@ int CServer::Run()
 				for(int o = 0; o < COUNT_WORLD; o++)
 				{
 					GameServer(o)->OnTick();
-					if(o == (LAST_WORLD - 1))
-						GameServer(o)->OnTickLatestWorld();
+					if(o == MAIN_WORLD)
+						GameServer(o)->OnTickMainWorld();
 				}
 			}
 
@@ -1899,7 +1899,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	else if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordChanal) == 0)
 	{
 		std::string Nickname("D|" + message.author.username);
-		m_pServer->GameServer(FAKE_CHAT_DISCORD_WORLD)->FakeChat(Nickname.c_str(), message.content.c_str());
+		m_pServer->GameServer(FAKE_DISCORD_CHAT_WORLD)->FakeChat(Nickname.c_str(), message.content.c_str());
 	}
 	// ideas-voting
 	else if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordIdeasChanal) == 0)

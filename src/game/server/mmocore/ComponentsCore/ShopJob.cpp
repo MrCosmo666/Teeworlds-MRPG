@@ -19,7 +19,7 @@ void ShopJob::OnInit()
 
 void ShopJob::OnTick()
 {
-	if(GS()->GetWorldID() == LOCAL_WORLD)
+	if(GS()->GetWorldID() == MAIN_WORLD)
 	{
 		if(GS()->Server()->Tick() % (1 * GS()->Server()->TickSpeed() * (g_Config.m_SvTimeCheckAuction * 60)) == 0)
 			CheckAuctionTime();

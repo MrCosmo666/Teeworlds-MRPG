@@ -1160,7 +1160,7 @@ bool CCharacter::IsLockedWorld()
 			{
 				m_pPlayer->GetTempData().m_TempTeleportX = m_pPlayer->GetTempData().m_TempTeleportY = -1;
 				GS()->Chat(m_pPlayer->GetCID(), "This chapter is still closed, you magically transported first zone!");
-				m_pPlayer->ChangeWorld(NEWBIE_ZERO_WORLD);
+				m_pPlayer->ChangeWorld(MAIN_WORLD);
 				return true;
 			}
 		}

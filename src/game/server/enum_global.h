@@ -55,12 +55,12 @@ enum DayType
 
 enum
 {
-	NEWBIE_ZERO_WORLD = 0,					// initial world
-	LOCAL_WORLD = 0,						// local world
-	COUNT_WORLD = 12,						// number of worlds
-	LAST_WORLD = COUNT_WORLD - 1,			// last world
-	FAKE_CHAT_DISCORD_WORLD = 7,			// fake world id discord chat
-	MAX_DROPPED_FROM_MOBS = 5,				// maximum number of items that can be dropped by mobs
+	MAIN_WORLD = 0,                     // local world
+	COUNT_WORLD = 12,                   // number of worlds
+	LAST_WORLD = COUNT_WORLD - 1,       // last world
+	FAKE_DISCORD_CHAT_WORLD = 7,        // fake world id discord chat
+
+	MAX_DROPPED_FROM_MOBS = 5,          // maximum number of items that can be dropped by mobs
 };
 
 #endif

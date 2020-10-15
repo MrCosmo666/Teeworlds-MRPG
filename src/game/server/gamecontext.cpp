@@ -958,7 +958,7 @@ void CGS::ClearTalkText(int ClientID)
 void CGS::UpdateDiscordStatus()
 {
 #ifdef CONF_DISCORD
-	if(Server()->Tick() % (Server()->TickSpeed() * 10) != 0 || m_WorldID != LOCAL_WORLD)
+	if(Server()->Tick() % (Server()->TickSpeed() * 10) != 0 || m_WorldID != MAIN_WORLD)
 		return;
 
 	int Players = 0;
@@ -1092,7 +1092,7 @@ void CGS::OnTick()
 }
 
 // Here we use functions that can have static data or functions that don't need to be called in all worlds
-void CGS::OnTickLatestWorld()
+void CGS::OnTickMainWorld()
 {
 	if(m_DayEnumType != Server()->GetEnumTypeDay())
 	{
@@ -1635,7 +1635,7 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 void CGS::ConSay(IConsole::IResult *pResult, void *pUserData)
 {
 	IServer* pServer = (IServer*)pUserData;
-	CGS* pSelf = (CGS*)pServer->GameServer(LOCAL_WORLD);
+	CGS* pSelf = (CGS*)pServer->GameServer(MAIN_WORLD);
 	pSelf->SendChat(-1, CHAT_ALL, -1, pResult->GetString(0));
 }
 
@@ -1657,7 +1657,7 @@ void CGS::ConAddCharacter(IConsole::IResult *pResult, void *pUserData)
 void CGS::ConConvertPasswords(IConsole::IResult* pResult, void* pUserData)
 {
 	IServer* pServer = (IServer*)pUserData;
-	CGS* pSelf = (CGS*)pServer->GameServer(LOCAL_WORLD);
+	CGS* pSelf = (CGS*)pServer->GameServer(MAIN_WORLD);
 
 	std::shared_ptr<ResultSet> RES(SJK.SD("ID, Password", "tw_accounts", "WHERE PasswordSalt IS NULL OR PasswordSalt = ''"));
 	while(RES->next())
