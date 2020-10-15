@@ -71,7 +71,7 @@ bool StorageJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	return false;
 }
 
-bool StorageJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool StorageJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (PPSTR(CMD, "REPAIRITEMS") == 0)

@@ -1544,7 +1544,11 @@ int CServer::Run()
 				}
 
 				for(int o = 0; o < COUNT_WORLD; o++)
+				{
 					GameServer(o)->OnTick();
+					if(o == (LAST_WORLD - 1))
+						GameServer(o)->OnTickLatestWorld();
+				}
 			}
 
 			// snap game

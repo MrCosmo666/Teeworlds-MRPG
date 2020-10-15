@@ -98,7 +98,7 @@ void MailBoxJob::SendInbox(int AuthID, const char* Name, const char* Desc, int I
 	GS()->ChatAccountID(AuthID, "[Mailbox] New letter ({STR})!", cName.cstr());
 }
 
-bool MailBoxJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool MailBoxJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if(PPSTR(CMD, "MAIL") == 0)

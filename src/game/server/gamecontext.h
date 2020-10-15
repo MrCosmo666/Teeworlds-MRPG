@@ -151,8 +151,7 @@ private:
 
 public:
 	void AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSpan);
-	void SendBroadcast(const char *pText, int ClientID, int Priority, int LifeSpan);
-	void SBL(int ClientID, int Priority, int LifeSpan, const char *pText, ...);
+	void Broadcast(int ClientID, int Priority, int LifeSpan, const char *pText, ...);
 	void BroadcastWorldID(int WorldID, int Priority, int LifeSpan, const char *pText, ...);
 	void BroadcastTick(int ClientID);
 
@@ -190,7 +189,7 @@ public:
 	void OnShutdown() override;
 
 	void OnTick() override;
-	void OnTickLocalWorld();
+	void OnTickLatestWorld() override;
 	void OnPreSnap() override;
 	void OnSnap(int ClientID) override;
 	void OnPostSnap() override;
@@ -260,7 +259,7 @@ public:
 	void AddBackpage(int ClientID);
 	void ShowPlayerStats(CPlayer *pPlayer);
 	void ShowItemValueInformation(CPlayer *pPlayer, int ItemID = itGold);
-	bool ParseVote(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text);
+	bool ParsingVoteCommands(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text);
 
 	/* #########################################################################
 		MMO GAMECONTEXT 
@@ -290,8 +289,8 @@ public:
 	bool IsAllowedPVP() const { return m_AllowedPVP; }
 
 	bool CheckingPlayersDistance(vec2 Pos, float Distance) const;
-	void SetRespawnWorld(int WorldID) { m_RespawnWorld = WorldID; }
 	void SetMapMusic(int SoundID) { m_MusicID = SoundID; }
+	void SetRespawnWorld(int WorldID) { m_RespawnWorld = WorldID; }
 	int GetRespawnWorld() const { return m_RespawnWorld; }
 
 	CCommandProcessor* CommandProcessor() { return m_pCommandProcessor; }

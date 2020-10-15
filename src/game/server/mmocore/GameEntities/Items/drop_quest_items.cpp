@@ -92,7 +92,7 @@ void CDropQuestItem::Tick()
 	if (m_Collide && pOwnerPlayer->GetCharacter() && distance(m_Pos, pOwnerPlayer->GetCharacter()->m_Core.m_Pos) < 32.0f)
 	{
 		// item selection text
-		GS()->SBL(m_OwnerID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Press 'Fire' for pick Quest Item");
+		GS()->Broadcast(m_OwnerID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Press 'Fire' for pick Quest Item");
 		if (pOwnerPlayer->GetCharacter()->m_ReloadTimer)
 		{
 			GS()->CreatePlayerSound(m_OwnerID, SOUND_ITEM_PICKUP);

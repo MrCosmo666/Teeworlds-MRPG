@@ -21,7 +21,7 @@ public:
 	virtual void OnInitAccount(CPlayer *pPlayer);
 	virtual bool OnHandleTile(CCharacter *pChr, int IndexCollision);
 	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
-	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+	virtual bool OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 
 private:
 	void UnlockLocation(CPlayer* pPlayer, vec2 Pos);

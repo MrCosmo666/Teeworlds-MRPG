@@ -70,7 +70,7 @@ void CCharacterBotAI::ShowProgressHealth()
 			const int StartHealth = m_pBotPlayer->GetStartHealth();
 			const float Percent = (Health * 100.0) / StartHealth;
 			std::unique_ptr<char[]> Progress = std::move(GS()->LevelString(100, Percent, 10, ':', ' '));
-			GS()->SBL(pPlayerDamage.first, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "{STR} {STR}({INT}/{INT})", 
+			GS()->Broadcast(pPlayerDamage.first, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "{STR} {STR}({INT}/{INT})", 
 				BotJob::ms_aDataBot[BotID].m_aNameBot, Progress.get(), &Health, &StartHealth);
 		}
 	}	
@@ -557,7 +557,7 @@ bool CCharacterBotAI::SearchTalkedPlayer()
 			!GS()->Collision()->IntersectLine(pFindPlayer->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) && m_pBotPlayer->IsActiveSnappingBot(i))
 		{
 			if (DialoguesNotEmpty)
-				GS()->SBL(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Begin dialog: \"hammer hit\"");
+				GS()->Broadcast(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Begin dialog: \"hammer hit\"");
 
 			pFindPlayer->GetCharacter()->m_Core.m_LostData = true;
 			m_Input.m_TargetX = static_cast<int>(pFindPlayer->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);

@@ -28,7 +28,7 @@ public:
 	void ShowPlantsItems(int ClientID);
 
 	void Work(CPlayer* pPlayer, int Level);
-	virtual bool OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
+	virtual bool OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
 };
 
 #endif

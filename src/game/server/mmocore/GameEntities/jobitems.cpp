@@ -48,7 +48,7 @@ void CJobItems::Work(int ClientID)
 	// not allowed un owner house job 
 	if(m_HouseID > 0 && GS()->Mmo()->House()->GetOwnerHouse(m_HouseID) <= 0)
 	{
-		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "It is forbidden to pick plants without the owner!");
+		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "It is forbidden to pick plants without the owner!");
 		return;
 	}
 
@@ -60,12 +60,12 @@ void CJobItems::Work(int ClientID)
 		int EquipItem = pPlayer->GetEquippedItem(EQUIP_MINER);
 		if (EquipItem <= 0)
 		{
-			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Need equip Pickaxe!");
+			GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Need equip Pickaxe!");
 			return;
 		}
 		if (pPlayer->Acc().m_aMiner[PlLevel] < m_Level)
 		{
-			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), &m_Level);
+			GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), &m_Level);
 			return;
 		}
 
@@ -73,7 +73,7 @@ void CJobItems::Work(int ClientID)
 		int Durability = pPlayerEquippedItem.m_Durability;
 		if (Durability <= 0)
 		{
-			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Need repair pickaxe!");
+			GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Need repair pickaxe!");
 			return;
 		}
 
@@ -83,7 +83,7 @@ void CJobItems::Work(int ClientID)
 		m_Progress += 3+pPlayer->GetItemsAttributeCount(Stats::StEfficiency);
 		GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
-		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P] : {STR} ({INT}/100%)", 
+		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P] : {STR} ({INT}/100%)", 
 			pPlayerWorkedItem.Info().GetName(pPlayer), (m_Progress > m_Health ? &m_Health : &m_Progress), &m_Health, 
 			pPlayerEquippedItem.Info().GetName(pPlayer), &Durability);
 
@@ -101,14 +101,14 @@ void CJobItems::Work(int ClientID)
 	// - - - - - - - - PLANTS - - - - - - - - 
 	if (pPlayer->Acc().m_aPlant[PlLevel] < m_Level)
 	{
-		GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), &m_Level);
+		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), &m_Level);
 		return;
 	}
 
 	m_Progress += 10;
 	GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
-	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P]",
+	GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P]",
 		pPlayerWorkedItem.Info().GetName(pPlayer), (m_Progress > m_Health ? &m_Health : &m_Progress), &m_Health);
 
 	if(m_Progress >= m_Health)

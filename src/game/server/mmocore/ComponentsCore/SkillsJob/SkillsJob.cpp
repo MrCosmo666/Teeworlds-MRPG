@@ -96,7 +96,7 @@ bool SkillsJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	return false;
 }
 
-bool SkillsJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool SkillsJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (PPSTR(CMD, "SKILLLEARN") == 0)

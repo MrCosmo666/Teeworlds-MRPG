@@ -92,7 +92,7 @@ public:
 
 	std::string HashPassword(const char* pPassword, const char* pSalt);
 
-	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+	virtual bool OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 	virtual void OnResetClient(int ClientID);
 };

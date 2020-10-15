@@ -137,7 +137,7 @@ bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 /* #########################################################################
 	GLOBAL MEMBER
 ######################################################################### */
-bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (PPSTR(CMD, "MLEADER") == 0)

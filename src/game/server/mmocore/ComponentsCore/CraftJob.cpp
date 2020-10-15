@@ -188,7 +188,7 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 	GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 }
 
-bool CraftJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool CraftJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	if(PPSTR(CMD, "CRAFT") == 0)
 	{

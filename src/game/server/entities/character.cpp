@@ -1172,7 +1172,7 @@ bool CCharacter::CheckFailMana(int Mana)
 {
 	if(m_Mana < Mana)
 	{
-		GS()->SBL(m_pPlayer->GetCID(), BroadcastPriority::BROADCAST_GAME_WARNING, 100, "No mana for use this or for maintenance.");
+		GS()->Broadcast(m_pPlayer->GetCID(), BroadcastPriority::BROADCAST_GAME_WARNING, 100, "No mana for use this or for maintenance.");
 		return true;
 	}
 

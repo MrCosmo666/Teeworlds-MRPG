@@ -93,14 +93,14 @@ bool MmoController::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 	return false;
 }
 
-bool MmoController::OnParseFullVote(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool MmoController::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	if(!pPlayer)
 		return true;
 
 	for(auto& component : m_Components.m_paComponents)
 	{
-		if(component->OnVotingMenu(pPlayer, CMD, VoteID, VoteID2, Get, GetText))
+		if(component->OnParsingVoteCommands(pPlayer, CMD, VoteID, VoteID2, Get, GetText))
 			return true;
 	}
 	return false;

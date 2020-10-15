@@ -28,7 +28,7 @@ public:
 
 	virtual void OnInitAccount(CPlayer* pPlayer);
 	virtual void OnInitWorld(const char* pWhereLocalWorld);
-	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+	virtual bool OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 };
 
 #endif

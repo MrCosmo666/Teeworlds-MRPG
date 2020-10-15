@@ -622,18 +622,6 @@ void CGS::Motd(int ClientID, const char* Text, ...)
 /* #########################################################################
 	BROADCAST FUNCTIONS 
 ######################################################################### */
-void CGS::SendBroadcast(const char *pText, int ClientID, int Priority, int LifeSpan)
-{
-	int Start = (ClientID < 0 ? 0 : ClientID);
-	int End = (ClientID < 0 ? MAX_PLAYERS : ClientID+1);
-	
-	for(int i = Start; i < End; i++)
-	{
-		if(m_apPlayers[i])
-			AddBroadcast(i, pText, Priority, LifeSpan);
-	}
-}
-
 void CGS::AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSpan)
 {
 	if (ClientID < 0 || ClientID >= MAX_PLAYERS)
@@ -643,7 +631,7 @@ void CGS::AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSp
 	{
 		if(m_aBroadcastStates[ClientID].m_TimedPriority > Priority)
 			return;
-				
+
 		str_copy(m_aBroadcastStates[ClientID].m_aTimedMessage, pText, sizeof(m_aBroadcastStates[ClientID].m_aTimedMessage));
 		m_aBroadcastStates[ClientID].m_LifeSpanTick = LifeSpan;
 		m_aBroadcastStates[ClientID].m_TimedPriority = Priority;
@@ -652,14 +640,14 @@ void CGS::AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSp
 	{
 		if(m_aBroadcastStates[ClientID].m_Priority > Priority)
 			return;
-				
+
 		str_copy(m_aBroadcastStates[ClientID].m_aNextMessage, pText, sizeof(m_aBroadcastStates[ClientID].m_aNextMessage));
 		m_aBroadcastStates[ClientID].m_Priority = Priority;
 	}
 }
 
 // formatted broadcast
-void CGS::SBL(int ClientID, int Priority, int LifeSpan, const char *pText, ...)
+void CGS::Broadcast(int ClientID, int Priority, int LifeSpan, const char *pText, ...)
 {
 	int Start = (ClientID < 0 ? 0 : ClientID);
 	int End = (ClientID < 0 ? MAX_PLAYERS : ClientID+1);
@@ -672,7 +660,6 @@ void CGS::SBL(int ClientID, int Priority, int LifeSpan, const char *pText, ...)
 		{
 			dynamic_string Buffer;
 			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
-			
 			AddBroadcast(i, Buffer.buffer(), Priority, LifeSpan);
 			Buffer.clear();
 		}
@@ -691,7 +678,6 @@ void CGS::BroadcastWorldID(int WorldID, int Priority, int LifeSpan, const char *
 		{
 			dynamic_string Buffer;
 			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
-			
 			AddBroadcast(i, Buffer.buffer(), Priority, LifeSpan);
 			Buffer.clear();
 		}
@@ -978,7 +964,7 @@ void CGS::UpdateDiscordStatus()
 	int Players = 0;
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(m_apPlayers[i])
+		if(Server()->ClientIngame(i))
 			Players++;
 	}
 
@@ -1102,16 +1088,12 @@ void CGS::OnTick()
 		}
 	}
 
-	OnTickLocalWorld();
 	Mmo()->OnTick();
 }
 
-void CGS::OnTickLocalWorld()
+// Here we use functions that can have static data or functions that don't need to be called in all worlds
+void CGS::OnTickLatestWorld()
 {
-	if(m_WorldID != LOCAL_WORLD) 
-		return;
-
-	// receive and send the modified day
 	if(m_DayEnumType != Server()->GetEnumTypeDay())
 	{
 		m_DayEnumType = Server()->GetEnumTypeDay(); 
@@ -1216,6 +1198,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				SendChat(ClientID, Mode, pMsg->m_Target, pMsg->m_pMessage);						
 			}
 		}
+
 		else if (MsgID == NETMSGTYPE_CL_COMMAND)
 		{
 			if (g_Config.m_SvSpamprotection && pPlayer->m_PlayerTick[TickState::LastChat] && pPlayer->m_PlayerTick[TickState::LastChat] + Server()->TickSpeed() > Server()->Tick())
@@ -1275,6 +1258,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			ChatFollow(ClientID, "Command {STR} not found!", pMsg->m_Name);
 			// CommandManager()->OnCommand(pMsg->m_Name, pMsg->m_Arguments, ClientID);
 		}
+
 		else if(MsgID == NETMSGTYPE_CL_CALLVOTE)
 		{
 			CNetMsg_Cl_CallVote *pMsg = (CNetMsg_Cl_CallVote *)pRawMsg;
@@ -1290,29 +1274,33 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			if (item != m_aPlayerVotes[ClientID].end())
 			{
 				const int InteractiveCount = string_to_number(pMsg->m_Reason, 1, 10000000);
-				ParseVote(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveCount, pMsg->m_Reason);
+				ParsingVoteCommands(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveCount, pMsg->m_Reason);
 				return;
 			}
 			ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		}
+
 		else if(MsgID == NETMSGTYPE_CL_VOTE)
 		{
 			CNetMsg_Cl_Vote *pMsg = (CNetMsg_Cl_Vote *)pRawMsg;
 			if(pPlayer->ParseItemsF3F4(pMsg->m_Vote))
 				return;
 		}
+
 		else if(MsgID == NETMSGTYPE_CL_SETTEAM)
 		{
 			if(!pPlayer->IsAuthed())
 			{
-				SBL(pPlayer->GetCID(), BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Use /register <name> <pass>.");
+				Broadcast(pPlayer->GetCID(), BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Use /register <name> <pass>.");
 				return;
 			}
 		}
+
 		else if (MsgID == NETMSGTYPE_CL_SETSPECTATORMODE)
 		{
 			return;
 		}
+
 		else if (MsgID == NETMSGTYPE_CL_EMOTICON)
 		{
 			CNetMsg_Cl_Emoticon *pMsg = (CNetMsg_Cl_Emoticon *)pRawMsg;
@@ -1323,6 +1311,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			pPlayer->m_PlayerTick[TickState::LastEmote] = Server()->Tick();
 			SendEmoticon(ClientID, pMsg->m_Emoticon, true);
 		}
+
 		else if (MsgID == NETMSGTYPE_CL_KILL)
 		{
 			if(pPlayer->m_PlayerTick[TickState::LastKill] && pPlayer->m_PlayerTick[TickState::LastKill]+Server()->TickSpeed()*3 > Server()->Tick())
@@ -1331,10 +1320,12 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			//pPlayer->m_PlayerTick[TickState::LastKill] = Server()->Tick();
 			//pPlayer->KillCharacter(WEAPON_SELF);
 		}
+
 		else if (MsgID == NETMSGTYPE_CL_READYCHANGE)
 		{
 			return;
 		}
+
 		else if(MsgID == NETMSGTYPE_CL_SKINCHANGE)
 		{
 			if(pPlayer->m_PlayerTick[TickState::LastChangeInfo] && pPlayer->m_PlayerTick[TickState::LastChangeInfo]+Server()->TickSpeed()*5 > Server()->Tick())
@@ -2216,7 +2207,7 @@ void CGS::ShowItemValueInformation(CPlayer *pPlayer, int ItemID)
 }
 
 // vote parsing of all functions of action methods
-bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text)
+bool CGS::ParsingVoteCommands(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text)
 {
 	CPlayer *pPlayer = GetPlayer(ClientID, false, true);
 	if(!pPlayer)
@@ -2251,7 +2242,7 @@ bool CGS::ParseVote(int ClientID, const char *CMD, const int VoteID, const int V
 
 	// parsing everything else
 	const sqlstr::CSqlString<64> FormatText = sqlstr::CSqlString<64>(Text);
-	return (bool)(Mmo()->OnParseFullVote(pPlayer, CMD, VoteID, VoteID2, Get, FormatText.cstr()));
+	return (bool)(Mmo()->OnParsingVoteCommands(pPlayer, CMD, VoteID, VoteID2, Get, FormatText.cstr()));
 }
 
 /* #########################################################################
