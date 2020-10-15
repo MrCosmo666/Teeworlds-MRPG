@@ -272,7 +272,7 @@ bool InventoryJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, cons
 
 	if(PPSTR(CMD, "SORTEDINVENTORY") == 0)
 	{
-		pPlayer->m_SortTabs[SORT_INVENTORY] = VoteID;
+		pPlayer->m_aSortTabs[SORT_INVENTORY] = VoteID;
 		GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
 		return true;
 	}
@@ -366,7 +366,7 @@ bool InventoryJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, cons
 
 	if(PPSTR(CMD, "SORTEDEQUIP") == 0)
 	{
-		pPlayer->m_SortTabs[SORT_EQUIPING] = VoteID;
+		pPlayer->m_aSortTabs[SORT_EQUIPING] = VoteID;
 		GS()->UpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
 		return true;				
 	}
@@ -403,8 +403,8 @@ bool InventoryJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 
 		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_OTHER);
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_OTHER, TAB_INVENTORY_SELECT, "Other ({INT})", &SizeItems);
-		if (pPlayer->m_SortTabs[SORT_INVENTORY])	
-			ListInventory(pPlayer, pPlayer->m_SortTabs[SORT_INVENTORY]);
+		if (pPlayer->m_aSortTabs[SORT_INVENTORY])	
+			ListInventory(pPlayer, pPlayer->m_aSortTabs[SORT_INVENTORY]);
 
 		GS()->AddBackpage(ClientID);
 		return true;
@@ -438,7 +438,7 @@ bool InventoryJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 		bool FindItem = false;
 		for (const auto& it : ms_aItems[ClientID])
 		{
-			if (!it.second.m_Count || it.second.Info().m_Function != pPlayer->m_SortTabs[SORT_EQUIPING])
+			if (!it.second.m_Count || it.second.Info().m_Function != pPlayer->m_aSortTabs[SORT_EQUIPING])
 				continue;
 
 			ItemSelected(pPlayer, it.second, true);

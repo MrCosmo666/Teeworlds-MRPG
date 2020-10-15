@@ -1151,7 +1151,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 	{
 		if(MsgID == NETMSGTYPE_CL_SAY)
 		{
-			if(g_Config.m_SvSpamprotection && pPlayer->m_PlayerTick[TickState::LastChat] && pPlayer->m_PlayerTick[TickState::LastChat]+Server()->TickSpeed() > Server()->Tick())
+			if(g_Config.m_SvSpamprotection && pPlayer->m_aPlayerTick[TickState::LastChat] && pPlayer->m_aPlayerTick[TickState::LastChat]+Server()->TickSpeed() > Server()->Tick())
 				return;
 
 			CNetMsg_Cl_Say *pMsg = (CNetMsg_Cl_Say *)pRawMsg;
@@ -1184,7 +1184,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			if(pEnd != nullptr)
 				*(const_cast<char *>(pEnd)) = 0;
 
-			pPlayer->m_PlayerTick[TickState::LastChat] = Server()->Tick();
+			pPlayer->m_aPlayerTick[TickState::LastChat] = Server()->Tick();
 
 			const int Mode = pMsg->m_Mode;
 			if(Mode != CHAT_NONE)
@@ -1201,7 +1201,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 		else if (MsgID == NETMSGTYPE_CL_COMMAND)
 		{
-			if (g_Config.m_SvSpamprotection && pPlayer->m_PlayerTick[TickState::LastChat] && pPlayer->m_PlayerTick[TickState::LastChat] + Server()->TickSpeed() > Server()->Tick())
+			if (g_Config.m_SvSpamprotection && pPlayer->m_aPlayerTick[TickState::LastChat] && pPlayer->m_aPlayerTick[TickState::LastChat] + Server()->TickSpeed() > Server()->Tick())
 				return;
 
 			CNetMsg_Cl_Command *pMsg = (CNetMsg_Cl_Command*)pRawMsg;
@@ -1247,7 +1247,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					return;
 			}
 
-			pPlayer->m_PlayerTick[TickState::LastChat] = Server()->Tick();
+			pPlayer->m_aPlayerTick[TickState::LastChat] = Server()->Tick();
 
 			if (Console()->IsCommand(pMsg->m_Name, CFGFLAG_CHAT))
 			{
@@ -1262,10 +1262,10 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		else if(MsgID == NETMSGTYPE_CL_CALLVOTE)
 		{
 			CNetMsg_Cl_CallVote *pMsg = (CNetMsg_Cl_CallVote *)pRawMsg;
-			if (str_comp_nocase(pMsg->m_Type, "option") != 0 || Server()->Tick() < (pPlayer->m_PlayerTick[TickState::LastVoteTry] + (Server()->TickSpeed() / 2)))
+			if (str_comp_nocase(pMsg->m_Type, "option") != 0 || Server()->Tick() < (pPlayer->m_aPlayerTick[TickState::LastVoteTry] + (Server()->TickSpeed() / 2)))
 				return;
 			
-			pPlayer->m_PlayerTick[TickState::LastVoteTry] = Server()->Tick();
+			pPlayer->m_aPlayerTick[TickState::LastVoteTry] = Server()->Tick();
 			const auto& item = std::find_if(m_aPlayerVotes[ClientID].begin(), m_aPlayerVotes[ClientID].end(), [pMsg](const CVoteOptions& vote)
 			{
 				return (str_comp_nocase(pMsg->m_Value, vote.m_aDescription) == 0);
@@ -1305,16 +1305,16 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		{
 			CNetMsg_Cl_Emoticon *pMsg = (CNetMsg_Cl_Emoticon *)pRawMsg;
 
-			if(g_Config.m_SvSpamprotection && pPlayer->m_PlayerTick[TickState::LastEmote] && pPlayer->m_PlayerTick[TickState::LastEmote]+(Server()->TickSpeed() / 2) > Server()->Tick())
+			if(g_Config.m_SvSpamprotection && pPlayer->m_aPlayerTick[TickState::LastEmote] && pPlayer->m_aPlayerTick[TickState::LastEmote]+(Server()->TickSpeed() / 2) > Server()->Tick())
 				return;
 
-			pPlayer->m_PlayerTick[TickState::LastEmote] = Server()->Tick();
+			pPlayer->m_aPlayerTick[TickState::LastEmote] = Server()->Tick();
 			SendEmoticon(ClientID, pMsg->m_Emoticon, true);
 		}
 
 		else if (MsgID == NETMSGTYPE_CL_KILL)
 		{
-			if(pPlayer->m_PlayerTick[TickState::LastKill] && pPlayer->m_PlayerTick[TickState::LastKill]+Server()->TickSpeed()*3 > Server()->Tick())
+			if(pPlayer->m_aPlayerTick[TickState::LastKill] && pPlayer->m_aPlayerTick[TickState::LastKill]+Server()->TickSpeed()*3 > Server()->Tick())
 				return;
 
 			//pPlayer->m_PlayerTick[TickState::LastKill] = Server()->Tick();
@@ -1328,10 +1328,10 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 		else if(MsgID == NETMSGTYPE_CL_SKINCHANGE)
 		{
-			if(pPlayer->m_PlayerTick[TickState::LastChangeInfo] && pPlayer->m_PlayerTick[TickState::LastChangeInfo]+Server()->TickSpeed()*5 > Server()->Tick())
+			if(pPlayer->m_aPlayerTick[TickState::LastChangeInfo] && pPlayer->m_aPlayerTick[TickState::LastChangeInfo]+Server()->TickSpeed()*5 > Server()->Tick())
 				return;
 
-			pPlayer->m_PlayerTick[TickState::LastChangeInfo] = Server()->Tick();
+			pPlayer->m_aPlayerTick[TickState::LastChangeInfo] = Server()->Tick();
 			CNetMsg_Cl_SkinChange *pMsg = (CNetMsg_Cl_SkinChange *)pRawMsg;
 
 			for(int p = 0; p < NUM_SKINPARTS; p++)
@@ -1397,11 +1397,11 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 	{
 		if (MsgID == NETMSGTYPE_CL_STARTINFO)
 		{
-			if(pPlayer->m_PlayerTick[TickState::LastChangeInfo] != 0)
+			if(pPlayer->m_aPlayerTick[TickState::LastChangeInfo] != 0)
 				return;
 
 			CNetMsg_Cl_StartInfo *pMsg = (CNetMsg_Cl_StartInfo *)pRawMsg;
-			pPlayer->m_PlayerTick[TickState::LastChangeInfo] = Server()->Tick();
+			pPlayer->m_aPlayerTick[TickState::LastChangeInfo] = Server()->Tick();
 
 			// set start infos
 			Server()->SetClientName(ClientID, pMsg->m_pName);
@@ -1549,7 +1549,7 @@ void CGS::ChangeWorld(int ClientID)
 
 bool CGS::IsClientReady(int ClientID) const
 {
-	return m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_PlayerTick[TickState::LastChangeInfo] > 0;
+	return m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_aPlayerTick[TickState::LastChangeInfo] > 0;
 }
 
 bool CGS::IsClientPlayer(int ClientID) const

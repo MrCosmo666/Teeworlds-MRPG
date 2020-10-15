@@ -182,7 +182,7 @@ enum
 	MIN_SKINCHANGE_CLIENTVERSION = 0x0703,	// minimum client version for skin change
 	MIN_RACE_CLIENTVERSION = 0x0704,		// minimum client version for race type
 	MAX_INBOX_LIST = 30,					// maximum number of emails what is displayed
-	STATS_MAX_FOR_ITEM = 2,
+	STATS_MAX_FOR_ITEM = 2,					// maximum number of stats per item
 
 	/*
 		All functions of items

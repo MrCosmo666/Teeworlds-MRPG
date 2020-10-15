@@ -13,7 +13,7 @@
 CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController(pGS)
 {
 	m_pGameType = "MmoTee";
-	m_DungeonID = GS()->DungeonID();
+	m_DungeonID = GS()->GetDungeonID();
 	m_WorldID = GS()->GetWorldID();
 	m_GameFlags = 0;
 	m_StartedPlayers = 0;

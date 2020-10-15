@@ -282,7 +282,7 @@ public:
 
 	bool IsMmoClient(int ClientID) const;
 	int GetWorldID() const { return m_WorldID; }
-	int DungeonID() const { return m_DungeonID; }
+	int GetDungeonID() const { return m_DungeonID; }
 	bool IsDungeon() const { return (m_DungeonID > 0); }
 	int GetExperienceMultiplier(int IncreaseCount) const;
 	bool IsPlayerEqualWorldID(int ClientID, int WorldID = -1) const;
@@ -299,9 +299,6 @@ private:
 	void UpdateZonePVP();
 	void UpdateZoneDungeon();
 
-	/* #########################################################################
-		FUNCTIONS PLAYER ITEMS
-	######################################################################### */
 	bool m_AllowedPVP;
 	int m_DayEnumType;
 	static int m_MultiplierExp;

@@ -55,7 +55,7 @@ public:
 	CGS* GS() const { return m_pGS; }
 	vec2 m_ViewPos;
 	int m_PlayerFlags;
-	int m_PlayerTick[TickState::NUM_TICK];
+	int m_aPlayerTick[TickState::NUM_TICK];
 	bool m_Flymode;
 	int m_MoodState;
 
@@ -69,14 +69,14 @@ public:
 	CTuningParams m_NextTuningParams;
 
 	bool m_Spawned;
-	short m_SortTabs[NUM_SORT_TAB];
+	short m_aSortTabs[NUM_SORT_TAB];
 	short m_OpenVoteMenu;
 	short m_LastVoteMenu;
 	vec3 m_Colored;
 
 private:
-	char m_FormatTalkQuest[512];
-	std::map < int, bool > m_HidenMenu;
+	char m_aFormatTalkQuest[512];
+	std::map < int, bool > m_aHiddenMenu;
 
 	/* #########################################################################
 		FUNCTIONS PLAYER ENGINE

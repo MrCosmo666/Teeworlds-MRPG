@@ -682,11 +682,11 @@ void CCharacter::Die(int Killer, int Weapon)
 		}
 	}
 
-	m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed() / 2;
+	m_pPlayer->m_aPlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed() / 2;
 	if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
 		int SubBotID = m_pPlayer->GetBotSub();
-		m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick()+BotJob::ms_aMobBot[SubBotID].m_RespawnTick*Server()->TickSpeed();
+		m_pPlayer->m_aPlayerTick[TickState::Respawn] = Server()->Tick()+BotJob::ms_aMobBot[SubBotID].m_RespawnTick*Server()->TickSpeed();
 	}
 
 	// a nice sound
@@ -695,7 +695,7 @@ void CCharacter::Die(int Killer, int Weapon)
 	m_pPlayer->ClearTalking();
 
 	// respawn
-	m_pPlayer->m_PlayerTick[TickState::Die] = Server()->Tick()/2;
+	m_pPlayer->m_aPlayerTick[TickState::Die] = Server()->Tick()/2;
 	m_pPlayer->m_Spawned = true;
 	GS()->m_World.RemoveEntity(this);
 	GS()->m_World.m_Core.m_apCharacters[ClientID] = 0;

@@ -10,11 +10,11 @@ MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
 
 CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 {
-	for(short & SortTab : m_SortTabs)
+	for(short & SortTab : m_aSortTabs)
 		SortTab = 0;
 
-	m_PlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed();
-	m_PlayerTick[TickState::Die] = Server()->Tick();
+	m_aPlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed();
+	m_aPlayerTick[TickState::Die] = Server()->Tick();
 	m_Spawned = true;
 	m_LastVoteMenu = NOPE;
 	m_OpenVoteMenu = MenuList::MAIN_MENU;
@@ -79,7 +79,7 @@ void CPlayer::Tick()
 			PotionsTick();
 		}
 	}
-	else if (m_Spawned && m_PlayerTick[TickState::Respawn] + Server()->TickSpeed() * 3 <= Server()->Tick())
+	else if (m_Spawned && m_aPlayerTick[TickState::Respawn] + Server()->TickSpeed() * 3 <= Server()->Tick())
 		TryRespawn();
 
 	TickOnlinePlayer();
@@ -439,8 +439,8 @@ bool CPlayer::CheckEffect(const char* Potion)
 
 bool CPlayer::GetHidenMenu(int HideID) const
 {
-	if(m_HidenMenu.find(HideID) != m_HidenMenu.end())
-		return m_HidenMenu.at(HideID);
+	if(m_aHiddenMenu.find(HideID) != m_aHiddenMenu.end())
+		return m_aHiddenMenu.at(HideID);
 
 	return false;
 }
@@ -504,7 +504,7 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 	{
 		if(GS()->IsDungeon())
 		{
-			const int DungeonID = GS()->DungeonID();
+			const int DungeonID = GS()->GetDungeonID();
 			if(!DungeonJob::Dungeon[DungeonID].IsDungeonPlaying())
 			{
 				GetTempData().m_TempDungeonReady ^= true;
@@ -526,10 +526,10 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 		// conversations for vanilla clients
 		if(GetTalkedID() > 0 && !GS()->IsMmoClient(m_ClientID))
 		{
-			if(m_PlayerTick[TickState::LastDialog] && m_PlayerTick[TickState::LastDialog] > GS()->Server()->Tick())
+			if(m_aPlayerTick[TickState::LastDialog] && m_aPlayerTick[TickState::LastDialog] > GS()->Server()->Tick())
 				return true;
 
-			m_PlayerTick[TickState::LastDialog] = GS()->Server()->Tick() + (GS()->Server()->TickSpeed() / 4);
+			m_aPlayerTick[TickState::LastDialog] = GS()->Server()->Tick() + (GS()->Server()->TickSpeed() / 4);
 			SetTalking(GetTalkedID(), true);
 			return true;
 		}
@@ -554,14 +554,14 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 		if(VoteID < TAB_STAT)
 			return true;
 
-		for(auto& x : m_HidenMenu)
+		for(auto& x : m_aHiddenMenu)
 		{
 			if((x.first > NUM_TAB_MENU && x.first != VoteID))
 				x.second = false;
 		}
-		m_HidenMenu[VoteID] ^= true;
-		if(m_HidenMenu[VoteID] == false)
-			m_HidenMenu.erase(VoteID);
+		m_aHiddenMenu[VoteID] ^= true;
+		if(m_aHiddenMenu[VoteID] == false)
+			m_aHiddenMenu.erase(VoteID);
 
 		GS()->ResetVotes(m_ClientID, m_OpenVoteMenu);
 		return true;
@@ -607,7 +607,7 @@ int CPlayer::GetAttributeCount(int BonusID, bool ActiveFinalStats)
 		AttributEx /= CGS::ms_aAttributsInfo[BonusID].m_Devide;
 
 	// if the best tank class is selected among the players we return the sync dungeon stats
-	if(GS()->IsDungeon() && CGS::ms_aAttributsInfo[BonusID].m_UpgradePrice < 10 && DungeonJob::Dungeon[GS()->DungeonID()].IsDungeonPlaying())
+	if(GS()->IsDungeon() && CGS::ms_aAttributsInfo[BonusID].m_UpgradePrice < 10 && DungeonJob::Dungeon[GS()->GetDungeonID()].IsDungeonPlaying())
 	{
 		CGameControllerDungeon* pDungeon = static_cast<CGameControllerDungeon*>(GS()->m_pController);
 		return pDungeon->GetAttributeDungeonSync(this, BonusID);
@@ -750,24 +750,24 @@ void CPlayer::ClearTalking()
 // - - - - - - F O R M A T - - - - - T E X T - - - - - - - - - 
 const char *CPlayer::FormatedTalkedText() 
 { 
-	return GS()->Server()->Localization()->Localize(GetLanguage(), m_FormatTalkQuest); 
+	return GS()->Server()->Localization()->Localize(GetLanguage(), m_aFormatTalkQuest); 
 }
 
 void CPlayer::FormatTextQuest(int DataBotID, const char *pText)
 {
-	if(!GS()->Mmo()->BotsData()->IsDataBotValid(DataBotID) || m_FormatTalkQuest[0] != '\0') 
+	if(!GS()->Mmo()->BotsData()->IsDataBotValid(DataBotID) || m_aFormatTalkQuest[0] != '\0') 
 		return;
 
-	str_copy(m_FormatTalkQuest, pText, sizeof(m_FormatTalkQuest));
-	str_replace(m_FormatTalkQuest, "[Player]", GS()->Server()->ClientName(m_ClientID));
-	str_replace(m_FormatTalkQuest, "[Talked]", BotJob::ms_aDataBot[DataBotID].m_aNameBot);
-	str_replace(m_FormatTalkQuest, "[Time]", GS()->Server()->GetStringTypeDay());
-	str_replace(m_FormatTalkQuest, "[Here]", GS()->Server()->GetWorldName(GS()->GetWorldID()));
+	str_copy(m_aFormatTalkQuest, pText, sizeof(m_aFormatTalkQuest));
+	str_replace(m_aFormatTalkQuest, "[Player]", GS()->Server()->ClientName(m_ClientID));
+	str_replace(m_aFormatTalkQuest, "[Talked]", BotJob::ms_aDataBot[DataBotID].m_aNameBot);
+	str_replace(m_aFormatTalkQuest, "[Time]", GS()->Server()->GetStringTypeDay());
+	str_replace(m_aFormatTalkQuest, "[Here]", GS()->Server()->GetWorldName(GS()->GetWorldID()));
 }
 
 void CPlayer::ClearFormatQuestText()
 {
-	mem_zero(m_FormatTalkQuest, sizeof(m_FormatTalkQuest));
+	mem_zero(m_aFormatTalkQuest, sizeof(m_aFormatTalkQuest));
 }
 
 void CPlayer::ChangeWorld(int WorldID)

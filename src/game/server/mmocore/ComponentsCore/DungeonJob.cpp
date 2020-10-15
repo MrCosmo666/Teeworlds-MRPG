@@ -81,7 +81,7 @@ void DungeonJob::ShowTankVotingDungeon(CPlayer* pPlayer)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
-	const int DungeonWorldID = Dungeon[GS()->DungeonID()].m_WorldID;
+	const int DungeonWorldID = Dungeon[GS()->GetDungeonID()].m_WorldID;
 	pPlayer->m_Colored = GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "Voting for the choice of tank!");
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
@@ -136,7 +136,7 @@ bool DungeonJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMe
 			ShowTankVotingDungeon(pPlayer);
 			GS()->AV(ClientID, "null");
 			pPlayer->m_Colored = { 30, 8, 8 };
-			GS()->AVL(ClientID, "DUNGEONEXIT", "Exit dungeon {STR} (warning)", Dungeon[GS()->DungeonID()].m_aName);
+			GS()->AVL(ClientID, "DUNGEONEXIT", "Exit dungeon {STR} (warning)", Dungeon[GS()->GetDungeonID()].m_aName);
 		}
 		GS()->AddBackpage(ClientID);
 		return true;

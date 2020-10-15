@@ -166,7 +166,7 @@ vec2 WorldSwapJob::GetPositionQuestBot(int ClientID, int QuestID)
 
 int WorldSwapJob::GetWorldType() const
 {
-	if(GS()->DungeonID())
+	if(GS()->GetDungeonID())
 		return WORLD_DUNGEON;
 	return WORLD_STANDARD;
 }

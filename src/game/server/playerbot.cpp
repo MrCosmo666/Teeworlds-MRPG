@@ -15,7 +15,7 @@ CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int Spaw
 {
 	m_Spawned = true;
 	m_DungeonAllowedSpawn = false;
-	m_PlayerTick[TickState::Respawn] = Server()->Tick();
+	m_aPlayerTick[TickState::Respawn] = Server()->Tick();
 	(this)->SendClientInfo(-1);
 }
 
@@ -54,7 +54,7 @@ void CPlayerBot::Tick()
 			m_ViewPos = m_pCharacter->GetPos();
 		}
 	} 
-	else if(m_Spawned && m_PlayerTick[TickState::Respawn]+Server()->TickSpeed()*3 <= Server()->Tick())
+	else if(m_Spawned && m_aPlayerTick[TickState::Respawn]+Server()->TickSpeed()*3 <= Server()->Tick())
 		TryRespawn();
 
 	HandleTuningParams();
