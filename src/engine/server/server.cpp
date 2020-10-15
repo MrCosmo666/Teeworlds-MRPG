@@ -311,10 +311,10 @@ const char* CServer::GetStringTypeDay() const
 // Format Day to Int
 int CServer::GetEnumTypeDay() const
 {
-	if(GetHourWorld() >= 0 && GetHourWorld() < 6) return DayType::NIGHTTYPE;
-	else if(GetHourWorld() >= 6 && GetHourWorld() < 13) return DayType::MORNINGTYPE;
-	else if(GetHourWorld() >= 13 && GetHourWorld() < 19) return DayType::DAYTYPE;
-	else return DayType::EVENINGTYPE;
+	if(GetHourWorld() >= 0 && GetHourWorld() < 6) return DayType::NIGHT_TYPE;
+	else if(GetHourWorld() >= 6 && GetHourWorld() < 13) return DayType::MORNING_TYPE;
+	else if(GetHourWorld() >= 13 && GetHourWorld() < 19) return DayType::DAY_TYPE;
+	else return DayType::EVENING_TYPE;
 }
 
 void CServer::SetClientName(int ClientID, const char *pName)

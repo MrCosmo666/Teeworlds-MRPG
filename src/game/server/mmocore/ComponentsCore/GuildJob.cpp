@@ -469,7 +469,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 
 		const int DecoItemID = VoteID;
 		pPlayer->GetTempData().m_TempDecoractionID = DecoItemID;
-		pPlayer->GetTempData().m_TempDecorationType = DECOTYPE_GUILD_HOUSE;
+		pPlayer->GetTempData().m_TempDecorationType = DECORATIONS_GUILD_HOUSE;
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
 		return true;
 	}

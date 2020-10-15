@@ -594,7 +594,7 @@ bool HouseJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const in
 
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
 		pPlayer->GetTempData().m_TempDecoractionID = VoteID;
-		pPlayer->GetTempData().m_TempDecorationType = DECOTYPE_HOUSE;
+		pPlayer->GetTempData().m_TempDecorationType = DECORATIONS_HOUSE;
 		return true;
 	}
 

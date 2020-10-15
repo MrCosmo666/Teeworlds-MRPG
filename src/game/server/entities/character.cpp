@@ -191,7 +191,7 @@ bool CCharacter::DecoInteractive()
 		if(m_pPlayer->GetItem(DecoID).m_Count <= 0 || GS()->GetItemInfo(DecoID).m_Type != ItemType::TYPE_DECORATION)
 			return false;
 
-		if (InteractiveType == DECOTYPE_HOUSE)
+		if (InteractiveType == DECORATIONS_HOUSE)
 		{
 			const int HouseID = GS()->Mmo()->House()->PlayerHouseID(m_pPlayer);
 			if (GS()->Mmo()->House()->AddDecorationHouse(DecoID, HouseID, m_pHelper->MousePos()))
@@ -202,7 +202,7 @@ bool CCharacter::DecoInteractive()
 				return true;
 			}
 		}
-		else if (InteractiveType == DECOTYPE_GUILD_HOUSE)
+		else if (InteractiveType == DECORATIONS_GUILD_HOUSE)
 		{
 			const int GuildID = m_pPlayer->Acc().m_GuildID;
 			if (GS()->Mmo()->Member()->AddDecorationHouse(DecoID, GuildID, m_pHelper->MousePos()))

@@ -1097,9 +1097,9 @@ void CGS::OnTickMainWorld()
 	if(m_DayEnumType != Server()->GetEnumTypeDay())
 	{
 		m_DayEnumType = Server()->GetEnumTypeDay(); 
-		if(m_DayEnumType == DayType::NIGHTTYPE)
+		if(m_DayEnumType == DayType::NIGHT_TYPE)
 			m_MultiplierExp = 100 + random_int() % 200;
-		else if(m_DayEnumType == DayType::MORNINGTYPE)
+		else if(m_DayEnumType == DayType::MORNING_TYPE)
 			m_MultiplierExp = 100;
 	
 		SendDayInfo(-1);
@@ -2364,9 +2364,9 @@ void CGS::SendDayInfo(int ClientID)
 {
 	if(ClientID == -1)
 		Chat(-1, "{STR} came! Good {STR}!", Server()->GetStringTypeDay(), Server()->GetStringTypeDay());
-	if(m_DayEnumType == DayType::NIGHTTYPE)
+	if(m_DayEnumType == DayType::NIGHT_TYPE)
 		Chat(ClientID, "Nighttime experience was increase to {INT}%", &m_MultiplierExp);
-	else if(m_DayEnumType == DayType::MORNINGTYPE)
+	else if(m_DayEnumType == DayType::MORNING_TYPE)
 		Chat(ClientID, "Daytime experience was downgraded to 100%");
 }
 
