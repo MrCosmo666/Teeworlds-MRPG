@@ -176,7 +176,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	}
 	else if(Table == SaveType::SAVE_POSITION)
 	{
-		int LatestCorrectWorldID = Account()->GetLastHistoryCorrectWorldID(pPlayer);
+		int LatestCorrectWorldID = Account()->GetHistoryLatestCorrectWorldID(pPlayer);
 		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", LatestCorrectWorldID, pPlayer->Acc().m_AuthID);
 	}
 	else if(Table == SaveType::SAVE_LANGUAGE)

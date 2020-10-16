@@ -83,7 +83,7 @@ public:
 	void LoadAccount(CPlayer *pPlayer, bool FirstInitilize = false);
 	void DiscordConnect(int ClientID, const char *pDID);
 
-	int GetLastHistoryCorrectWorldID(CPlayer* pPlayer) const;
+	int GetHistoryLatestCorrectWorldID(CPlayer* pPlayer) const;
 	int GetRank(int AuthID);
 	bool IsActive(int ClientID) const
 	{

@@ -253,7 +253,7 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 
 			if(!m_SafeTick)
 			{
-				int LatestCorrectWorldID = GS()->Mmo()->Account()->GetLastHistoryCorrectWorldID(pChr->GetPlayer());
+				int LatestCorrectWorldID = GS()->Mmo()->Account()->GetHistoryLatestCorrectWorldID(pChr->GetPlayer());
 				GS()->Chat(ClientID, "You were thrown out of dungeon!");
 				pChr->GetPlayer()->ChangeWorld(LatestCorrectWorldID);
 				return false;

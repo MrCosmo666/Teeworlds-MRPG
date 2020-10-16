@@ -194,7 +194,7 @@ bool DungeonJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const 
 	// dungeon exit
 	else if (PPSTR(CMD, "DUNGEONEXIT") == 0)
 	{
-		int LatestCorrectWorldID = Job()->Account()->GetLastHistoryCorrectWorldID(pPlayer);
+		int LatestCorrectWorldID = Job()->Account()->GetHistoryLatestCorrectWorldID(pPlayer);
 		pPlayer->ChangeWorld(LatestCorrectWorldID);
 		return true;
 	}
