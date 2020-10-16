@@ -71,7 +71,7 @@ bool CInventoryItem::Add(int Count, int Settings, int Enchant, bool Message)
 	GS()->Mmo()->Item()->GiveItem(m_pPlayer, m_ItemID, Count, Settings, Enchant);
 
 	// check the empty slot if yes then put the item on
-	const bool AutoEquip = (Info().m_Type == ItemType::TYPE_EQUIP && m_pPlayer->GetEquippedItem(Info().m_Function) <= 0) || Info().m_Type == TYPE_MODULE;
+	const bool AutoEquip = (Info().m_Type == ItemType::TYPE_EQUIP && m_pPlayer->GetEquippedItemID(Info().m_Function) <= 0) || Info().m_Type == TYPE_MODULE;
 	if(AutoEquip)
 	{
 		if(!IsEquipped())
@@ -117,12 +117,12 @@ bool CInventoryItem::Equip()
 	if(Info().m_Type == ItemType::TYPE_EQUIP)
 	{
 		const int EquipID = Info().m_Function;
-		int EquipItemID = m_pPlayer->GetEquippedItem(EquipID, m_ItemID);
+		int EquipItemID = m_pPlayer->GetEquippedItemID(EquipID, m_ItemID);
 		while(EquipItemID >= 1)
 		{
 			InventoryItem& EquipItem = m_pPlayer->GetItem(EquipItemID);
 			EquipItem.SetSettings(0);
-			EquipItemID = m_pPlayer->GetEquippedItem(EquipID, m_ItemID);
+			EquipItemID = m_pPlayer->GetEquippedItemID(EquipID, m_ItemID);
 		}
 
 		if(Info().m_Function == EQUIP_DISCORD)

@@ -30,8 +30,7 @@ public:
 		int m_aMiner[MINER::NUM_MINER];
 
 		// world
-		short m_WorldID;
-		short m_LastWorldID;
+		std::list < int > m_aHistoryWorld;
 
 		// skins
 		char m_aaSkinPartNames[NUM_SKINPARTS][MAX_SKIN_LENGTH];
@@ -83,7 +82,8 @@ public:
 	int LoginAccount(int ClientID, const char *Login, const char *Password);
 	void LoadAccount(CPlayer *pPlayer, bool FirstInitilize = false);
 	void DiscordConnect(int ClientID, const char *pDID);
-	
+
+	int GetLastHistoryCorrectWorldID(CPlayer* pPlayer) const;
 	int GetRank(int AuthID);
 	bool IsActive(int ClientID) const
 	{

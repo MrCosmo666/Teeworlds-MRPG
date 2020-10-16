@@ -7,7 +7,7 @@
 
 using namespace sqlstr;
 
-std::map < int , DungeonJob::StructDungeon > DungeonJob::Dungeon;
+std::map < int , DungeonJob::StructDungeon > DungeonJob::ms_aDungeon;
 
 DungeonJob::DungeonJob()
 {
@@ -15,14 +15,20 @@ DungeonJob::DungeonJob()
 	while (RES->next())
 	{
 		const int ID = RES->getInt("ID");
-		str_copy(Dungeon[ID].m_aName, RES->getString("Name").c_str(), sizeof(Dungeon[ID].m_aName));
-		Dungeon[ID].m_Level = RES->getInt("Level");
-		Dungeon[ID].m_DoorX = RES->getInt("DoorX");
-		Dungeon[ID].m_DoorY = RES->getInt("DoorY");
-		Dungeon[ID].m_OpenQuestID = RES->getInt("OpenQuestID");
-		Dungeon[ID].m_WorldID = RES->getInt("WorldID");
-		Dungeon[ID].m_IsStory = (bool)RES->getBoolean("Story");
+		str_copy(ms_aDungeon[ID].m_aName, RES->getString("Name").c_str(), sizeof(ms_aDungeon[ID].m_aName));
+		ms_aDungeon[ID].m_Level = RES->getInt("Level");
+		ms_aDungeon[ID].m_DoorX = RES->getInt("DoorX");
+		ms_aDungeon[ID].m_DoorY = RES->getInt("DoorY");
+		ms_aDungeon[ID].m_OpenQuestID = RES->getInt("OpenQuestID");
+		ms_aDungeon[ID].m_WorldID = RES->getInt("WorldID");
+		ms_aDungeon[ID].m_IsStory = (bool)RES->getBoolean("Story");
 	}
+}
+
+bool DungeonJob::IsDungeonWorld(int WorldID) const
+{
+	return std::find_if(ms_aDungeon.begin(), ms_aDungeon.end(),
+		[WorldID](const std::pair<int, StructDungeon>& pDungeon) { return pDungeon.second.m_WorldID == WorldID; }) != ms_aDungeon.end();
 }
 
 void DungeonJob::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds)
@@ -56,7 +62,7 @@ void DungeonJob::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
 void DungeonJob::ShowDungeonsList(CPlayer* pPlayer, bool Story)
 {
 	const int ClientID = pPlayer->GetCID();
-	for (const auto& dungeon : Dungeon)
+	for (const auto& dungeon : ms_aDungeon)
 	{
 		if(dungeon.second.m_IsStory != Story)
 			continue;
@@ -81,7 +87,7 @@ void DungeonJob::ShowTankVotingDungeon(CPlayer* pPlayer)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
-	const int DungeonWorldID = Dungeon[GS()->GetDungeonID()].m_WorldID;
+	const int DungeonWorldID = ms_aDungeon[GS()->GetDungeonID()].m_WorldID;
 	pPlayer->m_Colored = GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "Voting for the choice of tank!");
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
@@ -98,7 +104,7 @@ void DungeonJob::ShowTankVotingDungeon(CPlayer* pPlayer)
 void DungeonJob::CheckQuestingOpened(CPlayer *pPlayer, int QuestID)
 {
 	const int ClientID = pPlayer->GetCID();
-	for (const auto& dungeon : Dungeon)
+	for (const auto& dungeon : ms_aDungeon)
 	{
 		if (QuestID == dungeon.second.m_OpenQuestID)
 			GS()->Chat(-1, "{STR} opened dungeon ({STR})!", GS()->Server()->ClientName(ClientID), dungeon.second.m_aName);
@@ -136,7 +142,7 @@ bool DungeonJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMe
 			ShowTankVotingDungeon(pPlayer);
 			GS()->AV(ClientID, "null");
 			pPlayer->m_Colored = { 30, 8, 8 };
-			GS()->AVL(ClientID, "DUNGEONEXIT", "Exit dungeon {STR} (warning)", Dungeon[GS()->GetDungeonID()].m_aName);
+			GS()->AVL(ClientID, "DUNGEONEXIT", "Exit dungeon {STR} (warning)", ms_aDungeon[GS()->GetDungeonID()].m_aName);
 		}
 		GS()->AddBackpage(ClientID);
 		return true;
@@ -152,20 +158,20 @@ bool DungeonJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const 
 
 	if (PPSTR(CMD, "DUNGEONJOIN") == 0)
 	{
-		if(GS()->IsPlayerEqualWorldID(ClientID, Dungeon[VoteID].m_WorldID))
+		if(GS()->IsPlayerEqualWorldID(ClientID, ms_aDungeon[VoteID].m_WorldID))
 		{
 			GS()->Chat(ClientID, "You are already in this dungeon!");
 			GS()->UpdateVotes(ClientID, MenuList::MENU_DUNGEONS);
 			return true;
 		}
-		if (Dungeon[VoteID].IsDungeonPlaying())
+		if (ms_aDungeon[VoteID].IsDungeonPlaying())
 		{
 			GS()->Chat(ClientID, "At the moment players are passing this dungeon!");
 			GS()->UpdateVotes(ClientID, MenuList::MENU_DUNGEONS);
 			return true;
 		}
 
-		if (pPlayer->Acc().m_Level < Dungeon[VoteID].m_Level)
+		if (pPlayer->Acc().m_Level < ms_aDungeon[VoteID].m_Level)
 		{
 			GS()->Chat(ClientID, "Your level is low to pass this dungeon!");
 			GS()->UpdateVotes(ClientID, MenuList::MENU_DUNGEONS);
@@ -179,19 +185,30 @@ bool DungeonJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const 
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_POSITION);
 		}
 
-		GS()->Chat(-1, "{STR} joined to Dungeon {STR}!", GS()->Server()->ClientName(ClientID), Dungeon[VoteID].m_aName);
+		GS()->Chat(-1, "{STR} joined to Dungeon {STR}!", GS()->Server()->ClientName(ClientID), ms_aDungeon[VoteID].m_aName);
 		GS()->Chat(ClientID, "You can vote for the choice of tank (Dungeon Tab)!");
-		pPlayer->ChangeWorld(Dungeon[VoteID].m_WorldID);
+		pPlayer->ChangeWorld(ms_aDungeon[VoteID].m_WorldID);
 		return true;
 	}
+	
+	// dungeon exit
 	else if (PPSTR(CMD, "DUNGEONEXIT") == 0)
 	{
-		pPlayer->ChangeWorld(pPlayer->Acc().m_LastWorldID);
+		int LatestCorrectWorldID = Job()->Account()->GetLastHistoryCorrectWorldID(pPlayer);
+		pPlayer->ChangeWorld(LatestCorrectWorldID);
 		return true;
 	}
+
+	// dungeon voting
 	else if(PPSTR(CMD, "DUNGEONVOTE") == 0)
 	{
 		CPlayer* pSearchPlayer = GS()->GetPlayer(VoteID, true);
+		if(!pSearchPlayer)
+		{
+			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			return true;
+		}
+
 		if(VoteID == ClientID)
 		{
 			GS()->Chat(ClientID, "You can't vote for yourself!");
@@ -206,16 +223,10 @@ bool DungeonJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const 
 			return true;
 		}
 
-		if(!pSearchPlayer)
-		{
-			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
-			return true;
-		}
-
 		pPlayer->GetTempData().m_TempAlreadyVotedDungeon = true;
 		pSearchPlayer->GetTempData().m_TempTankVotingDungeon++;
 		GS()->ChatWorldID(pPlayer->GetPlayerWorldID(), "[Dungeon]", "{STR} voted for {STR}.", GS()->Server()->ClientName(ClientID), GS()->Server()->ClientName(VoteID));
-		GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		GS()->UpdateVotes(pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	return false;

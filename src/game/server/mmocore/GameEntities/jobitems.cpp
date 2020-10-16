@@ -57,7 +57,7 @@ void CJobItems::Work(int ClientID)
 	InventoryItem &pPlayerWorkedItem = pPlayer->GetItem(m_ItemID);
 	if(m_Type == 1)
 	{
-		int EquipItem = pPlayer->GetEquippedItem(EQUIP_MINER);
+		int EquipItem = pPlayer->GetEquippedItemID(EQUIP_MINER);
 		if (EquipItem <= 0)
 		{
 			GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Need equip Pickaxe!");

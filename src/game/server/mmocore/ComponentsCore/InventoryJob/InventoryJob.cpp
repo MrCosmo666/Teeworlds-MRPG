@@ -254,7 +254,7 @@ void InventoryJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pItemPlay
 	}
 
 	// not allowed drop equipped hammer
-	if (ItemID == pPlayer->GetEquippedItem(EQUIP_HAMMER))
+	if (ItemID == pPlayer->GetEquippedItemID(EQUIP_HAMMER))
 		return;
 
 	if (pItemPlayer.Info().m_Dysenthis > 0)
@@ -421,7 +421,7 @@ bool InventoryJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 		const char* pType[NUM_EQUIPS] = { "Hammer", "Gun", "Shotgun", "Grenade", "Rifle", "Pickaxe", "Wings", "Discord" };
 		for (int i = 0; i < NUM_EQUIPS; i++)
 		{
-			const int ItemID = pPlayer->GetEquippedItem(i);
+			const int ItemID = pPlayer->GetEquippedItemID(i);
 			InventoryItem& pItemPlayer = pPlayer->GetItem(ItemID);
 			if (ItemID <= 0 || !pItemPlayer.IsEquipped())
 			{

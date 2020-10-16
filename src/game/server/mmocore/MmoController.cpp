@@ -129,7 +129,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	
 	if(Table == SaveType::SAVE_STATS)
 	{
-		const int EquipDiscord = pPlayer->GetEquippedItem(EQUIP_DISCORD);
+		const int EquipDiscord = pPlayer->GetEquippedItemID(EQUIP_DISCORD);
 		SJK.UD("tw_accounts_data", "Level = '%d', Exp = '%d', DiscordEquip = '%d' WHERE ID = '%d'",
 			pPlayer->Acc().m_Level, pPlayer->Acc().m_Exp, EquipDiscord, pPlayer->Acc().m_AuthID);
 	}
@@ -174,9 +174,10 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	{
 		SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '%d' WHERE ID = '%d'", pPlayer->Acc().m_GuildID, pPlayer->Acc().m_GuildRank, pPlayer->Acc().m_AuthID);	
 	}
-	else if(Table == SaveType::SAVE_POSITION && !GS()->IsDungeon())
+	else if(Table == SaveType::SAVE_POSITION)
 	{
-		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", pPlayer->GetPlayerWorldID(), pPlayer->Acc().m_AuthID);
+		int LatestCorrectWorldID = Account()->GetLastHistoryCorrectWorldID(pPlayer);
+		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", LatestCorrectWorldID, pPlayer->Acc().m_AuthID);
 	}
 	else if(Table == SaveType::SAVE_LANGUAGE)
 	{

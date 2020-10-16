@@ -20,7 +20,7 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	m_TankClientID = -1;
 
 	// door creation to start
-	vec2 PosDoor = vec2(DungeonJob::Dungeon[m_DungeonID].m_DoorX, DungeonJob::Dungeon[m_DungeonID].m_DoorY);
+	vec2 PosDoor = vec2(DungeonJob::ms_aDungeon[m_DungeonID].m_DoorX, DungeonJob::ms_aDungeon[m_DungeonID].m_DoorY);
 	m_DungeonDoor = new DungeonDoor(&GS()->m_World, PosDoor);
 	ChangeState(DUNGEON_WAITING);
 
@@ -54,7 +54,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	// used when changing state to waiting
 	if (State == DUNGEON_WAITING)
 	{
-		DungeonJob::Dungeon[m_DungeonID].m_Progress = 0;
+		DungeonJob::ms_aDungeon[m_DungeonID].m_Progress = 0;
 		m_MaximumTick = 0;
 		m_FinishedTick = 0;
 		m_StartingTick = 0;
@@ -114,7 +114,7 @@ void CGameControllerDungeon::ChangeState(int State)
 		char aTimeFormat[64];
 		str_format(aTimeFormat, sizeof(aTimeFormat), "Time: %d minute(s) %d second(s)", Seconds / 60, Seconds - (Seconds / 60 * 60));
 		GS()->Chat(-1, "Group{STR}!", Buffer.buffer());
-		GS()->Chat(-1, "{STR} finished {STR}!", DungeonJob::Dungeon[m_DungeonID].m_aName, aTimeFormat);
+		GS()->Chat(-1, "{STR} finished {STR}!", DungeonJob::ms_aDungeon[m_DungeonID].m_aName, aTimeFormat);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
@@ -141,8 +141,8 @@ void CGameControllerDungeon::StateTick()
 	// update every second
 	if (Server()->Tick() % Server()->TickSpeed() == 0)
 	{
-		DungeonJob::Dungeon[m_DungeonID].m_Players = Players;
-		DungeonJob::Dungeon[m_DungeonID].m_State = m_StateDungeon;
+		DungeonJob::ms_aDungeon[m_DungeonID].m_Players = Players;
+		DungeonJob::ms_aDungeon[m_DungeonID].m_State = m_StateDungeon;
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
@@ -235,7 +235,7 @@ void CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKil
 	if (KillerID != VictimID && pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
 		const int Progress = 100 - (int)kurosio::translate_to_procent(CountMobs(), LeftMobsToWin());
-		DungeonJob::Dungeon[m_DungeonID].m_Progress = Progress;
+		DungeonJob::ms_aDungeon[m_DungeonID].m_Progress = Progress;
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The dungeon is completed on [{INT}%]", &Progress);
 		UpdateDoorKeyState();
 	}
@@ -253,8 +253,9 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 
 			if(!m_SafeTick)
 			{
+				int LatestCorrectWorldID = GS()->Mmo()->Account()->GetLastHistoryCorrectWorldID(pChr->GetPlayer());
 				GS()->Chat(ClientID, "You were thrown out of dungeon!");
-				pChr->GetPlayer()->ChangeWorld(pChr->GetPlayer()->Acc().m_LastWorldID);
+				pChr->GetPlayer()->ChangeWorld(LatestCorrectWorldID);
 				return false;
 			}
 		}

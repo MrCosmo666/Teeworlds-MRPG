@@ -9,7 +9,7 @@ class DungeonJob : public MmoComponent
 {
 	~DungeonJob()
 	{
-		Dungeon.clear();
+		ms_aDungeon.clear();
 	};
 
 	struct StructDungeon
@@ -28,10 +28,10 @@ class DungeonJob : public MmoComponent
 		bool IsDungeonPlaying() const { return m_State > 1; };
 	};
 
-
 public:
-	typedef std::map < int, StructDungeon > DungeonType;
-	static DungeonType Dungeon;
+	static std::map < int, StructDungeon > ms_aDungeon;
+
+	bool IsDungeonWorld(int WorldID) const;
 
 	DungeonJob();
 

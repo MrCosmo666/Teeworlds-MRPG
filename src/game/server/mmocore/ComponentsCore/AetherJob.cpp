@@ -128,7 +128,7 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 	const int ClientID = pPlayer->GetCID();
 	GS()->ShowItemValueInformation(pPlayer);
 	GS()->AV(ClientID, "null");
-	
+
 	GS()->AVH(ClientID, TAB_AETHER, GOLDEN_COLOR, "Available aethers");
 	if (Job()->Member()->GetGuildHouseID(pPlayer->Acc().m_GuildID) >= 1)
 		GS()->AVM(ClientID, "MSPAWN", NOPE, TAB_AETHER, "Move to Guild House - free");

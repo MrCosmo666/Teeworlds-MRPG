@@ -505,7 +505,7 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 		if(GS()->IsDungeon())
 		{
 			const int DungeonID = GS()->GetDungeonID();
-			if(!DungeonJob::Dungeon[DungeonID].IsDungeonPlaying())
+			if(!DungeonJob::ms_aDungeon[DungeonID].IsDungeonPlaying())
 			{
 				GetTempData().m_TempDungeonReady ^= true;
 				GS()->Chat(m_ClientID, "You change the ready mode to {STR}!", GetTempData().m_TempDungeonReady ? "ready" : "not ready");
@@ -516,13 +516,6 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 	// - - - - - F4- - - - - - -
 	else
 	{
-		if(m_PlayerFlags & PLAYERFLAG_SCOREBOARD && GetEquippedItem(EQUIP_WINGS) > 0)
-		{
-			m_Flymode ^= true;
-			GS()->Chat(m_ClientID, "You {STR} fly mode, your hook changes!", m_Flymode ? "Enable" : "Disable");
-			return true;
-		}
-
 		// conversations for vanilla clients
 		if(GetTalkedID() > 0 && !GS()->IsMmoClient(m_ClientID))
 		{
@@ -531,6 +524,13 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 
 			m_aPlayerTick[TickState::LastDialog] = GS()->Server()->Tick() + (GS()->Server()->TickSpeed() / 4);
 			SetTalking(GetTalkedID(), true);
+			return true;
+		}
+
+		if(m_PlayerFlags & PLAYERFLAG_SCOREBOARD && GetEquippedItemID(EQUIP_WINGS) > 0)
+		{
+			m_Flymode ^= true;
+			GS()->Chat(m_ClientID, "You {STR} fly mode, your hook changes!", m_Flymode ? "Enable" : "Disable");
 			return true;
 		}
 	}
@@ -583,7 +583,7 @@ CSkill &CPlayer::GetSkill(int SkillID)
 	return SkillsJob::ms_aSkills[m_ClientID][SkillID];
 }
 
-int CPlayer::GetEquippedItem(int EquipID, int SkipItemID) const
+int CPlayer::GetEquippedItemID(int EquipID, int SkipItemID) const
 {
 	for(const auto& it : InventoryJob::ms_aItems[m_ClientID])
 	{
@@ -607,7 +607,7 @@ int CPlayer::GetAttributeCount(int BonusID, bool ActiveFinalStats)
 		AttributEx /= CGS::ms_aAttributsInfo[BonusID].m_Devide;
 
 	// if the best tank class is selected among the players we return the sync dungeon stats
-	if(GS()->IsDungeon() && CGS::ms_aAttributsInfo[BonusID].m_UpgradePrice < 10 && DungeonJob::Dungeon[GS()->GetDungeonID()].IsDungeonPlaying())
+	if(GS()->IsDungeon() && CGS::ms_aAttributsInfo[BonusID].m_UpgradePrice < 10 && DungeonJob::ms_aDungeon[GS()->GetDungeonID()].IsDungeonPlaying())
 	{
 		CGameControllerDungeon* pDungeon = static_cast<CGameControllerDungeon*>(GS()->m_pController);
 		return pDungeon->GetAttributeDungeonSync(this, BonusID);
@@ -784,7 +784,7 @@ void CPlayer::ChangeWorld(int WorldID)
 		GS()->m_World.m_Core.m_apCharacters[m_ClientID] = 0;
 	}
 
-	Acc().m_LastWorldID = GS()->GetWorldID();
+	Acc().m_aHistoryWorld.push_front(WorldID);
 	Server()->ChangeWorld(m_ClientID, WorldID);
 }
 

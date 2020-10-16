@@ -10,6 +10,13 @@ using namespace sqlstr;
 std::map < int, AccountMainJob::StructData > AccountMainJob::ms_aData;
 std::map < int, AccountMainJob::StructTempPlayerData > AccountMainJob::ms_aPlayerTempData;
 
+int AccountMainJob::GetLastHistoryCorrectWorldID(CPlayer* pPlayer) const
+{
+	const auto pWorldIterator = std::find_if(pPlayer->Acc().m_aHistoryWorld.begin(), pPlayer->Acc().m_aHistoryWorld.end(),
+		[=](int WorldID) { return !Job()->Dungeon()->IsDungeonWorld(WorldID); });
+	return pWorldIterator != pPlayer->Acc().m_aHistoryWorld.end() ? *pWorldIterator : (int)MAIN_WORLD;
+}
+
 int AccountMainJob::SendAuthCode(int ClientID, int Code)
 {
 	if(GS()->IsMmoClient(ClientID))
@@ -123,7 +130,8 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		pPlayer->Acc().m_GuildID = ACCOUNTDATA->getInt("GuildID");
 		pPlayer->Acc().m_Upgrade = ACCOUNTDATA->getInt("Upgrade");
 		pPlayer->Acc().m_GuildRank = ACCOUNTDATA->getInt("GuildRank");
-		pPlayer->Acc().m_WorldID = ACCOUNTDATA->getInt("WorldID");
+		pPlayer->Acc().m_aHistoryWorld.push_front(ACCOUNTDATA->getInt("WorldID"));
+
 		for (const auto& at : CGS::ms_aAttributsInfo)
 		{
 			if (str_comp_nocase(at.second.m_aFieldName, "unfield") != 0)
@@ -172,7 +180,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	char pMsg[256], pLoggin[64];
 	str_format(pLoggin, sizeof(pLoggin), "%s logged in Account ID %d", GS()->Server()->ClientName(ClientID), pPlayer->Acc().m_AuthID);
 	str_format(pMsg, sizeof(pMsg), "?player=%s&rank=%d&dicid=%d",
-		GS()->Server()->ClientName(ClientID), Rank, pPlayer->GetEquippedItem(EQUIP_DISCORD));
+		GS()->Server()->ClientName(ClientID), Rank, pPlayer->GetEquippedItemID(EQUIP_DISCORD));
 	GS()->Server()->SendDiscordGenerateMessage("16757248", pLoggin, pMsg);
 #endif
 
@@ -189,9 +197,10 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 
 	pPlayer->GetTempData().m_TempSafeSpawn = true;
 
-	if(pPlayer->Acc().m_WorldID != GS()->GetWorldID())
+	int LatestCorrectWorldID = GetLastHistoryCorrectWorldID(pPlayer);
+	if(LatestCorrectWorldID != GS()->GetWorldID())
 	{
-		pPlayer->ChangeWorld(pPlayer->Acc().m_WorldID);
+		pPlayer->ChangeWorld(LatestCorrectWorldID);
 		return;
 	}
 	GS()->SendCompleteEquippingItems(ClientID);

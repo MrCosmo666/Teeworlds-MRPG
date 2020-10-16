@@ -100,7 +100,7 @@ public:
 	virtual	int GetMana() { return GetTempData().m_TempMana; };
 
 	virtual int IsActiveSnappingBot(int SnappingClient) const { return 2; };
-	virtual int GetEquippedItem(int EquipID, int SkipItemID = -1) const;
+	virtual int GetEquippedItemID(int EquipID, int SkipItemID = -1) const;
 	virtual int GetAttributeCount(int BonusID, bool ActiveFinalStats = false);
 	int GetItemsAttributeCount(int AttributeID) const;
 	virtual void UpdateTempData(int Health, int Mana);

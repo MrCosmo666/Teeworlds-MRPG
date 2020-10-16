@@ -76,7 +76,7 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 	int AttributeEx = BotJob::ms_aMobBot[m_SubBotID].m_Power;
 	for (int i = 0; i < MAX_EQUIPPED_SLOTS_BOTS; i++)
 	{
-		const int ItemID = GetEquippedItem(i);
+		const int ItemID = GetEquippedItemID(i);
 		const int ItemBonusCount = GS()->GetItemInfo(ItemID).GetInfoEnchantStats(BonusID);
 		if (ItemID > 0 && ItemBonusCount > 0)
 			AttributeEx += ItemBonusCount;
@@ -243,7 +243,7 @@ bool CPlayerBot::IsActiveQuests(int SnapClientID) const
 	return false;
 }
 
-int CPlayerBot::GetEquippedItem(int EquipID, int SkipItemID) const
+int CPlayerBot::GetEquippedItemID(int EquipID, int SkipItemID) const
 {
 	if (EquipID < EQUIP_HAMMER || EquipID > EQUIP_WINGS || EquipID == EQUIP_MINER)
 		return -1;

@@ -803,7 +803,7 @@ void CGS::SendEquipItem(int ClientID, int TargetID)
 	Msg.m_ClientID = ClientID;
 	for(int k = 0; k < NUM_EQUIPS; k++)
 	{
-		const int EquipItem = pPlayer->GetEquippedItem(k);
+		const int EquipItem = pPlayer->GetEquippedItemID(k);
 		const bool EnchantItem = pPlayer->IsBot() ? false : pPlayer->GetItem(EquipItem).IsEnchantMaxLevel();
 		Msg.m_EquipID[k] = EquipItem;
 		Msg.m_EnchantItem[k] = EnchantItem;
@@ -2405,7 +2405,7 @@ void CGS::UpdateZonePVP()
 void CGS::UpdateZoneDungeon()
 {
 	m_DungeonID = 0;
-	for(const auto& dd : DungeonJob::Dungeon)
+	for(const auto& dd : DungeonJob::ms_aDungeon)
 	{
 		if(m_WorldID != dd.second.m_WorldID)
 			continue;

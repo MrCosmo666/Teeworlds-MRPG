@@ -433,7 +433,7 @@ bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)
 {
 	const int WeaponID = clamp(Weapon, (int)WEAPON_HAMMER, (int)WEAPON_NINJA);
 	const bool IsHammer = (bool)(WeaponID == WEAPON_HAMMER);
-	if(m_pPlayer->GetEquippedItem(WeaponID) <= 0 && !IsHammer)
+	if(m_pPlayer->GetEquippedItemID(WeaponID) <= 0 && !IsHammer)
 	{
 		if(RemoveWeapon(WeaponID))
 			m_ActiveWeapon = m_LastWeapon;
@@ -1017,7 +1017,7 @@ void CCharacter::HandleTuning()
 	}
 	
 	// flight mode
-	if(m_pPlayer->m_Flymode && m_pPlayer->GetEquippedItem(EQUIP_WINGS) > 0)
+	if(m_pPlayer->m_Flymode && m_pPlayer->GetEquippedItemID(EQUIP_WINGS) > 0)
 	{
 		pTuningParams->m_Gravity = 0.00f;
 		pTuningParams->m_HookLength = 700.0f;
