@@ -12,11 +12,11 @@ std::map < int, AccountMainJob::StructTempPlayerData > AccountMainJob::ms_aPlaye
 
 int AccountMainJob::GetHistoryLatestCorrectWorldID(CPlayer* pPlayer) const
 {
-	const auto pWorldIterator = std::find_if(pPlayer->Acc().m_aHistoryWorld.begin(), pPlayer->Acc().m_aHistoryWorld.end(), [=](int WorldID) 
-	{ 
+	const auto pWorldIterator = std::find_if(pPlayer->Acc().m_aHistoryWorld.begin(), pPlayer->Acc().m_aHistoryWorld.end(), [=](int WorldID)
+	{
 		const int QuestToUnlock = Job()->WorldSwap()->GetNecessaryQuest(WorldID);
 		const bool IsValidQuest = Job()->Quest()->IsValidQuest(QuestToUnlock);
-		return !Job()->Dungeon()->IsDungeonWorld(WorldID) && (IsValidQuest && Job()->Quest()->IsCompletedQuest(pPlayer->GetCID(), QuestToUnlock) || !IsValidQuest);
+		return !Job()->Dungeon()->IsDungeonWorld(WorldID) && ((IsValidQuest && Job()->Quest()->IsCompletedQuest(pPlayer->GetCID(), QuestToUnlock)) || !IsValidQuest);
 	});
 	return pWorldIterator != pPlayer->Acc().m_aHistoryWorld.end() ? *pWorldIterator : (int)MAIN_WORLD;
 }
