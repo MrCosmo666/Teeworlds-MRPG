@@ -25,7 +25,7 @@ int QuestJob::GetState(int ClientID, int QuestID) const
 {
 	if(IsValidQuest(QuestID, ClientID))
 		return ms_aQuests[ClientID][QuestID].m_State;
-	return -1;
+	return QuestState::QUEST_NO_ACCEPT;
 }
 
 bool QuestJob::IsCompletedQuest(int ClientID, int QuestID) const
