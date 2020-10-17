@@ -311,10 +311,10 @@ const char* CServer::GetStringTypeDay() const
 // Format Day to Int
 int CServer::GetEnumTypeDay() const
 {
-	if(GetHourWorld() >= 0 && GetHourWorld() < 6) return DayType::NIGHTTYPE;
-	else if(GetHourWorld() >= 6 && GetHourWorld() < 13) return DayType::MORNINGTYPE;
-	else if(GetHourWorld() >= 13 && GetHourWorld() < 19) return DayType::DAYTYPE;
-	else return DayType::EVENINGTYPE;
+	if(GetHourWorld() >= 0 && GetHourWorld() < 6) return DayType::NIGHT_TYPE;
+	else if(GetHourWorld() >= 6 && GetHourWorld() < 13) return DayType::MORNING_TYPE;
+	else if(GetHourWorld() >= 13 && GetHourWorld() < 19) return DayType::DAY_TYPE;
+	else return DayType::EVENING_TYPE;
 }
 
 void CServer::SetClientName(int ClientID, const char *pName)
@@ -322,7 +322,9 @@ void CServer::SetClientName(int ClientID, const char *pName)
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY || !pName)
 		return;
 
-	str_copy(m_aClients[ClientID].m_aName, pName, MAX_NAME_LENGTH);
+	const char* pDefaultName = "(1)";
+	pName = str_utf8_skip_whitespaces(pName);
+	str_utf8_copy_num(m_aClients[ClientID].m_aName, *pName ? pName : pDefaultName, sizeof(m_aClients[ClientID].m_aName), MAX_NAME_LENGTH);
 }
 
 void CServer::SetClientClan(int ClientID, const char *pClan)
@@ -330,7 +332,7 @@ void CServer::SetClientClan(int ClientID, const char *pClan)
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY || !pClan)
 		return;
 
-	str_copy(m_aClients[ClientID].m_aClan, pClan, MAX_CLAN_LENGTH);
+	str_utf8_copy_num(m_aClients[ClientID].m_aClan, pClan, sizeof(m_aClients[ClientID].m_aClan), MAX_CLAN_LENGTH);
 }
 
 void CServer::SetClientCountry(int ClientID, int Country)
@@ -413,14 +415,6 @@ void CServer::ChangeWorld(int ClientID, int MapID)
 
 	m_aClients[ClientID].m_Snapshots.PurgeAll();
 	SendMap(ClientID);
-}
-
-void CServer::QuestBotUpdateOnWorld(int WorldID, int QuestID, int Step)
-{
-	if (WorldID < 0 || WorldID >= COUNT_WORLD)
-		return;
-
-	GameServer(WorldID)->UpdateQuestsBot(QuestID, Step);
 }
 
 void CServer::BackInformationFakeClient(int FakeClientID)
@@ -634,7 +628,7 @@ void CServer::InitRconPasswordIfUnset()
 	m_GeneratedRconPassword = 1;
 }
 
-int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int WorldID)
+int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int64 Mask, int WorldID)
 {
 	if (!pMsg)
 		return -1;
@@ -661,6 +655,10 @@ int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int WorldID)
 			{
 				if (m_aClients[i].m_State == CClient::STATE_INGAME && !m_aClients[i].m_Quitting)
 				{
+					// skip what is not included in the mask
+					if(Mask != -1 && (Mask & ((int64)1 << ClientID)) == 0)
+						continue;
+
 					if (WorldID != -1)
 					{
 						if (m_aClients[i].m_MapID == WorldID)
@@ -670,6 +668,7 @@ int CServer::SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int WorldID)
 						}
 						continue;
 					}
+
 					Packet.m_ClientID = i;
 					m_NetServer.Send(&Packet);
 				}
@@ -798,7 +797,7 @@ void CServer::DoSnapshot(int WorldID)
 int CServer::NewClientCallback(int ClientID, void *pUser)
 {
 	CServer *pThis = (CServer *)pUser;
-	pThis->GameServer(LOCAL_WORLD)->ClearClientData(ClientID);
+	pThis->GameServer(MAIN_WORLD)->ClearClientData(ClientID);
 	str_copy(pThis->m_aClients[ClientID].m_aLanguage, "en", sizeof(pThis->m_aClients[ClientID].m_aLanguage));
 	pThis->m_aClients[ClientID].m_State = CClient::STATE_AUTH;
 	pThis->m_aClients[ClientID].m_aName[0] = 0;
@@ -835,7 +834,7 @@ int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 			pThis->m_aClients[ClientID].m_Quitting = true;
 			pThis->GameServer(i)->OnClientDrop(ClientID, pReason);
 		}
-		pThis->GameServer(LOCAL_WORLD)->ClearClientData(ClientID);
+		pThis->GameServer(MAIN_WORLD)->ClearClientData(ClientID);
 	}
 	
 	pThis->m_aClients[ClientID].m_State = CClient::STATE_EMPTY;
@@ -984,7 +983,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 
 				m_aClients[ClientID].m_Version = Unpacker.GetInt();
 				m_aClients[ClientID].m_State = CClient::STATE_CONNECTING;
-				GameServer(LOCAL_WORLD)->ClearClientData(ClientID);
+				GameServer(MAIN_WORLD)->ClearClientData(ClientID);
 				SendMap(ClientID);
 			}
 		}
@@ -1162,8 +1161,10 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 					m_aClients[ClientID].m_Authed = AUTHED_ADMIN;
 					m_aClients[ClientID].m_pRconCmdToSend = Console()->FirstCommandInfo(IConsole::ACCESS_LEVEL_ADMIN, CFGFLAG_SERVER);
 					SendRconLine(ClientID, "Admin authentication successful. Full remote console access granted.");
+					char aAddrStr[NETADDR_MAXSTRSIZE];
+					net_addr_str(m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), true);
 					char aBuf[256];
-					str_format(aBuf, sizeof(aBuf), "ClientID=%d authed (admin)", ClientID);
+					str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=%s authed (admin)", ClientID, aAddrStr);
 					Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 				}
 				else if(g_Config.m_SvRconModPassword[0] && str_comp(pPw, g_Config.m_SvRconModPassword) == 0)
@@ -1174,8 +1175,10 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 					m_aClients[ClientID].m_Authed = AUTHED_MOD;
 					m_aClients[ClientID].m_pRconCmdToSend = Console()->FirstCommandInfo(IConsole::ACCESS_LEVEL_MOD, CFGFLAG_SERVER);
 					SendRconLine(ClientID, "Moderator authentication successful. Limited remote console access granted.");
+					char aAddrStr[NETADDR_MAXSTRSIZE];
+					net_addr_str(m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), true);
 					char aBuf[256];
-					str_format(aBuf, sizeof(aBuf), "ClientID=%d authed (moderator)", ClientID);
+					str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=%s authed (moderator)", ClientID, aAddrStr);
 					Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 				}
 				else if (g_Config.m_SvRconMaxTries && m_ServerBan.IsBannable(m_NetServer.ClientAddr(ClientID)))
@@ -1296,8 +1299,8 @@ void CServer::GenerateServerInfo(CPacker *pPacker, int Token)
 		{
 			if(m_aClients[i].m_State != CClient::STATE_EMPTY)
 			{
-				pPacker->AddString(ClientName(i), MAX_NAME_LENGTH); // client name
-				pPacker->AddString(ClientClan(i), MAX_CLAN_LENGTH); // client clan
+				pPacker->AddString(ClientName(i), 0); // client name
+				pPacker->AddString(ClientClan(i), 0); // client clan
 				pPacker->AddInt(m_aClients[i].m_Country); // client country
 				pPacker->AddInt(m_aClients[i].m_Score); // client score
 				pPacker->AddInt(GameServer()->IsClientPlayer(i)?0:1); // flag spectator=1, bot=2 (player=0)
@@ -1541,7 +1544,11 @@ int CServer::Run()
 				}
 
 				for(int o = 0; o < COUNT_WORLD; o++)
+				{
 					GameServer(o)->OnTick();
+					if(o == MAIN_WORLD)
+						GameServer(o)->OnTickMainWorld();
+				}
 			}
 
 			// snap game
@@ -1892,7 +1899,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	else if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordChanal) == 0)
 	{
 		std::string Nickname("D|" + message.author.username);
-		m_pServer->GameServer(FREE_SLOTS_WORLD)->FakeChat(Nickname.c_str(), message.content.c_str());
+		m_pServer->GameServer(FAKE_DISCORD_CHAT_WORLD)->FakeChat(Nickname.c_str(), message.content.c_str());
 	}
 	// ideas-voting
 	else if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordIdeasChanal) == 0)

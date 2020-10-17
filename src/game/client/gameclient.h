@@ -122,9 +122,29 @@ public:
 
 	vec2 m_LocalCharacterPos;
 
-	// predicted players
-	CCharacterCore m_PredictedPrevChar;
-	CCharacterCore m_PredictedChar;
+	// Whether we should use/render predicted entities. Depends on client
+	// and game state.
+	bool ShouldUsePredicted() const;
+
+	// Whether we should use/render predictions for a specific `ClientID`.
+	// Should check `ShouldUsePredicted` before checking this.
+	bool ShouldUsePredictedChar(int ClientID) const;
+
+	// Replaces `pPrevChar`, `pPlayerChar`, and `IntraTick` with their predicted
+	// counterparts for `ClientID`. Should check `ShouldUsePredictedChar`
+	// before using this.
+
+	void UsePredictedChar(
+		CNetObj_Character* pPrevChar,
+		CNetObj_Character* pPlayerChar,
+		float* IntraTick,
+		int ClientID
+	) const;
+
+	vec2 GetCharPos(int ClientID, bool Predicted = false) const;
+
+// ---
+
 
 	struct CPlayerInfoItem
 	{
@@ -186,10 +206,10 @@ public:
 	// client data
 	struct CClientData
 	{
-		char m_aName[MAX_NAME_LENGTH];
-		char m_aClan[MAX_CLAN_LENGTH];
+		char m_aName[MAX_NAME_LENGTH * UTF8_BYTE_LENGTH];
+		char m_aClan[MAX_CLAN_LENGTH * UTF8_BYTE_LENGTH];
 		int m_Country;
-		char m_aaSkinPartNames[NUM_SKINPARTS][24];
+		char m_aaSkinPartNames[NUM_SKINPARTS][MAX_SKIN_LENGTH];
 		int m_aUseCustomColors[NUM_SKINPARTS];
 		int m_aSkinPartColors[NUM_SKINPARTS];
 		int m_SkinPartIDs[NUM_SKINPARTS];
@@ -197,9 +217,12 @@ public:
 		int m_Emoticon;
 		int m_EmoticonStart;
 		CCharacterCore m_Predicted;
+		CCharacterCore m_PrevPredicted;
 
 		CTeeRenderInfo m_SkinInfo; // this is what the server reports
 		CTeeRenderInfo m_RenderInfo; // this is what we use
+
+		CNetObj_Character m_Evolved;
 
 		float m_Angle;
 		bool m_Active;
@@ -224,11 +247,10 @@ public:
 	float m_TeamChangeTime;
 	bool m_IsXmasDay;
 	float m_LastSkinChangeTime;
+	int m_IdentityState;
 	bool m_IsEasterDay;
 	bool m_InitComplete;
 	int m_WorldMusicID;
-
-	int RacePrecision() const { return m_Snap.m_pGameDataRace ? m_Snap.m_pGameDataRace->m_Precision : 3; }
 
 	//mmotee
 	bool m_ConnectedMmoServer;
@@ -288,10 +310,15 @@ public:
 	virtual const char *NetVersionHashReal() const;
 	virtual int ClientVersion() const;
 	static void GetPlayerLabel(char* aBuf, int BufferSize, int ClientID, const char* ClientName);
-	bool IsXmas() const;
-	bool IsEaster() const;
 	void StartRendering();
 	
+	bool IsXmas() const;
+	bool IsEaster() const;
+	int RacePrecision() const { return m_Snap.m_pGameDataRace ? m_Snap.m_pGameDataRace->m_Precision : 3; }
+	bool IsWorldPaused() const { return m_Snap.m_pGameData && (m_Snap.m_pGameData->m_GameStateFlags & (GAMESTATEFLAG_PAUSED | GAMESTATEFLAG_ROUNDOVER | GAMESTATEFLAG_GAMEOVER)); }
+	bool IsDemoPlaybackPaused() const;
+	float GetAnimationPlaybackSpeed() const;
+
 	//
 	bool MmoServer()  const { return m_ConnectedMmoServer; }
 	void SendAuthPack(const char* Login, const char* Password, bool StateRegistered);

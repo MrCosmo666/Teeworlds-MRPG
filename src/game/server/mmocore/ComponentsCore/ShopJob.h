@@ -34,7 +34,7 @@ public:
 
 	void CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot &AuSellItem);
 	void CheckAuctionTime();
-	virtual bool OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
+	virtual bool OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
 	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 };
 

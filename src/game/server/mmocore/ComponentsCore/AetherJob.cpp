@@ -33,7 +33,7 @@ void AetherJob::OnInitAccount(CPlayer *pPlayer)
 	}
 }
 
-bool AetherJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool AetherJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 
@@ -42,7 +42,7 @@ bool AetherJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID
 	{
 		const int TeleportID = VoteID;
 		const int Price = VoteID2;
-		if(Price > 0 && pPlayer->CheckFailMoney(Price))
+		if(Price > 0 && !pPlayer->SpendCurrency(Price))
 			return true;
 
 		const vec2 Position = vec2(ms_aTeleport[TeleportID].m_TeleX, ms_aTeleport[TeleportID].m_TeleY);
@@ -127,8 +127,8 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 	CPlayer* pPlayer = pChar->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
 	GS()->ShowItemValueInformation(pPlayer);
-	GS()->AV(ClientID, "null", "");
-	
+	GS()->AV(ClientID, "null");
+
 	GS()->AVH(ClientID, TAB_AETHER, GOLDEN_COLOR, "Available aethers");
 	if (Job()->Member()->GetGuildHouseID(pPlayer->Acc().m_GuildID) >= 1)
 		GS()->AVM(ClientID, "MSPAWN", NOPE, TAB_AETHER, "Move to Guild House - free");
@@ -152,5 +152,5 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 		GS()->AVD(ClientID, "TELEPORT", tl.first, Price, TAB_AETHER, "[{STR}] : {STR} - {INT}gold",
 			tl.second.m_aTeleName, GS()->Server()->GetWorldName(tl.second.m_WorldID), &Price);
 	}
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 }

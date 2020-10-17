@@ -56,7 +56,7 @@ bool CDropItem::TakeItem(int ClientID)
 	
 	// simple subject delivery
 	pPlayerDroppedItem.Add(m_DropItem.m_Count, 0, m_DropItem.m_Enchant);
-	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 10, "\0");
+	GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 10, "\0");
 	GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
 	GS()->UpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
 	GS()->m_World.DestroyEntity(this);
@@ -121,21 +121,21 @@ void CDropItem::Tick()
 	const InventoryItem pPlayerDroppedItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
 	if(!pPlayerDroppedItem.Info().IsEnchantable())
 	{
-		GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}x{INT} {STR}",
+		GS()->Broadcast(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}x{INT} {STR}",
 			m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.m_Count, (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0"));
 		return;
 	}
 
 	if (pPlayerDroppedItem.m_Count > 0)
 	{
-		GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) -> (+{INT}) {STR}", 
+		GS()->Broadcast(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) -> (+{INT}) {STR}", 
 			m_DropItem.Info().GetName(pChar->GetPlayer()),
 			&pPlayerDroppedItem.m_Enchant, &m_DropItem.m_Enchant,
 			(m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0"));
 		return;
 	}
 
-	GS()->SBL(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) {STR}",
+	GS()->Broadcast(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) {STR}",
 		pPlayerDroppedItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.m_Enchant, (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0"));
 }
 

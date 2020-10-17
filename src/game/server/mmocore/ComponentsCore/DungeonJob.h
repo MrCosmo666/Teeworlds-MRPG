@@ -9,7 +9,7 @@ class DungeonJob : public MmoComponent
 {
 	~DungeonJob()
 	{
-		Dungeon.clear();
+		ms_aDungeon.clear();
 	};
 
 	struct StructDungeon
@@ -17,25 +17,25 @@ class DungeonJob : public MmoComponent
 		char m_aName[64];
 		int m_Level;
 		int m_OpenQuestID;
-		int m_WorldID;
-
 		int m_DoorX;
 		int m_DoorY;
-
+		int m_WorldID;
 		int m_Players;
 		int m_Progress;
 		int m_State;
 		bool m_IsStory;
+
+		bool IsDungeonPlaying() const { return m_State > 1; };
 	};
 
-
 public:
-	typedef std::map < int, StructDungeon > DungeonType;
-	static DungeonType Dungeon;
+	static std::map < int, StructDungeon > ms_aDungeon;
+
+	bool IsDungeonWorld(int WorldID) const;
 
 	DungeonJob();
 
-	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+	virtual bool OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 
 	void SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds);

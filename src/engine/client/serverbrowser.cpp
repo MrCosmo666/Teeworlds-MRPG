@@ -387,9 +387,9 @@ void CServerBrowser::Refresh(int RefreshFlags)
 		Packet.m_pData = Packer.Data();
 		m_BroadcastTime = time_get();
 
-		for(int i = 8303; i <= 8310; i++)
+		for(int Port = LAN_PORT_BEGIN; Port <= LAN_PORT_END; Port++)
 		{
-			Packet.m_Address.port = i;
+			Packet.m_Address.port = Port;
 			m_pNetClient->Send(&Packet);
 		}
 
@@ -563,7 +563,7 @@ CServerEntry *CServerBrowser::Find(int ServerlistType, const NETADDR &Addr)
 {
 	for(CServerEntry *pEntry = m_aServerlist[ServerlistType].m_aServerlistIp[AddrHash(&Addr)]; pEntry; pEntry = pEntry->m_pNextIp)
 	{
-		if(net_addr_comp(&pEntry->m_Addr, &Addr) == 0)
+		if(net_addr_comp(&pEntry->m_Addr, &Addr, true) == 0)
 			return pEntry;
 	}
 	return (CServerEntry*)0;

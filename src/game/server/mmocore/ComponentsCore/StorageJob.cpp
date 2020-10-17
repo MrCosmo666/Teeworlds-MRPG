@@ -28,9 +28,9 @@ void StorageJob::ShowStorageMenu(CPlayer* pPlayer, int StorageID)
 	
 	GS()->AVH(ClientID, TAB_STORAGE, GOLDEN_COLOR, "Shop :: {STR}", ms_aStorage[StorageID].m_aName);
 	GS()->AVM(ClientID, "REPAIRITEMS", StorageID, TAB_STORAGE, "Repair all items - FREE");
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 	GS()->ShowItemValueInformation(pPlayer, ms_aStorage[StorageID].m_Currency);
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 }
 
 void StorageJob::OnInit()
@@ -71,7 +71,7 @@ bool StorageJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	return false;
 }
 
-bool StorageJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool StorageJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (PPSTR(CMD, "REPAIRITEMS") == 0)

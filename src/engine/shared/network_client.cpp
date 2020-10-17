@@ -80,7 +80,7 @@ int CNetClient::Recv(CNetChunk* pChunk, TOKEN* pResponseToken)
 
 		if (CNetBase::UnpackPacket(m_RecvUnpacker.m_aBuffer, Bytes, &m_RecvUnpacker.m_Data) == 0)
 		{
-			if (m_Connection.State() != NET_CONNSTATE_OFFLINE && m_Connection.State() != NET_CONNSTATE_ERROR && net_addr_comp(m_Connection.PeerAddress(), &Addr) == 0)
+			if(m_Connection.State() != NET_CONNSTATE_OFFLINE && m_Connection.State() != NET_CONNSTATE_ERROR && net_addr_comp(m_Connection.PeerAddress(), &Addr, true) == 0)
 			{
 				if (m_Connection.Feed(&m_RecvUnpacker.m_Data, &Addr))
 				{
@@ -127,7 +127,7 @@ int CNetClient::Send(CNetChunk* pChunk, TOKEN Token, CSendCBData* pCallbackData)
 			return -1;
 		}
 
-		if (pChunk->m_ClientID == -1 && net_addr_comp(&pChunk->m_Address, m_Connection.PeerAddress()) == 0)
+		if(pChunk->m_ClientID == -1 && net_addr_comp(&pChunk->m_Address, m_Connection.PeerAddress(), true) == 0)
 		{
 			// upgrade the packet, now that we know its recipent
 			pChunk->m_ClientID = 0;

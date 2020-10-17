@@ -71,7 +71,7 @@ bool CInventoryItem::Add(int Count, int Settings, int Enchant, bool Message)
 	GS()->Mmo()->Item()->GiveItem(m_pPlayer, m_ItemID, Count, Settings, Enchant);
 
 	// check the empty slot if yes then put the item on
-	const bool AutoEquip = (Info().m_Type == ItemType::TYPE_EQUIP && m_pPlayer->GetEquippedItem(Info().m_Function) <= 0) || Info().m_Type == TYPE_MODULE;
+	const bool AutoEquip = (Info().m_Type == ItemType::TYPE_EQUIP && m_pPlayer->GetEquippedItemID(Info().m_Function) <= 0) || Info().m_Type == TYPE_MODULE;
 	if(AutoEquip)
 	{
 		if(!IsEquipped())
@@ -96,11 +96,9 @@ bool CInventoryItem::Add(int Count, int Settings, int Enchant, bool Message)
 
 bool CInventoryItem::Remove(int Count, int Settings)
 {
-	if(m_Count <= 0 || Count < 1 || !m_pPlayer)
+	Count = min(Count, m_Count);
+	if(Count <= 0 || !m_pPlayer)
 		return false;
-
-	if(m_Count < Count)
-		Count = m_Count;
 
 	if(IsEquipped())
 		Equip();
@@ -119,12 +117,12 @@ bool CInventoryItem::Equip()
 	if(Info().m_Type == ItemType::TYPE_EQUIP)
 	{
 		const int EquipID = Info().m_Function;
-		int EquipItemID = m_pPlayer->GetEquippedItem(EquipID, m_ItemID);
+		int EquipItemID = m_pPlayer->GetEquippedItemID(EquipID, m_ItemID);
 		while(EquipItemID >= 1)
 		{
 			InventoryItem& EquipItem = m_pPlayer->GetItem(EquipItemID);
 			EquipItem.SetSettings(0);
-			EquipItemID = m_pPlayer->GetEquippedItem(EquipID, m_ItemID);
+			EquipItemID = m_pPlayer->GetEquippedItemID(EquipID, m_ItemID);
 		}
 
 		if(Info().m_Function == EQUIP_DISCORD)
@@ -142,7 +140,8 @@ bool CInventoryItem::Equip()
 
 bool CInventoryItem::Use(int Count)
 {
-	if(m_Count < Count || !m_pPlayer || !m_pPlayer->IsAuthed())
+	Count = Info().m_Function == FUNCTION_ONE_USED ? 1 : min(Count, m_Count);
+	if(Count <= 0 || !m_pPlayer || !m_pPlayer->IsAuthed())
 		return false;
 
 	const int ClientID = m_pPlayer->GetCID();
@@ -189,14 +188,14 @@ bool CInventoryItem::Use(int Count)
 		int BackUpgrades = 0;
 		for(const auto& at : CGS::ms_aAttributsInfo)
 		{
-			if(str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0 || m_pPlayer->Acc().m_aStats[at.first] <= 0)
+			if(str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0 || m_pPlayer->Acc().m_aStats[at.first] <= 0)
 				continue;
 
 			// skip weapon spreading
-			if(at.second.AtType == AtributType::AtWeapon)
+			if(at.second.m_Type == AtributType::AtWeapon)
 				continue;
 
-			BackUpgrades += (int)(m_pPlayer->Acc().m_aStats[at.first] * at.second.UpgradePrice);
+			BackUpgrades += (int)(m_pPlayer->Acc().m_aStats[at.first] * at.second.m_UpgradePrice);
 			m_pPlayer->Acc().m_aStats[at.first] = 0;
 		}
 
@@ -210,11 +209,11 @@ bool CInventoryItem::Use(int Count)
 		int BackUpgrades = 0;
 		for(const auto& at : CGS::ms_aAttributsInfo)
 		{
-			if(str_comp_nocase(at.second.FieldName, "unfield") == 0 || at.second.UpgradePrice <= 0 || m_pPlayer->Acc().m_aStats[at.first] <= 0)
+			if(str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0 || m_pPlayer->Acc().m_aStats[at.first] <= 0)
 				continue;
 
 			// skip all stats allow only weapons
-			if(at.second.AtType != AtributType::AtWeapon)
+			if(at.second.m_Type != AtributType::AtWeapon)
 				continue;
 
 			int BackCount = m_pPlayer->Acc().m_aStats[at.first];
@@ -226,7 +225,7 @@ bool CInventoryItem::Use(int Count)
 			if(BackCount <= 0)
 				continue;
 
-			BackUpgrades += (int)(BackCount * at.second.UpgradePrice);
+			BackUpgrades += (int)(BackCount * at.second.m_UpgradePrice);
 			m_pPlayer->Acc().m_aStats[at.first] -= BackCount;
 		}
 
@@ -237,6 +236,27 @@ bool CInventoryItem::Use(int Count)
 
 	GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
 	return true;
+}
+
+bool CInventoryItem::Drop(int Count)
+{
+	Count = min(Count, m_Count);
+	if(Count <= 0 || !m_pPlayer || !m_pPlayer->IsAuthed() || !m_pPlayer->GetCharacter())
+		return false;
+
+	CCharacter* m_pCharacter = m_pPlayer->GetCharacter();
+	vec2 Force = vec2(m_pCharacter->m_Core.m_Input.m_TargetX, m_pCharacter->m_Core.m_Input.m_TargetY);
+	if(length(Force) > 8.0f)
+		Force = normalize(Force) * 8.0f;
+
+	CInventoryItem DropItem = *this;
+	DropItem.m_Count = Count;
+	if(Remove(Count))
+	{
+		GS()->CreateDropItem(m_pCharacter->m_Core.m_Pos, -1, DropItem, Force);
+		return true;
+	}
+	return false;
 }
 
 bool CInventoryItem::Save()
@@ -260,19 +280,19 @@ int CInventoryItem::GetEnchantPrice() const
 
 		int UpgradePrice;
 		const int Attribute = Info().m_aAttribute[i];
-		const int TypeAttribute = CGS::ms_aAttributsInfo[Attribute].AtType;
+		const int TypeAttribute = CGS::ms_aAttributsInfo[Attribute].m_Type;
 
 		if(TypeAttribute == AtributType::AtHardtype || Attribute == Stats::StStrength)
 		{
-			UpgradePrice = max(12, CGS::ms_aAttributsInfo[Attribute].UpgradePrice) * 14;
+			UpgradePrice = max(12, CGS::ms_aAttributsInfo[Attribute].m_UpgradePrice) * 14;
 		}
 		else if(TypeAttribute == AtributType::AtJob || TypeAttribute == AtributType::AtWeapon || Attribute == Stats::StLuckyDropItem)
 		{
-			UpgradePrice = max(20, CGS::ms_aAttributsInfo[Attribute].UpgradePrice) * 14;
+			UpgradePrice = max(20, CGS::ms_aAttributsInfo[Attribute].m_UpgradePrice) * 14;
 		}
 		else
 		{
-			UpgradePrice = max(4, CGS::ms_aAttributsInfo[Attribute].UpgradePrice) * 5;
+			UpgradePrice = max(4, CGS::ms_aAttributsInfo[Attribute].m_UpgradePrice) * 5;
 		}
 
 		const int PercentEnchant = max(1, (int)kurosio::translate_to_procent_rest(Info().m_aAttributeCount[i], PERCENT_OF_ENCHANT));

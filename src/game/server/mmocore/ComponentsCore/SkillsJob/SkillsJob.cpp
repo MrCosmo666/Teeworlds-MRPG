@@ -62,9 +62,9 @@ bool SkillsJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMen
 			GS()->AVH(ClientID, TAB_INFO_SKILL, GREEN_COLOR, "Skill Learn Information");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_SKILL, "Here you can learn passive and active skills");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_SKILL, "You can bind active skill any button using the console");
-			GS()->AV(ClientID, "null", "");
+			GS()->AV(ClientID, "null");
 			GS()->ShowItemValueInformation(pPlayer, itSkillPoint);
-			GS()->AV(ClientID, "null", "");
+			GS()->AV(ClientID, "null");
 			
 			ShowMailSkillList(pPlayer, false);
 			ShowMailSkillList(pPlayer, true);
@@ -96,7 +96,7 @@ bool SkillsJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	return false;
 }
 
-bool SkillsJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool SkillsJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (PPSTR(CMD, "SKILLLEARN") == 0)
@@ -127,14 +127,14 @@ void SkillsJob::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
 		if(sk.second.m_Passive == Passive)
 			SkillSelected(pPlayer, sk.first);
 	}
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 }
 
 void SkillsJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 {
 	CSkill& pSkill = pPlayer->GetSkill(SkillID);
 	const int ClientID = pPlayer->GetCID();
-	const bool Passive = pSkill.Info().m_Passive;
+	const bool IsPassive = pSkill.Info().m_Passive;
 	const bool IsMaxLevel = pSkill.m_Level >= pSkill.Info().m_MaxLevel;
 	const int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + SkillID;
 
@@ -151,11 +151,10 @@ void SkillsJob::SkillSelected(CPlayer *pPlayer, int SkillID)
 	}
 	GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pSkill.Info().m_aDesc);
 
-	if(!Passive)
+	if(!IsPassive)
 	{
 		GS()->AVM(ClientID, "null", NOPE, HideID, "Mana required {INT}%", &pSkill.Info().m_ManaProcent);
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pSkill.Info().m_aDesc);
-		if(pSkill.m_Level >= 1)
+		if(pSkill.IsLearned())
 		{
 			GS()->AVM(ClientID, "null", NOPE, HideID, "F1 Bind: (bind 'key' say \"/useskill {INT}\")", &SkillID);
 			GS()->AVM(ClientID, "SKILLCHANGEEMOTICION", SkillID, HideID, "Used on {STR}", pSkill.GetControlEmoteStateName());

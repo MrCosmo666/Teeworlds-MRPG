@@ -122,7 +122,7 @@ bool WorldSwapJob::ChangeWorld(CPlayer *pPlayer, vec2 Pos)
 		const int StoryQuestNeeded = ms_aWorldSwap[WID].m_OpenQuestID;
 		if (StoryQuestNeeded > 0 && !GS()->Mmo()->Quest()->IsCompletedQuest(ClientID, StoryQuestNeeded))
 		{
-			GS()->SBL(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Requires quest completion '{STR}'!", GS()->Mmo()->Quest()->GetQuestName(StoryQuestNeeded));
+			GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Requires quest completion '{STR}'!", GS()->Mmo()->Quest()->GetQuestName(StoryQuestNeeded));
 			return false;
 		}
 
@@ -144,7 +144,7 @@ bool WorldSwapJob::ChangeWorld(CPlayer *pPlayer, vec2 Pos)
 
 vec2 WorldSwapJob::GetPositionQuestBot(int ClientID, int QuestID)
 {
-	const int playerTalkProgress = QuestJob::ms_aQuests[ClientID][QuestID].m_Progress;
+	const int playerTalkProgress = QuestJob::ms_aQuests[ClientID][QuestID].m_Step;
 	BotJob::QuestBotInfo *FindBot = Job()->Quest()->GetQuestBot(QuestID, playerTalkProgress);
 	if(FindBot)
 	{
@@ -166,7 +166,7 @@ vec2 WorldSwapJob::GetPositionQuestBot(int ClientID, int QuestID)
 
 int WorldSwapJob::GetWorldType() const
 {
-	if(GS()->DungeonID())
+	if(GS()->GetDungeonID())
 		return WORLD_DUNGEON;
 	return WORLD_STANDARD;
 }

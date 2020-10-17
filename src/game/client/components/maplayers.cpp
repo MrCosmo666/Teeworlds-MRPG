@@ -20,12 +20,9 @@
 
 #include "maplayers.h"
 
-CMapLayers::CMapLayers(int t)
+CMapLayers::CMapLayers(int Type)
 {
-	m_Type = t;
-	m_CurrentLocalTick = 0;
-	m_LastLocalTick = 0;
-	m_EnvelopeUpdate = false;
+	m_Type = Type;
 	m_pMenuMap = 0;
 	m_pMenuLayers = 0;
 	m_OnlineStartTime = 0;
@@ -39,28 +36,50 @@ void CMapLayers::OnStateChange(int NewState, int OldState)
 
 void CMapLayers::LoadBackgroundMap()
 {
-	int HourOfTheDay = time_houroftheday();
+	const char* pMenuMap = g_Config.m_ClMenuMap;
+	if(str_comp(pMenuMap, "auto") == 0)
+	{
+		switch(time_season())
+		{
+		case SEASON_SPRING:
+			pMenuMap = "heavens";
+			break;
+		case SEASON_SUMMER:
+			pMenuMap = "jungle";
+			break;
+		case SEASON_AUTUMN:
+			pMenuMap = "autumn";
+			break;
+		case SEASON_WINTER:
+			pMenuMap = "winter";
+			break;
+		}
+	}
+
+	const int HourOfTheDay = time_houroftheday();
+	const bool IsDaytime = HourOfTheDay >= 6 && HourOfTheDay < 18;
+
 	char aBuf[128];
 	// check for the appropriate day/night map
-	str_format(aBuf, sizeof(aBuf), "ui/themes/%s_%s.map", g_Config.m_ClMenuMap, (HourOfTheDay >= 6 && HourOfTheDay < 18) ? "day" : "night");
+	str_format(aBuf, sizeof(aBuf), "ui/themes/%s_%s.map", pMenuMap, IsDaytime ? "day" : "night");
 	if(!m_pMenuMap->Load(aBuf, m_pClient->Storage()))
 	{
 		// fall back on generic map
-		str_format(aBuf, sizeof(aBuf), "ui/themes/%s.map", g_Config.m_ClMenuMap);
+		str_format(aBuf, sizeof(aBuf), "ui/themes/%s.map", pMenuMap);
 		if(!m_pMenuMap->Load(aBuf, m_pClient->Storage()))
 		{
 			// fall back on day/night alternative map
-			str_format(aBuf, sizeof(aBuf), "ui/themes/%s_%s.map", g_Config.m_ClMenuMap, (HourOfTheDay >= 6 && HourOfTheDay < 18) ? "night" : "day");
+			str_format(aBuf, sizeof(aBuf), "ui/themes/%s_%s.map", pMenuMap, IsDaytime ? "night" : "day");
 			if(!m_pMenuMap->Load(aBuf, m_pClient->Storage()))
 			{
-				str_format(aBuf, sizeof(aBuf), "map '%s' not found", g_Config.m_ClMenuMap);
+				str_format(aBuf, sizeof(aBuf), "map '%s' not found", pMenuMap);
 				Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "client", aBuf);
 				return;
 			}
 		}
 	}
 
-	str_format(aBuf, sizeof(aBuf), "loaded map '%s'", g_Config.m_ClMenuMap);
+	str_format(aBuf, sizeof(aBuf), "loaded map '%s'", pMenuMap);
 	Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "client", aBuf);
 
 	m_pMenuLayers->Init(Kernel(), m_pMenuMap);
@@ -93,113 +112,15 @@ void CMapLayers::OnInit()
 	m_pEggTiles = 0;
 }
 
-static void PlaceEggDoodads(int LayerWidth, int LayerHeight, CTile* aOutTiles, CTile* aGameLayerTiles, int ItemWidth, int ItemHeight, const int* aImageTileID, int ImageTileIDCount, int Freq)
-{
-	for(int y = 0; y < LayerHeight-ItemHeight; y++)
-	{
-		for(int x = 0; x < LayerWidth-ItemWidth; x++)
-		{
-			bool Overlap = false;
-			bool ObstructedByWall = false;
-			bool HasGround = true;
-
-			for(int iy = 0; iy < ItemHeight; iy++)
-			{
-				for(int ix = 0; ix < ItemWidth; ix++)
-				{
-					int Tid = (y+iy) * LayerWidth + (x+ix);
-					int DownTid = (y+iy+1) * LayerWidth + (x+ix);
-
-					if(aOutTiles[Tid].m_Index != 0)
-					{
-						Overlap = true;
-						break;
-					}
-
-					if(aGameLayerTiles[Tid].m_Index == 1)
-					{
-						ObstructedByWall = true;
-						break;
-					}
-
-					if(iy == ItemHeight-1 && aGameLayerTiles[DownTid].m_Index != 1)
-					{
-						HasGround = false;
-						break;
-					}
-				}
-			}
-
-			if(!Overlap && !ObstructedByWall && HasGround && random_int()%Freq == 0)
-			{
-				const int BaskerStartID = aImageTileID[random_int()%ImageTileIDCount];
-
-				for(int iy = 0; iy < ItemHeight; iy++)
-				{
-					for(int ix = 0; ix < ItemWidth; ix++)
-					{
-						int Tid = (y+iy) * LayerWidth + (x+ix);
-						aOutTiles[Tid].m_Index = BaskerStartID + iy * 16 + ix;
-					}
-				}
-			}
-		}
-	}
-}
-
 void CMapLayers::OnMapLoad()
 {
 	if(Layers())
+	{
 		LoadEnvPoints(Layers(), m_lEnvPoints);
 
-	// easter time, place eggs
-	if(m_pClient->IsEaster())
-	{
-		CMapItemLayerTilemap* pGameLayer = Layers()->GameLayer();
-		if(m_pEggTiles)
-			mem_free(m_pEggTiles);
-
-		m_EggLayerWidth = pGameLayer->m_Width;
-		m_EggLayerHeight = pGameLayer->m_Height;
-		m_pEggTiles = (CTile*)mem_alloc(sizeof(CTile) * m_EggLayerWidth * m_EggLayerHeight,1);
-		mem_zero(m_pEggTiles, sizeof(CTile) * m_EggLayerWidth * m_EggLayerHeight);
-		CTile* aGameLayerTiles = (CTile*)Layers()->Map()->GetData(pGameLayer->m_Data);
-
-		// first pass: baskets
-		static const int s_aBasketIDs[] = {
-			38,
-			86
-		};
-
-		static const int s_BasketCount = sizeof(s_aBasketIDs)/sizeof(s_aBasketIDs[0]);
-		PlaceEggDoodads(m_EggLayerWidth, m_EggLayerHeight, m_pEggTiles, aGameLayerTiles, 3, 2, s_aBasketIDs, s_BasketCount, 250);
-
-		// second pass: double eggs
-		static const int s_aDoubleEggIDs[] = {
-			9,
-			25,
-			41,
-			57,
-			73,
-			89
-		};
-
-		static const int s_DoubleEggCount = sizeof(s_aDoubleEggIDs)/sizeof(s_aDoubleEggIDs[0]);
-		PlaceEggDoodads(m_EggLayerWidth, m_EggLayerHeight, m_pEggTiles, aGameLayerTiles, 2, 1, s_aDoubleEggIDs, s_DoubleEggCount, 100);
-
-		// third pass: eggs
-		static const int s_aEggIDs[] = {
-			1, 2, 3, 4, 5,
-			17, 18, 19, 20,
-			33, 34, 35, 36,
-			49, 50,     52,
-			65, 66,
-				82,
-				98
-		};
-
-		static const int s_EggCount = sizeof(s_aEggIDs)/sizeof(s_aEggIDs[0]);
-		PlaceEggDoodads(m_EggLayerWidth, m_EggLayerHeight, m_pEggTiles, aGameLayerTiles, 1, 1, s_aEggIDs, s_EggCount, 30);
+		// easter time, place eggs
+		if(m_pClient->IsEaster())
+			PlaceEasterEggs(Layers());
 	}
 }
 
@@ -271,17 +192,6 @@ void CMapLayers::LoadEnvPoints(const CLayers *pLayers, array<CEnvPoint>& lEnvPoi
 	}
 }
 
-void CMapLayers::EnvelopeUpdate()
-{
-	if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
-	{
-		const IDemoPlayer::CInfo *pInfo = DemoPlayer()->BaseInfo();
-		m_CurrentLocalTick = pInfo->m_CurrentTick;
-		m_LastLocalTick = pInfo->m_CurrentTick;
-		m_EnvelopeUpdate = true;
-	}
-}
-
 void CMapLayers::EnvelopeEval(float TimeOffset, int Env, float *pChannels, void *pUser)
 {
 	CMapLayers *pThis = (CMapLayers *)pUser;
@@ -291,18 +201,16 @@ void CMapLayers::EnvelopeEval(float TimeOffset, int Env, float *pChannels, void 
 	pChannels[3] = 0;
 
 	CEnvPoint *pPoints = 0;
-	CLayers *pLayers = 0;
+	CLayers* pLayers = 0;
+	if(pThis->Client()->State() == IClient::STATE_ONLINE || pThis->Client()->State() == IClient::STATE_DEMOPLAYBACK)
 	{
-		if(pThis->Client()->State() == IClient::STATE_ONLINE || pThis->Client()->State() == IClient::STATE_DEMOPLAYBACK)
-		{
-			pLayers = pThis->Layers();
-			pPoints = pThis->m_lEnvPoints.base_ptr();
-		}
-		else
-		{
-			pLayers = pThis->m_pMenuLayers;
-			pPoints = pThis->m_lEnvPointsMenu.base_ptr();
-		}
+		pLayers = pThis->Layers();
+		pPoints = pThis->m_lEnvPoints.base_ptr();
+	}
+	else
+	{
+		pLayers = pThis->m_pMenuLayers;
+		pPoints = pThis->m_lEnvPointsMenu.base_ptr();
 	}
 
 	int Start, Num;
@@ -311,60 +219,36 @@ void CMapLayers::EnvelopeEval(float TimeOffset, int Env, float *pChannels, void 
 	if(Env >= Num)
 		return;
 
-	CMapItemEnvelope *pItem = (CMapItemEnvelope *)pLayers->Map()->GetItem(Start+Env, 0, 0);
-
-	float Time = 0.0f;
-	if(pThis->Client()->State() == IClient::STATE_DEMOPLAYBACK)
+	const CMapItemEnvelope* pItem = (CMapItemEnvelope*)pLayers->Map()->GetItem(Start + Env, 0, 0);
+	static float s_Time = 0.0f;
+	if(pThis->Client()->State() == IClient::STATE_ONLINE || pThis->Client()->State() == IClient::STATE_DEMOPLAYBACK)
 	{
-		const IDemoPlayer::CInfo *pInfo = pThis->DemoPlayer()->BaseInfo();
-
-		if(!pInfo->m_Paused || pThis->m_EnvelopeUpdate)
-		{
-			if(pThis->m_CurrentLocalTick != pInfo->m_CurrentTick)
-			{
-				pThis->m_LastLocalTick = pThis->m_CurrentLocalTick;
-				pThis->m_CurrentLocalTick = pInfo->m_CurrentTick;
-			}
-
-			Time = mix(pThis->m_LastLocalTick / (float)pThis->Client()->GameTickSpeed(),
-						pThis->m_CurrentLocalTick / (float)pThis->Client()->GameTickSpeed(),
-						pThis->Client()->IntraGameTick());
-		}
-
-		pThis->RenderTools()->RenderEvalEnvelope(pPoints + pItem->m_StartPoint, pItem->m_NumPoints, 4, Time+TimeOffset, pChannels);
-	}
-	else if(pThis->Client()->State() != IClient::STATE_OFFLINE)
-	{
-		if(pThis->m_pClient->m_Snap.m_pGameData && !(pThis->m_pClient->m_Snap.m_pGameData->m_GameStateFlags&GAMESTATEFLAG_PAUSED))
+		if(pThis->m_pClient->m_Snap.m_pGameData && !pThis->m_pClient->IsWorldPaused())
 		{
 			if(pItem->m_Version < 2 || pItem->m_Synchronized)
 			{
-				Time = mix((pThis->Client()->PrevGameTick()-pThis->m_pClient->m_Snap.m_pGameData->m_GameStartTick) / (float)pThis->Client()->GameTickSpeed(),
-							(pThis->Client()->GameTick()-pThis->m_pClient->m_Snap.m_pGameData->m_GameStartTick) / (float)pThis->Client()->GameTickSpeed(),
-							pThis->Client()->IntraGameTick());
+				s_Time = mix(
+					pThis->Client()->PrevGameTick() - pThis->m_pClient->m_Snap.m_pGameData->m_GameStartTick,
+					pThis->Client()->GameTick() - pThis->m_pClient->m_Snap.m_pGameData->m_GameStartTick,
+					pThis->Client()->IntraGameTick()) / (float)pThis->Client()->GameTickSpeed();
 			}
 			else
-				Time = pThis->Client()->LocalTime()-pThis->m_OnlineStartTime;
+				s_Time = pThis->Client()->LocalTime() - pThis->m_OnlineStartTime;
 		}
-
-		pThis->RenderTools()->RenderEvalEnvelope(pPoints + pItem->m_StartPoint, pItem->m_NumPoints, 4, Time+TimeOffset, pChannels);
 	}
 	else
 	{
-		Time = pThis->Client()->LocalTime();
-		pThis->RenderTools()->RenderEvalEnvelope(pPoints + pItem->m_StartPoint, pItem->m_NumPoints, 4, Time+TimeOffset, pChannels);
+		s_Time = pThis->Client()->LocalTime();
 	}
+	CRenderTools::RenderEvalEnvelope(pPoints + pItem->m_StartPoint, pItem->m_NumPoints, 4, s_Time + TimeOffset, pChannels);
 }
 
 void CMapLayers::OnRender()
 {
-	if((Client()->State() != IClient::STATE_ONLINE && Client()->State() != IClient::STATE_DEMOPLAYBACK && !m_pMenuMap))
-		return;
-
 	CLayers *pLayers = 0;
 	if(Client()->State() == IClient::STATE_ONLINE || Client()->State() == IClient::STATE_DEMOPLAYBACK)
 		pLayers = Layers();
-	else if(m_pMenuMap->IsLoaded())
+	else if(m_pMenuMap && m_pMenuMap->IsLoaded())
 		pLayers = m_pMenuLayers;
 
 	if(!pLayers)
@@ -433,7 +317,7 @@ void CMapLayers::OnRender()
 			// skip rendering if detail layers is not wanted
 			if(!(pLayer->m_Flags&LAYERFLAG_DETAIL && !g_Config.m_GfxHighDetail && !IsGameLayer && (Client()->State() == IClient::STATE_ONLINE || Client()->State() == IClient::STATE_DEMOPLAYBACK)))
 			{
-				if(pLayer->m_Type == LAYERTYPE_TILES && Input()->KeyIsPressed(KEY_LCTRL) && Input()->KeyIsPressed(KEY_LSHIFT) && Input()->KeyPress(KEY_KP_0))
+				if(pLayer->m_Type == LAYERTYPE_TILES && Input()->KeyIsPressed(KEY_LCTRL) && Input()->KeyIsPressed(KEY_LSHIFT) && UI()->KeyPress(KEY_KP_0))
 				{
 					CMapItemLayerTilemap *pTMap = (CMapItemLayerTilemap *)pLayer;
 					CTile *pTiles = (CTile *)pLayers->Map()->GetData(pTMap->m_Data);
@@ -536,4 +420,107 @@ void CMapLayers::BackgroundMapUpdate()
 		if(g_Config.m_ClShowMenuMap)
 			LoadBackgroundMap();
 	}
+}
+
+static void PlaceEggDoodads(int LayerWidth, int LayerHeight, CTile* aOutTiles, CTile* aGameLayerTiles, int ItemWidth, int ItemHeight, const int* aImageTileID, int ImageTileIDCount, int Freq)
+{
+	for(int y = 0; y < LayerHeight - ItemHeight; y++)
+	{
+		for(int x = 0; x < LayerWidth - ItemWidth; x++)
+		{
+			bool Overlap = false;
+			bool ObstructedByWall = false;
+			bool HasGround = true;
+
+			for(int iy = 0; iy < ItemHeight; iy++)
+			{
+				for(int ix = 0; ix < ItemWidth; ix++)
+				{
+					int Tid = (y + iy) * LayerWidth + (x + ix);
+					int DownTid = (y + iy + 1) * LayerWidth + (x + ix);
+
+					if(aOutTiles[Tid].m_Index != 0)
+					{
+						Overlap = true;
+						break;
+					}
+
+					if(aGameLayerTiles[Tid].m_Index == 1)
+					{
+						ObstructedByWall = true;
+						break;
+					}
+
+					if(iy == ItemHeight - 1 && aGameLayerTiles[DownTid].m_Index != 1)
+					{
+						HasGround = false;
+						break;
+					}
+				}
+			}
+
+			if(!Overlap && !ObstructedByWall && HasGround && random_int() % Freq == 0)
+			{
+				const int BaskerStartID = aImageTileID[random_int() % ImageTileIDCount];
+
+				for(int iy = 0; iy < ItemHeight; iy++)
+				{
+					for(int ix = 0; ix < ItemWidth; ix++)
+					{
+						int Tid = (y + iy) * LayerWidth + (x + ix);
+						aOutTiles[Tid].m_Index = BaskerStartID + iy * 16 + ix;
+					}
+				}
+			}
+		}
+	}
+}
+
+void CMapLayers::PlaceEasterEggs(const CLayers* pLayers)
+{
+	CMapItemLayerTilemap* pGameLayer = pLayers->GameLayer();
+	if(m_pEggTiles)
+		mem_free(m_pEggTiles);
+
+	m_EggLayerWidth = pGameLayer->m_Width;
+	m_EggLayerHeight = pGameLayer->m_Height;
+	m_pEggTiles = (CTile*)mem_alloc(sizeof(CTile) * m_EggLayerWidth * m_EggLayerHeight, 1);
+	mem_zero(m_pEggTiles, sizeof(CTile) * m_EggLayerWidth * m_EggLayerHeight);
+	CTile* aGameLayerTiles = (CTile*)pLayers->Map()->GetData(pGameLayer->m_Data);
+
+	// first pass: baskets
+	static const int s_aBasketIDs[] = {
+		38,
+		86
+	};
+
+	static const int s_BasketCount = sizeof(s_aBasketIDs) / sizeof(s_aBasketIDs[0]);
+	PlaceEggDoodads(m_EggLayerWidth, m_EggLayerHeight, m_pEggTiles, aGameLayerTiles, 3, 2, s_aBasketIDs, s_BasketCount, 250);
+
+	// second pass: double eggs
+	static const int s_aDoubleEggIDs[] = {
+		9,
+		25,
+		41,
+		57,
+		73,
+		89
+	};
+
+	static const int s_DoubleEggCount = sizeof(s_aDoubleEggIDs) / sizeof(s_aDoubleEggIDs[0]);
+	PlaceEggDoodads(m_EggLayerWidth, m_EggLayerHeight, m_pEggTiles, aGameLayerTiles, 2, 1, s_aDoubleEggIDs, s_DoubleEggCount, 100);
+
+	// third pass: eggs
+	static const int s_aEggIDs[] = {
+		1, 2, 3, 4, 5,
+		17, 18, 19, 20,
+		33, 34, 35, 36,
+		49, 50,     52,
+		65, 66,
+			82,
+			98
+	};
+
+	static const int s_EggCount = sizeof(s_aEggIDs) / sizeof(s_aEggIDs[0]);
+	PlaceEggDoodads(m_EggLayerWidth, m_EggLayerHeight, m_pEggTiles, aGameLayerTiles, 1, 1, s_aEggIDs, s_EggCount, 30);
 }

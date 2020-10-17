@@ -262,13 +262,11 @@ const char* CLocalization::CLanguage::Localize_P(int Number, const char* pText) 
 	return pEntry->m_apVersions[PluralCode];
 }
 
-CLocalization::CLocalization(class CStorage* pStorage) :
-	m_pStorage(pStorage),
-	m_pMainLanguage(nullptr),
-	m_pUtf8Converter(nullptr)
-{
-	
-}
+CLocalization::CLocalization(class CStorage* pStorage) : 
+	m_pStorage(pStorage), 
+	m_pMainLanguage(nullptr), 
+	m_pUtf8Converter(nullptr) 
+{ }
 
 CLocalization::~CLocalization()
 {

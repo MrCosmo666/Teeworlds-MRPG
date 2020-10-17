@@ -93,8 +93,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	{
 		m_pPlayer->m_MoodState = m_pPlayer->GetMoodState();
 		GS()->Mmo()->Quest()->UpdateArrowStep(m_pPlayer->GetCID());
-		if(GS()->Mmo()->Quest()->CheckNewStories(m_pPlayer))
-			GS()->Chat(m_pPlayer->GetCID(), "There are new stories of familiar NPCs");
+		GS()->Mmo()->Quest()->AcceptNextStoryQuestStep(m_pPlayer);
 
 		m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
 		GS()->ResetVotes(m_pPlayer->GetCID(), m_pPlayer->m_OpenVoteMenu);
@@ -192,7 +191,7 @@ bool CCharacter::DecoInteractive()
 		if(m_pPlayer->GetItem(DecoID).m_Count <= 0 || GS()->GetItemInfo(DecoID).m_Type != ItemType::TYPE_DECORATION)
 			return false;
 
-		if (InteractiveType == DECOTYPE_HOUSE)
+		if (InteractiveType == DECORATIONS_HOUSE)
 		{
 			const int HouseID = GS()->Mmo()->House()->PlayerHouseID(m_pPlayer);
 			if (GS()->Mmo()->House()->AddDecorationHouse(DecoID, HouseID, m_pHelper->MousePos()))
@@ -203,7 +202,7 @@ bool CCharacter::DecoInteractive()
 				return true;
 			}
 		}
-		else if (InteractiveType == DECOTYPE_GUILD_HOUSE)
+		else if (InteractiveType == DECORATIONS_GUILD_HOUSE)
 		{
 			const int GuildID = m_pPlayer->Acc().m_GuildID;
 			if (GS()->Mmo()->Member()->AddDecorationHouse(DecoID, GuildID, m_pHelper->MousePos()))
@@ -426,7 +425,7 @@ void CCharacter::CreateQuestsStep(int QuestID)
 	if (QuestJob::ms_aQuests[ClientID].find(QuestID) == QuestJob::ms_aQuests[ClientID].end() || (Pos.x == 0.0f && Pos.y == 0.0f))
 		return;
 
-	const int Progress = QuestJob::ms_aQuests[ClientID][QuestID].m_Progress;
+	const int Progress = QuestJob::ms_aQuests[ClientID][QuestID].m_Step;
 	new CQuestPathFinder(GameWorld(), m_Core.m_Pos, ClientID, QuestID, Progress, Pos);
 }
 
@@ -434,7 +433,7 @@ bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)
 {
 	const int WeaponID = clamp(Weapon, (int)WEAPON_HAMMER, (int)WEAPON_NINJA);
 	const bool IsHammer = (bool)(WeaponID == WEAPON_HAMMER);
-	if(m_pPlayer->GetEquippedItem(WeaponID) <= 0 && !IsHammer)
+	if(m_pPlayer->GetEquippedItemID(WeaponID) <= 0 && !IsHammer)
 	{
 		if(RemoveWeapon(WeaponID))
 			m_ActiveWeapon = m_LastWeapon;
@@ -569,6 +568,13 @@ void CCharacter::TickDefered()
 		m_ReckoningCore.Quantize();
 	}
 
+	// apply drag velocity when the player is not firing ninja
+	// and set it back to 0 for the next tick
+	if(m_ActiveWeapon != WEAPON_NINJA)
+		m_Core.AddDragVelocity();
+	m_Core.ResetDragVelocity();
+
+
 	CCharacterCore::CParams CoreTickParams(&m_pPlayer->m_NextTuningParams);
 	m_Core.Move(&CoreTickParams);
 	m_Core.Quantize();
@@ -676,11 +682,11 @@ void CCharacter::Die(int Killer, int Weapon)
 		}
 	}
 
-	m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed() / 2;
+	m_pPlayer->m_aPlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed() / 2;
 	if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
 		int SubBotID = m_pPlayer->GetBotSub();
-		m_pPlayer->m_PlayerTick[TickState::Respawn] = Server()->Tick()+BotJob::ms_aMobBot[SubBotID].m_RespawnTick*Server()->TickSpeed();
+		m_pPlayer->m_aPlayerTick[TickState::Respawn] = Server()->Tick()+BotJob::ms_aMobBot[SubBotID].m_RespawnTick*Server()->TickSpeed();
 	}
 
 	// a nice sound
@@ -689,7 +695,7 @@ void CCharacter::Die(int Killer, int Weapon)
 	m_pPlayer->ClearTalking();
 
 	// respawn
-	m_pPlayer->m_PlayerTick[TickState::Die] = Server()->Tick()/2;
+	m_pPlayer->m_aPlayerTick[TickState::Die] = Server()->Tick()/2;
 	m_pPlayer->m_Spawned = true;
 	GS()->m_World.RemoveEntity(this);
 	GS()->m_World.m_Core.m_apCharacters[ClientID] = 0;
@@ -776,37 +782,32 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	if(From != m_pPlayer->GetCID())
 		GS()->CreatePlayerSound(From, SOUND_HIT);
 
-	// moved to BotAI
-	if(m_pPlayer->IsBot())
+	// verify death
+	if(m_Health <= 0)
 	{
-		bool IsDie = (bool)(m_Health <= 0);
-		return IsDie;
+		if(From != m_pPlayer->GetCID() && pFrom->GetCharacter())
+			pFrom->GetCharacter()->SetEmote(EMOTE_HAPPY, 1);
+
+		// do not kill the bot it is still running in CCharacterBotAI::TakeDamage
+		if(m_pPlayer->IsBot())
+			return false;
+
+		m_Health = 0;
+		m_pPlayer->ShowInformationStats();
+		Die(From, Weapon);
+		return false;
 	}
 
-	// health pool
-	if(m_Health <= m_pPlayer->GetStartHealth()/3)
+	// health recovery potion
+	if(!m_pPlayer->IsBot() && m_Health <= m_pPlayer->GetStartHealth() / 3)
 	{
 		InventoryItem& pItemPlayer = m_pPlayer->GetItem(itPotionHealthRegen);
 		if(!m_pPlayer->CheckEffect("RegenHealth") && pItemPlayer.IsEquipped())
 			pItemPlayer.Use(1);
 	}
 
-	// verify death
-	if(m_Health <= 0)
-	{
-		m_Health = 0;
-		m_pPlayer->ShowInformationStats();
-		Die(From, Weapon);
-		if (From != m_pPlayer->GetCID() && pFrom->GetCharacter()) 
-			pFrom->GetCharacter()->SetEmote(EMOTE_HAPPY, 1);
-		return false;
-	}
-
-	if (Dmg > 2) 
-		GS()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_LONG);
-	else 
-		GS()->CreateSound(m_Pos, SOUND_PLAYER_PAIN_SHORT);
-
+	const bool IsHardDamage = (CritDamage > 0);
+	GS()->CreateSound(m_Pos, IsHardDamage ? (int)SOUND_PLAYER_PAIN_LONG : (int)SOUND_PLAYER_PAIN_SHORT);
 	m_EmoteType = EMOTE_PAIN;
 	m_EmoteStop = Server()->Tick() + 500 * Server()->TickSpeed() / 1000;
 	return true;
@@ -1016,7 +1017,7 @@ void CCharacter::HandleTuning()
 	}
 	
 	// flight mode
-	if(m_pPlayer->m_Flymode && m_pPlayer->GetEquippedItem(EQUIP_WINGS) > 0)
+	if(m_pPlayer->m_Flymode && m_pPlayer->GetEquippedItemID(EQUIP_WINGS) > 0)
 	{
 		pTuningParams->m_Gravity = 0.00f;
 		pTuningParams->m_HookLength = 700.0f;
@@ -1139,8 +1140,8 @@ bool CCharacter::IsAllowedPVP(int FromID)
 	}
 
 	// anti pvp strong
-	const int FromAttributeLevel = pFrom->GetLevelDisciple(AtributType::AtDps) + pFrom->GetLevelDisciple(AtributType::AtTank) + pFrom->GetAttributeCount(AtributType::AtHealer);
-	const int PlayerAttributeLevel = m_pPlayer->GetLevelDisciple(AtributType::AtDps) + m_pPlayer->GetLevelDisciple(AtributType::AtTank) + m_pPlayer->GetAttributeCount(AtributType::AtHealer);
+	const int FromAttributeLevel = pFrom->GetLevelAllAttributes();
+	const int PlayerAttributeLevel = m_pPlayer->GetLevelAllAttributes();
 	if(!pFrom->IsBot() && !m_pPlayer->IsBot() && ((FromAttributeLevel - PlayerAttributeLevel > g_Config.m_SvStrongAntiPVP) || (PlayerAttributeLevel - FromAttributeLevel > g_Config.m_SvStrongAntiPVP)))
 		return false;
 
@@ -1159,7 +1160,7 @@ bool CCharacter::IsLockedWorld()
 			{
 				m_pPlayer->GetTempData().m_TempTeleportX = m_pPlayer->GetTempData().m_TempTeleportY = -1;
 				GS()->Chat(m_pPlayer->GetCID(), "This chapter is still closed, you magically transported first zone!");
-				m_pPlayer->ChangeWorld(NEWBIE_ZERO_WORLD);
+				m_pPlayer->ChangeWorld(MAIN_WORLD);
 				return true;
 			}
 		}
@@ -1171,7 +1172,7 @@ bool CCharacter::CheckFailMana(int Mana)
 {
 	if(m_Mana < Mana)
 	{
-		GS()->SBL(m_pPlayer->GetCID(), BroadcastPriority::BROADCAST_GAME_WARNING, 100, "No mana for use this or for maintenance.");
+		GS()->Broadcast(m_pPlayer->GetCID(), BroadcastPriority::BROADCAST_GAME_WARNING, 100, "No mana for use this or for maintenance.");
 		return true;
 	}
 

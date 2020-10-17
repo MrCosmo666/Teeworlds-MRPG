@@ -52,7 +52,7 @@ class BotJob : public MmoComponent
 		int m_Emote;
 		int m_WorldID;
 		int m_BotID;
-		int Function;
+		int m_Function;
 		std::vector < TalkingData > m_aTalk;
 	};
 
@@ -67,7 +67,7 @@ class BotJob : public MmoComponent
 		int m_PositionX;
 		int m_PositionY;
 		int m_QuestID;
-		int m_Progress;
+		int m_Step;
 		int m_WorldID;
 		int m_BotID;
 		int m_SubBotID;

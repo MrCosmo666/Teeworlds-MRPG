@@ -21,6 +21,8 @@ struct CVoteOptionClient
 	CVoteOptionClient *m_pNext;
 	CVoteOptionClient *m_pPrev;
 	char m_aDescription[VOTE_DESC_LENGTH];
+	int m_Depth;
+	bool m_IsSubheader;
 
 	// mmotee
 	int m_Colored[3];

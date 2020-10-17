@@ -22,8 +22,8 @@ public:
 	class CClient
 	{
 	public:
-		char m_aName[MAX_NAME_LENGTH];
-		char m_aClan[MAX_CLAN_LENGTH];
+		char m_aName[MAX_NAME_LENGTH * UTF8_BYTE_LENGTH];
+		char m_aClan[MAX_CLAN_LENGTH * UTF8_BYTE_LENGTH];
 		int m_Country;
 		int m_Score;
 		int m_PlayerType;
@@ -87,6 +87,7 @@ public:
 	int m_Country;
 	int m_ServerLevel;
 	char m_aGametype[MAX_GAMETYPES][16];
+	char m_aGametypeExclusive[MAX_GAMETYPES];
 	char m_aAddress[NETADDR_MAXSTRSIZE];
 
 	void ToggleLevel(int Level)
@@ -135,6 +136,9 @@ public:
 
 		REFRESHFLAG_INTERNET=1,
 		REFRESHFLAG_LAN=2,
+
+		LAN_PORT_BEGIN = 8303,
+		LAN_PORT_END = 8310,
 
 		FLAG_PASSWORD=1,
 		FLAG_PURE=2,

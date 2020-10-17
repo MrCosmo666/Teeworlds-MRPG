@@ -40,6 +40,7 @@ public:
 	bool Remove(int Count, int Settings = 0);
 	bool Equip();
 	bool Use(int Count);
+	bool Drop(int Count);
 	bool Save();
 
 	// equip modules types functions

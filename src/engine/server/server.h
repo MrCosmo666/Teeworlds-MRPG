@@ -92,7 +92,6 @@ public:
 	DiscordJob(const char *token, int threads);
 
 	void SetServer(CServer *pServer);
-	void SetGameServer(CGS *pGameServer);
 
 	void SendMessage(const char *pChanal, const char *Color, const char *Title, std::string pMsg);
 	void SendGenerateMessage(const char *pChanal, const char *Color, const char *Title, const char *pPhpArg);
@@ -107,7 +106,12 @@ class CServer : public IServer
 	class IStorage *m_pStorage;
 
 public:
-	virtual class IGameServer *GameServer(int id = 0) { return m_pGameServer[id]; }
+	virtual class IGameServer *GameServer(int WorldID = 0) 
+	{ 
+		if(WorldID < 0 || WorldID >= COUNT_WORLD)
+			return nullptr;
+		return m_pGameServer[WorldID];
+	}
 	class IConsole *Console() { return m_pConsole; }
 	class IStorage *Storage() { return m_pStorage; }
 	class DiscordJob *m_pDiscord;
@@ -160,8 +164,8 @@ public:
 		int m_CurrentInput;
 
 		// names update
-		char m_aName[MAX_NAME_LENGTH];
-		char m_aClan[MAX_CLAN_LENGTH];
+		char m_aName[MAX_NAME_LENGTH * UTF8_BYTE_LENGTH];
+		char m_aClan[MAX_CLAN_LENGTH * UTF8_BYTE_LENGTH];
 		char m_aLanguage[MAX_LANGUAGE_LENGTH];
 
 		int m_Version;
@@ -234,7 +238,6 @@ public:
 	virtual void SetClientScore(int ClientID, int Score);
 
 	virtual void ChangeWorld(int ClientID, int WorldID);
-	virtual void QuestBotUpdateOnWorld(int WorldID, int QuestID, int Step);
 	virtual int GetClientWorldID(int ClientID);
 	virtual void BackInformationFakeClient(int FakeClientID);
 
@@ -267,7 +270,7 @@ public:
 	int ClientCountry(int ClientID) const;
 	bool ClientIngame(int ClientID) const;
 
-	virtual int SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int WorldID = -1);
+	virtual int SendMsg(CMsgPacker* pMsg, int Flags, int ClientID, int64 Mask = -1, int WorldID = -1);
 
 	void DoSnapshot(int WorldID);
 

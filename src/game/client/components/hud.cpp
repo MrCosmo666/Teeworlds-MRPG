@@ -435,11 +435,6 @@ void CHud::RenderCheckpoint()
 	}
 }
 
-void CHud::RenderTalkText()
-{
-
-}
-
 void CHud::OnMessage(int MsgType, void* pRawMsg)
 {
 	if (MsgType == NETMSGTYPE_SV_CHECKPOINT)
@@ -808,7 +803,6 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 		str_format(Text, sizeof(Text), "%d", pClientStats->m_Armor);
 		TextRender()->SetCursor(&Cursor, 85, 23, 6.0f, TEXTFLAG_RENDER);
 		TextRender()->TextEx(&Cursor, Text, -1);
-
 	}
 }
 
@@ -1021,8 +1015,6 @@ void CHud::OnRender()
 			RenderConnectionWarning();
 		RenderTeambalanceWarning();
 		RenderVoting();
-
-		RenderTalkText();
 	}
 	RenderCursor();
 }

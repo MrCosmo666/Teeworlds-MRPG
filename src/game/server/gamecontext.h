@@ -82,10 +82,11 @@ public:
 	// - - - - - - - - - - - -
 	struct StructAttribut
 	{
-		char Name[32];
-		char FieldName[32];
-		int UpgradePrice;
-		int AtType;
+		char m_aName[32];
+		char m_aFieldName[32];
+		int m_UpgradePrice;
+		int m_Type;
+		int m_Devide;
 	};
 	static std::map < int, StructAttribut > ms_aAttributsInfo;
 
@@ -150,8 +151,7 @@ private:
 
 public:
 	void AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSpan);
-	void SendBroadcast(const char *pText, int ClientID, int Priority, int LifeSpan);
-	void SBL(int ClientID, int Priority, int LifeSpan, const char *pText, ...);
+	void Broadcast(int ClientID, int Priority, int LifeSpan, const char *pText, ...);
 	void BroadcastWorldID(int WorldID, int Priority, int LifeSpan, const char *pText, ...);
 	void BroadcastTick(int ClientID);
 
@@ -164,7 +164,7 @@ public:
 	void SendSettings(int ClientID);
 	void SendSkinChange(int ClientID, int TargetID);
 	void SendEquipItem(int ClientID, int TargetID);
-	void SendRangeEquipItem(int TargetID, int StartSenderClientID, int EndSenderClientID33);
+	void SendCompleteEquippingItems(int TargetID);
 	void SendTeam(int ClientID, int Team, bool DoChatMsg, int TargetID);
 	void SendGameMsg(int GameMsgID, int ClientID);
 	void SendGameMsg(int GameMsgID, int ParaI1, int ClientID);
@@ -189,7 +189,7 @@ public:
 	void OnShutdown() override;
 
 	void OnTick() override;
-	void OnTickLocalWorld();
+	void OnTickMainWorld() override;
 	void OnPreSnap() override;
 	void OnSnap(int ClientID) override;
 	void OnPostSnap() override;
@@ -197,7 +197,7 @@ public:
 	void OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID) override;
 	void OnClientConnected(int ClientID) override;
 	void ChangeWorld(int ClientID) override;
-	void UpdateQuestsBot(int QuestID, int Step) override;
+	void UpdateQuestsBot(int QuestID, int Step);
 
 	void OnClientEnter(int ClientID) override;
 	void OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld = false) override;
@@ -243,7 +243,7 @@ private:
 	std::list<CVoteOptions> m_aPlayerVotes[MAX_PLAYERS];
 
 public:
-	void AV(int To, const char *Cmd, const char *Desc, const int ID = -1, const int ID2 = -1, const char *Icon = "unused");
+	void AV(int To, const char *Cmd, const char *Desc = "\0", const int ID = -1, const int ID2 = -1, const char *Icon = "unused");
 	void AVL(int To, const char* aCmd, const char* pText, ...);
 	void AVH(int To, const int ID, vec3 Color, const char* pText, ...);
 	void AVHI(int To, const char *Icon, const int ID, vec3 Color, const char* pText, ...);
@@ -257,10 +257,10 @@ public:
 	void ResetVotes(int ClientID, int MenuList);
 	void UpdateVotes(int ClientID, int MenuList);
 	void UpdateVotes(int MenuList);
-	void AddBack(int ClientID);
+	void AddBackpage(int ClientID);
 	void ShowPlayerStats(CPlayer *pPlayer);
 	void ShowItemValueInformation(CPlayer *pPlayer, int ItemID = itGold);
-	bool ParseVote(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text);
+	bool ParsingVoteCommands(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text);
 
 	/* #########################################################################
 		MMO GAMECONTEXT 
@@ -268,8 +268,8 @@ public:
 	int CreateBot(short BotType, int BotID, int SubID);
 	void CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText);
 	void CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop = 1, vec2 Force = vec2(0.0f, 0.0f));
-	void CreateDropItem(vec2 Pos, int ClientID, int ItemID, int Count, int Enchant = 0, vec2 Force = vec2(0.0f, 0.0f));
-	void CreateDropItem(vec2 Pos, int ClientID, InventoryItem &pItemPlayer, int Count, vec2 Force = vec2(0.0f, 0.0f));
+	void CreateDropItem(vec2 Pos, int ClientID, InventoryItem DropItem, vec2 Force = vec2(0.0f, 0.0f));
+	void CreateRandomDropItem(vec2 Pos, int ClientID, float Random, InventoryItem DropItem, vec2 Force = vec2(0.0f, 0.0f));
 	bool TakeItemCharacter(int ClientID);
 	void SendInbox(int ClientID, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
 
@@ -283,16 +283,15 @@ public:
 
 	bool IsMmoClient(int ClientID) const;
 	int GetWorldID() const { return m_WorldID; }
-	int DungeonID() const { return m_DungeonID; }
+	int GetDungeonID() const { return m_DungeonID; }
 	bool IsDungeon() const { return (m_DungeonID > 0); }
-	int IncreaseExperienceRaid(int IncreaseCount) const;
+	int GetExperienceMultiplier(int IncreaseCount) const;
 	bool IsPlayerEqualWorldID(int ClientID, int WorldID = -1) const;
 	bool IsAllowedPVP() const { return m_AllowedPVP; }
-	const char* AtributeName(int BonusID) const;
 
 	bool CheckingPlayersDistance(vec2 Pos, float Distance) const;
-	void SetRespawnWorld(int WorldID) { m_RespawnWorld = WorldID; }
 	void SetMapMusic(int SoundID) { m_MusicID = SoundID; }
+	void SetRespawnWorld(int WorldID) { m_RespawnWorld = WorldID; }
 	int GetRespawnWorld() const { return m_RespawnWorld; }
 
 	CCommandProcessor* CommandProcessor() { return m_pCommandProcessor; }
@@ -301,12 +300,9 @@ private:
 	void UpdateZonePVP();
 	void UpdateZoneDungeon();
 
-	/* #########################################################################
-		FUNCTIONS PLAYER ITEMS
-	######################################################################### */
 	bool m_AllowedPVP;
 	int m_DayEnumType;
-	static int m_RaidExp;
+	static int m_MultiplierExp;
 };
 
 inline int64 CmaskAll() { return -1; }

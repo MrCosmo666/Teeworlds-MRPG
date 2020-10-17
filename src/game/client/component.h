@@ -41,8 +41,8 @@ public:
 	virtual void OnRender() {};
 	virtual void OnRelease() {};
 	virtual void OnMapLoad() {};
-	virtual void OnMessage(int Msg, void *pRawMsg) {}
-	virtual bool OnMouseMove(float x, float y) { return false; }
+	virtual void OnMessage(int Msg, void* pRawMsg) {}
+	virtual bool OnCursorMove(float x, float y, int CursorType) { return false; }
 	virtual bool OnInput(IInput::CEvent e) { return false; }
 };
 

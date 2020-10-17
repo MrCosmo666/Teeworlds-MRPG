@@ -249,7 +249,7 @@ void HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 	if(RES->next())
 	{
 		const int Price = RES->getInt("Price");
-		if(pPlayer->CheckFailMoney(Price))	
+		if(!pPlayer->SpendCurrency(Price))	
 			return;
 
 		ms_aHouse[HouseID].m_Bank = 0;
@@ -347,9 +347,9 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "and press (Back to inventory).");
 
 		Job()->Item()->ListInventory(pPlayer, ItemType::TYPE_DECORATION);
-		GS()->AV(ClientID, "null", "");
+		GS()->AV(ClientID, "null");
 		ShowDecorationList(pPlayer);
-		GS()->AddBack(ClientID);
+		GS()->AddBackpage(ClientID);
 		return true;
 	}
 
@@ -358,7 +358,7 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
 		ShowPersonalHouse(pPlayer);
-		GS()->AddBack(ClientID);
+		GS()->AddBackpage(ClientID);
 		return true;
 	}
 
@@ -370,11 +370,11 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 
 		GS()->AVH(ClientID, TAB_INFO_HOUSE_PLANT, GREEN_COLOR, "Plants Information");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE_PLANT, "Select item and in tab select 'To plant'");
-		GS()->AV(ClientID, "null", "");
+		GS()->AV(ClientID, "null");
 
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "Housing Active Plants: {STR}", GS()->GetItemInfo(PlantItemID).GetName(pPlayer));
 		GS()->Mmo()->Item()->ListInventory(pPlayer, FUNCTION_PLANTS, true);
-		GS()->AddBack(ClientID);
+		GS()->AddBackpage(ClientID);
 		return true;
 	}
 
@@ -445,9 +445,9 @@ void HouseJob::ShowHouseMenu(CPlayer *pPlayer, int HouseID)
 	GS()->AVH(ClientID, TAB_INFO_HOUSE, GREEN_COLOR, "House {INT} . {STR}", &HouseID, ms_aHouse[HouseID].m_aClass);
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE, "Owner House: {STR}", Job()->PlayerName(ms_aHouse[HouseID].m_OwnerID));
 
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 	GS()->ShowItemValueInformation(pPlayer, itGold);
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 	
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	if(ms_aHouse[HouseID].m_OwnerID <= 0)
@@ -455,7 +455,7 @@ void HouseJob::ShowHouseMenu(CPlayer *pPlayer, int HouseID)
 	else
 		GS()->AVM(ClientID, "null", HouseID, NOPE, "This house has already been purchased!");
 
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 }
 
 void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
@@ -474,14 +474,14 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "- - - - - - - - - -");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "Notes: Minimal operation house balance 100gold");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "In your safe is: {INT}gold", &ms_aHouse[HouseID].m_Bank);
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 	//
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", &pPlayer->GetItem(itGold).m_Count);
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVM(ClientID, "HOUSEADD", 1, NOPE, "Add to the safe gold. (Amount in a reason)");
 	GS()->AVM(ClientID, "HOUSETAKE", 1, NOPE, "Take the safe gold. (Amount in a reason)");
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 	//
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "▤ House system");
@@ -498,7 +498,7 @@ void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
 		GS()->AVM(ClientID, "null", MenuList::MENU_HOUSE_DECORATION, NOPE, "More settings allow, only on house zone");
 }
 
-bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool HouseJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if(PPSTR(CMD, "BUYHOUSE") == 0)
@@ -549,11 +549,11 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 			return true;
 		}
 		
-		if(pPlayer->CheckFailMoney(Get))
-			return true;
-
-		AddSafeDeposit(pPlayer, Get);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE);
+		if(pPlayer->SpendCurrency(Get))
+		{
+			AddSafeDeposit(pPlayer, Get);
+			GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE);
+		}
 		return true;
 	}
 
@@ -590,11 +590,11 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		GS()->ClearVotes(ClientID);
 		GS()->AV(ClientID, "null", "Please close vote and press Left Mouse,");
 		GS()->AV(ClientID, "null", "on position where add decoration!");
-		GS()->AddBack(ClientID);
+		GS()->AddBackpage(ClientID);
 
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
 		pPlayer->GetTempData().m_TempDecoractionID = VoteID;
-		pPlayer->GetTempData().m_TempDecorationType = DECOTYPE_HOUSE;
+		pPlayer->GetTempData().m_TempDecorationType = DECORATIONS_HOUSE;
 		return true;
 	}
 
@@ -627,7 +627,7 @@ bool HouseJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID,
 		}
 
 		const int ItemID = VoteID;
-		if(pPlayer->CheckFailMoney(1, ItemID))
+		if(!pPlayer->SpendCurrency(1, ItemID))
 			return true;
 
 		const int ChanceSuccesful = VoteID2;

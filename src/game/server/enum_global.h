@@ -47,20 +47,20 @@ STRINGABLE_ENUM_DECL(EMEMBERUPGRADE)
 */
 enum DayType
 {
-	NIGHTTYPE = 1,
-	DAYTYPE,
-	MORNINGTYPE,
-	EVENINGTYPE
+	NIGHT_TYPE = 1,
+	DAY_TYPE,
+	MORNING_TYPE,
+	EVENING_TYPE
 };
 
 enum
 {
-	NEWBIE_ZERO_WORLD = 0,					// initial world
-	LOCAL_WORLD = 0,						// local world
-	COUNT_WORLD = 12,						// number of worlds
-	LAST_WORLD = COUNT_WORLD - 1,			// last world
-	FREE_SLOTS_WORLD = 7,					// world where there are slots for fake mobs
-	MAX_DROPPED_FROM_MOBS = 5,				// maximum number of items that can be dropped by mobs
+	MAIN_WORLD = 0,                     // local world
+	COUNT_WORLD = 12,                   // number of worlds
+	LAST_WORLD = COUNT_WORLD - 1,       // last world
+	FAKE_DISCORD_CHAT_WORLD = 7,        // fake world id discord chat
+
+	MAX_DROPPED_FROM_MOBS = 5,          // maximum number of items that can be dropped by mobs
 };
 
 #endif

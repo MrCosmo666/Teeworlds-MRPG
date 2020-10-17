@@ -20,7 +20,7 @@ CQuestPathFinder::CQuestPathFinder(CGameWorld *pGameWorld, vec2 Pos, int ClientI
 void CQuestPathFinder::Tick() 
 {
 	CPlayer* pPlayer = GS()->GetPlayer(m_ClientID, true, true);
-	if (m_TargetPos == vec2(0.0f, 0.0f) || !pPlayer || QuestJob::ms_aQuests[m_ClientID][m_QuestID].m_Progress != m_QuestProgress || QuestJob::ms_aQuests[m_ClientID][m_QuestID].m_State != QuestState::QUEST_ACCEPT)
+	if (m_TargetPos == vec2(0.0f, 0.0f) || !pPlayer || QuestJob::ms_aQuests[m_ClientID][m_QuestID].m_Step != m_QuestProgress || QuestJob::ms_aQuests[m_ClientID][m_QuestID].m_State != QuestState::QUEST_ACCEPT)
 	{
 		Finish();
 		return;

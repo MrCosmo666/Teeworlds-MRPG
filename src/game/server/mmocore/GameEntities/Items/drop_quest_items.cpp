@@ -83,7 +83,7 @@ void CDropQuestItem::Tick()
 	const int QuestID = m_QuestBot.m_QuestID;
 	CPlayer* pOwnerPlayer = GS()->m_apPlayers[m_OwnerID];
 	InventoryItem& pPlayerQuestItem = pOwnerPlayer->GetItem(m_QuestBot.m_aItemSearch[0]);
-	if (QuestJob::ms_aQuests[m_OwnerID][QuestID].m_Progress != m_QuestBot.m_Progress || pPlayerQuestItem.m_Count >= Count)
+	if (QuestJob::ms_aQuests[m_OwnerID][QuestID].m_Step != m_QuestBot.m_Step || pPlayerQuestItem.m_Count >= Count)
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;
@@ -92,7 +92,7 @@ void CDropQuestItem::Tick()
 	if (m_Collide && pOwnerPlayer->GetCharacter() && distance(m_Pos, pOwnerPlayer->GetCharacter()->m_Core.m_Pos) < 32.0f)
 	{
 		// item selection text
-		GS()->SBL(m_OwnerID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Press 'Fire' for pick Quest Item");
+		GS()->Broadcast(m_OwnerID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Press 'Fire' for pick Quest Item");
 		if (pOwnerPlayer->GetCharacter()->m_ReloadTimer)
 		{
 			GS()->CreatePlayerSound(m_OwnerID, SOUND_ITEM_PICKUP);

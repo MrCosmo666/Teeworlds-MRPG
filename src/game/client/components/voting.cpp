@@ -81,7 +81,7 @@ void CVoting::RemovevoteOption(int OptionID)
 void CVoting::AddvoteOption(const char *pDescription, const char *pCommand)
 {
 	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "add_vote \"%s\" %s", pDescription, pCommand);
+	str_format(aBuf, sizeof(aBuf), "add_vote \"%s\" \"%s\"", pDescription, pCommand);
 	Client()->Rcon(aBuf);
 }
 
@@ -99,7 +99,7 @@ CVoting::CVoting()
 
 void CVoting::AddOption(const char *pDescription, vec3 Color, const char *Icon)
 {
-	CVoteOptionClient *pOption;
+	CVoteOptionClient* pOption;
 	if(m_pRecycleFirst)
 	{
 		pOption = m_pRecycleFirst;
@@ -110,7 +110,7 @@ void CVoting::AddOption(const char *pDescription, vec3 Color, const char *Icon)
 			m_pRecycleLast = 0;
 	}
 	else
-		pOption = (CVoteOptionClient *)m_Heap.Allocate(sizeof(CVoteOptionClient));
+		pOption = (CVoteOptionClient*)m_Heap.Allocate(sizeof(CVoteOptionClient));
 
 	pOption->m_pNext = 0;
 	pOption->m_pPrev = m_pLast;
@@ -120,14 +120,27 @@ void CVoting::AddOption(const char *pDescription, vec3 Color, const char *Icon)
 	if(!m_pFirst)
 		m_pFirst = pOption;
 
-	// mmotee
+	int Depth = 0;
+	for(; *pDescription == '#'; pDescription++, Depth++);
+	pOption->m_Depth = Depth ? Depth : pOption->m_pPrev ? pOption->m_pPrev->m_Depth : 0;
+
+	pOption->m_IsSubheader = Depth;
+
+	if(!*pDescription)
+		pOption->m_Depth = 0;
+
+	str_copy(pOption->m_aDescription, pDescription, sizeof(pOption->m_aDescription));
+
+	if(g_Config.m_Debug)
+		dbg_msg("voting", "added option '%s' with depth='%d'", pDescription, pOption->m_Depth);
+
+	// mrpg
 	vec3 ColorVote = g_Config.m_ClShowVoteColor ? Color : vec3(0.0f, 0.0f, 0.0f);
 	pOption->m_Colored[0] = ColorVote.x;
 	pOption->m_Colored[1] = ColorVote.y;
 	pOption->m_Colored[2] = ColorVote.z;
 
 	str_copy(pOption->m_Icon, Icon, sizeof(pOption->m_Icon));
-	str_copy(pOption->m_aDescription, pDescription, sizeof(pOption->m_aDescription));
 	++m_NumVoteOptions;
 }
 

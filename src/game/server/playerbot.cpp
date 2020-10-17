@@ -15,7 +15,7 @@ CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int Spaw
 {
 	m_Spawned = true;
 	m_DungeonAllowedSpawn = false;
-	m_PlayerTick[TickState::Respawn] = Server()->Tick();
+	m_aPlayerTick[TickState::Respawn] = Server()->Tick();
 	(this)->SendClientInfo(-1);
 }
 
@@ -54,7 +54,7 @@ void CPlayerBot::Tick()
 			m_ViewPos = m_pCharacter->GetPos();
 		}
 	} 
-	else if(m_Spawned && m_PlayerTick[TickState::Respawn]+Server()->TickSpeed()*3 <= Server()->Tick())
+	else if(m_Spawned && m_aPlayerTick[TickState::Respawn]+Server()->TickSpeed()*3 <= Server()->Tick())
 		TryRespawn();
 
 	HandleTuningParams();
@@ -67,31 +67,34 @@ int CPlayerBot::GetStartHealth()
 	return 10;	
 }
 
-int CPlayerBot::GetAttributeCount(int BonusID, bool Really, bool SearchClass)
+int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 {
 	if(m_BotType != BotsTypes::TYPE_BOT_MOB)
 		return 10;
 
-	int Power = BotJob::ms_aMobBot[m_SubBotID].m_Power;
+	// get stats from the bot's equipment
+	int AttributeEx = BotJob::ms_aMobBot[m_SubBotID].m_Power;
 	for (int i = 0; i < MAX_EQUIPPED_SLOTS_BOTS; i++)
 	{
-		const int ItemID = GetEquippedItem(i);
+		const int ItemID = GetEquippedItemID(i);
 		const int ItemBonusCount = GS()->GetItemInfo(ItemID).GetInfoEnchantStats(BonusID);
-		if (ItemID <= 0 || ItemBonusCount < 0)
-			continue;
-		Power += ItemBonusCount;
+		if (ItemID > 0 && ItemBonusCount > 0)
+			AttributeEx += ItemBonusCount;
+	}
+	
+	// spread weapons
+	if(BonusID == Stats::StSpreadShotgun || BonusID == Stats::StSpreadGrenade || BonusID == Stats::StSpreadRifle)
+		AttributeEx = BotJob::ms_aMobBot[m_SubBotID].m_Spread;
+
+	// all attribute stats without hardness
+	else if(BonusID != Stats::StHardness && CGS::ms_aAttributsInfo[BonusID].m_Devide > 0)
+	{
+		AttributeEx /= CGS::ms_aAttributsInfo[BonusID].m_Devide;
+		if(CGS::ms_aAttributsInfo[BonusID].m_Type == AtHardtype)
+			AttributeEx /= BotJob::ms_aMobBot[m_SubBotID].m_Boss ? 30 : 2;
 	}
 
-	// all damage stats
-	if (BonusID == Stats::StStrength || CGS::ms_aAttributsInfo[BonusID].AtType == AtHardtype)
-		Power /= BotJob::ms_aMobBot[m_SubBotID].m_Boss ? 300 : 50;
-	// spread weapons
-	else if(BonusID == Stats::StSpreadShotgun || BonusID == Stats::StSpreadGrenade || BonusID == Stats::StSpreadRifle)
-		Power = BotJob::ms_aMobBot[m_SubBotID].m_Spread;
-	// all another stats 
-	else if(BonusID != Stats::StHardness)
-		Power /= 5;
-	return Power;
+	return AttributeEx;
 }
 
 void CPlayerBot::TryRespawn()
@@ -141,8 +144,8 @@ int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 		const int QuestID = BotJob::ms_aQuestBot[m_SubBotID].m_QuestID;
 		if(GS()->Mmo()->Quest()->GetState(SnappingClient, QuestID) != QuestState::QUEST_ACCEPT) 
 			return 0;
-		const int TalkProgress = BotJob::ms_aQuestBot[m_SubBotID].m_Progress;
-		if(TalkProgress != QuestJob::ms_aQuests[SnappingClient][QuestID].m_Progress)
+		const int TalkProgress = BotJob::ms_aQuestBot[m_SubBotID].m_Step;
+		if(TalkProgress != QuestJob::ms_aQuests[SnappingClient][QuestID].m_Step)
 			return 0;
 		
 		// [first] quest bot active for player
@@ -231,7 +234,7 @@ bool CPlayerBot::IsActiveQuests(int SnapClientID) const
 	if(m_BotType == BotsTypes::TYPE_BOT_NPC)
 	{
 		const int GivesQuest = GS()->Mmo()->BotsData()->GetQuestNPC(m_SubBotID);
-		if(BotJob::ms_aNpcBot[m_SubBotID].Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST && 
+		if(BotJob::ms_aNpcBot[m_SubBotID].m_Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST && 
 			GS()->Mmo()->Quest()->GetState(SnapClientID, GivesQuest) == QuestState::QUEST_NO_ACCEPT)
 			return true;
 		return false;
@@ -240,7 +243,7 @@ bool CPlayerBot::IsActiveQuests(int SnapClientID) const
 	return false;
 }
 
-int CPlayerBot::GetEquippedItem(int EquipID, int SkipItemID) const
+int CPlayerBot::GetEquippedItemID(int EquipID, int SkipItemID) const
 {
 	if (EquipID < EQUIP_HAMMER || EquipID > EQUIP_WINGS || EquipID == EQUIP_MINER)
 		return -1;

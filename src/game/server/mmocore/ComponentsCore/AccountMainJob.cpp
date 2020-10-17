@@ -10,9 +10,20 @@ using namespace sqlstr;
 std::map < int, AccountMainJob::StructData > AccountMainJob::ms_aData;
 std::map < int, AccountMainJob::StructTempPlayerData > AccountMainJob::ms_aPlayerTempData;
 
+int AccountMainJob::GetHistoryLatestCorrectWorldID(CPlayer* pPlayer) const
+{
+	const auto pWorldIterator = std::find_if(pPlayer->Acc().m_aHistoryWorld.begin(), pPlayer->Acc().m_aHistoryWorld.end(), [=](int WorldID)
+	{
+		const int QuestToUnlock = Job()->WorldSwap()->GetNecessaryQuest(WorldID);
+		const bool IsValidQuest = Job()->Quest()->IsValidQuest(QuestToUnlock);
+		return !Job()->Dungeon()->IsDungeonWorld(WorldID) && ((IsValidQuest && Job()->Quest()->IsCompletedQuest(pPlayer->GetCID(), QuestToUnlock)) || !IsValidQuest);
+	});
+	return pWorldIterator != pPlayer->Acc().m_aHistoryWorld.end() ? *pWorldIterator : (int)MAIN_WORLD;
+}
+
 int AccountMainJob::SendAuthCode(int ClientID, int Code)
 {
-	if (GS()->IsMmoClient(ClientID))
+	if(GS()->IsMmoClient(ClientID))
 	{
 		CNetMsg_Sv_ClientProgressAuth ProgressMsg;
 		ProgressMsg.m_Code = Code;
@@ -123,11 +134,12 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		pPlayer->Acc().m_GuildID = ACCOUNTDATA->getInt("GuildID");
 		pPlayer->Acc().m_Upgrade = ACCOUNTDATA->getInt("Upgrade");
 		pPlayer->Acc().m_GuildRank = ACCOUNTDATA->getInt("GuildRank");
-		pPlayer->Acc().m_WorldID = ACCOUNTDATA->getInt("WorldID");
+		pPlayer->Acc().m_aHistoryWorld.push_front(ACCOUNTDATA->getInt("WorldID"));
+
 		for (const auto& at : CGS::ms_aAttributsInfo)
 		{
-			if (str_comp_nocase(at.second.FieldName, "unfield") != 0)
-				pPlayer->Acc().m_aStats[at.first] = ACCOUNTDATA->getInt(at.second.FieldName);
+			if (str_comp_nocase(at.second.m_aFieldName, "unfield") != 0)
+				pPlayer->Acc().m_aStats[at.first] = ACCOUNTDATA->getInt(at.second.m_aFieldName);
 		}
 
 		GS()->Chat(ClientID, "- - - - - - - [Successful login] - - - - - - -");
@@ -150,7 +162,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
-	GS()->SBL(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 200, "You are located {STR} ({STR})", 
+	GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 200, "You are located {STR} ({STR})", 
 		GS()->Server()->GetWorldName(GS()->GetWorldID()), (GS()->IsAllowedPVP() ? "Zone PVP" : "Safe zone"));
 
 	GS()->SendWorldMusic(ClientID, (GS()->IsDungeon() ? -1 : 0));
@@ -161,7 +173,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 			GS()->Chat(ClientID, "You have {INT} unread messages!", &CountMessageInbox);
 
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
-		GS()->SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
+		GS()->SendCompleteEquippingItems(ClientID);
 		return;
 	}
 
@@ -172,7 +184,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	char pMsg[256], pLoggin[64];
 	str_format(pLoggin, sizeof(pLoggin), "%s logged in Account ID %d", GS()->Server()->ClientName(ClientID), pPlayer->Acc().m_AuthID);
 	str_format(pMsg, sizeof(pMsg), "?player=%s&rank=%d&dicid=%d",
-		GS()->Server()->ClientName(ClientID), Rank, pPlayer->GetEquippedItem(EQUIP_DISCORD));
+		GS()->Server()->ClientName(ClientID), Rank, pPlayer->GetEquippedItemID(EQUIP_DISCORD));
 	GS()->Server()->SendDiscordGenerateMessage("16757248", pLoggin, pMsg);
 #endif
 
@@ -189,12 +201,13 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 
 	pPlayer->GetTempData().m_TempSafeSpawn = true;
 
-	if(pPlayer->Acc().m_WorldID != GS()->GetWorldID())
+	int LatestCorrectWorldID = GetHistoryLatestCorrectWorldID(pPlayer);
+	if(LatestCorrectWorldID != GS()->GetWorldID())
 	{
-		pPlayer->ChangeWorld(pPlayer->Acc().m_WorldID);
+		pPlayer->ChangeWorld(LatestCorrectWorldID);
 		return;
 	}
-	GS()->SendRangeEquipItem(ClientID, 0, MAX_CLIENTS);
+	GS()->SendCompleteEquippingItems(ClientID);
 }
 
 void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)
@@ -250,7 +263,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 
 		// equipment modules
 		bool IsFoundModules = false;
-		GS()->AV(ClientID, "null", "");
+		GS()->AV(ClientID, "null");
 		GS()->AVH(ClientID, TAB_SETTINGS_MODULES, GREEN_COLOR, "Modules settings");
 		for (const auto& it : InventoryJob::ms_aItems[ClientID])
 		{
@@ -269,7 +282,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		if (!IsFoundModules)
 			GS()->AVM(ClientID, "null", NOPE, TAB_SETTINGS_MODULES, "The list of modules equipment is empty.");
 	
-		GS()->AddBack(ClientID);
+		GS()->AddBackpage(ClientID);
 		return true;
 	}
 
@@ -280,7 +293,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		GS()->AVH(ClientID, TAB_INFO_LANGUAGES, GREEN_COLOR, "Languages Information");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_LANGUAGES, "Here you can choose the language.");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_LANGUAGES, "Note: translation is not complete.");
-		GS()->AV(ClientID, "null", "");
+		GS()->AV(ClientID, "null");
 
 		const char* pPlayerLanguage = pPlayer->GetLanguage();
 		GS()->AVH(ClientID, TAB_LANGUAGES, GRAY_COLOR, "Active language: [{STR}]", pPlayerLanguage);
@@ -294,13 +307,13 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 			const char *pLanguageName = GS()->Server()->Localization()->m_pLanguages[i]->GetName();
 			GS()->AVM(ClientID, "SELECTLANGUAGE", i, TAB_LANGUAGES, "Select language \"{STR}\"", pLanguageName);
 		}
-		GS()->AddBack(ClientID);
+		GS()->AddBackpage(ClientID);
 		return true;
 	}
 	return false;
 }
 
-bool AccountMainJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool AccountMainJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (PPSTR(CMD, "SELECTLANGUAGE") == 0)

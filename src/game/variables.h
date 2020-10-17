@@ -5,7 +5,9 @@
 #undef GAME_VARIABLES_H // this file will be included several times
 
 // client
-MACRO_CONFIG_INT(ClPredict, cl_predict, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Predict client movements")
+MACRO_CONFIG_INT(ClPredict, cl_predict, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Use prediction for objects in the game world")
+MACRO_CONFIG_INT(ClPredictPlayers, cl_predict_players, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Predict movements of other players")
+MACRO_CONFIG_INT(ClPredictProjectiles, cl_predict_projectiles, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Predict position of projectiles")
 MACRO_CONFIG_INT(ClNameplates, cl_nameplates, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Show name plates")
 MACRO_CONFIG_INT(ClNameplatesAlways, cl_nameplates_always, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Always show name plates disregarding of distance")
 MACRO_CONFIG_INT(ClNameplatesTeamcolors, cl_nameplates_teamcolors, 1, 0, 1, CFGFLAG_CLIENT|CFGFLAG_SAVE, "Use team colors for name plates")
@@ -85,24 +87,25 @@ MACRO_CONFIG_INT(PlayerUseCustomColorDecoration, player_use_custom_color_decorat
 MACRO_CONFIG_INT(PlayerUseCustomColorHands, player_use_custom_color_hands, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Toggles usage of custom colors for hands")
 MACRO_CONFIG_INT(PlayerUseCustomColorFeet, player_use_custom_color_feet, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Toggles usage of custom colors for feet")
 MACRO_CONFIG_INT(PlayerUseCustomColorEyes, player_use_custom_color_eyes, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Toggles usage of custom colors for eyes")
-MACRO_CONFIG_STR(PlayerSkin, player_skin, 24, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player skin")
-MACRO_CONFIG_STR(PlayerSkinBody, player_skin_body, 24, "standard", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player skin body")
-MACRO_CONFIG_STR(PlayerSkinMarking, player_skin_marking, 24, "", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player skin marking")
-MACRO_CONFIG_STR(PlayerSkinDecoration, player_skin_decoration, 24, "", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player skin decoration")
-MACRO_CONFIG_STR(PlayerSkinHands, player_skin_hands, 24, "standard", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player skin hands")
-MACRO_CONFIG_STR(PlayerSkinFeet, player_skin_feet, 24, "standard", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player skin feet")
-MACRO_CONFIG_STR(PlayerSkinEyes, player_skin_eyes, 24, "standard", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player skin eyes")
+MACRO_CONFIG_STR(PlayerSkin, player_skin, MAX_SKIN_LENGTH, "default", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player skin")
+MACRO_CONFIG_STR(PlayerSkinBody, player_skin_body, MAX_SKIN_LENGTH, "standard", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player skin body")
+MACRO_CONFIG_STR(PlayerSkinMarking, player_skin_marking, MAX_SKIN_LENGTH, "", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player skin marking")
+MACRO_CONFIG_STR(PlayerSkinDecoration, player_skin_decoration, MAX_SKIN_LENGTH, "", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player skin decoration")
+MACRO_CONFIG_STR(PlayerSkinHands, player_skin_hands, MAX_SKIN_LENGTH, "standard", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player skin hands")
+MACRO_CONFIG_STR(PlayerSkinFeet, player_skin_feet, MAX_SKIN_LENGTH, "standard", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player skin feet")
+MACRO_CONFIG_STR(PlayerSkinEyes, player_skin_eyes, MAX_SKIN_LENGTH, "standard", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Player skin eyes")
 
 MACRO_CONFIG_INT(UiBrowserPage, ui_browser_page, 5, 5, 9, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Interface serverbrowser page")
 MACRO_CONFIG_INT(UiSettingsPage, ui_settings_page, 0, 0, 6, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Interface settings page")
 MACRO_CONFIG_STR(UiInternetServerAddress, ui_internet_server_address, 64, "localhost:8303", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Interface server address (Internet page)")
 MACRO_CONFIG_STR(UiLanServerAddress, ui_lan_server_address, 64, "localhost:8303", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Interface server address (LAN page)")
 MACRO_CONFIG_INT(UiMousesens, ui_mousesens, 100, 1, 100000, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Mouse sensitivity for menus/editor")
+MACRO_CONFIG_INT(UiJoystickSens, ui_joystick_sens, 100, 1, 100000, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Joystick sensitivity for menus/editor")
 MACRO_CONFIG_INT(UiAutoswitchInfotab, ui_autoswitch_infotab, 1, 0, 1, CFGFLAG_SAVE | CFGFLAG_CLIENT, "Switch to the info tab when clicking on a server")
 
 MACRO_CONFIG_INT(GfxNoclip, gfx_noclip, 0, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Disable clipping")
 
-MACRO_CONFIG_STR(ClMenuMap, cl_menu_map, 64, "mmo", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Background map in the menu")
+MACRO_CONFIG_STR(ClMenuMap, cl_menu_map, 64, "mmo", CFGFLAG_CLIENT | CFGFLAG_SAVE, "Background map in the menu, auto = automatic based on season")
 MACRO_CONFIG_INT(ClShowMenuMap, cl_show_menu_map, 1, 0, 1, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Display background map in the menu")
 MACRO_CONFIG_INT(ClMenuAlpha, cl_menu_alpha, 25, 0, 75, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Transparency of the menu background")
 MACRO_CONFIG_INT(ClRotationRadius, cl_rotation_radius, 30, 1, 500, CFGFLAG_CLIENT | CFGFLAG_SAVE, "Menu camera rotation radius")
@@ -143,6 +146,8 @@ MACRO_CONFIG_INT(SvPriceUpgradeGuildAnother, sv_price_member_another, 16800, 100
 MACRO_CONFIG_INT(SvKillmobsIncreaseLevel, sv_kill_mobs_increase_level, 400, 0, 1000, CFGFLAG_SERVER, "Kill mobs of own level to increase.")
 MACRO_CONFIG_INT(SvMiningIncreaseLevel, sv_mining_increase_level, 80, 0, 1000, CFGFLAG_SERVER, "Mining items own level to increase")
 MACRO_CONFIG_INT(SvPlantingIncreaseLevel, sv_planting_increase_level, 80, 0, 10000, CFGFLAG_SERVER, "Planting items own level to increase")
+MACRO_CONFIG_INT(SvMultiplierExpRaidDungeon, sv_multiplier_exp_raid_dungeon, 150, 100, 1000, CFGFLAG_SERVER, "Dungeon experience multiplier")
+
 MACRO_CONFIG_INT(SvStrongGold, sv_strong_gold, 8, 0, 10000, CFGFLAG_SERVER, "Power mobs / strong gold")
 MACRO_CONFIG_INT(SvStrongAntiPVP, sv_strong_anti_pvp, 50, 0, 10000, CFGFLAG_SERVER, "Anti-PVP Difference classing leveling for denied.")
 

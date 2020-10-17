@@ -1,7 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#ifndef GAME_ITEMS_H
-#define GAME_ITEMS_H
+#ifndef GAME_ENUM_CONTEXT_H
+#define GAME_ENUM_CONTEXT_H
 
 #include <game/server/enum_global.h>
 #include <generated/protocol.h>
@@ -9,7 +9,7 @@
 #include <list>
 #include <map>
 
-// weapons and player harky
+// weapons and player stats
 enum Stats
 {
 	StSpreadShotgun			= 1,
@@ -182,7 +182,7 @@ enum
 	MIN_SKINCHANGE_CLIENTVERSION = 0x0703,	// minimum client version for skin change
 	MIN_RACE_CLIENTVERSION = 0x0704,		// minimum client version for race type
 	MAX_INBOX_LIST = 30,					// maximum number of emails what is displayed
-	STATS_MAX_FOR_ITEM = 2,
+	STATS_MAX_FOR_ITEM = 2,					// maximum number of stats per item
 
 	/*
 		All functions of items
@@ -217,14 +217,14 @@ enum
 	itTicketResetWeaponStats = 40,		// Ticket to reset the statistics cartridge upgrade
 	itTicketDiscountCraft = 43,			// Discount ticket for crafting
 
-	// sll sorting sheets that exist on the server
-	SORT_INVENTORY = 1,
+	// all sorting sheets that exist on the server
+	SORT_INVENTORY = 0,
 	SORT_EQUIPING,
 	NUM_SORT_TAB,
 
 	// type of decorations
-	DECOTYPE_HOUSE = 0,
-	DECOTYPE_GUILD_HOUSE,
+	DECORATIONS_HOUSE = 0,
+	DECORATIONS_GUILD_HOUSE,
 
 	// maximum bot slots
 	MAX_EQUIPPED_SLOTS_BOTS = EQUIP_WINGS + 1,
@@ -280,7 +280,7 @@ enum SaveType
 	SAVE_UPGRADES,			// Save Upgrades Damage and other this type
 	SAVE_PLANT_DATA,		// Save Plant Account
 	SAVE_MINER_DATA,		// Save Mining Account
-	SAVE_GUILD_DATA,		// Save Member Data
+	SAVE_GUILD_DATA,		// Save Guild Data
 	SAVE_POSITION,			// Save Position Player
 	SAVE_LANGUAGE,			// Save Language Client
 };

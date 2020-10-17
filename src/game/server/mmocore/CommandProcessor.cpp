@@ -386,6 +386,6 @@ void CCommandProcessor::ConChatRules(IConsole::IResult* pResult, void* pUser)
 
 void CCommandProcessor::LastChat(CGS *pGS, CPlayer *pPlayer)
 {
-	if(pPlayer->m_PlayerTick[TickState::LastChat] + pGS->Server()->TickSpeed() <= pGS->Server()->Tick())
-		pPlayer->m_PlayerTick[TickState::LastChat] = pGS->Server()->Tick();
+	if(pPlayer->m_aPlayerTick[TickState::LastChat] + pGS->Server()->TickSpeed() <= pGS->Server()->Tick())
+		pPlayer->m_aPlayerTick[TickState::LastChat] = pGS->Server()->Tick();
 }

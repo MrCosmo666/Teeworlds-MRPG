@@ -762,9 +762,11 @@ static void sockaddr_to_netaddr(const struct sockaddr *src, NETADDR *dst)
 	}
 }
 
-int net_addr_comp(const NETADDR *a, const NETADDR *b)
+int net_addr_comp(const NETADDR* a, const NETADDR* b, int check_port)
 {
-	return mem_comp(a, b, sizeof(NETADDR));
+	if(a->type == b->type && mem_comp(a->ip, b->ip, a->type == NETTYPE_IPV4 ? NETADDR_SIZE_IPV4 : NETADDR_SIZE_IPV6) == 0 && (!check_port || a->port == b->port))
+		return 0;
+	return -1;
 }
 
 void net_addr_str(const NETADDR *addr, char *string, int max_length, int add_port)
@@ -1854,6 +1856,36 @@ int time_houroftheday()
 	return time_info->tm_hour;
 }
 
+int time_season()
+{
+	time_t time_data;
+	struct tm* time_info;
+
+	time(&time_data);
+	time_info = localtime(&time_data);
+
+	switch(time_info->tm_mon)
+	{
+	case 11:
+	case 0:
+	case 1:
+		return SEASON_WINTER;
+	case 2:
+	case 3:
+	case 4:
+		return SEASON_SPRING;
+	case 5:
+	case 6:
+	case 7:
+		return SEASON_SUMMER;
+	case 8:
+	case 9:
+	case 10:
+		return SEASON_AUTUMN;
+	}
+	return SEASON_SPRING; // should never happen
+}
+
 int time_isxmasday()
 {
 	time_t time_data;
@@ -2682,6 +2714,22 @@ int str_utf8_check(const char *str)
 	return 1;
 }
 
+void str_utf8_copy_num(char* dst, const char* src, int dst_size, int num)
+{
+	int new_cursor;
+	int cursor = 0;
+
+	while(src[cursor])
+	{
+		new_cursor = str_utf8_forward(src, cursor);
+		if(new_cursor >= dst_size)			// reserve 1 byte for the null termination
+			break;
+		else
+			cursor = new_cursor;
+	}
+
+	str_copy(dst, src, cursor < dst_size ? cursor + 1 : dst_size);
+}
 
 unsigned str_quickhash(const char *str)
 {

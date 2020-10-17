@@ -34,8 +34,8 @@ public:
 	void SendClientInfo(int TargetID) override;
 	
 	int IsActiveSnappingBot(int SnappingClient) const override;
-	int GetEquippedItem(int EquipID, int SkipItemID = -1) const override;
-	int GetAttributeCount(int BonusID, bool Really = false, bool SearchClass = false) override;
+	int GetEquippedItemID(int EquipID, int SkipItemID = -1) const override;
+	int GetAttributeCount(int BonusID, bool Really = false) override;
 
 	void Tick() override;
 	void Snap(int SnappingClient) override;

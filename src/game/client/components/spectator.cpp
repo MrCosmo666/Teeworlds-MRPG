@@ -16,7 +16,7 @@
 
 void CSpectator::ConKeySpectator(IConsole::IResult *pResult, void *pUserData)
 {
-	CSpectator *pSelf = (CSpectator *)pUserData;
+	CSpectator* pSelf = (CSpectator*)pUserData;
 	if(pSelf->m_pClient->m_Snap.m_SpecInfo.m_Active &&
 		(pSelf->Client()->State() != IClient::STATE_DEMOPLAYBACK || pSelf->DemoPlayer()->GetDemoType() == IDemoPlayer::DEMOTYPE_SERVER))
 		pSelf->m_Active = pResult->GetInteger(0) != 0;
@@ -128,13 +128,13 @@ void CSpectator::OnConsoleInit()
 	Console()->Register("spectate_previous", "", CFGFLAG_CLIENT, ConSpectatePrevious, this, "Spectate the previous player");
 }
 
-bool CSpectator::OnMouseMove(float x, float y)
+bool CSpectator::OnCursorMove(float x, float y, int CursorType)
 {
 	if(!m_Active)
 		return false;
 
-	UI()->ConvertMouseMove(&x, &y);
-	m_SelectorMouse += vec2(x,y);
+	UI()->ConvertCursorMove(&x, &y, CursorType);
+	m_SelectorMouse += vec2(x, y);
 	return true;
 }
 

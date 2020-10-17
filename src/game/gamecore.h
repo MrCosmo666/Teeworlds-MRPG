@@ -200,6 +200,8 @@ public:
 	vec2 m_Pos;
 	vec2 m_Vel;
 
+	vec2 m_HookDragVel;
+
 	vec2 m_HookPos;
 	vec2 m_HookDir;
 	int m_HookTick;
@@ -223,8 +225,11 @@ public:
 	void Tick(bool UseInput, CTuningParams* TunningParams = NULL);
 	void Move(CTuningParams* TunningParams = NULL);
 
-	void Read(const CNetObj_CharacterCore *pObjCore);
-	void Write(CNetObj_CharacterCore *pObjCore);
+	void AddDragVelocity();
+	void ResetDragVelocity();
+
+	void Read(const CNetObj_CharacterCore* pObjCore);
+	void Write(CNetObj_CharacterCore* pObjCore) const;
 	void Quantize();
 };
 

@@ -6,6 +6,10 @@
 #include "kernel.h"
 #include "message.h"
 
+#include <engine/shared/protocol.h>
+#include <generated/protocol.h>
+#include <game/version.h>
+
 #define DC_SERVER_INFO g_Config.m_SvDiscordColorServerInfo
 #define DC_PLAYER_INFO g_Config.m_SvDiscordColorPlayerInfo
 #define DC_JOIN_LEAVE g_Config.m_SvDiscordColorJoinLeave
@@ -23,7 +27,7 @@ protected:
 	float WorldTime;
 
 public:
-	virtual class IGameServer* GameServer(int id = 0) = 0;
+	virtual class IGameServer* GameServer(int WorldID = 0) = 0;
 
 	class CLocalization* m_pLocalization;
 	inline class CLocalization* Localization() { return m_pLocalization; }
@@ -44,15 +48,42 @@ public:
 	virtual int GetClientInfo(int ClientID, CClientInfo *pInfo) const = 0;
 	virtual void GetClientAddr(int ClientID, char *pAddrStr, int Size) const = 0;
 
-	virtual int SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int WorldID = -1) = 0;
+	virtual int SendMsg(CMsgPacker *pMsg, int Flags, int ClientID, int64 Mask = -1, int WorldID = -1) = 0;
 
 	template<class T>
-	int SendPackMsg(T *pMsg, int Flags, int ClientID, int WorldID = -1)
+	int SendPackMsgMask(T* pMsg, int Flags, int ClientID, int64 Mask, int WorldID = -1)
 	{
 		CMsgPacker Packer(pMsg->MsgID(), false);
 		if(pMsg->Pack(&Packer))
 			return -1;
-		return SendMsg(&Packer, Flags, ClientID, WorldID);
+		return SendMsg(&Packer, Flags, ClientID, Mask, WorldID);
+	}
+
+	template<class T>
+	int SendPackMsg(T* pMsg, int Flags, int ClientID, int WorldID = -1)
+	{
+		CMsgPacker Packer(pMsg->MsgID(), false);
+		if(pMsg->Pack(&Packer))
+			return -1;
+
+		auto IsNotVanilaMsg = [=](int CID) -> bool // first mmo msg
+		{
+			return  GetClientProtocolVersion(CID) == PROTOCOL_VERSION_MMO && pMsg->MsgID() >= NETMSGTYPE_CL_ISMMOSERVER;
+		};
+
+		int64 Mask = -1;
+		if(ClientID == -1)
+		{
+			for(int i = 0; i < MAX_PLAYERS; i++)
+			{
+				if(ClientIngame(i) && (IsNotVanilaMsg(i) || pMsg->MsgID() < NETMSGTYPE_CL_ISMMOSERVER))
+					Mask |= (int64)1 << i;
+			}
+		}
+		else if(ClientIngame(ClientID) && (IsNotVanilaMsg(ClientID) || pMsg->MsgID() < NETMSGTYPE_CL_ISMMOSERVER))
+			Mask |= (int64)1 << ClientID;
+
+		return SendMsg(&Packer, Flags, ClientID, Mask, WorldID);
 	}
 
 	// World Time
@@ -68,7 +99,6 @@ public:
 	virtual void SetClientScore(int ClientID, int Score) = 0;
 
 	virtual void ChangeWorld(int ClientID, int WorldID) = 0;
-	virtual void QuestBotUpdateOnWorld(int WorldID, int QuestID, int Step) = 0;
 	virtual int GetClientWorldID(int ClientID) = 0;
 	virtual const char* GetWorldName(int WorldID) = 0;
 
@@ -114,6 +144,7 @@ public:
 	virtual void OnShutdown() = 0;
 
 	virtual void OnTick() = 0;
+	virtual void OnTickMainWorld() = 0;
 	virtual void OnPreSnap() = 0;
 	virtual void OnSnap(int ClientID) = 0;
 	virtual void OnPostSnap() = 0;
@@ -122,7 +153,6 @@ public:
 	virtual void ClearClientData(int ClientID) = 0;
 
 	virtual void ChangeWorld(int ClientID) = 0;
-	virtual void UpdateQuestsBot(int QuestID, int Step) = 0;
 	virtual void UpdateClientInformation(int FakeClientID) = 0;
 
 	virtual void OnClientConnected(int ClientID) = 0;

@@ -19,7 +19,7 @@ void ShopJob::OnInit()
 
 void ShopJob::OnTick()
 {
-	if(GS()->GetWorldID() == LOCAL_WORLD)
+	if(GS()->GetWorldID() == MAIN_WORLD)
 	{
 		if(GS()->Server()->Tick() % (1 * GS()->Server()->TickSpeed() * (g_Config.m_SvTimeCheckAuction * 60)) == 0)
 			CheckAuctionTime();
@@ -85,7 +85,7 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		GS()->AVM(ClientID, "SHOP", ID, HideID, "Exchange {STR}x{INT} to {STR}x{INT}", NeededItem.GetName(pPlayer), &Price, BuyightItem.GetName(pPlayer), &Count);
 		HideID++;
 	}
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 }
 
 // show auction
@@ -94,9 +94,9 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 	const int ClientID = pPlayer->GetCID();
 	GS()->AVH(ClientID, TAB_INFO_AUCTION, GREEN_COLOR, "Auction Information");
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_AUCTION, "To create a slot, see inventory item interact.");
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 	GS()->ShowItemValueInformation(pPlayer);
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 
 	bool FoundItems = false;
 	int HideID = (int)(NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 400);
@@ -137,7 +137,7 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 	if(!FoundItems)
 		GS()->AVL(ClientID, "null", "Currently there are no products.");
 		
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 }
 
 void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
@@ -163,7 +163,7 @@ void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
 		return GS()->Chat(ClientID, "Your same item found in the database, need reopen the slot!");
 
 	// if the money for the slot auction is withdrawn
-	if(pPlayer->CheckFailMoney(g_Config.m_SvAuctionPriceSlot))	
+	if(!pPlayer->SpendCurrency(g_Config.m_SvAuctionPriceSlot))	
 		return;
 
 	// pick up the item and add a slot
@@ -211,7 +211,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 		}
 
 		const int NeedItem = SHOPITEM->getInt("NeedItem");
-		if (pPlayer->CheckFailMoney(Price, NeedItem))
+		if (!pPlayer->SpendCurrency(Price, NeedItem))
 			return false;
 
 		char aBuf[128];
@@ -225,7 +225,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 
 	// - - - - - - - - - - - -SHOP - - - - - - - - - - - - -
 	const int NeedItem = SHOPITEM->getInt("NeedItem");
-	if (pPlayer->CheckFailMoney(Price, NeedItem))
+	if (!pPlayer->SpendCurrency(Price, NeedItem))
 		return false;
 
 	pPlayerBuyightItem.Add(Count, 0, Enchant);
@@ -299,13 +299,13 @@ bool ShopJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		GS()->AVM(ClientID, "AUCTIONCOUNT", ItemID, NOPE, "Item Count: {INT}", &SlotCount);
 		GS()->AVM(ClientID, "AUCTIONPRICE", ItemID, NOPE, "Item Price: {INT}", &SlotPrice);
 		GS()->AVM(ClientID, "AUCTIONACCEPT", ItemID, NOPE, "Add {STR}x{INT} {INT}gold", pInformationSellItem.GetName(pPlayer), &SlotCount, &SlotPrice);
-		GS()->AddBack(ClientID);
+		GS()->AddBackpage(ClientID);
 		return true;
 	}
 	return false;
 }
 
-bool ShopJob::OnVotingMenu(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool ShopJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 

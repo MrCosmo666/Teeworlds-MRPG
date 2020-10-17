@@ -491,12 +491,29 @@ int time_timestamp();
 
 /*
 	Function: time_houroftheday
-		Retrives the hours since midnight (0..23)
+		Retrieves the hours since midnight (0..23)
 
 	Returns:
 		The current hour of the day
 */
 int time_houroftheday();
+
+
+enum
+{
+	SEASON_SPRING = 0,
+	SEASON_SUMMER,
+	SEASON_AUTUMN,
+	SEASON_WINTER
+};
+
+/*
+	Function: time_season
+		Retrieves the current season of the year.
+	Returns:
+		one of the SEASON_* enum literals
+*/
+int time_season();
 
 /*
 	Function: time_isxmasday
@@ -530,6 +547,9 @@ enum
 {
 	NETADDR_MAXSTRSIZE = 1+(8*4+7)+1+1+5+1, // [XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX:XXXX]:XXXXX
 
+	NETADDR_SIZE_IPV4 = 4,
+	NETADDR_SIZE_IPV6 = 16,
+
 	NETTYPE_INVALID = 0,
 	NETTYPE_IPV4 = 1,
 	NETTYPE_IPV6 = 2,
@@ -540,8 +560,9 @@ enum
 typedef struct
 {
 	unsigned int type;
-	unsigned char ip[16];
+	unsigned char ip[NETADDR_SIZE_IPV6];
 	unsigned short port;
+	unsigned short reserved;
 } NETADDR;
 
 /*
@@ -574,13 +595,14 @@ int net_host_lookup(const char *hostname, NETADDR *addr, int types);
 	Parameters:
 		a - Address to compare
 		b - Address to compare to.
+		check_port - compares port or not
 
 	Returns:
 		<0 - Address a is lesser then address b
 		0 - Address a is equal to address b
-		>0 - Address a is greater then address b
+		-1 - Address a differs from address b
 */
-int net_addr_comp(const NETADDR *a, const NETADDR *b);
+int net_addr_comp(const NETADDR* a, const NETADDR* b, int check_port);
 
 /*
 	Function: net_addr_str
@@ -1468,6 +1490,10 @@ char str_uppercase(char c);
 int str_isallnum(const char *str);
 unsigned str_quickhash(const char *str);
 
+enum
+{
+	UTF8_BYTE_LENGTH = 4
+};
 
 int str_utf8_isstart(char c);
 
@@ -1591,6 +1617,20 @@ int str_utf8_encode(char *ptr, int chr);
 		- The string is treated as zero-terminated utf8 string.
 */
 int str_utf8_check(const char *str);
+
+/*
+	Function: str_utf8_copy_num
+		Copies a number of utf8 characters from one string to another.
+	Parameters:
+		dst - Pointer to a buffer that shall receive the string.
+		src - String to be copied.
+		dst_size - Size of the buffer dst.
+		num - maximum number of utf8 characters to be copied.
+	Remarks:
+		- The strings are treated as zero-terminated strings.
+		- Garantees that dst string will contain zero-termination.
+*/
+void str_utf8_copy_num(char* dst, const char* src, int dst_size, int num);
 
 /*
 	Function: shell_execute

@@ -30,13 +30,12 @@ public:
 		int m_aMiner[MINER::NUM_MINER];
 
 		// world
-		short m_WorldID;
-		short m_LastWorldID;
+		std::list < int > m_aHistoryWorld;
 
 		// skins
-		char m_aaSkinPartNames[6][24];
-		int m_aUseCustomColors[6];
-		int m_aSkinPartColors[6];
+		char m_aaSkinPartNames[NUM_SKINPARTS][MAX_SKIN_LENGTH];
+		int m_aUseCustomColors[NUM_SKINPARTS];
+		int m_aSkinPartColors[NUM_SKINPARTS];
 
 		int m_Team;
 		std::map < int , bool > m_aAetherLocation;
@@ -83,7 +82,8 @@ public:
 	int LoginAccount(int ClientID, const char *Login, const char *Password);
 	void LoadAccount(CPlayer *pPlayer, bool FirstInitilize = false);
 	void DiscordConnect(int ClientID, const char *pDID);
-	
+
+	int GetHistoryLatestCorrectWorldID(CPlayer* pPlayer) const;
 	int GetRank(int AuthID);
 	bool IsActive(int ClientID) const
 	{
@@ -92,7 +92,7 @@ public:
 
 	std::string HashPassword(const char* pPassword, const char* pSalt);
 
-	virtual bool OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+	virtual bool OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 	virtual void OnResetClient(int ClientID);
 };

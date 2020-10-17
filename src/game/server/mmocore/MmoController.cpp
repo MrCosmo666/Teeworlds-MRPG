@@ -93,14 +93,14 @@ bool MmoController::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 	return false;
 }
 
-bool MmoController::OnParseFullVote(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool MmoController::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	if(!pPlayer)
 		return true;
 
 	for(auto& component : m_Components.m_paComponents)
 	{
-		if(component->OnVotingMenu(pPlayer, CMD, VoteID, VoteID2, Get, GetText))
+		if(component->OnParsingVoteCommands(pPlayer, CMD, VoteID, VoteID2, Get, GetText))
 			return true;
 	}
 	return false;
@@ -129,7 +129,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	
 	if(Table == SaveType::SAVE_STATS)
 	{
-		const int EquipDiscord = pPlayer->GetEquippedItem(EQUIP_DISCORD);
+		const int EquipDiscord = pPlayer->GetEquippedItemID(EQUIP_DISCORD);
 		SJK.UD("tw_accounts_data", "Level = '%d', Exp = '%d', DiscordEquip = '%d' WHERE ID = '%d'",
 			pPlayer->Acc().m_Level, pPlayer->Acc().m_Exp, EquipDiscord, pPlayer->Acc().m_AuthID);
 	}
@@ -139,9 +139,9 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		dynamic_string Buffer;
 		for(const auto& at : CGS::ms_aAttributsInfo)
 		{
-			if(str_comp_nocase(at.second.FieldName, "unfield") == 0) 
+			if(str_comp_nocase(at.second.m_aFieldName, "unfield") == 0) 
 				continue;
-			str_format(aBuf, sizeof(aBuf), ", %s = '%d' ", at.second.FieldName, pPlayer->Acc().m_aStats[at.first]);
+			str_format(aBuf, sizeof(aBuf), ", %s = '%d' ", at.second.m_aFieldName, pPlayer->Acc().m_aStats[at.first]);
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
 
@@ -174,9 +174,10 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	{
 		SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '%d' WHERE ID = '%d'", pPlayer->Acc().m_GuildID, pPlayer->Acc().m_GuildRank, pPlayer->Acc().m_AuthID);	
 	}
-	else if(Table == SaveType::SAVE_POSITION && !GS()->IsDungeon())
+	else if(Table == SaveType::SAVE_POSITION)
 	{
-		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", pPlayer->GetPlayerWorldID(), pPlayer->Acc().m_AuthID);
+		int LatestCorrectWorldID = Account()->GetHistoryLatestCorrectWorldID(pPlayer);
+		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", LatestCorrectWorldID, pPlayer->Acc().m_AuthID);
 	}
 	else if(Table == SaveType::SAVE_LANGUAGE)
 	{

@@ -28,10 +28,10 @@ class CGameControllerDungeon : public IGameController
 	int m_SafeTick;
 	int m_MaximumTick;
 	int m_Time[MAX_PLAYERS];
-	bool m_ShowedTankingInfo;
 	int m_StartedPlayers;
 	int m_TankClientID;
 	bool m_SelectedWithVotes;
+	int m_SyncDungeon;
 
 public:
 	CGameControllerDungeon(class CGS* pGameServer);
@@ -41,7 +41,7 @@ public:
 	virtual void OnCharacterDeath(class CCharacter* pVictim, class CPlayer* pKiller, int Weapon);
 	virtual bool OnCharacterSpawn(class CCharacter* pChr);
 	virtual void CreateLogic(int Type, int Mode, vec2 Pos, int ParseID);
-	int GetDungeonSync(class CPlayer* pPlayer, int BonusID) const;
+	int GetAttributeDungeonSync(class CPlayer* pPlayer, int BonusID) const;
 
 private:
 	int PlayersReady() const;
@@ -52,7 +52,7 @@ private:
 	void ChangeState(int State);
 	void StateTick();
 	void SetMobsSpawn(bool AllowedSpawn);
-	void KillAllPlayers(bool StartDungeonMusic = false);
+	void KillAllPlayers();
 
 	void UpdateDoorKeyState();
 	void ResetDoorKeyState();

@@ -81,7 +81,7 @@ void CItemInformation::FormatAttributes(char* pBuffer, int Size, int Enchant) co
 		const int BonusCount = GetInfoEnchantStats(BonusID, Enchant);
 
 		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "%s+%d ", CGS::ms_aAttributsInfo[BonusID].Name, BonusCount);
+		str_format(aBuf, sizeof(aBuf), "%s+%d ", CGS::ms_aAttributsInfo[BonusID].m_aName, BonusCount);
 		Buffer.append_at(Buffer.length(), aBuf);
 	}
 	str_copy(pBuffer, Buffer.buffer(), Size);

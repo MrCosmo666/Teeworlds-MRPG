@@ -10,17 +10,16 @@ class CPlayers : public CComponent
 	void RenderPlayer(
 		const CNetObj_Character *pPrevChar,
 		const CNetObj_Character *pPlayerChar,
-		const CNetObj_PlayerInfo *pPrevInfo,
-		const CNetObj_PlayerInfo *pPlayerInfo,
+		const CNetObj_PlayerInfo* pPlayerInfo,
+		const CTeeRenderInfo* pRenderInfo,
 		int ClientID
 	);
 	void RenderHook(
 		const CNetObj_Character *pPrevChar,
-		const CNetObj_Character *pPlayerChar,
-		const CNetObj_PlayerInfo *pPrevInfo,
-		const CNetObj_PlayerInfo *pPlayerInfo,
+		const CNetObj_Character* pPlayerChar,
+		const CTeeRenderInfo* pRenderInfo,
 		int ClientID
-	);
+	) const;
 
 	// - - - - - - - - - - - - - - - - - - - -
 	struct EquipItem

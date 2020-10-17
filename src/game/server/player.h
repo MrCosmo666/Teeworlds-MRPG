@@ -55,10 +55,8 @@ public:
 	CGS* GS() const { return m_pGS; }
 	vec2 m_ViewPos;
 	int m_PlayerFlags;
-	int m_PlayerTick[TickState::NUM_TICK];
+	int m_aPlayerTick[TickState::NUM_TICK];
 	bool m_Flymode;
-	int m_SyncDungeon;
-	int m_SyncPlayers;
 	int m_MoodState;
 
 	StructLatency m_Latency;
@@ -71,14 +69,14 @@ public:
 	CTuningParams m_NextTuningParams;
 
 	bool m_Spawned;
-	short m_SortTabs[NUM_SORT_TAB];
+	short m_aSortTabs[NUM_SORT_TAB];
 	short m_OpenVoteMenu;
 	short m_LastVoteMenu;
 	vec3 m_Colored;
 
 private:
-	char m_FormatTalkQuest[512];
-	std::map < int, bool > m_HidenMenu;
+	char m_aFormatTalkQuest[512];
+	std::map < int, bool > m_aHiddenMenu;
 
 	/* #########################################################################
 		FUNCTIONS PLAYER ENGINE
@@ -102,8 +100,9 @@ public:
 	virtual	int GetMana() { return GetTempData().m_TempMana; };
 
 	virtual int IsActiveSnappingBot(int SnappingClient) const { return 2; };
-	virtual int GetEquippedItem(int EquipID, int SkipItemID = -1) const;
-	virtual int GetAttributeCount(int BonusID, bool Really = false, bool Searchclass = false);
+	virtual int GetEquippedItemID(int EquipID, int SkipItemID = -1) const;
+	virtual int GetAttributeCount(int BonusID, bool ActiveFinalStats = false);
+	int GetItemsAttributeCount(int AttributeID) const;
 	virtual void UpdateTempData(int Health, int Mana);
 	virtual void SendClientInfo(int TargetID);
 
@@ -134,7 +133,7 @@ public:
 	/* #########################################################################
 		FUNCTIONS PLAYER ACCOUNT 
 	######################################################################### */
-	bool CheckFailMoney(int Price, int ItemID = 1, bool CheckOnly = false);
+	bool SpendCurrency(int Price, int ItemID = 1);
 	void GiveEffect(const char* Potion, int Sec, int Random = 0);
 	void SetLanguage(const char* pLanguage);
 	const char* GetLanguage() const;
@@ -144,7 +143,6 @@ public:
 	bool CheckEffect(const char* Potion);
 	bool GetHidenMenu(int HideID) const;
 	bool IsAuthed();
-	int EnchantAttributes(int AttributeID) const;
 	int GetStartTeam();
 
 	int ExpNeed(int Level) const;
@@ -164,7 +162,8 @@ public:
 	AccountMainJob::StructTempPlayerData& GetTempData() { return AccountMainJob::ms_aPlayerTempData[m_ClientID]; }
 	AccountMainJob::StructData& Acc() { return AccountMainJob::ms_aData[m_ClientID]; }
 
-	int GetLevelDisciple(int Class, bool SearchClass = false);
+	int GetLevelTypeAttribute(int Class);
+	int GetLevelAllAttributes();
 
 	// npc conversations
 	void SetTalking(int TalkedID, bool ToProgress);

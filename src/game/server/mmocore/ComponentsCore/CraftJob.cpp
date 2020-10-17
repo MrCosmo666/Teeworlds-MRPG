@@ -28,8 +28,8 @@ void CraftJob::OnInit()
 		str_copy(aBuf, RES->getString("ItemNeedCount").c_str(), sizeof(aBuf));
 		if (!sscanf(aBuf, "%d %d %d", &ms_aCraft[ID].m_aItemNeedCount[0], &ms_aCraft[ID].m_aItemNeedCount[1], &ms_aCraft[ID].m_aItemNeedCount[2]))
 			dbg_msg("Error", "Error on scanf in Crafting");
-
 	}
+
 	Job()->ShowLoadingProgress("Crafts", ms_aCraft.size());	
 }
 
@@ -117,7 +117,7 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 	}
 
 	if(IsNotEmpty)
-		GS()->AV(ClientID, "null", "");
+		GS()->AV(ClientID, "null");
 }
 
 void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
@@ -154,7 +154,7 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 
 	// we are already organizing the crafting
 	const int Price = GetFinalPrice(pPlayer, CraftID);
-	if(pPlayer->CheckFailMoney(Price))
+	if(!pPlayer->SpendCurrency(Price))
 		return;
 
 	// delete ticket if equipped  
@@ -188,7 +188,7 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 	GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 }
 
-bool CraftJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool CraftJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	if(PPSTR(CMD, "CRAFT") == 0)
 	{
@@ -213,9 +213,9 @@ bool CraftJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 			GS()->AVH(ClientID, TAB_INFO_CRAFT, GREEN_COLOR, "Crafting Information");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_CRAFT, "If you will not have enough items for crafting");
 			GS()->AVM(ClientID, "null", NOPE, TAB_INFO_CRAFT, "You will write those and the amount that is still required");
-			GS()->AV(ClientID, "null", "");
+			GS()->AV(ClientID, "null");
 			GS()->ShowItemValueInformation(pPlayer);
-			GS()->AV(ClientID, "null", "");
+			GS()->AV(ClientID, "null");
 
 			ShowCraftList(pPlayer, "Craft | Can be used's", TYPE_USED);
 			ShowCraftList(pPlayer, "Craft | Potion's", TYPE_POTION);

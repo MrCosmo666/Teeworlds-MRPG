@@ -137,7 +137,7 @@ bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 /* #########################################################################
 	GLOBAL MEMBER
 ######################################################################### */
-bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (PPSTR(CMD, "MLEADER") == 0)
@@ -209,8 +209,8 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			AddHistoryGuild(GuildID, "'%s' level up to '%d'.", UpgradeNames(UpgradeID).c_str(), GuildCount);
 			GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
 			return true;
-
 		}
+
 		GS()->Chat(ClientID, "You don't have that much money in the Bank.");
 		return true;
 	}
@@ -227,7 +227,7 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 			return true;
 		}
 
-		if (pPlayer->CheckFailMoney(Get))
+		if(!pPlayer->SpendCurrency(Get))
 			return true;
 
 		if (AddMoneyBank(GuildID, Get))
@@ -465,11 +465,11 @@ bool GuildJob::OnVotingMenu(CPlayer* pPlayer, const char* CMD, const int VoteID,
 		GS()->ClearVotes(ClientID);
 		GS()->AV(ClientID, "null", "Please close vote and press Left Mouse,");
 		GS()->AV(ClientID, "null", "on position where add decoration!");
-		GS()->AddBack(ClientID);
+		GS()->AddBackpage(ClientID);
 
 		const int DecoItemID = VoteID;
 		pPlayer->GetTempData().m_TempDecoractionID = DecoItemID;
-		pPlayer->GetTempData().m_TempDecorationType = DECOTYPE_GUILD_HOUSE;
+		pPlayer->GetTempData().m_TempDecorationType = DECORATIONS_GUILD_HOUSE;
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
 		return true;
 	}
@@ -555,9 +555,9 @@ bool GuildJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "and press (Back to inventory).");
 
 		Job()->Item()->ListInventory(pPlayer, ItemType::TYPE_DECORATION);
-		GS()->AV(ClientID, "null", "");
+		GS()->AV(ClientID, "null");
 		ShowDecorationList(pPlayer);
-		GS()->AddBack(ClientID);
+		GS()->AddBackpage(ClientID);
 		return true;
 	}
 	return false;
@@ -822,18 +822,18 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "/gexit - leave of guild group.");
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "- - - - - - - - - -");
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Guild Bank: {INT}gold", &ms_aGuild[GuildID].m_Bank);
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 	//
 	pPlayer->m_Colored = GOLDEN_COLOR;
 	GS()->AVL(ClientID, "null", "Players list on guild");
 	ShowGuildPlayers(pPlayer);
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 	//
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", &pPlayer->GetItem(itGold).m_Count);
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "MMONEY", "Add gold guild bank. (Amount in a reason)", ms_aGuild[GuildID].m_aName);
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 	//
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "▤ Guild system");
@@ -843,7 +843,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_HISTORY, NOPE, "History of activity");
 	if (GuildHouse > 0)
 	{
-		GS()->AV(ClientID, "null", "");
+		GS()->AV(ClientID, "null");
 		pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 		GS()->AVL(ClientID, "null", "⌂ Housing system", &pPlayer->GetItem(itGold).m_Count);
 		pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
@@ -852,7 +852,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 		GS()->AVL(ClientID, "MSPAWN", "Teleport to guild house");
 		GS()->AVL(ClientID, "MHOUSESELL", "Sell your guild house (in reason 777)");
 	}
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 	//
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "☆ Guild upgrades", &pPlayer->GetItem(itGold).m_Count);
@@ -868,7 +868,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	int PriceUpgrade = ms_aGuild[ GuildID ].m_Upgrades[ EMEMBERUPGRADE::AvailableNSTSlots ] * g_Config.m_SvPriceUpgradeGuildSlot;
 	GS()->AVM(ClientID, "MUPGRADE", EMEMBERUPGRADE::AvailableNSTSlots, NOPE, "Upgrade {STR} ({INT}) {INT}gold", 
 		UpgradeNames(EMEMBERUPGRADE::AvailableNSTSlots).c_str(), &ms_aGuild[GuildID].m_Upgrades[ EMEMBERUPGRADE::AvailableNSTSlots ], &PriceUpgrade);
-	GS()->AddBack(ClientID);
+	GS()->AddBackpage(ClientID);
 	return;
 }
 
@@ -897,7 +897,6 @@ void GuildJob::ShowGuildPlayers(CPlayer* pPlayer)
 			GS()->AVM(ClientID, "MLEADER", AuthID, HideID, "Give Leader (in reason 134)");
 		HideID++;
 	}
-
 }
 
 void GuildJob::AddExperience(int GuildID)
@@ -1105,7 +1104,7 @@ void GuildJob::ShowMenuRank(CPlayer *pPlayer)
 	GS()->AV(ClientID, "null", "- Maximal 5 ranks for one guild");
 	GS()->AVM(ClientID, "MRANKNAME", 1, NOPE, "Name rank: {STR}", pPlayer->GetTempData().m_aRankGuildBuf);
 	GS()->AVM(ClientID, "MRANKCREATE", 1, NOPE, "Create new rank");
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 	
 	const int GuildID = pPlayer->Acc().m_GuildID;
 	for(auto mr: ms_aRankGuild)
@@ -1119,7 +1118,7 @@ void GuildJob::ShowMenuRank(CPlayer *pPlayer)
 		GS()->AVM(ClientID, "MRANKACCESS", mr.first, HideID, "Access rank ({STR})", AccessNames(mr.second.m_Access));
 		GS()->AVM(ClientID, "MRANKDELETE", mr.first, HideID, "Delete this rank");
 	}
-	GS()->AddBack(ClientID);
+	GS()->AddBackpage(ClientID);
 }
 
 /* #########################################################################
@@ -1163,7 +1162,7 @@ void GuildJob::ShowInvitesGuilds(int ClientID, int GuildID)
 		}
 		HideID++;
 	}
-	GS()->AddBack(ClientID);
+	GS()->AddBackpage(ClientID);
 }
 
 // show the guild's top and call on them
@@ -1176,7 +1175,7 @@ void GuildJob::ShowFinderGuilds(int ClientID)
 	GS()->AVL(ClientID, "null", "You are not in guild!");
 	GS()->AV(ClientID, "null", "Use reason how Value."); 	
 	GS()->AV(ClientID, "null", "Example: Find guild: [], in reason name.");
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 	GS()->AVM(ClientID, "MINVITENAME", 1, NOPE, "Find guild: {STR}", pPlayer->GetTempData().m_aGuildSearchBuf);
 
 	int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 1800;
@@ -1194,7 +1193,7 @@ void GuildJob::ShowFinderGuilds(int ClientID)
 		GS()->AVM(ClientID, "MINVITESEND", GuildID, HideID, "Send request to join {STR}", cGuildName.cstr());
 		HideID++;
 	}
-	GS()->AddBack(ClientID);
+	GS()->AddBackpage(ClientID);
 }
 
 /* #########################################################################
@@ -1211,7 +1210,7 @@ void GuildJob::ShowHistoryGuild(int ClientID, int GuildID)
 		str_format(aBuf, sizeof(aBuf), "[%s] %s", RES->getString("Time").c_str(), RES->getString("Text").c_str());
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "{STR}", aBuf);
 	}
-	GS()->AddBack(ClientID);	
+	GS()->AddBackpage(ClientID);	
 }
 
 // add to the guild history
@@ -1365,13 +1364,13 @@ void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 
 	if(pPlayer->Acc().IsGuild())
 	{
-		GS()->AV(ClientID, "null", "");
+		GS()->AV(ClientID, "null");
 		const int GuildBank = ms_aGuild[pPlayer->Acc().m_GuildID].m_Bank;
 		pPlayer->m_Colored = LIGHT_PURPLE_COLOR;
 		GS()->AVMI(ClientID, GS()->GetItemInfo(itGold).GetIcon(), "null", NOPE, NOPE, "Your guild have {INT} Gold", &GuildBank);
 	}
 
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	const int GuildHouseOwner = ms_aHouseGuild[HouseID].m_GuildID;
 	if(GuildHouseOwner > 0)
@@ -1379,7 +1378,7 @@ void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 	else
 		GS()->AVM(ClientID, "BUYMEMBERHOUSE", HouseID, NOPE, "Buy this guild house! Price: {INT}", &ms_aHouseGuild[HouseID].m_Price);
 		
-	GS()->AV(ClientID, "null", "");
+	GS()->AV(ClientID, "null");
 }
 
 bool GuildJob::ChangeStateDoor(int GuildID)
