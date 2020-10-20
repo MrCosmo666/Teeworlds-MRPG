@@ -45,6 +45,36 @@ int CItemInformation::GetInfoEnchantStats(int AttributeID, int Enchant) const
 	return EnchantStat;
 }
 
+int CItemInformation::GetEnchantPrice(int EnchantLevel) const
+{
+	int FinishedPrice = 0;
+	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
+	{
+		if(CGS::ms_aAttributsInfo.find(m_aAttribute[i]) == CGS::ms_aAttributsInfo.end())
+			continue;
+
+		int UpgradePrice;
+		const int Attribute = m_aAttribute[i];
+		const int TypeAttribute = CGS::ms_aAttributsInfo[Attribute].m_Type;
+
+		// strength stats
+		if(TypeAttribute == AtributType::AtHardtype)
+			UpgradePrice = max(20, CGS::ms_aAttributsInfo[Attribute].m_UpgradePrice) * 15;
+		
+		// weapon and job stats
+		else if(TypeAttribute == AtributType::AtJob || TypeAttribute == AtributType::AtWeapon || Attribute == Stats::StLuckyDropItem)
+			UpgradePrice = max(40, CGS::ms_aAttributsInfo[Attribute].m_UpgradePrice) * 15;
+		
+		// other stats
+		else
+			UpgradePrice = max(5, CGS::ms_aAttributsInfo[Attribute].m_UpgradePrice) * 15;
+
+		const int PercentEnchant = max(1, (int)kurosio::translate_to_procent_rest(m_aAttributeCount[i], PERCENT_OF_ENCHANT));
+		FinishedPrice += UpgradePrice * (PercentEnchant * (1 + EnchantLevel));
+	}
+	return FinishedPrice;
+}
+
 bool CItemInformation::IsEnchantable() const
 {
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)

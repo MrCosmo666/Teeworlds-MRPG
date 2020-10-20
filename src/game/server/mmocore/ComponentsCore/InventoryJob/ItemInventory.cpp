@@ -269,34 +269,3 @@ bool CInventoryItem::Save()
 	}
 	return false;
 }
-
-int CInventoryItem::GetEnchantPrice() const
-{
-	int FinishedPrice = 0;
-	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
-	{
-		if(CGS::ms_aAttributsInfo.find(Info().m_aAttribute[i]) == CGS::ms_aAttributsInfo.end())
-			continue;
-
-		int UpgradePrice;
-		const int Attribute = Info().m_aAttribute[i];
-		const int TypeAttribute = CGS::ms_aAttributsInfo[Attribute].m_Type;
-
-		if(TypeAttribute == AtributType::AtHardtype || Attribute == Stats::StStrength)
-		{
-			UpgradePrice = max(12, CGS::ms_aAttributsInfo[Attribute].m_UpgradePrice) * 14;
-		}
-		else if(TypeAttribute == AtributType::AtJob || TypeAttribute == AtributType::AtWeapon || Attribute == Stats::StLuckyDropItem)
-		{
-			UpgradePrice = max(20, CGS::ms_aAttributsInfo[Attribute].m_UpgradePrice) * 14;
-		}
-		else
-		{
-			UpgradePrice = max(4, CGS::ms_aAttributsInfo[Attribute].m_UpgradePrice) * 5;
-		}
-
-		const int PercentEnchant = max(1, (int)kurosio::translate_to_procent_rest(Info().m_aAttributeCount[i], PERCENT_OF_ENCHANT));
-		FinishedPrice += UpgradePrice * (PercentEnchant * (1 + m_Enchant));
-	}
-	return FinishedPrice;
-}

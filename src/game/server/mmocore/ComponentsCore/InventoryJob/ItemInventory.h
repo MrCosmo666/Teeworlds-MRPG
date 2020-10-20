@@ -45,7 +45,7 @@ public:
 
 	// equip modules types functions
 	int GetEnchantStats(int AttributeID) const { return Info().GetInfoEnchantStats(AttributeID, m_Enchant); }
-	int GetEnchantPrice() const;
+	int GetEnchantPrice() const { return Info().GetEnchantPrice(m_Enchant); }
 
 	bool IsEquipped() const { return m_Count > 0 && m_Settings > 0 && (Info().m_Type == ItemType::TYPE_POTION || Info().m_Type == ItemType::TYPE_SETTINGS || Info().m_Type == ItemType::TYPE_MODULE || Info().m_Type == ItemType::TYPE_EQUIP); }
 	bool IsEnchantMaxLevel() const { return Info().IsEnchantMaxLevel(m_Enchant); }

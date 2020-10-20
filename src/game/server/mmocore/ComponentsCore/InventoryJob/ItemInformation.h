@@ -29,6 +29,7 @@ public:
 	// equip modules types functions
 	int GetInfoEnchantStats(int AttributeID) const;
 	int GetInfoEnchantStats(int AttributeID, int Enchant) const;
+	int GetEnchantPrice(int EnchantLevel) const;
 
 	bool IsEnchantable() const;
 	bool IsEnchantMaxLevel(int Enchant) const;
