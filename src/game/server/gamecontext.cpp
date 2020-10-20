@@ -2331,9 +2331,8 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, InventoryItem DropItem, vec2 Fo
 	if(DropItem.m_ItemID <= 0 || DropItem.m_Count <= 0)
 		return;
 
-	vec2 Vel = Force + vec2(frandom() * 15.0, frandom() * 15.0);
-	const float Angle = Force.x * (0.15f + frandom() * 0.1f);
-	new CDropItem(&m_World, Pos, Vel, Angle, DropItem, ClientID);
+	const float Angle = GetAngle(normalize(Force));
+	new CDropItem(&m_World, Pos, Force, Angle, DropItem, ClientID);
 }
 
 // random drop of the item with percentage
@@ -2342,7 +2341,6 @@ void CGS::CreateRandomDropItem(vec2 Pos, int ClientID, float Random, InventoryIt
 	const float RandomDrop = frandom() * 100.0f;
 	if(RandomDrop < Random)
 		CreateDropItem(Pos, ClientID, DropItem, Force);
-	return;
 }
 
 bool CGS::TakeItemCharacter(int ClientID)

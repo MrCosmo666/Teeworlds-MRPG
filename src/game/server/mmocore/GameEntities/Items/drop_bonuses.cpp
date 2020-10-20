@@ -5,7 +5,7 @@
 #include "drop_bonuses.h"
 
 CDropBonuses::CDropBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, int Type, int Count)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPBONUS, Pos)
+: CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPBONUS, Pos, 24)
 {
 	m_Pos = Pos;
 	m_Vel = Vel;
@@ -45,20 +45,8 @@ void CDropBonuses::Tick()
 	}
 
 	// physic
-	m_Vel.y += 0.5f;
-	static const float ItemSize = (GetProximityRadius() / 2.0f);
-	bool IsCollide = (bool)GS()->Collision()->CheckPoint(m_Pos.x - ItemSize, m_Pos.y + ItemSize + 5) || GS()->Collision()->CheckPoint(m_Pos.x + ItemSize, m_Pos.y + ItemSize + 5);
-	if (IsCollide)
-	{
-		m_AngleForce += (m_Vel.x - 0.74f * 6.0f - m_AngleForce) / 2.0f;
-		m_Vel.x *= 0.8f;
-	}
-	else
-	{
-		m_Angle += clamp(m_AngleForce * 0.04f, -0.6f, 0.6f);
-		m_Vel.x *= 0.99f;
-	}
-	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(24.0f, 24.0f), 0.4f);
+	vec2 ItemSize = vec2(GetProximityRadius(), GetProximityRadius());
+	GS()->Collision()->MovePhysicalAngleBox(&m_Pos, &m_Vel, ItemSize, &m_Angle, &m_AngleForce, 0.5f);
 
 	// interactive
 	CCharacter *pChar = (CCharacter*)GameWorld()->ClosestEntity(m_Pos, 16.0f, CGameWorld::ENTTYPE_CHARACTER, 0);

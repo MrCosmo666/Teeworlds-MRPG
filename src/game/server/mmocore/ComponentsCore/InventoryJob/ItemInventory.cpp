@@ -249,10 +249,10 @@ bool CInventoryItem::Drop(int Count)
 	if(length(Force) > 8.0f)
 		Force = normalize(Force) * 8.0f;
 
-	CInventoryItem DropItem = *this;
-	DropItem.m_Count = Count;
 	if(Remove(Count))
 	{
+		CInventoryItem DropItem = *this;
+		DropItem.m_Count = Count;
 		GS()->CreateDropItem(m_pCharacter->m_Core.m_Pos, -1, DropItem, Force);
 		return true;
 	}

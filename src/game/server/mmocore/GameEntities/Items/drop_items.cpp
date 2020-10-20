@@ -90,22 +90,8 @@ void CDropItem::Tick()
 		m_OwnerID = -1;
 
 	// physic
-	m_Vel.y += 0.5f;
-	static const float CheckSize = (GetProximityRadius()/2.0f);
-	const bool IsCollide = (bool)GS()->Collision()->CheckPoint(m_Pos.x - CheckSize, m_Pos.y + CheckSize + 5) 
-		|| GS()->Collision()->CheckPoint(m_Pos.x + CheckSize, m_Pos.y + CheckSize + 5);
-	if (IsCollide)
-	{
-		m_AngleForce += (m_Vel.x - 0.74f * 6.0f - m_AngleForce) / 2.0f;
-		m_Vel.x *= 0.8f;
-	}
-	else
-	{
-		m_Angle += clamp(m_AngleForce * 0.04f, -0.6f, 0.6f);
-		m_Vel.x *= 0.99f;
-	}
-
-	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(GetProximityRadius(), GetProximityRadius()), 0.5f);
+	vec2 ItemSize = vec2(GetProximityRadius(), GetProximityRadius());
+	GS()->Collision()->MovePhysicalAngleBox(&m_Pos, &m_Vel, ItemSize, &m_Angle, &m_AngleForce, 0.5f);
 	if(length(m_Vel) < 0.3f)
 		m_Angle = 0.0f;
 
@@ -133,7 +119,6 @@ void CDropItem::Tick()
 	// non enchantable item
 	GS()->Broadcast(pChar->GetPlayer()->GetCID(), BROADCAST_GAME_INFORMATION, 100, "{STR}x{INT} {STR}",
 		m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.m_Count, pToNickname);
-
 }
 
 void CDropItem::Snap(int SnappingClient)

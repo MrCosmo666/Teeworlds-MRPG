@@ -56,22 +56,10 @@ void CDropQuestItem::Tick()
 	}
 
 	// physic
-	m_Vel.y += 0.5f;
-	static const float ItemSize = (GetProximityRadius()/2.0f);
-	m_Collide = (bool)GS()->Collision()->CheckPoint(m_Pos.x - ItemSize, m_Pos.y + ItemSize + 5) || GS()->Collision()->CheckPoint(m_Pos.x + ItemSize, m_Pos.y + ItemSize + 5);
-	if (m_Collide)
-	{
-		m_AngleForce += (m_Vel.x - 0.74f * 6.0f - m_AngleForce) / 2.0f;
-		m_Vel.x *= 0.8f;
-	}
-	else
-	{
-		m_Angle += clamp(m_AngleForce * 0.04f, -0.6f, 0.6f);
-		m_Vel.x *= 0.99f;
-	}
-	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(24.0f, 24.0f), 0.4f);
+	vec2 ItemSize = vec2(GetProximityRadius(), GetProximityRadius());
+	GS()->Collision()->MovePhysicalAngleBox(&m_Pos, &m_Vel, ItemSize, &m_Angle, &m_AngleForce, 0.5f);
 
-	// interactive
+	// check step and collected it or no
 	const int Count = m_QuestBot.m_aItemSearchCount[0];
 	const int QuestID = m_QuestBot.m_QuestID;
 	CPlayer* pOwnerPlayer = GS()->m_apPlayers[m_OwnerID];
@@ -82,7 +70,8 @@ void CDropQuestItem::Tick()
 		return;
 	}
 
-	if (m_Collide && pOwnerPlayer->GetCharacter() && distance(m_Pos, pOwnerPlayer->GetCharacter()->m_Core.m_Pos) < 32.0f)
+	// interactive
+	if (pOwnerPlayer->GetCharacter() && distance(m_Pos, pOwnerPlayer->GetCharacter()->m_Core.m_Pos) < 32.0f)
 	{
 		GS()->Broadcast(m_OwnerID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Press 'Fire' for pick Quest Item");
 		if (pOwnerPlayer->GetCharacter()->m_ReloadTimer)
@@ -100,7 +89,7 @@ void CDropQuestItem::Tick()
 
 void CDropQuestItem::Snap(int SnappingClient)
 {
-	if(m_Flashing || !m_Collide || m_OwnerID != SnappingClient || NetworkClipped(SnappingClient))
+	if(m_Flashing || m_OwnerID != SnappingClient || NetworkClipped(SnappingClient))
 		return;
 
 	// mrpg
