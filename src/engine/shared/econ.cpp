@@ -73,15 +73,24 @@ void CEcon::ConLogout(IConsole::IResult* pResult, void* pUserData)
 void CEcon::Init(IConsole* pConsole, CNetBan* pNetBan)
 {
 	m_pConsole = pConsole;
+	m_pNetBan = pNetBan;
 
-	for (int i = 0; i < NET_MAX_CONSOLE_CLIENTS; i++)
+	for(int i = 0; i < NET_MAX_CONSOLE_CLIENTS; i++)
 		m_aClients[i].m_State = CClient::STATE_EMPTY;
 
 	m_Ready = false;
+	m_LastOpenTry = 0;
 	m_UserClientID = -1;
+}
 
+bool CEcon::Open()
+{
 	if (g_Config.m_EcPort == 0 || g_Config.m_EcPassword[0] == 0)
-		return;
+		return false;
+
+	int64 Now = time_get();
+	if(m_LastOpenTry + 60 * time_freq() > Now)	// try again every 60s
+		return false;
 
 	NETADDR BindAddr;
 	if (g_Config.m_EcBindaddr[0] && net_host_lookup(g_Config.m_EcBindaddr, &BindAddr, NETTYPE_ALL) == 0)
@@ -97,7 +106,7 @@ void CEcon::Init(IConsole* pConsole, CNetBan* pNetBan)
 		BindAddr.port = g_Config.m_EcPort;
 	}
 
-	if (m_NetConsole.Open(BindAddr, pNetBan, NewClientCallback, DelClientCallback, this))
+	if(m_NetConsole.Open(BindAddr, m_pNetBan, NewClientCallback, DelClientCallback, this))
 	{
 		m_Ready = true;
 		char aBuf[128];
@@ -110,14 +119,18 @@ void CEcon::Init(IConsole* pConsole, CNetBan* pNetBan)
 		m_PrintCBIndex = Console()->RegisterPrintCallback(g_Config.m_EcOutputLevel, SendLineCB, this);
 
 		Console()->Register("logout", "", CFGFLAG_ECON, ConLogout, this, "Logout of econ");
+		return true;
 	}
 	else
 		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "econ", "couldn't open socket. port might already be in use");
+
+	m_LastOpenTry = Now;
+	return false;
 }
 
 void CEcon::Update()
 {
-	if (!m_Ready)
+	if(!m_Ready && !Open())
 		return;
 
 	m_NetConsole.Update();
