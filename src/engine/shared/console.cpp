@@ -804,13 +804,13 @@ CConsole::CConsole(int FlagMask)
 
 	#define MACRO_CONFIG_STR(Name,ScriptName,Len,Def,Flags,Desc) \
 	{ \
-		static CStrVariableData Data = { this, m_pConfig->m_##Name, Len, Len }; \
+		static CStrVariableData Data = { this, g_Config.m_##Name, Len, Len }; \
 		Register(#ScriptName, "?r", Flags, StrVariableCommand, &Data, Desc); \
 	}
 
 	#define MACRO_CONFIG_UTF8STR(Name,ScriptName,Size,Len,Def,Flags,Desc) \
 	{ \
-		static CStrVariableData Data = { this, m_pConfig->m_##Name, Size, Len }; \
+		static CStrVariableData Data = { this, g_Config.m_##Name, Size, Len }; \
 		Register(#ScriptName, "?r", Flags, StrVariableCommand, &Data, Desc); \
 	}
 

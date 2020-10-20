@@ -81,7 +81,7 @@ public:
 	{
 		#define MACRO_CONFIG_INT(Name,ScriptName,def,min,max,flags,desc) g_Config.m_##Name = def;
 		#define MACRO_CONFIG_STR(Name,ScriptName,len,def,flags,desc) str_copy(g_Config.m_##Name, def, len);
-		#define MACRO_CONFIG_UTF8STR(Name,ScriptName,size,len,def,flags,desc) str_utf8_copy_num(m_Values.m_##Name, def, size, len);
+		#define MACRO_CONFIG_UTF8STR(Name,ScriptName,size,len,def,flags,desc) str_utf8_copy_num(g_Config.m_##Name, def, size, len);
 
 		#include "config_variables.h"
 
@@ -94,7 +94,7 @@ public:
 	{
 		#define MACRO_CONFIG_INT(Name,ScriptName,def,min,max,flags,desc)	// nop
 		#define MACRO_CONFIG_STR(Name,ScriptName,len,def,flags,desc) if(!g_Config.m_##Name[0] && def[0]) str_copy(g_Config.m_##Name, def, len);
-		#define MACRO_CONFIG_UTF8STR(Name,ScriptName,size,len,def,flags,desc) if(!m_Values.m_##Name[0] && def[0]) str_utf8_copy_num(m_Values.m_##Name, def, size, len);
+		#define MACRO_CONFIG_UTF8STR(Name,ScriptName,size,len,def,flags,desc) if(!g_Config.m_##Name[0] && def[0]) str_utf8_copy_num(g_Config.m_##Name, def, size, len);
 
 		#include "config_variables.h"
 
@@ -122,7 +122,7 @@ public:
 
 		#define MACRO_CONFIG_INT(Name,ScriptName,def,min,max,flags,desc) if(((flags)&(CFGFLAG_SAVE))&&((flags)&(m_FlagMask))&&(g_Config.m_##Name!=int(def))){ str_format(aLineBuf, sizeof(aLineBuf), "%s %i", #ScriptName, g_Config.m_##Name); WriteLine(aLineBuf); }
 		#define MACRO_CONFIG_STR(Name,ScriptName,len,def,flags,desc) if(((flags)&(CFGFLAG_SAVE))&&((flags)&(m_FlagMask)&&(str_comp(g_Config.m_##Name,def)))){ EscapeParam(aEscapeBuf, g_Config.m_##Name, sizeof(aEscapeBuf)); str_format(aLineBuf, sizeof(aLineBuf), "%s \"%s\"", #ScriptName, aEscapeBuf); WriteLine(aLineBuf); }
-		#define MACRO_CONFIG_UTF8STR(Name,ScriptName,size,len,def,flags,desc) if(((flags)&(CFGFLAG_SAVE))&&((flags)&(m_FlagMask)&&(str_comp(m_Values.m_##Name,def)))){ EscapeParam(aEscapeBuf, m_Values.m_##Name, sizeof(aEscapeBuf)); str_format(aLineBuf, sizeof(aLineBuf), "%s \"%s\"", #ScriptName, aEscapeBuf); WriteLine(aLineBuf); }
+		#define MACRO_CONFIG_UTF8STR(Name,ScriptName,size,len,def,flags,desc) if(((flags)&(CFGFLAG_SAVE))&&((flags)&(m_FlagMask)&&(str_comp(g_Config.m_##Name,def)))){ EscapeParam(aEscapeBuf, g_Config.m_##Name, sizeof(aEscapeBuf)); str_format(aLineBuf, sizeof(aLineBuf), "%s \"%s\"", #ScriptName, aEscapeBuf); WriteLine(aLineBuf); }
 
 		#include "config_variables.h"
 
