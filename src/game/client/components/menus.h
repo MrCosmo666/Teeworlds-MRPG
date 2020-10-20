@@ -481,7 +481,7 @@ private:
 	bool m_NeedRestartSound;
 	bool m_NeedRestartUpdate;
 	int m_TeePartSelected;
-	char m_aSaveSkinName[MAX_SKIN_LENGTH];
+	char m_aSaveSkinName[MAX_SKIN_ARRAY_SIZE];
 
 	bool m_RefreshSkinSelector;
 	const CSkins::CSkin *m_pSelectedSkin;

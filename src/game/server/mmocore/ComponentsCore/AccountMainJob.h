@@ -33,7 +33,7 @@ public:
 		std::list < int > m_aHistoryWorld;
 
 		// skins
-		char m_aaSkinPartNames[NUM_SKINPARTS][MAX_SKIN_LENGTH];
+		char m_aaSkinPartNames[NUM_SKINPARTS][MAX_SKIN_ARRAY_SIZE];
 		int m_aUseCustomColors[NUM_SKINPARTS];
 		int m_aSkinPartColors[NUM_SKINPARTS];
 
