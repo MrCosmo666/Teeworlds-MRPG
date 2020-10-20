@@ -34,8 +34,9 @@ class CEcon
 	int m_PrintCBIndex;
 	int m_UserClientID;
 
-	static void SendLineCB(const char* pLine, void* pUserData, bool Highlighted);
+	static void SendLineCB(const char* pLine, void* pUserData, bool Highlighted);	
 	static void ConchainEconOutputLevelUpdate(IConsole::IResult* pResult, void* pUserData, IConsole::FCommandCallback pfnCallback, void* pCallbackUserData);
+	static void ConchainEconLingerUpdate(IConsole::IResult* pResult, void* pUserData, IConsole::FCommandCallback pfnCallback, void* pCallbackUserData);
 	static void ConLogout(IConsole::IResult* pResult, void* pUserData);
 
 	static int NewClientCallback(int ClientID, void* pUser);
