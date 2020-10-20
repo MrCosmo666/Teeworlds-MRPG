@@ -127,7 +127,9 @@ public:
 	bool DoEditBox(void* pID, const CUIRect* pRect, char* pStr, unsigned StrSize, float FontSize, float* pOffset, bool Hidden = false, int Corners = CUI::CORNER_ALL);
 
 private:
-	void DoEditBoxOption(void* pID, char* pOption, int OptionLength, const CUIRect* pRect, const char* pStr, float VSplitVal, float* pOffset, bool Hidden = false);
+	bool DoEditBoxUTF8(void* pID, const CUIRect* pRect, char* pStr, unsigned StrSize, unsigned MaxLength, float FontSize, float* pOffset, bool Hidden = false, int Corners = CUI::CORNER_ALL);
+	void DoEditBoxOption(void* pID, char* pOption, unsigned OptionSize, const CUIRect* pRect, const char* pStr, float VSplitVal, float* pOffset, bool Hidden = false);
+	void DoEditBoxOptionUTF8(void* pID, char* pOption, unsigned OptionSize, unsigned OptionMaxLength, const CUIRect* pRect, const char* pStr, float VSplitVal, float* pOffset, bool Hidden = false);
 	void DoScrollbarOption(void* pID, int* pOption, const CUIRect* pRect, const char* pStr, int Min, int Max, IScrollbarScale* pScale = &LinearScrollbarScale, bool Infinite = false);
 	void DoScrollbarOptionLabeled(void* pID, int* pOption, const CUIRect* pRect, const char* pStr, const char* apLabels[], int Num, IScrollbarScale* pScale = &LinearScrollbarScale);
 	float DoIndependentDropdownMenu(void* pID, const CUIRect* pRect, const char* pStr, float HeaderHeight, FDropdownCallback pfnCallback, bool* pActive);

@@ -1334,12 +1334,12 @@ void CMenus::RenderSettingsPlayer(CUIRect MainView)
 		// player name
 		Name.HSplitTop(ButtonHeight, &Button, &Name);
 		static float s_OffsetName = 0.0f;
-		DoEditBoxOption(g_Config.m_PlayerName, g_Config.m_PlayerName, sizeof(g_Config.m_PlayerName), &Button, Localize("Name"), 100.0f, &s_OffsetName);
+		DoEditBoxOptionUTF8(g_Config.m_PlayerName, g_Config.m_PlayerName, sizeof(g_Config.m_PlayerName), MAX_NAME_LENGTH, &Button, Localize("Name"), 100.0f, &s_OffsetName);
 
 		// player clan
 		Clan.HSplitTop(ButtonHeight, &Button, &Clan);
 		static float s_OffsetClan = 0.0f;
-		DoEditBoxOption(g_Config.m_PlayerClan, g_Config.m_PlayerClan, sizeof(g_Config.m_PlayerClan), &Button, Localize("Clan"), 100.0f, &s_OffsetClan);
+		DoEditBoxOptionUTF8(g_Config.m_PlayerName, g_Config.m_PlayerName, sizeof(g_Config.m_PlayerName), MAX_CLAN_LENGTH, &Button, Localize("Clan"), 100.0f, &s_OffsetClan);
 
 		// country selector
 		RenderTools()->DrawUIRect(&Bottom, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
