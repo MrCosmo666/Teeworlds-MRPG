@@ -1,8 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/math.h>
-#include <base/vmath.h>
-#include <generated/protocol.h>
 #include <game/server/gamecontext.h>
 
 #include "drop_quest_items.h"
@@ -19,8 +16,6 @@ CDropQuestItem::CDropQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float
 	m_QuestBot = BotData;
 	m_Flashing = false;
 	m_LifeSpan = Server()->TickSpeed() * 60;
-	m_StartTick = Server()->Tick();
-
 	GameWorld()->InsertEntity(this);
 	for(int i=0; i<NUM_IDS; i++)
 	{
@@ -46,6 +41,7 @@ void CDropQuestItem::Tick()
 		return;
 	}
 
+	// flashing
 	if (m_LifeSpan < 150)
 	{
 		m_FlashTimer--;
@@ -59,46 +55,31 @@ void CDropQuestItem::Tick()
 		}
 	}
 
-
 	// physic
-	m_Vel.y += 0.5f;
-	static const float CheckSize = (GetProximityRadius()/2.0f);
-	m_Collide = (bool)GS()->Collision()->CheckPoint(m_Pos.x - CheckSize, m_Pos.y + CheckSize + 5) 
-		|| GS()->Collision()->CheckPoint(m_Pos.x + CheckSize, m_Pos.y + CheckSize + 5);
-	if (m_Collide)
-	{
-		m_AngleForce += (m_Vel.x - 0.74f * 6.0f - m_AngleForce) / 2.0f;
-		m_Vel.x *= 0.8f;
-	}
-	else
-	{
-		m_Angle += clamp(m_AngleForce * 0.04f, -0.6f, 0.6f);
-		m_Vel.x *= 0.99f;
-	}
-	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(24.0f, 24.0f), 0.4f);
+	vec2 ItemSize = vec2(GetProximityRadius(), GetProximityRadius());
+	GS()->Collision()->MovePhysicalAngleBox(&m_Pos, &m_Vel, ItemSize, &m_Angle, &m_AngleForce, 0.5f);
 
-
-	// interactive
+	// check step and collected it or no
 	const int Count = m_QuestBot.m_aItemSearchCount[0];
 	const int QuestID = m_QuestBot.m_QuestID;
 	CPlayer* pOwnerPlayer = GS()->m_apPlayers[m_OwnerID];
-	InventoryItem& pPlayerQuestItem = pOwnerPlayer->GetItem(m_QuestBot.m_aItemSearch[0]);
-	if (QuestJob::ms_aQuests[m_OwnerID][QuestID].m_Step != m_QuestBot.m_Step || pPlayerQuestItem.m_Count >= Count)
+	InventoryItem& pPlayerItem = pOwnerPlayer->GetItem(m_QuestBot.m_aItemSearch[0]);
+	if (QuestJob::ms_aQuests[m_OwnerID][QuestID].m_Step != m_QuestBot.m_Step || pPlayerItem.m_Count >= Count)
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;
 	}
 
-	if (m_Collide && pOwnerPlayer->GetCharacter() && distance(m_Pos, pOwnerPlayer->GetCharacter()->m_Core.m_Pos) < 32.0f)
+	// interactive
+	if (pOwnerPlayer->GetCharacter() && distance(m_Pos, pOwnerPlayer->GetCharacter()->m_Core.m_Pos) < 32.0f)
 	{
-		// item selection text
 		GS()->Broadcast(m_OwnerID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Press 'Fire' for pick Quest Item");
 		if (pOwnerPlayer->GetCharacter()->m_ReloadTimer)
 		{
-			GS()->CreatePlayerSound(m_OwnerID, SOUND_ITEM_PICKUP);
+			pPlayerItem.Add(1);
 			pOwnerPlayer->GetCharacter()->m_ReloadTimer = 0;
-			pPlayerQuestItem.Add(1);
-			GS()->Chat(m_OwnerID, "You pick {STR} for {STR}!", pPlayerQuestItem.Info().GetName(pOwnerPlayer), m_QuestBot.GetName());
+			GS()->CreatePlayerSound(m_OwnerID, SOUND_ITEM_PICKUP);
+			GS()->Chat(m_OwnerID, "You pick {STR} for {STR}!", pPlayerItem.Info().GetName(pOwnerPlayer), m_QuestBot.GetName());
 			GS()->m_World.DestroyEntity(this);
 			return;
 		}
@@ -108,7 +89,7 @@ void CDropQuestItem::Tick()
 
 void CDropQuestItem::Snap(int SnappingClient)
 {
-	if(m_Flashing || !m_Collide || m_OwnerID != SnappingClient || NetworkClipped(SnappingClient))
+	if(m_Flashing || m_OwnerID != SnappingClient || NetworkClipped(SnappingClient))
 		return;
 
 	// mrpg
@@ -125,7 +106,7 @@ void CDropQuestItem::Snap(int SnappingClient)
 		return;
 	}
 
-	// vanilla
+	// vanilla box
 	CNetObj_Projectile* pProj = static_cast<CNetObj_Projectile*>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, GetID(), sizeof(CNetObj_Projectile)));
 	if (pProj)
 	{

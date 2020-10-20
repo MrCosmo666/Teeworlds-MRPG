@@ -147,7 +147,7 @@ void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force)
 	// experience
 	const int ExperienceMob = kurosio::computeExperience(BotJob::ms_aMobBot[SubID].m_Level) / g_Config.m_SvKillmobsIncreaseLevel;
 	const int ExperienceWithMultiplier = max(1, GS()->GetExperienceMultiplier(ExperienceMob));
-	pPlayer->AddExp(ExperienceWithMultiplier);
+	GS()->CreateParticleExperience(m_Core.m_Pos, ClientID, ExperienceWithMultiplier, Force);
 
 	// drop experience
 	const int ExperienceDrop = max(ExperienceWithMultiplier / 2, 1);

@@ -383,3 +383,36 @@ void CCollision::MoveBox(vec2 *pInoutPos, vec2 *pInoutVel, vec2 Size, float Elas
 	*pInoutPos = Pos;
 	*pInoutVel = Vel;
 }
+
+void CCollision::MovePhysicalAngleBox(vec2* pPos, vec2* pVel, vec2 Size, float* pAngle, float* pAngleForce, float Elasticity, float Gravity)
+{
+	// physic
+	vec2 Pos = *pPos;
+	vec2 Vel = *pVel;
+	float Angle = *pAngle;
+	float AngleForce = *pAngleForce;
+
+	Vel.y += Gravity;
+	const float CheckSizeX = (Size.x / 2.0f);
+	const float CheckSizeY = (Size.y / 2.0f);
+	const bool IsCollide = (bool)CheckPoint(Pos.x - CheckSizeX, Pos.y + CheckSizeY + 5) || CheckPoint(Pos.x + CheckSizeX, Pos.y + CheckSizeY + 5);
+	if(IsCollide)
+	{
+		AngleForce += (Vel.x - 0.74f * 6.0f - AngleForce) / 2.0f;
+		Vel.x *= 0.8f;
+	}
+	else
+	{
+		Angle += clamp(AngleForce * 0.04f, -0.6f, 0.6f);
+		Vel.x *= 0.99f;
+	}
+
+	// move box
+	MoveBox(&Pos, &Vel, Size, Elasticity);
+
+	// transfer the changes
+	*pPos = Pos;
+	*pVel = Vel;
+	*pAngle = Angle;
+	*pAngleForce = AngleForce;
+}

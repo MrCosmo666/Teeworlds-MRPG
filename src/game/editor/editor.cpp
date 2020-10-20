@@ -101,26 +101,26 @@ void CLayerGroup::MapScreen()
 void CLayerGroup::Render()
 {
 	MapScreen();
-	IGraphics *pGraphics = m_pMap->m_pEditor->Graphics();
+	IGraphics* pGraphics = m_pMap->m_pEditor->Graphics();
 
 	if(m_UseClipping)
 	{
 		float aPoints[4];
 		m_pMap->m_pGameGroup->Mapping(aPoints);
-		float x0 = (m_ClipX - aPoints[0]) / (aPoints[2]-aPoints[0]);
-		float y0 = (m_ClipY - aPoints[1]) / (aPoints[3]-aPoints[1]);
-		float x1 = ((m_ClipX+m_ClipW) - aPoints[0]) / (aPoints[2]-aPoints[0]);
-		float y1 = ((m_ClipY+m_ClipH) - aPoints[1]) / (aPoints[3]-aPoints[1]);
+		float x0 = (m_ClipX - aPoints[0]) / (aPoints[2] - aPoints[0]);
+		float y0 = (m_ClipY - aPoints[1]) / (aPoints[3] - aPoints[1]);
+		float x1 = ((m_ClipX + m_ClipW) - aPoints[0]) / (aPoints[2] - aPoints[0]);
+		float y1 = ((m_ClipY + m_ClipH) - aPoints[1]) / (aPoints[3] - aPoints[1]);
 
-		pGraphics->ClipEnable((int)(x0*pGraphics->ScreenWidth()), (int)(y0*pGraphics->ScreenHeight()),
-			(int)((x1-x0)*pGraphics->ScreenWidth()), (int)((y1-y0)*pGraphics->ScreenHeight()));
+		pGraphics->ClipEnable((int)(x0 * pGraphics->ScreenWidth()), (int)(y0 * pGraphics->ScreenHeight()),
+			(int)((x1 - x0) * pGraphics->ScreenWidth()), (int)((y1 - y0) * pGraphics->ScreenHeight()));
 	}
 
 	for(int i = 0; i < m_lLayers.size(); i++)
 	{
 		if(m_lLayers[i]->m_Visible && m_lLayers[i] != m_pMap->m_pGameLayer)
 		{
-			if(m_pMap->m_pEditor->m_ShowDetail || !(m_lLayers[i]->m_Flags&LAYERFLAG_DETAIL))
+			if(m_pMap->m_pEditor->m_ShowDetail || !(m_lLayers[i]->m_Flags & LAYERFLAG_DETAIL))
 				m_lLayers[i]->Render();
 		}
 	}
@@ -4184,10 +4184,6 @@ void CEditor::Render()
 	RenderBackground(View, m_CheckerTexture, 32.0f, 1.0f);
 
 	CUIRect MenuBar, CModeBar, ToolBar, StatusBar, EnvelopeEditor, ToolBox;
-	ToolBar.Margin(0.0f, &ToolBar);
-	ToolBox.Margin(0.0f, &ToolBox);
-	EnvelopeEditor.Margin(0.0f, &EnvelopeEditor);
-
 	m_ShowTilePicker = Input()->KeyIsPressed(KEY_SPACE) != 0 && m_Dialog == DIALOG_NONE;
 
 	if(m_GuiActive)
@@ -4241,12 +4237,12 @@ void CEditor::Render()
 		}
 	}
 	m_ZoomLevel = clamp(m_ZoomLevel, 50, 2000);
-	m_WorldZoom = m_ZoomLevel/100.0f;
+	m_WorldZoom = m_ZoomLevel / 100.0f;
 
 	if(m_GuiActive)
 	{
 		float Brightness = 0.25f;
-		RenderBackground(MenuBar, m_BackgroundTexture, 128.0f, Brightness*0);
+		RenderBackground(MenuBar, m_BackgroundTexture, 128.0f, Brightness * 0);
 		MenuBar.Margin(2.0f, &MenuBar);
 
 		RenderBackground(ToolBox, m_BackgroundTexture, 128.0f, Brightness);
@@ -4270,13 +4266,12 @@ void CEditor::Render()
 		}
 	}
 
-
-	if (m_Mode == MODE_LAYERS)
+	if(m_Mode == MODE_LAYERS)
 		RenderLayers(ToolBox, ToolBar, View);
 	else if(m_Mode == MODE_IMAGES)
 		RenderImages(ToolBox, ToolBar, View);
 
-	Graphics()->MapScreen(View.x, View.y, View.w, View.h);
+	Graphics()->MapScreen(UI()->Screen()->x, UI()->Screen()->y, UI()->Screen()->w, UI()->Screen()->h);
 
 	if(m_GuiActive)
 	{
@@ -4297,11 +4292,10 @@ void CEditor::Render()
 	if(m_PopupEventActivated)
 	{
 		static int s_PopupID = 0;
-		UiInvokePopupMenu(&s_PopupID, 0, Width/2.0f-200.0f, Height/2.0f-100.0f, 400.0f, 200.0f, PopupEvent);
+		UiInvokePopupMenu(&s_PopupID, 0, Width / 2.0f - 200.0f, Height / 2.0f - 100.0f, 400.0f, 200.0f, PopupEvent);
 		m_PopupEventActivated = false;
 		m_PopupEventWasActivated = true;
 	}
-
 
 	UiDoPopupMenu();
 
@@ -4313,7 +4307,7 @@ void CEditor::Render()
 	{
 		Graphics()->MapScreen(UI()->Screen()->x, UI()->Screen()->y, UI()->Screen()->w, UI()->Screen()->h);
 		CTextCursor Cursor;
-		TextRender()->SetCursor(&Cursor, View.x+10, View.y+View.h-24-10, 24.0f, TEXTFLAG_RENDER);
+		TextRender()->SetCursor(&Cursor, View.x + 10, View.y + View.h - 24 - 10, 24.0f, TEXTFLAG_RENDER);
 
 		int NKeys = 0;
 		for(int i = 0; i < KEY_LAST; i++)
@@ -4339,8 +4333,8 @@ void CEditor::Render()
 			Graphics()->WrapClamp();
 			Graphics()->QuadsBegin();
 			if(ms_pUiGotContext == UI()->HotItem())
-				Graphics()->SetColor(1,0,0,1);
-			IGraphics::CQuadItem QuadItem(mx,my, 16.0f, 16.0f);
+				Graphics()->SetColor(1, 0, 0, 1);
+			IGraphics::CQuadItem QuadItem(mx, my, 16.0f, 16.0f);
 			Graphics()->QuadsDrawTL(&QuadItem, 1);
 			Graphics()->QuadsEnd();
 			Graphics()->WrapNormal();
@@ -4352,7 +4346,7 @@ void CEditor::Render()
 			Graphics()->TextureClear();
 			Graphics()->QuadsBegin();
 			Graphics()->SetColor(m_SelectedColor.r, m_SelectedColor.g, m_SelectedColor.b, m_SelectedColor.a);
-			IGraphics::CQuadItem QuadItem(mx+1.0f,my-20.0f, 16.0f, 16.0f);
+			IGraphics::CQuadItem QuadItem(mx + 1.0f, my - 20.0f, 16.0f, 16.0f);
 			Graphics()->QuadsDrawTL(&QuadItem, 1);
 			Graphics()->QuadsEnd();
 		}

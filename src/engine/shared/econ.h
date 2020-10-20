@@ -28,14 +28,19 @@ class CEcon
 	CClient m_aClients[NET_MAX_CONSOLE_CLIENTS];
 
 	IConsole* m_pConsole;
+	CNetBan* m_pNetBan;
 	CNetConsole m_NetConsole;
 
 	bool m_Ready;
+	int64 m_LastOpenTry;
 	int m_PrintCBIndex;
 	int m_UserClientID;
 
-	static void SendLineCB(const char* pLine, void* pUserData, bool Highlighted);
+	void SetDefaultValues();
+
+	static void SendLineCB(const char* pLine, void* pUserData, bool Highlighted);	
 	static void ConchainEconOutputLevelUpdate(IConsole::IResult* pResult, void* pUserData, IConsole::FCommandCallback pfnCallback, void* pCallbackUserData);
+	static void ConchainEconLingerUpdate(IConsole::IResult* pResult, void* pUserData, IConsole::FCommandCallback pfnCallback, void* pCallbackUserData);
 	static void ConLogout(IConsole::IResult* pResult, void* pUserData);
 
 	static int NewClientCallback(int ClientID, void* pUser);
@@ -45,6 +50,7 @@ public:
 	IConsole* Console() { return m_pConsole; }
 
 	void Init(IConsole* pConsole, class CNetBan* pNetBan);
+	bool Open();
 	void Update();
 	void Send(int ClientID, const char* pLine);
 	void Shutdown();

@@ -19,6 +19,7 @@
 
 #include "mmocore/GameEntities/Items/drop_bonuses.h"
 #include "mmocore/GameEntities/Items/drop_items.h"
+#include "mmocore/GameEntities/Items/flying_experience.h"
 #include "mmocore/GameEntities/loltext.h"
 #include "mmocore/CommandProcessor.h"
 #include "mmocore/PathFinder.h"
@@ -2324,6 +2325,12 @@ void CGS::CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Life
 	return;
 }
 
+// creates a particle of experience that follows the player
+void CGS::CreateParticleExperience(vec2 Pos, int ClientID, int Experience, vec2 Force)
+{
+	new CFlyingExperience(&m_World, Pos, ClientID, Experience, Force);
+}
+
 // gives a bonus in the position type and quantity and the number of them.
 void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop, vec2 Force)
 {
@@ -2341,9 +2348,8 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, InventoryItem DropItem, vec2 Fo
 	if(DropItem.m_ItemID <= 0 || DropItem.m_Count <= 0)
 		return;
 
-	vec2 Vel = Force + vec2(frandom() * 15.0, frandom() * 15.0);
-	const float Angle = Force.x * (0.15f + frandom() * 0.1f);
-	new CDropItem(&m_World, Pos, Vel, Angle, DropItem, ClientID);
+	const float Angle = GetAngle(normalize(Force));
+	new CDropItem(&m_World, Pos, Force, Angle, DropItem, ClientID);
 }
 
 // random drop of the item with percentage
@@ -2352,7 +2358,6 @@ void CGS::CreateRandomDropItem(vec2 Pos, int ClientID, float Random, InventoryIt
 	const float RandomDrop = frandom() * 100.0f;
 	if(RandomDrop < Random)
 		CreateDropItem(Pos, ClientID, DropItem, Force);
-	return;
 }
 
 bool CGS::TakeItemCharacter(int ClientID)
