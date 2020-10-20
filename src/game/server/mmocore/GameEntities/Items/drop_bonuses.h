@@ -9,7 +9,6 @@ class CDropBonuses : public CEntity
 	float m_Angle;
 	float m_AngleForce;
 
-	int m_StartTick;
 	int m_Type;
 	bool m_Flashing;
 	int m_LifeSpan;
@@ -20,7 +19,6 @@ public:
 	CDropBonuses(CGameWorld* pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, int Type, int Count);
 
 	virtual void Tick();
-	virtual void TickPaused(); 
 	virtual void Snap(int SnappingClient);
 };
 

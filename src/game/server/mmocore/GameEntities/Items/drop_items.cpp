@@ -1,8 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/math.h>
-#include <base/vmath.h>
-#include <generated/protocol.h>
 #include <game/server/gamecontext.h>
 
 #include "drop_items.h"
@@ -14,13 +11,13 @@ CDropItem::CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForc
 	m_Vel = Vel;
 	m_Angle = 0.0f;
 	m_AngleForce = AngleForce;
+	m_Flashing = false;
+	m_LifeSpan = Server()->TickSpeed() * 20;
 
 	m_OwnerID = OwnerID;
 	m_DropItem = DropItem;
 	m_DropItem.m_Settings = 0;
-	m_Flashing = false;
-	m_LifeSpan = Server()->TickSpeed() * 20;
-	
+
 	GameWorld()->InsertEntity(this);
 	for(int i=0; i<NUM_IDS; i++)
 	{
@@ -74,6 +71,7 @@ void CDropItem::Tick()
 		return;
 	}
 
+	// flashing
 	if(m_LifeSpan < 150)
 	{
 		m_FlashTimer--;
@@ -87,13 +85,16 @@ void CDropItem::Tick()
 		}
 	}
 
+	// set without owner if there is no player owner 
+	if(m_OwnerID != -1 && !GS()->GetPlayer(m_OwnerID, true, true))
+		m_OwnerID = -1;
 
 	// physic
 	m_Vel.y += 0.5f;
 	static const float CheckSize = (GetProximityRadius()/2.0f);
-	const bool Grounded = (bool)GS()->Collision()->CheckPoint(m_Pos.x - CheckSize, m_Pos.y + CheckSize + 5) 
+	const bool IsCollide = (bool)GS()->Collision()->CheckPoint(m_Pos.x - CheckSize, m_Pos.y + CheckSize + 5) 
 		|| GS()->Collision()->CheckPoint(m_Pos.x + CheckSize, m_Pos.y + CheckSize + 5);
-	if (Grounded)
+	if (IsCollide)
 	{
 		m_AngleForce += (m_Vel.x - 0.74f * 6.0f - m_AngleForce) / 2.0f;
 		m_Vel.x *= 0.8f;
@@ -108,35 +109,31 @@ void CDropItem::Tick()
 	if(length(m_Vel) < 0.3f)
 		m_Angle = 0.0f;
 
-
 	// interactive
-	if(m_OwnerID != -1 && !GS()->GetPlayer(m_OwnerID, true, true))
-		m_OwnerID = -1;
-
 	CCharacter *pChar = (CCharacter*)GameWorld()->ClosestEntity(m_Pos, 64, CGameWorld::ENTTYPE_CHARACTER, 0);
 	if(!pChar || pChar->GetPlayer()->IsBot())
 		return;
 
-	// if not an enchanted object
-	const InventoryItem pPlayerDroppedItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
-	if(!pPlayerDroppedItem.Info().IsEnchantable())
+	const char* pToNickname = (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0");
+	const InventoryItem pPlayerItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
+
+	// enchantable item
+	if(pPlayerItem.Info().IsEnchantable())
 	{
-		GS()->Broadcast(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}x{INT} {STR}",
-			m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.m_Count, (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0"));
+		if(pPlayerItem.m_Count > 0)
+			GS()->Broadcast(pChar->GetPlayer()->GetCID(), BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) -> (+{INT}) {STR}",
+				m_DropItem.Info().GetName(pChar->GetPlayer()), &pPlayerItem.m_Enchant, &m_DropItem.m_Enchant, pToNickname);
+		else
+			GS()->Broadcast(pChar->GetPlayer()->GetCID(), BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) {STR}",
+				m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.m_Enchant, pToNickname);
+		
 		return;
 	}
 
-	if (pPlayerDroppedItem.m_Count > 0)
-	{
-		GS()->Broadcast(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) -> (+{INT}) {STR}", 
-			m_DropItem.Info().GetName(pChar->GetPlayer()),
-			&pPlayerDroppedItem.m_Enchant, &m_DropItem.m_Enchant,
-			(m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0"));
-		return;
-	}
+	// non enchantable item
+	GS()->Broadcast(pChar->GetPlayer()->GetCID(), BROADCAST_GAME_INFORMATION, 100, "{STR}x{INT} {STR}",
+		m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.m_Count, pToNickname);
 
-	GS()->Broadcast(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) {STR}",
-		pPlayerDroppedItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.m_Enchant, (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0"));
 }
 
 void CDropItem::Snap(int SnappingClient)

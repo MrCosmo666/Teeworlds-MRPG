@@ -1,8 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/math.h>
-#include <base/vmath.h>
-#include <generated/protocol.h>
 #include <game/server/gamecontext.h>
 
 #include "drop_bonuses.h"
@@ -19,7 +16,6 @@ CDropBonuses::CDropBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float Ang
 	m_Type = Type;
 	m_FlashTimer = 0;
 	m_Flashing = false;
-	m_StartTick = Server()->Tick();
 	m_LifeSpan = Server()->TickSpeed() * 15;
 	GameWorld()->InsertEntity(this);
 }
@@ -34,6 +30,7 @@ void CDropBonuses::Tick()
 		return;
 	}
 
+	// flashing
 	if (m_LifeSpan < 150)
 	{
 		m_FlashTimer--;
@@ -47,9 +44,11 @@ void CDropBonuses::Tick()
 		}
 	}
 
+	// physic
 	m_Vel.y += 0.5f;
-	bool Grounded = (bool)GS()->Collision()->CheckPoint(m_Pos.x - 12, m_Pos.y + 12 + 5) || GS()->Collision()->CheckPoint(m_Pos.x + 12, m_Pos.y + 12 + 5);
-	if (Grounded)
+	static const float ItemSize = (GetProximityRadius() / 2.0f);
+	bool IsCollide = (bool)GS()->Collision()->CheckPoint(m_Pos.x - ItemSize, m_Pos.y + ItemSize + 5) || GS()->Collision()->CheckPoint(m_Pos.x + ItemSize, m_Pos.y + ItemSize + 5);
+	if (IsCollide)
 	{
 		m_AngleForce += (m_Vel.x - 0.74f * 6.0f - m_AngleForce) / 2.0f;
 		m_Vel.x *= 0.8f;
@@ -61,25 +60,23 @@ void CDropBonuses::Tick()
 	}
 	GS()->Collision()->MoveBox(&m_Pos, &m_Vel, vec2(24.0f, 24.0f), 0.4f);
 
+	// interactive
 	CCharacter *pChar = (CCharacter*)GameWorld()->ClosestEntity(m_Pos, 16.0f, CGameWorld::ENTTYPE_CHARACTER, 0);
 	if(pChar && pChar->GetPlayer() && !pChar->GetPlayer()->IsBot())
 	{
 		if(m_Type == PICKUP_HEALTH)
+		{
 			GS()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
-
+		}
+		// experience
 		if(m_Type == PICKUP_ARMOR)
 		{
 			pChar->GetPlayer()->AddExp(m_Count);
 			GS()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
 		} 
 		GS()->m_World.DestroyEntity(this);
-		return;			
+		return;
 	}
-}
-
-void CDropBonuses::TickPaused()
-{
-	m_StartTick++;
 }
 
 void CDropBonuses::Snap(int SnappingClient)
