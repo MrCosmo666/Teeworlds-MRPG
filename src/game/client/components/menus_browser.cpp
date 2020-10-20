@@ -1030,7 +1030,7 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 	}
 
 	// list background
-	RenderTools()->DrawUIRect(&View, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
+	RenderTools()->DrawUIRect(&View, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_L, 5.0f);
 	{
 		int Column = COL_BROWSER_PING;
 		switch(g_Config.m_BrSort)
