@@ -26,6 +26,7 @@ public:
 	void DoCollectItem(CPlayer* pPlayer);
 	void AddMobProgress(CPlayer* pPlayer, int BotID);
 	void CreateQuestingItems(CPlayer* pPlayer);
+	void ShowRequired(CPlayer* pPlayer, const char* TextTalk);
 };
 
 #endif

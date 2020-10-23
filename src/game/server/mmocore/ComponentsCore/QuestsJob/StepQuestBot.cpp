@@ -185,6 +185,35 @@ void CPlayerStepQuestBot::DoCollectItem(CPlayer* pPlayer)
 	}
 }
 
+void CPlayerStepQuestBot::AddMobProgress(CPlayer* pPlayer, int BotID)
+{
+	if(!pPlayer || !pPlayer->GS()->Mmo()->BotsData()->IsDataBotValid(BotID))
+		return;
+
+	CGS* pGS = pPlayer->GS();
+	const int ClientID = pPlayer->GetCID();
+	const int QuestID = m_Bot->m_QuestID;
+
+	// if the quest is accepted
+	if(pPlayer->GetQuest(QuestID).GetState() != QuestState::QUEST_ACCEPT)
+		return;
+
+	// check complecte mob
+	for(int i = 0; i < 2; i++)
+	{
+		const int SubBotID = m_Bot->m_SubBotID;
+		if(BotID != m_Bot->m_aNeedMob[i] || m_MobProgress[i] >= m_Bot->m_aNeedMobCount[i])
+			continue;
+
+		m_MobProgress[i]++;
+		if(m_MobProgress[i] >= m_Bot->m_aNeedMobCount[i])
+			pGS->Chat(ClientID, "You killed {STR} required amount for NPC {STR}", BotJob::ms_aDataBot[BotID].m_aNameBot, m_Bot->GetName());
+
+		SJK.UD("tw_accounts_quests_bots_step", "Mob1Progress = '%d', Mob2Progress = '%d' WHERE SubBotID = '%d' AND OwnerID = '%d'", m_MobProgress[0], m_MobProgress[1], SubBotID, pPlayer->Acc().m_AuthID);
+		break;
+	}
+}
+
 void CPlayerStepQuestBot::CreateQuestingItems(CPlayer* pPlayer)
 {
 	if(!pPlayer || !pPlayer->GetCharacter() || m_Bot->m_InteractiveType != (int)QuestInteractive::INTERACTIVE_DROP_AND_TAKE_IT)
@@ -208,31 +237,117 @@ void CPlayerStepQuestBot::CreateQuestingItems(CPlayer* pPlayer)
 	}
 }
 
-void CPlayerStepQuestBot::AddMobProgress(CPlayer* pPlayer, int BotID)
+
+void CPlayerStepQuestBot::ShowRequired(CPlayer* pPlayer, const char* TextTalk)
 {
-	if(!pPlayer || !pPlayer->GS()->Mmo()->BotsData()->IsDataBotValid(BotID))
-		return;
+	//if(m_Bot->m_DesignBot)
+	//	return;
 
 	CGS* pGS = pPlayer->GS();
 	const int ClientID = pPlayer->GetCID();
+	if(pGS->IsMmoClient(ClientID))
+	{
+		char aBuf[64];
+		dynamic_string Buffer;
+		const int ClientID = pPlayer->GetCID();
+
+		// search item's
+		for (int i = 0; i < 2; i++)
+		{
+			const int ItemID = m_Bot->m_aItemSearch[i];
+			const int CountItem = m_Bot->m_aItemSearchCount[i];
+			if(ItemID <= 0 || CountItem <= 0)
+				continue;
+
+			if(m_Bot->m_InteractiveType == (int)QuestInteractive::INTERACTIVE_RANDOM_ACCEPT_ITEM)
+			{
+				const float Chance = m_Bot->m_InteractiveTemp <= 0 ? 100.0f : (1.0f / (float)m_Bot->m_InteractiveTemp) * 100;
+				str_format(aBuf, sizeof(aBuf), "%s [takes %0.2f%%]", aBuf, Chance);
+			}
+			else
+			{
+				str_format(aBuf, sizeof(aBuf), "%s", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
+			}
+
+			Buffer.append_at(Buffer.length(), aBuf);
+			pGS->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, CountItem, ItemID, false);
+		}
+
+		// search mob's
+		for (int i = 0; i < 2; i++)
+		{
+			const int BotID = m_Bot->m_aNeedMob[i];
+			const int CountMob = m_Bot->m_aNeedMobCount[i];
+			if (BotID <= 0 || CountMob <= 0 || !pGS->Mmo()->BotsData()->IsDataBotValid(BotID))
+				continue;
+
+			str_format(aBuf, sizeof(aBuf), "Defeat %s", BotJob::ms_aDataBot[BotID].m_aNameBot);
+			pGS->Mmo()->Quest()->QuestTableAddInfo(ClientID, aBuf, CountMob, m_MobProgress[i]);
+		}
+
+		// reward item's
+		for (int i = 0; i < 2; i++)
+		{
+			const int ItemID = m_Bot->m_aItemGives[i];
+			const int CountItem = m_Bot->m_aItemGivesCount[i];
+			if (ItemID <= 0 || CountItem <= 0)
+				continue;
+
+			str_format(aBuf, sizeof(aBuf), "Receive %s", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
+			pGS->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, CountItem, ItemID, true);
+		}
+		return;
+	}
+
+	char aBuf[64];
+	dynamic_string Buffer;
+	bool IsActiveTask = false;
 	const int QuestID = m_Bot->m_QuestID;
 
-	// if the quest is accepted
-	if(QuestJob::ms_aPlayerQuests[ClientID][QuestID].m_State != QuestState::QUEST_ACCEPT)
-		return;
-
-	// check complecte mob
+	// search item's and mob's
 	for(int i = 0; i < 2; i++)
 	{
-		const int SubBotID = m_Bot->m_SubBotID;
-		if(BotID != m_Bot->m_aNeedMob[i] || m_MobProgress[i] >= m_Bot->m_aNeedMobCount[i])
-			continue;
+		const int BotID = m_Bot->m_aNeedMob[i];
+		const int CountMob = m_Bot->m_aNeedMobCount[i];
+		if(BotID > 0 && CountMob > 0 && pGS->Mmo()->BotsData()->IsDataBotValid(BotID))
+		{
+			str_format(aBuf, sizeof(aBuf), "\n- Defeat %s [%d/%d]", BotJob::ms_aDataBot[BotID].m_aNameBot, m_MobProgress[i], CountMob);
+			Buffer.append_at(Buffer.length(), aBuf);
+			IsActiveTask = true;
+		}
 
-		m_MobProgress[i]++;
-		if(m_MobProgress[i] >= m_Bot->m_aNeedMobCount[i])
-			pGS->Chat(ClientID, "You killed {STR} required amount for NPC {STR}", BotJob::ms_aDataBot[BotID].m_aNameBot, m_Bot->GetName());
-
-		SJK.UD("tw_accounts_quests_bots_step", "Mob1Progress = '%d', Mob2Progress = '%d' WHERE SubBotID = '%d' AND OwnerID = '%d'", m_MobProgress[0], m_MobProgress[1], SubBotID, pPlayer->Acc().m_AuthID);
-		break;
+		const int ItemID = m_Bot->m_aItemSearch[i];
+		const int CountItem = m_Bot->m_aItemSearchCount[i];
+		if(ItemID > 0 && CountItem > 0)
+		{
+			InventoryItem PlayerQuestItem = pPlayer->GetItem(ItemID);
+			str_format(aBuf, sizeof(aBuf), "\n- Need %s [%d/%d]", PlayerQuestItem.Info().GetName(pPlayer), PlayerQuestItem.m_Count, CountItem);
+			Buffer.append_at(Buffer.length(), aBuf);
+			IsActiveTask = true;
+		}
 	}
+
+	// type random accept item's
+	if(m_Bot->m_InteractiveType == (int)QuestInteractive::INTERACTIVE_RANDOM_ACCEPT_ITEM)
+	{
+		const double Chance = m_Bot->m_InteractiveTemp <= 0 ? 100.0f : (1.0f / (double)m_Bot->m_InteractiveTemp) * 100;
+		str_format(aBuf, sizeof(aBuf), "\nChance that item he'll like [%0.2f%%]\n", Chance);
+		Buffer.append_at(Buffer.length(), aBuf);
+	}
+
+	// reward item's
+	for(int i = 0; i < 2; i++)
+	{
+		const int ItemID = m_Bot->m_aItemGives[i];
+		const int CountItem = m_Bot->m_aItemGivesCount[i];
+		if(ItemID > 0 && CountItem > 0)
+		{
+			str_format(aBuf, sizeof(aBuf), "\n- Receive %s [%d]", pPlayer->GetItem(ItemID).Info().GetName(pPlayer), CountItem);
+			Buffer.append_at(Buffer.length(), aBuf);
+		}
+	}
+
+	pGS->Motd(ClientID, "{STR}\n\n{STR}{STR}\n\n", TextTalk, (IsActiveTask ? "### Task" : "\0"), Buffer.buffer());
+	pPlayer->ClearFormatQuestText();
+	Buffer.clear();
 }

@@ -166,12 +166,12 @@ void BotJob::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 		str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) %s:\n- %s", (1 + Progress), sizeTalking, TalkedNick, pPlayer->FormatedTalkedText());
 		pPlayer->ClearFormatQuestText();
 
-		GS()->Mmo()->Quest()->QuestTableShowRequired(pPlayer, BotJob::ms_aQuestBot[MobID], reformTalkedText);
+		GS()->Mmo()->Quest()->QuestShowRequired(pPlayer, BotJob::ms_aQuestBot[MobID], reformTalkedText);
 		return;
 	}
 
 	// mmo clients
-	GS()->Mmo()->Quest()->QuestTableShowRequired(pPlayer, BotJob::ms_aQuestBot[MobID], "\0");
+	GS()->Mmo()->Quest()->QuestShowRequired(pPlayer, BotJob::ms_aQuestBot[MobID], "\0");
 }
 
 int BotJob::GetQuestNPC(int MobID) const
@@ -279,7 +279,6 @@ void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 	for(auto& pQuestBot : ms_aQuestBot)
 	{
 		int QuestID = pQuestBot.second.m_QuestID;
-		int Step = pQuestBot.second.m_Step;
 		QuestJob::ms_aDataQuests[QuestID].m_StepsQuestBot[pQuestBot.first].m_Bot = &pQuestBot.second;
 	}
 }
