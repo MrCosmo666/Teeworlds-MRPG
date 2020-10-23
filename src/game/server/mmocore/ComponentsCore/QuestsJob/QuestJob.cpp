@@ -85,7 +85,7 @@ void QuestJob::ShowQuestID(CPlayer *pPlayer, int QuestID)
 	const int LineQuest = pData.GetStoryCount(QuestID) + 1;
 
 	// TODO: REMOVE IT
-	GS()->AVCALLBACK(ClientID, "MENU", "\0", QuestID, NOPE, NOPE, "{INT}/{INT} {STR}: {STR}", [](CVoteOptionsCallback Callback)
+	GS()->AVCALLBACK(ClientID, "MENU", "\0", QuestID, NOPE, NOPE, [](CVoteOptionsCallback Callback)
 	{
 		CPlayer* pPlayer = Callback.pPlayer;
 		const int ClientID = pPlayer->GetCID();
@@ -103,7 +103,7 @@ void QuestJob::ShowQuestID(CPlayer *pPlayer, int QuestID)
 
 		pPlayer->m_LastVoteMenu = MenuList::MENU_JOURNAL_MAIN;
 		pPlayer->GS()->AddBackpage(ClientID);
-	}, &LineQuest, &CountQuest, pData.GetStory(), pData.GetName());
+	}, "{INT}/{INT} {STR}: {STR}", &LineQuest, &CountQuest, pData.GetStory(), pData.GetName());
 }
 
 // active npc information display
@@ -123,7 +123,7 @@ void QuestJob::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 		BotJob::QuestBotInfo* pBotInfo = pStepBot.second.m_Bot;
 		const int HideID = (NUM_TAB_MENU + 12500 + pBotInfo->m_SubBotID);
 		const int PosX = pBotInfo->m_PositionX / 32, PosY = pBotInfo->m_PositionY / 32;
-		GS()->AVH(clientID, HideID, LIGHT_BLUE_COLOR, "{STR} {STR}(x{INT} y{INT})", pBotInfo->GetName(), GS()->Server()->GetWorldName(pBotInfo->m_WorldID), &PosX, &PosY);
+		GS()->AVH(clientID, HideID, LIGHT_BLUE_COLOR, "Step {INT}. {STR} {STR}(x{INT} y{INT})", &pBotInfo->m_Step, pBotInfo->GetName(), GS()->Server()->GetWorldName(pBotInfo->m_WorldID), &PosX, &PosY);
 
 		// need for bot
 		bool NeedOnlyTalk = true;

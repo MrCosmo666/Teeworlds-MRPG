@@ -3,6 +3,8 @@
 #ifndef GAME_VOTING_H
 #define GAME_VOTING_H
 
+#include <functional>
+
 enum
 {
 	VOTE_DESC_LENGTH=64,

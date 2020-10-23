@@ -1716,22 +1716,22 @@ void CGS::ClearVotes(int ClientID)
 }
 
 // add a vote
-void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int ID2, const char *Icon, VoteCallBack Callback)
+void CGS::AV(int ClientID, const char *pCmd, const char *pDesc, const int TempInt, const int TempInt2, const char *pIcon, VoteCallBack Callback)
 {
-	if(To < 0 || To > MAX_PLAYERS || !m_apPlayers[To])
+	if(ClientID < 0 || ClientID > MAX_PLAYERS || !m_apPlayers[ClientID])
 		return;
 
-	char aDesc[128]; // buffer x2 with unicode
-	str_copy(aDesc, Desc, sizeof(aDesc));
-	if(str_comp(m_apPlayers[To]->GetLanguage(), "ru") == 0 || str_comp(m_apPlayers[To]->GetLanguage(), "uk") == 0)
-		str_translation_utf8_to_cp(aDesc);
+	char aBufDesc[128]; // buffer x2 with unicode
+	str_copy(aBufDesc, pDesc, sizeof(aBufDesc));
+	if(str_comp(m_apPlayers[ClientID]->GetLanguage(), "ru") == 0 || str_comp(m_apPlayers[ClientID]->GetLanguage(), "uk") == 0)
+		str_translation_utf8_to_cp(aBufDesc);
 	
 	CVoteOptions Vote;	
-	str_copy(Vote.m_aDescription, aDesc, sizeof(Vote.m_aDescription));
-	str_copy(Vote.m_aCommand, Cmd, sizeof(Vote.m_aCommand));
-	str_copy(Vote.m_aIcon, Cmd, sizeof(Vote.m_aIcon));
-	Vote.m_TempID = ID;
-	Vote.m_TempID2 = ID2;
+	str_copy(Vote.m_aDescription, aBufDesc, sizeof(Vote.m_aDescription));
+	str_copy(Vote.m_aCommand, pCmd, sizeof(Vote.m_aCommand));
+	str_copy(Vote.m_aIcon, pIcon, sizeof(Vote.m_aIcon));
+	Vote.m_TempID = TempInt;
+	Vote.m_TempID2 = TempInt2;
 	Vote.m_Callback = Callback;
 
 	// trim right and set maximum length to 64 utf8-characters
@@ -1762,20 +1762,20 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 	if(pEnd != nullptr)
 		*(const_cast<char *>(pEnd)) = 0;
 	
-	m_aPlayerVotes[To].push_back(Vote);
+	m_aPlayerVotes[ClientID].push_back(Vote);
 
 	// send to customers that have a mmo client
-	if(IsMmoClient(To)) 
+	if(IsMmoClient(ClientID))
 	{
 		if(Vote.m_aDescription[0] == '\0')
-			m_apPlayers[To]->m_Colored = { 0, 0, 0 };
+			m_apPlayers[ClientID]->m_Colored = { 0, 0, 0 };
 
 		CNetMsg_Sv_VoteMmoOptionAdd OptionMsg;
-		const vec3 ToHexColor = m_apPlayers[To]->m_Colored;
+		const vec3 ToHexColor = m_apPlayers[ClientID]->m_Colored;
 		OptionMsg.m_pHexColor = ((int)ToHexColor.r << 16) + ((int)ToHexColor.g << 8) + (int)ToHexColor.b;
 		OptionMsg.m_pDescription = Vote.m_aDescription;
 		StrToInts(OptionMsg.m_pIcon, 4, Vote.m_aIcon);
-		Server()->SendPackMsg(&OptionMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, To);
+		Server()->SendPackMsg(&OptionMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
 		return;
 	}
 
@@ -1785,23 +1785,23 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 	// send to vanilla clients
 	CNetMsg_Sv_VoteOptionAdd OptionMsg;	
 	OptionMsg.m_pDescription = Vote.m_aDescription;
-	Server()->SendPackMsg(&OptionMsg, MSGFLAG_VITAL, To);
+	Server()->SendPackMsg(&OptionMsg, MSGFLAG_VITAL, ClientID);
 }
 
 // add formatted vote
-void CGS::AVL(int To, const char* aCmd, const char* pText, ...)
+void CGS::AVL(int ClientID, const char *pCmd, const char *pText, ...)
 {
-	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
+	if(ClientID >= 0 && ClientID < MAX_PLAYERS && m_apPlayers[ClientID])
 	{
 		va_list VarArgs;
 		va_start(VarArgs, pText);
 		
 		dynamic_string Buffer;
-		if(str_comp(aCmd, "null") != 0)
+		if(str_comp(pCmd, "null") != 0)
 			Buffer.append("- ");
 		
-		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
-		AV(To, aCmd, Buffer.buffer());
+		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
+		AV(ClientID, pCmd, Buffer.buffer());
 		Buffer.clear();
 		
 		va_end(VarArgs);
@@ -1809,49 +1809,49 @@ void CGS::AVL(int To, const char* aCmd, const char* pText, ...)
 }
 
 // add formatted vote with color
-void CGS::AVH(int To, const int ID, vec3 Color, const char* pText, ...)
+void CGS::AVH(int ClientID, const int HideID, vec3 Color, const char *pText, ...)
 {
-	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
+	if(ClientID >= 0 && ClientID < MAX_PLAYERS && m_apPlayers[ClientID])
 	{
 		va_list VarArgs;
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		const bool HidenTabs = (ID >= TAB_STAT) ? m_apPlayers[To]->GetHidenMenu(ID) : false;
-		Buffer.append(GetSymbolHandleMenu(To, HidenTabs, ID));
+		const bool HidenTabs = (HideID >= TAB_STAT) ? m_apPlayers[ClientID]->GetHidenMenu(HideID) : false;
+		Buffer.append(GetSymbolHandleMenu(ClientID, HidenTabs, HideID));
 
-		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
-		if(ID > TAB_SETTINGS_MODULES && ID < NUM_TAB_MENU) { Buffer.append(" (Press me for help)"); }
+		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
+		if(HideID > TAB_SETTINGS_MODULES && HideID < NUM_TAB_MENU) { Buffer.append(" (Press me for help)"); }
 
-		m_apPlayers[To]->m_Colored = { Color.r, Color.g, Color.b };
-		AV(To, "HIDEN", Buffer.buffer(), ID, -1, "unused");
-		if(length(m_apPlayers[To]->m_Colored) > 1.0f)
-			m_apPlayers[To]->m_Colored /= 4.0f;
+		m_apPlayers[ClientID]->m_Colored = { Color.r, Color.g, Color.b };
+		AV(ClientID, "HIDEN", Buffer.buffer(), HideID, -1, "unused");
+		if(length(m_apPlayers[ClientID]->m_Colored) > 1.0f)
+			m_apPlayers[ClientID]->m_Colored /= 4.0f;
 		Buffer.clear();
 		va_end(VarArgs);
 	}
 }
 
 // add formatted vote with color and icon
-void CGS::AVHI(int To, const char *Icon, const int ID, vec3 Color, const char* pText, ...)
+void CGS::AVHI(int ClientID, const char *pIcon, const int HideID, vec3 Color, const char* pText, ...)
 {
-	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
+	if(ClientID >= 0 && ClientID < MAX_PLAYERS && m_apPlayers[ClientID])
 	{
 		va_list VarArgs;
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		const bool HidenTabs = (bool)(ID >= TAB_STAT ? m_apPlayers[To]->GetHidenMenu(ID) : false);
-		Buffer.append(GetSymbolHandleMenu(To, HidenTabs, ID));
+		const bool HidenTabs = (bool)(HideID >= TAB_STAT ? m_apPlayers[ClientID]->GetHidenMenu(HideID) : false);
+		Buffer.append(GetSymbolHandleMenu(ClientID, HidenTabs, HideID));
 
-		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
-		if(ID > TAB_SETTINGS_MODULES && ID < NUM_TAB_MENU)
+		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
+		if(HideID > TAB_SETTINGS_MODULES && HideID < NUM_TAB_MENU)
 			Buffer.append(" (Press me for help)");
 
-		m_apPlayers[To]->m_Colored = Color;
-		AV(To, "HIDEN", Buffer.buffer(), ID, -1, Icon);
-		if(length(m_apPlayers[To]->m_Colored) > 1.0f)
-			m_apPlayers[To]->m_Colored /= 4.0f;
+		m_apPlayers[ClientID]->m_Colored = Color;
+		AV(ClientID, "HIDEN", Buffer.buffer(), HideID, -1, pIcon);
+		if(length(m_apPlayers[ClientID]->m_Colored) > 1.0f)
+			m_apPlayers[ClientID]->m_Colored /= 4.0f;
 			
 		Buffer.clear();
 		va_end(VarArgs);
@@ -1859,78 +1859,78 @@ void CGS::AVHI(int To, const char *Icon, const int ID, vec3 Color, const char* p
 }
 
 // add formatted vote as menu
-void CGS::AVM(int To, const char* Type, const int ID, const int HideID, const char* pText, ...)
+void CGS::AVM(int ClientID, const char *pCmd, const int TempInt, const int HideID, const char* pText, ...)
 {
-	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
+	if(ClientID >= 0 && ClientID < MAX_PLAYERS && m_apPlayers[ClientID])
 	{
-		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) || 
-			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
+		if((!m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) ||
+			(m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
 			return;
 
 		va_list VarArgs;
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		if(ID != NOPE) { Buffer.append("- "); }
+		if(TempInt != NOPE) { Buffer.append("- "); }
 
-		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
-		AV(To, Type, Buffer.buffer(), ID);
+		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
+		AV(ClientID, pCmd, Buffer.buffer(), TempInt);
 		Buffer.clear();
 		va_end(VarArgs);
 	}
 }
 
 // add formatted vote as menu with icon
-void CGS::AVMI(int To, const char *Icon, const char* Type, const int ID, const int HideID, const char* pText, ...)
+void CGS::AVMI(int ClientID, const char *pIcon, const char *pCmd, const int TempInt, const int HideID, const char *pText, ...)
 {
-	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
+	if(ClientID >= 0 && ClientID < MAX_PLAYERS && m_apPlayers[ClientID])
 	{
-		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) || 
-			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
+		if((!m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) ||
+			(m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
 			return;
 
 		va_list VarArgs;
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		if(ID != NOPE) { Buffer.append("- "); }
+		if(TempInt != NOPE) { Buffer.append("- "); }
 
-		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
-		AV(To, Type, Buffer.buffer(), ID, -1, Icon);
+		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
+		AV(ClientID, pCmd, Buffer.buffer(), TempInt, -1, pIcon);
 		Buffer.clear();
 		va_end(VarArgs);
 	}
 }
 
 // add formatted vote with multiple id's
-void CGS::AVD(int To, const char* Type, const int ID, const int ID2, const int HideID, const char* pText, ...)
+void CGS::AVD(int ClientID, const char *pCmd, const int TempInt, const int TempInt2, const int HideID, const char *pText, ...)
 {
-	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
+	if(ClientID >= 0 && ClientID < MAX_PLAYERS && m_apPlayers[ClientID])
 	{
-		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) || 
-			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
+		if((!m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) ||
+			(m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
 			return;
 			
 		va_list VarArgs;
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		if(ID != NOPE) { Buffer.append("- "); }
+		if(TempInt != NOPE) { Buffer.append("- "); }
 
-		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
-		AV(To, Type, Buffer.buffer(), ID, ID2);
+		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
+		AV(ClientID, pCmd, Buffer.buffer(), TempInt, TempInt2);
 		Buffer.clear();
 		va_end(VarArgs);
 	}
 }
 
-// add formatted callback vote with multiple id's
-void CGS::AVCALLBACK(int To, const char* Type, const char* Icon, const int ID, const int ID2, const int HideID, const char* pText, VoteCallBack Callback, ...)
+// add formatted callback vote with multiple id's (need disallow used it for menu)
+void CGS::AVCALLBACK(int ClientID, const char *pCmd, const char *pIcon, const int TempInt, const int TempInt2, const int HideID, VoteCallBack Callback, const char* pText, ...)
 {
-	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
+	if(ClientID >= 0 && ClientID < MAX_PLAYERS && m_apPlayers[ClientID])
 	{
-		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) ||
-			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
+		if((!m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) ||
+			(m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
 			return;
 
 		va_list VarArgs;
@@ -1939,8 +1939,8 @@ void CGS::AVCALLBACK(int To, const char* Type, const char* Icon, const int ID, c
 		dynamic_string Buffer;
 		Buffer.append("- ");
 
-		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
-		AV(To, Type, Buffer.buffer(), ID, ID2, Icon, Callback);
+		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
+		AV(ClientID, pCmd, Buffer.buffer(), TempInt, TempInt2, pIcon, Callback);
 
 		Buffer.clear();
 		va_end(VarArgs);

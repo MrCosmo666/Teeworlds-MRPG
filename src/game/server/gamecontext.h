@@ -235,17 +235,16 @@ private:
 	std::list<CVoteOptions> m_aPlayerVotes[MAX_PLAYERS];
 
 public:	
-	void AV(int To, const char* Cmd, const char* Desc = "\0", const int ID = -1, const int ID2 = -1, const char* Icon = "unused", VoteCallBack Callback = nullptr);
-	void AVL(int To, const char* aCmd, const char* pText, ...);
-	void AVH(int To, const int ID, vec3 Color, const char* pText, ...);
-	void AVHI(int To, const char *Icon, const int ID, vec3 Color, const char* pText, ...);
-
-	void AVM(int To, const char* Type, const int ID, const int HideID, const char* pText, ...);
-	void AVMI(int To, const char *Icon, const char *Type, const int ID, const int HideID, const char *pText, ...);
-	void AVD(int To, const char* Type, const int ID, const int ID2, const int HideID, const char* pText, ...);
+	void AV(int ClientID , const char *pCmd, const char *pDesc = "\0", const int TempInt = -1, const int TempInt2 = -1, const char *pIcon = "unused", VoteCallBack Callback = nullptr);
+	void AVL(int ClientID, const char *pCmd, const char *pText, ...);
+	void AVH(int ClientID, const int HideID, vec3 Color, const char *pText, ...);
+	void AVHI(int ClientID, const char *pIcon, const int HideID, vec3 Color, const char *pText, ...);
+	void AVM(int ClientID, const char *pCmd, const int TempInt, const int HideID, const char* pText, ...);
+	void AVMI(int ClientID, const char *pIcon, const char *pCmd, const int TempInt, const int HideID, const char *pText, ...);
+	void AVD(int ClientID, const char *pCmd, const int TempInt, const int TempInt2, const int HideID, const char *pText, ...);
 
 	// TODO: fixme. improve the system using the ID method, as well as the ability to implement Backpage
-	void AVCALLBACK(int To, const char* Type, const char* Icon, const int ID, const int ID2, const int HideID, const char* pText, VoteCallBack Callback, ...);
+	void AVCALLBACK(int To, const char* Type, const char* Icon, const int ID, const int ID2, const int HideID, VoteCallBack Callback, const char* pText, ...);
 
 	void ClearVotes(int ClientID);
 	void ResetVotesNewbieInformation(int ClientID);
