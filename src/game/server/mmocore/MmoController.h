@@ -13,7 +13,7 @@
 #include "ComponentsCore/AccountPlantJob.h"
 #include "ComponentsCore/BotJob.h"
 #include "ComponentsCore/InventoryJob/InventoryJob.h"
-#include "ComponentsCore/QuestJob.h"
+#include "ComponentsCore/QuestsJob/QuestJob.h"
 #include "ComponentsCore/ShopJob.h"
 #include "ComponentsCore/StorageJob.h"
 

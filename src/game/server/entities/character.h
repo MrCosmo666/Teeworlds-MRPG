@@ -15,7 +15,7 @@ class CCharacter : public CEntity
 
 	// player controlling this character
 	class CPlayer *m_pPlayer;
-	class TileHandle *m_pHelper;
+	TileHandle *m_pHelper;
 
 	void FireWeapon();
 	bool DecoInteractive();
@@ -77,11 +77,9 @@ public:
 	void CreateSnapProj(int SnapID, int Count, int TypeID, bool Dynamic, bool Projectile);
 	void RemoveSnapProj(int Count, int SnapID, bool Effect = false);
 	
-	void CreateRandomDropItem(int DropCID, int Random, int ItemID, int Count, vec2 Force);
 	void GiveRandomMobEffect(int FromID);
 	void ChangePosition(vec2 NewPos);
 	void ResetDoorPos();
-	int GetPowerWeapons(int WeaponID);
 	void UpdateEquipingStats(int ItemID);
 
 	// these are non-heldback inputs

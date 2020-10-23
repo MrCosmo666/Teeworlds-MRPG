@@ -155,7 +155,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 
 		AddHistoryGuild(GuildID, "New guild leader '%s'.", Job()->PlayerName(SelectedAccountID));
 		GS()->ChatGuild(GuildID, "Change leader {STR}->{STR}", GS()->Server()->ClientName(ClientID), Job()->PlayerName(SelectedAccountID));
-		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -188,7 +188,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 			return true;
 		}
 		ExitGuild(VoteID);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -207,7 +207,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 			const int GuildCount = ms_aGuild[GuildID].m_Upgrades[UpgradeID];
 			GS()->ChatGuild(GuildID, "Improved to {INT} {STR} in {STR}!", &GuildCount, UpgradeNames(UpgradeID).c_str(), ms_aGuild[GuildID].m_aName);
 			AddHistoryGuild(GuildID, "'%s' level up to '%d'.", UpgradeNames(UpgradeID).c_str(), GuildCount);
-			GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
+			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
 			return true;
 		}
 
@@ -235,7 +235,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 			SJK.UD("tw_accounts_data", "GuildDeposit = GuildDeposit + '%d' WHERE ID = '%d'", Get, pPlayer->Acc().m_AuthID);
 			GS()->ChatGuild(GuildID, "{STR} deposit in treasury {INT}gold.", GS()->Server()->ClientName(ClientID), &Get);
 			AddHistoryGuild(GuildID, "'%s' added to bank %dgold.", GS()->Server()->ClientName(ClientID), Get);
-			GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
+			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
 		}
 		return true;
 	}
@@ -250,7 +250,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		}
 
 		BuyGuildHouse(GuildID, VoteID);
-		GS()->UpdateVotes(MenuList::MAIN_MENU);
+		GS()->StrongUpdateVotesForAll(MenuList::MAIN_MENU);
 		return true;
 	}
 
@@ -264,7 +264,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		}
 
 		SellGuildHouse(GuildID);
-		GS()->UpdateVotes(MenuList::MENU_GUILD);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -278,7 +278,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		}
 
 		if(ChangeStateDoor(GuildID))
-			GS()->UpdateVotes(MenuList::MENU_GUILD);
+			GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -296,7 +296,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		{
 			SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
 			Job()->Inbox()->SendInbox(SenderID, ms_aGuild[GuildID].m_aName, "You were accepted to join guild");
-			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			GS()->StrongUpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 			return true;
 		}
 		GS()->Chat(ClientID, "You can't accept (there are no free slot or he is already in Guild).");
@@ -329,7 +329,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		}
 
 		str_copy(pPlayer->GetTempData().m_aGuildSearchBuf, GetText, sizeof(pPlayer->GetTempData().m_aGuildSearchBuf));
-		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -354,7 +354,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		}
 
 		str_copy(pPlayer->GetTempData().m_aRankGuildBuf, GetText, sizeof(pPlayer->GetTempData().m_aRankGuildBuf));
-		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -375,7 +375,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		}
 
 		AddRank(GuildID, pPlayer->GetTempData().m_aRankGuildBuf);
-		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -390,7 +390,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 
 		const int RankID = VoteID;
 		DeleteRank(RankID, GuildID);
-		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -405,7 +405,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 
 		const int RankID = VoteID;
 		ChangeRankAccess(RankID);
-		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -426,7 +426,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 
 		const int RankID = VoteID;
 		ChangeRank(RankID, GuildID, pPlayer->GetTempData().m_aRankGuildBuf);
-		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -441,7 +441,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 
 		// change rank and clear the menu
 		ChangePlayerRank(VoteID, VoteID2);
-		GS()->UpdateVotes(MenuList::MENU_GUILD);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -492,7 +492,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
 			PlDecoItem.Add(1);
 		}
-		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD_HOUSE_DECORATION);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD_HOUSE_DECORATION);
 		return true;
 	}
 

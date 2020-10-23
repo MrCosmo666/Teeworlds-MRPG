@@ -265,7 +265,7 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 			{
 				if(!GS()->m_apPlayers[i] || !GS()->IsPlayerEqualWorldID(i, m_WorldID))
 					continue;
-				GS()->UpdateVotes(i, MenuList::MENU_DUNGEONS);
+				GS()->StrongUpdateVotes(i, MenuList::MENU_DUNGEONS);
 			}
 		}
 	}

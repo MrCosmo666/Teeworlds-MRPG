@@ -104,7 +104,7 @@ bool MailBoxJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const 
 	if(PPSTR(CMD, "MAIL") == 0)
 	{
 		ReceiveInbox(pPlayer, VoteID);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_INBOX);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INBOX);
 		return true;
 	}
 

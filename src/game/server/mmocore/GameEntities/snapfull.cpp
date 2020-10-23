@@ -4,15 +4,15 @@
 #include <engine/shared/config.h>
 #include "snapfull.h"
 
-CSnapFull::CSnapFull(CGameWorld *pGameWorld, vec2 Pos, int SnapID, int Owner, int Num, int Type, bool Changing, bool Projectile)
+CSnapFull::CSnapFull(CGameWorld *pGameWorld, vec2 Pos, int SnapID, int ClientID, int Num, int Type, bool Changing, bool Projectile)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_SNAPEFFECT, Pos)
 {
 	m_Pos = Pos;
-	m_Owner = Owner;
-	m_SnapItem.clear();
+	m_ClientID = ClientID;
 	m_LoadingTick = Server()->TickSpeed();
 	GameWorld()->InsertEntity(this);
-	
+
+	m_SnapItem.clear();
 	AddItem(Num, Type, Projectile, Changing, SnapID);
 }
 
@@ -49,11 +49,9 @@ void CSnapFull::RemoveItem(int Count, int SnapID, bool Effect)
 		{
 			if(Effect)
 			{
-				CPlayer *pOwner = GS()->m_apPlayers[m_Owner];
+				CPlayer *pOwner = GS()->m_apPlayers[m_ClientID];
 				if(pOwner)
-				{
-					GS()->CreateDeath(m_Pos, m_Owner);
-				}
+					GS()->CreateDeath(m_Pos, m_ClientID);
 			}
 			Server()->SnapFreeID(items->m_ID);
 			items = m_SnapItem.erase(items);
@@ -65,21 +63,21 @@ void CSnapFull::RemoveItem(int Count, int SnapID, bool Effect)
 
 void CSnapFull::Tick()
 {
-	CPlayer *pOwner = GS()->m_apPlayers[m_Owner];
-	if(!pOwner)
+	CPlayer *pOwner = GS()->m_apPlayers[m_ClientID];
+	if(!pOwner || !pOwner->GetCharacter())
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;
 	}
-	if(!pOwner->GetCharacter())
-		return;
 		
-	if(!m_boolreback) {
+	if(!m_boolreback) 
+	{
 		m_LoadingTick--;
 		if(m_LoadingTick <= 1)
 			m_boolreback = true;
 	}
-	else {
+	else 
+	{
 		m_LoadingTick++;
 		if(m_LoadingTick >= 30)
 			m_boolreback = false;
@@ -89,11 +87,11 @@ void CSnapFull::Tick()
 
 void CSnapFull::Snap(int SnappingClient)
 {
-	CPlayer *pOwner = GS()->m_apPlayers[m_Owner];
-	if(NetworkClipped(SnappingClient) || !pOwner->GetCharacter())
+	if(NetworkClipped(SnappingClient))
 		return;
 
 	// skip non interactive bot
+	CPlayer* pOwner = GS()->m_apPlayers[m_ClientID];
 	if(pOwner->IsActiveSnappingBot(SnappingClient) != 2)
 		return;
 

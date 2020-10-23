@@ -6,7 +6,7 @@
 #include "gamecontext.h"
 #include "player.h"
 
-MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
+MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 
 CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 {
@@ -241,8 +241,8 @@ void CPlayer::TryRespawn()
 		GetTempData().m_TempTeleportX = GetTempData().m_TempTeleportY = -1;
 	}
 
-	int savecidmem = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
-	m_pCharacter = new(savecidmem) CCharacter(&GS()->m_World);
+	int AllocMemoryCell = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
+	m_pCharacter = new(AllocMemoryCell) CCharacter(&GS()->m_World);
 	m_pCharacter->Spawn(this, SpawnPos);
 	GS()->CreatePlayerSpawn(SpawnPos);
 	m_Spawned = false;
@@ -410,7 +410,7 @@ void CPlayer::AddExp(int Exp)
 		GS()->ChatFollow(m_ClientID, "Level UP. Now Level {INT}!", &Acc().m_Level);
 		if(Acc().m_Exp < ExpNeed(Acc().m_Level))
 		{
-			GS()->UpdateVotes(m_ClientID, MenuList::MAIN_MENU);
+			GS()->StrongUpdateVotes(m_ClientID, MenuList::MAIN_MENU);
 			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_STATS);
 			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_UPGRADES);
 		}
@@ -559,11 +559,15 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 			if((x.first > NUM_TAB_MENU && x.first != VoteID))
 				x.second = false;
 		}
+
 		m_aHiddenMenu[VoteID] ^= true;
 		if(m_aHiddenMenu[VoteID] == false)
 			m_aHiddenMenu.erase(VoteID);
 
-		GS()->ResetVotes(m_ClientID, m_OpenVoteMenu);
+		if(m_ActiveMenuRegisteredCallback)
+			m_ActiveMenuRegisteredCallback(m_ActiveMenuOptionCallback);
+		else
+			GS()->StrongUpdateVotes(m_ClientID, m_OpenVoteMenu);
 		return true;
 	}
 	return false;
@@ -581,6 +585,13 @@ CSkill &CPlayer::GetSkill(int SkillID)
 	SkillsJob::ms_aSkills[m_ClientID][SkillID].m_SkillID = SkillID;
 	SkillsJob::ms_aSkills[m_ClientID][SkillID].SetSkillOwner(this);
 	return SkillsJob::ms_aSkills[m_ClientID][SkillID];
+}
+
+CPlayerQuest& CPlayer::GetQuest(int QuestID)
+{
+	QuestJob::ms_aPlayerQuests[m_ClientID][QuestID].m_QuestID = QuestID;
+	QuestJob::ms_aPlayerQuests[m_ClientID][QuestID].m_pPlayer = this;
+	return QuestJob::ms_aPlayerQuests[m_ClientID][QuestID];
 }
 
 int CPlayer::GetEquippedItemID(int EquipID, int SkipItemID) const
@@ -673,7 +684,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 
 		// you get to know in general if the quest is to give out a random senseless dialog
 		int GivingQuestID = GS()->Mmo()->BotsData()->GetQuestNPC(MobID);
-		if (isTalkingEmpty || GS()->Mmo()->Quest()->GetState(m_ClientID, GivingQuestID) >= QuestState::QUEST_ACCEPT)
+		if (isTalkingEmpty || GetQuest(GivingQuestID).GetState() >= QuestState::QUEST_ACCEPT)
 		{
 			const char* MeaninglessDialog = GS()->Mmo()->BotsData()->GetMeaninglessDialog();
 			GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, -1, TalkedID, MeaninglessDialog);
@@ -692,7 +703,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 				return;
 			}
 
-			GS()->Mmo()->Quest()->AcceptQuest(GivingQuestID, this);
+			GetQuest(GivingQuestID).Accept();
 			m_TalkingNPC.m_TalkedProgress++;
 		}
 
@@ -715,7 +726,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		{
 			if (!m_TalkingNPC.m_FreezedProgress)
 			{
-				GS()->Mmo()->Quest()->CreateQuestingItems(this, BotJob::ms_aQuestBot[MobID]);
+				//GS()->Mmo()->Quest()->CreateQuestingItems(this, BotJob::ms_aQuestBot[MobID]);
 				GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
 				GS()->Mmo()->BotsData()->ShowBotQuestTaskInfo(this, MobID, m_TalkingNPC.m_TalkedProgress);
 				m_TalkingNPC.m_FreezedProgress = true;
@@ -778,12 +789,7 @@ void CPlayer::ChangeWorld(int WorldID)
 	GetTempData().m_TempTankVotingDungeon = 0;
 	GetTempData().m_TempTimeDungeon = 0;
 
-	if(m_pCharacter)
-	{
-		GS()->m_World.DestroyEntity(m_pCharacter);
-		GS()->m_World.m_Core.m_apCharacters[m_ClientID] = 0;
-	}
-
+	// change worlds
 	Acc().m_aHistoryWorld.push_front(WorldID);
 	Server()->ChangeWorld(m_ClientID, WorldID);
 }

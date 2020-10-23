@@ -36,7 +36,7 @@ CInputCount CountInput(int Prev, int Cur)
 	return c;
 }
 
-MACRO_ALLOC_POOL_ID_IMPL(CCharacter, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
+MACRO_ALLOC_POOL_ID_IMPL(CCharacter, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 
 CCharacter::CCharacter(CGameWorld *pWorld)
 : CEntity(pWorld, CGameWorld::ENTTYPE_CHARACTER, vec2(0, 0), ms_PhysSize)
@@ -50,6 +50,7 @@ CCharacter::CCharacter(CGameWorld *pWorld)
 
 CCharacter::~CCharacter()
 {
+	dbg_msg("test", "heresss");
 	delete m_pHelper;
 	m_pHelper = nullptr;
 	GS()->m_World.m_Core.m_apCharacters[m_pPlayer->GetCID()] = nullptr;
@@ -420,13 +421,13 @@ void CCharacter::HandleWeapons()
 
 void CCharacter::CreateQuestsStep(int QuestID)
 {
-	const int ClientID = m_pPlayer->GetCID();
+	/*const int ClientID = m_pPlayer->GetCID();
 	vec2 Pos = GS()->Mmo()->WorldSwap()->GetPositionQuestBot(ClientID, QuestID);
 	if (QuestJob::ms_aQuests[ClientID].find(QuestID) == QuestJob::ms_aQuests[ClientID].end() || (Pos.x == 0.0f && Pos.y == 0.0f))
 		return;
 
 	const int Progress = QuestJob::ms_aQuests[ClientID][QuestID].m_Step;
-	new CQuestPathFinder(GameWorld(), m_Core.m_Pos, ClientID, QuestID, Progress, Pos);
+	new CQuestPathFinder(GameWorld(), m_Core.m_Pos, ClientID, QuestID, Progress, Pos); */ 
 }
 
 bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)
@@ -549,6 +550,12 @@ void CCharacter::TickDefered()
 		m_DoorHit = false;
 	}
 
+	// apply drag velocity when the player is not firing ninja
+	// and set it back to 0 for the next tick
+	if(m_ActiveWeapon != WEAPON_NINJA)
+		m_Core.AddDragVelocity();
+	m_Core.ResetDragVelocity();
+
 	if(m_pPlayer->IsBot())
 	{	
 		CCharacterCore::CParams CoreTickParams(&m_pPlayer->m_NextTuningParams);
@@ -567,13 +574,6 @@ void CCharacter::TickDefered()
 		m_ReckoningCore.Move(&CoreTickParams);
 		m_ReckoningCore.Quantize();
 	}
-
-	// apply drag velocity when the player is not firing ninja
-	// and set it back to 0 for the next tick
-	if(m_ActiveWeapon != WEAPON_NINJA)
-		m_Core.AddDragVelocity();
-	m_Core.ResetDragVelocity();
-
 
 	CCharacterCore::CParams CoreTickParams(&m_pPlayer->m_NextTuningParams);
 	m_Core.Move(&CoreTickParams);
@@ -1153,14 +1153,14 @@ bool CCharacter::IsLockedWorld()
 	if(m_Alive && (Server()->Tick() % Server()->TickSpeed() * 3) == 0  && m_pPlayer->IsAuthed())
 	{
 		const int NecessaryQuest = GS()->Mmo()->WorldSwap()->GetNecessaryQuest();
-		if(NecessaryQuest > 0 && !GS()->Mmo()->Quest()->IsCompletedQuest(m_pPlayer->GetCID(), NecessaryQuest))
+		if(NecessaryQuest > 0 && !m_pPlayer->GetQuest(NecessaryQuest).IsComplected())
 		{
 			const int CheckHouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
 			if(CheckHouseID <= 0)
 			{
 				m_pPlayer->GetTempData().m_TempTeleportX = m_pPlayer->GetTempData().m_TempTeleportY = -1;
 				GS()->Chat(m_pPlayer->GetCID(), "This chapter is still closed, you magically transported first zone!");
-				m_pPlayer->ChangeWorld(MAIN_WORLD);
+				m_pPlayer->ChangeWorld(MAIN_WORLD_ID);
 				return true;
 			}
 		}

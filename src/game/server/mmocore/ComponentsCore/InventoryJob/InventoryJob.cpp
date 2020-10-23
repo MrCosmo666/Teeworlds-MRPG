@@ -175,7 +175,7 @@ int InventoryJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Set
 int InventoryJob::ActionItemCountAllowed(CPlayer *pPlayer, int ItemID)
 {
 	const int ClientID = pPlayer->GetCID();
-	const int AvailableCount = Job()->Quest()->QuestingAllowedItemsCount(pPlayer, ItemID);
+	const int AvailableCount = /*Job()->Quest()->QuestingAllowedItemsCount(pPlayer, ItemID)*/ pPlayer->GetItem(ItemID).m_Count;
 	if (AvailableCount <= 0)
 	{
 		GS()->Chat(ClientID, "This count of items that you have, iced for the quest!");
@@ -273,7 +273,7 @@ bool InventoryJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, cons
 	if(PPSTR(CMD, "SORTEDINVENTORY") == 0)
 	{
 		pPlayer->m_aSortTabs[SORT_INVENTORY] = VoteID;
-		GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INVENTORY);
 		return true;
 	}
 
@@ -367,7 +367,7 @@ bool InventoryJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, cons
 	if(PPSTR(CMD, "SORTEDEQUIP") == 0)
 	{
 		pPlayer->m_aSortTabs[SORT_EQUIPING] = VoteID;
-		GS()->UpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
 		return true;				
 	}
 

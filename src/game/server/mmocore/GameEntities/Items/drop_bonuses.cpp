@@ -61,7 +61,8 @@ void CDropBonuses::Tick()
 		{
 			pChar->GetPlayer()->AddExp(m_Count);
 			GS()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
-		} 
+		}
+
 		GS()->m_World.DestroyEntity(this);
 		return;
 	}

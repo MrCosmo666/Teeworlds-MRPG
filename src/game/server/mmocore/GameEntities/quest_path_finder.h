@@ -21,7 +21,6 @@ public:
 	vec2 m_TargetPos;
 	int GetQuestID() const { return m_QuestID; }
 	int GetClientID() const { return m_ClientID; }
-	void Finish();
 };
 
 #endif

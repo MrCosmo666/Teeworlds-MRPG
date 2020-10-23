@@ -3,12 +3,12 @@
 #include <game/server/gamecontext.h>
 #include "loltext.h"
 
-CLolPlasma::CLolPlasma(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan)
-: CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER, Pos)
+CLolPlasma::CLolPlasma(CGameWorld* pGameWorld, CEntity* pParent, vec2 Pos, vec2 Vel, int Lifespan)
+	: CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER, Pos)
 {
 	m_LocalPos = vec2(0.0f, 0.0f);
 	m_StartOff = Pos;
-	m_Pos = (pParent ? pParent->GetPos() : vec2(0.0f,0.0f)) + m_StartOff;
+	m_Pos = (pParent ? pParent->GetPos() : vec2(0.0f, 0.0f)) + m_StartOff;
 	m_Vel = Vel;
 	m_Life = Lifespan;
 	m_StartTick = Server()->Tick();
@@ -19,20 +19,20 @@ CLolPlasma::CLolPlasma(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 
 void CLolPlasma::Tick()
 {
 	m_Life--;
-	if (m_Life < 0)
+	if(m_Life < 0)
 	{
 		GameWorld()->DestroyEntity(this);
 		return;
 	}
-	m_Pos = (m_pParent ? m_pParent->GetPos() : vec2(0.0f,0.0f)) + m_StartOff + (m_LocalPos += m_Vel);
+	m_Pos = (m_pParent ? m_pParent->GetPos() : vec2(0.0f, 0.0f)) + m_StartOff + (m_LocalPos += m_Vel);
 }
 
 void CLolPlasma::Snap(int SnappingClient)
 {
-	if (NetworkClipped(SnappingClient))
+	if(NetworkClipped(SnappingClient))
 		return;
 
-	CNetObj_Projectile *pObj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, GetID(), sizeof(CNetObj_Projectile)));
+	CNetObj_Projectile* pObj = static_cast<CNetObj_Projectile*>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, GetID(), sizeof(CNetObj_Projectile)));
 	if(!pObj)
 		return;
 
@@ -44,60 +44,7 @@ void CLolPlasma::Snap(int SnappingClient)
 	pObj->m_Type = WEAPON_HAMMER;
 }
 
-
-vec2 CLoltext::TextSize(const char *pText)
-{
-	char c;
-	int Count = 0;
-	while((c = *pText++))
-	{
-		if (c >= 'a' && c <= 'z')
-			c -= ('a' - 'A');
-		if (c != ' ' && !HasRepr(c))
-			continue;
-		++Count;
-	}//no there ain't linebreaks
-	return vec2(Count*g_Config.m_SvLoltextHspace*4.0f, g_Config.m_SvLoltextVspace);
-}
-
-void CLoltext::Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, bool Center, bool Follow)
-{
-	vec2 CurPos = Pos;
-	if (Center)
-		CurPos -= TextSize(pText)*0.5f;
-
-	if (pParent && !Follow)
-	{
-		CurPos += pParent->GetPos();
-		pParent = 0;
-	}
-
-	char c;
-	while((c = *pText++))
-	{
-		if (c >= 'a' && c <= 'z')
-			c -= ('a' - 'A');
-		if (c != ' ' && !HasRepr(c))
-			continue;
-
-		for(int y = 0; y < 5/*XXX*/; ++y)
-			for(int x = 0; x < 3/*XXX*/; ++x)
-				if (s_aaaChars[(unsigned)c][y][x])
-					new CLolPlasma(pGameWorld, pParent, CurPos + vec2(x*g_Config.m_SvLoltextHspace, y*g_Config.m_SvLoltextVspace), Vel, Lifespan);
-		CurPos.x += 4*g_Config.m_SvLoltextHspace;
-	}
-}
-
-bool CLoltext::HasRepr(char c) // can be removed when we have a full character set
-{
-	for(int y = 0; y < 5; ++y)
-		for(int x = 0; x < 3; ++x)
-			if (s_aaaChars[(unsigned)c][y][x])
-				return true;
-	return false;
-}
-
-bool CLoltext::s_aaaChars[256][5][3] = {
+static bool s_aaaChars[256][5][3] = {
 	{ {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0} }, // ascii 0
 	{ {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0} }, // ascii 1
 	{ {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0} }, // ascii 2
@@ -355,3 +302,55 @@ bool CLoltext::s_aaaChars[256][5][3] = {
 	{ {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0} }, // ascii 254
 	{ {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0}, {0,0,0} }  // ascii 255
 };
+
+inline static bool HasRepr(char c) // can be removed when we have a full character set
+{
+	for(int y = 0; y < 5; ++y)
+		for(int x = 0; x < 3; ++x)
+			if(s_aaaChars[(unsigned)c][y][x])
+				return true;
+	return false;
+}
+
+inline static vec2 TextSize(const char* pText)
+{
+	char c;
+	int Count = 0;
+	while((c = *pText++))
+	{
+		if(c >= 'a' && c <= 'z')
+			c -= ('a' - 'A');
+		if(c != ' ' && !HasRepr(c))
+			continue;
+		++Count;
+	}//no there ain't linebreaks
+	return vec2(Count * g_Config.m_SvLoltextHspace * 4.0f, g_Config.m_SvLoltextVspace);
+}
+
+void CLoltext::Create(CGameWorld* pGameWorld, CEntity* pParent, vec2 Pos, vec2 Vel, int Lifespan, const char* pText, bool Center, bool Follow)
+{
+	vec2 CurPos = Pos;
+	if(Center)
+		CurPos -= TextSize(pText) * 0.5f;
+
+	if(pParent && !Follow)
+	{
+		CurPos += pParent->GetPos();
+		pParent = 0;
+	}
+
+	char c;
+	while((c = *pText++))
+	{
+		if(c >= 'a' && c <= 'z')
+			c -= ('a' - 'A');
+		if(c != ' ' && !HasRepr(c))
+			continue;
+
+		for(int y = 0; y < 5/*XXX*/; ++y)
+			for(int x = 0; x < 3/*XXX*/; ++x)
+				if(s_aaaChars[(unsigned)c][y][x])
+					new CLolPlasma(pGameWorld, pParent, CurPos + vec2(x * g_Config.m_SvLoltextHspace, y * g_Config.m_SvLoltextVspace), Vel, Lifespan);
+		CurPos.x += 4 * g_Config.m_SvLoltextHspace;
+	}
+}

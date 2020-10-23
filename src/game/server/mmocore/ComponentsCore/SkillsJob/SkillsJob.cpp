@@ -103,7 +103,7 @@ bool SkillsJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const i
 	{
 		const int SkillID = VoteID;
 		if (pPlayer->GetSkill(SkillID).Upgrade())
-			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			GS()->StrongUpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 
@@ -111,7 +111,7 @@ bool SkillsJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const i
 	{
 		const int SkillID = VoteID;
 		pPlayer->GetSkill(SkillID).SelectNextControlEmote();
-		GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		GS()->StrongUpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	return false;

@@ -113,7 +113,7 @@ bool AccountPlantJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, c
 		if(pPlayer->Upgrade(Get, &pPlayer->Acc().m_aPlant[VoteID], &pPlayer->Acc().m_aPlant[PlUpgrade], VoteID2, 3, aBuf))
 		{
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_PLANT_DATA);
-			GS()->UpdateVotes(ClientID, MenuList::MENU_UPGRADE);
+			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_UPGRADE);
 		}
 		return true;
 	}	

@@ -55,12 +55,11 @@ enum DayType
 
 enum
 {
-	MAIN_WORLD = 0,                     // local world
-	COUNT_WORLD = 12,                   // number of worlds
-	LAST_WORLD = COUNT_WORLD - 1,       // last world
-	FAKE_DISCORD_CHAT_WORLD = 7,        // fake world id discord chat
+	ENGINE_MAX_WORLDS = 64,		// TODO: change to dynamic allocator, we allocate memory blocks for the server in advance for 64 worlds
+	MAIN_WORLD_ID = 0,
+	FAKE_DISCORD_WORLD_ID = 7,
 
-	MAX_DROPPED_FROM_MOBS = 5,          // maximum number of items that can be dropped by mobs
+	MAX_DROPPED_FROM_MOBS = 5,  // maximum number of items that can be dropped by mobs
 };
 
 #endif

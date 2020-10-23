@@ -6,7 +6,7 @@
 
 #include "playerbot.h"
 
-MACRO_ALLOC_POOL_ID_IMPL(CPlayerBot, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
+MACRO_ALLOC_POOL_ID_IMPL(CPlayerBot, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 
 IServer* CPlayer::Server() const { return m_pGS->Server(); };
 
@@ -116,8 +116,8 @@ void CPlayerBot::TryRespawn()
 	else if(SpawnType == BotsTypes::TYPE_BOT_QUEST)
 		SpawnPos = vec2(BotJob::ms_aQuestBot[m_SubBotID].m_PositionX, BotJob::ms_aQuestBot[m_SubBotID].m_PositionY);
 	
-	const int savecidmem = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
-	m_pCharacter = new(savecidmem) CCharacterBotAI(&GS()->m_World);
+	const int AllocMemoryCell = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
+	m_pCharacter = new(AllocMemoryCell) CCharacterBotAI(&GS()->m_World);
 	m_pCharacter->Spawn(this, SpawnPos);
 
 	// so that no effects can be seen that an NPC that is not visible to one player is visible to another player
@@ -136,16 +136,18 @@ void CPlayerBot::TryRespawn()
 */
 int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 {
-	if(SnappingClient < 0 || SnappingClient >= MAX_PLAYERS)
+	CPlayer* pSnappingPlayer = GS()->m_apPlayers[SnappingClient];
+	if(SnappingClient < 0 || SnappingClient >= MAX_PLAYERS || !pSnappingPlayer)
 		return 0;
 
 	if(m_BotType == BotsTypes::TYPE_BOT_QUEST)
 	{
 		const int QuestID = BotJob::ms_aQuestBot[m_SubBotID].m_QuestID;
-		if(GS()->Mmo()->Quest()->GetState(SnappingClient, QuestID) != QuestState::QUEST_ACCEPT) 
+		if(pSnappingPlayer->GetQuest(QuestID).GetState() != QuestState::QUEST_ACCEPT) 
 			return 0;
+
 		const int TalkProgress = BotJob::ms_aQuestBot[m_SubBotID].m_Step;
-		if(TalkProgress != QuestJob::ms_aQuests[SnappingClient][QuestID].m_Step)
+		if(TalkProgress != QuestJob::ms_aPlayerQuests[SnappingClient][QuestID].m_Step)
 			return 0;
 		
 		// [first] quest bot active for player
@@ -225,7 +227,8 @@ int CPlayerBot::GetBotLevel() const
 
 bool CPlayerBot::IsActiveQuests(int SnapClientID) const
 {
-	if (SnapClientID >= MAX_PLAYERS || SnapClientID < 0)
+	CPlayer* pSnappingPlayer = GS()->m_apPlayers[SnapClientID];
+	if (SnapClientID >= MAX_PLAYERS || SnapClientID < 0 || !pSnappingPlayer)
 		return false;
 
 	if (m_BotType == BotsTypes::TYPE_BOT_QUEST)
@@ -235,11 +238,11 @@ bool CPlayerBot::IsActiveQuests(int SnapClientID) const
 	{
 		const int GivesQuest = GS()->Mmo()->BotsData()->GetQuestNPC(m_SubBotID);
 		if(BotJob::ms_aNpcBot[m_SubBotID].m_Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST && 
-			GS()->Mmo()->Quest()->GetState(SnapClientID, GivesQuest) == QuestState::QUEST_NO_ACCEPT)
+			pSnappingPlayer->GetQuest(GivesQuest).GetState() == QuestState::QUEST_NO_ACCEPT)
 			return true;
+
 		return false;
 	}
-
 	return false;
 }
 
@@ -256,7 +259,7 @@ const char* CPlayerBot::GetStatusBot() const
 	if (m_BotType == BotsTypes::TYPE_BOT_QUEST)
 	{
 		const int QuestID = BotJob::ms_aQuestBot[m_SubBotID].m_QuestID;
-		return GS()->Mmo()->Quest()->GetQuestName(QuestID);
+		return GS()->GetQuestInfo(QuestID).GetName();
 	}
 	else if (m_BotType == BotsTypes::TYPE_BOT_MOB && BotJob::ms_aMobBot[m_SubBotID].m_Boss)
 	{

@@ -104,7 +104,7 @@ void WorldSwapJob::CheckQuestingOpened(CPlayer* pPlayer, int QuestID)
 
 int WorldSwapJob::GetNecessaryQuest(int WorldID) const
 {
-	int CheckWorldID = ((WorldID <= -1 || WorldID >= COUNT_WORLD) ? GS()->GetWorldID() : WorldID);
+	int CheckWorldID = WorldID != -1 ? GS()->GetWorldID() : WorldID;
 	for (const auto& sw : ms_aWorldSwap)
 	{
 		if (sw.second.m_TwoWorldID == CheckWorldID)
@@ -120,9 +120,9 @@ bool WorldSwapJob::ChangeWorld(CPlayer *pPlayer, vec2 Pos)
 	{
 		const int ClientID = pPlayer->GetCID();
 		const int StoryQuestNeeded = ms_aWorldSwap[WID].m_OpenQuestID;
-		if (StoryQuestNeeded > 0 && !GS()->Mmo()->Quest()->IsCompletedQuest(ClientID, StoryQuestNeeded))
+		if (StoryQuestNeeded > 0 && !pPlayer->GetQuest(StoryQuestNeeded).IsComplected())
 		{
-			GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Requires quest completion '{STR}'!", GS()->Mmo()->Quest()->GetQuestName(StoryQuestNeeded));
+			GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Requires quest completion '{STR}'!", pPlayer->GetQuest(StoryQuestNeeded).Info().GetName());
 			return false;
 		}
 
@@ -142,26 +142,22 @@ bool WorldSwapJob::ChangeWorld(CPlayer *pPlayer, vec2 Pos)
 	return false;
 }
 
-vec2 WorldSwapJob::GetPositionQuestBot(int ClientID, int QuestID)
+vec2 WorldSwapJob::GetPositionQuestBot(int ClientID, BotJob::QuestBotInfo QuestBot)
 {
-	const int playerTalkProgress = QuestJob::ms_aQuests[ClientID][QuestID].m_Step;
-	BotJob::QuestBotInfo *FindBot = Job()->Quest()->GetQuestBot(QuestID, playerTalkProgress);
-	if(FindBot)
-	{
-		if(GS()->GetWorldID() == FindBot->m_WorldID)
-			return vec2(FindBot->m_PositionX, FindBot->m_PositionY);
+	if(GS()->GetWorldID() == QuestBot.m_WorldID)
+		return vec2(QuestBot.m_PositionX, QuestBot.m_PositionY);
 
-		int TargetWorldID = FindBot->m_WorldID;
-		for(const auto& swp : ms_aWorldPositionLogic)
-		{
-			if(TargetWorldID != swp.m_BaseWorldID) 
-				continue;
-			TargetWorldID = swp.m_FindWorldID;
-			if(GS()->GetWorldID() == swp.m_FindWorldID)
-				return swp.m_Position;
-		}
+	int TargetWorldID = QuestBot.m_WorldID;
+	for(const auto& swp : ms_aWorldPositionLogic)
+	{
+		if(TargetWorldID != swp.m_BaseWorldID) 
+			continue;
+
+		TargetWorldID = swp.m_FindWorldID;
+		if(GS()->GetWorldID() == TargetWorldID)
+			return swp.m_Position;
 	}
-	return vec2(0.0f, 0.0f);
+	return vec2(0, 0);
 }
 
 int WorldSwapJob::GetWorldType() const

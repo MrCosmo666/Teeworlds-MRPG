@@ -35,7 +35,7 @@ MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 		component->m_Job = this;
 		component->m_GameServer = pGameServer;
 
-		if(m_pGameServer->GetWorldID() == LAST_WORLD)
+		if(m_pGameServer->GetWorldID() == MAIN_WORLD_ID)
 			component->OnInit();
 
 		char aLocalSelect[64];

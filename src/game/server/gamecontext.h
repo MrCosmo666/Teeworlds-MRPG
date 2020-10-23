@@ -97,6 +97,7 @@ public:
 	CPlayer *GetPlayer(int ClientID, bool CheckAuthed = false, bool CheckCharacter = false);
 	std::unique_ptr<char[]> LevelString(int MaxValue, int CurrentValue, int Step, char toValue, char fromValue);
 	ItemInformation &GetItemInfo(int ItemID) const;
+	CDataQuest &GetQuestInfo(int QuestID) const;
 	const char* GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const;
 
 	/* #########################################################################
@@ -196,11 +197,10 @@ public:
 	
 	void OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID) override;
 	void OnClientConnected(int ClientID) override;
-	void ChangeWorld(int ClientID) override;
-	void UpdateQuestsBot(int QuestID, int Step);
+	void PrepareClientChangeWorld(int ClientID) override;
 
 	void OnClientEnter(int ClientID) override;
-	void OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld = false) override;
+	void OnClientDrop(int ClientID, const char *pReason) override;
 	void OnClientDirectInput(int ClientID, void *pInput) override;
 	void OnClientPredictedInput(int ClientID, void *pInput) override;
 	bool IsClientReady(int ClientID) const override;
@@ -232,17 +232,10 @@ private:
 	/* #########################################################################
 		VOTING MMO GAMECONTEXT 
 	######################################################################### */
-	struct CVoteOptions
-	{
-		char m_aDescription[VOTE_DESC_LENGTH];
-		char m_aCommand[VOTE_CMD_LENGTH];
-		int m_TempID;
-		int m_TempID2;
-	};
 	std::list<CVoteOptions> m_aPlayerVotes[MAX_PLAYERS];
 
-public:
-	void AV(int To, const char *Cmd, const char *Desc = "\0", const int ID = -1, const int ID2 = -1, const char *Icon = "unused");
+public:	
+	void AV(int To, const char* Cmd, const char* Desc = "\0", const int ID = -1, const int ID2 = -1, const char* Icon = "unused", VoteCallBack Callback = nullptr);
 	void AVL(int To, const char* aCmd, const char* pText, ...);
 	void AVH(int To, const int ID, vec3 Color, const char* pText, ...);
 	void AVHI(int To, const char *Icon, const int ID, vec3 Color, const char* pText, ...);
@@ -251,15 +244,18 @@ public:
 	void AVMI(int To, const char *Icon, const char *Type, const int ID, const int HideID, const char *pText, ...);
 	void AVD(int To, const char* Type, const int ID, const int ID2, const int HideID, const char* pText, ...);
 
+	// TODO: fixme. improve the system using the ID method, as well as the ability to implement Backpage
+	void AVCALLBACK(int To, const char* Type, const char* Icon, const int ID, const int ID2, const int HideID, const char* pText, VoteCallBack Callback, ...);
+
 	void ClearVotes(int ClientID);
 	void ResetVotesNewbieInformation(int ClientID);
 	void ResetVotes(int ClientID, int MenuList);
-	void UpdateVotes(int ClientID, int MenuList);
-	void UpdateVotes(int MenuList);
+	void StrongUpdateVotes(int ClientID, int MenuList);
+	void StrongUpdateVotesForAll(int MenuList);
 	void AddBackpage(int ClientID);
 	void ShowPlayerStats(CPlayer *pPlayer);
 	void ShowItemValueInformation(CPlayer *pPlayer, int ItemID = itGold);
-	bool ParsingVoteCommands(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text);
+	bool ParsingVoteCommands(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text, VoteCallBack Callback = nullptr);
 
 	/* #########################################################################
 		MMO GAMECONTEXT 

@@ -234,7 +234,7 @@ bool CInventoryItem::Use(int Count)
 		GS()->Mmo()->SaveAccount(m_pPlayer, SaveType::SAVE_UPGRADES);
 	}
 
-	GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
+	GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INVENTORY);
 	return true;
 }
 

@@ -10,10 +10,10 @@ class CLolPlasma : public CEntity
 	int m_Life; // remaining ticks
 	int m_StartTick; // tick created
 	vec2 m_StartOff; // initial offset from parent, for proper following
-	CEntity *m_pParent;
+	CEntity* m_pParent;
 
 public:
-	CLolPlasma(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan);
+	CLolPlasma(CGameWorld* pGameWorld, CEntity* pParent, vec2 Pos, vec2 Vel, int Lifespan);
 
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);
@@ -21,11 +21,7 @@ public:
 
 class CLoltext 
 {
-private:
-	static bool s_aaaChars[256][5][3];
-	bool HasRepr(char c);
 public:
-	vec2 TextSize(const char *pText);
 	void Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, bool Center, bool Follow);
 };
 

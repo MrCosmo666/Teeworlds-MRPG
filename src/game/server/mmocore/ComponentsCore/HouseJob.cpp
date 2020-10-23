@@ -552,7 +552,7 @@ bool HouseJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const in
 		if(pPlayer->SpendCurrency(Get))
 		{
 			AddSafeDeposit(pPlayer, Get);
-			GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE);
+			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_HOUSE);
 		}
 		return true;
 	}
@@ -566,14 +566,14 @@ bool HouseJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const in
 		}
 		
 		TakeFromSafeDeposit(pPlayer, Get);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_HOUSE);
 		return true;
 	}
 
 	if(PPSTR(CMD, "HOUSEDOOR") == 0)
 	{
 		if(ChangeStateDoor(VoteID))
-			GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE);
+			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_HOUSE);
 		return true;		
 	}
 
@@ -607,7 +607,7 @@ bool HouseJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const in
 			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
 			PlDecoItem.Add(1);
 		}
-		GS()->UpdateVotes(ClientID, MenuList::MENU_HOUSE_DECORATION);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_HOUSE_DECORATION);
 		return true;
 	}
 

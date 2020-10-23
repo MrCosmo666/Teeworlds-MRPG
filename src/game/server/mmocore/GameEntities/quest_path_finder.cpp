@@ -9,34 +9,27 @@
 CQuestPathFinder::CQuestPathFinder(CGameWorld *pGameWorld, vec2 Pos, int ClientID, int QuestID, int QuestProgress, vec2 TargetPos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_FINDQUEST, Pos)
 {
+	m_ClientID = ClientID;
 	m_QuestID = QuestID;
 	m_QuestProgress = QuestProgress;
-	m_ClientID = ClientID;
 	m_TargetPos = TargetPos;
-	m_MainScenario = str_startswith(GS()->Mmo()->Quest()->GetStoryName(m_QuestID), "Main:") != nullptr;
+	m_MainScenario = str_startswith(GS()->GetQuestInfo(m_QuestID).GetStory(), "Main:") != nullptr;
 	GameWorld()->InsertEntity(this);
 }
 
 void CQuestPathFinder::Tick() 
 {
 	CPlayer* pPlayer = GS()->GetPlayer(m_ClientID, true, true);
-	if (m_TargetPos == vec2(0.0f, 0.0f) || !pPlayer || QuestJob::ms_aQuests[m_ClientID][m_QuestID].m_Step != m_QuestProgress || QuestJob::ms_aQuests[m_ClientID][m_QuestID].m_State != QuestState::QUEST_ACCEPT)
+	if (m_TargetPos == vec2(0.0f, 0.0f) || !pPlayer || QuestJob::ms_aPlayerQuests[m_ClientID][m_QuestID].m_Step != m_QuestProgress 
+		|| QuestJob::ms_aPlayerQuests[m_ClientID][m_QuestID].m_State != QuestState::QUEST_ACCEPT)
 	{
-		Finish();
+		if(GS()->GetPlayer(m_ClientID, true, true))
+			GS()->CreateDeath(m_Pos, m_ClientID);
+		GS()->m_World.DestroyEntity(this);
 		return;
 	}
 	vec2 Direction = normalize(GS()->m_apPlayers[m_ClientID]->GetCharacter()->m_Core.m_Pos - m_TargetPos);
 	m_Pos = GS()->m_apPlayers[m_ClientID]->GetCharacter()->m_Core.m_Pos - Direction * 90;
-}
-
-void CQuestPathFinder::Finish()
-{
-	if(GS()->GetPlayer(m_ClientID, true, true))
-	{
-		GS()->CreateDeath(m_Pos, m_ClientID);
-	}
-	GS()->m_World.DestroyEntity(this);
-	return;
 }
 
 void CQuestPathFinder::Snap(int SnappingClient)

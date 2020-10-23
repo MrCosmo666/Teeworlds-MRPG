@@ -35,7 +35,7 @@ void CDropQuestItem::Tick()
 {
 	// life time dk
 	m_LifeSpan--;
-	if (m_LifeSpan < 0 || !GS()->m_apPlayers[m_OwnerID] || GS()->Mmo()->Quest()->GetState(m_OwnerID, m_QuestBot.m_QuestID) != QuestState::QUEST_ACCEPT)
+	if (m_LifeSpan < 0 || !GS()->m_apPlayers[m_OwnerID] || GS()->m_apPlayers[m_OwnerID]->GetQuest(m_QuestBot.m_QuestID).GetState() != QuestState::QUEST_ACCEPT)
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;
@@ -64,7 +64,7 @@ void CDropQuestItem::Tick()
 	const int QuestID = m_QuestBot.m_QuestID;
 	CPlayer* pOwnerPlayer = GS()->m_apPlayers[m_OwnerID];
 	InventoryItem& pPlayerItem = pOwnerPlayer->GetItem(m_QuestBot.m_aItemSearch[0]);
-	if (QuestJob::ms_aQuests[m_OwnerID][QuestID].m_Step != m_QuestBot.m_Step || pPlayerItem.m_Count >= Count)
+	if (QuestJob::ms_aPlayerQuests[m_OwnerID][QuestID].m_Step != m_QuestBot.m_Step || pPlayerItem.m_Count >= Count)
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;

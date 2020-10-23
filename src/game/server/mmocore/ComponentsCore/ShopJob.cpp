@@ -19,7 +19,7 @@ void ShopJob::OnInit()
 
 void ShopJob::OnTick()
 {
-	if(GS()->GetWorldID() == MAIN_WORLD)
+	if(GS()->GetWorldID() == MAIN_WORLD_ID)
 	{
 		if(GS()->Server()->Tick() % (1 * GS()->Server()->TickSpeed() * (g_Config.m_SvTimeCheckAuction * 60)) == 0)
 			CheckAuctionTime();
@@ -335,7 +335,7 @@ bool ShopJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int
 			pPlayer->GetTempData().m_SellItem.m_Price = c_minimalprice;
 
 		pPlayer->GetTempData().m_SellItem.m_Count = Get;
-		GS()->UpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
 		return true;
 	}
 
@@ -346,7 +346,7 @@ bool ShopJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int
 			Get = c_minimalprice;
 
 		pPlayer->GetTempData().m_SellItem.m_Price = Get;
-		GS()->UpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);		
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);		
 		return true;
 	}
 
@@ -371,7 +371,7 @@ bool ShopJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int
 			GS()->ResetVotes(ClientID, MenuList::MENU_INVENTORY);
 			return true;
 		}
-		GS()->UpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
 		return true;
 	}
 

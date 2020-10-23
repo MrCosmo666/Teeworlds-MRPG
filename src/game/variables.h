@@ -152,7 +152,6 @@ MACRO_CONFIG_INT(SvStrongGold, sv_strong_gold, 8, 0, 10000, CFGFLAG_SERVER, "Pow
 MACRO_CONFIG_INT(SvStrongAntiPVP, sv_strong_anti_pvp, 50, 0, 10000, CFGFLAG_SERVER, "Anti-PVP Difference classing leveling for denied.")
 
 // world time
-MACRO_CONFIG_INT(SvShowWorldInformation, sv_world_information_name, 0, 0, 1, CFGFLAG_SERVER, "Show world informaton in server")
 MACRO_CONFIG_INT(SvTimeWaitingsDungeon, sv_waiting_dungeon_time, 180, 0, 1020, CFGFLAG_SERVER, "Watining time dungeon on secound")
 
 // house

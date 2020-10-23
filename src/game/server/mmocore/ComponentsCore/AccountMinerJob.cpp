@@ -114,7 +114,7 @@ bool AccountMinerJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, c
 		if (pPlayer->Upgrade(Get, &pPlayer->Acc().m_aMiner[VoteID], &pPlayer->Acc().m_aMiner[MnrUpgrade], VoteID2, 3, aBuf))
 		{
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_MINER_DATA);
-			GS()->UpdateVotes(ClientID, MenuList::MENU_UPGRADE);
+			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_UPGRADE);
 		}
 		return true;
 	}

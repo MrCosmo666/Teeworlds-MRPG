@@ -16,9 +16,9 @@ int AccountMainJob::GetHistoryLatestCorrectWorldID(CPlayer* pPlayer) const
 	{
 		const int QuestToUnlock = Job()->WorldSwap()->GetNecessaryQuest(WorldID);
 		const bool IsValidQuest = Job()->Quest()->IsValidQuest(QuestToUnlock);
-		return !Job()->Dungeon()->IsDungeonWorld(WorldID) && ((IsValidQuest && Job()->Quest()->IsCompletedQuest(pPlayer->GetCID(), QuestToUnlock)) || !IsValidQuest);
+		return !Job()->Dungeon()->IsDungeonWorld(WorldID) && ((IsValidQuest && pPlayer->GetQuest(QuestToUnlock).IsComplected()) || !IsValidQuest);
 	});
-	return pWorldIterator != pPlayer->Acc().m_aHistoryWorld.end() ? *pWorldIterator : (int)MAIN_WORLD;
+	return pWorldIterator != pPlayer->Acc().m_aHistoryWorld.end() ? *pWorldIterator : MAIN_WORLD_ID;
 }
 
 int AccountMainJob::SendAuthCode(int ClientID, int Code)
@@ -321,7 +321,7 @@ bool AccountMainJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, co
 		const char *pSelectedLanguage = GS()->Server()->Localization()->m_pLanguages[VoteID]->GetFilename();
 		pPlayer->SetLanguage(pSelectedLanguage);
 		GS()->Chat(ClientID, "You chosen a language \"{STR}\".", pSelectedLanguage);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_SELECT_LANGUAGE);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_SELECT_LANGUAGE);
 		Job()->SaveAccount(pPlayer, SaveType::SAVE_LANGUAGE);
 		return true;
 	}
