@@ -30,7 +30,8 @@ void CPlayerQuest::CheckaAvailableNewStep()
 		pStepBot.second.UpdateBot(pGS);
 	}
 
-	const bool IsFinalStep = (StepsBotComplected >= QuestJob::ms_aDataQuests[m_QuestID].m_StepsQuestBot.size());
+	// check new step or finish quest
+	const bool IsFinalStep = (StepsBotComplected >= (int)QuestJob::ms_aDataQuests[m_QuestID].m_StepsQuestBot.size());
 	if(IsFinalStep)
 	{
 		Finish();
@@ -70,10 +71,10 @@ bool CPlayerQuest::Accept()
 
 	// information
 	const int ClientID = m_pPlayer->GetCID();
-	//const int StorySize = GetStoryCount(ms_aQuestsData[QuestID].m_aStoryLine);
-	//const int StoryProgress = GetStoryCount(ms_aQuestsData[QuestID].m_aStoryLine, QuestID + 1);
-	//GS()->Chat(ClientID, "Quest: {STR} - {STR} {INT}/{INT}!", ms_aQuestsData[QuestID].m_aStoryLine, ms_aQuestsData[QuestID].m_aName, &StoryProgress, &StorySize);
-	//GS()->Chat(ClientID, "Receive a reward Gold {INT}, Experience {INT}", &ms_aQuestsData[QuestID].m_Gold, &ms_aQuestsData[QuestID].m_Exp);
+	const int StorySize = Info().GetStoryCount();
+	const int StoryProgress = Info().GetStoryCount(m_QuestID + 1);
+	pGS->Chat(ClientID, "Quest: {STR} - {STR} {INT}/{INT}!", Info().GetStory(), Info().GetName(), &StoryProgress, &StorySize);
+	pGS->Chat(ClientID, "Receive a reward Gold {INT}, Experience {INT}", &Info().m_Gold, &Info().m_Exp);
 	//pPlayer->GetCharacter()->CreateQuestsStep(QuestID);
 	pGS->CreatePlayerSound(ClientID, SOUND_CTF_CAPTURE);
 	return true;

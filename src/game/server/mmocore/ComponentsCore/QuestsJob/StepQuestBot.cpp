@@ -68,9 +68,6 @@ bool CStepQuestBot::IsActiveStep(CGS* pGS) const
 // ################# PLAYER STEP STRUCTURE ######################
 bool CPlayerStepQuestBot::IsCompleteItems(CPlayer* pPlayer) const
 {
-	const int ClientID = pPlayer->GetCID();
-	const int QuestID = m_Bot->m_QuestID;
-
 	for(int i = 0; i < 2; i++)
 	{
 		const int ItemID = m_Bot->m_aItemSearch[i];
@@ -86,8 +83,6 @@ bool CPlayerStepQuestBot::IsCompleteItems(CPlayer* pPlayer) const
 
 bool CPlayerStepQuestBot::IsCompleteMobs(CPlayer* pPlayer) const
 {
-	const int ClientID = pPlayer->GetCID();
-
 	for(int i = 0; i < 2; i++)
 	{
 		const int MobID = m_Bot->m_aNeedMob[i];
