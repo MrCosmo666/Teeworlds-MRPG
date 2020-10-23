@@ -182,7 +182,8 @@ void QuestJob::QuestShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, c
 	const int ClientID = pPlayer->GetCID();
 	auto Item = std::find_if(ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot.begin(), ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot.end(),
 		[pBot](const std::pair<int, CPlayerStepQuestBot>& pStepBot) { return pStepBot.second.m_Bot->m_SubBotID == pBot.m_SubBotID; });
-	return (Item != ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot.end() ? Item->second.ShowRequired(pPlayer, TextTalk) : false);
+	if(Item != ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot.end())
+		Item->second.ShowRequired(pPlayer, TextTalk);
 }
 
 void QuestJob::AddMobProgressQuests(CPlayer* pPlayer, int BotID)
