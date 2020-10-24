@@ -44,8 +44,7 @@ void SkillsJob::OnInitAccount(CPlayer *pPlayer)
 
 void SkillsJob::OnResetClient(int ClientID)
 {
-	if (ms_aSkills.find(ClientID) != ms_aSkills.end())
-		ms_aSkills.erase(ClientID);
+	ms_aSkills.erase(ClientID);
 }
 
 bool SkillsJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)

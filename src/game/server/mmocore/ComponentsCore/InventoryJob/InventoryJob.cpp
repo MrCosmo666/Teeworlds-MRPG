@@ -65,8 +65,7 @@ void InventoryJob::OnInitAccount(CPlayer *pPlayer)
 
 void InventoryJob::OnResetClient(int ClientID)
 {
-	if (ms_aItems.find(ClientID) != ms_aItems.end())
-		ms_aItems.erase(ClientID);
+	ms_aItems.erase(ClientID);
 }
 
 void InventoryJob::RepairDurabilityItems(CPlayer *pPlayer)

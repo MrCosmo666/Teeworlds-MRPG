@@ -29,6 +29,7 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 
 CPlayer::~CPlayer()
 {
+	m_aHiddenMenu.clear();
 	delete m_pCharacter;
 	m_pCharacter = nullptr;
 }

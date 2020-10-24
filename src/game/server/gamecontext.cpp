@@ -1570,12 +1570,12 @@ const char *CGS::NetVersion() const { return GAME_NETVERSION; }
 void CGS::ClearClientData(int ClientID)
 {
 	Mmo()->ResetClientData(ClientID);
-	if(ms_aEffects.find(ClientID) != ms_aEffects.end()) 
-		ms_aEffects.erase(ClientID);
+	m_aPlayerVotes[ClientID].clear();
+	ms_aEffects.erase(ClientID);
 
 	// clear active snap bots for player
-	for(auto& databot : BotJob::ms_aDataBot)
-		databot.second.m_aAlreadySnapQuestBot[ClientID] = false;
+	for(auto& pActiveSnap : BotJob::ms_aDataBot)
+		pActiveSnap.second.m_aAlreadySnapQuestBot[ClientID] = false;
 }
 
 int CGS::GetRank(int AuthID)

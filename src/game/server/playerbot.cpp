@@ -146,8 +146,7 @@ int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 		if(pSnappingPlayer->GetQuest(QuestID).GetState() != QuestState::QUEST_ACCEPT) 
 			return 0;
 
-		const int TalkProgress = BotJob::ms_aQuestBot[m_SubBotID].m_Step;
-		if(TalkProgress != QuestJob::ms_aPlayerQuests[SnappingClient][QuestID].m_Step)
+		if(BotJob::ms_aQuestBot[m_SubBotID].m_Step != pSnappingPlayer->GetQuest(QuestID).m_Step)
 			return 0;
 		
 		// [first] quest bot active for player
@@ -156,10 +155,10 @@ int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 
 	if(m_BotType == BotsTypes::TYPE_BOT_NPC)
 	{
-		// [second] skip snapping already snap on quest state
+		// [second] skip snapping for npc already snap on quest state
 		if(BotJob::ms_aDataBot[m_BotID].m_aAlreadySnapQuestBot[SnappingClient])
 			return 0;
-			
+		
 		if(!IsActiveQuests(SnappingClient))
 			return 1;
 	}

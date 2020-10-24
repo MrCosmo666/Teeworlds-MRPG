@@ -330,11 +330,8 @@ bool AccountMainJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, co
 
 void AccountMainJob::OnResetClient(int ClientID)
 {
-	if(ms_aPlayerTempData.find(ClientID) != ms_aPlayerTempData.end())
-		ms_aPlayerTempData.erase(ClientID);
-
-	if (ms_aData.find(ClientID) != ms_aData.end())
-		ms_aData.erase(ClientID);
+	ms_aPlayerTempData.erase(ClientID);
+	ms_aData.erase(ClientID);
 }
 
 std::string AccountMainJob::HashPassword(const char* pPassword, const char* pSalt)

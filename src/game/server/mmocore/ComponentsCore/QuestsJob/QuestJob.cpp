@@ -381,6 +381,7 @@ void QuestJob::OnResetClient(int ClientID)
 			pStepBot.second.UpdateBot(GS());
 		}
 	}
+	ms_aPlayerQuests.erase(ClientID);
 }
 
 void QuestJob::OnMessage(int MsgID, void* pRawMsg, int ClientID)
