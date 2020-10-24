@@ -66,6 +66,7 @@ bool CPlayerQuest::Accept()
 		SJK.ID("tw_accounts_quests_bots_step", "(QuestID, SubBotID, OwnerID) VALUES ('%d', '%d', '%d')", 
 			pStepBot.second.m_Bot->m_QuestID, pStepBot.second.m_Bot->m_SubBotID, m_pPlayer->Acc().m_AuthID);
 		pStepBot.second.UpdateBot(pGS);
+		pStepBot.second.CreateStepArrow(m_pPlayer);
 	}
 	SJK.ID("tw_accounts_quests", "(QuestID, OwnerID, Type) VALUES ('%d', '%d', '%d')", m_QuestID, m_pPlayer->Acc().m_AuthID, QuestState::QUEST_ACCEPT);
 
