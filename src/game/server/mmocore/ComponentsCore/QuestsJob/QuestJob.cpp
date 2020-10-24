@@ -55,6 +55,7 @@ void QuestJob::ShowQuestsTabList(CPlayer* pPlayer, int StateQuest)
 		if(StateQuest == QuestState::QUEST_FINISHED)
 		{
 			ShowQuestID(pPlayer, pDataQuest.first);
+			IsEmptyList = false;
 			continue;
 		}
 
@@ -169,7 +170,6 @@ void QuestJob::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, bool LastDialog)
 {
 	const int QuestID = pBot.m_QuestID;
-	const int ClientID = pPlayer->GetCID();
 	CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
 	auto Item = std::find_if(pPlayerQuest.m_StepsQuestBot.begin(), pPlayerQuest.m_StepsQuestBot.end(),
 		[pBot](const std::pair<int, CPlayerStepQuestBot>& pStepBot) { return pStepBot.second.m_Bot->m_SubBotID == pBot.m_SubBotID; });
@@ -179,7 +179,6 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot,
 void QuestJob::QuestShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, const char* TextTalk)
 {
 	const int QuestID = pBot.m_QuestID;
-	const int ClientID = pPlayer->GetCID();
 	CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
 	auto Item = std::find_if(pPlayerQuest.m_StepsQuestBot.begin(), pPlayerQuest.m_StepsQuestBot.end(),
 		[pBot](const std::pair<int, CPlayerStepQuestBot>& pStepBot) { return pStepBot.second.m_Bot->m_SubBotID == pBot.m_SubBotID; });
@@ -190,7 +189,6 @@ void QuestJob::QuestShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, c
 void QuestJob::CreateQuestingItems(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot)
 {
 	const int QuestID = pBot.m_QuestID;
-	const int ClientID = pPlayer->GetCID();
 	CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
 	auto Item = std::find_if(pPlayerQuest.m_StepsQuestBot.begin(), pPlayerQuest.m_StepsQuestBot.end(),
 		[pBot](const std::pair<int, CPlayerStepQuestBot>& pStepBot) { return pStepBot.second.m_Bot->m_SubBotID == pBot.m_SubBotID; });
