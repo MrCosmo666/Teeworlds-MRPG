@@ -33,8 +33,9 @@ void CQuestPathFinder::Tick()
 		return;
 	}
 
-	vec2 Direction = normalize(GS()->m_apPlayers[m_ClientID]->GetCharacter()->m_Core.m_Pos - m_TargetPos);
-	m_Pos = GS()->m_apPlayers[m_ClientID]->GetCharacter()->m_Core.m_Pos - Direction * 90;
+	vec2 PlayerPosition = GS()->m_apPlayers[m_ClientID]->GetCharacter()->m_Core.m_Pos;
+	vec2 Direction = normalize(PlayerPosition - m_TargetPos);
+	m_Pos = PlayerPosition - Direction * clamp(distance(m_Pos, m_TargetPos), 32.0f, 90.0f);
 }
 
 void CQuestPathFinder::Snap(int SnappingClient)

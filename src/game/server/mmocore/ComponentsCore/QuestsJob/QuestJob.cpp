@@ -46,6 +46,7 @@ void QuestJob::ShowQuestsTabList(CPlayer* pPlayer, int StateQuest)
 
 	// check first quest story step
 	bool IsEmptyList = true;
+	pPlayer->m_Colored = LIGHT_GOLDEN_COLOR;
 	std::list < std::string /*stories was checked*/ > StoriesChecked;
 	for(const auto& pDataQuest : ms_aDataQuests)
 	{
@@ -127,7 +128,7 @@ void QuestJob::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 		// skipped non accepted task list
 		if(pPlayerQuest.GetState() != QUEST_ACCEPT)
 		{
-			GS()->AVM(ClientID, "null", NOPE, HideID, "Step been completed, or not accepted!");
+			GS()->AVM(ClientID, "null", NOPE, HideID, "Quest been completed, or not accepted!");
 			continue;
 		}
 

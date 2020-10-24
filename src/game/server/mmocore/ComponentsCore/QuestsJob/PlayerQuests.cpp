@@ -28,6 +28,7 @@ void CPlayerQuest::CheckaAvailableNewStep()
 			StepsBotComplected++;
 
 		pStepBot.second.UpdateBot(pGS);
+		pStepBot.second.CreateStepArrow(m_pPlayer);
 	}
 
 	// check new step or finish quest
