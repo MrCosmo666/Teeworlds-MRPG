@@ -315,7 +315,10 @@ int QuestJob::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID)
 			continue;
 
 		for(auto& pStepBot : pPlayerQuest.second.m_StepsQuestBot)
-			AvailableCount -= pStepBot.second.GetCountBlockedItem(pPlayer, ItemID);
+		{
+			if(!pStepBot.second.m_StepComplete)
+				AvailableCount -= pStepBot.second.GetCountBlockedItem(pPlayer, ItemID);
+		}
 	}
 	return max(AvailableCount, 0);
 }
