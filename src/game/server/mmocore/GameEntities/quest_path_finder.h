@@ -8,18 +8,16 @@
 class CQuestPathFinder : public CEntity
 {
 	int m_ClientID;
-	int m_QuestID;
-	int m_QuestProgress;
+	int m_SubBotID;
 	bool m_MainScenario;
 
 public:
-	CQuestPathFinder(CGameWorld* pGameWorld, vec2 Pos, int ClientID, int QuestID, int QuestProgress, vec2 TargetPos);
+	CQuestPathFinder(CGameWorld* pGameWorld, vec2 Pos, int ClientID, BotJob::QuestBotInfo QuestBot);
 
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);
 
 	vec2 m_TargetPos;
-	int GetQuestID() const { return m_QuestID; }
 	int GetClientID() const { return m_ClientID; }
 };
 

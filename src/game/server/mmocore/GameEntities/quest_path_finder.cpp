@@ -6,24 +6,24 @@
 #include <game/server/gamecontext.h>
 #include "quest_path_finder.h"
 
-CQuestPathFinder::CQuestPathFinder(CGameWorld *pGameWorld, vec2 Pos, int ClientID, int QuestID, int QuestProgress, vec2 TargetPos)
+CQuestPathFinder::CQuestPathFinder(CGameWorld *pGameWorld, vec2 Pos, int ClientID, BotJob::QuestBotInfo QuestBot)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_FINDQUEST, Pos)
 {
 	m_ClientID = ClientID;
-	m_QuestID = QuestID;
-	m_QuestProgress = QuestProgress;
-	m_TargetPos = TargetPos;
-	m_MainScenario = str_startswith(GS()->GetQuestInfo(m_QuestID).GetStory(), "Main:") != nullptr;
+	m_SubBotID = QuestBot.m_SubBotID;
+	m_TargetPos = GS()->Mmo()->WorldSwap()->GetPositionQuestBot(ClientID, QuestBot);
+	m_MainScenario = str_startswith(GS()->GetQuestInfo(QuestBot.m_QuestID).GetStory(), "Main:") != nullptr;
 	GameWorld()->InsertEntity(this);
 }
 
 void CQuestPathFinder::Tick() 
 {
+	const int QuestID = BotJob::ms_aQuestBot[m_SubBotID].m_QuestID;
+	const int Step = BotJob::ms_aQuestBot[m_SubBotID].m_Step;
 	CPlayer* pPlayer = GS()->GetPlayer(m_ClientID, true, true);
-	if (m_TargetPos == vec2(0.0f, 0.0f) || !pPlayer || QuestJob::ms_aPlayerQuests[m_ClientID][m_QuestID].m_Step != m_QuestProgress 
-		|| QuestJob::ms_aPlayerQuests[m_ClientID][m_QuestID].m_State != QuestState::QUEST_ACCEPT)
+	if (!pPlayer || m_TargetPos == vec2(0.0f, 0.0f) || pPlayer->GetQuest(QuestID).m_Step != Step || pPlayer->GetQuest(QuestID).m_StepsQuestBot[m_SubBotID].m_StepComplete)
 	{
-		if(GS()->GetPlayer(m_ClientID, true, true))
+		if(pPlayer)
 			GS()->CreateDeath(m_Pos, m_ClientID);
 		GS()->m_World.DestroyEntity(this);
 		return;

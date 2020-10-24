@@ -4,13 +4,13 @@
 
 #include "jobitems.h"
 // 1 - miner / 2 - plant
-CJobItems::CJobItems(CGameWorld *pGameWorld, int ItemID, int Level, vec2 Pos, int Type, int Health, int HouseID)
+CJobItems::CJobItems(CGameWorld *pGameWorld, int ItemID, int Level, vec2 Pos, int Type, int StartHealth, int HouseID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_JOBITEMS, Pos, PickupPhysSize)
 {
 	m_ItemID = ItemID;
 	m_Level = Level;
 	m_Type = Type;
-	m_Health = Health;
+	m_StartHealth = StartHealth;
 	m_HouseID = HouseID;
 	SpawnPositions();
 
@@ -37,12 +37,12 @@ void CJobItems::SpawnPositions()
 void CJobItems::SetSpawn(int Sec)
 {
 	m_SpawnTick = Server()->Tick() + (Server()->TickSpeed()*Sec);
-	m_Progress = m_Health;
+	m_Health = m_StartHealth;
 }
 
 void CJobItems::Work(int ClientID)
 {
-	if(ClientID >= MAX_PLAYERS || ClientID < 0 || m_Progress >= m_Health || !GS()->m_apPlayers[ClientID])
+	if(ClientID >= MAX_PLAYERS || ClientID < 0 || m_Health >= m_StartHealth || !GS()->m_apPlayers[ClientID])
 		return;
 
 	// not allowed un owner house job 
@@ -80,14 +80,14 @@ void CJobItems::Work(int ClientID)
 		if (rand() % 10 == 0)
 			pPlayerEquippedItem.SetDurability(Durability - 1);
 
-		m_Progress += 3+pPlayer->GetItemsAttributeCount(Stats::StEfficiency);
+		m_Health += 3+pPlayer->GetItemsAttributeCount(Stats::StEfficiency);
 		GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
 		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P] : {STR} ({INT}/100%)", 
-			pPlayerWorkedItem.Info().GetName(pPlayer), (m_Progress > m_Health ? &m_Health : &m_Progress), &m_Health, 
+			pPlayerWorkedItem.Info().GetName(pPlayer), (m_Health > m_StartHealth ? &m_StartHealth : &m_Health), &m_StartHealth, 
 			pPlayerEquippedItem.Info().GetName(pPlayer), &Durability);
 
-		if(m_Progress >= m_Health)
+		if(m_Health >= m_StartHealth)
 		{
 			GS()->Mmo()->MinerAcc()->Work(pPlayer, m_Level);
 			SetSpawn(20);
@@ -105,13 +105,13 @@ void CJobItems::Work(int ClientID)
 		return;
 	}
 
-	m_Progress += 10;
+	m_Health += 10;
 	GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
 	GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P]",
-		pPlayerWorkedItem.Info().GetName(pPlayer), (m_Progress > m_Health ? &m_Health : &m_Progress), &m_Health);
+		pPlayerWorkedItem.Info().GetName(pPlayer), (m_Health > m_StartHealth ? &m_StartHealth : &m_Health), &m_StartHealth);
 
-	if(m_Progress >= m_Health)
+	if(m_Health >= m_StartHealth)
 	{
 		GS()->Mmo()->PlantsAcc()->Work(pPlayer, m_Level);
 		SetSpawn(20);
@@ -134,7 +134,7 @@ int CJobItems::SwitchToObject(bool MmoItem)
 void CJobItems::Reset()
 {
 	m_SpawnTick = -1;
-	m_Progress = 0;
+	m_Health = 0;
 }
 
 void CJobItems::Tick()

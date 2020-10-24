@@ -171,10 +171,7 @@ void QuestJob::QuestShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, c
 {
 	const int QuestID = pBot.m_QuestID;
 	CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
-	auto Item = std::find_if(pPlayerQuest.m_StepsQuestBot.begin(), pPlayerQuest.m_StepsQuestBot.end(),
-		[pBot](const std::pair<int, CPlayerStepQuestBot>& pStepBot) { return pStepBot.second.m_Bot->m_SubBotID == pBot.m_SubBotID; });
-	if(Item != pPlayerQuest.m_StepsQuestBot.end())
-		Item->second.ShowRequired(pPlayer, TextTalk);
+	pPlayerQuest.m_StepsQuestBot[pBot.m_SubBotID].ShowRequired(pPlayer, TextTalk);
 }
 
 void QuestJob::QuestTableAddInfo(int ClientID, const char* pText, int Requires, int Have)
@@ -204,19 +201,16 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot,
 {
 	const int QuestID = pBot.m_QuestID;
 	CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
-	auto Item = std::find_if(pPlayerQuest.m_StepsQuestBot.begin(), pPlayerQuest.m_StepsQuestBot.end(),
-		[pBot](const std::pair<int, CPlayerStepQuestBot>& pStepBot) { return pStepBot.second.m_Bot->m_SubBotID == pBot.m_SubBotID; });
-	return (Item != pPlayerQuest.m_StepsQuestBot.end() ? Item->second.Finish(pPlayer, LastDialog) : false);
+	if(pPlayerQuest.m_StepsQuestBot.find(pBot.m_SubBotID) != pPlayerQuest.m_StepsQuestBot.end())
+		return pPlayerQuest.m_StepsQuestBot[pBot.m_SubBotID].Finish(pPlayer, LastDialog);
+	return false;
 }
 
 void QuestJob::CreateQuestingItems(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot)
 {
 	const int QuestID = pBot.m_QuestID;
 	CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
-	auto Item = std::find_if(pPlayerQuest.m_StepsQuestBot.begin(), pPlayerQuest.m_StepsQuestBot.end(),
-		[pBot](const std::pair<int, CPlayerStepQuestBot>& pStepBot) { return pStepBot.second.m_Bot->m_SubBotID == pBot.m_SubBotID; });
-	if(Item != pPlayerQuest.m_StepsQuestBot.end())
-		Item->second.CreateQuestingItems(pPlayer);
+	pPlayerQuest.m_StepsQuestBot[pBot.m_SubBotID].CreateQuestingItems(pPlayer);
 }
 
 void QuestJob::AddMobProgressQuests(CPlayer* pPlayer, int BotID)

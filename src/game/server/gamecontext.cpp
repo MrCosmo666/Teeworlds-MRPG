@@ -63,6 +63,8 @@ CGS::CGS()
 
 CGS::~CGS()
 {
+	m_Events.Clear();
+	m_CommandManager.ClearCommands();
 	for(auto & apPlayer : m_apPlayers)
 		delete apPlayer;
 

@@ -11,6 +11,7 @@ class CPathfinder
 {
 public:
 	CPathfinder(class CLayers* Layers, class CCollision* Collision);
+	~CPathfinder();
 
 	struct CNode
 	{

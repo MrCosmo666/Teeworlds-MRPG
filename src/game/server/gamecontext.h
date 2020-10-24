@@ -42,6 +42,7 @@ class CGS : public IGameServer
 	IServer *m_pServer;
 	class IConsole *m_pConsole;
 	MmoController* m_pMmoController;
+	class CPathfinder* m_pPathFinder;
 
 	CLayers m_Layers;
 	CCollision m_Collision;
@@ -53,7 +54,6 @@ class CGS : public IGameServer
 	void Construct(int Resetting);
 	bool m_Resetting;
 
-	class CPathfinder* m_pPathFinder;
 public:
 	IServer *Server() const { return m_pServer; }
 	class IConsole *Console() { return m_pConsole; }

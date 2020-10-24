@@ -44,7 +44,7 @@ int AccountMinerJob::GetOreHealth(vec2 Pos) const
 	{
 		vec2 Position = vec2(ore.second.m_PositionX, ore.second.m_PositionY);
 		if(distance(Position, Pos) < ore.second.m_Distance)
-			return ore.second.m_Health;
+			return ore.second.m_StartHealth;
 	}
 	return -1;
 }
@@ -97,7 +97,7 @@ void AccountMinerJob::OnInitWorld(const char* pWhereLocalWorld)
 		const int ID = RES->getInt("ID");
 		ms_aOre[ID].m_ItemID = RES->getInt("ItemID");
 		ms_aOre[ID].m_Level = RES->getInt("Level");
-		ms_aOre[ID].m_Health = RES->getInt("Health");
+		ms_aOre[ID].m_StartHealth = RES->getInt("Health");
 		ms_aOre[ID].m_PositionX = RES->getInt("PositionX");
 		ms_aOre[ID].m_PositionY = RES->getInt("PositionY");
 		ms_aOre[ID].m_Distance = RES->getInt("Distance");

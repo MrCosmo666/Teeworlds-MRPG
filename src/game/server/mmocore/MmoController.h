@@ -38,8 +38,10 @@ class MmoController
  			m_paComponents.push_back(pComponent);
 		}
 		
-		void clear()
+		void free()
 		{
+			for(auto& pComponent : m_paComponents)
+				delete pComponent;
 			m_paComponents.clear();
 		}
 
