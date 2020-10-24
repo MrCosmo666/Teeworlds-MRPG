@@ -721,7 +721,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 			return;
 		}
 
-		bool RequiestQuestTask = BotJob::ms_aQuestBot[MobID].m_aTalk[m_TalkingNPC.m_TalkedProgress].m_RequestComplete;
+		const bool RequiestQuestTask = BotJob::ms_aQuestBot[MobID].m_aTalk[m_TalkingNPC.m_TalkedProgress].m_RequestComplete;
 		if (RequiestQuestTask)
 		{
 			if (!m_TalkingNPC.m_FreezedProgress)

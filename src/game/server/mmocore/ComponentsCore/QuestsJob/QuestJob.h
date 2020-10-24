@@ -37,14 +37,14 @@ private:
 	void ShowQuestID(CPlayer *pPlayer, int QuestID);
 
 public:
-	bool InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, bool LastDialog);
-	void AddMobProgressQuests(CPlayer* pPlayer, int BotID);
-	void CreateQuestingItems(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot);
-
 	void QuestShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, const char* TextTalk = "\0");
 	void QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID, bool Giving);
 	void QuestTableAddInfo(int ClientID, const char* pText, int Requires, int Have);
 	void QuestTableClear(int ClientID);
+
+	bool InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, bool LastDialog);
+	void AddMobProgressQuests(CPlayer* pPlayer, int BotID);
+	void CreateQuestingItems(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot);
 
 	void UpdateArrowStep(int ClientID);
 	void AcceptNextStoryQuestStep(CPlayer* pPlayer, int CheckQuestID);

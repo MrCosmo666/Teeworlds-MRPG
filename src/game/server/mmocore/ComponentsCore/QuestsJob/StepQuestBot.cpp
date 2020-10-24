@@ -219,7 +219,7 @@ void CPlayerStepQuestBot::CreateQuestingItems(CPlayer* pPlayer)
 	const int ClientID = pPlayer->GetCID();
 	for(CDropQuestItem* pHh = (CDropQuestItem*)pGS->m_World.FindFirst(CGameWorld::ENTTYPE_DROPQUEST); pHh; pHh = (CDropQuestItem*)pHh->TypeNext())
 	{
-		if(pHh->m_OwnerID == ClientID && pHh->m_QuestBot.m_QuestID == m_Bot->m_QuestID)
+		if(pHh->m_ClientID == ClientID && pHh->m_QuestBot.m_QuestID == m_Bot->m_QuestID)
 			return;
 	}
 

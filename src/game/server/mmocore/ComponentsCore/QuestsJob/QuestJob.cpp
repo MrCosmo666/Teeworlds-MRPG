@@ -167,15 +167,6 @@ void QuestJob::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 	}
 }
 
-bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, bool LastDialog)
-{
-	const int QuestID = pBot.m_QuestID;
-	CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
-	auto Item = std::find_if(pPlayerQuest.m_StepsQuestBot.begin(), pPlayerQuest.m_StepsQuestBot.end(),
-		[pBot](const std::pair<int, CPlayerStepQuestBot>& pStepBot) { return pStepBot.second.m_Bot->m_SubBotID == pBot.m_SubBotID; });
-	return (Item != pPlayerQuest.m_StepsQuestBot.end() ? Item->second.Finish(pPlayer, LastDialog) : false);
-}
-
 void QuestJob::QuestShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, const char* TextTalk)
 {
 	const int QuestID = pBot.m_QuestID;
@@ -184,6 +175,38 @@ void QuestJob::QuestShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, c
 		[pBot](const std::pair<int, CPlayerStepQuestBot>& pStepBot) { return pStepBot.second.m_Bot->m_SubBotID == pBot.m_SubBotID; });
 	if(Item != pPlayerQuest.m_StepsQuestBot.end())
 		Item->second.ShowRequired(pPlayer, TextTalk);
+}
+
+void QuestJob::QuestTableAddInfo(int ClientID, const char* pText, int Requires, int Have)
+{
+	if(ClientID < 0 || ClientID >= MAX_PLAYERS || !GS()->IsMmoClient(ClientID))
+		return;
+
+	CNetMsg_Sv_AddQuestingProcessing Msg;
+	Msg.m_pText = pText;
+	Msg.m_pRequiresNum = Requires;
+	Msg.m_pHaveNum = clamp(Have, 0, Requires);
+	Msg.m_pGivingTable = false;
+	StrToInts(Msg.m_pIcon, 4, "hammer");
+	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+}
+
+void QuestJob::QuestTableClear(int ClientID)
+{
+	if(ClientID < 0 || ClientID >= MAX_PLAYERS || !GS()->IsMmoClient(ClientID))
+		return;
+
+	CNetMsg_Sv_ClearQuestingProcessing Msg;
+	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+}
+
+bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, bool LastDialog)
+{
+	const int QuestID = pBot.m_QuestID;
+	CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
+	auto Item = std::find_if(pPlayerQuest.m_StepsQuestBot.begin(), pPlayerQuest.m_StepsQuestBot.end(),
+		[pBot](const std::pair<int, CPlayerStepQuestBot>& pStepBot) { return pStepBot.second.m_Bot->m_SubBotID == pBot.m_SubBotID; });
+	return (Item != pPlayerQuest.m_StepsQuestBot.end() ? Item->second.Finish(pPlayer, LastDialog) : false);
 }
 
 void QuestJob::CreateQuestingItems(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot)
@@ -246,14 +269,19 @@ void QuestJob::AcceptNextStoryQuestStep(CPlayer* pPlayer)
 {
 	// check first quest story step search active quests
 	std::list < std::string /*stories was checked*/ > StoriesChecked;
-	for(const auto& qp : ms_aPlayerQuests[pPlayer->GetCID()])
+	for(const auto& pPlayerQuest : ms_aPlayerQuests[pPlayer->GetCID()])
 	{
+		// allow accept next story quest only for complected some quest on story
+		if(pPlayerQuest.second.GetState() != QuestState::QUEST_FINISHED)
+			continue;
+
+		// accept next story quest
 		const auto& IsAlreadyChecked = std::find_if(StoriesChecked.begin(), StoriesChecked.end(), [=](const std::string &stories)
-		{ return (str_comp_nocase(ms_aDataQuests[qp.first].m_aStoryLine, stories.c_str()) == 0); });
+		{ return (str_comp_nocase(ms_aDataQuests[pPlayerQuest.first].m_aStoryLine, stories.c_str()) == 0); });
 		if(IsAlreadyChecked == StoriesChecked.end())
 		{
-			StoriesChecked.emplace_back(ms_aDataQuests[qp.first].m_aStoryLine);
-			AcceptNextStoryQuestStep(pPlayer, qp.first);
+			StoriesChecked.emplace_back(ms_aDataQuests[pPlayerQuest.first].m_aStoryLine);
+			AcceptNextStoryQuestStep(pPlayer, pPlayerQuest.first);
 		}
 	}
 }
@@ -274,28 +302,6 @@ void QuestJob::QuestTableAddItem(int ClientID, const char* pText, int Requires, 
 	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
-void QuestJob::QuestTableAddInfo(int ClientID, const char *pText, int Requires, int Have)
-{
-	if (ClientID < 0 || ClientID >= MAX_PLAYERS || !GS()->IsMmoClient(ClientID))
-		return;
-
-	CNetMsg_Sv_AddQuestingProcessing Msg;
-	Msg.m_pText = pText;
-	Msg.m_pRequiresNum = Requires;
-	Msg.m_pHaveNum = clamp(Have, 0, Requires);
-	Msg.m_pGivingTable = false;
-	StrToInts(Msg.m_pIcon, 4, "hammer");
-	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-}
-
-void QuestJob::QuestTableClear(int ClientID)
-{
-	if (ClientID < 0 || ClientID >= MAX_PLAYERS || !GS()->IsMmoClient(ClientID))
-		return;
-	
-	CNetMsg_Sv_ClearQuestingProcessing Msg;
-	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-}
 /*
 int QuestJob::QuestingAllowedItemsCount(CPlayer *pPlayer, int ItemID)
 {
