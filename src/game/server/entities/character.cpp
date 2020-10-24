@@ -9,7 +9,6 @@
 #include "laser.h"
 #include "projectile.h"
 
-#include <game/server/mmocore/GameEntities/quest_path_finder.h>
 #include <game/server/mmocore/GameEntities/snapfull.h>
 #include <game/server/mmocore/GameEntities/jobitems.h>
 
@@ -92,7 +91,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	if(!m_pPlayer->IsBot())
 	{
 		m_pPlayer->m_MoodState = m_pPlayer->GetMoodState();
-		GS()->Mmo()->Quest()->UpdateArrowStep(m_pPlayer->GetCID());
+		GS()->Mmo()->Quest()->UpdateArrowStep(m_pPlayer);
 		GS()->Mmo()->Quest()->AcceptNextStoryQuestStep(m_pPlayer);
 
 		m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
@@ -416,17 +415,6 @@ void CCharacter::HandleWeapons()
 			m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart = -1;
 		}
 	}
-}
-
-void CCharacter::CreateQuestsStep(int QuestID)
-{
-	/*const int ClientID = m_pPlayer->GetCID();
-	vec2 Pos = GS()->Mmo()->WorldSwap()->GetPositionQuestBot(ClientID, QuestID);
-	if (QuestJob::ms_aQuests[ClientID].find(QuestID) == QuestJob::ms_aQuests[ClientID].end() || (Pos.x == 0.0f && Pos.y == 0.0f))
-		return;
-
-	const int Progress = QuestJob::ms_aQuests[ClientID][QuestID].m_Step;
-	new CQuestPathFinder(GameWorld(), m_Core.m_Pos, ClientID, QuestID, Progress, Pos); */ 
 }
 
 bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)

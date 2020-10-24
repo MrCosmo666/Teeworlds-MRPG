@@ -229,16 +229,17 @@ void QuestJob::AddMobProgressQuests(CPlayer* pPlayer, int BotID)
 	}
 }
 
-void QuestJob::UpdateArrowStep(int ClientID)
+void QuestJob::UpdateArrowStep(CPlayer *pPlayer)
 {
-	CPlayer* pPlayer = GS()->GetPlayer(ClientID, true, true);
-	if (!pPlayer)
-		return;
-
-	for (const auto& qp : ms_aPlayerQuests[ClientID])
+	// TODO Optimize algoritm check complected steps
+	const int ClientID = pPlayer->GetCID();
+	for (auto& pPlayerQuest : ms_aPlayerQuests[ClientID])
 	{
-		if (qp.second.m_State == QuestState::QUEST_ACCEPT)
-			pPlayer->GetCharacter()->CreateQuestsStep(qp.first);
+		if(pPlayerQuest.second.m_State != QuestState::QUEST_ACCEPT)
+			continue;
+
+		for(auto& pStepBot : pPlayerQuest.second.m_StepsQuestBot)
+			pStepBot.second.CreateStepArrow(pPlayer);
 	}
 }
 

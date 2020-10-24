@@ -25,6 +25,7 @@ public:
 	bool Finish(CPlayer* pPlayer, bool LastDialog);
 	void DoCollectItem(CPlayer* pPlayer);
 	void AddMobProgress(CPlayer* pPlayer, int BotID);
+	void CreateStepArrow(CPlayer* pPlayer);
 	void CreateQuestingItems(CPlayer* pPlayer);
 	void ShowRequired(CPlayer* pPlayer, const char* TextTalk);
 };

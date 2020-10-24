@@ -46,7 +46,7 @@ public:
 	void AddMobProgressQuests(CPlayer* pPlayer, int BotID);
 	void CreateQuestingItems(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot);
 
-	void UpdateArrowStep(int ClientID);
+	void UpdateArrowStep(CPlayer *pPlayer);
 	void AcceptNextStoryQuestStep(CPlayer* pPlayer, int CheckQuestID);
 	void AcceptNextStoryQuestStep(CPlayer* pPlayer);
 	//int QuestingAllowedItemsCount(CPlayer* pPlayer, int ItemID);

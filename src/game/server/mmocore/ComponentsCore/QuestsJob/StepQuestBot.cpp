@@ -10,6 +10,7 @@
 #include "QuestJob.h"
 
 #include <game/server/mmocore/GameEntities/Items/drop_quest_items.h>
+#include <game/server/mmocore/GameEntities/quest_path_finder.h>
 
 // ##############################################################
 // ################# GLOBAL STEP STRUCTURE ######################
@@ -208,6 +209,16 @@ void CPlayerStepQuestBot::AddMobProgress(CPlayer* pPlayer, int BotID)
 		SJK.UD("tw_accounts_quests_bots_step", "Mob1Progress = '%d', Mob2Progress = '%d' WHERE SubBotID = '%d' AND OwnerID = '%d'", m_MobProgress[0], m_MobProgress[1], SubBotID, pPlayer->Acc().m_AuthID);
 		break;
 	}
+}
+
+void CPlayerStepQuestBot::CreateStepArrow(CPlayer* pPlayer)
+{
+	if(!pPlayer || !pPlayer->GetCharacter())
+		return;
+
+	CGS* pGS = pPlayer->GS();
+	const int ClientID = pPlayer->GetCID();
+	new CQuestPathFinder(&pGS->m_World, pPlayer->GetCharacter()->m_Core.m_Pos, ClientID, *m_Bot);
 }
 
 void CPlayerStepQuestBot::CreateQuestingItems(CPlayer* pPlayer)
