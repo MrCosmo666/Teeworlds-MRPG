@@ -207,12 +207,12 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot,
 	return false;
 }
 
-void QuestJob::CreateQuestingItems(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot)
+void QuestJob::DoStepDropTakeItems(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot)
 {
 	const int QuestID = pBot.m_QuestID;
 	CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
 	if(pPlayerQuest.m_StepsQuestBot.find(pBot.m_SubBotID) != pPlayerQuest.m_StepsQuestBot.end())
-		pPlayerQuest.m_StepsQuestBot[pBot.m_SubBotID].CreateQuestingItems(pPlayer);
+		pPlayerQuest.m_StepsQuestBot[pBot.m_SubBotID].CreateStepDropTakeItems(pPlayer);
 }
 
 void QuestJob::AddMobProgressQuests(CPlayer* pPlayer, int BotID)

@@ -3,7 +3,8 @@
 #ifndef GAME_SERVER_STEP_QUEST_H
 #define GAME_SERVER_STEP_QUEST_H
 
-// information steps data
+// ##############################################################
+// ################# GLOBAL STEP STRUCTURE ######################
 class CStepQuestBot
 {
 public:
@@ -13,6 +14,8 @@ public:
 	bool IsActiveStep(CGS* pGS) const;
 };
 
+// ##############################################################
+// ################# PLAYER STEP STRUCTURE ######################
 class CPlayerStepQuestBot : public CStepQuestBot
 {
 public:
@@ -24,9 +27,10 @@ public:
 	bool IsCompleteMobs(CPlayer* pPlayer) const;
 	bool Finish(CPlayer* pPlayer, bool LastDialog);
 	void DoCollectItem(CPlayer* pPlayer);
+
 	void AddMobProgress(CPlayer* pPlayer, int BotID);
 	void CreateStepArrow(CPlayer* pPlayer);
-	void CreateQuestingItems(CPlayer* pPlayer);
+	void CreateStepDropTakeItems(CPlayer* pPlayer);
 	void ShowRequired(CPlayer* pPlayer, const char* TextTalk);
 };
 

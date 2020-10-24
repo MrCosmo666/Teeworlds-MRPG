@@ -53,7 +53,12 @@ void CPlayerBot::Tick()
 			TickThreadMobsPathFinder();
 			m_ViewPos = m_pCharacter->GetPos();
 		}
-	} 
+		else if(!m_WayPoints.empty())
+		{
+			m_PathSize = 0;
+			m_WayPoints.clear();
+		}
+	}
 	else if(m_Spawned && m_aPlayerTick[TickState::Respawn]+Server()->TickSpeed()*3 <= Server()->Tick())
 		TryRespawn();
 

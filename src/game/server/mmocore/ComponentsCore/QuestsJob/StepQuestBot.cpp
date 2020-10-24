@@ -26,7 +26,6 @@ void CStepQuestBot::UpdateBot(CGS* pGS)
 	{
 		if(!pBotGS->m_apPlayers[i] || pBotGS->m_apPlayers[i]->GetBotType() != BotsTypes::TYPE_BOT_QUEST || pBotGS->m_apPlayers[i]->GetBotSub() != m_Bot->m_SubBotID)
 			continue;
-
 		BotClientID = i;
 	}
 
@@ -34,13 +33,13 @@ void CStepQuestBot::UpdateBot(CGS* pGS)
 	const bool ActiveBot = IsActiveStep(pGS);
 	if(ActiveBot && BotClientID <= -1)
 	{
-		dbg_msg("quest test", "quest to step bot active, but mob not found create");
+		//dbg_msg("quest sync", "quest to step bot active, but mob not found create");
 		pBotGS->CreateBot(BotsTypes::TYPE_BOT_QUEST, m_Bot->m_BotID, m_Bot->m_SubBotID);
 	}
 	// if the bot is not active for more than one player
 	if(!ActiveBot && BotClientID >= MAX_PLAYERS)
 	{
-		dbg_msg("quest test", "mob found, but quest to step not active on players");
+		//dbg_msg("quest sync", "mob found, but quest to step not active on players");
 		delete pBotGS->m_apPlayers[BotClientID];
 		pBotGS->m_apPlayers[BotClientID] = nullptr;
 	}
@@ -213,15 +212,18 @@ void CPlayerStepQuestBot::AddMobProgress(CPlayer* pPlayer, int BotID)
 
 void CPlayerStepQuestBot::CreateStepArrow(CPlayer* pPlayer)
 {
-	if(!pPlayer || !pPlayer->GetCharacter())
+	if(!pPlayer || !pPlayer->GetCharacter() || m_StepComplete)
 		return;
 
-	CGS* pGS = pPlayer->GS();
-	const int ClientID = pPlayer->GetCID();
-	new CQuestPathFinder(&pGS->m_World, pPlayer->GetCharacter()->m_Core.m_Pos, ClientID, *m_Bot);
+	if(pPlayer->GetQuest(m_Bot->m_QuestID).GetState() == QuestState::QUEST_ACCEPT && pPlayer->GetQuest(m_Bot->m_QuestID).m_Step == m_Bot->m_Step)
+	{
+		CGS* pGS = pPlayer->GS();
+		const int ClientID = pPlayer->GetCID();
+		new CQuestPathFinder(&pGS->m_World, pPlayer->GetCharacter()->m_Core.m_Pos, ClientID, *m_Bot);
+	}
 }
 
-void CPlayerStepQuestBot::CreateQuestingItems(CPlayer* pPlayer)
+void CPlayerStepQuestBot::CreateStepDropTakeItems(CPlayer* pPlayer)
 {
 	if(!pPlayer || !pPlayer->GetCharacter() || m_Bot->m_InteractiveType != (int)QuestInteractive::INTERACTIVE_DROP_AND_TAKE_IT)
 		return;

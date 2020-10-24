@@ -21,14 +21,18 @@ void CQuestPathFinder::Tick()
 	const int QuestID = BotJob::ms_aQuestBot[m_SubBotID].m_QuestID;
 	const int Step = BotJob::ms_aQuestBot[m_SubBotID].m_Step;
 	CPlayer* pPlayer = GS()->GetPlayer(m_ClientID, true, true);
-	if (!pPlayer || m_TargetPos == vec2(0.0f, 0.0f) || pPlayer->GetQuest(QuestID).m_Step != Step || pPlayer->GetQuest(QuestID).GetState() != QuestState::QUEST_ACCEPT
-		|| pPlayer->GetQuest(QuestID).m_StepsQuestBot[m_SubBotID].m_StepComplete)
+	if(!pPlayer || !length(m_TargetPos))
 	{
-		if(pPlayer)
-			GS()->CreateDeath(m_Pos, m_ClientID);
 		GS()->m_World.DestroyEntity(this);
 		return;
 	}
+	if (pPlayer->GetQuest(QuestID).m_Step != Step || pPlayer->GetQuest(QuestID).GetState() != QuestState::QUEST_ACCEPT || pPlayer->GetQuest(QuestID).m_StepsQuestBot[m_SubBotID].m_StepComplete)
+	{
+		GS()->CreateDeath(m_Pos, m_ClientID);
+		GS()->m_World.DestroyEntity(this);
+		return;
+	}
+
 	vec2 Direction = normalize(GS()->m_apPlayers[m_ClientID]->GetCharacter()->m_Core.m_Pos - m_TargetPos);
 	m_Pos = GS()->m_apPlayers[m_ClientID]->GetCharacter()->m_Core.m_Pos - Direction * 90;
 }

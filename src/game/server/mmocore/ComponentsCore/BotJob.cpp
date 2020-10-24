@@ -372,7 +372,7 @@ const char* BotJob::GetMeaninglessDialog()
 std::mutex lockingPath;
 void BotJob::FindThreadPath(class CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos)
 {
-	if((int)StartPos.x <= 0 || (int)StartPos.y <= 0 || (int)SearchPos.x <= 0 || (int)SearchPos.y <= 0)
+	if(length(StartPos) <= 0 || length(SearchPos) <= 0 || GS()->Collision()->CheckPoint(StartPos) || GS()->Collision()->CheckPoint(SearchPos))
 		return;
 
 	std::thread([pBotPlayer, StartPos, SearchPos]()
@@ -384,8 +384,9 @@ void BotJob::FindThreadPath(class CPlayerBot* pBotPlayer, vec2 StartPos, vec2 Se
 		pBotPlayer->GS()->PathFinder()->FindPath();
 		pBotPlayer->m_PathSize = pBotPlayer->GS()->PathFinder()->m_FinalSize;
 		for(int i = pBotPlayer->m_PathSize - 1, j = 0; i >= 0; i--, j++)
+		{
 			pBotPlayer->m_WayPoints[j] = vec2(pBotPlayer->GS()->PathFinder()->m_lFinalPath[i].m_Pos.x * 32 + 16, pBotPlayer->GS()->PathFinder()->m_lFinalPath[i].m_Pos.y * 32 + 16);
-
+		}
 		lockingPath.unlock();
 	}).detach();
 }

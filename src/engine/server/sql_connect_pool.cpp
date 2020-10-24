@@ -47,6 +47,7 @@ CConectionPool::CConectionPool()
 		m_pDriver = get_driver_instance();
 
 		SqlConnectionLock.lock();
+
 		for(int i = 0; i < g_Config.m_SvMySqlPoolSize; ++i) 
 			this->CreateConnection();
 
@@ -108,7 +109,7 @@ Connection* CConectionPool::GetConnection()
 			dbg_msg("sql", "connection closed. re-creation!");
 			delete pConnection;
 			pConnection = nullptr;
-			pConnection = this->CreateConnection();
+			pConnection = CreateConnection();
 		}
 
 		dbg_msg("sql", "connection is established %d pool size", (int)m_ConnList.size());
@@ -118,7 +119,7 @@ Connection* CConectionPool::GetConnection()
 	else
 	{
 		dbg_msg("sql", "need at least one connection to work with the database, creating a connection!");
-		pConnection = this->CreateConnection();
+		pConnection = CreateConnection();
 
 		SqlConnectionLock.unlock();
 		return pConnection;

@@ -44,7 +44,7 @@ public:
 
 	bool InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, bool LastDialog);
 	void AddMobProgressQuests(CPlayer* pPlayer, int BotID);
-	void CreateQuestingItems(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot);
+	void DoStepDropTakeItems(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot);
 
 	void UpdateArrowStep(CPlayer *pPlayer);
 	void AcceptNextStoryQuestStep(CPlayer* pPlayer, int CheckQuestID);
