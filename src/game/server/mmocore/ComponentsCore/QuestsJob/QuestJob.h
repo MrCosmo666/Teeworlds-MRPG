@@ -49,7 +49,7 @@ public:
 	void UpdateArrowStep(CPlayer *pPlayer);
 	void AcceptNextStoryQuestStep(CPlayer* pPlayer, int CheckQuestID);
 	void AcceptNextStoryQuestStep(CPlayer* pPlayer);
-	//int QuestingAllowedItemsCount(CPlayer* pPlayer, int ItemID);
+	int GetUnfrozenItemCount(CPlayer* pPlayer, int ItemID);
 
 	virtual void OnInit();
 	virtual void OnInitAccount(CPlayer* pPlayer);

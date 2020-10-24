@@ -66,6 +66,24 @@ bool CStepQuestBot::IsActiveStep(CGS* pGS) const
 
 // ##############################################################
 // ################# PLAYER STEP STRUCTURE ######################
+int CPlayerStepQuestBot::GetCountBlockedItem(CPlayer* pPlayer, int ItemID) const
+{
+	CGS* pGS = pPlayer->GS();
+	const int ClientID = pPlayer->GetCID();
+	for(int i = 0; i < 2; i++)
+	{
+		const int BlockedItemID = m_Bot->m_aItemSearch[i];
+		const int BlockedItemCount = m_Bot->m_aItemSearchCount[i];
+		if(BlockedItemID <= 0 || BlockedItemCount <= 0 || ItemID != BlockedItemID)
+			continue;
+
+		// if(pPlayer->GetItem(ItemID).m_Count <= BlockedItemCount)
+		//	pGS->Chat(ClientID, "{STR}x{INT} item frozen for {STR} quest NPC!", pPlayer->GetItem(BlockedItemID).Info().GetName(pPlayer), &BlockedItemCount, m_Bot->GetName());
+		return BlockedItemCount;
+	}
+	return 0;
+}
+
 bool CPlayerStepQuestBot::IsCompleteItems(CPlayer* pPlayer) const
 {
 	for(int i = 0; i < 2; i++)

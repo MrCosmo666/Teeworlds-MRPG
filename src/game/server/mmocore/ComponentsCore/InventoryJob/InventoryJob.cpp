@@ -171,17 +171,14 @@ int InventoryJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Set
 	return 0;		
 }
 
-int InventoryJob::ActionItemCountAllowed(CPlayer *pPlayer, int ItemID)
+int InventoryJob::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID)
 {
-	const int ClientID = pPlayer->GetCID();
-	const int AvailableCount = /*Job()->Quest()->QuestingAllowedItemsCount(pPlayer, ItemID)*/ pPlayer->GetItem(ItemID).m_Count;
-	if (AvailableCount <= 0)
+	const int AvailableCount = Job()->Quest()->GetUnfrozenItemCount(pPlayer, ItemID);
+	if(AvailableCount <= 0)
 	{
-		GS()->Chat(ClientID, "This count of items that you have, iced for the quest!");
-		GS()->Chat(ClientID, "Can see in which quest they are required in Adventure journal!");
-		return -1;
+		GS()->Chat(pPlayer->GetCID(), "\"{STR}\" frozen for quests!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
+		GS()->Chat(pPlayer->GetCID(), "You can find out, which quest requires item in the quest log!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
 	}
-
 	return AvailableCount;
 }
 
@@ -281,7 +278,7 @@ bool InventoryJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, cons
 		if (!pPlayer->GetCharacter())
 			return true;
 
-		int AvailableCount = ActionItemCountAllowed(pPlayer, VoteID);
+		int AvailableCount = GetUnfrozenItemCount(pPlayer, VoteID);
 		if (AvailableCount <= 0)
 			return true;
 
@@ -296,7 +293,7 @@ bool InventoryJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, cons
 
 	if(PPSTR(CMD, "IUSE") == 0)
 	{
-		int AvailableCount = ActionItemCountAllowed(pPlayer, VoteID);
+		int AvailableCount = GetUnfrozenItemCount(pPlayer, VoteID);
 		if (AvailableCount <= 0)
 			return true;
 
@@ -307,7 +304,7 @@ bool InventoryJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, cons
 
 	if(PPSTR(CMD, "IDESYNTHESIS") == 0)
 	{
-		int AvailableCount = ActionItemCountAllowed(pPlayer, VoteID);
+		int AvailableCount = GetUnfrozenItemCount(pPlayer, VoteID);
 		if (AvailableCount <= 0)
 			return true;
 

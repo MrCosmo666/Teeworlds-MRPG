@@ -352,7 +352,7 @@ bool ShopJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int
 
 	if(PPSTR(CMD, "AUCTIONSLOT") == 0)
 	{
-		int AvailableCount = Job()->Item()->ActionItemCountAllowed(pPlayer, VoteID);
+		int AvailableCount = Job()->Item()->GetUnfrozenItemCount(pPlayer, VoteID);
 		if (AvailableCount <= 0)
 			return true;
 

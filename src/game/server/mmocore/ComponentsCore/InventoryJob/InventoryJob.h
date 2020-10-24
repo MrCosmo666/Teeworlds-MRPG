@@ -24,8 +24,8 @@ public:
 	void ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunction = false);
 	int GiveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant);
 	int RemoveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings);
-	void ItemSelected(CPlayer *pPlayer, const InventoryItem& pItemPlayer, bool Dress = false);
-	int ActionItemCountAllowed(CPlayer* pPlayer, int ItemID);
+	void ItemSelected(CPlayer* pPlayer, const InventoryItem& pItemPlayer, bool Dress = false);
+	int GetUnfrozenItemCount(CPlayer* pPlayer, int ItemID);
 
 	void RepairDurabilityItems(CPlayer *pPlayer);
 	int GetCountItemsType(CPlayer* pPlayer, int Type) const;

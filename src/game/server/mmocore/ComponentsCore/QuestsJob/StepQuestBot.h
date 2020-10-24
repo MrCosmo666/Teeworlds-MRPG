@@ -23,6 +23,7 @@ public:
 	bool m_StepComplete;
 	bool m_ClientQuitting;
 
+	int GetCountBlockedItem(CPlayer* pPlayer, int ItemID) const;
 	bool IsCompleteItems(CPlayer* pPlayer) const;
 	bool IsCompleteMobs(CPlayer* pPlayer) const;
 	bool Finish(CPlayer* pPlayer, bool LastDialog);

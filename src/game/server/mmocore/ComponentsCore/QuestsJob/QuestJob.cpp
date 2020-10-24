@@ -305,34 +305,21 @@ void QuestJob::QuestTableAddItem(int ClientID, const char* pText, int Requires, 
 	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
-/*
-int QuestJob::QuestingAllowedItemsCount(CPlayer *pPlayer, int ItemID)
+int QuestJob::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID)
 {
 	const int ClientID = pPlayer->GetCID();
-	const InventoryItem PlayerSearchItem = pPlayer->GetItem(ItemID);
-	for (const auto& qq : ms_aPlayerQuests[ClientID])
+	int AvailableCount = pPlayer->GetItem(ItemID).m_Count;
+	for (const auto& pPlayerQuest : ms_aPlayerQuests[ClientID])
 	{
-		if (qq.second.m_State != QuestState::QUEST_ACCEPT)
+		if(pPlayerQuest.second.m_State != QuestState::QUEST_ACCEPT)
 			continue;
 
-		BotJob::QuestBotInfo *BotInfo = GetQuestBot(qq.first, qq.second.m_Step);
-		if (!BotInfo)
-			continue;
-
-		for (int i = 0; i < 2; i++)
-		{
-			const int needItemID = BotInfo->m_aItemSearch[i];
-			const int numNeed = BotInfo->m_aItemSearchCount[i];
-			if (needItemID <= 0 || numNeed <= 0 || ItemID != needItemID)
-				continue;
-
-			const int AvailableCount = clamp(PlayerSearchItem.m_Count - numNeed, 0, PlayerSearchItem.m_Count);
-			return AvailableCount;
-		}
+		for(auto& pStepBot : pPlayerQuest.second.m_StepsQuestBot)
+			AvailableCount -= pStepBot.second.GetCountBlockedItem(pPlayer, ItemID);
 	}
-	return PlayerSearchItem.m_Count;
+	return max(AvailableCount, 0);
 }
-*/
+
 void QuestJob::OnInit()
 {
 	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_quests_list"));
