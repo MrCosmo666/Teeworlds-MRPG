@@ -91,6 +91,7 @@ bool CInventoryItem::Add(int Count, int Settings, int Enchant, bool Message)
 	else if(Info().m_Type != ItemType::TYPE_INVISIBLE)
 		GS()->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(m_pPlayer), &Count);
 
+	GS()->StrongUpdateVotes(m_pPlayer->GetCID(), MenuList::MENU_INVENTORY);
 	return true;
 }
 
@@ -104,6 +105,7 @@ bool CInventoryItem::Remove(int Count, int Settings)
 		Equip();
 
 	const int Code = GS()->Mmo()->Item()->RemoveItem(m_pPlayer, m_ItemID, Count, Settings);
+	GS()->StrongUpdateVotes(m_pPlayer->GetCID(), MenuList::MENU_INVENTORY);
 	return (bool)(Code > 0);
 }
 

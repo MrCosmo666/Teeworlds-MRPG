@@ -174,7 +174,7 @@ int InventoryJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Set
 int InventoryJob::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID)
 {
 	const int AvailableCount = Job()->Quest()->GetUnfrozenItemCount(pPlayer, ItemID);
-	if(AvailableCount <= 0)
+	if(AvailableCount <= 0 && pPlayer->GetItem(ItemID).m_Count >= 1)
 	{
 		GS()->Chat(pPlayer->GetCID(), "\"{STR}\" frozen for quests!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
 		GS()->Chat(pPlayer->GetCID(), "You can find out, which quest requires item in the quest log!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
@@ -287,7 +287,6 @@ bool InventoryJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, cons
 		pItemPlayer.Drop(Get);
 
 		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "You drop {STR}x{INT}", pItemPlayer.Info().GetName(pPlayer), &Get);
-		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 
@@ -316,7 +315,6 @@ bool InventoryJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, cons
 		{
 			GS()->Chat(ClientID, "Disassemble {STR}x{INT}, you receive {INT} {STR}(s)", 
 				pPlayerSelectedItem.Info().GetName(pPlayer), &Get, &DesCount, pPlayerMaterialItem.Info().GetName(pPlayer));
-			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		}
 		return true;
 	}
