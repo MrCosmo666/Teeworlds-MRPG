@@ -171,7 +171,8 @@ void QuestJob::QuestShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, c
 {
 	const int QuestID = pBot.m_QuestID;
 	CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
-	pPlayerQuest.m_StepsQuestBot[pBot.m_SubBotID].ShowRequired(pPlayer, TextTalk);
+	if(pPlayerQuest.m_StepsQuestBot.find(pBot.m_SubBotID) != pPlayerQuest.m_StepsQuestBot.end())
+		pPlayerQuest.m_StepsQuestBot[pBot.m_SubBotID].ShowRequired(pPlayer, TextTalk);
 }
 
 void QuestJob::QuestTableAddInfo(int ClientID, const char* pText, int Requires, int Have)
@@ -210,7 +211,8 @@ void QuestJob::CreateQuestingItems(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot)
 {
 	const int QuestID = pBot.m_QuestID;
 	CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
-	pPlayerQuest.m_StepsQuestBot[pBot.m_SubBotID].CreateQuestingItems(pPlayer);
+	if(pPlayerQuest.m_StepsQuestBot.find(pBot.m_SubBotID) != pPlayerQuest.m_StepsQuestBot.end())
+		pPlayerQuest.m_StepsQuestBot[pBot.m_SubBotID].CreateQuestingItems(pPlayer);
 }
 
 void QuestJob::AddMobProgressQuests(CPlayer* pPlayer, int BotID)
