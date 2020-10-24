@@ -1377,7 +1377,7 @@ const char *CServer::GetMapName() const
 bool CServer::LoadMap(int ID)
 {
 	char aBuf[512];
-	str_format(aBuf, sizeof(aBuf), "maps/%s.map", WorldsInstance.ms_aWorlds[ID].m_aMapName);
+	str_format(aBuf, sizeof(aBuf), "maps/%s", WorldsInstance.ms_aWorlds[ID].m_aPath);
 
 	// check for valid standard map
 	if(!m_MapChecker.ReadAndValidateMap(Storage(), aBuf, IStorage::TYPE_ALL))
@@ -1401,7 +1401,6 @@ bool CServer::LoadMap(int ID)
 	Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBufMsg);
 	str_format(aBufMsg, sizeof(aBufMsg), "%s crc is %08x", aBuf, pMap->Crc());
 	Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBufMsg);
-	str_copy(m_aCurrentMap, WorldsInstance.ms_aWorlds[ID].m_aMapName, sizeof(m_aCurrentMap));
 
 	// load complete map into memory for download
 	{
@@ -1430,7 +1429,7 @@ int CServer::Run()
 		if(!LoadMap(pWorld.first))
 		{
 			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "%s MAP NOT FOUND OR LOADING...", pWorld.second.m_aMapName);
+			str_format(aBuf, sizeof(aBuf), "maps/%s MAP NOT FOUND OR LOADING...", pWorld.second.m_aPath);
 			Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 			return -1;
 		}
@@ -2027,12 +2026,12 @@ bool WorldsLoading(IKernel *pKernel, IStorage* pStorage, IConsole* pConsole)
 		for(unsigned i = 0; i < rStart.u.array.length; ++i)
 		{
 			const char* pWorldName = rStart[i]["name"];
-			const char* pMapName = rStart[i]["map"];
+			const char* pPath = rStart[i]["path"];
 
 			// here set worlds name
 			WorldsInstance.Add(i, pKernel);
 			str_copy(WorldsInstance.ms_aWorlds[i].m_aName, pWorldName, sizeof(WorldsInstance.ms_aWorlds[i].m_aName));
-			str_copy(WorldsInstance.ms_aWorlds[i].m_aMapName, pMapName, sizeof(WorldsInstance.ms_aWorlds[i].m_aMapName));
+			str_copy(WorldsInstance.ms_aWorlds[i].m_aPath, pPath, sizeof(WorldsInstance.ms_aWorlds[i].m_aPath));
 		}
 	}
 

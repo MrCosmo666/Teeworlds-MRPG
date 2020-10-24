@@ -22,7 +22,7 @@ class CWorldGameServerArray
 	struct CWorldGameServer
 	{
 		char m_aName[64];
-		char m_aMapName[64];
+		char m_aPath[512];
 		class IGameServer* m_pGameServer;
 		IEngineMap* m_pLoadedMap;
 	};
@@ -238,7 +238,6 @@ public:
 	{
 		MAP_CHUNK_SIZE=NET_MAX_PAYLOAD-NET_MAX_CHUNKHEADERSIZE-4, // msg type
 	};
-	char m_aCurrentMap[64];
 	int m_MapChunksPerRequest;
 
 	int m_RconPasswordSet;

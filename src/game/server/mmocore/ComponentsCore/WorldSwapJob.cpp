@@ -43,10 +43,10 @@ void WorldSwapJob::OnInit()
 
 void WorldSwapJob::OnInitWorld(const char* pWhereLocalWorld)
 {
-	const int WorldID = GS()->GetWorldID();
-	const CSqlString<32> world_name = CSqlString<32>(GS()->Server()->GetWorldName(WorldID));
 	SJK.SDT("RespawnWorld, MusicID", "ENUM_WORLDS", [&](ResultSet* RES)
 	{
+		const int WorldID = GS()->GetWorldID();
+		const CSqlString<32> world_name = CSqlString<32>(GS()->Server()->GetWorldName(WorldID));
 		if(RES->next())
 		{
 			const int RespawnWorld = (int)RES->getInt("RespawnWorld");

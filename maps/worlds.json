@@ -1,0 +1,50 @@
+{"worlds":[
+	{
+		"name": "Pier Elfinia",
+		"path": "0-Chapter/0-Pier Elfinia.map"
+	},
+	{
+		"name": "Way to the Elfinia",
+		"path": "0-Chapter/1-Way to the Elfinia.map"
+	},	
+	{
+		"name": "Elfinia",
+		"path": "1-Chapter/2-Elfinia.map"
+	},	
+	{
+		"name": "Elfinia Deep cave",
+		"path": "1-Chapter/3-Elfinia Deep cave.map"
+	},	
+	{
+		"name": "Elfia home room",
+		"path": "1-Chapter/4-Elfia home room.map"
+	},	
+	{
+		"name": "Elfinia occupation of goblins",
+		"path": "1-Chapter/5-Elfinia occupation of goblins.map"
+	},	
+	{
+		"name": "Elfinia Abandoned mine",
+		"path": "Dungeons/6-Elfinia Abandoned mine.map"
+	},	
+	{
+		"name": "Diana home room",
+		"path": "1-Chapter/7-Diana home room.map"
+	},	
+	{
+		"name": "Noctis Resonance",
+		"path": "Dungeons/8-Noctis Resonance.map"
+	},	
+	{
+		"name": "Departure",
+		"path": "2-Chapter/9-Departure.map"
+	},	
+	{
+		"name": "Underwater of Neptune",
+		"path": "Dungeons/10-Underwater of Neptune.map"
+	},	
+	{
+		"name": "Kugan",
+		"path": "2-Chapter/11-Kugan.map"
+	}
+]}
