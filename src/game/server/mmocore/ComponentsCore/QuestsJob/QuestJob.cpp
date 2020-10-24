@@ -170,25 +170,37 @@ bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot,
 {
 	const int QuestID = pBot.m_QuestID;
 	const int ClientID = pPlayer->GetCID();
-	auto Item = std::find_if(ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot.begin(), ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot.end(), 
+	CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
+	auto Item = std::find_if(pPlayerQuest.m_StepsQuestBot.begin(), pPlayerQuest.m_StepsQuestBot.end(),
 		[pBot](const std::pair<int, CPlayerStepQuestBot>& pStepBot) { return pStepBot.second.m_Bot->m_SubBotID == pBot.m_SubBotID; });
-	return (Item != ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot.end() ? Item->second.Finish(pPlayer, LastDialog) : false);
+	return (Item != pPlayerQuest.m_StepsQuestBot.end() ? Item->second.Finish(pPlayer, LastDialog) : false);
 }
-
 
 void QuestJob::QuestShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, const char* TextTalk)
 {
 	const int QuestID = pBot.m_QuestID;
 	const int ClientID = pPlayer->GetCID();
-	auto Item = std::find_if(ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot.begin(), ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot.end(),
+	CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
+	auto Item = std::find_if(pPlayerQuest.m_StepsQuestBot.begin(), pPlayerQuest.m_StepsQuestBot.end(),
 		[pBot](const std::pair<int, CPlayerStepQuestBot>& pStepBot) { return pStepBot.second.m_Bot->m_SubBotID == pBot.m_SubBotID; });
-	if(Item != ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot.end())
+	if(Item != pPlayerQuest.m_StepsQuestBot.end())
 		Item->second.ShowRequired(pPlayer, TextTalk);
+}
+
+void QuestJob::CreateQuestingItems(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot)
+{
+	const int QuestID = pBot.m_QuestID;
+	const int ClientID = pPlayer->GetCID();
+	CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
+	auto Item = std::find_if(pPlayerQuest.m_StepsQuestBot.begin(), pPlayerQuest.m_StepsQuestBot.end(),
+		[pBot](const std::pair<int, CPlayerStepQuestBot>& pStepBot) { return pStepBot.second.m_Bot->m_SubBotID == pBot.m_SubBotID; });
+	if(Item != pPlayerQuest.m_StepsQuestBot.end())
+		Item->second.CreateQuestingItems(pPlayer);
 }
 
 void QuestJob::AddMobProgressQuests(CPlayer* pPlayer, int BotID)
 {
-	// check complected steps
+	// TODO Optimize algoritm check complected steps
 	const int ClientID = pPlayer->GetCID();
 	for(auto& pPlayerQuest : QuestJob::ms_aPlayerQuests[ClientID])
 	{

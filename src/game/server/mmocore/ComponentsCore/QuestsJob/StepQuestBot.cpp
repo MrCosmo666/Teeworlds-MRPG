@@ -52,11 +52,11 @@ bool CStepQuestBot::IsActiveStep(CGS* pGS) const
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pPlayer = pGS->m_apPlayers[i];
-		if(!pPlayer || !pPlayer->IsAuthed() || pPlayer->GetQuest(QuestID).GetState() != QuestState::QUEST_ACCEPT)
+		if(!pPlayer || !pPlayer->IsAuthed())
 			continue;
 
-		if(m_Bot->m_Step != QuestJob::ms_aPlayerQuests[i][QuestID].m_Step || QuestJob::ms_aPlayerQuests[i][QuestID].m_StepsQuestBot[SubBotID].m_StepComplete ||
-			QuestJob::ms_aPlayerQuests[i][QuestID].m_StepsQuestBot[SubBotID].m_ClientQuitting)
+		CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
+		if(pPlayerQuest.GetState() != QuestState::QUEST_ACCEPT || m_Bot->m_Step != pPlayerQuest.m_Step || pPlayerQuest.m_StepsQuestBot[SubBotID].m_StepComplete || pPlayerQuest.m_StepsQuestBot[SubBotID].m_ClientQuitting)
 			continue;
 
 		return true;
@@ -187,16 +187,12 @@ void CPlayerStepQuestBot::DoCollectItem(CPlayer* pPlayer)
 
 void CPlayerStepQuestBot::AddMobProgress(CPlayer* pPlayer, int BotID)
 {
-	if(!pPlayer || !pPlayer->GS()->Mmo()->BotsData()->IsDataBotValid(BotID))
+	const int QuestID = m_Bot->m_QuestID;
+	if(!pPlayer || !pPlayer->GS()->Mmo()->BotsData()->IsDataBotValid(BotID) || pPlayer->GetQuest(QuestID).GetState() != QuestState::QUEST_ACCEPT)
 		return;
 
 	CGS* pGS = pPlayer->GS();
 	const int ClientID = pPlayer->GetCID();
-	const int QuestID = m_Bot->m_QuestID;
-
-	// if the quest is accepted
-	if(pPlayer->GetQuest(QuestID).GetState() != QuestState::QUEST_ACCEPT)
-		return;
 
 	// check complecte mob
 	for(int i = 0; i < 2; i++)
@@ -302,7 +298,6 @@ void CPlayerStepQuestBot::ShowRequired(CPlayer* pPlayer, const char* TextTalk)
 	char aBuf[64];
 	dynamic_string Buffer;
 	bool IsActiveTask = false;
-	const int QuestID = m_Bot->m_QuestID;
 
 	// search item's and mob's
 	for(int i = 0; i < 2; i++)

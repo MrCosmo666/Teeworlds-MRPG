@@ -39,6 +39,7 @@ private:
 public:
 	bool InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, bool LastDialog);
 	void AddMobProgressQuests(CPlayer* pPlayer, int BotID);
+	void CreateQuestingItems(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot);
 
 	void QuestShowRequired(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, const char* TextTalk = "\0");
 	void QuestTableAddItem(int ClientID, const char* pText, int Requires, int ItemID, bool Giving);

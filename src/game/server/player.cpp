@@ -726,7 +726,7 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		{
 			if (!m_TalkingNPC.m_FreezedProgress)
 			{
-				//GS()->Mmo()->Quest()->CreateQuestingItems(this, BotJob::ms_aQuestBot[MobID]);
+				GS()->Mmo()->Quest()->CreateQuestingItems(this, BotJob::ms_aQuestBot[MobID]);
 				GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
 				GS()->Mmo()->BotsData()->ShowBotQuestTaskInfo(this, MobID, m_TalkingNPC.m_TalkedProgress);
 				m_TalkingNPC.m_FreezedProgress = true;
