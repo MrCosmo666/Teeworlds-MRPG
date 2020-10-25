@@ -246,14 +246,14 @@ void QuestJob::AcceptNextStoryQuestStep(CPlayer *pPlayer, int CheckQuestID)
 	for (auto pQuestData = ms_aDataQuests.find(CheckQuestID); pQuestData != ms_aDataQuests.end(); pQuestData++)
 	{
 		// search next quest story step
-		if(str_comp_nocase(CheckingQuest.m_aStoryLine, pQuestData->second.m_aStoryLine) != 0)
+		if(str_comp_nocase(CheckingQuest.m_aStoryLine, pQuestData->second.m_aStoryLine) == 0)
 		{
 			// skip all if a quest story is found that is still active
 			if(pPlayer->GetQuest(pQuestData->first).GetState() == QUEST_ACCEPT)
 				break;
 
 			// accept next quest step
-			if(!IsValidQuest(pQuestData->first, pPlayer->GetCID()) || pPlayer->GetQuest(pQuestData->first).Accept())
+			if(pPlayer->GetQuest(pQuestData->first).Accept())
 				break;
 		}
 	}
@@ -268,13 +268,13 @@ void QuestJob::AcceptNextStoryQuestStep(CPlayer* pPlayer)
 		// allow accept next story quest only for complected some quest on story
 		if(pPlayerQuest.second.GetState() != QuestState::QUEST_FINISHED)
 			continue;
-
+	
 		// accept next story quest
-		const auto& IsAlreadyChecked = std::find_if(StoriesChecked.begin(), StoriesChecked.end(), [=](const std::string &stories)
+		const auto& IsAlreadyChecked = std::find_if(StoriesChecked.begin(), StoriesChecked.end(), [=](const std::string& stories)
 		{ return (str_comp_nocase(ms_aDataQuests[pPlayerQuest.first].m_aStoryLine, stories.c_str()) == 0); });
 		if(IsAlreadyChecked == StoriesChecked.end())
 		{
-			StoriesChecked.emplace_back(ms_aDataQuests[pPlayerQuest.first].m_aStoryLine);
+			StoriesChecked.emplace_front(ms_aDataQuests[pPlayerQuest.first].m_aStoryLine);
 			AcceptNextStoryQuestStep(pPlayer, pPlayerQuest.first);
 		}
 	}
