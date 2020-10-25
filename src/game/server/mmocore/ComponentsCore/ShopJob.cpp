@@ -205,7 +205,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 		if (OwnerID == pPlayer->Acc().m_AuthID)
 		{
 			GS()->Chat(ClientID, "You closed auction slot!");
-			GS()->SendInbox(ClientID, "Auction Alert", "You have bought a item, or canceled your slot", ItemID, Count, Enchant);
+			GS()->SendInbox(pPlayer, "Auction Alert", "You have bought a item, or canceled your slot", ItemID, Count, Enchant);
 			SJK.DD("tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, OwnerID);
 			return true;
 		}
@@ -216,7 +216,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "Your [Slot %sx%d] was sold!", pPlayerBuyightItem.Info().GetName(pPlayer), Count);
-		Job()->Inbox()->SendInbox(OwnerID, "Auction Sell", aBuf, itGold, Price, 0);
+		GS()->SendInbox(OwnerID, "Auction Sell", aBuf, itGold, Price, 0);
 		SJK.DD("tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, OwnerID);
 		pPlayerBuyightItem.Add(Count, 0, Enchant);
 		GS()->Chat(ClientID, "You buy {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(pPlayer), &Count);
@@ -244,7 +244,7 @@ void ShopJob::CheckAuctionTime()
 		const int Count = RES->getInt("Count");
 		const int Enchant = RES->getInt("Enchant");
 		const int OwnerID = RES->getInt("OwnerID");
-		Job()->Inbox()->SendInbox(OwnerID, "Auction expired", "Your slot has expired", ItemID, Count, Enchant);
+		GS()->SendInbox(OwnerID, "Auction expired", "Your slot has expired", ItemID, Count, Enchant);
 		SJK.DD("tw_mailshop", "WHERE ID = '%d'", ID);
 	}
 	if(ReleaseSlots) 

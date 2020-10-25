@@ -3,6 +3,8 @@
 #include <game/server/gamecontext.h>
 #include "ItemInventory.h"
 
+#include "RandomBox.h"
+
 int randomRangecount(int startrandom, int endrandom, int count)
 {
 	int result = 0;

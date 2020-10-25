@@ -1632,7 +1632,7 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 			pPlayer->GetItem(ItemID).Add(Count, 0, Enchant);
 			return;
 		}
-		pSelf->SendInbox(ClientID, "The sender heavens", "Sent from console", ItemID, Count, Enchant);
+		pSelf->SendInbox(pPlayer, "The sender heavens", "Sent from console", ItemID, Count, Enchant);
 	}
 }
 
@@ -2376,13 +2376,18 @@ bool CGS::TakeItemCharacter(int ClientID)
 }
 
 // send a message with or without the object using ClientID
-void CGS::SendInbox(int ClientID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
+void CGS::SendInbox(CPlayer* pPlayer, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
 {
-	CPlayer* pPlayer = GetPlayer(ClientID, true);
-	if(!pPlayer) 
+	if(!pPlayer || !pPlayer->IsAuthed())
 		return;
 
-	Mmo()->Inbox()->SendInbox(pPlayer->Acc().m_AuthID, Name, Desc, ItemID, Count, Enchant);
+	SendInbox(pPlayer->Acc().m_AuthID, Name, Desc, ItemID, Count, Enchant);
+} 
+
+// send a message with or without the object using AuthID
+void CGS::SendInbox(int AuthID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
+{
+	Mmo()->Inbox()->SendInbox(AuthID, Name, Desc, ItemID, Count, Enchant);
 } 
 
 // send day information

@@ -266,7 +266,8 @@ public:
 	void CreateDropItem(vec2 Pos, int ClientID, InventoryItem DropItem, vec2 Force = vec2(0.0f, 0.0f));
 	void CreateRandomDropItem(vec2 Pos, int ClientID, float Random, InventoryItem DropItem, vec2 Force = vec2(0.0f, 0.0f));
 	bool TakeItemCharacter(int ClientID);
-	void SendInbox(int ClientID, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
+	void SendInbox(CPlayer *pPlayer, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
+	void SendInbox(int AuthID, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
 
 private:
 	void SendDayInfo(int ClientID);

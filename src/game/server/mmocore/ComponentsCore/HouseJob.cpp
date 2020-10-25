@@ -272,7 +272,7 @@ void HouseJob::SellHouse(int HouseID)
 	{
 		const int OwnerID = RES->getInt("OwnerID");
 		const int Price = ms_aHouse[HouseID].m_Price + RES->getInt("HouseBank");
-		Job()->Inbox()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itGold, Price, 0);
+		GS()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itGold, Price, 0);
 		SJK.UD("tw_houses", "OwnerID = NULL, HouseBank = '0' WHERE ID = '%d'", HouseID);
 
 		const int ClientID = Job()->Account()->CheckOnlineAccount(OwnerID);

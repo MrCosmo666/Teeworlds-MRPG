@@ -295,7 +295,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		if(JoinGuild(SenderID, GuildID))
 		{
 			SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
-			Job()->Inbox()->SendInbox(SenderID, ms_aGuild[GuildID].m_aName, "You were accepted to join guild");
+			GS()->SendInbox(SenderID, ms_aGuild[GuildID].m_aName, "You were accepted to join guild");
 			GS()->StrongUpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 			return true;
 		}
@@ -315,7 +315,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		const int SenderID = VoteID;
 		GS()->Chat(ClientID, "You reject invite.");
 		SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
-		Job()->Inbox()->SendInbox(SenderID, ms_aGuild[GuildID].m_aName, "You were denied join guild");
+		GS()->SendInbox(SenderID, ms_aGuild[GuildID].m_aName, "You were denied join guild");
 		GS()->ResetVotes(ClientID, MenuList::MENU_GUILD);
 		return true;
 	}
