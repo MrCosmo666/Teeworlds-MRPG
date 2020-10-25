@@ -266,9 +266,6 @@ void CPlayerStepQuestBot::CreateStepDropTakeItems(CPlayer* pPlayer)
 
 void CPlayerStepQuestBot::ShowRequired(CPlayer* pPlayer, const char* TextTalk)
 {
-	//if(m_Bot->m_DesignBot)
-	//	return;
-
 	CGS* pGS = pPlayer->GS();
 	const int ClientID = pPlayer->GetCID();
 	if(pGS->IsMmoClient(ClientID))
