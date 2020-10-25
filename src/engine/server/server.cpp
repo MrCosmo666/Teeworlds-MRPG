@@ -272,6 +272,7 @@ void CServer::CClient::Reset()
 	m_CurrentInput = 0;
 	mem_zero(&m_LatestInput, sizeof(m_LatestInput));
 
+	m_Snapshots.PurgeAll();
 	m_LastAckedSnapshot = -1;
 	m_LastInputTick = -1;
 	m_SnapRate = CClient::SNAPRATE_INIT;
