@@ -25,13 +25,13 @@ CRandomBoxRandomizer::CRandomBoxRandomizer(CGameWorld* pGameWorld, CPlayer* pPla
 std::vector<StructRandomBoxItem>::iterator CRandomBoxRandomizer::SelectRandomItem()
 {
 	const float RandomDrop = frandom() * 100.0f;
-	auto &pItem = std::find_if(m_List.begin(), m_List.end(), [RandomDrop](const StructRandomBoxItem& pItem) { return RandomDrop < pItem.m_Chance; });
+	auto pItem = std::find_if(m_List.begin(), m_List.end(), [RandomDrop](const StructRandomBoxItem &pItem) { return RandomDrop < pItem.m_Chance; });
 	return pItem != m_List.end() ? pItem : std::prev(m_List.end());
 }
 
 void CRandomBoxRandomizer::Tick()
 {
-	auto& pSelectedItem = std::prev(m_List.end());
+	auto pSelectedItem = std::prev(m_List.end());
 	if(!m_LifeTime || m_LifeTime % Server()->TickSpeed() == 0)
 	{
 		pSelectedItem = SelectRandomItem();
