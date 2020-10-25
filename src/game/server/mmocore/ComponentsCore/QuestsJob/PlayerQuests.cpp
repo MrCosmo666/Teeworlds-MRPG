@@ -10,40 +10,40 @@ CDataQuest& CPlayerQuest::Info() const { return QuestJob::ms_aDataQuests[m_Quest
 
 void CPlayerQuest::CheckaAvailableNewStep()
 {
-	// check complected bot steps
+	// check whether the active steps is complete
 	for(auto& pStepBot : m_StepsQuestBot)
 	{
 		if(pStepBot.second.m_Bot->m_Step == m_Step && !pStepBot.second.m_StepComplete)
 			return;
 	}
 
+	// add step
 	m_Step++;
 
-	// check finished all steps bots
+	// to see if this step is final
+	bool FinalStep = true;
 	CGS* pGS = m_pPlayer->GS();
-	int StepsBotComplected = 0;
 	for(auto& pStepBot : m_StepsQuestBot)
 	{
-		if(pStepBot.second.m_StepComplete)
-			StepsBotComplected++;
+		if(!pStepBot.second.m_StepComplete)
+			FinalStep = false;
 
 		pStepBot.second.UpdateBot(pGS);
 		pStepBot.second.CreateStepArrow(m_pPlayer);
 	}
-
-	// check new step or finish quest
-	const bool IsFinalStep = (StepsBotComplected >= (int)QuestJob::ms_aDataQuests[m_QuestID].m_StepsQuestBot.size());
-	if(IsFinalStep)
+	
+	// finish the quest or update the step
+	if(FinalStep)
 	{
 		Finish();
 		const int ClientID = m_pPlayer->GetCID();
 		pGS->StrongUpdateVotes(ClientID, MenuList::MENU_JOURNAL_MAIN);
 		pGS->StrongUpdateVotes(ClientID, MenuList::MAIN_MENU);
+		return;
 	}
-	else
-	{
-		SJK.UD("tw_accounts_quests", "Step = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'", m_Step, m_QuestID, m_pPlayer->Acc().m_AuthID);
-	}
+
+	// if the step is not completed, we update	
+	SJK.UD("tw_accounts_quests", "Step = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'", m_Step, m_QuestID, m_pPlayer->Acc().m_AuthID);
 }
 
 bool CPlayerQuest::Accept()
@@ -54,22 +54,21 @@ bool CPlayerQuest::Accept()
 	// init quest
 	m_Step = 1;
 	m_State = QuestState::QUEST_ACCEPT;
-	m_StepsQuestBot = Info().CopySteps();
+	SJK.ID("tw_accounts_quests", "(QuestID, OwnerID, Type) VALUES ('%d', '%d', '%d')", m_QuestID, m_pPlayer->Acc().m_AuthID, QuestState::QUEST_ACCEPT);
 
-	// accept quest
+	// init steps
 	CGS* pGS = m_pPlayer->GS();
+	m_StepsQuestBot = Info().CopySteps();
 	for(auto& pStepBot : m_StepsQuestBot)
 	{
 		pStepBot.second.m_MobProgress[0] = 0;
 		pStepBot.second.m_MobProgress[1] = 0;
 		pStepBot.second.m_StepComplete = false;
 		pStepBot.second.m_ClientQuitting = false;
-		SJK.ID("tw_accounts_quests_bots_step", "(QuestID, SubBotID, OwnerID) VALUES ('%d', '%d', '%d')", 
-			pStepBot.second.m_Bot->m_QuestID, pStepBot.second.m_Bot->m_SubBotID, m_pPlayer->Acc().m_AuthID);
+		SJK.ID("tw_accounts_quests_bots_step", "(QuestID, SubBotID, OwnerID) VALUES ('%d', '%d', '%d')", pStepBot.second.m_Bot->m_QuestID, pStepBot.second.m_Bot->m_SubBotID, m_pPlayer->Acc().m_AuthID);
 		pStepBot.second.UpdateBot(pGS);
 		pStepBot.second.CreateStepArrow(m_pPlayer);
 	}
-	SJK.ID("tw_accounts_quests", "(QuestID, OwnerID, Type) VALUES ('%d', '%d', '%d')", m_QuestID, m_pPlayer->Acc().m_AuthID, QuestState::QUEST_ACCEPT);
 
 	// information
 	const int ClientID = m_pPlayer->GetCID();
@@ -84,20 +83,20 @@ bool CPlayerQuest::Accept()
 
 void CPlayerQuest::Finish()
 {
-	CGS* pGS = m_pPlayer->GS();
-	const int ClientID = m_pPlayer->GetCID();
 	if(m_State != QUEST_ACCEPT)
 		return;
 
-	// set quest state to finished
+	// finish quest
 	m_State = QuestState::QUEST_FINISHED;
 	SJK.UD("tw_accounts_quests", "Type = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'", m_State, m_QuestID, m_pPlayer->Acc().m_AuthID);
 
-	// clear tempdata
+	// finish and clear steps
 	m_StepsQuestBot.clear();
 	SJK.DD("tw_accounts_quests_bots_step", "WHERE OwnerID = '%d' AND QuestID = '%d'", m_pPlayer->Acc().m_AuthID, m_QuestID);
 
 	// awards and write about completion
+	CGS* pGS = m_pPlayer->GS();
+	const int ClientID = m_pPlayer->GetCID();
 	m_pPlayer->AddMoney(Info().m_Gold);
 	m_pPlayer->AddExp(Info().m_Exp);
 	pGS->Chat(-1, "{STR} completed: {STR} - {STR}!", pGS->Server()->ClientName(ClientID), Info().m_aStoryLine, Info().m_aName);

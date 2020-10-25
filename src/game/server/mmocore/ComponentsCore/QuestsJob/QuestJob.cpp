@@ -6,14 +6,6 @@
 #include <game/server/gamecontext.h>
 #include "QuestJob.h"
 
-/*
-	Task list:
-	- Resume arrow for quest npc
-	- More clear structures quests
-	- Resume task board quest npc
-	- Clear data steps after finished quest (done not full)
-*/
-
 std::map < int, std::map <int, CPlayerQuest > > QuestJob::ms_aPlayerQuests;
 std::map < int, CDataQuest > QuestJob::ms_aDataQuests;
 
@@ -29,7 +21,6 @@ static const char* GetStateName(int Type)
 
 void QuestJob::ShowQuestsMainList(CPlayer* pPlayer)
 {
-	// show the quest sheet
 	ShowQuestsTabList(pPlayer, QuestState::QUEST_ACCEPT);
 	ShowQuestsTabList(pPlayer, QuestState::QUEST_NO_ACCEPT);
 
@@ -255,7 +246,7 @@ void QuestJob::AcceptNextStoryQuestStep(CPlayer *pPlayer, int CheckQuestID)
 	for (auto pQuestData = ms_aDataQuests.find(CheckQuestID); pQuestData != ms_aDataQuests.end(); pQuestData++)
 	{
 		// search next quest story step
-		if(str_comp_nocase(CheckingQuest.m_aStoryLine, pQuestData->second.m_aStoryLine) == 0)
+		if(str_comp_nocase(CheckingQuest.m_aStoryLine, pQuestData->second.m_aStoryLine) != 0)
 		{
 			// skip all if a quest story is found that is still active
 			if(pPlayer->GetQuest(pQuestData->first).GetState() == QUEST_ACCEPT)
@@ -333,7 +324,6 @@ void QuestJob::OnInit()
 		str_copy(ms_aDataQuests[QUID].m_aStoryLine, RES->getString("StoryLine").c_str(), sizeof(ms_aDataQuests[QUID].m_aStoryLine));
 		ms_aDataQuests[QUID].m_Gold = (int)RES->getInt("Money");
 		ms_aDataQuests[QUID].m_Exp = (int)RES->getInt("Exp");
-		// init steps bots run on BotJob::Init
 	}
 }
 

@@ -40,11 +40,8 @@ bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 	{
 		m_Core.m_LostData = true;
 		GS()->SendEquipItem(m_pBotPlayer->GetCID(), -1);
-		if(!BotJob::ms_aQuestBot[SubBotID].m_DesignBot)
-		{
-			CreateSnapProj(GetSnapFullID(), 2, PICKUP_HEALTH, true, false);
-			CreateSnapProj(GetSnapFullID(), 2, PICKUP_ARMOR, true, false);
-		}
+		CreateSnapProj(GetSnapFullID(), 2, PICKUP_HEALTH, true, false);
+		CreateSnapProj(GetSnapFullID(), 2, PICKUP_ARMOR, true, false);
 	}
 	else if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{

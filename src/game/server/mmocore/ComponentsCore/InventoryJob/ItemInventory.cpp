@@ -91,7 +91,6 @@ bool CInventoryItem::Add(int Count, int Settings, int Enchant, bool Message)
 	else if(Info().m_Type != ItemType::TYPE_INVISIBLE)
 		GS()->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(m_pPlayer), &Count);
 
-	GS()->StrongUpdateVotes(m_pPlayer->GetCID(), MenuList::MENU_INVENTORY);
 	return true;
 }
 
@@ -105,7 +104,6 @@ bool CInventoryItem::Remove(int Count, int Settings)
 		Equip();
 
 	const int Code = GS()->Mmo()->Item()->RemoveItem(m_pPlayer, m_ItemID, Count, Settings);
-	GS()->StrongUpdateVotes(m_pPlayer->GetCID(), MenuList::MENU_INVENTORY);
 	return (bool)(Code > 0);
 }
 
@@ -147,96 +145,95 @@ bool CInventoryItem::Use(int Count)
 		return false;
 
 	const int ClientID = m_pPlayer->GetCID();
+	// potion health regen
 	if(m_ItemID == itPotionHealthRegen && Remove(Count, 0))
 	{
 		m_pPlayer->GiveEffect("RegenHealth", 15);
 		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), &Count);
 	}
-
-	if(m_ItemID == itPotionManaRegen && Remove(Count, 0))
+	// potion mana regen
+	else if(m_ItemID == itPotionManaRegen && Remove(Count, 0))
 	{
 		m_pPlayer->GiveEffect("RegenMana", 15);
 		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), &Count);
 	}
-
-	if(m_ItemID == itPotionResurrection && Remove(Count, 0))
+	// potion resurrection
+	else if(m_ItemID == itPotionResurrection && Remove(Count, 0))
 	{
 		m_pPlayer->GetTempData().m_TempSafeSpawn = false;
 		m_pPlayer->GetTempData().m_TempHealth = m_pPlayer->GetStartHealth();
 		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), &Count);
 	}
-
-	if(m_ItemID == itTicketDiscountCraft)
+	// ticket discount craft
+	else if(m_ItemID == itTicketDiscountCraft)
 	{
 		GS()->Chat(ClientID, "This item can only be used (Auto Use, and then craft).");
 	}
-
-	if(m_ItemID == itCapsuleSurvivalExperience && Remove(Count, 0))
+	// survial capsule experience
+	else if(m_ItemID == itCapsuleSurvivalExperience && Remove(Count, 0))
 	{
 		int Getting = randomRangecount(10, 50, Count);
 		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} Survival Experience.", GS()->Server()->ClientName(ClientID), Info().GetName(), &Count, &Getting);
 		m_pPlayer->AddExp(Getting);
 	}
-
-	if(m_ItemID == itLittleBagGold && Remove(Count, 0))
+	// little bag gold
+	else if(m_ItemID == itLittleBagGold && Remove(Count, 0))
 	{
 		int Getting = randomRangecount(10, 50, Count);
 		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} gold.", GS()->Server()->ClientName(ClientID), Info().GetName(), &Count, &Getting);
 		m_pPlayer->AddMoney(Getting);
 	}
-
-	if(m_ItemID == itTicketResetClassStats && Remove(Count, 0))
+	// ticket reset for class stats
+	else if(m_ItemID == itTicketResetClassStats && Remove(Count, 0))
 	{
 		int BackUpgrades = 0;
-		for(const auto& at : CGS::ms_aAttributsInfo)
+		for(const auto& pAttribute : CGS::ms_aAttributsInfo)
 		{
-			if(str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0 || m_pPlayer->Acc().m_aStats[at.first] <= 0)
+			if(str_comp_nocase(pAttribute.second.m_aFieldName, "unfield") == 0 || pAttribute.second.m_UpgradePrice <= 0 || m_pPlayer->Acc().m_aStats[pAttribute.first] <= 0)
 				continue;
 
 			// skip weapon spreading
-			if(at.second.m_Type == AtributType::AtWeapon)
+			if(pAttribute.second.m_Type == AtributType::AtWeapon)
 				continue;
 
-			BackUpgrades += (int)(m_pPlayer->Acc().m_aStats[at.first] * at.second.m_UpgradePrice);
-			m_pPlayer->Acc().m_aStats[at.first] = 0;
+			BackUpgrades += (int)(m_pPlayer->Acc().m_aStats[pAttribute.first] * pAttribute.second.m_UpgradePrice);
+			m_pPlayer->Acc().m_aStats[pAttribute.first] = 0;
 		}
 
 		GS()->Chat(-1, "{STR} used {STR} returned {INT} upgrades.", GS()->Server()->ClientName(ClientID), Info().GetName(), &BackUpgrades);
 		m_pPlayer->Acc().m_Upgrade += BackUpgrades;
 		GS()->Mmo()->SaveAccount(m_pPlayer, SaveType::SAVE_UPGRADES);
 	}
-
-	if(m_ItemID == itTicketResetWeaponStats && Remove(Count, 0))
+	// ticket reset for weapons stats
+	else if(m_ItemID == itTicketResetWeaponStats && Remove(Count, 0))
 	{
 		int BackUpgrades = 0;
-		for(const auto& at : CGS::ms_aAttributsInfo)
+		for(const auto& pAttribute : CGS::ms_aAttributsInfo)
 		{
-			if(str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0 || m_pPlayer->Acc().m_aStats[at.first] <= 0)
+			if(str_comp_nocase(pAttribute.second.m_aFieldName, "unfield") == 0 || pAttribute.second.m_UpgradePrice <= 0 || m_pPlayer->Acc().m_aStats[pAttribute.first] <= 0)
 				continue;
 
 			// skip all stats allow only weapons
-			if(at.second.m_Type != AtributType::AtWeapon)
+			if(pAttribute.second.m_Type != AtributType::AtWeapon)
 				continue;
 
-			int BackCount = m_pPlayer->Acc().m_aStats[at.first];
-			if(at.first == Stats::StSpreadShotgun)
-				BackCount = m_pPlayer->Acc().m_aStats[at.first] - 3;
-			else if(at.first == Stats::StSpreadGrenade || at.first == Stats::StSpreadRifle)
-				BackCount = m_pPlayer->Acc().m_aStats[at.first] - 1;
+			int UpgradeCount = m_pPlayer->Acc().m_aStats[pAttribute.first];
+			if(pAttribute.first == Stats::StSpreadShotgun)
+				UpgradeCount = m_pPlayer->Acc().m_aStats[pAttribute.first] - 3;
+			else if(pAttribute.first == Stats::StSpreadGrenade || pAttribute.first == Stats::StSpreadRifle)
+				UpgradeCount = m_pPlayer->Acc().m_aStats[pAttribute.first] - 1;
 
-			if(BackCount <= 0)
+			if(UpgradeCount <= 0)
 				continue;
 
-			BackUpgrades += (int)(BackCount * at.second.m_UpgradePrice);
-			m_pPlayer->Acc().m_aStats[at.first] -= BackCount;
+			BackUpgrades += (int)(UpgradeCount * pAttribute.second.m_UpgradePrice);
+			m_pPlayer->Acc().m_aStats[pAttribute.first] -= UpgradeCount;
 		}
 
 		GS()->Chat(-1, "{STR} used {STR} returned {INT} upgrades.", GS()->Server()->ClientName(ClientID), Info().GetName(), &BackUpgrades);
 		m_pPlayer->Acc().m_Upgrade += BackUpgrades;
 		GS()->Mmo()->SaveAccount(m_pPlayer, SaveType::SAVE_UPGRADES);
 	}
-
-	GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INVENTORY);
 	return true;
 }
 

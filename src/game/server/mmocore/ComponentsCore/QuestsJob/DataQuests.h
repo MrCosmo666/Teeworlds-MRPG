@@ -21,9 +21,8 @@ public:
 	{
 		std::map<int, CPlayerStepQuestBot> m_Copy;
 		for(auto& pStepBot : m_StepsQuestBot)
-		{
 			m_Copy[pStepBot.first] = (CPlayerStepQuestBot&)pStepBot.second;
-		}
+
 		return m_Copy;
 	}
 

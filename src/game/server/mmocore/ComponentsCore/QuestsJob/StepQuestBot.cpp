@@ -56,7 +56,11 @@ bool CStepQuestBot::IsActiveStep(CGS* pGS) const
 			continue;
 
 		CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
-		if(pPlayerQuest.GetState() != QuestState::QUEST_ACCEPT || m_Bot->m_Step != pPlayerQuest.m_Step || pPlayerQuest.m_StepsQuestBot[SubBotID].m_StepComplete || pPlayerQuest.m_StepsQuestBot[SubBotID].m_ClientQuitting)
+		if(pPlayerQuest.GetState() != QuestState::QUEST_ACCEPT || m_Bot->m_Step != pPlayerQuest.m_Step)
+			continue;
+
+		// skip complete steps and players who come out to clear the world of bots
+		if(pPlayerQuest.m_StepsQuestBot[SubBotID].m_StepComplete || pPlayerQuest.m_StepsQuestBot[SubBotID].m_ClientQuitting)
 			continue;
 
 		return true;
@@ -68,8 +72,6 @@ bool CStepQuestBot::IsActiveStep(CGS* pGS) const
 // ################# PLAYER STEP STRUCTURE ######################
 int CPlayerStepQuestBot::GetCountBlockedItem(CPlayer* pPlayer, int ItemID) const
 {
-	CGS* pGS = pPlayer->GS();
-	const int ClientID = pPlayer->GetCID();
 	for(int i = 0; i < 2; i++)
 	{
 		const int BlockedItemID = m_Bot->m_aItemSearch[i];
@@ -117,9 +119,6 @@ bool CPlayerStepQuestBot::IsCompleteMobs(CPlayer* pPlayer) const
 bool CPlayerStepQuestBot::Finish(CPlayer* pPlayer, bool LastDialog)
 {
 	CGS* pGS = pPlayer->GS();
-	//if(m_Bot->m_DesignBot)
-	//	return true;
-
 	const int ClientID = pPlayer->GetCID();
 	const int QuestID = m_Bot->m_QuestID;
 	if(!IsCompleteItems(pPlayer) || !IsCompleteMobs(pPlayer))

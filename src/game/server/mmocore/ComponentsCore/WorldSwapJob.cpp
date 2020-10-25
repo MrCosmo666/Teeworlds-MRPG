@@ -104,13 +104,10 @@ void WorldSwapJob::CheckQuestingOpened(CPlayer* pPlayer, int QuestID)
 
 int WorldSwapJob::GetNecessaryQuest(int WorldID) const
 {
-	int CheckWorldID = WorldID != -1 ? GS()->GetWorldID() : WorldID;
-	for (const auto& sw : ms_aWorldSwap)
-	{
-		if (sw.second.m_TwoWorldID == CheckWorldID)
-			return sw.second.m_OpenQuestID;
-	}
-	return -1;
+	int CheckWorldID = WorldID != -1 ? WorldID : GS()->GetWorldID();
+	const auto& pItem = std::find_if(ms_aWorldSwap.begin(), ms_aWorldSwap.end(), [CheckWorldID](const std::pair<int, StructSwapWorld>& pWorldSwap)
+	{ return pWorldSwap.second.m_TwoWorldID == CheckWorldID; });
+	return pItem != ms_aWorldSwap.end() ? pItem->second.m_OpenQuestID : -1;
 }
 
 bool WorldSwapJob::ChangeWorld(CPlayer *pPlayer, vec2 Pos)

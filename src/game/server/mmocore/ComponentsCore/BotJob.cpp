@@ -242,7 +242,6 @@ void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 		ms_aQuestBot[MobID].m_BotID = (int)RES->getInt("BotID");
 		ms_aQuestBot[MobID].m_QuestID = (int)RES->getInt("QuestID");
 		ms_aQuestBot[MobID].m_Step = (int)RES->getInt("Step");
-		ms_aQuestBot[MobID].m_DesignBot = (bool)RES->getBoolean("DesignBot");
 		ms_aQuestBot[MobID].m_WorldID = (int)RES->getInt("WorldID");
 		ms_aQuestBot[MobID].m_PositionX = (int)RES->getInt("pos_x");
 		ms_aQuestBot[MobID].m_PositionY = (int)RES->getInt("pos_y") + 1;
@@ -362,9 +361,10 @@ void BotJob::LoadMobsBots(const char* pWhereLocalWorld)
 
 const char* BotJob::GetMeaninglessDialog()
 {
-	const char* pTalking[3] = { "[Player], do you have any questions? I'm sorry I can't help you.", 
-								"What a beautiful [Time]. I don't have anything for you [Player].", 
-								"[Player] are you interested something? I'm sorry, don't want to talk right now." };
+	const char* pTalking[3] = { 
+		"[Player], do you have any questions? I'm sorry I can't help you.", 
+		"What a beautiful [Time]. I don't have anything for you [Player].", 
+		"[Player] are you interested something? I'm sorry, don't want to talk right now." };
 	return pTalking[random_int()%3];
 }
 
