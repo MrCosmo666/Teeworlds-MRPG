@@ -4,7 +4,7 @@
 #include "loltext.h"
 
 CLolPlasma::CLolPlasma(CGameWorld* pGameWorld, CEntity* pParent, vec2 Pos, vec2 Vel, int Lifespan)
-	: CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER, Pos)
+	: CEntity(pGameWorld, CGameWorld::ENTTYPE_WORLD_TEXT, Pos)
 {
 	m_LocalPos = vec2(0.0f, 0.0f);
 	m_StartOff = Pos;
@@ -19,7 +19,7 @@ CLolPlasma::CLolPlasma(CGameWorld* pGameWorld, CEntity* pParent, vec2 Pos, vec2 
 void CLolPlasma::Tick()
 {
 	m_Life--;
-	if(m_Life < 0)
+	if(!m_Life)
 	{
 		GameWorld()->DestroyEntity(this);
 		return;

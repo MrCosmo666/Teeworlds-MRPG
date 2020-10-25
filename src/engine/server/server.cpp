@@ -274,7 +274,6 @@ void CServer::CClient::Reset()
 
 	m_LastAckedSnapshot = -1;
 	m_LastInputTick = -1;
-	m_Snapshots.PurgeAll();
 	m_SnapRate = CClient::SNAPRATE_INIT;
 	m_Score = 0;
 	m_MapChunk = 0;
@@ -766,7 +765,7 @@ void CServer::DoSnapshot(int WorldID)
 						Msg.AddInt(Crc);
 						Msg.AddInt(Chunk);
 						Msg.AddRaw(&aCompData[n*MaxSize], Chunk);
-						SendMsg(&Msg, MSGFLAG_FLUSH, i);
+						SendMsg(&Msg, MSGFLAG_FLUSH, i, -1, WorldID);
 					}
 					else
 					{
@@ -778,7 +777,7 @@ void CServer::DoSnapshot(int WorldID)
 						Msg.AddInt(Crc);
 						Msg.AddInt(Chunk);
 						Msg.AddRaw(&aCompData[n*MaxSize], Chunk);
-						SendMsg(&Msg, MSGFLAG_FLUSH, i);
+						SendMsg(&Msg, MSGFLAG_FLUSH, i, -1, WorldID);
 					}
 				}
 			}
@@ -787,7 +786,7 @@ void CServer::DoSnapshot(int WorldID)
 				CMsgPacker Msg(NETMSG_SNAPEMPTY, true);
 				Msg.AddInt(m_CurrentGameTick);
 				Msg.AddInt(m_CurrentGameTick-DeltaTick);
-				SendMsg(&Msg, MSGFLAG_FLUSH, i);
+				SendMsg(&Msg, MSGFLAG_FLUSH, i, -1, WorldID);
 			}
 		}
 	}
@@ -904,7 +903,7 @@ void CServer::SendRconLineAuthed(const char *pLine, void *pUser, bool Highlighte
 
 void CServer::SendRconCmdAdd(const IConsole::CCommandInfo *pCommandInfo, int ClientID)
 {
-	if (ClientID > MAX_PLAYERS)
+	if (ClientID >= MAX_PLAYERS)
 		return;
 
 	CMsgPacker Msg(NETMSG_RCON_CMD_ADD, true);
@@ -916,7 +915,7 @@ void CServer::SendRconCmdAdd(const IConsole::CCommandInfo *pCommandInfo, int Cli
 
 void CServer::SendRconCmdRem(const IConsole::CCommandInfo *pCommandInfo, int ClientID)
 {
-	if (ClientID > MAX_PLAYERS)
+	if (ClientID >= MAX_PLAYERS)
 		return;
 
 	CMsgPacker Msg(NETMSG_RCON_CMD_REM, true);
@@ -946,7 +945,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 	Unpacker.Reset(pPacket->m_pData, pPacket->m_DataSize);
 
 	int ClientID = pPacket->m_ClientID;
-	if (ClientID > MAX_PLAYERS)
+	if (ClientID >= MAX_PLAYERS)
 		return;
 
 	// unpack msgid and system flag
@@ -1091,7 +1090,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				CMsgPacker Msg(NETMSG_INPUTTIMING, true);
 				Msg.AddInt(IntendedTick);
 				Msg.AddInt(TimeLeft);
-				SendMsg(&Msg, 0, ClientID);
+				SendMsg(&Msg, 0, ClientID, -1, m_aClients[ClientID].m_WorldID);
 			}
 
 			m_aClients[ClientID].m_LastInputTick = IntendedTick;
@@ -1112,7 +1111,8 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				m_aClients[ClientID].m_Latency = (int)(((Now-TagTime)*1000)/time_freq());
 				m_aClients[ClientID].m_Latency = max(0, m_aClients[ClientID].m_Latency - PingCorrection);
 			}
-			mem_copy(m_aClients[ClientID].m_LatestInput.m_aData, pInput->m_aData, MAX_INPUT_SIZE*sizeof(int));
+
+			mem_copy(m_aClients[ClientID].m_LatestInput.m_aData, pInput->m_aData, MAX_INPUT_SIZE * sizeof(int));
 
 			m_aClients[ClientID].m_CurrentInput++;
 			m_aClients[ClientID].m_CurrentInput %= 200;
@@ -1207,7 +1207,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 		else if(Msg == NETMSG_PING)
 		{
 			CMsgPacker Msg(NETMSG_PING_REPLY, true);
-			SendMsg(&Msg, 0, ClientID);
+			SendMsg(&Msg, 0, ClientID, -1, m_aClients[ClientID].m_WorldID);
 		}
 		else
 		{

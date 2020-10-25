@@ -1720,7 +1720,7 @@ void CGS::ClearVotes(int ClientID)
 // add a vote
 void CGS::AV(int ClientID, const char *pCmd, const char *pDesc, const int TempInt, const int TempInt2, const char *pIcon, VoteCallBack Callback)
 {
-	if(ClientID < 0 || ClientID > MAX_PLAYERS || !m_apPlayers[ClientID])
+	if(ClientID < 0 || ClientID >= MAX_PLAYERS || !m_apPlayers[ClientID])
 		return;
 
 	char aBufDesc[128]; // buffer x2 with unicode
@@ -2319,14 +2319,13 @@ int CGS::CreateBot(short BotType, int BotID, int SubID)
 }
 
 // create lol text in the world
-void CGS::CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText)
+void CGS::CreateText(CEntity* pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char* pText)
 {
 	if(!CheckingPlayersDistance(Pos, 800))
 		return;
 
 	CLoltext Text;
 	Text.Create(&m_World, pParent, Pos, Vel, Lifespan, pText, true, Follow);
-	return;
 }
 
 // creates a particle of experience that follows the player
