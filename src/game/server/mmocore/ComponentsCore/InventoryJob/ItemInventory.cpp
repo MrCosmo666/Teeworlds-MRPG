@@ -154,7 +154,7 @@ bool CInventoryItem::Use(int Count)
 		RandomBox.Add(itGold, 10, 80.0f);
 		RandomBox.Add(itTicketGuild, 1, 50.0f);
 		RandomBox.Add(itMaterial, 100, 5.0f);
-		if(RandomBox.Start(m_pPlayer, 10) && Remove(Count, 0))
+		if(RandomBox.Start(m_pPlayer, 10, this))
 		{
 			m_pPlayer->GiveEffect("RegenHealth", 15);
 			GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), &Count);
