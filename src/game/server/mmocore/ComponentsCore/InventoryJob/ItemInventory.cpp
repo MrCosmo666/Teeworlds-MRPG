@@ -148,10 +148,17 @@ bool CInventoryItem::Use(int Count)
 
 	const int ClientID = m_pPlayer->GetCID();
 	// potion health regen
-	if(m_ItemID == itPotionHealthRegen && Remove(Count, 0))
+	if(m_ItemID == itPotionHealthRegen)
 	{
-		m_pPlayer->GiveEffect("RegenHealth", 15);
-		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), &Count);
+		CRandomBox RandomBox;
+		RandomBox.Add(itGold, 10, 80.0f);
+		RandomBox.Add(itTicketGuild, 1, 50.0f);
+		RandomBox.Add(itMaterial, 100, 5.0f);
+		if(RandomBox.Start(m_pPlayer, 10) && Remove(Count, 0))
+		{
+			m_pPlayer->GiveEffect("RegenHealth", 15);
+			GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), &Count);
+		}
 	}
 	// potion mana regen
 	else if(m_ItemID == itPotionManaRegen && Remove(Count, 0))

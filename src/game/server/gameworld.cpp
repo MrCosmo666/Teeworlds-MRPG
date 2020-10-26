@@ -150,7 +150,7 @@ void CGameWorld::RemoveEntities()
 			if(pEnt->IsMarkedForDestroy())
 			{
 				RemoveEntity(pEnt);
-				delete pEnt;
+				pEnt->Destroy();
 				pEnt = 0;
 			}
 			pEnt = m_pNextTraverseEntity;

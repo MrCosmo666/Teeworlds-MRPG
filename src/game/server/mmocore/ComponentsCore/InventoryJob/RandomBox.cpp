@@ -3,13 +3,22 @@
 #include <game/server/gamecontext.h>
 #include "RandomBox.h"
 
-void CRandomBox::Start(CPlayer *pPlayer, int Seconds) 
+bool CRandomBox::Start(CPlayer *pPlayer, int Seconds) 
 {
 	if(!pPlayer || !pPlayer->IsAuthed())
-		return;
+		return false;
 
+	if(pPlayer->m_aPlayerTick[LastRandomBox] > pPlayer->GS()->Server()->Tick())
+	{
+		pPlayer->GS()->Broadcast(pPlayer->GetCID(), BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Wait until the last random box opens!");
+		return false;
+	}
+
+	Seconds *= pPlayer->GS()->Server()->TickSpeed();
+	pPlayer->m_aPlayerTick[LastRandomBox] = pPlayer->GS()->Server()->Tick() + Seconds;
 	std::sort(m_ArrayItems.begin(), m_ArrayItems.end(), [](const StructRandomBoxItem &pLeft, const StructRandomBoxItem &pRight) { return pLeft.m_Chance < pRight.m_Chance; });
-	new CRandomBoxRandomizer(&pPlayer->GS()->m_World, pPlayer, pPlayer->Acc().m_AuthID, Seconds * pPlayer->GS()->Server()->TickSpeed(), m_ArrayItems);
+	new CRandomBoxRandomizer(&pPlayer->GS()->m_World, pPlayer, pPlayer->Acc().m_AuthID, Seconds, m_ArrayItems);
+	return true;
 };
 
 CRandomBoxRandomizer::CRandomBoxRandomizer(CGameWorld* pGameWorld, CPlayer* pPlayer, int PlayerAuthID, int LifeTime, std::vector<StructRandomBoxItem> List)
@@ -31,32 +40,31 @@ std::vector<StructRandomBoxItem>::iterator CRandomBoxRandomizer::SelectRandomIte
 
 void CRandomBoxRandomizer::Tick()
 {
-	auto pSelectedItem = std::prev(m_List.end());
 	if(!m_LifeTime || m_LifeTime % Server()->TickSpeed() == 0)
 	{
-		pSelectedItem = SelectRandomItem();
+		auto pSelectedItem = SelectRandomItem();
 		if(m_pPlayer && m_pPlayer->GetCharacter())
 		{
 			vec2 PlayerPosition = m_pPlayer->GetCharacter()->m_Core.m_Pos;
-			GS()->CreateText(nullptr, false, vec2(PlayerPosition.x, PlayerPosition.y - 64), vec2(0, -0.5f), 40, GS()->GetItemInfo(pSelectedItem->m_ItemID).GetName());
+			GS()->CreateText(nullptr, false, vec2(PlayerPosition.x, PlayerPosition.y - 80), vec2(0, -0.3f), 15, GS()->GetItemInfo(pSelectedItem->m_ItemID).GetName());
 		}
-	}
 
-	// a case when a client changes the world or comes out while choosing a random object.
-	if(!m_pPlayer)
-	{
-		GS()->SendInbox(m_PlayerAuthID, "Random Box", "Item was not received by you personally.", pSelectedItem->m_ItemID, pSelectedItem->m_Count);
-		GS()->m_World.DestroyEntity(this);
-		return;
-	}
+		// give usually
+		if(!m_LifeTime)
+		{
+			// a case when a client changes the world or comes out while choosing a random object.
+			if(!m_pPlayer)
+			{
+				GS()->SendInbox(m_PlayerAuthID, "Random Box", "Item was not received by you personally.", pSelectedItem->m_ItemID, pSelectedItem->m_Count);
+				GS()->m_World.DestroyEntity(this);
+				return;
+			}
 
-	// give usually
-	if(!m_LifeTime)
-	{
-		m_pPlayer->GetItem(pSelectedItem->m_ItemID).Add(pSelectedItem->m_Count);
-		GS()->CreateDeath(m_pPlayer->m_ViewPos, m_pPlayer->GetCID());
-		GS()->m_World.DestroyEntity(this);
-		return;
+			m_pPlayer->GetItem(pSelectedItem->m_ItemID).Add(pSelectedItem->m_Count);
+			GS()->CreateDeath(m_pPlayer->m_ViewPos, m_pPlayer->GetCID());
+			GS()->m_World.DestroyEntity(this);
+			return;
+		}
 	}
 	m_LifeTime--;
 }

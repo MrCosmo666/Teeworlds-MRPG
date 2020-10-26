@@ -26,7 +26,7 @@ public:
 		m_ArrayItems.push_back(Item);
 	}
 
-	void Start(CPlayer* pPlayer, int LifeTime);
+	bool Start(CPlayer* pPlayer, int LifeTime);
 };
 
 class CRandomBoxRandomizer : public CEntity
