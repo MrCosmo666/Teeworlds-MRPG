@@ -1097,6 +1097,15 @@ void CGS::OnTick()
 		}
 	}
 
+	SJK.UD("tw_accounts", "ID = '1' WHERE ID = '1'");
+	SJK.UD("tw_accounts", "ID = '1' WHERE ID = '1'");
+	SJK.UD("tw_accounts", "ID = '1' WHERE ID = '1'");
+	SJK.UD("tw_accounts", "ID = '1' WHERE ID = '1'");
+	SJK.UD("tw_accounts", "ID = '1' WHERE ID = '1'");
+	SJK.UD("tw_accounts", "ID = '1' WHERE ID = '1'");
+	SJK.UD("tw_accounts", "ID = '1' WHERE ID = '1'");
+	SJK.UD("tw_accounts", "ID = '1' WHERE ID = '1'");
+
 	Mmo()->OnTick();
 }
 

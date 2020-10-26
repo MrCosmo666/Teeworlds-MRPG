@@ -2,7 +2,6 @@
 #include <thread>
 #include <stdarg.h>
 #include <mysql_connection.h>
-#include <cppconn/exception.h>
 #include <cppconn/driver.h>
 #include <base/system.h>
 #include <engine/shared/config.h>
@@ -103,22 +102,18 @@ Connection* CConectionPool::GetConnection()
 	{
 		pConnection = m_ConnList.front();
 		m_ConnList.pop_front();
-		dbg_msg("sql", "got connection from front. checking for availability!");
 		if(pConnection->isClosed())
 		{
-			dbg_msg("sql", "connection closed. re-creation!");
 			delete pConnection;
 			pConnection = nullptr;
 			pConnection = CreateConnection();
 		}
 
-		dbg_msg("sql", "connection is established %d pool size", (int)m_ConnList.size());
 		SqlConnectionLock.unlock();
 		return pConnection;
 	}
 	else
 	{
-		dbg_msg("sql", "need at least one connection to work with the database, creating a connection!");
 		pConnection = CreateConnection();
 
 		SqlConnectionLock.unlock();
@@ -132,7 +127,6 @@ void CConectionPool::ReleaseConnection(Connection* pConnection)
 
 	if(pConnection)
 	{
-		dbg_msg("sql", "action was performed and the connection returned to pool!");
 		m_ConnList.push_back(pConnection);
 	}
 
@@ -198,30 +192,33 @@ void CConectionPool::InsertFormated(int Milliseconds, const char *Table, const c
 	vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
 	#endif
 	aBuf[sizeof(aBuf) - 1] = '\0';
-	std::string Query = "INSERT INTO " + std::string(Table) + " " + std::string(aBuf) + ";";
-	std::thread Thread([Query, Milliseconds]()
+	SQLString Query = SQLString("INSERT INTO " + SQLString(Table) + " " + SQLString(aBuf) + ";");
+	std::thread Thread([this, Query, Milliseconds, args]()
 	{
-		const int pr_Milliseconds = Milliseconds;
-		std::string pr_Query = Query;
-
 		if(Milliseconds > 0)
-			std::this_thread::sleep_for(std::chrono::milliseconds(pr_Milliseconds));
+			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
+
+		const char* pError = nullptr;
 
 		SqlThreadRecursiveLock.lock();
-		Connection* pConnection = nullptr;
+		m_pDriver->threadInit();
+		Connection* pConnection = SJK.GetConnection();
 		try
 		{
-			pConnection = SJK.GetConnection();
-			std::shared_ptr<Statement> STMT(pConnection->createStatement());
-			STMT->execute(pr_Query.c_str());
-			SJK.ReleaseConnection(pConnection);
+			std::unique_ptr<Statement> pStmt(pConnection->createStatement());
+			pStmt->executeUpdate(Query.c_str());
+			pStmt->close();
 		}
 		catch (SQLException & e)
 		{
-			dbg_msg("sql", "%s", e.what());
-			SJK.DisconnectConnection(pConnection);
+			pError = e.what();
 		}
+		SJK.ReleaseConnection(pConnection);
+		m_pDriver->threadEnd();
 		SqlThreadRecursiveLock.unlock();
+
+		if(pError != nullptr)
+			dbg_msg("SQL", "%s", pError);
 	});
 	Thread.detach();
 }
@@ -255,29 +252,32 @@ void CConectionPool::UpdateFormated(int Milliseconds, const char *Table, const c
 	#endif
 	aBuf[sizeof(aBuf) - 1] = '\0';
 	std::string Query = "UPDATE " + std::string(Table) + " SET " + std::string(aBuf) + ";";
-	std::thread Thread([Query, Milliseconds]()
+	std::thread Thread([this, Query, Milliseconds]()
 	{
-		const int pr_Milliseconds = Milliseconds;
-		std::string pr_Query = Query;
-
-		if(pr_Milliseconds > 0)
-			std::this_thread::sleep_for(std::chrono::milliseconds(pr_Milliseconds));
+		if(Milliseconds > 0)
+			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
+		
+		const char* pError = nullptr;
 
 		SqlThreadRecursiveLock.lock();
-		Connection* pConnection = nullptr;
+		m_pDriver->threadInit();
+		Connection* pConnection = SJK.GetConnection();
 		try
 		{
-			pConnection = SJK.GetConnection();
-			std::shared_ptr<Statement> STMT(pConnection->createStatement());
-			STMT->execute(pr_Query.c_str());
-			SJK.ReleaseConnection(pConnection);
+			std::unique_ptr<Statement> pStmt(pConnection->createStatement());
+			pStmt->executeUpdate(Query.c_str());
+			pStmt->close();
 		}
-		catch(SQLException &e)
+		catch(SQLException& e)
 		{
-			dbg_msg("sql", "%s", e.what());
-			SJK.DisconnectConnection(pConnection);
+			pError = e.what();
 		}
+		SJK.ReleaseConnection(pConnection);
+		m_pDriver->threadEnd();
 		SqlThreadRecursiveLock.unlock();
+
+		if(pError != nullptr)
+			dbg_msg("SQL", "%s", pError);
 	});
 	Thread.detach();
 }
@@ -311,29 +311,32 @@ void CConectionPool::DeleteFormated(int Milliseconds, const char *Table, const c
 	#endif
 	aBuf[sizeof(aBuf) - 1] = '\0';
 	std::string Query = "DELETE FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
-	std::thread Thread([Query, Milliseconds]()
+	std::thread Thread([this, Query, Milliseconds]()
 	{
-		const int pr_Milliseconds = Milliseconds;
-		std::string pr_Query = Query;
-
 		if(Milliseconds > 0)
-			std::this_thread::sleep_for(std::chrono::milliseconds(pr_Milliseconds));
+			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
+
+		const char* pError = nullptr;
 
 		SqlThreadRecursiveLock.lock();
-		Connection* pConnection = nullptr;
+		m_pDriver->threadInit();
+		Connection* pConnection = SJK.GetConnection();
 		try
 		{
-			pConnection = SJK.GetConnection();
-			std::shared_ptr<Statement> STMT(pConnection->createStatement());
-			STMT->execute(pr_Query.c_str());
-			SJK.ReleaseConnection(pConnection);
+			std::unique_ptr<Statement> pStmt(pConnection->createStatement());
+			pStmt->executeUpdate(Query.c_str());
+			pStmt->close();
 		}
-		catch (SQLException & e)
+		catch (SQLException& e)
 		{
-			dbg_msg("sql", "%s", e.what());
-			SJK.DisconnectConnection(pConnection);
+			pError = e.what();
 		}
+		SJK.ReleaseConnection(pConnection);
+		m_pDriver->threadEnd();
 		SqlThreadRecursiveLock.unlock();
+
+		if(pError != nullptr)
+			dbg_msg("SQL", "%s", pError);
 	});
 	Thread.detach();
 }

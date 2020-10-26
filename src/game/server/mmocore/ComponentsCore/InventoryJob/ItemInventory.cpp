@@ -150,8 +150,8 @@ bool CInventoryItem::Use(int Count)
 	// potion health regen
 	if(m_ItemID == itPotionHealthRegen && Remove(Count, 0))
 	{
-			m_pPlayer->GiveEffect("RegenHealth", 15);
-			GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), &Count);
+		m_pPlayer->GiveEffect("RegenHealth", 15);
+		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), &Count);
 	}
 	// potion mana regen
 	else if(m_ItemID == itPotionManaRegen && Remove(Count, 0))
