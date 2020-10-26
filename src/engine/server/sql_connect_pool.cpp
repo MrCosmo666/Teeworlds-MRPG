@@ -192,8 +192,8 @@ void CConectionPool::InsertFormated(int Milliseconds, const char *Table, const c
 	vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
 	#endif
 	aBuf[sizeof(aBuf) - 1] = '\0';
-	SQLString Query = SQLString("INSERT INTO " + SQLString(Table) + " " + SQLString(aBuf) + ";");
-	std::thread Thread([this, Query, Milliseconds, args]()
+	std::string Query("INSERT INTO " + std::string(Table) + " " + std::string(aBuf) + ";");
+	std::thread Thread([this, Query, Milliseconds]()
 	{
 		if(Milliseconds > 0)
 			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
@@ -251,7 +251,7 @@ void CConectionPool::UpdateFormated(int Milliseconds, const char *Table, const c
 	vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
 	#endif
 	aBuf[sizeof(aBuf) - 1] = '\0';
-	std::string Query = "UPDATE " + std::string(Table) + " SET " + std::string(aBuf) + ";";
+	std::string Query("UPDATE " + std::string(Table) + " SET " + std::string(aBuf) + ";");
 	std::thread Thread([this, Query, Milliseconds]()
 	{
 		if(Milliseconds > 0)
@@ -310,7 +310,7 @@ void CConectionPool::DeleteFormated(int Milliseconds, const char *Table, const c
 	vsnprintf(aBuf, sizeof(aBuf), Buffer, args);
 	#endif
 	aBuf[sizeof(aBuf) - 1] = '\0';
-	std::string Query = "DELETE FROM " + std::string(Table) + " " + std::string(aBuf) + ";";
+	std::string Query("DELETE FROM " + std::string(Table) + " " + std::string(aBuf) + ";");
 	std::thread Thread([this, Query, Milliseconds]()
 	{
 		if(Milliseconds > 0)
