@@ -1136,7 +1136,6 @@ void CGS::OnSnap(int ClientID)
 void CGS::OnPreSnap() {}
 void CGS::OnPostSnap()
 {
-	m_World.PostSnap();
 	m_Events.Clear();
 }
 

@@ -174,8 +174,6 @@ public:
 	*/
 	void Snap(int SnappingClient);
 	
-	void PostSnap();
-
 	/*
 		Function: tick
 			Calls tick on all the entities in the world to progress
