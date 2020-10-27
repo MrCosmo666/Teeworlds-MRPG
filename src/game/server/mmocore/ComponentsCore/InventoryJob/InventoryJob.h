@@ -31,7 +31,7 @@ public:
 	int GetCountItemsType(CPlayer* pPlayer, int Type) const;
 
 	// TODO: FIX IT (lock .. unlock)
-	void AddItemSleep(int AccountID, int ItemID, int GiveCount, int Milliseconds);
+	void AddItemSleep(int AccountID, int ItemID, int Count, int Milliseconds);
 };
 
 #endif

@@ -465,33 +465,34 @@ int InventoryJob::GetCountItemsType(CPlayer *pPlayer, int Type) const
 }
 
 // TODO: FIX IT (lock .. unlock)
-static std::map<int, std::mutex > lock_sleep;
-void InventoryJob::AddItemSleep(int AccountID, int ItemID, int GiveCount, int Milliseconds)
+std::mutex lock_sleep;
+void InventoryJob::AddItemSleep(int AccountID, int ItemID, int Count, int Milliseconds)
 {
-	std::thread([this, AccountID, ItemID, GiveCount, Milliseconds]()
+	std::thread Thread([this, AccountID, ItemID, Count, Milliseconds]()
 	{
 		if(Milliseconds > 0)
 			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
 
-		lock_sleep[AccountID].lock();
+		lock_sleep.lock();
 		const int ClientID = Job()->Account()->CheckOnlineAccount(AccountID);
 		CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
 		if(pPlayer)
 		{
-			pPlayer->GetItem(ItemID).Add(GiveCount);
-			lock_sleep[AccountID].unlock();
+			pPlayer->GetItem(ItemID).Add(Count);
+			lock_sleep.unlock();
 			return;
 		}
 
 		ResultPtr pRes = SJK.SD("Count", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, AccountID);
 		if(pRes->next())
 		{
-			const int ReallyCount = (int)pRes->getInt("Count") + GiveCount;
+			const int ReallyCount = (int)pRes->getInt("Count") + Count;
 			SJK.UD("tw_accounts_items", "Count = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", ReallyCount, AccountID, ItemID);
-			lock_sleep[AccountID].unlock();
+			lock_sleep.unlock();
 			return;
 		}
-		SJK.ID("tw_accounts_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '0', '0')", ItemID, AccountID, GiveCount);
-		lock_sleep[AccountID].unlock();
-	}).detach();
+		SJK.ID("tw_accounts_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '0', '0')", ItemID, AccountID, Count);
+		lock_sleep.unlock();
+	});
+	Thread.detach();
 }
