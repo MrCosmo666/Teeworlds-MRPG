@@ -116,7 +116,7 @@ bool CPlayerStepQuestBot::IsCompleteMobs(CPlayer* pPlayer) const
 	return true;
 }
 
-bool CPlayerStepQuestBot::Finish(CPlayer* pPlayer, bool LastDialog)
+bool CPlayerStepQuestBot::Finish(CPlayer* pPlayer, bool FinalStepTalking)
 {
 	CGS* pGS = pPlayer->GS();
 	const int ClientID = pPlayer->GetCID();
@@ -127,7 +127,7 @@ bool CPlayerStepQuestBot::Finish(CPlayer* pPlayer, bool LastDialog)
 		return false;
 	}
 
-	if(!LastDialog)
+	if(!FinalStepTalking)
 	{
 		pGS->CreatePlayerSound(ClientID, SOUND_CTF_CAPTURE);
 		return true;
@@ -148,23 +148,6 @@ bool CPlayerStepQuestBot::Finish(CPlayer* pPlayer, bool LastDialog)
 
 void CPlayerStepQuestBot::DoCollectItem(CPlayer* pPlayer)
 {
-	/* // actions with what is required
-	if(m_Bot->m_InteractiveType == (int)QuestInteractive::INTERACTIVE_RANDOM_ACCEPT_ITEM && m_Bot->m_InteractiveTemp > 0)
-	{
-		const bool Succesful = random_int() % m_Bot->m_InteractiveTemp == 0;
-		for(int i = 0; i < 2; i++)
-		{
-			const int ItemID = m_Bot->m_aItemSearch[i];
-			const int Count = m_Bot->m_aItemSearchCount[i];
-			if(ItemID > 0 && Count > 0)
-				pPlayer->GetItem(ItemID).Remove(Count);
-		}
-
-		if(!Succesful)
-			pGS->Chat(ClientID, "{STR} don't like the item.", m_Bot->GetName());
-		return Succesful;
-	}*/
-
 	// anti stressing with double thread sql result what work one (item)
 	CGS* pGS = pPlayer->GS();
 	bool antiStressing = false;
@@ -282,16 +265,7 @@ void CPlayerStepQuestBot::ShowRequired(CPlayer* pPlayer, const char* TextTalk)
 			if(ItemID <= 0 || CountItem <= 0)
 				continue;
 
-			if(m_Bot->m_InteractiveType == (int)QuestInteractive::INTERACTIVE_RANDOM_ACCEPT_ITEM)
-			{
-				const float Chance = m_Bot->m_InteractiveTemp <= 0 ? 100.0f : (1.0f / (float)m_Bot->m_InteractiveTemp) * 100;
-				str_format(aBuf, sizeof(aBuf), "%s [takes %0.2f%%]", aBuf, Chance);
-			}
-			else
-			{
-				str_format(aBuf, sizeof(aBuf), "%s", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
-			}
-
+			str_format(aBuf, sizeof(aBuf), "%s", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
 			Buffer.append_at(Buffer.length(), aBuf);
 			pGS->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, CountItem, ItemID, false);
 		}
@@ -347,14 +321,6 @@ void CPlayerStepQuestBot::ShowRequired(CPlayer* pPlayer, const char* TextTalk)
 			Buffer.append_at(Buffer.length(), aBuf);
 			IsActiveTask = true;
 		}
-	}
-
-	// type random accept item's
-	if(m_Bot->m_InteractiveType == (int)QuestInteractive::INTERACTIVE_RANDOM_ACCEPT_ITEM)
-	{
-		const double Chance = m_Bot->m_InteractiveTemp <= 0 ? 100.0f : (1.0f / (double)m_Bot->m_InteractiveTemp) * 100;
-		str_format(aBuf, sizeof(aBuf), "\nChance that item he'll like [%0.2f%%]\n", Chance);
-		Buffer.append_at(Buffer.length(), aBuf);
 	}
 
 	// reward item's

@@ -195,12 +195,12 @@ void QuestJob::QuestTableClear(int ClientID)
 	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
-bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, bool LastDialog)
+bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, bool FinalStepTalking)
 {
 	const int QuestID = pBot.m_QuestID;
 	CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
 	if(pPlayerQuest.m_StepsQuestBot.find(pBot.m_SubBotID) != pPlayerQuest.m_StepsQuestBot.end())
-		return pPlayerQuest.m_StepsQuestBot[pBot.m_SubBotID].Finish(pPlayer, LastDialog);
+		return pPlayerQuest.m_StepsQuestBot[pBot.m_SubBotID].Finish(pPlayer, FinalStepTalking);
 	return false;
 }
 

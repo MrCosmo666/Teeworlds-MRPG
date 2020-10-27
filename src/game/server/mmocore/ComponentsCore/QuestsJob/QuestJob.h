@@ -8,7 +8,7 @@
 
 enum QuestInteractive
 {
-	INTERACTIVE_RANDOM_ACCEPT_ITEM = 1,
+	// INTERACTIVE_RANDOM_ACCEPT_ITEM = 1, // Todo this, it is necessary to lead to a fully understandable view of the conversation steps and refactoring it
 	INTERACTIVE_DROP_AND_TAKE_IT = 2,
 };
 
@@ -42,7 +42,7 @@ public:
 	void QuestTableAddInfo(int ClientID, const char* pText, int Requires, int Have);
 	void QuestTableClear(int ClientID);
 
-	bool InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, bool LastDialog);
+	bool InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, bool FinalStepTalking);
 	void AddMobProgressQuests(CPlayer* pPlayer, int BotID);
 	void DoStepDropTakeItems(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot);
 

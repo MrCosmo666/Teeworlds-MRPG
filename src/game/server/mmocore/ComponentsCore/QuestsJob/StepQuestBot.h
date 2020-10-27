@@ -26,7 +26,7 @@ public:
 	int GetCountBlockedItem(CPlayer* pPlayer, int ItemID) const;
 	bool IsCompleteItems(CPlayer* pPlayer) const;
 	bool IsCompleteMobs(CPlayer* pPlayer) const;
-	bool Finish(CPlayer* pPlayer, bool LastDialog);
+	bool Finish(CPlayer* pPlayer, bool FinalStepTalking);
 	void DoCollectItem(CPlayer* pPlayer);
 
 	void AddMobProgress(CPlayer* pPlayer, int BotID);
