@@ -11,19 +11,19 @@ std::map < int , std::map < int , CSkill > > SkillsJob::ms_aSkills;
 
 void SkillsJob::OnInit()
 { 
-	SJK.SDT("*", "tw_skills_list", [&](ResultSet* RES)
+	SJK.SDT("*", "tw_skills_list", [&](ResultPtr pRes)
 	{
-		while(RES->next())
+		while(pRes->next())
 		{
-			const int SkillID = (int)RES->getInt("ID");
-			str_copy(ms_aSkillsData[SkillID].m_aName, RES->getString("SkillName").c_str(), sizeof(ms_aSkillsData[SkillID].m_aName));
-			str_copy(ms_aSkillsData[SkillID].m_aDesc, RES->getString("SkillDesc").c_str(), sizeof(ms_aSkillsData[SkillID].m_aDesc));
-			str_copy(ms_aSkillsData[SkillID].m_aBonusInfo, RES->getString("BonusInfo").c_str(), sizeof(ms_aSkillsData[SkillID].m_aBonusInfo));
-			ms_aSkillsData[SkillID].m_ManaProcent = (int)RES->getInt("ManaProcent");
-			ms_aSkillsData[SkillID].m_PriceSP = (int)RES->getInt("Price");
-			ms_aSkillsData[SkillID].m_MaxLevel = (int)RES->getInt("MaxLevel");
-			ms_aSkillsData[SkillID].m_BonusCount = (int)RES->getInt("BonusCount");
-			ms_aSkillsData[SkillID].m_Passive = (bool)RES->getBoolean("Passive");
+			const int SkillID = (int)pRes->getInt("ID");
+			str_copy(ms_aSkillsData[SkillID].m_aName, pRes->getString("SkillName").c_str(), sizeof(ms_aSkillsData[SkillID].m_aName));
+			str_copy(ms_aSkillsData[SkillID].m_aDesc, pRes->getString("SkillDesc").c_str(), sizeof(ms_aSkillsData[SkillID].m_aDesc));
+			str_copy(ms_aSkillsData[SkillID].m_aBonusInfo, pRes->getString("BonusInfo").c_str(), sizeof(ms_aSkillsData[SkillID].m_aBonusInfo));
+			ms_aSkillsData[SkillID].m_ManaProcent = (int)pRes->getInt("ManaProcent");
+			ms_aSkillsData[SkillID].m_PriceSP = (int)pRes->getInt("Price");
+			ms_aSkillsData[SkillID].m_MaxLevel = (int)pRes->getInt("MaxLevel");
+			ms_aSkillsData[SkillID].m_BonusCount = (int)pRes->getInt("BonusCount");
+			ms_aSkillsData[SkillID].m_Passive = (bool)pRes->getBoolean("Passive");
 		}
 	});
 }
@@ -31,14 +31,14 @@ void SkillsJob::OnInit()
 void SkillsJob::OnInitAccount(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID));
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	while(pRes->next())
 	{
-		const int SkillID = (int)RES->getInt("SkillID");
+		const int SkillID = (int)pRes->getInt("SkillID");
 		ms_aSkills[ClientID][SkillID].SetSkillOwner(pPlayer);
 		ms_aSkills[ClientID][SkillID].m_SkillID = SkillID;
-		ms_aSkills[ClientID][SkillID].m_Level = (int)RES->getInt("SkillLevel");
-		ms_aSkills[ClientID][SkillID].m_SelectedEmoticion = (int)RES->getInt("SelectedEmoticion");
+		ms_aSkills[ClientID][SkillID].m_Level = (int)pRes->getInt("SkillLevel");
+		ms_aSkills[ClientID][SkillID].m_SelectedEmoticion = (int)pRes->getInt("SelectedEmoticion");
 	}		
 }
 

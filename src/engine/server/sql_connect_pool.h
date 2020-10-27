@@ -7,6 +7,7 @@
 
 using namespace sql;
 #define SJK CConectionPool::GetInstance()
+typedef std::unique_ptr<ResultSet> ResultPtr;
 
 class CConectionPool 
 {
@@ -44,8 +45,8 @@ public:
 	void DDS(int Milliseconds, const char *Table, const char *Buffer, ...);
 
 	// database extraction function
-	std::shared_ptr<class ResultSet> SD(const char *Select, const char *Table, const char *Buffer = "", ...);
-	void SDT(const char* Select, const char* Table, std::function<void(class ResultSet*)> func, const char* Buffer = "", ...);
+	ResultPtr SD(const char *Select, const char *Table, const char *Buffer = "", ...);
+	void SDT(const char* Select, const char* Table, std::function<void(ResultPtr)> func, const char* Buffer = "", ...);
 };
 
 #endif

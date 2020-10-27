@@ -1797,15 +1797,15 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		sqlstr::CSqlString<64> cDiscordIDorNick = sqlstr::CSqlString<64>(input.c_str());
 
 		// user lookup
-		std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_data", "WHERE Nick LIKE '%s'LIMIT 5", cDiscordIDorNick.cstr()));
-		while(RES->next())
+		ResultPtr pRes = SJK.SD("*", "tw_accounts_data", "WHERE Nick LIKE '%s'LIMIT 5", cDiscordIDorNick.cstr());
+		while(pRes->next())
 		{
-			const int AuthID = RES->getInt("ID");
+			const int AuthID = pRes->getInt("ID");
 			const int RandomColor = 1000+random_int()%10000000;
 			const int Rank = Server()->GameServer()->GetRank(AuthID);
 
 			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "?player=%s&rank=%d&dicid=%d", RES->getString("Nick").c_str(), Rank, RES->getInt("DiscordEquip"));
+			str_format(aBuf, sizeof(aBuf), "?player=%s&rank=%d&dicid=%d", pRes->getString("Nick").c_str(), Rank, pRes->getInt("DiscordEquip"));
 			SendGenerateMessage(std::string(message.channelID).c_str(), std::to_string(RandomColor).c_str(), "Discord MRPG Card", aBuf);
 			Found = true;
 		}
@@ -1834,11 +1834,11 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		sqlstr::CSqlString<64> cDiscordID = sqlstr::CSqlString<64>(UserID.c_str());
 
 		// get connected
-		std::shared_ptr<ResultSet> RES(SJK.SD("Nick", "tw_accounts_data", "WHERE DiscordID = '%s'", cDiscordID.cstr()));
+		ResultPtr pRes = SJK.SD("Nick", "tw_accounts_data", "WHERE DiscordID = '%s'", cDiscordID.cstr());
 		while(RES->next())
 		{
 			// send a connected message
-			Nick = RES->getString("Nick").c_str();
+			Nick = pRes->getString("Nick").c_str();
 			SendMessage(std::string(message.channelID).c_str(), DC_DISCORD_BOT, "Good work :)", "**Your account is enabled: Nickname in-game: " + Nick + "**");
 			Found = true;
 		}
@@ -1921,14 +1921,14 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		std::string Names = "";
 		std::string Levels = "";
 		std::string GoldValues = "";
-		std::shared_ptr<ResultSet> RES(SJK.SD("a.ID, ad.Nick AS `Nick`, ad.Level AS `Level`, g.Count AS `Gold`", "tw_accounts a", "JOIN tw_accounts_data ad ON a.ID = ad.ID LEFT JOIN tw_accounts_items g ON a.ID = g.OwnerID AND g.ItemID = 1 ORDER BY %s LIMIT 10", (message.startsWith("!mgoldranking") ? "g.Count DESC, ad.Level DESC" : "ad.Level DESC, g.Count DESC")));
-		while (RES->next())
+		ResultPtr pRes = SJK.SD("a.ID, ad.Nick AS `Nick`, ad.Level AS `Level`, g.Count AS `Gold`", "tw_accounts a", "JOIN tw_accounts_data ad ON a.ID = ad.ID LEFT JOIN tw_accounts_items g ON a.ID = g.OwnerID AND g.ItemID = 1 ORDER BY %s LIMIT 10", (message.startsWith("!mgoldranking") ? "g.Count DESC, ad.Level DESC" : "ad.Level DESC, g.Count DESC"));
+		while (pRes->next())
 		{
-			Names += std::to_string(Rank) + ". **" + RES->getString("Nick").c_str() + "**\n";
+			Names += std::to_string(Rank) + ". **" + pRes->getString("Nick").c_str() + "**\n";
 			Rank++;
 
-			Levels += std::to_string(RES->getInt("Level")) + "\n";
-			GoldValues += std::to_string(RES->getInt("Gold")) + "\n";
+			Levels += std::to_string(pRes->getInt("Level")) + "\n";
+			GoldValues += std::to_string(pRes->getInt("Gold")) + "\n";
 		}
 
 		embed.fields.push_back(SleepyDiscord::EmbedField("Name", Names, true));

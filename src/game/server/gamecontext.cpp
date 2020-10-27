@@ -1097,15 +1097,6 @@ void CGS::OnTick()
 		}
 	}
 
-	SJK.UD("tw_accounts", "ID = '1' WHERE ID = '1'");
-	SJK.UD("tw_accounts", "ID = '1' WHERE ID = '1'");
-	SJK.UD("tw_accounts", "ID = '1' WHERE ID = '1'");
-	SJK.UD("tw_accounts", "ID = '1' WHERE ID = '1'");
-	SJK.UD("tw_accounts", "ID = '1' WHERE ID = '1'");
-	SJK.UD("tw_accounts", "ID = '1' WHERE ID = '1'");
-	SJK.UD("tw_accounts", "ID = '1' WHERE ID = '1'");
-	SJK.UD("tw_accounts", "ID = '1' WHERE ID = '1'");
-
 	Mmo()->OnTick();
 }
 
@@ -1672,16 +1663,15 @@ void CGS::ConConvertPasswords(IConsole::IResult* pResult, void* pUserData)
 	IServer* pServer = (IServer*)pUserData;
 	CGS* pSelf = (CGS*)pServer->GameServer(MAIN_WORLD_ID);
 
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID, Password", "tw_accounts", "WHERE PasswordSalt IS NULL OR PasswordSalt = ''"));
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("ID, Password", "tw_accounts", "WHERE PasswordSalt IS NULL OR PasswordSalt = ''");
+	while(pRes->next())
 	{
 		char aSalt[32] = { 0 };
 		secure_random_password(aSalt, sizeof(aSalt), 24);
 
-		std::string Password = pSelf->Mmo()->Account()->HashPassword(RES->getString("Password").c_str(), aSalt);
-
-		SJK.UD("tw_accounts", "Password = '%s', PasswordSalt = '%s' WHERE ID = %d", Password.c_str(), aSalt, RES->getInt("ID"));
-		dbg_msg("mrpg", "%d: %s -> %s", RES->getInt("ID"), RES->getString("Password").c_str(), Password.c_str());
+		std::string Password = pSelf->Mmo()->Account()->HashPassword(pRes->getString("Password").c_str(), aSalt);
+		SJK.UD("tw_accounts", "Password = '%s', PasswordSalt = '%s' WHERE ID = %d", Password.c_str(), aSalt, pRes->getInt("ID"));
+		dbg_msg("mrpg", "%d: %s -> %s", pRes->getInt("ID"), pRes->getString("Password").c_str(), Password.c_str());
 	}
 }
 

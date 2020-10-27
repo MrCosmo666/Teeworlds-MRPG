@@ -9,18 +9,18 @@ std::list < WorldSwapJob::StructPositionLogic > WorldSwapJob::ms_aWorldPositionL
 
 void WorldSwapJob::OnInit()
 {
-	SJK.SDT("*", "tw_world_swap", [&](ResultSet* RES)
+	SJK.SDT("*", "tw_world_swap", [&](ResultPtr pRes)
 	{
-		while(RES->next())
+		while(pRes->next())
 		{
-			const int ID = RES->getInt("ID");
-			ms_aWorldSwap[ID].m_OpenQuestID = RES->getInt("OpenQuestID");
-			ms_aWorldSwap[ID].m_PositionX = RES->getInt("PositionX");
-			ms_aWorldSwap[ID].m_PositionY = RES->getInt("PositionY");
-			ms_aWorldSwap[ID].m_WorldID = RES->getInt("WorldID");
-			ms_aWorldSwap[ID].m_TwoPositionX = RES->getInt("TwoPositionX");
-			ms_aWorldSwap[ID].m_TwoPositionY = RES->getInt("TwoPositionY");
-			ms_aWorldSwap[ID].m_TwoWorldID = RES->getInt("TwoWorldID");
+			const int ID = pRes->getInt("ID");
+			ms_aWorldSwap[ID].m_OpenQuestID = pRes->getInt("OpenQuestID");
+			ms_aWorldSwap[ID].m_PositionX = pRes->getInt("PositionX");
+			ms_aWorldSwap[ID].m_PositionY = pRes->getInt("PositionY");
+			ms_aWorldSwap[ID].m_WorldID = pRes->getInt("WorldID");
+			ms_aWorldSwap[ID].m_TwoPositionX = pRes->getInt("TwoPositionX");
+			ms_aWorldSwap[ID].m_TwoPositionY = pRes->getInt("TwoPositionY");
+			ms_aWorldSwap[ID].m_TwoWorldID = pRes->getInt("TwoWorldID");
 		}
 
 		for(const auto& swapw : ms_aWorldSwap)
@@ -43,14 +43,14 @@ void WorldSwapJob::OnInit()
 
 void WorldSwapJob::OnInitWorld(const char* pWhereLocalWorld)
 {
-	SJK.SDT("RespawnWorld, MusicID", "ENUM_WORLDS", [&](ResultSet* RES)
+	SJK.SDT("RespawnWorld, MusicID", "ENUM_WORLDS", [&](ResultPtr pRes)
 	{
 		const int WorldID = GS()->GetWorldID();
 		const CSqlString<32> world_name = CSqlString<32>(GS()->Server()->GetWorldName(WorldID));
-		if(RES->next())
+		if(pRes->next())
 		{
-			const int RespawnWorld = (int)RES->getInt("RespawnWorld");
-			const int MusicID = (int)RES->getInt("MusicID");
+			const int RespawnWorld = (int)pRes->getInt("RespawnWorld");
+			const int MusicID = (int)pRes->getInt("MusicID");
 			SJK.UD("ENUM_WORLDS", "Name = '%s' WHERE WorldID = '%d'", world_name.cstr(), WorldID);
 			GS()->SetRespawnWorld(RespawnWorld);
 			GS()->SetMapMusic(MusicID);

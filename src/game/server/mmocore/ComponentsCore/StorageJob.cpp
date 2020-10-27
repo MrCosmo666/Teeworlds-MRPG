@@ -35,16 +35,16 @@ void StorageJob::ShowStorageMenu(CPlayer* pPlayer, int StorageID)
 
 void StorageJob::OnInit()
 {
-	SJK.SDT("*", "tw_storages", [&](ResultSet* RES)
+	SJK.SDT("*", "tw_storages", [&](ResultPtr pRes)
 	{
-		while(RES->next())
+		while(pRes->next())
 		{
-			const int ID = (int)RES->getInt("ID");
-			ms_aStorage[ID].m_PosX = (int)RES->getInt("PosX");
-			ms_aStorage[ID].m_PosY = (int)RES->getInt("PosY");
-			ms_aStorage[ID].m_Currency = (int)RES->getInt("Currency");
-			ms_aStorage[ID].m_WorldID = (int)RES->getInt("WorldID");
-			str_copy(ms_aStorage[ID].m_aName, RES->getString("Name").c_str(), sizeof(ms_aStorage[ID].m_aName));
+			const int ID = (int)pRes->getInt("ID");
+			ms_aStorage[ID].m_PosX = (int)pRes->getInt("PosX");
+			ms_aStorage[ID].m_PosY = (int)pRes->getInt("PosY");
+			ms_aStorage[ID].m_Currency = (int)pRes->getInt("Currency");
+			ms_aStorage[ID].m_WorldID = (int)pRes->getInt("WorldID");
+			str_copy(ms_aStorage[ID].m_aName, pRes->getString("Name").c_str(), sizeof(ms_aStorage[ID].m_aName));
 		}
 	});
 }

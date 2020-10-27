@@ -9,25 +9,25 @@ std::map < int , AccountPlantJob::StructPlants > AccountPlantJob::ms_aPlants;
 
 void AccountPlantJob::OnInitWorld(const char* pWhereLocalWorld)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_position_plant", pWhereLocalWorld));
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_position_plant", pWhereLocalWorld);
+	while(pRes->next())
 	{
-		const int ID = RES->getInt("ID");
-		ms_aPlants[ID].m_ItemID = RES->getInt("ItemID");
-		ms_aPlants[ID].m_Level = RES->getInt("Level");
-		ms_aPlants[ID].m_PositionX = RES->getInt("PositionX");
-		ms_aPlants[ID].m_PositionY = RES->getInt("PositionY");	
-		ms_aPlants[ID].m_Distance = RES->getInt("Distance");
+		const int ID = pRes->getInt("ID");
+		ms_aPlants[ID].m_ItemID = pRes->getInt("ItemID");
+		ms_aPlants[ID].m_Level = pRes->getInt("Level");
+		ms_aPlants[ID].m_PositionX = pRes->getInt("PositionX");
+		ms_aPlants[ID].m_PositionY = pRes->getInt("PositionY");
+		ms_aPlants[ID].m_Distance = pRes->getInt("Distance");
 	}
 }
 
 void AccountPlantJob::OnInitAccount(CPlayer *pPlayer)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_plants", "WHERE AccountID = '%d'", pPlayer->Acc().m_AuthID));
-	if(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_plants", "WHERE AccountID = '%d'", pPlayer->Acc().m_AuthID);
+	if(pRes->next())
 	{
 		for(int i = 0; i < NUM_PLANT; i++)
-			pPlayer->Acc().m_aPlant[i] = RES->getInt(str_PLANT((PLANT) i));
+			pPlayer->Acc().m_aPlant[i] = pRes->getInt(str_PLANT((PLANT) i));
 		return;
 	}
 	pPlayer->Acc().m_aPlant[PlLevel] = 1;

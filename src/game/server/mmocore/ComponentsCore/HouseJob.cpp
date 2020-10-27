@@ -12,23 +12,23 @@ std::map <int, HouseJob::HouseList> HouseJob::ms_aHouse;
 void HouseJob::OnInitWorld(const char* pWhereLocalWorld) 
 {
 	// load house
-	SJK.SDT("*", "tw_houses", [&](ResultSet* RES)
+	SJK.SDT("*", "tw_houses", [&](ResultPtr pRes)
 	{
-		while(RES->next())
+		while(pRes->next())
 		{
-			const int HouseID = RES->getInt("ID");
-			ms_aHouse[HouseID].m_DoorX = RES->getInt("DoorX");
-			ms_aHouse[HouseID].m_DoorY = RES->getInt("DoorY");
-			ms_aHouse[HouseID].m_PosX = RES->getInt("PosX");
-			ms_aHouse[HouseID].m_PosY = RES->getInt("PosY");
-			ms_aHouse[HouseID].m_OwnerID = RES->getInt("OwnerID");
-			ms_aHouse[HouseID].m_Price = RES->getInt("Price");
-			ms_aHouse[HouseID].m_Bank = RES->getInt("HouseBank");
-			ms_aHouse[HouseID].m_WorldID = RES->getInt("WorldID");
-			str_copy(ms_aHouse[HouseID].m_aClass, RES->getString("Class").c_str(), sizeof(ms_aHouse[HouseID].m_aClass));
-			ms_aHouse[HouseID].m_PlantID = RES->getInt("PlantID");
-			ms_aHouse[HouseID].m_PlantPosX = RES->getInt("PlantX");
-			ms_aHouse[HouseID].m_PlantPosY = RES->getInt("PlantY");
+			const int HouseID = pRes->getInt("ID");
+			ms_aHouse[HouseID].m_DoorX = pRes->getInt("DoorX");
+			ms_aHouse[HouseID].m_DoorY = pRes->getInt("DoorY");
+			ms_aHouse[HouseID].m_PosX = pRes->getInt("PosX");
+			ms_aHouse[HouseID].m_PosY = pRes->getInt("PosY");
+			ms_aHouse[HouseID].m_OwnerID = pRes->getInt("OwnerID");
+			ms_aHouse[HouseID].m_Price = pRes->getInt("Price");
+			ms_aHouse[HouseID].m_Bank = pRes->getInt("HouseBank");
+			ms_aHouse[HouseID].m_WorldID = pRes->getInt("WorldID");
+			str_copy(ms_aHouse[HouseID].m_aClass, pRes->getString("Class").c_str(), sizeof(ms_aHouse[HouseID].m_aClass));
+			ms_aHouse[HouseID].m_PlantID = pRes->getInt("PlantID");
+			ms_aHouse[HouseID].m_PlantPosX = pRes->getInt("PlantX");
+			ms_aHouse[HouseID].m_PlantPosY = pRes->getInt("PlantY");
 			if(GS()->GetWorldID() == ms_aHouse[HouseID].m_WorldID && ms_aHouse[HouseID].m_OwnerID > 0 && !ms_aHouse[HouseID].m_Door)
 			{
 				ms_aHouse[HouseID].m_Door = 0;
@@ -41,13 +41,13 @@ void HouseJob::OnInitWorld(const char* pWhereLocalWorld)
 	// load decoration
 	if(ms_aDecorationHouse.empty())
 	{
-		SJK.SDT("*", "tw_houses_decorations", [&](ResultSet* DecoRES)
+		SJK.SDT("*", "tw_houses_decorations", [&](ResultPtr pRes)
 		{
-			while(DecoRES->next())
+			while(pRes->next())
 			{
-				const int DecoID = DecoRES->getInt("ID");
-				ms_aDecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(DecoRES->getInt("X"),
-					DecoRES->getInt("Y")), DecoRES->getInt("HouseID"), DecoRES->getInt("DecoID"));
+				const int DecoID = pRes->getInt("ID");
+				ms_aDecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(pRes->getInt("X"),
+					pRes->getInt("Y")), pRes->getInt("HouseID"), pRes->getInt("DecoID"));
 			}
 			Job()->ShowLoadingProgress("Houses Decorations", ms_aDecorationHouse.size());
 		}, pWhereLocalWorld);
@@ -94,11 +94,12 @@ bool HouseJob::AddDecorationHouse(int DecoID, int HouseID, vec2 Position)
 	if(distance(PositionHouse, Position) > 400.0f)
 		return false;
 
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_houses_decorations", "WHERE HouseID = '%d'", HouseID));
-	if((int)RES->rowsCount() >= g_Config.m_SvLimitDecoration) return false;
+	ResultPtr pRes = SJK.SD("ID", "tw_houses_decorations", "WHERE HouseID = '%d'", HouseID);
+	if((int)pRes->rowsCount() >= g_Config.m_SvLimitDecoration) 
+		return false;
 
-	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_houses_decorations", "ORDER BY ID DESC LIMIT 1"));
-	int InitID = (RES2->next() ? RES2->getInt("ID")+1 : 1); 
+	ResultPtr pRes2 = SJK.SD("ID", "tw_houses_decorations", "ORDER BY ID DESC LIMIT 1");
+	int InitID = (pRes2->next() ? pRes2->getInt("ID")+1 : 1);
 
 	SJK.ID("tw_houses_decorations", "(ID, DecoID, HouseID, X, Y, WorldID) VALUES ('%d', '%d', '%d', '%d', '%d', '%d')", 
 		InitID, DecoID, HouseID, (int)Position.x, (int)Position.y, GS()->GetWorldID());
@@ -245,10 +246,10 @@ void HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 		return;
 	}
 
-	std::shared_ptr<ResultSet> RES(SJK.SD("OwnerID, Price", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NULL", HouseID));
-	if(RES->next())
+	ResultPtr pRes = SJK.SD("OwnerID, Price", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NULL", HouseID);
+	if(pRes->next())
 	{
-		const int Price = RES->getInt("Price");
+		const int Price = pRes->getInt("Price");
 		if(!pPlayer->SpendCurrency(Price))	
 			return;
 
@@ -267,11 +268,11 @@ void HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 
 void HouseJob::SellHouse(int HouseID)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("HouseBank, OwnerID", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NOT NULL", HouseID));
-	if(RES->next())
+	ResultPtr pRes = SJK.SD("HouseBank, OwnerID", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NOT NULL", HouseID);
+	if(pRes->next())
 	{
-		const int OwnerID = RES->getInt("OwnerID");
-		const int Price = ms_aHouse[HouseID].m_Price + RES->getInt("HouseBank");
+		const int OwnerID = pRes->getInt("OwnerID");
+		const int Price = ms_aHouse[HouseID].m_Price + pRes->getInt("HouseBank");
 		GS()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itGold, Price, 0);
 		SJK.UD("tw_houses", "OwnerID = NULL, HouseBank = '0' WHERE ID = '%d'", HouseID);
 
@@ -384,12 +385,12 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 void HouseJob::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
 {
 	const int ClientID = pPlayer->GetCID();
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID));
-	if(!RES->next())
+	ResultPtr pRes = SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	if(!pRes->next())
 		return;
 
-	const int HouseID = RES->getInt("ID");
-	const int Bank = (int)RES->getInt("HouseBank");
+	const int HouseID = pRes->getInt("ID");
+	const int Bank = (int)pRes->getInt("HouseBank");
 	if(Bank < TakeCount)
 	{
 		GS()->Chat(ClientID, "Acceptable for take {INT}gold", &Bank);
@@ -405,12 +406,12 @@ void HouseJob::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
 void HouseJob::AddSafeDeposit(CPlayer *pPlayer, int Balance)
 {
 	const int ClientID = pPlayer->GetCID();
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID));
-	if(!RES->next())
+	ResultPtr pRes = SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	if(!pRes->next())
 		return;
 
-	const int HouseID = RES->getInt("ID");
-	ms_aHouse[HouseID].m_Bank = RES->getInt("HouseBank") + Balance;            
+	const int HouseID = pRes->getInt("ID");
+	ms_aHouse[HouseID].m_Bank = pRes->getInt("HouseBank") + Balance;
 	GS()->Chat(ClientID, "You put {INT} gold in the safe {INT}!", &Balance, &ms_aHouse[HouseID].m_Bank);
 	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", ms_aHouse[HouseID].m_Bank, HouseID);
 }

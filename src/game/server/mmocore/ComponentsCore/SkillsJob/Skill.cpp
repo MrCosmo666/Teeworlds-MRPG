@@ -113,8 +113,8 @@ bool CSkill::Upgrade()
 		return false;
 
 	const int ClientID = m_pPlayer->GetCID();
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_skills", "WHERE SkillID = '%d' AND OwnerID = '%d'", m_SkillID, m_pPlayer->Acc().m_AuthID));
-	if(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_skills", "WHERE SkillID = '%d' AND OwnerID = '%d'", m_SkillID, m_pPlayer->Acc().m_AuthID);
+	if(pRes->next())
 	{
 		m_Level++;
 		SJK.UD("tw_accounts_skills", "SkillLevel = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", m_Level, m_SkillID, m_pPlayer->Acc().m_AuthID);

@@ -10,22 +10,22 @@ std::map < int , CraftJob::CraftStruct > CraftJob::ms_aCraft;
 
 void CraftJob::OnInit()
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_craft_list"));
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_craft_list");
+	while(pRes->next())
 	{
-		const int ID = RES->getInt("ID");
-		ms_aCraft[ID].m_ReceivedItemID = RES->getInt("GetItem");
-		ms_aCraft[ID].m_ReceivedItemCount = RES->getInt("GetItemCount");
-		ms_aCraft[ID].m_Price = RES->getInt("Price");
-		ms_aCraft[ID].m_WorldID = RES->getInt("WorldID");
+		const int ID = pRes->getInt("ID");
+		ms_aCraft[ID].m_ReceivedItemID = pRes->getInt("GetItem");
+		ms_aCraft[ID].m_ReceivedItemCount = pRes->getInt("GetItemCount");
+		ms_aCraft[ID].m_Price = pRes->getInt("Price");
+		ms_aCraft[ID].m_WorldID = pRes->getInt("WorldID");
 
 		char aBuf[32];
 		for(int i = 0; i < 3; i ++)
 		{
 			str_format(aBuf, sizeof(aBuf), "ItemNeed%d", i);
-			ms_aCraft[ID].m_aItemNeedID[i] = RES->getInt(aBuf);
+			ms_aCraft[ID].m_aItemNeedID[i] = pRes->getInt(aBuf);
 		}
-		str_copy(aBuf, RES->getString("ItemNeedCount").c_str(), sizeof(aBuf));
+		str_copy(aBuf, pRes->getString("ItemNeedCount").c_str(), sizeof(aBuf));
 		if (!sscanf(aBuf, "%d %d %d", &ms_aCraft[ID].m_aItemNeedCount[0], &ms_aCraft[ID].m_aItemNeedCount[1], &ms_aCraft[ID].m_aItemNeedCount[2]))
 			dbg_msg("Error", "Error on scanf in Crafting");
 	}

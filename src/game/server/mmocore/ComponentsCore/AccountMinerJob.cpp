@@ -77,11 +77,11 @@ void AccountMinerJob::Work(CPlayer *pPlayer, int Level)
 
 void AccountMinerJob::OnInitAccount(CPlayer* pPlayer)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_miner", "WHERE AccountID = '%d'", pPlayer->Acc().m_AuthID));
-	if (RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_miner", "WHERE AccountID = '%d'", pPlayer->Acc().m_AuthID);
+	if (pRes->next())
 	{
 		for (int i = 0; i < NUM_MINER; i++)
-			pPlayer->Acc().m_aMiner[i] = RES->getInt(str_MINER((MINER)i));
+			pPlayer->Acc().m_aMiner[i] = pRes->getInt(str_MINER((MINER)i));
 		return;
 	}
 	pPlayer->Acc().m_aMiner[MnrLevel] = 1;
@@ -91,16 +91,16 @@ void AccountMinerJob::OnInitAccount(CPlayer* pPlayer)
 
 void AccountMinerJob::OnInitWorld(const char* pWhereLocalWorld)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_position_miner", pWhereLocalWorld));
-	while (RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_position_miner", pWhereLocalWorld);
+	while (pRes->next())
 	{
-		const int ID = RES->getInt("ID");
-		ms_aOre[ID].m_ItemID = RES->getInt("ItemID");
-		ms_aOre[ID].m_Level = RES->getInt("Level");
-		ms_aOre[ID].m_StartHealth = RES->getInt("Health");
-		ms_aOre[ID].m_PositionX = RES->getInt("PositionX");
-		ms_aOre[ID].m_PositionY = RES->getInt("PositionY");
-		ms_aOre[ID].m_Distance = RES->getInt("Distance");
+		const int ID = pRes->getInt("ID");
+		ms_aOre[ID].m_ItemID = pRes->getInt("ItemID");
+		ms_aOre[ID].m_Level = pRes->getInt("Level");
+		ms_aOre[ID].m_StartHealth = pRes->getInt("Health");
+		ms_aOre[ID].m_PositionX = pRes->getInt("PositionX");
+		ms_aOre[ID].m_PositionY = pRes->getInt("PositionY");
+		ms_aOre[ID].m_Distance = pRes->getInt("Distance");
 	}
 }
 

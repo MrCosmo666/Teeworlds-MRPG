@@ -11,17 +11,17 @@ std::map < int , DungeonJob::StructDungeon > DungeonJob::ms_aDungeon;
 
 DungeonJob::DungeonJob()
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons"));
-	while (RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_dungeons");
+	while (pRes->next())
 	{
-		const int ID = RES->getInt("ID");
-		str_copy(ms_aDungeon[ID].m_aName, RES->getString("Name").c_str(), sizeof(ms_aDungeon[ID].m_aName));
-		ms_aDungeon[ID].m_Level = RES->getInt("Level");
-		ms_aDungeon[ID].m_DoorX = RES->getInt("DoorX");
-		ms_aDungeon[ID].m_DoorY = RES->getInt("DoorY");
-		ms_aDungeon[ID].m_OpenQuestID = RES->getInt("OpenQuestID");
-		ms_aDungeon[ID].m_WorldID = RES->getInt("WorldID");
-		ms_aDungeon[ID].m_IsStory = (bool)RES->getBoolean("Story");
+		const int ID = pRes->getInt("ID");
+		str_copy(ms_aDungeon[ID].m_aName, pRes->getString("Name").c_str(), sizeof(ms_aDungeon[ID].m_aName));
+		ms_aDungeon[ID].m_Level = pRes->getInt("Level");
+		ms_aDungeon[ID].m_DoorX = pRes->getInt("DoorX");
+		ms_aDungeon[ID].m_DoorY = pRes->getInt("DoorY");
+		ms_aDungeon[ID].m_OpenQuestID = pRes->getInt("OpenQuestID");
+		ms_aDungeon[ID].m_WorldID = pRes->getInt("WorldID");
+		ms_aDungeon[ID].m_IsStory = (bool)pRes->getBoolean("Story");
 	}
 }
 
@@ -33,10 +33,10 @@ bool DungeonJob::IsDungeonWorld(int WorldID) const
 
 void DungeonJob::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "WHERE OwnerID = '%d' AND DungeonID = '%d'", pPlayer->Acc().m_AuthID, DungeonID));
-	if (RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_dungeons_records", "WHERE OwnerID = '%d' AND DungeonID = '%d'", pPlayer->Acc().m_AuthID, DungeonID);
+	if (pRes->next())
 	{
-		if (RES->getInt("Seconds") > Seconds)
+		if (pRes->getInt("Seconds") > Seconds)
 			SJK.UD("tw_dungeons_records", "Seconds = '%d' WHERE OwnerID = '%d' AND DungeonID = '%d'", Seconds, pPlayer->Acc().m_AuthID, DungeonID);
 		return;
 	}
@@ -46,12 +46,12 @@ void DungeonJob::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds)
 void DungeonJob::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
 {
 	const int ClientID = pPlayer->GetCID();
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_records", "WHERE DungeonID = '%d' ORDER BY Seconds ASC LIMIT 5", DungeonID));
-	while (RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_dungeons_records", "WHERE DungeonID = '%d' ORDER BY Seconds ASC LIMIT 5", DungeonID);
+	while (pRes->next())
 	{
-		const int Rank = RES->getRow();
-		const int OwnerID = RES->getInt("OwnerID");
-		const int BaseSeconds = RES->getDouble("Seconds");
+		const int Rank = pRes->getRow();
+		const int OwnerID = pRes->getInt("OwnerID");
+		const int BaseSeconds = pRes->getDouble("Seconds");
 
 		const int Minutes = BaseSeconds / 60;
 		const int Seconds = BaseSeconds - (BaseSeconds / 60 * 60);
