@@ -43,9 +43,6 @@ void CEventHandler::Clear()
 
 void CEventHandler::Snap(int SnappingClient)
 {
-	if(!GS()->IsPlayerEqualWorldID(SnappingClient))
-		return;
-
 	for(int i = 0; i < m_NumEvents; i++)
 	{
 		if(m_aTypes[i] > NETEVENTTYPE_DAMAGE && !GS()->IsMmoClient(SnappingClient))

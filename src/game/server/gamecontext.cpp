@@ -1120,16 +1120,17 @@ void CGS::OnTickMainWorld()
 // output of all objects
 void CGS::OnSnap(int ClientID)
 {
-	if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->GetPlayerWorldID() != GetWorldID())
+	CPlayer* pPlayer = m_apPlayers[ClientID];
+	if(pPlayer && !pPlayer->IsBot() && pPlayer->GetPlayerWorldID() != GetWorldID())
 		return;
 
 	m_World.Snap(ClientID);
 	m_pController->Snap(ClientID);
 	m_Events.Snap(ClientID);
-	for(auto & apPlayer : m_apPlayers)
+	for(auto& arpPlayer : m_apPlayers)
 	{
-		if(apPlayer)
-			apPlayer->Snap(ClientID);
+		if(arpPlayer)
+			arpPlayer->Snap(ClientID);
 	}
 }
 
