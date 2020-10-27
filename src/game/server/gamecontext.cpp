@@ -1125,7 +1125,7 @@ void CGS::OnSnap(int ClientID)
 		return;
 
 	m_World.Snap(ClientID);
-	m_pController->Snap(ClientID);
+	m_pController->Snap();
 	m_Events.Snap(ClientID);
 	for(auto& arpPlayer : m_apPlayers)
 	{
