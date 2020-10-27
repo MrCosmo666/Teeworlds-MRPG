@@ -358,6 +358,7 @@ ResultPtr CConectionPool::SD(const char* Select, const char* Table, const char* 
 
 	SqlThreadRecursiveLock.lock();
 	std::string Query("SELECT " + std::string(Select) + " FROM " + std::string(Table) + " " + std::string(aBuf) + ";");
+	m_pDriver->threadInit();
 	Connection* pConnection = SJK.GetConnection();
 	ResultPtr pResult = nullptr;
 	try
@@ -371,6 +372,7 @@ ResultPtr CConectionPool::SD(const char* Select, const char* Table, const char* 
 		pError = e.what();
 	}
 	SJK.ReleaseConnection(pConnection);
+	m_pDriver->threadEnd();
 	SqlThreadRecursiveLock.unlock();
 
 	if(pError != nullptr)
