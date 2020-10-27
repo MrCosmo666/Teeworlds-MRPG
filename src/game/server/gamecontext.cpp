@@ -1121,7 +1121,7 @@ void CGS::OnTickMainWorld()
 void CGS::OnSnap(int ClientID)
 {
 	CPlayer* pPlayer = m_apPlayers[ClientID];
-	if(pPlayer && !pPlayer->IsBot() && pPlayer->GetPlayerWorldID() != GetWorldID())
+	if(!pPlayer || pPlayer->GetPlayerWorldID() != GetWorldID())
 		return;
 
 	m_World.Snap(ClientID);
