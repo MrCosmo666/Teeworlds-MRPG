@@ -8,13 +8,13 @@
 class CSnapFull : public CEntity
 {
 public:
-	CSnapFull(CGameWorld *pGameWorld, vec2 Pos, int SnapID, int Owner, int Num, int Type, bool Changing, bool Projectile);
+	CSnapFull(CGameWorld *pGameWorld, vec2 Pos, int SnapID, int ClientID, int Num, int Type, bool Changing, bool Projectile);
 	~CSnapFull();
 
 	virtual void Snap(int SnappingClient);
 	virtual void Tick();
 
-	int GetOwner() const { return m_Owner; }
+	int GetOwner() const { return m_ClientID; }
 	void AddItem(int Count, int Type, bool Projectile, bool Dynamic, int SnapID);
 	void RemoveItem(int Count, int SnapID, bool Effect);
 
@@ -29,7 +29,7 @@ private:
 	};
 	std::list < struct SnapItem > m_SnapItem;
 
-	int m_Owner;
+	int m_ClientID;
 	int m_LoadingTick;
 	bool m_boolreback;
 };

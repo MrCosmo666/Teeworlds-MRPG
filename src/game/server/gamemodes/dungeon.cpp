@@ -25,11 +25,11 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	ChangeState(DUNGEON_WAITING);
 
 	// key door construction
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_dungeons_door", "WHERE DungeonID = '%d'", m_DungeonID));
-	while (RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_dungeons_door", "WHERE DungeonID = '%d'", m_DungeonID);
+	while (pRes->next())
 	{
-		const int DungeonBotID = RES->getInt("BotID");
-		vec2 Position = vec2(RES->getInt("PosX"), RES->getInt("PosY"));
+		const int DungeonBotID = pRes->getInt("BotID");
+		vec2 Position = vec2(pRes->getInt("PosX"), pRes->getInt("PosY"));
 		new CLogicDungeonDoorKey(&GS()->m_World, Position, DungeonBotID);
 	}
 }
@@ -265,7 +265,7 @@ bool CGameControllerDungeon::OnCharacterSpawn(CCharacter* pChr)
 			{
 				if(!GS()->m_apPlayers[i] || !GS()->IsPlayerEqualWorldID(i, m_WorldID))
 					continue;
-				GS()->UpdateVotes(i, MenuList::MENU_DUNGEONS);
+				GS()->StrongUpdateVotes(i, MenuList::MENU_DUNGEONS);
 			}
 		}
 	}

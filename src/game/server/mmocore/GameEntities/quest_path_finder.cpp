@@ -6,37 +6,36 @@
 #include <game/server/gamecontext.h>
 #include "quest_path_finder.h"
 
-CQuestPathFinder::CQuestPathFinder(CGameWorld *pGameWorld, vec2 Pos, int ClientID, int QuestID, int QuestProgress, vec2 TargetPos)
+CQuestPathFinder::CQuestPathFinder(CGameWorld* pGameWorld, vec2 Pos, int ClientID, BotJob::QuestBotInfo QuestBot)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_FINDQUEST, Pos)
 {
-	m_QuestID = QuestID;
-	m_QuestProgress = QuestProgress;
 	m_ClientID = ClientID;
-	m_TargetPos = TargetPos;
-	m_MainScenario = str_startswith(GS()->Mmo()->Quest()->GetStoryName(m_QuestID), "Main:") != nullptr;
+	m_SubBotID = QuestBot.m_SubBotID;
+	m_TargetPos = GS()->Mmo()->WorldSwap()->GetPositionQuestBot(ClientID, QuestBot);
+	m_MainScenario = str_startswith(GS()->GetQuestInfo(QuestBot.m_QuestID).GetStory(), "Main:") != nullptr;
 	GameWorld()->InsertEntity(this);
 }
 
 void CQuestPathFinder::Tick() 
 {
+	const int QuestID = BotJob::ms_aQuestBot[m_SubBotID].m_QuestID;
+	const int Step = BotJob::ms_aQuestBot[m_SubBotID].m_Step;
 	CPlayer* pPlayer = GS()->GetPlayer(m_ClientID, true, true);
-	if (m_TargetPos == vec2(0.0f, 0.0f) || !pPlayer || QuestJob::ms_aQuests[m_ClientID][m_QuestID].m_Step != m_QuestProgress || QuestJob::ms_aQuests[m_ClientID][m_QuestID].m_State != QuestState::QUEST_ACCEPT)
+	if(!pPlayer || !length(m_TargetPos))
 	{
-		Finish();
+		GS()->m_World.DestroyEntity(this);
 		return;
 	}
-	vec2 Direction = normalize(GS()->m_apPlayers[m_ClientID]->GetCharacter()->m_Core.m_Pos - m_TargetPos);
-	m_Pos = GS()->m_apPlayers[m_ClientID]->GetCharacter()->m_Core.m_Pos - Direction * 90;
-}
-
-void CQuestPathFinder::Finish()
-{
-	if(GS()->GetPlayer(m_ClientID, true, true))
+	if (pPlayer->GetQuest(QuestID).m_Step != Step || pPlayer->GetQuest(QuestID).GetState() != QuestState::QUEST_ACCEPT || pPlayer->GetQuest(QuestID).m_StepsQuestBot[m_SubBotID].m_StepComplete)
 	{
 		GS()->CreateDeath(m_Pos, m_ClientID);
+		GS()->m_World.DestroyEntity(this);
+		return;
 	}
-	GS()->m_World.DestroyEntity(this);
-	return;
+
+	vec2 PlayerPosition = GS()->m_apPlayers[m_ClientID]->GetCharacter()->m_Core.m_Pos;
+	vec2 Direction = normalize(PlayerPosition - m_TargetPos);
+	m_Pos = PlayerPosition - Direction * clamp(distance(m_Pos, m_TargetPos), 32.0f, 90.0f);
 }
 
 void CQuestPathFinder::Snap(int SnappingClient)

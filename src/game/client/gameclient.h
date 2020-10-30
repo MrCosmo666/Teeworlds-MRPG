@@ -9,6 +9,7 @@
 #include <game/layers.h>
 #include <game/gamecore.h>
 #include "render.h"
+#include "anim_ui.h"
 
 class CGameClient : public IGameClient
 {
@@ -45,7 +46,9 @@ class CGameClient : public IGameClient
 	class IEditor *m_pEditor;
 	class IFriends *m_pFriends;
 	class IBlacklist *m_pBlacklist;
-	class IUpdater *m_pUpdater;
+	class IUpdater* m_pUpdater;
+
+	class CAnimUI* m_pAnumUI;
 
 	CLayers m_Layers;
 	class CCollision m_Collision;
@@ -95,7 +98,9 @@ public:
 	class IEditor *Editor() { return m_pEditor; }
 	class IFriends *Friends() { return m_pFriends; }
 	class IBlacklist *Blacklist() { return m_pBlacklist; }
-	class IUpdater *Updater() { return m_pUpdater; }
+	class IUpdater* Updater() { return m_pUpdater; }
+
+	class CAnimUI* AnimUI() { return m_pAnumUI; }
 
 	const char *NetobjFailedOn() { return m_NetObjHandler.FailedObjOn(); };
 	int NetobjNumFailures() { return m_NetObjHandler.NumObjFailures(); };

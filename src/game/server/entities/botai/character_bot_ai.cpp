@@ -9,15 +9,10 @@
 
 #include <game/server/mmocore/GameEntities/Skills/healthturret/hearth.h>
 
-MACRO_ALLOC_POOL_ID_IMPL(CCharacterBotAI, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
+MACRO_ALLOC_POOL_ID_IMPL(CCharacterBotAI, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 
 CCharacterBotAI::CCharacterBotAI(CGameWorld *pWorld) : CCharacter(pWorld) {}
-
-CCharacterBotAI::~CCharacterBotAI() 
-{
-	RemoveSnapProj(100, GetSnapFullID());
-	RemoveSnapProj(100, GetSnapFullID(), true);
-}
+CCharacterBotAI::~CCharacterBotAI() {}
 
 int CCharacterBotAI::GetSnapFullID() const { return m_pBotPlayer->GetCID() * SNAPBOTS; }
 
@@ -138,7 +133,7 @@ void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force)
 
 	// quest mob progress
 	if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
-		GS()->Mmo()->Quest()->AddMobProgress(pPlayer, BotID);
+		GS()->Mmo()->Quest()->AddMobProgressQuests(pPlayer, BotID);
 
 	// golds
 	const int Golds = max(BotJob::ms_aMobBot[SubID].m_Power / g_Config.m_SvStrongGold, 1);

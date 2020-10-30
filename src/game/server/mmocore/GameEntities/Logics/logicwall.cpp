@@ -212,7 +212,7 @@ void CLogicWallLine::SetClientID(int ClientID) { m_ClientID = ClientID; }
 
 void CLogicWallLine::Tick() 
 {
-	if(m_ClientID < 0 || m_ClientID > MAX_PLAYERS || !GS()->m_apPlayers[m_ClientID] || !GS()->m_apPlayers[m_ClientID]->GetCharacter())
+	if(m_ClientID < 0 || m_ClientID >= MAX_PLAYERS || !GS()->m_apPlayers[m_ClientID] || !GS()->m_apPlayers[m_ClientID]->GetCharacter())
 	{
 		m_PosTo = m_Pos;
 		return;

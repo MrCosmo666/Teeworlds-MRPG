@@ -21,7 +21,6 @@ public:
 	CDecorationHouses(CGameWorld* pGameWorld, vec2 Pos, int OwnerID, int DecoID);
 	~CDecorationHouses();
 
-	virtual void Tick();
 	virtual void Snap(int SnappingClient);
 };
 

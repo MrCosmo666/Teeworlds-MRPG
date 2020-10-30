@@ -4,7 +4,7 @@
 
 #include "drop_quest_items.h"
 
-CDropQuestItem::CDropQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, const BotJob::QuestBotInfo BotData, int OwnerID)
+CDropQuestItem::CDropQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, BotJob::QuestBotInfo BotData, int ClientID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPQUEST, Pos, 24.0f)
 {
 	m_Pos = Pos;
@@ -12,9 +12,10 @@ CDropQuestItem::CDropQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float
 	m_Angle = 0.0f;
 	m_AngleForce = AngleForce;
 
-	m_OwnerID = OwnerID;
+	m_ClientID = ClientID;
 	m_QuestBot = BotData;
 	m_Flashing = false;
+	m_FlashTimer = 0;
 	m_LifeSpan = Server()->TickSpeed() * 60;
 	GameWorld()->InsertEntity(this);
 	for(int i=0; i<NUM_IDS; i++)
@@ -35,7 +36,7 @@ void CDropQuestItem::Tick()
 {
 	// life time dk
 	m_LifeSpan--;
-	if (m_LifeSpan < 0 || !GS()->m_apPlayers[m_OwnerID] || GS()->Mmo()->Quest()->GetState(m_OwnerID, m_QuestBot.m_QuestID) != QuestState::QUEST_ACCEPT)
+	if (m_LifeSpan < 0 || !GS()->m_apPlayers[m_ClientID] || GS()->m_apPlayers[m_ClientID]->GetQuest(m_QuestBot.m_QuestID).GetState() != QuestState::QUEST_ACCEPT)
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;
@@ -61,10 +62,10 @@ void CDropQuestItem::Tick()
 
 	// check step and collected it or no
 	const int Count = m_QuestBot.m_aItemSearchCount[0];
-	const int QuestID = m_QuestBot.m_QuestID;
-	CPlayer* pOwnerPlayer = GS()->m_apPlayers[m_OwnerID];
+	CPlayer* pOwnerPlayer = GS()->m_apPlayers[m_ClientID];
+	CPlayerQuest& pPlayerQuest = pOwnerPlayer->GetQuest(m_QuestBot.m_QuestID);
 	InventoryItem& pPlayerItem = pOwnerPlayer->GetItem(m_QuestBot.m_aItemSearch[0]);
-	if (QuestJob::ms_aQuests[m_OwnerID][QuestID].m_Step != m_QuestBot.m_Step || pPlayerItem.m_Count >= Count)
+	if (pPlayerQuest.m_Step != m_QuestBot.m_Step || pPlayerItem.m_Count >= Count)
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;
@@ -73,13 +74,13 @@ void CDropQuestItem::Tick()
 	// interactive
 	if (pOwnerPlayer->GetCharacter() && distance(m_Pos, pOwnerPlayer->GetCharacter()->m_Core.m_Pos) < 32.0f)
 	{
-		GS()->Broadcast(m_OwnerID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Press 'Fire' for pick Quest Item");
+		GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Press 'Fire' for pick Quest Item");
 		if (pOwnerPlayer->GetCharacter()->m_ReloadTimer)
 		{
 			pPlayerItem.Add(1);
 			pOwnerPlayer->GetCharacter()->m_ReloadTimer = 0;
-			GS()->CreatePlayerSound(m_OwnerID, SOUND_ITEM_PICKUP);
-			GS()->Chat(m_OwnerID, "You pick {STR} for {STR}!", pPlayerItem.Info().GetName(pOwnerPlayer), m_QuestBot.GetName());
+			GS()->CreatePlayerSound(m_ClientID, SOUND_ITEM_PICKUP);
+			GS()->Chat(m_ClientID, "You pick {STR} for {STR}!", pPlayerItem.Info().GetName(pOwnerPlayer), m_QuestBot.GetName());
 			GS()->m_World.DestroyEntity(this);
 			return;
 		}
@@ -89,7 +90,7 @@ void CDropQuestItem::Tick()
 
 void CDropQuestItem::Snap(int SnappingClient)
 {
-	if(m_Flashing || m_OwnerID != SnappingClient || NetworkClipped(SnappingClient))
+	if(m_Flashing || m_ClientID != SnappingClient || NetworkClipped(SnappingClient))
 		return;
 
 	// mrpg

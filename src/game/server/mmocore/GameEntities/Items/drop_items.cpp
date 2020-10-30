@@ -46,16 +46,16 @@ bool CDropItem::TakeItem(int ClientID)
 	{
 		tl_swap(pPlayerDroppedItem, m_DropItem);
 		GS()->Chat(ClientID, "You now own {STR}(+{INT})", pPlayerDroppedItem.Info().GetName(pPlayer), &pPlayerDroppedItem.m_Enchant);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INVENTORY);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
 		return true;
 	}
 	
 	// simple subject delivery
 	pPlayerDroppedItem.Add(m_DropItem.m_Count, 0, m_DropItem.m_Enchant);
 	GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 10, "\0");
-	GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
-	GS()->UpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
+	GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INVENTORY);
+	GS()->StrongUpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
 	GS()->m_World.DestroyEntity(this);
 	return true;
 }

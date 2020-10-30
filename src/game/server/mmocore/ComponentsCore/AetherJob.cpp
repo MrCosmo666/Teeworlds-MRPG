@@ -9,15 +9,15 @@ std::map < int , AetherJob::StructTeleport > AetherJob::ms_aTeleport;
 
 void AetherJob::OnInit()
 {
-	SJK.SDT("*", "tw_aethers", [&](ResultSet* RES)
+	SJK.SDT("*", "tw_aethers", [&](ResultPtr pRes)
 	{
-		while(RES->next())
+		while(pRes->next())
 		{
-			const int ID = RES->getInt("ID");
-			str_copy(ms_aTeleport[ID].m_aTeleName, RES->getString("TeleName").c_str(), sizeof(ms_aTeleport[ID].m_aTeleName));
-			ms_aTeleport[ID].m_TeleX = RES->getInt("TeleX");
-			ms_aTeleport[ID].m_TeleY = RES->getInt("TeleY");
-			ms_aTeleport[ID].m_WorldID = RES->getInt("WorldID");
+			const int ID = pRes->getInt("ID");
+			str_copy(ms_aTeleport[ID].m_aTeleName, pRes->getString("TeleName").c_str(), sizeof(ms_aTeleport[ID].m_aTeleName));
+			ms_aTeleport[ID].m_TeleX = pRes->getInt("TeleX");
+			ms_aTeleport[ID].m_TeleY = pRes->getInt("TeleY");
+			ms_aTeleport[ID].m_WorldID = pRes->getInt("WorldID");
 		}
 		Job()->ShowLoadingProgress("Aethers", ms_aTeleport.size());
 	});
@@ -25,10 +25,10 @@ void AetherJob::OnInit()
 
 void AetherJob::OnInitAccount(CPlayer *pPlayer)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_locations", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID));
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_locations", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	while(pRes->next())
 	{
-		int TeleportID = RES->getInt("TeleportID");
+		int TeleportID = pRes->getInt("TeleportID");
 		pPlayer->Acc().m_aAetherLocation[TeleportID] = true;
 	}
 }
@@ -72,14 +72,14 @@ bool AetherJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 		GS()->Chat(ClientID, "You can see menu in the votes!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
 		UnlockLocation(pChr->GetPlayer(), pChr->m_Core.m_Pos);
-		GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		GS()->StrongUpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_AETHER_TELEPORT))
 	{
 		GS()->Chat(ClientID, "You left the active zone, menu is restored!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
-		GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		GS()->StrongUpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 

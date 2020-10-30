@@ -31,7 +31,7 @@ public:
 	virtual void OnInitWorld(const char* pWhereLocalWorld);
 	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
 
-	vec2 GetPositionQuestBot(int ClientID, int QuestID);
+	vec2 GetPositionQuestBot(int ClientID, BotJob::QuestBotInfo QuestBot);
 	int GetWorldType() const;
 	int GetNecessaryQuest(int WorldID = -1) const;
 	void CheckQuestingOpened(CPlayer* pPlayer, int QuestID);

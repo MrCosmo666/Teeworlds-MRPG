@@ -9,17 +9,17 @@ std::map < int , ShopJob::ShopPersonal > ShopJob::ms_aShopList;
 
 void ShopJob::OnInit()
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID, StorageID", "tw_mailshop"));
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("ID, StorageID", "tw_mailshop");
+	while(pRes->next())
 	{
-		int ID = RES->getInt("ID");
-		ms_aShopList[ID].m_StorageID = RES->getInt("StorageID");
+		int ID = pRes->getInt("ID");
+		ms_aShopList[ID].m_StorageID = pRes->getInt("StorageID");
 	}
 }
 
 void ShopJob::OnTick()
 {
-	if(GS()->GetWorldID() == MAIN_WORLD)
+	if(GS()->GetWorldID() == MAIN_WORLD_ID)
 	{
 		if(GS()->Server()->Tick() % (1 * GS()->Server()->TickSpeed() * (g_Config.m_SvTimeCheckAuction * 60)) == 0)
 			CheckAuctionTime();
@@ -52,15 +52,15 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 {
 	const int ClientID = pPlayer->GetCID();
 	int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 300;
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE StorageID = '%d' ORDER BY Price", StorageID));
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_mailshop", "WHERE StorageID = '%d' ORDER BY Price", StorageID);
+	while(pRes->next())
 	{
-		const int ID = RES->getInt("ID");
-		const int ItemID = RES->getInt("ItemID");
-		const int Price = RES->getInt("Price");
-		const int Enchant = RES->getInt("Enchant");
-		const int Count = RES->getInt("Count");
-		const int NeedItemID = RES->getInt("NeedItem");
+		const int ID = pRes->getInt("ID");
+		const int ItemID = pRes->getInt("ItemID");
+		const int Price = pRes->getInt("Price");
+		const int Enchant = pRes->getInt("Enchant");
+		const int Count = pRes->getInt("Count");
+		const int NeedItemID = pRes->getInt("NeedItem");
 		ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
 		ItemInformation &NeededItem = GS()->GetItemInfo(NeedItemID);
 		
@@ -100,15 +100,15 @@ void ShopJob::ShowAuction(CPlayer *pPlayer)
 
 	bool FoundItems = false;
 	int HideID = (int)(NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 400);
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 ORDER BY Price"));
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 ORDER BY Price");
+	while(pRes->next())
 	{
-		const int ID = RES->getInt("ID");
-		const int ItemID = RES->getInt("ItemID");
-		const int Price = RES->getInt("Price");
-		const int Enchant = RES->getInt("Enchant");
-		const int Count = RES->getInt("Count");
-		const int OwnerID = RES->getInt("OwnerID");
+		const int ID = pRes->getInt("ID");
+		const int ItemID = pRes->getInt("ItemID");
+		const int Price = pRes->getInt("Price");
+		const int Enchant = pRes->getInt("Enchant");
+		const int Count = pRes->getInt("Count");
+		const int OwnerID = pRes->getInt("OwnerID");
 		ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
 
 		if (BuyightItem.IsEnchantable())
@@ -147,19 +147,19 @@ void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
 	InventoryItem &pPlayerAuctionItem = pPlayer->GetItem(ItemID);
 
 	// check the number of slots whether everything is occupied or not
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_mailshop", "WHERE OwnerID > '0' LIMIT %d", g_Config.m_SvMaxMasiveAuctionSlots));
-	if((int)RES->rowsCount() >= g_Config.m_SvMaxMasiveAuctionSlots)
+	ResultPtr pResCheck = SJK.SD("ID", "tw_mailshop", "WHERE OwnerID > '0' LIMIT %d", g_Config.m_SvMaxMasiveAuctionSlots);
+	if((int)pResCheck->rowsCount() >= g_Config.m_SvMaxMasiveAuctionSlots)
 		return GS()->Chat(ClientID, "Auction has run out of slots, wait for the release of slots!");
 
 	// check your slots
-	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_mailshop", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AuthID, g_Config.m_SvMaxAuctionSlots));
-	const int CountSlot = RES2->rowsCount();
+	ResultPtr pResCheck2 = SJK.SD("ID", "tw_mailshop", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AuthID, g_Config.m_SvMaxAuctionSlots);
+	const int CountSlot = pResCheck2->rowsCount();
 	if(CountSlot >= g_Config.m_SvMaxAuctionSlots)
 		return GS()->Chat(ClientID, "You use all open the slots in your auction!");
 
 	// we check if the item is in the auction
-	std::shared_ptr<ResultSet> RES3(SJK.SD("ID", "tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AuthID));
-	if(RES3->next()) 
+	ResultPtr pResCheck3 = SJK.SD("ID", "tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AuthID);
+	if(pResCheck3->next())
 		return GS()->Chat(ClientID, "Your same item found in the database, need reopen the slot!");
 
 	// if the money for the slot auction is withdrawn
@@ -182,11 +182,11 @@ void ShopJob::CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot& AuSellItem)
 bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 {
 	const int ClientID = pPlayer->GetCID();
-	std::shared_ptr<ResultSet> SHOPITEM(SJK.SD("*", "tw_mailshop", "WHERE ID = '%d'", ID));
-	if (!SHOPITEM->next())
+	ResultPtr pRes = SJK.SD("*", "tw_mailshop", "WHERE ID = '%d'", ID);
+	if (!pRes->next())
 		return false;
 
-	const int ItemID = SHOPITEM->getInt("ItemID");
+	const int ItemID = pRes->getInt("ItemID");
 	InventoryItem &pPlayerBuyightItem = pPlayer->GetItem(ItemID);
 	if (pPlayerBuyightItem.m_Count > 0 && pPlayerBuyightItem.Info().IsEnchantable())
 	{
@@ -195,28 +195,28 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 	}
 
 	// - - - - - - - - - - AUCTION - - - - - - - - - - - - -
-	int Price = SHOPITEM->getInt("Price");
-	const int OwnerID = SHOPITEM->getInt("OwnerID");
-	const int Count = SHOPITEM->getInt("Count");
-	const int Enchant = SHOPITEM->getInt("Enchant");
+	int Price = pRes->getInt("Price");
+	const int OwnerID = pRes->getInt("OwnerID");
+	const int Count = pRes->getInt("Count");
+	const int Enchant = pRes->getInt("Enchant");
 	if (OwnerID > 0)
 	{
 		// take out your slot
 		if (OwnerID == pPlayer->Acc().m_AuthID)
 		{
 			GS()->Chat(ClientID, "You closed auction slot!");
-			GS()->SendInbox(ClientID, "Auction Alert", "You have bought a item, or canceled your slot", ItemID, Count, Enchant);
+			GS()->SendInbox(pPlayer, "Auction Alert", "You have bought a item, or canceled your slot", ItemID, Count, Enchant);
 			SJK.DD("tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, OwnerID);
 			return true;
 		}
 
-		const int NeedItem = SHOPITEM->getInt("NeedItem");
+		const int NeedItem = pRes->getInt("NeedItem");
 		if (!pPlayer->SpendCurrency(Price, NeedItem))
 			return false;
 
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "Your [Slot %sx%d] was sold!", pPlayerBuyightItem.Info().GetName(pPlayer), Count);
-		Job()->Inbox()->SendInbox(OwnerID, "Auction Sell", aBuf, itGold, Price, 0);
+		GS()->SendInbox(OwnerID, "Auction Sell", aBuf, itGold, Price, 0);
 		SJK.DD("tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, OwnerID);
 		pPlayerBuyightItem.Add(Count, 0, Enchant);
 		GS()->Chat(ClientID, "You buy {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(pPlayer), &Count);
@@ -224,7 +224,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 	}
 
 	// - - - - - - - - - - - -SHOP - - - - - - - - - - - - -
-	const int NeedItem = SHOPITEM->getInt("NeedItem");
+	const int NeedItem = pRes->getInt("NeedItem");
 	if (!pPlayer->SpendCurrency(Price, NeedItem))
 		return false;
 
@@ -235,16 +235,16 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 
 void ShopJob::CheckAuctionTime()
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 AND DATE_SUB(NOW(),INTERVAL %d MINUTE) > Time", g_Config.m_SvTimeAuctionSlot));
-	int ReleaseSlots = (int)RES->rowsCount();
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 AND DATE_SUB(NOW(),INTERVAL %d MINUTE) > Time", g_Config.m_SvTimeAuctionSlot);
+	int ReleaseSlots = (int)pRes->rowsCount();
+	while(pRes->next())
 	{
-		const int ID = RES->getInt("ID");
-		const int ItemID = RES->getInt("ItemID");
-		const int Count = RES->getInt("Count");
-		const int Enchant = RES->getInt("Enchant");
-		const int OwnerID = RES->getInt("OwnerID");
-		Job()->Inbox()->SendInbox(OwnerID, "Auction expired", "Your slot has expired", ItemID, Count, Enchant);
+		const int ID = pRes->getInt("ID");
+		const int ItemID = pRes->getInt("ItemID");
+		const int Count = pRes->getInt("Count");
+		const int Enchant = pRes->getInt("Enchant");
+		const int OwnerID = pRes->getInt("OwnerID");
+		GS()->SendInbox(OwnerID, "Auction expired", "Your slot has expired", ItemID, Count, Enchant);
 		SJK.DD("tw_mailshop", "WHERE ID = '%d'", ID);
 	}
 	if(ReleaseSlots) 
@@ -335,7 +335,7 @@ bool ShopJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int
 			pPlayer->GetTempData().m_SellItem.m_Price = c_minimalprice;
 
 		pPlayer->GetTempData().m_SellItem.m_Count = Get;
-		GS()->UpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
 		return true;
 	}
 
@@ -346,13 +346,13 @@ bool ShopJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int
 			Get = c_minimalprice;
 
 		pPlayer->GetTempData().m_SellItem.m_Price = Get;
-		GS()->UpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);		
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);		
 		return true;
 	}
 
 	if(PPSTR(CMD, "AUCTIONSLOT") == 0)
 	{
-		int AvailableCount = Job()->Item()->ActionItemCountAllowed(pPlayer, VoteID);
+		int AvailableCount = Job()->Item()->GetUnfrozenItemCount(pPlayer, VoteID);
 		if (AvailableCount <= 0)
 			return true;
 
@@ -371,7 +371,7 @@ bool ShopJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int
 			GS()->ResetVotes(ClientID, MenuList::MENU_INVENTORY);
 			return true;
 		}
-		GS()->UpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
 		return true;
 	}
 

@@ -23,13 +23,14 @@ public:
 		ENTTYPE_PICKUP,
 		ENTTYPE_CHARACTER,
 		ENTTYPE_FLAG,
+		ENTTYPE_RANDOM_BOX,
+		ENTTYPE_WORLD_TEXT,
 		ENTTYPE_DROPBONUS,
 		ENTTYPE_DROPITEM,
 		ENTTYPE_DROPQUEST,
 		ENTTYPE_FINDQUEST,
 		ENTTYPE_JOBITEMS,
 		ENTTYPE_SNAPEFFECT,
-		ENTTYPE_MOBS,
 		ENTTYPE_EYES,
 		ENTTYPE_EYESWALL,
 		ENTTYPE_DECOHOUSE,
@@ -173,8 +174,6 @@ public:
 	*/
 	void Snap(int SnappingClient);
 	
-	void PostSnap();
-
 	/*
 		Function: tick
 			Calls tick on all the entities in the world to progress

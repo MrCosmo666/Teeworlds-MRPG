@@ -13,32 +13,32 @@ std::map < int , GuildJob::GuildStructRank > GuildJob::ms_aRankGuild;
 void GuildJob::LoadGuildRank(int GuildID)
 {
 	// rank loading
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_ranks", "WHERE ID > '0' AND GuildID = '%d'", GuildID));
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_guilds_ranks", "WHERE ID > '0' AND GuildID = '%d'", GuildID);
+	while(pRes->next())
 	{
-			int ID = RES->getInt("ID");
-			ms_aRankGuild[ID].m_GuildID = GuildID;
-			ms_aRankGuild[ID].m_Access = RES->getInt("Access");
-			str_copy(ms_aRankGuild[ID].m_aRank, RES->getString("Name").c_str(), sizeof(ms_aRankGuild[ID].m_aRank));
+		int ID = pRes->getInt("ID");
+		ms_aRankGuild[ID].m_GuildID = GuildID;
+		ms_aRankGuild[ID].m_Access = pRes->getInt("Access");
+		str_copy(ms_aRankGuild[ID].m_aRank, pRes->getString("Name").c_str(), sizeof(ms_aRankGuild[ID].m_aRank));
 	}
 }
 
 void GuildJob::OnInit()
 {
-	SJK.SDT("*", "tw_guilds", [&](ResultSet* RES)
+	SJK.SDT("*", "tw_guilds", [&](ResultPtr pRes)
 	{
-		while(RES->next())
+		while(pRes->next())
 		{
-			int GuildID = RES->getInt("ID");
-			ms_aGuild[GuildID].m_OwnerID = RES->getInt("OwnerID");
-			ms_aGuild[GuildID].m_Level = RES->getInt("Level");
-			ms_aGuild[GuildID].m_Exp = RES->getInt("Experience");
-			ms_aGuild[GuildID].m_Bank = RES->getInt("Bank");
-			ms_aGuild[GuildID].m_Score = RES->getInt("Score");
-			str_copy(ms_aGuild[GuildID].m_aName, RES->getString("GuildName").c_str(), sizeof(ms_aGuild[GuildID].m_aName));
+			int GuildID = pRes->getInt("ID");
+			ms_aGuild[GuildID].m_OwnerID = pRes->getInt("OwnerID");
+			ms_aGuild[GuildID].m_Level = pRes->getInt("Level");
+			ms_aGuild[GuildID].m_Exp = pRes->getInt("Experience");
+			ms_aGuild[GuildID].m_Bank = pRes->getInt("Bank");
+			ms_aGuild[GuildID].m_Score = pRes->getInt("Score");
+			str_copy(ms_aGuild[GuildID].m_aName, pRes->getString("GuildName").c_str(), sizeof(ms_aGuild[GuildID].m_aName));
 
 			for(int i = 0; i < EMEMBERUPGRADE::NUM_EMEMBERUPGRADE; i++)
-				ms_aGuild[GuildID].m_Upgrades[i] = RES->getInt(UpgradeNames(i, true).c_str());
+				ms_aGuild[GuildID].m_Upgrades[i] = pRes->getInt(UpgradeNames(i, true).c_str());
 
 			LoadGuildRank(GuildID);
 		}
@@ -49,20 +49,20 @@ void GuildJob::OnInit()
 void GuildJob::OnInitWorld(const char* pWhereLocalWorld) 
 { 
 	// load houses
-	SJK.SDT("*", "tw_guilds_houses", [&](ResultSet* RES)
+	SJK.SDT("*", "tw_guilds_houses", [&](ResultPtr pRes)
 	{
-		while(RES->next())
+		while(pRes->next())
 		{
-			int HouseID = RES->getInt("ID");
-			ms_aHouseGuild[HouseID].m_DoorX = RES->getInt("DoorX");
-			ms_aHouseGuild[HouseID].m_DoorY = RES->getInt("DoorY");
-			ms_aHouseGuild[HouseID].m_GuildID = RES->getInt("OwnerMID");
-			ms_aHouseGuild[HouseID].m_PosX = RES->getInt("PosX");
-			ms_aHouseGuild[HouseID].m_PosY = RES->getInt("PosY");
-			ms_aHouseGuild[HouseID].m_Price = RES->getInt("Price");
-			ms_aHouseGuild[HouseID].m_WorldID = RES->getInt("WorldID");
-			ms_aHouseGuild[HouseID].m_TextX = RES->getInt("TextX");
-			ms_aHouseGuild[HouseID].m_TextY = RES->getInt("TextY");
+			int HouseID = pRes->getInt("ID");
+			ms_aHouseGuild[HouseID].m_DoorX = pRes->getInt("DoorX");
+			ms_aHouseGuild[HouseID].m_DoorY = pRes->getInt("DoorY");
+			ms_aHouseGuild[HouseID].m_GuildID = pRes->getInt("OwnerMID");
+			ms_aHouseGuild[HouseID].m_PosX = pRes->getInt("PosX");
+			ms_aHouseGuild[HouseID].m_PosY = pRes->getInt("PosY");
+			ms_aHouseGuild[HouseID].m_Price = pRes->getInt("Price");
+			ms_aHouseGuild[HouseID].m_WorldID = pRes->getInt("WorldID");
+			ms_aHouseGuild[HouseID].m_TextX = pRes->getInt("TextX");
+			ms_aHouseGuild[HouseID].m_TextY = pRes->getInt("TextY");
 			if(ms_aHouseGuild[HouseID].m_GuildID > 0 && !ms_aHouseGuild[HouseID].m_pDoor)
 			{
 				ms_aHouseGuild[HouseID].m_pDoor = 0;
@@ -73,13 +73,13 @@ void GuildJob::OnInitWorld(const char* pWhereLocalWorld)
 	}, pWhereLocalWorld);
 
 	// load decorations
-	SJK.SDT("*", "tw_guilds_decorations", [&](ResultSet* DecoRES)
+	SJK.SDT("*", "tw_guilds_decorations", [&](ResultPtr pRes)
 	{
-		while(DecoRES->next())
+		while(pRes->next())
 		{
-			const int DecoID = DecoRES->getInt("ID");
-			m_DecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(DecoRES->getInt("X"),
-				DecoRES->getInt("Y")), DecoRES->getInt("HouseID"), DecoRES->getInt("DecoID"));
+			const int DecoID = pRes->getInt("ID");
+			m_DecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(pRes->getInt("X"),
+				pRes->getInt("Y")), pRes->getInt("HouseID"), pRes->getInt("DecoID"));
 		}
 		Job()->ShowLoadingProgress("Guilds Houses Decorations", m_DecorationHouse.size());
 	}, pWhereLocalWorld);
@@ -155,7 +155,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 
 		AddHistoryGuild(GuildID, "New guild leader '%s'.", Job()->PlayerName(SelectedAccountID));
 		GS()->ChatGuild(GuildID, "Change leader {STR}->{STR}", GS()->Server()->ClientName(ClientID), Job()->PlayerName(SelectedAccountID));
-		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -188,7 +188,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 			return true;
 		}
 		ExitGuild(VoteID);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -207,7 +207,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 			const int GuildCount = ms_aGuild[GuildID].m_Upgrades[UpgradeID];
 			GS()->ChatGuild(GuildID, "Improved to {INT} {STR} in {STR}!", &GuildCount, UpgradeNames(UpgradeID).c_str(), ms_aGuild[GuildID].m_aName);
 			AddHistoryGuild(GuildID, "'%s' level up to '%d'.", UpgradeNames(UpgradeID).c_str(), GuildCount);
-			GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
+			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
 			return true;
 		}
 
@@ -235,7 +235,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 			SJK.UD("tw_accounts_data", "GuildDeposit = GuildDeposit + '%d' WHERE ID = '%d'", Get, pPlayer->Acc().m_AuthID);
 			GS()->ChatGuild(GuildID, "{STR} deposit in treasury {INT}gold.", GS()->Server()->ClientName(ClientID), &Get);
 			AddHistoryGuild(GuildID, "'%s' added to bank %dgold.", GS()->Server()->ClientName(ClientID), Get);
-			GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
+			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
 		}
 		return true;
 	}
@@ -250,7 +250,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		}
 
 		BuyGuildHouse(GuildID, VoteID);
-		GS()->UpdateVotes(MenuList::MAIN_MENU);
+		GS()->StrongUpdateVotesForAll(MenuList::MAIN_MENU);
 		return true;
 	}
 
@@ -264,7 +264,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		}
 
 		SellGuildHouse(GuildID);
-		GS()->UpdateVotes(MenuList::MENU_GUILD);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -278,7 +278,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		}
 
 		if(ChangeStateDoor(GuildID))
-			GS()->UpdateVotes(MenuList::MENU_GUILD);
+			GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -295,8 +295,8 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		if(JoinGuild(SenderID, GuildID))
 		{
 			SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
-			Job()->Inbox()->SendInbox(SenderID, ms_aGuild[GuildID].m_aName, "You were accepted to join guild");
-			GS()->UpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			GS()->SendInbox(SenderID, ms_aGuild[GuildID].m_aName, "You were accepted to join guild");
+			GS()->StrongUpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 			return true;
 		}
 		GS()->Chat(ClientID, "You can't accept (there are no free slot or he is already in Guild).");
@@ -315,7 +315,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		const int SenderID = VoteID;
 		GS()->Chat(ClientID, "You reject invite.");
 		SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
-		Job()->Inbox()->SendInbox(SenderID, ms_aGuild[GuildID].m_aName, "You were denied join guild");
+		GS()->SendInbox(SenderID, ms_aGuild[GuildID].m_aName, "You were denied join guild");
 		GS()->ResetVotes(ClientID, MenuList::MENU_GUILD);
 		return true;
 	}
@@ -329,7 +329,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		}
 
 		str_copy(pPlayer->GetTempData().m_aGuildSearchBuf, GetText, sizeof(pPlayer->GetTempData().m_aGuildSearchBuf));
-		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -354,7 +354,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		}
 
 		str_copy(pPlayer->GetTempData().m_aRankGuildBuf, GetText, sizeof(pPlayer->GetTempData().m_aRankGuildBuf));
-		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -375,7 +375,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		}
 
 		AddRank(GuildID, pPlayer->GetTempData().m_aRankGuildBuf);
-		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -390,7 +390,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 
 		const int RankID = VoteID;
 		DeleteRank(RankID, GuildID);
-		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -405,7 +405,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 
 		const int RankID = VoteID;
 		ChangeRankAccess(RankID);
-		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -426,7 +426,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 
 		const int RankID = VoteID;
 		ChangeRank(RankID, GuildID, pPlayer->GetTempData().m_aRankGuildBuf);
-		GS()->UpdateVotes(MenuList::MENU_GUILD_RANK);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_RANK);
 		return true;
 	}
 
@@ -441,7 +441,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 
 		// change rank and clear the menu
 		ChangePlayerRank(VoteID, VoteID2);
-		GS()->UpdateVotes(MenuList::MENU_GUILD);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD);
 		return true;
 	}
 
@@ -492,7 +492,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
 			PlDecoItem.Add(1);
 		}
-		GS()->UpdateVotes(ClientID, MenuList::MENU_GUILD_HOUSE_DECORATION);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD_HOUSE_DECORATION);
 		return true;
 	}
 
@@ -646,12 +646,12 @@ bool GuildJob::AddDecorationHouse(int DecoID, int GuildID, vec2 Position)
 		return false;
 
 	int HouseID = GetGuildHouseID(GuildID);
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_decorations", "WHERE HouseID = '%d'", HouseID));
-	if ((int)RES->rowsCount() >= g_Config.m_SvLimitDecoration) 
+	ResultPtr pRes = SJK.SD("ID", "tw_guilds_decorations", "WHERE HouseID = '%d'", HouseID);
+	if ((int)pRes->rowsCount() >= g_Config.m_SvLimitDecoration)
 		return false;
 
-	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_guilds_decorations", "ORDER BY ID DESC LIMIT 1"));
-	int InitID = (RES2->next() ? RES2->getInt("ID") + 1 : 1);
+	ResultPtr pRes2 = SJK.SD("ID", "tw_guilds_decorations", "ORDER BY ID DESC LIMIT 1");
+	int InitID = (pRes2->next() ? pRes2->getInt("ID") + 1 : 1);
 	SJK.ID("tw_guilds_decorations", "(ID, DecoID, HouseID, X, Y, WorldID) VALUES ('%d', '%d', '%d', '%d', '%d', '%d')",
 		InitID, DecoID, HouseID, (int)Position.x, (int)Position.y, GS()->GetWorldID());
 	m_DecorationHouse[InitID] = new CDecorationHouses(&GS()->m_World, Position, HouseID, DecoID);
@@ -706,8 +706,8 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 
 	// we check the availability of the guild's name
 	CSqlString<64> cGuildName = CSqlString<64>(GuildName);
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds", "WHERE GuildName = '%s'", cGuildName.cstr()));
-	if(RES->next()) 
+	ResultPtr pRes = SJK.SD("ID", "tw_guilds", "WHERE GuildName = '%s'", cGuildName.cstr());
+	if(pRes->next())
 	{
 		GS()->Chat(ClientID, "This guild name already useds!");
 		return;
@@ -717,8 +717,8 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 	if(pPlayer->GetItem(itTicketGuild).m_Count > 0 && pPlayer->GetItem(itTicketGuild).Remove(1))
 	{
 		// get ID for initialization
-		std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_guilds", "ORDER BY ID DESC LIMIT 1"));
-		const int InitID = RES2->next() ? RES2->getInt("ID")+1 : 1; // TODO: thread save ? hm need for table all time auto increment = 1; NEED FIX IT -- use some kind of uuid
+		ResultPtr pResID = SJK.SD("ID", "tw_guilds", "ORDER BY ID DESC LIMIT 1");
+		const int InitID = pResID->next() ? pResID->getInt("ID")+1 : 1; // TODO: thread save ? hm need for table all time auto increment = 1; NEED FIX IT -- use some kind of uuid
 		
 		// initialize the guild
 		str_copy(ms_aGuild[InitID].m_aName, cGuildName.cstr(), sizeof(ms_aGuild[InitID].m_aName));
@@ -743,8 +743,8 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 bool GuildJob::JoinGuild(int AuthID, int GuildID)
 {
 	const char *PlayerName = Job()->PlayerName(AuthID);
-	std::shared_ptr<ResultSet> CheckJoinRES(SJK.SD("ID", "tw_accounts_data", "WHERE ID = '%d' AND GuildID IS NOT NULL", AuthID));
-	if(CheckJoinRES->next())
+	ResultPtr pResCheckJoin = SJK.SD("ID", "tw_accounts_data", "WHERE ID = '%d' AND GuildID IS NOT NULL", AuthID);
+	if(pResCheckJoin->next())
 	{
 		GS()->ChatAccountID(AuthID, "You already in guild group!");
 		GS()->ChatGuild(GuildID, "{STR} already joined your or another guilds", PlayerName);
@@ -752,8 +752,8 @@ bool GuildJob::JoinGuild(int AuthID, int GuildID)
 	}
 
 	// check the number of slots available
-	std::shared_ptr<ResultSet> CheckSlotsRES(SJK.SD("ID", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID));
-	if((int)CheckSlotsRES->rowsCount() >= ms_aGuild[GuildID].m_Upgrades[EMEMBERUPGRADE::AvailableNSTSlots])
+	ResultPtr pResCheckSlot = SJK.SD("ID", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID);
+	if((int)pResCheckSlot->rowsCount() >= ms_aGuild[GuildID].m_Upgrades[EMEMBERUPGRADE::AvailableNSTSlots])
 	{
 		GS()->ChatAccountID(AuthID, "You don't joined [No slots for join]");
 		GS()->ChatGuild(GuildID, "{STR} don't joined [No slots for join]", PlayerName);
@@ -776,19 +776,19 @@ bool GuildJob::JoinGuild(int AuthID, int GuildID)
 void GuildJob::ExitGuild(int AuthID)
 {
 	// we check if the clan leader leaves
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds", "WHERE OwnerID = '%d'", AuthID));
-	if (RES->next())
+	ResultPtr pRes = SJK.SD("ID", "tw_guilds", "WHERE OwnerID = '%d'", AuthID);
+	if (pRes->next())
 	{
 		GS()->ChatAccountID(AuthID, "A leader cannot leave his guild group!");
 		return;
 	}
 
 	// we check the account and its guild
-	std::shared_ptr<ResultSet> RES2(SJK.SD("GuildID", "tw_accounts_data", "WHERE ID = '%d'", AuthID));
-	if (RES2->next())
+	ResultPtr pResExit = SJK.SD("GuildID", "tw_accounts_data", "WHERE ID = '%d'", AuthID);
+	if (pResExit->next())
 	{
 		// we write to the guild that the player has left the guild
-		const int GuildID = RES2->getInt("GuildID");
+		const int GuildID = pResExit->getInt("GuildID");
 		GS()->ChatGuild(GuildID, "{STR} left the Guild!", Job()->PlayerName(AuthID));
 		AddHistoryGuild(GuildID, "'%s' exit or kicked.", Job()->PlayerName(AuthID));
 
@@ -877,13 +877,13 @@ void GuildJob::ShowGuildPlayers(CPlayer* pPlayer)
 	const int ClientID = pPlayer->GetCID();
 	const int GuildID = pPlayer->Acc().m_GuildID;
 	int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 1000;
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID, Nick, GuildRank, GuildDeposit", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID));
-	while (RES->next())
+	ResultPtr pRes = SJK.SD("ID, Nick, GuildRank, GuildDeposit", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID);
+	while (pRes->next())
 	{
-		const int AuthID = RES->getInt("ID");
-		const int RankID = RES->getInt("GuildRank");
-		const int Deposit = RES->getInt("GuildDeposit");
-		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "{STR} {STR} Deposit: {INT}", GetGuildRank(GuildID, RankID), RES->getString("Nick").c_str(), &Deposit);
+		const int AuthID = pRes->getInt("ID");
+		const int RankID = pRes->getInt("GuildRank");
+		const int Deposit = pRes->getInt("GuildDeposit");
+		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "{STR} {STR} Deposit: {INT}", GetGuildRank(GuildID, RankID), pRes->getString("Nick").c_str(), &Deposit);
 
 		for (auto mr : ms_aRankGuild)
 		{
@@ -925,24 +925,24 @@ void GuildJob::AddExperience(int GuildID)
 
 bool GuildJob::AddMoneyBank(int GuildID, int Money)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID, Bank", "tw_guilds", "WHERE ID = '%d'", GuildID));
-	if(!RES->next()) 
+	ResultPtr pRes = SJK.SD("ID, Bank", "tw_guilds", "WHERE ID = '%d'", GuildID);
+	if(!pRes->next())
 		return false;
 	
 	// add money
-	ms_aGuild[GuildID].m_Bank = RES->getInt("Bank") + Money;
+	ms_aGuild[GuildID].m_Bank = pRes->getInt("Bank") + Money;
 	SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", ms_aGuild[GuildID].m_Bank, GuildID);
 	return true;
 }
 
 bool GuildJob::RemoveMoneyBank(int GuildID, int Money)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID, Bank", "tw_guilds", "WHERE ID = '%d'", GuildID));
-	if(!RES->next()) 
+	ResultPtr pRes = SJK.SD("ID, Bank", "tw_guilds", "WHERE ID = '%d'", GuildID);
+	if(!pRes->next())
 		return false;
 	
 	// check if the bank has enough to pay
-	ms_aGuild[GuildID].m_Bank = RES->getInt("Bank");
+	ms_aGuild[GuildID].m_Bank = pRes->getInt("Bank");
 	if(Money > ms_aGuild[GuildID].m_Bank)
 		return false;
 
@@ -955,11 +955,11 @@ bool GuildJob::RemoveMoneyBank(int GuildID, int Money)
 // purchase of upgrade maximum number of slots
 bool GuildJob::UpgradeGuild(int GuildID, int Field)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "WHERE ID = '%d'", GuildID));
-	if(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_guilds", "WHERE ID = '%d'", GuildID);
+	if(pRes->next())
 	{
-		ms_aGuild[GuildID].m_Bank = RES->getInt("Bank");
-		ms_aGuild[GuildID].m_Upgrades[Field] = RES->getInt(UpgradeNames(Field, true).c_str());
+		ms_aGuild[GuildID].m_Bank = pRes->getInt("Bank");
+		ms_aGuild[GuildID].m_Upgrades[Field] = pRes->getInt(UpgradeNames(Field, true).c_str());
 		const int UpgradePrice = (Field == EMEMBERUPGRADE::AvailableNSTSlots ? g_Config.m_SvPriceUpgradeGuildSlot : g_Config.m_SvPriceUpgradeGuildAnother);
 		const int PriceAvailable = ms_aGuild[GuildID].m_Upgrades[Field]*UpgradePrice;
 		if(PriceAvailable > ms_aGuild[GuildID].m_Bank)
@@ -1017,11 +1017,11 @@ void GuildJob::AddRank(int GuildID, const char *Rank)
 	if(ms_aRankGuild.find(FindRank) != ms_aRankGuild.end())
 		return GS()->ChatGuild(GuildID, "Found this rank in your table, change name");
 
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_ranks", "WHERE GuildID = '%d'", GuildID));
-	if(RES->rowsCount() >= 5) return;
+	ResultPtr pRes = SJK.SD("ID", "tw_guilds_ranks", "WHERE GuildID = '%d'", GuildID);
+	if(pRes->rowsCount() >= 5) return;
 
-	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_guilds_ranks", "ORDER BY ID DESC LIMIT 1"));
-	const int InitID = RES2->next() ? RES2->getInt("ID")+1 : 1; // thread save ? hm need for table all time auto increment = 1; NEED FIX IT
+	ResultPtr pResID = SJK.SD("ID", "tw_guilds_ranks", "ORDER BY ID DESC LIMIT 1");
+	const int InitID = pResID->next() ? pResID->getInt("ID")+1 : 1; // thread save ? hm need for table all time auto increment = 1; NEED FIX IT
 
 	CSqlString<64> cGuildRank = CSqlString<64>(Rank);
 	SJK.ID("tw_guilds_ranks", "(ID, GuildID, Name) VALUES ('%d', '%d', '%s')", InitID, GuildID, cGuildRank.cstr());
@@ -1127,8 +1127,8 @@ void GuildJob::ShowMenuRank(CPlayer *pPlayer)
 int GuildJob::GetGuildPlayerCount(int GuildID)
 {
 	int MemberPlayers = -1;
-	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID));
-		MemberPlayers = RES2->rowsCount();
+	ResultPtr pRes = SJK.SD("ID", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID);
+		MemberPlayers = pRes->rowsCount();
 	return MemberPlayers;
 }
 
@@ -1138,8 +1138,8 @@ int GuildJob::GetGuildPlayerCount(int GuildID)
 // add a player to the guild
 bool GuildJob::AddInviteGuild(int GuildID, int OwnerID)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'",  GuildID, OwnerID));
-	if(RES->rowsCount() >= 1) return false;
+	ResultPtr pRes = SJK.SD("ID", "tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'",  GuildID, OwnerID);
+	if(pRes->rowsCount() >= 1) return false;
 
 	SJK.ID("tw_guilds_invites", "(GuildID, OwnerID) VALUES ('%d', '%d')", GuildID, OwnerID);
 	GS()->ChatGuild(GuildID, "{STR} send invites to join our guilds", Job()->PlayerName(OwnerID));
@@ -1150,10 +1150,10 @@ bool GuildJob::AddInviteGuild(int GuildID, int OwnerID)
 void GuildJob::ShowInvitesGuilds(int ClientID, int GuildID)
 {
 	int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 1900;
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_invites", "WHERE GuildID = '%d'", GuildID));
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_guilds_invites", "WHERE GuildID = '%d'", GuildID);
+	while(pRes->next())
 	{
-		const int SenderID = RES->getInt("OwnerID");
+		const int SenderID = pRes->getInt("OwnerID");
 		const char *PlayerName = Job()->PlayerName(SenderID);
 		GS()->AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "Sender {STR} to join guilds", PlayerName);
 		{
@@ -1180,13 +1180,13 @@ void GuildJob::ShowFinderGuilds(int ClientID)
 
 	int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 1800;
 	CSqlString<64> cGuildName = CSqlString<64>(pPlayer->GetTempData().m_aGuildSearchBuf);
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "WHERE GuildName LIKE '%%%s%%'", cGuildName.cstr()));
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_guilds", "WHERE GuildName LIKE '%%%s%%'", cGuildName.cstr());
+	while(pRes->next())
 	{
-		const int GuildID = RES->getInt("ID");
-		const int AvailableSlot = RES->getInt("AvailableSlots");
+		const int GuildID = pRes->getInt("ID");
+		const int AvailableSlot = pRes->getInt("AvailableSlots");
 		const int PlayersCount = GetGuildPlayerCount(GuildID);
-		cGuildName = RES->getString("GuildName").c_str();
+		cGuildName = pRes->getString("GuildName").c_str();
 		GS()->AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} : Leader {STR} : Players [{INT}/{INT}]", 
 			cGuildName.cstr(), Job()->PlayerName(ms_aGuild[GuildID].m_OwnerID), &PlayersCount, &AvailableSlot);
 		GS()->AVM(ClientID, "null", NOPE, HideID, "House: {STR} | Bank: {INT} gold", (GetGuildHouseID(GuildID) <= 0 ? "No" : "Yes"), &ms_aGuild[ GuildID ].m_Bank);
@@ -1204,10 +1204,10 @@ void GuildJob::ShowHistoryGuild(int ClientID, int GuildID)
 {
 	// looking for the entire history of the guild in the database
 	char aBuf[128];
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_history", "WHERE GuildID = '%d' ORDER BY ID DESC LIMIT 20", GuildID));
-	while(RES->next()) 
+	ResultPtr pRes = SJK.SD("*", "tw_guilds_history", "WHERE GuildID = '%d' ORDER BY ID DESC LIMIT 20", GuildID);
+	while(pRes->next())
 	{
-		str_format(aBuf, sizeof(aBuf), "[%s] %s", RES->getString("Time").c_str(), RES->getString("Text").c_str());
+		str_format(aBuf, sizeof(aBuf), "[%s] %s", pRes->getString("Time").c_str(), pRes->getString("Text").c_str());
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "{STR}", aBuf);
 	}
 	GS()->AddBackpage(ClientID);	
@@ -1299,10 +1299,10 @@ void GuildJob::BuyGuildHouse(int GuildID, int HouseID)
 		return;
 	}
 
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds_houses", "WHERE ID = '%d' AND OwnerMID IS NULL", HouseID));
-	if(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_guilds_houses", "WHERE ID = '%d' AND OwnerMID IS NULL", HouseID);
+	if(pRes->next())
 	{
-		const int Price = RES->getInt("Price");
+		const int Price = pRes->getInt("Price");
 		if(ms_aGuild[GuildID].m_Bank < Price)
 		{
 			GS()->ChatGuild(GuildID, "This Guild house requires {INT}gold!", &Price);
@@ -1334,8 +1334,8 @@ void GuildJob::SellGuildHouse(int GuildID)
 		return;
 	}
 
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_guilds_houses", "WHERE ID = '%d' AND OwnerMID IS NOT NULL", HouseID));
-	if(RES->next())
+	ResultPtr pRes = SJK.SD("ID", "tw_guilds_houses", "WHERE ID = '%d' AND OwnerMID IS NOT NULL", HouseID);
+	if(pRes->next())
 	{
 		SJK.UD("tw_guilds_houses", "OwnerMID = NULL WHERE ID = '%d'", HouseID);
 

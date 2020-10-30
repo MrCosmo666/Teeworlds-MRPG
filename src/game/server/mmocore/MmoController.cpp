@@ -35,7 +35,7 @@ MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 		component->m_Job = this;
 		component->m_GameServer = pGameServer;
 
-		if(m_pGameServer->GetWorldID() == LAST_WORLD)
+		if(m_pGameServer->GetWorldID() == MAIN_WORLD_ID)
 			component->OnInit();
 
 		char aLocalSelect[64];
@@ -47,7 +47,7 @@ MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 MmoController::~MmoController()
 {
 	SJK.DisconnectConnectionHeap();
-	m_Components.clear();
+	m_Components.free();
 }
 
 void MmoController::OnTick()
@@ -191,11 +191,11 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 
 void MmoController::LoadLogicWorld()
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_logicworld", "WHERE WorldID = '%d'", GS()->GetWorldID()));
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_logicworld", "WHERE WorldID = '%d'", GS()->GetWorldID());
+	while(pRes->next())
 	{
-		const int Type = (int)RES->getInt("MobID"), Mode = (int)RES->getInt("Mode"), Health = (int)RES->getInt("ParseInt");
-		const vec2 Position = vec2(RES->getInt("PosX"), RES->getInt("PosY"));
+		const int Type = (int)pRes->getInt("MobID"), Mode = (int)pRes->getInt("Mode"), Health = (int)pRes->getInt("ParseInt");
+		const vec2 Position = vec2(pRes->getInt("PosX"), pRes->getInt("PosY"));
 		GS()->m_pController->CreateLogic(Type, Mode, Position, Health);
 	}
 }
@@ -203,10 +203,10 @@ void MmoController::LoadLogicWorld()
 char SaveNick[32];
 const char* MmoController::PlayerName(int AccountID)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("Nick", "tw_accounts_data", "WHERE ID = '%d'", AccountID));
-	if(RES->next())
+	ResultPtr pRes = SJK.SD("Nick", "tw_accounts_data", "WHERE ID = '%d'", AccountID);
+	if(pRes->next())
 	{
-		str_copy(SaveNick, RES->getString("Nick").c_str(), sizeof(SaveNick));
+		str_copy(SaveNick, pRes->getString("Nick").c_str(), sizeof(SaveNick));
 		return SaveNick;
 	}
 	return "No found!";
@@ -225,51 +225,51 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
 	if(TypeID == ToplistTypes::GUILDS_LEVELING)
 	{
-		std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "ORDER BY Level DESC, Experience DESC LIMIT 10"));
-		while (RES->next())
+		ResultPtr pRes = SJK.SD("*", "tw_guilds", "ORDER BY Level DESC, Experience DESC LIMIT 10");
+		while (pRes->next())
 		{
 			char NameGuild[64];
-			const int Rank = RES->getRow();
-			const int Level = RES->getInt("Level");
-			const int Experience = RES->getInt("Experience");
-			str_copy(NameGuild, RES->getString("GuildName").c_str(), sizeof(NameGuild));
+			const int Rank = pRes->getRow();
+			const int Level = pRes->getInt("Level");
+			const int Experience = pRes->getInt("Experience");
+			str_copy(NameGuild, pRes->getString("GuildName").c_str(), sizeof(NameGuild));
 			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Level {INT} : Exp {INT}", &Rank, NameGuild, &Level, &Experience);
 		}
 	}
 	else if (TypeID == ToplistTypes::GUILDS_WEALTHY)
 	{
-		std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_guilds", "ORDER BY Bank DESC LIMIT 10"));
-		while (RES->next())
+		ResultPtr pRes = SJK.SD("*", "tw_guilds", "ORDER BY Bank DESC LIMIT 10");
+		while (pRes->next())
 		{
 			char NameGuild[64];
-			const int Rank = RES->getRow();
-			const int Gold = RES->getInt("Bank");
-			str_copy(NameGuild, RES->getString("GuildName").c_str(), sizeof(NameGuild));
+			const int Rank = pRes->getRow();
+			const int Gold = pRes->getInt("Bank");
+			str_copy(NameGuild, pRes->getString("GuildName").c_str(), sizeof(NameGuild));
 			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Gold {INT}", &Rank, NameGuild, &Gold);
 		}
 	}
 	else if (TypeID == ToplistTypes::PLAYERS_LEVELING)
 	{
-		std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_data", "ORDER BY Level DESC, Exp DESC LIMIT 10"));
-		while (RES->next())
+		ResultPtr pRes = SJK.SD("*", "tw_accounts_data", "ORDER BY Level DESC, Exp DESC LIMIT 10");
+		while (pRes->next())
 		{
 			char Nick[64];
-			const int Rank = RES->getRow();
-			const int Level = RES->getInt("Level");
-			const int Experience = RES->getInt("Exp");
-			str_copy(Nick, RES->getString("Nick").c_str(), sizeof(Nick));
+			const int Rank = pRes->getRow();
+			const int Level = pRes->getInt("Level");
+			const int Experience = pRes->getInt("Exp");
+			str_copy(Nick, pRes->getString("Nick").c_str(), sizeof(Nick));
 			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Level {INT} : Exp {INT}", &Rank, Nick, &Level, &Experience);
 		}
 	}
 	else if (TypeID == ToplistTypes::PLAYERS_WEALTHY)
 	{
-		std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_items", "WHERE ItemID = '%d' ORDER BY Count DESC LIMIT 10", (int)itGold));
-		while (RES->next())
+		ResultPtr pRes = SJK.SD("*", "tw_accounts_items", "WHERE ItemID = '%d' ORDER BY Count DESC LIMIT 10", (int)itGold);
+		while (pRes->next())
 		{
 			char Nick[64];
-			const int Rank = RES->getRow();
-			const int Gold = RES->getInt("Count");
-			const int OwnerID = RES->getInt("OwnerID");
+			const int Rank = pRes->getRow();
+			const int Gold = pRes->getInt("Count");
+			const int OwnerID = pRes->getInt("OwnerID");
 			str_copy(Nick, PlayerName(OwnerID), sizeof(Nick));
 			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Gold {INT}", &Rank, Nick, &Gold);
 		}

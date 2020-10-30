@@ -11,7 +11,7 @@ class AccountMinerJob : public MmoComponent
 	{
 		int m_ItemID;
 		int m_Level;
-		int m_Health;
+		int m_StartHealth;
 		int m_PositionX;
 		int m_PositionY;
 		int m_Distance;

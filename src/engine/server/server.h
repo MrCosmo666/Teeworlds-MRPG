@@ -14,6 +14,38 @@ STRINGABLE_ENUM_IMPL(MINER)
 STRINGABLE_ENUM_IMPL(PLANT)
 STRINGABLE_ENUM_IMPL(EMEMBERUPGRADE)
 
+// multiworlds
+#define WorldsInstance CWorldGameServerArray::GetInstance()
+class CWorldGameServerArray
+{
+	static std::shared_ptr<CWorldGameServerArray> m_Instance;
+	struct CWorldGameServer
+	{
+		char m_aName[64];
+		char m_aPath[512];
+		class IGameServer* m_pGameServer;
+		IEngineMap* m_pLoadedMap;
+	};
+public:
+	static CWorldGameServerArray& GetInstance();
+
+	std::map < int /*id*/, CWorldGameServer/*game world*/ > ms_aWorlds;
+	~CWorldGameServerArray() { Clear(); }
+
+	bool IsValid(int WorldID) { return ms_aWorlds.find(WorldID) != ms_aWorlds.end(); }
+	bool Add(int WorldID, IKernel* pKernel);
+	void Clear()
+	{
+		for(auto& pWorld : ms_aWorlds)
+		{
+			delete pWorld.second.m_pGameServer;
+			delete pWorld.second.m_pLoadedMap;
+		}
+		ms_aWorlds.clear();
+	}
+};
+
+// 
 class CSnapIDPool
 {
 	enum
@@ -101,16 +133,15 @@ public:
 
 class CServer : public IServer
 {
-	class IGameServer *m_pGameServer[COUNT_WORLD];
 	class IConsole *m_pConsole;
 	class IStorage *m_pStorage;
 
 public:
-	virtual class IGameServer *GameServer(int WorldID = 0) 
-	{ 
-		if(WorldID < 0 || WorldID >= COUNT_WORLD)
+	virtual class IGameServer* GameServer(int WorldID = 0)
+	{
+		if(WorldsInstance.ms_aWorlds.find(WorldID) == WorldsInstance.ms_aWorlds.end())
 			return nullptr;
-		return m_pGameServer[WorldID];
+		return WorldsInstance.ms_aWorlds[WorldID].m_pGameServer;
 	}
 	class IConsole *Console() { return m_pConsole; }
 	class IStorage *Storage() { return m_pStorage; }
@@ -174,8 +205,8 @@ public:
 		int m_Authed;
 		int m_AuthTries;
 
-		int m_MapID;
-		int m_OldMapID;
+		int m_WorldID;
+		int m_OldWorldID;
 		bool m_ChangeMap;
 
 		int m_MapChunk;
@@ -201,17 +232,13 @@ public:
 	int m_RconClientID;
 	int m_RconAuthLevel;
 	int m_PrintCBIndex;
-	int m_BotsCount;
 
 	// map
 	enum
 	{
 		MAP_CHUNK_SIZE=NET_MAX_PAYLOAD-NET_MAX_CHUNKHEADERSIZE-4, // msg type
 	};
-	char m_aCurrentMap[64];
 	int m_MapChunksPerRequest;
-
-	IEngineMap *m_pLoadedMap[COUNT_WORLD];
 
 	int m_RconPasswordSet;
 	int m_GeneratedRconPassword;
@@ -251,7 +278,6 @@ public:
 	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText);
 	virtual void SendDiscordGenerateMessage(const char *pColor, const char *pTitle, const char *pMsg);
 	virtual void SendDiscordStatus(const char *pStatus, int Type);
-	virtual void AddInformationBotsCount(int Count);
 
 	void Kick(int ClientID, const char *pReason);
 
@@ -294,7 +320,7 @@ public:
 	void PumpNetwork();
 
 	const char *GetMapName() const;
-	bool LoadMap(const char *pMapName, int ID);
+	bool LoadMap(int ID);
 
 	void InitRegister(CNetServer *pNetServer, IEngineMasterServer *pMasterServer, IConsole *pConsole);
 	int Run();

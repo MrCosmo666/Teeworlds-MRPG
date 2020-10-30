@@ -44,7 +44,7 @@ int AccountMinerJob::GetOreHealth(vec2 Pos) const
 	{
 		vec2 Position = vec2(ore.second.m_PositionX, ore.second.m_PositionY);
 		if(distance(Position, Pos) < ore.second.m_Distance)
-			return ore.second.m_Health;
+			return ore.second.m_StartHealth;
 	}
 	return -1;
 }
@@ -77,11 +77,11 @@ void AccountMinerJob::Work(CPlayer *pPlayer, int Level)
 
 void AccountMinerJob::OnInitAccount(CPlayer* pPlayer)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_miner", "WHERE AccountID = '%d'", pPlayer->Acc().m_AuthID));
-	if (RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_miner", "WHERE AccountID = '%d'", pPlayer->Acc().m_AuthID);
+	if (pRes->next())
 	{
 		for (int i = 0; i < NUM_MINER; i++)
-			pPlayer->Acc().m_aMiner[i] = RES->getInt(str_MINER((MINER)i));
+			pPlayer->Acc().m_aMiner[i] = pRes->getInt(str_MINER((MINER)i));
 		return;
 	}
 	pPlayer->Acc().m_aMiner[MnrLevel] = 1;
@@ -91,16 +91,16 @@ void AccountMinerJob::OnInitAccount(CPlayer* pPlayer)
 
 void AccountMinerJob::OnInitWorld(const char* pWhereLocalWorld)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_position_miner", pWhereLocalWorld));
-	while (RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_position_miner", pWhereLocalWorld);
+	while (pRes->next())
 	{
-		const int ID = RES->getInt("ID");
-		ms_aOre[ID].m_ItemID = RES->getInt("ItemID");
-		ms_aOre[ID].m_Level = RES->getInt("Level");
-		ms_aOre[ID].m_Health = RES->getInt("Health");
-		ms_aOre[ID].m_PositionX = RES->getInt("PositionX");
-		ms_aOre[ID].m_PositionY = RES->getInt("PositionY");
-		ms_aOre[ID].m_Distance = RES->getInt("Distance");
+		const int ID = pRes->getInt("ID");
+		ms_aOre[ID].m_ItemID = pRes->getInt("ItemID");
+		ms_aOre[ID].m_Level = pRes->getInt("Level");
+		ms_aOre[ID].m_StartHealth = pRes->getInt("Health");
+		ms_aOre[ID].m_PositionX = pRes->getInt("PositionX");
+		ms_aOre[ID].m_PositionY = pRes->getInt("PositionY");
+		ms_aOre[ID].m_Distance = pRes->getInt("Distance");
 	}
 }
 
@@ -114,7 +114,7 @@ bool AccountMinerJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, c
 		if (pPlayer->Upgrade(Get, &pPlayer->Acc().m_aMiner[VoteID], &pPlayer->Acc().m_aMiner[MnrUpgrade], VoteID2, 3, aBuf))
 		{
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_MINER_DATA);
-			GS()->UpdateVotes(ClientID, MenuList::MENU_UPGRADE);
+			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_UPGRADE);
 		}
 		return true;
 	}

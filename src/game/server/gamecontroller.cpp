@@ -148,7 +148,7 @@ void IGameController::OnReset()
 }
 
 // general
-void IGameController::Snap(int SnappingClient)
+void IGameController::Snap()
 {
 	CNetObj_GameData *pGameData = static_cast<CNetObj_GameData *>(Server()->SnapNewItem(NETOBJTYPE_GAMEDATA, 0, sizeof(CNetObj_GameData)));
 	if(!pGameData)
@@ -157,20 +157,6 @@ void IGameController::Snap(int SnappingClient)
 	pGameData->m_GameStartTick = 0;
 	pGameData->m_GameStateFlags = 0;
 	pGameData->m_GameStateEndTick = 0;
-
-	// demo recording
-	if(SnappingClient == -1)
-	{
-		CNetObj_De_GameInfo *pGameInfo = static_cast<CNetObj_De_GameInfo *>(Server()->SnapNewItem(NETOBJTYPE_DE_GAMEINFO, 0, sizeof(CNetObj_De_GameInfo)));
-		if(!pGameInfo)
-			return;
-
-		pGameInfo->m_GameFlags = 0;
-		pGameInfo->m_ScoreLimit = /*m_GameInfo.m_ScoreLimit*/ 0;
-		pGameInfo->m_TimeLimit = /*m_GameInfo.m_TimeLimit*/ 0;
-		pGameInfo->m_MatchNum = /*m_GameInfo.m_MatchNum*/ 0;
-		pGameInfo->m_MatchCurrent = /*m_GameInfo.m_MatchCurrent*/ 0;
-	}
 }
 
 void IGameController::Tick() { }

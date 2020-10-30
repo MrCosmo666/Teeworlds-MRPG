@@ -19,10 +19,10 @@ class CDropQuestItem : public CEntity
 	int m_FlashTimer;
 
 public:
-	CDropQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, BotJob::QuestBotInfo BotData, int OwnerID);
+	CDropQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, BotJob::QuestBotInfo BotData, int ClientID);
 	virtual ~CDropQuestItem();
 
-	int m_OwnerID;
+	int m_ClientID;
 	BotJob::QuestBotInfo m_QuestBot;
 
 	virtual void Tick();

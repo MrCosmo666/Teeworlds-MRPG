@@ -13,7 +13,7 @@
 #include "ComponentsCore/AccountPlantJob.h"
 #include "ComponentsCore/BotJob.h"
 #include "ComponentsCore/InventoryJob/InventoryJob.h"
-#include "ComponentsCore/QuestJob.h"
+#include "ComponentsCore/QuestsJob/QuestJob.h"
 #include "ComponentsCore/ShopJob.h"
 #include "ComponentsCore/StorageJob.h"
 
@@ -38,8 +38,10 @@ class MmoController
  			m_paComponents.push_back(pComponent);
 		}
 		
-		void clear()
+		void free()
 		{
+			for(auto& pComponent : m_paComponents)
+				delete pComponent;
 			m_paComponents.clear();
 		}
 

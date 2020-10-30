@@ -68,7 +68,7 @@ public:
 	virtual void CreateLogic(int Type, int Mode, vec2 Pos, int Health) = 0;
 	
 	// general
-	virtual void Snap(int SnappingClient);
+	virtual void Snap();
 	virtual void Tick();
 
 	const char *GetGameType() const { return m_pGameType; }

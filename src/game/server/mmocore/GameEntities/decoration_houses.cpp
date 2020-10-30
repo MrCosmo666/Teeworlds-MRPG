@@ -37,10 +37,6 @@ int CDecorationHouses::SwitchToObject(bool Data)
 	return -1;
 }
 
-void CDecorationHouses::Tick()
-{
-}
-
 void CDecorationHouses::Snap(int SnappingClient)
 {
 	if (NetworkClipped(SnappingClient))

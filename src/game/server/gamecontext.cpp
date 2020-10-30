@@ -63,10 +63,14 @@ CGS::CGS()
 
 CGS::~CGS()
 {
+	m_Events.Clear();
+	m_CommandManager.ClearCommands();
 	for(auto & apPlayer : m_apPlayers)
 		delete apPlayer;
-	
+
+	delete m_pController;
 	delete m_pMmoController;
+	delete m_pCommandProcessor;
 	delete m_pPathFinder;
 }
 
@@ -152,6 +156,7 @@ const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const
 }
 
 ItemInformation &CGS::GetItemInfo(int ItemID) const { return InventoryJob::ms_aItemsInfo[ItemID]; }
+CDataQuest &CGS::GetQuestInfo(int QuestID) const { return QuestJob::ms_aDataQuests[QuestID]; }
 
 /* #########################################################################
 	EVENTS 
@@ -959,7 +964,7 @@ void CGS::ClearTalkText(int ClientID)
 void CGS::UpdateDiscordStatus()
 {
 #ifdef CONF_DISCORD
-	if(Server()->Tick() % (Server()->TickSpeed() * 10) != 0 || m_WorldID != MAIN_WORLD)
+	if(Server()->Tick() % (Server()->TickSpeed() * 10) != 0 || m_WorldID != WorldControls::MainWorld)
 		return;
 
 	int Players = 0;
@@ -1068,6 +1073,9 @@ void CGS::OnShutdown()
 	delete m_pCommandProcessor;
 	m_pCommandProcessor = nullptr;
 
+	delete m_pPathFinder;
+	m_pPathFinder = nullptr;
+
 	Clear();
 }
 
@@ -1113,23 +1121,23 @@ void CGS::OnTickMainWorld()
 // output of all objects
 void CGS::OnSnap(int ClientID)
 {
-	if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->GetPlayerWorldID() != GetWorldID())
+	CPlayer* pPlayer = m_apPlayers[ClientID];
+	if(!pPlayer || pPlayer->GetPlayerWorldID() != GetWorldID())
 		return;
 
 	m_World.Snap(ClientID);
-	m_pController->Snap(ClientID);
+	m_pController->Snap();
 	m_Events.Snap(ClientID);
-	for(auto & apPlayer : m_apPlayers)
+	for(auto& arpPlayer : m_apPlayers)
 	{
-		if(apPlayer)
-			apPlayer->Snap(ClientID);
+		if(arpPlayer)
+			arpPlayer->Snap(ClientID);
 	}
 }
 
 void CGS::OnPreSnap() {}
 void CGS::OnPostSnap()
 {
-	m_World.PostSnap();
 	m_Events.Clear();
 }
 
@@ -1276,7 +1284,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			if (item != m_aPlayerVotes[ClientID].end())
 			{
 				const int InteractiveCount = string_to_number(pMsg->m_Reason, 1, 10000000);
-				ParsingVoteCommands(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveCount, pMsg->m_Reason);
+				ParsingVoteCommands(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveCount, pMsg->m_Reason, item->m_Callback);
 				return;
 			}
 			ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
@@ -1431,8 +1439,8 @@ void CGS::OnClientConnected(int ClientID)
 {
 	if(!m_apPlayers[ClientID])
 	{
-		const int savecidmem = ClientID+m_WorldID*MAX_CLIENTS;
-		m_apPlayers[ClientID] = new(savecidmem) CPlayer(this, ClientID);
+		const int AllocMemoryCell = ClientID+m_WorldID*MAX_CLIENTS;
+		m_apPlayers[ClientID] = new(AllocMemoryCell) CPlayer(this, ClientID);
 	}
 
 	SendMotd(ClientID);
@@ -1477,16 +1485,10 @@ void CGS::OnClientEnter(int ClientID)
 	ResetVotes(ClientID, MenuList::MAIN_MENU);
 }
 
-void CGS::OnClientDrop(int ClientID, const char *pReason, bool ChangeWorld)
+void CGS::OnClientDrop(int ClientID, const char *pReason)
 {
 	if(!m_apPlayers[ClientID] || m_apPlayers[ClientID]->IsBot())
 		return;
-
-	if(ChangeWorld)
-	{
-		m_apPlayers[ClientID]->KillCharacter();
-		return;
-	}
 
 	// update clients on drop
 	m_pController->OnPlayerDisconnect(m_apPlayers[ClientID]);
@@ -1538,15 +1540,16 @@ void CGS::OnClientPredictedInput(int ClientID, void *pInput)
 }
 
 // change the world
-void CGS::ChangeWorld(int ClientID)
+void CGS::PrepareClientChangeWorld(int ClientID)
 {
 	if (m_apPlayers[ClientID])
 	{
+		m_apPlayers[ClientID]->KillCharacter(WEAPON_WORLD);
 		delete m_apPlayers[ClientID];
 		m_apPlayers[ClientID] = nullptr;
 	}
-	const int savecidmem = ClientID+m_WorldID*MAX_CLIENTS;
-	m_apPlayers[ClientID] = new(savecidmem) CPlayer(this, ClientID);
+	const int AllocMemoryCell = ClientID+m_WorldID*MAX_CLIENTS;
+	m_apPlayers[ClientID] = new(AllocMemoryCell) CPlayer(this, ClientID);
 }
 
 bool CGS::IsClientReady(int ClientID) const
@@ -1570,12 +1573,12 @@ const char *CGS::NetVersion() const { return GAME_NETVERSION; }
 void CGS::ClearClientData(int ClientID)
 {
 	Mmo()->ResetClientData(ClientID);
-	if(ms_aEffects.find(ClientID) != ms_aEffects.end()) 
-		ms_aEffects.erase(ClientID);
+	m_aPlayerVotes[ClientID].clear();
+	ms_aEffects.erase(ClientID);
 
 	// clear active snap bots for player
-	for(auto& databot : BotJob::ms_aDataBot)
-		databot.second.m_aAlreadySnapQuestBot[ClientID] = false;
+	for(auto& pActiveSnap : BotJob::ms_aDataBot)
+		pActiveSnap.second.m_aAlreadySnapQuestBot[ClientID] = false;
 }
 
 int CGS::GetRank(int AuthID)
@@ -1630,7 +1633,7 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 			pPlayer->GetItem(ItemID).Add(Count, 0, Enchant);
 			return;
 		}
-		pSelf->SendInbox(ClientID, "The sender heavens", "Sent from console", ItemID, Count, Enchant);
+		pSelf->SendInbox(pPlayer, "The sender heavens", "Sent from console", ItemID, Count, Enchant);
 	}
 }
 
@@ -1653,7 +1656,7 @@ void CGS::ConRemItem(IConsole::IResult* pResult, void* pUserData)
 void CGS::ConSay(IConsole::IResult *pResult, void *pUserData)
 {
 	IServer* pServer = (IServer*)pUserData;
-	CGS* pSelf = (CGS*)pServer->GameServer(MAIN_WORLD);
+	CGS* pSelf = (CGS*)pServer->GameServer(MAIN_WORLD_ID);
 	pSelf->SendChat(-1, CHAT_ALL, -1, pResult->GetString(0));
 }
 
@@ -1675,18 +1678,17 @@ void CGS::ConAddCharacter(IConsole::IResult *pResult, void *pUserData)
 void CGS::ConConvertPasswords(IConsole::IResult* pResult, void* pUserData)
 {
 	IServer* pServer = (IServer*)pUserData;
-	CGS* pSelf = (CGS*)pServer->GameServer(MAIN_WORLD);
+	CGS* pSelf = (CGS*)pServer->GameServer(MAIN_WORLD_ID);
 
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID, Password", "tw_accounts", "WHERE PasswordSalt IS NULL OR PasswordSalt = ''"));
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("ID, Password", "tw_accounts", "WHERE PasswordSalt IS NULL OR PasswordSalt = ''");
+	while(pRes->next())
 	{
 		char aSalt[32] = { 0 };
 		secure_random_password(aSalt, sizeof(aSalt), 24);
 
-		std::string Password = pSelf->Mmo()->Account()->HashPassword(RES->getString("Password").c_str(), aSalt);
-
-		SJK.UD("tw_accounts", "Password = '%s', PasswordSalt = '%s' WHERE ID = %d", Password.c_str(), aSalt, RES->getInt("ID"));
-		dbg_msg("mrpg", "%d: %s -> %s", RES->getInt("ID"), RES->getString("Password").c_str(), Password.c_str());
+		std::string Password = pSelf->Mmo()->Account()->HashPassword(pRes->getString("Password").c_str(), aSalt);
+		SJK.UD("tw_accounts", "Password = '%s', PasswordSalt = '%s' WHERE ID = %d", Password.c_str(), aSalt, pRes->getInt("ID"));
+		dbg_msg("mrpg", "%d: %s -> %s", pRes->getInt("ID"), pRes->getString("Password").c_str(), Password.c_str());
 	}
 }
 
@@ -1732,21 +1734,23 @@ void CGS::ClearVotes(int ClientID)
 }
 
 // add a vote
-void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int ID2, const char *Icon)
+void CGS::AV(int ClientID, const char *pCmd, const char *pDesc, const int TempInt, const int TempInt2, const char *pIcon, VoteCallBack Callback)
 {
-	if(To < 0 || To > MAX_PLAYERS || !m_apPlayers[To])
+	if(ClientID < 0 || ClientID >= MAX_PLAYERS || !m_apPlayers[ClientID])
 		return;
 
-	char aDesc[128]; // buffer x2 with unicode
-	str_copy(aDesc, Desc, sizeof(aDesc));
-	if(str_comp(m_apPlayers[To]->GetLanguage(), "ru") == 0 || str_comp(m_apPlayers[To]->GetLanguage(), "uk") == 0)
-		str_translation_utf8_to_cp(aDesc);
+	char aBufDesc[128]; // buffer x2 with unicode
+	str_copy(aBufDesc, pDesc, sizeof(aBufDesc));
+	if(str_comp(m_apPlayers[ClientID]->GetLanguage(), "ru") == 0 || str_comp(m_apPlayers[ClientID]->GetLanguage(), "uk") == 0)
+		str_translation_utf8_to_cp(aBufDesc);
 	
 	CVoteOptions Vote;	
-	str_copy(Vote.m_aDescription, aDesc, sizeof(Vote.m_aDescription));
-	str_copy(Vote.m_aCommand, Cmd, sizeof(Vote.m_aCommand));
-	Vote.m_TempID = ID;
-	Vote.m_TempID2 = ID2; 
+	str_copy(Vote.m_aDescription, aBufDesc, sizeof(Vote.m_aDescription));
+	str_copy(Vote.m_aCommand, pCmd, sizeof(Vote.m_aCommand));
+	str_copy(Vote.m_aIcon, pIcon, sizeof(Vote.m_aIcon));
+	Vote.m_TempID = TempInt;
+	Vote.m_TempID2 = TempInt2;
+	Vote.m_Callback = Callback;
 
 	// trim right and set maximum length to 64 utf8-characters
 	int Length = 0;
@@ -1776,20 +1780,20 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 	if(pEnd != nullptr)
 		*(const_cast<char *>(pEnd)) = 0;
 	
-	m_aPlayerVotes[To].push_back(Vote);
+	m_aPlayerVotes[ClientID].push_back(Vote);
 
 	// send to customers that have a mmo client
-	if(IsMmoClient(To)) 
+	if(IsMmoClient(ClientID))
 	{
 		if(Vote.m_aDescription[0] == '\0')
-			m_apPlayers[To]->m_Colored = { 0, 0, 0 };
+			m_apPlayers[ClientID]->m_Colored = { 0, 0, 0 };
 
 		CNetMsg_Sv_VoteMmoOptionAdd OptionMsg;
-		const vec3 ToHexColor = m_apPlayers[To]->m_Colored;
+		const vec3 ToHexColor = m_apPlayers[ClientID]->m_Colored;
 		OptionMsg.m_pHexColor = ((int)ToHexColor.r << 16) + ((int)ToHexColor.g << 8) + (int)ToHexColor.b;
 		OptionMsg.m_pDescription = Vote.m_aDescription;
-		StrToInts(OptionMsg.m_pIcon, 4, Icon);
-		Server()->SendPackMsg(&OptionMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, To);
+		StrToInts(OptionMsg.m_pIcon, 4, Vote.m_aIcon);
+		Server()->SendPackMsg(&OptionMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);
 		return;
 	}
 
@@ -1799,23 +1803,23 @@ void CGS::AV(int To, const char *Cmd, const char *Desc, const int ID, const int 
 	// send to vanilla clients
 	CNetMsg_Sv_VoteOptionAdd OptionMsg;	
 	OptionMsg.m_pDescription = Vote.m_aDescription;
-	Server()->SendPackMsg(&OptionMsg, MSGFLAG_VITAL, To);
+	Server()->SendPackMsg(&OptionMsg, MSGFLAG_VITAL, ClientID);
 }
 
 // add formatted vote
-void CGS::AVL(int To, const char* aCmd, const char* pText, ...)
+void CGS::AVL(int ClientID, const char *pCmd, const char *pText, ...)
 {
-	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
+	if(ClientID >= 0 && ClientID < MAX_PLAYERS && m_apPlayers[ClientID])
 	{
 		va_list VarArgs;
 		va_start(VarArgs, pText);
 		
 		dynamic_string Buffer;
-		if(str_comp(aCmd, "null") != 0)
+		if(str_comp(pCmd, "null") != 0)
 			Buffer.append("- ");
 		
-		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
-		AV(To, aCmd, Buffer.buffer());
+		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
+		AV(ClientID, pCmd, Buffer.buffer());
 		Buffer.clear();
 		
 		va_end(VarArgs);
@@ -1823,49 +1827,49 @@ void CGS::AVL(int To, const char* aCmd, const char* pText, ...)
 }
 
 // add formatted vote with color
-void CGS::AVH(int To, const int ID, vec3 Color, const char* pText, ...)
+void CGS::AVH(int ClientID, const int HideID, vec3 Color, const char *pText, ...)
 {
-	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
+	if(ClientID >= 0 && ClientID < MAX_PLAYERS && m_apPlayers[ClientID])
 	{
 		va_list VarArgs;
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		const bool HidenTabs = (ID >= TAB_STAT) ? m_apPlayers[To]->GetHidenMenu(ID) : false;
-		Buffer.append(GetSymbolHandleMenu(To, HidenTabs, ID));
+		const bool HidenTabs = (HideID >= TAB_STAT) ? m_apPlayers[ClientID]->GetHidenMenu(HideID) : false;
+		Buffer.append(GetSymbolHandleMenu(ClientID, HidenTabs, HideID));
 
-		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
-		if(ID > TAB_SETTINGS_MODULES && ID < NUM_TAB_MENU) { Buffer.append(" (Press me for help)"); }
+		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
+		if(HideID > TAB_SETTINGS_MODULES && HideID < NUM_TAB_MENU) { Buffer.append(" (Press me for help)"); }
 
-		m_apPlayers[To]->m_Colored = { Color.r, Color.g, Color.b };
-		AV(To, "HIDEN", Buffer.buffer(), ID);
-		if(length(m_apPlayers[To]->m_Colored) > 1.0f)
-			m_apPlayers[To]->m_Colored /= 4.0f;
+		m_apPlayers[ClientID]->m_Colored = { Color.r, Color.g, Color.b };
+		AV(ClientID, "HIDEN", Buffer.buffer(), HideID, -1, "unused");
+		if(length(m_apPlayers[ClientID]->m_Colored) > 1.0f)
+			m_apPlayers[ClientID]->m_Colored /= 4.0f;
 		Buffer.clear();
 		va_end(VarArgs);
 	}
 }
 
 // add formatted vote with color and icon
-void CGS::AVHI(int To, const char *Icon, const int ID, vec3 Color, const char* pText, ...)
+void CGS::AVHI(int ClientID, const char *pIcon, const int HideID, vec3 Color, const char* pText, ...)
 {
-	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
+	if(ClientID >= 0 && ClientID < MAX_PLAYERS && m_apPlayers[ClientID])
 	{
 		va_list VarArgs;
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		const bool HidenTabs = (bool)(ID >= TAB_STAT ? m_apPlayers[To]->GetHidenMenu(ID) : false);
-		Buffer.append(GetSymbolHandleMenu(To, HidenTabs, ID));
+		const bool HidenTabs = (bool)(HideID >= TAB_STAT ? m_apPlayers[ClientID]->GetHidenMenu(HideID) : false);
+		Buffer.append(GetSymbolHandleMenu(ClientID, HidenTabs, HideID));
 
-		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
-		if(ID > TAB_SETTINGS_MODULES && ID < NUM_TAB_MENU)
+		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
+		if(HideID > TAB_SETTINGS_MODULES && HideID < NUM_TAB_MENU)
 			Buffer.append(" (Press me for help)");
 
-		m_apPlayers[To]->m_Colored = Color;
-		AV(To, "HIDEN", Buffer.buffer(), ID, -1, Icon);
-		if(length(m_apPlayers[To]->m_Colored) > 1.0f)
-			m_apPlayers[To]->m_Colored /= 4.0f;
+		m_apPlayers[ClientID]->m_Colored = Color;
+		AV(ClientID, "HIDEN", Buffer.buffer(), HideID, -1, pIcon);
+		if(length(m_apPlayers[ClientID]->m_Colored) > 1.0f)
+			m_apPlayers[ClientID]->m_Colored /= 4.0f;
 			
 		Buffer.clear();
 		va_end(VarArgs);
@@ -1873,66 +1877,89 @@ void CGS::AVHI(int To, const char *Icon, const int ID, vec3 Color, const char* p
 }
 
 // add formatted vote as menu
-void CGS::AVM(int To, const char* Type, const int ID, const int HideID, const char* pText, ...)
+void CGS::AVM(int ClientID, const char *pCmd, const int TempInt, const int HideID, const char* pText, ...)
 {
-	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
+	if(ClientID >= 0 && ClientID < MAX_PLAYERS && m_apPlayers[ClientID])
 	{
-		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) || 
-			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
+		if((!m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) ||
+			(m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
 			return;
 
 		va_list VarArgs;
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		if(ID != NOPE) { Buffer.append("- "); }
+		if(TempInt != NOPE) { Buffer.append("- "); }
 
-		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
-		AV(To, Type, Buffer.buffer(), ID);
+		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
+		AV(ClientID, pCmd, Buffer.buffer(), TempInt);
 		Buffer.clear();
 		va_end(VarArgs);
 	}
 }
 
 // add formatted vote as menu with icon
-void CGS::AVMI(int To, const char *Icon, const char* Type, const int ID, const int HideID, const char* pText, ...)
+void CGS::AVMI(int ClientID, const char *pIcon, const char *pCmd, const int TempInt, const int HideID, const char *pText, ...)
 {
-	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
+	if(ClientID >= 0 && ClientID < MAX_PLAYERS && m_apPlayers[ClientID])
 	{
-		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) || 
-			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
+		if((!m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) ||
+			(m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
 			return;
 
 		va_list VarArgs;
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		if(ID != NOPE) { Buffer.append("- "); }
+		if(TempInt != NOPE) { Buffer.append("- "); }
 
-		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
-		AV(To, Type, Buffer.buffer(), ID, -1, Icon);
+		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
+		AV(ClientID, pCmd, Buffer.buffer(), TempInt, -1, pIcon);
 		Buffer.clear();
 		va_end(VarArgs);
 	}
 }
 
 // add formatted vote with multiple id's
-void CGS::AVD(int To, const char* Type, const int ID, const int ID2, const int HideID, const char* pText, ...)
+void CGS::AVD(int ClientID, const char *pCmd, const int TempInt, const int TempInt2, const int HideID, const char *pText, ...)
 {
-	if(To >= 0 && To < MAX_PLAYERS && m_apPlayers[To])
+	if(ClientID >= 0 && ClientID < MAX_PLAYERS && m_apPlayers[ClientID])
 	{
-		if((!m_apPlayers[To]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) || 
-			(m_apPlayers[To]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
+		if((!m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) ||
+			(m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
 			return;
 			
 		va_list VarArgs;
 		va_start(VarArgs, pText);
 
 		dynamic_string Buffer;
-		if(ID != NOPE) { Buffer.append("- "); }
+		if(TempInt != NOPE) { Buffer.append("- "); }
 
-		Server()->Localization()->Format_VL(Buffer, m_apPlayers[To]->GetLanguage(), pText, VarArgs);
-		AV(To, Type, Buffer.buffer(), ID, ID2);
+		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
+		AV(ClientID, pCmd, Buffer.buffer(), TempInt, TempInt2);
+		Buffer.clear();
+		va_end(VarArgs);
+	}
+}
+
+// add formatted callback vote with multiple id's (need disallow used it for menu)
+void CGS::AVCALLBACK(int ClientID, const char *pCmd, const char *pIcon, const int TempInt, const int TempInt2, const int HideID, VoteCallBack Callback, const char* pText, ...)
+{
+	if(ClientID >= 0 && ClientID < MAX_PLAYERS && m_apPlayers[ClientID])
+	{
+		if((!m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) ||
+			(m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
+			return;
+
+		va_list VarArgs;
+		va_start(VarArgs, pText);
+
+		dynamic_string Buffer;
+		Buffer.append("- ");
+
+		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
+		AV(ClientID, pCmd, Buffer.buffer(), TempInt, TempInt2, pIcon, Callback);
+
 		Buffer.clear();
 		va_end(VarArgs);
 	}
@@ -1944,10 +1971,16 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	if(!pPlayer)
 		return;
 
+	if(pPlayer && pPlayer->m_ActiveMenuRegisteredCallback)
+	{
+		pPlayer->m_ActiveMenuRegisteredCallback = nullptr;
+		pPlayer->m_ActiveMenuOptionCallback = { 0 };
+	}
+
 	kurosio::kpause(3);
 	pPlayer->m_OpenVoteMenu = MenuList;
 	ClearVotes(ClientID);
-
+	
 	if (Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList, true))
 	{
 		m_apPlayers[ClientID]->m_Colored = { 20, 7, 15 };
@@ -2161,15 +2194,15 @@ void CGS::ResetVotesNewbieInformation(int ClientID)
 	AVL(ClientID, "null", "Good game !");
 }
 
-// created for menu update if it is in the open
-void CGS::UpdateVotes(int ClientID, int MenuList)
+// strong update votes variability of the data
+void CGS::StrongUpdateVotes(int ClientID, int MenuList)
 {
 	if(m_apPlayers[ClientID] && m_apPlayers[ClientID]->m_OpenVoteMenu == MenuList)
 		ResetVotes(ClientID, MenuList);
 }
 
-// refresh votes to all who have a menu open
-void CGS::UpdateVotes(int MenuList)
+// strong update votes variability of the data
+void CGS::StrongUpdateVotesForAll(int MenuList)
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -2225,14 +2258,36 @@ void CGS::ShowItemValueInformation(CPlayer *pPlayer, int ItemID)
 }
 
 // vote parsing of all functions of action methods
-bool CGS::ParsingVoteCommands(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text)
+bool CGS::ParsingVoteCommands(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text, VoteCallBack Callback)
 {
 	CPlayer *pPlayer = GetPlayer(ClientID, false, true);
 	if(!pPlayer)
 	{
 		Chat(ClientID, "Use it when you're not dead!");
 		return true;
-	} 
+	}
+
+	const sqlstr::CSqlString<64> FormatText = sqlstr::CSqlString<64>(Text);
+	if(Callback)
+	{
+		CVoteOptionsCallback InstanceCallback;
+		InstanceCallback.pPlayer = pPlayer;
+		InstanceCallback.Get = Get;
+		InstanceCallback.VoteID = VoteID;
+		InstanceCallback.VoteID2 = VoteID2;
+		str_copy(InstanceCallback.Text, FormatText.cstr(), sizeof(InstanceCallback.Text));
+		str_copy(InstanceCallback.Command, CMD, sizeof(InstanceCallback.Command));
+
+		// TODO: fixme. improve the system using the ID method, as well as the ability to implement Backpage
+		if(PPSTR(CMD, "MENU") == 0)
+		{
+			pPlayer->m_ActiveMenuOptionCallback = InstanceCallback;
+			pPlayer->m_ActiveMenuRegisteredCallback = Callback;
+		}
+		Callback(InstanceCallback);
+		return true;
+	}
+
 
 	if(PPSTR(CMD, "null") == 0) 
 		return true;
@@ -2259,7 +2314,6 @@ bool CGS::ParsingVoteCommands(int ClientID, const char *CMD, const int VoteID, c
 		return true;
 
 	// parsing everything else
-	const sqlstr::CSqlString<64> FormatText = sqlstr::CSqlString<64>(Text);
 	return (bool)(Mmo()->OnParsingVoteCommands(pPlayer, CMD, VoteID, VoteID2, Get, FormatText.cstr()));
 }
 
@@ -2275,54 +2329,19 @@ int CGS::CreateBot(short BotType, int BotID, int SubID)
 		return -1;
 
 	Server()->InitClientBot(BotClientID);
-	const int savecidmem = BotClientID+m_WorldID*MAX_CLIENTS;
-	m_apPlayers[BotClientID] = new(savecidmem) CPlayerBot(this, BotClientID, BotID, SubID, BotType);
+	const int AllocMemoryCell = BotClientID+m_WorldID*MAX_CLIENTS;
+	m_apPlayers[BotClientID] = new(AllocMemoryCell) CPlayerBot(this, BotClientID, BotID, SubID, BotType);
 	return BotClientID;
 }
 
-// remove bots that are not active in people for quests
-void CGS::UpdateQuestsBot(int QuestID, int Step)
-{
-	for(auto& FindBot : BotJob::ms_aQuestBot)
-	{
-		CGS* pBotGS = (CGS*)Server()->GameServer(FindBot.second.m_WorldID);
-		if(QuestID != FindBot.second.m_QuestID || Step != FindBot.second.m_Step || !pBotGS)
-			continue;
-
-		// check it's if there's a active bot
-		int BotClientID = -1;
-		for(int i = MAX_PLAYERS ; i < MAX_CLIENTS; i++)
-		{
-			if(!pBotGS->m_apPlayers[i] || pBotGS->m_apPlayers[i]->GetBotType() != BotsTypes::TYPE_BOT_QUEST 
-				|| pBotGS->m_apPlayers[i]->GetBotSub() != FindBot.second.m_SubBotID)
-				continue;
-
-			BotClientID = i;
-		}
-
-		// seek if all players have an active bot
-		const bool ActiveBot = pBotGS->Mmo()->Quest()->IsActiveQuestBot(QuestID, Step);
-		if(ActiveBot && BotClientID <= -1)
-			pBotGS->CreateBot(BotsTypes::TYPE_BOT_QUEST, FindBot.second.m_BotID, FindBot.second.m_SubBotID);
-
-		// if the bot is not active for more than one player
-		if (!ActiveBot && BotClientID >= MAX_PLAYERS)
-		{
-			delete pBotGS->m_apPlayers[BotClientID];
-			pBotGS->m_apPlayers[BotClientID] = nullptr;
-		}
-	}
-}
-
 // create lol text in the world
-void CGS::CreateText(CEntity *pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char *pText)
+void CGS::CreateText(CEntity* pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char* pText)
 {
 	if(!CheckingPlayersDistance(Pos, 800))
 		return;
 
 	CLoltext Text;
 	Text.Create(&m_World, pParent, Pos, Vel, Lifespan, pText, true, Follow);
-	return;
 }
 
 // creates a particle of experience that follows the player
@@ -2372,13 +2391,18 @@ bool CGS::TakeItemCharacter(int ClientID)
 }
 
 // send a message with or without the object using ClientID
-void CGS::SendInbox(int ClientID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
+void CGS::SendInbox(CPlayer* pPlayer, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
 {
-	CPlayer* pPlayer = GetPlayer(ClientID, true);
-	if(!pPlayer) 
+	if(!pPlayer || !pPlayer->IsAuthed())
 		return;
 
-	Mmo()->Inbox()->SendInbox(pPlayer->Acc().m_AuthID, Name, Desc, ItemID, Count, Enchant);
+	SendInbox(pPlayer->Acc().m_AuthID, Name, Desc, ItemID, Count, Enchant);
+} 
+
+// send a message with or without the object using AuthID
+void CGS::SendInbox(int AuthID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
+{
+	Mmo()->Inbox()->SendInbox(AuthID, Name, Desc, ItemID, Count, Enchant);
 } 
 
 // send day information

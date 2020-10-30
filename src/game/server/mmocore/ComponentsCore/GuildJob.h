@@ -42,15 +42,9 @@ class GuildJob : public MmoComponent
 		int m_Access;
 	};
 
-	typedef std::map < int , GuildStruct > GuildType;
-	static GuildType ms_aGuild;
-
-	typedef std::map < int , GuildStructHouse > GuildHouseType;
-	static GuildHouseType ms_aHouseGuild;
-
-	typedef std::map < int , GuildStructRank > GuildRankType;
-	static GuildRankType ms_aRankGuild;
-
+	static std::map < int, GuildStruct > ms_aGuild;
+	static std::map < int, GuildStructHouse > ms_aHouseGuild;
+	static std::map < int, GuildStructRank > ms_aRankGuild;
 	std::map < int, CDecorationHouses* > m_DecorationHouse;
 
 	void LoadGuildRank(int GuildID);

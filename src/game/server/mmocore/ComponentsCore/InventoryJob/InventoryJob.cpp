@@ -9,40 +9,40 @@ std::map < int , ItemInformation > InventoryJob::ms_aItemsInfo;
 
 void InventoryJob::OnInit()
 {
-	SJK.SDT("*", "tw_items_list", [&](ResultSet* RES)
+	SJK.SDT("*", "tw_items_list", [&](ResultPtr pRes)
 	{
-		while(RES->next())
+		while(pRes->next())
 		{
-			const int ItemID = (int)RES->getInt("ItemID");
-			str_copy(ms_aItemsInfo[ItemID].m_aName, RES->getString("Name").c_str(), sizeof(ms_aItemsInfo[ItemID].m_aName));
-			str_copy(ms_aItemsInfo[ItemID].m_aDesc, RES->getString("Description").c_str(), sizeof(ms_aItemsInfo[ItemID].m_aDesc));
-			str_copy(ms_aItemsInfo[ItemID].m_aIcon, RES->getString("Icon").c_str(), sizeof(ms_aItemsInfo[ItemID].m_aIcon));
-			ms_aItemsInfo[ItemID].m_Type = (int)RES->getInt("Type");
-			ms_aItemsInfo[ItemID].m_Function = (int)RES->getInt("Function");
-			ms_aItemsInfo[ItemID].m_Dysenthis = (int)RES->getInt("Desynthesis");
-			ms_aItemsInfo[ItemID].m_MinimalPrice = (int)RES->getInt("Selling");
+			const int ItemID = (int)pRes->getInt("ItemID");
+			str_copy(ms_aItemsInfo[ItemID].m_aName, pRes->getString("Name").c_str(), sizeof(ms_aItemsInfo[ItemID].m_aName));
+			str_copy(ms_aItemsInfo[ItemID].m_aDesc, pRes->getString("Description").c_str(), sizeof(ms_aItemsInfo[ItemID].m_aDesc));
+			str_copy(ms_aItemsInfo[ItemID].m_aIcon, pRes->getString("Icon").c_str(), sizeof(ms_aItemsInfo[ItemID].m_aIcon));
+			ms_aItemsInfo[ItemID].m_Type = (int)pRes->getInt("Type");
+			ms_aItemsInfo[ItemID].m_Function = (int)pRes->getInt("Function");
+			ms_aItemsInfo[ItemID].m_Dysenthis = (int)pRes->getInt("Desynthesis");
+			ms_aItemsInfo[ItemID].m_MinimalPrice = (int)pRes->getInt("Selling");
 			for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 			{
 				char aBuf[32];
 				str_format(aBuf, sizeof(aBuf), "Stat_%d", i);
-				ms_aItemsInfo[ItemID].m_aAttribute[i] = (int)RES->getInt(aBuf);
+				ms_aItemsInfo[ItemID].m_aAttribute[i] = (int)pRes->getInt(aBuf);
 				str_format(aBuf, sizeof(aBuf), "StatCount_%d", i);
-				ms_aItemsInfo[ItemID].m_aAttributeCount[i] = (int)RES->getInt(aBuf);
+				ms_aItemsInfo[ItemID].m_aAttributeCount[i] = (int)pRes->getInt(aBuf);
 			}
-			ms_aItemsInfo[ItemID].m_ProjID = (int)RES->getInt("ProjectileID");
+			ms_aItemsInfo[ItemID].m_ProjID = (int)pRes->getInt("ProjectileID");
 		}
 	});
 
-	SJK.SDT("*", "tw_attributs", [&](ResultSet* RES)
+	SJK.SDT("*", "tw_attributs", [&](ResultPtr pRes)
 	{
-		while(RES->next())
+		while(pRes->next())
 		{
-			const int AttID = RES->getInt("ID");
-			str_copy(CGS::ms_aAttributsInfo[AttID].m_aName, RES->getString("name").c_str(), sizeof(CGS::ms_aAttributsInfo[AttID].m_aName));
-			str_copy(CGS::ms_aAttributsInfo[AttID].m_aFieldName, RES->getString("field_name").c_str(), sizeof(CGS::ms_aAttributsInfo[AttID].m_aFieldName));
-			CGS::ms_aAttributsInfo[AttID].m_UpgradePrice = RES->getInt("price");
-			CGS::ms_aAttributsInfo[AttID].m_Type = RES->getInt("at_type");
-			CGS::ms_aAttributsInfo[AttID].m_Devide = RES->getInt("divide");
+			const int AttID = pRes->getInt("ID");
+			str_copy(CGS::ms_aAttributsInfo[AttID].m_aName, pRes->getString("name").c_str(), sizeof(CGS::ms_aAttributsInfo[AttID].m_aName));
+			str_copy(CGS::ms_aAttributsInfo[AttID].m_aFieldName, pRes->getString("field_name").c_str(), sizeof(CGS::ms_aAttributsInfo[AttID].m_aFieldName));
+			CGS::ms_aAttributsInfo[AttID].m_UpgradePrice = pRes->getInt("price");
+			CGS::ms_aAttributsInfo[AttID].m_Type = pRes->getInt("at_type");
+			CGS::ms_aAttributsInfo[AttID].m_Devide = pRes->getInt("divide");
 		}
 	});
 }
@@ -50,23 +50,22 @@ void InventoryJob::OnInit()
 void InventoryJob::OnInitAccount(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_items", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID));
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_items", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	while(pRes->next())
 	{
-		int ItemID = (int)RES->getInt("ItemID");
+		int ItemID = (int)pRes->getInt("ItemID");
 		ms_aItems[ClientID][ItemID].SetItemOwner(pPlayer);
 		ms_aItems[ClientID][ItemID].m_ItemID = ItemID;
-		ms_aItems[ClientID][ItemID].m_Count = (int)RES->getInt("Count");
-		ms_aItems[ClientID][ItemID].m_Settings = (int)RES->getInt("Settings");
-		ms_aItems[ClientID][ItemID].m_Enchant = (int)RES->getInt("Enchant");
-		ms_aItems[ClientID][ItemID].m_Durability = (int)RES->getInt("Durability");
+		ms_aItems[ClientID][ItemID].m_Count = (int)pRes->getInt("Count");
+		ms_aItems[ClientID][ItemID].m_Settings = (int)pRes->getInt("Settings");
+		ms_aItems[ClientID][ItemID].m_Enchant = (int)pRes->getInt("Enchant");
+		ms_aItems[ClientID][ItemID].m_Durability = (int)pRes->getInt("Durability");
 	}		
 }
 
 void InventoryJob::OnResetClient(int ClientID)
 {
-	if (ms_aItems.find(ClientID) != ms_aItems.end())
-		ms_aItems.erase(ClientID);
+	ms_aItems.erase(ClientID);
 }
 
 void InventoryJob::RepairDurabilityItems(CPlayer *pPlayer)
@@ -113,11 +112,11 @@ int InventoryJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Setti
 {
 	// check initialize and add the item
 	const int ClientID = pPlayer->GetCID();
-	std::shared_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AuthID));
-	if(RES->next())
+	ResultPtr pRes = SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AuthID);
+	if(pRes->next())
 	{
-		ms_aItems[ClientID][ItemID].m_Count = RES->getInt("Count")+Count;
-		ms_aItems[ClientID][ItemID].m_Settings = RES->getInt("Settings")+Settings;
+		ms_aItems[ClientID][ItemID].m_Count = pRes->getInt("Count")+Count;
+		ms_aItems[ClientID][ItemID].m_Settings = pRes->getInt("Settings")+Settings;
 		ms_aItems[ClientID][ItemID].m_Enchant = Enchant;
 		return 1;	
 	}
@@ -147,14 +146,14 @@ int InventoryJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Set
 {
 	// we check the database
 	const int ClientID = pPlayer->GetCID();
-	std::shared_ptr<ResultSet> RES(SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AuthID));
-	if(RES->next())
+	ResultPtr pRes = SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AuthID);
+	if(pRes->next())
 	{
 		// update if there is more
-		if(RES->getInt("Count") > Count)
+		if(pRes->getInt("Count") > Count)
 		{
-			ms_aItems[ClientID][ItemID].m_Count = RES->getInt("Count")-Count;
-			ms_aItems[ClientID][ItemID].m_Settings = RES->getInt("Settings")-Settings;
+			ms_aItems[ClientID][ItemID].m_Count = pRes->getInt("Count")-Count;
+			ms_aItems[ClientID][ItemID].m_Settings = pRes->getInt("Settings")-Settings;
 			return 1;		
 		}
 
@@ -172,17 +171,14 @@ int InventoryJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Set
 	return 0;		
 }
 
-int InventoryJob::ActionItemCountAllowed(CPlayer *pPlayer, int ItemID)
+int InventoryJob::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID)
 {
-	const int ClientID = pPlayer->GetCID();
-	const int AvailableCount = Job()->Quest()->QuestingAllowedItemsCount(pPlayer, ItemID);
-	if (AvailableCount <= 0)
+	const int AvailableCount = Job()->Quest()->GetUnfrozenItemCount(pPlayer, ItemID);
+	if(AvailableCount <= 0 && pPlayer->GetItem(ItemID).m_Count >= 1)
 	{
-		GS()->Chat(ClientID, "This count of items that you have, iced for the quest!");
-		GS()->Chat(ClientID, "Can see in which quest they are required in Adventure journal!");
-		return -1;
+		GS()->Chat(pPlayer->GetCID(), "\"{STR}\" frozen for some quest.", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
+		GS()->Chat(pPlayer->GetCID(), "In the \"Adventure Journal\", you can see in which quest an item is used!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
 	}
-
 	return AvailableCount;
 }
 
@@ -273,7 +269,7 @@ bool InventoryJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, cons
 	if(PPSTR(CMD, "SORTEDINVENTORY") == 0)
 	{
 		pPlayer->m_aSortTabs[SORT_INVENTORY] = VoteID;
-		GS()->UpdateVotes(ClientID, MenuList::MENU_INVENTORY);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INVENTORY);
 		return true;
 	}
 
@@ -282,7 +278,7 @@ bool InventoryJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, cons
 		if (!pPlayer->GetCharacter())
 			return true;
 
-		int AvailableCount = ActionItemCountAllowed(pPlayer, VoteID);
+		int AvailableCount = GetUnfrozenItemCount(pPlayer, VoteID);
 		if (AvailableCount <= 0)
 			return true;
 
@@ -297,18 +293,19 @@ bool InventoryJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, cons
 
 	if(PPSTR(CMD, "IUSE") == 0)
 	{
-		int AvailableCount = ActionItemCountAllowed(pPlayer, VoteID);
+		int AvailableCount = GetUnfrozenItemCount(pPlayer, VoteID);
 		if (AvailableCount <= 0)
 			return true;
 
 		Get = min(AvailableCount, Get);
 		pPlayer->GetItem(VoteID).Use(Get);
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 
 	if(PPSTR(CMD, "IDESYNTHESIS") == 0)
 	{
-		int AvailableCount = ActionItemCountAllowed(pPlayer, VoteID);
+		int AvailableCount = GetUnfrozenItemCount(pPlayer, VoteID);
 		if (AvailableCount <= 0)
 			return true;
 
@@ -367,7 +364,7 @@ bool InventoryJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, cons
 	if(PPSTR(CMD, "SORTEDEQUIP") == 0)
 	{
 		pPlayer->m_aSortTabs[SORT_EQUIPING] = VoteID;
-		GS()->UpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
 		return true;				
 	}
 
@@ -468,33 +465,34 @@ int InventoryJob::GetCountItemsType(CPlayer *pPlayer, int Type) const
 }
 
 // TODO: FIX IT (lock .. unlock)
-static std::map<int, std::mutex > lock_sleep;
-void InventoryJob::AddItemSleep(int AccountID, int ItemID, int GiveCount, int Milliseconds)
+std::mutex lock_sleep;
+void InventoryJob::AddItemSleep(int AccountID, int ItemID, int Count, int Milliseconds)
 {
-	std::thread([this, AccountID, ItemID, GiveCount, Milliseconds]()
+	std::thread Thread([this, AccountID, ItemID, Count, Milliseconds]()
 	{
 		if(Milliseconds > 0)
 			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
 
-		lock_sleep[AccountID].lock();
+		lock_sleep.lock();
 		const int ClientID = Job()->Account()->CheckOnlineAccount(AccountID);
 		CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
 		if(pPlayer)
 		{
-			pPlayer->GetItem(ItemID).Add(GiveCount);
-			lock_sleep[AccountID].unlock();
+			pPlayer->GetItem(ItemID).Add(Count);
+			lock_sleep.unlock();
 			return;
 		}
 
-		std::shared_ptr<ResultSet> RES(SJK.SD("Count", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, AccountID));
-		if(RES->next())
+		ResultPtr pRes = SJK.SD("Count", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, AccountID);
+		if(pRes->next())
 		{
-			const int ReallyCount = (int)RES->getInt("Count") + GiveCount;
+			const int ReallyCount = (int)pRes->getInt("Count") + Count;
 			SJK.UD("tw_accounts_items", "Count = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", ReallyCount, AccountID, ItemID);
-			lock_sleep[AccountID].unlock();
+			lock_sleep.unlock();
 			return;
 		}
-		SJK.ID("tw_accounts_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '0', '0')", ItemID, AccountID, GiveCount);
-		lock_sleep[AccountID].unlock();
-	}).detach();
+		SJK.ID("tw_accounts_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '0', '0')", ItemID, AccountID, Count);
+		lock_sleep.unlock();
+	});
+	Thread.detach();
 }

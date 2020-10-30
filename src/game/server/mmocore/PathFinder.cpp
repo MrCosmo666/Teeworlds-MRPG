@@ -49,6 +49,13 @@ CPathfinder::CPathfinder(class CLayers* Layers, class CCollision* Collision) : m
 	}
 }
 
+CPathfinder::~CPathfinder()
+{
+	m_lMap.clear();
+	m_lFinalPath.clear();
+	m_lNodes.clear();
+}
+
 void CPathfinder::Init()
 {
 	m_ClosedNodes = 0;

@@ -8,6 +8,7 @@
 
 #include "mmocore/ComponentsCore/InventoryJob/ItemInventory.h"
 #include "mmocore/ComponentsCore/SkillsJob/Skill.h"
+#include "mmocore/ComponentsCore/QuestsJob/PlayerQuests.h"
 
 #include "entities/character.h"
 
@@ -21,7 +22,7 @@ class CPlayer
 {
 	MACRO_ALLOC_POOL_ID()
 
-		struct StructLatency
+	struct StructLatency
 	{
 		int m_AccumMin;
 		int m_AccumMax;
@@ -69,10 +70,15 @@ public:
 	CTuningParams m_NextTuningParams;
 
 	bool m_Spawned;
+
+	vec3 m_Colored;
 	short m_aSortTabs[NUM_SORT_TAB];
 	short m_OpenVoteMenu;
 	short m_LastVoteMenu;
-	vec3 m_Colored;
+
+	// TODO: fixme. improve the system using the ID method, as well as the ability to implement Backpage
+	CVoteOptionsCallback m_ActiveMenuOptionCallback;
+	VoteCallBack m_ActiveMenuRegisteredCallback;
 
 private:
 	char m_aFormatTalkQuest[512];
@@ -159,6 +165,7 @@ public:
 	######################################################################### */
 	InventoryItem& GetItem(int ItemID);
 	CSkill &GetSkill(int SkillID);
+	CPlayerQuest& GetQuest(int QuestID);
 	AccountMainJob::StructTempPlayerData& GetTempData() { return AccountMainJob::ms_aPlayerTempData[m_ClientID]; }
 	AccountMainJob::StructData& Acc() { return AccountMainJob::ms_aData[m_ClientID]; }
 
@@ -166,7 +173,7 @@ public:
 	int GetLevelAllAttributes();
 
 	// npc conversations
-	void SetTalking(int TalkedID, bool ToProgress);
+	void SetTalking(int TalkedID, bool IsStartDialogue);
 	void ClearTalking();
 	int GetTalkedID() const { return m_TalkingNPC.m_TalkedID; };
 

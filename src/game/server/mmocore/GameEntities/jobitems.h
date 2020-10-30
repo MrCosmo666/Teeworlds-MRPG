@@ -10,7 +10,7 @@ const int PickupPhysSize = 14;
 class CJobItems : public CEntity
 {
 public:
-	CJobItems(CGameWorld *pGameWorld, int ItemID, int Level, vec2 Pos, int Type, int Health, int HouseID = -1);
+	CJobItems(CGameWorld *pGameWorld, int ItemID, int Level, vec2 Pos, int Type, int StartHealth, int HouseID = -1);
 
 	virtual void Reset();
 	virtual void Tick();
@@ -25,8 +25,8 @@ public:
 	int m_HouseID;
 private:
 	int m_Level;
-	int m_Progress;
 	int m_Health;
+	int m_StartHealth;
 	int m_SpawnTick;
 	int m_Type;
 

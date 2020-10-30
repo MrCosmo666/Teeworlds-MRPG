@@ -15,7 +15,7 @@ class CCharacterBotAI : public CCharacter
 	MACRO_ALLOC_POOL_ID()
 
 public:
-	CCharacterBotAI(CGameWorld *pWorld);
+	CCharacterBotAI(CGameWorld* pWorld);
 	~CCharacterBotAI();
 
 	int GetBotTarget() const { return m_BotTargetID; };

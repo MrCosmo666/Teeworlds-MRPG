@@ -8,13 +8,13 @@ using namespace sqlstr;
 // mails
 void MailBoxJob::ReceiveInbox(CPlayer *pPlayer, int InboxID)
 {
-	std::shared_ptr<ResultSet> RES(SJK.SD("ItemID, Count, Enchant", "tw_accounts_inbox", "WHERE ID = '%d'", InboxID));
-	if(!RES->next())
+	ResultPtr pRes = SJK.SD("ItemID, Count, Enchant", "tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
+	if(!pRes->next())
 		return;
 	
 	// get informed about the mail
-	const int ItemID = RES->getInt("ItemID");
-	const int Count = RES->getInt("Count");
+	const int ItemID = pRes->getInt("ItemID");
+	const int Count = pRes->getInt("Count");
 	if(ItemID <= 0 || Count <= 0)
 	{
 		SJK.DD("tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
@@ -29,7 +29,7 @@ void MailBoxJob::ReceiveInbox(CPlayer *pPlayer, int InboxID)
 	}
 	SJK.DD("tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
 
-	const int Enchant = RES->getInt("Enchant");
+	const int Enchant = pRes->getInt("Enchant");
 	pPlayer->GetItem(ItemID).Add(Count, 0, Enchant);
 	GS()->Chat(pPlayer->GetCID(), "You received an attached item [{STR}].", GS()->GetItemInfo(ItemID).GetName(pPlayer));
 }
@@ -41,21 +41,21 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 	bool EmptyMailBox = true;
 	const int ClientID = pPlayer->GetCID();
 	int HideID = (int)(NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 200);
-	std::shared_ptr<ResultSet> RES(SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AuthID, MAX_INBOX_LIST));
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AuthID, MAX_INBOX_LIST);
+	while(pRes->next())
 	{
 		// get the information to create an object
-		const int MailID = RES->getInt("ID");
-		const int ItemID = RES->getInt("ItemID");
-		const int Count = RES->getInt("Count"); 
-		const int Enchant = RES->getInt("Enchant");
+		const int MailID = pRes->getInt("ID");
+		const int ItemID = pRes->getInt("ItemID");
+		const int Count = pRes->getInt("Count");
+		const int Enchant = pRes->getInt("Enchant");
 		EmptyMailBox = false;
 		ShowLetterID++;
 		HideID++;
 
 		// add vote menu
-		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "✉ Letter({INT}) {STR}", &ShowLetterID, RES->getString("MailName").c_str());
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", RES->getString("MailDesc").c_str());
+		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "✉ Letter({INT}) {STR}", &ShowLetterID, pRes->getString("MailName").c_str());
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pRes->getString("MailDesc").c_str());
 		if(ItemID <= 0 || Count <= 0)
 			GS()->AVM(ClientID, "MAIL", MailID, HideID, "I read it (L{INT})", &ShowLetterID);
 		else if(GS()->GetItemInfo(ItemID).IsEnchantable())
@@ -76,8 +76,8 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 // check whether messages are available
 int MailBoxJob::GetActiveInbox(CPlayer *pPlayer)
 {
-	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID));
-	const int MailCount = RES2->rowsCount();
+	ResultPtr pRes = SJK.SD("ID", "tw_accounts_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	const int MailCount = pRes->rowsCount();
 	return MailCount;
 }
 
@@ -104,7 +104,7 @@ bool MailBoxJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const 
 	if(PPSTR(CMD, "MAIL") == 0)
 	{
 		ReceiveInbox(pPlayer, VoteID);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_INBOX);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INBOX);
 		return true;
 	}
 

@@ -3,6 +3,56 @@
 #ifndef GAME_CLIENT_UI_H
 #define GAME_CLIENT_UI_H
 
+// TODO: Animations Rect rework
+enum ANIMATION_TYPE
+{
+	AnimIN,
+	AnimOUT,
+	LINEAR,
+	LINEARBACK,
+	EaseIN,				// Smooth, slow at first, slow at the end, very slow overall speed
+	EaseOUT,			// Smooth, fast at first, slow at the end, total speed is very slow
+	EaseINOUT,			// Smoothly, at the beginning and at the end slowly, the overall speed is very slow
+	EaseOUTIN,			//
+	EaseIN2,			// Smooth, slow at first, slow at last, slow overall speed
+	EaseOUT2,			// Smoothly, fast at first, slow at the end, the total speed is slow
+	EaseINOUT2,			// Smoothly, at the beginning and at the end slowly, the total speed is slow
+	EaseOUTIN2,			//
+	EaseIN3,			// Smooth, slow at first, fast at last, overall speed is average
+	EaseOUT3,			// Smoothly, fast at first, slow at last, overall speed is average
+	EaseINOUT3,			// Smoothly, slowly at the beginning and at the end, the overall speed is average
+	EaseOUTIN3,			//
+	EaseIN4,			// Smooth, slow at first, fast at the end, fast overall speed - fast
+	EaseOUT4,			// Smoothly, fast at the beginning, slow at the end, overall speed - fast
+	EaseINOUT4,			// Smoothly, at the beginning and at the end slowly, the overall speed - fast
+	EaseOUTIN4,			//
+	EaseIN5,			// Smooth, slow at first, fast at last, overall speed - very fast
+	EaseOUT5,			// Smooth, fast at first, slow at last, overall speed - very fast
+	EaseINOUT5,			// Smoothly, at the beginning and at the end slowly, the overall speed - very fast
+	EaseOUTIN5,			//
+	EaseIN6,            // Smooth, slow at first, very fast at the end, overall speed - very fast
+	EaseOUT6,           // Smooth, fast at first, slow at last, total speed - very fast
+	EaseINOUT6,         // Smoothly, at the beginning and at the end slowly, the overall speed is very fast
+	EaseOUTIN6,			//
+	EaseINCirc,         // Smooth, slow at first, very fast at the end, very fast overall speed
+	EaseOUTCirc,        // Smooth at first, fast at the end, slow at the end, overall speed - faster than the previous ones
+	EaseINOUTCirc,      // Smoothly, at the beginning and at the end slowly, the overall speed is faster than the previous ones
+	EaseOUTINCirc,		//
+	EaseINBack,			// Smoothly late, late at first.
+	EaseOUTBack,		// Smoothly late, late at the end.
+	EaseINOUTBack,		// Smoothly late, early and late at the beginning and end.
+	EaseOUTINBack,		//
+	EaseINElastic,		// gently, elastically at the end
+	EaseOUTElastic,		// gently, elastically at first
+	EaseINOUTElastic,	// gently, in the center elastic
+	EaseOUTINELastic,	//
+	EaseINBounce,		// gently, jumps slowly
+	EaseOUTBounce,		// gently, immediately jumps
+	EaseINOUTBounce,	// smoothly, jumps both at the beginning and at the end.
+	EaseOUTINBounce,	//
+	Default,
+};
+
 class CUIRect
 {
 public:
@@ -49,7 +99,7 @@ class CUI
 
 	class IGraphics* m_pGraphics;
 	class IInput* m_pInput;
-	class ITextRender *m_pTextRender;
+	class ITextRender* m_pTextRender;
 
 public:
 	static const vec4 ms_DefaultTextColor;
@@ -147,6 +197,5 @@ public:
 	void DoLabel(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, float LineWidth = -1.0f, bool MultiLine = true);
 	void DoLabelHighlighted(const CUIRect* pRect, const char* pText, const char* pHighlighted, float FontSize, const vec4& TextColor, const vec4& HighlightColor);
 };
-
 
 #endif

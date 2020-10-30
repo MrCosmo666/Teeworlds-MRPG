@@ -9,7 +9,6 @@
 #include "laser.h"
 #include "projectile.h"
 
-#include <game/server/mmocore/GameEntities/quest_path_finder.h>
 #include <game/server/mmocore/GameEntities/snapfull.h>
 #include <game/server/mmocore/GameEntities/jobitems.h>
 
@@ -36,7 +35,7 @@ CInputCount CountInput(int Prev, int Cur)
 	return c;
 }
 
-MACRO_ALLOC_POOL_ID_IMPL(CCharacter, MAX_CLIENTS*COUNT_WORLD+MAX_CLIENTS)
+MACRO_ALLOC_POOL_ID_IMPL(CCharacter, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 
 CCharacter::CCharacter(CGameWorld *pWorld)
 : CEntity(pWorld, CGameWorld::ENTTYPE_CHARACTER, vec2(0, 0), ms_PhysSize)
@@ -92,7 +91,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	if(!m_pPlayer->IsBot())
 	{
 		m_pPlayer->m_MoodState = m_pPlayer->GetMoodState();
-		GS()->Mmo()->Quest()->UpdateArrowStep(m_pPlayer->GetCID());
+		GS()->Mmo()->Quest()->UpdateArrowStep(m_pPlayer);
 		GS()->Mmo()->Quest()->AcceptNextStoryQuestStep(m_pPlayer);
 
 		m_AmmoRegen = m_pPlayer->GetAttributeCount(Stats::StAmmoRegen, true);
@@ -290,8 +289,7 @@ void CCharacter::FireWeapon()
 				// talking wth bot
 				if (!StartedTalking && StartConversation(pTarget->GetPlayer()))
 				{
-					m_pPlayer->ClearTalking();
-					m_pPlayer->SetTalking(pTarget->GetPlayer()->GetCID(), false);
+					m_pPlayer->SetTalking(pTarget->GetPlayer()->GetCID(), true);
 					GS()->CreateHammerHit(ProjStartPos);
 					StartedTalking = true;
 					Hits = true;
@@ -418,17 +416,6 @@ void CCharacter::HandleWeapons()
 	}
 }
 
-void CCharacter::CreateQuestsStep(int QuestID)
-{
-	const int ClientID = m_pPlayer->GetCID();
-	vec2 Pos = GS()->Mmo()->WorldSwap()->GetPositionQuestBot(ClientID, QuestID);
-	if (QuestJob::ms_aQuests[ClientID].find(QuestID) == QuestJob::ms_aQuests[ClientID].end() || (Pos.x == 0.0f && Pos.y == 0.0f))
-		return;
-
-	const int Progress = QuestJob::ms_aQuests[ClientID][QuestID].m_Step;
-	new CQuestPathFinder(GameWorld(), m_Core.m_Pos, ClientID, QuestID, Progress, Pos);
-}
-
 bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)
 {
 	const int WeaponID = clamp(Weapon, (int)WEAPON_HAMMER, (int)WEAPON_NINJA);
@@ -549,6 +536,12 @@ void CCharacter::TickDefered()
 		m_DoorHit = false;
 	}
 
+	// apply drag velocity when the player is not firing ninja
+	// and set it back to 0 for the next tick
+	if(m_ActiveWeapon != WEAPON_NINJA)
+		m_Core.AddDragVelocity();
+	m_Core.ResetDragVelocity();
+
 	if(m_pPlayer->IsBot())
 	{	
 		CCharacterCore::CParams CoreTickParams(&m_pPlayer->m_NextTuningParams);
@@ -567,13 +560,6 @@ void CCharacter::TickDefered()
 		m_ReckoningCore.Move(&CoreTickParams);
 		m_ReckoningCore.Quantize();
 	}
-
-	// apply drag velocity when the player is not firing ninja
-	// and set it back to 0 for the next tick
-	if(m_ActiveWeapon != WEAPON_NINJA)
-		m_Core.AddDragVelocity();
-	m_Core.ResetDragVelocity();
-
 
 	CCharacterCore::CParams CoreTickParams(&m_pPlayer->m_NextTuningParams);
 	m_Core.Move(&CoreTickParams);
@@ -1153,14 +1139,14 @@ bool CCharacter::IsLockedWorld()
 	if(m_Alive && (Server()->Tick() % Server()->TickSpeed() * 3) == 0  && m_pPlayer->IsAuthed())
 	{
 		const int NecessaryQuest = GS()->Mmo()->WorldSwap()->GetNecessaryQuest();
-		if(NecessaryQuest > 0 && !GS()->Mmo()->Quest()->IsCompletedQuest(m_pPlayer->GetCID(), NecessaryQuest))
+		if(NecessaryQuest > 0 && !m_pPlayer->GetQuest(NecessaryQuest).IsComplected())
 		{
 			const int CheckHouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
 			if(CheckHouseID <= 0)
 			{
 				m_pPlayer->GetTempData().m_TempTeleportX = m_pPlayer->GetTempData().m_TempTeleportY = -1;
 				GS()->Chat(m_pPlayer->GetCID(), "This chapter is still closed, you magically transported first zone!");
-				m_pPlayer->ChangeWorld(MAIN_WORLD);
+				m_pPlayer->ChangeWorld(MAIN_WORLD_ID);
 				return true;
 			}
 		}

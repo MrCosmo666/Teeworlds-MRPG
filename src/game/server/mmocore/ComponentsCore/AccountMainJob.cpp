@@ -16,9 +16,9 @@ int AccountMainJob::GetHistoryLatestCorrectWorldID(CPlayer* pPlayer) const
 	{
 		const int QuestToUnlock = Job()->WorldSwap()->GetNecessaryQuest(WorldID);
 		const bool IsValidQuest = Job()->Quest()->IsValidQuest(QuestToUnlock);
-		return !Job()->Dungeon()->IsDungeonWorld(WorldID) && ((IsValidQuest && Job()->Quest()->IsCompletedQuest(pPlayer->GetCID(), QuestToUnlock)) || !IsValidQuest);
+		return !Job()->Dungeon()->IsDungeonWorld(WorldID) && ((IsValidQuest && pPlayer->GetQuest(QuestToUnlock).IsComplected()) || !IsValidQuest);
 	});
-	return pWorldIterator != pPlayer->Acc().m_aHistoryWorld.end() ? *pWorldIterator : (int)MAIN_WORLD;
+	return pWorldIterator != pPlayer->Acc().m_aHistoryWorld.end() ? *pWorldIterator : MAIN_WORLD_ID;
 }
 
 int AccountMainJob::SendAuthCode(int ClientID, int Code)
@@ -50,8 +50,8 @@ int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char 
 		return SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
 	}
 	CSqlString<32> clear_Nick = CSqlString<32>(GS()->Server()->ClientName(ClientID));
-	std::shared_ptr<ResultSet> RES2(SJK.SD("ID", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
-	if(RES2->next())
+	ResultPtr pRes = SJK.SD("ID", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr());
+	if(pRes->next())
 	{
 		GS()->Chat(ClientID, "- - - - [Your nickname is already registered] - - - -");
 		GS()->Chat(ClientID, "Your nick is a unique identifier, and it has already been used!");
@@ -60,8 +60,8 @@ int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char 
 		return SendAuthCode(ClientID, AUTH_REGISTER_ERROR_NICK);
 	}
 
-	std::shared_ptr<ResultSet> RES4(SJK.SD("ID", "tw_accounts", "ORDER BY ID DESC LIMIT 1"));
-	const int InitID = RES4->next() ? RES4->getInt("ID")+1 : 1; // thread save ? hm need for table all time auto increment = 1; NEED FIX IT
+	ResultPtr pResID = SJK.SD("ID", "tw_accounts", "ORDER BY ID DESC LIMIT 1");
+	const int InitID = pResID->next() ? pResID->getInt("ID")+1 : 1; // thread save ? hm need for table all time auto increment = 1; NEED FIX IT
 
 	CSqlString<32> clear_Login = CSqlString<32>(Login);
 	CSqlString<32> clear_Pass = CSqlString<32>(Password);
@@ -99,16 +99,16 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 	CSqlString<32> clear_Login = CSqlString<32>(Login);
 	CSqlString<32> clear_Pass = CSqlString<32>(Password);
 	CSqlString<32> clear_Nick = CSqlString<32>(GS()->Server()->ClientName(ClientID));
-	std::shared_ptr<ResultSet> ACCOUNTDATA(SJK.SD("*", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr()));
-	if(ACCOUNTDATA->next())
+	ResultPtr pResAccount = SJK.SD("*", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr());
+	if(pResAccount->next())
 	{
-		const int UserID = ACCOUNTDATA->getInt("ID");
-		std::shared_ptr<ResultSet> CHECKACCESS(SJK.SD("ID, LoginDate, Language, Password, PasswordSalt", "tw_accounts", "WHERE Username = '%s' AND ID = '%d'", clear_Login.cstr(), UserID));
+		const int UserID = pResAccount->getInt("ID");
+		ResultPtr pResCheck = SJK.SD("ID, LoginDate, Language, Password, PasswordSalt", "tw_accounts", "WHERE Username = '%s' AND ID = '%d'", clear_Login.cstr(), UserID);
 
 		bool LoginSuccess = false;
-		if(CHECKACCESS->next())
+		if(pResCheck->next())
 		{
-			if(!str_comp(CHECKACCESS->getString("Password").c_str(), HashPassword(clear_Pass.cstr(), CHECKACCESS->getString("PasswordSalt").c_str()).c_str()))
+			if(!str_comp(pResCheck->getString("Password").c_str(), HashPassword(clear_Pass.cstr(), pResCheck->getString("PasswordSalt").c_str()).c_str()))
 				LoginSuccess = true;
 		}
 
@@ -124,22 +124,22 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 			return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
 		}
 
-		pPlayer->SetLanguage(CHECKACCESS->getString("Language").c_str());
+		pPlayer->SetLanguage(pResCheck->getString("Language").c_str());
 		str_copy(pPlayer->Acc().m_aLogin, clear_Login.cstr(), sizeof(pPlayer->Acc().m_aLogin));
-		str_copy(pPlayer->Acc().m_aLastLogin, CHECKACCESS->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().m_aLastLogin));
+		str_copy(pPlayer->Acc().m_aLastLogin, pResCheck->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().m_aLastLogin));
 
 		pPlayer->Acc().m_AuthID = UserID;
-		pPlayer->Acc().m_Level = ACCOUNTDATA->getInt("Level");
-		pPlayer->Acc().m_Exp = ACCOUNTDATA->getInt("Exp");
-		pPlayer->Acc().m_GuildID = ACCOUNTDATA->getInt("GuildID");
-		pPlayer->Acc().m_Upgrade = ACCOUNTDATA->getInt("Upgrade");
-		pPlayer->Acc().m_GuildRank = ACCOUNTDATA->getInt("GuildRank");
-		pPlayer->Acc().m_aHistoryWorld.push_front(ACCOUNTDATA->getInt("WorldID"));
+		pPlayer->Acc().m_Level = pResAccount->getInt("Level");
+		pPlayer->Acc().m_Exp = pResAccount->getInt("Exp");
+		pPlayer->Acc().m_GuildID = pResAccount->getInt("GuildID");
+		pPlayer->Acc().m_Upgrade = pResAccount->getInt("Upgrade");
+		pPlayer->Acc().m_GuildRank = pResAccount->getInt("GuildRank");
+		pPlayer->Acc().m_aHistoryWorld.push_front(pResAccount->getInt("WorldID"));
 
 		for (const auto& at : CGS::ms_aAttributsInfo)
 		{
 			if (str_comp_nocase(at.second.m_aFieldName, "unfield") != 0)
-				pPlayer->Acc().m_aStats[at.first] = ACCOUNTDATA->getInt(at.second.m_aFieldName);
+				pPlayer->Acc().m_aStats[at.first] = pResAccount->getInt(at.second.m_aFieldName);
 		}
 
 		GS()->Chat(ClientID, "- - - - - - - [Successful login] - - - - - - -");
@@ -227,11 +227,11 @@ void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)
 int AccountMainJob::GetRank(int AuthID)
 {
 	int Rank = 0;
-	std::shared_ptr<ResultSet> RES(SJK.SD("ID", "tw_accounts_data", "ORDER BY Level DESC, Exp DESC"));
-	while(RES->next())
+	ResultPtr pRes = SJK.SD("ID", "tw_accounts_data", "ORDER BY Level DESC, Exp DESC");
+	while(pRes->next())
 	{
 		Rank++;
-		int SelectedAuthID = RES->getInt("ID");
+		int SelectedAuthID = pRes->getInt("ID");
 		if(AuthID == SelectedAuthID) 
 			return Rank;
 	}
@@ -321,7 +321,7 @@ bool AccountMainJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, co
 		const char *pSelectedLanguage = GS()->Server()->Localization()->m_pLanguages[VoteID]->GetFilename();
 		pPlayer->SetLanguage(pSelectedLanguage);
 		GS()->Chat(ClientID, "You chosen a language \"{STR}\".", pSelectedLanguage);
-		GS()->UpdateVotes(ClientID, MenuList::MENU_SELECT_LANGUAGE);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_SELECT_LANGUAGE);
 		Job()->SaveAccount(pPlayer, SaveType::SAVE_LANGUAGE);
 		return true;
 	}
@@ -330,11 +330,8 @@ bool AccountMainJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, co
 
 void AccountMainJob::OnResetClient(int ClientID)
 {
-	if(ms_aPlayerTempData.find(ClientID) != ms_aPlayerTempData.end())
-		ms_aPlayerTempData.erase(ClientID);
-
-	if (ms_aData.find(ClientID) != ms_aData.end())
-		ms_aData.erase(ClientID);
+	ms_aPlayerTempData.erase(ClientID);
+	ms_aData.erase(ClientID);
 }
 
 std::string AccountMainJob::HashPassword(const char* pPassword, const char* pSalt)
