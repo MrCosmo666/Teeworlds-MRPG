@@ -66,13 +66,19 @@ void BotJob::ProcessingTalkingNPC(int OwnID, int TalkingID, bool PlayerTalked, c
 
 void BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char *pText)
 {
+	const int SizeTalking = BotJob::ms_aNpcBot[MobID].m_aTalk.size();
+	if(!IsNpcBotValid(MobID) || Progress >= SizeTalking)
+	{
+		pPlayer->ClearTalking();
+		return;
+	}
+
 	const int ClientID = pPlayer->GetCID();
 	if (!GS()->IsMmoClient(ClientID))
 		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 
 	char reformTalkedText[512];
 	const int BotID = ms_aNpcBot[MobID].m_BotID;
-	const int sizeTalking = ms_aNpcBot[MobID].m_aTalk.size();
 	if (str_comp_nocase(pText, "empty") != 0)
 	{
 		pPlayer->FormatTextQuest(BotID, pText);
@@ -95,12 +101,12 @@ void BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 	if(!GS()->IsMmoClient(ClientID))
 	{
 		const char* TalkedNick = (PlayerTalked ? GS()->Server()->ClientName(ClientID) : ms_aNpcBot[MobID].GetName());
-		str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) %s:\n- %s", (1 + Progress), sizeTalking, TalkedNick, pPlayer->FormatedTalkedText());
+		str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) %s:\n- %s", (1 + Progress), SizeTalking, TalkedNick, pPlayer->FormatedTalkedText());
 		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 	}
 	else
 	{
-		str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) - %s", (1 + Progress), sizeTalking, pPlayer->FormatedTalkedText());
+		str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) - %s", (1 + Progress), SizeTalking, pPlayer->FormatedTalkedText());
 	}
 	pPlayer->ClearFormatQuestText();
 	GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID,
@@ -109,10 +115,16 @@ void BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 
 void BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID)
 {
+	const int SizeTalking = BotJob::ms_aQuestBot[MobID].m_aTalk.size();
+	if(!IsQuestBotValid(MobID) || Progress >= SizeTalking)
+	{
+		pPlayer->ClearTalking();
+		return;
+	}
+
 	const int ClientID = pPlayer->GetCID();
 	char reformTalkedText[512];
 	const int BotID = ms_aQuestBot[MobID].m_BotID;
-	const int sizeTalking = ms_aQuestBot[MobID].m_aTalk.size();
 	const bool PlayerTalked = ms_aQuestBot[MobID].m_aTalk[Progress].m_PlayerTalked;
 	pPlayer->FormatTextQuest(BotID, ms_aQuestBot[MobID].m_aTalk[Progress].m_aTalkingText);
 	if(!GS()->IsMmoClient(ClientID))
@@ -120,12 +132,12 @@ void BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int Talk
 		const int QuestID = ms_aQuestBot[MobID].m_QuestID;
 		const char* TalkedNick = (PlayerTalked ? GS()->Server()->ClientName(ClientID) : ms_aQuestBot[MobID].GetName());
 		str_format(reformTalkedText, sizeof(reformTalkedText), "%s\n=========\n\n( %d of %d ) %s:\n- %s", 
-			GS()->GetQuestInfo(QuestID).GetName(), (1 + Progress), sizeTalking, TalkedNick, pPlayer->FormatedTalkedText());
+			GS()->GetQuestInfo(QuestID).GetName(), (1 + Progress), SizeTalking, TalkedNick, pPlayer->FormatedTalkedText());
 		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 	}
 	else
 	{
-		str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) - %s", (1 + Progress), sizeTalking, pPlayer->FormatedTalkedText());
+		str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) - %s", (1 + Progress), SizeTalking, pPlayer->FormatedTalkedText());
 	}
 	pPlayer->ClearFormatQuestText();
 	GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID,
@@ -135,15 +147,15 @@ void BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int Talk
 void BotJob::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 {
 	const int ClientID = pPlayer->GetCID();
-	if (!IsQuestBotValid(MobID) || Progress >= (int)ms_aQuestBot[MobID].m_aTalk.size())
+	const int SizeTalking = BotJob::ms_aQuestBot[MobID].m_aTalk.size();
+	if (!IsQuestBotValid(MobID) || Progress >= SizeTalking)
 	{
-		GS()->ClearTalkText(ClientID);
+		pPlayer->ClearTalking();
 		return;
 	}
 
 	// vanila clients
 	const int BotID = BotJob::ms_aQuestBot[MobID].m_BotID;
-	const int sizeTalking = BotJob::ms_aQuestBot[MobID].m_aTalk.size();
 	if (!GS()->IsMmoClient(ClientID))
 	{
 		const int QuestID = ms_aQuestBot[MobID].m_QuestID;
@@ -153,7 +165,7 @@ void BotJob::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 		char reformTalkedText[512];
 		pPlayer->FormatTextQuest(BotID, BotJob::ms_aQuestBot[MobID].m_aTalk[Progress].m_aTalkingText);
 		str_format(reformTalkedText, sizeof(reformTalkedText), "%s\n=========\n\n( %d of %d ) %s:\n- %s", 
-			GS()->GetQuestInfo(QuestID).GetName(), (1 + Progress), sizeTalking, TalkedNick, pPlayer->FormatedTalkedText());
+			GS()->GetQuestInfo(QuestID).GetName(), (1 + Progress), SizeTalking, TalkedNick, pPlayer->FormatedTalkedText());
 		pPlayer->ClearFormatQuestText();
 
 		GS()->Mmo()->Quest()->QuestShowRequired(pPlayer, BotJob::ms_aQuestBot[MobID], reformTalkedText);
