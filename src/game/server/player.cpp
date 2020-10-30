@@ -22,6 +22,7 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	m_NextTuningParams = m_PrevTuningParams;
 	m_MoodState = MOOD_NORMAL;
 	GS()->SendTuningParams(ClientID);
+	ClearTalking();
 
 	if(!IsBot())
 		Acc().m_Team = GetStartTeam();
@@ -524,7 +525,7 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 				return true;
 
 			m_aPlayerTick[TickState::LastDialog] = GS()->Server()->Tick() + (GS()->Server()->TickSpeed() / 4);
-			SetTalking(GetTalkedID(), true);
+			SetTalking(GetTalkedID(), false);
 			return true;
 		}
 
@@ -662,12 +663,18 @@ int CPlayer::GetLevelAllAttributes()
 }
 
 // - - - - - - T A L K I N G - - - - B O T S - - - - - - - - - 
-void CPlayer::SetTalking(int TalkedID, bool ToProgress)
+void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 {
-	if (TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] || (!ToProgress && m_TalkingNPC.m_TalkedID != -1) || (ToProgress && m_TalkingNPC.m_TalkedID == -1))
+	if (TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] || (!IsStartDialogue && m_TalkingNPC.m_TalkedID == -1))
 		return;
 
 	m_TalkingNPC.m_TalkedID = TalkedID;
+	if(IsStartDialogue)
+	{
+		m_TalkingNPC.m_FreezedProgress = false;
+		m_TalkingNPC.m_TalkedProgress = 0;
+	}
+
 	GS()->Mmo()->Quest()->QuestTableClear(m_ClientID);
 	CPlayerBot* pBotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[TalkedID]);
 	const int MobID = pBotPlayer->GetBotSub();
@@ -679,7 +686,6 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		if ((isTalkingEmpty && m_TalkingNPC.m_TalkedProgress == IS_TALKING_EMPTY) || (!isTalkingEmpty && m_TalkingNPC.m_TalkedProgress >= sizeTalking))
 		{
 			ClearTalking();
-			GS()->ClearTalkText(m_ClientID);
 			return;
 		}
 
@@ -717,7 +723,6 @@ void CPlayer::SetTalking(int TalkedID, bool ToProgress)
 		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
 		{
 			ClearTalking();
-			GS()->ClearTalkText(m_ClientID);
 			GS()->Mmo()->Quest()->InteractiveQuestNPC(this, BotJob::ms_aQuestBot[MobID], true);
 			return;
 		}

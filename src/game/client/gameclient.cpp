@@ -389,6 +389,7 @@ void CGameClient::OnConsoleInit()
 void CGameClient::OnInit()
 {
 	m_pGraphics = Kernel()->RequestInterface<IGraphics>();
+	m_pAnumUI = new CAnimUI(this);
 
 	// propagate pointers
 	m_UI.Init(Graphics(), Input(), TextRender());

@@ -132,8 +132,8 @@ public:
 
 	void ConAddCharacterBot(int ClientID, const char *pCharacter);
 	void ProcessingTalkingNPC(int OwnID, int TalkingID, bool PlayerTalked, const char *Message, int Style, int TalkingEmote);
-	bool TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char *pText = "empty");
-	bool TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID);
+	void TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char *pText = "empty");
+	void TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID);
 	void ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress);
 	int GetQuestNPC(int MobID) const;
 	const char *GetMeaninglessDialog();

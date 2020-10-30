@@ -64,15 +64,9 @@ void BotJob::ProcessingTalkingNPC(int OwnID, int TalkingID, bool PlayerTalked, c
 	GS()->Motd(OwnID, Message);
 }
 
-bool BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char *pText)
+void BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char *pText)
 {
 	const int ClientID = pPlayer->GetCID();
-	if (!IsNpcBotValid(MobID) || Progress >= (int)ms_aNpcBot[MobID].m_aTalk.size())
-	{
-		GS()->ClearTalkText(ClientID);
-		return false;
-	}
-
 	if (!GS()->IsMmoClient(ClientID))
 		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 
@@ -93,7 +87,7 @@ bool BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 		}
 		pPlayer->ClearFormatQuestText();
 		GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID, false, reformTalkedText, 0, EMOTE_BLINK);
-		return true;
+		return;
 	}
 
 	const bool PlayerTalked = ms_aNpcBot[MobID].m_aTalk[Progress].m_PlayerTalked;
@@ -111,18 +105,11 @@ bool BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 	pPlayer->ClearFormatQuestText();
 	GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID,
 		PlayerTalked, reformTalkedText, ms_aNpcBot[MobID].m_aTalk[Progress].m_Style, ms_aNpcBot[MobID].m_aTalk[Progress].m_Emote);
-	return true;
 }
 
-bool BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID)
+void BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID)
 {
 	const int ClientID = pPlayer->GetCID();
-	if (!IsQuestBotValid(MobID) || Progress >= (int)ms_aQuestBot[MobID].m_aTalk.size())
-	{
-		GS()->ClearTalkText(ClientID);
-		return false;
-	}
-
 	char reformTalkedText[512];
 	const int BotID = ms_aQuestBot[MobID].m_BotID;
 	const int sizeTalking = ms_aQuestBot[MobID].m_aTalk.size();
@@ -143,7 +130,6 @@ bool BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int Talk
 	pPlayer->ClearFormatQuestText();
 	GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID,
 		PlayerTalked, reformTalkedText, ms_aQuestBot[MobID].m_aTalk[Progress].m_Style, ms_aQuestBot[MobID].m_aTalk[Progress].m_Emote);
-	return true;
 }
 
 void BotJob::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)

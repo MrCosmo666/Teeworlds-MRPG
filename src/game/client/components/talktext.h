@@ -8,10 +8,13 @@
 
 class CTalkText : public CComponent
 {
-	// mmotee render talk text
+	CAnimElementsUI* m_pAnimBackground;
+	CAnimElementsUI* m_pAnimBackgroundOther;
+
+	// mmotee talk text
 	int m_TalkClientID;
-	int m_Style;
 	int m_TalkedEmote;
+	int m_TalkedEmoticionSpriteID;
 	bool m_PlayerTalked;
 	bool m_Stranger;
 	
@@ -19,18 +22,20 @@ class CTalkText : public CComponent
 	int64 m_RegrnizedTalkTime;
 	char m_TalkText[TALKING_SIZE];
 	char m_RegrnizedTalkText[TALKING_SIZE];
+
+	float m_ScreenWidth;
+	float m_ScreenHeight;
+
 	void RegrnizedTalkingText();
-
-
-	void ClientPressed();
-	
-public:
 	void Clear();
-	bool IsActive();
 	const char* GetTalkText() const { return m_TalkText; }
 
-	virtual void OnRender();
+public:
+	bool IsActive() const;
+
+	virtual void OnInit();
 	virtual void OnStateChange(int NewState, int OldState);
+	virtual void OnRender();
 	virtual void OnMessage(int MsgType, void *pRawMsg);
 	virtual bool OnInput(IInput::CEvent Event);
 

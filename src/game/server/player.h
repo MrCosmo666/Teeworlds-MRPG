@@ -173,7 +173,7 @@ public:
 	int GetLevelAllAttributes();
 
 	// npc conversations
-	void SetTalking(int TalkedID, bool ToProgress);
+	void SetTalking(int TalkedID, bool IsStartDialogue);
 	void ClearTalking();
 	int GetTalkedID() const { return m_TalkingNPC.m_TalkedID; };
 

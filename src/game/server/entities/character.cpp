@@ -289,8 +289,7 @@ void CCharacter::FireWeapon()
 				// talking wth bot
 				if (!StartedTalking && StartConversation(pTarget->GetPlayer()))
 				{
-					m_pPlayer->ClearTalking();
-					m_pPlayer->SetTalking(pTarget->GetPlayer()->GetCID(), false);
+					m_pPlayer->SetTalking(pTarget->GetPlayer()->GetCID(), true);
 					GS()->CreateHammerHit(ProjStartPos);
 					StartedTalking = true;
 					Hits = true;

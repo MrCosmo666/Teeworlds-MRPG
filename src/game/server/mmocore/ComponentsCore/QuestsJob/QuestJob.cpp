@@ -376,7 +376,7 @@ void QuestJob::OnMessage(int MsgID, void* pRawMsg, int ClientID)
 			return;
 
 		pPlayer->m_aPlayerTick[TickState::LastDialog] = GS()->Server()->Tick() + (GS()->Server()->TickSpeed() / 4);
-		pPlayer->SetTalking(pPlayer->GetTalkedID(), true);
+		pPlayer->SetTalking(pPlayer->GetTalkedID(), false);
 	}
 }
 
