@@ -220,7 +220,7 @@ public:
 	const vector4_base& operator /=(const vector4_base& v) { x /= v.x; y /= v.y; w /= v.w; h /= v.h; return *this; }
 
 	bool operator ==(const vector4_base& v) const { return x == v.x && y == v.y && w == v.w && h == v.h; } //TODO: do this with an eps instead
-	bool operator !=(const vector4_base &v) const { return x != v.x || y != v.y || z != v.w || w != v.h; }
+	bool operator !=(const vector4_base &v) const { return x != v.x || y != v.y || w != v.w || h != v.h; }
 
 	operator const T* () { return &x; }
 };
