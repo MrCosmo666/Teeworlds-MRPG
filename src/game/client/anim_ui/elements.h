@@ -14,7 +14,7 @@ public:
 	char m_aName[256];
 
     CAnimElementsUI(class CAnimUI* pAnimUI, const char *Name);
-	~CAnimElementsUI();
+	virtual ~CAnimElementsUI();
 
 	class IClient* Client() const;
 	class IGraphics* Graphics() const;
