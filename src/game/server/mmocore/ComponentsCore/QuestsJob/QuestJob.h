@@ -57,7 +57,6 @@ public:
 	virtual void OnMessage(int MsgID, void* pRawMsg, int ClientID);
 	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
 	virtual bool OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
-
 };
 
 #endif

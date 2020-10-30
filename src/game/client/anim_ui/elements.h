@@ -8,7 +8,7 @@ class CAnimElementsUI
 protected:
 	virtual void Render() = 0;
 	virtual void PreRender();
-	virtual void PostRender();
+	virtual void PostRender() {};
 
 public:
 	char m_aName[256];

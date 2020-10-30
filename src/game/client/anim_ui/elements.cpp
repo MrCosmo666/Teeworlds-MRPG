@@ -32,11 +32,6 @@ void CAnimElementsUI::PreRender()
 	m_pColor->PreRender();
 }
 
-void CAnimElementsUI::PostRender()
-{
-
-}
-
 class IClient *CAnimElementsUI::Client() const{ return m_pAnimUI->Client()->Client();}
 class IGraphics *CAnimElementsUI::Graphics() const{ return m_pAnimUI->Client()->Graphics();}
 class ITextRender *CAnimElementsUI::TextRender() const{ return m_pAnimUI->Client()->TextRender();}
