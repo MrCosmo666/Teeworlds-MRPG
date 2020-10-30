@@ -113,7 +113,7 @@ void CValue::PreRender()
 
 vec4 CValue::Animation(int AnimType, vec4 min, vec4 max, float time)
 {
-	float s = 0.0f, a = 0.0f, p = 0.0f, d = 0.0f;
+	float s = 0.0f;
 	switch (AnimType)
 	{
 		case EaseIN:
