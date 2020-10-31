@@ -47,7 +47,7 @@ public:
 	void CallvoteSpectate(int ClientID, const char *pReason, bool ForceVote = false);
 	void CallvoteKick(int ClientID, const char *pReason, bool ForceVote = false);
 	void CallvoteOption(int OptionID, const char *pReason, bool ForceVote = false);
-	void AddOption(const char* pDescription, vec3 Color = vec3(0, 0, 0), const char *Icon = "");
+	void AddOption(const char* pDescription, vec3 Color = vec3(0, 0, 0), const char *pIcon = "");
 	void RemovevoteOption(int OptionID);
 	void AddvoteOption(const char *pDescription, const char *pCommand);
 

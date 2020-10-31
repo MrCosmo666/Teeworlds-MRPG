@@ -17,8 +17,14 @@ private:
 	int m_DungeonAllowedSpawn;
 
 public:
+	int m_LastPosTick;
+	int m_PathSize;
+	vec2 m_CharPos;
+	vec2 m_TargetPos;
+	std::map<int, vec2> m_WayPoints;
+
 	CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint);
-	virtual ~CPlayerBot() override;
+	~CPlayerBot() override;
 
 	int GetBotID() const override { return m_BotID; };
 	int GetBotType() const override { return m_BotType; };
@@ -39,13 +45,6 @@ public:
 
 	void Tick() override;
 	void Snap(int SnappingClient) override;
-
-	int m_LastPosTick;
-	int m_PathSize;
-	vec2 m_CharPos;
-	vec2 m_TargetPos;
-	std::map<int, vec2> m_WayPoints;
-
 	void SetDungeonAllowedSpawn(bool Spawn) { m_DungeonAllowedSpawn = Spawn; };
 	
 private:

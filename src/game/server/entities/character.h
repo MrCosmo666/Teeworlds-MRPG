@@ -17,29 +17,65 @@ class CCharacter : public CEntity
 	class CPlayer *m_pPlayer;
 	TileHandle *m_pHelper;
 
-	void FireWeapon();
-	bool DecoInteractive();
-	
-	void HandleWeapons();
+	bool m_Alive;
+	int m_Event;
+	int m_Mana;
+	int m_LastWeapon;
+	int m_QueuedWeapon;
+	int m_AttackTick;
+	int m_EmoteType;
+	int m_EmoteStop;
 
+	// last tick that the player took any action ie some input
+	int m_LastAction;
+	int m_LastNoAmmoSound;
+	int m_NumInputs;
+	int m_TriggeredEvents;
+
+	// info for dead reckoning
+	int m_ReckoningTick; // tick that we are performing dead reckoning From
+	CCharacterCore m_SendCore; // core that we should send
+	CCharacterCore m_ReckoningCore; // the dead reckoning core
+
+	void FireWeapon();
+	void HandleWeapons();
 	void HandleWeaponSwitch();
 	void DoWeaponSwitch();
-
 	bool InteractiveHammer(vec2 Direction, vec2 ProjStartPos);
 	//void InteractiveGun(vec2 Direction, vec2 ProjStartPos);
 	//void InteractiveShotgun(vec2 Direction, vec2 ProjStartPos);
 	//void InteractiveGrenade(vec2 Direction, vec2 ProjStartPos);
 	//void InteractiveRifle(vec2 Direction, vec2 ProjStartPos);
+	bool DecoInteractive();
 	void HandleTuning();
 	void HandleBuff(CTuningParams* TuningParams);
 	void HandleAuthedPlayer();
 	bool IsLockedWorld();
 
+protected:
+	int m_Health;
+	int m_Armor;
+	struct WeaponStat
+	{
+		int m_AmmoRegenStart;
+		int m_Ammo;
+		bool m_Got;
+
+	} m_aWeapons[NUM_WEAPONS];
+
+	// these are non-heldback inputs
+	CNetObj_PlayerInput m_Input;
+	CNetObj_PlayerInput m_LatestPrevInput;
+	CNetObj_PlayerInput m_LatestInput;
+
+	void HandleTilesets();
+	void HandleEvents();
+
 public:
 	//character's size
 	static const int ms_PhysSize = 28;
 	CCharacter(CGameWorld *pWorld);
-	~CCharacter();
+	virtual ~CCharacter();
 
 	CPlayer *GetPlayer() const { return m_pPlayer; }
 	TileHandle *GetHelper() const { return m_pHelper; }
@@ -70,7 +106,6 @@ public:
 	int Mana() const { return m_Mana; }
 	int Health() const { return m_Health; }
 
-	void CreateQuestsStep(int QuestID);
 	virtual bool GiveWeapon(int Weapon, int GiveAmmo);
 	bool RemoveWeapon(int Weapon);
 
@@ -81,11 +116,6 @@ public:
 	void ChangePosition(vec2 NewPos);
 	void ResetDoorPos();
 	void UpdateEquipingStats(int ItemID);
-
-	// these are non-heldback inputs
-	CNetObj_PlayerInput m_Input;
-	CNetObj_PlayerInput m_LatestPrevInput;
-	CNetObj_PlayerInput m_LatestInput;
 
 	// input
 	int m_ActiveWeapon;
@@ -103,47 +133,8 @@ public:
 	vec2 m_OlderPos;
 	bool m_DoorHit;
 
-protected:
-	struct WeaponStat
-	{
-		int m_AmmoRegenStart;
-		int m_Ammo;
-		bool m_Got;
-
-	} m_aWeapons[NUM_WEAPONS];
-	void HandleTilesets();
-	void HandleEvents();
-
 private:
-	bool m_Alive;
-
-	int m_Event;
-	int m_Mana;
-
-	int m_LastWeapon;
-	int m_QueuedWeapon;
-
-	int m_AttackTick;
-
-	int m_EmoteType;
-	int m_EmoteStop;
-
-	// last tick that the player took any action ie some input
-	int m_LastAction;
-	int m_LastNoAmmoSound;
-	int m_NumInputs;
-	int m_TriggeredEvents;
-
-	// info for dead reckoning
-	int m_ReckoningTick; // tick that we are performing dead reckoning From
-	CCharacterCore m_SendCore; // core that we should send
-	CCharacterCore m_ReckoningCore; // the dead reckoning core
-
 	bool StartConversation(CPlayer* pTarget);
-
-protected:
-	int m_Health;
-	int m_Armor;
 };
 
 #endif

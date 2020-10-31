@@ -346,7 +346,7 @@ void CGameControllerDungeon::SetMobsSpawn(bool AllowedSpawn)
 		if (BotPlayer && BotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && m_WorldID == BotPlayer->GetPlayerWorldID())
 		{
 			BotPlayer->SetDungeonAllowedSpawn(AllowedSpawn);
-			if (!AllowedSpawn && BotPlayer->GetCharacter())
+			if(!AllowedSpawn && BotPlayer->GetCharacter())
 				BotPlayer->GetCharacter()->Die(i, WEAPON_WORLD);
 		}
 	}

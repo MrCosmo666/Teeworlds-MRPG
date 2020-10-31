@@ -509,11 +509,11 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect, float Size)
 {
 	// first loading of icons
-	static bool s_Init = true;
-	if (m_pClient->MmoServer() && s_Init)
+	static bool s_Init = false;
+	if (m_pClient->MmoServer() && !s_Init)
 	{
 		m_pClient->Storage()->ListDirectory(IStorage::TYPE_ALL, "mmotee/itemicons", ItemIconScan, this);
-		s_Init = false;
+		s_Init = true;
 	}
 
 	// formatted as an object icon
@@ -548,7 +548,6 @@ bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect, float Size)
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
 		Graphics()->QuadsEnd();
 	}
-
 	return IconFound;
 }
 

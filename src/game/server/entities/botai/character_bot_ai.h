@@ -13,16 +13,14 @@ class CEntityFunctionNurse;
 class CCharacterBotAI : public CCharacter
 {
 	MACRO_ALLOC_POOL_ID()
-
-public:
-	CCharacterBotAI(CGameWorld* pWorld);
-	~CCharacterBotAI();
-
-	int GetBotTarget() const { return m_BotTargetID; };
-
-private: 
-	class CPlayerBot* m_pBotPlayer;
 	
+	class CPlayerBot* m_pBotPlayer;
+
+	// target system
+	int m_BotTargetID;
+	int m_BotTargetLife;
+	bool m_BotTargetCollised;
+
 	// bot ai
 	bool m_BotActive;
 	int m_MoveTick;
@@ -30,24 +28,24 @@ private:
 	vec2 m_PrevPos;
 	vec2 m_WallPos;
 	int m_EmotionsStyle;
-
-	// target system
-	int m_BotTargetID;
-	int m_BotTargetLife;
-	bool m_BotTargetCollised;
 	std::map < int, bool > m_aListDmgPlayers;
 
-	virtual bool Spawn(class CPlayer *pPlayer, vec2 Pos);
-	virtual void Tick();
-	virtual void TickDefered();
-	virtual bool TakeDamage(vec2 Force, int Dmg, int From, int Weapon);
-	virtual void Die(int Killer, int Weapon);
-	virtual bool GiveWeapon(int Weapon, int GiveAmmo);
-	virtual int GetSnapFullID() const;
+public:
+	CCharacterBotAI(CGameWorld* pWorld);
+	~CCharacterBotAI() override;
 
-	void CreateRandomDropItem(int DropCID, float Random, int ItemID, int Count, vec2 Force);
+	int GetBotTarget() const { return m_BotTargetID; };
+
+private: 
+	bool Spawn(class CPlayer *pPlayer, vec2 Pos) override;
+	void Tick() override;
+	void TickDefered() override;
+	bool TakeDamage(vec2 Force, int Dmg, int From, int Weapon) override;
+	void Die(int Killer, int Weapon) override;
+	bool GiveWeapon(int Weapon, int GiveAmmo) override;
+	int GetSnapFullID() const override;
+	
 	void RewardPlayer(CPlayer *pPlayer, vec2 ForceDies);
-
 	void ChangeWeapons();
 	void ShowProgressHealth();
 	void EmotesAction(int EmotionStyle);

@@ -290,6 +290,7 @@ void CCharacter::FireWeapon()
 				if (!StartedTalking && StartConversation(pTarget->GetPlayer()))
 				{
 					m_pPlayer->SetTalking(pTarget->GetPlayer()->GetCID(), true);
+					GS()->CreatePlayerSound(m_pPlayer->GetCID(), SOUND_PLAYER_SPAWN);
 					GS()->CreateHammerHit(ProjStartPos);
 					StartedTalking = true;
 					Hits = true;

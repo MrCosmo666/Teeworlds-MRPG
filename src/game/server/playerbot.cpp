@@ -104,34 +104,39 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 
 void CPlayerBot::TryRespawn()
 {
-	// close spawn mobs on non allowed spawn dungeon
-	if (GS()->IsDungeon() && !m_DungeonAllowedSpawn && m_BotType == BotsTypes::TYPE_BOT_MOB)
-		return;
-
+	// select spawn point
 	vec2 SpawnPos;
-	const int SpawnType = m_BotType;
-	if(SpawnType == BotsTypes::TYPE_BOT_MOB)
+	if(m_BotType == BotsTypes::TYPE_BOT_MOB)
 	{
+		// close spawn mobs on non allowed spawn dungeon
+		if(GS()->IsDungeon() && !m_DungeonAllowedSpawn)
+			return;
+
 		vec2 MobRespawnPosition = vec2(BotJob::ms_aMobBot[m_SubBotID].m_PositionX, BotJob::ms_aMobBot[m_SubBotID].m_PositionY);
 		if(!GS()->m_pController->CanSpawn(m_BotType, &SpawnPos, MobRespawnPosition))
 			return;
+
+		// reset spawn mobs on non allowed spawn dungeon
+		if(GS()->IsDungeon() && m_DungeonAllowedSpawn)
+			m_DungeonAllowedSpawn = false;
 	}
-	else if(SpawnType == BotsTypes::TYPE_BOT_NPC)
+	else if(m_BotType == BotsTypes::TYPE_BOT_NPC)
+	{
 		SpawnPos = vec2(BotJob::ms_aNpcBot[m_SubBotID].m_PositionX, BotJob::ms_aNpcBot[m_SubBotID].m_PositionY);
-	else if(SpawnType == BotsTypes::TYPE_BOT_QUEST)
+	}
+	else if(m_BotType == BotsTypes::TYPE_BOT_QUEST)
+	{
 		SpawnPos = vec2(BotJob::ms_aQuestBot[m_SubBotID].m_PositionX, BotJob::ms_aQuestBot[m_SubBotID].m_PositionY);
-	
+	}
+
+	// create character
 	const int AllocMemoryCell = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
 	m_pCharacter = new(AllocMemoryCell) CCharacterBotAI(&GS()->m_World);
 	m_pCharacter->Spawn(this, SpawnPos);
 
 	// so that no effects can be seen that an NPC that is not visible to one player is visible to another player
-	if(SpawnType != BotsTypes::TYPE_BOT_QUEST)
+	if(m_BotType != BotsTypes::TYPE_BOT_QUEST)
 		GS()->CreatePlayerSpawn(SpawnPos);
-
-	// reset the dungeon, if allowed
-	if (SpawnType == BotsTypes::TYPE_BOT_MOB && GS()->IsDungeon() && m_DungeonAllowedSpawn)
-		m_DungeonAllowedSpawn = false;
 }
 
 /*
