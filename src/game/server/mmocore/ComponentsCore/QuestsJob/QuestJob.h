@@ -14,6 +14,13 @@ enum QuestInteractive
 
 class QuestJob : public MmoComponent
 {
+	void OnInit() override;
+	void OnInitAccount(CPlayer* pPlayer) override;
+	void OnResetClient(int ClientID) override;
+	void OnMessage(int MsgID, void* pRawMsg, int ClientID) override;
+	bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu) override;
+	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
+
 public:
 	static std::map < int, std::map <int , CPlayerQuest > > ms_aPlayerQuests;
 	static std::map < int, CDataQuest > ms_aDataQuests;
@@ -50,13 +57,6 @@ public:
 	void AcceptNextStoryQuestStep(CPlayer* pPlayer, int CheckQuestID);
 	void AcceptNextStoryQuestStep(CPlayer* pPlayer);
 	int GetUnfrozenItemCount(CPlayer* pPlayer, int ItemID);
-
-	virtual void OnInit();
-	virtual void OnInitAccount(CPlayer* pPlayer);
-	virtual void OnResetClient(int ClientID);
-	virtual void OnMessage(int MsgID, void* pRawMsg, int ClientID);
-	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
-	virtual bool OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
 };
 
 #endif

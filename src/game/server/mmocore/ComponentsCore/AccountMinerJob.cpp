@@ -104,7 +104,7 @@ void AccountMinerJob::OnInitWorld(const char* pWhereLocalWorld)
 	}
 }
 
-bool AccountMinerJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool AccountMinerJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (PPSTR(CMD, "MINERUPGRADE") == 0)

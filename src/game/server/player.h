@@ -43,6 +43,8 @@ class CPlayer
 		int m_TalkedProgress;
 	};
 	StructTalkNPC m_TalkingNPC;
+	char m_aFormatTalkQuest[512];
+	std::map < int, bool > m_aHiddenMenu;
 
 protected:
 	CCharacter* m_pCharacter;
@@ -51,6 +53,7 @@ protected:
 	IServer* Server() const;
 	int m_ClientID;
 	void PotionsTick();
+	void HandleTuningParams();
 
 public:
 	CGS* GS() const { return m_pGS; }
@@ -81,20 +84,16 @@ public:
 	VoteCallBack m_ActiveMenuRegisteredCallback;
 
 private:
-	char m_aFormatTalkQuest[512];
-	std::map < int, bool > m_aHiddenMenu;
 
 	/* #########################################################################
 		FUNCTIONS PLAYER ENGINE
 	######################################################################### */
-	void TickOnlinePlayer();
-	void TickSystemTalk();
 public:
 	CPlayer(CGS* pGS, int ClientID);
 	virtual ~CPlayer();
 
-	bool IsBot() const { return (bool)(m_ClientID >= MAX_PLAYERS && m_ClientID < MAX_CLIENTS); }
 	virtual int GetTeam();
+	virtual bool IsBot() const { return false; }
 	virtual int GetBotID() const { return -1; };
 	virtual int GetBotType() const { return -1; };
 	virtual int GetBotSub() const { return -1; };
@@ -113,12 +112,11 @@ public:
 	virtual void SendClientInfo(int TargetID);
 
 	virtual void Tick();
-	void PostTick();
-
+	virtual void PostTick();
 	virtual void Snap(int SnappingClient);
-	void HandleTuningParams();
 	
 private:
+	void TickSystemTalk();
 	virtual void TryRespawn();
 
 public:
@@ -141,7 +139,6 @@ public:
 	######################################################################### */
 	bool SpendCurrency(int Price, int ItemID = 1);
 	void GiveEffect(const char* Potion, int Sec, int Random = 0);
-	void SetLanguage(const char* pLanguage);
 	const char* GetLanguage() const;
 	void AddExp(int Exp);
 	void AddMoney(int Money);

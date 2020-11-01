@@ -26,10 +26,11 @@ public:
 	CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint);
 	~CPlayerBot() override;
 
+	int GetTeam() override { return TEAM_BLUE; };
+	bool IsBot() const override { return true; }
 	int GetBotID() const override { return m_BotID; };
 	int GetBotType() const override { return m_BotType; };
 	int GetBotSub() const override { return m_SubBotID; };
-	int GetTeam() override { return TEAM_BLUE; };
 	int GetPlayerWorldID() const override;
 
 	int GetStartHealth() override;
@@ -44,6 +45,7 @@ public:
 	int GetAttributeCount(int BonusID, bool Really = false) override;
 
 	void Tick() override;
+	void PostTick() override;
 	void Snap(int SnappingClient) override;
 	void SetDungeonAllowedSpawn(bool Spawn) { m_DungeonAllowedSpawn = Spawn; };
 	

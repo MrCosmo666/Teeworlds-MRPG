@@ -19,16 +19,14 @@ class CraftJob : public MmoComponent
 	};
 	static std::map <int, CraftStruct> ms_aCraft;
 
+	void OnInit() override;
+	bool OnHandleTile(CCharacter* pChr, int IndexCollision) override;
+	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
+	bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu) override;
+
 	int GetFinalPrice(CPlayer* pPlayer, int CraftID) const;
 	void CraftItem(CPlayer* pPlayer, int CraftID);
 	void ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectType);
-
-public:
-	virtual void OnInit();
-	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
-	virtual bool OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
-	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
-
 };
 
 #endif

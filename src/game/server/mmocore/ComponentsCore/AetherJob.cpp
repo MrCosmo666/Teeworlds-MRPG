@@ -33,7 +33,7 @@ void AetherJob::OnInitAccount(CPlayer *pPlayer)
 	}
 }
 
-bool AetherJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool AetherJob::OnHandleVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 
@@ -115,7 +115,7 @@ void AetherJob::UnlockLocation(CPlayer *pPlayer, vec2 Pos)
 
 		SJK.ID("tw_accounts_locations", "(OwnerID, TeleportID) VALUES ('%d', '%d')", pPlayer->Acc().m_AuthID, tl.first);
 		GS()->Chat(ClientID, "You unlock aether {STR}!", ms_aTeleport[tl.first].m_aTeleName);
-		GS()->ChatDiscord("14671083", GS()->Server()->ClientName(ClientID), "Adventure unlock aether {STR}", ms_aTeleport[tl.first].m_aTeleName);
+		GS()->ChatDiscord("14671083", Server()->ClientName(ClientID), "Adventure unlock aether {STR}", ms_aTeleport[tl.first].m_aTeleName);
 
 		pPlayer->Acc().m_aAetherLocation[tl.first] = true;
 		return;
@@ -144,13 +144,13 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 			distance(pPlayer->GetCharacter()->m_Core.m_Pos, vec2(tl.second.m_TeleX, tl.second.m_TeleY)) < 120);
 		if (LocalTeleport)
 		{
-			GS()->AVM(ClientID, "null", tl.first, TAB_AETHER, "[Local {STR}] : {STR}", tl.second.m_aTeleName, GS()->Server()->GetWorldName(tl.second.m_WorldID));
+			GS()->AVM(ClientID, "null", tl.first, TAB_AETHER, "[Local {STR}] : {STR}", tl.second.m_aTeleName, Server()->GetWorldName(tl.second.m_WorldID));
 			continue;
 		}
 
 		int Price = g_Config.m_SvPriceTeleport * (tl.second.m_WorldID + 1);
 		GS()->AVD(ClientID, "TELEPORT", tl.first, Price, TAB_AETHER, "[{STR}] : {STR} - {INT}gold",
-			tl.second.m_aTeleName, GS()->Server()->GetWorldName(tl.second.m_WorldID), &Price);
+			tl.second.m_aTeleName, Server()->GetWorldName(tl.second.m_WorldID), &Price);
 	}
 	GS()->AV(ClientID, "null");
 }

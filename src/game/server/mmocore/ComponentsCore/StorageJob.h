@@ -17,11 +17,11 @@ class StorageJob : public MmoComponent
 	};
 	static std::map < int, SturctStorage > ms_aStorage;
 
-public:
-	virtual void OnInit();
-	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
-	virtual bool OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
-	
+	void OnInit() override;
+	bool OnHandleTile(CCharacter* pChr, int IndexCollision) override;
+	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
+
+public:	
 	void ShowStorageMenu(CPlayer *pPlayer, int StorageID);
 	int GetStorageID(vec2 Pos) const;
 };

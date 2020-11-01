@@ -5,33 +5,25 @@
 
 using namespace sqlstr;
 
-// mails
-void MailBoxJob::ReceiveInbox(CPlayer *pPlayer, int InboxID)
+bool MailBoxJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
-	ResultPtr pRes = SJK.SD("ItemID, Count, Enchant", "tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
-	if(!pRes->next())
-		return;
-	
-	// get informed about the mail
-	const int ItemID = pRes->getInt("ItemID");
-	const int Count = pRes->getInt("Count");
-	if(ItemID <= 0 || Count <= 0)
+	const int ClientID = pPlayer->GetCID();
+	if(PPSTR(CMD, "MAIL") == 0)
 	{
-		SJK.DD("tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
-		return;
+		ReceiveInbox(pPlayer, VoteID);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INBOX);
+		return true;
 	}
 
-	// recieve
-	if(GS()->GetItemInfo(ItemID).IsEnchantable() && pPlayer->GetItem(ItemID).m_Count > 0)
-	{
-		GS()->Chat(pPlayer->GetCID(), "Enchant item maximal count x1 in a backpack!");
-		return;
-	}
-	SJK.DD("tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
+	return false;
+}
 
-	const int Enchant = pRes->getInt("Enchant");
-	pPlayer->GetItem(ItemID).Add(Count, 0, Enchant);
-	GS()->Chat(pPlayer->GetCID(), "You received an attached item [{STR}].", GS()->GetItemInfo(ItemID).GetName(pPlayer));
+// check whether messages are available
+int MailBoxJob::GetActiveInbox(CPlayer* pPlayer)
+{
+	ResultPtr pRes = SJK.SD("ID", "tw_accounts_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	const int MailCount = pRes->rowsCount();
+	return MailCount;
 }
 
 // show a list of mails
@@ -73,14 +65,6 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 		GS()->AVL(ClientID, "null", "Your mailbox is empty");
 }
 
-// check whether messages are available
-int MailBoxJob::GetActiveInbox(CPlayer *pPlayer)
-{
-	ResultPtr pRes = SJK.SD("ID", "tw_accounts_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
-	const int MailCount = pRes->rowsCount();
-	return MailCount;
-}
-
 // sending a mail to a player
 void MailBoxJob::SendInbox(int AuthID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
 {
@@ -98,15 +82,30 @@ void MailBoxJob::SendInbox(int AuthID, const char* Name, const char* Desc, int I
 	GS()->ChatAccountID(AuthID, "[Mailbox] New letter ({STR})!", cName.cstr());
 }
 
-bool MailBoxJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+void MailBoxJob::ReceiveInbox(CPlayer* pPlayer, int InboxID)
 {
-	const int ClientID = pPlayer->GetCID();
-	if(PPSTR(CMD, "MAIL") == 0)
+	ResultPtr pRes = SJK.SD("ItemID, Count, Enchant", "tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
+	if(!pRes->next())
+		return;
+
+	// get informed about the mail
+	const int ItemID = pRes->getInt("ItemID");
+	const int Count = pRes->getInt("Count");
+	if(ItemID <= 0 || Count <= 0)
 	{
-		ReceiveInbox(pPlayer, VoteID);
-		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INBOX);
-		return true;
+		SJK.DD("tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
+		return;
 	}
 
-	return false;
+	// recieve
+	if(GS()->GetItemInfo(ItemID).IsEnchantable() && pPlayer->GetItem(ItemID).m_Count > 0)
+	{
+		GS()->Chat(pPlayer->GetCID(), "Enchant item maximal count x1 in a backpack!");
+		return;
+	}
+	SJK.DD("tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
+
+	const int Enchant = pRes->getInt("Enchant");
+	pPlayer->GetItem(ItemID).Add(Count, 0, Enchant);
+	GS()->Chat(pPlayer->GetCID(), "You received an attached item [{STR}].", GS()->GetItemInfo(ItemID).GetName(pPlayer));
 }

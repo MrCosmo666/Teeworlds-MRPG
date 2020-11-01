@@ -179,7 +179,7 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 	PlayerCraftItem.Add(CraftGetCount);
 	if(PlayerCraftItem.Info().IsEnchantable())
 	{
-		GS()->Chat(-1, "{STR} crafted [{STR}x{INT}].", GS()->Server()->ClientName(ClientID), PlayerCraftItem.Info().GetName(), &CraftGetCount);
+		GS()->Chat(-1, "{STR} crafted [{STR}x{INT}].", Server()->ClientName(ClientID), PlayerCraftItem.Info().GetName(), &CraftGetCount);
 		return;
 	}
 
@@ -188,7 +188,7 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 	GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 }
 
-bool CraftJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool CraftJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	if(PPSTR(CMD, "CRAFT") == 0)
 	{

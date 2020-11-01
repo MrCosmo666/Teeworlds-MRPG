@@ -100,7 +100,7 @@ void BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 	pPlayer->FormatTextQuest(BotID, ms_aNpcBot[MobID].m_aTalk[Progress].m_aTalkingText);
 	if(!GS()->IsMmoClient(ClientID))
 	{
-		const char* TalkedNick = (PlayerTalked ? GS()->Server()->ClientName(ClientID) : ms_aNpcBot[MobID].GetName());
+		const char* TalkedNick = (PlayerTalked ? Server()->ClientName(ClientID) : ms_aNpcBot[MobID].GetName());
 		str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) %s:\n- %s", (1 + Progress), SizeTalking, TalkedNick, pPlayer->FormatedTalkedText());
 		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 	}
@@ -130,7 +130,7 @@ void BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int Talk
 	if(!GS()->IsMmoClient(ClientID))
 	{
 		const int QuestID = ms_aQuestBot[MobID].m_QuestID;
-		const char* TalkedNick = (PlayerTalked ? GS()->Server()->ClientName(ClientID) : ms_aQuestBot[MobID].GetName());
+		const char* TalkedNick = (PlayerTalked ? Server()->ClientName(ClientID) : ms_aQuestBot[MobID].GetName());
 		str_format(reformTalkedText, sizeof(reformTalkedText), "%s\n=========\n\n( %d of %d ) %s:\n- %s", 
 			GS()->GetQuestInfo(QuestID).GetName(), (1 + Progress), SizeTalking, TalkedNick, pPlayer->FormatedTalkedText());
 		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
@@ -160,7 +160,7 @@ void BotJob::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 	{
 		const int QuestID = ms_aQuestBot[MobID].m_QuestID;
 		const bool PlayerTalked = ms_aQuestBot[MobID].m_aTalk[Progress].m_PlayerTalked;
-		const char* TalkedNick = (PlayerTalked ? GS()->Server()->ClientName(ClientID) : ms_aQuestBot[MobID].GetName());
+		const char* TalkedNick = (PlayerTalked ? Server()->ClientName(ClientID) : ms_aQuestBot[MobID].GetName());
 
 		char reformTalkedText[512];
 		pPlayer->FormatTextQuest(BotID, BotJob::ms_aQuestBot[MobID].m_aTalk[Progress].m_aTalkingText);

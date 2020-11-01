@@ -4183,7 +4183,7 @@ void CEditor::Render()
 	// render checker
 	RenderBackground(View, m_CheckerTexture, 32.0f, 1.0f);
 
-	CUIRect MenuBar, CModeBar, ToolBar, StatusBar, EnvelopeEditor, ToolBox;
+	CUIRect MenuBar = View, CModeBar = View, ToolBar = View, StatusBar = View, EnvelopeEditor = View, ToolBox = View;
 	m_ShowTilePicker = Input()->KeyIsPressed(KEY_SPACE) != 0 && m_Dialog == DIALOG_NONE;
 
 	if(m_GuiActive)
@@ -4691,6 +4691,9 @@ void CEditor::UpdateAndRender()
 		float rx = 0.0f, ry = 0.0f;
 		int CursorType = Input()->CursorRelative(&rx, &ry);
 		UI()->ConvertCursorMove(&rx, &ry, CursorType);
+
+		m_MouseDeltaX = rx;
+		m_MouseDeltaY = ry;
 
 		if(!m_LockMouse)
 		{

@@ -10,7 +10,7 @@ MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 
 CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 {
-	for(short & SortTab : m_aSortTabs)
+	for(short& SortTab : m_aSortTabs)
 		SortTab = 0;
 
 	m_aPlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed();
@@ -84,8 +84,7 @@ void CPlayer::Tick()
 	else if (m_Spawned && m_aPlayerTick[TickState::Respawn] + Server()->TickSpeed() * 3 <= Server()->Tick())
 		TryRespawn();
 
-	TickOnlinePlayer();
-	HandleTuningParams();
+	TickSystemTalk();
 }
 
 void CPlayer::PotionsTick()
@@ -113,11 +112,9 @@ void CPlayer::PostTick()
 	// update latency value
 	if (Server()->ClientIngame(m_ClientID) && GS()->IsPlayerEqualWorldID(m_ClientID) && IsAuthed())
 		GetTempData().m_TempPing = (short)m_Latency.m_Min;
-}
 
-void CPlayer::TickOnlinePlayer()
-{
-	TickSystemTalk();
+	// update tuning params
+	HandleTuningParams();
 }
 
 void CPlayer::TickSystemTalk()
@@ -380,11 +377,6 @@ void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
 		CGS::ms_aEffects[m_ClientID][Potion] = Sec;
 		GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, Potion, true);
 	}
-}
-
-void CPlayer::SetLanguage(const char* pLanguage)
-{
-	Server()->SetClientLanguage(m_ClientID, pLanguage);
 }
 
 const char *CPlayer::GetLanguage() const

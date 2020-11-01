@@ -47,17 +47,15 @@ class GuildJob : public MmoComponent
 	static std::map < int, GuildStructRank > ms_aRankGuild;
 	std::map < int, CDecorationHouses* > m_DecorationHouse;
 
-	void LoadGuildRank(int GuildID);
-
-public:
-	virtual void OnInit();
-	virtual void OnInitWorld(const char* pWhereLocalWorld);
-	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
-	virtual bool OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
-	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
-	virtual void OnTick();
+	void OnInit() override;
+	void OnInitWorld(const char* pWhereLocalWorld) override;
+	void OnTick() override;
+	bool OnHandleTile(CCharacter* pChr, int IndexCollision) override;
+	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
+	bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu) override;
 
 private:
+	void LoadGuildRank(int GuildID);
 	void TickHousingText();
 
 	std::string UpgradeNames(int Field, bool DataTable = false);

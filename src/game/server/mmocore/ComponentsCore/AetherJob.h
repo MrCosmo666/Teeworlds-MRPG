@@ -16,14 +16,12 @@ class AetherJob : public MmoComponent
 	};
 	static std::map < int, StructTeleport > ms_aTeleport;
 
-public:
-	virtual void OnInit();
-	virtual void OnInitAccount(CPlayer *pPlayer);
-	virtual bool OnHandleTile(CCharacter *pChr, int IndexCollision);
-	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
-	virtual bool OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
+	void OnInit() override;
+	void OnInitAccount(CPlayer* pPlayer) override;
+	bool OnHandleTile(CCharacter* pChr, int IndexCollision) override;
+	bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu) override;
+	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
 
-private:
 	void UnlockLocation(CPlayer* pPlayer, vec2 Pos);
 	void ShowTeleportList(CCharacter* pChar);
 };

@@ -23,21 +23,21 @@ class WorldSwapJob : public MmoComponent
 		int m_FindWorldID;
 		vec2 m_Position;
 	};
-
 	static std::map < int, StructSwapWorld > ms_aWorldSwap;
 	static std::list < StructPositionLogic > ms_aWorldPositionLogic;
-public:
-	virtual void OnInit();
-	virtual void OnInitWorld(const char* pWhereLocalWorld);
-	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
 
-	vec2 GetPositionQuestBot(int ClientID, BotJob::QuestBotInfo QuestBot);
+	void OnInit() override;
+	void OnInitWorld(const char* pWhereLocalWorld) override;
+	bool OnHandleTile(CCharacter* pChr, int IndexCollision) override;
+
+public:
 	int GetWorldType() const;
 	int GetNecessaryQuest(int WorldID = -1) const;
+	vec2 GetPositionQuestBot(int ClientID, BotJob::QuestBotInfo QuestBot);
 	void CheckQuestingOpened(CPlayer* pPlayer, int QuestID);
 
 private:
-	bool ChangeWorld(CPlayer *pPlayer, vec2 Pos);
+	bool ChangeWorld(CPlayer* pPlayer, vec2 Pos);
 	int GetID(vec2 Pos);
 };
 

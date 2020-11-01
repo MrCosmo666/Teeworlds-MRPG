@@ -84,20 +84,24 @@ void GuildJob::OnInitWorld(const char* pWhereLocalWorld)
 		Job()->ShowLoadingProgress("Guilds Houses Decorations", m_DecorationHouse.size());
 	}, pWhereLocalWorld);
 }
+void GuildJob::OnTick()
+{
+	TickHousingText();
+}
 
 bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 {
 	CPlayer* pPlayer = pChr->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
 
-	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_GUILD_HOUSE))
+	if(pChr->GetHelper()->TileEnter(IndexCollision, TILE_GUILD_HOUSE))
 	{
 		GS()->Chat(ClientID, "You can see menu in the votes!");
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
 		return true;
 	}
-	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_GUILD_HOUSE))
+	else if(pChr->GetHelper()->TileExit(IndexCollision, TILE_GUILD_HOUSE))
 	{
 		GS()->Chat(ClientID, "You left the active zone, menu is restored!");
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
@@ -105,23 +109,23 @@ bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 		return true;
 	}
 
-	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_GUILD_CHAIRS))
+	if(pChr->GetHelper()->TileEnter(IndexCollision, TILE_GUILD_CHAIRS))
 	{
-		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true; 
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
 		return true;
 	}
-	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_GUILD_CHAIRS))
+	else if(pChr->GetHelper()->TileExit(IndexCollision, TILE_GUILD_CHAIRS))
 	{
 		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
 		return true;
 	}
-	if (pChr->GetHelper()->BoolIndex(TILE_GUILD_CHAIRS))
+	if(pChr->GetHelper()->BoolIndex(TILE_GUILD_CHAIRS))
 	{
-		if (GS()->Server()->Tick() % (GS()->Server()->TickSpeed() * 5) == 0)
+		if(Server()->Tick() % (Server()->TickSpeed() * 5) == 0)
 		{
 			const int HouseID = GetPosHouseID(pChr->m_Core.m_Pos);
 			const int GuildID = GetHouseGuildID(HouseID);
-			if (HouseID <= 0 || GuildID <= 0) 
+			if(HouseID <= 0 || GuildID <= 0)
 				return true;
 
 			const int Exp = GetMemberChairBonus(GuildID, EMEMBERUPGRADE::ChairNSTExperience);
@@ -134,16 +138,13 @@ bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	return false;
 }
 
-/* #########################################################################
-	GLOBAL MEMBER
-######################################################################### */
-bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
-	if (PPSTR(CMD, "MLEADER") == 0)
+	if(PPSTR(CMD, "MLEADER") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer) || Get != 134)
+		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer) || Get != 134)
 		{
 			GS()->Chat(ClientID, "You have no access.");
 			return true;
@@ -154,21 +155,21 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		SJK.UD("tw_guilds", "OwnerID = '%d' WHERE ID = '%d'", SelectedAccountID, GuildID);
 
 		AddHistoryGuild(GuildID, "New guild leader '%s'.", Job()->PlayerName(SelectedAccountID));
-		GS()->ChatGuild(GuildID, "Change leader {STR}->{STR}", GS()->Server()->ClientName(ClientID), Job()->PlayerName(SelectedAccountID));
+		GS()->ChatGuild(GuildID, "Change leader {STR}->{STR}", Server()->ClientName(ClientID), Job()->PlayerName(SelectedAccountID));
 		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
 		return true;
 	}
 
-	if (PPSTR(CMD, "MSPAWN") == 0)
+	if(PPSTR(CMD, "MSPAWN") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
 		const int HouseID = GetGuildHouseID(GuildID);
-		if (GuildID <= 0 || HouseID <= 0)
+		if(GuildID <= 0 || HouseID <= 0)
 			return true;
 
 		vec2 Position = GetPositionHouse(GuildID);
 		const int WorldID = ms_aHouseGuild[HouseID].m_WorldID;
-		if (!GS()->IsPlayerEqualWorldID(ClientID, WorldID))
+		if(!GS()->IsPlayerEqualWorldID(ClientID, WorldID))
 		{
 			pPlayer->GetTempData().m_TempTeleportX = Position.x;
 			pPlayer->GetTempData().m_TempTeleportY = Position.y;
@@ -179,10 +180,10 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "MKICK") == 0)
+	if(PPSTR(CMD, "MKICK") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
+		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
 		{
 			GS()->Chat(ClientID, "You have no access.");
 			return true;
@@ -192,17 +193,17 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "MUPGRADE") == 0)
+	if(PPSTR(CMD, "MUPGRADE") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
+		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
 		{
 			GS()->Chat(ClientID, "You have no access.");
 			return true;
 		}
 
 		const int UpgradeID = VoteID;
-		if (UpgradeGuild(GuildID, UpgradeID))
+		if(UpgradeGuild(GuildID, UpgradeID))
 		{
 			const int GuildCount = ms_aGuild[GuildID].m_Upgrades[UpgradeID];
 			GS()->ChatGuild(GuildID, "Improved to {INT} {STR} in {STR}!", &GuildCount, UpgradeNames(UpgradeID).c_str(), ms_aGuild[GuildID].m_aName);
@@ -215,13 +216,13 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "MMONEY") == 0)
+	if(PPSTR(CMD, "MMONEY") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if (GuildID <= 0)
+		if(GuildID <= 0)
 			return true;
 
-		if (Get < 100)
+		if(Get < 100)
 		{
 			GS()->Chat(ClientID, "Minimal 100 gold.");
 			return true;
@@ -230,20 +231,20 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		if(!pPlayer->SpendCurrency(Get))
 			return true;
 
-		if (AddMoneyBank(GuildID, Get))
+		if(AddMoneyBank(GuildID, Get))
 		{
 			SJK.UD("tw_accounts_data", "GuildDeposit = GuildDeposit + '%d' WHERE ID = '%d'", Get, pPlayer->Acc().m_AuthID);
-			GS()->ChatGuild(GuildID, "{STR} deposit in treasury {INT}gold.", GS()->Server()->ClientName(ClientID), &Get);
-			AddHistoryGuild(GuildID, "'%s' added to bank %dgold.", GS()->Server()->ClientName(ClientID), Get);
+			GS()->ChatGuild(GuildID, "{STR} deposit in treasury {INT}gold.", Server()->ClientName(ClientID), &Get);
+			AddHistoryGuild(GuildID, "'%s' added to bank %dgold.", Server()->ClientName(ClientID), Get);
 			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
 		}
 		return true;
 	}
 
-	if (PPSTR(CMD, "BUYMEMBERHOUSE") == 0)
+	if(PPSTR(CMD, "BUYMEMBERHOUSE") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer))
 		{
 			GS()->Chat(ClientID, "You have no access.");
 			return true;
@@ -254,10 +255,10 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "MHOUSESELL") == 0)
+	if(PPSTR(CMD, "MHOUSESELL") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer) || Get != 777)
+		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer) || Get != 777)
 		{
 			GS()->Chat(ClientID, "You have no access.");
 			return true;
@@ -268,10 +269,10 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "MDOOR") == 0)
+	if(PPSTR(CMD, "MDOOR") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
+		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
 		{
 			GS()->Chat(ClientID, "You have no access.");
 			return true;
@@ -282,10 +283,10 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "MINVITEACCEPT") == 0)
+	if(PPSTR(CMD, "MINVITEACCEPT") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
+		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
 		{
 			GS()->Chat(ClientID, "You have no access.");
 			return true;
@@ -303,10 +304,10 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "MINVITEREJECT") == 0)
+	if(PPSTR(CMD, "MINVITEREJECT") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
+		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
 		{
 			GS()->Chat(ClientID, "You have no access.");
 			return true;
@@ -320,9 +321,9 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "MINVITENAME") == 0)
+	if(PPSTR(CMD, "MINVITENAME") == 0)
 	{
-		if (PPSTR(GetText, "NULL") == 0)
+		if(PPSTR(GetText, "NULL") == 0)
 		{
 			GS()->Chat(ClientID, "Use please another name.");
 			return true;
@@ -333,9 +334,9 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "MINVITESEND") == 0)
+	if(PPSTR(CMD, "MINVITESEND") == 0)
 	{
-		if (!AddInviteGuild(VoteID, pPlayer->Acc().m_AuthID))
+		if(!AddInviteGuild(VoteID, pPlayer->Acc().m_AuthID))
 		{
 			GS()->Chat(ClientID, "You have already sent the invitation.");
 			return true;
@@ -345,9 +346,9 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "MRANKNAME") == 0)
+	if(PPSTR(CMD, "MRANKNAME") == 0)
 	{
-		if (PPSTR(GetText, "NULL") == 0)
+		if(PPSTR(GetText, "NULL") == 0)
 		{
 			GS()->Chat(ClientID, "Use please another name.");
 			return true;
@@ -358,17 +359,17 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "MRANKCREATE") == 0)
+	if(PPSTR(CMD, "MRANKCREATE") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer))
 		{
 			GS()->Chat(ClientID, "You have no access.");
 			return true;
 		}
 
 		const int lenRank = str_length(pPlayer->GetTempData().m_aRankGuildBuf);
-		if (lenRank < 2 || lenRank > 16)
+		if(lenRank < 2 || lenRank > 16)
 		{
 			GS()->Chat(ClientID, "Minimal 2, maximal 16 symbols.");
 			return true;
@@ -379,10 +380,10 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "MRANKDELETE") == 0)
+	if(PPSTR(CMD, "MRANKDELETE") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer))
 		{
 			GS()->Chat(ClientID, "You have no access.");
 			return true;
@@ -394,10 +395,10 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "MRANKACCESS") == 0)
+	if(PPSTR(CMD, "MRANKACCESS") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer))
 		{
 			GS()->Chat(ClientID, "You have no access.");
 			return true;
@@ -409,16 +410,16 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "MRANKSET") == 0)
+	if(PPSTR(CMD, "MRANKSET") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer))
 		{
 			GS()->Chat(ClientID, "You have no access.");
 			return true;
 		}
 
-		if (str_length(pPlayer->GetTempData().m_aRankGuildBuf) < 2)
+		if(str_length(pPlayer->GetTempData().m_aRankGuildBuf) < 2)
 		{
 			GS()->Chat(ClientID, "Minimal symbols 2.");
 			return true;
@@ -430,10 +431,10 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "MRANKCHANGE") == 0)
+	if(PPSTR(CMD, "MRANKCHANGE") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if (GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer))
 		{
 			GS()->Chat(ClientID, "You have no access.");
 			return true;
@@ -445,18 +446,18 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "DECOGUILDSTART") == 0)
+	if(PPSTR(CMD, "DECOGUILDSTART") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
 		const int HouseID = GetGuildHouseID(GuildID);
-		if (GuildID <= 0 || HouseID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
+		if(GuildID <= 0 || HouseID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
 		{
 			GS()->Chat(ClientID, "You have no access.");
 			return true;
 		}
 
 		const vec2 PositionHouse = GetPositionHouse(GuildID);
-		if (distance(PositionHouse, pPlayer->GetCharacter()->m_Core.m_Pos) > 600)
+		if(distance(PositionHouse, pPlayer->GetCharacter()->m_Core.m_Pos) > 600)
 		{
 			GS()->Chat(ClientID, "Maximum distance between your home 600!");
 			return true;
@@ -474,11 +475,11 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		return true;
 	}
 
-	if (PPSTR(CMD, "DECOGUILDDELETE") == 0)
+	if(PPSTR(CMD, "DECOGUILDDELETE") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
 		const int HouseID = GetGuildHouseID(GuildID);
-		if (GuildID <= 0 || HouseID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
+		if(GuildID <= 0 || HouseID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
 		{
 			GS()->Chat(ClientID, "You have no access.");
 			return true;
@@ -486,7 +487,7 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 
 		const int DecoID = VoteID;
 		const int DecoItemID = VoteID2;
-		if (DeleteDecorationHouse(DecoID))
+		if(DeleteDecorationHouse(DecoID))
 		{
 			InventoryItem& PlDecoItem = pPlayer->GetItem(DecoItemID);
 			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
@@ -502,13 +503,13 @@ bool GuildJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 bool GuildJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
 	const int ClientID = pPlayer->GetCID();
-	if (ReplaceMenu)
+	if(ReplaceMenu)
 	{
 		CCharacter* pChr = pPlayer->GetCharacter();
-		if (!pChr || !pChr->IsAlive())
+		if(!pChr || !pChr->IsAlive())
 			return false;
-		
-		if (pChr->GetHelper()->BoolIndex(TILE_GUILD_HOUSE))
+
+		if(pChr->GetHelper()->BoolIndex(TILE_GUILD_HOUSE))
 		{
 			const int GuildHouseID = GetPosHouseID(pChr->m_Core.m_Pos);
 			Job()->Member()->ShowBuyHouse(pPlayer, GuildHouseID);
@@ -517,35 +518,35 @@ bool GuildJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		return false;
 	}
 
-	if (Menulist == MenuList::MENU_GUILD)
+	if(Menulist == MenuList::MENU_GUILD)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 		ShowMenuGuild(pPlayer);
 		return true;
 	}
 
-	if (Menulist == MenuList::MENU_GUILD_HISTORY)
+	if(Menulist == MenuList::MENU_GUILD_HISTORY)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_GUILD;
 		ShowHistoryGuild(ClientID, pPlayer->Acc().m_GuildID);
 		return true;
 	}
 
-	if (Menulist == MenuList::MENU_GUILD_RANK)
+	if(Menulist == MenuList::MENU_GUILD_RANK)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_GUILD;
 		ShowMenuRank(pPlayer);
 		return true;
 	}
 
-	if (Menulist == MenuList::MENU_GUILD_INVITES)
+	if(Menulist == MenuList::MENU_GUILD_INVITES)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_GUILD;
 		ShowInvitesGuilds(ClientID, pPlayer->Acc().m_GuildID);
 		return true;
 	}
 
-	if (Menulist == MenuList::MENU_GUILD_HOUSE_DECORATION)
+	if(Menulist == MenuList::MENU_GUILD_HOUSE_DECORATION)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_GUILD;
 		GS()->AVH(ClientID, TAB_INFO_DECORATION, GREEN_COLOR, "Decorations Information");
@@ -566,14 +567,9 @@ bool GuildJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 /* #########################################################################
 	BASED GUILDS
 ######################################################################### */
-void GuildJob::OnTick()
-{
-	TickHousingText();
-}
-
 void GuildJob::TickHousingText()
 {
-	if (GS()->Server()->Tick() % (GS()->Server()->TickSpeed() * 2) != 0)
+	if (Server()->Tick() % (Server()->TickSpeed() * 2) != 0)
 		return;
 
 	for (const auto& mh : ms_aHouseGuild)
@@ -581,7 +577,7 @@ void GuildJob::TickHousingText()
 		if (mh.second.m_WorldID != GS()->GetWorldID())
 			continue;
 
-		const int LifeTime = (GS()->Server()->TickSpeed() * 2) - 5;
+		const int LifeTime = (Server()->TickSpeed() * 2) - 5;
 		const int GuildID = mh.second.m_GuildID;
 		if (GuildID > 0)
 		{
@@ -999,10 +995,10 @@ const char *GuildJob::GetGuildRank(int GuildID, int RankID)
 // find rank by name and organization
 int GuildJob::FindGuildRank(int GuildID, const char *Rank) const
 {
-	for(auto mr: ms_aRankGuild)
+	for(auto& pRank : ms_aRankGuild)
 	{
-		if(GuildID == mr.second.m_GuildID && str_comp(Rank, mr.second.m_aRank) == 0)
-			return mr.first;
+		if(GuildID == pRank.second.m_GuildID && str_comp(Rank, pRank.second.m_aRank) == 0)
+			return pRank.first;
 	}
 	return -1;
 }
@@ -1314,7 +1310,7 @@ void GuildJob::BuyGuildHouse(int GuildID, int HouseID)
 		ms_aHouseGuild[HouseID].m_GuildID = GuildID;
 		SJK.UD("tw_guilds_houses", "OwnerMID = '%d' WHERE ID = '%d'", GuildID, HouseID);
 
-		const char* WorldName = GS()->Server()->GetWorldName(ms_aHouseGuild[HouseID].m_WorldID);
+		const char* WorldName = Server()->GetWorldName(ms_aHouseGuild[HouseID].m_WorldID);
 		GS()->Chat(-1, "{STR} buyight guild house on {STR}!", ms_aGuild[GuildID].m_aName, WorldName);
 		GS()->ChatDiscord(DC_SERVER_INFO, "Information", "{STR} buyight guild house on {STR}!", ms_aGuild[GuildID].m_aName, WorldName);
 		AddHistoryGuild(GuildID, "Bought a house on '%s'.", WorldName);
@@ -1343,7 +1339,7 @@ void GuildJob::SellGuildHouse(int GuildID)
 		ms_aGuild[GuildID].m_Bank += ReturnedGold;
 		SJK.UD("tw_guilds", "Bank = '%d' WHERE ID = '%d'", ms_aGuild[GuildID].m_Bank, GuildID);
 		GS()->ChatGuild(GuildID, "House sold, {INT}gold returned in bank", &ReturnedGold);
-		AddHistoryGuild(GuildID, "Lost a house on '%s'.", GS()->Server()->GetWorldName(ms_aHouseGuild[HouseID].m_WorldID));
+		AddHistoryGuild(GuildID, "Lost a house on '%s'.", Server()->GetWorldName(ms_aHouseGuild[HouseID].m_WorldID));
 	}
 
 	if(ms_aHouseGuild[HouseID].m_pDoor)

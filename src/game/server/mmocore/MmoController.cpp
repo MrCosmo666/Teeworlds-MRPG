@@ -34,6 +34,7 @@ MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 	{
 		component->m_Job = this;
 		component->m_GameServer = pGameServer;
+		component->m_pServer = pGameServer->Server();
 
 		if(m_pGameServer->GetWorldID() == MAIN_WORLD_ID)
 			component->OnInit();
@@ -100,7 +101,7 @@ bool MmoController::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, con
 
 	for(auto& component : m_Components.m_paComponents)
 	{
-		if(component->OnParsingVoteCommands(pPlayer, CMD, VoteID, VoteID2, Get, GetText))
+		if(component->OnHandleVoteCommands(pPlayer, CMD, VoteID, VoteID2, Get, GetText))
 			return true;
 	}
 	return false;

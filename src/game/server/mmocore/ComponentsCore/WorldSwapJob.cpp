@@ -46,7 +46,7 @@ void WorldSwapJob::OnInitWorld(const char* pWhereLocalWorld)
 	SJK.SDT("RespawnWorld, MusicID", "ENUM_WORLDS", [&](ResultPtr pRes)
 	{
 		const int WorldID = GS()->GetWorldID();
-		const CSqlString<32> world_name = CSqlString<32>(GS()->Server()->GetWorldName(WorldID));
+		const CSqlString<32> world_name = CSqlString<32>(Server()->GetWorldName(WorldID));
 		if(pRes->next())
 		{
 			const int RespawnWorld = (int)pRes->getInt("RespawnWorld");
@@ -77,29 +77,11 @@ bool WorldSwapJob::OnHandleTile(CCharacter *pChr, int IndexCollision)
 	return false;
 }
 
-int WorldSwapJob::GetID(vec2 Pos)
+int WorldSwapJob::GetWorldType() const
 {
-	for(const auto& sw : ms_aWorldSwap)
-	{
-		if (sw.second.m_WorldID == GS()->GetWorldID() || sw.second.m_TwoWorldID == GS()->GetWorldID())
-		{
-			vec2 SwapPosition = vec2(sw.second.m_PositionX, sw.second.m_PositionY);
-			vec2 SwapPosition2 = vec2(sw.second.m_TwoPositionX, sw.second.m_TwoPositionY);
-			if (distance(SwapPosition, Pos) < 400 || distance(SwapPosition2, Pos) < 400)
-				return sw.first;
-		}
-	}
-	return -1;
-}
-
-void WorldSwapJob::CheckQuestingOpened(CPlayer* pPlayer, int QuestID)
-{
-	const int ClientID = pPlayer->GetCID();
-	for (const auto& sw : ms_aWorldSwap)
-	{
-		if (QuestID == sw.second.m_OpenQuestID)
-			GS()->Chat(-1, "{STR} opened zone ({STR})!", GS()->Server()->ClientName(ClientID), GS()->Server()->GetWorldName(sw.second.m_TwoWorldID));
-	}
+	if(GS()->GetDungeonID())
+		return WORLD_DUNGEON;
+	return WORLD_STANDARD;
 }
 
 int WorldSwapJob::GetNecessaryQuest(int WorldID) const
@@ -108,35 +90,6 @@ int WorldSwapJob::GetNecessaryQuest(int WorldID) const
 	const auto& pItem = std::find_if(ms_aWorldSwap.begin(), ms_aWorldSwap.end(), [CheckWorldID](const std::pair<int, StructSwapWorld>& pWorldSwap)
 	{ return pWorldSwap.second.m_TwoWorldID == CheckWorldID; });
 	return pItem != ms_aWorldSwap.end() ? pItem->second.m_OpenQuestID : -1;
-}
-
-bool WorldSwapJob::ChangeWorld(CPlayer *pPlayer, vec2 Pos)
-{
-	const int WID = GetID(Pos);
-	if (ms_aWorldSwap.find(WID) != ms_aWorldSwap.end())
-	{
-		const int ClientID = pPlayer->GetCID();
-		const int StoryQuestNeeded = ms_aWorldSwap[WID].m_OpenQuestID;
-		if (StoryQuestNeeded > 0 && !pPlayer->GetQuest(StoryQuestNeeded).IsComplected())
-		{
-			GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Requires quest completion '{STR}'!", pPlayer->GetQuest(StoryQuestNeeded).Info().GetName());
-			return false;
-		}
-
-		if (ms_aWorldSwap[WID].m_WorldID == GS()->GetWorldID())
-		{
-			pPlayer->GetTempData().m_TempTeleportX = ms_aWorldSwap[WID].m_TwoPositionX;
-			pPlayer->GetTempData().m_TempTeleportY = ms_aWorldSwap[WID].m_TwoPositionY;
-			pPlayer->ChangeWorld(ms_aWorldSwap[WID].m_TwoWorldID);
-			return true;
-		}
-
-		pPlayer->GetTempData().m_TempTeleportX = ms_aWorldSwap[WID].m_PositionX;
-		pPlayer->GetTempData().m_TempTeleportY = ms_aWorldSwap[WID].m_PositionY;
-		pPlayer->ChangeWorld(ms_aWorldSwap[WID].m_WorldID);
-		return true;
-	}
-	return false;
 }
 
 vec2 WorldSwapJob::GetPositionQuestBot(int ClientID, BotJob::QuestBotInfo QuestBot)
@@ -157,9 +110,56 @@ vec2 WorldSwapJob::GetPositionQuestBot(int ClientID, BotJob::QuestBotInfo QuestB
 	return vec2(0, 0);
 }
 
-int WorldSwapJob::GetWorldType() const
+void WorldSwapJob::CheckQuestingOpened(CPlayer* pPlayer, int QuestID)
 {
-	if(GS()->GetDungeonID())
-		return WORLD_DUNGEON;
-	return WORLD_STANDARD;
+	const int ClientID = pPlayer->GetCID();
+	for(const auto& sw : ms_aWorldSwap)
+	{
+		if(QuestID == sw.second.m_OpenQuestID)
+			GS()->Chat(-1, "{STR} opened zone ({STR})!", Server()->ClientName(ClientID), Server()->GetWorldName(sw.second.m_TwoWorldID));
+	}
+}
+
+bool WorldSwapJob::ChangeWorld(CPlayer* pPlayer, vec2 Pos)
+{
+	const int WID = GetID(Pos);
+	if(ms_aWorldSwap.find(WID) != ms_aWorldSwap.end())
+	{
+		const int ClientID = pPlayer->GetCID();
+		const int StoryQuestNeeded = ms_aWorldSwap[WID].m_OpenQuestID;
+		if(StoryQuestNeeded > 0 && !pPlayer->GetQuest(StoryQuestNeeded).IsComplected())
+		{
+			GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Requires quest completion '{STR}'!", pPlayer->GetQuest(StoryQuestNeeded).Info().GetName());
+			return false;
+		}
+
+		if(ms_aWorldSwap[WID].m_WorldID == GS()->GetWorldID())
+		{
+			pPlayer->GetTempData().m_TempTeleportX = ms_aWorldSwap[WID].m_TwoPositionX;
+			pPlayer->GetTempData().m_TempTeleportY = ms_aWorldSwap[WID].m_TwoPositionY;
+			pPlayer->ChangeWorld(ms_aWorldSwap[WID].m_TwoWorldID);
+			return true;
+		}
+
+		pPlayer->GetTempData().m_TempTeleportX = ms_aWorldSwap[WID].m_PositionX;
+		pPlayer->GetTempData().m_TempTeleportY = ms_aWorldSwap[WID].m_PositionY;
+		pPlayer->ChangeWorld(ms_aWorldSwap[WID].m_WorldID);
+		return true;
+	}
+	return false;
+}
+
+int WorldSwapJob::GetID(vec2 Pos)
+{
+	for(const auto& sw : ms_aWorldSwap)
+	{
+		if(sw.second.m_WorldID == GS()->GetWorldID() || sw.second.m_TwoWorldID == GS()->GetWorldID())
+		{
+			vec2 SwapPosition = vec2(sw.second.m_PositionX, sw.second.m_PositionY);
+			vec2 SwapPosition2 = vec2(sw.second.m_TwoPositionX, sw.second.m_TwoPositionY);
+			if(distance(SwapPosition, Pos) < 400 || distance(SwapPosition2, Pos) < 400)
+				return sw.first;
+		}
+	}
+	return -1;
 }

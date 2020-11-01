@@ -28,16 +28,14 @@ class DungeonJob : public MmoComponent
 		bool IsDungeonPlaying() const { return m_State > 1; };
 	};
 
+	void OnInit() override;
+	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
+	bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu) override;
+
 public:
 	static std::map < int, StructDungeon > ms_aDungeon;
 
 	bool IsDungeonWorld(int WorldID) const;
-
-	DungeonJob();
-
-	virtual bool OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
-	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
-
 	void SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds);
 	void ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID);
 	void ShowDungeonsList(CPlayer* pPlayer, bool Story);

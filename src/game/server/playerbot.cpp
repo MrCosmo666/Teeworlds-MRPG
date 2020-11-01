@@ -61,7 +61,11 @@ void CPlayerBot::Tick()
 	}
 	else if(m_Spawned && m_aPlayerTick[TickState::Respawn]+Server()->TickSpeed()*3 <= Server()->Tick())
 		TryRespawn();
+}
 
+void CPlayerBot::PostTick()
+{
+	// update tuning params
 	HandleTuningParams();
 }
 

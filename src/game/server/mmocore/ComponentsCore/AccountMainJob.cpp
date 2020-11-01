@@ -27,7 +27,7 @@ int AccountMainJob::SendAuthCode(int ClientID, int Code)
 	{
 		CNetMsg_Sv_ClientProgressAuth ProgressMsg;
 		ProgressMsg.m_Code = Code;
-		GS()->Server()->SendPackMsg(&ProgressMsg, MSGFLAG_VITAL, ClientID);
+		Server()->SendPackMsg(&ProgressMsg, MSGFLAG_VITAL, ClientID);
 	}
 	return Code;
 }
@@ -49,7 +49,7 @@ int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char 
 		GS()->Chat(ClientID, "Username / Password must contain 4-12 characters");
 		return SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
 	}
-	CSqlString<32> clear_Nick = CSqlString<32>(GS()->Server()->ClientName(ClientID));
+	CSqlString<32> clear_Nick = CSqlString<32>(Server()->ClientName(ClientID));
 	ResultPtr pRes = SJK.SD("ID", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr());
 	if(pRes->next())
 	{
@@ -67,7 +67,7 @@ int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char 
 	CSqlString<32> clear_Pass = CSqlString<32>(Password);
 
 	char aAddrStr[64];
-	GS()->Server()->GetClientAddr(ClientID, aAddrStr, sizeof(aAddrStr));
+	Server()->GetClientAddr(ClientID, aAddrStr, sizeof(aAddrStr));
 
 	char aSalt[32] = { 0 };
 	secure_random_password(aSalt, sizeof(aSalt), 24);
@@ -98,7 +98,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 
 	CSqlString<32> clear_Login = CSqlString<32>(Login);
 	CSqlString<32> clear_Pass = CSqlString<32>(Password);
-	CSqlString<32> clear_Nick = CSqlString<32>(GS()->Server()->ClientName(ClientID));
+	CSqlString<32> clear_Nick = CSqlString<32>(Server()->ClientName(ClientID));
 	ResultPtr pResAccount = SJK.SD("*", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr());
 	if(pResAccount->next())
 	{
@@ -124,7 +124,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 			return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
 		}
 
-		pPlayer->SetLanguage(pResCheck->getString("Language").c_str());
+		Server()->SetClientLanguage(ClientID, pResCheck->getString("Language").c_str());
 		str_copy(pPlayer->Acc().m_aLogin, clear_Login.cstr(), sizeof(pPlayer->Acc().m_aLogin));
 		str_copy(pPlayer->Acc().m_aLastLogin, pResCheck->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().m_aLastLogin));
 
@@ -147,7 +147,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		GS()->m_pController->DoTeamChange(pPlayer, false);
 
 		char aAddrStr[64];
-		GS()->Server()->GetClientAddr(ClientID, aAddrStr, sizeof(aAddrStr));
+		Server()->GetClientAddr(ClientID, aAddrStr, sizeof(aAddrStr));
 		SJK.UD("tw_accounts", "LoginDate = CURRENT_TIMESTAMP, LoginIP = '%s' WHERE ID = '%d'", aAddrStr, UserID);
 		return SendAuthCode(ClientID, AUTH_LOGIN_GOOD);
 	}
@@ -163,7 +163,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 
 	const int ClientID = pPlayer->GetCID();
 	GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 200, "You are located {STR} ({STR})", 
-		GS()->Server()->GetWorldName(GS()->GetWorldID()), (GS()->IsAllowedPVP() ? "Zone PVP" : "Safe zone"));
+		Server()->GetWorldName(GS()->GetWorldID()), (GS()->IsAllowedPVP() ? "Zone PVP" : "Safe zone"));
 
 	GS()->SendWorldMusic(ClientID, (GS()->IsDungeon() ? -1 : 0));
 	if(!FirstInitilize)
@@ -179,13 +179,13 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 
 	Job()->OnInitAccount(ClientID);
 	const int Rank = GetRank(pPlayer->Acc().m_AuthID);
-	GS()->Chat(-1, "{STR} logged to account. Rank #{INT}", GS()->Server()->ClientName(ClientID), &Rank);
+	GS()->Chat(-1, "{STR} logged to account. Rank #{INT}", Server()->ClientName(ClientID), &Rank);
 #ifdef CONF_DISCORD
 	char pMsg[256], pLoggin[64];
-	str_format(pLoggin, sizeof(pLoggin), "%s logged in Account ID %d", GS()->Server()->ClientName(ClientID), pPlayer->Acc().m_AuthID);
+	str_format(pLoggin, sizeof(pLoggin), "%s logged in Account ID %d", Server()->ClientName(ClientID), pPlayer->Acc().m_AuthID);
 	str_format(pMsg, sizeof(pMsg), "?player=%s&rank=%d&dicid=%d",
-		GS()->Server()->ClientName(ClientID), Rank, pPlayer->GetEquippedItemID(EQUIP_DISCORD));
-	GS()->Server()->SendDiscordGenerateMessage("16757248", pLoggin, pMsg);
+		Server()->ClientName(ClientID), Rank, pPlayer->GetEquippedItemID(EQUIP_DISCORD));
+	Server()->SendDiscordGenerateMessage("16757248", pLoggin, pMsg);
 #endif
 
 	if (!pPlayer->GetItem(itHammer).m_Count)
@@ -297,14 +297,14 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 
 		const char* pPlayerLanguage = pPlayer->GetLanguage();
 		GS()->AVH(ClientID, TAB_LANGUAGES, GRAY_COLOR, "Active language: [{STR}]", pPlayerLanguage);
-		for(int i = 0; i < GS()->Server()->Localization()->m_pLanguages.size(); i++)
+		for(int i = 0; i < Server()->Localization()->m_pLanguages.size(); i++)
 		{
 			// do not show the language already selected by the player in the selection lists
-			if(str_comp(pPlayerLanguage, GS()->Server()->Localization()->m_pLanguages[i]->GetFilename()) == 0)
+			if(str_comp(pPlayerLanguage, Server()->Localization()->m_pLanguages[i]->GetFilename()) == 0)
 				continue;
 
 			// add language selection
-			const char *pLanguageName = GS()->Server()->Localization()->m_pLanguages[i]->GetName();
+			const char *pLanguageName = Server()->Localization()->m_pLanguages[i]->GetName();
 			GS()->AVM(ClientID, "SELECTLANGUAGE", i, TAB_LANGUAGES, "Select language \"{STR}\"", pLanguageName);
 		}
 		GS()->AddBackpage(ClientID);
@@ -313,13 +313,13 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 	return false;
 }
 
-bool AccountMainJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool AccountMainJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (PPSTR(CMD, "SELECTLANGUAGE") == 0)
 	{
-		const char *pSelectedLanguage = GS()->Server()->Localization()->m_pLanguages[VoteID]->GetFilename();
-		pPlayer->SetLanguage(pSelectedLanguage);
+		const char *pSelectedLanguage = Server()->Localization()->m_pLanguages[VoteID]->GetFilename();
+		Server()->SetClientLanguage(ClientID, pSelectedLanguage);
 		GS()->Chat(ClientID, "You chosen a language \"{STR}\".", pSelectedLanguage);
 		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_SELECT_LANGUAGE);
 		Job()->SaveAccount(pPlayer, SaveType::SAVE_LANGUAGE);

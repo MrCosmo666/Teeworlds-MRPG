@@ -2323,10 +2323,12 @@ bool CGS::ParsingVoteCommands(int ClientID, const char *CMD, const int VoteID, c
 int CGS::CreateBot(short BotType, int BotID, int SubID)
 {
 	int BotClientID = MAX_PLAYERS;
-	while(BotClientID < MAX_CLIENTS && m_apPlayers[BotClientID])
+	while(m_apPlayers[BotClientID])
+	{
 		BotClientID++;
-	if (BotClientID >= MAX_CLIENTS)
-		return -1;
+		if(BotClientID >= MAX_CLIENTS)
+			return -1;
+	}
 
 	Server()->InitClientBot(BotClientID);
 	const int AllocMemoryCell = BotClientID+m_WorldID*MAX_CLIENTS;

@@ -68,6 +68,196 @@ void InventoryJob::OnResetClient(int ClientID)
 	ms_aItems.erase(ClientID);
 }
 
+bool InventoryJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+{
+	const int ClientID = pPlayer->GetCID();
+	if(ReplaceMenu)
+		return false;
+
+	if(Menulist == MenuList::MENU_INVENTORY)
+	{
+		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
+		GS()->AVH(ClientID, TAB_INFO_INVENTORY, GREEN_COLOR, "Inventory Information");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_INVENTORY, "Choose the type of items you want to show");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_INVENTORY, "After, need select item to interact");
+		GS()->AV(ClientID, "null");
+
+		GS()->AVH(ClientID, TAB_INVENTORY_SELECT, RED_COLOR, "Inventory Select List");
+		int SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_USED);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_USED, TAB_INVENTORY_SELECT, "Used ({INT})", &SizeItems);
+
+		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_CRAFT);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_CRAFT, TAB_INVENTORY_SELECT, "Craft ({INT})", &SizeItems);
+
+		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_MODULE);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_MODULE, TAB_INVENTORY_SELECT, "Modules ({INT})", &SizeItems);
+
+		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_POTION);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_POTION, TAB_INVENTORY_SELECT, "Potion ({INT})", &SizeItems);
+
+		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_OTHER);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_OTHER, TAB_INVENTORY_SELECT, "Other ({INT})", &SizeItems);
+		if(pPlayer->m_aSortTabs[SORT_INVENTORY])
+			ListInventory(pPlayer, pPlayer->m_aSortTabs[SORT_INVENTORY]);
+
+		GS()->AddBackpage(ClientID);
+		return true;
+	}
+
+	if(Menulist == MenuList::MENU_EQUIPMENT)
+	{
+		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
+		GS()->AVH(ClientID, TAB_INFO_EQUIP, GREEN_COLOR, "Equip / Armor Information");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_EQUIP, "Select tab and select armor.");
+		GS()->AV(ClientID, "null");
+
+		GS()->AVH(ClientID, TAB_EQUIP_SELECT, RED_COLOR, "Equip Select Slot");
+		const char* pType[NUM_EQUIPS] = { "Hammer", "Gun", "Shotgun", "Grenade", "Rifle", "Pickaxe", "Wings", "Discord" };
+		for(int i = 0; i < NUM_EQUIPS; i++)
+		{
+			const int ItemID = pPlayer->GetEquippedItemID(i);
+			InventoryItem& pItemPlayer = pPlayer->GetItem(ItemID);
+			if(ItemID <= 0 || !pItemPlayer.IsEquipped())
+			{
+				GS()->AVM(ClientID, "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} Not equipped", pType[i]);
+				continue;
+			}
+
+			char aAttributes[128];
+			pItemPlayer.FormatAttributes(aAttributes, sizeof(aAttributes));
+			GS()->AVMI(ClientID, pItemPlayer.Info().GetIcon(), "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], pItemPlayer.Info().GetName(pPlayer), aAttributes);
+		}
+
+		GS()->AV(ClientID, "null");
+		bool FindItem = false;
+		for(const auto& it : ms_aItems[ClientID])
+		{
+			if(!it.second.m_Count || it.second.Info().m_Function != pPlayer->m_aSortTabs[SORT_EQUIPING])
+				continue;
+
+			ItemSelected(pPlayer, it.second, true);
+			FindItem = true;
+		}
+
+		if(!FindItem)
+			GS()->AVL(ClientID, "null", "There are no items in this tab");
+
+		GS()->AddBackpage(ClientID);
+		return true;
+	}
+
+	return false;
+}
+
+bool InventoryJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+{
+	const int ClientID = pPlayer->GetCID();
+
+	if(PPSTR(CMD, "SORTEDINVENTORY") == 0)
+	{
+		pPlayer->m_aSortTabs[SORT_INVENTORY] = VoteID;
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INVENTORY);
+		return true;
+	}
+
+	if(PPSTR(CMD, "IDROP") == 0)
+	{
+		if(!pPlayer->GetCharacter())
+			return true;
+
+		int AvailableCount = GetUnfrozenItemCount(pPlayer, VoteID);
+		if(AvailableCount <= 0)
+			return true;
+
+		Get = min(AvailableCount, Get);
+		InventoryItem& pItemPlayer = pPlayer->GetItem(VoteID);
+		pItemPlayer.Drop(Get);
+
+		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "You drop {STR}x{INT}", pItemPlayer.Info().GetName(pPlayer), &Get);
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		return true;
+	}
+
+	if(PPSTR(CMD, "IUSE") == 0)
+	{
+		int AvailableCount = GetUnfrozenItemCount(pPlayer, VoteID);
+		if(AvailableCount <= 0)
+			return true;
+
+		Get = min(AvailableCount, Get);
+		pPlayer->GetItem(VoteID).Use(Get);
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		return true;
+	}
+
+	if(PPSTR(CMD, "IDESYNTHESIS") == 0)
+	{
+		int AvailableCount = GetUnfrozenItemCount(pPlayer, VoteID);
+		if(AvailableCount <= 0)
+			return true;
+
+		Get = min(AvailableCount, Get);
+		InventoryItem& pPlayerSelectedItem = pPlayer->GetItem(VoteID);
+		InventoryItem& pPlayerMaterialItem = pPlayer->GetItem(itMaterial);
+		const int DesCount = pPlayerSelectedItem.Info().m_Dysenthis * Get;
+		if(pPlayerSelectedItem.Remove(Get) && pPlayerMaterialItem.Add(DesCount))
+		{
+			GS()->Chat(ClientID, "Disassemble {STR}x{INT}, you receive {INT} {STR}(s)",
+				pPlayerSelectedItem.Info().GetName(pPlayer), &Get, &DesCount, pPlayerMaterialItem.Info().GetName(pPlayer));
+			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		}
+		return true;
+	}
+
+	if(PPSTR(CMD, "ISETTINGS") == 0)
+	{
+		if(!pPlayer->GetCharacter())
+			return true;
+
+		pPlayer->GetItem(VoteID).Equip();
+		GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		return true;
+	}
+
+	if(PPSTR(CMD, "IENCHANT") == 0)
+	{
+		InventoryItem& pItemPlayer = pPlayer->GetItem(VoteID);
+		if(pItemPlayer.IsEnchantMaxLevel())
+		{
+			GS()->Chat(ClientID, "You enchant max level for this item!");
+			return true;
+		}
+
+		const int Price = pItemPlayer.GetEnchantPrice();
+		if(!pPlayer->SpendCurrency(Price, itMaterial))
+			return true;
+
+		const int EnchantLevel = pItemPlayer.m_Enchant + 1;
+		pItemPlayer.SetEnchant(EnchantLevel);
+		if(pItemPlayer.IsEnchantMaxLevel())
+			GS()->SendEquipItem(ClientID, -1);
+
+		char aEnchantBuf[16];
+		pItemPlayer.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf));
+
+		char aAttributes[128];
+		pItemPlayer.FormatAttributes(aAttributes, sizeof(aAttributes));
+		GS()->Chat(-1, "{STR} enchant {STR} {STR} {STR}", Server()->ClientName(ClientID), pItemPlayer.Info().GetName(), aEnchantBuf, aAttributes);
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		return true;
+	}
+
+	if(PPSTR(CMD, "SORTEDEQUIP") == 0)
+	{
+		pPlayer->m_aSortTabs[SORT_EQUIPING] = VoteID;
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
+		return true;
+	}
+
+	return false;
+}
+
 void InventoryJob::RepairDurabilityItems(CPlayer *pPlayer)
 { 
 	const int ClientID = pPlayer->GetCID();
@@ -260,196 +450,6 @@ void InventoryJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pItemPlay
 
 	if (pItemPlayer.Info().m_MinimalPrice > 0)
 		GS()->AVM(ClientID, "AUCTIONSLOT", ItemID, HideID, "Create Slot Auction {STR}", pNameItem);
-}
-
-bool InventoryJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
-{
-	const int ClientID = pPlayer->GetCID();
-
-	if(PPSTR(CMD, "SORTEDINVENTORY") == 0)
-	{
-		pPlayer->m_aSortTabs[SORT_INVENTORY] = VoteID;
-		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INVENTORY);
-		return true;
-	}
-
-	if(PPSTR(CMD, "IDROP") == 0)
-	{
-		if (!pPlayer->GetCharacter())
-			return true;
-
-		int AvailableCount = GetUnfrozenItemCount(pPlayer, VoteID);
-		if (AvailableCount <= 0)
-			return true;
-
-		Get = min(AvailableCount, Get);
-		InventoryItem& pItemPlayer = pPlayer->GetItem(VoteID);
-		pItemPlayer.Drop(Get);
-
-		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "You drop {STR}x{INT}", pItemPlayer.Info().GetName(pPlayer), &Get);
-		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-		return true;
-	}
-
-	if(PPSTR(CMD, "IUSE") == 0)
-	{
-		int AvailableCount = GetUnfrozenItemCount(pPlayer, VoteID);
-		if (AvailableCount <= 0)
-			return true;
-
-		Get = min(AvailableCount, Get);
-		pPlayer->GetItem(VoteID).Use(Get);
-		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-		return true;
-	}
-
-	if(PPSTR(CMD, "IDESYNTHESIS") == 0)
-	{
-		int AvailableCount = GetUnfrozenItemCount(pPlayer, VoteID);
-		if (AvailableCount <= 0)
-			return true;
-
-		Get = min(AvailableCount, Get);
-		InventoryItem &pPlayerSelectedItem = pPlayer->GetItem(VoteID);
-		InventoryItem &pPlayerMaterialItem = pPlayer->GetItem(itMaterial);
-		const int DesCount = pPlayerSelectedItem.Info().m_Dysenthis * Get;
-		if(pPlayerSelectedItem.Remove(Get) && pPlayerMaterialItem.Add(DesCount))
-		{
-			GS()->Chat(ClientID, "Disassemble {STR}x{INT}, you receive {INT} {STR}(s)", 
-				pPlayerSelectedItem.Info().GetName(pPlayer), &Get, &DesCount, pPlayerMaterialItem.Info().GetName(pPlayer));
-			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-		}
-		return true;
-	}
-
-	if(PPSTR(CMD, "ISETTINGS") == 0)
-	{
-		if(!pPlayer->GetCharacter())
-			return true;
-
-		pPlayer->GetItem(VoteID).Equip();
-		GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
-		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-		return true;
-	}
-
-	if(PPSTR(CMD, "IENCHANT") == 0)
-	{
-		InventoryItem &pItemPlayer = pPlayer->GetItem(VoteID);
-		if(pItemPlayer.IsEnchantMaxLevel())
-		{
-			GS()->Chat(ClientID, "You enchant max level for this item!");
-			return true;			
-		}
-
-		const int Price = pItemPlayer.GetEnchantPrice();
-		if(!pPlayer->SpendCurrency(Price, itMaterial))
-			return true;
-
-		const int EnchantLevel = pItemPlayer.m_Enchant + 1;
-		pItemPlayer.SetEnchant(EnchantLevel);
-		if(pItemPlayer.IsEnchantMaxLevel())
-			GS()->SendEquipItem(ClientID, -1);
-
-		char aEnchantBuf[16];
-		pItemPlayer.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf));
-
-		char aAttributes[128];
-		pItemPlayer.FormatAttributes(aAttributes, sizeof(aAttributes));
-		GS()->Chat(-1, "{STR} enchant {STR} {STR} {STR}", GS()->Server()->ClientName(ClientID), pItemPlayer.Info().GetName(), aEnchantBuf, aAttributes);
-		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-		return true;
-	}
-
-	if(PPSTR(CMD, "SORTEDEQUIP") == 0)
-	{
-		pPlayer->m_aSortTabs[SORT_EQUIPING] = VoteID;
-		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
-		return true;				
-	}
-
-	return false;
-}
-
-bool InventoryJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
-{
-	const int ClientID = pPlayer->GetCID();
-	if (ReplaceMenu)
-		return false;
-
-	if (Menulist == MenuList::MENU_INVENTORY)
-	{
-		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
-		GS()->AVH(ClientID, TAB_INFO_INVENTORY, GREEN_COLOR, "Inventory Information");
-		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_INVENTORY, "Choose the type of items you want to show");
-		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_INVENTORY, "After, need select item to interact");
-		GS()->AV(ClientID, "null");
-
-		GS()->AVH(ClientID, TAB_INVENTORY_SELECT, RED_COLOR, "Inventory Select List");
-		int SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_USED); 
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_USED, TAB_INVENTORY_SELECT, "Used ({INT})", &SizeItems);
-
-		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_CRAFT);
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_CRAFT, TAB_INVENTORY_SELECT, "Craft ({INT})", &SizeItems);
-		
-		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_MODULE);
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_MODULE, TAB_INVENTORY_SELECT, "Modules ({INT})", &SizeItems);
-
-		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_POTION);
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_POTION, TAB_INVENTORY_SELECT, "Potion ({INT})", &SizeItems);
-
-		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_OTHER);
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_OTHER, TAB_INVENTORY_SELECT, "Other ({INT})", &SizeItems);
-		if (pPlayer->m_aSortTabs[SORT_INVENTORY])	
-			ListInventory(pPlayer, pPlayer->m_aSortTabs[SORT_INVENTORY]);
-
-		GS()->AddBackpage(ClientID);
-		return true;
-	}
-
-	if (Menulist == MenuList::MENU_EQUIPMENT)
-	{
-		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
-		GS()->AVH(ClientID, TAB_INFO_EQUIP, GREEN_COLOR, "Equip / Armor Information");
-		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_EQUIP, "Select tab and select armor.");
-		GS()->AV(ClientID, "null");
-
-		GS()->AVH(ClientID, TAB_EQUIP_SELECT, RED_COLOR, "Equip Select Slot");
-		const char* pType[NUM_EQUIPS] = { "Hammer", "Gun", "Shotgun", "Grenade", "Rifle", "Pickaxe", "Wings", "Discord" };
-		for (int i = 0; i < NUM_EQUIPS; i++)
-		{
-			const int ItemID = pPlayer->GetEquippedItemID(i);
-			InventoryItem& pItemPlayer = pPlayer->GetItem(ItemID);
-			if (ItemID <= 0 || !pItemPlayer.IsEquipped())
-			{
-				GS()->AVM(ClientID, "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} Not equipped", pType[i]);
-				continue;
-			}
-
-			char aAttributes[128];
-			pItemPlayer.FormatAttributes(aAttributes, sizeof(aAttributes));
-			GS()->AVMI(ClientID, pItemPlayer.Info().GetIcon(), "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], pItemPlayer.Info().GetName(pPlayer), aAttributes);
-		}
-
-		GS()->AV(ClientID, "null");
-		bool FindItem = false;
-		for (const auto& it : ms_aItems[ClientID])
-		{
-			if (!it.second.m_Count || it.second.Info().m_Function != pPlayer->m_aSortTabs[SORT_EQUIPING])
-				continue;
-
-			ItemSelected(pPlayer, it.second, true);
-			FindItem = true;
-		}
-
-		if (!FindItem)
-			GS()->AVL(ClientID, "null", "There are no items in this tab");
-
-		GS()->AddBackpage(ClientID);
-		return true;
-	}
-
-	return false;
 }
 
 int InventoryJob::GetCountItemsType(CPlayer *pPlayer, int Type) const

@@ -1,7 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <game/server/gamecontext.h>
-
 #include "SkillsJob.h"
 
 using namespace sqlstr;
@@ -95,7 +94,7 @@ bool SkillsJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	return false;
 }
 
-bool SkillsJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool SkillsJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if (PPSTR(CMD, "SKILLLEARN") == 0)

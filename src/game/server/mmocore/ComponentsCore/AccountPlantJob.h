@@ -17,9 +17,11 @@ class AccountPlantJob : public MmoComponent
 	};
 	static std::map < int, StructPlants > ms_aPlants;
 
+	void OnInitWorld(const char* pWhereLocalWorld) override;
+	void OnInitAccount(CPlayer* pPlayer) override;
+	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
+
 public:
-	virtual void OnInitWorld(const char* pWhereLocalWorld);
-	virtual void OnInitAccount(CPlayer *pPlayer);
 
 	int GetPlantLevel(vec2 Pos);
 	int GetPlantItemID(vec2 Pos);
@@ -28,7 +30,6 @@ public:
 	void ShowPlantsItems(int ClientID);
 
 	void Work(CPlayer* pPlayer, int Level);
-	virtual bool OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
 };
 
 #endif

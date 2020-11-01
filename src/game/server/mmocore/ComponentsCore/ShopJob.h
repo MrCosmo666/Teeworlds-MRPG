@@ -21,21 +21,21 @@ class ShopJob : public MmoComponent
 	};
 	static std::map < int, ShopPersonal > ms_aShopList;
 
-	bool BuyShopItem(CPlayer* pPlayer, int ID);
-	void ShowAuction(CPlayer* pPlayer);
-	void ShowMailShop(CPlayer* pPlayer, int StorageID);
+	void OnInit() override;
+	void OnTick() override;
+	bool OnHandleTile(CCharacter* pChr, int IndexCollision) override;
+	bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu) override;
+	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
 
 public:
 	typedef StructAuctionItem AuctionSlot;
-
-	virtual void OnInit();
-	virtual void OnTick();
-	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
-
-	void CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot &AuSellItem);
+	void CreateAuctionSlot(CPlayer *pPlayer, AuctionSlot &pAuctionItem);
 	void CheckAuctionTime();
-	virtual bool OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
-	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
+
+private:
+	bool BuyShopItem(CPlayer* pPlayer, int ID);
+	void ShowAuction(CPlayer* pPlayer);
+	void ShowMailShop(CPlayer* pPlayer, int StorageID);
 };
 
 #endif

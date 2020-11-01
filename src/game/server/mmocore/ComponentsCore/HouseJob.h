@@ -30,24 +30,25 @@ class HouseJob : public MmoComponent
 
 		HouseDoor *m_Door;
 	};
-	typedef std::map < int , HouseList > HouseType;
-	static HouseType ms_aHouse;
-
+	static std::map < int, HouseList > ms_aHouse;
 	std::map < int , CDecorationHouses * > ms_aDecorationHouse;
-public:
-	virtual void OnInitWorld(const char* pWhereLocalWorld);
-	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
-	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
-	
+
+	void OnInitWorld(const char* pWhereLocalWorld) override;
+	bool OnHandleTile(CCharacter* pChr, int IndexCollision) override;
+	bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu) override;
+	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
+
 	/* #########################################################################
 		FUNCTIONS HOUSES PLANTS
 	######################################################################### */
 	void ChangePlantsID(int HouseID, int PlantID);
 
+public:
 	/* #########################################################################
 		FUNCTIONS HOUSES DECORATION
 	######################################################################### */
 	bool AddDecorationHouse(int DecoID, int OwnerID, vec2 Position);
+
 private:
 	bool DeleteDecorationHouse(int ID);
 	void ShowDecorationList(CPlayer *pPlayer);
@@ -62,9 +63,8 @@ private:
 		GET CHECK HOUSES 
 	######################################################################### */
 public:
-	int GetWorldID(int HouseID) const;
-	int GetOwnerHouse(int HouseID);
-	int GetHouse(vec2 Pos, bool Plants = false);
+	bool IsHouseHasOwner(int HouseID) const;
+	int GetHouse(vec2 Pos, bool Plants = false) const;
 	int GetHousePrice(int HouseID) const;
 	bool GetHouseDoor(int HouseID) const;
 	vec2 GetPositionHouse(int HouseID) const;
@@ -85,16 +85,9 @@ public:
 	void AddSafeDeposit(CPlayer *pPlayer, int Balance);
 	
 	bool ChangeStateDoor(int HouseID);
-
-	/* #########################################################################
-		PARSING HOUSES 
-	######################################################################### */
-	virtual bool OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
 };
 
-
 // - - - - - - - - - - - - - - DOOR HOUSES - - - - - - - - - - - - - - 
-// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 class HouseDoor : public CEntity
 {
 public:

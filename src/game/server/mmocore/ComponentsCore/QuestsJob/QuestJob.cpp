@@ -9,6 +9,100 @@
 std::map < int, std::map <int, CPlayerQuest > > QuestJob::ms_aPlayerQuests;
 std::map < int, CDataQuest > QuestJob::ms_aDataQuests;
 
+void QuestJob::OnInit()
+{
+	ResultPtr pRes = SJK.SD("*", "tw_quests_list");
+	while(pRes->next())
+	{
+		const int QUID = pRes->getInt("ID");
+		str_copy(ms_aDataQuests[QUID].m_aName, pRes->getString("Name").c_str(), sizeof(ms_aDataQuests[QUID].m_aName));
+		str_copy(ms_aDataQuests[QUID].m_aStoryLine, pRes->getString("StoryLine").c_str(), sizeof(ms_aDataQuests[QUID].m_aStoryLine));
+		ms_aDataQuests[QUID].m_Gold = (int)pRes->getInt("Money");
+		ms_aDataQuests[QUID].m_Exp = (int)pRes->getInt("Exp");
+	}
+}
+
+void QuestJob::OnInitAccount(CPlayer* pPlayer)
+{
+	const int ClientID = pPlayer->GetCID();
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_quests", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	while(pRes->next())
+	{
+		const int QuestID = pRes->getInt("QuestID");
+		ms_aPlayerQuests[ClientID][QuestID].m_State = (int)pRes->getInt("Type");
+		ms_aPlayerQuests[ClientID][QuestID].m_Step = (int)pRes->getInt("Step");
+		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot = ms_aDataQuests[QuestID].CopySteps();
+	}
+
+	// init data steps players
+	ResultPtr pResStep = SJK.SD("*", "tw_accounts_quests_bots_step", "WHERE OwnerID = '%d' ", pPlayer->Acc().m_AuthID);
+	while(pResStep->next())
+	{
+		const int SubBotID = pResStep->getInt("SubBotID"); // is a unique value
+		const int QuestID = BotJob::ms_aQuestBot[SubBotID].m_QuestID;
+		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].m_Bot = &BotJob::ms_aQuestBot[SubBotID];
+		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].m_MobProgress[0] = pResStep->getInt("Mob1Progress");
+		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].m_MobProgress[1] = pResStep->getInt("Mob1Progress");
+		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].m_StepComplete = pResStep->getBoolean("Completed");
+		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].m_ClientQuitting = false;
+		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].UpdateBot(GS());
+	}
+}
+
+void QuestJob::OnResetClient(int ClientID)
+{
+	for(auto& qp : ms_aPlayerQuests[ClientID])
+	{
+		for(auto& pStepBot : qp.second.m_StepsQuestBot)
+		{
+			pStepBot.second.m_ClientQuitting = true;
+			pStepBot.second.UpdateBot(GS());
+		}
+	}
+	ms_aPlayerQuests.erase(ClientID);
+}
+
+void QuestJob::OnMessage(int MsgID, void* pRawMsg, int ClientID)
+{
+	CPlayer* pPlayer = GS()->m_apPlayers[ClientID];
+	if(MsgID == NETMSGTYPE_CL_TALKINTERACTIVE)
+	{
+		if(pPlayer->m_aPlayerTick[TickState::LastDialog] && pPlayer->m_aPlayerTick[TickState::LastDialog] > Server()->Tick())
+			return;
+
+		pPlayer->m_aPlayerTick[TickState::LastDialog] = Server()->Tick() + (Server()->TickSpeed() / 4);
+		pPlayer->SetTalking(pPlayer->GetTalkedID(), false);
+	}
+}
+
+bool QuestJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+{
+	const int ClientID = pPlayer->GetCID();
+	if(ReplaceMenu)
+	{
+		CCharacter* pChr = pPlayer->GetCharacter();
+		if(!pChr || !pChr->IsAlive())
+			return false;
+
+		return false;
+	}
+
+	if(Menulist == MenuList::MENU_JOURNAL_FINISHED)
+	{
+		pPlayer->m_LastVoteMenu = MenuList::MENU_JOURNAL_MAIN;
+		ShowQuestsTabList(pPlayer, QuestState::QUEST_FINISHED);
+		GS()->AddBackpage(ClientID);
+		return true;
+	}
+
+	return false;
+}
+
+bool QuestJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+{
+	return false;
+}
+
 static const char* GetStateName(int Type)
 {
 	switch(Type)
@@ -114,7 +208,7 @@ void QuestJob::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 		const int HideID = (NUM_TAB_MENU + 12500 + pBotInfo->m_SubBotID);
 		const int PosX = pBotInfo->m_PositionX / 32, PosY = pBotInfo->m_PositionY / 32;
 		const char* pSymbol = (((pPlayerQuest.GetState() == QUEST_ACCEPT && pPlayerQuest.m_StepsQuestBot[pStepBot.first].m_StepComplete) || pPlayerQuest.GetState() == QuestState::QUEST_FINISHED) ? "✔ " : "\0");
-		GS()->AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR}Step {INT}. {STR} {STR}(x{INT} y{INT})", pSymbol, &pBotInfo->m_Step, pBotInfo->GetName(), GS()->Server()->GetWorldName(pBotInfo->m_WorldID), &PosX, &PosY);
+		GS()->AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR}Step {INT}. {STR} {STR}(x{INT} y{INT})", pSymbol, &pBotInfo->m_Step, pBotInfo->GetName(), Server()->GetWorldName(pBotInfo->m_WorldID), &PosX, &PosY);
 
 		// skipped non accepted task list
 		if(pPlayerQuest.GetState() != QUEST_ACCEPT)
@@ -183,7 +277,7 @@ void QuestJob::QuestTableAddInfo(int ClientID, const char* pText, int Requires, 
 	Msg.m_pHaveNum = clamp(Have, 0, Requires);
 	Msg.m_pGivingTable = false;
 	StrToInts(Msg.m_pIcon, 4, "hammer");
-	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
 void QuestJob::QuestTableClear(int ClientID)
@@ -192,7 +286,7 @@ void QuestJob::QuestTableClear(int ClientID)
 		return;
 
 	CNetMsg_Sv_ClearQuestingProcessing Msg;
-	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
 bool QuestJob::InteractiveQuestNPC(CPlayer* pPlayer, BotJob::QuestBotInfo& pBot, bool FinalStepTalking)
@@ -293,7 +387,7 @@ void QuestJob::QuestTableAddItem(int ClientID, const char* pText, int Requires, 
 	Msg.m_pHaveNum = clamp(PlayerSelectedItem.m_Count, 0, Requires);
 	Msg.m_pGivingTable = GivingTable;
 	StrToInts(Msg.m_pIcon, 4, PlayerSelectedItem.Info().GetIcon());
-	GS()->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
 int QuestJob::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID)
@@ -312,98 +406,4 @@ int QuestJob::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID)
 		}
 	}
 	return max(AvailableCount, 0);
-}
-
-void QuestJob::OnInit()
-{
-	ResultPtr pRes = SJK.SD("*", "tw_quests_list");
-	while (pRes->next())
-	{
-		const int QUID = pRes->getInt("ID");
-		str_copy(ms_aDataQuests[QUID].m_aName, pRes->getString("Name").c_str(), sizeof(ms_aDataQuests[QUID].m_aName));
-		str_copy(ms_aDataQuests[QUID].m_aStoryLine, pRes->getString("StoryLine").c_str(), sizeof(ms_aDataQuests[QUID].m_aStoryLine));
-		ms_aDataQuests[QUID].m_Gold = (int)pRes->getInt("Money");
-		ms_aDataQuests[QUID].m_Exp = (int)pRes->getInt("Exp");
-	}
-}
-
-void QuestJob::OnInitAccount(CPlayer* pPlayer)
-{
-	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_quests", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
-	while (pRes->next())
-	{
-		const int QuestID = pRes->getInt("QuestID");
-		ms_aPlayerQuests[ClientID][QuestID].m_State = (int)pRes->getInt("Type");
-		ms_aPlayerQuests[ClientID][QuestID].m_Step = (int)pRes->getInt("Step");
-		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot = ms_aDataQuests[QuestID].CopySteps();
-	}
-
-	// init data steps players
-	ResultPtr pResStep = SJK.SD("*", "tw_accounts_quests_bots_step", "WHERE OwnerID = '%d' ", pPlayer->Acc().m_AuthID);
-	while(pResStep->next())
-	{
-		const int SubBotID = pResStep->getInt("SubBotID"); // is a unique value
-		const int QuestID = BotJob::ms_aQuestBot[SubBotID].m_QuestID;
-		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].m_Bot = &BotJob::ms_aQuestBot[SubBotID];
-		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].m_MobProgress[0] = pResStep->getInt("Mob1Progress");
-		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].m_MobProgress[1] = pResStep->getInt("Mob1Progress");
-		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].m_StepComplete = pResStep->getBoolean("Completed");
-		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].m_ClientQuitting = false;
-		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].UpdateBot(GS());
-	}
-}
-
-void QuestJob::OnResetClient(int ClientID)
-{
-	for(auto& qp : ms_aPlayerQuests[ClientID])
-	{
-		for(auto& pStepBot : qp.second.m_StepsQuestBot)
-		{
-			pStepBot.second.m_ClientQuitting = true;
-			pStepBot.second.UpdateBot(GS());
-		}
-	}
-	ms_aPlayerQuests.erase(ClientID);
-}
-
-void QuestJob::OnMessage(int MsgID, void* pRawMsg, int ClientID)
-{
-	CPlayer* pPlayer = GS()->m_apPlayers[ClientID];
-	if (MsgID == NETMSGTYPE_CL_TALKINTERACTIVE)
-	{
-		if (pPlayer->m_aPlayerTick[TickState::LastDialog] && pPlayer->m_aPlayerTick[TickState::LastDialog] > GS()->Server()->Tick())
-			return;
-
-		pPlayer->m_aPlayerTick[TickState::LastDialog] = GS()->Server()->Tick() + (GS()->Server()->TickSpeed() / 4);
-		pPlayer->SetTalking(pPlayer->GetTalkedID(), false);
-	}
-}
-
-bool QuestJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
-{
-	const int ClientID = pPlayer->GetCID();
-	if (ReplaceMenu)
-	{
-		CCharacter* pChr = pPlayer->GetCharacter();
-		if (!pChr || !pChr->IsAlive())
-			return false;
-
-		return false;
-	}
-
-	if (Menulist == MenuList::MENU_JOURNAL_FINISHED)
-	{
-		pPlayer->m_LastVoteMenu = MenuList::MENU_JOURNAL_MAIN;
-		ShowQuestsTabList(pPlayer, QuestState::QUEST_FINISHED);
-		GS()->AddBackpage(ClientID);
-		return true;
-	}
-
-	return false;
-}
-
-bool QuestJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
-{
-	return false;
 }

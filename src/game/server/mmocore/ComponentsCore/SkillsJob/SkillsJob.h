@@ -7,17 +7,16 @@
 
 class SkillsJob : public MmoComponent
 {
+	void OnInit() override;
+	void OnInitAccount(CPlayer* pPlayer) override;
+	void OnResetClient(int ClientID) override;
+	bool OnHandleTile(CCharacter* pChr, int IndexCollision) override;
+	bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu) override;
+	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
+
 public:
 	static std::map < int, CSkillInformation > ms_aSkillsData;
 	static std::map < int, std::map < int, CSkill > > ms_aSkills;
-
-	virtual void OnInit();
-	virtual void OnInitAccount(CPlayer *pPlayer);
-	virtual void OnResetClient(int ClientID);
-	virtual bool OnHandleTile(CCharacter* pChr, int IndexCollision);
-	virtual bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu);
-	virtual bool OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText);
-
 	void ParseEmoticionSkill(CPlayer* pPlayer, int EmoticionID);
 
 private:

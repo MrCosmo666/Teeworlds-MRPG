@@ -103,7 +103,7 @@ void AccountPlantJob::Work(CPlayer* pPlayer, int Level)
 	Job()->SaveAccount(pPlayer, SAVE_PLANT_DATA);
 }
 
-bool AccountPlantJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
+bool AccountPlantJob::OnHandleVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
 	const int ClientID = pPlayer->GetCID();	
 	if(PPSTR(CMD, "PLANTUPGRADE") == 0)

@@ -7,14 +7,15 @@
 
 class MailBoxJob : public MmoComponent
 {
-	void ReceiveInbox(CPlayer *pPlayer, int InboxID);
+	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
 
 public:
 	int GetActiveInbox(CPlayer* pPlayer);
 	void GetInformationInbox(CPlayer *pPlayer);
 	void SendInbox(int AuthID, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
 
-	virtual bool OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);	
+private:
+	void ReceiveInbox(CPlayer* pPlayer, int InboxID);
 };
 
 #endif

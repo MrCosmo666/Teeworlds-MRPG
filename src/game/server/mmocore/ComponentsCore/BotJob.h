@@ -111,12 +111,14 @@ class BotJob : public MmoComponent
 		int m_BotID;
 	};
 
+	void OnInitWorld(const char* pWhereLocalWorld) override;
+
 	void LoadMainInformationBots();
 	void LoadQuestBots(const char* pWhereLocalWorld);
 	void LoadNpcBots(const char* pWhereLocalWorld);
 	void LoadMobsBots(const char* pWhereLocalWorld);
+
 public:
-	virtual void OnInitWorld(const char* pWhereLocalWorld);
 
 	typedef DescDataBot DataBotInfo;
 	static std::map < int , DataBotInfo > ms_aDataBot;

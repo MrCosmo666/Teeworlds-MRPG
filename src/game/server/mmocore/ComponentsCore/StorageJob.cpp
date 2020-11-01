@@ -6,6 +6,57 @@
 using namespace sqlstr;
 std::map < int, StorageJob::SturctStorage > StorageJob::ms_aStorage;
 
+void StorageJob::OnInit()
+{
+	SJK.SDT("*", "tw_storages", [&](ResultPtr pRes)
+		{
+			while(pRes->next())
+			{
+				const int ID = (int)pRes->getInt("ID");
+				ms_aStorage[ID].m_PosX = (int)pRes->getInt("PosX");
+				ms_aStorage[ID].m_PosY = (int)pRes->getInt("PosY");
+				ms_aStorage[ID].m_Currency = (int)pRes->getInt("Currency");
+				ms_aStorage[ID].m_WorldID = (int)pRes->getInt("WorldID");
+				str_copy(ms_aStorage[ID].m_aName, pRes->getString("Name").c_str(), sizeof(ms_aStorage[ID].m_aName));
+			}
+		});
+}
+
+bool StorageJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
+{
+	CPlayer* pPlayer = pChr->GetPlayer();
+	const int ClientID = pPlayer->GetCID();
+	if(pChr->GetHelper()->TileEnter(IndexCollision, TILE_SHOP_ZONE))
+	{
+		GS()->Chat(ClientID, "You can see menu in the votes!");
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		return true;
+	}
+	else if(pChr->GetHelper()->TileExit(IndexCollision, TILE_SHOP_ZONE))
+	{
+		GS()->Chat(ClientID, "You left the active zone, menu is restored!");
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		return true;
+	}
+
+	return false;
+}
+
+bool StorageJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+{
+	const int ClientID = pPlayer->GetCID();
+	if(PPSTR(CMD, "REPAIRITEMS") == 0)
+	{
+		Job()->Item()->RepairDurabilityItems(pPlayer);
+		GS()->Chat(ClientID, "You repaired all items.");
+		return true;
+	}
+
+	return false;
+}
+
 int StorageJob::GetStorageID(vec2 Pos) const
 {
 	for (const auto& st : ms_aStorage)
@@ -31,55 +82,4 @@ void StorageJob::ShowStorageMenu(CPlayer* pPlayer, int StorageID)
 	GS()->AV(ClientID, "null");
 	GS()->ShowItemValueInformation(pPlayer, ms_aStorage[StorageID].m_Currency);
 	GS()->AV(ClientID, "null");
-}
-
-void StorageJob::OnInit()
-{
-	SJK.SDT("*", "tw_storages", [&](ResultPtr pRes)
-	{
-		while(pRes->next())
-		{
-			const int ID = (int)pRes->getInt("ID");
-			ms_aStorage[ID].m_PosX = (int)pRes->getInt("PosX");
-			ms_aStorage[ID].m_PosY = (int)pRes->getInt("PosY");
-			ms_aStorage[ID].m_Currency = (int)pRes->getInt("Currency");
-			ms_aStorage[ID].m_WorldID = (int)pRes->getInt("WorldID");
-			str_copy(ms_aStorage[ID].m_aName, pRes->getString("Name").c_str(), sizeof(ms_aStorage[ID].m_aName));
-		}
-	});
-}
-
-bool StorageJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
-{
-	CPlayer* pPlayer = pChr->GetPlayer();
-	const int ClientID = pPlayer->GetCID();
-	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_SHOP_ZONE))
-	{
-		GS()->Chat(ClientID, "You can see menu in the votes!");
-		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
-		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-		return true;
-	}
-	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_SHOP_ZONE))
-	{
-		GS()->Chat(ClientID, "You left the active zone, menu is restored!");
-		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
-		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-		return true;
-	}
-
-	return false;
-}
-
-bool StorageJob::OnParsingVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
-{
-	const int ClientID = pPlayer->GetCID();
-	if (PPSTR(CMD, "REPAIRITEMS") == 0)
-	{
-		Job()->Item()->RepairDurabilityItems(pPlayer);
-		GS()->Chat(ClientID, "You repaired all items.");
-		return true;
-	}
-
-	return false;
 }

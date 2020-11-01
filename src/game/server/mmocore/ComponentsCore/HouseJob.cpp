@@ -54,9 +54,246 @@ void HouseJob::OnInitWorld(const char* pWhereLocalWorld)
 	}
 }
 
-/*
-	Later lead to quality standard code
-*/
+bool HouseJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
+{
+	CPlayer* pPlayer = pChr->GetPlayer();
+	const int ClientID = pPlayer->GetCID();
+
+	if(pChr->GetHelper()->TileEnter(IndexCollision, TILE_PLAYER_HOUSE))
+	{
+		GS()->Chat(ClientID, "You can see menu in the votes!");
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		return true;
+	}
+	else if(pChr->GetHelper()->TileExit(IndexCollision, TILE_PLAYER_HOUSE))
+	{
+		GS()->Chat(ClientID, "You left the active zone, menu is restored!");
+		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+		return true;
+	}
+
+	return false;
+}
+
+bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+{
+	const int ClientID = pPlayer->GetCID();
+	if(ReplaceMenu)
+	{
+		CCharacter* pChr = pPlayer->GetCharacter();
+		if(!pChr || !pChr->IsAlive())
+			return false;
+
+		if(pChr->GetHelper()->BoolIndex(TILE_PLAYER_HOUSE))
+		{
+			const int HouseID = GetHouse(pChr->m_Core.m_Pos);
+			if(HouseID > 0)
+				ShowHouseMenu(pPlayer, HouseID);
+			return true;
+		}
+		return false;
+	}
+
+	if(Menulist == MenuList::MENU_HOUSE_DECORATION)
+	{
+		pPlayer->m_LastVoteMenu = MenuList::MENU_HOUSE;
+		GS()->AVH(ClientID, TAB_INFO_DECORATION, GREEN_COLOR, "Decorations Information");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "Add: Select your item in list. Select (Add to house),");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "later press (ESC) and mouse select position");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "Return in inventory: Select down your decorations");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "and press (Back to inventory).");
+
+		Job()->Item()->ListInventory(pPlayer, ItemType::TYPE_DECORATION);
+		GS()->AV(ClientID, "null");
+		ShowDecorationList(pPlayer);
+		GS()->AddBackpage(ClientID);
+		return true;
+	}
+
+	if(Menulist == MenuList::MENU_HOUSE)
+	{
+		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
+
+		ShowPersonalHouse(pPlayer);
+		GS()->AddBackpage(ClientID);
+		return true;
+	}
+
+	if(Menulist == MenuList::MENU_HOUSE_PLANTS)
+	{
+		pPlayer->m_LastVoteMenu = MenuList::MENU_HOUSE;
+		const int HouseID = OwnerHouseID(pPlayer->Acc().m_AuthID);
+		const int PlantItemID = GetPlantsID(HouseID);
+
+		GS()->AVH(ClientID, TAB_INFO_HOUSE_PLANT, GREEN_COLOR, "Plants Information");
+		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE_PLANT, "Select item and in tab select 'To plant'");
+		GS()->AV(ClientID, "null");
+
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "Housing Active Plants: {STR}", GS()->GetItemInfo(PlantItemID).GetName(pPlayer));
+		GS()->Mmo()->Item()->ListInventory(pPlayer, FUNCTION_PLANTS, true);
+		GS()->AddBackpage(ClientID);
+		return true;
+	}
+
+	return false;
+}
+
+bool HouseJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+{
+	const int ClientID = pPlayer->GetCID();
+	if(PPSTR(CMD, "BUYHOUSE") == 0)
+	{
+		const int HouseID = VoteID;
+		BuyHouse(HouseID, pPlayer);
+		return true;
+	}
+
+	if(PPSTR(CMD, "HSPAWN") == 0)
+	{
+		if(!pPlayer->GetCharacter())
+			return true;
+
+		const int HouseID = PlayerHouseID(pPlayer);
+		if(HouseID < 0)
+		{
+			GS()->Chat(ClientID, "You not owner home!");
+			return true;
+		}
+
+		vec2 Position = GetPositionHouse(HouseID);
+		const int HouseWorldID = ms_aHouse[HouseID].m_WorldID;
+		if(!GS()->IsPlayerEqualWorldID(ClientID, HouseWorldID))
+		{
+			pPlayer->GetTempData().m_TempTeleportX = Position.x;
+			pPlayer->GetTempData().m_TempTeleportY = Position.y;
+			pPlayer->ChangeWorld(HouseWorldID);
+			return true;
+		}
+		pPlayer->GetCharacter()->ChangePosition(Position);
+		return true;
+	}
+
+	if(PPSTR(CMD, "HSELL") == 0)
+	{
+		const int HouseID = VoteID;
+		if(HouseID <= 0 || Get != 777)
+		{
+			GS()->Chat(ClientID, "A verification number was entered incorrectly.");
+			return true;
+		}
+
+		SellHouse(HouseID);
+		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
+		return true;
+	}
+
+	if(PPSTR(CMD, "HOUSEADD") == 0)
+	{
+		if(Get < 100)
+		{
+			GS()->Chat(ClientID, "Minimal 100 gold.");
+			return true;
+		}
+
+		if(pPlayer->SpendCurrency(Get))
+		{
+			AddSafeDeposit(pPlayer, Get);
+			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_HOUSE);
+		}
+		return true;
+	}
+
+	if(PPSTR(CMD, "HOUSETAKE") == 0)
+	{
+		if(Get < 100)
+		{
+			GS()->Chat(ClientID, "Minimal 100 gold.");
+			return true;
+		}
+
+		TakeFromSafeDeposit(pPlayer, Get);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_HOUSE);
+		return true;
+	}
+
+	if(PPSTR(CMD, "HOUSEDOOR") == 0)
+	{
+		if(ChangeStateDoor(VoteID))
+			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_HOUSE);
+		return true;
+	}
+
+	if(PPSTR(CMD, "DECOSTART") == 0)
+	{
+		const int HouseID = PlayerHouseID(pPlayer);
+		const vec2 PositionHouse = GetPositionHouse(HouseID);
+		if(HouseID <= 0 || distance(PositionHouse, pPlayer->GetCharacter()->m_Core.m_Pos) > 600)
+		{
+			GS()->Chat(ClientID, "Long distance from the house, or you do not own the house!");
+			return true;
+		}
+
+		GS()->ClearVotes(ClientID);
+		GS()->AV(ClientID, "null", "Please close vote and press Left Mouse,");
+		GS()->AV(ClientID, "null", "on position where add decoration!");
+		GS()->AddBackpage(ClientID);
+
+		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
+		pPlayer->GetTempData().m_TempDecoractionID = VoteID;
+		pPlayer->GetTempData().m_TempDecorationType = DECORATIONS_HOUSE;
+		return true;
+	}
+
+	if(PPSTR(CMD, "DECODELETE") == 0)
+	{
+		const int HouseID = PlayerHouseID(pPlayer);
+		if(HouseID > 0 && DeleteDecorationHouse(VoteID))
+		{
+			InventoryItem& PlDecoItem = pPlayer->GetItem(VoteID2);
+			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
+			PlDecoItem.Add(1);
+		}
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_HOUSE_DECORATION);
+		return true;
+	}
+
+	if(PPSTR(CMD, "HOMEPLANTSET") == 0)
+	{
+		const int HouseID = PlayerHouseID(pPlayer);
+		if(HouseID < 0)
+		{
+			GS()->Chat(ClientID, "You not owner home!");
+			return true;
+		}
+
+		if(GetPlantsID(HouseID) <= 0)
+		{
+			GS()->Chat(ClientID, "Your home does not support plants!");
+			return true;
+		}
+
+		const int ItemID = VoteID;
+		if(!pPlayer->SpendCurrency(1, ItemID))
+			return true;
+
+		const int ChanceSuccesful = VoteID2;
+		if(ChanceSuccesful != 0)
+		{
+			GS()->Chat(ClientID, "Unfortunately plant did not take root!");
+			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			return true;
+		}
+
+		GS()->Chat(-1, "Congratulations {STR}, planted at home {STR}!", Server()->ClientName(ClientID), GS()->GetItemInfo(ItemID).m_aName);
+		ChangePlantsID(HouseID, ItemID);
+		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
+	}
+
+	return false;
+}
+
 /* #########################################################################
 	FUNCTIONS HOUSES PLANTS
 ######################################################################### */
@@ -65,17 +302,17 @@ void HouseJob::ChangePlantsID(int HouseID, int PlantID)
 	if(ms_aHouse.find(HouseID) == ms_aHouse.end())
 		return;
 
-	bool Changes = false;
+	bool Updates = false;
 	for(CJobItems* pPlant = (CJobItems*)GS()->m_World.FindFirst(CGameWorld::ENTTYPE_JOBITEMS); pPlant; pPlant = (CJobItems*)pPlant->TypeNext())
 	{
-		if(pPlant->m_HouseID == HouseID)
-		{
-			pPlant->m_ItemID = PlantID;
-			Changes = true;
-		}
+		if(pPlant->m_HouseID != HouseID)
+			continue;
+
+		pPlant->m_ItemID = PlantID;
+		Updates = true;
 	}
 
-	if(Changes) 
+	if(Updates)
 	{
 		ms_aHouse[HouseID].m_PlantID = PlantID;
 		SJK.UD("tw_houses", "PlantID = '%d' WHERE ID = '%d'", PlantID, HouseID);
@@ -99,7 +336,7 @@ bool HouseJob::AddDecorationHouse(int DecoID, int HouseID, vec2 Position)
 		return false;
 
 	ResultPtr pRes2 = SJK.SD("ID", "tw_houses_decorations", "ORDER BY ID DESC LIMIT 1");
-	int InitID = (pRes2->next() ? pRes2->getInt("ID")+1 : 1);
+	const int InitID = (pRes2->next() ? pRes2->getInt("ID")+1 : 1);
 
 	SJK.ID("tw_houses_decorations", "(ID, DecoID, HouseID, X, Y, WorldID) VALUES ('%d', '%d', '%d', '%d', '%d', '%d')", 
 		InitID, DecoID, HouseID, (int)Position.x, (int)Position.y, GS()->GetWorldID());
@@ -112,10 +349,10 @@ bool HouseJob::DeleteDecorationHouse(int ID)
 {
 	if(ms_aDecorationHouse.find(ID) != ms_aDecorationHouse.end())
 	{
-		if(ms_aDecorationHouse.at(ID))
+		if(ms_aDecorationHouse[ID])
 		{
-			delete ms_aDecorationHouse.at(ID);
-			ms_aDecorationHouse.at(ID) = 0;
+			delete ms_aDecorationHouse[ID];
+			ms_aDecorationHouse[ID] = 0;
 		}
 		ms_aDecorationHouse.erase(ID);
 		SJK.DD("tw_houses_decorations", "WHERE ID = '%d'", ID);
@@ -126,8 +363,8 @@ bool HouseJob::DeleteDecorationHouse(int ID)
 
 void HouseJob::ShowDecorationList(CPlayer *pPlayer)
 {
-	int HouseID = PlayerHouseID(pPlayer);
-	int ClientID = pPlayer->GetCID();
+	const int HouseID = PlayerHouseID(pPlayer);
+	const int ClientID = pPlayer->GetCID();
 	for (auto deco = ms_aDecorationHouse.begin(); deco != ms_aDecorationHouse.end(); deco++)
 	{
 		if(deco->second && deco->second->m_HouseID == HouseID) 
@@ -139,23 +376,78 @@ void HouseJob::ShowDecorationList(CPlayer *pPlayer)
 }
 
 /* #########################################################################
+	MENUS HOUSES
+######################################################################### */
+void HouseJob::ShowHouseMenu(CPlayer* pPlayer, int HouseID)
+{
+	const int ClientID = pPlayer->GetCID();
+	GS()->AVH(ClientID, TAB_INFO_HOUSE, GREEN_COLOR, "House {INT} . {STR}", &HouseID, ms_aHouse[HouseID].m_aClass);
+	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE, "Owner House: {STR}", Job()->PlayerName(ms_aHouse[HouseID].m_OwnerID));
+
+	GS()->AV(ClientID, "null");
+	GS()->ShowItemValueInformation(pPlayer, itGold);
+	GS()->AV(ClientID, "null");
+
+	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
+	if(ms_aHouse[HouseID].m_OwnerID <= 0)
+		GS()->AVM(ClientID, "BUYHOUSE", HouseID, NOPE, "Buy this house. Price {INT}gold", &ms_aHouse[HouseID].m_Price);
+	else
+		GS()->AVM(ClientID, "null", HouseID, NOPE, "This house has already been purchased!");
+
+	GS()->AV(ClientID, "null");
+}
+
+void HouseJob::ShowPersonalHouse(CPlayer* pPlayer)
+{
+	const int ClientID = pPlayer->GetCID();
+	const int HouseID = PlayerHouseID(pPlayer);
+	if(HouseID <= 0)
+	{
+		GS()->AVL(ClientID, "null", "You not owner home!");
+		return;
+	}
+
+	const bool StateDoor = GetHouseDoor(HouseID);
+	GS()->AVH(ClientID, TAB_HOUSE_STAT, BLUE_COLOR, "House stats {INT} Class {STR} Door [{STR}]", &HouseID, ms_aHouse[HouseID].m_aClass, StateDoor ? "Closed" : "Opened");
+	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "/doorhouse - interactive with door.");
+	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "- - - - - - - - - -");
+	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "Notes: Minimal operation house balance 100gold");
+	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "In your safe is: {INT}gold", &ms_aHouse[HouseID].m_Bank);
+	GS()->AV(ClientID, "null");
+	//
+	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
+	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", &pPlayer->GetItem(itGold).m_Count);
+	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
+	GS()->AVM(ClientID, "HOUSEADD", 1, NOPE, "Add to the safe gold. (Amount in a reason)");
+	GS()->AVM(ClientID, "HOUSETAKE", 1, NOPE, "Take the safe gold. (Amount in a reason)");
+	GS()->AV(ClientID, "null");
+	//
+	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
+	GS()->AVL(ClientID, "null", "▤ House system");
+	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
+	GS()->AVM(ClientID, "HOUSEDOOR", HouseID, NOPE, "Change state to [\"{STR}\"]", StateDoor ? "OPEN" : "CLOSED");
+	GS()->AVM(ClientID, "HSPAWN", 1, NOPE, "Teleport to your house");
+	GS()->AVM(ClientID, "HSELL", HouseID, NOPE, "Sell your house (in reason 777)");
+	if(GS()->IsPlayerEqualWorldID(ClientID, ms_aHouse[HouseID].m_WorldID))
+	{
+		GS()->AVM(ClientID, "MENU", MenuList::MENU_HOUSE_DECORATION, NOPE, "Settings Decorations");
+		GS()->AVM(ClientID, "MENU", MenuList::MENU_HOUSE_PLANTS, NOPE, "Settings Plants");
+	}
+	else
+		GS()->AVM(ClientID, "null", MenuList::MENU_HOUSE_DECORATION, NOPE, "More settings allow, only on house zone");
+}
+
+/* #########################################################################
 	GET CHECK HOUSES 
 ######################################################################### */
-int HouseJob::GetOwnerHouse(int HouseID)
+bool HouseJob::IsHouseHasOwner(int HouseID) const
 {
 	if(ms_aHouse.find(HouseID) != ms_aHouse.end())
-		return ms_aHouse[HouseID].m_OwnerID;
-	return -1;
+		return ms_aHouse[HouseID].m_OwnerID >= 1;
+	return false;
 }
 
-int HouseJob::GetWorldID(int HouseID) const
-{
-	if(ms_aHouse.find(HouseID) != ms_aHouse.end())
-		return ms_aHouse.at(HouseID).m_WorldID;
-	return -1;
-}
-
-int HouseJob::GetHouse(vec2 Pos, bool Plants)
+int HouseJob::GetHouse(vec2 Pos, bool Plants) const
 {
 	float Distance = (Plants ? 300.0f : 128.0f);
 	for(const auto& ihome : ms_aHouse)
@@ -257,8 +549,8 @@ void HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 		ms_aHouse[HouseID].m_OwnerID = pPlayer->Acc().m_AuthID;
 		SJK.UD("tw_houses", "OwnerID = '%d', HouseBank = '0' WHERE ID = '%d'", ms_aHouse[HouseID].m_OwnerID, HouseID);
 
-		GS()->Chat(-1, "{STR} becomes the owner of the house class {STR}", GS()->Server()->ClientName(ClientID), ms_aHouse[HouseID].m_aClass);
-		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**{STR} becomes the owner of the house class {STR}**", GS()->Server()->ClientName(ClientID), ms_aHouse[HouseID].m_aClass);
+		GS()->Chat(-1, "{STR} becomes the owner of the house class {STR}", Server()->ClientName(ClientID), ms_aHouse[HouseID].m_aClass);
+		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**{STR} becomes the owner of the house class {STR}**", Server()->ClientName(ClientID), ms_aHouse[HouseID].m_aClass);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return;
 	}
@@ -294,92 +586,6 @@ void HouseJob::SellHouse(int HouseID)
 
 	ms_aHouse[HouseID].m_OwnerID = -1;
 	ms_aHouse[HouseID].m_Bank = 0;
-}
-
-bool HouseJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
-{
-	CPlayer* pPlayer = pChr->GetPlayer();
-	const int ClientID = pPlayer->GetCID();
-
-	if (pChr->GetHelper()->TileEnter(IndexCollision, TILE_PLAYER_HOUSE))
-	{
-		GS()->Chat(ClientID, "You can see menu in the votes!");
-		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
-		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-		return true;
-	}
-	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_PLAYER_HOUSE))
-	{
-		GS()->Chat(ClientID, "You left the active zone, menu is restored!");
-		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
-		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-		return true;
-	}
-
-	return false;
-}
-
-bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
-{
-	const int ClientID = pPlayer->GetCID();
-	if (ReplaceMenu)
-	{
-		CCharacter* pChr = pPlayer->GetCharacter();
-		if (!pChr || !pChr->IsAlive())
-			return false;
-
-		if (pChr->GetHelper()->BoolIndex(TILE_PLAYER_HOUSE))
-		{
-			const int HouseID = GetHouse(pChr->m_Core.m_Pos);
-			if (HouseID > 0)
-				ShowHouseMenu(pPlayer, HouseID);
-			return true;
-		}
-		return false;
-	}
-
-	if (Menulist == MenuList::MENU_HOUSE_DECORATION)
-	{
-		pPlayer->m_LastVoteMenu = MenuList::MENU_HOUSE;
-		GS()->AVH(ClientID, TAB_INFO_DECORATION, GREEN_COLOR, "Decorations Information");
-		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "Add: Select your item in list. Select (Add to house),");
-		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "later press (ESC) and mouse select position");
-		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "Return in inventory: Select down your decorations");
-		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DECORATION, "and press (Back to inventory).");
-
-		Job()->Item()->ListInventory(pPlayer, ItemType::TYPE_DECORATION);
-		GS()->AV(ClientID, "null");
-		ShowDecorationList(pPlayer);
-		GS()->AddBackpage(ClientID);
-		return true;
-	}
-
-	if (Menulist == MenuList::MENU_HOUSE)
-	{
-		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
-
-		ShowPersonalHouse(pPlayer);
-		GS()->AddBackpage(ClientID);
-		return true;
-	}
-
-	if (Menulist == MenuList::MENU_HOUSE_PLANTS)
-	{
-		pPlayer->m_LastVoteMenu = MenuList::MENU_HOUSE;
-		const int HouseID = OwnerHouseID(pPlayer->Acc().m_AuthID);
-		const int PlantItemID = GetPlantsID(HouseID);
-
-		GS()->AVH(ClientID, TAB_INFO_HOUSE_PLANT, GREEN_COLOR, "Plants Information");
-		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE_PLANT, "Select item and in tab select 'To plant'");
-		GS()->AV(ClientID, "null");
-
-		GS()->AVM(ClientID, "null", NOPE, NOPE, "Housing Active Plants: {STR}", GS()->GetItemInfo(PlantItemID).GetName(pPlayer));
-		GS()->Mmo()->Item()->ListInventory(pPlayer, FUNCTION_PLANTS, true);
-		GS()->AddBackpage(ClientID);
-		return true;
-	}
-
-	return false;
 }
 
 void HouseJob::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
@@ -440,213 +646,7 @@ bool HouseJob::ChangeStateDoor(int HouseID)
 	return true;
 }
 
-void HouseJob::ShowHouseMenu(CPlayer *pPlayer, int HouseID)
-{
-	const int ClientID = pPlayer->GetCID();
-	GS()->AVH(ClientID, TAB_INFO_HOUSE, GREEN_COLOR, "House {INT} . {STR}", &HouseID, ms_aHouse[HouseID].m_aClass);
-	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE, "Owner House: {STR}", Job()->PlayerName(ms_aHouse[HouseID].m_OwnerID));
-
-	GS()->AV(ClientID, "null");
-	GS()->ShowItemValueInformation(pPlayer, itGold);
-	GS()->AV(ClientID, "null");
-	
-	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
-	if(ms_aHouse[HouseID].m_OwnerID <= 0)
-		GS()->AVM(ClientID, "BUYHOUSE", HouseID, NOPE, "Buy this house. Price {INT}gold", &ms_aHouse[HouseID].m_Price);
-	else
-		GS()->AVM(ClientID, "null", HouseID, NOPE, "This house has already been purchased!");
-
-	GS()->AV(ClientID, "null");
-}
-
-void HouseJob::ShowPersonalHouse(CPlayer *pPlayer)
-{
-	const int ClientID = pPlayer->GetCID();
-	const int HouseID = PlayerHouseID(pPlayer);
-	if(HouseID <= 0)
-	{
-		GS()->AVL(ClientID, "null", "You not owner home!");
-		return;
-	}
-
-	const bool StateDoor = GetHouseDoor(HouseID);
-	GS()->AVH(ClientID, TAB_HOUSE_STAT, BLUE_COLOR, "House stats {INT} Class {STR} Door [{STR}]", &HouseID, ms_aHouse[HouseID].m_aClass, StateDoor ? "Closed" : "Opened");
-	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "/doorhouse - interactive with door.");
-	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "- - - - - - - - - -");
-	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "Notes: Minimal operation house balance 100gold");
-	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "In your safe is: {INT}gold", &ms_aHouse[HouseID].m_Bank);
-	GS()->AV(ClientID, "null");
-	//
-	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
-	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", &pPlayer->GetItem(itGold).m_Count);
-	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
-	GS()->AVM(ClientID, "HOUSEADD", 1, NOPE, "Add to the safe gold. (Amount in a reason)");
-	GS()->AVM(ClientID, "HOUSETAKE", 1, NOPE, "Take the safe gold. (Amount in a reason)");
-	GS()->AV(ClientID, "null");
-	//
-	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
-	GS()->AVL(ClientID, "null", "▤ House system");
-	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
-	GS()->AVM(ClientID, "HOUSEDOOR", HouseID, NOPE, "Change state to [\"{STR}\"]", StateDoor ? "OPEN" : "CLOSED");
-	GS()->AVM(ClientID, "HSPAWN", 1, NOPE, "Teleport to your house");
-	GS()->AVM(ClientID, "HSELL", HouseID, NOPE, "Sell your house (in reason 777)");
-	if(GS()->IsPlayerEqualWorldID(ClientID, ms_aHouse[HouseID].m_WorldID))
-	{
-		GS()->AVM(ClientID, "MENU", MenuList::MENU_HOUSE_DECORATION, NOPE, "Settings Decorations");
-		GS()->AVM(ClientID, "MENU", MenuList::MENU_HOUSE_PLANTS, NOPE, "Settings Plants");
-	}
-	else
-		GS()->AVM(ClientID, "null", MenuList::MENU_HOUSE_DECORATION, NOPE, "More settings allow, only on house zone");
-}
-
-bool HouseJob::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
-{
-	const int ClientID = pPlayer->GetCID();
-	if(PPSTR(CMD, "BUYHOUSE") == 0)
-	{
-		const int HouseID = VoteID;
-		BuyHouse(HouseID, pPlayer);
-		return true;
-	}
-
-	if(PPSTR(CMD, "HSPAWN") == 0)
-	{
-		if(!pPlayer->GetCharacter())
-			return true;
-
-		int HouseID = PlayerHouseID(pPlayer);
-		int HouseWorldID = GetWorldID(HouseID);
-		vec2 Position = GetPositionHouse(HouseID);
-		if(!GS()->IsPlayerEqualWorldID(ClientID, HouseWorldID))
-		{
-			pPlayer->GetTempData().m_TempTeleportX = Position.x;
-			pPlayer->GetTempData().m_TempTeleportY = Position.y;
-			pPlayer->ChangeWorld(HouseWorldID);
-			return true;
-		}
-		pPlayer->GetCharacter()->ChangePosition(Position);
-		return true;
-	}
-
-	if (PPSTR(CMD, "HSELL") == 0)
-	{
-		const int HouseID = VoteID;
-		if (HouseID <= 0 || Get != 777)
-		{
-			GS()->Chat(ClientID, "A verification number was entered incorrectly.");
-			return true;
-		}
-
-		SellHouse(HouseID);
-		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
-		return true;
-	}
-
-	if(PPSTR(CMD, "HOUSEADD") == 0)
-	{
-		if(Get < 100)
-		{
-			GS()->Chat(ClientID, "Minimal 100 gold.");
-			return true;
-		}
-		
-		if(pPlayer->SpendCurrency(Get))
-		{
-			AddSafeDeposit(pPlayer, Get);
-			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_HOUSE);
-		}
-		return true;
-	}
-
-	if(PPSTR(CMD, "HOUSETAKE") == 0)
-	{
-		if(Get < 100)
-		{
-			GS()->Chat(ClientID, "Minimal 100 gold.");
-			return true;
-		}
-		
-		TakeFromSafeDeposit(pPlayer, Get);
-		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_HOUSE);
-		return true;
-	}
-
-	if(PPSTR(CMD, "HOUSEDOOR") == 0)
-	{
-		if(ChangeStateDoor(VoteID))
-			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_HOUSE);
-		return true;		
-	}
-
-	if(PPSTR(CMD, "DECOSTART") == 0)
-	{
-		const int HouseID = PlayerHouseID(pPlayer);
-		const vec2 PositionHouse = GetPositionHouse(HouseID);
-		if(HouseID <= 0 || distance(PositionHouse, pPlayer->GetCharacter()->m_Core.m_Pos) > 600)
-		{
-			GS()->Chat(ClientID, "Long distance from the house, or you do not own the house!");
-			return true;
-		}
-
-		GS()->ClearVotes(ClientID);
-		GS()->AV(ClientID, "null", "Please close vote and press Left Mouse,");
-		GS()->AV(ClientID, "null", "on position where add decoration!");
-		GS()->AddBackpage(ClientID);
-
-		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
-		pPlayer->GetTempData().m_TempDecoractionID = VoteID;
-		pPlayer->GetTempData().m_TempDecorationType = DECORATIONS_HOUSE;
-		return true;
-	}
-
-	if(PPSTR(CMD, "DECODELETE") == 0)
-	{
-		const int HouseID = PlayerHouseID(pPlayer);
-		if(HouseID > 0 && DeleteDecorationHouse(VoteID))
-		{
-			InventoryItem &PlDecoItem = pPlayer->GetItem(VoteID2);
-			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
-			PlDecoItem.Add(1);
-		}
-		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_HOUSE_DECORATION);
-		return true;
-	}
-
-	if(PPSTR(CMD, "HOMEPLANTSET") == 0)
-	{
-		const int HouseID = PlayerHouseID(pPlayer);
-		if(HouseID < 0)
-		{
-			GS()->Chat(ClientID,"You not owner home!");
-			return true;
-		}
-
-		if(GetPlantsID(HouseID) <= 0)
-		{
-			GS()->Chat(ClientID, "Your home does not support plants!");
-			return true;		
-		}
-
-		const int ItemID = VoteID;
-		if(!pPlayer->SpendCurrency(1, ItemID))
-			return true;
-
-		const int ChanceSuccesful = VoteID2;
-		if(ChanceSuccesful != 0)
-		{
-			GS()->Chat(ClientID, "Unfortunately plant did not take root!");
-			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-			return true;
-		}
-
-		GS()->Chat(-1, "Congratulations {STR}, planted at home {STR}!", GS()->Server()->ClientName(ClientID), GS()->GetItemInfo(ItemID).m_aName);
-		ChangePlantsID(HouseID, ItemID);
-		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
-	}
-
-	return false;
-}
-
+// - - - - - - - - - - - - - - DOOR HOUSES - - - - - - - - - - - - - - 
 HouseDoor::HouseDoor(CGameWorld *pGameWorld, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_PLAYER_HOUSE_DOOR, Pos)
 {
