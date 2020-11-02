@@ -71,6 +71,17 @@ void CCharacterBotAI::ShowProgressHealth()
 	}	
 }
 
+void CCharacterBotAI::GiveRandomEffects(int To)
+{
+	CPlayer* pPlayerTo = GS()->GetPlayer(To);
+	if(!pPlayerTo && To != m_pBotPlayer->GetCID())
+		return;
+
+	const int SubID = m_pBotPlayer->GetBotSub();
+	if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && BotJob::ms_aMobBot[SubID].m_aEffect[0] != '\0')
+		pPlayerTo->GiveEffect(BotJob::ms_aMobBot[SubID].m_aEffect, 3 + random_int() % 3, 40);
+}
+
 bool CCharacterBotAI::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 {
 	CPlayer* pFrom = GS()->GetPlayer(From, true);

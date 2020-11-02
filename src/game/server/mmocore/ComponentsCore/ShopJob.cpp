@@ -350,28 +350,28 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		const int Enchant = pRes->getInt("Enchant");
 		const int Count = pRes->getInt("Count");
 		const int NeedItemID = pRes->getInt("NeedItem");
-		ItemInformation &BuyightItem = GS()->GetItemInfo(ItemID);
-		ItemInformation &NeededItem = GS()->GetItemInfo(NeedItemID);
+		ItemInformation &pBuyightItem = GS()->GetItemInfo(ItemID);
+		ItemInformation &pNeededItem = GS()->GetItemInfo(NeedItemID);
 		
-		if (BuyightItem.IsEnchantable())
+		if (pBuyightItem.IsEnchantable())
 		{
 			char aEnchantBuf[16];
-			BuyightItem.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf), Enchant);
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} {STR} - {INT} {STR}",
-				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), &Price, NeededItem.GetName(pPlayer));
+			pBuyightItem.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf), Enchant);
+			GS()->AVHI(ClientID, pBuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} {STR} - {INT} {STR}",
+				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), pBuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), &Price, pNeededItem.GetName(pPlayer));
 
 			char aAttributes[128];
-			BuyightItem.FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
+			pBuyightItem.FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 		}
 		else
 		{
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) - {INT} {STR}",
-				BuyightItem.GetName(pPlayer), &Count, &pPlayer->GetItem(ItemID).m_Count, &Price, NeededItem.GetName(pPlayer));
+			GS()->AVHI(ClientID, pBuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) - {INT} {STR}",
+				pBuyightItem.GetName(pPlayer), &Count, &pPlayer->GetItem(ItemID).m_Count, &Price, pNeededItem.GetName(pPlayer));
 		}
 
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", BuyightItem.GetDesc(pPlayer));
-		GS()->AVM(ClientID, "SHOP", ID, HideID, "Exchange {STR}x{INT} to {STR}x{INT}", NeededItem.GetName(pPlayer), &Price, BuyightItem.GetName(pPlayer), &Count);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pBuyightItem.GetDesc(pPlayer));
+		GS()->AVM(ClientID, "SHOP", ID, HideID, "Exchange {STR}x{INT} to {STR}x{INT}", pNeededItem.GetName(pPlayer), &Price, pBuyightItem.GetName(pPlayer), &Count);
 		HideID++;
 	}
 	GS()->AV(ClientID, "null");

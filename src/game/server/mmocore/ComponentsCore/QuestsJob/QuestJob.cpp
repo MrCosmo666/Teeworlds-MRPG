@@ -127,7 +127,7 @@ void QuestJob::ShowQuestsTabList(CPlayer* pPlayer, int StateQuest)
 {
 	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = GOLDEN_COLOR;
-	GS()->AVL(ClientID, "null", "★ {STR} quests", GetStateName(StateQuest));
+	GS()->AVL(ClientID, "null", "{STR} quests", GetStateName(StateQuest));
 
 	// check first quest story step
 	bool IsEmptyList = true;
@@ -159,7 +159,7 @@ void QuestJob::ShowQuestsTabList(CPlayer* pPlayer, int StateQuest)
 	if(IsEmptyList)
 	{
 		pPlayer->m_Colored = LIGHT_GOLDEN_COLOR;
-		GS()->AV(ClientID, "null", "This list is empty");
+		GS()->AV(ClientID, "null", "List of quests is empty");
 	}
 	GS()->AV(ClientID, "null");
 }

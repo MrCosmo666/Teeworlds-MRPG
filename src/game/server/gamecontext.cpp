@@ -27,8 +27,8 @@
 #include <teeother/components/localization.h>
 
 // static data that have the same value in different objects
-std::map < int , CGS::StructAttribut > CGS::ms_aAttributsInfo;
-std::map < int , std::map < std::string , int > > CGS::ms_aEffects;
+std::map < int, CGS::StructAttribut > CGS::ms_aAttributsInfo;
+std::map < std::string, int > CGS::ms_aEffects[MAX_PLAYERS];
 int CGS::m_MultiplierExp = 100;
 
 enum
@@ -1055,8 +1055,9 @@ void CGS::OnConsoleInit()
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 
 	Console()->Register("parseskin", "i[cid]", CFGFLAG_SERVER, ConParseSkin, m_pServer, "Parse skin on console. Easy for devlop bots.");
-	Console()->Register("giveitem", "i[cid]i[itemid]i[count]i[ench]i[mail]", CFGFLAG_SERVER, ConGiveItem, m_pServer, "Give item <clientid> <itemid> <count> <enchant> <mail 1=yes 0=no>");
+	Console()->Register("giveitem", "i[cid]i[itemid]i[count]i[enchant]i[mail]", CFGFLAG_SERVER, ConGiveItem, m_pServer, "Give item <clientid> <itemid> <count> <enchant> <mail 1=yes 0=no>");
 	Console()->Register("removeitem", "i[cid]i[itemid]i[count]", CFGFLAG_SERVER, ConRemItem, m_pServer, "Remove item <clientid> <itemid> <count>");
+	Console()->Register("disband_guild", "r[guildname]", CFGFLAG_SERVER, ConDisbandGuild, m_pServer, "Disband the guild with the name");
 	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, m_pServer, "Say in chat");
 	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, m_pServer, "(Warning) Add new bot on database or update if finding <clientid> <bot name>");
 	Console()->Register("convert_passwords", "", CFGFLAG_SERVER, ConConvertPasswords, m_pServer, "Convert existing plaintext passwords into hashed passwords");
@@ -1091,9 +1092,9 @@ void CGS::OnTick()
 			continue;
 
 		m_apPlayers[i]->Tick();
+		m_apPlayers[i]->PostTick();
 		if(i < MAX_PLAYERS)
 		{
-			m_apPlayers[i]->PostTick();
 			BroadcastTick(i);
 		}
 	}
@@ -1574,7 +1575,7 @@ void CGS::ClearClientData(int ClientID)
 {
 	Mmo()->ResetClientData(ClientID);
 	m_aPlayerVotes[ClientID].clear();
-	ms_aEffects.erase(ClientID);
+	ms_aEffects[ClientID].clear();
 
 	// clear active snap bots for player
 	for(auto& pActiveSnap : BotJob::ms_aDataBot)
@@ -1635,6 +1636,26 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 		}
 		pSelf->SendInbox(pPlayer, "The sender heavens", "Sent from console", ItemID, Count, Enchant);
 	}
+}
+
+void CGS::ConDisbandGuild(IConsole::IResult* pResult, void* pUserData)
+{
+	IServer* pServer = (IServer*)pUserData;
+	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetClientWorldID(MAIN_WORLD_ID));
+	const char* pGuildName = pResult->GetString(0);
+	const int GuildID = pSelf->Mmo()->Member()->SearchGuildByName(pGuildName);
+
+	char aBuf[256];
+	if(GuildID <= 0)
+	{
+		str_format(aBuf, sizeof(aBuf), "\"%s\", no such guild has been found.", pGuildName);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "disbandguild", aBuf);
+		return;
+	}
+
+	str_format(aBuf, sizeof(aBuf), "Guild with identifier %d and by the name of %s has been disbanded.", GuildID, pGuildName);
+	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "disbandguild", aBuf);
+	pSelf->Mmo()->Member()->DisbandGuild(GuildID);
 }
 
 void CGS::ConRemItem(IConsole::IResult* pResult, void* pUserData)
@@ -2010,9 +2031,11 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVM(ClientID, "MENU", MenuList::MENU_SETTINGS, TAB_PERSONAL, "Settings");
 		AVM(ClientID, "MENU", MenuList::MENU_INBOX, TAB_PERSONAL, "Mailbox");
 		AVM(ClientID, "MENU", MenuList::MENU_JOURNAL_MAIN, TAB_PERSONAL, "Journal");
-		AVM(ClientID, "MENU", MenuList::MENU_GUILD, TAB_PERSONAL, "Guild");
 		if(Mmo()->House()->PlayerHouseID(pPlayer) > 0)
 			AVM(ClientID, "MENU", MenuList::MENU_HOUSE, TAB_PERSONAL, "House");
+		AVM(ClientID, "MENU", MenuList::MENU_GUILD_FINDER, TAB_PERSONAL, "Guild finder");
+		if(pPlayer->Acc().IsGuild())
+			AVM(ClientID, "MENU", MenuList::MENU_GUILD, TAB_PERSONAL, "Guild");
 		AV(ClientID, "null");
 
 		// info menu

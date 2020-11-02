@@ -58,6 +58,10 @@
 	{
 		"key": "Guild",
 		"value": "Gilde"
+	},	
+	{
+		"key": "Guild finder",
+		"value": "Gilden-Finder"
 	},
 	{
 		"key": "House",
@@ -106,10 +110,6 @@
 	{
 		"key": "Ranking Information",
 		"value": "Ranking Informationen"
-	},
-	{
-		"key": "Here you can see top server Guilds, Players.",
-		"value": "Here you can see top server Guilds, Players."
 	},
 	{
 		"key": "Top 10 guilds leveling",

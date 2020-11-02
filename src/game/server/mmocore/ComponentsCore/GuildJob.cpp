@@ -138,115 +138,44 @@ bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	return false;
 }
 
+/*
+	TODO: We have to process checks in functions, they exist for something.
+*/
 bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
+
+	// -------------------------------------
+	// ACCESS RANK: Leader functions
 	if(PPSTR(CMD, "MLEADER") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer) || Get != 134)
+		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_LEADER) || Get != 134)
 		{
-			GS()->Chat(ClientID, "You have no access.");
+			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
+			return true;
+		}
+		const int SelectedAccountID = VoteID;
+		if(pPlayer->Acc().m_AuthID == SelectedAccountID)
+		{
+			GS()->Chat(ClientID, "You can't give the rights to yourself!");
 			return true;
 		}
 
-		const int SelectedAccountID = VoteID;
 		ms_aGuild[GuildID].m_OwnerID = SelectedAccountID;
 		SJK.UD("tw_guilds", "OwnerID = '%d' WHERE ID = '%d'", SelectedAccountID, GuildID);
-
 		AddHistoryGuild(GuildID, "New guild leader '%s'.", Job()->PlayerName(SelectedAccountID));
 		GS()->ChatGuild(GuildID, "Change leader {STR}->{STR}", Server()->ClientName(ClientID), Job()->PlayerName(SelectedAccountID));
-		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
-		return true;
-	}
-
-	if(PPSTR(CMD, "MSPAWN") == 0)
-	{
-		const int GuildID = pPlayer->Acc().m_GuildID;
-		const int HouseID = GetGuildHouseID(GuildID);
-		if(GuildID <= 0 || HouseID <= 0)
-			return true;
-
-		vec2 Position = GetPositionHouse(GuildID);
-		const int WorldID = ms_aHouseGuild[HouseID].m_WorldID;
-		if(!GS()->IsPlayerEqualWorldID(ClientID, WorldID))
-		{
-			pPlayer->GetTempData().m_TempTeleportX = Position.x;
-			pPlayer->GetTempData().m_TempTeleportY = Position.y;
-			pPlayer->ChangeWorld(WorldID);
-			return true;
-		}
-		pPlayer->GetCharacter()->ChangePosition(Position);
-		return true;
-	}
-
-	if(PPSTR(CMD, "MKICK") == 0)
-	{
-		const int GuildID = pPlayer->Acc().m_GuildID;
-		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-		ExitGuild(VoteID);
-		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
-		return true;
-	}
-
-	if(PPSTR(CMD, "MUPGRADE") == 0)
-	{
-		const int GuildID = pPlayer->Acc().m_GuildID;
-		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		const int UpgradeID = VoteID;
-		if(UpgradeGuild(GuildID, UpgradeID))
-		{
-			const int GuildCount = ms_aGuild[GuildID].m_Upgrades[UpgradeID];
-			GS()->ChatGuild(GuildID, "Improved to {INT} {STR} in {STR}!", &GuildCount, UpgradeNames(UpgradeID).c_str(), ms_aGuild[GuildID].m_aName);
-			AddHistoryGuild(GuildID, "'%s' level up to '%d'.", UpgradeNames(UpgradeID).c_str(), GuildCount);
-			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
-			return true;
-		}
-
-		GS()->Chat(ClientID, "You don't have that much money in the Bank.");
-		return true;
-	}
-
-	if(PPSTR(CMD, "MMONEY") == 0)
-	{
-		const int GuildID = pPlayer->Acc().m_GuildID;
-		if(GuildID <= 0)
-			return true;
-
-		if(Get < 100)
-		{
-			GS()->Chat(ClientID, "Minimal 100 gold.");
-			return true;
-		}
-
-		if(!pPlayer->SpendCurrency(Get))
-			return true;
-
-		if(AddMoneyBank(GuildID, Get))
-		{
-			SJK.UD("tw_accounts_data", "GuildDeposit = GuildDeposit + '%d' WHERE ID = '%d'", Get, pPlayer->Acc().m_AuthID);
-			GS()->ChatGuild(GuildID, "{STR} deposit in treasury {INT}gold.", Server()->ClientName(ClientID), &Get);
-			AddHistoryGuild(GuildID, "'%s' added to bank %dgold.", Server()->ClientName(ClientID), Get);
-			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
-		}
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_PLAYERS);
 		return true;
 	}
 
 	if(PPSTR(CMD, "BUYMEMBERHOUSE") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_LEADER))
 		{
-			GS()->Chat(ClientID, "You have no access.");
+			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
 			return true;
 		}
 
@@ -258,120 +187,44 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 	if(PPSTR(CMD, "MHOUSESELL") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer) || Get != 777)
+		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_LEADER) || Get != 7177)
 		{
-			GS()->Chat(ClientID, "You have no access.");
+			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
 			return true;
 		}
 
-		SellGuildHouse(GuildID);
+		DisbandGuild(GuildID);
 		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD);
 		return true;
 	}
 
-	if(PPSTR(CMD, "MDOOR") == 0)
+	if(PPSTR(CMD, "MDISBAND") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
+		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_LEADER) || Get != 55428)
 		{
-			GS()->Chat(ClientID, "You have no access.");
+			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
 			return true;
 		}
 
-		if(ChangeStateDoor(GuildID))
-			GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD);
-		return true;
-	}
-
-	if(PPSTR(CMD, "MINVITEACCEPT") == 0)
-	{
-		const int GuildID = pPlayer->Acc().m_GuildID;
-		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		const int SenderID = VoteID;
-		if(JoinGuild(SenderID, GuildID))
-		{
-			SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
-			GS()->SendInbox(SenderID, ms_aGuild[GuildID].m_aName, "You were accepted to join guild");
-			GS()->StrongUpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
-			return true;
-		}
-		GS()->Chat(ClientID, "You can't accept (there are no free slot or he is already in Guild).");
-		return true;
-	}
-
-	if(PPSTR(CMD, "MINVITEREJECT") == 0)
-	{
-		const int GuildID = pPlayer->Acc().m_GuildID;
-		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		const int SenderID = VoteID;
-		GS()->Chat(ClientID, "You reject invite.");
-		SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
-		GS()->SendInbox(SenderID, ms_aGuild[GuildID].m_aName, "You were denied join guild");
-		GS()->ResetVotes(ClientID, MenuList::MENU_GUILD);
-		return true;
-	}
-
-	if(PPSTR(CMD, "MINVITENAME") == 0)
-	{
-		if(PPSTR(GetText, "NULL") == 0)
-		{
-			GS()->Chat(ClientID, "Use please another name.");
-			return true;
-		}
-
-		str_copy(pPlayer->GetTempData().m_aGuildSearchBuf, GetText, sizeof(pPlayer->GetTempData().m_aGuildSearchBuf));
-		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
-		return true;
-	}
-
-	if(PPSTR(CMD, "MINVITESEND") == 0)
-	{
-		if(!AddInviteGuild(VoteID, pPlayer->Acc().m_AuthID))
-		{
-			GS()->Chat(ClientID, "You have already sent the invitation.");
-			return true;
-		}
-
-		GS()->Chat(ClientID, "You sent the invitation to join.");
-		return true;
-	}
-
-	if(PPSTR(CMD, "MRANKNAME") == 0)
-	{
-		if(PPSTR(GetText, "NULL") == 0)
-		{
-			GS()->Chat(ClientID, "Use please another name.");
-			return true;
-		}
-
-		str_copy(pPlayer->GetTempData().m_aRankGuildBuf, GetText, sizeof(pPlayer->GetTempData().m_aRankGuildBuf));
-		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_RANK);
+		DisbandGuild(GuildID);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD);
 		return true;
 	}
 
 	if(PPSTR(CMD, "MRANKCREATE") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_LEADER))
 		{
-			GS()->Chat(ClientID, "You have no access.");
+			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
 			return true;
 		}
 
-		const int lenRank = str_length(pPlayer->GetTempData().m_aRankGuildBuf);
-		if(lenRank < 2 || lenRank > 16)
+		const int LengthRank = str_length(pPlayer->GetTempData().m_aRankGuildBuf);
+		if(LengthRank < 2 || LengthRank > 16)
 		{
-			GS()->Chat(ClientID, "Minimal 2, maximal 16 symbols.");
+			GS()->Chat(ClientID, "Minimum number of characters 2, maximum 16.");
 			return true;
 		}
 
@@ -380,12 +233,34 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 		return true;
 	}
 
+	if(PPSTR(CMD, "MRANKSET") == 0)
+	{
+		const int GuildID = pPlayer->Acc().m_GuildID;
+		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_LEADER))
+		{
+			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
+			return true;
+		}
+
+		const int LengthRank = str_length(pPlayer->GetTempData().m_aRankGuildBuf);
+		if(LengthRank < 2 || LengthRank > 16)
+		{
+			GS()->Chat(ClientID, "Minimum number of characters 2, maximum 16.");
+			return true;
+		}
+
+		const int RankID = VoteID;
+		ChangeRank(RankID, GuildID, pPlayer->GetTempData().m_aRankGuildBuf);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_RANK);
+		return true;
+	}
+
 	if(PPSTR(CMD, "MRANKDELETE") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_LEADER))
 		{
-			GS()->Chat(ClientID, "You have no access.");
+			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
 			return true;
 		}
 
@@ -398,9 +273,9 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 	if(PPSTR(CMD, "MRANKACCESS") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_LEADER))
 		{
-			GS()->Chat(ClientID, "You have no access.");
+			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
 			return true;
 		}
 
@@ -410,39 +285,113 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 		return true;
 	}
 
-	if(PPSTR(CMD, "MRANKSET") == 0)
-	{
-		const int GuildID = pPlayer->Acc().m_GuildID;
-		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer))
-		{
-			GS()->Chat(ClientID, "You have no access.");
-			return true;
-		}
-
-		if(str_length(pPlayer->GetTempData().m_aRankGuildBuf) < 2)
-		{
-			GS()->Chat(ClientID, "Minimal symbols 2.");
-			return true;
-		}
-
-		const int RankID = VoteID;
-		ChangeRank(RankID, GuildID, pPlayer->GetTempData().m_aRankGuildBuf);
-		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_RANK);
-		return true;
-	}
-
 	if(PPSTR(CMD, "MRANKCHANGE") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if(GuildID <= 0 || !IsLeaderPlayer(pPlayer))
+		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_LEADER))
 		{
-			GS()->Chat(ClientID, "You have no access.");
+			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
 			return true;
 		}
 
 		// change rank and clear the menu
 		ChangePlayerRank(VoteID, VoteID2);
-		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_PLAYERS);
+		return true;
+	}
+
+
+	// -------------------------------------
+	// ACCESS RANK: Invite and kick functions
+	if(PPSTR(CMD, "MKICK") == 0)
+	{
+		const int GuildID = pPlayer->Acc().m_GuildID;
+		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
+		{
+			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
+			return true;
+		}
+
+		ExitGuild(VoteID);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_PLAYERS);
+		return true;
+	}
+
+	if(PPSTR(CMD, "MINVITEACCEPT") == 0)
+	{
+		const int GuildID = pPlayer->Acc().m_GuildID;
+		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
+		{
+			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
+			return true;
+		}
+
+		const int SenderID = VoteID;
+		if(JoinGuild(SenderID, GuildID))
+		{
+			SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
+			GS()->SendInbox(SenderID, ms_aGuild[GuildID].m_aName, "You were accepted to join guild");
+			GS()->StrongUpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_PLAYERS);
+			return true;
+		}
+		GS()->Chat(ClientID, "You can't accept (there are no free slot or he is already in Guild).");
+		return true;
+	}
+
+	if(PPSTR(CMD, "MINVITEREJECT") == 0)
+	{
+		const int GuildID = pPlayer->Acc().m_GuildID;
+		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
+		{
+			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
+			return true;
+		}
+
+		const int SenderID = VoteID;
+		GS()->Chat(ClientID, "You reject invite.");
+		SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
+		GS()->SendInbox(SenderID, ms_aGuild[GuildID].m_aName, "You were denied join guild");
+		GS()->ResetVotes(ClientID, MenuList::MENU_GUILD);
+		return true;
+	}
+
+
+	// -------------------------------------
+	// ACCESS RANK: Upgrade house functions
+	if(PPSTR(CMD, "MDOOR") == 0)
+	{
+		const int GuildID = pPlayer->Acc().m_GuildID;
+		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
+		{
+			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
+			return true;
+		}
+
+		if(ChangeStateDoor(GuildID))
+			GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD);
+		return true;
+	}
+
+	if(PPSTR(CMD, "MUPGRADE") == 0)
+	{
+		const int GuildID = pPlayer->Acc().m_GuildID;
+		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
+		{
+			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
+			return true;
+		}
+
+		const int UpgradeID = VoteID;
+		if(UpgradeGuild(GuildID, UpgradeID))
+		{
+			const int GuildCount = ms_aGuild[GuildID].m_Upgrades[UpgradeID];
+			GS()->ChatGuild(GuildID, "Improved to {INT} {STR} in {STR}!", &GuildCount, UpgradeNames(UpgradeID).c_str(), ms_aGuild[GuildID].m_aName);
+			AddHistoryGuild(GuildID, "'%s' level up to '%d'.", UpgradeNames(UpgradeID).c_str(), GuildCount);
+			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
+			return true;
+		}
+		GS()->Chat(ClientID, "You don't have that much money in the Bank.");
 		return true;
 	}
 
@@ -450,9 +399,9 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
 		const int HouseID = GetGuildHouseID(GuildID);
-		if(GuildID <= 0 || HouseID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
+		if(GuildID <= 0 || HouseID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
 		{
-			GS()->Chat(ClientID, "You have no access.");
+			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
 			return true;
 		}
 
@@ -479,9 +428,9 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
 		const int HouseID = GetGuildHouseID(GuildID);
-		if(GuildID <= 0 || HouseID <= 0 || !IsLeaderPlayer(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
+		if(GuildID <= 0 || HouseID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_UPGRADE_HOUSE))
 		{
-			GS()->Chat(ClientID, "You have no access.");
+			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
 			return true;
 		}
 
@@ -497,6 +446,97 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 		return true;
 	}
 
+
+	// -------------------------------------
+	// ACCESS RANK: Full access functions
+	if(PPSTR(CMD, "MSPAWN") == 0)
+	{
+		const int GuildID = pPlayer->Acc().m_GuildID;
+		const int HouseID = GetGuildHouseID(GuildID);
+		if(GuildID <= 0 || HouseID <= 0)
+		{
+			GS()->Chat(ClientID, "You may not have a home, or you may not be in the guild.");
+			return true;
+		}
+
+		vec2 Position = GetPositionHouse(GuildID);
+		const int WorldID = ms_aHouseGuild[HouseID].m_WorldID;
+		if(!GS()->IsPlayerEqualWorldID(ClientID, WorldID))
+		{
+			pPlayer->GetTempData().m_TempTeleportX = Position.x;
+			pPlayer->GetTempData().m_TempTeleportY = Position.y;
+			pPlayer->ChangeWorld(WorldID);
+			return true;
+		}
+		pPlayer->GetCharacter()->ChangePosition(Position);
+		return true;
+	}
+	if(PPSTR(CMD, "MMONEY") == 0)
+	{
+		const int GuildID = pPlayer->Acc().m_GuildID;
+		if(GuildID <= 0)
+		{
+			GS()->Chat(ClientID, "You are not a member of the guild.");
+			return true;
+		}
+		if(Get < 100)
+		{
+			GS()->Chat(ClientID, "Minimum number is 100 gold.");
+			return true;
+		}
+
+		if(pPlayer->SpendCurrency(Get))
+		{
+			AddMoneyBank(GuildID, Get);
+			SJK.UD("tw_accounts_data", "GuildDeposit = GuildDeposit + '%d' WHERE ID = '%d'", Get, pPlayer->Acc().m_AuthID);
+			GS()->ChatGuild(GuildID, "{STR} deposit in treasury {INT}gold.", Server()->ClientName(ClientID), &Get);
+			AddHistoryGuild(GuildID, "'%s' added to bank %dgold.", Server()->ClientName(ClientID), Get);
+			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
+		}
+		return true;
+	}
+	if(PPSTR(CMD, "MRANKNAME") == 0)
+	{
+		if(PPSTR(GetText, "NULL") == 0)
+		{
+			GS()->Chat(ClientID, "Use please another name.");
+			return true;
+		}
+
+		str_copy(pPlayer->GetTempData().m_aRankGuildBuf, GetText, sizeof(pPlayer->GetTempData().m_aRankGuildBuf));
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_RANK);
+		return true;
+	}
+
+	// -------------------------------------
+	// Functions outside the guild
+	if(PPSTR(CMD, "MINVITENAME") == 0)
+	{
+		if(PPSTR(GetText, "NULL") == 0)
+		{
+			GS()->Chat(ClientID, "Use please another name.");
+			return true;
+		}
+
+		str_copy(pPlayer->GetTempData().m_aGuildSearchBuf, GetText, sizeof(pPlayer->GetTempData().m_aGuildSearchBuf));
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
+		return true;
+	}
+
+	if(PPSTR(CMD, "MINVITESEND") == 0)
+	{
+		SendInviteGuild(VoteID, pPlayer);
+		return true;
+	}
+
+	if(PPSTR(CMD, "MINVITEVIEWPLAYERS") == 0)
+	{
+		pPlayer->m_LastVoteMenu = MENU_GUILD_FINDER;
+		GS()->ClearVotes(ClientID);
+		ShowGuildPlayers(pPlayer, VoteID);
+		GS()->AddBackpage(ClientID);
+		return true;
+	}
 	return false;
 }
 
@@ -517,11 +557,26 @@ bool GuildJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		}
 		return false;
 	}
+	
+	if(Menulist == MenuList::MENU_GUILD_FINDER)
+	{
+		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
+		ShowFinderGuilds(ClientID);
+		return true;
+	}
 
 	if(Menulist == MenuList::MENU_GUILD)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 		ShowMenuGuild(pPlayer);
+		return true;
+	}
+
+	if(Menulist == MenuList::MENU_GUILD_PLAYERS)
+	{
+		pPlayer->m_LastVoteMenu = MenuList::MENU_GUILD;
+		ShowGuildPlayers(pPlayer, pPlayer->Acc().m_GuildID);
+		GS()->AddBackpage(ClientID);
 		return true;
 	}
 
@@ -581,7 +636,7 @@ void GuildJob::TickHousingText()
 		const int GuildID = mh.second.m_GuildID;
 		if (GuildID > 0)
 		{
-			GS()->CreateText(NULL, false, vec2(mh.second.m_TextX, mh.second.m_TextY), vec2(0, 0), LifeTime, ms_aGuild[GuildID].m_aName);
+			GS()->CreateText(NULL, false, vec2(mh.second.m_TextX, mh.second.m_TextY), vec2(0, 0), LifeTime, GuildName(GuildID));
 			continue;
 		}
 		GS()->CreateText(NULL, false, vec2(mh.second.m_TextX, mh.second.m_TextY), vec2(0, 0), LifeTime, "GUILD HOUSE");
@@ -591,14 +646,32 @@ void GuildJob::TickHousingText()
 /* #########################################################################
 	GET CHECK MEMBER 
 ######################################################################### */
+int GuildJob::SearchGuildByName(const char* pGuildName) const
+{
+	std::string SearchName(pGuildName); // I do not trust him with such important things xd
+	auto pItem = std::find_if(ms_aGuild.begin(), ms_aGuild.end(), [SearchName](std::pair< int, GuildStruct> pCheck)
+	{
+		std::string RealName(pCheck.second.m_aName);
+		return SearchName.compare(RealName) == 0;
+	});
+	return pItem != ms_aGuild.end() ? pItem->first : -1;
+}
+
 const char *GuildJob::GuildName(int GuildID) const
 {	
 	if(ms_aGuild.find(GuildID) != ms_aGuild.end())
 		return ms_aGuild[GuildID].m_aName;
-	return "None"; 
+	return "Broken"; 
 }
 
-bool GuildJob::IsLeaderPlayer(CPlayer *pPlayer, int Access) const
+int GuildJob::GetMemberAccess(CPlayer* pPlayer) const
+{
+	if(pPlayer->Acc().IsGuild() && ms_aRankGuild.find(pPlayer->Acc().m_GuildRank) != ms_aRankGuild.end())
+		return ms_aRankGuild[pPlayer->Acc().m_GuildRank].m_Access;
+	return 0;
+}
+
+bool GuildJob::CheckMemberAccess(CPlayer *pPlayer, int Access) const
 {
 	const int GuildID = pPlayer->Acc().m_GuildID;
 	if(GuildID > 0 && ms_aGuild.find(GuildID) != ms_aGuild.end() &&
@@ -700,6 +773,13 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 		return;
 	}
 
+	// broken its invalid guild
+	if(str_comp_nocase(GuildName, "Broken") == 0)
+	{
+		GS()->Chat(ClientID, "This name is reserved by the system!");
+		return;
+	}
+
 	// we check the availability of the guild's name
 	CSqlString<64> cGuildName = CSqlString<64>(GuildName);
 	ResultPtr pRes = SJK.SD("ID", "tw_guilds", "WHERE GuildName = '%s'", cGuildName.cstr());
@@ -731,9 +811,44 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 		SJK.ID("tw_guilds", "(ID, GuildName, OwnerID) VALUES ('%d', '%s', '%d')", InitID, cGuildName.cstr(), pPlayer->Acc().m_AuthID);
 		SJK.UDS(1000, "tw_accounts_data", "GuildID = '%d' WHERE ID = '%d'", InitID, pPlayer->Acc().m_AuthID);
 		GS()->Chat(-1, "New guilds [{STR}] have been created!", cGuildName.cstr());
+		GS()->StrongUpdateVotes(ClientID, MenuList::MAIN_MENU);
 	}
 	else 
 		GS()->Chat(ClientID, "You need first buy guild ticket on shop!");
+}
+
+void GuildJob::DisbandGuild(int GuildID)
+{
+	ResultPtr pResCheck = SJK.SD("ID", "tw_guilds", "WHERE ID = '%d'", GuildID);
+	if(!pResCheck)
+	{
+		dbg_msg("Guild", "The guild is disassembled with identifier %d, but it was not found in the e database.", GuildID);
+		return;
+	}
+
+	// clear guild data
+	const int OwnerAuthID = ms_aGuild[GuildID].m_OwnerID;
+	int BankGoldReturned = max(1, ms_aGuild[GuildID].m_Bank);
+	const int HouseID = GetGuildHouseID(GuildID);
+	if(HouseID > 0)
+		BankGoldReturned += ms_aHouseGuild[HouseID].m_Price;
+	GS()->SendInbox(OwnerAuthID, "Your guild was disbanded.", "We returned some gold from your guild.", itGold, BankGoldReturned);
+	SJK.DD("tw_guilds", "WHERE ID = '%d'", GuildID);
+	GS()->Chat(-1, "The {STR} Guild has been disbanded.", ms_aGuild[GuildID].m_aName);
+	ms_aGuild.erase(GuildID);
+	
+	// clear player guild data
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		CPlayer* pPlayer = GS()->GetPlayer(i, true);
+		if(!pPlayer || pPlayer->Acc().m_GuildID != GuildID)
+			continue;
+
+		pPlayer->Acc().m_GuildID = 0;
+		pPlayer->Acc().m_GuildRank = 0;
+		GS()->ResetVotes(i, MAIN_MENU);
+	}
+	SJK.UD("tw_accounts_data", "GuildID = NULL, GuildRank = NULL, GuildDeposit = '0' WHERE GuildID = '%d'", GuildID);
 }
 
 bool GuildJob::JoinGuild(int AuthID, int GuildID)
@@ -801,13 +916,12 @@ void GuildJob::ExitGuild(int AuthID)
 
 void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 {
+	if(!pPlayer->Acc().IsGuild())
+		return;
+	
 	// if you haven't found a guild like this, then 'Search for guilds'
 	const int ClientID = pPlayer->GetCID();
 	const int GuildID = pPlayer->Acc().m_GuildID;
-	if(ms_aGuild.find(GuildID) == ms_aGuild.end()) 
-		return ShowFinderGuilds(ClientID);
-	
-	// show the menu itself
 	const int GuildHouse = GetGuildHouseID(GuildID);
 	const int ExpNeed = kurosio::computeExperience(ms_aGuild[GuildID].m_Level);
 	GS()->AVH(ClientID, TAB_GUILD_STAT, BLUE_COLOR, "Guild name: {STR}", ms_aGuild[GuildID].m_aName);
@@ -820,11 +934,6 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Guild Bank: {INT}gold", &ms_aGuild[GuildID].m_Bank);
 	GS()->AV(ClientID, "null");
 	//
-	pPlayer->m_Colored = GOLDEN_COLOR;
-	GS()->AVL(ClientID, "null", "Players list on guild");
-	ShowGuildPlayers(pPlayer);
-	GS()->AV(ClientID, "null");
-	//
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", &pPlayer->GetItem(itGold).m_Count);
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
@@ -834,9 +943,10 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "▤ Guild system");
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
-	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_RANK, NOPE, "Settings guild Rank(s)");
-	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_INVITES, NOPE, "Invites to your guild");
+	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_PLAYERS, NOPE, "List of players");
+	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_INVITES, NOPE, "Requests membership");
 	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_HISTORY, NOPE, "History of activity");
+	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_RANK, NOPE, "Rank settings");
 	if (GuildHouse > 0)
 	{
 		GS()->AV(ClientID, "null");
@@ -846,8 +956,16 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_HOUSE_DECORATION, NOPE, "Settings Decoration(s)");
 		GS()->AVL(ClientID, "MDOOR", "Change state (\"{STR}\")", GetGuildDoor(GuildID) ? "OPEN" : "CLOSED");
 		GS()->AVL(ClientID, "MSPAWN", "Teleport to guild house");
-		GS()->AVL(ClientID, "MHOUSESELL", "Sell your guild house (in reason 777)");
+		GS()->AVL(ClientID, "MHOUSESELL", "Sell your guild house (in reason 7177)");
 	}
+	GS()->AV(ClientID, "null");
+	//
+	pPlayer->m_Colored = LIGHT_RED_COLOR;
+	GS()->AVL(ClientID, "null", "✖ Disband guild", &pPlayer->GetItem(itGold).m_Count);
+	pPlayer->m_Colored = SMALL_LIGHT_RED_COLOR;
+	GS()->AVL(ClientID, "null", "Gold spent on upgrades will not be refunded");
+	GS()->AVL(ClientID, "null", "All gold will be returned to the leader only");
+	GS()->AVL(ClientID, "MDISBAND", "Disband guild (in reason 55428)");
 	GS()->AV(ClientID, "null");
 	//
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
@@ -868,29 +986,52 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	return;
 }
 
-void GuildJob::ShowGuildPlayers(CPlayer* pPlayer)
+void GuildJob::ShowGuildPlayers(CPlayer* pPlayer, int GuildID)
 {
 	const int ClientID = pPlayer->GetCID();
-	const int GuildID = pPlayer->Acc().m_GuildID;
+	const bool SelfGuild = pPlayer->Acc().m_GuildID == GuildID;
 	int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 1000;
+
+	pPlayer->m_Colored = GOLDEN_COLOR;
+	GS()->AVL(ClientID, "null", "List players of {STR}", ms_aGuild[GuildID].m_aName);
+
 	ResultPtr pRes = SJK.SD("ID, Nick, GuildRank, GuildDeposit", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID);
 	while (pRes->next())
 	{
-		const int AuthID = pRes->getInt("ID");
-		const int RankID = pRes->getInt("GuildRank");
-		const int Deposit = pRes->getInt("GuildDeposit");
-		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "{STR} {STR} Deposit: {INT}", GetGuildRank(GuildID, RankID), pRes->getString("Nick").c_str(), &Deposit);
+		bool AllowedInteractiveWithPlayers = false;
+		const int PlayerAuthID = pRes->getInt("ID");
+		const int PlayerRankID = pRes->getInt("GuildRank");
+		const int PlayerDeposit = pRes->getInt("GuildDeposit");
+		CSqlString<32> PlayerNickname(pRes->getString("Nick").c_str());
 
-		for (auto mr : ms_aRankGuild)
+		// without access
+		if(!SelfGuild)
 		{
-			if (GuildID != mr.second.m_GuildID || RankID == mr.first)
-				continue;
-
-			GS()->AVD(ClientID, "MRANKCHANGE", AuthID, mr.first, HideID, "Change Rank to: {STR}{STR}", mr.second.m_aRank, mr.second.m_Access > 0 ? "*" : "");
+			pPlayer->m_Colored = LIGHT_GOLDEN_COLOR;
+			GS()->AVL(ClientID, "null",  "{STR} {STR} Deposit: {INT}", GetGuildRank(GuildID, PlayerRankID), PlayerNickname.cstr(), &PlayerDeposit);
+			continue;
 		}
-		GS()->AVM(ClientID, "MKICK", AuthID, HideID, "Kick");
-		if (AuthID != pPlayer->Acc().m_AuthID) 
-			GS()->AVM(ClientID, "MLEADER", AuthID, HideID, "Give Leader (in reason 134)");
+
+		// with access for interactives with players
+		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "{STR} {STR} Deposit: {INT}", GetGuildRank(GuildID, PlayerRankID), PlayerNickname.cstr(), &PlayerDeposit);
+		if(CheckMemberAccess(pPlayer, GuildAccess::ACCESS_LEADER))
+		{
+			for(auto& pRank : ms_aRankGuild)
+			{
+				if(GuildID == pRank.second.m_GuildID && PlayerRankID != pRank.first)
+					GS()->AVD(ClientID, "MRANKCHANGE", PlayerAuthID, pRank.first, HideID, "Change Rank to: {STR}{STR}", pRank.second.m_aRank, pRank.second.m_Access > 0 ? "*" : "");
+			}
+			GS()->AVM(ClientID, "MLEADER", PlayerAuthID, HideID, "Give Leader (in reason 134)");
+			AllowedInteractiveWithPlayers = true;
+		}
+		if(CheckMemberAccess(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
+		{
+			GS()->AVM(ClientID, "MKICK", PlayerAuthID, HideID, "Kick");
+			AllowedInteractiveWithPlayers = true;
+		}
+
+		if(!AllowedInteractiveWithPlayers)
+			GS()->AVM(ClientID, "null", PlayerAuthID, HideID, "You don't have rights to interact");
 		HideID++;
 	}
 }
@@ -1132,14 +1273,26 @@ int GuildJob::GetGuildPlayerCount(int GuildID)
 	FUNCTIONS MEMBER INVITE MEMBER 
 ######################################################################### */
 // add a player to the guild
-bool GuildJob::AddInviteGuild(int GuildID, int OwnerID)
+void GuildJob::SendInviteGuild(int GuildID, CPlayer *pPlayer)
 {
-	ResultPtr pRes = SJK.SD("ID", "tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'",  GuildID, OwnerID);
-	if(pRes->rowsCount() >= 1) return false;
+	const int ClientID = pPlayer->GetCID();
+	if(pPlayer->Acc().IsGuild())
+	{
+		GS()->Chat(ClientID, "You are already in the guild {STR}.", GuildName(pPlayer->Acc().m_GuildID));
+		return;
+	}
 
-	SJK.ID("tw_guilds_invites", "(GuildID, OwnerID) VALUES ('%d', '%d')", GuildID, OwnerID);
-	GS()->ChatGuild(GuildID, "{STR} send invites to join our guilds", Job()->PlayerName(OwnerID));
-	return true;
+	const int AuthID = pPlayer->Acc().m_AuthID;
+	ResultPtr pRes = SJK.SD("ID", "tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'",  GuildID, AuthID);
+	if(pRes->rowsCount() >= 1)
+	{
+		GS()->Chat(ClientID, "You have already sent a request to join this guild.");
+		return;
+	}
+
+	SJK.ID("tw_guilds_invites", "(GuildID, OwnerID) VALUES ('%d', '%d')", GuildID, AuthID);
+	GS()->ChatGuild(GuildID, "{STR} send invites to join our guilds", Job()->PlayerName(AuthID));
+	GS()->Chat(ClientID, "You sent a request to join the guild.");
 }
 
 // show the invitation sheet to our guild
@@ -1165,9 +1318,6 @@ void GuildJob::ShowInvitesGuilds(int ClientID, int GuildID)
 void GuildJob::ShowFinderGuilds(int ClientID)
 {
 	CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
-	if(!pPlayer)
-		return;
-
 	GS()->AVL(ClientID, "null", "You are not in guild!");
 	GS()->AV(ClientID, "null", "Use reason how Value."); 	
 	GS()->AV(ClientID, "null", "Example: Find guild: [], in reason name.");
@@ -1185,7 +1335,8 @@ void GuildJob::ShowFinderGuilds(int ClientID)
 		cGuildName = pRes->getString("GuildName").c_str();
 		GS()->AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} : Leader {STR} : Players [{INT}/{INT}]", 
 			cGuildName.cstr(), Job()->PlayerName(ms_aGuild[GuildID].m_OwnerID), &PlayersCount, &AvailableSlot);
-		GS()->AVM(ClientID, "null", NOPE, HideID, "House: {STR} | Bank: {INT} gold", (GetGuildHouseID(GuildID) <= 0 ? "No" : "Yes"), &ms_aGuild[ GuildID ].m_Bank);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "House: {STR} | Bank: {INT} gold", (GetGuildHouseID(GuildID) <= 0 ? "No" : "Yes"), &ms_aGuild[GuildID].m_Bank);
+		GS()->AVM(ClientID, "MINVITEVIEWPLAYERS", GuildID, HideID, "View player list");
 		GS()->AVM(ClientID, "MINVITESEND", GuildID, HideID, "Send request to join {STR}", cGuildName.cstr());
 		HideID++;
 	}
@@ -1311,8 +1462,8 @@ void GuildJob::BuyGuildHouse(int GuildID, int HouseID)
 		SJK.UD("tw_guilds_houses", "OwnerMID = '%d' WHERE ID = '%d'", GuildID, HouseID);
 
 		const char* WorldName = Server()->GetWorldName(ms_aHouseGuild[HouseID].m_WorldID);
-		GS()->Chat(-1, "{STR} buyight guild house on {STR}!", ms_aGuild[GuildID].m_aName, WorldName);
-		GS()->ChatDiscord(DC_SERVER_INFO, "Information", "{STR} buyight guild house on {STR}!", ms_aGuild[GuildID].m_aName, WorldName);
+		GS()->Chat(-1, "{STR} buyight guild house on {STR}!", GuildName(GuildID), WorldName);
+		GS()->ChatDiscord(DC_SERVER_INFO, "Information", "{STR} buyight guild house on {STR}!", GuildName(GuildID), WorldName);
 		AddHistoryGuild(GuildID, "Bought a house on '%s'.", WorldName);
 		return;
 	}

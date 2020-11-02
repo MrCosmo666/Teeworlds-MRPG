@@ -653,7 +653,7 @@ void CCharacter::Die(int Killer, int Weapon)
 	if(Weapon != WEAPON_WORLD && !GS()->IsDungeon())
 	{
 		m_pPlayer->UpdateTempData(0, 0);
-		CGS::ms_aEffects[ClientID].clear();
+		m_pPlayer->ClearEffects();
 		const int SafezoneWorldID = GS()->GetRespawnWorld();
 		if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot() && GS()->m_apPlayers[Killer])
 		{
@@ -752,8 +752,8 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 			distance(m_Core.m_Pos, pFrom->GetCharacter()->m_Core.m_Pos) < ms_PhysSize+90.0f)
 			Dmg = max(1, Dmg/3);
 
-		// TODO: Impl it
-		GiveRandomMobEffect(From);
+		// give effects from player or bot to who got damage
+		pFrom->GetCharacter()->GiveRandomEffects(m_pPlayer->GetCID());
 	}
 
 	int OldHealth = m_Health;
@@ -789,7 +789,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	if(!m_pPlayer->IsBot() && m_Health <= m_pPlayer->GetStartHealth() / 3)
 	{
 		InventoryItem& pItemPlayer = m_pPlayer->GetItem(itPotionHealthRegen);
-		if(!m_pPlayer->CheckEffect("RegenHealth") && pItemPlayer.IsEquipped())
+		if(!m_pPlayer->IsActiveEffect("RegenHealth") && pItemPlayer.IsEquipped())
 			pItemPlayer.Use(1);
 	}
 
@@ -903,12 +903,13 @@ void CCharacter::HandleEvents()
 	}
 }
 
-void CCharacter::GiveRandomMobEffect(int FromID)
+void CCharacter::GiveRandomEffects(int To)
 {
-	CPlayer* pFrom = GS()->GetPlayer(FromID);
-	if(!pFrom || !pFrom->IsBot() || pFrom->GetBotType() != BotsTypes::TYPE_BOT_MOB || BotJob::ms_aMobBot[pFrom->GetBotSub()].m_aEffect[0] == '\0')
-		return;
-	m_pPlayer->GiveEffect(BotJob::ms_aMobBot[pFrom->GetBotSub()].m_aEffect, 3+random_int()%3, 40);
+	//CPlayer* pPlayerTo = GS()->GetPlayer(To);
+	//if(!pPlayerTo && To != m_pPlayer->GetCID())
+	//	return;
+
+	// Here effects ( buffs ) from player for TO
 }
 
 bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)
@@ -953,54 +954,38 @@ void CCharacter::InteractiveRifle(vec2 Direction, vec2 ProjStartPos)
 */
 void CCharacter::HandleTuning()
 {
-	// water tuning
 	CTuningParams* pTuningParams = &m_pPlayer->m_NextTuningParams;
 
+	// skip collision
 	if(m_Core.m_LostData)
 		pTuningParams->m_PlayerCollision = 0;
 
-	if(m_pHelper->BoolIndex(TILE_WATER))
+	// behavior mobs
+	const int MobID = m_pPlayer->GetBotSub();
+	if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC || m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 	{
-		pTuningParams->m_Gravity = -0.05f;
-		pTuningParams->m_GroundFriction = 0.95f;
-		pTuningParams->m_GroundControlSpeed = 250.0f / Server()->TickSpeed();
-		pTuningParams->m_GroundControlAccel = 1.5f;
-		pTuningParams->m_AirFriction = 0.95f;
-		pTuningParams->m_AirControlSpeed = 250.0f / Server()->TickSpeed();
-		pTuningParams->m_AirControlAccel = 1.5f;
-		SetEmote(EMOTE_BLINK, 1);	
+		// walk effect
+		pTuningParams->m_GroundControlSpeed = 5.0f;
+		pTuningParams->m_GroundControlAccel = 1.0f;
 	}
-		
-	if(m_pPlayer->IsBot())
+	else if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
-		// behavior mobs
-		const int MobID = m_pPlayer->GetBotSub();
-		if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC || m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
+		// effect slower
+		if(str_comp(BotJob::ms_aMobBot[MobID].m_aBehavior, "Slime") == 0)
 		{
-			// walk effect
-			pTuningParams->m_GroundControlSpeed = 5.0f;
-			pTuningParams->m_GroundControlAccel = 1.0f;
-		}
-		else if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
-		{
-			// effect slower
-			if(str_comp(BotJob::ms_aMobBot[MobID].m_aBehavior, "Slime") == 0)
-			{
-				pTuningParams->m_Gravity = 0.25f;
-				pTuningParams->m_GroundJumpImpulse = 8.0f;
+			pTuningParams->m_Gravity = 0.25f;
+			pTuningParams->m_GroundJumpImpulse = 8.0f;
 
-				pTuningParams->m_AirFriction = 0.75f;
-				pTuningParams->m_AirControlAccel = 1.0f;
-				pTuningParams->m_AirControlSpeed = 3.75f;
-				pTuningParams->m_AirJumpImpulse = 8.0f;
+			pTuningParams->m_AirFriction = 0.75f;
+			pTuningParams->m_AirControlAccel = 1.0f;
+			pTuningParams->m_AirControlSpeed = 3.75f;
+			pTuningParams->m_AirJumpImpulse = 8.0f;
 
-				pTuningParams->m_HookFireSpeed = 30.0f;
-				pTuningParams->m_HookDragAccel = 1.5f;
-				pTuningParams->m_HookDragSpeed = 8.0f;
-				pTuningParams->m_PlayerHooking = 0;
-			}
+			pTuningParams->m_HookFireSpeed = 30.0f;
+			pTuningParams->m_HookDragAccel = 1.5f;
+			pTuningParams->m_HookDragSpeed = 8.0f;
+			pTuningParams->m_PlayerHooking = 0;
 		}
-		return;
 	}
 	
 	// flight mode
@@ -1014,13 +999,26 @@ void CCharacter::HandleTuning()
 		m_Core.m_Vel += Direction * 0.001f;
 	}
 
+	// water
+	if(m_pHelper->BoolIndex(TILE_WATER))
+	{
+		pTuningParams->m_Gravity = -0.05f;
+		pTuningParams->m_GroundFriction = 0.95f;
+		pTuningParams->m_GroundControlSpeed = 250.0f / Server()->TickSpeed();
+		pTuningParams->m_GroundControlAccel = 1.5f;
+		pTuningParams->m_AirFriction = 0.95f;
+		pTuningParams->m_AirControlSpeed = 250.0f / Server()->TickSpeed();
+		pTuningParams->m_AirControlAccel = 1.5f;
+		SetEmote(EMOTE_BLINK, 1);
+	}
+
 	// potions and buffs are different
 	HandleBuff(pTuningParams);
 }
 
 void CCharacter::HandleBuff(CTuningParams* TuningParams)
 {
-	if(m_pPlayer->CheckEffect("Slowdown"))
+	if(m_pPlayer->IsActiveEffect("Slowdown"))
 	{
 		TuningParams->m_Gravity = 0.35f;
 		TuningParams->m_GroundFriction = 0.30f;
@@ -1037,23 +1035,23 @@ void CCharacter::HandleBuff(CTuningParams* TuningParams)
 	// poisons
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
 	{	
-		if(m_pPlayer->CheckEffect("Fire"))
+		if(m_pPlayer->IsActiveEffect("Fire"))
 		{
 			const int ExplodeDamageSize = kurosio::translate_to_procent_rest(m_pPlayer->GetStartHealth(), 3);
 			GS()->CreateExplosion(m_Core.m_Pos, m_pPlayer->GetCID(), WEAPON_GRENADE, 0);
 			TakeDamage(vec2(0, 0), ExplodeDamageSize, m_pPlayer->GetCID(), WEAPON_SELF);
 		}
-		if(m_pPlayer->CheckEffect("Poison"))
+		if(m_pPlayer->IsActiveEffect("Poison"))
 		{
 			const int PoisonSize = kurosio::translate_to_procent_rest(m_pPlayer->GetStartHealth(), 3);
 			TakeDamage(vec2(0, 0), PoisonSize, m_pPlayer->GetCID(), WEAPON_SELF);
 		}
-		if(m_pPlayer->CheckEffect("RegenHealth"))
+		if(m_pPlayer->IsActiveEffect("RegenHealth"))
 		{
 			const int RestoreHealth = kurosio::translate_to_procent_rest(m_pPlayer->GetStartHealth(), 3);
 			IncreaseHealth(RestoreHealth);
 		}
-		if(m_pPlayer->CheckEffect("RegenMana"))
+		if(m_pPlayer->IsActiveEffect("RegenMana"))
 		{
 			const int RestoreMana = kurosio::translate_to_procent_rest(m_pPlayer->GetStartMana(), 5);
 			IncreaseMana(RestoreMana);
@@ -1164,7 +1162,7 @@ bool CCharacter::CheckFailMana(int Mana)
 	}
 
 	m_Mana -= Mana;
-	if(m_Mana <= m_pPlayer->GetStartMana() / 5 && !m_pPlayer->CheckEffect("RegenMana") && m_pPlayer->GetItem(itPotionManaRegen).IsEquipped())
+	if(m_Mana <= m_pPlayer->GetStartMana() / 5 && !m_pPlayer->IsActiveEffect("RegenMana") && m_pPlayer->GetItem(itPotionManaRegen).IsEquipped())
 		m_pPlayer->GetItem(itPotionManaRegen).Use(1);
 
 	m_pPlayer->ShowInformationStats();

@@ -78,7 +78,7 @@ void CPlayer::Tick()
 		if(m_pCharacter->IsAlive())
 		{
 			m_ViewPos = m_pCharacter->GetPos();
-			PotionsTick();
+			EffectsTick();
 		}
 	}
 	else if (m_Spawned && m_aPlayerTick[TickState::Respawn] + Server()->TickSpeed() * 3 <= Server()->Tick())
@@ -87,34 +87,35 @@ void CPlayer::Tick()
 	TickSystemTalk();
 }
 
-void CPlayer::PotionsTick()
-{
-	if (Server()->Tick() % Server()->TickSpeed() != 0)
-		return;
-
-	// TODO: change it
-	for (auto ieffect = CGS::ms_aEffects[m_ClientID].begin(); ieffect != CGS::ms_aEffects[m_ClientID].end();)
-	{
-		ieffect->second--;
-		if (ieffect->second <= 0)
-		{
-			GS()->Chat(m_ClientID, "You lost the effect {STR}.", ieffect->first.c_str());
-			GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, ieffect->first.c_str(), false);
-			ieffect = CGS::ms_aEffects[m_ClientID].erase(ieffect);
-			continue;
-		}
-		++ieffect;
-	}	
-}
-
 void CPlayer::PostTick()
 {
 	// update latency value
 	if (Server()->ClientIngame(m_ClientID) && GS()->IsPlayerEqualWorldID(m_ClientID) && IsAuthed())
 		GetTempData().m_TempPing = (short)m_Latency.m_Min;
 
-	// update tuning params
+	// update player tick
 	HandleTuningParams();
+	TickSystemTalk();
+	EffectsTick();
+}
+
+void CPlayer::EffectsTick()
+{
+	if(Server()->Tick() % Server()->TickSpeed() != 0)
+		return;
+
+	for(auto pEffect = CGS::ms_aEffects[m_ClientID].begin(); pEffect != CGS::ms_aEffects[m_ClientID].end();)
+	{
+		pEffect->second--;
+		if(pEffect->second <= 0)
+		{
+			GS()->Chat(m_ClientID, "You lost the effect {STR}.", pEffect->first.c_str());
+			GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, pEffect->first.c_str(), false);
+			pEffect = CGS::ms_aEffects[m_ClientID].erase(pEffect);
+			continue;
+		}
+		++pEffect;
+	}
 }
 
 void CPlayer::TickSystemTalk()
@@ -379,6 +380,16 @@ void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
 	}
 }
 
+bool CPlayer::IsActiveEffect(const char* Potion) const
+{
+	return CGS::ms_aEffects[m_ClientID].find(Potion) != CGS::ms_aEffects[m_ClientID].end();
+}
+
+void CPlayer::ClearEffects()
+{
+	CGS::ms_aEffects[m_ClientID].clear();
+}
+
 const char *CPlayer::GetLanguage() const
 {
 	return Server()->GetClientLanguage(m_ClientID);
@@ -421,14 +432,6 @@ void CPlayer::AddExp(int Exp)
 void CPlayer::AddMoney(int Money) 
 { 
 	GetItem(itGold).Add(Money); 
-}
-
-bool CPlayer::CheckEffect(const char* Potion)
-{
-	if(CGS::ms_aEffects[m_ClientID].find(Potion) != CGS::ms_aEffects[m_ClientID].end())
-		return true;
-
-	return false;
 }
 
 bool CPlayer::GetHidenMenu(int HideID) const

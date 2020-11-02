@@ -77,8 +77,7 @@ public:
 	/* #########################################################################
 		SWAP GAMECONTEX DATA 
 	######################################################################### */
-	// - - - - - - - - - - - -
-	static std::map < int, std::map < std::string, int > > ms_aEffects;
+	static std::map < std::string /* effect */, int /* seconds */ > ms_aEffects[MAX_PLAYERS];
 	// - - - - - - - - - - - -
 	struct StructAttribut
 	{
@@ -220,6 +219,7 @@ private:
 	static void ConParseSkin(IConsole::IResult *pResult, void *pUserData);
 	static void ConGiveItem(IConsole::IResult *pResult, void *pUserData);
 	static void ConRemItem(IConsole::IResult* pResult, void* pUserData);
+	static void ConDisbandGuild(IConsole::IResult* pResult, void* pUserData);
 	static void ConSay(IConsole::IResult *pResult, void *pUserData);
 	static void ConAddCharacter(IConsole::IResult *pResult, void *pUserData);
 	static void ConConvertPasswords(IConsole::IResult* pResult, void* pUserData);

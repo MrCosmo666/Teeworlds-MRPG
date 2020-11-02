@@ -52,7 +52,6 @@ protected:
 
 	IServer* Server() const;
 	int m_ClientID;
-	void PotionsTick();
 	void HandleTuningParams();
 
 public:
@@ -83,8 +82,6 @@ public:
 	CVoteOptionsCallback m_ActiveMenuOptionCallback;
 	VoteCallBack m_ActiveMenuRegisteredCallback;
 
-private:
-
 	/* #########################################################################
 		FUNCTIONS PLAYER ENGINE
 	######################################################################### */
@@ -111,11 +108,16 @@ public:
 	virtual void UpdateTempData(int Health, int Mana);
 	virtual void SendClientInfo(int TargetID);
 
+	virtual void GiveEffect(const char* Potion, int Sec, int Random = 0);
+	virtual bool IsActiveEffect(const char* Potion) const;
+	virtual void ClearEffects();
+
 	virtual void Tick();
 	virtual void PostTick();
 	virtual void Snap(int SnappingClient);
 	
 private:
+	void EffectsTick();
 	void TickSystemTalk();
 	virtual void TryRespawn();
 
@@ -138,12 +140,10 @@ public:
 		FUNCTIONS PLAYER ACCOUNT 
 	######################################################################### */
 	bool SpendCurrency(int Price, int ItemID = 1);
-	void GiveEffect(const char* Potion, int Sec, int Random = 0);
 	const char* GetLanguage() const;
 	void AddExp(int Exp);
 	void AddMoney(int Money);
 
-	bool CheckEffect(const char* Potion);
 	bool GetHidenMenu(int HideID) const;
 	bool IsAuthed();
 	int GetStartTeam();

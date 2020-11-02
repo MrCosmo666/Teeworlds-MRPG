@@ -6,6 +6,9 @@
 #include <game/server/mmocore/GameEntities/decoration_houses.h>
 #include "../MmoComponent.h"
 
+/* TODO:
+	Need refactoring it in two parts, the system and the game part
+*/
 class GuildDoor;
 class GuildJob : public MmoComponent
 {
@@ -61,17 +64,21 @@ private:
 	std::string UpgradeNames(int Field, bool DataTable = false);
 
 public:
+	int SearchGuildByName(const char* pGuildName) const;
+
 	const char *GuildName(int GuildID) const;
-	bool IsLeaderPlayer(CPlayer *pPlayer, int Access = GuildAccess::ACCESS_LEADER) const;
+	int GetMemberAccess(CPlayer *pPlayer) const;
+	bool CheckMemberAccess(CPlayer *pPlayer, int Access = GuildAccess::ACCESS_LEADER) const;
 	int GetMemberChairBonus(int GuildID, int Field) const;
 
 	void CreateGuild(int ClientID, const char *GuildName);
+	void DisbandGuild(int GuildID);
 	bool JoinGuild(int AuthID, int GuildID);
 	void ExitGuild(int AuthID);
 
 private:
 	void ShowMenuGuild(CPlayer *pPlayer);
-	void ShowGuildPlayers(CPlayer *pPlayer);
+	void ShowGuildPlayers(CPlayer *pPlayer, int GuildID);
 
 public:
 	void AddExperience(int GuildID);	
@@ -103,7 +110,7 @@ public:
 private:
 	void ShowInvitesGuilds(int ClientID, int GuildID);
 	void ShowFinderGuilds(int ClientID);
-	bool AddInviteGuild(int GuildID, int OwnerID);
+	void SendInviteGuild(int GuildID, CPlayer* pPlayer);
 
 	void ShowHistoryGuild(int ClientID, int GuildID);
 	void AddHistoryGuild(int GuildID, const char *Buffer, ...);
