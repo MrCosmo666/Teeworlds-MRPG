@@ -48,6 +48,7 @@ void CGameControllerDungeon::KillAllPlayers()
 
 void CGameControllerDungeon::ChangeState(int State)
 {
+	DungeonJob::ms_aDungeon[m_DungeonID].m_State = State;
 	m_StateDungeon = State;
 
 	// - - - - - - - - - - - - - - - - - - - - - -
@@ -69,7 +70,7 @@ void CGameControllerDungeon::ChangeState(int State)
 	// used when changing state to waiting start
 	else if (State == DUNGEON_WAITING_START)
 	{
-		m_SyncDungeon = GS()->Mmo()->Dungeon()->SyncFactor();
+		m_SyncDungeon = GetSyncFactor();
 		m_StartingTick = Server()->TickSpeed() * g_Config.m_SvTimeWaitingsDungeon;
 		SetMobsSpawn(false);
 	}
@@ -134,22 +135,14 @@ void CGameControllerDungeon::StateTick()
 	// - - - - - - - - - - - - - - - - - - - - - -
 	// dungeon
 	const int Players = PlayersNum();
+	DungeonJob::ms_aDungeon[m_DungeonID].m_Players = Players;
 	if (Players < 1 && m_StateDungeon != DUNGEON_WAITING)
 		ChangeState(DUNGEON_WAITING);
-
-	// - - - - - - - - - - - - - - - - - - - - - -
-	// update every second
-	if (Server()->Tick() % Server()->TickSpeed() == 0)
-	{
-		DungeonJob::ms_aDungeon[m_DungeonID].m_Players = Players;
-		DungeonJob::ms_aDungeon[m_DungeonID].m_State = m_StateDungeon;
-	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
 	// used in tick when waiting
 	if (m_StateDungeon == DUNGEON_WAITING)
 	{
-		m_StartedPlayers = Players;
 		if (Players >= 1)
 			ChangeState(DUNGEON_WAITING_START);
 	}
@@ -179,8 +172,11 @@ void CGameControllerDungeon::StateTick()
 			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon waiting {INT} sec!\nPlayer's are ready to start right now {INT} of {INT}!\nYou can change state with 'Vote yes'", &Time, &PlayersReadyState, &Players);
 
 			m_StartingTick--;
-			if (!m_StartingTick)
+			if(!m_StartingTick)
+			{
+				m_StartedPlayers = Players;
 				ChangeState(DUNGEON_STARTED);
+			}
 		}
 	}
 
@@ -404,6 +400,55 @@ void CGameControllerDungeon::SelectTankPlayer()
 	}
 }
 
+// TODO: something to do with the balance
+int CGameControllerDungeon::GetSyncFactor() const
+{
+	int MaxFactor = 0;
+	int MinFactor = INT_MAX;
+	for(int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
+	{
+		CPlayerBot* pBotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
+		if(!pBotPlayer || pBotPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB || pBotPlayer->GetPlayerWorldID() != m_WorldID)
+			continue;
+
+		int LevelDisciple = pBotPlayer->GetLevelAllAttributes();
+		MinFactor = min(MinFactor, LevelDisciple);
+		MaxFactor = max(MaxFactor, LevelDisciple);
+	}
+	return (MaxFactor + MinFactor) / 2;
+}
+
+int CGameControllerDungeon::GetAttributeDungeonSync(CPlayer* pPlayer, int BonusID) const
+{
+	float Percent = 0.0f;
+	int AttributeType = CGS::ms_aAttributsInfo[BonusID].m_Type;
+
+	// - - - - - - - - -- - - -
+	// balance tanks
+	if(pPlayer->m_MoodState == MOOD_PLAYER_TANK)
+	{
+		float ActiveAttribute = m_SyncDungeon / 2.0f;
+		if(AttributeType == AtributType::AtTank)
+			Percent = 25.0f;
+
+		const int AttributeSyncProcent = kurosio::translate_to_procent_rest(ActiveAttribute, Percent);
+		return max(AttributeSyncProcent, 1);
+	}
+
+	// - - - - - - - - -- - - -
+	// balance healer damage divides the average attribute into the number of players
+	float ActiveAttribute = m_SyncDungeon / m_StartedPlayers;
+	if(AttributeType == AtributType::AtHealer)
+		Percent = min(20.0f + (m_StartedPlayers * 2.0f), 35.0f);
+	else if(AttributeType == AtributType::AtTank)
+		Percent = 5.0f;
+	else if(AttributeType == AtributType::AtHardtype || AttributeType == AtributType::AtDps)
+		Percent = 0.1f;
+
+	const int AttributeSyncProcent = kurosio::translate_to_procent_rest(ActiveAttribute, Percent);
+	return max(AttributeSyncProcent, 1);
+}
+
 void CGameControllerDungeon::Tick()
 {
 	if (m_MaximumTick)
@@ -449,44 +494,11 @@ bool CGameControllerDungeon::OnEntity(int Index, vec2 Pos)
 	return false;
 }
 
-// TODO: something to do with the balance
-int CGameControllerDungeon::GetAttributeDungeonSync(CPlayer* pPlayer, int BonusID) const
-{
-	float Percent = 0.0f;
-	int AttributeType = CGS::ms_aAttributsInfo[BonusID].m_Type;
-
-	// - - - - - - - - -- - - -
-	// balance tanks
-	if(pPlayer->m_MoodState == MOOD_PLAYER_TANK)
-	{
-		float ActiveAttribute = m_SyncDungeon / 2.0f;
-		if(AttributeType == AtributType::AtTank)
-			Percent = 25.0f;
-
-		const int AttributeSyncProcent = kurosio::translate_to_procent_rest(ActiveAttribute, Percent);
-		return max(AttributeSyncProcent, 1);
-	}
-
-	// - - - - - - - - -- - - -
-	// balance healer damage divides the average attribute into the number of players
-	float ActiveAttribute = m_SyncDungeon / m_StartedPlayers;
-	if(AttributeType == AtributType::AtHealer)
-		Percent = min(20.0f + (m_StartedPlayers * 2.0f), 35.0f);
-	else if(AttributeType == AtributType::AtTank)
-		Percent = 5.0f;
-	else if(AttributeType == AtributType::AtHardtype || AttributeType == AtributType::AtDps)
-		Percent = 0.1f;
-
-	const int AttributeSyncProcent = kurosio::translate_to_procent_rest(ActiveAttribute, Percent);
-	return max(AttributeSyncProcent, 1);
-}
-
 DungeonDoor::DungeonDoor(CGameWorld *pGameWorld, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DUNGEON_DOOR, Pos)
 {
 	m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, 'y', '-');
 	m_Pos.y += 30;
-
 	m_State = DUNGEON_WAITING;
 	GameWorld()->InsertEntity(this);
 }

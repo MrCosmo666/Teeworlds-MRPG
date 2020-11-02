@@ -41,6 +41,5 @@ public:
 	void ShowDungeonsList(CPlayer* pPlayer, bool Story);
 	void CheckQuestingOpened(CPlayer* pPlayer, int QuestID);
 	void ShowTankVotingDungeon(CPlayer* pPlayer);
-	int SyncFactor();
 };
 #endif

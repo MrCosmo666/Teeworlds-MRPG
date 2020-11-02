@@ -231,20 +231,3 @@ void DungeonJob::CheckQuestingOpened(CPlayer *pPlayer, int QuestID)
 			GS()->Chat(-1, "{STR} opened dungeon ({STR})!", Server()->ClientName(ClientID), dungeon.second.m_aName);
 	}
 }
-
-int DungeonJob::SyncFactor()
-{
-	int MaxFactor = 0;
-	int MinFactor = INT_MAX;
-	for (int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
-	{
-		CPlayerBot* pBotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
-		if(!pBotPlayer || pBotPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB || pBotPlayer->GetPlayerWorldID() != GS()->GetWorldID())
-			continue;
-
-		int LevelDisciple = pBotPlayer->GetLevelAllAttributes();
-		MinFactor = min(MinFactor, LevelDisciple);
-		MaxFactor = max(MaxFactor, LevelDisciple);
-	}
-	return (MaxFactor + MinFactor) / 2;
-}
