@@ -86,7 +86,7 @@ public:
 	virtual void TickPaused();
 	virtual void Snap(int SnappingClient);
 	virtual void PostSnap();
-	virtual bool Spawn(class CPlayer *pPlayer, vec2 Pos);
+	virtual bool Spawn(class CPlayer* pPlayer, vec2 Pos);
 	virtual bool TakeDamage(vec2 Force, int Dmg, int From, int Weapon);
 	virtual void Die(int Killer, int Weapon);
 
@@ -95,6 +95,7 @@ public:
 	void ResetInput();
 	bool IsGrounded();
 
+	virtual void GiveRandomEffects(int To);
 	bool IsAllowedPVP(int FromID);
 	bool IsAlive() const { return m_Alive; }
 	void SetEvent(int EventID) { m_Event = EventID; };
@@ -112,7 +113,6 @@ public:
 	void CreateSnapProj(int SnapID, int Count, int TypeID, bool Dynamic, bool Projectile);
 	void RemoveSnapProj(int Count, int SnapID, bool Effect = false);
 	
-	void GiveRandomMobEffect(int FromID);
 	void ChangePosition(vec2 NewPos);
 	void ResetDoorPos();
 	void UpdateEquipingStats(int ItemID);

@@ -74,8 +74,8 @@ bool CPlayerQuest::Accept()
 	const int ClientID = m_pPlayer->GetCID();
 	const int StorySize = Info().GetStoryCount();
 	const int StoryProgress = Info().GetStoryCount(m_QuestID + 1);
-	pGS->Chat(ClientID, "Quest: {STR} - {STR} {INT}/{INT}!", Info().GetStory(), Info().GetName(), &StoryProgress, &StorySize);
-	pGS->Chat(ClientID, "Receive a reward Gold {INT}, Experience {INT}", &Info().m_Gold, &Info().m_Exp);
+	pGS->Chat(ClientID, "Accepted the quest ({STR} - {STR} {INT}/{INT})!", Info().GetStory(), Info().GetName(), &StoryProgress, &StorySize);
+	pGS->Chat(ClientID, "Reward for completing (Gold {INT}, Experience {INT})!", &Info().m_Gold, &Info().m_Exp);
 	//pPlayer->GetCharacter()->CreateQuestsStep(QuestID);
 	pGS->CreatePlayerSound(ClientID, SOUND_CTF_CAPTURE);
 	return true;
@@ -99,7 +99,7 @@ void CPlayerQuest::Finish()
 	const int ClientID = m_pPlayer->GetCID();
 	m_pPlayer->AddMoney(Info().m_Gold);
 	m_pPlayer->AddExp(Info().m_Exp);
-	pGS->Chat(-1, "{STR} completed: {STR} - {STR}!", pGS->Server()->ClientName(ClientID), Info().m_aStoryLine, Info().m_aName);
+	pGS->Chat(-1, "{STR} completed ({STR} - {STR})!", pGS->Server()->ClientName(ClientID), Info().m_aStoryLine, Info().m_aName);
 	pGS->ChatDiscord(DC_PLAYER_INFO, pGS->Server()->ClientName(ClientID), "Completed ({STR} - {STR})", Info().m_aStoryLine, Info().m_aName);
 
 	// check whether the after quest has opened something new

@@ -44,12 +44,18 @@ public:
 	int GetEquippedItemID(int EquipID, int SkipItemID = -1) const override;
 	int GetAttributeCount(int BonusID, bool Really = false) override;
 
+	void GiveEffect(const char* Potion, int Sec, int Random = 0) override;
+	bool IsActiveEffect(const char* Potion) const override;
+	void ClearEffects() override;
+
 	void Tick() override;
 	void PostTick() override;
 	void Snap(int SnappingClient) override;
 	void SetDungeonAllowedSpawn(bool Spawn) { m_DungeonAllowedSpawn = Spawn; };
-	
+
 private:
+	std::map < std::string /* effect */, int /* seconds */ > m_aEffects;
+	void EffectsTick();
 	void TryRespawn() override;
 
 	int GetBotLevel() const;

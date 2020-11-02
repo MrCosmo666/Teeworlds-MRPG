@@ -77,8 +77,7 @@ public:
 	/* #########################################################################
 		SWAP GAMECONTEX DATA 
 	######################################################################### */
-	// - - - - - - - - - - - -
-	static std::map < int, std::map < std::string, int > > ms_aEffects;
+	static std::map < std::string /* effect */, int /* seconds */ > ms_aEffects[MAX_PLAYERS];
 	// - - - - - - - - - - - -
 	struct StructAttribut
 	{

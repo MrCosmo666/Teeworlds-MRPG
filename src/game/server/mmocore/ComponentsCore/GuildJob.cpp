@@ -187,7 +187,7 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 	if(PPSTR(CMD, "MHOUSESELL") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_LEADER) || Get != 55428)
+		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_LEADER) || Get != 7177)
 		{
 			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
 			return true;
@@ -201,7 +201,7 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 	if(PPSTR(CMD, "MDISBAND") == 0)
 	{
 		const int GuildID = pPlayer->Acc().m_GuildID;
-		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_LEADER) || Get != 777)
+		if(GuildID <= 0 || !CheckMemberAccess(pPlayer, GuildAccess::ACCESS_LEADER) || Get != 55428)
 		{
 			GS()->Chat(ClientID, "You have no access, or you are not a member of the guild.");
 			return true;
@@ -948,7 +948,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_HOUSE_DECORATION, NOPE, "Settings Decoration(s)");
 		GS()->AVL(ClientID, "MDOOR", "Change state (\"{STR}\")", GetGuildDoor(GuildID) ? "OPEN" : "CLOSED");
 		GS()->AVL(ClientID, "MSPAWN", "Teleport to guild house");
-		GS()->AVL(ClientID, "MHOUSESELL", "Sell your guild house (in reason 777)");
+		GS()->AVL(ClientID, "MHOUSESELL", "Sell your guild house (in reason 7177)");
 	}
 	GS()->AVL(ClientID, "MDISBAND", "Disband guild (in reason 55428)");
 	GS()->AV(ClientID, "null");

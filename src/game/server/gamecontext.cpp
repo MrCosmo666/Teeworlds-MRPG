@@ -27,8 +27,8 @@
 #include <teeother/components/localization.h>
 
 // static data that have the same value in different objects
-std::map < int , CGS::StructAttribut > CGS::ms_aAttributsInfo;
-std::map < int , std::map < std::string , int > > CGS::ms_aEffects;
+std::map < int, CGS::StructAttribut > CGS::ms_aAttributsInfo;
+std::map < std::string, int > CGS::ms_aEffects[MAX_PLAYERS];
 int CGS::m_MultiplierExp = 100;
 
 enum
@@ -1092,9 +1092,9 @@ void CGS::OnTick()
 			continue;
 
 		m_apPlayers[i]->Tick();
+		m_apPlayers[i]->PostTick();
 		if(i < MAX_PLAYERS)
 		{
-			m_apPlayers[i]->PostTick();
 			BroadcastTick(i);
 		}
 	}
@@ -1575,7 +1575,7 @@ void CGS::ClearClientData(int ClientID)
 {
 	Mmo()->ResetClientData(ClientID);
 	m_aPlayerVotes[ClientID].clear();
-	ms_aEffects.erase(ClientID);
+	ms_aEffects[ClientID].clear();
 
 	// clear active snap bots for player
 	for(auto& pActiveSnap : BotJob::ms_aDataBot)

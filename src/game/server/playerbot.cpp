@@ -65,8 +65,27 @@ void CPlayerBot::Tick()
 
 void CPlayerBot::PostTick()
 {
-	// update tuning params
+	// update playerbot tick
 	HandleTuningParams();
+	EffectsTick();
+}
+
+void CPlayerBot::EffectsTick()
+{
+	if(Server()->Tick() % Server()->TickSpeed() != 0)
+		return;
+
+	for(auto pEffect = m_aEffects.begin(); pEffect != m_aEffects.end();)
+	{
+		pEffect->second--;
+		if(pEffect->second <= 0)
+		{
+			GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, pEffect->first.c_str(), false);
+			pEffect = m_aEffects.erase(pEffect);
+			continue;
+		}
+		++pEffect;
+	}
 }
 
 int CPlayerBot::GetStartHealth()
@@ -104,6 +123,28 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 	}
 
 	return AttributeEx;
+}
+
+void CPlayerBot::GiveEffect(const char* Potion, int Sec, int Random)
+{
+	if(!m_pCharacter || !m_pCharacter->IsAlive())
+		return;
+
+	if((Random && rand() % Random == 0) || !Random)
+	{
+		m_aEffects[Potion] = Sec;
+		GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, Potion, true);
+	}
+}
+
+bool CPlayerBot::IsActiveEffect(const char* Potion) const
+{
+	return m_aEffects.find(Potion) != m_aEffects.end();
+}
+
+void CPlayerBot::ClearEffects()
+{
+	m_aEffects.clear();
 }
 
 void CPlayerBot::TryRespawn()

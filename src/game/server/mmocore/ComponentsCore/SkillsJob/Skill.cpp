@@ -7,10 +7,7 @@
 #include <game/server/mmocore/GameEntities/Skills/sleepygravity/sleepygravity.h>
 #include <game/server/mmocore/GameEntities/Skills/noctislucisteleport/noctis_teleport.h>
 
-CSkillInformation& CSkill::Info() const 
-{ 
-	return SkillsJob::ms_aSkillsData[m_SkillID]; 
-}
+CSkillInformation& CSkill::Info() const { return SkillsJob::ms_aSkillsData[m_SkillID]; }
 
 void CSkill::SetSkillOwner(CPlayer* pPlayer)
 {
