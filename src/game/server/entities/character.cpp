@@ -960,19 +960,6 @@ void CCharacter::HandleTuning()
 	if(m_Core.m_LostData)
 		pTuningParams->m_PlayerCollision = 0;
 
-	// water
-	if(m_pHelper->BoolIndex(TILE_WATER))
-	{
-		pTuningParams->m_Gravity = -0.05f;
-		pTuningParams->m_GroundFriction = 0.95f;
-		pTuningParams->m_GroundControlSpeed = 250.0f / Server()->TickSpeed();
-		pTuningParams->m_GroundControlAccel = 1.5f;
-		pTuningParams->m_AirFriction = 0.95f;
-		pTuningParams->m_AirControlSpeed = 250.0f / Server()->TickSpeed();
-		pTuningParams->m_AirControlAccel = 1.5f;
-		SetEmote(EMOTE_BLINK, 1);	
-	}
-
 	// behavior mobs
 	const int MobID = m_pPlayer->GetBotSub();
 	if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC || m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
@@ -1010,6 +997,19 @@ void CCharacter::HandleTuning()
 
 		vec2 Direction = vec2(m_Core.m_Input.m_TargetX, m_Core.m_Input.m_TargetY);
 		m_Core.m_Vel += Direction * 0.001f;
+	}
+
+	// water
+	if(m_pHelper->BoolIndex(TILE_WATER))
+	{
+		pTuningParams->m_Gravity = -0.05f;
+		pTuningParams->m_GroundFriction = 0.95f;
+		pTuningParams->m_GroundControlSpeed = 250.0f / Server()->TickSpeed();
+		pTuningParams->m_GroundControlAccel = 1.5f;
+		pTuningParams->m_AirFriction = 0.95f;
+		pTuningParams->m_AirControlSpeed = 250.0f / Server()->TickSpeed();
+		pTuningParams->m_AirControlAccel = 1.5f;
+		SetEmote(EMOTE_BLINK, 1);
 	}
 
 	// potions and buffs are different
