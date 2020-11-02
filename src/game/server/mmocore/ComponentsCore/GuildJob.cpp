@@ -828,7 +828,7 @@ void GuildJob::DisbandGuild(int GuildID)
 
 	// clear guild data
 	const int OwnerAuthID = ms_aGuild[GuildID].m_OwnerID;
-	int BankGoldReturned = ms_aGuild[GuildID].m_Bank;
+	int BankGoldReturned = max(1, ms_aGuild[GuildID].m_Bank);
 	const int HouseID = GetGuildHouseID(GuildID);
 	if(HouseID > 0)
 		BankGoldReturned += ms_aHouseGuild[HouseID].m_Price;
