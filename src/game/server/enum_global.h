@@ -12,6 +12,7 @@
 #define LIGHT_GOLDEN_COLOR vec3(16, 7, 0)
 #define RED_COLOR vec3(40, 15, 15)
 #define LIGHT_RED_COLOR vec3(16, 7, 5)
+#define SMALL_LIGHT_RED_COLOR vec3(10, 5, 3)
 #define BLUE_COLOR vec3(10, 22, 40)
 #define LIGHT_BLUE_COLOR vec3(2, 7, 16)
 #define PURPLE_COLOR vec3(32, 10, 40)

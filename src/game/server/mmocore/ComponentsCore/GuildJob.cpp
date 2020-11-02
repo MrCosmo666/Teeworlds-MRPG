@@ -166,7 +166,7 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 		SJK.UD("tw_guilds", "OwnerID = '%d' WHERE ID = '%d'", SelectedAccountID, GuildID);
 		AddHistoryGuild(GuildID, "New guild leader '%s'.", Job()->PlayerName(SelectedAccountID));
 		GS()->ChatGuild(GuildID, "Change leader {STR}->{STR}", Server()->ClientName(ClientID), Job()->PlayerName(SelectedAccountID));
-		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_PLAYERS);
 		return true;
 	}
 
@@ -207,7 +207,7 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 			return true;
 		}
 
-		SellGuildHouse(GuildID);
+		DisbandGuild(GuildID);
 		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD);
 		return true;
 	}
@@ -296,7 +296,7 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 
 		// change rank and clear the menu
 		ChangePlayerRank(VoteID, VoteID2);
-		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_PLAYERS);
 		return true;
 	}
 
@@ -313,7 +313,7 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 		}
 
 		ExitGuild(VoteID);
-		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
+		GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_PLAYERS);
 		return true;
 	}
 
@@ -332,6 +332,7 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 			SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
 			GS()->SendInbox(SenderID, ms_aGuild[GuildID].m_aName, "You were accepted to join guild");
 			GS()->StrongUpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
+			GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_PLAYERS);
 			return true;
 		}
 		GS()->Chat(ClientID, "You can't accept (there are no free slot or he is already in Guild).");
@@ -571,6 +572,14 @@ bool GuildJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		return true;
 	}
 
+	if(Menulist == MenuList::MENU_GUILD_PLAYERS)
+	{
+		pPlayer->m_LastVoteMenu = MenuList::MENU_GUILD;
+		ShowGuildPlayers(pPlayer, pPlayer->Acc().m_GuildID);
+		GS()->AddBackpage(ClientID);
+		return true;
+	}
+
 	if(Menulist == MenuList::MENU_GUILD_HISTORY)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_GUILD;
@@ -802,6 +811,7 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 		SJK.ID("tw_guilds", "(ID, GuildName, OwnerID) VALUES ('%d', '%s', '%d')", InitID, cGuildName.cstr(), pPlayer->Acc().m_AuthID);
 		SJK.UDS(1000, "tw_accounts_data", "GuildID = '%d' WHERE ID = '%d'", InitID, pPlayer->Acc().m_AuthID);
 		GS()->Chat(-1, "New guilds [{STR}] have been created!", cGuildName.cstr());
+		GS()->StrongUpdateVotes(ClientID, MenuList::MAIN_MENU);
 	}
 	else 
 		GS()->Chat(ClientID, "You need first buy guild ticket on shop!");
@@ -924,9 +934,6 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Guild Bank: {INT}gold", &ms_aGuild[GuildID].m_Bank);
 	GS()->AV(ClientID, "null");
 	//
-	ShowGuildPlayers(pPlayer, GuildID);
-	GS()->AV(ClientID, "null");
-	//
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", &pPlayer->GetItem(itGold).m_Count);
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
@@ -936,9 +943,10 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "▤ Guild system");
 	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
-	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_RANK, NOPE, "Settings guild Rank(s)");
-	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_INVITES, NOPE, "Invites to your guild");
+	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_PLAYERS, NOPE, "List of players");
+	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_INVITES, NOPE, "Requests membership");
 	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_HISTORY, NOPE, "History of activity");
+	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_RANK, NOPE, "Rank settings");
 	if (GuildHouse > 0)
 	{
 		GS()->AV(ClientID, "null");
@@ -950,6 +958,13 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 		GS()->AVL(ClientID, "MSPAWN", "Teleport to guild house");
 		GS()->AVL(ClientID, "MHOUSESELL", "Sell your guild house (in reason 7177)");
 	}
+	GS()->AV(ClientID, "null");
+	//
+	pPlayer->m_Colored = LIGHT_RED_COLOR;
+	GS()->AVL(ClientID, "null", "✖ Disband guild", &pPlayer->GetItem(itGold).m_Count);
+	pPlayer->m_Colored = SMALL_LIGHT_RED_COLOR;
+	GS()->AVL(ClientID, "null", "Gold spent on upgrades will not be refunded");
+	GS()->AVL(ClientID, "null", "All gold will be returned to the leader only");
 	GS()->AVL(ClientID, "MDISBAND", "Disband guild (in reason 55428)");
 	GS()->AV(ClientID, "null");
 	//
