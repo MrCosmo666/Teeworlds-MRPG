@@ -220,6 +220,7 @@ private:
 	static void ConParseSkin(IConsole::IResult *pResult, void *pUserData);
 	static void ConGiveItem(IConsole::IResult *pResult, void *pUserData);
 	static void ConRemItem(IConsole::IResult* pResult, void* pUserData);
+	static void ConDisbandGuild(IConsole::IResult* pResult, void* pUserData);
 	static void ConSay(IConsole::IResult *pResult, void *pUserData);
 	static void ConAddCharacter(IConsole::IResult *pResult, void *pUserData);
 	static void ConConvertPasswords(IConsole::IResult* pResult, void* pUserData);

@@ -58,6 +58,10 @@
 	{
 		"key": "Guild",
 		"value": "Гильдия"
+	},	
+	{
+		"key": "Guild finder",
+		"value": "Поиск гильдии"
 	},
 	{
 		"key": "House",
@@ -130,10 +134,6 @@
 	{
 		"key": "Chance & Loot Information",
 		"value": "Инфopмaция o шaнcax и дoбычe"
-	},
-	{
-		"key": "Here you can see chance loot, mobs, on YOUR ZONE.",
-		"value": "Шaнc дpoпa, cпaвнa в BAШEЙ зoнe."
 	},
 	{
 		"key": "There are no active mobs in your zone!",
