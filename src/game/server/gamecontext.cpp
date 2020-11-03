@@ -1641,7 +1641,7 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 void CGS::ConDisbandGuild(IConsole::IResult* pResult, void* pUserData)
 {
 	IServer* pServer = (IServer*)pUserData;
-	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetClientWorldID(MAIN_WORLD_ID));
+	CGS* pSelf = (CGS*)pServer->GameServer(MAIN_WORLD_ID);
 	const char* pGuildName = pResult->GetString(0);
 	const int GuildID = pSelf->Mmo()->Member()->SearchGuildByName(pGuildName);
 
