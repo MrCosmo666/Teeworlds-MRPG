@@ -94,6 +94,7 @@ public:
 	######################################################################### */
 	class CCharacter *GetPlayerChar(int ClientID);
 	CPlayer *GetPlayer(int ClientID, bool CheckAuthed = false, bool CheckCharacter = false);
+	CPlayer *GetPlayerFromAuthID(int AuthID);
 	std::unique_ptr<char[]> LevelString(int MaxValue, int CurrentValue, int Step, char toValue, char fromValue);
 	ItemInformation &GetItemInfo(int ItemID) const;
 	CDataQuest &GetQuestInfo(int QuestID) const;

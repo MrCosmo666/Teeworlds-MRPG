@@ -32,16 +32,6 @@ int AccountMainJob::SendAuthCode(int ClientID, int Code)
 	return Code;
 }
 
-int AccountMainJob::CheckOnlineAccount(int AuthID) const
-{
-	for (const auto& dt : AccountMainJob::ms_aData)
-	{
-		if (dt.second.m_AuthID == AuthID && GS()->m_apPlayers[dt.first])
-			return dt.first;
-	}
-	return -1;
-}
-
 int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char *Password)
 {
 	if(str_length(Login) > 12 || str_length(Login) < 4 || str_length(Password) > 12 || str_length(Password) < 4)
@@ -118,7 +108,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 			return SendAuthCode(ClientID, AUTH_LOGIN_WRONG);
 		}
 
-		if (CheckOnlineAccount(UserID) >= 0)
+		if (GS()->GetPlayerFromAuthID(UserID) != nullptr)
 		{
 			GS()->Chat(ClientID, "The account is already in the game!");
 			return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);

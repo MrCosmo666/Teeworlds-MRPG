@@ -48,7 +48,10 @@ inline T bezier(const T p0, const T p1, const T p2, const T p3, TB amount)
 }
 
 inline int random_int() { return (((rand() & 0xffff) << 16) | (rand() & 0xffff)) & 0x7FFFFFFF; };
+inline int random_num(int min, int max) { return (random_int() % (max - min + 1)) + min; }
 inline float frandom() { return rand()/(float)(RAND_MAX); }
+inline float frandom_num(float min, float max) { return (frandom() * (max - min)) + min; }
+inline float centrelized_frandom(float center, float range) { return (center - range) + (frandom() * range); }
 
 // float to fixed
 inline int f2fx(float v) { return (int)(v*(float)(1<<10)); }
