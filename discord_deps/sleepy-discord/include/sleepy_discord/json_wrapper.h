@@ -243,7 +243,7 @@ namespace SleepyDiscord {
 		struct StdArrayTypeHelper : public EmptyFunction<StdArray>, public FromContainerFunction<StdArray, TypeHelper> {
 			static inline StdArray toType(const Value& value) {
 				ArrayWrapper<typename StdArray::value_type> arrayWrapper(value);
-				std::array<typename StdArray::value_type, std::tuple_size<StdArray>::value> arr;
+				std::array<typename StdArray::value_type, std::tuple_size<StdArray>::value> arr{};
 				Array jsonArray = arrayWrapper.getDoc().template Get<Array>();
 				Value::ConstValueIterator iterator = jsonArray.Begin();
 				for (typename StdArray::value_type& v : arr) {
@@ -326,7 +326,7 @@ namespace SleepyDiscord {
 
 		template<class ResultingObject>
 		inline ResultingObject fromJSON(const Value& value) {
-			ResultingObject object;
+			ResultingObject object = ResultingObject();
 			fromJSON(object, value);
 			return object;
 		}

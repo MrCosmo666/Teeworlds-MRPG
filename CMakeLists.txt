@@ -861,6 +861,13 @@ if(DISCORD_SERVER_COMPILE)
 	list(APPEND SLEEPY_DISCORD_LIBRARIES "ssl" "crypto" "Threads::Threads")
   endif()
 
+  #Todo add support for it
+  target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_UWEBSOCKETS)
+  target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_OPUS)
+  target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_SODIUM)
+  target_link_libraries(sleepy-discord PUBLIC ${SLEEPY_DISCORD_LIBRARIES})
+  list(APPEND TARGETS_DEP sleepy-discord)
+
   #The codebase is c++11 but both clang and visual c++ have issues with c++11
   #These issues are fixed by using preprocessor defines to replace code that
   #cause issues with c++14 code
@@ -869,13 +876,6 @@ if(DISCORD_SERVER_COMPILE)
 	set_target_properties(sleepy-discord PROPERTIES CXX_STANDARD_REQUIRED ON)
 	target_compile_features(sleepy-discord PUBLIC cxx_std_14)
   endif()
-
-  #Todo add support for it
-  target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_UWEBSOCKETS)
-  target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_OPUS)
-  target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_SODIUM)
-  target_link_libraries(sleepy-discord PUBLIC ${SLEEPY_DISCORD_LIBRARIES})
-  list(APPEND TARGETS_DEP sleepy-discord)
 
   if(MSVC)
 	target_compile_options(sleepy-discord PRIVATE -W3)
@@ -1329,10 +1329,6 @@ foreach(target ${TARGETS})
     else()
       target_compile_options(${target} PRIVATE $<$<NOT:${DBG}>:/MT> $<${DBG}:/MTd>)
     endif()
-    target_compile_options(${target} PRIVATE /MP) # Use multiple cores
-    target_compile_options(${target} PRIVATE /EHsc) # Only catch C++ exceptions with catch.
-    target_compile_options(${target} PRIVATE /GS) # Protect the stack pointer.
-    target_compile_options(${target} PRIVATE /wd4996) # Use of non-_s functions.
   endif()
   if(OUR_FLAGS)
     target_compile_options(${target} PRIVATE ${OUR_FLAGS})
