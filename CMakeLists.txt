@@ -870,19 +870,18 @@ if(DISCORD_SERVER_COMPILE)
 	target_compile_features(sleepy-discord PUBLIC cxx_std_14)
   endif()
 
-  if(MSVC)
-	target_compile_options(sleepy-discord PUBLIC -W3)
-  else()
-  	target_compile_options(sleepy-discord PUBLIC -Wall)
-  endif()
-
   #Todo add support for it
   target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_UWEBSOCKETS)
   target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_OPUS)
   target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_SODIUM)
-
   target_link_libraries(sleepy-discord PUBLIC ${SLEEPY_DISCORD_LIBRARIES})
   list(APPEND TARGETS_DEP sleepy-discord)
+
+  if(MSVC)
+	target_compile_options(sleepy-discord PRIVATE -W3)
+  else()
+  	target_compile_options(sleepy-discord PRIVATE -Wall)
+  endif()
 endif()
 
 ########################################################################
