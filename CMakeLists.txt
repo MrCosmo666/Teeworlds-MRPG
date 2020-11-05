@@ -827,14 +827,14 @@ if(DISCORD_SERVER_COMPILE)
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include/cpr DESTINATION ${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include)
   set(CPR_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include")
   file(GLOB CPR_LIBRARIES_SRC "${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/cpr/*.cpp" "${CPR_INCLUDE_DIRS}/*.h") 
-  add_library(${CPR_LIBRARIES} EXCLUDE_FROM_ALL OBJECT ${CPR_LIBRARIES_SRC})
-  target_link_libraries(${CPR_LIBRARIES} ${CURL_LIBRARIES})
+  add_library(${CPR_LIBRARIES} ${CPR_LIBRARIES_SRC})
+  target_link_libraries(${CPR_LIBRARIES} PUBLIC ${CURL_LIBRARIES})
   target_include_directories(${CPR_LIBRARIES} PUBLIC ${CPR_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
   list(APPEND TARGETS_DEP ${CPR_LIBRARIES})
 
   # Include Sleepy-Discord
   file(GLOB SLEEPY_DISCORD_LIBRARIES_SRC "${PROJECT_SOURCE_DIR}/discord_deps/sleepy-discord/sleepy_discord/*.cpp")
-  add_library(sleepy-discord ${SLEEPY_DISCORD_LIBRARIES_SRC} $<TARGET_OBJECTS:${CPR_LIBRARIES}>)
+  add_library(sleepy-discord EXCLUDE_FROM_ALL OBJECT ${SLEEPY_DISCORD_LIBRARIES_SRC} $<TARGET_OBJECTS:${CPR_LIBRARIES}>)
 
   target_include_directories(sleepy-discord
     PUBLIC ${PROJECT_SOURCE_DIR}/discord_deps/sleepy-discord/include
@@ -867,10 +867,6 @@ if(DISCORD_SERVER_COMPILE)
   target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_SODIUM)
   target_link_libraries(sleepy-discord PUBLIC ${SLEEPY_DISCORD_LIBRARIES})
   list(APPEND TARGETS_DEP sleepy-discord)
-  
-  if(UNIX)
-    target_compile_options(sleepy-discord PUBLIC -Wduplicated-branches)
-  endif()
 
   #The codebase is c++11 but both clang and visual c++ have issues with c++11
   #These issues are fixed by using preprocessor defines to replace code that
