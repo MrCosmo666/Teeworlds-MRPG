@@ -892,7 +892,7 @@ if(SERVER_COMPILE)
     src/generated/server_data.cpp
     src/generated/server_data.h)
 
-  # # #
+  ###
   set(SERVER_SRC ${ENGINE_SERVER} ${GAME_SERVER} ${GAME_GENERATED_SERVER} ${LOCALIZED_SERVER})
 
   if(TARGET_OS STREQUAL "windows")
