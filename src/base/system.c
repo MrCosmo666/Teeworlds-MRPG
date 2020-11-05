@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include "system.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdarg.h>
@@ -9,8 +11,6 @@
 
 #include <sys/types.h>
 #include <sys/stat.h>
-
-#include "system.h"
 
 #if defined(CONF_FAMILY_UNIX)
 	#include <sys/time.h>
@@ -1751,6 +1751,7 @@ int fs_chdir(const char *path)
 	if(fs_is_dir(path))
 	{
 		if(chdir(path))
+
 			return 1;
 		else
 			return 0;
