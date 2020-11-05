@@ -46,7 +46,7 @@ void CLocalizationDatabase::AddString(const char *pOrgStr, const char *pNewStr, 
 	m_Strings.add(s);
 }
 
-bool CLocalizationDatabase::Load(const char *pFilename, IStorage *pStorage, IConsole *pConsole)
+bool CLocalizationDatabase::Load(const char *pFilename, IStorageEngine *pStorage, IConsole *pConsole)
 {
 	// empty string means unload
 	if(pFilename[0] == 0)
@@ -57,7 +57,7 @@ bool CLocalizationDatabase::Load(const char *pFilename, IStorage *pStorage, ICon
 	}
 
 	// read file data into buffer
-	IOHANDLE File = pStorage->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_ALL);
+	IOHANDLE File = pStorage->OpenFile(pFilename, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 	if(!File)
 		return false;
 	int FileSize = (int)io_length(File);

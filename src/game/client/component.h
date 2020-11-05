@@ -19,7 +19,7 @@ protected:
 	class ITextRender *TextRender() const { return m_pClient->TextRender(); }
 	class IClient *Client() const { return m_pClient->Client(); }
 	class IInput *Input() const { return m_pClient->Input(); }
-	class IStorage *Storage() const { return m_pClient->Storage(); }
+	class IStorageEngine *Storage() const { return m_pClient->Storage(); }
 	class CUI *UI() const { return m_pClient->UI(); }
 	class ISound *Sound() const { return m_pClient->Sound(); }
 	class CRenderTools *RenderTools() const { return m_pClient->RenderTools(); }

@@ -63,7 +63,7 @@ bool CMapChecker::IsMapValid(const char *pMapName, const SHA256_DIGEST *pMapSha2
 	return !StandardMap;
 }
 
-bool CMapChecker::ReadAndValidateMap(IStorage *pStorage, const char *pFilename, int StorageType)
+bool CMapChecker::ReadAndValidateMap(IStorageEngine *pStorage, const char *pFilename, int StorageType)
 {
 	// extract map name
 	char aMapName[MAX_MAP_LENGTH];

@@ -7,7 +7,7 @@
 #include <game/server/enum_global.h>
 
 #ifdef CONF_DISCORD
-	#include <teeother/sleepy_discord/websocketpp_websocket.h>
+	#include <sleepy_discord/websocketpp_websocket.h>
 #endif
 
 STRINGABLE_ENUM_IMPL(MINER)
@@ -90,7 +90,7 @@ class CServerBan : public CNetBan
 public:
 	class CServer *Server() const { return m_pServer; }
 
-	void InitServerBan(class IConsole *pConsole, class IStorage *pStorage, class CServer* pServer);
+	void InitServerBan(class IConsole *pConsole, class IStorageEngine *pStorage, class CServer* pServer);
 
 	virtual int BanAddr(const NETADDR *pAddr, int Seconds, const char *pReason);
 	virtual int BanRange(const CNetRange *pRange, int Seconds, const char *pReason);
@@ -134,7 +134,7 @@ public:
 class CServer : public IServer
 {
 	class IConsole *m_pConsole;
-	class IStorage *m_pStorage;
+	class IStorageEngine *m_pStorage;
 
 public:
 	virtual class IGameServer* GameServer(int WorldID = 0)
@@ -144,7 +144,7 @@ public:
 		return WorldsInstance.ms_aWorlds[WorldID].m_pGameServer;
 	}
 	class IConsole *Console() { return m_pConsole; }
-	class IStorage *Storage() { return m_pStorage; }
+	class IStorageEngine*Storage() { return m_pStorage; }
 	class DiscordJob *m_pDiscord;
 
 	enum

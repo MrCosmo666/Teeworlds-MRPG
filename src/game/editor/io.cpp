@@ -13,10 +13,10 @@ static int MakeVersion(int i, const T &v)
 
 int CEditor::Save(const char *pFilename)
 {
-	return m_Map.Save(Kernel()->RequestInterface<IStorage>(), pFilename);
+	return m_Map.Save(Kernel()->RequestInterface<IStorageEngine>(), pFilename);
 }
 
-int CEditorMap::Save(class IStorage *pStorage, const char *pFileName)
+int CEditorMap::Save(class IStorageEngine *pStorage, const char *pFileName)
 {
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "saving to '%s'...", pFileName);
@@ -250,15 +250,15 @@ int CEditorMap::Save(class IStorage *pStorage, const char *pFileName)
 int CEditor::Load(const char *pFileName, int StorageType)
 {
 	Reset();
-	return m_Map.Load(Kernel()->RequestInterface<IStorage>(), pFileName, StorageType);
+	return m_Map.Load(Kernel()->RequestInterface<IStorageEngine>(), pFileName, StorageType);
 }
 
 void CEditor::LoadCurrentMap()
 {
-	CallbackOpenMap(m_pClient->GetCurrentMapPath(), IStorage::TYPE_ALL, this);
+	CallbackOpenMap(m_pClient->GetCurrentMapPath(), IStorageEngine::TYPE_ALL, this);
 }
 
-int CEditorMap::Load(class IStorage *pStorage, const char *pFileName, int StorageType)
+int CEditorMap::Load(class IStorageEngine *pStorage, const char *pFileName, int StorageType)
 {
 	CDataFileReader DataFile;
 	if(!DataFile.Open(pStorage, pFileName, StorageType))
@@ -310,7 +310,7 @@ int CEditorMap::Load(class IStorage *pStorage, const char *pFileName, int Storag
 
 					// load external
 					CEditorImage ImgInfo(m_pEditor);
-					if(m_pEditor->Graphics()->LoadPNG(&ImgInfo, aBuf, IStorage::TYPE_ALL))
+					if(m_pEditor->Graphics()->LoadPNG(&ImgInfo, aBuf, IStorageEngine::TYPE_ALL))
 					{
 						*pImg = ImgInfo;
 						pImg->m_Texture = m_pEditor->Graphics()->LoadTextureRaw(ImgInfo.m_Width, ImgInfo.m_Height, ImgInfo.m_Format, ImgInfo.m_pData, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_MULTI_DIMENSION);
@@ -529,7 +529,7 @@ int CEditor::Append(const char *pFileName, int StorageType)
 	NewMap.m_pEditor = this;
 
 	int Err;
-	Err = NewMap.Load(Kernel()->RequestInterface<IStorage>(), pFileName, StorageType);
+	Err = NewMap.Load(Kernel()->RequestInterface<IStorageEngine>(), pFileName, StorageType);
 	if(!Err)
 		return Err;
 

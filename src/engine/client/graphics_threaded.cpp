@@ -485,7 +485,7 @@ void CGraphics_Threaded::ScreenshotDirect(const char* pFilename)
 		char aWholePath[1024];
 		png_t Png; // ignore_convention
 
-		IOHANDLE File = m_pStorage->OpenFile(pFilename, IOFLAG_WRITE, IStorage::TYPE_SAVE, aWholePath, sizeof(aWholePath));
+		IOHANDLE File = m_pStorage->OpenFile(pFilename, IOFLAG_WRITE, IStorageEngine::TYPE_SAVE, aWholePath, sizeof(aWholePath));
 		if (File)
 			io_close(File);
 
@@ -792,7 +792,7 @@ int CGraphics_Threaded::InitWindow()
 int CGraphics_Threaded::Init()
 {
 	// fetch pointers
-	m_pStorage = Kernel()->RequestInterface<IStorage>();
+	m_pStorage = Kernel()->RequestInterface<IStorageEngine>();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 
 	// init textures

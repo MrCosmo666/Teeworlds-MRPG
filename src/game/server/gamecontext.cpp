@@ -972,7 +972,7 @@ void CGS::ClearTalkText(int ClientID)
 void CGS::UpdateDiscordStatus()
 {
 #ifdef CONF_DISCORD
-	if(Server()->Tick() % (Server()->TickSpeed() * 10) != 0 || m_WorldID != WorldControls::MainWorld)
+	if(Server()->Tick() % (Server()->TickSpeed() * 10) != 0 || m_WorldID != MAIN_WORLD_ID)
 		return;
 
 	int Players = 0;

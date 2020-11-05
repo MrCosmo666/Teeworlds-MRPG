@@ -10,7 +10,7 @@ CConfiguration g_Config;
 
 class CConfig : public IConfig
 {
-	IStorage *m_pStorage;
+	IStorageEngine *m_pStorage;
 	IConsole *m_pConsole;
 	IOHANDLE m_ConfigFile;
 	int m_FlagMask;
@@ -68,7 +68,7 @@ public:
 
 	virtual void Init(int FlagMask)
 	{
-		m_pStorage = Kernel()->RequestInterface<IStorage>();
+		m_pStorage = Kernel()->RequestInterface<IStorageEngine>();
 		m_pConsole = Kernel()->RequestInterface<IConsole>();
 		m_FlagMask = FlagMask;
 		Reset();
@@ -110,7 +110,7 @@ public:
 		
 		if(!pFilename)
 			pFilename = SETTINGS_FILENAME ".cfg";
-		m_ConfigFile = m_pStorage->OpenFile(pFilename, IOFLAG_WRITE, IStorage::TYPE_SAVE);
+		m_ConfigFile = m_pStorage->OpenFile(pFilename, IOFLAG_WRITE, IStorageEngine::TYPE_SAVE);
 
 		if(!m_ConfigFile)
 			return;

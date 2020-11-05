@@ -3,7 +3,7 @@
 
 #include <unicode/tmutfmt.h>
 #include <teeother/tl/hashtable.h>
-#define CStorage IStorage
+#define CStorage IStorageEngine
 
 struct CLocalizableString
 {

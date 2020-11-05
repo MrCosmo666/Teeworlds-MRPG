@@ -6,7 +6,7 @@
 #include <base/hash.h>
 #include "kernel.h"
 
-class IStorage : public IInterface
+class IStorageEngine : public IInterface
 {
 	MACRO_INTERFACE("storage", 0)
 public:
@@ -37,8 +37,8 @@ public:
 	virtual const char* GetBinaryPath(const char *pDir, char *pBuffer, unsigned BufferSize) = 0;
 };
 
-IStorage *CreateStorage(const char *pApplicationName, int StorageType, int NumArgs, const char **ppArguments);
-IStorage *CreateTestStorage();
+IStorageEngine *CreateStorage(const char *pApplicationName, int StorageType, int NumArgs, const char **ppArguments);
+IStorageEngine *CreateTestStorage();
 
 
 #endif

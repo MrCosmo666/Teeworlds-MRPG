@@ -16,6 +16,7 @@ CCharacterBotAI::~CCharacterBotAI() {}
 
 int CCharacterBotAI::GetSnapFullID() const { return m_pBotPlayer->GetCID() * SNAPBOTS; }
 
+
 bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 {
 	m_pBotPlayer = static_cast<CPlayerBot*>(pPlayer);

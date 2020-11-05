@@ -87,8 +87,8 @@ CServerBrowser::~CServerBrowser()
 //mmotee
 void CServerBrowser::LoadMmoInfoJson()
 {
-	IStorage *pStorage = Kernel()->RequestInterface<IStorage>();
-	IOHANDLE File = pStorage->OpenFile(MMOTEE_INFO, IOFLAG_READ, IStorage::TYPE_SAVE);
+	IStorageEngine*pStorage = Kernel()->RequestInterface<IStorageEngine>();
+	IOHANDLE File = pStorage->OpenFile(MMOTEE_INFO, IOFLAG_READ, IStorageEngine::TYPE_SAVE);
 
 	if (!File)
 		return;
@@ -172,7 +172,7 @@ const json_value *CServerBrowser::LoadMmoInfo()
 void CServerBrowser::Init(class CNetClient *pNetClient, const char *pNetVersion)
 {
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
-	m_pStorage = Kernel()->RequestInterface<IStorage>();
+	m_pStorage = Kernel()->RequestInterface<IStorageEngine>();
 	m_pMasterServer = Kernel()->RequestInterface<IMasterServer>();
 	m_pNetClient = pNetClient;
 
@@ -688,7 +688,7 @@ void CServerBrowser::SetInfo(int ServerlistType, CServerEntry *pEntry, const CSe
 void CServerBrowser::LoadServerlist()
 {
 	// read file data into buffer
-	IOHANDLE File = Storage()->OpenFile(s_pFilename, IOFLAG_READ, IStorage::TYPE_ALL);
+	IOHANDLE File = Storage()->OpenFile(s_pFilename, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 	if(!File)
 		return;
 	int FileSize = (int)io_length(File);
@@ -727,7 +727,7 @@ void CServerBrowser::LoadServerlist()
 
 void CServerBrowser::SaveServerlist()
 {
-	IOHANDLE File = Storage()->OpenFile(s_pFilename, IOFLAG_WRITE, IStorage::TYPE_SAVE);
+	IOHANDLE File = Storage()->OpenFile(s_pFilename, IOFLAG_WRITE, IStorageEngine::TYPE_SAVE);
 	if(!File)
 		return;
 

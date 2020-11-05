@@ -36,7 +36,7 @@ public:
 	std::shared_ptr<CHostLookup> m_apLookup[MAX_MASTERSERVERS];
 	int m_State;
 	IEngine *m_pEngine;
-	IStorage *m_pStorage;
+	IStorageEngine *m_pStorage;
 
 	CMasterServer()
 	{
@@ -119,7 +119,7 @@ public:
 	virtual void Init()
 	{
 		m_pEngine = Kernel()->RequestInterface<IEngine>();
-		m_pStorage = Kernel()->RequestInterface<IStorage>();
+		m_pStorage = Kernel()->RequestInterface<IStorageEngine>();
 	}
 
 	virtual void SetDefault()
@@ -138,7 +138,7 @@ public:
 			return -1;
 
 		// try to open file
-		IOHANDLE File = m_pStorage->OpenFile("masters.cfg", IOFLAG_READ, IStorage::TYPE_SAVE);
+		IOHANDLE File = m_pStorage->OpenFile("masters.cfg", IOFLAG_READ, IStorageEngine::TYPE_SAVE);
 		if(!File)
 			return -1;
 
@@ -191,7 +191,7 @@ public:
 			return -1;
 
 		// try to open file
-		IOHANDLE File = m_pStorage->OpenFile("masters.cfg", IOFLAG_WRITE, IStorage::TYPE_SAVE);
+		IOHANDLE File = m_pStorage->OpenFile("masters.cfg", IOFLAG_WRITE, IStorageEngine::TYPE_SAVE);
 		if(!File)
 			return -1;
 

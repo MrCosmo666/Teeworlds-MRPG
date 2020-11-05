@@ -31,7 +31,7 @@ CDemoRecorder::CDemoRecorder(class CSnapshotDelta* pSnapshotDelta)
 }
 
 // Record
-int CDemoRecorder::Start(class IStorage* pStorage, class IConsole* pConsole, const char* pFilename, const char* pNetVersion, const char* pMap, SHA256_DIGEST Sha256, unsigned Crc, const char* pType, bool IsMMO)
+int CDemoRecorder::Start(class IStorageEngine* pStorage, class IConsole* pConsole, const char* pFilename, const char* pNetVersion, const char* pMap, SHA256_DIGEST Sha256, unsigned Crc, const char* pType, bool IsMMO)
 {
 	CDemoHeader Header;
 	if (m_File)
@@ -43,28 +43,28 @@ int CDemoRecorder::Start(class IStorage* pStorage, class IConsole* pConsole, con
 	char aMapFilename[128];
 	// try the normal maps folder
 	str_format(aMapFilename, sizeof(aMapFilename), "maps/%s.map", pMap);
-	IOHANDLE MapFile = pStorage->OpenFile(aMapFilename, IOFLAG_READ, IStorage::TYPE_ALL, 0, 0, CDataFileReader::CheckSha256, &Sha256);
+	IOHANDLE MapFile = pStorage->OpenFile(aMapFilename, IOFLAG_READ, IStorageEngine::TYPE_ALL, 0, 0, CDataFileReader::CheckSha256, &Sha256);
 	if (!MapFile)
 	{
 		// try the downloaded maps (sha256)
 		char aSha256[SHA256_MAXSTRSIZE];
 		sha256_str(Sha256, aSha256, sizeof(aSha256));
 		str_format(aMapFilename, sizeof(aMapFilename), "downloadedmaps/%s_%s.map", pMap, aSha256);
-		MapFile = pStorage->OpenFile(aMapFilename, IOFLAG_READ, IStorage::TYPE_ALL, 0, 0, CDataFileReader::CheckSha256, &Sha256);
+		MapFile = pStorage->OpenFile(aMapFilename, IOFLAG_READ, IStorageEngine::TYPE_ALL, 0, 0, CDataFileReader::CheckSha256, &Sha256);
 	}
 	if (!MapFile)
 	{
 		// try the downloaded maps (crc)
 		str_format(aMapFilename, sizeof(aMapFilename), "downloadedmaps/%s_%08x.map", pMap, Crc);
-		MapFile = pStorage->OpenFile(aMapFilename, IOFLAG_READ, IStorage::TYPE_ALL, 0, 0, CDataFileReader::CheckSha256, &Sha256);
+		MapFile = pStorage->OpenFile(aMapFilename, IOFLAG_READ, IStorageEngine::TYPE_ALL, 0, 0, CDataFileReader::CheckSha256, &Sha256);
 	}
 	if (!MapFile)
 	{
 		// search for the map within subfolders
 		char aBuf[IO_MAX_PATH_LENGTH];
 		str_format(aMapFilename, sizeof(aMapFilename), "%s.map", pMap);
-		if (pStorage->FindFile(aMapFilename, "maps", IStorage::TYPE_ALL, aBuf, sizeof(aBuf)))
-			MapFile = pStorage->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL, 0, 0, CDataFileReader::CheckSha256, &Sha256);
+		if (pStorage->FindFile(aMapFilename, "maps", IStorageEngine::TYPE_ALL, aBuf, sizeof(aBuf)))
+			MapFile = pStorage->OpenFile(aBuf, IOFLAG_READ, IStorageEngine::TYPE_ALL, 0, 0, CDataFileReader::CheckSha256, &Sha256);
 	}
 	if (!MapFile)
 	{
@@ -74,7 +74,7 @@ int CDemoRecorder::Start(class IStorage* pStorage, class IConsole* pConsole, con
 		return -1;
 	}
 
-	IOHANDLE DemoFile = pStorage->OpenFile(pFilename, IOFLAG_WRITE, IStorage::TYPE_SAVE);
+	IOHANDLE DemoFile = pStorage->OpenFile(pFilename, IOFLAG_WRITE, IStorageEngine::TYPE_SAVE);
 	if (!DemoFile)
 	{
 		io_close(MapFile);
@@ -589,7 +589,7 @@ void CDemoPlayer::Unpause()
 	m_Info.m_Info.m_Paused = false;
 }
 
-const char* CDemoPlayer::Load(class IStorage* pStorage, class IConsole* pConsole, const char* pFilename, int StorageType, const char* pNetversion)
+const char* CDemoPlayer::Load(class IStorageEngine* pStorage, class IConsole* pConsole, const char* pFilename, int StorageType, const char* pNetversion)
 {
 	m_pConsole = pConsole;
 	m_aErrorMsg[0] = 0;
@@ -660,7 +660,7 @@ const char* CDemoPlayer::Load(class IStorage* pStorage, class IConsole* pConsole
 	unsigned Crc = bytes_be_to_uint(m_Info.m_Header.m_aMapCrc);
 	char aMapFilename[128];
 	str_format(aMapFilename, sizeof(aMapFilename), "downloadedmaps/%s_%08x.map", m_Info.m_Header.m_aMapName, Crc);
-	IOHANDLE MapFile = pStorage->OpenFile(aMapFilename, IOFLAG_READ, IStorage::TYPE_ALL);
+	IOHANDLE MapFile = pStorage->OpenFile(aMapFilename, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 
 	if (MapFile)
 	{
@@ -674,7 +674,7 @@ const char* CDemoPlayer::Load(class IStorage* pStorage, class IConsole* pConsole
 		io_read(m_File, pMapData, MapSize);
 
 		// save map
-		MapFile = pStorage->OpenFile(aMapFilename, IOFLAG_WRITE, IStorage::TYPE_SAVE);
+		MapFile = pStorage->OpenFile(aMapFilename, IOFLAG_WRITE, IStorageEngine::TYPE_SAVE);
 		io_write(MapFile, pMapData, MapSize);
 		io_close(MapFile);
 
@@ -832,7 +832,7 @@ void CDemoPlayer::GetDemoName(char* pBuffer, int BufferSize) const
 	str_copy(pBuffer, pExtractedName, Length);
 }
 
-bool CDemoPlayer::GetDemoInfo(class IStorage* pStorage, const char* pFilename, int StorageType, CDemoHeader* pDemoHeader) const
+bool CDemoPlayer::GetDemoInfo(class IStorageEngine* pStorage, const char* pFilename, int StorageType, CDemoHeader* pDemoHeader) const
 {
 	if (!pDemoHeader)
 		return false;

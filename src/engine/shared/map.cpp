@@ -43,13 +43,13 @@ public:
 		m_pCurrentMapData = 0x0;
 	}
 
-	virtual bool Load(const char *pMapName, IStorage *pStorage)
+	virtual bool Load(const char *pMapName, IStorageEngine *pStorage)
 	{
 		if (!pStorage)
-			pStorage = Kernel()->RequestInterface<IStorage>();
+			pStorage = Kernel()->RequestInterface<IStorageEngine>();
 		if (!pStorage)
 			return false;
-		if (!m_DataFile.Open(pStorage, pMapName, IStorage::TYPE_ALL))
+		if (!m_DataFile.Open(pStorage, pMapName, IStorageEngine::TYPE_ALL))
 			return false;
 		// check version
 		CMapItemVersion *pItem = (CMapItemVersion *)m_DataFile.FindItem(MAPITEMTYPE_VERSION, 0);

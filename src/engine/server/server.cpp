@@ -149,7 +149,7 @@ void CSnapIDPool::FreeID(int ID)
 }
 
 
-void CServerBan::InitServerBan(IConsole *pConsole, IStorage *pStorage, CServer* pServer)
+void CServerBan::InitServerBan(IConsole *pConsole, IStorageEngine *pStorage, CServer* pServer)
 {
 	CNetBan::Init(pConsole, pStorage);
 
@@ -1381,7 +1381,7 @@ bool CServer::LoadMap(int ID)
 	str_format(aBuf, sizeof(aBuf), "maps/%s", WorldsInstance.ms_aWorlds[ID].m_aPath);
 
 	// check for valid standard map
-	if(!m_MapChecker.ReadAndValidateMap(Storage(), aBuf, IStorage::TYPE_ALL))
+	if(!m_MapChecker.ReadAndValidateMap(Storage(), aBuf, IStorageEngine::TYPE_ALL))
 	{
 		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "mapchecker", "invalid standard map");
 		return 0;
@@ -1405,7 +1405,7 @@ bool CServer::LoadMap(int ID)
 
 	// load complete map into memory for download
 	{
-		IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
+		IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 		pMap->SetCurrentMapSize((int)io_length(File));	
 		pMap->SetCurrentMapData((unsigned char *)mem_alloc(pMap->GetCurrentMapSize(), 1));
 		io_read(File, pMap->GetCurrentMapData(), pMap->GetCurrentMapSize());
@@ -1701,7 +1701,7 @@ void CServer::ConchainRconPasswordSet(IConsole::IResult *pResult, void *pUserDat
 void CServer::RegisterCommands()
 {
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
-	m_pStorage = Kernel()->RequestInterface<IStorage>();
+	m_pStorage = Kernel()->RequestInterface<IStorageEngine>();
 
 	// register console commands
 	Console()->Register("kick", "i[id] ?r[reason]", CFGFLAG_SERVER, ConKick, this, "Kick player with specified id for any reason");
@@ -1760,7 +1760,6 @@ void CServer::SnapSetStaticsize(int ItemType, int Size)
 }
 
 static CServer *CreateServer() { return new CServer(); }
-
 
 #ifdef CONF_DISCORD
 DiscordJob::DiscordJob(const char *token, int threads) : SleepyDiscord::DiscordClient(token, SleepyDiscord::USER_CONTROLED_THREADS)
@@ -1835,7 +1834,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 
 		// get connected
 		ResultPtr pRes = SJK.SD("Nick", "tw_accounts_data", "WHERE DiscordID = '%s'", cDiscordID.cstr());
-		while(RES->next())
+		while(pRes->next())
 		{
 			// send a connected message
 			Nick = pRes->getString("Nick").c_str();
@@ -1994,12 +1993,12 @@ void DiscordJob::SendMessage(const char *pChanal, const char *Color, const char 
 }
 #endif
 
-bool WorldsLoading(IKernel *pKernel, IStorage* pStorage, IConsole* pConsole)
+bool WorldsLoading(IKernel *pKernel, IStorageEngine* pStorage, IConsole* pConsole)
 {
 	// read file data into buffer
 	char aFileBuf[512];
 	str_format(aFileBuf, sizeof(aFileBuf), "maps/worlds.json");
-	IOHANDLE File = pStorage->OpenFile(aFileBuf, IOFLAG_READ, IStorage::TYPE_ALL);
+	IOHANDLE File = pStorage->OpenFile(aFileBuf, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 	if(!File)
 		return false;
 	
@@ -2080,7 +2079,7 @@ int main(int argc, const char **argv) // ignore_convention
 	IEngine *pEngine = CreateEngine("Teeworlds_Server", false, 1);
 	IConsole *pConsole = CreateConsole(CFGFLAG_SERVER|CFGFLAG_ECON);
 	IEngineMasterServer *pEngineMasterServer = CreateEngineMasterServer();
-	IStorage *pStorage = CreateStorage("Teeworlds", IStorage::STORAGETYPE_SERVER, argc, argv); // ignore_convention
+	IStorageEngine *pStorage = CreateStorage("Teeworlds", IStorageEngine::STORAGETYPE_SERVER, argc, argv); // ignore_convention
 	IConfig *pConfig = CreateConfig();
 	pServer->InitRegister(&pServer->m_NetServer, pEngineMasterServer, pConsole);
 

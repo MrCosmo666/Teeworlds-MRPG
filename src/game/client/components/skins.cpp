@@ -93,7 +93,7 @@ int CSkins::SkinPartScan(const char* pName, int IsDir, int DirType, void* pUser)
 	Part.m_Flags = 0;
 	if (pName[0] == 'x' && pName[1] == '_')
 		Part.m_Flags |= SKINFLAG_SPECIAL;
-	if (DirType != IStorage::TYPE_SAVE)
+	if (DirType != IStorageEngine::TYPE_SAVE)
 		Part.m_Flags |= SKINFLAG_STANDARD;
 	str_utf8_copy_num(Part.m_aName, pName, min(str_length(pName) - 3, int(sizeof(Part.m_aName))), MAX_SKIN_LENGTH);
 	if (g_Config.m_Debug)
@@ -116,7 +116,7 @@ int CSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 	// read file data into buffer
 	char aBuf[512];
 	str_format(aBuf, sizeof(aBuf), "skins/%s", pName);
-	IOHANDLE File = pSelf->Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
+	IOHANDLE File = pSelf->Storage()->OpenFile(aBuf, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 	if (!File)
 		return 0;
 	int FileSize = (int)io_length(File);
@@ -202,7 +202,7 @@ int CSkins::SkinScan(const char* pName, int IsDir, int DirType, void* pUser)
 
 	// set skin data
 	Skin.m_Flags = SpecialSkin ? SKINFLAG_SPECIAL : 0;
-	if (DirType != IStorage::TYPE_SAVE)
+	if (DirType != IStorageEngine::TYPE_SAVE)
 		Skin.m_Flags |= SKINFLAG_STANDARD;
 	if (g_Config.m_Debug)
 	{
@@ -239,7 +239,7 @@ void CSkins::OnInit()
 		char aBuf[64];
 		str_format(aBuf, sizeof(aBuf), "skins/%s", ms_apSkinPartNames[p]);
 		m_ScanningPart = p;
-		Storage()->ListDirectory(IStorage::TYPE_ALL, aBuf, SkinPartScan, this);
+		Storage()->ListDirectory(IStorageEngine::TYPE_ALL, aBuf, SkinPartScan, this);
 
 		// add dummy skin part
 		if (!m_aaSkinParts[p].size())
@@ -273,7 +273,7 @@ void CSkins::OnInit()
 
 	// load skins
 	m_aSkins.clear();
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "skins", SkinScan, this);
+	Storage()->ListDirectory(IStorageEngine::TYPE_ALL, "skins", SkinScan, this);
 	m_pClient->m_pMenus->RenderLoading(5);
 
 	// add dummy skin
@@ -284,7 +284,7 @@ void CSkins::OnInit()
 		// add xmas hat
 		const char* pFileName = "skins/xmas_hat.png";
 		CImageInfo Info;
-		if (!Graphics()->LoadPNG(&Info, pFileName, IStorage::TYPE_ALL) || Info.m_Width != 128 || Info.m_Height != 512)
+		if (!Graphics()->LoadPNG(&Info, pFileName, IStorageEngine::TYPE_ALL) || Info.m_Width != 128 || Info.m_Height != 512)
 		{
 			char aBuf[128];
 			str_format(aBuf, sizeof(aBuf), "failed to load xmas hat '%s'", pFileName);
@@ -304,7 +304,7 @@ void CSkins::OnInit()
 		// add bot decoration
 		const char* pFileName = "skins/bot.png";
 		CImageInfo Info;
-		if (!Graphics()->LoadPNG(&Info, pFileName, IStorage::TYPE_ALL) || Info.m_Width != 384 || Info.m_Height != 160)
+		if (!Graphics()->LoadPNG(&Info, pFileName, IStorageEngine::TYPE_ALL) || Info.m_Width != 384 || Info.m_Height != 160)
 		{
 			char aBuf[128];
 			str_format(aBuf, sizeof(aBuf), "failed to load bot '%s'", pFileName);
@@ -541,7 +541,7 @@ void CSkins::SaveSkinfile(const char* pSaveSkinName)
 {
 	char aBuf[512];
 	str_format(aBuf, sizeof(aBuf), "skins/%s.json", pSaveSkinName);
-	IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_WRITE, IStorage::TYPE_SAVE);
+	IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_WRITE, IStorageEngine::TYPE_SAVE);
 	if(!File)
 		return;
 

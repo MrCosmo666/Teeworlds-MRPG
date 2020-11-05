@@ -208,7 +208,7 @@ int CSound::Init()
 
 	m_SoundEnabled = 0;
 	m_pGraphics = Kernel()->RequestInterface<IEngineGraphics>();
-	m_pStorage = Kernel()->RequestInterface<IStorage>();
+	m_pStorage = Kernel()->RequestInterface<IStorageEngine>();
 
 	SDL_AudioSpec Format;
 
@@ -389,7 +389,7 @@ ISound::CSampleHandle CSound::LoadWV(const char *pFilename)
 		return CSampleHandle();
 
 	lock_wait(m_SoundLock);
-	s_File = m_pStorage->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_ALL);
+	s_File = m_pStorage->OpenFile(pFilename, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 	if(!s_File)
 	{
 		dbg_msg("sound/wv", "failed to open file. filename='%s'", pFilename);

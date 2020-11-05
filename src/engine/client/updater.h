@@ -27,7 +27,7 @@ class CUpdater : public IUpdater
 	friend class CUpdaterFetchTask;
 
 	class IClient *m_pClient;
-	class IStorage *m_pStorage;
+	class IStorageEngine *m_pStorage;
 	class IEngine *m_pEngine;
 
 	bool m_IsWinXP;
