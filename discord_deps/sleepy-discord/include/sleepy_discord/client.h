@@ -342,15 +342,15 @@ namespace SleepyDiscord {
 		void updateStatus(std::string gameName = "", uint64_t idleSince = 0, Status status = online, bool afk = false);
 
 		void waitTilReady();  ////Deprecated, uses sleep. No replacment for now
-		const bool isReady() { return ready; }
-		const bool isQuiting() { return quiting; }
-		const bool isBot() { return bot; }
-		const Snowflake<User> getID() { return userID; }
+		bool isReady() const { return ready; }
+		bool isQuiting() const { return quiting; }
+		bool isBot() const { return bot; }
+		Snowflake<User> getID() const { return userID; }
 		void setShardID(int _shardID, int _shardCount); //Note: must be called before run or reconnect
-		const int getShardID() { return shardID; }
-		const int getShardCount() { return shardCount; }
-		const bool hasIntents() { return intentsIsSet; }
-		const IntentsRaw getIntents() { return intents; }
+		int getShardID() const { return shardID; }
+		int getShardCount() const { return shardCount; }
+		bool hasIntents() const { return intentsIsSet; }
+		IntentsRaw getIntents() const { return intents; }
 		void setIntents(IntentsRaw newIntents) { intentsIsSet = true; intents = static_cast<Intent>(newIntents); }
 		void quit() { quit(false); }	//public function for diconnecting
 		virtual void run();
@@ -586,7 +586,7 @@ namespace SleepyDiscord {
 			messageProcessor->processCloseCode(code);
 		}
 		virtual void runAsync();
-		virtual const time_t getEpochTimeMillisecond();
+		virtual time_t const getEpochTimeMillisecond();
 
 	private:
 		using GenericMessageReceiver::initialize;

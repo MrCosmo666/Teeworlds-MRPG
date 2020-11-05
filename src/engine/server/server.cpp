@@ -1791,7 +1791,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		}
 
 		// search data
-		bool Found = false; int Limit = 0;
+		bool Found = false;
 		std::string input = "%" + messagecont.substr(8, messagecont.length() - 8) + "%";
 		sqlstr::CSqlString<64> cDiscordIDorNick = sqlstr::CSqlString<64>(input.c_str());
 

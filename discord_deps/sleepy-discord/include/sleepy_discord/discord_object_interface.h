@@ -138,7 +138,7 @@ namespace SleepyDiscord {
 			return ID != right.ID;
 		}
 
-		inline const Time getTimestamp() {
+		inline Time const getTimestamp() {
 			return ID.timestamp();
 		}
 	};
