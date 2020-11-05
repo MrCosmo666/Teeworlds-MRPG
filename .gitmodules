@@ -1,3 +1,6 @@
 [submodule "discord_deps/discord_deps/websocketpp"]
 	path = discord_deps/discord_deps/websocketpp
 	url = https://github.com/zaphoyd/websocketpp
+[submodule "discord_deps/websocketpp"]
+	path = discord_deps/websocketpp
+	url = https://github.com/zaphoyd/websocketpp
