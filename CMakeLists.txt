@@ -876,12 +876,6 @@ if(DISCORD_SERVER_COMPILE)
 	set_target_properties(sleepy-discord PROPERTIES CXX_STANDARD_REQUIRED ON)
 	target_compile_features(sleepy-discord PUBLIC cxx_std_14)
   endif()
-
-  if(MSVC)
-	target_compile_options(sleepy-discord PRIVATE -W3)
-  else()
-  	target_compile_options(sleepy-discord PRIVATE -Wall)
-  endif()
 endif()
 
 ########################################################################
