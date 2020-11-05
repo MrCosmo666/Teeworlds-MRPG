@@ -14,8 +14,8 @@ jobs:
           build-args: --parallel
           package-file: mmoteeworlds-linux_x86_64.tar.xz
           env:
-            CFLAGS: -Wdeclaration-after-statement -Werror -Wduplicated-branches
-            CXXFLAGS: -Werror -Wduplicated-branches
+            CFLAGS: -Wdeclaration-after-statement -Wall -Wduplicated-branches
+            CXXFLAGS: -Wall -Wduplicated-branches
         - os: windows-latest
           cmake-args: -G "Visual Studio 16 2019" -A x64
           package-file: mmoteeworlds-win64.zip
