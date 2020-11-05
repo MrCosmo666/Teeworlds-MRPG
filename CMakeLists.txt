@@ -867,6 +867,10 @@ if(DISCORD_SERVER_COMPILE)
   target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_SODIUM)
   target_link_libraries(sleepy-discord PUBLIC ${SLEEPY_DISCORD_LIBRARIES})
   list(APPEND TARGETS_DEP sleepy-discord)
+  
+  if(UNIX)
+    target_compile_options(sleepy-discord PUBLIC -Wduplicated-branches)
+  endif()
 
   #The codebase is c++11 but both clang and visual c++ have issues with c++11
   #These issues are fixed by using preprocessor defines to replace code that

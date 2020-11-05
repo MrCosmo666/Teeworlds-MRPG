@@ -16,7 +16,7 @@ namespace SleepyDiscord {
 		int consecutiveReconnectsCount = 0;
 		Timer reconnectTimer;
 
-		inline time_t const getRetryDelay() {
+		inline time_t getRetryDelay() {
 			return consecutiveReconnectsCount < 50 ? consecutiveReconnectsCount * 5000 : 5000 * 50;
 		}
 	};

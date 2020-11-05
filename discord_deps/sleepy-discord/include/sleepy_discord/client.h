@@ -78,7 +78,7 @@ namespace SleepyDiscord {
 		std::atomic<bool> isGlobalRateLimited = { false };
 		std::atomic<time_t> nextRetry = { 0 };
 		void limitBucket(Route::Bucket& bucket, time_t timestamp);
-		const time_t getLiftTime(Route::Bucket& bucket, const time_t& currentTime);
+		time_t getLiftTime(Route::Bucket& bucket, const time_t& currentTime);
 		//isLimited also returns the next Retry timestamp
 	private:
 		std::unordered_map<Route::Bucket, time_t> buckets;
@@ -586,7 +586,7 @@ namespace SleepyDiscord {
 			messageProcessor->processCloseCode(code);
 		}
 		virtual void runAsync();
-		virtual time_t const getEpochTimeMillisecond();
+		virtual time_t getEpochTimeMillisecond();
 
 	private:
 		using GenericMessageReceiver::initialize;
