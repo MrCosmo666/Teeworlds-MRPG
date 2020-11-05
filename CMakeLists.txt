@@ -884,6 +884,7 @@ if(DISCORD_SERVER_COMPILE)
   target_link_libraries(sleepy-discord PUBLIC ${SLEEPY_DISCORD_LIBRARIES})
   list(APPEND TARGETS_DEP sleepy-discord)
 endif()
+
 ########################################################################
 # SERVER
 ########################################################################
