@@ -20,8 +20,8 @@ def unzip(filename, where):
 	return z.namelist()[0]
 
 def downloadAll(targets):
-	version = "master"
-	url = "https://github.com/MrCosmoTW/MmoTee-Libs/archive/{}.zip".format(version)
+	version = "update-icu"
+	url = "https://github.com/MrCosmo666/MmoTee-Libs/archive/{}.zip".format(version)
 
 	# download and unzip
 	src_package_libs = twlib.fetch_file(url)
