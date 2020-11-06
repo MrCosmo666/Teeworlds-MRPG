@@ -6,10 +6,6 @@
 #include <engine/server.h>
 #include <game/server/enum_global.h>
 
-#ifdef CONF_DISCORD
-	#include <sleepy_discord/websocketpp_websocket.h>
-#endif
-
 STRINGABLE_ENUM_IMPL(MINER)
 STRINGABLE_ENUM_IMPL(PLANT)
 STRINGABLE_ENUM_IMPL(EMEMBERUPGRADE)
@@ -97,39 +93,6 @@ public:
 
 	static void ConBanExt(class IConsole::IResult *pResult, void *pUser);
 };
-
-#ifdef CONF_DISCORD
-class DiscordJob : public SleepyDiscord::DiscordClient
-{
-	CServer *m_pServer;
-	CServer *Server() const { return m_pServer; }
-
-	class CGS *m_GameServer;
-	CGS *GS() const { return m_GameServer; }
-
-	// роли
-	std::vector<SleepyDiscord::Role> RoleList;
-
-	void onMessage(SleepyDiscord::Message message) override;
-	void onReaction(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
-						SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID, SleepyDiscord::Emoji emoji) override;
-	void onDeleteReaction(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
-						SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID, SleepyDiscord::Emoji emoji) override;
-	void UpdateMessageIdeas(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
-						SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID);
-
-
-public:
-	using SleepyDiscord::DiscordClient::DiscordClient;
-	DiscordJob(const char *token, int threads);
-
-	void SetServer(CServer *pServer);
-
-	void SendMessage(const char *pChanal, const char *Color, const char *Title, std::string pMsg);
-	void SendGenerateMessage(const char *pChanal, const char *Color, const char *Title, const char *pPhpArg);
-	void SendStatus(const char* Status, int Type);
-};
-#endif
 
 class CServer : public IServer
 {

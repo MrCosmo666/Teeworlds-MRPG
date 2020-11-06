@@ -284,11 +284,8 @@ if(NOT CMAKE_CROSSCOMPILING)
   find_package(PkgConfig)
 endif()
 
-if(NOT(Boost_INCLUDES_DIRS))
-  set(Boost_INCLUDE_DIRS "other/boost/include")
-endif()
-
 ## own packages
+set(Boost_INCLUDES_DIRS)
 find_package(Threads)
 find_package(ZLIB)
 find_package(Pnglite)
@@ -303,12 +300,15 @@ find_package(DiscordGameSDK)
 
 if(TARGET_OS AND TARGET_OS STREQUAL "linux")
   find_package(Boost 1.36.0)
-    
   if(NOT(Boost_FOUND))
     message(FATAL_ERROR, "Boost need install.")
   endif()
 elseif(TARGET_OS AND TARGET_OS STREQUAL "mac")
   set(SERVER_COMPILE OFF)
+endif()
+
+if(NOT(Boost_INCLUDES_DIRS))
+  set(Boost_INCLUDE_DIRS "other/boost/include")
 endif()
 
 # another packages
@@ -383,12 +383,12 @@ if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   show_dependency_status("Hdiutil" HDIUTIL)
 endif()
 
+show_dependency_status("OpenSSL" OPENSSL)
+show_dependency_status("Curl" CURL)
 if(COMPILE_SERVER)
-  show_dependency_status("OpenSSL" OPENSSL)
   show_dependency_status("MySQL" MYSQL)
   show_dependency_status("ICU" ICU)
 elseif(COMPILE_CLIENT)
-  show_dependency_status("Curl" CURL)
   show_dependency_status("Freetype" FREETYPE)
   show_dependency_status("Pnglite" PNGLITE)
   show_dependency_status("SDL2" SDL2)
@@ -821,21 +821,24 @@ endif()
 ########################################################################
 # SLEEPY-DISCORD
 ########################################################################
+
 if(DISCORD_SERVER_COMPILE)
   # Include Cpr
   set(CPR_LIBRARIES cpr CACHE INTERNAL "")
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include/cpr DESTINATION ${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include)
   set(CPR_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include")
   file(GLOB CPR_LIBRARIES_SRC "${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/cpr/*.cpp" "${CPR_INCLUDE_DIRS}/*.h") 
-  add_library(${CPR_LIBRARIES} ${CPR_LIBRARIES_SRC})
-  target_link_libraries(${CPR_LIBRARIES} PUBLIC ${CURL_LIBRARIES})
+  add_library(${CPR_LIBRARIES} EXCLUDE_FROM_ALL OBJECT ${CPR_LIBRARIES_SRC})
+  if((MINGW OR TARGET_OS STREQUAL "linux") AND PREFER_BUNDLED_LIBS)
+    target_link_libraries(${CPR_LIBRARIES} -lcurl) # wtf
+  endif()
+  target_link_libraries(${CPR_LIBRARIES} ${CURL_LIBRARIES})
   target_include_directories(${CPR_LIBRARIES} PUBLIC ${CPR_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
   list(APPEND TARGETS_DEP ${CPR_LIBRARIES})
 
   # Include Sleepy-Discord
   file(GLOB SLEEPY_DISCORD_LIBRARIES_SRC "${PROJECT_SOURCE_DIR}/discord_deps/sleepy-discord/sleepy_discord/*.cpp")
-  add_library(sleepy-discord EXCLUDE_FROM_ALL OBJECT ${SLEEPY_DISCORD_LIBRARIES_SRC} $<TARGET_OBJECTS:${CPR_LIBRARIES}>)
-
+  add_library(sleepy-discord EXCLUDE_FROM_ALL OBJECT ${SLEEPY_DISCORD_LIBRARIES_SRC})
   target_include_directories(sleepy-discord
     PUBLIC ${PROJECT_SOURCE_DIR}/discord_deps/sleepy-discord/include
 	PRIVATE ${PROJECT_SOURCE_DIR}/discord_deps/sleepy-discord/include/sleepy_discord)
@@ -843,7 +846,7 @@ if(DISCORD_SERVER_COMPILE)
   # Including Cpr to Sleepy-Discord
   set(SLEEPY_DISCORD_LIBRARIES)
   target_include_directories(sleepy-discord PUBLIC ${CPR_INCLUDE_DIRS})
-  list(APPEND SLEEPY_DISCORD_LIBRARIES "${CPR_LIBRARIES}")
+  target_link_libraries(sleepy-discord ${CPR_LIBRARIES})
   target_compile_definitions(sleepy-discord PUBLIC EXISTENT_CPR)
 
   # Including Asio to Sleepy-Discord
@@ -865,9 +868,14 @@ if(DISCORD_SERVER_COMPILE)
   target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_UWEBSOCKETS)
   target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_OPUS)
   target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_SODIUM)
-  target_link_libraries(sleepy-discord PUBLIC ${SLEEPY_DISCORD_LIBRARIES})
+  target_link_libraries(sleepy-discord ${SLEEPY_DISCORD_LIBRARIES})
   list(APPEND TARGETS_DEP sleepy-discord)
 
+  # Disable warning sleepy-discord
+  if(MINGW OR TARGET_OS STREQUAL "linux")
+    target_compile_options(sleepy-discord PUBLIC -Wno-duplicated-branches -Wno-deprecated-copy)
+  endif()
+  
   #The codebase is c++11 but both clang and visual c++ have issues with c++11
   #These issues are fixed by using preprocessor defines to replace code that
   #cause issues with c++14 code
@@ -922,16 +930,15 @@ if(SERVER_COMPILE)
     ${ICU_INCLUDE_DIRS}
     ${MYSQL_INCLUDE_DIRS}
   )
-  target_include_directories(${TARGET_SERVER} PRIVATE ${SERVER_INCLUDES_DIRS})
-  target_link_libraries(${TARGET_SERVER} ${LIBS} ${SERVER_LIBRARIES})
 
   if(DISCORD_SERVER_COMPILE)
-    target_link_libraries(${TARGET_SERVER} sleepy-discord)
+    list(APPEND SERVER_LIBRARIES sleepy-discord ${CPR_LIBRARIES})
   endif()
-
+  target_include_directories(${TARGET_SERVER} PRIVATE ${SERVER_INCLUDES_DIRS})
+  target_link_libraries(${TARGET_SERVER} ${LIBS} ${SERVER_LIBRARIES})
   list(APPEND TARGETS_OWN ${TARGET_SERVER})
   list(APPEND TARGETS_LINK ${TARGET_SERVER})
-
+  
   if(TARGET_OS AND TARGET_OS STREQUAL "mac")
     set(SERVER_LAUNCHER_SRC src/osxlaunch/server.mm)
     set(TARGET_SERVER_LAUNCHER ${TARGET_SERVER}-Launcher)

@@ -378,7 +378,7 @@ ResultPtr CConectionPool::SD(const char* Select, const char* Table, const char* 
 	if(pError != nullptr)
 		dbg_msg("SQL", "%s", pError);
 
-	return std::move(pResult);
+	return pResult;
 }
 
 void CConectionPool::SDT(const char* Select, const char* Table, std::function<void(ResultPtr)> func, const char* Buffer, ...)
