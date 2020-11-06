@@ -149,10 +149,10 @@ namespace SleepyDiscord {
 					);
 					else if (!response.text.empty())
 						onError(ERROR_NOTE, response.text);
-#if defined(__cpp_exceptions) || defined(__EXCEPTIONS)
+/*#if defined(__cpp_exceptions) || defined(__EXCEPTIONS)
 						if (static_cast<int>(mode) & static_cast<int>(ThrowError))
 							throw code;
-#endif
+#endif*/
 					}
 				} break;
 			}
@@ -244,8 +244,8 @@ namespace SleepyDiscord {
 		Session session;
 		session.setUrl("https://discordapp.com/api/gateway");
 		Response a = session.request(Get);	//todo change this back to a post
-		if (!a.text.length()) {	//error check
-			quit(false, true);
+		if(!a.text.length())
+		{	//error check
 			return setError(GATEWAY_FAILED);
 		}
 		if (!theGateway.empty())
@@ -661,7 +661,7 @@ namespace SleepyDiscord {
 		case SHARDING_REQUIRED:
 		case INVALID_INTENTS:
 		case DISALLOWED_INTENTS:
-			return quit(false, true);
+			return restart();
 			break;
 		}
 		reconnect(1001);
