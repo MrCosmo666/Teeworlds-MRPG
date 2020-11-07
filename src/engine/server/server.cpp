@@ -39,6 +39,8 @@
 
 #include "discord_main.h"
 
+// std::map < int, std::mutex > IServer::MutexPlayerDataSafe;
+
 // static instance worlds data
 std::shared_ptr<CWorldGameServerArray> CWorldGameServerArray::m_Instance;
 CWorldGameServerArray &CWorldGameServerArray::GetInstance()
@@ -440,15 +442,14 @@ int CServer::GetClientWorldID(int ClientID)
 	return m_aClients[ClientID].m_WorldID;
 }
 
-void CServer::SendDiscordGenerateMessage(const char *pColor, const char *pTitle, const char *pMsg)
+void CServer::SendDiscordGenerateMessage(const char *pColor, const char *pTitle, const char *pPhpArgs)
 {
 	#ifdef CONF_DISCORD
-		char Color[16], Title[256], Msg[512];
-		str_copy(Color, pColor, sizeof(Color));
-		str_copy(Title, pTitle, sizeof(Title));
-		str_copy(Msg, pMsg, sizeof(Msg));
-
-		std::thread t([=]() { m_pDiscord->SendGenerateMessage(g_Config.m_SvDiscordChanal, Color, Title, Msg); });
+		char aPrColorBuf[16], aPrTitleBuf[256], aPrPhpArgsBuf[512];
+		str_copy(aPrColorBuf, pColor, sizeof(aPrColorBuf));
+		str_copy(aPrTitleBuf, pTitle, sizeof(aPrTitleBuf));
+		str_copy(aPrPhpArgsBuf, pPhpArgs, sizeof(aPrPhpArgsBuf));
+		std::thread t([=]() { m_pDiscord->SendGenerateMessage(g_Config.m_SvDiscordChanal, aPrColorBuf, aPrTitleBuf, aPrPhpArgsBuf); });
 		t.detach();
 	#endif
 }
@@ -456,23 +457,21 @@ void CServer::SendDiscordGenerateMessage(const char *pColor, const char *pTitle,
 void CServer::SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText)
 {
 	#ifdef CONF_DISCORD
-		char aText[512], aTitle[256], aColor[16];
-		str_copy(aText, pText, sizeof(aText));
-		str_copy(aTitle, pTitle, sizeof(aTitle));
-		str_copy(aColor, pColor, sizeof(aColor));
-
-		std::thread t([=]() { m_pDiscord->SendMessage(pChanel, aColor, aTitle, aText); });
+		char aPrTextBuf[512], aPrTitleBuf[256], aPrColorBuf[16];
+		str_copy(aPrTextBuf, pText, sizeof(aPrTextBuf));
+		str_copy(aPrTitleBuf, pTitle, sizeof(aPrTitleBuf));
+		str_copy(aPrColorBuf, pColor, sizeof(aPrColorBuf));
+		std::thread t([=]() { m_pDiscord->SendEmbedMessage(pChanel, aPrColorBuf, aPrTitleBuf, aPrTextBuf); });
 		t.detach();
 	#endif
 }
 
-void CServer::SendDiscordStatus(const char *pStatus, int Type)
+void CServer::UpdateDiscordStatus(const char *pStatus)
 {
 	#ifdef CONF_DISCORD
-		char aStatus[128];		
-		int StatusType = Type;
-		str_copy(aStatus, pStatus, sizeof(aStatus));
-		std::thread t([=]() { m_pDiscord->SendStatus(aStatus, StatusType); });
+		char aPrStatusBuf[128];
+		str_copy(aPrStatusBuf, pStatus, sizeof(aPrStatusBuf));
+		std::thread t([=]() { m_pDiscord->UpdateStatus(aPrStatusBuf); });
 		t.detach();
 	#endif
 }
@@ -799,6 +798,7 @@ void CServer::DoSnapshot(int WorldID)
 
 int CServer::NewClientCallback(int ClientID, void *pUser)
 {
+	// THREAD_PLAYER_DATA_SAFE(ClientID)
 	CServer *pThis = (CServer *)pUser;
 	pThis->GameServer(MAIN_WORLD_ID)->ClearClientData(ClientID);
 	str_copy(pThis->m_aClients[ClientID].m_aLanguage, "en", sizeof(pThis->m_aClients[ClientID].m_aLanguage));
@@ -821,6 +821,7 @@ int CServer::NewClientCallback(int ClientID, void *pUser)
 
 int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 {
+	// THREAD_PLAYER_DATA_SAFE(ClientID)
 	CServer *pThis = (CServer *)pUser;
 
 	char aAddrStr[NETADDR_MAXSTRSIZE];

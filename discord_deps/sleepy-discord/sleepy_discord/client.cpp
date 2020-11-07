@@ -661,7 +661,7 @@ namespace SleepyDiscord {
 		case SHARDING_REQUIRED:
 		case INVALID_INTENTS:
 		case DISALLOWED_INTENTS:
-			return restart();
+			return quit(true, false);
 			break;
 		}
 		reconnect(1001);

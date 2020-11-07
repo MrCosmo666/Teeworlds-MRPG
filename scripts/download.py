@@ -20,7 +20,7 @@ def unzip(filename, where):
 	return z.namelist()[0]
 
 def downloadAll(targets):
-	version = "update-icu"
+	version = "master"
 	url = "https://github.com/MrCosmo666/MmoTee-Libs/archive/{}.zip".format(version)
 
 	# download and unzip

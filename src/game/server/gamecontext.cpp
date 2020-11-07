@@ -986,10 +986,10 @@ void CGS::UpdateDiscordStatus()
 	{
 		char aBuf[64];
 		str_format(aBuf, sizeof(aBuf), "%d player's play MRPG!", Players);
-		Server()->SendDiscordStatus(aBuf, 3);
+		Server()->UpdateDiscordStatus(aBuf);
 		return;
 	}
-	Server()->SendDiscordStatus("and expects players.", 3);
+	Server()->UpdateDiscordStatus("and expects players.");
 #endif
 }
 

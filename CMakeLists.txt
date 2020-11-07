@@ -846,7 +846,7 @@ if(DISCORD_SERVER_COMPILE)
   # Including Cpr to Sleepy-Discord
   set(SLEEPY_DISCORD_LIBRARIES)
   target_include_directories(sleepy-discord PUBLIC ${CPR_INCLUDE_DIRS})
-  target_link_libraries(sleepy-discord ${CPR_LIBRARIES})
+  list(APPEND SLEEPY_DISCORD_LIBRARIES ${CPR_LIBRARIES})
   target_compile_definitions(sleepy-discord PUBLIC EXISTENT_CPR)
 
   # Including Asio to Sleepy-Discord
