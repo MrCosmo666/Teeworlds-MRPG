@@ -442,14 +442,13 @@ int CServer::GetClientWorldID(int ClientID)
 	return m_aClients[ClientID].m_WorldID;
 }
 
-void CServer::SendDiscordGenerateMessage(const char *pColor, const char *pTitle, const char *pPhpArgs)
+void CServer::SendDiscordGenerateMessage(const char *pTitle, int AuthID, const char* pColor)
 {
 	#ifdef CONF_DISCORD
-		char aPrColorBuf[16], aPrTitleBuf[256], aPrPhpArgsBuf[512];
+		char aPrColorBuf[16], aPrTitleBuf[256];
 		str_copy(aPrColorBuf, pColor, sizeof(aPrColorBuf));
 		str_copy(aPrTitleBuf, pTitle, sizeof(aPrTitleBuf));
-		str_copy(aPrPhpArgsBuf, pPhpArgs, sizeof(aPrPhpArgsBuf));
-		std::thread t([=]() { m_pDiscord->SendGenerateMessage(g_Config.m_SvDiscordChanal, aPrColorBuf, aPrTitleBuf, aPrPhpArgsBuf); });
+		std::thread t([=]() { m_pDiscord->SendGenerateMessage(SleepyDiscord::User(), g_Config.m_SvDiscordChanal, aPrTitleBuf, AuthID, aPrColorBuf); });
 		t.detach();
 	#endif
 }

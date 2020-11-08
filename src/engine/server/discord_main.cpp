@@ -38,11 +38,11 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	{
 		SleepyDiscord::Embed EmbedHelp;
 		EmbedHelp.title = "Commands / Information";
-		EmbedHelp.description = "**!mconnect** - Info for connect your discord and account in game."
-			"\n**!monline** - Show players ingame."
-			"\n**!mstats <symbol>** - See stats players. Minimal 1 symbols."
+		EmbedHelp.description = "**!mconnect** - Info for connect your discord to account in game."
+			"\n**!monline** - Show players online."
 			"\n**!mranking** - Show ranking by level."
-			"\n**!mgoldranking** - Show ranking by gold.";
+			"\n**!mgoldranking** - Show ranking by gold."
+			"\n**!mstats <symbols>** - Search for player accounts cards. Minimum 1 symbol.";
 		EmbedHelp.color = string_to_number(DC_DISCORD_INFO, 0, 1410065407);
 		sendMessage(message.channelID, "\0", EmbedHelp);
 	}
@@ -54,28 +54,14 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		{
 			SleepyDiscord::Embed EmbedWarning;
 			EmbedWarning.title = "Not right!";
-			EmbedWarning.description = "Use **!mstats <nick full or not>. Minimal symbols 1.**!!!";
+			EmbedWarning.description = "Use: **!mstats <symbols>**. Minimum 1 symbol!";
 			EmbedWarning.color = string_to_number(DC_SERVER_WARNING, 0, 1410065407);
 			sendMessage(message.channelID, "\0", EmbedWarning);
 			return;
 		}
 
-		bool Found = false;
 		std::string InputNick = "%" + message.content.substr(8, message.content.length() - 8) + "%";
-		CSqlString<64> SearchNick = sqlstr::CSqlString<64>(InputNick.c_str());
-		ResultPtr pRes = SJK.SD("*", "tw_accounts_data", "WHERE Nick LIKE '%s'LIMIT 5", SearchNick.cstr());
-		while(pRes->next())
-		{
-			const int AuthID = pRes->getInt("ID");
-			const int RandomColor = 1000+random_int()%10000000;
-			const int Rank = Server()->GameServer()->GetRank(AuthID);
-
-			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "?player=%s&rank=%d&dicid=%d", pRes->getString("Nick").c_str(), Rank, pRes->getInt("DiscordEquip"));
-			SendGenerateMessage(std::string(message.channelID).c_str(), std::to_string(RandomColor).c_str(), "Discord MRPG Card", aBuf);
-			Found = true;
-		}
-
+		bool Found = SendGenerateMessage(message.author, std::string(message.channelID).c_str(), "Discord MRPG Card", InputNick.c_str());
 		if(!Found)
 		{
 			SleepyDiscord::Embed EmbedWarning;
@@ -125,7 +111,6 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		EmbedConnectInfo.color = string_to_number(DC_DISCORD_INFO, 0, 1410065407);
 		sendMessage(message.channelID, "\0", EmbedConnectInfo);
 
-		// search criteria
 		SleepyDiscord::Embed EmbedConnectResult;
 		std::string Nick = "Refresh please.";
 		std::string UserID = userAuth;
@@ -156,7 +141,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		CGS* pGS = (CGS*)Server()->GameServer(MAIN_WORLD_ID);
 		for(int i = 0; i < MAX_PLAYERS; i++) 
 		{
-			// THREAD_PLAYER_DATA_SAFE(i)
+			// THREAD_PLAYER_DATA_SAFE(i) // this thread working on detach we can got (Big ass)
 			CPlayer* pPlayer = pGS->GetPlayer(i);
 			if(pPlayer)
 			{
@@ -182,7 +167,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 
 		SleepyDiscord::Embed EmbedIdeas;
 		EmbedIdeas.title = std::string("Suggestion");
-		EmbedIdeas.description = "From:" + message.author.showUser() + "!\n" + message.content;
+		EmbedIdeas.description = "From: " + message.author.showUser() + "\n" + message.content;
 		EmbedIdeas.color = 431050;
 		EmbedIdeas.thumbnail.url = message.author.avatarUrl();
 		EmbedIdeas.thumbnail.proxyUrl = message.author.avatarUrl();
@@ -218,19 +203,53 @@ void DiscordJob::UpdateStatus(const char* Status)
 	this->updateStatus(Status);
 }
 
-void DiscordJob::SendGenerateMessage(const char* pChanal, const char* pColor, const char* pTitle, const char* pPhpArg)
+bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, const char* pChannel, const char *pTitle, const char* pSearchNickname, const char* pColor, bool MultipleSearch)
 {
-	char aImageUrlBuf[128];
-	str_format(aImageUrlBuf, sizeof(aImageUrlBuf), "%s%s", g_Config.m_SvGenerateURL, pPhpArg);
+	CSqlString<64> SearchNick(std::string("%" + std::string(pSearchNickname) + "%").c_str());
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_data", "WHERE Nick LIKE '%s' LIMIT %d", SearchNick.cstr(), (MultipleSearch ? 3 : 1));
+	while(pRes->next())
+	{
+		const int AuthID = pRes->getInt("ID");
+		const int Rank = Server()->GameServer()->GetRank(AuthID);
+		std::string Nickname(pRes->getString("Nick").c_str());
+		std::string PhpArguments = "?player=" + Nickname + "&dicid=" + std::to_string(pRes->getInt("DiscordEquip")) + "&rank=" + std::to_string(Rank);
+		std::string ImageUrl = std::string(g_Config.m_SvGenerateURL) + PhpArguments;
 
-	SleepyDiscord::Embed embed;
-	embed.title = std::string(pTitle);
-	embed.image.height = 800;
-	embed.image.width = 600;
-	embed.image.url = aImageUrlBuf;
-	embed.image.proxyUrl = aImageUrlBuf;
-	embed.color = string_to_number(pColor, 0, 1410065407);
-	this->sendMessage(pChanal, "\0", embed);
+		SleepyDiscord::Embed embed;
+		embed.title = pTitle;
+		embed.image.height = 800;
+		embed.image.width = 600;
+		embed.image.url = ImageUrl;
+		embed.image.proxyUrl = ImageUrl;
+		embed.color = pColor[0] != '\0' ? string_to_number(pColor, 0, 1410065407) : 1703301;
+		std::string DiscordID(pRes->getString("DiscordID").c_str());
+		if(DiscordID.compare("null") != 0)
+		{
+			SleepyDiscord::User userAuth = getUser(DiscordID).cast();
+			embed.description = "Owns this account: " + userAuth.showUser() + "\n\nPersonal card MRPG of this user"; // should we ping a person if another person is looking at his card?
+			embed.thumbnail.url = userAuth.avatarUrl();
+			embed.thumbnail.proxyUrl = userAuth.avatarUrl();
+			embed.thumbnail.height = 32;
+			embed.thumbnail.width = 32;
+		}
+		if(!UserRequestFrom.empty())
+		{
+			embed.footer.text = "Request from " + UserRequestFrom.username;
+			embed.footer.iconUrl = UserRequestFrom.avatarUrl();
+			embed.footer.proxyIconUrl = UserRequestFrom.avatarUrl();
+		}
+
+		this->sendMessage(std::string(pChannel), "\0", embed);
+	}
+	const bool Founded = (pRes->rowsCount() > 0);
+	return Founded;
+}
+
+bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, const char* pChanal, const char* pTitle, const int AuthID, const char* pColor)
+{
+	CGS* pGS = (CGS*)Server()->GameServer(MAIN_WORLD_ID);
+	std::string Nickname(pGS->Mmo()->PlayerName(AuthID));
+	return SendGenerateMessage(UserRequestFrom, pChanal, pTitle, Nickname.c_str(), pColor, false);
 }
 
 void DiscordJob::SendEmbedMessage(const char *pChanal, const char *Color, const char *Title, std::string pMsg)

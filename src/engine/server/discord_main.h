@@ -27,7 +27,8 @@ public:
 	void SetServer(IServer *pServer);
 
 	void SendEmbedMessage(const char *pChanal, const char *Color, const char *Title, std::string pMsg);
-	void SendGenerateMessage(const char *pChanal, const char *Color, const char *Title, const char *pPhpArg);
+	bool SendGenerateMessage(SleepyDiscord::User UserRequestFrom, const char *pChanal, const char *pTitle, const char *pSearchNickname, const char* pColor = "\0", bool MultipleSearch = true);
+	bool SendGenerateMessage(SleepyDiscord::User UserRequestFrom, const char *pChanal, const char *pTitle, const int AuthID, const char* pColor = "\0");
 	void UpdateStatus(const char* Status);
 };
 

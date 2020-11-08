@@ -66,6 +66,8 @@ namespace SleepyDiscord {
 		PremiumType premiumType = PremiumType::None;
 		Flags publieFlags = Flags::None;
 
+		bool empty() const { return (username.empty() || discriminator.empty()); }
+
 		JSONStructStart
 			std::make_tuple(
 				json::pair                      (&User::ID           , "id"           , json::REQUIRIED_FIELD        ),

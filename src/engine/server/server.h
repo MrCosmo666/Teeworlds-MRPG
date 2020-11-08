@@ -239,7 +239,7 @@ public:
 	virtual const char* GetWorldName(int WorldID);
 
 	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText);
-	virtual void SendDiscordGenerateMessage(const char *pColor, const char *pTitle, const char *pPhpArgs);
+	virtual void SendDiscordGenerateMessage(const char *pTitle, int AuthID, const char* pColor = "\0");
 	virtual void UpdateDiscordStatus(const char *pStatus);
 
 	void Kick(int ClientID, const char *pReason);

@@ -117,7 +117,7 @@ public:
 
 	// discord
 	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText) = 0;
-	virtual void SendDiscordGenerateMessage(const char *pColor, const char *pTitle, const char *pPhpArgs) = 0;
+	virtual void SendDiscordGenerateMessage(const char* pTitle, int AuthID, const char* pColor = "\0") = 0;
 	virtual void UpdateDiscordStatus(const char *pStatus) = 0;
 	
 	// Bots

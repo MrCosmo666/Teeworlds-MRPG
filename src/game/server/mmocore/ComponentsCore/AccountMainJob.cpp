@@ -171,11 +171,9 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	const int Rank = GetRank(pPlayer->Acc().m_AuthID);
 	GS()->Chat(-1, "{STR} logged to account. Rank #{INT}", Server()->ClientName(ClientID), &Rank);
 #ifdef CONF_DISCORD
-	char pMsg[256], pLoggin[64];
-	str_format(pLoggin, sizeof(pLoggin), "%s logged in Account ID %d", Server()->ClientName(ClientID), pPlayer->Acc().m_AuthID);
-	str_format(pMsg, sizeof(pMsg), "?player=%s&rank=%d&dicid=%d",
-		Server()->ClientName(ClientID), Rank, pPlayer->GetEquippedItemID(EQUIP_DISCORD));
-	Server()->SendDiscordGenerateMessage("16757248", pLoggin, pMsg);
+	char aLoginBuf[64];
+	str_format(aLoginBuf, sizeof(aLoginBuf), "%s logged in Account ID %d", Server()->ClientName(ClientID), pPlayer->Acc().m_AuthID);
+	Server()->SendDiscordGenerateMessage(aLoginBuf, pPlayer->Acc().m_AuthID);
 #endif
 
 	if (!pPlayer->GetItem(itHammer).m_Count)
@@ -206,8 +204,9 @@ void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true);
 	if(!pPlayer) return;	
 
-	CSqlString<64> cDID = CSqlString<64>(pDID);
-	SJK.UD("tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", cDID.cstr(), pPlayer->Acc().m_AuthID);
+	CSqlString<64> DiscordID = CSqlString<64>(pDID);
+	SJK.UD("tw_accounts_data", "DiscordID = 'null' WHERE DiscordID = '%s'", DiscordID.cstr());
+	SJK.UD("tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", DiscordID.cstr(), pPlayer->Acc().m_AuthID);
 
 	GS()->Chat(ClientID, "Update DiscordID.");
 	GS()->Chat(ClientID, "Check connect status in Discord \"!mconnect\".");
