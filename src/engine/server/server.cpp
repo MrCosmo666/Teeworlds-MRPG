@@ -437,7 +437,7 @@ void CServer::BackInformationFakeClient(int FakeClientID)
 int CServer::GetClientWorldID(int ClientID)
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
-		return -1;
+		return 0;
 
 	return m_aClients[ClientID].m_WorldID;
 }

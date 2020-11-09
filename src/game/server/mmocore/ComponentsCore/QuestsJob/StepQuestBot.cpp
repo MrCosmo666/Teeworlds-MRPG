@@ -157,7 +157,7 @@ void CPlayerStepQuestBot::DoCollectItem(CPlayer* pPlayer)
 		const int Count = m_Bot->m_aItemSearchCount[i];
 		if(ItemID > 0 && Count > 0)
 		{
-			pGS->Chat(pPlayer->GetCID(), "[Completed] Give the {STR}x{INT} to the {STR}!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer), &Count, m_Bot->GetName());
+			pGS->Chat(pPlayer->GetCID(), "[Done] Give the {STR}x{INT} to the {STR}!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer), &Count, m_Bot->GetName());
 			antiStressing = (bool)(ItemID == m_Bot->m_aItemGives[0] || ItemID == m_Bot->m_aItemGives[1]);
 			pPlayer->GetItem(ItemID).Remove(Count);
 		}
@@ -203,7 +203,7 @@ void CPlayerStepQuestBot::AddMobProgress(CPlayer* pPlayer, int BotID)
 
 		m_MobProgress[i]++;
 		if(m_MobProgress[i] >= m_Bot->m_aNeedMobCount[i])
-			pGS->Chat(ClientID, "[Completed] Defeat the {STR}'s for the {STR}!", BotJob::ms_aDataBot[BotID].m_aNameBot, m_Bot->GetName());
+			pGS->Chat(ClientID, "[Done] Defeat the {STR}'s for the {STR}!", BotJob::ms_aDataBot[BotID].m_aNameBot, m_Bot->GetName());
 
 		SJK.UD("tw_accounts_quests_bots_step", "Mob1Progress = '%d', Mob2Progress = '%d' WHERE SubBotID = '%d' AND OwnerID = '%d'", m_MobProgress[0], m_MobProgress[1], SubBotID, pPlayer->Acc().m_AuthID);
 		break;

@@ -80,7 +80,8 @@ void CPlayerBot::EffectsTick()
 		pEffect->second--;
 		if(pEffect->second <= 0)
 		{
-			GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, pEffect->first.c_str(), false);
+			if(m_pCharacter && m_pCharacter->IsAlive())
+				GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, pEffect->first.c_str(), false);
 			pEffect = m_aEffects.erase(pEffect);
 			continue;
 		}

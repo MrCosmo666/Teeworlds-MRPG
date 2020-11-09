@@ -1147,6 +1147,7 @@ void CGS::OnSnap(int ClientID)
 void CGS::OnPreSnap() {}
 void CGS::OnPostSnap()
 {
+	m_World.PostSnap();
 	m_Events.Clear();
 }
 
@@ -2024,7 +2025,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		// statistics menu
 		const int ExpForLevel = pPlayer->ExpNeed(pPlayer->Acc().m_Level);
 		AVH(ClientID, TAB_STAT, GREEN_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().m_aLastLogin);
-		AVM(ClientID, "null", NOPE, TAB_STAT, "Discord: \"{STR}\". Ideas, bugs, rewards", g_Config.m_SvDiscordInviteGroup);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Discord: \"{STR}\"", g_Config.m_SvDiscordInviteGroup);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Level {INT} : Exp {INT}/{INT}", &pPlayer->Acc().m_Level, &pPlayer->Acc().m_Exp, &ExpForLevel);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Skill Point {INT}SP", &pPlayer->GetItem(itSkillPoint).m_Count);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Gold: {INT}", &pPlayer->GetItem(itGold).m_Count);

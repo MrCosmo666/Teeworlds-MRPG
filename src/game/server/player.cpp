@@ -109,8 +109,9 @@ void CPlayer::EffectsTick()
 		pEffect->second--;
 		if(pEffect->second <= 0)
 		{
+			if(m_pCharacter && m_pCharacter->IsAlive())
+				GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, pEffect->first.c_str(), false);
 			GS()->Chat(m_ClientID, "You lost the effect {STR}.", pEffect->first.c_str());
-			GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, pEffect->first.c_str(), false);
 			pEffect = CGS::ms_aEffects[m_ClientID].erase(pEffect);
 			continue;
 		}
