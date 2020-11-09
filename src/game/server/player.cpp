@@ -91,7 +91,7 @@ void CPlayer::PostTick()
 {
 	// update latency value
 	if (Server()->ClientIngame(m_ClientID) && GS()->IsPlayerEqualWorldID(m_ClientID) && IsAuthed())
-		GetTempData().m_TempPing = (short)m_Latency.m_Min;
+		GetTempData().m_TempPing = m_Latency.m_Min;
 
 	// update player tick
 	HandleTuningParams();
@@ -217,10 +217,7 @@ void CPlayer::TryRespawn()
 {
 	vec2 SpawnPos;
 	int SpawnType = SPAWN_HUMAN;
-
-	if(GS()->IsDungeon() && GetTempData().m_TempSafeSpawn)
-		GetTempData().m_TempSafeSpawn = false;
-	else if(GetTempData().m_TempSafeSpawn)
+	if(GetTempData().m_TempSafeSpawn)
 	{
 		const int SafezoneWorldID = GS()->GetRespawnWorld();
 		if(SafezoneWorldID >= 0 && !GS()->IsPlayerEqualWorldID(m_ClientID, SafezoneWorldID))
@@ -228,7 +225,6 @@ void CPlayer::TryRespawn()
 			ChangeWorld(SafezoneWorldID);
 			return;
 		}
-
 		SpawnType = SPAWN_HUMAN_SAFE;
 	}
 

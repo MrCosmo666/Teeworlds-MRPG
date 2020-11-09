@@ -136,17 +136,16 @@ namespace SleepyDiscord {
 					//{ "code", "message" });	//parse json to get code and message
 					rapidjson::Document document;
 					document.Parse(response.text.c_str());
-						if (!document.IsObject()) {
-							onError(GENERAL_ERROR, "No error code or message from Discord");
-						}
+					if (!document.IsObject())
+					{
+						onError(GENERAL_ERROR, "No error code or message from Discord");
+						break;
+					}
 
 					auto errorCode = document.FindMember("code");
 					auto errorMessage = document.FindMember("message");
 					if (errorCode != document.MemberEnd())
-						onError(
-							static_cast<ErrorCode>(errorCode->value.GetInt()),
-							{ errorMessage != document.MemberEnd() ? errorMessage->value.GetString() : "" }
-					);
+						onError(static_cast<ErrorCode>(errorCode->value.GetInt()), { errorMessage != document.MemberEnd() ? errorMessage->value.GetString() : "" });
 					else if (!response.text.empty())
 						onError(ERROR_NOTE, response.text);
 /*#if defined(__cpp_exceptions) || defined(__EXCEPTIONS)

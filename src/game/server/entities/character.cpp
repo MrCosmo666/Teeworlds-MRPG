@@ -652,15 +652,17 @@ void CCharacter::Die(int Killer, int Weapon)
 	const int ClientID = m_pPlayer->GetCID();
 	if(Weapon != WEAPON_WORLD && !GS()->IsDungeon())
 	{
-		m_pPlayer->UpdateTempData(0, 0);
 		m_pPlayer->ClearEffects();
+		m_pPlayer->UpdateTempData(0, 0);
 		const int SafezoneWorldID = GS()->GetRespawnWorld();
 		if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot() && GS()->m_apPlayers[Killer])
 		{
 			// potion resurrection
 			InventoryItem& pItemPlayer = m_pPlayer->GetItem(itPotionResurrection);
 			if(pItemPlayer.IsEquipped())
+			{
 				pItemPlayer.Use(1);
+			}
 			else
 			{
 				GS()->Chat(ClientID, "You are dead, you will be treated in {STR}", Server()->GetWorldName(SafezoneWorldID));

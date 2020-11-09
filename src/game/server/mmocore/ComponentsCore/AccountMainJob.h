@@ -64,7 +64,7 @@ public:
 		// player stats
 		int m_TempHealth;
 		int m_TempMana;
-		short m_TempPing;
+		int m_TempPing;
 
 		// save pos teleport
 		bool m_TempSafeSpawn;
