@@ -39,7 +39,7 @@ static void CurlUnlock(CURL *pHandle, curl_lock_data Data, void *pUser)
 	lock_unlock(gs_aLocks[GetLockIndex(Data)]);
 }
 
-bool HttpInit(IStorage *pStorage)
+bool HttpInit(IStorageEngine* pStorage)
 {
 	if(curl_global_init(CURL_GLOBAL_DEFAULT))
 	{
@@ -245,7 +245,7 @@ size_t CGet::OnData(char *pData, size_t DataSize)
 	return DataSize;
 }
 
-CGetFile::CGetFile(IStorage *pStorage, const char *pUrl, const char *pDest, int StorageType, bool CanTimeout) :
+CGetFile::CGetFile(IStorageEngine* pStorage, const char *pUrl, const char *pDest, int StorageType, bool CanTimeout) :
 	CRequest(pUrl, CanTimeout),
 	m_pStorage(pStorage),
 	m_StorageType(StorageType)

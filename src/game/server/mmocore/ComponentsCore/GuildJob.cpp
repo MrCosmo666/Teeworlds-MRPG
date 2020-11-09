@@ -661,7 +661,7 @@ const char *GuildJob::GuildName(int GuildID) const
 {	
 	if(ms_aGuild.find(GuildID) != ms_aGuild.end())
 		return ms_aGuild[GuildID].m_aName;
-	return "Broken"; 
+	return "invalid"; 
 }
 
 int GuildJob::GetMemberAccess(CPlayer* pPlayer) const
@@ -760,29 +760,19 @@ void GuildJob::ShowDecorationList(CPlayer* pPlayer)
 /* #########################################################################
 	FUNCTIONS MEMBER MEMBER 
 ######################################################################### */
-void GuildJob::CreateGuild(int ClientID, const char *GuildName)
+void GuildJob::CreateGuild(CPlayer *pPlayer, const char *pGuildName)
 {
-	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true);
-	if (!pPlayer)
-		return;
-
 	// check whether we are already in the guild
+	const int ClientID = pPlayer->GetCID();
 	if(pPlayer->Acc().m_GuildID > 0) 
 	{
 		GS()->Chat(ClientID, "You already in guild group!");
 		return;
 	}
 
-	// broken its invalid guild
-	if(str_comp_nocase(GuildName, "Broken") == 0)
-	{
-		GS()->Chat(ClientID, "This name is reserved by the system!");
-		return;
-	}
-
 	// we check the availability of the guild's name
-	CSqlString<64> cGuildName = CSqlString<64>(GuildName);
-	ResultPtr pRes = SJK.SD("ID", "tw_guilds", "WHERE GuildName = '%s'", cGuildName.cstr());
+	CSqlString<64> GuildName(pGuildName);
+	ResultPtr pRes = SJK.SD("ID", "tw_guilds", "WHERE GuildName = '%s'", GuildName.cstr());
 	if(pRes->next())
 	{
 		GS()->Chat(ClientID, "This guild name already useds!");
@@ -790,31 +780,32 @@ void GuildJob::CreateGuild(int ClientID, const char *GuildName)
 	}
 
 	// we check the ticket, we take it and create
-	if(pPlayer->GetItem(itTicketGuild).m_Count > 0 && pPlayer->GetItem(itTicketGuild).Remove(1))
+	if(pPlayer->GetItem(itTicketGuild).m_Count <= 0 || !pPlayer->GetItem(itTicketGuild).Remove(1))
 	{
-		// get ID for initialization
-		ResultPtr pResID = SJK.SD("ID", "tw_guilds", "ORDER BY ID DESC LIMIT 1");
-		const int InitID = pResID->next() ? pResID->getInt("ID")+1 : 1; // TODO: thread save ? hm need for table all time auto increment = 1; NEED FIX IT -- use some kind of uuid
-		
-		// initialize the guild
-		str_copy(ms_aGuild[InitID].m_aName, cGuildName.cstr(), sizeof(ms_aGuild[InitID].m_aName));
-		ms_aGuild[InitID].m_OwnerID = pPlayer->Acc().m_AuthID;
-		ms_aGuild[InitID].m_Level = 1;
-		ms_aGuild[InitID].m_Exp = 0;
-		ms_aGuild[InitID].m_Bank = 0;
-		ms_aGuild[InitID].m_Score = 0;
-		ms_aGuild[InitID].m_Upgrades[EMEMBERUPGRADE::AvailableNSTSlots] = 2;
-		ms_aGuild[InitID].m_Upgrades[EMEMBERUPGRADE::ChairNSTExperience] = 1;
-		pPlayer->Acc().m_GuildID = InitID;
-
-		// we create a guild in the table
-		SJK.ID("tw_guilds", "(ID, GuildName, OwnerID) VALUES ('%d', '%s', '%d')", InitID, cGuildName.cstr(), pPlayer->Acc().m_AuthID);
-		SJK.UDS(1000, "tw_accounts_data", "GuildID = '%d' WHERE ID = '%d'", InitID, pPlayer->Acc().m_AuthID);
-		GS()->Chat(-1, "New guilds [{STR}] have been created!", cGuildName.cstr());
-		GS()->StrongUpdateVotes(ClientID, MenuList::MAIN_MENU);
-	}
-	else 
 		GS()->Chat(ClientID, "You need first buy guild ticket on shop!");
+		return;
+	}
+
+	// get ID for initialization
+	ResultPtr pResID = SJK.SD("ID", "tw_guilds", "ORDER BY ID DESC LIMIT 1");
+	const int InitID = pResID->next() ? pResID->getInt("ID")+1 : 1; // TODO: thread save ? hm need for table all time auto increment = 1; NEED FIX IT -- use some kind of uuid
+		
+	// initialize the guild
+	str_copy(ms_aGuild[InitID].m_aName, GuildName.cstr(), sizeof(ms_aGuild[InitID].m_aName));
+	ms_aGuild[InitID].m_OwnerID = pPlayer->Acc().m_AuthID;
+	ms_aGuild[InitID].m_Level = 1;
+	ms_aGuild[InitID].m_Exp = 0;
+	ms_aGuild[InitID].m_Bank = 0;
+	ms_aGuild[InitID].m_Score = 0;
+	ms_aGuild[InitID].m_Upgrades[EMEMBERUPGRADE::AvailableNSTSlots] = 2;
+	ms_aGuild[InitID].m_Upgrades[EMEMBERUPGRADE::ChairNSTExperience] = 1;
+	pPlayer->Acc().m_GuildID = InitID;
+
+	// we create a guild in the table
+	SJK.ID("tw_guilds", "(ID, GuildName, OwnerID) VALUES ('%d', '%s', '%d')", InitID, GuildName.cstr(), pPlayer->Acc().m_AuthID);
+	SJK.UDS(1000, "tw_accounts_data", "GuildID = '%d' WHERE ID = '%d'", InitID, pPlayer->Acc().m_AuthID);
+	GS()->Chat(-1, "New guilds [{STR}] have been created!", GuildName.cstr());
+	GS()->StrongUpdateVotes(ClientID, MenuList::MAIN_MENU);
 }
 
 void GuildJob::DisbandGuild(int GuildID)
@@ -853,12 +844,12 @@ void GuildJob::DisbandGuild(int GuildID)
 
 bool GuildJob::JoinGuild(int AuthID, int GuildID)
 {
-	const char *PlayerName = Job()->PlayerName(AuthID);
+	const char *pPlayerName = Job()->PlayerName(AuthID);
 	ResultPtr pResCheckJoin = SJK.SD("ID", "tw_accounts_data", "WHERE ID = '%d' AND GuildID IS NOT NULL", AuthID);
 	if(pResCheckJoin->next())
 	{
 		GS()->ChatAccountID(AuthID, "You already in guild group!");
-		GS()->ChatGuild(GuildID, "{STR} already joined your or another guilds", PlayerName);
+		GS()->ChatGuild(GuildID, "{STR} already joined your or another guilds", pPlayerName);
 		return false;
 	}
 
@@ -867,20 +858,20 @@ bool GuildJob::JoinGuild(int AuthID, int GuildID)
 	if((int)pResCheckSlot->rowsCount() >= ms_aGuild[GuildID].m_Upgrades[EMEMBERUPGRADE::AvailableNSTSlots])
 	{
 		GS()->ChatAccountID(AuthID, "You don't joined [No slots for join]");
-		GS()->ChatGuild(GuildID, "{STR} don't joined [No slots for join]", PlayerName);
+		GS()->ChatGuild(GuildID, "{STR} don't joined [No slots for join]", pPlayerName);
 		return false;
 	}
 
 	// we update and get the data
-	const int ClientID = Job()->Account()->CheckOnlineAccount(AuthID);
-	if(ClientID >= 0 && ClientID < MAX_PLAYERS)
+	CPlayer *pPlayer = GS()->GetPlayerFromAuthID(AuthID);
+	if(pPlayer)
 	{
-		AccountMainJob::ms_aData[ClientID].m_GuildID = GuildID;
-		AccountMainJob::ms_aData[ClientID].m_GuildRank = 0;
-		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
+		pPlayer->Acc().m_GuildID = GuildID;
+		pPlayer->Acc().m_GuildRank = 0;
+		GS()->ResetVotes(pPlayer->GetCID(), MenuList::MAIN_MENU);
 	}
 	SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = NULL WHERE ID = '%d'", GuildID, AuthID);
-	GS()->ChatGuild(GuildID, "Player {STR} join in your guild!", PlayerName);
+	GS()->ChatGuild(GuildID, "Player {STR} join in your guild!", pPlayerName);
 	return true;
 }
 
@@ -904,11 +895,11 @@ void GuildJob::ExitGuild(int AuthID)
 		AddHistoryGuild(GuildID, "'%s' exit or kicked.", Job()->PlayerName(AuthID));
 
 		// we update the player's information
-		const int ClientID = Job()->Account()->CheckOnlineAccount(AuthID);
-		if(ClientID >= 0 && ClientID < MAX_PLAYERS)
+		CPlayer *pPlayer = GS()->GetPlayerFromAuthID(AuthID);
+		if(pPlayer)
 		{
-			AccountMainJob::ms_aData[ClientID].m_GuildID = 0;
-			GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
+			pPlayer->Acc().m_GuildID = 0;
+			GS()->ResetVotes(pPlayer->GetCID(), MenuList::MAIN_MENU);
 		}
 		SJK.UD("tw_accounts_data", "GuildID = NULL, GuildRank = NULL, GuildDeposit = '0' WHERE ID = '%d'", AuthID);
 	}
@@ -979,7 +970,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 			GS()->AVM(ClientID, "MUPGRADE", i, NOPE, "Upgrade {STR} ({INT}) {INT}gold", UpgradeNames(i).c_str(), &ms_aGuild[GuildID].m_Upgrades[i], &PriceUpgrade);
 		}
 	}
-	int PriceUpgrade = ms_aGuild[ GuildID ].m_Upgrades[ EMEMBERUPGRADE::AvailableNSTSlots ] * g_Config.m_SvPriceUpgradeGuildSlot;
+	int PriceUpgrade = ms_aGuild[GuildID].m_Upgrades[ EMEMBERUPGRADE::AvailableNSTSlots ] * g_Config.m_SvPriceUpgradeGuildSlot;
 	GS()->AVM(ClientID, "MUPGRADE", EMEMBERUPGRADE::AvailableNSTSlots, NOPE, "Upgrade {STR} ({INT}) {INT}gold", 
 		UpgradeNames(EMEMBERUPGRADE::AvailableNSTSlots).c_str(), &ms_aGuild[GuildID].m_Upgrades[ EMEMBERUPGRADE::AvailableNSTSlots ], &PriceUpgrade);
 	GS()->AddBackpage(ClientID);
@@ -1219,8 +1210,7 @@ void GuildJob::ChangeRankAccess(int RankID)
 // change player rank
 void GuildJob::ChangePlayerRank(int AuthID, int RankID)
 {
-	const int ClientID = Job()->Account()->CheckOnlineAccount(AuthID);
-	CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
+	CPlayer* pPlayer = GS()->GetPlayerFromAuthID(AuthID);
 	if(pPlayer)
 		pPlayer->Acc().m_GuildRank = RankID;
 

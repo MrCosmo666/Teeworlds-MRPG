@@ -71,7 +71,7 @@ public:
 	bool CheckMemberAccess(CPlayer *pPlayer, int Access = GuildAccess::ACCESS_LEADER) const;
 	int GetMemberChairBonus(int GuildID, int Field) const;
 
-	void CreateGuild(int ClientID, const char *GuildName);
+	void CreateGuild(CPlayer *pPlayer, const char *pGuildName);
 	void DisbandGuild(int GuildID);
 	bool JoinGuild(int AuthID, int GuildID);
 	void ExitGuild(int AuthID);

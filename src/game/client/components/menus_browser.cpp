@@ -150,7 +150,7 @@ void CMenus::LoadFilters()
 {
 	// read file data into buffer
 	const char *pFilename = "ui_settings_mrpg.json";
-	IOHANDLE File = Storage()->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_ALL);
+	IOHANDLE File = Storage()->OpenFile(pFilename, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 	if(!File)
 		return;
 	int FileSize = (int)io_length(File);
@@ -266,7 +266,7 @@ void CMenus::LoadFilters()
 
 void CMenus::SaveFilters()
 {
-	IOHANDLE File = Storage()->OpenFile("ui_settings_mrpg.json", IOFLAG_WRITE, IStorage::TYPE_SAVE);
+	IOHANDLE File = Storage()->OpenFile("ui_settings_mrpg.json", IOFLAG_WRITE, IStorageEngine::TYPE_SAVE);
 	if(!File)
 		return;
 

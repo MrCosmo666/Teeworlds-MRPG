@@ -352,7 +352,7 @@ class CGraphics_Threaded : public IEngineGraphics
 	unsigned m_CurrentCommandBuffer;
 
 	//
-	class IStorage* m_pStorage;
+	class IStorageEngine* m_pStorage;
 	class IConsole* m_pConsole;
 
 	CCommandBuffer::CVertex m_aVertices[MAX_VERTICES];

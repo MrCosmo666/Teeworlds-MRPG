@@ -669,7 +669,7 @@ void CGameConsole::Dump(int Type)
 	char aFilename[128];
 	str_timestamp(aBuf, sizeof(aBuf));
 	str_format(aFilename, sizeof(aFilename), "dumps/%s_dump_%s.txt", pConsole->m_pName, aBuf);
-	IOHANDLE File = Storage()->OpenFile(aFilename, IOFLAG_WRITE, IStorage::TYPE_SAVE);
+	IOHANDLE File = Storage()->OpenFile(aFilename, IOFLAG_WRITE, IStorageEngine::TYPE_SAVE);
 	if(File)
 	{
 		for(CInstance::CBacklogEntry *pEntry = pConsole->m_Backlog.First(); pEntry; pEntry = pConsole->m_Backlog.Next(pEntry))

@@ -90,7 +90,7 @@ CUpdater::CUpdater()
 void CUpdater::Init()
 {
 	m_pClient = Kernel()->RequestInterface<IClient>();
-	m_pStorage = Kernel()->RequestInterface<IStorage>();
+	m_pStorage = Kernel()->RequestInterface<IStorageEngine>();
 	m_pEngine = Kernel()->RequestInterface<IEngine>();
 	m_IsWinXP = os_is_winxp_or_lower();
 }
@@ -193,7 +193,7 @@ bool CUpdater::ReplaceClient()
 void CUpdater::ParseUpdate()
 {
 	char aPath[512];
-	IOHANDLE File = m_pStorage->OpenFile(m_pStorage->GetBinaryPath("mmotee-info.json", aPath, sizeof aPath), IOFLAG_READ, IStorage::TYPE_ALL);
+	IOHANDLE File = m_pStorage->OpenFile(m_pStorage->GetBinaryPath("mmotee-info.json", aPath, sizeof aPath), IOFLAG_READ, IStorageEngine::TYPE_ALL);
 	if(!File)
 		return;
 

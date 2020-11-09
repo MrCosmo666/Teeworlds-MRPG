@@ -80,8 +80,6 @@ public:
 	static std::map < int, StructTempPlayerData > ms_aPlayerTempData;
 
 	int SendAuthCode(int ClientID, int Code);
-	int CheckOnlineAccount(int AuthID) const;
-
 	int RegisterAccount(int ClientID, const char *Login, const char *Password);
 	int LoginAccount(int ClientID, const char *Login, const char *Password);
 	void LoadAccount(CPlayer *pPlayer, bool FirstInitilize = false);

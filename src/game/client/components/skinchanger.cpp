@@ -75,7 +75,7 @@ void CCSkinChanger::CGameSkins::DelayedInit()
 	m_DefaultTexture = g_pData->m_aImages[IMAGE_GAME].m_Id; // save default texture
 	if (g_Config.m_GameTexture[0] != '\0')
 	{
-		if (LoadEntity(g_Config.m_GameTexture, IStorage::TYPE_ALL, &m_InitialTexture))
+		if (LoadEntity(g_Config.m_GameTexture, IStorageEngine::TYPE_ALL, &m_InitialTexture))
 		{
 			g_pData->m_aImages[IMAGE_GAME].m_Id = m_InitialTexture;
 			char aBuf[256];
@@ -92,7 +92,7 @@ void CCSkinChanger::CGameSkins::LoadEntities()
 	for (int i = 0; i < m_Count; i++)
 		Graphics()->UnloadTexture(&(m_Info[i].m_aTextures));
 
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "gameskins", EntityScan, this);
+	Storage()->ListDirectory(IStorageEngine::TYPE_ALL, "gameskins", EntityScan, this);
 	m_IsLoaded = true;
 }
 
@@ -134,7 +134,7 @@ void CCSkinChanger::CParticles::DelayedInit()
 	m_DefaultTexture = g_pData->m_aImages[IMAGE_PARTICLES].m_Id; // save default texture
 	if (g_Config.m_GameParticles[0] != '\0')
 	{
-		if (LoadEntity(g_Config.m_GameParticles, IStorage::TYPE_ALL, &m_InitialTexture))
+		if (LoadEntity(g_Config.m_GameParticles, IStorageEngine::TYPE_ALL, &m_InitialTexture))
 		{
 			g_pData->m_aImages[IMAGE_PARTICLES].m_Id = m_InitialTexture;
 			char aBuf[256];
@@ -150,7 +150,7 @@ void CCSkinChanger::CParticles::LoadEntities()
 	for (int i = 0; i < m_Count; i++)
 		Graphics()->UnloadTexture(&(m_Info[i].m_aTextures));
 
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "particles", EntityScan, this);
+	Storage()->ListDirectory(IStorageEngine::TYPE_ALL, "particles", EntityScan, this);
 	m_IsLoaded = true;
 }
 bool CCSkinChanger::CParticles::LoadEntity(const char *pName, int DirType, IGraphics::CTextureHandle *pTexture)
@@ -189,7 +189,7 @@ void CCSkinChanger::CCursors::DelayedInit()
 	m_DefaultTexture = g_pData->m_aImages[IMAGE_CURSOR].m_Id; // save default texture
 	if (g_Config.m_GameCursor[0] != '\0')
 	{
-		if (LoadEntity(g_Config.m_GameCursor, IStorage::TYPE_ALL, &m_InitialTexture))
+		if (LoadEntity(g_Config.m_GameCursor, IStorageEngine::TYPE_ALL, &m_InitialTexture))
 		{
 			g_pData->m_aImages[IMAGE_CURSOR].m_Id = m_InitialTexture;
 			char aBuf[256];
@@ -205,7 +205,7 @@ void CCSkinChanger::CCursors::LoadEntities()
 	for (int i = 0; i < m_Count; i++)
 		Graphics()->UnloadTexture(&(m_Info[i].m_aTextures));
 
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "cursor", EntityScan, this);
+	Storage()->ListDirectory(IStorageEngine::TYPE_ALL, "cursor", EntityScan, this);
 	m_IsLoaded = true;
 }
 bool CCSkinChanger::CCursors::LoadEntity(const char *pName, int DirType, IGraphics::CTextureHandle *pTexture)
@@ -244,7 +244,7 @@ void CCSkinChanger::CEmoticons::DelayedInit()
 	m_DefaultTexture = g_pData->m_aImages[IMAGE_EMOTICONS].m_Id; // save default texture
 	if (g_Config.m_GameEmoticons[0] != '\0')
 	{
-		if (LoadEntity(g_Config.m_GameEmoticons, IStorage::TYPE_ALL, &m_InitialTexture))
+		if (LoadEntity(g_Config.m_GameEmoticons, IStorageEngine::TYPE_ALL, &m_InitialTexture))
 		{
 			g_pData->m_aImages[IMAGE_EMOTICONS].m_Id = m_InitialTexture;
 			char aBuf[256];
@@ -260,7 +260,7 @@ void CCSkinChanger::CEmoticons::LoadEntities()
 	for (int i = 0; i < m_Count; i++)
 		Graphics()->UnloadTexture(&(m_Info[i].m_aTextures));
 
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "emoticons", EntityScan, this);
+	Storage()->ListDirectory(IStorageEngine::TYPE_ALL, "emoticons", EntityScan, this);
 	m_IsLoaded = true;
 }
 bool CCSkinChanger::CEmoticons::LoadEntity(const char *pName, int DirType, IGraphics::CTextureHandle *pTexture)
@@ -296,13 +296,13 @@ void CCSkinChanger::CEntities::DelayedInit() { }
 
 void CCSkinChanger::CEntities::LoadEntities()
 {
-	m_DefaultTexture = Graphics()->LoadTexture("editor/entities.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_MULTI_DIMENSION);
+	m_DefaultTexture = Graphics()->LoadTexture("editor/entities.png", IStorageEngine::TYPE_ALL, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_MULTI_DIMENSION);
 
 	// unload all textures (don't think that's necessary)
 	for (int i = 0; i < m_Count; i++)
 		Graphics()->UnloadTexture(&(m_Info[i].m_aTextures));
 
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "entities", EntityScan, this);
+	Storage()->ListDirectory(IStorageEngine::TYPE_ALL, "entities", EntityScan, this);
 	m_IsLoaded = true;
 }
 bool CCSkinChanger::CEntities::LoadEntity(const char *pName, int DirType, IGraphics::CTextureHandle *pTexture)

@@ -660,11 +660,11 @@ int CMenus::ThemeIconScan(const char *pName, int IsDir, int DirType, void *pUser
 	return 0; // no existing theme
 }
 
-void LoadLanguageIndexfile(IStorage *pStorage, IConsole *pConsole, sorted_array<CLanguage> *pLanguages)
+void LoadLanguageIndexfile(IStorageEngine*pStorage, IConsole *pConsole, sorted_array<CLanguage> *pLanguages)
 {
 	// read file data into buffer
 	const char *pFilename = "languages/index.json";
-	IOHANDLE File = pStorage->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_ALL);
+	IOHANDLE File = pStorage->OpenFile(pFilename, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 	if(!File)
 	{
 		pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", "couldn't open index file");
@@ -781,8 +781,8 @@ void CMenus::RenderThemeSelection(CUIRect MainView, bool Header)
 			str_copy(g_Config.m_ClMenuMap, "", sizeof(g_Config.m_ClMenuMap)); // cl_menu_map otherwise resets to default on loading
 		m_lThemes.add(CTheme("", false, false)); // no theme
 		m_lThemes.add(CTheme("auto", false, false)); // auto theme
-		Storage()->ListDirectory(IStorage::TYPE_ALL, "ui/themes", ThemeScan, (CMenus*)this);
-		Storage()->ListDirectory(IStorage::TYPE_ALL, "ui/themes", ThemeIconScan, (CMenus*)this);
+		Storage()->ListDirectory(IStorageEngine::TYPE_ALL, "ui/themes", ThemeScan, (CMenus*)this);
+		Storage()->ListDirectory(IStorageEngine::TYPE_ALL, "ui/themes", ThemeIconScan, (CMenus*)this);
 	}
 
 	int SelectedTheme = -1;
@@ -1441,7 +1441,7 @@ void CMenus::PopupConfirmDeleteSkin()
 	{
 		char aBuf[IO_MAX_PATH_LENGTH];
 		str_format(aBuf, sizeof(aBuf), "skins/%s.json", m_pSelectedSkin->m_aName);
-		if(Storage()->RemoveFile(aBuf, IStorage::TYPE_SAVE))
+		if(Storage()->RemoveFile(aBuf, IStorageEngine::TYPE_SAVE))
 		{
 			m_pClient->m_pSkins->RemoveSkin(m_pSelectedSkin);
 			m_RefreshSkinSelector = true;

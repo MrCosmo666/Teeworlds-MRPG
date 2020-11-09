@@ -651,9 +651,9 @@ int CEditor::PopupNewFolder(CEditor *pEditor, CUIRect View)
 			{
 				char aBuf[512];
 				str_format(aBuf, sizeof(aBuf), "%s/%s", pEditor->m_pFileDialogPath, pEditor->m_FileDialogNewFolderName);
-				if(pEditor->Storage()->CreateFolder(aBuf, IStorage::TYPE_SAVE))
+				if(pEditor->Storage()->CreateFolder(aBuf, IStorageEngine::TYPE_SAVE))
 				{
-					pEditor->FilelistPopulate(IStorage::TYPE_SAVE);
+					pEditor->FilelistPopulate(IStorageEngine::TYPE_SAVE);
 					return 1;
 				}
 				else
@@ -799,7 +799,7 @@ int CEditor::PopupEvent(CEditor *pEditor, CUIRect View)
 		if(pEditor->m_PopupEventType == POPEVENT_EXIT)
 			g_Config.m_ClEditor = 0;
 		else if(pEditor->m_PopupEventType == POPEVENT_LOAD)
-			pEditor->InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_MAP, "Load map", "Load", "maps", "", pEditor->CallbackOpenMap, pEditor);
+			pEditor->InvokeFileDialog(IStorageEngine::TYPE_ALL, FILETYPE_MAP, "Load map", "Load", "maps", "", pEditor->CallbackOpenMap, pEditor);
 		else if(pEditor->m_PopupEventType == POPEVENT_LOAD_CURRENT)
 			pEditor->LoadCurrentMap();
 		else if(pEditor->m_PopupEventType == POPEVENT_NEW)
@@ -808,7 +808,7 @@ int CEditor::PopupEvent(CEditor *pEditor, CUIRect View)
 			pEditor->m_aFileName[0] = 0;
 		}
 		else if(pEditor->m_PopupEventType == POPEVENT_SAVE)
-			pEditor->CallbackSaveMap(pEditor->m_aFileSaveName, IStorage::TYPE_SAVE, pEditor);
+			pEditor->CallbackSaveMap(pEditor->m_aFileSaveName, IStorageEngine::TYPE_SAVE, pEditor);
 		pEditor->m_PopupEventWasActivated = false;
 		return 1;
 	}
@@ -1215,7 +1215,7 @@ int CEditor::PopupImage(CEditor* pEditor, CUIRect View)
 	View.HSplitTop(12.0f, &Slot, &View);
 	if(pEditor->DoButton_MenuItem(&s_ReplaceButton, "Replace", 0, &Slot, 0, "Replaces the image with a new one"))
 	{
-		pEditor->InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_IMG, "Replace Image", "Replace", "mapres", "", ReplaceImage, pEditor);
+		pEditor->InvokeFileDialog(IStorageEngine::TYPE_ALL, FILETYPE_IMG, "Replace Image", "Replace", "mapres", "", ReplaceImage, pEditor);
 		return 1;
 	}
 
@@ -1271,7 +1271,7 @@ int CEditor::PopupMenuFile(CEditor* pEditor, CUIRect View)
 			pEditor->m_PopupEventActivated = true;
 		}
 		else
-			pEditor->InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_MAP, "Load map", "Load", "maps", "", pEditor->CallbackOpenMap, pEditor);
+			pEditor->InvokeFileDialog(IStorageEngine::TYPE_ALL, FILETYPE_MAP, "Load map", "Load", "maps", "", pEditor->CallbackOpenMap, pEditor);
 		return 1;
 	}
 
@@ -1296,7 +1296,7 @@ int CEditor::PopupMenuFile(CEditor* pEditor, CUIRect View)
 	View.HSplitTop(12.0f, &Slot, &View);
 	if(pEditor->DoButton_MenuItem(&s_AppendButton, "Append", 0, &Slot, 0, "Opens a map and adds everything from that map to the current one"))
 	{
-		pEditor->InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_MAP, "Append map", "Append", "maps", "", pEditor->CallbackAppendMap, pEditor);
+		pEditor->InvokeFileDialog(IStorageEngine::TYPE_ALL, FILETYPE_MAP, "Append map", "Append", "maps", "", pEditor->CallbackAppendMap, pEditor);
 		return 1;
 	}
 
@@ -1311,7 +1311,7 @@ int CEditor::PopupMenuFile(CEditor* pEditor, CUIRect View)
 			pEditor->m_PopupEventActivated = true;
 		}
 		else
-			pEditor->InvokeFileDialog(IStorage::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", "", pEditor->CallbackSaveMap, pEditor);
+			pEditor->InvokeFileDialog(IStorageEngine::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", "", pEditor->CallbackSaveMap, pEditor);
 		return 1;
 	}
 
@@ -1319,7 +1319,7 @@ int CEditor::PopupMenuFile(CEditor* pEditor, CUIRect View)
 	View.HSplitTop(12.0f, &Slot, &View);
 	if(pEditor->DoButton_MenuItem(&s_SaveAsButton, "Save As", 0, &Slot, 0, "Saves the current map under a new name"))
 	{
-		pEditor->InvokeFileDialog(IStorage::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", "", pEditor->CallbackSaveMap, pEditor);
+		pEditor->InvokeFileDialog(IStorageEngine::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", "", pEditor->CallbackSaveMap, pEditor);
 		return 1;
 	}
 

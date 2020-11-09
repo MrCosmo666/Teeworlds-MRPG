@@ -130,7 +130,7 @@ void CPlayerBot::GiveEffect(const char* Potion, int Sec, int Random)
 	if(!m_pCharacter || !m_pCharacter->IsAlive())
 		return;
 
-	if((Random && rand() % Random == 0) || !Random)
+	if((Random && random_int() % Random == 0) || !Random)
 	{
 		m_aEffects[Potion] = Sec;
 		GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, Potion, true);

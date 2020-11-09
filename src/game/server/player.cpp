@@ -372,7 +372,7 @@ void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
 	if(!m_pCharacter || !m_pCharacter->IsAlive())
 		return;
 
-	if((Random && rand()%Random == 0) || !Random)
+	if((Random && random_int() % Random == 0) || !Random)
 	{
 		GS()->Chat(m_ClientID, "You got the effect {STR} time {INT}sec.", Potion, &Sec);
 		CGS::ms_aEffects[m_ClientID][Potion] = Sec;

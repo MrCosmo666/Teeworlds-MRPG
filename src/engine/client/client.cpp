@@ -587,7 +587,7 @@ void CClient::DisconnectWithReason(const char* pReason)
 	if (m_MapdownloadFileTemp)
 	{
 		io_close(m_MapdownloadFileTemp);
-		Storage()->RemoveFile(m_aMapdownloadFilenameTemp, IStorage::TYPE_SAVE);
+		Storage()->RemoveFile(m_aMapdownloadFilenameTemp, IStorageEngine::TYPE_SAVE);
 	}
 	m_MapdownloadFileTemp = 0;
 	m_MapdownloadSha256 = SHA256_ZEROED;
@@ -688,7 +688,7 @@ void CClient::DebugRender()
 	static NETSTATS Prev, Current;
 	static int64 LastSnap = 0;
 	int64 Now = time_get();
-	static IGraphics::CTextureHandle s_Font = Graphics()->LoadTexture("ui/debug_font.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_NORESAMPLE);
+	static IGraphics::CTextureHandle s_Font = Graphics()->LoadTexture("ui/debug_font.png", IStorageEngine::TYPE_ALL, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_NORESAMPLE);
 	char aBuffer[256];
 
 	//m_pGraphics->BlendNormal();
@@ -846,7 +846,7 @@ void CClient::RequestMmoInfo()
 	char aUrl[256];
 	str_copy(aUrl, "https://mrpg.teeworlds.dev/update/info.json", sizeof(aUrl));
 
-	m_pMmoInfoTask = std::make_shared<CGetFile>(Storage(), aUrl, MMOTEE_INFO, IStorage::TYPE_SAVE, true);
+	m_pMmoInfoTask = std::make_shared<CGetFile>(Storage(), aUrl, MMOTEE_INFO, IStorageEngine::TYPE_SAVE, true);
 	Engine()->AddJob(m_pMmoInfoTask);
 }
 
@@ -994,7 +994,7 @@ const char* CClient::LoadMapSearch(const char* pMapName, const SHA256_DIGEST* pW
 	// search for the map within subfolders
 	char aFilename[128];
 	str_format(aFilename, sizeof(aFilename), "%s.map", pMapName);
-	if (Storage()->FindFile(aFilename, "maps", IStorage::TYPE_ALL, aBuf, sizeof(aBuf)))
+	if (Storage()->FindFile(aFilename, "maps", IStorageEngine::TYPE_ALL, aBuf, sizeof(aBuf)))
 		pError = LoadMap(pMapName, aBuf, pWantedSha256, WantedCrc);
 
 	return pError;
@@ -1269,7 +1269,7 @@ void CClient::ProcessServerPacket(CNetChunk* pPacket)
 					if (m_MapdownloadFileTemp)
 					{
 						io_close(m_MapdownloadFileTemp);
-						Storage()->RemoveFile(m_aMapdownloadFilenameTemp, IStorage::TYPE_SAVE);
+						Storage()->RemoveFile(m_aMapdownloadFilenameTemp, IStorageEngine::TYPE_SAVE);
 					}
 
 					// start map download
@@ -1281,7 +1281,7 @@ void CClient::ProcessServerPacket(CNetChunk* pPacket)
 					m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "client/network", aBuf);
 
 					str_copy(m_aMapdownloadName, pMap, sizeof(m_aMapdownloadName));
-					m_MapdownloadFileTemp = Storage()->OpenFile(m_aMapdownloadFilenameTemp, IOFLAG_WRITE, IStorage::TYPE_SAVE);
+					m_MapdownloadFileTemp = Storage()->OpenFile(m_aMapdownloadFilenameTemp, IOFLAG_WRITE, IStorageEngine::TYPE_SAVE);
 					m_MapdownloadChunk = 0;
 					m_MapdownloadChunkNum = MapChunkNum;
 					m_MapDownloadChunkSize = MapChunkSize;
@@ -1325,8 +1325,8 @@ void CClient::ProcessServerPacket(CNetChunk* pPacket)
 				m_MapdownloadAmount = 0;
 				m_MapdownloadTotalsize = -1;
 
-				Storage()->RemoveFile(m_aMapdownloadFilename, IStorage::TYPE_SAVE);
-				Storage()->RenameFile(m_aMapdownloadFilenameTemp, m_aMapdownloadFilename, IStorage::TYPE_SAVE);
+				Storage()->RemoveFile(m_aMapdownloadFilename, IStorageEngine::TYPE_SAVE);
+				Storage()->RenameFile(m_aMapdownloadFilenameTemp, m_aMapdownloadFilename, IStorageEngine::TYPE_SAVE);
 
 				// load map
 				const char* pError = LoadMap(m_aMapdownloadName, m_aMapdownloadFilename, m_MapdownloadSha256Present ? &m_MapdownloadSha256 : 0, m_MapdownloadCrc);
@@ -1958,7 +1958,7 @@ void CClient::InitInterfaces()
 	m_pInput = Kernel()->RequestInterface<IEngineInput>();
 	m_pMap = Kernel()->RequestInterface<IEngineMap>();
 	m_pMasterServer = Kernel()->RequestInterface<IEngineMasterServer>();
-	m_pStorage = Kernel()->RequestInterface<IStorage>();
+	m_pStorage = Kernel()->RequestInterface<IStorageEngine>();
 	m_pUpdater = Kernel()->RequestInterface<IUpdater>();
 	m_pDiscord = Kernel()->RequestInterface<IDiscord>();
 
@@ -2488,7 +2488,7 @@ const char* CClient::DemoPlayer_Play(const char* pFilename, int StorageType)
 void CClient::Con_Play(IConsole::IResult* pResult, void* pUserData)
 {
 	CClient* pSelf = (CClient*)pUserData;
-	pSelf->DemoPlayer_Play(pResult->GetString(0), IStorage::TYPE_ALL);
+	pSelf->DemoPlayer_Play(pResult->GetString(0), IStorageEngine::TYPE_ALL);
 }
 
 void CClient::DemoRecorder_Start(const char* pFilename, bool WithTimestamp)
@@ -2746,7 +2746,7 @@ int main(int argc, const char** argv) // ignore_convention
 	int FlagMask = CFGFLAG_CLIENT;
 	IEngine* pEngine = CreateEngine("Teeworlds", false, 1);
 	IConsole* pConsole = CreateConsole(FlagMask);
-	IStorage* pStorage = CreateStorage("Teeworlds", IStorage::STORAGETYPE_CLIENT, argc, argv); // ignore_convention
+	IStorageEngine* pStorage = CreateStorage("Teeworlds", IStorageEngine::STORAGETYPE_CLIENT, argc, argv); // ignore_convention
 	IConfig* pConfig = CreateConfig();
 	IEngineSound* pEngineSound = CreateEngineSound();
 	IEngineInput* pEngineInput = CreateEngineInput();

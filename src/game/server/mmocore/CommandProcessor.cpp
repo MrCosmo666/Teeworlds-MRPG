@@ -206,7 +206,7 @@ void CCommandProcessor::ConChatGuildCreate(IConsole::IResult* pResult, void* pUs
 		return;
 	}
 
-	pGS->Mmo()->Member()->CreateGuild(ClientID, aGuildName);
+	pGS->Mmo()->Member()->CreateGuild(pPlayer, aGuildName);
 }
 
 void CCommandProcessor::ConChatDoorHouse(IConsole::IResult* pResult, void* pUser)

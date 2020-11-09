@@ -16,6 +16,7 @@ CCharacterBotAI::~CCharacterBotAI() {}
 
 int CCharacterBotAI::GetSnapFullID() const { return m_pBotPlayer->GetCID() * SNAPBOTS; }
 
+
 bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 {
 	m_pBotPlayer = static_cast<CPlayerBot*>(pPlayer);
@@ -170,7 +171,8 @@ void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force)
 			continue;
 
 		const float RandomDrop = clamp(BotJob::ms_aMobBot[SubID].m_aRandomItem[i] + ActiveLuckyDrop, 0.0f, 100.0f);
-		GS()->CreateRandomDropItem(m_Core.m_Pos, ClientID, RandomDrop, DropItem, Force);
+		vec2 ForceRandom(centrelized_frandom(Force.x, Force.x / 4.0f), centrelized_frandom(Force.y, Force.y / 8.0f));
+		GS()->CreateRandomDropItem(m_Core.m_Pos, ClientID, RandomDrop, DropItem, ForceRandom);
 	}
 
 	// skill point

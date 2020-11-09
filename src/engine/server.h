@@ -3,6 +3,10 @@
 #ifndef ENGINE_SERVER_H
 #define ENGINE_SERVER_H
 
+// #include <map>
+// #include <mutex>
+// #define THREAD_PLAYER_DATA_SAFE(clientid) std::lock_guard<std::mutex> lgplayersafe##clientid(IServer::MutexPlayerDataSafe[clientid]);
+
 #include "kernel.h"
 #include "message.h"
 
@@ -18,6 +22,7 @@
 #define DC_DISCORD_BOT g_Config.m_SvDiscordColorDiscordBot
 #define DC_DISCORD_INFO g_Config.m_SvDiscordColorDiscordInfo
 
+
 class IServer : public IInterface
 {
 	MACRO_INTERFACE("server", 0)
@@ -27,6 +32,7 @@ protected:
 	float WorldTime;
 
 public:
+	// static std::map < int, std::mutex > MutexPlayerDataSafe;
 	virtual class IGameServer* GameServer(int WorldID = 0) = 0;
 
 	class CLocalization* m_pLocalization;
@@ -93,6 +99,7 @@ public:
 	virtual const char* GetStringTypeDay() const = 0;
 	virtual int GetEnumTypeDay() const = 0;
 
+	// main client functions
 	virtual void SetClientName(int ClientID, char const *pName) = 0;
 	virtual void SetClientClan(int ClientID, char const *pClan) = 0;
 	virtual void SetClientCountry(int ClientID, int Country) = 0;
@@ -108,18 +115,19 @@ public:
 	virtual void SetClientLanguage(int ClientID, const char* pLanguage) = 0;
 	virtual const char* GetClientLanguage(int ClientID) const = 0;
 
+	// discord
 	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText) = 0;
-	virtual void SendDiscordGenerateMessage(const char *pColor, const char *pTitle, const char *pMsg) = 0;
-	virtual void SendDiscordStatus(const char *pStatus, int Type) = 0;
+	virtual void SendDiscordGenerateMessage(const char* pTitle, int AuthID, const char* pColor = "\0") = 0;
+	virtual void UpdateDiscordStatus(const char *pStatus) = 0;
 	
 	// Bots
 	virtual void InitClientBot(int ClientID) = 0;
 	virtual void BackInformationFakeClient(int FakeClientID) = 0;
 
+	// snapshots
 	virtual int SnapNewID() = 0;
 	virtual void SnapFreeID(int ID) = 0;
 	virtual void *SnapNewItem(int Type, int ID, int Size) = 0;
-
 	virtual void SnapSetStaticsize(int ItemType, int Size) = 0;
 
 	enum

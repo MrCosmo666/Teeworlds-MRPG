@@ -80,14 +80,14 @@ class CGetFile : public CRequest
 	virtual bool BeforeInit();
 	virtual bool BeforeCompletion();
 
-	IStorage *m_pStorage;
+	IStorageEngine *m_pStorage;
 
 	char m_aDest[256];
 	int m_StorageType;
 	IOHANDLE m_File;
 
 public:
-	CGetFile(IStorage *pStorage, const char *pUrl, const char *pDest, int StorageType = -2, bool CanTimeout = true);
+	CGetFile(IStorageEngine *pStorage, const char *pUrl, const char *pDest, int StorageType = -2, bool CanTimeout = true);
 
 	const char *Dest() const { return m_aDest; }
 };
@@ -104,6 +104,6 @@ public:
 	CPostJson(const char *pUrl, bool CanTimeout, const char *pJson);
 };
 
-bool HttpInit(IStorage *pStorage);
+bool HttpInit(IStorageEngine *pStorage);
 void EscapeUrl(char *pBuf, int Size, const char *pStr);
 #endif // ENGINE_CLIENT_HTTP_H

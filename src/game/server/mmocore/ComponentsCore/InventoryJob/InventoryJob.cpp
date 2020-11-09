@@ -474,8 +474,7 @@ void InventoryJob::AddItemSleep(int AccountID, int ItemID, int Count, int Millis
 			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
 
 		lock_sleep.lock();
-		const int ClientID = Job()->Account()->CheckOnlineAccount(AccountID);
-		CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
+		CPlayer* pPlayer = GS()->GetPlayerFromAuthID(AccountID);
 		if(pPlayer)
 		{
 			pPlayer->GetItem(ItemID).Add(Count);

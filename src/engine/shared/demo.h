@@ -27,7 +27,7 @@ class CDemoRecorder : public IDemoRecorder
 public:
 	CDemoRecorder(class CSnapshotDelta* pSnapshotDelta);
 
-	int Start(class IStorage* pStorage, class IConsole* pConsole, const char* pFilename, const char* pNetversion, const char* pMap, SHA256_DIGEST MapSha256, unsigned MapCrc, const char* pType, bool IsMMO);
+	int Start(class IStorageEngine* pStorage, class IConsole* pConsole, const char* pFilename, const char* pNetversion, const char* pMap, SHA256_DIGEST MapSha256, unsigned MapCrc, const char* pType, bool IsMMO);
 	int Stop();
 	void AddDemoMarker();
 
@@ -109,7 +109,7 @@ public:
 
 	void SetListener(IListener* pListner);
 
-	const char* Load(class IStorage* pStorage, class IConsole* pConsole, const char* pFilename, int StorageType, const char* pNetversion);
+	const char* Load(class IStorageEngine* pStorage, class IConsole* pConsole, const char* pFilename, int StorageType, const char* pNetversion);
 	int Play();
 	void Pause();
 	void Unpause();
@@ -118,7 +118,7 @@ public:
 	int SetPos(float Percent);
 	const CInfo* BaseInfo() const { return &m_Info.m_Info; }
 	void GetDemoName(char* pBuffer, int BufferSize) const;
-	bool GetDemoInfo(class IStorage* pStorage, const char* pFilename, int StorageType, CDemoHeader* pDemoHeader) const;
+	bool GetDemoInfo(class IStorageEngine* pStorage, const char* pFilename, int StorageType, CDemoHeader* pDemoHeader) const;
 	int GetDemoType() const;
 
 	int Update();

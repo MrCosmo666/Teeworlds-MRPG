@@ -116,6 +116,17 @@ CPlayer *CGS::GetPlayer(int ClientID, bool CheckAuthed, bool CheckCharacter)
 	return nullptr;
 }
 
+CPlayer* CGS::GetPlayerFromAuthID(int AuthID)
+{
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		CPlayer* pPlayer = GetPlayer(i, true);
+		if(pPlayer && pPlayer->Acc().m_AuthID == AuthID)
+			return pPlayer;
+	}
+	return nullptr;
+}
+
 // Level String by Matodor (Progress Bar) creates some sort of bar progress
 std::unique_ptr<char[]> CGS::LevelString(int MaxValue, int CurrentValue, int Step, char toValue, char fromValue)
 {
@@ -484,8 +495,8 @@ void CGS::ChatFollow(int ClientID, const char* pText, ...)
 // send to an authorized player
 void CGS::ChatAccountID(int AccountID, const char* pText, ...)
 {
-	const int ClientID = Mmo()->Account()->CheckOnlineAccount(AccountID);
-	if(ClientID < 0 || ClientID >= MAX_PLAYERS)
+	CPlayer *pPlayer = GetPlayerFromAuthID(AccountID);
+	if(!pPlayer)
 		return;
 
 	CNetMsg_Sv_Chat Msg;
@@ -496,15 +507,12 @@ void CGS::ChatAccountID(int AccountID, const char* pText, ...)
 	va_start(VarArgs, pText);
 	
 	dynamic_string Buffer;
-	if(m_apPlayers[ClientID])
-	{
-		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
-		
-		Msg.m_TargetID = ClientID;
-		Msg.m_pMessage = Buffer.buffer();
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-		Buffer.clear();
-	}
+	Server()->Localization()->Format_VL(Buffer, pPlayer->GetLanguage(), pText, VarArgs);
+
+	Msg.m_TargetID = pPlayer->GetCID();
+	Msg.m_pMessage = Buffer.buffer();
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, pPlayer->GetCID());
+	Buffer.clear();
 	va_end(VarArgs);
 }
 
@@ -964,7 +972,7 @@ void CGS::ClearTalkText(int ClientID)
 void CGS::UpdateDiscordStatus()
 {
 #ifdef CONF_DISCORD
-	if(Server()->Tick() % (Server()->TickSpeed() * 10) != 0 || m_WorldID != WorldControls::MainWorld)
+	if(Server()->Tick() % (Server()->TickSpeed() * 10) != 0 || m_WorldID != MAIN_WORLD_ID)
 		return;
 
 	int Players = 0;
@@ -978,10 +986,10 @@ void CGS::UpdateDiscordStatus()
 	{
 		char aBuf[64];
 		str_format(aBuf, sizeof(aBuf), "%d player's play MRPG!", Players);
-		Server()->SendDiscordStatus(aBuf, 3);
+		Server()->UpdateDiscordStatus(aBuf);
 		return;
 	}
-	Server()->SendDiscordStatus("and expects players.", 3);
+	Server()->UpdateDiscordStatus("and expects players.");
 #endif
 }
 
@@ -1641,7 +1649,7 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 void CGS::ConDisbandGuild(IConsole::IResult* pResult, void* pUserData)
 {
 	IServer* pServer = (IServer*)pUserData;
-	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetClientWorldID(MAIN_WORLD_ID));
+	CGS* pSelf = (CGS*)pServer->GameServer(MAIN_WORLD_ID);
 	const char* pGuildName = pResult->GetString(0);
 	const int GuildID = pSelf->Mmo()->Member()->SearchGuildByName(pGuildName);
 

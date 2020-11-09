@@ -17,7 +17,7 @@ public:
 
 	bool IsOpen() const { return m_pDataFile != 0; }
 
-	bool Open(class IStorage *pStorage, const char *pFilename, int StorageType);
+	bool Open(class IStorageEngine *pStorage, const char *pFilename, int StorageType);
 	bool Close();
 
 	void *GetData(int Index);
@@ -83,7 +83,7 @@ class CDataFileWriter
 public:
 	CDataFileWriter();
 	~CDataFileWriter();
-	bool Open(class IStorage* pStorage, const char* Filename);
+	bool Open(class IStorageEngine* pStorage, const char* Filename);
 	int AddData(int Size, const void* pData);
 	int AddDataSwapped(int Size, const void* pData);
 	int AddItem(int Type, int ID, int Size, const void* pData);

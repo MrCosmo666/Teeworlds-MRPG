@@ -236,7 +236,7 @@ void CGameClient::OnConsoleInit()
 	m_pSound = Kernel()->RequestInterface<ISound>();
 	m_pInput = Kernel()->RequestInterface<IInput>();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
-	m_pStorage = Kernel()->RequestInterface<IStorage>();
+	m_pStorage = Kernel()->RequestInterface<IStorageEngine>();
 	m_pDemoPlayer = Kernel()->RequestInterface<IDemoPlayer>();
 	m_pDemoRecorder = Kernel()->RequestInterface<IDemoRecorder>();
 	m_pServerBrowser = Kernel()->RequestInterface<IServerBrowser>();
@@ -426,7 +426,7 @@ void CGameClient::OnInit()
 	char aFontName[256];
 	static CFont *pDefaultFont = 0;
 	str_format(aFontName, sizeof(aFontName), "fonts/%s", g_Config.m_ClFontfile);
-	IOHANDLE File = Storage()->OpenFile(aFontName, IOFLAG_READ, IStorage::TYPE_ALL, aFontName, sizeof(aFontName));
+	IOHANDLE File = Storage()->OpenFile(aFontName, IOFLAG_READ, IStorageEngine::TYPE_ALL, aFontName, sizeof(aFontName));
 	if(File)
 	{
 		io_close(File);
@@ -441,7 +441,7 @@ void CGameClient::OnInit()
 	else
 	{
 		// loading standard font
-		IOHANDLE File = Storage()->OpenFile("fonts/DejaVuSans.ttf", IOFLAG_READ, IStorage::TYPE_ALL, aFontName, sizeof(aFontName));
+		IOHANDLE File = Storage()->OpenFile("fonts/DejaVuSans.ttf", IOFLAG_READ, IStorageEngine::TYPE_ALL, aFontName, sizeof(aFontName));
 		if (File)
 		{
 			io_close(File);
@@ -463,7 +463,7 @@ void CGameClient::OnInit()
 	// load textures
 	for(int i = 0; i < g_pData->m_NumImages; i++)
 	{
-		g_pData->m_aImages[i].m_Id = Graphics()->LoadTexture(g_pData->m_aImages[i].m_pFilename, IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, g_pData->m_aImages[i].m_Flag ? IGraphics::TEXLOAD_LINEARMIPMAPS : 0);
+		g_pData->m_aImages[i].m_Id = Graphics()->LoadTexture(g_pData->m_aImages[i].m_pFilename, IStorageEngine::TYPE_ALL, CImageInfo::FORMAT_AUTO, g_pData->m_aImages[i].m_Flag ? IGraphics::TEXLOAD_LINEARMIPMAPS : 0);
 		m_pMenus->RenderLoading(1);
 	}
 	// init the editor

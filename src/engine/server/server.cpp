@@ -37,6 +37,10 @@
 #include <engine/external/json-parser/json.h>
 #include <teeother/components/localization.h>
 
+#include "discord_main.h"
+
+// std::map < int, std::mutex > IServer::MutexPlayerDataSafe;
+
 // static instance worlds data
 std::shared_ptr<CWorldGameServerArray> CWorldGameServerArray::m_Instance;
 CWorldGameServerArray &CWorldGameServerArray::GetInstance()
@@ -149,7 +153,7 @@ void CSnapIDPool::FreeID(int ID)
 }
 
 
-void CServerBan::InitServerBan(IConsole *pConsole, IStorage *pStorage, CServer* pServer)
+void CServerBan::InitServerBan(IConsole *pConsole, IStorageEngine *pStorage, CServer* pServer)
 {
 	CNetBan::Init(pConsole, pStorage);
 
@@ -438,15 +442,13 @@ int CServer::GetClientWorldID(int ClientID)
 	return m_aClients[ClientID].m_WorldID;
 }
 
-void CServer::SendDiscordGenerateMessage(const char *pColor, const char *pTitle, const char *pMsg)
+void CServer::SendDiscordGenerateMessage(const char *pTitle, int AuthID, const char* pColor)
 {
 	#ifdef CONF_DISCORD
-		char Color[16], Title[256], Msg[512];
-		str_copy(Color, pColor, sizeof(Color));
-		str_copy(Title, pTitle, sizeof(Title));
-		str_copy(Msg, pMsg, sizeof(Msg));
-
-		std::thread t([=]() { m_pDiscord->SendGenerateMessage(g_Config.m_SvDiscordChanal, Color, Title, Msg); });
+		char aPrColorBuf[16], aPrTitleBuf[256];
+		str_copy(aPrColorBuf, pColor, sizeof(aPrColorBuf));
+		str_copy(aPrTitleBuf, pTitle, sizeof(aPrTitleBuf));
+		std::thread t([=]() { m_pDiscord->SendGenerateMessage(SleepyDiscord::User(), g_Config.m_SvDiscordChanal, aPrTitleBuf, AuthID, aPrColorBuf); });
 		t.detach();
 	#endif
 }
@@ -454,23 +456,21 @@ void CServer::SendDiscordGenerateMessage(const char *pColor, const char *pTitle,
 void CServer::SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText)
 {
 	#ifdef CONF_DISCORD
-		char aText[512], aTitle[256], aColor[16];
-		str_copy(aText, pText, sizeof(aText));
-		str_copy(aTitle, pTitle, sizeof(aTitle));
-		str_copy(aColor, pColor, sizeof(aColor));
-
-		std::thread t([=]() { m_pDiscord->SendMessage(pChanel, aColor, aTitle, aText); });
+		char aPrTextBuf[512], aPrTitleBuf[256], aPrColorBuf[16];
+		str_copy(aPrTextBuf, pText, sizeof(aPrTextBuf));
+		str_copy(aPrTitleBuf, pTitle, sizeof(aPrTitleBuf));
+		str_copy(aPrColorBuf, pColor, sizeof(aPrColorBuf));
+		std::thread t([=]() { m_pDiscord->SendEmbedMessage(pChanel, aPrColorBuf, aPrTitleBuf, aPrTextBuf); });
 		t.detach();
 	#endif
 }
 
-void CServer::SendDiscordStatus(const char *pStatus, int Type)
+void CServer::UpdateDiscordStatus(const char *pStatus)
 {
 	#ifdef CONF_DISCORD
-		char aStatus[128];		
-		int StatusType = Type;
-		str_copy(aStatus, pStatus, sizeof(aStatus));
-		std::thread t([=]() { m_pDiscord->SendStatus(aStatus, StatusType); });
+		char aPrStatusBuf[128];
+		str_copy(aPrStatusBuf, pStatus, sizeof(aPrStatusBuf));
+		std::thread t([=]() { m_pDiscord->UpdateStatus(aPrStatusBuf); });
 		t.detach();
 	#endif
 }
@@ -797,6 +797,7 @@ void CServer::DoSnapshot(int WorldID)
 
 int CServer::NewClientCallback(int ClientID, void *pUser)
 {
+	// THREAD_PLAYER_DATA_SAFE(ClientID)
 	CServer *pThis = (CServer *)pUser;
 	pThis->GameServer(MAIN_WORLD_ID)->ClearClientData(ClientID);
 	str_copy(pThis->m_aClients[ClientID].m_aLanguage, "en", sizeof(pThis->m_aClients[ClientID].m_aLanguage));
@@ -819,6 +820,7 @@ int CServer::NewClientCallback(int ClientID, void *pUser)
 
 int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 {
+	// THREAD_PLAYER_DATA_SAFE(ClientID)
 	CServer *pThis = (CServer *)pUser;
 
 	char aAddrStr[NETADDR_MAXSTRSIZE];
@@ -1381,7 +1383,7 @@ bool CServer::LoadMap(int ID)
 	str_format(aBuf, sizeof(aBuf), "maps/%s", WorldsInstance.ms_aWorlds[ID].m_aPath);
 
 	// check for valid standard map
-	if(!m_MapChecker.ReadAndValidateMap(Storage(), aBuf, IStorage::TYPE_ALL))
+	if(!m_MapChecker.ReadAndValidateMap(Storage(), aBuf, IStorageEngine::TYPE_ALL))
 	{
 		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "mapchecker", "invalid standard map");
 		return 0;
@@ -1405,7 +1407,7 @@ bool CServer::LoadMap(int ID)
 
 	// load complete map into memory for download
 	{
-		IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
+		IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 		pMap->SetCurrentMapSize((int)io_length(File));	
 		pMap->SetCurrentMapData((unsigned char *)mem_alloc(pMap->GetCurrentMapSize(), 1));
 		io_read(File, pMap->GetCurrentMapData(), pMap->GetCurrentMapSize());
@@ -1701,7 +1703,7 @@ void CServer::ConchainRconPasswordSet(IConsole::IResult *pResult, void *pUserDat
 void CServer::RegisterCommands()
 {
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
-	m_pStorage = Kernel()->RequestInterface<IStorage>();
+	m_pStorage = Kernel()->RequestInterface<IStorageEngine>();
 
 	// register console commands
 	Console()->Register("kick", "i[id] ?r[reason]", CFGFLAG_SERVER, ConKick, this, "Kick player with specified id for any reason");
@@ -1761,245 +1763,12 @@ void CServer::SnapSetStaticsize(int ItemType, int Size)
 
 static CServer *CreateServer() { return new CServer(); }
 
-
-#ifdef CONF_DISCORD
-DiscordJob::DiscordJob(const char *token, int threads) : SleepyDiscord::DiscordClient(token, SleepyDiscord::USER_CONTROLED_THREADS)
-{
-	std::thread t1(&DiscordJob::run, this);
-	t1.detach();
-}
-
-void DiscordJob::SetServer(CServer *pServer) 
-{
-	m_pServer = pServer;
-}
-
-void DiscordJob::onMessage(SleepyDiscord::Message message) 
-{
-	if(message.length() <= 0 || !g_Config.m_SvCreateDiscordBot || message.author == getCurrentUser().cast())
-	 	return;
-
-	// statistics
-	if (message.startsWith("!mstats"))
-	{
-		// if the number of characters is less than the required
-		std::string messagecont = message.content;
-		if(messagecont.size() <= 8)
-		{
-			SendMessage(std::string(message.channelID).c_str(), DC_SERVER_WARNING, "Not right!",
-			std::string("Use **!mstats <nick full or not>. Minimal symbols 1.**!!!"));
-			return;
-		}
-
-		// search data
-		bool Found = false; int Limit = 0;
-		std::string input = "%" + messagecont.substr(8, messagecont.length() - 8) + "%";
-		sqlstr::CSqlString<64> cDiscordIDorNick = sqlstr::CSqlString<64>(input.c_str());
-
-		// user lookup
-		ResultPtr pRes = SJK.SD("*", "tw_accounts_data", "WHERE Nick LIKE '%s'LIMIT 5", cDiscordIDorNick.cstr());
-		while(pRes->next())
-		{
-			const int AuthID = pRes->getInt("ID");
-			const int RandomColor = 1000+random_int()%10000000;
-			const int Rank = Server()->GameServer()->GetRank(AuthID);
-
-			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "?player=%s&rank=%d&dicid=%d", pRes->getString("Nick").c_str(), Rank, pRes->getInt("DiscordEquip"));
-			SendGenerateMessage(std::string(message.channelID).c_str(), std::to_string(RandomColor).c_str(), "Discord MRPG Card", aBuf);
-			Found = true;
-		}
-
-		if(!Found)
-		{
-			SendMessage(std::string(message.channelID).c_str(), DC_SERVER_WARNING, "Sorry!",
-				"**This account not found in database!**");
-		}
-		return;
-	}
-
-	else if (message.startsWith("!mconnect"))
-	{	
-		// get the user's ID
-		SleepyDiscord::Snowflake<SleepyDiscord::User> userAuth = getUser(message.author).cast();
-		SendMessage(std::string(message.channelID).c_str(), DC_DISCORD_INFO, "Connector Information",  
-			"```ini\n[Warning] Do not connect other people's discords to your account in the game\nThis is similar to hacking your account in the game\n# Use in-game for connect your personal discord:\n# Did '" + userAuth + "'\n# Command in-game: /discord_connect <did>```");
-
-		// check for user search
-		std::string Nick = "Refresh please.";
-		std::string UserID = userAuth;
-
-		// search criteria
-		bool Found = false;
-		sqlstr::CSqlString<64> cDiscordID = sqlstr::CSqlString<64>(UserID.c_str());
-
-		// get connected
-		ResultPtr pRes = SJK.SD("Nick", "tw_accounts_data", "WHERE DiscordID = '%s'", cDiscordID.cstr());
-		while(RES->next())
-		{
-			// send a connected message
-			Nick = pRes->getString("Nick").c_str();
-			SendMessage(std::string(message.channelID).c_str(), DC_DISCORD_BOT, "Good work :)", "**Your account is enabled: Nickname in-game: " + Nick + "**");
-			Found = true;
-		}
-
-		// end connection
-		if(!Found)
-			SendMessage(std::string(message.channelID).c_str(), DC_SERVER_WARNING, "Fail in work :(", "**Fail connect. See !mconnect.\nUse in-game /discord_connect <DID>..**");
-		return;
-	}
-
-	// list all players
-	else if (message.startsWith("!monline"))
-	{
-		dynamic_string Buffer;
-		for(int i = 0; i < MAX_PLAYERS; i++) 
-		{
-			if(!Server()->ClientIngame(i)) 
-				continue;
-
-			Buffer.append_at(Buffer.length(), Server()->ClientName(i));
-			Buffer.append_at(Buffer.length(), "\n");
-		}
-		if(Buffer.length() <= 0)
-		{
-			SendMessage(std::string(message.channelID).c_str(), DC_DISCORD_BOT, "Online Server", "Server is empty");
-			return;
-		}
-		SendMessage(std::string(message.channelID).c_str(), DC_DISCORD_BOT, "Online Server", Buffer.buffer());
-		Buffer.clear();
-		return;
-	}
-	// help
-	else if (message.startsWith("!mhelp"))
-	{
-		SendMessage(std::string(message.channelID).c_str(), DC_DISCORD_INFO, "Commands / Information", 
-		"`!mconnect` - Info for connect your discord and account in game."
-		"\n`!mstats <symbol>` - See stats players. Minimal 1 symbols."
-		"\n`!monline` - Show players ingame.");
-	}
-	// send from the discord chat to server chat
-	else if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordChanal) == 0)
-	{
-		std::string Nickname("D|" + message.author.username);
-		m_pServer->GameServer(FAKE_DISCORD_WORLD_ID)->FakeChat(Nickname.c_str(), message.content.c_str());
-	}
-	// ideas-voting
-	else if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordIdeasChanal) == 0)
-	{
-		deleteMessage(message.channelID, message);
-
-		SleepyDiscord::Embed embed;
-		embed.title = std::string("Suggestion");
-		embed.color = 431050;
-
-		SleepyDiscord::EmbedThumbnail embedthumb;
-		embedthumb.url = message.author.avatarUrl();
-		embedthumb.proxyUrl = message.author.avatarUrl();
-		embed.thumbnail = embedthumb;
-
-		SleepyDiscord::EmbedFooter embedfooter;
-		embedfooter.text = "Use reactions for voting!";
-		embedfooter.iconUrl = message.author.avatarUrl();
-		embedfooter.proxyIconUrl = message.author.avatarUrl();
-		embed.footer = embedfooter;
-		embed.description = "From:" + message.author.showUser() + "!\n" + message.content;
-
-		SleepyDiscord::Message pMessage = sendMessage(message.channelID, "\0", embed);
-		addReaction(message.channelID, pMessage, "%E2%9C%85");
-		addReaction(message.channelID, pMessage, "%E2%9D%8C");
-	}
-
-	// ranking
-	else if (message.startsWith("!mranking") || message.startsWith("!mgoldranking"))
-	{
-		SleepyDiscord::Embed embed;
-		embed.title = message.startsWith("!mgoldranking") ? "Ranking by Gold" : "Ranking by Level";
-		embed.color = 422353;
-
-		int Rank = 1;
-		std::string Names = "";
-		std::string Levels = "";
-		std::string GoldValues = "";
-		ResultPtr pRes = SJK.SD("a.ID, ad.Nick AS `Nick`, ad.Level AS `Level`, g.Count AS `Gold`", "tw_accounts a", "JOIN tw_accounts_data ad ON a.ID = ad.ID LEFT JOIN tw_accounts_items g ON a.ID = g.OwnerID AND g.ItemID = 1 ORDER BY %s LIMIT 10", (message.startsWith("!mgoldranking") ? "g.Count DESC, ad.Level DESC" : "ad.Level DESC, g.Count DESC"));
-		while (pRes->next())
-		{
-			Names += std::to_string(Rank) + ". **" + pRes->getString("Nick").c_str() + "**\n";
-			Rank++;
-
-			Levels += std::to_string(pRes->getInt("Level")) + "\n";
-			GoldValues += std::to_string(pRes->getInt("Gold")) + "\n";
-		}
-
-		embed.fields.push_back(SleepyDiscord::EmbedField("Name", Names, true));
-		embed.fields.push_back(SleepyDiscord::EmbedField("Level", Levels, true));
-		embed.fields.push_back(SleepyDiscord::EmbedField("Gold", GoldValues, true));
-
-		SleepyDiscord::Message pMessage = sendMessage(message.channelID, "\0", embed);
-	}
-}
-
-void DiscordJob::onReaction(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
-SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID, SleepyDiscord::Emoji emoji)
-{ 
-}
-
-void DiscordJob::onDeleteReaction(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
-SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID, SleepyDiscord::Emoji emoji)
-{
-}
-
-void DiscordJob::UpdateMessageIdeas(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
-SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID)
-{
-	if(userID == getCurrentUser().cast())
-		return;
-}
-
-void DiscordJob::SendStatus(const char *Status, int Type)
-{
-	if(!g_Config.m_SvCreateDiscordBot) return;
-	this->updateStatus(Status, Type);
-}
-
-void DiscordJob::SendGenerateMessage(const char *pChanal, const char *Color, const char *Title, const char *pPhpArg)
-{
-	if(!g_Config.m_SvCreateDiscordBot) return;
-
-	SleepyDiscord::Embed embed;
-	embed.title = std::string(Title);
-	embed.color = string_to_number(Color, 0, 1410065407);
-
-	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "%s/%s/gentee.php%s", g_Config.m_SvSiteUrl, g_Config.m_SvGenerateURL, pPhpArg);
-
-	SleepyDiscord::EmbedImage embedimage;
-	embedimage.height = 800;
-	embedimage.width = 600;
-	embedimage.url = std::string(aBuf);
-	embedimage.proxyUrl = std::string(aBuf);
-	embed.image = embedimage;
-	this->sendMessage(pChanal, "\0", embed);
-}
-
-void DiscordJob::SendMessage(const char *pChanal, const char *Color, const char *Title, std::string pMsg)
-{
-	if(!g_Config.m_SvCreateDiscordBot) return;
-
-	SleepyDiscord::Embed embed;
-	embed.title = std::string(Title);
-	embed.color = string_to_number(Color, 0, 1410065407);
-	embed.description = pMsg;
-	this->sendMessage(pChanal, "\0", embed);
-}
-#endif
-
-bool WorldsLoading(IKernel *pKernel, IStorage* pStorage, IConsole* pConsole)
+bool WorldsLoading(IKernel *pKernel, IStorageEngine* pStorage, IConsole* pConsole)
 {
 	// read file data into buffer
 	char aFileBuf[512];
 	str_format(aFileBuf, sizeof(aFileBuf), "maps/worlds.json");
-	IOHANDLE File = pStorage->OpenFile(aFileBuf, IOFLAG_READ, IStorage::TYPE_ALL);
+	IOHANDLE File = pStorage->OpenFile(aFileBuf, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 	if(!File)
 		return false;
 	
@@ -2080,7 +1849,7 @@ int main(int argc, const char **argv) // ignore_convention
 	IEngine *pEngine = CreateEngine("Teeworlds_Server", false, 1);
 	IConsole *pConsole = CreateConsole(CFGFLAG_SERVER|CFGFLAG_ECON);
 	IEngineMasterServer *pEngineMasterServer = CreateEngineMasterServer();
-	IStorage *pStorage = CreateStorage("Teeworlds", IStorage::STORAGETYPE_SERVER, argc, argv); // ignore_convention
+	IStorageEngine *pStorage = CreateStorage("Teeworlds", IStorageEngine::STORAGETYPE_SERVER, argc, argv); // ignore_convention
 	IConfig *pConfig = CreateConfig();
 	pServer->InitRegister(&pServer->m_NetServer, pEngineMasterServer, pConsole);
 

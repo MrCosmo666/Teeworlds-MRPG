@@ -568,11 +568,11 @@ void HouseJob::SellHouse(int HouseID)
 		GS()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itGold, Price, 0);
 		SJK.UD("tw_houses", "OwnerID = NULL, HouseBank = '0' WHERE ID = '%d'", HouseID);
 
-		const int ClientID = Job()->Account()->CheckOnlineAccount(OwnerID);
-		if(ClientID >= 0)
+		CPlayer *pPlayer = GS()->GetPlayerFromAuthID(OwnerID);
+		if(pPlayer)
 		{
-			GS()->ChatFollow(ClientID, "Your House is sold!");
-			GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
+			GS()->ChatFollow(pPlayer->GetCID(), "Your House is sold!");
+			GS()->ResetVotes(pPlayer->GetCID(), MenuList::MAIN_MENU);
 		}
 		GS()->Chat(-1, "House: {INT} have been is released!", &HouseID);
 		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**[House: {INT}] have been sold!**", &HouseID);

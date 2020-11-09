@@ -294,7 +294,7 @@ int main(int argc, const char **argv) // ignore_convention
 
 	int FlagMask = CFGFLAG_MASTER;
 	IKernel *pKernel = IKernel::Create();
-	IStorage *pStorage = CreateStorage("Teeworlds", IStorage::STORAGETYPE_BASIC, argc, argv);
+	IStorageEngine *pStorage = CreateStorage("Teeworlds", IStorageEngine::STORAGETYPE_BASIC, argc, argv);
 	IConfig *pConfig = CreateConfig();
 	m_pConsole = CreateConsole(FlagMask);
 	

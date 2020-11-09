@@ -32,16 +32,6 @@ int AccountMainJob::SendAuthCode(int ClientID, int Code)
 	return Code;
 }
 
-int AccountMainJob::CheckOnlineAccount(int AuthID) const
-{
-	for (const auto& dt : AccountMainJob::ms_aData)
-	{
-		if (dt.second.m_AuthID == AuthID && GS()->m_apPlayers[dt.first])
-			return dt.first;
-	}
-	return -1;
-}
-
 int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char *Password)
 {
 	if(str_length(Login) > 12 || str_length(Login) < 4 || str_length(Password) > 12 || str_length(Password) < 4)
@@ -118,7 +108,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 			return SendAuthCode(ClientID, AUTH_LOGIN_WRONG);
 		}
 
-		if (CheckOnlineAccount(UserID) >= 0)
+		if (GS()->GetPlayerFromAuthID(UserID) != nullptr)
 		{
 			GS()->Chat(ClientID, "The account is already in the game!");
 			return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
@@ -181,11 +171,9 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	const int Rank = GetRank(pPlayer->Acc().m_AuthID);
 	GS()->Chat(-1, "{STR} logged to account. Rank #{INT}", Server()->ClientName(ClientID), &Rank);
 #ifdef CONF_DISCORD
-	char pMsg[256], pLoggin[64];
-	str_format(pLoggin, sizeof(pLoggin), "%s logged in Account ID %d", Server()->ClientName(ClientID), pPlayer->Acc().m_AuthID);
-	str_format(pMsg, sizeof(pMsg), "?player=%s&rank=%d&dicid=%d",
-		Server()->ClientName(ClientID), Rank, pPlayer->GetEquippedItemID(EQUIP_DISCORD));
-	Server()->SendDiscordGenerateMessage("16757248", pLoggin, pMsg);
+	char aLoginBuf[64];
+	str_format(aLoginBuf, sizeof(aLoginBuf), "%s logged in Account ID %d", Server()->ClientName(ClientID), pPlayer->Acc().m_AuthID);
+	Server()->SendDiscordGenerateMessage(aLoginBuf, pPlayer->Acc().m_AuthID);
 #endif
 
 	if (!pPlayer->GetItem(itHammer).m_Count)
@@ -216,8 +204,9 @@ void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true);
 	if(!pPlayer) return;	
 
-	CSqlString<64> cDID = CSqlString<64>(pDID);
-	SJK.UD("tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", cDID.cstr(), pPlayer->Acc().m_AuthID);
+	CSqlString<64> DiscordID = CSqlString<64>(pDID);
+	SJK.UD("tw_accounts_data", "DiscordID = 'null' WHERE DiscordID = '%s'", DiscordID.cstr());
+	SJK.UD("tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", DiscordID.cstr(), pPlayer->Acc().m_AuthID);
 
 	GS()->Chat(ClientID, "Update DiscordID.");
 	GS()->Chat(ClientID, "Check connect status in Discord \"!mconnect\".");

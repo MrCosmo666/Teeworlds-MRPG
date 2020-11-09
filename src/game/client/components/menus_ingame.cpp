@@ -512,7 +512,7 @@ bool CMenus::DoItemIcon(const char *pItem, CUIRect pRect, float Size)
 	static bool s_Init = false;
 	if (m_pClient->MmoServer() && !s_Init)
 	{
-		m_pClient->Storage()->ListDirectory(IStorage::TYPE_ALL, "mmotee/itemicons", ItemIconScan, this);
+		m_pClient->Storage()->ListDirectory(IStorageEngine::TYPE_ALL, "mmotee/itemicons", ItemIconScan, this);
 		s_Init = true;
 	}
 

@@ -53,7 +53,7 @@ void CMapImages::LoadMapImages(IMap *pMap, class CLayers *pLayers, int MapType)
 			char Buf[256];
 			char *pName = (char *)pMap->GetData(pImg->m_ImageName);
 			str_format(Buf, sizeof(Buf), "mapres/%s.png", pName);
-			m_Info[MapType].m_aTextures[i] = Graphics()->LoadTexture(Buf, IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, TextureFlags);
+			m_Info[MapType].m_aTextures[i] = Graphics()->LoadTexture(Buf, IStorageEngine::TYPE_ALL, CImageInfo::FORMAT_AUTO, TextureFlags);
 		}
 		else
 		{
@@ -84,7 +84,7 @@ IGraphics::CTextureHandle CMapImages::GetEasterTexture()
 {
 	if(!m_EasterIsLoaded)
 	{
-		m_EasterTexture = Graphics()->LoadTexture("mapres/easter.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_ARRAY_256);
+		m_EasterTexture = Graphics()->LoadTexture("mapres/easter.png", IStorageEngine::TYPE_ALL, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_ARRAY_256);
 		if(!m_EasterTexture.IsValid())
 			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "mapimages", "Failed to load easter.png");
 		m_EasterIsLoaded = true;

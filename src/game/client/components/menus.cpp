@@ -1474,7 +1474,7 @@ void CMenus::OnInit()
 
 	// load menu images
 	m_lMenuImages.clear();
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "ui/menuimages", MenuImageScan, this);
+	Storage()->ListDirectory(IStorageEngine::TYPE_ALL, "ui/menuimages", MenuImageScan, this);
 
 	// load filters
 	LoadFilters();
@@ -1483,7 +1483,7 @@ void CMenus::OnInit()
 	RenderLoading(1);
 
 	// load game type icons
-	Storage()->ListDirectory(IStorage::TYPE_ALL, "ui/gametypes", GameIconScan, this);
+	Storage()->ListDirectory(IStorageEngine::TYPE_ALL, "ui/gametypes", GameIconScan, this);
 	RenderLoading(1);
 
 	// initial launch preparations
@@ -2455,7 +2455,7 @@ void CMenus::RenderBackground(float Time)
 	Graphics()->QuadsEnd();
 
 	// render border fade
-	static IGraphics::CTextureHandle s_TextureBlob = Graphics()->LoadTexture("ui/blob.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
+	static IGraphics::CTextureHandle s_TextureBlob = Graphics()->LoadTexture("ui/blob.png", IStorageEngine::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
 	Graphics()->TextureSet(s_TextureBlob);
 	Graphics()->QuadsBegin();
 	Graphics()->SetColor(0, 0, 0, 0.5f);

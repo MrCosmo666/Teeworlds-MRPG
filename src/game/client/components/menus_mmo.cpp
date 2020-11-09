@@ -393,7 +393,7 @@ void CMenus::RenderFontSelection(CUIRect MainView)
 
 	if (s_Fonts.size() == 0)
 	{
-		Storage()->ListDirectory(IStorage::TYPE_ALL, "fonts", GatherFonts, &s_Fonts);
+		Storage()->ListDirectory(IStorageEngine::TYPE_ALL, "fonts", GatherFonts, &s_Fonts);
 		for (int i = 0; i < s_Fonts.size(); i++)
 		{
 			if (str_comp(s_Fonts[i].m_FileName, g_Config.m_ClFontfile) == 0)
@@ -427,7 +427,7 @@ void CMenus::RenderFontSelection(CUIRect MainView)
 		str_format(aRelFontPath, sizeof(aRelFontPath), "fonts/%s", g_Config.m_ClFontfile);
 		char aFontPath[512];
 
-		IOHANDLE File = Storage()->OpenFile(aRelFontPath, IOFLAG_READ, IStorage::TYPE_ALL, aFontPath, sizeof(aFontPath));
+		IOHANDLE File = Storage()->OpenFile(aRelFontPath, IOFLAG_READ, IStorageEngine::TYPE_ALL, aFontPath, sizeof(aFontPath));
 		if (File)
 			io_close(File);
 

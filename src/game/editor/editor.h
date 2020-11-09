@@ -383,8 +383,8 @@ public:
 	void CreateDefault();
 
 	// io
-	int Save(class IStorage *pStorage, const char *pFilename);
-	int Load(class IStorage *pStorage, const char *pFilename, int StorageType);
+	int Save(class IStorageEngine *pStorage, const char *pFilename);
+	int Load(class IStorageEngine *pStorage, const char *pFilename, int StorageType);
 };
 
 
@@ -505,7 +505,7 @@ class CEditor : public IEditor
 	class IConsole *m_pConsole;
 	class IGraphics *m_pGraphics;
 	class ITextRender *m_pTextRender;
-	class IStorage *m_pStorage;
+	class IStorageEngine *m_pStorage;
 	CRenderTools m_RenderTools;
 	CUI m_UI;
 public:
@@ -514,7 +514,7 @@ public:
 	class IConsole *Console() { return m_pConsole; };
 	class IGraphics *Graphics() { return m_pGraphics; };
 	class ITextRender *TextRender() { return m_pTextRender; };
-	class IStorage *Storage() { return m_pStorage; };
+	class IStorageEngine *Storage() { return m_pStorage; };
 	CUI *UI() { return &m_UI; }
 	CRenderTools *RenderTools() { return &m_RenderTools; }
 

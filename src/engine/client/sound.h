@@ -11,7 +11,7 @@ class CSound : public IEngineSound
 
 public:
 	IEngineGraphics *m_pGraphics;
-	IStorage *m_pStorage;
+	IStorageEngine *m_pStorage;
 
 	virtual int Init();
 

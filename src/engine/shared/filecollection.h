@@ -19,14 +19,14 @@ class CFileCollection
 	char m_aFileExt[32];
 	int m_FileExtLength;
 	char m_aPath[512];
-	IStorage *m_pStorage;
+	IStorageEngine *m_pStorage;
 
 	bool IsFilenameValid(const char *pFilename);
 	int64 ExtractTimestamp(const char *pTimestring);
 	void BuildTimestring(int64 Timestamp, char *pTimestring);
 
 public:
-	void Init(IStorage *pStorage, const char *pPath, const char *pFileDesc, const char *pFileExt, int MaxEntries);
+	void Init(IStorageEngine *pStorage, const char *pPath, const char *pFileDesc, const char *pFileExt, int MaxEntries);
 	void AddEntry(int64 Timestamp);
 
 	static int FilelistCallback(const char *pFilename, int IsDir, int StorageType, void *pUser);

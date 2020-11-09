@@ -63,7 +63,7 @@ class CClient : public IClient, public CDemoPlayer::IListener
 	IGameClient* m_pGameClient;
 	IEngineMap* m_pMap;
 	IConsole* m_pConsole;
-	IStorage* m_pStorage;
+	IStorageEngine* m_pStorage;
 	IUpdater* m_pUpdater;
 	IEngineMasterServer* m_pMasterServer;
 	IDiscord* m_pDiscord;
@@ -204,7 +204,7 @@ public:
 	IEngineSound* Sound() { return m_pSound; }
 	IGameClient* GameClient() { return m_pGameClient; }
 	IEngineMasterServer* MasterServer() { return m_pMasterServer; }
-	IStorage* Storage() { return m_pStorage; }
+	IStorageEngine* Storage() { return m_pStorage; }
 	IUpdater* Updater() { return m_pUpdater; }
 	IDiscord* Discord() { return m_pDiscord; }
 

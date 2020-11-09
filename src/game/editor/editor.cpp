@@ -213,7 +213,7 @@ void CEditorImage::LoadAutoMapper()
 	// read file data into buffer
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "editor/automap/%s.json", m_aName);
-	IOHANDLE File = m_pEditor->Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
+	IOHANDLE File = m_pEditor->Storage()->OpenFile(aBuf, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 	if(!File)
 		return;
 	int FileSize = (int)io_length(File);
@@ -801,7 +801,7 @@ void CEditor::CallbackOpenMap(const char *pFileName, int StorageType, void *pUse
 	if(pEditor->Load(pFileName, StorageType))
 	{
 		str_copy(pEditor->m_aFileName, pFileName, 512);
-		pEditor->m_ValidSaveFilename = StorageType == IStorage::TYPE_SAVE && pEditor->m_pFileDialogPath == pEditor->m_aFileDialogCurrentFolder;
+		pEditor->m_ValidSaveFilename = StorageType == IStorageEngine::TYPE_SAVE && pEditor->m_pFileDialogPath == pEditor->m_aFileDialogCurrentFolder;
 		pEditor->SortImages();
 		pEditor->m_Dialog = DIALOG_NONE;
 		pEditor->m_Map.m_Modified = false;
@@ -836,7 +836,7 @@ void CEditor::CallbackSaveMap(const char *pFileName, int StorageType, void *pUse
 	if(pEditor->Save(pFileName))
 	{
 		str_copy(pEditor->m_aFileName, pFileName, sizeof(pEditor->m_aFileName));
-		pEditor->m_ValidSaveFilename = StorageType == IStorage::TYPE_SAVE && pEditor->m_pFileDialogPath == pEditor->m_aFileDialogCurrentFolder;
+		pEditor->m_ValidSaveFilename = StorageType == IStorageEngine::TYPE_SAVE && pEditor->m_pFileDialogPath == pEditor->m_aFileDialogCurrentFolder;
 		pEditor->m_Map.m_Modified = false;
 	}
 
@@ -865,7 +865,7 @@ void CEditor::DoToolbar(CUIRect ToolBar)
 			}
 		}
 		else
-			InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_MAP, "Load map", "Load", "maps", "", CallbackOpenMap, this);
+			InvokeFileDialog(IStorageEngine::TYPE_ALL, FILETYPE_MAP, "Load map", "Load", "maps", "", CallbackOpenMap, this);
 	}
 
 	// ctrl+s to save
@@ -881,7 +881,7 @@ void CEditor::DoToolbar(CUIRect ToolBar)
 			}
 		}
 		else
-			InvokeFileDialog(IStorage::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", "", CallbackSaveMap, this);
+			InvokeFileDialog(IStorageEngine::TYPE_SAVE, FILETYPE_MAP, "Save map", "Save", "maps", "", CallbackSaveMap, this);
 	}
 
 	// detail button
@@ -3027,7 +3027,7 @@ void CEditor::RenderImages(CUIRect ToolBox, CUIRect ToolBar, CUIRect View)
 	static int s_NewImageButton = 0;
 	ToolBox.HSplitTop(12.0f, &Slot, &ToolBox);
 	if(DoButton_Editor(&s_NewImageButton, "Add", 0, &Slot, 0, "Load a new image to use in the map"))
-		InvokeFileDialog(IStorage::TYPE_ALL, FILETYPE_IMG, "Add Image", "Add", "mapres", "", AddImage, this);
+		InvokeFileDialog(IStorageEngine::TYPE_ALL, FILETYPE_IMG, "Add Image", "Add", "mapres", "", AddImage, this);
 }
 
 
@@ -3139,7 +3139,7 @@ void CEditor::RenderFileDialog()
 	UI()->DoLabel(&PathBox, aBuf, 10.0f, CUI::ALIGN_LEFT);
 
 	// filebox
-	if(m_FileDialogStorageType == IStorage::TYPE_SAVE)
+	if(m_FileDialogStorageType == IStorageEngine::TYPE_SAVE)
 	{
 		static float s_FileBoxID = 0;
 		UI()->DoLabel(&FileBoxLabel, "Filename:", 10.0f, CUI::ALIGN_LEFT);
@@ -3338,7 +3338,7 @@ void CEditor::RenderFileDialog()
 			str_format(m_aFileSaveName, sizeof(m_aFileSaveName), "%s/%s", m_pFileDialogPath, m_aFileDialogFileName);
 			if(!str_comp(m_pFileDialogButtonText, "Save"))
 			{
-				IOHANDLE File = Storage()->OpenFile(m_aFileSaveName, IOFLAG_READ, IStorage::TYPE_SAVE);
+				IOHANDLE File = Storage()->OpenFile(m_aFileSaveName, IOFLAG_READ, IStorageEngine::TYPE_SAVE);
 				if(File)
 				{
 					io_close(File);
@@ -3360,7 +3360,7 @@ void CEditor::RenderFileDialog()
 	if(DoButton_Editor(&s_CancelButton, "Cancel", 0, &Button, 0, 0) || Input()->KeyPress(KEY_ESCAPE))
 		m_Dialog = DIALOG_NONE;
 
-	if(m_FileDialogStorageType == IStorage::TYPE_SAVE)
+	if(m_FileDialogStorageType == IStorageEngine::TYPE_SAVE)
 	{
 		ButtonBar.VSplitLeft(40.0f, 0, &ButtonBar);
 		ButtonBar.VSplitLeft(70.0f, &Button, &ButtonBar);
@@ -3374,7 +3374,7 @@ void CEditor::RenderFileDialog()
 		}
 	}
 
-	if(m_FileDialogStorageType == IStorage::TYPE_SAVE)
+	if(m_FileDialogStorageType == IStorageEngine::TYPE_SAVE)
 	{
 		ButtonBar.VSplitLeft(40.0f, 0, &ButtonBar);
 		ButtonBar.VSplitLeft(70.0f, &Button, &ButtonBar);
@@ -3394,14 +3394,14 @@ void CEditor::RenderFileDialog()
 void CEditor::FilelistPopulate(int StorageType)
 {
 	m_FileList.clear();
-	if(m_FileDialogStorageType != IStorage::TYPE_SAVE && !str_comp(m_pFileDialogPath, "maps"))
+	if(m_FileDialogStorageType != IStorageEngine::TYPE_SAVE && !str_comp(m_pFileDialogPath, "maps"))
 	{
 		CFilelistItem Item;
 		str_copy(Item.m_aFilename, "downloadedmaps", sizeof(Item.m_aFilename));
 		str_copy(Item.m_aName, "downloadedmaps/", sizeof(Item.m_aName));
 		Item.m_IsDir = true;
 		Item.m_IsLink = true;
-		Item.m_StorageType = IStorage::TYPE_SAVE;
+		Item.m_StorageType = IStorageEngine::TYPE_SAVE;
 		m_FileList.add(Item);
 	}
 	Storage()->ListDirectory(StorageType, m_pFileDialogPath, EditorListdirCallback, this);
@@ -4528,20 +4528,20 @@ void CEditor::Init()
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 	m_pGraphics = Kernel()->RequestInterface<IGraphics>();
 	m_pTextRender = Kernel()->RequestInterface<ITextRender>();
-	m_pStorage = Kernel()->RequestInterface<IStorage>();
+	m_pStorage = Kernel()->RequestInterface<IStorageEngine>();
 	m_RenderTools.m_pGraphics = m_pGraphics;
 	m_RenderTools.m_pUI = &m_UI;
 	m_UI.Init(m_pGraphics, m_pInput, m_pTextRender);
 	m_Map.m_pEditor = this;
 
-	m_CheckerTexture = Graphics()->LoadTexture("editor/checker.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
-	m_BackgroundTexture = Graphics()->LoadTexture("editor/background.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
-	m_CursorTexture = Graphics()->LoadTexture("editor/cursor.png", IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
+	m_CheckerTexture = Graphics()->LoadTexture("editor/checker.png", IStorageEngine::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
+	m_BackgroundTexture = Graphics()->LoadTexture("editor/background.png", IStorageEngine::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
+	m_CursorTexture = Graphics()->LoadTexture("editor/cursor.png", IStorageEngine::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);
 
 	char aBuf[256];
 	if(g_Config.m_GameEntities[0] == '\0') str_copy(aBuf, "editor/entities.png", sizeof(aBuf));
 	else str_format(aBuf, sizeof(aBuf), "entities/%s", g_Config.m_GameEntities);
-	m_EntitiesTexture = Graphics()->LoadTexture(aBuf, IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_MULTI_DIMENSION);
+	m_EntitiesTexture = Graphics()->LoadTexture(aBuf, IStorageEngine::TYPE_ALL, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_MULTI_DIMENSION);
 
 	m_TilesetPicker.m_pEditor = this;
 	m_TilesetPicker.MakePalette();
@@ -4567,7 +4567,7 @@ void CEditor::ReInitEntities()
 	char aBuf[256];
 	if (g_Config.m_GameEntities[0] == '\0') str_copy(aBuf, "editor/entities.png", sizeof(aBuf));
 	else str_format(aBuf, sizeof(aBuf), "entities/%s", g_Config.m_GameEntities);
-	m_EntitiesTexture = Graphics()->LoadTexture(aBuf, IStorage::TYPE_ALL, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_MULTI_DIMENSION);
+	m_EntitiesTexture = Graphics()->LoadTexture(aBuf, IStorageEngine::TYPE_ALL, CImageInfo::FORMAT_AUTO, IGraphics::TEXLOAD_MULTI_DIMENSION);
 	m_Map.m_pGameLayer->m_Texture = m_EntitiesTexture;
 }
 
@@ -4589,7 +4589,7 @@ void CEditor::ConMapMagic(IConsole::IResult *pResult, void *pUserData)
 		char aBuf[64] = { 0 };
 		str_format(aBuf, sizeof(aBuf), "maps/%s.map", s_aMaps[m]);
 		dbg_msg("map magic", "processing map '%s'", s_aMaps[m]);
-		CallbackOpenMap(aBuf, IStorage::TYPE_ALL, pSelf);
+		CallbackOpenMap(aBuf, IStorageEngine::TYPE_ALL, pSelf);
 		bool Edited = false;
 
 		// find image
@@ -4610,7 +4610,7 @@ void CEditor::ConMapMagic(IConsole::IResult *pResult, void *pUserData)
 		{
 			str_format(aBuf, sizeof(aBuf), "maps/%s_mapmagic.map", s_aMaps[m]);
 			dbg_msg("map magic", "saving map '%s_mapmagic'", s_aMaps[m]);
-			CallbackSaveMap(aBuf, IStorage::TYPE_SAVE, pSelf);
+			CallbackSaveMap(aBuf, IStorageEngine::TYPE_SAVE, pSelf);
 		}
 	}
 }

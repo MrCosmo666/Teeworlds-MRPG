@@ -6,10 +6,6 @@
 #include <engine/server.h>
 #include <game/server/enum_global.h>
 
-#ifdef CONF_DISCORD
-	#include <teeother/sleepy_discord/websocketpp_websocket.h>
-#endif
-
 STRINGABLE_ENUM_IMPL(MINER)
 STRINGABLE_ENUM_IMPL(PLANT)
 STRINGABLE_ENUM_IMPL(EMEMBERUPGRADE)
@@ -90,7 +86,7 @@ class CServerBan : public CNetBan
 public:
 	class CServer *Server() const { return m_pServer; }
 
-	void InitServerBan(class IConsole *pConsole, class IStorage *pStorage, class CServer* pServer);
+	void InitServerBan(class IConsole *pConsole, class IStorageEngine *pStorage, class CServer* pServer);
 
 	virtual int BanAddr(const NETADDR *pAddr, int Seconds, const char *pReason);
 	virtual int BanRange(const CNetRange *pRange, int Seconds, const char *pReason);
@@ -98,43 +94,10 @@ public:
 	static void ConBanExt(class IConsole::IResult *pResult, void *pUser);
 };
 
-#ifdef CONF_DISCORD
-class DiscordJob : public SleepyDiscord::DiscordClient
-{
-	CServer *m_pServer;
-	CServer *Server() const { return m_pServer; }
-
-	class CGS *m_GameServer;
-	CGS *GS() const { return m_GameServer; }
-
-	// роли
-	std::vector<SleepyDiscord::Role> RoleList;
-
-	void onMessage(SleepyDiscord::Message message) override;
-	void onReaction(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
-						SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID, SleepyDiscord::Emoji emoji) override;
-	void onDeleteReaction(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
-						SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID, SleepyDiscord::Emoji emoji) override;
-	void UpdateMessageIdeas(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
-						SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID);
-
-
-public:
-	using SleepyDiscord::DiscordClient::DiscordClient;
-	DiscordJob(const char *token, int threads);
-
-	void SetServer(CServer *pServer);
-
-	void SendMessage(const char *pChanal, const char *Color, const char *Title, std::string pMsg);
-	void SendGenerateMessage(const char *pChanal, const char *Color, const char *Title, const char *pPhpArg);
-	void SendStatus(const char* Status, int Type);
-};
-#endif
-
 class CServer : public IServer
 {
 	class IConsole *m_pConsole;
-	class IStorage *m_pStorage;
+	class IStorageEngine *m_pStorage;
 
 public:
 	virtual class IGameServer* GameServer(int WorldID = 0)
@@ -144,7 +107,7 @@ public:
 		return WorldsInstance.ms_aWorlds[WorldID].m_pGameServer;
 	}
 	class IConsole *Console() { return m_pConsole; }
-	class IStorage *Storage() { return m_pStorage; }
+	class IStorageEngine*Storage() { return m_pStorage; }
 	class DiscordJob *m_pDiscord;
 
 	enum
@@ -276,8 +239,8 @@ public:
 	virtual const char* GetWorldName(int WorldID);
 
 	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText);
-	virtual void SendDiscordGenerateMessage(const char *pColor, const char *pTitle, const char *pMsg);
-	virtual void SendDiscordStatus(const char *pStatus, int Type);
+	virtual void SendDiscordGenerateMessage(const char *pTitle, int AuthID, const char* pColor = "\0");
+	virtual void UpdateDiscordStatus(const char *pStatus);
 
 	void Kick(int ClientID, const char *pReason);
 

@@ -54,7 +54,7 @@ jobs:
         ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target package_default
         mkdir artifacts
         mv ${{ matrix.package-file }} artifacts
-    - name: Purge Artifacts    
+    - name: Purge Artifacts
       uses: kolpav/purge-artifacts-action@v1
       with:
         token: ${{ secrets.PRIVATE_REPO_ACCESS_TOKEN }}

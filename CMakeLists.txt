@@ -78,6 +78,7 @@ endif()
 set(AUTO_DEPENDENCIES_DEFAULT ON)
 option(DOWNLOAD_DEPENDENCIES "Download dependencies" ${AUTO_DEPENDENCIES_DEFAULT})
 option(DOWNLOAD_GTEST "Download and compile GTest if not found" ${AUTO_DEPENDENCIES_DEFAULT})
+option(DISCORD_SERVER_COMPILE "Compile Sleepy-Discord in conjunction with the server" ON)
 option(PREFER_BUNDLED_LIBS "Prefer bundled libraries over system libraries" ${AUTO_DEPENDENCIES_DEFAULT})
 option(DEV "Don't generate stuff necessary for packaging" OFF)
 set(OpenGL_GL_PREFERENCE LEGACY)
@@ -284,6 +285,7 @@ if(NOT CMAKE_CROSSCOMPILING)
 endif()
 
 ## own packages
+set(Boost_INCLUDES_DIRS)
 find_package(Threads)
 find_package(ZLIB)
 find_package(Pnglite)
@@ -298,12 +300,15 @@ find_package(DiscordGameSDK)
 
 if(TARGET_OS AND TARGET_OS STREQUAL "linux")
   find_package(Boost 1.36.0)
-    
   if(NOT(Boost_FOUND))
     message(FATAL_ERROR, "Boost need install.")
   endif()
 elseif(TARGET_OS AND TARGET_OS STREQUAL "mac")
   set(SERVER_COMPILE OFF)
+endif()
+
+if(NOT(Boost_INCLUDES_DIRS))
+  set(Boost_INCLUDE_DIRS "other/boost/include")
 endif()
 
 # another packages
@@ -353,23 +358,8 @@ set(CLIENT_INCLUDES_DIRS
   ${DISCORDGAMESDK_INCLUDE_DIRS}
 )
 
-# server lib
-set(SERVER_LIBRARIES
-  ${MYSQL_LIBRARIES} 
-  ${ICU_LIBRARIES}
-)
 
-# server includes
-if(NOT(Boost_INCLUDES_DIRS))
-  set(Boost_INCLUDE_DIRS "other/boost/include")
-endif()
-
-set(SERVER_INCLUDES_DIRS
-  ${Boost_INCLUDE_DIRS} 
-  ${ICU_INCLUDE_DIRS}
-  ${MYSQL_INCLUDE_DIRS})
-
-message(STATUS "******** Mmo ( Teeworlds) ********")
+message(STATUS "******** Mmo (Teeworlds) ********")
 message(STATUS "Target OS: ${TARGET_OS} ${TARGET_BITS}bit")
 message(STATUS "Compiler: ${CMAKE_CXX_COMPILER}")
 message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
@@ -393,13 +383,13 @@ if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   show_dependency_status("Hdiutil" HDIUTIL)
 endif()
 
+show_dependency_status("OpenSSL" OPENSSL)
+show_dependency_status("Curl" CURL)
 if(COMPILE_SERVER)
   show_dependency_status("MySQL" MYSQL)
   show_dependency_status("ICU" ICU)
 elseif(COMPILE_CLIENT)
-  show_dependency_status("Curl" CURL)
   show_dependency_status("Freetype" FREETYPE)
-  show_dependency_status("OpenSSL Crypto" CRYPTO) 
   show_dependency_status("Pnglite" PNGLITE)
   show_dependency_status("SDL2" SDL2)
   show_dependency_status("Wavpack" WAVPACK)
@@ -413,6 +403,14 @@ endif()
 
 if(SERVER_COMPILE AND NOT(MYSQL_FOUND))
   message(SEND_ERROR "You must install MySQL to compile Teeworlds MMO(Server)")
+endif()
+if(SERVER_COMPILE AND NOT(OPENSSL_FOUND))
+  message(STATUS "####################### WARNING ##########################")
+  message(STATUS "Sleepy-discord build with the server is not available")
+  message(STATUS "The server will be compiled without Sleepy-Discord")
+  message(STATUS "Need OpenSSL: https://slproweb.com/products/Win32OpenSSL.html")
+  message(STATUS "###########################################################")
+  set(DISCORD_SERVER_COMPILE OFF)
 endif()
 if(SERVER_COMPILE AND NOT(ICU_FOUND))
   message(SEND_ERROR "You must install ICU to compile Teeworlds MMO(Server)")
@@ -532,7 +530,7 @@ add_library(md5 EXCLUDE_FROM_ALL OBJECT ${DEP_MD5_SRC})
 list(APPEND TARGETS_DEP json md5)
 
 set(DEP_MD5)
-if(NOT CRYPTO_FOUND)
+if(NOT OPENSSL_FOUND)
   set(DEP_MD5 $<TARGET_OBJECTS:md5>)
 endif()
 
@@ -553,6 +551,7 @@ set(COPY_FILES_CLIENT
 set(COPY_FILES_SERVER
   ${ICU_COPY_FILES}
   ${MYSQL_COPY_FILES}
+  ${OPENSSL_COPY_FILES}
 )
 
 file(COPY ${COPY_FILES_CLIENT} ${COPY_FILES_SERVER} DESTINATION .)
@@ -750,7 +749,7 @@ set(GAME_GENERATED_SHARED
 set(DEPS ${DEP_JSON} ${DEP_MD5} ${ZLIB_DEP})
 
 # Libraries
-set(LIBS ${CMAKE_THREAD_LIBS_INIT} ${ZLIB_LIBRARIES} ${CRYPTO_LIBRARIES} ${PLATFORM_LIBS})
+set(LIBS ${CMAKE_THREAD_LIBS_INIT} ${ZLIB_LIBRARIES} ${OPENSSL_CRYPTO_LIBRARIES} ${PLATFORM_LIBS})
 
 # Targets
 add_library(engine-shared EXCLUDE_FROM_ALL OBJECT ${ENGINE_INTERFACE} ${ENGINE_SHARED} ${ENGINE_GENERATED_SHARED} ${BASE})
@@ -820,6 +819,74 @@ if(CLIENT_COMPILE)
 endif()
 
 ########################################################################
+# SLEEPY-DISCORD
+########################################################################
+
+if(DISCORD_SERVER_COMPILE)
+  # Include Cpr
+  set(CPR_LIBRARIES cpr CACHE INTERNAL "")
+  install(DIRECTORY ${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include/cpr DESTINATION ${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include)
+  set(CPR_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include")
+  file(GLOB CPR_LIBRARIES_SRC "${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/cpr/*.cpp" "${CPR_INCLUDE_DIRS}/*.h") 
+  add_library(${CPR_LIBRARIES} EXCLUDE_FROM_ALL OBJECT ${CPR_LIBRARIES_SRC})
+  if((MINGW OR TARGET_OS STREQUAL "linux") AND PREFER_BUNDLED_LIBS)
+    target_link_libraries(${CPR_LIBRARIES} -lcurl) # wtf
+  endif()
+  target_link_libraries(${CPR_LIBRARIES} ${CURL_LIBRARIES})
+  target_include_directories(${CPR_LIBRARIES} PUBLIC ${CPR_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
+  list(APPEND TARGETS_DEP ${CPR_LIBRARIES})
+
+  # Include Sleepy-Discord
+  file(GLOB SLEEPY_DISCORD_LIBRARIES_SRC "${PROJECT_SOURCE_DIR}/discord_deps/sleepy-discord/sleepy_discord/*.cpp")
+  add_library(sleepy-discord EXCLUDE_FROM_ALL OBJECT ${SLEEPY_DISCORD_LIBRARIES_SRC})
+  target_include_directories(sleepy-discord
+    PUBLIC ${PROJECT_SOURCE_DIR}/discord_deps/sleepy-discord/include
+	PRIVATE ${PROJECT_SOURCE_DIR}/discord_deps/sleepy-discord/include/sleepy_discord)
+
+  # Including Cpr to Sleepy-Discord
+  set(SLEEPY_DISCORD_LIBRARIES)
+  target_include_directories(sleepy-discord PUBLIC ${CPR_INCLUDE_DIRS})
+  list(APPEND SLEEPY_DISCORD_LIBRARIES ${CPR_LIBRARIES})
+  target_compile_definitions(sleepy-discord PUBLIC EXISTENT_CPR)
+
+  # Including Asio to Sleepy-Discord
+  target_include_directories(sleepy-discord PUBLIC "${PROJECT_SOURCE_DIR}/discord_deps/asio/asio/include")
+  target_compile_definitions(sleepy-discord PUBLIC EXISTENT_ASIO)
+
+  # Including Websocketpp to Sleepy-Discord
+  target_include_directories(sleepy-discord PUBLIC "${PROJECT_SOURCE_DIR}/discord_deps/websocketpp")
+  target_compile_definitions(sleepy-discord PUBLIC EXISTENT_WEBSOCKETPP)
+
+  # Including OpenSSL to Sleepy-Discord
+  if (WIN32)
+	list(APPEND SLEEPY_DISCORD_LIBRARIES "OpenSSL::SSL" "OpenSSL::Crypto")
+  elseif (UNIX)
+	list(APPEND SLEEPY_DISCORD_LIBRARIES "ssl" "crypto" "Threads::Threads")
+  endif()
+
+  #Todo add support for it
+  target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_UWEBSOCKETS)
+  target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_OPUS)
+  target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_SODIUM)
+  target_link_libraries(sleepy-discord ${SLEEPY_DISCORD_LIBRARIES})
+  list(APPEND TARGETS_DEP sleepy-discord)
+
+  # Disable warning sleepy-discord
+  if(MINGW OR TARGET_OS STREQUAL "linux")
+    target_compile_options(sleepy-discord PUBLIC -Wno-duplicated-branches -Wno-deprecated-copy)
+  endif()
+  
+  #The codebase is c++11 but both clang and visual c++ have issues with c++11
+  #These issues are fixed by using preprocessor defines to replace code that
+  #cause issues with c++14 code
+  if (CXX_STANDARD LESS 14 OR NOT CXX_STANDARD)
+	set_target_properties(sleepy-discord PROPERTIES CXX_STANDARD 14)
+	set_target_properties(sleepy-discord PROPERTIES CXX_STANDARD_REQUIRED ON)
+	target_compile_features(sleepy-discord PUBLIC cxx_std_14)
+  endif()
+endif()
+
+########################################################################
 # SERVER
 ########################################################################
 
@@ -833,8 +900,9 @@ if(SERVER_COMPILE)
     src/generated/server_data.cpp
     src/generated/server_data.h)
 
-  # # #
+  ###
   set(SERVER_SRC ${ENGINE_SERVER} ${GAME_SERVER} ${GAME_GENERATED_SERVER} ${LOCALIZED_SERVER})
+
   if(TARGET_OS STREQUAL "windows")
     set(SERVER_ICON "other/icons/${SERVER_EXECUTABLE}.rc")
   else()
@@ -852,12 +920,25 @@ if(SERVER_COMPILE)
   )
 
   # server includes & lib
+  set(SERVER_LIBRARIES
+    ${MYSQL_LIBRARIES}
+    ${ICU_LIBRARIES}
+  )
+
+  set(SERVER_INCLUDES_DIRS
+    ${Boost_INCLUDE_DIRS} 
+    ${ICU_INCLUDE_DIRS}
+    ${MYSQL_INCLUDE_DIRS}
+  )
+
+  if(DISCORD_SERVER_COMPILE)
+    list(APPEND SERVER_LIBRARIES sleepy-discord ${CPR_LIBRARIES})
+  endif()
   target_include_directories(${TARGET_SERVER} PRIVATE ${SERVER_INCLUDES_DIRS})
   target_link_libraries(${TARGET_SERVER} ${LIBS} ${SERVER_LIBRARIES})
-
   list(APPEND TARGETS_OWN ${TARGET_SERVER})
   list(APPEND TARGETS_LINK ${TARGET_SERVER})
-
+  
   if(TARGET_OS AND TARGET_OS STREQUAL "mac")
     set(SERVER_LAUNCHER_SRC src/osxlaunch/server.mm)
     set(TARGET_SERVER_LAUNCHER ${TARGET_SERVER}-Launcher)
@@ -1249,10 +1330,6 @@ foreach(target ${TARGETS})
     else()
       target_compile_options(${target} PRIVATE $<$<NOT:${DBG}>:/MT> $<${DBG}:/MTd>)
     endif()
-    target_compile_options(${target} PRIVATE /MP) # Use multiple cores
-    target_compile_options(${target} PRIVATE /EHsc) # Only catch C++ exceptions with catch.
-    target_compile_options(${target} PRIVATE /GS) # Protect the stack pointer.
-    target_compile_options(${target} PRIVATE /wd4996) # Use of non-_s functions.
   endif()
   if(OUR_FLAGS)
     target_compile_options(${target} PRIVATE ${OUR_FLAGS})
@@ -1301,9 +1378,13 @@ foreach(target ${TARGETS_OWN})
   target_compile_definitions(${target} PRIVATE $<$<CONFIG:Debug>:CONF_DEBUG>)
   target_include_directories(${target} PRIVATE ${ZLIB_INCLUDE_DIRS})
 
-  if(CRYPTO_FOUND)
+  if(OPENSSL_FOUND)
 	target_compile_definitions(${target} PRIVATE CONF_OPENSSL)
-	target_include_directories(${target} PRIVATE ${CRYPTO_INCLUDE_DIRS})
+	target_include_directories(${target} PRIVATE ${OPENSSL_INCLUDE_DIRS})
+  endif()
+
+  if(DISCORD_SERVER_COMPILE)
+    target_compile_definitions(${target} PRIVATE CONF_DISCORD)
   endif()
 
   if(MYSQL_FOUND)

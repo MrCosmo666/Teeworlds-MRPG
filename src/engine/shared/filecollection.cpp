@@ -84,7 +84,7 @@ void CFileCollection::BuildTimestring(int64 Timestamp, char *pTimestring)
 	pTimestring[0] = (Timestamp&0xF)+'0';
 }
 
-void CFileCollection::Init(IStorage *pStorage, const char *pPath, const char *pFileDesc, const char *pFileExt, int MaxEntries)
+void CFileCollection::Init(IStorageEngine *pStorage, const char *pPath, const char *pFileDesc, const char *pFileExt, int MaxEntries)
 {
 	mem_zero(m_aTimestamps, sizeof(m_aTimestamps));
 	m_NumTimestamps = 0;
@@ -96,7 +96,7 @@ void CFileCollection::Init(IStorage *pStorage, const char *pPath, const char *pF
 	str_copy(m_aPath, pPath, sizeof(m_aPath));
 	m_pStorage = pStorage;
 
-	m_pStorage->ListDirectory(IStorage::TYPE_SAVE, m_aPath, FilelistCallback, this);
+	m_pStorage->ListDirectory(IStorageEngine::TYPE_SAVE, m_aPath, FilelistCallback, this);
 }
 
 void CFileCollection::AddEntry(int64 Timestamp)
@@ -115,7 +115,7 @@ void CFileCollection::AddEntry(int64 Timestamp)
 			char aTimestring[TIMESTAMP_LENGTH];
 			BuildTimestring(m_aTimestamps[0], aTimestring);
 			str_format(aBuf, sizeof(aBuf), "%s/%s_%s%s", m_aPath, m_aFileDesc, aTimestring, m_aFileExt);
-			m_pStorage->RemoveFile(aBuf, IStorage::TYPE_SAVE);
+			m_pStorage->RemoveFile(aBuf, IStorageEngine::TYPE_SAVE);
 		}
 
 		// add entry to the sorted list

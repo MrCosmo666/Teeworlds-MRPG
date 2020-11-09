@@ -21,7 +21,7 @@ def unzip(filename, where):
 
 def downloadAll(targets):
 	version = "master"
-	url = "https://github.com/MrCosmoTW/MmoTee-Libs/archive/{}.zip".format(version)
+	url = "https://github.com/MrCosmo666/MmoTee-Libs/archive/{}.zip".format(version)
 
 	# download and unzip
 	src_package_libs = twlib.fetch_file(url)
