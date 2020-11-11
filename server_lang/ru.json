@@ -397,6 +397,6 @@
 	},
 	{
 		"key": "[Done] Defeat the {STR}'s for the {STR}!",
-		"value": "Задание еще не выполнено!"
+		"value": "[Выполнено] Победить {STR} для {STR}!"
 	}
 ]}
