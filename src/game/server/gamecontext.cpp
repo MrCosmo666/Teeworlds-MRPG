@@ -1013,7 +1013,7 @@ void CGS::OnInit(int WorldID)
 	m_Events.SetGameServer(this);
 	m_CommandManager.Init(m_pConsole, this, NewCommandHook, RemoveCommandHook);
 	m_WorldID = WorldID;
-	m_RespawnWorld = -1;
+	m_RespawnWorldID = -1;
 	m_MusicID = -1;
 
 	for(int i = 0; i < NUM_NETOBJTYPES; i++)
@@ -1291,7 +1291,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				return (str_comp_nocase(pMsg->m_Value, vote.m_aDescription) == 0);
 			});
 
-			if (item != m_aPlayerVotes[ClientID].end())
+			if(item != m_aPlayerVotes[ClientID].end())
 			{
 				const int InteractiveCount = string_to_number(pMsg->m_Reason, 1, 10000000);
 				ParsingVoteCommands(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveCount, pMsg->m_Reason, item->m_Callback);
@@ -1487,7 +1487,7 @@ void CGS::OnClientEnter(int ClientID)
 		SendDayInfo(ClientID);
 		
 		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "connected and enter in MRPG");
-		ResetVotesNewbieInformation(ClientID);
+		ShowVotesNewbieInformation(ClientID);
 		return;
 	}
 
@@ -1996,7 +1996,7 @@ void CGS::AVCALLBACK(int ClientID, const char *pCmd, const char *pIcon, const in
 }
 
 void CGS::ResetVotes(int ClientID, int MenuList)
-{	
+{
 	CPlayer *pPlayer = GetPlayer(ClientID, true);
 	if(!pPlayer)
 		return;
@@ -2057,13 +2057,13 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 		
 		Mmo()->Quest()->ShowQuestsMainList(pPlayer);
-		AddBackpage(ClientID);
+		AddVotesBackpage(ClientID);
 	}
 	else if(MenuList == MenuList::MENU_INBOX) 
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
-		AddBackpage(ClientID);
+		AddVotesBackpage(ClientID);
 		AV(ClientID, "null");
 		Mmo()->Inbox()->GetInformationInbox(pPlayer);
 	}
@@ -2075,7 +2075,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVM(ClientID, "null", NOPE, TAB_INFO_UPGR, "Select upgrades type in Reason, write count.");
 		AV(ClientID, "null");
 
-		ShowPlayerStats(pPlayer);
+		ShowVotesPlayerStats(pPlayer);
 
 		// DPS UPGRADES
 		int Range = pPlayer->GetLevelTypeAttribute(AtributType::AtDps);
@@ -2123,7 +2123,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVH(ClientID, TAB_UPGR_JOB, GOLDEN_COLOR, "Disciple of Jobs");
 		Mmo()->PlantsAcc()->ShowMenu(ClientID);
 		Mmo()->MinerAcc()->ShowMenu(pPlayer);
-		AddBackpage(ClientID);
+		AddVotesBackpage(ClientID);
 	}
 	else if (MenuList == MenuList::MENU_TOP_LIST)
 	{
@@ -2137,7 +2137,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVM(ClientID, "SELECTEDTOP", ToplistTypes::GUILDS_WEALTHY, NOPE, "Top 10 guilds wealthy");
 		AVM(ClientID, "SELECTEDTOP", ToplistTypes::PLAYERS_LEVELING, NOPE, "Top 10 players leveling");
 		AVM(ClientID, "SELECTEDTOP", ToplistTypes::PLAYERS_WEALTHY, NOPE, "Top 10 players wealthy");
-		AddBackpage(ClientID);
+		AddVotesBackpage(ClientID);
 	}
 	else if(MenuList == MenuList::MENU_GUIDEDROP) 
 	{
@@ -2174,14 +2174,14 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		if (!FoundedBots)
 			AVL(ClientID, "null", "There are no active mobs in your zone!");
 
-		AddBackpage(ClientID);
+		AddVotesBackpage(ClientID);
 	}
 		
 	Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList, false);
 }
 
 // information for unauthorized players
-void CGS::ResetVotesNewbieInformation(int ClientID)
+void CGS::ShowVotesNewbieInformation(int ClientID)
 {
 	CPlayer *pPlayer = GetPlayer(ClientID);
 	if(!pPlayer)
@@ -2244,7 +2244,7 @@ void CGS::StrongUpdateVotesForAll(int MenuList)
 }
 
 // the back button adds a back button to the menu (But remember to specify the last menu ID).
-void CGS::AddBackpage(int ClientID)
+void CGS::AddVotesBackpage(int ClientID)
 {	
 	if(!m_apPlayers[ClientID]) 
 		return;
@@ -2256,7 +2256,7 @@ void CGS::AddBackpage(int ClientID)
 }
 
 // print player statistics
-void CGS::ShowPlayerStats(CPlayer *pPlayer)
+void CGS::ShowVotesPlayerStats(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
 	AVH(ClientID, TAB_INFO_STAT, BLUE_COLOR, "Player Stats {STR}", IsDungeon() ? "(Sync)" : "\0");
@@ -2282,7 +2282,7 @@ void CGS::ShowPlayerStats(CPlayer *pPlayer)
 }
 
 // display information by currency
-void CGS::ShowItemValueInformation(CPlayer *pPlayer, int ItemID)
+void CGS::ShowVotesItemValueInformation(CPlayer *pPlayer, int ItemID)
 {
 	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_Colored = LIGHT_PURPLE_COLOR;

@@ -104,12 +104,12 @@ CLocalization::CLanguage::~CLanguage()
 		uplrules_close(m_pPluralRules);
 }
 
-bool CLocalization::CLanguage::Load(CLocalization* pLocalization, CStorage* pStorage)
+bool CLocalization::CLanguage::Load(CLocalization* pLocalization, IStorageEngine* pStorage)
 {
 	// read file data into buffer
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "./server_lang/%s.json", m_aFilename);
-	const IOHANDLE File = pStorage->OpenFile(aBuf, IOFLAG_READ, CStorage::TYPE_ALL);
+	const IOHANDLE File = pStorage->OpenFile(aBuf, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 	if(!File)
 		return false;
 
@@ -262,7 +262,7 @@ const char* CLocalization::CLanguage::Localize_P(int Number, const char* pText) 
 	return pEntry->m_apVersions[PluralCode];
 }
 
-CLocalization::CLocalization(class CStorage* pStorage) : 
+CLocalization::CLocalization(class IStorageEngine* pStorage) :
 	m_pStorage(pStorage), 
 	m_pMainLanguage(nullptr), 
 	m_pUtf8Converter(nullptr) 
@@ -295,7 +295,7 @@ bool CLocalization::Init()
 	
 	// read file data into buffer
 	const char *pFilename = "./server_lang/index.json";
-	const IOHANDLE File = Storage()->OpenFile(pFilename, IOFLAG_READ, CStorage::TYPE_ALL);
+	const IOHANDLE File = Storage()->OpenFile(pFilename, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 	if(!File)
 	{
 		dbg_msg("Localization", "can't open ./server_lang/index.json");

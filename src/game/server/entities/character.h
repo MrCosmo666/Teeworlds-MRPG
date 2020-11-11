@@ -125,7 +125,7 @@ public:
 	CCharacterCore m_Core;
 
 	// allow perm
-	bool m_NoAllowDamage;
+	bool m_SkipDamage;
 	int m_AmmoRegen;
 	int m_ReloadTimer;
 

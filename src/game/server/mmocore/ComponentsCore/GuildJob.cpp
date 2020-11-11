@@ -98,25 +98,25 @@ bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	{
 		GS()->Chat(ClientID, "You can see menu in the votes!");
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
-		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
+		pChr->m_Core.m_ProtectHooked = pChr->m_SkipDamage = true;
 		return true;
 	}
 	else if(pChr->GetHelper()->TileExit(IndexCollision, TILE_GUILD_HOUSE))
 	{
 		GS()->Chat(ClientID, "You left the active zone, menu is restored!");
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
-		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
+		pChr->m_Core.m_ProtectHooked = pChr->m_SkipDamage = false;
 		return true;
 	}
 
 	if(pChr->GetHelper()->TileEnter(IndexCollision, TILE_GUILD_CHAIRS))
 	{
-		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
+		pChr->m_Core.m_ProtectHooked = pChr->m_SkipDamage = true;
 		return true;
 	}
 	else if(pChr->GetHelper()->TileExit(IndexCollision, TILE_GUILD_CHAIRS))
 	{
-		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
+		pChr->m_Core.m_ProtectHooked = pChr->m_SkipDamage = false;
 		return true;
 	}
 	if(pChr->GetHelper()->BoolIndex(TILE_GUILD_CHAIRS))
@@ -415,7 +415,7 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 		GS()->ClearVotes(ClientID);
 		GS()->AV(ClientID, "null", "Please close vote and press Left Mouse,");
 		GS()->AV(ClientID, "null", "on position where add decoration!");
-		GS()->AddBackpage(ClientID);
+		GS()->AddVotesBackpage(ClientID);
 
 		const int DecoItemID = VoteID;
 		pPlayer->GetTempData().m_TempDecoractionID = DecoItemID;
@@ -534,7 +534,7 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 		pPlayer->m_LastVoteMenu = MENU_GUILD_FINDER;
 		GS()->ClearVotes(ClientID);
 		ShowGuildPlayers(pPlayer, VoteID);
-		GS()->AddBackpage(ClientID);
+		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
 	return false;
@@ -576,7 +576,7 @@ bool GuildJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_GUILD;
 		ShowGuildPlayers(pPlayer, pPlayer->Acc().m_GuildID);
-		GS()->AddBackpage(ClientID);
+		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
 
@@ -613,7 +613,7 @@ bool GuildJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		Job()->Item()->ListInventory(pPlayer, ItemType::TYPE_DECORATION);
 		GS()->AV(ClientID, "null");
 		ShowDecorationList(pPlayer);
-		GS()->AddBackpage(ClientID);
+		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
 	return false;
@@ -973,7 +973,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	int PriceUpgrade = ms_aGuild[GuildID].m_Upgrades[ EMEMBERUPGRADE::AvailableNSTSlots ] * g_Config.m_SvPriceUpgradeGuildSlot;
 	GS()->AVM(ClientID, "MUPGRADE", EMEMBERUPGRADE::AvailableNSTSlots, NOPE, "Upgrade {STR} ({INT}) {INT}gold", 
 		UpgradeNames(EMEMBERUPGRADE::AvailableNSTSlots).c_str(), &ms_aGuild[GuildID].m_Upgrades[ EMEMBERUPGRADE::AvailableNSTSlots ], &PriceUpgrade);
-	GS()->AddBackpage(ClientID);
+	GS()->AddVotesBackpage(ClientID);
 	return;
 }
 
@@ -1245,7 +1245,7 @@ void GuildJob::ShowMenuRank(CPlayer *pPlayer)
 		GS()->AVM(ClientID, "MRANKACCESS", mr.first, HideID, "Access rank ({STR})", AccessNames(mr.second.m_Access));
 		GS()->AVM(ClientID, "MRANKDELETE", mr.first, HideID, "Delete this rank");
 	}
-	GS()->AddBackpage(ClientID);
+	GS()->AddVotesBackpage(ClientID);
 }
 
 /* #########################################################################
@@ -1301,7 +1301,7 @@ void GuildJob::ShowInvitesGuilds(int ClientID, int GuildID)
 		}
 		HideID++;
 	}
-	GS()->AddBackpage(ClientID);
+	GS()->AddVotesBackpage(ClientID);
 }
 
 // show the guild's top and call on them
@@ -1330,7 +1330,7 @@ void GuildJob::ShowFinderGuilds(int ClientID)
 		GS()->AVM(ClientID, "MINVITESEND", GuildID, HideID, "Send request to join {STR}", cGuildName.cstr());
 		HideID++;
 	}
-	GS()->AddBackpage(ClientID);
+	GS()->AddVotesBackpage(ClientID);
 }
 
 /* #########################################################################
@@ -1347,7 +1347,7 @@ void GuildJob::ShowHistoryGuild(int ClientID, int GuildID)
 		str_format(aBuf, sizeof(aBuf), "[%s] %s", pRes->getString("Time").c_str(), pRes->getString("Text").c_str());
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "{STR}", aBuf);
 	}
-	GS()->AddBackpage(ClientID);	
+	GS()->AddVotesBackpage(ClientID);	
 }
 
 // add to the guild history

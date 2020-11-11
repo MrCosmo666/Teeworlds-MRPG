@@ -36,7 +36,7 @@ class CGS : public IGameServer
 	int m_WorldID;
 	int m_DungeonID;
 
-	int m_RespawnWorld;
+	int m_RespawnWorldID;
 	int m_MusicID;
 
 	IServer *m_pServer;
@@ -53,6 +53,8 @@ class CGS : public IGameServer
 	CGS(int Resetting);
 	void Construct(int Resetting);
 	bool m_Resetting;
+
+	//
 
 public:
 	IServer *Server() const { return m_pServer; }
@@ -249,13 +251,14 @@ public:
 	void AVCALLBACK(int To, const char* Type, const char* Icon, const int ID, const int ID2, const int HideID, VoteCallBack Callback, const char* pText, ...);
 
 	void ClearVotes(int ClientID);
-	void ResetVotesNewbieInformation(int ClientID);
+	void ShowVotesNewbieInformation(int ClientID);
 	void ResetVotes(int ClientID, int MenuList);
+	void ResetVotesTransaction(int ClientID, int MenuList);
 	void StrongUpdateVotes(int ClientID, int MenuList);
 	void StrongUpdateVotesForAll(int MenuList);
-	void AddBackpage(int ClientID);
-	void ShowPlayerStats(CPlayer *pPlayer);
-	void ShowItemValueInformation(CPlayer *pPlayer, int ItemID = itGold);
+	void AddVotesBackpage(int ClientID);
+	void ShowVotesPlayerStats(CPlayer *pPlayer);
+	void ShowVotesItemValueInformation(CPlayer *pPlayer, int ItemID = itGold);
 	bool ParsingVoteCommands(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text, VoteCallBack Callback = nullptr);
 
 	/* #########################################################################
@@ -289,8 +292,8 @@ public:
 
 	bool CheckingPlayersDistance(vec2 Pos, float Distance) const;
 	void SetMapMusic(int SoundID) { m_MusicID = SoundID; }
-	void SetRespawnWorld(int WorldID) { m_RespawnWorld = WorldID; }
-	int GetRespawnWorld() const { return m_RespawnWorld; }
+	void SetRespawnWorld(int WorldID) { m_RespawnWorldID = WorldID; }
+	int GetRespawnWorld() const { return m_RespawnWorldID; }
 
 	CCommandProcessor* CommandProcessor() { return m_pCommandProcessor; }
 

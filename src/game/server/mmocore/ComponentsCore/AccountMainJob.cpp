@@ -271,7 +271,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		if (!IsFoundModules)
 			GS()->AVM(ClientID, "null", NOPE, TAB_SETTINGS_MODULES, "The list of modules equipment is empty.");
 	
-		GS()->AddBackpage(ClientID);
+		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
 
@@ -296,7 +296,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 			const char *pLanguageName = Server()->Localization()->m_pLanguages[i]->GetName();
 			GS()->AVM(ClientID, "SELECTLANGUAGE", i, TAB_LANGUAGES, "Select language \"{STR}\"", pLanguageName);
 		}
-		GS()->AddBackpage(ClientID);
+		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
 	return false;

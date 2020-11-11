@@ -1,9 +1,8 @@
-#ifndef __SHARED_LOCALIZATION__
-#define __SHARED_LOCALIZATION__
+#ifndef TEEOTHER_LOCALIZATION
+#define TEEOTHER_LOCALIZATION
 
 #include <unicode/tmutfmt.h>
 #include <teeother/tl/hashtable.h>
-#define CStorage IStorageEngine
 
 struct CLocalizableString
 {
@@ -19,8 +18,8 @@ struct CLocalizableString
 class CLocalization
 {
 private:
-	class CStorage* m_pStorage;
-	inline class CStorage* Storage() { return m_pStorage; }
+	class IStorageEngine* m_pStorage;
+	inline class IStorageEngine* Storage() { return m_pStorage; }
 	
 public:
 	enum
@@ -88,7 +87,7 @@ public:
 		inline int GetWritingDirection() const { return m_Direction; }
 		inline void SetWritingDirection(int Direction) { m_Direction = Direction; }
 		inline bool IsLoaded() const { return m_Loaded; }
-		bool Load(CLocalization* pLocalization, class CStorage* pStorage);
+		bool Load(CLocalization* pLocalization, class IStorageEngine* pStorage);
 		const char* Localize(const char* pKey) const;
 		const char* Localize_P(int Number, const char* pText) const;
 	};
@@ -120,7 +119,7 @@ protected:
 	void AppendPercent(dynamic_string& Buffer, int& BufferIter, CLanguage* pLanguage, double Number);
 
 public:
-	CLocalization(class CStorage* pStorage);
+	CLocalization(class IStorageEngine* pStorage);
 	virtual ~CLocalization();
 	
 	virtual bool InitConfig(int argc, const char** argv);

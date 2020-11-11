@@ -100,7 +100,7 @@ bool InventoryJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 		if(pPlayer->m_aSortTabs[SORT_INVENTORY])
 			ListInventory(pPlayer, pPlayer->m_aSortTabs[SORT_INVENTORY]);
 
-		GS()->AddBackpage(ClientID);
+		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
 
@@ -142,7 +142,7 @@ bool InventoryJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 		if(!FindItem)
 			GS()->AVL(ClientID, "null", "There are no items in this tab");
 
-		GS()->AddBackpage(ClientID);
+		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
 

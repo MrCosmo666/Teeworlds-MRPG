@@ -29,14 +29,14 @@ bool StorageJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	if(pChr->GetHelper()->TileEnter(IndexCollision, TILE_SHOP_ZONE))
 	{
 		GS()->Chat(ClientID, "You can see menu in the votes!");
-		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
+		pChr->m_Core.m_ProtectHooked = pChr->m_SkipDamage = true;
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	else if(pChr->GetHelper()->TileExit(IndexCollision, TILE_SHOP_ZONE))
 	{
 		GS()->Chat(ClientID, "You left the active zone, menu is restored!");
-		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
+		pChr->m_Core.m_ProtectHooked = pChr->m_SkipDamage = false;
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
@@ -80,6 +80,6 @@ void StorageJob::ShowStorageMenu(CPlayer* pPlayer, int StorageID)
 	GS()->AVH(ClientID, TAB_STORAGE, GOLDEN_COLOR, "Shop :: {STR}", ms_aStorage[StorageID].m_aName);
 	GS()->AVM(ClientID, "REPAIRITEMS", StorageID, TAB_STORAGE, "Repair all items - FREE");
 	GS()->AV(ClientID, "null");
-	GS()->ShowItemValueInformation(pPlayer, ms_aStorage[StorageID].m_Currency);
+	GS()->ShowVotesItemValueInformation(pPlayer, ms_aStorage[StorageID].m_Currency);
 	GS()->AV(ClientID, "null");
 }

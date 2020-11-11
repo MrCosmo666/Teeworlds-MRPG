@@ -84,7 +84,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 
 	m_Mana = 0;
 	m_OldPos = Pos;
-	m_NoAllowDamage = false;
+	m_SkipDamage = false;
 	m_Core.m_LostData = false;
 	m_Event = TILE_CLEAR_EVENTS;
 	m_Core.m_WorldID = m_pPlayer->GetPlayerWorldID();
@@ -1098,7 +1098,7 @@ void CCharacter::HandleAuthedPlayer()
 bool CCharacter::IsAllowedPVP(int FromID)
 {
 	CPlayer* pFrom = GS()->GetPlayer(FromID, false, true);
-	if(!pFrom || (m_NoAllowDamage || pFrom->GetCharacter()->m_NoAllowDamage) || (m_pPlayer->IsBot() && pFrom->IsBot()))
+	if(!pFrom || (m_SkipDamage || pFrom->GetCharacter()->m_SkipDamage) || (m_pPlayer->IsBot() && pFrom->IsBot()))
 		return false;
 	
 	// pvp only for mobs

@@ -91,7 +91,7 @@ bool QuestJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_JOURNAL_MAIN;
 		ShowQuestsTabList(pPlayer, QuestState::QUEST_FINISHED);
-		GS()->AddBackpage(ClientID);
+		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
 
@@ -189,7 +189,7 @@ void QuestJob::ShowQuestID(CPlayer *pPlayer, int QuestID)
 		pPlayer->GS()->AVL(ClientID, "null", "Gold: {INT} Exp: {INT}", &pData.m_Gold, &pData.m_Exp);
 
 		pPlayer->m_LastVoteMenu = MenuList::MENU_JOURNAL_MAIN;
-		pPlayer->GS()->AddBackpage(ClientID);
+		pPlayer->GS()->AddVotesBackpage(ClientID);
 	}, "{INT}/{INT} {STR}: {STR}", &LineQuest, &CountQuest, pData.GetStory(), pData.GetName());
 }
 
