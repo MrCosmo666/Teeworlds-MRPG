@@ -556,8 +556,8 @@ bool CCharacterBotAI::SearchTalkedPlayer()
 {
 	bool PlayerFinding = false;
 	const int MobID = m_pBotPlayer->GetBotSub();
-	const bool DialoguesNotEmpty = ((bool)(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST && !(BotJob::ms_aQuestBot[MobID].m_aTalk).empty())
-				|| (m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC && !(BotJob::ms_aNpcBot[MobID].m_aTalk).empty()));
+	const bool DialoguesNotEmpty = ((bool)(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST && !(BotJob::ms_aQuestBot[MobID].m_aDialog).empty())
+				|| (m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC && !(BotJob::ms_aNpcBot[MobID].m_aDialog).empty()));
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pFindPlayer = GS()->GetPlayer(i, true, true);

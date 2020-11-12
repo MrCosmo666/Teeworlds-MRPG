@@ -323,6 +323,29 @@ void AccountMainJob::OnResetClient(int ClientID)
 	ms_aData.erase(ClientID);
 }
 
+void AccountMainJob::OnMessage(int MsgID, void* pRawMsg, int ClientID)
+{
+	CPlayer *pPlayer = GS()->m_apPlayers[ClientID];
+	if(!pPlayer)
+		return;
+
+	if(MsgID == NETMSGTYPE_CL_CLIENTAUTH)
+	{
+		CNetMsg_Cl_ClientAuth* pMsg = (CNetMsg_Cl_ClientAuth*)pRawMsg;
+
+		// account registration
+		if(pMsg->m_SelectRegister)
+		{
+			RegisterAccount(ClientID, pMsg->m_Login, pMsg->m_Password);
+			return;
+		}
+
+		// account authorization
+		if(LoginAccount(ClientID, pMsg->m_Login, pMsg->m_Password) == AUTH_LOGIN_GOOD)
+			LoadAccount(pPlayer, true);
+	}
+}
+
 std::string AccountMainJob::HashPassword(const char* pPassword, const char* pSalt)
 {
 	char aPlaintext[128] = { 0 };

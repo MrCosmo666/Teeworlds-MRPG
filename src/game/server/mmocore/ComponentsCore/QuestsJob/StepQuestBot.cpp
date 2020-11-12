@@ -30,14 +30,14 @@ void CStepQuestBot::UpdateBot(CGS* pGS)
 	}
 
 	// seek if all players have an active bot
-	const bool ActiveBot = IsActiveStep(pGS);
-	if(ActiveBot && BotClientID <= -1)
+	const bool ActiveStepBot = IsActiveStep(pGS);
+	if(ActiveStepBot && BotClientID <= -1)
 	{
 		//dbg_msg("quest sync", "quest to step bot active, but mob not found create");
 		pBotGS->CreateBot(BotsTypes::TYPE_BOT_QUEST, m_Bot->m_BotID, m_Bot->m_SubBotID);
 	}
 	// if the bot is not active for more than one player
-	if(!ActiveBot && BotClientID >= MAX_PLAYERS)
+	if(!ActiveStepBot && BotClientID >= MAX_PLAYERS)
 	{
 		//dbg_msg("quest sync", "mob found, but quest to step not active on players");
 		delete pBotGS->m_apPlayers[BotClientID];

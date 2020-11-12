@@ -1314,6 +1314,8 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				Broadcast(pPlayer->GetCID(), BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Use /register <name> <pass>.");
 				return;
 			}
+
+			Broadcast(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Team change is not allowed.");
 		}
 
 		else if (MsgID == NETMSGTYPE_CL_SETSPECTATORMODE)
@@ -1337,6 +1339,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			if(pPlayer->m_aPlayerTick[TickState::LastKill] && pPlayer->m_aPlayerTick[TickState::LastKill]+Server()->TickSpeed()*3 > Server()->Tick())
 				return;
 
+			Broadcast(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Self kill is not allowed.");
 			//pPlayer->m_PlayerTick[TickState::LastKill] = Server()->Tick();
 			//pPlayer->KillCharacter(WEAPON_SELF);
 		}
@@ -1394,21 +1397,6 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 			// loading of all parts of players' data
 			SendCompleteEquippingItems(ClientID);
-		}
-		else if(MsgID == NETMSGTYPE_CL_CLIENTAUTH)
-		{
-			CNetMsg_Cl_ClientAuth *pMsg = (CNetMsg_Cl_ClientAuth *)pRawMsg;
-			
-			// account registration
-			if(pMsg->m_SelectRegister)
-			{
-				Mmo()->Account()->RegisterAccount(ClientID, pMsg->m_Login, pMsg->m_Password);
-				return;
-			}
-
-			// account authorization
-			if(Mmo()->Account()->LoginAccount(ClientID, pMsg->m_Login, pMsg->m_Password) == AUTH_LOGIN_GOOD)
-				Mmo()->Account()->LoadAccount(pPlayer, true);
 		}
 		else 
 			Mmo()->OnMessage(MsgID, pRawMsg, ClientID);

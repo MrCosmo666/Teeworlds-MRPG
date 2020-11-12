@@ -431,7 +431,7 @@ int CGameControllerDungeon::GetAttributeDungeonSync(CPlayer* pPlayer, int BonusI
 	{
 		float ActiveAttribute = m_SyncDungeon / 2.0f;
 		if(AttributeType == AtributType::AtTank)
-			Percent = 25.0f;
+			Percent = 30.0f;
 
 		const int AttributeSyncProcent = kurosio::translate_to_procent_rest(ActiveAttribute, Percent);
 		return max(AttributeSyncProcent, 1);

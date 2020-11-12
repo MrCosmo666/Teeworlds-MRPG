@@ -16,7 +16,7 @@ class BotJob : public MmoComponent
 	};
 
 	// bots talking data
-	struct TalkingData
+	struct DialogData
 	{
 		char m_aTalkingText[512];
 		int m_Style;
@@ -27,18 +27,18 @@ class BotJob : public MmoComponent
 	};
 
 	// main bots information
-	struct DescDataBot
+	struct StructDataBot
 	{
-		char m_aNameBot[16];
-		char m_aaSkinNameBot[6][24];
-		int m_aUseCustomBot[6];
-		int m_aSkinColorBot[6];
+		char m_aNameBot[MAX_NAME_ARRAY_SIZE];
+		char m_aaSkinNameBot[NUM_SKINPARTS][MAX_SKIN_ARRAY_SIZE];
+		int m_aUseCustomBot[NUM_SKINPARTS];
+		int m_aSkinColorBot[NUM_SKINPARTS];
 		int m_aEquipSlot[MAX_EQUIPPED_SLOTS_BOTS];
 		bool m_aAlreadySnapQuestBot[MAX_PLAYERS];
 	};
 
-	// types bots information
-	struct ClassNpcBot
+	// npc type data information
+	struct StructNpcBot
 	{
 		const char* GetName() const
 		{
@@ -53,10 +53,11 @@ class BotJob : public MmoComponent
 		int m_WorldID;
 		int m_BotID;
 		int m_Function;
-		std::vector < TalkingData > m_aTalk;
+		std::vector < DialogData > m_aDialog;
 	};
 
-	struct ClassQuestBot
+	// quest type data information
+	struct StructQuestBot
 	{
 		const char* GetName() const
 		{
@@ -84,10 +85,11 @@ class BotJob : public MmoComponent
 		int m_InteractiveType;
 		int m_InteractiveTemp;
 		bool m_GenerateNick;
-		std::vector < TalkingData > m_aTalk;
+		std::vector < DialogData > m_aDialog;
 	};
 
-	struct ClassMobsBot
+	// mob type data information
+	struct StructMobsBot
 	{
 		const char* GetName() const
 		{
@@ -119,17 +121,16 @@ class BotJob : public MmoComponent
 	void LoadMobsBots(const char* pWhereLocalWorld);
 
 public:
-
-	typedef DescDataBot DataBotInfo;
+	typedef StructDataBot DataBotInfo;
 	static std::map < int , DataBotInfo > ms_aDataBot;
 
-	typedef ClassQuestBot QuestBotInfo;
+	typedef StructQuestBot QuestBotInfo;
 	static std::map < int , QuestBotInfo > ms_aQuestBot;
 
-	typedef ClassNpcBot NpcBotInfo;
+	typedef StructNpcBot NpcBotInfo;
 	static std::map < int , NpcBotInfo > ms_aNpcBot;
 
-	typedef ClassMobsBot MobBotInfo;
+	typedef StructMobsBot MobBotInfo;
 	static std::map < int , MobBotInfo > ms_aMobBot;
 
 	void ConAddCharacterBot(int ClientID, const char *pCharacter);
@@ -154,7 +155,6 @@ public:
 			return true;
 		return false;
 	}
-	
 	bool IsQuestBotValid(int MobID) const 
 	{ 
 		if(ms_aQuestBot.find(MobID) != ms_aQuestBot.end() && IsDataBotValid(ms_aQuestBot[MobID].m_BotID))

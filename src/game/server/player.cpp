@@ -67,18 +67,17 @@ void CPlayer::Tick()
 		}
 	}
 
-	if (m_pCharacter && !m_pCharacter->IsAlive())
-	{
-		delete m_pCharacter;
-		m_pCharacter = nullptr;
-	}
-
 	if (m_pCharacter)
 	{
 		if(m_pCharacter->IsAlive())
 		{
 			m_ViewPos = m_pCharacter->GetPos();
 			EffectsTick();
+		}
+		else
+		{
+			delete m_pCharacter;
+			m_pCharacter = nullptr;
 		}
 	}
 	else if (m_Spawned && m_aPlayerTick[TickState::Respawn] + Server()->TickSpeed() * 3 <= Server()->Tick())
@@ -673,8 +672,8 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 	if (pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
 		// clearing the end of dialogs or a dialog that was meaningless
-		const int sizeTalking = BotJob::ms_aNpcBot[MobID].m_aTalk.size();
-		const bool isTalkingEmpty = BotJob::ms_aNpcBot[MobID].m_aTalk.empty();
+		const int sizeTalking = BotJob::ms_aNpcBot[MobID].m_aDialog.size();
+		const bool isTalkingEmpty = BotJob::ms_aNpcBot[MobID].m_aDialog.empty();
 		if ((isTalkingEmpty && m_TalkingNPC.m_TalkedProgress == IS_TALKING_EMPTY) || (!isTalkingEmpty && m_TalkingNPC.m_TalkedProgress >= sizeTalking))
 		{
 			ClearTalking();
@@ -692,7 +691,7 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 		}
 
 		// get a quest for the progress of dialogue if it is in this progress we accept the quest
-		GivingQuestID = BotJob::ms_aNpcBot[MobID].m_aTalk[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
+		GivingQuestID = BotJob::ms_aNpcBot[MobID].m_aDialog[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
 		if (GivingQuestID >= 1)
 		{
 			if (!m_TalkingNPC.m_FreezedProgress)
@@ -711,7 +710,7 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 
 	else if (pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 	{
-		const int sizeTalking = BotJob::ms_aQuestBot[MobID].m_aTalk.size();
+		const int sizeTalking = BotJob::ms_aQuestBot[MobID].m_aDialog.size();
 		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
 		{
 			ClearTalking();
@@ -719,7 +718,7 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 			return;
 		}
 
-		const bool RequiestQuestTask = BotJob::ms_aQuestBot[MobID].m_aTalk[m_TalkingNPC.m_TalkedProgress].m_RequestComplete;
+		const bool RequiestQuestTask = BotJob::ms_aQuestBot[MobID].m_aDialog[m_TalkingNPC.m_TalkedProgress].m_RequestComplete;
 		if (RequiestQuestTask)
 		{
 			if (!m_TalkingNPC.m_FreezedProgress)
