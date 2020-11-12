@@ -8,10 +8,6 @@
 		"value": "Hi, {STR} Last log in {STR}"
 	},
 	{
-		"key": "Discord: \"{STR}\". Ideas, bugs, rewards",
-		"value": "Discord: \"{STR}\". Ideas, bugs, rewards"
-	},
-	{
 		"key": "Level {INT} : Exp {INT}/{INT}",
 		"value": "Ebene {INT}: Erfahrung {INT}/{INT}"
 	},
@@ -394,5 +390,13 @@
 	{
 		"key": "Task has not been completed yet!",
 		"value": "Aufgabe ist noch nicht abgeschlossen!"
+	},
+	{
+		"key": "[Done] Give the {STR}x{INT} to the {STR}!",
+		"value": "[Done] Give the {STR}x{INT} to the {STR}!"
+	},
+	{
+		"key": "[Done] Defeat the {STR}'s for the {STR}!",
+		"value": "[Done] Defeat the {STR}'s for the {STR}!"
 	}
 ]}

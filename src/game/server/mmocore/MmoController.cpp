@@ -216,7 +216,7 @@ const char* MmoController::PlayerName(int AccountID)
 void MmoController::ShowLoadingProgress(const char* pLoading, int Size)
 {
 	char aLoadingBuf[128];
-	str_format(aLoadingBuf, sizeof(aLoadingBuf), "Loaded %d %s | CK WorldID %d.", Size, pLoading, GS()->GetWorldID());
+	str_format(aLoadingBuf, sizeof(aLoadingBuf), "[Loaded %d %s] :: WorldID %d.", Size, pLoading, GS()->GetWorldID());
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "LOAD DB", aLoadingBuf);
 }
 

@@ -8,7 +8,7 @@
 using namespace sqlstr;
 
 // bot structures
-std::map <int, BotJob::DescDataBot> BotJob::ms_aDataBot;
+std::map <int, BotJob::DataBotInfo> BotJob::ms_aDataBot;
 std::map <int, BotJob::QuestBotInfo> BotJob::ms_aQuestBot;
 std::map <int, BotJob::NpcBotInfo> BotJob::ms_aNpcBot;
 std::map <int, BotJob::MobBotInfo> BotJob::ms_aMobBot;
@@ -66,7 +66,7 @@ void BotJob::ProcessingTalkingNPC(int OwnID, int TalkingID, bool PlayerTalked, c
 
 void BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char *pText)
 {
-	const int SizeTalking = BotJob::ms_aNpcBot[MobID].m_aTalk.size();
+	const int SizeTalking = BotJob::ms_aNpcBot[MobID].m_aDialog.size();
 	if(!IsNpcBotValid(MobID) || Progress >= SizeTalking)
 	{
 		pPlayer->ClearTalking();
@@ -96,8 +96,8 @@ void BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 		return;
 	}
 
-	const bool PlayerTalked = ms_aNpcBot[MobID].m_aTalk[Progress].m_PlayerTalked;
-	pPlayer->FormatTextQuest(BotID, ms_aNpcBot[MobID].m_aTalk[Progress].m_aTalkingText);
+	const bool PlayerTalked = ms_aNpcBot[MobID].m_aDialog[Progress].m_PlayerTalked;
+	pPlayer->FormatTextQuest(BotID, ms_aNpcBot[MobID].m_aDialog[Progress].m_aTalkingText);
 	if(!GS()->IsMmoClient(ClientID))
 	{
 		const char* TalkedNick = (PlayerTalked ? Server()->ClientName(ClientID) : ms_aNpcBot[MobID].GetName());
@@ -110,12 +110,12 @@ void BotJob::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talked
 	}
 	pPlayer->ClearFormatQuestText();
 	GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID,
-		PlayerTalked, reformTalkedText, ms_aNpcBot[MobID].m_aTalk[Progress].m_Style, ms_aNpcBot[MobID].m_aTalk[Progress].m_Emote);
+		PlayerTalked, reformTalkedText, ms_aNpcBot[MobID].m_aDialog[Progress].m_Style, ms_aNpcBot[MobID].m_aDialog[Progress].m_Emote);
 }
 
 void BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID)
 {
-	const int SizeTalking = BotJob::ms_aQuestBot[MobID].m_aTalk.size();
+	const int SizeTalking = BotJob::ms_aQuestBot[MobID].m_aDialog.size();
 	if(!IsQuestBotValid(MobID) || Progress >= SizeTalking)
 	{
 		pPlayer->ClearTalking();
@@ -125,8 +125,8 @@ void BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int Talk
 	const int ClientID = pPlayer->GetCID();
 	char reformTalkedText[512];
 	const int BotID = ms_aQuestBot[MobID].m_BotID;
-	const bool PlayerTalked = ms_aQuestBot[MobID].m_aTalk[Progress].m_PlayerTalked;
-	pPlayer->FormatTextQuest(BotID, ms_aQuestBot[MobID].m_aTalk[Progress].m_aTalkingText);
+	const bool PlayerTalked = ms_aQuestBot[MobID].m_aDialog[Progress].m_PlayerTalked;
+	pPlayer->FormatTextQuest(BotID, ms_aQuestBot[MobID].m_aDialog[Progress].m_aTalkingText);
 	if(!GS()->IsMmoClient(ClientID))
 	{
 		const int QuestID = ms_aQuestBot[MobID].m_QuestID;
@@ -141,13 +141,13 @@ void BotJob::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int Talk
 	}
 	pPlayer->ClearFormatQuestText();
 	GS()->Mmo()->BotsData()->ProcessingTalkingNPC(ClientID, TalkedID,
-		PlayerTalked, reformTalkedText, ms_aQuestBot[MobID].m_aTalk[Progress].m_Style, ms_aQuestBot[MobID].m_aTalk[Progress].m_Emote);
+		PlayerTalked, reformTalkedText, ms_aQuestBot[MobID].m_aDialog[Progress].m_Style, ms_aQuestBot[MobID].m_aDialog[Progress].m_Emote);
 }
 
 void BotJob::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 {
 	const int ClientID = pPlayer->GetCID();
-	const int SizeTalking = BotJob::ms_aQuestBot[MobID].m_aTalk.size();
+	const int SizeTalking = BotJob::ms_aQuestBot[MobID].m_aDialog.size();
 	if (!IsQuestBotValid(MobID) || Progress >= SizeTalking)
 	{
 		pPlayer->ClearTalking();
@@ -159,11 +159,11 @@ void BotJob::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 	if (!GS()->IsMmoClient(ClientID))
 	{
 		const int QuestID = ms_aQuestBot[MobID].m_QuestID;
-		const bool PlayerTalked = ms_aQuestBot[MobID].m_aTalk[Progress].m_PlayerTalked;
+		const bool PlayerTalked = ms_aQuestBot[MobID].m_aDialog[Progress].m_PlayerTalked;
 		const char* TalkedNick = (PlayerTalked ? Server()->ClientName(ClientID) : ms_aQuestBot[MobID].GetName());
 
 		char reformTalkedText[512];
-		pPlayer->FormatTextQuest(BotID, BotJob::ms_aQuestBot[MobID].m_aTalk[Progress].m_aTalkingText);
+		pPlayer->FormatTextQuest(BotID, BotJob::ms_aQuestBot[MobID].m_aDialog[Progress].m_aTalkingText);
 		str_format(reformTalkedText, sizeof(reformTalkedText), "%s\n=========\n\n( %d of %d ) %s:\n- %s", 
 			GS()->GetQuestInfo(QuestID).GetName(), (1 + Progress), SizeTalking, TalkedNick, pPlayer->FormatedTalkedText());
 		pPlayer->ClearFormatQuestText();
@@ -181,7 +181,7 @@ int BotJob::GetQuestNPC(int MobID) const
 	if (!IsNpcBotValid(MobID))
 		return -1;
 		
-	for (const auto& npc : ms_aNpcBot[MobID].m_aTalk)
+	for (const auto& npc : ms_aNpcBot[MobID].m_aDialog)
 	{
 		if (npc.m_GivingQuest > 0)
 			return npc.m_GivingQuest;
@@ -266,13 +266,13 @@ void BotJob::LoadQuestBots(const char* pWhereLocalWorld)
 		ResultPtr pResTalk = SJK.SD("*", "tw_talk_quest_npc", "WHERE MobID = '%d'", MobID);
 		while(pResTalk->next())
 		{
-			TalkingData LoadTalk;
+			DialogData LoadTalk;
 			LoadTalk.m_Emote = pResTalk->getInt("TalkingEmote");
 			LoadTalk.m_Style = pResTalk->getInt("Style");
 			LoadTalk.m_PlayerTalked = pResTalk->getBoolean("PlayerTalked");
 			LoadTalk.m_RequestComplete = pResTalk->getBoolean("RequestComplete");
 			str_copy(LoadTalk.m_aTalkingText, pResTalk->getString("TalkText").c_str(), sizeof(LoadTalk.m_aTalkingText));
-			ms_aQuestBot[MobID].m_aTalk.push_back(LoadTalk);
+			ms_aQuestBot[MobID].m_aDialog.push_back(LoadTalk);
 		}
 	}
 
@@ -306,13 +306,13 @@ void BotJob::LoadNpcBots(const char* pWhereLocalWorld)
 		ResultPtr pResTalk = SJK.SD("*", "tw_talk_other_npc", "WHERE MobID = '%d'", MobID);
 		while(pResTalk->next())
 		{
-			TalkingData LoadTalk;
+			DialogData LoadTalk;
 			LoadTalk.m_Emote = pResTalk->getInt("TalkingEmote");
 			LoadTalk.m_Style = pResTalk->getInt("Style");
 			LoadTalk.m_PlayerTalked = pResTalk->getBoolean("PlayerTalked");
 			LoadTalk.m_GivingQuest = pResTalk->getInt("GivingQuest");
 			str_copy(LoadTalk.m_aTalkingText, pResTalk->getString("TalkText").c_str(), sizeof(LoadTalk.m_aTalkingText));
-			ms_aNpcBot[MobID].m_aTalk.push_back(LoadTalk);
+			ms_aNpcBot[MobID].m_aDialog.push_back(LoadTalk);
 
 			if(LoadTalk.m_GivingQuest > 0)
 				ms_aNpcBot[MobID].m_Function = FunctionsNPC::FUNCTION_NPC_GIVE_QUEST;

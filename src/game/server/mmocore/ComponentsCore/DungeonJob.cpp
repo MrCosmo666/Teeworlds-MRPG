@@ -56,7 +56,7 @@ bool DungeonJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMe
 			pPlayer->m_Colored = { 30, 8, 8 };
 			GS()->AVL(ClientID, "DUNGEONEXIT", "Exit dungeon {STR} (warning)", ms_aDungeon[GS()->GetDungeonID()].m_aName);
 		}
-		GS()->AddBackpage(ClientID);
+		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
 	return false;

@@ -41,27 +41,28 @@ bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 		return true;
 	}
 
-	// HEALTH
+	// Health
 	int StartHealth = pChr->GetPlayer()->GetStartHealth();
-	if(pChr->GetPlayer()->GetTempData().m_TempSafeSpawn == true)
+	if(!GS()->IsDungeon())
 	{
-		pChr->GetPlayer()->GetTempData().m_TempSafeSpawn = false;
-		StartHealth /= 2;
+		if(pChr->GetPlayer()->GetHealth() > 0)
+			StartHealth = pChr->GetPlayer()->GetHealth();
+		else if(pChr->GetPlayer()->GetTempData().m_TempSafeSpawn == true)
+		{
+			pChr->GetPlayer()->GetTempData().m_TempSafeSpawn = false;
+			StartHealth /= 2;
+		}
 	}
-	if(GS()->IsDungeon())
-		StartHealth = pChr->GetPlayer()->GetStartHealth();
-	else if(pChr->GetPlayer()->GetTempData().m_TempHealth > 0)
-		StartHealth = pChr->GetPlayer()->GetTempData().m_TempHealth;
 	pChr->IncreaseHealth(StartHealth);
 
-	// MANA
-	if(pChr->GetPlayer()->GetTempData().m_TempMana > 0)
+	// Mana
+	if(pChr->GetPlayer()->GetMana() > 0)
 	{
-		const int StartMana = pChr->GetPlayer()->GetTempData().m_TempMana;
+		const int StartMana = pChr->GetPlayer()->GetMana();
 		pChr->IncreaseMana(StartMana);
 	}
 
-	// AMMO
+	// Weapons
 	const int StartAmmo = 10 + pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo);
 	pChr->GiveWeapon(WEAPON_HAMMER, -1);
 	for(int i = 1; i < NUM_WEAPONS-1; i++)

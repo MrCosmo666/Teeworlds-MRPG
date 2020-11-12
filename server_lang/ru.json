@@ -8,10 +8,6 @@
 		"value": "Пpивeт, {STR} Вxoд {STR}"
 	},
 	{
-		"key": "Discord: \"{STR}\". Ideas, bugs, rewards",
-		"value": "Discord: \"{STR}\". Идеи, баги, нагр."
-	},
-	{
 		"key": "Level {INT} : Exp {INT}/{INT}",
 		"value": "Уровень {INT} : Опыт {INT}/{INT}"
 	},
@@ -394,5 +390,13 @@
 	{
 		"key": "Task has not been completed yet!",
 		"value": "Задание еще не выполнено!"
+	},
+	{
+		"key": "[Done] Give the {STR}x{INT} to the {STR}!",
+		"value": "[Выполнено] Отдать {STR}x{INT} для {STR}!"
+	},
+	{
+		"key": "[Done] Defeat the {STR}'s for the {STR}!",
+		"value": "[Выполнено] Победить {STR} для {STR}!"
 	}
 ]}

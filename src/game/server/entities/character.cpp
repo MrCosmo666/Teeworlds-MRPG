@@ -84,7 +84,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 
 	m_Mana = 0;
 	m_OldPos = Pos;
-	m_NoAllowDamage = false;
+	m_SkipDamage = false;
 	m_Core.m_LostData = false;
 	m_Event = TILE_CLEAR_EVENTS;
 	m_Core.m_WorldID = m_pPlayer->GetPlayerWorldID();
@@ -652,15 +652,17 @@ void CCharacter::Die(int Killer, int Weapon)
 	const int ClientID = m_pPlayer->GetCID();
 	if(Weapon != WEAPON_WORLD && !GS()->IsDungeon())
 	{
-		m_pPlayer->UpdateTempData(0, 0);
 		m_pPlayer->ClearEffects();
+		m_pPlayer->UpdateTempData(0, 0);
 		const int SafezoneWorldID = GS()->GetRespawnWorld();
 		if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot() && GS()->m_apPlayers[Killer])
 		{
 			// potion resurrection
 			InventoryItem& pItemPlayer = m_pPlayer->GetItem(itPotionResurrection);
 			if(pItemPlayer.IsEquipped())
+			{
 				pItemPlayer.Use(1);
+			}
 			else
 			{
 				GS()->Chat(ClientID, "You are dead, you will be treated in {STR}", Server()->GetWorldName(SafezoneWorldID));
@@ -1096,7 +1098,7 @@ void CCharacter::HandleAuthedPlayer()
 bool CCharacter::IsAllowedPVP(int FromID)
 {
 	CPlayer* pFrom = GS()->GetPlayer(FromID, false, true);
-	if(!pFrom || (m_NoAllowDamage || pFrom->GetCharacter()->m_NoAllowDamage) || (m_pPlayer->IsBot() && pFrom->IsBot()))
+	if(!pFrom || (m_SkipDamage || pFrom->GetCharacter()->m_SkipDamage) || (m_pPlayer->IsBot() && pFrom->IsBot()))
 		return false;
 	
 	// pvp only for mobs

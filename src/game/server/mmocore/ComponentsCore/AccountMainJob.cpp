@@ -271,7 +271,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		if (!IsFoundModules)
 			GS()->AVM(ClientID, "null", NOPE, TAB_SETTINGS_MODULES, "The list of modules equipment is empty.");
 	
-		GS()->AddBackpage(ClientID);
+		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
 
@@ -296,7 +296,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 			const char *pLanguageName = Server()->Localization()->m_pLanguages[i]->GetName();
 			GS()->AVM(ClientID, "SELECTLANGUAGE", i, TAB_LANGUAGES, "Select language \"{STR}\"", pLanguageName);
 		}
-		GS()->AddBackpage(ClientID);
+		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
 	return false;
@@ -321,6 +321,29 @@ void AccountMainJob::OnResetClient(int ClientID)
 {
 	ms_aPlayerTempData.erase(ClientID);
 	ms_aData.erase(ClientID);
+}
+
+void AccountMainJob::OnMessage(int MsgID, void* pRawMsg, int ClientID)
+{
+	CPlayer *pPlayer = GS()->m_apPlayers[ClientID];
+	if(!pPlayer)
+		return;
+
+	if(MsgID == NETMSGTYPE_CL_CLIENTAUTH)
+	{
+		CNetMsg_Cl_ClientAuth* pMsg = (CNetMsg_Cl_ClientAuth*)pRawMsg;
+
+		// account registration
+		if(pMsg->m_SelectRegister)
+		{
+			RegisterAccount(ClientID, pMsg->m_Login, pMsg->m_Password);
+			return;
+		}
+
+		// account authorization
+		if(LoginAccount(ClientID, pMsg->m_Login, pMsg->m_Password) == AUTH_LOGIN_GOOD)
+			LoadAccount(pPlayer, true);
+	}
 }
 
 std::string AccountMainJob::HashPassword(const char* pPassword, const char* pSalt)

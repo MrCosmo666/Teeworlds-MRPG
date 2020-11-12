@@ -39,19 +39,16 @@ void HouseJob::OnInitWorld(const char* pWhereLocalWorld)
 	}, pWhereLocalWorld);
 
 	// load decoration
-	if(ms_aDecorationHouse.empty())
+	SJK.SDT("*", "tw_houses_decorations", [&](ResultPtr pRes)
 	{
-		SJK.SDT("*", "tw_houses_decorations", [&](ResultPtr pRes)
+		while(pRes->next())
 		{
-			while(pRes->next())
-			{
-				const int DecoID = pRes->getInt("ID");
-				ms_aDecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(pRes->getInt("X"),
-					pRes->getInt("Y")), pRes->getInt("HouseID"), pRes->getInt("DecoID"));
-			}
-			Job()->ShowLoadingProgress("Houses Decorations", ms_aDecorationHouse.size());
-		}, pWhereLocalWorld);
-	}
+			const int DecoID = pRes->getInt("ID");
+			ms_aDecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(pRes->getInt("X"),
+				pRes->getInt("Y")), pRes->getInt("HouseID"), pRes->getInt("DecoID"));
+		}
+		Job()->ShowLoadingProgress("Houses Decorations", ms_aDecorationHouse.size());
+	}, pWhereLocalWorld);
 }
 
 bool HouseJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
@@ -62,14 +59,14 @@ bool HouseJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 	if(pChr->GetHelper()->TileEnter(IndexCollision, TILE_PLAYER_HOUSE))
 	{
 		GS()->Chat(ClientID, "You can see menu in the votes!");
-		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = true;
+		pChr->m_Core.m_ProtectHooked = pChr->m_SkipDamage = true;
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
 	else if(pChr->GetHelper()->TileExit(IndexCollision, TILE_PLAYER_HOUSE))
 	{
 		GS()->Chat(ClientID, "You left the active zone, menu is restored!");
-		pChr->m_Core.m_ProtectHooked = pChr->m_NoAllowDamage = false;
+		pChr->m_Core.m_ProtectHooked = pChr->m_SkipDamage = false;
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
@@ -108,7 +105,7 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		Job()->Item()->ListInventory(pPlayer, ItemType::TYPE_DECORATION);
 		GS()->AV(ClientID, "null");
 		ShowDecorationList(pPlayer);
-		GS()->AddBackpage(ClientID);
+		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
 
@@ -117,7 +114,7 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
 		ShowPersonalHouse(pPlayer);
-		GS()->AddBackpage(ClientID);
+		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
 
@@ -133,7 +130,7 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "Housing Active Plants: {STR}", GS()->GetItemInfo(PlantItemID).GetName(pPlayer));
 		GS()->Mmo()->Item()->ListInventory(pPlayer, FUNCTION_PLANTS, true);
-		GS()->AddBackpage(ClientID);
+		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
 
@@ -238,7 +235,7 @@ bool HouseJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 		GS()->ClearVotes(ClientID);
 		GS()->AV(ClientID, "null", "Please close vote and press Left Mouse,");
 		GS()->AV(ClientID, "null", "on position where add decoration!");
-		GS()->AddBackpage(ClientID);
+		GS()->AddVotesBackpage(ClientID);
 
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
 		pPlayer->GetTempData().m_TempDecoractionID = VoteID;
@@ -385,7 +382,7 @@ void HouseJob::ShowHouseMenu(CPlayer* pPlayer, int HouseID)
 	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE, "Owner House: {STR}", Job()->PlayerName(ms_aHouse[HouseID].m_OwnerID));
 
 	GS()->AV(ClientID, "null");
-	GS()->ShowItemValueInformation(pPlayer, itGold);
+	GS()->ShowVotesItemValueInformation(pPlayer, itGold);
 	GS()->AV(ClientID, "null");
 
 	pPlayer->m_Colored = LIGHT_GRAY_COLOR;

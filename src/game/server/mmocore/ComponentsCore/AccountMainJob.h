@@ -11,6 +11,7 @@ class AccountMainJob : public MmoComponent
 	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
 	bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu) override;
 	void OnResetClient(int ClientID) override;
+	void OnMessage(int MsgID, void* pRawMsg, int ClientID) override;
 
 public:
 	struct StructData
@@ -64,7 +65,7 @@ public:
 		// player stats
 		int m_TempHealth;
 		int m_TempMana;
-		short m_TempPing;
+		int m_TempPing;
 
 		// save pos teleport
 		bool m_TempSafeSpawn;

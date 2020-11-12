@@ -3,9 +3,8 @@
 #ifndef ENGINE_SERVER_H
 #define ENGINE_SERVER_H
 
-// #include <map>
 // #include <mutex>
-// #define THREAD_PLAYER_DATA_SAFE(clientid) std::lock_guard<std::mutex> lgplayersafe##clientid(IServer::MutexPlayerDataSafe[clientid]);
+// #define THREAD_PLAYER_DATA_SAFE(clientid) std::unique_lock<std::mutex> lgplayersafe##clientid(IServer::m_aMutexPlayerDataSafe[clientid]);
 
 #include "kernel.h"
 #include "message.h"
@@ -32,7 +31,7 @@ protected:
 	float WorldTime;
 
 public:
-	// static std::map < int, std::mutex > MutexPlayerDataSafe;
+	// static std::mutex m_aMutexPlayerDataSafe[MAX_CLIENTS];
 	virtual class IGameServer* GameServer(int WorldID = 0) = 0;
 
 	class CLocalization* m_pLocalization;

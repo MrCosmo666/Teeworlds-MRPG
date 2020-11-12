@@ -34,12 +34,12 @@
 	#include <windows.h>
 #endif
 
-#include <engine/external/json-parser/json.h>
 #include <teeother/components/localization.h>
+#include <engine/external/json-parser/json.h>
 
 #include "discord_main.h"
 
-// std::map < int, std::mutex > IServer::MutexPlayerDataSafe;
+// std::mutex IServer::m_aMutexPlayerDataSafe[MAX_CLIENTS];
 
 // static instance worlds data
 std::shared_ptr<CWorldGameServerArray> CWorldGameServerArray::m_Instance;
@@ -437,7 +437,7 @@ void CServer::BackInformationFakeClient(int FakeClientID)
 int CServer::GetClientWorldID(int ClientID)
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || m_aClients[ClientID].m_State < CClient::STATE_READY)
-		return -1;
+		return MAIN_WORLD_ID;
 
 	return m_aClients[ClientID].m_WorldID;
 }
