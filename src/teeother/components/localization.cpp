@@ -114,7 +114,7 @@ bool CLocalization::CLanguage::Load(CLocalization* pLocalization, IStorageEngine
 		return false;
 
 	const int FileSize = (int)io_length(File);
-	char* pFileData = (char*)mem_alloc(FileSize, 1);
+	char *pFileData = (char *)mem_alloc(FileSize, 1);
 	io_read(File, pFileData, FileSize);
 	io_close(File);
 
@@ -344,47 +344,6 @@ bool CLocalization::Init()
 
 	// clean up
 	json_value_free(pJsonData);
-	return true;
-}
-	
-void CLocalization::AddListener(IListener* pListener)
-{
-	m_pListeners.increment() = pListener;
-}
-
-void CLocalization::RemoveListener(IListener* pListener)
-{
-	for(int i=0; i<m_pListeners.size(); i++)
-	{
-		if(m_pListeners[i] == pListener)
-			m_pListeners.remove_index(i);
-	}
-}
-
-bool CLocalization::PreUpdate()
-{
-	if(!m_pMainLanguage || m_Cfg_MainLanguage != m_pMainLanguage->GetFilename())
-	{
-		CLanguage* pLanguage = nullptr;
-		
-		for(int i=0; i<m_pLanguages.size(); i++)
-		{
-			if(m_Cfg_MainLanguage == m_pLanguages[i]->GetFilename())
-			{
-				pLanguage = m_pLanguages[i];
-				break;
-			}
-		}
-		
-		if(m_pMainLanguage != pLanguage)
-		{
-			m_pMainLanguage = pLanguage;
-			
-			for(int i=0; i<m_pListeners.size(); i++)
-				m_pListeners[i]->OnLocalizationModified();
-		}
-	}
-	
 	return true;
 }
 

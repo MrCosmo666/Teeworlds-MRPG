@@ -31,58 +31,9 @@ std::map < int, CGS::StructAttribut > CGS::ms_aAttributsInfo;
 std::map < std::string, int > CGS::ms_aEffects[MAX_PLAYERS];
 int CGS::m_MultiplierExp = 100;
 
-enum
-{
-	RESET,
-	NO_RESET
-};
-
-void CGS::Construct(int Resetting)
-{
-	for (auto & apPlayer : m_apPlayers)
-		apPlayer = nullptr;
-
-	m_Resetting = false;
-	m_pServer = nullptr;
-	m_pController = nullptr;
-	m_pCommandProcessor = nullptr;
-
-	if(Resetting==NO_RESET)
-		m_pMmoController = nullptr;
-}
-
-CGS::CGS(int Resetting)
-{
-	Construct(Resetting);
-}
-
 CGS::CGS()
 {
-	Construct(NO_RESET);
-}
-
-CGS::~CGS()
-{
-	m_Events.Clear();
-	m_CommandManager.ClearCommands();
-	for(auto & apPlayer : m_apPlayers)
-		delete apPlayer;
-
-	delete m_pController;
-	delete m_pMmoController;
-	delete m_pCommandProcessor;
-	delete m_pPathFinder;
-}
-
-void CGS::Clear()
-{
-	const CTuningParams Tuning = m_Tuning;         
-	m_Resetting = true;
-	this->~CGS();
-	mem_zero(this, sizeof(*this));
-	new (this) CGS(RESET);
-
-	for(auto & BroadcastState : m_aBroadcastStates)
+	for(auto& BroadcastState : m_aBroadcastStates)
 	{
 		BroadcastState.m_NoChangeTick = 0;
 		BroadcastState.m_LifeSpanTick = 0;
@@ -90,7 +41,29 @@ void CGS::Clear()
 		BroadcastState.m_aPrevMessage[0] = 0;
 		BroadcastState.m_aNextMessage[0] = 0;
 	}
-	m_Tuning = Tuning;
+
+	for(auto& apPlayer : m_apPlayers)
+		apPlayer = nullptr;
+
+	m_pServer = nullptr;
+	m_pController = nullptr;
+	m_pMmoController = nullptr;
+	m_pCommandProcessor = nullptr;
+	m_pPathFinder = nullptr;
+}
+
+CGS::~CGS()
+{
+	m_Events.Clear();
+	m_CommandManager.ClearCommands();
+
+	for(auto & apPlayer : m_apPlayers)
+		delete apPlayer;
+
+	delete m_pController;
+	delete m_pMmoController;
+	delete m_pCommandProcessor;
+	delete m_pPathFinder;
 }
 
 class CCharacter *CGS::GetPlayerChar(int ClientID)
@@ -1069,23 +1042,6 @@ void CGS::OnConsoleInit()
 	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, m_pServer, "Say in chat");
 	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, m_pServer, "(Warning) Add new bot on database or update if finding <clientid> <bot name>");
 	Console()->Register("convert_passwords", "", CFGFLAG_SERVER, ConConvertPasswords, m_pServer, "Convert existing plaintext passwords into hashed passwords");
-}
-
-void CGS::OnShutdown()
-{
-	delete m_pController;
-	m_pController = nullptr;
-
-	delete m_pMmoController;
-	m_pMmoController = nullptr;
-
-	delete m_pCommandProcessor;
-	m_pCommandProcessor = nullptr;
-
-	delete m_pPathFinder;
-	m_pPathFinder = nullptr;
-
-	Clear();
 }
 
 void CGS::OnTick()
