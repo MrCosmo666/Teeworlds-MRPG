@@ -42,7 +42,7 @@ void CSnapFull::AddItem(int Count, int Type, bool Projectile, bool Dynamic, int 
 
 void CSnapFull::RemoveItem(int Count, int SnapID, bool Effect)
 {
-	for (auto &pItems = m_SnapItem.begin(); pItems != m_SnapItem.end(); )
+	for (auto pItems = m_SnapItem.begin(); pItems != m_SnapItem.end(); )
 	{ 
 		if(Count <= 0)
 			break;
