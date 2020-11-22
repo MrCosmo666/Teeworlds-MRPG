@@ -39,6 +39,8 @@
 #include "discord_main.h"
 
 // std::mutex IServer::m_aMutexPlayerDataSafe[MAX_CLIENTS];
+
+// game worlds
 bool CWorldGameServerArray::Add(int WorldID, IKernel* pKernel)
 {
 	dbg_assert(WorldID < ENGINE_MAX_WORLDS, "exceeded pool of allocated memory for worlds");
@@ -52,6 +54,17 @@ bool CWorldGameServerArray::Add(int WorldID, IKernel* pKernel)
 	return RegisterFail;
 }
 
+void CWorldGameServerArray::Clear()
+{
+	for(auto& pWorld : ms_aWorlds)
+	{
+		delete pWorld.second.m_pGameServer;
+		delete pWorld.second.m_pLoadedMap;
+	}
+	ms_aWorlds.clear();
+}
+
+// snap listern pool
 CSnapIDPool::CSnapIDPool()
 {
 	Reset();
@@ -72,7 +85,6 @@ void CSnapIDPool::Reset()
 	m_Usage = 0;
 	m_InUsage = 0;
 }
-
 
 void CSnapIDPool::RemoveFirstTimeout()
 {
@@ -408,7 +420,6 @@ const char *CServer::GetWorldName(int WorldID)
 {
 	if(!WorldsInstance->IsValid(WorldID))
 		return "invalid";
-
 	return WorldsInstance->ms_aWorlds[WorldID].m_aName;
 }
 
@@ -419,15 +430,15 @@ const char* CServer::GetClientLanguage(int ClientID) const
 	return m_aClients[ClientID].m_aLanguage;
 }
 
-void CServer::ChangeWorld(int ClientID, int WorldID)
+void CServer::ChangeWorld(int ClientID, int NewWorldID)
 {
-	if(!WorldsInstance->IsValid(WorldID) || WorldID == m_aClients[ClientID].m_WorldID || ClientID < 0 || ClientID >= MAX_PLAYERS || m_aClients[ClientID].m_State < CClient::STATE_READY)
+	if(!WorldsInstance->IsValid(NewWorldID) || NewWorldID == m_aClients[ClientID].m_WorldID || ClientID < 0 || ClientID >= MAX_PLAYERS || m_aClients[ClientID].m_State < CClient::STATE_READY)
 		return;
 
 	m_aClients[ClientID].m_OldWorldID = m_aClients[ClientID].m_WorldID;
 	GameServer(m_aClients[ClientID].m_OldWorldID)->PrepareClientChangeWorld(ClientID);
 
-	m_aClients[ClientID].m_WorldID = WorldID;
+	m_aClients[ClientID].m_WorldID = NewWorldID;
 	GameServer(m_aClients[ClientID].m_WorldID)->PrepareClientChangeWorld(ClientID);
 
 	m_aClients[ClientID].m_ChangeMap = true;

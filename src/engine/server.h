@@ -106,7 +106,7 @@ public:
 	virtual void SetClientCountry(int ClientID, int Country) = 0;
 	virtual void SetClientScore(int ClientID, int Score) = 0;
 
-	virtual void ChangeWorld(int ClientID, int WorldID) = 0;
+	virtual void ChangeWorld(int ClientID, int NewWorldID) = 0;
 	virtual int GetClientWorldID(int ClientID) = 0;
 	virtual const char* GetWorldName(int WorldID) = 0;
 

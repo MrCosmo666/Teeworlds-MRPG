@@ -29,15 +29,7 @@ public:
 
 	bool IsValid(int WorldID) { return ms_aWorlds.find(WorldID) != ms_aWorlds.end(); }
 	bool Add(int WorldID, IKernel* pKernel);
-	void Clear()
-	{
-		for(auto& pWorld : ms_aWorlds)
-		{
-			pWorld.second.m_pGameServer->OnShutdown();
-			delete pWorld.second.m_pLoadedMap;
-		}
-		ms_aWorlds.clear();
-	}
+	void Clear();
 };
 
 // 
@@ -231,7 +223,7 @@ public:
 	virtual void SetClientCountry(int ClientID, int Country);
 	virtual void SetClientScore(int ClientID, int Score);
 
-	virtual void ChangeWorld(int ClientID, int WorldID);
+	virtual void ChangeWorld(int ClientID, int NewWorldID);
 	virtual int GetClientWorldID(int ClientID);
 	virtual void BackInformationFakeClient(int FakeClientID);
 
