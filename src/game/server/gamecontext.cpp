@@ -1035,6 +1035,7 @@ void CGS::OnConsoleInit()
 	m_pServer = Kernel()->RequestInterface<IServer>();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
 
+	Console()->Register("set_world_time", "i[hour]", CFGFLAG_SERVER, ConSetWorldTime, m_pServer, "Set worlds time.");
 	Console()->Register("parseskin", "i[cid]", CFGFLAG_SERVER, ConParseSkin, m_pServer, "Parse skin on console. Easy for devlop bots.");
 	Console()->Register("giveitem", "i[cid]i[itemid]i[count]i[enchant]i[mail]", CFGFLAG_SERVER, ConGiveItem, m_pServer, "Give item <clientid> <itemid> <count> <enchant> <mail 1=yes 0=no>");
 	Console()->Register("removeitem", "i[cid]i[itemid]i[count]", CFGFLAG_SERVER, ConRemItem, m_pServer, "Remove item <clientid> <itemid> <count>");
@@ -1543,6 +1544,13 @@ int CGS::GetRank(int AuthID)
 /* #########################################################################
 	CONSOLE GAMECONTEXT 
 ######################################################################### */
+void CGS::ConSetWorldTime(IConsole::IResult* pResult, void* pUserData)
+{
+	int Hour = pResult->GetInteger(0);
+	IServer* pServer = (IServer*)pUserData;
+	pServer->SetOffsetWorldTime(Hour);
+}
+
 void CGS::ConParseSkin(IConsole::IResult *pResult, void *pUserData)
 {
 	int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS-1);

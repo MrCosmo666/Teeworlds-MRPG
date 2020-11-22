@@ -155,7 +155,7 @@ void IGameController::Snap()
 	if(!pGameData)
 		return;
 
-	pGameData->m_GameStartTick = 0;
+	pGameData->m_GameStartTick = Server()->GetOffsetWorldTime();
 	pGameData->m_GameStateFlags = 0;
 	pGameData->m_GameStateEndTick = 0;
 }

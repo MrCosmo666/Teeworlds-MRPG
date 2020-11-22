@@ -92,9 +92,11 @@ public:
 	}
 
 	// World Time
-	virtual int GetSecWorld() const = 0;
-	virtual int GetHourWorld() const = 0;
-	virtual bool CheckWorldTime(int Hour, int Sec) = 0;
+	virtual int GetMinutesWorldTime() const = 0;
+	virtual int GetHourWorldTime() const = 0;
+	virtual int GetOffsetWorldTime() const = 0;
+	virtual void SetOffsetWorldTime(int Hour) = 0;
+	virtual bool CheckWorldTime(int Hour, int Minute) = 0;
 	virtual const char* GetStringTypeDay() const = 0;
 	virtual int GetEnumTypeDay() const = 0;
 
