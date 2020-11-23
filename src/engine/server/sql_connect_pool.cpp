@@ -86,7 +86,6 @@ Connection* CConectionPool::CreateConnection()
 		{
 			dbg_msg("Sql Exception", "%s", e.what());
 			DisconnectConnection(pConnection);
-			pConnection = nullptr;
 		}
 	}
 	m_ConnList.push_back(pConnection);
@@ -133,8 +132,6 @@ void CConectionPool::ReleaseConnection(Connection* pConnection)
 
 void CConectionPool::DisconnectConnection(Connection* pConnection)
 {
-	SqlConnectionLock.lock();
-
 	if(pConnection)
 	{
 		try
@@ -149,16 +146,18 @@ void CConectionPool::DisconnectConnection(Connection* pConnection)
 	m_ConnList.remove(pConnection);
 	delete pConnection;
 	pConnection = nullptr;
-
-	SqlConnectionLock.unlock();
 }
 
 void CConectionPool::DisconnectConnectionHeap()
 {
+	SqlConnectionLock.lock();
+
 	for(auto& iconn : m_ConnList)
 		DisconnectConnection(iconn);
 		
 	m_ConnList.clear();
+
+	SqlConnectionLock.unlock();
 }
 
 // #####################################################
