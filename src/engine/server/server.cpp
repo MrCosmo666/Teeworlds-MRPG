@@ -465,33 +465,29 @@ int CServer::GetClientWorldID(int ClientID)
 void CServer::SendDiscordGenerateMessage(const char *pTitle, int AuthID, const char* pColor)
 {
 	#ifdef CONF_DISCORD
-		char aPrColorBuf[16], aPrTitleBuf[256];
-		str_copy(aPrColorBuf, pColor, sizeof(aPrColorBuf));
-		str_copy(aPrTitleBuf, pTitle, sizeof(aPrTitleBuf));
-		std::thread t([=]() { m_pDiscord->SendGenerateMessage(SleepyDiscord::User(), g_Config.m_SvDiscordChanal, aPrTitleBuf, AuthID, aPrColorBuf); });
-		t.detach();
+	DiscordTask ThreadTask(std::bind(&DiscordJob::SendGenerateMessageAuthID, m_pDiscord, SleepyDiscord::User(), g_Config.m_SvDiscordChanal, pTitle, AuthID, pColor));
+	m_pDiscord->AddThreadTask(ThreadTask);
 	#endif
 }
 
-void CServer::SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText)
+void CServer::SendDiscordMessage(const char *pChannel, const char* pColor, const char* pTitle, const char* pText)
 {
-	#ifdef CONF_DISCORD
-		char aPrTextBuf[512], aPrTitleBuf[256], aPrColorBuf[16];
-		str_copy(aPrTextBuf, pText, sizeof(aPrTextBuf));
-		str_copy(aPrTitleBuf, pTitle, sizeof(aPrTitleBuf));
-		str_copy(aPrColorBuf, pColor, sizeof(aPrColorBuf));
-		std::thread t([=]() { m_pDiscord->SendEmbedMessage(pChanel, aPrColorBuf, aPrTitleBuf, aPrTextBuf); });
-		t.detach();
+#ifdef CONF_DISCORD
+	SleepyDiscord::Embed embed;
+	embed.title = std::string(pTitle);
+	embed.color = string_to_number(pColor, 0, 1410065407);
+	embed.description = pText;
+
+	DiscordTask ThreadTask(std::bind(&DiscordJob::sendMessageWithoutResponse, m_pDiscord, pChannel, std::string("\0"), embed));
+	m_pDiscord->AddThreadTask(ThreadTask);
 	#endif
 }
 
 void CServer::UpdateDiscordStatus(const char *pStatus)
 {
-	#ifdef CONF_DISCORD
-		char aPrStatusBuf[128];
-		str_copy(aPrStatusBuf, pStatus, sizeof(aPrStatusBuf));
-		std::thread t([=]() { m_pDiscord->UpdateStatus(aPrStatusBuf); });
-		t.detach();
+#ifdef CONF_DISCORD
+	DiscordTask ThreadTask(std::bind(&DiscordJob::updateStatus, m_pDiscord, pStatus, 0, SleepyDiscord::online, false));
+	m_pDiscord->AddThreadTask(ThreadTask);
 	#endif
 }
 
@@ -1917,8 +1913,7 @@ int main(int argc, const char **argv) // ignore_convention
 
 	// run the server
 	#ifdef CONF_DISCORD
-		pServer->m_pDiscord = new DiscordJob(g_Config.m_SvDiscordToken, 3);
-		pServer->m_pDiscord->SetServer(pServer);
+		pServer->m_pDiscord = new DiscordJob(pServer);
 	#endif
 	
 	dbg_msg("server", "starting...");

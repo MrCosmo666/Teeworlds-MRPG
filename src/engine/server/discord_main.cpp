@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#ifdef CONF_DISCORD
+
 #include <base/math.h>
 #include <base/system.h>
 #include <engine/shared/config.h>
@@ -7,20 +9,21 @@
 
 #include "discord_main.h"
 
-#ifdef CONF_DISCORD
+#include <mutex>
+std::mutex ml_mutex_task;
 
 using namespace sqlstr;
-DiscordJob::DiscordJob(const char *token, int threads) : SleepyDiscord::DiscordClient(token, SleepyDiscord::USER_CONTROLED_THREADS)
-{
-	m_pServer = nullptr;
-	std::thread(&DiscordJob::run, this).detach();
-}
-
-void DiscordJob::SetServer(IServer *pServer)
+DiscordJob::DiscordJob(IServer* pServer) : SleepyDiscord::DiscordClient(g_Config.m_SvDiscordToken, SleepyDiscord::USER_CONTROLED_THREADS)
 {
 	m_pServer = pServer;
+
+	std::thread(&DiscordJob::run, this).detach(); // start thread discord event bot
+	std::thread(&DiscordJob::HandlerThreadTasks, this).detach(); // start handler bridge teeworlds - discord bot
 }
 
+/************************************************************************/
+/* Discord main functions                                               */
+/************************************************************************/
 void DiscordJob::onMessage(SleepyDiscord::Message message) 
 {
 	if(message.length() <= 0 || message.author == getCurrentUser().cast())
@@ -181,28 +184,6 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	}
 }
 
-void DiscordJob::onReaction(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
-SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID, SleepyDiscord::Emoji emoji)
-{ 
-}
-
-void DiscordJob::onDeleteReaction(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
-SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID, SleepyDiscord::Emoji emoji)
-{
-}
-
-void DiscordJob::UpdateMessageIdeas(SleepyDiscord::Snowflake<SleepyDiscord::User> userID, SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, 
-SleepyDiscord::Snowflake<SleepyDiscord::Message> messageID)
-{
-	if(userID == getCurrentUser().cast())
-		return;
-}
-
-void DiscordJob::UpdateStatus(const char* Status)
-{
-	this->updateStatus(Status);
-}
-
 bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, const char* pChannel, const char *pTitle, const char* pSearchNickname, const char* pColor, bool MultipleSearch)
 {
 	CSqlString<64> SearchNick(std::string("%" + std::string(pSearchNickname) + "%").c_str());
@@ -245,19 +226,45 @@ bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, const 
 	return Founded;
 }
 
-bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, const char* pChanal, const char* pTitle, const int AuthID, const char* pColor)
+bool DiscordJob::SendGenerateMessageAuthID(SleepyDiscord::User UserRequestFrom, const char* pChanal, const char* pTitle, int AuthID, const char* pColor)
 {
 	CGS* pGS = (CGS*)Server()->GameServer(MAIN_WORLD_ID);
 	std::string Nickname(pGS->Mmo()->PlayerName(AuthID));
 	return SendGenerateMessage(UserRequestFrom, pChanal, pTitle, Nickname.c_str(), pColor, false);
 }
 
-void DiscordJob::SendEmbedMessage(const char *pChanal, const char *Color, const char *Title, std::string pMsg)
+/************************************************************************/
+/* Discord teeworlds server side                                        */
+/************************************************************************/
+void DiscordJob::HandlerThreadTasks()
 {
-	SleepyDiscord::Embed embed;
-	embed.title = std::string(Title);
-	embed.color = string_to_number(Color, 0, 1410065407);
-	embed.description = pMsg;
-	this->sendMessage(pChanal, "\0", embed);
+	int64 HandleTime = time_get();
+	while(true)
+	{
+		if((HandleTime + time_freq()) > time_get() || m_pThreadHandler.empty() || !m_pServer)
+			continue;
+
+		ml_mutex_task.lock();
+		bool Executed = false;
+		for(DiscordHandle* pHandler : m_pThreadHandler)
+		{
+			Executed = true;
+			pHandler->m_pEvent();
+			delete pHandler;
+		}
+		if(Executed)
+			m_pThreadHandler.clear();
+
+		HandleTime = time_get();
+		ml_mutex_task.unlock();
+	}
 }
+
+void DiscordJob::AddThreadTask(DiscordTask Task)
+{
+	ml_mutex_task.lock();
+	m_pThreadHandler.push_back(new DiscordHandle(Task));
+	ml_mutex_task.unlock();
+}
+
 #endif

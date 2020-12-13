@@ -117,7 +117,7 @@ public:
 	virtual const char* GetClientLanguage(int ClientID) const = 0;
 
 	// discord
-	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText) = 0;
+	virtual void SendDiscordMessage(const char *pChannel, const char* pColor, const char* pTitle, const char* pText) = 0;
 	virtual void SendDiscordGenerateMessage(const char* pTitle, int AuthID, const char* pColor = "\0") = 0;
 	virtual void UpdateDiscordStatus(const char *pStatus) = 0;
 	
