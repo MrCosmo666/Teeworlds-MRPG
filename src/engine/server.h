@@ -92,9 +92,11 @@ public:
 	}
 
 	// World Time
-	virtual int GetSecWorld() const = 0;
-	virtual int GetHourWorld() const = 0;
-	virtual bool CheckWorldTime(int Hour, int Sec) = 0;
+	virtual int GetMinutesWorldTime() const = 0;
+	virtual int GetHourWorldTime() const = 0;
+	virtual int GetOffsetWorldTime() const = 0;
+	virtual void SetOffsetWorldTime(int Hour) = 0;
+	virtual bool CheckWorldTime(int Hour, int Minute) = 0;
 	virtual const char* GetStringTypeDay() const = 0;
 	virtual int GetEnumTypeDay() const = 0;
 
@@ -104,7 +106,7 @@ public:
 	virtual void SetClientCountry(int ClientID, int Country) = 0;
 	virtual void SetClientScore(int ClientID, int Score) = 0;
 
-	virtual void ChangeWorld(int ClientID, int WorldID) = 0;
+	virtual void ChangeWorld(int ClientID, int NewWorldID) = 0;
 	virtual int GetClientWorldID(int ClientID) = 0;
 	virtual const char* GetWorldName(int WorldID) = 0;
 
@@ -115,7 +117,7 @@ public:
 	virtual const char* GetClientLanguage(int ClientID) const = 0;
 
 	// discord
-	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText) = 0;
+	virtual void SendDiscordMessage(const char *pChannel, const char* pColor, const char* pTitle, const char* pText) = 0;
 	virtual void SendDiscordGenerateMessage(const char* pTitle, int AuthID, const char* pColor = "\0") = 0;
 	virtual void UpdateDiscordStatus(const char *pStatus) = 0;
 	

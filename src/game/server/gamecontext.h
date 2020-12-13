@@ -50,12 +50,6 @@ class CGS : public IGameServer
 	CNetObjHandler m_NetObjHandler;
 	CTuningParams m_Tuning;
 
-	CGS(int Resetting);
-	void Construct(int Resetting);
-	bool m_Resetting;
-
-	//
-
 public:
 	IServer *Server() const { return m_pServer; }
 	class IConsole *Console() { return m_pConsole; }
@@ -66,7 +60,6 @@ public:
 
 	CGS();
 	~CGS();
-	void Clear();
 
 	CEventHandler m_Events;
 	CPlayer *m_apPlayers[MAX_CLIENTS];
@@ -189,7 +182,7 @@ public:
 	######################################################################### */	
 	void OnInit(int WorldID) override;
 	void OnConsoleInit() override;
-	void OnShutdown() override;
+	void OnShutdown() override { delete this; }
 
 	void OnTick() override;
 	void OnTickMainWorld() override;
@@ -219,6 +212,7 @@ public:
 		CONSOLE GAMECONTEXT 
 	######################################################################### */
 private:
+	static void ConSetWorldTime(IConsole::IResult *pResult, void *pUserData);
 	static void ConParseSkin(IConsole::IResult *pResult, void *pUserData);
 	static void ConGiveItem(IConsole::IResult *pResult, void *pUserData);
 	static void ConRemItem(IConsole::IResult* pResult, void* pUserData);

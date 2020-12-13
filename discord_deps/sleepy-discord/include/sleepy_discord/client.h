@@ -338,9 +338,10 @@ namespace SleepyDiscord {
 		ObjectResponse<Webhook> executeWebhook               (Snowflake<Webhook> webhookID, std::string webhookToken, std::vector<Embed> embeds, bool wait = false, std::string username = "", std::string avatar_url = "", bool tts = false); //to do test this
 		ObjectResponse<Webhook> executeWebhook               (Snowflake<Webhook> webhookID, std::string webhookToken, filePathPart file, bool wait = false, std::string username = "", std::string avatar_url = "", bool tts = false);         //to do test this
 
-		//websocket functions
 		void updateStatus(std::string gameName = "", uint64_t idleSince = 0, Status status = online, bool afk = false);
+		void sendMessageWithoutResponse(Snowflake<Channel> channelID, std::string message, Embed embed = Embed::Flag::INVALID_EMBED) { sendMessage(channelID, message, embed, false); }
 
+		//websocket functions
 		void waitTilReady();  ////Deprecated, uses sleep. No replacment for now
 		bool isReady() const { return ready; }
 		bool isQuiting() const { return quiting; }

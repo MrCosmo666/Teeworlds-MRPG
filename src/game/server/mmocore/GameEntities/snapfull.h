@@ -31,7 +31,7 @@ private:
 
 	int m_ClientID;
 	int m_LoadingTick;
-	bool m_boolreback;
+	bool m_IsBack;
 };
 
 #endif

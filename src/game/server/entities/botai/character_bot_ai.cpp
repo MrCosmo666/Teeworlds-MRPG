@@ -16,7 +16,6 @@ CCharacterBotAI::~CCharacterBotAI() {}
 
 int CCharacterBotAI::GetSnapFullID() const { return m_pBotPlayer->GetCID() * SNAPBOTS; }
 
-
 bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 {
 	m_pBotPlayer = static_cast<CPlayerBot*>(pPlayer);
@@ -210,12 +209,9 @@ void CCharacterBotAI::Tick()
 	if(!m_BotActive || !IsAlive())
 		return;
 
-	if(IsAlive())
-	{
-		EngineBots();
-		HandleEvents();
-		HandleTilesets();
-	}
+	EngineBots();
+	HandleEvents();
+	HandleTilesets();
 	CCharacter::Tick();
 }
 

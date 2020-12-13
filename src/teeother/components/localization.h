@@ -1,25 +1,15 @@
-#ifndef TEEOTHER_LOCALIZATION
-#define TEEOTHER_LOCALIZATION
+#ifndef __SHARED_LOCALIZATION__
+#define __SHARED_LOCALIZATION__
 
 #include <unicode/tmutfmt.h>
 #include <teeother/tl/hashtable.h>
 
-struct CLocalizableString
-{
-	const char* m_pText;
-	
-	CLocalizableString(const char* pText) :
-		m_pText(pText)
-	{ }
-};
-
-#define _P(TEXT_SINGULAR, TEXT_PLURAL) TEXT_PLURAL
+#define LPLURAL(TEXT_SINGULAR, TEXT_PLURAL) TEXT_PLURAL
 
 class CLocalization
 {
-private:
 	class IStorageEngine* m_pStorage;
-	inline class IStorageEngine* Storage() { return m_pStorage; }
+	class IStorageEngine* Storage() { return m_pStorage; }
 	
 public:
 	enum
@@ -34,12 +24,6 @@ public:
 		NUM_PLURALTYPES,
 	};
 
-	class IListener
-	{
-	public:
-		virtual void OnLocalizationModified() = 0;
-	};
-	
 	class CLanguage
 	{
 	protected:
@@ -62,7 +46,6 @@ public:
 			}
 		};
 		
-	protected:
 		char m_aName[64];
 		char m_aFilename[64];
 		char m_aParentFilename[64];
@@ -101,9 +84,6 @@ public:
 
 protected:
 	CLanguage* m_pMainLanguage;
-	array<IListener*> m_pListeners;
-	bool m_UpdateListeners;
-	
 	UConverter* m_pUtf8Converter;
 
 public:
@@ -124,10 +104,6 @@ public:
 	
 	virtual bool InitConfig(int argc, const char** argv);
 	virtual bool Init();
-	virtual bool PreUpdate();
-	
-	void AddListener(IListener* pListener);
-	void RemoveListener(IListener* pListener);
 	
 	inline bool GetWritingDirection() const { return (!m_pMainLanguage ? DIRECTION_LTR : m_pMainLanguage->GetWritingDirection()); }
 	

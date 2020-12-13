@@ -4,6 +4,7 @@
 #define ENGINE_SERVER_SERVER_H
 
 #include <engine/server.h>
+#include <teeother/tl/singletion.h>
 #include <game/server/enum_global.h>
 
 STRINGABLE_ENUM_IMPL(MINER)
@@ -11,10 +12,10 @@ STRINGABLE_ENUM_IMPL(PLANT)
 STRINGABLE_ENUM_IMPL(EMEMBERUPGRADE)
 
 // multiworlds
-#define WorldsInstance CWorldGameServerArray::GetInstance()
+#define WorldsInstance CSingleton<CWorldGameServerArray>::Get()
+
 class CWorldGameServerArray
 {
-	static std::shared_ptr<CWorldGameServerArray> m_Instance;
 	struct CWorldGameServer
 	{
 		char m_aName[64];
@@ -23,22 +24,12 @@ class CWorldGameServerArray
 		IEngineMap* m_pLoadedMap;
 	};
 public:
-	static CWorldGameServerArray& GetInstance();
-
-	std::map < int /*id*/, CWorldGameServer/*game world*/ > ms_aWorlds;
+	std::map < int /*ID*/, CWorldGameServer /*Game world*/ > ms_aWorlds;
 	~CWorldGameServerArray() { Clear(); }
 
 	bool IsValid(int WorldID) { return ms_aWorlds.find(WorldID) != ms_aWorlds.end(); }
 	bool Add(int WorldID, IKernel* pKernel);
-	void Clear()
-	{
-		for(auto& pWorld : ms_aWorlds)
-		{
-			delete pWorld.second.m_pGameServer;
-			delete pWorld.second.m_pLoadedMap;
-		}
-		ms_aWorlds.clear();
-	}
+	void Clear();
 };
 
 // 
@@ -102,9 +93,9 @@ class CServer : public IServer
 public:
 	virtual class IGameServer* GameServer(int WorldID = 0)
 	{
-		if(WorldsInstance.ms_aWorlds.find(WorldID) == WorldsInstance.ms_aWorlds.end())
+		if(WorldsInstance->ms_aWorlds.find(WorldID) == WorldsInstance->ms_aWorlds.end())
 			return nullptr;
-		return WorldsInstance.ms_aWorlds[WorldID].m_pGameServer;
+		return WorldsInstance->ms_aWorlds[WorldID].m_pGameServer;
 	}
 	class IConsole *Console() { return m_pConsole; }
 	class IStorageEngine*Storage() { return m_pStorage; }
@@ -212,22 +203,27 @@ public:
 	CServer();
 
 	// world time
-	int WorldSec;
-	int WorldHour;
-	bool WorldCheckTime;
+	int m_ShiftTime;
+	int m_LastShiftTick;
+	int m_TimeWorldMinute;
+	int m_TimeWorldHour;
+	bool m_TimeWorldAlarm;
 
-	virtual int GetSecWorld() const;
-	virtual int GetHourWorld() const;
-	virtual bool CheckWorldTime(int Hour, int Sec);
+	virtual int GetMinutesWorldTime() const;
+	virtual int GetHourWorldTime() const;
+	virtual int GetOffsetWorldTime() const;
+	virtual void SetOffsetWorldTime(int Hour);
+	virtual bool CheckWorldTime(int Hour, int Minute);
 	virtual const char* GetStringTypeDay() const;
 	virtual int GetEnumTypeDay() const;
 
+	// basic
 	virtual void SetClientName(int ClientID, const char *pName);
 	virtual void SetClientClan(int ClientID, char const *pClan);
 	virtual void SetClientCountry(int ClientID, int Country);
 	virtual void SetClientScore(int ClientID, int Score);
 
-	virtual void ChangeWorld(int ClientID, int WorldID);
+	virtual void ChangeWorld(int ClientID, int NewWorldID);
 	virtual int GetClientWorldID(int ClientID);
 	virtual void BackInformationFakeClient(int FakeClientID);
 
@@ -238,7 +234,7 @@ public:
 	virtual const char* GetClientLanguage(int ClientID) const;
 	virtual const char* GetWorldName(int WorldID);
 
-	virtual void SendDiscordMessage(const char *pChanel, const char* pColor, const char* pTitle, const char* pText);
+	virtual void SendDiscordMessage(const char *pChannel, const char* pColor, const char* pTitle, const char* pText);
 	virtual void SendDiscordGenerateMessage(const char *pTitle, int AuthID, const char* pColor = "\0");
 	virtual void UpdateDiscordStatus(const char *pStatus);
 
