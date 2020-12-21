@@ -423,8 +423,8 @@ bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)
 	const bool IsHammer = (bool)(WeaponID == WEAPON_HAMMER);
 	if(m_pPlayer->GetEquippedItemID(WeaponID) <= 0 && !IsHammer)
 	{
-		if(RemoveWeapon(WeaponID))
-			m_ActiveWeapon = m_LastWeapon;
+		if(RemoveWeapon(WeaponID) && WeaponID == m_ActiveWeapon)
+			m_ActiveWeapon = m_aWeapons[m_LastWeapon].m_Got ? m_LastWeapon : (int)WEAPON_HAMMER;
 		return false;
 	}
 
