@@ -301,6 +301,12 @@ CServer::CServer()
 	Init();
 }
 
+CServer::~CServer()
+{
+	// saved for something that works on the server side with sql e.g. discordjo
+	SJK.DisconnectConnectionHeap();
+}
+
 // get the world minute
 int CServer::GetMinutesWorldTime() const
 {
@@ -327,9 +333,9 @@ void CServer::SetOffsetWorldTime(int Hour)
 	m_TimeWorldMinute = 0;
 
 	if(Hour <= 0)
-		m_ShiftTime = Tick();
+		m_ShiftTime = m_LastShiftTick;
 	else
-		m_ShiftTime = Tick() - ((clamp(Hour, 0, 23) * 60) * TickSpeed());
+		m_ShiftTime = m_LastShiftTick - ((m_TimeWorldHour * 60) * TickSpeed());
 }
 
 // skipping in two places so that time does not run out.
@@ -441,10 +447,9 @@ void CServer::ChangeWorld(int ClientID, int NewWorldID)
 	m_aClients[ClientID].m_WorldID = NewWorldID;
 	GameServer(m_aClients[ClientID].m_WorldID)->PrepareClientChangeWorld(ClientID);
 
+	m_aClients[ClientID].Reset();
 	m_aClients[ClientID].m_ChangeMap = true;
-	m_aClients[ClientID].m_MapChunk = 0;
 	m_aClients[ClientID].m_State = CClient::STATE_CONNECTING;
-	m_aClients[ClientID].m_Snapshots.PurgeAll();
 	SendMap(ClientID);
 }
 
@@ -1504,6 +1509,7 @@ int CServer::Run()
 			int64 t = time_get();
 			bool NewTicks = false;
 			bool ShouldSnap = false;
+			bool ExistsPlayers = false;
 
 			while(t > TickStartTime(m_CurrentGameTick+1))
 			{
@@ -1517,6 +1523,8 @@ int CServer::Run()
 				{
 					if(m_aClients[c].m_State == CClient::STATE_EMPTY)
 						continue;
+					
+					ExistsPlayers = true;
 					for(int i = 0; i < 200; i++)
 					{
 						if(m_aClients[c].m_aInputs[i].m_GameTick == Tick())
@@ -1534,7 +1542,7 @@ int CServer::Run()
 				// world time
 				if(Tick() % TickSpeed() == 0)
 				{
-					if(!m_TimeWorldAlarm) 
+					if(!m_TimeWorldAlarm)
 						m_TimeWorldMinute++;
 					else
 						m_TimeWorldAlarm = false;
@@ -1559,15 +1567,56 @@ int CServer::Run()
 				}
 			}
 
-			// snap game
 			if(NewTicks)
 			{
-				if(g_Config.m_SvHighBandwidth || ShouldSnap)
+				// snap game
+				if(ExistsPlayers)
 				{
-					for(auto& pWorld : WorldsInstance->ms_aWorlds)
-						DoSnapshot(pWorld.first);
+					if(g_Config.m_SvHighBandwidth || ShouldSnap)
+					{
+						for(auto& pWorld : WorldsInstance->ms_aWorlds)
+							DoSnapshot(pWorld.first);
+					}
+					UpdateClientRconCommands();
 				}
-				UpdateClientRconCommands();
+				// reset server ((24 * 60) * 60) * 50 = 4320000 tick in day i think
+				else if(m_CurrentGameTick > (g_Config.m_SvHardresetAfterDays * 4320000))
+				{
+					// There are no players, bots can't initialized self, so you can reinitialize the server
+					Init();
+					m_CurrentGameTick = 0;
+					m_GameStartTime = time_get();
+					SetOffsetWorldTime(0);
+
+					// Initializing worlds
+					for(auto& pWorld : WorldsInstance->ms_aWorlds)
+					{
+						// free map data and loading
+						char aBuf[256];
+						pWorld.second.m_pLoadedMap->Unload();
+						if(!LoadMap(pWorld.first))
+						{
+							str_format(aBuf, sizeof(aBuf), "maps/%s map no found...", pWorld.second.m_aPath);
+							Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+							return -1;
+						}
+
+						// recreate gamecontext
+						delete pWorld.second.m_pGameServer;
+						pWorld.second.m_pGameServer = CreateGameServer();
+						if(!Kernel()->ReregisterInterface(pWorld.second.m_pGameServer, pWorld.first))
+						{
+							str_format(aBuf, sizeof(aBuf), "the gamecontext interface could not be updated / world %d...", pWorld.first);
+							Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+							return -1;
+						}
+					}
+
+					// reinit gamecontext
+					for(auto& pWorld : WorldsInstance->ms_aWorlds)
+						pWorld.second.m_pGameServer->OnInit(pWorld.first);
+					Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "A week-long server restart without players.");
+				}
 			}
 
 			// master server stuff
@@ -1784,7 +1833,7 @@ bool WorldsLoading(IKernel *pKernel, IStorageEngine* pStorage, IConsole* pConsol
 	IOHANDLE File = pStorage->OpenFile(aFileBuf, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 	if(!File)
 		return false;
-	
+
 	const int FileSize = (int)io_length(File);
 	char* pFileData = (char*)mem_alloc(FileSize, 1);
 	io_read(File, pFileData, FileSize);
@@ -1822,7 +1871,6 @@ bool WorldsLoading(IKernel *pKernel, IStorageEngine* pStorage, IConsole* pConsol
 	json_value_free(pJsonData);
 	return true;
 }
-
 
 int main(int argc, const char **argv) // ignore_convention
 {

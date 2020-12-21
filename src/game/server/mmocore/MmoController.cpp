@@ -47,7 +47,6 @@ MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 
 MmoController::~MmoController()
 {
-	SJK.DisconnectConnectionHeap();
 	m_Components.free();
 }
 
