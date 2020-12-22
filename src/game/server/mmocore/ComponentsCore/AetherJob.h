@@ -7,6 +7,11 @@
 
 class AetherJob : public MmoComponent
 {
+	~AetherJob()
+	{
+		ms_aTeleport.clear();
+	};
+
 	struct StructTeleport
 	{
 		int m_TeleX;

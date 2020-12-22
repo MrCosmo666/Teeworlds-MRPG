@@ -10,6 +10,11 @@ class HouseDoor;
 class CDecorationHouses;
 class HouseJob : public MmoComponent
 {
+	~HouseJob()
+	{
+		ms_aHouse.clear();
+	};
+
 	/* #########################################################################
 		VAR AND OBJECTS HOUSES 
 	######################################################################### */
@@ -31,7 +36,7 @@ class HouseJob : public MmoComponent
 		HouseDoor *m_Door;
 	};
 	static std::map < int, HouseList > ms_aHouse;
-	std::map < int , CDecorationHouses * > ms_aDecorationHouse;
+	std::map < int , CDecorationHouses * > m_aDecorationHouse;
 
 	void OnInitWorld(const char* pWhereLocalWorld) override;
 	bool OnHandleTile(CCharacter* pChr, int IndexCollision) override;

@@ -7,6 +7,11 @@
 
 class ShopJob : public MmoComponent
 {
+	~ShopJob()
+	{
+		ms_aShopList.clear();
+	};
+
 	struct StructAuctionItem
 	{
 		int m_ItemID;

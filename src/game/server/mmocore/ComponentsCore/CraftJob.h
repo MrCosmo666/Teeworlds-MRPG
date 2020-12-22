@@ -7,6 +7,11 @@
  
 class CraftJob : public MmoComponent
 {
+	~CraftJob()
+	{
+		ms_aCraft.clear();
+	};
+
  	// create an instance of the class so that you can use it globally
 	struct CraftStruct
 	{

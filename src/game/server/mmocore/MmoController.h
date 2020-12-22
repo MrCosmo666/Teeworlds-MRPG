@@ -40,7 +40,7 @@ class MmoController
 		
 		void free()
 		{
-			for(auto& pComponent : m_paComponents)
+			for(auto* pComponent : m_paComponents)
 				delete pComponent;
 			m_paComponents.clear();
 		}

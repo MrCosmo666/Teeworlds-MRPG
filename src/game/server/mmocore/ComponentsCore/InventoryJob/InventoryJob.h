@@ -7,6 +7,12 @@
 
 class InventoryJob : public MmoComponent
 {
+	~InventoryJob()
+	{
+		ms_aItemsInfo.clear();
+		ms_aItems.clear();
+	};
+
 	void OnInit() override;
 	void OnInitAccount(CPlayer* pPlayer) override;
 	void OnResetClient(int ClientID) override;

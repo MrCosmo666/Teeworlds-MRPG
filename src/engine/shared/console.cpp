@@ -1073,13 +1073,18 @@ void CConsole::Chain(const char *pName, FChainCommandCallback pfnChainFunc, void
 		return;
 	}
 
-	CChain *pChainInfo = (CChain *)mem_alloc(sizeof(CChain), sizeof(void*));
-
 	// store info
+	CChain* pChainInfo = (CChain*)mem_alloc(sizeof(CChain), sizeof(void*));
 	pChainInfo->m_pfnChainCallback = pfnChainFunc;
 	pChainInfo->m_pUserData = pUser;
 	pChainInfo->m_pfnCallback = pCommand->m_pfnCallback;
 	pChainInfo->m_pCallbackUserData = pCommand->m_pUserData;
+	if(pCommand->m_pUserData)
+	{
+		CChain *pChainUser = (CChain*)pCommand->m_pUserData;
+		if(mem_comp(pChainUser, pChainInfo, sizeof(pChainUser)) == 0)
+			mem_free(pChainUser);
+	}
 
 	// chain
 	pCommand->m_pfnCallback = Con_Chain;

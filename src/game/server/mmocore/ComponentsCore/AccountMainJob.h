@@ -8,6 +8,12 @@
 
 class AccountMainJob : public MmoComponent
 {
+	~AccountMainJob()
+	{
+		ms_aData.clear();
+		ms_aPlayerTempData.clear();
+	};
+
 	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
 	bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu) override;
 	void OnResetClient(int ClientID) override;

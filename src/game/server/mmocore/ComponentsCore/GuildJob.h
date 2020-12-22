@@ -12,6 +12,13 @@
 class GuildDoor;
 class GuildJob : public MmoComponent
 {
+	~GuildJob()
+	{
+		ms_aGuild.clear();
+		ms_aHouseGuild.clear();
+		ms_aRankGuild.clear();
+	};
+
 	struct GuildStruct
 	{
 		char m_aName[32];
