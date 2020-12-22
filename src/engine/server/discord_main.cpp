@@ -238,24 +238,22 @@ bool DiscordJob::SendGenerateMessageAuthID(SleepyDiscord::User UserRequestFrom, 
 /************************************************************************/
 void DiscordJob::HandlerThreadTasks()
 {
-	int64 HandleTime = time_get();
 	while(true)
 	{
-		if((HandleTime + time_freq()) > time_get() || m_pThreadHandler.empty() || !m_pServer)
-			continue;
-
 		ml_mutex_task.lock();
-		bool Executed = false;
+		if(m_pThreadHandler.empty())
+		{
+			ml_mutex_task.unlock();
+			std::this_thread::sleep_for(std::chrono::seconds(1));
+			continue;
+		}
+
 		for(DiscordHandle* pHandler : m_pThreadHandler)
 		{
-			Executed = true;
 			pHandler->m_pEvent();
 			delete pHandler;
 		}
-		if(Executed)
-			m_pThreadHandler.clear();
-
-		HandleTime = time_get();
+		m_pThreadHandler.clear();
 		ml_mutex_task.unlock();
 	}
 }

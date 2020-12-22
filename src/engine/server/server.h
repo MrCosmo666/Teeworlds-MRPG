@@ -201,6 +201,7 @@ public:
 	CMapChecker m_MapChecker;
 
 	CServer();
+	~CServer();
 
 	// world time
 	int m_ShiftTime;
