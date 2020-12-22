@@ -1,6 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <map>
+#include <cstdint>
 #include <base/math.h>
 #include <base/system.h>
 
@@ -491,7 +492,7 @@ void CServer::SendDiscordMessage(const char *pChannel, const char* pColor, const
 void CServer::UpdateDiscordStatus(const char *pStatus)
 {
 #ifdef CONF_DISCORD
-	DiscordTask ThreadTask(std::bind(&DiscordJob::updateStatus, m_pDiscord, pStatus, 0Ui64, SleepyDiscord::online, false));
+	DiscordTask ThreadTask(std::bind(&DiscordJob::updateStatus, m_pDiscord, pStatus, std::numeric_limits<uint64_t>::max(), SleepyDiscord::online, false));
 	m_pDiscord->AddThreadTask(ThreadTask);
 	#endif
 }
