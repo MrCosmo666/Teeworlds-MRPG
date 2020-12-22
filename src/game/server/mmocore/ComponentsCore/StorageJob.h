@@ -7,6 +7,11 @@
 
 class StorageJob : public MmoComponent
 {
+	~StorageJob()
+	{
+		ms_aStorage.clear();
+	};
+
 	struct SturctStorage
 	{
 		char m_aName[32];
@@ -21,7 +26,7 @@ class StorageJob : public MmoComponent
 	bool OnHandleTile(CCharacter* pChr, int IndexCollision) override;
 	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
 
-public:	
+public:
 	void ShowStorageMenu(CPlayer *pPlayer, int StorageID);
 	int GetStorageID(vec2 Pos) const;
 };

@@ -14,6 +14,12 @@ enum QuestInteractive
 
 class QuestJob : public MmoComponent
 {
+	~QuestJob()
+	{
+		ms_aDataQuests.clear();
+		ms_aPlayerQuests.clear();
+	}
+
 	void OnInit() override;
 	void OnInitAccount(CPlayer* pPlayer) override;
 	void OnResetClient(int ClientID) override;

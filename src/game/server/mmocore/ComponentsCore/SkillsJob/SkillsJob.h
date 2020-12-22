@@ -7,6 +7,12 @@
 
 class SkillsJob : public MmoComponent
 {
+	~SkillsJob()
+	{
+		ms_aSkillsData.clear();
+		ms_aSkills.clear();
+	};
+
 	void OnInit() override;
 	void OnInitAccount(CPlayer* pPlayer) override;
 	void OnResetClient(int ClientID) override;

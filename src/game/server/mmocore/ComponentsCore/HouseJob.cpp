@@ -44,10 +44,10 @@ void HouseJob::OnInitWorld(const char* pWhereLocalWorld)
 		while(pRes->next())
 		{
 			const int DecoID = pRes->getInt("ID");
-			ms_aDecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(pRes->getInt("X"),
+			m_aDecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(pRes->getInt("X"),
 				pRes->getInt("Y")), pRes->getInt("HouseID"), pRes->getInt("DecoID"));
 		}
-		Job()->ShowLoadingProgress("Houses Decorations", ms_aDecorationHouse.size());
+		Job()->ShowLoadingProgress("Houses Decorations", m_aDecorationHouse.size());
 	}, pWhereLocalWorld);
 }
 
@@ -338,20 +338,20 @@ bool HouseJob::AddDecorationHouse(int DecoID, int HouseID, vec2 Position)
 	SJK.ID("tw_houses_decorations", "(ID, DecoID, HouseID, X, Y, WorldID) VALUES ('%d', '%d', '%d', '%d', '%d', '%d')", 
 		InitID, DecoID, HouseID, (int)Position.x, (int)Position.y, GS()->GetWorldID());
 
-	ms_aDecorationHouse[InitID] = new CDecorationHouses(&GS()->m_World, Position, HouseID, DecoID);
+	m_aDecorationHouse[InitID] = new CDecorationHouses(&GS()->m_World, Position, HouseID, DecoID);
 	return true;
 }
 
 bool HouseJob::DeleteDecorationHouse(int ID)
 {
-	if(ms_aDecorationHouse.find(ID) != ms_aDecorationHouse.end())
+	if(m_aDecorationHouse.find(ID) != m_aDecorationHouse.end())
 	{
-		if(ms_aDecorationHouse[ID])
+		if(m_aDecorationHouse[ID])
 		{
-			delete ms_aDecorationHouse[ID];
-			ms_aDecorationHouse[ID] = 0;
+			delete m_aDecorationHouse[ID];
+			m_aDecorationHouse[ID] = 0;
 		}
-		ms_aDecorationHouse.erase(ID);
+		m_aDecorationHouse.erase(ID);
 		SJK.DD("tw_houses_decorations", "WHERE ID = '%d'", ID);
 		return true;
 	}
@@ -362,7 +362,7 @@ void HouseJob::ShowDecorationList(CPlayer *pPlayer)
 {
 	const int HouseID = PlayerHouseID(pPlayer);
 	const int ClientID = pPlayer->GetCID();
-	for (auto deco = ms_aDecorationHouse.begin(); deco != ms_aDecorationHouse.end(); deco++)
+	for (auto deco = m_aDecorationHouse.begin(); deco != m_aDecorationHouse.end(); deco++)
 	{
 		if(deco->second && deco->second->m_HouseID == HouseID) 
 		{

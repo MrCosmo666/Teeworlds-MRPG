@@ -7,6 +7,12 @@
 
 class WorldSwapJob : public MmoComponent
 {
+	~WorldSwapJob()
+	{
+		ms_aWorldSwap.clear();
+		ms_aWorldPositionLogic.clear();
+	};
+
 	struct StructSwapWorld
 	{
 		int m_OpenQuestID;

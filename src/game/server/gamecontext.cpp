@@ -55,9 +55,11 @@ CGS::CGS()
 CGS::~CGS()
 {
 	m_Events.Clear();
+	ms_aAttributsInfo.clear();
 	m_CommandManager.ClearCommands();
-
-	for(auto & apPlayer : m_apPlayers)
+	for(auto& pEffects : ms_aEffects)
+		pEffects.clear();
+	for(auto* apPlayer : m_apPlayers)
 		delete apPlayer;
 
 	delete m_pController;

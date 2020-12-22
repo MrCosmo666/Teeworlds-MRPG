@@ -7,6 +7,11 @@
 
 class AccountMinerJob : public MmoComponent
 {
+	~AccountMinerJob()
+	{
+		ms_aOre.clear();
+	};
+
 	struct StructOres
 	{
 		int m_ItemID;
