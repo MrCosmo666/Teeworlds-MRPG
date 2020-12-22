@@ -5,7 +5,7 @@ endif()
 
 file(STRINGS src/game/version.h VERSION_LINE
     LIMIT_COUNT 1
-    REGEX CLIENT_RELEASE_VERSION
+    REGEX GAME_RELEASE_VERSION
 )
 
 if(VERSION_LINE MATCHES "\"([0-9]+)\\.([0-9]+)\\.([0-9]+|[0-9]+\\.[0-9]+)\"")

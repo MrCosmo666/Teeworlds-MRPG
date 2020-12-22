@@ -491,7 +491,7 @@ void CServer::SendDiscordMessage(const char *pChannel, const char* pColor, const
 void CServer::UpdateDiscordStatus(const char *pStatus)
 {
 #ifdef CONF_DISCORD
-	DiscordTask ThreadTask(std::bind(&DiscordJob::updateStatus, m_pDiscord, pStatus, 0, SleepyDiscord::online, false));
+	DiscordTask ThreadTask(std::bind(&DiscordJob::updateStatus, m_pDiscord, pStatus, 0Ui64, SleepyDiscord::online, false));
 	m_pDiscord->AddThreadTask(ThreadTask);
 	#endif
 }

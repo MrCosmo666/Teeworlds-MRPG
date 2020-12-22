@@ -60,10 +60,10 @@ void BuildPackets()
 void SendVer(NETADDR *pAddr, TOKEN ResponseToken)
 {
 	CNetChunk p;
-	unsigned char aData[sizeof(VERSIONSRV_VERSION) + sizeof(CLIENT_RELEASE_VERSION)];
+	unsigned char aData[sizeof(VERSIONSRV_VERSION) + sizeof(GAME_RELEASE_VERSION)];
 
 	mem_copy(aData, VERSIONSRV_VERSION, sizeof(VERSIONSRV_VERSION));
-	mem_copy(aData + sizeof(VERSIONSRV_VERSION), CLIENT_RELEASE_VERSION, sizeof(CLIENT_RELEASE_VERSION));
+	mem_copy(aData + sizeof(VERSIONSRV_VERSION), GAME_RELEASE_VERSION, sizeof(GAME_RELEASE_VERSION));
 
 	p.m_ClientID = -1;
 	p.m_Address = *pAddr;
