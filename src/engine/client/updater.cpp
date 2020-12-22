@@ -206,7 +206,7 @@ void CUpdater::ParseUpdate()
 	if(pVersion && pVersion->type == json_object)
 	{
 		const json_value* pVersionString = json_object_get(pVersion, "version");
-		if(str_comp(json_string_get(pVersionString), CLIENT_RELEASE_VERSION))
+		if(str_comp(json_string_get(pVersionString), GAME_RELEASE_VERSION))
 			m_ArchiveUpdate = true;
 		else
 			m_State = FAIL;

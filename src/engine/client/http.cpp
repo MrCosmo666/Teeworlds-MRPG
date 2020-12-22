@@ -125,7 +125,7 @@ int CRequest::RunImpl(CURL *pHandle)
 	curl_easy_setopt(pHandle, CURLOPT_FAILONERROR, 1L);
 	curl_easy_setopt(pHandle, CURLOPT_URL, m_aUrl);
 	curl_easy_setopt(pHandle, CURLOPT_NOSIGNAL, 1L);
-	curl_easy_setopt(pHandle, CURLOPT_USERAGENT, "Teeworlds " CLIENT_RELEASE_VERSION " (" CONF_PLATFORM_STRING "; " CONF_ARCH_STRING ")");
+	curl_easy_setopt(pHandle, CURLOPT_USERAGENT, "Teeworlds " GAME_RELEASE_VERSION " (" CONF_PLATFORM_STRING "; " CONF_ARCH_STRING ")");
 
 	curl_easy_setopt(pHandle, CURLOPT_WRITEDATA, this);
 	curl_easy_setopt(pHandle, CURLOPT_WRITEFUNCTION, WriteCallback);
