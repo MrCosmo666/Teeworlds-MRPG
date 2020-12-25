@@ -34,7 +34,7 @@ class BotJob : public MmoComponent
 		int m_aUseCustomBot[NUM_SKINPARTS];
 		int m_aSkinColorBot[NUM_SKINPARTS];
 		int m_aEquipSlot[MAX_EQUIPPED_SLOTS_BOTS];
-		bool m_aAlreadySnapQuestBot[MAX_PLAYERS];
+		bool m_aAlreadyActiveQuestBot[MAX_PLAYERS];
 	};
 
 	// npc type data information
@@ -161,10 +161,6 @@ public:
 			return true;
 		return false;
 	}
-
-	// threading path finder
-	void FindThreadPath(class CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos);
-	void GetThreadRandomWaypointTarget(class CPlayerBot* pBotPlayer);
 };
 
 #endif

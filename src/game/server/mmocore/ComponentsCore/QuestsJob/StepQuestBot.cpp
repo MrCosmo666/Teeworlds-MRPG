@@ -138,7 +138,7 @@ bool CPlayerStepQuestBot::Finish(CPlayer* pPlayer, bool FinalStepTalking)
 	// update state complete
 	m_StepComplete = true;
 	SJK.UD("tw_accounts_quests_bots_step", "Completed = '1' WHERE SubBotID = '%d' AND OwnerID = '%d'", m_Bot->m_SubBotID, pPlayer->Acc().m_AuthID);
-	BotJob::ms_aDataBot[m_Bot->m_BotID].m_aAlreadySnapQuestBot[ClientID] = false;
+	BotJob::ms_aDataBot[m_Bot->m_BotID].m_aAlreadyActiveQuestBot[ClientID] = false;
 	UpdateBot(pGS);
 
 	QuestJob::ms_aPlayerQuests[ClientID][QuestID].CheckaAvailableNewStep();

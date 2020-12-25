@@ -8,6 +8,7 @@
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 
+IServer* CPlayer::Server() const { return m_pGS->Server(); };
 CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 {
 	for(short& SortTab : m_aSortTabs)

@@ -5,7 +5,6 @@
 #include <algorithm>
 
 #include <base/math.h>
-#include <engine/map.h>
 #include <engine/shared/config.h>
 
 #include <generated/server_data.h>
@@ -1535,7 +1534,7 @@ void CGS::ClearClientData(int ClientID)
 
 	// clear active snap bots for player
 	for(auto& pActiveSnap : BotJob::ms_aDataBot)
-		pActiveSnap.second.m_aAlreadySnapQuestBot[ClientID] = false;
+		pActiveSnap.second.m_aAlreadyActiveQuestBot[ClientID] = false;
 }
 
 int CGS::GetRank(int AuthID)

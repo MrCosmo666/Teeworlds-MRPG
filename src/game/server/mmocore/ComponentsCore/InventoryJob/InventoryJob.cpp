@@ -454,14 +454,9 @@ void InventoryJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pItemPlay
 
 int InventoryJob::GetCountItemsType(CPlayer *pPlayer, int Type) const
 {
-	int SizeItems = 0;
 	const int ClientID = pPlayer->GetCID();
-	for(const auto& item : ms_aItems[ClientID])
-	{
-		if(item.second.m_Count > 0 && item.second.Info().m_Type == Type)
-			SizeItems++;
-	}
-	return SizeItems;
+	return (int)std::count_if(ms_aItems[ClientID].begin(), ms_aItems[ClientID].end(), [Type](std::pair< const int, InventoryItem>& pItem)
+		{return pItem.second.m_Count > 0 && pItem.second.Info().m_Type == Type; });;
 }
 
 // TODO: FIX IT (lock .. unlock)
