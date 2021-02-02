@@ -26,7 +26,6 @@
 #include <teeother/components/localization.h>
 
 // temp
-#include <fstream>
 #include <teeother/tl/nlohmann_json.h>
 using json = nlohmann::json;
 
@@ -1709,19 +1708,21 @@ void CGS::ConConvertQuestSteps(IConsole::IResult* pResult, void* pUserData)
 			});
 
 			// save file
-			std::ofstream convertFile(JsonName);
-			convertFile << JsonQuestData;
-			if(convertFile.bad())
+			IOHANDLE File = io_open(JsonName.c_str(), IOFLAG_WRITE);
+			if(!File)
 			{
 				dbg_msg("convert steps", "error convert with account id %d and quest id %d", OwnerID, QuestID);
 			}
 			else
 			{
+				std::string Data = JsonQuestData.dump();
+				io_write(File, Data.c_str(), Data.length());
+				io_close(File);
+
 				// delete from database
 				SJK.DD("tw_accounts_quests_bots_step", "WHERE OwnerID = '%d' AND QuestID = '%d'", OwnerID, QuestID);
 				dbg_msg("convert steps", "converted successfully with account id %d and quest id %d", OwnerID, QuestID);
 			}
-			convertFile.close();
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 

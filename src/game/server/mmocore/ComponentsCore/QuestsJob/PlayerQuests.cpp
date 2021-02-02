@@ -4,7 +4,6 @@
 #include <game/server/gamecontext.h>
 #include "PlayerQuests.h"
 
-#include <fstream>
 #include <teeother/tl/nlohmann_json.h>
 using json = nlohmann::json;
 
@@ -47,9 +46,13 @@ void CPlayerQuest::InitSteps()
 	}
 
 	// save file
-	std::ofstream fileNew(GetJsonName());
-	fileNew << JsonQuestData;
-	fileNew.close();
+	IOHANDLE File = io_open(GetJsonName().c_str(), IOFLAG_WRITE);
+	if(!File)
+		return;
+
+	std::string Data = JsonQuestData.dump();
+	io_write(File, Data.c_str(), Data.length());
+	io_close(File);
 }
 
 void CPlayerQuest::LoadSteps()
@@ -58,16 +61,25 @@ void CPlayerQuest::LoadSteps()
 		return;
 
 	// loading file is not open pereinitilized steps
-	std::ifstream fileLoad(GetJsonName());
-	if(!fileLoad.is_open() || !fileLoad.good())
+	IOHANDLE File = io_open(GetJsonName().c_str(), IOFLAG_READ);
+	if(!File)
 	{
 		InitSteps();
 		return;
 	}
 
+	const int FileSize = (int)io_length(File) + 1;
+	char* pFileData = (char*)malloc(FileSize);
+	mem_zero(pFileData, FileSize);
+	io_read(File, pFileData, FileSize);
+
+	// close and clear
+	json JsonQuestData = json::parse(pFileData);
+	mem_free(pFileData);
+	io_close(File);
+
 	// loading steps
 	m_StepsQuestBot = Info().CopyBasicSteps();
-	json JsonQuestData = json::parse(fileLoad);
 	m_Step = JsonQuestData.value("current_step", 1);
 	auto Steps = JsonQuestData["steps"];
 	for(auto& pStep : Steps)
@@ -79,11 +91,7 @@ void CPlayerQuest::LoadSteps()
 		m_StepsQuestBot[SubBotID].m_ClientQuitting = false;
 		m_StepsQuestBot[SubBotID].UpdateBot(m_pPlayer->GS());
 		m_StepsQuestBot[SubBotID].CreateStepArrow(m_pPlayer);
-
 	}
-
-	// close file
-	fileLoad.close();
 }
 
 void CPlayerQuest::SaveSteps()
@@ -106,9 +114,13 @@ void CPlayerQuest::SaveSteps()
 	}
 
 	// replace file
-	std::ofstream fileUpdate(GetJsonName());
-	fileUpdate << JsonQuestData;
-	fileUpdate.close();
+	IOHANDLE File = io_open(GetJsonName().c_str(), IOFLAG_WRITE);
+	if(!File)
+		return;
+
+	std::string Data = JsonQuestData.dump();
+	io_write(File, Data.c_str(), Data.length());
+	io_close(File);
 }
 
 void CPlayerQuest::ClearSteps()
@@ -119,7 +131,7 @@ void CPlayerQuest::ClearSteps()
 		pStepBot.second.CreateStepArrow(m_pPlayer);
 	}
 	m_StepsQuestBot.clear();
-	std::remove(GetJsonName().c_str());
+	fs_remove(GetJsonName().c_str());
 }
 
 bool CPlayerQuest::Accept()
