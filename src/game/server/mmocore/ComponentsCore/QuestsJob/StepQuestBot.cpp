@@ -192,7 +192,6 @@ void CPlayerStepQuestBot::AddMobProgress(CPlayer* pPlayer, int BotID)
 	// check complecte mob
 	for(int i = 0; i < 2; i++)
 	{
-		const int SubBotID = m_Bot->m_SubBotID;
 		if(BotID != m_Bot->m_aNeedMob[i] || m_MobProgress[i] >= m_Bot->m_aNeedMobCount[i])
 			continue;
 
