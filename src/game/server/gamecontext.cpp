@@ -1668,6 +1668,8 @@ void CGS::ConConvertQuestSteps(IConsole::IResult* pResult, void* pUserData)
 {
 	IServer* pServer = (IServer*)pUserData;
 	CGS* pSelf = (CGS*)pServer->GameServer(MAIN_WORLD_ID);
+	pSelf->Chat(-1, "It may seem that the server is frozen. It may take some time.");
+	pSelf->Chat(-1, "For more information, see the server logs.");
 
 	// checking dir
 	if(!fs_is_dir("server_data/quest_tmp"))
@@ -1688,7 +1690,7 @@ void CGS::ConConvertQuestSteps(IConsole::IResult* pResult, void* pUserData)
 		std::string JsonName = pSelf->GetQuestInfo(QuestID).GetJsonName(OwnerID);
 
 		// search all steps for active player quest
-		ResultPtr pResSteps = SJK.SD("*", "tw_accounts_quests_bots_step", "WHERE OwnerID = '%d', QuestID = '%d'", OwnerID, QuestID);
+		ResultPtr pResSteps = SJK.SD("*", "tw_accounts_quests_bots_step", "WHERE OwnerID = '%d' AND QuestID = '%d'", OwnerID, QuestID);
 		while(pResSteps->next())
 		{
 			// initilized steps data
@@ -1709,24 +1711,21 @@ void CGS::ConConvertQuestSteps(IConsole::IResult* pResult, void* pUserData)
 			// save file
 			std::ofstream convertFile(JsonName);
 			convertFile << JsonQuestData;
+			if(convertFile.bad())
+			{
+				dbg_msg("convert steps", "error convert with account id %d and quest id %d", OwnerID, QuestID);
+			}
+			else
+			{
+				// delete from database
+				SJK.DD("tw_accounts_quests_bots_step", "WHERE OwnerID = '%d' AND QuestID = '%d'", OwnerID, QuestID);
+				dbg_msg("convert steps", "converted successfully with account id %d and quest id %d", OwnerID, QuestID);
+			}
 			convertFile.close();
-		}
-
-		// checking succesful
-		std::ifstream fileLoad(JsonName);
-		if(fileLoad.is_open() && fileLoad.good())
-		{
-			// delete from database
-			SJK.DD("tw_accounts_quests_bots_step", "WHERE OwnerID = '%d', QuestID = '%d'", OwnerID, QuestID);
-			dbg_msg("convert steps", "converted successfully with account id %d and quest id %d", OwnerID, QuestID);
-		}
-		else
-		{
-			dbg_msg("convert steps", "error convert with account id %d and quest id %d", OwnerID, QuestID);
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 
 		// clear json and close file
-		fileLoad.close();
 		JsonQuestData.clear();
 	}
 }
