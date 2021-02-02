@@ -10,14 +10,16 @@ class CDataQuest
 public:
 	char m_aName[24];
 	char m_aStoryLine[24];
+	int m_QuestID;
 	int m_Gold;
 	int m_Exp;
 
+	std::string GetJsonName(int AuthID) const;
 	const char* GetName() const { return m_aName; }
 	const char* GetStory() const { return m_aStoryLine; }
 	int GetStoryCount(int CountFromQuestID = -1) const;
 
-	std::map<int, CPlayerStepQuestBot> CopySteps()
+	std::map<int, CPlayerStepQuestBot> CopyBasicSteps()
 	{
 		std::map<int, CPlayerStepQuestBot> m_Copy;
 		for(auto& pStepBot : m_StepsQuestBot)

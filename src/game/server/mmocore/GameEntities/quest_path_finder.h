@@ -7,11 +7,12 @@
 
 class CQuestPathFinder : public CEntity
 {
-	int m_ClientID;
-	int m_SubBotID;
 	bool m_MainScenario;
 
 public:
+	int m_ClientID;
+	int m_SubBotID;
+
 	CQuestPathFinder(CGameWorld* pGameWorld, vec2 Pos, int ClientID, BotJob::QuestBotInfo QuestBot);
 
 	virtual void Tick();

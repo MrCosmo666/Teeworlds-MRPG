@@ -25,6 +25,11 @@
 
 #include <teeother/components/localization.h>
 
+// temp
+#include <fstream>
+#include <teeother/tl/nlohmann_json.h>
+using json = nlohmann::json;
+
 // static data that have the same value in different objects
 std::map < int, CGS::StructAttribut > CGS::ms_aAttributsInfo;
 std::map < std::string, int > CGS::ms_aEffects[MAX_PLAYERS];
@@ -1043,7 +1048,7 @@ void CGS::OnConsoleInit()
 	Console()->Register("disband_guild", "r[guildname]", CFGFLAG_SERVER, ConDisbandGuild, m_pServer, "Disband the guild with the name");
 	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, m_pServer, "Say in chat");
 	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, m_pServer, "(Warning) Add new bot on database or update if finding <clientid> <bot name>");
-	Console()->Register("convert_passwords", "", CFGFLAG_SERVER, ConConvertPasswords, m_pServer, "Convert existing plaintext passwords into hashed passwords");
+	Console()->Register("convert_players_steps", "", CFGFLAG_SERVER, ConConvertQuestSteps, m_pServer, "Convert step data from the database to file json format");
 }
 
 void CGS::OnTick()
@@ -1658,20 +1663,71 @@ void CGS::ConAddCharacter(IConsole::IResult *pResult, void *pUserData)
 	pSelf->Mmo()->BotsData()->ConAddCharacterBot(ClientID, pResult->GetString(1));
 }
 
-void CGS::ConConvertPasswords(IConsole::IResult* pResult, void* pUserData)
+// TODO: don't forget to delete
+void CGS::ConConvertQuestSteps(IConsole::IResult* pResult, void* pUserData)
 {
 	IServer* pServer = (IServer*)pUserData;
 	CGS* pSelf = (CGS*)pServer->GameServer(MAIN_WORLD_ID);
 
-	ResultPtr pRes = SJK.SD("ID, Password", "tw_accounts", "WHERE PasswordSalt IS NULL OR PasswordSalt = ''");
-	while(pRes->next())
+	// checking dir
+	if(!fs_is_dir("server_data/quest_tmp"))
 	{
-		char aSalt[32] = { 0 };
-		secure_random_password(aSalt, sizeof(aSalt), 24);
+		fs_makedir("server_data");
+		fs_makedir("server_data/quest_tmp");
+	}
 
-		std::string Password = pSelf->Mmo()->Account()->HashPassword(pRes->getString("Password").c_str(), aSalt);
-		SJK.UD("tw_accounts", "Password = '%s', PasswordSalt = '%s' WHERE ID = %d", Password.c_str(), aSalt, pRes->getInt("ID"));
-		dbg_msg("mrpg", "%d: %s -> %s", pRes->getInt("ID"), pRes->getString("Password").c_str(), Password.c_str());
+	// search active quests
+	json JsonQuestData;
+	ResultPtr pResQuest = SJK.SD("*", "tw_accounts_quests", "WHERE Type = '%d'", (int)QuestState::QUEST_ACCEPT);
+	while(pResQuest->next())
+	{
+		// initilized basicly quest data
+		const int QuestID = pResQuest->getInt("QuestID");
+		const int OwnerID = pResQuest->getInt("OwnerID");
+		const int CurrentStep = pResQuest->getInt("Step");
+		std::string JsonName = pSelf->GetQuestInfo(QuestID).GetJsonName(OwnerID);
+
+		// search all steps for active player quest
+		ResultPtr pResSteps = SJK.SD("*", "tw_accounts_quests_bots_step", "WHERE OwnerID = '%d', QuestID = '%d'", OwnerID, QuestID);
+		while(pResSteps->next())
+		{
+			// initilized steps data
+			const int SubBotID = pResSteps->getInt("SubBotID");
+			const int MobProgress[2] = { pResSteps->getInt("Mob1Progress"), pResSteps->getInt("Mob2Progress") };
+			const bool StepComplete = pResSteps->getBoolean("Completed");
+
+			// convert steps to json file
+			JsonQuestData["current_step"] = CurrentStep;
+			JsonQuestData["steps"].push_back(
+			{
+				{ "subbotid", SubBotID },
+				{ "mobprogress1", MobProgress[0] },
+				{ "mobprogress2", MobProgress[1] },
+				{ "state", StepComplete }
+			});
+
+			// save file
+			std::ofstream convertFile(JsonName);
+			convertFile << JsonQuestData;
+			convertFile.close();
+		}
+
+		// checking succesful
+		std::ifstream fileLoad(JsonName);
+		if(fileLoad.is_open() && fileLoad.good())
+		{
+			// delete from database
+			SJK.DD("tw_accounts_quests_bots_step", "WHERE OwnerID = '%d', QuestID = '%d'", OwnerID, QuestID);
+			dbg_msg("convert steps", "converted successfully with account id %d and quest id %d", OwnerID, QuestID);
+		}
+		else
+		{
+			dbg_msg("convert steps", "error convert with account id %d and quest id %d", OwnerID, QuestID);
+		}
+
+		// clear json and close file
+		fileLoad.close();
+		JsonQuestData.clear();
 	}
 }
 

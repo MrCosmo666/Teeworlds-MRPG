@@ -6,6 +6,8 @@
 #include <game/server/gamecontext.h>
 #include "DataQuests.h"
 
+std::string CDataQuest::GetJsonName(int AuthID) const { return "server_data/quest_tmp/" + std::to_string(m_QuestID) + "-" + std::to_string(AuthID) + ".json"; }
+
 int CDataQuest::GetStoryCount(int CountFromQuestID) const
 {
 	// get total number of quests storyline
