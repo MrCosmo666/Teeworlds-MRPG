@@ -30,18 +30,18 @@ MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 	m_Components.add(m_pAccPlant = new AccountPlantJob());
 	m_Components.add(m_pMailBoxJob = new MailBoxJob());
 
-	for(auto& component : m_Components.m_paComponents)
+	for(auto& pComponent : m_Components.m_paComponents)
 	{
-		component->m_Job = this;
-		component->m_GameServer = pGameServer;
-		component->m_pServer = pGameServer->Server();
+		pComponent->m_Job = this;
+		pComponent->m_GameServer = pGameServer;
+		pComponent->m_pServer = pGameServer->Server();
 
 		if(m_pGameServer->GetWorldID() == MAIN_WORLD_ID)
-			component->OnInit();
+			pComponent->OnInit();
 
 		char aLocalSelect[64];
 		str_format(aLocalSelect, sizeof(aLocalSelect), "WHERE WorldID = '%d'", m_pGameServer->GetWorldID());
-		component->OnInitWorld(aLocalSelect);
+		pComponent->OnInitWorld(aLocalSelect);
 	}
 }
 
@@ -72,9 +72,9 @@ bool MmoController::OnPlayerHandleMainMenu(int ClientID, int Menulist, bool Repl
 	if(!pPlayer || !pPlayer->IsAuthed()) 
 		return true;
 
-	for(auto& component : m_Components.m_paComponents)
+	for(auto& pComponent : m_Components.m_paComponents)
 	{
-		if(component->OnHandleMenulist(pPlayer, Menulist, ReplaceMenu))
+		if(pComponent->OnHandleMenulist(pPlayer, Menulist, ReplaceMenu))
 			return true;
 	}
 	return false;
@@ -85,9 +85,9 @@ bool MmoController::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 	if(!pChr || !pChr->IsAlive()) 
 		return true;
 
-	for(auto & component : m_Components.m_paComponents)
+	for(auto & pComponent : m_Components.m_paComponents)
 	{
-		if(component->OnHandleTile(pChr, IndexCollision))
+		if(pComponent->OnHandleTile(pChr, IndexCollision))
 			return true;
 	}
 	return false;
@@ -98,9 +98,9 @@ bool MmoController::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, con
 	if(!pPlayer)
 		return true;
 
-	for(auto& component : m_Components.m_paComponents)
+	for(auto& pComponent : m_Components.m_paComponents)
 	{
-		if(component->OnHandleVoteCommands(pPlayer, CMD, VoteID, VoteID2, Get, GetText))
+		if(pComponent->OnHandleVoteCommands(pPlayer, CMD, VoteID, VoteID2, Get, GetText))
 			return true;
 	}
 	return false;
@@ -111,14 +111,14 @@ void MmoController::OnMessage(int MsgID, void *pRawMsg, int ClientID)
 	if(!pRawMsg)
 		return;
 
-	for(auto& component : m_Components.m_paComponents)
-		component->OnMessage(MsgID, pRawMsg, ClientID);
+	for(auto& pComponent : m_Components.m_paComponents)
+		pComponent->OnMessage(MsgID, pRawMsg, ClientID);
 }
 
 void MmoController::ResetClientData(int ClientID)
 {
-	for (auto& component : m_Components.m_paComponents)
-		component->OnResetClient(ClientID);
+	for (auto& pComponent : m_Components.m_paComponents)
+		pComponent->OnResetClient(ClientID);
 }
 
 // saving account

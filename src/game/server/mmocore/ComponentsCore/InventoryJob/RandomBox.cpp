@@ -47,31 +47,31 @@ void CRandomBoxRandomizer::Tick()
 {
 	if(!m_LifeTime || m_LifeTime % Server()->TickSpeed() == 0)
 	{
-		auto pSelectedItem = SelectRandomItem();
+		auto pRandomItem = SelectRandomItem();
 		if(m_pPlayer && m_pPlayer->GetCharacter())
 		{
 			vec2 PlayerPosition = m_pPlayer->GetCharacter()->m_Core.m_Pos;
-			GS()->CreateText(nullptr, false, vec2(PlayerPosition.x, PlayerPosition.y - 80), vec2(0, -0.3f), 15, GS()->GetItemInfo(pSelectedItem->m_ItemID).GetName());
+			GS()->CreateText(nullptr, false, vec2(PlayerPosition.x, PlayerPosition.y - 80), vec2(0, -0.3f), 15, GS()->GetItemInfo(pRandomItem->m_ItemID).GetName());
 		}
 
 		if(!m_LifeTime)
 		{
 			// a case when a client changes the world or comes out while choosing a random object.
-			if(!m_pPlayer)
+			InventoryItem* pPlayerRandomItem = m_pPlayer ? &m_pPlayer->GetItem(pRandomItem->m_ItemID) : nullptr;
+			if(!m_pPlayer || (pPlayerRandomItem->Info().IsEnchantable() && pPlayerRandomItem->m_Count > 0))
+				GS()->SendInbox(m_PlayerAuthID, "Random Box", "Item was not received by you personally.", pRandomItem->m_ItemID, pRandomItem->m_Count);
+			else
 			{
-				GS()->SendInbox(m_PlayerAuthID, "Random Box", "Item was not received by you personally.", pSelectedItem->m_ItemID, pSelectedItem->m_Count);
-				GS()->m_World.DestroyEntity(this);
-				return;
+				m_pPlayer->GetItem(pRandomItem->m_ItemID).Add(pRandomItem->m_Count);
+				GS()->CreateDeath(m_pPlayer->m_ViewPos, m_pPlayer->GetCID());
 			}
 
-			// give usually
-			if(m_pPlayerUsesItem)
+			// infromation
+			if(m_pPlayer && m_pPlayerUsesItem)
 			{
-				const char* pClientName = m_pPlayer->GS()->Server()->ClientName(m_pPlayer->GetCID());
-				GS()->Chat(-1, "{STR} uses {STR} and got {STR}x{INT}!", pClientName, m_pPlayerUsesItem->Info().GetName(), GS()->GetItemInfo(pSelectedItem->m_ItemID).GetName(), &pSelectedItem->m_Count);
+				const char* pClientName = GS()->Server()->ClientName(m_pPlayer->GetCID());
+				GS()->Chat(-1, "{STR} uses {STR} and got {STR}x{INT}!", pClientName, m_pPlayerUsesItem->Info().GetName(), pPlayerRandomItem->Info().GetName(), &pRandomItem->m_Count);
 			}
-			m_pPlayer->GetItem(pSelectedItem->m_ItemID).Add(pSelectedItem->m_Count);
-			GS()->CreateDeath(m_pPlayer->m_ViewPos, m_pPlayer->GetCID());
 			GS()->m_World.DestroyEntity(this);
 			return;
 		}

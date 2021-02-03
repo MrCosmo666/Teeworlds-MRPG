@@ -1797,6 +1797,7 @@ void CServer::InitClientBot(int ClientID)
 		
 	m_aClients[ClientID].m_State = CClient::STATE_INGAME;
 	m_aClients[ClientID].m_WorldID = -1;
+	m_aClients[ClientID].m_Score = 1;
 	SetClientClan(ClientID, "::Bots:");
 	SendConnectionReady(ClientID);
 }

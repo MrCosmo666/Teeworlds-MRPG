@@ -8,8 +8,7 @@
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayerBot, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 
-IServer* CPlayer::Server() const { return m_pGS->Server(); };
-
+std::mutex lockingPath;
 CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint)
 : CPlayer(pGS, ClientID), m_BotType(SpawnPoint), m_BotID(BotID), m_SubBotID(SubBotID), m_BotHealth(0)
 {
@@ -22,7 +21,7 @@ CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int Spaw
 CPlayerBot::~CPlayerBot() 
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
-		BotJob::ms_aDataBot[m_BotID].m_aAlreadySnapQuestBot[i] = false;
+		BotJob::ms_aDataBot[m_BotID].m_aAlreadyActiveQuestBot[i] = false;
 
 	CNetMsg_Sv_ClientDrop Msg;
 	Msg.m_ClientID = m_ClientID;
@@ -39,7 +38,6 @@ void CPlayerBot::Tick()
 	if(!Server()->ClientIngame(m_ClientID))
 		return;
 
-	Server()->SetClientScore(m_ClientID, 1);
 	if(m_pCharacter && !m_pCharacter->IsAlive())
 	{
 		delete m_pCharacter;
@@ -50,13 +48,15 @@ void CPlayerBot::Tick()
 	{
 		if(m_pCharacter->IsAlive() && GS()->CheckingPlayersDistance(m_pCharacter->GetPos(), 1000.0f))
 		{
-			TickThreadMobsPathFinder();
 			m_ViewPos = m_pCharacter->GetPos();
+			ThreadMobsPathFinder();
 		}
 		else if(!m_WayPoints.empty())
 		{
+			lockingPath.lock();
 			m_PathSize = 0;
 			m_WayPoints.clear();
+			lockingPath.unlock();
 		}
 	}
 	else if(m_Spawned && m_aPlayerTick[TickState::Respawn]+Server()->TickSpeed()*3 <= Server()->Tick())
@@ -206,13 +206,13 @@ int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 			return 0;
 		
 		// [first] quest bot active for player
-		BotJob::ms_aDataBot[m_BotID].m_aAlreadySnapQuestBot[SnappingClient] = true;
+		BotJob::ms_aDataBot[m_BotID].m_aAlreadyActiveQuestBot[SnappingClient] = true;
 	}
 
 	if(m_BotType == BotsTypes::TYPE_BOT_NPC)
 	{
 		// [second] skip snapping for npc already snap on quest state
-		if(BotJob::ms_aDataBot[m_BotID].m_aAlreadySnapQuestBot[SnappingClient])
+		if(BotJob::ms_aDataBot[m_BotID].m_aAlreadyActiveQuestBot[SnappingClient])
 			return 0;
 		
 		if(!IsActiveQuests(SnappingClient))
@@ -305,7 +305,6 @@ int CPlayerBot::GetEquippedItemID(int EquipID, int SkipItemID) const
 {
 	if (EquipID < EQUIP_HAMMER || EquipID > EQUIP_WINGS || EquipID == EQUIP_MINER)
 		return -1;
-
 	return BotJob::ms_aDataBot[m_BotID].m_aEquipSlot[EquipID];
 }
 
@@ -320,7 +319,6 @@ const char* CPlayerBot::GetStatusBot() const
 	{
 		if (GS()->IsDungeon())
 			return "Boss";
-		
 		return "Raid";
 	}
 
@@ -332,38 +330,13 @@ void CPlayerBot::GenerateNick(char* buffer, int size_buffer)
 	static const int SIZE_GENERATE = 10;
 	const char* FirstPos[SIZE_GENERATE] = { "Ja", "Qu", "Je", "Di", "Xo", "Us", "St", "Th", "Ge", "Re" };
 	const char* LastPos[SIZE_GENERATE] = { "de", "sa", "ul", "ma", "sa", "py", "as", "al", "ly", "in" };
+
 	if(GetBotType() == BotsTypes::TYPE_BOT_MOB && BotJob::ms_aMobBot[m_SubBotID].m_Spread > 0)
-	{
-		char aBuf[24];
-		str_format(aBuf, sizeof(aBuf), "%s %s%s", BotJob::ms_aDataBot[m_BotID].m_aNameBot, FirstPos[random_int() % SIZE_GENERATE], LastPos[random_int() % SIZE_GENERATE]);
-		str_copy(buffer, aBuf, size_buffer);
-	}
+		str_format(buffer, size_buffer, "%s %s%s", BotJob::ms_aDataBot[m_BotID].m_aNameBot, FirstPos[random_int() % SIZE_GENERATE], LastPos[random_int() % SIZE_GENERATE]);
 	else if(GetBotType() == BotsTypes::TYPE_BOT_QUEST && BotJob::ms_aQuestBot[m_SubBotID].m_GenerateNick)
-	{
-		char aBuf[24];
-		str_format(aBuf, sizeof(aBuf), "%s %s%s", BotJob::ms_aDataBot[m_BotID].m_aNameBot, FirstPos[random_int() % SIZE_GENERATE], LastPos[random_int() % SIZE_GENERATE]);
-		str_copy(buffer, aBuf, size_buffer);
-	}
+		str_format(buffer, size_buffer, "%s %s%s", BotJob::ms_aDataBot[m_BotID].m_aNameBot, FirstPos[random_int() % SIZE_GENERATE], LastPos[random_int() % SIZE_GENERATE]);
 	else
 		str_copy(buffer, BotJob::ms_aDataBot[m_BotID].m_aNameBot, size_buffer);
-}
-
-// thread path finder
-void CPlayerBot::TickThreadMobsPathFinder()
-{
-	if(!m_pCharacter || !m_pCharacter->IsAlive())
-		return;
-
-	if(GetBotType() == BotsTypes::TYPE_BOT_MOB)
-	{
-		if(m_TargetPos != vec2(0, 0) && (Server()->Tick() + 3 * m_ClientID) % (Server()->TickSpeed()) == 0)
-			GS()->Mmo()->BotsData()->FindThreadPath(this, m_ViewPos, m_TargetPos);
-		else if(m_TargetPos == vec2(0, 0) || distance(m_ViewPos, m_TargetPos) < 60.0f)
-		{
-			m_LastPosTick = Server()->Tick() + (Server()->TickSpeed() * 2 + rand() % 4);
-			GS()->Mmo()->BotsData()->GetThreadRandomWaypointTarget(this);
-		}
-	}
 }
 
 void CPlayerBot::SendClientInfo(int TargetID)
@@ -400,4 +373,56 @@ int CPlayerBot::GetPlayerWorldID() const
 	else if(m_BotType == BotsTypes::TYPE_BOT_NPC) 
 		return BotJob::ms_aNpcBot[m_SubBotID].m_WorldID;
 	return BotJob::ms_aQuestBot[m_SubBotID].m_WorldID;
+}
+
+/***********************************************************************************/
+/*  Thread path finderdon't want to secure m_TargetPos, or m_WayPoints with mutex  */
+/***********************************************************************************/
+static void FindThreadPath(CGS* pGameServer, CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos)
+{
+	if(!pGameServer || !pBotPlayer || length(StartPos) <= 0 || length(SearchPos) <= 0
+		|| pGameServer->Collision()->CheckPoint(StartPos) || pGameServer->Collision()->CheckPoint(SearchPos))
+		return;
+
+	lockingPath.lock();
+	pGameServer->PathFinder()->Init();
+	pGameServer->PathFinder()->SetStart(StartPos);
+	pGameServer->PathFinder()->SetEnd(SearchPos);
+	pGameServer->PathFinder()->FindPath();
+	pBotPlayer->m_PathSize = pGameServer->PathFinder()->m_FinalSize;
+	for(int i = pBotPlayer->m_PathSize - 1, j = 0; i >= 0; i--, j++)
+	{
+		pBotPlayer->m_WayPoints[j] = vec2(pGameServer->PathFinder()->m_lFinalPath[i].m_Pos.x * 32 + 16, pGameServer->PathFinder()->m_lFinalPath[i].m_Pos.y * 32 + 16);
+	}
+	lockingPath.unlock();
+}
+
+static void GetThreadRandomWaypointTarget(CGS* pGameServer, CPlayerBot* pBotPlayer)
+{
+	if(!pGameServer || !pBotPlayer)
+		return;
+
+	lockingPath.lock();
+	vec2 TargetPos = pGameServer->PathFinder()->GetRandomWaypoint();
+	pBotPlayer->m_TargetPos = vec2(TargetPos.x * 32, TargetPos.y * 32);
+	lockingPath.unlock();
+}
+
+void CPlayerBot::ThreadMobsPathFinder()
+{
+	if(!m_pCharacter || !m_pCharacter->IsAlive())
+		return;
+
+	if(GetBotType() == BotsTypes::TYPE_BOT_MOB)
+	{
+		if(m_TargetPos != vec2(0, 0) && (Server()->Tick() + 3 * m_ClientID) % (Server()->TickSpeed()) == 0)
+		{
+			std::thread(&FindThreadPath, GS(), this, m_ViewPos, m_TargetPos).detach();
+		}
+		else if(m_TargetPos == vec2(0, 0) || distance(m_ViewPos, m_TargetPos) < 60.0f)
+		{
+			m_LastPosTick = Server()->Tick() + (Server()->TickSpeed() * 2 + rand() % 4);
+			std::thread(&GetThreadRandomWaypointTarget, GS(), this).detach();
+		}
+	}
 }

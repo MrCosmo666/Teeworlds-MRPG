@@ -8,7 +8,6 @@
 
 class CPlayerQuest
 {
-	void Finish();
 
 public:
 	int m_QuestID;
@@ -17,15 +16,23 @@ public:
 	int m_State;
 	int m_Step;
 
-	// steps with array bot data on active step
-	std::map < int, CPlayerStepQuestBot > m_StepsQuestBot;
-
-	void CheckaAvailableNewStep();
-	bool Accept();
-
+	std::string GetJsonName() const;
 	CDataQuest& Info() const;
 	bool IsComplected() const { return m_State == QuestState::QUEST_FINISHED; }
 	int GetState() const { return m_State; }
+
+	// steps
+	void InitSteps();
+	void LoadSteps();
+	void SaveSteps();
+	void ClearSteps();
+	std::map < int, CPlayerStepQuestBot > m_StepsQuestBot;
+
+	// main
+	void CheckaAvailableNewStep();
+	bool Accept();
+private:
+	void Finish();
 };
 
 #endif

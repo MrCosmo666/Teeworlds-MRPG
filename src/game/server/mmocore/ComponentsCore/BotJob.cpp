@@ -3,8 +3,6 @@
 #include <game/server/gamecontext.h>
 #include "BotJob.h"
 
-#include <game/server/mmocore/PathFinder.h>
-
 using namespace sqlstr;
 
 // bot structures
@@ -220,7 +218,7 @@ void BotJob::LoadMainInformationBots()
 		}
 
 		for(int i = 0; i < MAX_PLAYERS; i++)
-			ms_aDataBot[BotID].m_aAlreadySnapQuestBot[i] = false;
+			ms_aDataBot[BotID].m_aAlreadyActiveQuestBot[i] = false;
 
 		ms_aDataBot[BotID].m_aEquipSlot[EQUIP_HAMMER] = pRes->getInt("SlotHammer");
 		ms_aDataBot[BotID].m_aEquipSlot[EQUIP_GUN] = pRes->getInt("SlotGun");
@@ -363,43 +361,11 @@ void BotJob::LoadMobsBots(const char* pWhereLocalWorld)
 
 const char* BotJob::GetMeaninglessDialog()
 {
-	const char* pTalking[3] = { 
+	const char* pTalking[3] = 
+	{ 
 		"[Player], do you have any questions? I'm sorry I can't help you.", 
 		"What a beautiful [Time]. I don't have anything for you [Player].", 
-		"[Player] are you interested something? I'm sorry, don't want to talk right now." };
+		"[Player] are you interested something? I'm sorry, don't want to talk right now." 
+	};
 	return pTalking[random_int()%3];
-}
-
-// threading CPathFinderThread botai ? TODO: protect BotPlayer?
-std::mutex lockingPath;
-void BotJob::FindThreadPath(class CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos)
-{
-	if(length(StartPos) <= 0 || length(SearchPos) <= 0 || GS()->Collision()->CheckPoint(StartPos) || GS()->Collision()->CheckPoint(SearchPos))
-		return;
-
-	std::thread([pBotPlayer, StartPos, SearchPos]()
-	{
-		lockingPath.lock();
-		pBotPlayer->GS()->PathFinder()->Init();
-		pBotPlayer->GS()->PathFinder()->SetStart(StartPos);
-		pBotPlayer->GS()->PathFinder()->SetEnd(SearchPos);
-		pBotPlayer->GS()->PathFinder()->FindPath();
-		pBotPlayer->m_PathSize = pBotPlayer->GS()->PathFinder()->m_FinalSize;
-		for(int i = pBotPlayer->m_PathSize - 1, j = 0; i >= 0; i--, j++)
-		{
-			pBotPlayer->m_WayPoints[j] = vec2(pBotPlayer->GS()->PathFinder()->m_lFinalPath[i].m_Pos.x * 32 + 16, pBotPlayer->GS()->PathFinder()->m_lFinalPath[i].m_Pos.y * 32 + 16);
-		}
-		lockingPath.unlock();
-	}).detach();
-}
-
-void BotJob::GetThreadRandomWaypointTarget(class CPlayerBot* pBotPlayer)
-{
-	std::thread([this, pBotPlayer]()
-	{
-		lockingPath.lock();
-		vec2 TargetPos = pBotPlayer->GS()->PathFinder()->GetRandomWaypoint();
-		pBotPlayer->m_TargetPos = vec2(TargetPos.x * 32, TargetPos.y * 32);
-		lockingPath.unlock();
-	}).detach();
 }

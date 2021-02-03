@@ -78,9 +78,6 @@ int CPlayerStepQuestBot::GetCountBlockedItem(CPlayer* pPlayer, int ItemID) const
 		const int BlockedItemCount = m_Bot->m_aItemSearchCount[i];
 		if(BlockedItemID <= 0 || BlockedItemCount <= 0 || ItemID != BlockedItemID)
 			continue;
-
-		// if(pPlayer->GetItem(ItemID).m_Count <= BlockedItemCount)
-		//	pGS->Chat(ClientID, "{STR}x{INT} item frozen for {STR} quest NPC!", pPlayer->GetItem(BlockedItemID).Info().GetName(pPlayer), &BlockedItemCount, m_Bot->GetName());
 		return BlockedItemCount;
 	}
 	return 0;
@@ -94,7 +91,6 @@ bool CPlayerStepQuestBot::IsCompleteItems(CPlayer* pPlayer) const
 		const int Count = m_Bot->m_aItemSearchCount[i];
 		if(ItemID <= 0 || Count <= 0)
 			continue;
-
 		if(pPlayer->GetItem(ItemID).m_Count < Count)
 			return false;
 	}
@@ -109,7 +105,6 @@ bool CPlayerStepQuestBot::IsCompleteMobs(CPlayer* pPlayer) const
 		const int Count = m_Bot->m_aNeedMobCount[i];
 		if(MobID <= 0 || Count <= 0)
 			continue;
-
 		if(m_MobProgress[i] < Count)
 			return false;
 	}
@@ -137,8 +132,8 @@ bool CPlayerStepQuestBot::Finish(CPlayer* pPlayer, bool FinalStepTalking)
 
 	// update state complete
 	m_StepComplete = true;
-	SJK.UD("tw_accounts_quests_bots_step", "Completed = '1' WHERE SubBotID = '%d' AND OwnerID = '%d'", m_Bot->m_SubBotID, pPlayer->Acc().m_AuthID);
-	BotJob::ms_aDataBot[m_Bot->m_BotID].m_aAlreadySnapQuestBot[ClientID] = false;
+	BotJob::ms_aDataBot[m_Bot->m_BotID].m_aAlreadyActiveQuestBot[ClientID] = false;
+	QuestJob::ms_aPlayerQuests[ClientID][QuestID].SaveSteps();
 	UpdateBot(pGS);
 
 	QuestJob::ms_aPlayerQuests[ClientID][QuestID].CheckaAvailableNewStep();
@@ -197,7 +192,6 @@ void CPlayerStepQuestBot::AddMobProgress(CPlayer* pPlayer, int BotID)
 	// check complecte mob
 	for(int i = 0; i < 2; i++)
 	{
-		const int SubBotID = m_Bot->m_SubBotID;
 		if(BotID != m_Bot->m_aNeedMob[i] || m_MobProgress[i] >= m_Bot->m_aNeedMobCount[i])
 			continue;
 
@@ -205,7 +199,7 @@ void CPlayerStepQuestBot::AddMobProgress(CPlayer* pPlayer, int BotID)
 		if(m_MobProgress[i] >= m_Bot->m_aNeedMobCount[i])
 			pGS->Chat(ClientID, "[Done] Defeat the {STR}'s for the {STR}!", BotJob::ms_aDataBot[BotID].m_aNameBot, m_Bot->GetName());
 
-		SJK.UD("tw_accounts_quests_bots_step", "Mob1Progress = '%d', Mob2Progress = '%d' WHERE SubBotID = '%d' AND OwnerID = '%d'", m_MobProgress[0], m_MobProgress[1], SubBotID, pPlayer->Acc().m_AuthID);
+		QuestJob::ms_aPlayerQuests[ClientID][QuestID].SaveSteps();
 		break;
 	}
 }
@@ -219,6 +213,12 @@ void CPlayerStepQuestBot::CreateStepArrow(CPlayer* pPlayer)
 	{
 		CGS* pGS = pPlayer->GS();
 		const int ClientID = pPlayer->GetCID();
+		for(CQuestPathFinder* pFq = (CQuestPathFinder*)pGS->m_World.FindFirst(CGameWorld::ENTTYPE_FINDQUEST); pFq; pFq = (CQuestPathFinder*)pFq->TypeNext())
+		{
+			if(pFq->m_SubBotID == m_Bot->m_SubBotID && pFq->m_ClientID == ClientID)
+				return;
+		}
+
 		new CQuestPathFinder(&pGS->m_World, pPlayer->GetCharacter()->m_Core.m_Pos, ClientID, *m_Bot);
 	}
 }

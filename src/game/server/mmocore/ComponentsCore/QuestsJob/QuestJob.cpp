@@ -15,6 +15,7 @@ void QuestJob::OnInit()
 	while(pRes->next())
 	{
 		const int QUID = pRes->getInt("ID");
+		ms_aDataQuests[QUID].m_QuestID = QUID;
 		str_copy(ms_aDataQuests[QUID].m_aName, pRes->getString("Name").c_str(), sizeof(ms_aDataQuests[QUID].m_aName));
 		str_copy(ms_aDataQuests[QUID].m_aStoryLine, pRes->getString("StoryLine").c_str(), sizeof(ms_aDataQuests[QUID].m_aStoryLine));
 		ms_aDataQuests[QUID].m_Gold = (int)pRes->getInt("Money");
@@ -29,23 +30,10 @@ void QuestJob::OnInitAccount(CPlayer* pPlayer)
 	while(pRes->next())
 	{
 		const int QuestID = pRes->getInt("QuestID");
+		ms_aPlayerQuests[ClientID][QuestID].m_pPlayer = pPlayer;
+		ms_aPlayerQuests[ClientID][QuestID].m_QuestID = QuestID;
 		ms_aPlayerQuests[ClientID][QuestID].m_State = (int)pRes->getInt("Type");
-		ms_aPlayerQuests[ClientID][QuestID].m_Step = (int)pRes->getInt("Step");
-		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot = ms_aDataQuests[QuestID].CopySteps();
-	}
-
-	// init data steps players
-	ResultPtr pResStep = SJK.SD("*", "tw_accounts_quests_bots_step", "WHERE OwnerID = '%d' ", pPlayer->Acc().m_AuthID);
-	while(pResStep->next())
-	{
-		const int SubBotID = pResStep->getInt("SubBotID"); // is a unique value
-		const int QuestID = BotJob::ms_aQuestBot[SubBotID].m_QuestID;
-		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].m_Bot = &BotJob::ms_aQuestBot[SubBotID];
-		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].m_MobProgress[0] = pResStep->getInt("Mob1Progress");
-		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].m_MobProgress[1] = pResStep->getInt("Mob1Progress");
-		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].m_StepComplete = pResStep->getBoolean("Completed");
-		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].m_ClientQuitting = false;
-		ms_aPlayerQuests[ClientID][QuestID].m_StepsQuestBot[SubBotID].UpdateBot(GS());
+		ms_aPlayerQuests[ClientID][QuestID].LoadSteps();
 	}
 }
 
