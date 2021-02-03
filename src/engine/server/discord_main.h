@@ -19,8 +19,8 @@ private:
 	/* Discord main functions                                               */
 	/************************************************************************/
 	void onMessage(SleepyDiscord::Message message) override;
-	bool SendGenerateMessage(SleepyDiscord::User UserRequestFrom, const char* pChanal, const char* pTitle, const char* pSearchNickname, const char* pColor = "\0", bool MultipleSearch = true);
-	bool SendGenerateMessageAuthID(SleepyDiscord::User UserRequestFrom, const char* pChanal, const char* pTitle, int AuthID, const char* pColor = "\0");
+	bool SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::string Chanal, std::string Title, std::string SearchNickname, std::string Color = "\0", bool MultipleSearch = true);
+	bool SendGenerateMessageAuthID(SleepyDiscord::User UserRequestFrom, std::string Chanal, std::string Title, int AuthID, std::string Color = "\0");
 
 	/************************************************************************/
 	/* Discord teeworlds server side                                        */
