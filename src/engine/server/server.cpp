@@ -470,9 +470,9 @@ int CServer::GetClientWorldID(int ClientID)
 
 void CServer::SendDiscordGenerateMessage(const char *pTitle, int AuthID, const char* pColor)
 {
-	#ifdef CONF_DISCORD
-	DiscordTask ThreadTask(std::bind(&DiscordJob::SendGenerateMessageAuthID, m_pDiscord, SleepyDiscord::User(), g_Config.m_SvDiscordChanal, pTitle, AuthID, pColor));
-	m_pDiscord->AddThreadTask(ThreadTask);
+#ifdef CONF_DISCORD
+	DiscordTask Task(std::bind(&DiscordJob::SendGenerateMessageAuthID, m_pDiscord, SleepyDiscord::User(), std::string(g_Config.m_SvDiscordChanal), std::string(pTitle), AuthID, std::string(pColor)));
+	m_pDiscord->AddThreadTask(Task);
 	#endif
 }
 
@@ -481,18 +481,18 @@ void CServer::SendDiscordMessage(const char *pChannel, const char* pColor, const
 #ifdef CONF_DISCORD
 	SleepyDiscord::Embed embed;
 	embed.title = std::string(pTitle);
+	embed.description = std::string(pText);
 	embed.color = string_to_number(pColor, 0, 1410065407);
-	embed.description = pText;
 
-	DiscordTask ThreadTask(std::bind(&DiscordJob::sendMessageWithoutResponse, m_pDiscord, pChannel, std::string("\0"), embed));
-	m_pDiscord->AddThreadTask(ThreadTask);
+	DiscordTask Task(std::bind(&DiscordJob::sendMessageWithoutResponse, m_pDiscord, std::string(pChannel), std::string("\0"), embed));
+	m_pDiscord->AddThreadTask(Task);
 	#endif
 }
 
 void CServer::UpdateDiscordStatus(const char *pStatus)
 {
 #ifdef CONF_DISCORD
-	DiscordTask ThreadTask(std::bind(&DiscordJob::updateStatus, m_pDiscord, pStatus, std::numeric_limits<uint64_t>::max(), SleepyDiscord::online, false));
+	DiscordTask ThreadTask(std::bind(&DiscordJob::updateStatus, m_pDiscord, std::string(pStatus), std::numeric_limits<uint64_t>::max(), SleepyDiscord::online, false));
 	m_pDiscord->AddThreadTask(ThreadTask);
 	#endif
 }
@@ -1616,7 +1616,7 @@ int CServer::Run()
 					// reinit gamecontext
 					for(auto& pWorld : WorldsInstance->ms_aWorlds)
 						pWorld.second.m_pGameServer->OnInit(pWorld.first);
-					Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "A week-long server restart without players.");
+					Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "A long server restart without players.");
 				}
 			}
 
