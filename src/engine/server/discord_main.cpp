@@ -202,7 +202,7 @@ bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::s
 		embed.image.width = 600;
 		embed.image.url = ImageUrl;
 		embed.image.proxyUrl = ImageUrl;
-		embed.color = Color[0] != '\0' ? string_to_number(Color.c_str(), 0, 1410065407) : 1703301;
+		embed.color = Color[0] != '\0' ? string_to_number(Color.c_str(), 0, 1410065407) : 16738560;
 		std::string DiscordID(pRes->getString("DiscordID").c_str());
 		if(DiscordID.compare("null") != 0)
 		{

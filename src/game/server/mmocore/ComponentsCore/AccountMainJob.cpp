@@ -163,7 +163,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 			GS()->Chat(ClientID, "You have {INT} unread messages!", &CountMessageInbox);
 
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
-		GS()->SendCompleteEquippingItems(ClientID);
+		GS()->SendFullyEquipments(ClientID);
 		return;
 	}
 
@@ -195,7 +195,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		pPlayer->ChangeWorld(LatestCorrectWorldID);
 		return;
 	}
-	GS()->SendCompleteEquippingItems(ClientID);
+	GS()->SendFullyEquipments(ClientID);
 }
 
 void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)

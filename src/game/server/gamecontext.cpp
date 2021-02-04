@@ -36,13 +36,13 @@ int CGS::m_MultiplierExp = 100;
 
 CGS::CGS()
 {
-	for(auto& BroadcastState : m_aBroadcastStates)
+	for(auto& pBroadcastState : m_aBroadcastStates)
 	{
-		BroadcastState.m_NoChangeTick = 0;
-		BroadcastState.m_LifeSpanTick = 0;
-		BroadcastState.m_Priority = 0;
-		BroadcastState.m_aPrevMessage[0] = 0;
-		BroadcastState.m_aNextMessage[0] = 0;
+		pBroadcastState.m_NoChangeTick = 0;
+		pBroadcastState.m_LifeSpanTick = 0;
+		pBroadcastState.m_Priority = 0;
+		pBroadcastState.m_aPrevMessage[0] = 0;
+		pBroadcastState.m_aNextMessage[0] = 0;
 	}
 
 	for(auto& apPlayer : m_apPlayers)
@@ -78,7 +78,6 @@ class CCharacter *CGS::GetPlayerChar(int ClientID)
 	return m_apPlayers[ClientID]->GetCharacter();
 }
 
-// easy to get a player (ClientID, Authorization, Character).
 CPlayer *CGS::GetPlayer(int ClientID, bool CheckAuthed, bool CheckCharacter)
 {
 	if(ClientID < 0 || ClientID >= MAX_CLIENTS || !m_apPlayers[ClientID])
@@ -335,11 +334,11 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 
 	if(Mode == CHAT_ALL)
 	{
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
-		
 		// send discord chat only from players
 		if(ChatterClientID < MAX_PLAYERS)
 			ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
+
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
 	}
 	else if(Mode == CHAT_TEAM)
 	{
@@ -350,12 +349,12 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 			return;
 		}
 
-		// pack one for the recording only
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOSEND, -1);
-
 		// send discord chat only from players
 		if(pChatterPlayer)
 			ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
+
+		// pack one for the recording only
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOSEND, -1);
 
 		// send chat to guild team
 		const int GuildID = pChatterPlayer->Acc().m_GuildID;
@@ -784,8 +783,8 @@ void CGS::SendSkinChange(int ClientID, int TargetID)
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID);
 }
 
-// Send Equip Items
-void CGS::SendEquipItem(int ClientID, int TargetID)
+// Send equipments
+void CGS::SendEquipments(int ClientID, int TargetID)
 {
 	CPlayer *pPlayer = GetPlayer(ClientID);
 	if(!pPlayer)
@@ -806,14 +805,14 @@ void CGS::SendEquipItem(int ClientID, int TargetID)
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD, TargetID, MsgWorldID);
 }
 
-// Send equipment in radius
-void CGS::SendCompleteEquippingItems(int TargetID)
+// Send fully players equipments
+void CGS::SendFullyEquipments(int TargetID)
 {
 	for (int i = 0; i < MAX_CLIENTS; i++)
-			SendEquipItem(i, TargetID);
+			SendEquipments(i, TargetID);
 
-	SendEquipItem(TargetID, TargetID);
-	SendEquipItem(TargetID, -1);
+	SendEquipments(TargetID, TargetID);
+	SendEquipments(TargetID, -1);
 }
 
 void CGS::SendTeam(int ClientID, int Team, bool DoChatMsg, int TargetID)
@@ -859,7 +858,7 @@ void CGS::UpdateClientInformation(int ClientID)
 		return;
 	
 	pPlayer->SendClientInfo(-1);
-	SendEquipItem(ClientID, -1);
+	SendEquipments(ClientID, -1);
 }
 
 void CGS::SendChatCommand(const CCommandManager::CCommand* pCommand, int ClientID)
@@ -926,6 +925,15 @@ void CGS::SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const cha
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
+void CGS::ClearTalkText(int ClientID)
+{
+	if(!IsMmoClient(ClientID))
+		return;
+
+	CNetMsg_Sv_ClearTalkText Msg;
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+}
+
 void CGS::SendProgressBar(int ClientID, int Count, int Request, const char* Message)
 {
 	CNetMsg_Sv_ProgressBar Msg;
@@ -935,14 +943,6 @@ void CGS::SendProgressBar(int ClientID, int Count, int Request, const char* Mess
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
-void CGS::ClearTalkText(int ClientID)
-{
-	if(!IsMmoClient(ClientID))
-		return;
-
-	CNetMsg_Sv_ClearTalkText Msg;
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-}
 
 /* #########################################################################
 	ENGINE GAMECONTEXT 
@@ -1358,7 +1358,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			Server()->SendPackMsg(&GoodCheck, MSGFLAG_VITAL|MSGFLAG_FLUSH|MSGFLAG_NORECORD, ClientID);
 
 			// loading of all parts of players' data
-			SendCompleteEquippingItems(ClientID);
+			SendFullyEquipments(ClientID);
 		}
 		else 
 			Mmo()->OnMessage(MsgID, pRawMsg, ClientID);
@@ -2269,21 +2269,21 @@ void CGS::ShowVotesPlayerStats(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
 	AVH(ClientID, TAB_INFO_STAT, BLUE_COLOR, "Player Stats {STR}", IsDungeon() ? "(Sync)" : "\0");
-	for(const auto& at : ms_aAttributsInfo)
+	for(const auto& pAtt : ms_aAttributsInfo)
 	{
-		if(str_comp_nocase(at.second.m_aFieldName, "unfield") == 0) 
+		if(str_comp_nocase(pAtt.second.m_aFieldName, "unfield") == 0)
 			continue;
 	
 		// if upgrades are cheap, they have a division of statistics
-		const int AttributeSize = pPlayer->GetAttributeCount(at.first);
-		if(at.second.m_UpgradePrice < 10)
+		const int AttributeSize = pPlayer->GetAttributeCount(pAtt.first);
+		if(pAtt.second.m_Devide <= 1)
 		{
-			const int AttributeRealSize = pPlayer->GetAttributeCount(at.first, true);
-			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} (+{INT}) - {STR}", &AttributeSize, &AttributeRealSize, at.second.m_aName);
+			const int AttributeRealSize = pPlayer->GetAttributeCount(pAtt.first, true);
+			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} (+{INT}) - {STR}", &AttributeSize, &AttributeRealSize, pAtt.second.m_aName);
 			continue;
 		}
 
-		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "+{INT} - {STR}", &AttributeSize, at.second.m_aName);
+		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "+{INT} - {STR}", &AttributeSize, pAtt.second.m_aName);
 	}
 
 	AVM(ClientID, "null", NOPE, NOPE, "Player Upgrade Point: {INT}P", &pPlayer->Acc().m_Upgrade);
@@ -2465,7 +2465,7 @@ void CGS::ChangeEquipSkin(int ClientID, int ItemID)
 	if(!pPlayer || GetItemInfo(ItemID).m_Type != ItemType::TYPE_EQUIP || GetItemInfo(ItemID).m_Function == EQUIP_DISCORD || GetItemInfo(ItemID).m_Function == EQUIP_MINER)
 		return;
 
-	SendEquipItem(ClientID, -1);
+	SendEquipments(ClientID, -1);
 }
 
 int CGS::GetExperienceMultiplier(int Experience) const
