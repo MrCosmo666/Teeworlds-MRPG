@@ -51,6 +51,8 @@ void CTalkText::Clear()
 
 void CTalkText::OnInit()
 {
+	Clear();
+
 	m_ScreenWidth = 400 * 3.0f * Graphics()->ScreenAspect();
 	m_ScreenHeight = 400 * 3.0f;
 	m_pAnimBackground = m_pClient->AnimUI()->Get("TalkingBackground");
@@ -69,7 +71,7 @@ void CTalkText::OnStateChange(int NewState, int OldState)
 
 void CTalkText::OnRender()
 {
-	if(!IsActive() || m_pClient->m_pMenus->IsActive())
+	if(!IsActive())
 		return;
 
 	Graphics()->MapScreen(0, 0, m_ScreenWidth, m_ScreenHeight);
