@@ -38,26 +38,28 @@ void CMenus::RenderRgbSliders(CUIRect* pMainView, CUIRect* pButton, int &r, int 
 		}
 		else
 			DoScrollbarH(pColorSlider[i], pButton, 0);
+
 		UI()->DoLabel(&Text, pLabels[i], 15.0f, CUI::ALIGN_LEFT);
 	}
 }
 
 void CMenus::RenderSettingsMmo(CUIRect MainView)
 {
-	CUIRect Label, Button, Tabbar;
 	static int s_SettingsPage = 0;
+
+	// draw tab menu
+	CUIRect Label, Button, Tabbar;
 	MainView.HSplitTop(20.0f, 0, &MainView);
 	MainView.HSplitTop(20.0f, &Tabbar, &MainView);
 
-	// draw tab menu
 	const int TAB_SIZE = 4;
 	const char* Tabs[TAB_SIZE] = { "General", "Visual", "Gamer", "Credits" };
 	const int Corner[TAB_SIZE] = { CUI::CORNER_TL, 0, 0, CUI::CORNER_TR };
+	static CButtonContainer s_Buttons[TAB_SIZE];
 	for (int i = 0; i < TAB_SIZE; i++)
 	{
 		Tabbar.VSplitLeft(100.0f, &Button, &Tabbar);
 
-		static CButtonContainer s_Buttons[3];
 		if (DoButton_MenuTabTop(&s_Buttons[i], Tabs[i], Client()->State() == IClient::STATE_OFFLINE && s_SettingsPage == i, &Button, s_SettingsPage == i ? 1.0f : 1.5f, 1.0f, Corner[i], 6.0f))
 			s_SettingsPage = i;
 	}
@@ -66,7 +68,8 @@ void CMenus::RenderSettingsMmo(CUIRect MainView)
 	MainView.HSplitTop(400.0f, &MainView, &Label);
 	RenderSettingsMmoGeneral(MainView, s_SettingsPage);
 
-	const char* apInformation[TAB_SIZE] = {
+	const char* apInformation[TAB_SIZE] = 
+	{
 		"Setting up the general part of the client",
 		"Setting up the visual part of the client",
 		"Features of the Gamer Client (Dune)",
@@ -81,7 +84,7 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 	float ButtonHeight = 20.0f;
 	float Spacing = 2.0f;
 	CUIRect Button;
-	RenderTools()->DrawUIRect4(&MainView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), 0, 5.0f);
+	RenderTools()->DrawUIRect4(&MainView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 100.0f), vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 100.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), 0, 5.0f);
 
 	// general
 	if (Page == 0)
@@ -91,7 +94,7 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 
 		// ---------------------- LEFT SIDE --------------------------
 		UI()->DoLabel(&BasicLeft, "General Mmo Settings", 12.0f, CUI::ALIGN_CENTER);
-		BasicLeft.HSplitTop(14.0f, &Button, &BasicLeft);
+		BasicLeft.HSplitTop(18.0f, &Button, &BasicLeft);
 
 		// vanilla damage ind
 		BasicLeft.HSplitTop(Spacing, 0, &BasicLeft);
@@ -131,12 +134,12 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 
 		// --------------------- RIGHT SIDE --------------------------
 		UI()->DoLabel(&BasicRight, "Customize", 12.0f, CUI::ALIGN_CENTER);
-		BasicRight.HSplitTop(14.0f, &Button, &BasicRight);
+		BasicRight.HSplitTop(18.0f, &Button, &BasicRight);
 
 		// background
 		CUIRect BackgroundExpBar = Button;
-		BasicRight.HSplitTop(ButtonHeight * 4.2f, &BackgroundExpBar, 0);
-		RenderTools()->DrawUIRect(&BackgroundExpBar, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 80.0f), CUI::CORNER_ALL, 5.0f);
+		BasicRight.HSplitTop(ButtonHeight * 5.0f, &BackgroundExpBar, 0);
+		RenderTools()->DrawUIRect(&BackgroundExpBar, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 100.0f), CUI::CORNER_ALL, 5.0f);
 		
 		// expbar
 		CUIRect ExpBar;
@@ -445,13 +448,13 @@ void CMenus::PreparationLeftRightSide(const char* pName, CUIRect MainView, CUIRe
 		CUIRect BackLeft;
 		LeftSide->VMargin(Spacing * 2.0f, &BackLeft);
 		BackLeft.VMargin(2.0f, LeftSide);
-		RenderTools()->DrawUIRect(&BackLeft, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), CUI::CORNER_ALL, 5.0f);
+		RenderTools()->DrawUIRect(&BackLeft, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 100.0f), CUI::CORNER_ALL, 5.0f);
 	}
 	{ // right
 		CUIRect BackRight;
 		RightSide->VMargin(Spacing * 2.0f, &BackRight);
 		BackRight.VMargin(2.0f, RightSide);
-		RenderTools()->DrawUIRect(&BackRight, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 50.0f), CUI::CORNER_ALL, 5.0f);
+		RenderTools()->DrawUIRect(&BackRight, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 100.0f), CUI::CORNER_ALL, 5.0f);
 	}
 	LeftSide->VSplitRight(Spacing * 0.5f, LeftSide, 0);
 	RightSide->VSplitLeft(Spacing * 0.5f, 0, RightSide);

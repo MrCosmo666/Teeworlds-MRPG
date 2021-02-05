@@ -159,8 +159,8 @@ public:
 	void SendMotd(int ClientID);
 	void SendSettings(int ClientID);
 	void SendSkinChange(int ClientID, int TargetID);
-	void SendEquipItem(int ClientID, int TargetID);
-	void SendCompleteEquippingItems(int TargetID);
+	void SendEquipments(int ClientID, int TargetID);
+	void SendFullyEquipments(int TargetID);
 	void SendTeam(int ClientID, int Team, bool DoChatMsg, int TargetID);
 	void SendGameMsg(int GameMsgID, int ClientID);
 	void SendGameMsg(int GameMsgID, int ParaI1, int ClientID);
@@ -173,9 +173,9 @@ public:
 	void SendRemoveChatCommand(const CCommandManager::CCommand* pCommand, int ClientID);
 
 	void SendTuningParams(int ClientID);
-	void SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char *Message, int Style = -1, int TalkingEmote = -1);
-	void SendProgressBar(int ClientID, int Count, int Request, const char *Message);
+	void SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char* Message, int Style = -1, int TalkingEmote = -1);
 	void ClearTalkText(int ClientID);
+	void SendProgressBar(int ClientID, int Count, int Request, const char *Message);
 
 	/* #########################################################################
 		ENGINE GAMECONTEXT 

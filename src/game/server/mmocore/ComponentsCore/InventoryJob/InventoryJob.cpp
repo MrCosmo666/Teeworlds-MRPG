@@ -236,7 +236,7 @@ bool InventoryJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const
 		const int EnchantLevel = pItemPlayer.m_Enchant + 1;
 		pItemPlayer.SetEnchant(EnchantLevel);
 		if(pItemPlayer.IsEnchantMaxLevel())
-			GS()->SendEquipItem(ClientID, -1);
+			GS()->SendEquipments(ClientID, -1);
 
 		char aEnchantBuf[16];
 		pItemPlayer.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf));
