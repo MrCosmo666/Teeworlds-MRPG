@@ -226,9 +226,6 @@ private:
 	static void NewCommandHook(const CCommandManager::CCommand* pCommand, void* pContext);
 	static void RemoveCommandHook(const CCommandManager::CCommand* pCommand, void* pContext);
 
-	// temp
-	static void ConConvertQuestSteps(IConsole::IResult* pResult, void* pUserData);
-
 	/* #########################################################################
 		VOTING MMO GAMECONTEXT 
 	######################################################################### */
@@ -249,7 +246,6 @@ public:
 	void ClearVotes(int ClientID);
 	void ShowVotesNewbieInformation(int ClientID);
 	void ResetVotes(int ClientID, int MenuList);
-	void ResetVotesTransaction(int ClientID, int MenuList);
 	void StrongUpdateVotes(int ClientID, int MenuList);
 	void StrongUpdateVotesForAll(int MenuList);
 	void AddVotesBackpage(int ClientID);
