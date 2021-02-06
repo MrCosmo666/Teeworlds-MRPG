@@ -304,7 +304,10 @@ void QuestJob::AddMobProgressQuests(CPlayer* pPlayer, int BotID)
 			continue;
 
 		for(auto& pStepBot : pPlayerQuest.second.m_StepsQuestBot)
-			pStepBot.second.AddMobProgress(pPlayer, BotID);
+		{
+			if(pPlayerQuest.second.m_Step == pStepBot.second.m_Bot->m_Step)
+				pStepBot.second.AddMobProgress(pPlayer, BotID);
+		}
 	}
 }
 
