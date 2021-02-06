@@ -768,6 +768,35 @@ void CPlayer::FormatTextQuest(int DataBotID, const char *pText)
 		return;
 
 	str_copy(m_aFormatTalkQuest, pText, sizeof(m_aFormatTalkQuest));
+
+	// arrays replacing dialogs
+	const char* pBot = str_find_nocase(m_aFormatTalkQuest, "[Bot_");
+	while(pBot != nullptr)
+	{
+		int SearchBotID = 0;
+		if(sscanf(pBot, "[Bot_%d]", &SearchBotID) && GS()->Mmo()->BotsData()->IsDataBotValid(SearchBotID))
+		{
+			char aBufSearch[16];
+			str_format(aBufSearch, sizeof(aBufSearch), "[Bot_%d]", SearchBotID);
+			str_replace(m_aFormatTalkQuest, aBufSearch, BotJob::ms_aDataBot[SearchBotID].m_aNameBot);
+		}
+		pBot = str_find_nocase(m_aFormatTalkQuest, "[Bot_");
+	}
+
+	const char* pWorld = str_find_nocase(m_aFormatTalkQuest, "[World_");
+	while(pWorld != nullptr)
+	{
+		int WorldID = 0;
+		if(sscanf(pWorld, "[World_%d]", &WorldID))
+		{
+			char aBufSearch[16];
+			str_format(aBufSearch, sizeof(aBufSearch), "[World_%d]", WorldID);
+			str_replace(m_aFormatTalkQuest, aBufSearch, Server()->GetWorldName(WorldID));
+		}
+		pWorld = str_find_nocase(m_aFormatTalkQuest, "[World_");
+	}
+
+	// based replacing dialogs
 	str_replace(m_aFormatTalkQuest, "[Player]", GS()->Server()->ClientName(m_ClientID));
 	str_replace(m_aFormatTalkQuest, "[Talked]", BotJob::ms_aDataBot[DataBotID].m_aNameBot);
 	str_replace(m_aFormatTalkQuest, "[Time]", GS()->Server()->GetStringTypeDay());

@@ -266,7 +266,6 @@ void CInventory::OnInit()
 {
 	m_Screen = *UI()->Screen();
 	m_Active = false;
-
 }
 
 bool CInventory::OnInput(IInput::CEvent Event)
