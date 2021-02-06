@@ -121,10 +121,10 @@ void CPlayer::EffectsTick()
 
 void CPlayer::TickSystemTalk()
 {
-	if(m_TalkingNPC.m_TalkedID == -1 || m_TalkingNPC.m_TalkedID == m_ClientID)
+	if(m_DialogNPC.m_TalkedID == -1 || m_DialogNPC.m_TalkedID == m_ClientID)
 		return;
 
-	const int TalkedID = m_TalkingNPC.m_TalkedID;
+	const int TalkedID = m_DialogNPC.m_TalkedID;
 	if(!m_pCharacter || TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] || distance(m_ViewPos, GS()->m_apPlayers[TalkedID]->m_ViewPos) > 180.0f)
 		ClearTalking();
 }
@@ -319,12 +319,12 @@ void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed,
 		return;
 	}
 
-	char BufferInBroadcast[128];
+	char aBufBroadcast[128];
 	const float GetLevelProgress = (float)(MyExp * 100.0) / (float)ExpNeed;
 	const float GetExpProgress = (float)(GivedExp * 100.0) / (float)ExpNeed;
 	std::unique_ptr<char[]> Level = std::move(GS()->LevelString(100, (int)GetLevelProgress, 10, ':', ' '));
-	str_format(BufferInBroadcast, sizeof(BufferInBroadcast), "^235Lv%d %s%s %0.2f%%+%0.3f%%(%d)XP\n", MyLevel, Name, Level.get(), GetLevelProgress, GetExpProgress, GivedExp);
-	GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, BufferInBroadcast);
+	str_format(aBufBroadcast, sizeof(aBufBroadcast), "^235Lv%d %s%s %0.2f%%+%0.3f%%(%d)XP\n", MyLevel, Name, Level.get(), GetLevelProgress, GetExpProgress, GivedExp);
+	GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, aBufBroadcast);
 }
 
 bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade, const char *UpgradeName)
@@ -657,14 +657,14 @@ int CPlayer::GetLevelAllAttributes()
 // - - - - - - T A L K I N G - - - - B O T S - - - - - - - - - 
 void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 {
-	if (TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] || (!IsStartDialogue && m_TalkingNPC.m_TalkedID == -1))
+	if (TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] || (!IsStartDialogue && m_DialogNPC.m_TalkedID == -1))
 		return;
 
-	m_TalkingNPC.m_TalkedID = TalkedID;
+	m_DialogNPC.m_TalkedID = TalkedID;
 	if(IsStartDialogue)
 	{
-		m_TalkingNPC.m_FreezedProgress = false;
-		m_TalkingNPC.m_TalkedProgress = 0;
+		m_DialogNPC.m_FreezedProgress = false;
+		m_DialogNPC.m_Progress = 0;
 	}
 
 	GS()->Mmo()->Quest()->QuestTableClear(m_ClientID);
@@ -675,7 +675,7 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 		// clearing the end of dialogs or a dialog that was meaningless
 		const int sizeTalking = BotJob::ms_aNpcBot[MobID].m_aDialog.size();
 		const bool isTalkingEmpty = BotJob::ms_aNpcBot[MobID].m_aDialog.empty();
-		if ((isTalkingEmpty && m_TalkingNPC.m_TalkedProgress == IS_TALKING_EMPTY) || (!isTalkingEmpty && m_TalkingNPC.m_TalkedProgress >= sizeTalking))
+		if ((isTalkingEmpty && m_DialogNPC.m_Progress == IS_TALKING_EMPTY) || (!isTalkingEmpty && m_DialogNPC.m_Progress >= sizeTalking))
 		{
 			ClearTalking();
 			return;
@@ -685,92 +685,92 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 		int GivingQuestID = GS()->Mmo()->BotsData()->GetQuestNPC(MobID);
 		if (isTalkingEmpty || GetQuest(GivingQuestID).GetState() >= QuestState::QUEST_ACCEPT)
 		{
-			const char* MeaninglessDialog = GS()->Mmo()->BotsData()->GetMeaninglessDialog();
-			GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, -1, TalkedID, MeaninglessDialog);
-			m_TalkingNPC.m_TalkedProgress = IS_TALKING_EMPTY;
+			const char* pMeaninglessDialog = GS()->Mmo()->BotsData()->GetMeaninglessDialog();
+			GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, -1, TalkedID, pMeaninglessDialog);
+			m_DialogNPC.m_Progress = IS_TALKING_EMPTY;
 			return;
 		}
 
 		// get a quest for the progress of dialogue if it is in this progress we accept the quest
-		GivingQuestID = BotJob::ms_aNpcBot[MobID].m_aDialog[m_TalkingNPC.m_TalkedProgress].m_GivingQuest;
+		GivingQuestID = BotJob::ms_aNpcBot[MobID].m_aDialog[m_DialogNPC.m_Progress].m_GivingQuest;
 		if (GivingQuestID >= 1)
 		{
-			if (!m_TalkingNPC.m_FreezedProgress)
+			if (!m_DialogNPC.m_FreezedProgress)
 			{
-				GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
-				m_TalkingNPC.m_FreezedProgress = true;
+				GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_DialogNPC.m_Progress, TalkedID);
+				m_DialogNPC.m_FreezedProgress = true;
 				return;
 			}
 
 			GetQuest(GivingQuestID).Accept();
-			m_TalkingNPC.m_TalkedProgress++;
+			m_DialogNPC.m_Progress++;
 		}
 
-		GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
+		GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_DialogNPC.m_Progress, TalkedID);
 	}
 
 	else if (pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 	{
 		const int sizeTalking = BotJob::ms_aQuestBot[MobID].m_aDialog.size();
-		if (m_TalkingNPC.m_TalkedProgress >= sizeTalking)
+		if (m_DialogNPC.m_Progress >= sizeTalking)
 		{
 			ClearTalking();
 			GS()->Mmo()->Quest()->InteractiveQuestNPC(this, BotJob::ms_aQuestBot[MobID], true);
 			return;
 		}
 
-		const bool RequiestQuestTask = BotJob::ms_aQuestBot[MobID].m_aDialog[m_TalkingNPC.m_TalkedProgress].m_RequestComplete;
+		const bool RequiestQuestTask = BotJob::ms_aQuestBot[MobID].m_aDialog[m_DialogNPC.m_Progress].m_RequestComplete;
 		if (RequiestQuestTask)
 		{
-			if (!m_TalkingNPC.m_FreezedProgress)
+			if (!m_DialogNPC.m_FreezedProgress)
 			{
 				GS()->Mmo()->Quest()->DoStepDropTakeItems(this, BotJob::ms_aQuestBot[MobID]);
-				GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
-				GS()->Mmo()->BotsData()->ShowBotQuestTaskInfo(this, MobID, m_TalkingNPC.m_TalkedProgress);
-				m_TalkingNPC.m_FreezedProgress = true;
+				GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_DialogNPC.m_Progress, TalkedID);
+				GS()->Mmo()->BotsData()->ShowBotQuestTaskInfo(this, MobID, m_DialogNPC.m_Progress);
+				m_DialogNPC.m_FreezedProgress = true;
 				return;
 			}
 
 			// skip non complete dialog quest
 			if (!GS()->Mmo()->Quest()->InteractiveQuestNPC(this, BotJob::ms_aQuestBot[MobID], false))
 			{
-				GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
-				GS()->Mmo()->BotsData()->ShowBotQuestTaskInfo(this, MobID, m_TalkingNPC.m_TalkedProgress);
+				GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_DialogNPC.m_Progress, TalkedID);
+				GS()->Mmo()->BotsData()->ShowBotQuestTaskInfo(this, MobID, m_DialogNPC.m_Progress);
 				return;
 			}
 			else
-				m_TalkingNPC.m_TalkedProgress++;
+				m_DialogNPC.m_Progress++;
 		}
 
-		GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_TalkingNPC.m_TalkedProgress, TalkedID);
+		GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_DialogNPC.m_Progress, TalkedID);
 	}
 
-	m_TalkingNPC.m_TalkedProgress++;
+	m_DialogNPC.m_Progress++;
 }
 
 void CPlayer::ClearTalking()
 {
 	GS()->ClearTalkText(m_ClientID);
-	m_TalkingNPC.m_TalkedID = -1;
-	m_TalkingNPC.m_TalkedProgress = 0;
-	m_TalkingNPC.m_FreezedProgress = false;
+	m_DialogNPC.m_TalkedID = -1;
+	m_DialogNPC.m_Progress = 0;
+	m_DialogNPC.m_FreezedProgress = false;
 }
 
 // - - - - - - F O R M A T - - - - - T E X T - - - - - - - - - 
 const char *CPlayer::GetDialogText() 
 { 
-	return GS()->Server()->Localization()->Localize(GetLanguage(), m_aFormatTalkQuest); 
+	return GS()->Server()->Localization()->Localize(GetLanguage(), m_aFormatDialogText); 
 }
 
 void CPlayer::FormatDialogText(int DataBotID, const char *pText)
 {
-	if(!GS()->Mmo()->BotsData()->IsDataBotValid(DataBotID) || m_aFormatTalkQuest[0] != '\0') 
+	if(!GS()->Mmo()->BotsData()->IsDataBotValid(DataBotID) || m_aFormatDialogText[0] != '\0') 
 		return;
 
-	str_copy(m_aFormatTalkQuest, pText, sizeof(m_aFormatTalkQuest));
+	str_copy(m_aFormatDialogText, pText, sizeof(m_aFormatDialogText));
 
 	// arrays replacing dialogs
-	const char* pBot = str_find_nocase(m_aFormatTalkQuest, "[Bot_");
+	const char* pBot = str_find_nocase(m_aFormatDialogText, "[Bot_");
 	while(pBot != nullptr)
 	{
 		int SearchBotID = 0;
@@ -778,12 +778,12 @@ void CPlayer::FormatDialogText(int DataBotID, const char *pText)
 		{
 			char aBufSearch[16];
 			str_format(aBufSearch, sizeof(aBufSearch), "[Bot_%d]", SearchBotID);
-			str_replace(m_aFormatTalkQuest, aBufSearch, BotJob::ms_aDataBot[SearchBotID].m_aNameBot);
+			str_replace(m_aFormatDialogText, aBufSearch, BotJob::ms_aDataBot[SearchBotID].m_aNameBot);
 		}
-		pBot = str_find_nocase(m_aFormatTalkQuest, "[Bot_");
+		pBot = str_find_nocase(m_aFormatDialogText, "[Bot_");
 	}
 
-	const char* pWorld = str_find_nocase(m_aFormatTalkQuest, "[World_");
+	const char* pWorld = str_find_nocase(m_aFormatDialogText, "[World_");
 	while(pWorld != nullptr)
 	{
 		int WorldID = 0;
@@ -791,21 +791,21 @@ void CPlayer::FormatDialogText(int DataBotID, const char *pText)
 		{
 			char aBufSearch[16];
 			str_format(aBufSearch, sizeof(aBufSearch), "[World_%d]", WorldID);
-			str_replace(m_aFormatTalkQuest, aBufSearch, Server()->GetWorldName(WorldID));
+			str_replace(m_aFormatDialogText, aBufSearch, Server()->GetWorldName(WorldID));
 		}
-		pWorld = str_find_nocase(m_aFormatTalkQuest, "[World_");
+		pWorld = str_find_nocase(m_aFormatDialogText, "[World_");
 	}
 
 	// based replacing dialogs
-	str_replace(m_aFormatTalkQuest, "[Player]", GS()->Server()->ClientName(m_ClientID));
-	str_replace(m_aFormatTalkQuest, "[Talked]", BotJob::ms_aDataBot[DataBotID].m_aNameBot);
-	str_replace(m_aFormatTalkQuest, "[Time]", GS()->Server()->GetStringTypeDay());
-	str_replace(m_aFormatTalkQuest, "[Here]", GS()->Server()->GetWorldName(GS()->GetWorldID()));
+	str_replace(m_aFormatDialogText, "[Player]", GS()->Server()->ClientName(m_ClientID));
+	str_replace(m_aFormatDialogText, "[Talked]", BotJob::ms_aDataBot[DataBotID].m_aNameBot);
+	str_replace(m_aFormatDialogText, "[Time]", GS()->Server()->GetStringTypeDay());
+	str_replace(m_aFormatDialogText, "[Here]", GS()->Server()->GetWorldName(GS()->GetWorldID()));
 }
 
 void CPlayer::ClearDialogText()
 {
-	mem_zero(m_aFormatTalkQuest, sizeof(m_aFormatTalkQuest));
+	mem_zero(m_aFormatDialogText, sizeof(m_aFormatDialogText));
 }
 
 void CPlayer::ChangeWorld(int WorldID)

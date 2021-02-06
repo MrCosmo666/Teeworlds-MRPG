@@ -36,14 +36,14 @@ class CPlayer
 		int m_TargetY;
 	};
 
-	struct StructTalkNPC
+	struct StructDialogNPC
 	{
-		bool m_FreezedProgress;
 		int m_TalkedID;
-		int m_TalkedProgress;
+		int m_Progress;
+		bool m_FreezedProgress;
 	};
-	StructTalkNPC m_TalkingNPC;
-	char m_aFormatTalkQuest[512];
+	StructDialogNPC m_DialogNPC;
+	char m_aFormatDialogText[512];
 	std::map < int, bool > m_aHiddenMenu;
 
 protected:
@@ -172,7 +172,7 @@ public:
 	// npc conversations
 	void SetTalking(int TalkedID, bool IsStartDialogue);
 	void ClearTalking();
-	int GetTalkedID() const { return m_TalkingNPC.m_TalkedID; };
+	int GetTalkedID() const { return m_DialogNPC.m_TalkedID; };
 
 	// dialog formating
 	const char *GetDialogText();
