@@ -174,13 +174,12 @@ public:
 	void ClearTalking();
 	int GetTalkedID() const { return m_TalkingNPC.m_TalkedID; };
 
-	// text formatting
-	const char *FormatedTalkedText();
-	void FormatTextQuest(int DataBotID, const char *pText);
-	void ClearFormatQuestText();
+	// dialog formating
+	const char *GetDialogText();
+	void FormatDialogText(int DataBotID, const char *pText);
+	void ClearDialogText();
 
 	int GetMoodState() const { return MOOD_NORMAL; }
-
 	void ChangeWorld(int WorldID);
 };
 

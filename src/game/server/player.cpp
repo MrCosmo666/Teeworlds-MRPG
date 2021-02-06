@@ -757,12 +757,12 @@ void CPlayer::ClearTalking()
 }
 
 // - - - - - - F O R M A T - - - - - T E X T - - - - - - - - - 
-const char *CPlayer::FormatedTalkedText() 
+const char *CPlayer::GetDialogText() 
 { 
 	return GS()->Server()->Localization()->Localize(GetLanguage(), m_aFormatTalkQuest); 
 }
 
-void CPlayer::FormatTextQuest(int DataBotID, const char *pText)
+void CPlayer::FormatDialogText(int DataBotID, const char *pText)
 {
 	if(!GS()->Mmo()->BotsData()->IsDataBotValid(DataBotID) || m_aFormatTalkQuest[0] != '\0') 
 		return;
@@ -803,7 +803,7 @@ void CPlayer::FormatTextQuest(int DataBotID, const char *pText)
 	str_replace(m_aFormatTalkQuest, "[Here]", GS()->Server()->GetWorldName(GS()->GetWorldID()));
 }
 
-void CPlayer::ClearFormatQuestText()
+void CPlayer::ClearDialogText()
 {
 	mem_zero(m_aFormatTalkQuest, sizeof(m_aFormatTalkQuest));
 }

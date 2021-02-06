@@ -336,6 +336,6 @@ void CPlayerStepQuestBot::ShowRequired(CPlayer* pPlayer, const char* TextTalk)
 	}
 
 	pGS->Motd(ClientID, "{STR}\n\n{STR}{STR}\n\n", TextTalk, (IsActiveTask ? "### Task" : "\0"), Buffer.buffer());
-	pPlayer->ClearFormatQuestText();
+	pPlayer->ClearDialogText();
 	Buffer.clear();
 }
