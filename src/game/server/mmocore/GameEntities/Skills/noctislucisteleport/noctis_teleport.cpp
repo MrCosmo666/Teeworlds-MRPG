@@ -5,7 +5,7 @@
 #include "noctis_teleport.h"
 
 CNoctisTeleport::CNoctisTeleport(CGameWorld *pGameWorld, vec2 Pos, CCharacter* pPlayerChar, int SkillBonus)
-: CEntity(pGameWorld, CGameWorld::ENTYPE_NOCTIS_TELEPORT, Pos, 64.0f)
+: CEntity(pGameWorld, CGameWorld::ENTYPE_NOCTIS_TELEPORT, Pos, 28.0f)
 {
 	// transmitted arguments
 	m_pPlayerChar = pPlayerChar;
@@ -31,11 +31,14 @@ void CNoctisTeleport::Tick()
 		return;
 	}
 
-	vec2 To = m_Pos + normalize(m_Direction) * GetProximityRadius();
-	vec2 Size = vec2(GetProximityRadius()/2, GetProximityRadius()/2);
-	CCharacter *pSearchChar = (CCharacter*)GS()->m_World.ClosestEntity(To, 64.0f, CGameWorld::ENTTYPE_CHARACTER, nullptr);
-	if(!m_LifeSpan || GS()->Collision()->TestBox(To, Size) || GS()->m_World.IntersectClosestDoorEntity(To, GetProximityRadius()) 
-		|| (pSearchChar && pSearchChar->IsAlive() && pSearchChar != m_pPlayerChar && pSearchChar->IsAllowedPVP(m_pPlayerChar->GetPlayer()->GetCID())))
+	// TODO: optimize
+	vec2 To = m_Pos + normalize(m_Direction) * 20.0f;
+	vec2 Size = vec2(GetProximityRadius(), GetProximityRadius());
+	CCharacter *pSearchChar = (CCharacter*)GS()->m_World.ClosestEntity(To, GetProximityRadius(), CGameWorld::ENTTYPE_CHARACTER, nullptr);
+	const bool IsCollide = (GS()->Collision()->TestBox(m_Pos, Size) || GS()->Collision()->TestBox(To, Size) 
+		|| GS()->m_World.IntersectClosestDoorEntity(m_Pos, GetProximityRadius()) || GS()->m_World.IntersectClosestDoorEntity(To, GetProximityRadius()));
+
+	if(!m_LifeSpan || IsCollide || (pSearchChar && pSearchChar->IsAlive() && pSearchChar != m_pPlayerChar && pSearchChar->IsAllowedPVP(m_pPlayerChar->GetPlayer()->GetCID())))
 	{
 		GS()->CreateSound(m_pPlayerChar->GetPos(), SOUND_NINJA_FIRE);
 
@@ -70,6 +73,7 @@ void CNoctisTeleport::Tick()
 		Reset();
 		return;
 	}
+
 	m_PosTo = m_Pos;
 	m_Pos += normalize(m_Direction) * 20.0f;
 }
