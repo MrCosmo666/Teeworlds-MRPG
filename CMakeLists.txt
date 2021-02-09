@@ -288,10 +288,11 @@ find_package(Freetype)
 find_package(SDL2)
 find_package(Wavpack)
 find_package(Curl)
-find_package(Crypto)
+find_package(OpenSSL)
 find_package(ICU)
 find_package(MySQL)
 find_package(DiscordGameSDK)
+find_package(GLEW)
 
 if(TARGET_OS AND TARGET_OS STREQUAL "linux")
   find_package(Boost 1.36.0)
@@ -329,38 +330,7 @@ if(TARGET_OS AND TARGET_OS STREQUAL "mac")
   endif()
 endif()
 
-########################################################################
-# (DEPENDENCIES SUB) LIBRARIES AND INCLUDES FOR CLIENT/SERVER AND COMPONENTS
-########################################################################
-    
-# clients lib
-set(CLIENT_LIBRARIES
-  ${CURL_LIBRARIES} 
-  ${FREETYPE_LIBRARIES} 
-  ${PNGLITE_LIBRARIES} 
-  ${SDL2_LIBRARIES} 
-  ${WAVPACK_LIBRARIES}
-  ${DISCORDGAMESDK_LIBRARIES}
-)
-
-# client includes
-set(CLIENT_INCLUDES_DIRS
-  ${CURL_INCLUDE_DIRS}
-  ${FREETYPE_INCLUDE_DIRS} 
-  ${PNGLITE_INCLUDE_DIRS} 
-  ${SDL2_INCLUDE_DIRS} 
-  ${WAVPACK_INCLUDE_DIRS}
-  ${DISCORDGAMESDK_INCLUDE_DIRS}
-)
-
-
-message(STATUS "******** Mmo (Teeworlds) ********")
-message(STATUS "Target OS: ${TARGET_OS} ${TARGET_BITS}bit")
-message(STATUS "Compiler: ${CMAKE_CXX_COMPILER}")
-message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
-
-message(STATUS "Dependencies:")
-function(show_dependency_status OUTPUT_NAME NAME)
+function(show_dependency_status OUTPUT_NAME NAME REQUIRED)
   if(${NAME}_FOUND)
     if(${NAME}_BUNDLED)
       message(STATUS " * ${OUTPUT_NAME} not found (using bundled version)")
@@ -369,62 +339,46 @@ function(show_dependency_status OUTPUT_NAME NAME)
     endif()
   else()
     message(STATUS " * ${OUTPUT_NAME} not found")
+    if(REQUIRED)
+      message(SEND_ERROR "You must install ${OUTPUT_NAME} to compile Teeworlds MMO")
+    endif()
   endif()
 endfunction()
 
-show_dependency_status("PythonInterp" PYTHONINTERP)
+message(STATUS "******** Mmo (Teeworlds) ********")
+message(STATUS "Target OS: ${TARGET_OS} ${TARGET_BITS}bit")
+message(STATUS "Compiler: ${CMAKE_CXX_COMPILER}")
+message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
+message(STATUS "Dependencies:")
+
+show_dependency_status("PythonInterp" PYTHONINTERP TRUE)
 if(TARGET_OS AND TARGET_OS STREQUAL "mac")
-  show_dependency_status("Dmg tools" DMGTOOLS)
-  show_dependency_status("Hdiutil" HDIUTIL)
+  show_dependency_status("Dmg tools" DMGTOOLS TRUE)
+  show_dependency_status("Hdiutil" HDIUTIL TRUE)
 endif()
 
-show_dependency_status("OpenSSL" OPENSSL)
-show_dependency_status("Curl" CURL)
-if(COMPILE_SERVER)
-  show_dependency_status("MySQL" MYSQL)
-  show_dependency_status("ICU" ICU)
-elseif(COMPILE_CLIENT)
-  show_dependency_status("Freetype" FREETYPE)
-  show_dependency_status("Pnglite" PNGLITE)
-  show_dependency_status("SDL2" SDL2)
-  show_dependency_status("Wavpack" WAVPACK)
-  show_dependency_status("Zlib" ZLIB)
-  show_dependency_status("DiscordGameSDK" DISCORDGAMESDK)
+if(SERVER_COMPILE)
+  show_dependency_status("MySQL" MYSQL TRUE)
+  show_dependency_status("ICU" ICU TRUE)
+  show_dependency_status("OpenSSL" OPENSSL FALSE)
 endif()
+if(CLIENT_COMPILE)
+  show_dependency_status("Freetype" FREETYPE TRUE)
+  show_dependency_status("Pnglite" PNGLITE TRUE)
+  show_dependency_status("SDL2" SDL2 TRUE)
+  show_dependency_status("Wavpack" WAVPACK TRUE)
+  show_dependency_status("Zlib" ZLIB TRUE)
+  show_dependency_status("DiscordGameSDK" DISCORDGAMESDK TRUE)
+  show_dependency_status("Glew" GLEW TRUE)
+endif()
+show_dependency_status("Curl" CURL TRUE)
 
-if(NOT(PYTHONINTERP_FOUND))
-  message(SEND_ERROR "You must install Python to compile Teeworlds MMO(All)")
-endif()
-
-if(SERVER_COMPILE AND NOT(MYSQL_FOUND))
-  message(SEND_ERROR "You must install MySQL to compile Teeworlds MMO(Server)")
-endif()
-if(SERVER_COMPILE AND NOT(OPENSSL_FOUND))
-  message(STATUS "####################### WARNING ##########################")
-  message(STATUS "Sleepy-discord build with the server is not available")
-  message(STATUS "The server will be compiled without Sleepy-Discord")
-  message(STATUS "Need OpenSSL: https://slproweb.com/products/Win32OpenSSL.html")
-  message(STATUS "###########################################################")
+if(NOT OPENSSL_FOUND)
+  message(WARNING "Server discord support is disabled, as well as some crypto functions in favor of md5")
   set(DISCORD_SERVER_COMPILE OFF)
 endif()
-if(SERVER_COMPILE AND NOT(ICU_FOUND))
-  message(SEND_ERROR "You must install ICU to compile Teeworlds MMO(Server)")
-endif()
 
-if(CLIENT_COMPILE AND NOT(CURL_FOUND))
-  message(SEND_ERROR "You must install Curl to compile Teeworlds MMO(Client)")
-endif()
-if(CLIENT_COMPILE AND NOT(FREETYPE_FOUND))
-  message(SEND_ERROR "You must install Freetype to compile Teeworlds MMO(Client)")
-endif()
-if(CLIENT_COMPILE AND NOT(SDL2_FOUND))
-  message(SEND_ERROR "You must install SDL2 to compile Teeworlds MMO(Client)")
-endif()
-if(CLIENT_COMPILE AND NOT(DISCORDGAMESDK_FOUND))
-  message(SEND_ERROR "You must install Discord GameSDK to compile Teeworlds MMO(Client)")
-endif()
-
-if(NOT(GTEST_FOUND))
+if(NOT GTEST_FOUND)
   if(DOWNLOAD_GTEST)
     if(GIT_FOUND)
       message(STATUS "Automatically downloading GTest to be able to run tests")
@@ -751,15 +705,15 @@ set(GAME_GENERATED_SHARED
   src/generated/protocol.h
 )
 
+# Libraries & Deps
 set(DEPS ${DEP_JSON} ${DEP_MD5} ${ZLIB_DEP})
-
-# Libraries
-set(LIBS ${CMAKE_THREAD_LIBS_INIT} ${ZLIB_LIBRARIES} ${OPENSSL_CRYPTO_LIBRARIES} ${PLATFORM_LIBS})
+set(LIBS ${CMAKE_THREAD_LIBS_INIT} ${ZLIB_LIBRARIES} ${OPENSSL_CRYPTO_LIBRARY} ${PLATFORM_LIBS})
 
 # Targets
 add_library(engine-shared EXCLUDE_FROM_ALL OBJECT ${ENGINE_INTERFACE} ${ENGINE_SHARED} ${ENGINE_GENERATED_SHARED} ${BASE})
 add_library(game-shared EXCLUDE_FROM_ALL OBJECT ${GAME_SHARED} ${GAME_GENERATED_SHARED})
 list(APPEND TARGETS_OWN engine-shared game-shared)
+
 
 ########################################################################
 # CLIENT
@@ -770,13 +724,32 @@ if(CLIENT_COMPILE)
   file(GLOB ENGINE_CLIENT "src/engine/client/*.cpp" "src/engine/client/*.h")
   file(GLOB GAME_CLIENT "src/game/client/*.cpp" "src/game/client/*.h" "src/game/client/components/*.cpp" "src/game/client/components/*.h"  "src/game/client/anim_ui/*.cpp" "src/game/client/anim_ui/*.h")
   file(GLOB GAME_EDITOR "src/game/editor/*.cpp" "src/game/editor/*.h")
-  set(GAME_GENERATED_CLIENT
-    src/generated/client_data.cpp
-    src/generated/client_data.h
-  )
+  set(GAME_GENERATED_CLIENT src/generated/client_data.cpp src/generated/client_data.h)
   set(CLIENT_SRC ${PLATFORM_CLIENT} ${ENGINE_CLIENT} ${GAME_CLIENT} ${GAME_EDITOR} ${GAME_GENERATED_CLIENT})
-  set(DEPS_CLIENT ${DEPS} ${PNGLITE_DEP} ${WAVPACK_DEP} ${DISCORDGAMESDK_DEP})
 
+  # Deps
+  set(CLIENT_INCLUDES_DIRS
+    ${CURL_INCLUDE_DIRS} 
+    ${FREETYPE_INCLUDE_DIRS} 
+    ${GLEW_INCLUDE_DIRS} 
+    ${PNGLITE_INCLUDE_DIRS} 
+    ${SDL2_INCLUDE_DIRS} 
+    ${WAVPACK_INCLUDE_DIRS} 
+    ${DISCORDGAMESDK_INCLUDE_DIRS}
+  )
+  set(CLIENT_LIBRARIES
+    ${CURL_LIBRARIES} 
+    ${FREETYPE_LIBRARIES} 
+    ${GLEW_LIBRARIES} 
+    ${PNGLITE_LIBRARIES} 
+    ${SDL2_LIBRARIES} 
+    ${WAVPACK_LIBRARIES} 
+    ${DISCORDGAMESDK_LIBRARIES}
+  )
+  set(DEPS_CLIENT ${DEPS} ${GLEW_DEP} ${PNGLITE_DEP} ${WAVPACK_DEP} ${DISCORDGAMESDK_DEP})
+    
+  # Icon
+  set(CLIENT_ICON)
   if(TARGET_OS STREQUAL "windows")
     set(CLIENT_ICON "other/icons/${CLIENT_EXECUTABLE}.rc")
     if(NOT MINGW)
@@ -784,8 +757,6 @@ if(CLIENT_COMPILE)
     else()
       set(CLIENT_MANIFEST "other/manifest/teeworlds.rc")
     endif()
-  else()
-    set(CLIENT_ICON)
   endif()
 
   # Target
@@ -799,7 +770,7 @@ if(CLIENT_COMPILE)
     $<TARGET_OBJECTS:game-shared>
   )
 
-  # client includes & libs
+  # linking includes & libs on client
   target_include_directories(${TARGET_CLIENT} PRIVATE ${CLIENT_INCLUDES_DIRS})
   target_link_libraries(${TARGET_CLIENT} ${LIBS} ${CLIENT_LIBRARIES} ${PLATFORM_CLIENT_LIBS})
 
@@ -823,6 +794,7 @@ if(CLIENT_COMPILE)
   list(APPEND TARGETS_LINK ${TARGET_CLIENT})
 endif()
 
+
 ########################################################################
 # SLEEPY-DISCORD
 ########################################################################
@@ -838,7 +810,7 @@ if(DISCORD_SERVER_COMPILE)
     target_link_libraries(${CPR_LIBRARIES} -lcurl) # wtf
   endif()
   target_link_libraries(${CPR_LIBRARIES} ${CURL_LIBRARIES})
-  target_include_directories(${CPR_LIBRARIES} PUBLIC ${CPR_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS})
+  target_include_directories(${CPR_LIBRARIES} PUBLIC ${CPR_INCLUDE_DIRS} ${CURL_INCLUDE_DIRS} ${OPENSSL_INCLUDE_DIRS})
   list(APPEND TARGETS_DEP ${CPR_LIBRARIES})
 
   # Include Sleepy-Discord
@@ -864,9 +836,9 @@ if(DISCORD_SERVER_COMPILE)
 
   # Including OpenSSL to Sleepy-Discord
   if (WIN32)
-	list(APPEND SLEEPY_DISCORD_LIBRARIES "OpenSSL::SSL" "OpenSSL::Crypto")
+	list(APPEND SLEEPY_DISCORD_LIBRARIES ${OPENSSL_LIBRARY})
   elseif (UNIX)
-	list(APPEND SLEEPY_DISCORD_LIBRARIES "ssl" "crypto" "Threads::Threads")
+	list(APPEND SLEEPY_DISCORD_LIBRARIES ${OPENSSL_LIBRARY} "Threads::Threads")
   endif()
 
   #Todo add support for it
@@ -891,6 +863,7 @@ if(DISCORD_SERVER_COMPILE)
   endif()
 endif()
 
+
 ########################################################################
 # SERVER
 ########################################################################
@@ -900,47 +873,46 @@ if(SERVER_COMPILE)
   file(GLOB ENGINE_SERVER "src/engine/server/*.cpp" "src/engine/server/*.h")
   file(GLOB_RECURSE GAME_SERVER "src/game/server/*.cpp" "src/game/server/*.h")
   file(GLOB LOCALIZED_SERVER "src/teeother/components/*.cpp" "src/teeother/components/*.h" "src/teeother/tl/*.h" "src/teeother/system/*.h")
-
-  set(GAME_GENERATED_SERVER
-    src/generated/server_data.cpp
-    src/generated/server_data.h)
-
-  ###
+  set(GAME_GENERATED_SERVER src/generated/server_data.cpp src/generated/server_data.h)
   set(SERVER_SRC ${ENGINE_SERVER} ${GAME_SERVER} ${GAME_GENERATED_SERVER} ${LOCALIZED_SERVER})
 
-  if(TARGET_OS STREQUAL "windows")
-    set(SERVER_ICON "other/icons/${SERVER_EXECUTABLE}.rc")
-  else()
-    set(SERVER_ICON)
+  # Deps
+  set(DISCORD_SERVER_LIBS)
+  if(DISCORD_SERVER_COMPILE)
+    set(DISCORD_SERVER_LIBS sleepy-discord ${CPR_LIBRARIES})
   endif()
-
-# Target
-  set(TARGET_SERVER ${SERVER_EXECUTABLE})
-  add_executable(${TARGET_SERVER}
-    ${DEPS}
-    ${SERVER_SRC}
-    ${SERVER_ICON}
-    $<TARGET_OBJECTS:engine-shared>
-    $<TARGET_OBJECTS:game-shared>
-  )
-
-  # server includes & lib
-  set(SERVER_LIBRARIES
-    ${MYSQL_LIBRARIES}
-    ${ICU_LIBRARIES}
-  )
 
   set(SERVER_INCLUDES_DIRS
     ${Boost_INCLUDE_DIRS} 
     ${ICU_INCLUDE_DIRS}
     ${MYSQL_INCLUDE_DIRS}
   )
-
-  if(DISCORD_SERVER_COMPILE)
-    list(APPEND SERVER_LIBRARIES sleepy-discord ${CPR_LIBRARIES})
+  set(SERVER_LIBRARIES
+    ${MYSQL_LIBRARIES}
+    ${ICU_LIBRARIES}
+    ${DISCORD_SERVER_LIBS}
+  )
+  set(DEPS_SERVER ${DEPS})
+  
+  # Icon
+  set(SERVER_ICON)
+  if(TARGET_OS STREQUAL "windows")
+    set(SERVER_ICON "other/icons/${SERVER_EXECUTABLE}.rc")
   endif()
+
+  # Target
+  set(TARGET_SERVER ${SERVER_EXECUTABLE})
+  add_executable(${TARGET_SERVER}
+    ${SERVER_SRC}
+    ${SERVER_ICON}
+    ${DEPS_SERVER}
+    $<TARGET_OBJECTS:engine-shared>
+    $<TARGET_OBJECTS:game-shared>
+  )
+
   target_include_directories(${TARGET_SERVER} PRIVATE ${SERVER_INCLUDES_DIRS})
   target_link_libraries(${TARGET_SERVER} ${LIBS} ${SERVER_LIBRARIES})
+
   list(APPEND TARGETS_OWN ${TARGET_SERVER})
   list(APPEND TARGETS_LINK ${TARGET_SERVER})
   
@@ -1362,8 +1334,9 @@ foreach(target ${TARGETS_LINK})
       # Link pthread library statically instead of dynamically.
       # Solution from https://stackoverflow.com/a/28001261.
       target_link_libraries(${target} -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic)
-    endif()
+    endif()    
   endif()
+  target_compile_definitions(${target} PRIVATE GLEW_STATIC)
 endforeach()
 
 foreach(target ${TARGETS_OWN})
