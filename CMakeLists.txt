@@ -71,7 +71,6 @@ else()
 endif()
 
 set(AUTO_DEPENDENCIES_DEFAULT ON)
-option(DOWNLOAD_DEPENDENCIES "Download dependencies" ${AUTO_DEPENDENCIES_DEFAULT})
 option(DOWNLOAD_GTEST "Download and compile GTest if not found" ${AUTO_DEPENDENCIES_DEFAULT})
 option(DISCORD_SERVER_COMPILE "Compile Sleepy-Discord in conjunction with the server" ON)
 option(PREFER_BUNDLED_LIBS "Prefer bundled libraries over system libraries" ${AUTO_DEPENDENCIES_DEFAULT})
@@ -96,29 +95,6 @@ set(SERVER_EXECUTABLE mmoteeworlds_srv CACHE STRING "Name of the built server ex
 set(CLIENT_EXECUTABLE mmoteeworlds CACHE STRING "Name of the build client executable")
 set(SERVER_COMPILE ON)
 set(CLIENT_COMPILE ON)
-
-########################################################################
-# Download dependencies
-########################################################################
-
-find_package(PythonInterp)
-if(DOWNLOAD_DEPENDENCIES)
-  if(PYTHON_EXECUTABLE AND TARGET_OS AND TARGET_BITS)
-    set(DOWNLOADS)
-    foreach(sdep boost curl freetype icu mysql sdl discordgamesdk openssl)
-      if(NOT EXISTS "${PROJECT_SOURCE_DIR}/other/${sdep}/${TARGET_OS}/lib${TARGET_BITS}")
-        list(APPEND DOWNLOADS ${sdep})
-      endif()
-    endforeach()
-    if(DOWNLOADS)
-      message(STATUS "- - - - - - - - - - - - - - - - - - - - - - - - - - - - -")
-      message(STATUS "Downloading dep Teeworlds MMO. This may take a long time.")
-      execute_process(COMMAND ${PYTHON_EXECUTABLE} scripts/download.py ${DOWNLOADS}
-        WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-      )
-    endif()
-  endif()
-endif()
 
 ########################################################################
 # Compiler flags
@@ -239,7 +215,7 @@ function(set_extra_dirs_lib VARIABLE NAME)
     set(TYPE PATHS)
   endif()
   if(TARGET_BITS AND TARGET_OS)
-    set(DIR "other/${NAME}/${TARGET_OS}/lib${TARGET_BITS}")
+    set(DIR "libraries/${NAME}/${TARGET_OS}/lib${TARGET_BITS}")
     set("${TYPE}_${VARIABLE}_LIBDIR" "${DIR}" PARENT_SCOPE)
     set("EXTRA_${VARIABLE}_LIBDIR" "${DIR}" PARENT_SCOPE)
   endif()
@@ -250,7 +226,7 @@ function(set_extra_dirs_include VARIABLE NAME LIBRARY)
   set("HINTS_${VARIABLE}_INCLUDEDIR" PARENT_SCOPE)
   is_bundled(IS_BUNDLED "${LIBRARY}")
   if(IS_BUNDLED)
-    set("HINTS_${VARIABLE}_INCLUDEDIR" "other/${NAME}/include" "other/${NAME}/include/${TARGET_OS}" PARENT_SCOPE)
+    set("HINTS_${VARIABLE}_INCLUDEDIR" "libraries/${NAME}/include" "libraries/${NAME}/include/${TARGET_OS}" PARENT_SCOPE)
   endif()
 endfunction()
 
@@ -281,6 +257,7 @@ endif()
 
 ## own packages
 set(Boost_INCLUDES_DIRS)
+find_package(PythonInterp)
 find_package(Threads)
 find_package(ZLIB)
 find_package(Pnglite)
@@ -304,7 +281,7 @@ elseif(TARGET_OS AND TARGET_OS STREQUAL "mac")
 endif()
 
 if(NOT(Boost_INCLUDES_DIRS))
-  set(Boost_INCLUDE_DIRS "other/boost/include")
+  set(Boost_INCLUDE_DIRS "libraries/boost/include")
 endif()
 
 # another packages
