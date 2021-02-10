@@ -4,21 +4,33 @@ on: [push, pull_request]
 
 jobs:
   build-cmake:
+    name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-latest, windows-2019]
         include:
-        - os: ubuntu-latest
+        - name: "Ubuntu-Latest x86_64"
           cmake-args: -G "Unix Makefiles"
           build-args: --parallel
           package-file: mmoteeworlds-linux_x86_64.tar.xz
           env:
             CFLAGS: -Wdeclaration-after-statement -Wduplicated-branches -Werror
             CXXFLAGS: -Wduplicated-branches -Werror
+            
+        - name: "Windows x64"
         - os: windows-latest
           cmake-args: -G "Visual Studio 16 2019" -A x64
           package-file: mmoteeworlds-win64.zip
+          env:
+            CFLAGS: /WX
+            CXXFLAGS: /WX
+            LDFLAGS: /WX
+
+        - name: "Windows x86"
+        - os: windows-2019
+          cmake-args: -DSERVER_COMPILE=OFF -G "Visual Studio 16 2019" -A Win32
+          package-file: mmoteeworlds-win32.zip
           env:
             CFLAGS: /WX
             CXXFLAGS: /WX
