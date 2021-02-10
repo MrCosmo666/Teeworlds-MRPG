@@ -100,7 +100,7 @@ public:
 	}
 
 	std::string HashPassword(const char* pPassword, const char* pSalt);
-
+	void UseVoucher(int ClientID, const char* pVoucher);
 };
 
 #endif

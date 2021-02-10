@@ -27,6 +27,9 @@ CCommandProcessor::CCommandProcessor(CGS *pGS)
 	AddCommand("cmdlist", "", ConChatCmdList, pServer, "");
 	AddCommand("help", "", ConChatCmdList, pServer, "");
 	AddCommand("rules", "", ConChatRules, pServer, "");
+	AddCommand("rules", "", ConChatRules, pServer, "");
+	AddCommand("voucher", "?s[voucher]", ConChatVoucher, pServer, "");
+	AddCommand("coupon", "?s[coupon]", ConChatVoucher, pServer, "");
 
 #ifdef CONF_DISCORD
 	AddCommand("discord_connect", "?s[DID]", ConChatDiscordConnect, pServer, "");
@@ -354,6 +357,27 @@ void CCommandProcessor::ConChatRules(IConsole::IResult* pResult, void* pUser)
 	pGS->ChatFollow(ClientID, "- Don't use multiple accounts");
 	pGS->ChatFollow(ClientID, "- Don't share your account credentials (username, password)");
 	pGS->ChatFollow(ClientID, "- Do not use ads, that is not part of the game");
+}
+
+void CCommandProcessor::ConChatVoucher(IConsole::IResult* pResult, void* pUser)
+{
+	int ClientID = pResult->GetClientID();
+	IServer* pServer = (IServer*)pUser;
+	CGS* pGS = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
+
+	CPlayer* pPlayer = pGS->m_apPlayers[ClientID];
+	if (!pPlayer || !pPlayer->IsAuthed())
+		return;
+
+	if (pResult->NumArguments() != 1)
+	{
+		pGS->Chat(ClientID, "Use: /voucher <voucher>");
+		return;
+	}
+
+	char aVoucher[32];
+	str_copy(aVoucher, pResult->GetString(0), sizeof(aVoucher));
+	pGS->Mmo()->Account()->UseVoucher(ClientID, aVoucher);
 }
 
 void CCommandProcessor::LastChat(CGS *pGS, CPlayer *pPlayer)

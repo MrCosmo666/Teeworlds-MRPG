@@ -4,6 +4,7 @@
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 #include <teeother/components/localization.h>
+#include <teeother/tl/nlohmann_json.h>
 #include "AccountMainJob.h"
 
 using namespace sqlstr;
@@ -358,4 +359,48 @@ std::string AccountMainJob::HashPassword(const char* pPassword, const char* pSal
 	char aHash[SHA256_MAXSTRSIZE];
 	sha256_str(Digest, aHash, sizeof(aHash));
 	return std::string(aHash);
+}
+
+void AccountMainJob::UseVoucher(int ClientID, const char* pVoucher)
+{
+	CPlayer* pPlayer = GS()->m_apPlayers[ClientID];
+	if (!pPlayer || !pPlayer->IsAuthed())
+		return;
+
+	char aSelect[256];
+	CSqlString<32> VoucherCode = CSqlString<32>(pVoucher);
+	str_format(aSelect, sizeof(aSelect), "v.*, IF((SELECT r.id FROM tw_voucher_redeemed r WHERE CASE v.multiple WHEN 1 THEN r.voucher_id = v.id AND r.user_id = %d ELSE r.voucher_id = v.id END) IS NULL, FALSE, TRUE) AS used", pPlayer->Acc().m_AuthID);
+
+	ResultPtr pResVoucher = SJK.SD(aSelect, "tw_voucher v", "WHERE v.code = '%s'", VoucherCode.cstr());
+	if (pResVoucher->next())
+	{
+		int VoucherID = pResVoucher->getInt("id");
+		int ValidUntil = pResVoucher->getInt("valid_until");
+		nlohmann::json JsonData = nlohmann::json::parse(pResVoucher->getString("data").c_str());
+
+		if (ValidUntil > 0 && ValidUntil < time(0))
+			GS()->Chat(ClientID, "The voucher code '{STR}' has expired.", pVoucher);
+		else if (pResVoucher->getBoolean("used"))
+			GS()->Chat(ClientID, "This voucher has already been redeemed.");
+		else
+		{
+			int Exp = JsonData.value("exp", 0);
+			int Money = JsonData.value("money", 0);
+			int Upgrade = JsonData.value("upgrade", 0);
+
+			if (Exp > 0)
+				pPlayer->AddExp(Exp);
+			if (Money > 0)
+				pPlayer->AddMoney(Money);
+			if(Upgrade > 0)
+				pPlayer->Acc().m_Upgrade += Upgrade;
+
+			SJK.ID("tw_voucher_redeemed", "(voucher_id, user_id, time_created) VALUES (%d, %d, %d)", VoucherID, pPlayer->Acc().m_AuthID, (int)time(0));
+			GS()->Chat(ClientID, "You have successfully redeemed the voucher '{STR}'.", pVoucher);
+		}
+
+		return;
+	}
+
+	GS()->Chat(ClientID, "The voucher code '{STR}' does not exist.", pVoucher);
 }
