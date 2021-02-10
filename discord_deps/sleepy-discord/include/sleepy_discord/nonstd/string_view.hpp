@@ -355,10 +355,12 @@ using std::operator<<;
 # define nssv_SUPPRESS_MSGSL_WARNING(expr)        [[gsl::suppress(expr)]]
 # define nssv_SUPPRESS_MSVC_WARNING(code, descr)  __pragma(warning(suppress: code) )
 # define nssv_DISABLE_MSVC_WARNINGS(codes)        __pragma(warning(push))  __pragma(warning(disable: codes))
+# undef max
 #else
 # define nssv_SUPPRESS_MSGSL_WARNING(expr)
 # define nssv_SUPPRESS_MSVC_WARNING(code, descr)
 # define nssv_DISABLE_MSVC_WARNINGS(codes)
+# undef max
 #endif
 
 #if defined(__clang__)
