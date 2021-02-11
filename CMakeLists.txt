@@ -71,6 +71,7 @@ else()
 endif()
 
 set(AUTO_DEPENDENCIES_DEFAULT ON)
+option(SERVER_COMPILE "Build the server together with the client" ON)
 option(DOWNLOAD_GTEST "Download and compile GTest if not found" ${AUTO_DEPENDENCIES_DEFAULT})
 option(DISCORD_SERVER_COMPILE "Compile Sleepy-Discord in conjunction with the server" ON)
 option(PREFER_BUNDLED_LIBS "Prefer bundled libraries over system libraries" ${AUTO_DEPENDENCIES_DEFAULT})
@@ -93,7 +94,6 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
 
 set(SERVER_EXECUTABLE mmoteeworlds_srv CACHE STRING "Name of the built server executable")
 set(CLIENT_EXECUTABLE mmoteeworlds CACHE STRING "Name of the build client executable")
-set(SERVER_COMPILE ON)
 set(CLIENT_COMPILE ON)
 
 ########################################################################
@@ -776,7 +776,7 @@ endif()
 # SLEEPY-DISCORD
 ########################################################################
 
-if(DISCORD_SERVER_COMPILE)
+if(SERVER_COMPILE AND DISCORD_SERVER_COMPILE)
   # Include Cpr
   set(CPR_LIBRARIES cpr CACHE INTERNAL "")
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include/cpr DESTINATION ${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include)

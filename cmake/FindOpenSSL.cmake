@@ -1,7 +1,7 @@
 # out
 # - OPENSSL_CRYPTO_LIBRARY - (libcrypto)
 # - OPENSSL_SSL_LIBRARY - (libssl)
-# - OPENSSL_SSL_LIBRARY - (libcrypto + libssl)
+# - OPENSSL_LIBRARY - (libcrypto + libssl)
 
 if(NOT CMAKE_CROSSCOMPILING)
   find_package(PkgConfig QUIET)
