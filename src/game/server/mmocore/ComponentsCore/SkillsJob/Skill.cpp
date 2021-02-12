@@ -95,7 +95,9 @@ bool CSkill::Use()
 		GS()->CreateText(NULL, false, vec2(PlayerPosition.x, PlayerPosition.y - 96.0f), vec2(0, 0), 40, "RECOVERY AMMO");
 	}
 	default:
+	{
 		return false;
+	}
 	}
 
 	return true;
