@@ -44,6 +44,7 @@ bool CSkill::Use()
 	switch (m_SkillID)
 	{
 	case Skill::SkillHeartTurret:
+	{
 		for (CHealthHealer* pHh = (CHealthHealer*)GS()->m_World.FindFirst(CGameWorld::ENTYPE_SKILLTURRETHEART); pHh; pHh = (CHealthHealer*)pHh->TypeNext())
 		{
 			if (pHh->m_pPlayer->GetCID() != ClientID)
@@ -54,8 +55,9 @@ bool CSkill::Use()
 		}
 		const int PowerLevel = PriceMana;
 		new CHealthHealer(&GS()->m_World, m_pPlayer, GetBonus(), PowerLevel, PlayerPosition);
-
+	}
 	case Skill::SkillSleepyGravity:
+	{
 		for (CSleepyGravity* pHh = (CSleepyGravity*)GS()->m_World.FindFirst(CGameWorld::ENTYPE_SLEEPYGRAVITY); pHh; pHh = (CSleepyGravity*)pHh->TypeNext())
 		{
 			if (pHh->m_pPlayer->GetCID() != ClientID)
@@ -66,11 +68,13 @@ bool CSkill::Use()
 		}
 		const int PowerLevel = PriceMana;
 		new CSleepyGravity(&GS()->m_World, m_pPlayer, GetBonus(), PowerLevel, PlayerPosition);
-
+	}
 	case Skill::SkillNoctisTeleport:
+	{
 		new CNoctisTeleport(&GS()->m_World, PlayerPosition, pChr, GetBonus());
-
+	}
 	case Skill::SkillBlessingGodWar:
+	{
 		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			CPlayer* pPlayerSearch = GS()->GetPlayer(i, true, true);
@@ -89,7 +93,7 @@ bool CSkill::Use()
 		}
 
 		GS()->CreateText(NULL, false, vec2(PlayerPosition.x, PlayerPosition.y - 96.0f), vec2(0, 0), 40, "RECOVERY AMMO");
-
+	}
 	default:
 		return false;
 	}
