@@ -395,6 +395,21 @@ void AccountMainJob::UseVoucher(int ClientID, const char* pVoucher)
 			if(Upgrade > 0)
 				pPlayer->Acc().m_Upgrade += Upgrade;
 
+			if (JsonData.find("items") != JsonData.end() && JsonData["items"].is_array())
+			{
+				for (nlohmann::json Item : JsonData["items"])
+				{
+					int ItemID = Item.value("id", -1);
+					int Value = Item.value("value", 0);
+
+					if (ItemID > NOPE && Value > 0)
+					{
+						if (InventoryJob::ms_aItemsInfo.find(ItemID) != InventoryJob::ms_aItemsInfo.end())
+							pPlayer->GetItem(ItemID).Add(Value);
+					}
+				}
+			}
+
 			SJK.ID("tw_voucher_redeemed", "(voucher_id, user_id, time_created) VALUES (%d, %d, %d)", VoucherID, pPlayer->Acc().m_AuthID, (int)time(0));
 			GS()->Chat(ClientID, "You have successfully redeemed the voucher '{STR}'.", pVoucher);
 		}
