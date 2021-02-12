@@ -40,11 +40,13 @@ bool CSkill::Use()
 
 	const vec2 PlayerPosition = pChr->GetPos();
 	const int ClientID = m_pPlayer->GetCID();
-	if(m_SkillID == Skill::SkillHeartTurret)
+
+	switch (m_SkillID)
 	{
-		for(CHealthHealer* pHh = (CHealthHealer*)GS()->m_World.FindFirst(CGameWorld::ENTYPE_SKILLTURRETHEART); pHh; pHh = (CHealthHealer*)pHh->TypeNext())
+	case Skill::SkillHeartTurret:
+		for (CHealthHealer* pHh = (CHealthHealer*)GS()->m_World.FindFirst(CGameWorld::ENTYPE_SKILLTURRETHEART); pHh; pHh = (CHealthHealer*)pHh->TypeNext())
 		{
-			if(pHh->m_pPlayer->GetCID() != ClientID)
+			if (pHh->m_pPlayer->GetCID() != ClientID)
 				continue;
 
 			pHh->Reset();
@@ -52,14 +54,11 @@ bool CSkill::Use()
 		}
 		const int PowerLevel = PriceMana;
 		new CHealthHealer(&GS()->m_World, m_pPlayer, GetBonus(), PowerLevel, PlayerPosition);
-		return true;
-	}
 
-	if(m_SkillID == Skill::SkillSleepyGravity)
-	{
-		for(CSleepyGravity* pHh = (CSleepyGravity*)GS()->m_World.FindFirst(CGameWorld::ENTYPE_SLEEPYGRAVITY); pHh; pHh = (CSleepyGravity*)pHh->TypeNext())
+	case Skill::SkillSleepyGravity:
+		for (CSleepyGravity* pHh = (CSleepyGravity*)GS()->m_World.FindFirst(CGameWorld::ENTYPE_SLEEPYGRAVITY); pHh; pHh = (CSleepyGravity*)pHh->TypeNext())
 		{
-			if(pHh->m_pPlayer->GetCID() != ClientID)
+			if (pHh->m_pPlayer->GetCID() != ClientID)
 				continue;
 
 			pHh->Reset();
@@ -67,27 +66,21 @@ bool CSkill::Use()
 		}
 		const int PowerLevel = PriceMana;
 		new CSleepyGravity(&GS()->m_World, m_pPlayer, GetBonus(), PowerLevel, PlayerPosition);
-		return true;
-	}
 
-	if(m_SkillID == Skill::SkillNoctisTeleport)
-	{
+	case Skill::SkillNoctisTeleport:
 		new CNoctisTeleport(&GS()->m_World, PlayerPosition, pChr, GetBonus());
-		return true;
-	}
 
-	if(m_SkillID == Skill::SkillBlessingGodWar)
-	{
-		for(int i = 0; i < MAX_PLAYERS; i++)
+	case Skill::SkillBlessingGodWar:
+		for (int i = 0; i < MAX_PLAYERS; i++)
 		{
 			CPlayer* pPlayerSearch = GS()->GetPlayer(i, true, true);
-			if(!pPlayerSearch || !GS()->IsPlayerEqualWorldID(i) || distance(PlayerPosition, pPlayerSearch->GetCharacter()->GetPos()) > 800
+			if (!pPlayerSearch || !GS()->IsPlayerEqualWorldID(i) || distance(PlayerPosition, pPlayerSearch->GetCharacter()->GetPos()) > 800
 				|| (pPlayerSearch->GetCharacter()->IsAllowedPVP(ClientID) && i != ClientID))
 				continue;
 
 			const int RealAmmo = 10 + pPlayerSearch->GetAttributeCount(Stats::StAmmo);
 			const int RestoreAmmo = kurosio::translate_to_procent_rest(RealAmmo, min(GetBonus(), 100));
-			for(int i = WEAPON_GUN; i <= WEAPON_LASER; i++)
+			for (int i = WEAPON_GUN; i <= WEAPON_LASER; i++)
 			{
 				pPlayerSearch->GetCharacter()->GiveWeapon(i, RestoreAmmo);
 				GS()->CreateSound(PlayerPosition, SOUND_CTF_GRAB_PL);
@@ -96,9 +89,12 @@ bool CSkill::Use()
 		}
 
 		GS()->CreateText(NULL, false, vec2(PlayerPosition.x, PlayerPosition.y - 96.0f), vec2(0, 0), 40, "RECOVERY AMMO");
-		return true;
+
+	default:
+		return false;
 	}
-	return false;
+
+	return true;
 }
 
 bool CSkill::Upgrade()
