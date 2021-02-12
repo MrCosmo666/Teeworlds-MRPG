@@ -56,7 +56,7 @@ void AccountMinerJob::Work(CPlayer *pPlayer, int Level)
 	pPlayer->Acc().m_aMiner[MnrExp] += clamp(MultiplierExperience, 1, MultiplierExperience);
 
 	int ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().m_aMiner[MnrLevel]);
-	for( ; pPlayer->Acc().m_aMiner[MnrExp] >= ExperienceNeed; )
+	while(pPlayer->Acc().m_aMiner[MnrExp] >= ExperienceNeed)
 	{
 		pPlayer->Acc().m_aMiner[MnrExp] -= ExperienceNeed;
 		pPlayer->Acc().m_aMiner[MnrLevel]++;

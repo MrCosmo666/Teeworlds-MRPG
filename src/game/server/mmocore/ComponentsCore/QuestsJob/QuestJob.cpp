@@ -68,9 +68,9 @@ bool QuestJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 	const int ClientID = pPlayer->GetCID();
 	if(ReplaceMenu)
 	{
-		CCharacter* pChr = pPlayer->GetCharacter();
+		/*CCharacter* pChr = pPlayer->GetCharacter();
 		if(!pChr || !pChr->IsAlive())
-			return false;
+			return false;*/
 
 		return false;
 	}

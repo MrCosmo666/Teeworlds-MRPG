@@ -163,7 +163,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 			GS()->Chat(ClientID, "You have {INT} unread messages!", &CountMessageInbox);
 
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
-		GS()->SendFullyEquipments(ClientID);
+		GS()->SendFullyEquipments(ClientID); // ide shows that GS doesn't have this method
 		return;
 	}
 
@@ -231,9 +231,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 {
 	const int ClientID = pPlayer->GetCID();
 	if (ReplaceMenu)
-	{
 		return false;
-	}
 
 	// settings
 	if (Menulist == MenuList::MENU_SETTINGS)
