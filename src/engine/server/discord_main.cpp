@@ -163,6 +163,24 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		sendMessage(message.channelID, "\0", EmbedOnlines);
 	}
 
+	//avatar
+	else if (message.startsWith("!mavatar"))
+	{
+		std::string avatar = message.author.avatarUrl();
+		std::string UserChecking = message.content.substr(8, std::numeric_limits<size_t>::max());
+		UserChecking.erase(std::remove_if(UserChecking.begin(), UserChecking.end(), [](unsigned char symbol)
+		{ 
+			return (symbol < '0' || symbol > '9');
+		}), UserChecking.end());
+			
+		if(!UserChecking.empty())
+		{
+			SleepyDiscord::User userAuth = getUser(UserChecking);
+			avatar = userAuth.avatarUrl();
+		}
+		sendMessage(message.channelID, avatar);
+	}
+
 	// ideas-voting
 	if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordIdeasChanal) == 0)
 	{
