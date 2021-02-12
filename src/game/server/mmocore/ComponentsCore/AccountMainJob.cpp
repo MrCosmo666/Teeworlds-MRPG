@@ -410,6 +410,9 @@ void AccountMainJob::UseVoucher(int ClientID, const char* pVoucher)
 				}
 			}
 
+			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_STATS);
+			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_UPGRADES);
+
 			SJK.ID("tw_voucher_redeemed", "(voucher_id, user_id, time_created) VALUES (%d, %d, %d)", VoucherID, pPlayer->Acc().m_AuthID, (int)time(0));
 			GS()->Chat(ClientID, "You have successfully redeemed the voucher '{STR}'.", pVoucher);
 		}
