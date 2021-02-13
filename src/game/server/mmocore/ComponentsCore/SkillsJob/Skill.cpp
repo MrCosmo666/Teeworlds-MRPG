@@ -55,6 +55,7 @@ bool CSkill::Use()
 		}
 		const int PowerLevel = PriceMana;
 		new CHealthHealer(&GS()->m_World, m_pPlayer, GetBonus(), PowerLevel, PlayerPosition);
+		break;
 	}
 	case Skill::SkillSleepyGravity:
 	{
@@ -68,10 +69,12 @@ bool CSkill::Use()
 		}
 		const int PowerLevel = PriceMana;
 		new CSleepyGravity(&GS()->m_World, m_pPlayer, GetBonus(), PowerLevel, PlayerPosition);
+		break;
 	}
 	case Skill::SkillNoctisTeleport:
 	{
 		new CNoctisTeleport(&GS()->m_World, PlayerPosition, pChr, GetBonus());
+		break;
 	}
 	case Skill::SkillBlessingGodWar:
 	{
@@ -93,6 +96,7 @@ bool CSkill::Use()
 		}
 
 		GS()->CreateText(NULL, false, vec2(PlayerPosition.x, PlayerPosition.y - 96.0f), vec2(0, 0), 40, "RECOVERY AMMO");
+		break;
 	}
 	default:
 	{
