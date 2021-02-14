@@ -47,7 +47,7 @@ int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char 
 		GS()->Chat(ClientID, "- - - - [Your nickname is already registered] - - - -");
 		GS()->Chat(ClientID, "Your nick is a unique identifier, and it has already been used!");
 		GS()->Chat(ClientID, "You can restore access by contacting support, or change nick.");
-		GS()->Chat(ClientID, "Discord group \"{STR}\".", g_Config.m_SvDiscordInviteGroup);
+		GS()->Chat(ClientID, "Discord group \"{STR}\".", g_Config.m_SvDiscordInviteLink);
 		return SendAuthCode(ClientID, AUTH_REGISTER_ERROR_NICK);
 	}
 

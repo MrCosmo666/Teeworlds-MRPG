@@ -260,7 +260,7 @@ void CServerBan::ConBanExt(IConsole::IResult *pResult, void *pUser)
 			char aAddrStr[NETADDR_MAXSTRSIZE];
 			net_addr_str(pThis->Server()->m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), true);
 			str_format(aBuf, sizeof(aBuf), "Player %s IP(%s). Banned for %d minutes!", pThis->Server()->ClientName(ClientID), aAddrStr, Minutes);
-			pThis->Server()->SendDiscordMessage(g_Config.m_SvDiscordAdminChanal, DC_SERVER_WARNING, "Bans information!", aBuf);
+			pThis->Server()->SendDiscordMessage(g_Config.m_SvDiscordAdminChannel, DC_SERVER_WARNING, "Bans information!", aBuf);
 			pThis->BanAddr(pThis->Server()->m_NetServer.ClientAddr(ClientID), Minutes*60, pReason);
 		}
 	}
@@ -471,7 +471,7 @@ int CServer::GetClientWorldID(int ClientID)
 void CServer::SendDiscordGenerateMessage(const char *pTitle, int AuthID, const char* pColor)
 {
 #ifdef CONF_DISCORD
-	DiscordTask Task(std::bind(&DiscordJob::SendGenerateMessageAuthID, m_pDiscord, SleepyDiscord::User(), std::string(g_Config.m_SvDiscordChanal), std::string(pTitle), AuthID, std::string(pColor)));
+	DiscordTask Task(std::bind(&DiscordJob::SendGenerateMessageAuthID, m_pDiscord, SleepyDiscord::User(), std::string(g_Config.m_SvDiscordServerChatChannel), std::string(pTitle), AuthID, std::string(pColor)));
 	m_pDiscord->AddThreadTask(Task);
 	#endif
 }

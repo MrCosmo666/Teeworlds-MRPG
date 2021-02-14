@@ -30,7 +30,7 @@ namespace SleepyDiscord {
 
 	}
 
-	void BaseDiscordClient::onMember(Snowflake<Server> serverID, ServerMember member) {
+	void BaseDiscordClient::onAddMember(Snowflake<Server> serverID, ServerMember member) {
 
 	}
 

@@ -471,7 +471,7 @@ namespace SleepyDiscord {
 				Snowflake<Server> serverID = d["guild_id"];
 				ServerMember member(d);
 				appendObjectToCache(serverID, &Server::members, member);
-				onMember(serverID, member);
+				onAddMember(serverID, member);
 				} break;
 			case hash("GUILD_MEMBER_REMOVE"        ): {
 				Snowflake<Server> serverID = d["guild_id"];

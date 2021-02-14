@@ -559,7 +559,7 @@ void CGS::ChatDiscord(const char *Color, const char *Title, const char* pText, .
 	
 	dynamic_string Buffer;
 	Server()->Localization()->Format_VL(Buffer, "en", pText, VarArgs);
-	Server()->SendDiscordMessage(g_Config.m_SvDiscordChanal, Color, Title, Buffer.buffer());
+	Server()->SendDiscordMessage(g_Config.m_SvDiscordServerChatChannel, Color, Title, Buffer.buffer());
 	Buffer.clear();
 
 	va_end(VarArgs);
@@ -1960,7 +1960,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		// statistics menu
 		const int ExpForLevel = pPlayer->ExpNeed(pPlayer->Acc().m_Level);
 		AVH(ClientID, TAB_STAT, GREEN_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().m_aLastLogin);
-		AVM(ClientID, "null", NOPE, TAB_STAT, "Discord: \"{STR}\"", g_Config.m_SvDiscordInviteGroup);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Discord: \"{STR}\"", g_Config.m_SvDiscordInviteLink);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Level {INT} : Exp {INT}/{INT}", &pPlayer->Acc().m_Level, &pPlayer->Acc().m_Exp, &ExpForLevel);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Skill Point {INT}SP", &pPlayer->GetItem(itSkillPoint).m_Count);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Gold: {INT}", &pPlayer->GetItem(itGold).m_Count);

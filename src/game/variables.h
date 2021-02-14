@@ -160,13 +160,17 @@ MACRO_CONFIG_INT(SvLimitDecoration, sv_limit_decorations, 10, 5, 20, CFGFLAG_SER
 // discord
 MACRO_CONFIG_INT(SvCreateDiscordBot, sv_discord_bot, 1, 0, 1, CFGFLAG_SERVER, "Create discord bot")
 MACRO_CONFIG_STR(SvDiscordToken, sv_discord_token, 256, "", CFGFLAG_SERVER, "Discord Token")
-MACRO_CONFIG_STR(SvDiscordChanal, sv_discord_server_chanel, 128, "", CFGFLAG_SERVER, "Discord Server Chanel")
-MACRO_CONFIG_STR(SvDiscordIdeasChanal, sv_discord_ideas_chanel, 128, "", CFGFLAG_SERVER, "Discord Ideas Chanel")
-MACRO_CONFIG_STR(SvDiscordAdminChanal, sv_discord_admin_chanel, 128, "", CFGFLAG_SERVER, "Discord Admin Chanel")
-MACRO_CONFIG_STR(SvDiscordInviteGroup, sv_discord_invite_group, 32, "nope", CFGFLAG_SERVER, "Discord group.")
+MACRO_CONFIG_STR(SvDiscordInviteLink, sv_discord_invite_link, 32, "nope", CFGFLAG_SERVER, "Link to server invitation")
 MACRO_CONFIG_STR(SvDiscordGenerateURL, sv_discord_generateurl, 128, "nope", CFGFLAG_SERVER, "Path folder generate image. Example 'submodules/generator'.")
 MACRO_CONFIG_STR(SvSiteUrl, sv_site_url, 128, "nope", CFGFLAG_SERVER, "Url site. Example 'https://mrpg.teeworlds.dev'")
 
+// discord channels
+MACRO_CONFIG_STR(SvDiscordWelcomeChannel, sv_discord_welcome_channel, 128, "", CFGFLAG_SERVER, "Discord welcome channel")
+MACRO_CONFIG_STR(SvDiscordServerChatChannel, sv_discord_server_chat_channel, 128, "", CFGFLAG_SERVER, "Discord server chat channel")
+MACRO_CONFIG_STR(SvDiscordSuggestionChannel, sv_discord_suggestion_channel, 128, "", CFGFLAG_SERVER, "Discord suggestions channel")
+MACRO_CONFIG_STR(SvDiscordAdminChannel, sv_discord_admin_channel, 128, "", CFGFLAG_SERVER, "Discord admin channel")
+
+// discord colors
 MACRO_CONFIG_STR(SvDiscordColorWarning, sv_discord_color_warning, 32, "13183530", CFGFLAG_SERVER, "Discord embed color warning.")
 MACRO_CONFIG_STR(SvDiscordColorServerChat, sv_discord_color_server, 32, "11253955", CFGFLAG_SERVER, "Discord embed color server chat.")
 MACRO_CONFIG_STR(SvDiscordColorJoinLeave, sv_discord_color_joinleave, 32, "14494801", CFGFLAG_SERVER, "Discord embed color enter exit.")
