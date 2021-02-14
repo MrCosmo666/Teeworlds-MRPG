@@ -188,7 +188,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	}
 
 	// ideas-voting
-	if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordIdeasChannel) == 0)
+	if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordSuggestionChannel) == 0)
 	{
 		deleteMessage(message.channelID, message);
 
