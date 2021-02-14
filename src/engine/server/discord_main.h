@@ -18,6 +18,8 @@ private:
 	/************************************************************************/
 	/* Discord main functions                                               */
 	/************************************************************************/
+	void onAddMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> serverID, SleepyDiscord::ServerMember member) override;
+	void onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> serverID, SleepyDiscord::User user) override;
 	void onMessage(SleepyDiscord::Message message) override;
 	bool SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::string Chanal, std::string Title, std::string SearchNickname, std::string Color = "\0", bool MultipleSearch = true);
 	bool SendGenerateMessageAuthID(SleepyDiscord::User UserRequestFrom, std::string Chanal, std::string Title, int AuthID, std::string Color = "\0");

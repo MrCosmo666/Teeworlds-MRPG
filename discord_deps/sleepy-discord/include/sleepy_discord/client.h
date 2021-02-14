@@ -511,7 +511,7 @@ namespace SleepyDiscord {
 		virtual void onEditServer        (Server            server      );
 		virtual void onBan               (Snowflake<Server> serverID, User user);
 		virtual void onUnban             (Snowflake<Server> serverID, User user);
-		virtual void onMember            (Snowflake<Server> serverID, ServerMember member);
+		virtual void onAddMember         (Snowflake<Server> serverID, ServerMember member);
 		virtual void onRemoveMember      (Snowflake<Server> serverID, User user);
 		virtual void onEditMember        (Snowflake<Server> serverID, User user, std::vector<Snowflake<Role>> roles, std::string nick);
 		virtual void onRole              (Snowflake<Server> serverID, Role role);

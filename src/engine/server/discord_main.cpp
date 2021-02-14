@@ -24,13 +24,36 @@ DiscordJob::DiscordJob(IServer* pServer) : SleepyDiscord::DiscordClient(g_Config
 /************************************************************************/
 /* Discord main functions                                               */
 /************************************************************************/
+void DiscordJob::onAddMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> serverID, SleepyDiscord::ServerMember member)
+{
+	// welcome messages
+	std::vector <std::string > WelcomesStr;
+	WelcomesStr.push_back("I can't believe my eyes! Wipe my window " + member.user.showUser());
+	WelcomesStr.push_back(member.user.showUser() + ", i bet you haven't seen me as long as i had!");
+	WelcomesStr.push_back("Welcome, " + member.user.showUser() + ". We hope you're not coming to us without pizza!");
+	WelcomesStr.push_back("The raptor "+ member.user.showUser() + " appeared. Watch out!");
+	std::string RulesStr("\n**Don't forget to read the rules <#708092196024352768>!**");
+
+	const int RandomID = random_int() % WelcomesStr.size();
+	std::string Fullmessage(WelcomesStr[RandomID] + RulesStr);
+
+	SleepyDiscord::Embed EmbedWelcome;
+	EmbedWelcome.color = 3553599;
+	EmbedWelcome.description = Fullmessage;
+	sendMessage(g_Config.m_SvDiscordServerChatChannel, "\0", EmbedWelcome);
+}
+
+void DiscordJob::onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> serverID, SleepyDiscord::User user)
+{
+}
+
 void DiscordJob::onMessage(SleepyDiscord::Message message) 
 {
 	if(message.length() <= 0 || message.author == getCurrentUser().cast())
 	 	return;
 
 	// send from the discord chat to server chat
-	if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordChanal) == 0)
+	if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordServerChatChannel) == 0)
 	{
 		std::string Nickname("D|" + message.author.username);
 		m_pServer->GameServer(FAKE_DISCORD_WORLD_ID)->FakeChat(Nickname.c_str(), message.content.c_str());
@@ -164,7 +187,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	}
 
 	// ideas-voting
-	if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordIdeasChanal) == 0)
+	if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordIdeasChannel) == 0)
 	{
 		deleteMessage(message.channelID, message);
 

@@ -8,7 +8,8 @@
 #include "nonstd/string_view.hpp"
 #include "json_wrapper.h"
 
-namespace SleepyDiscord {
+namespace SleepyDiscord 
+{
 	using Time = int64_t;
 
 	//Stops you from mixing up different types of ids, like using a message_id as a user_id
