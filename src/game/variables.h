@@ -164,6 +164,9 @@ MACRO_CONFIG_STR(SvDiscordInviteLink, sv_discord_invite_link, 32, "nope", CFGFLA
 MACRO_CONFIG_STR(SvDiscordGenerateURL, sv_discord_generateurl, 128, "nope", CFGFLAG_SERVER, "Path folder generate image. Example 'submodules/generator'.")
 MACRO_CONFIG_STR(SvSiteUrl, sv_site_url, 128, "nope", CFGFLAG_SERVER, "Url site. Example 'https://mrpg.teeworlds.dev'")
 
+// discord roles
+MACRO_CONFIG_STR(SvDiscordMemberRole, sv_discord_member_role, 128, "", CFGFLAG_SERVER, "Discord role that gives when member joins.")
+
 // discord channels
 MACRO_CONFIG_STR(SvDiscordWelcomeChannel, sv_discord_welcome_channel, 128, "", CFGFLAG_SERVER, "Discord welcome channel")
 MACRO_CONFIG_STR(SvDiscordServerChatChannel, sv_discord_server_chat_channel, 128, "", CFGFLAG_SERVER, "Discord server chat channel")

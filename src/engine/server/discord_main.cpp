@@ -41,6 +41,9 @@ void DiscordJob::onAddMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> ser
 	EmbedWelcome.color = 3553599;
 	EmbedWelcome.description = Fullmessage;
 	sendMessage(g_Config.m_SvDiscordWelcomeChannel, "\0", EmbedWelcome);
+
+	// give member role
+	addRole(serverID, member.ID, g_Config.m_SvDiscordMemberRole);
 }
 
 void DiscordJob::onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> serverID, SleepyDiscord::User user)
