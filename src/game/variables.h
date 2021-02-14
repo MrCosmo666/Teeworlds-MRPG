@@ -165,10 +165,10 @@ MACRO_CONFIG_STR(SvDiscordGenerateURL, sv_discord_generateurl, 128, "nope", CFGF
 MACRO_CONFIG_STR(SvSiteUrl, sv_site_url, 128, "nope", CFGFLAG_SERVER, "Url site. Example 'https://mrpg.teeworlds.dev'")
 
 // discord channels
-MACRO_CONFIG_STR(SvDiscordWelcomeChannel, sv_discord_welcome_channel, 128, "", CFGFLAG_SERVER, "Discord Welcome Channel")
-MACRO_CONFIG_STR(SvDiscordServerChatChannel, sv_discord_server_chat_channel, 128, "", CFGFLAG_SERVER, "Discord Server Chat Channel")
-MACRO_CONFIG_STR(SvDiscordIdeasChannel, sv_discord_ideas_channel, 128, "", CFGFLAG_SERVER, "Discord Ideas Channel")
-MACRO_CONFIG_STR(SvDiscordAdminChannel, sv_discord_admin_channel, 128, "", CFGFLAG_SERVER, "Discord Admin Channel")
+MACRO_CONFIG_STR(SvDiscordWelcomeChannel, sv_discord_welcome_channel, 128, "", CFGFLAG_SERVER, "Discord welcome channel")
+MACRO_CONFIG_STR(SvDiscordServerChatChannel, sv_discord_server_chat_channel, 128, "", CFGFLAG_SERVER, "Discord server chat channel")
+MACRO_CONFIG_STR(SvDiscordSuggestionChannel, sv_discord_suggestion_channel, 128, "", CFGFLAG_SERVER, "Discord suggestions channel")
+MACRO_CONFIG_STR(SvDiscordAdminChannel, sv_discord_admin_channel, 128, "", CFGFLAG_SERVER, "Discord admin channel")
 
 // discord colors
 MACRO_CONFIG_STR(SvDiscordColorWarning, sv_discord_color_warning, 32, "13183530", CFGFLAG_SERVER, "Discord embed color warning.")

@@ -66,6 +66,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		EmbedHelp.title = "Commands / Information";
 		EmbedHelp.description = "**!mconnect** - Info for connect your discord to account in game."
 			"\n**!monline** - Show players online."
+			"\n**!mavatar** - Show user avatar."
 			"\n**!mranking** - Show ranking by level."
 			"\n**!mgoldranking** - Show ranking by gold."
 			"\n**!mstats <symbols>** - Search for player accounts cards. Minimum 1 symbol.";
