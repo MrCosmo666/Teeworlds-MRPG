@@ -9,7 +9,7 @@ class CSkill
 {
 	CGS* m_pGS;
 	CPlayer* m_pPlayer;
-	CGS* GS() { return m_pGS; }
+	CGS* GS() const { return m_pGS; }
 
 public:
 	CSkill() : m_pPlayer(nullptr)

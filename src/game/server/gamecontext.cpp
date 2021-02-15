@@ -13,6 +13,7 @@
 
 #include <game/collision.h>
 #include <game/gamecore.h>
+
 #include "gamemodes/main.h"
 #include "gamemodes/dungeon.h"
 

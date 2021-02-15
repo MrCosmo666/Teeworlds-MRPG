@@ -17,7 +17,8 @@ public:
 	std::string GetJsonName(int AuthID) const;
 	const char* GetName() const { return m_aName; }
 	const char* GetStory() const { return m_aStoryLine; }
-	int GetStoryCount(int CountFromQuestID = -1) const;
+	int GetQuestStoryPosition() const;
+	int GetQuestStorySize() const;
 
 	std::map<int, CPlayerStepQuestBot> CopyBasicSteps()
 	{
