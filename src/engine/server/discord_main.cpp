@@ -23,20 +23,20 @@ DiscordJob::DiscordJob(IServer* pServer) : SleepyDiscord::DiscordClient(g_Config
 }
 
 /************************************************************************/
-/* Discord main functions                                               */
+/* Discord main events functions                                        */
 /************************************************************************/
 void DiscordJob::onAddMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> serverID, SleepyDiscord::ServerMember member)
 {
 	// welcome messages
-	std::vector <std::string > WelcomesStr;
-	WelcomesStr.push_back("I can't believe my eyes! Wipe my window " + member.user.showUser());
-	WelcomesStr.push_back(member.user.showUser() + ", i bet you haven't seen me as long as i had!");
-	WelcomesStr.push_back("Welcome, " + member.user.showUser() + ". We hope you're not coming to us without pizza!");
-	WelcomesStr.push_back("The raptor "+ member.user.showUser() + " appeared. Watch out!");
+	std::vector < std::string > ArrayWelcomes;
+	ArrayWelcomes.push_back("I can't believe my eyes! Wipe my window " + member.user.showUser());
+	ArrayWelcomes.push_back(member.user.showUser() + ", i bet you haven't seen me as long as i had!");
+	ArrayWelcomes.push_back("Welcome, " + member.user.showUser() + ". We hope you're not coming to us without pizza!");
+	ArrayWelcomes.push_back("The raptor "+ member.user.showUser() + " appeared. Watch out!");
 	std::string RulesStr("\n**Don't forget to read the rules <#708092196024352768>!**");
 
-	const int RandomID = random_int() % WelcomesStr.size();
-	std::string Fullmessage(WelcomesStr[RandomID] + RulesStr);
+	const int RandomID = random_int() % ArrayWelcomes.size();
+	std::string Fullmessage(ArrayWelcomes[RandomID] + RulesStr);
 
 	SleepyDiscord::Embed EmbedWelcome;
 	EmbedWelcome.color = 3553599;
@@ -61,6 +61,28 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	{
 		std::string Nickname("D|" + message.author.username);
 		m_pServer->GameServer(FAKE_DISCORD_WORLD_ID)->FakeChat(Nickname.c_str(), message.content.c_str());
+		return;
+	}
+
+	// suggestions-voting
+	if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordSuggestionChannel) == 0)
+	{
+		deleteMessage(message.channelID, message);
+
+		SleepyDiscord::Embed EmbedIdeas;
+		EmbedIdeas.title = std::string("Suggestion");
+		EmbedIdeas.description = "From: " + message.author.showUser() + "\n" + message.content;
+		EmbedIdeas.color = 431050;
+		EmbedIdeas.thumbnail.url = message.author.avatarUrl();
+		EmbedIdeas.thumbnail.proxyUrl = message.author.avatarUrl();
+		EmbedIdeas.footer.text = "Use reactions for voting!";
+		EmbedIdeas.footer.iconUrl = message.author.avatarUrl();
+		EmbedIdeas.footer.proxyIconUrl = message.author.avatarUrl();
+
+		SleepyDiscord::Message pMessage = sendMessage(message.channelID, "\0", EmbedIdeas);
+		addReaction(message.channelID, pMessage, "%E2%9C%85");
+		addReaction(message.channelID, pMessage, "%E2%9D%8C");
+		return;
 	}
 
 	// help
@@ -78,29 +100,19 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		sendMessage(message.channelID, "\0", EmbedHelp);
 	}
 
-	// statistics
+	// search for account stats
 	else if (message.startsWith("!mstats"))
 	{
 		if(message.content.size() <= 8)
 		{
-			SleepyDiscord::Embed EmbedWarning;
-			EmbedWarning.title = "Not right!";
-			EmbedWarning.description = "Use: **!mstats <symbols>**. Minimum 1 symbol!";
-			EmbedWarning.color = string_to_number(DC_SERVER_WARNING, 0, 1410065407);
-			sendMessage(message.channelID, "\0", EmbedWarning);
+			SendWarningMessage(message.channelID, "You must enter at least 1 character to search for accounts.");
 			return;
 		}
 
 		std::string InputNick = "%" + message.content.substr(8, message.content.length() - 8) + "%";
 		bool Found = SendGenerateMessage(message.author, message.channelID, "Discord MRPG Card", InputNick.c_str());
 		if(!Found)
-		{
-			SleepyDiscord::Embed EmbedWarning;
-			EmbedWarning.title = "Sorry!";
-			EmbedWarning.description = "**This account not found in database!**";
-			EmbedWarning.color = string_to_number(DC_SERVER_WARNING, 0, 1410065407);
-			sendMessage(message.channelID, "\0", EmbedWarning);
-		}
+			SendWarningMessage(message.channelID, "Accounts containing [" + InputNick + "] among nicknames were not found on the server.");
 	}
 
 	// ranking
@@ -129,39 +141,29 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 
 	// connect discordid to database
 	else if (message.startsWith("!mconnect"))
-	{	
-		SleepyDiscord::Snowflake<SleepyDiscord::User> userAuth = getUser(message.author).cast();
-
-		SleepyDiscord::Embed EmbedConnectInfo;
-		EmbedConnectInfo.title = "Connector Information";
-		EmbedConnectInfo.description = "```ini\n[Warning] Do not connect other people's discords to your account in the game"
-			"\nThis is similar to hacking your account in the game"
-			"\n# Use in-game for connect your personal discord:"
-			"\n# Did '" + userAuth +
-			"'\n# Command in-game: /discord_connect <did>```";
-		EmbedConnectInfo.color = string_to_number(DC_DISCORD_INFO, 0, 1410065407);
-		sendMessage(message.channelID, "\0", EmbedConnectInfo);
-
-		SleepyDiscord::Embed EmbedConnectResult;
-		std::string Nick = "Refresh please.";
-		std::string UserID = userAuth;
-		sqlstr::CSqlString<64> DiscordID = sqlstr::CSqlString<64>(UserID.c_str());
+	{
+		sqlstr::CSqlString<64> DiscordID = sqlstr::CSqlString<64>(std::string(message.author.ID).c_str());
 		ResultPtr pRes = SJK.SD("Nick", "tw_accounts_data", "WHERE DiscordID = '%s'", DiscordID.cstr());
 		if(!pRes->rowsCount())
 		{
-			EmbedConnectResult.title = "Fail in work :(";
-			EmbedConnectResult.description = "**Fail connect. See !mconnect.\nUse in-game /discord_connect <DID>..**";
-			EmbedConnectResult.color = string_to_number(DC_SERVER_WARNING, 0, 1410065407);
-			sendMessage(message.channelID, "\0", EmbedConnectResult);
-		}
-		while(pRes->next())
-		{
-			Nick = pRes->getString("Nick").c_str();
+			SleepyDiscord::Embed EmbedConnectInfo;
+			EmbedConnectInfo.title = "Information on how to connect your account";
+			EmbedConnectInfo.description = "**Warning:**\n"
+				"Do not connect other people's discord accounts to your in-game account. This is similar to hacking your account in the game.\n\n"
+				"**How to connect:**\n"
+				"You need to enter in the game the command \"__/discord_connect <did>__\".\n"
+				"Your personal Discord ID: " + message.author.ID;
+			EmbedConnectInfo.color = string_to_number(DC_DISCORD_INFO, 0, 1410065407);
+			sendMessage(message.channelID, "\0", EmbedConnectInfo);
 
-			EmbedConnectResult.title = "Good work :)";
-			EmbedConnectResult.description = "**Your account is enabled: Nickname in-game: " + Nick + "**";
-			EmbedConnectResult.color = string_to_number(DC_DISCORD_BOT, 0, 1410065407);
-			sendMessage(message.channelID, "\0", EmbedConnectResult);
+			SendWarningMessage(message.channelID, "Your account is not connected to the game account.\nSee the information in !mconnect, to connect your account to Discord.");
+			return;
+		}
+
+		if(pRes->next())
+		{
+			std::string Nick(pRes->getString("Nick").c_str());
+			SendSuccesfulMessage(message.channelID, "Your account is connected to the game Nickname [" + Nick + "].");
 		}
 	}
 
@@ -172,7 +174,6 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		CGS* pGS = (CGS*)Server()->GameServer(MAIN_WORLD_ID);
 		for(int i = 0; i < MAX_PLAYERS; i++) 
 		{
-			// THREAD_PLAYER_DATA_SAFE(i) // this thread working on detach we can got (Big ass)
 			CPlayer* pPlayer = pGS->GetPlayer(i);
 			if(pPlayer)
 			{
@@ -181,52 +182,56 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 				Onlines += "**" + Nickname + "** - " + Team + "\n";
 			}
 		}
-		if(Onlines.empty())
-			Onlines = "Server is empty";
 
 		SleepyDiscord::Embed EmbedOnlines;
 		EmbedOnlines.title = "Online Server";
-		EmbedOnlines.description = Onlines;
+		EmbedOnlines.description = Onlines.empty() ? "Server is empty" : Onlines;
 		EmbedOnlines.color = string_to_number(DC_DISCORD_BOT, 0, 1410065407);
 		sendMessage(message.channelID, "\0", EmbedOnlines);
 	}
 
-	//avatar
+	// show user avatars
 	else if (message.startsWith("!mavatar"))
 	{
-		std::string avatar = message.author.avatarUrl();
-		std::string UserChecking = message.content.substr(8, std::numeric_limits<size_t>::max());
-		UserChecking.erase(std::remove_if(UserChecking.begin(), UserChecking.end(), [](unsigned char symbol)
-		{ return (symbol < '0' || symbol > '9'); }), UserChecking.end());
-			
-		if(!UserChecking.empty())
+		if(message.mentions.empty())
 		{
-			SleepyDiscord::User UserAvatar = getUser(UserChecking);
-			if(!UserAvatar.invalid())
-				avatar = UserAvatar.avatarUrl();
+			sendMessage(message.channelID, message.author.avatarUrl());
+			return;
 		}
-		sendMessage(message.channelID, avatar);
+		else if(message.mentions.size() > 2)
+		{
+			SendWarningMessage(message.channelID, "Prohibited to use this command with more than 2 people.");
+			return;
+		}
+
+		for(auto& pMention : message.mentions)
+			sendMessage(message.channelID, pMention.avatarUrl());
 	}
+}
 
-	// ideas-voting
-	if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordSuggestionChannel) == 0)
-	{
-		deleteMessage(message.channelID, message);
+/************************************************************************/
+/* Discord main functions                                               */
+/************************************************************************/
+void DiscordJob::SendSuccesfulMessage(SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, std::string Message)
+{
+	if(channelID.empty())
+		return;
 
-		SleepyDiscord::Embed EmbedIdeas;
-		EmbedIdeas.title = std::string("Suggestion");
-		EmbedIdeas.description = "From: " + message.author.showUser() + "\n" + message.content;
-		EmbedIdeas.color = 431050;
-		EmbedIdeas.thumbnail.url = message.author.avatarUrl();
-		EmbedIdeas.thumbnail.proxyUrl = message.author.avatarUrl();
-		EmbedIdeas.footer.text = "Use reactions for voting!";
-		EmbedIdeas.footer.iconUrl = message.author.avatarUrl();
-		EmbedIdeas.footer.proxyIconUrl = message.author.avatarUrl();
+	SleepyDiscord::Embed EmbedSuccessful;
+	EmbedSuccessful.description = Message;
+	EmbedSuccessful.color = string_to_number(DC_DISCORD_BOT, 0, 1410065407);
+	sendMessage(channelID, "\0", EmbedSuccessful);
+}
 
-		SleepyDiscord::Message pMessage = sendMessage(message.channelID, "\0", EmbedIdeas);
-		addReaction(message.channelID, pMessage, "%E2%9C%85");
-		addReaction(message.channelID, pMessage, "%E2%9D%8C");
-	}
+void DiscordJob::SendWarningMessage(SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, std::string Message)
+{
+	if(channelID.empty())
+		return;
+
+	SleepyDiscord::Embed EmbedWarning;
+	EmbedWarning.description = Message;
+	EmbedWarning.color = string_to_number(DC_SERVER_WARNING, 0, 1410065407);
+	sendMessage(channelID, "\0", EmbedWarning);
 }
 
 bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::string Channel, std::string Title, std::string SearchNickname, std::string Color, bool MultipleSearch)
