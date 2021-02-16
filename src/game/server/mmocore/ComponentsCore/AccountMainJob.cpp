@@ -203,14 +203,19 @@ void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)
 {
 #ifdef CONF_DISCORD
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true);
-	if(!pPlayer) return;	
+	if(!pPlayer) 
+		return;	
 
 	CSqlString<64> DiscordID = CSqlString<64>(pDID);
+	
+	// disable another account if it is connected to this discord
 	SJK.UD("tw_accounts_data", "DiscordID = 'null' WHERE DiscordID = '%s'", DiscordID.cstr());
-	SJK.UD("tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", DiscordID.cstr(), pPlayer->Acc().m_AccountID);
+	
+	// connect the player discord id
+	SJK.UDS(1000,"tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", DiscordID.cstr(), pPlayer->Acc().m_AccountID);
 
-	GS()->Chat(ClientID, "Update DiscordID.");
-	GS()->Chat(ClientID, "Check connect status in Discord \"!mconnect\".");
+	GS()->Chat(ClientID, "Your Discord ID has been updated.");
+	GS()->Chat(ClientID, "Check the connection status in discord \"!mconnect\".");
 #endif
 }
 

@@ -1243,7 +1243,7 @@ void str_hex(char *dst, int dst_size, const void *data, int data_size);
 	Parameters:
 		str - String to check.
 	Returns:
-		Returns 0 if it's a number, -1 otherwise.
+		Returns 1 if it's a number, 0 otherwise.
 	Remarks:
 		- The strings are treated as zero-terminated strings.
 */
