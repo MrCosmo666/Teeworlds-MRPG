@@ -12,9 +12,7 @@ std::mutex lockingPath;
 CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint)
 : CPlayer(pGS, ClientID), m_BotType(SpawnPoint), m_BotID(BotID), m_SubBotID(SubBotID), m_BotHealth(0)
 {
-	m_Spawned = true;
 	m_DungeonAllowedSpawn = false;
-	m_aPlayerTick[TickState::Respawn] = Server()->Tick();
 	(this)->SendClientInfo(-1);
 }
 

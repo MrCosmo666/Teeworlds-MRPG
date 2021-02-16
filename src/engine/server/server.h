@@ -57,7 +57,6 @@ class CSnapIDPool
 	int m_InUsage;
 
 public:
-
 	CSnapIDPool();
 
 	void Reset();

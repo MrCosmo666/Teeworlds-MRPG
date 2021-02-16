@@ -28,7 +28,6 @@ class IServer : public IInterface
 protected:
 	int m_CurrentGameTick;
 	int m_TickSpeed;
-	float WorldTime;
 
 public:
 	// static std::mutex m_aMutexPlayerDataSafe[MAX_CLIENTS];
