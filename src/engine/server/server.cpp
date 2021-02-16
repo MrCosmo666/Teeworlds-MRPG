@@ -468,10 +468,10 @@ int CServer::GetClientWorldID(int ClientID)
 	return m_aClients[ClientID].m_WorldID;
 }
 
-void CServer::SendDiscordGenerateMessage(const char *pTitle, int AuthID, const char* pColor)
+void CServer::SendDiscordGenerateMessage(const char *pTitle, int AccountID, const char* pColor)
 {
 #ifdef CONF_DISCORD
-	DiscordTask Task(std::bind(&DiscordJob::SendGenerateMessageAuthID, m_pDiscord, SleepyDiscord::User(), std::string(g_Config.m_SvDiscordServerChatChannel), std::string(pTitle), AuthID, std::string(pColor)));
+	DiscordTask Task(std::bind(&DiscordJob::SendGenerateMessageAccountID, m_pDiscord, SleepyDiscord::User(), std::string(g_Config.m_SvDiscordServerChatChannel), std::string(pTitle), AccountID, std::string(pColor)));
 	m_pDiscord->AddThreadTask(Task);
 	#endif
 }

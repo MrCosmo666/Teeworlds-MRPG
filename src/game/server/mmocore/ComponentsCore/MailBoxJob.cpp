@@ -66,20 +66,20 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 }
 
 // sending a mail to a player
-void MailBoxJob::SendInbox(int AuthID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
+void MailBoxJob::SendInbox(int AccountID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
 {
 	// clear str and connection
 	const CSqlString<64> cName = CSqlString<64>(Name);
 	const CSqlString<64> cDesc = CSqlString<64>(Desc);
 	if (ItemID <= 0)
 	{
-		SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, OwnerID) VALUES ('%s', '%s', '%d');", cName.cstr(), cDesc.cstr(), AuthID);
+		SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, OwnerID) VALUES ('%s', '%s', '%d');", cName.cstr(), cDesc.cstr(), AccountID);
 		return;
 	}
 
 	SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, ItemID, Count, Enchant, OwnerID) VALUES ('%s', '%s', '%d', '%d', '%d', '%d');",
-		 cName.cstr(), cDesc.cstr(), ItemID, Count, Enchant, AuthID);
-	GS()->ChatAccountID(AuthID, "[Mailbox] New letter ({STR})!", cName.cstr());
+		 cName.cstr(), cDesc.cstr(), ItemID, Count, Enchant, AccountID);
+	GS()->ChatAccountID(AccountID, "[Mailbox] New letter ({STR})!", cName.cstr());
 }
 
 void MailBoxJob::ReceiveInbox(CPlayer* pPlayer, int InboxID)

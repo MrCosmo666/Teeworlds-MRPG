@@ -14,7 +14,7 @@ public:
 	int m_Gold;
 	int m_Exp;
 
-	std::string GetJsonFileName(int AuthID) const;
+	std::string GetJsonFileName(int AccountID) const;
 	const char* GetName() const { return m_aName; }
 	const char* GetStory() const { return m_aStoryLine; }
 	int GetQuestStoryPosition() const;

@@ -493,10 +493,10 @@ int HouseJob::PlayerHouseID(CPlayer *pPlayer) const
 	return -1;
 }
 
-int HouseJob::OwnerHouseID(int AuthID) const
+int HouseJob::OwnerHouseID(int AccountID) const
 {
 	for (auto ihome = ms_aHouse.begin(); ihome != ms_aHouse.end(); ihome++) {
-		if(ms_aHouse.at(ihome->first).m_OwnerID == AuthID)
+		if(ms_aHouse.at(ihome->first).m_OwnerID == AccountID)
 			return ihome->first;
 	}
 	return -1;
@@ -565,7 +565,7 @@ void HouseJob::SellHouse(int HouseID)
 		GS()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itGold, Price, 0);
 		SJK.UD("tw_houses", "OwnerID = NULL, HouseBank = '0' WHERE ID = '%d'", HouseID);
 
-		CPlayer *pPlayer = GS()->GetPlayerFromAuthID(OwnerID);
+		CPlayer *pPlayer = GS()->GetPlayerFromAccountID(OwnerID);
 		if(pPlayer)
 		{
 			GS()->ChatFollow(pPlayer->GetCID(), "Your House is sold!");

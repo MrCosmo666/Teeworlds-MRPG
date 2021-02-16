@@ -109,7 +109,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 			return SendAuthCode(ClientID, AUTH_LOGIN_WRONG);
 		}
 
-		if (GS()->GetPlayerFromAuthID(UserID) != nullptr)
+		if (GS()->GetPlayerFromAccountID(UserID) != nullptr)
 		{
 			GS()->Chat(ClientID, "The account is already in the game!");
 			return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
@@ -214,15 +214,15 @@ void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)
 #endif
 }
 
-int AccountMainJob::GetRank(int AuthID)
+int AccountMainJob::GetRank(int AccountID)
 {
 	int Rank = 0;
 	ResultPtr pRes = SJK.SD("ID", "tw_accounts_data", "ORDER BY Level DESC, Exp DESC");
 	while(pRes->next())
 	{
 		Rank++;
-		int SelectedAuthID = pRes->getInt("ID");
-		if(AuthID == SelectedAuthID) 
+		int SelectedAccountID = pRes->getInt("ID");
+		if(AccountID == SelectedAccountID)
 			return Rank;
 	}
 	return -1;

@@ -92,7 +92,7 @@ public:
 	void DiscordConnect(int ClientID, const char *pDID);
 
 	int GetHistoryLatestCorrectWorldID(CPlayer* pPlayer) const;
-	int GetRank(int AuthID);
+	int GetRank(int AccountID);
 	bool IsActive(int ClientID) const
 	{
 		return (bool)(ms_aData.find(ClientID) != ms_aData.end());

@@ -235,8 +235,8 @@ bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::s
 	ResultPtr pRes = SJK.SD("*", "tw_accounts_data", "WHERE Nick LIKE '%s' LIMIT %d", SearchNick.cstr(), (MultipleSearch ? 3 : 1));
 	while(pRes->next())
 	{
-		const int AuthID = pRes->getInt("ID");
-		const int Rank = Server()->GameServer()->GetRank(AuthID);
+		const int AccountID = pRes->getInt("ID");
+		const int Rank = Server()->GameServer()->GetRank(AccountID);
 		std::string Nickname(pRes->getString("Nick").c_str());
 		std::string PhpArguments = "?player=" + Nickname + "&dicid=" + std::to_string(pRes->getInt("DiscordEquip")) + "&rank=" + std::to_string(Rank);
 		std::string ImageUrl = std::string(g_Config.m_SvDiscordGenerateURL) + PhpArguments;
@@ -271,10 +271,10 @@ bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::s
 	return Founded;
 }
 
-bool DiscordJob::SendGenerateMessageAuthID(SleepyDiscord::User UserRequestFrom, std::string Chanal, std::string Title, int AuthID, std::string Color)
+bool DiscordJob::SendGenerateMessageAccountID(SleepyDiscord::User UserRequestFrom, std::string Chanal, std::string Title, int AccountID, std::string Color)
 {
 	CGS* pGS = (CGS*)Server()->GameServer(MAIN_WORLD_ID);
-	std::string Nickname(pGS->Mmo()->PlayerName(AuthID));
+	std::string Nickname(pGS->Mmo()->PlayerName(AccountID));
 	return SendGenerateMessage(UserRequestFrom, Chanal, Title, Nickname.c_str(), Color, false);
 }
 

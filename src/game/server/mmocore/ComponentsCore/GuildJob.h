@@ -80,8 +80,8 @@ public:
 
 	void CreateGuild(CPlayer *pPlayer, const char *pGuildName);
 	void DisbandGuild(int GuildID);
-	bool JoinGuild(int AuthID, int GuildID);
-	void ExitGuild(int AuthID);
+	bool JoinGuild(int AccountID, int GuildID);
+	void ExitGuild(int AccountID);
 
 private:
 	void ShowMenuGuild(CPlayer *pPlayer);
@@ -108,7 +108,7 @@ private:
 	void DeleteRank(int RankID, int GuildID);
 	void ChangeRank(int RankID, int GuildID, const char *NewRank);
 	void ChangeRankAccess(int RankID);
-	void ChangePlayerRank(int AuthID, int RankID);
+	void ChangePlayerRank(int AccountID, int RankID);
 	void ShowMenuRank(CPlayer *pPlayer);
 
 public:

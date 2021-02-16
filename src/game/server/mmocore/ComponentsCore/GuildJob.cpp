@@ -818,12 +818,12 @@ void GuildJob::DisbandGuild(int GuildID)
 	}
 
 	// clear guild data
-	const int OwnerAuthID = ms_aGuild[GuildID].m_OwnerID;
+	const int OwnerAccountID = ms_aGuild[GuildID].m_OwnerID;
 	int BankGoldReturned = max(1, ms_aGuild[GuildID].m_Bank);
 	const int HouseID = GetGuildHouseID(GuildID);
 	if(HouseID > 0)
 		BankGoldReturned += ms_aHouseGuild[HouseID].m_Price;
-	GS()->SendInbox(OwnerAuthID, "Your guild was disbanded.", "We returned some gold from your guild.", itGold, BankGoldReturned);
+	GS()->SendInbox(OwnerAccountID, "Your guild was disbanded.", "We returned some gold from your guild.", itGold, BankGoldReturned);
 	SJK.DD("tw_guilds", "WHERE ID = '%d'", GuildID);
 	GS()->Chat(-1, "The {STR} Guild has been disbanded.", ms_aGuild[GuildID].m_aName);
 	ms_aGuild.erase(GuildID);
@@ -842,13 +842,13 @@ void GuildJob::DisbandGuild(int GuildID)
 	SJK.UD("tw_accounts_data", "GuildID = NULL, GuildRank = NULL, GuildDeposit = '0' WHERE GuildID = '%d'", GuildID);
 }
 
-bool GuildJob::JoinGuild(int AuthID, int GuildID)
+bool GuildJob::JoinGuild(int AccountID, int GuildID)
 {
-	const char *pPlayerName = Job()->PlayerName(AuthID);
-	ResultPtr pResCheckJoin = SJK.SD("ID", "tw_accounts_data", "WHERE ID = '%d' AND GuildID IS NOT NULL", AuthID);
+	const char *pPlayerName = Job()->PlayerName(AccountID);
+	ResultPtr pResCheckJoin = SJK.SD("ID", "tw_accounts_data", "WHERE ID = '%d' AND GuildID IS NOT NULL", AccountID);
 	if(pResCheckJoin->next())
 	{
-		GS()->ChatAccountID(AuthID, "You already in guild group!");
+		GS()->ChatAccountID(AccountID, "You already in guild group!");
 		GS()->ChatGuild(GuildID, "{STR} already joined your or another guilds", pPlayerName);
 		return false;
 	}
@@ -857,51 +857,51 @@ bool GuildJob::JoinGuild(int AuthID, int GuildID)
 	ResultPtr pResCheckSlot = SJK.SD("ID", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID);
 	if((int)pResCheckSlot->rowsCount() >= ms_aGuild[GuildID].m_Upgrades[EMEMBERUPGRADE::AvailableNSTSlots])
 	{
-		GS()->ChatAccountID(AuthID, "You don't joined [No slots for join]");
+		GS()->ChatAccountID(AccountID, "You don't joined [No slots for join]");
 		GS()->ChatGuild(GuildID, "{STR} don't joined [No slots for join]", pPlayerName);
 		return false;
 	}
 
 	// we update and get the data
-	CPlayer *pPlayer = GS()->GetPlayerFromAuthID(AuthID);
+	CPlayer *pPlayer = GS()->GetPlayerFromAccountID(AccountID);
 	if(pPlayer)
 	{
 		pPlayer->Acc().m_GuildID = GuildID;
 		pPlayer->Acc().m_GuildRank = 0;
 		GS()->ResetVotes(pPlayer->GetCID(), MenuList::MAIN_MENU);
 	}
-	SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = NULL WHERE ID = '%d'", GuildID, AuthID);
+	SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = NULL WHERE ID = '%d'", GuildID, AccountID);
 	GS()->ChatGuild(GuildID, "Player {STR} join in your guild!", pPlayerName);
 	return true;
 }
 
-void GuildJob::ExitGuild(int AuthID)
+void GuildJob::ExitGuild(int AccountID)
 {
 	// we check if the clan leader leaves
-	ResultPtr pRes = SJK.SD("ID", "tw_guilds", "WHERE OwnerID = '%d'", AuthID);
+	ResultPtr pRes = SJK.SD("ID", "tw_guilds", "WHERE OwnerID = '%d'", AccountID);
 	if (pRes->next())
 	{
-		GS()->ChatAccountID(AuthID, "A leader cannot leave his guild group!");
+		GS()->ChatAccountID(AccountID, "A leader cannot leave his guild group!");
 		return;
 	}
 
 	// we check the account and its guild
-	ResultPtr pResExit = SJK.SD("GuildID", "tw_accounts_data", "WHERE ID = '%d'", AuthID);
+	ResultPtr pResExit = SJK.SD("GuildID", "tw_accounts_data", "WHERE ID = '%d'", AccountID);
 	if (pResExit->next())
 	{
 		// we write to the guild that the player has left the guild
 		const int GuildID = pResExit->getInt("GuildID");
-		GS()->ChatGuild(GuildID, "{STR} left the Guild!", Job()->PlayerName(AuthID));
-		AddHistoryGuild(GuildID, "'%s' exit or kicked.", Job()->PlayerName(AuthID));
+		GS()->ChatGuild(GuildID, "{STR} left the Guild!", Job()->PlayerName(AccountID));
+		AddHistoryGuild(GuildID, "'%s' exit or kicked.", Job()->PlayerName(AccountID));
 
 		// we update the player's information
-		CPlayer *pPlayer = GS()->GetPlayerFromAuthID(AuthID);
+		CPlayer *pPlayer = GS()->GetPlayerFromAccountID(AccountID);
 		if(pPlayer)
 		{
 			pPlayer->Acc().m_GuildID = 0;
 			GS()->ResetVotes(pPlayer->GetCID(), MenuList::MAIN_MENU);
 		}
-		SJK.UD("tw_accounts_data", "GuildID = NULL, GuildRank = NULL, GuildDeposit = '0' WHERE ID = '%d'", AuthID);
+		SJK.UD("tw_accounts_data", "GuildID = NULL, GuildRank = NULL, GuildDeposit = '0' WHERE ID = '%d'", AccountID);
 	}
 }
 
@@ -990,7 +990,7 @@ void GuildJob::ShowGuildPlayers(CPlayer* pPlayer, int GuildID)
 	while (pRes->next())
 	{
 		bool AllowedInteractiveWithPlayers = false;
-		const int PlayerAuthID = pRes->getInt("ID");
+		const int PlayerAccountID = pRes->getInt("ID");
 		const int PlayerRankID = pRes->getInt("GuildRank");
 		const int PlayerDeposit = pRes->getInt("GuildDeposit");
 		CSqlString<32> PlayerNickname(pRes->getString("Nick").c_str());
@@ -1010,19 +1010,19 @@ void GuildJob::ShowGuildPlayers(CPlayer* pPlayer, int GuildID)
 			for(auto& pRank : ms_aRankGuild)
 			{
 				if(GuildID == pRank.second.m_GuildID && PlayerRankID != pRank.first)
-					GS()->AVD(ClientID, "MRANKCHANGE", PlayerAuthID, pRank.first, HideID, "Change Rank to: {STR}{STR}", pRank.second.m_aRank, pRank.second.m_Access > 0 ? "*" : "");
+					GS()->AVD(ClientID, "MRANKCHANGE", PlayerAccountID, pRank.first, HideID, "Change Rank to: {STR}{STR}", pRank.second.m_aRank, pRank.second.m_Access > 0 ? "*" : "");
 			}
-			GS()->AVM(ClientID, "MLEADER", PlayerAuthID, HideID, "Give Leader (in reason 134)");
+			GS()->AVM(ClientID, "MLEADER", PlayerAccountID, HideID, "Give Leader (in reason 134)");
 			AllowedInteractiveWithPlayers = true;
 		}
 		if(CheckMemberAccess(pPlayer, GuildAccess::ACCESS_INVITE_KICK))
 		{
-			GS()->AVM(ClientID, "MKICK", PlayerAuthID, HideID, "Kick");
+			GS()->AVM(ClientID, "MKICK", PlayerAccountID, HideID, "Kick");
 			AllowedInteractiveWithPlayers = true;
 		}
 
 		if(!AllowedInteractiveWithPlayers)
-			GS()->AVM(ClientID, "null", PlayerAuthID, HideID, "You don't have rights to interact");
+			GS()->AVM(ClientID, "null", PlayerAccountID, HideID, "You don't have rights to interact");
 		HideID++;
 	}
 }
@@ -1208,13 +1208,13 @@ void GuildJob::ChangeRankAccess(int RankID)
 }
 
 // change player rank
-void GuildJob::ChangePlayerRank(int AuthID, int RankID)
+void GuildJob::ChangePlayerRank(int AccountID, int RankID)
 {
-	CPlayer* pPlayer = GS()->GetPlayerFromAuthID(AuthID);
+	CPlayer* pPlayer = GS()->GetPlayerFromAccountID(AccountID);
 	if(pPlayer)
 		pPlayer->Acc().m_GuildRank = RankID;
 
-	SJK.UD("tw_accounts_data", "GuildRank = '%d' WHERE ID = '%d'", RankID, AuthID);
+	SJK.UD("tw_accounts_data", "GuildRank = '%d' WHERE ID = '%d'", RankID, AccountID);
 }
 
 // rank menu display
@@ -1272,16 +1272,16 @@ void GuildJob::SendInviteGuild(int GuildID, CPlayer *pPlayer)
 		return;
 	}
 
-	const int AuthID = pPlayer->Acc().m_AccountID;
-	ResultPtr pRes = SJK.SD("ID", "tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'",  GuildID, AuthID);
+	const int AccountID = pPlayer->Acc().m_AccountID;
+	ResultPtr pRes = SJK.SD("ID", "tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'",  GuildID, AccountID);
 	if(pRes->rowsCount() >= 1)
 	{
 		GS()->Chat(ClientID, "You have already sent a request to join this guild.");
 		return;
 	}
 
-	SJK.ID("tw_guilds_invites", "(GuildID, OwnerID) VALUES ('%d', '%d')", GuildID, AuthID);
-	GS()->ChatGuild(GuildID, "{STR} send invites to join our guilds", Job()->PlayerName(AuthID));
+	SJK.ID("tw_guilds_invites", "(GuildID, OwnerID) VALUES ('%d', '%d')", GuildID, AccountID);
+	GS()->ChatGuild(GuildID, "{STR} send invites to join our guilds", Job()->PlayerName(AccountID));
 	GS()->Chat(ClientID, "You sent a request to join the guild.");
 }
 

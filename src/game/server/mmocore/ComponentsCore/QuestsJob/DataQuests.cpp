@@ -6,7 +6,7 @@
 #include <game/server/gamecontext.h>
 #include "DataQuests.h"
 
-std::string CDataQuest::GetJsonFileName(int AuthID) const { return "server_data/quest_tmp/" + std::to_string(m_QuestID) + "-" + std::to_string(AuthID) + ".json"; }
+std::string CDataQuest::GetJsonFileName(int AccountID) const { return "server_data/quest_tmp/" + std::to_string(m_QuestID) + "-" + std::to_string(AccountID) + ".json"; }
 
 int CDataQuest::GetQuestStoryPosition() const
 {
