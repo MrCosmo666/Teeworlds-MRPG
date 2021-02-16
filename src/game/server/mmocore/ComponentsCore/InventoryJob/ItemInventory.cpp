@@ -265,7 +265,7 @@ bool CInventoryItem::Save()
 	if(m_pPlayer && m_pPlayer->IsAuthed())
 	{
 		SJK.UD("tw_accounts_items", "Count = '%d', Settings = '%d', Enchant = '%d', Durability = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'",
-			m_Count, m_Settings, m_Enchant, m_Durability, m_pPlayer->Acc().m_AuthID, m_ItemID);
+			m_Count, m_Settings, m_Enchant, m_Durability, m_pPlayer->Acc().m_AccountID, m_ItemID);
 		return true;
 	}
 	return false;

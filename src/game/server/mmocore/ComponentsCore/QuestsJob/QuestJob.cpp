@@ -26,7 +26,7 @@ void QuestJob::OnInit()
 void QuestJob::OnInitAccount(CPlayer* pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_quests", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_quests", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
 	while(pRes->next())
 	{
 		const int QuestID = pRes->getInt("QuestID");

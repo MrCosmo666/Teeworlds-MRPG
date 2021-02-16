@@ -8,7 +8,7 @@
 using json = nlohmann::json;
 
 CDataQuest& CPlayerQuest::Info() const { return QuestJob::ms_aDataQuests[m_QuestID]; }
-std::string CPlayerQuest::GetJsonName() const { return Info().GetJsonName(m_pPlayer->Acc().m_AuthID); }
+std::string CPlayerQuest::GetJsonFileName() const { return Info().GetJsonFileName(m_pPlayer->Acc().m_AccountID); }
 
 void CPlayerQuest::InitSteps()
 {
@@ -46,7 +46,7 @@ void CPlayerQuest::InitSteps()
 	}
 
 	// save file
-	IOHANDLE File = io_open(GetJsonName().c_str(), IOFLAG_WRITE);
+	IOHANDLE File = io_open(GetJsonFileName().c_str(), IOFLAG_WRITE);
 	if(!File)
 		return;
 
@@ -61,7 +61,7 @@ void CPlayerQuest::LoadSteps()
 		return;
 
 	// loading file is not open pereinitilized steps
-	IOHANDLE File = io_open(GetJsonName().c_str(), IOFLAG_READ);
+	IOHANDLE File = io_open(GetJsonFileName().c_str(), IOFLAG_READ);
 	if(!File)
 	{
 		InitSteps();
@@ -114,7 +114,7 @@ void CPlayerQuest::SaveSteps()
 	}
 
 	// replace file
-	IOHANDLE File = io_open(GetJsonName().c_str(), IOFLAG_WRITE);
+	IOHANDLE File = io_open(GetJsonFileName().c_str(), IOFLAG_WRITE);
 	if(!File)
 		return;
 
@@ -131,7 +131,7 @@ void CPlayerQuest::ClearSteps()
 		pStepBot.second.CreateStepArrow(m_pPlayer);
 	}
 	m_StepsQuestBot.clear();
-	fs_remove(GetJsonName().c_str());
+	fs_remove(GetJsonFileName().c_str());
 }
 
 bool CPlayerQuest::Accept()
@@ -141,7 +141,7 @@ bool CPlayerQuest::Accept()
 
 	// init quest
 	m_State = QuestState::QUEST_ACCEPT;
-	SJK.ID("tw_accounts_quests", "(QuestID, OwnerID, Type) VALUES ('%d', '%d', '%d')", m_QuestID, m_pPlayer->Acc().m_AuthID, QuestState::QUEST_ACCEPT);
+	SJK.ID("tw_accounts_quests", "(QuestID, OwnerID, Type) VALUES ('%d', '%d', '%d')", m_QuestID, m_pPlayer->Acc().m_AccountID, QuestState::QUEST_ACCEPT);
 
 	// init steps
 	InitSteps();
@@ -164,7 +164,7 @@ void CPlayerQuest::Finish()
 
 	// finish quest
 	m_State = QuestState::QUEST_FINISHED;
-	SJK.UD("tw_accounts_quests", "Type = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'", m_State, m_QuestID, m_pPlayer->Acc().m_AuthID);
+	SJK.UD("tw_accounts_quests", "Type = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'", m_State, m_QuestID, m_pPlayer->Acc().m_AccountID);
 
 	// clear steps
 	ClearSteps();

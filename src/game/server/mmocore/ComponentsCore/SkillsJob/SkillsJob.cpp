@@ -30,7 +30,7 @@ void SkillsJob::OnInit()
 void SkillsJob::OnInitAccount(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
 	while(pRes->next())
 	{
 		const int SkillID = (int)pRes->getInt("SkillID");

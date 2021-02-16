@@ -21,7 +21,7 @@ bool MailBoxJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const i
 // check whether messages are available
 int MailBoxJob::GetActiveInbox(CPlayer* pPlayer)
 {
-	ResultPtr pRes = SJK.SD("ID", "tw_accounts_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	ResultPtr pRes = SJK.SD("ID", "tw_accounts_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
 	const int MailCount = pRes->rowsCount();
 	return MailCount;
 }
@@ -33,7 +33,7 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 	bool EmptyMailBox = true;
 	const int ClientID = pPlayer->GetCID();
 	int HideID = (int)(NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 200);
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AuthID, MAX_INBOX_LIST);
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AccountID, MAX_INBOX_LIST);
 	while(pRes->next())
 	{
 		// get the information to create an object

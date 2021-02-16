@@ -23,10 +23,9 @@ public:
 	struct StructData
 	{
 		char m_aLogin[64];
-		// ðåchar Password[64];
 		char m_aLastLogin[64];
 		char m_aLanguage[8];
-		int m_AuthID;
+		int m_AccountID;
 		int m_Level;
 		int m_Exp; 
 		int m_GuildID;

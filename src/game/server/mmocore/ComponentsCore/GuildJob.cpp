@@ -156,7 +156,7 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 			return true;
 		}
 		const int SelectedAccountID = VoteID;
-		if(pPlayer->Acc().m_AuthID == SelectedAccountID)
+		if(pPlayer->Acc().m_AccountID == SelectedAccountID)
 		{
 			GS()->Chat(ClientID, "You can't give the rights to yourself!");
 			return true;
@@ -488,7 +488,7 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 		if(pPlayer->SpendCurrency(Get))
 		{
 			AddMoneyBank(GuildID, Get);
-			SJK.UD("tw_accounts_data", "GuildDeposit = GuildDeposit + '%d' WHERE ID = '%d'", Get, pPlayer->Acc().m_AuthID);
+			SJK.UD("tw_accounts_data", "GuildDeposit = GuildDeposit + '%d' WHERE ID = '%d'", Get, pPlayer->Acc().m_AccountID);
 			GS()->ChatGuild(GuildID, "{STR} deposit in treasury {INT}gold.", Server()->ClientName(ClientID), &Get);
 			AddHistoryGuild(GuildID, "'%s' added to bank %dgold.", Server()->ClientName(ClientID), Get);
 			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_GUILD);
@@ -675,7 +675,7 @@ bool GuildJob::CheckMemberAccess(CPlayer *pPlayer, int Access) const
 {
 	const int GuildID = pPlayer->Acc().m_GuildID;
 	if(GuildID > 0 && ms_aGuild.find(GuildID) != ms_aGuild.end() &&
-		(ms_aGuild[GuildID].m_OwnerID == pPlayer->Acc().m_AuthID ||
+		(ms_aGuild[GuildID].m_OwnerID == pPlayer->Acc().m_AccountID ||
 			(ms_aRankGuild.find(pPlayer->Acc().m_GuildRank) != ms_aRankGuild.end() &&
 				(ms_aRankGuild[pPlayer->Acc().m_GuildRank].m_Access == Access || ms_aRankGuild[pPlayer->Acc().m_GuildRank].m_Access == GuildAccess::ACCESS_FULL))))
 		return true;
@@ -792,7 +792,7 @@ void GuildJob::CreateGuild(CPlayer *pPlayer, const char *pGuildName)
 		
 	// initialize the guild
 	str_copy(ms_aGuild[InitID].m_aName, GuildName.cstr(), sizeof(ms_aGuild[InitID].m_aName));
-	ms_aGuild[InitID].m_OwnerID = pPlayer->Acc().m_AuthID;
+	ms_aGuild[InitID].m_OwnerID = pPlayer->Acc().m_AccountID;
 	ms_aGuild[InitID].m_Level = 1;
 	ms_aGuild[InitID].m_Exp = 0;
 	ms_aGuild[InitID].m_Bank = 0;
@@ -802,8 +802,8 @@ void GuildJob::CreateGuild(CPlayer *pPlayer, const char *pGuildName)
 	pPlayer->Acc().m_GuildID = InitID;
 
 	// we create a guild in the table
-	SJK.ID("tw_guilds", "(ID, GuildName, OwnerID) VALUES ('%d', '%s', '%d')", InitID, GuildName.cstr(), pPlayer->Acc().m_AuthID);
-	SJK.UDS(1000, "tw_accounts_data", "GuildID = '%d' WHERE ID = '%d'", InitID, pPlayer->Acc().m_AuthID);
+	SJK.ID("tw_guilds", "(ID, GuildName, OwnerID) VALUES ('%d', '%s', '%d')", InitID, GuildName.cstr(), pPlayer->Acc().m_AccountID);
+	SJK.UDS(1000, "tw_accounts_data", "GuildID = '%d' WHERE ID = '%d'", InitID, pPlayer->Acc().m_AccountID);
 	GS()->Chat(-1, "New guilds [{STR}] have been created!", GuildName.cstr());
 	GS()->StrongUpdateVotes(ClientID, MenuList::MAIN_MENU);
 }
@@ -1272,7 +1272,7 @@ void GuildJob::SendInviteGuild(int GuildID, CPlayer *pPlayer)
 		return;
 	}
 
-	const int AuthID = pPlayer->Acc().m_AuthID;
+	const int AuthID = pPlayer->Acc().m_AccountID;
 	ResultPtr pRes = SJK.SD("ID", "tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'",  GuildID, AuthID);
 	if(pRes->rowsCount() >= 1)
 	{

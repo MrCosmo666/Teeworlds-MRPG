@@ -187,13 +187,13 @@ void ShopJob::CreateAuctionSlot(CPlayer* pPlayer, AuctionSlot& pAuctionItem)
 		return GS()->Chat(ClientID, "Auction has run out of slots, wait for the release of slots!");
 
 	// check your slots
-	ResultPtr pResCheck2 = SJK.SD("ID", "tw_mailshop", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AuthID, g_Config.m_SvMaxAuctionSlots);
+	ResultPtr pResCheck2 = SJK.SD("ID", "tw_mailshop", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AccountID, g_Config.m_SvMaxAuctionSlots);
 	const int CountSlot = pResCheck2->rowsCount();
 	if(CountSlot >= g_Config.m_SvMaxAuctionSlots)
 		return GS()->Chat(ClientID, "You use all open the slots in your auction!");
 
 	// we check if the item is in the auction
-	ResultPtr pResCheck3 = SJK.SD("ID", "tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AuthID);
+	ResultPtr pResCheck3 = SJK.SD("ID", "tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AccountID);
 	if(pResCheck3->next())
 		return GS()->Chat(ClientID, "Your same item found in the database, need reopen the slot!");
 
@@ -205,7 +205,7 @@ void ShopJob::CreateAuctionSlot(CPlayer* pPlayer, AuctionSlot& pAuctionItem)
 	if(pPlayerAuctionItem.m_Count >= pAuctionItem.m_Count && pPlayerAuctionItem.Remove(pAuctionItem.m_Count))
 	{
 		SJK.ID("tw_mailshop", "(ItemID, Price, Count, OwnerID, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d')",
-			ItemID, pAuctionItem.m_Price, pAuctionItem.m_Count, pPlayer->Acc().m_AuthID, pAuctionItem.m_Enchant);
+			ItemID, pAuctionItem.m_Price, pAuctionItem.m_Count, pPlayer->Acc().m_AccountID, pAuctionItem.m_Enchant);
 
 		const int AvailableSlot = (g_Config.m_SvMaxAuctionSlots - CountSlot) - 1;
 		GS()->Chat(-1, "{STR} created a slot [{STR}x{INT}] auction.",
@@ -255,7 +255,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 	if(OwnerID > 0)
 	{
 		// take out your slot
-		if(OwnerID == pPlayer->Acc().m_AuthID)
+		if(OwnerID == pPlayer->Acc().m_AccountID)
 		{
 			GS()->Chat(ClientID, "You closed auction slot!");
 			GS()->SendInbox(pPlayer, "Auction Alert", "You have bought a item, or canceled your slot", ItemID, Count, Enchant);

@@ -152,14 +152,14 @@ bool DungeonJob::IsDungeonWorld(int WorldID) const
 
 void DungeonJob::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds)
 {
-	ResultPtr pRes = SJK.SD("*", "tw_dungeons_records", "WHERE OwnerID = '%d' AND DungeonID = '%d'", pPlayer->Acc().m_AuthID, DungeonID);
+	ResultPtr pRes = SJK.SD("*", "tw_dungeons_records", "WHERE OwnerID = '%d' AND DungeonID = '%d'", pPlayer->Acc().m_AccountID, DungeonID);
 	if (pRes->next())
 	{
 		if (pRes->getInt("Seconds") > Seconds)
-			SJK.UD("tw_dungeons_records", "Seconds = '%d' WHERE OwnerID = '%d' AND DungeonID = '%d'", Seconds, pPlayer->Acc().m_AuthID, DungeonID);
+			SJK.UD("tw_dungeons_records", "Seconds = '%d' WHERE OwnerID = '%d' AND DungeonID = '%d'", Seconds, pPlayer->Acc().m_AccountID, DungeonID);
 		return;
 	}
-	SJK.ID("tw_dungeons_records", "(OwnerID, DungeonID, Seconds) VALUES ('%d', '%d', '%d')", pPlayer->Acc().m_AuthID, DungeonID, Seconds);
+	SJK.ID("tw_dungeons_records", "(OwnerID, DungeonID, Seconds) VALUES ('%d', '%d', '%d')", pPlayer->Acc().m_AccountID, DungeonID, Seconds);
 }
 
 void DungeonJob::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)

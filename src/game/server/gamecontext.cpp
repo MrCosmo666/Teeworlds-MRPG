@@ -95,7 +95,7 @@ CPlayer* CGS::GetPlayerFromAuthID(int AuthID)
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pPlayer = GetPlayer(i, true);
-		if(pPlayer && pPlayer->Acc().m_AuthID == AuthID)
+		if(pPlayer && pPlayer->Acc().m_AccountID == AuthID)
 			return pPlayer;
 	}
 	return nullptr;
@@ -2366,7 +2366,7 @@ void CGS::SendInbox(CPlayer* pPlayer, const char* Name, const char* Desc, int It
 	if(!pPlayer || !pPlayer->IsAuthed())
 		return;
 
-	SendInbox(pPlayer->Acc().m_AuthID, Name, Desc, ItemID, Count, Enchant);
+	SendInbox(pPlayer->Acc().m_AccountID, Name, Desc, ItemID, Count, Enchant);
 } 
 
 // send a message with or without the object using AuthID

@@ -20,7 +20,7 @@ bool CRandomBox::Start(CPlayer *pPlayer, int Seconds, InventoryItem *pPlayerUses
 		Seconds *= pPlayer->GS()->Server()->TickSpeed();
 		pPlayer->m_aPlayerTick[LastRandomBox] = pPlayer->GS()->Server()->Tick() + Seconds;
 		std::sort(m_ArrayItems.begin(), m_ArrayItems.end(), [](const StructRandomBoxItem& pLeft, const StructRandomBoxItem& pRight) { return pLeft.m_Chance < pRight.m_Chance; });
-		new CRandomBoxRandomizer(&pPlayer->GS()->m_World, pPlayer, pPlayer->Acc().m_AuthID, Seconds, m_ArrayItems, pPlayerUsesItem);
+		new CRandomBoxRandomizer(&pPlayer->GS()->m_World, pPlayer, pPlayer->Acc().m_AccountID, Seconds, m_ArrayItems, pPlayerUsesItem);
 	}
 	return true;
 };

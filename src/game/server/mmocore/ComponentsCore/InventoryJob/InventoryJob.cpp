@@ -50,7 +50,7 @@ void InventoryJob::OnInit()
 void InventoryJob::OnInitAccount(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_items", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_items", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
 	while(pRes->next())
 	{
 		int ItemID = (int)pRes->getInt("ItemID");
@@ -261,7 +261,7 @@ bool InventoryJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const
 void InventoryJob::RepairDurabilityItems(CPlayer *pPlayer)
 { 
 	const int ClientID = pPlayer->GetCID();
-	SJK.UD("tw_accounts_items", "Durability = '100' WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	SJK.UD("tw_accounts_items", "Durability = '100' WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
 	for(auto& it : ms_aItems[ClientID])
 		it.second.m_Durability = 100;
 }
@@ -293,7 +293,7 @@ int InventoryJob::GiveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings
 	if(SecureID == 1)
 	{
 		SJK.UD("tw_accounts_items", "Count = '%d', Settings = '%d', Enchant = '%d' WHERE ItemID = '%d' AND OwnerID = '%d'",
-			ms_aItems[ClientID][ItemID].m_Count, ms_aItems[ClientID][ItemID].m_Settings, ms_aItems[ClientID][ItemID].m_Enchant, ItemID, pPlayer->Acc().m_AuthID);
+			ms_aItems[ClientID][ItemID].m_Count, ms_aItems[ClientID][ItemID].m_Settings, ms_aItems[ClientID][ItemID].m_Enchant, ItemID, pPlayer->Acc().m_AccountID);
 	}
 	return SecureID;
 }
@@ -302,7 +302,7 @@ int InventoryJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Setti
 {
 	// check initialize and add the item
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AuthID);
+	ResultPtr pRes = SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AccountID);
 	if(pRes->next())
 	{
 		ms_aItems[ClientID][ItemID].m_Count = pRes->getInt("Count")+Count;
@@ -317,7 +317,7 @@ int InventoryJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Setti
 	ms_aItems[ClientID][ItemID].m_Enchant = Enchant;
 	ms_aItems[ClientID][ItemID].m_Durability = 100;
 	SJK.ID("tw_accounts_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d')",
-		ItemID, pPlayer->Acc().m_AuthID, Count, Settings, Enchant);
+		ItemID, pPlayer->Acc().m_AccountID, Count, Settings, Enchant);
 	return 2;
 }
 
@@ -327,7 +327,7 @@ int InventoryJob::RemoveItem(CPlayer *pPlayer, int ItemID, int Count, int Settin
 	if(SecureID == 1)
 	{
 		SJK.UD("tw_accounts_items", "Count = Count - '%d', Settings = Settings - '%d' WHERE ItemID = '%d' AND OwnerID = '%d'",
-			Count, Settings, ItemID, pPlayer->Acc().m_AuthID);
+			Count, Settings, ItemID, pPlayer->Acc().m_AccountID);
 	}
 	return SecureID;
 }
@@ -336,7 +336,7 @@ int InventoryJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Set
 {
 	// we check the database
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AuthID);
+	ResultPtr pRes = SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AccountID);
 	if(pRes->next())
 	{
 		// update if there is more
@@ -351,7 +351,7 @@ int InventoryJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Set
 		ms_aItems[ClientID][ItemID].m_Count = 0;
 		ms_aItems[ClientID][ItemID].m_Settings = 0;
 		ms_aItems[ClientID][ItemID].m_Enchant = 0;
-		SJK.DD("tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AuthID);
+		SJK.DD("tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AccountID);
 		return 2;		
 	}
 
@@ -424,7 +424,7 @@ void InventoryJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pItemPlay
 
 	if(pItemPlayer.Info().m_Function == FUNCTION_PLANTS)
 	{
-		const int HouseID = Job()->House()->OwnerHouseID(pPlayer->Acc().m_AuthID);
+		const int HouseID = Job()->House()->OwnerHouseID(pPlayer->Acc().m_AccountID);
 		const int PlantItemID = Job()->House()->GetPlantsID(HouseID);
 		if(HouseID > 0 && PlantItemID != ItemID)
 		{

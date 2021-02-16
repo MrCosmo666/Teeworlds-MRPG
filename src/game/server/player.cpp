@@ -442,15 +442,14 @@ bool CPlayer::GetHidenMenu(int HideID) const
 bool CPlayer::IsAuthed()
 { 
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID))
-		return Acc().m_AuthID;
+		return (bool)Acc().m_AccountID;
 	return false; 
 }
 
 int CPlayer::GetStartTeam()
 {
-	if(Acc().m_AuthID)
+	if(IsAuthed())
 		return TEAM_RED;
-
 	return TEAM_SPECTATORS;
 }
 

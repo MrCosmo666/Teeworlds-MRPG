@@ -24,7 +24,7 @@ void CSkill::SelectNextControlEmote()
 	if(m_SelectedEmoticion >= NUM_EMOTICONS)
 		m_SelectedEmoticion = -1;
 
-	SJK.UD("tw_accounts_skills", "SelectedEmoticion = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", m_SelectedEmoticion, m_SkillID, m_pPlayer->Acc().m_AuthID);
+	SJK.UD("tw_accounts_skills", "SelectedEmoticion = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", m_SelectedEmoticion, m_SkillID, m_pPlayer->Acc().m_AccountID);
 }
 
 bool CSkill::Use()
@@ -110,18 +110,18 @@ bool CSkill::Upgrade()
 		return false;
 
 	const int ClientID = m_pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_skills", "WHERE SkillID = '%d' AND OwnerID = '%d'", m_SkillID, m_pPlayer->Acc().m_AuthID);
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_skills", "WHERE SkillID = '%d' AND OwnerID = '%d'", m_SkillID, m_pPlayer->Acc().m_AccountID);
 	if(pRes->next())
 	{
 		m_Level++;
-		SJK.UD("tw_accounts_skills", "SkillLevel = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", m_Level, m_SkillID, m_pPlayer->Acc().m_AuthID);
+		SJK.UD("tw_accounts_skills", "SkillLevel = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", m_Level, m_SkillID, m_pPlayer->Acc().m_AccountID);
 		GS()->Chat(ClientID, "Increased the skill [{STR} level to {INT}]", Info().m_aName, &m_Level);
 		return true;
 	}
 
 	m_Level = 1;
 	m_SelectedEmoticion = -1;
-	SJK.ID("tw_accounts_skills", "(SkillID, OwnerID, SkillLevel) VALUES ('%d', '%d', '1');", m_SkillID, m_pPlayer->Acc().m_AuthID);
+	SJK.ID("tw_accounts_skills", "(SkillID, OwnerID, SkillLevel) VALUES ('%d', '%d', '1');", m_SkillID, m_pPlayer->Acc().m_AccountID);
 	GS()->Chat(ClientID, "Learned a new skill [{STR}]", Info().m_aName);
 	return true;
 }
