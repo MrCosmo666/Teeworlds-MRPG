@@ -13,6 +13,7 @@
 
 #include <game/collision.h>
 #include <game/gamecore.h>
+
 #include "gamemodes/main.h"
 #include "gamemodes/dungeon.h"
 
@@ -89,12 +90,12 @@ CPlayer *CGS::GetPlayer(int ClientID, bool CheckAuthed, bool CheckCharacter)
 	return nullptr;
 }
 
-CPlayer* CGS::GetPlayerFromAuthID(int AuthID)
+CPlayer* CGS::GetPlayerFromAccountID(int AccountID)
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pPlayer = GetPlayer(i, true);
-		if(pPlayer && pPlayer->Acc().m_AuthID == AuthID)
+		if(pPlayer && pPlayer->Acc().m_AccountID == AccountID)
 			return pPlayer;
 	}
 	return nullptr;
@@ -468,7 +469,7 @@ void CGS::ChatFollow(int ClientID, const char* pText, ...)
 // send to an authorized player
 void CGS::ChatAccountID(int AccountID, const char* pText, ...)
 {
-	CPlayer *pPlayer = GetPlayerFromAuthID(AccountID);
+	CPlayer *pPlayer = GetPlayerFromAccountID(AccountID);
 	if(!pPlayer)
 		return;
 
@@ -1536,9 +1537,9 @@ void CGS::ClearClientData(int ClientID)
 		pActiveSnap.second.m_aAlreadyActiveQuestBot[ClientID] = false;
 }
 
-int CGS::GetRank(int AuthID)
+int CGS::GetRank(int AccountID)
 {
-	return Mmo()->Account()->GetRank(AuthID);
+	return Mmo()->Account()->GetRank(AccountID);
 }
 
 /* #########################################################################
@@ -2365,13 +2366,13 @@ void CGS::SendInbox(CPlayer* pPlayer, const char* Name, const char* Desc, int It
 	if(!pPlayer || !pPlayer->IsAuthed())
 		return;
 
-	SendInbox(pPlayer->Acc().m_AuthID, Name, Desc, ItemID, Count, Enchant);
+	SendInbox(pPlayer->Acc().m_AccountID, Name, Desc, ItemID, Count, Enchant);
 } 
 
-// send a message with or without the object using AuthID
-void CGS::SendInbox(int AuthID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
+// send a message with or without the object using AccountID
+void CGS::SendInbox(int AccountID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
 {
-	Mmo()->Inbox()->SendInbox(AuthID, Name, Desc, ItemID, Count, Enchant);
+	Mmo()->Inbox()->SendInbox(AccountID, Name, Desc, ItemID, Count, Enchant);
 } 
 
 // send day information

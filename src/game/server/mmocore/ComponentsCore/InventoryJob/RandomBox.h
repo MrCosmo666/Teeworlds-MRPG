@@ -32,13 +32,13 @@ public:
 class CRandomBoxRandomizer : public CEntity
 {
 	int m_LifeTime;
-	int m_PlayerAuthID;
+	int m_PlayerAccountID;
 	CPlayer* m_pPlayer;
 	InventoryItem* m_pPlayerUsesItem;
 	std::vector<StructRandomBoxItem> m_List;
 
 public:
-	CRandomBoxRandomizer(CGameWorld* pGameWorld, CPlayer* pPlayer, int PlayerAuthID, int LifeTime, std::vector<StructRandomBoxItem> List, InventoryItem* pPlayerUsesItem);
+	CRandomBoxRandomizer(CGameWorld* pGameWorld, CPlayer* pPlayer, int PlayerAccountID, int LifeTime, std::vector<StructRandomBoxItem> List, InventoryItem* pPlayerUsesItem);
 
 	std::vector<StructRandomBoxItem>::iterator SelectRandomItem();
 	virtual void Tick();

@@ -521,7 +521,7 @@ void CNetBan::ConUnban(IConsole::IResult *pResult, void *pUser)
 	str_copy(aBuf, pResult->GetString(0), sizeof(aBuf));
 	const char* pSeparator = str_find(aBuf, "-");
 
-	if(!str_is_number(aBuf))
+	if(str_is_number(aBuf))
 	{
 		pThis->UnbanByIndex(str_toint(aBuf));
 	}

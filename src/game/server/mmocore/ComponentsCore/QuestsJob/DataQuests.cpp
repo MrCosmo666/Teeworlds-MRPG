@@ -6,26 +6,18 @@
 #include <game/server/gamecontext.h>
 #include "DataQuests.h"
 
-std::string CDataQuest::GetJsonName(int AuthID) const { return "server_data/quest_tmp/" + std::to_string(m_QuestID) + "-" + std::to_string(AuthID) + ".json"; }
+std::string CDataQuest::GetJsonFileName(int AccountID) const { return "server_data/quest_tmp/" + std::to_string(m_QuestID) + "-" + std::to_string(AccountID) + ".json"; }
 
-int CDataQuest::GetStoryCount(int CountFromQuestID) const
+int CDataQuest::GetQuestStoryPosition() const
 {
-	// get total number of quests storyline
-	int Count = 0;
-	for(const auto& qd : QuestJob::ms_aDataQuests)
-	{
-		if(str_comp(qd.second.m_aStoryLine, m_aStoryLine) == 0)
-			Count++;
-	}
+	// get position of quests storyline
+	return (int)std::count_if(QuestJob::ms_aDataQuests.begin(), QuestJob::ms_aDataQuests.end(), [this](std::pair< const int, CDataQuest>& pItem)
+	{	return str_comp(pItem.second.m_aStoryLine, m_aStoryLine) == 0 && m_QuestID >= pItem.first; });
+}
 
-	// get the number of quests storyline from the quest
-	if(CountFromQuestID > 0)
-	{
-		for(auto qquest = QuestJob::ms_aDataQuests.find(CountFromQuestID); qquest != QuestJob::ms_aDataQuests.end(); qquest++)
-		{
-			if(str_comp(qquest->second.m_aStoryLine, m_aStoryLine) == 0)
-				Count--;
-		}
-	}
-	return Count;
+int CDataQuest::GetQuestStorySize() const
+{
+	// get size of quests storyline
+	return (int)std::count_if(QuestJob::ms_aDataQuests.begin(), QuestJob::ms_aDataQuests.end(), [this](std::pair< const int, CDataQuest>& pItem)
+		{	return str_comp(pItem.second.m_aStoryLine, m_aStoryLine) == 0; });
 }

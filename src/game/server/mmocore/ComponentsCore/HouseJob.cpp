@@ -121,7 +121,7 @@ bool HouseJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 	if(Menulist == MenuList::MENU_HOUSE_PLANTS)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_HOUSE;
-		const int HouseID = OwnerHouseID(pPlayer->Acc().m_AuthID);
+		const int HouseID = OwnerHouseID(pPlayer->Acc().m_AccountID);
 		const int PlantItemID = GetPlantsID(HouseID);
 
 		GS()->AVH(ClientID, TAB_INFO_HOUSE_PLANT, GREEN_COLOR, "Plants Information");
@@ -487,16 +487,16 @@ vec2 HouseJob::GetPositionHouse(int HouseID) const
 int HouseJob::PlayerHouseID(CPlayer *pPlayer) const
 {
 	for (auto ihome = ms_aHouse.begin(); ihome != ms_aHouse.end(); ihome++) {
-		if(ms_aHouse.at(ihome->first).m_OwnerID == pPlayer->Acc().m_AuthID)
+		if(ms_aHouse.at(ihome->first).m_OwnerID == pPlayer->Acc().m_AccountID)
 			return ihome->first;
 	}
 	return -1;
 }
 
-int HouseJob::OwnerHouseID(int AuthID) const
+int HouseJob::OwnerHouseID(int AccountID) const
 {
 	for (auto ihome = ms_aHouse.begin(); ihome != ms_aHouse.end(); ihome++) {
-		if(ms_aHouse.at(ihome->first).m_OwnerID == AuthID)
+		if(ms_aHouse.at(ihome->first).m_OwnerID == AccountID)
 			return ihome->first;
 	}
 	return -1;
@@ -543,7 +543,7 @@ void HouseJob::BuyHouse(int HouseID, CPlayer *pPlayer)
 			return;
 
 		ms_aHouse[HouseID].m_Bank = 0;
-		ms_aHouse[HouseID].m_OwnerID = pPlayer->Acc().m_AuthID;
+		ms_aHouse[HouseID].m_OwnerID = pPlayer->Acc().m_AccountID;
 		SJK.UD("tw_houses", "OwnerID = '%d', HouseBank = '0' WHERE ID = '%d'", ms_aHouse[HouseID].m_OwnerID, HouseID);
 
 		GS()->Chat(-1, "{STR} becomes the owner of the house class {STR}", Server()->ClientName(ClientID), ms_aHouse[HouseID].m_aClass);
@@ -565,7 +565,7 @@ void HouseJob::SellHouse(int HouseID)
 		GS()->SendInbox(OwnerID, "House is sold", "Your house is sold !", itGold, Price, 0);
 		SJK.UD("tw_houses", "OwnerID = NULL, HouseBank = '0' WHERE ID = '%d'", HouseID);
 
-		CPlayer *pPlayer = GS()->GetPlayerFromAuthID(OwnerID);
+		CPlayer *pPlayer = GS()->GetPlayerFromAccountID(OwnerID);
 		if(pPlayer)
 		{
 			GS()->ChatFollow(pPlayer->GetCID(), "Your House is sold!");
@@ -588,7 +588,7 @@ void HouseJob::SellHouse(int HouseID)
 void HouseJob::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
 {
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	ResultPtr pRes = SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
 	if(!pRes->next())
 		return;
 
@@ -609,7 +609,7 @@ void HouseJob::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
 void HouseJob::AddSafeDeposit(CPlayer *pPlayer, int Balance)
 {
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	ResultPtr pRes = SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
 	if(!pRes->next())
 		return;
 

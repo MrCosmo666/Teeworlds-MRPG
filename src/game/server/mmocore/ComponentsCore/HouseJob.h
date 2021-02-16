@@ -74,7 +74,7 @@ public:
 	bool GetHouseDoor(int HouseID) const;
 	vec2 GetPositionHouse(int HouseID) const;
 	int PlayerHouseID(CPlayer *pPlayer) const;
-	int OwnerHouseID(int AuthID) const;
+	int OwnerHouseID(int AccountID) const;
 	int GetPlantsID(int HouseID) const;
 
 	const char *ClassName(int HouseID) const;

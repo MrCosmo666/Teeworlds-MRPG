@@ -26,7 +26,7 @@ void QuestJob::OnInit()
 void QuestJob::OnInitAccount(CPlayer* pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_quests", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_quests", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
 	while(pRes->next())
 	{
 		const int QuestID = pRes->getInt("QuestID");
@@ -156,8 +156,8 @@ void QuestJob::ShowQuestID(CPlayer *pPlayer, int QuestID)
 {
 	CDataQuest pData = pPlayer->GetQuest(QuestID).Info();
 	const int ClientID = pPlayer->GetCID();
-	const int CountQuest = pData.GetStoryCount();
-	const int LineQuest = pData.GetStoryCount(QuestID) + 1;
+	const int QuestsSize = pData.GetQuestStorySize();
+	const int QuestPosition = pData.GetQuestStoryPosition();
 
 	// TODO: REMOVE IT
 	GS()->AVCALLBACK(ClientID, "MENU", "\0", QuestID, NOPE, NOPE, [](CVoteOptionsCallback Callback)
@@ -178,7 +178,7 @@ void QuestJob::ShowQuestID(CPlayer *pPlayer, int QuestID)
 
 		pPlayer->m_LastVoteMenu = MenuList::MENU_JOURNAL_MAIN;
 		pPlayer->GS()->AddVotesBackpage(ClientID);
-	}, "{INT}/{INT} {STR}: {STR}", &LineQuest, &CountQuest, pData.GetStory(), pData.GetName());
+	}, "{INT}/{INT} {STR}: {STR}", &QuestPosition, &QuestsSize, pData.GetStory(), pData.GetName());
 }
 
 // active npc information display

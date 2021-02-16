@@ -25,7 +25,7 @@ void AetherJob::OnInit()
 
 void AetherJob::OnInitAccount(CPlayer *pPlayer)
 {
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_locations", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AuthID);
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_locations", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
 	while(pRes->next())
 	{
 		int TeleportID = pRes->getInt("TeleportID");
@@ -113,7 +113,7 @@ void AetherJob::UnlockLocation(CPlayer *pPlayer, vec2 Pos)
 		if (distance(vec2(tl.second.m_TeleX, tl.second.m_TeleY), Pos) > 100 || pPlayer->Acc().m_aAetherLocation.find(tl.first) != pPlayer->Acc().m_aAetherLocation.end())
 			continue;
 
-		SJK.ID("tw_accounts_locations", "(OwnerID, TeleportID) VALUES ('%d', '%d')", pPlayer->Acc().m_AuthID, tl.first);
+		SJK.ID("tw_accounts_locations", "(OwnerID, TeleportID) VALUES ('%d', '%d')", pPlayer->Acc().m_AccountID, tl.first);
 		GS()->Chat(ClientID, "You unlock aether {STR}!", ms_aTeleport[tl.first].m_aTeleName);
 		GS()->ChatDiscord("14671083", Server()->ClientName(ClientID), "Adventure unlock aether {STR}", ms_aTeleport[tl.first].m_aTeleName);
 

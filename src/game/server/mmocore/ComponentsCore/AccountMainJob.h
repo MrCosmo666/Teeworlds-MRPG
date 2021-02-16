@@ -23,10 +23,9 @@ public:
 	struct StructData
 	{
 		char m_aLogin[64];
-		// ðåchar Password[64];
 		char m_aLastLogin[64];
 		char m_aLanguage[8];
-		int m_AuthID;
+		int m_AccountID;
 		int m_Level;
 		int m_Exp; 
 		int m_GuildID;
@@ -93,7 +92,7 @@ public:
 	void DiscordConnect(int ClientID, const char *pDID);
 
 	int GetHistoryLatestCorrectWorldID(CPlayer* pPlayer) const;
-	int GetRank(int AuthID);
+	int GetRank(int AccountID);
 	bool IsActive(int ClientID) const
 	{
 		return (bool)(ms_aData.find(ClientID) != ms_aData.end());

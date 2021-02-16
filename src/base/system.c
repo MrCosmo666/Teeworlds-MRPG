@@ -2456,10 +2456,10 @@ int str_is_number(const char* str)
 	while(*str)
 	{
 		if(!(*str >= '0' && *str <= '9'))
-			return -1;
+			return 0;
 		str++;
 	}
-	return 0;
+	return 1;
 }
 
 #ifdef __GNUC__

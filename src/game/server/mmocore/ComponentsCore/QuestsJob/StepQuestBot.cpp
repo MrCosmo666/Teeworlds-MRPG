@@ -166,7 +166,7 @@ void CPlayerStepQuestBot::DoCollectItem(CPlayer* pPlayer)
 		{
 			if(antiStressing)
 			{
-				pGS->Mmo()->Item()->AddItemSleep(pPlayer->Acc().m_AuthID, ItemID, Count, 300);
+				pGS->Mmo()->Item()->AddItemSleep(pPlayer->Acc().m_AccountID, ItemID, Count, 300);
 				continue;
 			}
 
@@ -213,12 +213,6 @@ void CPlayerStepQuestBot::CreateStepArrow(CPlayer* pPlayer)
 	{
 		CGS* pGS = pPlayer->GS();
 		const int ClientID = pPlayer->GetCID();
-		for(CQuestPathFinder* pFq = (CQuestPathFinder*)pGS->m_World.FindFirst(CGameWorld::ENTTYPE_FINDQUEST); pFq; pFq = (CQuestPathFinder*)pFq->TypeNext())
-		{
-			if(pFq->m_SubBotID == m_Bot->m_SubBotID && pFq->m_ClientID == ClientID)
-				return;
-		}
-
 		new CQuestPathFinder(&pGS->m_World, pPlayer->GetCharacter()->m_Core.m_Pos, ClientID, *m_Bot);
 	}
 }

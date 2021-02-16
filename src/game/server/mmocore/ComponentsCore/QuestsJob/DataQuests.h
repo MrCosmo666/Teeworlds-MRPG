@@ -14,10 +14,11 @@ public:
 	int m_Gold;
 	int m_Exp;
 
-	std::string GetJsonName(int AuthID) const;
+	std::string GetJsonFileName(int AccountID) const;
 	const char* GetName() const { return m_aName; }
 	const char* GetStory() const { return m_aStoryLine; }
-	int GetStoryCount(int CountFromQuestID = -1) const;
+	int GetQuestStoryPosition() const;
+	int GetQuestStorySize() const;
 
 	std::map<int, CPlayerStepQuestBot> CopyBasicSteps()
 	{

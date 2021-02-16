@@ -20,17 +20,17 @@ bool CRandomBox::Start(CPlayer *pPlayer, int Seconds, InventoryItem *pPlayerUses
 		Seconds *= pPlayer->GS()->Server()->TickSpeed();
 		pPlayer->m_aPlayerTick[LastRandomBox] = pPlayer->GS()->Server()->Tick() + Seconds;
 		std::sort(m_ArrayItems.begin(), m_ArrayItems.end(), [](const StructRandomBoxItem& pLeft, const StructRandomBoxItem& pRight) { return pLeft.m_Chance < pRight.m_Chance; });
-		new CRandomBoxRandomizer(&pPlayer->GS()->m_World, pPlayer, pPlayer->Acc().m_AuthID, Seconds, m_ArrayItems, pPlayerUsesItem);
+		new CRandomBoxRandomizer(&pPlayer->GS()->m_World, pPlayer, pPlayer->Acc().m_AccountID, Seconds, m_ArrayItems, pPlayerUsesItem);
 	}
 	return true;
 };
 
-CRandomBoxRandomizer::CRandomBoxRandomizer(CGameWorld* pGameWorld, CPlayer* pPlayer, int PlayerAuthID, int LifeTime, std::vector<StructRandomBoxItem> List, InventoryItem *pPlayerUsesItem)
+CRandomBoxRandomizer::CRandomBoxRandomizer(CGameWorld* pGameWorld, CPlayer* pPlayer, int PlayerAccountID, int LifeTime, std::vector<StructRandomBoxItem> List, InventoryItem *pPlayerUsesItem)
 	: CEntity(pGameWorld, CGameWorld::ENTTYPE_RANDOM_BOX, pPlayer->m_ViewPos)
 {
 	m_LifeTime = LifeTime;
 	m_pPlayer = pPlayer;
-	m_PlayerAuthID = PlayerAuthID;
+	m_PlayerAccountID = PlayerAccountID;
 	m_pPlayerUsesItem = pPlayerUsesItem;
 	std::copy(List.begin(), List.end(), std::back_inserter(m_List));
 	GameWorld()->InsertEntity(this);
@@ -59,7 +59,7 @@ void CRandomBoxRandomizer::Tick()
 			// a case when a client changes the world or comes out while choosing a random object.
 			InventoryItem* pPlayerRandomItem = m_pPlayer ? &m_pPlayer->GetItem(pRandomItem->m_ItemID) : nullptr;
 			if(!m_pPlayer || (pPlayerRandomItem->Info().IsEnchantable() && pPlayerRandomItem->m_Count > 0))
-				GS()->SendInbox(m_PlayerAuthID, "Random Box", "Item was not received by you personally.", pRandomItem->m_ItemID, pRandomItem->m_Count);
+				GS()->SendInbox(m_PlayerAccountID, "Random Box", "Item was not received by you personally.", pRandomItem->m_ItemID, pRandomItem->m_Count);
 			else
 			{
 				m_pPlayer->GetItem(pRandomItem->m_ItemID).Add(pRandomItem->m_Count);

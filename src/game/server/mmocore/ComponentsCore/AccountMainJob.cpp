@@ -109,7 +109,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 			return SendAuthCode(ClientID, AUTH_LOGIN_WRONG);
 		}
 
-		if (GS()->GetPlayerFromAuthID(UserID) != nullptr)
+		if (GS()->GetPlayerFromAccountID(UserID) != nullptr)
 		{
 			GS()->Chat(ClientID, "The account is already in the game!");
 			return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
@@ -119,7 +119,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		str_copy(pPlayer->Acc().m_aLogin, clear_Login.cstr(), sizeof(pPlayer->Acc().m_aLogin));
 		str_copy(pPlayer->Acc().m_aLastLogin, pResCheck->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().m_aLastLogin));
 
-		pPlayer->Acc().m_AuthID = UserID;
+		pPlayer->Acc().m_AccountID = UserID;
 		pPlayer->Acc().m_Level = pResAccount->getInt("Level");
 		pPlayer->Acc().m_Exp = pResAccount->getInt("Exp");
 		pPlayer->Acc().m_GuildID = pResAccount->getInt("GuildID");
@@ -169,12 +169,12 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	}
 
 	Job()->OnInitAccount(ClientID);
-	const int Rank = GetRank(pPlayer->Acc().m_AuthID);
+	const int Rank = GetRank(pPlayer->Acc().m_AccountID);
 	GS()->Chat(-1, "{STR} logged to account. Rank #{INT}", Server()->ClientName(ClientID), &Rank);
 #ifdef CONF_DISCORD
 	char aLoginBuf[64];
-	str_format(aLoginBuf, sizeof(aLoginBuf), "%s logged in Account ID %d", Server()->ClientName(ClientID), pPlayer->Acc().m_AuthID);
-	Server()->SendDiscordGenerateMessage(aLoginBuf, pPlayer->Acc().m_AuthID);
+	str_format(aLoginBuf, sizeof(aLoginBuf), "%s logged in Account ID %d", Server()->ClientName(ClientID), pPlayer->Acc().m_AccountID);
+	Server()->SendDiscordGenerateMessage(aLoginBuf, pPlayer->Acc().m_AccountID);
 #endif
 
 	if (!pPlayer->GetItem(itHammer).m_Count)
@@ -203,26 +203,31 @@ void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)
 {
 #ifdef CONF_DISCORD
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true);
-	if(!pPlayer) return;	
+	if(!pPlayer) 
+		return;	
 
 	CSqlString<64> DiscordID = CSqlString<64>(pDID);
+	
+	// disable another account if it is connected to this discord
 	SJK.UD("tw_accounts_data", "DiscordID = 'null' WHERE DiscordID = '%s'", DiscordID.cstr());
-	SJK.UD("tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", DiscordID.cstr(), pPlayer->Acc().m_AuthID);
+	
+	// connect the player discord id
+	SJK.UDS(1000,"tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", DiscordID.cstr(), pPlayer->Acc().m_AccountID);
 
-	GS()->Chat(ClientID, "Update DiscordID.");
-	GS()->Chat(ClientID, "Check connect status in Discord \"!mconnect\".");
+	GS()->Chat(ClientID, "Your Discord ID has been updated.");
+	GS()->Chat(ClientID, "Check the connection status in discord \"!mconnect\".");
 #endif
 }
 
-int AccountMainJob::GetRank(int AuthID)
+int AccountMainJob::GetRank(int AccountID)
 {
 	int Rank = 0;
 	ResultPtr pRes = SJK.SD("ID", "tw_accounts_data", "ORDER BY Level DESC, Exp DESC");
 	while(pRes->next())
 	{
 		Rank++;
-		int SelectedAuthID = pRes->getInt("ID");
-		if(AuthID == SelectedAuthID) 
+		int SelectedAccountID = pRes->getInt("ID");
+		if(AccountID == SelectedAccountID)
 			return Rank;
 	}
 	return -1;
@@ -369,7 +374,7 @@ void AccountMainJob::UseVoucher(int ClientID, const char* pVoucher)
 
 	char aSelect[256];
 	CSqlString<32> VoucherCode = CSqlString<32>(pVoucher);
-	str_format(aSelect, sizeof(aSelect), "v.*, IF((SELECT r.id FROM tw_voucher_redeemed r WHERE CASE v.multiple WHEN 1 THEN r.voucher_id = v.id AND r.user_id = %d ELSE r.voucher_id = v.id END) IS NULL, FALSE, TRUE) AS used", pPlayer->Acc().m_AuthID);
+	str_format(aSelect, sizeof(aSelect), "v.*, IF((SELECT r.id FROM tw_voucher_redeemed r WHERE CASE v.multiple WHEN 1 THEN r.voucher_id = v.id AND r.user_id = %d ELSE r.voucher_id = v.id END) IS NULL, FALSE, TRUE) AS used", pPlayer->Acc().m_AccountID);
 
 	ResultPtr pResVoucher = SJK.SD(aSelect, "tw_voucher v", "WHERE v.code = '%s'", VoucherCode.cstr());
 	if (pResVoucher->next())
@@ -413,7 +418,7 @@ void AccountMainJob::UseVoucher(int ClientID, const char* pVoucher)
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_STATS);
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_UPGRADES);
 
-			SJK.ID("tw_voucher_redeemed", "(voucher_id, user_id, time_created) VALUES (%d, %d, %d)", VoucherID, pPlayer->Acc().m_AuthID, (int)time(0));
+			SJK.ID("tw_voucher_redeemed", "(voucher_id, user_id, time_created) VALUES (%d, %d, %d)", VoucherID, pPlayer->Acc().m_AccountID, (int)time(0));
 			GS()->Chat(ClientID, "You have successfully redeemed the voucher '{STR}'.", pVoucher);
 		}
 

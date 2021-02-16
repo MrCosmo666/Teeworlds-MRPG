@@ -14,19 +14,22 @@ CPlayer::CPlayer(CGS *pGS, int ClientID) : m_pGS(pGS), m_ClientID(ClientID)
 	for(short& SortTab : m_aSortTabs)
 		SortTab = 0;
 
+	m_Spawned = true;
 	m_aPlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed();
 	m_aPlayerTick[TickState::Die] = Server()->Tick();
-	m_Spawned = true;
-	m_LastVoteMenu = NOPE;
-	m_OpenVoteMenu = MenuList::MAIN_MENU;
 	m_PrevTuningParams = *pGS->Tuning();
 	m_NextTuningParams = m_PrevTuningParams;
-	m_MoodState = MOOD_NORMAL;
-	GS()->SendTuningParams(ClientID);
-	ClearTalking();
 
-	if(!IsBot())
+	// constructor only for players
+	if(m_ClientID < MAX_PLAYERS)
+	{
+		m_LastVoteMenu = NOPE;
+		m_OpenVoteMenu = MenuList::MAIN_MENU;
+		m_MoodState = MOOD_NORMAL;
 		Acc().m_Team = GetStartTeam();
+		GS()->SendTuningParams(ClientID);
+		ClearTalking();
+	}
 }
 
 CPlayer::~CPlayer()
@@ -442,15 +445,14 @@ bool CPlayer::GetHidenMenu(int HideID) const
 bool CPlayer::IsAuthed()
 { 
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID))
-		return Acc().m_AuthID;
+		return (bool)Acc().m_AccountID;
 	return false; 
 }
 
 int CPlayer::GetStartTeam()
 {
-	if(Acc().m_AuthID)
+	if(IsAuthed())
 		return TEAM_RED;
-
 	return TEAM_SPECTATORS;
 }
 

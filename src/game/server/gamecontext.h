@@ -89,7 +89,7 @@ public:
 	######################################################################### */
 	class CCharacter *GetPlayerChar(int ClientID);
 	CPlayer *GetPlayer(int ClientID, bool CheckAuthed = false, bool CheckCharacter = false);
-	CPlayer *GetPlayerFromAuthID(int AuthID);
+	CPlayer *GetPlayerFromAccountID(int AccountID);
 	std::unique_ptr<char[]> LevelString(int MaxValue, int CurrentValue, int Step, char toValue, char fromValue);
 	ItemInformation &GetItemInfo(int ItemID) const;
 	CDataQuest &GetQuestInfo(int QuestID) const;
@@ -206,7 +206,7 @@ public:
 	const char *NetVersion() const override;
 
 	void ClearClientData(int ClientID) override;
-	int GetRank(int AuthID) override;
+	int GetRank(int AccountID) override;
 
 	/* #########################################################################
 		CONSOLE GAMECONTEXT 
@@ -264,7 +264,7 @@ public:
 	void CreateRandomDropItem(vec2 Pos, int ClientID, float Random, InventoryItem DropItem, vec2 Force = vec2(0.0f, 0.0f));
 	bool TakeItemCharacter(int ClientID);
 	void SendInbox(CPlayer *pPlayer, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
-	void SendInbox(int AuthID, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
+	void SendInbox(int AccountID, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
 
 private:
 	void SendDayInfo(int ClientID);

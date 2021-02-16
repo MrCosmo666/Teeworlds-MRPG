@@ -131,7 +131,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	{
 		const int EquipDiscord = pPlayer->GetEquippedItemID(EQUIP_DISCORD);
 		SJK.UD("tw_accounts_data", "Level = '%d', Exp = '%d', DiscordEquip = '%d' WHERE ID = '%d'",
-			pPlayer->Acc().m_Level, pPlayer->Acc().m_Exp, EquipDiscord, pPlayer->Acc().m_AuthID);
+			pPlayer->Acc().m_Level, pPlayer->Acc().m_Exp, EquipDiscord, pPlayer->Acc().m_AccountID);
 	}
 	else if(Table == SaveType::SAVE_UPGRADES)
 	{
@@ -145,7 +145,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
 
-		SJK.UD("tw_accounts_data", "Upgrade = '%d' %s WHERE ID = '%d'", pPlayer->Acc().m_Upgrade, Buffer.buffer(), pPlayer->Acc().m_AuthID);
+		SJK.UD("tw_accounts_data", "Upgrade = '%d' %s WHERE ID = '%d'", pPlayer->Acc().m_Upgrade, Buffer.buffer(), pPlayer->Acc().m_AccountID);
 		Buffer.clear();
 	}
 	else if(Table == SaveType::SAVE_PLANT_DATA)
@@ -156,7 +156,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", str_PLANT((PLANT) i), pPlayer->Acc().m_aPlant[i], (i == NUM_PLANT-1 ? "" : ", "));
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
-		SJK.UD("tw_accounts_plants", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().m_AuthID);
+		SJK.UD("tw_accounts_plants", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().m_AccountID);
 		Buffer.clear();
 	}
 	else if(Table == SaveType::SAVE_MINER_DATA)
@@ -167,25 +167,25 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", str_MINER((MINER) i), pPlayer->Acc().m_aMiner[i], (i == NUM_MINER-1 ? "" : ", "));
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
-		SJK.UD("tw_accounts_miner", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().m_AuthID);
+		SJK.UD("tw_accounts_miner", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().m_AccountID);
 		Buffer.clear();
 	}
 	else if(Table == SaveType::SAVE_GUILD_DATA)
 	{
-		SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '%d' WHERE ID = '%d'", pPlayer->Acc().m_GuildID, pPlayer->Acc().m_GuildRank, pPlayer->Acc().m_AuthID);	
+		SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '%d' WHERE ID = '%d'", pPlayer->Acc().m_GuildID, pPlayer->Acc().m_GuildRank, pPlayer->Acc().m_AccountID);	
 	}
 	else if(Table == SaveType::SAVE_POSITION)
 	{
 		int LatestCorrectWorldID = Account()->GetHistoryLatestCorrectWorldID(pPlayer);
-		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", LatestCorrectWorldID, pPlayer->Acc().m_AuthID);
+		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", LatestCorrectWorldID, pPlayer->Acc().m_AccountID);
 	}
 	else if(Table == SaveType::SAVE_LANGUAGE)
 	{
-		SJK.UD("tw_accounts", "Language = '%s' WHERE ID = '%d'", pPlayer->GetLanguage(), pPlayer->Acc().m_AuthID);
+		SJK.UD("tw_accounts", "Language = '%s' WHERE ID = '%d'", pPlayer->GetLanguage(), pPlayer->Acc().m_AccountID);
 	}
 	else
 	{
-		SJK.UD("tw_accounts", "Username = '%s' WHERE ID = '%d'", pPlayer->Acc().m_aLogin, pPlayer->Acc().m_AuthID);
+		SJK.UD("tw_accounts", "Username = '%s' WHERE ID = '%d'", pPlayer->Acc().m_aLogin, pPlayer->Acc().m_AccountID);
 	}
 }
 

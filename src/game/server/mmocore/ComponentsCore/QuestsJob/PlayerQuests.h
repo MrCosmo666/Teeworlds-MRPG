@@ -8,7 +8,6 @@
 
 class CPlayerQuest
 {
-
 public:
 	int m_QuestID;
 	CPlayer* m_pPlayer;
@@ -16,7 +15,7 @@ public:
 	int m_State;
 	int m_Step;
 
-	std::string GetJsonName() const;
+	std::string GetJsonFileName() const;
 	CDataQuest& Info() const;
 	bool IsComplected() const { return m_State == QuestState::QUEST_FINISHED; }
 	int GetState() const { return m_State; }

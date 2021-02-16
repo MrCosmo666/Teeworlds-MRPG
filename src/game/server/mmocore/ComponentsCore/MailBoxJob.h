@@ -12,7 +12,7 @@ class MailBoxJob : public MmoComponent
 public:
 	int GetActiveInbox(CPlayer* pPlayer);
 	void GetInformationInbox(CPlayer *pPlayer);
-	void SendInbox(int AuthID, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
+	void SendInbox(int AccountID, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
 
 private:
 	void ReceiveInbox(CPlayer* pPlayer, int InboxID);

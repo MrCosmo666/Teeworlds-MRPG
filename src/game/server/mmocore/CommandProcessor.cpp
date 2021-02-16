@@ -160,10 +160,15 @@ void CCommandProcessor::ConChatDiscordConnect(IConsole::IResult* pResult, void* 
 
 	char aDiscordDID[32];
 	str_copy(aDiscordDID, pResult->GetString(0), sizeof(aDiscordDID));
-
 	if (str_length(aDiscordDID) > 30 || str_length(aDiscordDID) < 10)
 	{
 		pGS->ChatFollow(ClientID, "Discord ID must contain 10-30 characters.");
+		return;
+	}
+
+	if(!str_is_number(aDiscordDID))
+	{
+		pGS->ChatFollow(ClientID, "Discord ID can only contain numbers.");
 		return;
 	}
 
@@ -181,8 +186,8 @@ void CCommandProcessor::ConChatGuildExit(IConsole::IResult* pResult, void* pUser
 	if (!pPlayer || !pPlayer->IsAuthed() || !pPlayer->Acc().IsGuild())
 		return;
 
-	int AuthID = pPlayer->Acc().m_AuthID;
-	pGS->Mmo()->Member()->ExitGuild(AuthID);
+	int AccountID = pPlayer->Acc().m_AccountID;
+	pGS->Mmo()->Member()->ExitGuild(AccountID);
 }
 
 void CCommandProcessor::ConChatGuildCreate(IConsole::IResult* pResult, void* pUser)

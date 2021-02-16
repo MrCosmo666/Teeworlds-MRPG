@@ -22,7 +22,7 @@ private:
 	void onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> serverID, SleepyDiscord::User user) override;
 	void onMessage(SleepyDiscord::Message message) override;
 	bool SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::string Chanal, std::string Title, std::string SearchNickname, std::string Color = "\0", bool MultipleSearch = true);
-	bool SendGenerateMessageAuthID(SleepyDiscord::User UserRequestFrom, std::string Chanal, std::string Title, int AuthID, std::string Color = "\0");
+	bool SendGenerateMessageAccountID(SleepyDiscord::User UserRequestFrom, std::string Chanal, std::string Title, int AccountID, std::string Color = "\0");
 
 	/************************************************************************/
 	/* Discord teeworlds server side                                        */

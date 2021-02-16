@@ -77,7 +77,7 @@ void AccountMinerJob::Work(CPlayer *pPlayer, int Level)
 
 void AccountMinerJob::OnInitAccount(CPlayer* pPlayer)
 {
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_miner", "WHERE AccountID = '%d'", pPlayer->Acc().m_AuthID);
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_miner", "WHERE AccountID = '%d'", pPlayer->Acc().m_AccountID);
 	if (pRes->next())
 	{
 		for (int i = 0; i < NUM_MINER; i++)
@@ -86,7 +86,7 @@ void AccountMinerJob::OnInitAccount(CPlayer* pPlayer)
 	}
 	pPlayer->Acc().m_aMiner[MnrLevel] = 1;
 	pPlayer->Acc().m_aMiner[MnrCount] = 1;
-	SJK.ID("tw_accounts_miner", "(AccountID) VALUES ('%d')", pPlayer->Acc().m_AuthID);
+	SJK.ID("tw_accounts_miner", "(AccountID) VALUES ('%d')", pPlayer->Acc().m_AccountID);
 }
 
 void AccountMinerJob::OnInitWorld(const char* pWhereLocalWorld)
