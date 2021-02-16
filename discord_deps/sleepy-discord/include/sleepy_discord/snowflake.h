@@ -8,8 +8,7 @@
 #include "nonstd/string_view.hpp"
 #include "json_wrapper.h"
 
-namespace SleepyDiscord 
-{
+namespace SleepyDiscord {
 	using Time = int64_t;
 
 	//Stops you from mixing up different types of ids, like using a message_id as a user_id
@@ -56,6 +55,16 @@ namespace SleepyDiscord
 			if (raw == "") throw std::invalid_argument("invalid snow in Snowflake");
 #endif
 			return std::chrono::time_point<std::chrono::steady_clock>(std::chrono::milliseconds((std::stoll(raw) >> 22) + discordEpoch));
+		}
+
+		inline const bool empty() const { return raw.empty(); }
+
+		inline json::Value serialize(typename json::Value::AllocatorType& alloc) const {
+			return json::ClassTypeHelper<RawType>::fromType(raw, alloc);
+		}
+
+		static inline const bool isType(const typename json::Value& value) {
+			return value.IsString();
 		}
 
 		template<class iterator>

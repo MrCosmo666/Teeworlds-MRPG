@@ -7,6 +7,8 @@
 #include <unordered_map>
 #include <functional>
 #include <forward_list>
+#include <atomic>
+#include <mutex>
 
 //objects
 #include "message.h"
@@ -17,6 +19,7 @@
 #include "permissions.h"
 #include "gateway.h"
 #include "voice.h"
+#include "slash_commands.h"
 
 #include "error.h"
 #include "session.h"
@@ -25,18 +28,18 @@
 #include "timer.h"
 #include "voice_connection.h"
 #include "asio_schedule.h"
+#include "rate_limiter.h"
 
 namespace SleepyDiscord {
 #define TOKEN_SIZE 64
 
 	struct Request;
+	class BaseDiscordClient;
 
 	//to dos
-	//intents
 	//custom rapid json error
 	//detect cloudflare error
 	//emojis rate limits
-	//async
 	//merge to master
 	//cache
 
@@ -47,42 +50,10 @@ namespace SleepyDiscord {
 		DEFAULT_THREADS = USER_CONTROLED_THREADS
 	};
 
-	class Route {
-	public:
-		using Bucket = std::string;
-		Route(const std::string route, const std::initializer_list<std::string>& _values = {});
-		Route(const char* route);
-		inline const std::string& url() {
-			return _url;
-		}
-		const Bucket bucket(RequestMethod method);
-		inline operator const std::string&() {
-			return url();
-		}
-
-	private:
-		const std::string path;
-		std::string _url;
-		const std::initializer_list<std::string>& values;
-
-		//for the snowflake part, discord class should do
-		std::unordered_map<std::string, Snowflake<User>::RawType>
-			majorParameters = {
-			{ "channel.id", {} },
-			{ "guild.id"  , {} },
-			{ "webhook.id", {} }
-		};
-	};
-
-	struct RateLimiter {
-		std::atomic<bool> isGlobalRateLimited = { false };
-		std::atomic<time_t> nextRetry = { 0 };
-		void limitBucket(Route::Bucket& bucket, time_t timestamp);
-		time_t getLiftTime(Route::Bucket& bucket, const time_t& currentTime);
-		//isLimited also returns the next Retry timestamp
-	private:
-		std::unordered_map<Route::Bucket, time_t> buckets;
-		std::mutex mutex;
+	enum class TTS : char {
+		DisableTTS,
+		EnableTTS,
+		Default = DisableTTS,
 	};
 
 	enum RequestMode {
@@ -144,7 +115,7 @@ namespace SleepyDiscord {
 
 		template<class ParmType>
 		void requestAsync(const RequestMethod method, Route path, std::function<void(ParmType)> callback, const std::string jsonParameters = "",
-			const std::initializer_list<Part>& multipartParameters = {}, const RequestMode mode = Async) {
+			const std::vector<Part>& multipartParameters = {}, const RequestMode mode = Async) {
 			postTask(static_cast<PostableTask>(
 				Request{ *this, method, path, jsonParameters, multipartParameters, callback ? RequestCallback([callback](Response r) {
 					callback(static_cast<ParmType>(r));
@@ -154,7 +125,7 @@ namespace SleepyDiscord {
 
 		template<class ParmType>
 		Response requestSync(const RequestMethod method, Route path, std::function<void(ParmType)> callback, const std::string jsonParameters = "",
-			const std::initializer_list<Part>& multipartParameters = {}, const RequestMode mode = Sync) {
+			const std::vector<Part>& multipartParameters = {}, const RequestMode mode = Sync) {
 			return request(method, path, jsonParameters, multipartParameters, callback ? RequestCallback([callback](Response r) {
 				callback(static_cast<ParmType>(r));
 			}) : RequestCallback(nullptr), mode );
@@ -234,14 +205,18 @@ namespace SleepyDiscord {
 		enum GetMessagesKey {na, around, before, after, limit};
 		ArrayResponse <Message     > getMessages             (Snowflake<Channel> channelID, GetMessagesKey when, Snowflake<Message> messageID, uint8_t limit = 0);
 		ObjectResponse<Message     > getMessage              (Snowflake<Channel> channelID, Snowflake<Message> messageID                                                   , RequestSettings<ObjectResponse<Message>> settings = {});  //to do add more then one message return
-		ObjectResponse<Message     > sendMessage             (Snowflake<Channel> channelID, std::string message, Embed embed = Embed::Flag::INVALID_EMBED, bool tts = false, RequestSettings<ObjectResponse<Message>> settings = {});
+		const Embed createInvalidEmbed() {
+			return Embed::Flag::INVALID_EMBED;
+		}
+		//maybe move this to message.h
+		ObjectResponse<Message     > sendMessage             (Snowflake<Channel> channelID, std::string message, Embed embed = Embed::Flag::INVALID_EMBED, MessageReference replyingTo = {}, TTS tts = TTS::Default, RequestSettings<ObjectResponse<Message>> settings = {});
 		ObjectResponse<Message     > sendMessage             (SendMessageParams params                                                                                     , RequestSettings<ObjectResponse<Message>> settings = {});
-		ObjectResponse<Message     > uploadFile              (Snowflake<Channel> channelID, std::string fileLocation, std::string message                                  , RequestSettings<ObjectResponse<Message>> settings = {});
+		ObjectResponse<Message     > uploadFile              (Snowflake<Channel> channelID, std::string fileLocation, std::string message, Embed embed = Embed::Flag::INVALID_EMBED, MessageReference replyingTo = {}, RequestSettings<ObjectResponse<Message>> settings = {});
 		BoolResponse                 addReaction             (Snowflake<Channel> channelID, Snowflake<Message> messageID, std::string emoji                                , RequestSettings<BoolResponse           > settings = {});
 		BoolResponse                 removeReaction          (Snowflake<Channel> channelID, Snowflake<Message> messageID, std::string emoji, Snowflake<User> userID = "@me");
 		ArrayResponse <Reaction    > getReactions            (Snowflake<Channel> channelID, Snowflake<Message> messageID, std::string emoji                                , RequestSettings<ArrayResponse<Reaction>> settings = {});
 		StandardResponse             removeAllReactions      (Snowflake<Channel> channelID, Snowflake<Message> messageID                                                   , RequestSettings<StandardResponse       > settings = {});
-		ObjectResponse<Message     > editMessage             (Snowflake<Channel> channelID, Snowflake<Message> messageID, std::string newMessage                           , RequestSettings<ObjectResponse<Message>> settings = {});
+		ObjectResponse<Message     > editMessage             (Snowflake<Channel> channelID, Snowflake<Message> messageID, std::string newMessage, Embed embed = Embed::Flag::INVALID_EMBED, RequestSettings<ObjectResponse<Message>> settings = {});
 		BoolResponse                 deleteMessage           (Snowflake<Channel> channelID, Snowflake<Message> messageID                                                   , RequestSettings<BoolResponse           > settings = {});
 		BoolResponse                 bulkDeleteMessages      (Snowflake<Channel> channelID, std::vector<Snowflake<Message>> messageIDs                                     , RequestSettings<BoolResponse           > settings = {});
 		/*allow is a bitwise value of all allowed permissions
@@ -264,9 +239,9 @@ namespace SleepyDiscord {
 		inline BoolResponse          deleteChannelPermission (Snowflake<Channel> channelID, std::string               ID                   ) { return removeChannelPermission(channelID,        ID       ); }
 		inline StandardResponse      deleteRecipient         (Snowflake<Channel> channelID, Snowflake<User   >    _userID                  ) { return removeRecipient        (channelID,   _userID       ); }
 		//For Convenience
-		inline ObjectResponse<Message> editMessage(Message message, std::string newMessage) { return editMessage(message.channelID, message.ID, newMessage); }
+		inline ObjectResponse<Message> editMessage(Message message, std::string newMessage, Embed embed = Embed::Flag::INVALID_EMBED) { return editMessage(message.channelID, message.ID, newMessage, embed); }
 		inline ObjectResponse<Message> sendMessage(Snowflake<Channel> channelID, std::string message, RequestSettings<ObjectResponse<Message>> settings) {
-			return sendMessage(channelID, message, Embed::Flag::INVALID_EMBED, false, settings);
+			return sendMessage(channelID, message, Embed::Flag::INVALID_EMBED, MessageReference{}, TTS::Default, settings);
 		}
 
 		//server functions
@@ -287,7 +262,7 @@ namespace SleepyDiscord {
 		BoolResponse                 removeRole              (Snowflake<Server> serverID, Snowflake<User> userID, Snowflake<Role> roleID         , RequestSettings<BoolResponse                 > settings = {});
 		BoolResponse                 kickMember              (Snowflake<Server> serverID, Snowflake<User> userID                                 , RequestSettings<BoolResponse                 > settings = {});
 		ArrayResponse <User        > getBans                 (Snowflake<Server> serverID                                                         , RequestSettings<ArrayResponse<User          >> settings = {});  //to do test this
-		BoolResponse                 banMember               (Snowflake<Server> serverID, Snowflake<User> userID                                 , RequestSettings<BoolResponse                 > settings = {});
+		BoolResponse                 banMember               (Snowflake<Server> serverID, Snowflake<User> userID, int deleteMessageDays = -1, std::string reason = "", RequestSettings<BoolResponse> settings = {});
 		BoolResponse                 unbanMember             (Snowflake<Server> serverID, Snowflake<User> userID                                 , RequestSettings<BoolResponse                 > settings = {});
 		ArrayResponse <Role        > getRoles                (Snowflake<Server> serverID                                                         , RequestSettings<ArrayResponse<Role          >> settings = {});
 		ObjectResponse<Role        > createRole              (Snowflake<Server> serverID, std::string name = "", Permission permissions = Permission::NONE, unsigned int color = 0, bool hoist = false, bool mentionable = false);
@@ -303,7 +278,7 @@ namespace SleepyDiscord {
 		BoolResponse                 editIntergration        (Snowflake<Server> serverID, std::string integrationID, int expireBegavior, int expireGracePeriod, bool enbleEmoticons); //to do test
 		BoolResponse                 deleteIntegration       (Snowflake<Server> serverID, std::string integrationID                              , RequestSettings<BoolResponse                 > settings = {});  //to do test this
 		BoolResponse                 syncIntegration         (Snowflake<Server> serverID, std::string integrationID                              , RequestSettings<BoolResponse                 > settings = {});  //to do test this
-		ObjectResponse<ServerEmbed > getServerEmbed          (Snowflake<Server> serverID                                                         , RequestSettings<ObjectResponse<ServerEmbed  >> settings = {});
+		ObjectResponse<ServerWidget > getServerWidget          (Snowflake<Server> serverID                                                       , RequestSettings<ObjectResponse<ServerWidget>> settings = {});
 		//edit server embed   I don't know what the perms are
 
 		//Invite functions
@@ -339,7 +314,29 @@ namespace SleepyDiscord {
 		ObjectResponse<Webhook> executeWebhook               (Snowflake<Webhook> webhookID, std::string webhookToken, filePathPart file, bool wait = false, std::string username = "", std::string avatar_url = "", bool tts = false);         //to do test this
 
 		void updateStatus(std::string gameName = "", uint64_t idleSince = 0, Status status = online, bool afk = false);
-		void sendMessageWithoutResponse(Snowflake<Channel> channelID, std::string message, Embed embed = Embed::Flag::INVALID_EMBED) { sendMessage(channelID, message, embed, false); }
+		void sendMessageWithoutResponse(Snowflake<Channel> channelID, std::string message, Embed embed = Embed::Flag::INVALID_EMBED) { sendMessage(channelID, message, embed, MessageReference{}, TTS::Default); }
+		void requestServerMembers(ServerMembersRequest request);
+
+		//slash commands
+		ArrayResponse<ApplicationCommand> getGlobalApplicationCommands(Snowflake<DiscordObject> applicationID);
+		ObjectResponse<ApplicationCommand> createGlobalApplicationCommand(Snowflake<DiscordObject> applicationID, std::string name, std::string description, std::vector<ApplicationCommand::Option> options);
+		ObjectResponse<ApplicationCommand> editGlobalApplicationCommand(Snowflake<DiscordObject> applicationID, Snowflake<ApplicationCommand> commandID, std::string name, std::string description, std::vector<ApplicationCommand::Option> options);
+		BoolResponse deleteGlobalApplicationCommand(Snowflake<DiscordObject> applicationID, Snowflake<ApplicationCommand> commandID);
+		ArrayResponse<ApplicationCommand> getServerApplicationCommands(Snowflake<DiscordObject> applicationID, Snowflake<Server> serverID);
+		ObjectResponse<ApplicationCommand> createServerApplicationCommand(Snowflake<DiscordObject> applicationID, Snowflake<Server> serverID, std::string name, std::string description, std::vector<ApplicationCommand::Option> options);
+		ObjectResponse<ApplicationCommand> editServerApplicationCommand(Snowflake<DiscordObject> applicationID, Snowflake<Server> serverID, Snowflake<ApplicationCommand> commandID, std::string name, std::string description, std::vector<ApplicationCommand::Option> options);
+		BoolResponse deleteServerApplicationCommand(Snowflake<DiscordObject> applicationID, Snowflake<Server> serverID, Snowflake<ApplicationCommand> commandID);
+		BoolResponse createInteractionResponse(Snowflake<Interaction> interactionID, std::string token, Interaction::Response response);
+		//Response editOriginalInteractionResponse();
+		BoolResponse deleteOriginalInteractionResponse(std::string interactionToken);
+		//Response createFollowupMessage(std::string interactionToken,)
+		//Response editFollowupMessage(std::string interactionToken, Snowflake<Message> messageID)
+		BoolResponse deleteFollowupMessage(std::string interactionToken, Snowflake<Message> messageID);
+
+		ArrayResponse<ApplicationCommand> getApplicationCommands(Snowflake<DiscordObject> applicationID, Snowflake<Server> serverID);
+		ObjectResponse<ApplicationCommand> createApplicationCommand(Snowflake<DiscordObject> applicationID, Snowflake<Server> serverID, std::string name, std::string description, std::vector<ApplicationCommand::Option> options);
+		ObjectResponse<ApplicationCommand> editApplicationCommand(Snowflake<DiscordObject> applicationID, Snowflake<Server> serverID, Snowflake<ApplicationCommand> commandID, std::string name, std::string description, std::vector<ApplicationCommand::Option> options);
+		BoolResponse deleteApplicationCommand(Snowflake<DiscordObject> applicationID, Snowflake<Server> serverID, Snowflake<ApplicationCommand> commandID);
 
 		//websocket functions
 		void waitTilReady();  ////Deprecated, uses sleep. No replacment for now
@@ -461,7 +458,7 @@ namespace SleepyDiscord {
 	protected:
 		//Rest events
 		virtual void onDepletedRequestSupply(const Route::Bucket& bucket, time_t timeTilReset);
-		virtual void onExceededRateLimit(bool global, std::time_t timeTilRetry, Request request);
+		virtual void onExceededRateLimit(bool global, std::time_t timeTilRetry, Request request, bool& continueRequest);
 
 		/* list of events
 		READY
@@ -518,7 +515,7 @@ namespace SleepyDiscord {
 		virtual void onDeleteRole        (Snowflake<Server> serverID, Snowflake<Role> roleID);
 		virtual void onEditRole          (Snowflake<Server> serverID, Role role);
 		virtual void onEditEmojis        (Snowflake<Server> serverID, std::vector<Emoji> emojis);
-		virtual void onMemberChunk       (Snowflake<Server> serverID, std::vector<ServerMember> members);
+		virtual void onMemberChunk       (ServerMembersChunk memberChunk);
 		virtual void onDeleteChannel     (Channel            channel    );
 		virtual void onEditChannel       (Channel            channel    );
 		virtual void onPinMessage        (Snowflake<Channel> channelID, std::string lastPinTimestamp);
@@ -541,6 +538,7 @@ namespace SleepyDiscord {
 		virtual void onServer            (Server             server     );
 		virtual void onChannel           (Channel            channel    );
 		virtual void onDispatch          (const json::Value& jsonMessage);
+		virtual void onInteraction       (Interaction        interaction) {}
 
 		//websocket stuff
 		virtual void onHeartbeat();
@@ -574,7 +572,7 @@ namespace SleepyDiscord {
 		void handleFailToConnect() override { reconnect(); }
 		virtual void send(std::string /*message*/, WebsocketConnection& /*connection*/) {}
 		virtual void disconnect(unsigned int /*code*/, const std::string /*reason*/, WebsocketConnection& /*connection*/) {}
-		void reconnect(const unsigned int status = 1000);
+		void reconnect(const unsigned int status = 4900);
 		virtual void stopClient() {}
 		//the next 3 functions are part of BaseDiscordClient because VoiceConnection is a private nested class
 		inline void initialize(GenericMessageReceiver*& messageProcessor) const {
@@ -639,7 +637,7 @@ namespace SleepyDiscord {
 
 		//rate limiting
 		int8_t messagesRemaining = 0;
-		RateLimiter rateLimiter;
+		RateLimiter<BaseDiscordClient> rateLimiter;
 
 		//error handling
 		void setError(int errorCode);

@@ -834,11 +834,8 @@ if(SERVER_COMPILE AND DISCORD_SERVER_COMPILE)
   #The codebase is c++11 but both clang and visual c++ have issues with c++11
   #These issues are fixed by using preprocessor defines to replace code that
   #cause issues with c++14 code
-  if (CXX_STANDARD LESS 14 OR NOT CXX_STANDARD)
-	set_target_properties(sleepy-discord PROPERTIES CXX_STANDARD 14)
-	set_target_properties(sleepy-discord PROPERTIES CXX_STANDARD_REQUIRED ON)
-	target_compile_features(sleepy-discord PUBLIC cxx_std_14)
-  endif()
+  set_target_properties(sleepy-discord PROPERTIES CXX_STANDARD_REQUIRED ON)
+  target_compile_features(sleepy-discord PUBLIC cxx_std_11 cxx_return_type_deduction)
 endif()
 
 
