@@ -214,7 +214,7 @@ namespace SleepyDiscord {
 
 	template<>
 	struct GetDefault<Activity::ActivityType> {
-		static inline const Activity::ActivityType get() {
+		static inline Activity::ActivityType get() {
 			return Activity::ActivityType::ACTIVITY_TYPE_NONE;
 		}
 	};

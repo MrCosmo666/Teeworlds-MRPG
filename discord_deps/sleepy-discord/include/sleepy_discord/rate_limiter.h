@@ -40,7 +40,7 @@ namespace SleepyDiscord {
 			buckets[bucket].nextTry = timestamp;
 		}
 
-		const time_t getLiftTime(Route::Bucket& bucket, const time_t& currentTime) {
+		time_t getLiftTime(Route::Bucket& bucket, const time_t& currentTime) {
 			if (isGlobalRateLimited && currentTime < nextRetry)
 					return nextRetry;
 			isGlobalRateLimited = false;

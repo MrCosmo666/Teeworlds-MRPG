@@ -140,7 +140,7 @@ namespace SleepyDiscord {
 
 	template<>
 	struct GetDefault<UnavailableServer::AvailableFlag> {
-		static inline const UnavailableServer::AvailableFlag get() {
+		static inline UnavailableServer::AvailableFlag get() {
 			return UnavailableServer::AvailableFlag::NotSet;
 		} 
 	};

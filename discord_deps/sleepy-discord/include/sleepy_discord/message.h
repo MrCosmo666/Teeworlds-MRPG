@@ -129,7 +129,7 @@ namespace SleepyDiscord {
 			);
 		JSONStructEnd
 
-		inline const bool empty() const {
+		inline bool empty() const {
 			return messageID.empty() && channelID.empty() && serverID.empty();
 		}
 	};
@@ -283,14 +283,14 @@ namespace SleepyDiscord {
 			);
 		JSONStructEnd
 
-		inline const bool empty() const {
+		inline bool empty() const {
 			return AllowMentionsParseHelper<
 				ParseContainer, json::ClassTypeHelper
 				>::empty(parse) &&
 			repliedUser == MentionReplierFlag::NotSet;
 		}
 
-		inline const bool willMention() const {
+		inline bool willMention() const {
 			return !parse.empty() &&
 				repliedUser == MentionReplierFlag::MentionReply;
 		}
@@ -298,7 +298,7 @@ namespace SleepyDiscord {
 
 	template<>
 	struct GetDefault<MentionReplierFlag> {
-		static inline const MentionReplierFlag get() {
+		static inline MentionReplierFlag get() {
 			return MentionReplierFlag::NotSet;
 		} 
 	};

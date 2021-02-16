@@ -35,7 +35,7 @@ namespace SleepyDiscord {
 
 	template<>
 	struct GetDefault<Overwrite::Type> {
-		static inline const Overwrite::Type get() {
+		static inline Overwrite::Type get() {
 			return Overwrite::Type::TYPE_NONE;
 		}
 	};
@@ -103,7 +103,7 @@ namespace SleepyDiscord {
 
 	template<>
 	struct GetDefault<Channel::ChannelType> {
-		static inline const Channel::ChannelType get() {
+		static inline Channel::ChannelType get() {
 			return Channel::ChannelType::CHANNEL_TYPE_NONE;
 		}
 	};

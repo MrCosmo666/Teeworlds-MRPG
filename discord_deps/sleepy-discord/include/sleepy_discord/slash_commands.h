@@ -41,12 +41,12 @@ namespace SleepyDiscord {
 
 				//warning crashes if type isn't correct
 				template<class Type>
-				inline const Type get() {
+				inline Type get() const {
 					return json::ClassTypeHelper<Type>::toType(value);
 				}
 
 				template<class Type>
-				inline const bool get(Type& target) {
+				inline bool get(Type& target) const {
 					return json::castValue<Type, json::ClassTypeHelper<Type>>(target, value);
 				}
 
@@ -154,7 +154,7 @@ namespace SleepyDiscord {
 
 	template<>
 	struct GetDefault<ApplicationCommand::Option::Default> {
-		static inline const ApplicationCommand::Option::Default get() {
+		static inline ApplicationCommand::Option::Default get() {
 			return ApplicationCommand::Option::Default::Undefined;
 		}
 	};

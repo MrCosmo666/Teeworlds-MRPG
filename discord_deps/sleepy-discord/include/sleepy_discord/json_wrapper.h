@@ -82,7 +82,7 @@ namespace SleepyDiscord {
 			inline const Value& getDoc() const { return json; }
 			operator const Value&() const { return getDoc(); }
 			template<class Callback>
-			const bool getDoc(const Callback& callback) const {
+			bool getDoc(const Callback& callback) const {
 				callback(json);
 				return true;
 			}
@@ -691,16 +691,16 @@ namespace SleepyDiscord {
 			using Container = std::shared_ptr<Type>;
 			using weak_ptr = typename Container::weak_ptr;
 
-			const bool isUndefined() const {
+			bool isUndefined() const {
 				return ( flags & defined ) == undefined;
 			}
-			const bool isDefined() const {
+			bool isDefined() const {
 				return !isUndefined();
 			}
-			const bool isAvaiable() const {
+			bool isAvaiable() const {
 				return isDefined() && static_cast<bool>(value);
 			}
-			const bool isNull() const {
+			bool isNull() const {
 				return isDefined() && !static_cast<bool>(value);
 			}
 			 
