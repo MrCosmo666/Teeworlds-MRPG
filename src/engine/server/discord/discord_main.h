@@ -35,6 +35,7 @@ private:
 	/************************************************************************/
 	// Allow access only from the CServer 
 	friend class CServer;
+	friend class DiscordCommands;
 	struct DiscordHandle
 	{
 		DiscordTask m_pEvent;

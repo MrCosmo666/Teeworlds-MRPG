@@ -845,7 +845,7 @@ endif()
 
 if(SERVER_COMPILE)
   # Sources
-  file(GLOB ENGINE_SERVER "src/engine/server/*.cpp" "src/engine/server/*.h")
+  file(GLOB ENGINE_SERVER "src/engine/server/*.cpp" "src/engine/server/*.h" "src/engine/server/discord/*.cpp" "src/engine/server/discord/*.h")
   file(GLOB_RECURSE GAME_SERVER "src/game/server/*.cpp" "src/game/server/*.h")
   file(GLOB LOCALIZED_SERVER "src/teeother/components/*.cpp" "src/teeother/components/*.h" "src/teeother/tl/*.h" "src/teeother/system/*.h")
   set(GAME_GENERATED_SERVER src/generated/server_data.cpp src/generated/server_data.h)
