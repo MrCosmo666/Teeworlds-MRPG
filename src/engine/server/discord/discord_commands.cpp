@@ -243,7 +243,7 @@ bool DiscordCommands::ExecuteCommand(DiscordJob* pDiscord, SleepyDiscord::Messag
 
 			CConsole::CResult Result;
 			const int CommandLength = str_length(pCommand.m_aCommand) + 1;
-			if(CommandLength < message.content.size())
+			if(CommandLength < (int)message.content.size())
 			{
 				std::string ArgumentsLine = message.content.substr(CommandLength);
 				str_copy(Result.m_aStringStorage, ArgumentsLine.c_str(), sizeof(Result.m_aStringStorage));
