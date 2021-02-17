@@ -19,7 +19,6 @@ private:
 	/* Discord main events functions                                        */
 	/************************************************************************/
 	void onAddMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> serverID, SleepyDiscord::ServerMember member) override;
-	void onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> serverID, SleepyDiscord::User user) override;
 	void onMessage(SleepyDiscord::Message message) override;
 
 	/************************************************************************/

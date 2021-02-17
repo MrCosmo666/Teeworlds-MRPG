@@ -2,11 +2,13 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifdef CONF_DISCORD
 
+#include <base/math.h>
 #include <base/system.h>
 #include <engine/shared/config.h>
+#include <engine/shared/console.h>
 #include <game/server/gamecontext.h>
-#include "discord_main.h"
 
+#include "discord_main.h"
 #include "discord_commands.h"
 
 std::vector < DiscordCommands::Command > DiscordCommands::m_aCommands;
@@ -14,49 +16,48 @@ std::vector < DiscordCommands::Command > DiscordCommands::m_aCommands;
 void DiscordCommands::InitCommands()
 {
 	// commands important
-	DiscordCommands::RegisterCommand("!mhelp", "get help on commands.", ComHelp, TYPE_IMPORTANT);
-	DiscordCommands::RegisterCommand("!mconnect", "help for connect your discord to account in game.", ComConnect, TYPE_IMPORTANT|TYPE_GAME);
+	DiscordCommands::RegisterCommand("!mhelp", "", "get help on commands.", ComHelp, CMD_IMPORTANT);
+	DiscordCommands::RegisterCommand("!mconnect", "", "help for connect your discord to account in game.", ComConnect, CMD_IMPORTANT|CMD_GAME);
 
 	// commands game server
-	DiscordCommands::RegisterCommand("!monline", "show a list of players on the server.", ComOnline, TYPE_GAME);
-	DiscordCommands::RegisterCommand("!mstats", "searching for players and displaying their personal MRPG cards.", ComStats, TYPE_GAME);
-	DiscordCommands::RegisterCommand("!mranking", "show the ranking of players by level.", ComRanking, TYPE_GAME);
-	DiscordCommands::RegisterCommand("!mgoldranking", "show the ranking of players by gold.", ComRanking, TYPE_GAME);
+	DiscordCommands::RegisterCommand("!monline", "", "show a list of players on the server.", ComOnline, CMD_GAME);
+	DiscordCommands::RegisterCommand("!mstats", "?s[nickname]", "searching for players and displaying their personal MRPG cards.", ComStats, CMD_GAME);
+	DiscordCommands::RegisterCommand("!mranking", "", "show the ranking of players by level.", ComRanking, CMD_GAME);
+	DiscordCommands::RegisterCommand("!mgoldranking", "", "show the ranking of players by gold.", ComRanking, CMD_GAME);
 
 	// commands fun
-	DiscordCommands::RegisterCommand("!mavatar", "show user avatars.", ComAvatar, TYPE_FUN);
+	DiscordCommands::RegisterCommand("!mavatar", "", "show user avatars.", ComAvatar, CMD_FUN);
 
 	// commands admin
-	DiscordCommands::RegisterCommand("!madminhelp", "help on admin commands.", ComAvatar, -1, ACCESS_ADMIN);
 }
 
 /************************************************************************/
 /*  Important commands                                                  */
 /************************************************************************/
-void DiscordCommands::ComHelp(DiscordJob *pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComHelp(void *pResult, class DiscordJob *pDiscord, SleepyDiscord::Message message)
 {
 	std::string ImportantCmd("_**Important commands:**_");
 	std::string RelatedGameServerCmd("\n\n_**Related game server commands:**_");
 	std::string EntertainmentFunCmd("\n\n_**Entertainment / Fun**_");
-	std::string AdminToolsCmd = "";
+
 	for(auto& pCommand : DiscordCommands::m_aCommands)
 	{
-		if(pCommand.m_TypeFlags & TYPE_IMPORTANT)
+		if(pCommand.m_TypeFlags & CMD_IMPORTANT)
 			ImportantCmd += "\n- **" + std::string(pCommand.m_aCommand) + "** - " + std::string(pCommand.m_aCommandDesc);
-		else if(pCommand.m_TypeFlags & TYPE_GAME)
+		else if(pCommand.m_TypeFlags & CMD_GAME)
 			RelatedGameServerCmd += "\n- **" + std::string(pCommand.m_aCommand) + "** - " + std::string(pCommand.m_aCommandDesc);
-		else if(pCommand.m_TypeFlags & TYPE_FUN)
+		else if(pCommand.m_TypeFlags & CMD_FUN)
 			EntertainmentFunCmd += "\n- **" + std::string(pCommand.m_aCommand) + "** - " + std::string(pCommand.m_aCommandDesc);
 	}
 
 	SleepyDiscord::Embed EmbedHelp;
 	EmbedHelp.title = "Commands / Information";
-	EmbedHelp.description = ImportantCmd + RelatedGameServerCmd + EntertainmentFunCmd + AdminToolsCmd;
-	EmbedHelp.color = 1233333;
+	EmbedHelp.description = ImportantCmd + RelatedGameServerCmd + EntertainmentFunCmd;
+	EmbedHelp.color = string_to_number(DC_DISCORD_INFO, 0, 1410065407);
 	pDiscord->sendMessage(message.channelID, "\0", EmbedHelp);
 }
 
-void DiscordCommands::ComConnect(class DiscordJob* pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComConnect(void* pResult, class DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
 	sqlstr::CSqlString<64> DiscordID = sqlstr::CSqlString<64>(std::string(message.author.ID).c_str());
 	ResultPtr pRes = SJK.SD("Nick", "tw_accounts_data", "WHERE DiscordID = '%s'", DiscordID.cstr());
@@ -87,7 +88,7 @@ void DiscordCommands::ComConnect(class DiscordJob* pDiscord, SleepyDiscord::Mess
 /************************************************************************/
 /*  Game server commands                                                */
 /************************************************************************/
-void DiscordCommands::ComOnline(class DiscordJob* pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComOnline(void* pResult, class DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
 	std::string Onlines = "";
 	CGS* pGS = (CGS*)pDiscord->Server()->GameServer(MAIN_WORLD_ID);
@@ -109,21 +110,16 @@ void DiscordCommands::ComOnline(class DiscordJob* pDiscord, SleepyDiscord::Messa
 	pDiscord->sendMessage(message.channelID, "\0", EmbedOnlines);
 }
 
-void DiscordCommands::ComStats(class DiscordJob* pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComStats(void* pResult, class DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
-	if(message.content.size() <= 8)
-	{
-		pDiscord->SendWarningMessage(message.channelID, "You must enter at least 1 character to search for accounts.");
-		return;
-	}
-
-	std::string InputNick = "%" + message.content.substr(8, message.content.length() - 8) + "%";
-	bool Found = pDiscord->SendGenerateMessage(message.author, message.channelID, "Discord MRPG Card", InputNick.c_str());
+	IConsole::IResult* pArgs = (IConsole::IResult*)pResult;
+	const char* pSearchNick = pArgs->GetString(0);
+	bool Found = pDiscord->SendGenerateMessage(message.author, message.channelID, "Discord MRPG Card", pSearchNick);
 	if(!Found)
-		pDiscord->SendWarningMessage(message.channelID, "Accounts containing [" + InputNick + "] among nicknames were not found on the server.");
+		pDiscord->SendWarningMessage(message.channelID, "Accounts containing [" + std::string(pSearchNick) + "] among nicknames were not found on the server.");
 }
 
-void DiscordCommands::ComRanking(class DiscordJob* pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComRanking(void* pResult, class DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
 	SleepyDiscord::Embed EmbedRanking;
 	EmbedRanking.title = message.startsWith("!mgoldranking") ? "Ranking by Gold" : "Ranking by Level";
@@ -150,7 +146,7 @@ void DiscordCommands::ComRanking(class DiscordJob* pDiscord, SleepyDiscord::Mess
 /************************************************************************/
 /*  Fun commands                                                        */
 /************************************************************************/
-void DiscordCommands::ComAvatar(class DiscordJob* pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComAvatar(void* pResult, class DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
 	if(message.mentions.empty())
 	{
@@ -169,20 +165,18 @@ void DiscordCommands::ComAvatar(class DiscordJob* pDiscord, SleepyDiscord::Messa
 
 
 /************************************************************************/
-/*  Fun commands                                                        */
+/*  Admin commands                                                      */
 /************************************************************************/
-void DiscordCommands::ComAdminHelp(class DiscordJob* pDiscord, SleepyDiscord::Message message)
-{
 
-}
 
 /************************************************************************/
 /*  Engine commands                                                     */
 /************************************************************************/
-void DiscordCommands::RegisterCommand(const char* pName, const char* pDesc, CommandCallback pCallback, int64 FlagsType, int64 Flags)
+void DiscordCommands::RegisterCommand(const char* pName, const char* pArgs, const char* pDesc, CommandCallback pCallback, int64 FlagsType, int64 Flags)
 {
 	DiscordCommands::Command NewCommand;
 	str_copy(NewCommand.m_aCommand, pName, sizeof(NewCommand.m_aCommand));
+	str_copy(NewCommand.m_aCommandArgs, pArgs, sizeof(NewCommand.m_aCommandArgs));
 	str_copy(NewCommand.m_aCommandDesc, pDesc, sizeof(NewCommand.m_aCommandDesc));
 	NewCommand.m_TypeFlags = FlagsType;
 	NewCommand.m_AccessFlags = Flags;
@@ -190,25 +184,67 @@ void DiscordCommands::RegisterCommand(const char* pName, const char* pDesc, Comm
 	DiscordCommands::m_aCommands.push_back(NewCommand);
 }
 
-bool DiscordCommands::ExecuteÑommand(DiscordJob* pDiscord, SleepyDiscord::Message message)
+bool DiscordCommands::ExecuteCommand(DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
 	for(auto& pCommand : DiscordCommands::m_aCommands)
 	{
 		if(message.startsWith(pCommand.m_aCommand))
 		{
-			SleepyDiscord::Server Server = pDiscord->getServer(message.serverID).cast();
-			if(!(pCommand.m_AccessFlags & ACCESS_BASE) && 
-				((pCommand.m_AccessFlags & ACCESS_VERIFIED && !message.author.verified)
-					|| (pCommand.m_AccessFlags & ACCESS_ADMIN && message.author.ID != Server.ownerID)
-					|| (pCommand.m_AccessFlags & ACCESS_NITRO_CLASSIC && message.author.premiumType < SleepyDiscord::User::PremiumType::Nitro_Classic)
-					|| (pCommand.m_AccessFlags & ACCESS_NITRO && message.author.premiumType < SleepyDiscord::User::PremiumType::Nitro)
-				))
+			if(!(pCommand.m_AccessFlags & ACCESS_EVERYONE))
 			{
-				pDiscord->SendWarningMessage(message.channelID, "You do not have enough rights to execute this command.");
-				return true;
+				if(!(pCommand.m_AccessFlags & ACCESS_OWNER))
+				{
+					if(pCommand.m_AccessFlags & ACCESS_ADMIN)
+					{
+						std::vector<SleepyDiscord::Role> UserRoles = pDiscord->getUserRoles(message.serverID, message.author);
+						auto pRole = std::find_if(UserRoles.begin(), UserRoles.end(), [](SleepyDiscord::Role& pItem) { return pItem.permissions & SleepyDiscord::Permission::ADMINISTRATOR; });
+						if(pRole == UserRoles.end())
+						{
+							pDiscord->SendWarningMessage(message.channelID,
+								"You do not have enough rights to execute this command."
+								"\nOnly a user with administrator rights can use this command.");
+							return true;
+						}
+					}
+
+					if((pCommand.m_AccessFlags & ACCESS_VERIFIED && !message.author.verified))
+					{
+						pDiscord->SendWarningMessage(message.channelID,
+							"You do not have enough rights to execute this command."
+							"\nOnly the one verified in Discord can use this command.");
+						return true;
+					}
+				}
+				else
+				{
+					SleepyDiscord::Server Server = pDiscord->getServer(message.serverID).cast();
+					if(message.author.ID != Server.ownerID)
+					{
+						pDiscord->SendWarningMessage(message.channelID,
+							"You do not have enough rights to execute this command."
+							"\nOnly the owner of the server can use this command.");
+						return true;
+					}
+				}
 			}
 
-			pCommand.m_pCallback(pDiscord, message);
+			CConsole::CResult Result;
+			const int CommandLength = str_length(pCommand.m_aCommand) + 1;
+			if(CommandLength < message.content.size())
+			{
+				std::string ArgumentsLine = message.content.substr(CommandLength);
+				str_copy(Result.m_aStringStorage, ArgumentsLine.c_str(), sizeof(Result.m_aStringStorage));
+				Result.m_pArgsStart = Result.m_aStringStorage;
+
+				CGS* pGS = (CGS*)pDiscord->Server()->GameServer(MAIN_WORLD_ID);
+				int Error = pGS->Console()->ParseCustomArgs(&Result, pCommand.m_aCommandArgs);
+				if(Error)
+				{
+					pDiscord->SendWarningMessage(message.channelID, "An error occurred when executing a command with arguments.");
+					return true;
+				}
+			}
+			pCommand.m_pCallback(&Result, pDiscord, message);
 			return true;
 		}
 	}

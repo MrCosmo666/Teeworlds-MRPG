@@ -129,6 +129,9 @@ namespace SleepyDiscord {
 		bool managed = false;
 		bool mentionable = false;
 
+		// owns
+		std::string showMention() { return std::string("<@&" + std::string(ID) + ">"); }
+
 		inline bool operator==(Role& right) {
 			return ID == right.ID;
 		}

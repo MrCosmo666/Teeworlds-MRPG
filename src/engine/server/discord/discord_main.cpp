@@ -33,10 +33,10 @@ void DiscordJob::onAddMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> ser
 {
 	// welcome messages
 	std::vector < std::string > ArrayWelcomes;
-	ArrayWelcomes.push_back("I can't believe my eyes! Wipe my window " + member.user.showUser());
-	ArrayWelcomes.push_back(member.user.showUser() + ", i bet you haven't seen me as long as i had!");
-	ArrayWelcomes.push_back("Welcome, " + member.user.showUser() + ". We hope you're not coming to us without pizza!");
-	ArrayWelcomes.push_back("The raptor "+ member.user.showUser() + " appeared. Watch out!");
+	ArrayWelcomes.push_back("I can't believe my eyes! Wipe my window " + member.user.showMention());
+	ArrayWelcomes.push_back(member.user.showMention() + ", i bet you haven't seen me as long as i had!");
+	ArrayWelcomes.push_back("Welcome, " + member.user.showMention() + ". We hope you're not coming to us without pizza!");
+	ArrayWelcomes.push_back("The raptor "+ member.user.showMention() + " appeared. Watch out!");
 	std::string RulesStr("\n**Don't forget to read the rules <#708092196024352768>!**");
 
 	const int RandomID = random_int() % ArrayWelcomes.size();
@@ -49,10 +49,6 @@ void DiscordJob::onAddMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> ser
 
 	// give member role
 	addRole(serverID, member.ID, g_Config.m_SvDiscordMemberRole);
-}
-
-void DiscordJob::onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> serverID, SleepyDiscord::User user)
-{
 }
 
 void DiscordJob::onMessage(SleepyDiscord::Message message) 
@@ -76,7 +72,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 
 		SleepyDiscord::Embed EmbedIdeas;
 		EmbedIdeas.title = std::string("Suggestion");
-		EmbedIdeas.description = "From: " + message.author.showUser() + "\n" + message.content;
+		EmbedIdeas.description = "From: " + message.author.showMention() + "\n" + message.content;
 		EmbedIdeas.color = 431050;
 		EmbedIdeas.thumbnail.url = message.author.avatarUrl();
 		EmbedIdeas.thumbnail.proxyUrl = message.author.avatarUrl();
@@ -91,8 +87,9 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	}
 
 	// command processor
-	if(DiscordCommands::Execute—ommand(this, message))
+	if(DiscordCommands::ExecuteCommand(this, message))
 		return;
+
 }
 
 /************************************************************************/
@@ -139,7 +136,7 @@ bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::s
 			SleepyDiscord::User UserAccountOwner = getUser(DiscordID).cast();
 			if(!UserAccountOwner.invalid())
 			{
-				embed.description = "Owns this account: " + UserAccountOwner.showUser() + "\n\nPersonal card MRPG of this user"; // should we ping a person if another person is looking at his card?
+				embed.description = "Owns this account: " + UserAccountOwner.showMention() + "\n\nPersonal card MRPG of this user"; // should we ping a person if another person is looking at his card?
 				embed.thumbnail.url = UserAccountOwner.avatarUrl();
 				embed.thumbnail.proxyUrl = UserAccountOwner.avatarUrl();
 				embed.thumbnail.height = 32;
