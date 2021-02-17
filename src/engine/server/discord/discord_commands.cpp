@@ -17,7 +17,7 @@ void DiscordCommands::InitCommands()
 {
 	// commands important
 	DiscordCommands::RegisterCommand("!mhelp", "", "get help on commands.", ComHelp, CMD_IMPORTANT);
-	DiscordCommands::RegisterCommand("!mconnect", "", "help for connect your discord to account in game.", ComConnect, CMD_IMPORTANT|CMD_GAME);
+	DiscordCommands::RegisterCommand("!mconnect", "", "help for connect your discord to account in game.", ComConnect, CMD_IMPORTANT);
 
 	// commands game server
 	DiscordCommands::RegisterCommand("!monline", "", "show a list of players on the server.", ComOnline, CMD_GAME);
@@ -34,7 +34,7 @@ void DiscordCommands::InitCommands()
 /************************************************************************/
 /*  Important commands                                                  */
 /************************************************************************/
-void DiscordCommands::ComHelp(void *pResult, class DiscordJob *pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComHelp(void *pResult, DiscordJob *pDiscord, SleepyDiscord::Message message)
 {
 	std::string ImportantCmd("__**Important commands:**__");
 	std::string RelatedGameServerCmd("\n\n__**Related game server commands:**__");
@@ -64,7 +64,7 @@ void DiscordCommands::ComHelp(void *pResult, class DiscordJob *pDiscord, SleepyD
 	pDiscord->sendMessage(message.channelID, "\0", EmbedHelp);
 }
 
-void DiscordCommands::ComConnect(void* pResult, class DiscordJob* pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComConnect(void* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
 	sqlstr::CSqlString<64> DiscordID = sqlstr::CSqlString<64>(std::string(message.author.ID).c_str());
 	ResultPtr pRes = SJK.SD("Nick", "tw_accounts_data", "WHERE DiscordID = '%s'", DiscordID.cstr());
@@ -95,7 +95,7 @@ void DiscordCommands::ComConnect(void* pResult, class DiscordJob* pDiscord, Slee
 /************************************************************************/
 /*  Game server commands                                                */
 /************************************************************************/
-void DiscordCommands::ComOnline(void* pResult, class DiscordJob* pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComOnline(void* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
 	std::string Onlines = "";
 	CGS* pGS = (CGS*)pDiscord->Server()->GameServer(MAIN_WORLD_ID);
@@ -117,7 +117,7 @@ void DiscordCommands::ComOnline(void* pResult, class DiscordJob* pDiscord, Sleep
 	pDiscord->sendMessage(message.channelID, "\0", EmbedOnlines);
 }
 
-void DiscordCommands::ComStats(void* pResult, class DiscordJob* pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComStats(void* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
 	IConsole::IResult* pArgs = (IConsole::IResult*)pResult;
 	if(pArgs->NumArguments() <= 0)
@@ -132,7 +132,7 @@ void DiscordCommands::ComStats(void* pResult, class DiscordJob* pDiscord, Sleepy
 		pDiscord->SendWarningMessage(message.channelID, "Accounts containing [" + std::string(pSearchNick) + "] among nicknames were not found on the server.");
 }
 
-void DiscordCommands::ComRanking(void* pResult, class DiscordJob* pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComRanking(void* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
 	SleepyDiscord::Embed EmbedRanking;
 	EmbedRanking.title = message.startsWith("!mgoldranking") ? "Ranking by Gold" : "Ranking by Level";
@@ -159,7 +159,7 @@ void DiscordCommands::ComRanking(void* pResult, class DiscordJob* pDiscord, Slee
 /************************************************************************/
 /*  Fun commands                                                        */
 /************************************************************************/
-void DiscordCommands::ComAvatar(void* pResult, class DiscordJob* pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComAvatar(void* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
 	if(message.mentions.empty())
 	{
