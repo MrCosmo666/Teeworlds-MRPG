@@ -16,19 +16,25 @@ public:
 
 private:
 	/************************************************************************/
-	/* Discord main functions                                               */
+	/* Discord main events functions                                        */
 	/************************************************************************/
 	void onAddMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> serverID, SleepyDiscord::ServerMember member) override;
-	void onRemoveMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> serverID, SleepyDiscord::User user) override;
 	void onMessage(SleepyDiscord::Message message) override;
-	bool SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::string Chanal, std::string Title, std::string SearchNickname, std::string Color = "\0", bool MultipleSearch = true);
-	bool SendGenerateMessageAccountID(SleepyDiscord::User UserRequestFrom, std::string Chanal, std::string Title, int AccountID, std::string Color = "\0");
+
+	/************************************************************************/
+	/* Discord main functions                                               */
+	/************************************************************************/
+	void SendWarningMessage(SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, std::string Message);
+	void SendSuccesfulMessage(SleepyDiscord::Snowflake<SleepyDiscord::Channel> channelID, std::string Message);
+	bool SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::string Channel, std::string Title, std::string SearchNickname, std::string Color = "\0", bool MultipleSearch = true);
+	bool SendGenerateMessageAccountID(SleepyDiscord::User UserRequestFrom, std::string Channel, std::string Title, int AccountID, std::string Color = "\0");
 
 	/************************************************************************/
 	/* Discord teeworlds server side                                        */
 	/************************************************************************/
 	// Allow access only from the CServer 
 	friend class CServer;
+	friend class DiscordCommands;
 	struct DiscordHandle
 	{
 		DiscordTask m_pEvent;

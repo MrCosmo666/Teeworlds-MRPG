@@ -37,7 +37,7 @@
 #include <engine/server/sql_connect_pool.h>
 #include <engine/server/sql_string_helpers.h>
 
-#include "discord_main.h"
+#include "discord/discord_main.h"
 
 // std::mutex IServer::m_aMutexPlayerDataSafe[MAX_CLIENTS];
 

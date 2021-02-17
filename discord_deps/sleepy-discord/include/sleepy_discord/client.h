@@ -313,6 +313,20 @@ namespace SleepyDiscord {
 		ObjectResponse<Webhook> executeWebhook               (Snowflake<Webhook> webhookID, std::string webhookToken, std::vector<Embed> embeds, bool wait = false, std::string username = "", std::string avatar_url = "", bool tts = false); //to do test this
 		ObjectResponse<Webhook> executeWebhook               (Snowflake<Webhook> webhookID, std::string webhookToken, filePathPart file, bool wait = false, std::string username = "", std::string avatar_url = "", bool tts = false);         //to do test this
 
+		std::vector<Role> getUserRoles(Snowflake<Server> serverID, Snowflake<User> userID)
+		{
+			std::vector<Role> ServerRoles = getRoles(serverID);
+			std::vector<Snowflake<Role>> MemberRoles = getMember(serverID, userID).cast().roles;
+			
+			std::vector<Role> UserRoles;
+			for(auto& pServerRole : ServerRoles)
+			{
+				auto pUserRole = std::find_if(MemberRoles.begin(), MemberRoles.end(), [&pServerRole](Snowflake<Role>& pRole) { return pRole == pServerRole.ID; });
+				if(pUserRole != MemberRoles.end())
+					UserRoles.push_back(pServerRole);
+			}
+			return UserRoles;
+		}
 		void updateStatus(std::string gameName = "", uint64_t idleSince = 0, Status status = online, bool afk = false);
 		void sendMessageWithoutResponse(Snowflake<Channel> channelID, std::string message, Embed embed = Embed::Flag::INVALID_EMBED) { sendMessage(channelID, message, embed, MessageReference{}, TTS::Default); }
 		void requestServerMembers(ServerMembersRequest request);
