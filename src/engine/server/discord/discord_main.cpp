@@ -89,7 +89,6 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	// command processor
 	if(DiscordCommands::ExecuteCommand(this, message))
 		return;
-
 }
 
 /************************************************************************/

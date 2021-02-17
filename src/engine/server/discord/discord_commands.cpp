@@ -21,12 +21,12 @@ void DiscordCommands::InitCommands()
 
 	// commands game server
 	DiscordCommands::RegisterCommand("!monline", "", "show a list of players on the server.", ComOnline, CMD_GAME);
-	DiscordCommands::RegisterCommand("!mstats", "?s[nickname]", "searching for players and displaying their personal MRPG cards.", ComStats, CMD_GAME);
+	DiscordCommands::RegisterCommand("!mstats", "?s[nick]", "searching for players and displaying their personal MRPG cards.", ComStats, CMD_GAME);
 	DiscordCommands::RegisterCommand("!mranking", "", "show the ranking of players by level.", ComRanking, CMD_GAME);
 	DiscordCommands::RegisterCommand("!mgoldranking", "", "show the ranking of players by gold.", ComRanking, CMD_GAME);
 
 	// commands fun
-	DiscordCommands::RegisterCommand("!mavatar", "", "show user avatars.", ComAvatar, CMD_FUN);
+	DiscordCommands::RegisterCommand("!mavatar", "?s[mention] ?s[mention2]", "show user avatars.", ComAvatar, CMD_FUN);
 
 	// commands admin
 }
@@ -36,18 +36,25 @@ void DiscordCommands::InitCommands()
 /************************************************************************/
 void DiscordCommands::ComHelp(void *pResult, class DiscordJob *pDiscord, SleepyDiscord::Message message)
 {
-	std::string ImportantCmd("_**Important commands:**_");
-	std::string RelatedGameServerCmd("\n\n_**Related game server commands:**_");
-	std::string EntertainmentFunCmd("\n\n_**Entertainment / Fun**_");
+	std::string ImportantCmd("__**Important commands:**__");
+	std::string RelatedGameServerCmd("\n\n__**Related game server commands:**__");
+	std::string EntertainmentFunCmd("\n\n__**Entertainment / Fun**__");
 
 	for(auto& pCommand : DiscordCommands::m_aCommands)
 	{
+		std::string ArgsStr(pCommand.m_aCommandArgs);
 		if(pCommand.m_TypeFlags & CMD_IMPORTANT)
-			ImportantCmd += "\n- **" + std::string(pCommand.m_aCommand) + "** - " + std::string(pCommand.m_aCommandDesc);
-		else if(pCommand.m_TypeFlags & CMD_GAME)
-			RelatedGameServerCmd += "\n- **" + std::string(pCommand.m_aCommand) + "** - " + std::string(pCommand.m_aCommandDesc);
-		else if(pCommand.m_TypeFlags & CMD_FUN)
-			EntertainmentFunCmd += "\n- **" + std::string(pCommand.m_aCommand) + "** - " + std::string(pCommand.m_aCommandDesc);
+		{
+			ImportantCmd += "\n- **" + std::string(pCommand.m_aCommand) + (ArgsStr.empty() ? "" : " " + std::string(pCommand.m_aCommandArgs)) + "** - " + std::string(pCommand.m_aCommandDesc);
+		}
+		if(pCommand.m_TypeFlags & CMD_GAME)
+		{
+			RelatedGameServerCmd += "\n- **" + std::string(pCommand.m_aCommand) + (ArgsStr.empty() ? "" : " " + std::string(pCommand.m_aCommandArgs)) + "** - " + std::string(pCommand.m_aCommandDesc);
+		}
+		if(pCommand.m_TypeFlags & CMD_FUN)
+		{
+			EntertainmentFunCmd += "\n- **" + std::string(pCommand.m_aCommand) + (ArgsStr.empty() ? "" : " " + std::string(pCommand.m_aCommandArgs)) + "** - " + std::string(pCommand.m_aCommandDesc);
+		}
 	}
 
 	SleepyDiscord::Embed EmbedHelp;
@@ -113,6 +120,12 @@ void DiscordCommands::ComOnline(void* pResult, class DiscordJob* pDiscord, Sleep
 void DiscordCommands::ComStats(void* pResult, class DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
 	IConsole::IResult* pArgs = (IConsole::IResult*)pResult;
+	if(pArgs->NumArguments() <= 0)
+	{
+		pDiscord->SendWarningMessage(message.channelID, "You can use this command with 1 argument.\nThe argument can be placed in quotation marks \"\".");
+		return;
+	}
+
 	const char* pSearchNick = pArgs->GetString(0);
 	bool Found = pDiscord->SendGenerateMessage(message.author, message.channelID, "Discord MRPG Card", pSearchNick);
 	if(!Found)

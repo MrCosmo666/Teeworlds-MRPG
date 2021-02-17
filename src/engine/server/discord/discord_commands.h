@@ -60,7 +60,6 @@ public:
 		char m_aCommandArgs[128];
 		int64 m_AccessFlags;
 		int64 m_TypeFlags;
-
 		CommandCallback m_pCallback;
 	};
 
