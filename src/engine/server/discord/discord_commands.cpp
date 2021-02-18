@@ -26,7 +26,7 @@ void DiscordCommands::InitCommands()
 	DiscordCommands::RegisterCommand("!mgoldranking", "", "show the ranking of players by gold.", ComRanking, CMD_GAME);
 
 	// commands fun
-	DiscordCommands::RegisterCommand("!mavatar", "?s[mention] ?s[mention2]", "show user avatars.", ComAvatar, CMD_FUN);
+	DiscordCommands::RegisterCommand("!mavatar", "?s[mention]", "show user avatars.", ComAvatar, CMD_FUN);
 
 	// commands admin
 }
@@ -166,14 +166,12 @@ void DiscordCommands::ComAvatar(void* pResult, DiscordJob* pDiscord, SleepyDisco
 		pDiscord->sendMessage(message.channelID, message.author.avatarUrl());
 		return;
 	}
-	else if(message.mentions.size() > 2)
+	else if(message.mentions.size() > 1)
 	{
-		pDiscord->SendWarningMessage(message.channelID, "Prohibited to use this command with more than 2 people.");
+		pDiscord->SendWarningMessage(message.channelID, "Prohibited to use this command with more than 1 people.");
 		return;
 	}
-
-	for(auto& pMention : message.mentions)
-		pDiscord->sendMessage(message.channelID, pMention.avatarUrl());
+	pDiscord->sendMessage(message.channelID, message.mentions[0].avatarUrl());
 }
 
 
