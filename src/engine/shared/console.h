@@ -124,10 +124,6 @@ public:
 		virtual float GetFloat(unsigned Index);
 	};
 
-private:
-	int ParseStart(CResult* pResult, const char* pString, int Length);
-	int ParseArgs(CResult* pResult, const char* pFormat);
-
 	/*
 	This function will set pFormat to the next parameter (i,s,r,v,?) it contains and
 	pNext to the command.
@@ -135,8 +131,11 @@ private:
 	Returns true on failure.
 	Expects pFormat to point at a parameter.
 	*/
-	bool NextParam(char* pNext, const char*& pFormat);
+	static bool NextParam(char* pNext, const char*& pFormat);
+	static int ParseArgs(CResult* pResult, const char* pFormat);
 
+private:
+	int ParseStart(CResult* pResult, const char* pString, int Length);
 
 	class CExecutionQueue
 	{
@@ -216,7 +215,6 @@ public:
 	void SetAccessLevel(int AccessLevel) { m_AccessLevel = clamp(AccessLevel, (int)(ACCESS_LEVEL_ADMIN), (int)(ACCESS_LEVEL_MOD)); }
 
 	// mrpg
-	virtual int ParseCustomArgs(void* pResult, const char* pFormat) { return ParseArgs(static_cast<CResult*>(pResult), pFormat); }
 	virtual bool IsCommand(const char* pStr, int FlagMask);
 };
 

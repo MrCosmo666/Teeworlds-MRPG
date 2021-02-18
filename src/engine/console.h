@@ -102,7 +102,6 @@ public:
 	virtual void SetAccessLevel(int AccessLevel) = 0;
 
 	// mrpg
-	virtual int ParseCustomArgs(void* pResult, const char* pFormat) = 0;
 	virtual bool IsCommand(const char* pStr, int FlagMask) = 0;
 };
 

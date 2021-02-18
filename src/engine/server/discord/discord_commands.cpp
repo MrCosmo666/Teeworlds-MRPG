@@ -249,8 +249,7 @@ bool DiscordCommands::ExecuteCommand(DiscordJob* pDiscord, SleepyDiscord::Messag
 				str_copy(Result.m_aStringStorage, ArgumentsLine.c_str(), sizeof(Result.m_aStringStorage));
 				Result.m_pArgsStart = Result.m_aStringStorage;
 
-				CGS* pGS = (CGS*)pDiscord->Server()->GameServer(MAIN_WORLD_ID);
-				int Error = pGS->Console()->ParseCustomArgs(&Result, pCommand.m_aCommandArgs);
+				int Error = CConsole::ParseArgs(&Result, pCommand.m_aCommandArgs);
 				if(Error)
 				{
 					pDiscord->SendWarningMessage(message.channelID, "An error occurred when executing a command with arguments.");
