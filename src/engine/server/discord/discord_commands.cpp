@@ -21,7 +21,7 @@ void DiscordCommands::InitCommands()
 
 	// commands game server
 	DiscordCommands::RegisterCommand("!monline", "", "show a list of players on the server.", ComOnline, CMD_GAME);
-	DiscordCommands::RegisterCommand("!mstats", "s[nick]", "searching for players and displaying their personal MRPG cards.", ComStats, CMD_GAME);
+	DiscordCommands::RegisterCommand("!mstats", "r[nick]", "searching for players and displaying their personal MRPG cards.", ComStats, CMD_GAME);
 	DiscordCommands::RegisterCommand("!mranking", "", "show the ranking of players by level.", ComRanking, CMD_GAME);
 	DiscordCommands::RegisterCommand("!mgoldranking", "", "show the ranking of players by gold.", ComRanking, CMD_GAME);
 
