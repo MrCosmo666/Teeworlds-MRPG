@@ -5,41 +5,35 @@
 #include "game/server/gamecontext.h"
 #include "CommandProcessor.h"
 
-/*
-	Later lead to quality
-*/
-
 CCommandProcessor::CCommandProcessor(CGS *pGS)
 {
 	m_pGS = pGS;
 
 	IServer* pServer = m_pGS->Server();
-	AddCommand("login", "?s[username] ?s[password]", ConChatLogin, pServer, "");
-	AddCommand("register", "?s[username] ?s[password]", ConChatRegister, pServer, "");
+	AddCommand("login", "s[username] s[password]", ConChatLogin, pServer, "");
+	AddCommand("register", "s[username] s[password]", ConChatRegister, pServer, "");
 	AddCommand("gexit", "", ConChatGuildExit, pServer, "");
-	AddCommand("gcreate", "?s[guildname]", ConChatGuildCreate, pServer, "");
+	AddCommand("gcreate", "r[guildname]", ConChatGuildCreate, pServer, "");
 	AddCommand("doorhouse", "", ConChatDoorHouse, pServer, "");
 	AddCommand("sellhouse", "", ConChatSellHouse, pServer, "");
 	AddCommand("pos", "", ConChatPosition, pServer, "");
-	AddCommand("sd", "?i[sound]", ConChatSound, pServer, "");
-	AddCommand("useitem", "?i[item]", ConChatUseItem, pServer, "");
-	AddCommand("useskill", "?i[skill]", ConChatUseSkill, pServer, "");
+	AddCommand("sound", "i[sound]", ConChatSound, pServer, "");
+	AddCommand("useitem", "i[item]", ConChatUseItem, pServer, "");
+	AddCommand("useskill", "i[skill]", ConChatUseSkill, pServer, "");
 	AddCommand("cmdlist", "", ConChatCmdList, pServer, "");
 	AddCommand("help", "", ConChatCmdList, pServer, "");
 	AddCommand("rules", "", ConChatRules, pServer, "");
 	AddCommand("rules", "", ConChatRules, pServer, "");
-	AddCommand("voucher", "?s[voucher]", ConChatVoucher, pServer, "");
-	AddCommand("coupon", "?s[coupon]", ConChatVoucher, pServer, "");
-
+	AddCommand("voucher", "r[voucher]", ConChatVoucher, pServer, "");
+	AddCommand("coupon", "r[coupon]", ConChatVoucher, pServer, "");
 #ifdef CONF_DISCORD
-	AddCommand("discord_connect", "?s[DID]", ConChatDiscordConnect, pServer, "");
+	AddCommand("discord_connect", "s[DID]", ConChatDiscordConnect, pServer, "");
 #endif
 }
 
 void CCommandProcessor::AddCommand(const char* pName, const char* pParams, IConsole::FCommandCallback pfnFunc, void* pUser, const char* pHelp)
 {
 	GS()->Console()->Register(pName, pParams, CFGFLAG_CHAT, pfnFunc, pUser, pHelp);
-
 	if (!GS()->CommandManager()->AddCommand(pName, pHelp, pParams, pfnFunc, pUser))
 	{
 		if (pParams[0])
@@ -51,33 +45,39 @@ void CCommandProcessor::AddCommand(const char* pName, const char* pParams, ICons
 		dbg_msg("CCommandProcessor", "failed to add command: '/%s'", pName);
 }
 
-void CCommandProcessor::ChatCmd(CNetMsg_Cl_Say* pMsg, CPlayer* pPlayer)
+void CCommandProcessor::ChatCmd(const char *pMessage, CPlayer* pPlayer)
 {
-	LastChat(GS(), pPlayer);
+	LastChat(pPlayer);
 	const int ClientID = pPlayer->GetCID();
 
-	char aCommand[256][256] = { {0} };
-	int Command = 0;
 	int Char = 0;
-	for (int i = 1; i < str_length(pMsg->m_pMessage); i++)
+	char aCommand[256] = { 0 };
+	for(int i = 1; i < str_length(pMessage); i++)
 	{
-		if (pMsg->m_pMessage[i] == ' ')
+		if(pMessage[i] != ' ')
 		{
-			Command++;
-			Char = 0;
+			aCommand[Char] = pMessage[i];
+			Char++;
 			continue;
 		}
-		aCommand[Command][Char] = pMsg->m_pMessage[i];
-		Char++;
+		break;
 	}
-
-	if (GS()->Console()->IsCommand(aCommand[0], CFGFLAG_CHAT))
+	
+	const IConsole::CCommandInfo* pCommand = GS()->Console()->GetCommandInfo(aCommand, CFGFLAG_CHAT, 0);
+	if (pCommand)
 	{
-		GS()->Console()->ExecuteLineFlag(pMsg->m_pMessage + 1, CFGFLAG_CHAT, ClientID, false);
+		int ErrorArgs;
+		GS()->Console()->ExecuteLineFlag(pMessage + 1, CFGFLAG_CHAT, ClientID, false, &ErrorArgs);
+		if(ErrorArgs)
+		{
+			char aArgsDesc[256];
+			GS()->Console()->ParseArgumentsDescription(pCommand->m_pParams, aArgsDesc, sizeof(aArgsDesc));
+			GS()->ChatFollow(ClientID, "Use: /{STR} {STR}", pCommand->m_pName, aArgsDesc);
+		}
 		return;
 	}
 
-	GS()->ChatFollow(ClientID, "Command {STR} not found!", pMsg->m_pMessage);
+	GS()->ChatFollow(ClientID, "Command {STR} not found!", pMessage);
 }
 
 void CCommandProcessor::ConChatLogin(IConsole::IResult* pResult, void* pUser)
@@ -93,12 +93,6 @@ void CCommandProcessor::ConChatLogin(IConsole::IResult* pResult, void* pUser)
 	if (pPlayer->IsAuthed())
 	{
 		pGS->Chat(ClientID, "You're already signed in.");
-		return;
-	}
-
-	if (pResult->NumArguments() != 2)
-	{
-		pGS->Chat(ClientID, "Use: /login <username> <password>");
 		return;
 	}
 
@@ -127,12 +121,6 @@ void CCommandProcessor::ConChatRegister(IConsole::IResult* pResult, void* pUser)
 		return;
 	}
 
-	if (pResult->NumArguments() != 2)
-	{
-		pGS->Chat(ClientID, "Use: /register <username> <password>");
-		return;
-	}
-
 	char aUsername[16];
 	char aPassword[16];
 	str_copy(aUsername, pResult->GetString(0), sizeof(aUsername));
@@ -151,12 +139,6 @@ void CCommandProcessor::ConChatDiscordConnect(IConsole::IResult* pResult, void* 
 	CPlayer* pPlayer = pGS->m_apPlayers[ClientID];
 	if (!pPlayer || !pPlayer->IsAuthed())
 		return;
-
-	if (pResult->NumArguments() != 1)
-	{
-		pGS->Chat(ClientID, "Use: /discord_connect <DID>");
-		return;
-	}
 
 	char aDiscordDID[32];
 	str_copy(aDiscordDID, pResult->GetString(0), sizeof(aDiscordDID));
@@ -199,12 +181,6 @@ void CCommandProcessor::ConChatGuildCreate(IConsole::IResult* pResult, void* pUs
 	CPlayer* pPlayer = pGS->m_apPlayers[ClientID];
 	if (!pPlayer || !pPlayer->IsAuthed() || pPlayer->Acc().IsGuild())
 		return;
-
-	if (pResult->NumArguments() != 1)
-	{
-		pGS->Chat(ClientID, "Use: /gcreate <guildname>");
-		return;
-	}
 
 	char aGuildName[16];
 	str_copy(aGuildName, pResult->GetString(0), sizeof(aGuildName));
@@ -279,12 +255,6 @@ void CCommandProcessor::ConChatSound(IConsole::IResult* pResult, void* pUser)
 	if (!pPlayer || !pPlayer->GetCharacter() || !pGS->Server()->IsAuthed(ClientID))
 		return;
 
-	if (pResult->NumArguments() != 1)
-	{
-		pGS->ChatFollow(ClientID, "Please use: /sd <idsound>");
-		return;
-	}
-
 	const int SoundID = clamp(pResult->GetInteger(0), 0, 40);
 	pGS->CreateSound(pPlayer->GetCharacter()->m_Core.m_Pos, SoundID);
 }
@@ -299,12 +269,6 @@ void CCommandProcessor::ConChatUseItem(IConsole::IResult* pResult, void* pUser)
 	if (!pPlayer || !pPlayer->IsAuthed())
 		return;
 
-	if (pResult->NumArguments() != 1)
-	{
-		pGS->ChatFollow(ClientID, "Please use: /useitem <itemid>");
-		return;
-	}
-
 	int ItemID = pResult->GetInteger(0);
 	pPlayer->GetItem(ItemID).Use(1);
 }
@@ -318,12 +282,6 @@ void CCommandProcessor::ConChatUseSkill(IConsole::IResult* pResult, void* pUser)
 	CPlayer* pPlayer = pGS->m_apPlayers[ClientID];
 	if (!pPlayer || !pPlayer->IsAuthed())
 		return;
-
-	if (pResult->NumArguments() != 1)
-	{
-		pGS->ChatFollow(ClientID, "Please use: /useskill <skillid>");
-		return;
-	}
 
 	int SkillID = pResult->GetInteger(0);
 	pPlayer->GetSkill(SkillID).Use();
@@ -385,8 +343,8 @@ void CCommandProcessor::ConChatVoucher(IConsole::IResult* pResult, void* pUser)
 	pGS->Mmo()->Account()->UseVoucher(ClientID, aVoucher);
 }
 
-void CCommandProcessor::LastChat(CGS *pGS, CPlayer *pPlayer)
+void CCommandProcessor::LastChat(CPlayer *pPlayer)
 {
-	if(pPlayer->m_aPlayerTick[TickState::LastChat] + pGS->Server()->TickSpeed() <= pGS->Server()->Tick())
-		pPlayer->m_aPlayerTick[TickState::LastChat] = pGS->Server()->Tick();
+	if(pPlayer->m_aPlayerTick[TickState::LastChat] + GS()->Server()->TickSpeed() <= GS()->Server()->Tick())
+		pPlayer->m_aPlayerTick[TickState::LastChat] = GS()->Server()->Tick();
 }

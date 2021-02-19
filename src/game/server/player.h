@@ -52,7 +52,6 @@ protected:
 
 	IServer* Server() const;
 	int m_ClientID;
-	void HandleTuningParams();
 
 public:
 	CGS* GS() const { return m_pGS; }
@@ -73,7 +72,7 @@ public:
 
 	bool m_Spawned;
 
-	vec3 m_Colored;
+	vec3 m_VoteColored;
 	short m_aSortTabs[NUM_SORT_TAB];
 	short m_OpenVoteMenu;
 	short m_LastVoteMenu;
@@ -101,6 +100,7 @@ public:
 	virtual	int GetHealth() { return GetTempData().m_TempHealth; };
 	virtual	int GetMana() { return GetTempData().m_TempMana; };
 
+	virtual void HandleTuningParams();
 	virtual int IsActiveSnappingBot(int SnappingClient) const { return 2; };
 	virtual int GetEquippedItemID(int EquipID, int SkipItemID = -1) const;
 	virtual int GetAttributeCount(int BonusID, bool ActiveFinalStats = false);

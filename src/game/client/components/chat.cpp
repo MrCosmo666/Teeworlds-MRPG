@@ -1435,58 +1435,11 @@ void CChat::HandleCommands(float x, float y, float w)
 				TextRender()->TextEx(&Cursor, " ", -1);
 
 				TextRender()->TextColor(0.0f, 0.5f, 0.5f, 1.0f);
-				for (const char* c = pCommand->m_aArgsFormat; *c;)
-				{
-					char aBuf[32] = "";
-					char aDesc[32];
 
-					bool Optional = false;
-					if (c[0] == '?')
-					{
-						Optional = true;
-						c++;
-					}
+				char aArgumentsDesc[256];
+				Console()->ParseArgumentsDescription(pCommand->m_aArgsFormat, aArgumentsDesc, sizeof(aArgumentsDesc));
+				TextRender()->TextEx(&Cursor, aArgumentsDesc, -1);
 
-					const char* pDesc = 0;
-					if (c[1] == '[')
-					{
-						str_format(aDesc, sizeof(aDesc), "%.*s", str_span(&c[2], "]"), &c[2]);
-						pDesc = aDesc;
-						c += str_span(c, "]") + 1;
-					}
-					else
-					{
-						if (c[0] == 'i')
-						{
-							pDesc = "number";
-						}
-						else if (c[0] == 'f')
-						{
-							pDesc = "float";
-						}
-						else if (c[0] == 'r' || c[0] == 's')
-						{
-							pDesc = "string";
-						}
-						else
-						{
-							break; // ill-formed
-						}
-
-						c++;
-					}
-
-					if (Optional)
-					{
-						str_format(aBuf, sizeof(aBuf), "[%s] ", pDesc);
-					}
-					else
-					{
-						str_format(aBuf, sizeof(aBuf), "<%s> ", pDesc);
-					}
-					c = str_skip_whitespaces_const(c);
-					TextRender()->TextEx(&Cursor, aBuf, -1);
-				}
 				TextRender()->TextColor(0.5f, 0.5f, 0.5f, 1.0f);
 				TextRender()->TextEx(&Cursor, pCommand->m_aHelpText, -1);
 				TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);

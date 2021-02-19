@@ -63,7 +63,7 @@ class CConsole : public IConsole
 	static void ConModCommandStatus(IResult *pResult, void *pUser);
 
 	void ExecuteFileRecurse(const char *pFilename);
-	void ExecuteLineStroked(int Stroke, const char *pStr, int ClientID = -1, bool InterpretSemicolons = true);
+	void ExecuteLineStroked(int Stroke, const char *pStr, int ClientID = -1, bool InterpretSemicolons = true, int* pErrorArgs = nullptr);
 
 	struct
 	{
@@ -133,6 +133,7 @@ public:
 	*/
 	static bool NextParam(char* pNext, const char*& pFormat);
 	static int ParseArgs(CResult* pResult, const char* pFormat);
+	static void ParseArgsDescription(const char* pFormat, char* paBuffer, int Size);
 
 private:
 	int ParseStart(CResult* pResult, const char* pString, int Length);
@@ -189,7 +190,7 @@ public:
 	virtual void PossibleCommands(const char *pStr, int FlagMask, bool Temp, FPossibleCallback pfnCallback, void *pUser);
 	virtual void PossibleMaps(const char *pStr, FPossibleCallback pfnCallback, void *pUser);
 
-	virtual void ParseArguments(int NumArgs, const char **ppArguments);
+	virtual void ParseArguments(int NumArgs, const char** ppArguments);
 	virtual void Register(const char *pName, const char *pParams, int Flags, FCommandCallback pfnFunc, void *pUser, const char *pHelp);
 	virtual void RegisterTemp(const char *pName, const char *pParams, int Flags, const char *pHelp);
 	virtual void DeregisterTemp(const char *pName);
@@ -202,8 +203,8 @@ public:
 
 	virtual bool ArgStringIsValid(const char* pFormat);
 	virtual bool LineIsValid(const char *pStr);
-	virtual void ExecuteLine(const char *pStr, int ClientID = -1, bool InterpretSemicolons = true);
-	virtual void ExecuteLineFlag(const char *pStr, int FlagMask, int ClientID = -1, bool InterpretSemicolons = true);
+	virtual void ExecuteLine(const char *pStr, int ClientID = -1, bool InterpretSemicolons = true, int *pErrorArgs = nullptr);
+	virtual void ExecuteLineFlag(const char *pStr, int FlagMask, int ClientID = -1, bool InterpretSemicolons = true, int* pErrorArgs = nullptr);
 	virtual bool ExecuteFile(const char* pFilename);
 
 	virtual int RegisterPrintCallback(int OutputLevel, FPrintCallback pfnPrintCallback, void *pUserData);
@@ -216,6 +217,7 @@ public:
 
 	// mrpg
 	virtual bool IsCommand(const char* pStr, int FlagMask);
+	virtual void ParseArgumentsDescription(const char* pFormat, char* aBuffer, int Size) { return ParseArgsDescription(pFormat, aBuffer, Size); }
 };
 
 #endif

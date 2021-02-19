@@ -222,7 +222,7 @@ void MmoController::ShowLoadingProgress(const char* pLoading, int Size)
 void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 {
 	const int ClientID = pPlayer->GetCID();
-	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
+	pPlayer->m_VoteColored = SMALL_LIGHT_GRAY_COLOR;
 	if(TypeID == ToplistTypes::GUILDS_LEVELING)
 	{
 		ResultPtr pRes = SJK.SD("*", "tw_guilds", "ORDER BY Level DESC, Experience DESC LIMIT 10");

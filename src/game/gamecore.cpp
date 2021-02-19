@@ -204,7 +204,7 @@ void CCharacterCore::Tick(bool UseInput, CTuningParams* TunningParams)
 			for(int i = 0; i < MAX_CLIENTS; i++)
 			{
 				CCharacterCore *pCharCore = m_pWorld->m_apCharacters[i];
-				if(!pCharCore || pCharCore->m_LostData || m_WorldID != pCharCore->m_WorldID || pCharCore == this)
+				if(!pCharCore || pCharCore->m_SkipCollideTees || m_WorldID != pCharCore->m_WorldID || pCharCore == this)
 					continue;
 
 				vec2 ClosestPoint = closest_point_on_line(m_HookPos, NewPos, pCharCore->m_Pos);
@@ -307,7 +307,7 @@ void CCharacterCore::Tick(bool UseInput, CTuningParams* TunningParams)
 		for(int i = 0; i < MAX_CLIENTS; i++)
 		{
 			CCharacterCore *pCharCore = m_pWorld->m_apCharacters[i];
-			if(!pCharCore || pCharCore->m_LostData || m_WorldID != pCharCore->m_WorldID || pCharCore == this)
+			if(!pCharCore || pCharCore->m_SkipCollideTees || m_WorldID != pCharCore->m_WorldID || pCharCore == this)
 				continue;
 
 			// handle player <-> player collision
@@ -389,7 +389,7 @@ void CCharacterCore::Move(CTuningParams* TunningParams)
 			for(int p = 0; p < MAX_CLIENTS; p++)
 			{
 				CCharacterCore *pCharCore = m_pWorld->m_apCharacters[p];
-				if(!pCharCore || pCharCore->m_LostData || m_WorldID != pCharCore->m_WorldID || pCharCore == this)
+				if(!pCharCore || pCharCore->m_SkipCollideTees || m_WorldID != pCharCore->m_WorldID || pCharCore == this)
 					continue;
 				float D = distance(Pos, pCharCore->m_Pos);
 				if (D < PhysSize && D >= 0.0f)

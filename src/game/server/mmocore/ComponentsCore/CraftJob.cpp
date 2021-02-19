@@ -71,7 +71,7 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 {
 	bool IsNotEmpty = false;
 	const int ClientID = pPlayer->GetCID();
-	pPlayer->m_Colored = GRAY_COLOR;
+	pPlayer->m_VoteColored = GRAY_COLOR;
 
 	for(const auto& cr : ms_aCraft)
 	{

@@ -385,7 +385,7 @@ void HouseJob::ShowHouseMenu(CPlayer* pPlayer, int HouseID)
 	GS()->ShowVotesItemValueInformation(pPlayer, itGold);
 	GS()->AV(ClientID, "null");
 
-	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
+	pPlayer->m_VoteColored = LIGHT_GRAY_COLOR;
 	if(ms_aHouse[HouseID].m_OwnerID <= 0)
 		GS()->AVM(ClientID, "BUYHOUSE", HouseID, NOPE, "Buy this house. Price {INT}gold", &ms_aHouse[HouseID].m_Price);
 	else
@@ -412,16 +412,16 @@ void HouseJob::ShowPersonalHouse(CPlayer* pPlayer)
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "In your safe is: {INT}gold", &ms_aHouse[HouseID].m_Bank);
 	GS()->AV(ClientID, "null");
 	//
-	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
+	pPlayer->m_VoteColored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", &pPlayer->GetItem(itGold).m_Count);
-	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
+	pPlayer->m_VoteColored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVM(ClientID, "HOUSEADD", 1, NOPE, "Add to the safe gold. (Amount in a reason)");
 	GS()->AVM(ClientID, "HOUSETAKE", 1, NOPE, "Take the safe gold. (Amount in a reason)");
 	GS()->AV(ClientID, "null");
 	//
-	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
+	pPlayer->m_VoteColored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "▤ House system");
-	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
+	pPlayer->m_VoteColored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVM(ClientID, "HOUSEDOOR", HouseID, NOPE, "Change state to [\"{STR}\"]", StateDoor ? "OPEN" : "CLOSED");
 	GS()->AVM(ClientID, "HSPAWN", 1, NOPE, "Teleport to your house");
 	GS()->AVM(ClientID, "HSELL", HouseID, NOPE, "Sell your house (in reason 777)");

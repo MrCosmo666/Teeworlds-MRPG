@@ -107,19 +107,19 @@ void QuestJob::ShowQuestsMainList(CPlayer* pPlayer)
 	ShowQuestsTabList(pPlayer, QuestState::QUEST_NO_ACCEPT);
 
 	// show the completed menu
-	pPlayer->m_Colored = BLUE_COLOR;
+	pPlayer->m_VoteColored = BLUE_COLOR;
 	GS()->AVM(pPlayer->GetCID(), "MENU", MenuList::MENU_JOURNAL_FINISHED, NOPE, "List of completed quests");
 }
 
 void QuestJob::ShowQuestsTabList(CPlayer* pPlayer, int StateQuest)
 {
 	const int ClientID = pPlayer->GetCID();
-	pPlayer->m_Colored = GOLDEN_COLOR;
+	pPlayer->m_VoteColored = GOLDEN_COLOR;
 	GS()->AVL(ClientID, "null", "{STR} quests", GetStateName(StateQuest));
 
 	// check first quest story step
 	bool IsEmptyList = true;
-	pPlayer->m_Colored = LIGHT_GOLDEN_COLOR;
+	pPlayer->m_VoteColored = LIGHT_GOLDEN_COLOR;
 	std::list < std::string /*stories was checked*/ > StoriesChecked;
 	for(const auto& pDataQuest : ms_aDataQuests)
 	{
@@ -146,7 +146,7 @@ void QuestJob::ShowQuestsTabList(CPlayer* pPlayer, int StateQuest)
 	// if the quest list is empty
 	if(IsEmptyList)
 	{
-		pPlayer->m_Colored = LIGHT_GOLDEN_COLOR;
+		pPlayer->m_VoteColored = LIGHT_GOLDEN_COLOR;
 		GS()->AV(ClientID, "null", "List of quests is empty");
 	}
 	GS()->AV(ClientID, "null");
@@ -171,9 +171,9 @@ void QuestJob::ShowQuestID(CPlayer *pPlayer, int QuestID)
 		pPlayer->GS()->Mmo()->Quest()->ShowQuestsActiveNPC(pPlayer, QuestID);
 		pPlayer->GS()->AV(ClientID, "null");
 
-		pPlayer->m_Colored = GOLDEN_COLOR;
+		pPlayer->m_VoteColored = GOLDEN_COLOR;
 		pPlayer->GS()->AVL(ClientID, "null", "{STR} : Reward", pData.GetName());
-		pPlayer->m_Colored = LIGHT_GOLDEN_COLOR;
+		pPlayer->m_VoteColored = LIGHT_GOLDEN_COLOR;
 		pPlayer->GS()->AVL(ClientID, "null", "Gold: {INT} Exp: {INT}", &pData.m_Gold, &pData.m_Exp);
 
 		pPlayer->m_LastVoteMenu = MenuList::MENU_JOURNAL_MAIN;
@@ -186,7 +186,7 @@ void QuestJob::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 {
 	CPlayerQuest& pPlayerQuest = pPlayer->GetQuest(QuestID);
 	const int ClientID = pPlayer->GetCID();
-	pPlayer->m_Colored = BLUE_COLOR;
+	pPlayer->m_VoteColored = BLUE_COLOR;
 	GS()->AVM(ClientID, "null", NOPE, NOPE, "Active NPC for current quests");
 
 	for(auto& pStepBot : ms_aDataQuests[QuestID].m_StepsQuestBot)

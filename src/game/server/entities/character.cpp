@@ -85,7 +85,7 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_Mana = 0;
 	m_OldPos = Pos;
 	m_SkipDamage = false;
-	m_Core.m_LostData = false;
+	m_Core.m_SkipCollideTees = false;
 	m_Event = TILE_CLEAR_EVENTS;
 	m_Core.m_WorldID = m_pPlayer->GetPlayerWorldID();
 	if(!m_pPlayer->IsBot())
@@ -300,7 +300,7 @@ void CCharacter::FireWeapon()
 					continue;
 				}
 
-				if (pTarget->m_Core.m_LostData)
+				if (pTarget->m_Core.m_SkipCollideTees)
 					continue;
 
 				if(length(pTarget->m_Pos-ProjStartPos) > 0.0f)
@@ -500,6 +500,9 @@ void CCharacter::ResetInput()
 
 void CCharacter::Tick()
 {
+	if(!IsAlive())
+		return;
+
 	HandleTuning();
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true, &m_pPlayer->m_NextTuningParams);
@@ -513,25 +516,23 @@ void CCharacter::Tick()
 		m_OlderPos = m_OldPos;
 		m_OldPos = m_Core.m_Pos;
 	}
+
 	HandleWeapons();
 
 	if (m_pPlayer->IsBot() || IsLockedWorld())
 		return;
 
-	if(IsAlive())
-	{
-		HandleAuthedPlayer();
-		HandleTilesets();
-		m_Core.m_LostData = false;
-	}
+	HandleAuthedPlayer();
+	HandleTilesets(); 
+	m_Core.m_SkipCollideTees = false;
 }
 
 void CCharacter::TickDefered()
 {
 	if(!IsAlive())
 		return;
-	
-	if (m_DoorHit)
+
+	if(m_DoorHit)
 	{
 		ResetDoorPos();
 		m_DoorHit = false;
@@ -543,27 +544,25 @@ void CCharacter::TickDefered()
 		m_Core.AddDragVelocity();
 	m_Core.ResetDragVelocity();
 
+	CCharacterCore::CParams PlayerTunningParams(&m_pPlayer->m_NextTuningParams); 
 	if(m_pPlayer->IsBot())
-	{	
-		CCharacterCore::CParams CoreTickParams(&m_pPlayer->m_NextTuningParams);
-		m_Core.Move(&CoreTickParams);
+	{
+		m_Core.Move(&PlayerTunningParams);
 		m_Core.Quantize();
-		m_Pos = m_Core.m_Pos;		
+		m_Pos = m_Core.m_Pos;
 		return;
 	}
 
 	// advance the dummy
 	{
-		CCharacterCore::CParams CoreTickParams(&GameWorld()->m_Core.m_Tuning);
 		CWorldCore TempWorld;
 		m_ReckoningCore.Init(&TempWorld, GS()->Collision());
-		m_ReckoningCore.Tick(false, &CoreTickParams);
-		m_ReckoningCore.Move(&CoreTickParams);
+		m_ReckoningCore.Tick(false, &PlayerTunningParams);
+		m_ReckoningCore.Move(&PlayerTunningParams);
 		m_ReckoningCore.Quantize();
 	}
 
-	CCharacterCore::CParams CoreTickParams(&m_pPlayer->m_NextTuningParams);
-	m_Core.Move(&CoreTickParams);
+	m_Core.Move(&PlayerTunningParams);
 	m_Core.Quantize();
 	m_Pos = m_Core.m_Pos;
 	m_TriggeredEvents |= m_Core.m_TriggeredEvents;
@@ -586,25 +585,13 @@ void CCharacter::TickDefered()
 		m_Core.Write(&Current);
 
 		// only allow dead reackoning for a top of 3 seconds
-		if(m_ReckoningTick+Server()->TickSpeed()*3 < Server()->Tick() || mem_comp(&Predicted, &Current, sizeof(CNetObj_Character)) != 0)
+		if(m_ReckoningTick + Server()->TickSpeed() * 3 < Server()->Tick() || mem_comp(&Predicted, &Current, sizeof(CNetObj_Character)) != 0)
 		{
 			m_ReckoningTick = Server()->Tick();
 			m_SendCore = m_Core;
 			m_ReckoningCore = m_Core;
 		}
 	}
-}
-
-void CCharacter::TickPaused()
-{
-	++m_AttackTick;
-	++m_ReckoningTick;
-	if(m_LastAction != -1)
-		++m_LastAction;
-	if(m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart > -1)
-		++m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart;
-	if(m_EmoteStop > -1)
-		++m_EmoteStop;
 }
 
 bool CCharacter::IncreaseHealth(int Amount)
@@ -866,6 +853,9 @@ void CCharacter::PostSnap()
 
 void CCharacter::HandleTilesets()
 {
+	if(!m_Alive)
+		return;
+
 	// get index tileset char pos component items
 	const int Index = GS()->Collision()->GetParseTilesAt(m_Core.m_Pos.x, m_Core.m_Pos.y);
 	if(!m_pPlayer->IsBot() && GS()->Mmo()->OnPlayerHandleTile(this, Index))
@@ -959,7 +949,7 @@ void CCharacter::HandleTuning()
 	CTuningParams* pTuningParams = &m_pPlayer->m_NextTuningParams;
 
 	// skip collision
-	if(m_Core.m_LostData)
+	if(m_Core.m_SkipCollideTees)
 		pTuningParams->m_PlayerCollision = 0;
 
 	// behavior mobs
@@ -1083,7 +1073,7 @@ void CCharacter::UpdateEquipingStats(int ItemID)
 
 void CCharacter::HandleAuthedPlayer()
 {
-	if(!m_Alive || !m_pPlayer->IsAuthed())
+	if(!m_pPlayer->IsAuthed())
 		return;
 
 	// recovery mana

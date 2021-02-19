@@ -219,6 +219,14 @@ int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 	return 2;
 }
 
+void CPlayerBot::HandleTuningParams()
+{
+	if(!(m_PrevTuningParams == m_NextTuningParams))
+		m_PrevTuningParams = m_NextTuningParams;
+
+	m_NextTuningParams = *GS()->Tuning();
+}
+
 void CPlayerBot::Snap(int SnappingClient)
 {
 	if(!Server()->ClientIngame(m_ClientID) || !IsActiveSnappingBot(SnappingClient))
