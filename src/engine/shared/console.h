@@ -63,7 +63,7 @@ class CConsole : public IConsole
 	static void ConModCommandStatus(IResult *pResult, void *pUser);
 
 	void ExecuteFileRecurse(const char *pFilename);
-	void ExecuteLineStroked(int Stroke, const char *pStr, int ClientID = -1, bool InterpretSemicolons = true);
+	void ExecuteLineStroked(int Stroke, const char *pStr, int ClientID = -1, bool InterpretSemicolons = true, int* pErrorArgs = nullptr);
 
 	struct
 	{
@@ -124,10 +124,6 @@ public:
 		virtual float GetFloat(unsigned Index);
 	};
 
-private:
-	int ParseStart(CResult* pResult, const char* pString, int Length);
-	int ParseArgs(CResult* pResult, const char* pFormat);
-
 	/*
 	This function will set pFormat to the next parameter (i,s,r,v,?) it contains and
 	pNext to the command.
@@ -135,8 +131,12 @@ private:
 	Returns true on failure.
 	Expects pFormat to point at a parameter.
 	*/
-	bool NextParam(char* pNext, const char*& pFormat);
+	static bool NextParam(char* pNext, const char*& pFormat);
+	static int ParseArgs(CResult* pResult, const char* pFormat);
+	static void ParseArgsDescription(const char* pFormat, char* paBuffer, int Size);
 
+private:
+	int ParseStart(CResult* pResult, const char* pString, int Length);
 
 	class CExecutionQueue
 	{
@@ -190,7 +190,7 @@ public:
 	virtual void PossibleCommands(const char *pStr, int FlagMask, bool Temp, FPossibleCallback pfnCallback, void *pUser);
 	virtual void PossibleMaps(const char *pStr, FPossibleCallback pfnCallback, void *pUser);
 
-	virtual void ParseArguments(int NumArgs, const char **ppArguments);
+	virtual void ParseArguments(int NumArgs, const char** ppArguments);
 	virtual void Register(const char *pName, const char *pParams, int Flags, FCommandCallback pfnFunc, void *pUser, const char *pHelp);
 	virtual void RegisterTemp(const char *pName, const char *pParams, int Flags, const char *pHelp);
 	virtual void DeregisterTemp(const char *pName);
@@ -203,8 +203,8 @@ public:
 
 	virtual bool ArgStringIsValid(const char* pFormat);
 	virtual bool LineIsValid(const char *pStr);
-	virtual void ExecuteLine(const char *pStr, int ClientID = -1, bool InterpretSemicolons = true);
-	virtual void ExecuteLineFlag(const char *pStr, int FlagMask, int ClientID = -1, bool InterpretSemicolons = true);
+	virtual void ExecuteLine(const char *pStr, int ClientID = -1, bool InterpretSemicolons = true, int *pErrorArgs = nullptr);
+	virtual void ExecuteLineFlag(const char *pStr, int FlagMask, int ClientID = -1, bool InterpretSemicolons = true, int* pErrorArgs = nullptr);
 	virtual bool ExecuteFile(const char* pFilename);
 
 	virtual int RegisterPrintCallback(int OutputLevel, FPrintCallback pfnPrintCallback, void *pUserData);
@@ -216,8 +216,8 @@ public:
 	void SetAccessLevel(int AccessLevel) { m_AccessLevel = clamp(AccessLevel, (int)(ACCESS_LEVEL_ADMIN), (int)(ACCESS_LEVEL_MOD)); }
 
 	// mrpg
-	virtual int ParseCustomArgs(void* pResult, const char* pFormat) { return ParseArgs(static_cast<CResult*>(pResult), pFormat); }
 	virtual bool IsCommand(const char* pStr, int FlagMask);
+	virtual void ParseArgumentsDescription(const char* pFormat, char* aBuffer, int Size) { return ParseArgsDescription(pFormat, aBuffer, Size); }
 };
 
 #endif

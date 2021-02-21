@@ -925,15 +925,15 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Guild Bank: {INT}gold", &ms_aGuild[GuildID].m_Bank);
 	GS()->AV(ClientID, "null");
 	//
-	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
+	pPlayer->m_VoteColored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", &pPlayer->GetItem(itGold).m_Count);
-	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
+	pPlayer->m_VoteColored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "MMONEY", "Add gold guild bank. (Amount in a reason)", ms_aGuild[GuildID].m_aName);
 	GS()->AV(ClientID, "null");
 	//
-	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
+	pPlayer->m_VoteColored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "▤ Guild system");
-	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
+	pPlayer->m_VoteColored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_PLAYERS, NOPE, "List of players");
 	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_INVITES, NOPE, "Requests membership");
 	GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_HISTORY, NOPE, "History of activity");
@@ -941,9 +941,9 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	if (GuildHouse > 0)
 	{
 		GS()->AV(ClientID, "null");
-		pPlayer->m_Colored = LIGHT_GRAY_COLOR;
+		pPlayer->m_VoteColored = LIGHT_GRAY_COLOR;
 		GS()->AVL(ClientID, "null", "⌂ Housing system", &pPlayer->GetItem(itGold).m_Count);
-		pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
+		pPlayer->m_VoteColored = SMALL_LIGHT_GRAY_COLOR;
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_GUILD_HOUSE_DECORATION, NOPE, "Settings Decoration(s)");
 		GS()->AVL(ClientID, "MDOOR", "Change state (\"{STR}\")", GetGuildDoor(GuildID) ? "OPEN" : "CLOSED");
 		GS()->AVL(ClientID, "MSPAWN", "Teleport to guild house");
@@ -951,17 +951,17 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	}
 	GS()->AV(ClientID, "null");
 	//
-	pPlayer->m_Colored = LIGHT_RED_COLOR;
+	pPlayer->m_VoteColored = LIGHT_RED_COLOR;
 	GS()->AVL(ClientID, "null", "✖ Disband guild", &pPlayer->GetItem(itGold).m_Count);
-	pPlayer->m_Colored = SMALL_LIGHT_RED_COLOR;
+	pPlayer->m_VoteColored = SMALL_LIGHT_RED_COLOR;
 	GS()->AVL(ClientID, "null", "Gold spent on upgrades will not be refunded");
 	GS()->AVL(ClientID, "null", "All gold will be returned to the leader only");
 	GS()->AVL(ClientID, "MDISBAND", "Disband guild (in reason 55428)");
 	GS()->AV(ClientID, "null");
 	//
-	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
+	pPlayer->m_VoteColored = LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "☆ Guild upgrades", &pPlayer->GetItem(itGold).m_Count);
-	pPlayer->m_Colored = SMALL_LIGHT_GRAY_COLOR;
+	pPlayer->m_VoteColored = SMALL_LIGHT_GRAY_COLOR;
 	if (GuildHouse > 0)
 	{
 		for(int i = EMEMBERUPGRADE::ChairNSTExperience ; i < EMEMBERUPGRADE::NUM_EMEMBERUPGRADE; i++)
@@ -983,7 +983,7 @@ void GuildJob::ShowGuildPlayers(CPlayer* pPlayer, int GuildID)
 	const bool SelfGuild = pPlayer->Acc().m_GuildID == GuildID;
 	int HideID = NUM_TAB_MENU + InventoryJob::ms_aItemsInfo.size() + 1000;
 
-	pPlayer->m_Colored = GOLDEN_COLOR;
+	pPlayer->m_VoteColored = GOLDEN_COLOR;
 	GS()->AVL(ClientID, "null", "List players of {STR}", ms_aGuild[GuildID].m_aName);
 
 	ResultPtr pRes = SJK.SD("ID, Nick, GuildRank, GuildDeposit", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID);
@@ -998,7 +998,7 @@ void GuildJob::ShowGuildPlayers(CPlayer* pPlayer, int GuildID)
 		// without access
 		if(!SelfGuild)
 		{
-			pPlayer->m_Colored = LIGHT_GOLDEN_COLOR;
+			pPlayer->m_VoteColored = LIGHT_GOLDEN_COLOR;
 			GS()->AVL(ClientID, "null",  "{STR} {STR} Deposit: {INT}", GetGuildRank(GuildID, PlayerRankID), PlayerNickname.cstr(), &PlayerDeposit);
 			continue;
 		}
@@ -1503,12 +1503,12 @@ void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 	{
 		GS()->AV(ClientID, "null");
 		const int GuildBank = ms_aGuild[pPlayer->Acc().m_GuildID].m_Bank;
-		pPlayer->m_Colored = LIGHT_PURPLE_COLOR;
+		pPlayer->m_VoteColored = LIGHT_PURPLE_COLOR;
 		GS()->AVMI(ClientID, GS()->GetItemInfo(itGold).GetIcon(), "null", NOPE, NOPE, "Your guild have {INT} Gold", &GuildBank);
 	}
 
 	GS()->AV(ClientID, "null");
-	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
+	pPlayer->m_VoteColored = LIGHT_GRAY_COLOR;
 	const int GuildHouseOwner = ms_aHouseGuild[HouseID].m_GuildID;
 	if(GuildHouseOwner > 0)
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "Guild owner house: {STR}", ms_aGuild[GuildHouseOwner].m_aName);

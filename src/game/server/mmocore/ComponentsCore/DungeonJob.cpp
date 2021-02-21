@@ -39,12 +39,12 @@ bool DungeonJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMe
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_DUNGEON, "View the fastest players on the passage");
 		GS()->AV(ClientID, "null");
 
-		pPlayer->m_Colored = GOLDEN_COLOR;
+		pPlayer->m_VoteColored = GOLDEN_COLOR;
 		GS()->AVL(ClientID, "null", "Story dungeon's");
 		ShowDungeonsList(pPlayer, true);
 		GS()->AV(ClientID, "null");
 
-		pPlayer->m_Colored = GOLDEN_COLOR;
+		pPlayer->m_VoteColored = GOLDEN_COLOR;
 		GS()->AVL(ClientID, "null", "Alternative story dungeon's");
 		ShowDungeonsList(pPlayer, false);
 
@@ -53,7 +53,7 @@ bool DungeonJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMe
 			GS()->AV(ClientID, "null");
 			ShowTankVotingDungeon(pPlayer);
 			GS()->AV(ClientID, "null");
-			pPlayer->m_Colored = { 30, 8, 8 };
+			pPlayer->m_VoteColored = { 30, 8, 8 };
 			GS()->AVL(ClientID, "DUNGEONEXIT", "Exit dungeon {STR} (warning)", ms_aDungeon[GS()->GetDungeonID()].m_aName);
 		}
 		GS()->AddVotesBackpage(ClientID);
@@ -207,9 +207,9 @@ void DungeonJob::ShowTankVotingDungeon(CPlayer* pPlayer)
 
 	const int ClientID = pPlayer->GetCID();
 	const int DungeonWorldID = ms_aDungeon[GS()->GetDungeonID()].m_WorldID;
-	pPlayer->m_Colored = GRAY_COLOR;
+	pPlayer->m_VoteColored = GRAY_COLOR;
 	GS()->AVL(ClientID, "null", "Voting for the choice of tank!");
-	pPlayer->m_Colored = LIGHT_GRAY_COLOR;
+	pPlayer->m_VoteColored = LIGHT_GRAY_COLOR;
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pSearchPlayer = GS()->GetPlayer(i, true);

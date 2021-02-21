@@ -209,7 +209,7 @@ public:
 	int m_HookedPlayer;
 	bool m_ProtectHooked;
 	bool m_Death;
-	bool m_LostData;
+	bool m_SkipCollideTees;
 	int m_WorldID;
 	
 	int m_Jumped;

@@ -37,9 +37,10 @@ public:
 	int GetHealth() override { return m_BotHealth; };
 	int GetMana() override { return 999; };
 
+	void HandleTuningParams() override;
 	void UpdateTempData(int Health, int Mana) override { m_BotHealth = Health; };
 	void SendClientInfo(int TargetID) override;
-	
+
 	int IsActiveSnappingBot(int SnappingClient) const override;
 	int GetEquippedItemID(int EquipID, int SkipItemID = -1) const override;
 	int GetAttributeCount(int BonusID, bool Really = false) override;

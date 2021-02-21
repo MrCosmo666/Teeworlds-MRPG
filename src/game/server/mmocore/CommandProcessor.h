@@ -4,15 +4,8 @@
 class CCommandProcessor
 {
 	CGS* m_pGS;
-
-	void LastChat(CGS* pGS, CPlayer* pPlayer);
-
-public:
-	CCommandProcessor(CGS* pGS);
-
-	CGS* GS() { return m_pGS; }
-
-	void ChatCmd(CNetMsg_Cl_Say *pMsg, CPlayer *pPlayer);
+	CGS* GS() const { return m_pGS; }
+	void LastChat(CPlayer* pPlayer);
 	void AddCommand(const char* pName, const char* pParams, IConsole::FCommandCallback pfnFunc, void* pUser, const char* pHelp);
 
 	static void ConChatLogin(IConsole::IResult* pResult, void* pUserData);
@@ -28,10 +21,13 @@ public:
 	static void ConChatCmdList(IConsole::IResult* pResult, void* pUserData);
 	static void ConChatRules(IConsole::IResult* pResult, void* pUserData);
 	static void ConChatVoucher(IConsole::IResult* pResult, void* pUserData);
-
 #ifdef CONF_DISCORD
 	static void ConChatDiscordConnect(IConsole::IResult* pResult, void* pUserData);
 #endif
+
+public:
+	CCommandProcessor(CGS* pGS);
+	void ChatCmd(const char* pMessage, CPlayer *pPlayer);
 };
 
 #endif

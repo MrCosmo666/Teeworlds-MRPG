@@ -83,7 +83,6 @@ public:
 	virtual int GetSnapFullID() const;
 	virtual void Tick();
 	virtual void TickDefered();
-	virtual void TickPaused();
 	virtual void Snap(int SnappingClient);
 	virtual void PostSnap();
 	virtual bool Spawn(class CPlayer* pPlayer, vec2 Pos);

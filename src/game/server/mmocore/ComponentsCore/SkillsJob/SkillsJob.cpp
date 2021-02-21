@@ -118,7 +118,7 @@ bool SkillsJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 void SkillsJob::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
 {
 	const int ClientID = pPlayer->GetCID();
-	pPlayer->m_Colored = BLUE_COLOR;
+	pPlayer->m_VoteColored = BLUE_COLOR;
 	GS()->AVL(ClientID, "null", "{STR} skill's", (Passive ? "Passive" : "Active"));
 	for (const auto& sk : ms_aSkillsData)
 	{

@@ -1169,10 +1169,9 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			{
 				if(pMsg->m_pMessage[0] == '/')
 				{
-					CommandProcessor()->ChatCmd(pMsg, pPlayer);
+					CommandProcessor()->ChatCmd(pMsg->m_pMessage, pPlayer);
 					return;
 				}
-
 				SendChat(ClientID, Mode, pMsg->m_Target, pMsg->m_pMessage);						
 			}
 		}
@@ -1225,16 +1224,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					return;
 			}
 
-			pPlayer->m_aPlayerTick[TickState::LastChat] = Server()->Tick();
-
-			if (Console()->IsCommand(pMsg->m_Name, CFGFLAG_CHAT))
-			{
-				Console()->ExecuteLineFlag(aFullMsg + 1, CFGFLAG_CHAT, ClientID, false);
-				return;
-			}
-
-			ChatFollow(ClientID, "Command {STR} not found!", pMsg->m_Name);
-			// CommandManager()->OnCommand(pMsg->m_Name, pMsg->m_Arguments, ClientID);
+			CommandProcessor()->ChatCmd(aFullMsg, pPlayer);
 		}
 
 		else if(MsgID == NETMSGTYPE_CL_CALLVOTE)
@@ -1752,10 +1742,10 @@ void CGS::AV(int ClientID, const char *pCmd, const char *pDesc, const int TempIn
 	if(IsMmoClient(ClientID))
 	{
 		if(Vote.m_aDescription[0] == '\0')
-			m_apPlayers[ClientID]->m_Colored = { 0, 0, 0 };
+			m_apPlayers[ClientID]->m_VoteColored = { 0, 0, 0 };
 
 		CNetMsg_Sv_VoteMmoOptionAdd OptionMsg;
-		const vec3 ToHexColor = m_apPlayers[ClientID]->m_Colored;
+		const vec3 ToHexColor = m_apPlayers[ClientID]->m_VoteColored;
 		OptionMsg.m_pHexColor = ((int)ToHexColor.r << 16) + ((int)ToHexColor.g << 8) + (int)ToHexColor.b;
 		OptionMsg.m_pDescription = Vote.m_aDescription;
 		StrToInts(OptionMsg.m_pIcon, 4, Vote.m_aIcon);
@@ -1807,10 +1797,10 @@ void CGS::AVH(int ClientID, const int HideID, vec3 Color, const char *pText, ...
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
 		if(HideID > TAB_SETTINGS_MODULES && HideID < NUM_TAB_MENU) { Buffer.append(" (Press me for help)"); }
 
-		m_apPlayers[ClientID]->m_Colored = { Color.r, Color.g, Color.b };
+		m_apPlayers[ClientID]->m_VoteColored = { Color.r, Color.g, Color.b };
 		AV(ClientID, "HIDEN", Buffer.buffer(), HideID, -1, "unused");
-		if(length(m_apPlayers[ClientID]->m_Colored) > 1.0f)
-			m_apPlayers[ClientID]->m_Colored /= 4.0f;
+		if(length(m_apPlayers[ClientID]->m_VoteColored) > 1.0f)
+			m_apPlayers[ClientID]->m_VoteColored /= 4.0f;
 		Buffer.clear();
 		va_end(VarArgs);
 	}
@@ -1832,10 +1822,10 @@ void CGS::AVHI(int ClientID, const char *pIcon, const int HideID, vec3 Color, co
 		if(HideID > TAB_SETTINGS_MODULES && HideID < NUM_TAB_MENU)
 			Buffer.append(" (Press me for help)");
 
-		m_apPlayers[ClientID]->m_Colored = Color;
+		m_apPlayers[ClientID]->m_VoteColored = Color;
 		AV(ClientID, "HIDEN", Buffer.buffer(), HideID, -1, pIcon);
-		if(length(m_apPlayers[ClientID]->m_Colored) > 1.0f)
-			m_apPlayers[ClientID]->m_Colored /= 4.0f;
+		if(length(m_apPlayers[ClientID]->m_VoteColored) > 1.0f)
+			m_apPlayers[ClientID]->m_VoteColored /= 4.0f;
 			
 		Buffer.clear();
 		va_end(VarArgs);
@@ -1949,7 +1939,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	
 	if (Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList, true))
 	{
-		m_apPlayers[ClientID]->m_Colored = { 20, 7, 15 };
+		m_apPlayers[ClientID]->m_VoteColored = { 20, 7, 15 };
 		AVL(ClientID, "null", "The main menu will return as soon as you leave this zone!");
 		return;
 	}
@@ -2068,7 +2058,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVM(ClientID, "null", NOPE, TAB_INFO_TOP, "Here you can see top server Guilds, Players.");
 		AV(ClientID, "null");
 
-		m_apPlayers[ClientID]->m_Colored = { 20,7,15 };
+		m_apPlayers[ClientID]->m_VoteColored = { 20,7,15 };
 		AVM(ClientID, "SELECTEDTOP", ToplistTypes::GUILDS_LEVELING, NOPE, "Top 10 guilds leveling");
 		AVM(ClientID, "SELECTEDTOP", ToplistTypes::GUILDS_WEALTHY, NOPE, "Top 10 guilds wealthy");
 		AVM(ClientID, "SELECTEDTOP", ToplistTypes::PLAYERS_LEVELING, NOPE, "Top 10 players leveling");
@@ -2186,9 +2176,9 @@ void CGS::AddVotesBackpage(int ClientID)
 		return;
 
 	AV(ClientID, "null");
-	m_apPlayers[ClientID]->m_Colored = RED_COLOR;
+	m_apPlayers[ClientID]->m_VoteColored = RED_COLOR;
 	AVL(ClientID, "BACK", "Backpage");
-	m_apPlayers[ClientID]->m_Colored = {0,0,0};
+	m_apPlayers[ClientID]->m_VoteColored = {0,0,0};
 }
 
 // print player statistics
@@ -2221,7 +2211,7 @@ void CGS::ShowVotesPlayerStats(CPlayer *pPlayer)
 void CGS::ShowVotesItemValueInformation(CPlayer *pPlayer, int ItemID)
 {
 	const int ClientID = pPlayer->GetCID();
-	pPlayer->m_Colored = LIGHT_PURPLE_COLOR;
+	pPlayer->m_VoteColored = LIGHT_PURPLE_COLOR;
 	AVMI(ClientID, GetItemInfo(ItemID).GetIcon(), "null", NOPE, NOPE, "You have {INT} {STR}", &pPlayer->GetItem(ItemID).m_Count, GetItemInfo(ItemID).GetName());
 }
 

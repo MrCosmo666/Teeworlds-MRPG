@@ -99,7 +99,7 @@ int CConsole::ParseStart(CResult *pResult, const char *pString, int Length)
 	return 0;
 }
 
-int CConsole::ParseArgs(CResult *pResult, const char *pFormat)
+int CConsole::ParseArgs(CResult* pResult, const char* pFormat)
 {
 	char Command = *pFormat;
 	char *pStr;
@@ -111,7 +111,15 @@ int CConsole::ParseArgs(CResult *pResult, const char *pFormat)
 	while (!Error)
 	{
 		if(!Command)
+		{
+			if(*pStr)
+			{
+				// simular empty argument
+				pResult->AddArgument("");
+				Error = 1;
+			}
 			break;
+		}
 
 		if(Command == '?')
 			Optional = 1;
@@ -121,7 +129,7 @@ int CConsole::ParseArgs(CResult *pResult, const char *pFormat)
 
 			if(!(*pStr)) // error, non optional command needs value
 			{
-				if (!Optional)
+				if(!Optional)
 				{
 					Error = 1;
 				}
@@ -189,6 +197,64 @@ int CConsole::ParseArgs(CResult *pResult, const char *pFormat)
 	}
 
 	return Error;
+}
+
+void CConsole::ParseArgsDescription(const char* pFormat, char* paBuffer, int Size)
+{
+	paBuffer[0] = '\0';
+	for(const char* c = pFormat; *c;)
+	{
+		char aBuf[32] = "";
+		char aDesc[32];
+
+		bool Optional = false;
+		if(c[0] == '?')
+		{
+			Optional = true;
+			c++;
+		}
+
+		const char* pDesc = 0;
+		if(c[1] == '[')
+		{
+			str_format(aDesc, sizeof(aDesc), "%.*s", str_span(&c[2], "]"), &c[2]);
+			pDesc = aDesc;
+			c += str_span(c, "]") + 1;
+		}
+		else
+		{
+			if(c[0] == 'i')
+			{
+				pDesc = "number";
+			}
+			else if(c[0] == 'f')
+			{
+				pDesc = "float";
+			}
+			else if(c[0] == 'r' || c[0] == 's')
+			{
+				pDesc = "string";
+			}
+			else
+			{
+				break; // ill-formed
+			}
+
+			c++;
+		}
+
+		if(Optional)
+		{
+			str_format(aBuf, sizeof(aBuf), "[%s] ", pDesc);
+			str_append(paBuffer, aBuf, Size);
+		}
+		else
+		{
+			str_format(aBuf, sizeof(aBuf), "<%s> ", pDesc);
+			str_append(paBuffer, aBuf, Size);
+		}
+		c = str_skip_whitespaces_const(c);
+	}
 }
 
 bool CConsole::NextParam(char* pNext, const char*& pFormat)
@@ -318,7 +384,7 @@ bool CConsole::LineIsValid(const char *pStr)
 	return true;
 }
 
-void CConsole::ExecuteLineStroked(int Stroke, const char *pStr, int ClientID, bool InterpretSemicolons)
+void CConsole::ExecuteLineStroked(int Stroke, const char *pStr, int ClientID, bool InterpretSemicolons, int *pErrorArgs)
 {
 	while(pStr && *pStr)
 	{
@@ -374,7 +440,8 @@ void CConsole::ExecuteLineStroked(int Stroke, const char *pStr, int ClientID, bo
 
 				if(Stroke || IsStrokeCommand)
 				{
-					if(ParseArgs(&Result, pCommand->m_pParams))
+					int ErrorArgs = (pErrorArgs ? (*pErrorArgs = ParseArgs(&Result, pCommand->m_pParams)) : ParseArgs(&Result, pCommand->m_pParams));
+					if(ErrorArgs)
 					{
 						char aBuf[256];
 						str_format(aBuf, sizeof(aBuf), "Invalid arguments... Usage: %s %s", pCommand->m_pName, pCommand->m_pParams);
@@ -443,17 +510,17 @@ CConsole::CCommand *CConsole::FindCommand(const char *pName, int FlagMask)
 	return 0x0;
 }
 
-void CConsole::ExecuteLine(const char *pStr, int ClientID, bool InterpretSemicolons)
+void CConsole::ExecuteLine(const char *pStr, int ClientID, bool InterpretSemicolons, int* pErrorArgs)
 {
-	CConsole::ExecuteLineStroked(1, pStr, ClientID, InterpretSemicolons); // press it
-	CConsole::ExecuteLineStroked(0, pStr, ClientID, InterpretSemicolons); // then release it
+	CConsole::ExecuteLineStroked(1, pStr, ClientID, InterpretSemicolons, pErrorArgs); // press it
+	CConsole::ExecuteLineStroked(0, pStr, ClientID, InterpretSemicolons, pErrorArgs); // then release it
 }
 
-void CConsole::ExecuteLineFlag(const char *pStr, int FlagMask, int ClientID, bool InterpretSemicolons)
+void CConsole::ExecuteLineFlag(const char *pStr, int FlagMask, int ClientID, bool InterpretSemicolons, int *pErrorArgs)
 {
 	int Temp = m_FlagMask;
 	m_FlagMask = FlagMask;
-	ExecuteLine(pStr, ClientID, InterpretSemicolons);
+	ExecuteLine(pStr, ClientID, InterpretSemicolons, pErrorArgs);
 	m_FlagMask = Temp;
 }
 

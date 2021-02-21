@@ -38,14 +38,14 @@ bool CCharacterBotAI::Spawn(class CPlayer *pPlayer, vec2 Pos)
 	}
 	else if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 	{
-		m_Core.m_LostData = true;
+		m_Core.m_SkipCollideTees = true;
 		GS()->SendEquipments(m_pBotPlayer->GetCID(), -1);
 		CreateSnapProj(GetSnapFullID(), 2, PICKUP_HEALTH, true, false);
 		CreateSnapProj(GetSnapFullID(), 2, PICKUP_ARMOR, true, false);
 	}
 	else if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
-		m_Core.m_LostData = true;
+		m_Core.m_SkipCollideTees = true;
 		const int Function = BotJob::ms_aNpcBot[SubBotID].m_Function;
 		if(Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST)
 			CreateSnapProj(GetSnapFullID(), 3, PICKUP_ARMOR, false, false);
@@ -563,7 +563,7 @@ bool CCharacterBotAI::SearchTalkedPlayer()
 			if (DialoguesNotEmpty)
 				GS()->Broadcast(i, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Begin dialog: \"hammer hit\"");
 
-			pFindPlayer->GetCharacter()->m_Core.m_LostData = true;
+			pFindPlayer->GetCharacter()->m_Core.m_SkipCollideTees = true;
 			m_Input.m_TargetX = static_cast<int>(pFindPlayer->GetCharacter()->m_Core.m_Pos.x - m_Pos.x);
 			m_Input.m_TargetY = static_cast<int>(pFindPlayer->GetCharacter()->m_Core.m_Pos.y - m_Pos.y);
 			m_Input.m_Direction = 0;
@@ -648,7 +648,7 @@ bool CCharacterBotAI::FunctionNurseNPC()
 
 		// disable collision with players
 		if(distance(pFindPlayer->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f)
-			pFindPlayer->GetCharacter()->m_Core.m_LostData = true;
+			pFindPlayer->GetCharacter()->m_Core.m_SkipCollideTees = true;
 
 		// skip full health
 		if(pFindPlayer->GetHealth() >= pFindPlayer->GetStartHealth())
