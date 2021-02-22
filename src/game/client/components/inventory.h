@@ -19,8 +19,10 @@ class CInventory : public CComponent
 {
 	class InventorySlot
 	{
+		CInventory* m_pInventory;
+
 	public:
-		InventorySlot()
+		InventorySlot(CInventory * pInventory) : m_pInventory(pInventory)
 		{
 			m_SlotID = 0;
 			m_ItemID = 0;
@@ -33,6 +35,7 @@ class CInventory : public CComponent
 		char m_aDesc[256];
 		char m_aIcon[64];
 
+		int m_Page;
 		int m_SlotID;
 		int m_ItemID;
 		int m_Count;
@@ -40,22 +43,43 @@ class CInventory : public CComponent
 		CUIRect m_RectSlot;
 
 		// render
-		void Render(CInventory* pInventory);
-		void PostRender(CInventory* pInventory);
+		void Render();
+		void PostRender();
 
 		// functions
 		bool IsEmptySlot() const { return m_ItemID <= 0 || m_Count <= 0 || m_aIcon[0] == '\0'; }
 		const char* GetHovoredDesc() const { return m_aDesc; }
+
+		// main
+		void InitSlot(InventorySlot pItemSlot)
+		{
+			std::swap(*this, pItemSlot);
+		}
 	};
 
-	struct CInventoryPage
+	class CInventoryPage
 	{
-		InventorySlot m_Slot[MAX_ITEMS_PER_PAGE];
+		CInventory* m_pInventory;
+
+	public:
+		CInventoryPage(CInventory *pInventory, int Page) : m_pInventory(pInventory)
+		{
+			for(int i = 0; i < MAX_ITEMS_PER_PAGE; i++)
+			{
+				m_Slot[i] = new InventorySlot(pInventory);
+				m_Slot[i]->m_Page = Page;
+			}
+		};
+
+		InventorySlot* m_Slot[MAX_ITEMS_PER_PAGE];
 	};
 
 	bool m_Active;
-	CUIRect m_Screen;
 	vec2 m_PositionMouse;
+
+	// rects
+	CUIRect m_Screen;
+	CUIRect m_InventoryBackground;
 
 	// mouse events
 	int m_MouseFlag;
@@ -63,26 +87,34 @@ class CInventory : public CComponent
 	// control inventory
 	int m_ActivePage;
 
-	int m_HoveredSlotID;
-	int m_SelectionSlotID;
-	int m_InteractiveSlotID;
+	InventorySlot *m_HoveredSlot;
+	InventorySlot *m_SelectionSlot;
+	InventorySlot *m_InteractiveSlot;
 
 	vec2 m_SlotInteractivePosition;
-	std::map < int , CInventoryPage > m_aInventoryPages;
+	std::map < int , CInventoryPage* > m_aInventoryPages;
 
 public:
 	CInventory();
 	bool IsActive() const { return m_Active; }
 
-	std::pair <int, int> FindSlotID(int ItemID);
+	InventorySlot &FindSlot(int ItemID);
 	void AddItem(int ItemID, int Count, const char* pName, const char* pDesc, const char* pIcon);
 
+	// events
 	virtual void OnRender();
 	virtual void OnMessage(int MsgType, void* pRawMsg);
 	virtual void OnInit();
 	virtual bool OnCursorMove(float x, float y, int CursorType);
 	virtual bool OnInput(IInput::CEvent Event);
+	virtual void OnStateChange(int NewState, int OldState);
+	virtual void OnConsoleInit();
+	static void ConToggleInventoryMRPG(IConsole::IResult* pResult, void* pUser);
 
+	// pages
+	void ScrollInventoryPage(int Page, CUIRect* pHoveredRect = nullptr);
+
+	// render
 	void RenderSelectTab(CUIRect MainView);
 	void RenderInventory();
 	void RenderInventoryPage(CUIRect MainView);

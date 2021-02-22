@@ -50,46 +50,53 @@ static void CalculateSlotPosition(int SlotID, CUIRect *SlotRect)
 
 CInventory::CInventory()
 {
+	m_aInventoryPages[0] = new CInventoryPage(this, 0);
+	m_InteractiveSlot = nullptr;
+	m_SelectionSlot = nullptr;
+	m_HoveredSlot = nullptr;
+
 	m_MouseFlag = 0;
 	m_ActivePage = 0;
-	m_HoveredSlotID = -1;
-	m_SelectionSlotID = -1;
-	m_InteractiveSlotID = -1;
 }
 
-std::pair <int, int> CInventory::FindSlotID(int ItemID)
+CInventory::InventorySlot &CInventory::FindSlot(int ItemID)
 {
-	for(auto &pPages : m_aInventoryPages)
+	for(int i = 0; i < m_aInventoryPages.size(); i++)
 	{
-		for(int p = 0; p < MAX_ITEMS_PER_PAGE; p++)
+		CInventoryPage* pInventoryPage = m_aInventoryPages[i];
+		if(pInventoryPage)
 		{
-			if(pPages.second.m_Slot[p].IsEmptySlot())
-				return std::pair < int, int >(pPages.first, p);
+			for(int p = 0; p < MAX_ITEMS_PER_PAGE; p++)
+			{
+				if(pInventoryPage->m_Slot[p]->IsEmptySlot())
+				{
+					pInventoryPage->m_Slot[p]->m_Page = i;
+					pInventoryPage->m_Slot[p]->m_SlotID = p;
+					return *pInventoryPage->m_Slot[p];
+				}
+			}
 		}
 	}
+
 	const int NewPage = (int)m_aInventoryPages.size();
-	return std::pair < int, int > (NewPage, 0);
+	m_aInventoryPages[NewPage] = new CInventoryPage(this, NewPage);
+	m_aInventoryPages[NewPage]->m_Slot[0]->m_Page = NewPage;
+	m_aInventoryPages[NewPage]->m_Slot[0]->m_SlotID = 0;
+	return *m_aInventoryPages[NewPage]->m_Slot[0];
 }
 
 void CInventory::AddItem(int ItemID, int Count, const char *pName, const char *pDesc, const char *pIcon)
 {
-	std::pair<int, int> Position = FindSlotID(ItemID);
-	const int FreeSlotID = Position.second;
-	const int Page = Position.first;
-
 	CUIRect SlotRect = { m_Screen.w / 1.25f, m_Screen.h / 4.0f, BoxWidth, BoxHeight };
-	CalculateSlotPosition(FreeSlotID, &SlotRect);
 
-	// add slot
-	InventorySlot SlotItem;
-	SlotItem.m_SlotID = FreeSlotID;
-	SlotItem.m_ItemID = ItemID;
-	SlotItem.m_Count = Count;
-	SlotItem.m_RectSlot = SlotRect;
-	str_copy(SlotItem.m_aName, pName, sizeof(SlotItem.m_aName));
-	str_copy(SlotItem.m_aDesc, pDesc, sizeof(SlotItem.m_aDesc));
-	str_copy(SlotItem.m_aIcon, pIcon, sizeof(SlotItem.m_aIcon));
-	m_aInventoryPages[Page].m_Slot[FreeSlotID] = SlotItem;
+	InventorySlot& NewSlot = FindSlot(ItemID);
+	CalculateSlotPosition(NewSlot.m_SlotID, &SlotRect);
+	NewSlot.m_ItemID = ItemID;
+	NewSlot.m_Count = Count;
+	NewSlot.m_RectSlot = SlotRect;
+	str_copy(NewSlot.m_aName, pName, sizeof(NewSlot.m_aName));
+	str_copy(NewSlot.m_aDesc, pDesc, sizeof(NewSlot.m_aDesc));
+	str_copy(NewSlot.m_aIcon, pIcon, sizeof(NewSlot.m_aIcon));
 }
 
 void CInventory::OnRender()
@@ -122,7 +129,7 @@ void CInventory::OnRender()
 	if(m_MouseFlag & MouseEvent::M_RIGHT_PRESSED)
 		OldEvent |= MouseEvent::M_RIGHT_PRESSED;
 	m_MouseFlag = OldEvent;
-	m_HoveredSlotID = -1;
+	m_HoveredSlot = nullptr;
 }
 
 void CInventory::RenderSelectTab(CUIRect MainView)
@@ -145,51 +152,71 @@ void CInventory::RenderSelectTab(CUIRect MainView)
 
 void CInventory::RenderInventory()
 {
-	CUIRect MainView = { m_Screen.w / 1.25f, m_Screen.h / 4.0f, m_Screen.w / 4.0f, m_Screen.h / 1.2f };
-	RenderSelectTab(MainView);
-	CUIRect Background = { MainView.x - 20.0f, MainView.y - 20.0f, BoxWidth * (MAX_SLOTS_WIDTH + 2), BoxHeight * (MAX_SLOTS_HEIGHT + 3) };
+	if(m_pClient->m_pGameConsole->IsConsoleActive() || !IsActive())
+		return;
+
+	// background
+	m_InventoryBackground = { m_Screen.w / 1.25f, m_Screen.h / 4.0f, m_Screen.w / 4.0f, m_Screen.h / 1.2f };
+	RenderSelectTab(m_InventoryBackground);
+	CUIRect Background = { m_InventoryBackground.x - 20.0f, m_InventoryBackground.y - 20.0f, BoxWidth * (MAX_SLOTS_WIDTH + 2), BoxHeight * (MAX_SLOTS_HEIGHT + 3) };
 	RenderTools()->DrawRoundRect(&Background, vec4(0.4f, 0.4f, 0.4f, 0.7f), 16.0f);
 
-	// - - - - - -
 	// render pages
-	RenderInventoryPage(MainView);
-	CInventoryPage& pInventoryActivePage = m_aInventoryPages[m_ActivePage];
+	RenderInventoryPage(m_InventoryBackground);
+	CInventoryPage *pInventoryActivePage = m_aInventoryPages[m_ActivePage];
 
-	// - - - - - -
 	// empty grid
 	for(int i = 0; i < MAX_ITEMS_PER_PAGE; i++)
 	{
-		CUIRect SlotRect = MainView;
+		CUIRect SlotRect = m_InventoryBackground;
 		CalculateSlotPosition(i, &SlotRect);
-		pInventoryActivePage.m_Slot[i].m_SlotID = i;
-		pInventoryActivePage.m_Slot[i].m_RectSlot = SlotRect;
-		if(m_InteractiveSlotID == -1 && UI()->MouseHovered(&SlotRect))
+		if(!m_InteractiveSlot && UI()->MouseHovered(&SlotRect))
 			RenderTools()->DrawRoundRect(&SlotRect, vec4(0.5f, 0.5f, 0.5f, 0.5f), 8.0f);
 		else
 			RenderTools()->DrawRoundRect(&SlotRect, vec4(0.2f, 0.2f, 0.2f, 0.4f), 8.0f);
+
+		// set positions to every slot on page
+		pInventoryActivePage->m_Slot[i]->m_RectSlot = SlotRect;
 	}
 
-	// - - - - - - - - 
-	// render inventory
+	// render inventory	
 	for(int i = 0; i < MAX_ITEMS_PER_PAGE; i++)
-	{	
-		// skip selections slot and render it on post
-		if(m_MouseFlag & MouseEvent::M_LEFT_PRESSED && m_SelectionSlotID == i)
-		{
-			pInventoryActivePage.m_Slot[i].m_RectSlot.x = m_PositionMouse.x;
-			pInventoryActivePage.m_Slot[i].m_RectSlot.y = m_PositionMouse.y;
+	{
+		if(m_SelectionSlot == pInventoryActivePage->m_Slot[i])
 			continue;
-		}
-		pInventoryActivePage.m_Slot[i].Render(this);
+		pInventoryActivePage->m_Slot[i]->Render();
 	}
 
-	// - - - - - - - - - - -
 	// post render inventory
 	for(int i = 0; i < MAX_ITEMS_PER_PAGE; i++)
 	{
-		pInventoryActivePage.m_Slot[i].PostRender(this);
+		if(m_SelectionSlot == pInventoryActivePage->m_Slot[i])
+			continue;
+		pInventoryActivePage->m_Slot[i]->PostRender();
 	}
 
+	dbg_msg("test", "%p", m_SelectionSlot);
+	if(m_SelectionSlot)
+	{
+		// selected slot move to mouse
+		if(m_MouseFlag & MouseEvent::M_LEFT_PRESSED)
+		{
+			m_SelectionSlot->m_RectSlot.x = m_PositionMouse.x;
+			m_SelectionSlot->m_RectSlot.y = m_PositionMouse.y;
+		}
+
+		// render selected slot
+		m_SelectionSlot->Render();
+		m_SelectionSlot->PostRender();
+
+		// swap event slots
+		if(m_MouseFlag & MouseEvent::M_LEFT_RELEASE)
+		{
+			if(m_HoveredSlot)
+				tl_swap(*m_SelectionSlot, *m_HoveredSlot);
+			m_SelectionSlot = nullptr;
+		}
+	}
 }
 
 void CInventory::RenderInventoryPage(CUIRect MainView)
@@ -202,12 +229,8 @@ void CInventory::RenderInventoryPage(CUIRect MainView)
 	SelectRect.HSplitTop(BoxHeight * MAX_SLOTS_HEIGHT + 30.0f, 0, &SelectRect);
 	SelectRect.VMargin((BoxWidth * MAX_SLOTS_WIDTH) / 2.0f - 20.0f, &SelectRect);
 	RenderTextRoundRect(vec2(SelectRect.x, SelectRect.y), 2.0f, 12.0f, "<", 6.0f, &HoveredLeft);
-	if(m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredLeft && m_InteractiveSlotID == -1)
-	{
-		m_HoveredSlotID = -1;
-		m_SelectionSlotID = -1;
-		m_ActivePage = max(0, m_ActivePage - 1);
-	}
+	if(m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredLeft && !m_InteractiveSlot)
+		ScrollInventoryPage(m_ActivePage - 1);
 
 	// information
 	char aPageBuf[16];
@@ -218,12 +241,8 @@ void CInventory::RenderInventoryPage(CUIRect MainView)
 	// right
 	SelectRect.VSplitLeft(25.0f, 0, &SelectRect);
 	RenderTextRoundRect(vec2(SelectRect.x, SelectRect.y), 2.0f, 12.0f, ">", 6.0f, &HoveredRight);
-	if(m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredRight && m_InteractiveSlotID == -1)
-	{
-		m_HoveredSlotID = -1;
-		m_SelectionSlotID = -1;
-		m_ActivePage = min((int)m_aInventoryPages.size(), m_ActivePage + 1);
-	}
+	if(m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredRight && !m_InteractiveSlot)
+		ScrollInventoryPage(m_ActivePage + 1);
 }
 
 void CInventory::RenderTextRoundRect(vec2 Position, float Margin, float FontSize, const char *pText, float Rounding, bool* pHovored)
@@ -264,8 +283,55 @@ void CInventory::OnMessage(int MsgType, void* pRawMsg)
 
 void CInventory::OnInit()
 {
+	int ID = 0;
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+
 	m_Screen = *UI()->Screen();
-	m_Active = false;
+	m_Active = true;
 }
 
 bool CInventory::OnInput(IInput::CEvent Event)
@@ -301,7 +367,38 @@ bool CInventory::OnInput(IInput::CEvent Event)
 		}
 		return true;
 	}
+	// scroll pages
+	else if(Event.m_Key == KEY_MOUSE_WHEEL_UP)
+	{
+		ScrollInventoryPage(m_ActivePage + 1);
+		return true;
+	}
+	else if(Event.m_Key == KEY_MOUSE_WHEEL_DOWN)
+	{
+		ScrollInventoryPage(m_ActivePage - 1);
+		return true;
+	}
 	return false;
+}
+
+void CInventory::OnStateChange(int NewState, int OldState)
+{
+	if(NewState != IClient::STATE_ONLINE)
+		m_Active = false;
+}
+
+void CInventory::OnConsoleInit()
+{
+	Console()->Register("toggle_inventory_mrpg", "", CFGFLAG_CLIENT, ConToggleInventoryMRPG, this, "Toggle inventory mrpg");
+}
+
+void CInventory::ConToggleInventoryMRPG(IConsole::IResult* pResult, void* pUser)
+{
+	CInventory* pInventory = static_cast<CInventory*>(pUser);
+	if(pInventory->Client()->State() != IClient::STATE_ONLINE)
+		return;
+
+	pInventory->m_Active ^= true;
 }
 
 bool CInventory::OnCursorMove(float x, float y, int CursorType)
@@ -319,61 +416,66 @@ bool CInventory::OnCursorMove(float x, float y, int CursorType)
 	return true;
 }
 
-void CInventory::InventorySlot::Render(CInventory* pInventory)
+void CInventory::InventorySlot::Render()
 {
 	// hovered
-	if(pInventory->m_InteractiveSlotID == -1 && pInventory->UI()->MouseHovered(&m_RectSlot))
+	if(m_pInventory->m_SelectionSlot != this && !m_pInventory->m_InteractiveSlot)
 	{
-		pInventory->m_HoveredSlotID = m_SlotID;
-		if(!IsEmptySlot())
+		if(m_pInventory->UI()->MouseHovered(&m_RectSlot))
 		{
-			// select slot after left mouse
-			if(pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED)
-				pInventory->m_SelectionSlotID = m_SlotID;
-			// open interactive menu
-			else if(pInventory->m_MouseFlag & MouseEvent::M_RIGHT_CLICKED)
+			m_pInventory->m_HoveredSlot = this;
+
+			// select slot events mouse
+			if(!IsEmptySlot())
 			{
-				pInventory->m_InteractiveSlotID = m_SlotID;
-				pInventory->m_SlotInteractivePosition = pInventory->m_PositionMouse;
-				m_InteractiveCount = min(m_InteractiveCount, m_Count);
+				if(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED)
+				{
+					m_pInventory->m_SelectionSlot = this;
+				}
+				else if(m_pInventory->m_MouseFlag & MouseEvent::M_RIGHT_CLICKED)
+				{
+					m_pInventory->m_InteractiveSlot = this;
+					m_pInventory->m_SlotInteractivePosition = m_pInventory->m_PositionMouse;
+					m_InteractiveCount = min(m_InteractiveCount, m_Count);
+				}
 			}
 		}
-	}
-	else
-	{
-		pInventory->RenderTools()->DrawRoundRect(&m_RectSlot, vec4(0.2f, 0.2f, 0.2f, 0.4f), 8.0f);
+		else
+		{
+			m_pInventory->RenderTools()->DrawRoundRect(&m_RectSlot, vec4(0.2f, 0.2f, 0.2f, 0.4f), 8.0f);
+		}
 	}
 
 	// icon and count near icon
 	if(!IsEmptySlot())
 	{
 		char aCountBuf[32];
-		str_format(aCountBuf, sizeof(aCountBuf), "%d%s", min(999, m_Count), (m_Count > 999 ? "+" : "\0"));
-		pInventory->m_pClient->m_pMenus->DoItemIcon(m_aIcon, m_RectSlot, 32.0f);
-		pInventory->TextRender()->Text(0x0, m_RectSlot.x, m_RectSlot.y, 10.0f, aCountBuf, -1.0f);
+		str_format(aCountBuf, sizeof(aCountBuf), "%d%s %d", min(999, m_Count), (m_Count > 999 ? "+" : "\0"), m_Page);
+		m_pInventory->m_pClient->m_pMenus->DoItemIcon(m_aIcon, m_RectSlot, 32.0f);
+		m_pInventory->TextRender()->Text(0x0, m_RectSlot.x, m_RectSlot.y, 10.0f, aCountBuf, -1.0f);
 	}
 }
 
-void CInventory::InventorySlot::PostRender(CInventory* pInventory)
+void CInventory::InventorySlot::PostRender()
 {
-	CInventoryPage& pInventoryActivePage = pInventory->m_aInventoryPages[pInventory->m_ActivePage];
+	CInventoryPage *pInventoryActivePage = m_pInventory->m_aInventoryPages[m_pInventory->m_ActivePage];
 
 	// - - - - - - - - - - - -
 	// render slot interactive
-	if(pInventory->m_InteractiveSlotID == m_SlotID)
+	if(m_pInventory->m_InteractiveSlot == this)
 	{
 		static float Space = 20.0f;
-		CUIRect InteractiveRect = pInventory->m_Screen;
-		vec2 Position = vec2(pInventory->m_SlotInteractivePosition.x, pInventory->m_SlotInteractivePosition.y);
+		CUIRect InteractiveRect = m_pInventory->m_Screen;
+		vec2 Position = vec2(m_pInventory->m_SlotInteractivePosition.x, m_pInventory->m_SlotInteractivePosition.y);
 		InteractiveRect.w = 150.0f;
 		InteractiveRect.h = 120.0f;
-		InteractiveRect.x = pInventory->m_SlotInteractivePosition.x - (InteractiveRect.w / 2.0f);
-		InteractiveRect.y = pInventory->m_SlotInteractivePosition.y;
-		pInventory->RenderTools()->DrawRoundRect(&InteractiveRect, vec4(0.1f, 0.1f, 0.1f, 0.8f), 16.0f);
+		InteractiveRect.x = m_pInventory->m_SlotInteractivePosition.x - (InteractiveRect.w / 2.0f);
+		InteractiveRect.y = m_pInventory->m_SlotInteractivePosition.y;
+		m_pInventory->RenderTools()->DrawRoundRect(&InteractiveRect, vec4(0.1f, 0.1f, 0.1f, 0.8f), 16.0f);
 
 		char aBuf[256];
 		str_format(aBuf, sizeof(aBuf), "Interaction with %s", m_aName);
-		pInventory->RenderTextRoundRect(Position, 2.0f, 12.0f, aBuf, 5.0f);
+		m_pInventory->RenderTextRoundRect(Position, 2.0f, 12.0f, aBuf, 5.0f);
 
 		char aCountBuf[32];
 		CUIRect ItemRect = InteractiveRect;
@@ -382,23 +484,23 @@ void CInventory::InventorySlot::PostRender(CInventory* pInventory)
 		ItemRect.w = BoxWidth;
 		ItemRect.h = BoxHeight;
 		str_format(aCountBuf, sizeof(aCountBuf), "%d%s", min(999, m_Count), (m_Count > 999 ? "+" : "\0"));
-		pInventory->RenderTools()->DrawRoundRect(&ItemRect, vec4(0.2f, 0.2f, 0.2f, 0.4f), 8.0f);
-		pInventory->m_pClient->m_pMenus->DoItemIcon(m_aIcon, ItemRect, 32.0f);
-		pInventory->TextRender()->Text(0x0, ItemRect.x, ItemRect.y, 10.0f, aCountBuf, -1.0f);
+		m_pInventory->RenderTools()->DrawRoundRect(&ItemRect, vec4(0.2f, 0.2f, 0.2f, 0.4f), 8.0f);
+		m_pInventory->m_pClient->m_pMenus->DoItemIcon(m_aIcon, ItemRect, 32.0f);
+		m_pInventory->TextRender()->Text(0x0, ItemRect.x, ItemRect.y, 10.0f, aCountBuf, -1.0f);
 
 		// interactions
 		bool HoveredUseItem;
 		Position = vec2(Position.x, Position.y + Space);
-		pInventory->RenderTextRoundRect(Position, 2.0f, 10.0f, "Use item", 6.0f, &HoveredUseItem);
-		if(pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredUseItem)
+		m_pInventory->RenderTextRoundRect(Position, 2.0f, 10.0f, "Use item", 6.0f, &HoveredUseItem);
+		if(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredUseItem)
 		{
 			// todo use item
 		}
 
 		bool HoveredDropItem;
 		Position = vec2(Position.x, Position.y + Space);
-		pInventory->RenderTextRoundRect(Position, 2.0f, 10.0f, "Drop item", 6.0f, &HoveredDropItem);
-		if(pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredDropItem)
+		m_pInventory->RenderTextRoundRect(Position, 2.0f, 10.0f, "Drop item", 6.0f, &HoveredDropItem);
+		if(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredDropItem)
 		{
 			// todo drop item
 		}
@@ -412,82 +514,75 @@ void CInventory::InventorySlot::PostRender(CInventory* pInventory)
 		SelectRect.HSplitTop(25.0f, 0, &SelectRect);
 
 		// left
-		SelectRect.x = pInventory->m_SlotInteractivePosition.x;
+		SelectRect.x = m_pInventory->m_SlotInteractivePosition.x;
 		SelectRect.x -= 10.0f;
-		pInventory->RenderTextRoundRect(vec2(SelectRect.x, SelectRect.y), 2.0f, 10.0f, "<", 4.0f, &HoveredLeft);
-		if(pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredLeft)
+		m_pInventory->RenderTextRoundRect(vec2(SelectRect.x, SelectRect.y), 2.0f, 10.0f, "<", 4.0f, &HoveredLeft);
+		if(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredLeft)
 			m_InteractiveCount = max(1, m_InteractiveCount - 1);
 
 		// min
 		SelectRect.x -= 20.0f;
-		pInventory->RenderTextRoundRect(vec2(SelectRect.x, SelectRect.y), 2.0f, 10.0f, "MIN", 4.0f, &HoveredMin);
-		if(pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredMin)
+		m_pInventory->RenderTextRoundRect(vec2(SelectRect.x, SelectRect.y), 2.0f, 10.0f, "MIN", 4.0f, &HoveredMin);
+		if(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredMin)
 			m_InteractiveCount = 1;
 
 		// right
-		SelectRect.x = pInventory->m_SlotInteractivePosition.x;
+		SelectRect.x = m_pInventory->m_SlotInteractivePosition.x;
 		SelectRect.x += 10.0f;
-		pInventory->RenderTextRoundRect(vec2(SelectRect.x, SelectRect.y), 2.0f, 10.0f, ">", 4.0f, &HoveredRight);
-		if(pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredRight)
+		m_pInventory->RenderTextRoundRect(vec2(SelectRect.x, SelectRect.y), 2.0f, 10.0f, ">", 4.0f, &HoveredRight);
+		if(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredRight)
 			m_InteractiveCount = min(m_Count, m_InteractiveCount + 1);
 
 		// max
 		SelectRect.x += 20.0f;
-		pInventory->RenderTextRoundRect(vec2(SelectRect.x, SelectRect.y), 2.0f, 10.0f, "MAX", 4.0f, &HoveredMax);
-		if(pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredMax)
+		m_pInventory->RenderTextRoundRect(vec2(SelectRect.x, SelectRect.y), 2.0f, 10.0f, "MAX", 4.0f, &HoveredMax);
+		if(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredMax)
 			m_InteractiveCount = m_Count;
 
 		// information
 		char aNumberBuf[16];
 		str_format(aNumberBuf, sizeof(aNumberBuf), "%d", m_InteractiveCount);
 		SelectRect.HSplitTop(25.0f, 0, &SelectRect);
-		SelectRect.x = pInventory->m_SlotInteractivePosition.x;
-		pInventory->RenderTextRoundRect(vec2(SelectRect.x, SelectRect.y), 3.0f, 16.0f, aNumberBuf, 8.0f);
+		SelectRect.x = m_pInventory->m_SlotInteractivePosition.x;
+		m_pInventory->RenderTextRoundRect(vec2(SelectRect.x, SelectRect.y), 3.0f, 16.0f, aNumberBuf, 8.0f);
 
-		if(pInventory->m_MouseFlag & (MouseEvent::M_LEFT_CLICKED | MouseEvent::M_RIGHT_CLICKED) && !pInventory->UI()->MouseHovered(&InteractiveRect))
-			pInventory->m_InteractiveSlotID = -1;
+		if(m_pInventory->m_MouseFlag & (MouseEvent::M_LEFT_CLICKED | MouseEvent::M_RIGHT_CLICKED) && !m_pInventory->UI()->MouseHovered(&InteractiveRect))
+			m_pInventory->m_InteractiveSlot = nullptr;
 		return;
 	}
 
-	// - - - - - - - -
-	// swap event slots
-	if(pInventory->m_SelectionSlotID == m_SlotID && pInventory->m_MouseFlag & M_LEFT_RELEASE)
-	{
-		if(pInventory->m_HoveredSlotID != -1)
-		{
-			tl_swap(pInventoryActivePage.m_Slot[pInventory->m_SelectionSlotID], pInventoryActivePage.m_Slot[pInventory->m_HoveredSlotID]);
-		}
-		pInventory->m_SelectionSlotID = -1;
-		pInventory->m_HoveredSlotID = -1;
-		return;
-	}
-
-	// - - - - - - - - - - - - - - - -
 	// render information hovered item
-	if(((pInventory->m_HoveredSlotID == m_SlotID && pInventory->m_SelectionSlotID == -1) || pInventory->m_SelectionSlotID == m_SlotID) && !IsEmptySlot())
+	if(((m_pInventory->m_HoveredSlot == this && !m_pInventory->m_SelectionSlot) || m_pInventory->m_SelectionSlot == this) && !IsEmptySlot())
 	{
 		const float FontDescSize = 10.0f;
-		const float TextNameWidth = pInventory->TextRender()->TextWidth(0, FontDescSize, m_aName, -1, -1.0f);
-		const float TextDescWidth = pInventory->TextRender()->TextWidth(0, FontDescSize, m_aDesc, -1, -1.0f);
+		const float TextNameWidth = m_pInventory->TextRender()->TextWidth(0, FontDescSize, m_aName, -1, -1.0f);
+		const float TextDescWidth = m_pInventory->TextRender()->TextWidth(0, FontDescSize, m_aDesc, -1, -1.0f);
 		const float BackgroundWidth = 50.0f + TextNameWidth;
 		const float BackgroundHeight = 25.0f + (float)ceil(TextDescWidth / BackgroundWidth) * FontDescSize;
-		CUIRect Background = { pInventory->m_PositionMouse.x, pInventory->m_PositionMouse.y - BackgroundHeight, BackgroundWidth, BackgroundHeight };
-		pInventory->RenderTools()->DrawRoundRect(&Background, vec4(0.0f, 0.0f, 0.0f, 0.4f), 8.0f);
-		pInventory->TextRender()->Text(nullptr, Background.x, Background.y, 14.0f, m_aName, -1.0f);
+		CUIRect Background = { m_pInventory->m_PositionMouse.x, m_pInventory->m_PositionMouse.y - BackgroundHeight, BackgroundWidth, BackgroundHeight };
+		m_pInventory->RenderTools()->DrawRoundRect(&Background, vec4(0.0f, 0.0f, 0.0f, 0.4f), 8.0f);
+		m_pInventory->TextRender()->Text(nullptr, Background.x, Background.y, 14.0f, m_aName, -1.0f);
 
 		CUIRect Label;
 		CTextCursor Cursor;
 		Background.HSplitTop(15.0f, 0, &Label);
-		pInventory->TextRender()->SetCursor(&Cursor, Label.x, Label.y, FontDescSize, TEXTFLAG_RENDER);
+		m_pInventory->TextRender()->SetCursor(&Cursor, Label.x, Label.y, FontDescSize, TEXTFLAG_RENDER);
 		Cursor.m_LineWidth = Background.w;
 		Cursor.m_MaxLines = ceil(Background.h / FontDescSize);
-		pInventory->TextRender()->TextEx(&Cursor, m_aDesc, -1);
+		m_pInventory->TextRender()->TextEx(&Cursor, m_aDesc, -1);
 	}
+}
 
-	// - - - - - - - - - - - -
-	// render selection slot
-	if(pInventory->m_SelectionSlotID == m_SlotID && !IsEmptySlot())
+// inventory pages
+void CInventory::ScrollInventoryPage(int Page, CUIRect* pHoveredRect)
+{
+	if(pHoveredRect && !UI()->MouseHovered(pHoveredRect) || m_InteractiveSlot != nullptr)
+		return;
+
+	int NewPage = clamp(Page, 0, (int)m_aInventoryPages.size() - 1);
+	if(NewPage != m_ActivePage)
 	{
-		Render(pInventory);
+		m_HoveredSlot = nullptr;
+		m_ActivePage = NewPage;
 	}
 }

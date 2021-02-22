@@ -49,6 +49,7 @@ static CKeyInfo gs_aKeys[] =
 	{ "Add demo marker", "add_demomarker", 0, 0},
 	{ "Toggle sounds", "snd_toggle", 0, 0},
 	{ "Show Hook Collision Line", "+showhookcoll", 0, 0},
+	{ "Inventory MRPG", "toggle_inventory_mrpg", 0, 0},
 };
 
 /*	This is for scripts/update_localization.py to work, don't remove!
@@ -431,7 +432,7 @@ float CMenus::RenderSettingsControlsMisc(CUIRect View)
 {
 	UpdateBindKeys(m_pClient->m_pBinds);
 
-	int NumOptions = 12;
+	int NumOptions = 13;
 	int StartOption = 20;
 	float ButtonHeight = 20.0f;
 	float Spacing = 2.0f;

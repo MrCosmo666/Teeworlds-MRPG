@@ -40,6 +40,7 @@
 #include "components/flow.h"
 #include "components/hud.h"
 #include "components/items.h"
+#include "components/inventory.h"
 #include "components/infomessages.h"
 #include "components/mapimages.h"
 #include "components/maplayers.h"
@@ -108,6 +109,7 @@ static CGameConsole gs_GameConsole;
 static CBinds gs_Binds;
 static CParticles gs_Particles;
 static CMenus gs_Menus;
+static CInventory gs_Inventory;
 static CSkins gs_Skins;
 static CCountryFlags gs_CountryFlags;
 static CFlow gs_Flow;
@@ -251,6 +253,7 @@ void CGameClient::OnConsoleInit()
 	m_pGameConsole = &::gs_GameConsole;
 	m_pParticles = &::gs_Particles;
 	m_pMenus = &::gs_Menus;
+	m_pInventory = &::gs_Inventory;
 
 	//mmotee
 	m_pSkins = &::gs_Skins;
@@ -328,6 +331,7 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(m_pMotd);
 	m_All.Add(m_pMenus);
 	m_All.Add(&m_pMenus->m_Binder);
+	m_All.Add(m_pInventory);
 	m_All.Add(m_pGameConsole);
 
 	// mmotee inputs
@@ -340,6 +344,7 @@ void CGameClient::OnConsoleInit()
 	m_Input.Add(m_pChat); // chat has higher prio due to tha you can quit it by pressing esc
 	m_Input.Add(m_pMotd); // for pressing esc to remove it
 	m_Input.Add(m_pMenus);
+	m_Input.Add(m_pInventory);
 	m_Input.Add(&gs_Spectator);
 	m_Input.Add(&gs_Emoticon);
 	m_Input.Add(m_pControls);

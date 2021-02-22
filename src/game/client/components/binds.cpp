@@ -12,7 +12,7 @@ const int CBinds::s_aaDefaultBindKeys[][2] = {
 	{KEY_MOUSE_WHEEL_UP, 0}, {KEY_MOUSE_WHEEL_DOWN, 0},
 	{'t', 0}, {'y', 0}, {'x', 0},
 	{KEY_F3, 0}, {KEY_F4, 0},
-	{'r', 0},
+	{'r', 0}, {'b', 0},
 };
 const char CBinds::s_aaDefaultBindValues[][32] = {
 	"toggle_local_console", "toggle_remote_console", "+scoreboard", "+stats", "+show_chat", "screenshot", "snd_toggle",
@@ -22,7 +22,7 @@ const char CBinds::s_aaDefaultBindValues[][32] = {
 	"+prevweapon", "+nextweapon",
 	"chat all", "chat team", "chat whisper",
 	"vote yes", "vote no",
-	"ready_change",
+	"ready_change", "toggle_inventory_mrpg"
 };
 
 CBinds::CBinds()
