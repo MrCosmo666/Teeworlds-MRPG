@@ -47,13 +47,6 @@ void CInventorySlot::UpdateEvents()
 
 void CInventorySlot::Render()
 {
-	// hovered
-	if(m_pInventory->m_SelectionSlot != this && !m_pInventory->m_InteractiveSlot)
-	{
-		if(!m_pInventory->UI()->MouseHovered(&m_RectSlot))
-			m_pInventory->RenderTools()->DrawRoundRect(&m_RectSlot, vec4(0.2f, 0.2f, 0.2f, 0.4f), 8.0f);
-	}
-
 	// icon and count near icon
 	if(!IsEmptySlot())
 	{

@@ -158,13 +158,12 @@ void CInventory::RenderInventory()
 	{
 		CUIRect SlotRect = m_InventoryBackground;
 		CalculateSlotPosition(i, &SlotRect);
+		pInventoryActivePage->GetSlot(i)->m_RectSlot = SlotRect;
+	
 		if(!m_InteractiveSlot && UI()->MouseHovered(&SlotRect))
 			RenderTools()->DrawRoundRect(&SlotRect, vec4(0.5f, 0.5f, 0.5f, 0.5f), 8.0f);
 		else
 			RenderTools()->DrawRoundRect(&SlotRect, vec4(0.2f, 0.2f, 0.2f, 0.4f), 8.0f);
-
-		// set positions to every slot on page
-		pInventoryActivePage->GetSlot(i)->m_RectSlot = SlotRect;
 	}
 
 	// render inventory	
