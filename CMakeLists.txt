@@ -700,7 +700,7 @@ list(APPEND TARGETS_OWN engine-shared game-shared)
 if(CLIENT_COMPILE)
   # Sources
   file(GLOB ENGINE_CLIENT "src/engine/client/*.cpp" "src/engine/client/*.h")
-  file(GLOB GAME_CLIENT "src/game/client/*.cpp" "src/game/client/*.h" "src/game/client/components/*.cpp" "src/game/client/components/*.h"  "src/game/client/anim_ui/*.cpp" "src/game/client/anim_ui/*.h")
+  file(GLOB_RECURSE GAME_CLIENT "src/game/client/*.cpp" "src/game/client/*.h")
   file(GLOB GAME_EDITOR "src/game/editor/*.cpp" "src/game/editor/*.h")
   set(GAME_GENERATED_CLIENT src/generated/client_data.cpp src/generated/client_data.h)
   set(CLIENT_SRC ${PLATFORM_CLIENT} ${ENGINE_CLIENT} ${GAME_CLIENT} ${GAME_EDITOR} ${GAME_GENERATED_CLIENT})

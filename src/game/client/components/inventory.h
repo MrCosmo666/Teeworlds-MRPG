@@ -8,71 +8,14 @@
 #include <game/client/component.h>
 #include <game/client/ui.h>
 
-enum
-{
-	MAX_SLOTS_WIDTH = 5,
-	MAX_SLOTS_HEIGHT = 8,
-	MAX_ITEMS_PER_PAGE = MAX_SLOTS_WIDTH * MAX_SLOTS_HEIGHT
-};
-
 class CInventory : public CComponent
 {
-	class InventorySlot
-	{
-		CInventory* m_pInventory;
-
-	public:
-		InventorySlot(CInventory * pInventory) : m_pInventory(pInventory)
-		{
-			m_SlotID = 0;
-			m_ItemID = 0;
-			m_Count = 0;
-			m_aIcon[0] = '\0';
-			m_RectSlot = CUIRect();
-			m_InteractiveCount = 1;
-		}
-		char m_aName[64];
-		char m_aDesc[256];
-		char m_aIcon[64];
-
-		int m_Page;
-		int m_SlotID;
-		int m_ItemID;
-		int m_Count;
-		int m_InteractiveCount;
-		CUIRect m_RectSlot;
-
-		// render
-		void Render();
-		void PostRender();
-
-		// functions
-		bool IsEmptySlot() const { return m_ItemID <= 0 || m_Count <= 0 || m_aIcon[0] == '\0'; }
-		const char* GetHovoredDesc() const { return m_aDesc; }
-
-		// main
-		void InitSlot(InventorySlot pItemSlot)
-		{
-			std::swap(*this, pItemSlot);
-		}
-	};
-
-	class CInventoryPage
-	{
-		CInventory* m_pInventory;
-
-	public:
-		CInventoryPage(CInventory *pInventory, int Page) : m_pInventory(pInventory)
-		{
-			for(int i = 0; i < MAX_ITEMS_PER_PAGE; i++)
-			{
-				m_Slot[i] = new InventorySlot(pInventory);
-				m_Slot[i]->m_Page = Page;
-			}
-		};
-
-		InventorySlot* m_Slot[MAX_ITEMS_PER_PAGE];
-	};
+	friend class CInventorySlot;
+	friend class CInventoryPage;
+	CInventorySlot* m_HoveredSlot;
+	CInventorySlot* m_SelectionSlot;
+	CInventorySlot* m_InteractiveSlot;
+	std::map < int, CInventoryPage* > m_aInventoryPages;
 
 	bool m_Active;
 	vec2 m_PositionMouse;
@@ -85,20 +28,15 @@ class CInventory : public CComponent
 	int m_MouseFlag;
 
 	// control inventory
+	CInventorySlot& FindSlot(int ItemID);
+
 	int m_ActivePage;
-
-	InventorySlot *m_HoveredSlot;
-	InventorySlot *m_SelectionSlot;
-	InventorySlot *m_InteractiveSlot;
-
 	vec2 m_SlotInteractivePosition;
-	std::map < int , CInventoryPage* > m_aInventoryPages;
 
 public:
 	CInventory();
 	bool IsActive() const { return m_Active; }
 
-	InventorySlot &FindSlot(int ItemID);
 	void AddItem(int ItemID, int Count, const char* pName, const char* pDesc, const char* pIcon);
 
 	// events
