@@ -3,22 +3,22 @@
 #ifndef GAME_CLIENT_COMPONENTS_INVENTORY_PAGE_H
 #define GAME_CLIENT_COMPONENTS_INVENTORY_PAGE_H
 
-enum
-{
-	MAX_SLOTS_WIDTH = 5,
-	MAX_SLOTS_HEIGHT = 8,
-	MAX_ITEMS_PER_PAGE = MAX_SLOTS_WIDTH * MAX_SLOTS_HEIGHT
-};
+#include <base/tl/array.h>
 
 class CInventoryPage
 {
 	class CInventory* m_pInventory;
-	class CInventorySlot* m_Slot[MAX_ITEMS_PER_PAGE];
+	class CInventoryList* m_pInventoryList;
+	array<CInventorySlot*> m_Slot;
 
 public:
-	CInventoryPage(CInventory* pInventory, int Page);
+	CInventoryPage(CInventory* pInventory, CInventoryList* pInventoryList, int Page);
+	~CInventoryPage();
 
-	CInventorySlot*GetSlot(int SlotID) const { return m_Slot[SlotID]; }
+	CInventorySlot *GetSlot(int SlotID) const { return m_Slot[SlotID]; }
+
+	void Render();
+	void CalculateSlotPosition(int SlotID, CUIRect* SlotRect);
 };
 
 #endif

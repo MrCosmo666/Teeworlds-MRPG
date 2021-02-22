@@ -6,13 +6,13 @@
 #include <game/client/components/menus.h>
 #include <game/client/components/inventory.h>
 
+#include "inv_list.h"
 #include "inv_page.h"
 #include "inv_slot.h"
 
-CInventorySlot::CInventorySlot(CInventory* pInventory)
-: m_pInventory(pInventory)
+CInventorySlot::CInventorySlot(CInventory* pInventory, CInventoryList* pInventoryList, int Page, int SlotID)
+: m_pInventory(pInventory), m_pInventoryList(pInventoryList), m_SlotID(SlotID), m_Page(Page)
 {
-	m_SlotID = 0;
 	m_ItemID = 0;
 	m_Count = 0;
 	m_aIcon[0] = '\0';
@@ -22,23 +22,23 @@ CInventorySlot::CInventorySlot(CInventory* pInventory)
 
 void CInventorySlot::UpdateEvents()
 {
-	if(m_pInventory->m_InteractiveSlot)
+	if(m_pInventoryList->GetInteractiveSlot())
 		return;
 
 	// update hovered and selection and interactive slots
 	if(m_pInventory->UI()->MouseHovered(&m_RectSlot))
 	{
-		m_pInventory->m_HoveredSlot = this;
+		m_pInventoryList->SetHoveredSlot(this);
 		if(!IsEmptySlot())
 		{
 			if(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED)
 			{
-				m_pInventory->m_SelectionSlot = this;
+				m_pInventoryList->SetSelectedSlot(this);
 			}
 			else if(m_pInventory->m_MouseFlag & MouseEvent::M_RIGHT_CLICKED)
 			{
-				m_pInventory->m_InteractiveSlot = this;
-				m_pInventory->m_SlotInteractivePosition = m_pInventory->m_PositionMouse;
+				m_pInventoryList->SetInteractiveSlot(this);
+				m_pInventoryList->m_SlotInteractivePosition = m_pInventory->m_PositionMouse;
 				m_InteractiveCount = min(m_InteractiveCount, m_Count);
 			}
 		}
@@ -59,9 +59,10 @@ void CInventorySlot::Render()
 
 void CInventorySlot::OnInteractiveSlot()
 {
-	if(m_pInventory->m_InteractiveSlot != this)
+	if(m_pInventoryList->GetInteractiveSlot() != this)
 		return;
 
+	/*
 	static float Space = 20.0f;
 	CUIRect InteractiveRect = m_pInventory->m_Screen;
 	vec2 Position = vec2(m_pInventory->m_SlotInteractivePosition.x, m_pInventory->m_SlotInteractivePosition.y);
@@ -146,11 +147,12 @@ void CInventorySlot::OnInteractiveSlot()
 
 	if(m_pInventory->m_MouseFlag & (MouseEvent::M_LEFT_CLICKED | MouseEvent::M_RIGHT_CLICKED) && !m_pInventory->UI()->MouseHovered(&InteractiveRect))
 		m_pInventory->m_InteractiveSlot = nullptr;
+	*/
 }
 
 void CInventorySlot::OnSelectedSlot()
 {
-	if(m_pInventory->m_SelectionSlot != this)
+	if(m_pInventoryList->GetSelectedSlot() != this)
 		return;
 
 	// selected slot move to mouse
@@ -166,18 +168,18 @@ void CInventorySlot::OnSelectedSlot()
 	// swap event slots
 	if(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_RELEASE)
 	{
-		if(m_pInventory->m_HoveredSlot)
-			tl_swap(*m_pInventory->m_SelectionSlot, *m_pInventory->m_HoveredSlot);
-		m_pInventory->m_SelectionSlot = nullptr;
+		if(m_pInventoryList->GetHoveredSlot())
+			tl_swap(*m_pInventoryList->GetSelectedSlot(), *m_pInventoryList->GetHoveredSlot());
+		m_pInventoryList->SetSelectedSlot(nullptr);
 	}
 }
 
 void CInventorySlot::OnHoveredSlot()
 {
-	if(m_pInventory->m_HoveredSlot != this)
+	if(m_pInventoryList->GetHoveredSlot() != this)
 		return;
 
-	if(!m_pInventory->m_SelectionSlot && !IsEmptySlot())
+	if(!IsEmptySlot())
 	{
 		const float FontDescSize = 10.0f;
 		const float TextNameWidth = m_pInventory->TextRender()->TextWidth(0, FontDescSize, m_aName, -1, -1.0f);

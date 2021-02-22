@@ -22,16 +22,17 @@ static int SpacingSlot = 3.0f;
 
 class CInventorySlot
 {
-	CInventory* m_pInventory;
+	int m_Page;
+	int m_SlotID;
+	class CInventory* m_pInventory;
+	class CInventoryList* m_pInventoryList;
 
 public:
-	CInventorySlot(CInventory* pInventory);
+	CInventorySlot(CInventory* pInventory, CInventoryList* pInventoryList, int Page, int SlotID);
 	char m_aName[64];
 	char m_aDesc[256];
 	char m_aIcon[64];
 
-	int m_Page;
-	int m_SlotID;
 	int m_ItemID;
 	int m_Count;
 	int m_InteractiveCount;
