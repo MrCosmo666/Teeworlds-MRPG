@@ -10,7 +10,8 @@
 #include "inv_slot.h"
 #include "inv_list.h"
 
-CInventoryList::CInventoryList(CInventory* pInventory, CUIRect& pMainView, int MaxSlotsWidth, int MaxSlotsHeight) : m_pInventory(pInventory)
+CInventoryList::CInventoryList(CInventory* pInventory, const char *pInventoryListName, CUIRect& pMainView, int MaxSlotsWidth, int MaxSlotsHeight) 
+	: m_pInventory(pInventory)
 {
 	m_WindowSkipX = 0.0f;
 	m_ActiveWindow = false;
@@ -24,123 +25,85 @@ CInventoryList::CInventoryList(CInventory* pInventory, CUIRect& pMainView, int M
 	m_MainView.y = max(pMainView.y, 20.0f);
 	m_MainView.w = ((BoxSize + SpacingSlot) * (MaxSlotsWidth + 1)) - (SpacingSlot * 2.0f);
 	m_MainView.h = ((BoxSize + SpacingSlot) * (MaxSlotsHeight + 2)) - (SpacingSlot * 2.0f);
+	str_copy(m_aInventoryListName, pInventoryListName, sizeof(m_aInventoryListName));
 
 	// by default, the first page should exist
 	m_aInventoryPages[0] = new CInventoryPage(m_pInventory, this, 0);
 
 	// test
 	int ID = 0;
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
-	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, random_int()%1500, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, random_int() % 1500, "Hello suka", "Info tipo blea", "ignot_g");
 }
 
 CInventoryList::~CInventoryList()
@@ -155,6 +118,7 @@ void CInventoryList::WindowRender()
 	// hovered window
 	CUIRect Bordure = m_MainView;
 	Bordure.h = 24.0f;
+
 	if(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && m_pInventory->UI()->MouseInside(&Bordure))
 	{
 		m_ActiveWindow = true;
@@ -183,8 +147,28 @@ void CInventoryList::WindowRender()
 	}
 
 	// background
-	m_pInventory->RenderTools()->DrawRoundRect(&m_MainView, vec4(0.4f, 0.4f, 0.4f, 0.85f), 16.0f);
-	m_pInventory->RenderTools()->DrawUIRect(&Bordure, vec4(0.0f, 0.0f, 0.0f, 1.0f), CUI::CORNER_T, 12.0f);
+	CUIRect MoreBackground = m_MainView;
+	MoreBackground.Margin(5.0f, &MoreBackground);
+	m_pInventory->RenderTools()->DrawRoundRect(&MoreBackground, vec4(0.3f, 0.3f, 0.3f, 0.9f), 16.0f);
+	m_pInventory->RenderTools()->DrawRoundRect(&m_MainView, vec4(0.1f, 0.1f, 0.1f, 0.50f), 16.0f);
+	m_pInventory->RenderTools()->DrawRoundRect(&Bordure, vec4(0.4f, 0.4f, 0.4f, 1.0f), 12.0f);
+
+	// name
+	m_pInventory->UI()->DoLabel(&Bordure, m_aInventoryListName, 16.0f, CUI::EAlignment::ALIGN_CENTER, -1.0f);
+
+	// close
+	CUIRect Button;
+	Bordure.VSplitRight(24.0f, 0, &Button);
+	static CMenus::CButtonContainer s_CloseButton;
+	vec4 Color = mix(vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.7f, 0.1f, 0.1f, 0.75f), s_CloseButton.GetFade());
+	m_pInventory->RenderTools()->DrawUIRect(&Button, Color, CUI::CORNER_ALL, 12.0f);
+	m_pInventory->UI()->DoLabel(&Button, "\xE2\x9C\x95", 18.0f, CUI::ALIGN_CENTER);
+	m_pInventory->UI()->DoButtonLogic(s_CloseButton.GetID(), &Button);
+	if(m_pInventory->UI()->GetActiveItem() == s_CloseButton.GetID())
+	{
+		dbg_msg("test", "heree");
+		m_Openned = false;
+	}
 }
 
 void CInventoryList::Render()
@@ -223,31 +207,42 @@ void CInventoryList::RenderSelectionPage()
 	bool HoveredLeft;
 	bool HoveredRight;
 	static float FontSize = 16.0f;
+	static float FontDescSize = 10.0f;
 	static float SpaceOption = 32.0f;
 
-	char aPageBuf[16];
-	str_format(aPageBuf, sizeof(aPageBuf), "%d", (m_ActivePage + 1));
-	float tw = m_pInventory->TextRender()->TextWidth(0, FontSize, aPageBuf, -1, -1.0f);
-
-	// left
 	CUIRect SelectionRect = m_MainView;
 	SelectionRect.HSplitBottom((float)BoxSize, 0, &SelectionRect);
-	SelectionRect.VMargin((float)(m_MainView.w / 2.0f) - ((tw / 2.0f) + SpaceOption), &SelectionRect);
-	RenderTextRoundRect(vec2(SelectionRect.x, SelectionRect.y), 0.0f, FontSize, "<", 6.0f, &HoveredLeft);
-	if((m_pInventory->m_MouseFlag & MouseEvent::M_WHEEL_DOWN && m_pInventory->UI()->MouseInside(&m_MainView))
+	SelectionRect.VMargin((float)(m_MainView.w / 2.0f) - SpaceOption, &SelectionRect);
+	{ // left arrow
+
+		RenderTextRoundRect(vec2(SelectionRect.x, SelectionRect.y), 0.0f, FontSize, "<", 6.0f, &HoveredLeft);
+		if((m_pInventory->m_MouseFlag & MouseEvent::M_WHEEL_DOWN && m_pInventory->UI()->MouseInside(&m_MainView))
 			|| (m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredLeft && !m_InteractiveSlot))
-		ScrollInventoryPage(m_ActivePage - 1);
+			ScrollInventoryPage(m_ActivePage - 1);
+	}
 
-	// information
-	SelectionRect.x += SpaceOption;
-	RenderTextRoundRect(vec2(SelectionRect.x, SelectionRect.y), 1.0f, FontSize, aPageBuf, 6.0f);
+	{ // information
 
-	// right
-	SelectionRect.x += SpaceOption;
-	RenderTextRoundRect(vec2(SelectionRect.x, SelectionRect.y), 0.0f, FontSize, ">", 6.0f, &HoveredRight);
-	if((m_pInventory->m_MouseFlag & MouseEvent::M_WHEEL_UP && m_pInventory->UI()->MouseInside(&m_MainView)) ||
-		(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredRight && !m_InteractiveSlot))
-		ScrollInventoryPage(m_ActivePage + 1);
+		CUIRect Label = SelectionRect;
+
+		char aPageBuf[16];
+		str_format(aPageBuf, sizeof(aPageBuf), "%d", (m_ActivePage + 1));
+		m_pInventory->UI()->DoLabel(&Label, aPageBuf, FontSize, CUI::EAlignment::ALIGN_CENTER);
+
+		Label.HSplitBottom((float)20.0f, 0, &Label);
+		m_pInventory->TextRender()->TextColor(0.85f, 0.85f, 0.85f, 0.85f);
+		m_pInventory->UI()->DoLabel(&Label, "Can scroll with the mouse wheel.", FontDescSize, CUI::EAlignment::ALIGN_CENTER);
+		m_pInventory->TextRender()->TextColor(CUI::ms_DefaultTextColor);
+	}
+
+	SelectionRect.x += (SpaceOption * 2.0f); 
+	{ // right arrow
+		
+		RenderTextRoundRect(vec2(SelectionRect.x, SelectionRect.y), 0.0f, FontSize, ">", 6.0f, &HoveredRight);
+		if((m_pInventory->m_MouseFlag & MouseEvent::M_WHEEL_UP && m_pInventory->UI()->MouseInside(&m_MainView)) ||
+			(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredRight && !m_InteractiveSlot))
+			ScrollInventoryPage(m_ActivePage + 1);
+	}
 }
 
 
@@ -298,12 +293,12 @@ void CInventoryList::RenderTextRoundRect(vec2 Position, float Margin, float Font
 	{
 		*pHovored = m_pInventory->UI()->MouseHovered(&Rect);
 		if(*pHovored)
-			m_pInventory->RenderTools()->DrawRoundRect(&Rect, vec4(0.2f, 0.2f, 0.2f, 0.4f), Rounding);
+			m_pInventory->RenderTools()->DrawRoundRect(&Rect, vec4(0.5f, 0.5f, 0.5f, 0.4f), Rounding);
 		else
-			m_pInventory->RenderTools()->DrawRoundRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.4f), Rounding);
+			m_pInventory->RenderTools()->DrawRoundRect(&Rect, vec4(0.1f, 0.1f, 0.1f, 0.4f), Rounding);
 	}
 	else
-		m_pInventory->RenderTools()->DrawRoundRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.2f), Rounding);
+		m_pInventory->RenderTools()->DrawRoundRect(&Rect, vec4(0.1f, 0.1f, 0.1f, 0.2f), Rounding);
 
 	Rect.Margin(Margin, &Rect);
 	m_pInventory->TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.1f);

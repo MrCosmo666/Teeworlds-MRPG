@@ -40,9 +40,9 @@ void CInventoryPage::Render()
 
 		CalculateSlotPosition(i, &SlotRect);
 		if(!m_pInventoryList->GetInteractiveSlot() && m_pInventory->UI()->MouseHovered(&SlotRect))
-			m_pInventory->RenderTools()->DrawRoundRect(&SlotRect, vec4(0.5f, 0.5f, 0.5f, 0.5f), 8.0f);
+			m_pInventory->RenderTools()->DrawRoundRect(&SlotRect, vec4(0.7f, 0.7f, 0.7f, 0.5f), 8.0f);
 		else
-			m_pInventory->RenderTools()->DrawRoundRect(&SlotRect, vec4(0.2f, 0.2f, 0.2f, 0.4f), 8.0f);
+			m_pInventory->RenderTools()->DrawRoundRect(&SlotRect, vec4(0.35f, 0.35f, 0.35f, 0.4f), 8.0f);
 
 		m_Slot[i]->m_RectSlot = SlotRect;
 	}

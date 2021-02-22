@@ -36,6 +36,7 @@ void CInventory::OnRender()
 
 	// render inventory
 	m_pCraftItems->Render();
+	m_pOtherItems->Render();
 
 	// render cursor
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CURSOR].m_Id);
@@ -95,7 +96,8 @@ void CInventory::OnInit()
 	m_ScreenRestriction = *UI()->Screen();
 	m_Active = true;
 
-	m_pCraftItems = new CInventoryList(this, m_ScreenRestriction, 5, 6);
+	m_pCraftItems = new CInventoryList(this, "Craft items", m_ScreenRestriction, 5, 6);
+	m_pOtherItems = new CInventoryList(this, "Other items", m_ScreenRestriction, 8, 4);
 }
 
 bool CInventory::OnInput(IInput::CEvent Event)

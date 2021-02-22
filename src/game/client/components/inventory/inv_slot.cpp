@@ -52,7 +52,7 @@ void CInventorySlot::Render()
 	if(!IsEmptySlot())
 	{
 		char aCountBuf[32];
-		str_format(aCountBuf, sizeof(aCountBuf), "%d%s %d", min(999, m_Count), (m_Count > 999 ? "+" : "\0"), m_Page);
+		str_format(aCountBuf, sizeof(aCountBuf), "%d%s", min(999, m_Count), (m_Count > 999 ? "+" : "\0"));
 		m_pInventory->m_pClient->m_pMenus->DoItemIcon(m_aIcon, m_RectSlot, BoxSize);
 		m_pInventory->TextRender()->Text(0x0, m_RectSlot.x, m_RectSlot.y, 10.0f, aCountBuf, -1.0f);
 	}

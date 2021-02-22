@@ -9,6 +9,7 @@
 class CInventoryList
 {
 	// basic
+	char m_aInventoryListName[64];
 	float m_WindowSkipX;
 	float m_WindowSkipY;
 	bool m_ActiveWindow;
@@ -31,7 +32,7 @@ class CInventoryList
 	void WindowRender();
 
 public:
-	CInventoryList(CInventory* pInventory, CUIRect& pMainView, int MaxSlotsWidth, int MaxSlotsHeight);
+	CInventoryList(CInventory* pInventory, const char* pInventoryListName, CUIRect& pMainView, int MaxSlotsWidth, int MaxSlotsHeight);
 	~CInventoryList();
 
 	vec2 m_SlotInteractivePosition;
