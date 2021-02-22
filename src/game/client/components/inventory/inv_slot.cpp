@@ -29,6 +29,7 @@ void CInventorySlot::UpdateEvents()
 	if(m_pInventory->UI()->MouseHovered(&m_RectSlot))
 	{
 		m_pInventoryList->SetHoveredSlot(this);
+
 		if(!IsEmptySlot())
 		{
 			if(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED)
@@ -52,7 +53,7 @@ void CInventorySlot::Render()
 	{
 		char aCountBuf[32];
 		str_format(aCountBuf, sizeof(aCountBuf), "%d%s %d", min(999, m_Count), (m_Count > 999 ? "+" : "\0"), m_Page);
-		m_pInventory->m_pClient->m_pMenus->DoItemIcon(m_aIcon, m_RectSlot, 32.0f);
+		m_pInventory->m_pClient->m_pMenus->DoItemIcon(m_aIcon, m_RectSlot, BoxSize);
 		m_pInventory->TextRender()->Text(0x0, m_RectSlot.x, m_RectSlot.y, 10.0f, aCountBuf, -1.0f);
 	}
 }
@@ -62,16 +63,16 @@ void CInventorySlot::OnInteractiveSlot()
 	if(m_pInventoryList->GetInteractiveSlot() != this)
 		return;
 
-	/*
 	static float Space = 20.0f;
-	CUIRect InteractiveRect = m_pInventory->m_Screen;
-	vec2 Position = vec2(m_pInventory->m_SlotInteractivePosition.x, m_pInventory->m_SlotInteractivePosition.y);
-	InteractiveRect.w = 150.0f;
-	InteractiveRect.h = 120.0f;
-	InteractiveRect.x = m_pInventory->m_SlotInteractivePosition.x - (InteractiveRect.w / 2.0f);
-	InteractiveRect.y = m_pInventory->m_SlotInteractivePosition.y;
-	m_pInventory->RenderTools()->DrawRoundRect(&InteractiveRect, vec4(0.1f, 0.1f, 0.1f, 0.8f), 16.0f);
+	CUIRect BackgroundRect = m_pInventoryList->GetMainViewRect();
 
+	BackgroundRect.w = 150.0f;
+	BackgroundRect.h = 120.0f;
+	BackgroundRect.x = m_pInventoryList->m_SlotInteractivePosition.x - (BackgroundRect.w / 2.0f);
+	BackgroundRect.y = m_pInventoryList->m_SlotInteractivePosition.y;
+	m_pInventory->RenderTools()->DrawRoundRect(&BackgroundRect, vec4(0.1f, 0.1f, 0.1f, 0.8f), 16.0f);
+
+	/*
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "Interaction with %s", m_aName);
 	m_pInventory->RenderTextRoundRect(Position, 2.0f, 12.0f, aBuf, 5.0f);
@@ -144,10 +145,9 @@ void CInventorySlot::OnInteractiveSlot()
 	SelectRect.HSplitTop(25.0f, 0, &SelectRect);
 	SelectRect.x = m_pInventory->m_SlotInteractivePosition.x;
 	m_pInventory->RenderTextRoundRect(vec2(SelectRect.x, SelectRect.y), 3.0f, 16.0f, aNumberBuf, 8.0f);
-
-	if(m_pInventory->m_MouseFlag & (MouseEvent::M_LEFT_CLICKED | MouseEvent::M_RIGHT_CLICKED) && !m_pInventory->UI()->MouseHovered(&InteractiveRect))
-		m_pInventory->m_InteractiveSlot = nullptr;
 	*/
+	if(m_pInventory->m_MouseFlag & (MouseEvent::M_LEFT_CLICKED | MouseEvent::M_RIGHT_CLICKED) && !m_pInventory->UI()->MouseHovered(&BackgroundRect))
+		m_pInventoryList->SetInteractiveSlot(nullptr);
 }
 
 void CInventorySlot::OnSelectedSlot()

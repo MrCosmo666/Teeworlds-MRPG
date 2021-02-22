@@ -95,7 +95,7 @@ void CInventory::OnInit()
 	m_ScreenRestriction = *UI()->Screen();
 	m_Active = true;
 
-	m_pCraftItems = new CInventoryList(this, m_ScreenRestriction, 10, 5);
+	m_pCraftItems = new CInventoryList(this, m_ScreenRestriction, 5, 6);
 }
 
 bool CInventory::OnInput(IInput::CEvent Event)
@@ -131,15 +131,14 @@ bool CInventory::OnInput(IInput::CEvent Event)
 		}
 		return true;
 	}
-	// scroll pages
 	else if(Event.m_Key == KEY_MOUSE_WHEEL_UP)
 	{
-		// ScrollInventoryPage(m_ActivePage + 1);
+		m_MouseFlag |= M_WHEEL_UP;
 		return true;
 	}
 	else if(Event.m_Key == KEY_MOUSE_WHEEL_DOWN)
 	{
-		// ScrollInventoryPage(m_ActivePage - 1);
+		m_MouseFlag |= M_WHEEL_DOWN;
 		return true;
 	}
 	return false;

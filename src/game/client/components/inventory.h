@@ -41,6 +41,7 @@ public:
 	void RenderInventory();
 
 	// inventory list
+	class CButtonContainer* pButtonBordour;
 	class CInventoryList *m_pCraftItems;
 };
 

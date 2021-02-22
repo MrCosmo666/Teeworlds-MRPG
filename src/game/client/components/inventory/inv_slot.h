@@ -7,17 +7,18 @@
 
 enum MouseEvent
 {
-	M_LEFT_CLICKED = 1,
-	M_LEFT_RELEASE = 2,
-	M_LEFT_PRESSED = 4,
-	M_RIGHT_CLICKED = 8,
-	M_RIGHT_RELEASE = 16,
-	M_RIGHT_PRESSED = 32,
+	M_LEFT_CLICKED = 1 << 0,
+	M_LEFT_RELEASE = 1 << 1,
+	M_LEFT_PRESSED = 1 << 2,
+	M_RIGHT_CLICKED = 1 << 3,
+	M_RIGHT_RELEASE = 1 << 4,
+	M_RIGHT_PRESSED = 1 << 5,
+	M_WHEEL_UP = 1 << 6,
+	M_WHEEL_DOWN = 1 << 7,
 };
 
 // basic set of variables for configuration
-static float BoxWidth = 32.0f;
-static float BoxHeight = 32.0f;
+static float BoxSize = 40.0f;
 static int SpacingSlot = 3.0f;
 
 class CInventorySlot

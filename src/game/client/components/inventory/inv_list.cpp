@@ -10,15 +10,20 @@
 #include "inv_slot.h"
 #include "inv_list.h"
 
-CInventoryList::CInventoryList(CInventory* pInventory, CUIRect &pMainView, int MaxSlotsWidth, int MaxSlotsHeight) : m_pInventory(pInventory)
+CInventoryList::CInventoryList(CInventory* pInventory, CUIRect& pMainView, int MaxSlotsWidth, int MaxSlotsHeight) : m_pInventory(pInventory)
 {
+	m_WindowSkipX = 0.0f;
+	m_ActiveWindow = false;
 	m_ActivePage = 0;
 	m_HoveredSlot = nullptr;
 	m_SelectionSlot = nullptr;
 	m_InteractiveSlot = nullptr;
 	m_MaxSlotsWidth = MaxSlotsWidth;
 	m_MaxSlotsHeight = MaxSlotsHeight;
-	m_MainView = { pMainView.x, pMainView.y, (BoxWidth + SpacingSlot) * MaxSlotsWidth, (BoxHeight + SpacingSlot) * MaxSlotsHeight };
+	m_MainView = pMainView;
+	m_MainView.y = max(pMainView.y, 20.0f);
+	m_MainView.w = ((BoxSize + SpacingSlot) * (MaxSlotsWidth + 1)) - (SpacingSlot * 2.0f);
+	m_MainView.h = ((BoxSize + SpacingSlot) * (MaxSlotsHeight + 2)) - (SpacingSlot * 2.0f);
 
 	// by default, the first page should exist
 	m_aInventoryPages[0] = new CInventoryPage(m_pInventory, this, 0);
@@ -70,6 +75,72 @@ CInventoryList::CInventoryList(CInventory* pInventory, CUIRect &pMainView, int M
 	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
 	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
 	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_r");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_b");
+	AddItem(++ID, 1000, "Hello suka", "Info tipo blea", "ignot_g");
 }
 
 CInventoryList::~CInventoryList()
@@ -79,16 +150,49 @@ CInventoryList::~CInventoryList()
 	m_aInventoryPages.clear();
 }
 
+void CInventoryList::WindowRender()
+{
+	// hovered window
+	CUIRect Bordure = m_MainView;
+	Bordure.h = 24.0f;
+	if(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && m_pInventory->UI()->MouseInside(&Bordure))
+	{
+		m_ActiveWindow = true;
+		m_WindowSkipX = (m_pInventory->m_PositionMouse.x - m_MainView.x);
+		m_WindowSkipY = (m_pInventory->m_PositionMouse.y - m_MainView.y);
+	}
+	else if(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_RELEASE)
+	{
+		m_ActiveWindow = false;
+		m_WindowSkipX = 0.0f;
+		m_WindowSkipY = 0.0f;
+	}
+
+	if(m_ActiveWindow)
+	{
+		float NewPositionX = m_pInventory->m_PositionMouse.x - m_WindowSkipX;
+		float NewPositionY = m_pInventory->m_PositionMouse.y - m_WindowSkipY;
+		NewPositionX = clamp(NewPositionX, 0.0f, m_pInventory->m_ScreenRestriction.w - m_MainView.w);
+		NewPositionY = clamp(NewPositionY, 0.0f, m_pInventory->m_ScreenRestriction.h - m_MainView.h);
+
+		m_MainView.x = NewPositionX;
+		m_MainView.y = NewPositionY;
+		Bordure.x = NewPositionX;
+		Bordure.y = NewPositionY;
+		m_pInventory->m_PositionMouse = vec2(m_MainView.x + m_WindowSkipX, m_MainView.y + m_WindowSkipY);
+	}
+
+	// background
+	m_pInventory->RenderTools()->DrawRoundRect(&m_MainView, vec4(0.4f, 0.4f, 0.4f, 0.85f), 16.0f);
+	m_pInventory->RenderTools()->DrawUIRect(&Bordure, vec4(0.0f, 0.0f, 0.0f, 1.0f), CUI::CORNER_T, 12.0f);
+}
+
 void CInventoryList::Render()
 {
 	if(!m_Openned)
 		return;
 
-	// background
-	CUIRect Bordure;
-	m_MainView.HSplitMid(&Bordure, 0, 200.0f);
-	m_pInventory->RenderTools()->DrawRoundRect(&Bordure, vec4(0.6f, 0.4f, 0.4f, 0.7f), 16.0f);
-	m_pInventory->RenderTools()->DrawRoundRect(&m_MainView, vec4(0.4f, 0.4f, 0.4f, 0.7f), 16.0f);
+	WindowRender();
 
 	// render pages
 	CInventoryPage* pInventoryActivePage = m_aInventoryPages[m_ActivePage];
@@ -96,18 +200,7 @@ void CInventoryList::Render()
 		return;
 
 	pInventoryActivePage->Render();
-	RenderSelectionPage(m_MainView);
-
-	// render inventory	
-	for(int i = 0; i < GetPageMaxSlots(); i++)
-	{
-		CInventorySlot* pSlot = pInventoryActivePage->GetSlot(i);
-		if(!pSlot || m_SelectionSlot == pSlot)
-			continue;
-
-		pInventoryActivePage->GetSlot(i)->Render();
-		pInventoryActivePage->GetSlot(i)->UpdateEvents();
-	}
+	RenderSelectionPage();
 
 	// on hovered slot
 	if(m_HoveredSlot)
@@ -120,31 +213,40 @@ void CInventoryList::Render()
 	// on selected slot
 	if(m_SelectionSlot)
 		m_SelectionSlot->OnSelectedSlot();
+
+	// reset hovered item
+	SetHoveredSlot(nullptr);
 }
 
-void CInventoryList::RenderSelectionPage(CUIRect MainView)
+void CInventoryList::RenderSelectionPage()
 {
 	bool HoveredLeft;
 	bool HoveredRight;
+	static float FontSize = 16.0f;
+	static float SpaceOption = 32.0f;
+
+	char aPageBuf[16];
+	str_format(aPageBuf, sizeof(aPageBuf), "%d", (m_ActivePage + 1));
+	float tw = m_pInventory->TextRender()->TextWidth(0, FontSize, aPageBuf, -1, -1.0f);
 
 	// left
-	CUIRect SelectRect = MainView;
-	SelectRect.HSplitTop(BoxHeight * m_MaxSlotsHeight + 30.0f, 0, &SelectRect);
-	SelectRect.VMargin((BoxWidth * m_MaxSlotsWidth) / 2.0f - 20.0f, &SelectRect);
-	RenderTextRoundRect(vec2(SelectRect.x, SelectRect.y), 2.0f, 12.0f, "<", 6.0f, &HoveredLeft);
-	if(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredLeft && !m_InteractiveSlot)
+	CUIRect SelectionRect = m_MainView;
+	SelectionRect.HSplitBottom((float)BoxSize, 0, &SelectionRect);
+	SelectionRect.VMargin((float)(m_MainView.w / 2.0f) - ((tw / 2.0f) + SpaceOption), &SelectionRect);
+	RenderTextRoundRect(vec2(SelectionRect.x, SelectionRect.y), 0.0f, FontSize, "<", 6.0f, &HoveredLeft);
+	if((m_pInventory->m_MouseFlag & MouseEvent::M_WHEEL_DOWN && m_pInventory->UI()->MouseInside(&m_MainView))
+			|| (m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredLeft && !m_InteractiveSlot))
 		ScrollInventoryPage(m_ActivePage - 1);
 
 	// information
-	char aPageBuf[16];
-	str_format(aPageBuf, sizeof(aPageBuf), "%d", (m_ActivePage + 1));
-	SelectRect.VSplitLeft(25.0f, 0, &SelectRect);
-	RenderTextRoundRect(vec2(SelectRect.x, SelectRect.y), 3.0f, 12.0f, aPageBuf, 6.0f);
+	SelectionRect.x += SpaceOption;
+	RenderTextRoundRect(vec2(SelectionRect.x, SelectionRect.y), 1.0f, FontSize, aPageBuf, 6.0f);
 
 	// right
-	SelectRect.VSplitLeft(25.0f, 0, &SelectRect);
-	RenderTextRoundRect(vec2(SelectRect.x, SelectRect.y), 2.0f, 12.0f, ">", 6.0f, &HoveredRight);
-	if(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredRight && !m_InteractiveSlot)
+	SelectionRect.x += SpaceOption;
+	RenderTextRoundRect(vec2(SelectionRect.x, SelectionRect.y), 0.0f, FontSize, ">", 6.0f, &HoveredRight);
+	if((m_pInventory->m_MouseFlag & MouseEvent::M_WHEEL_UP && m_pInventory->UI()->MouseInside(&m_MainView)) ||
+		(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredRight && !m_InteractiveSlot))
 		ScrollInventoryPage(m_ActivePage + 1);
 }
 
@@ -196,12 +298,12 @@ void CInventoryList::RenderTextRoundRect(vec2 Position, float Margin, float Font
 	{
 		*pHovored = m_pInventory->UI()->MouseHovered(&Rect);
 		if(*pHovored)
-			m_pInventory->RenderTools()->DrawRoundRect(&Rect, vec4(0.2f, 0.2f, 0.2f, 0.5f), Rounding);
+			m_pInventory->RenderTools()->DrawRoundRect(&Rect, vec4(0.2f, 0.2f, 0.2f, 0.4f), Rounding);
 		else
-			m_pInventory->RenderTools()->DrawRoundRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.5f), Rounding);
+			m_pInventory->RenderTools()->DrawRoundRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.4f), Rounding);
 	}
 	else
-		m_pInventory->RenderTools()->DrawRoundRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.5f), Rounding);
+		m_pInventory->RenderTools()->DrawRoundRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.2f), Rounding);
 
 	Rect.Margin(Margin, &Rect);
 	m_pInventory->TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.1f);

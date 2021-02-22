@@ -34,7 +34,10 @@ void CInventoryPage::Render()
 	// empty grid
 	for(int i = 0; i < m_pInventoryList->GetPageMaxSlots(); i++)
 	{
-		CUIRect SlotRect = CUIRect();
+		CUIRect SlotRect = m_pInventoryList->GetMainViewRect();
+		SlotRect.VSplitLeft(BoxSize / 2.0f, 0, &SlotRect);
+		SlotRect.HSplitTop(BoxSize, 0, &SlotRect);
+
 		CalculateSlotPosition(i, &SlotRect);
 		if(!m_pInventoryList->GetInteractiveSlot() && m_pInventory->UI()->MouseHovered(&SlotRect))
 			m_pInventory->RenderTools()->DrawRoundRect(&SlotRect, vec4(0.5f, 0.5f, 0.5f, 0.5f), 8.0f);
@@ -44,6 +47,16 @@ void CInventoryPage::Render()
 		m_Slot[i]->m_RectSlot = SlotRect;
 	}
 
+	// render inventory	
+	for(int i = 0; i < m_pInventoryList->GetPageMaxSlots(); i++)
+	{
+		CInventorySlot* pSlot = GetSlot(i);
+		if(!pSlot || m_pInventoryList->GetSelectedSlot() == pSlot)
+			continue;
+
+		GetSlot(i)->Render();
+		GetSlot(i)->UpdateEvents();
+	}
 }
 
 void CInventoryPage::CalculateSlotPosition(int SlotID, CUIRect* SlotRect)
@@ -53,12 +66,12 @@ void CInventoryPage::CalculateSlotPosition(int SlotID, CUIRect* SlotRect)
 	{
 		if(CheckingSlot % m_pInventoryList->GetSlotsWidth() != 0)
 		{
-			SlotRect->x += (BoxWidth + SpacingSlot);
+			SlotRect->x += (BoxSize + SpacingSlot);
 			continue;
 		}
 		SlotRect->x = OldPositionX;
-		SlotRect->y += (BoxHeight + SpacingSlot);
+		SlotRect->y += (BoxSize + SpacingSlot);
 	}
-	SlotRect->w = BoxWidth;
-	SlotRect->h = BoxHeight;
+	SlotRect->w = BoxSize;
+	SlotRect->h = BoxSize;
 }
