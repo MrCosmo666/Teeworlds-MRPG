@@ -23,7 +23,7 @@ void CWindowUI::Render()
 
 	// logic bordour move window
 	CUIRect Bordure;
-	m_WindowRect.HSplitTop(16.0f, &Bordure, 0);
+	m_WindowRect.HSplitTop(20.0f, &Bordure, 0);
 	int MoveLogic = m_pUI->DoMouseEventLogic(&Bordure, KEY_MOUSE_1);
 	if(MoveLogic & CUI::CButtonLogicEvent::EVENT_PRESS)
 	{
@@ -62,11 +62,11 @@ void CWindowUI::Render()
 
 	// bordour draw
 	vec4 Color = mix(vec4(0.1f, 0.1f, 0.1f, 1.0f), vec4(0.4f, 0.4f, 0.4f, 1.0f), m_pUI->GetFade(&Bordure, IsActive()));
-	m_pRenderTools->DrawUIRect(&Bordure, Color, CUI::CORNER_ALL, 8.0f);
+	m_pRenderTools->DrawUIRect(&Bordure, Color, CUI::CORNER_ALL, 10.0f);
 
 	CUIRect Label;
 	Bordure.VSplitLeft(10.0f, 0, &Label);
-	m_pUI->DoLabel(&Label, m_aWindowName, 12.0f, CUI::EAlignment::ALIGN_LEFT, -1.0f);
+	m_pUI->DoLabel(&Label, m_aWindowName, 14.0f, CUI::EAlignment::ALIGN_LEFT, -1.0f);
 
 	// close button
 	if(m_WindowFlags & CWindowFlags::WINDOW_CLOSE)
@@ -74,8 +74,8 @@ void CWindowUI::Render()
 		CUIRect ButtonClose;
 		Bordure.VSplitRight(24.0f, 0, &ButtonClose);
 		Color = mix(vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.7f, 0.1f, 0.1f, 0.75f), m_pUI->GetFade(&ButtonClose, false));
-		m_pRenderTools->DrawUIRect(&ButtonClose, Color, CUI::CORNER_ALL, 8.0f);
-		m_pUI->DoLabel(&ButtonClose, "\xE2\x9C\x95", 14.0f, CUI::ALIGN_CENTER);
+		m_pRenderTools->DrawUIRect(&ButtonClose, Color, CUI::CORNER_ALL, 10.0f);
+		m_pUI->DoLabel(&ButtonClose, "\xE2\x9C\x95", 16.0f, CUI::ALIGN_CENTER);
 		const int CloseLogic = m_pUI->DoMouseEventLogic(&ButtonClose, KEY_MOUSE_1);
 		if(CloseLogic & CUI::CButtonLogicEvent::EVENT_PRESS)
 			m_Openned = false;
@@ -90,8 +90,8 @@ void CWindowUI::Render()
 			ButtonHide.x -= 24.0f;
 
 		Color = mix(vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.2f, 0.5f, 0.75f), m_pUI->GetFade(&ButtonHide, false));
-		m_pRenderTools->DrawUIRect(&ButtonHide, Color, CUI::CORNER_ALL, 8.0f);
-		m_pUI->DoLabel(&ButtonHide, m_WindowHidden ? "\xe2\x81\x82" : "\xe2\x80\xbb", 14.0f, CUI::ALIGN_CENTER);
+		m_pRenderTools->DrawUIRect(&ButtonHide, Color, CUI::CORNER_ALL, 10.0f);
+		m_pUI->DoLabel(&ButtonHide, m_WindowHidden ? "\xe2\x81\x82" : "\xe2\x80\xbb", 16.0f, CUI::ALIGN_CENTER);
 		const int HideLogic = m_pUI->DoMouseEventLogic(&ButtonHide, KEY_MOUSE_1);
 		if(HideLogic & CUI::CButtonLogicEvent::EVENT_PRESS)
 		{
