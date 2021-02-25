@@ -22,9 +22,8 @@ void CWindowUI::Render()
 	m_pUI->StartCheckWindow(this);
 
 	// logic bordour move window
-	CUIRect Bordure = m_WindowRect;
-	Bordure.h = 16.0f;
-
+	CUIRect Bordure;
+	m_WindowRect.HSplitTop(16.0f, &Bordure, 0);
 	int MoveLogic = m_pUI->DoMouseEventLogic(&Bordure, KEY_MOUSE_1);
 	if(MoveLogic & CUI::CButtonLogicEvent::EVENT_PRESS)
 	{

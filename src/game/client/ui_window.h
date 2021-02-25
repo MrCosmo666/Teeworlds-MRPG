@@ -17,6 +17,10 @@ enum CWindowFlags
 class CWindowUI
 {
 	friend class CUI;
+	friend class CWindowsRender;
+
+	static CUI* m_pUI;
+	static class CRenderTools* m_pRenderTools;
 	typedef std::function<void(CUIRect&, CWindowUI&)> RenderWindowCallback;
 	static std::vector<CWindowUI*> ms_aWindows;
 	RenderWindowCallback m_pCallback;
@@ -36,8 +40,6 @@ public:
 	CWindowUI() = default;
 	CWindowUI(const CWindowUI& pWindow) = default;
 
-	static CUI* m_pUI;
-	static class CRenderTools* m_pRenderTools;
 	static CWindowUI* GetActiveWindow()
 	{
 		if(!CWindowUI::ms_aWindows.empty())
@@ -58,8 +60,6 @@ public:
 private:
 
 	void Render();
-
-	// TODO optimize it / This is designed to make it very easy to create windows
 	CWindowUI* GetWindow(const char* pWindowName) const;
 };
 

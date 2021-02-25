@@ -23,7 +23,6 @@
 #include <game/version.h>
 #include "localization.h"
 #include "render.h"
-#include "ui_window.h"
 
 #include "gameclient.h"
 
@@ -60,6 +59,7 @@
 #include "components/stats.h"
 #include "components/talktext.h"
 #include "components/voting.h"
+#include "components/windows.h"
 
 //mmotee thnx gamer client # dune
 #include "components/skinchanger.h"
@@ -134,6 +134,7 @@ static CMapLayers gs_MapLayersBackGround(CMapLayers::TYPE_BACKGROUND);
 static CMapLayers gs_MapLayersForeGround(CMapLayers::TYPE_FOREGROUND);
 
 // mmotee thnx gamer client # dune
+static CWindowsRender gs_WindowRender;
 static CCSkinChanger gs_SkinChanger;
 static CTalkText gs_TalkText;
 static CQuestingProcessing gs_QuestingProcess;
@@ -331,6 +332,7 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(m_pStats);
 	m_All.Add(m_pMotd);
 	m_All.Add(m_pMenus);
+	m_All.Add(&gs_WindowRender);
 	m_All.Add(&m_pMenus->m_Binder);
 	m_All.Add(m_pInventory);
 	m_All.Add(m_pGameConsole);
@@ -401,9 +403,6 @@ void CGameClient::OnInit()
 	m_UI.Init(Client(), Graphics(), Input(), TextRender());
 	m_RenderTools.m_pGraphics = Graphics();
 	m_RenderTools.m_pUI = UI();
-	CWindowUI::m_pRenderTools = RenderTools();
-	CWindowUI::m_pUI = UI();
-
 	int64 Start = time_get();
 
 	// Render load screen at 0% to get graphics sooner.
@@ -739,8 +738,6 @@ void CGameClient::OnRender()
 	// render all systems
 	for(int i = 0; i < m_All.m_Num; i++)
 		m_All.m_paComponents[i]->OnRender();
-
-	m_UI.WindowRender();
 
 	// clear all events/input for this frame
 	Input()->Clear();
