@@ -28,27 +28,6 @@ CInventory::CInventory()
 
 void CInventory::OnRender()
 {
-	CWindowUI m_WindowList;
-	m_WindowList.Init("Window minimize", { 10, 20, 200, 80 }, WINDOW_MINIMIZE);
-	m_WindowList.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
-	{
-
-	});
-
-	CWindowUI m_WindowList2;
-	m_WindowList2.Init("Window close", { 10, 20, 250, 50 }, WINDOW_CLOSE);
-	m_WindowList2.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
-	{
-
-	});
-
-	CWindowUI m_WindowList3;
-	m_WindowList3.Init("Window close minimize", { 10, 20, 250, 100 }, WINDOW_ALL);
-	m_WindowList3.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
-	{
-
-	});
-
 	// skip menus
 	if(m_pClient->m_pMenus->IsActive() || !m_Active)
 		return;
@@ -60,6 +39,7 @@ void CInventory::OnRender()
 	// render inventory
 	m_pCraftItems->Render();
 	m_pOtherItems->Render();
+	m_pSomeItems->Render();
 
 	// render cursor
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CURSOR].m_Id);
@@ -121,6 +101,7 @@ void CInventory::OnInit()
 
 	m_pCraftItems = new CInventoryList(this, "Craft items", m_ScreenRestriction, 5, 6);
 	m_pOtherItems = new CInventoryList(this, "Other items", m_ScreenRestriction, 8, 4);
+	m_pSomeItems = new CInventoryList(this, "Some items", m_ScreenRestriction, 4, 3);
 }
 
 bool CInventory::OnInput(IInput::CEvent Event)

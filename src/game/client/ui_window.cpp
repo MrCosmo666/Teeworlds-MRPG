@@ -53,16 +53,17 @@ void CWindowUI::Render()
 
 	if(!m_WindowHidden)
 	{
+		vec4 Color = mix(vec4(0.15f, 0.15f, 0.15f, 0.85f), vec4(0.25f, 0.25f, 0.25f, 0.9f), m_pUI->GetFade(&m_WindowRect, IsActive(), 0.4f));
+
 		// background draw
 		CUIRect MoreBackground = m_WindowRect;
 		MoreBackground.Margin(4.0f, &MoreBackground);
-		vec4 Color = mix(vec4(0.2f, 0.2f, 0.2f, 0.8f), vec4(0.25f, 0.25f, 0.25f, 0.9f), m_pUI->GetFade(&MoreBackground, IsActive(), 0.4f));
 		m_pRenderTools->DrawRoundRect(&MoreBackground, Color, 12.0f);
 		m_pRenderTools->DrawRoundRect(&m_WindowRect, vec4(0.1f, 0.1f, 0.1f, 0.5f), 12.0f);
 	}
 
 	// bordour draw
-	vec4 Color = mix(vec4(0.1f, 0.1f, 0.1f, 1.0f), vec4(0.4f, 0.4f, 0.4f, 1.0f), m_pUI->GetFade(&Bordure, IsActive()));
+	vec4 Color = mix(vec4(0.1f, 0.1f, 0.1f, 1.0f), vec4(0.3f, 0.3f, 0.3f, 1.0f), m_pUI->GetFade(&Bordure, IsActive()));
 	m_pRenderTools->DrawUIRect(&Bordure, Color, CUI::CORNER_ALL, 10.0f);
 
 	CUIRect Label;
@@ -90,7 +91,7 @@ void CWindowUI::Render()
 		if(m_WindowFlags & CWindowFlags::WINDOW_CLOSE)
 			ButtonHide.x -= 24.0f;
 
-		Color = mix(vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.2f, 0.5f, 0.75f), m_pUI->GetFade(&ButtonHide, false));
+		Color = mix(vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.2f, 0.7f, 0.75f), m_pUI->GetFade(&ButtonHide, false));
 		m_pRenderTools->DrawUIRect(&ButtonHide, Color, CUI::CORNER_ALL, 10.0f);
 		m_pUI->DoLabel(&ButtonHide, m_WindowHidden ? "\xe2\x81\x82" : "\xe2\x80\xbb", 16.0f, CUI::ALIGN_CENTER);
 		const int HideLogic = m_pUI->DoMouseEventLogic(&ButtonHide, KEY_MOUSE_1);
