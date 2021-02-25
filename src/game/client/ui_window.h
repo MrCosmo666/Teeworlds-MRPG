@@ -7,6 +7,13 @@
 #include <functional>
 #include "ui.h"
 
+enum CWindowFlags
+{
+	WINDOW_MINIMIZE = 1 << 0,
+	WINDOW_CLOSE = 1 << 1,
+	WINDOW_ALL = WINDOW_MINIMIZE | WINDOW_CLOSE
+};
+
 class CWindowUI
 {
 	friend class CUI;
@@ -14,13 +21,16 @@ class CWindowUI
 	static std::vector<CWindowUI*> ms_aWindows;
 	RenderWindowCallback m_pCallback;
 
-	bool m_WindowMove;
+	bool m_Openned;
+	char m_aWindowName[128];
+	CUIRect m_WindowRect;
+	CUIRect m_WindowRectOld;
+
+	int m_WindowFlags;
+	bool m_WindowHidden;
+	bool m_WindowMoved;
 	float m_WindowSkipX;
 	float m_WindowSkipY;
-
-	char m_aWindowName[128];
-	bool m_Openned;
-	CUIRect m_WindowRect;
 
 public:
 	CWindowUI() = default;
@@ -35,7 +45,7 @@ public:
 		return nullptr;
 	}
 
-	void Init(const char* pWindowName, CUIRect WindowRect);
+	void Init(const char* pWindowName, CUIRect WindowRect, int WindowFlags = CWindowFlags::WINDOW_ALL);
 	CUIRect& GetRect();
 	bool IsOpenned() const;
 	bool IsActive() const;
@@ -46,6 +56,7 @@ public:
 	void OnRenderWindow(RenderWindowCallback pCallback);
 
 private:
+
 	void Render();
 
 	// TODO optimize it / This is designed to make it very easy to create windows

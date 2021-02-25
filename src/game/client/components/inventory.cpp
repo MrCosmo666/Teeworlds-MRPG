@@ -28,16 +28,27 @@ CInventory::CInventory()
 
 void CInventory::OnRender()
 {
-	for(int i = 0; i < 20; i++)
+	CWindowUI m_WindowList;
+	m_WindowList.Init("Window minimize", { 10, 20, 200, 80 }, WINDOW_MINIMIZE);
+	m_WindowList.OnRenderWindow([&](CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
 	{
-		CWindowUI m_WindowList;
-		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "Test %d", i);
-		m_WindowList.Init(aBuf, { 10, 20, (float)(100+rand()%200), (float)(50+rand()%200) });
-		m_WindowList.OnRenderWindow([&](CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
-		{
-		});
-	}
+	
+	});
+	
+	CWindowUI m_WindowList2;
+	m_WindowList2.Init("Window close", { 10, 20, 250, 50 }, WINDOW_CLOSE);
+	m_WindowList2.OnRenderWindow([&](CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+	{
+
+	});
+
+	CWindowUI m_WindowList3;
+	m_WindowList3.Init("Window close minimize", { 10, 20, 250, 100 }, WINDOW_ALL);
+	m_WindowList3.OnRenderWindow([&](CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+	{
+
+	});
+
 	// skip menus
 	if(m_pClient->m_pMenus->IsActive() || !m_Active)
 		return;
