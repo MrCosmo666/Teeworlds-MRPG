@@ -26,6 +26,7 @@ CInventoryList::CInventoryList(CInventory* pInventory, const char *pInventoryLis
 	m_WindowItemsList.Init(pInventoryListName, MainView);
 
 	// by default, the first page should exist
+	m_ActivePage = 0;
 	m_aInventoryPages[0] = new CInventoryPage(m_pInventory, this, 0);
 
 	// test
