@@ -58,10 +58,6 @@ void CWindowUI::Render()
 		MoreBackground.Margin(4.0f, &MoreBackground);
 		m_pRenderTools->DrawRoundRect(&MoreBackground, vec4(0.3f, 0.3f, 0.3f, 0.9f), 12.0f);
 		m_pRenderTools->DrawRoundRect(&m_WindowRect, vec4(0.1f, 0.1f, 0.1f, 0.50f), 12.0f);
-
-		// callback function render
-		if(m_pCallback)
-			m_pCallback(m_WindowRect, *this);
 	}
 
 	// bordour draw
@@ -108,6 +104,13 @@ void CWindowUI::Render()
 			else
 				m_WindowRect = m_WindowRectOld;
 		}
+	}
+
+	if(!m_WindowHidden)
+	{
+		// callback function render
+		if(m_pCallback)
+			m_pCallback(m_WindowRect, *this);
 	}
 
 	// end check only this window
