@@ -13,12 +13,7 @@ class CInventoryList
 	CWindowUI m_WindowItemsList;
 
 	// basic
-	char m_aInventoryListName[64];
-	float m_WindowSkipX;
-	float m_WindowSkipY;
-	bool m_ActiveWindow;
 	class CInventory* m_pInventory;
-	bool m_Openned;
 	CUIRect m_MainView;
 
 	// slots
@@ -50,9 +45,6 @@ public:
 	int GetSlotsHeight() const { return m_MaxSlotsHeight; }
 
 	// basic
-	void Open() { m_Openned = true; }
-	void Close() { m_Openned = false; }
-	bool IsOpenned() const { return m_Openned; }
 	void Render();
 
 	// slots

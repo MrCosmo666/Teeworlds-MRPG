@@ -13,21 +13,17 @@
 CInventoryList::CInventoryList(CInventory* pInventory, const char *pInventoryListName, CUIRect& pMainView, int MaxSlotsWidth, int MaxSlotsHeight) 
 	: m_pInventory(pInventory)
 {
-	m_WindowSkipX = 0.0f;
-	m_ActiveWindow = false;
-	m_ActivePage = 0;
 	m_HoveredSlot = nullptr;
 	m_SelectionSlot = nullptr;
 	m_InteractiveSlot = nullptr;
 	m_MaxSlotsWidth = MaxSlotsWidth;
 	m_MaxSlotsHeight = MaxSlotsHeight;
-	str_copy(m_aInventoryListName, pInventoryListName, sizeof(m_aInventoryListName));
 
 	CUIRect MainView = pMainView;
 	MainView.y = max(pMainView.y, 20.0f);
 	MainView.w = ((BoxSize + SpacingSlot) * (MaxSlotsWidth + 1)) - (SpacingSlot * 2.0f);
 	MainView.h = ((BoxSize + SpacingSlot) * (MaxSlotsHeight + 2)) - (SpacingSlot * 2.0f);
-	m_WindowItemsList.Init(m_aInventoryListName, MainView);
+	m_WindowItemsList.Init(pInventoryListName, MainView);
 
 	// by default, the first page should exist
 	m_aInventoryPages[0] = new CInventoryPage(m_pInventory, this, 0);
