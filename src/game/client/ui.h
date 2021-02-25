@@ -3,6 +3,8 @@
 #ifndef GAME_CLIENT_UI_H
 #define GAME_CLIENT_UI_H
 
+#include <vector>
+
 // TODO: Animations Rect rework
 enum ANIMATION_TYPE
 {
@@ -100,6 +102,10 @@ class CUI
 	class IGraphics* m_pGraphics;
 	class IInput* m_pInput;
 	class ITextRender* m_pTextRender;
+	class IClient* m_pClient;
+
+	class CWindowUI* m_pCheckWindow;
+	class CWindowUI* m_pHoveredWindow;
 
 public:
 	static const vec4 ms_DefaultTextColor;
@@ -109,8 +115,9 @@ public:
 	static const vec4 ms_TransparentTextColor;
 
 	// TODO: Refactor: Fill this in
-	void Init(class IGraphics *pGraphics, class IInput* pInput, class ITextRender *pTextRender)
+	void Init(class IClient *pClient, class IGraphics *pGraphics, class IInput* pInput, class ITextRender *pTextRender)
 	{ 
+		m_pClient = pClient;
 		m_pGraphics = pGraphics; 
 		m_pInput = pInput;
 		m_pTextRender = pTextRender;
@@ -120,6 +127,7 @@ public:
 	class ITextRender *TextRender() const { return m_pTextRender; }
 
 	CUI();
+	~CUI();
 
 	enum
 	{
@@ -178,7 +186,7 @@ public:
 
 	bool MouseInside(const CUIRect* pRect) const { return pRect->Inside(m_MouseX, m_MouseY); };
 	bool MouseInsideClip() const { return !IsClipped() || MouseInside(ClipArea()); };
-	bool MouseHovered(const CUIRect* pRect) const { return MouseInside(pRect) && MouseInsideClip(); };
+	bool MouseHovered(const CUIRect* pRect);
 	void ConvertCursorMove(float* pX, float* pY, int CursorType) const;
 
 	bool KeyPress(int Key) const;
@@ -196,6 +204,33 @@ public:
 
 	void DoLabel(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, float LineWidth = -1.0f, bool MultiLine = true);
 	void DoLabelHighlighted(const CUIRect* pRect, const char* pText, const char* pHighlighted, float FontSize, const vec4& TextColor, const vec4& HighlightColor);
+
+	// CUI ELEMENTS over time to adjust the order
+	enum CButtonLogicEvent
+	{
+		EMPTY = 0,
+		EVENT_PRESS = 1 << 0,
+		EVENT_PRESSED = 1 << 1,
+		EVENT_RELEASE = 1 << 2,
+		EVENT_HOVERED = 1 << 3,
+	};
+
+	struct AnimFade
+	{
+		CUIRect m_Rect;
+		float m_Seconds;
+		float m_StartTime;
+	};
+	std::vector< AnimFade > m_AnimFades;
+	float GetFade(CUIRect* pRect, bool Checked = false, const CWindowUI* pWindow = nullptr, float Seconds = 0.6f);
+	int DoMouseEventLogic(const CUIRect* pRect, int Button = 0);
+	
+	// window system
+	void StartCheckWindow(class CWindowUI* pWindow) { m_pCheckWindow = pWindow; }
+	void FinishCheckWindow() { m_pCheckWindow = nullptr; }
+
+	void WindowRender();
+	void WindowsClear();
 };
 
 #endif

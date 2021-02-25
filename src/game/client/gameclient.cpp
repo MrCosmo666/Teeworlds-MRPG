@@ -23,6 +23,7 @@
 #include <game/version.h>
 #include "localization.h"
 #include "render.h"
+#include "ui_window.h"
 
 #include "gameclient.h"
 
@@ -397,9 +398,11 @@ void CGameClient::OnInit()
 	m_pAnumUI = new CAnimUI(this);
 
 	// propagate pointers
-	m_UI.Init(Graphics(), Input(), TextRender());
+	m_UI.Init(Client(), Graphics(), Input(), TextRender());
 	m_RenderTools.m_pGraphics = Graphics();
 	m_RenderTools.m_pUI = UI();
+	CWindowUI::m_pRenderTools = RenderTools();
+	CWindowUI::m_pUI = UI();
 
 	int64 Start = time_get();
 
@@ -736,6 +739,8 @@ void CGameClient::OnRender()
 	// render all systems
 	for(int i = 0; i < m_All.m_Num; i++)
 		m_All.m_paComponents[i]->OnRender();
+
+	m_UI.WindowRender();
 
 	// clear all events/input for this frame
 	Input()->Clear();

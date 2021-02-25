@@ -4405,7 +4405,7 @@ void CEditor::Init()
 	m_pStorage = Kernel()->RequestInterface<IStorageEngine>();
 	m_RenderTools.m_pGraphics = m_pGraphics;
 	m_RenderTools.m_pUI = &m_UI;
-	m_UI.Init(m_pGraphics, m_pInput, m_pTextRender);
+	m_UI.Init(m_pClient, m_pGraphics, m_pInput, m_pTextRender);
 	m_Map.m_pEditor = this;
 
 	m_CheckerTexture = Graphics()->LoadTexture("editor/checker.png", IStorageEngine::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);

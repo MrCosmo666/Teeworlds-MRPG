@@ -1,13 +1,18 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/system.h>
+#include <generated/client_data.h>
 
+#include <engine/client.h>
 #include <engine/shared/config.h>
 #include <engine/graphics.h>
 #include <engine/textrender.h>
 #include <engine/keys.h>
 #include <engine/input.h>
 #include "ui.h"
+
+#include "ui_window.h"
+#include "render.h"
 
 /********************************************************
  UI
@@ -37,6 +42,13 @@ CUI::CUI()
 	m_Screen.y = 0;
 
 	m_NumClips = 0;
+
+	m_AnimFades.clear();
+}
+
+CUI::~CUI()
+{
+	WindowsClear();
 }
 
 void CUI::Update(float MouseX, float MouseY, float MouseWorldX, float MouseWorldY)
@@ -69,6 +81,25 @@ bool CUI::KeyPress(int Key) const
 bool CUI::KeyIsPressed(int Key) const
 {
 	return Enabled() && Input()->KeyIsPressed(Key);
+}
+
+bool CUI::MouseHovered(const CUIRect* pRect)
+{
+	// this logic ignores all MouseHovered excluding its area and available area. 
+	// So that each window is unique and clicks or selections don't look weird
+	if(!m_pCheckWindow)
+	{
+		for(auto &p : CWindowUI::ms_aWindows)
+		{
+			if(p->IsOpenned() && MouseInside(&p->m_WindowRect))
+				return false;
+		}
+		return MouseInside(pRect) && MouseInsideClip();
+	}
+
+	if(m_pHoveredWindow && m_pCheckWindow == m_pHoveredWindow && MouseInside(&m_pHoveredWindow->m_WindowRect))
+		return MouseInside(pRect) && MouseInsideClip();
+	return false;
 }
 
 void CUI::ConvertCursorMove(float* pX, float* pY, int CursorType) const
@@ -416,4 +447,120 @@ void CUI::DoLabelHighlighted(const CUIRect* pRect, const char* pText, const char
 	}
 	else
 		TextRender()->TextEx(&Cursor, pText, -1);
+}
+
+// TODO: improve
+// I have no idea how to avoid static data and make unique ID
+// in each area regardless of the class and still work directly at runtime
+float CUI::GetFade(CUIRect *pRect, bool Checked, const CWindowUI *pWindow, float Seconds)
+{
+	const bool Hovered = MouseHovered(pRect);
+	m_AnimFades.erase(std::remove_if(m_AnimFades.begin(), m_AnimFades.end(), [&](const AnimFade& pFade)
+		{ return (pFade.m_StartTime + pFade.m_Seconds) < m_pClient->LocalTime(); }), m_AnimFades.end());
+	auto pItem = std::find_if(m_AnimFades.begin(), m_AnimFades.end(), [&pRect](const AnimFade& pFade)
+		{ return pRect->x == pFade.m_Rect.x && pRect->y == pFade.m_Rect.y && pRect->w == pFade.m_Rect.w && pRect->h == pFade.m_Rect.h; }); 
+
+	if(Hovered || Checked)
+	{
+		if(pItem != m_AnimFades.end())
+		{
+			pItem->m_StartTime = m_pClient->LocalTime();
+			pItem->m_Seconds = Seconds;
+		}
+		else
+		{
+			AnimFade Fade;
+			Fade.m_Rect = *pRect;
+			Fade.m_StartTime = m_pClient->LocalTime();
+			Fade.m_Seconds = Seconds;
+			m_AnimFades.push_back(Fade);
+		}
+		return 1.0f;
+	}
+
+	if(pItem != m_AnimFades.end())
+	{
+		float Progression = max(0.0f, pItem->m_StartTime - m_pClient->LocalTime() + pItem->m_Seconds) / pItem->m_Seconds;
+		return Progression;
+	}
+	return 0.0f;
+}
+
+int CUI::DoMouseEventLogic(const CUIRect* pRect, int Button)
+{
+	static bool IsPressed = false;
+	int Event = CButtonLogicEvent::EMPTY;
+	if(MouseHovered(pRect))
+	{
+		Event = CButtonLogicEvent::EVENT_HOVERED;
+		if(KeyPress(Button))
+		{
+			Event |= CButtonLogicEvent::EVENT_PRESS;
+			IsPressed = true;
+		}
+		else if(KeyIsPressed(Button))
+			Event |= CButtonLogicEvent::EVENT_PRESSED;
+		else if(IsPressed)
+		{
+			Event |= CButtonLogicEvent::EVENT_RELEASE;
+			IsPressed = false;
+		}
+	}
+	return Event;
+}
+
+void CUI::WindowRender()
+{
+	if(CWindowUI::ms_aWindows.empty())
+		return;
+
+	// update hovered the active highlighted area
+	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
+	{
+		if((*it)->IsOpenned() && MouseInside(&(*it)->m_WindowRect))
+			m_pHoveredWindow = (*it);
+	}
+
+	// draw in reverse order as they are sorted here
+	CUIRect ScreenMap = *Screen();
+	Graphics()->MapScreen(ScreenMap.x, ScreenMap.y, ScreenMap.w, ScreenMap.h);
+	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
+		(*it)->Render();
+
+	// update the sorting in case of a change of the active window
+	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
+	{
+		// start check only this window
+		StartCheckWindow((*it));
+		if(DoMouseEventLogic(&(*it)->m_WindowRect, KEY_MOUSE_1) & CUI::CButtonLogicEvent::EVENT_PRESS)
+		{
+			if((*it)->m_Openned && CWindowUI::GetActiveWindow() != (*it))
+			{
+				auto Iterator = std::find_if(CWindowUI::ms_aWindows.begin(), CWindowUI::ms_aWindows.end(), [=](const CWindowUI* pWindow) { return pWindow == (*it);  });
+				if(Iterator != CWindowUI::ms_aWindows.end())
+					std::rotate(CWindowUI::ms_aWindows.begin(), Iterator, Iterator + 1);
+			}
+		}
+		// end check only this window
+		FinishCheckWindow();
+	}
+
+	// clear hovered active highlighted area
+	m_pHoveredWindow = nullptr;
+
+	// render cursor
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CURSOR].m_Id);
+	Graphics()->WrapClamp();
+	Graphics()->QuadsBegin();
+	IGraphics::CQuadItem QuadItem(MouseX(), MouseY(), 24, 24);
+	Graphics()->QuadsDrawTL(&QuadItem, 1);
+	Graphics()->QuadsEnd();
+	Graphics()->WrapNormal();
+}
+
+void CUI::WindowsClear()
+{
+	for(auto* p : CWindowUI::ms_aWindows)
+		delete p;
+	CWindowUI::ms_aWindows.clear();
 }

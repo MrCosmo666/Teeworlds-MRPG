@@ -18,6 +18,8 @@
 #include "inventory/inv_page.h"
 #include "inventory/inv_slot.h"
 
+#include <game/client/ui_window.h>
+
 // TODO: ever complete the inventory
 CInventory::CInventory()
 {
@@ -26,6 +28,16 @@ CInventory::CInventory()
 
 void CInventory::OnRender()
 {
+	for(int i = 0; i < 20; i++)
+	{
+		CWindowUI m_WindowList;
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "Test %d", i);
+		m_WindowList.Init(aBuf, { 10, 20, (float)(100+rand()%200), (float)(50+rand()%200) });
+		m_WindowList.OnRenderWindow([&](CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+		{
+		});
+	}
 	// skip menus
 	if(m_pClient->m_pMenus->IsActive() || !m_Active)
 		return;
