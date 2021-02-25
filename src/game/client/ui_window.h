@@ -40,26 +40,24 @@ public:
 	CWindowUI() = default;
 	CWindowUI(const CWindowUI& pWindow) = default;
 
+	bool IsOpenned() const;
+	bool IsActive() const;
+	CUIRect& GetRect();
+	const char* GetWindowName() const { return m_aWindowName; }
+
+	void Open() { m_Openned = true; }
+	void Close() { m_Openned = false; }
+	void Init(const char* pWindowName, CUIRect WindowRect, int WindowFlags = CWindowFlags::WINDOW_ALL);
+	void OnRenderWindow(RenderWindowCallback pCallback);
+
+private:
+	void Render();
 	static CWindowUI* GetActiveWindow()
 	{
 		if(!CWindowUI::ms_aWindows.empty())
 			return CWindowUI::ms_aWindows.front();
 		return nullptr;
 	}
-
-	void Init(const char* pWindowName, CUIRect WindowRect, int WindowFlags = CWindowFlags::WINDOW_ALL);
-	CUIRect& GetRect();
-	bool IsOpenned() const;
-	bool IsActive() const;
-	const char* GetWindowName() const { return m_aWindowName; }
-
-	void Open() { m_Openned = true; }
-	void Close() { m_Openned = false; }
-	void OnRenderWindow(RenderWindowCallback pCallback);
-
-private:
-
-	void Render();
 	CWindowUI* GetWindow(const char* pWindowName) const;
 };
 
