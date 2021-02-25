@@ -21,7 +21,7 @@ class CWindowUI
 
 	static CUI* m_pUI;
 	static class CRenderTools* m_pRenderTools;
-	typedef std::function<void(CUIRect&, CWindowUI&)> RenderWindowCallback;
+	typedef std::function<void(const CUIRect&, CWindowUI&)> RenderWindowCallback;
 	static std::vector<CWindowUI*> ms_aWindows;
 	RenderWindowCallback m_pCallback;
 
@@ -42,7 +42,7 @@ public:
 
 	bool IsOpenned() const;
 	bool IsActive() const;
-	CUIRect& GetRect();
+	const CUIRect& GetRect();
 	const char* GetWindowName() const { return m_aWindowName; }
 
 	void Open() { m_Openned = true; }

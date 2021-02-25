@@ -30,21 +30,21 @@ void CInventory::OnRender()
 {
 	CWindowUI m_WindowList;
 	m_WindowList.Init("Window minimize", { 10, 20, 200, 80 }, WINDOW_MINIMIZE);
-	m_WindowList.OnRenderWindow([&](CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+	m_WindowList.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
 	{
-	
+
 	});
-	
+
 	CWindowUI m_WindowList2;
 	m_WindowList2.Init("Window close", { 10, 20, 250, 50 }, WINDOW_CLOSE);
-	m_WindowList2.OnRenderWindow([&](CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+	m_WindowList2.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
 	{
 
 	});
 
 	CWindowUI m_WindowList3;
 	m_WindowList3.Init("Window close minimize", { 10, 20, 250, 100 }, WINDOW_ALL);
-	m_WindowList3.OnRenderWindow([&](CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+	m_WindowList3.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
 	{
 
 	});

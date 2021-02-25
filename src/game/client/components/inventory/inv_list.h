@@ -5,9 +5,13 @@
 
 #include <map>
 #include <game/client/ui.h>
+#include <game/client/ui_window.h>
 
 class CInventoryList
 {
+	// window
+	CWindowUI m_WindowItemsList;
+
 	// basic
 	char m_aInventoryListName[64];
 	float m_WindowSkipX;
@@ -28,16 +32,13 @@ class CInventoryList
 	int m_MaxSlotsHeight;
 	std::map < int, class CInventoryPage* > m_aInventoryPages;
 
-	// basic
-	void WindowRender();
-
 public:
 	CInventoryList(CInventory* pInventory, const char* pInventoryListName, CUIRect& pMainView, int MaxSlotsWidth, int MaxSlotsHeight);
 	~CInventoryList();
 
 	vec2 m_SlotInteractivePosition;
 
-	CUIRect GetMainViewRect() const { return m_MainView; }
+	const CUIRect &GetMainViewRect() { return m_WindowItemsList.GetRect(); }
 	CInventorySlot* GetHoveredSlot() const { return m_HoveredSlot; }
 	void SetHoveredSlot(CInventorySlot* pSlot) { m_HoveredSlot = pSlot; }
 	CInventorySlot* GetSelectedSlot() const { return m_SelectionSlot; }
@@ -62,7 +63,7 @@ public:
 	void ScrollInventoryPage(int Page);
 
 	// render tools
-	void RenderTextRoundRect(vec2 Position, float Margin, float FontSize, const char* pText, float Rounding, bool* pHovored = nullptr);
+	void RenderTextRoundRect(CUIRect Rect, float Margin, float FontSize, const char* pText, float Rounding, bool* pHovored = nullptr);
 };
 
 #endif

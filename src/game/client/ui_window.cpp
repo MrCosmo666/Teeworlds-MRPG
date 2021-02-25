@@ -15,7 +15,7 @@ CRenderTools* CWindowUI::m_pRenderTools;
 void CWindowUI::Render()
 {
 	// don't render closed window
-	if(!m_Openned)
+	if(!m_Openned || !m_pCallback)
 		return;
 
 	// start check only this window
@@ -61,10 +61,7 @@ void CWindowUI::Render()
 
 		// callback function render
 		if(m_pCallback)
-		{
 			m_pCallback(m_WindowRect, *this);
-			m_pCallback = nullptr;
-		}
 	}
 
 	// bordour draw
@@ -138,7 +135,7 @@ void CWindowUI::Init(const char* pWindowName, CUIRect WindowRect, int WindowFlag
 	(*this) = *pWindow;
 }
 
-CUIRect& CWindowUI::GetRect()
+const CUIRect& CWindowUI::GetRect()
 {
 	CWindowUI* pWindow = GetWindow(m_aWindowName);
 	return (pWindow ? pWindow->m_WindowRect : m_WindowRect);

@@ -91,7 +91,7 @@ bool CUI::MouseHovered(const CUIRect* pRect)
 	{
 		for(auto &p : CWindowUI::ms_aWindows)
 		{
-			if(p->IsOpenned() && MouseInside(&p->m_WindowRect))
+			if(p->m_Openned && p->m_pCallback && MouseInside(&p->m_WindowRect))
 				return false;
 		}
 		return MouseInside(pRect) && MouseInsideClip();
@@ -525,33 +525,46 @@ void CUI::WindowRender()
 	// update hovered the active highlighted area
 	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
 	{
-		if((*it)->IsOpenned() && MouseInside(&(*it)->m_WindowRect))
-			m_pHoveredWindow = (*it);
+		if((*it)->m_Openned && (*it)->m_pCallback)
+		{
+			if(MouseInside(&(*it)->m_WindowRect))
+				m_pHoveredWindow = (*it);
+		}
 	}
 
 	// draw in reverse order as they are sorted here
 	CUIRect ScreenMap = *Screen();
 	Graphics()->MapScreen(ScreenMap.x, ScreenMap.y, ScreenMap.w, ScreenMap.h);
 	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
-		(*it)->Render();
+	{
+		if((*it)->m_Openned && (*it)->m_pCallback)
+			(*it)->Render();
+	}
 
 	// update the sorting in case of a change of the active window
 	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
 	{
 		// start check only this window
 		StartCheckWindow((*it));
-		if(DoMouseEventLogic(&(*it)->m_WindowRect, KEY_MOUSE_1) & CUI::CButtonLogicEvent::EVENT_PRESS)
+		if((*it)->m_Openned && (*it)->m_pCallback)
 		{
-			if((*it)->m_Openned && CWindowUI::GetActiveWindow() != (*it))
+			if(CWindowUI::GetActiveWindow() != (*it) && (DoMouseEventLogic(&(*it)->m_WindowRect, KEY_MOUSE_1) & CUI::CButtonLogicEvent::EVENT_PRESS))
 			{
 				auto Iterator = std::find_if(CWindowUI::ms_aWindows.begin(), CWindowUI::ms_aWindows.end(), [=](const CWindowUI* pWindow) { return pWindow == (*it);  });
 				if(Iterator != CWindowUI::ms_aWindows.end())
+				{
 					std::rotate(CWindowUI::ms_aWindows.begin(), Iterator, Iterator + 1);
+					break;
+				}
 			}
 		}
 		// end check only this window
 		FinishCheckWindow();
 	}
+
+	// clear all callback functions
+	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
+		(*it)->m_pCallback = nullptr;
 
 	// clear hovered active highlighted area
 	m_pHoveredWindow = nullptr;
