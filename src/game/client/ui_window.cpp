@@ -95,7 +95,7 @@ void CWindowUI::Render()
 
 		Color = mix(vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.2f, 0.5f, 0.75f), m_pUI->GetFade(&ButtonHide, false));
 		m_pRenderTools->DrawUIRect(&ButtonHide, Color, CUI::CORNER_ALL, 8.0f);
-		m_pUI->DoLabel(&ButtonHide, m_WindowHidden ? "\xe2\x80\xbb" : "\xe2\x81\x82", 14.0f, CUI::ALIGN_CENTER);
+		m_pUI->DoLabel(&ButtonHide, m_WindowHidden ? "\xe2\x81\x82" : "\xe2\x80\xbb", 14.0f, CUI::ALIGN_CENTER);
 		const int HideLogic = m_pUI->DoMouseEventLogic(&ButtonHide, KEY_MOUSE_1);
 		if(HideLogic & CUI::CButtonLogicEvent::EVENT_PRESS)
 		{
