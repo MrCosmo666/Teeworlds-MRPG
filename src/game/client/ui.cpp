@@ -490,7 +490,8 @@ int CUI::DoMouseEventLogic(const CUIRect* pRect, int Button)
 {
 	static bool IsPressed = false;
 	int Event = CButtonLogicEvent::EMPTY;
-	if(MouseHovered(pRect))
+	bool Hovered = MouseHovered(pRect);
+	if(Hovered)
 	{
 		Event = CButtonLogicEvent::EVENT_HOVERED;
 		if(KeyPress(Button))
@@ -506,6 +507,13 @@ int CUI::DoMouseEventLogic(const CUIRect* pRect, int Button)
 			IsPressed = false;
 		}
 	}
+
+	if(!Hovered && IsPressed)
+	{
+		Event = CButtonLogicEvent::EVENT_RELEASE;
+		IsPressed = false;
+	}
+
 	return Event;
 }
 
