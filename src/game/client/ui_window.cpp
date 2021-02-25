@@ -56,8 +56,9 @@ void CWindowUI::Render()
 		// background draw
 		CUIRect MoreBackground = m_WindowRect;
 		MoreBackground.Margin(4.0f, &MoreBackground);
-		m_pRenderTools->DrawRoundRect(&MoreBackground, vec4(0.3f, 0.3f, 0.3f, 0.9f), 12.0f);
-		m_pRenderTools->DrawRoundRect(&m_WindowRect, vec4(0.1f, 0.1f, 0.1f, 0.50f), 12.0f);
+		vec4 Color = mix(vec4(0.2f, 0.2f, 0.2f, 0.8f), vec4(0.25f, 0.25f, 0.25f, 0.9f), m_pUI->GetFade(&MoreBackground, IsActive(), 0.4f));
+		m_pRenderTools->DrawRoundRect(&MoreBackground, Color, 12.0f);
+		m_pRenderTools->DrawRoundRect(&m_WindowRect, vec4(0.1f, 0.1f, 0.1f, 0.5f), 12.0f);
 	}
 
 	// bordour draw

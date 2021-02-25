@@ -222,7 +222,7 @@ public:
 		float m_StartTime;
 	};
 	std::vector< AnimFade > m_AnimFades;
-	float GetFade(CUIRect* pRect, bool Checked = false, const CWindowUI* pWindow = nullptr, float Seconds = 0.6f);
+	float GetFade(CUIRect* pRect, bool Checked = false, float Seconds = 0.6f);
 	int DoMouseEventLogic(const CUIRect* pRect, int Button = 0);
 	
 	// window system

@@ -452,7 +452,7 @@ void CUI::DoLabelHighlighted(const CUIRect* pRect, const char* pText, const char
 // TODO: improve
 // I have no idea how to avoid static data and make unique ID
 // in each area regardless of the class and still work directly at runtime
-float CUI::GetFade(CUIRect *pRect, bool Checked, const CWindowUI *pWindow, float Seconds)
+float CUI::GetFade(CUIRect *pRect, bool Checked, float Seconds)
 {
 	const bool Hovered = MouseHovered(pRect);
 	m_AnimFades.erase(std::remove_if(m_AnimFades.begin(), m_AnimFades.end(), [&](const AnimFade& pFade)
