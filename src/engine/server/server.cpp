@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <map>
 #include <cstdint>
 #include <base/math.h>
 #include <base/system.h>
@@ -17,7 +16,6 @@
 #include <engine/shared/config.h>
 #include <engine/shared/econ.h>
 #include <engine/shared/mapchecker.h>
-#include <engine/shared/netban.h>
 #include <engine/shared/network.h>
 #include <engine/shared/packer.h>
 #include <engine/shared/protocol.h>
@@ -32,17 +30,14 @@
 	#include <windows.h>
 #endif
 
-#include <engine/server/sql_connect_pool.h>
-#include <engine/server/sql_string_helpers.h>
-#include <teeother/components/localization.h>
-
 #include <engine/shared/mmodata.h>
-#include <game/server/enum_context.h>
 #include "discord/discord_main.h"
 #include "multi_worlds.h"
 #include "server_ban.h"
 
-// std::mutex IServer::m_aMutexPlayerDataSafe[MAX_CLIENTS];
+#include <teeother/components/localization.h>
+#include <engine/server/sql_connect_pool.h>
+#include <game/server/enum_context.h>
 
 void CServer::CClient::Reset()
 {
