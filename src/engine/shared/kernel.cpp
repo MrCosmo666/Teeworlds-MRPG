@@ -7,7 +7,7 @@ class CKernel : public IKernel
 {
 	enum
 	{
-		MAX_INTERFACES = 128,
+		MAX_INTERFACES = 256,
 	};
 
 	class CInterfaceInfo

@@ -32,39 +32,15 @@
 	#include <windows.h>
 #endif
 
-#include <engine/external/json-parser/json.h>
 #include <engine/server/sql_connect_pool.h>
 #include <engine/server/sql_string_helpers.h>
 #include <teeother/components/localization.h>
 
+#include "multi_worlds.h"
 #include <game/server/enum_context.h>
 #include "discord/discord_main.h"
 
 // std::mutex IServer::m_aMutexPlayerDataSafe[MAX_CLIENTS];
-
-// game worlds
-bool CWorldGameServerArray::Add(int WorldID, IKernel* pKernel)
-{
-	dbg_assert(WorldID < ENGINE_MAX_WORLDS, "exceeded pool of allocated memory for worlds");
-	ms_aWorlds[WorldID].m_pGameServer = CreateGameServer();
-	ms_aWorlds[WorldID].m_pLoadedMap = CreateEngineMap();
-
-	bool RegisterFail = false;
-	RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IEngineMap*>(ms_aWorlds[WorldID].m_pLoadedMap), WorldID);
-	RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IMap*>(ms_aWorlds[WorldID].m_pLoadedMap), WorldID);
-	RegisterFail = RegisterFail || !pKernel->RegisterInterface(ms_aWorlds[WorldID].m_pGameServer, WorldID);
-	return RegisterFail;
-}
-
-void CWorldGameServerArray::Clear()
-{
-	for(auto& pWorld : ms_aWorlds)
-	{
-		delete pWorld.second.m_pGameServer;
-		delete pWorld.second.m_pLoadedMap;
-	}
-	ms_aWorlds.clear();
-}
 
 // snap listern pool
 CSnapIDPool::CSnapIDPool()
@@ -299,14 +275,24 @@ CServer::CServer()
 
 	m_RconPasswordSet = 0;
 	m_GeneratedRconPassword = 0;
+	m_HeavyReload = false;
+
+	m_pMultiWorlds = new CMultiWorlds;
 
 	Init();
 }
 
 CServer::~CServer()
 {
-	// saved for something that works on the server side with sql e.g. discordjo
+	delete m_pMultiWorlds;
 	SJK.DisconnectConnectionHeap();
+}
+
+IGameServer* CServer::GameServer(int WorldID)
+{
+	if(!m_pMultiWorlds->IsValid(WorldID))
+		return m_pMultiWorlds->GetWorld(MAIN_WORLD_ID)->m_pGameServer;
+	return m_pMultiWorlds->GetWorld(WorldID)->m_pGameServer;
 }
 
 // get the world minute
@@ -426,9 +412,9 @@ void CServer::SetClientLanguage(int ClientID, const char* pLanguage)
 
 const char *CServer::GetWorldName(int WorldID)
 {
-	if(!WorldsInstance->IsValid(WorldID))
+	if(!m_pMultiWorlds->IsValid(WorldID))
 		return "invalid";
-	return WorldsInstance->ms_aWorlds[WorldID].m_aName;
+	return m_pMultiWorlds->GetWorld(WorldID)->m_aName;
 }
 
 const char* CServer::GetClientLanguage(int ClientID) const
@@ -440,7 +426,7 @@ const char* CServer::GetClientLanguage(int ClientID) const
 
 void CServer::ChangeWorld(int ClientID, int NewWorldID)
 {
-	if(!WorldsInstance->IsValid(NewWorldID) || NewWorldID == m_aClients[ClientID].m_WorldID || ClientID < 0 || ClientID >= MAX_PLAYERS || m_aClients[ClientID].m_State < CClient::STATE_READY)
+	if(!m_pMultiWorlds->IsValid(NewWorldID) || NewWorldID == m_aClients[ClientID].m_WorldID || ClientID < 0 || ClientID >= MAX_PLAYERS || m_aClients[ClientID].m_State < CClient::STATE_READY)
 		return;
 
 	m_aClients[ClientID].m_OldWorldID = m_aClients[ClientID].m_WorldID;
@@ -457,8 +443,11 @@ void CServer::ChangeWorld(int ClientID, int NewWorldID)
 
 void CServer::BackInformationFakeClient(int FakeClientID)
 {
-	for(auto& pWorld : WorldsInstance->ms_aWorlds)
-		pWorld.second.m_pGameServer->UpdateClientInformation(FakeClientID);
+	for(int i = 0; i < m_pMultiWorlds->GetSizeInitilized(); i++)
+	{
+		IGameServer* pGameServer = m_pMultiWorlds->GetWorld(i)->m_pGameServer;
+		pGameServer->UpdateClientInformation(FakeClientID);
+	}
 }
 
 int CServer::GetClientWorldID(int ClientID)
@@ -871,9 +860,11 @@ int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 	if(pThis->m_aClients[ClientID].m_State >= CClient::STATE_READY)
 	{
 		pThis->m_aClients[ClientID].m_Quitting = true;
-		for(auto& pWorld : WorldsInstance->ms_aWorlds)
-			pWorld.second.m_pGameServer->OnClientDrop(ClientID, pReason);
-
+		for(int i = 0; i < pThis->m_pMultiWorlds->GetSizeInitilized(); i++)
+		{
+			IGameServer* pGameServer = pThis->m_pMultiWorlds->GetWorld(i)->m_pGameServer;
+			pGameServer->OnClientDrop(ClientID, pReason);
+		}
 		pThis->GameServer(MAIN_WORLD_ID)->ClearClientData(ClientID);
 	}
 	
@@ -897,12 +888,13 @@ int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 void CServer::SendMap(int ClientID)
 {
 	const int WorldID = m_aClients[ClientID].m_WorldID;
-	IEngineMap* pMap = WorldsInstance->ms_aWorlds[WorldID].m_pLoadedMap;
+	const char* pWorldName = m_pMultiWorlds->GetWorld(WorldID)->m_aName;
+	IEngineMap* pMap = m_pMultiWorlds->GetWorld(WorldID)->m_pLoadedMap;
+
 	unsigned Crc = pMap->Crc();
 	SHA256_DIGEST Sha256 = pMap->Sha256();
-
 	CMsgPacker Msg(NETMSG_MAP_CHANGE, true);
-	Msg.AddString(WorldsInstance->ms_aWorlds[WorldID].m_aName, 0);
+	Msg.AddString(pWorldName, 0);
 	Msg.AddInt(Crc);
 	Msg.AddInt(pMap->GetCurrentMapSize());
 	Msg.AddInt(m_MapChunksPerRequest);
@@ -1032,8 +1024,8 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 			if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && m_aClients[ClientID].m_State == CClient::STATE_CONNECTING)
 			{
 				const int WorldID = m_aClients[ClientID].m_WorldID;
-				const int CurrentMapSize = WorldsInstance->ms_aWorlds[WorldID].m_pLoadedMap->GetCurrentMapSize();
-				unsigned char* CurrentMapData = WorldsInstance->ms_aWorlds[WorldID].m_pLoadedMap->GetCurrentMapData();
+				const int CurrentMapSize = m_pMultiWorlds->GetWorld(WorldID)->m_pLoadedMap->GetCurrentMapSize();
+				unsigned char* CurrentMapData = m_pMultiWorlds->GetWorld(WorldID)->m_pLoadedMap->GetCurrentMapData();
 
 				int ChunkSize = MAP_CHUNK_SIZE;
 				for(int i = 0; i < m_MapChunksPerRequest && m_aClients[ClientID].m_MapChunk >= 0; ++i)
@@ -1095,9 +1087,11 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 					str_format(aBuf, sizeof(aBuf), "player is ready. ClientID=%d addr=%s", ClientID, aAddrStr);
 					Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBuf);
 
-					for(auto& pWorld : WorldsInstance->ms_aWorlds)
-						pWorld.second.m_pGameServer->PrepareClientChangeWorld(ClientID);
-
+					for(int i = 0; i < m_pMultiWorlds->GetSizeInitilized(); i++)
+					{
+						IGameServer* pGameServer = m_pMultiWorlds->GetWorld(i)->m_pGameServer;
+						pGameServer->PrepareClientChangeWorld(ClientID);
+					}
 					GameServer(WorldID)->OnClientConnected(ClientID);
 				}
 
@@ -1421,7 +1415,7 @@ void CServer::PumpNetwork()
 bool CServer::LoadMap(int ID)
 {
 	char aBuf[512];
-	str_format(aBuf, sizeof(aBuf), "maps/%s", WorldsInstance->ms_aWorlds[ID].m_aPath);
+	str_format(aBuf, sizeof(aBuf), "maps/%s", m_pMultiWorlds->GetWorld(ID)->m_aPath);
 
 	// check for valid standard map
 	if(!m_MapChecker.ReadAndValidateMap(Storage(), aBuf, IStorageEngine::TYPE_ALL))
@@ -1430,7 +1424,7 @@ bool CServer::LoadMap(int ID)
 		return 0;
 	}
 
-	IEngineMap *pMap = WorldsInstance->ms_aWorlds[ID].m_pLoadedMap;
+	IEngineMap *pMap = m_pMultiWorlds->GetWorld(ID)->m_pLoadedMap;
 	if(!pMap->Load(aBuf))
 		return 0;
 
@@ -1469,12 +1463,12 @@ int CServer::Run()
 	m_DataChunksPerRequest = g_Config.m_SvMapDownloadSpeed;
 
 	// loading maps to memory
-	for(auto& pWorld : WorldsInstance->ms_aWorlds)
+	for(int i = 0; i < m_pMultiWorlds->GetSizeInitilized(); i++)
 	{
-		if(!LoadMap(pWorld.first))
+		if(!LoadMap(i))
 		{
 			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "maps/%s the map is not loaded...", pWorld.second.m_aPath);
+			str_format(aBuf, sizeof(aBuf), "maps/%s the map is not loaded...", m_pMultiWorlds->GetWorld(i)->m_aPath);
 			Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 			return -1;
 		}
@@ -1505,9 +1499,12 @@ int CServer::Run()
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "server name is '%s'", g_Config.m_SvName);
 	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+	for(int i = 0; i < m_pMultiWorlds->GetSizeInitilized(); i++)
+	{
+		IGameServer* pGameServer = m_pMultiWorlds->GetWorld(i)->m_pGameServer;
+		pGameServer->OnInit(i);
 
-	for(auto& pWorld : WorldsInstance->ms_aWorlds)
-		pWorld.second.m_pGameServer->OnInit(pWorld.first);
+	}
 
 	str_format(aBuf, sizeof(aBuf), "version %s", GameServer()->NetVersion());
 	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
@@ -1585,60 +1582,86 @@ int CServer::Run()
 					}
 				}
 
-				WorldsInstance->ms_aWorlds[MAIN_WORLD_ID].m_pGameServer->OnTickMainWorld();
-				for(auto& pWorld : WorldsInstance->ms_aWorlds)
-					pWorld.second.m_pGameServer->OnTick();
+				m_pMultiWorlds->GetWorld(MAIN_WORLD_ID)->m_pGameServer->OnTickMainWorld();
+				for(int i = 0; i < m_pMultiWorlds->GetSizeInitilized(); i++)
+				{
+					IGameServer* pGameServer = m_pMultiWorlds->GetWorld(i)->m_pGameServer;
+					pGameServer->OnTick();
+				}
 			}
 
 			if(NewTicks)
 			{
 				// snap game
-				if(ExistsPlayers)
+				if(ExistsPlayers && !m_HeavyReload)
 				{
 					if(g_Config.m_SvHighBandwidth || ShouldSnap)
 					{
-						for(auto& pWorld : WorldsInstance->ms_aWorlds)
-							DoSnapshot(pWorld.first);
+						for(int i = 0; i < m_pMultiWorlds->GetSizeInitilized(); i++)
+							DoSnapshot(i);
 					}
 					UpdateClientRconCommands();
 				}
-				// reset server ((24 * 60) * 60) * 50 = 4320000 tick in day i think
+				// heavy reset server ((24 * 60) * 60) * SERVER_TICK_SPEED = 4320000 tick in day i think
 				else if(m_CurrentGameTick > (g_Config.m_SvHardresetAfterDays * 4320000))
 				{
-					// There are no players, bots can't initialized self, so you can reinitialize the server
-					Init();
 					m_CurrentGameTick = 0;
 					m_GameStartTime = time_get();
 					SetOffsetWorldTime(0);
-
-					// Initializing worlds
-					for(auto& pWorld : WorldsInstance->ms_aWorlds)
+					for(int i = 0; i < m_pMultiWorlds->GetSizeInitilized(); i++)
 					{
-						// free map data and loading
-						char aBuf[256];
-						pWorld.second.m_pLoadedMap->Unload();
-						if(!LoadMap(pWorld.first))
+						// free map data
+						m_pMultiWorlds->GetWorld(i)->m_pLoadedMap->Unload();
+						m_pMultiWorlds->GetWorld(i)->m_pLoadedMapSixup->Unload();
+
+						// reload map data
+						if(!LoadMap(i))
 						{
-							str_format(aBuf, sizeof(aBuf), "maps/%s the map is not loaded...", pWorld.second.m_aPath);
+							char aBuf[256];
+							str_format(aBuf, sizeof(aBuf), "maps/%s the map is not loaded...", m_pMultiWorlds->GetWorld(i)->m_aPath);
 							Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 							return -1;
 						}
 
 						// recreate gamecontext
-						delete pWorld.second.m_pGameServer;
-						pWorld.second.m_pGameServer = CreateGameServer();
-						if(!Kernel()->ReregisterInterface(pWorld.second.m_pGameServer, pWorld.first))
+						delete m_pMultiWorlds->GetWorld(i)->m_pGameServer;
+						m_pMultiWorlds->GetWorld(i)->m_pGameServer = CreateGameServer();
+						if(!Kernel()->ReregisterInterface(m_pMultiWorlds->GetWorld(i)->m_pGameServer, i))
 						{
-							str_format(aBuf, sizeof(aBuf), "the gamecontext interface could not be updated / world %d...", pWorld.first);
+							char aBuf[256];
+							str_format(aBuf, sizeof(aBuf), "the gamecontext interface could not be updated / world %d...", i);
 							Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 							return -1;
 						}
 					}
 
+					if(m_HeavyReload)
+					{
+						// If it is a reload from rcon
+						for(int ClientID = 0; ClientID < MAX_PLAYERS; ClientID++)
+						{
+							if(m_aClients[ClientID].m_State <= CClient::STATE_AUTH)
+								continue;
+
+							m_aClients[ClientID].Reset();
+							m_aClients[ClientID].m_State = CClient::STATE_CONNECTING;
+							SendMap(ClientID);
+						}
+						m_HeavyReload = false;
+					}
+					else
+					{
+						// or reset full server data
+						Init();
+					}
+
 					// reinit gamecontext
-					for(auto& pWorld : WorldsInstance->ms_aWorlds)
-						pWorld.second.m_pGameServer->OnInit(pWorld.first);
-					Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "A long server restart without players.");
+					for(int i = 0; i < m_pMultiWorlds->GetSizeInitilized(); i++)
+					{
+						IGameServer* pGameServer = m_pMultiWorlds->GetWorld(i)->m_pGameServer;
+						pGameServer->OnInit(i);
+					}
+					Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "A server was heavy reload.");
 				}
 			}
 
@@ -1654,7 +1677,7 @@ int CServer::Run()
 	// disconnect all clients on shutdown
 	m_NetServer.Close();
 	m_Econ.Shutdown();
-	WorldsInstance->Clear();
+	m_pMultiWorlds->Clear();
 	return 0;
 }
 
@@ -1807,8 +1830,11 @@ void CServer::RegisterCommands()
 	// register console commands in sub parts
 	m_ServerBan.InitServerBan(Console(), Storage(), this);
 	
-	for(auto pWorld : WorldsInstance->ms_aWorlds)
-		pWorld.second.m_pGameServer->OnConsoleInit();
+	for(int i = 0; i < m_pMultiWorlds->GetSizeInitilized(); i++)
+	{
+		IGameServer* pGameServer = m_pMultiWorlds->GetWorld(i)->m_pGameServer;
+		pGameServer->OnConsoleInit();
+	}
 }
 
 
@@ -1848,53 +1874,6 @@ void CServer::SnapSetStaticsize(int ItemType, int Size)
 }
 
 static CServer *CreateServer() { return new CServer(); }
-
-bool WorldsLoading(IKernel *pKernel, IStorageEngine* pStorage, IConsole* pConsole)
-{
-	// read file data into buffer
-	char aFileBuf[512];
-	str_format(aFileBuf, sizeof(aFileBuf), "maps/worlds.json");
-	IOHANDLE File = pStorage->OpenFile(aFileBuf, IOFLAG_READ, IStorageEngine::TYPE_ALL);
-	if(!File)
-		return false;
-
-	const int FileSize = (int)io_length(File);
-	char* pFileData = (char*)mem_alloc(FileSize, 1);
-	io_read(File, pFileData, FileSize);
-	io_close(File);
-
-	// parse json data
-	json_settings JsonSettings;
-	mem_zero(&JsonSettings, sizeof(JsonSettings));
-	char aError[256];
-	json_value* pJsonData = json_parse_ex(&JsonSettings, pFileData, FileSize, aError);
-	mem_free(pFileData);
-	if(pJsonData == 0)
-	{
-		pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "Error on reading \"worlds.json\"", aError);
-		return false;
-	}
-
-	// extract data
-	const json_value& rStart = (*pJsonData)["worlds"];
-	if(rStart.type == json_array)
-	{
-		for(unsigned i = 0; i < rStart.u.array.length; ++i)
-		{
-			const char* pWorldName = rStart[i]["name"];
-			const char* pPath = rStart[i]["path"];
-
-			// here set worlds name
-			WorldsInstance->Add(i, pKernel);
-			str_copy(WorldsInstance->ms_aWorlds[i].m_aName, pWorldName, sizeof(WorldsInstance->ms_aWorlds[i].m_aName));
-			str_copy(WorldsInstance->ms_aWorlds[i].m_aPath, pPath, sizeof(WorldsInstance->ms_aWorlds[i].m_aPath));
-		}
-	}
-
-	// clean up
-	json_value_free(pJsonData);
-	return true;
-}
 
 int main(int argc, const char **argv) // ignore_convention
 {
@@ -1946,7 +1925,7 @@ int main(int argc, const char **argv) // ignore_convention
 	RegisterFail = RegisterFail || !pKernel->RegisterInterface(pConfig);
 	RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IEngineMasterServer*>(pEngineMasterServer)); // register as both
 	RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IMasterServer*>(pEngineMasterServer));
-	RegisterFail = RegisterFail || !WorldsLoading(pKernel, pStorage, pConsole);
+	RegisterFail = RegisterFail || !pServer->MultiWorlds()->LoadWorlds(pServer, pKernel, pStorage, pConsole);
 
 	if(RegisterFail)
 		return -1;

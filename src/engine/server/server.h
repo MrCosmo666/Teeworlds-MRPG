@@ -2,33 +2,9 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef ENGINE_SERVER_SERVER_H
 #define ENGINE_SERVER_SERVER_H
-#include <teeother/tl/singletion.h>
-
 #include <engine/server.h>
 #include <engine/shared/mmodata.h>
 
-// multiworlds
-#define WorldsInstance CSingleton<CWorldGameServerArray>::Get()
-
-class CWorldGameServerArray
-{
-	struct CWorldGameServer
-	{
-		char m_aName[64];
-		char m_aPath[512];
-		class IGameServer* m_pGameServer;
-		IEngineMap* m_pLoadedMap;
-	};
-public:
-	std::map < int /*ID*/, CWorldGameServer /*Game world*/ > ms_aWorlds;
-	~CWorldGameServerArray() { Clear(); }
-
-	bool IsValid(int WorldID) { return ms_aWorlds.find(WorldID) != ms_aWorlds.end(); }
-	bool Add(int WorldID, IKernel* pKernel);
-	void Clear();
-};
-
-// 
 class CSnapIDPool
 {
 	enum
@@ -84,16 +60,13 @@ class CServer : public IServer
 {
 	class IConsole *m_pConsole;
 	class IStorageEngine *m_pStorage;
+	class CMultiWorlds* m_pMultiWorlds;
 
 public:
-	virtual class IGameServer* GameServer(int WorldID = 0)
-	{
-		if(WorldsInstance->ms_aWorlds.find(WorldID) == WorldsInstance->ms_aWorlds.end())
-			return nullptr;
-		return WorldsInstance->ms_aWorlds[WorldID].m_pGameServer;
-	}
+	virtual class IGameServer* GameServer(int WorldID = 0);
 	class IConsole *Console() { return m_pConsole; }
 	class IStorageEngine*Storage() { return m_pStorage; }
+	class CMultiWorlds* MultiWorlds() const { return m_pMultiWorlds; }
 	class DiscordJob *m_pDiscord;
 
 	enum
@@ -182,6 +155,7 @@ public:
 	int m_RconClientID;
 	int m_RconAuthLevel;
 	int m_PrintCBIndex;
+	bool m_HeavyReload;
 
 	// map
 	enum
