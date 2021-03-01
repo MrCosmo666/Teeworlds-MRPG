@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/system.h>
 #include "eventhandler.h"
+
 #include "gamecontext.h"
 
 //////////////////////////////////////////////////

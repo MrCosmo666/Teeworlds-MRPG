@@ -3,6 +3,7 @@
 #ifndef GAME_SERVER_GAMECONTEXT_H
 #define GAME_SERVER_GAMECONTEXT_H
 #include <engine/server.h>
+#include <engine/console.h>
 
 #include <base/another/kurhelper.h>
 #include <game/voting.h>
@@ -14,16 +15,6 @@
 #include "player.h"
 
 #include "mmocore/MmoController.h"
-#include "mmocore/CommandProcessor.h"
-
-#ifdef _MSC_VER
-typedef __int32 int32_t;
-typedef unsigned __int32 uint32_t;
-typedef __int64 int64_t;
-typedef unsigned __int64 uint64_t;
-#else
-#include <stdint.h>
-#endif
 
 class CGS : public IGameServer
 {
@@ -40,6 +31,7 @@ class CGS : public IGameServer
 	class IConsole *m_pConsole;
 	class CPathfinder* m_pPathFinder;
 	class IStorageEngine* m_pStorage;
+	class CCommandProcessor* m_pCommandProcessor;
 	MmoController* m_pMmoController;
 
 	class CLayers *m_pLayers;
@@ -64,8 +56,6 @@ public:
 	CPlayer *m_apPlayers[MAX_CLIENTS];
 	IGameController *m_pController;
 	CGameWorld m_World;
-	CCommandManager m_CommandManager;
-	CCommandManager* CommandManager() { return &m_CommandManager; }
 	CPathfinder* PathFinder() const { return m_pPathFinder; }
 
 	/* #########################################################################
@@ -166,10 +156,7 @@ public:
 	void SendGameMsg(int GameMsgID, int ParaI1, int ParaI2, int ParaI3, int ClientID);
 	void UpdateClientInformation(int ClientID);
 
-	void SendChatCommand(const CCommandManager::CCommand* pCommand, int ClientID);
 	void SendChatCommands(int ClientID);
-	void SendRemoveChatCommand(const char* pCommand, int ClientID);
-	void SendRemoveChatCommand(const CCommandManager::CCommand* pCommand, int ClientID);
 
 	void SendTuningParams(int ClientID);
 	void SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char* Message, int Style = -1, int TalkingEmote = -1);
@@ -221,9 +208,6 @@ private:
 	static void ConchainSettingUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	static void ConchainGameinfoUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 
-	static void NewCommandHook(const CCommandManager::CCommand* pCommand, void* pContext);
-	static void RemoveCommandHook(const CCommandManager::CCommand* pCommand, void* pContext);
-
 	/* #########################################################################
 		VOTING MMO GAMECONTEXT 
 	######################################################################### */
@@ -267,7 +251,6 @@ public:
 private:
 	void SendDayInfo(int ClientID);
 
-	CCommandProcessor *m_pCommandProcessor;
 
 public:
 	void ChangeEquipSkin(int ClientID, int ItemID);

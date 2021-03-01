@@ -59,7 +59,6 @@ CGS::~CGS()
 {
 	m_Events.Clear();
 	ms_aAttributsInfo.clear();
-	m_CommandManager.ClearCommands();
 	for(auto& pEffects : ms_aEffects)
 		pEffects.clear();
 	for(auto* apPlayer : m_apPlayers)
@@ -862,49 +861,6 @@ void CGS::UpdateClientInformation(int ClientID)
 	SendEquipments(ClientID, -1);
 }
 
-void CGS::SendChatCommand(const CCommandManager::CCommand* pCommand, int ClientID)
-{
-	CNetMsg_Sv_CommandInfo Msg;
-	Msg.m_Name = pCommand->m_aName;
-	Msg.m_HelpText = pCommand->m_aHelpText;
-	Msg.m_ArgsFormat = pCommand->m_aArgsFormat;
-
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-}
-
-void CGS::SendChatCommands(int ClientID)
-{
-	// remove default commands from client
-	SendRemoveChatCommand("all", ClientID);
-	SendRemoveChatCommand("friend", ClientID);
-	SendRemoveChatCommand("m", ClientID);
-	SendRemoveChatCommand("mute", ClientID);
-	SendRemoveChatCommand("r", ClientID);
-	SendRemoveChatCommand("team", ClientID);
-	SendRemoveChatCommand("w", ClientID);
-	SendRemoveChatCommand("whisper", ClientID);
-
-	// send our commands
-	for (int i = 0; i < CommandManager()->CommandCount(); i++)
-		SendChatCommand(CommandManager()->GetCommand(i), ClientID);
-}
-
-void CGS::SendRemoveChatCommand(const CCommandManager::CCommand* pCommand, int ClientID)
-{
-	CNetMsg_Sv_CommandInfoRemove Msg;
-	Msg.m_Name = pCommand->m_aName;
-
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-}
-
-void CGS::SendRemoveChatCommand(const char* pCommand, int ClientID)
-{
-	CNetMsg_Sv_CommandInfoRemove Msg;
-	Msg.m_Name = pCommand;
-
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-}
-
 void CGS::SendTuningParams(int ClientID)
 {
 	CMsgPacker Msg(NETMSGTYPE_SV_TUNEPARAMS);
@@ -972,18 +928,6 @@ void CGS::UpdateDiscordStatus()
 #endif
 }
 
-void CGS::NewCommandHook(const CCommandManager::CCommand* pCommand, void* pContext)
-{
-	CGS* pSelf = (CGS*)pContext;
-	pSelf->SendChatCommand(pCommand, -1);
-}
-
-void CGS::RemoveCommandHook(const CCommandManager::CCommand* pCommand, void* pContext)
-{
-	CGS* pSelf = (CGS*)pContext;
-	pSelf->SendRemoveChatCommand(pCommand, -1);
-}
-
 void CGS::OnInit(int WorldID)
 {
 	m_pServer = Kernel()->RequestInterface<IServer>();
@@ -991,7 +935,6 @@ void CGS::OnInit(int WorldID)
 	m_pStorage = Kernel()->RequestInterface<IStorageEngine>();
 	m_World.SetGameServer(this);
 	m_Events.SetGameServer(this);
-	m_CommandManager.Init(m_pConsole, this, NewCommandHook, RemoveCommandHook);
 	m_WorldID = WorldID;
 	m_RespawnWorldID = -1;
 	m_MusicID = -1;
@@ -1016,7 +959,6 @@ void CGS::OnInit(int WorldID)
 		m_pController = new CGameControllerMain(this);
 
 	m_pCommandProcessor = new CCommandProcessor(this);
-	m_pController->RegisterChatCommands(CommandManager());
 
 	// initialize cores
 	CMapItemLayerTilemap *pTileMap = m_pLayers->GameLayer();
@@ -1408,7 +1350,7 @@ void CGS::OnClientEnter(int ClientID)
 		return;
 
 	m_pController->OnPlayerConnect(pPlayer);
-	SendChatCommands(ClientID);
+	m_pCommandProcessor->SendChatCommands(ClientID);
 	pPlayer->SendClientInfo(-1);
 	for(int i = 0; i < MAX_CLIENTS; ++i)
 	{

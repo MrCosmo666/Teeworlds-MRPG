@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_ENTITIES_DROPINGITEMS_H
 #define GAME_SERVER_ENTITIES_DROPINGITEMS_H
+#include <game/server/entity.h>
 
 class CDropItem : public CEntity
 {
@@ -24,7 +25,7 @@ class CDropItem : public CEntity
 	
 
 public:
-	CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, InventoryItem DropItem, int OwnerID);
+	CDropItem(class CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, InventoryItem DropItem, int OwnerID);
 	~CDropItem();
 
 	virtual void Tick();

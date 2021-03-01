@@ -8,6 +8,7 @@
 CCommandProcessor::CCommandProcessor(CGS *pGS)
 {
 	m_pGS = pGS;
+	m_CommandManager.Init(m_pGS->Console(), this, NewCommandHook, RemoveCommandHook);
 
 	IServer* pServer = m_pGS->Server();
 	AddCommand("login", "s[username] s[password]", ConChatLogin, pServer, "");
@@ -31,53 +32,9 @@ CCommandProcessor::CCommandProcessor(CGS *pGS)
 #endif
 }
 
-void CCommandProcessor::AddCommand(const char* pName, const char* pParams, IConsole::FCommandCallback pfnFunc, void* pUser, const char* pHelp)
+CCommandProcessor::~CCommandProcessor()
 {
-	GS()->Console()->Register(pName, pParams, CFGFLAG_CHAT, pfnFunc, pUser, pHelp);
-	if (!GS()->CommandManager()->AddCommand(pName, pHelp, pParams, pfnFunc, pUser))
-	{
-		if (pParams[0])
-			dbg_msg("CCommandProcessor", "registered chat command: '/%s %s'", pName, pParams);
-		else
-			dbg_msg("CCommandProcessor", "registered chat command: '/%s'", pName);
-	}
-	else
-		dbg_msg("CCommandProcessor", "failed to add command: '/%s'", pName);
-}
-
-void CCommandProcessor::ChatCmd(const char *pMessage, CPlayer* pPlayer)
-{
-	LastChat(pPlayer);
-	const int ClientID = pPlayer->GetCID();
-
-	int Char = 0;
-	char aCommand[256] = { 0 };
-	for(int i = 1; i < str_length(pMessage); i++)
-	{
-		if(pMessage[i] != ' ')
-		{
-			aCommand[Char] = pMessage[i];
-			Char++;
-			continue;
-		}
-		break;
-	}
-	
-	const IConsole::CCommandInfo* pCommand = GS()->Console()->GetCommandInfo(aCommand, CFGFLAG_CHAT, 0);
-	if (pCommand)
-	{
-		int ErrorArgs;
-		GS()->Console()->ExecuteLineFlag(pMessage + 1, CFGFLAG_CHAT, ClientID, false, &ErrorArgs);
-		if(ErrorArgs)
-		{
-			char aArgsDesc[256];
-			GS()->Console()->ParseArgumentsDescription(pCommand->m_pParams, aArgsDesc, sizeof(aArgsDesc));
-			GS()->ChatFollow(ClientID, "Use: /{STR} {STR}", pCommand->m_pName, aArgsDesc);
-		}
-		return;
-	}
-
-	GS()->ChatFollow(ClientID, "Command {STR} not found!", pMessage);
+	m_CommandManager.ClearCommands();
 }
 
 void CCommandProcessor::ConChatLogin(IConsole::IResult* pResult, void* pUser)
@@ -343,8 +300,117 @@ void CCommandProcessor::ConChatVoucher(IConsole::IResult* pResult, void* pUser)
 	pGS->Mmo()->Account()->UseVoucher(ClientID, aVoucher);
 }
 
+
+/************************************************************************/
+/*  Command system                                                      */
+/************************************************************************/
+
+void CCommandProcessor::ChatCmd(const char* pMessage, CPlayer* pPlayer)
+{
+	LastChat(pPlayer);
+	const int ClientID = pPlayer->GetCID();
+
+	int Char = 0;
+	char aCommand[256] = { 0 };
+	for(int i = 1; i < str_length(pMessage); i++)
+	{
+		if(pMessage[i] != ' ')
+		{
+			aCommand[Char] = pMessage[i];
+			Char++;
+			continue;
+		}
+		break;
+	}
+
+	const IConsole::CCommandInfo* pCommand = GS()->Console()->GetCommandInfo(aCommand, CFGFLAG_CHAT, 0);
+	if(pCommand)
+	{
+		int ErrorArgs;
+		GS()->Console()->ExecuteLineFlag(pMessage + 1, CFGFLAG_CHAT, ClientID, false, &ErrorArgs);
+		if(ErrorArgs)
+		{
+			char aArgsDesc[256];
+			GS()->Console()->ParseArgumentsDescription(pCommand->m_pParams, aArgsDesc, sizeof(aArgsDesc));
+			GS()->ChatFollow(ClientID, "Use: /{STR} {STR}", pCommand->m_pName, aArgsDesc);
+		}
+		return;
+	}
+
+	GS()->ChatFollow(ClientID, "Command {STR} not found!", pMessage);
+}
+
+void CCommandProcessor::SendChatCommands(int ClientID)
+{
+	// remove based commands
+	SendRemoveChatCommand("all", ClientID);
+	SendRemoveChatCommand("friend", ClientID);
+	SendRemoveChatCommand("m", ClientID);
+	SendRemoveChatCommand("mute", ClientID);
+	SendRemoveChatCommand("r", ClientID);
+	SendRemoveChatCommand("team", ClientID);
+	SendRemoveChatCommand("w", ClientID);
+	SendRemoveChatCommand("whisper", ClientID);
+
+	// send our commands
+	for(int i = 0; i < m_CommandManager.CommandCount(); i++)
+		SendChatCommand(m_CommandManager.GetCommand(i), ClientID);
+}
+
+void CCommandProcessor::AddCommand(const char* pName, const char* pParams, IConsole::FCommandCallback pfnFunc, void* pUser, const char* pHelp)
+{
+	GS()->Console()->Register(pName, pParams, CFGFLAG_CHAT, pfnFunc, pUser, pHelp);
+	if(!m_CommandManager.AddCommand(pName, pHelp, pParams, pfnFunc, pUser))
+	{
+		if(pParams[0])
+			dbg_msg("CCommandProcessor", "registered chat command: '/%s %s'", pName, pParams);
+		else
+			dbg_msg("CCommandProcessor", "registered chat command: '/%s'", pName);
+	}
+	else
+		dbg_msg("CCommandProcessor", "failed to add command: '/%s'", pName);
+}
+
 void CCommandProcessor::LastChat(CPlayer *pPlayer)
 {
 	if(pPlayer->m_aPlayerTick[TickState::LastChat] + GS()->Server()->TickSpeed() <= GS()->Server()->Tick())
 		pPlayer->m_aPlayerTick[TickState::LastChat] = GS()->Server()->Tick();
+}
+
+void CCommandProcessor::NewCommandHook(const CCommandManager::CCommand* pCommand, void* pContext)
+{
+	CCommandProcessor* pSelf = (CCommandProcessor*)pContext;
+	pSelf->SendChatCommand(pCommand, -1);
+}
+
+void CCommandProcessor::RemoveCommandHook(const CCommandManager::CCommand* pCommand, void* pContext)
+{
+	CCommandProcessor* pSelf = (CCommandProcessor*)pContext;
+	pSelf->SendRemoveChatCommand(pCommand, -1);
+}
+
+void CCommandProcessor::SendChatCommand(const CCommandManager::CCommand* pCommand, int ClientID)
+{
+	CNetMsg_Sv_CommandInfo Msg;
+	Msg.m_Name = pCommand->m_aName;
+	Msg.m_HelpText = pCommand->m_aHelpText;
+	Msg.m_ArgsFormat = pCommand->m_aArgsFormat;
+
+	m_pGS->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+}
+
+void CCommandProcessor::SendRemoveChatCommand(const CCommandManager::CCommand* pCommand, int ClientID)
+{
+	CNetMsg_Sv_CommandInfoRemove Msg;
+	Msg.m_Name = pCommand->m_aName;
+
+	m_pGS->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+}
+
+void CCommandProcessor::SendRemoveChatCommand(const char* pCommand, int ClientID)
+{
+	CNetMsg_Sv_CommandInfoRemove Msg;
+	Msg.m_Name = pCommand;
+
+	m_pGS->Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }

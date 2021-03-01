@@ -4,7 +4,6 @@
 #define GAME_SERVER_GAMECONTROLLER_H
 
 #include <base/vmath.h>
-#include <game/commands.h>
 #include <game/server/enum_context.h>
 
 /*
@@ -55,9 +54,6 @@ public:
 	virtual void OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon);
 	virtual bool OnCharacterSpawn(class CCharacter *pChr);
 	virtual bool OnEntity(int Index, vec2 Pos);
-
-	static void Com_Example(IConsole::IResult* pResult, void* pContext);
-	virtual void RegisterChatCommands(CCommandManager* pManager);
 
 	void OnPlayerConnect(class CPlayer *pPlayer);
 	void OnPlayerDisconnect(class CPlayer *pPlayer);

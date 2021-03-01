@@ -1,8 +1,7 @@
 #ifndef ENGINE_SERVER_SQL_CONNECTIONPOOL_H
 #define ENGINE_SERVER_SQL_CONNECTIONPOOL_H
 
-#include <boost/scoped_ptr.hpp>
-#include <cppconn/statement.h>
+#include <cppconn/resultset.h>
 #include <functional>
 
 using namespace sql;

@@ -1,11 +1,11 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <game/mapitems.h>
+#include "gamecontroller.h"
 
+#include <engine/console.h>
 #include "entities/pickup.h"
 #include "gamecontext.h"
-
-#include "gamecontroller.h"
 
 /*
 	Here you need to put it in order make more events
@@ -278,16 +278,4 @@ void IGameController::DoTeamChange(CPlayer *pPlayer, bool DoChatMsg)
 	str_format(aBuf, sizeof(aBuf), "team_join player='%d:%s' m_Team=%d", ClientID, Server()->ClientName(ClientID), Team);
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "game", aBuf);
 	OnPlayerInfoChange(pPlayer, GS()->GetWorldID());
-}
-
-void IGameController::Com_Example(IConsole::IResult* pResult, void* pContext)
-{
-	//CCommandManager::SCommandContext* pComContext = (CCommandManager::SCommandContext*)pContext;
-	//IGameController* pSelf = (IGameController*)pComContext->m_pContext;
-
-}
-
-void IGameController::RegisterChatCommands(CCommandManager* pManager)
-{
-	//pManager->AddCommand("test", "Test the command system", "r", Com_Example, this);
 }
