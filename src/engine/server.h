@@ -136,8 +136,12 @@ public:
 		RCON_CID_VOTE=-2,
 	};
 	virtual void SetRconCID(int ClientID) = 0;
+	virtual int GetRconCID() const = 0;
+	virtual int GetRconAuthLevel() const = 0;
+	virtual int GetAuthedState(int ClientID) const = 0;
 	virtual bool IsAuthed(int ClientID) const = 0;
 	virtual bool IsBanned(int ClientID) = 0;
+	virtual bool IsEmpty(int ClientID) const = 0;
 	virtual void Kick(int ClientID, const char *pReason) = 0;
 };
 

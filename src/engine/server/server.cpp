@@ -23,7 +23,7 @@
 #include <engine/shared/protocol.h>
 #include <engine/shared/snapshot.h>
 #include <mastersrv/mastersrv.h>
-
+#include "snapshot_ids_pool.h"
 #include "register.h"
 #include "server.h"
 
@@ -40,212 +40,9 @@
 #include <game/server/enum_context.h>
 #include "discord/discord_main.h"
 #include "multi_worlds.h"
+#include "server_ban.h"
 
 // std::mutex IServer::m_aMutexPlayerDataSafe[MAX_CLIENTS];
-
-// snap listern pool
-CSnapIDPool::CSnapIDPool()
-{
-	Reset();
-}
-
-void CSnapIDPool::Reset()
-{
-	for(int i = 0; i < MAX_IDS; i++)
-	{
-		m_aIDs[i].m_Next = i+1;
-		m_aIDs[i].m_State = 0;
-	}
-
-	m_aIDs[MAX_IDS-1].m_Next = -1;
-	m_FirstFree = 0;
-	m_FirstTimed = -1;
-	m_LastTimed = -1;
-	m_Usage = 0;
-	m_InUsage = 0;
-}
-
-void CSnapIDPool::RemoveFirstTimeout()
-{
-	int NextTimed = m_aIDs[m_FirstTimed].m_Next;
-
-	// add it to the free list
-	m_aIDs[m_FirstTimed].m_Next = m_FirstFree;
-	m_aIDs[m_FirstTimed].m_State = 0;
-	m_FirstFree = m_FirstTimed;
-
-	// remove it from the timed list
-	m_FirstTimed = NextTimed;
-	if(m_FirstTimed == -1)
-		m_LastTimed = -1;
-
-	m_Usage--;
-}
-
-int CSnapIDPool::NewID()
-{
-	int64 Now = time_get();
-
-	// process timed ids
-	while(m_FirstTimed != -1 && m_aIDs[m_FirstTimed].m_Timeout < Now)
-		RemoveFirstTimeout();
-
-	int ID = m_FirstFree;
-	dbg_assert(ID != -1, "id error");
-	if(ID == -1)
-		return ID;
-	m_FirstFree = m_aIDs[m_FirstFree].m_Next;
-	m_aIDs[ID].m_State = 1;
-	m_Usage++;
-	m_InUsage++;
-	return ID;
-}
-
-void CSnapIDPool::TimeoutIDs()
-{
-	// process timed ids
-	while(m_FirstTimed != -1)
-		RemoveFirstTimeout();
-}
-
-void CSnapIDPool::FreeID(int ID)
-{
-	if(ID < 0)
-		return;
-	dbg_assert(m_aIDs[ID].m_State == 1, "id is not alloced");
-
-	m_InUsage--;
-	m_aIDs[ID].m_State = 2;
-	m_aIDs[ID].m_Timeout = time_get()+time_freq()*5;
-	m_aIDs[ID].m_Next = -1;
-
-	if(m_LastTimed != -1)
-	{
-		m_aIDs[m_LastTimed].m_Next = ID;
-		m_LastTimed = ID;
-	}
-	else
-	{
-		m_FirstTimed = ID;
-		m_LastTimed = ID;
-	}
-}
-
-
-void CServerBan::InitServerBan(IConsole *pConsole, IStorageEngine *pStorage, CServer* pServer)
-{
-	CNetBan::Init(pConsole, pStorage);
-
-	m_pServer = pServer;
-
-	// overwrites base command, todo: improve this
-	Console()->Register("ban", "s[id|ip|range] ?i[minutes] r[reason]", CFGFLAG_SERVER | CFGFLAG_STORE, ConBanExt, this, "Ban player with IP/IP range/client id for x minutes for any reason");
-}
-
-template<class T>
-int CServerBan::BanExt(T *pBanPool, const typename T::CDataType *pData, int Seconds, const char *pReason)
-{
-	// validate address
-	if(Server()->m_RconClientID >= 0 && Server()->m_RconClientID < MAX_PLAYERS &&
-		Server()->m_aClients[Server()->m_RconClientID].m_State != CServer::CClient::STATE_EMPTY)
-	{
-		if(NetMatch(pData, Server()->m_NetServer.ClientAddr(Server()->m_RconClientID)))
-		{
-			Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "net_ban", "ban error (you can't ban yourself)");
-			return -1;
-		}
-
-		for(int i = 0; i < MAX_PLAYERS; ++i)
-		{
-			if(i == Server()->m_RconClientID || Server()->m_aClients[i].m_State == CServer::CClient::STATE_EMPTY)
-				continue;
-
-			if(Server()->m_aClients[i].m_Authed >= Server()->m_RconAuthLevel && NetMatch(pData, Server()->m_NetServer.ClientAddr(i)))
-			{
-				Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "net_ban", "ban error (command denied)");
-				return -1;
-			}
-		}
-	}
-	else if(Server()->m_RconClientID == IServer::RCON_CID_VOTE)
-	{
-		for(int i = 0; i < MAX_PLAYERS; ++i)
-		{
-			if(Server()->m_aClients[i].m_State == CServer::CClient::STATE_EMPTY)
-				continue;
-
-			if(Server()->m_aClients[i].m_Authed != CServer::AUTHED_NO && NetMatch(pData, Server()->m_NetServer.ClientAddr(i)))
-			{
-				Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "net_ban", "ban error (command denied)");
-				return -1;
-			}
-		}
-	}
-
-	int Result = Ban(pBanPool, pData, Seconds, pReason);
-	if(Result != 0)
-		return Result;
-
-	// drop banned clients
-	typename T::CDataType Data = *pData;
-	for(int i = 0; i < MAX_PLAYERS; ++i)
-	{
-		if(Server()->m_aClients[i].m_State == CServer::CClient::STATE_EMPTY)
-			continue;
-
-		if(NetMatch(&Data, Server()->m_NetServer.ClientAddr(i)))
-		{
-			CNetHash NetHash(&Data);
-			char aBuf[256];
-			MakeBanInfo(pBanPool->Find(&Data, &NetHash), aBuf, sizeof(aBuf), MSGTYPE_PLAYER);
-			Server()->m_NetServer.Drop(i, aBuf);
-		}
-	}
-
-	return Result;
-}
-
-int CServerBan::BanAddr(const NETADDR *pAddr, int Seconds, const char *pReason)
-{
-	return BanExt(&m_BanAddrPool, pAddr, Seconds, pReason);
-}
-
-int CServerBan::BanRange(const CNetRange *pRange, int Seconds, const char *pReason)
-{
-	if(pRange->IsValid())
-		return BanExt(&m_BanRangePool, pRange, Seconds, pReason);
-
-	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "net_ban", "ban failed (invalid range)");
-	return -1;
-}
-
-void CServerBan::ConBanExt(IConsole::IResult *pResult, void *pUser)
-{
-	CServerBan *pThis = static_cast<CServerBan *>(pUser);
-
-	const char *pStr = pResult->GetString(0);
-	const int Minutes = pResult->NumArguments()>1 ? clamp(pResult->GetInteger(1), 0, 44640) : 30;
-	const char *pReason = pResult->NumArguments()>2 ? pResult->GetString(2) : "No reason given";
-
-	if(str_is_number(pStr))
-	{
-		const int ClientID = str_toint(pStr);
-		if(ClientID < 0 || ClientID >= MAX_PLAYERS || pThis->Server()->m_aClients[ClientID].m_State == CServer::CClient::STATE_EMPTY)
-			pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "net_ban", "ban error (invalid client id)");
-		else
-		{
-			char aBuf[128];
-			char aAddrStr[NETADDR_MAXSTRSIZE];
-			net_addr_str(pThis->Server()->m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), true);
-			str_format(aBuf, sizeof(aBuf), "Player %s IP(%s). Banned for %d minutes!", pThis->Server()->ClientName(ClientID), aAddrStr, Minutes);
-			pThis->Server()->SendDiscordMessage(g_Config.m_SvDiscordAdminChannel, DC_SERVER_WARNING, "Bans information!", aBuf);
-			pThis->BanAddr(pThis->Server()->m_NetServer.ClientAddr(ClientID), Minutes*60, pReason);
-		}
-	}
-	else
-		ConBan(pResult, pUser);
-}
-
 
 void CServer::CClient::Reset()
 {
@@ -280,6 +77,7 @@ CServer::CServer()
 	m_GeneratedRconPassword = 0;
 	m_HeavyReload = false;
 
+	m_pServerBan = new CServerBan;
 	m_pMultiWorlds = new CMultiWorlds;
 	m_pDataMmo = new CDataMMO;
 
@@ -551,6 +349,21 @@ void CServer::SetRconCID(int ClientID)
 	m_RconClientID = ClientID;
 }
 
+int CServer::GetRconCID() const
+{
+	return m_RconClientID;
+}
+
+int CServer::GetRconAuthLevel() const
+{
+	return m_RconAuthLevel;
+}
+
+int CServer::GetAuthedState(int ClientID) const
+{
+	return m_aClients[ClientID].m_Authed;
+}
+
 bool CServer::IsAuthed(int ClientID) const
 {
 	return m_aClients[ClientID].m_Authed;
@@ -558,7 +371,12 @@ bool CServer::IsAuthed(int ClientID) const
 
 bool CServer::IsBanned(int ClientID)
 {
-	return m_ServerBan.IsBanned(m_NetServer.ClientAddr(ClientID), 0, 0, 0);
+	return m_pServerBan->IsBanned(m_NetServer.ClientAddr(ClientID), 0, 0, 0);
+}
+
+bool CServer::IsEmpty(int ClientID) const
+{
+	return m_aClients[ClientID].m_State == CClient::STATE_EMPTY;
 }
 
 int CServer::GetClientInfo(int ClientID, CClientInfo *pInfo) const
@@ -1245,7 +1063,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 					str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=%s authed (moderator)", ClientID, aAddrStr);
 					Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 				}
-				else if (g_Config.m_SvRconMaxTries && m_ServerBan.IsBannable(m_NetServer.ClientAddr(ClientID)))
+				else if (g_Config.m_SvRconMaxTries && m_pServerBan->IsBannable(m_NetServer.ClientAddr(ClientID)))
 				{
 					m_aClients[ClientID].m_AuthTries++;
 					char aBuf[128];
@@ -1256,7 +1074,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 						if(!g_Config.m_SvRconBantime)
 							m_NetServer.Drop(ClientID, "Too many remote console authentication tries");
 						else
-							m_ServerBan.BanAddr(m_NetServer.ClientAddr(ClientID), g_Config.m_SvRconBantime*60, "Too many remote console authentication tries");
+							m_pServerBan->BanAddr(m_NetServer.ClientAddr(ClientID), g_Config.m_SvRconBantime*60, "Too many remote console authentication tries");
 					}
 				}
 				else
@@ -1413,7 +1231,7 @@ void CServer::PumpNetwork()
 			ProcessClientPacket(&Packet);
 	}
 
-	m_ServerBan.Update();
+	m_pServerBan->Update();
 	m_Econ.Update();
 }
 
@@ -1493,13 +1311,13 @@ int CServer::Run()
 		BindAddr.port = g_Config.m_SvPort;
 	}
 
-	if(!m_NetServer.Open(BindAddr, &m_ServerBan, g_Config.m_SvMaxClients, g_Config.m_SvMaxClientsPerIP, NewClientCallback, DelClientCallback, this))
+	if(!m_NetServer.Open(BindAddr, m_pServerBan, g_Config.m_SvMaxClients, g_Config.m_SvMaxClientsPerIP, NewClientCallback, DelClientCallback, this))
 	{
 		dbg_msg("server", "couldn't open socket. port %d might already be in use", g_Config.m_SvPort);
 		return -1;
 	}
 
-	m_Econ.Init(Console(), &m_ServerBan);
+	m_Econ.Init(Console(), m_pServerBan);
 
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "server name is '%s'", g_Config.m_SvName);
@@ -1712,8 +1530,8 @@ void CServer::ConStatus(IConsole::IResult *pResult, void *pUser)
 			net_addr_str(pThis->m_NetServer.ClientAddr(i), aAddrStr, sizeof(aAddrStr), true);
 			if(pThis->m_aClients[i].m_State == CClient::STATE_INGAME)
 			{
-				const char *pAuthStr = pThis->m_aClients[i].m_Authed == CServer::AUTHED_ADMIN ? "(Admin)" :
-										pThis->m_aClients[i].m_Authed == CServer::AUTHED_MOD ? "(Mod)" : "";
+				const char *pAuthStr = pThis->m_aClients[i].m_Authed == AUTHED_ADMIN ? "(Admin)" :
+										pThis->m_aClients[i].m_Authed == AUTHED_MOD ? "(Mod)" : "";
 				str_format(aBuf, sizeof(aBuf), "id=%d addr=%s client=%x name='%s' score=%d %s", i, aAddrStr,
 					pThis->m_aClients[i].m_Version, pThis->m_aClients[i].m_aName, pThis->m_aClients[i].m_Score, pAuthStr);
 			}
@@ -1785,7 +1603,7 @@ void CServer::ConchainModCommandUpdate(IConsole::IResult *pResult, void *pUserDa
 		{
 			for(int i = 0; i < MAX_PLAYERS; ++i)
 			{
-				if(pThis->m_aClients[i].m_State == CServer::CClient::STATE_EMPTY || pThis->m_aClients[i].m_Authed != CServer::AUTHED_MOD ||
+				if(pThis->m_aClients[i].m_State == CServer::CClient::STATE_EMPTY || pThis->m_aClients[i].m_Authed != AUTHED_MOD ||
 					(pThis->m_aClients[i].m_pRconCmdToSend && str_comp(pResult->GetString(0), pThis->m_aClients[i].m_pRconCmdToSend->m_pName) >= 0))
 					continue;
 
@@ -1840,7 +1658,7 @@ void CServer::RegisterCommands()
 	Console()->Chain("sv_rcon_password", ConchainRconPasswordSet, this);
 
 	// register console commands in sub parts
-	m_ServerBan.InitServerBan(Console(), Storage(), this);
+	m_pServerBan->InitServerBan(Console(), Storage(), this, &m_NetServer);
 	
 	for(int i = 0; i < m_pMultiWorlds->GetSizeInitilized(); i++)
 	{

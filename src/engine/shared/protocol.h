@@ -80,6 +80,13 @@ enum
 	NETMSG_REQUEST_MMO_DATA,
 };
 
+enum
+{
+	AUTHED_NO = 0,
+	AUTHED_MOD,
+	AUTHED_ADMIN,
+};
+
 // this should be revised
 enum
 {

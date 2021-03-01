@@ -4,63 +4,13 @@
 #define ENGINE_SERVER_SERVER_H
 #include <engine/server.h>
 
-class CSnapIDPool
-{
-	enum
-	{
-		MAX_IDS = 16*1024,
-	};
-
-	class CID
-	{
-	public:
-		short m_Next;
-		short m_State; // 0 = free, 1 = alloced, 2 = timed
-		int m_Timeout;
-	};
-
-	CID m_aIDs[MAX_IDS];
-
-	int m_FirstFree;
-	int m_FirstTimed;
-	int m_LastTimed;
-	int m_Usage;
-	int m_InUsage;
-
-public:
-	CSnapIDPool();
-
-	void Reset();
-	void RemoveFirstTimeout();
-	int NewID();
-	void TimeoutIDs();
-	void FreeID(int ID);
-};
-
-
-class CServerBan : public CNetBan
-{
-	class CServer *m_pServer;
-
-	template<class T> int BanExt(T *pBanPool, const typename T::CDataType *pData, int Seconds, const char *pReason);
-
-public:
-	class CServer *Server() const { return m_pServer; }
-
-	void InitServerBan(class IConsole *pConsole, class IStorageEngine *pStorage, class CServer* pServer);
-
-	virtual int BanAddr(const NETADDR *pAddr, int Seconds, const char *pReason);
-	virtual int BanRange(const CNetRange *pRange, int Seconds, const char *pReason);
-
-	static void ConBanExt(class IConsole::IResult *pResult, void *pUser);
-};
-
 class CServer : public IServer
 {
 	class IConsole *m_pConsole;
 	class IStorageEngine *m_pStorage;
 	class CMultiWorlds* m_pMultiWorlds;
 	class CDataMMO* m_pDataMmo;
+	class CServerBan* m_pServerBan;
 
 public:
 	virtual class IGameServer* GameServer(int WorldID = 0);
@@ -71,10 +21,6 @@ public:
 
 	enum
 	{
-		AUTHED_NO=0,
-		AUTHED_MOD,
-		AUTHED_ADMIN,
-
 		MAX_RCONCMD_RATIO = 8,
 		MAX_RCONCMD_SEND=16,
 	};
@@ -148,7 +94,6 @@ public:
 	CSnapIDPool m_IDPool;
 	CNetServer m_NetServer;
 	CEcon m_Econ;
-	CServerBan m_ServerBan;
 
 	int64 m_GameStartTime;
 	int m_RunServer;
@@ -220,15 +165,19 @@ public:
 
 	void InitRconPasswordIfUnset();
 
-	void SetRconCID(int ClientID);
-	bool IsAuthed(int ClientID) const;
-	bool IsBanned(int ClientID);
-	int GetClientInfo(int ClientID, CClientInfo *pInfo) const;
-	void GetClientAddr(int ClientID, char *pAddrStr, int Size) const;
-	const char *ClientName(int ClientID) const;
-	const char *ClientClan(int ClientID) const;
-	int ClientCountry(int ClientID) const;
-	bool ClientIngame(int ClientID) const;
+	void SetRconCID(int ClientID) override;
+	int GetRconCID() const override;
+	int GetRconAuthLevel() const override;
+	int GetAuthedState(int ClientID) const override;
+	bool IsAuthed(int ClientID) const override;
+	bool IsBanned(int ClientID) override;
+	bool IsEmpty(int ClientID) const override;
+	int GetClientInfo(int ClientID, CClientInfo *pInfo) const override;
+	void GetClientAddr(int ClientID, char *pAddrStr, int Size) const override;
+	const char *ClientName(int ClientID) const override;
+	const char *ClientClan(int ClientID) const override;
+	int ClientCountry(int ClientID) const override;
+	bool ClientIngame(int ClientID) const override;
 
 	virtual int SendMsg(CMsgPacker* pMsg, int Flags, int ClientID, int64 Mask = -1, int WorldID = -1);
 
