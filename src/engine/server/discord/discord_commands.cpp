@@ -1,15 +1,13 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifdef CONF_DISCORD
-
 #include <base/math.h>
-#include <base/system.h>
+#include "discord_main.h"
+#include "discord_commands.h"
+
 #include <engine/shared/config.h>
 #include <engine/shared/console.h>
 #include <game/server/gamecontext.h>
-
-#include "discord_main.h"
-#include "discord_commands.h"
 
 std::vector < DiscordCommands::Command > DiscordCommands::m_aCommands;
 
@@ -34,7 +32,7 @@ void DiscordCommands::InitCommands()
 /************************************************************************/
 /*  Important commands                                                  */
 /************************************************************************/
-void DiscordCommands::ComHelp(void *pResult, DiscordJob *pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComHelp(IConsole::IResult* pResult, DiscordJob *pDiscord, SleepyDiscord::Message message)
 {
 	std::string ImportantCmd("__**Important commands:**__");
 	std::string RelatedGameServerCmd("\n\n__**Related game server commands:**__");
@@ -70,7 +68,7 @@ void DiscordCommands::ComHelp(void *pResult, DiscordJob *pDiscord, SleepyDiscord
 	pDiscord->sendMessage(message.channelID, "\0", EmbedHelp);
 }
 
-void DiscordCommands::ComConnect(void* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComConnect(IConsole::IResult* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
 	sqlstr::CSqlString<64> DiscordID = sqlstr::CSqlString<64>(std::string(message.author.ID).c_str());
 	ResultPtr pRes = SJK.SD("Nick", "tw_accounts_data", "WHERE DiscordID = '%s'", DiscordID.cstr());
@@ -101,7 +99,7 @@ void DiscordCommands::ComConnect(void* pResult, DiscordJob* pDiscord, SleepyDisc
 /************************************************************************/
 /*  Game server commands                                                */
 /************************************************************************/
-void DiscordCommands::ComOnline(void* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComOnline(IConsole::IResult* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
 	std::string Onlines = "";
 	CGS* pGS = (CGS*)pDiscord->Server()->GameServer(MAIN_WORLD_ID);
@@ -123,7 +121,7 @@ void DiscordCommands::ComOnline(void* pResult, DiscordJob* pDiscord, SleepyDisco
 	pDiscord->sendMessage(message.channelID, "\0", EmbedOnlines);
 }
 
-void DiscordCommands::ComStats(void* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComStats(IConsole::IResult* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
 	IConsole::IResult* pArgs = (IConsole::IResult*)pResult;
 	const char* pSearchNick = pArgs->GetString(0);
@@ -132,7 +130,7 @@ void DiscordCommands::ComStats(void* pResult, DiscordJob* pDiscord, SleepyDiscor
 		pDiscord->SendWarningMessage(message.channelID, "Accounts containing [" + std::string(pSearchNick) + "] among nicknames were not found on the server.");
 }
 
-void DiscordCommands::ComRanking(void* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComRanking(IConsole::IResult* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
 	SleepyDiscord::Embed EmbedRanking;
 	EmbedRanking.title = message.startsWith("!mgoldranking") ? "Ranking by Gold" : "Ranking by Level";
@@ -159,7 +157,7 @@ void DiscordCommands::ComRanking(void* pResult, DiscordJob* pDiscord, SleepyDisc
 /************************************************************************/
 /*  Fun commands                                                        */
 /************************************************************************/
-void DiscordCommands::ComAvatar(void* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
+void DiscordCommands::ComAvatar(IConsole::IResult* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
 	if(message.mentions.empty())
 	{
@@ -183,7 +181,7 @@ void DiscordCommands::ComAvatar(void* pResult, DiscordJob* pDiscord, SleepyDisco
 /************************************************************************/
 /*  Engine commands                                                     */
 /************************************************************************/
-void DiscordCommands::RegisterCommand(const char* pName, const char* pArgs, const char* pDesc, CommandCallback pCallback, int64 FlagsType, int64 Flags)
+void DiscordCommands::RegisterCommand(const char* pName, const char* pArgs, const char* pDesc, CommandCallback pCallback, int FlagsType, int Flags)
 {
 	DiscordCommands::Command NewCommand;
 	str_copy(NewCommand.m_aCommand, pName, sizeof(NewCommand.m_aCommand));

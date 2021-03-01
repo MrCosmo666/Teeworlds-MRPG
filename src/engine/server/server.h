@@ -11,13 +11,13 @@ class CServer : public IServer
 	class CMultiWorlds* m_pMultiWorlds;
 	class CDataMMO* m_pDataMmo;
 	class CServerBan* m_pServerBan;
+	class DiscordJob* m_pDiscord;
 
 public:
 	virtual class IGameServer* GameServer(int WorldID = 0);
 	class IConsole *Console() { return m_pConsole; }
 	class IStorageEngine*Storage() { return m_pStorage; }
 	class CMultiWorlds* MultiWorlds() const { return m_pMultiWorlds; }
-	class DiscordJob *m_pDiscord;
 
 	enum
 	{

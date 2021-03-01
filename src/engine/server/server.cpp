@@ -75,6 +75,9 @@ CServer::CServer()
 	m_pServerBan = new CServerBan;
 	m_pMultiWorlds = new CMultiWorlds;
 	m_pDataMmo = new CDataMMO;
+#ifdef CONF_DISCORD
+	m_pDiscord = new DiscordJob(this);
+#endif
 
 	Init();
 }
@@ -83,6 +86,9 @@ CServer::~CServer()
 {
 	delete m_pMultiWorlds;
 	delete m_pDataMmo;
+#ifdef CONF_DISCORD
+	delete m_pDiscord;
+#endif
 	SJK.DisconnectConnectionHeap();
 }
 
@@ -1788,18 +1794,11 @@ int main(int argc, const char **argv) // ignore_convention
 		pServer->InitRconPasswordIfUnset();
 
 	// run the server
-	#ifdef CONF_DISCORD
-		pServer->m_pDiscord = new DiscordJob(pServer);
-	#endif
-	
 	dbg_msg("server", "starting...");
 	pServer->Run();
 
 	// free
 	delete pServer->m_pLocalization;
-	#ifdef CONF_DISCORD
-		delete pServer->m_pDiscord;
-	#endif
 
 	delete pServer;
 	delete pKernel;
