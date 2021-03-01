@@ -14,7 +14,6 @@ bool CMultiWorlds::Add(int WorldID, IKernel* pKernel, IServer *pServer)
 	CWorldGameServer& pNewWorld = m_Worlds[WorldID];
 	pNewWorld.m_pGameServer = CreateGameServer();
 	pNewWorld.m_pLoadedMap = CreateEngineMap();
-	pNewWorld.m_pLoadedMapSixup = CreateEngineMap();
 	m_WasInitilized++;
 
 	bool RegisterFail = false;
@@ -76,9 +75,7 @@ void CMultiWorlds::Clear()
 	for(int i = 0; i < m_WasInitilized; i++)
 	{
 		m_Worlds[i].m_pLoadedMap->Unload();
-		m_Worlds[i].m_pLoadedMapSixup->Unload();
 		delete m_Worlds[i].m_pLoadedMap;
-		delete m_Worlds[i].m_pLoadedMapSixup;
 		delete m_Worlds[i].m_pGameServer;
 	}
 	m_WasInitilized = 0;

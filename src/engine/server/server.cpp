@@ -1612,7 +1612,6 @@ int CServer::Run()
 					{
 						// free map data
 						m_pMultiWorlds->GetWorld(i)->m_pLoadedMap->Unload();
-						m_pMultiWorlds->GetWorld(i)->m_pLoadedMapSixup->Unload();
 
 						// reload map data
 						if(!LoadMap(i))

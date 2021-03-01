@@ -14,7 +14,6 @@ public:
 		char m_aPath[512];
 		class IGameServer* m_pGameServer;
 		class IEngineMap* m_pLoadedMap;
-		class IEngineMap* m_pLoadedMapSixup;
 	};
 
 	CMultiWorlds()
@@ -23,7 +22,6 @@ public:
 		{
 			m_Worlds[i].m_pGameServer = nullptr;
 			m_Worlds[i].m_pLoadedMap = nullptr;
-			m_Worlds[i].m_pLoadedMapSixup = nullptr;
 		}
 		m_WasInitilized = 0;
 	}
