@@ -1592,22 +1592,13 @@ int CServer::Run()
 
 			if(NewTicks)
 			{
-				// snap game
-				if(ExistsPlayers && !m_HeavyReload)
-				{
-					if(g_Config.m_SvHighBandwidth || ShouldSnap)
-					{
-						for(int i = 0; i < m_pMultiWorlds->GetSizeInitilized(); i++)
-							DoSnapshot(i);
-					}
-					UpdateClientRconCommands();
-				}
 				// heavy reset server ((24 * 60) * 60) * SERVER_TICK_SPEED = 4320000 tick in day i think
-				else if(m_CurrentGameTick > (g_Config.m_SvHardresetAfterDays * 4320000))
+				if((!ExistsPlayers && m_CurrentGameTick > (g_Config.m_SvHardresetAfterDays * 4320000)) || m_HeavyReload)
 				{
 					m_CurrentGameTick = 0;
 					m_GameStartTime = time_get();
 					SetOffsetWorldTime(0);
+
 					for(int i = 0; i < m_pMultiWorlds->GetSizeInitilized(); i++)
 					{
 						// free map data
@@ -1636,7 +1627,7 @@ int CServer::Run()
 
 					if(m_HeavyReload)
 					{
-						// If it is a reload from rcon
+						// reload players
 						for(int ClientID = 0; ClientID < MAX_PLAYERS; ClientID++)
 						{
 							if(m_aClients[ClientID].m_State <= CClient::STATE_AUTH)
@@ -1661,6 +1652,16 @@ int CServer::Run()
 						pGameServer->OnInit(i);
 					}
 					Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "A server was heavy reload.");
+				}
+				else
+				{
+					// snap game
+					if(g_Config.m_SvHighBandwidth || ShouldSnap)
+					{
+						for(int i = 0; i < m_pMultiWorlds->GetSizeInitilized(); i++)
+							DoSnapshot(i);
+					}
+					UpdateClientRconCommands();
 				}
 			}
 
@@ -1720,6 +1721,11 @@ void CServer::ConStatus(IConsole::IResult *pResult, void *pUser)
 void CServer::ConShutdown(IConsole::IResult *pResult, void *pUser)
 {
 	((CServer *)pUser)->m_RunServer = 0;
+}
+
+void CServer::ConReload(IConsole::IResult* pResult, void* pUser)
+{
+	((CServer*)pUser)->m_HeavyReload = true;
 }
 
 void CServer::ConLogout(IConsole::IResult *pResult, void *pUser)
@@ -1816,6 +1822,7 @@ void CServer::RegisterCommands()
 	Console()->Register("kick", "i[id] ?r[reason]", CFGFLAG_SERVER, ConKick, this, "Kick player with specified id for any reason");
 	Console()->Register("status", "", CFGFLAG_SERVER, ConStatus, this, "List players");
 	Console()->Register("shutdown", "", CFGFLAG_SERVER, ConShutdown, this, "Shut down");
+	Console()->Register("reload", "", CFGFLAG_SERVER, ConReload, this, "Reload maps and synchronize data with the database");
 	Console()->Register("logout", "", CFGFLAG_SERVER, ConLogout, this, "Logout of rcon");
 
 	Console()->Chain("sv_name", ConchainSpecialInfoupdate, this);
