@@ -260,6 +260,8 @@ void CServer::CClient::Reset()
 	m_SnapRate = CClient::SNAPRATE_INIT;
 	m_Score = 0;
 	m_MapChunk = 0;
+	m_DataMmoChunk = 0;
+	m_ChangeMap = false;
 }
 
 CServer::CServer()
@@ -1635,6 +1637,7 @@ int CServer::Run()
 
 							m_aClients[ClientID].Reset();
 							m_aClients[ClientID].m_State = CClient::STATE_CONNECTING;
+							SendDataMmoInfo(ClientID);
 							SendMap(ClientID);
 						}
 						m_HeavyReload = false;
