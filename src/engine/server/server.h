@@ -3,7 +3,6 @@
 #ifndef ENGINE_SERVER_SERVER_H
 #define ENGINE_SERVER_SERVER_H
 #include <engine/server.h>
-#include <engine/shared/mmodata.h>
 
 class CSnapIDPool
 {
@@ -61,6 +60,7 @@ class CServer : public IServer
 	class IConsole *m_pConsole;
 	class IStorageEngine *m_pStorage;
 	class CMultiWorlds* m_pMultiWorlds;
+	class CDataMMO* m_pDataMmo;
 
 public:
 	virtual class IGameServer* GameServer(int WorldID = 0);
@@ -190,7 +190,6 @@ public:
 	virtual int GetEnumTypeDay() const;
 
 	// mmo data
-	CDataMMO m_DataMmo;
 	void SendDataMmoInfo(int ClientID);
 
 	// basic

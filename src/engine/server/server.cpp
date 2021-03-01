@@ -36,9 +36,10 @@
 #include <engine/server/sql_string_helpers.h>
 #include <teeother/components/localization.h>
 
-#include "multi_worlds.h"
+#include <engine/shared/mmodata.h>
 #include <game/server/enum_context.h>
 #include "discord/discord_main.h"
+#include "multi_worlds.h"
 
 // std::mutex IServer::m_aMutexPlayerDataSafe[MAX_CLIENTS];
 
@@ -280,6 +281,7 @@ CServer::CServer()
 	m_HeavyReload = false;
 
 	m_pMultiWorlds = new CMultiWorlds;
+	m_pDataMmo = new CDataMMO;
 
 	Init();
 }
@@ -287,6 +289,7 @@ CServer::CServer()
 CServer::~CServer()
 {
 	delete m_pMultiWorlds;
+	delete m_pDataMmo;
 	SJK.DisconnectConnectionHeap();
 }
 
@@ -615,9 +618,9 @@ bool CServer::ClientIngame(int ClientID) const
 
 void CServer::SendDataMmoInfo(int ClientID)
 {
-	int Size = m_DataMmo.GetCurrentSize();
-	unsigned int Crc = m_DataMmo.Crc();
-	SHA256_DIGEST Sha256 = m_DataMmo.Sha256();
+	int Size = m_pDataMmo->GetCurrentSize();
+	unsigned int Crc = m_pDataMmo->Crc();
+	SHA256_DIGEST Sha256 = m_pDataMmo->Sha256();
 
 	CMsgPacker Msg(NETMSG_DATA_MMO_INFO, true);
 	Msg.AddInt(Crc);
@@ -1052,8 +1055,8 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 		{
 			if((pPacket->m_Flags & NET_CHUNKFLAG_VITAL) != 0 && m_aClients[ClientID].m_State == CClient::STATE_CONNECTING)
 			{
-				const int CurrentDataSize = m_DataMmo.GetCurrentSize();
-				unsigned char* CurrentData = m_DataMmo.GetCurrentData();
+				const int CurrentDataSize = m_pDataMmo->GetCurrentSize();
+				unsigned char* CurrentData = m_pDataMmo->GetCurrentData();
 
 				int ChunkSize = MAP_CHUNK_SIZE;
 				for(int i = 0; i < m_DataChunksPerRequest && m_aClients[ClientID].m_DataMmoChunk >= 0; ++i)
@@ -1510,7 +1513,7 @@ int CServer::Run()
 
 	str_format(aBuf, sizeof(aBuf), "version %s", GameServer()->NetVersion());
 	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
-	if(!m_DataMmo.Load(m_pStorage))
+	if(!m_pDataMmo->Load(m_pStorage))
 	{
 		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "mmo data information was not uploaded");
 		return -1;
