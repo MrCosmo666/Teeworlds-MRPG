@@ -1,6 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <teeother/components/localization.h>
+#include <game/server/mmocore/ComponentsCore/InventoryJob/InventoryJob.h>
 
 #include "gamemodes/dungeon.h"
 #include "gamecontext.h"
@@ -330,7 +331,7 @@ void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed,
 	GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, aBufBroadcast);
 }
 
-bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade, const char *UpgradeName)
+bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade)
 {
 	const int UpgradeNeed = Price*Count;
 	if((*Upgrade + Count) > MaximalUpgrade)
@@ -445,7 +446,7 @@ bool CPlayer::GetHidenMenu(int HideID) const
 bool CPlayer::IsAuthed()
 { 
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID))
-		return (bool)Acc().m_AccountID;
+		return (bool)(Acc().m_AccountID > 0);
 	return false; 
 }
 
@@ -537,7 +538,7 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 {
 	if(PPSTR(CMD, "UPGRADE") == 0)
 	{
-		if(Upgrade(Get, &Acc().m_aStats[VoteID], &Acc().m_Upgrade, VoteID2, 1000, CGS::ms_aAttributsInfo[VoteID].m_aName)) 
+		if(Upgrade(Get, &Acc().m_aStats[VoteID], &Acc().m_Upgrade, VoteID2, 1000)) 
 		{
 			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_UPGRADES);
 			GS()->ResetVotes(m_ClientID, MenuList::MENU_UPGRADE);

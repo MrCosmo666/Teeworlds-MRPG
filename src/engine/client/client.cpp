@@ -280,18 +280,10 @@ CClient::CClient() : m_DemoPlayer(&m_SnapshotDelta), m_DemoRecorder(&m_SnapshotD
 	m_aCmdConnect[0] = 0;
 
 	// map download
-	m_aMapdownloadFilename[0] = 0;
-	m_aMapdownloadFilenameTemp[0] = 0;
-	m_aMapdownloadName[0] = 0;
-	m_MapdownloadFileTemp = 0;
-	m_MapdownloadChunk = 0;
-	m_MapdownloadSha256 = SHA256_ZEROED;
-	m_MapdownloadSha256Present = false;
-	m_MapdownloadCrc = 0;
-	m_MapdownloadAmount = -1;
-	m_MapdownloadTotalsize = -1;
+	m_DownloadMap.Clear();
 
 	// mmotee
+	m_DownloadMmoData.Clear();
 	m_pMmoInfoTask = nullptr;
 	m_aNews[0] = '\0';
 
@@ -361,8 +353,11 @@ void CClient::SendEnterGame()
 
 void CClient::SendReady()
 {
-	CMsgPacker Msg(NETMSG_READY, true);
-	SendMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_FLUSH);
+	if(m_DownloadMap.m_Downloaded && m_DownloadMmoData.m_Downloaded)
+	{
+		CMsgPacker Msg(NETMSG_READY, true);
+		SendMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_FLUSH);
+	}
 }
 
 void CClient::RconAuth(const char* pName, const char* pPassword)
@@ -583,18 +578,19 @@ void CClient::DisconnectWithReason(const char* pReason)
 	m_pMap->Unload();
 
 	// disable all downloads
-	m_MapdownloadChunk = 0;
-	if (m_MapdownloadFileTemp)
+	if(m_DownloadMap.m_FileTemp)
 	{
-		io_close(m_MapdownloadFileTemp);
-		Storage()->RemoveFile(m_aMapdownloadFilenameTemp, IStorageEngine::TYPE_SAVE);
+		io_close(m_DownloadMap.m_FileTemp);
+		Storage()->RemoveFile(m_DownloadMap.m_aFilenameTemp, IStorageEngine::TYPE_SAVE);
 	}
-	m_MapdownloadFileTemp = 0;
-	m_MapdownloadSha256 = SHA256_ZEROED;
-	m_MapdownloadSha256Present = false;
-	m_MapdownloadCrc = 0;
-	m_MapdownloadTotalsize = -1;
-	m_MapdownloadAmount = 0;
+	m_DownloadMap.Clear();
+
+	if(m_DownloadMmoData.m_FileTemp)
+	{
+		io_close(m_DownloadMmoData.m_FileTemp);
+		Storage()->RemoveFile(m_DownloadMmoData.m_aFilenameTemp, IStorageEngine::TYPE_SAVE);
+	}
+	m_DownloadMmoData.Clear();
 
 	// clear the current server info
 	mem_zero(&m_CurrentServerInfo, sizeof(m_CurrentServerInfo));
@@ -879,11 +875,41 @@ void CClient::Render()
 	DebugRender();
 }
 
+bool CClient::LoadMmoData(const SHA256_DIGEST* pWantedSha256, unsigned WantedCrc)
+{
+	SetState(IClient::STATE_LOADING);
+	m_DownloadMmoData.m_Downloaded = false;
+
+	if(!m_DataMmo.Load(m_pStorage))
+		return false;
+
+	// check crc and sha256
+	if(pWantedSha256 && m_DataMmo.Sha256() != *pWantedSha256 || m_DataMmo.Crc() != WantedCrc)
+	{
+		m_DataMmo.Unload();
+		return false;
+	}
+
+	m_DownloadMmoData.m_Downloaded = true;
+	return true;
+}
+
+static void FormatMmoDataDownloadFilename(const SHA256_DIGEST* pSha256, bool Temp, char* pBuffer, int BufferSize)
+{
+	char aSuffix[32];
+	if(Temp)
+		str_format(aSuffix, sizeof(aSuffix), ".%d.tmp", pid());
+
+	char aSha256[SHA256_MAXSTRSIZE];
+	sha256_str(*pSha256, aSha256, sizeof(aSha256));
+	str_format(pBuffer, BufferSize, "%s_%s%s", MMO_DATA_FILE, aSha256, aSuffix);
+}
+
 const char* CClient::LoadMap(const char* pName, const char* pFilename, const SHA256_DIGEST* pWantedSha256, unsigned WantedCrc)
 {
 	static char aErrorMsg[512];
-
 	SetState(IClient::STATE_LOADING);
+	m_DownloadMap.m_Downloaded = false;
 
 	if (!m_pMap->Load(pFilename))
 	{
@@ -924,7 +950,7 @@ const char* CClient::LoadMap(const char* pName, const char* pFilename, const SHA
 	str_copy(m_aCurrentMapPath, pFilename, sizeof(m_aCurrentMapPath));
 	m_CurrentMapSha256 = m_pMap->Sha256();
 	m_CurrentMapCrc = m_pMap->Crc();
-
+	m_DownloadMap.m_Downloaded = true;
 	return 0x0;
 }
 
@@ -1236,6 +1262,7 @@ void CClient::ProcessServerPacket(CNetChunk* pPacket)
 			int MapChunkSize = Unpacker.GetInt();
 			if (Unpacker.Error())
 				return;
+
 			const SHA256_DIGEST* pMapSha256 = (const SHA256_DIGEST*)Unpacker.GetRaw(sizeof(*pMapSha256));
 			const char* pError = 0;
 
@@ -1266,30 +1293,30 @@ void CClient::ProcessServerPacket(CNetChunk* pPacket)
 				}
 				else
 				{
-					if (m_MapdownloadFileTemp)
+					if (m_DownloadMap.m_FileTemp)
 					{
-						io_close(m_MapdownloadFileTemp);
-						Storage()->RemoveFile(m_aMapdownloadFilenameTemp, IStorageEngine::TYPE_SAVE);
+						io_close(m_DownloadMap.m_FileTemp);
+						Storage()->RemoveFile(m_DownloadMap.m_aFilenameTemp, IStorageEngine::TYPE_SAVE);
 					}
 
 					// start map download
-					FormatMapDownloadFilename(pMap, pMapSha256, MapCrc, false, m_aMapdownloadFilename, sizeof(m_aMapdownloadFilename));
-					FormatMapDownloadFilename(pMap, pMapSha256, MapCrc, true, m_aMapdownloadFilenameTemp, sizeof(m_aMapdownloadFilenameTemp));
+					FormatMapDownloadFilename(pMap, pMapSha256, MapCrc, false, m_DownloadMap.m_aFilename, sizeof(m_DownloadMap.m_aFilename));
+					FormatMapDownloadFilename(pMap, pMapSha256, MapCrc, true, m_DownloadMap.m_aFilenameTemp, sizeof(m_DownloadMap.m_aFilenameTemp));
 
 					char aBuf[256];
-					str_format(aBuf, sizeof(aBuf), "starting to download map to '%s'", m_aMapdownloadFilenameTemp);
+					str_format(aBuf, sizeof(aBuf), "starting to download map to '%s'", m_DownloadMap.m_aFilenameTemp);
 					m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "client/network", aBuf);
 
-					str_copy(m_aMapdownloadName, pMap, sizeof(m_aMapdownloadName));
-					m_MapdownloadFileTemp = Storage()->OpenFile(m_aMapdownloadFilenameTemp, IOFLAG_WRITE, IStorageEngine::TYPE_SAVE);
-					m_MapdownloadChunk = 0;
-					m_MapdownloadChunkNum = MapChunkNum;
-					m_MapDownloadChunkSize = MapChunkSize;
-					m_MapdownloadSha256 = pMapSha256 ? *pMapSha256 : SHA256_ZEROED;
-					m_MapdownloadSha256Present = pMapSha256;
-					m_MapdownloadCrc = MapCrc;
-					m_MapdownloadTotalsize = MapSize;
-					m_MapdownloadAmount = 0;
+					str_copy(m_DownloadMap.m_aName, pMap, sizeof(m_DownloadMap.m_aName));
+					m_DownloadMap.m_FileTemp = Storage()->OpenFile(m_DownloadMap.m_aFilenameTemp, IOFLAG_WRITE, IStorageEngine::TYPE_SAVE);
+					m_DownloadMap.m_Chunk = 0;
+					m_DownloadMap.m_DownloadChunkNum = MapChunkNum;
+					m_DownloadMap.m_DownloadChunkSize = MapChunkSize;
+					m_DownloadMap.m_Sha256 = pMapSha256 ? *pMapSha256 : SHA256_ZEROED;
+					m_DownloadMap.m_Sha256Present = pMapSha256;
+					m_DownloadMap.m_Crc = MapCrc;
+					m_DownloadMap.m_Totalsize = MapSize;
+					m_DownloadMap.m_Amount = 0;
 
 					// request first chunk package of map data
 					CMsgPacker Msg(NETMSG_REQUEST_MAP_DATA, true);
@@ -1302,34 +1329,34 @@ void CClient::ProcessServerPacket(CNetChunk* pPacket)
 		}
 		else if ((pPacket->m_Flags & NET_CHUNKFLAG_VITAL) != 0 && Msg == NETMSG_MAP_DATA)
 		{
-			if (!m_MapdownloadFileTemp)
+			if (!m_DownloadMap.m_FileTemp)
 				return;
 
-			int Size = min(m_MapDownloadChunkSize, m_MapdownloadTotalsize - m_MapdownloadAmount);
+			int Size = min(m_DownloadMap.m_DownloadChunkSize, m_DownloadMap.m_Totalsize - m_DownloadMap.m_Amount);
 			const unsigned char* pData = Unpacker.GetRaw(Size);
 			if (Unpacker.Error())
 				return;
 
-			io_write(m_MapdownloadFileTemp, pData, Size);
-			++m_MapdownloadChunk;
-			m_MapdownloadAmount += Size;
+			io_write(m_DownloadMap.m_FileTemp, pData, Size);
+			++m_DownloadMap.m_Chunk;
+			m_DownloadMap.m_Amount += Size;
 
-			if (m_MapdownloadAmount == m_MapdownloadTotalsize)
+			if (m_DownloadMap.m_Amount == m_DownloadMap.m_Totalsize)
 			{
 				// map download complete
 				m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "client/network", "download complete, loading map");
 
-				if (m_MapdownloadFileTemp)
-					io_close(m_MapdownloadFileTemp);
-				m_MapdownloadFileTemp = 0;
-				m_MapdownloadAmount = 0;
-				m_MapdownloadTotalsize = -1;
+				if (m_DownloadMap.m_FileTemp)
+					io_close(m_DownloadMap.m_FileTemp);
+				m_DownloadMap.m_FileTemp = 0;
+				m_DownloadMap.m_Amount = 0;
+				m_DownloadMap.m_Totalsize = -1;
 
-				Storage()->RemoveFile(m_aMapdownloadFilename, IStorageEngine::TYPE_SAVE);
-				Storage()->RenameFile(m_aMapdownloadFilenameTemp, m_aMapdownloadFilename, IStorageEngine::TYPE_SAVE);
+				Storage()->RemoveFile(m_DownloadMap.m_aFilename, IStorageEngine::TYPE_SAVE);
+				Storage()->RenameFile(m_DownloadMap.m_aFilenameTemp, m_DownloadMap.m_aFilename, IStorageEngine::TYPE_SAVE);
 
 				// load map
-				const char* pError = LoadMap(m_aMapdownloadName, m_aMapdownloadFilename, m_MapdownloadSha256Present ? &m_MapdownloadSha256 : 0, m_MapdownloadCrc);
+				const char* pError = LoadMap(m_DownloadMap.m_aName, m_DownloadMap.m_aFilename, m_DownloadMap.m_Sha256Present ? &m_DownloadMap.m_Sha256 : 0, m_DownloadMap.m_Crc);
 				if (!pError)
 				{
 					m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "client/network", "loading done");
@@ -1338,7 +1365,7 @@ void CClient::ProcessServerPacket(CNetChunk* pPacket)
 				else
 					DisconnectWithReason(pError);
 			}
-			else if (m_MapdownloadChunk % m_MapdownloadChunkNum == 0)
+			else if (m_DownloadMap.m_Chunk % m_DownloadMap.m_DownloadChunkNum == 0)
 			{
 				// request next chunk package of map data
 				CMsgPacker Msg(NETMSG_REQUEST_MAP_DATA, true);
@@ -1627,6 +1654,85 @@ void CClient::ProcessServerPacket(CNetChunk* pPacket)
 					// ack snapshot
 					m_AckGameTick = GameTick;
 				}
+			}
+		}	
+		else if((pPacket->m_Flags & NET_CHUNKFLAG_VITAL) != 0 && Msg == NETMSG_DATA_MMO_INFO)
+		{
+			int Crc = Unpacker.GetInt();
+			int Size = Unpacker.GetInt();
+			int ChunkNum = Unpacker.GetInt();
+			int ChunkSize = Unpacker.GetInt();
+			if(Unpacker.Error() || Size <= 0)
+				return;
+
+			const char* pMmoName = MMO_DATA_FILE;
+			const SHA256_DIGEST* pMmoSha256 = (const SHA256_DIGEST*)Unpacker.GetRaw(sizeof(*pMmoSha256));
+			if(LoadMmoData(pMmoSha256, Crc))
+			{
+				m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "client/network", "mmo data file loaded");
+				SendReady();
+				return;
+			}
+
+			if(m_DownloadMmoData.m_FileTemp)
+			{
+				io_close(m_DownloadMmoData.m_FileTemp);
+				Storage()->RemoveFile(m_DownloadMmoData.m_aFilenameTemp, IStorageEngine::TYPE_SAVE);
+			}
+
+			// start download
+			FormatMmoDataDownloadFilename(pMmoSha256, false, m_DownloadMmoData.m_aFilename, sizeof(m_DownloadMmoData.m_aFilename));
+			FormatMmoDataDownloadFilename(pMmoSha256, true, m_DownloadMmoData.m_aFilenameTemp, sizeof(m_DownloadMmoData.m_aFilenameTemp));
+			m_DownloadMmoData.m_FileTemp = Storage()->OpenFile(m_DownloadMmoData.m_aFilenameTemp, IOFLAG_WRITE, IStorageEngine::TYPE_SAVE);
+			m_DownloadMmoData.m_Sha256 = *pMmoSha256;
+			m_DownloadMmoData.m_Crc = Crc;
+			m_DownloadMmoData.m_DownloadChunkNum = ChunkNum;
+			m_DownloadMmoData.m_DownloadChunkSize = ChunkSize;
+			m_DownloadMmoData.m_Totalsize = Size;
+			m_DownloadMmoData.m_Chunk = 0;
+			m_DownloadMmoData.m_Amount = 0;
+
+			// request first chunk package of data
+			CMsgPacker Msg(NETMSG_REQUEST_MMO_DATA, true);
+			SendMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_FLUSH);
+		}
+		else if((pPacket->m_Flags & NET_CHUNKFLAG_VITAL) != 0 && Msg == NETMSG_DATA_MMO)
+		{
+			if(!m_DownloadMmoData.m_FileTemp)
+				return;
+
+			int Size = min(m_DownloadMmoData.m_DownloadChunkSize, m_DownloadMmoData.m_Totalsize - m_DownloadMmoData.m_Amount);
+			const unsigned char* pData = Unpacker.GetRaw(Size);
+			if(Unpacker.Error())
+				return;
+
+			io_write(m_DownloadMmoData.m_FileTemp, pData, Size);
+			++m_DownloadMmoData.m_Chunk;
+			m_DownloadMmoData.m_Amount += Size;
+
+			if(m_DownloadMmoData.m_Amount == m_DownloadMmoData.m_Totalsize)
+			{
+				// data download complete
+				m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "client/network", "download complete, loading mmo data");
+
+				if(m_DownloadMmoData.m_FileTemp)
+					io_close(m_DownloadMmoData.m_FileTemp);
+				m_DownloadMmoData.m_FileTemp = 0;
+				m_DownloadMmoData.m_Amount = 0;
+				m_DownloadMmoData.m_Totalsize = -1;
+
+				Storage()->RemoveFile(m_DownloadMmoData.m_aFilename, IStorageEngine::TYPE_SAVE);
+				Storage()->RenameFile(m_DownloadMmoData.m_aFilenameTemp, m_DownloadMmoData.m_aFilename, IStorageEngine::TYPE_SAVE);
+
+				// load data
+				LoadMmoData(&m_DownloadMmoData.m_Sha256, m_DownloadMmoData.m_Crc);
+				SendReady();
+			}
+			else if(m_DownloadMmoData.m_Chunk % m_DownloadMmoData.m_DownloadChunkNum == 0)
+			{
+				// request next chunk package of map data
+				CMsgPacker Msg(NETMSG_REQUEST_MMO_DATA, true);
+				SendMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_FLUSH);
 			}
 		}
 	}

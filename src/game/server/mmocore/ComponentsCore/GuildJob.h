@@ -6,6 +6,9 @@
 #include <game/server/mmocore/GameEntities/decoration_houses.h>
 #include "../MmoComponent.h"
 
+#include <string>
+#include <tuple>
+
 /* TODO:
 	Need refactoring it in two parts, the system and the game part
 */
@@ -21,13 +24,31 @@ class GuildJob : public MmoComponent
 
 	struct GuildStruct
 	{
+		enum
+		{
+			AVAILABLE_SLOTS = 0,
+			CHAIR_EXPERIENCE = 1,
+			NUM_GUILD_UPGRADES,
+		};
+		GuildStruct()
+		{
+			m_Upgrades[AVAILABLE_SLOTS] = { "Available slots", "AvailableSlots", 0 };
+			m_Upgrades[CHAIR_EXPERIENCE] = { "Chair experience", "ChairExperience", 0 };
+		}
+		struct
+		{
+			char m_aName[64];
+			char m_aFieldName[64];
+			int m_Value;
+		} m_Upgrades[NUM_GUILD_UPGRADES];
+
 		char m_aName[32];
 		int m_Level;
 		int m_Exp;
 		int m_OwnerID;
 		int m_Bank;
-		int m_Upgrades[EMEMBERUPGRADE::NUM_EMEMBERUPGRADE];
 		int m_Score;
+
 	};
 	
 	struct GuildStructHouse
@@ -67,8 +88,6 @@ class GuildJob : public MmoComponent
 private:
 	void LoadGuildRank(int GuildID);
 	void TickHousingText();
-
-	std::string UpgradeNames(int Field, bool DataTable = false);
 
 public:
 	int SearchGuildByName(const char* pGuildName) const;

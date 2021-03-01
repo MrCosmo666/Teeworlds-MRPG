@@ -2,14 +2,10 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef ENGINE_SERVER_SERVER_H
 #define ENGINE_SERVER_SERVER_H
+#include <teeother/tl/singletion.h>
 
 #include <engine/server.h>
-#include <teeother/tl/singletion.h>
-#include <game/server/enum_global.h>
-
-STRINGABLE_ENUM_IMPL(MINER)
-STRINGABLE_ENUM_IMPL(PLANT)
-STRINGABLE_ENUM_IMPL(EMEMBERUPGRADE)
+#include <engine/shared/mmodata.h>
 
 // multiworlds
 #define WorldsInstance CSingleton<CWorldGameServerArray>::Get()
@@ -163,6 +159,7 @@ public:
 		bool m_ChangeMap;
 
 		int m_MapChunk;
+		int m_DataMmoChunk;
 		bool m_NoRconNote;
 		bool m_Quitting;
 		const IConsole::CCommandInfo *m_pRconCmdToSend;
@@ -192,6 +189,7 @@ public:
 		MAP_CHUNK_SIZE=NET_MAX_PAYLOAD-NET_MAX_CHUNKHEADERSIZE-4, // msg type
 	};
 	int m_MapChunksPerRequest;
+	int m_DataChunksPerRequest;
 
 	int m_RconPasswordSet;
 	int m_GeneratedRconPassword;
@@ -216,6 +214,10 @@ public:
 	virtual bool CheckWorldTime(int Hour, int Minute);
 	virtual const char* GetStringTypeDay() const;
 	virtual int GetEnumTypeDay() const;
+
+	// mmo data
+	CDataMMO m_DataMmo;
+	void SendDataMmoInfo(int ClientID);
 
 	// basic
 	virtual void SetClientName(int ClientID, const char *pName);
@@ -278,7 +280,6 @@ public:
 
 	void PumpNetwork();
 
-	const char *GetMapName() const;
 	bool LoadMap(int ID);
 
 	void InitRegister(CNetServer *pNetServer, IEngineMasterServer *pMasterServer, IConsole *pConsole);

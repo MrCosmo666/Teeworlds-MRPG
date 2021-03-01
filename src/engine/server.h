@@ -172,11 +172,8 @@ public:
 	virtual bool IsClientPlayer(int ClientID) const = 0;
 	virtual void FakeChat(const char *pName, const char *pText) = 0;
 
-	virtual const char *GameType() const = 0;
 	virtual const char *Version() const = 0;
 	virtual const char *NetVersion() const = 0;
-
-	virtual bool TimeScore() const { return false; }
 	virtual int GetRank(int AuthID) = 0;
 };
 

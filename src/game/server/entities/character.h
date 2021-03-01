@@ -2,11 +2,9 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_ENTITIES_CHARACTER_H
 #define GAME_SERVER_ENTITIES_CHARACTER_H
-
-#include <generated/protocol.h>
-
-#include <game/gamecore.h>
 #include <game/server/entity.h>
+#include <game/gamecore.h>
+
 #include "../mmocore/TileHandle.h"
 
 class CCharacter : public CEntity

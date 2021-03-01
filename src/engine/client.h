@@ -110,6 +110,8 @@ public:
 	virtual const char *MapDownloadName() const = 0;
 	virtual int MapDownloadAmount() const = 0;
 	virtual int MapDownloadTotalsize() const = 0;
+	virtual int MmoDownloadAmount() const = 0;
+	virtual int MmoDownloadTotalsize() const = 0;
 
 	// input
 	virtual const int *GetInput(int Tick) const = 0;

@@ -6,8 +6,10 @@
 
 #include <base/math.h>
 #include <engine/shared/config.h>
+#include <engine/storage.h>
 
 #include <generated/server_data.h>
+#include <game/layers.h>
 #include <game/version.h>
 #include "gamecontext.h"
 
@@ -50,6 +52,7 @@ CGS::CGS()
 	m_pMmoController = nullptr;
 	m_pCommandProcessor = nullptr;
 	m_pPathFinder = nullptr;
+	m_pLayers = nullptr;
 }
 
 CGS::~CGS()
@@ -66,6 +69,7 @@ CGS::~CGS()
 	delete m_pMmoController;
 	delete m_pCommandProcessor;
 	delete m_pPathFinder;
+	delete m_pLayers;
 }
 
 class CCharacter *CGS::GetPlayerChar(int ClientID)
@@ -984,6 +988,7 @@ void CGS::OnInit(int WorldID)
 {
 	m_pServer = Kernel()->RequestInterface<IServer>();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
+	m_pStorage = Kernel()->RequestInterface<IStorageEngine>();
 	m_World.SetGameServer(this);
 	m_Events.SetGameServer(this);
 	m_CommandManager.Init(m_pConsole, this, NewCommandHook, RemoveCommandHook);
@@ -995,10 +1000,12 @@ void CGS::OnInit(int WorldID)
 		Server()->SnapSetStaticsize(i, m_NetObjHandler.GetObjSize(i));
 
 	// create controller
-	m_Layers.Init(Kernel(), nullptr, WorldID);
-	m_Collision.Init(&m_Layers);
+	m_pLayers = new CLayers();
+	m_pLayers->Init(Kernel(), nullptr, WorldID);
+	m_Collision.Init(m_pLayers);
 	m_pMmoController = new MmoController(this);
 	m_pMmoController->LoadLogicWorld();
+	m_pMmoController->PrepareInformation(m_pStorage);
 	UpdateZoneDungeon();
 	UpdateZonePVP();
 
@@ -1011,8 +1018,8 @@ void CGS::OnInit(int WorldID)
 	m_pCommandProcessor = new CCommandProcessor(this);
 	m_pController->RegisterChatCommands(CommandManager());
 
-	// initialize layers
-	CMapItemLayerTilemap *pTileMap = m_Layers.GameLayer();
+	// initialize cores
+	CMapItemLayerTilemap *pTileMap = m_pLayers->GameLayer();
 	CTile *pTiles = (CTile *)Kernel()->RequestInterface<IMap>(WorldID)->GetData(pTileMap->m_Data);
 	for(int y = 0; y < pTileMap->m_Height; y++) 
 	{
@@ -1028,7 +1035,7 @@ void CGS::OnInit(int WorldID)
 	}
 	
 	// initialize pathfinder
-	m_pPathFinder = new CPathfinder(&m_Layers, &m_Collision);
+	m_pPathFinder = new CPathfinder(m_pLayers, &m_Collision);
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
 }
 
@@ -1511,7 +1518,6 @@ bool CGS::IsMmoClient(int ClientID) const
 {
 	return (bool)((Server()->GetClientProtocolVersion(ClientID) == PROTOCOL_VERSION_MMO) || (ClientID >= MAX_PLAYERS && ClientID < MAX_CLIENTS)); 
 }
-const char *CGS::GameType() const { return m_pController && m_pController->GetGameType() ? m_pController->GetGameType() : ""; }
 const char *CGS::Version() const { return GAME_VERSION; }
 const char *CGS::NetVersion() const { return GAME_NETVERSION; }
 
@@ -2047,7 +2053,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		AV(ClientID, "null"), 
 		AVH(ClientID, TAB_UPGR_JOB, GOLDEN_COLOR, "Disciple of Jobs");
-		Mmo()->PlantsAcc()->ShowMenu(ClientID);
+		Mmo()->PlantsAcc()->ShowMenu(pPlayer);
 		Mmo()->MinerAcc()->ShowMenu(pPlayer);
 		AddVotesBackpage(ClientID);
 	}

@@ -2,12 +2,9 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_GAMECONTEXT_H
 #define GAME_SERVER_GAMECONTEXT_H
-
-#include <engine/console.h>
 #include <engine/server.h>
 
 #include <base/another/kurhelper.h>
-#include <game/layers.h>
 #include <game/voting.h>
 
 #include "gamecontroller.h"
@@ -41,10 +38,11 @@ class CGS : public IGameServer
 
 	IServer *m_pServer;
 	class IConsole *m_pConsole;
-	MmoController* m_pMmoController;
 	class CPathfinder* m_pPathFinder;
+	class IStorageEngine* m_pStorage;
+	MmoController* m_pMmoController;
 
-	CLayers m_Layers;
+	class CLayers *m_pLayers;
 	CCollision m_Collision;
 
 	CNetObjHandler m_NetObjHandler;
@@ -54,6 +52,7 @@ public:
 	IServer *Server() const { return m_pServer; }
 	class IConsole *Console() { return m_pConsole; }
 	MmoController* Mmo() { return m_pMmoController; }
+	IStorageEngine* Storage() { return m_pStorage; }
 
 	CCollision *Collision() { return &m_Collision; }
 	CTuningParams *Tuning() { return &m_Tuning; }
@@ -201,7 +200,6 @@ public:
 	bool IsClientReady(int ClientID) const override;
 	bool IsClientPlayer(int ClientID) const override;
 
-	const char *GameType() const override;
 	const char *Version() const override;
 	const char *NetVersion() const override;
 

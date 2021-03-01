@@ -6,6 +6,8 @@
 #include <base/system.h>
 #include <base/hash.h>
 
+#define MMO_DATA_FILE "data.mmo"
+
 // raw datafile access
 class CDataFileReader
 {

@@ -2,14 +2,16 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_ITEM_INVENTORY_H
 #define GAME_SERVER_ITEM_INVENTORY_H
+#include <game/server/enum_context.h>
 
 #include "ItemInformation.h"
 
 class CInventoryItem
 {
-	CGS* m_pGS;
-	CPlayer* m_pPlayer;
-	CGS* GS() { return m_pGS; }
+	class CGS* m_pGS;
+	class CPlayer* m_pPlayer;
+	CGS* GS() const { return m_pGS; }
+	bool Save();
 
 public:
 	int m_ItemID;
@@ -18,19 +20,10 @@ public:
 	int m_Enchant;
 	int m_Durability;
 
-	CInventoryItem() : m_pPlayer(nullptr)
-	{
-		m_ItemID = 0;
-		m_Count = 0;
-		m_Settings = 0;
-		m_Enchant = 0;
-		m_Durability = 0;
-	};
-
 	ItemInformation& Info() const;
 	int GetID() const { return m_ItemID; }
 
-	// main functions	
+	// main functions
 	void SetItemOwner(CPlayer* pPlayer);
 	bool SetEnchant(int Enchant);
 	bool SetSettings(int Settings);
@@ -41,7 +34,6 @@ public:
 	bool Equip();
 	bool Use(int Count);
 	bool Drop(int Count);
-	bool Save();
 
 	// equip modules types functions
 	int GetEnchantStats(int AttributeID) const { return Info().GetInfoEnchantStats(AttributeID, m_Enchant); }

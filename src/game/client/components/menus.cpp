@@ -1855,7 +1855,8 @@ void CMenus::Render()
 				Client()->Disconnect();
 				m_Popup = POPUP_NONE;
 			}
-
+			
+			// map data download
 			if(Client()->MapDownloadTotalsize() > 0)
 			{
 				char aBuf[128];
@@ -1903,14 +1904,20 @@ void CMenus::Render()
 				Box.HSplitTop(SpacingH, 0, &Box);
 				Box.HSplitTop(ButtonHeight, &Part, &Box);
 				Part.VMargin(40.0f, &Part);
-				RenderTools()->DrawUIRect(&Part, vec4(1.0f, 1.0f, 1.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
-				Part.w = max(10.0f, (Part.w*Client()->MapDownloadAmount())/Client()->MapDownloadTotalsize());
-				RenderTools()->DrawUIRect(&Part, vec4(1.0f, 1.0f, 1.0f, 0.5f), CUI::CORNER_ALL, 5.0f);
+				RenderTools()->DrawUIBar(TextRender(), Part, vec4(0.5f, 0.5f, 0.5f, 0.25f), Client()->MapDownloadAmount(), Client()->MapDownloadTotalsize(), "", 10, 5.0f, 3.0f);
 			}
 			else
 			{
 				Box.HSplitTop(27.0f, 0, &Box);
 				UI()->DoLabel(&Box, Client()->ServerAddress(), FontSize, CUI::ALIGN_CENTER);
+			}
+
+			// mmo data download
+			if(Client()->MmoDownloadTotalsize() > 0)
+			{
+				CUIRect DownloadDataProgress = Screen;
+				Screen.HSplitBottom(10.0f, 0, &DownloadDataProgress);
+				RenderTools()->DrawUIBar(TextRender(), DownloadDataProgress, vec4(0.5f, 0.5f, 0.5f, 0.25f), Client()->MmoDownloadAmount(), Client()->MmoDownloadTotalsize(), "Download MRPG data files", 10, 4.0f, 1.0f);
 			}
 		}
 		else if(m_Popup == POPUP_LANGUAGE)

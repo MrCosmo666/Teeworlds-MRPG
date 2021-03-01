@@ -73,6 +73,11 @@ enum
 
 	NETMSG_MAPLIST_ENTRY_ADD,// todo 0.8: move up
 	NETMSG_MAPLIST_ENTRY_REM,
+
+	// sent by mrpg
+	NETMSG_DATA_MMO_INFO,
+	NETMSG_DATA_MMO,
+	NETMSG_REQUEST_MMO_DATA,
 };
 
 // this should be revised

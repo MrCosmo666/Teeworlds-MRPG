@@ -8,9 +8,12 @@
 	And distribute where they are required
 	This will affect the size of the output file
 */
-#include "ComponentsCore/AccountMainJob.h"
-#include "ComponentsCore/AccountMinerJob.h"
-#include "ComponentsCore/AccountPlantJob.h"
+#include <engine/server/sql_connect_pool.h>
+#include <engine/server/sql_string_helpers.h>
+
+#include "ComponentsCore/AccountJob/AccountMainJob.h"
+#include "ComponentsCore/AccountJob/AccountMinerJob.h"
+#include "ComponentsCore/AccountJob/AccountPlantJob.h"
 #include "ComponentsCore/BotJob.h"
 #include "ComponentsCore/InventoryJob/InventoryJob.h"
 #include "ComponentsCore/QuestsJob/QuestJob.h"
@@ -24,9 +27,6 @@
 #include "ComponentsCore/HouseJob.h"
 #include "ComponentsCore/MailBoxJob.h"
 #include "ComponentsCore/GuildJob.h"
-
-#include <engine/server/sql_connect_pool.h>
-#include <engine/server/sql_string_helpers.h>
 
 class MmoController
 {
@@ -57,7 +57,6 @@ class MmoController
 	class QuestJob *m_pQuest;
 	class ShopJob *m_pShopmail;
 	class StorageJob *m_pStorageWork;
-
 	class GuildJob* m_pGuildJob;
 	class CraftJob* m_pCraftJob;
 	class DungeonJob* m_pDungeonJob;
@@ -98,6 +97,7 @@ public:
 	void OnMessage(int MsgID, void *pRawMsg, int ClientID);
 	bool OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
 	void ResetClientData(int ClientID);
+	void PrepareInformation(class IStorageEngine* pStorage);
 
 	// 
 	void LoadLogicWorld();

@@ -272,11 +272,16 @@ namespace SleepyDiscord {
 		ParseContainer parse = {""};
 		std::vector<Snowflake<Role>> roles;
 		std::vector<Snowflake<User>> users;
+		enum class MentionReplierFlag : char {
+			NotSet = -2,
+			WillNotMentionReply = false,
+			MentionReply = true
+		};
 		MentionReplierFlag repliedUser = MentionReplierFlag::NotSet;
 
 		JSONStructStart
 			std::make_tuple(
-				json::pair<AllowMentionsParseHelper >(&AllowedMentions::parse      , "parse"       , json::OPTIONAL_FIELD),
+				json::pair<json::ContainerTypeHelper>(&AllowedMentions::parse      , "parse"       , json::OPTIONAL_FIELD),
 				json::pair<json::ContainerTypeHelper>(&AllowedMentions::roles      , "roles"       , json::OPTIONAL_FIELD),
 				json::pair<json::ContainerTypeHelper>(&AllowedMentions::users      , "users"       , json::OPTIONAL_FIELD),
 				json::pair<json::EnumTypeHelper     >(&AllowedMentions::repliedUser, "replied_user", json::OPTIONAL_FIELD)
@@ -284,27 +289,19 @@ namespace SleepyDiscord {
 		JSONStructEnd
 
 		inline bool empty() const {
-			return AllowMentionsParseHelper<
-				ParseContainer, json::ClassTypeHelper
-				>::empty(parse) &&
-			repliedUser == MentionReplierFlag::NotSet;
-		}
-
-		inline bool willMention() const {
-			return !parse.empty() &&
-				repliedUser == MentionReplierFlag::MentionReply;
+			return parse.empty() && repliedUser == MentionReplierFlag::NotSet;
 		}
 	};
 
 	template<>
-	struct GetDefault<MentionReplierFlag> {
-		static inline MentionReplierFlag get() {
-			return MentionReplierFlag::NotSet;
+	struct GetDefault<AllowedMentions::MentionReplierFlag> {
+		static inline AllowedMentions::MentionReplierFlag get() {
+			return AllowedMentions::MentionReplierFlag::NotSet;
 		} 
 	};
 
 	template<>
-	struct GetEnumBaseType<MentionReplierFlag> {
+	struct GetEnumBaseType<AllowedMentions::MentionReplierFlag> {
 		//this makes the json wrapper know to use getBool instead of getInt
 		using Value = bool; 
 	};

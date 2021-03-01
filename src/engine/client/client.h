@@ -4,6 +4,7 @@
 #define ENGINE_CLIENT_CLIENT_H
 
 #include <base/hash.h>
+#include <engine/shared/mmodata.h>
 #include <engine/client/http.h>
 
 class CGraph
@@ -27,6 +28,37 @@ public:
 	void Render(IGraphics* pGraphics, IGraphics::CTextureHandle FontTexture, float x, float y, float w, float h, const char* pDescription);
 };
 
+struct CDownloadChunkItem
+{
+	void Clear()
+	{
+		m_aFilename[0] = 0;
+		m_aFilenameTemp[0] = 0;
+		m_aName[0] = 0;
+		m_FileTemp = 0;
+		m_Chunk = 0;
+		m_Sha256 = SHA256_ZEROED;
+		m_Sha256Present = false;
+		m_Crc = 0;
+		m_Amount = -1;
+		m_Totalsize = -1;
+		m_Downloaded = true;
+	}
+	char m_aName[256];
+	char m_aFilename[256];
+	char m_aFilenameTemp[256];
+	IOHANDLE m_FileTemp;
+	unsigned int m_Crc;
+	SHA256_DIGEST m_Sha256;
+
+	int m_Amount;
+	int m_Totalsize;
+	int m_Chunk;
+	int m_DownloadChunkNum;
+	int m_DownloadChunkSize;
+	bool m_Sha256Present;
+	bool m_Downloaded;
+};
 
 class CSmoothTime
 {
@@ -128,20 +160,13 @@ class CClient : public IClient, public CDemoPlayer::IListener
 	char m_aCmdConnect[256];
 
 	// map download
-	char m_aMapdownloadFilename[256];
-	char m_aMapdownloadFilenameTemp[256];
-	char m_aMapdownloadName[256];
-	IOHANDLE m_MapdownloadFileTemp;
-	int m_MapdownloadChunk;
-	int m_MapdownloadChunkNum;
-	int m_MapDownloadChunkSize;
-	SHA256_DIGEST m_MapdownloadSha256;
-	bool m_MapdownloadSha256Present;
-	int m_MapdownloadCrc;
-	int m_MapdownloadAmount;
-	int m_MapdownloadTotalsize;
+	CDownloadChunkItem m_DownloadMap;
 
 	//mmotee
+	CDataMMO m_DataMmo;
+	CDownloadChunkItem m_DownloadMmoData;
+	bool LoadMmoData(const SHA256_DIGEST* pWantedSha256, unsigned WantedCrc);
+
 	std::shared_ptr<CGetFile> m_pMmoInfoTask;
 
 	// time
@@ -288,9 +313,11 @@ public:
 
 	const char* GetCurrentMapName() const { return m_aCurrentMap; }
 	const char* GetCurrentMapPath() const { return m_aCurrentMapPath; }
-	virtual const char* MapDownloadName() const { return m_aMapdownloadName; }
-	virtual int MapDownloadAmount() const { return m_MapdownloadAmount; }
-	virtual int MapDownloadTotalsize() const { return m_MapdownloadTotalsize; }
+	virtual const char* MapDownloadName() const { return m_DownloadMap.m_aName; }
+	virtual int MapDownloadAmount() const { return m_DownloadMap.m_Amount; }
+	virtual int MapDownloadTotalsize() const { return m_DownloadMap.m_Totalsize; }
+	virtual int MmoDownloadAmount() const { return m_DownloadMmoData.m_Amount; }
+	virtual int MmoDownloadTotalsize() const { return m_DownloadMmoData.m_Totalsize; }
 
 	void PumpNetwork();
 

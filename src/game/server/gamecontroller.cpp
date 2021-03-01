@@ -18,7 +18,6 @@ IGameController::IGameController(CGS *pGS)
 	m_pServer = m_pGS->Server();
 
 	// info
-	m_pGameType = "unknown";
 	m_aNumSpawnPoints[0] = 0;
 	m_aNumSpawnPoints[1] = 0;
 	m_aNumSpawnPoints[2] = 0;

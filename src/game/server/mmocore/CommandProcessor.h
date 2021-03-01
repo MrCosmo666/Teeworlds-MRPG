@@ -3,9 +3,9 @@
 
 class CCommandProcessor
 {
-	CGS* m_pGS;
-	CGS* GS() const { return m_pGS; }
-	void LastChat(CPlayer* pPlayer);
+	class CGS* m_pGS;
+	class CGS* GS() const { return m_pGS; }
+	void LastChat(class CPlayer* pPlayer);
 	void AddCommand(const char* pName, const char* pParams, IConsole::FCommandCallback pfnFunc, void* pUser, const char* pHelp);
 
 	static void ConChatLogin(IConsole::IResult* pResult, void* pUserData);
@@ -27,7 +27,7 @@ class CCommandProcessor
 
 public:
 	CCommandProcessor(CGS* pGS);
-	void ChatCmd(const char* pMessage, CPlayer *pPlayer);
+	void ChatCmd(const char* pMessage, class CPlayer *pPlayer);
 };
 
 #endif

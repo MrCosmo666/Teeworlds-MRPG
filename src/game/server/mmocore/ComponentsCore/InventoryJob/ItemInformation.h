@@ -7,20 +7,11 @@
 #define PERCENT_OF_ENCHANT 8
 #define PERCENT_MAXIMUM_ENCHANT 40
 
-class CItemInformation
+#include <game/data_structures.h>
+
+class CItemInformation : public CItemDataInformation
 {
 public:
-	char m_aName[32];
-	char m_aDesc[64];
-	char m_aIcon[16];
-	int m_Type;
-	int m_Function;
-	int m_Dysenthis;
-	int m_MinimalPrice;
-	int m_aAttribute[STATS_MAX_FOR_ITEM];
-	int m_aAttributeCount[STATS_MAX_FOR_ITEM];
-	int m_ProjID;
-
 	// main functions
 	const char* GetName(class CPlayer* pPlayer = nullptr) const;
 	const char* GetDesc(class CPlayer* pPlayer = nullptr) const;

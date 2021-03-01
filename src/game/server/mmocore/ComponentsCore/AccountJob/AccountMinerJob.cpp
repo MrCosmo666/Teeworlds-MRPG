@@ -10,10 +10,14 @@ std::map < int , AccountMinerJob::StructOres > AccountMinerJob::ms_aOre;
 void AccountMinerJob::ShowMenu(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	int ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().m_aMiner[MnrLevel]);
-	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Miner Point: {INT} :: Level: {INT} Exp: {INT}/{INT}", 
-		&pPlayer->Acc().m_aMiner[MnrUpgrade], &pPlayer->Acc().m_aMiner[MnrLevel], &pPlayer->Acc().m_aMiner[MnrExp], &ExperienceNeed);
-	GS()->AVD(ClientID, "MINERUPGRADE", MnrCount, 20, TAB_UPGR_JOB, "Quantity +{INT} (Price 20P)", &pPlayer->Acc().m_aMiner[MnrCount]);
+	const int JobLevel = pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value;
+	const int JobExperience = pPlayer->Acc().m_aMiner[JOB_EXPERIENCE].m_Value;
+	const int JobUpgrades = pPlayer->Acc().m_aMiner[JOB_UPGRADES].m_Value;
+	const int JobUpgrCounts = pPlayer->Acc().m_aMiner[JOB_UPGR_COUNTS].m_Value;
+	const int ExperienceNeed = kurosio::computeExperience(JobExperience);
+
+	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Miner Point: {INT} :: Level: {INT} Exp: {INT}/{INT}", &JobUpgrades, &JobLevel, &JobExperience, &ExperienceNeed);
+	GS()->AVD(ClientID, "MINERUPGRADE", JOB_UPGR_COUNTS, 20, TAB_UPGR_JOB, "Quantity +{INT} (Price 20P)", &JobUpgrCounts);
 }
 
 int AccountMinerJob::GetOreLevel(vec2 Pos) const
@@ -53,14 +57,14 @@ void AccountMinerJob::Work(CPlayer *pPlayer, int Level)
 {
 	const int ClientID = pPlayer->GetCID();
 	const int MultiplierExperience = kurosio::computeExperience(Level) / g_Config.m_SvMiningIncreaseLevel;
-	pPlayer->Acc().m_aMiner[MnrExp] += clamp(MultiplierExperience, 1, MultiplierExperience);
+	pPlayer->Acc().m_aMiner[JOB_EXPERIENCE].m_Value += clamp(MultiplierExperience, 1, MultiplierExperience);
 
-	int ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().m_aMiner[MnrLevel]);
-	for( ; pPlayer->Acc().m_aMiner[MnrExp] >= ExperienceNeed; )
+	int ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value);
+	for( ; pPlayer->Acc().m_aMiner[JOB_EXPERIENCE].m_Value >= ExperienceNeed; )
 	{
-		pPlayer->Acc().m_aMiner[MnrExp] -= ExperienceNeed;
-		pPlayer->Acc().m_aMiner[MnrLevel]++;
-		pPlayer->Acc().m_aMiner[MnrUpgrade]++;
+		pPlayer->Acc().m_aMiner[JOB_EXPERIENCE].m_Value -= ExperienceNeed;
+		pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value++;
+		pPlayer->Acc().m_aMiner[JOB_UPGR_COUNTS].m_Value++;
 
 		if(pPlayer->GetCharacter() && pPlayer->GetCharacter()->IsAlive())
 		{
@@ -68,10 +72,13 @@ void AccountMinerJob::Work(CPlayer *pPlayer, int Level)
 			GS()->CreateDeath(pPlayer->GetCharacter()->m_Core.m_Pos, ClientID);
 			GS()->CreateText(pPlayer->GetCharacter(), false, vec2(0, -40), vec2(0, -1), 40, "miner up");
 		}
-		ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().m_aMiner[MnrLevel]);
-		GS()->ChatFollow(ClientID, "Miner Level UP. Now Level {INT}!", &pPlayer->Acc().m_aMiner[MnrLevel]);
+
+		const int NewLevel = pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value;
+		ExperienceNeed = kurosio::computeExperience(NewLevel);
+		GS()->ChatFollow(ClientID, "Miner Level UP. Now Level {INT}!", &NewLevel);
 	}
-	pPlayer->ProgressBar("Miner", pPlayer->Acc().m_aMiner[MnrLevel], pPlayer->Acc().m_aMiner[MnrExp], ExperienceNeed, MultiplierExperience);
+
+	pPlayer->ProgressBar("Miner", pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value, pPlayer->Acc().m_aMiner[JOB_EXPERIENCE].m_Value, ExperienceNeed, MultiplierExperience);
 	Job()->SaveAccount(pPlayer, SAVE_MINER_DATA);
 }
 
@@ -80,12 +87,15 @@ void AccountMinerJob::OnInitAccount(CPlayer* pPlayer)
 	ResultPtr pRes = SJK.SD("*", "tw_accounts_miner", "WHERE AccountID = '%d'", pPlayer->Acc().m_AccountID);
 	if (pRes->next())
 	{
-		for (int i = 0; i < NUM_MINER; i++)
-			pPlayer->Acc().m_aMiner[i] = pRes->getInt(str_MINER((MINER)i));
+		for(int i = 0; i < NUM_JOB_ACCOUNTS_STATS; i++)
+		{
+			const char* pFieldName = pPlayer->Acc().m_aMiner[i].m_aFieldName;
+			pPlayer->Acc().m_aMiner[i].m_Value = pRes->getInt(pFieldName);
+		}
 		return;
 	}
-	pPlayer->Acc().m_aMiner[MnrLevel] = 1;
-	pPlayer->Acc().m_aMiner[MnrCount] = 1;
+	pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value = 1;
+	pPlayer->Acc().m_aMiner[JOB_UPGR_COUNTS].m_Value = 1;
 	SJK.ID("tw_accounts_miner", "(AccountID) VALUES ('%d')", pPlayer->Acc().m_AccountID);
 }
 
@@ -109,9 +119,7 @@ bool AccountMinerJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, co
 	const int ClientID = pPlayer->GetCID();
 	if (PPSTR(CMD, "MINERUPGRADE") == 0)
 	{
-		char aBuf[32];
-		str_format(aBuf, sizeof(aBuf), "Mining '%s'", str_MINER((MINER)VoteID));
-		if (pPlayer->Upgrade(Get, &pPlayer->Acc().m_aMiner[VoteID], &pPlayer->Acc().m_aMiner[MnrUpgrade], VoteID2, 3, aBuf))
+		if (pPlayer->Upgrade(Get, &pPlayer->Acc().m_aMiner[VoteID].m_Value, &pPlayer->Acc().m_aMiner[JOB_UPGRADES].m_Value, VoteID2, 3))
 		{
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_MINER_DATA);
 			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_UPGRADE);

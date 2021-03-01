@@ -1,11 +1,33 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <engine/shared/datafile.h>
 #include <game/server/gamecontext.h>
 #include "InventoryJob.h"
 
 using namespace sqlstr;
 std::map < int , std::map < int , InventoryItem > > InventoryJob::ms_aItems;
 std::map < int , ItemInformation > InventoryJob::ms_aItemsInfo;
+
+#include <teeother/tl/nlohmann_json.h>
+using json = nlohmann::json;
+
+void InventoryJob::OnPrepareInformation(IStorageEngine* pStorage, CDataFileWriter* pDataFile)
+{
+	json JsonQuestData;
+	for(auto& p : InventoryJob::ms_aItemsInfo)
+	{
+		JsonQuestData["items"].push_back(
+		{
+			{ "id", p.first },
+			{ "name", p.second.m_aName },
+			{ "desc", p.second.m_aDesc },
+			{ "icon", p.second.m_aIcon }
+		});
+	}
+
+	std::string Data = JsonQuestData.dump();
+	pDataFile->AddItem(MMO_DATA_INVENTORY_INFORMATION, 0, (int)Data.length() + 1, Data.c_str());
+}
 
 void InventoryJob::OnInit()
 {

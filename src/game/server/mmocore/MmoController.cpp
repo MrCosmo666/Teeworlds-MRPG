@@ -1,10 +1,14 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <thread>
-#include <teeother/system/string.h>
-
+#include <base/vmath.h>
+#include <engine/server/sql_connect_pool.h>
+#include <engine/server/sql_string_helpers.h>
 #include <game/server/gamecontext.h>
 #include "MmoController.h"
+
+#include <engine/storage.h>
+#include <engine/shared/datafile.h>
+#include <teeother/system/string.h>
 
 #include "ComponentsCore/AetherJob.h"
 
@@ -106,6 +110,35 @@ bool MmoController::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, con
 	return false;
 }
 
+void MmoController::PrepareInformation(IStorageEngine *pStorage)
+{
+	// write mmo data to file
+	CDataFileWriter DataInfoWriter;
+	if(!DataInfoWriter.Open(pStorage, MMO_DATA_FILE))
+		return;
+
+	for(auto& pComponent : m_Components.m_paComponents)
+		pComponent->OnPrepareInformation(pStorage, &DataInfoWriter);
+
+	DataInfoWriter.Finish();
+
+	CDataFileReader DataInfoReader;
+	if(!DataInfoReader.Open(pStorage, MMO_DATA_FILE, IStorageEngine::TYPE_ALL))
+		return;
+
+	const char* pItem = (const char*)DataInfoReader.FindItem(MMO_DATA_INVENTORY_INFORMATION, 0);
+	if(pItem)
+	{
+		dbg_msg("test", "%s", pItem);
+	}
+
+	char aSha256[SHA256_MAXSTRSIZE];
+	sha256_str(DataInfoReader.Sha256(), aSha256, sizeof(aSha256));
+	dbg_msg("test", "mmo data file sha256 is %s", aSha256);
+	dbg_msg("test", "mmo data file Crc is %08x", DataInfoReader.Crc());
+	DataInfoReader.Close();
+}
+
 void MmoController::OnMessage(int MsgID, void *pRawMsg, int ClientID)
 {
 	if(!pRawMsg)
@@ -152,10 +185,14 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	{
 		char aBuf[64];
 		dynamic_string Buffer;
-		for(int i = 0; i < PLANT::NUM_PLANT; i++) {
-			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", str_PLANT((PLANT) i), pPlayer->Acc().m_aPlant[i], (i == NUM_PLANT-1 ? "" : ", "));
+		for(int i = 0; i < NUM_JOB_ACCOUNTS_STATS; i++) 
+		{
+			const char *pFieldName = pPlayer->Acc().m_aPlant[i].m_aFieldName;
+			const int JobValue = pPlayer->Acc().m_aPlant[i].m_Value;
+			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", pFieldName, JobValue, (i == NUM_JOB_ACCOUNTS_STATS-1 ? "" : ", "));
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
+
 		SJK.UD("tw_accounts_plants", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().m_AccountID);
 		Buffer.clear();
 	}
@@ -163,10 +200,14 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	{
 		char aBuf[64];
 		dynamic_string Buffer;
-		for(int i = 0; i < MINER::NUM_MINER; i++) {
-			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", str_MINER((MINER) i), pPlayer->Acc().m_aMiner[i], (i == NUM_MINER-1 ? "" : ", "));
+		for(int i = 0; i < NUM_JOB_ACCOUNTS_STATS; i++)
+		{
+			const char* pFieldName = pPlayer->Acc().m_aMiner[i].m_aFieldName;
+			const int JobValue = pPlayer->Acc().m_aMiner[i].m_Value;
+			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", pFieldName, JobValue, (i == NUM_JOB_ACCOUNTS_STATS-1 ? "" : ", "));
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
+
 		SJK.UD("tw_accounts_miner", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().m_AccountID);
 		Buffer.clear();
 	}

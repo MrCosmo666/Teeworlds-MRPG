@@ -11,7 +11,6 @@
 CGameControllerMain::CGameControllerMain(class CGS *pGS)
 : IGameController(pGS)
 {
-	m_pGameType = "M-RPG";
 	m_GameFlags = 0;
 }
 

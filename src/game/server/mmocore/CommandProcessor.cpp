@@ -1,9 +1,9 @@
+#include <engine/console.h>
+#include "CommandProcessor.h"
+
 #include <engine/server.h>
 #include <engine/shared/config.h>
-
-#include <teeother/components/localization.h>
 #include "game/server/gamecontext.h"
-#include "CommandProcessor.h"
 
 CCommandProcessor::CCommandProcessor(CGS *pGS)
 {

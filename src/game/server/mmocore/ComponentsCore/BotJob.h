@@ -2,9 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_BOTS_INFO_SQL_H
 #define GAME_SERVER_BOTS_INFO_SQL_H
-
 #include "../MmoComponent.h"
- 
+
 class BotJob : public MmoComponent
 {
 	~BotJob()
@@ -40,12 +39,7 @@ class BotJob : public MmoComponent
 	// npc type data information
 	struct StructNpcBot
 	{
-		const char* GetName() const
-		{
-			dbg_assert(ms_aDataBot.find(m_BotID) != ms_aDataBot.end(), "Name bot it invalid");
-			return ms_aDataBot[m_BotID].m_aNameBot;
-		}
-
+		const char* GetName() const { return ms_aDataBot[m_BotID].m_aNameBot; }
 		bool m_Static;
 		int m_PositionX;
 		int m_PositionY;
@@ -59,12 +53,7 @@ class BotJob : public MmoComponent
 	// quest type data information
 	struct StructQuestBot
 	{
-		const char* GetName() const
-		{
-			dbg_assert(ms_aDataBot.find(m_BotID) != ms_aDataBot.end(), "Name bot it invalid");
-			return ms_aDataBot[m_BotID].m_aNameBot;
-		}
-
+		const char* GetName() const { return ms_aDataBot[m_BotID].m_aNameBot; }
 		int m_PositionX;
 		int m_PositionY;
 		int m_QuestID;
@@ -91,11 +80,7 @@ class BotJob : public MmoComponent
 	// mob type data information
 	struct StructMobsBot
 	{
-		const char* GetName() const
-		{
-			dbg_assert(ms_aDataBot.find(m_BotID) != ms_aDataBot.end(), "Name bot it invalid");
-			return ms_aDataBot[m_BotID].m_aNameBot;
-		}
+		const char* GetName() const { return ms_aDataBot[m_BotID].m_aNameBot; }
 		bool m_Boss;
 		int m_Power;
 		int m_Spread;

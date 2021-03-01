@@ -3,14 +3,15 @@
 #ifndef GAME_SERVER_PLAYER_H
 #define GAME_SERVER_PLAYER_H
 
-#include "mmocore/ComponentsCore/AccountMainJob.h"
+#include "mmocore/ComponentsCore/AccountJob/AccountMainJob.h"
 #include "mmocore/ComponentsCore/BotJob.h"
 
-#include "mmocore/ComponentsCore/InventoryJob/ItemInventory.h"
+#include "mmocore/ComponentsCore/InventoryJob/Item.h"
 #include "mmocore/ComponentsCore/SkillsJob/Skill.h"
 #include "mmocore/ComponentsCore/QuestsJob/PlayerQuests.h"
 
 #include "entities/character.h"
+#include <game/voting.h>
 
 enum
 {
@@ -134,7 +135,7 @@ public:
 		FUNCTIONS PLAYER HELPER 
 	######################################################################### */
 	void ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp);
-	bool Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade, const char *UpgradeName);
+	bool Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade);
 
 	/* #########################################################################
 		FUNCTIONS PLAYER ACCOUNT 

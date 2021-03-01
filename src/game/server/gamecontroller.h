@@ -44,7 +44,6 @@ protected:
 	IServer *Server() const { return m_pServer; }
 
 	// info
-	const char *m_pGameType;
 	int m_GameFlags;
 	
 	void UpdateGameInfo(int ClientID);
@@ -71,7 +70,6 @@ public:
 	virtual void Snap();
 	virtual void Tick();
 
-	const char *GetGameType() const { return m_pGameType; }
 	bool CanSpawn(int SpawnType, vec2 *pPos, vec2 BotPos) const;
 	void DoTeamChange(class CPlayer *pPlayer, bool DoChatMsg=true);
 

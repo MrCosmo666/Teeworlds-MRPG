@@ -1,40 +1,39 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#ifndef GAME_SERVER_SQLMINERACC_H
-#define GAME_SERVER_SQLMINERACC_H
+#ifndef GAME_SERVER_SQLPLANTACC_H
+#define GAME_SERVER_SQLPLANTACC_H
 
-#include "../MmoComponent.h"
+#include <game/server/mmocore/MmoComponent.h>
 
-class AccountMinerJob : public MmoComponent
+class AccountPlantJob : public MmoComponent
 {
-	~AccountMinerJob()
+	~AccountPlantJob()
 	{
-		ms_aOre.clear();
+		ms_aPlants.clear();
 	};
 
-	struct StructOres
+	struct StructPlants
 	{
 		int m_ItemID;
 		int m_Level;
-		int m_StartHealth;
 		int m_PositionX;
 		int m_PositionY;
 		int m_Distance;
 	};
-	static std::map < int, StructOres > ms_aOre;
+	static std::map < int, StructPlants > ms_aPlants;
 
-	void OnInitAccount(CPlayer* pPlayer) override;
 	void OnInitWorld(const char* pWhereLocalWorld) override;
+	void OnInitAccount(CPlayer* pPlayer) override;
 	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
 
 public:
-	int GetOreLevel(vec2 Pos) const;
-	int GetOreItemID(vec2 Pos) const;
-	int GetOreHealth(vec2 Pos) const;
+	int GetPlantLevel(vec2 Pos);
+	int GetPlantItemID(vec2 Pos);
 
-	void ShowMenu(CPlayer *pPlayer);
-	void Work(CPlayer *pPlayer, int Exp);
+	void ShowMenu(CPlayer* pPlayer);
+	void ShowPlantsItems(int ClientID);
 
+	void Work(CPlayer* pPlayer, int Level);
 };
 
 #endif

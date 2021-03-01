@@ -26,12 +26,15 @@ void AccountPlantJob::OnInitAccount(CPlayer *pPlayer)
 	ResultPtr pRes = SJK.SD("*", "tw_accounts_plants", "WHERE AccountID = '%d'", pPlayer->Acc().m_AccountID);
 	if(pRes->next())
 	{
-		for(int i = 0; i < NUM_PLANT; i++)
-			pPlayer->Acc().m_aPlant[i] = pRes->getInt(str_PLANT((PLANT) i));
+		for(int i = 0; i < NUM_JOB_ACCOUNTS_STATS; i++)
+		{
+			const char* pFieldName = pPlayer->Acc().m_aPlant[i].m_aFieldName;
+			pPlayer->Acc().m_aPlant[i].m_Value = pRes->getInt(pFieldName);
+		}
 		return;
 	}
-	pPlayer->Acc().m_aPlant[PlLevel] = 1;
-	pPlayer->Acc().m_aPlant[PlCounts] = 1;
+	pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value = 1;
+	pPlayer->Acc().m_aPlant[JOB_UPGR_COUNTS].m_Value = 1;
 	SJK.ID("tw_accounts_plants", "(AccountID) VALUES ('%d')", pPlayer->Acc().m_AccountID);	
 }
 
@@ -57,16 +60,17 @@ int AccountPlantJob::GetPlantItemID(vec2 Pos)
 	return -1;
 }
 
-void AccountPlantJob::ShowMenu(int ClientID)
+void AccountPlantJob::ShowMenu(CPlayer* pPlayer)
 {
-	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true);
-	if(!pPlayer)
-		return;
+	const int ClientID = pPlayer->GetCID();
+	const int JobLevel = pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value;
+	const int JobExperience = pPlayer->Acc().m_aPlant[JOB_EXPERIENCE].m_Value;
+	const int JobUpgrades = pPlayer->Acc().m_aPlant[JOB_UPGRADES].m_Value;
+	const int JobUpgrCounts = pPlayer->Acc().m_aPlant[JOB_UPGR_COUNTS].m_Value;
+	const int ExperienceNeed = kurosio::computeExperience(JobExperience);
 
-	int ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().m_aPlant[PlLevel]);
-	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Plants Point: {INT} :: Level: {INT} Exp: {INT}/{INT}", 
-		&pPlayer->Acc().m_aPlant[PlUpgrade], &pPlayer->Acc().m_aPlant[PlLevel], &pPlayer->Acc().m_aPlant[PlExp], &ExperienceNeed);
-	GS()->AVD(ClientID, "PLANTUPGRADE", PlCounts, 20, TAB_UPGR_JOB, "Quantity +{INT} (Price 20P)", &pPlayer->Acc().m_aPlant[PlCounts]);
+	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Plants Point: {INT} :: Level: {INT} Exp: {INT}/{INT}", &JobUpgrades, &JobLevel, &JobExperience, &ExperienceNeed);
+	GS()->AVD(ClientID, "PLANTUPGRADE", JOB_UPGR_COUNTS, 20, TAB_UPGR_JOB, "Quantity +{INT} (Price 20P)", &JobUpgrCounts);
 }
 
 void AccountPlantJob::ShowPlantsItems(int ClientID)
@@ -82,24 +86,27 @@ void AccountPlantJob::Work(CPlayer* pPlayer, int Level)
 {
 	const int ClientID = pPlayer->GetCID();
 	const int MultiplierExperience = kurosio::computeExperience(Level) / g_Config.m_SvPlantingIncreaseLevel;
-	pPlayer->Acc().m_aPlant[MnrExp] += clamp(MultiplierExperience, 1, MultiplierExperience);
+	pPlayer->Acc().m_aPlant[JOB_EXPERIENCE].m_Value += clamp(MultiplierExperience, 1, MultiplierExperience);
 
-	int ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().m_aPlant[PlLevel]);
-	for (; pPlayer->Acc().m_aPlant[MnrExp] >= ExperienceNeed; )
+	int ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value);
+	for (; pPlayer->Acc().m_aPlant[JOB_EXPERIENCE].m_Value >= ExperienceNeed; )
 	{
-		pPlayer->Acc().m_aPlant[PlExp] -= ExperienceNeed;
-		pPlayer->Acc().m_aPlant[PlLevel]++;
-		pPlayer->Acc().m_aPlant[PlUpgrade]++;
+		pPlayer->Acc().m_aPlant[JOB_EXPERIENCE].m_Value -= ExperienceNeed;
+		pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value++;
+		pPlayer->Acc().m_aPlant[JOB_UPGRADES].m_Value++;
+
 		if(pPlayer->GetCharacter() && pPlayer->GetCharacter()->IsAlive())
 		{
 			GS()->CreateSound(pPlayer->GetCharacter()->m_Core.m_Pos, 4);
 			GS()->CreateDeath(pPlayer->GetCharacter()->m_Core.m_Pos, ClientID);
 			GS()->CreateText(pPlayer->GetCharacter(), false, vec2(0, -40), vec2(0, -1), 40, "plants up");
 		}
-		ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().m_aPlant[PlLevel]);
-		GS()->ChatFollow(ClientID, "Plants Level UP. Now Level {INT}!", &pPlayer->Acc().m_aPlant[PlLevel]);
+
+		ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value);
+		GS()->ChatFollow(ClientID, "Plants Level UP. Now Level {INT}!", &pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value);
 	}
-	pPlayer->ProgressBar("Plants", pPlayer->Acc().m_aPlant[PlLevel], pPlayer->Acc().m_aPlant[PlExp], ExperienceNeed, MultiplierExperience);
+
+	pPlayer->ProgressBar("Plants", pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value, pPlayer->Acc().m_aPlant[JOB_EXPERIENCE].m_Value, ExperienceNeed, MultiplierExperience);
 	Job()->SaveAccount(pPlayer, SAVE_PLANT_DATA);
 }
 
@@ -108,9 +115,7 @@ bool AccountPlantJob::OnHandleVoteCommands(CPlayer *pPlayer, const char *CMD, co
 	const int ClientID = pPlayer->GetCID();	
 	if(PPSTR(CMD, "PLANTUPGRADE") == 0)
 	{
-		char aBuf[32];
-		str_format(aBuf, sizeof(aBuf), "Harvest '%s'", str_PLANT((PLANT)VoteID));
-		if(pPlayer->Upgrade(Get, &pPlayer->Acc().m_aPlant[VoteID], &pPlayer->Acc().m_aPlant[PlUpgrade], VoteID2, 3, aBuf))
+		if(pPlayer->Upgrade(Get, &pPlayer->Acc().m_aPlant[VoteID].m_Value, &pPlayer->Acc().m_aPlant[JOB_UPGRADES].m_Value, VoteID2, 3))
 		{
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_PLANT_DATA);
 			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_UPGRADE);

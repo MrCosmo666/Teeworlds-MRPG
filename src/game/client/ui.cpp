@@ -533,12 +533,16 @@ void CUI::WindowRender()
 	}
 
 	// draw in reverse order as they are sorted here
+	bool RenderCursor = false;
 	CUIRect ScreenMap = *Screen();
 	Graphics()->MapScreen(ScreenMap.x, ScreenMap.y, ScreenMap.w, ScreenMap.h);
 	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
 	{
 		if((*it)->m_Openned && (*it)->m_pCallback)
+		{
 			(*it)->Render();
+			RenderCursor = true;
+		}
 	}
 
 	// update the sorting in case of a change of the active window
@@ -570,13 +574,16 @@ void CUI::WindowRender()
 	m_pHoveredWindow = nullptr;
 
 	// render cursor
-	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CURSOR].m_Id);
-	Graphics()->WrapClamp();
-	Graphics()->QuadsBegin();
-	IGraphics::CQuadItem QuadItem(MouseX(), MouseY(), 24, 24);
-	Graphics()->QuadsDrawTL(&QuadItem, 1);
-	Graphics()->QuadsEnd();
-	Graphics()->WrapNormal();
+	if(RenderCursor)
+	{
+		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CURSOR].m_Id);
+		Graphics()->WrapClamp();
+		Graphics()->QuadsBegin();
+		IGraphics::CQuadItem QuadItem(MouseX(), MouseY(), 24, 24);
+		Graphics()->QuadsDrawTL(&QuadItem, 1);
+		Graphics()->QuadsEnd();
+		Graphics()->WrapNormal();
+	}
 }
 
 void CUI::WindowsClear()

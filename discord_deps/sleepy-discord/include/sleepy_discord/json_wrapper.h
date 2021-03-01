@@ -76,16 +76,39 @@ namespace SleepyDiscord {
 		template <class Type>
 		struct ClassTypeHelper;
 
+		template<class Value = const json::Value>
 		struct ArrayStringWrapper {
-			const Value& json;
-			ArrayStringWrapper(const Value& json) : json(json) {}
-			inline const Value& getDoc() const { return json; }
-			operator const Value&() const { return getDoc(); }
+			Value& json;
+			ArrayStringWrapper(Value& json) : json(json) {}
+			inline Value& getDoc() const { return json; }
+			operator Value&() const { return getDoc(); }
 			template<class Callback>
 			bool getDoc(const Callback& callback) const {
 				callback(json);
 				return true;
 			}
+		};
+
+		template<class Type, class Enable = void>
+		struct ArrayValueWrapper {
+			using value = const Value;
+			using type = ArrayStringWrapper<value>;
+		};
+
+		template<class Type>
+		struct ArrayValueWrapper<
+			Type, typename std::enable_if<std::is_constructible<Type, const Value>::value>::type
+		> {
+			using value = const Value;
+			using type = ArrayStringWrapper<value>;
+		};
+
+		template<class Type>
+		struct ArrayValueWrapper<
+			Type, typename std::enable_if<std::is_constructible<Type, Value>::value>::type
+		> {
+			using value = Value;
+			using type = ArrayStringWrapper<value>;
 		};
 
 		template <typename T>
@@ -96,14 +119,27 @@ namespace SleepyDiscord {
 		template <typename T>
 		constexpr std::false_type hasPushBack(long);
 
-		template<class TypeToConvertTo, class Base = ArrayStringWrapper>
+		template<class TypeToConvertTo, class Base = typename ArrayValueWrapper<TypeToConvertTo>::type>
 		struct ArrayWrapper : public Base {
+			using base = Base;
 			using Base::Base;
 			using DocType = decltype(((Base*)nullptr)->getDoc());
-			template<class Container>
-			static inline Container get(const Value& value) {
-				Array jsonArray = value.template Get<Array>();
+			
+			template<class Container, class Value>
+			static inline Container get(Value& value, std::true_type) {
+				auto jsonArray = value.GetArray(); //can be ether const Array or Array, so we use auto
 				return Container(jsonArray.begin(), jsonArray.end());
+			}
+
+			template<class Container, class Value>
+			static inline Container get(Value&& value, std::false_type) {
+				DocType v = std::move(value);
+				return get<Container>(v, std::true_type{});
+			}
+
+			template<class Container, class Value>
+			static inline Container get(Value&& value) { //lvalue check
+				return get<Container>(value, std::is_lvalue_reference<Value&&>());
 			}
 
 			template<class Container>
@@ -188,9 +224,9 @@ namespace SleepyDiscord {
 			return value.GetBool();
 		}
 
-		template<class Type>
-		inline ArrayWrapper<Type> toArray(const Value& value) {
-			return ArrayWrapper<Type>(value);
+		template<class Type, class Value>
+		inline ArrayWrapper<Type, ArrayStringWrapper<Value>> toArray(Value& value) {
+			return ArrayWrapper<Type, ArrayStringWrapper<Value>>(value);
 		}
 
 		template<class Type>
@@ -304,7 +340,7 @@ namespace SleepyDiscord {
 			}
 
 			template<class T>
-			static inline typename std::enable_if<!hasSerialize<T>::value, Value>::type
+			static inline typename std::enable_if<hasSerialize<T>::value == false, Value>::type
 			fromType(const T& value, Value::AllocatorType& allocator) {
 				return toJSON(value, allocator);
 			}
@@ -423,7 +459,7 @@ namespace SleepyDiscord {
 				return value == GetDefault::get();
 			}
 			static inline bool isType(const Value& value) {
-				return ClassTypeHelper<Type>::isType(value);
+				return ClassTypeHelper<BaseType>::isType(value);
 			}
 		};
 
@@ -675,6 +711,22 @@ namespace SleepyDiscord {
 		inline std::string stringifyObj(const Object& object) {
 			rapidjson::MemoryPoolAllocator<> allocator;
 			return stringify(toJSON(object, allocator));
+		}
+
+		template<class Object, size_t i = 0>
+		inline typename std::enable_if<i == std::tuple_size<decltype(Object::JSONStruct)>::value, void>::type
+			mergeObj(Object& object, const Object& objectChanges) {
+		}
+
+		template<class Object, size_t i = 0>
+		inline typename std::enable_if < i < std::tuple_size<decltype(Object::JSONStruct)>::value, void>::type
+			mergeObj(Object& object, const Object& objectChanges) {
+			constexpr auto field = std::get<i>(Object::JSONStruct);
+			using Helper = typename decltype(field)::Helper;
+			if (!Helper::empty(objectChanges.*(field.member))) {
+				object.*(field.member) = objectChanges.*(field.member);
+			}
+			mergeObj<Object, i + 1>(object, objectChanges);
 		}
 
 		//json optional and null emulation

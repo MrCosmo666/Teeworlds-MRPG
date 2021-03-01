@@ -72,8 +72,8 @@ endif()
 
 set(AUTO_DEPENDENCIES_DEFAULT ON)
 option(SERVER_COMPILE "Build the server together with the client" ON)
-option(DOWNLOAD_GTEST "Download and compile GTest if not found" ${AUTO_DEPENDENCIES_DEFAULT})
 option(DISCORD_SERVER_COMPILE "Compile Sleepy-Discord in conjunction with the server" ON)
+option(DOWNLOAD_GTEST "Download and compile GTest if not found" ${AUTO_DEPENDENCIES_DEFAULT})
 option(PREFER_BUNDLED_LIBS "Prefer bundled libraries over system libraries" ${AUTO_DEPENDENCIES_DEFAULT})
 option(DEV "Don't generate stuff necessary for packaging" OFF)
 set(OpenGL_GL_PREFERENCE LEGACY)
@@ -642,6 +642,7 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   memheap.cpp
   memheap.h
   message.h
+  mmodata.h
   netban.cpp
   netban.h
   network.cpp
@@ -662,21 +663,8 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   storage.cpp
 )
 set(ENGINE_GENERATED_SHARED src/generated/nethash.cpp src/generated/protocol.cpp src/generated/protocol.h)
-set_src(GAME_SHARED GLOB src/game
-  collision.cpp
-  collision.h
-  commands.h
-  gamecore.cpp
-  gamecore.h
-  layers.cpp
-  layers.h
-  mapitems.h
-  tuning.h
-  typedef_struct.h
-  variables.h
-  version.h
-  voting.h
-)
+file(GLOB GAME_SHARED "src/game/*.cpp" "src/game/*.h")
+
 set(GAME_GENERATED_SHARED
   src/generated/git_revision.cpp
   src/generated/nethash.cpp
@@ -820,6 +808,7 @@ if(SERVER_COMPILE AND DISCORD_SERVER_COMPILE)
   endif()
 
   #Todo add support for it
+  target_compile_definitions(sleepy-discord PUBLIC NONEEXISTENT_ZLIB_NG)
   target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_UWEBSOCKETS)
   target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_OPUS)
   target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_SODIUM)

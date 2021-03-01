@@ -2,9 +2,9 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_SQL_MAINACCOUNT_H
 #define GAME_SERVER_SQL_MAINACCOUNT_H
+#include <game/server/mmocore/MmoComponent.h>
 
-#include "../MmoComponent.h"
-#include "ShopJob.h"
+#include <game/server/mmocore/ComponentsCore/ShopJob.h>
 
 class AccountMainJob : public MmoComponent
 {
@@ -22,6 +22,7 @@ class AccountMainJob : public MmoComponent
 public:
 	struct StructData
 	{
+		// main
 		char m_aLogin[64];
 		char m_aLastLogin[64];
 		char m_aLanguage[8];
@@ -30,17 +31,11 @@ public:
 		int m_Exp; 
 		int m_GuildID;
 		int m_GuildRank;
+		std::list < int > m_aHistoryWorld;
 
 		// upgrades
 		int m_Upgrade;
 		std::map < int, int > m_aStats;
-
-		// jobs
-		int m_aPlant[PLANT::NUM_PLANT];
-		int m_aMiner[MINER::NUM_MINER];
-
-		// world
-		std::list < int > m_aHistoryWorld;
 
 		// skins
 		char m_aaSkinPartNames[NUM_SKINPARTS][MAX_SKIN_ARRAY_SIZE];
@@ -50,6 +45,31 @@ public:
 		int m_Team;
 		std::map < int , bool > m_aAetherLocation;
 		bool IsGuild() const { return m_GuildID > 0; }
+
+		StructData()
+		{
+			m_AccountID = -1;
+			m_Level = 0;
+			m_Team = TEAM_SPECTATORS;
+
+			// Name :: Field name database :: value
+			m_aMiner[JOB_LEVEL] =      { "Miner level", "MnrLevel", 0 };
+			m_aMiner[JOB_EXPERIENCE] = { "Miner experience", "MnrExp", 0 };
+			m_aMiner[JOB_UPGRADES] =   { "Miner upgrades", "MnrUpgrade", 0 };
+			m_aMiner[JOB_UPGR_COUNTS] ={ "Miner counts", "MnrCount", 0 };
+
+			m_aPlant[JOB_LEVEL] =      { "Farmer level", "PlLevel", 0 };
+			m_aPlant[JOB_EXPERIENCE] = { "Farmer experience", "PlExp", 0 };
+			m_aPlant[JOB_UPGRADES] =   { "Farmer upgrades", "PlUpgrade", 0 };
+			m_aPlant[JOB_UPGR_COUNTS] ={ "Farmer counts", "PlCounts", 0 };
+		}
+		// TODO: do not store data in the account
+		struct
+		{
+			char m_aName[64];
+			char m_aFieldName[64];
+			int m_Value;
+		} m_aMiner[NUM_JOB_ACCOUNTS_STATS], m_aPlant[NUM_JOB_ACCOUNTS_STATS];
 	};
 	static std::map < int, StructData > ms_aData;
 

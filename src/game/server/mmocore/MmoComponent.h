@@ -3,6 +3,12 @@
 #ifndef GAME_SERVER_MMO_COMPONENT_H
 #define GAME_SERVER_MMO_COMPONENT_H
 
+#include <map>
+#include <list>
+#include <vector>
+#include <engine/shared/protocol.h>
+#include <game/server/enum_context.h>
+
 class MmoComponent
 {
 protected:
@@ -28,6 +34,8 @@ private:
 	virtual bool OnHandleMenulist(class CPlayer* pPlayer, int Menulist, bool ReplaceMenu) { return false; };
 	virtual bool OnHandleVoteCommands(class CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) { return false; }
 	virtual void OnMessage(int MsgID, void* pRawMsg, int ClientID) {};
+
+	virtual void OnPrepareInformation(class IStorageEngine* pStorage, class CDataFileWriter* pDataFile) {};
 };
 
 #endif

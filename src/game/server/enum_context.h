@@ -6,10 +6,17 @@
 #include <game/server/enum_global.h>
 #include <generated/protocol.h>
 
-#include <list>
-#include <map>
+// jobs
+enum
+{
+	JOB_LEVEL = 0,
+	JOB_EXPERIENCE = 1,
+	JOB_UPGR_COUNTS = 2,
+	JOB_UPGRADES = 3,
+	NUM_JOB_ACCOUNTS_STATS,
+};
 
-// weapons and player stats
+// player stats
 enum Stats
 {
 	StSpreadShotgun			= 1,
@@ -287,6 +294,26 @@ enum SaveType
 	SAVE_GUILD_DATA,		// Save Guild Data
 	SAVE_POSITION,			// Save Position Player
 	SAVE_LANGUAGE,			// Save Language Client
+};
+
+enum DayType
+{
+	NIGHT_TYPE = 1,
+	DAY_TYPE,
+	MORNING_TYPE,
+	EVENING_TYPE
+};
+
+/*
+	Basic kernel server settings
+	This is where the most basic server settings are stored
+*/
+enum
+{
+	ENGINE_MAX_WORLDS = 64,		// TODO: change to dynamic allocator, we allocate memory blocks for the server in advance for 64 worlds
+	MAIN_WORLD_ID = 0,
+	FAKE_DISCORD_WORLD_ID = 7,
+	MAX_DROPPED_FROM_MOBS = 5,  // maximum number of items that can be dropped by mobs
 };
 
 #endif
