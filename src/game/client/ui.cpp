@@ -85,6 +85,9 @@ bool CUI::KeyIsPressed(int Key) const
 
 bool CUI::MouseHovered(const CUIRect* pRect)
 {
+	if(g_Config.m_ClEditor || (m_pHoveredWindow && m_pCheckWindow && m_pCheckWindow == m_pHoveredWindow && MouseInside(&m_pHoveredWindow->m_WindowRect)))
+		return MouseInside(pRect) && MouseInsideClip();
+
 	// this logic ignores all MouseHovered excluding its area and available area. 
 	// So that each window is unique and clicks or selections don't look weird
 	if(!m_pCheckWindow)
@@ -96,9 +99,6 @@ bool CUI::MouseHovered(const CUIRect* pRect)
 		}
 		return MouseInside(pRect) && MouseInsideClip();
 	}
-
-	if(m_pHoveredWindow && m_pCheckWindow == m_pHoveredWindow && MouseInside(&m_pHoveredWindow->m_WindowRect))
-		return MouseInside(pRect) && MouseInsideClip();
 	return false;
 }
 
