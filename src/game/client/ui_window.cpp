@@ -158,6 +158,36 @@ bool CWindowUI::IsActive() const
 	return (bool)(pWindow && pWindow->m_Openned && CWindowUI::GetActiveWindow() == pWindow);
 }
 
+void CWindowUI::Open()
+{
+	CWindowUI* pWindow = GetWindow(m_aWindowName);
+	if(pWindow)
+	{
+		pWindow->m_Openned = true;
+		auto pSearch = std::find_if(CWindowUI::ms_aWindows.begin(), CWindowUI::ms_aWindows.end(), [this](const CWindowUI* pWindow) { return str_comp(m_aWindowName, pWindow->GetWindowName()) == 0;  });
+		std::rotate(CWindowUI::ms_aWindows.begin(), pSearch, pSearch + 1);
+	}
+}
+
+void CWindowUI::Close()
+{
+	CWindowUI* pWindow = GetWindow(m_aWindowName);
+	if(pWindow)
+		pWindow->m_Openned = false;
+}
+
+void CWindowUI::CloseOpen()
+{
+	CWindowUI* pWindow = GetWindow(m_aWindowName);
+	if(pWindow)
+	{
+		if(pWindow->m_Openned)
+			Close();
+		else
+			Open();
+	}
+}
+
 void CWindowUI::OnRenderWindow(RenderWindowCallback pCallback)
 {
 	CWindowUI* pWindow = GetWindow(m_aWindowName);

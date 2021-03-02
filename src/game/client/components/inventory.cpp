@@ -158,20 +158,6 @@ void CInventory::OnStateChange(int NewState, int OldState)
 	}
 }
 
-void CInventory::OnConsoleInit()
-{
-	Console()->Register("toggle_inventory_mrpg", "", CFGFLAG_CLIENT, ConToggleInventoryMRPG, this, "Toggle inventory mrpg");
-}
-
-void CInventory::ConToggleInventoryMRPG(IConsole::IResult* pResult, void* pUser)
-{
-	CInventory* pInventory = static_cast<CInventory*>(pUser);
-	if(pInventory->Client()->State() != IClient::STATE_ONLINE)
-		return;
-
-	pInventory->m_Active ^= true;
-}
-
 bool CInventory::OnCursorMove(float x, float y, int CursorType)
 {
 	if(!m_Active)

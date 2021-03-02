@@ -62,6 +62,7 @@
 #include "components/windows.h"
 
 //mmotee thnx gamer client # dune
+#include "components/gui/game_ui_interface.h"
 #include "components/skinchanger.h"
 
 inline void AppendDecimals(char* pBuf, int Size, int Time, int Precision)
@@ -134,6 +135,7 @@ static CMapLayers gs_MapLayersBackGround(CMapLayers::TYPE_BACKGROUND);
 static CMapLayers gs_MapLayersForeGround(CMapLayers::TYPE_FOREGROUND);
 
 // mmotee thnx gamer client # dune
+static CUIGameInterface gs_GameInterfaceUI;
 static CWindowsRender gs_WindowRender;
 static CCSkinChanger gs_SkinChanger;
 static CTalkText gs_TalkText;
@@ -256,6 +258,7 @@ void CGameClient::OnConsoleInit()
 	m_pParticles = &::gs_Particles;
 	m_pMenus = &::gs_Menus;
 	m_pInventory = &::gs_Inventory;
+	m_pGameInterfaceUI = &::gs_GameInterfaceUI;
 
 	//mmotee
 	m_pSkins = &::gs_Skins;
@@ -332,13 +335,19 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(m_pStats);
 	m_All.Add(m_pMotd);
 	m_All.Add(m_pMenus);
-	m_All.Add(&gs_WindowRender);
 	m_All.Add(&m_pMenus->m_Binder);
+
+	// game hud interface
 	m_All.Add(m_pInventory);
+	m_All.Add(m_pGameInterfaceUI);
+	m_All.Add(&gs_WindowRender);
+	//
+
 	m_All.Add(m_pGameConsole);
 
 	// mmotee inputs
 	m_Input.Add(m_pTalkText);
+	m_Input.Add(m_pGameInterfaceUI);
 
 	// vanilla inputs
 	m_Input.Add(&m_pMenus->m_Binder); // this will take over all input when we want to bind a key
@@ -347,7 +356,6 @@ void CGameClient::OnConsoleInit()
 	m_Input.Add(m_pChat); // chat has higher prio due to tha you can quit it by pressing esc
 	m_Input.Add(m_pMotd); // for pressing esc to remove it
 	m_Input.Add(m_pMenus);
-	m_Input.Add(m_pInventory);
 	m_Input.Add(&gs_Spectator);
 	m_Input.Add(&gs_Emoticon);
 	m_Input.Add(m_pControls);

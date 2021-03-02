@@ -45,8 +45,9 @@ public:
 	const CUIRect& GetRect();
 	const char* GetWindowName() const { return m_aWindowName; }
 
-	void Open() { m_Openned = true; }
-	void Close() { m_Openned = false; }
+	void Open();
+	void Close();
+	void CloseOpen();
 	void Init(const char* pWindowName, CUIRect WindowRect, int WindowFlags = CWindowFlags::WINDOW_ALL);
 	void OnRenderWindow(RenderWindowCallback pCallback);
 

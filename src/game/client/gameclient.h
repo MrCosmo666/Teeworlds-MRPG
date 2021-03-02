@@ -371,6 +371,7 @@ public:
 	class CMapLayers *m_pMapLayersBackGround;
 	class CMapLayers *m_pMapLayersForeGround;
 
+	class CUIGameInterface* m_pGameInterfaceUI;
 	class CTalkText* m_pTalkText;
 	class CCSkinChanger* m_pSkinChanger;
 

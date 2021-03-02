@@ -33,8 +33,6 @@ public:
 	virtual bool OnCursorMove(float x, float y, int CursorType);
 	virtual bool OnInput(IInput::CEvent Event);
 	virtual void OnStateChange(int NewState, int OldState);
-	virtual void OnConsoleInit();
-	static void ConToggleInventoryMRPG(IConsole::IResult* pResult, void* pUser);
 
 	// render
 	void RenderSelectTab(CUIRect MainView);

@@ -22,7 +22,7 @@ const char CBinds::s_aaDefaultBindValues[][32] = {
 	"+prevweapon", "+nextweapon",
 	"chat all", "chat team", "chat whisper",
 	"vote yes", "vote no",
-	"ready_change", "toggle_inventory_mrpg"
+	"ready_change", "toggle_game_hud_mrpg"
 };
 
 CBinds::CBinds()
