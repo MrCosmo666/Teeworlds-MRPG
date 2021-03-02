@@ -1,7 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/another/kurhelper.h>
-
 #include <engine/graphics.h>
 #include <engine/textrender.h>
 #include <engine/shared/config.h>
@@ -729,7 +727,7 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 
 	// hud
 	{
-		int ExpNeeded = (int)kurosio::computeExperience(pClientStats->m_Level);
+		int ExpNeeded = computeExperience(pClientStats->m_Level);
 		str_format(aBuf, sizeof(aBuf), "Level: %d Exp: %d/%d", pClientStats->m_Level, pClientStats->m_Exp, ExpNeeded);
 
 		CUIRect ExpBar = { 8.0f, 41.5, 100.0f, 7.0f };
