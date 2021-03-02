@@ -114,17 +114,19 @@ void CUIGameInterface::ConToggleGameHUDMRPG(IConsole::IResult* pResult, void* pU
 
 void CUIGameInterface::RenderIconLogic(CUIRect* pRect, CWindowUI *pWindow, int SpriteID)
 {
-	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAMEHUD].m_Id);
-	Graphics()->WrapClamp();
-	Graphics()->QuadsBegin();
-	RenderTools()->SelectSprite(SpriteID);
-	IGraphics::CQuadItem MainIcon(pRect->x, pRect->y, 48, 48);
-	Graphics()->QuadsDrawTL(&MainIcon, 1);
-	Graphics()->QuadsEnd();
-	Graphics()->WrapNormal();
-
 	CUIRect Icon = { pRect->x, pRect->y, 48.0f, 48.0f };
 	int MoveLogic = UI()->DoMouseEventLogic(&Icon, KEY_MOUSE_1);
 	if(MoveLogic & CUI::CButtonLogicEvent::EVENT_PRESS)
 		pWindow->CloseOpen();
+
+	float Size = MoveLogic & CUI::CButtonLogicEvent::EVENT_HOVERED ? 56.0f : 48.0f;
+	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAMEHUD].m_Id);
+	Graphics()->WrapClamp();
+	Graphics()->QuadsBegin();
+	RenderTools()->SelectSprite(SpriteID);
+	IGraphics::CQuadItem MainIcon(pRect->x, pRect->y, Size, Size);
+	Graphics()->QuadsDrawTL(&MainIcon, 1);
+	Graphics()->QuadsEnd();
+	Graphics()->WrapNormal();
+
 }
