@@ -60,9 +60,9 @@ int CraftJob::GetFinalPrice(CPlayer* pPlayer, int CraftID) const
 	if(!pPlayer)
 		return ms_aCraft[CraftID].m_Price;
 
-	int Discount = (int)kurosio::translate_to_procent_rest(ms_aCraft[CraftID].m_Price, pPlayer->GetSkill(SkillCraftDiscount).m_Level);
+	int Discount = translate_to_percent_rest(ms_aCraft[CraftID].m_Price, pPlayer->GetSkill(SkillCraftDiscount).m_Level);
 	if(pPlayer->GetItem(itTicketDiscountCraft).IsEquipped())
-		Discount += (int)kurosio::translate_to_procent_rest(ms_aCraft[CraftID].m_Price, 20);
+		Discount += translate_to_percent_rest(ms_aCraft[CraftID].m_Price, 20);
 
 	return max(ms_aCraft[CraftID].m_Price - Discount, 0);
 }

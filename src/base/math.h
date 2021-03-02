@@ -4,6 +4,7 @@
 #define BASE_MATH_H
 
 #include <stdlib.h>
+#include <type_traits>
 
 template <typename T>
 inline T clamp(T val, T min, T max)
@@ -89,5 +90,21 @@ template <typename T> inline T min(T a, T b) { return a<b?a:b; }
 template <typename T> inline T max(T a, T b) { return a>b?a:b; }
 template <typename T> inline T max(T a, T b, T c) { return max(max(a, b), c); }
 template <typename T> inline T absolute(T a) { return a<T(0)?-a:a; }
+
+template < typename T> // char is arithmetic type we must exclude it 'a' / 'd' etc
+using PercentArithmetic = typename std::enable_if < std::is_arithmetic  < T >::value && !std::is_same < T, char >::value, T >::type;
+
+template <typename T> // derive from the number of percent e.g. ((100, 10%) = 10)
+inline PercentArithmetic<T> translate_to_percent_rest(T value, float percent) { return (T)(((double)value / 100.0f) * (T)percent); }
+
+template <typename T> // add to the number a percentage e.g. ((100, 10%) = 110)
+inline PercentArithmetic<T> add_percent_to_source(T *pvalue, float percent)
+{
+	*pvalue = ((T)((double)*pvalue) * (1.0f + ((T)percent / 100.0f)));
+	return (T)(*pvalue);
+}
+
+template <typename T> // translate from the first to the second in percent e.g. ((10, 5) = 50%)
+inline PercentArithmetic<T> translate_to_percent(T from, T value) { return (T)(((double)value / (double)from) * 100.0f); }
 
 #endif // BASE_MATH_H

@@ -231,7 +231,7 @@ void CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKil
 	const int VictimID = pVictim->GetPlayer()->GetCID();
 	if (KillerID != VictimID && pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
-		const int Progress = 100 - (int)kurosio::translate_to_procent(CountMobs(), LeftMobsToWin());
+		const int Progress = 100 - translate_to_percent(CountMobs(), LeftMobsToWin());
 		DungeonJob::ms_aDungeon[m_DungeonID].m_Progress = Progress;
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The dungeon is completed on [{INT}%]", &Progress);
 		UpdateDoorKeyState();
@@ -432,7 +432,7 @@ int CGameControllerDungeon::GetAttributeDungeonSync(CPlayer* pPlayer, int BonusI
 		if(AttributeType == AtributType::AtTank)
 			Percent = 30.0f;
 
-		const int AttributeSyncProcent = kurosio::translate_to_procent_rest(ActiveAttribute, Percent);
+		const int AttributeSyncProcent = translate_to_percent_rest(ActiveAttribute, Percent);
 		return max(AttributeSyncProcent, 1);
 	}
 
@@ -446,7 +446,7 @@ int CGameControllerDungeon::GetAttributeDungeonSync(CPlayer* pPlayer, int BonusI
 	else if(AttributeType == AtributType::AtHardtype || AttributeType == AtributType::AtDps)
 		Percent = 0.1f;
 
-	const int AttributeSyncProcent = kurosio::translate_to_procent_rest(ActiveAttribute, Percent);
+	const int AttributeSyncProcent = translate_to_percent_rest(ActiveAttribute, Percent);
 	return max(AttributeSyncProcent, 1);
 }
 

@@ -35,7 +35,7 @@ int CItemInformation::GetInfoEnchantStats(int AttributeID, int Enchant) const
 	if(StatSize <= 0)
 		return 0;
 
-	const int PercentEnchant = (int)kurosio::translate_to_procent_rest(StatSize, PERCENT_OF_ENCHANT);
+	const int PercentEnchant = translate_to_percent_rest(StatSize, PERCENT_OF_ENCHANT);
 	int EnchantStat = StatSize + PercentEnchant * (1 + Enchant);
 
 	// the case when with percent will back 0
@@ -69,7 +69,7 @@ int CItemInformation::GetEnchantPrice(int EnchantLevel) const
 		else
 			UpgradePrice = max(5, CGS::ms_aAttributsInfo[Attribute].m_UpgradePrice) * 15;
 
-		const int PercentEnchant = max(1, (int)kurosio::translate_to_procent_rest(m_aAttributeCount[i], PERCENT_OF_ENCHANT));
+		const int PercentEnchant = max(1, translate_to_percent_rest(m_aAttributeCount[i], PERCENT_OF_ENCHANT));
 		FinishedPrice += UpgradePrice * (PercentEnchant * (1 + EnchantLevel));
 	}
 	return FinishedPrice;
@@ -92,7 +92,7 @@ bool CItemInformation::IsEnchantMaxLevel(int Enchant) const
 		if(CGS::ms_aAttributsInfo.find(m_aAttribute[i]) == CGS::ms_aAttributsInfo.end() || m_aAttributeCount[i] <= 0)
 			continue;
 
-		const int EnchantMax = m_aAttributeCount[i] + (int)kurosio::translate_to_procent_rest(m_aAttributeCount[i], PERCENT_MAXIMUM_ENCHANT);
+		const int EnchantMax = m_aAttributeCount[i] + translate_to_percent_rest(m_aAttributeCount[i], PERCENT_MAXIMUM_ENCHANT);
 		if(GetInfoEnchantStats(m_aAttribute[i], Enchant) > EnchantMax)
 			return true;
 	}

@@ -2336,8 +2336,8 @@ void CGS::ChangeEquipSkin(int ClientID, int ItemID)
 int CGS::GetExperienceMultiplier(int Experience) const
 {
 	if(IsDungeon())
-		return (int)kurosio::translate_to_procent_rest(Experience, g_Config.m_SvMultiplierExpRaidDungeon);
-	return (int)kurosio::translate_to_procent_rest(Experience, m_MultiplierExp);
+		return translate_to_percent_rest(Experience, g_Config.m_SvMultiplierExpRaidDungeon);
+	return translate_to_percent_rest(Experience, m_MultiplierExp);
 }
 
 void CGS::UpdateZonePVP()

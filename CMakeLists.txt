@@ -944,16 +944,7 @@ add_custom_target(everything DEPENDS ${TARGETS_OWN})
 ########################################################################
 
 if(GTEST_FOUND OR DOWNLOAD_GTEST)
-  set_src(TESTS GLOB src/test
-    fs.cpp
-    git_revision.cpp
-    hash.cpp
-    storage.cpp
-    str.cpp
-    test.cpp
-    test.h
-    thread.cpp
-  )
+  file(GLOB TESTS "src/test/*.cpp" "src/test/*.h")
   set(TARGET_TESTRUNNER testrunner)
   add_executable(${TARGET_TESTRUNNER} EXCLUDE_FROM_ALL
     ${TESTS}

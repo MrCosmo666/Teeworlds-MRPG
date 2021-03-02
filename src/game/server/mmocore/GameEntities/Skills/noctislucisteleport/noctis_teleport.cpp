@@ -47,7 +47,7 @@ void CNoctisTeleport::Tick()
 		m_pPlayerChar->ChangePosition(OldPosition);
 
 		const int ClientID = m_pPlayerChar->GetPlayer()->GetCID();
-		const int MaximalDamageSize = kurosio::translate_to_procent_rest(m_pPlayerChar->GetPlayer()->GetAttributeCount(Stats::StStrength, true), clamp(m_SkillBonus, 5, 50));
+		const int MaximalDamageSize = translate_to_percent_rest(m_pPlayerChar->GetPlayer()->GetAttributeCount(Stats::StStrength, true), clamp(m_SkillBonus, 5, 50));
 		for(int i = 0; i < MAX_CLIENTS; i++)
 		{
 			CPlayer *pSearchPlayer = GS()->GetPlayer(i, false, true);

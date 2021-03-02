@@ -3,12 +3,12 @@
 #include <base/vmath.h>
 #include <engine/server/sql_connect_pool.h>
 #include <engine/server/sql_string_helpers.h>
-#include <game/server/gamecontext.h>
 #include "MmoController.h"
 
 #include <engine/storage.h>
 #include <engine/shared/datafile.h>
 #include <teeother/system/string.h>
+#include <game/server/gamecontext.h>
 
 #include "ComponentsCore/AetherJob.h"
 

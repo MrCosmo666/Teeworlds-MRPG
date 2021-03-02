@@ -2,8 +2,9 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_SKILLJOB_H
 #define GAME_SERVER_SKILLJOB_H
-
 #include <game/server/mmocore/MmoComponent.h>
+
+#include "Skill.h"
 
 class SkillsJob : public MmoComponent
 {

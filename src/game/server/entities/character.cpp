@@ -1029,23 +1029,23 @@ void CCharacter::HandleBuff(CTuningParams* TuningParams)
 	{	
 		if(m_pPlayer->IsActiveEffect("Fire"))
 		{
-			const int ExplodeDamageSize = kurosio::translate_to_procent_rest(m_pPlayer->GetStartHealth(), 3);
+			const int ExplodeDamageSize = translate_to_percent_rest(m_pPlayer->GetStartHealth(), 3);
 			GS()->CreateExplosion(m_Core.m_Pos, m_pPlayer->GetCID(), WEAPON_GRENADE, 0);
 			TakeDamage(vec2(0, 0), ExplodeDamageSize, m_pPlayer->GetCID(), WEAPON_SELF);
 		}
 		if(m_pPlayer->IsActiveEffect("Poison"))
 		{
-			const int PoisonSize = kurosio::translate_to_procent_rest(m_pPlayer->GetStartHealth(), 3);
+			const int PoisonSize = translate_to_percent_rest(m_pPlayer->GetStartHealth(), 3);
 			TakeDamage(vec2(0, 0), PoisonSize, m_pPlayer->GetCID(), WEAPON_SELF);
 		}
 		if(m_pPlayer->IsActiveEffect("RegenHealth"))
 		{
-			const int RestoreHealth = kurosio::translate_to_procent_rest(m_pPlayer->GetStartHealth(), 3);
+			const int RestoreHealth = translate_to_percent_rest(m_pPlayer->GetStartHealth(), 3);
 			IncreaseHealth(RestoreHealth);
 		}
 		if(m_pPlayer->IsActiveEffect("RegenMana"))
 		{
-			const int RestoreMana = kurosio::translate_to_procent_rest(m_pPlayer->GetStartMana(), 5);
+			const int RestoreMana = translate_to_percent_rest(m_pPlayer->GetStartMana(), 5);
 			IncreaseMana(RestoreMana);
 		}
 	}

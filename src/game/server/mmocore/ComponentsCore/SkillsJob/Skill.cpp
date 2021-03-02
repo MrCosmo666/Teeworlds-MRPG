@@ -34,7 +34,7 @@ bool CSkill::Use()
 
 	// mana check
 	CCharacter* pChr = m_pPlayer->GetCharacter();
-	const int PriceMana = kurosio::translate_to_procent_rest(m_pPlayer->GetStartMana(), Info().m_ManaProcent);
+	const int PriceMana = translate_to_percent_rest(m_pPlayer->GetStartMana(), Info().m_ManaProcent);
 	if(PriceMana > 0 && pChr->CheckFailMana(PriceMana))
 		return false;
 
@@ -86,7 +86,7 @@ bool CSkill::Use()
 				continue;
 
 			const int RealAmmo = 10 + pPlayerSearch->GetAttributeCount(Stats::StAmmo);
-			const int RestoreAmmo = kurosio::translate_to_procent_rest(RealAmmo, min(GetBonus(), 100));
+			const int RestoreAmmo = translate_to_percent_rest(RealAmmo, min(GetBonus(), 100));
 			for(int i = WEAPON_GUN; i <= WEAPON_LASER; i++)
 			{
 				pPlayerSearch->GetCharacter()->GiveWeapon(i, RestoreAmmo);
