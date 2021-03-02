@@ -901,7 +901,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	const int ClientID = pPlayer->GetCID();
 	const int GuildID = pPlayer->Acc().m_GuildID;
 	const int GuildHouse = GetGuildHouseID(GuildID);
-	const int ExpNeed = kurosio::computeExperience(ms_aGuild[GuildID].m_Level);
+	const int ExpNeed = computeExperience(ms_aGuild[GuildID].m_Level);
 	GS()->AVH(ClientID, TAB_GUILD_STAT, BLUE_COLOR, "Guild name: {STR}", ms_aGuild[GuildID].m_aName);
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Level: {INT} Experience: {INT}/{INT}", &ms_aGuild[GuildID].m_Level, &ms_aGuild[GuildID].m_Exp, &ExpNeed);
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Maximal available player count: {INT}", &ms_aGuild[GuildID].m_Upgrades[GuildStruct::AVAILABLE_SLOTS]);
@@ -1022,13 +1022,13 @@ void GuildJob::AddExperience(int GuildID)
 	ms_aGuild[GuildID].m_Exp += 1;
 
 	bool UpdateTable = false;
-	int ExperienceNeed = kurosio::computeExperience(ms_aGuild[GuildID].m_Level);
+	int ExperienceNeed = computeExperience(ms_aGuild[GuildID].m_Level);
 	for( ; ms_aGuild[GuildID].m_Exp >= ExperienceNeed; )
 	{
 		ms_aGuild[GuildID].m_Exp -= ExperienceNeed; 
 		ms_aGuild[GuildID].m_Level++;
 
-		ExperienceNeed = kurosio::computeExperience(ms_aGuild[GuildID].m_Level);
+		ExperienceNeed = computeExperience(ms_aGuild[GuildID].m_Level);
 		if(ms_aGuild[GuildID].m_Exp < ExperienceNeed)
 			UpdateTable = true;
 

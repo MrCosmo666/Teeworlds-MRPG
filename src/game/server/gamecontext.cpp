@@ -1,10 +1,10 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <stdarg.h>
-#include <thread>
 #include <algorithm>
 
 #include <base/math.h>
+#include <base/threadpool.h>
 #include <engine/shared/config.h>
 #include <engine/storage.h>
 
@@ -1881,7 +1881,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		pPlayer->m_ActiveMenuOptionCallback = { 0 };
 	}
 
-	kurosio::kpause(3);
+	sleep_pause(3); // TODO: fix need it
 	pPlayer->m_OpenVoteMenu = MenuList;
 	ClearVotes(ClientID);
 	

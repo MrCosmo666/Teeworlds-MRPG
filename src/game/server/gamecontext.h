@@ -4,8 +4,6 @@
 #define GAME_SERVER_GAMECONTEXT_H
 #include <engine/server.h>
 #include <engine/console.h>
-
-#include <base/another/kurhelper.h>
 #include <game/voting.h>
 
 #include "gamecontroller.h"

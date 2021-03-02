@@ -67,7 +67,7 @@ void AccountPlantJob::ShowMenu(CPlayer* pPlayer)
 	const int JobExperience = pPlayer->Acc().m_aPlant[JOB_EXPERIENCE].m_Value;
 	const int JobUpgrades = pPlayer->Acc().m_aPlant[JOB_UPGRADES].m_Value;
 	const int JobUpgrCounts = pPlayer->Acc().m_aPlant[JOB_UPGR_COUNTS].m_Value;
-	const int ExperienceNeed = kurosio::computeExperience(JobExperience);
+	const int ExperienceNeed = computeExperience(JobExperience);
 
 	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Plants Point: {INT} :: Level: {INT} Exp: {INT}/{INT}", &JobUpgrades, &JobLevel, &JobExperience, &ExperienceNeed);
 	GS()->AVD(ClientID, "PLANTUPGRADE", JOB_UPGR_COUNTS, 20, TAB_UPGR_JOB, "Quantity +{INT} (Price 20P)", &JobUpgrCounts);
@@ -85,10 +85,10 @@ void AccountPlantJob::ShowPlantsItems(int ClientID)
 void AccountPlantJob::Work(CPlayer* pPlayer, int Level)
 {
 	const int ClientID = pPlayer->GetCID();
-	const int MultiplierExperience = kurosio::computeExperience(Level) / g_Config.m_SvPlantingIncreaseLevel;
+	const int MultiplierExperience = computeExperience(Level) / g_Config.m_SvPlantingIncreaseLevel;
 	pPlayer->Acc().m_aPlant[JOB_EXPERIENCE].m_Value += clamp(MultiplierExperience, 1, MultiplierExperience);
 
-	int ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value);
+	int ExperienceNeed = computeExperience(pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value);
 	for (; pPlayer->Acc().m_aPlant[JOB_EXPERIENCE].m_Value >= ExperienceNeed; )
 	{
 		pPlayer->Acc().m_aPlant[JOB_EXPERIENCE].m_Value -= ExperienceNeed;
@@ -102,7 +102,7 @@ void AccountPlantJob::Work(CPlayer* pPlayer, int Level)
 			GS()->CreateText(pPlayer->GetCharacter(), false, vec2(0, -40), vec2(0, -1), 40, "plants up");
 		}
 
-		ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value);
+		ExperienceNeed = computeExperience(pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value);
 		GS()->ChatFollow(ClientID, "Plants Level UP. Now Level {INT}!", &pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value);
 	}
 

@@ -5,6 +5,7 @@
 #include <game/server/mmocore/MmoComponent.h>
 
 #include <game/server/mmocore/ComponentsCore/ShopJob.h>
+#include <string>
 
 class AccountMainJob : public MmoComponent
 {

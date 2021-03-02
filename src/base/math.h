@@ -91,6 +91,14 @@ template <typename T> inline T max(T a, T b) { return a>b?a:b; }
 template <typename T> inline T max(T a, T b, T c) { return max(max(a, b), c); }
 template <typename T> inline T absolute(T a) { return a<T(0)?-a:a; }
 
+inline unsigned long long computeExperience(unsigned Level)
+{
+	if(Level == 1)
+		return 18;
+	return (unsigned long long)(24 * pow(Level, 2)) - ((unsigned long long)24 * Level);
+}
+
+// percents
 template < typename T> // char is arithmetic type we must exclude it 'a' / 'd' etc
 using PercentArithmetic = typename std::enable_if < std::is_arithmetic  < T >::value && !std::is_same < T, char >::value, T >::type;
 

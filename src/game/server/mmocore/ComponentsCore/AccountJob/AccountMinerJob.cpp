@@ -14,7 +14,7 @@ void AccountMinerJob::ShowMenu(CPlayer *pPlayer)
 	const int JobExperience = pPlayer->Acc().m_aMiner[JOB_EXPERIENCE].m_Value;
 	const int JobUpgrades = pPlayer->Acc().m_aMiner[JOB_UPGRADES].m_Value;
 	const int JobUpgrCounts = pPlayer->Acc().m_aMiner[JOB_UPGR_COUNTS].m_Value;
-	const int ExperienceNeed = kurosio::computeExperience(JobExperience);
+	const int ExperienceNeed = computeExperience(JobExperience);
 
 	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Miner Point: {INT} :: Level: {INT} Exp: {INT}/{INT}", &JobUpgrades, &JobLevel, &JobExperience, &ExperienceNeed);
 	GS()->AVD(ClientID, "MINERUPGRADE", JOB_UPGR_COUNTS, 20, TAB_UPGR_JOB, "Quantity +{INT} (Price 20P)", &JobUpgrCounts);
@@ -56,10 +56,10 @@ int AccountMinerJob::GetOreHealth(vec2 Pos) const
 void AccountMinerJob::Work(CPlayer *pPlayer, int Level)
 {
 	const int ClientID = pPlayer->GetCID();
-	const int MultiplierExperience = kurosio::computeExperience(Level) / g_Config.m_SvMiningIncreaseLevel;
+	const int MultiplierExperience = computeExperience(Level) / g_Config.m_SvMiningIncreaseLevel;
 	pPlayer->Acc().m_aMiner[JOB_EXPERIENCE].m_Value += clamp(MultiplierExperience, 1, MultiplierExperience);
 
-	int ExperienceNeed = kurosio::computeExperience(pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value);
+	int ExperienceNeed = computeExperience(pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value);
 	for( ; pPlayer->Acc().m_aMiner[JOB_EXPERIENCE].m_Value >= ExperienceNeed; )
 	{
 		pPlayer->Acc().m_aMiner[JOB_EXPERIENCE].m_Value -= ExperienceNeed;
@@ -74,7 +74,7 @@ void AccountMinerJob::Work(CPlayer *pPlayer, int Level)
 		}
 
 		const int NewLevel = pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value;
-		ExperienceNeed = kurosio::computeExperience(NewLevel);
+		ExperienceNeed = computeExperience(NewLevel);
 		GS()->ChatFollow(ClientID, "Miner Level UP. Now Level {INT}!", &NewLevel);
 	}
 

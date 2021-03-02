@@ -459,7 +459,7 @@ int CPlayer::GetStartTeam()
 
 int CPlayer::ExpNeed(int Level) const
 {
-	return kurosio::computeExperience(Level);
+	return computeExperience(Level);
 }
 
 int CPlayer::GetStartHealth()

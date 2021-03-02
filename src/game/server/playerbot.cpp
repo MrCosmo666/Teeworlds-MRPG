@@ -1,12 +1,15 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <map>
-#include <string>
 #include "playerbot.h"
 
 #include "entities/botai/character_bot_ai.h"
 #include "mmocore/PathFinder.h"
 #include "gamecontext.h"
+
+#include <map>
+#include <string>
+#include <thread>
+#include <mutex>
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayerBot, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 

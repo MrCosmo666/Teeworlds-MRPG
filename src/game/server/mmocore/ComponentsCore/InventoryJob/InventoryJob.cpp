@@ -4,12 +4,14 @@
 #include <game/server/gamecontext.h>
 #include "InventoryJob.h"
 
+#include <teeother/tl/nlohmann_json.h>
+
+#include <mutex>
+
 using namespace sqlstr;
+using json = nlohmann::json;
 std::map < int , std::map < int , InventoryItem > > InventoryJob::ms_aItems;
 std::map < int , ItemInformation > InventoryJob::ms_aItemsInfo;
-
-#include <teeother/tl/nlohmann_json.h>
-using json = nlohmann::json;
 
 void InventoryJob::OnPrepareInformation(IStorageEngine* pStorage, CDataFileWriter* pDataFile)
 {

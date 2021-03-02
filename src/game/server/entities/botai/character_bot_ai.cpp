@@ -151,7 +151,7 @@ void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force)
 	pPlayer->AddMoney(Golds);
 
 	// experience
-	const int ExperienceMob = kurosio::computeExperience(BotJob::ms_aMobBot[SubID].m_Level) / g_Config.m_SvKillmobsIncreaseLevel;
+	const int ExperienceMob = computeExperience(BotJob::ms_aMobBot[SubID].m_Level) / g_Config.m_SvKillmobsIncreaseLevel;
 	const int ExperienceWithMultiplier = max(1, GS()->GetExperienceMultiplier(ExperienceMob));
 	GS()->CreateParticleExperience(m_Core.m_Pos, ClientID, ExperienceWithMultiplier, Force);
 

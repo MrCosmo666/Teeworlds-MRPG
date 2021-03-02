@@ -2,8 +2,9 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_DATA_QUESTS_H
 #define GAME_SERVER_DATA_QUESTS_H
-
 #include "StepQuestBot.h"
+
+#include <string>
 
 class CDataQuest
 {
