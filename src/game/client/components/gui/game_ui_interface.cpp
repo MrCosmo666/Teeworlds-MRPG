@@ -70,12 +70,6 @@ void CUIGameInterface::OnRender()
 		});
 	}
 
-	m_pTestWindow.Init("test", { 150, 150, 300, 250 }, CWindowFlags::WINDOW_ALL);
-	m_pTestWindow.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
-	{
-
-	});
-
 	// mouse
 	UI()->Update(m_MousePos.x, m_MousePos.y, m_MousePos.x * 3.0f, m_MousePos.y * 3.0f);
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CURSOR].m_Id);
