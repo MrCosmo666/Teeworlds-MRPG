@@ -20,7 +20,7 @@ public:
 
 	bool IsActiveHUD() const { return m_ActiveHUD; }
 
-	void RenderIconLogic(class CUIRect* pRect, class CWindowUI* pWindow, int SpriteID);
+	void DoIconSelectionWindow(CMenus::CButtonContainer* pBC, class CUIRect* pRect, class CWindowUI* pWindow, int SpriteID);
 };
 
 #endif

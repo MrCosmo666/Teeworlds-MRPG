@@ -325,6 +325,12 @@ void CRenderTools::DrawUIRect(const CUIRect *r, vec4 Color, int Corners, float R
 	Graphics()->QuadsEnd();
 }
 
+void CRenderTools::DrawUIRectMonochromeGradient(const CUIRect* pRect, vec4 Color, int Corners, float Rounding)
+{
+	vec4 ColorDownGradient = vec4(max(Color.r - 0.05f, 0.0f), max(Color.g - 0.05f, 0.0f), max(Color.b - 0.05f, 0.0f), Color.a);
+	DrawUIRect4(pRect, Color, Color, ColorDownGradient, ColorDownGradient, Corners, Rounding);
+}
+
 void CRenderTools::DrawUIRect4(const CUIRect *r, vec4 ColorTopLeft, vec4 ColorTopRight, vec4 ColorBottomLeft, vec4 ColorBottomRight, int Corners, float Rounding)
 {
 	Graphics()->TextureClear();

@@ -3,6 +3,7 @@
 #include <engine/shared/config.h>
 #include <generated/client_data.h>
 
+#include <game/client/components/sounds.h>
 #include <game/client/components/menus.h>
 #include <game/client/components/console.h>
 #include <game/client/ui_window.h>
@@ -17,11 +18,17 @@ void CUIGameInterface::OnRender()
 	const CUIRect* pScreen = UI()->Screen();
 	Graphics()->MapScreen(pScreen->x, pScreen->y, pScreen->w, pScreen->h);
 
-	// maillist window
-	CWindowUI m_WindowMails;
-	m_WindowMails.Init("Mail list", { 150, 150, 400, 300 });
-	m_WindowMails.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+	// inbox/mail gui icon
+	CUIRect IconView;
+	pScreen->VSplitRight(60.0f, 0, &IconView);
+	IconView.HSplitBottom(400.0f, 0, &IconView);
+	static CMenus::CButtonContainer s_MailListButton;
+	CWindowUI m_WindowMails("Mail list", { 150,150,250,400 }, CWindowFlags::WINDOW_ALL);
+	DoIconSelectionWindow(&s_MailListButton, &IconView, &m_WindowMails, SPRITE_HUD_ICON_MAIL);
 	{
+		// inbox/mail window
+		m_WindowMails.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+		{
 			CUIRect List = pWindowRect;
 			int OldSelectedFont = m_MailboxSelectedOption;
 			static CMenus::CListBox s_ListBox;
@@ -30,7 +37,8 @@ void CUIGameInterface::OnRender()
 
 			for(int i = 0; i < 200; i++)
 			{
-				CMenus::CListboxItem Item = s_ListBox.DoNextItem((void*)i);
+				static int s_DefaultEntitiyId;
+				CMenus::CListboxItem Item = s_ListBox.DoNextItem(i > 0 ? (void*)i : (void*)&s_DefaultEntitiyId, m_MailboxSelectedOption == i);
 				if(Item.m_Visible)
 				{
 					float IconSize = 21.0f;
@@ -46,24 +54,21 @@ void CUIGameInterface::OnRender()
 				}
 			}
 			m_MailboxSelectedOption = s_ListBox.DoEnd();
-	});
+		});
+	}
 
-	// quest book window
-	CWindowUI m_WindowQuestBook;
-	m_WindowQuestBook.Init("Quest book", { 150, 150, 400, 300 });
-	m_WindowQuestBook.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+	// questing gui icon
+	IconView.HMargin(52.0f, &IconView);
+	static CMenus::CButtonContainer s_QuestingListButton;
+	CWindowUI m_WindowQuestBook("Quest book", { 150, 150, 300, 250 }, CWindowFlags::WINDOW_ALL);
+	DoIconSelectionWindow(&s_QuestingListButton, &IconView, &m_WindowQuestBook, SPRITE_HUD_ICON_QUEST);
 	{
+		// questing window
+		m_WindowQuestBook.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+		{
 
-	});
-
-	// icons
-	CUIRect IconView;
-	pScreen->VSplitRight(60.0f, 0, &IconView);
-	IconView.HSplitBottom(400.0f, 0, &IconView);
-	RenderIconLogic(&IconView, &m_WindowMails, SPRITE_HUD_ICON_MAIL);
-	
-	IconView.HMargin(50.0f, &IconView);
-	RenderIconLogic(&IconView, &m_WindowQuestBook, SPRITE_HUD_ICON_QUEST);
+		});
+	}
 
 	// mouse
 	UI()->Update(m_MousePos.x, m_MousePos.y, m_MousePos.x * 3.0f, m_MousePos.y * 3.0f);
@@ -86,7 +91,6 @@ bool CUIGameInterface::OnInput(IInput::CEvent Event)
 	if(m_pClient->m_pGameConsole->IsConsoleActive() || !m_ActiveHUD)
 		return false;
 
-	// special handle esc and enter for popup purposes
 	if(Event.m_Flags & IInput::FLAG_PRESS)
 	{
 		if(Event.m_Key == KEY_ESCAPE)
@@ -146,11 +150,27 @@ void CUIGameInterface::ConToggleGameHUDMRPG(IConsole::IResult* pResult, void* pU
 	pGameHUD->m_ActiveHUD ^= true;
 }
 
-void CUIGameInterface::RenderIconLogic(CUIRect* pRect, CWindowUI *pWindow, int SpriteID)
+void CUIGameInterface::DoIconSelectionWindow(CMenus::CButtonContainer* pBC, CUIRect* pRect, CWindowUI *pWindow, int SpriteID)
 {
-	float Size = UI()->HotItem() == pWindow ? 56.0f : 48.0f;
-	CUIRect Icon = { pRect->x, pRect->y, 48.0f, 48.0f };
-	UI()->DoButtonLogic(pWindow, &Icon);
+	if(!pBC || !pWindow)
+		return;
+
+	if(UI()->HotItem() == pBC->GetID())
+	{
+		vec4 ColorHighlight = vec4(1.0f, 0.55f, 0.0f, 0.4f);
+		pWindow->HighlightEnable(ColorHighlight);
+	}
+	else
+	{
+		pWindow->HighlightDisable();
+	}
+
+	bool WindowOpenned = pWindow->IsOpenned();
+	const float FadeVal = WindowOpenned ? max(pBC->GetFade() + 0.5f, 1.0f) : pBC->GetFade();
+	float Size = 42.0f + (FadeVal * 6.0f);
+	CUIRect Icon = { pRect->x, pRect->y, Size, Size };
+	RenderTools()->DrawUIRect(&Icon, vec4(0.0f + FadeVal, 0.0f + FadeVal, 0.0f + FadeVal, 0.3f), CUI::CORNER_ALL, 5.0f);
+
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAMEHUD].m_Id);
 	Graphics()->WrapClamp();
 	Graphics()->QuadsBegin();
@@ -160,9 +180,16 @@ void CUIGameInterface::RenderIconLogic(CUIRect* pRect, CWindowUI *pWindow, int S
 	Graphics()->QuadsEnd();
 	Graphics()->WrapNormal();
 
-	if(UI()->GetActiveItem() == pWindow)
-	{
+	const void* pLastActiveItem = UI()->GetActiveItem();
+	if(UI()->DoButtonLogic(pBC->GetID(), &Icon))
 		pWindow->CloseOpen();
-		UI()->SetActiveItem(0);
+
+	// UI sounds
+	if(g_Config.m_SndEnableUI)
+	{
+		if(g_Config.m_SndEnableUIHover && UI()->NextHotItem() == pBC->GetID() && UI()->NextHotItem() != UI()->HotItem())
+			m_pClient->m_pSounds->Play(CSounds::CHN_GUI, SOUND_BUTTON_HOVER, 1);
+		if(UI()->GetActiveItem() == pBC->GetID() && pLastActiveItem != pBC->GetID())
+			m_pClient->m_pSounds->Play(CSounds::CHN_GUI, SOUND_BUTTON_CLICK, 0);
 	}
 }

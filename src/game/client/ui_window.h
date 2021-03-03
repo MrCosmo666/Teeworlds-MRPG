@@ -26,6 +26,7 @@ class CWindowUI
 	RenderWindowCallback m_pCallback;
 
 	bool m_Openned;
+	vec4 m_HighlightColor;
 	char m_aWindowName[128];
 	CUIRect m_WindowRect;
 	CUIRect m_WindowRectOld;
@@ -39,6 +40,7 @@ class CWindowUI
 public:
 	CWindowUI() = default;
 	CWindowUI(const CWindowUI& pWindow) = default;
+	CWindowUI(const char* pWindowName, CUIRect WindowRect, int WindowFlags = CWindowFlags::WINDOW_ALL);
 
 	bool IsOpenned() const;
 	bool IsActive() const;
@@ -50,6 +52,8 @@ public:
 	void CloseOpen();
 	void Init(const char* pWindowName, CUIRect WindowRect, int WindowFlags = CWindowFlags::WINDOW_ALL);
 	void OnRenderWindow(RenderWindowCallback pCallback);
+	void HighlightEnable(vec4 Color);
+	void HighlightDisable();
 
 private:
 	void Render();

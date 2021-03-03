@@ -51,21 +51,47 @@ void CWindowUI::Render()
 		}
 	}
 
-	static float MainBackgroundMargin = 4.0f;
+	// highlight
+	bool IsActiveWindow = IsActive();
+	static float MainBackgroundMargin = 2.0f;
+	if(IsActiveWindow || m_HighlightColor.a > 0.0f)
+	{
+		float Margin = m_HighlightColor.a > 0.0f ? -3.0f : -1.0f;
+		if(m_WindowHidden)
+		{
+			const float Fade = m_pUI->GetFade(&Bordure, IsActiveWindow, 0.5f);
+			vec4 ColorHighlight = m_HighlightColor.a > 0.0f ? m_HighlightColor : vec4(0.4f, 0.25f, 0.f, 0.2f);
+
+			CUIRect HighlightActive = Bordure;
+			HighlightActive.Margin(Margin, &HighlightActive);
+			m_pRenderTools->DrawUIRectMonochromeGradient(&HighlightActive, ColorHighlight, CUI::CORNER_ALL, 8.0f);
+		}
+		else
+		{
+			const float Fade = m_pUI->GetFade(&m_WindowRect, IsActiveWindow, 0.5f);
+			vec4 ColorHighlight = m_HighlightColor.a > 0.0f ? m_HighlightColor : vec4(0.4f, 0.25f, 0.f, 0.2f);
+
+			CUIRect HighlightActive = m_WindowRect;
+			HighlightActive.Margin(Margin, &HighlightActive);
+			m_pRenderTools->DrawUIRectMonochromeGradient(&HighlightActive, ColorHighlight, CUI::CORNER_ALL, 8.0f);
+		}
+	}
+
+	// background draw
 	if(!m_WindowHidden)
 	{
-		vec4 Color = mix(vec4(0.15f, 0.15f, 0.15f, 0.85f), vec4(0.25f, 0.25f, 0.25f, 0.9f), m_pUI->GetFade(&m_WindowRect, IsActive(), 0.4f));
-
-		// background draw
 		CUIRect MainBackground = m_WindowRect;
 		MainBackground.Margin(MainBackgroundMargin, &MainBackground);
-		m_pRenderTools->DrawRoundRect(&MainBackground, Color, 12.0f);
+		float BackgroundFade = m_pUI->GetFade(&m_WindowRect, IsActiveWindow, 0.4f);
+		vec4 Color = mix(vec4(0.15f, 0.15f, 0.15f, 0.85f), vec4(0.2f, 0.2f, 0.2f, 0.9f), BackgroundFade);
+		m_pRenderTools->DrawUIRectMonochromeGradient(&MainBackground, Color, CUI::CORNER_ALL, 12.0f);
 		m_pRenderTools->DrawRoundRect(&m_WindowRect, vec4(0.1f, 0.1f, 0.1f, 0.5f), 12.0f);
 	}
 
 	// bordour draw
-	vec4 Color = mix(vec4(0.1f, 0.1f, 0.1f, 1.0f), vec4(0.3f, 0.3f, 0.3f, 1.0f), m_pUI->GetFade(&Bordure, IsActive()));
-	m_pRenderTools->DrawUIRect(&Bordure, Color, CUI::CORNER_ALL, 10.0f);
+	const float BordureFade = m_pUI->GetFade(&Bordure, IsActiveWindow);
+	vec4 Color = mix(vec4(0.15f, 0.15f, 0.15f, 1.0f), vec4(0.3f, 0.3f, 0.3f, 1.0f), BordureFade);
+	m_pRenderTools->DrawUIRectMonochromeGradient(&Bordure, Color, CUI::CORNER_ALL, 10.0f);
 
 	CUIRect Label;
 	Bordure.VSplitLeft(10.0f, 0, &Label);
@@ -77,7 +103,7 @@ void CWindowUI::Render()
 		CUIRect ButtonClose;
 		Bordure.VSplitRight(24.0f, 0, &ButtonClose);
 		Color = mix(vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.7f, 0.1f, 0.1f, 0.75f), m_pUI->GetFade(&ButtonClose, false));
-		m_pRenderTools->DrawUIRect(&ButtonClose, Color, CUI::CORNER_ALL, 10.0f);
+		m_pRenderTools->DrawUIRectMonochromeGradient(&ButtonClose, Color, CUI::CORNER_ALL, 10.0f);
 		m_pUI->DoLabel(&ButtonClose, "\xE2\x9C\x95", 16.0f, CUI::ALIGN_CENTER);
 		const int CloseLogic = m_pUI->DoMouseEventLogic(&ButtonClose, KEY_MOUSE_1);
 		if(CloseLogic & CUI::CButtonLogicEvent::EVENT_PRESS)
@@ -93,7 +119,7 @@ void CWindowUI::Render()
 			ButtonHide.x -= 24.0f;
 
 		Color = mix(vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.2f, 0.7f, 0.75f), m_pUI->GetFade(&ButtonHide, false));
-		m_pRenderTools->DrawUIRect(&ButtonHide, Color, CUI::CORNER_ALL, 10.0f);
+		m_pRenderTools->DrawUIRectMonochromeGradient(&ButtonHide, Color, CUI::CORNER_ALL, 10.0f);
 		m_pUI->DoLabel(&ButtonHide, m_WindowHidden ? "\xe2\x81\x82" : "\xe2\x80\xbb", 16.0f, CUI::ALIGN_CENTER);
 		const int HideLogic = m_pUI->DoMouseEventLogic(&ButtonHide, KEY_MOUSE_1);
 		if(HideLogic & CUI::CButtonLogicEvent::EVENT_PRESS)
@@ -152,6 +178,11 @@ const CUIRect& CWindowUI::GetRect()
 	return (pWindow ? pWindow->m_WindowRect : m_WindowRect);
 }
 
+CWindowUI::CWindowUI(const char* pWindowName, CUIRect WindowRect, int WindowFlags)
+{
+	Init(pWindowName, WindowRect, WindowFlags);
+}
+
 bool CWindowUI::IsOpenned() const
 {
 	CWindowUI* pWindow = GetWindow(m_aWindowName);
@@ -199,6 +230,20 @@ void CWindowUI::OnRenderWindow(RenderWindowCallback pCallback)
 	CWindowUI* pWindow = GetWindow(m_aWindowName);
 	if(pWindow)
 		pWindow->m_pCallback = pCallback;
+}
+
+void CWindowUI::HighlightEnable(vec4 Color)
+{
+	CWindowUI* pWindow = GetWindow(m_aWindowName);
+	if(pWindow)
+		pWindow->m_HighlightColor = Color;
+}
+
+void CWindowUI::HighlightDisable()
+{
+	CWindowUI* pWindow = GetWindow(m_aWindowName);
+	if(pWindow)
+		pWindow->m_HighlightColor = vec4(-1, -1, -1, -1);
 }
 
 CWindowUI* CWindowUI::GetWindow(const char* pWindowName) const
