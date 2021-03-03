@@ -11,4 +11,5 @@ void CWindowsRender::OnRender()
 	CWindowUI::m_pRenderTools = RenderTools();
 	CWindowUI::m_pUI = UI();
 	UI()->WindowRender();
+	UI()->FinishCheck();
 }

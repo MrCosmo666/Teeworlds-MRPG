@@ -3,6 +3,7 @@
 #include <engine/shared/config.h>
 #include <generated/client_data.h>
 
+#include <game/client/components/menus.h>
 #include <game/client/components/console.h>
 #include <game/client/ui_window.h>
 
@@ -21,7 +22,30 @@ void CUIGameInterface::OnRender()
 	m_WindowMails.Init("Mail list", { 150, 150, 400, 300 });
 	m_WindowMails.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
 	{
+			CUIRect List = pWindowRect;
+			int OldSelectedFont = m_MailboxSelectedOption;
+			static CMenus::CListBox s_ListBox;
+			s_ListBox.DoHeader(&List, Localize("Option"), 20.0f, 2.0f);
+			s_ListBox.DoStart(20.0f, 200, 1, 1, m_MailboxSelectedOption);
 
+			for(int i = 0; i < 200; i++)
+			{
+				CMenus::CListboxItem Item = s_ListBox.DoNextItem((void*)i);
+				if(Item.m_Visible)
+				{
+					float IconSize = 21.0f;
+					IconSize = 18.0f;
+					Item.m_Rect.y += 1.25f;
+					Item.m_Rect.x += 2.0f;
+
+					bool Icon = m_pClient->m_pMenus->DoItemIcon("ignot_r", { Item.m_Rect.x + 2.0f, Item.m_Rect.y, Item.m_Rect.w, Item.m_Rect.h, }, IconSize);
+					Item.m_Rect.VMargin((Icon ? 25.0f : 5.0f), &Item.m_Rect);
+					Item.m_Rect.y += 2.0f;
+
+					UI()->DoLabel(&Item.m_Rect, "Suka bleat", 16.0f, CUI::ALIGN_LEFT);
+				}
+			}
+			m_MailboxSelectedOption = s_ListBox.DoEnd();
 	});
 
 	// quest book window
@@ -61,6 +85,16 @@ bool CUIGameInterface::OnInput(IInput::CEvent Event)
 {
 	if(m_pClient->m_pGameConsole->IsConsoleActive() || !m_ActiveHUD)
 		return false;
+
+	// special handle esc and enter for popup purposes
+	if(Event.m_Flags & IInput::FLAG_PRESS)
+	{
+		if(Event.m_Key == KEY_ESCAPE)
+		{
+			m_ActiveHUD = false;
+			return true;
+		}
+	}
 
 	if(Event.m_Key == KEY_MOUSE_1)
 	{

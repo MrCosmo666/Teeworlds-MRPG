@@ -30,7 +30,7 @@ public:
 		Clear();
 	}
 	CWorldGameServer* GetWorld(int WorldID) { return &m_Worlds[WorldID]; };
-	bool IsValid(int WorldID) { return (bool)(WorldID > 0 && WorldID < ENGINE_MAX_WORLDS && m_Worlds[WorldID].m_pGameServer); }
+	bool IsValid(int WorldID) { return (bool)(WorldID >= 0 && WorldID < ENGINE_MAX_WORLDS && m_Worlds[WorldID].m_pGameServer); }
 	int GetSizeInitilized() const { return m_WasInitilized; }
 
 	bool LoadWorlds(class IServer* pServer, class IKernel* pKernel, class IStorageEngine* pStorage, class IConsole* pConsole);

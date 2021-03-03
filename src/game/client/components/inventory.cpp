@@ -32,7 +32,6 @@ void CInventory::OnRender()
 	if(m_pClient->m_pMenus->IsActive() || !m_Active)
 		return;
 
-	UI()->StartCheck();
 	Graphics()->MapScreen(m_ScreenRestriction.x, m_ScreenRestriction.y, m_ScreenRestriction.w, m_ScreenRestriction.h);
 	UI()->Update(m_PositionMouse.x, m_PositionMouse.y, m_PositionMouse.x * 3.0f, m_PositionMouse.y * 3.0f);
 
@@ -49,7 +48,6 @@ void CInventory::OnRender()
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
 	Graphics()->WrapNormal();
-	UI()->FinishCheck();
 
 	// reset events
 	int OldEvent = 0;

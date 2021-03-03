@@ -235,6 +235,7 @@ private:
 	};
 
 	// Listbox : found in menus_listbox.cpp
+public:
 	struct CListboxItem
 	{
 		bool m_Visible;
@@ -285,6 +286,7 @@ private:
 		float GetScrollBarWidth() const { return m_ScrollRegion.IsScrollbarShown() ? 20 : 0; } // defined in menus_scrollregion.cpp
 	};
 
+private:
 	enum
 	{
 		POPUP_NONE = 0,
@@ -819,8 +821,12 @@ private:
 	void RenderMenubar(CUIRect r);
 	void RenderNews(CUIRect MainView);
 	void RenderBackButton(CUIRect MainView);
+
+public:
 	inline float GetListHeaderHeight() const { return ms_ListheaderHeight + (g_Config.m_ClGBrowser ? 3.0f : 0.0f); }
 	inline float GetListHeaderHeightFactor() const { return 1.0f + (g_Config.m_ClGBrowser ? (3.0f / ms_ListheaderHeight) : 0.0f); }
+
+private:
 	static void ConchainUpdateMusicState(IConsole::IResult* pResult, void* pUserData, IConsole::FCommandCallback pfnCallback, void* pCallbackUserData);
 	void UpdateMusicState();
 
@@ -880,13 +886,13 @@ private:
 	void RenderMmoSettingsTexture(CUIRect MainView, CUIRect Background);
 	void RenderRgbSliders(CUIRect* pMainView, CUIRect* pButton, int &r, int &g, int &b, bool Enabled);
 	void RenderSettingsMmoChangerGeneric(CUIRect MainView, CCSkinChanger::CTextureEntity* pEntities, char* pConfigStr, const char* pLabel, int ItemsPerRow, float Ratio);
-	void RenderCursor(int ImageID, vec4 Color);
 	void PreparationLeftRightSide(const char* pName, CUIRect MainView, CUIRect* LeftSide, CUIRect* RightSide, const float Spacing, const float ButtonHeight);
 	
 	// auth state for mmotee
 	void RenderAuthWindow();
 
 public:
+	void RenderCursor(int ImageID, vec4 Color);
 	void OnAuthMessage(int MsgType, void* pRawMsg);
 	void SetAuthState(bool ShowWindowAuth);
 	void setAuthMessage(const char *Message, int EAuthColorMessage);

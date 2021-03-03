@@ -21,6 +21,7 @@
 #include <generated/protocol.h>
 #include <generated/client_data.h>
 
+#include <game/client/ui_window.h>
 #include <game/client/components/binds.h>
 #include <game/client/components/camera.h>
 #include <game/client/components/console.h>
@@ -2359,7 +2360,20 @@ void CMenus::OnRender()
 		PopupMessage(Localize("Disconnected"), Localize("The server is running a non-standard tuning on a pure game type."), Localize("Ok"));
 	}
 
-	if(IsActive() == EMenuState::NOACTIVE || IsActive() == EMenuState::AUTHSTATE)
+	// render auth for mmotee
+	if(IsActive() == EMenuState::AUTHSTATE)
+	{
+		if(m_pClient->MmoServer() && Client()->State() == IClient::STATE_ONLINE && m_ShowAuthWindow)
+		{
+			if(m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team != TEAM_SPECTATORS)
+				OnReset();
+			else
+				RenderAuthWindow();
+		}
+		return;
+	}
+
+	if(IsActive() == EMenuState::NOACTIVE)
 	{
 		m_EscapePressed = false;
 		m_EnterPressed = false;
@@ -2368,19 +2382,18 @@ void CMenus::OnRender()
 		m_UpArrowPressed = false;
 		m_DownArrowPressed = false;
 		m_ActiveEditbox = false;
-
-		// render auth for mmotee
-		if(m_pClient->MmoServer() && Client()->State() == IClient::STATE_ONLINE && m_ShowAuthWindow)
-		{
-			if(m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team != TEAM_SPECTATORS)
-				OnReset();
-			else
-				RenderAuthWindow();
-		}
-
-		UI()->FinishCheck();
 		return;
 	}
+
+
+	// quest book window
+	CWindowUI m_WindowQuestBook;
+	m_WindowQuestBook.Init("Suka book", { 150, 150, 400, 300 });
+	m_WindowQuestBook.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+		{
+
+		});
+
 
 	// render
 	if(Client()->State() != IClient::STATE_DEMOPLAYBACK)
@@ -2402,7 +2415,6 @@ void CMenus::OnRender()
 		TextRender()->TextEx(&Cursor, aBuf, -1);
 	}
 
-	UI()->FinishCheck();
 	m_EscapePressed = false;
 	m_EnterPressed = false;
 	m_TabPressed = false;

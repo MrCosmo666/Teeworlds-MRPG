@@ -7,6 +7,7 @@ class CUIGameInterface : public CComponent
 {
 	bool m_ActiveHUD;
 	vec2 m_MousePos;
+	int m_MailboxSelectedOption;
 
 public:
 	virtual void OnRender();

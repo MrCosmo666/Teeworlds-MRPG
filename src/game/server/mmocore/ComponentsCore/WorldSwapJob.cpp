@@ -43,21 +43,20 @@ void WorldSwapJob::OnInit()
 
 void WorldSwapJob::OnInitWorld(const char* pWhereLocalWorld)
 {
-	SJK.SDT("RespawnWorld, MusicID", "ENUM_WORLDS", [&](ResultPtr pRes)
+	const int WorldID = GS()->GetWorldID();
+	const CSqlString<32> world_name = CSqlString<32>(Server()->GetWorldName(WorldID));
+
+	ResultPtr pRes = SJK.SD("RespawnWorld, MusicID", "ENUM_WORLDS", pWhereLocalWorld);
+	if(pRes->next())
 	{
-		const int WorldID = GS()->GetWorldID();
-		const CSqlString<32> world_name = CSqlString<32>(Server()->GetWorldName(WorldID));
-		if(pRes->next())
-		{
-			const int RespawnWorld = (int)pRes->getInt("RespawnWorld");
-			const int MusicID = (int)pRes->getInt("MusicID");
-			SJK.UD("ENUM_WORLDS", "Name = '%s' WHERE WorldID = '%d'", world_name.cstr(), WorldID);
-			GS()->SetRespawnWorld(RespawnWorld);
-			GS()->SetMapMusic(MusicID);
-			return;
-		}
-		SJK.ID("ENUM_WORLDS", "(WorldID, Name) VALUES ('%d', '%s')", WorldID, world_name.cstr());
-	}, pWhereLocalWorld);
+		const int RespawnWorld = (int)pRes->getInt("RespawnWorld");
+		const int MusicID = (int)pRes->getInt("MusicID");
+		SJK.UD("ENUM_WORLDS", "Name = '%s' WHERE WorldID = '%d'", world_name.cstr(), WorldID);
+		GS()->SetRespawnWorld(RespawnWorld);
+		GS()->SetMapMusic(MusicID);
+		return;
+	}
+	SJK.ID("ENUM_WORLDS", "(WorldID, Name) VALUES ('%d', '%s')", WorldID, world_name.cstr());
 }
 
 bool WorldSwapJob::OnHandleTile(CCharacter *pChr, int IndexCollision)

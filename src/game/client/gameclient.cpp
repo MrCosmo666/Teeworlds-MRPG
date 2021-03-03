@@ -334,13 +334,12 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(&gs_Scoreboard);
 	m_All.Add(m_pStats);
 	m_All.Add(m_pMotd);
-	m_All.Add(m_pMenus);
-	m_All.Add(&m_pMenus->m_Binder);
 
-	// game hud interface
+	m_All.Add(m_pMenus); // here starting ui checking
+	m_All.Add(&m_pMenus->m_Binder);
 	m_All.Add(m_pInventory);
 	m_All.Add(m_pGameInterfaceUI);
-	m_All.Add(&gs_WindowRender);
+	m_All.Add(&gs_WindowRender); // here ending ui checking
 	//
 
 	m_All.Add(m_pGameConsole);
