@@ -51,14 +51,15 @@ void CWindowUI::Render()
 		}
 	}
 
+	static float MainBackgroundMargin = 4.0f;
 	if(!m_WindowHidden)
 	{
 		vec4 Color = mix(vec4(0.15f, 0.15f, 0.15f, 0.85f), vec4(0.25f, 0.25f, 0.25f, 0.9f), m_pUI->GetFade(&m_WindowRect, IsActive(), 0.4f));
 
 		// background draw
-		CUIRect MoreBackground = m_WindowRect;
-		MoreBackground.Margin(4.0f, &MoreBackground);
-		m_pRenderTools->DrawRoundRect(&MoreBackground, Color, 12.0f);
+		CUIRect MainBackground = m_WindowRect;
+		MainBackground.Margin(MainBackgroundMargin, &MainBackground);
+		m_pRenderTools->DrawRoundRect(&MainBackground, Color, 12.0f);
 		m_pRenderTools->DrawRoundRect(&m_WindowRect, vec4(0.1f, 0.1f, 0.1f, 0.5f), 12.0f);
 	}
 
@@ -112,7 +113,12 @@ void CWindowUI::Render()
 	{
 		// callback function render
 		if(m_pCallback)
-			m_pCallback(m_WindowRect, *this);
+		{
+			CUIRect DrawWindowRect = m_WindowRect;
+			DrawWindowRect.Margin(MainBackgroundMargin, &DrawWindowRect);
+			DrawWindowRect.HSplitTop(Bordure.h, 0, &DrawWindowRect);
+			m_pCallback(DrawWindowRect, *this);
+		}
 	}
 
 	// end check only this window
