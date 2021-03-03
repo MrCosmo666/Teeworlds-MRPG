@@ -2,12 +2,14 @@
 #define GAME_CLIENT_COMPONENTS_INTERFACE_H
 
 #include <game/client/component.h>
+#include <game/client/ui_window.h>
 
 class CUIGameInterface : public CComponent
 {
 	bool m_ActiveHUD;
 	vec2 m_MousePos;
 	int m_MailboxSelectedOption;
+	CWindowUI m_pTestWindow;
 
 public:
 	virtual void OnRender();

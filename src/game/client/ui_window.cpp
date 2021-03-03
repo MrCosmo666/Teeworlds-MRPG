@@ -60,7 +60,7 @@ void CWindowUI::Render()
 		if(m_WindowHidden)
 		{
 			const float Fade = m_pUI->GetFade(&Bordure, IsActiveWindow, 0.5f);
-			vec4 ColorHighlight = m_HighlightColor.a > 0.0f ? m_HighlightColor : vec4(0.4f, 0.25f, 0.f, 0.2f);
+			vec4 ColorHighlight = m_HighlightColor.a > 0.0f ? m_HighlightColor : vec4(0.4f, 0.35f, 0.f, 0.2f);
 
 			CUIRect HighlightActive = Bordure;
 			HighlightActive.Margin(Margin, &HighlightActive);
@@ -69,7 +69,7 @@ void CWindowUI::Render()
 		else
 		{
 			const float Fade = m_pUI->GetFade(&m_WindowRect, IsActiveWindow, 0.5f);
-			vec4 ColorHighlight = m_HighlightColor.a > 0.0f ? m_HighlightColor : vec4(0.4f, 0.25f, 0.f, 0.2f);
+			vec4 ColorHighlight = m_HighlightColor.a > 0.0f ? m_HighlightColor : vec4(0.4f, 0.35f, 0.f, 0.2f);
 
 			CUIRect HighlightActive = m_WindowRect;
 			HighlightActive.Margin(Margin, &HighlightActive);
@@ -83,7 +83,7 @@ void CWindowUI::Render()
 		CUIRect MainBackground = m_WindowRect;
 		MainBackground.Margin(MainBackgroundMargin, &MainBackground);
 		float BackgroundFade = m_pUI->GetFade(&m_WindowRect, IsActiveWindow, 0.4f);
-		vec4 Color = mix(vec4(0.15f, 0.15f, 0.15f, 0.85f), vec4(0.2f, 0.2f, 0.2f, 0.9f), BackgroundFade);
+		vec4 Color = mix(vec4(0.15f, 0.15f, 0.15f, 0.95f), vec4(0.2f, 0.2f, 0.2f, 0.95f), BackgroundFade);
 		m_pRenderTools->DrawUIRectMonochromeGradient(&MainBackground, Color, CUI::CORNER_ALL, 12.0f);
 		m_pRenderTools->DrawRoundRect(&m_WindowRect, vec4(0.1f, 0.1f, 0.1f, 0.5f), 12.0f);
 	}
@@ -127,11 +127,11 @@ void CWindowUI::Render()
 			m_WindowHidden ^= true;
 			if(m_WindowHidden)
 			{
-				m_WindowRectOld = m_WindowRect;
+				m_WindowRectGuardian = m_WindowRect;
 				m_WindowRect = Bordure;
 			}
 			else
-				m_WindowRect = m_WindowRectOld;
+				m_WindowRect = m_WindowRectGuardian;
 		}
 	}
 
@@ -158,6 +158,7 @@ void CWindowUI::Init(const char* pWindowName, CUIRect WindowRect, int WindowFlag
 	CWindowUI* pWindow = GetWindow(pWindowName);
 	if(pWindow)
 	{
+		pWindow->m_SkippedRenderFrames = 0;
 		(*this) = *pWindow;
 		return;
 	}
@@ -166,6 +167,7 @@ void CWindowUI::Init(const char* pWindowName, CUIRect WindowRect, int WindowFlag
 	str_copy(pWindow->m_aWindowName, pWindowName, sizeof(pWindow->m_aWindowName));
 	pWindow->m_WindowFlags = WindowFlags;
 	pWindow->m_WindowRect = WindowRect;
+	pWindow->m_SkippedRenderFrames = 0;
 	pWindow->m_WindowHidden = false;
 	pWindow->m_Openned = true;
 	ms_aWindows.push_back(pWindow);
@@ -229,7 +231,10 @@ void CWindowUI::OnRenderWindow(RenderWindowCallback pCallback)
 {
 	CWindowUI* pWindow = GetWindow(m_aWindowName);
 	if(pWindow)
+	{
 		pWindow->m_pCallback = pCallback;
+		pWindow->m_SkippedRenderFrames--;
+	}
 }
 
 void CWindowUI::HighlightEnable(vec4 Color)

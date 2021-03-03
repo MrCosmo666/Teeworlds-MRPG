@@ -548,10 +548,10 @@ void CUI::WindowRender()
 	// update the sorting in case of a change of the active window
 	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
 	{
-		// start check only this window
-		StartCheckWindow((*it));
 		if((*it)->m_Openned && (*it)->m_pCallback)
 		{
+			// start check only this window
+			StartCheckWindow((*it));
 			if(CWindowUI::GetActiveWindow() != (*it) && (DoMouseEventLogic(&(*it)->m_WindowRect, KEY_MOUSE_1) & CUI::CButtonLogicEvent::EVENT_PRESS))
 			{
 				auto Iterator = std::find_if(CWindowUI::ms_aWindows.begin(), CWindowUI::ms_aWindows.end(), [=](const CWindowUI* pWindow) { return pWindow == (*it);  });
@@ -561,17 +561,26 @@ void CUI::WindowRender()
 					break;
 				}
 			}
+			// end check only this window
+			FinishCheckWindow();
 		}
-		// end check only this window
-		FinishCheckWindow();
 	}
-
-	// clear all callback functions
-	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
-		(*it)->m_pCallback = nullptr;
 
 	// clear hovered active highlighted area
 	m_pHoveredWindow = nullptr;
+
+	// clear all callback functions
+	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
+	{
+		// Lifehack I do not know how to bypass the uniqueness of Callback functions 
+		// by keeping the exit from the window if it is not updated, and at the same time keep the order of the windows
+		if((*it)->m_SkippedRenderFrames >= 1)
+		{
+			(*it)->m_pCallback = nullptr;
+			(*it)->m_SkippedRenderFrames = 0;
+		}
+		(*it)->m_SkippedRenderFrames++;
+	}
 
 	// render cursor
 	if(RenderCursor)

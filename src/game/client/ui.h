@@ -103,7 +103,6 @@ class CUI
 	class IInput* m_pInput;
 	class ITextRender* m_pTextRender;
 	class IClient* m_pClient;
-
 	class CWindowUI* m_pCheckWindow;
 	class CWindowUI* m_pHoveredWindow;
 

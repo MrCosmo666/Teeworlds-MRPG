@@ -24,12 +24,13 @@ class CWindowUI
 	typedef std::function<void(const CUIRect&, CWindowUI&)> RenderWindowCallback;
 	static std::vector<CWindowUI*> ms_aWindows;
 	RenderWindowCallback m_pCallback;
+	int m_SkippedRenderFrames;
 
 	bool m_Openned;
 	vec4 m_HighlightColor;
 	char m_aWindowName[128];
 	CUIRect m_WindowRect;
-	CUIRect m_WindowRectOld;
+	CUIRect m_WindowRectGuardian;
 
 	int m_WindowFlags;
 	bool m_WindowHidden;

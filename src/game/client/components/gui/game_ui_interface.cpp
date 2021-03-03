@@ -23,11 +23,11 @@ void CUIGameInterface::OnRender()
 	pScreen->VSplitRight(60.0f, 0, &IconView);
 	IconView.HSplitBottom(400.0f, 0, &IconView);
 	static CMenus::CButtonContainer s_MailListButton;
-	CWindowUI m_WindowMails("Mail list", { 150,150,250,400 }, CWindowFlags::WINDOW_ALL);
-	DoIconSelectionWindow(&s_MailListButton, &IconView, &m_WindowMails, SPRITE_HUD_ICON_MAIL);
+	CWindowUI WindowMails("Mail list", { 150,150,250,400 }, CWindowFlags::WINDOW_ALL);
+	DoIconSelectionWindow(&s_MailListButton, &IconView, &WindowMails, SPRITE_HUD_ICON_MAIL);
 	{
 		// inbox/mail window
-		m_WindowMails.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+		WindowMails.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
 		{
 			CUIRect List = pWindowRect;
 			int OldSelectedFont = m_MailboxSelectedOption;
@@ -60,15 +60,21 @@ void CUIGameInterface::OnRender()
 	// questing gui icon
 	IconView.HMargin(52.0f, &IconView);
 	static CMenus::CButtonContainer s_QuestingListButton;
-	CWindowUI m_WindowQuestBook("Quest book", { 150, 150, 300, 250 }, CWindowFlags::WINDOW_ALL);
-	DoIconSelectionWindow(&s_QuestingListButton, &IconView, &m_WindowQuestBook, SPRITE_HUD_ICON_QUEST);
+	CWindowUI WindowQuestBook("Quest book", { 150, 150, 300, 250 }, CWindowFlags::WINDOW_ALL);
+	DoIconSelectionWindow(&s_QuestingListButton, &IconView, &WindowQuestBook, SPRITE_HUD_ICON_QUEST);
 	{
 		// questing window
-		m_WindowQuestBook.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+		WindowQuestBook.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
 		{
 
 		});
 	}
+
+	m_pTestWindow.Init("test", { 150, 150, 300, 250 }, CWindowFlags::WINDOW_ALL);
+	m_pTestWindow.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+	{
+
+	});
 
 	// mouse
 	UI()->Update(m_MousePos.x, m_MousePos.y, m_MousePos.x * 3.0f, m_MousePos.y * 3.0f);
