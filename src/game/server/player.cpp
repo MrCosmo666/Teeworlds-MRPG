@@ -1,11 +1,12 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <teeother/components/localization.h>
-#include <game/server/mmocore/ComponentsCore/InventoryJob/InventoryJob.h>
-
-#include "gamemodes/dungeon.h"
-#include "gamecontext.h"
 #include "player.h"
+
+#include <game/server/mmocore/ComponentsCore/InventoryJob/InventoryJob.h>
+#include <teeother/components/localization.h>
+
+#include "gamecontext.h"
+#include "gamemodes/dungeon.h"
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 
@@ -242,7 +243,7 @@ void CPlayer::TryRespawn()
 		GetTempData().m_TempTeleportX = GetTempData().m_TempTeleportY = -1;
 	}
 
-	int AllocMemoryCell = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
+	const int AllocMemoryCell = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
 	m_pCharacter = new(AllocMemoryCell) CCharacter(&GS()->m_World);
 	m_pCharacter->Spawn(this, SpawnPos);
 	GS()->CreatePlayerSpawn(SpawnPos);
@@ -315,7 +316,7 @@ int CPlayer::GetTeam()
 /* #########################################################################
 	FUNCTIONS PLAYER HELPER
 ######################################################################### */
-void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp)
+void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp) const
 {
 	if (GS()->IsMmoClient(m_ClientID))
 	{
@@ -326,7 +327,7 @@ void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed,
 	char aBufBroadcast[128];
 	const float GetLevelProgress = (float)(MyExp * 100.0) / (float)ExpNeed;
 	const float GetExpProgress = (float)(GivedExp * 100.0) / (float)ExpNeed;
-	std::unique_ptr<char[]> Level = std::move(GS()->LevelString(100, (int)GetLevelProgress, 10, ':', ' '));
+	const std::unique_ptr<char[]> Level = std::move(GS()->LevelString(100, (int)GetLevelProgress, 10, ':', ' '));
 	str_format(aBufBroadcast, sizeof(aBufBroadcast), "^235Lv%d %s%s %0.2f%%+%0.3f%%(%d)XP\n", MyLevel, Name, Level.get(), GetLevelProgress, GetExpProgress, GivedExp);
 	GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, aBufBroadcast);
 }
@@ -443,21 +444,21 @@ bool CPlayer::GetHidenMenu(int HideID) const
 	return false;
 }
 
-bool CPlayer::IsAuthed()
+bool CPlayer::IsAuthed() const
 {
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID))
 		return (bool)(Acc().m_AccountID > 0);
 	return false;
 }
 
-int CPlayer::GetStartTeam()
+int CPlayer::GetStartTeam() const
 {
 	if(IsAuthed())
 		return TEAM_RED;
 	return TEAM_SPECTATORS;
 }
 
-int CPlayer::ExpNeed(int Level) const
+int CPlayer::ExpNeed(int Level)
 {
 	return computeExperience(Level);
 }
@@ -469,7 +470,7 @@ int CPlayer::GetStartHealth()
 
 int CPlayer::GetStartMana()
 {
-	int EnchantBonus = GetAttributeCount(Stats::StPiety, true);
+	const int EnchantBonus = GetAttributeCount(Stats::StPiety, true);
 	return 10 + EnchantBonus;
 }
 

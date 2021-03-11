@@ -3,15 +3,15 @@
 #ifndef GAME_SERVER_PLAYER_H
 #define GAME_SERVER_PLAYER_H
 
-#include "mmocore/ComponentsCore/AccountJob/AccountMainJob.h"
 #include "mmocore/ComponentsCore/BotJob.h"
+#include "mmocore/ComponentsCore/AccountJob/AccountMainJob.h"
 
 #include "mmocore/ComponentsCore/InventoryJob/Item.h"
-#include "mmocore/ComponentsCore/SkillsJob/Skill.h"
 #include "mmocore/ComponentsCore/QuestsJob/PlayerQuests.h"
+#include "mmocore/ComponentsCore/SkillsJob/Skill.h"
 
-#include "entities/character.h"
 #include <game/voting.h>
+#include "entities/character.h"
 
 enum
 {
@@ -134,7 +134,7 @@ public:
 	/* #########################################################################
 		FUNCTIONS PLAYER HELPER
 	######################################################################### */
-	void ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp);
+	void ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp) const;
 	bool Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade) const;
 
 	/* #########################################################################
@@ -146,10 +146,10 @@ public:
 	void AddMoney(int Money);
 
 	bool GetHidenMenu(int HideID) const;
-	bool IsAuthed();
-	int GetStartTeam();
+	bool IsAuthed() const;
+	int GetStartTeam() const;
 
-	int ExpNeed(int Level) const;
+	static int ExpNeed(int Level);
 	void ShowInformationStats();
 
 	/* #########################################################################
