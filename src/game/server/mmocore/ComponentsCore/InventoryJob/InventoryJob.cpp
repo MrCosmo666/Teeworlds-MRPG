@@ -398,7 +398,7 @@ int InventoryJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Set
 	return 0;
 }
 
-int InventoryJob::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID)
+int InventoryJob::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID) const
 {
 	const int AvailableCount = Job()->Quest()->GetUnfrozenItemCount(pPlayer, ItemID);
 	if(AvailableCount <= 0 && pPlayer->GetItem(ItemID).m_Count >= 1)

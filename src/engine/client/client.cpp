@@ -2444,7 +2444,7 @@ void CClient::Run()
 	}
 }
 
-int64 CClient::TickStartTime(int Tick)
+int64 CClient::TickStartTime(int Tick) const
 {
 	return m_MenuStartTime + (time_freq() * Tick) / m_GameTickSpeed;
 }

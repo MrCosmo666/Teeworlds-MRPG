@@ -19,7 +19,7 @@ class SortWrap
 	CServerBrowserFilter::CServerFilter* m_pThis;
 public:
 	SortWrap(CServerBrowserFilter::CServerFilter* t, SortFunc f) : m_pfnSort(f), m_pThis(t) {}
-	bool operator()(int a, int b) { return (g_Config.m_BrSortOrder ? (m_pThis->*m_pfnSort)(b, a) : (m_pThis->*m_pfnSort)(a, b)); }
+	bool operator()(int a, int b) const { return (g_Config.m_BrSortOrder ? (m_pThis->*m_pfnSort)(b, a) : (m_pThis->*m_pfnSort)(a, b)); }
 };
 
 //	CServerFilter

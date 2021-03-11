@@ -84,7 +84,7 @@ void CPathfinder::SetEnd(vec2 Pos)
 }
 
 
-int CPathfinder::GetIndex(int XPos, int YPos)
+int CPathfinder::GetIndex(int XPos, int YPos) const
 {
 	return XPos + m_pLayers->GameLayer()->m_Width * YPos;
 }

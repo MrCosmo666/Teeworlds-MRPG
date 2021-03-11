@@ -34,7 +34,7 @@ public:
 	virtual class IGameServer* GameServer(int WorldID = 0) = 0;
 
 	class CLocalization* m_pLocalization;
-	inline class CLocalization* Localization() { return m_pLocalization; }
+	inline class CLocalization* Localization() const { return m_pLocalization; }
 
 	struct CClientInfo
 	{

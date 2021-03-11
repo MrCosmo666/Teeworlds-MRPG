@@ -62,7 +62,7 @@ public:
 	void UpdateArrowStep(CPlayer *pPlayer);
 	void AcceptNextStoryQuestStep(CPlayer* pPlayer, int CheckQuestID);
 	void AcceptNextStoryQuestStep(CPlayer* pPlayer);
-	int GetUnfrozenItemCount(CPlayer* pPlayer, int ItemID);
+	int GetUnfrozenItemCount(CPlayer* pPlayer, int ItemID) const;
 };
 
 #endif

@@ -196,7 +196,7 @@ void CGameConsole::CInstance::OnInput(IInput::CEvent Event)
 					m_CompletionMapChosen++;
 					m_CompletionMapEnumerationCount = 0;
 					m_pGameConsole->m_pConsole->PossibleMaps(m_aCompletionMapBuffer, PossibleMapsCompleteCallback, this);
-					
+
 					// handle wrapping
 					if(m_CompletionMapEnumerationCount && m_CompletionMapChosen >= m_CompletionMapEnumerationCount)
 					{
@@ -501,11 +501,11 @@ void CGameConsole::OnRender()
 		TextRender()->TextEx(&Cursor, aInputString, pConsole->m_Input.GetCursorOffset());
 		TextRender()->TextEx(&Cursor, aInputString+pConsole->m_Input.GetCursorOffset(), -1);
 		int Lines = Cursor.m_LineCount;
-		
+
 		y -= (Lines - 1) * FontSize;
 		TextRender()->SetCursor(&Cursor, x, y, FontSize, TEXTFLAG_RENDER);
 		Cursor.m_LineWidth = Screen.w - 10.0f - x;
-		
+
 		TextRender()->TextEx(&Cursor, aInputString, pConsole->m_Input.GetCursorOffset());
 		static float MarkerOffset = TextRender()->TextWidth(0, FontSize, "|", -1, -1.0f)/3;
 		CTextCursor Marker = Cursor;
@@ -732,7 +732,7 @@ void CGameConsole::ConchainConsoleOutputLevelUpdate(IConsole::IResult *pResult, 
 	}
 }
 
-bool CGameConsole::IsConsoleActive()
+bool CGameConsole::IsConsoleActive() const
 {
 	return m_ConsoleState != CONSOLE_CLOSED;
 }

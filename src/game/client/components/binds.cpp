@@ -198,14 +198,14 @@ void CBinds::UnbindAll()
 			m_aaaKeyBindings[i][m][0] = 0;
 }
 
-const char *CBinds::Get(int KeyID, int Modifier)
+const char *CBinds::Get(int KeyID, int Modifier) const
 {
 	if(KeyID > 0 && KeyID < KEY_LAST)
 		return m_aaaKeyBindings[KeyID][Modifier];
 	return "";
 }
 
-void CBinds::GetKeyID(const char* pBindStr, int& KeyID, int& Modifier)
+void CBinds::GetKeyID(const char* pBindStr, int& KeyID, int& Modifier) const
 {
 	KeyID = KEY_LAST;
 	Modifier = MODIFIER_COUNT;
@@ -233,7 +233,7 @@ void CBinds::GetKeyID(const char* pBindStr, int& KeyID, int& Modifier)
 	}
 }
 
-void CBinds::GetKey(const char* pBindStr, char aKey[64], unsigned BufSize, int KeyID, int Modifier)
+void CBinds::GetKey(const char* pBindStr, char aKey[64], unsigned BufSize, int KeyID, int Modifier) const
 {
 	aKey[0] = 0;
 	if (KeyID < KEY_LAST) 
@@ -244,7 +244,7 @@ void CBinds::GetKey(const char* pBindStr, char aKey[64], unsigned BufSize, int K
 	str_copy(aKey, Localize("key not found"), BufSize);
 }
 
-void CBinds::GetKey(const char* pBindStr, char aKey[64], unsigned BufSize)
+void CBinds::GetKey(const char* pBindStr, char aKey[64], unsigned BufSize) const
 {
 	int KeyID, Modifier;
 	GetKeyID(pBindStr, KeyID, Modifier);
@@ -338,7 +338,7 @@ void CBinds::ConBinds(IConsole::IResult* pResult, void* pUserData)
 	}
 }
 
-int CBinds::DecodeBindString(const char *pKeyName, int* pModifier)
+int CBinds::DecodeBindString(const char *pKeyName, int* pModifier) const
 {
 	// check for modifier of type xxx+xxx
 	char aBuf[64];

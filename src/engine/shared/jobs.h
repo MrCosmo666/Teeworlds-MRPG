@@ -26,7 +26,7 @@ public:
 	IJob(const IJob &Other);
 	IJob &operator=(const IJob &Other);
 	virtual ~IJob();
-	int Status();
+	int Status() const;
 
 	enum
 	{

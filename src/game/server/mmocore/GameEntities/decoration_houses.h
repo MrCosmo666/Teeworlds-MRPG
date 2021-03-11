@@ -13,7 +13,7 @@ class CDecorationHouses : public CEntity
 	};
 	int m_IDs[NUM_IDS];
 
-	int SwitchToObject(bool Data);
+	int SwitchToObject(bool Data) const;
 public:
 	int m_DecoID;
 	int m_HouseID;

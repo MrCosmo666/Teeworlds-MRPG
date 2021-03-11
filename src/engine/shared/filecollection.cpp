@@ -7,7 +7,7 @@
 
 #include "filecollection.h"
 
-bool CFileCollection::IsFilenameValid(const char *pFilename)
+bool CFileCollection::IsFilenameValid(const char *pFilename) const
 {
 	if(str_length(pFilename) != m_FileDescLength+TIMESTAMP_LENGTH+m_FileExtLength ||
 		str_comp_num(pFilename, m_aFileDesc, m_FileDescLength) ||

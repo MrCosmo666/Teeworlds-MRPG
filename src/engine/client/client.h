@@ -219,18 +219,18 @@ class CClient : public IClient, public CDemoPlayer::IListener
 		class CHostLookup m_VersionServeraddr;
 	} m_VersionInfo;
 
-	int64 TickStartTime(int Tick);
+	int64 TickStartTime(int Tick) const;
 
 public:
-	IEngine* Engine() { return m_pEngine; }
-	IEngineGraphics* Graphics() { return m_pGraphics; }
-	IEngineInput* Input() { return m_pInput; }
-	IEngineSound* Sound() { return m_pSound; }
-	IGameClient* GameClient() { return m_pGameClient; }
-	IEngineMasterServer* MasterServer() { return m_pMasterServer; }
-	IStorageEngine* Storage() { return m_pStorage; }
-	IUpdater* Updater() { return m_pUpdater; }
-	IDiscord* Discord() { return m_pDiscord; }
+	IEngine* Engine() const { return m_pEngine; }
+	IEngineGraphics* Graphics() const { return m_pGraphics; }
+	IEngineInput* Input() const { return m_pInput; }
+	IEngineSound* Sound() const { return m_pSound; }
+	IGameClient* GameClient() const { return m_pGameClient; }
+	IEngineMasterServer* MasterServer() const { return m_pMasterServer; }
+	IStorageEngine* Storage() const { return m_pStorage; }
+	IUpdater* Updater() const { return m_pUpdater; }
+	IDiscord* Discord() const { return m_pDiscord; }
 
 	CClient();
 

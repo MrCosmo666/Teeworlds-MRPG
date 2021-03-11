@@ -40,9 +40,10 @@ class CGS : public IGameServer
 
 public:
 	IServer *Server() const { return m_pServer; }
-	class IConsole *Console() { return m_pConsole; }
-	MmoController* Mmo() { return m_pMmoController; }
-	IStorageEngine* Storage() { return m_pStorage; }
+	class IConsole* Console() const { return m_pConsole; }
+	MmoController* Mmo() const { return m_pMmoController; }
+	IStorageEngine* Storage() const { return m_pStorage; }
+	CCommandProcessor* CommandProcessor() const { return m_pCommandProcessor; }
 
 	CCollision *Collision() { return &m_Collision; }
 	CTuningParams *Tuning() { return &m_Tuning; }
@@ -266,8 +267,6 @@ public:
 	void SetMapMusic(int SoundID) { m_MusicID = SoundID; }
 	void SetRespawnWorld(int WorldID) { m_RespawnWorldID = WorldID; }
 	int GetRespawnWorld() const { return m_RespawnWorldID; }
-
-	CCommandProcessor* CommandProcessor() { return m_pCommandProcessor; }
 
 private:
 	void UpdateZonePVP();

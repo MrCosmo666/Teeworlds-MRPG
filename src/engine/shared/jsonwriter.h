@@ -34,7 +34,7 @@ class CJsonWriter
 	CState *m_pState;
 	int m_Indentation;
 
-	bool CanWriteDatatype();
+	bool CanWriteDatatype() const;
 	inline void WriteInternal(const char* pStr);
 	void WriteInternalEscaped(const char* pStr);
 	void WriteIndent(bool EndElement);

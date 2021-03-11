@@ -21,7 +21,7 @@ void CQuestingProcessing::Clear()
 	mem_zero((void *)QuestTable, sizeof(QuestTable));
 }
 
-bool CQuestingProcessing::IsActive()
+bool CQuestingProcessing::IsActive() const
 {
 	return QuestTable[0].TableActive() && m_pClient->m_pTalkText->IsActive();
 }

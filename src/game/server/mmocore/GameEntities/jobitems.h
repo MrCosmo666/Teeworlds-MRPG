@@ -30,7 +30,7 @@ private:
 	int m_SpawnTick;
 	int m_Type;
 
-	int SwitchToObject(bool MmoItem);
+	int SwitchToObject(bool MmoItem) const;
 };
 
 #endif

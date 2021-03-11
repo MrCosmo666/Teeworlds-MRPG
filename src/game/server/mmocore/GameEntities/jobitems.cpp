@@ -121,7 +121,7 @@ void CJobItems::Work(int ClientID)
 	}
 }
 
-int CJobItems::SwitchToObject(bool MmoItem)
+int CJobItems::SwitchToObject(bool MmoItem) const
 {
 	switch(m_Type)
 	{

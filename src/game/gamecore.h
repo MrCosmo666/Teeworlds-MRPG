@@ -34,7 +34,7 @@ public:
 		#undef MACRO_TUNING_PARAM
 	}
 
-	bool operator==(const CTuningParams& TuningParams)
+	bool operator==(const CTuningParams& TuningParams) const
 	{
 		#define MACRO_TUNING_PARAM(Name,ScriptName,Value) if(m_##Name != TuningParams.m_##Name) return false;
 		#include "tuning.h"

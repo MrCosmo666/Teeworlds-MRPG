@@ -346,12 +346,12 @@ void CSkins::RemoveSkin(const CSkin* pSkin)
 	m_aSkins.remove(*pSkin);
 }
 
-int CSkins::Num()
+int CSkins::Num() const
 {
 	return m_aSkins.size();
 }
 
-int CSkins::NumSkinPart(int Part)
+int CSkins::NumSkinPart(int Part) const
 {
 	return m_aaSkinParts[Part].size();
 }

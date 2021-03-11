@@ -185,7 +185,7 @@ public:
 
 	bool MouseInside(const CUIRect* pRect) const { return pRect->Inside(m_MouseX, m_MouseY); };
 	bool MouseInsideClip() const { return !IsClipped() || MouseInside(ClipArea()); };
-	bool MouseHovered(const CUIRect* pRect);
+	bool MouseHovered(const CUIRect* pRect) const;
 	void ConvertCursorMove(float* pX, float* pY, int CursorType) const;
 
 	bool KeyPress(int Key) const;
@@ -201,9 +201,9 @@ public:
 	bool DoButtonLogic(const void* pID, const CUIRect* pRect, int Button = 0);
 	int DoPickerLogic(const void *pID, const CUIRect *pRect, float *pX, float *pY);
 
-	void DoLabel(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, float LineWidth = -1.0f, bool MultiLine = true);
-	void DoLabelColored(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, vec4 Color, float LineWidth = -1.0f, bool MultiLine = true);
-	void DoLabelHighlighted(const CUIRect* pRect, const char* pText, const char* pHighlighted, float FontSize, const vec4& TextColor, const vec4& HighlightColor);
+	void DoLabel(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, float LineWidth = -1.0f, bool MultiLine = true) const;
+	void DoLabelColored(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, vec4 Color, float LineWidth = -1.0f, bool MultiLine = true) const;
+	void DoLabelHighlighted(const CUIRect* pRect, const char* pText, const char* pHighlighted, float FontSize, const vec4& TextColor, const vec4& HighlightColor) const;
 
 	// CUI ELEMENTS over time to adjust the order
 	enum CButtonLogicEvent
@@ -223,7 +223,7 @@ public:
 	};
 	std::vector< AnimFade > m_AnimFades;
 	float GetFade(CUIRect* pRect, bool Checked = false, float Seconds = 0.6f);
-	int DoMouseEventLogic(const CUIRect* pRect, int Button = 0);
+	int DoMouseEventLogic(const CUIRect* pRect, int Button = 0) const;
 
 	// window system
 	void StartCheckWindow(class CWindowUI* pWindow) { m_pCheckWindow = pWindow; }

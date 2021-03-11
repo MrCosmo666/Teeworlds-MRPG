@@ -169,7 +169,7 @@ private:
 	} m_ExecutionQueue;
 
 	void AddCommandSorted(CCommand *pCommand);
-	CCommand *FindCommand(const char *pName, int FlagMask);
+	CCommand *FindCommand(const char *pName, int FlagMask) const;
 
 	struct CMapListEntryTemp {
 		CMapListEntryTemp *m_pPrev;

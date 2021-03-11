@@ -336,7 +336,7 @@ const char* CPlayerBot::GetStatusBot() const
 	return "\0";
 }
 
-void CPlayerBot::GenerateNick(char* buffer, int size_buffer)
+void CPlayerBot::GenerateNick(char* buffer, int size_buffer) const
 {
 	static const int SIZE_GENERATE = 10;
 	const char* FirstPos[SIZE_GENERATE] = { "Ja", "Qu", "Je", "Di", "Xo", "Us", "St", "Th", "Ge", "Re" };

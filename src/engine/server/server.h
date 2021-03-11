@@ -15,8 +15,8 @@ class CServer : public IServer
 
 public:
 	virtual class IGameServer* GameServer(int WorldID = 0);
-	class IConsole *Console() { return m_pConsole; }
-	class IStorageEngine*Storage() { return m_pStorage; }
+	class IConsole *Console() const { return m_pConsole; }
+	class IStorageEngine*Storage() const { return m_pStorage; }
 	class CMultiWorlds* MultiWorlds() const { return m_pMultiWorlds; }
 
 	enum
@@ -160,7 +160,7 @@ public:
 
 	void Kick(int ClientID, const char *pReason);
 
-	int64 TickStartTime(int Tick);
+	int64 TickStartTime(int Tick) const;
 	int Init();
 
 	void InitRconPasswordIfUnset();

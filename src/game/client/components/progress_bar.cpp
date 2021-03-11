@@ -20,7 +20,7 @@ void CProgressBar::Clear()
 	mem_zero(m_ProgressText, sizeof(m_ProgressText));
 }
 
-bool CProgressBar::IsActive()
+bool CProgressBar::IsActive() const
 {
 	return (bool)(m_ProgressTime > 0.0f);
 }

@@ -32,7 +32,7 @@ public:
 	// primary
 	void ListInventory(class CPlayer *pPlayer, int TypeList, bool SortedFunction = false);
 	void ItemSelected(class CPlayer* pPlayer, const InventoryItem& pItemPlayer, bool Dress = false);
-	int GetUnfrozenItemCount(class CPlayer* pPlayer, int ItemID);
+	int GetUnfrozenItemCount(class CPlayer* pPlayer, int ItemID) const;
 
 	void RepairDurabilityItems(class CPlayer *pPlayer);
 	int GetCountItemsType(class CPlayer* pPlayer, int Type) const;

@@ -27,8 +27,8 @@ class CDiscord : public IDiscord
 public:
 	CDiscord();
 
-	class IClient* Client() { return m_pClient; }
-	class IGameClient* GameClient() { return m_pGameClient; }
+	class IClient* Client() const { return m_pClient; }
+	class IGameClient* GameClient() const { return m_pGameClient; }
 
 	virtual void Init();
 	virtual void Update();

@@ -14,7 +14,7 @@ class IInterface
 	friend class CKernel;
 	IKernel* m_pKernel;
 protected:
-	IKernel* Kernel() { return m_pKernel; }
+	IKernel* Kernel() const { return m_pKernel; }
 public:
 	IInterface() : m_pKernel(0) {}
 	virtual ~IInterface() {}

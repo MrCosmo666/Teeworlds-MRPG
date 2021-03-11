@@ -22,8 +22,8 @@ public:
 	void EndAnimation();
 	void PreRender();
 
-	vec4 GetValue(){ return m_Value; }
-	class CUIRect GetRect();
+	vec4 GetValue() const { return m_Value; }
+	class CUIRect GetRect() const;
 
 private:
 	bool m_RepairAnimation;

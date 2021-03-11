@@ -205,7 +205,7 @@ void CWindowUI::Open()
 	}
 }
 
-void CWindowUI::Close()
+void CWindowUI::Close() const
 {
 	CWindowUI* pWindow = GetWindow(m_aWindowName);
 	if(pWindow)
@@ -231,7 +231,7 @@ void CWindowUI::CloseOpen()
 	}
 }
 
-void CWindowUI::OnRenderWindow(RenderWindowCallback pCallback)
+void CWindowUI::OnRenderWindow(RenderWindowCallback pCallback) const
 {
 	CWindowUI* pWindow = GetWindow(m_aWindowName);
 	if(pWindow)
@@ -241,7 +241,7 @@ void CWindowUI::OnRenderWindow(RenderWindowCallback pCallback)
 	}
 }
 
-void CWindowUI::HighlightEnable(vec4 Color, bool DaughtersToo)
+void CWindowUI::HighlightEnable(vec4 Color, bool DaughtersToo) const
 {
 	CWindowUI* pWindow = GetWindow(m_aWindowName);
 	if(pWindow)
@@ -259,7 +259,7 @@ void CWindowUI::HighlightEnable(vec4 Color, bool DaughtersToo)
 	}
 }
 
-void CWindowUI::HighlightDisable()
+void CWindowUI::HighlightDisable() const
 {
 	CWindowUI* pWindow = GetWindow(m_aWindowName);
 	if(pWindow)

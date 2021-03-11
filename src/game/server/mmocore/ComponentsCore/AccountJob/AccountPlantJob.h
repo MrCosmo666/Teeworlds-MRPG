@@ -27,8 +27,8 @@ class AccountPlantJob : public MmoComponent
 	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
 
 public:
-	int GetPlantLevel(vec2 Pos);
-	int GetPlantItemID(vec2 Pos);
+	int GetPlantLevel(vec2 Pos) const;
+	int GetPlantItemID(vec2 Pos) const;
 
 	void ShowMenu(CPlayer* pPlayer);
 	void ShowPlantsItems(int ClientID);

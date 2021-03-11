@@ -63,7 +63,7 @@ private:
 	const char* GetStatusBot() const;
 	int GetMoodState(int SnappingClient) const;
 	bool IsActiveQuests(int SnapClientID) const;
-	void GenerateNick(char* buffer, int size_buffer);
+	void GenerateNick(char* buffer, int size_buffer) const;
 
 	/***********************************************************************************/
 	/*  Thread path finderdon't want to secure m_TargetPos, or m_WayPoints with mutex  */

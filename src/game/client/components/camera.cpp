@@ -119,7 +119,7 @@ void CCamera::ChangePosition(int PositionNumber)
 	m_MoveTime = 0.0f;
 }
 
-int CCamera::GetCurrentPosition()
+int CCamera::GetCurrentPosition() const
 {
 	return m_CurrentPosition;
 }

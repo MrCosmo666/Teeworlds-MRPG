@@ -23,7 +23,7 @@ public:
 	}
 
 	void SetCurrentSize(int Size) { m_CurrentSize = Size; }
-	int GetCurrentSize() { return m_CurrentSize; }
+	int GetCurrentSize() const { return m_CurrentSize; }
 
 	const char* GetJsonItem(int Index)
 	{
@@ -32,7 +32,7 @@ public:
 	};
 
 	void SetCurrentData(unsigned char* CurrentData) { m_pCurrentData = CurrentData; }
-	unsigned char* GetCurrentData() { return m_pCurrentData; }
+	unsigned char* GetCurrentData() const { return m_pCurrentData; }
 	void Unload()
 	{
 		m_DataFile.Close();
@@ -57,17 +57,17 @@ public:
 		return true;
 	}
 
-	bool IsLoaded()
+	bool IsLoaded() const
 	{
 		return m_DataFile.IsOpen();
 	}
 
-	SHA256_DIGEST Sha256()
+	SHA256_DIGEST Sha256() const
 	{
 		return m_DataFile.Sha256();
 	}
 
-	unsigned Crc()
+	unsigned Crc() const
 	{
 		return m_DataFile.Crc();
 	}

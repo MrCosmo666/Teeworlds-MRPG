@@ -100,7 +100,7 @@ public:
 		}
 	}
 
-	int IsLevelFiltered(int Level)
+	int IsLevelFiltered(int Level) const
 	{
 		return m_ServerLevel & (1 << Level);
 	}

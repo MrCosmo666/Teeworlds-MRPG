@@ -25,7 +25,7 @@ CDecorationHouses::~CDecorationHouses()
 	}
 }
 
-int CDecorationHouses::SwitchToObject(bool Data)
+int CDecorationHouses::SwitchToObject(bool Data) const
 {
 	switch (m_DecoID)
 	{

@@ -16,7 +16,7 @@ void CMotd::Clear()
 	m_ServerMotdTime = 0;
 }
 
-bool CMotd::IsActive()
+bool CMotd::IsActive() const
 {
 	// dont render modt if the menu is active
 	if(m_pClient->m_pMenus->IsActive())

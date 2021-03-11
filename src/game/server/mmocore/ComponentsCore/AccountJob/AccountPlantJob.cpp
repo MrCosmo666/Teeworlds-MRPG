@@ -35,10 +35,10 @@ void AccountPlantJob::OnInitAccount(CPlayer *pPlayer)
 	}
 	pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value = 1;
 	pPlayer->Acc().m_aPlant[JOB_UPGR_COUNTS].m_Value = 1;
-	SJK.ID("tw_accounts_plants", "(AccountID) VALUES ('%d')", pPlayer->Acc().m_AccountID);	
+	SJK.ID("tw_accounts_plants", "(AccountID) VALUES ('%d')", pPlayer->Acc().m_AccountID);
 }
 
-int AccountPlantJob::GetPlantLevel(vec2 Pos)
+int AccountPlantJob::GetPlantLevel(vec2 Pos) const
 {
 	for(const auto & Plant : ms_aPlants)
 	{
@@ -49,7 +49,7 @@ int AccountPlantJob::GetPlantLevel(vec2 Pos)
 	return -1;
 }
 
-int AccountPlantJob::GetPlantItemID(vec2 Pos)
+int AccountPlantJob::GetPlantItemID(vec2 Pos) const
 {
 	for(const auto & Plant : ms_aPlants)
 	{
@@ -112,7 +112,7 @@ void AccountPlantJob::Work(CPlayer* pPlayer, int Level)
 
 bool AccountPlantJob::OnHandleVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
-	const int ClientID = pPlayer->GetCID();	
+	const int ClientID = pPlayer->GetCID();
 	if(PPSTR(CMD, "PLANTUPGRADE") == 0)
 	{
 		if(pPlayer->Upgrade(Get, &pPlayer->Acc().m_aPlant[VoteID].m_Value, &pPlayer->Acc().m_aPlant[JOB_UPGRADES].m_Value, VoteID2, 3))
@@ -121,7 +121,7 @@ bool AccountPlantJob::OnHandleVoteCommands(CPlayer *pPlayer, const char *CMD, co
 			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_UPGRADE);
 		}
 		return true;
-	}	
+	}
 
 	return false;
 }

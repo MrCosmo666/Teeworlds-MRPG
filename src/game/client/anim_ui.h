@@ -15,9 +15,9 @@ public:
 	CAnimElementsUI *Get(const char *Name);
 
 	CAnimElementsUI *Get(int Index) { return m_aAnimElements[Index]; }
-	int GetSize() { return m_aAnimElements.size(); }
+	int GetSize() const { return m_aAnimElements.size(); }
 
-	class CGameClient *Client() { return m_pClient; }
+	class CGameClient *Client() const { return m_pClient; }
 private:
 	class CGameClient* m_pClient;
 	array <CAnimElementsUI*> m_aAnimElements;

@@ -36,7 +36,7 @@ class CInput : public IEngineInput
 	void ClearKeyStates();
 	bool KeyState(int Key) const;
 
-	IEngineGraphics* Graphics() { return m_pGraphics; }
+	IEngineGraphics* Graphics() const { return m_pGraphics; }
 
 public:
 	CInput();

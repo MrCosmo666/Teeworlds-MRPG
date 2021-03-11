@@ -33,7 +33,7 @@ public:
 	int GetCollisionAt(float x, float y) const { return GetTile(round_to_int(x), round_to_int(y)); }
 
 	int GetParseTilesAt(float x, float y) const { return GetParseTile(round_to_int(x), round_to_int(y)); }
-	vec2 FindDirCollision(int CheckNum, vec2 SourceVec, char Cord, char SumSymbol);
+	vec2 FindDirCollision(int CheckNum, vec2 SourceVec, char Cord, char SumSymbol) const;
 
 	int GetWidth() const { return m_Width; };
 	int GetHeight() const { return m_Height; };
@@ -43,7 +43,7 @@ public:
 	void MoveBox(vec2 *pInoutPos, vec2 *pInoutVel, vec2 Size, float Elasticity, bool *pDeath=NULL) const;
 	bool TestBox(vec2 Pos, vec2 Size, int Flag=COLFLAG_SOLID) const;
 
-	void MovePhysicalAngleBox(vec2* pPos, vec2* pVel, vec2 Size, float* pAngle, float* pAngleForce, float Elasticity, float Gravity = 0.5f);
+	void MovePhysicalAngleBox(vec2* pPos, vec2* pVel, vec2 Size, float* pAngle, float* pAngleForce, float Elasticity, float Gravity = 0.5f) const;
 };
 
 #endif

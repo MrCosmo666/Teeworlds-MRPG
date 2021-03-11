@@ -34,8 +34,8 @@ class CMapChecker
 public:
 	CMapChecker();
 	void AddMaplist(struct CMapVersion *pMaplist, int Num);
-	bool IsMapValid(const char *pMapName, const SHA256_DIGEST *pMapSha256, unsigned MapCrc, unsigned MapSize);
-	bool ReadAndValidateMap(class IStorageEngine *pStorage, const char *pFilename, int StorageType);
+	bool IsMapValid(const char *pMapName, const SHA256_DIGEST *pMapSha256, unsigned MapCrc, unsigned MapSize) const;
+	bool ReadAndValidateMap(class IStorageEngine *pStorage, const char *pFilename, int StorageType) const;
 };
 
 #endif

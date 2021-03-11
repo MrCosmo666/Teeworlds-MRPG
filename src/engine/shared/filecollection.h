@@ -21,7 +21,7 @@ class CFileCollection
 	char m_aPath[512];
 	IStorageEngine *m_pStorage;
 
-	bool IsFilenameValid(const char *pFilename);
+	bool IsFilenameValid(const char *pFilename) const;
 	int64 ExtractTimestamp(const char *pTimestring);
 	void BuildTimestring(int64 Timestamp, char *pTimestring);
 

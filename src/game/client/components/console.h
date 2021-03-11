@@ -96,7 +96,7 @@ public:
 
 	CGameConsole();
 
-	bool IsConsoleActive();
+	bool IsConsoleActive() const;
 	void PrintLine(int Type, const char *pLine);
 
 	virtual void OnStateChange(int NewState, int OldState);

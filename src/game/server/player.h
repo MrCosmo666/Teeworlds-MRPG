@@ -116,29 +116,29 @@ public:
 	virtual void Tick();
 	virtual void PostTick();
 	virtual void Snap(int SnappingClient);
-	
+
 private:
 	void EffectsTick();
 	void TickSystemTalk();
 	virtual void TryRespawn();
 
 public:
-	CCharacter *GetCharacter();
+	CCharacter *GetCharacter() const;
 
 	void KillCharacter(int Weapon = WEAPON_WORLD);
 	void OnDisconnect();
 	void OnDirectInput(CNetObj_PlayerInput *NewInput);
-	void OnPredictedInput(CNetObj_PlayerInput *NewInput);
+	void OnPredictedInput(CNetObj_PlayerInput *NewInput) const;
 
 	int GetCID() const { return m_ClientID; };
 	/* #########################################################################
-		FUNCTIONS PLAYER HELPER 
+		FUNCTIONS PLAYER HELPER
 	######################################################################### */
 	void ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp);
-	bool Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade);
+	bool Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade) const;
 
 	/* #########################################################################
-		FUNCTIONS PLAYER ACCOUNT 
+		FUNCTIONS PLAYER ACCOUNT
 	######################################################################### */
 	bool SpendCurrency(int Price, int ItemID = 1);
 	const char* GetLanguage() const;
@@ -153,19 +153,19 @@ public:
 	void ShowInformationStats();
 
 	/* #########################################################################
-		FUNCTIONS PLAYER PARSING 
+		FUNCTIONS PLAYER PARSING
 	######################################################################### */
 	bool ParseItemsF3F4(int Vote);
   	bool ParseVoteUpgrades(const char *CMD, const int VoteID, const int VoteID2, int Get);
 
 	/* #########################################################################
-		FUNCTIONS PLAYER ITEMS 
+		FUNCTIONS PLAYER ITEMS
 	######################################################################### */
 	InventoryItem& GetItem(int ItemID);
 	CSkill &GetSkill(int SkillID);
 	CPlayerQuest& GetQuest(int QuestID);
-	AccountMainJob::StructTempPlayerData& GetTempData() { return AccountMainJob::ms_aPlayerTempData[m_ClientID]; }
-	AccountMainJob::StructData& Acc() { return AccountMainJob::ms_aData[m_ClientID]; }
+	AccountMainJob::StructTempPlayerData& GetTempData() const { return AccountMainJob::ms_aPlayerTempData[m_ClientID]; }
+	AccountMainJob::StructData& Acc() const { return AccountMainJob::ms_aData[m_ClientID]; }
 
 	int GetLevelTypeAttribute(int Class);
 	int GetLevelAllAttributes();
@@ -176,7 +176,7 @@ public:
 	int GetTalkedID() const { return m_DialogNPC.m_TalkedID; };
 
 	// dialog formating
-	const char *GetDialogText();
+	const char *GetDialogText() const;
 	void FormatDialogText(int DataBotID, const char *pText);
 	void ClearDialogText();
 

@@ -11,7 +11,7 @@ class CMotd : public CComponent
 	char m_aServerMotd[1024];
 public:
 	void Clear();
-	bool IsActive();
+	bool IsActive() const;
 	const char *GetMotd() const { return m_aServerMotd; }
 
 	virtual void OnRender();

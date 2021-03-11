@@ -91,7 +91,7 @@ int WorldSwapJob::GetNecessaryQuest(int WorldID) const
 	return pItem != ms_aWorldSwap.end() ? pItem->second.m_OpenQuestID : -1;
 }
 
-vec2 WorldSwapJob::GetPositionQuestBot(int ClientID, BotJob::QuestBotInfo QuestBot)
+vec2 WorldSwapJob::GetPositionQuestBot(int ClientID, BotJob::QuestBotInfo QuestBot) const
 {
 	if(GS()->GetWorldID() == QuestBot.m_WorldID)
 		return vec2(QuestBot.m_PositionX, QuestBot.m_PositionY);
@@ -109,7 +109,7 @@ vec2 WorldSwapJob::GetPositionQuestBot(int ClientID, BotJob::QuestBotInfo QuestB
 	return vec2(0, 0);
 }
 
-void WorldSwapJob::CheckQuestingOpened(CPlayer* pPlayer, int QuestID)
+void WorldSwapJob::CheckQuestingOpened(CPlayer* pPlayer, int QuestID) const
 {
 	const int ClientID = pPlayer->GetCID();
 	for(const auto& sw : ms_aWorldSwap)
@@ -148,7 +148,7 @@ bool WorldSwapJob::ChangeWorld(CPlayer* pPlayer, vec2 Pos)
 	return false;
 }
 
-int WorldSwapJob::GetID(vec2 Pos)
+int WorldSwapJob::GetID(vec2 Pos) const
 {
 	for(const auto& sw : ms_aWorldSwap)
 	{

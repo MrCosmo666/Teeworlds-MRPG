@@ -135,7 +135,7 @@ public:
 		AddPath("$APPDIR");
 	}
 
-	bool IsDuplicatePath(const char *pPath)
+	bool IsDuplicatePath(const char *pPath) const
 	{
 		for (int i = 0; i < m_NumPaths; ++i)
 		{

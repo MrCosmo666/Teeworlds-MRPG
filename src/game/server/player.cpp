@@ -211,7 +211,7 @@ void CPlayer::Snap(int SnappingClient)
 		StrToInts(pClientInfo->m_StateName, 6, "\0");
 }
 
-CCharacter *CPlayer::GetCharacter()
+CCharacter *CPlayer::GetCharacter() const
 {
 	if(m_pCharacter && m_pCharacter->IsAlive())
 		return m_pCharacter;
@@ -295,7 +295,7 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 	}
 }
 
-void CPlayer::OnPredictedInput(CNetObj_PlayerInput *NewInput)
+void CPlayer::OnPredictedInput(CNetObj_PlayerInput *NewInput) const
 {
 	// skip the input if chat is active
 	if((m_PlayerFlags&PLAYERFLAG_CHATTING) && (NewInput->m_PlayerFlags&PLAYERFLAG_CHATTING))
@@ -331,7 +331,7 @@ void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed,
 	GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, aBufBroadcast);
 }
 
-bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade)
+bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade) const
 {
 	const int UpgradeNeed = Price*Count;
 	if((*Upgrade + Count) > MaximalUpgrade)
@@ -760,7 +760,7 @@ void CPlayer::ClearTalking()
 }
 
 // - - - - - - F O R M A T - - - - - T E X T - - - - - - - - -
-const char *CPlayer::GetDialogText()
+const char *CPlayer::GetDialogText() const
 {
 	return GS()->Server()->Localization()->Localize(GetLanguage(), m_aFormatDialogText);
 }

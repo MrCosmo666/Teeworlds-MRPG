@@ -48,16 +48,16 @@ public:
 	bool IsActive() const;
 	const CUIRect& GetRect();
 	const char* GetWindowName() const { return m_aWindowName; }
-	std::vector<CWindowUI> GetDaughtersWindows() { return m_DaughtersWindows; }
+	std::vector<CWindowUI> GetDaughtersWindows() const { return m_DaughtersWindows; }
 
 	void Open();
-	void Close();
+	void Close() const;
 	void CloseOpen();
 	void Init(const char* pWindowName, CUIRect WindowRect, bool DefaultClose = false, std::vector<CWindowUI> DaughtersWindows = {}, int WindowFlags = CWindowFlags::WINDOW_ALL);
 	void ReInitRect(CUIRect WindowRect) { m_WindowRect = WindowRect; }
-	void OnRenderWindow(RenderWindowCallback pCallback);
-	void HighlightEnable(vec4 Color, bool DaughtersToo = false);
-	void HighlightDisable();
+	void OnRenderWindow(RenderWindowCallback pCallback) const;
+	void HighlightEnable(vec4 Color, bool DaughtersToo = false) const;
+	void HighlightDisable() const;
 
 private:
 	void Render();

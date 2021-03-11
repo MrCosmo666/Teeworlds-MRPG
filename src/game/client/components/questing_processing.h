@@ -28,7 +28,7 @@ class CQuestingProcessing : public CComponent
 
 public:
 	void Clear();
-	bool IsActive(); 
+	bool IsActive() const; 
 	void ProcessingRenderTable(int TableID, CUIRect& Box);
 
 	int TableSize() const;

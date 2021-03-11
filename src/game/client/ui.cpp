@@ -83,7 +83,7 @@ bool CUI::KeyIsPressed(int Key) const
 	return Enabled() && Input()->KeyIsPressed(Key);
 }
 
-bool CUI::MouseHovered(const CUIRect* pRect)
+bool CUI::MouseHovered(const CUIRect* pRect) const
 {
 	if(g_Config.m_ClEditor || (m_pHoveredWindow && m_pCheckWindow && m_pCheckWindow == m_pHoveredWindow && MouseInside(&m_pHoveredWindow->m_WindowRect)))
 		return MouseInside(pRect) && MouseInsideClip();
@@ -407,7 +407,7 @@ int CUI::DoPickerLogic(const void *pID, const CUIRect *pRect, float *pX, float *
 	return 1;
 }
 
-void CUI::DoLabel(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, float LineWidth, bool MultiLine)
+void CUI::DoLabel(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, float LineWidth, bool MultiLine) const
 {
 	// TODO: FIX ME!!!!
 	//Graphics()->BlendNormal();
@@ -429,14 +429,14 @@ void CUI::DoLabel(const CUIRect* pRect, const char* pText, float FontSize, EAlig
 	TextRender()->Text(0, TextX, pRect->y - FontSize / 10.0f, FontSize, pText, LineWidth, MultiLine);
 }
 
-void CUI::DoLabelColored(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, vec4 Color, float LineWidth, bool MultiLine)
+void CUI::DoLabelColored(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, vec4 Color, float LineWidth, bool MultiLine) const
 {
 	TextRender()->TextColor(Color);
 	DoLabel(pRect, pText, FontSize, Align, LineWidth, MultiLine);
 	TextRender()->TextColor(ms_DefaultTextColor);
 }
 
-void CUI::DoLabelHighlighted(const CUIRect* pRect, const char* pText, const char* pHighlighted, float FontSize, const vec4& TextColor, const vec4& HighlightColor)
+void CUI::DoLabelHighlighted(const CUIRect* pRect, const char* pText, const char* pHighlighted, float FontSize, const vec4& TextColor, const vec4& HighlightColor) const
 {
 	CTextCursor Cursor;
 	TextRender()->SetCursor(&Cursor, pRect->x, pRect->y, FontSize, TEXTFLAG_RENDER | TEXTFLAG_STOP_AT_END);
@@ -493,7 +493,7 @@ float CUI::GetFade(CUIRect *pRect, bool Checked, float Seconds)
 	return 0.0f;
 }
 
-int CUI::DoMouseEventLogic(const CUIRect* pRect, int Button)
+int CUI::DoMouseEventLogic(const CUIRect* pRect, int Button) const
 {
 	static bool IsPressed = false;
 	int Event = CButtonLogicEvent::EMPTY;

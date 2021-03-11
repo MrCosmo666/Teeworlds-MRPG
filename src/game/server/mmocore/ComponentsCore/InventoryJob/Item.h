@@ -44,7 +44,7 @@ public:
 	void FormatAttributes(char* pBuffer, int Size) const { Info().FormatAttributes(pBuffer, Size, m_Enchant); }
 
 private:
-	bool Save();
+	bool Save() const;
 };
 typedef CInventoryItem InventoryItem;
 

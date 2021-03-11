@@ -48,7 +48,7 @@ public:
 
 	void BackgroundMapUpdate();
 
-	bool MenuMapLoaded() { return m_pMenuMap ? m_pMenuMap->IsLoaded() : false; }
+	bool MenuMapLoaded() const { return m_pMenuMap ? m_pMenuMap->IsLoaded() : false; }
 };
 
 #endif

@@ -260,7 +260,7 @@ bool CInventoryItem::Drop(int Count)
 	return false;
 }
 
-bool CInventoryItem::Save()
+bool CInventoryItem::Save() const
 {
 	if(m_pPlayer && m_pPlayer->IsAuthed())
 	{

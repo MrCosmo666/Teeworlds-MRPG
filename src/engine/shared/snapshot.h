@@ -46,9 +46,9 @@ public:
 	const CSnapshotItem* GetItem(int Index) const;
 	int GetItemSize(int Index) const;
 	int GetItemIndex(int Key) const;
-	void InvalidateItem(int Index);
+	void InvalidateItem(int Index) const;
 
-	int Serialize(char* pDstData);
+	int Serialize(char* pDstData) const;
 
 	int Crc() const;
 	void DebugDump() const;
@@ -120,7 +120,7 @@ public:
 	void PurgeAll();
 	void PurgeUntil(int Tick);
 	void Add(int Tick, int64 Tagtime, int DataSize, void* pData, int CreateAlt);
-	int Get(int Tick, int64* pTagtime, CSnapshot** ppData, CSnapshot** ppAltData);
+	int Get(int Tick, int64* pTagtime, CSnapshot** ppData, CSnapshot** ppAltData) const;
 };
 
 class CSnapshotBuilder

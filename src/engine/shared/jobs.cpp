@@ -22,7 +22,7 @@ IJob::~IJob()
 {
 }
 
-int IJob::Status()
+int IJob::Status() const
 {
 	return m_Status.load();
 }

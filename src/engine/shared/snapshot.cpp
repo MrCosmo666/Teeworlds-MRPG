@@ -33,12 +33,12 @@ int CSnapshot::GetItemIndex(int Key) const
 	return Index;
 }
 
-void CSnapshot::InvalidateItem(int Index)
+void CSnapshot::InvalidateItem(int Index) const
 {
 	((CSnapshotItem*)(DataStart() + Offsets()[Index]))->Invalidate();
 }
 
-int CSnapshot::Serialize(char* pDstData)
+int CSnapshot::Serialize(char* pDstData) const
 {
 	int* pData = (int*)pDstData;
 	pData[0] = m_DataSize;
@@ -491,7 +491,7 @@ void CSnapshotStorage::Add(int Tick, int64 Tagtime, int DataSize, void* pData, i
 	m_pLast = pHolder;
 }
 
-int CSnapshotStorage::Get(int Tick, int64* pTagtime, CSnapshot** ppData, CSnapshot** ppAltData)
+int CSnapshotStorage::Get(int Tick, int64* pTagtime, CSnapshot** ppData, CSnapshot** ppAltData) const
 {
 	CHolder* pHolder = m_pFirst;
 

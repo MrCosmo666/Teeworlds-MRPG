@@ -65,8 +65,8 @@ private:
 	class IServer *m_pServer;
 
 public:
-	class CGS *GS() { return m_pGS; }
-	class IServer *Server() { return m_pServer; }
+	class CGS *GS() const { return m_pGS; }
+	class IServer *Server() const { return m_pServer; }
 
 	bool m_ResetRequested;
 	bool m_Paused;

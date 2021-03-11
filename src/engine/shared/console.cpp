@@ -496,7 +496,7 @@ void CConsole::PossibleMaps(const char *pStr, FPossibleCallback pfnCallback, voi
 	}
 }
 
-CConsole::CCommand *CConsole::FindCommand(const char *pName, int FlagMask)
+CConsole::CCommand *CConsole::FindCommand(const char *pName, int FlagMask) const
 {
 	for(CCommand *pCommand = m_pFirstCommand; pCommand; pCommand = pCommand->m_pNext)
 	{

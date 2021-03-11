@@ -39,12 +39,12 @@ class WorldSwapJob : public MmoComponent
 public:
 	int GetWorldType() const;
 	int GetNecessaryQuest(int WorldID = -1) const;
-	vec2 GetPositionQuestBot(int ClientID, BotJob::QuestBotInfo QuestBot);
-	void CheckQuestingOpened(CPlayer* pPlayer, int QuestID);
+	vec2 GetPositionQuestBot(int ClientID, BotJob::QuestBotInfo QuestBot) const;
+	void CheckQuestingOpened(CPlayer* pPlayer, int QuestID) const;
 
 private:
 	bool ChangeWorld(CPlayer* pPlayer, vec2 Pos);
-	int GetID(vec2 Pos);
+	int GetID(vec2 Pos) const;
 };
 
 #endif

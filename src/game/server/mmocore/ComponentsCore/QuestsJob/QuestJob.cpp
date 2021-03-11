@@ -353,7 +353,7 @@ void QuestJob::AcceptNextStoryQuestStep(CPlayer* pPlayer)
 		// allow accept next story quest only for complected some quest on story
 		if(pPlayerQuest.second.GetState() != QuestState::QUEST_FINISHED)
 			continue;
-	
+
 		// accept next story quest
 		const auto& IsAlreadyChecked = std::find_if(StoriesChecked.begin(), StoriesChecked.end(), [=](const std::string& stories)
 		{ return (str_comp_nocase(ms_aDataQuests[pPlayerQuest.first].m_aStoryLine, stories.c_str()) == 0); });
@@ -381,7 +381,7 @@ void QuestJob::QuestTableAddItem(int ClientID, const char* pText, int Requires, 
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
-int QuestJob::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID)
+int QuestJob::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID) const
 {
 	const int ClientID = pPlayer->GetCID();
 	int AvailableCount = pPlayer->GetItem(ItemID).m_Count;
