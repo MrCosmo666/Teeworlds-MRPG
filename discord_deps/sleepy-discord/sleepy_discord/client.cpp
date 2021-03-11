@@ -7,7 +7,6 @@
 #include <sstream>
 #include <iomanip>
 #include <ctime>
-#include <cstring>
 #include "client.h"
 #include "version_helper.h"
 //#include "json.h"
@@ -31,12 +30,6 @@ namespace SleepyDiscord {
 			setShardID(_shardID, _shardCount);
 
 		messagesRemaining = 4;
-		postTask(
-			[this]() {
-				getTheGateway();
-				connect(theGateway, this, connection);
-			}
-		);
 	}
 
 	BaseDiscordClient::~BaseDiscordClient() {
@@ -728,7 +721,6 @@ namespace SleepyDiscord {
 		case INVALID_INTENTS:
 		case DISALLOWED_INTENTS:
 			return quit(false, true);
-			break;
 		}
 		reconnect();
 	}

@@ -154,11 +154,10 @@ namespace SleepyDiscord {
 
 			template<class Container>
 			bool get(Container& value) {
-				static const auto getter = [&](DocType doc) {
+				static const auto getter = [&](DocType& doc) {
 					value = get<Container>(doc);
 				};
-				if (!Base::getDoc(getter))
-					return false;
+				return Base::getDoc(getter);
 			}
 
 			template<template<class...> class Container, typename Type = TypeToConvertTo>
