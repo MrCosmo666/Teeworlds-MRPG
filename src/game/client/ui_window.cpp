@@ -42,7 +42,7 @@ void CWindowUI::Render()
 		Bordure.y = NewPositionY;
 		m_WindowRect.x = NewPositionX;
 		m_WindowRect.y = NewPositionY;
-	
+
 		if(!m_pUI->KeyIsPressed(KEY_MOUSE_1))
 		{
 			m_WindowMoved = false;
@@ -52,15 +52,14 @@ void CWindowUI::Render()
 	}
 
 	// highlight
-	bool IsActiveWindow = IsActive();
+	const bool IsActiveWindow = IsActive();
 	static float MainBackgroundMargin = 2.0f;
 	if(IsActiveWindow || m_HighlightColor.a > 0.0f)
 	{
 		float Margin = m_HighlightColor.a > 0.0f ? -3.0f : -1.0f;
+		vec4 ColorHighlight = m_HighlightColor.a > 0.0f ? m_HighlightColor : vec4(0.4f, 0.35f, 0.f, 0.2f);
 		if(m_WindowHidden)
 		{
-			const float Fade = m_pUI->GetFade(&Bordure, IsActiveWindow, 0.5f);
-			vec4 ColorHighlight = m_HighlightColor.a > 0.0f ? m_HighlightColor : vec4(0.4f, 0.35f, 0.f, 0.2f);
 
 			CUIRect HighlightActive = Bordure;
 			HighlightActive.Margin(Margin, &HighlightActive);
@@ -68,9 +67,6 @@ void CWindowUI::Render()
 		}
 		else
 		{
-			const float Fade = m_pUI->GetFade(&m_WindowRect, IsActiveWindow, 0.5f);
-			vec4 ColorHighlight = m_HighlightColor.a > 0.0f ? m_HighlightColor : vec4(0.4f, 0.35f, 0.f, 0.2f);
-
 			CUIRect HighlightActive = m_WindowRect;
 			HighlightActive.Margin(Margin, &HighlightActive);
 			m_pRenderTools->DrawUIRectMonochromeGradient(&HighlightActive, ColorHighlight, CUI::CORNER_ALL, 8.0f);
@@ -107,7 +103,7 @@ void CWindowUI::Render()
 		m_pUI->DoLabel(&ButtonClose, "\xE2\x9C\x95", 16.0f, CUI::ALIGN_CENTER);
 		const int CloseLogic = m_pUI->DoMouseEventLogic(&ButtonClose, KEY_MOUSE_1);
 		if(CloseLogic & CUI::CButtonLogicEvent::EVENT_PRESS)
-			m_Openned = false;
+			Close();
 	}
 
 	// hide button
@@ -153,7 +149,7 @@ void CWindowUI::Render()
 
 // - - -- - -- - -- - -- - -- - -- - -
 // Functions for working with windows
-void CWindowUI::Init(const char* pWindowName, CUIRect WindowRect, int WindowFlags)
+void CWindowUI::Init(const char* pWindowName, CUIRect WindowRect, bool DefaultClose, std::vector<CWindowUI> DaughtersWindows, int WindowFlags)
 {
 	CWindowUI* pWindow = GetWindow(pWindowName);
 	if(pWindow)
@@ -165,11 +161,12 @@ void CWindowUI::Init(const char* pWindowName, CUIRect WindowRect, int WindowFlag
 
 	pWindow = new CWindowUI();
 	str_copy(pWindow->m_aWindowName, pWindowName, sizeof(pWindow->m_aWindowName));
+	pWindow->m_DaughtersWindows = DaughtersWindows;
 	pWindow->m_WindowFlags = WindowFlags;
 	pWindow->m_WindowRect = WindowRect;
 	pWindow->m_SkippedRenderFrames = 0;
 	pWindow->m_WindowHidden = false;
-	pWindow->m_Openned = true;
+	pWindow->m_Openned = !DefaultClose;
 	ms_aWindows.push_back(pWindow);
 	(*this) = *pWindow;
 }
@@ -180,9 +177,9 @@ const CUIRect& CWindowUI::GetRect()
 	return (pWindow ? pWindow->m_WindowRect : m_WindowRect);
 }
 
-CWindowUI::CWindowUI(const char* pWindowName, CUIRect WindowRect, int WindowFlags)
+CWindowUI::CWindowUI(const char* pWindowName, CUIRect WindowRect, bool DefaultClose, std::vector<CWindowUI> DaughtersWindows, int WindowFlags)
 {
-	Init(pWindowName, WindowRect, WindowFlags);
+	Init(pWindowName, WindowRect, DefaultClose, DaughtersWindows, WindowFlags);
 }
 
 bool CWindowUI::IsOpenned() const
@@ -212,7 +209,14 @@ void CWindowUI::Close()
 {
 	CWindowUI* pWindow = GetWindow(m_aWindowName);
 	if(pWindow)
+	{
+		for(auto& p : pWindow->m_DaughtersWindows)
+		{
+			if(p.IsOpenned())
+				p.Close();
+		}
 		pWindow->m_Openned = false;
+	}
 }
 
 void CWindowUI::CloseOpen()
@@ -237,18 +241,37 @@ void CWindowUI::OnRenderWindow(RenderWindowCallback pCallback)
 	}
 }
 
-void CWindowUI::HighlightEnable(vec4 Color)
+void CWindowUI::HighlightEnable(vec4 Color, bool DaughtersToo)
 {
 	CWindowUI* pWindow = GetWindow(m_aWindowName);
 	if(pWindow)
+	{
 		pWindow->m_HighlightColor = Color;
+		if(DaughtersToo)
+		{
+			for(auto& p : pWindow->m_DaughtersWindows)
+			{
+				CWindowUI* pDep = GetWindow(p.m_aWindowName);
+				if(pDep)
+					pDep->m_HighlightColor = Color;
+			}
+		}
+	}
 }
 
 void CWindowUI::HighlightDisable()
 {
 	CWindowUI* pWindow = GetWindow(m_aWindowName);
 	if(pWindow)
+	{
 		pWindow->m_HighlightColor = vec4(-1, -1, -1, -1);
+		for(auto& p : pWindow->m_DaughtersWindows)
+		{
+			CWindowUI* pDep = GetWindow(p.m_aWindowName);
+			if(pDep)
+				pDep->m_HighlightColor = vec4(-1, -1, -1, -1);
+		}
+	}
 }
 
 CWindowUI* CWindowUI::GetWindow(const char* pWindowName) const

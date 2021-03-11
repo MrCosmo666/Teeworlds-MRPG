@@ -174,11 +174,11 @@ void QuestJob::ShowQuestID(CPlayer *pPlayer, int QuestID)
 		pPlayer->m_VoteColored = GOLDEN_COLOR;
 		pPlayer->GS()->AVL(ClientID, "null", "{STR} : Reward", pData.GetName());
 		pPlayer->m_VoteColored = LIGHT_GOLDEN_COLOR;
-		pPlayer->GS()->AVL(ClientID, "null", "Gold: {INT} Exp: {INT}", &pData.m_Gold, &pData.m_Exp);
+		pPlayer->GS()->AVL(ClientID, "null", "Gold: {INT} Exp: {INT}", pData.m_Gold, pData.m_Exp);
 
 		pPlayer->m_LastVoteMenu = MenuList::MENU_JOURNAL_MAIN;
 		pPlayer->GS()->AddVotesBackpage(ClientID);
-	}, "{INT}/{INT} {STR}: {STR}", &QuestPosition, &QuestsSize, pData.GetStory(), pData.GetName());
+	}, "{INT}/{INT} {STR}: {STR}", QuestPosition, QuestsSize, pData.GetStory(), pData.GetName());
 }
 
 // active npc information display
@@ -196,7 +196,7 @@ void QuestJob::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 		const int HideID = (NUM_TAB_MENU + 12500 + pBotInfo->m_SubBotID);
 		const int PosX = pBotInfo->m_PositionX / 32, PosY = pBotInfo->m_PositionY / 32;
 		const char* pSymbol = (((pPlayerQuest.GetState() == QUEST_ACCEPT && pPlayerQuest.m_StepsQuestBot[pStepBot.first].m_StepComplete) || pPlayerQuest.GetState() == QuestState::QUEST_FINISHED) ? "✔ " : "\0");
-		GS()->AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR}Step {INT}. {STR} {STR}(x{INT} y{INT})", pSymbol, &pBotInfo->m_Step, pBotInfo->GetName(), Server()->GetWorldName(pBotInfo->m_WorldID), &PosX, &PosY);
+		GS()->AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR}Step {INT}. {STR} {STR}(x{INT} y{INT})", pSymbol, pBotInfo->m_Step, pBotInfo->GetName(), Server()->GetWorldName(pBotInfo->m_WorldID), PosX, PosY);
 
 		// skipped non accepted task list
 		if(pPlayerQuest.GetState() != QUEST_ACCEPT)
@@ -214,7 +214,7 @@ void QuestJob::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 			if(NeedKillMobID > 0 && KillNeed > 0 && Job()->BotsData()->IsDataBotValid(NeedKillMobID))
 			{
 				GS()->AVMI(ClientID, "broken_h", "null", NOPE, HideID, "- Defeat {STR} [{INT}/{INT}]",
-					BotJob::ms_aDataBot[NeedKillMobID].m_aNameBot, &pPlayerQuest.m_StepsQuestBot[pStepBot.first].m_MobProgress[i], &KillNeed);
+					BotJob::ms_aDataBot[NeedKillMobID].m_aNameBot, pPlayerQuest.m_StepsQuestBot[pStepBot.first].m_MobProgress[i], KillNeed);
 				NeedOnlyTalk = false;
 			}
 
@@ -224,7 +224,7 @@ void QuestJob::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 			{
 				InventoryItem PlayerItem = pPlayer->GetItem(NeedItemID);
 				int ClapmItem = clamp(PlayerItem.m_Count, 0, NeedCount);
-				GS()->AVMI(ClientID, PlayerItem.Info().GetIcon(), "null", NOPE, HideID, "- Item {STR} [{INT}/{INT}]", PlayerItem.Info().GetName(pPlayer), &ClapmItem, &NeedCount);
+				GS()->AVMI(ClientID, PlayerItem.Info().GetIcon(), "null", NOPE, HideID, "- Item {STR} [{INT}/{INT}]", PlayerItem.Info().GetName(pPlayer), ClapmItem, NeedCount);
 				NeedOnlyTalk = false;
 			}
 		}
@@ -237,7 +237,7 @@ void QuestJob::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 			if(RewardItemID > 0 && RewardCount > 0)
 			{
 				ItemInformation RewardItem = GS()->GetItemInfo(RewardItemID);
-				GS()->AVMI(ClientID, RewardItem.GetIcon(), "null", NOPE, HideID, "- Receive {STR}x{INT}", RewardItem.GetName(pPlayer), &RewardCount);
+				GS()->AVMI(ClientID, RewardItem.GetIcon(), "null", NOPE, HideID, "- Receive {STR}x{INT}", RewardItem.GetName(pPlayer), RewardCount);
 			}
 		}
 

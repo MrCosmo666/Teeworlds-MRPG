@@ -7,7 +7,7 @@
 #define PERCENT_OF_ENCHANT 8
 #define PERCENT_MAXIMUM_ENCHANT 40
 
-#include <game/data_structures.h>
+#include <game/enum_context.h>
 
 class CItemInformation : public CItemDataInformation
 {

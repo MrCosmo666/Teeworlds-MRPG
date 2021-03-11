@@ -315,7 +315,7 @@ public:
 	virtual int ClientVersion() const;
 	static void GetPlayerLabel(char* aBuf, int BufferSize, int ClientID, const char* ClientName);
 	void StartRendering();
-	
+
 	bool IsXmas() const;
 	bool IsEaster() const;
 	int RacePrecision() const { return m_Snap.m_pGameDataRace ? m_Snap.m_pGameDataRace->m_Precision : 3; }
@@ -335,7 +335,6 @@ public:
 	void DoEnterMessage(const char *pName, int ClientID, int Team);
 	void DoLeaveMessage(const char *pName, int ClientID, const char *pReason);
 	void DoTeamChangeMessage(const char *pName, int ClientID, int Team);
-
 	int GetClientID(const char* pName);
 
 	// actions
@@ -345,6 +344,9 @@ public:
 	void SendKill();
 	void SendReadyChange();
 	void SendSkinChange();
+
+	// todo change it
+	void ParsingMmoData();
 
 	// pointers to all systems
 	class CGameConsole *m_pGameConsole;

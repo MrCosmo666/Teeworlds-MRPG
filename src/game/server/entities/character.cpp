@@ -213,7 +213,7 @@ bool CCharacter::DecoInteractive()
 			}
 		}
 
-		GS()->Chat(ClientID, "Distance House and Decoration maximal {INT} block!", &g_Config.m_SvLimitDecoration);
+		GS()->Chat(ClientID, "Distance House and Decoration maximal {INT} block!", g_Config.m_SvLimitDecoration);
 		GS()->Chat(ClientID, "Setting object reset, use repeat!");
 		GS()->ResetVotes(ClientID, MenuList::MENU_HOUSE_DECORATION);
 		return true;

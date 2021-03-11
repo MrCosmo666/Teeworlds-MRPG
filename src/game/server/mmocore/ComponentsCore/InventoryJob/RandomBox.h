@@ -2,8 +2,9 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_INVENTORY_RANDOM_BOX_H
 #define GAME_SERVER_INVENTORY_RANDOM_BOX_H
-
 #include <game/server/entity.h>
+
+#include <vector>
 
 struct StructRandomBoxItem
 {

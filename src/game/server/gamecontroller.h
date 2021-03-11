@@ -4,7 +4,7 @@
 #define GAME_SERVER_GAMECONTROLLER_H
 
 #include <base/vmath.h>
-#include <game/server/enum_context.h>
+#include <game/enum_context.h>
 
 /*
 	Class: Game Controller

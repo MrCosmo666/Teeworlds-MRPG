@@ -23,6 +23,7 @@
 #include <engine/storage.h>
 #include <engine/textrender.h>
 #include <engine/discord.h>
+#include <engine/shared/mmodata.h>
 
 #include <engine/client/http.h>
 #include <engine/external/json-parser/json.h>
@@ -602,6 +603,9 @@ void CClient::DisconnectWithReason(const char* pReason)
 	m_aSnapshots[SNAP_CURRENT] = 0;
 	m_aSnapshots[SNAP_PREV] = 0;
 	m_RecivedSnapshots = 0;
+
+	// clear data mmo
+	m_DataMmo.Unload();
 }
 
 void CClient::Disconnect()
@@ -1655,7 +1659,7 @@ void CClient::ProcessServerPacket(CNetChunk* pPacket)
 					m_AckGameTick = GameTick;
 				}
 			}
-		}	
+		}
 		else if((pPacket->m_Flags & NET_CHUNKFLAG_VITAL) != 0 && Msg == NETMSG_DATA_MMO_INFO)
 		{
 			int Crc = Unpacker.GetInt();

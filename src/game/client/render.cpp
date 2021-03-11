@@ -331,6 +331,34 @@ void CRenderTools::DrawUIRectMonochromeGradient(const CUIRect* pRect, vec4 Color
 	DrawUIRect4(pRect, Color, Color, ColorDownGradient, ColorDownGradient, Corners, Rounding);
 }
 
+void CRenderTools::DrawLine(float x, float y, float tox, float toy, vec4 Color)
+{
+	Graphics()->TextureClear();
+
+	Graphics()->LinesBegin();
+	Graphics()->SetColor(Color.r, Color.g, Color.b, Color.a);
+	IGraphics::CLineItem Line = IGraphics::CLineItem(x, y, tox, toy);
+	Graphics()->LinesDraw(&Line, 1);
+	Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+	Graphics()->LinesEnd();
+}
+
+void CRenderTools::DrawUIRectLine(const CUIRect* pRect, vec4 Color, int LineFlags)
+{ 
+	float x = pRect->x, y = pRect->y, tox = pRect->x + pRect->w, toy = pRect->y + pRect->h;
+	if(LineFlags & LineDirectionFlag::LINE_LEFT)
+	{
+		tox = pRect->x + pRect->w;
+		toy = pRect->y;
+	}
+	else if(LineFlags & LineDirectionFlag::LINE_DOWN)
+	{
+		tox = pRect->x;
+		toy = pRect->y + pRect->h;
+	}
+	DrawLine(x, y, tox, toy, Color);
+}
+
 void CRenderTools::DrawUIRect4(const CUIRect *r, vec4 ColorTopLeft, vec4 ColorTopRight, vec4 ColorBottomLeft, vec4 ColorBottomRight, int Corners, float Rounding)
 {
 	Graphics()->TextureClear();

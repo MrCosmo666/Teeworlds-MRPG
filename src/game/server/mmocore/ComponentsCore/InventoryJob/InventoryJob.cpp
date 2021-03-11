@@ -18,13 +18,32 @@ void InventoryJob::OnPrepareInformation(IStorageEngine* pStorage, CDataFileWrite
 	json JsonQuestData;
 	for(auto& p : InventoryJob::ms_aItemsInfo)
 	{
+		// data information
 		JsonQuestData["items"].push_back(
 		{
 			{ "id", p.first },
 			{ "name", p.second.m_aName },
 			{ "desc", p.second.m_aDesc },
-			{ "icon", p.second.m_aIcon }
+			{ "icon", p.second.m_aIcon },
 		});
+
+		/*// item attributes
+		const char* pNameAttributes[STATS_MAX_FOR_ITEM] = {};
+		for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
+		{
+			int AttributeID = p.second.m_aAttribute[i];
+			pNameAttributes[i] = "Empty slot characteristics";
+			if(CGS::ms_aAttributsInfo.find(AttributeID) != CGS::ms_aAttributsInfo.end() && p.second.m_aAttributeCount[i] > 0)
+				pNameAttributes[i] = CGS::ms_aAttributsInfo[AttributeID].m_aName;
+		}
+		char attBuf[64];
+		for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
+		{
+			str_format(attBuf, sizeof(attBuf), "att%d", i);
+			JsonQuestData["items"].push_back({ attBuf, pNameAttributes[i] });
+			str_format(attBuf, sizeof(attBuf), "att%d_val", i);
+			JsonQuestData["items"].push_back({ attBuf, p.second.m_aAttributeCount[i] });
+		}*/
 	}
 
 	std::string Data = JsonQuestData.dump();
@@ -84,7 +103,7 @@ void InventoryJob::OnInitAccount(CPlayer *pPlayer)
 		ms_aItems[ClientID][ItemID].m_Settings = (int)pRes->getInt("Settings");
 		ms_aItems[ClientID][ItemID].m_Enchant = (int)pRes->getInt("Enchant");
 		ms_aItems[ClientID][ItemID].m_Durability = (int)pRes->getInt("Durability");
-	}		
+	}
 }
 
 void InventoryJob::OnResetClient(int ClientID)
@@ -108,19 +127,19 @@ bool InventoryJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 
 		GS()->AVH(ClientID, TAB_INVENTORY_SELECT, RED_COLOR, "Inventory Select List");
 		int SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_USED);
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_USED, TAB_INVENTORY_SELECT, "Used ({INT})", &SizeItems);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_USED, TAB_INVENTORY_SELECT, "Used ({INT})", SizeItems);
 
 		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_CRAFT);
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_CRAFT, TAB_INVENTORY_SELECT, "Craft ({INT})", &SizeItems);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_CRAFT, TAB_INVENTORY_SELECT, "Craft ({INT})", SizeItems);
 
 		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_MODULE);
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_MODULE, TAB_INVENTORY_SELECT, "Modules ({INT})", &SizeItems);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_MODULE, TAB_INVENTORY_SELECT, "Modules ({INT})", SizeItems);
 
 		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_POTION);
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_POTION, TAB_INVENTORY_SELECT, "Potion ({INT})", &SizeItems);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_POTION, TAB_INVENTORY_SELECT, "Potion ({INT})", SizeItems);
 
 		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_OTHER);
-		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_OTHER, TAB_INVENTORY_SELECT, "Other ({INT})", &SizeItems);
+		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_OTHER, TAB_INVENTORY_SELECT, "Other ({INT})", SizeItems);
 		if(pPlayer->m_aSortTabs[SORT_INVENTORY])
 			ListInventory(pPlayer, pPlayer->m_aSortTabs[SORT_INVENTORY]);
 
@@ -151,8 +170,8 @@ bool InventoryJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 			pItemPlayer.FormatAttributes(aAttributes, sizeof(aAttributes));
 			GS()->AVMI(ClientID, pItemPlayer.Info().GetIcon(), "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], pItemPlayer.Info().GetName(pPlayer), aAttributes);
 		}
-
 		GS()->AV(ClientID, "null");
+
 		bool FindItem = false;
 		for(const auto& it : ms_aItems[ClientID])
 		{
@@ -186,9 +205,6 @@ bool InventoryJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const
 
 	if(PPSTR(CMD, "IDROP") == 0)
 	{
-		if(!pPlayer->GetCharacter())
-			return true;
-
 		int AvailableCount = GetUnfrozenItemCount(pPlayer, VoteID);
 		if(AvailableCount <= 0)
 			return true;
@@ -197,7 +213,7 @@ bool InventoryJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const
 		InventoryItem& pItemPlayer = pPlayer->GetItem(VoteID);
 		pItemPlayer.Drop(Get);
 
-		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "You drop {STR}x{INT}", pItemPlayer.Info().GetName(pPlayer), &Get);
+		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "You drop {STR}x{INT}", pItemPlayer.Info().GetName(pPlayer), Get);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
@@ -227,7 +243,7 @@ bool InventoryJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const
 		if(pPlayerSelectedItem.Remove(Get) && pPlayerMaterialItem.Add(DesCount))
 		{
 			GS()->Chat(ClientID, "Disassemble {STR}x{INT}, you receive {INT} {STR}(s)",
-				pPlayerSelectedItem.Info().GetName(pPlayer), &Get, &DesCount, pPlayerMaterialItem.Info().GetName(pPlayer));
+				pPlayerSelectedItem.Info().GetName(pPlayer), Get, DesCount, pPlayerMaterialItem.Info().GetName(pPlayer));
 			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		}
 		return true;
@@ -235,9 +251,6 @@ bool InventoryJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const
 
 	if(PPSTR(CMD, "ISETTINGS") == 0)
 	{
-		if(!pPlayer->GetCharacter())
-			return true;
-
 		pPlayer->GetItem(VoteID).Equip();
 		GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
@@ -283,7 +296,7 @@ bool InventoryJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const
 }
 
 void InventoryJob::RepairDurabilityItems(CPlayer *pPlayer)
-{ 
+{
 	const int ClientID = pPlayer->GetCID();
 	SJK.UD("tw_accounts_items", "Durability = '100' WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
 	for(auto& it : ms_aItems[ClientID])
@@ -299,7 +312,7 @@ void InventoryJob::ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFunc
 	bool Found = false;
 	for(const auto& it : ms_aItems[ClientID])
 	{
-		if(!it.second.m_Count || ((SortedFunction && it.second.Info().m_Function != TypeList) 
+		if(!it.second.m_Count || ((SortedFunction && it.second.Info().m_Function != TypeList)
 			|| (!SortedFunction && it.second.Info().m_Type != TypeList)))
 			continue;
 
@@ -332,7 +345,7 @@ int InventoryJob::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Setti
 		ms_aItems[ClientID][ItemID].m_Count = pRes->getInt("Count")+Count;
 		ms_aItems[ClientID][ItemID].m_Settings = pRes->getInt("Settings")+Settings;
 		ms_aItems[ClientID][ItemID].m_Enchant = Enchant;
-		return 1;	
+		return 1;
 	}
 
 	// create an object if not found
@@ -368,7 +381,7 @@ int InventoryJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Set
 		{
 			ms_aItems[ClientID][ItemID].m_Count = pRes->getInt("Count")-Count;
 			ms_aItems[ClientID][ItemID].m_Settings = pRes->getInt("Settings")-Settings;
-			return 1;		
+			return 1;
 		}
 
 		// remove the object if it is less than the required amount
@@ -376,13 +389,13 @@ int InventoryJob::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Set
 		ms_aItems[ClientID][ItemID].m_Settings = 0;
 		ms_aItems[ClientID][ItemID].m_Enchant = 0;
 		SJK.DD("tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AccountID);
-		return 2;		
+		return 2;
 	}
 
 	ms_aItems[ClientID][ItemID].m_Count = 0;
 	ms_aItems[ClientID][ItemID].m_Settings = 0;
-	ms_aItems[ClientID][ItemID].m_Enchant = 0;	
-	return 0;		
+	ms_aItems[ClientID][ItemID].m_Enchant = 0;
+	return 0;
 }
 
 int InventoryJob::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID)
@@ -419,7 +432,7 @@ void InventoryJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pItemPlay
 	else
 	{
 		GS()->AVHI(ClientID, pItemPlayer.Info().GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} x{INT}",
-			(pItemPlayer.m_Settings ? "Dressed - " : "\0"), pNameItem, &pItemPlayer.m_Count);
+			(pItemPlayer.m_Settings ? "Dressed - " : "\0"), pNameItem, pItemPlayer.m_Count);
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pItemPlayer.Info().GetDesc(pPlayer));
 	}
 
@@ -460,7 +473,7 @@ void InventoryJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pItemPlay
 	if (pItemPlayer.Info().IsEnchantable() && !pItemPlayer.IsEnchantMaxLevel())
 	{
 		const int Price = pItemPlayer.GetEnchantPrice();
-		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR} ({INT} materials)", pNameItem, &Price);
+		GS()->AVM(ClientID, "IENCHANT", ItemID, HideID, "Enchant {STR} ({INT} materials)", pNameItem, Price);
 	}
 
 	// not allowed drop equipped hammer
@@ -468,7 +481,7 @@ void InventoryJob::ItemSelected(CPlayer* pPlayer, const InventoryItem& pItemPlay
 		return;
 
 	if (pItemPlayer.Info().m_Dysenthis > 0)
-		GS()->AVM(ClientID, "IDESYNTHESIS", ItemID, HideID, "Disassemble {STR} (+{INT} materials)", pNameItem, &pItemPlayer.Info().m_Dysenthis);
+		GS()->AVM(ClientID, "IDESYNTHESIS", ItemID, HideID, "Disassemble {STR} (+{INT} materials)", pNameItem, pItemPlayer.Info().m_Dysenthis);
 
 	GS()->AVM(ClientID, "IDROP", ItemID, HideID, "Drop {STR}", pNameItem);
 

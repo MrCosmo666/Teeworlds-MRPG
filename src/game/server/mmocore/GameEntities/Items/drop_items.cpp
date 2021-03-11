@@ -48,7 +48,7 @@ bool CDropItem::TakeItem(int ClientID)
 	if(pPlayerDroppedItem.m_Count > 0 && pPlayerDroppedItem.Info().IsEnchantable())
 	{
 		tl_swap(pPlayerDroppedItem, m_DropItem);
-		GS()->Chat(ClientID, "You now own {STR}(+{INT})", pPlayerDroppedItem.Info().GetName(pPlayer), &pPlayerDroppedItem.m_Enchant);
+		GS()->Chat(ClientID, "You now own {STR}(+{INT})", pPlayerDroppedItem.Info().GetName(pPlayer), pPlayerDroppedItem.m_Enchant);
 		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INVENTORY);
 		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
 		return true;
@@ -111,17 +111,17 @@ void CDropItem::Tick()
 	{
 		if(pPlayerItem.m_Count > 0)
 			GS()->Broadcast(pChar->GetPlayer()->GetCID(), BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) -> (+{INT}) {STR}",
-				m_DropItem.Info().GetName(pChar->GetPlayer()), &pPlayerItem.m_Enchant, &m_DropItem.m_Enchant, pToNickname);
+				m_DropItem.Info().GetName(pChar->GetPlayer()), pPlayerItem.m_Enchant, m_DropItem.m_Enchant, pToNickname);
 		else
 			GS()->Broadcast(pChar->GetPlayer()->GetCID(), BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) {STR}",
-				m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.m_Enchant, pToNickname);
+				m_DropItem.Info().GetName(pChar->GetPlayer()), m_DropItem.m_Enchant, pToNickname);
 		
 		return;
 	}
 
 	// non enchantable item
 	GS()->Broadcast(pChar->GetPlayer()->GetCID(), BROADCAST_GAME_INFORMATION, 100, "{STR}x{INT} {STR}",
-		m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.m_Count, pToNickname);
+		m_DropItem.Info().GetName(pChar->GetPlayer()), m_DropItem.m_Count, pToNickname);
 }
 
 void CDropItem::Snap(int SnappingClient)

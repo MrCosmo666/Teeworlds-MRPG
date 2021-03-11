@@ -88,14 +88,14 @@ bool ShopJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 		GS()->AVH(ClientID, TAB_INFO_AUCTION_BIND, GREEN_COLOR, "Information Auction Slot");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_AUCTION_BIND, "The reason for write the number for each row");
 		pPlayer->m_VoteColored = { 15,15,15 };
-		GS()->AVM(ClientID, "null", NOPE, NOPE, "Item x{INT} Minimal Price: {INT}gold", &SlotCount, &MinimalPrice);
-		GS()->AVM(ClientID, "null", NOPE, NOPE, "Auction Slot Price: {INT}gold", &g_Config.m_SvAuctionPriceSlot);
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "Item x{INT} Minimal Price: {INT}gold", SlotCount, MinimalPrice);
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "Auction Slot Price: {INT}gold", g_Config.m_SvAuctionPriceSlot);
 		if(SlotEnchant > 0)
-			GS()->AVM(ClientID, "null", NOPE, NOPE, "Warning selling enchanted: +{INT}", &SlotEnchant);
+			GS()->AVM(ClientID, "null", NOPE, NOPE, "Warning selling enchanted: +{INT}", SlotEnchant);
 
-		GS()->AVM(ClientID, "AUCTIONCOUNT", ItemID, NOPE, "Item Count: {INT}", &SlotCount);
-		GS()->AVM(ClientID, "AUCTIONPRICE", ItemID, NOPE, "Item Price: {INT}", &SlotPrice);
-		GS()->AVM(ClientID, "AUCTIONACCEPT", ItemID, NOPE, "Add {STR}x{INT} {INT}gold", pInformationSellItem.GetName(pPlayer), &SlotCount, &SlotPrice);
+		GS()->AVM(ClientID, "AUCTIONCOUNT", ItemID, NOPE, "Item Count: {INT}", SlotCount);
+		GS()->AVM(ClientID, "AUCTIONPRICE", ItemID, NOPE, "Item Price: {INT}", SlotPrice);
+		GS()->AVM(ClientID, "AUCTIONACCEPT", ItemID, NOPE, "Add {STR}x{INT} {INT}gold", pInformationSellItem.GetName(pPlayer), SlotCount, SlotPrice);
 		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
@@ -209,8 +209,8 @@ void ShopJob::CreateAuctionSlot(CPlayer* pPlayer, AuctionSlot& pAuctionItem)
 
 		const int AvailableSlot = (g_Config.m_SvMaxAuctionSlots - CountSlot) - 1;
 		GS()->Chat(-1, "{STR} created a slot [{STR}x{INT}] auction.",
-			Server()->ClientName(ClientID), pPlayerAuctionItem.Info().GetName(pPlayer), &pAuctionItem.m_Count);
-		GS()->ChatFollow(ClientID, "Still available {INT} slots!", &AvailableSlot);
+			Server()->ClientName(ClientID), pPlayerAuctionItem.Info().GetName(pPlayer), pAuctionItem.m_Count);
+		GS()->ChatFollow(ClientID, "Still available {INT} slots!", AvailableSlot);
 	}
 }
 
@@ -229,7 +229,7 @@ void ShopJob::CheckAuctionTime()
 		SJK.DD("tw_mailshop", "WHERE ID = '%d'", ID);
 	}
 	if(ReleaseSlots)
-		GS()->ChatFollow(-1, "Auction {INT} slots has been released!", &ReleaseSlots);
+		GS()->ChatFollow(-1, "Auction {INT} slots has been released!", ReleaseSlots);
 }
 
 bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
@@ -272,7 +272,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 		GS()->SendInbox(OwnerID, "Auction Sell", aBuf, itGold, Price, 0);
 		SJK.DD("tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, OwnerID);
 		pPlayerBuyightItem.Add(Count, 0, Enchant);
-		GS()->Chat(ClientID, "You buy {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(pPlayer), &Count);
+		GS()->Chat(ClientID, "You buy {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(pPlayer), Count);
 		return true;
 	}
 
@@ -282,7 +282,7 @@ bool ShopJob::BuyShopItem(CPlayer* pPlayer, int ID)
 		return false;
 
 	pPlayerBuyightItem.Add(Count, 0, Enchant);
-	GS()->Chat(ClientID, "You exchange {STR}x{INT} to {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(pPlayer), &Count, GS()->GetItemInfo(NeedItem).GetName(pPlayer), &Price);
+	GS()->Chat(ClientID, "You exchange {STR}x{INT} to {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(pPlayer), Count, GS()->GetItemInfo(NeedItem).GetName(pPlayer), Price);
 	return true;
 }
 
@@ -313,7 +313,7 @@ void ShopJob::ShowAuction(CPlayer* pPlayer)
 			char aEnchantBuf[16];
 			BuyightItem.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf), Enchant);
 			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} {STR} - {INT} gold",
-				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), &Price);
+				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), Price);
 
 			char aAttributes[128];
 			BuyightItem.FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
@@ -322,12 +322,12 @@ void ShopJob::ShowAuction(CPlayer* pPlayer)
 		else
 		{
 			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) - {INT} gold",
-				BuyightItem.GetName(pPlayer), &Count, &pPlayer->GetItem(ItemID).m_Count, &Price);
+				BuyightItem.GetName(pPlayer), Count, pPlayer->GetItem(ItemID).m_Count, Price);
 		}
 
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", BuyightItem.GetDesc(pPlayer));
 		GS()->AVM(ClientID, "null", NOPE, HideID, "Seller {STR}", Job()->PlayerName(OwnerID));
-		GS()->AVM(ClientID, "SHOP", ID, HideID, "Buy Price {INT} gold", &Price);
+		GS()->AVM(ClientID, "SHOP", ID, HideID, "Buy Price {INT} gold", Price);
 		FoundItems = true;
 		++HideID;
 	}
@@ -358,7 +358,7 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 			char aEnchantBuf[16];
 			pBuyightItem.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf), Enchant);
 			GS()->AVHI(ClientID, pBuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} {STR} - {INT} {STR}",
-				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), pBuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), &Price, pNeededItem.GetName(pPlayer));
+				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), pBuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), Price, pNeededItem.GetName(pPlayer));
 
 			char aAttributes[128];
 			pBuyightItem.FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
@@ -367,11 +367,11 @@ void ShopJob::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		else
 		{
 			GS()->AVHI(ClientID, pBuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) - {INT} {STR}",
-				pBuyightItem.GetName(pPlayer), &Count, &pPlayer->GetItem(ItemID).m_Count, &Price, pNeededItem.GetName(pPlayer));
+				pBuyightItem.GetName(pPlayer), Count, pPlayer->GetItem(ItemID).m_Count, Price, pNeededItem.GetName(pPlayer));
 		}
 
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pBuyightItem.GetDesc(pPlayer));
-		GS()->AVM(ClientID, "SHOP", ID, HideID, "Exchange {STR}x{INT} to {STR}x{INT}", pNeededItem.GetName(pPlayer), &Price, pBuyightItem.GetName(pPlayer), &Count);
+		GS()->AVM(ClientID, "SHOP", ID, HideID, "Exchange {STR}x{INT} to {STR}x{INT}", pNeededItem.GetName(pPlayer), Price, pBuyightItem.GetName(pPlayer), Count);
 		HideID++;
 	}
 	GS()->AV(ClientID, "null");

@@ -37,7 +37,7 @@
 
 #include <teeother/components/localization.h>
 #include <engine/server/sql_connect_pool.h>
-#include <game/server/enum_context.h>
+#include <game/enum_context.h>
 
 void CServer::CClient::Reset()
 {

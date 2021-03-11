@@ -16,8 +16,8 @@ void AccountMinerJob::ShowMenu(CPlayer *pPlayer)
 	const int JobUpgrCounts = pPlayer->Acc().m_aMiner[JOB_UPGR_COUNTS].m_Value;
 	const int ExperienceNeed = computeExperience(JobExperience);
 
-	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Miner Point: {INT} :: Level: {INT} Exp: {INT}/{INT}", &JobUpgrades, &JobLevel, &JobExperience, &ExperienceNeed);
-	GS()->AVD(ClientID, "MINERUPGRADE", JOB_UPGR_COUNTS, 20, TAB_UPGR_JOB, "Quantity +{INT} (Price 20P)", &JobUpgrCounts);
+	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Miner Point: {INT} :: Level: {INT} Exp: {INT}/{INT}", JobUpgrades, JobLevel, JobExperience, ExperienceNeed);
+	GS()->AVD(ClientID, "MINERUPGRADE", JOB_UPGR_COUNTS, 20, TAB_UPGR_JOB, "Quantity +{INT} (Price 20P)", JobUpgrCounts);
 }
 
 int AccountMinerJob::GetOreLevel(vec2 Pos) const
@@ -75,7 +75,7 @@ void AccountMinerJob::Work(CPlayer *pPlayer, int Level)
 
 		const int NewLevel = pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value;
 		ExperienceNeed = computeExperience(NewLevel);
-		GS()->ChatFollow(ClientID, "Miner Level UP. Now Level {INT}!", &NewLevel);
+		GS()->ChatFollow(ClientID, "Miner Level UP. Now Level {INT}!", NewLevel);
 	}
 
 	pPlayer->ProgressBar("Miner", pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value, pPlayer->Acc().m_aMiner[JOB_EXPERIENCE].m_Value, ExperienceNeed, MultiplierExperience);

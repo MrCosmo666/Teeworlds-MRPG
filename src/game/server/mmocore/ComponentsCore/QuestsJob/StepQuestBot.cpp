@@ -152,7 +152,7 @@ void CPlayerStepQuestBot::DoCollectItem(CPlayer* pPlayer)
 		const int Count = m_Bot->m_aItemSearchCount[i];
 		if(ItemID > 0 && Count > 0)
 		{
-			pGS->Chat(pPlayer->GetCID(), "[Done] Give the {STR}x{INT} to the {STR}!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer), &Count, m_Bot->GetName());
+			pGS->Chat(pPlayer->GetCID(), "[Done] Give the {STR}x{INT} to the {STR}!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer), Count, m_Bot->GetName());
 			antiStressing = (bool)(ItemID == m_Bot->m_aItemGives[0] || ItemID == m_Bot->m_aItemGives[1]);
 			pPlayer->GetItem(ItemID).Remove(Count);
 		}

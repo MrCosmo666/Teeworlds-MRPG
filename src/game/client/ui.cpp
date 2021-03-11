@@ -88,7 +88,7 @@ bool CUI::MouseHovered(const CUIRect* pRect)
 	if(g_Config.m_ClEditor || (m_pHoveredWindow && m_pCheckWindow && m_pCheckWindow == m_pHoveredWindow && MouseInside(&m_pHoveredWindow->m_WindowRect)))
 		return MouseInside(pRect) && MouseInsideClip();
 
-	// this logic ignores all MouseHovered excluding its area and available area. 
+	// this logic ignores all MouseHovered excluding its area and available area.
 	// So that each window is unique and clicks or selections don't look weird
 	if(!m_pCheckWindow)
 	{
@@ -429,6 +429,13 @@ void CUI::DoLabel(const CUIRect* pRect, const char* pText, float FontSize, EAlig
 	TextRender()->Text(0, TextX, pRect->y - FontSize / 10.0f, FontSize, pText, LineWidth, MultiLine);
 }
 
+void CUI::DoLabelColored(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, vec4 Color, float LineWidth, bool MultiLine)
+{
+	TextRender()->TextColor(Color);
+	DoLabel(pRect, pText, FontSize, Align, LineWidth, MultiLine);
+	TextRender()->TextColor(ms_DefaultTextColor);
+}
+
 void CUI::DoLabelHighlighted(const CUIRect* pRect, const char* pText, const char* pHighlighted, float FontSize, const vec4& TextColor, const vec4& HighlightColor)
 {
 	CTextCursor Cursor;
@@ -458,7 +465,7 @@ float CUI::GetFade(CUIRect *pRect, bool Checked, float Seconds)
 	m_AnimFades.erase(std::remove_if(m_AnimFades.begin(), m_AnimFades.end(), [&](const AnimFade& pFade)
 		{ return (pFade.m_StartTime + pFade.m_Seconds) < m_pClient->LocalTime(); }), m_AnimFades.end());
 	auto pItem = std::find_if(m_AnimFades.begin(), m_AnimFades.end(), [&pRect](const AnimFade& pFade)
-		{ return pRect->x == pFade.m_Rect.x && pRect->y == pFade.m_Rect.y && pRect->w == pFade.m_Rect.w && pRect->h == pFade.m_Rect.h; }); 
+		{ return pRect->x == pFade.m_Rect.x && pRect->y == pFade.m_Rect.y && pRect->w == pFade.m_Rect.w && pRect->h == pFade.m_Rect.h; });
 
 	if(Hovered || Checked)
 	{
@@ -561,6 +568,9 @@ void CUI::WindowRender()
 					break;
 				}
 			}
+			if((*it)->m_HighlightColor.a > 0.0f)
+				(*it)->HighlightDisable();
+
 			// end check only this window
 			FinishCheckWindow();
 		}
@@ -572,9 +582,9 @@ void CUI::WindowRender()
 	// clear all callback functions
 	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
 	{
-		// Lifehack I do not know how to bypass the uniqueness of Callback functions 
+		// Lifehack I do not know how to bypass the uniqueness of Callback functions
 		// by keeping the exit from the window if it is not updated, and at the same time keep the order of the windows
-		if((*it)->m_SkippedRenderFrames >= 1)
+		if((*it)->m_SkippedRenderFrames >= 3)
 		{
 			(*it)->m_pCallback = nullptr;
 			(*it)->m_SkippedRenderFrames = 0;

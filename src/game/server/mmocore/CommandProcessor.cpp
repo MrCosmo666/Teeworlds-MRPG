@@ -181,7 +181,7 @@ void CCommandProcessor::ConChatSellHouse(IConsole::IResult* pResult, void* pUser
 		pGS->Chat(ClientID, "You have no home.");
 		return;
 	}
-	
+
 	// sell house
 	pGS->Mmo()->House()->SellHouse(HouseID);
 }
@@ -198,7 +198,7 @@ void CCommandProcessor::ConChatPosition(IConsole::IResult* pResult, void* pUser)
 
 	const int PosX = pPlayer->GetCharacter()->m_Core.m_Pos.x / 32;
 	const int PosY = pPlayer->GetCharacter()->m_Core.m_Pos.y/32;
-	pGS->Chat(ClientID, "[{STR}] Position X: {INT} Y: {INT}.", pGS->Server()->GetWorldName(pGS->GetWorldID()), &PosX, &PosY);
+	pGS->Chat(ClientID, "[{STR}] Position X: {INT} Y: {INT}.", pGS->Server()->GetWorldName(pGS->GetWorldID()), PosX, PosY);
 	dbg_msg("test", "%0.f %0.f WorldID: %d", pPlayer->GetCharacter()->m_Core.m_Pos.x, pPlayer->GetCharacter()->m_Core.m_Pos.y, pGS->GetWorldID());
 }
 
@@ -291,7 +291,7 @@ void CCommandProcessor::ConChatVoucher(IConsole::IResult* pResult, void* pUser)
 
 	if (pResult->NumArguments() != 1)
 	{
-		pGS->Chat(ClientID, "Use: /voucher <voucher>");
+		pGS->Chat(ClientID, "Use: /voucher <voucher>", pPlayer);
 		return;
 	}
 

@@ -66,7 +66,7 @@ void CCharacterBotAI::ShowProgressHealth()
 			const float Percent = (Health * 100.0) / StartHealth;
 			std::unique_ptr<char[]> Progress = std::move(GS()->LevelString(100, Percent, 10, ':', ' '));
 			GS()->Broadcast(pPlayerDamage.first, BroadcastPriority::BROADCAST_GAME_PRIORITY, 100, "{STR} {STR}({INT}/{INT})", 
-				BotJob::ms_aDataBot[BotID].m_aNameBot, Progress.get(), &Health, &StartHealth);
+				BotJob::ms_aDataBot[BotID].m_aNameBot, Progress.get(), Health, StartHealth);
 		}
 	}	
 }
@@ -181,7 +181,7 @@ void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force)
 	{
 		InventoryItem& pItemSkillPlayer = pPlayer->GetItem(itSkillPoint);
 		pItemSkillPlayer.Add(1);
-		GS()->Chat(ClientID, "Skill points increased. Now ({INT}SP)", &pItemSkillPlayer.m_Count);
+		GS()->Chat(ClientID, "Skill points increased. Now ({INT}SP)", pItemSkillPlayer.m_Count);
 	}
 }
 

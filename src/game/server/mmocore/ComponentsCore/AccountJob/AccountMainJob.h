@@ -4,8 +4,8 @@
 #define GAME_SERVER_SQL_MAINACCOUNT_H
 #include <game/server/mmocore/MmoComponent.h>
 
-#include <game/server/mmocore/ComponentsCore/ShopJob.h>
 #include <string>
+#include <game/server/mmocore/ComponentsCore/ShopJob.h>
 
 class AccountMainJob : public MmoComponent
 {
@@ -29,7 +29,7 @@ public:
 		char m_aLanguage[8];
 		int m_AccountID;
 		int m_Level;
-		int m_Exp; 
+		int m_Exp;
 		int m_GuildID;
 		int m_GuildRank;
 		std::list < int > m_aHistoryWorld;

@@ -7,28 +7,20 @@
 
 class CSkill
 {
-	CGS* m_pGS;
-	CPlayer* m_pPlayer;
+	class CGS* m_pGS;
+	class CPlayer* m_pPlayer;
 	CGS* GS() const { return m_pGS; }
 
 public:
-	CSkill() : m_pPlayer(nullptr)
-	{
-		m_SkillID = 0;
-		m_Level = 0;
-		m_SelectedEmoticion = -1;
-	};
-
 	int m_SkillID;
 	int m_Level;
 	int m_SelectedEmoticion;
 
-	void SetSkillOwner(CPlayer* pPlayer);
-
 	CSkillInformation& Info() const;
-	bool IsLearned() const { return m_Level > 0; }
+	void SetSkillOwner(CPlayer* pPlayer);
 	int GetID() const { return m_SkillID; }
 	int GetBonus() const { return m_Level * Info().m_BonusCount; };
+	bool IsLearned() const { return m_Level > 0; }
 	const char* GetControlEmoteStateName() const { return Info().GetControlEmoteStateName(m_SelectedEmoticion); }
 
 	void SelectNextControlEmote();

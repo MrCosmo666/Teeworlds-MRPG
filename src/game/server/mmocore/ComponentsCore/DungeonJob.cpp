@@ -174,7 +174,7 @@ void DungeonJob::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
 
 		const int Minutes = BaseSeconds / 60;
 		const int Seconds = BaseSeconds - (BaseSeconds / 60 * 60);
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{INT}. {STR} : Time: {INT} minute(s) {INT} second(s)", &Rank, Job()->PlayerName(OwnerID), &Minutes, &Seconds);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{INT}. {STR} : Time: {INT} minute(s) {INT} second(s)", Rank, Job()->PlayerName(OwnerID), Minutes, Seconds);
 	}
 }
 
@@ -188,7 +188,7 @@ void DungeonJob::ShowDungeonsList(CPlayer* pPlayer, bool Story)
 
 		const int HideID = 7500 + dungeon.first;
 		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "Lvl{INT} {STR} : Players {INT} : {STR} [{INT}%]",
-			&dungeon.second.m_Level, dungeon.second.m_aName, &dungeon.second.m_Players, (dungeon.second.IsDungeonPlaying() ? "Active dungeon" : "Waiting players"), &dungeon.second.m_Progress);
+			dungeon.second.m_Level, dungeon.second.m_aName, dungeon.second.m_Players, (dungeon.second.IsDungeonPlaying() ? "Active dungeon" : "Waiting players"), dungeon.second.m_Progress);
 
 		ShowDungeonTop(pPlayer, dungeon.first, HideID);
 
@@ -216,7 +216,7 @@ void DungeonJob::ShowTankVotingDungeon(CPlayer* pPlayer)
 		if(!pSearchPlayer || pSearchPlayer->GetPlayerWorldID() != DungeonWorldID)
 			continue;
 
-		GS()->AVM(ClientID, "DUNGEONVOTE", i, NOPE, "Vote for {STR} (Votes: {INT})", Server()->ClientName(i), &pSearchPlayer->GetTempData().m_TempTankVotingDungeon);
+		GS()->AVM(ClientID, "DUNGEONVOTE", i, NOPE, "Vote for {STR} (Votes: {INT})", Server()->ClientName(i), pSearchPlayer->GetTempData().m_TempTankVotingDungeon);
 	}
 }
 

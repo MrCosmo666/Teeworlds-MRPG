@@ -3,8 +3,23 @@
 #ifndef GAME_ENUM_CONTEXT_H
 #define GAME_ENUM_CONTEXT_H
 
-#include <game/server/enum_global.h>
+#include <base/vmath.h>
 #include <generated/protocol.h>
+
+#define GRAY_COLOR vec3(40, 42, 45)
+#define LIGHT_GRAY_COLOR vec3(15, 15, 16)
+#define SMALL_LIGHT_GRAY_COLOR vec3(10, 11, 11)
+#define GOLDEN_COLOR vec3(35, 20, 2)
+#define LIGHT_GOLDEN_COLOR vec3(16, 7, 0)
+#define RED_COLOR vec3(40, 15, 15)
+#define LIGHT_RED_COLOR vec3(16, 7, 5)
+#define SMALL_LIGHT_RED_COLOR vec3(10, 5, 3)
+#define BLUE_COLOR vec3(10, 22, 40)
+#define LIGHT_BLUE_COLOR vec3(2, 7, 16)
+#define PURPLE_COLOR vec3(32, 10, 40)
+#define LIGHT_PURPLE_COLOR vec3(16, 5, 20)
+#define GREEN_COLOR vec3(15, 40, 15)
+#define LIGHT_GREEN_COLOR vec3(0, 16, 0)
 
 // jobs
 enum
@@ -311,6 +326,27 @@ enum DayType
 enum
 {
 	MAX_DROPPED_FROM_MOBS = 5,  // maximum number of items that can be dropped by mobs
+};
+
+enum CDataList
+{
+	MMO_DATA_INVENTORY_INFORMATION = 0,
+};
+
+// sturctures
+class CItemDataInformation
+{
+public:
+	char m_aName[32];
+	char m_aDesc[64];
+	char m_aIcon[16];
+	int m_Type;
+	int m_Function;
+	int m_Dysenthis;
+	int m_MinimalPrice;
+	int m_aAttribute[2];
+	int m_aAttributeCount[2];
+	int m_ProjID;
 };
 
 #endif

@@ -80,19 +80,19 @@ bool CSkill::Use()
 	{
 		for(int i = 0; i < MAX_PLAYERS; i++)
 		{
-			CPlayer* pPlayerSearch = GS()->GetPlayer(i, true, true);
-			if(!pPlayerSearch || !GS()->IsPlayerEqualWorldID(i) || distance(PlayerPosition, pPlayerSearch->GetCharacter()->GetPos()) > 800
-				|| (pPlayerSearch->GetCharacter()->IsAllowedPVP(ClientID) && i != ClientID))
+			CPlayer* pPlayer = GS()->GetPlayer(i, true, true);
+			if(!pPlayer || !GS()->IsPlayerEqualWorldID(i) || distance(PlayerPosition, pPlayer->GetCharacter()->GetPos()) > 800
+				|| (pPlayer->GetCharacter()->IsAllowedPVP(ClientID) && i != ClientID))
 				continue;
 
-			const int RealAmmo = 10 + pPlayerSearch->GetAttributeCount(Stats::StAmmo);
+			const int RealAmmo = 10 + pPlayer->GetAttributeCount(Stats::StAmmo);
 			const int RestoreAmmo = translate_to_percent_rest(RealAmmo, min(GetBonus(), 100));
 			for(int i = WEAPON_GUN; i <= WEAPON_LASER; i++)
 			{
-				pPlayerSearch->GetCharacter()->GiveWeapon(i, RestoreAmmo);
-				GS()->CreateSound(PlayerPosition, SOUND_CTF_GRAB_PL);
+				pPlayer->GetCharacter()->GiveWeapon(i, RestoreAmmo);
 				GS()->CreateDeath(PlayerPosition, i);
 			}
+			GS()->CreateSound(PlayerPosition, SOUND_CTF_GRAB_PL);
 		}
 
 		GS()->CreateText(NULL, false, vec2(PlayerPosition.x, PlayerPosition.y - 96.0f), vec2(0, 0), 40, "RECOVERY AMMO");
@@ -115,7 +115,7 @@ bool CSkill::Upgrade()
 	{
 		m_Level++;
 		SJK.UD("tw_accounts_skills", "SkillLevel = '%d' WHERE SkillID = '%d' AND OwnerID = '%d'", m_Level, m_SkillID, m_pPlayer->Acc().m_AccountID);
-		GS()->Chat(ClientID, "Increased the skill [{STR} level to {INT}]", Info().m_aName, &m_Level);
+		GS()->Chat(ClientID, "Increased the skill [{STR} level to {INT}]", Info().m_aName, m_Level);
 		return true;
 	}
 

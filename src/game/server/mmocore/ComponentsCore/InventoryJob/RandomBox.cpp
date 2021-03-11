@@ -70,7 +70,7 @@ void CRandomBoxRandomizer::Tick()
 			if(m_pPlayer && m_pPlayerUsesItem)
 			{
 				const char* pClientName = GS()->Server()->ClientName(m_pPlayer->GetCID());
-				GS()->Chat(-1, "{STR} uses {STR} and got {STR}x{INT}!", pClientName, m_pPlayerUsesItem->Info().GetName(), pPlayerRandomItem->Info().GetName(), &pRandomItem->m_Count);
+				GS()->Chat(-1, "{STR} uses {STR} and got {STR}x{INT}!", pClientName, m_pPlayerUsesItem->Info().GetName(), pPlayerRandomItem->Info().GetName(), pRandomItem->m_Count);
 			}
 			GS()->m_World.DestroyEntity(this);
 			return;

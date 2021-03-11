@@ -4,7 +4,6 @@
 #define ENGINE_CLIENT_CLIENT_H
 
 #include <base/hash.h>
-#include <engine/shared/mmodata.h>
 #include <engine/client/http.h>
 
 class CGraph
@@ -35,7 +34,7 @@ struct CDownloadChunkItem
 		m_aFilename[0] = 0;
 		m_aFilenameTemp[0] = 0;
 		m_aName[0] = 0;
-		m_FileTemp = 0;
+		m_FileTemp = nullptr;
 		m_Chunk = 0;
 		m_Sha256 = SHA256_ZEROED;
 		m_Sha256Present = false;
@@ -236,7 +235,7 @@ public:
 	CClient();
 
 	// ----- send functions -----
-	virtual int SendMsg(CMsgPacker* pMsg, int Flags);
+	int SendMsg(CMsgPacker* pMsg, int Flags) override;
 
 	void SendInfo();
 	void SendEnterGame();
@@ -244,26 +243,32 @@ public:
 	void OnClientOnline();
 
 	// mmotee
-	virtual int ClientFPS() const;
-	bool EditorHasUnsavedData() { return m_pEditor->HasUnsavedData(); }
+	int ClientFPS() const override;
+	bool EditorHasUnsavedData() override { return m_pEditor->HasUnsavedData(); }
 
-	virtual bool RconAuthed() const { return m_RconAuthed != 0; }
-	virtual bool UseTempRconCommands() const { return m_UseTempRconCommands != 0; }
-	void RconAuth(const char* pName, const char* pPassword);
-	virtual void Rcon(const char* pCmd);
+	bool RconAuthed() const override { return m_RconAuthed != 0; }
+	bool UseTempRconCommands() const override { return m_UseTempRconCommands != 0; }
+	void RconAuth(const char* pName, const char* pPassword) override;
+	void Rcon(const char* pCmd) override;
 
-	virtual bool ConnectionProblems() const;
-	virtual int GetInputtimeMarginStabilityScore();
+	bool ConnectionProblems() const override;
+	int GetInputtimeMarginStabilityScore() override;
 
-	virtual bool SoundInitFailed() const { return m_SoundInitFailed; }
+	bool SoundInitFailed() const override { return m_SoundInitFailed; }
 
+	const char* GetJsonDataMRPG(int DataType) override
+	{
+		if(m_DataMmo.IsLoaded())
+			return m_DataMmo.GetJsonItem(DataType);
+		return "\0";
+	}
 
 	void SendInput();
 
 	// TODO: OPT: do this alot smarter!
-	virtual const int* GetInput(int Tick) const;
+	const int* GetInput(int Tick) const override;
 
-	const char* LatestVersion() const;
+	const char* LatestVersion() const override;
 	void VersionUpdate();
 
 	// ------ state handling -----
@@ -271,38 +276,38 @@ public:
 
 	// called when the map is loaded and we should init for a new round
 	void OnEnterGame();
-	virtual void EnterGame();
+	void EnterGame() override;
 
-	virtual void Connect(const char* pAddress);
+	void Connect(const char* pAddress) override;
 	void DisconnectWithReason(const char* pReason);
-	virtual void Disconnect();
-	const char* ServerAddress() const { return m_aServerAddressStr; }
+	void Disconnect() override;
+	const char* ServerAddress() const override { return m_aServerAddressStr; }
 
 
-	virtual void GetServerInfo(CServerInfo* pServerInfo);
+	void GetServerInfo(CServerInfo* pServerInfo) override;
 
 	// ---
 
-	const void* SnapGetItem(int SnapID, int Index, CSnapItem* pItem) const;
-	void SnapInvalidateItem(int SnapID, int Index);
-	const void* SnapFindItem(int SnapID, int Type, int ID) const;
-	int SnapNumItems(int SnapID) const;
-	void* SnapNewItem(int Type, int ID, int Size);
-	void SnapSetStaticsize(int ItemType, int Size);
+	const void* SnapGetItem(int SnapID, int Index, CSnapItem* pItem) const override;
+	void SnapInvalidateItem(int SnapID, int Index) override;
+	const void* SnapFindItem(int SnapID, int Type, int ID) const override;
+	int SnapNumItems(int SnapID) const override;
+	void* SnapNewItem(int Type, int ID, int Size) override;
+	void SnapSetStaticsize(int ItemType, int Size) override;
 
 	void Render();
 	void DebugRender();
 
 	//mmotee
-	void RequestMmoInfo();
+	void RequestMmoInfo() override;
 	void ResetMmoInfo();
 	void FinishMmoInfo();
 	void LoadMmoInfo();
-	virtual void OpenUpdateArchive();
+	void OpenUpdateArchive() override;
 
-	virtual void Quit();
+	void Quit() override;
 
-	virtual const char* ErrorString() const;
+	const char* ErrorString() const override;
 
 	const char* LoadMap(const char* pName, const char* pFilename, const SHA256_DIGEST* pWantedSha256, unsigned WantedCrc);
 	const char* LoadMapSearch(const char* pMapName, const SHA256_DIGEST* pWantedSha256, int WantedCrc);
@@ -311,18 +316,18 @@ public:
 	void ProcessConnlessPacket(CNetChunk* pPacket);
 	void ProcessServerPacket(CNetChunk* pPacket);
 
-	const char* GetCurrentMapName() const { return m_aCurrentMap; }
-	const char* GetCurrentMapPath() const { return m_aCurrentMapPath; }
-	virtual const char* MapDownloadName() const { return m_DownloadMap.m_aName; }
-	virtual int MapDownloadAmount() const { return m_DownloadMap.m_Amount; }
-	virtual int MapDownloadTotalsize() const { return m_DownloadMap.m_Totalsize; }
-	virtual int MmoDownloadAmount() const { return m_DownloadMmoData.m_Amount; }
-	virtual int MmoDownloadTotalsize() const { return m_DownloadMmoData.m_Totalsize; }
+	const char* GetCurrentMapName() const override { return m_aCurrentMap; }
+	const char* GetCurrentMapPath() const override { return m_aCurrentMapPath; }
+	const char* MapDownloadName() const override { return m_DownloadMap.m_aName; }
+	int MapDownloadAmount() const override { return m_DownloadMap.m_Amount; }
+	int MapDownloadTotalsize() const override { return m_DownloadMap.m_Totalsize; }
+	int MmoDownloadAmount() const override { return m_DownloadMmoData.m_Amount; }
+	int MmoDownloadTotalsize() const override { return m_DownloadMmoData.m_Totalsize; }
 
 	void PumpNetwork();
 
-	virtual void OnDemoPlayerSnapshot(void* pData, int Size);
-	virtual void OnDemoPlayerMessage(void* pData, int Size);
+	void OnDemoPlayerSnapshot(void* pData, int Size) override;
+	void OnDemoPlayerMessage(void* pData, int Size) override;
 
 	void Update();
 
@@ -343,8 +348,6 @@ public:
 	static void Con_Screenshot(IConsole::IResult* pResult, void* pUserData);
 	static void Con_Rcon(IConsole::IResult* pResult, void* pUserData);
 	static void Con_RconAuth(IConsole::IResult* pResult, void* pUserData);
-	static void Con_AddFavorite(IConsole::IResult* pResult, void* pUserData);
-	static void Con_RemoveFavorite(IConsole::IResult* pResult, void* pUserData);
 	static void Con_Play(IConsole::IResult* pResult, void* pUserData);
 	static void Con_Record(IConsole::IResult* pResult, void* pUserData);
 	static void Con_StopRecord(IConsole::IResult* pResult, void* pUserData);
@@ -357,32 +360,32 @@ public:
 
 	void RegisterCommands();
 
-	const char* DemoPlayer_Play(const char* pFilename, int StorageType);
-	void DemoRecorder_Start(const char* pFilename, bool WithTimestamp);
-	void DemoRecorder_HandleAutoStart();
-	void DemoRecorder_Stop();
+	const char* DemoPlayer_Play(const char* pFilename, int StorageType) override;
+	void DemoRecorder_Start(const char* pFilename, bool WithTimestamp) override;
+	void DemoRecorder_HandleAutoStart() override;
+	void DemoRecorder_Stop() override;
 	void DemoRecorder_AddDemoMarker();
-	void RecordGameMessage(bool State) { m_RecordGameMessage = State; }
+	void RecordGameMessage(bool State) override { m_RecordGameMessage = State; }
 
-	void AutoScreenshot_Start();
-	void AutoStatScreenshot_Start();
+	void AutoScreenshot_Start() override;
+	void AutoStatScreenshot_Start() override;
 	void AutoScreenshot_Cleanup();
 
-	void ServerBrowserUpdate();
+	void ServerBrowserUpdate() override;
 
 	// gfx
-	void SwitchWindowScreen(int Index);
-	void ToggleFullscreen();
-	void ToggleWindowBordered();
-	void ToggleWindowVSync();
+	void SwitchWindowScreen(int Index) override;
+	void ToggleFullscreen() override;
+	void ToggleWindowBordered() override;
+	void ToggleWindowVSync() override;
 
 	// mrpg
 private:
 
 public:
 
-	void NotifyWindow();
+	void NotifyWindow() override;
 
-	bool IsWindowActive() { return m_pGraphics->WindowActive(); }
+	bool IsWindowActive() override { return m_pGraphics->WindowActive(); }
 };
 #endif

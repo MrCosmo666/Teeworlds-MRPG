@@ -17,7 +17,7 @@
 class CGS : public IGameServer
 {
 	/* #########################################################################
-		VAR AND OBJECT GAMECONTEX DATA 
+		VAR AND OBJECT GAMECONTEX DATA
 	######################################################################### */
 	int m_WorldID;
 	int m_DungeonID;
@@ -57,7 +57,7 @@ public:
 	CPathfinder* PathFinder() const { return m_pPathFinder; }
 
 	/* #########################################################################
-		SWAP GAMECONTEX DATA 
+		SWAP GAMECONTEX DATA
 	######################################################################### */
 	static std::map < std::string /* effect */, int /* seconds */ > ms_aEffects[MAX_PLAYERS];
 	// - - - - - - - - - - - -
@@ -72,7 +72,7 @@ public:
 	static std::map < int, StructAttribut > ms_aAttributsInfo;
 
 	/* #########################################################################
-		HELPER PLAYER FUNCTION 
+		HELPER PLAYER FUNCTION
 	######################################################################### */
 	class CCharacter *GetPlayerChar(int ClientID);
 	CPlayer *GetPlayer(int ClientID, bool CheckAuthed = false, bool CheckCharacter = false);
@@ -83,7 +83,7 @@ public:
 	const char* GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const;
 
 	/* #########################################################################
-		EVENTS 
+		EVENTS
 	######################################################################### */
 	void CreateDamage(vec2 Pos, int ClientID, int Amount, bool CritDamage, bool OnlyVanilla);
 	void CreateHammerHit(vec2 Pos);
@@ -97,7 +97,7 @@ public:
 	void SendMmoPotion(vec2 Pos, const char *Potion, bool Added);
 
 	/* #########################################################################
-		CHAT FUNCTIONS 
+		CHAT FUNCTIONS
 	######################################################################### */
 private:
 	void SendChat(int ChatterClientID, int Mode, int To, const char *pText);
@@ -115,17 +115,17 @@ public:
 	void Motd(int ClientID, const char* Text, ...);
 
 	/* #########################################################################
-		BROADCAST FUNCTIONS 
+		BROADCAST FUNCTIONS
 	######################################################################### */
 private:
 	struct CBroadcastState
 	{
 		int m_NoChangeTick;
 		char m_aPrevMessage[1024];
-		
+
 		int m_Priority;
 		char m_aNextMessage[1024];
-		
+
 		int m_LifeSpanTick;
 		int m_TimedPriority;
 		char m_aTimedMessage[1024];
@@ -139,7 +139,7 @@ public:
 	void BroadcastTick(int ClientID);
 
 	/* #########################################################################
-		PACKET MESSAGE FUNCTIONS 
+		PACKET MESSAGE FUNCTIONS
 	######################################################################### */
 	void SendEmoticon(int ClientID, int Emoticon, bool SenderClient = false);
 	void SendWeaponPickup(int ClientID, int Weapon);
@@ -160,10 +160,11 @@ public:
 	void SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char* Message, int Style = -1, int TalkingEmote = -1);
 	void ClearTalkText(int ClientID);
 	void SendProgressBar(int ClientID, int Count, int Request, const char *Message);
+	void SendInformationBoxGUI(int ClientID, const char* pMsg, ...);
 
 	/* #########################################################################
-		ENGINE GAMECONTEXT 
-	######################################################################### */	
+		ENGINE GAMECONTEXT
+	######################################################################### */
 	void OnInit(int WorldID) override;
 	void OnConsoleInit() override;
 	void OnShutdown() override { delete this; }
@@ -173,7 +174,7 @@ public:
 	void OnPreSnap() override;
 	void OnSnap(int ClientID) override;
 	void OnPostSnap() override;
-	
+
 	void OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID) override;
 	void OnClientConnected(int ClientID) override;
 	void PrepareClientChangeWorld(int ClientID) override;
@@ -192,7 +193,7 @@ public:
 	int GetRank(int AccountID) override;
 
 	/* #########################################################################
-		CONSOLE GAMECONTEXT 
+		CONSOLE GAMECONTEXT
 	######################################################################### */
 private:
 	static void ConSetWorldTime(IConsole::IResult *pResult, void *pUserData);
@@ -207,11 +208,11 @@ private:
 	static void ConchainGameinfoUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 
 	/* #########################################################################
-		VOTING MMO GAMECONTEXT 
+		VOTING MMO GAMECONTEXT
 	######################################################################### */
 	std::list<CVoteOptions> m_aPlayerVotes[MAX_PLAYERS];
 
-public:	
+public:
 	void AV(int ClientID , const char *pCmd, const char *pDesc = "\0", const int TempInt = -1, const int TempInt2 = -1, const char *pIcon = "unused", VoteCallBack Callback = nullptr);
 	void AVL(int ClientID, const char *pCmd, const char *pText, ...);
 	void AVH(int ClientID, const int HideID, vec3 Color, const char *pText, ...);
@@ -234,7 +235,7 @@ public:
 	bool ParsingVoteCommands(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text, VoteCallBack Callback = nullptr);
 
 	/* #########################################################################
-		MMO GAMECONTEXT 
+		MMO GAMECONTEXT
 	######################################################################### */
 	int CreateBot(short BotType, int BotID, int SubID);
 	void CreateText(CEntity* pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char* pText);

@@ -69,8 +69,8 @@ void AccountPlantJob::ShowMenu(CPlayer* pPlayer)
 	const int JobUpgrCounts = pPlayer->Acc().m_aPlant[JOB_UPGR_COUNTS].m_Value;
 	const int ExperienceNeed = computeExperience(JobExperience);
 
-	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Plants Point: {INT} :: Level: {INT} Exp: {INT}/{INT}", &JobUpgrades, &JobLevel, &JobExperience, &ExperienceNeed);
-	GS()->AVD(ClientID, "PLANTUPGRADE", JOB_UPGR_COUNTS, 20, TAB_UPGR_JOB, "Quantity +{INT} (Price 20P)", &JobUpgrCounts);
+	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Plants Point: {INT} :: Level: {INT} Exp: {INT}/{INT}", JobUpgrades, JobLevel, JobExperience, ExperienceNeed);
+	GS()->AVD(ClientID, "PLANTUPGRADE", JOB_UPGR_COUNTS, 20, TAB_UPGR_JOB, "Quantity +{INT} (Price 20P)", JobUpgrCounts);
 }
 
 void AccountPlantJob::ShowPlantsItems(int ClientID)
@@ -103,7 +103,7 @@ void AccountPlantJob::Work(CPlayer* pPlayer, int Level)
 		}
 
 		ExperienceNeed = computeExperience(pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value);
-		GS()->ChatFollow(ClientID, "Plants Level UP. Now Level {INT}!", &pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value);
+		GS()->ChatFollow(ClientID, "Plants Level UP. Now Level {INT}!", pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value);
 	}
 
 	pPlayer->ProgressBar("Plants", pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value, pPlayer->Acc().m_aPlant[JOB_EXPERIENCE].m_Value, ExperienceNeed, MultiplierExperience);

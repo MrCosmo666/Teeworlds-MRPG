@@ -7,7 +7,7 @@
 #include <list>
 #include <vector>
 #include <engine/shared/protocol.h>
-#include <game/server/enum_context.h>
+#include <game/enum_context.h>
 
 class MmoComponent
 {

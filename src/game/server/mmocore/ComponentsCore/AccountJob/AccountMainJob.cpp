@@ -1,11 +1,11 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include "AccountMainJob.h"
 #include <base/hash_ctxt.h>
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 #include <teeother/components/localization.h>
 #include <teeother/tl/nlohmann_json.h>
-#include "AccountMainJob.h"
 
 using namespace sqlstr;
 std::map < int, AccountMainJob::StructData > AccountMainJob::ms_aData;
@@ -76,9 +76,9 @@ int AccountMainJob::RegisterAccount(int ClientID, const char *Login, const char 
 int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Password)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, false);
-	if(!pPlayer) 
+	if(!pPlayer)
 		return SendAuthCode(ClientID, AUTH_ALL_UNKNOWN);
-	
+
 	const int LengthLogin = str_length(Login);
 	const int LengthPassword = str_length(Password);
 	if(LengthLogin > 12 || LengthLogin < 4 || LengthPassword > 12 || LengthPassword < 4)
@@ -134,7 +134,7 @@ int AccountMainJob::LoginAccount(int ClientID, const char *Login, const char *Pa
 		}
 
 		GS()->Chat(ClientID, "- - - - - - - [Successful login] - - - - - - -");
-		GS()->Chat(ClientID, "Menu is available in call-votes!");
+		GS()->Chat(ClientID, "Menu is available in call-votes! {INT}", pPlayer->Acc().m_AccountID);
 		GS()->m_pController->DoTeamChange(pPlayer, false);
 
 		char aAddrStr[64];
@@ -153,7 +153,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
-	GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 200, "You are located {STR} ({STR})", 
+	GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 200, "You are located {STR} ({STR})",
 		Server()->GetWorldName(GS()->GetWorldID()), (GS()->IsAllowedPVP() ? "Zone PVP" : "Safe zone"));
 
 	GS()->SendWorldMusic(ClientID, (GS()->IsDungeon() ? -1 : 0));
@@ -161,7 +161,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	{
 		const int CountMessageInbox = Job()->Inbox()->GetActiveInbox(pPlayer);
 		if (CountMessageInbox > 0)
-			GS()->Chat(ClientID, "You have {INT} unread messages!", &CountMessageInbox);
+			GS()->Chat(ClientID, "You have {INT} unread messages!", CountMessageInbox);
 
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		GS()->SendFullyEquipments(ClientID);
@@ -170,7 +170,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 
 	Job()->OnInitAccount(ClientID);
 	const int Rank = GetRank(pPlayer->Acc().m_AccountID);
-	GS()->Chat(-1, "{STR} logged to account. Rank #{INT}", Server()->ClientName(ClientID), &Rank);
+	GS()->Chat(-1, "{STR} logged to account. Rank #{INT}", Server()->ClientName(ClientID), Rank);
 #ifdef CONF_DISCORD
 	char aLoginBuf[64];
 	str_format(aLoginBuf, sizeof(aLoginBuf), "%s logged in Account ID %d", Server()->ClientName(ClientID), pPlayer->Acc().m_AccountID);
@@ -183,7 +183,7 @@ void AccountMainJob::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		GS()->Chat(ClientID, "Quest NPCs are marked with an aura Heart and Shield.");
 		GS()->Chat(ClientID, "Shield around you indicates location of active quest.");
 	}
-	
+
 	// settings
 	if(!pPlayer->GetItem(itModePVP).m_Count)
 		pPlayer->GetItem(itModePVP).Add(1, 1);
@@ -203,14 +203,14 @@ void AccountMainJob::DiscordConnect(int ClientID, const char *pDID)
 {
 #ifdef CONF_DISCORD
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true);
-	if(!pPlayer) 
-		return;	
+	if(!pPlayer)
+		return;
 
 	CSqlString<64> DiscordID = CSqlString<64>(pDID);
-	
+
 	// disable another account if it is connected to this discord
 	SJK.UD("tw_accounts_data", "DiscordID = 'null' WHERE DiscordID = '%s'", DiscordID.cstr());
-	
+
 	// connect the player discord id
 	SJK.UDS(1000,"tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", DiscordID.cstr(), pPlayer->Acc().m_AccountID);
 
@@ -276,7 +276,7 @@ bool AccountMainJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		// if no modules are found
 		if (!IsFoundModules)
 			GS()->AVM(ClientID, "null", NOPE, TAB_SETTINGS_MODULES, "The list of modules equipment is empty.");
-	
+
 		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}

@@ -41,7 +41,7 @@ CPlayer::~CPlayer()
 }
 
 /* #########################################################################
-	FUNCTIONS PLAYER ENGINE 
+	FUNCTIONS PLAYER ENGINE
 ######################################################################### */
 void CPlayer::Tick()
 {
@@ -196,7 +196,7 @@ void CPlayer::Snap(int SnappingClient)
 	StrToInts(pClientInfo->m_Potions, 12, Buffer.buffer());
 	Buffer.clear();
 
-	Server()->Localization()->Format(Buffer, GetLanguage(), "{INT}", &GetItem(itGold).m_Count);
+	Server()->Localization()->Format(Buffer, GetLanguage(), "{INT}", GetItem(itGold).m_Count);
 	StrToInts(pClientInfo->m_Gold, 6, Buffer.buffer());
 	Buffer.clear();
 
@@ -279,7 +279,7 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 		m_PlayerFlags = NewInput->m_PlayerFlags;
 		return;
 	}
-	
+
 	m_PlayerFlags = NewInput->m_PlayerFlags;
 
 	if(m_pCharacter)
@@ -307,13 +307,13 @@ void CPlayer::OnPredictedInput(CNetObj_PlayerInput *NewInput)
 
 int CPlayer::GetTeam()
 {
-	if(GS()->Mmo()->Account()->IsActive(m_ClientID)) 
+	if(GS()->Mmo()->Account()->IsActive(m_ClientID))
 		return Acc().m_Team;
 	return TEAM_SPECTATORS;
 }
 
 /* #########################################################################
-	FUNCTIONS PLAYER HELPER 
+	FUNCTIONS PLAYER HELPER
 ######################################################################### */
 void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp)
 {
@@ -337,12 +337,12 @@ bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int Maxi
 	if((*Upgrade + Count) > MaximalUpgrade)
 	{
 		GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Upgrade has a maximum level.");
-		return false;		
+		return false;
 	}
 
 	if(*Useless < UpgradeNeed)
 	{
-		GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Not upgrade points for +{INT}. Required {INT}.", &Count, &UpgradeNeed);
+		GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Not upgrade points for +{INT}. Required {INT}.", Count, UpgradeNeed);
 		return false;
 	}
 
@@ -352,7 +352,7 @@ bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int Maxi
 }
 
 /* #########################################################################
-	FUNCTIONS PLAYER ACCOUNT 
+	FUNCTIONS PLAYER ACCOUNT
 ######################################################################### */
 bool CPlayer::SpendCurrency(int Price, int ItemID)
 {
@@ -362,7 +362,7 @@ bool CPlayer::SpendCurrency(int Price, int ItemID)
 	InventoryItem &pItemPlayer = GetItem(ItemID);
 	if(pItemPlayer.m_Count < Price)
 	{
-		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", &Price, &pItemPlayer.m_Count, pItemPlayer.Info().GetName(this), NULL);
+		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", Price, pItemPlayer.m_Count, pItemPlayer.Info().GetName(this));
 		return false;
 	}
 	return pItemPlayer.Remove(Price);
@@ -375,7 +375,7 @@ void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
 
 	if((Random && random_int() % Random == 0) || !Random)
 	{
-		GS()->Chat(m_ClientID, "You got the effect {STR} time {INT}sec.", Potion, &Sec);
+		GS()->Chat(m_ClientID, "You got the effect {STR} time {INT}sec.", Potion, Sec);
 		CGS::ms_aEffects[m_ClientID][Potion] = Sec;
 		GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, Potion, true);
 	}
@@ -405,7 +405,7 @@ void CPlayer::UpdateTempData(int Health, int Mana)
 void CPlayer::AddExp(int Exp)
 {
 	Acc().m_Exp += Exp;
-	for( ; Acc().m_Exp >= ExpNeed(Acc().m_Level); ) 
+	for( ; Acc().m_Exp >= ExpNeed(Acc().m_Level); )
 	{
 		Acc().m_Exp -= ExpNeed(Acc().m_Level), Acc().m_Level++;
 		Acc().m_Upgrade += 10;
@@ -413,7 +413,7 @@ void CPlayer::AddExp(int Exp)
 		GS()->CreateDeath(m_pCharacter->m_Core.m_Pos, m_ClientID);
 		GS()->CreateSound(m_pCharacter->m_Core.m_Pos, 4);
 		GS()->CreateText(m_pCharacter, false, vec2(0, -40), vec2(0, -1), 30, "level");
-		GS()->ChatFollow(m_ClientID, "Level UP. Now Level {INT}!", &Acc().m_Level);
+		GS()->ChatFollow(m_ClientID, "Level UP. Now Level {INT}!", Acc().m_Level);
 		if(Acc().m_Exp < ExpNeed(Acc().m_Level))
 		{
 			GS()->StrongUpdateVotes(m_ClientID, MenuList::MAIN_MENU);
@@ -430,9 +430,9 @@ void CPlayer::AddExp(int Exp)
 		GS()->Mmo()->Member()->AddExperience(Acc().m_GuildID);
 }
 
-void CPlayer::AddMoney(int Money) 
-{ 
-	GetItem(itGold).Add(Money); 
+void CPlayer::AddMoney(int Money)
+{
+	GetItem(itGold).Add(Money);
 }
 
 bool CPlayer::GetHidenMenu(int HideID) const
@@ -444,10 +444,10 @@ bool CPlayer::GetHidenMenu(int HideID) const
 }
 
 bool CPlayer::IsAuthed()
-{ 
+{
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID))
 		return (bool)(Acc().m_AccountID > 0);
-	return false; 
+	return false;
 }
 
 int CPlayer::GetStartTeam()
@@ -482,11 +482,11 @@ void CPlayer::ShowInformationStats()
 	const int StartHealth = GetStartHealth();
 	const int Mana = GetMana();
 	const int StartMana = GetStartMana();
-	GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_BASIC_STATS, 100, "H: {INT}/{INT} M: {INT}/{INT}", &Health, &StartHealth, &Mana, &StartMana);
+	GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_BASIC_STATS, 100, "H: {INT}/{INT} M: {INT}/{INT}", Health, StartHealth, Mana, StartMana);
 }
 
 /* #########################################################################
-	FUNCTIONS PLAYER PARSING 
+	FUNCTIONS PLAYER PARSING
 ######################################################################### */
 bool CPlayer::ParseItemsF3F4(int Vote)
 {
@@ -538,7 +538,7 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 {
 	if(PPSTR(CMD, "UPGRADE") == 0)
 	{
-		if(Upgrade(Get, &Acc().m_aStats[VoteID], &Acc().m_Upgrade, VoteID2, 1000)) 
+		if(Upgrade(Get, &Acc().m_aStats[VoteID], &Acc().m_Upgrade, VoteID2, 1000))
 		{
 			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_UPGRADES);
 			GS()->ResetVotes(m_ClientID, MenuList::MENU_UPGRADE);
@@ -570,7 +570,7 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 	return false;
 }
 
-InventoryItem &CPlayer::GetItem(int ItemID) 
+InventoryItem &CPlayer::GetItem(int ItemID)
 {
 	InventoryJob::ms_aItems[m_ClientID][ItemID].m_ItemID = ItemID;
 	InventoryJob::ms_aItems[m_ClientID][ItemID].SetItemOwner(this);
@@ -657,7 +657,7 @@ int CPlayer::GetLevelAllAttributes()
 	return Atributs;
 }
 
-// - - - - - - T A L K I N G - - - - B O T S - - - - - - - - - 
+// - - - - - - T A L K I N G - - - - B O T S - - - - - - - - -
 void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 {
 	if (TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] || (!IsStartDialogue && m_DialogNPC.m_TalkedID == -1))
@@ -759,15 +759,15 @@ void CPlayer::ClearTalking()
 	m_DialogNPC.m_FreezedProgress = false;
 }
 
-// - - - - - - F O R M A T - - - - - T E X T - - - - - - - - - 
-const char *CPlayer::GetDialogText() 
-{ 
-	return GS()->Server()->Localization()->Localize(GetLanguage(), m_aFormatDialogText); 
+// - - - - - - F O R M A T - - - - - T E X T - - - - - - - - -
+const char *CPlayer::GetDialogText()
+{
+	return GS()->Server()->Localization()->Localize(GetLanguage(), m_aFormatDialogText);
 }
 
 void CPlayer::FormatDialogText(int DataBotID, const char *pText)
 {
-	if(!GS()->Mmo()->BotsData()->IsDataBotValid(DataBotID) || m_aFormatDialogText[0] != '\0') 
+	if(!GS()->Mmo()->BotsData()->IsDataBotValid(DataBotID) || m_aFormatDialogText[0] != '\0')
 		return;
 
 	str_copy(m_aFormatDialogText, pText, sizeof(m_aFormatDialogText));
@@ -825,10 +825,10 @@ void CPlayer::ChangeWorld(int WorldID)
 }
 
 void CPlayer::SendClientInfo(int TargetID)
-{	
+{
 	if(TargetID != -1 && (TargetID < 0 || TargetID >= MAX_PLAYERS || !Server()->ClientIngame(TargetID)))
 		return;
-		
+
 	CNetMsg_Sv_ClientInfo ClientInfoMsg;
 	ClientInfoMsg.m_ClientID = m_ClientID;
 	ClientInfoMsg.m_Local = (bool)(m_ClientID == TargetID);

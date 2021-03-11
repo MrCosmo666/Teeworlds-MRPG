@@ -2,16 +2,14 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_ITEM_INVENTORY_H
 #define GAME_SERVER_ITEM_INVENTORY_H
-#include <game/server/enum_context.h>
-
+#include <game/enum_context.h>
 #include "ItemInformation.h"
 
 class CInventoryItem
 {
 	class CGS* m_pGS;
 	class CPlayer* m_pPlayer;
-	CGS* GS() const { return m_pGS; }
-	bool Save();
+	class CGS* GS() const { return m_pGS; }
 
 public:
 	int m_ItemID;
@@ -44,6 +42,9 @@ public:
 
 	void FormatEnchantLevel(char* pBuffer, int Size) const { Info().FormatEnchantLevel(pBuffer, Size, m_Enchant); }
 	void FormatAttributes(char* pBuffer, int Size) const { Info().FormatAttributes(pBuffer, Size, m_Enchant); }
+
+private:
+	bool Save();
 };
 typedef CInventoryItem InventoryItem;
 

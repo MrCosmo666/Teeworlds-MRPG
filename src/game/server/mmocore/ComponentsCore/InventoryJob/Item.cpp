@@ -1,11 +1,11 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <game/server/gamecontext.h>
 #include "Item.h"
-
 #include "RandomBox.h"
 
-int randomRangecount(int startrandom, int endrandom, int count)
+#include <game/server/gamecontext.h>
+
+inline int randomRangecount(int startrandom, int endrandom, int count)
 {
 	int result = 0;
 	for(int i = 0; i < count; i++)
@@ -89,9 +89,9 @@ bool CInventoryItem::Add(int Count, int Settings, int Enchant, bool Message)
 		return true;
 
 	if(Info().m_Type == ItemType::TYPE_EQUIP || Info().m_Type == ItemType::TYPE_MODULE)
-		GS()->Chat(-1, "{STR} got of the {STR}x{INT}!", GS()->Server()->ClientName(ClientID), Info().GetName(), &Count);
+		GS()->Chat(-1, "{STR} got of the {STR}x{INT}!", GS()->Server()->ClientName(ClientID), Info().GetName(), Count);
 	else if(Info().m_Type != ItemType::TYPE_INVISIBLE)
-		GS()->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(m_pPlayer), &Count);
+		GS()->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(m_pPlayer), Count);
 
 	return true;
 }
@@ -151,20 +151,20 @@ bool CInventoryItem::Use(int Count)
 	if(m_ItemID == itPotionHealthRegen && Remove(Count, 0))
 	{
 		m_pPlayer->GiveEffect("RegenHealth", 15);
-		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), &Count);
+		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), Count);
 	}
 	// potion mana regen
 	else if(m_ItemID == itPotionManaRegen && Remove(Count, 0))
 	{
 		m_pPlayer->GiveEffect("RegenMana", 15);
-		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), &Count);
+		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), Count);
 	}
 	// potion resurrection
 	else if(m_ItemID == itPotionResurrection && Remove(Count, 0))
 	{
 		m_pPlayer->GetTempData().m_TempSafeSpawn = false;
 		m_pPlayer->GetTempData().m_TempHealth = m_pPlayer->GetStartHealth();
-		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), &Count);
+		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), Count);
 	}
 	// ticket discount craft
 	else if(m_ItemID == itTicketDiscountCraft)
@@ -175,14 +175,14 @@ bool CInventoryItem::Use(int Count)
 	else if(m_ItemID == itCapsuleSurvivalExperience && Remove(Count, 0))
 	{
 		int Getting = randomRangecount(10, 50, Count);
-		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} Survival Experience.", GS()->Server()->ClientName(ClientID), Info().GetName(), &Count, &Getting);
+		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} Survival Experience.", GS()->Server()->ClientName(ClientID), Info().GetName(), Count, Getting);
 		m_pPlayer->AddExp(Getting);
 	}
 	// little bag gold
 	else if(m_ItemID == itLittleBagGold && Remove(Count, 0))
 	{
 		int Getting = randomRangecount(10, 50, Count);
-		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} gold.", GS()->Server()->ClientName(ClientID), Info().GetName(), &Count, &Getting);
+		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} gold.", GS()->Server()->ClientName(ClientID), Info().GetName(), Count, Getting);
 		m_pPlayer->AddMoney(Getting);
 	}
 	// ticket reset for class stats
@@ -202,7 +202,7 @@ bool CInventoryItem::Use(int Count)
 			m_pPlayer->Acc().m_aStats[pAttribute.first] = 0;
 		}
 
-		GS()->Chat(-1, "{STR} used {STR} returned {INT} upgrades.", GS()->Server()->ClientName(ClientID), Info().GetName(), &BackUpgrades);
+		GS()->Chat(-1, "{STR} used {STR} returned {INT} upgrades.", GS()->Server()->ClientName(ClientID), Info().GetName(), BackUpgrades);
 		m_pPlayer->Acc().m_Upgrade += BackUpgrades;
 		GS()->Mmo()->SaveAccount(m_pPlayer, SaveType::SAVE_UPGRADES);
 	}
@@ -232,7 +232,7 @@ bool CInventoryItem::Use(int Count)
 			m_pPlayer->Acc().m_aStats[pAttribute.first] -= UpgradeCount;
 		}
 
-		GS()->Chat(-1, "{STR} used {STR} returned {INT} upgrades.", GS()->Server()->ClientName(ClientID), Info().GetName(), &BackUpgrades);
+		GS()->Chat(-1, "{STR} used {STR} returned {INT} upgrades.", GS()->Server()->ClientName(ClientID), Info().GetName(), BackUpgrades);
 		m_pPlayer->Acc().m_Upgrade += BackUpgrades;
 		GS()->Mmo()->SaveAccount(m_pPlayer, SaveType::SAVE_UPGRADES);
 	}

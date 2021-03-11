@@ -3,8 +3,8 @@
 #ifndef GAME_CLIENT_UI_WINDOW_H
 #define GAME_CLIENT_UI_WINDOW_H
 
-#include <vector>
 #include <functional>
+#include <vector>
 #include "ui.h"
 
 enum CWindowFlags
@@ -31,6 +31,7 @@ class CWindowUI
 	char m_aWindowName[128];
 	CUIRect m_WindowRect;
 	CUIRect m_WindowRectGuardian;
+	std::vector<CWindowUI> m_DaughtersWindows;
 
 	int m_WindowFlags;
 	bool m_WindowHidden;
@@ -41,19 +42,21 @@ class CWindowUI
 public:
 	CWindowUI() = default;
 	CWindowUI(const CWindowUI& pWindow) = default;
-	CWindowUI(const char* pWindowName, CUIRect WindowRect, int WindowFlags = CWindowFlags::WINDOW_ALL);
+	CWindowUI(const char* pWindowName, CUIRect WindowRect, bool DefaultClose = false, std::vector<CWindowUI> DaughtersWindows = {}, int WindowFlags = CWindowFlags::WINDOW_ALL);
 
 	bool IsOpenned() const;
 	bool IsActive() const;
 	const CUIRect& GetRect();
 	const char* GetWindowName() const { return m_aWindowName; }
+	std::vector<CWindowUI> GetDaughtersWindows() { return m_DaughtersWindows; }
 
 	void Open();
 	void Close();
 	void CloseOpen();
-	void Init(const char* pWindowName, CUIRect WindowRect, int WindowFlags = CWindowFlags::WINDOW_ALL);
+	void Init(const char* pWindowName, CUIRect WindowRect, bool DefaultClose = false, std::vector<CWindowUI> DaughtersWindows = {}, int WindowFlags = CWindowFlags::WINDOW_ALL);
+	void ReInitRect(CUIRect WindowRect) { m_WindowRect = WindowRect; }
 	void OnRenderWindow(RenderWindowCallback pCallback);
-	void HighlightEnable(vec4 Color);
+	void HighlightEnable(vec4 Color, bool DaughtersToo = false);
 	void HighlightDisable();
 
 private:

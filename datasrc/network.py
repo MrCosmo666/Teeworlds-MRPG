@@ -639,4 +639,39 @@ Messages = [
 		NetIntRange("m_pVolume", 1, 10),
 	]),
 
+    # -------------
+    # mrpg gui boxes
+	NetMessage("Sv_SendGuiInformationBox", 
+    [
+		NetStringStrict("m_pMsg"),
+    ]),
+    
+    # -------------
+    # mrpg inbox / TODO: optimize
+	NetMessage("Cl_ShowMailListRequest", []),
+    
+	NetMessage("Cl_ReceiveMail", 
+	[
+		NetIntAny("m_MailID"),
+	]),
+    
+	NetMessage("Sv_SendGotNewMail", []),
+    
+    NetMessage("Sv_SendMailInfo",
+	[
+		NetIntAny("m_MailID"), # unique value by which to receive the letter
+		NetStringStrict("m_pTitle"),
+		NetStringStrict("m_pMsg"),
+		NetIntAny("m_ItemID"),
+		NetIntAny("m_Count"),
+		NetIntAny("m_EnchantLevel"),
+	]),
+    
+	NetMessage("Cl_SendMailToPlayer", 
+	[
+		NetStringStrict("m_pPlayer"),
+		NetStringStrict("m_pTitle"),
+		NetStringStrict("m_pMsg"),
+        # todo: add support sending items / after implementations of items / and from
+	]),
 ]

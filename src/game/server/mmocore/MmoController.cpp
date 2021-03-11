@@ -63,7 +63,7 @@ void MmoController::OnTick()
 void MmoController::OnInitAccount(int ClientID)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
-	if(!pPlayer || !pPlayer->IsAuthed()) 
+	if(!pPlayer || !pPlayer->IsAuthed())
 		return;
 
 	for(auto& component : m_Components.m_paComponents)
@@ -73,7 +73,7 @@ void MmoController::OnInitAccount(int ClientID)
 bool MmoController::OnPlayerHandleMainMenu(int ClientID, int Menulist, bool ReplaceMenu)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
-	if(!pPlayer || !pPlayer->IsAuthed()) 
+	if(!pPlayer || !pPlayer->IsAuthed())
 		return true;
 
 	for(auto& pComponent : m_Components.m_paComponents)
@@ -86,7 +86,7 @@ bool MmoController::OnPlayerHandleMainMenu(int ClientID, int Menulist, bool Repl
 
 bool MmoController::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 {
-	if(!pChr || !pChr->IsAlive()) 
+	if(!pChr || !pChr->IsAlive())
 		return true;
 
 	for(auto & pComponent : m_Components.m_paComponents)
@@ -157,9 +157,9 @@ void MmoController::ResetClientData(int ClientID)
 // saving account
 void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 {
-	if(!pPlayer->IsAuthed()) 
+	if(!pPlayer->IsAuthed())
 		return;
-	
+
 	if(Table == SaveType::SAVE_STATS)
 	{
 		const int EquipDiscord = pPlayer->GetEquippedItemID(EQUIP_DISCORD);
@@ -172,7 +172,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		dynamic_string Buffer;
 		for(const auto& at : CGS::ms_aAttributsInfo)
 		{
-			if(str_comp_nocase(at.second.m_aFieldName, "unfield") == 0) 
+			if(str_comp_nocase(at.second.m_aFieldName, "unfield") == 0)
 				continue;
 			str_format(aBuf, sizeof(aBuf), ", %s = '%d' ", at.second.m_aFieldName, pPlayer->Acc().m_aStats[at.first]);
 			Buffer.append_at(Buffer.length(), aBuf);
@@ -185,7 +185,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	{
 		char aBuf[64];
 		dynamic_string Buffer;
-		for(int i = 0; i < NUM_JOB_ACCOUNTS_STATS; i++) 
+		for(int i = 0; i < NUM_JOB_ACCOUNTS_STATS; i++)
 		{
 			const char *pFieldName = pPlayer->Acc().m_aPlant[i].m_aFieldName;
 			const int JobValue = pPlayer->Acc().m_aPlant[i].m_Value;
@@ -213,7 +213,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	}
 	else if(Table == SaveType::SAVE_GUILD_DATA)
 	{
-		SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '%d' WHERE ID = '%d'", pPlayer->Acc().m_GuildID, pPlayer->Acc().m_GuildRank, pPlayer->Acc().m_AccountID);	
+		SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '%d' WHERE ID = '%d'", pPlayer->Acc().m_GuildID, pPlayer->Acc().m_GuildRank, pPlayer->Acc().m_AccountID);
 	}
 	else if(Table == SaveType::SAVE_POSITION)
 	{
@@ -274,7 +274,7 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 			const int Level = pRes->getInt("Level");
 			const int Experience = pRes->getInt("Experience");
 			str_copy(NameGuild, pRes->getString("GuildName").c_str(), sizeof(NameGuild));
-			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Level {INT} : Exp {INT}", &Rank, NameGuild, &Level, &Experience);
+			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Level {INT} : Exp {INT}", Rank, NameGuild, Level, Experience);
 		}
 	}
 	else if (TypeID == ToplistTypes::GUILDS_WEALTHY)
@@ -286,7 +286,7 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 			const int Rank = pRes->getRow();
 			const int Gold = pRes->getInt("Bank");
 			str_copy(NameGuild, pRes->getString("GuildName").c_str(), sizeof(NameGuild));
-			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Gold {INT}", &Rank, NameGuild, &Gold);
+			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Gold {INT}", Rank, NameGuild, Gold);
 		}
 	}
 	else if (TypeID == ToplistTypes::PLAYERS_LEVELING)
@@ -299,7 +299,7 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 			const int Level = pRes->getInt("Level");
 			const int Experience = pRes->getInt("Exp");
 			str_copy(Nick, pRes->getString("Nick").c_str(), sizeof(Nick));
-			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Level {INT} : Exp {INT}", &Rank, Nick, &Level, &Experience);
+			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Level {INT} : Exp {INT}", Rank, Nick, Level, Experience);
 		}
 	}
 	else if (TypeID == ToplistTypes::PLAYERS_WEALTHY)
@@ -312,7 +312,7 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 			const int Gold = pRes->getInt("Count");
 			const int OwnerID = pRes->getInt("OwnerID");
 			str_copy(Nick, PlayerName(OwnerID), sizeof(Nick));
-			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Gold {INT}", &Rank, Nick, &Gold);
+			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Gold {INT}", Rank, Nick, Gold);
 		}
 	}
 }

@@ -113,6 +113,7 @@ public:
 private:
 	typedef float (CMenus::* FDropdownCallback)(CUIRect View);
 
+public:
 	bool DoButton_SpriteID(CButtonContainer* pBC, int ImageID, int SpriteID, bool Checked, const CUIRect* pRect, int Corners = CUI::CORNER_ALL, float Rounding = 5.0f, bool Fade = true);
 	bool DoButton_Toggle(const void* pID, bool Checked, const CUIRect* pRect, bool Active);
 	bool DoButton_Menu(CButtonContainer* pBC, const char* pText, bool Checked, const CUIRect* pRect, const char* pImageName = 0, int Corners = CUI::CORNER_ALL, float Rounding = 5.0f, float FontFactor = 0.0f, vec4 ColorHot = vec4(1.0f, 1.0f, 1.0f, 0.75f), bool TextFade = true);
@@ -122,11 +123,7 @@ private:
 
 	void DoIcon(int ImageId, int SpriteId, const CUIRect* pRect, const vec4* pColor = 0);
 	bool DoButton_GridHeader(const void* pID, const char* pText, bool Checked, CUI::EAlignment Align, const CUIRect* pRect, int Corners = CUI::CORNER_ALL);
-
-public:
 	bool DoEditBox(void* pID, const CUIRect* pRect, char* pStr, unsigned StrSize, float FontSize, float* pOffset, bool Hidden = false, int Corners = CUI::CORNER_ALL);
-
-private:
 	bool DoEditBoxUTF8(void* pID, const CUIRect* pRect, char* pStr, unsigned StrSize, unsigned MaxLength, float FontSize, float* pOffset, bool Hidden = false, int Corners = CUI::CORNER_ALL);
 	void DoEditBoxOption(void* pID, char* pOption, unsigned OptionSize, const CUIRect* pRect, const char* pStr, float VSplitVal, float* pOffset, bool Hidden = false);
 	void DoEditBoxOptionUTF8(void* pID, char* pOption, unsigned OptionSize, unsigned OptionMaxLength, const CUIRect* pRect, const char* pStr, float VSplitVal, float* pOffset, bool Hidden = false);
@@ -135,6 +132,7 @@ private:
 	float DoIndependentDropdownMenu(void* pID, const CUIRect* pRect, const char* pStr, float HeaderHeight, FDropdownCallback pfnCallback, bool* pActive);
 	void DoInfoBox(const CUIRect* pRect, const char* pLable, const char* pValue);
 
+private:
 	float DoScrollbarV(const void *pID, const CUIRect *pRect, float Current);
 	float DoScrollbarH(const void *pID, const CUIRect *pRect, float Current);
 	void DoJoystickBar(const CUIRect *pRect, float Current, float Tolerance, bool Active);

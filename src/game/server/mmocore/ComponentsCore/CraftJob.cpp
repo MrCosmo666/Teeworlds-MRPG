@@ -90,7 +90,7 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 		if (InfoGetItem.IsEnchantable())
 		{
 			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} - {INT} gold",
-				(pPlayer->GetItem(cr.second.m_ReceivedItemID).m_Count ? "✔ " : "\0"), InfoGetItem.GetName(pPlayer), &Price);
+				(pPlayer->GetItem(cr.second.m_ReceivedItemID).m_Count ? "✔ " : "\0"), InfoGetItem.GetName(pPlayer), Price);
 
 			char aAttributes[128];
 			InfoGetItem.FormatAttributes(aAttributes, sizeof(aAttributes), 0);
@@ -99,7 +99,7 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 		else
 		{
 			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) :: {INT} gold",
-				InfoGetItem.GetName(pPlayer), &cr.second.m_ReceivedItemCount, &pPlayer->GetItem(cr.second.m_ReceivedItemID).m_Count, &Price);
+				InfoGetItem.GetName(pPlayer), cr.second.m_ReceivedItemCount, pPlayer->GetItem(cr.second.m_ReceivedItemID).m_Count, Price);
 		}
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", InfoGetItem.GetDesc(pPlayer));
 
@@ -111,7 +111,7 @@ void CraftJob::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectT
 				continue;
 			
 			InventoryItem &PlSearchItem = pPlayer->GetItem(SearchItemID);
-			GS()->AVMI(ClientID, PlSearchItem.Info().GetIcon(), "null", NOPE, HideID, "{STR} {INT}({INT})", PlSearchItem.Info().GetName(pPlayer), &SearchCount, &PlSearchItem.m_Count);
+			GS()->AVMI(ClientID, PlSearchItem.Info().GetIcon(), "null", NOPE, HideID, "{STR} {INT}({INT})", PlSearchItem.Info().GetName(pPlayer), SearchCount, PlSearchItem.m_Count);
 		}
 		GS()->AVM(ClientID, "CRAFT", cr.first, HideID, "Craft {STR}", InfoGetItem.GetName(pPlayer));
 	}
@@ -179,12 +179,12 @@ void CraftJob::CraftItem(CPlayer *pPlayer, int CraftID)
 	PlayerCraftItem.Add(CraftGetCount);
 	if(PlayerCraftItem.Info().IsEnchantable())
 	{
-		GS()->Chat(-1, "{STR} crafted [{STR}x{INT}].", Server()->ClientName(ClientID), PlayerCraftItem.Info().GetName(), &CraftGetCount);
+		GS()->Chat(-1, "{STR} crafted [{STR}x{INT}].", Server()->ClientName(ClientID), PlayerCraftItem.Info().GetName(), CraftGetCount);
 		return;
 	}
 
 	GS()->CreatePlayerSound(ClientID, SOUND_ITEM_SELL_BUY);
-	GS()->Chat(ClientID, "You crafted [{STR}x{INT}].", PlayerCraftItem.Info().GetName(pPlayer), &CraftGetCount);
+	GS()->Chat(ClientID, "You crafted [{STR}x{INT}].", PlayerCraftItem.Info().GetName(pPlayer), CraftGetCount);
 	GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 }
 

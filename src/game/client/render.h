@@ -22,6 +22,12 @@ enum
 	TILERENDERFLAG_EXTEND = 4,
 };
 
+enum LineDirectionFlag
+{
+	LINE_LEFT = 1 << 0,
+	LINE_DOWN = 1 << 1,
+};
+
 class CTeeRenderInfo
 {
 public:
@@ -70,6 +76,9 @@ public:
 	void DrawUIRect(const CUIRect *pRect, vec4 Color, int Corners, float Rounding);
 	void DrawUIRect4(const CUIRect *pRect, vec4 ColorTopLeft, vec4 ColorTopRight, vec4 ColorBottomLeft, vec4 ColorBottomRight, int Corners, float Rounding);
 	void DrawUIRectMonochromeGradient(const CUIRect* pRect, vec4 Color, int Corners, float Rounding);
+
+	void DrawLine(float x, float y, float tox, float toy, vec4 Color);
+	void DrawUIRectLine(const CUIRect* pRect, vec4 Color, int DirectionType = LineDirectionFlag::LINE_LEFT);
 
 	// object render methods (gc_render_obj.cpp)
 	void RenderTee(class CAnimState* pAnim, const CTeeRenderInfo* pInfo, int Emote, vec2 Dir, vec2 Pos);

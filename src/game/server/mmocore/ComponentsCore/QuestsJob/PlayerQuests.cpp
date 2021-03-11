@@ -151,8 +151,8 @@ bool CPlayerQuest::Accept()
 	const int ClientID = m_pPlayer->GetCID();
 	const int QuestsSize = Info().GetQuestStorySize();
 	const int QuestPosition = Info().GetQuestStoryPosition();
-	pGS->Chat(ClientID, "Accepted the quest ({STR} - {STR} {INT}/{INT})!", Info().GetStory(), Info().GetName(), &QuestPosition, &QuestsSize);
-	pGS->Chat(ClientID, "Reward for completing (Gold {INT}, Experience {INT})!", &Info().m_Gold, &Info().m_Exp);
+	pGS->Chat(ClientID, "Accepted the quest ({STR} - {STR} {INT}/{INT})!", Info().GetStory(), Info().GetName(), QuestPosition, QuestsSize);
+	pGS->Chat(ClientID, "Reward for completing (Gold {INT}, Experience {INT})!", Info().m_Gold, Info().m_Exp);
 	pGS->CreatePlayerSound(ClientID, SOUND_CTF_CAPTURE);
 	return true;
 }

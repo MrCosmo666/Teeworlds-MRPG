@@ -115,9 +115,9 @@ public:
 
 	// TODO: Refactor: Fill this in
 	void Init(class IClient *pClient, class IGraphics *pGraphics, class IInput* pInput, class ITextRender *pTextRender)
-	{ 
+	{
 		m_pClient = pClient;
-		m_pGraphics = pGraphics; 
+		m_pGraphics = pGraphics;
 		m_pInput = pInput;
 		m_pTextRender = pTextRender;
 	}
@@ -202,6 +202,7 @@ public:
 	int DoPickerLogic(const void *pID, const CUIRect *pRect, float *pX, float *pY);
 
 	void DoLabel(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, float LineWidth = -1.0f, bool MultiLine = true);
+	void DoLabelColored(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, vec4 Color, float LineWidth = -1.0f, bool MultiLine = true);
 	void DoLabelHighlighted(const CUIRect* pRect, const char* pText, const char* pHighlighted, float FontSize, const vec4& TextColor, const vec4& HighlightColor);
 
 	// CUI ELEMENTS over time to adjust the order
@@ -223,13 +224,18 @@ public:
 	std::vector< AnimFade > m_AnimFades;
 	float GetFade(CUIRect* pRect, bool Checked = false, float Seconds = 0.6f);
 	int DoMouseEventLogic(const CUIRect* pRect, int Button = 0);
-	
+
 	// window system
 	void StartCheckWindow(class CWindowUI* pWindow) { m_pCheckWindow = pWindow; }
 	void FinishCheckWindow() { m_pCheckWindow = nullptr; }
 
 	void WindowRender();
 	void WindowsClear();
+
+	// slots
+	class CInventorySlot* m_pHoveredSlot;
+	class CInventorySlot* m_pSelectionSlot;
+	class CInventorySlot* m_pInteractiveSlot;
 };
 
 #endif

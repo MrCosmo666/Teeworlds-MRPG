@@ -65,7 +65,7 @@ void CJobItems::Work(int ClientID)
 		}
 		if (pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value < m_Level)
 		{
-			GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), &m_Level);
+			GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), m_Level);
 			return;
 		}
 
@@ -84,7 +84,7 @@ void CJobItems::Work(int ClientID)
 		GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
 		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P] : {STR} ({INT}/100%)", 
-			pPlayerWorkedItem.Info().GetName(pPlayer), (m_Health > m_StartHealth ? &m_StartHealth : &m_Health), &m_StartHealth, 
+			pPlayerWorkedItem.Info().GetName(pPlayer), (m_Health > m_StartHealth ? m_StartHealth : m_Health), m_StartHealth, 
 			pPlayerEquippedItem.Info().GetName(pPlayer), &Durability);
 
 		if(m_Health >= m_StartHealth)
@@ -101,7 +101,7 @@ void CJobItems::Work(int ClientID)
 	// - - - - - - - - PLANTS - - - - - - - - 
 	if (pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value < m_Level)
 	{
-		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), &m_Level);
+		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), m_Level);
 		return;
 	}
 
@@ -109,7 +109,7 @@ void CJobItems::Work(int ClientID)
 	GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
 	GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P]",
-		pPlayerWorkedItem.Info().GetName(pPlayer), (m_Health > m_StartHealth ? &m_StartHealth : &m_Health), &m_StartHealth);
+		pPlayerWorkedItem.Info().GetName(pPlayer), (m_Health > m_StartHealth ? m_StartHealth : m_Health), m_StartHealth);
 
 	if(m_Health >= m_StartHealth)
 	{

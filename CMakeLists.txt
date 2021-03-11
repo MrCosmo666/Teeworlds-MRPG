@@ -162,7 +162,7 @@ if(NOT MSVC)
   if (NOT TARGET_OS STREQUAL "linux")
     add_c_compiler_flag_if_supported(OUR_FLAGS_DEP -Wno-implicit-function-declaration)
   endif()
-  
+
   add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wduplicated-cond)
   add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wduplicated-branches)
   add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wlogical-op)
@@ -695,25 +695,25 @@ if(CLIENT_COMPILE)
 
   # Deps
   set(CLIENT_INCLUDES_DIRS
-    ${CURL_INCLUDE_DIRS} 
-    ${FREETYPE_INCLUDE_DIRS} 
-    ${GLEW_INCLUDE_DIRS} 
-    ${PNGLITE_INCLUDE_DIRS} 
-    ${SDL2_INCLUDE_DIRS} 
-    ${WAVPACK_INCLUDE_DIRS} 
+    ${CURL_INCLUDE_DIRS}
+    ${FREETYPE_INCLUDE_DIRS}
+    ${GLEW_INCLUDE_DIRS}
+    ${PNGLITE_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIRS}
+    ${WAVPACK_INCLUDE_DIRS}
     ${DISCORDGAMESDK_INCLUDE_DIRS}
   )
   set(CLIENT_LIBRARIES
-    ${CURL_LIBRARIES} 
-    ${FREETYPE_LIBRARIES} 
-    ${GLEW_LIBRARIES} 
-    ${PNGLITE_LIBRARIES} 
-    ${SDL2_LIBRARIES} 
-    ${WAVPACK_LIBRARIES} 
+    ${CURL_LIBRARIES}
+    ${FREETYPE_LIBRARIES}
+    ${GLEW_LIBRARIES}
+    ${PNGLITE_LIBRARIES}
+    ${SDL2_LIBRARIES}
+    ${WAVPACK_LIBRARIES}
     ${DISCORDGAMESDK_LIBRARIES}
   )
   set(DEPS_CLIENT ${DEPS} ${GLEW_DEP} ${PNGLITE_DEP} ${WAVPACK_DEP} ${DISCORDGAMESDK_DEP})
-    
+
   # Icon
   set(CLIENT_ICON)
   if(TARGET_OS STREQUAL "windows")
@@ -770,7 +770,7 @@ if(SERVER_COMPILE AND DISCORD_SERVER_COMPILE)
   set(CPR_LIBRARIES cpr CACHE INTERNAL "")
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include/cpr DESTINATION ${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include)
   set(CPR_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include")
-  file(GLOB CPR_LIBRARIES_SRC "${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/cpr/*.cpp" "${CPR_INCLUDE_DIRS}/*.h") 
+  file(GLOB CPR_LIBRARIES_SRC "${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/cpr/*.cpp" "${CPR_INCLUDE_DIRS}/*.h")
   add_library(${CPR_LIBRARIES} EXCLUDE_FROM_ALL OBJECT ${CPR_LIBRARIES_SRC})
   if((MINGW OR TARGET_OS STREQUAL "linux") AND PREFER_BUNDLED_LIBS)
     target_link_libraries(${CPR_LIBRARIES} -lcurl) # wtf
@@ -819,7 +819,7 @@ if(SERVER_COMPILE AND DISCORD_SERVER_COMPILE)
   if(MINGW OR TARGET_OS STREQUAL "linux")
     target_compile_options(sleepy-discord PUBLIC -Wno-duplicated-branches -Wno-deprecated-copy)
   endif()
-  
+
   #The codebase is c++11 but both clang and visual c++ have issues with c++11
   #These issues are fixed by using preprocessor defines to replace code that
   #cause issues with c++14 code
@@ -834,7 +834,7 @@ endif()
 
 if(SERVER_COMPILE)
   # Sources
-  file(GLOB ENGINE_SERVER "src/engine/server/*.cpp" "src/engine/server/*.h" "src/engine/server/discord/*.cpp" "src/engine/server/discord/*.h")
+  file(GLOB_RECURSE ENGINE_SERVER "src/engine/server/*.cpp" "src/engine/server/*.h")
   file(GLOB_RECURSE GAME_SERVER "src/game/server/*.cpp" "src/game/server/*.h")
   file(GLOB LOCALIZED_SERVER "src/teeother/components/*.cpp" "src/teeother/components/*.h" "src/teeother/tl/*.h" "src/teeother/system/*.h")
   set(GAME_GENERATED_SERVER src/generated/server_data.cpp src/generated/server_data.h)
@@ -847,7 +847,7 @@ if(SERVER_COMPILE)
   endif()
 
   set(SERVER_INCLUDES_DIRS
-    ${Boost_INCLUDE_DIRS} 
+    ${Boost_INCLUDE_DIRS}
     ${ICU_INCLUDE_DIRS}
     ${MYSQL_INCLUDE_DIRS}
   )
@@ -857,7 +857,7 @@ if(SERVER_COMPILE)
     ${DISCORD_SERVER_LIBS}
   )
   set(DEPS_SERVER ${DEPS})
-  
+
   # Icon
   set(SERVER_ICON)
   if(TARGET_OS STREQUAL "windows")
@@ -879,7 +879,7 @@ if(SERVER_COMPILE)
 
   list(APPEND TARGETS_OWN ${TARGET_SERVER})
   list(APPEND TARGETS_LINK ${TARGET_SERVER})
-  
+
   if(TARGET_OS AND TARGET_OS STREQUAL "mac")
     set(SERVER_LAUNCHER_SRC src/osxlaunch/server.mm)
     set(TARGET_SERVER_LAUNCHER ${TARGET_SERVER}-Launcher)
@@ -1289,7 +1289,7 @@ foreach(target ${TARGETS_LINK})
       # Link pthread library statically instead of dynamically.
       # Solution from https://stackoverflow.com/a/28001261.
       target_link_libraries(${target} -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic)
-    endif()    
+    endif()
   endif()
   target_compile_definitions(${target} PRIVATE GLEW_STATIC)
 endforeach()

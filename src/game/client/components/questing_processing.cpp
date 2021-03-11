@@ -88,7 +88,9 @@ void CQuestingProcessing::OnRender()
 	const float tx = Width / 3.0f, ty = Height / 2.5f, tw = Width / 3.0f, th = 60.0f;
 	CUIRect BackgroundMain = { tx, ty - tabsize * (60.0f), tw, (45.0f + th * tabsize) };
 	BackgroundMain.Margin(5.0f, &BackgroundMain);
-	RenderTools()->DrawUIRect4(&BackgroundMain, COLOR_BACKGROUND, COLOR_BACKGROUND, COLOR_BACKGROUND / 1.2f, COLOR_BACKGROUND / 1.2f, CUI::CORNER_ALL, 30.0f);
+	RenderTools()->DrawUIRectMonochromeGradient(&BackgroundMain, COLOR_BACKGROUND, CUI::CORNER_ALL, 30.0f);
+	BackgroundMain.Margin(5.0f, &BackgroundMain);
+	RenderTools()->DrawUIRectMonochromeGradient(&BackgroundMain, vec4(0.f, 0.f, 0.f, 0.1f), CUI::CORNER_ALL, 30.0f);
 	BackgroundMain.VMargin(20.0f, &BackgroundMain);
 
 	// --------------------- DRAW TABLES ----------------------

@@ -150,7 +150,7 @@ void AetherJob::ShowTeleportList(CCharacter* pChar)
 
 		int Price = g_Config.m_SvPriceTeleport * (tl.second.m_WorldID + 1);
 		GS()->AVD(ClientID, "TELEPORT", tl.first, Price, TAB_AETHER, "[{STR}] : {STR} - {INT}gold",
-			tl.second.m_aTeleName, Server()->GetWorldName(tl.second.m_WorldID), &Price);
+			tl.second.m_aTeleName, Server()->GetWorldName(tl.second.m_WorldID), Price);
 	}
 	GS()->AV(ClientID, "null");
 }

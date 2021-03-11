@@ -170,7 +170,7 @@ void CGameControllerDungeon::StateTick()
 
 			// run up to speed // if(m_StartingTick % Server()->TickSpeed() == 0)
 			const int Time = m_StartingTick / Server()->TickSpeed();
-			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon waiting {INT} sec!\nPlayer's are ready to start right now {INT} of {INT}!\nYou can change state with 'Vote yes'", &Time, &PlayersReadyState, &Players);
+			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon waiting {INT} sec!\nPlayer's are ready to start right now {INT} of {INT}!\nYou can change state with 'Vote yes'", Time, PlayersReadyState, Players);
 
 			m_StartingTick--;
 			if(!m_StartingTick)
@@ -213,7 +213,7 @@ void CGameControllerDungeon::StateTick()
 		if (m_FinishedTick)
 		{
 			const int Time = m_FinishedTick / Server()->TickSpeed();
-			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon ended {INT} sec!", &Time);
+			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon ended {INT} sec!", Time);
 
 			m_FinishedTick--;
 		}
@@ -233,7 +233,7 @@ void CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKil
 	{
 		const int Progress = 100 - translate_to_percent(CountMobs(), LeftMobsToWin());
 		DungeonJob::ms_aDungeon[m_DungeonID].m_Progress = Progress;
-		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The dungeon is completed on [{INT}%]", &Progress);
+		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The dungeon is completed on [{INT}%]", Progress);
 		UpdateDoorKeyState();
 	}
 }
@@ -391,12 +391,12 @@ void CGameControllerDungeon::SelectTankPlayer()
 	{
 		if(m_SelectedWithVotes)
 			GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank is assigned to {STR} with {INT} votes!",
-				Server()->ClientName(m_TankClientID), &pTankPlayer->GetTempData().m_TempTankVotingDungeon);
+				Server()->ClientName(m_TankClientID), pTankPlayer->GetTempData().m_TempTankVotingDungeon);
 		else
 		{
 			const int StrengthTank = pTankPlayer->GetLevelTypeAttribute(AtributType::AtTank);
 			GS()->ChatWorldID(m_WorldID, "[Dungeon]", "Tank {STR} assigned with class strength {INT}p!",
-				Server()->ClientName(m_TankClientID), &StrengthTank);
+				Server()->ClientName(m_TankClientID), StrengthTank);
 		}
 	}
 }

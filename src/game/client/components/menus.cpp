@@ -2385,16 +2385,6 @@ void CMenus::OnRender()
 		return;
 	}
 
-
-	// quest book window
-	CWindowUI m_WindowQuestBook;
-	m_WindowQuestBook.Init("Suka book", { 150, 150, 400, 300 });
-	m_WindowQuestBook.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
-		{
-
-		});
-
-
 	// render
 	if(Client()->State() != IClient::STATE_DEMOPLAYBACK)
 		Render();
