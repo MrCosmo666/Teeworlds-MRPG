@@ -268,8 +268,8 @@ void CCharacter::FireWeapon()
 		}
 	}
 
-	vec2 Direction = normalize(vec2(m_LatestInput.m_TargetX, m_LatestInput.m_TargetY));
-	vec2 ProjStartPos = m_Pos+Direction*GetProximityRadius()*0.75f;
+	const vec2 Direction = normalize(vec2(m_LatestInput.m_TargetX, m_LatestInput.m_TargetY));
+	const vec2 ProjStartPos = m_Pos+Direction*GetProximityRadius()*0.75f;
 	switch(m_ActiveWeapon)
 	{
 		case WEAPON_HAMMER:
@@ -287,7 +287,7 @@ void CCharacter::FireWeapon()
 			GS()->CreateSound(m_Pos, SOUND_HAMMER_FIRE);
 
 			CCharacter *apEnts[MAX_CLIENTS];
-			int Num = GS()->m_World.FindEntities(ProjStartPos, GetProximityRadius()* Radius, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
+			const int Num = GS()->m_World.FindEntities(ProjStartPos, GetProximityRadius()* Radius, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
 			for (int i = 0; i < Num; ++i)
 			{
 				CCharacter* pTarget = apEnts[i];
@@ -344,9 +344,9 @@ void CCharacter::FireWeapon()
 			Msg.AddInt(ShotSpread);
 			for (int i = 1; i <= ShotSpread; ++i)
 			{
-				float Spreading = ((0.0058945f*(9.0f*ShotSpread)/2)) - (0.0058945f*(9.0f*i));
-				float a = GetAngle(Direction) + Spreading;
-				float Speed = (float)GS()->Tuning()->m_ShotgunSpeeddiff + frandom()*0.2f;
+				const float Spreading = ((0.0058945f*(9.0f*ShotSpread)/2)) - (0.0058945f*(9.0f*i));
+				const float a = GetAngle(Direction) + Spreading;
+				const float Speed = (float)GS()->Tuning()->m_ShotgunSpeeddiff + frandom()*0.2f;
 				new CProjectile(GameWorld(), WEAPON_SHOTGUN, m_pPlayer->GetCID(), ProjStartPos,
 					vec2(cosf(a), sinf(a))*Speed,
 					(int)(Server()->TickSpeed() * GS()->Tuning()->m_ShotgunLifetime),
@@ -363,8 +363,8 @@ void CCharacter::FireWeapon()
 			Msg.AddInt(ShotSpread);
 			for (int i = 1; i < ShotSpread; ++i)
 			{
-				float Spreading = ((0.0058945f*(9.0f*ShotSpread)/2)) - (0.0058945f*(9.0f*i));
-				float a = GetAngle(Direction) + Spreading;
+				const float Spreading = ((0.0058945f*(9.0f*ShotSpread)/2)) - (0.0058945f*(9.0f*i));
+				const float a = GetAngle(Direction) + Spreading;
 				new CProjectile(GameWorld(), WEAPON_GRENADE, m_pPlayer->GetCID(), ProjStartPos,
 					vec2(cosf(a), sinf(a)),
 					(int)(Server()->TickSpeed()*GS()->Tuning()->m_GrenadeLifetime),
@@ -379,8 +379,8 @@ void CCharacter::FireWeapon()
 			const int ShotSpread = min(1 + m_pPlayer->GetAttributeCount(Stats::StSpreadRifle), 36);
 			for (int i = 1; i < ShotSpread; ++i)
 			{
-				float Spreading = ((0.0058945f*(9.0f*ShotSpread)/2)) - (0.0058945f*(9.0f*i));
-				float a = GetAngle(Direction) + Spreading;
+				const float Spreading = ((0.0058945f*(9.0f*ShotSpread)/2)) - (0.0058945f*(9.0f*i));
+				const float a = GetAngle(Direction) + Spreading;
 				new CLaser(GameWorld(), m_Pos, vec2(cosf(a), sinf(a)), GS()->Tuning()->m_LaserReach, m_pPlayer->GetCID());
 			}
 			GS()->CreateSound(m_Pos, SOUND_LASER_FIRE);
@@ -395,7 +395,7 @@ void CCharacter::FireWeapon()
 
 	if(!m_ReloadTimer)
 	{
-		int ReloadArt = m_pPlayer->GetAttributeCount(Stats::StDexterity);
+		const int ReloadArt = m_pPlayer->GetAttributeCount(Stats::StDexterity);
 		m_ReloadTimer = g_pData->m_Weapons.m_aId[m_ActiveWeapon].m_Firedelay * Server()->TickSpeed() / (1000 + ReloadArt);
 	}
 }
@@ -448,7 +448,7 @@ bool CCharacter::GiveWeapon(int Weapon, int GiveAmmo)
 
 bool CCharacter::RemoveWeapon(int Weapon)
 {
-	bool Succesful = m_aWeapons[Weapon].m_Got;
+	const bool Succesful = m_aWeapons[Weapon].m_Got;
 	m_aWeapons[Weapon].m_Got = false;
 	m_aWeapons[Weapon].m_Ammo = -1;
 	return Succesful;
@@ -669,7 +669,7 @@ void CCharacter::Die(int Killer, int Weapon)
 	m_pPlayer->m_aPlayerTick[TickState::Respawn] = Server()->Tick() + Server()->TickSpeed() / 2;
 	if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
-		int SubBotID = m_pPlayer->GetBotSub();
+		const int SubBotID = m_pPlayer->GetBotSub();
 		m_pPlayer->m_aPlayerTick[TickState::Respawn] = Server()->Tick() + MobBotInfo::ms_aMobBot[SubBotID].m_RespawnTick*Server()->TickSpeed();
 	}
 
@@ -753,7 +753,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 		pFrom->GetCharacter()->GiveRandomEffects(m_pPlayer->GetCID());
 	}
 
-	int OldHealth = m_Health;
+	const int OldHealth = m_Health;
 	if(Dmg)
 	{
 		m_Health -= Dmg;
@@ -993,7 +993,7 @@ void CCharacter::HandleTuning()
 		pTuningParams->m_HookLength = 700.0f;
 		pTuningParams->m_AirControlAccel = 1.5f;
 
-		vec2 Direction = vec2(m_Core.m_Input.m_TargetX, m_Core.m_Input.m_TargetY);
+		const vec2 Direction = vec2(m_Core.m_Input.m_TargetX, m_Core.m_Input.m_TargetY);
 		m_Core.m_Vel += Direction * 0.001f;
 	}
 

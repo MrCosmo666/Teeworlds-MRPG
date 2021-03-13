@@ -72,16 +72,17 @@ public:
 	//character's size
 	static const int ms_PhysSize = 28;
 	CCharacter(CGameWorld *pWorld);
-	virtual ~CCharacter();
+	~CCharacter() override;
 
 	CPlayer *GetPlayer() const { return m_pPlayer; }
 	TileHandle *GetHelper() const { return m_pHelper; }
 
 	virtual int GetSnapFullID() const;
-	virtual void Tick();
-	virtual void TickDefered();
-	virtual void Snap(int SnappingClient);
-	virtual void PostSnap();
+	void Tick() override;
+	void TickDefered() override;
+	void Snap(int SnappingClient) override;
+	void PostSnap() override;
+
 	virtual bool Spawn(class CPlayer* pPlayer, vec2 Pos);
 	virtual void GiveRandomEffects(int To);
 	virtual bool TakeDamage(vec2 Force, int Dmg, int From, int Weapon);
