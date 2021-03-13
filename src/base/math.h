@@ -3,8 +3,9 @@
 #ifndef BASE_MATH_H
 #define BASE_MATH_H
 
+#include <math.h>
 #include <stdlib.h>
-#include <type_traits>
+#include <type_traits> // cxx inc
 
 template <typename T>
 T clamp(T val, T min, T max)

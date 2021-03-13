@@ -1976,7 +1976,14 @@ void str_append(char *dst, const char *src, int dst_size)
 
 void str_copy(char *dst, const char *src, int dst_size)
 {
-	strncpy(dst, src, dst_size);
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+#endif
+	(strncpy(dst, src, dst_size));
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 	dst[dst_size-1] = 0; /* assure null termination */
 }
 
