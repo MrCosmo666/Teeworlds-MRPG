@@ -3,8 +3,6 @@
 #ifndef GAME_SERVER_ENTITY_H
 #define GAME_SERVER_ENTITY_H
 
-#include <base/vmath.h>
-
 #include "alloc.h"
 #include "gameworld.h"
 

@@ -7,8 +7,6 @@
 
 #include "kernel.h"
 
-
-
 struct CContactInfo
 {
 	char m_aName[MAX_NAME_ARRAY_SIZE];

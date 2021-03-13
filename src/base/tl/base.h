@@ -11,7 +11,7 @@ inline void tl_assert(bool statement)
 }
 
 template<class T>
-inline void tl_swap(T &a, T &b)
+void tl_swap(T &a, T &b)
 {
 	T c = b;
 	b = a;

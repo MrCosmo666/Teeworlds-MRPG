@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
+
 #include <base/color.h>
 #include <engine/graphics.h>
 #include <engine/textrender.h>
@@ -33,7 +35,7 @@ void CMenus::OnAuthMessage(int MsgType, void* pRawMsg)
 			case AUTH_REGISTER_GOOD:
 			setAuthMessage("The was completed successfully", EAuthColorMessage::SUCCESS_MESSAGE);
 			break;
-			
+
 			case AUTH_LOGIN_GOOD:
 			SetAuthState(false);
 			setAuthMessage("The was completed successfully", EAuthColorMessage::SUCCESS_MESSAGE);
@@ -185,7 +187,7 @@ void CMenus::RenderAuthWindow()
 		}
 
 		{ // right
-			CUIRect BackRegister; 
+			CUIRect BackRegister;
 			BasicRegister.Margin(5.0f, &BackRegister);
 			RenderTools()->DrawUIRect(&BackRegister, HexToRgba(0x147FF57), CUI::CORNER_ALL, 5.0f);
 		}
@@ -232,7 +234,7 @@ void CMenus::RenderAuthWindow()
 		{
 			BasicRegister.HSplitTop(25.0f, &Label, &BasicRegister);
 			UI()->DoLabel(&Label, Localize("Register account"), 16.0f, CUI::ALIGN_LEFT);
-			
+
 			static char s_aAccount[64];
 			static char s_aPassword[64];
 			static char s_aRepeatPassword[64];

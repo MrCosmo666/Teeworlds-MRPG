@@ -1,5 +1,6 @@
+#include <base/stdafx.h>
+
 #include "updater.h"
-#include <base/system.h>
 #include <engine/engine.h>
 #include <engine/storage.h>
 #include <engine/client.h>

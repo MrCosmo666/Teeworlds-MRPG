@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef ENGINE_SERVER_SERVER_BAN_H
 #define ENGINE_SERVER_SERVER_BAN_H
-
 #include <engine/shared/netban.h>
 
 class CServerBan : public CNetBan

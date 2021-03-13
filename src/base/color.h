@@ -32,8 +32,8 @@ inline vec3 HslToRgb(vec3 HSL)
 		return vec3(HSL.l, HSL.l, HSL.l);
 	else
 	{
-		float v2 = HSL.l < 0.5f ? HSL.l * (1.0f + HSL.s) : (HSL.l+HSL.s) - (HSL.s*HSL.l);
-		float v1 = 2.0f * HSL.l - v2;
+		const float v2 = HSL.l < 0.5f ? HSL.l * (1.0f + HSL.s) : (HSL.l+HSL.s) - (HSL.s*HSL.l);
+		const float v1 = 2.0f * HSL.l - v2;
 
 		return vec3(HueToRgb(v1, v2, HSL.h + (1.0f/3.0f)), HueToRgb(v1, v2, HSL.h), HueToRgb(v1, v2, HSL.h - (1.0f/3.0f)));
 	}
@@ -61,11 +61,11 @@ inline vec4 HexToRgba(int hex)
 */
 inline vec3 HsvToRgb(vec3 hsv)
 {
-	int h = int(hsv.x * 6.0f);
-	float f = hsv.x * 6.0f - h;
-	float p = hsv.z * (1.0f - hsv.y);
-	float q = hsv.z * (1.0f - hsv.y * f);
-	float t = hsv.z * (1.0f - hsv.y * (1.0f - f));
+	const int h = static_cast<int>(hsv.x * 6.0f);
+	const float f = hsv.x * 6.0f - h;
+	const float p = hsv.z * (1.0f - hsv.y);
+	const float q = hsv.z * (1.0f - hsv.y * f);
+	const float t = hsv.z * (1.0f - hsv.y * (1.0f - f));
 
 	vec3 rgb = vec3(0.0f, 0.0f, 0.0f);
 
@@ -106,6 +106,7 @@ inline vec3 HsvToRgb(vec3 hsv)
 		rgb.g = p;
 		rgb.b = q;
 		break;
+	default: break;
 	}
 
 	return rgb;
@@ -117,12 +118,11 @@ inline vec3 HsvToRgb(vec3 hsv)
 */
 inline vec3 RgbToHsv(vec3 rgb)
 {
-	float h_min = min(min(rgb.r, rgb.g), rgb.b);
-	float h_max = max(max(rgb.r, rgb.g), rgb.b);
+	const float h_min = min(min(rgb.r, rgb.g), rgb.b);
+	const float h_max = max(max(rgb.r, rgb.g), rgb.b);
 
 	// hue
-	float hue = 0.0f;
-
+	float hue;
 	if(h_max == h_min)
 		hue = 0.0f;
 	else if(h_max == rgb.r)
@@ -143,15 +143,15 @@ inline vec3 RgbToHsv(vec3 rgb)
 		s = (h_max - h_min)/h_max;
 
 	// value
-	float v = h_max;
+	const float v = h_max;
 
 	return vec3(hue, s, v);
 }
 
 inline vec3 RgbToLab(vec3 rgb)
 {
-	vec3 adapt(0.950467f, 1, 1.088969f);
-	vec3 xyz(
+	const vec3 adapt(0.950467f, 1, 1.088969f);
+	const vec3 xyz(
 		0.412424f * rgb.r + 0.357579f * rgb.g + 0.180464f * rgb.b,
 		0.212656f * rgb.r + 0.715158f * rgb.g + 0.0721856f * rgb.b,
 		0.0193324f * rgb.r + 0.119193f * rgb.g + 0.950444f * rgb.b
@@ -169,9 +169,9 @@ inline vec3 RgbToLab(vec3 rgb)
 
 inline float LabDistance(vec3 labA, vec3 labB)
 {
-	float ld = labA.x - labB.x;
-	float ad = labA.y - labB.y;
-	float bd = labA.z - labB.z;
+	const float ld = labA.x - labB.x;
+	const float ad = labA.y - labB.y;
+	const float bd = labA.z - labB.z;
 	return sqrtf(ld * ld + ad * ad + bd * bd);
 }
 

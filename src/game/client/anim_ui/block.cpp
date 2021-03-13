@@ -1,3 +1,5 @@
+#include <base/stdafx.h>
+
 #include <engine/graphics.h>
 #include <game/client/render.h>
 #include "block.h"

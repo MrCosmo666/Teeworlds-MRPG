@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
+
 #include <engine/textrender.h>
 #include <engine/shared/config.h>
 #include <generated/protocol.h>
@@ -22,9 +24,9 @@ const char* CNamePlates::GetMoodName(int MoodType) const
 	else if (MoodType == MOOD_FRIENDLY)
 		return "Friendly";
 	else if (MoodType == MOOD_QUESTING)
-		return "Questing NPC";	
+		return "Questing NPC";
 	else if (MoodType == MOOD_PLAYER_TANK)
-		return "Tank Player";	
+		return "Tank Player";
 	else
 		return "Player";
 }
@@ -43,7 +45,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 	float a = 1.0f;
 	if (g_Config.m_ClNameplatesAlways == 0)
 		a = clamp(1.0f - powf(distance(m_pClient->m_pControls->m_TargetPos, Position) / 200.0f, 16.0f), 0.0f, 1.0f);
-		
+
 	CTextCursor Cursor;
 	if (m_pClient->MmoServer() && m_pClient->m_aClients[ClientID].m_pLocalStats && a > 0.001f)
 	{
@@ -73,7 +75,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 			case MOOD_QUESTING:
 				str_format(aIconPlayerType, sizeof(aIconPlayerType), "paper");
 				ColorNameplates = vec4(0.9f, 0.85f, 0.35f, a);
-				break;				
+				break;
 			case MOOD_PLAYER_TANK:
 				str_format(aIconPlayerType, sizeof(aIconPlayerType), "rose");
 				ColorNameplates = vec4(0.15f, 0.60f, 1.00f, a);
@@ -120,17 +122,17 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 		}
 
 		if(aIconPlayerType[0] != '\0')
-		{ 
+		{
 			CUIRect IconRect = { Cursor.m_X, Cursor.m_Y + FontSize / 5.0f, 16.0f, 16.0f };
 			m_pClient->m_pMenus->DoItemIcon(aIconPlayerType, IconRect, FontSize);
 		}
 
 		if(pClientStats->m_ActiveQuest)
-		{ 
+		{
 			CUIRect IconRect = { Position.x - 64.0f / 2.0f, Cursor.m_Y - 65.0f, 16.0f, 16.0f };
 			m_pClient->m_pMenus->DoItemIcon("quest_a", IconRect, 64.0f);
 		}
-			
+
 		{
 			const float FontSizeAgressed = FontSize - 8.0f;
 			const float twAgressed = TextRender()->TextWidth(0, FontSizeAgressed, GetMoodName(pClientStats->m_MoodType), -1, -1.0f);

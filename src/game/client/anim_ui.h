@@ -1,7 +1,6 @@
 #ifndef GAME_CLIENT_ANIM_UI_H
 #define GAME_CLIENT_ANIM_UI_H
 
-#include <base/tl/array.h>
 #include <game/client/anim_ui/elements.h>
 
 // TDTW

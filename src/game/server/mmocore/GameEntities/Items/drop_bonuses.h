@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_ENTITIES_DROPINGBONUSES_H
 #define GAME_SERVER_ENTITIES_DROPINGBONUSES_H
+#include <game/server/entity.h>
 
 class CDropBonuses : public CEntity
 {
@@ -18,8 +19,8 @@ class CDropBonuses : public CEntity
 public:
 	CDropBonuses(CGameWorld* pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, int Type, int Count);
 
-	virtual void Tick();
-	virtual void Snap(int SnappingClient);
+	void Tick() override;
+	void Snap(int SnappingClient) override;
 };
 
 #endif

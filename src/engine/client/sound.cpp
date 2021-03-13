@@ -1,11 +1,9 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/math.h>
-#include <base/system.h>
+#include <base/stdafx.h>
 
 #include <engine/graphics.h>
 #include <engine/storage.h>
-
 #include <engine/shared/config.h>
 
 #include "SDL.h"
@@ -16,7 +14,6 @@ extern "C"
 {
 	#include <wavpack.h>
 }
-#include <math.h>
 
 enum
 {

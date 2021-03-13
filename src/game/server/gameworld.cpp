@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-
 #include "gameworld.h"
 #include "entity.h"
 #include "gamecontext.h"
@@ -8,14 +7,14 @@
 //////////////////////////////////////////////////
 // game world
 //////////////////////////////////////////////////
-CGameWorld::CGameWorld()
+CGameWorld::CGameWorld(): m_pNextTraverseEntity(nullptr), m_Paused(false)
 {
-	m_pGS = 0x0;
-	m_pServer = 0x0;
+	m_pGS = nullptr;
+	m_pServer = nullptr;
 
 	m_ResetRequested = false;
-	for(int i = 0; i < NUM_ENTTYPES; i++)
-		m_apFirstEntityTypes[i] = 0;
+	for (int i = 0; i < NUM_ENTTYPES; i++)
+		m_apFirstEntityTypes[i] = nullptr;
 }
 
 CGameWorld::~CGameWorld()
@@ -34,7 +33,7 @@ void CGameWorld::SetGameServer(CGS *pGS)
 
 CEntity *CGameWorld::FindFirst(int Type)
 {
-	return Type < 0 || Type >= NUM_ENTTYPES ? 0 : m_apFirstEntityTypes[Type];
+	return Type < 0 || Type >= NUM_ENTTYPES ? nullptr : m_apFirstEntityTypes[Type];
 }
 
 int CGameWorld::FindEntities(vec2 Pos, float Radius, CEntity **ppEnts, int Max, int Type)
@@ -68,7 +67,7 @@ void CGameWorld::InsertEntity(CEntity *pEnt)
 	if(m_apFirstEntityTypes[pEnt->m_ObjType])
 		m_apFirstEntityTypes[pEnt->m_ObjType]->m_pPrevTypeEntity = pEnt;
 	pEnt->m_pNextTypeEntity = m_apFirstEntityTypes[pEnt->m_ObjType];
-	pEnt->m_pPrevTypeEntity = 0x0;
+	pEnt->m_pPrevTypeEntity = nullptr;
 	m_apFirstEntityTypes[pEnt->m_ObjType] = pEnt;
 }
 
@@ -95,8 +94,8 @@ void CGameWorld::RemoveEntity(CEntity *pEnt)
 	if(m_pNextTraverseEntity == pEnt)
 		m_pNextTraverseEntity = pEnt->m_pNextTypeEntity;
 
-	pEnt->m_pNextTypeEntity = 0;
-	pEnt->m_pPrevTypeEntity = 0;
+	pEnt->m_pNextTypeEntity = nullptr;
+	pEnt->m_pPrevTypeEntity = nullptr;
 }
 
 //
@@ -152,7 +151,7 @@ void CGameWorld::RemoveEntities()
 			{
 				RemoveEntity(pEnt);
 				pEnt->Destroy();
-				pEnt = 0;
+				pEnt = nullptr;
 			}
 			pEnt = m_pNextTraverseEntity;
 		}
@@ -189,7 +188,7 @@ CCharacter *CGameWorld::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, v
 {
 	// Find other players
 	float ClosestLen = distance(Pos0, Pos1) * 100.0f;
-	CCharacter *pClosest = 0;
+	CCharacter *pClosest = nullptr;
 
 	CCharacter *p = (CCharacter *)FindFirst(ENTTYPE_CHARACTER);
 	for(; p; p = (CCharacter *)p->TypeNext())
@@ -217,7 +216,7 @@ CCharacter *CGameWorld::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, v
 bool CGameWorld::IntersectClosestEntity(vec2 Pos, float Radius, int EnttypeID)
 {
 	for(CEntity *pDoor = (CEntity *)FindFirst(EnttypeID); pDoor; pDoor = (CEntity *)pDoor->TypeNext())
- 	{	
+ 	{
 		vec2 IntersectPos = pDoor->m_PosTo;
 		if(pDoor->m_Pos != pDoor->m_PosTo)
 			IntersectPos = closest_point_on_line(pDoor->m_Pos, pDoor->m_PosTo, Pos);
@@ -231,20 +230,20 @@ bool CGameWorld::IntersectClosestDoorEntity(vec2 Pos, float Radius)
 {
 	if(IntersectClosestEntity(Pos, Radius, ENTTYPE_DUNGEON_DOOR))
 		return true;
-	else if(IntersectClosestEntity(Pos, Radius, ENTTYPE_DUNGEON_PROGRESS_DOOR))
+	if(IntersectClosestEntity(Pos, Radius, ENTTYPE_DUNGEON_PROGRESS_DOOR))
 		return true;
-	else if(IntersectClosestEntity(Pos, Radius, ENTTYPE_GUILD_HOUSE_DOOR))
+	if(IntersectClosestEntity(Pos, Radius, ENTTYPE_GUILD_HOUSE_DOOR))
 		return true;
-	else if(IntersectClosestEntity(Pos, Radius, ENTTYPE_PLAYER_HOUSE_DOOR))
+	if(IntersectClosestEntity(Pos, Radius, ENTTYPE_PLAYER_HOUSE_DOOR))
 		return true;
 	return false;
 }
 
-CEntity *CGameWorld::ClosestEntity(vec2 Pos, float Radius, int Type, CEntity *pNotThis)
+CEntity *CGameWorld::ClosestEntity(vec2 Pos, float Radius, int Type, CEntity *pNotThis) const
 {
 	// Find other players
 	float ClosestRange = Radius*2;
-	CEntity *pClosest = 0;
+	CEntity *pClosest = nullptr;
 
 	CEntity *p = GS()->m_World.FindFirst(Type);
 	for(; p; p = p->TypeNext())
@@ -252,7 +251,7 @@ CEntity *CGameWorld::ClosestEntity(vec2 Pos, float Radius, int Type, CEntity *pN
 		if(p == pNotThis)
 			continue;
 
-		float Len = distance(Pos, p->m_Pos);
+		const float Len = distance(Pos, p->m_Pos);
 		if(Len < p->m_ProximityRadius+Radius)
 		{
 			if(Len < ClosestRange)

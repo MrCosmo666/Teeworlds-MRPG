@@ -1,21 +1,13 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-
-#include <base/detect.h>
-#include <base/math.h>
-#include <base/tl/threading.h>
-
-#include <base/system.h>
+#include <base/stdafx.h>
 
 #include <pnglite.h>
 
 #include <engine/shared/config.h>
 #include <engine/graphics.h>
 #include <engine/storage.h>
-#include <engine/keys.h>
 #include <engine/console.h>
-
-#include <math.h> // cosf, sinf
 
 #include "graphics_threaded.h"
 

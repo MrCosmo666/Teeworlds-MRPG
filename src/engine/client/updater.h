@@ -3,8 +3,6 @@
 
 #include <engine/updater.h>
 #include <engine/client/http.h>
-#include <map>
-#include <string>
 
 #define CLIENT_EXEC "mmoteeworlds"
 

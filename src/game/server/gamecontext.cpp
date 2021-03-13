@@ -1,32 +1,42 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <stdarg.h>
-#include <algorithm>
+#include <base/stdafx.h>
 
-#include <base/math.h>
-#include <base/threadpool.h>
-#include <engine/shared/config.h>
-#include <engine/storage.h>
-
-#include <generated/server_data.h>
-#include <game/layers.h>
-#include <game/version.h>
 #include "gamecontext.h"
+
+#include <base/threadpool.h>
+#include <engine/storage.h>
+#include <engine/shared/config.h>
 
 #include <game/collision.h>
 #include <game/gamecore.h>
+#include <game/layers.h>
+#include <game/version.h>
+#include <generated/server_data.h>
 
-#include "gamemodes/main.h"
 #include "gamemodes/dungeon.h"
+#include "gamemodes/main.h"
 
+#include "mmocore/CommandProcessor.h"
+#include "mmocore/PathFinder.h"
+#include "mmocore/GameEntities/loltext.h"
 #include "mmocore/GameEntities/Items/drop_bonuses.h"
 #include "mmocore/GameEntities/Items/drop_items.h"
 #include "mmocore/GameEntities/Items/flying_experience.h"
-#include "mmocore/GameEntities/loltext.h"
-#include "mmocore/CommandProcessor.h"
-#include "mmocore/PathFinder.h"
 
+#include <game/game_context.h>
 #include <teeother/components/localization.h>
+
+#include "mmocore/Components/Dungeons/DungeonJob.h"
+#include "mmocore/Components/Bots/BotCore.h"
+#include "mmocore/Components/Accounts/AccountCore.h"
+#include "mmocore/Components/Accounts/AccountMinerCore.h"
+#include "mmocore/Components/Accounts/AccountPlantCore.h"
+#include "mmocore/Components/Mails/MailBoxJob.h"
+#include "mmocore/Components/Guilds/GuildJob.h"
+#include "mmocore/Components/Houses/HouseCore.h"
+#include "mmocore/Components/Quests/QuestCore.h"
+#include "mmocore/Components/Skills/SkillsCore.h"
 
 // static data that have the same value in different objects
 std::map < int, CGS::StructAttribut > CGS::ms_aAttributsInfo;
@@ -109,14 +119,14 @@ std::unique_ptr<char[]> CGS::LevelString(int MaxValue, int CurrentValue, int Ste
 {
 	CurrentValue = clamp(CurrentValue, 0, MaxValue);
 
-	int Size = 3 + MaxValue / Step;
+	const int Size = 3 + MaxValue / Step;
 	std::unique_ptr<char[]> Buf(new char[Size]);
 	Buf[0] = '[';
 	Buf[Size - 2] = ']';
 	Buf[Size - 1] = '\0';
 
-    int a = CurrentValue / Step;
-    int b = (MaxValue - CurrentValue) / Step;
+	const int a = CurrentValue / Step;
+	const int b = (MaxValue - CurrentValue) / Step;
     int i = 1;
 
 	for (int ai = 0; ai < a; ai++, i++)
@@ -143,8 +153,8 @@ const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const
 	return ID >= NUM_TAB_MENU ? ("\\/ # ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("/\\ # ") : ("\\/ # "));
 }
 
-ItemInformation &CGS::GetItemInfo(int ItemID) const { return InventoryJob::ms_aItemsInfo[ItemID]; }
-CDataQuest &CGS::GetQuestInfo(int QuestID) const { return QuestJob::ms_aDataQuests[QuestID]; }
+ItemInformation &CGS::GetItemInfo(int ItemID) const { return CItemInformation::ms_aItemsInfo[ItemID]; }
+CQuestDataInfo &CGS::GetQuestInfo(int QuestID) const { return CQuestDataInfo::ms_aDataQuests[QuestID]; }
 
 /* #########################################################################
 	EVENTS
@@ -208,7 +218,7 @@ void CGS::CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamage)
 	const float Radius = g_pData->m_Explosion.m_Radius;
 	const float InnerRadius = 48.0f;
 	const float MaxForce = g_pData->m_Explosion.m_MaxForce;
-	int Num = m_World.FindEntities(Pos, Radius, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
+	const int Num = m_World.FindEntities(Pos, Radius, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
 	for(int i = 0; i < Num; i++)
 	{
 		vec2 Diff = apEnts[i]->GetPos() - Pos;
@@ -283,7 +293,7 @@ void CGS::CreatePlayerSound(int ClientID, int Sound)
 	}
 }
 
-void CGS::SendMmoEffect(vec2 Pos, int EffectID, int ClientID)
+void CGS::CreateEffect(vec2 Pos, int EffectID)
 {
 	CNetEvent_EffectMmo *pEvent = (CNetEvent_EffectMmo *)m_Events.Create(NETEVENTTYPE_EFFECTMMO, sizeof(CNetEvent_EffectMmo));
 	if(pEvent)
@@ -294,7 +304,7 @@ void CGS::SendMmoEffect(vec2 Pos, int EffectID, int ClientID)
 	}
 }
 
-void CGS::SendMmoPotion(vec2 Pos, const char *Potion, bool Added)
+void CGS::CreatePotionEffect(vec2 Pos, const char *Potion, bool Added)
 {
 	CNetEvent_EffectPotion *pEvent = (CNetEvent_EffectPotion *)m_Events.Create(NETEVENTTYPE_EFFECTPOTION, sizeof(CNetEvent_EffectPotion));
 	if(pEvent)
@@ -443,8 +453,8 @@ void CGS::Chat(int ClientID, const char* pText, ...)
 
 void CGS::ChatFollow(int ClientID, const char* pText, ...)
 {
-	int Start = (ClientID < 0 ? 0 : ClientID);
-	int End = (ClientID < 0 ? MAX_CLIENTS : ClientID + 1);
+	const int Start = (ClientID < 0 ? 0 : ClientID);
+	const int End = (ClientID < 0 ? MAX_CLIENTS : ClientID + 1);
 
 	CNetMsg_Sv_Chat Msg;
 	Msg.m_Mode = CHAT_WHISPER;
@@ -640,8 +650,8 @@ void CGS::AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSp
 // formatted broadcast
 void CGS::Broadcast(int ClientID, int Priority, int LifeSpan, const char *pText, ...)
 {
-	int Start = (ClientID < 0 ? 0 : ClientID);
-	int End = (ClientID < 0 ? MAX_PLAYERS : ClientID+1);
+	const int Start = (ClientID < 0 ? 0 : ClientID);
+	const int End = (ClientID < 0 ? MAX_PLAYERS : ClientID+1);
 
 	va_list VarArgs;
 	va_start(VarArgs, pText);
@@ -986,10 +996,10 @@ void CGS::OnInit(int WorldID)
 	{
 		for(int x = 0; x < pTileMap->m_Width; x++)
 		{
-			int Index = pTiles[y*pTileMap->m_Width+x].m_Index;
+			const int Index = pTiles[y*pTileMap->m_Width+x].m_Index;
 			if(Index >= ENTITY_OFFSET)
 			{
-				vec2 Pos(x*32.0f+16.0f, y*32.0f+16.0f);
+				const vec2 Pos(x*32.0f+16.0f, y*32.0f+16.0f);
 				m_pController->OnEntity(Index-ENTITY_OFFSET, Pos);
 			}
 		}
@@ -1109,7 +1119,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			while(*p)
 			{
 				const char *pStrOld = p;
-				int Code = str_utf8_decode(&p);
+				const int Code = str_utf8_decode(&p);
 
 				// check if unicode is not empty
 				if(Code > 0x20 && Code != 0xA0 && Code != 0x034F && (Code < 0x2000 || Code > 0x200F) && (Code < 0x2028 || Code > 0x202F) &&
@@ -1166,7 +1176,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				while (*p)
 				{
 					const char* pStrOld = p;
-					int Code = str_utf8_decode(&p);
+					const int Code = str_utf8_decode(&p);
 
 					// check if unicode is not empty
 					if (Code > 0x20 && Code != 0xA0 && Code != 0x034F && (Code < 0x2000 || Code > 0x200F) && (Code < 0x2028 || Code > 0x202F) &&
@@ -1423,7 +1433,7 @@ void CGS::OnClientDrop(int ClientID, const char *pReason)
 
 void CGS::OnClientDirectInput(int ClientID, void *pInput)
 {
-	int NumFailures = m_NetObjHandler.NumObjFailures();
+	const int NumFailures = m_NetObjHandler.NumObjFailures();
 	if(m_NetObjHandler.ValidateObj(NETOBJTYPE_PLAYERINPUT, pInput, sizeof(CNetObj_PlayerInput)) == -1)
 	{
 		if(g_Config.m_Debug && NumFailures != m_NetObjHandler.NumObjFailures())
@@ -1439,7 +1449,7 @@ void CGS::OnClientDirectInput(int ClientID, void *pInput)
 
 void CGS::OnClientPredictedInput(int ClientID, void *pInput)
 {
-	int NumFailures = m_NetObjHandler.NumObjFailures();
+	const int NumFailures = m_NetObjHandler.NumObjFailures();
 	if(m_NetObjHandler.ValidateObj(NETOBJTYPE_PLAYERINPUT, pInput, sizeof(CNetObj_PlayerInput)) == -1)
 	{
 		if(g_Config.m_Debug && NumFailures != m_NetObjHandler.NumObjFailures())
@@ -1490,7 +1500,7 @@ void CGS::ClearClientData(int ClientID)
 	ms_aEffects[ClientID].clear();
 
 	// clear active snap bots for player
-	for(auto& pActiveSnap : BotJob::ms_aDataBot)
+	for(auto& pActiveSnap : DataBotInfo::ms_aDataBot)
 		pActiveSnap.second.m_aAlreadyActiveQuestBot[ClientID] = false;
 }
 
@@ -1504,14 +1514,14 @@ int CGS::GetRank(int AccountID)
 ######################################################################### */
 void CGS::ConSetWorldTime(IConsole::IResult* pResult, void* pUserData)
 {
-	int Hour = pResult->GetInteger(0);
+	const int Hour = pResult->GetInteger(0);
 	IServer* pServer = (IServer*)pUserData;
 	pServer->SetOffsetWorldTime(Hour);
 }
 
 void CGS::ConParseSkin(IConsole::IResult *pResult, void *pUserData)
 {
-	int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS-1);
+	const int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS-1);
 	IServer* pServer = (IServer*)pUserData;
 	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
@@ -1897,7 +1907,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	if(pPlayer && pPlayer->m_ActiveMenuRegisteredCallback)
 	{
 		pPlayer->m_ActiveMenuRegisteredCallback = nullptr;
-		pPlayer->m_ActiveMenuOptionCallback = { 0 };
+		pPlayer->m_ActiveMenuOptionCallback = { nullptr };
 	}
 
 	sleep_pause(3); // TODO: fix need it
@@ -2012,7 +2022,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_WEAPON, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, pPlayer->Acc().m_aStats[at.first], at.second.m_UpgradePrice);
 		}
 
-		AV(ClientID, "null"),
+		AV(ClientID, "null");
 		AVH(ClientID, TAB_UPGR_JOB, GOLDEN_COLOR, "Disciple of Jobs");
 		Mmo()->PlantsAcc()->ShowMenu(pPlayer);
 		Mmo()->MinerAcc()->ShowMenu(pPlayer);
@@ -2042,7 +2052,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		char aBuf[128];
 		bool FoundedBots = false;
 		const float AddedChanceDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
-		for(const auto& mobs : BotJob::ms_aMobBot)
+		for(const auto& mobs : MobBotInfo::ms_aMobBot)
 		{
 			if (!IsPlayerEqualWorldID(ClientID, mobs.second.m_WorldID))
 				continue;
@@ -2216,26 +2226,27 @@ bool CGS::ParsingVoteCommands(int ClientID, const char *CMD, const int VoteID, c
 
 	if(PPSTR(CMD, "null") == 0)
 		return true;
-	else if(PPSTR(CMD, "BACK") == 0)
+
+	if(PPSTR(CMD, "BACK") == 0)
 	{
 		CreatePlayerSound(ClientID, SOUND_BOOK_FLIP);
 		ResetVotes(ClientID, pPlayer->m_LastVoteMenu);
 		return true;
 	}
-	else if(PPSTR(CMD, "MENU") == 0)
+	if(PPSTR(CMD, "MENU") == 0)
 	{
 		CreatePlayerSound(ClientID, SOUND_BOOK_FLIP);
 		ResetVotes(ClientID, VoteID);
 		return true;
 	}
-	else if (PPSTR(CMD, "SELECTEDTOP") == 0)
+	if (PPSTR(CMD, "SELECTEDTOP") == 0)
 	{
 		ResetVotes(ClientID, MenuList::MENU_TOP_LIST);
 		AV(ClientID, "null", "\0");
 		Mmo()->ShowTopList(pPlayer, VoteID);
 		return true;
 	}
-	else if(pPlayer->ParseVoteUpgrades(CMD, VoteID, VoteID2, Get))
+	if(pPlayer->ParseVoteUpgrades(CMD, VoteID, VoteID2, Get))
 		return true;
 
 	// parsing everything else
@@ -2282,7 +2293,7 @@ void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop, vec2 For
 {
 	for(int i = 0; i < NumDrop; i++)
 	{
-		vec2 Vel = Force + vec2(frandom() * 15.0, frandom() * 15.0);
+		const vec2 Vel = Force + vec2(frandom() * 15.0f, frandom() * 15.0f);
 		const float Angle = Force.x * (0.15f + frandom() * 0.1f);
 		new CDropBonuses(&m_World, Pos, Vel, Angle, Type, Count);
 	}
@@ -2378,7 +2389,7 @@ void CGS::UpdateZonePVP()
 void CGS::UpdateZoneDungeon()
 {
 	m_DungeonID = 0;
-	for(const auto& dd : DungeonJob::ms_aDungeon)
+	for(const auto& dd : CDungeonData::ms_aDungeon)
 	{
 		if(m_WorldID != dd.second.m_WorldID)
 			continue;

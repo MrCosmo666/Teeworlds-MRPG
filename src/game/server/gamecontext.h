@@ -2,15 +2,15 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_GAMECONTEXT_H
 #define GAME_SERVER_GAMECONTEXT_H
-#include <engine/server.h>
 #include <engine/console.h>
+#include <engine/server.h>
 #include <game/voting.h>
 
-#include "gamecontroller.h"
 #include "eventhandler.h"
+#include "gamecontroller.h"
 #include "gameworld.h"
-#include "playerbot.h"
 #include "player.h"
+#include "playerbot.h"
 
 #include "mmocore/MmoController.h"
 
@@ -19,28 +19,26 @@ class CGS : public IGameServer
 	/* #########################################################################
 		VAR AND OBJECT GAMECONTEX DATA
 	######################################################################### */
-	int m_WorldID;
-	int m_DungeonID;
-
-	int m_RespawnWorldID;
-	int m_MusicID;
-
-	IServer *m_pServer;
-	class IConsole *m_pConsole;
+	class IServer* m_pServer;
+	class IConsole* m_pConsole;
 	class CPathfinder* m_pPathFinder;
 	class IStorageEngine* m_pStorage;
 	class CCommandProcessor* m_pCommandProcessor;
-	MmoController* m_pMmoController;
+	class MmoController* m_pMmoController;
+	class CLayers* m_pLayers;
 
-	class CLayers *m_pLayers;
 	CCollision m_Collision;
-
 	CNetObjHandler m_NetObjHandler;
 	CTuningParams m_Tuning;
 
+	int m_WorldID;
+	int m_DungeonID;
+	int m_RespawnWorldID;
+	int m_MusicID;
+
 public:
 	IServer *Server() const { return m_pServer; }
-	class IConsole* Console() const { return m_pConsole; }
+	IConsole* Console() const { return m_pConsole; }
 	MmoController* Mmo() const { return m_pMmoController; }
 	IStorageEngine* Storage() const { return m_pStorage; }
 	CCommandProcessor* CommandProcessor() const { return m_pCommandProcessor; }
@@ -49,7 +47,7 @@ public:
 	CTuningParams *Tuning() { return &m_Tuning; }
 
 	CGS();
-	~CGS();
+	~CGS() override;
 
 	CEventHandler m_Events;
 	CPlayer *m_apPlayers[MAX_CLIENTS];
@@ -80,7 +78,7 @@ public:
 	CPlayer *GetPlayerFromAccountID(int AccountID);
 	std::unique_ptr<char[]> LevelString(int MaxValue, int CurrentValue, int Step, char toValue, char fromValue);
 	ItemInformation &GetItemInfo(int ItemID) const;
-	CDataQuest &GetQuestInfo(int QuestID) const;
+	CQuestDataInfo &GetQuestInfo(int QuestID) const;
 	const char* GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const;
 
 	/* #########################################################################
@@ -90,12 +88,12 @@ public:
 	void CreateHammerHit(vec2 Pos);
 	void CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamage);
 	void CreatePlayerSpawn(vec2 Pos);
-	void CreateDeath(vec2 Pos, int Who);
+	void CreateDeath(vec2 Pos, int ClientID);
 	void CreateSound(vec2 Pos, int Sound, int64 Mask=-1);
 	void SendWorldMusic(int ClientID, int MusicID = 0);
 	void CreatePlayerSound(int ClientID, int Sound);
-	void SendMmoEffect(vec2 Pos, int EffectID, int ClientID = -1);
-	void SendMmoPotion(vec2 Pos, const char *Potion, bool Added);
+	void CreateEffect(vec2 Pos, int EffectID);
+	void CreatePotionEffect(vec2 Pos, const char *Potion, bool Added);
 
 	/* #########################################################################
 		CHAT FUNCTIONS
@@ -105,7 +103,7 @@ private:
 	void UpdateDiscordStatus();
 
 public:
-	void FakeChat(const char *pName, const char *pText);
+	void FakeChat(const char *pName, const char *pText) override;
 	void Chat(int ClientID, const char* pText, ...);
 	void ChatFollow(int ClientID, const char* pText, ...);
 	void ChatAccountID(int AccountID, const char* pText, ...);
@@ -153,9 +151,7 @@ public:
 	void SendGameMsg(int GameMsgID, int ClientID);
 	void SendGameMsg(int GameMsgID, int ParaI1, int ClientID);
 	void SendGameMsg(int GameMsgID, int ParaI1, int ParaI2, int ParaI3, int ClientID);
-	void UpdateClientInformation(int ClientID);
-
-	void SendChatCommands(int ClientID);
+	void UpdateClientInformation(int ClientID) override;
 
 	void SendTuningParams(int ClientID);
 	void SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char* Message, int Style = -1, int TalkingEmote = -1);
@@ -214,16 +210,16 @@ private:
 	std::list<CVoteOptions> m_aPlayerVotes[MAX_PLAYERS];
 
 public:
-	void AV(int ClientID , const char *pCmd, const char *pDesc = "\0", const int TempInt = -1, const int TempInt2 = -1, const char *pIcon = "unused", VoteCallBack Callback = nullptr);
+	void AV(int ClientID , const char *pCmd, const char *pDesc = "\0", int TempInt = -1, int TempInt2 = -1, const char *pIcon = "unused", VoteCallBack Callback = nullptr);
 	void AVL(int ClientID, const char *pCmd, const char *pText, ...);
-	void AVH(int ClientID, const int HideID, vec3 Color, const char *pText, ...);
-	void AVHI(int ClientID, const char *pIcon, const int HideID, vec3 Color, const char *pText, ...);
-	void AVM(int ClientID, const char *pCmd, const int TempInt, const int HideID, const char* pText, ...);
-	void AVMI(int ClientID, const char *pIcon, const char *pCmd, const int TempInt, const int HideID, const char *pText, ...);
-	void AVD(int ClientID, const char *pCmd, const int TempInt, const int TempInt2, const int HideID, const char *pText, ...);
+	void AVH(int ClientID, int HideID, vec3 Color, const char *pText, ...);
+	void AVHI(int ClientID, const char *pIcon, int HideID, vec3 Color, const char *pText, ...);
+	void AVM(int ClientID, const char *pCmd, int TempInt, int HideID, const char* pText, ...);
+	void AVMI(int ClientID, const char *pIcon, const char *pCmd, int TempInt, int HideID, const char *pText, ...);
+	void AVD(int ClientID, const char *pCmd, int TempInt, int TempInt2, int HideID, const char *pText, ...);
 
 	// TODO: fixme. improve the system using the ID method, as well as the ability to implement Backpage
-	void AVCALLBACK(int To, const char* Type, const char* Icon, const int ID, const int ID2, const int HideID, VoteCallBack Callback, const char* pText, ...);
+	void AVCALLBACK(int To, const char* Type, const char* Icon, int ID, int ID2, int HideID, VoteCallBack Callback, const char* pText, ...);
 
 	void ClearVotes(int ClientID);
 	void ShowVotesNewbieInformation(int ClientID);
@@ -233,7 +229,7 @@ public:
 	void AddVotesBackpage(int ClientID);
 	void ShowVotesPlayerStats(CPlayer *pPlayer);
 	void ShowVotesItemValueInformation(CPlayer *pPlayer, int ItemID = itGold);
-	bool ParsingVoteCommands(int ClientID, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *Text, VoteCallBack Callback = nullptr);
+	bool ParsingVoteCommands(int ClientID, const char *CMD, int VoteID, int VoteID2, int Get, const char *Text, VoteCallBack Callback = nullptr);
 
 	/* #########################################################################
 		MMO GAMECONTEXT
@@ -259,7 +255,7 @@ public:
 	int GetWorldID() const { return m_WorldID; }
 	int GetDungeonID() const { return m_DungeonID; }
 	bool IsDungeon() const { return (m_DungeonID > 0); }
-	int GetExperienceMultiplier(int IncreaseCount) const;
+	int GetExperienceMultiplier(int Experience) const;
 	bool IsPlayerEqualWorldID(int ClientID, int WorldID = -1) const;
 	bool IsAllowedPVP() const { return m_AllowedPVP; }
 

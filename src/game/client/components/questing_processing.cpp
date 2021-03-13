@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
+
 #include <engine/shared/config.h>
 #include <engine/graphics.h>
 #include <engine/textrender.h>
@@ -124,7 +126,7 @@ void CQuestingProcessing::OnMessage(int MsgType, void *pRawMsg)
 			QuestTable[i].m_Have = pMsg->m_pHaveNum;
 			QuestTable[i].m_GivingTable = pMsg->m_pGivingTable;
 			str_copy(QuestTable[i].m_aText, pMsg->m_pText, sizeof(QuestTable[i].m_aText));
-		
+
 			char pIcon[16];
 			IntsToStr(pMsg->m_pIcon, 4, pIcon);
 			str_copy(QuestTable[i].m_aIcon, pIcon, sizeof(QuestTable[i].m_aIcon));

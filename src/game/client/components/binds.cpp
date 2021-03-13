@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
+
 #include <engine/config.h>
 #include <engine/shared/config.h>
 #include "binds.h"
@@ -236,7 +238,7 @@ void CBinds::GetKeyID(const char* pBindStr, int& KeyID, int& Modifier) const
 void CBinds::GetKey(const char* pBindStr, char aKey[64], unsigned BufSize, int KeyID, int Modifier) const
 {
 	aKey[0] = 0;
-	if (KeyID < KEY_LAST) 
+	if (KeyID < KEY_LAST)
 	{
 		str_format(aKey, BufSize, "%s%s", GetModifierName(Modifier), Input()->KeyName(KeyID));
 		return;

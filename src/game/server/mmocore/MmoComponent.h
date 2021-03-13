@@ -3,12 +3,12 @@
 #ifndef GAME_SERVER_MMO_COMPONENT_H
 #define GAME_SERVER_MMO_COMPONENT_H
 
-#include <map>
-#include <list>
-#include <vector>
-#include <engine/shared/protocol.h>
-#include <game/enum_context.h>
+#include <engine/server/sql_connect_pool.h>
+#include <engine/server/sql_string_helpers.h>
 
+#include <game/game_context.h>
+
+using namespace sqlstr;
 class MmoComponent
 {
 protected:

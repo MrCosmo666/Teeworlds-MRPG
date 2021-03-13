@@ -3,8 +3,6 @@
 #ifndef GAME_CLIENT_UI_WINDOW_H
 #define GAME_CLIENT_UI_WINDOW_H
 
-#include <functional>
-#include <vector>
 #include "ui.h"
 
 enum CWindowFlags

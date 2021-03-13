@@ -1,5 +1,6 @@
-#include <base/color.h>
+#include <base/stdafx.h>
 
+#include <base/color.h>
 #include <engine/storage.h>
 #include <engine/shared/config.h>
 #include <engine/textrender.h>
@@ -68,7 +69,7 @@ void CMenus::RenderSettingsMmo(CUIRect MainView)
 	MainView.HSplitTop(400.0f, &MainView, &Label);
 	RenderSettingsMmoGeneral(MainView, s_SettingsPage);
 
-	const char* apInformation[TAB_SIZE] = 
+	const char* apInformation[TAB_SIZE] =
 	{
 		"Setting up the general part of the client",
 		"Setting up the visual part of the client",
@@ -140,7 +141,7 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		CUIRect BackgroundExpBar = Button;
 		BasicRight.HSplitTop(ButtonHeight * 5.0f, &BackgroundExpBar, 0);
 		RenderTools()->DrawUIRect(&BackgroundExpBar, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 100.0f), CUI::CORNER_ALL, 5.0f);
-		
+
 		// expbar
 		CUIRect ExpBar;
 		BasicRight.HSplitTop(5.0f, 0, &BasicRight);
@@ -252,7 +253,7 @@ void CMenus::RenderSettingsMmoChangerGeneric(CUIRect MainView, CCSkinChanger::CT
 			Graphics()->BlendNormal();
 			if (i == 0) Graphics()->TextureSet(pEntities->GetDefault());
 			else Graphics()->TextureSet(pEntities->Get(i - 1));
-			
+
 			Graphics()->QuadsBegin();
 			IGraphics::CQuadItem QuadItem(Item.m_Rect.x, Item.m_Rect.y, Item.m_Rect.w, Item.m_Rect.h);
 			Graphics()->QuadsDrawTL(&QuadItem, 1);

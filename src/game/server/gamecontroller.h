@@ -2,9 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_GAMECONTROLLER_H
 #define GAME_SERVER_GAMECONTROLLER_H
-
-#include <base/vmath.h>
-#include <game/enum_context.h>
+#include <game/game_context.h>
 
 /*
 	Class: Game Controller
@@ -34,7 +32,7 @@ class IGameController
 	};
 	vec2 m_aaSpawnPoints[SpawnTypes::SPAWN_NUM][64];
 	int m_aNumSpawnPoints[SpawnTypes::SPAWN_NUM];
-	
+
 	float EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos) const;
 	void EvaluateSpawnType(CSpawnEval *pEval, int Type, vec2 BotPos) const;
 
@@ -44,7 +42,7 @@ protected:
 
 	// info
 	int m_GameFlags;
-	
+
 	void UpdateGameInfo(int ClientID);
 
 public:
@@ -61,7 +59,7 @@ public:
 	void OnReset();
 
 	virtual void CreateLogic(int Type, int Mode, vec2 Pos, int Health) = 0;
-	
+
 	// general
 	virtual void Snap();
 	virtual void Tick();

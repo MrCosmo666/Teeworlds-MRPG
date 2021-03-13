@@ -1,12 +1,16 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
+#include "main.h"
 
 #include <game/server/gamecontext.h>
-#include <game/server/mmocore/GameEntities/npcwall.h>
 #include <game/server/mmocore/GameEntities/jobitems.h>
+#include <game/server/mmocore/GameEntities/npcwall.h>
 #include <game/server/mmocore/GameEntities/Logics/logicwall.h>
 
-#include "main.h"
+#include <game/server/mmocore/Components/Accounts/AccountMinerCore.h>
+#include <game/server/mmocore/Components/Accounts/AccountPlantCore.h>
+#include <game/server/mmocore/Components/Houses/HouseCore.h>
 
 CGameControllerMain::CGameControllerMain(class CGS *pGS)
 : IGameController(pGS)
@@ -65,7 +69,7 @@ bool CGameControllerMain::OnEntity(int Index, vec2 Pos)
 		const int ItemID = GS()->Mmo()->PlantsAcc()->GetPlantItemID(Pos), Level = GS()->Mmo()->PlantsAcc()->GetPlantLevel(Pos);
 		if(ItemID > 0)
 			new CJobItems(&GS()->m_World, ItemID, Level, Pos, 0, 100);
-	
+
 		return true;
 	}
 

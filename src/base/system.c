@@ -1609,10 +1609,10 @@ int fs_storage_path(const char *appname, char *path, int max)
 	int i;
 	char *xdgdatahome = getenv("XDG_DATA_HOME");
 	char xdgpath[max];
-	
+
 	if(!home)
 		return -1;
-	
+
 #if defined(CONF_PLATFORM_MACOSX)
 	str_format(path, max, "%s/Library/Application Support/%s", home, appname);
 	return 0;
@@ -1636,7 +1636,7 @@ int fs_storage_path(const char *appname, char *path, int max)
 		for(i = strlen(xdgdatahome)+1; xdgpath[i]; i++)
 			xdgpath[i] = tolower(xdgpath[i]);
 	}
-	
+
 	/* check for old location / backward compatibility */
 	if(fs_is_dir(path))
 	{
@@ -1644,7 +1644,7 @@ int fs_storage_path(const char *appname, char *path, int max)
 		/* for backward compatibility */
 		return 0;
 	}
-	
+
 	str_format(path, max, "%s", xdgpath);
 
 	return 0;
@@ -1852,7 +1852,7 @@ int net_socket_read_wait(NETSOCKET sock, int time)
 	}
 
 	/* don't care about writefds and exceptfds */
-	select(sockid+1, &readfds, NULL, NULL, &tv);	
+	select(sockid+1, &readfds, NULL, NULL, &tv);
 
 	if(sock.ipv4sock >= 0 && FD_ISSET(sock.ipv4sock, &readfds))
 		return 1;

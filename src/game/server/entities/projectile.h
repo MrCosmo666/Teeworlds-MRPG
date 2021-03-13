@@ -25,10 +25,10 @@ public:
 
 	vec2 GetPos(float Time);
 
-	virtual void Reset();
-	virtual void Tick();
+	void Reset() override;
+	void Tick() override;
 	virtual void TickPaused();
-	virtual void Snap(int SnappingClient);
+	void Snap(int SnappingClient) override;
 
 private:
 	int GetOwnerProjID(int ClientID);

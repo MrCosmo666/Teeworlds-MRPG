@@ -1,8 +1,14 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
+#include "jobitems.h"
+
 #include <game/server/gamecontext.h>
 
-#include "jobitems.h"
+#include <game/server/mmocore/Components/Accounts/AccountMinerCore.h>
+#include <game/server/mmocore/Components/Accounts/AccountPlantCore.h>
+#include <game/server/mmocore/Components/Houses/HouseCore.h>
+
 // 1 - miner / 2 - plant
 CJobItems::CJobItems(CGameWorld *pGameWorld, int ItemID, int Level, vec2 Pos, int Type, int StartHealth, int HouseID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_JOBITEMS, Pos, PickupPhysSize)
@@ -21,16 +27,16 @@ CJobItems::CJobItems(CGameWorld *pGameWorld, int ItemID, int Level, vec2 Pos, in
 void CJobItems::SpawnPositions()
 {
 	vec2 SwapPos = vec2(m_Pos.x, m_Pos.y-20);
-	if (GS()->Collision()->GetCollisionAt(SwapPos.x, SwapPos.y) > 0) 
+	if (GS()->Collision()->GetCollisionAt(SwapPos.x, SwapPos.y) > 0)
 		m_Pos = SwapPos;
 	SwapPos = vec2(m_Pos.x, m_Pos.y+16);
-	if (GS()->Collision()->GetCollisionAt(SwapPos.x, SwapPos.y) > 0) 
+	if (GS()->Collision()->GetCollisionAt(SwapPos.x, SwapPos.y) > 0)
 		m_Pos = SwapPos;
 	SwapPos = vec2(m_Pos.x-18, m_Pos.y);
-	if (GS()->Collision()->GetCollisionAt(SwapPos.x, SwapPos.y) > 0) 
+	if (GS()->Collision()->GetCollisionAt(SwapPos.x, SwapPos.y) > 0)
 		m_Pos = SwapPos;
 	SwapPos = vec2(m_Pos.x+18, m_Pos.y);
-	if (GS()->Collision()->GetCollisionAt(SwapPos.x, SwapPos.y) > 0) 
+	if (GS()->Collision()->GetCollisionAt(SwapPos.x, SwapPos.y) > 0)
 		m_Pos = SwapPos;
 }
 
@@ -45,14 +51,14 @@ void CJobItems::Work(int ClientID)
 	if(ClientID >= MAX_PLAYERS || ClientID < 0 || m_Health >= m_StartHealth || !GS()->m_apPlayers[ClientID])
 		return;
 
-	// not allowed un owner house job 
+	// not allowed un owner house job
 	if(m_HouseID > 0 && !GS()->Mmo()->House()->IsHouseHasOwner(m_HouseID))
 	{
-		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "It is forbidden to pick plants without the owner!");
+		GS()->Broadcast(ClientID, BROADCAST_GAME_WARNING, 100, "It is forbidden to pick plants without the owner!");
 		return;
 	}
 
-	// - - - - - - - - MINING - - - - - - - - 
+	// - - - - - - - - MINING - - - - - - - -
 	CPlayer *pPlayer = GS()->m_apPlayers[ClientID];
 	InventoryItem &pPlayerWorkedItem = pPlayer->GetItem(m_ItemID);
 	if(m_Type == 1)
@@ -60,12 +66,12 @@ void CJobItems::Work(int ClientID)
 		int EquipItem = pPlayer->GetEquippedItemID(EQUIP_MINER);
 		if (EquipItem <= 0)
 		{
-			GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Need equip Pickaxe!");
+			GS()->Broadcast(ClientID, BROADCAST_GAME_WARNING, 100, "Need equip Pickaxe!");
 			return;
 		}
 		if (pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value < m_Level)
 		{
-			GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), m_Level);
+			GS()->Broadcast(ClientID, BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), m_Level);
 			return;
 		}
 
@@ -73,18 +79,18 @@ void CJobItems::Work(int ClientID)
 		int Durability = pPlayerEquippedItem.m_Durability;
 		if (Durability <= 0)
 		{
-			GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Need repair pickaxe!");
+			GS()->Broadcast(ClientID, BROADCAST_GAME_WARNING, 100, "Need repair pickaxe!");
 			return;
 		}
 
 		if (rand() % 10 == 0)
 			pPlayerEquippedItem.SetDurability(Durability - 1);
 
-		m_Health += 3+pPlayer->GetItemsAttributeCount(Stats::StEfficiency);
+		m_Health += 3+pPlayer->GetItemsAttributeCount(StEfficiency);
 		GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
-		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P] : {STR} ({INT}/100%)", 
-			pPlayerWorkedItem.Info().GetName(pPlayer), (m_Health > m_StartHealth ? m_StartHealth : m_Health), m_StartHealth, 
+		GS()->Broadcast(ClientID, BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P] : {STR} ({INT}/100%)",
+			pPlayerWorkedItem.Info().GetName(pPlayer), (m_Health > m_StartHealth ? m_StartHealth : m_Health), m_StartHealth,
 			pPlayerEquippedItem.Info().GetName(pPlayer), &Durability);
 
 		if(m_Health >= m_StartHealth)
@@ -98,17 +104,17 @@ void CJobItems::Work(int ClientID)
 		return;
 	}
 
-	// - - - - - - - - PLANTS - - - - - - - - 
+	// - - - - - - - - PLANTS - - - - - - - -
 	if (pPlayer->Acc().m_aPlant[JOB_LEVEL].m_Value < m_Level)
 	{
-		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), m_Level);
+		GS()->Broadcast(ClientID, BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), m_Level);
 		return;
 	}
 
 	m_Health += 10;
 	GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
-	GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P]",
+	GS()->Broadcast(ClientID, BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P]",
 		pPlayerWorkedItem.Info().GetName(pPlayer), (m_Health > m_StartHealth ? m_StartHealth : m_Health), m_StartHealth);
 
 	if(m_Health >= m_StartHealth)

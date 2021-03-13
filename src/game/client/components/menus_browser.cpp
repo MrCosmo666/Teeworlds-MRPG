@@ -1,6 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <algorithm> // sort  TODO: remove this
+#include <base/stdafx.h>
 
 #include <engine/external/json-parser/json.h>
 
@@ -1100,7 +1100,7 @@ void CMenus::RenderServerbrowserServerList(CUIRect View)
 	if(m_aSelectedFilters[BrowserType] == -2)
 		m_aSelectedFilters[BrowserType] = SelectedFilter;
 	else if(SelectedFilter != m_aSelectedFilters[BrowserType])
-	{		
+	{
 		// update stored state based on updated state of UI
 		m_aSelectedFilters[BrowserType] = SelectedFilter;
 		m_aSelectedServers[BrowserType] = -1;
@@ -1558,12 +1558,12 @@ void CMenus::RenderServerbrowserFriendTab(CUIRect View)
 		const CServerInfo *pEntry = ServerBrowser()->Get(ServerIndex);
 		if (pEntry->m_FriendState == CContactInfo::CONTACT_NO)
 			continue;
-				
+
 		for(int j = 0; j < pEntry->m_NumClients; ++j)
 		{
 			if(pEntry->m_aClients[j].m_FriendState == CContactInfo::CONTACT_NO)
 				continue;
-			
+
 			CFriendItem FriendItem;
 			FriendItem.m_pServerInfo = pEntry;
 			str_copy(FriendItem.m_aName, pEntry->m_aClients[j].m_aName, sizeof(FriendItem.m_aName));
@@ -1676,7 +1676,7 @@ void CMenus::RenderServerbrowserFriendTab(CUIRect View)
 			View.HSplitTop(SpacingH, &Space, &View);
 			s_ScrollRegion.AddRect(Space);
 		}
-		
+
 		// header
 		RenderTools()->DrawUIRect(&Header, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
 		Header.VSplitLeft(Header.h, &Icon, &Label);
@@ -2219,7 +2219,7 @@ void CMenus::RenderDetailScoreboard(CUIRect View, const CServerInfo* pInfo, int 
 			LineHeight = 0.25f * View.h;
 		}
 	}
-		
+
 	CUIRect Row = View;
 	int Count = 0;
 	for(int i = 0; i < pInfo->m_NumClients; i++)

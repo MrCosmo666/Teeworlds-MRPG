@@ -4,7 +4,6 @@
 #define GAME_CLIENT_RENDER_H
 
 #include <engine/graphics.h>
-#include <base/vmath.h>
 #include <generated/protocol.h>
 #include <game/mapitems.h>
 #include "ui.h"

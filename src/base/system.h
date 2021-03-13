@@ -1068,7 +1068,7 @@ int str_comp_nocase(const char *a, const char *b);
 		- Only garanted to work with a-z/A-Z.
 		- The strings are treated as zero-terminated strings.
 */
-int str_comp_nocase_num(const char *a, const char *b, const int num);
+int str_comp_nocase_num(const char *a, const char *b, int num);
 
 /*
 	Function: str_comp
@@ -1105,7 +1105,7 @@ int str_comp(const char *a, const char *b);
 	Remarks:
 		- The strings are treated as zero-terminated strings.
 */
-int str_comp_num(const char *a, const char *b, const int num);
+int str_comp_num(const char *a, const char *b, int num);
 
 /*
 	Function: str_comp_filenames
@@ -1367,7 +1367,7 @@ int fs_is_dir(const char *path);
 		Gets the modification time of a file
 */
 time_t fs_getmtime(const char* path);
-	
+
 /*
 	Function: fs_chdir
 		Changes current working directory

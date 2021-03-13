@@ -1,9 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
 
 #include <base/color.h>
-#include <base/math.h>
-
 #include <engine/engine.h>
 #include <engine/graphics.h>
 #include <engine/serverbrowser.h>
@@ -812,7 +811,7 @@ void CMenus::RenderThemeSelection(CUIRect MainView, bool Header)
 
 		CUIRect Icon;
 		Item.m_Rect.VSplitLeft(Item.m_Rect.h * 2.0f, &Icon, &Item.m_Rect);
-		
+
 		// draw icon if it exists
 		if(Theme.m_IconTexture.IsValid())
 		{
@@ -1657,7 +1656,7 @@ void CMenus::RenderSettingsGraphics(CUIRect MainView)
 #ifdef CONF_PLATFORM_MACOSX
 	CheckFullscreen = true;
 #endif
-	
+
 	static const int s_GfxFullscreen = g_Config.m_GfxFullscreen;
 	static const int s_GfxScreenWidth = g_Config.m_GfxScreenWidth;
 	static const int s_GfxScreenHeight = g_Config.m_GfxScreenHeight;
@@ -1989,7 +1988,7 @@ void CMenus::RenderSettingsSound(CUIRect MainView)
 			g_Config.m_SndMusicMRPG ^= 1;
 			m_pClient->UpdateStateMmoMusic();
 		}
-		
+
 		Sound.HSplitTop(Spacing, 0, &Sound);
 		Sound.HSplitTop(ButtonHeight, &Button, &Sound);
 		Button.VSplitLeft(ButtonHeight, 0, &Button);
@@ -2162,7 +2161,7 @@ void CMenus::RenderSettings(CUIRect MainView)
 		RenderSettingsGeneral(MainView);
 	else if(g_Config.m_UiSettingsPage == SETTINGS_PLAYER)
 		RenderSettingsPlayer(MainView);
-	else if(g_Config.m_UiSettingsPage == SETTINGS_TBD) // TODO: replace removed tee page to something else	
+	else if(g_Config.m_UiSettingsPage == SETTINGS_TBD) // TODO: replace removed tee page to something else
 		g_Config.m_UiSettingsPage = SETTINGS_PLAYER; // TODO: remove this
 	else if(g_Config.m_UiSettingsPage == SETTINGS_CONTROLS)
 		RenderSettingsControls(MainView);

@@ -7,7 +7,7 @@
 #include <type_traits>
 
 template <typename T>
-inline T clamp(T val, T min, T max)
+T clamp(T val, T min, T max)
 {
 	if(val < min)
 		return min;
@@ -29,13 +29,13 @@ inline int round_to_int(float f)
 }
 
 template<typename T, typename TB>
-inline T mix(const T a, const T b, TB amount)
+T mix(const T a, const T b, TB amount)
 {
 	return a + (b-a)*amount;
 }
 
 template<typename T, typename TB>
-inline T bezier(const T p0, const T p1, const T p2, const T p3, TB amount)
+T bezier(const T p0, const T p1, const T p2, const T p3, TB amount)
 {
 	// De-Casteljau Algorithm
 	const T c10 = mix(p0, p1, amount);
@@ -86,10 +86,11 @@ public:
 
 const float pi = 3.1415926535897932384626433f;
 
-template <typename T> inline T min(T a, T b) { return a<b?a:b; }
-template <typename T> inline T max(T a, T b) { return a>b?a:b; }
-template <typename T> inline T max(T a, T b, T c) { return max(max(a, b), c); }
-template <typename T> inline T absolute(T a) { return a<T(0)?-a:a; }
+// ODR (one-definition rule) states that there must be exactly one definition of a variable, function, class, enum or template
+template <typename T> T min(T a, T b) { return a<b?a:b; }
+template <typename T> T max(T a, T b) { return a>b?a:b; }
+template <typename T> T max(T a, T b, T c) { return max(max(a, b), c); }
+template <typename T> T absolute(T a) { return a<T(0)?-a:a; }
 
 inline unsigned long long computeExperience(unsigned Level)
 {
@@ -103,16 +104,16 @@ template < typename T> // char is arithmetic type we must exclude it 'a' / 'd' e
 using PercentArithmetic = typename std::enable_if < std::is_arithmetic  < T >::value && !std::is_same < T, char >::value, T >::type;
 
 template <typename T> // derive from the number of percent e.g. ((100, 10%) = 10)
-inline PercentArithmetic<T> translate_to_percent_rest(T value, float percent) { return (T)(((double)value / 100.0f) * (T)percent); }
+PercentArithmetic<T> translate_to_percent_rest(T value, float percent) { return (T)(((double)value / 100.0f) * (T)percent); }
 
 template <typename T> // add to the number a percentage e.g. ((100, 10%) = 110)
-inline PercentArithmetic<T> add_percent_to_source(T *pvalue, float percent)
+PercentArithmetic<T> add_percent_to_source(T *pvalue, float percent)
 {
 	*pvalue = ((T)((double)*pvalue) * (1.0f + ((T)percent / 100.0f)));
 	return (T)(*pvalue);
 }
 
 template <typename T> // translate from the first to the second in percent e.g. ((10, 5) = 50%)
-inline PercentArithmetic<T> translate_to_percent(T from, T value) { return (T)(((double)value / (double)from) * 100.0f); }
+PercentArithmetic<T> translate_to_percent(T from, T value) { return (T)(((double)value / (double)from) * 100.0f); }
 
 #endif // BASE_MATH_H

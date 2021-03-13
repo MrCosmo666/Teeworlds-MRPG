@@ -1,6 +1,6 @@
-#include "snapshot_ids_pool.h"
+#include <base/stdafx.h>
 
-#include <base/system.h>
+#include "snapshot_ids_pool.h"
 
 CSnapIDPool::CSnapIDPool()
 {

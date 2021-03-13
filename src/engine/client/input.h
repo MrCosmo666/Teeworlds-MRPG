@@ -3,8 +3,6 @@
 #ifndef ENGINE_CLIENT_INPUT_H
 #define ENGINE_CLIENT_INPUT_H
 
-#include <base/tl/sorted_array.h>
-
 class CInput : public IEngineInput
 {
 	IEngineGraphics* m_pGraphics;

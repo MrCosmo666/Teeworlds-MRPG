@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_GAMEMODES_MOD_H
 #define GAME_SERVER_GAMEMODES_MOD_H
-
 #include <game/server/gamecontroller.h>
 
 class CGameControllerMain : public IGameController
@@ -11,9 +10,9 @@ public:
 
 	CGameControllerMain(class CGS *pGameServer);
 
-	virtual void Tick();
-	virtual bool OnEntity(int Index, vec2 Pos);
-	virtual void CreateLogic(int Type, int Mode, vec2 Pos, int ParseID);
+	void Tick() override;
+	bool OnEntity(int Index, vec2 Pos) override;
+	void CreateLogic(int Type, int Mode, vec2 Pos, int ParseID) override;
 
 };
 #endif

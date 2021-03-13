@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
+
 #include <engine/textrender.h>
 #include <engine/shared/config.h>
 
@@ -10,7 +12,7 @@
 #include "inv_slot.h"
 #include "inv_list.h"
 
-CInventoryList::CInventoryList(CInventory* pInventory, const char *pInventoryListName, CUIRect& pMainView, int MaxSlotsWidth, int MaxSlotsHeight) 
+CInventoryList::CInventoryList(CInventory* pInventory, const char *pInventoryListName, CUIRect& pMainView, int MaxSlotsWidth, int MaxSlotsHeight)
 	: m_pInventory(pInventory)
 {
 	m_HoveredSlot = nullptr;
@@ -156,7 +158,7 @@ void CInventoryList::RenderSelectionPage()
 	CUIRect SelectionRect = MainView;
 	SelectionRect.HSplitBottom((float)BoxSize, 0, &SelectionRect);
 	SelectionRect.VMargin((float)(MainView.w / 2.0f) - SpaceOption, &SelectionRect);
-	{ 
+	{
 		// left arrow
 		RenderTextRoundRect(SelectionRect, 0.0f, FontSize, "<", 6.0f, &HoveredLeft);
 		if((m_pInventory->m_MouseFlag & MouseEvent::M_WHEEL_DOWN && m_pInventory->UI()->MouseInside(&m_MainView))
@@ -178,9 +180,9 @@ void CInventoryList::RenderSelectionPage()
 		m_pInventory->TextRender()->TextColor(CUI::ms_DefaultTextColor);
 	}
 
-	SelectionRect.x += (SpaceOption * 2.0f); 
+	SelectionRect.x += (SpaceOption * 2.0f);
 	{ // right arrow
-		
+
 		RenderTextRoundRect(SelectionRect, 0.0f, FontSize, ">", 6.0f, &HoveredRight);
 		if((m_pInventory->m_MouseFlag & MouseEvent::M_WHEEL_UP && m_pInventory->UI()->MouseInside(&m_MainView)) ||
 			(m_pInventory->m_MouseFlag & MouseEvent::M_LEFT_CLICKED && HoveredRight && !m_InteractiveSlot))

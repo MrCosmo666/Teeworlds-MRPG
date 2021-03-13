@@ -2,11 +2,20 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include "player.h"
 
-#include <game/server/mmocore/ComponentsCore/InventoryJob/InventoryJob.h>
-#include <teeother/components/localization.h>
-
 #include "gamecontext.h"
 #include "gamemodes/dungeon.h"
+
+#include <teeother/components/localization.h>
+
+#include "mmocore/Components/Accounts/AccountCore.h"
+#include "mmocore/Components/Bots/BotCore.h"
+#include "mmocore/Components/Dungeons/DungeonData.h"
+#include "mmocore/Components/Guilds/GuildJob.h"
+#include "mmocore/Components/Quests/QuestCore.h"
+#include "mmocore/Components/Worlds/WorldSwapCore.h"
+
+#include "mmocore/Components/Inventory/ItemData.h"
+#include "mmocore/Components/Skills/SkillData.h"
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 
@@ -115,7 +124,7 @@ void CPlayer::EffectsTick()
 		if(pEffect->second <= 0)
 		{
 			if(m_pCharacter && m_pCharacter->IsAlive())
-				GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, pEffect->first.c_str(), false);
+				GS()->CreatePotionEffect(m_pCharacter->m_Core.m_Pos, pEffect->first.c_str(), false);
 			GS()->Chat(m_ClientID, "You lost the effect {STR}.", pEffect->first.c_str());
 			pEffect = CGS::ms_aEffects[m_ClientID].erase(pEffect);
 			continue;
@@ -378,7 +387,7 @@ void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
 	{
 		GS()->Chat(m_ClientID, "You got the effect {STR} time {INT}sec.", Potion, Sec);
 		CGS::ms_aEffects[m_ClientID][Potion] = Sec;
-		GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, Potion, true);
+		GS()->CreatePotionEffect(m_pCharacter->m_Core.m_Pos, Potion, true);
 	}
 }
 
@@ -503,7 +512,7 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 		if(GS()->IsDungeon())
 		{
 			const int DungeonID = GS()->GetDungeonID();
-			if(!DungeonJob::ms_aDungeon[DungeonID].IsDungeonPlaying())
+			if(!CDungeonData::ms_aDungeon[DungeonID].IsDungeonPlaying())
 			{
 				GetTempData().m_TempDungeonReady ^= true;
 				GS()->Chat(m_ClientID, "You change the ready mode to {STR}!", GetTempData().m_TempDungeonReady ? "ready" : "not ready");
@@ -573,28 +582,28 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 
 InventoryItem &CPlayer::GetItem(int ItemID)
 {
-	InventoryJob::ms_aItems[m_ClientID][ItemID].m_ItemID = ItemID;
-	InventoryJob::ms_aItems[m_ClientID][ItemID].SetItemOwner(this);
-	return InventoryJob::ms_aItems[m_ClientID][ItemID];
+	CItemData::ms_aItems[m_ClientID][ItemID].m_ItemID = ItemID;
+	CItemData::ms_aItems[m_ClientID][ItemID].SetItemOwner(this);
+	return CItemData::ms_aItems[m_ClientID][ItemID];
 }
 
-CSkill &CPlayer::GetSkill(int SkillID)
+CSkillData &CPlayer::GetSkill(int SkillID)
 {
-	SkillsJob::ms_aSkills[m_ClientID][SkillID].m_SkillID = SkillID;
-	SkillsJob::ms_aSkills[m_ClientID][SkillID].SetSkillOwner(this);
-	return SkillsJob::ms_aSkills[m_ClientID][SkillID];
+	CSkillData::ms_aSkills[m_ClientID][SkillID].m_SkillID = SkillID;
+	CSkillData::ms_aSkills[m_ClientID][SkillID].SetSkillOwner(this);
+	return CSkillData::ms_aSkills[m_ClientID][SkillID];
 }
 
-CPlayerQuest& CPlayer::GetQuest(int QuestID)
+CQuestData& CPlayer::GetQuest(int QuestID)
 {
-	QuestJob::ms_aPlayerQuests[m_ClientID][QuestID].m_QuestID = QuestID;
-	QuestJob::ms_aPlayerQuests[m_ClientID][QuestID].m_pPlayer = this;
-	return QuestJob::ms_aPlayerQuests[m_ClientID][QuestID];
+	CQuestData::ms_aPlayerQuests[m_ClientID][QuestID].m_QuestID = QuestID;
+	CQuestData::ms_aPlayerQuests[m_ClientID][QuestID].m_pPlayer = this;
+	return CQuestData::ms_aPlayerQuests[m_ClientID][QuestID];
 }
 
 int CPlayer::GetEquippedItemID(int EquipID, int SkipItemID) const
 {
-	for(const auto& it : InventoryJob::ms_aItems[m_ClientID])
+	for(const auto& it : CItemData::ms_aItems[m_ClientID])
 	{
 		if(!it.second.m_Count || !it.second.m_Settings || it.second.Info().m_Function != EquipID || it.first == SkipItemID)
 			continue;
@@ -616,7 +625,7 @@ int CPlayer::GetAttributeCount(int BonusID, bool ActiveFinalStats)
 		AttributEx /= CGS::ms_aAttributsInfo[BonusID].m_Devide;
 
 	// if the best tank class is selected among the players we return the sync dungeon stats
-	if(GS()->IsDungeon() && CGS::ms_aAttributsInfo[BonusID].m_UpgradePrice < 10 && DungeonJob::ms_aDungeon[GS()->GetDungeonID()].IsDungeonPlaying())
+	if(GS()->IsDungeon() && CGS::ms_aAttributsInfo[BonusID].m_UpgradePrice < 10 && CDungeonData::ms_aDungeon[GS()->GetDungeonID()].IsDungeonPlaying())
 	{
 		CGameControllerDungeon* pDungeon = static_cast<CGameControllerDungeon*>(GS()->m_pController);
 		return pDungeon->GetAttributeDungeonSync(this, BonusID);
@@ -628,7 +637,7 @@ int CPlayer::GetAttributeCount(int BonusID, bool ActiveFinalStats)
 int CPlayer::GetItemsAttributeCount(int AttributeID) const
 {
 	int SummingSize = 0;
-	for(const auto& it : InventoryJob::ms_aItems[m_ClientID])
+	for(const auto& it : CItemData::ms_aItems[m_ClientID])
 	{
 		if(!it.second.IsEquipped() || !it.second.Info().IsEnchantable() || !it.second.Info().GetInfoEnchantStats(AttributeID))
 			continue;
@@ -677,8 +686,8 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 	if (pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
 		// clearing the end of dialogs or a dialog that was meaningless
-		const int sizeTalking = BotJob::ms_aNpcBot[MobID].m_aDialog.size();
-		const bool isTalkingEmpty = BotJob::ms_aNpcBot[MobID].m_aDialog.empty();
+		const int sizeTalking = NpcBotInfo::ms_aNpcBot[MobID].m_aDialog.size();
+		const bool isTalkingEmpty = NpcBotInfo::ms_aNpcBot[MobID].m_aDialog.empty();
 		if ((isTalkingEmpty && m_DialogNPC.m_Progress == IS_TALKING_EMPTY) || (!isTalkingEmpty && m_DialogNPC.m_Progress >= sizeTalking))
 		{
 			ClearTalking();
@@ -696,7 +705,7 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 		}
 
 		// get a quest for the progress of dialogue if it is in this progress we accept the quest
-		GivingQuestID = BotJob::ms_aNpcBot[MobID].m_aDialog[m_DialogNPC.m_Progress].m_GivingQuest;
+		GivingQuestID = NpcBotInfo::ms_aNpcBot[MobID].m_aDialog[m_DialogNPC.m_Progress].m_GivingQuest;
 		if (GivingQuestID >= 1)
 		{
 			if (!m_DialogNPC.m_FreezedProgress)
@@ -715,20 +724,20 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 
 	else if (pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 	{
-		const int sizeTalking = BotJob::ms_aQuestBot[MobID].m_aDialog.size();
+		const int sizeTalking = QuestBotInfo::ms_aQuestBot[MobID].m_aDialog.size();
 		if (m_DialogNPC.m_Progress >= sizeTalking)
 		{
 			ClearTalking();
-			GS()->Mmo()->Quest()->InteractiveQuestNPC(this, BotJob::ms_aQuestBot[MobID], true);
+			GS()->Mmo()->Quest()->InteractiveQuestNPC(this, QuestBotInfo::ms_aQuestBot[MobID], true);
 			return;
 		}
 
-		const bool RequiestQuestTask = BotJob::ms_aQuestBot[MobID].m_aDialog[m_DialogNPC.m_Progress].m_RequestComplete;
+		const bool RequiestQuestTask = QuestBotInfo::ms_aQuestBot[MobID].m_aDialog[m_DialogNPC.m_Progress].m_RequestComplete;
 		if (RequiestQuestTask)
 		{
 			if (!m_DialogNPC.m_FreezedProgress)
 			{
-				GS()->Mmo()->Quest()->DoStepDropTakeItems(this, BotJob::ms_aQuestBot[MobID]);
+				GS()->Mmo()->Quest()->DoStepDropTakeItems(this, QuestBotInfo::ms_aQuestBot[MobID]);
 				GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_DialogNPC.m_Progress, TalkedID);
 				GS()->Mmo()->BotsData()->ShowBotQuestTaskInfo(this, MobID, m_DialogNPC.m_Progress);
 				m_DialogNPC.m_FreezedProgress = true;
@@ -736,7 +745,7 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 			}
 
 			// skip non complete dialog quest
-			if (!GS()->Mmo()->Quest()->InteractiveQuestNPC(this, BotJob::ms_aQuestBot[MobID], false))
+			if (!GS()->Mmo()->Quest()->InteractiveQuestNPC(this, QuestBotInfo::ms_aQuestBot[MobID], false))
 			{
 				GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_DialogNPC.m_Progress, TalkedID);
 				GS()->Mmo()->BotsData()->ShowBotQuestTaskInfo(this, MobID, m_DialogNPC.m_Progress);
@@ -768,7 +777,7 @@ const char *CPlayer::GetDialogText() const
 
 void CPlayer::FormatDialogText(int DataBotID, const char *pText)
 {
-	if(!GS()->Mmo()->BotsData()->IsDataBotValid(DataBotID) || m_aFormatDialogText[0] != '\0')
+	if(!DataBotInfo::IsDataBotValid(DataBotID) || m_aFormatDialogText[0] != '\0')
 		return;
 
 	str_copy(m_aFormatDialogText, pText, sizeof(m_aFormatDialogText));
@@ -778,11 +787,11 @@ void CPlayer::FormatDialogText(int DataBotID, const char *pText)
 	while(pBot != nullptr)
 	{
 		int SearchBotID = 0;
-		if(sscanf(pBot, "[Bot_%d]", &SearchBotID) && GS()->Mmo()->BotsData()->IsDataBotValid(SearchBotID))
+		if(sscanf(pBot, "[Bot_%d]", &SearchBotID) && DataBotInfo::IsDataBotValid(SearchBotID))
 		{
 			char aBufSearch[16];
 			str_format(aBufSearch, sizeof(aBufSearch), "[Bot_%d]", SearchBotID);
-			str_replace(m_aFormatDialogText, aBufSearch, BotJob::ms_aDataBot[SearchBotID].m_aNameBot);
+			str_replace(m_aFormatDialogText, aBufSearch, DataBotInfo::ms_aDataBot[SearchBotID].m_aNameBot);
 		}
 		pBot = str_find_nocase(m_aFormatDialogText, "[Bot_");
 	}
@@ -802,7 +811,7 @@ void CPlayer::FormatDialogText(int DataBotID, const char *pText)
 
 	// based replacing dialogs
 	str_replace(m_aFormatDialogText, "[Player]", GS()->Server()->ClientName(m_ClientID));
-	str_replace(m_aFormatDialogText, "[Talked]", BotJob::ms_aDataBot[DataBotID].m_aNameBot);
+	str_replace(m_aFormatDialogText, "[Talked]", DataBotInfo::ms_aDataBot[DataBotID].m_aNameBot);
 	str_replace(m_aFormatDialogText, "[Time]", GS()->Server()->GetStringTypeDay());
 	str_replace(m_aFormatDialogText, "[Here]", GS()->Server()->GetWorldName(GS()->GetWorldID()));
 }

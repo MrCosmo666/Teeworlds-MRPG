@@ -1,8 +1,10 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <game/server/gamecontext.h>
+#include <base/stdafx.h>
 
 #include "drop_bonuses.h"
+
+#include <game/server/gamecontext.h>
 
 CDropBonuses::CDropBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, int Type, int Count)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPBONUS, Pos, 24)

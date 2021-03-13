@@ -1,10 +1,9 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <game/server/gamecontext.h>
-#include <engine/shared/config.h>
+#include <base/stdafx.h>
 #include "snapfull.h"
 
-// TODO: rework it Wtf we copy vector nice (fixed) xd
+#include <game/server/gamecontext.h>
 
 CSnapFull::CSnapFull(CGameWorld *pGameWorld, vec2 Pos, int SnapID, int ClientID, int Num, int Type, bool Changing, bool Projectile)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_SNAPEFFECT, Pos)
@@ -37,16 +36,16 @@ void CSnapFull::AddItem(int Count, int Type, bool Projectile, bool Dynamic, int 
 		Item.m_SnapID = SnapID;
 		Item.m_Projectile = Projectile;
 		m_SnapItem.push_back(Item);
-	}	
+	}
 }
 
 void CSnapFull::RemoveItem(int Count, int SnapID, bool Effect)
 {
 	for (auto pItems = m_SnapItem.begin(); pItems != m_SnapItem.end(); )
-	{ 
+	{
 		if(Count <= 0)
 			break;
-		
+
 		if(pItems->m_SnapID != SnapID)
 		{
 			++pItems;
@@ -73,14 +72,14 @@ void CSnapFull::Tick()
 		GS()->m_World.DestroyEntity(this);
 		return;
 	}
-		
-	if(!m_IsBack) 
+
+	if(!m_IsBack)
 	{
 		m_LoadingTick--;
 		if(m_LoadingTick <= 1)
 			m_IsBack = true;
 	}
-	else 
+	else
 	{
 		m_LoadingTick++;
 		if(m_LoadingTick >= 30)

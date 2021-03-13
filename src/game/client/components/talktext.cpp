@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
+
 #include <generated/protocol.h>
 #include <generated/client_data.h>
 
@@ -102,7 +104,7 @@ void CTalkText::OnRender()
 	if(m_pClient->m_aClients[LocalClientID].m_Active || (TalkClientID >= 0 && TalkClientID < MAX_CLIENTS && m_pClient->m_aClients[TalkClientID].m_Active))
 	{
 		// dialogue with someone
-		if (LocalClientID != TalkClientID) 
+		if (LocalClientID != TalkClientID)
 		{
 			CTeeRenderInfo RenderTalking = m_pClient->m_aClients[TalkClientID].m_RenderInfo;
 			RenderTalking.m_Size = 128.0f;
@@ -129,7 +131,7 @@ void CTalkText::OnRender()
 
 	// ------------------------ TEXT --------------------------
 	// --------------------------------------------------------
-	CTextCursor Cursor; 
+	CTextCursor Cursor;
 	float FontSize = 22.0f;
 	CUIRect BackgroundOther = m_pAnimBackgroundOther->GetPos()->GetRect();
 	BackgroundOther.VMargin(20.0f, &BackgroundOther);

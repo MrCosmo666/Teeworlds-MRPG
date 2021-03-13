@@ -1,16 +1,18 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <limits.h>
+#include <base/stdafx.h>
+#include "dungeon.h"
 
 #include <engine/shared/config.h>
-#include <teeother/system/string.h>
 #include <game/server/entity.h>
 #include <game/server/gamecontext.h>
 
 #include <game/server/mmocore/GameEntities/npcwall.h>
 #include <game/server/mmocore/GameEntities/Logics/logicwall.h>
+#include <teeother/system/string.h>
 
-#include "dungeon.h"
+#include <game/server/mmocore/Components/Dungeons/DungeonJob.h>
+#include <game/server/mmocore/Components/Accounts/AccountCore.h>
 
 CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController(pGS)
 {
@@ -21,7 +23,7 @@ CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController
 	m_TankClientID = -1;
 
 	// door creation to start
-	vec2 PosDoor = vec2(DungeonJob::ms_aDungeon[m_DungeonID].m_DoorX, DungeonJob::ms_aDungeon[m_DungeonID].m_DoorY);
+	vec2 PosDoor = vec2(CDungeonData::ms_aDungeon[m_DungeonID].m_DoorX, CDungeonData::ms_aDungeon[m_DungeonID].m_DoorY);
 	m_DungeonDoor = new DungeonDoor(&GS()->m_World, PosDoor);
 	ChangeState(DUNGEON_WAITING);
 
@@ -49,14 +51,14 @@ void CGameControllerDungeon::KillAllPlayers()
 
 void CGameControllerDungeon::ChangeState(int State)
 {
-	DungeonJob::ms_aDungeon[m_DungeonID].m_State = State;
+	CDungeonData::ms_aDungeon[m_DungeonID].m_State = State;
 	m_StateDungeon = State;
 
 	// - - - - - - - - - - - - - - - - - - - - - -
 	// used when changing state to waiting
 	if (State == DUNGEON_WAITING)
 	{
-		DungeonJob::ms_aDungeon[m_DungeonID].m_Progress = 0;
+		CDungeonData::ms_aDungeon[m_DungeonID].m_Progress = 0;
 		m_MaximumTick = 0;
 		m_FinishedTick = 0;
 		m_StartingTick = 0;
@@ -116,7 +118,7 @@ void CGameControllerDungeon::ChangeState(int State)
 		char aTimeFormat[64];
 		str_format(aTimeFormat, sizeof(aTimeFormat), "Time: %d minute(s) %d second(s)", Seconds / 60, Seconds - (Seconds / 60 * 60));
 		GS()->Chat(-1, "Group{STR}!", Buffer.buffer());
-		GS()->Chat(-1, "{STR} finished {STR}!", DungeonJob::ms_aDungeon[m_DungeonID].m_aName, aTimeFormat);
+		GS()->Chat(-1, "{STR} finished {STR}!", CDungeonData::ms_aDungeon[m_DungeonID].m_aName, aTimeFormat);
 	}
 
 	// - - - - - - - - - - - - - - - - - - - - - -
@@ -136,7 +138,7 @@ void CGameControllerDungeon::StateTick()
 	// - - - - - - - - - - - - - - - - - - - - - -
 	// dungeon
 	const int Players = PlayersNum();
-	DungeonJob::ms_aDungeon[m_DungeonID].m_Players = Players;
+	CDungeonData::ms_aDungeon[m_DungeonID].m_Players = Players;
 	if (Players < 1 && m_StateDungeon != DUNGEON_WAITING)
 		ChangeState(DUNGEON_WAITING);
 
@@ -232,7 +234,7 @@ void CGameControllerDungeon::OnCharacterDeath(CCharacter* pVictim, CPlayer* pKil
 	if (KillerID != VictimID && pVictim->GetPlayer()->IsBot() && pVictim->GetPlayer()->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
 		const int Progress = 100 - translate_to_percent(CountMobs(), LeftMobsToWin());
-		DungeonJob::ms_aDungeon[m_DungeonID].m_Progress = Progress;
+		CDungeonData::ms_aDungeon[m_DungeonID].m_Progress = Progress;
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The dungeon is completed on [{INT}%]", Progress);
 		UpdateDoorKeyState();
 	}
@@ -491,7 +493,7 @@ bool CGameControllerDungeon::OnEntity(int Index, vec2 Pos)
 		new CNPCWall(&GS()->m_World, Pos, true);
 		return true;
 	}
-	
+
 	return false;
 }
 
@@ -525,7 +527,7 @@ void DungeonDoor::Snap(int SnappingClient)
 {
 	if (m_State >= DUNGEON_STARTED || NetworkClipped(SnappingClient))
 		return;
-	
+
 	CNetObj_Laser *pObj = static_cast<CNetObj_Laser *>(Server()->SnapNewItem(NETOBJTYPE_LASER, GetID(), sizeof(CNetObj_Laser)));
 	if (!pObj)
 		return;

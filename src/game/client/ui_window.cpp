@@ -1,10 +1,10 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/system.h>
-#include <engine/keys.h>
-
-#include "render.h"
+#include <base/stdafx.h>
 #include "ui_window.h"
+
+#include <engine/keys.h>
+#include "render.h"
 
 std::vector<CWindowUI*> CWindowUI::ms_aWindows;
 CUI* CWindowUI::m_pUI;

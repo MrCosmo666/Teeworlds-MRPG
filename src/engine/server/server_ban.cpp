@@ -1,9 +1,9 @@
+#include <base/stdafx.h>
+
 #include <engine/console.h>
 #include "server_ban.h"
 
-#include <base/math.h>
 #include <engine/server.h>
-#include <engine/config.h>
 #include <engine/shared/config.h>
 #include <engine/shared/network.h>
 #include <engine/shared/protocol.h>

@@ -1,8 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/color.h>
-#include <base/math.h>
+#include <base/stdafx.h>
 
+#include <base/color.h>
 #include <engine/client.h>
 #include <engine/console.h>
 #include <engine/graphics.h>
@@ -293,7 +293,7 @@ void CLayerTiles::FillSelection(bool Empty, CLayer *pBrush, CUIRect Rect)
 
 	if(m_LiveAutoMap)
 	{
-		RECTi r = {sx - 1, sy - 1, w + 2, h + 2};	
+		RECTi r = {sx - 1, sy - 1, w + 2, h + 2};
 		m_pEditor->m_Map.m_lImages[m_Image]->m_pAutoMapper->Proceed(this, m_SelectedRuleSet, r);
 	}
 

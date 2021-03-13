@@ -3,7 +3,6 @@
 #ifndef GAME_CLIENT_COMPONENTS_INVENTORY_LIST_H
 #define GAME_CLIENT_COMPONENTS_INVENTORY_LIST_H
 
-#include <map>
 #include <game/client/ui.h>
 #include <game/client/ui_window.h>
 

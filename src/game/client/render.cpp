@@ -1,8 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <math.h>
-
-#include <base/math.h>
+#include <base/stdafx.h>
 
 #include <engine/shared/config.h>
 #include <engine/graphics.h>
@@ -344,7 +342,7 @@ void CRenderTools::DrawLine(float x, float y, float tox, float toy, vec4 Color)
 }
 
 void CRenderTools::DrawUIRectLine(const CUIRect* pRect, vec4 Color, int LineFlags)
-{ 
+{
 	float x = pRect->x, y = pRect->y, tox = pRect->x + pRect->w, toy = pRect->y + pRect->h;
 	if(LineFlags & LineDirectionFlag::LINE_LEFT)
 	{
@@ -519,7 +517,7 @@ void CRenderTools::RenderTee(CAnimState* pAnim, const CTeeRenderInfo* pInfo, int
 					Graphics()->QuadsDraw(&QuadItem, 1);
 				}
 				Graphics()->QuadsEnd();
-				
+
 				// draw xmas hat
 				if(!OutLine && pInfo->m_HatTexture.IsValid())
 				{

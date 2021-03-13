@@ -2,7 +2,6 @@
 #define BASE_HASH_CTXT_H
 
 #include "hash.h"
-#include <stdint.h>
 
 #if defined(CONF_OPENSSL)
 #include <openssl/md5.h>

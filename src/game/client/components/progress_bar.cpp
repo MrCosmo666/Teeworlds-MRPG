@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
+
 #include <engine/shared/config.h>
 #include <engine/graphics.h>
 #include <engine/textrender.h>
@@ -42,7 +44,7 @@ void CProgressBar::OnRender()
 	if (Client()->LocalTime() < m_ProgressTime)
 	{
 		// --------------------- BACKGROUND -----------------------
-		CUIRect BackgroundMain = { Width / 3.0f, Height - 120.0f, Width / 3.0f, Height / 17.0f };	
+		CUIRect BackgroundMain = { Width / 3.0f, Height - 120.0f, Width / 3.0f, Height / 17.0f };
 		RenderTools()->DrawRoundRect(&BackgroundMain, vec4(0.2f, 0.2f, 0.2f, 0.4f), 30.0f);
 		BackgroundMain.VMargin(20.0f, &BackgroundMain);
 

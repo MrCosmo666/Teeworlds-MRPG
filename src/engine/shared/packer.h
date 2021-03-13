@@ -3,8 +3,6 @@
 #ifndef ENGINE_SHARED_PACKER_H
 #define ENGINE_SHARED_PACKER_H
 
-
-
 class CPacker
 {
 	enum

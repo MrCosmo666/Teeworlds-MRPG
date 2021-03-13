@@ -1,3 +1,5 @@
+#include <base/stdafx.h>
+
 #include <engine/console.h>
 #include <engine/storage.h>
 
@@ -121,7 +123,7 @@ void CTilesetMapper::Proceed(CLayerTiles *pLayer, int ConfigID, RECTi Area)
 		return;
 
 	pLayer->Clamp(&Area);
-	
+
 	int BaseTile = pConf->m_BaseTile;
 
 	// auto map !

@@ -1,9 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
 
 #include <base/color.h>
-#include <base/system.h>
-
 #include <engine/shared/datafile.h>
 #include <engine/shared/config.h>
 #include <engine/client.h>
@@ -4012,15 +4011,15 @@ void CEditor::RenderMenubar(CUIRect MenuBar)
 	MenuBar.VSplitRight(20.f, &MenuBar, &ExitButton);
 	MenuBar.VSplitLeft(40.0f, 0, &MenuBar);
 	MenuBar.VSplitLeft(MenuBar.w*0.75f, &MenuBar, &Info);
-	
+
 
 	char aBuf[128];
 	str_format(aBuf, sizeof(aBuf), "File: %s", m_aFileName);
 	UI()->DoLabel(&MenuBar, aBuf, 10.0f, CUI::ALIGN_LEFT);
 
 	if(m_ShowPosition)
-		str_format(aBuf, sizeof(aBuf), "X: %i(%0.f), Y: %i(%0.f) Z: %i, A: %.1f, G: %i ", 
-			(int)m_WorldOffsetX / 32, m_WorldOffsetX, 
+		str_format(aBuf, sizeof(aBuf), "X: %i(%0.f), Y: %i(%0.f) Z: %i, A: %.1f, G: %i ",
+			(int)m_WorldOffsetX / 32, m_WorldOffsetX,
 			(int)m_WorldOffsetY / 32, m_WorldOffsetY,
 			m_ZoomLevel, m_AnimateSpeed, m_GridFactor);
 	else

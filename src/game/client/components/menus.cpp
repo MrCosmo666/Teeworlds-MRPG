@@ -1,10 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <math.h>
-
-#include <base/system.h>
-#include <base/math.h>
-#include <base/vmath.h>
+#include <base/stdafx.h>
 
 #include <engine/config.h>
 #include <engine/editor.h>
@@ -89,7 +85,7 @@ CMenus::CMenus()
 	m_DownArrowPressed = false;
 
 	m_LastInput = time_get();
-	
+
 	m_CursorActive = false;
 	m_PrevCursorActive = false;
 
@@ -540,7 +536,7 @@ bool CMenus::DoEditBoxUTF8(void* pID, const CUIRect * pRect, char* pStr, unsigne
 	{
 		// set cursor active
 		m_CursorActive = true;
-		
+
 		if((2 * time_get() / time_freq()) % 2)	// make it blink
 		{
 			float TextWidth = TextRender()->TextWidth(0, FontSize, pDisplayStr, s_AtIndex, -1.0f);
@@ -1021,7 +1017,7 @@ void CMenus::RenderMenubar(CUIRect Rect)
 		static CButtonContainer s_SettingsButton;
 		if(DoButton_MenuTabTop(&s_SettingsButton, Localize("Settings"), m_GamePage == PAGE_SETTINGS, &Right) || CheckHotKey(KEY_S))
 			NewPage = PAGE_SETTINGS;
-		
+
 		Rect.HSplitTop(Spacing, 0, &Rect);
 		Rect.HSplitTop(25.0f, &Box, &Rect);
 	}
@@ -1147,7 +1143,7 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			Left.VSplitLeft(Spacing, 0, &Left); // little space
 			Left.VSplitLeft(ButtonWidth, &Button, &Left);
 		}
-		
+
 		// mrpg button
 		static CButtonContainer s_MRPGButton;
 		if (DoButton_MenuTabTop(&s_MRPGButton, Localize("MRPG"), m_ActivePage == PAGE_MRPG, &Button))
@@ -1509,7 +1505,7 @@ void CMenus::OnInit()
 	Console()->Chain("snd_enable_music", ConchainUpdateMusicState, this);
 	Console()->Chain("snd_enable_music_mrpg", ConchainUpdateMusicState, this);
 
-	RenderLoading(1);	
+	RenderLoading(1);
 	ServerBrowser()->SetType(g_Config.m_UiBrowserPage == PAGE_LAN ? IServerBrowser::TYPE_LAN : IServerBrowser::TYPE_INTERNET);
 }
 
@@ -1624,7 +1620,7 @@ void CMenus::Render()
 
 				// draw non-blending X
 				CUIRect XText = Button;
-	
+
 				UI()->DoLabel(&XText, "\xE2\x9C\x95", XText.h*ms_FontmodHeight, CUI::ALIGN_CENTER);
 				if(UI()->DoButtonLogic(s_QuitButton.GetID(), &Button))
 					m_Popup = POPUP_QUIT;
@@ -1808,7 +1804,7 @@ void CMenus::Render()
 		else if(m_Popup == POPUP_PASSWORD)
 		{
 			Box.HMargin(4.0f, &Box);
-		
+
 			CUIRect Label;
 			Box.HSplitTop(20.0f, &Label, &Box);
 			UI()->DoLabel(&Label, pExtraText, FontSize, CUI::ALIGN_CENTER);
@@ -1856,7 +1852,7 @@ void CMenus::Render()
 				Client()->Disconnect();
 				m_Popup = POPUP_NONE;
 			}
-			
+
 			// map data download
 			if(Client()->MapDownloadTotalsize() > 0)
 			{

@@ -1,20 +1,21 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
+#include "npcwall.h"
+
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
-
-#include "npcwall.h"
 
 CNPCWall::CNPCWall(CGameWorld *pGameWorld, vec2 Pos, bool Left)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_NPC_DOOR, Pos)
 {
-	if(!Left) 
+	if(!Left)
 		m_Pos.y += 30;
-	else 
+	else
 		m_Pos.x -= 30;
 
 	m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, (Left ? 'x' : 'y'), (Left ? '+' : '-'));
-	m_Active = false; 
+	m_Active = false;
 
 	GameWorld()->InsertEntity(this);
 }
@@ -22,7 +23,7 @@ CNPCWall::CNPCWall(CGameWorld *pGameWorld, vec2 Pos, bool Left)
 void CNPCWall::Tick()
 {
 	// We're looking for bots
-	m_Active = false;	
+	m_Active = false;
 	for (CCharacter* pChar = (CCharacter*)GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter*)pChar->TypeNext())
 	{
 		if (pChar->GetPlayer()->IsBot() && pChar->GetPlayer()->GetBotType() != BotsTypes::TYPE_BOT_MOB)
@@ -48,5 +49,5 @@ void CNPCWall::Snap(int SnappingClient)
 	pObj->m_Y = (int)m_Pos.y;
 	pObj->m_FromX = (int)m_PosTo.x;
 	pObj->m_FromY = (int)m_PosTo.y;
-	pObj->m_StartTick = Server()->Tick()-6; 
+	pObj->m_StartTick = Server()->Tick()-6;
 }

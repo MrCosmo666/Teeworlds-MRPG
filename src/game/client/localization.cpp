@@ -1,8 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
 
 #include "localization.h"
-#include <base/tl/algorithm.h>
 
 #include <engine/external/json-parser/json.h>
 #include <engine/console.h>
@@ -77,7 +77,7 @@ bool CLocalizationDatabase::Load(const char *pFilename, IStorageEngine *pStorage
 	char aError[256];
 	json_value *pJsonData = json_parse_ex(&JsonSettings, pFileData, FileSize, aError);
 	mem_free(pFileData);
-	
+
 	if(pJsonData == 0)
 	{
 		pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, pFilename, aError);
@@ -141,7 +141,7 @@ const char *CLocalizationDatabase::FindString(unsigned Hash, unsigned ContextHas
 		else if(rStr.m_ContextHash == DefaultHash)
 			DefaultIndex = i;
 	}
-	
+
     return r.index(DefaultIndex).m_Replacement;
 }
 

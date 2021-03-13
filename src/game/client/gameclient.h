@@ -2,8 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_CLIENT_GAMECLIENT_H
 #define GAME_CLIENT_GAMECLIENT_H
-
-#include <base/vmath.h>
 #include <engine/client.h>
 #include <engine/console.h>
 #include <game/layers.h>

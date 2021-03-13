@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_GAMEWORLD_H
 #define GAME_SERVER_GAMEWORLD_H
-
 #include <game/gamecore.h>
 
 class CEntity;
@@ -109,7 +108,7 @@ public:
 		Returns:
 			Returns a pointer to the closest CEntity or NULL if no CEntity is close enough.
 	*/
-	CEntity *ClosestEntity(vec2 Pos, float Radius, int Type, CEntity *pNotThis);
+	CEntity *ClosestEntity(vec2 Pos, float Radius, int Type, CEntity *pNotThis) const;
 
 	/*
 		Function: interserct_CCharacter
@@ -125,7 +124,7 @@ public:
 		Returns:
 			Returns a pointer to the closest hit or NULL of there is no intersection.
 	*/
-	class CCharacter *IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, vec2 &NewPos, class CEntity *pNotThis = 0);
+	class CCharacter *IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, vec2 &NewPos, class CEntity *pNotThis = nullptr);
 
 
 	/*

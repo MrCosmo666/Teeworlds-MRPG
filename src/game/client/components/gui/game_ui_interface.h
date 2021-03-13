@@ -3,11 +3,8 @@
 
 #include <game/client/component.h>
 
-#include <game/enum_context.h>
+#include <game/game_context.h>
 #include <game/client/ui_window.h>
-
-#include <map>
-#include <vector>
 
 class CUIGameInterface : public CComponent
 {

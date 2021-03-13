@@ -1,10 +1,13 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <game/server/gamecontext.h>
+#include <base/stdafx.h>
 
+#include <game/server/mmocore/Components/Bots/BotData.h>
 #include "drop_quest_items.h"
 
-CDropQuestItem::CDropQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, BotJob::QuestBotInfo BotData, int ClientID)
+#include <game/server/gamecontext.h>
+
+CDropQuestItem::CDropQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, QuestBotInfo BotData, int ClientID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPQUEST, Pos, 24.0f)
 {
 	m_Pos = Pos;
@@ -63,7 +66,7 @@ void CDropQuestItem::Tick()
 	// check step and collected it or no
 	const int Count = m_QuestBot.m_aItemSearchCount[0];
 	CPlayer* pOwnerPlayer = GS()->m_apPlayers[m_ClientID];
-	CPlayerQuest& pPlayerQuest = pOwnerPlayer->GetQuest(m_QuestBot.m_QuestID);
+	CQuestData& pPlayerQuest = pOwnerPlayer->GetQuest(m_QuestBot.m_QuestID);
 	InventoryItem& pPlayerItem = pOwnerPlayer->GetItem(m_QuestBot.m_aItemSearch[0]);
 	if (pPlayerQuest.m_Step != m_QuestBot.m_Step || pPlayerItem.m_Count >= Count)
 	{
@@ -136,4 +139,4 @@ void CDropQuestItem::Snap(int SnappingClient)
 		pRifleObj->m_FromY = (int)PosTo.y;
 		pRifleObj->m_StartTick = Server()->Tick() - 4;
 	}
-} 
+}

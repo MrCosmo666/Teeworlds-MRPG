@@ -1,7 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-
-#include <base/math.h>
+#include <base/stdafx.h>
 
 #include <engine/demo.h>
 #include <engine/keys.h>
@@ -46,7 +45,7 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 	const float ButtonbarHeight = 20.0f;
 	const float NameBarHeight = 20.0f;
 	const float Margins = 5.0f;
-	
+
 	float TotalHeight;
 	if(m_MenuActiveID == EMenuState::ESCSTATE)
 		TotalHeight = SeekBarHeight+ButtonbarHeight+NameBarHeight+Margins*3;
@@ -721,10 +720,10 @@ float CMenus::RenderDemoDetails(CUIRect View)
 	if(!m_DemolistSelectedIsDir && m_DemolistSelectedIndex >= 0 && m_lDemos[m_DemolistSelectedIndex].m_Valid && m_lDemos[m_DemolistSelectedIndex].m_InfosLoaded)
 	{
 		CUIRect Button;
-		
+
 		const float ButtonHeight = 20.0f;
 		const float Spacing = 2.0f;
-		
+
 		View.HSplitTop(Spacing, 0, &View);
 		View.HSplitTop(ButtonHeight, &Button, &View);
 		DoInfoBox(&Button, Localize("Created"), m_lDemos[m_DemolistSelectedIndex].m_Info.m_aTimestamp);

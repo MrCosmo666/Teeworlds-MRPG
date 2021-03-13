@@ -15,7 +15,7 @@ static void digest_str(const unsigned char* digest, size_t digest_len, char* str
 	for(i = 0; i < max_len; i++)
 	{
 		static const char HEX[] = "0123456789abcdef";
-		int index = i / 2;
+		const unsigned index = i / 2;
 		if(i % 2 == 0)
 		{
 			str[i] = HEX[digest[index] >> 4];

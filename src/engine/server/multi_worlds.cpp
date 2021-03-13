@@ -1,6 +1,7 @@
+#include <base/stdafx.h>
+
 #include "multi_worlds.h"
 
-#include <base/system.h>
 #include <engine/console.h>
 #include <engine/map.h>
 #include <engine/server.h>

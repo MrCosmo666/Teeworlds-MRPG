@@ -10,7 +10,7 @@ class CCommandProcessor
 	CCommandManager m_CommandManager;
 
 	/************************************************************************/
-	/*  Commands                                                             */
+	/*  Commands                                                            */
 	/************************************************************************/
 	static void ConChatLogin(IConsole::IResult* pResult, void* pUserData);
 	static void ConChatRegister(IConsole::IResult* pResult, void* pUserData);

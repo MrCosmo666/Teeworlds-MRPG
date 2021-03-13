@@ -3,8 +3,6 @@
 #ifndef GAME_COLLISION_H
 #define GAME_COLLISION_H
 
-#include <base/vmath.h>
-
 class CCollision
 {
 	class CTile *m_pTiles;

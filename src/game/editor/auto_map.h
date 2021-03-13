@@ -1,9 +1,6 @@
 #ifndef GAME_EDITOR_AUTO_MAP_H
 #define GAME_EDITOR_AUTO_MAP_H
 
-#include <base/tl/array.h>
-#include <base/vmath.h>
-
 #include <engine/external/json-parser/json.h>
 
 typedef struct

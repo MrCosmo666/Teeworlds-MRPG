@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef VERSIONSRV_VERSIONSRV_H
 #define VERSIONSRV_VERSIONSRV_H
-#include <base/hash.h>
 static const int VERSIONSRV_PORT = 8285;
 
 struct CMapVersion

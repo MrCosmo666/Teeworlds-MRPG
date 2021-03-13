@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
+
 #include <engine/demo.h>
 #include <engine/engine.h>
 
@@ -304,7 +306,7 @@ void CEffects::MmoEffects(vec2 Pos, int EffectID)
 		m_pClient->m_pParticles->Add(CParticles::GROUP_MMOEFFECTS, &p);
 		return;
 	}
-	
+
 	p.m_Spr = SPRITE_TELEPORT1;
 	p.m_Frames = 8;
 	p.m_Pos = Pos;
@@ -331,7 +333,7 @@ void CEffects::MmoEffectPotion(vec2 Pos, const char* Potion, bool Added)
 
 	vec4 Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 	if (str_find(Potion, "Health") != nullptr)
-		Color = vec4(1.0f, 0.80f, 1.0f, 1.0f);	
+		Color = vec4(1.0f, 0.80f, 1.0f, 1.0f);
 	if(str_find(Potion, "Mana") != nullptr)
 		Color = vec4(0.80f, 0.80f, 1.0f, 1.0f);
 	if (str_find(Potion, "Poison") != nullptr)
@@ -351,7 +353,7 @@ void CEffects::MmoEffectPotion(vec2 Pos, const char* Potion, bool Added)
 void CEffects::DamageMmoInd(vec2 Pos, int DamageCount, bool CritDamage)
 {
 	const int IncreaseSize = min(DamageCount, 28);
-	
+
 	CParticle p;
 	p.SetDefault();
 	p.m_Pos = Pos;
@@ -363,7 +365,7 @@ void CEffects::DamageMmoInd(vec2 Pos, int DamageCount, bool CritDamage)
 	p.m_Gravity = 0.7f;
 	p.m_FlowAffected = 0.0f;
 	p.m_Friction = 0.9f;
-	
+
 	if(CritDamage)
 	{
 		p.m_StartSize = 22.0f + IncreaseSize * 0.5f;

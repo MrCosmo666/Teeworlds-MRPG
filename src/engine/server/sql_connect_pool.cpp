@@ -1,33 +1,31 @@
+#include <base/stdafx.h>
+
 #include <mysql_connection.h>
 #include <cppconn/driver.h>
 #include <cppconn/statement.h>
 #include "sql_connect_pool.h"
 
-#include <base/system.h>
 #include <engine/shared/config.h>
 
-#include <stdarg.h>
-#include <mutex>
-#include <thread>
 /*
-	I don't see the point in using SELECT operations in the thread, 
-	since this will lead to unnecessary code, which may cause confusion, 
-	and by calculations if (SQL server / server) = localhost, 
-	this will not do any harm (but after the release is complete, 
+	I don't see the point in using SELECT operations in the thread,
+	since this will lead to unnecessary code, which may cause confusion,
+	and by calculations if (SQL server / server) = localhost,
+	this will not do any harm (but after the release is complete,
 	it is advisable to use the Thread function with Callback)
 
-	And in General, you should review the SQL system, 
-	it works (and has been tested by time and tests), 
+	And in General, you should review the SQL system,
+	it works (and has been tested by time and tests),
 	but this implementation is not very narrowly focused
 
 	This approach works if the old query is not executed before,
 	 a new query it will create a reserve.
 
-	 It may seem that it does not use Pool, 
+	 It may seem that it does not use Pool,
 	 but in fact it is and is created as a reserve when running
 	 <tlock>
 
-	 Usage is performed in turn following synchronously 
+	 Usage is performed in turn following synchronously
 	 working running through each request in order
 
 	 This pool is not asynchronous
@@ -49,13 +47,13 @@ CConectionPool::CConectionPool()
 
 		SqlConnectionLock.lock();
 
-		for(int i = 0; i < g_Config.m_SvMySqlPoolSize; ++i) 
+		for(int i = 0; i < g_Config.m_SvMySqlPoolSize; ++i)
 			this->CreateConnection();
 
 		SqlConnectionLock.unlock();
 	}
-	catch(SQLException &e) 
-	{ 
+	catch(SQLException &e)
+	{
 		dbg_msg("Sql Exception", "%s", e.what());
 		exit(0);
 	}
@@ -84,7 +82,7 @@ Connection* CConectionPool::CreateConnection()
 			pConnection->setClientOption("OPT_CHARSET_NAME", "utf8mb4");
 			pConnection->setSchema(g_Config.m_SvMySqlDatabase);
 		}
-		catch(SQLException &e) 
+		catch(SQLException &e)
 		{
 			dbg_msg("Sql Exception", "%s", e.what());
 			DisconnectConnection(pConnection);
@@ -156,7 +154,7 @@ void CConectionPool::DisconnectConnectionHeap()
 
 	for(auto& iconn : m_ConnList)
 		DisconnectConnection(iconn);
-		
+
 	m_ConnList.clear();
 
 	SqlConnectionLock.unlock();
@@ -178,7 +176,7 @@ void CConectionPool::IDS(int Milliseconds, const char *Table, const char *Buffer
 	va_list Arguments;
 	va_start(Arguments, Buffer);
 	InsertFormated(Milliseconds, Table, Buffer, Arguments);
-	va_end(Arguments);	
+	va_end(Arguments);
 }
 
 void CConectionPool::InsertFormated(int Milliseconds, const char *Table, const char *Buffer, va_list args)
@@ -254,7 +252,7 @@ void CConectionPool::UpdateFormated(int Milliseconds, const char *Table, const c
 	{
 		if(Milliseconds > 0)
 			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
-		
+
 		const char* pError = nullptr;
 
 		SqlThreadRecursiveLock.lock();
@@ -351,7 +349,7 @@ ResultPtr CConectionPool::SD(const char* Select, const char* Table, const char* 
 	_vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
 #else
 	vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
-#endif  
+#endif
 	va_end(VarArgs);
 	aBuf[sizeof(aBuf) - 1] = '\0';
 
@@ -391,7 +389,7 @@ void CConectionPool::SDT(const char* Select, const char* Table, std::function<vo
 	_vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
 #else
 	vsnprintf(aBuf, sizeof(aBuf), Buffer, VarArgs);
-#endif  
+#endif
 	va_end(VarArgs);
 	aBuf[sizeof(aBuf) - 1] = '\0';
 	const std::string Query("SELECT " + std::string(Select) + " FROM " + std::string(Table) + " " + std::string(aBuf) + ";");

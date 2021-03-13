@@ -1,3 +1,5 @@
+#include <base/stdafx.h>
+
 #include <engine/shared/config.h>
 #include <engine/textrender.h>
 #include <engine/graphics.h>

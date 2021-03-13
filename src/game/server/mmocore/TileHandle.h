@@ -2,12 +2,11 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_TILE_HANDLE_CHARACTER_H
 #define GAME_SERVER_TILE_HANDLE_CHARACTER_H
-
 #include <game/mapitems.h>
 
+class CCharacter;
 class TileHandle
 {
-private:
 	CCharacter *m_pCharacter;
 	bool m_Collide[MAX_TILES];
 

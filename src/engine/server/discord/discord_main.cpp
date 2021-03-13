@@ -1,13 +1,14 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifdef CONF_DISCORD
+#include <base/stdafx.h>
+
 #include "discord_main.h"
 #include "discord_commands.h"
 
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 
-#include <mutex>
 std::mutex ml_mutex_task;
 
 using namespace sqlstr;
@@ -48,7 +49,7 @@ void DiscordJob::onAddMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> ser
 	addRole(serverID, member.ID, g_Config.m_SvDiscordMemberRole);
 }
 
-void DiscordJob::onMessage(SleepyDiscord::Message message) 
+void DiscordJob::onMessage(SleepyDiscord::Message message)
 {
 	// skip empty and messages from the bot itself
 	if(message.length() <= 0 || message.author == getCurrentUser().cast())

@@ -1,6 +1,5 @@
-#include <base/vmath.h>
-#include <base/system.h>
-#include <base/math.h>
+#include <base/stdafx.h>
+
 #include <game/client/ui.h>
 
 #include "elements.h"

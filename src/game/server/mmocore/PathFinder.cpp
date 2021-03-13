@@ -1,9 +1,10 @@
 /* Pathfind class by Sushi */
+#include <base/stdafx.h>
+
 #include "PathFinder.h"
 
-#include <engine/shared/config.h>
-#include <game/layers.h>
 #include <game/collision.h>
+#include <game/layers.h>
 
 CPathfinder::CPathfinder(class CLayers* Layers, class CCollision* Collision) : m_pLayers(Layers), m_pCollision(Collision)
 {

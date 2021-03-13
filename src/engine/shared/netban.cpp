@@ -1,4 +1,4 @@
-#include <base/math.h>
+#include <base/stdafx.h>
 
 #include <engine/console.h>
 #include <engine/storage.h>
@@ -236,7 +236,7 @@ void CNetBan::MakeBanInfo(CBan<T> *pBan, char *pBuf, unsigned BuffSize, int Type
 			pBuf[0] = 0;
 		return;
 	}
-	
+
 	// build type based part
 	char aBuf[256];
 	if(Type == MSGTYPE_PLAYER)
@@ -401,7 +401,7 @@ int CNetBan::UnbanByRange(const CNetRange *pRange)
 {
 	if(pRange->IsValid())
 		return Unban(&m_BanRangePool, pRange);
-	
+
 	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "net_ban", "ban failed (invalid range)");
 	return -1;
 }
@@ -479,7 +479,7 @@ bool CNetBan::IsBanned(const NETADDR *pAddr, char *pBuf, unsigned BufferSize, in
 			}
 		}
 	}
-	
+
 	return false;
 }
 
@@ -580,7 +580,7 @@ void CNetBan::ConBansSave(IConsole::IResult *pResult, void *pUser)
 	CNetBan *pThis = static_cast<CNetBan *>(pUser);
 	char aBuf[256];
 	const char *pFilename = pResult->GetString(0);
-	
+
 	IOHANDLE File = pThis->Storage()->OpenFile(pFilename, IOFLAG_WRITE, IStorageEngine::TYPE_SAVE);
 	if(!File)
 	{

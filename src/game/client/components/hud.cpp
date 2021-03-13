@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
+
 #include <engine/graphics.h>
 #include <engine/textrender.h>
 #include <engine/shared/config.h>
@@ -461,7 +463,7 @@ void CHud::RenderWarmupTimer()
 		const float FontSizeTitle = LargeTimer ? 20.0f : 8.0f;
 		const float FontSizeMessage = LargeTimer ? 16.0f : 6.0f;
 
-		if(LargeTimer) 
+		if(LargeTimer)
 		{
 			float TextWidth = TextRender()->TextWidth(0, FontSizeTitle, pText, -1, -1.0f);
 			TextRender()->Text(0, 150 * Graphics()->ScreenAspect() - TextWidth / 2, 50, FontSizeTitle, pText, -1.0f);

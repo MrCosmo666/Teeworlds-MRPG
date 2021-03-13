@@ -5,7 +5,7 @@
 
 #include "player.h"
 
-class CPlayerBot : public CPlayer 
+class CPlayerBot : public CPlayer
 {
 	MACRO_ALLOC_POOL_ID()
 
@@ -26,19 +26,19 @@ public:
 	CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint);
 	~CPlayerBot() override;
 
-	int GetTeam() override { return TEAM_BLUE; };
+	int GetTeam() override { return TEAM_BLUE; }
 	bool IsBot() const override { return true; }
-	int GetBotID() const override { return m_BotID; };
-	int GetBotType() const override { return m_BotType; };
-	int GetBotSub() const override { return m_SubBotID; };
+	int GetBotID() const override { return m_BotID; }
+	int GetBotType() const override { return m_BotType; }
+	int GetBotSub() const override { return m_SubBotID; }
 	int GetPlayerWorldID() const override;
 
 	int GetStartHealth() override;
-	int GetHealth() override { return m_BotHealth; };
-	int GetMana() override { return 999; };
+	int GetHealth() override { return m_BotHealth; }
+	int GetMana() override { return 999; }
 
 	void HandleTuningParams() override;
-	void UpdateTempData(int Health, int Mana) override { m_BotHealth = Health; };
+	void UpdateTempData(int Health, int Mana) override { m_BotHealth = Health; }
 	void SendClientInfo(int TargetID) override;
 
 	int IsActiveSnappingBot(int SnappingClient) const override;
@@ -52,7 +52,7 @@ public:
 	void Tick() override;
 	void PostTick() override;
 	void Snap(int SnappingClient) override;
-	void SetDungeonAllowedSpawn(bool Spawn) { m_DungeonAllowedSpawn = Spawn; };
+	void SetDungeonAllowedSpawn(bool Spawn) { m_DungeonAllowedSpawn = Spawn; }
 
 private:
 	std::map < std::string /* effect */, int /* seconds */ > m_aEffects;

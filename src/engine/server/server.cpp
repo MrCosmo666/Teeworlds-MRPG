@@ -1,8 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <cstdint>
-#include <base/math.h>
-#include <base/system.h>
+#include <base/stdafx.h>
 
 #include <engine/config.h>
 #include <engine/console.h>
@@ -25,11 +23,6 @@
 #include "register.h"
 #include "server.h"
 
-#if defined(CONF_FAMILY_WINDOWS)
-	#define WIN32_LEAN_AND_MEAN
-	#include <windows.h>
-#endif
-
 #include <engine/shared/mmodata.h>
 #include "discord/discord_main.h"
 #include "multi_worlds.h"
@@ -37,7 +30,12 @@
 
 #include <teeother/components/localization.h>
 #include <engine/server/sql_connect_pool.h>
-#include <game/enum_context.h>
+
+#include "game/game_context.h"
+
+#if defined(CONF_FAMILY_WINDOWS)
+  #include <windows.h>
+#endif
 
 void CServer::CClient::Reset()
 {
@@ -341,7 +339,7 @@ int CServer::Init()
 		m_aClients[i].m_aClan[0] = 0;
 		m_aClients[i].m_Country = -1;
 		m_aClients[i].m_Snapshots.Init();
-	}	
+	}
 	return 0;
 }
 
@@ -691,7 +689,7 @@ int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 		}
 		pThis->GameServer(MAIN_WORLD_ID)->ClearClientData(ClientID);
 	}
-	
+
 	pThis->m_aClients[ClientID].m_State = CClient::STATE_EMPTY;
 	pThis->m_aClients[ClientID].m_aName[0] = 0;
 	pThis->m_aClients[ClientID].m_aClan[0] = 0;
@@ -863,7 +861,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 					}
 					else
 						m_aClients[ClientID].m_MapChunk++;
-					
+
 					CMsgPacker Msg(NETMSG_MAP_DATA, true);
 					Msg.AddRaw(&CurrentMapData[Offset], ChunkSize);
 					SendMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH, ClientID);
@@ -934,7 +932,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				{
 					char aAddrStr[NETADDR_MAXSTRSIZE];
 					net_addr_str(m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), true);
-				
+
 					char aBuf[256];
 					str_format(aBuf, sizeof(aBuf), "player has entered the game. ClientID=%d addr=%s", ClientID, aAddrStr);
 					Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
@@ -1267,7 +1265,7 @@ bool CServer::LoadMap(int ID)
 	// load complete map into memory for download
 	{
 		IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorageEngine::TYPE_ALL);
-		pMap->SetCurrentMapSize((int)io_length(File));	
+		pMap->SetCurrentMapSize((int)io_length(File));
 		pMap->SetCurrentMapData((unsigned char *)mem_alloc(pMap->GetCurrentMapSize(), 1));
 		io_read(File, pMap->GetCurrentMapData(), pMap->GetCurrentMapSize());
 		io_close(File);
@@ -1370,7 +1368,7 @@ int CServer::Run()
 				{
 					if(m_aClients[c].m_State == CClient::STATE_EMPTY)
 						continue;
-					
+
 					ExistsPlayers = true;
 					for(int i = 0; i < 200; i++)
 					{
@@ -1660,7 +1658,7 @@ void CServer::RegisterCommands()
 
 	// register console commands in sub parts
 	m_pServerBan->InitServerBan(Console(), Storage(), this, &m_NetServer);
-	
+
 	for(int i = 0; i < m_pMultiWorlds->GetSizeInitilized(); i++)
 	{
 		IGameServer* pGameServer = m_pMultiWorlds->GetWorld(i)->m_pGameServer;
@@ -1673,7 +1671,7 @@ void CServer::InitClientBot(int ClientID)
 {
 	if (ClientID < MAX_PLAYERS || ClientID >= MAX_CLIENTS)
 		return;
-		
+
 	m_aClients[ClientID].m_State = CClient::STATE_INGAME;
 	m_aClients[ClientID].m_WorldID = -1;
 	m_aClients[ClientID].m_Score = 1;

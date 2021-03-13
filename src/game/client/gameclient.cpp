@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
+
 #include <engine/contacts.h>
 #include <engine/demo.h>
 #include <engine/editor.h>
@@ -11,9 +13,6 @@
 #include <engine/textrender.h>
 #include <engine/updater.h>
 #include <engine/shared/config.h>
-
-#include <base/math.h>
-#include <base/vmath.h>
 
 #include <generated/client_data.h>
 #include <generated/protocol.h>
@@ -62,7 +61,6 @@
 //mmotee thnx gamer client # dune
 #include "components/skinchanger.h"
 #include "components/gui/game_ui_interface.h"
-#include "teeother/tl/nlohmann_json.h"
 
 inline void AppendDecimals(char* pBuf, int Size, int Time, int Precision)
 {

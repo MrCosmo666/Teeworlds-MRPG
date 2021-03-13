@@ -1,7 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/system.h>
-#include <base/math.h>
+#include <base/stdafx.h>
+
 #include <engine/graphics.h>
 #include <engine/textrender.h>
 
@@ -467,7 +467,7 @@ public:
 	virtual CFont *LoadFont(const char *pFilename)
 	{
 		CFont *pFont = (CFont *)mem_alloc(sizeof(CFont), 1);
-		
+
 		mem_free(m_pDefaultFont);
 		mem_zero(pFont, sizeof(*pFont));
 		str_copy(pFont->m_aFilename, pFilename, sizeof(pFont->m_aFilename));

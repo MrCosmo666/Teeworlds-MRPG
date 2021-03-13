@@ -1,4 +1,4 @@
-#include <stdarg.h>
+#include <base/stdafx.h>
 
 #include <engine/external/json-parser/json.h>
 #include <engine/storage.h>

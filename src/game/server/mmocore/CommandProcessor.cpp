@@ -1,9 +1,15 @@
+#include <base/stdafx.h>
+
 #include <engine/console.h>
 #include "CommandProcessor.h"
 
 #include <engine/server.h>
 #include <engine/shared/config.h>
 #include "game/server/gamecontext.h"
+
+#include <game/server/mmocore/Components/Accounts/AccountCore.h>
+#include <game/server/mmocore/Components/Guilds/GuildJob.h>
+#include <game/server/mmocore/Components/Houses/HouseCore.h>
 
 CCommandProcessor::CCommandProcessor(CGS *pGS)
 {

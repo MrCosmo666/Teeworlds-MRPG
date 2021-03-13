@@ -3,8 +3,6 @@
 #ifndef GAME_CLIENT_UI_H
 #define GAME_CLIENT_UI_H
 
-#include <vector>
-
 // TODO: Animations Rect rework
 enum ANIMATION_TYPE
 {
@@ -196,7 +194,7 @@ public:
 	void ClipEnable(const CUIRect *pRect);
 	void ClipDisable();
 	const CUIRect* ClipArea() const;
-	inline bool IsClipped() const { return m_NumClips > 0; };
+	bool IsClipped() const { return m_NumClips > 0; };
 
 	bool DoButtonLogic(const void* pID, const CUIRect* pRect, int Button = 0);
 	int DoPickerLogic(const void *pID, const CUIRect *pRect, float *pX, float *pY);

@@ -1,20 +1,13 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/math.h>
-#include <base/system.h>
+#include <base/stdafx.h>
 
 #include <engine/shared/config.h>
-#include <engine/shared/memheap.h>
 #include <engine/shared/network.h>
-#include <engine/shared/packer.h>
 
 #include <engine/config.h>
 #include <engine/console.h>
 #include <engine/engine.h>
-#include <engine/contacts.h>
-#include <engine/masterserver.h>
-
-#include <mastersrv/mastersrv.h>
 
 #include "serverbrowser_fav.h"
 
@@ -127,7 +120,7 @@ CServerBrowserFavorites::CFavoriteServer *CServerBrowserFavorites::FindFavoriteB
 			return &m_aFavoriteServers[i];
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -158,7 +151,7 @@ bool CServerBrowserFavorites::RemoveFavoriteEx(const char *pHostname, const NETA
 			// skip result on favorite hostname lookup
 			m_FavLookup.m_FavoriteIndex = -1;
 		}
-		
+
 		// remove favorite
 		RemoveFavoriteEntry(Index);
 		if(m_FavLookup.m_FavoriteIndex > Index)

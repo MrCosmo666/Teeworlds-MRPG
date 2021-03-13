@@ -1,7 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
+
 #ifdef CONF_DISCORD
-#include <base/math.h>
 #include "discord_main.h"
 #include "discord_commands.h"
 
@@ -56,7 +57,7 @@ void DiscordCommands::ComHelp(IConsole::IResult* pResult, DiscordJob *pDiscord, 
 			EntertainmentFunCmd += "\n- **" + std::string(pCommand.m_aCommand) + (ArgsStr.empty() ? "" : " " + ArgsStr) + "** - " + std::string(pCommand.m_aCommandDesc);
 		}
 	}
-	
+
 	std::string Description(ImportantCmd + RelatedGameServerCmd + EntertainmentFunCmd +
 		"\n\n__**The argument text can be placed in quotation marks \"\".**__"
 		"\n__**[argument] - means that it is optional argument.**__");

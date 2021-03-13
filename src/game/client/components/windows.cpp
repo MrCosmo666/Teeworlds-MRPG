@@ -1,3 +1,5 @@
+#include <base/stdafx.h>
+
 #include "windows.h"
 
 #include <game/client/ui_window.h>

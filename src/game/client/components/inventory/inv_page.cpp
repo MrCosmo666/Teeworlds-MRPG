@@ -1,6 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/vmath.h>
+#include <base/stdafx.h>
+
 #include <engine/keys.h>
 #include <engine/storage.h>
 #include <engine/textrender.h>
@@ -14,7 +15,7 @@
 #include "inv_slot.h"
 #include "inv_page.h"
 
-CInventoryPage::CInventoryPage(CInventory* pInventory, CInventoryList* pInventoryList, int Page) 
+CInventoryPage::CInventoryPage(CInventory* pInventory, CInventoryList* pInventoryList, int Page)
 	: m_pInventory(pInventory), m_pInventoryList(pInventoryList)
 {
 	int NewSlots = 0;
@@ -47,7 +48,7 @@ void CInventoryPage::Render()
 		m_Slot[i]->m_RectSlot = SlotRect;
 	}
 
-	// render inventory	
+	// render inventory
 	for(int i = 0; i < m_pInventoryList->GetPageMaxSlots(); i++)
 	{
 		CInventorySlot* pSlot = GetSlot(i);

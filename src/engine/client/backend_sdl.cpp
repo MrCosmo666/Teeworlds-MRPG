@@ -1,15 +1,8 @@
-#include <base/detect.h>
-
-#if defined(CONF_FAMILY_WINDOWS)
-	// For FlashWindowEx, FLASHWINFO, FLASHW_TRAY
-	#define _WIN32_WINNT 0x0501
-	#define WINVER 0x0501
-#endif
+#include <base/stdafx.h>
+#include <base/tl/threading.h>
 
 #include "SDL.h"
 #include "SDL_opengl.h"
-
-#include <base/tl/threading.h>
 
 #include "graphics_threaded.h"
 #include "backend_sdl.h"
@@ -258,7 +251,7 @@ void CCommandProcessorFragment_OpenGL::SetState(const CCommandBuffer::CState& St
 }
 
 void CCommandProcessorFragment_OpenGL::Cmd_Init(const CInitCommand* pCommand)
-{	
+{
 	// set some default settings
 	glEnable(GL_BLEND);
 	glDisable(GL_CULL_FACE);

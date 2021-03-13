@@ -22,14 +22,12 @@ class CDropItem : public CEntity
 	InventoryItem m_DropItem;
 	int m_OwnerID;
 
-	
-
 public:
 	CDropItem(class CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, InventoryItem DropItem, int OwnerID);
-	~CDropItem();
+	~CDropItem() override;
 
-	virtual void Tick();
-	virtual void Snap(int SnappingClient);
+	void Tick() override;
+	void Snap(int SnappingClient) override;
 
 	bool TakeItem(int ClientID);
 };

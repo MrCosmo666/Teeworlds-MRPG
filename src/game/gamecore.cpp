@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
+
 #include "gamecore.h"
 
 const char *CTuningParams::m_apNames[] =
@@ -25,7 +27,7 @@ bool CTuningParams::Get(int Index, float *pValue) const
 	*pValue = (float)((CTuneParam *)this)[Index];
 	return true;
 }
- 
+
 bool CTuningParams::Set(const char *pName, float Value)
 {
 	for(int i = 0; i < Num(); i++)
@@ -80,13 +82,13 @@ void CCharacterCore::Reset()
 void CCharacterCore::Tick(bool UseInput, CTuningParams* TunningParams)
 {
 	const CTuningParams* pTuningParams = TunningParams ? TunningParams : &m_pWorld->m_Tuning;
-	
+
 	float PhysSize = 28.0f;
 	m_TriggeredEvents = 0;
 
 	// get ground state
 	bool Grounded = false;
-	if(m_pCollision->CheckPoint(m_Pos.x+PhysSize/2, m_Pos.y+PhysSize/2+5) 
+	if(m_pCollision->CheckPoint(m_Pos.x+PhysSize/2, m_Pos.y+PhysSize/2+5)
 		|| m_pCollision->CheckPoint(m_Pos.x-PhysSize/2, m_Pos.y+PhysSize/2+5))
 		Grounded = true;
 
@@ -211,7 +213,7 @@ void CCharacterCore::Tick(bool UseInput, CTuningParams* TunningParams)
 				if(distance(pCharCore->m_Pos, ClosestPoint) < PhysSize+2.0f)
 				{
 					if((m_HookedPlayer == -1 || distance(m_HookPos, pCharCore->m_Pos) < Distance))
-					{	
+					{
 						if(!pCharCore->m_ProtectHooked)
 						{
 							m_TriggeredEvents |= COREEVENTFLAG_HOOK_ATTACH_PLAYER;

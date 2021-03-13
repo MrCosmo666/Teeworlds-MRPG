@@ -1,6 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/system.h>
+#include <base/stdafx.h>
+
 #include <engine/map.h>
 #include <engine/storage.h>
 #include <game/mapitems.h>
@@ -37,7 +38,7 @@ public:
 	virtual void Unload()
 	{
 		m_DataFile.Close();
-		
+
 		m_CurrentMapSize = 0;
 		mem_free(m_pCurrentMapData);
 		m_pCurrentMapData = 0x0;

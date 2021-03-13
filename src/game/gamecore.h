@@ -3,10 +3,6 @@
 #ifndef GAME_GAMECORE_H
 #define GAME_GAMECORE_H
 
-#include <base/system.h>
-#include <base/math.h>
-
-#include <math.h>
 #include "collision.h"
 #include <engine/shared/protocol.h>
 #include <generated/protocol.h>
@@ -185,7 +181,7 @@ public:
 		const CTuningParams* m_pTuningParams;
 		int m_HookMode;
 		int m_HookGrabTime;
-		
+
 		CParams(const CTuningParams* pTuningParams)
 		{
 			m_pTuningParams = pTuningParams;
@@ -211,7 +207,7 @@ public:
 	bool m_Death;
 	bool m_SkipCollideTees;
 	int m_WorldID;
-	
+
 	int m_Jumped;
 
 	int m_Direction;

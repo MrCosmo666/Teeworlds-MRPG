@@ -3,7 +3,6 @@
 #ifndef ENGINE_CLIENT_CLIENT_H
 #define ENGINE_CLIENT_CLIENT_H
 
-#include <base/hash.h>
 #include <engine/client/http.h>
 
 class CGraph

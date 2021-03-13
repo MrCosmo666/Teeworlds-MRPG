@@ -1,10 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <math.h>
-
-#include <base/system.h>
-#include <base/math.h>
-#include <base/vmath.h>
+#include <base/stdafx.h>
 
 #include <engine/config.h>
 #include <engine/shared/config.h>

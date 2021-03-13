@@ -1,12 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <new>
-#include <algorithm>
-
-#include <stdarg.h>
-
-#include <base/math.h>
-#include <base/system.h>
+#include <base/stdafx.h>
 
 #include <engine/client.h>
 #include <engine/config.h>
@@ -51,7 +45,6 @@
 #include "client.h"
 
 #if defined(CONF_FAMILY_WINDOWS)
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
 

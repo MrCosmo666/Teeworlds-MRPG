@@ -1,6 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/math.h>
+#include <base/stdafx.h>
 
 #include <engine/config.h>
 #include <engine/demo.h>
@@ -61,7 +61,7 @@ void CMenus::RenderGame(CUIRect MainView)
 
 	float Spacing = 3.0f;
 	float ButtonWidth = (MainView.w/6.0f)-(Spacing*5.0)/6.0f;
-	
+
 	// cut view
 	MainView.HSplitTop(20.0f, 0, &MainView);
 	float NoteHeight = !Info.m_aNotification[0] ? 0.0f : 45.0f;
@@ -379,7 +379,7 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 	UI()->DoLabel(&Label, Localize("Server info"), ButtonHeight*ms_FontmodHeight*0.8f, CUI::ALIGN_CENTER);
 	RenderTools()->DrawUIRect(&ServerInfo, vec4(0.0, 0.0, 0.0, 0.25f), CUI::CORNER_ALL, 5.0f);
 	ServerInfo.Margin(5.0f, &ServerInfo);
-	
+
 	ServerInfo.HSplitTop(2*ButtonHeight, &Label, &ServerInfo);
 	Label.y += 2.0f;
 	UI()->DoLabel(&Label, CurrentServerInfo.m_aName, ButtonHeight*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT, Label.w);
@@ -388,7 +388,7 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 	Label.y += 2.0f;
 	str_format(aBuf, sizeof(aBuf), "%s: %s", Localize("Address"), CurrentServerInfo.m_aHostname);
 	UI()->DoLabel(&Label, aBuf, ButtonHeight*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
-	
+
 	ServerInfo.HSplitTop(ButtonHeight, &Label, &ServerInfo);
 	Label.y += 2.0f;
 	str_format(aBuf, sizeof(aBuf), "%s: %d", Localize("Ping"), m_pClient->m_Snap.m_pLocalInfo->m_Latency);
@@ -403,7 +403,7 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 	Label.y += 2.0f;
 	str_format(aBuf, sizeof(aBuf), "%s: %s", Localize("Password"), CurrentServerInfo.m_Flags&IServerBrowser::FLAG_PASSWORD ? Localize("Yes", "With") : Localize("No", "Without/None"));
 	UI()->DoLabel(&Label, aBuf, ButtonHeight*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
-	
+
 	const bool IsFavorite = CurrentServerInfo.m_Favorite;
 	ServerInfo.HSplitBottom(ButtonHeight, &ServerInfo, &Label);
 	static int s_AddFavButton = 0;
@@ -859,7 +859,7 @@ void CMenus::RenderServerControl(CUIRect MainView)
 	// render background
 	MainView.HSplitBottom(90.0f+2*20.0f, &MainView, &Extended);
 	RenderTools()->DrawUIRect(&Extended, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
-	
+
 	bool doCallVote = false;
 	// render page
 	if(s_ControlPage == 0)
@@ -896,7 +896,7 @@ void CMenus::RenderServerControl(CUIRect MainView)
 
 			// render reason
 			Bottom.VSplitRight(120.0f, &Bottom, &Button);
-			
+
 			Bottom.VSplitRight(40.0f, &Bottom, 0);
 			Bottom.VSplitRight(160.0f, &Bottom, &Reason);
 			Reason.VSplitRight(Reason.h, &Reason, &ClearButton);
@@ -919,7 +919,7 @@ void CMenus::RenderServerControl(CUIRect MainView)
 					m_aCallvoteReason[0] = 0;
 			}
 		}
- 
+
 		if(pNotification == 0)
 		{
 			// call vote

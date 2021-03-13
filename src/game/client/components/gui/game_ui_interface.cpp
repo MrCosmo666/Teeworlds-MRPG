@@ -1,10 +1,11 @@
+#include <base/stdafx.h>
+
 #include <engine/console.h>
 #include <engine/keys.h>
-#include <engine/textrender.h>
 #include <engine/shared/config.h>
 #include <generated/client_data.h>
 
-#include <game/enum_context.h>
+#include <game/game_context.h>
 #include <game/client/components/console.h>
 #include <game/client/components/menus.h>
 #include <game/client/components/sounds.h>

@@ -1,16 +1,24 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
-
-#include <generated/server_data.h>
-#include <game/server/gamecontext.h>
+#include <base/stdafx.h>
 
 #include "character.h"
+#include <engine/shared/config.h>
+#include <generated/server_data.h>
+
+#include <game/server/gamecontext.h>
+
 #include "laser.h"
 #include "projectile.h"
 
-#include <game/server/mmocore/GameEntities/snapfull.h>
+#include <game/server/mmocore/Components/Bots/BotData.h>
+#include <game/server/mmocore/Components/Guilds/GuildJob.h>
+#include <game/server/mmocore/Components/Houses/HouseCore.h>
+#include <game/server/mmocore/Components/Quests/QuestCore.h>
+#include <game/server/mmocore/Components/Worlds/WorldSwapCore.h>
+
 #include <game/server/mmocore/GameEntities/jobitems.h>
+#include <game/server/mmocore/GameEntities/snapfull.h>
 
 //input count
 struct CInputCount
@@ -277,7 +285,7 @@ void CCharacter::FireWeapon()
 			const float PlayerRadius = (float)m_pPlayer->GetAttributeCount(Stats::StHammerPower, true);
 			const float Radius = clamp(PlayerRadius / 5.0f, 1.7f, 8.0f);
 			GS()->CreateSound(m_Pos, SOUND_HAMMER_FIRE);
-			
+
 			CCharacter *apEnts[MAX_CLIENTS];
 			int Num = GS()->m_World.FindEntities(ProjStartPos, GetProximityRadius()* Radius, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
 			for (int i = 0; i < Num; ++i)
@@ -296,7 +304,7 @@ void CCharacter::FireWeapon()
 					Hits = true;
 
 					const int BotID = pTarget->GetPlayer()->GetBotID();
-					GS()->ChatFollow(m_pPlayer->GetCID(), "You start dialogue with {STR}!", BotJob::ms_aDataBot[BotID].m_aNameBot);
+					GS()->ChatFollow(m_pPlayer->GetCID(), "You start dialogue with {STR}!", DataBotInfo::ms_aDataBot[BotID].m_aNameBot);
 					continue;
 				}
 
@@ -315,7 +323,7 @@ void CCharacter::FireWeapon()
 				pTarget->TakeDamage(vec2(0.f, -1.f) + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage, m_pPlayer->GetCID(), m_ActiveWeapon);
 				Hits = true;
 			}
-			if(Hits) 
+			if(Hits)
 				m_ReloadTimer = Server()->TickSpeed()/3;
 		} break;
 
@@ -357,7 +365,7 @@ void CCharacter::FireWeapon()
 			{
 				float Spreading = ((0.0058945f*(9.0f*ShotSpread)/2)) - (0.0058945f*(9.0f*i));
 				float a = GetAngle(Direction) + Spreading;
-				new CProjectile(GameWorld(), WEAPON_GRENADE, m_pPlayer->GetCID(), ProjStartPos, 
+				new CProjectile(GameWorld(), WEAPON_GRENADE, m_pPlayer->GetCID(), ProjStartPos,
 					vec2(cosf(a), sinf(a)),
 					(int)(Server()->TickSpeed()*GS()->Tuning()->m_GrenadeLifetime),
 					g_pData->m_Weapons.m_Grenade.m_pBase->m_Damage, true, 0, SOUND_GRENADE_EXPLODE, WEAPON_GRENADE);
@@ -523,7 +531,7 @@ void CCharacter::Tick()
 		return;
 
 	HandleAuthedPlayer();
-	HandleTilesets(); 
+	HandleTilesets();
 	m_Core.m_SkipCollideTees = false;
 }
 
@@ -544,7 +552,7 @@ void CCharacter::TickDefered()
 		m_Core.AddDragVelocity();
 	m_Core.ResetDragVelocity();
 
-	CCharacterCore::CParams PlayerTunningParams(&m_pPlayer->m_NextTuningParams); 
+	CCharacterCore::CParams PlayerTunningParams(&m_pPlayer->m_NextTuningParams);
 	if(m_pPlayer->IsBot())
 	{
 		m_Core.Move(&PlayerTunningParams);
@@ -596,7 +604,7 @@ void CCharacter::TickDefered()
 
 bool CCharacter::IncreaseHealth(int Amount)
 {
-	if(m_Health >= m_pPlayer->GetStartHealth()) 
+	if(m_Health >= m_pPlayer->GetStartHealth())
 		return false;
 
 	const int OldHealth = m_Health;
@@ -608,7 +616,7 @@ bool CCharacter::IncreaseHealth(int Amount)
 	{
 		char aBuf[32];
 		str_format(aBuf, sizeof(aBuf), "%d Health", m_Health - OldHealth);
-		GS()->SendMmoPotion(m_Core.m_Pos, aBuf, true);
+		GS()->CreatePotionEffect(m_Core.m_Pos, aBuf, true);
 	}
 	return true;
 }
@@ -627,7 +635,7 @@ bool CCharacter::IncreaseMana(int Amount)
 	{
 		char aBuf[32];
 		str_format(aBuf, sizeof(aBuf), "%d Mana", m_Mana - OldMana);
-		GS()->SendMmoPotion(m_Core.m_Pos, aBuf, true);
+		GS()->CreatePotionEffect(m_Core.m_Pos, aBuf, true);
 	}
 	return true;
 }
@@ -662,7 +670,7 @@ void CCharacter::Die(int Killer, int Weapon)
 	if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
 		int SubBotID = m_pPlayer->GetBotSub();
-		m_pPlayer->m_aPlayerTick[TickState::Respawn] = Server()->Tick()+BotJob::ms_aMobBot[SubBotID].m_RespawnTick*Server()->TickSpeed();
+		m_pPlayer->m_aPlayerTick[TickState::Respawn] = Server()->Tick() + MobBotInfo::ms_aMobBot[SubBotID].m_RespawnTick*Server()->TickSpeed();
 	}
 
 	// a nice sound
@@ -709,7 +717,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 		const int EnchantBonus = pFrom->GetAttributeCount(Stats::StStrength, true);
 		Dmg += EnchantBonus;
-	
+
 		// vampirism replenish your health
 		int TempInt = pFrom->GetAttributeCount(Stats::StVampirism, true);
 		if(random_int()%5000 < min(TempInt, 3000))
@@ -717,7 +725,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 			pFrom->GetCharacter()->IncreaseHealth(max(1, Dmg/2));
 			GS()->SendEmoticon(From, EMOTICON_DROP);
 		}
-		
+
 		// miss out on damage
 		TempInt = pFrom->GetAttributeCount(Stats::StLucky, true);
 		if(!pFrom->IsBot() && random_int()%5000 < min(TempInt, 3000))
@@ -725,7 +733,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 			Dmg = 0;
 			GS()->SendEmoticon(From, EMOTICON_HEARTS);
 		}
-		
+
 		// critical damage
 		TempInt = pFrom->GetAttributeCount(Stats::StDirectCriticalHit, true);
 		if(!pFrom->IsBot() && random_int()%5000 < min(TempInt, 2200))
@@ -737,7 +745,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 		}
 
 		// fix quick killer spread players
-		if(pFrom->GetCharacter()->m_ActiveWeapon != WEAPON_HAMMER && 
+		if(pFrom->GetCharacter()->m_ActiveWeapon != WEAPON_HAMMER &&
 			distance(m_Core.m_Pos, pFrom->GetCharacter()->m_Core.m_Pos) < ms_PhysSize+90.0f)
 			Dmg = max(1, Dmg/3);
 
@@ -751,7 +759,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 		m_Health -= Dmg;
 		m_pPlayer->ShowInformationStats();
 	}
-	
+
 	// create healthmod indicator
 	GS()->CreateDamage(m_Pos, m_pPlayer->GetCID(), OldHealth-m_Health, (bool)(CritDamage > 0), false);
 
@@ -793,7 +801,7 @@ void CCharacter::Snap(int SnappingClient)
 {
 	if(NetworkClipped(SnappingClient) || !m_pPlayer->IsActiveSnappingBot(SnappingClient))
 		return;
-	
+
 	CNetObj_Character *pCharacter = static_cast<CNetObj_Character *>(Server()->SnapNewItem(NETOBJTYPE_CHARACTER, m_pPlayer->GetCID(), sizeof(CNetObj_Character)));
 	if(!pCharacter)
 		return;
@@ -819,7 +827,7 @@ void CCharacter::Snap(int SnappingClient)
 		m_EmoteStop = -1;
 	}
 
-	pCharacter->m_Emote = m_EmoteType;	
+	pCharacter->m_Emote = m_EmoteType;
 	if(250 - ((Server()->Tick() - m_LastAction) % (250)) < 5)
 		pCharacter->m_Emote = EMOTE_BLINK;
 
@@ -875,7 +883,7 @@ void CCharacter::HandleTilesets()
 		GS()->CreateDeath(m_Pos, m_pPlayer->GetCID());
 }
 
-void CCharacter::HandleEvents() 
+void CCharacter::HandleEvents()
 {
 	if(m_Event == TILE_EVENT_PARTY)
 	{
@@ -891,7 +899,7 @@ void CCharacter::HandleEvents()
 	{
 		SetEmote(EMOTE_HAPPY, 1);
 		if(Server()->Tick() % Server()->TickSpeed() == 0)
-			GS()->SendMmoEffect(m_Core.m_Pos, EFFECT_SPASALON);
+			GS()->CreateEffect(m_Core.m_Pos, EFFECT_SPASALON);
 	}
 }
 
@@ -963,7 +971,7 @@ void CCharacter::HandleTuning()
 	else if(m_pPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB)
 	{
 		// effect slower
-		if(str_comp(BotJob::ms_aMobBot[MobID].m_aBehavior, "Slime") == 0)
+		if(str_comp(MobBotInfo::ms_aMobBot[MobID].m_aBehavior, "Slime") == 0)
 		{
 			pTuningParams->m_Gravity = 0.25f;
 			pTuningParams->m_GroundJumpImpulse = 8.0f;
@@ -979,7 +987,7 @@ void CCharacter::HandleTuning()
 			pTuningParams->m_PlayerHooking = 0;
 		}
 	}
-	
+
 	// flight mode
 	if(m_pPlayer->m_Flymode && m_pPlayer->GetEquippedItemID(EQUIP_WINGS) > 0)
 	{
@@ -1026,7 +1034,7 @@ void CCharacter::HandleBuff(CTuningParams* TuningParams)
 
 	// poisons
 	if(Server()->Tick() % Server()->TickSpeed() == 0)
-	{	
+	{
 		if(m_pPlayer->IsActiveEffect("Fire"))
 		{
 			const int ExplodeDamageSize = translate_to_percent_rest(m_pPlayer->GetStartHealth(), 3);
@@ -1090,13 +1098,13 @@ bool CCharacter::IsAllowedPVP(int FromID)
 	CPlayer* pFrom = GS()->GetPlayer(FromID, false, true);
 	if(!pFrom || (m_SkipDamage || pFrom->GetCharacter()->m_SkipDamage) || (m_pPlayer->IsBot() && pFrom->IsBot()))
 		return false;
-	
+
 	// pvp only for mobs
 	if((m_pPlayer->IsBot() && m_pPlayer->GetBotType() != BotsTypes::TYPE_BOT_MOB) || (pFrom->IsBot() && pFrom->GetBotType() != BotsTypes::TYPE_BOT_MOB))
 		return false;
 
 	// disable damage on invisible wall
-	if(GS()->Collision()->GetParseTilesAt(GetPos().x, GetPos().y) == TILE_INVISIBLE_WALL 
+	if(GS()->Collision()->GetParseTilesAt(GetPos().x, GetPos().y) == TILE_INVISIBLE_WALL
 		|| GS()->Collision()->GetParseTilesAt(pFrom->GetCharacter()->GetPos().x, pFrom->GetCharacter()->GetPos().y) == TILE_INVISIBLE_WALL)
 		return false;
 
@@ -1158,7 +1166,7 @@ bool CCharacter::CheckFailMana(int Mana)
 		m_pPlayer->GetItem(itPotionManaRegen).Use(1);
 
 	m_pPlayer->ShowInformationStats();
-	return false;	
+	return false;
 }
 
 void CCharacter::ChangePosition(vec2 NewPos)
@@ -1166,8 +1174,8 @@ void CCharacter::ChangePosition(vec2 NewPos)
 	if(!m_Alive)
 		return;
 
-	GS()->SendMmoEffect(m_Core.m_Pos, EFFECT_TELEPORT);
-	GS()->SendMmoEffect(NewPos, EFFECT_TELEPORT);
+	GS()->CreateEffect(m_Core.m_Pos, EFFECT_TELEPORT);
+	GS()->CreateEffect(NewPos, EFFECT_TELEPORT);
 	GS()->CreateDeath(m_Core.m_Pos, m_pPlayer->GetCID());
 	GS()->CreateDeath(NewPos, m_pPlayer->GetCID());
 	m_Core.m_Pos = NewPos;

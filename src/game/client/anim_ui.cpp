@@ -1,3 +1,5 @@
+#include <base/stdafx.h>
+
 #include <engine/graphics.h>
 #include "anim_ui/block.h"
 #include "anim_ui.h"

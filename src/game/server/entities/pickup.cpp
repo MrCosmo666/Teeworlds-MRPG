@@ -1,10 +1,12 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <generated/server_data.h>
-#include <game/server/gamecontext.h>
+#include <base/stdafx.h>
 
-#include "character.h"
 #include "pickup.h"
+
+#include <game/server/gamecontext.h>
+#include <generated/server_data.h>
+#include "character.h"
 
 CPickup::CPickup(CGameWorld *pGameWorld, int Type, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_PICKUP, Pos, PickupPhysSize)

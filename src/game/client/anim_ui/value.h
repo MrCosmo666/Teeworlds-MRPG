@@ -1,8 +1,6 @@
 #ifndef GAME_CLIENT_ANIM_UI_VALUE_H
 #define GAME_CLIENT_ANIM_UI_VALUE_H
 
-#include <functional>
-
 class CValue
 {
 	typedef std::function<void()> AnimCallback;

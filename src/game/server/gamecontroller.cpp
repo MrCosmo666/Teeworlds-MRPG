@@ -1,11 +1,14 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <game/mapitems.h>
+#include <base/stdafx.h>
+
 #include "gamecontroller.h"
 
 #include <engine/console.h>
-#include "entities/pickup.h"
+#include <game/mapitems.h>
+
 #include "gamecontext.h"
+#include "entities/pickup.h"
 
 /*
 	Here you need to put it in order make more events
@@ -15,6 +18,7 @@
 IGameController::IGameController(CGS *pGS)
 {
 	m_pGS = pGS;
+	m_GameFlags = 0;
 	m_pServer = m_pGS->Server();
 
 	// info
@@ -72,7 +76,6 @@ bool IGameController::OnCharacterSpawn(CCharacter* pChr)
 bool IGameController::OnEntity(int Index, vec2 Pos)
 {
 	int Type = -1;
-
 	switch(Index)
 	{
 	case ENTITY_SPAWN:
@@ -99,6 +102,7 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 	case ENTITY_PICKUP_LASER:
 		Type = PICKUP_LASER;
 		break;
+	default: break;
 	}
 
 	if(Type != -1)
@@ -207,7 +211,7 @@ bool IGameController::CanSpawn(int SpawnType, vec2 *pOutPos, vec2 BotPos) const
 float IGameController::EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos) const
 {
 	float Score = 0.0f;
-	CCharacter *pC = static_cast<CCharacter *>(GS()->m_World.FindFirst(CGameWorld::ENTTYPE_CHARACTER));
+	CCharacter *pC = dynamic_cast<CCharacter *>(GS()->m_World.FindFirst(CGameWorld::ENTTYPE_CHARACTER));
 	for(; pC; pC = (CCharacter *)pC->TypeNext())
 	{
 		// team mates are not as dangerous as enemies
@@ -216,7 +220,7 @@ float IGameController::EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos) const
 			Scoremod = 0.5f;
 
 		float d = distance(Pos, pC->GetPos());
-		Score += Scoremod * (d == 0 ? 1000000000.0f : 1.0f/d);
+		Score += Scoremod * (d == 0.f ? 1000000000.0f : 1.0f/d);
 	}
 
 	return Score;
@@ -232,7 +236,7 @@ void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type, vec2 BotPos
 		int Num = GS()->m_World.FindEntities(m_aaSpawnPoints[Type][i], 64, (CEntity**)aEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
 		vec2 Positions[5] = { vec2(0.0f, 0.0f), vec2(-32.0f, 0.0f), vec2(0.0f, -32.0f), vec2(32.0f, 0.0f), vec2(0.0f, 32.0f) };
 		int Result = -1;
-	
+
 		if(BotPos != vec2(-1, -1) && distance(BotPos, m_aaSpawnPoints[Type][i]) > 800.0f)
 			continue;
 
@@ -241,7 +245,7 @@ void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type, vec2 BotPos
 			Result = Index;
 			for(int c = 0; c < Num; ++c)
 			{
-				if( 
+				if(
 					GS()->Collision()->CheckPoint(m_aaSpawnPoints[Type][i]+Positions[Index]) ||
 					distance(aEnts[c]->GetPos(), m_aaSpawnPoints[Type][i]+Positions[Index]) <= aEnts[c]->GetProximityRadius())
 				{

@@ -1,6 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/system.h>
+#include <base/stdafx.h>
 
 #include <engine/config.h>
 #include <engine/console.h>
@@ -297,7 +297,7 @@ int main(int argc, const char **argv) // ignore_convention
 	IStorageEngine *pStorage = CreateStorage("Teeworlds", IStorageEngine::STORAGETYPE_BASIC, argc, argv);
 	IConfig *pConfig = CreateConfig();
 	m_pConsole = CreateConsole(FlagMask);
-	
+
 	bool RegisterFail = !pKernel->RegisterInterface(pStorage);
 	RegisterFail |= !pKernel->RegisterInterface(m_pConsole);
 	RegisterFail |= !pKernel->RegisterInterface(pConfig);

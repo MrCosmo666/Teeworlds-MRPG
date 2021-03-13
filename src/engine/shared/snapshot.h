@@ -3,10 +3,7 @@
 #ifndef ENGINE_SHARED_SNAPSHOT_H
 #define ENGINE_SHARED_SNAPSHOT_H
 
-#include <base/system.h>
-
 // CSnapshot
-
 class CSnapshotItem
 {
 	friend class CSnapshotBuilder;

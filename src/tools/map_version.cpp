@@ -1,12 +1,10 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/math.h>
-#include <base/system.h>
+#include <base/stdafx.h>
 
 #include <engine/kernel.h>
 #include <engine/map.h>
 #include <engine/storage.h>
-
 
 static IOHANDLE s_File = 0;
 static IStorageEngine *s_pStorage = 0;

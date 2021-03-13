@@ -3,8 +3,6 @@
 #ifndef GAME_CLIENT_COMPONENTS_INVENTORY_PAGE_H
 #define GAME_CLIENT_COMPONENTS_INVENTORY_PAGE_H
 
-#include <base/tl/array.h>
-
 class CInventoryPage
 {
 	class CInventory* m_pInventory;

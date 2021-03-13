@@ -2,10 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_CLIENT_COMPONENTS_MENUS_H
 #define GAME_CLIENT_COMPONENTS_MENUS_H
-
-#include <base/vmath.h>
-#include <base/tl/sorted_array.h>
-
 #include <engine/graphics.h>
 #include <engine/demo.h>
 #include <engine/contacts.h>
@@ -589,7 +585,7 @@ private:
 			return false;
 		}
 	};
-	
+
 	sorted_array<CDemoItem> m_lDemos;
 	char m_aCurrentDemoFolder[256];
 	char m_aCurrentDemoFile[64];
@@ -885,7 +881,7 @@ private:
 	void RenderRgbSliders(CUIRect* pMainView, CUIRect* pButton, int &r, int &g, int &b, bool Enabled);
 	void RenderSettingsMmoChangerGeneric(CUIRect MainView, CCSkinChanger::CTextureEntity* pEntities, char* pConfigStr, const char* pLabel, int ItemsPerRow, float Ratio);
 	void PreparationLeftRightSide(const char* pName, CUIRect MainView, CUIRect* LeftSide, CUIRect* RightSide, const float Spacing, const float ButtonHeight);
-	
+
 	// auth state for mmotee
 	void RenderAuthWindow();
 

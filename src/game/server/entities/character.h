@@ -3,7 +3,6 @@
 #ifndef GAME_SERVER_ENTITIES_CHARACTER_H
 #define GAME_SERVER_ENTITIES_CHARACTER_H
 #include <game/server/entity.h>
-#include <game/gamecore.h>
 
 #include "../mmocore/TileHandle.h"
 
@@ -109,7 +108,7 @@ public:
 
 	void CreateSnapProj(int SnapID, int Count, int TypeID, bool Dynamic, bool Projectile);
 	void RemoveSnapProj(int Count, int SnapID, bool Effect = false);
-	
+
 	void ChangePosition(vec2 NewPos);
 	void ResetDoorPos();
 	void UpdateEquipingStats(int ItemID);
