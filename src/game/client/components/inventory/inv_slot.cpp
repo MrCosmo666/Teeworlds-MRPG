@@ -13,7 +13,7 @@
 #include "inv_slot.h"
 
 CInventorySlot::CInventorySlot(CInventory* pInventory, CInventoryList* pInventoryList, int Page, int SlotID)
-: m_SlotID(SlotID), m_Page(Page), m_pInventory(pInventory), m_pInventoryList(pInventoryList)
+: m_Page(Page), m_SlotID(SlotID), m_pInventory(pInventory), m_pInventoryList(pInventoryList)
 {
 	m_ItemID = 0;
 	m_Count = 0;
