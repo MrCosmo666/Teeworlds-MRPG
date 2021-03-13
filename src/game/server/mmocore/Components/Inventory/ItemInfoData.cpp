@@ -7,22 +7,22 @@
 #include <game/server/gamecontext.h>
 #include <teeother/components/localization.h>
 
-std::map < int, CItemInformation > CItemInformation::ms_aItemsInfo;
-const char* CItemInformation::GetName(CPlayer* pPlayer) const
+std::map < int, CItemDataInfo > CItemDataInfo::ms_aItemsInfo;
+const char* CItemDataInfo::GetName(CPlayer* pPlayer) const
 {
 	if(!pPlayer)
 		return m_aName;
 	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), m_aName);
 }
 
-const char* CItemInformation::GetDesc(CPlayer* pPlayer) const
+const char* CItemDataInfo::GetDesc(CPlayer* pPlayer) const
 {
 	if(!pPlayer)
 		return m_aDesc;
 	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), m_aDesc);
 }
 
-int CItemInformation::GetInfoEnchantStats(int AttributeID) const
+int CItemDataInfo::GetInfoEnchantStats(int AttributeID) const
 {
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
@@ -32,7 +32,7 @@ int CItemInformation::GetInfoEnchantStats(int AttributeID) const
 	return 0;
 }
 
-int CItemInformation::GetInfoEnchantStats(int AttributeID, int Enchant) const
+int CItemDataInfo::GetInfoEnchantStats(int AttributeID, int Enchant) const
 {
 	const int StatSize = GetInfoEnchantStats(AttributeID);
 	if(StatSize <= 0)
@@ -48,7 +48,7 @@ int CItemInformation::GetInfoEnchantStats(int AttributeID, int Enchant) const
 	return EnchantStat;
 }
 
-int CItemInformation::GetEnchantPrice(int EnchantLevel) const
+int CItemDataInfo::GetEnchantPrice(int EnchantLevel) const
 {
 	int FinishedPrice = 0;
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
@@ -78,7 +78,7 @@ int CItemInformation::GetEnchantPrice(int EnchantLevel) const
 	return FinishedPrice;
 }
 
-bool CItemInformation::IsEnchantable() const
+bool CItemDataInfo::IsEnchantable() const
 {
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
@@ -88,7 +88,7 @@ bool CItemInformation::IsEnchantable() const
 	return false;
 }
 
-bool CItemInformation::IsEnchantMaxLevel(int Enchant) const
+bool CItemDataInfo::IsEnchantMaxLevel(int Enchant) const
 {
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
@@ -102,7 +102,7 @@ bool CItemInformation::IsEnchantMaxLevel(int Enchant) const
 	return false;
 }
 
-void CItemInformation::FormatAttributes(char* pBuffer, int Size, int Enchant) const
+void CItemDataInfo::FormatAttributes(char* pBuffer, int Size, int Enchant) const
 {
 	dynamic_string Buffer;
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
@@ -121,7 +121,7 @@ void CItemInformation::FormatAttributes(char* pBuffer, int Size, int Enchant) co
 	Buffer.clear();
 }
 
-void CItemInformation::FormatEnchantLevel(char* pBuffer, int Size, int Enchant) const
+void CItemDataInfo::FormatEnchantLevel(char* pBuffer, int Size, int Enchant) const
 {
 	if(Enchant > 0)
 	{

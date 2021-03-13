@@ -5,8 +5,6 @@
 
 #include <game/server/gamecontext.h>
 
-using namespace sqlstr;
-
 void CSkillsCore::OnInit()
 {
 	SJK.SDT("*", "tw_skills_list", [&](ResultPtr pRes)
@@ -133,7 +131,7 @@ void CSkillsCore::SkillSelected(CPlayer *pPlayer, int SkillID)
 	const int ClientID = pPlayer->GetCID();
 	const bool IsPassive = pSkill.Info().m_Passive;
 	const bool IsMaxLevel = pSkill.m_Level >= pSkill.Info().m_MaxLevel;
-	const int HideID = NUM_TAB_MENU + CItemInformation::ms_aItemsInfo.size() + SkillID;
+	const int HideID = NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + SkillID;
 
 	GS()->AVHI(ClientID, "skill", HideID, LIGHT_BLUE_COLOR, "{STR} - {INT}SP ({INT}/{INT})", pSkill.Info().m_aName, pSkill.Info().m_PriceSP, pSkill.m_Level, pSkill.Info().m_MaxLevel);
 	if(!IsMaxLevel)

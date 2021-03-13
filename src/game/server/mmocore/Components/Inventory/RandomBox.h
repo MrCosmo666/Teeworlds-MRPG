@@ -7,6 +7,7 @@
 #include "ItemData.h"
 
 class CPlayer;
+
 struct StructRandomBoxItem
 {
 	int m_ItemID;
@@ -28,7 +29,7 @@ public:
 		m_ArrayItems.push_back(Item);
 	}
 
-	bool Start(CPlayer* pPlayer, int LifeTime, InventoryItem *pPlayerUsesItem = nullptr);
+	bool Start(CPlayer* pPlayer, int LifeTime, CItemData* pPlayerUsesItem = nullptr);
 };
 
 class CRandomBoxRandomizer : public CEntity
@@ -36,11 +37,11 @@ class CRandomBoxRandomizer : public CEntity
 	int m_LifeTime;
 	int m_PlayerAccountID;
 	CPlayer* m_pPlayer;
-	InventoryItem* m_pPlayerUsesItem;
+	CItemData* m_pPlayerUsesItem;
 	std::vector<StructRandomBoxItem> m_List;
 
 public:
-	CRandomBoxRandomizer(CGameWorld* pGameWorld, CPlayer* pPlayer, int PlayerAccountID, int LifeTime, std::vector<StructRandomBoxItem> List, InventoryItem* pPlayerUsesItem);
+	CRandomBoxRandomizer(CGameWorld* pGameWorld, CPlayer* pPlayer, int PlayerAccountID, int LifeTime, std::vector<StructRandomBoxItem> List, CItemData* pPlayerUsesItem);
 
 	std::vector<StructRandomBoxItem>::iterator SelectRandomItem();
 	void Tick() override;

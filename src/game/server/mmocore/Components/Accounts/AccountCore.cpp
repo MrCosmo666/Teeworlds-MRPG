@@ -4,17 +4,14 @@
 
 #include "AccountCore.h"
 
-#include <game/server/gamecontext.h>
-
 #include <engine/shared/config.h>
+#include <game/server/gamecontext.h>
 #include <teeother/components/localization.h>
 
 #include <game/server/mmocore/Components/Dungeons/DungeonJob.h>
-#include <game/server/mmocore/Components/Mails/MailBoxJob.h>
+#include <game/server/mmocore/Components/Mails/MailBoxCore.h>
 #include <game/server/mmocore/Components/Quests/QuestCore.h>
 #include <game/server/mmocore/Components/Worlds/WorldSwapCore.h>
-
-using namespace sqlstr;
 
 int CAccountCore::GetHistoryLatestCorrectWorldID(CPlayer* pPlayer) const
 {
@@ -256,7 +253,7 @@ bool CAccountCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 		GS()->AVM(ClientID, "MENU", MenuList::MENU_SELECT_LANGUAGE, TAB_SETTINGS, "Settings language");
 		for (const auto& it : CItemData::ms_aItems[ClientID])
 		{
-			const InventoryItem ItemData = it.second;
+			const CItemData ItemData = it.second;
 			if (ItemData.Info().m_Type == ItemType::TYPE_SETTINGS && ItemData.m_Count > 0)
 				GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.m_Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
 		}
@@ -267,7 +264,7 @@ bool CAccountCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 		GS()->AVH(ClientID, TAB_SETTINGS_MODULES, GREEN_COLOR, "Modules settings");
 		for (const auto& it : CItemData::ms_aItems[ClientID])
 		{
-			const InventoryItem ItemData = it.second;
+			const CItemData ItemData = it.second;
 			if (ItemData.Info().m_Type == ItemType::TYPE_MODULE && ItemData.m_Count > 0)
 			{
 				char aAttributes[128];
@@ -414,7 +411,7 @@ void CAccountCore::UseVoucher(int ClientID, const char* pVoucher)
 
 					if (ItemID > NOPE && Value > 0)
 					{
-						if (CItemInformation::ms_aItemsInfo.find(ItemID) != CItemInformation::ms_aItemsInfo.end())
+						if (CItemDataInfo::ms_aItemsInfo.find(ItemID) != CItemDataInfo::ms_aItemsInfo.end())
 							pPlayer->GetItem(ItemID).Add(Value);
 					}
 				}

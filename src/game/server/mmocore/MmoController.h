@@ -43,7 +43,7 @@ class MmoController
 	class CCraftCore* m_pCraftJob;
 	class DungeonJob* m_pDungeonJob;
 	class CHouseCore* m_pHouseJob;
-	class MailBoxJob* m_pMailBoxJob;
+	class CMailBoxCore* m_pMailBoxJob;
 	class CSkillsCore* m_pSkillJob;
 	class CWorldSwapCore* m_pWorldSwapJob;
 
@@ -66,7 +66,7 @@ public:
 	CCraftCore* Craft() const { return m_pCraftJob; }
 	DungeonJob* Dungeon() const { return m_pDungeonJob; }
 	CHouseCore* House() const { return m_pHouseJob; }
-	MailBoxJob* Inbox() const { return m_pMailBoxJob; }
+	CMailBoxCore* Inbox() const { return m_pMailBoxJob; }
 	GuildJob* Member() const { return m_pGuildJob; }
 	CSkillsCore* Skills() const { return m_pSkillJob; }
 	CWorldSwapCore *WorldSwap() const { return m_pWorldSwapJob; }

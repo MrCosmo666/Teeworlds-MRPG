@@ -40,7 +40,8 @@ bool CShopCore::OnHandleTile(CCharacter* pChr, int IndexCollision)
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
-	else if (pChr->GetHelper()->TileExit(IndexCollision, TILE_AUCTION))
+
+	if (pChr->GetHelper()->TileExit(IndexCollision, TILE_AUCTION))
 	{
 		GS()->Chat(ClientID, "You left the active zone, menu is restored!");
 		pChr->m_Core.m_ProtectHooked = pChr->m_SkipDamage = false;
@@ -81,7 +82,7 @@ bool CShopCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMen
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MENU_INVENTORY;
 		const int ItemID = pPlayer->GetTempData().m_SellItem.m_ItemID;
-		ItemInformation& pInformationSellItem = GS()->GetItemInfo(ItemID);
+		CItemDataInfo &pInformationSellItem = GS()->GetItemInfo(ItemID);
 
 		const int SlotCount = pPlayer->GetTempData().m_SellItem.m_Count;
 		const int MinimalPrice = SlotCount * pInformationSellItem.m_MinimalPrice;
@@ -122,7 +123,7 @@ bool CShopCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 	if(PPSTR(CMD, "AUCTIONCOUNT") == 0)
 	{
 		// if there are fewer items installed, we set the number of items.
-		InventoryItem& pPlayerSellItem = pPlayer->GetItem(VoteID);
+		CItemData& pPlayerSellItem = pPlayer->GetItem(VoteID);
 		if(Get > pPlayerSellItem.m_Count)
 			Get = pPlayerSellItem.m_Count;
 
@@ -164,7 +165,7 @@ bool CShopCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 
 	if(PPSTR(CMD, "AUCTIONACCEPT") == 0)
 	{
-		InventoryItem& pPlayerSellItem = pPlayer->GetItem(VoteID);
+		CItemData& pPlayerSellItem = pPlayer->GetItem(VoteID);
 		if(pPlayerSellItem.m_Count >= pPlayer->GetTempData().m_SellItem.m_Count && pPlayer->GetTempData().m_SellItem.m_Price >= 10)
 		{
 			CreateAuctionSlot(pPlayer, pPlayer->GetTempData().m_SellItem);
@@ -182,7 +183,7 @@ void CShopCore::CreateAuctionSlot(CPlayer* pPlayer, CAuctionItem& pAuctionItem)
 {
 	const int ItemID = pAuctionItem.m_ItemID;
 	const int ClientID = pPlayer->GetCID();
-	InventoryItem& pPlayerAuctionItem = pPlayer->GetItem(ItemID);
+	CItemData& pPlayerAuctionItem = pPlayer->GetItem(ItemID);
 
 	// check the number of slots whether everything is occupied or not
 	ResultPtr pResCheck = SJK.SD("ID", "tw_mailshop", "WHERE OwnerID > '0' LIMIT %d", g_Config.m_SvMaxMasiveAuctionSlots);
@@ -243,7 +244,7 @@ bool CShopCore::BuyShopItem(CPlayer* pPlayer, int ID)
 		return false;
 
 	const int ItemID = pRes->getInt("ItemID");
-	InventoryItem& pPlayerBuyightItem = pPlayer->GetItem(ItemID);
+	CItemData& pPlayerBuyightItem = pPlayer->GetItem(ItemID);
 	if(pPlayerBuyightItem.m_Count > 0 && pPlayerBuyightItem.Info().IsEnchantable())
 	{
 		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");
@@ -299,7 +300,7 @@ void CShopCore::ShowAuction(CPlayer* pPlayer)
 	GS()->AV(ClientID, "null");
 
 	bool FoundItems = false;
-	int HideID = (int)(NUM_TAB_MENU + CItemInformation::ms_aItemsInfo.size() + 400);
+	int HideID = (int)(NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + 400);
 	ResultPtr pRes = SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 ORDER BY Price");
 	while(pRes->next())
 	{
@@ -309,26 +310,26 @@ void CShopCore::ShowAuction(CPlayer* pPlayer)
 		const int Enchant = pRes->getInt("Enchant");
 		const int Count = pRes->getInt("Count");
 		const int OwnerID = pRes->getInt("OwnerID");
-		ItemInformation& BuyightItem = GS()->GetItemInfo(ItemID);
+		CItemDataInfo &pBuyightItem = GS()->GetItemInfo(ItemID);
 
-		if(BuyightItem.IsEnchantable())
+		if(pBuyightItem.IsEnchantable())
 		{
 			char aEnchantBuf[16];
-			BuyightItem.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf), Enchant);
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} {STR} - {INT} gold",
-				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), BuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), Price);
+			pBuyightItem.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf), Enchant);
+			GS()->AVHI(ClientID, pBuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} {STR} - {INT} gold",
+				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), pBuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), Price);
 
 			char aAttributes[128];
-			BuyightItem.FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
+			pBuyightItem.FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 		}
 		else
 		{
-			GS()->AVHI(ClientID, BuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) - {INT} gold",
-				BuyightItem.GetName(pPlayer), Count, pPlayer->GetItem(ItemID).m_Count, Price);
+			GS()->AVHI(ClientID, pBuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) - {INT} gold",
+				pBuyightItem.GetName(pPlayer), Count, pPlayer->GetItem(ItemID).m_Count, Price);
 		}
 
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", BuyightItem.GetDesc(pPlayer));
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pBuyightItem.GetDesc(pPlayer));
 		GS()->AVM(ClientID, "null", NOPE, HideID, "Seller {STR}", Job()->PlayerName(OwnerID));
 		GS()->AVM(ClientID, "SHOP", ID, HideID, "Buy Price {INT} gold", Price);
 		FoundItems = true;
@@ -343,7 +344,7 @@ void CShopCore::ShowAuction(CPlayer* pPlayer)
 void CShopCore::ShowMailShop(CPlayer *pPlayer, int StorageID)
 {
 	const int ClientID = pPlayer->GetCID();
-	int HideID = NUM_TAB_MENU + CItemInformation::ms_aItemsInfo.size() + 300;
+	int HideID = NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + 300;
 	ResultPtr pRes = SJK.SD("*", "tw_mailshop", "WHERE StorageID = '%d' ORDER BY Price", StorageID);
 	while(pRes->next())
 	{
@@ -353,8 +354,8 @@ void CShopCore::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		const int Enchant = pRes->getInt("Enchant");
 		const int Count = pRes->getInt("Count");
 		const int NeedItemID = pRes->getInt("NeedItem");
-		ItemInformation &pBuyightItem = GS()->GetItemInfo(ItemID);
-		ItemInformation &pNeededItem = GS()->GetItemInfo(NeedItemID);
+		CItemDataInfo &pBuyightItem = GS()->GetItemInfo(ItemID);
+		CItemDataInfo &pNeededItem = GS()->GetItemInfo(NeedItemID);
 
 		if (pBuyightItem.IsEnchantable())
 		{

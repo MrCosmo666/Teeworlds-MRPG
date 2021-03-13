@@ -1,7 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#ifndef GAME_SERVER_WORLDSWAPJOB_H
-#define GAME_SERVER_WORLDSWAPJOB_H
+#ifndef GAME_SERVER_COMPONENT_WORLDSWAP_CORE_H
+#define GAME_SERVER_COMPONENT_WORLDSWAP_CORE_H
 #include <game/server/mmocore/MmoComponent.h>
 
 #include <game/server/mmocore/Components/Bots/BotData.h>

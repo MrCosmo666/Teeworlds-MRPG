@@ -1,6 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/stdafx.h>
+
 #include "dungeon.h"
 
 #include <engine/shared/config.h>
@@ -11,8 +12,8 @@
 #include <game/server/mmocore/GameEntities/Logics/logicwall.h>
 #include <teeother/system/string.h>
 
-#include <game/server/mmocore/Components/Dungeons/DungeonJob.h>
 #include <game/server/mmocore/Components/Accounts/AccountCore.h>
+#include <game/server/mmocore/Components/Dungeons/DungeonJob.h>
 
 CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController(pGS)
 {

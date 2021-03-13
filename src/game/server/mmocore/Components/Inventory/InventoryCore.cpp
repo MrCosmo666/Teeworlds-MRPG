@@ -13,7 +13,7 @@ using namespace sqlstr;
 void CInventoryCore::OnPrepareInformation(IStorageEngine* pStorage, CDataFileWriter* pDataFile)
 {
 	nlohmann::json JsonQuestData;
-	for(auto& p : CItemInformation::ms_aItemsInfo)
+	for(auto& p : CItemDataInfo::ms_aItemsInfo)
 	{
 		// data information
 		JsonQuestData["items"].push_back(
@@ -54,22 +54,22 @@ void CInventoryCore::OnInit()
 		while(pRes->next())
 		{
 			const int ItemID = (int)pRes->getInt("ItemID");
-			str_copy(CItemInformation::ms_aItemsInfo[ItemID].m_aName, pRes->getString("Name").c_str(), sizeof(CItemInformation::ms_aItemsInfo[ItemID].m_aName));
-			str_copy(CItemInformation::ms_aItemsInfo[ItemID].m_aDesc, pRes->getString("Description").c_str(), sizeof(CItemInformation::ms_aItemsInfo[ItemID].m_aDesc));
-			str_copy(CItemInformation::ms_aItemsInfo[ItemID].m_aIcon, pRes->getString("Icon").c_str(), sizeof(CItemInformation::ms_aItemsInfo[ItemID].m_aIcon));
-			CItemInformation::ms_aItemsInfo[ItemID].m_Type = (int)pRes->getInt("Type");
-			CItemInformation::ms_aItemsInfo[ItemID].m_Function = (int)pRes->getInt("Function");
-			CItemInformation::ms_aItemsInfo[ItemID].m_Dysenthis = (int)pRes->getInt("Desynthesis");
-			CItemInformation::ms_aItemsInfo[ItemID].m_MinimalPrice = (int)pRes->getInt("Selling");
+			str_copy(CItemDataInfo::ms_aItemsInfo[ItemID].m_aName, pRes->getString("Name").c_str(), sizeof(CItemDataInfo::ms_aItemsInfo[ItemID].m_aName));
+			str_copy(CItemDataInfo::ms_aItemsInfo[ItemID].m_aDesc, pRes->getString("Description").c_str(), sizeof(CItemDataInfo::ms_aItemsInfo[ItemID].m_aDesc));
+			str_copy(CItemDataInfo::ms_aItemsInfo[ItemID].m_aIcon, pRes->getString("Icon").c_str(), sizeof(CItemDataInfo::ms_aItemsInfo[ItemID].m_aIcon));
+			CItemDataInfo::ms_aItemsInfo[ItemID].m_Type = (int)pRes->getInt("Type");
+			CItemDataInfo::ms_aItemsInfo[ItemID].m_Function = (int)pRes->getInt("Function");
+			CItemDataInfo::ms_aItemsInfo[ItemID].m_Dysenthis = (int)pRes->getInt("Desynthesis");
+			CItemDataInfo::ms_aItemsInfo[ItemID].m_MinimalPrice = (int)pRes->getInt("Selling");
 			for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 			{
 				char aBuf[32];
 				str_format(aBuf, sizeof(aBuf), "Stat_%d", i);
-				CItemInformation::ms_aItemsInfo[ItemID].m_aAttribute[i] = (int)pRes->getInt(aBuf);
+				CItemDataInfo::ms_aItemsInfo[ItemID].m_aAttribute[i] = (int)pRes->getInt(aBuf);
 				str_format(aBuf, sizeof(aBuf), "StatCount_%d", i);
-				CItemInformation::ms_aItemsInfo[ItemID].m_aAttributeCount[i] = (int)pRes->getInt(aBuf);
+				CItemDataInfo::ms_aItemsInfo[ItemID].m_aAttributeCount[i] = (int)pRes->getInt(aBuf);
 			}
-			CItemInformation::ms_aItemsInfo[ItemID].m_ProjID = (int)pRes->getInt("ProjectileID");
+			CItemDataInfo::ms_aItemsInfo[ItemID].m_ProjID = (int)pRes->getInt("ProjectileID");
 		}
 	});
 
@@ -156,7 +156,7 @@ bool CInventoryCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		for(int i = 0; i < NUM_EQUIPS; i++)
 		{
 			const int ItemID = pPlayer->GetEquippedItemID(i);
-			InventoryItem& pItemPlayer = pPlayer->GetItem(ItemID);
+			CItemData& pItemPlayer = pPlayer->GetItem(ItemID);
 			if(ItemID <= 0 || !pItemPlayer.IsEquipped())
 			{
 				GS()->AVM(ClientID, "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} Not equipped", pType[i]);
@@ -207,7 +207,7 @@ bool CInventoryCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, con
 			return true;
 
 		Get = min(AvailableCount, Get);
-		InventoryItem& pItemPlayer = pPlayer->GetItem(VoteID);
+		CItemData& pItemPlayer = pPlayer->GetItem(VoteID);
 		pItemPlayer.Drop(Get);
 
 		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "You drop {STR}x{INT}", pItemPlayer.Info().GetName(pPlayer), Get);
@@ -234,8 +234,8 @@ bool CInventoryCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, con
 			return true;
 
 		Get = min(AvailableCount, Get);
-		InventoryItem& pPlayerSelectedItem = pPlayer->GetItem(VoteID);
-		InventoryItem& pPlayerMaterialItem = pPlayer->GetItem(itMaterial);
+		CItemData& pPlayerSelectedItem = pPlayer->GetItem(VoteID);
+		CItemData& pPlayerMaterialItem = pPlayer->GetItem(itMaterial);
 		const int DesCount = pPlayerSelectedItem.Info().m_Dysenthis * Get;
 		if(pPlayerSelectedItem.Remove(Get) && pPlayerMaterialItem.Add(DesCount))
 		{
@@ -256,7 +256,7 @@ bool CInventoryCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, con
 
 	if(PPSTR(CMD, "IENCHANT") == 0)
 	{
-		InventoryItem& pItemPlayer = pPlayer->GetItem(VoteID);
+		CItemData& pItemPlayer = pPlayer->GetItem(VoteID);
 		if(pItemPlayer.IsEnchantMaxLevel())
 		{
 			GS()->Chat(ClientID, "You enchant max level for this item!");
@@ -406,7 +406,7 @@ int CInventoryCore::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID) const
 	return AvailableCount;
 }
 
-void CInventoryCore::ItemSelected(CPlayer* pPlayer, const InventoryItem& pItemPlayer, bool Dress)
+void CInventoryCore::ItemSelected(CPlayer* pPlayer, const CItemData& pItemPlayer, bool Dress)
 {
 	const int ClientID = pPlayer->GetCID();
 	const int ItemID = pItemPlayer.GetID();
@@ -489,7 +489,7 @@ void CInventoryCore::ItemSelected(CPlayer* pPlayer, const InventoryItem& pItemPl
 int CInventoryCore::GetCountItemsType(CPlayer *pPlayer, int Type) const
 {
 	const int ClientID = pPlayer->GetCID();
-	return (int)std::count_if(CItemData::ms_aItems[ClientID].begin(), CItemData::ms_aItems[ClientID].end(), [Type](std::pair< const int, InventoryItem>& pItem)
+	return (int)std::count_if(CItemData::ms_aItems[ClientID].begin(), CItemData::ms_aItems[ClientID].end(), [Type](std::pair< const int, CItemData>& pItem)
 	                          {return pItem.second.m_Count > 0 && pItem.second.Info().m_Type == Type; });
 }
 

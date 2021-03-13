@@ -9,7 +9,6 @@ class CPlayerBot : public CPlayer
 {
 	MACRO_ALLOC_POOL_ID()
 
-private:
 	int m_BotType;
 	int m_BotID;
 	int m_SubBotID;

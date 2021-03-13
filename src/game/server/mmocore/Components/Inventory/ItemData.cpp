@@ -19,11 +19,6 @@ inline int randomRangecount(int startrandom, int endrandom, int count)
 	return result;
 }
 
-ItemInformation& CItemData::Info() const
-{
-	return CItemInformation::ms_aItemsInfo[m_ItemID];
-};
-
 void CItemData::SetItemOwner(CPlayer* pPlayer)
 {
 	m_pPlayer = pPlayer;
@@ -76,7 +71,7 @@ bool CItemData::Add(int Count, int Settings, int Enchant, bool Message)
 	GS()->Mmo()->Item()->GiveItem(m_pPlayer, m_ItemID, Count, Settings, Enchant);
 
 	// check the empty slot if yes then put the item on
-	const bool AutoEquip = (Info().m_Type == ItemType::TYPE_EQUIP && m_pPlayer->GetEquippedItemID(Info().m_Function) <= 0) || Info().m_Type == TYPE_MODULE;
+	const bool AutoEquip = (Info().m_Type == TYPE_EQUIP && m_pPlayer->GetEquippedItemID(Info().m_Function) <= 0) || Info().m_Type == TYPE_MODULE;
 	if(AutoEquip)
 	{
 		if(!IsEquipped())
@@ -88,12 +83,12 @@ bool CItemData::Add(int Count, int Settings, int Enchant, bool Message)
 		GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 	}
 
-	if(!Message || Info().m_Type == ItemType::TYPE_SETTINGS)
+	if(!Message || Info().m_Type == TYPE_SETTINGS)
 		return true;
 
-	if(Info().m_Type == ItemType::TYPE_EQUIP || Info().m_Type == ItemType::TYPE_MODULE)
+	if(Info().m_Type == TYPE_EQUIP || Info().m_Type == TYPE_MODULE)
 		GS()->Chat(-1, "{STR} got of the {STR}x{INT}!", GS()->Server()->ClientName(ClientID), Info().GetName(), Count);
-	else if(Info().m_Type != ItemType::TYPE_INVISIBLE)
+	else if(Info().m_Type != TYPE_INVISIBLE)
 		GS()->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(m_pPlayer), Count);
 
 	return true;
@@ -119,19 +114,19 @@ bool CItemData::Equip()
 
 	m_Settings ^= true;
 
-	if(Info().m_Type == ItemType::TYPE_EQUIP)
+	if(Info().m_Type == TYPE_EQUIP)
 	{
 		const int EquipID = Info().m_Function;
 		int EquipItemID = m_pPlayer->GetEquippedItemID(EquipID, m_ItemID);
 		while(EquipItemID >= 1)
 		{
-			InventoryItem& EquipItem = m_pPlayer->GetItem(EquipItemID);
+			CItemData& EquipItem = m_pPlayer->GetItem(EquipItemID);
 			EquipItem.SetSettings(0);
 			EquipItemID = m_pPlayer->GetEquippedItemID(EquipID, m_ItemID);
 		}
 
 		if(Info().m_Function == EQUIP_DISCORD)
-			GS()->Mmo()->SaveAccount(m_pPlayer, SaveType::SAVE_STATS);
+			GS()->Mmo()->SaveAccount(m_pPlayer, SAVE_STATS);
 
 		GS()->ChangeEquipSkin(m_pPlayer->GetCID(), m_ItemID);
 	}
@@ -198,7 +193,7 @@ bool CItemData::Use(int Count)
 				continue;
 
 			// skip weapon spreading
-			if(pAttribute.second.m_Type == AtributType::AtWeapon)
+			if(pAttribute.second.m_Type == AtWeapon)
 				continue;
 
 			BackUpgrades += (int)(m_pPlayer->Acc().m_aStats[pAttribute.first] * pAttribute.second.m_UpgradePrice);
@@ -207,7 +202,7 @@ bool CItemData::Use(int Count)
 
 		GS()->Chat(-1, "{STR} used {STR} returned {INT} upgrades.", GS()->Server()->ClientName(ClientID), Info().GetName(), BackUpgrades);
 		m_pPlayer->Acc().m_Upgrade += BackUpgrades;
-		GS()->Mmo()->SaveAccount(m_pPlayer, SaveType::SAVE_UPGRADES);
+		GS()->Mmo()->SaveAccount(m_pPlayer, SAVE_UPGRADES);
 	}
 	// ticket reset for weapons stats
 	else if(m_ItemID == itTicketResetWeaponStats && Remove(Count, 0))
@@ -219,13 +214,13 @@ bool CItemData::Use(int Count)
 				continue;
 
 			// skip all stats allow only weapons
-			if(pAttribute.second.m_Type != AtributType::AtWeapon)
+			if(pAttribute.second.m_Type != AtWeapon)
 				continue;
 
 			int UpgradeCount = m_pPlayer->Acc().m_aStats[pAttribute.first];
-			if(pAttribute.first == Stats::StSpreadShotgun)
+			if(pAttribute.first == StSpreadShotgun)
 				UpgradeCount = m_pPlayer->Acc().m_aStats[pAttribute.first] - 3;
-			else if(pAttribute.first == Stats::StSpreadGrenade || pAttribute.first == Stats::StSpreadRifle)
+			else if(pAttribute.first == StSpreadGrenade || pAttribute.first == StSpreadRifle)
 				UpgradeCount = m_pPlayer->Acc().m_aStats[pAttribute.first] - 1;
 
 			if(UpgradeCount <= 0)
@@ -237,7 +232,7 @@ bool CItemData::Use(int Count)
 
 		GS()->Chat(-1, "{STR} used {STR} returned {INT} upgrades.", GS()->Server()->ClientName(ClientID), Info().GetName(), BackUpgrades);
 		m_pPlayer->Acc().m_Upgrade += BackUpgrades;
-		GS()->Mmo()->SaveAccount(m_pPlayer, SaveType::SAVE_UPGRADES);
+		GS()->Mmo()->SaveAccount(m_pPlayer, SAVE_UPGRADES);
 	}
 	return true;
 }

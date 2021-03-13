@@ -2,10 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/stdafx.h>
 
-#include "gamecontroller.h"
-
-#include <engine/console.h>
 #include <game/mapitems.h>
+#include "gamecontroller.h"
 
 #include "gamecontext.h"
 #include "entities/pickup.h"

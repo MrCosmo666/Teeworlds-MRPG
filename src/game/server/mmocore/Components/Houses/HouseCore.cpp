@@ -260,7 +260,7 @@ bool CHouseCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const i
 		const int HouseID = PlayerHouseID(pPlayer);
 		if(HouseID > 0 && DeleteDecorationHouse(VoteID))
 		{
-			InventoryItem& PlDecoItem = pPlayer->GetItem(VoteID2);
+			CItemData& PlDecoItem = pPlayer->GetItem(VoteID2);
 			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
 			PlDecoItem.Add(1);
 		}

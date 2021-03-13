@@ -1,7 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#ifndef GAME_SERVER_SQLITEM_H
-#define GAME_SERVER_SQLITEM_H
+#ifndef GAME_SERVER_COMPONENT_INVENTORY_CORE_H
+#define GAME_SERVER_COMPONENT_INVENTORY_CORE_H
 #include <game/server/mmocore/MmoComponent.h>
 
 #include "ItemData.h"
@@ -10,7 +10,7 @@ class CInventoryCore : public MmoComponent
 {
 	~CInventoryCore() override
 	{
-		CItemInformation::ms_aItemsInfo.clear();
+		CItemDataInfo::ms_aItemsInfo.clear();
 		CItemData::ms_aItems.clear();
 	};
 
@@ -27,7 +27,7 @@ class CInventoryCore : public MmoComponent
 public:
 	// primary
 	void ListInventory(class CPlayer *pPlayer, int TypeList, bool SortedFunction = false);
-	void ItemSelected(class CPlayer* pPlayer, const InventoryItem& pItemPlayer, bool Dress = false);
+	void ItemSelected(class CPlayer* pPlayer, const CItemData& pItemPlayer, bool Dress = false);
 	int GetUnfrozenItemCount(class CPlayer* pPlayer, int ItemID) const;
 
 	void RepairDurabilityItems(class CPlayer *pPlayer);

@@ -51,10 +51,10 @@ void QuestCore::OnMessage(int MsgID, void* pRawMsg, int ClientID)
 	CPlayer* pPlayer = GS()->m_apPlayers[ClientID];
 	if(MsgID == NETMSGTYPE_CL_TALKINTERACTIVE)
 	{
-		if(pPlayer->m_aPlayerTick[TickState::LastDialog] && pPlayer->m_aPlayerTick[TickState::LastDialog] > Server()->Tick())
+		if(pPlayer->m_aPlayerTick[LastDialog] && pPlayer->m_aPlayerTick[LastDialog] > Server()->Tick())
 			return;
 
-		pPlayer->m_aPlayerTick[TickState::LastDialog] = Server()->Tick() + (Server()->TickSpeed() / 4);
+		pPlayer->m_aPlayerTick[LastDialog] = Server()->Tick() + (Server()->TickSpeed() / 4);
 		pPlayer->SetTalking(pPlayer->GetTalkedID(), false);
 	}
 }
@@ -71,10 +71,10 @@ bool QuestCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMen
 		return false;
 	}
 
-	if(Menulist == MenuList::MENU_JOURNAL_FINISHED)
+	if(Menulist == MENU_JOURNAL_FINISHED)
 	{
-		pPlayer->m_LastVoteMenu = MenuList::MENU_JOURNAL_MAIN;
-		ShowQuestsTabList(pPlayer, QuestState::QUEST_FINISHED);
+		pPlayer->m_LastVoteMenu = MENU_JOURNAL_MAIN;
+		ShowQuestsTabList(pPlayer, QUEST_FINISHED);
 		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
@@ -91,20 +91,20 @@ static const char* GetStateName(int Type)
 {
 	switch(Type)
 	{
-		case QuestState::QUEST_ACCEPT: return "Active";
-		case QuestState::QUEST_FINISHED: return "Finished";
+		case QUEST_ACCEPT: return "Active";
+		case QUEST_FINISHED: return "Finished";
 		default: return "Not active";
 	}
 }
 
 void QuestCore::ShowQuestsMainList(CPlayer* pPlayer)
 {
-	ShowQuestsTabList(pPlayer, QuestState::QUEST_ACCEPT);
-	ShowQuestsTabList(pPlayer, QuestState::QUEST_NO_ACCEPT);
+	ShowQuestsTabList(pPlayer, QUEST_ACCEPT);
+	ShowQuestsTabList(pPlayer, QUEST_NO_ACCEPT);
 
 	// show the completed menu
 	pPlayer->m_VoteColored = BLUE_COLOR;
-	GS()->AVM(pPlayer->GetCID(), "MENU", MenuList::MENU_JOURNAL_FINISHED, NOPE, "List of completed quests");
+	GS()->AVM(pPlayer->GetCID(), "MENU", MENU_JOURNAL_FINISHED, NOPE, "List of completed quests");
 }
 
 void QuestCore::ShowQuestsTabList(CPlayer* pPlayer, int StateQuest)
@@ -122,7 +122,7 @@ void QuestCore::ShowQuestsTabList(CPlayer* pPlayer, int StateQuest)
 		if(pPlayer->GetQuest(pDataQuest.first).GetState() != StateQuest)
 			continue;
 
-		if(StateQuest == QuestState::QUEST_FINISHED)
+		if(StateQuest == QUEST_FINISHED)
 		{
 			ShowQuestID(pPlayer, pDataQuest.first);
 			IsEmptyList = false;
@@ -172,7 +172,7 @@ void QuestCore::ShowQuestID(CPlayer *pPlayer, int QuestID)
 		pPlayer->m_VoteColored = LIGHT_GOLDEN_COLOR;
 		pPlayer->GS()->AVL(ClientID, "null", "Gold: {INT} Exp: {INT}", pData.m_Gold, pData.m_Exp);
 
-		pPlayer->m_LastVoteMenu = MenuList::MENU_JOURNAL_MAIN;
+		pPlayer->m_LastVoteMenu = MENU_JOURNAL_MAIN;
 		pPlayer->GS()->AddVotesBackpage(ClientID);
 	}, "{INT}/{INT} {STR}: {STR}", QuestPosition, QuestsSize, pData.GetStory(), pData.GetName());
 }
@@ -191,7 +191,8 @@ void QuestCore::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 		QuestBotInfo* pBotInfo = pStepBot.second.m_Bot;
 		const int HideID = (NUM_TAB_MENU + 12500 + pBotInfo->m_SubBotID);
 		const int PosX = pBotInfo->m_PositionX / 32, PosY = pBotInfo->m_PositionY / 32;
-		const char* pSymbol = (((pPlayerQuest.GetState() == QUEST_ACCEPT && pPlayerQuest.m_StepsQuestBot[pStepBot.first].m_StepComplete) || pPlayerQuest.GetState() == QuestState::QUEST_FINISHED) ? "✔ " : "\0");
+		const char* pSymbol = (((pPlayerQuest.GetState() == QUEST_ACCEPT && pPlayerQuest.m_StepsQuestBot[pStepBot.first].m_StepComplete) || pPlayerQuest.GetState() ==
+			                       QUEST_FINISHED) ? "✔ " : "\0");
 		GS()->AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR}Step {INT}. {STR} {STR}(x{INT} y{INT})", pSymbol, pBotInfo->m_Step, pBotInfo->GetName(), Server()->GetWorldName(pBotInfo->m_WorldID), PosX, PosY);
 
 		// skipped non accepted task list
@@ -218,7 +219,7 @@ void QuestCore::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 			const int NeedCount = pBotInfo->m_aItemSearchCount[i];
 			if(NeedItemID > 0 && NeedCount > 0)
 			{
-				InventoryItem PlayerItem = pPlayer->GetItem(NeedItemID);
+				CItemData PlayerItem = pPlayer->GetItem(NeedItemID);
 				int ClapmItem = clamp(PlayerItem.m_Count, 0, NeedCount);
 				GS()->AVMI(ClientID, PlayerItem.Info().GetIcon(), "null", NOPE, HideID, "- Item {STR} [{INT}/{INT}]", PlayerItem.Info().GetName(pPlayer), ClapmItem, NeedCount);
 				NeedOnlyTalk = false;
@@ -232,7 +233,7 @@ void QuestCore::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 			const int RewardCount = pBotInfo->m_aItemGivesCount[i];
 			if(RewardItemID > 0 && RewardCount > 0)
 			{
-				ItemInformation RewardItem = GS()->GetItemInfo(RewardItemID);
+				CItemDataInfo &RewardItem = GS()->GetItemInfo(RewardItemID);
 				GS()->AVMI(ClientID, RewardItem.GetIcon(), "null", NOPE, HideID, "- Receive {STR}x{INT}", RewardItem.GetName(pPlayer), RewardCount);
 			}
 		}
@@ -296,7 +297,7 @@ void QuestCore::AddMobProgressQuests(CPlayer* pPlayer, int BotID)
 	const int ClientID = pPlayer->GetCID();
 	for(auto& pPlayerQuest : CQuestData::ms_aPlayerQuests[ClientID])
 	{
-		if(pPlayerQuest.second.m_State != QuestState::QUEST_ACCEPT)
+		if(pPlayerQuest.second.m_State != QUEST_ACCEPT)
 			continue;
 
 		for(auto& pStepBot : pPlayerQuest.second.m_StepsQuestBot)
@@ -313,7 +314,7 @@ void QuestCore::UpdateArrowStep(CPlayer *pPlayer)
 	const int ClientID = pPlayer->GetCID();
 	for (auto& pPlayerQuest : CQuestData::ms_aPlayerQuests[ClientID])
 	{
-		if(pPlayerQuest.second.m_State != QuestState::QUEST_ACCEPT)
+		if(pPlayerQuest.second.m_State != QUEST_ACCEPT)
 			continue;
 
 		for(auto& pStepBot : pPlayerQuest.second.m_StepsQuestBot)
@@ -347,7 +348,7 @@ void QuestCore::AcceptNextStoryQuestStep(CPlayer* pPlayer)
 	for(const auto& pPlayerQuest : CQuestData::ms_aPlayerQuests[pPlayer->GetCID()])
 	{
 		// allow accept next story quest only for complected some quest on story
-		if(pPlayerQuest.second.GetState() != QuestState::QUEST_FINISHED)
+		if(pPlayerQuest.second.GetState() != QUEST_FINISHED)
 			continue;
 
 		// accept next story quest
@@ -366,7 +367,7 @@ void QuestCore::QuestTableAddItem(int ClientID, const char* pText, int Requires,
 	if (!pPlayer || ItemID < itGold || !GS()->IsMmoClient(ClientID))
 		return;
 
-	const InventoryItem PlayerSelectedItem = pPlayer->GetItem(ItemID);
+	const CItemData PlayerSelectedItem = pPlayer->GetItem(ItemID);
 
 	CNetMsg_Sv_AddQuestingProcessing Msg;
 	Msg.m_pText = pText;
@@ -383,7 +384,7 @@ int QuestCore::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID) const
 	int AvailableCount = pPlayer->GetItem(ItemID).m_Count;
 	for (const auto& pPlayerQuest : CQuestData::ms_aPlayerQuests[ClientID])
 	{
-		if(pPlayerQuest.second.m_State != QuestState::QUEST_ACCEPT)
+		if(pPlayerQuest.second.m_State != QUEST_ACCEPT)
 			continue;
 
 		for(auto& pStepBot : pPlayerQuest.second.m_StepsQuestBot)

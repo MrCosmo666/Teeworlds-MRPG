@@ -10,7 +10,6 @@
 #include <game/server/mmocore/Components/Skills/Entities/healthturret/hearth.h> // for nurse
 
 #include <game/server/mmocore/Components/Bots/BotData.h>
-
 #include <game/server/mmocore/Components/Quests/QuestCore.h>
 
 MACRO_ALLOC_POOL_ID_IMPL(CCharacterBotAI, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
@@ -167,7 +166,7 @@ void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force)
 	const float ActiveLuckyDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
 	for(int i = 0; i < 5; i++)
 	{
-		InventoryItem DropItem;
+		CItemData DropItem;
 		DropItem.m_ItemID = MobBotInfo::ms_aMobBot[SubID].m_aDropItem[i];
 		DropItem.m_Count = MobBotInfo::ms_aMobBot[SubID].m_aCountItem[i];
 		if(DropItem.m_ItemID <= 0 || DropItem.m_Count <= 0)
@@ -183,7 +182,7 @@ void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force)
 	const int CalculateSP = (pPlayer->Acc().m_Level > MobBotInfo::ms_aMobBot[SubID].m_Level ? 40 + min(40, (pPlayer->Acc().m_Level - MobBotInfo::ms_aMobBot[SubID].m_Level) * 2) : 40);
 	if(random_int() % CalculateSP == 0)
 	{
-		InventoryItem& pItemSkillPlayer = pPlayer->GetItem(itSkillPoint);
+		CItemData &pItemSkillPlayer = pPlayer->GetItem(itSkillPoint);
 		pItemSkillPlayer.Add(1);
 		GS()->Chat(ClientID, "Skill points increased. Now ({INT}SP)", pItemSkillPlayer.m_Count);
 	}

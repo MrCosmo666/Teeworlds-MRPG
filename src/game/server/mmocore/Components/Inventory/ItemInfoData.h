@@ -1,14 +1,14 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#ifndef GAME_SERVER_ITEM_INFORMATION_H
-#define GAME_SERVER_ITEM_INFORMATION_H
+#ifndef GAME_SERVER_COMPONENT_ITEM_DATA_INFO_H
+#define GAME_SERVER_COMPONENT_ITEM_DATA_INFO_H
 
 // define for quick fine-tuning of enchantment
 #define PERCENT_OF_ENCHANT 8
 #define PERCENT_MAXIMUM_ENCHANT 40
 #include <game/game_context.h>
 
-class CItemInformation : public CItemDataInformation
+class CItemDataInfo : public CItemDataInformation
 {
 public:
 	// main functions
@@ -27,8 +27,7 @@ public:
 	void FormatAttributes(char* pBuffer, int Size, int Enchant) const;
 	void FormatEnchantLevel(char* pBuffer, int Size, int Enchant) const;
 
-	static std::map < int, CItemInformation > ms_aItemsInfo;
+	static std::map < int, CItemDataInfo > ms_aItemsInfo;
 };
-typedef CItemInformation ItemInformation;
 
 #endif

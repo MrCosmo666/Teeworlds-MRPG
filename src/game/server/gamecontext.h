@@ -77,7 +77,7 @@ public:
 	CPlayer *GetPlayer(int ClientID, bool CheckAuthed = false, bool CheckCharacter = false);
 	CPlayer *GetPlayerFromAccountID(int AccountID);
 	std::unique_ptr<char[]> LevelString(int MaxValue, int CurrentValue, int Step, char toValue, char fromValue);
-	ItemInformation &GetItemInfo(int ItemID) const;
+	CItemDataInfo &GetItemInfo(int ItemID) const;
 	CQuestDataInfo &GetQuestInfo(int QuestID) const;
 	const char* GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const;
 
@@ -238,8 +238,8 @@ public:
 	void CreateText(CEntity* pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char* pText);
 	void CreateParticleExperience(vec2 Pos, int ClientID, int Experience, vec2 Force = vec2(0.0f, 0.0f));
 	void CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop = 1, vec2 Force = vec2(0.0f, 0.0f));
-	void CreateDropItem(vec2 Pos, int ClientID, InventoryItem DropItem, vec2 Force = vec2(0.0f, 0.0f));
-	void CreateRandomDropItem(vec2 Pos, int ClientID, float Random, InventoryItem DropItem, vec2 Force = vec2(0.0f, 0.0f));
+	void CreateDropItem(vec2 Pos, int ClientID, CItemData DropItem, vec2 Force = vec2(0.0f, 0.0f));
+	void CreateRandomDropItem(vec2 Pos, int ClientID, float Random, CItemData DropItem, vec2 Force = vec2(0.0f, 0.0f));
 	bool TakeItemCharacter(int ClientID);
 	void SendInbox(CPlayer *pPlayer, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
 	void SendInbox(int AccountID, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);

@@ -159,8 +159,8 @@ public:
 	/* #########################################################################
 		FUNCTIONS PLAYER ITEMS
 	######################################################################### */
-	InventoryItem& GetItem(int ItemID);
-	CSkillData &GetSkill(int SkillID);
+	CItemData& GetItem(int ItemID);
+	CSkillData& GetSkill(int SkillID);
 	CQuestData& GetQuest(int QuestID);
 	CAccountTempData& GetTempData() const { return CAccountTempData::ms_aPlayerTempData[m_ClientID]; }
 	CAccountData& Acc() const { return CAccountData::ms_aData[m_ClientID]; }

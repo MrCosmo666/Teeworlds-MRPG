@@ -75,7 +75,7 @@ void CCraftCore::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int Selec
 
 	for(const auto& cr : CCraftData::ms_aCraft)
 	{
-		ItemInformation& InfoGetItem = GS()->GetItemInfo(cr.second.m_ReceivedItemID);
+		CItemDataInfo& InfoGetItem = GS()->GetItemInfo(cr.second.m_ReceivedItemID);
 		if(InfoGetItem.m_Type != SelectType || cr.second.m_WorldID != GS()->GetWorldID())
 			continue;
 
@@ -86,7 +86,7 @@ void CCraftCore::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int Selec
 		}
 
 		const int Price = GetFinalPrice(pPlayer, cr.first);
-		int HideID = NUM_TAB_MENU + CItemInformation::ms_aItemsInfo.size() + cr.first;
+		int HideID = NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + cr.first;
 		if (InfoGetItem.IsEnchantable())
 		{
 			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} - {INT} gold",
@@ -110,7 +110,7 @@ void CCraftCore::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int Selec
 			if(SearchItemID <= 0 || SearchCount <= 0)
 				continue;
 
-			InventoryItem &PlSearchItem = pPlayer->GetItem(SearchItemID);
+			CItemData &PlSearchItem = pPlayer->GetItem(SearchItemID);
 			GS()->AVMI(ClientID, PlSearchItem.Info().GetIcon(), "null", NOPE, HideID, "{STR} {INT}({INT})", PlSearchItem.Info().GetName(pPlayer), SearchCount, PlSearchItem.m_Count);
 		}
 		GS()->AVM(ClientID, "CRAFT", cr.first, HideID, "Craft {STR}", InfoGetItem.GetName(pPlayer));
@@ -123,7 +123,7 @@ void CCraftCore::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int Selec
 void CCraftCore::CraftItem(CPlayer *pPlayer, int CraftID)
 {
 	const int ClientID = pPlayer->GetCID();
-	InventoryItem& PlayerCraftItem = pPlayer->GetItem(CCraftData::ms_aCraft[CraftID].m_ReceivedItemID);
+	CItemData& PlayerCraftItem = pPlayer->GetItem(CCraftData::ms_aCraft[CraftID].m_ReceivedItemID);
 	if (PlayerCraftItem.Info().IsEnchantable() && PlayerCraftItem.m_Count > 0)
 	{
 		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");

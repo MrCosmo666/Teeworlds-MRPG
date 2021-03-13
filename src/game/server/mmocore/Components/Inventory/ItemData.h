@@ -1,7 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#ifndef GAME_SERVER_ITEM_INVENTORY_H
-#define GAME_SERVER_ITEM_INVENTORY_H
+#ifndef GAME_SERVER_COMPONENT_ITEM_DATA_H
+#define GAME_SERVER_COMPONENT_ITEM_DATA_H
 #include "ItemInfoData.h"
 
 class CItemData
@@ -17,7 +17,7 @@ public:
 	int m_Enchant;
 	int m_Durability;
 
-	ItemInformation& Info() const;
+	CItemDataInfo& Info() const { return CItemDataInfo::ms_aItemsInfo[m_ItemID]; }
 	int GetID() const { return m_ItemID; }
 
 	// main functions
@@ -48,6 +48,5 @@ private:
 public:
 	static std::map < int, std::map < int, CItemData > > ms_aItems;
 };
-typedef CItemData InventoryItem;
 
 #endif

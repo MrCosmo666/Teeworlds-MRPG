@@ -5,14 +5,14 @@
 
 #include <game/server/gamecontext.h>
 
-bool CRandomBox::Start(CPlayer *pPlayer, int Seconds, InventoryItem *pPlayerUsesItem)
+bool CRandomBox::Start(CPlayer *pPlayer, int Seconds, CItemData* pPlayerUsesItem)
 {
 	if(!pPlayer || !pPlayer->IsAuthed())
 		return false;
 
 	if(pPlayer->m_aPlayerTick[LastRandomBox] > pPlayer->GS()->Server()->Tick())
 	{
-		pPlayer->GS()->Broadcast(pPlayer->GetCID(), BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Wait until the last random box opens!");
+		pPlayer->GS()->Broadcast(pPlayer->GetCID(), BROADCAST_MAIN_INFORMATION, 100, "Wait until the last random box opens!");
 		return false;
 	}
 
@@ -27,7 +27,7 @@ bool CRandomBox::Start(CPlayer *pPlayer, int Seconds, InventoryItem *pPlayerUses
 	return true;
 };
 
-CRandomBoxRandomizer::CRandomBoxRandomizer(CGameWorld* pGameWorld, CPlayer* pPlayer, int PlayerAccountID, int LifeTime, std::vector<StructRandomBoxItem> List, InventoryItem *pPlayerUsesItem)
+CRandomBoxRandomizer::CRandomBoxRandomizer(CGameWorld* pGameWorld, CPlayer* pPlayer, int PlayerAccountID, int LifeTime, std::vector<StructRandomBoxItem> List, CItemData* pPlayerUsesItem)
 	: CEntity(pGameWorld, CGameWorld::ENTTYPE_RANDOM_BOX, pPlayer->m_ViewPos)
 {
 	m_LifeTime = LifeTime;
@@ -59,7 +59,7 @@ void CRandomBoxRandomizer::Tick()
 		if(!m_LifeTime)
 		{
 			// a case when a client changes the world or comes out while choosing a random object.
-			InventoryItem* pPlayerRandomItem = m_pPlayer ? &m_pPlayer->GetItem(pRandomItem->m_ItemID) : nullptr;
+			CItemData* pPlayerRandomItem = m_pPlayer ? &m_pPlayer->GetItem(pRandomItem->m_ItemID) : nullptr;
 			if(!m_pPlayer || (pPlayerRandomItem->Info().IsEnchantable() && pPlayerRandomItem->m_Count > 0))
 				GS()->SendInbox(m_PlayerAccountID, "Random Box", "Item was not received by you personally.", pRandomItem->m_ItemID, pRandomItem->m_Count);
 			else

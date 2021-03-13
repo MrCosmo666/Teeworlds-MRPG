@@ -653,7 +653,7 @@ void CCharacter::Die(int Killer, int Weapon)
 		if(SafezoneWorldID >= 0 && !m_pPlayer->IsBot() && GS()->m_apPlayers[Killer])
 		{
 			// potion resurrection
-			InventoryItem& pItemPlayer = m_pPlayer->GetItem(itPotionResurrection);
+			CItemData& pItemPlayer = m_pPlayer->GetItem(itPotionResurrection);
 			if(pItemPlayer.IsEquipped())
 			{
 				pItemPlayer.Use(1);
@@ -785,7 +785,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	// health recovery potion
 	if(!m_pPlayer->IsBot() && m_Health <= m_pPlayer->GetStartHealth() / 3)
 	{
-		InventoryItem& pItemPlayer = m_pPlayer->GetItem(itPotionHealthRegen);
+		CItemData& pItemPlayer = m_pPlayer->GetItem(itPotionHealthRegen);
 		if(!m_pPlayer->IsActiveEffect("RegenHealth") && pItemPlayer.IsEquipped())
 			pItemPlayer.Use(1);
 	}
@@ -1071,7 +1071,7 @@ void CCharacter::UpdateEquipingStats(int ItemID)
 		m_Health = m_pPlayer->GetStartHealth();
 	}
 
-	const ItemInformation pInformationItem = GS()->GetItemInfo(ItemID);
+	const CItemDataInfo pInformationItem = GS()->GetItemInfo(ItemID);
 	if((pInformationItem.m_Function >= EQUIP_HAMMER && pInformationItem.m_Function <= EQUIP_RIFLE))
 		m_pPlayer->GetCharacter()->GiveWeapon(pInformationItem.m_Function, 3);
 

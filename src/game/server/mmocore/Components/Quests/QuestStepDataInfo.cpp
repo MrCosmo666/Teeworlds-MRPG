@@ -309,7 +309,7 @@ void CPlayerQuestStepDataInfo::ShowRequired(CPlayer* pPlayer, const char* TextTa
 		const int CountItem = m_Bot->m_aItemSearchCount[i];
 		if(ItemID > 0 && CountItem > 0)
 		{
-			InventoryItem PlayerQuestItem = pPlayer->GetItem(ItemID);
+			CItemData PlayerQuestItem = pPlayer->GetItem(ItemID);
 			str_format(aBuf, sizeof(aBuf), "\n- Need %s [%d/%d]", PlayerQuestItem.Info().GetName(pPlayer), PlayerQuestItem.m_Count, CountItem);
 			Buffer.append_at(Buffer.length(), aBuf);
 			IsActiveTask = true;

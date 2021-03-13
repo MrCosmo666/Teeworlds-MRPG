@@ -19,7 +19,7 @@ class CSkillsCore : public MmoComponent
 	void OnResetClient(int ClientID) override;
 	bool OnHandleTile(CCharacter* pChr, int IndexCollision) override;
 	bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu) override;
-	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
+	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, int VoteID, int VoteID2, int Get, const char* GetText) override;
 
 public:
 	void ParseEmoticionSkill(CPlayer* pPlayer, int EmoticionID);

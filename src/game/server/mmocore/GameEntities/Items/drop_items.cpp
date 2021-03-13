@@ -7,7 +7,7 @@
 
 #include <game/server/gamecontext.h>
 
-CDropItem::CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, InventoryItem DropItem, int OwnerID)
+CDropItem::CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, CItemData DropItem, int OwnerID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPITEM, Pos, 28.0f)
 {
 	m_Pos = Pos;
@@ -44,7 +44,7 @@ bool CDropItem::TakeItem(int ClientID)
 
 	// change of enchanted objects
 	GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
-	InventoryItem &pPlayerDroppedItem = pPlayer->GetItem(m_DropItem.GetID());
+	CItemData &pPlayerDroppedItem = pPlayer->GetItem(m_DropItem.GetID());
 	if(pPlayerDroppedItem.m_Count > 0 && pPlayerDroppedItem.Info().IsEnchantable())
 	{
 		tl_swap(pPlayerDroppedItem, m_DropItem);
@@ -104,7 +104,7 @@ void CDropItem::Tick()
 		return;
 
 	const char* pToNickname = (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0");
-	const InventoryItem pPlayerItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
+	const CItemData pPlayerItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
 
 	// enchantable item
 	if(pPlayerItem.Info().IsEnchantable())

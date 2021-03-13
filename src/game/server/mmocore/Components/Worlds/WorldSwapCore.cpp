@@ -5,7 +5,6 @@
 
 #include <game/server/gamecontext.h>
 
-using namespace sqlstr;
 void CWorldSwapCore::OnInit()
 {
 	SJK.SDT("*", "tw_world_swap", [&](ResultPtr pRes)

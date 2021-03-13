@@ -19,7 +19,7 @@
 #include "Components/Guilds/GuildJob.h"
 #include "Components/Houses/HouseCore.h"
 #include "Components/Inventory/InventoryCore.h"
-#include "Components/Mails/MailBoxJob.h"
+#include "Components/Mails/MailBoxCore.h"
 #include "Components/Quests/QuestCore.h"
 #include "Components/Shops/ShopCore.h"
 #include "Components/Skills/SkillsCore.h"
@@ -46,7 +46,7 @@ MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 	m_Components.add(m_pAccMain = new CAccountCore());
 	m_Components.add(m_pAccMiner = new CAccountMinerCore());
 	m_Components.add(m_pAccPlant = new CAccountPlantCore());
-	m_Components.add(m_pMailBoxJob = new MailBoxJob());
+	m_Components.add(m_pMailBoxJob = new CMailBoxCore());
 
 	for(auto& pComponent : m_Components.m_paComponents)
 	{

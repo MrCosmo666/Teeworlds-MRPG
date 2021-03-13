@@ -1,5 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/stdafx.h>
+
 #include "player.h"
 
 #include "gamecontext.h"
@@ -369,7 +371,7 @@ bool CPlayer::SpendCurrency(int Price, int ItemID)
 	if (Price <= 0)
 		return true;
 
-	InventoryItem &pItemPlayer = GetItem(ItemID);
+	CItemData& pItemPlayer = GetItem(ItemID);
 	if(pItemPlayer.m_Count < Price)
 	{
 		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", Price, pItemPlayer.m_Count, pItemPlayer.Info().GetName(this));
@@ -580,14 +582,14 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 	return false;
 }
 
-InventoryItem &CPlayer::GetItem(int ItemID)
+CItemData& CPlayer::GetItem(int ItemID)
 {
 	CItemData::ms_aItems[m_ClientID][ItemID].m_ItemID = ItemID;
 	CItemData::ms_aItems[m_ClientID][ItemID].SetItemOwner(this);
 	return CItemData::ms_aItems[m_ClientID][ItemID];
 }
 
-CSkillData &CPlayer::GetSkill(int SkillID)
+CSkillData& CPlayer::GetSkill(int SkillID)
 {
 	CSkillData::ms_aSkills[m_ClientID][SkillID].m_SkillID = SkillID;
 	CSkillData::ms_aSkills[m_ClientID][SkillID].SetSkillOwner(this);

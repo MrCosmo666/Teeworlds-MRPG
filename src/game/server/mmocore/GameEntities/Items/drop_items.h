@@ -19,11 +19,11 @@ class CDropItem : public CEntity
 	int m_LifeSpan;
 	int m_FlashTimer;
 
-	InventoryItem m_DropItem;
+	CItemData m_DropItem;
 	int m_OwnerID;
 
 public:
-	CDropItem(class CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, InventoryItem DropItem, int OwnerID);
+	CDropItem(class CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, CItemData DropItem, int OwnerID);
 	~CDropItem() override;
 
 	void Tick() override;

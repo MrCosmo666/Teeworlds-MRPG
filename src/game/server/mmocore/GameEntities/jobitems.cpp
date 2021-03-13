@@ -60,7 +60,7 @@ void CJobItems::Work(int ClientID)
 
 	// - - - - - - - - MINING - - - - - - - -
 	CPlayer *pPlayer = GS()->m_apPlayers[ClientID];
-	InventoryItem &pPlayerWorkedItem = pPlayer->GetItem(m_ItemID);
+	CItemData& pPlayerWorkedItem = pPlayer->GetItem(m_ItemID);
 	if(m_Type == 1)
 	{
 		int EquipItem = pPlayer->GetEquippedItemID(EQUIP_MINER);
@@ -75,7 +75,7 @@ void CJobItems::Work(int ClientID)
 			return;
 		}
 
-		InventoryItem& pPlayerEquippedItem = pPlayer->GetItem(EquipItem);
+		CItemData& pPlayerEquippedItem = pPlayer->GetItem(EquipItem);
 		int Durability = pPlayerEquippedItem.m_Durability;
 		if (Durability <= 0)
 		{

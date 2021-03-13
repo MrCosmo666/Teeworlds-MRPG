@@ -67,7 +67,7 @@ void CDropQuestItem::Tick()
 	const int Count = m_QuestBot.m_aItemSearchCount[0];
 	CPlayer* pOwnerPlayer = GS()->m_apPlayers[m_ClientID];
 	CQuestData& pPlayerQuest = pOwnerPlayer->GetQuest(m_QuestBot.m_QuestID);
-	InventoryItem& pPlayerItem = pOwnerPlayer->GetItem(m_QuestBot.m_aItemSearch[0]);
+	CItemData& pPlayerItem = pOwnerPlayer->GetItem(m_QuestBot.m_aItemSearch[0]);
 	if (pPlayerQuest.m_Step != m_QuestBot.m_Step || pPlayerItem.m_Count >= Count)
 	{
 		GS()->m_World.DestroyEntity(this);

@@ -2,14 +2,14 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/stdafx.h>
 
-#include "MailBoxJob.h"
+#include "MailBoxCore.h"
 
 #include <base/threadpool.h>
 #include <game/server/gamecontext.h>
 
 using namespace sqlstr;
 
-bool MailBoxJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool CMailBoxCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if(PPSTR(CMD, "MAIL") == 0)
@@ -23,7 +23,7 @@ bool MailBoxJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const i
 }
 
 // check whether messages are available
-int MailBoxJob::GetActiveInbox(CPlayer* pPlayer)
+int CMailBoxCore::GetActiveInbox(CPlayer* pPlayer)
 {
 	ResultPtr pRes = SJK.SD("ID", "tw_accounts_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
 	const int MailCount = pRes->rowsCount();
@@ -31,12 +31,12 @@ int MailBoxJob::GetActiveInbox(CPlayer* pPlayer)
 }
 
 // show a list of mails
-void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
+void CMailBoxCore::GetInformationInbox(CPlayer *pPlayer)
 {
 	int ShowLetterID = 0;
 	bool EmptyMailBox = true;
 	const int ClientID = pPlayer->GetCID();
-	int HideID = (int)(NUM_TAB_MENU + CItemInformation::ms_aItemsInfo.size() + 200);
+	int HideID = (int)(NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + 200);
 	ResultPtr pRes = SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AccountID, MAX_INBOX_LIST);
 	while(pRes->next())
 	{
@@ -70,7 +70,7 @@ void MailBoxJob::GetInformationInbox(CPlayer *pPlayer)
 }
 
 // sending a mail to a player
-void MailBoxJob::SendInbox(int AccountID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
+void CMailBoxCore::SendInbox(int AccountID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
 {
 	// clear str and connection
 	const CSqlString<64> cName = CSqlString<64>(Name);
@@ -96,7 +96,7 @@ void MailBoxJob::SendInbox(int AccountID, const char* Name, const char* Desc, in
 
 }
 
-bool MailBoxJob::SendInbox(const char* pNickname, const char* pName, const char* pDesc, int ItemID, int Count, int Enchant)
+bool CMailBoxCore::SendInbox(const char* pNickname, const char* pName, const char* pDesc, int ItemID, int Count, int Enchant)
 {
 	const CSqlString<64> cName = CSqlString<64>(pNickname);
 	ResultPtr pRes = SJK.SD("ID, Nick", "tw_accounts_data", "WHERE Nick = '%s'", cName.cstr());
@@ -109,7 +109,7 @@ bool MailBoxJob::SendInbox(const char* pNickname, const char* pName, const char*
 	return false;
 }
 
-void MailBoxJob::ReceiveInbox(CPlayer* pPlayer, int InboxID)
+void CMailBoxCore::ReceiveInbox(CPlayer* pPlayer, int InboxID)
 {
 	ResultPtr pRes = SJK.SD("ItemID, Count, Enchant", "tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
 	if(pRes->next())
@@ -138,7 +138,7 @@ void MailBoxJob::ReceiveInbox(CPlayer* pPlayer, int InboxID)
 }
 
 // client server
-void MailBoxJob::SendClientMailList(CPlayer* pPlayer)
+void CMailBoxCore::SendClientMailList(CPlayer* pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
 	ResultPtr pRes = SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
@@ -162,7 +162,7 @@ void MailBoxJob::SendClientMailList(CPlayer* pPlayer)
 	}
 }
 
-void MailBoxJob::OnMessage(int MsgID, void* pRawMsg, int ClientID)
+void CMailBoxCore::OnMessage(int MsgID, void* pRawMsg, int ClientID)
 {
 	CPlayer* pPlayer = GS()->m_apPlayers[ClientID];
 	if(MsgID == NETMSGTYPE_CL_SHOWMAILLISTREQUEST)

@@ -440,7 +440,7 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 		const int DecoItemID = VoteID2;
 		if(DeleteDecorationHouse(DecoID))
 		{
-			InventoryItem& PlDecoItem = pPlayer->GetItem(DecoItemID);
+			CItemData& PlDecoItem = pPlayer->GetItem(DecoItemID);
 			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
 			PlDecoItem.Add(1);
 		}
@@ -973,7 +973,7 @@ void GuildJob::ShowGuildPlayers(CPlayer* pPlayer, int GuildID)
 {
 	const int ClientID = pPlayer->GetCID();
 	const bool SelfGuild = pPlayer->Acc().m_GuildID == GuildID;
-	int HideID = NUM_TAB_MENU + CItemInformation::ms_aItemsInfo.size() + 1000;
+	int HideID = NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + 1000;
 
 	pPlayer->m_VoteColored = GOLDEN_COLOR;
 	GS()->AVL(ClientID, "null", "List players of {STR}", CGuildData::ms_aGuild[GuildID].m_aName);
@@ -1215,7 +1215,7 @@ void GuildJob::ChangePlayerRank(int AccountID, int RankID)
 void GuildJob::ShowMenuRank(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	int HideID = NUM_TAB_MENU + CItemInformation::ms_aItemsInfo.size() + 1300;
+	int HideID = NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + 1300;
 	pPlayer->m_LastVoteMenu = MenuList::MENU_GUILD;
 
 	GS()->AV(ClientID, "null", "Use reason how enter Value, Click fields!");
@@ -1282,7 +1282,7 @@ void GuildJob::SendInviteGuild(int GuildID, CPlayer *pPlayer)
 // show the invitation sheet to our guild
 void GuildJob::ShowInvitesGuilds(int ClientID, int GuildID)
 {
-	int HideID = NUM_TAB_MENU + CItemInformation::ms_aItemsInfo.size() + 1900;
+	int HideID = NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + 1900;
 	ResultPtr pRes = SJK.SD("*", "tw_guilds_invites", "WHERE GuildID = '%d'", GuildID);
 	while(pRes->next())
 	{
@@ -1308,7 +1308,7 @@ void GuildJob::ShowFinderGuilds(int ClientID)
 	GS()->AV(ClientID, "null");
 	GS()->AVM(ClientID, "MINVITENAME", 1, NOPE, "Find guild: {STR}", pPlayer->GetTempData().m_aGuildSearchBuf);
 
-	int HideID = NUM_TAB_MENU + CItemInformation::ms_aItemsInfo.size() + 1800;
+	int HideID = NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + 1800;
 	CSqlString<64> cGuildName = CSqlString<64>(pPlayer->GetTempData().m_aGuildSearchBuf);
 	ResultPtr pRes = SJK.SD("*", "tw_guilds", "WHERE GuildName LIKE '%%%s%%'", cGuildName.cstr());
 	while(pRes->next())

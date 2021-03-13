@@ -32,7 +32,7 @@
 #include "mmocore/Components/Accounts/AccountCore.h"
 #include "mmocore/Components/Accounts/AccountMinerCore.h"
 #include "mmocore/Components/Accounts/AccountPlantCore.h"
-#include "mmocore/Components/Mails/MailBoxJob.h"
+#include "mmocore/Components/Mails/MailBoxCore.h"
 #include "mmocore/Components/Guilds/GuildJob.h"
 #include "mmocore/Components/Houses/HouseCore.h"
 #include "mmocore/Components/Quests/QuestCore.h"
@@ -153,7 +153,7 @@ const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const
 	return ID >= NUM_TAB_MENU ? ("\\/ # ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("/\\ # ") : ("\\/ # "));
 }
 
-ItemInformation &CGS::GetItemInfo(int ItemID) const { return CItemInformation::ms_aItemsInfo[ItemID]; }
+CItemDataInfo &CGS::GetItemInfo(int ItemID) const { return CItemDataInfo::ms_aItemsInfo[ItemID]; }
 CQuestDataInfo &CGS::GetQuestInfo(int QuestID) const { return CQuestDataInfo::ms_aDataQuests[QuestID]; }
 
 /* #########################################################################
@@ -2067,7 +2067,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 					continue;
 
 				const float Chance = mobs.second.m_aRandomItem[i];
-				ItemInformation &InfoDropItem = GetItemInfo(mobs.second.m_aDropItem[i]);
+				CItemDataInfo &InfoDropItem = GetItemInfo(mobs.second.m_aDropItem[i]);
 				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%(+%0.2f%%)", InfoDropItem.GetName(pPlayer), mobs.second.m_aCountItem[i], Chance, AddedChanceDrop);
 				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, "{STR}", aBuf);
 				FoundedBots = true;
@@ -2300,7 +2300,7 @@ void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop, vec2 For
 }
 
 // lands items in the position type and quantity and their number themselves
-void CGS::CreateDropItem(vec2 Pos, int ClientID, InventoryItem DropItem, vec2 Force)
+void CGS::CreateDropItem(vec2 Pos, int ClientID, CItemData DropItem, vec2 Force)
 {
 	if(DropItem.m_ItemID <= 0 || DropItem.m_Count <= 0)
 		return;
@@ -2310,7 +2310,7 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, InventoryItem DropItem, vec2 Fo
 }
 
 // random drop of the item with percentage
-void CGS::CreateRandomDropItem(vec2 Pos, int ClientID, float Random, InventoryItem DropItem, vec2 Force)
+void CGS::CreateRandomDropItem(vec2 Pos, int ClientID, float Random, CItemData DropItem, vec2 Force)
 {
 	const float RandomDrop = frandom() * 100.0f;
 	if(RandomDrop < Random)
