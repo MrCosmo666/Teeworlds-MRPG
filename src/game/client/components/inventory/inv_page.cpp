@@ -2,11 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/stdafx.h>
 
-#include <engine/keys.h>
-#include <engine/storage.h>
 #include <engine/textrender.h>
-
-#include <engine/shared/config.h>
 #include <generated/client_data.h>
 
 #include <game/client/components/inventory.h>
@@ -36,8 +32,8 @@ void CInventoryPage::Render()
 	for(int i = 0; i < m_pInventoryList->GetPageMaxSlots(); i++)
 	{
 		CUIRect SlotRect = m_pInventoryList->GetMainViewRect();
-		SlotRect.VSplitLeft(BoxSize / 2.0f, 0, &SlotRect);
-		SlotRect.HSplitTop(BoxSize, 0, &SlotRect);
+		SlotRect.VSplitLeft(INVSLOT_BOXSIZE / 2.0f, 0, &SlotRect);
+		SlotRect.HSplitTop(INVSLOT_BOXSIZE, 0, &SlotRect);
 
 		CalculateSlotPosition(i, &SlotRect);
 		if(!m_pInventoryList->GetInteractiveSlot() && m_pInventory->UI()->MouseHovered(&SlotRect))
@@ -67,12 +63,12 @@ void CInventoryPage::CalculateSlotPosition(int SlotID, CUIRect* SlotRect)
 	{
 		if(CheckingSlot % m_pInventoryList->GetSlotsWidth() != 0)
 		{
-			SlotRect->x += (BoxSize + SpacingSlot);
+			SlotRect->x += (INVSLOT_BOXSIZE + INVSLOT_SPACING);
 			continue;
 		}
 		SlotRect->x = OldPositionX;
-		SlotRect->y += (BoxSize + SpacingSlot);
+		SlotRect->y += (INVSLOT_BOXSIZE + INVSLOT_SPACING);
 	}
-	SlotRect->w = BoxSize;
-	SlotRect->h = BoxSize;
+	SlotRect->w = INVSLOT_BOXSIZE;
+	SlotRect->h = INVSLOT_BOXSIZE;
 }

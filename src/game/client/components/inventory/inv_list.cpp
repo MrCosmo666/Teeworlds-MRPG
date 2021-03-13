@@ -22,8 +22,8 @@ CInventoryList::CInventoryList(CInventory* pInventory, const char *pInventoryLis
 
 	CUIRect MainView = pMainView;
 	MainView.y = max(pMainView.y, 20.0f);
-	MainView.w = ((BoxSize + SpacingSlot) * (MaxSlotsWidth + 1)) - (SpacingSlot * 2.0f);
-	MainView.h = ((BoxSize + SpacingSlot) * (MaxSlotsHeight + 2)) - (SpacingSlot * 2.0f);
+	MainView.w = ((INVSLOT_BOXSIZE + INVSLOT_SPACING) * (MaxSlotsWidth + 1)) - (INVSLOT_SPACING * 2.0f);
+	MainView.h = ((INVSLOT_BOXSIZE + INVSLOT_SPACING) * (MaxSlotsHeight + 2)) - (INVSLOT_SPACING * 2.0f);
 	m_WindowItemsList.Init(pInventoryListName, MainView);
 
 	// by default, the first page should exist
@@ -155,7 +155,7 @@ void CInventoryList::RenderSelectionPage()
 
 	const CUIRect &MainView = GetMainViewRect();
 	CUIRect SelectionRect = MainView;
-	SelectionRect.HSplitBottom((float)BoxSize, 0, &SelectionRect);
+	SelectionRect.HSplitBottom(INVSLOT_BOXSIZE, 0, &SelectionRect);
 	SelectionRect.VMargin((float)(MainView.w / 2.0f) - SpaceOption, &SelectionRect);
 	{
 		// left arrow

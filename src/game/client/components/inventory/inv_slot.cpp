@@ -3,13 +3,11 @@
 #include <base/stdafx.h>
 
 #include <engine/textrender.h>
-#include <engine/shared/config.h>
 
 #include <game/client/components/menus.h>
 #include <game/client/components/inventory.h>
 
 #include "inv_list.h"
-#include "inv_page.h"
 #include "inv_slot.h"
 
 CInventorySlot::CInventorySlot(CInventory* pInventory, CInventoryList* pInventoryList, int Page, int SlotID)
@@ -55,7 +53,7 @@ void CInventorySlot::Render()
 	{
 		char aCountBuf[32];
 		str_format(aCountBuf, sizeof(aCountBuf), "%d%s", min(999, m_Count), (m_Count > 999 ? "+" : "\0"));
-		m_pInventory->m_pClient->m_pMenus->DoItemIcon(m_aIcon, m_RectSlot, BoxSize);
+		m_pInventory->m_pClient->m_pMenus->DoItemIcon(m_aIcon, m_RectSlot, INVSLOT_BOXSIZE);
 		m_pInventory->TextRender()->Text(0x0, m_RectSlot.x, m_RectSlot.y, 10.0f, aCountBuf, -1.0f);
 	}
 }

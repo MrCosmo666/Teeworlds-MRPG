@@ -18,8 +18,8 @@ enum MouseEvent
 };
 
 // basic set of variables for configuration
-static float BoxSize = 40.0f;
-static float SpacingSlot = 3.0f;
+#define INVSLOT_BOXSIZE 40.0f
+#define INVSLOT_SPACING 3.0f
 
 class CInventorySlot
 {
