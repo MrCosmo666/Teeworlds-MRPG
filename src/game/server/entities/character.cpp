@@ -48,7 +48,7 @@ MACRO_ALLOC_POOL_ID_IMPL(CCharacter, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIEN
 CCharacter::CCharacter(CGameWorld *pWorld)
 : CEntity(pWorld, CGameWorld::ENTTYPE_CHARACTER, vec2(0, 0), ms_PhysSize)
 {
-	m_pHelper = new TileHandle(this);
+	m_pHelper = new TileHandle();
 	m_DoorHit = false;
 	m_Health = 0;
 	m_Armor = 0;
@@ -201,7 +201,7 @@ bool CCharacter::DecoInteractive()
 		if (InteractiveType == DECORATIONS_HOUSE)
 		{
 			const int HouseID = GS()->Mmo()->House()->PlayerHouseID(m_pPlayer);
-			if (GS()->Mmo()->House()->AddDecorationHouse(DecoID, HouseID, m_pHelper->MousePos()))
+			if (GS()->Mmo()->House()->AddDecorationHouse(DecoID, HouseID, GetMousePos()))
 			{
 				GS()->Chat(ClientID, "You added {STR}, to your house!", GS()->GetItemInfo(DecoID).GetName(m_pPlayer));
 				m_pPlayer->GetItem(DecoID).Remove(1);
@@ -212,7 +212,7 @@ bool CCharacter::DecoInteractive()
 		else if (InteractiveType == DECORATIONS_GUILD_HOUSE)
 		{
 			const int GuildID = m_pPlayer->Acc().m_GuildID;
-			if (GS()->Mmo()->Member()->AddDecorationHouse(DecoID, GuildID, m_pHelper->MousePos()))
+			if (GS()->Mmo()->Member()->AddDecorationHouse(DecoID, GuildID, GetMousePos()))
 			{
 				GS()->Chat(ClientID, "You added {STR}, to your guild house!", GS()->GetItemInfo(DecoID).GetName(m_pPlayer));
 				m_pPlayer->GetItem(DecoID).Remove(1);
@@ -291,7 +291,7 @@ void CCharacter::FireWeapon()
 			for (int i = 0; i < Num; ++i)
 			{
 				CCharacter* pTarget = apEnts[i];
-				if((pTarget == this) || GS()->Collision()->IntersectLineWithInvisible(ProjStartPos, pTarget->m_Pos, 0, 0))
+				if((pTarget == this) || GS()->Collision()->IntersectLineWithInvisible(ProjStartPos, pTarget->m_Pos, nullptr, nullptr))
 					continue;
 
 				// talking wth bot
@@ -682,7 +682,7 @@ void CCharacter::Die(int Killer, int Weapon)
 	m_pPlayer->m_aPlayerTick[TickState::Die] = Server()->Tick()/2;
 	m_pPlayer->m_Spawned = true;
 	GS()->m_World.RemoveEntity(this);
-	GS()->m_World.m_Core.m_apCharacters[ClientID] = 0;
+	GS()->m_World.m_Core.m_apCharacters[ClientID] = nullptr;
 	GS()->CreateDeath(m_Pos, ClientID);
 }
 
@@ -877,9 +877,9 @@ void CCharacter::HandleTilesets()
 		else if (m_pHelper->TileExit(Index, i)) {}
 	}
 
-	if (m_pHelper->TileEnter(Index, TILE_WATER))
-		GS()->CreateDeath(m_Pos, m_pPlayer->GetCID());
-	else if (m_pHelper->TileExit(Index, TILE_WATER))
+	// water effect enter exit
+	const bool EnterExitWaterTile = m_pHelper->TileEnter(Index, TILE_WATER) || m_pHelper->TileExit(Index, TILE_WATER);
+	if (EnterExitWaterTile)
 		GS()->CreateDeath(m_Pos, m_pPlayer->GetCID());
 }
 
@@ -920,11 +920,9 @@ bool CCharacter::InteractiveHammer(vec2 Direction, vec2 ProjStartPos)
 	if (GS()->TakeItemCharacter(m_pPlayer->GetCID()))
 		return true;
 
-	vec2 PosJob = vec2(0, 0);
-	CJobItems* pJobItem = (CJobItems*)GameWorld()->ClosestEntity(m_Pos, 15, CGameWorld::ENTTYPE_JOBITEMS, 0);
+	CJobItems* pJobItem = (CJobItems*)GameWorld()->ClosestEntity(m_Pos, 15, CGameWorld::ENTTYPE_JOBITEMS, nullptr);
 	if(pJobItem)
 	{
-		PosJob = pJobItem->GetPos();
 		pJobItem->Work(m_pPlayer->GetCID());
 		m_ReloadTimer = Server()->TickSpeed() / 3;
 		return true;
@@ -1205,7 +1203,7 @@ bool CCharacter::StartConversation(CPlayer *pTarget)
 // decoration player's
 void CCharacter::CreateSnapProj(int SnapID, int Count, int TypeID, bool Dynamic, bool Projectile)
 {
-	CSnapFull* pSnapItem = (CSnapFull*)GameWorld()->ClosestEntity(m_Pos, 300, CGameWorld::ENTTYPE_SNAPEFFECT, 0);
+	CSnapFull* pSnapItem = (CSnapFull*)GameWorld()->ClosestEntity(m_Pos, 300, CGameWorld::ENTTYPE_SNAPEFFECT, nullptr);
 	if(pSnapItem && pSnapItem->GetOwner() == m_pPlayer->GetCID())
 	{
 		pSnapItem->AddItem(Count, TypeID, Projectile, Dynamic, SnapID);
@@ -1216,7 +1214,7 @@ void CCharacter::CreateSnapProj(int SnapID, int Count, int TypeID, bool Dynamic,
 
 void CCharacter::RemoveSnapProj(int Count, int SnapID, bool Effect)
 {
-	CSnapFull* pSnapItem = (CSnapFull*)GameWorld()->ClosestEntity(m_Pos, 300, CGameWorld::ENTTYPE_SNAPEFFECT, 0);
+	CSnapFull* pSnapItem = (CSnapFull*)GameWorld()->ClosestEntity(m_Pos, 300, CGameWorld::ENTTYPE_SNAPEFFECT, nullptr);
 	if(pSnapItem && pSnapItem->GetOwner() == m_pPlayer->GetCID())
 	{
 		pSnapItem->RemoveItem(Count, SnapID, Effect);

@@ -4,15 +4,6 @@
 
 #include "TileHandle.h"
 
-#include <game/server/entities/character.h>
-
-TileHandle::TileHandle(CCharacter *Character)
-: m_pCharacter(Character)
-{
-	for(bool & i : m_Collide)
-		i = false;
-}
-
 bool TileHandle::TileEnter(int IndexPlayer, int IndexNeed)
 {
 	if(IndexPlayer == IndexNeed && !m_Collide[IndexNeed])
@@ -30,10 +21,4 @@ bool TileHandle::TileExit(int IndexPlayer, int IndexNeed)
 		return true;
 	}
 	return false;
-}
-
-vec2 TileHandle::MousePos() const
-{
-	vec2 Direction = vec2(m_pCharacter->m_Core.m_Input.m_TargetX, m_pCharacter->m_Core.m_Input.m_TargetY);
-	return m_pCharacter->m_Core.m_Pos+Direction;
 }
