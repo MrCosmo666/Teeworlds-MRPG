@@ -49,12 +49,17 @@ struct CAccountData
 		m_aPlant[JOB_UPGR_COUNTS] = { "Farmer counts", "PlCounts", 0 };
 	}
 	// TODO: do not store data in the account
-	struct
+	struct CFieldStruct
 	{
+		CFieldStruct() = default;
+		CFieldStruct(const CFieldStruct& pField) = default;
+
 		char m_aName[64];
 		char m_aFieldName[64];
 		int m_Value;
-	} m_aMiner[NUM_JOB_ACCOUNTS_STATS], m_aPlant[NUM_JOB_ACCOUNTS_STATS];
+	};
+	CFieldStruct m_aMiner[NUM_JOB_ACCOUNTS_STATS];
+	CFieldStruct m_aPlant[NUM_JOB_ACCOUNTS_STATS];
 
 	static std::map < int, CAccountData > ms_aData;
 };

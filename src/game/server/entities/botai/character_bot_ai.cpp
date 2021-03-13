@@ -7,7 +7,7 @@
 #include <game/server/playerbot.h>
 #include "character_bot_ai.h"
 
-#include <game/server/mmocore/Components/Skills/Entities/healthturret/hearth.h> // for nurse
+#include <game/server/mmocore/Components/Skills/Entities/HealthTurret/hearth.h> // for nurse
 
 #include <game/server/mmocore/Components/Bots/BotData.h>
 #include <game/server/mmocore/Components/Quests/QuestCore.h>
