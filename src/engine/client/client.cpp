@@ -881,7 +881,7 @@ bool CClient::LoadMmoData(const SHA256_DIGEST* pWantedSha256, unsigned WantedCrc
 		return false;
 
 	// check crc and sha256
-	if(pWantedSha256 && m_DataMmo.Sha256() != *pWantedSha256 || m_DataMmo.Crc() != WantedCrc)
+	if((pWantedSha256 && m_DataMmo.Sha256() != *pWantedSha256) || m_DataMmo.Crc() != WantedCrc)
 	{
 		m_DataMmo.Unload();
 		return false;
@@ -1662,7 +1662,6 @@ void CClient::ProcessServerPacket(CNetChunk* pPacket)
 			if(Unpacker.Error() || Size <= 0)
 				return;
 
-			const char* pMmoName = MMO_DATA_FILE;
 			const SHA256_DIGEST* pMmoSha256 = (const SHA256_DIGEST*)Unpacker.GetRaw(sizeof(*pMmoSha256));
 			if(LoadMmoData(pMmoSha256, Crc))
 			{

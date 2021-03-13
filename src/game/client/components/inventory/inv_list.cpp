@@ -3,7 +3,6 @@
 #include <base/stdafx.h>
 
 #include <engine/textrender.h>
-#include <engine/shared/config.h>
 
 #include <game/client/components/menus.h>
 #include <game/client/components/inventory.h>
@@ -109,7 +108,7 @@ CInventoryList::CInventoryList(CInventory* pInventory, const char *pInventoryLis
 
 CInventoryList::~CInventoryList()
 {
-	for(int i = 0; i < m_aInventoryPages.size(); i++)
+	for(int i = 0; i < (int)m_aInventoryPages.size(); i++)
 		delete m_aInventoryPages[i];
 	m_aInventoryPages.clear();
 }
@@ -195,7 +194,7 @@ void CInventoryList::AddItem(int ItemID, int Count, const char* pName, const cha
 {
 	// TODO: rework and add clamping items
 	CInventorySlot* pSlot = nullptr;
-	for(int i = 0; i < m_aInventoryPages.size(); i++)
+	for(int i = 0; i < (int)m_aInventoryPages.size(); i++)
 	{
 		CInventoryPage* pInventoryPage = m_aInventoryPages[i];
 		if(pInventoryPage)

@@ -6,6 +6,7 @@
 #include <engine/demo.h>
 #include <engine/contacts.h>
 #include <engine/serverbrowser.h>
+#include <engine/shared/config.h>
 
 #include <game/voting.h>
 #include <game/client/component.h>
@@ -817,8 +818,8 @@ private:
 	void RenderBackButton(CUIRect MainView);
 
 public:
-	inline float GetListHeaderHeight() const { return ms_ListheaderHeight + (g_Config.m_ClGBrowser ? 3.0f : 0.0f); }
-	inline float GetListHeaderHeightFactor() const { return 1.0f + (g_Config.m_ClGBrowser ? (3.0f / ms_ListheaderHeight) : 0.0f); }
+	static float GetListHeaderHeight() { return ms_ListheaderHeight + (g_Config.m_ClGBrowser ? 3.0f : 0.0f); }
+	static float GetListHeaderHeightFactor() { return 1.0f + (g_Config.m_ClGBrowser ? (3.0f / ms_ListheaderHeight) : 0.0f); }
 
 private:
 	static void ConchainUpdateMusicState(IConsole::IResult* pResult, void* pUserData, IConsole::FCommandCallback pfnCallback, void* pCallbackUserData);

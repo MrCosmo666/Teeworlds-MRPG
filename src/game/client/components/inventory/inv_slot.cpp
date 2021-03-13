@@ -13,7 +13,7 @@
 #include "inv_slot.h"
 
 CInventorySlot::CInventorySlot(CInventory* pInventory, CInventoryList* pInventoryList, int Page, int SlotID)
-: m_pInventory(pInventory), m_pInventoryList(pInventoryList), m_SlotID(SlotID), m_Page(Page)
+: m_SlotID(SlotID), m_Page(Page), m_pInventory(pInventory), m_pInventoryList(pInventoryList)
 {
 	m_ItemID = 0;
 	m_Count = 0;
@@ -65,9 +65,7 @@ void CInventorySlot::OnInteractiveSlot()
 	if(m_pInventoryList->GetInteractiveSlot() != this)
 		return;
 
-	static float Space = 20.0f;
 	CUIRect BackgroundRect = m_pInventoryList->GetMainViewRect();
-
 	BackgroundRect.w = 150.0f;
 	BackgroundRect.h = 120.0f;
 	BackgroundRect.x = m_pInventoryList->m_SlotInteractivePosition.x - (BackgroundRect.w / 2.0f);

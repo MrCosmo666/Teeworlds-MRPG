@@ -107,7 +107,7 @@ public:
 	{
 		if(!m_pStorage)
 			return;
-		
+
 		if(!pFilename)
 			pFilename = SETTINGS_FILENAME ".cfg";
 		m_ConfigFile = m_pStorage->OpenFile(pFilename, IOFLAG_WRITE, IStorageEngine::TYPE_SAVE);

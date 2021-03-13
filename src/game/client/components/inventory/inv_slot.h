@@ -19,7 +19,7 @@ enum MouseEvent
 
 // basic set of variables for configuration
 static float BoxSize = 40.0f;
-static int SpacingSlot = 3.0f;
+static float SpacingSlot = 3.0f;
 
 class CInventorySlot
 {

@@ -2178,7 +2178,7 @@ void CGameClient::ParsingMmoData()
 		str_copy(Item.m_aIcon, p.value("icon", "").c_str(), sizeof(Item.m_aIcon));
 		CUIGameInterface::m_aItemsDataInformation[Item.m_ItemID] = Item;
 	}
-	str_format(aResultBuf, sizeof(aResultBuf), "loaded %d data items list", CUIGameInterface::m_aItemsDataInformation.size());
+	str_format(aResultBuf, sizeof(aResultBuf), "loaded %d data items list", (int)CUIGameInterface::m_aItemsDataInformation.size());
 	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "game", aResultBuf);
 }
 

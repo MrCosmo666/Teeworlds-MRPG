@@ -257,7 +257,7 @@ void CUIGameInterface::RenderInbox()
 			static CMenus::CListBox s_ListBox;
 			s_ListBox.DoHeader(&ListBoxRect, "", 0.0f, 8.0f);
 			s_ListBox.DoStart(40.0f, m_aLettersList.size(), 1, 3, -1, 0, false);
-			for(int i = 0; i < m_aLettersList.size(); i++)
+			for(int i = 0; i < (int)m_aLettersList.size(); i++)
 			{
 				const CMailboxLetter* pLetter = &m_aLettersList[i];
 				CMenus::CListboxItem Item = s_ListBox.DoNextItem(pLetter, s_LetterSelected == i);
@@ -307,7 +307,7 @@ void CUIGameInterface::RenderInbox()
 	{
 		m_WindowMailboxLetterSelected.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
 		{
-			if((m_LetterActiveSelected < 0 || m_LetterActiveSelected >= m_aLettersList.size()) && pCurrentWindow.IsOpenned())
+			if((m_LetterActiveSelected < 0 || m_LetterActiveSelected >= (int)m_aLettersList.size()) && pCurrentWindow.IsOpenned())
 			{
 				pCurrentWindow.Close();
 				return;

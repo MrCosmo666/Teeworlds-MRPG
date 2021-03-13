@@ -2,29 +2,21 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/stdafx.h>
 
-#include <engine/config.h>
 #include <engine/editor.h>
-#include <engine/engine.h>
-#include <engine/contacts.h>
 #include <engine/keys.h>
 #include <engine/serverbrowser.h>
 #include <engine/storage.h>
-#include <engine/updater.h>
 #include <engine/textrender.h>
 #include <engine/shared/config.h>
 
-#include <game/version.h>
 #include <generated/protocol.h>
 #include <generated/client_data.h>
 
-#include <game/client/ui_window.h>
 #include <game/client/components/binds.h>
 #include <game/client/components/camera.h>
-#include <game/client/components/console.h>
 #include <game/client/components/sounds.h>
 #include <game/client/gameclient.h>
 #include <game/client/lineinput.h>
-#include <mastersrv/mastersrv.h>
 
 #include "maplayers.h"
 #include "countryflags.h"
