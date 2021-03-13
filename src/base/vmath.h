@@ -12,7 +12,7 @@ public:
 	union { T x,u; };
 	union { T y,v; };
 
-	vector2_base(): x(), u(), y(), v() { }
+	vector2_base(): x(), y() { }
 	vector2_base(T nx, T ny)
 	{
 		x = nx;
@@ -112,7 +112,7 @@ public:
 	union { T y,g,s; };
 	union { T z,b,v,l; };
 
-	vector3_base(): x(), r(), h(), y(), g(), s(), z(), b(), v(), l() { }
+	vector3_base(): x(), y(), z() { }
 	vector3_base(T nx, T ny, T nz)
 	{
 		x = nx;
@@ -188,7 +188,7 @@ public:
 	union { T w,b; };
 	union { T h,a; };
 
-	vector4_base(): x(), r(), y(), g(), w(), b(), h(), a() {}
+	vector4_base(): x(), y(), w(), h() {}
 	vector4_base(T nx, T ny, T nw, T nh)
 	{
 		x = nx;
