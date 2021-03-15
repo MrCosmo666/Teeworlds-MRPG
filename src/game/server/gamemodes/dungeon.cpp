@@ -408,7 +408,7 @@ void CGameControllerDungeon::SelectTankPlayer()
 int CGameControllerDungeon::GetSyncFactor() const
 {
 	int MaxFactor = 0;
-	int MinFactor = INT_MAX;
+	int MinFactor = std::numeric_limits<int>::max();
 	for(int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		CPlayerBot* pBotPlayer = static_cast<CPlayerBot*>(GS()->m_apPlayers[i]);
