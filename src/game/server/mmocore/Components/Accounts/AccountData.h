@@ -4,6 +4,7 @@
 #define GAME_SERVER_COMPONENT_ACCOUNT_DATA_H
 #include <game/game_context.h>
 #include <game/server/mmocore/Components/Shops/ShopData.h>
+#include <game/server/mmocore/Utils/FieldData.h>
 
 struct CAccountData
 {
@@ -31,35 +32,25 @@ struct CAccountData
 	std::map < int, bool > m_aAetherLocation;
 	bool IsGuild() const { return m_GuildID > 0; }
 
+	CFieldsData m_aMiningData;
+	CFieldsData m_aPlantData;
+
 	CAccountData()
 	{
 		m_AccountID = -1;
 		m_Level = 0;
 		m_Team = TEAM_SPECTATORS;
 
-		// Name :: Field name database :: value
-		m_aMiner[JOB_LEVEL] = { "Miner level", "MnrLevel", 0 };
-		m_aMiner[JOB_EXPERIENCE] = { "Miner experience", "MnrExp", 0 };
-		m_aMiner[JOB_UPGRADES] = { "Miner upgrades", "MnrUpgrade", 0 };
-		m_aMiner[JOB_UPGR_COUNTS] = { "Miner counts", "MnrCount", 0 };
+		m_aMiningData.add_field<int, JOB_LEVEL>("MnrLevel", "Miner level");
+		m_aMiningData.add_field<int, JOB_EXPERIENCE>("MnrExp", "Miner experience");
+		m_aMiningData.add_field<int, JOB_UPGRADES>("MnrUpgrade", "Miner upgrades");
+		m_aMiningData.add_field<int, JOB_UPGR_COUNTS>("MnrCount", "Miner counts");
 
-		m_aPlant[JOB_LEVEL] = { "Farmer level", "PlLevel", 0 };
-		m_aPlant[JOB_EXPERIENCE] = { "Farmer experience", "PlExp", 0 };
-		m_aPlant[JOB_UPGRADES] = { "Farmer upgrades", "PlUpgrade", 0 };
-		m_aPlant[JOB_UPGR_COUNTS] = { "Farmer counts", "PlCounts", 0 };
+		m_aPlantData.add_field<int, JOB_LEVEL>("PlLevel", "Farmer level");
+		m_aPlantData.add_field<int, JOB_EXPERIENCE>("PlExp", "Farmer experience");
+		m_aPlantData.add_field<int, JOB_UPGRADES>("PlUpgrade", "Farmer upgrades");
+		m_aPlantData.add_field<int, JOB_UPGR_COUNTS>("PlCounts", "Farmer counts");
 	}
-	// TODO: do not store data in the account
-	struct CFieldStruct
-	{
-		CFieldStruct() = default;
-		CFieldStruct(const CFieldStruct& pField) = default;
-
-		char m_aName[64];
-		char m_aFieldName[64];
-		int m_Value;
-	};
-	CFieldStruct m_aMiner[NUM_JOB_ACCOUNTS_STATS];
-	CFieldStruct m_aPlant[NUM_JOB_ACCOUNTS_STATS];
 
 	static std::map < int, CAccountData > ms_aData;
 };

@@ -13,11 +13,11 @@ std::map < int , CAccountMinerCore::StructOres > CAccountMinerCore::ms_aOre;
 void CAccountMinerCore::ShowMenu(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	const int JobLevel = pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value;
-	const int JobExperience = pPlayer->Acc().m_aMiner[JOB_EXPERIENCE].m_Value;
-	const int JobUpgrades = pPlayer->Acc().m_aMiner[JOB_UPGRADES].m_Value;
-	const int JobUpgrCounts = pPlayer->Acc().m_aMiner[JOB_UPGR_COUNTS].m_Value;
-	const int ExperienceNeed = computeExperience(JobExperience);
+	const int JobLevel = pPlayer->Acc().m_aMiningData[JOB_LEVEL];
+	const int JobExperience = pPlayer->Acc().m_aMiningData[JOB_EXPERIENCE];
+	const int JobUpgrades = pPlayer->Acc().m_aMiningData[JOB_UPGRADES];
+	const int JobUpgrCounts = pPlayer->Acc().m_aMiningData[JOB_UPGR_COUNTS];
+	const int ExperienceNeed = computeExperience(JobLevel);
 
 	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Miner Point: {INT} :: Level: {INT} Exp: {INT}/{INT}", JobUpgrades, JobLevel, JobExperience, ExperienceNeed);
 	GS()->AVD(ClientID, "MINERUPGRADE", JOB_UPGR_COUNTS, 20, TAB_UPGR_JOB, "Quantity +{INT} (Price 20P)", JobUpgrCounts);
@@ -60,14 +60,14 @@ void CAccountMinerCore::Work(CPlayer *pPlayer, int Level)
 {
 	const int ClientID = pPlayer->GetCID();
 	const int MultiplierExperience = computeExperience(Level) / g_Config.m_SvMiningIncreaseLevel;
-	pPlayer->Acc().m_aMiner[JOB_EXPERIENCE].m_Value += clamp(MultiplierExperience, 1, MultiplierExperience);
+	pPlayer->Acc().m_aMiningData[JOB_EXPERIENCE] += clamp(MultiplierExperience, 1, MultiplierExperience);
 
-	int ExperienceNeed = computeExperience(pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value);
-	for( ; pPlayer->Acc().m_aMiner[JOB_EXPERIENCE].m_Value >= ExperienceNeed; )
+	int ExperienceNeed = computeExperience((int)pPlayer->Acc().m_aMiningData[JOB_LEVEL]);
+	for( ; (int)pPlayer->Acc().m_aMiningData[JOB_EXPERIENCE] >= ExperienceNeed; )
 	{
-		pPlayer->Acc().m_aMiner[JOB_EXPERIENCE].m_Value -= ExperienceNeed;
-		pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value++;
-		pPlayer->Acc().m_aMiner[JOB_UPGR_COUNTS].m_Value++;
+		pPlayer->Acc().m_aMiningData[JOB_EXPERIENCE] -= ExperienceNeed;
+		pPlayer->Acc().m_aMiningData[JOB_LEVEL]++;
+		pPlayer->Acc().m_aMiningData[JOB_UPGR_COUNTS]++;
 
 		if(pPlayer->GetCharacter() && pPlayer->GetCharacter()->IsAlive())
 		{
@@ -76,12 +76,12 @@ void CAccountMinerCore::Work(CPlayer *pPlayer, int Level)
 			GS()->CreateText(pPlayer->GetCharacter(), false, vec2(0, -40), vec2(0, -1), 40, "miner up");
 		}
 
-		const int NewLevel = pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value;
+		const int NewLevel = pPlayer->Acc().m_aMiningData[JOB_LEVEL];
 		ExperienceNeed = computeExperience(NewLevel);
 		GS()->ChatFollow(ClientID, "Miner Level UP. Now Level {INT}!", NewLevel);
 	}
 
-	pPlayer->ProgressBar("Miner", pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value, pPlayer->Acc().m_aMiner[JOB_EXPERIENCE].m_Value, ExperienceNeed, MultiplierExperience);
+	pPlayer->ProgressBar("Miner", pPlayer->Acc().m_aMiningData[JOB_LEVEL], pPlayer->Acc().m_aMiningData[JOB_EXPERIENCE], ExperienceNeed, MultiplierExperience);
 	Job()->SaveAccount(pPlayer, SAVE_MINER_DATA);
 }
 
@@ -92,13 +92,13 @@ void CAccountMinerCore::OnInitAccount(CPlayer* pPlayer)
 	{
 		for(int i = 0; i < NUM_JOB_ACCOUNTS_STATS; i++)
 		{
-			const char* pFieldName = pPlayer->Acc().m_aMiner[i].m_aFieldName;
-			pPlayer->Acc().m_aMiner[i].m_Value = pRes->getInt(pFieldName);
+			const char* pFieldName = pPlayer->Acc().m_aMiningData[i].getField();
+			pPlayer->Acc().m_aMiningData[i] = pRes->getInt(pFieldName);
 		}
 		return;
 	}
-	pPlayer->Acc().m_aMiner[JOB_LEVEL].m_Value = 1;
-	pPlayer->Acc().m_aMiner[JOB_UPGR_COUNTS].m_Value = 1;
+	pPlayer->Acc().m_aMiningData[JOB_LEVEL] = 1;
+	pPlayer->Acc().m_aMiningData[JOB_UPGR_COUNTS] = 1;
 	SJK.ID("tw_accounts_miner", "(AccountID) VALUES ('%d')", pPlayer->Acc().m_AccountID);
 }
 
@@ -122,7 +122,7 @@ bool CAccountMinerCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, 
 	const int ClientID = pPlayer->GetCID();
 	if (PPSTR(CMD, "MINERUPGRADE") == 0)
 	{
-		if (pPlayer->Upgrade(Get, &pPlayer->Acc().m_aMiner[VoteID].m_Value, &pPlayer->Acc().m_aMiner[JOB_UPGRADES].m_Value, VoteID2, 3))
+		if (pPlayer->Upgrade(Get, &pPlayer->Acc().m_aMiningData[VoteID], &pPlayer->Acc().m_aMiningData[JOB_UPGRADES], VoteID2, 3))
 		{
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_MINER_DATA);
 			GS()->StrongUpdateVotes(ClientID, MenuList::MENU_UPGRADE);
