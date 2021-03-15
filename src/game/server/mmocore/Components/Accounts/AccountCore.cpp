@@ -1,7 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/stdafx.h>
-
 #include "AccountCore.h"
 
 #include <engine/shared/config.h>
@@ -12,6 +10,10 @@
 #include <game/server/mmocore/Components/Mails/MailBoxCore.h>
 #include <game/server/mmocore/Components/Quests/QuestCore.h>
 #include <game/server/mmocore/Components/Worlds/WorldSwapCore.h>
+
+#include <base/hash_ctxt.h>
+
+#include <teeother/tl/nlohmann_json.h>
 
 int CAccountCore::GetHistoryLatestCorrectWorldID(CPlayer* pPlayer) const
 {

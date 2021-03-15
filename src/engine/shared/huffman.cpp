@@ -1,8 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/stdafx.h>
-
 #include "huffman.h"
+
+#include <base/system.h>
 
 static const unsigned gs_aFreqTable[256 + 1] = {
 	1 << 30,4545,2657,431,1950,919,444,482,2244,617,838,542,715,1814,304,240,754,212,647,186,

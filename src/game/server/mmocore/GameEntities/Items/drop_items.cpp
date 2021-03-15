@@ -1,11 +1,11 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/stdafx.h>
-
 #include <game/server/mmocore/Components/Inventory/ItemData.h>
 #include "drop_items.h"
 
 #include <game/server/gamecontext.h>
+
+#include <base/tl/base.h>
 
 CDropItem::CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, CItemData DropItem, int OwnerID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPITEM, Pos, 28.0f)

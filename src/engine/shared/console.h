@@ -2,6 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef ENGINE_SHARED_CONSOLE_H
 #define ENGINE_SHARED_CONSOLE_H
+#include <new>
+#include <base/math.h>
 
 #include <engine/console.h>
 #include "memheap.h"

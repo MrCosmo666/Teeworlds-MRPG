@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/stdafx.h>
 #include "InventoryCore.h"
 
 #include <engine/shared/datafile.h>
@@ -8,6 +7,10 @@
 
 #include <game/server/mmocore/Components/Houses/HouseCore.h>
 #include <game/server/mmocore/Components/Quests/QuestCore.h>
+
+#include <teeother/tl/nlohmann_json.h>
+
+#include <mutex>
 
 using namespace sqlstr;
 void CInventoryCore::OnPrepareInformation(IStorageEngine* pStorage, CDataFileWriter* pDataFile)

@@ -3,6 +3,8 @@
 #ifndef GAME_SERVER_COMPONENT_SKILL_DATA_INFO_H
 #define GAME_SERVER_COMPONENT_SKILL_DATA_INFO_H
 
+#include <map>
+
 class CSkillDataInfo
 {
 public:
@@ -16,7 +18,7 @@ public:
 	bool m_Passive;
 
 	static const char* GetControlEmoteStateName(int EmoticionID);
-	static std::map < int, CSkillDataInfo > ms_aSkillsData;
+	static std::map< int, CSkillDataInfo > ms_aSkillsData;
 };
 
 #endif

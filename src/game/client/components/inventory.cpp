@@ -1,12 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/stdafx.h>
-
 #include <engine/keys.h>
-#include <engine/storage.h>
 #include <engine/textrender.h>
 
-#include <engine/shared/config.h>
 #include <generated/client_data.h>
 
 #include <game/client/render.h>
@@ -16,10 +12,7 @@
 #include "inventory.h"
 
 #include "inventory/inv_list.h"
-#include "inventory/inv_page.h"
 #include "inventory/inv_slot.h"
-
-#include <game/client/ui_window.h>
 
 // TODO: ever complete the inventory
 CInventory::CInventory()

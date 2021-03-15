@@ -5,6 +5,8 @@
 
 #include "ui.h"
 
+#include <functional>
+
 enum CWindowFlags
 {
 	WINDOW_MINIMIZE = 1 << 0,

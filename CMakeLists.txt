@@ -1,4 +1,8 @@
-cmake_minimum_required(VERSION 3.16...3.19.1)
+cmake_minimum_required(VERSION 2.8.12...3.19.1)
+if(CMAKE_VERSION VERSION_LESS 3.12)
+  cmake_policy(VERSION ${CMAKE_VERSION})
+endif()
+
 file(STRINGS src/game/version.h VERSION_LINE
     LIMIT_COUNT 1
     REGEX GAME_RELEASE_VERSION
@@ -673,12 +677,6 @@ set(LIBS ${CMAKE_THREAD_LIBS_INIT} ${ZLIB_LIBRARIES} ${OPENSSL_CRYPTO_LIBRARY} $
 # Targets
 add_library(engine-shared EXCLUDE_FROM_ALL OBJECT ${ENGINE_INTERFACE} ${ENGINE_SHARED} ${ENGINE_GENERATED_SHARED} ${BASE})
 add_library(game-shared EXCLUDE_FROM_ALL OBJECT ${GAME_SHARED} ${GAME_GENERATED_SHARED})
-
-# pch
-set_source_files_properties(src/generated/*.cpp PROPERTIES SKIP_PRECOMPILE_HEADERS ON)
-target_precompile_headers(engine-shared PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:${PROJECT_SOURCE_DIR}/src/base/stdafx.h>")
-target_precompile_headers(game-shared PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:${PROJECT_SOURCE_DIR}/src/base/stdafx.h>")
-
 list(APPEND TARGETS_OWN engine-shared game-shared)
 
 ########################################################################
@@ -737,7 +735,6 @@ if(CLIENT_COMPILE)
   )
 
   # linking includes & libs on client
-  target_precompile_headers(${TARGET_CLIENT} REUSE_FROM engine-shared)
   target_include_directories(${TARGET_CLIENT} PRIVATE ${CLIENT_INCLUDES_DIRS})
   target_link_libraries(${TARGET_CLIENT} ${LIBS} ${CLIENT_LIBRARIES} ${PLATFORM_CLIENT_LIBS})
 
@@ -875,7 +872,6 @@ if(SERVER_COMPILE)
     $<TARGET_OBJECTS:game-shared>
   )
 
-  target_precompile_headers(${TARGET_SERVER} REUSE_FROM engine-shared)
   target_include_directories(${TARGET_SERVER} PRIVATE ${SERVER_INCLUDES_DIRS})
   target_link_libraries(${TARGET_SERVER} ${LIBS} ${SERVER_LIBRARIES})
 
@@ -905,8 +901,6 @@ set(TARGET_VERSIONSRV versionsrv)
 
 add_executable(${TARGET_MASTERSRV} EXCLUDE_FROM_ALL ${MASTERSRV_SRC} $<TARGET_OBJECTS:engine-shared> ${DEPS})
 add_executable(${TARGET_VERSIONSRV} EXCLUDE_FROM_ALL ${VERSIONSRV_SRC} $<TARGET_OBJECTS:engine-shared> ${DEPS})
-target_precompile_headers(${TARGET_MASTERSRV} REUSE_FROM engine-shared)
-target_precompile_headers(${TARGET_VERSIONSRV} REUSE_FROM engine-shared)
 
 target_link_libraries(${TARGET_MASTERSRV} ${LIBS})
 target_link_libraries(${TARGET_VERSIONSRV} ${LIBS})
@@ -934,7 +928,6 @@ foreach(ABS_T ${TOOLS})
     )
 
     target_link_libraries(${TOOL} ${LIBS})
-    target_precompile_headers(${TOOL} REUSE_FROM engine-shared)
     list(APPEND TARGETS_TOOLS ${TOOL})
   endif()
 endforeach()

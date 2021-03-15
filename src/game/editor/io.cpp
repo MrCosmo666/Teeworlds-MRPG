@@ -1,7 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/stdafx.h>
-
 #include <engine/client.h>
 #include <engine/console.h>
 #include <engine/serverbrowser.h>
@@ -185,7 +183,7 @@ int CEditorMap::Save(class IStorageEngine *pStorage, const char *pFileName)
 
 	// check for bezier curve envelopes, otherwise use older, smaller envelope points
 	int Version = CMapItemEnvelope_v2::CURRENT_VERSION;
-	int Size = sizeof(CEnvPoint_v1);
+	int Size = sizeof(CEnvPoint_v1);	
 	for(int e = 0; e < m_lEnvelopes.size(); e++)
 	{
 		for(int p = 0; p < m_lEnvelopes[e]->m_lPoints.size(); p++)
@@ -425,7 +423,7 @@ int CEditorMap::Load(class IStorageEngine *pStorage, const char *pFileName, int 
 							pTiles->ExtractTiles((CTile *)pData);
 						else
 							mem_copy(pTiles->m_pTiles, pData, pTiles->m_Width*pTiles->m_Height*sizeof(CTile));
-
+						
 
 						if(pTiles->m_Game && pTilemapItem->m_Version == MakeVersion(1, *pTilemapItem))
 						{

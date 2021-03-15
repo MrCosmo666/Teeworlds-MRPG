@@ -6,6 +6,9 @@
 // There is an idea about automatic unloading from the database to save changes in the fields.
 // With the help of a list. In the future I think it will be necessary to achieve this
 
+#include <string>
+#include <typeinfo>
+
 // TODO: add exceptions
 
 // ref declaration
@@ -26,7 +29,7 @@ template < typename Type >
 struct GetterType
 {
 	// constexpr for to control at compile time
-	static constexpr int Get()
+	static int Get()
 	{
 		if(typeid(Type) == typeid(int))
 			return FIELD_TYPE_INTEGER;

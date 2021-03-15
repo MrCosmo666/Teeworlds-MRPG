@@ -1,18 +1,13 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/stdafx.h>
-
-#include <engine/shared/config.h>
 #include <engine/graphics.h>
 #include <engine/textrender.h>
 #include <engine/keys.h>
 
 #include <generated/protocol.h>
-#include <generated/client_data.h>
 
 #include "console.h"
 #include "menus.h"
-#include "talktext.h"
 #include "progress_bar.h"
 
 #define COLOR_BACKGROUND vec4(0.2f, 0.2f, 0.2f, 0.5f)

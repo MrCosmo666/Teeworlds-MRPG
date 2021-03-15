@@ -1,7 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/stdafx.h>
 #include "QuestDataInfo.h"
+
+#include <algorithm>
 
 std::string CQuestDataInfo::GetJsonFileName(int AccountID) const { return "server_data/quest_tmp/" + std::to_string(m_QuestID) + "-" + std::to_string(AccountID) + ".json"; }
 

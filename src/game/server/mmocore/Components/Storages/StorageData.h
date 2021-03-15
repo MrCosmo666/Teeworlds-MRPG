@@ -3,6 +3,8 @@
 #ifndef GAME_SERVER_COMPONENT_STORAGE_DATA_H
 #define GAME_SERVER_COMPONENT_STORAGE_DATA_H
 
+#include <map>
+
 struct CStorageData
 {
 	char m_aName[32];
@@ -11,7 +13,7 @@ struct CStorageData
 	int m_Currency;
 	int m_WorldID;
 
-	static std::map < int, CStorageData > ms_aStorage;
+	static std::map< int, CStorageData > ms_aStorage;
 };
 
 #endif

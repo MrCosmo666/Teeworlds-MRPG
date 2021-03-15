@@ -1,11 +1,9 @@
-#include <base/stdafx.h>
+#include "elements.h"
 
 #include <engine/graphics.h>
 #include <game/client/gameclient.h>
-#include <game/client/render.h>
 #include <game/client/anim_ui.h>
 
-#include "elements.h"
 
 CAnimElementsUI::CAnimElementsUI(class CAnimUI *pAnimUI, const char *Name)
 {

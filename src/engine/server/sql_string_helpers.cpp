@@ -1,4 +1,4 @@
-#include <base/stdafx.h>
+#include <base/system.h>
 
 #include "sql_string_helpers.h"
 

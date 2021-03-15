@@ -1,4 +1,3 @@
-#include <base/stdafx.h>
 
 #include <mysql_connection.h>
 #include <cppconn/driver.h>
@@ -6,6 +5,10 @@
 #include "sql_connect_pool.h"
 
 #include <engine/shared/config.h>
+
+#include <stdarg.h>
+#include <mutex>
+#include <thread>
 
 /*
 	I don't see the point in using SELECT operations in the thread,

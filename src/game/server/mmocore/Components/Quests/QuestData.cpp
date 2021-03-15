@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/stdafx.h>
 #include "QuestCore.h"
 
 #include <engine/shared/config.h>
@@ -8,6 +7,8 @@
 
 #include <game/server/mmocore/Components/Dungeons/DungeonJob.h>
 #include <game/server/mmocore/Components/Worlds/WorldSwapCore.h>
+
+#include <teeother/tl/nlohmann_json.h>
 
 CQuestDataInfo& CQuestData::Info() const { return CQuestDataInfo::ms_aDataQuests[m_QuestID]; }
 std::string CQuestData::GetJsonFileName() const { return Info().GetJsonFileName(m_pPlayer->Acc().m_AccountID); }

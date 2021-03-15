@@ -1,6 +1,6 @@
-#include <base/stdafx.h>
-
 #include <gtest/gtest.h>
+
+#include <base/system.h>
 #include <game/version.h>
 
 extern const char *GIT_SHORTREV_HASH;

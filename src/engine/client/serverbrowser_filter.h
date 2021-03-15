@@ -3,6 +3,8 @@
 #ifndef ENGINE_CLIENT_SERVERBROWSER_FILTER_H
 #define ENGINE_CLIENT_SERVERBROWSER_FILTER_H
 
+#include <base/tl/array.h>
+
 class CServerBrowserFilter
 {
 public:

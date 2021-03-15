@@ -6,6 +6,9 @@
 #include <game/server/mmocore/Components/Shops/ShopData.h>
 #include <game/server/mmocore/Utils/FieldData.h>
 
+#include <list>
+#include <map>
+
 struct CAccountData
 {
 	// main
@@ -17,11 +20,11 @@ struct CAccountData
 	int m_Exp;
 	int m_GuildID;
 	int m_GuildRank;
-	std::list < int > m_aHistoryWorld;
+	std::list< int > m_aHistoryWorld;
 
 	// upgrades
 	int m_Upgrade;
-	std::map < int, int > m_aStats;
+	std::map< int, int > m_aStats;
 
 	// skins
 	char m_aaSkinPartNames[NUM_SKINPARTS][MAX_SKIN_ARRAY_SIZE];

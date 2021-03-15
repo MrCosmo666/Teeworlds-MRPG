@@ -4,6 +4,8 @@
 #define GAME_SERVER_ENTITIES_SNAP_FULL_H
 #include <game/server/entity.h>
 
+#include <list>
+
 class CSnapFull : public CEntity
 {
 public:
@@ -26,7 +28,7 @@ private:
 		bool m_Changing;
 		bool m_Projectile;
 	};
-	std::list < struct SnapItem > m_SnapItem;
+	std::list< struct SnapItem > m_SnapItem;
 
 	int m_ClientID;
 	int m_LoadingTick;

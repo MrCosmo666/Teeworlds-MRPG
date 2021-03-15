@@ -2,6 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_CLIENT_COMPONENTS_SKINS_H
 #define GAME_CLIENT_COMPONENTS_SKINS_H
+#include <base/vmath.h>
+#include <base/tl/sorted_array.h>
 #include <game/client/component.h>
 
 // todo: fix duplicate skins (different paths)

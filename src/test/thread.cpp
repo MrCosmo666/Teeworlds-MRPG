@@ -1,6 +1,6 @@
-#include <base/stdafx.h>
-
 #include <gtest/gtest.h>
+
+#include <base/system.h>
 
 static void Nothing(void *pUser)
 {

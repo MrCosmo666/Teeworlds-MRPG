@@ -3,6 +3,9 @@
 #ifndef ENGINE_SHARED_DATAFILE_H
 #define ENGINE_SHARED_DATAFILE_H
 
+#include <base/hash.h>
+#include <base/system.h>
+
 #define MMO_DATA_FILE "data.mmo"
 
 // raw datafile access

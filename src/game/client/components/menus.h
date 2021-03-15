@@ -2,6 +2,9 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_CLIENT_COMPONENTS_MENUS_H
 #define GAME_CLIENT_COMPONENTS_MENUS_H
+#include <base/vmath.h>
+#include <base/tl/sorted_array.h>
+
 #include <engine/graphics.h>
 #include <engine/demo.h>
 #include <engine/contacts.h>

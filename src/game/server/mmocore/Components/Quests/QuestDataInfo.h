@@ -2,7 +2,10 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_COMPONENT_QUEST_DATA_INFO_H
 #define GAME_SERVER_COMPONENT_QUEST_DATA_INFO_H
+
 #include "QuestStepDataInfo.h"
+
+#include <string>
 
 class CQuestDataInfo
 {

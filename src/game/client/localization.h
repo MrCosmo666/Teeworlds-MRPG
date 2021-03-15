@@ -4,6 +4,7 @@
 #define GAME_LOCALIZATION_H
 
 #include <base/tl/string.h>
+#include <base/tl/sorted_array.h>
 
 class CLocalizationDatabase
 {

@@ -1,6 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/stdafx.h>
+#include <cstdint>
+#include <base/math.h>
+#include <base/system.h>
 
 #include <engine/config.h>
 #include <engine/console.h>
@@ -23,6 +25,11 @@
 #include "register.h"
 #include "server.h"
 
+#if defined(CONF_FAMILY_WINDOWS)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#endif
+
 #include <engine/shared/mmodata.h>
 #include "discord/discord_main.h"
 #include "multi_worlds.h"
@@ -32,10 +39,6 @@
 #include <engine/server/sql_connect_pool.h>
 
 #include "game/game_context.h"
-
-#if defined(CONF_FAMILY_WINDOWS)
-  #include <windows.h>
-#endif
 
 void CServer::CClient::Reset()
 {

@@ -2,6 +2,9 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef ENGINE_SHARED_FILECOLLECTION_H
 #define ENGINE_SHARED_FILECOLLECTION_H
+#include <base/system.h>
+
+class IStorageEngine;
 
 class CFileCollection
 {

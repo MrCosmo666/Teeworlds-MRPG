@@ -1,17 +1,15 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/stdafx.h>
-
 #include "SDL.h"
 
-#include <engine/shared/config.h>
 #include <engine/console.h>
 #include <engine/graphics.h>
 #include <engine/input.h>
-#include <engine/keys.h>
 
 #include "input.h"
 
+#include <engine/keys.h>
+#include <engine/shared/config.h>
 
 // this header is protected so you don't include it from anywere
 #define KEYS_INCLUDE

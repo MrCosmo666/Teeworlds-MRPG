@@ -1,10 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/stdafx.h>
-
+#include <base/math.h>
 #include <engine/shared/config.h>
 
-#include <game/collision.h>
 #include <game/client/gameclient.h>
 #include <game/client/component.h>
 

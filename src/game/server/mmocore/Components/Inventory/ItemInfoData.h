@@ -8,6 +8,8 @@
 #define PERCENT_MAXIMUM_ENCHANT 40
 #include <game/game_context.h>
 
+#include <map>
+
 class CItemDataInfo : public CItemDataInformation
 {
 public:
@@ -27,7 +29,7 @@ public:
 	void FormatAttributes(char* pBuffer, int Size, int Enchant) const;
 	void FormatEnchantLevel(char* pBuffer, int Size, int Enchant) const;
 
-	static std::map < int, CItemDataInfo > ms_aItemsInfo;
+	static std::map< int, CItemDataInfo > ms_aItemsInfo;
 };
 
 #endif

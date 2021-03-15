@@ -1,9 +1,9 @@
-#include <base/stdafx.h>
-
 #include <game/client/ui.h>
 
 #include "elements.h"
 #include "value.h"
+
+#include <base/system.h>
 
 CUIRect CValue::GetRect() const { return { m_Value.x, m_Value.y, m_Value.w, m_Value.h }; }
 

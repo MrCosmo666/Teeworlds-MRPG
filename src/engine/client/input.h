@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef ENGINE_CLIENT_INPUT_H
 #define ENGINE_CLIENT_INPUT_H
+#include <base/tl/sorted_array.h>
 
 class CInput : public IEngineInput
 {

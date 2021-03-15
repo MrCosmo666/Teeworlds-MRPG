@@ -4,6 +4,8 @@
 #define GAME_SERVER_BOTAI_HELPER_H
 #include "../character.h"
 
+#include <map>
+
 class CEntityFunctionNurse;
 class CCharacterBotAI : public CCharacter
 {

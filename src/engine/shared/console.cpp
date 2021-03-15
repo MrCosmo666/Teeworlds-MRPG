@@ -1,11 +1,12 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/stdafx.h>
 #include <engine/storage.h>
 
 #include "config.h"
 #include "console.h"
 #include "linereader.h"
+
+#include <base/system.h>
 
 int CConsole::CResult::GetClientID() { return m_ClientID; }
 bool CConsole::IsCommand(const char* pStr, int FlagMask)

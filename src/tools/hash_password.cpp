@@ -1,6 +1,11 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/stdafx.h>
+#include <stdio.h>
+#include <stdarg.h>
+
+#include <base/hash_ctxt.h>
+#include <base/math.h>
+#include <base/system.h>
 
 void dbg_print(const char* sys, const char* fmt, ...)
 {

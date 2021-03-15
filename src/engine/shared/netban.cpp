@@ -1,10 +1,10 @@
-#include <base/stdafx.h>
-
 #include <engine/console.h>
 #include <engine/storage.h>
 #include <engine/shared/config.h>
 
 #include "netban.h"
+
+#include <base/math.h>
 
 CNetBan::CNetHash::CNetHash(const NETADDR *pAddr)
 {

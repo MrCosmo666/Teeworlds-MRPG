@@ -4,6 +4,8 @@
 #define GAME_SERVER_COMPONENT_SKILL_DATA_H
 #include "SkillDataInfo.h"
 
+#include <map>
+
 class CSkillData
 {
 	class CGS* m_pGS;
@@ -26,7 +28,7 @@ public:
 	bool Upgrade();
 	bool Use();
 
-	static std::map < int, std::map < int, CSkillData > > ms_aSkills;
+	static std::map< int, std::map < int, CSkillData > > ms_aSkills;
 };
 
 #endif

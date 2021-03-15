@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef ENGINE_SHARED_JSONWRITER_H
 #define ENGINE_SHARED_JSONWRITER_H
+#include <base/system.h>
 
 class CJsonWriter
 {

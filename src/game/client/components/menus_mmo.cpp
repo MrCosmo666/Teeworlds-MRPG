@@ -1,22 +1,15 @@
-#include <base/stdafx.h>
-
 #include <base/color.h>
+
 #include <engine/storage.h>
 #include <engine/shared/config.h>
 #include <engine/textrender.h>
 #include <engine/graphics.h>
 
-#include <game/version.h>
 #include <game/client/ui.h>
 #include <game/client/render.h>
 #include <game/client/gameclient.h>
 
-#include <generated/client_data.h>
-
-#include <game/client/components/binds.h>
 #include <game/client/components/menus.h>
-#include <game/client/components/items.h>
-#include <game/client/components/skins.h>
 
 void CMenus::RenderRgbSliders(CUIRect* pMainView, CUIRect* pButton, int &r, int &g, int &b, bool Enabled)
 {

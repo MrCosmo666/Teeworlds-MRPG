@@ -4,6 +4,8 @@
 #define GAME_SERVER_COMPONENT_ITEM_DATA_H
 #include "ItemInfoData.h"
 
+#include <map>
+
 class CItemData
 {
 	class CGS* m_pGS;

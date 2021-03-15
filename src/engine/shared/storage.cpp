@@ -1,10 +1,10 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/stdafx.h>
-
 #include <engine/storage.h>
 #include "linereader.h"
 #include <zlib.h>
+
+#include <base/hash_ctxt.h>
 
 // compiled-in data-dir path
 #define DATA_DIR "data"

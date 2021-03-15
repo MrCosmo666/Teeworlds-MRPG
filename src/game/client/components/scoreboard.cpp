@@ -1,6 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/stdafx.h>
+#include <limits.h>
 
 #include <engine/demo.h>
 #include <engine/graphics.h>
@@ -12,6 +12,7 @@
 
 #include <game/client/animstate.h>
 #include <game/client/gameclient.h>
+#include <game/client/localization.h>
 #include <game/client/render.h>
 #include <game/client/ui.h>
 #include <game/client/components/countryflags.h>
@@ -710,7 +711,7 @@ void CScoreboard::RenderNetworkQuality(float x, float w)
 	float y = 0.0f;
 
 	const int NumBars = 5;
-	int ScoreThresolds[NumBars] = { std::numeric_limits<int>::max(), 1000, 250, 50, -80 };
+	int ScoreThresolds[NumBars] = { INT_MAX, 1000, 250, 50, -80 };
 	CUIRect BarRect = {
 		x - 4.0f,
 		y + LineHeight,

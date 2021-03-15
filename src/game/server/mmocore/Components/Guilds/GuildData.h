@@ -5,6 +5,8 @@
 
 #include <game/server/mmocore/Utils/FieldData.h>
 
+#include <map>
+
 struct CGuildData
 {
 	enum
@@ -28,7 +30,7 @@ struct CGuildData
 	int m_Bank;
 	int m_Score;
 
-	static std::map < int, CGuildData > ms_aGuild;
+	static std::map< int, CGuildData > ms_aGuild;
 };
 
 struct CGuildHouseData

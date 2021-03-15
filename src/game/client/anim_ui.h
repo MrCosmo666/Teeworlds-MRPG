@@ -3,6 +3,8 @@
 
 #include <game/client/anim_ui/elements.h>
 
+#include <base/tl/array.h>
+
 // TDTW
 class CAnimUI
 {
@@ -19,7 +21,7 @@ public:
 	class CGameClient *Client() const { return m_pClient; }
 private:
 	class CGameClient* m_pClient;
-	array <CAnimElementsUI*> m_aAnimElements;
+	array<CAnimElementsUI*> m_aAnimElements;
 
 	CAnimElementsUI *SearchElement(char const *Name);
 	int SearchElementIndex(char const *Name);

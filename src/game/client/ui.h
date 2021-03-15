@@ -3,6 +3,9 @@
 #ifndef GAME_CLIENT_UI_H
 #define GAME_CLIENT_UI_H
 
+#include <base/vmath.h>
+#include <vector>
+
 // TODO: Animations Rect rework
 enum ANIMATION_TYPE
 {

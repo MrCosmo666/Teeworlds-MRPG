@@ -1,5 +1,3 @@
-#include <base/stdafx.h>
-
 #include <engine/external/json-parser/json.h>
 #include <engine/storage.h>
 #include <unicode/ushape.h>
@@ -8,6 +6,8 @@
 #include <unicode/upluralrules.h>
 
 #include "localization.h"
+
+#include <cstdarg>
 
 CLocalization::CLanguage::CLanguage()
 	: m_Loaded(false), m_Direction(CLocalization::DIRECTION_LTR),

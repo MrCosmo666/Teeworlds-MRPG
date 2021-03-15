@@ -6,6 +6,8 @@
 #include <game/client/ui.h>
 #include <game/client/ui_window.h>
 
+#include <map>
+
 class CInventoryList
 {
 	// window
@@ -24,7 +26,7 @@ class CInventoryList
 	int m_ActivePage;
 	int m_MaxSlotsWidth;
 	int m_MaxSlotsHeight;
-	std::map < int, class CInventoryPage* > m_aInventoryPages;
+	std::map< int, class CInventoryPage* > m_aInventoryPages;
 
 public:
 	CInventoryList(CInventory* pInventory, const char* pInventoryListName, CUIRect& pMainView, int MaxSlotsWidth, int MaxSlotsHeight);

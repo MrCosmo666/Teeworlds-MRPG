@@ -3,6 +3,8 @@
 #ifndef GAME_SERVER_COMPONENT_AETHER_DATA_H
 #define GAME_SERVER_COMPONENT_AETHER_DATA_H
 
+#include <map>
+
 struct CAetherData
 {
 	int m_TeleX;
@@ -10,7 +12,7 @@ struct CAetherData
 	int m_WorldID;
 	char m_aTeleName[64];
 
-	static std::map < int, CAetherData > ms_aTeleport;
+	static std::map< int, CAetherData > ms_aTeleport;
 };
 
 #endif

@@ -1,7 +1,7 @@
-#include <base/stdafx.h>
-
 #include "test.h"
 #include <gtest/gtest.h>
+
+#include <base/system.h>
 
 TEST(Filesystem, CreateCloseDelete)
 {

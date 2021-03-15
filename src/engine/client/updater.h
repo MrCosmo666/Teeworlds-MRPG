@@ -20,6 +20,8 @@
 #define PLAT_CLIENT_DOWN CLIENT_EXEC "-" PLAT_NAME PLAT_EXT
 #define PLAT_CLIENT_EXEC CLIENT_EXEC "-updated" PLAT_EXT
 
+#include <map>
+
 class CUpdater : public IUpdater
 {
 	friend class CUpdaterFetchTask;

@@ -1,4 +1,3 @@
-#include <base/stdafx.h>
 #include "decoration_houses.h"
 
 #include <engine/server.h>

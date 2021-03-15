@@ -1,5 +1,3 @@
-#include <base/stdafx.h>
-
 #include "http.h"
 #include <engine/external/json-parser/json.h>
 #include <engine/shared/config.h>

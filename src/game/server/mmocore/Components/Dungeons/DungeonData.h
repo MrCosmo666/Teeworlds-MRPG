@@ -3,6 +3,8 @@
 #ifndef GAME_SERVER_COMPONENT_DUNGEON_DATA_H
 #define GAME_SERVER_COMPONENT_DUNGEON_DATA_H
 
+#include <map>
+
 struct CDungeonData
 {
 	char m_aName[64];
@@ -18,7 +20,7 @@ struct CDungeonData
 
 	bool IsDungeonPlaying() const { return m_State > 1; }
 
-	static std::map < int, CDungeonData > ms_aDungeon;
+	static std::map< int, CDungeonData > ms_aDungeon;
 };
 
 #endif

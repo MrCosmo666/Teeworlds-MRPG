@@ -2,6 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_CLIENT_COMPONENTS_SPECTATOR_H
 #define GAME_CLIENT_COMPONENTS_SPECTATOR_H
+#include <base/vmath.h>
+
 #include <game/client/component.h>
 
 class CSpectator : public CComponent

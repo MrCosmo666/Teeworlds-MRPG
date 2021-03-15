@@ -1,6 +1,6 @@
-#include <base/stdafx.h>
-
 #include <gtest/gtest.h>
+
+#include <base/math.h>
 
 TEST(Percent, AddProcentToSource)
 {

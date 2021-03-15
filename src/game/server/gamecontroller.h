@@ -2,6 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_GAMECONTROLLER_H
 #define GAME_SERVER_GAMECONTROLLER_H
+
+#include <base/vmath.h>
 #include <game/game_context.h>
 
 /*

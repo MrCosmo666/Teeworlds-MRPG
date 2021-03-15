@@ -1,4 +1,3 @@
-#include <base/stdafx.h>
 #include "loltext.h"
 
 #include <engine/server.h>

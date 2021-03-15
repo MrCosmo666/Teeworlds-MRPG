@@ -1,10 +1,11 @@
 #ifndef GAME_CLIENT_COMPONENTS_INTERFACE_H
 #define GAME_CLIENT_COMPONENTS_INTERFACE_H
-
 #include <game/client/component.h>
 
 #include <game/game_context.h>
 #include <game/client/ui_window.h>
+
+#include <map>
 
 class CUIGameInterface : public CComponent
 {

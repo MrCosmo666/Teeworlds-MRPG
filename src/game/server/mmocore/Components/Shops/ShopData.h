@@ -3,6 +3,8 @@
 #ifndef GAME_SERVER_COMPONENT_SHOP_DATA_H
 #define GAME_SERVER_COMPONENT_SHOP_DATA_H
 
+#include <map>
+
 struct CAuctionItem
 {
 	int m_ItemID;
@@ -15,7 +17,7 @@ struct CShop
 {
 	int m_StorageID;
 
-	static std::map < int, CShop > ms_aShopList;
+	static std::map< int, CShop > ms_aShopList;
 };
 
 #endif

@@ -1,5 +1,3 @@
-#include <base/stdafx.h>
-
 #include <engine/console.h>
 #include "CommandProcessor.h"
 

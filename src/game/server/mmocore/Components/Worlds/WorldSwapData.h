@@ -3,6 +3,9 @@
 #ifndef GAME_SERVER_COMPONENT_WORLDSWAP_DATA_H
 #define GAME_SERVER_COMPONENT_WORLDSWAP_DATA_H
 
+#include <list>
+#include <map>
+
 struct CWorldSwapData
 {
 	int m_OpenQuestID;
@@ -13,7 +16,7 @@ struct CWorldSwapData
 	int m_TwoPositionY;
 	int m_TwoWorldID;
 
-	static std::map < int, CWorldSwapData > ms_aWorldSwap;
+	static std::map< int, CWorldSwapData > ms_aWorldSwap;
 };
 struct CWorldSwapPosition
 {
@@ -21,7 +24,7 @@ struct CWorldSwapPosition
 	int m_FindWorldID;
 	vec2 m_Position;
 
-	static std::list < CWorldSwapPosition > ms_aWorldPositionLogic;
+	static std::list< CWorldSwapPosition > ms_aWorldPositionLogic;
 };
 
 #endif
