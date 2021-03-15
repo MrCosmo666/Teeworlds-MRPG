@@ -201,7 +201,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		dynamic_string Buffer;
 		for(int i = 0; i < NUM_JOB_ACCOUNTS_STATS; i++)
 		{
-			const char *pFieldName = pPlayer->Acc().m_aPlantData[i].getField();
+			const char *pFieldName = pPlayer->Acc().m_aPlantData[i].getFieldName();
 			const int JobValue = pPlayer->Acc().m_aPlantData[i];
 			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", pFieldName, JobValue, (i == NUM_JOB_ACCOUNTS_STATS-1 ? "" : ", "));
 			Buffer.append_at(Buffer.length(), aBuf);
@@ -216,7 +216,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		dynamic_string Buffer;
 		for(int i = 0; i < NUM_JOB_ACCOUNTS_STATS; i++)
 		{
-			const char* pFieldName = pPlayer->Acc().m_aMiningData[i].getField();
+			const char* pFieldName = pPlayer->Acc().m_aMiningData[i].getFieldName();
 			const int JobValue = pPlayer->Acc().m_aMiningData[i];
 			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", pFieldName, JobValue, (i == NUM_JOB_ACCOUNTS_STATS-1 ? "" : ", "));
 			Buffer.append_at(Buffer.length(), aBuf);

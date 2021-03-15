@@ -14,7 +14,7 @@ class CAccountCore : public MmoComponent
 		CAccountTempData::ms_aPlayerTempData.clear();
 	};
 
-	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
+	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, int VoteID, int VoteID2, int Get, const char* GetText) override;
 	bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu) override;
 	void OnResetClient(int ClientID) override;
 	void OnMessage(int MsgID, void* pRawMsg, int ClientID) override;

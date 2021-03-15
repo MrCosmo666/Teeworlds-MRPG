@@ -3,6 +3,8 @@
 #ifndef GAME_SERVER_COMPONENT_GUILD_DATA_H
 #define GAME_SERVER_COMPONENT_GUILD_DATA_H
 
+#include <game/server/mmocore/Utils/FieldData.h>
+
 struct CGuildData
 {
 	enum
@@ -13,19 +15,11 @@ struct CGuildData
 	};
 	CGuildData()
 	{
-		m_Upgrades[AVAILABLE_SLOTS] = { "Available slots", "AvailableSlots", 0 };
-		m_Upgrades[CHAIR_EXPERIENCE] = { "Chair experience", "ChairExperience", 0 };
+		m_aGuildUpgrades.add_field<int, AVAILABLE_SLOTS>("AvailableSlots", "Available slots");
+		m_aGuildUpgrades.add_field<int, CHAIR_EXPERIENCE>("ChairExperience", "Chair experience");
 	}
-	struct CFieldStruct
-	{
-		CFieldStruct() = default;
-		CFieldStruct(const CFieldStruct& pField) = default;
+	CFieldsData m_aGuildUpgrades;
 
-		char m_aName[64];
-		char m_aFieldName[64];
-		int m_Value;
-	};
-	CFieldStruct m_Upgrades[NUM_GUILD_UPGRADES];
 
 	char m_aName[32];
 	int m_Level;

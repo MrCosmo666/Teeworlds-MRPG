@@ -92,7 +92,7 @@ void CAccountMinerCore::OnInitAccount(CPlayer* pPlayer)
 	{
 		for(int i = 0; i < NUM_JOB_ACCOUNTS_STATS; i++)
 		{
-			const char* pFieldName = pPlayer->Acc().m_aMiningData[i].getField();
+			const char* pFieldName = pPlayer->Acc().m_aMiningData[i].getFieldName();
 			pPlayer->Acc().m_aMiningData[i] = pRes->getInt(pFieldName);
 		}
 		return;

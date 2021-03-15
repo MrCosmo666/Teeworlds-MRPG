@@ -33,7 +33,7 @@ void CAccountPlantCore::OnInitAccount(CPlayer *pPlayer)
 	{
 		for(int i = 0; i < NUM_JOB_ACCOUNTS_STATS; i++)
 		{
-			const char* pFieldName = pPlayer->Acc().m_aPlantData[i].getField();
+			const char* pFieldName = pPlayer->Acc().m_aPlantData[i].getFieldName();
 			pPlayer->Acc().m_aPlantData[i] = pRes->getInt(pFieldName);
 			dbg_msg("test", "%d", (int)pPlayer->Acc().m_aPlantData[i]);
 		}

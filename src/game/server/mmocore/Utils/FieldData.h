@@ -212,7 +212,7 @@ public:
 		return &m_Data.m_Integer;
 	}
 
-	const char* getField() const { return m_Field.c_str(); }
+	const char* getFieldName() const { return m_Field.c_str(); }
 	const char* getName() const { return m_Name.c_str(); }
 };
 
@@ -245,7 +245,7 @@ public:
 		CNode* pHead = m_pHead;
 		while(pHead)
 		{
-			if(pHead->m_Data.getField() == FieldName)
+			if(pHead->m_Data.getFieldName() == FieldName)
 				return pHead->m_Data;
 			pHead = pHead->m_pNext;
 		}
