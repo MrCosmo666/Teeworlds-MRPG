@@ -556,7 +556,7 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 			}
 			else if(str_comp_num("PRC", pText + ParamTypeStart, 3) == 0)
 			{
-				const double pVarArgValue = static_cast<double>(va_arg(VarArgs, float));
+				const double pVarArgValue = va_arg(VarArgs, double);
 				AppendPercent(Buffer, BufferIter, pLanguage, pVarArgValue);
 			}
 
