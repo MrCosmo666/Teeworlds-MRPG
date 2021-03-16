@@ -22,7 +22,7 @@ jobs:
             
         - name: "Windows x64"
           os: windows-latest
-          cmake-args: -G "Visual Studio 16 2019" -A x64
+          cmake-args: -DSERVER_COMPILE=OFF -G "Visual Studio 16 2019" -A x64
           package-file: mmoteeworlds-win64.zip
           env:
             CFLAGS: /WX
