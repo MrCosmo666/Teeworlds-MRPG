@@ -6,8 +6,6 @@
 // There is an idea about automatic unloading from the database to save changes in the fields.
 // With the help of a list. In the future I think it will be necessary to achieve this
 
-#include <string>
-#include <typeinfo>
 
 // TODO: add exceptions
 

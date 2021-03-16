@@ -10,8 +10,6 @@
 
 #include <game/server/mmocore/Components/Inventory/InventoryCore.h>
 
-#include <cstdarg>
-
 void GuildJob::LoadGuildRank(int GuildID)
 {
 	// rank loading

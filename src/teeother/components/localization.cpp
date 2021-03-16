@@ -7,8 +7,6 @@
 
 #include "localization.h"
 
-#include <cstdarg>
-
 CLocalization::CLanguage::CLanguage()
 	: m_Loaded(false), m_Direction(CLocalization::DIRECTION_LTR),
 	m_pPluralRules(nullptr) , m_pValueFormater(nullptr), m_pNumberFormater(nullptr), m_pPercentFormater(nullptr)

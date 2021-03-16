@@ -3,8 +3,6 @@
 #ifndef GAME_SERVER_COMPONENT_AETHER_DATA_H
 #define GAME_SERVER_COMPONENT_AETHER_DATA_H
 
-#include <map>
-
 struct CAetherData
 {
 	int m_TeleX;

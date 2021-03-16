@@ -13,8 +13,6 @@
 
 #include <base/hash_ctxt.h>
 
-#include <teeother/tl/nlohmann_json.h>
-
 int CAccountCore::GetHistoryLatestCorrectWorldID(CPlayer* pPlayer) const
 {
 	const auto pWorldIterator = std::find_if(pPlayer->Acc().m_aHistoryWorld.begin(), pPlayer->Acc().m_aHistoryWorld.end(), [=](int WorldID)

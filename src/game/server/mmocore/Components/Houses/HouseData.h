@@ -3,8 +3,6 @@
 #ifndef GAME_SERVER_COMPONENT_HOUSE_DATA_H
 #define GAME_SERVER_COMPONENT_HOUSE_DATA_H
 
-#include <map>
-
 struct CHouseData
 {
 	int m_PosX;

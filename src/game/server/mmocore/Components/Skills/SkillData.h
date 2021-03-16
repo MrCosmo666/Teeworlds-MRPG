@@ -4,8 +4,6 @@
 #define GAME_SERVER_COMPONENT_SKILL_DATA_H
 #include "SkillDataInfo.h"
 
-#include <map>
-
 class CSkillData
 {
 	class CGS* m_pGS;
