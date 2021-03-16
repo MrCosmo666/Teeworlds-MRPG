@@ -3,13 +3,11 @@
 #include <base/color.h>
 #include <base/math.h>
 
-#include <engine/client.h>
-#include <engine/console.h>
 #include <engine/graphics.h>
 #include <engine/textrender.h>
 #include <engine/storage.h>
+#include <engine/shared/config.h>
 
-#include <generated/client_data.h>
 #include <game/client/localization.h>
 #include <game/client/render.h>
 #include "editor.h"
@@ -293,7 +291,7 @@ void CLayerTiles::FillSelection(bool Empty, CLayer *pBrush, CUIRect Rect)
 
 	if(m_LiveAutoMap)
 	{
-		RECTi r = {sx - 1, sy - 1, w + 2, h + 2};	
+		RECTi r = {sx - 1, sy - 1, w + 2, h + 2};
 		m_pEditor->m_Map.m_lImages[m_Image]->m_pAutoMapper->Proceed(this, m_SelectedRuleSet, r);
 	}
 

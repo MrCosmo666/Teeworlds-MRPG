@@ -1,9 +1,9 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-
 #include <base/color.h>
 #include <base/tl/array.h>
 
+#include <engine/shared/config.h>
 #include <engine/console.h>
 #include <engine/graphics.h>
 #include <engine/input.h>
@@ -12,7 +12,6 @@
 #include <engine/client.h>
 
 #include "editor.h"
-
 
 // popup menu handling
 static struct
@@ -1116,7 +1115,7 @@ int CEditor::PopupColorPicker(CEditor *pEditor, CUIRect View)
 	if(pEditor->UI()->DoPickerLogic(&s_SVPicker, &SVPicker, &X, &Y))
 	{
 		hsv.y = X/SVPicker.w;
-		hsv.z = 1.0f - Y/SVPicker.h;	
+		hsv.z = 1.0f - Y/SVPicker.h;
 	}
 
 	// hue slider
@@ -1157,9 +1156,9 @@ int CEditor::PopupColorPicker(CEditor *pEditor, CUIRect View)
 	static int s_HuePicker = 0;
 	if(pEditor->UI()->DoPickerLogic(&s_HuePicker, &HuePicker, &X, &Y))
 	{
-		hsv.x = 1.0f - Y/HuePicker.h;	
+		hsv.x = 1.0f - Y/HuePicker.h;
 	}
-	
+
 	// palette
 	static int s_Palette = 0;
 	pEditor->RenderTools()->DrawUIRect(&Palette, pEditor->m_SelectedColor, 0, 0.0f);

@@ -205,7 +205,6 @@ public:
 	vector4_base operator /(const vector4_base& v) const { return vector4_base(x/v.x, y/v.y, w/v.w, h/v.h); }
 	vector4_base operator /(const T v) const { return vector4_base(x/v, y/v, w/v, h/v); }
 
-	const vector4_base& operator =(const vector4_base& v) { x = v.x; y = v.y; w = v.w; h = v.h; return *this; }
 	const vector4_base& operator +=(const vector4_base& v) { x += v.x; y += v.y; w += v.w; h += v.h; return *this; }
 	const vector4_base& operator -=(const vector4_base& v) { x -= v.x; y -= v.y; w -= v.w; h -= v.h; return *this; }
 	const vector4_base& operator *=(const T v) { x *= v; y *= v; w *= v; h *= v; return *this; }
