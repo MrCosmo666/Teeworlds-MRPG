@@ -3,6 +3,10 @@ if(CMAKE_VERSION VERSION_LESS 3.12)
   cmake_policy(VERSION ${CMAKE_VERSION})
 endif()
 
+if(POLICY CMP0057)
+  cmake_policy(SET CMP0058 NEW)
+endif()
+
 file(STRINGS src/game/version.h VERSION_LINE
     LIMIT_COUNT 1
     REGEX GAME_RELEASE_VERSION
