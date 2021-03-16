@@ -3,6 +3,7 @@
 #include <cppconn/resultset.h>
 
 #include <functional>
+#include <memory>
 
 using namespace sql;
 #define SJK CConectionPool::GetInstance()
