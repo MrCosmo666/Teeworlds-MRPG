@@ -3,7 +3,7 @@ if(CMAKE_VERSION VERSION_LESS 3.12)
   cmake_policy(VERSION ${CMAKE_VERSION})
 endif()
 
-if(POLICY CMP0057)
+if(POLICY CMP0058)
   cmake_policy(SET CMP0058 NEW)
 endif()
 
