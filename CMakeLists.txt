@@ -271,6 +271,8 @@ find_package(MySQL)
 find_package(DiscordGameSDK)
 find_package(GLEW)
 
+include(PrecompiledHeader)
+  
 if(TARGET_OS AND TARGET_OS STREQUAL "linux")
   find_package(Boost 1.36.0)
   if(NOT(Boost_FOUND))
@@ -876,6 +878,7 @@ if(SERVER_COMPILE)
 
   target_include_directories(${TARGET_SERVER} PRIVATE ${SERVER_INCLUDES_DIRS})
   target_link_libraries(${TARGET_SERVER} ${LIBS} ${SERVER_LIBRARIES})
+  add_precompiled_header(${TARGET_SERVER} engine/server/apch/stdpch.h SOURCE_CXX src/engine/server/apch/stdpch.cpp FORCEINCLUDE)
 
   list(APPEND TARGETS_OWN ${TARGET_SERVER})
   list(APPEND TARGETS_LINK ${TARGET_SERVER})
@@ -888,11 +891,6 @@ if(SERVER_COMPILE)
     list(APPEND TARGETS_OWN ${TARGET_SERVER_LAUNCHER})
     list(APPEND TARGETS_LINK ${TARGET_SERVER_LAUNCHER})
   endif()
-
-  # pch
-  include(PrecompiledHeader)
-  add_precompiled_header(${TARGET_SERVER} engine/server/apch/stdpch.h SOURCE_CXX src/engine/server/apch/stdpch.cpp FORCEINCLUDE)
-
 endif()
 
 ########################################################################
