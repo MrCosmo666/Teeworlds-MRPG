@@ -5,6 +5,8 @@
 #include <engine/keys.h>
 #include "render.h"
 
+#include <algorithm>
+
 std::vector<CWindowUI*> CWindowUI::ms_aWindows;
 CUI* CWindowUI::m_pUI;
 CRenderTools* CWindowUI::m_pRenderTools;

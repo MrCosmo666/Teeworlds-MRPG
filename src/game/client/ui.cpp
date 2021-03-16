@@ -11,6 +11,7 @@
 #include <engine/textrender.h>
 #include <engine/shared/config.h>
 
+#include <algorithm>
 
 /********************************************************
  UI
