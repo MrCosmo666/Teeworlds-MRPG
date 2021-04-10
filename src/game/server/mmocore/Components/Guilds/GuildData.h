@@ -5,6 +5,8 @@
 
 #include <game/server/mmocore/Utils/FieldData.h>
 
+#include <map>
+
 struct CGuildData
 {
 	enum

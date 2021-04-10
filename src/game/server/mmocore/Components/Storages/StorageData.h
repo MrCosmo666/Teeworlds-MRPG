@@ -3,6 +3,8 @@
 #ifndef GAME_SERVER_COMPONENT_STORAGE_DATA_H
 #define GAME_SERVER_COMPONENT_STORAGE_DATA_H
 
+#include <map>
+
 struct CStorageData
 {
 	char m_aName[32];

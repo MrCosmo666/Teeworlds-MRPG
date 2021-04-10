@@ -36,6 +36,8 @@
 #include "mmocore/Components/Quests/QuestCore.h"
 #include "mmocore/Components/Skills/SkillsCore.h"
 
+#include <cstdarg>
+
 // static data that have the same value in different objects
 std::map < int, CGS::StructAttribut > CGS::ms_aAttributsInfo;
 std::map < std::string, int > CGS::ms_aEffects[MAX_PLAYERS];

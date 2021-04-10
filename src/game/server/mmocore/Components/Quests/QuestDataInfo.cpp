@@ -2,6 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include "QuestDataInfo.h"
 
+#include <algorithm>
+
 std::string CQuestDataInfo::GetJsonFileName(int AccountID) const { return "server_data/quest_tmp/" + std::to_string(m_QuestID) + "-" + std::to_string(AccountID) + ".json"; }
 
 std::map < int, CQuestDataInfo > CQuestDataInfo::ms_aDataQuests;

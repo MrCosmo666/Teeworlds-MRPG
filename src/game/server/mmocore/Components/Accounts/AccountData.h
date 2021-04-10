@@ -6,6 +6,9 @@
 #include <game/server/mmocore/Components/Shops/ShopData.h>
 #include <game/server/mmocore/Utils/FieldData.h>
 
+#include <list>
+#include <map>
+
 struct CAccountData
 {
 	// main

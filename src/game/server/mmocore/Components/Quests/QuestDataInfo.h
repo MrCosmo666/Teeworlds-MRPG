@@ -5,6 +5,8 @@
 
 #include "QuestStepDataInfo.h"
 
+#include <string>
+
 class CQuestDataInfo
 {
 public:

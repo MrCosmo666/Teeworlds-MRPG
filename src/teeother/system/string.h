@@ -1,11 +1,11 @@
 /*
  * Some parts of this file comes from other projects.
  * These parts are itendified in this file by the following block:
- *
+ * 
  * FOREIGN CODE BEGIN: ProjectName *************************************
- *
+ * 
  * FOREIGN CODE END: ProjectName ***************************************
- *
+ * 
  * If ProjectName is "TeeWorlds", then this part of the code follows the
  * TeeWorlds licence:
  *      (c) Magnus Auvinen. See licence.txt in the root of the
@@ -16,6 +16,7 @@
 #ifndef __SHARED_SYSTEM_STRING__
 #define __SHARED_SYSTEM_STRING__
 
+#include <cstdlib>
 #include <base/math.h>
 #include <base/system.h>
 
@@ -25,37 +26,37 @@ class _fixed_string_core
 {
 private:
 	char m_aBuffer[SIZE];
-
+	
 	 //throw a compilation error if the object is copied
 	_fixed_string_core(const _fixed_string_core&);
 	_fixed_string_core& operator=(const _fixed_string_core&);
-
+	
 public:
 	_fixed_string_core()
 	{
 		m_aBuffer[0] = 0;
 	}
 
-	char* buffer() { return m_aBuffer; }
-	const char* buffer() const { return m_aBuffer; }
-	int maxsize() const { return SIZE; }
-
-	void copy(const char* pBuffer)
+	inline char* buffer() { return m_aBuffer; }
+	inline const char* buffer() const { return m_aBuffer; }
+	inline int maxsize() const { return SIZE; }
+	
+	inline void copy(const char* pBuffer)
 	{
 		str_copy(m_aBuffer, pBuffer, SIZE);
 	}
-
-	void transfert(_fixed_string_core& String)
+	
+	inline void transfert(_fixed_string_core& String)
 	{
 		copy((const char*) String.buffer());
 	}
-
-	void append_at(int Pos, const char* pBuffer)
+	
+	inline void append_at(int Pos, const char* pBuffer)
 	{
 		str_append(m_aBuffer+Pos, pBuffer, SIZE-Pos);
 	}
-
-	void append_at_num(int Pos, const char* pBuffer, int num)
+	
+	inline void append_at_num(int Pos, const char* pBuffer, int num)
 	{
 		str_append_num(m_aBuffer+Pos, pBuffer, SIZE-Pos, num);
 	}
@@ -69,7 +70,7 @@ private:
 	char* m_pBuffer;
 	int m_MaxSize;
 
-private:
+private:	
 	 //throw a compilation error if the object is copied
 	_dynamic_string_core(const _dynamic_string_core&);
 	_dynamic_string_core& operator=(const _dynamic_string_core&);
@@ -81,13 +82,13 @@ public:
 	{
 		resize_buffer(INITIALSIZE);
 	}
-
+	
 	~_dynamic_string_core()
 	{
 		if(m_pBuffer)
 			delete[] m_pBuffer;
 	}
-
+	
 	void resize_buffer(int Size)
 	{
 		if(m_pBuffer)
@@ -106,31 +107,31 @@ public:
 		}
 	}
 
-	char* buffer() { return m_pBuffer; }
-	const char* buffer() const { return m_pBuffer; }
-	int maxsize() const { return m_MaxSize; }
-
-	void copy(const char* pBuffer)
+	inline char* buffer() { return m_pBuffer; }
+	inline const char* buffer() const { return m_pBuffer; }
+	inline int maxsize() const { return m_MaxSize; }
+	
+	inline void copy(const char* pBuffer)
 	{
 		int Size = str_length(pBuffer)+1;
 		if(Size > m_MaxSize)
 			resize_buffer(Size);
-
+		
 		str_copy(m_pBuffer, pBuffer, m_MaxSize);
 	}
-
-	void transfert(_dynamic_string_core& String)
+	
+	inline void transfert(_dynamic_string_core& String)
 	{
 		if(m_pBuffer)
 			delete[] m_pBuffer;
-
+		
 		m_pBuffer = String.m_pBuffer;
 		m_MaxSize = String.m_MaxSize;
 		String.m_pBuffer = NULL;
 		String.m_MaxSize = 0;
 	}
-
-	int append_at(int Pos, const char* pBuffer)
+	
+	inline int append_at(int Pos, const char* pBuffer)
 	{
 		const int BufferSize = str_length(pBuffer);
 		const int Size = Pos+BufferSize+1;
@@ -139,16 +140,16 @@ public:
 			int NewSize = m_MaxSize*2;
 			while(Size > NewSize)
 				NewSize *= 2;
-
+			
 			resize_buffer(NewSize);
 		}
-
+		
 		str_append(m_pBuffer+Pos, pBuffer, m_MaxSize-Pos);
-
+		
 		return min(Pos + BufferSize, m_MaxSize-1);
 	}
-
-	int append_at_num(int Pos, const char* pBuffer, int Num)
+	
+	inline int append_at_num(int Pos, const char* pBuffer, int Num)
 	{
 		const int Size = Pos+Num+1;
 		if(Size > m_MaxSize)
@@ -156,12 +157,12 @@ public:
 			int NewSize = m_MaxSize*2;
 			while(Size > NewSize)
 				NewSize *= 2;
-
+			
 			resize_buffer(NewSize);
 		}
-
+		
 		str_append_num(m_pBuffer+Pos, pBuffer, m_MaxSize-Pos, Num);
-
+		
 		return min(Pos + Num, m_MaxSize-1);
 	}
 };
@@ -173,54 +174,54 @@ public:
 	string() :
 		BASE()
 	{
-
+		
 	}
-
+	
 	string(const char* pBuffer) :
 		BASE()
 	{
 		BASE::copy(pBuffer);
 	}
-
-	int length() const { return str_length(BASE::buffer()); }
-	void clear() { BASE::buffer()[0] = 0; }
-	bool empty() const { return (BASE::buffer()[0] == 0); }
-
-	void copy(const char* pBuffer) { BASE::copy(pBuffer); }
-
+	
+	inline int length() const { return str_length(BASE::buffer()); }
+	inline void clear() { BASE::buffer()[0] = 0; }
+	inline bool empty() const { return (BASE::buffer()[0] == 0); }
+	
+	inline void copy(const char* pBuffer) { BASE::copy(pBuffer); }
+	
 	template<typename STR>
-	void copy(const STR& str)
+	inline void copy(const STR& str)
 	{
 		BASE::copy(str.buffer());
 	}
-
-	void append(const char* pBuffer) { BASE::append_at(length(), pBuffer); }
-
+	
+	inline void append(const char* pBuffer) { BASE::append_at(length(), pBuffer); }
+	
 	template<typename STR>
-	void append(const STR& str)
+	inline void append(const STR& str)
 	{
 		BASE::append_at(length(), str.buffer());
 	}
-
-	void append_num(const char* pBuffer, int num) { BASE::append_at_num(length(), pBuffer, num); }
-
+	
+	inline void append_num(const char* pBuffer, int num) { BASE::append_at_num(length(), pBuffer, num); }
+	
 	template<typename STR>
-	void append_num(const STR& str, int num)
+	inline void append_num(const STR& str, int num)
 	{
 		BASE::append_at_num(length(), str.buffer(), num);
 	}
-
+	
 	bool operator<(const char* buffer) const
 	{
 		return (str_comp(BASE::buffer(), buffer) < 0);
 	}
-
+	
 	template<typename STR>
 	bool operator<(const STR& str) const
 	{
 		return (str_comp(BASE::buffer(), str.buffer()) < 0);
 	}
-
+	
 	bool operator>(const char* buffer) const
 	{
 		return (str_comp(BASE::buffer(), buffer) > 0);
@@ -231,7 +232,7 @@ public:
 	{
 		return (str_comp(BASE::buffer(), str.buffer()) > 0);
 	}
-
+	
 	bool operator==(const char* buffer) const
 	{
 		return (str_comp(BASE::buffer(), buffer) == 0);
@@ -242,7 +243,7 @@ public:
 	{
 		return (str_comp(BASE::buffer(), str.buffer()) == 0);
 	}
-
+	
 	bool operator!=(const char* buffer) const
 	{
 		return (str_comp(BASE::buffer(), buffer) != 0);

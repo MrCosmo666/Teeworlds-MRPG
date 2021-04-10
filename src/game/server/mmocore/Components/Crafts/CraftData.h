@@ -3,6 +3,8 @@
 #ifndef GAME_SERVER_COMPONENT_CRAFT_DATA_H
 #define GAME_SERVER_COMPONENT_CRAFT_DATA_H
 
+#include <map>
+
 struct CCraftData
 {
 	int m_aItemNeedID[3];

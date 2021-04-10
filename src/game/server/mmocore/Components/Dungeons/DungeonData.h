@@ -3,6 +3,8 @@
 #ifndef GAME_SERVER_COMPONENT_DUNGEON_DATA_H
 #define GAME_SERVER_COMPONENT_DUNGEON_DATA_H
 
+#include <map>
+
 struct CDungeonData
 {
 	char m_aName[64];

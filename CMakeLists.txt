@@ -3,10 +3,6 @@ if(CMAKE_VERSION VERSION_LESS 3.12)
   cmake_policy(VERSION ${CMAKE_VERSION})
 endif()
 
-if(POLICY CMP0058)
-  cmake_policy(SET CMP0058 NEW)
-endif()
-
 file(STRINGS src/game/version.h VERSION_LINE
     LIMIT_COUNT 1
     REGEX GAME_RELEASE_VERSION
@@ -275,8 +271,6 @@ find_package(MySQL)
 find_package(DiscordGameSDK)
 find_package(GLEW)
 
-include(PrecompiledHeader)
-  
 if(TARGET_OS AND TARGET_OS STREQUAL "linux")
   find_package(Boost 1.36.0)
   if(NOT(Boost_FOUND))
@@ -838,7 +832,7 @@ endif()
 
 if(SERVER_COMPILE)
   # Sources
-  file(GLOB ENGINE_SERVER "src/engine/server/*.cpp" "src/engine/server/*.h" "src/engine/server/discord/*.cpp" "src/engine/server/discord/*.h")
+  file(GLOB_RECURSE ENGINE_SERVER "src/engine/server/*.cpp" "src/engine/server/*.h")
   file(GLOB_RECURSE GAME_SERVER "src/game/server/*.cpp" "src/game/server/*.h")
   file(GLOB LOCALIZED_SERVER "src/teeother/components/*.cpp" "src/teeother/components/*.h" "src/teeother/tl/*.h" "src/teeother/system/*.h")
   set(GAME_GENERATED_SERVER src/generated/server_data.cpp src/generated/server_data.h)
@@ -871,8 +865,6 @@ if(SERVER_COMPILE)
   # Target
   set(TARGET_SERVER ${SERVER_EXECUTABLE})
   add_executable(${TARGET_SERVER}
-    src/engine/server/apch/stdpch.cpp
-    src/engine/server/apch/stdpch.h
     ${SERVER_SRC}
     ${SERVER_ICON}
     ${DEPS_SERVER}
@@ -882,7 +874,6 @@ if(SERVER_COMPILE)
 
   target_include_directories(${TARGET_SERVER} PRIVATE ${SERVER_INCLUDES_DIRS})
   target_link_libraries(${TARGET_SERVER} ${LIBS} ${SERVER_LIBRARIES})
-  add_precompiled_header(${TARGET_SERVER} engine/server/apch/stdpch.h SOURCE_CXX src/engine/server/apch/stdpch.cpp FORCEINCLUDE)
 
   list(APPEND TARGETS_OWN ${TARGET_SERVER})
   list(APPEND TARGETS_LINK ${TARGET_SERVER})
