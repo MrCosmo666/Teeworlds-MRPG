@@ -1,5 +1,6 @@
 from datatypes import *
 
+Dialogs = Enum("DIALOG_STYLE", ["MSGBOX", "INPUT", "LIST", "PASSWORD"])
 Pickups = Enum("PICKUP", ["HEALTH", "ARMOR", "GRENADE", "SHOTGUN", "LASER", "NINJA", "GUN", "HAMMER"])
 Emotes = Enum("EMOTE", ["NORMAL", "PAIN", "HAPPY", "SURPRISE", "ANGRY", "BLINK"])
 Emoticons = Enum("EMOTICON", ["OOP", "EXCLAMATION", "HEARTS", "DROP", "DOTDOT", "MUSIC", "SORRY", "GHOST", "SUSHI", "SPLATTEE", "DEVILTEE", "ZOMG", "ZZZ", "WTF", "EYES", "QUESTION"])
@@ -93,6 +94,7 @@ Enums = [
 	MoodType,
 	WorldType,
 	TalkedStyles,
+    Dialogs,
 ]
 
 Flags = [
@@ -674,4 +676,32 @@ Messages = [
 		NetStringStrict("m_pMsg"),
         # todo: add support sending items / after implementations of items / and from
 	]),
+    
+    # - - - -
+    # dialogs
+	NetMessage("DialogCommon", 
+    [
+        NetStringStrict("m_pTitle"),
+		NetStringStrict("m_pButton1"),
+		NetStringStrict("m_pButton2"),
+	]),
+
+    # dialog msgbox
+	NetMessage("Sv_Dialog_Msgbox:DialogCommon", 
+    [
+		NetStringStrict("m_pMsg"),
+	]),
+
+    # dialog input
+	NetMessage("Sv_Dialog_Input:DialogCommon", 
+    [
+		NetStringStrict("m_pMsg"),
+	]),
+    
+    # dialog list
+    NetMessage("Sv_Dialog_List:DialogCommon", []),
+    NetMessage("Sv_Dialog_List_AddItem", 
+    [
+        NetStringStrict("m_pTitle"),
+    ]),
 ]
