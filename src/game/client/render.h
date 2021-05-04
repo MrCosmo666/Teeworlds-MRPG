@@ -31,8 +31,7 @@ public:
 			m_aColors[i] = vec4(1,1,1,1);
 		m_Size = 1.0f;
 		m_GotAirJump = 1;
-	};
-
+	}
 	IGraphics::CTextureHandle m_aTextures[NUM_SKINPARTS];
 	IGraphics::CTextureHandle m_HatTexture;
 	IGraphics::CTextureHandle m_BotTexture;

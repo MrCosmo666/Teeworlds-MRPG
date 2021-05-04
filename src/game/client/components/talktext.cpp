@@ -90,7 +90,7 @@ void CTalkText::OnRender()
 	Graphics()->QuadsBegin();
 
 	RenderTools()->SelectSprite(m_TalkedEmoticionSpriteID);
-	IGraphics::CQuadItem QuadItem(PositionTalked.x, PositionTalked.y, PositionTalked.w, PositionTalked.h);
+	IGraphics::CQuadItem QuadItem(PositionTalked.x, PositionTalked.y, PositionTalked.z, PositionTalked.w);
 	Graphics()->QuadsDraw(&QuadItem, 1);
 
 	Graphics()->QuadsEnd();

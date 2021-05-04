@@ -6,7 +6,7 @@
 #include "elements.h"
 #include "value.h"
 
-CUIRect CValue::GetRect() { return { m_Value.x, m_Value.y, m_Value.w, m_Value.h }; }
+CUIRect CValue::GetRect() { return { m_Value.x, m_Value.y, m_Value.z, m_Value.w }; }
 
 CValue::CValue()
 {

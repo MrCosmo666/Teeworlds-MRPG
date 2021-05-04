@@ -10,7 +10,7 @@ CBlock::CBlock(class CAnimUI* pAnimUI, const char *Name) : CAnimElementsUI(pAnim
 
 void CBlock::Render()
 {
-	CUIRect Rect = { m_pPos->GetValue().x, m_pPos->GetValue().y, m_pPos->GetValue().w, m_pPos->GetValue().h };
+	CUIRect Rect = { m_pPos->GetValue().x, m_pPos->GetValue().y, m_pPos->GetValue().z, m_pPos->GetValue().w };
 	RenderTools()->DrawUIRect(&Rect, m_pColor->GetValue(), (int)m_CornerType, m_RoundCorner);
 }
 
