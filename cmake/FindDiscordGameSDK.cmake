@@ -61,7 +61,9 @@ if(DISCORDGAMESDK_BUNDLED AND TARGET_OS STREQUAL "windows")
     "${EXTRA_DISCORDGAMESDK_LIBDIR}/discord_game_sdk.dll"
   )
 else()
-  set(DISCORDGAMESDK_COPY_FILES)
+  set(DISCORDGAMESDK_COPY_FILES
+    "${EXTRA_DISCORDGAMESDK_LIBDIR}/libdiscordgamesdk.so"
+  )
 endif()
 
 list(APPEND TARGETS_DEP discordgamesdk)
