@@ -411,21 +411,36 @@ void CUI::DoLabel(const CUIRect* pRect, const char* pText, float FontSize, EAlig
 	// TODO: FIX ME!!!!
 	//Graphics()->BlendNormal();
 
-	float TextX = pRect->x;
+	static CTextCursor s_Cursor;
+	s_Cursor.Reset();
+	s_Cursor.m_FontSize = FontSize;
+	s_Cursor.m_MaxWidth = LineWidth;
+	s_Cursor.m_MaxLines = 1;
+	s_Cursor.m_Align = Align;
+
+	if(MultiLine)
+	{
+		s_Cursor.m_Flags |= TEXTFLAG_ALLOW_NEWLINE;
+		s_Cursor.m_MaxLines = -1;
+	}
+
 	switch(Align)
 	{
-	case ALIGN_CENTER:
-		TextX += pRect->w / 2.0f - TextRender()->TextWidth(0, FontSize, pText, -1, LineWidth) / 2.0f;
+	case CUI::ALIGN_LEFT:
+		s_Cursor.m_Align = TEXTALIGN_LEFT;
+		s_Cursor.MoveTo(pRect->x, pRect->y);
 		break;
-	case ALIGN_LEFT:
-		// default is left aligned
+	case CUI::ALIGN_CENTER:
+		s_Cursor.m_Align = TEXTALIGN_CENTER;
+		s_Cursor.MoveTo(pRect->x + pRect->w / 2.0f, pRect->y);
 		break;
-	case ALIGN_RIGHT:
-		TextX += pRect->w - TextRender()->TextWidth(0, FontSize, pText, -1, LineWidth);
+	case CUI::ALIGN_RIGHT:
+		s_Cursor.m_Align = TEXTALIGN_RIGHT;
+		s_Cursor.MoveTo(pRect->x + pRect->w, pRect->y);
 		break;
 	}
 
-	TextRender()->Text(0, TextX, pRect->y - FontSize / 10.0f, FontSize, pText, LineWidth, MultiLine);
+	TextRender()->TextOutlined(&s_Cursor, pText, -1);
 }
 
 void CUI::DoLabelColored(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, vec4 Color, float LineWidth, bool MultiLine) const
@@ -437,22 +452,26 @@ void CUI::DoLabelColored(const CUIRect* pRect, const char* pText, float FontSize
 
 void CUI::DoLabelHighlighted(const CUIRect* pRect, const char* pText, const char* pHighlighted, float FontSize, const vec4& TextColor, const vec4& HighlightColor) const
 {
-	CTextCursor Cursor;
-	TextRender()->SetCursor(&Cursor, pRect->x, pRect->y, FontSize, TEXTFLAG_RENDER | TEXTFLAG_STOP_AT_END);
-	Cursor.m_LineWidth = pRect->w;
+	static CTextCursor s_Cursor;
+	s_Cursor.Reset();
+	s_Cursor.m_FontSize = FontSize;
+	s_Cursor.m_MaxWidth = pRect->w;
+	s_Cursor.MoveTo(pRect->x, pRect->y);
 
 	TextRender()->TextColor(TextColor);
 	const char* pMatch = pHighlighted && pHighlighted[0] ? str_find_nocase(pText, pHighlighted) : 0;
 	if(pMatch)
 	{
-		TextRender()->TextEx(&Cursor, pText, (int)(pMatch - pText));
+		TextRender()->TextDeferred(&s_Cursor, pText, (int)(pMatch - pText));
 		TextRender()->TextColor(HighlightColor);
-		TextRender()->TextEx(&Cursor, pMatch, str_length(pHighlighted));
+		TextRender()->TextDeferred(&s_Cursor, pMatch, str_length(pHighlighted));
 		TextRender()->TextColor(TextColor);
-		TextRender()->TextEx(&Cursor, pMatch + str_length(pHighlighted), -1);
+		TextRender()->TextDeferred(&s_Cursor, pMatch + str_length(pHighlighted), -1);
 	}
 	else
-		TextRender()->TextEx(&Cursor, pText, -1);
+		TextRender()->TextDeferred(&s_Cursor, pText, -1);
+
+	TextRender()->DrawTextOutlined(&s_Cursor);
 }
 
 // TODO: improve

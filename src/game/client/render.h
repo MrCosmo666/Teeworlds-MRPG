@@ -95,14 +95,14 @@ public:
 		float OffsetX, float OffsetY, float Aspect, float Zoom, float aPoints[4]);
 	void MapScreenToGroup(float CenterX, float CenterY, CMapItemGroup *pGroup, float Zoom);
 
-	void DrawClientID(ITextRender* pTextRender, CTextCursor* pCursor, int ID,
+	float DrawClientID(ITextRender* pTextRender, float FontSize, vec2 Position, int ID,
 					  const vec4& BgColor = vec4(1, 1, 1, 0.5f), const vec4& TextColor = vec4(0.1f, 0.1f, 0.1f, 1.0f));
 	float GetClientIdRectSize(float FontSize);
 
 	// mrpg client
 	void RenderWings(CAnimState* pAnim, int SpriteID, vec2 Dir, vec2 Pos, vec2 PosWings, vec2 Size);
 	void DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color, int Num, int Max, const char* pText, const int Shares, const float Rounding = 2.0f, const float MarginSize = 0.0f, float FontOffset = 0.0f);
-	void DrawUIText(ITextRender* pTextRender, CTextCursor* pCursor, const char* pText,
+	float DrawUIText(ITextRender* pTextRender, vec2 CursorPosition, const char* pText,
 		const vec4& BgColor, const vec4& TextColor, float FontSize);
 };
 

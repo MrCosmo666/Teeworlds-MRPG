@@ -52,7 +52,9 @@ void CInventorySlot::Render()
 		char aCountBuf[32];
 		str_format(aCountBuf, sizeof(aCountBuf), "%d%s", min(999, m_Count), (m_Count > 999 ? "+" : "\0"));
 		m_pInventory->m_pClient->m_pMenus->DoItemIcon(m_aIcon, m_RectSlot, INVSLOT_BOXSIZE);
-		m_pInventory->TextRender()->Text(0x0, m_RectSlot.x, m_RectSlot.y, 10.0f, aCountBuf, -1.0f);
+
+		CTextCursor Cursor(10.0f, m_RectSlot.x, m_RectSlot.y);
+		m_pInventory->TextRender()->TextDeferred(&Cursor, aCountBuf, -1.0f);
 	}
 }
 
@@ -178,20 +180,23 @@ void CInventorySlot::OnHoveredSlot()
 	if(!IsEmptySlot())
 	{
 		const float FontDescSize = 10.0f;
-		const float TextNameWidth = m_pInventory->TextRender()->TextWidth(0, FontDescSize, m_aName, -1, -1.0f);
-		const float TextDescWidth = m_pInventory->TextRender()->TextWidth(0, FontDescSize, m_aDesc, -1, -1.0f);
+		const float TextNameWidth = m_pInventory->TextRender()->TextWidth(FontDescSize, m_aName, -1);
+		const float TextDescWidth = m_pInventory->TextRender()->TextWidth(FontDescSize, m_aDesc, -1);
 		const float BackgroundWidth = 50.0f + TextNameWidth;
 		const float BackgroundHeight = 25.0f + (float)ceil(TextDescWidth / BackgroundWidth) * FontDescSize;
 		CUIRect Background = { m_pInventory->m_PositionMouse.x, m_pInventory->m_PositionMouse.y - BackgroundHeight, BackgroundWidth, BackgroundHeight };
 		m_pInventory->RenderTools()->DrawRoundRect(&Background, vec4(0.0f, 0.0f, 0.0f, 0.4f), 8.0f);
-		m_pInventory->TextRender()->Text(nullptr, Background.x, Background.y, 14.0f, m_aName, -1.0f);
+
+		CTextCursor Cursor(14.0f, Background.x, Background.y);
+		m_pInventory->TextRender()->TextDeferred(&Cursor, m_aName, -1.0f);
 
 		CUIRect Label;
-		CTextCursor Cursor;
 		Background.HSplitTop(15.0f, 0, &Label);
-		m_pInventory->TextRender()->SetCursor(&Cursor, Label.x, Label.y, FontDescSize, TEXTFLAG_RENDER);
-		Cursor.m_LineWidth = Background.w;
+
+		Cursor.Reset();
+		Cursor.MoveTo(Label.x, Label.y);
+		Cursor.m_MaxWidth = Background.w;
 		Cursor.m_MaxLines = ceil(Background.h / FontDescSize);
-		m_pInventory->TextRender()->TextEx(&Cursor, m_aDesc, -1);
+		m_pInventory->TextRender()->TextDeferred(&Cursor, m_aDesc, -1);
 	}
 }

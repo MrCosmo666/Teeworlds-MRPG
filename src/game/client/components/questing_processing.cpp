@@ -100,7 +100,8 @@ void CQuestingProcessing::OnRender()
 
 	// ---------------- TEXT (Quest Task List) ----------------
 	// --------------------------------------------------------
-	TextRender()->Text(0x0, BackgroundMain.x, BackgroundMain.y - 30.0f, 42.0f, Localize("Quest Task List"), -1.0f);
+	CTextCursor Cursor(42.0f, BackgroundMain.x, BackgroundMain.y - 24.f);
+	TextRender()->TextShadowed(&Cursor, Localize("Quest Task List"), -1.0f, vec2(0.5f, 0.8f));
 }
 
 void CQuestingProcessing::OnMessage(int MsgType, void *pRawMsg)

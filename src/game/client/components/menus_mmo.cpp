@@ -196,7 +196,7 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		static CButtonContainer s_ButtonDiscord;
 		MainView.HSplitTop(16.0f, &DiscordLink, &MainView);
 		const char* pURL = "https://mrpg.teeworlds.dev";
-		float TextWidth = TextRender()->TextWidth(0, 12.0f, pURL, -1, -1);
+		float TextWidth = TextRender()->TextWidth(12.0f, pURL, -1);
 		DiscordLink.x = DiscordLink.x + (DiscordLink.w / 2.0f) - (TextWidth / 2.0f);
 		DiscordLink.w = TextWidth;
 
@@ -384,7 +384,8 @@ int GatherFonts(const char *pFileName, int IsDir, int Type, void *pUser)
 
 void CMenus::RenderFontSelection(CUIRect MainView)
 {
-	static CListBox s_ListBox;
+// TODO: update fonts
+/*	static CListBox s_ListBox;
 	static int s_SelectedFont = 0;
 	static sorted_array<CFontFile> s_Fonts;
 
@@ -429,7 +430,7 @@ void CMenus::RenderFontSelection(CUIRect MainView)
 			io_close(File);
 
 		TextRender()->SetDefaultFont(TextRender()->LoadFont(aFontPath));
-	}
+	}*/
 }
 
 void CMenus::PreparationLeftRightSide(const char* pName, CUIRect MainView, CUIRect *LeftSide, CUIRect *RightSide, const float Spacing, const float ButtonHeight)

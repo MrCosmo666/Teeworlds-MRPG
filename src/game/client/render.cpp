@@ -661,51 +661,38 @@ void CRenderTools::MapScreenToGroup(float CenterX, float CenterY, CMapItemGroup 
 	Graphics()->MapScreen(aPoints[0], aPoints[1], aPoints[2], aPoints[3]);
 }
 
-void CRenderTools::DrawClientID(ITextRender* pTextRender, CTextCursor* pCursor, int ID,
-								const vec4& BgColor, const vec4& TextColor)
+float CRenderTools::DrawClientID(ITextRender* pTextRender, float FontSize, vec2 CursorPosition, int ID,
+	const vec4& BgColor, const vec4& TextColor)
 {
-	if(!g_Config.m_ClShowUserId) return;
+	if(!g_Config.m_ClShowUserId) return 0;
 
-	char aBuff[4];
-	str_format(aBuff, sizeof(aBuff), "%2d ", ID);
+	char aBuf[4];
+	str_format(aBuf, sizeof(aBuf), "%d", ID);
 
-	const float LinebaseY = pTextRender->TextGetLineBaseY(pCursor);
+	static CTextCursor s_Cursor;
+	s_Cursor.Reset();
+	s_Cursor.m_FontSize = FontSize;
+	s_Cursor.m_Align = TEXTALIGN_CENTER;
 
-	float ScreenX0, ScreenY0, ScreenX1, ScreenY1;
-	Graphics()->GetScreen(&ScreenX0, &ScreenY0, &ScreenX1, &ScreenY1);
-	float FakeToScreenY = (Graphics()->ScreenHeight()/(ScreenY1-ScreenY0));
-	float FontSize = (int)(pCursor->m_FontSize * FakeToScreenY)/FakeToScreenY;
+	vec4 OldColor = pTextRender->GetColor();
+	pTextRender->TextColor(TextColor);
+	pTextRender->TextDeferred(&s_Cursor, aBuf, -1);
+	pTextRender->TextColor(OldColor);
 
+	const float LinebaseY = CursorPosition.y + s_Cursor.BaseLineY();
 	const float Width = 1.4f * FontSize;
-	float OffsetY = 0.0f;
-
-	// jump to the next line when reaching the line width
-	if ((pCursor->m_Flags & (TEXTFLAG_ALLOW_NEWLINE | TEXTFLAG_STOP_AT_END)) && pCursor->m_LineWidth > 0.0f && pCursor->m_LineWidth + pCursor->m_StartX < pCursor->m_X + Width)
-	{
-		pCursor->m_X = pCursor->m_StartX;
-		pCursor->m_Y += FontSize;
-		pCursor->m_LineCount += 1;
-		OffsetY += FontSize;
-	}
-
-	// abort when exceeding the maximum numbers of lines
-	if (pCursor->m_MaxLines > 0 && pCursor->m_LineCount > pCursor->m_MaxLines)
-		return;
 
 	CUIRect Rect;
-	Rect.x = pCursor->m_X;
-	Rect.y = LinebaseY - FontSize + 0.025f * FontSize + OffsetY;
+	Rect.x = CursorPosition.x;
+	Rect.y = LinebaseY - FontSize + 0.15f * FontSize;
 	Rect.w = Width;
 	Rect.h = FontSize;
 	DrawRoundRect(&Rect, BgColor, 0.25f * FontSize);
 
-	const float PrevX = pCursor->m_X;
-	pCursor->m_X += (ID < 10 ? 0.04f: 0.0f) * FontSize;
+	s_Cursor.MoveTo(Rect.x + Rect.w / 2.0f, CursorPosition.y);
+	pTextRender->DrawTextPlain(&s_Cursor);
 
-	// TODO: make a simple text one (no shadow)
-	pTextRender->TextShadowed(pCursor, aBuff, -1, vec2(0,0), vec4(0,0,0,0), TextColor);
-
-	pCursor->m_X = PrevX + Rect.w + 0.2f * FontSize;
+	return Width + 0.2f * FontSize;
 }
 
 float CRenderTools::GetClientIdRectSize(float FontSize)
@@ -715,25 +702,32 @@ float CRenderTools::GetClientIdRectSize(float FontSize)
 }
 
 // mrpg client
-void CRenderTools::DrawUIText(ITextRender* pTextRender, CTextCursor* pCursor, const char* pText,
+float CRenderTools::DrawUIText(ITextRender* pTextRender, vec2 CursorPosition, const char* pText,
 	const vec4& BgColor, const vec4& TextColor, float FontSize)
 {
-	// abort when exceeding the maximum numbers of lines
-	if (pCursor->m_MaxLines > 0 && pCursor->m_LineCount > pCursor->m_MaxLines)
-		return;
+	static CTextCursor s_Cursor;
+	s_Cursor.Reset();
+	s_Cursor.m_FontSize = FontSize;
+	s_Cursor.m_Align = TEXTALIGN_CENTER;
 
-	const float LinebaseY = pTextRender->TextGetLineBaseY(pCursor);
-	float tw = pTextRender->TextWidth(0, FontSize, pText, -1, -1.0f);
+	vec4 OldColor = pTextRender->GetColor();
+	pTextRender->TextColor(TextColor);
+	pTextRender->TextDeferred(&s_Cursor, pText, -1);
+	pTextRender->TextColor(OldColor);
+
+	const float LinebaseY = CursorPosition.y + s_Cursor.BaseLineY();
+	const float Width = 12.0f + pTextRender->TextWidth(FontSize, pText, -1);
 
 	CUIRect Rect;
-	Rect.x = pCursor->m_X;
-	Rect.y = LinebaseY - FontSize + 0.025f * FontSize;
-	Rect.w = tw;
+	Rect.x = CursorPosition.x;
+	Rect.y = LinebaseY - FontSize + 0.15f * FontSize;
+	Rect.w = Width;
 	Rect.h = FontSize;
 	DrawRoundRect(&Rect, BgColor, 0.25f * FontSize);
 
-	// TODO: make a simple text one (no shadow)
-	pTextRender->TextShadowed(pCursor, pText, -1, vec2(0, 0), vec4(0, 0, 0, 0), TextColor);
+	s_Cursor.MoveTo(Rect.x + Rect.w / 2.0f, CursorPosition.y);
+	pTextRender->DrawTextOutlined(&s_Cursor);
+	return Rect.w + 4.0f;
 }
 
 void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color, int Num, int Max, const char* pText, const int Shares, const float Rounding, const float MarginSize, float FontOffset)
@@ -748,7 +742,7 @@ void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color,
 	// Processing and centralizing the text by bar
 	const float FakeToScreenY = (Graphics()->ScreenHeight() / (ScreenY1 - ScreenY0));
 	const float FontSize = ((float)(BackgroundProgress.h * FakeToScreenY) / FakeToScreenY) - FontOffset;
-	const float TextWeidth = (float)pTextRender->TextWidth(nullptr, FontSize, pText, -1, -1.0f);
+	const float TextWeidth = (float)pTextRender->TextWidth(FontSize, pText, -1);
 	if (TextWeidth > Rect.w)
 	{
 		const float changesSize = TextWeidth - Rect.w;
@@ -766,9 +760,13 @@ void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color,
 	DrawUIRect4(&BackgroundProgress, Color, Color, Color / 1.1f, Color / 1.1f, 15, (Progress < Rounding ? Progress : Rounding));
 
 	// Cursor
-	CTextCursor Cursor;
+	static CTextCursor s_Cursor;
 	const float ProgressCursorX = (Rect.x + Rect.w / 2.0f) - TextWeidth / 2.0f;
-	pTextRender->SetCursor(&Cursor, ProgressCursorX, Rect.y, FontSize, TEXTFLAG_RENDER);
+
+	s_Cursor.Reset();
+	s_Cursor.m_FontSize = FontSize;
+	s_Cursor.MoveTo(ProgressCursorX, Rect.y);
+	pTextRender->TextDeferred(&s_Cursor, pText, -1);
 
 	// Shares
 	if (Shares)
@@ -789,10 +787,10 @@ void CRenderTools::DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color,
 
 	// Text
 	pTextRender->TextColor(1, 1, 1, 0.85f);
-	pTextRender->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.1f);
-	pTextRender->TextEx(&Cursor, pText, -1);
+	pTextRender->TextSecondaryColor(0.0f, 0.0f, 0.0f, 0.1f);
+	pTextRender->DrawTextPlain(&s_Cursor);
 	pTextRender->TextColor(1, 1, 1, 1);
-	pTextRender->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.3f);
+	pTextRender->TextSecondaryColor(0.0f, 0.0f, 0.0f, 0.3f);
 }
 
 void CRenderTools::RenderWings(CAnimState* pAnim, int SpriteID, vec2 Dir, vec2 Pos, vec2 PosWings, vec2 Size)

@@ -224,7 +224,7 @@ void CInventoryList::AddItem(int ItemID, int Count, const char* pName, const cha
 
 void CInventoryList::RenderTextRoundRect(CUIRect Rect, float Margin, float FontSize, const char* pText, float Rounding, bool* pHovored /* = nullptr */)
 {
-	const float TextWeidth = (float)m_pInventory->TextRender()->TextWidth(nullptr, FontSize, pText, -1, -1.0f);
+	const float TextWeidth = (float)m_pInventory->TextRender()->TextWidth(FontSize, pText, -1);
 	Rect.x -= (TextWeidth / 2.0f);
 	Rect.w = (TextWeidth + (Margin * 2.0f));
 	Rect.h = (FontSize + Rounding);
@@ -241,9 +241,10 @@ void CInventoryList::RenderTextRoundRect(CUIRect Rect, float Margin, float FontS
 		m_pInventory->RenderTools()->DrawRoundRect(&Rect, vec4(0.1f, 0.1f, 0.1f, 0.2f), Rounding);
 
 	Rect.Margin(Margin, &Rect);
-	m_pInventory->TextRender()->TextOutlineColor(0.0f, 0.0f, 0.0f, 0.1f);
-	m_pInventory->TextRender()->Text(0x0, Rect.x, Rect.y, FontSize, pText, -1.0f);
-	m_pInventory->TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+	m_pInventory->TextRender()->TextSecondaryColor(0.0f, 0.0f, 0.0f, 0.1f);
+	static CTextCursor Cursor(FontSize, Rect.x, Rect.y);
+	m_pInventory->TextRender()->TextDeferred(&Cursor, pText, -1.0f);
+	m_pInventory->TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 }
 
 void CInventoryList::ScrollInventoryPage(int Page)

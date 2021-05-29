@@ -374,13 +374,13 @@ void CMenus::RenderSkinSelection(CUIRect MainView)
 			if(Item.m_Selected)
 			{
 				TextRender()->TextColor(CUI::ms_HighlightTextColor);
-				TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
+				TextRender()->TextSecondaryColor(CUI::ms_HighlightTextOutlineColor);
 			}
 			UI()->DoLabel(&Label, s->m_aName, 10.0f, CUI::ALIGN_CENTER);
 			if(Item.m_Selected)
 			{
 				TextRender()->TextColor(CUI::ms_DefaultTextColor);
-				TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+				TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 			}
 		}
 	}
@@ -487,13 +487,13 @@ void CMenus::RenderSkinPartSelection(CUIRect MainView)
 			if(Item.m_Selected)
 			{
 				TextRender()->TextColor(CUI::ms_HighlightTextColor);
-				TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
+				TextRender()->TextSecondaryColor(CUI::ms_HighlightTextOutlineColor);
 			}
 			UI()->DoLabel(&Label, s->m_aName, 10.0f, CUI::ALIGN_CENTER);
 			if(Item.m_Selected)
 			{
 				TextRender()->TextColor(CUI::ms_DefaultTextColor);
-				TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+				TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 			}
 		}
 	}
@@ -747,14 +747,14 @@ void CMenus::RenderLanguageSelection(CUIRect MainView, bool Header)
 			if(Item.m_Selected)
 			{
 				TextRender()->TextColor(CUI::ms_HighlightTextColor);
-				TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
+				TextRender()->TextSecondaryColor(CUI::ms_HighlightTextOutlineColor);
 			}
 			Item.m_Rect.y += 2.0f;
 			UI()->DoLabel(&Item.m_Rect, r.front().m_Name, Item.m_Rect.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_LEFT);
 			if(Item.m_Selected)
 			{
 				TextRender()->TextColor(CUI::ms_DefaultTextColor);
-				TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+				TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 			}
 		}
 	}
@@ -765,6 +765,7 @@ void CMenus::RenderLanguageSelection(CUIRect MainView, bool Header)
 	{
 		m_ActiveListBox = ACTLB_LANG;
 		str_copy(g_Config.m_ClLanguagefile, s_Languages[s_SelectedLanguage].m_FileName, sizeof(g_Config.m_ClLanguagefile));
+		TextRender()->SetFontLanguageVariant(g_Config.m_ClLanguagefile);
 		g_Localization.Load(s_Languages[s_SelectedLanguage].m_FileName, Storage(), Console());
 	}
 }
@@ -841,14 +842,14 @@ void CMenus::RenderThemeSelection(CUIRect MainView, bool Header)
 		if(Item.m_Selected)
 		{
 			TextRender()->TextColor(CUI::ms_HighlightTextColor);
-			TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
+			TextRender()->TextSecondaryColor(CUI::ms_HighlightTextOutlineColor);
 		}
 		Item.m_Rect.y += 2.0f;
 		UI()->DoLabel(&Item.m_Rect, aName, Item.m_Rect.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_LEFT);
 		if(Item.m_Selected)
 		{
 			TextRender()->TextColor(CUI::ms_DefaultTextColor);
-			TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+			TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 		}
 	}
 
@@ -1627,14 +1628,14 @@ bool CMenus::DoResolutionList(CUIRect* pRect, CListBox* pListBox,
 			if(Item.m_Selected)
 			{
 				TextRender()->TextColor(CUI::ms_HighlightTextColor);
-				TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
+				TextRender()->TextSecondaryColor(CUI::ms_HighlightTextOutlineColor);
 			}
 			Item.m_Rect.y += 2.0f;
 			UI()->DoLabel(&Item.m_Rect, aBuf, Item.m_Rect.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_CENTER);
 			if(Item.m_Selected)
 			{
 				TextRender()->TextColor(CUI::ms_DefaultTextColor);
-				TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+				TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 			}
 		}
 	}

@@ -436,34 +436,9 @@ void CGameClient::OnInit()
 	m_pMenus->InitLoading(TotalWorkAmount);
 	m_pMenus->RenderLoading(4);
 
-	// loading font
-	char aFontName[256];
-	static CFont *pDefaultFont = 0;
-	str_format(aFontName, sizeof(aFontName), "fonts/%s", g_Config.m_ClFontfile);
-	IOHANDLE File = Storage()->OpenFile(aFontName, IOFLAG_READ, IStorageEngine::TYPE_ALL, aFontName, sizeof(aFontName));
-	if(File)
-	{
-		io_close(File);
-		pDefaultFont = TextRender()->LoadFont(aFontName);
-		if(!pDefaultFont)
-		{
-			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "failed to load font. filename='%s'", aFontName);
-			Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "gameclient", aBuf);
-		}
-	}
-	else
-	{
-		// loading standard font
-		IOHANDLE File = Storage()->OpenFile("fonts/DejaVuSans.ttf", IOFLAG_READ, IStorageEngine::TYPE_ALL, aFontName, sizeof(aFontName));
-		if (File)
-		{
-			io_close(File);
-			pDefaultFont = TextRender()->LoadFont(aFontName);
-			str_copy(g_Config.m_ClFontfile, "DejaVuSans.ttf", sizeof(g_Config.m_ClFontfile));
-		}
-	}
-	TextRender()->SetDefaultFont(pDefaultFont);
+
+	m_pTextRender->LoadFonts(Storage(), Console());
+	m_pTextRender->SetFontLanguageVariant(g_Config.m_ClLanguagefile);
 	m_pMenus->RenderLoading(1);
 
 	// set the language

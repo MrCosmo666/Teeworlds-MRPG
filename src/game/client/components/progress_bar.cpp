@@ -53,15 +53,18 @@ void CProgressBar::OnRender()
 			m_ProgressCount, m_ProgressRequest, aBuf, 5, 10.0f, 6.0f);
 
 		// ----------------------- TEXT ---------------------------
-		CTextCursor Cursor;
+		static CTextCursor s_Cursor;
 		float FontSize = 32.0f;
 		float CenterText = BackgroundMain.x + (BackgroundMain.w / 2.0f);
-		float tw = TextRender()->TextWidth(0, FontSize, m_ProgressText, -1, -1.0f);
+		float tw = TextRender()->TextWidth(FontSize, m_ProgressText, -1);
 		BackgroundMain.HSplitBottom(95.0f, 0, &BackgroundMain);
-		TextRender()->SetCursor(&Cursor, CenterText - tw / 2.0f, BackgroundMain.y, FontSize, TEXTFLAG_RENDER);
-		Cursor.m_LineWidth = BackgroundMain.w;
-		Cursor.m_MaxLines = ceil(BackgroundMain.h / FontSize);
-		TextRender()->TextEx(&Cursor, m_ProgressText, -1);
+
+		s_Cursor.Reset();
+		s_Cursor.m_FontSize = FontSize;
+		s_Cursor.MoveTo(CenterText - tw / 2.0f, BackgroundMain.y);
+		s_Cursor.m_MaxWidth = BackgroundMain.w;
+		s_Cursor.m_MaxLines = ceil(BackgroundMain.h / FontSize);
+		TextRender()->TextOutlined(&s_Cursor, m_ProgressText, -1);
 	}
 }
 
