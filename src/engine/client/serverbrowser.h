@@ -31,6 +31,7 @@ public:
 	void Refresh(int RefreshFlags);
 	bool IsRefreshing() const { return m_pFirstReqServer != 0; }
 	bool IsRefreshingMasters() const { return m_pMasterServer->IsRefreshing(); }
+	bool WasUpdated(bool Purge);
 	int LoadingProgression() const;
 
 	// mmotee
@@ -113,6 +114,7 @@ private:
 	int m_NumRequests;
 
 	int m_NeedRefresh;
+	bool m_InfoUpdated;
 
 	//mmotee
 	json_value *m_pMmoInfo;

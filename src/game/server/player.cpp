@@ -85,10 +85,7 @@ void CPlayer::Tick()
 	if (m_pCharacter)
 	{
 		if(m_pCharacter->IsAlive())
-		{
 			m_ViewPos = m_pCharacter->GetPos();
-			EffectsTick();
-		}
 		else
 		{
 			delete m_pCharacter;
@@ -115,7 +112,7 @@ void CPlayer::PostTick()
 
 void CPlayer::EffectsTick()
 {
-	if(Server()->Tick() % Server()->TickSpeed() != 0)
+	if(Server()->Tick() % Server()->TickSpeed() != 0 || CGS::ms_aEffects[m_ClientID].empty())
 		return;
 
 	for(auto pEffect = CGS::ms_aEffects[m_ClientID].begin(); pEffect != CGS::ms_aEffects[m_ClientID].end();)

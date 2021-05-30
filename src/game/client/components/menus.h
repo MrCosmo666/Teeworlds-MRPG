@@ -292,6 +292,7 @@ private:
 		POPUP_CONFIRM, // generic confirmation popup (two buttons)
 		POPUP_FIRST_LAUNCH,
 		POPUP_CONNECTING,
+		POPUP_LOADING_DEMO,
 		POPUP_LANGUAGE,
 		POPUP_COUNTRY,
 		POPUP_RENAME_DEMO,
@@ -501,6 +502,11 @@ private:
 	int m_DownloadLastCheckSize;
 	float m_DownloadSpeed;
 
+	// for demo loading popup
+	char m_aDemoLoadingFile[IO_MAX_PATH_LENGTH];
+	int m_DemoLoadingStorageType;
+	bool m_DemoLoadingPopupRendered;
+
 	// for password popup
 	char m_aPasswordPopupServerAddress[256];
 
@@ -698,26 +704,6 @@ private:
 	void Move(bool Up, int Filter);
 	void InitDefaultFilters();
 
-	class CInfoOverlay
-	{
-	public:
-		enum
-		{
-			OVERLAY_SERVERINFO=0,
-			OVERLAY_HEADERINFO,
-			OVERLAY_PLAYERSINFO,
-		};
-
-		int m_Type;
-		const void *m_pData;
-		float m_X;
-		float m_Y;
-		bool m_Reset;
-	};
-
-	CInfoOverlay m_InfoOverlay;
-	bool m_InfoOverlayActive;
-
 	struct CColumn
 	{
 		int m_ID;
@@ -862,7 +848,6 @@ private:
 	void RenderDetailScoreboard(CUIRect View, const CServerInfo* pInfo, int RowCount, const vec4& TextColor, const vec4& TextOutlineColor);
 	void RenderServerbrowserServerDetail(CUIRect View, const CServerInfo* pInfo);
 	void RenderServerbrowserBottomBox(CUIRect View);
-	void RenderServerbrowserOverlay();
 	void RenderFilterHeader(CUIRect View, int FilterIndex);
 	void PopupConfirmRemoveFilter();
 	void PopupConfirmCountryFilter();
@@ -873,7 +858,6 @@ private:
 	static void ConchainServerbrowserUpdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	static void ConchainServerbrowserSortingUpdate(IConsole::IResult* pResult, void* pUserData, IConsole::FCommandCallback pfnCallback, void* pCallbackUserData);
 	void DoFriendListEntry(CUIRect *pView, CFriendItem *pFriend, const void *pID, const CContactInfo *pFriendInfo, const CServerInfo *pServerInfo, bool Checked, bool Clan = false);
-	void SetOverlay(int Type, float x, float y, const void *pData);
 	void UpdateFriendCounter(const CServerInfo *pEntry);
 	void UpdateFriends();
 
@@ -987,5 +971,7 @@ public:
 	virtual bool OnInput(IInput::CEvent Event);
 
 	virtual bool OnCursorMove(float x, float y, int CursorType);
+
+	static void Con_Play(IConsole::IResult* pResult, void* pUserData);
 };
 #endif

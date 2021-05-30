@@ -19,10 +19,10 @@
 #include "maplayers.h"
 #include "menus.h"
 
-CMenus::CColumn CMenus::ms_aDemoCols[] = {
-	{COL_DEMO_NAME,		CMenus::SORT_DEMONAME, Localize("Name"), 0, 100.0f, 0, {0}, {0}, CUI::ALIGN_CENTER},
-	{COL_DEMO_LENGTH,	CMenus::SORT_LENGTH, Localize("Length"), 1, 80.0f, 0, {0}, {0}, CUI::ALIGN_CENTER},
-	{COL_DEMO_DATE,		CMenus::SORT_DATE, Localize("Date"), 1, 170.0f, 0, {0}, {0}, CUI::ALIGN_CENTER},
+CMenus::CColumn CMenus::ms_aDemoCols[] = { // Localize("Name"); Localize("Length"); Localize("Date"); - these strings are localized within CLocConstString
+	{COL_DEMO_NAME,		CMenus::SORT_DEMONAME, "Name", 0, 100.0f, 0, {0}, {0}, CUI::ALIGN_CENTER},
+	{COL_DEMO_LENGTH,	CMenus::SORT_LENGTH, "Length", 1, 80.0f, 0, {0}, {0}, CUI::ALIGN_CENTER},
+	{COL_DEMO_DATE,		CMenus::SORT_DATE, "Date", 1, 170.0f, 0, {0}, {0}, CUI::ALIGN_CENTER},
 };
 
 bool CMenus::FetchHeader(CDemoItem* pItem)
@@ -686,16 +686,10 @@ void CMenus::RenderDemoList(CUIRect MainView)
 			}
 			else // file
 			{
-				char aBuf[IO_MAX_PATH_LENGTH];
-				str_format(aBuf, sizeof(aBuf), "%s/%s", m_aCurrentDemoFolder, m_lDemos[m_DemolistSelectedIndex].m_aFilename);
-				const char* pError = Client()->DemoPlayer_Play(aBuf, m_lDemos[m_DemolistSelectedIndex].m_StorageType);
-				if(pError)
-					PopupMessage(Localize("Error loading demo"), pError, Localize("Ok"));
-				else
-				{
-					UI()->SetActiveItem(0);
-					return;
-				}
+				str_format(m_aDemoLoadingFile, sizeof(m_aDemoLoadingFile), "%s/%s", m_aCurrentDemoFolder, m_lDemos[m_DemolistSelectedIndex].m_aFilename);
+				m_DemoLoadingStorageType = m_lDemos[m_DemolistSelectedIndex].m_StorageType;
+				m_Popup = POPUP_LOADING_DEMO;
+				UI()->SetActiveItem(0);
 			}
 		}
 	}
@@ -769,17 +763,23 @@ float CMenus::RenderDemoDetails(CUIRect View)
 
 		CUIRect ButtonRight;
 		Button.VSplitMid(&Button, &ButtonRight);
-		float Size = float((m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapSize[0] << 24) | (m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapSize[1] << 16) |
-			(m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapSize[2] << 8) | (m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapSize[3])) / 1024.0f;
+		const float Size = float(bytes_be_to_uint(m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapSize)) / 1024.0f;
 		str_format(aBuf, sizeof(aBuf), Localize("%.3f KiB"), Size);
 		DoInfoBox(&Button, Localize("Size"), aBuf);
 
-		unsigned Crc = (m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapCrc[0] << 24) | (m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapCrc[1] << 16) |
-			(m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapCrc[2] << 8) | (m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapCrc[3]);
+		const unsigned Crc = bytes_be_to_uint(m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapCrc);
 		str_format(aBuf, sizeof(aBuf), "%08x", Crc);
 		DoInfoBox(&ButtonRight, Localize("Crc"), aBuf);
 	}
 
 	//unused
 	return 0.0f;
+}
+
+void CMenus::Con_Play(IConsole::IResult* pResult, void* pUserData)
+{
+	CMenus* pSelf = (CMenus*)pUserData;
+	str_copy(pSelf->m_aDemoLoadingFile, pResult->GetString(0), sizeof(pSelf->m_aDemoLoadingFile));
+	pSelf->m_DemoLoadingStorageType = IStorageEngine::TYPE_ALL;
+	pSelf->m_Popup = POPUP_LOADING_DEMO;
 }

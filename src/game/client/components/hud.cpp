@@ -738,23 +738,18 @@ void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetOb
 	str_format(aBuf, sizeof(aBuf), "%s. x%d, y%d", Client()->GetCurrentMapName(), pCharacter->m_X / 32, pCharacter->m_Y / 32);
 	TextRender()->TextOutlined(&s_Cursor, aBuf, -1);
 
-	// gold : box
-	IntsToStr(pClientStats->m_Gold, 6, aBuf);
-	float textWidth = TextRender()->TextWidth(5.0f, aBuf, -1);
-	Rect = { 5, 57.0f, textWidth + 16.0f, 9.0f };
-	RenderTools()->DrawUIRect(&Rect, vec4(0.3f, 0.1f, 0.0f, 0.15f), CUI::CORNER_ALL, 4.0f);
-
 	// gold : text
-	s_Cursor.Reset();
-	s_Cursor.MoveTo(Rect.x, 57.0f);
-	s_Cursor.m_FontSize = 5.0f;
-	m_pClient->m_pMenus->DoItemIcon("gold", { Rect.x, Rect.y - 2.0f, Rect.h, Rect.w }, 12.0f);
-	Rect.VSplitLeft(13.0f, 0, &Rect);
-	TextRender()->TextOutlined(&s_Cursor, aBuf, -1);
+	float FontGoldSize = 6.0f;
+	vec2 GoldInformationPosition = vec2(13.0f, 57.0f);
+	IntsToStr(pClientStats->m_Gold, 6, aBuf);
+	RenderTools()->DrawUIText(TextRender(), GoldInformationPosition, aBuf, vec4(0.4f, 0.12f, 0.0f, 0.3f), vec4(1.0f, 1.0f, 1.0f, 1.0f), FontGoldSize);
+
+	GoldInformationPosition.x -= 8.0f;
+	m_pClient->m_pMenus->DoItemIcon("gold", { GoldInformationPosition.x, GoldInformationPosition.y - 2.0f, Rect.h, Rect.w }, 12.0f);
 
 	// draw info effects
 	IntsToStr(pClientStats->m_Potions, 12, aBuf);
-	textWidth = TextRender()->TextWidth(5.0f, aBuf, -1);
+	float textWidth = TextRender()->TextWidth(5.0f, aBuf, -1);
 	if(textWidth > 2.0)
 	{
 		Rect = { 7.0f, 72.0f, textWidth + 10.0f, 9.0f };
@@ -1084,6 +1079,27 @@ void CHud::RenderCheckpoint()
 	}
 }
 
+void CHud::RenderLocalTime(float x)
+{
+	if(!m_pClient->m_pScoreboard->IsActive())
+		return;
+
+	//draw the box
+	Graphics()->BlendNormal();
+	CUIRect Rect = { x - 30.0f, 0.0f, 25.0f, 12.5f };
+	vec4 Color = vec4(0.0f, 0.0f, 0.0f, 0.4f);
+	RenderTools()->DrawUIRect(&Rect, Color, CUI::CORNER_B, 3.75f);
+
+	//draw the text
+	char aTimeStr[6];
+	str_timestamp_format(aTimeStr, sizeof(aTimeStr), "%H:%M");
+	static CTextCursor s_Cursor(5.0f);
+	s_Cursor.m_Align = TEXTALIGN_CENTER;
+	s_Cursor.Reset(aTimeStr[4]); // last digit always indicate changes
+	s_Cursor.MoveTo(Rect.x + Rect.w / 2, (12.5f - 7.5f) / 2.f);
+	TextRender()->TextOutlined(&s_Cursor, aTimeStr, -1);
+}
+
 void CHud::OnMessage(int MsgType, void* pRawMsg)
 {
 	if(MsgType == NETMSGTYPE_SV_CHECKPOINT)
@@ -1154,6 +1170,7 @@ void CHud::OnRender()
 			RenderConnectionWarning();
 		RenderTeambalanceWarning();
 		RenderVoting();
+		RenderLocalTime((m_Width / 7) * 3);
 	}
 	RenderCursor();
 }

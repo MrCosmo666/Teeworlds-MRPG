@@ -78,6 +78,9 @@ CMenus::CMenus()
 	m_UpArrowPressed = false;
 	m_DownArrowPressed = false;
 
+	m_aDemoLoadingFile[0] = 0;
+	m_DemoLoadingPopupRendered = false;
+
 	m_LastInput = time_get();
 
 	m_CursorActive = false;
@@ -629,7 +632,7 @@ void CMenus::DoScrollbarOptionLabeled(void* pID, int* pOption, const CUIRect* pR
 	ScrollBar.VMargin(4.0f, &ScrollBar);
 	Value = pScale->ToAbsolute(DoScrollbarH(pID, &ScrollBar, pScale->ToRelative(Value, 0, Max)), 0, Max);
 
-	if(UI()->HotItem() != pID && UI()->MouseHovered(pRect) && UI()->MouseButtonClicked(0))
+	if(UI()->HotItem() != pID && !UI()->CheckActiveItem(pID) && UI()->MouseHovered(pRect) && UI()->MouseButtonClicked(0))
 		Value = (Value + 1) % Num;
 
 	*pOption = clamp(Value, 0, Max);
@@ -1435,7 +1438,9 @@ void CMenus::UpdatedFilteredVideoModes()
 	{
 		const int G = gcd(m_aModes[i].m_Width, m_aModes[i].m_Height);
 		if(m_aModes[i].m_Width / G == DesktopWidthG &&
-			m_aModes[i].m_Height / G == DesktopHeightG)
+			m_aModes[i].m_Height / G == DesktopHeightG &&
+			m_aModes[i].m_Width <= Graphics()->DesktopWidth() &&
+			m_aModes[i].m_Height <= Graphics()->DesktopHeight())
 		{
 			m_lRecommendedVideoModes.add(m_aModes[i]);
 		}
@@ -1701,6 +1706,11 @@ void CMenus::Render()
 				NumOptions = 5;
 			}
 		}
+		else if(m_Popup == POPUP_LOADING_DEMO)
+		{
+			pTitle = Localize("Loading demo");
+			pExtraText = "";
+		}
 		else if(m_Popup == POPUP_LANGUAGE)
 		{
 			pTitle = Localize("Language");
@@ -1708,7 +1718,7 @@ void CMenus::Render()
 		}
 		else if(m_Popup == POPUP_COUNTRY)
 		{
-			pTitle = Localize("Country");
+			pTitle = Localize("Flag");
 			NumOptions = 8;
 		}
 		else if(m_Popup == POPUP_RENAME_DEMO)
@@ -1909,6 +1919,25 @@ void CMenus::Render()
 				CUIRect DownloadDataProgress = Screen;
 				Screen.HSplitBottom(10.0f, 0, &DownloadDataProgress);
 				RenderTools()->DrawUIBar(TextRender(), DownloadDataProgress, vec4(0.5f, 0.5f, 0.5f, 0.25f), Client()->MmoDownloadAmount(), Client()->MmoDownloadTotalsize(), "Download MRPG data files", 10, 4.0f, 1.0f);
+			}
+		}
+		else if(m_Popup == POPUP_LOADING_DEMO)
+		{
+			if(m_DemoLoadingPopupRendered)
+			{
+				m_Popup = POPUP_NONE;
+				m_DemoLoadingPopupRendered = false;
+				const char* pError = Client()->DemoPlayer_Play(m_aDemoLoadingFile, m_DemoLoadingStorageType);
+				if(pError)
+					PopupMessage(Localize("Error loading demo"), pError, Localize("Ok"));
+				m_aDemoLoadingFile[0] = 0;
+			}
+			else
+			{
+				Box.HSplitTop(27.0f, 0, &Box);
+				UI()->DoLabel(&Box, m_aDemoLoadingFile, FontSize, CUI::ALIGN_CENTER);
+				// wait until next frame to load the demo
+				m_DemoLoadingPopupRendered = true;
 			}
 		}
 		else if(m_Popup == POPUP_LANGUAGE)
@@ -2270,6 +2299,8 @@ bool CMenus::OnInput(IInput::CEvent e)
 void CMenus::OnConsoleInit()
 {
 	CUIElementBase::Init(this);
+
+	Console()->Register("play", "r[file]", CFGFLAG_CLIENT | CFGFLAG_STORE, Con_Play, this, "Play the file specified");
 }
 
 void CMenus::OnShutdown()

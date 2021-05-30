@@ -1650,6 +1650,20 @@ int str_utf8_check(const char *str);
 void str_utf8_copy_num(char* dst, const char* src, int dst_size, int num);
 
 /*
+	Function: str_utf8_stats
+		Determines the byte size and utf8 character count of a string.
+	Parameters:
+		str - Pointer to the string.
+		max_size - Maximum number of bytes to count.
+		size - Pointer to store size (number of non-zero bytes) of the string.
+		count - Pointer to store count of utf8 characters of the string.
+	Remarks:
+		- Assumes nothing about the encoding of the string.
+		  It's the users responsibility to make sure the bounds are aligned.
+*/
+void str_utf8_stats(const char* str, int max_size, int* size, int* count);
+
+/*
 	Function: shell_execute
 		Executes a given file.
 */

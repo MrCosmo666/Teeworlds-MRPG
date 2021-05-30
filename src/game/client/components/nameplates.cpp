@@ -161,11 +161,6 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 		TextRender()->TextSecondaryColor(0.0f, 0.0f, 0.0f, 0.5f * a);
 		TextRender()->TextColor(1.0f, 1.0f, 1.0f, a);
 
-		s_Cursor.Reset();
-		s_Cursor.MoveTo(Position.x - tw / 2.0f, Position.y - FontSize - 38.0f);
-		s_Cursor.m_FontSize = FontSize;
-		TextRender()->TextDeferred(&s_Cursor, aName, -1);
-
 		if(g_Config.m_ClNameplatesTeamcolors && m_pClient->m_GameInfo.m_GameFlags&GAMEFLAG_TEAMS)
 		{
 			if(m_pClient->m_aClients[ClientID].m_Team == TEAM_RED)
@@ -183,6 +178,11 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 			else if(m_pClient->m_aClients[ClientID].m_Team == TEAM_BLUE)
 				BgIdColor = vec4(0.7f, 0.7f, 1.0f, a * 0.5f);
 		}
+
+		s_Cursor.Reset();
+		s_Cursor.MoveTo(Position.x - tw / 2.0f, Position.y - FontSize - 38.0f);
+		s_Cursor.m_FontSize = FontSize;
+		TextRender()->TextDeferred(&s_Cursor, aName, -1);
 
 		if (a > 0.001f)
 		{
