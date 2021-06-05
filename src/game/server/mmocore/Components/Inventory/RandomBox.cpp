@@ -60,7 +60,7 @@ void CRandomBoxRandomizer::Tick()
 			// a case when a client changes the world or comes out while choosing a random object.
 			CItemData* pPlayerRandomItem = m_pPlayer ? &m_pPlayer->GetItem(pRandomItem->m_ItemID) : nullptr;
 			if(!m_pPlayer || (pPlayerRandomItem->Info().IsEnchantable() && pPlayerRandomItem->m_Count > 0))
-				GS()->SendInbox(m_PlayerAccountID, "Random Box", "Item was not received by you personally.", pRandomItem->m_ItemID, pRandomItem->m_Count);
+				GS()->SendInbox("System", m_PlayerAccountID, "Random Box", "Item was not received by you personally.", pRandomItem->m_ItemID, pRandomItem->m_Count);
 			else
 			{
 				m_pPlayer->GetItem(pRandomItem->m_ItemID).Add(pRandomItem->m_Count);

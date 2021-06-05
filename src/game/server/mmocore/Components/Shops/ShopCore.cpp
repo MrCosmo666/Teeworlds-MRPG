@@ -228,7 +228,7 @@ void CShopCore::CheckAuctionTime()
 		const int Count = pRes->getInt("Count");
 		const int Enchant = pRes->getInt("Enchant");
 		const int OwnerID = pRes->getInt("OwnerID");
-		GS()->SendInbox(OwnerID, "Auction expired", "Your slot has expired", ItemID, Count, Enchant);
+		GS()->SendInbox("Auctionist", OwnerID, "Auction expired", "Your slot has expired", ItemID, Count, Enchant);
 		SJK.DD("tw_mailshop", "WHERE ID = '%d'", ID);
 	}
 	if(ReleaseSlots)
@@ -261,7 +261,7 @@ bool CShopCore::BuyShopItem(CPlayer* pPlayer, int ID)
 		if(OwnerID == pPlayer->Acc().m_AccountID)
 		{
 			GS()->Chat(ClientID, "You closed auction slot!");
-			GS()->SendInbox(pPlayer, "Auction Alert", "You have bought a item, or canceled your slot", ItemID, Count, Enchant);
+			GS()->SendInbox("Auctionist", pPlayer, "Auction Alert", "You have bought a item, or canceled your slot", ItemID, Count, Enchant);
 			SJK.DD("tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, OwnerID);
 			return true;
 		}
@@ -272,7 +272,7 @@ bool CShopCore::BuyShopItem(CPlayer* pPlayer, int ID)
 
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "Your [Slot %sx%d] was sold!", pPlayerBuyightItem.Info().GetName(pPlayer), Count);
-		GS()->SendInbox(OwnerID, "Auction Sell", aBuf, itGold, Price, 0);
+		GS()->SendInbox("Auctionist", OwnerID, "Auction Sell", aBuf, itGold, Price, 0);
 		SJK.DD("tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, OwnerID);
 		pPlayerBuyightItem.Add(Count, 0, Enchant);
 		GS()->Chat(ClientID, "You buy {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(pPlayer), Count);

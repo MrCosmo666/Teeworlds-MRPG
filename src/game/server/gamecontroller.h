@@ -51,6 +51,7 @@ public:
 	IGameController(class CGS *pGS);
 	virtual ~IGameController() {};
 
+	virtual void OnCharacterDamage(class CPlayer* pFrom, class CPlayer* pTo, int Damage);
 	virtual void OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon);
 	virtual bool OnCharacterSpawn(class CCharacter *pChr);
 	virtual bool OnEntity(int Index, vec2 Pos);

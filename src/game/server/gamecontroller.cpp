@@ -23,6 +23,12 @@ IGameController::IGameController(CGS *pGS)
 	m_aNumSpawnPoints[2] = 0;
 }
 
+
+
+void IGameController::OnCharacterDamage(CPlayer* pFrom, CPlayer* pTo, int Damage)
+{
+}
+
 void IGameController::OnCharacterDeath(CCharacter *pVictim, CPlayer *pKiller, int Weapon)
 {
 	return;

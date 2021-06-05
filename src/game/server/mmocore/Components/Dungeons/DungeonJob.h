@@ -18,9 +18,8 @@ class DungeonJob : public MmoComponent
 	bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu) override;
 
 public:
-
 	bool IsDungeonWorld(int WorldID) const;
-	void SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds);
+	void SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, CPlayerDungeonRecord *pPlayerDungeonRecord);
 	void ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID);
 	void ShowDungeonsList(CPlayer* pPlayer, bool Story);
 	void CheckQuestingOpened(CPlayer* pPlayer, int QuestID);

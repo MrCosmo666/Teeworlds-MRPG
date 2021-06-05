@@ -163,7 +163,7 @@ void CAccountCore::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	GS()->SendWorldMusic(ClientID, (GS()->IsDungeon() ? -1 : 0));
 	if(!FirstInitilize)
 	{
-		const int CountMessageInbox = Job()->Inbox()->GetActiveInbox(pPlayer);
+		const int CountMessageInbox = Job()->Inbox()->GetMailLettersSize(pPlayer->Acc().m_AccountID);
 		if (CountMessageInbox > 0)
 			GS()->Chat(ClientID, "You have {INT} unread messages!", CountMessageInbox);
 

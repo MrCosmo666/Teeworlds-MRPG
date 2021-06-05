@@ -71,6 +71,16 @@ enum
 
 	EFFECTENCHANT = 10,
 };
+
+enum
+{
+    MAILLETTERFLAG_REFRESH = 1 << 0,
+    MAILLETTERFLAG_READ = 1 << 1,
+    MAILLETTERFLAG_ACCEPT = 1 << 2,
+    MAILLETTERFLAG_DELETE = 1 << 3,
+    MAILLETTER_MAX_CAPACITY = 15,
+};
+
 '''
 
 RawSource = '''
@@ -650,30 +660,30 @@ Messages = [
     
     # -------------
     # mrpg inbox / TODO: optimize
-	NetMessage("Cl_ShowMailListRequest", []),
-    
-	NetMessage("Cl_ReceiveMail", 
+	NetMessage("Cl_MailLetterActions", 
 	[
-		NetIntAny("m_MailID"),
+		NetIntAny("m_MailLetterID"),
+		NetIntAny("m_MailLetterFlags"),
 	]),
     
-	NetMessage("Sv_SendGotNewMail", []),
-    
-    NetMessage("Sv_SendMailInfo",
+    NetMessage("Sv_SendMailLetterInfo",
 	[
-		NetIntAny("m_MailID"), # unique value by which to receive the letter
+		NetIntAny("m_MailLetterID"), # unique value by which to receive the letter
+		NetStringStrict("m_pTitle"),
+        NetStringStrict("m_pFrom"),
+		NetStringStrict("m_pMsg"),
+        NetBool("m_IsRead"),
+        
+		NetStringStrict("m_pJsonAttachementItem"),
+	]),
+    
+	NetMessage("Cl_SendMailLetterTo", 
+	[
 		NetStringStrict("m_pTitle"),
 		NetStringStrict("m_pMsg"),
-		NetIntAny("m_ItemID"),
-		NetIntAny("m_Count"),
-		NetIntAny("m_EnchantLevel"),
-	]),
-    
-	NetMessage("Cl_SendMailToPlayer", 
-	[
 		NetStringStrict("m_pPlayer"),
-		NetStringStrict("m_pTitle"),
-		NetStringStrict("m_pMsg"),
+		NetIntAny("m_FromClientID"),
+        
         # todo: add support sending items / after implementations of items / and from
 	]),
     

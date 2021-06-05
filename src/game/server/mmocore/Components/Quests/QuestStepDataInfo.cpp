@@ -171,7 +171,7 @@ void CPlayerQuestStepDataInfo::DoCollectItem(CPlayer* pPlayer)
 
 			if(pPlayer->GetItem(ItemID).Info().IsEnchantable() && pPlayer->GetItem(ItemID).m_Count >= 1)
 			{
-				pGS->SendInbox(pPlayer, "No place for item", "You already have this item, but we can't put it in inventory", ItemID, 1);
+				pGS->SendInbox("System", pPlayer, "No place for item", "You already have this item, but we can't put it in inventory", ItemID, 1);
 				continue;
 			}
 			pPlayer->GetItem(ItemID).Add(Count);

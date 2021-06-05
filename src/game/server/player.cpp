@@ -95,7 +95,10 @@ void CPlayer::Tick()
 	else if (m_Spawned && m_aPlayerTick[TickState::Respawn] + Server()->TickSpeed() * 3 <= Server()->Tick())
 		TryRespawn();
 
+	// update player tick
 	TickSystemTalk();
+	HandleTuningParams();
+	EffectsTick();
 }
 
 void CPlayer::PostTick()
@@ -103,11 +106,6 @@ void CPlayer::PostTick()
 	// update latency value
 	if (Server()->ClientIngame(m_ClientID) && GS()->IsPlayerEqualWorldID(m_ClientID) && IsAuthed())
 		GetTempData().m_TempPing = m_Latency.m_Min;
-
-	// update player tick
-	HandleTuningParams();
-	TickSystemTalk();
-	EffectsTick();
 }
 
 void CPlayer::EffectsTick()

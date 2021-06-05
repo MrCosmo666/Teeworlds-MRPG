@@ -22,7 +22,7 @@ CInventoryList::CInventoryList(CInventory* pInventory, const char *pInventoryLis
 	MainView.y = max(pMainView.y, 20.0f);
 	MainView.w = ((INVSLOT_BOXSIZE + INVSLOT_SPACING) * (MaxSlotsWidth + 1)) - (INVSLOT_SPACING * 2.0f);
 	MainView.h = ((INVSLOT_BOXSIZE + INVSLOT_SPACING) * (MaxSlotsHeight + 2)) - (INVSLOT_SPACING * 2.0f);
-	m_WindowItemsList.Init(pInventoryListName, MainView);
+	m_pWindowItemsList = CUI::CreateWindow(pInventoryListName, vec2(200, 200));
 
 	// by default, the first page should exist
 	m_ActivePage = 0;
@@ -113,10 +113,10 @@ CInventoryList::~CInventoryList()
 
 void CInventoryList::Render()
 {
-	if(!m_WindowItemsList.IsOpenned())
+	if(!m_pWindowItemsList->IsOpenned())
 		return;
 
-	m_WindowItemsList.OnRenderWindow([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+	m_pWindowItemsList->RegisterCallback([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
 	{
 		// render pages
 		CInventoryPage* pInventoryActivePage = m_aInventoryPages[m_ActivePage];

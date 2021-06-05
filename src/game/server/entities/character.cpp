@@ -754,8 +754,9 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	const int OldHealth = m_Health;
 	if(Dmg)
 	{
-		m_Health -= Dmg;
+		GS()->m_pController->OnCharacterDamage(pFrom, m_pPlayer, min(Dmg, m_Health));
 		m_pPlayer->ShowInformationStats();
+		m_Health -= Dmg;
 	}
 
 	// create healthmod indicator

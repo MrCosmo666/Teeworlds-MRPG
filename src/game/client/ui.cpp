@@ -72,6 +72,42 @@ void CUI::Update(float MouseX, float MouseY, float MouseWorldX, float MouseWorld
 	m_pBecommingHotItem = 0;
 }
 
+void CUI::MouseRectLimitMapScreen(CUIRect* pRect, float Indent, int LimitRectFlag)
+{
+	const float MaxWidth = Screen()->w;
+	const float MaxHeight = Screen()->h;
+	const float SpaceWidthX = Screen()->w / 24.f;
+	const float SpaceHeightY = Screen()->h / 24.f;
+
+	if(MouseX() < MaxWidth / 2.0f)
+	{
+		pRect->x = MouseX() - (pRect->w + Indent);
+		if((pRect->x - SpaceWidthX) < Screen()->x)
+			pRect->x = Indent + SpaceWidthX;
+	}
+	else
+	{
+		pRect->x = MouseX();
+		if((MouseX() + (pRect->w + SpaceWidthX)) > MaxWidth)
+			pRect->x = (MaxWidth - pRect->w) - (Indent + SpaceWidthX);
+	}
+
+	if((MouseY() < MaxHeight / 2.0f && LimitRectFlag & RECTLIMITSCREEN_DOWN) || LimitRectFlag == RECTLIMITSCREEN_ALL)
+	{
+		pRect->y = MouseY();
+		if((MouseY() + (pRect->h + SpaceHeightY)) > MaxHeight)
+			pRect->y = (MaxHeight - pRect->h) - (Indent + SpaceHeightY);
+	}
+	else if(LimitRectFlag & RECTLIMITSCREEN_UP || LimitRectFlag == RECTLIMITSCREEN_ALL)
+	{
+		pRect->y = MouseY() - (pRect->h + Indent);
+		if((pRect->y - SpaceHeightY) < Screen()->y)
+			pRect->y = Indent + SpaceHeightY;
+	}
+	else
+		pRect->y = MouseY();
+}
+
 bool CUI::KeyPress(int Key) const
 {
 	return Enabled() && Input()->KeyPress(Key);
@@ -550,30 +586,28 @@ void CUI::WindowRender()
 	// update hovered the active highlighted area
 	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
 	{
-		if((*it)->m_Openned && (*it)->m_pCallback)
-		{
-			if(MouseInside(&(*it)->m_WindowRect))
-				m_pHoveredWindow = (*it);
-		}
+		if((*it)->m_Openned && MouseInside(&(*it)->m_WindowRect))
+			m_pHoveredWindow = (*it);
 	}
 
 	// draw in reverse order as they are sorted here
-	bool RenderCursor = false;
+	bool ShowCursor = false;
 	CUIRect ScreenMap = *Screen();
 	Graphics()->MapScreen(ScreenMap.x, ScreenMap.y, ScreenMap.w, ScreenMap.h);
 	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
 	{
-		if((*it)->m_Openned && (*it)->m_pCallback)
+		if((*it)->m_Openned)
 		{
+			if((*it)->m_pRenderDependence == nullptr || ((*it)->m_pRenderDependence && (*(*it)->m_pRenderDependence) == true))
+				ShowCursor = true;
 			(*it)->Render();
-			RenderCursor = true;
 		}
 	}
 
 	// update the sorting in case of a change of the active window
 	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
 	{
-		if((*it)->m_Openned && (*it)->m_pCallback)
+		if((*it)->m_Openned)
 		{
 			// start check only this window
 			StartCheckWindow((*it));
@@ -586,8 +620,6 @@ void CUI::WindowRender()
 					break;
 				}
 			}
-			if((*it)->m_HighlightColor.a > 0.0f)
-				(*it)->HighlightDisable();
 
 			// end check only this window
 			FinishCheckWindow();
@@ -597,21 +629,8 @@ void CUI::WindowRender()
 	// clear hovered active highlighted area
 	m_pHoveredWindow = nullptr;
 
-	// clear all callback functions
-	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
-	{
-		// Lifehack I do not know how to bypass the uniqueness of Callback functions
-		// by keeping the exit from the window if it is not updated, and at the same time keep the order of the windows
-		if((*it)->m_SkippedRenderFrames >= 3)
-		{
-			(*it)->m_pCallback = nullptr;
-			(*it)->m_SkippedRenderFrames = 0;
-		}
-		(*it)->m_SkippedRenderFrames++;
-	}
-
 	// render cursor
-	if(RenderCursor)
+	if(ShowCursor)
 	{
 		Graphics()->TextureSet(g_pData->m_aImages[IMAGE_CURSOR].m_Id);
 		Graphics()->WrapClamp();
@@ -628,4 +647,15 @@ void CUI::WindowsClear()
 	for(auto* p : CWindowUI::ms_aWindows)
 		delete p;
 	CWindowUI::ms_aWindows.clear();
+}
+
+CWindowUI* CUI::CreateWindow(const char* pWindowName, vec2 WindowSize, CWindowUI* pDependentWindow, bool* pRenderDependence, int WindowFlags)
+{
+	const auto pSearch = std::find_if(CWindowUI::ms_aWindows.begin(), CWindowUI::ms_aWindows.end(), [pWindowName](const CWindowUI* pWindow) { return str_comp(pWindowName, pWindow->GetWindowName()) == 0;  });
+	if(pSearch != CWindowUI::ms_aWindows.end())
+		return (*pSearch);
+
+	CWindowUI *pWindow =  new CWindowUI(pWindowName, WindowSize, pDependentWindow, pRenderDependence, WindowFlags);
+	CWindowUI::ms_aWindows.push_back(pWindow);
+	return pWindow;
 }

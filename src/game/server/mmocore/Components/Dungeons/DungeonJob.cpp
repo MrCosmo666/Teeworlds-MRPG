@@ -149,16 +149,20 @@ bool DungeonJob::IsDungeonWorld(int WorldID) const
 	                    [WorldID](const std::pair<int, CDungeonData>& pDungeon) { return pDungeon.second.m_WorldID == WorldID; }) != CDungeonData::ms_aDungeon.end();
 }
 
-void DungeonJob::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, int Seconds)
+void DungeonJob::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, CPlayerDungeonRecord *pPlayerDungeonRecord)
 {
+	const int Seconds = pPlayerDungeonRecord->m_Time;
+	const float PassageHelp = pPlayerDungeonRecord->m_PassageHelp;
+
 	ResultPtr pRes = SJK.SD("*", "tw_dungeons_records", "WHERE OwnerID = '%d' AND DungeonID = '%d'", pPlayer->Acc().m_AccountID, DungeonID);
 	if (pRes->next())
 	{
-		if (pRes->getInt("Seconds") > Seconds)
-			SJK.UD("tw_dungeons_records", "Seconds = '%d' WHERE OwnerID = '%d' AND DungeonID = '%d'", Seconds, pPlayer->Acc().m_AccountID, DungeonID);
+		if (pRes->getInt("Seconds") > Seconds && pRes->getInt("PassageHelp") < PassageHelp)
+			SJK.UD("tw_dungeons_records", "Seconds = '%d', PassageHelp = '%f' WHERE OwnerID = '%d' AND DungeonID = '%d'",
+				Seconds, PassageHelp, pPlayer->Acc().m_AccountID, DungeonID);
 		return;
 	}
-	SJK.ID("tw_dungeons_records", "(OwnerID, DungeonID, Seconds) VALUES ('%d', '%d', '%d')", pPlayer->Acc().m_AccountID, DungeonID, Seconds);
+	SJK.ID("tw_dungeons_records", "(OwnerID, DungeonID, Seconds, PassageHelp) VALUES ('%d', '%d', '%d', '%f')", pPlayer->Acc().m_AccountID, DungeonID, Seconds, PassageHelp);
 }
 
 void DungeonJob::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
@@ -169,11 +173,12 @@ void DungeonJob::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
 	{
 		const int Rank = pRes->getRow();
 		const int OwnerID = pRes->getInt("OwnerID");
-		const int BaseSeconds = pRes->getDouble("Seconds");
+		const int BaseSeconds = pRes->getInt("Seconds");
+		const int BasePassageHelp = pRes->getInt("PassageHelp");
 
 		const int Minutes = BaseSeconds / 60;
 		const int Seconds = BaseSeconds - (BaseSeconds / 60 * 60);
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{INT}. {STR} : Time: {INT} minute(s) {INT} second(s)", Rank, Job()->PlayerName(OwnerID), Minutes, Seconds);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{INT}. {STR} | {INT}:{INT}min | {INT}P", Rank, Job()->PlayerName(OwnerID), Minutes, Seconds, BasePassageHelp);
 	}
 }
 

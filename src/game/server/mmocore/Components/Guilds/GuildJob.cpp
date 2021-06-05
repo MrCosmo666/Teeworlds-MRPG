@@ -331,7 +331,7 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 		if(JoinGuild(SenderID, GuildID))
 		{
 			SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
-			GS()->SendInbox(SenderID, CGuildData::ms_aGuild[GuildID].m_aName, "You were accepted to join guild");
+			GS()->SendInbox(Server()->ClientName(ClientID),SenderID, CGuildData::ms_aGuild[GuildID].m_aName, "You were accepted to join guild");
 			GS()->StrongUpdateVotes(ClientID, pPlayer->m_OpenVoteMenu);
 			GS()->StrongUpdateVotesForAll(MenuList::MENU_GUILD_PLAYERS);
 			return true;
@@ -352,7 +352,7 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 		const int SenderID = VoteID;
 		GS()->Chat(ClientID, "You reject invite.");
 		SJK.DD("tw_guilds_invites", "WHERE GuildID = '%d' AND OwnerID = '%d'", GuildID, SenderID);
-		GS()->SendInbox(SenderID, CGuildData::ms_aGuild[GuildID].m_aName, "You were denied join guild");
+		GS()->SendInbox(Server()->ClientName(ClientID), SenderID, CGuildData::ms_aGuild[GuildID].m_aName, "You were denied join guild");
 		GS()->ResetVotes(ClientID, MenuList::MENU_GUILD);
 		return true;
 	}
@@ -812,7 +812,7 @@ void GuildJob::DisbandGuild(int GuildID)
 	const int HouseID = GetGuildHouseID(GuildID);
 	if(HouseID > 0)
 		BankGoldReturned += CGuildHouseData::ms_aHouseGuild[HouseID].m_Price;
-	GS()->SendInbox(OwnerAccountID, "Your guild was disbanded.", "We returned some gold from your guild.", itGold, BankGoldReturned);
+	GS()->SendInbox("System", OwnerAccountID, "Your guild was disbanded.", "We returned some gold from your guild.", itGold, BankGoldReturned);
 	SJK.DD("tw_guilds", "WHERE ID = '%d'", GuildID);
 	GS()->Chat(-1, "The {STR} Guild has been disbanded.", CGuildData::ms_aGuild[GuildID].m_aName);
 	CGuildData::ms_aGuild.erase(GuildID);

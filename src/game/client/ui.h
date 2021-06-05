@@ -172,6 +172,14 @@ public:
 	bool MouseButton(int Index) const { return (m_MouseButtons >> Index) & 1; }
 	bool MouseButtonClicked(int Index) const { return MouseButton(Index) && !((m_LastMouseButtons >> Index) & 1); }
 
+	enum
+	{
+		RECTLIMITSCREEN_ALL = -1,
+		RECTLIMITSCREEN_UP = 1 << 0,
+		RECTLIMITSCREEN_DOWN = 1 << 1,
+	};
+	void MouseRectLimitMapScreen(CUIRect* pRect, float Indent, int LimitRectFlag = -1);
+
 	void SetHotItem(const void *pID) { m_pBecommingHotItem = pID; }
 	void SetActiveItem(const void *pID) { m_ActiveItemValid = true; m_pActiveItem = pID; if (pID) m_pLastActiveItem = pID; }
 	bool CheckActiveItem(const void *pID) { if(m_pActiveItem == pID) { m_ActiveItemValid = true; return true; } return false; };
@@ -227,11 +235,20 @@ public:
 	int DoMouseEventLogic(const CUIRect* pRect, int Button = 0) const;
 
 	// window system
+	enum
+	{
+		WINDOWFLAG_MINIMIZE = 1 << 0,
+		WINDOWFLAG_CLOSE = 1 << 1,
+		WINDOWFLAG_ALL = WINDOWFLAG_MINIMIZE | WINDOWFLAG_CLOSE
+	};
+
 	void StartCheckWindow(class CWindowUI* pWindow) { m_pCheckWindow = pWindow; }
 	void FinishCheckWindow() { m_pCheckWindow = nullptr; }
 
 	void WindowRender();
 	void WindowsClear();
+
+	static class CWindowUI* CreateWindow(const char* pWindowName, vec2 WindowSize, class CWindowUI* pDependentWindow = nullptr, bool* pRenderDependence = nullptr, int WindowFlags = WINDOWFLAG_ALL);
 
 	// slots
 	class CInventorySlot* m_pHoveredSlot;

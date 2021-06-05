@@ -480,11 +480,11 @@ void CGS::ChatFollow(int ClientID, const char* pText, ...)
 }
 
 // send to an authorized player
-void CGS::ChatAccountID(int AccountID, const char* pText, ...)
+bool CGS::ChatAccountID(int AccountID, const char* pText, ...)
 {
 	CPlayer *pPlayer = GetPlayerFromAccountID(AccountID);
 	if(!pPlayer)
-		return;
+		return false;
 
 	CNetMsg_Sv_Chat Msg;
 	Msg.m_Mode = CHAT_ALL;
@@ -501,6 +501,7 @@ void CGS::ChatAccountID(int AccountID, const char* pText, ...)
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, pPlayer->GetCID());
 	Buffer.clear();
 	va_end(VarArgs);
+	return true;
 }
 
 // Send a guild a message
@@ -1563,7 +1564,7 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 			pPlayer->GetItem(ItemID).Add(Count, 0, Enchant);
 			return;
 		}
-		pSelf->SendInbox(pPlayer, "The sender heavens", "Sent from console", ItemID, Count, Enchant);
+		pSelf->SendInbox("Console", pPlayer, "The sender heavens", "Sent from console", ItemID, Count, Enchant);
 	}
 }
 
@@ -2329,18 +2330,18 @@ bool CGS::TakeItemCharacter(int ClientID)
 }
 
 // send a message with or without the object using ClientID
-void CGS::SendInbox(CPlayer* pPlayer, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
+void CGS::SendInbox(const char* pFrom, CPlayer* pPlayer, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
 {
 	if(!pPlayer || !pPlayer->IsAuthed())
 		return;
 
-	SendInbox(pPlayer->Acc().m_AccountID, Name, Desc, ItemID, Count, Enchant);
+	SendInbox(pFrom, pPlayer->Acc().m_AccountID, Name, Desc, ItemID, Count, Enchant);
 }
 
 // send a message with or without the object using AccountID
-void CGS::SendInbox(int AccountID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
+void CGS::SendInbox(const char* pFrom, int AccountID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
 {
-	Mmo()->Inbox()->SendInbox(AccountID, Name, Desc, ItemID, Count, Enchant);
+	Mmo()->Inbox()->SendInbox(pFrom, AccountID, Name, Desc, ItemID, Count, Enchant);
 }
 
 // send day information

@@ -106,7 +106,7 @@ public:
 	void FakeChat(const char *pName, const char *pText) override;
 	void Chat(int ClientID, const char* pText, ...);
 	void ChatFollow(int ClientID, const char* pText, ...);
-	void ChatAccountID(int AccountID, const char* pText, ...);
+	bool ChatAccountID(int AccountID, const char* pText, ...);
 	void ChatDiscord(const char *Color, const char *Title, const char* pText, ...);
 	void ChatDiscordChannel(const char* pChanel, const char* Color, const char* Title, const char* pText, ...);
 	void ChatGuild(int GuildID, const char* pText, ...);
@@ -241,8 +241,8 @@ public:
 	void CreateDropItem(vec2 Pos, int ClientID, CItemData DropItem, vec2 Force = vec2(0.0f, 0.0f));
 	void CreateRandomDropItem(vec2 Pos, int ClientID, float Random, CItemData DropItem, vec2 Force = vec2(0.0f, 0.0f));
 	bool TakeItemCharacter(int ClientID);
-	void SendInbox(CPlayer *pPlayer, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
-	void SendInbox(int AccountID, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
+	void SendInbox(const char* pFrom, CPlayer *pPlayer, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
+	void SendInbox(const char* pFrom, int AccountID, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
 
 private:
 	void SendDayInfo(int ClientID);

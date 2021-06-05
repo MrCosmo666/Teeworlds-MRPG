@@ -5,6 +5,8 @@
 #include <base/threadpool.h>
 #include <game/server/gamecontext.h>
 
+#include <teeother/tl/nlohmann_json.h>
+
 using namespace sqlstr;
 
 bool CMailBoxCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
@@ -12,7 +14,14 @@ bool CMailBoxCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const
 	const int ClientID = pPlayer->GetCID();
 	if(PPSTR(CMD, "MAIL") == 0)
 	{
-		ReceiveInbox(pPlayer, VoteID);
+		AcceptMailLetter(pPlayer, VoteID);
+		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INBOX);
+		return true;
+	}
+
+	if(PPSTR(CMD, "DELETE_MAIL") == 0)
+	{
+		DeleteMailLetter(VoteID);
 		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INBOX);
 		return true;
 	}
@@ -21,9 +30,9 @@ bool CMailBoxCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const
 }
 
 // check whether messages are available
-int CMailBoxCore::GetActiveInbox(CPlayer* pPlayer)
+int CMailBoxCore::GetMailLettersSize(int AccountID)
 {
-	ResultPtr pRes = SJK.SD("ID", "tw_accounts_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
+	ResultPtr pRes = SJK.SD("ID", "tw_accounts_inbox", "WHERE OwnerID = '%d'", AccountID);
 	const int MailCount = pRes->rowsCount();
 	return MailCount;
 }
@@ -35,11 +44,11 @@ void CMailBoxCore::GetInformationInbox(CPlayer *pPlayer)
 	bool EmptyMailBox = true;
 	const int ClientID = pPlayer->GetCID();
 	int HideID = (int)(NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + 200);
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AccountID, MAX_INBOX_LIST);
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AccountID, (int)MAILLETTER_MAX_CAPACITY);
 	while(pRes->next())
 	{
 		// get the information to create an object
-		const int MailID = pRes->getInt("ID");
+		const int MailLetterID = pRes->getInt("ID");
 		const int ItemID = pRes->getInt("ItemID");
 		const int Count = pRes->getInt("Count");
 		const int Enchant = pRes->getInt("Enchant");
@@ -51,16 +60,18 @@ void CMailBoxCore::GetInformationInbox(CPlayer *pPlayer)
 		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "✉ Letter({INT}) {STR}", ShowLetterID, pRes->getString("MailName").c_str());
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pRes->getString("MailDesc").c_str());
 		if(ItemID <= 0 || Count <= 0)
-			GS()->AVM(ClientID, "MAIL", MailID, HideID, "I read it (L{INT})", ShowLetterID);
+			GS()->AVM(ClientID, "MAIL", MailLetterID, HideID, "Accept (L{INT})", ShowLetterID);
 		else if(GS()->GetItemInfo(ItemID).IsEnchantable())
 		{
 			char aEnchantBuf[16];
 			GS()->GetItemInfo(ItemID).FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf), Enchant);
-			GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive {STR} {STR} (L{INT})",
+			GS()->AVM(ClientID, "MAIL", MailLetterID, HideID, "Receive {STR} {STR} (L{INT})",
 				GS()->GetItemInfo(ItemID).GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), ShowLetterID);
 		}
 		else
-			GS()->AVM(ClientID, "MAIL", MailID, HideID, "Receive {STR}x{INT} (L{INT})", GS()->GetItemInfo(ItemID).GetName(pPlayer), Count, ShowLetterID);
+			GS()->AVM(ClientID, "MAIL", MailLetterID, HideID, "Receive {STR}x{INT} (L{INT})", GS()->GetItemInfo(ItemID).GetName(pPlayer), Count, ShowLetterID);
+
+		GS()->AVM(ClientID, "DELETE_MAIL", MailLetterID, HideID, "Delete (L{INT})", ShowLetterID);
 	}
 
 	if(EmptyMailBox)
@@ -68,48 +79,51 @@ void CMailBoxCore::GetInformationInbox(CPlayer *pPlayer)
 }
 
 // sending a mail to a player
-void CMailBoxCore::SendInbox(int AccountID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
+void CMailBoxCore::SendInbox(const char* pFrom, int AccountID, const char* pName, const char* pDesc, int ItemID, int Count, int Enchant)
 {
 	// clear str and connection
-	const CSqlString<64> cName = CSqlString<64>(Name);
-	const CSqlString<64> cDesc = CSqlString<64>(Desc);
+	const CSqlString<64> cName = CSqlString<64>(pName);
+	const CSqlString<64> cDesc = CSqlString<64>(pDesc);
+	const CSqlString<64> cFrom = CSqlString<64>(pFrom);
 
 	// send information about new message
-	CPlayer* pPlayer = GS()->GetPlayerFromAccountID(AccountID);
-	if(pPlayer)
+	if(GS()->ChatAccountID(AccountID, "[Mailbox] New letter ({STR})!", cName.cstr()))
 	{
-		CNetMsg_Sv_SendGotNewMail Msg;
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, pPlayer->GetCID());
+		const int MailLettersSize = GetMailLettersSize(AccountID);
+		if(MailLettersSize >= (int)MAILLETTER_MAX_CAPACITY)
+		{
+			GS()->ChatAccountID(AccountID, "[Mailbox] Your mailbox is full you can't get.");
+			GS()->ChatAccountID(AccountID, "[Mailbox] It will come after you clear your mailbox.");
+		}
 	}
-	GS()->ChatAccountID(AccountID, "[Mailbox] New letter ({STR})!", cName.cstr());
 
 	// send new message
 	if (ItemID <= 0)
 	{
-		SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, OwnerID) VALUES ('%s', '%s', '%d');", cName.cstr(), cDesc.cstr(), AccountID);
+		SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, OwnerID, FromSend) VALUES ('%s', '%s', '%d', '%s');", cName.cstr(), cDesc.cstr(), AccountID, pFrom);
 		return;
 	}
-	SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, ItemID, Count, Enchant, OwnerID) VALUES ('%s', '%s', '%d', '%d', '%d', '%d');",
-		 cName.cstr(), cDesc.cstr(), ItemID, Count, Enchant, AccountID);
+	SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, ItemID, Count, Enchant, OwnerID, FromSend) VALUES ('%s', '%s', '%d', '%d', '%d', '%d', '%s');",
+		 cName.cstr(), cDesc.cstr(), ItemID, Count, Enchant, AccountID, pFrom);
 
 }
 
-bool CMailBoxCore::SendInbox(const char* pNickname, const char* pName, const char* pDesc, int ItemID, int Count, int Enchant)
+bool CMailBoxCore::SendInbox(const char* pFrom, const char* pNickname, const char* pName, const char* pDesc, int ItemID, int Count, int Enchant)
 {
 	const CSqlString<64> cName = CSqlString<64>(pNickname);
 	ResultPtr pRes = SJK.SD("ID, Nick", "tw_accounts_data", "WHERE Nick = '%s'", cName.cstr());
 	if(pRes->next())
 	{
 		const int AccountID = pRes->getInt("ID");
-		SendInbox(AccountID, pName, pDesc, ItemID, Count, Enchant);
+		SendInbox(pFrom, AccountID, pName, pDesc, ItemID, Count, Enchant);
 		return true;
 	}
 	return false;
 }
 
-void CMailBoxCore::ReceiveInbox(CPlayer* pPlayer, int InboxID)
+void CMailBoxCore::AcceptMailLetter(CPlayer* pPlayer, int MailLetterID)
 {
-	ResultPtr pRes = SJK.SD("ItemID, Count, Enchant", "tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
+	ResultPtr pRes = SJK.SD("ItemID, Count, Enchant", "tw_accounts_inbox", "WHERE ID = '%d'", MailLetterID);
 	if(pRes->next())
 	{
 		// get informed about the mail
@@ -117,7 +131,7 @@ void CMailBoxCore::ReceiveInbox(CPlayer* pPlayer, int InboxID)
 		const int Count = pRes->getInt("Count");
 		if(ItemID <= 0 || Count <= 0)
 		{
-			SJK.DD("tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
+			DeleteMailLetter(MailLetterID);
 			return;
 		}
 
@@ -131,31 +145,53 @@ void CMailBoxCore::ReceiveInbox(CPlayer* pPlayer, int InboxID)
 		const int Enchant = pRes->getInt("Enchant");
 		pPlayer->GetItem(ItemID).Add(Count, 0, Enchant);
 		GS()->Chat(pPlayer->GetCID(), "You received an attached item [{STR}].", GS()->GetItemInfo(ItemID).GetName(pPlayer));
-		SJK.DD("tw_accounts_inbox", "WHERE ID = '%d'", InboxID);
+		DeleteMailLetter(MailLetterID);
 	}
 }
 
+void CMailBoxCore::DeleteMailLetter(int MailLetterID)
+{
+	SJK.DD("tw_accounts_inbox", "WHERE ID = '%d'", MailLetterID);
+}
+
+void CMailBoxCore::SetReadState(int MailLetterID, bool State)
+{
+	SJK.UD("tw_accounts_inbox", "IsRead='%d' WHERE ID = '%d'", State, MailLetterID);
+}
+
 // client server
-void CMailBoxCore::SendClientMailList(CPlayer* pPlayer)
+void CMailBoxCore::SendClientListMail(CPlayer* pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AccountID, (int)MAILLETTER_MAX_CAPACITY);
 	while(pRes->next())
 	{
-		const int MailID = pRes->getInt("ID");
+		std::string Name = pRes->getString("MailName").c_str();
+		std::string Desc = pRes->getString("MailDesc").c_str();
+		std::string From = pRes->getString("FromSend").c_str();
+
+		const int MailLetterID = pRes->getInt("ID");
 		const int ItemID = pRes->getInt("ItemID");
 		const int Count = pRes->getInt("Count");
 		const int Enchant = pRes->getInt("Enchant");
-		std::string Name = pRes->getString("MailName").c_str();
-		std::string Desc = pRes->getString("MailDesc").c_str();
+		const bool IsRead = pRes->getBoolean("IsRead");
 
-		CNetMsg_Sv_SendMailInfo Msg;
-		Msg.m_MailID = MailID;
+		// basic mail letter information
+		CNetMsg_Sv_SendMailLetterInfo Msg;
+		Msg.m_MailLetterID = MailLetterID;
 		Msg.m_pTitle = Name.c_str();
 		Msg.m_pMsg = Desc.c_str();
-		Msg.m_ItemID = ItemID;
-		Msg.m_Count = Count;
-		Msg.m_EnchantLevel = Enchant;
+		Msg.m_pFrom = From.c_str();
+		Msg.m_IsRead = IsRead;
+
+		// attachment items
+		nlohmann::json JsonItemAttachment;
+		JsonItemAttachment["item"] = ItemID;
+		JsonItemAttachment["amount"] = Count;
+		JsonItemAttachment["enchant"] = Enchant;
+
+		std::string JsonStringData = JsonItemAttachment.dump();
+		Msg.m_pJsonAttachementItem = JsonStringData.c_str();
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 	}
 }
@@ -163,24 +199,39 @@ void CMailBoxCore::SendClientMailList(CPlayer* pPlayer)
 void CMailBoxCore::OnMessage(int MsgID, void* pRawMsg, int ClientID)
 {
 	CPlayer* pPlayer = GS()->m_apPlayers[ClientID];
-	if(MsgID == NETMSGTYPE_CL_SHOWMAILLISTREQUEST)
+	if(MsgID == NETMSGTYPE_CL_MAILLETTERACTIONS)
 	{
-		// We work with active async table inbox
-		set_timer_detach([this, pPlayer]()
+		CNetMsg_Cl_MailLetterActions* pMsg = (CNetMsg_Cl_MailLetterActions*)pRawMsg;
+
+		if(pMsg->m_MailLetterFlags & MAILLETTERFLAG_ACCEPT)
 		{
-			if(pPlayer)
-				SendClientMailList(pPlayer);
-		}, 100);
+			AcceptMailLetter(pPlayer, pMsg->m_MailLetterID);
+		}
+
+		if(pMsg->m_MailLetterFlags & MAILLETTERFLAG_DELETE)
+		{
+			DeleteMailLetter(pMsg->m_MailLetterID);
+		}
+
+		if(pMsg->m_MailLetterFlags & MAILLETTERFLAG_READ)
+		{
+			SetReadState(pMsg->m_MailLetterID, true);
+		}
+
+		if(pMsg->m_MailLetterFlags & MAILLETTERFLAG_REFRESH)
+		{
+			// because the update can take place after the receipt of the letter, where operations are performed in the thread
+			set_timer_detach([this, pPlayer]()
+			{
+				if(pPlayer)
+					SendClientListMail(pPlayer);
+			}, 100);
+		}
 	}
-	else if(MsgID == NETMSGTYPE_CL_RECEIVEMAIL)
+	else if(MsgID == NETMSGTYPE_CL_SENDMAILLETTERTO)
 	{
-		CNetMsg_Cl_ReceiveMail* pMsg = (CNetMsg_Cl_ReceiveMail*)pRawMsg;
-		ReceiveInbox(pPlayer, pMsg->m_MailID);
-	}
-	else if(MsgID == NETMSGTYPE_CL_SENDMAILTOPLAYER)
-	{
-		CNetMsg_Cl_SendMailToPlayer* pMsg = (CNetMsg_Cl_SendMailToPlayer*)pRawMsg;
-		if(SendInbox(pMsg->m_pPlayer, pMsg->m_pTitle, pMsg->m_pMsg))
+		CNetMsg_Cl_SendMailLetterTo* pMsg = (CNetMsg_Cl_SendMailLetterTo*)pRawMsg;
+		if(SendInbox(Server()->ClientName(pMsg->m_FromClientID), pMsg->m_pPlayer, pMsg->m_pTitle, pMsg->m_pMsg))
 		{
 			GS()->SendInformationBoxGUI(ClientID, "Your letter \"{STR}\" was sent to the player \"{STR}\"!", pMsg->m_pTitle, pMsg->m_pPlayer);
 			return;

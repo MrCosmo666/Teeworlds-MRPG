@@ -10,14 +10,16 @@ class CMailBoxCore : public MmoComponent
 	void OnMessage(int MsgID, void* pRawMsg, int ClientID) override;
 
 public:
-	int GetActiveInbox(CPlayer* pPlayer);
+	int GetMailLettersSize(int AccountID);
 	void GetInformationInbox(CPlayer *pPlayer);
-	void SendInbox(int AccountID, const char* pName, const char* pDesc, int ItemID = -1, int Count = -1, int Enchant = -1);
-	bool SendInbox(const char* pNickname, const char* pName, const char* pDesc, int ItemID = -1, int Count = -1, int Enchant = -1);
+	void SendInbox(const char* pFrom, int AccountID, const char* pName, const char* pDesc, int ItemID = -1, int Count = -1, int Enchant = -1);
+	bool SendInbox(const char* pFrom, const char* pNickname, const char* pName, const char* pDesc, int ItemID = -1, int Count = -1, int Enchant = -1);
 
 private:
-	void ReceiveInbox(CPlayer* pPlayer, int InboxID);
-	void SendClientMailList(CPlayer* pPlayer);
+	void DeleteMailLetter(int MailLetterID);
+	void AcceptMailLetter(CPlayer* pPlayer, int MailLetterID);
+	void SetReadState(int MailLetterID, bool State);
+	void SendClientListMail(CPlayer* pPlayer);
 };
 
 #endif

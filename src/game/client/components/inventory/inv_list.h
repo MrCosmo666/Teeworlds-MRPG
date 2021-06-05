@@ -11,7 +11,7 @@
 class CInventoryList
 {
 	// window
-	CWindowUI m_WindowItemsList;
+	CWindowUI* m_pWindowItemsList;
 
 	// basic
 	class CInventory* m_pInventory;
@@ -34,7 +34,7 @@ public:
 
 	vec2 m_SlotInteractivePosition;
 
-	const CUIRect &GetMainViewRect() { return m_WindowItemsList.GetRect(); }
+	const CUIRect &GetMainViewRect() { return m_pWindowItemsList->GetRect(); }
 	CInventorySlot* GetHoveredSlot() const { return m_HoveredSlot; }
 	void SetHoveredSlot(CInventorySlot* pSlot) { m_HoveredSlot = pSlot; }
 	CInventorySlot* GetSelectedSlot() const { return m_SelectionSlot; }

@@ -5,6 +5,22 @@
 
 #include <map>
 
+struct CPlayerDungeonRecord
+{
+	CPlayerDungeonRecord()
+	{
+		Reset();
+	}
+	void Reset()
+	{
+		m_Time = 0;
+		m_PassageHelp = 0;
+	}
+
+	int m_Time;
+	int m_PassageHelp;
+};
+
 struct CDungeonData
 {
 	char m_aName[64];
