@@ -345,3 +345,9 @@ void CWindowUI::SetDependent(const char* pWindowName)
 {
 	str_copy(m_aWindowDependentName, pWindowName, sizeof(m_aWindowDependentName));
 }
+
+CWindowUI* CWindowUI::GetActiveWindow()
+{
+	const auto pItem = std::find_if(ms_aWindows.begin(), ms_aWindows.end(), [](const CWindowUI* pWindow) { return pWindow->IsRenderAllowed(); });
+	return pItem != ms_aWindows.end() ? (*pItem) : nullptr;
+}

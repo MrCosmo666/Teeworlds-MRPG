@@ -200,11 +200,7 @@ public:
 	void SetDependent(const char* pWindowName);
 
 private:
-	static CWindowUI* GetActiveWindow()
-	{
-		const auto pItem = std::find_if(ms_aWindows.begin(), ms_aWindows.end(), [](const CWindowUI* pWindow) { return pWindow->IsRenderAllowed(); });
-		return pItem != ms_aWindows.end() ? (*pItem) : nullptr;
-	}
+	static CWindowUI* GetActiveWindow();
 };
 
 

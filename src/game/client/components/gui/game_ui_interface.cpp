@@ -28,7 +28,7 @@ void CUIGameInterface::OnInit()
 	// inbox system
 	m_pWindowMailboxList = UI()->CreateWindow("Mailbox list", vec2(320, 250), nullptr, &m_ActiveGUI);
 	m_pWindowMailboxLetter = UI()->CreateWindow("Letter", vec2(250, 140), m_pWindowMailboxList, &m_ActiveGUI);
-	m_pWindowMailboxLetterActions = UI()->CreateWindow("Letter actions", vec2(0, 0), nullptr, &m_ActiveGUI, CUI::WINDOW_WITHOUT_BORDURE | CUI::WINDOW_CLOSE_CLICKING_OUTSIDE);
+	m_pWindowMailboxLetterActions = UI()->CreateWindow("Letter actions", vec2(0, 0), m_pWindowMailboxList, &m_ActiveGUI, CUI::WINDOW_WITHOUT_BORDURE | CUI::WINDOW_CLOSE_CLICKING_OUTSIDE);
 	m_pWindowMailboxLetterSend = UI()->CreateWindow("Sending a letter", vec2(220, 190), m_pWindowMailboxList, &m_ActiveGUI);
 
 	m_pWindowMailboxList->Register(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxList, this));
@@ -230,7 +230,7 @@ void CUIGameInterface::CallbackRenderMailboxList(const CUIRect& pWindowRect, CWi
 	char aBuf[128];
 	static int s_LetterSelected = -1;
 	static CMenus::CListBox s_ListBox;
-	str_format(aBuf, sizeof(aBuf), "Mailbox capacity %d/%d", m_aLettersList.size(), MAILLETTER_MAX_CAPACITY);
+	str_format(aBuf, sizeof(aBuf), "Mailbox capacity %d/%d", (int)m_aLettersList.size(), MAILLETTER_MAX_CAPACITY);
 	s_ListBox.DoHeader(&ListBoxRect, aBuf, 20.0f, 0.0f);
 	s_ListBox.DoStart(18.0f, m_aLettersList.size(), 1, 3, -1, 0, true, 0, true);
 	for(int i = 0; i < (int)m_aLettersList.size(); i++)
@@ -450,7 +450,7 @@ void CUIGameInterface::CallbackRenderMailboxLetterActions(const CUIRect& pWindow
 		pCurrentWindow.Close();
 	}
 
-	pCurrentWindow.SetSize(vec2(120, 4.0f + ButtonAmount * ButtonHeight));
+	pCurrentWindow.SetSize(vec2(100, 4.0f + ButtonAmount * ButtonHeight));
 }
 
 void CUIGameInterface::SendLetterAction(CMailboxLetter* pLetter, int64 Flags)
