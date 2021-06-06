@@ -100,12 +100,11 @@ void CMailBoxCore::SendInbox(const char* pFrom, int AccountID, const char* pName
 	// send new message
 	if (ItemID <= 0)
 	{
-		SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, OwnerID, FromSend) VALUES ('%s', '%s', '%d', '%s');", cName.cstr(), cDesc.cstr(), AccountID, pFrom);
+		SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, OwnerID, FromSend) VALUES ('%s', '%s', '%d', '%s');", cName.cstr(), cDesc.cstr(), AccountID, cFrom.cstr());
 		return;
 	}
 	SJK.ID("tw_accounts_inbox", "(MailName, MailDesc, ItemID, Count, Enchant, OwnerID, FromSend) VALUES ('%s', '%s', '%d', '%d', '%d', '%d', '%s');",
-		 cName.cstr(), cDesc.cstr(), ItemID, Count, Enchant, AccountID, pFrom);
-
+		 cName.cstr(), cDesc.cstr(), ItemID, Count, Enchant, AccountID, cFrom.cstr());
 }
 
 bool CMailBoxCore::SendInbox(const char* pFrom, const char* pNickname, const char* pName, const char* pDesc, int ItemID, int Count, int Enchant)
