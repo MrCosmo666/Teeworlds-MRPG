@@ -18,23 +18,29 @@ std::map< int /*itemid*/, CUIGameInterface::CClientItem > CUIGameInterface::m_aC
 
 void CUIGameInterface::OnInit()
 {
-	// gui items
-	m_pWindowPopupBox = UI()->CreateWindow("Are you sure?", vec2(0,0), nullptr, &m_ActiveGUI);
+	// gui elements
+	m_pWindowPopupBox = UI()->CreateWindow("Are you sure?", vec2(0, 0), nullptr, &m_ActiveGUI);
 	m_pWindowInformationBox = UI()->CreateWindow("Information", vec2(0, 0), nullptr, &m_ActiveGUI);
-	m_pWindowPopupBox->RegisterCallback(WINDOW_REGISTER(&CUIGameInterface::CallbackRenderGuiPopupBox, this));
-	m_pWindowInformationBox->RegisterCallback(WINDOW_REGISTER(&CUIGameInterface::CallbackRenderInfoWindow, this));
+
+	m_pWindowPopupBox->Register(WINREGISTER(&CUIGameInterface::CallbackRenderGuiPopupBox, this));
+	m_pWindowInformationBox->Register(WINREGISTER(&CUIGameInterface::CallbackRenderInfoWindow, this));
 
 	// inbox system
-	m_pWindowMailboxList = UI()->CreateWindow("Mailbox list", vec2(270, 300), nullptr, &m_ActiveGUI);
-	m_pWindowMailboxLetterActions = UI()->CreateWindow("Letter", vec2(250, 140), m_pWindowMailboxList, &m_ActiveGUI);
+	m_pWindowMailboxList = UI()->CreateWindow("Mailbox list", vec2(320, 250), nullptr, &m_ActiveGUI);
+	m_pWindowMailboxLetter = UI()->CreateWindow("Letter", vec2(250, 140), m_pWindowMailboxList, &m_ActiveGUI);
+	m_pWindowMailboxLetterActions = UI()->CreateWindow("Letter actions", vec2(0, 0), nullptr, &m_ActiveGUI, CUI::WINDOW_WITHOUT_BORDURE | CUI::WINDOW_CLOSE_CLICKING_OUTSIDE);
 	m_pWindowMailboxLetterSend = UI()->CreateWindow("Sending a letter", vec2(220, 190), m_pWindowMailboxList, &m_ActiveGUI);
-	m_pWindowMailboxList->RegisterCallback(WINDOW_REGISTER(&CUIGameInterface::CallbackRenderMailboxList, this));
-	m_pWindowMailboxLetterActions->RegisterCallback(WINDOW_REGISTER(&CUIGameInterface::CallbackRenderMailboxLetterSelected, this));
-	m_pWindowMailboxLetterSend->RegisterCallback(WINDOW_REGISTER(&CUIGameInterface::CallbackRenderMailboxLetterSend, this));
+
+	m_pWindowMailboxList->Register(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxList, this));
+	m_pWindowMailboxLetter->Register(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxLetter, this));
+	m_pWindowMailboxLetterActions->Register(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxLetterActions, this));
+	m_pWindowMailboxLetterSend->Register(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxLetterSend, this));
+
+	m_pWindowMailboxList->RegisterHelp(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxListButtonHelp, this));
 
 	// questing system
 	m_pWindowQuestsList = UI()->CreateWindow("Quest book", vec2(300, 80));
-	m_pWindowQuestsList->RegisterCallback(WINDOW_REGISTER(&CUIGameInterface::CallbackRenderQuests, this));
+	m_pWindowQuestsList->Register(WINREGISTER(&CUIGameInterface::CallbackRenderQuests, this));
 }
 
 void CUIGameInterface::OnReset()
@@ -45,7 +51,7 @@ void CUIGameInterface::OnReset()
 	m_pWindowPopupBox->Close();
 	m_pWindowInformationBox->Close();
 	m_pWindowMailboxList->Close();
-	m_pWindowMailboxLetterActions->Close();
+	m_pWindowMailboxLetter->Close();
 	m_pWindowMailboxLetterSend->Close();
 	m_pWindowQuestsList->Close();
 }
@@ -112,7 +118,7 @@ void CUIGameInterface::RenderGuiIcons()
 		static CMenus::CButtonContainer s_MailListButton;
 		const bool UnreadLetters = UnreadLetterMails();
 		if(DoIconSelectionWindow(&s_MailListButton, &IconView, m_pWindowMailboxList, SPRITE_HUD_ICON_MAIL, UnreadLetters ? "New" : nullptr) && m_pWindowMailboxList->IsOpenned())
-			SendLetterAction(-1, MAILLETTERFLAG_REFRESH);
+			SendLetterAction(nullptr, MAILLETTERFLAG_REFRESH);
 
 	}
 	// questing gui icon
@@ -201,100 +207,105 @@ void CUIGameInterface::ConToggleGameHUDMRPG(IConsole::IResult* pResult, void* pU
 void CUIGameInterface::CallbackRenderMailboxList(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
 {
 	CUIRect ListBoxRect, DownButtonsRect, ButtonRefreshRect, ButtonSendRect;
-	pWindowRect.HSplitBottom(25.0f, &ListBoxRect, &DownButtonsRect);
+	pWindowRect.HSplitBottom(40.0f, &ListBoxRect, &DownButtonsRect);
+	DownButtonsRect.Margin(8.0f, &DownButtonsRect);
 	DownButtonsRect.VSplitLeft(40.0f, &ButtonSendRect, &ButtonRefreshRect);
 
 	static CMenus::CButtonContainer s_ButtonSend;
-	if(m_pClient->m_pMenus->DoButton_Menu(&s_ButtonSend, "\xe2\x9c\x89", 0, &ButtonSendRect, 0, CUI::CORNER_BL, 12.0f))
+	if(m_pClient->m_pMenus->DoButton_Menu(&s_ButtonSend, "\xe2\x9c\x89", 0, &ButtonSendRect, 0, CUI::CORNER_L, 4.0f))
 		m_pWindowMailboxLetterSend->Reverse();
 
 	static CMenus::CButtonContainer s_ButtonRefresh;
-	if(m_pClient->m_pMenus->DoButton_Menu(&s_ButtonRefresh, "Refresh", 0, &ButtonRefreshRect, 0, CUI::CORNER_BR, 12.0f))
-		SendLetterAction(-1, MAILLETTERFLAG_REFRESH);
+	if(m_pClient->m_pMenus->DoButton_Menu(&s_ButtonRefresh, "Refresh", 0, &ButtonRefreshRect, 0, CUI::CORNER_R, 4.0f))
+		SendLetterAction(nullptr, MAILLETTERFLAG_REFRESH);
 
 	if(m_aLettersList.empty())
 	{
 		CUIRect LabelEmpty;
-		pWindowRect.HSplitTop(pWindowRect.h / 3.0f, 0, &LabelEmpty);
-		UI()->DoLabel(&LabelEmpty, "Is empty.\nTry refresh the list.", 14.0f, CUI::ALIGN_CENTER);
+		pWindowRect.HSplitTop(pWindowRect.h / 2.5f, 0, &LabelEmpty);
+		UI()->DoLabel(&LabelEmpty, "Is empty.\nTry refresh the list.", 12.0f, CUI::ALIGN_CENTER);
 		return;
 	}
 
 	char aBuf[128];
 	static int s_LetterSelected = -1;
 	static CMenus::CListBox s_ListBox;
-	str_format(aBuf, sizeof(aBuf), "Mailbox capacity %d/%d", m_aLettersList.size(), (int)MAILLETTER_MAX_CAPACITY);
+	str_format(aBuf, sizeof(aBuf), "Mailbox capacity %d/%d", m_aLettersList.size(), MAILLETTER_MAX_CAPACITY);
 	s_ListBox.DoHeader(&ListBoxRect, aBuf, 20.0f, 0.0f);
-	s_ListBox.DoStart(32.0f, m_aLettersList.size(), 1, 3, -1, 0, false);
+	s_ListBox.DoStart(18.0f, m_aLettersList.size(), 1, 3, -1, 0, true, 0, true);
 	for(int i = 0; i < (int)m_aLettersList.size(); i++)
 	{
 		const CMailboxLetter* pLetter = &m_aLettersList[i];
 		CMenus::CListboxItem Item = s_ListBox.DoNextItem(pLetter, s_LetterSelected == i);
 		if(Item.m_Visible)
 		{
-			static float SkipLabelWeidth = 5.0f;
-			static float LetterIconSize = 30.0f;
+			static float LetterIconSize = 16.0f;
 			const bool HasItem = !pLetter->m_AttachmentItem.Empty();
 			const vec4 TextColor = pLetter->m_IsRead ? vec4(0.6f, 0.6f, 0.6f, 1.0f) : vec4(1.0f, 1.0f, 1.0f, 1.0f);
-			const char* pIcon = HasItem ? (pLetter->m_IsRead ? "mail_o" : "mail_c") : (pLetter->m_IsRead ? "letter_o" : "letter_c");
+			const char* pIcon = HasItem ? "letter_i" : "letter";
 
-			CUIRect LetterIconRect;
-			Item.m_Rect.Margin(5.0f, &LetterIconRect);
-			m_pClient->m_pMenus->DoItemIcon(pIcon, LetterIconRect, LetterIconRect.h);
+			CUIRect Label, LetterIconRect;
+			Item.m_Rect.VMargin(4.0f, &Item.m_Rect);
+			Item.m_Rect.VSplitLeft(LetterIconSize, &LetterIconRect, &Label);
+			Label.Margin(2.0f, &Label);
+			m_pClient->m_pMenus->DoItemIcon(pIcon, LetterIconRect, LetterIconSize);
+			UI()->DoLabelColored(&Label, pLetter->m_aName, 10.0f, CUI::ALIGN_LEFT, TextColor, Label.w, false);
 
-			CUIRect Label, Attachment;
-			Item.m_Rect.VMargin((LetterIconSize + 5.0f), &Label);
-			Label.VSplitRight(0.0f, &Label, &Attachment);
-
-			Label.HSplitTop(3.0f, 0, &Label);
-			UI()->DoLabelColored(&Label, pLetter->m_aName, 12.0f, CUI::ALIGN_LEFT, TextColor, Label.w - SkipLabelWeidth, false);
-
-			Label.HSplitTop(14.0f, 0, &Label);
-			UI()->DoLabelColored(&Label, "by", 10.0f, CUI::ALIGN_LEFT, vec4(0.5f, 0.5f, 0.5f, 1.0f), Label.w - SkipLabelWeidth, false);
+			const float TextWidth = TextRender()->TextWidth(10.0f, pLetter->m_aFrom, -1);
+			Label.VSplitRight(TextWidth + 16.0f, 0, &Label);
+			UI()->DoLabelColored(&Label, "by", 10.0f, CUI::ALIGN_LEFT, vec4(0.5f, 0.5f, 0.5f, 1.0f), Label.w, false);
 			Label.VSplitLeft(15.0f, 0, &Label);
-			UI()->DoLabelColored(&Label, pLetter->m_aFrom, 10.0f, CUI::ALIGN_LEFT, vec4(0.85f, 0.85f, 0.85f, 1.0f), Label.w - SkipLabelWeidth, false);
-
-			if(HasItem)
-			{
-				Attachment.HSplitTop(2.0f, 0, &Attachment);
-				DrawUIRectIconItem(&Attachment, 28.0f, pLetter->m_AttachmentItem);
-			}
+			UI()->DoLabelColored(&Label, pLetter->m_aFrom, 10.0f, CUI::ALIGN_LEFT, vec4(0.85f, 0.85f, 0.85f, 1.0f), Label.w, false);
 		}
 	}
 
 	s_LetterSelected = s_ListBox.DoEnd();
-	if(s_ListBox.WasItemActivated() && (s_LetterSelected != m_LetterActiveSelected || !m_pWindowMailboxLetterActions->IsOpenned()))
+	if(s_LetterSelected >= 0 && s_LetterSelected < (int)m_aLettersList.size())
 	{
-		m_LetterActiveSelected = s_LetterSelected;
-		m_pWindowMailboxLetterActions->Open();
+		if(s_ListBox.WasItemActivated())
+		{
+			m_pLetterSelected = &m_aLettersList[s_LetterSelected];
+			m_pWindowMailboxLetter->Open();
+		}
+		if(s_ListBox.WasRightMouseClick())
+		{
+			m_pLetterSelected = &m_aLettersList[s_LetterSelected];
+			m_pWindowMailboxLetter->Close();
+			m_pWindowMailboxLetterActions->Open();
+		}
 	}
 }
 
-void CUIGameInterface::CallbackRenderMailboxLetterSelected(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+void CUIGameInterface::CallbackRenderMailboxListButtonHelp(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
 {
-	if((m_LetterActiveSelected < 0 || m_LetterActiveSelected >= (int)m_aLettersList.size()) && pCurrentWindow.IsOpenned())
+	pCurrentWindow.SetSize({ 200, 200 });
+
+
+}
+
+void CUIGameInterface::CallbackRenderMailboxLetter(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+{
+	if(!m_pLetterSelected)
 	{
 		pCurrentWindow.Close();
 		return;
 	}
 
 	// update state read
-	CMailboxLetter* pLetter = &m_aLettersList[m_LetterActiveSelected];
-	SendLetterAction(pLetter->m_MailLetterID, MAILLETTERFLAG_READ);
-	pLetter->m_IsRead = true;
+	SendLetterAction(m_pLetterSelected, MAILLETTERFLAG_READ);
 
 	// labels
-	const bool HasItem = !pLetter->m_AttachmentItem.Empty();
+	const bool HasItem = !m_pLetterSelected->m_AttachmentItem.Empty();
 	CUIRect Label = pWindowRect, ItemSlot, AcceptButton, DeleteButton;
 	Label.VMargin(10.0f, &Label);
 	Label.HSplitBottom(28.0f, &Label, &AcceptButton);
 	UI()->DoLabelColored(&Label, " Title:", 12.0f, CUI::ALIGN_LEFT, vec4(1.0f, 0.9f, 0.8f, 1.0f));
-	UI()->DoLabel(&Label, pLetter->m_aName, 12.0f, CUI::ALIGN_CENTER);
+	UI()->DoLabel(&Label, m_pLetterSelected->m_aName, 12.0f, CUI::ALIGN_CENTER);
 	Label.HSplitTop(22.0f, 0, &Label);
 	RenderTools()->DrawUIRectLine(&Label, vec4(0.3f, 0.3f, 0.3f, 0.3f), LineDirectionFlag::LINE_LEFT);
 	if(HasItem)
 		Label.VSplitRight(64.0f, &Label, &ItemSlot);
-	UI()->DoLabel(&Label, pLetter->m_aDesc, 10.0f, CUI::ALIGN_LEFT, Label.w);
+	UI()->DoLabel(&Label, m_pLetterSelected->m_aDesc, 10.0f, CUI::ALIGN_LEFT, Label.w);
 
 	AcceptButton.HMargin(5.0f, &AcceptButton);
 	AcceptButton.VSplitLeft(80.0f, &DeleteButton, &AcceptButton);
@@ -304,7 +315,7 @@ void CUIGameInterface::CallbackRenderMailboxLetterSelected(const CUIRect& pWindo
 	static CMenus::CButtonContainer s_aButtonAccept;
 	if(m_pClient->m_pMenus->DoButton_Menu(&s_aButtonAccept, "Accept", 0, &AcceptButton, 0, CUI::CORNER_ALL))
 	{
-		SendLetterAction(pLetter->m_MailLetterID, MAILLETTERFLAG_ACCEPT | MAILLETTERFLAG_REFRESH);
+		SendLetterAction(m_pLetterSelected, MAILLETTERFLAG_ACCEPT | MAILLETTERFLAG_REFRESH);
 		pCurrentWindow.Close();
 	}
 
@@ -312,9 +323,7 @@ void CUIGameInterface::CallbackRenderMailboxLetterSelected(const CUIRect& pWindo
 	DeleteButton.VMargin(3.0f, &DeleteButton);
 	static CMenus::CButtonContainer s_aButtonDelete;
 	if(m_pClient->m_pMenus->DoButton_Menu(&s_aButtonDelete, "Delete", 0, &DeleteButton, 0, CUI::CORNER_ALL))
-	{
 		CreatePopupBox(&pCurrentWindow, 200.0f, "Do you really want to delete letter?", POPUP_REGISTER(&CUIGameInterface::CallbackPopupDeleteLetter, this));
-	}
 
 	// icon item
 	if(HasItem)
@@ -327,9 +336,9 @@ void CUIGameInterface::CallbackRenderMailboxLetterSelected(const CUIRect& pWindo
 		LabelAmount.y += 3.0f + IconSize;
 
 		char aBufAttachmentLabel[256];
-		str_format(aBufAttachmentLabel, sizeof(aBufAttachmentLabel), "Amount\n%d", pLetter->m_AttachmentItem.m_Amount);
+		str_format(aBufAttachmentLabel, sizeof(aBufAttachmentLabel), "Amount\n%d", m_pLetterSelected->m_AttachmentItem.m_Amount);
 		UI()->DoLabelColored(&LabelAmount, aBufAttachmentLabel, 10.0f, CUI::ALIGN_CENTER, vec4(1.0f, 0.9f, 0.8f, 1.0f));
-		DoDrawItemIcon(&s_IconButton, &ItemSlot, IconSize, pLetter->m_AttachmentItem);
+		DoDrawItemIcon(&s_IconButton, &ItemSlot, IconSize, m_pLetterSelected->m_AttachmentItem);
 	}
 }
 
@@ -388,7 +397,7 @@ void CUIGameInterface::CallbackRenderMailboxLetterSend(const CUIRect& pWindowRec
 		if(str_length(s_aBufTitle) < 3 || str_length(s_aBufTitle) > 12 || str_length(s_aBufPlayer) < 1 || str_length(s_aBufPlayer) > 24
 			|| str_length(s_aBufMessage) < 1 || str_length(s_aBufMessage) > 48)
 		{
-			CreateInformationBox(&pCurrentWindow, 176, "The minimum number of characters entered can.\n- Title (3 - 12)\n- Player (1 - 24)\n- Message (1 - 48)");
+			CreateInformationBox(&pCurrentWindow, 260.0f, "The minimum number of characters entered can.\n- Title (3 - 12)\n- Player (1 - 24)\n- Message (1 - 48)");
 		}
 		else
 		{
@@ -407,16 +416,56 @@ void CUIGameInterface::CallbackRenderMailboxLetterSend(const CUIRect& pWindowRec
 	}
 }
 
-void CUIGameInterface::SendLetterAction(int LetterID, int64 Flags)
+void CUIGameInterface::CallbackRenderMailboxLetterActions(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+{
+	float ButtonAmount = 2;
+	static float ButtonHeight = 16.0f;
+
+	CUIRect MainView = pWindowRect, Button;
+	MainView.HSplitTop(ButtonHeight, &Button, &MainView);
+	static CMenus::CButtonContainer s_aButtonOpen;
+	if(m_pClient->m_pMenus->DoButton_Menu(&s_aButtonOpen, "Open letter", 0, &Button, 0, CUI::CORNER_ALL, 2.0f))
+	{
+		m_pWindowMailboxLetter->Open();
+		pCurrentWindow.Close();
+	}
+
+	if(!m_pLetterSelected->m_IsRead)
+	{
+		ButtonAmount++;
+		MainView.HSplitTop(ButtonHeight, &Button, &MainView);
+		static CMenus::CButtonContainer s_aButtonMarkRead;
+		if(m_pClient->m_pMenus->DoButton_Menu(&s_aButtonMarkRead, "Mark as read", 0, &Button, 0, CUI::CORNER_ALL, 2.0f))
+		{
+			SendLetterAction(m_pLetterSelected, MAILLETTERFLAG_READ);
+			pCurrentWindow.Close();
+		}
+	}
+
+	MainView.HSplitTop(ButtonHeight, &Button, &MainView);
+	static CMenus::CButtonContainer s_aButtonDelete;
+	if(m_pClient->m_pMenus->DoButton_Menu(&s_aButtonDelete, "Delete letter", 0, &Button, 0, CUI::CORNER_ALL, 2.0f))
+	{
+		CreatePopupBox(m_pWindowMailboxLetter, 200.0f, "Do you really want to delete letter?", POPUP_REGISTER(&CUIGameInterface::CallbackPopupDeleteLetter, this));
+		pCurrentWindow.Close();
+	}
+
+	pCurrentWindow.SetSize(vec2(120, 4.0f + ButtonAmount * ButtonHeight));
+}
+
+void CUIGameInterface::SendLetterAction(CMailboxLetter* pLetter, int64 Flags)
 {
 	if(Client()->State() != IClient::STATE_ONLINE)
 		return;
+
+	if(pLetter && Flags & MAILLETTERFLAG_READ)
+		pLetter->m_IsRead = true;
 
 	if(Flags & MAILLETTERFLAG_REFRESH)
 		m_aLettersList.clear();
 
 	CNetMsg_Cl_MailLetterActions Msg;
-	Msg.m_MailLetterID = LetterID;
+	Msg.m_MailLetterID = pLetter ? pLetter->m_MailLetterID : -1;
 	Msg.m_MailLetterFlags = Flags;
 	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
 }
@@ -612,10 +661,6 @@ void CUIGameInterface::CreateInformationBox(CWindowUI* pDependentWindow, float W
 	const CUIRect* pScreen = UI()->Screen();
 	Graphics()->MapScreen(pScreen->x, pScreen->y, pScreen->w, pScreen->h);
 
-	// close other information box
-	if(m_pWindowInformationBox->IsOpenned())
-		m_pWindowInformationBox->Close();
-
 	// plain text for information box
 	const float FontSize = 10.0f;
 	m_CursorInformationBox.Reset();
@@ -658,10 +703,6 @@ void CUIGameInterface::CreatePopupBox(CWindowUI* pDependentWindow, float Width, 
 	const CUIRect* pScreen = UI()->Screen();
 	Graphics()->MapScreen(pScreen->x, pScreen->y, pScreen->w, pScreen->h);
 
-	// close other information box
-	if(m_pWindowPopupBox->IsOpenned())
-		m_pWindowPopupBox->Close();
-
 	// plain text for information box
 	const float FontSize = 10.0f;
 	m_CursorPopupBox.Reset();
@@ -697,14 +738,16 @@ void CUIGameInterface::CallbackRenderGuiPopupBox(const CUIRect& pWindowRect, CWi
 	static CMenus::CButtonContainer s_ButtonAccept;
 	if(m_pClient->m_pMenus->DoButton_Menu(&s_ButtonAccept, "Yes", 0, &ButtonAccept, 0, CUI::CORNER_ALL, 8.0f))
 	{
-		m_WindowPopupCallback(&pCurrentWindow, true);
+		if(m_WindowPopupCallback)
+			m_WindowPopupCallback(&pCurrentWindow, true);
 		pCurrentWindow.Close();
 	}
 
 	static CMenus::CButtonContainer s_ButtonDeny;
 	if(m_pClient->m_pMenus->DoButton_Menu(&s_ButtonDeny, "No", 0, &ButtonDeny, 0, CUI::CORNER_ALL, 8.0f))
 	{
-		m_WindowPopupCallback(&pCurrentWindow, false);
+		if(m_WindowPopupCallback)
+			m_WindowPopupCallback(&pCurrentWindow, false);
 		pCurrentWindow.Close();
 	}
 }
@@ -713,8 +756,7 @@ void CUIGameInterface::CallbackPopupDeleteLetter(const CWindowUI* pPopupWindow, 
 {
 	if(ButtonYes)
 	{
-		CMailboxLetter* pLetter = &m_aLettersList[m_LetterActiveSelected];
-		SendLetterAction(pLetter->m_MailLetterID, MAILLETTERFLAG_DELETE | MAILLETTERFLAG_REFRESH);
-		m_pWindowMailboxLetterActions->Close();
+		SendLetterAction(m_pLetterSelected, MAILLETTERFLAG_DELETE | MAILLETTERFLAG_REFRESH);
+		m_pWindowMailboxLetter->Close();
 	}
 }

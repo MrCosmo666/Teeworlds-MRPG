@@ -11,7 +11,9 @@
 class CWindowsRender : public CComponent
 {
 public:
-	virtual void OnRender();
+	void OnRender() override;
+
+	void CallbackWindowHelper(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
 };
 
 #endif

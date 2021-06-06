@@ -18,10 +18,6 @@ CInventoryList::CInventoryList(CInventory* pInventory, const char *pInventoryLis
 	m_MaxSlotsWidth = MaxSlotsWidth;
 	m_MaxSlotsHeight = MaxSlotsHeight;
 
-	CUIRect MainView = pMainView;
-	MainView.y = max(pMainView.y, 20.0f);
-	MainView.w = ((INVSLOT_BOXSIZE + INVSLOT_SPACING) * (MaxSlotsWidth + 1)) - (INVSLOT_SPACING * 2.0f);
-	MainView.h = ((INVSLOT_BOXSIZE + INVSLOT_SPACING) * (MaxSlotsHeight + 2)) - (INVSLOT_SPACING * 2.0f);
 	m_pWindowItemsList = CUI::CreateWindow(pInventoryListName, vec2(200, 200));
 
 	// by default, the first page should exist
@@ -116,7 +112,7 @@ void CInventoryList::Render()
 	if(!m_pWindowItemsList->IsOpenned())
 		return;
 
-	m_pWindowItemsList->RegisterCallback([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+	m_pWindowItemsList->Register([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
 	{
 		// render pages
 		CInventoryPage* pInventoryActivePage = m_aInventoryPages[m_ActivePage];

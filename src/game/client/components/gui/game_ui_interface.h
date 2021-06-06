@@ -50,6 +50,8 @@ private:
 	bool m_ActiveGUI;
 	void RenderGuiIcons();
 
+	// test window
+
 	// gui information box
 	CTextCursor m_CursorInformationBox;
 	CWindowUI* m_pWindowInformationBox;
@@ -66,15 +68,21 @@ private:
 	void CallbackPopupDeleteLetter(const CWindowUI* pPopupWindow, bool ButtonYes);
 
 	// inbox
-	int m_LetterActiveSelected;
+	CMailboxLetter* m_pLetterSelected;
 	CWindowUI* m_pWindowMailboxList;
-	CWindowUI* m_pWindowMailboxLetterSend;
-	CWindowUI* m_pWindowMailboxLetterActions;
 	void CallbackRenderMailboxList(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
-	void CallbackRenderMailboxLetterSelected(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
+	void CallbackRenderMailboxListButtonHelp(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
+
+	CWindowUI* m_pWindowMailboxLetterSend;
+	void CallbackRenderMailboxLetter(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
+
+	CWindowUI* m_pWindowMailboxLetter;
 	void CallbackRenderMailboxLetterSend(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
 
-	void SendLetterAction(int LetterID, int64 Flags);
+	CWindowUI* m_pWindowMailboxLetterActions;
+	void CallbackRenderMailboxLetterActions(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
+
+	void SendLetterAction(CMailboxLetter* pLetter, int64 Flags);
 	bool UnreadLetterMails() const;
 
 	// questing

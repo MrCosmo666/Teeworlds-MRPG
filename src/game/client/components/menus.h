@@ -256,6 +256,8 @@ public:
 		int m_ListBoxNumItems;
 		int m_ListBoxItemsPerRow;
 		bool m_ListBoxItemActivated;
+		bool m_ListBoxAllowRightMouseClick;
+		bool m_ListBoxItemRightMouseActivated;
 		const char* m_pBottomText;
 		float m_FooterHeight;
 		CScrollRegion m_ScrollRegion;
@@ -275,12 +277,13 @@ public:
 		bool DoFilter(float FilterHeight = 20.0f, float Spacing = 2.0f);
 		void DoFooter(const char* pBottomText, float FooterHeight = 20.0f); // call before DoStart to create a footer
 		void DoStart(float RowHeight, int NumItems, int ItemsPerRow, int RowsPerScroll, int SelectedIndex,
-			const CUIRect* pRect = 0, bool Background = true, bool* pActive = 0);
+			const CUIRect* pRect = 0, bool Background = true, bool* pActive = 0, bool AllowRightMouseClick = false);
 		CListboxItem DoNextItem(const void* pID, bool Selected = false, bool* pActive = 0);
 		CListboxItem DoSubheader();
 		int DoEnd();
 		bool FilterMatches(const char* pNeedle) const;
 		bool WasItemActivated() const { return m_ListBoxItemActivated; };
+		bool WasRightMouseClick() const { return m_ListBoxItemRightMouseActivated; }
 		float GetScrollBarWidth() const { return m_ScrollRegion.IsScrollbarShown() ? 20 : 0; } // defined in menus_scrollregion.cpp
 	};
 

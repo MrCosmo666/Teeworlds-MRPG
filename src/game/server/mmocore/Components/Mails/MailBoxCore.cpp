@@ -44,7 +44,7 @@ void CMailBoxCore::GetInformationInbox(CPlayer *pPlayer)
 	bool EmptyMailBox = true;
 	const int ClientID = pPlayer->GetCID();
 	int HideID = (int)(NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + 200);
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AccountID, (int)MAILLETTER_MAX_CAPACITY);
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AccountID, MAILLETTER_MAX_CAPACITY);
 	while(pRes->next())
 	{
 		// get the information to create an object
@@ -163,7 +163,7 @@ void CMailBoxCore::SetReadState(int MailLetterID, bool State)
 void CMailBoxCore::SendClientListMail(CPlayer* pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AccountID, (int)MAILLETTER_MAX_CAPACITY);
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_inbox", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AccountID, MAILLETTER_MAX_CAPACITY);
 	while(pRes->next())
 	{
 		std::string Name = pRes->getString("MailName").c_str();

@@ -83,7 +83,7 @@ void CMenus::CListBox::DoFooter(const char* pBottomText, float FooterHeight)
 }
 
 void CMenus::CListBox::DoStart(float RowHeight, int NumItems, int ItemsPerRow, int RowsPerScroll,
-	int SelectedIndex, const CUIRect* pRect, bool Background, bool* pActive)
+	int SelectedIndex, const CUIRect* pRect, bool Background, bool* pActive, bool AllowRightMouseClick)
 {
 	CUIRect View;
 	if(pRect)
@@ -116,6 +116,8 @@ void CMenus::CListBox::DoStart(float RowHeight, int NumItems, int ItemsPerRow, i
 	m_ListBoxItemsPerRow = ItemsPerRow;
 	m_ListBoxDoneEvents = 0;
 	m_ListBoxItemActivated = false;
+	m_ListBoxItemRightMouseActivated = false;
+	m_ListBoxAllowRightMouseClick = AllowRightMouseClick;
 
 	// handle input
 	if(!pActive || *pActive)
@@ -159,7 +161,7 @@ CMenus::CListboxItem CMenus::CListBox::DoNextRow()
 
 CMenus::CListboxItem CMenus::CListBox::DoNextItem(const void *pId, bool Selected, bool *pActive)
 {
-	int ThisItemIndex = m_ListBoxItemIndex;
+	const int ThisItemIndex = m_ListBoxItemIndex;
 	if(Selected)
 	{
 		if(m_ListBoxSelectedIndex == m_ListBoxNewSelected)
@@ -169,8 +171,9 @@ CMenus::CListboxItem CMenus::CListBox::DoNextItem(const void *pId, bool Selected
 
 	CListboxItem Item = DoNextRow();
 	static bool s_ItemClicked = false;
+	bool RightMouseClicked = false;
 
-	if(Item.m_Visible && m_pUI->DoButtonLogic(pId, &Item.m_Rect))
+	if(Item.m_Visible && (m_pUI->DoButtonLogic(pId, &Item.m_Rect) || (m_ListBoxAllowRightMouseClick && (RightMouseClicked = m_pUI->DoButtonLogic(pId, &Item.m_Rect, 1)))))
 	{
 		s_ItemClicked = true;
 		m_ListBoxNewSelected = ThisItemIndex;
@@ -180,11 +183,17 @@ CMenus::CListboxItem CMenus::CListBox::DoNextItem(const void *pId, bool Selected
 	else
 		s_ItemClicked = false;
 
-	const bool ProcessInput = !pActive || *pActive;
-
 	// process input, regard selected index
+	if(RightMouseClicked)
+	{
+		m_ListBoxItemRightMouseActivated = true;
+		m_pMenus->UI()->SetActiveItem(0);
+	}
+
+	const bool ProcessInput = !pActive || *pActive;
 	if(m_ListBoxSelectedIndex == ThisItemIndex)
 	{
+
 		if(ProcessInput && !m_ListBoxDoneEvents)
 		{
 			m_ListBoxDoneEvents = 1;
@@ -194,6 +203,7 @@ CMenus::CListboxItem CMenus::CListBox::DoNextItem(const void *pId, bool Selected
 				m_ListBoxItemActivated = true;
 				m_pMenus->UI()->SetActiveItem(0);
 			}
+
 		}
 
 		CUIRect r = Item.m_Rect;

@@ -412,6 +412,9 @@ void CGameClient::OnInit()
 	m_RenderTools.m_pUI = UI();
 	int64 Start = time_get();
 
+	// init window components
+	CWindowUI::InitComponents(UI(), RenderTools());
+
 	// Render load screen at 0% to get graphics sooner.
 	// Swap again to minimize initial flashing color.
 	m_pMenus->InitLoading(1);

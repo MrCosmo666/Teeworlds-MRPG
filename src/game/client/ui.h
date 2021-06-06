@@ -177,6 +177,11 @@ public:
 		RECTLIMITSCREEN_ALL = -1,
 		RECTLIMITSCREEN_UP = 1 << 0,
 		RECTLIMITSCREEN_DOWN = 1 << 1,
+
+		RECTLIMITSCREEN_SKIP_BORDURE_UP = 1 << 2,
+		RECTLIMITSCREEN_SKIP_BORDURE_DOWN = 1 << 3,
+
+		RECTLIMITSCREEN_ALIGN_CENTER_X = 1 << 4,
 	};
 	void MouseRectLimitMapScreen(CUIRect* pRect, float Indent, int LimitRectFlag = -1);
 
@@ -239,16 +244,18 @@ public:
 	{
 		WINDOWFLAG_MINIMIZE = 1 << 0,
 		WINDOWFLAG_CLOSE = 1 << 1,
-		WINDOWFLAG_ALL = WINDOWFLAG_MINIMIZE | WINDOWFLAG_CLOSE
+		WINDOWFLAG_ALL = WINDOWFLAG_MINIMIZE | WINDOWFLAG_CLOSE,
+
+		WINDOW_WITHOUT_BORDURE = 1 << 2,
+		WINDOW_CLOSE_CLICKING_OUTSIDE = 1 << 3,
 	};
+
+	static class CWindowUI* CreateWindow(const char* pWindowName, vec2 WindowSize, class CWindowUI* pDependentWindow = nullptr, bool* pRenderDependence = nullptr, int WindowFlags = WINDOWFLAG_ALL);
 
 	void StartCheckWindow(class CWindowUI* pWindow) { m_pCheckWindow = pWindow; }
 	void FinishCheckWindow() { m_pCheckWindow = nullptr; }
-
 	void WindowRender();
 	void WindowsClear();
-
-	static class CWindowUI* CreateWindow(const char* pWindowName, vec2 WindowSize, class CWindowUI* pDependentWindow = nullptr, bool* pRenderDependence = nullptr, int WindowFlags = WINDOWFLAG_ALL);
 
 	// slots
 	class CInventorySlot* m_pHoveredSlot;

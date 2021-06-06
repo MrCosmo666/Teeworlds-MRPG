@@ -79,33 +79,42 @@ void CUI::MouseRectLimitMapScreen(CUIRect* pRect, float Indent, int LimitRectFla
 	const float SpaceWidthX = Screen()->w / 24.f;
 	const float SpaceHeightY = Screen()->h / 24.f;
 
-	if(MouseX() < MaxWidth / 2.0f)
+	pRect->x = MouseX();
+	if(pRect->x < MaxWidth / 2.0f)
 	{
-		pRect->x = MouseX() - (pRect->w + Indent);
+		pRect->x -= pRect->w + Indent;
+		if(LimitRectFlag & RECTLIMITSCREEN_ALIGN_CENTER_X)
+			pRect->x += pRect->w / 2.0f;
 		if((pRect->x - SpaceWidthX) < Screen()->x)
 			pRect->x = Indent + SpaceWidthX;
 	}
 	else
 	{
-		pRect->x = MouseX();
-		if((MouseX() + (pRect->w + SpaceWidthX)) > MaxWidth)
+		if(LimitRectFlag & RECTLIMITSCREEN_ALIGN_CENTER_X)
+			pRect->x -= pRect->w / 2.0f;
+		if((pRect->x + (pRect->w + SpaceWidthX)) > MaxWidth)
 			pRect->x = (MaxWidth - pRect->w) - (Indent + SpaceWidthX);
 	}
 
-	if((MouseY() < MaxHeight / 2.0f && LimitRectFlag & RECTLIMITSCREEN_DOWN) || LimitRectFlag == RECTLIMITSCREEN_ALL)
+	pRect->y = MouseY();
+	if((pRect->y < MaxHeight / 2.0f && LimitRectFlag & RECTLIMITSCREEN_DOWN) || LimitRectFlag == RECTLIMITSCREEN_ALL)
 	{
-		pRect->y = MouseY();
-		if((MouseY() + (pRect->h + SpaceHeightY)) > MaxHeight)
+		if(LimitRectFlag & RECTLIMITSCREEN_SKIP_BORDURE_DOWN)
+			pRect->y += Indent;
+		else if((pRect->y + (pRect->h + SpaceHeightY)) > MaxHeight)
 			pRect->y = (MaxHeight - pRect->h) - (Indent + SpaceHeightY);
 	}
 	else if(LimitRectFlag & RECTLIMITSCREEN_UP || LimitRectFlag == RECTLIMITSCREEN_ALL)
 	{
-		pRect->y = MouseY() - (pRect->h + Indent);
-		if((pRect->y - SpaceHeightY) < Screen()->y)
-			pRect->y = Indent + SpaceHeightY;
+		if(LimitRectFlag & RECTLIMITSCREEN_SKIP_BORDURE_UP)
+			pRect->y -= pRect->h + Indent;
+		else
+		{
+			pRect->y -= pRect->h + Indent;
+			if((pRect->y - SpaceHeightY) < Screen()->y)
+				pRect->y = Indent + SpaceHeightY;
+		}
 	}
-	else
-		pRect->y = MouseY();
 }
 
 bool CUI::KeyPress(int Key) const
@@ -129,7 +138,7 @@ bool CUI::MouseHovered(const CUIRect* pRect) const
 	{
 		for(auto &p : CWindowUI::ms_aWindows)
 		{
-			if(p->m_Openned && p->m_pCallback && MouseInside(&p->m_WindowRect))
+			if(p->IsRenderAllowed() && MouseInside(&p->m_WindowRect))
 				return false;
 		}
 		return MouseInside(pRect) && MouseInsideClip();
@@ -578,36 +587,48 @@ int CUI::DoMouseEventLogic(const CUIRect* pRect, int Button) const
 	return Event;
 }
 
+CWindowUI* CUI::CreateWindow(const char* pWindowName, vec2 WindowSize, CWindowUI* pDependentWindow, bool* pRenderDependence, int WindowFlags)
+{
+	const auto pSearch = std::find_if(CWindowUI::ms_aWindows.begin(), CWindowUI::ms_aWindows.end(), [pWindowName](const CWindowUI* pWindow) { return str_comp(pWindowName, pWindow->GetWindowName()) == 0;  });
+	if(pSearch != CWindowUI::ms_aWindows.end())
+		return (*pSearch);
+
+	CWindowUI* pWindow = new CWindowUI(pWindowName, WindowSize, pDependentWindow, pRenderDependence, WindowFlags);
+	CWindowUI::ms_aWindows.push_back(pWindow);
+	return pWindow;
+}
+
 void CUI::WindowRender()
 {
-	if(CWindowUI::ms_aWindows.empty())
-		return;
+	/*const auto RenderAllowed = [](const CWindowUI* pWindow) -> bool
+	{
+		return (pWindow->m_Openned && (pWindow->m_pRenderDependence == nullptr || (pWindow->m_pRenderDependence && *pWindow->m_pRenderDependence == true)));
+	};*/
 
 	// update hovered the active highlighted area
 	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
 	{
-		if((*it)->m_Openned && MouseInside(&(*it)->m_WindowRect))
+		if((*it)->IsRenderAllowed() && MouseInside(&(*it)->m_WindowRect))
 			m_pHoveredWindow = (*it);
 	}
 
 	// draw in reverse order as they are sorted here
 	bool ShowCursor = false;
-	CUIRect ScreenMap = *Screen();
+	const CUIRect ScreenMap = *Screen();
 	Graphics()->MapScreen(ScreenMap.x, ScreenMap.y, ScreenMap.w, ScreenMap.h);
 	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
 	{
-		if((*it)->m_Openned)
+		if((*it)->IsRenderAllowed())
 		{
-			if((*it)->m_pRenderDependence == nullptr || ((*it)->m_pRenderDependence && (*(*it)->m_pRenderDependence) == true))
-				ShowCursor = true;
 			(*it)->Render();
+			ShowCursor = true;
 		}
 	}
 
 	// update the sorting in case of a change of the active window
 	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
 	{
-		if((*it)->m_Openned)
+		if((*it)->IsRenderAllowed())
 		{
 			// start check only this window
 			StartCheckWindow((*it));
@@ -629,6 +650,22 @@ void CUI::WindowRender()
 	// clear hovered active highlighted area
 	m_pHoveredWindow = nullptr;
 
+	// hotkeys
+	CWindowUI* pWindowActive = CWindowUI::GetActiveWindow();
+	if(pWindowActive)
+	{
+		if((pWindowActive->m_WindowFlags & WINDOWFLAG_CLOSE) && Input()->KeyIsPressed(KEY_LCTRL) && Input()->KeyPress(KEY_Q))
+			pWindowActive->Close();
+		if((pWindowActive->m_WindowFlags & WINDOWFLAG_MINIMIZE) && Input()->KeyIsPressed(KEY_LCTRL) && Input()->KeyPress(KEY_M))
+			pWindowActive->MinimizeWindow();
+		if((pWindowActive->m_pCallbackHelp) && Input()->KeyIsPressed(KEY_LCTRL) && Input()->KeyPress(KEY_H))
+		{
+			CWindowUI::ms_pWindowHelper->Init(vec2(0, 0), pWindowActive, pWindowActive->m_pRenderDependence);
+			CWindowUI::ms_pWindowHelper->Register(pWindowActive->m_pCallbackHelp);
+			CWindowUI::ms_pWindowHelper->Open();
+		}
+	}
+
 	// render cursor
 	if(ShowCursor)
 	{
@@ -647,15 +684,4 @@ void CUI::WindowsClear()
 	for(auto* p : CWindowUI::ms_aWindows)
 		delete p;
 	CWindowUI::ms_aWindows.clear();
-}
-
-CWindowUI* CUI::CreateWindow(const char* pWindowName, vec2 WindowSize, CWindowUI* pDependentWindow, bool* pRenderDependence, int WindowFlags)
-{
-	const auto pSearch = std::find_if(CWindowUI::ms_aWindows.begin(), CWindowUI::ms_aWindows.end(), [pWindowName](const CWindowUI* pWindow) { return str_comp(pWindowName, pWindow->GetWindowName()) == 0;  });
-	if(pSearch != CWindowUI::ms_aWindows.end())
-		return (*pSearch);
-
-	CWindowUI *pWindow =  new CWindowUI(pWindowName, WindowSize, pDependentWindow, pRenderDependence, WindowFlags);
-	CWindowUI::ms_aWindows.push_back(pWindow);
-	return pWindow;
 }
