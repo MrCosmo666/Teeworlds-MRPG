@@ -1328,7 +1328,6 @@ int CServer::Run()
 	{
 		IGameServer* pGameServer = m_pMultiWorlds->GetWorld(i)->m_pGameServer;
 		pGameServer->OnInit(i);
-
 	}
 
 	str_format(aBuf, sizeof(aBuf), "version %s", GameServer()->NetVersion());

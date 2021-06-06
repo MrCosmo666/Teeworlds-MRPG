@@ -563,7 +563,6 @@ void CChat::OnMessage(int MsgType, void* pRawMsg)
 			dbg_msg("chat_commands", "adding server chat command: name='%s' args='%s' help='%s'", pMsg->m_Name, pMsg->m_ArgsFormat, pMsg->m_HelpText);
 		else
 			dbg_msg("chat_commands", "failed to add command '%s'", pMsg->m_Name);
-
 	}
 	else if(MsgType == NETMSGTYPE_SV_COMMANDINFOREMOVE)
 	{
@@ -989,7 +988,6 @@ void CChat::OnRender()
 
 			TextRender()->DrawTextOutlined(&m_InputCursor);
 			TextRender()->DrawTextOutlined(&s_MarkerCursor);
-
 		}
 	}
 
