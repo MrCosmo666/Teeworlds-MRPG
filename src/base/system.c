@@ -147,13 +147,14 @@ static void logger_win_console(const char *line)
 			wline[len] = glyph;
 			break;
 		}
-		else if(glyph == 0)
+		if(glyph == 0)
 		{
 			// A character code of 0 signals the end of the string.
 			error = 0;
 			break;
 		}
-		else if(glyph > 0xffff)
+
+		if(glyph > 0xffff)
 		{
 			// Since the windows console does not really support
 			// UTF-16, don't mind doing actual UTF-16 encoding,
@@ -247,7 +248,6 @@ void dbg_logger_file(const char *filename)
 		dbg_logger(logger_file);
 	else
 		dbg_msg("dbg/logger", "failed to open '%s' for logging", filename);
-
 }
 
 #if defined(CONF_FAMILY_WINDOWS)

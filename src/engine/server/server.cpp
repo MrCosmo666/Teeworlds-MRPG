@@ -40,6 +40,10 @@
 
 #include "game/game_context.h"
 
+#include <game/server/mmocore/Utils/CrashHandler.h>
+
+CrashHandler g_CrashHandler;
+
 void CServer::CClient::Reset()
 {
 	// reset input
@@ -147,18 +151,18 @@ bool CServer::CheckWorldTime(int Hour, int Minute)
 const char* CServer::GetStringTypeDay() const
 {
 	if(m_TimeWorldHour >= 0 && m_TimeWorldHour < 6) return "Night";
-	else if(m_TimeWorldHour >= 6 && m_TimeWorldHour < 13) return "Morning";
-	else if(m_TimeWorldHour >= 13 && m_TimeWorldHour < 19) return "Day";
-	else return "Evening";
+	if(m_TimeWorldHour >= 6 && m_TimeWorldHour < 13) return "Morning";
+	if(m_TimeWorldHour >= 13 && m_TimeWorldHour < 19) return "Day";
+	return "Evening";
 }
 
 // format Day to Int
 int CServer::GetEnumTypeDay() const
 {
 	if(m_TimeWorldHour >= 0 && m_TimeWorldHour < 6) return DayType::NIGHT_TYPE;
-	else if(m_TimeWorldHour >= 6 && m_TimeWorldHour < 13) return DayType::MORNING_TYPE;
-	else if(m_TimeWorldHour >= 13 && m_TimeWorldHour < 19) return DayType::DAY_TYPE;
-	else return DayType::EVENING_TYPE;
+	if(m_TimeWorldHour >= 6 && m_TimeWorldHour < 13) return DayType::MORNING_TYPE;
+	if(m_TimeWorldHour >= 13 && m_TimeWorldHour < 19) return DayType::DAY_TYPE;
+	return DayType::EVENING_TYPE;
 }
 
 void CServer::SetClientName(int ClientID, const char *pName)
@@ -299,15 +303,15 @@ void CServer::Kick(int ClientID, const char *pReason)
 		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "invalid client id to kick");
 		return;
 	}
-	else if(m_RconClientID == ClientID)
+	if(m_RconClientID == ClientID)
 	{
 		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "you can't kick yourself");
- 		return;
+		return;
 	}
-	else if(m_aClients[ClientID].m_Authed > m_RconAuthLevel)
+	if(m_aClients[ClientID].m_Authed > m_RconAuthLevel)
 	{
 		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "kick command denied");
- 		return;
+		return;
 	}
 
 	m_NetServer.Drop(ClientID, pReason);
@@ -407,8 +411,7 @@ const char *CServer::ClientName(int ClientID) const
 		return "(invalid)";
 	if(m_aClients[ClientID].m_State == CServer::CClient::STATE_INGAME)
 		return m_aClients[ClientID].m_aName;
-	else
-		return "(connecting)";
+	return "(connecting)";
 }
 
 const char *CServer::ClientClan(int ClientID) const
@@ -417,8 +420,7 @@ const char *CServer::ClientClan(int ClientID) const
 		return "";
 	if(m_aClients[ClientID].m_State == CServer::CClient::STATE_INGAME)
 		return m_aClients[ClientID].m_aClan;
-	else
-		return "";
+	return "";
 }
 
 int CServer::ClientCountry(int ClientID) const
@@ -427,8 +429,7 @@ int CServer::ClientCountry(int ClientID) const
 		return -1;
 	if(m_aClients[ClientID].m_State == CServer::CClient::STATE_INGAME)
 		return m_aClients[ClientID].m_Country;
-	else
-		return -1;
+	return -1;
 }
 
 bool CServer::ClientIngame(int ClientID) const
@@ -1328,6 +1329,7 @@ int CServer::Run()
 	{
 		IGameServer* pGameServer = m_pMultiWorlds->GetWorld(i)->m_pGameServer;
 		pGameServer->OnInit(i);
+		delete pGameServer;
 	}
 
 	str_format(aBuf, sizeof(aBuf), "version %s", GameServer()->NetVersion());
