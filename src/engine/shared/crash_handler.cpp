@@ -135,11 +135,10 @@ void CrashHandler::WriteStackTrace()
 		WriteLineFile(aBuf);
 	}
 	SymCleanup(Process);
-	io_close(s_ioStackTraceFile);
 
 #elif defined(CONF_FAMILY_UNIX)
 	void* paAddrList[MAX_FRAMES + 1];
-	const int Addrlen = backtrace(paAddrList, sizeof(paAddrList) / sizeof(void*));
+	unsigned int Addrlen = backtrace(paAddrList, sizeof(paAddrList) / sizeof(void*));
 
 	if(Addrlen == 0)
 	{
@@ -185,6 +184,7 @@ void CrashHandler::WriteStackTrace()
 		}
 	}
 	free(ppSymbollist);
-	io_close(s_StackTraceFile);
 #endif
+
+	io_close(s_ioStackTraceFile);
 }
