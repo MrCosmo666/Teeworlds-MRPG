@@ -102,19 +102,21 @@ void CrashHandler::WriteStackTrace()
 	FrameShot.AddrPC.Mode = AddrModeFlat;
 	FrameShot.AddrFrame.Mode = AddrModeFlat;
 	FrameShot.AddrStack.Mode = AddrModeFlat;
-#if defined(CONF_PLATFORM_WIN32) // https://docs.microsoft.com/en-us/windows/win32/api/dbghelp/ns-dbghelp-stackframe
-	FrameShot.AddrPC.Offset = context.Eip;
-	FrameShot.AddrFrame.Offset = context.Ebp;
-	FrameShot.AddrStack.Offset = context.Esp;
-#else
+#if defined(CONF_PLATFORM_WIN64) // https://docs.microsoft.com/en-us/windows/win32/api/dbghelp/ns-dbghelp-stackframe
+	DWORD64 Offset;
 	FrameShot.AddrPC.Offset = context.Rip;
 	FrameShot.AddrFrame.Offset = context.Rbp;
 	FrameShot.AddrStack.Offset = context.Rsp;
+#else
+	DWORD Offset;
+	FrameShot.AddrPC.Offset = context.Eip;
+	FrameShot.AddrFrame.Offset = context.Ebp;
+	FrameShot.AddrStack.Offset = context.Esp;
 #endif
 
 	while(StackWalk(Machine, Process, Thread, &FrameShot, &context, nullptr, SymFunctionTableAccess, SymGetModuleBase, nullptr))
 	{
-		DWORD64 Offset = 0;
+		Offset = 0;
 		char aSymbolBuffer[sizeof(IMAGEHLP_SYMBOL) + 255];
 		PIMAGEHLP_SYMBOL Symbol = (PIMAGEHLP_SYMBOL)aSymbolBuffer;
 		Symbol->SizeOfStruct = (sizeof IMAGEHLP_SYMBOL) + 255;
