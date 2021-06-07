@@ -64,7 +64,7 @@ void CMenus::RenderAuthWindow()
 	if (m_pClient->m_pScoreboard->IsActive())
 		return;
 
-	m_MenuActiveID = EMenuState::AUTHSTATE;
+	m_MenuActiveID = MENU_AUTH_STATE;
 
 	CUIRect MainView = *UI()->Screen();
 	Graphics()->MapScreen(MainView.x, MainView.y, MainView.w, MainView.h);
@@ -292,9 +292,6 @@ void CMenus::RenderAuthWindow()
 	IGraphics::CQuadItem QuadItem(MainView.w / 2 - 240, MainView.h / 2 - 270, 513, 128);
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
-
-	// render cursor
-	RenderCursor(IMAGE_CURSOR, vec4(1.0f, 0.7f, 0.6f, 0.6f));
 }
 
 void CMenus::setAuthMessage(const char* Message, int EAuthColorMessage)

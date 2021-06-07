@@ -59,7 +59,7 @@ CMenus::CMenus()
 	m_aSaveSkinName[0] = 0;
 	m_RefreshSkinSelector = true;
 	m_pSelectedSkin = 0;
-	m_MenuActiveID = EMenuState::ESCSTATE;
+	m_MenuActiveID = MENU_ESC_STATE;
 	m_SeekBarActivatedTime = 0;
 	m_SeekBarActive = true;
 	m_SkinModified = false;
@@ -925,14 +925,14 @@ int CMenus::DoKeyReader(CButtonContainer* pBC, const CUIRect* pRect, int Key, in
 		DoButton_KeySelect(pBC, "???", pRect);
 		m_KeyReaderIsActive = true;
 	}
-	else if(Key == 0)
+	else if(NewKey == 0)
 	{
 		DoButton_KeySelect(pBC, "", pRect);
 	}
 	else
 	{
 		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "%s%s", CBinds::GetModifierName(*pNewModifier), Input()->KeyName(Key));
+		str_format(aBuf, sizeof(aBuf), "%s%s", CBinds::GetModifierName(*pNewModifier), Input()->KeyName(NewKey));
 		DoButton_KeySelect(pBC, aBuf, pRect);
 	}
 	return NewKey;
@@ -1546,11 +1546,8 @@ void CMenus::PopupCountry(int Selection, FPopupButtonCallback pfnOkButtonCallbac
 	m_Popup = POPUP_COUNTRY;
 }
 
-void CMenus::Render()
+void CMenus::RenderMenu(CUIRect Screen)
 {
-	CUIRect Screen = *UI()->Screen();
-	Graphics()->MapScreen(Screen.x, Screen.y, Screen.w, Screen.h);
-
 	static int s_InitTick = 5;
 	if(s_InitTick > 0)
 	{
@@ -2171,7 +2168,7 @@ void CMenus::SetAuthState(bool ShowWindowAuth)
 		if(!m_pClient->m_pSounds->IsPlaying(SOUND_MUSIC_MRPG_FESTIVAL))
 			m_pClient->m_pSounds->Play(CSounds::CHN_MMORPG, SOUND_MUSIC_MRPG_FESTIVAL, 0.3f);
 
-		SetActive(EMenuState::AUTHSTATE);
+		SetActive(MENU_AUTH_STATE);
 		return;
 	}
 
@@ -2179,13 +2176,17 @@ void CMenus::SetAuthState(bool ShowWindowAuth)
 	if(m_pClient->m_pSounds->IsPlaying(SOUND_MUSIC_MRPG_FESTIVAL))
 		m_pClient->m_pSounds->Stop(SOUND_MUSIC_MRPG_FESTIVAL);
 
-	SetActive(EMenuState::NOACTIVE);
+	SetActive(MENU_NO_ACTIVE);
 	mem_zero(aAuthResultReason, sizeof(aAuthResultReason));
 }
 
 void CMenus::SetActive(int ActiveID)
 {
-	m_MenuActiveID = ActiveID;
+	if(m_ShowAuthWindow && ActiveID == MENU_NO_ACTIVE)
+		m_MenuActiveID = MENU_AUTH_STATE;
+	else
+		m_MenuActiveID = ActiveID;
+
 	if(!m_MenuActiveID)
 	{
 		if(Client()->State() == IClient::STATE_ONLINE)
@@ -2216,7 +2217,7 @@ void CMenus::OnReset()
 {
 	m_pClient->m_pSounds->Stop(SOUND_MUSIC_MRPG_FESTIVAL);
 	m_ShowAuthWindow = false;
-	m_MenuActiveID = EMenuState::NOACTIVE;
+	m_MenuActiveID = MENU_NO_ACTIVE;
 	mem_zero(aAuthResultReason, sizeof(aAuthResultReason));
 }
 
@@ -2246,10 +2247,9 @@ int CMenus::GetNewESCState() const
 	// Authed menus
 	if (m_ShowAuthWindow)
 	{
-		if (m_MenuActiveID == EMenuState::AUTHSTATE)
-			return (int)EMenuState::ESCSTATE;
-		else
-			return (int)EMenuState::AUTHSTATE;
+		if (m_MenuActiveID == MENU_AUTH_STATE)
+			return MENU_ESC_STATE;
+		return MENU_AUTH_STATE;
 	}
 	return !IsActive();
 }
@@ -2274,7 +2274,7 @@ bool CMenus::OnInput(IInput::CEvent e)
 		return true;
 
 	// based key input for ESC state
-	if(IsActive() == EMenuState::ESCSTATE)
+	if(m_MenuActiveID == MENU_ESC_STATE)
 	{
 		if(e.m_Flags&IInput::FLAG_PRESS)
 		{
@@ -2365,65 +2365,55 @@ void CMenus::OnRender()
 		m_KeyReaderWasActive = false;
 
 	if(Client()->State() != IClient::STATE_ONLINE && Client()->State() != IClient::STATE_DEMOPLAYBACK)
-		SetActive(EMenuState::ESCSTATE);
-
-	if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
-	{
-		CUIRect Screen = *UI()->Screen();
-		Graphics()->MapScreen(Screen.x, Screen.y, Screen.w, Screen.h);
-		RenderDemoPlayer(Screen);
-	}
+		SetActive(MENU_ESC_STATE);
 
 	if(Client()->State() == IClient::STATE_ONLINE && m_pClient->m_ServerMode == m_pClient->SERVERMODE_PUREMOD)
 	{
 		Client()->Disconnect();
-		SetActive(EMenuState::ESCSTATE);
+		SetActive(MENU_ESC_STATE);
 		PopupMessage(Localize("Disconnected"), Localize("The server is running a non-standard tuning on a pure game type."), Localize("Ok"));
 	}
 
-	// render auth for mmotee
-	if(IsActive() == EMenuState::AUTHSTATE)
+	if(Client()->State() == IClient::STATE_DEMOPLAYBACK || IsActive())
 	{
-		if(m_pClient->MmoServer() && Client()->State() == IClient::STATE_ONLINE && m_ShowAuthWindow)
-		{
-			if(m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team != TEAM_SPECTATORS)
-				OnReset();
-			else
-				RenderAuthWindow();
-		}
-		return;
-	}
-
-	if(IsActive() == EMenuState::NOACTIVE)
-	{
-		m_EscapePressed = false;
-		m_EnterPressed = false;
-		m_TabPressed = false;
-		m_DeletePressed = false;
-		m_UpArrowPressed = false;
-		m_DownArrowPressed = false;
-		m_ActiveEditbox = false;
-		return;
-	}
-
-	// render
-	if(Client()->State() != IClient::STATE_DEMOPLAYBACK)
-		Render();
-
-	// render cursor
-	RenderCursor(IMAGE_CURSOR, vec4(1, 1, 1, 1));
-
-	// render debug information
-	if(g_Config.m_Debug)
-	{
+		// update the ui
 		const CUIRect* pScreen = UI()->Screen();
-		Graphics()->MapScreen(pScreen->x, pScreen->y, pScreen->w, pScreen->h);
+		float MouseX = (m_MousePos.x / (float)Graphics()->ScreenWidth()) * pScreen->w;
+		float MouseY = (m_MousePos.y / (float)Graphics()->ScreenHeight()) * pScreen->h;
+		UI()->Update(MouseX, MouseY, MouseX * 3.0f, MouseY * 3.0f);
 
-		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "%p %p %p", UI()->HotItem(), UI()->GetActiveItem(), UI()->LastActiveItem());
-		static CTextCursor s_Cursor(10, 10, 10);
-		s_Cursor.Reset();
-		TextRender()->TextOutlined(&s_Cursor, aBuf, -1);
+		// render demo player or main menu
+		Graphics()->MapScreen(pScreen->x, pScreen->y, pScreen->w, pScreen->h);
+		if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
+			RenderDemoPlayer(*pScreen);
+		else if(m_MenuActiveID == MENU_AUTH_STATE)
+		{
+			if(m_pClient->MmoServer() && Client()->State() == IClient::STATE_ONLINE && m_ShowAuthWindow)
+			{
+				if(m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team != TEAM_SPECTATORS)
+					OnReset();
+				else
+					RenderAuthWindow();
+			}
+		}
+		else
+			RenderMenu(*pScreen);
+
+		if(IsActive())
+		{
+			RenderTools()->RenderCursor(IMAGE_CURSOR, MouseX, MouseY, 24.0f);
+
+			// render debug information
+			if(g_Config.m_Debug)
+			{
+				char aBuf[64];
+				str_format(aBuf, sizeof(aBuf), "%p %p %p", UI()->HotItem(), UI()->GetActiveItem(), UI()->LastActiveItem());
+				static CTextCursor s_Cursor(10, 10, 10);
+				s_Cursor.Reset();
+				TextRender()->TextOutlined(&s_Cursor, aBuf, -1);
+			}
+			UI()->FinishCheck();
+		}
 	}
 
 	m_EscapePressed = false;
@@ -2444,23 +2434,6 @@ bool CMenus::CheckHotKey(int Key) const
 		&& UI()->KeyIsPressed(Key);
 }
 
-void CMenus::RenderCursor(int ImageID, vec4 Color)
-{
-	const CUIRect* pScreen = UI()->Screen();
-	float MouseX = (m_MousePos.x / (float)Graphics()->ScreenWidth()) * pScreen->w;
-	float MouseY = (m_MousePos.y / (float)Graphics()->ScreenHeight()) * pScreen->h;
-	UI()->Update(MouseX, MouseY, MouseX * 3.0f, MouseY * 3.0f);
-
-	// render cursor
-	Graphics()->TextureSet(g_pData->m_aImages[ImageID].m_Id);
-	Graphics()->WrapClamp();
-	Graphics()->QuadsBegin();
-	Graphics()->SetColor(Color.r, Color.g, Color.b, Color.a);
-	IGraphics::CQuadItem QuadItem(MouseX, MouseY, 24, 24);
-	Graphics()->QuadsDrawTL(&QuadItem, 1);
-	Graphics()->QuadsEnd();
-	Graphics()->WrapNormal();
-}
 
 bool CMenus::IsBackgroundNeeded() const
 {

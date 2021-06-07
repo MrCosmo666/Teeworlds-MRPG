@@ -46,20 +46,22 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 	s_Cursor.Reset();
 	if (m_pClient->MmoServer() && m_pClient->m_aClients[ClientID].m_pLocalStats && a > 0.001f)
 	{
-		char aBuf[64], aIconPlayerType[32]; aIconPlayerType[0] = '\0';
+		// TODO: optimzie and rework it
+		char aBuf[64], aIconPlayerType[32];
 		vec4 ColorNameplates = vec4(1.0f, 1.0f, 1.0f, a);
 		vec4 OutlineNameplates = vec4(0.0f, 0.0f, 0.0f, 0.5f * a);
+		aIconPlayerType[0] = '\0';
 
 		const CNetObj_Mmo_ClientInfo* pClientStats = m_pClient->m_aClients[ClientID].m_pLocalStats;
 		switch (pClientStats->m_MoodType)
 		{
 			case MOOD_ANGRY:
 				str_format(aIconPlayerType, sizeof(aIconPlayerType), "angry");
-				ColorNameplates = vec4(0.9f, 0.65f, 0.65f, a);
+				ColorNameplates = vec4(0.9f, 0.5f, 0.5f, a);
 				break;
 			case MOOD_AGRESSED_TANK:
 				str_format(aIconPlayerType, sizeof(aIconPlayerType), "agressed_y");
-				ColorNameplates = vec4(0.9f, 0.4f, 0.4f, a);
+				ColorNameplates = vec4(0.9f, 0.3f, 0.3f, a);
 				break;
 			case MOOD_AGRESSED_OTHER:
 				str_format(aIconPlayerType, sizeof(aIconPlayerType), "agressed_o");
@@ -80,15 +82,15 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 		}
 
 		// Healthbar
-		bool ShowedHealthBar = false;
+		bool ShowHealthBar = false;
 		str_format(aBuf, sizeof(aBuf), "LVL%d%s", pClientStats->m_Level, aName);
 		float TextWeidthTemp = TextRender()->TextWidth(FontSize, aBuf, -1);
 		if (pClientStats->m_Health < pClientStats->m_HealthStart)
 		{
-			CUIRect HealthBar = { Position.x - (TextWeidthTemp / 2.0f), Position.y - FontSize - 92.0f, TextWeidthTemp, 22.0f };
+			CUIRect HealthBar = { Position.x - (TextWeidthTemp / 2.0f), Position.y - FontSize - 92.0f, TextWeidthTemp, 21.f };
 			str_format(aBuf, sizeof(aBuf), "%d / %d", pClientStats->m_Health, pClientStats->m_HealthStart);
 			RenderTools()->DrawUIBar(TextRender(), HealthBar, ColorNameplates / 1.2f, pClientStats->m_Health, pClientStats->m_HealthStart, aBuf, 5, 6.0f, 3.0f);
-			ShowedHealthBar = true;
+			ShowHealthBar = true;
 		}
 
 		// Guild / state name
@@ -102,7 +104,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 				s_Cursor.m_FontSize = FontStateSize;
 
 				const float AlphaMoon = clamp(a - 0.20f, 0.0f, a);
-				const float GuildnameY = Position.y - FontStateSize - (ShowedHealthBar ? 120.0f : 95.0f);
+				const float GuildnameY = Position.y - FontStateSize - (ShowHealthBar ? 120.0f : 95.0f);
 				TextRender()->TextColor(1.0f, 0.95f, 0.0f, AlphaMoon);
 				TextRender()->TextSecondaryColor(0.0f, 0.0f, 0.0f, 0.5f * AlphaMoon);
 				s_Cursor.MoveTo(Position.x - (twState / 2.0f), GuildnameY);
@@ -121,7 +123,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 
 			str_format(aBuf, sizeof(aBuf), "%d", pClientStats->m_Level);
 			float Skipped = RenderTools()->DrawUIText(TextRender(), vec2((Position.x - (TextWeidthTemp / 2.0f)), Position.y - FontSize - 70.0f), aBuf,
-				vec4(ColorNameplates.r, ColorNameplates.g, ColorNameplates.b, ColorNameplates.a / 3.0f), vec4(1.0f, 1.0f, 1.0f, 1.0f), FontSize);
+				ColorNameplates, vec4(1.0f, 1.0f, 1.0f, 1.0f), FontSize);
 			s_Cursor.MoveTo((Position.x + Skipped) - (TextWeidthTemp / 2.0f), Position.y - FontSize - 70.0f);
 			TextRender()->TextOutlined(&s_Cursor, aName, -1);
 
@@ -136,7 +138,7 @@ void CNamePlates::RenderNameplate(const CNetObj_Character *pPrevChar, const CNet
 			// Quest npc
 			if(pClientStats->m_ActiveQuest)
 			{
-				CUIRect IconRect = { Position.x - 64.0f / 2.0f, s_Cursor.CursorPosition().y - 65.0f, 16.0f, 16.0f };
+				CUIRect IconRect = { Position.x - 64.0f / 2.0f, s_Cursor.CursorPosition().y - 82.0f, 16.0f, 16.0f };
 				m_pClient->m_pMenus->DoItemIcon("quest_a", IconRect, 64.0f);
 			}
 		}

@@ -324,7 +324,7 @@ void CRenderTools::DrawUIRect(const CUIRect *r, vec4 Color, int Corners, float R
 
 void CRenderTools::DrawUIRectMonochromeGradient(const CUIRect* pRect, vec4 Color, int Corners, float Rounding)
 {
-	vec4 ColorDownGradient = vec4(max(Color.r - 0.05f, 0.0f), max(Color.g - 0.05f, 0.0f), max(Color.b - 0.05f, 0.0f), Color.a);
+	const vec4 ColorDownGradient = vec4(max(Color.r - 0.05f, 0.0f), max(Color.g - 0.05f, 0.0f), max(Color.b - 0.05f, 0.0f), Color.a);
 	DrawUIRect4(pRect, Color, Color, ColorDownGradient, ColorDownGradient, Corners, Rounding);
 }
 
@@ -723,7 +723,7 @@ float CRenderTools::DrawUIText(ITextRender* pTextRender, vec2 CursorPosition, co
 	Rect.y = LinebaseY - FontSize + 0.15f * FontSize;
 	Rect.w = Width;
 	Rect.h = FontSize;
-	DrawRoundRect(&Rect, BgColor, 0.25f * FontSize);
+	DrawUIRectMonochromeGradient(&Rect, BgColor, CUI::CORNER_ALL, 0.25f * FontSize);
 
 	s_Cursor.MoveTo(Rect.x + Rect.w / 2.0f, CursorPosition.y);
 	pTextRender->DrawTextOutlined(&s_Cursor);
@@ -828,4 +828,16 @@ void CRenderTools::RenderWings(CAnimState* pAnim, int SpriteID, vec2 Dir, vec2 P
 			}
 		}
 	}
+}
+
+void CRenderTools::RenderCursor(int ImageID, float CenterX, float CenterY, float Size)
+{
+	Graphics()->TextureSet(g_pData->m_aImages[ImageID].m_Id);
+	Graphics()->WrapClamp();
+	Graphics()->QuadsBegin();
+	Graphics()->SetColor(1.0f, 1.0f, 1.0f, 1.0f);
+	IGraphics::CQuadItem QuadItem(CenterX, CenterY, Size, Size);
+	Graphics()->QuadsDrawTL(&QuadItem, 1);
+	Graphics()->QuadsEnd();
+	Graphics()->WrapNormal();
 }

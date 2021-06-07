@@ -180,7 +180,7 @@ void CMenus::RenderGame(CUIRect MainView)
 			if(DoButton_Menu(&s_JoinButton, aBuf, Team == TEAM_RED, &Button) && Team != TEAM_RED && !(Info.m_aNotification[0]))
 			{
 				m_pClient->SendSwitchTeam(TEAM_RED);
-				SetActive(EMenuState::NOACTIVE);
+				SetActive(MENU_NO_ACTIVE);
 			}
 		}
 

@@ -21,7 +21,7 @@
 
 bool CTalkText::IsActive() const
 {
-	return (bool)(m_TalkClientID >= 0 && m_pClient->m_pMenus->IsActive() <= 0);
+	return (bool)(m_TalkClientID >= 0 && !m_pClient->m_pMenus->IsActive());
 }
 
 void CTalkText::RegrnizedTalkingText()

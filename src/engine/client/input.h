@@ -58,7 +58,7 @@ public:
 
 	void MouseModeRelative();
 	void MouseModeAbsolute();
-	int MouseDoubleClick();
+	bool MouseDoubleClick();
 	bool MouseRelative(float* pX, float* pY);
 
 	const char* GetClipboardText();

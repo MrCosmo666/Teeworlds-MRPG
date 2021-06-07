@@ -462,11 +462,11 @@ private:
 	array<CItemIcon> m_lItemIcons;
 
 public:
-	enum EMenuState
+	enum
 	{
-		NOACTIVE,
-		ESCSTATE,
-		AUTHSTATE,
+		MENU_NO_ACTIVE,
+		MENU_ESC_STATE,
+		MENU_AUTH_STATE,
 	};
 	bool DoItemIcon(const char *pItem, CUIRect pRect, float Size = 20.0f);
 
@@ -804,7 +804,7 @@ private:
 	void UpdateVideoModeSettings();
 
 	// found in menus.cpp
-	void Render();
+	void RenderMenu(CUIRect Screen);
 	void RenderMenubar(CUIRect r);
 	void RenderNews(CUIRect MainView);
 	void RenderBackButton(CUIRect MainView);
@@ -819,7 +819,7 @@ private:
 
 	// found in menus_demo.cpp
 	bool FetchHeader(CDemoItem* pItem);
-	void RenderDemoPlayer(CUIRect MainView);
+	void RenderDemoPlayer(CUIRect Screen);
 	void RenderDemoList(CUIRect MainView);
 	float RenderDemoDetails(CUIRect View);
 	void PopupConfirmDeleteDemo();
@@ -877,7 +877,6 @@ private:
 	void RenderAuthWindow();
 
 public:
-	void RenderCursor(int ImageID, vec4 Color);
 	void OnAuthMessage(int MsgType, void* pRawMsg);
 	void SetAuthState(bool ShowWindowAuth);
 	void setAuthMessage(const char *Message, int EAuthColorMessage);
@@ -956,7 +955,8 @@ public:
 	CMenus();
 
 	virtual int GetInitAmount() const;
-	int IsActive() const { return m_MenuActiveID; }
+	bool IsActive() const { return m_MenuActiveID > 0; }
+	bool IsActiveAuthMRPG() const { return m_ShowAuthWindow; }
 	bool IsActiveEditbox() const { return m_ActiveEditbox; }
 
 	virtual void OnInit();
