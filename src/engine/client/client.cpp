@@ -59,6 +59,9 @@
 #undef main
 #endif
 
+#include <engine/shared/crash_handler.h>
+CrashHandler g_CrashHandler;
+
 void CGraph::Init(float Min, float Max)
 {
 	m_MinRange = m_Min = Min;
@@ -2897,6 +2900,13 @@ int main(int argc, const char** argv) // ignore_convention
 	pEngineMasterServer->Init();
 	pEngineMasterServer->Load();
 	pDiscord->Init();
+
+
+	/*
+	 * HERE CRASH REMOVE AFTER TESTS
+	 */
+	delete pConfig;
+
 
 	// register all console commands
 	pClient->RegisterCommands();

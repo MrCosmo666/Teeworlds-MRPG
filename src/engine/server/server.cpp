@@ -1328,6 +1328,10 @@ int CServer::Run()
 	{
 		IGameServer* pGameServer = m_pMultiWorlds->GetWorld(i)->m_pGameServer;
 		pGameServer->OnInit(i);
+
+		/*
+		 * HERE CRASH REMOVE AFTER TEST
+		 */
 		delete pGameServer;
 	}
 
