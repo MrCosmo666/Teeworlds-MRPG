@@ -40,8 +40,7 @@
 
 #include "game/game_context.h"
 
-#include <game/server/mmocore/Utils/CrashHandler.h>
-
+#include <engine/shared/crash_handler.h>
 CrashHandler g_CrashHandler;
 
 void CServer::CClient::Reset()
