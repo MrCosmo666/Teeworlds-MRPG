@@ -99,12 +99,18 @@ void CrashHandler::WriteStackTrace()
 	RtlCaptureContext(&context);
 
 	STACKFRAME FrameShot;
-	FrameShot.AddrPC.Offset = context.Rip;
 	FrameShot.AddrPC.Mode = AddrModeFlat;
-	FrameShot.AddrFrame.Offset = context.Rbp;
 	FrameShot.AddrFrame.Mode = AddrModeFlat;
-	FrameShot.AddrStack.Offset = context.Rsp;
 	FrameShot.AddrStack.Mode = AddrModeFlat;
+#if defined(CONF_PLATFORM_WIN32) // https://docs.microsoft.com/en-us/windows/win32/api/dbghelp/ns-dbghelp-stackframe
+	FrameShot.AddrPC.Offset = context.Eip;
+	FrameShot.AddrFrame.Offset = context.Ebp;
+	FrameShot.AddrStack.Offset = context.Esp;
+#else
+	FrameShot.AddrPC.Offset = context.Rip;
+	FrameShot.AddrFrame.Offset = context.Rbp;
+	FrameShot.AddrStack.Offset = context.Rsp;
+#endif
 
 	while(StackWalk(Machine, Process, Thread, &FrameShot, &context, nullptr, SymFunctionTableAccess, SymGetModuleBase, nullptr))
 	{
