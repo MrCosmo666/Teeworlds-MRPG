@@ -40,9 +40,6 @@
 
 #include "game/game_context.h"
 
-#include <engine/shared/crash_handler.h>
-CrashHandler g_CrashHandler;
-
 void CServer::CClient::Reset()
 {
 	// reset input
@@ -1329,9 +1326,6 @@ int CServer::Run()
 		IGameServer* pGameServer = m_pMultiWorlds->GetWorld(i)->m_pGameServer;
 		pGameServer->OnInit(i);
 
-		/*
-		 * HERE CRASH REMOVE AFTER TEST
-		 */
 		delete pGameServer;
 	}
 
