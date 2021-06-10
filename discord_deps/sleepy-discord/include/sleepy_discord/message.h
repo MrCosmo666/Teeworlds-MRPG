@@ -82,7 +82,7 @@ namespace SleepyDiscord {
 		BaseComponent(Type _type) : type(_type) {}
 		~BaseComponent() = default;
 
-		inline const ComponentType getType() const { return type; }
+		inline ComponentType getType() const { return type; }
 
 	protected:
 		Type type;
@@ -104,7 +104,7 @@ namespace SleepyDiscord {
 
 		inline bool empty() const { return JSONTypeHelper::empty(data); }
 
-		static inline const bool isType(const typename json::Value& value) {
+		static inline bool isType(const typename json::Value& value) {
 			return value.IsObject() && value.FindMember("type") != value.MemberEnd();
 		}
 
@@ -136,7 +136,7 @@ namespace SleepyDiscord {
 		~ActionRow() = default;
 		ActionRow(json::Value& json);
 		ActionRow(const nonstd::string_view& json);
-		static const ComponentType componentType = ComponentType::ActionRow;
+		static ComponentType componentType = ComponentType::ActionRow;
 
 		std::vector<std::shared_ptr<BaseComponent>> components;
 
