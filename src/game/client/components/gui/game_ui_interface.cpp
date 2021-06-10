@@ -16,12 +16,14 @@
 std::map< int /*itemid*/, CUIGameInterface::CItemDataClientInfo > CUIGameInterface::m_aItemsDataInformation;
 std::map< int /*itemid*/, CUIGameInterface::CClientItem > CUIGameInterface::m_aClientItems;
 
+/*
+ * Refactoring later. I'm lazy.
+ */
 void CUIGameInterface::OnInit()
 {
 	// gui elements
 	m_pWindowPopupBox = UI()->CreateWindow("Are you sure?", vec2(0, 0), nullptr, &m_ActiveGUI);
 	m_pWindowInformationBox = UI()->CreateWindow("Information", vec2(0, 0), nullptr, &m_ActiveGUI);
-
 	m_pWindowPopupBox->Register(WINREGISTER(&CUIGameInterface::CallbackRenderGuiPopupBox, this));
 	m_pWindowInformationBox->Register(WINREGISTER(&CUIGameInterface::CallbackRenderInfoWindow, this));
 
@@ -30,7 +32,6 @@ void CUIGameInterface::OnInit()
 	m_pWindowMailboxLetter = UI()->CreateWindow("Letter", vec2(250, 140), m_pWindowMailboxList, &m_ActiveGUI);
 	m_pWindowMailboxLetterActions = UI()->CreateWindow("Letter actions", vec2(0, 0), m_pWindowMailboxList, &m_ActiveGUI, CUI::WINDOW_WITHOUT_BORDURE | CUI::WINDOW_CLOSE_CLICKING_OUTSIDE);
 	m_pWindowMailboxLetterSend = UI()->CreateWindow("Sending a letter", vec2(220, 190), m_pWindowMailboxList, &m_ActiveGUI);
-
 	m_pWindowMailboxList->Register(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxList, this));
 	m_pWindowMailboxLetter->Register(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxLetter, this));
 	m_pWindowMailboxLetterActions->Register(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxLetterActions, this));
@@ -278,9 +279,14 @@ void CUIGameInterface::CallbackRenderMailboxList(const CUIRect& pWindowRect, CWi
 
 void CUIGameInterface::CallbackRenderMailboxListButtonHelp(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
 {
-	pCurrentWindow.SetSize({ 200, 200 });
+	CUIRect Label = pWindowRect;
+	const float FontSize = 10.0f;
+	const char* pLineHelp = "This is where you can control your inbox.View.And interact with it.";
 
+	float TextWidth = TextRender()->TextWidth(FontSize, pLineHelp, -1);
+	UI()->DoLabel(&Label, pLineHelp, FontSize, CUI::EAlignment::ALIGN_LEFT);
 
+	pCurrentWindow.SetWorkspaceSize({ TextWidth, 30 });
 }
 
 void CUIGameInterface::CallbackRenderMailboxLetter(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
@@ -450,7 +456,7 @@ void CUIGameInterface::CallbackRenderMailboxLetterActions(const CUIRect& pWindow
 		pCurrentWindow.Close();
 	}
 
-	pCurrentWindow.SetSize(vec2(100, 4.0f + ButtonAmount * ButtonHeight));
+	pCurrentWindow.SetWorkspaceSize(vec2(100, 4.0f + ButtonAmount * ButtonHeight));
 }
 
 void CUIGameInterface::SendLetterAction(CMailboxLetter* pLetter, int64 Flags)

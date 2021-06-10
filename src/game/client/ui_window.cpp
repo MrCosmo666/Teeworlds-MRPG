@@ -53,14 +53,14 @@ void CWindowUI::RenderDefaultWindow()
 	static float s_WindowSkipMovingY;
 
 	// highlight
+	CUIRect Workspace;
+	m_WindowRect.HSplitTop(20.0f, &m_WindowBordure, &Workspace);
 	if(m_WindowMinimize)
 		RenderHighlightArea(m_WindowBordure);
 	else
 		RenderHighlightArea(m_WindowRect);
 
 	// background draw
-	CUIRect Workspace;
-	m_WindowRect.HSplitTop(20.0f, &m_WindowBordure, &Workspace);
 	const bool IsActiveWindow = IsActive();
 	if(!m_WindowMinimize)
 	{
@@ -243,6 +243,7 @@ void CWindowUI::MinimizeWindow()
 // Functions for working with windows
 void CWindowUI::Init(vec2 WindowSize, CWindowUI* pWindowDependent, bool* pRenderDependence)
 {
+	m_WindowBordure = { 0, 0, 0, 0 };
 	m_WindowRect = { 0, 0, WindowSize.x, WindowSize.y };
 	m_WindowRectProtected = m_WindowRect;
 	m_WindowMinimize = false;

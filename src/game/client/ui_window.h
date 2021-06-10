@@ -88,16 +88,16 @@ public:
 	const char* GetWindowName() const { return m_aWindowName; }
 
 	/*
-		Function: SetSize -> void
-			- Set window size.
+		Function: SetWorkspaceSize -> void
+			- Set workspace window size.
 		Parameters:
-			- WindowSize - Window size (Width Height).
+			- WorkspaceSize - Window size (Width Height).
 	*/
-	void SetSize(vec2 WindowSize)
+	void SetWorkspaceSize(vec2 WorkspaceSize)
 	{
-		if(m_WindowRect.w != WindowSize.x || m_WindowRect.h != WindowSize.y)
+		CUIRect NewWindowRect = { 0, 0, WorkspaceSize.x, WorkspaceSize.y + m_WindowBordure.h };
+		if(NewWindowRect.w != m_WindowRect.w || NewWindowRect.h != m_WindowRect.h)
 		{
-			CUIRect NewWindowRect = { 0, 0, WindowSize.x, WindowSize.y };
 			m_pUI->MouseRectLimitMapScreen(&NewWindowRect, 6.0f, CUI::RECTLIMITSCREEN_UP | CUI::RECTLIMITSCREEN_ALIGN_CENTER_X);
 			m_WindowRect = NewWindowRect;
 			m_WindowRectProtected = NewWindowRect;
