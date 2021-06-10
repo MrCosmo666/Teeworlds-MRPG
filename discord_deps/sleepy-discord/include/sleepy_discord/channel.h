@@ -12,8 +12,7 @@ namespace SleepyDiscord {
 		Overwrite(const nonstd::string_view & rawJSON);
 		//Overwrite(const json::Values values);
 		~Overwrite() {}
-		enum class Type : int 
-		{
+		enum class Type : int {
 			TYPE_NONE = -400,
 			role = 0,
 			member = 1
@@ -61,7 +60,8 @@ namespace SleepyDiscord {
 			GROUP_DM          = 3,
 			SERVER_CATEGORY   = 4,
 			GUILD_NEWS        = 5,
-			GUILD_STORE       = 6
+			GUILD_STORE       = 6,
+			GUILD_STAGE_VOICE = 13
 		} type = CHANNEL_TYPE_NONE;
 		Snowflake<Server>      serverID;             //optional,                  used in server       channels
 		int                    position = 0;         //optional,                  used in server       channels

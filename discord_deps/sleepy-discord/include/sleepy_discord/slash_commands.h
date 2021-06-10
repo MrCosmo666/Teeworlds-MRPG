@@ -6,9 +6,10 @@
 #include "channel.h"
 #include "embed.h"
 #include "message.h"
+#include "user.h"
 
 namespace SleepyDiscord {
-
+	
 	struct AppCommand : public IdentifiableDiscordObject<AppCommand> {
 		AppCommand() = default;
 		AppCommand(json::Value & json);
@@ -116,9 +117,9 @@ namespace SleepyDiscord {
 
 				JSONStructStart
 					std::make_tuple(
-						json::pair                           (&AppCommand::InteractionData::Option::name   , "name"   , json::REQUIRIED_FIELD),
-						json::pair                           (&AppCommand::InteractionData::Option::value  , "value"  , json::OPTIONAL_FIELD ),
-						json::pair<json::ContainerTypeHelper>(&AppCommand::InteractionData::Option::options, "options", json::OPTIONAL_FIELD )
+						json::pair                           (&AppCommand::InteractionData::Option::name   , "name"          , json::OPTIONAL_FIELD),
+						json::pair                           (&AppCommand::InteractionData::Option::value  , "value"         , json::OPTIONAL_FIELD),
+						json::pair<json::ContainerTypeHelper>(&AppCommand::InteractionData::Option::options, "options"       , json::OPTIONAL_FIELD)
 					);
 				JSONStructEnd
 			};
@@ -126,12 +127,33 @@ namespace SleepyDiscord {
 			Snowflake<AppCommand> ID;
 			std::string name;
 			std::vector<Option> options;
+			std::string customID;
+			ComponentType componentType;
 
 			JSONStructStart
 				std::make_tuple(
-					json::pair                           (&AppCommand::InteractionData::ID     , "id"     , json::REQUIRIED_FIELD),
-					json::pair                           (&AppCommand::InteractionData::name   , "name"   , json::REQUIRIED_FIELD),
-					json::pair<json::ContainerTypeHelper>(&AppCommand::InteractionData::options, "options", json::OPTIONAL_FIELD )
+					json::pair                           (&AppCommand::InteractionData::ID           , "id"            , json::OPTIONAL_FIELD),
+					json::pair                           (&AppCommand::InteractionData::name         , "name"          , json::OPTIONAL_FIELD),
+					json::pair<json::ContainerTypeHelper>(&AppCommand::InteractionData::options      , "options"       , json::OPTIONAL_FIELD),
+					json::pair                           (&AppCommand::InteractionData::customID     , "custom_id"     , json::OPTIONAL_FIELD),
+					json::pair<json::EnumTypeHelper     >(&AppCommand::InteractionData::componentType, "component_type", json::OPTIONAL_FIELD)
+				);
+			JSONStructEnd
+		};
+
+		struct Permissions : IdentifiableDiscordObject<DiscordObject> {
+			enum class Type : int {
+				ROLE = 1,
+				USER = 2
+			};
+			Permissions::Type Type;
+			bool Permission;
+
+			JSONStructStart
+				std::make_tuple(
+					json::pair                      (&Permissions::ID        , "id"        , json::REQUIRIED_FIELD),
+					json::pair<json::EnumTypeHelper>(&Permissions::Type      , "type"      , json::REQUIRIED_FIELD),
+					json::pair                      (&Permissions::Permission, "permission", json::REQUIRIED_FIELD)
 				);
 			JSONStructEnd
 		};
@@ -157,6 +179,21 @@ namespace SleepyDiscord {
 		JSONStructEnd
 	};
 
+	struct ServerAppCommandPermissions : IdentifiableDiscordObject<AppCommand> {
+		Snowflake<User> applicationID;
+		Snowflake<Server> serverID;
+		std::vector<AppCommand::Permissions> permissions;
+
+		JSONStructStart
+			std::make_tuple(
+				json::pair                           (&ServerAppCommandPermissions::ID           , "id"            , json::REQUIRIED_FIELD),
+				json::pair                           (&ServerAppCommandPermissions::applicationID, "application_id", json::REQUIRIED_FIELD),
+				json::pair                           (&ServerAppCommandPermissions::serverID     , "guild_id"      , json::REQUIRIED_FIELD),
+				json::pair<json::ContainerTypeHelper>(&ServerAppCommandPermissions::permissions  , "permissions"   , json::REQUIRIED_FIELD)
+			);
+		JSONStructEnd
+	};
+
 	template<>
 	struct GetDefault<AppCommand::Option::Default> {
 		static inline AppCommand::Option::Default get() {
@@ -174,21 +211,27 @@ namespace SleepyDiscord {
 		value = _val; //moves
 	}
 
-	struct InteractionAppCommandCallbackData : public DiscordObject {
+	struct InteractionAppCommandCallbackData : public EditWebhookParams {
 		InteractionAppCommandCallbackData() = default;
-		InteractionAppCommandCallbackData(const json::Value & json);
+		InteractionAppCommandCallbackData(json::Value & json);
 		InteractionAppCommandCallbackData(const nonstd::string_view & json);
+
+		inline bool empty() const { return content.empty() && embeds.empty() && components.empty(); }
+
 		bool tts = false;
-		std::string content;
-		std::vector<Embed> embeds;
-		AllowedMentions allowedMentions;
+		enum class Flags : int {
+			NONE = 0,
+			Ephemeral = 64
+		} flags = Flags::NONE;
 
 		JSONStructStart
 			std::make_tuple(
-				json::pair                           (&InteractionAppCommandCallbackData::tts            , "tts"             , json::OPTIONAL_FIELD ),
-				json::pair                           (&InteractionAppCommandCallbackData::content        , "content"         , json::REQUIRIED_FIELD),
-				json::pair<json::ContainerTypeHelper>(&InteractionAppCommandCallbackData::embeds         , "embeds"          , json::OPTIONAL_FIELD ),
-				json::pair                           (&InteractionAppCommandCallbackData::allowedMentions, "allowed_mentions", json::OPTIONAL_FIELD )
+				json::pair                           (&InteractionAppCommandCallbackData::tts            , "tts"             , json::OPTIONAL_FIELD),
+				json::pair                           (&InteractionAppCommandCallbackData::content        , "content"         , json::OPTIONAL_FIELD),
+				json::pair<json::ContainerTypeHelper>(&InteractionAppCommandCallbackData::embeds         , "embeds"          , json::OPTIONAL_FIELD),
+				json::pair                           (&InteractionAppCommandCallbackData::allowedMentions, "allowed_mentions", json::OPTIONAL_FIELD),
+				json::pair<json::EnumTypeHelper     >(&InteractionAppCommandCallbackData::flags          , "flags"           , json::OPTIONAL_FIELD),
+				json::pair<json::ContainerTypeHelper>(&InteractionAppCommandCallbackData::components     , "components"      , json::OPTIONAL_FIELD)
 			);
 		JSONStructEnd
 	};
@@ -198,26 +241,23 @@ namespace SleepyDiscord {
 		Interaction(json::Value & json);
 		Interaction(const nonstd::string_view & json);
 
-		enum class Type : int {
-			NONE = 0, //made up type
-			Ping = 1,
-			ApplicationCommand = 2,
+		enum class CallbackType : int {
+			NONE                             = 0, //made up type
+			Pong                             = 1,
+			Acknowledge                      = 2,
+			ChannelMessage                   = 3,
+			ChannelMessageWithSource         = 4,
+			DeferredChannelMessageWithSource = 5,
+			DeferredUpdateMessage            = 6,
+			UpdateMessage                    = 7,
 		};
 
 		struct Response : public DiscordObject {
 			Response() = default;
-			Response(const json::Value & json);
+			Response(json::Value & json);
 			Response(const nonstd::string_view & json);
 
-			enum class Type : int {
-				NONE = 0, //made up type
-				Pong = 1,
-				Acknowledge = 2,
-				ChannelMessage = 3,
-				ChannelMessageWithSource = 4,
-				ACKWithSource = 5,
-			};
-
+			using Type = CallbackType;
 			Type type;
 			InteractionAppCommandCallbackData data;
 
@@ -229,24 +269,32 @@ namespace SleepyDiscord {
 			JSONStructEnd
 		};
 
-		Type type;
+		using AppCommandCallbackData = InteractionAppCommandCallbackData;
+		using Type = InteractionType;
+		InteractionType type;
+		Snowflake<DiscordObject> applicationID;
 		AppCommand::InteractionData data;
 		Snowflake<Server> serverID;
 		Snowflake<Channel> channelID;
 		ServerMember member;
+		User user;
 		std::string token;
 		int version = 1;
+		Message message;
 
 		JSONStructStart
 			std::make_tuple(
-				json::pair                      (&Interaction::ID       , "id"        , json::REQUIRIED_FIELD),
-				json::pair<json::EnumTypeHelper>(&Interaction::type     , "type"      , json::REQUIRIED_FIELD),
-				json::pair                      (&Interaction::data     , "data"      , json::OPTIONAL_FIELD ),
-				json::pair                      (&Interaction::serverID , "guild_id"  , json::OPTIONAL_FIELD ),
-				json::pair                      (&Interaction::channelID, "channel_id", json::OPTIONAL_FIELD ),
-				json::pair                      (&Interaction::member   , "member"    , json::OPTIONAL_FIELD ),
-				json::pair                      (&Interaction::token    , "token"     , json::OPTIONAL_FIELD ),
-				json::pair<                   1>(&Interaction::version  , "version"   , json::OPTIONAL_FIELD )
+				json::pair                      (&Interaction::ID           , "id"            , json::REQUIRIED_FIELD),
+				json::pair                      (&Interaction::applicationID, "application_id", json::OPTIONAL_FIELD ),
+				json::pair<json::EnumTypeHelper>(&Interaction::type         , "type"          , json::REQUIRIED_FIELD),
+				json::pair                      (&Interaction::data         , "data"          , json::OPTIONAL_FIELD ),
+				json::pair                      (&Interaction::serverID     , "guild_id"      , json::OPTIONAL_FIELD ),
+				json::pair                      (&Interaction::channelID    , "channel_id"    , json::OPTIONAL_FIELD ),
+				json::pair                      (&Interaction::member       , "member"        , json::OPTIONAL_FIELD ),
+				json::pair                      (&Interaction::user         , "user"          , json::OPTIONAL_FIELD ),
+				json::pair                      (&Interaction::token        , "token"         , json::OPTIONAL_FIELD ),
+				json::pair<                   1>(&Interaction::version      , "version"       , json::OPTIONAL_FIELD ),
+				json::pair                      (&Interaction::message      , "message"       , json::OPTIONAL_FIELD )
 			);
 		JSONStructEnd
 	};

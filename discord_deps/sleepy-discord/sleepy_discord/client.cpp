@@ -7,6 +7,7 @@
 #include <sstream>
 #include <iomanip>
 #include <ctime>
+#include <cstring>
 #include "client.h"
 #include "version_helper.h"
 //#include "json.h"
@@ -98,6 +99,31 @@ namespace SleepyDiscord {
 			default: response.statusCode = BAD_REQUEST; break; //unexpected method
 			}
 
+			//rate limit check
+			if (response.header["X-RateLimit-Remaining"] == "0" && response.statusCode != TOO_MANY_REQUESTS) {
+				std::tm date = {};
+				//for some reason std::get_time requires gcc 5
+				std::istringstream dateStream(response.header["Date"]);
+				dateStream >> std::get_time(&date, "%a, %d %b %Y %H:%M:%S GMT");
+				const double resetTime = std::stod(response.header["X-RateLimit-Reset"]);
+				const time_t reset = time_t(resetTime) + 1; //add one second for lost precision
+				const std::string& xBucket = response.header["X-RateLimit-Bucket"];
+#if defined(_WIN32) || defined(_WIN64)
+				std::tm gmTM;
+				std::tm* const resetGM = &gmTM;
+				gmtime_s(resetGM, &reset);
+#elif defined(__STDC_LIB_EXT1__)
+				std::tm gmTM;
+				std::tm* resetGM = &gmTM;
+				gmtime_s(&reset, resetGM);
+#else
+				std::tm* resetGM = std::gmtime(&reset);
+#endif
+				const time_t resetDelta = (std::mktime(resetGM) - std::mktime(&date)) * 1000;
+				rateLimiter.limitBucket(bucket, xBucket, resetDelta + getEpochTimeMillisecond());
+				onDepletedRequestSupply(bucket, resetDelta);
+			}
+
 			//status checking
 			switch (response.statusCode) {
 			case OK: case CREATED: case NO_CONTENT: case NOT_MODIFIED: break;
@@ -143,33 +169,10 @@ namespace SleepyDiscord {
 /*#if defined(__cpp_exceptions) || defined(__EXCEPTIONS)
 						if (static_cast<int>(mode) & static_cast<int>(ThrowError))
 							throw code;
-#endif*/
+#endif */
 					}
 				} break;
 			}
-
-			//rate limit check
-			if (response.header["X-RateLimit-Remaining"] == "0" && response.statusCode != TOO_MANY_REQUESTS) {
-				std::tm date = {};
-				//for some reason std::get_time requires gcc 5
-				std::istringstream dateStream(response.header["Date"]);
-				dateStream >> std::get_time(&date, "%a, %d %b %Y %H:%M:%S GMT");
-				const double resetTime = std::stod(response.header["X-RateLimit-Reset"]);
-				const time_t reset = time_t(resetTime) + 1; //add one second for lost precision
-				const std::string& xBucket = response.header["X-RateLimit-Bucket"];
-#if defined(_WIN32) || defined(_WIN64)
-				std::tm gmTM;
-				std::tm*const resetGM = &gmTM;
-				gmtime_s(resetGM, &reset);
-#else
-				std::tm* resetGM = std::gmtime(&reset);
-#endif
-				const time_t resetDelta = (std::mktime(resetGM) - std::mktime(&date)) * 1000;
-				rateLimiter.limitBucket(bucket, xBucket, resetDelta + getEpochTimeMillisecond());
-				onDepletedRequestSupply(bucket, resetDelta);
-			}
-
-			//update rate limits
 
 			handleCallbackCall();
 		}
@@ -227,7 +230,15 @@ namespace SleepyDiscord {
 
 	void BaseDiscordClient::requestServerMembers(ServerMembersRequest request) {
 		auto data = json::toJSON(request);
-		sendL(json::stringify(data));
+		std::string stringData = json::stringify(data);
+
+		std::string query;
+		query.reserve(14 + stringData.length());
+		query += "{\"op\":8,\"d\":";
+		query += stringData;
+		query += "}";
+
+		sendL(query);
 	}
 
 	void BaseDiscordClient::waitTilReady() {
@@ -249,9 +260,8 @@ namespace SleepyDiscord {
 		Session session;
 		session.setUrl("https://discord.com/api/gateway");
 		Response a = session.request(Get);	//todo change this back to a post
-		if (!a.text.length()) 
-		{	//error check
-			//quit(false, true);
+		if (!a.text.length()) {	//error check
+			// quit(false, true);
 			return setError(GATEWAY_FAILED);
 		}
 		if (!theGateway.empty())
@@ -586,7 +596,7 @@ namespace SleepyDiscord {
 				onEditVoiceState(state);
 				} break;
 			case hash("TYPING_START"               ): onTyping            (d["channel_id"], d["user_id"], d["timestamp"].GetInt64() * 1000); break;
-			case hash("MESSAGE_CREATE"             ): onMessage           (d); break;
+			case hash("MESSAGE_CREATE"             ): onMessage           (document["d"]); break;
 			case hash("MESSAGE_UPDATE"             ): onEditMessage       (d); break;
 			case hash("MESSAGE_DELETE"             ): onDeleteMessages    (d["channel_id"], { d["id"] }); break;
 			case hash("MESSAGE_DELETE_BULK"        ): onDeleteMessages    (d["channel_id"], json::toArray<Snowflake<Message>>(d["ids"])); break;
@@ -615,6 +625,9 @@ namespace SleepyDiscord {
 			case hash("APPLICATION_COMMAND_UPDATE" ): onEditAppCommand    (d); break;
 			case hash("APPLICATION_COMMAND_DELETE" ): onDeleteAppCommand  (d); break;
 			case hash("INTERACTION_CREATE"         ): onInteraction       (document["d"]); break;
+			case hash("STAGE_INSTANCE_CREATE"      ): onStageInstance     (d); break;
+			case hash("STAGE_INSTANCE_UPDATE"      ): onEditStageInstance (d); break;
+			case hash("STAGE_INSTANCE_DELETE"      ): onDeleteStageInstance(d); break;
 			default: 
 				onUnknownEvent(json::toStdString(t), d);
 				break;
@@ -721,6 +734,11 @@ namespace SleepyDiscord {
 		case INVALID_INTENTS:
 		case DISALLOWED_INTENTS:
 			return quit(false, true);
+			break;
+
+		case 4900: //Sleepy Discord reconnect
+			//don't do another reconnect during a reconnect
+			return;
 		}
 		reconnect();
 	}

@@ -14,17 +14,17 @@ std::vector < DiscordCommands::Command > DiscordCommands::m_aCommands;
 void DiscordCommands::InitCommands()
 {
 	// commands important
-	DiscordCommands::RegisterCommand("!mhelp", "", "get help on commands.", ComHelp, CMD_IMPORTANT);
-	DiscordCommands::RegisterCommand("!mconnect", "", "help for connect your discord to account in game.", ComConnect, CMD_IMPORTANT);
+	RegisterCommand("!mhelp", "", "get help on commands.", ComHelp, CMD_IMPORTANT);
+	RegisterCommand("!mconnect", "", "help for connect your discord to account in game.", ComConnect, CMD_IMPORTANT);
 
 	// commands game server
-	DiscordCommands::RegisterCommand("!monline", "", "show a list of players on the server.", ComOnline, CMD_GAME);
-	DiscordCommands::RegisterCommand("!mstats", "r[nick]", "searching for players and displaying their personal MRPG cards.", ComStats, CMD_GAME);
-	DiscordCommands::RegisterCommand("!mranking", "", "show the ranking of players by level.", ComRanking, CMD_GAME);
-	DiscordCommands::RegisterCommand("!mgoldranking", "", "show the ranking of players by gold.", ComRanking, CMD_GAME);
+	RegisterCommand("!monline", "", "show a list of players on the server.", ComOnline, CMD_GAME);
+	RegisterCommand("!mstats", "r[nick]", "searching for players and displaying their personal MRPG cards.", ComStats, CMD_GAME);
+	RegisterCommand("!mranking", "", "show the ranking of players by level.", ComRanking, CMD_GAME);
+	RegisterCommand("!mgoldranking", "", "show the ranking of players by gold.", ComRanking, CMD_GAME);
 
 	// commands fun
-	DiscordCommands::RegisterCommand("!mavatar", "?s[mention]", "show user avatars.", ComAvatar, CMD_FUN);
+	RegisterCommand("!mavatar", "?s[mention]", "show user avatars.", ComAvatar, CMD_FUN);
 
 	// commands admin
 }
@@ -38,23 +38,17 @@ void DiscordCommands::ComHelp(IConsole::IResult* pResult, DiscordJob *pDiscord, 
 	std::string RelatedGameServerCmd("\n\n__**Related game server commands:**__");
 	std::string EntertainmentFunCmd("\n\n__**Entertainment / Fun**__");
 
-	for(auto& pCommand : DiscordCommands::m_aCommands)
+	for(auto& pCommand : m_aCommands)
 	{
 		char aArgsDesc[256];
 		CConsole::ParseArgsDescription(pCommand.m_aCommandArgs, aArgsDesc, sizeof(aArgsDesc));
 		std::string ArgsStr(aArgsDesc);
 		if(pCommand.m_TypeFlags & CMD_IMPORTANT)
-		{
 			ImportantCmd += "\n- **" + std::string(pCommand.m_aCommand) + (ArgsStr.empty() ? "" : " " + ArgsStr) + "** - " + std::string(pCommand.m_aCommandDesc);
-		}
 		if(pCommand.m_TypeFlags & CMD_GAME)
-		{
 			RelatedGameServerCmd += "\n- **" + std::string(pCommand.m_aCommand) + (ArgsStr.empty() ? "" : " " + ArgsStr) + "** - " + std::string(pCommand.m_aCommandDesc);
-		}
 		if(pCommand.m_TypeFlags & CMD_FUN)
-		{
 			EntertainmentFunCmd += "\n- **" + std::string(pCommand.m_aCommand) + (ArgsStr.empty() ? "" : " " + ArgsStr) + "** - " + std::string(pCommand.m_aCommandDesc);
-		}
 	}
 
 	std::string Description(ImportantCmd + RelatedGameServerCmd + EntertainmentFunCmd +
@@ -70,7 +64,7 @@ void DiscordCommands::ComHelp(IConsole::IResult* pResult, DiscordJob *pDiscord, 
 
 void DiscordCommands::ComConnect(IConsole::IResult* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
-	sqlstr::CSqlString<64> DiscordID = sqlstr::CSqlString<64>(std::string(message.author.ID).c_str());
+	CSqlString<64> DiscordID = sqlstr::CSqlString<64>(std::string(message.author.ID).c_str());
 	ResultPtr pRes = SJK.SD("Nick", "tw_accounts_data", "WHERE DiscordID = '%s'", DiscordID.cstr());
 	if(!pRes->rowsCount())
 	{
@@ -103,6 +97,7 @@ void DiscordCommands::ComOnline(IConsole::IResult* pResult, DiscordJob* pDiscord
 {
 	std::string Onlines = "";
 	CGS* pGS = (CGS*)pDiscord->Server()->GameServer(MAIN_WORLD_ID);
+
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pPlayer = pGS->GetPlayer(i);
@@ -123,8 +118,7 @@ void DiscordCommands::ComOnline(IConsole::IResult* pResult, DiscordJob* pDiscord
 
 void DiscordCommands::ComStats(IConsole::IResult* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
-	IConsole::IResult* pArgs = (IConsole::IResult*)pResult;
-	const char* pSearchNick = pArgs->GetString(0);
+	const char* pSearchNick = pResult->GetString(0);
 	bool Found = pDiscord->SendGenerateMessage(message.author, message.channelID, "Discord MRPG Card", pSearchNick);
 	if(!Found)
 		pDiscord->SendWarningMessage(message.channelID, "Accounts containing [" + std::string(pSearchNick) + "] among nicknames were not found on the server.");
@@ -132,13 +126,13 @@ void DiscordCommands::ComStats(IConsole::IResult* pResult, DiscordJob* pDiscord,
 
 void DiscordCommands::ComRanking(IConsole::IResult* pResult, DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
+	std::string Names = "";
+	std::string Levels = "";
+	std::string GoldValues = "";
 	SleepyDiscord::Embed EmbedRanking;
 	EmbedRanking.title = message.startsWith("!mgoldranking") ? "Ranking by Gold" : "Ranking by Level";
 	EmbedRanking.color = 422353;
 
-	std::string Names = "";
-	std::string Levels = "";
-	std::string GoldValues = "";
 	ResultPtr pRes = SJK.SD("a.ID, ad.Nick AS `Nick`, ad.Level AS `Level`, g.Count AS `Gold`", "tw_accounts a", "JOIN tw_accounts_data ad ON a.ID = ad.ID LEFT JOIN tw_accounts_items g ON a.ID = g.OwnerID AND g.ItemID = 1 ORDER BY %s LIMIT 10", (message.startsWith("!mgoldranking") ? "g.Count DESC, ad.Level DESC" : "ad.Level DESC, g.Count DESC"));
 	while(pRes->next())
 	{
@@ -164,7 +158,8 @@ void DiscordCommands::ComAvatar(IConsole::IResult* pResult, DiscordJob* pDiscord
 		pDiscord->sendMessage(message.channelID, message.author.avatarUrl());
 		return;
 	}
-	else if(message.mentions.size() > 1)
+
+	if(message.mentions.size() > 1)
 	{
 		pDiscord->SendWarningMessage(message.channelID, "Prohibited to use this command with more than 1 people.");
 		return;
@@ -183,19 +178,19 @@ void DiscordCommands::ComAvatar(IConsole::IResult* pResult, DiscordJob* pDiscord
 /************************************************************************/
 void DiscordCommands::RegisterCommand(const char* pName, const char* pArgs, const char* pDesc, CommandCallback pCallback, int FlagsType, int Flags)
 {
-	DiscordCommands::Command NewCommand;
+	Command NewCommand;
 	str_copy(NewCommand.m_aCommand, pName, sizeof(NewCommand.m_aCommand));
 	str_copy(NewCommand.m_aCommandArgs, pArgs, sizeof(NewCommand.m_aCommandArgs));
 	str_copy(NewCommand.m_aCommandDesc, pDesc, sizeof(NewCommand.m_aCommandDesc));
 	NewCommand.m_TypeFlags = FlagsType;
 	NewCommand.m_AccessFlags = Flags;
 	NewCommand.m_pCallback = pCallback;
-	DiscordCommands::m_aCommands.push_back(NewCommand);
+	m_aCommands.push_back(NewCommand);
 }
 
 bool DiscordCommands::ExecuteCommand(DiscordJob* pDiscord, SleepyDiscord::Message message)
 {
-	for(auto& pCommand : DiscordCommands::m_aCommands)
+	for(auto& pCommand : m_aCommands)
 	{
 		if(message.startsWith(pCommand.m_aCommand))
 		{

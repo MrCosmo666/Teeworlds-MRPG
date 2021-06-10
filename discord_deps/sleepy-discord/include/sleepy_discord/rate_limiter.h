@@ -40,7 +40,7 @@ namespace SleepyDiscord {
 			buckets[bucket] = xBucket;
 			limits[xBucket].nextTry = timestamp;
 		}
-
+		
 		time_t getLiftTime(Route::Bucket& bucket, const time_t& currentTime) {
 			if (isGlobalRateLimited && currentTime < nextRetry)
 					return nextRetry;
@@ -99,4 +99,4 @@ namespace SleepyDiscord {
 		std::unordered_map<std::string, RateLimit> limits;
 		std::mutex mutex;
 	};
-} 
+}

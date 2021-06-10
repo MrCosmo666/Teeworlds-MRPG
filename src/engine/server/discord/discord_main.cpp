@@ -132,7 +132,7 @@ bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::s
 			SleepyDiscord::User UserAccountOwner = getUser(DiscordID).cast();
 			if(!UserAccountOwner.invalid())
 			{
-				embed.description = "Owns this account: " + UserAccountOwner.showMention() + "\n\nPersonal card MRPG of this user"; // should we ping a person if another person is looking at his card?
+				embed.description = "Owns this account: " + UserAccountOwner.showMention() + "\n\nPersonal card MRPG of this user";
 				embed.thumbnail.url = UserAccountOwner.avatarUrl();
 				embed.thumbnail.proxyUrl = UserAccountOwner.avatarUrl();
 				embed.thumbnail.height = 32;

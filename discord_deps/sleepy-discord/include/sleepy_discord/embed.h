@@ -222,11 +222,11 @@ namespace SleepyDiscord {
 				json::pair<json::ContainerTypeHelper>(&Embed::fields     , "fields"     , json::OPTIONAL_FIELD)
 			);
 		JSONStructEnd
-		
+
 	private:
 		friend BaseDiscordClient;
-		friend SendMessageParams;	
-	
+		friend SendMessageParams;
+
 		Flag flags = Flag::VALID_EMBED;
 	};
 }

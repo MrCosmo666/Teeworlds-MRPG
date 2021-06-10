@@ -9,12 +9,7 @@ namespace SleepyDiscord {
 	class BaseDiscordClient;
 
 	class DiscordObject {
-#define \
-		modIfElse(condition, modifier, value, el) \
-			condition(value) ? modifier(value) : el
-#define \
-		setIfElse(condition, value, el) \
-			condition(value) ? value : el
+
 	};
 
 	struct EmptyDiscordObject {
@@ -50,7 +45,7 @@ namespace SleepyDiscord {
 		void merge(Derived& changes) {
 			json::mergeObj(*this, changes);
 		}
-		
+
 		template<class DiscordObject>
 		inline bool operator==(const Snowflake<DiscordObject>& right) const {
 			return ID == static_cast<Snowflake<DiscordObject>>(right);
