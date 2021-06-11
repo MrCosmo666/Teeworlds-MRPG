@@ -47,7 +47,7 @@ namespace SleepyDiscord {
 			);
 		JSONStructEnd
 	};
-	
+
 	struct Reaction : public DiscordObject {
 	public:
 		Reaction() = default;
@@ -136,7 +136,7 @@ namespace SleepyDiscord {
 		~ActionRow() = default;
 		ActionRow(json::Value& json);
 		ActionRow(const nonstd::string_view& json);
-		static ComponentType componentType = ComponentType::ActionRow;
+		static const ComponentType componentType = ComponentType::ActionRow;
 
 		std::vector<std::shared_ptr<BaseComponent>> components;
 
@@ -256,7 +256,7 @@ namespace SleepyDiscord {
 			APNG = 2,
 			LOTTIE = 3
 		} format;
-		
+
 		JSONStructStart
 			std::make_tuple(
 				json::pair                      (&Sticker::ID             , "id"              , json::REQUIRIED_FIELD),
@@ -495,13 +495,13 @@ namespace SleepyDiscord {
 	struct GetDefault<AllowedMentions::MentionReplierFlag> {
 		static inline AllowedMentions::MentionReplierFlag get() {
 			return AllowedMentions::MentionReplierFlag::NotSet;
-		} 
+		}
 	};
 
 	template<>
 	struct GetEnumBaseType<AllowedMentions::MentionReplierFlag> {
 		//this makes the json wrapper know to use getBool instead of getInt
-		using Value = bool; 
+		using Value = bool;
 	};
 
 	template<class Type>
