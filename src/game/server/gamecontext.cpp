@@ -566,7 +566,7 @@ void CGS::ChatWorldID(int WorldID, const char* Suffix, const char* pText, ...)
 }
 
 // Send discord message
-void CGS::ChatDiscord(const char *Color, const char *Title, const char* pText, ...)
+void CGS::ChatDiscord(int Color, const char *Title, const char* pText, ...)
 {
 #ifdef CONF_DISCORD
 	va_list VarArgs;
@@ -582,7 +582,7 @@ void CGS::ChatDiscord(const char *Color, const char *Title, const char* pText, .
 }
 
 // Send a discord message to the channel
-void CGS::ChatDiscordChannel(const char *pChanel, const char *Color, const char *Title, const char* pText, ...)
+void CGS::ChatDiscordChannel(const char *pChanel, int Color, const char *Title, const char* pText, ...)
 {
 #ifdef CONF_DISCORD
 	va_list VarArgs;

@@ -76,9 +76,6 @@ CServer::CServer()
 	m_pServerBan = new CServerBan;
 	m_pMultiWorlds = new CMultiWorlds;
 	m_pDataMmo = new CDataMMO;
-#ifdef CONF_DISCORD
-	m_pDiscord = new DiscordJob(this);
-#endif
 
 	Init();
 }
@@ -87,9 +84,6 @@ CServer::~CServer()
 {
 	delete m_pMultiWorlds;
 	delete m_pDataMmo;
-#ifdef CONF_DISCORD
-	delete m_pDiscord;
-#endif
 	SJK.DisconnectConnectionHeap();
 }
 
@@ -263,21 +257,21 @@ int CServer::GetClientWorldID(int ClientID)
 	return m_aClients[ClientID].m_WorldID;
 }
 
-void CServer::SendDiscordGenerateMessage(const char *pTitle, int AccountID, const char* pColor)
+void CServer::SendDiscordGenerateMessage(const char *pTitle, int AccountID, int Color)
 {
 #ifdef CONF_DISCORD
-	DiscordTask Task(std::bind(&DiscordJob::SendGenerateMessageAccountID, m_pDiscord, SleepyDiscord::User(), std::string(g_Config.m_SvDiscordServerChatChannel), std::string(pTitle), AccountID, std::string(pColor)));
+	DiscordTask Task(std::bind(&DiscordJob::SendGenerateMessageAccountID, m_pDiscord, SleepyDiscord::User(), std::string(g_Config.m_SvDiscordServerChatChannel), std::string(pTitle), AccountID, Color));
 	m_pDiscord->AddThreadTask(Task);
 	#endif
 }
 
-void CServer::SendDiscordMessage(const char *pChannel, const char* pColor, const char* pTitle, const char* pText)
+void CServer::SendDiscordMessage(const char *pChannel, int Color, const char* pTitle, const char* pText)
 {
 #ifdef CONF_DISCORD
 	SleepyDiscord::Embed embed;
 	embed.title = std::string(pTitle);
 	embed.description = std::string(pText);
-	embed.color = string_to_number(pColor, 0, 1410065407);
+	embed.color = Color;
 
 	DiscordTask Task(std::bind(&DiscordJob::sendMessageWithoutResponse, m_pDiscord, std::string(pChannel), std::string("\0"), embed));
 	m_pDiscord->AddThreadTask(Task);
@@ -1345,6 +1339,11 @@ int CServer::Run()
 		dbg_msg("server", "+-------------------------+");
 	}
 
+	// intilized discord bot
+#ifdef CONF_DISCORD
+	m_pDiscord = new DiscordJob(this);
+#endif
+
 	// start game
 	{
 		m_GameStartTime = time_get();
@@ -1500,6 +1499,9 @@ int CServer::Run()
 	m_NetServer.Close();
 	m_Econ.Shutdown();
 	m_pMultiWorlds->Clear();
+#ifdef CONF_DISCORD
+	delete m_pDiscord;
+#endif
 	return 0;
 }
 

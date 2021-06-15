@@ -53,8 +53,8 @@ namespace SleepyDiscord {
 		std::string username;
 		std::string discriminator;
 		std::string avatar;			//base64 encoded jpeg image
-		std::string avatarUrl() { return std::string("https://cdn.discordapp.com/avatars/" + ID + "/" + avatar + ".jpg?size=1024"); }
-		std::string showMention() { return std::string("<@!" + std::string(ID) + ">"); }
+		std::string avatarUrl(int size = 1024) { return std::string("https://cdn.discordapp.com/avatars/" + ID + "/" + avatar + ".jpg?size=" + std::to_string(size)); }
+		std::string showMention() { return std::string("<@!" + ID + ">"); }
 
 		//these are optional
 		bool bot = false;

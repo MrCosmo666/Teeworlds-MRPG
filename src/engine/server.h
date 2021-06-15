@@ -3,9 +3,6 @@
 #ifndef ENGINE_SERVER_H
 #define ENGINE_SERVER_H
 
-// #include <mutex>
-// #define THREAD_PLAYER_DATA_SAFE(clientid) std::unique_lock<std::mutex> lgplayersafe##clientid(IServer::m_aMutexPlayerDataSafe[clientid]);
-
 #include "kernel.h"
 #include "message.h"
 
@@ -13,14 +10,14 @@
 #include <generated/protocol.h>
 #include <game/version.h>
 
-#define DC_SERVER_INFO g_Config.m_SvDiscordColorServerInfo
-#define DC_PLAYER_INFO g_Config.m_SvDiscordColorPlayerInfo
-#define DC_JOIN_LEAVE g_Config.m_SvDiscordColorJoinLeave
-#define DC_SERVER_CHAT g_Config.m_SvDiscordColorServerChat
-#define DC_SERVER_WARNING g_Config.m_SvDiscordColorWarning
-#define DC_DISCORD_BOT g_Config.m_SvDiscordColorDiscordBot
-#define DC_DISCORD_INFO g_Config.m_SvDiscordColorDiscordInfo
-
+#define DC_SERVER_INFO 13872503
+#define DC_PLAYER_INFO 1346299
+#define DC_JOIN_LEAVE 14494801
+#define DC_SERVER_CHAT 7899095
+#define DC_DISCORD_WARNING 13183530
+#define DC_DISCORD_SUCCESS 1346299
+#define DC_DISCORD_INFO 431050
+#define DC_INVISIBLE_GRAY 3553599
 
 class IServer : public IInterface
 {
@@ -116,10 +113,10 @@ public:
 	virtual const char* GetClientLanguage(int ClientID) const = 0;
 
 	// discord
-	virtual void SendDiscordMessage(const char *pChannel, const char* pColor, const char* pTitle, const char* pText) = 0;
-	virtual void SendDiscordGenerateMessage(const char* pTitle, int AccountID, const char* pColor = "\0") = 0;
+	virtual void SendDiscordMessage(const char *pChannel, int Color, const char* pTitle, const char* pText) = 0;
+	virtual void SendDiscordGenerateMessage(const char* pTitle, int AccountID, int Color = 0) = 0;
 	virtual void UpdateDiscordStatus(const char *pStatus) = 0;
-	
+
 	// Bots
 	virtual void InitClientBot(int ClientID) = 0;
 	virtual void BackInformationFakeClient(int FakeClientID) = 0;

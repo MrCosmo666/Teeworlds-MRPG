@@ -114,7 +114,7 @@ void CServerBan::ConBanExt(IConsole::IResult* pResult, void* pUser)
 			char aAddrStr[NETADDR_MAXSTRSIZE];
 			net_addr_str(pThis->m_pNetServer->ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), true);
 			str_format(aBuf, sizeof(aBuf), "Player %s IP(%s). Banned for %d minutes!", pThis->Server()->ClientName(ClientID), aAddrStr, Minutes);
-			pThis->Server()->SendDiscordMessage(g_Config.m_SvDiscordAdminChannel, DC_SERVER_WARNING, "Bans information!", aBuf);
+			pThis->Server()->SendDiscordMessage(g_Config.m_SvDiscordAdminChannel, DC_DISCORD_WARNING, "Bans information!", aBuf);
 			pThis->BanAddr(pThis->m_pNetServer->ClientAddr(ClientID), Minutes * 60, pReason);
 		}
 	}

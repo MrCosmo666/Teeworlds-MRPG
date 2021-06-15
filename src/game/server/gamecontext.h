@@ -107,8 +107,8 @@ public:
 	void Chat(int ClientID, const char* pText, ...);
 	void ChatFollow(int ClientID, const char* pText, ...);
 	bool ChatAccountID(int AccountID, const char* pText, ...);
-	void ChatDiscord(const char *Color, const char *Title, const char* pText, ...);
-	void ChatDiscordChannel(const char* pChanel, const char* Color, const char* Title, const char* pText, ...);
+	void ChatDiscord(int Color, const char *Title, const char* pText, ...);
+	void ChatDiscordChannel(const char* pChanel, int Color, const char* Title, const char* pText, ...);
 	void ChatGuild(int GuildID, const char* pText, ...);
 	void ChatWorldID(int WorldID, const char *Suffix, const char* pText, ...);
 	void Motd(int ClientID, const char* Text, ...);

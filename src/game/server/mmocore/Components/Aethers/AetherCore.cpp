@@ -116,7 +116,7 @@ void CAetherCore::UnlockLocation(CPlayer *pPlayer, vec2 Pos)
 
 		SJK.ID("tw_accounts_locations", "(OwnerID, TeleportID) VALUES ('%d', '%d')", pPlayer->Acc().m_AccountID, tl.first);
 		GS()->Chat(ClientID, "You unlock aether {STR}!", CAetherData::ms_aTeleport[tl.first].m_aTeleName);
-		GS()->ChatDiscord("14671083", Server()->ClientName(ClientID), "Adventure unlock aether {STR}", CAetherData::ms_aTeleport[tl.first].m_aTeleName);
+		GS()->ChatDiscord(DC_SERVER_INFO, Server()->ClientName(ClientID), "Adventure unlock aether {STR}", CAetherData::ms_aTeleport[tl.first].m_aTeleName);
 
 		pPlayer->Acc().m_aAetherLocation[tl.first] = true;
 		return;

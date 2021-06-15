@@ -179,7 +179,7 @@ void CQuestData::Finish()
 	m_pPlayer->AddMoney(Info().m_Gold);
 	m_pPlayer->AddExp(Info().m_Exp);
 	pGS->Chat(-1, "{STR} completed ({STR} - {STR})!", pGS->Server()->ClientName(ClientID), Info().m_aStoryLine, Info().m_aName);
-	pGS->ChatDiscord(DC_PLAYER_INFO, pGS->Server()->ClientName(ClientID), "Completed ({STR} - {STR})", Info().m_aStoryLine, Info().m_aName);
+	pGS->ChatDiscord(DC_SERVER_INFO, pGS->Server()->ClientName(ClientID), "Completed ({STR} - {STR})", Info().m_aStoryLine, Info().m_aName);
 
 	// check whether the after quest has opened something new
 	pGS->Mmo()->WorldSwap()->CheckQuestingOpened(m_pPlayer, m_QuestID);
