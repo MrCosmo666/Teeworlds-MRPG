@@ -166,6 +166,7 @@ namespace SleepyDiscord {
 
 		using EmptyOptions = std::array<EmptyDiscordObject, 0>;
 		static constexpr EmptyOptions emptyOptions = {};
+		static constexpr int testtest = 0;
 
 		JSONStructStart
 			std::make_tuple(

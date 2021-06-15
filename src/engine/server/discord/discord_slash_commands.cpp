@@ -386,6 +386,7 @@ void DiscordCommands::RegisterCommand(DiscordJob* pDiscord, std::string CommandI
 	}
 	else
 	{
+		dbg_msg("test", "%d", SleepyDiscord::AppCommand::testtest);
 		dbg_msg("discord_command", "%s %s is performed", RequiresUpdate ? "updating" : "registration", pName);
 		sleep_pause(500); // pause for disable many requests to discord api
 		if(RequiresUpdate)
