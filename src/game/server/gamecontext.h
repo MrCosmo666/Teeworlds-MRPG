@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_GAMECONTEXT_H
 #define GAME_SERVER_GAMECONTEXT_H
+
 #include <engine/console.h>
 #include <engine/server.h>
 #include <game/voting.h>
@@ -119,22 +120,22 @@ public:
 private:
 	struct CBroadcastState
 	{
+		int m_LifeSpanTick;
 		int m_NoChangeTick;
 		char m_aPrevMessage[1024];
 
-		int m_Priority;
+		BroadcastPriority m_Priority;
 		char m_aNextMessage[1024];
 
-		int m_LifeSpanTick;
-		int m_TimedPriority;
+		BroadcastPriority m_TimedPriority;
 		char m_aTimedMessage[1024];
 	};
 	CBroadcastState m_aBroadcastStates[MAX_PLAYERS];
 
 public:
-	void AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSpan);
-	void Broadcast(int ClientID, int Priority, int LifeSpan, const char *pText, ...);
-	void BroadcastWorldID(int WorldID, int Priority, int LifeSpan, const char *pText, ...);
+	void AddBroadcast(int ClientID, const char* pText, BroadcastPriority Priority, int LifeSpan);
+	void Broadcast(int ClientID, BroadcastPriority Priority, int LifeSpan, const char *pText, ...);
+	void BroadcastWorldID(int WorldID, BroadcastPriority Priority, int LifeSpan, const char *pText, ...);
 	void BroadcastTick(int ClientID);
 
 	/* #########################################################################

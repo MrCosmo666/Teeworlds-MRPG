@@ -28,7 +28,7 @@ void DiscordJob::onReady(SleepyDiscord::Ready readyData)
 
 void DiscordJob::onInteraction(SleepyDiscord::Interaction interaction)
 {
-	const auto pBtnItem = std::find_if(m_aBtnCallbacks.begin(), m_aBtnCallbacks.end(), [&interaction](const StructButtonCallback& pItem) { return str_comp(interaction.data.customID.c_str(), pItem.m_aButtonID) == 0; });
+	const auto pBtnItem = std::find_if(m_aBtnCallbacks.begin(), m_aBtnCallbacks.end(), [&interaction](const StructButtonCallback& pItem) { return interaction.data.customID == pItem.m_aButtonID; });
 	if(pBtnItem != m_aBtnCallbacks.end() && pBtnItem->m_BtnCallback)
 	{
 		pBtnItem->m_BtnCallback(this, &interaction);
@@ -49,14 +49,11 @@ void DiscordJob::onAddMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> ser
 	ArrayWelcomes.push_back(member.user.showMention() + ", i bet you haven't seen me as long as i had!");
 	ArrayWelcomes.push_back("Welcome, " + member.user.showMention() + ". We hope you're not coming to us without pizza!");
 	ArrayWelcomes.push_back("The raptor "+ member.user.showMention() + " appeared. Watch out!");
-	std::string RulesStr("\n**Don't forget to read the rules <#708092196024352768>!**");
 
-	const int RandomID = random_int() % ArrayWelcomes.size();
-	std::string Fullmessage(ArrayWelcomes[RandomID] + RulesStr);
-
+	const int RandomMessage = random_int() % ArrayWelcomes.size();
 	SleepyDiscord::Embed EmbedWelcome;
 	EmbedWelcome.color = DC_INVISIBLE_GRAY;
-	EmbedWelcome.description = Fullmessage;
+	EmbedWelcome.description = ArrayWelcomes[RandomMessage];
 	sendMessage(g_Config.m_SvDiscordWelcomeChannel, "\0", EmbedWelcome);
 
 	// give member role
@@ -70,15 +67,15 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	 	return;
 
 	// send from the discord chat to server chat
-	if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordServerChatChannel) == 0)
+	if(message.channelID == g_Config.m_SvDiscordServerChatChannel)
 	{
-		std::string Nickname("D|" + message.author.username);
+		const std::string Nickname("D|" + message.author.username);
 		m_pServer->GameServer(FAKE_DISCORD_WORLD_ID)->FakeChat(Nickname.c_str(), message.content.c_str());
 		return;
 	}
 
 	// suggestions-voting
-	if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordSuggestionChannel) == 0)
+	if(std::string(message.channelID) == g_Config.m_SvDiscordSuggestionChannel)
 	{
 		deleteMessage(message.channelID, message);
 
@@ -119,7 +116,7 @@ void DiscordJob::SendWarningMessage(SleepyDiscord::Snowflake<SleepyDiscord::Chan
 
 bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::string Channel, std::string Title, std::string SearchNickname, int Color, bool MultipleSearch)
 {
-	CSqlString<64> SearchNick(std::string("%" + SearchNickname + "%").c_str());
+	const CSqlString<64> SearchNick(std::string("%" + SearchNickname + "%").c_str());
 	ResultPtr pRes = SJK.SD("*", "tw_accounts_data", "WHERE Nick LIKE '%s' LIMIT %d", SearchNick.cstr(), (MultipleSearch ? 3 : 1));
 	while(pRes->next())
 	{
@@ -127,7 +124,7 @@ bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::s
 		const int Rank = Server()->GameServer()->GetRank(AccountID);
 		std::string Nickname(pRes->getString("Nick").c_str());
 		std::string PhpArguments = "?player=" + Nickname + "&dicid=" + std::to_string(pRes->getInt("DiscordEquip")) + "&rank=" + std::to_string(Rank);
-		std::string ImageUrl = std::string(g_Config.m_SvDiscordGenerateURL) + PhpArguments;
+		const std::string ImageUrl = std::string(g_Config.m_SvDiscordGenerateURL) + PhpArguments;
 
 		SleepyDiscord::Embed embed;
 		embed.title = Title;
@@ -162,11 +159,11 @@ bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::s
 	return Founded;
 }
 
-bool DiscordJob::SendGenerateMessageAccountID(SleepyDiscord::User UserRequestFrom, std::string Chanal, std::string Title, int AccountID, int Color)
+bool DiscordJob::SendGenerateMessageAccountID(SleepyDiscord::User UserRequestFrom, std::string Channel, std::string Title, int AccountID, int Color)
 {
 	CGS* pGS = (CGS*)Server()->GameServer(MAIN_WORLD_ID);
-	std::string Nickname(pGS->Mmo()->PlayerName(AccountID));
-	return SendGenerateMessage(UserRequestFrom, Chanal, Title, Nickname.c_str(), Color, false);
+	const std::string Nickname(pGS->Mmo()->PlayerName(AccountID));
+	return SendGenerateMessage(UserRequestFrom, Channel, Title, Nickname, Color, false);
 }
 
 // TODO: Rework it need impl it for easy use and safe

@@ -1,6 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include "GuildJob.h"
+#include "GuildCore.h"
 
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
@@ -12,7 +12,7 @@
 
 #include <cstdarg>
 
-void GuildJob::LoadGuildRank(int GuildID)
+void GuildCore::LoadGuildRank(int GuildID)
 {
 	// rank loading
 	ResultPtr pRes = SJK.SD("*", "tw_guilds_ranks", "WHERE ID > '0' AND GuildID = '%d'", GuildID);
@@ -25,7 +25,7 @@ void GuildJob::LoadGuildRank(int GuildID)
 	}
 }
 
-void GuildJob::OnInit()
+void GuildCore::OnInit()
 {
 	SJK.SDT("*", "tw_guilds", [&](ResultPtr pRes)
 	{
@@ -48,7 +48,7 @@ void GuildJob::OnInit()
 	});
 }
 
-void GuildJob::OnInitWorld(const char* pWhereLocalWorld)
+void GuildCore::OnInitWorld(const char* pWhereLocalWorld)
 {
 	// load houses
 	SJK.SDT("*", "tw_guilds_houses", [&](ResultPtr pRes)
@@ -86,12 +86,12 @@ void GuildJob::OnInitWorld(const char* pWhereLocalWorld)
 		Job()->ShowLoadingProgress("Guilds Houses Decorations", m_DecorationHouse.size());
 	}, pWhereLocalWorld);
 }
-void GuildJob::OnTick()
+void GuildCore::OnTick()
 {
 	TickHousingText();
 }
 
-bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
+bool GuildCore::OnHandleTile(CCharacter* pChr, int IndexCollision)
 {
 	CPlayer* pPlayer = pChr->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
@@ -142,7 +142,7 @@ bool GuildJob::OnHandleTile(CCharacter* pChr, int IndexCollision)
 /*
 	TODO: We have to process checks in functions, they exist for something.
 */
-bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool GuildCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, int VoteID, int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 
@@ -542,7 +542,7 @@ bool GuildJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int
 	return false;
 }
 
-bool GuildJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+bool GuildCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
 	const int ClientID = pPlayer->GetCID();
 	if(ReplaceMenu)
@@ -624,7 +624,7 @@ bool GuildJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu
 /* #########################################################################
 	BASED GUILDS
 ######################################################################### */
-void GuildJob::TickHousingText()
+void GuildCore::TickHousingText()
 {
 	if (Server()->Tick() % (Server()->TickSpeed() * 2) != 0)
 		return;
@@ -648,7 +648,7 @@ void GuildJob::TickHousingText()
 /* #########################################################################
 	GET CHECK MEMBER
 ######################################################################### */
-int GuildJob::SearchGuildByName(const char* pGuildName) const
+int GuildCore::SearchGuildByName(const char* pGuildName) const
 {
 	std::string SearchName(pGuildName); // I do not trust him with such important things xd
 	auto pItem = std::find_if(CGuildData::ms_aGuild.begin(), CGuildData::ms_aGuild.end(), [SearchName](std::pair< int, CGuildData> pCheck)
@@ -659,21 +659,21 @@ int GuildJob::SearchGuildByName(const char* pGuildName) const
 	return pItem != CGuildData::ms_aGuild.end() ? pItem->first : -1;
 }
 
-const char *GuildJob::GuildName(int GuildID) const
+const char *GuildCore::GuildName(int GuildID) const
 {
 	if(CGuildData::ms_aGuild.find(GuildID) != CGuildData::ms_aGuild.end())
 		return CGuildData::ms_aGuild[GuildID].m_aName;
 	return "invalid";
 }
 
-int GuildJob::GetMemberAccess(CPlayer* pPlayer) const
+int GuildCore::GetMemberAccess(CPlayer* pPlayer) const
 {
 	if(pPlayer->Acc().IsGuild() && CGuildRankData::ms_aRankGuild.find(pPlayer->Acc().m_GuildRank) != CGuildRankData::ms_aRankGuild.end())
 		return CGuildRankData::ms_aRankGuild[pPlayer->Acc().m_GuildRank].m_Access;
 	return 0;
 }
 
-bool GuildJob::CheckMemberAccess(CPlayer *pPlayer, int Access) const
+bool GuildCore::CheckMemberAccess(CPlayer *pPlayer, int Access) const
 {
 	const int GuildID = pPlayer->Acc().m_GuildID;
 	if(GuildID > 0 && CGuildData::ms_aGuild.find(GuildID) != CGuildData::ms_aGuild.end() &&
@@ -684,7 +684,7 @@ bool GuildJob::CheckMemberAccess(CPlayer *pPlayer, int Access) const
 	return false;
 }
 
-int GuildJob::GetMemberChairBonus(int GuildID, int Field) const
+int GuildCore::GetMemberChairBonus(int GuildID, int Field) const
 {
 	if(GuildID > 0 && CGuildData::ms_aGuild.find(GuildID) != CGuildData::ms_aGuild.end())
 		return CGuildData::ms_aGuild[GuildID].m_aGuildUpgrades[Field];
@@ -694,7 +694,7 @@ int GuildJob::GetMemberChairBonus(int GuildID, int Field) const
 /* #########################################################################
 	FUNCTIONS HOUSES DECORATION
 ######################################################################### */
-bool GuildJob::AddDecorationHouse(int DecoID, int GuildID, vec2 Position)
+bool GuildCore::AddDecorationHouse(int DecoID, int GuildID, vec2 Position)
 {
 	if (CGuildData::ms_aGuild.find(GuildID) == CGuildData::ms_aGuild.end())
 		return false;
@@ -716,7 +716,7 @@ bool GuildJob::AddDecorationHouse(int DecoID, int GuildID, vec2 Position)
 	return true;
 }
 
-bool GuildJob::DeleteDecorationHouse(int ID)
+bool GuildCore::DeleteDecorationHouse(int ID)
 {
 	if (m_DecorationHouse.find(ID) == m_DecorationHouse.end())
 		return false;
@@ -731,7 +731,7 @@ bool GuildJob::DeleteDecorationHouse(int ID)
 	return true;
 }
 
-void GuildJob::ShowDecorationList(CPlayer* pPlayer)
+void GuildCore::ShowDecorationList(CPlayer* pPlayer)
 {
 	int ClientID = pPlayer->GetCID();
 	int GuildID = pPlayer->Acc().m_GuildID;
@@ -749,7 +749,7 @@ void GuildJob::ShowDecorationList(CPlayer* pPlayer)
 /* #########################################################################
 	FUNCTIONS MEMBER MEMBER
 ######################################################################### */
-void GuildJob::CreateGuild(CPlayer *pPlayer, const char *pGuildName)
+void GuildCore::CreateGuild(CPlayer *pPlayer, const char *pGuildName)
 {
 	// check whether we are already in the guild
 	const int ClientID = pPlayer->GetCID();
@@ -797,7 +797,7 @@ void GuildJob::CreateGuild(CPlayer *pPlayer, const char *pGuildName)
 	GS()->StrongUpdateVotes(ClientID, MenuList::MAIN_MENU);
 }
 
-void GuildJob::DisbandGuild(int GuildID)
+void GuildCore::DisbandGuild(int GuildID)
 {
 	ResultPtr pResCheck = SJK.SD("ID", "tw_guilds", "WHERE ID = '%d'", GuildID);
 	if(!pResCheck)
@@ -831,7 +831,7 @@ void GuildJob::DisbandGuild(int GuildID)
 	SJK.UD("tw_accounts_data", "GuildID = NULL, GuildRank = NULL, GuildDeposit = '0' WHERE GuildID = '%d'", GuildID);
 }
 
-bool GuildJob::JoinGuild(int AccountID, int GuildID)
+bool GuildCore::JoinGuild(int AccountID, int GuildID)
 {
 	const char *pPlayerName = Job()->PlayerName(AccountID);
 	ResultPtr pResCheckJoin = SJK.SD("ID", "tw_accounts_data", "WHERE ID = '%d' AND GuildID IS NOT NULL", AccountID);
@@ -864,7 +864,7 @@ bool GuildJob::JoinGuild(int AccountID, int GuildID)
 	return true;
 }
 
-void GuildJob::ExitGuild(int AccountID)
+void GuildCore::ExitGuild(int AccountID)
 {
 	// we check if the clan leader leaves
 	ResultPtr pRes = SJK.SD("ID", "tw_guilds", "WHERE OwnerID = '%d'", AccountID);
@@ -894,7 +894,7 @@ void GuildJob::ExitGuild(int AccountID)
 	}
 }
 
-void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
+void GuildCore::ShowMenuGuild(CPlayer *pPlayer)
 {
 	if(!pPlayer->Acc().IsGuild())
 		return;
@@ -969,7 +969,7 @@ void GuildJob::ShowMenuGuild(CPlayer *pPlayer)
 	return;
 }
 
-void GuildJob::ShowGuildPlayers(CPlayer* pPlayer, int GuildID)
+void GuildCore::ShowGuildPlayers(CPlayer* pPlayer, int GuildID)
 {
 	const int ClientID = pPlayer->GetCID();
 	const bool SelfGuild = pPlayer->Acc().m_GuildID == GuildID;
@@ -1019,7 +1019,7 @@ void GuildJob::ShowGuildPlayers(CPlayer* pPlayer, int GuildID)
 	}
 }
 
-void GuildJob::AddExperience(int GuildID)
+void GuildCore::AddExperience(int GuildID)
 {
 	CGuildData::ms_aGuild[GuildID].m_Exp += 1;
 
@@ -1043,7 +1043,7 @@ void GuildJob::AddExperience(int GuildID)
 		SJK.UD("tw_guilds", "Level = '%d', Experience = '%d' WHERE ID = '%d'", CGuildData::ms_aGuild[GuildID].m_Level, CGuildData::ms_aGuild[GuildID].m_Exp, GuildID);
 }
 
-bool GuildJob::AddMoneyBank(int GuildID, int Money)
+bool GuildCore::AddMoneyBank(int GuildID, int Money)
 {
 	ResultPtr pRes = SJK.SD("ID, Bank", "tw_guilds", "WHERE ID = '%d'", GuildID);
 	if(!pRes->next())
@@ -1055,7 +1055,7 @@ bool GuildJob::AddMoneyBank(int GuildID, int Money)
 	return true;
 }
 
-bool GuildJob::RemoveMoneyBank(int GuildID, int Money)
+bool GuildCore::RemoveMoneyBank(int GuildID, int Money)
 {
 	ResultPtr pRes = SJK.SD("ID, Bank", "tw_guilds", "WHERE ID = '%d'", GuildID);
 	if(!pRes->next())
@@ -1073,7 +1073,7 @@ bool GuildJob::RemoveMoneyBank(int GuildID, int Money)
 }
 
 // purchase of upgrade maximum number of slots
-bool GuildJob::UpgradeGuild(int GuildID, int Field)
+bool GuildCore::UpgradeGuild(int GuildID, int Field)
 {
 	ResultPtr pRes = SJK.SD("*", "tw_guilds", "WHERE ID = '%d'", GuildID);
 	if(pRes->next())
@@ -1099,7 +1099,7 @@ bool GuildJob::UpgradeGuild(int GuildID, int Field)
 	GET CHECK MEMBER RANK MEMBER
 ######################################################################### */
 // access name
-const char *GuildJob::AccessNames(int Access)
+const char *GuildCore::AccessNames(int Access)
 {
 	switch(Access)
 	{
@@ -1111,7 +1111,7 @@ const char *GuildJob::AccessNames(int Access)
 }
 
 // get a rank name
-const char *GuildJob::GetGuildRank(int GuildID, int RankID)
+const char *GuildCore::GetGuildRank(int GuildID, int RankID)
 {
 	if(CGuildRankData::ms_aRankGuild.find(RankID) != CGuildRankData::ms_aRankGuild.end() && GuildID == CGuildRankData::ms_aRankGuild[RankID].m_GuildID)
 		return CGuildRankData::ms_aRankGuild[RankID].m_aRank;
@@ -1119,7 +1119,7 @@ const char *GuildJob::GetGuildRank(int GuildID, int RankID)
 }
 
 // find rank by name and organization
-int GuildJob::FindGuildRank(int GuildID, const char *Rank) const
+int GuildCore::FindGuildRank(int GuildID, const char *Rank) const
 {
 	for(auto& pRank : CGuildRankData::ms_aRankGuild)
 	{
@@ -1133,7 +1133,7 @@ int GuildJob::FindGuildRank(int GuildID, const char *Rank) const
 	FUNCTIONS MEMBER RANK MEMBER
 ######################################################################### */
 // add rank
-void GuildJob::AddRank(int GuildID, const char *Rank)
+void GuildCore::AddRank(int GuildID, const char *Rank)
 {
 	const int FindRank = FindGuildRank(GuildID, Rank);
 	if(CGuildRankData::ms_aRankGuild.find(FindRank) != CGuildRankData::ms_aRankGuild.end())
@@ -1155,7 +1155,7 @@ void GuildJob::AddRank(int GuildID, const char *Rank)
 }
 
 // unrank
-void GuildJob::DeleteRank(int RankID, int GuildID)
+void GuildCore::DeleteRank(int RankID, int GuildID)
 {
 	if(CGuildRankData::ms_aRankGuild.find(RankID) != CGuildRankData::ms_aRankGuild.end())
 	{
@@ -1168,7 +1168,7 @@ void GuildJob::DeleteRank(int RankID, int GuildID)
 }
 
 // change rank
-void GuildJob::ChangeRank(int RankID, int GuildID, const char *NewRank)
+void GuildCore::ChangeRank(int RankID, int GuildID, const char *NewRank)
 {
 	const int FindRank = FindGuildRank(GuildID, NewRank);
 	if(CGuildRankData::ms_aRankGuild.find(FindRank) != CGuildRankData::ms_aRankGuild.end())
@@ -1186,7 +1186,7 @@ void GuildJob::ChangeRank(int RankID, int GuildID, const char *NewRank)
 }
 
 // change access rank
-void GuildJob::ChangeRankAccess(int RankID)
+void GuildCore::ChangeRankAccess(int RankID)
 {
 	if(CGuildRankData::ms_aRankGuild.find(RankID) != CGuildRankData::ms_aRankGuild.end())
 	{
@@ -1202,7 +1202,7 @@ void GuildJob::ChangeRankAccess(int RankID)
 }
 
 // change player rank
-void GuildJob::ChangePlayerRank(int AccountID, int RankID)
+void GuildCore::ChangePlayerRank(int AccountID, int RankID)
 {
 	CPlayer* pPlayer = GS()->GetPlayerFromAccountID(AccountID);
 	if(pPlayer)
@@ -1212,7 +1212,7 @@ void GuildJob::ChangePlayerRank(int AccountID, int RankID)
 }
 
 // rank menu display
-void GuildJob::ShowMenuRank(CPlayer *pPlayer)
+void GuildCore::ShowMenuRank(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
 	int HideID = NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + 1300;
@@ -1245,7 +1245,7 @@ void GuildJob::ShowMenuRank(CPlayer *pPlayer)
 /* #########################################################################
 	GET CHECK MEMBER INVITE MEMBER
 ######################################################################### */
-int GuildJob::GetGuildPlayerCount(int GuildID)
+int GuildCore::GetGuildPlayerCount(int GuildID)
 {
 	int MemberPlayers = -1;
 	ResultPtr pRes = SJK.SD("ID", "tw_accounts_data", "WHERE GuildID = '%d'", GuildID);
@@ -1257,7 +1257,7 @@ int GuildJob::GetGuildPlayerCount(int GuildID)
 	FUNCTIONS MEMBER INVITE MEMBER
 ######################################################################### */
 // add a player to the guild
-void GuildJob::SendInviteGuild(int GuildID, CPlayer *pPlayer)
+void GuildCore::SendInviteGuild(int GuildID, CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
 	if(pPlayer->Acc().IsGuild())
@@ -1280,7 +1280,7 @@ void GuildJob::SendInviteGuild(int GuildID, CPlayer *pPlayer)
 }
 
 // show the invitation sheet to our guild
-void GuildJob::ShowInvitesGuilds(int ClientID, int GuildID)
+void GuildCore::ShowInvitesGuilds(int ClientID, int GuildID)
 {
 	int HideID = NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + 1900;
 	ResultPtr pRes = SJK.SD("*", "tw_guilds_invites", "WHERE GuildID = '%d'", GuildID);
@@ -1299,7 +1299,7 @@ void GuildJob::ShowInvitesGuilds(int ClientID, int GuildID)
 }
 
 // show the guild's top and call on them
-void GuildJob::ShowFinderGuilds(int ClientID)
+void GuildCore::ShowFinderGuilds(int ClientID)
 {
 	CPlayer* pPlayer = GS()->GetPlayer(ClientID, true);
 	GS()->AVL(ClientID, "null", "You are not in guild!");
@@ -1331,7 +1331,7 @@ void GuildJob::ShowFinderGuilds(int ClientID)
 	FUNCTIONS MEMBER HISTORY MEMBER
 ######################################################################### */
 // list of stories
-void GuildJob::ShowHistoryGuild(int ClientID, int GuildID)
+void GuildCore::ShowHistoryGuild(int ClientID, int GuildID)
 {
 	// looking for the entire history of the guild in the database
 	char aBuf[128];
@@ -1345,7 +1345,7 @@ void GuildJob::ShowHistoryGuild(int ClientID, int GuildID)
 }
 
 // add to the guild history
-void GuildJob::AddHistoryGuild(int GuildID, const char *Buffer, ...)
+void GuildCore::AddHistoryGuild(int GuildID, const char *Buffer, ...)
 {
 	char aBuf[512];
 	va_list VarArgs;
@@ -1365,14 +1365,14 @@ void GuildJob::AddHistoryGuild(int GuildID, const char *Buffer, ...)
 	GET CHECK MEMBER HOUSING MEMBER
 ######################################################################### */
 // guild house
-int GuildJob::GetHouseGuildID(int HouseID) const
+int GuildCore::GetHouseGuildID(int HouseID) const
 {
 	if(CGuildHouseData::ms_aHouseGuild.find(HouseID) != CGuildHouseData::ms_aHouseGuild.end())
 		return CGuildHouseData::ms_aHouseGuild.at(HouseID).m_GuildID;
 	return -1;
 }
 
-int GuildJob::GetHouseWorldID(int HouseID) const
+int GuildCore::GetHouseWorldID(int HouseID) const
 {
 	if (CGuildHouseData::ms_aHouseGuild.find(HouseID) != CGuildHouseData::ms_aHouseGuild.end())
 		return CGuildHouseData::ms_aHouseGuild.at(HouseID).m_GuildID;
@@ -1380,7 +1380,7 @@ int GuildJob::GetHouseWorldID(int HouseID) const
 }
 
 // search by position
-int GuildJob::GetPosHouseID(vec2 Pos) const
+int GuildCore::GetPosHouseID(vec2 Pos) const
 {
 	for(const auto& m: CGuildHouseData::ms_aHouseGuild)
 	{
@@ -1394,7 +1394,7 @@ int GuildJob::GetPosHouseID(vec2 Pos) const
 	return -1;
 }
 
-bool GuildJob::GetGuildDoor(int GuildID) const
+bool GuildCore::GetGuildDoor(int GuildID) const
 {
 	const int HouseID = GetGuildHouseID(GuildID);
 	if(HouseID > 0 && CGuildHouseData::ms_aHouseGuild.find(HouseID) != CGuildHouseData::ms_aHouseGuild.end())
@@ -1402,7 +1402,7 @@ bool GuildJob::GetGuildDoor(int GuildID) const
 	return false;
 }
 
-vec2 GuildJob::GetPositionHouse(int GuildID) const
+vec2 GuildCore::GetPositionHouse(int GuildID) const
 {
 	const int HouseID = GetGuildHouseID(GuildID);
 	if(HouseID > 0 && CGuildHouseData::ms_aHouseGuild.find(HouseID) != CGuildHouseData::ms_aHouseGuild.end())
@@ -1410,7 +1410,7 @@ vec2 GuildJob::GetPositionHouse(int GuildID) const
 	return vec2(0, 0);
 }
 
-int GuildJob::GetGuildHouseID(int GuildID) const
+int GuildCore::GetGuildHouseID(int GuildID) const
 {
 	for(const auto& imh : CGuildHouseData::ms_aHouseGuild)
 	{
@@ -1421,7 +1421,7 @@ int GuildJob::GetGuildHouseID(int GuildID) const
 }
 
 // buying a guild house
-void GuildJob::BuyGuildHouse(int GuildID, int HouseID)
+void GuildCore::BuyGuildHouse(int GuildID, int HouseID)
 {
 	// check if the guild has a house
 	if(GetGuildHouseID(GuildID) > 0)
@@ -1456,7 +1456,7 @@ void GuildJob::BuyGuildHouse(int GuildID, int HouseID)
 }
 
 // guild house sale
-void GuildJob::SellGuildHouse(int GuildID)
+void GuildCore::SellGuildHouse(int GuildID)
 {
 	const int HouseID = GetGuildHouseID(GuildID);
 	if(HouseID <= 0)
@@ -1486,7 +1486,7 @@ void GuildJob::SellGuildHouse(int GuildID)
 	CGuildHouseData::ms_aHouseGuild[HouseID].m_GuildID = -1;
 }
 
-void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
+void GuildCore::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 {
 	const int ClientID = pPlayer->GetCID();
 	GS()->AVH(ClientID, TAB_INFO_GUILD_HOUSE, GREEN_COLOR, "Information Member Housing");
@@ -1512,7 +1512,7 @@ void GuildJob::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 	GS()->AV(ClientID, "null");
 }
 
-bool GuildJob::ChangeStateDoor(int GuildID)
+bool GuildCore::ChangeStateDoor(int GuildID)
 {
 	const int HouseID = GetGuildHouseID(GuildID);
 	if(CGuildHouseData::ms_aHouseGuild.find(HouseID) == CGuildHouseData::ms_aHouseGuild.end())

@@ -20,22 +20,22 @@ class CAccountCore : public MmoComponent
 	void OnMessage(int MsgID, void* pRawMsg, int ClientID) override;
 
 public:
-	int SendAuthCode(int ClientID, int Code);
+	int SendAuthCode(int ClientID, int Code) const;
 	int RegisterAccount(int ClientID, const char *Login, const char *Password);
 	int LoginAccount(int ClientID, const char *Login, const char *Password);
 	void LoadAccount(CPlayer *pPlayer, bool FirstInitilize = false);
-	void DiscordConnect(int ClientID, const char *pDID);
+	void DiscordConnect(int ClientID, const char *pDID) const;
 
 	int GetHistoryLatestCorrectWorldID(CPlayer* pPlayer) const;
-	int GetRank(int AccountID);
-
+	
+	static int GetRank(int AccountID);
 	static bool IsActive(int ClientID)
 	{
 		return CAccountData::ms_aData.find(ClientID) != CAccountData::ms_aData.end();
 	}
 
-	std::string HashPassword(const char* pPassword, const char* pSalt);
-	void UseVoucher(int ClientID, const char* pVoucher);
+	static std::string HashPassword(const char* pPassword, const char* pSalt);
+	void UseVoucher(int ClientID, const char* pVoucher) const;
 };
 
 #endif

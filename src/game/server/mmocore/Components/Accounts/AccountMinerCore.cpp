@@ -6,10 +6,9 @@
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 
-using namespace sqlstr;
 std::map < int , CAccountMinerCore::StructOres > CAccountMinerCore::ms_aOre;
 
-void CAccountMinerCore::ShowMenu(CPlayer *pPlayer)
+void CAccountMinerCore::ShowMenu(CPlayer *pPlayer) const
 {
 	const int ClientID = pPlayer->GetCID();
 	const int JobLevel = pPlayer->Acc().m_aMiningData[JOB_LEVEL];

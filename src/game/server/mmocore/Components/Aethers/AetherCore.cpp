@@ -5,7 +5,7 @@
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 
-#include <game/server/mmocore/Components/Guilds/GuildJob.h>
+#include <game/server/mmocore/Components/Guilds/GuildCore.h>
 #include <game/server/mmocore/Components/Houses/HouseCore.h>
 
 void CAetherCore::OnInit()
@@ -123,7 +123,7 @@ void CAetherCore::UnlockLocation(CPlayer *pPlayer, vec2 Pos)
 	}
 }
 
-void CAetherCore::ShowTeleportList(CCharacter* pChar)
+void CAetherCore::ShowTeleportList(CCharacter* pChar) const
 {
 	CPlayer* pPlayer = pChar->GetPlayer();
 	const int ClientID = pPlayer->GetCID();
@@ -149,7 +149,7 @@ void CAetherCore::ShowTeleportList(CCharacter* pChar)
 			continue;
 		}
 
-		int Price = g_Config.m_SvPriceTeleport * (tl.second.m_WorldID + 1);
+		const int Price = g_Config.m_SvPriceTeleport * (tl.second.m_WorldID + 1);
 		GS()->AVD(ClientID, "TELEPORT", tl.first, Price, TAB_AETHER, "[{STR}] : {STR} - {INT}gold",
 			tl.second.m_aTeleName, Server()->GetWorldName(tl.second.m_WorldID), Price);
 	}

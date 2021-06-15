@@ -1,5 +1,6 @@
 #ifndef GAME_PATHFIND_H
 #define GAME_PATHFIND_H
+
 #include "BinaryHeap.h"
 
 #define MAX_WAY_CALC 50000

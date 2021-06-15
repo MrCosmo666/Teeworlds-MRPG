@@ -6,8 +6,6 @@
 
 #include <game/server/mmocore/Components/Quests/QuestCore.h>
 
-using namespace sqlstr;
-
 // loading of all skins and mobs to use for connection with other bots
 void CBotCore::OnInitWorld(const char* pWhereLocalWorld)
 {
@@ -39,7 +37,7 @@ void CBotCore::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talk
 
 	const int ClientID = pPlayer->GetCID();
 	if (!GS()->IsMmoClient(ClientID))
-		GS()->Broadcast(ClientID, BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
+		GS()->Broadcast(ClientID, BroadcastPriority::GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 
 	char reformTalkedText[512];
 	const int BotID = NpcBotInfo::ms_aNpcBot[MobID].m_BotID;
@@ -49,7 +47,7 @@ void CBotCore::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talk
 		if(!GS()->IsMmoClient(ClientID))
 		{
 			str_format(reformTalkedText, sizeof(reformTalkedText), "( 1 of 1 ) %s:\n- %s", NpcBotInfo::ms_aNpcBot[MobID].GetName(), pPlayer->GetDialogText());
-			GS()->Broadcast(ClientID, BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
+			GS()->Broadcast(ClientID, BroadcastPriority::GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 		}
 		else
 		{
@@ -66,7 +64,7 @@ void CBotCore::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talk
 	{
 		const char* TalkedNick = (PlayerTalked ? Server()->ClientName(ClientID) : NpcBotInfo::ms_aNpcBot[MobID].GetName());
 		str_format(reformTalkedText, sizeof(reformTalkedText), "( %d of %d ) %s:\n- %s", (1 + Progress), SizeTalking, TalkedNick, pPlayer->GetDialogText());
-		GS()->Broadcast(ClientID, BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
+		GS()->Broadcast(ClientID, BroadcastPriority::GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 	}
 	else
 	{
@@ -97,7 +95,7 @@ void CBotCore::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int Ta
 		const char* TalkedNick = (PlayerTalked ? Server()->ClientName(ClientID) : QuestBotInfo::ms_aQuestBot[MobID].GetName());
 		str_format(reformTalkedText, sizeof(reformTalkedText), "%s\n=========\n\n( %d of %d ) %s:\n- %s",
 			GS()->GetQuestInfo(QuestID).GetName(), (1 + Progress), SizeTalking, TalkedNick, pPlayer->GetDialogText());
-		GS()->Broadcast(ClientID, BROADCAST_GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
+		GS()->Broadcast(ClientID, BroadcastPriority::GAME_PRIORITY, 100, "Press 'F4' to continue the dialog!");
 	}
 	else
 	{

@@ -5,7 +5,7 @@
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 
-#include <game/server/mmocore/Components/Dungeons/DungeonJob.h>
+#include <game/server/mmocore/Components/Dungeons/DungeonCore.h>
 #include <game/server/mmocore/Components/Worlds/WorldSwapCore.h>
 
 #include <teeother/tl/nlohmann_json.h>

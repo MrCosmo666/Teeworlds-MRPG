@@ -3,10 +3,10 @@
 #ifdef CONF_DISCORD
 #include <base/threadpool.h>
 #include "discord_main.h"
+
 #include "discord_slash_commands.h"
 
 #include <engine/shared/config.h>
-#include <engine/shared/console.h>
 #include <game/server/gamecontext.h>
 
 std::vector < DiscordCommands::Command > DiscordCommands::ms_aCommands;
@@ -17,28 +17,28 @@ void DiscordCommands::InitCommands(DiscordJob* pDiscord)
 	std::vector<SleepyDiscord::AppCommand> aDiscordCmd(pDiscord->getGlobalAppCommands(g_Config.m_SvDiscordApplicationID));
 	auto CommandRegisteredID = [&aDiscordCmd](const char* pCmd) -> std::string
 	{
-		const auto pItem = std::find_if(aDiscordCmd.begin(), aDiscordCmd.end(), [pCmd](const SleepyDiscord::AppCommand& pDiscordCmd) { return str_comp(pCmd, pDiscordCmd.name.c_str()) == 0; });
+		const auto pItem = std::find_if(aDiscordCmd.begin(), aDiscordCmd.end(), [pCmd](const SleepyDiscord::AppCommand& pDiscordCmd) { return pDiscordCmd.name == pCmd; });
 		return pItem != aDiscordCmd.end() ? pItem->ID : "\0";
 	};
 
-	#define DISCORD_CMD(argsnum, name, argsformat, desc, callback, flags) \
+	#define REG_DCMD(argsnum, name, argsformat, desc, callback, flags) \
 		RegisterCommand<argsnum>(pDiscord, CommandRegisteredID(name), name, argsformat, desc, callback, flags)
 
 	// commands important
-	DISCORD_CMD(0, "help", "", "get help on commands.", CmdHelp, CMD_IMPORTANT);
-	DISCORD_CMD(0, "connect", "", "help for connect your discord to account in game.", CmdConnect, CMD_IMPORTANT);
-	DISCORD_CMD(0, "websites", "", "get links official/interested websites.", CmdWebsites, CMD_IMPORTANT);
+	REG_DCMD(0, "help", "", "get help on commands.", CmdHelp, CMD_IMPORTANT);
+	REG_DCMD(0, "connect", "", "help for connect your discord to account in game.", CmdConnect, CMD_IMPORTANT);
+	REG_DCMD(0, "websites", "", "get links official/interested websites.", CmdWebsites, CMD_IMPORTANT);
 
 	// commands game server
-	DISCORD_CMD(0, "online", "", "show a list of players on the server.", CmdOnline, CMD_GAME);
-	DISCORD_CMD(1, "stats", "s[nick]", "searching for players and displaying their personal MRPG cards.", CmdStats, CMD_GAME);
-	DISCORD_CMD(0, "ranking", "", "show the ranking of players by level.", CmdRanking, CMD_GAME);
-	DISCORD_CMD(0, "goldranking", "", "show the ranking of players by gold.", CmdRanking, CMD_GAME);
+	REG_DCMD(0, "online", "", "show a list of players on the server.", CmdOnline, CMD_GAME);
+	REG_DCMD(1, "stats", "s[nick]", "searching for players and displaying their personal MRPG cards.", CmdStats, CMD_GAME);
+	REG_DCMD(0, "ranking", "", "show the ranking of players by level.", CmdRanking, CMD_GAME);
+	REG_DCMD(0, "goldranking", "", "show the ranking of players by gold.", CmdRanking, CMD_GAME);
 
 	// commands fun
-	DISCORD_CMD(1, "avatar", "u[user]", "show user avatars.", CmdAvatar, CMD_FUN);
+	REG_DCMD(1, "avatar", "u[user]", "show user avatars.", CmdAvatar, CMD_FUN);
 
-	#undef REGISTER_CMD
+	#undef REG_DCMD
 }
 
 /************************************************************************/
@@ -313,7 +313,7 @@ void DiscordCommands::RegisterCommand(DiscordJob* pDiscord, std::string CommandI
 	NewCommand.m_pCallback = pCallback;
 	ms_aCommands.push_back(NewCommand);
 
-	const bool RequiresUpdate = CommandID != "\0";
+	const bool RequiresUpdate = (bool)(CommandID != "\0");
 	if(ArrSize > 0)
 	{
 		int StringPos = 0;
@@ -404,7 +404,7 @@ bool DiscordCommands::ExecuteCommand(DiscordJob* pDiscord, SleepyDiscord::Intera
 {
 	for(auto& pCommand : ms_aCommands)
 	{
-		if(str_comp(pInteraction->data.name.c_str(), pCommand.m_aCommand) == 0)
+		if(pInteraction->data.name == pCommand.m_aCommand)
 		{
 			pCommand.m_pCallback(pInteraction, pDiscord, false);
 			return true;

@@ -29,8 +29,8 @@ public:
 	int GetPlantLevel(vec2 Pos) const;
 	int GetPlantItemID(vec2 Pos) const;
 
-	void ShowMenu(CPlayer* pPlayer);
-	void ShowPlantsItems(int ClientID);
+	void ShowMenu(CPlayer* pPlayer) const;
+	void ShowPlantsItems(int ClientID) const;
 
 	void Work(CPlayer* pPlayer, int Level);
 };

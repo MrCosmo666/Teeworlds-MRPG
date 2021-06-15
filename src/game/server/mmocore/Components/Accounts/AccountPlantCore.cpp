@@ -7,7 +7,6 @@
 
 #include <game/server/mmocore/Components/Inventory/InventoryCore.h>
 
-using namespace sqlstr;
 std::map < int , CAccountPlantCore::StructPlants > CAccountPlantCore::ms_aPlants;
 
 void CAccountPlantCore::OnInitWorld(const char* pWhereLocalWorld)
@@ -64,7 +63,7 @@ int CAccountPlantCore::GetPlantItemID(vec2 Pos) const
 	return -1;
 }
 
-void CAccountPlantCore::ShowMenu(CPlayer* pPlayer)
+void CAccountPlantCore::ShowMenu(CPlayer* pPlayer) const
 {
 	const int ClientID = pPlayer->GetCID();
 	const int JobLevel = pPlayer->Acc().m_aPlantData[JOB_LEVEL];
@@ -77,7 +76,7 @@ void CAccountPlantCore::ShowMenu(CPlayer* pPlayer)
 	GS()->AVD(ClientID, "PLANTUPGRADE", JOB_UPGR_COUNTS, 20, TAB_UPGR_JOB, "Quantity +{INT} (Price 20P)", JobUpgrCounts);
 }
 
-void CAccountPlantCore::ShowPlantsItems(int ClientID)
+void CAccountPlantCore::ShowPlantsItems(int ClientID) const
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true);
 	if(!pPlayer)

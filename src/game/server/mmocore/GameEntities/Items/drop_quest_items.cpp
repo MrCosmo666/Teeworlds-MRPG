@@ -75,7 +75,7 @@ void CDropQuestItem::Tick()
 	// interactive
 	if (pOwnerPlayer->GetCharacter() && distance(m_Pos, pOwnerPlayer->GetCharacter()->m_Core.m_Pos) < 32.0f)
 	{
-		GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Press 'Fire' for pick Quest Item");
+		GS()->Broadcast(m_ClientID, BroadcastPriority::GAME_INFORMATION, 10, "Press 'Fire' for pick Quest Item");
 		if (pOwnerPlayer->GetCharacter()->m_ReloadTimer)
 		{
 			pPlayerItem.Add(1);

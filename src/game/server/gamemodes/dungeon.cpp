@@ -11,7 +11,7 @@
 #include <teeother/system/string.h>
 
 #include <game/server/mmocore/Components/Accounts/AccountCore.h>
-#include <game/server/mmocore/Components/Dungeons/DungeonJob.h>
+#include <game/server/mmocore/Components/Dungeons/DungeonCore.h>
 
 CGameControllerDungeon::CGameControllerDungeon(class CGS *pGS) : IGameController(pGS)
 {
@@ -91,7 +91,7 @@ void CGameControllerDungeon::ChangeState(int State)
 
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "The security timer is enabled for 30 seconds!");
 		GS()->ChatWorldID(m_WorldID, "[Dungeon]", "You are given 10 minutes to complete of dungeon!");
-		GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon started!");
+		GS()->BroadcastWorldID(m_WorldID, BroadcastPriority::VERY_IMPORTANT, 500, "Dungeon started!");
 
 		SetMobsSpawn(true);
 		KillAllPlayers();
@@ -201,7 +201,7 @@ void CGameControllerDungeon::StateTick()
 
 			// output before the start of the passage
 			const int Time = m_StartingTick / Server()->TickSpeed();
-			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon waiting {INT} sec!\nPlayer's are ready to start right now {INT} of {INT}!\nYou can change state with 'Vote yes'", Time, PlayersReadyState, Players);
+			GS()->BroadcastWorldID(m_WorldID, BroadcastPriority::VERY_IMPORTANT, 500, "Dungeon waiting {INT} sec!\nPlayer's are ready to start right now {INT} of {INT}!\nYou can change state with 'Vote yes'", Time, PlayersReadyState, Players);
 
 			m_StartingTick--;
 			if(!m_StartingTick)
@@ -246,7 +246,7 @@ void CGameControllerDungeon::StateTick()
 		if (m_FinishedTick)
 		{
 			const int Time = m_FinishedTick / Server()->TickSpeed();
-			GS()->BroadcastWorldID(m_WorldID, 99999, 500, "Dungeon ended {INT} sec!", Time);
+			GS()->BroadcastWorldID(m_WorldID, BroadcastPriority::VERY_IMPORTANT, 500, "Dungeon ended {INT} sec!", Time);
 
 			m_FinishedTick--;
 		}

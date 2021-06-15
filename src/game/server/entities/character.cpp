@@ -10,7 +10,7 @@
 #include "projectile.h"
 
 #include <game/server/mmocore/Components/Bots/BotData.h>
-#include <game/server/mmocore/Components/Guilds/GuildJob.h>
+#include <game/server/mmocore/Components/Guilds/GuildCore.h>
 #include <game/server/mmocore/Components/Houses/HouseCore.h>
 #include <game/server/mmocore/Components/Quests/QuestCore.h>
 #include <game/server/mmocore/Components/Worlds/WorldSwapCore.h>
@@ -1154,7 +1154,7 @@ bool CCharacter::CheckFailMana(int Mana)
 {
 	if(m_Mana < Mana)
 	{
-		GS()->Broadcast(m_pPlayer->GetCID(), BroadcastPriority::BROADCAST_GAME_WARNING, 100, "No mana for use this or for maintenance.");
+		GS()->Broadcast(m_pPlayer->GetCID(), BroadcastPriority::GAME_WARNING, 100, "No mana for use this or for maintenance.");
 		return true;
 	}
 

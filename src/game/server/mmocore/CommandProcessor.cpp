@@ -6,7 +6,7 @@
 #include "game/server/gamecontext.h"
 
 #include <game/server/mmocore/Components/Accounts/AccountCore.h>
-#include <game/server/mmocore/Components/Guilds/GuildJob.h>
+#include <game/server/mmocore/Components/Guilds/GuildCore.h>
 #include <game/server/mmocore/Components/Houses/HouseCore.h>
 
 CCommandProcessor::CCommandProcessor(CGS *pGS)

@@ -8,9 +8,9 @@
 
 class GuildDoor;
 class CDecorationHouses;
-class GuildJob : public MmoComponent
+class GuildCore : public MmoComponent
 {
-	~GuildJob() override
+	~GuildCore() override
 	{
 		CGuildData::ms_aGuild.clear();
 		CGuildHouseData::ms_aHouseGuild.clear();
@@ -23,7 +23,7 @@ class GuildJob : public MmoComponent
 	void OnInitWorld(const char* pWhereLocalWorld) override;
 	void OnTick() override;
 	bool OnHandleTile(CCharacter* pChr, int IndexCollision) override;
-	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
+	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, int VoteID, const int VoteID2, int Get, const char* GetText) override;
 	bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu) override;
 
 private:
@@ -72,7 +72,7 @@ private:
 	void ShowMenuRank(CPlayer *pPlayer);
 
 public:
-	int GetGuildPlayerCount(int GuildID);
+	static int GetGuildPlayerCount(int GuildID);
 
 private:
 	void ShowInvitesGuilds(int ClientID, int GuildID);
@@ -80,7 +80,7 @@ private:
 	void SendInviteGuild(int GuildID, CPlayer* pPlayer);
 
 	void ShowHistoryGuild(int ClientID, int GuildID);
-	void AddHistoryGuild(int GuildID, const char *Buffer, ...);
+	static void AddHistoryGuild(int GuildID, const char *Buffer, ...);
 
 public:
 	int GetHouseGuildID(int HouseID) const;

@@ -1,12 +1,12 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include "DungeonJob.h"
+#include "DungeonCore.h"
 
 #include <game/server/gamecontext.h>
 
 #include <game/server/mmocore/Components/Accounts/AccountCore.h>
 
-void DungeonJob::OnInit()
+void DungeonCore::OnInit()
 {
 	ResultPtr pRes = SJK.SD("*", "tw_dungeons");
 	while(pRes->next())
@@ -22,7 +22,7 @@ void DungeonJob::OnInit()
 	}
 }
 
-bool DungeonJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
+bool DungeonCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu)
 {
 	const int ClientID = pPlayer->GetCID();
 	if(ReplaceMenu)
@@ -61,7 +61,7 @@ bool DungeonJob::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMe
 	return false;
 }
 
-bool DungeonJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
+bool DungeonCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText)
 {
 	const int ClientID = pPlayer->GetCID();
 	if(!pPlayer->GetCharacter() || !pPlayer->GetCharacter()->IsAlive())
@@ -143,13 +143,13 @@ bool DungeonJob::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const i
 	return false;
 }
 
-bool DungeonJob::IsDungeonWorld(int WorldID) const
+bool DungeonCore::IsDungeonWorld(int WorldID)
 {
 	return std::find_if(CDungeonData::ms_aDungeon.begin(), CDungeonData::ms_aDungeon.end(),
 	                    [WorldID](const std::pair<int, CDungeonData>& pDungeon) { return pDungeon.second.m_WorldID == WorldID; }) != CDungeonData::ms_aDungeon.end();
 }
 
-void DungeonJob::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, CPlayerDungeonRecord *pPlayerDungeonRecord)
+void DungeonCore::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, CPlayerDungeonRecord *pPlayerDungeonRecord)
 {
 	const int Seconds = pPlayerDungeonRecord->m_Time;
 	const float PassageHelp = pPlayerDungeonRecord->m_PassageHelp;
@@ -165,7 +165,7 @@ void DungeonJob::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, CPlayerDunge
 	SJK.ID("tw_dungeons_records", "(OwnerID, DungeonID, Seconds, PassageHelp) VALUES ('%d', '%d', '%d', '%f')", pPlayer->Acc().m_AccountID, DungeonID, Seconds, PassageHelp);
 }
 
-void DungeonJob::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
+void DungeonCore::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID) const
 {
 	const int ClientID = pPlayer->GetCID();
 	ResultPtr pRes = SJK.SD("*", "tw_dungeons_records", "WHERE DungeonID = '%d' ORDER BY Seconds ASC LIMIT 5", DungeonID);
@@ -182,7 +182,7 @@ void DungeonJob::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID)
 	}
 }
 
-void DungeonJob::ShowDungeonsList(CPlayer* pPlayer, bool Story)
+void DungeonCore::ShowDungeonsList(CPlayer* pPlayer, bool Story) const
 {
 	const int ClientID = pPlayer->GetCID();
 	for (const auto& dungeon : CDungeonData::ms_aDungeon)
@@ -204,7 +204,7 @@ void DungeonJob::ShowDungeonsList(CPlayer* pPlayer, bool Story)
 	}
 }
 
-void DungeonJob::ShowTankVotingDungeon(CPlayer* pPlayer)
+void DungeonCore::ShowTankVotingDungeon(CPlayer* pPlayer) const
 {
 	if(!GS()->IsDungeon())
 		return;
@@ -224,7 +224,7 @@ void DungeonJob::ShowTankVotingDungeon(CPlayer* pPlayer)
 	}
 }
 
-void DungeonJob::CheckQuestingOpened(CPlayer *pPlayer, int QuestID)
+void DungeonCore::CheckQuestingOpened(CPlayer *pPlayer, int QuestID) const
 {
 	const int ClientID = pPlayer->GetCID();
 	for (const auto& dungeon : CDungeonData::ms_aDungeon)

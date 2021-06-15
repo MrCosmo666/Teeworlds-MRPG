@@ -6,7 +6,7 @@
 #include <game/server/gamecontext.h>
 #include <teeother/components/localization.h>
 
-#include <game/server/mmocore/Components/Dungeons/DungeonJob.h>
+#include <game/server/mmocore/Components/Dungeons/DungeonCore.h>
 #include <game/server/mmocore/Components/Mails/MailBoxCore.h>
 #include <game/server/mmocore/Components/Quests/QuestCore.h>
 #include <game/server/mmocore/Components/Worlds/WorldSwapCore.h>
@@ -26,7 +26,7 @@ int CAccountCore::GetHistoryLatestCorrectWorldID(CPlayer* pPlayer) const
 	return pWorldIterator != pPlayer->Acc().m_aHistoryWorld.end() ? *pWorldIterator : MAIN_WORLD_ID;
 }
 
-int CAccountCore::SendAuthCode(int ClientID, int Code)
+int CAccountCore::SendAuthCode(int ClientID, int Code) const
 {
 	if(GS()->IsMmoClient(ClientID))
 	{
@@ -44,8 +44,8 @@ int CAccountCore::RegisterAccount(int ClientID, const char *Login, const char *P
 		GS()->Chat(ClientID, "Username / Password must contain 4-12 characters");
 		return SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
 	}
-	CSqlString<32> clear_Nick = CSqlString<32>(Server()->ClientName(ClientID));
-	ResultPtr pRes = SJK.SD("ID", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr());
+	const CSqlString<32> cClearNick = CSqlString<32>(Server()->ClientName(ClientID));
+	ResultPtr pRes = SJK.SD("ID", "tw_accounts_data", "WHERE Nick = '%s'", cClearNick.cstr());
 	if(pRes->next())
 	{
 		GS()->Chat(ClientID, "- - - - [Your nickname is already registered] - - - -");
@@ -58,8 +58,8 @@ int CAccountCore::RegisterAccount(int ClientID, const char *Login, const char *P
 	ResultPtr pResID = SJK.SD("ID", "tw_accounts", "ORDER BY ID DESC LIMIT 1");
 	const int InitID = pResID->next() ? pResID->getInt("ID")+1 : 1; // thread save ? hm need for table all time auto increment = 1; NEED FIX IT
 
-	CSqlString<32> clear_Login = CSqlString<32>(Login);
-	CSqlString<32> clear_Pass = CSqlString<32>(Password);
+	const CSqlString<32> cClearLogin = CSqlString<32>(Login);
+	const CSqlString<32> cClearPass = CSqlString<32>(Password);
 
 	char aAddrStr[64];
 	Server()->GetClientAddr(ClientID, aAddrStr, sizeof(aAddrStr));
@@ -67,13 +67,13 @@ int CAccountCore::RegisterAccount(int ClientID, const char *Login, const char *P
 	char aSalt[32] = { 0 };
 	secure_random_password(aSalt, sizeof(aSalt), 24);
 
-	SJK.ID("tw_accounts", "(ID, Username, Password, PasswordSalt, RegisterDate, RegisteredIP) VALUES ('%d', '%s', '%s', '%s', UTC_TIMESTAMP(), '%s')", InitID, clear_Login.cstr(), HashPassword(clear_Pass.cstr(), aSalt).c_str(), aSalt, aAddrStr);
-	SJK.IDS(100, "tw_accounts_data", "(ID, Nick) VALUES ('%d', '%s')", InitID, clear_Nick.cstr());
+	SJK.ID("tw_accounts", "(ID, Username, Password, PasswordSalt, RegisterDate, RegisteredIP) VALUES ('%d', '%s', '%s', '%s', UTC_TIMESTAMP(), '%s')", InitID, cClearLogin.cstr(), HashPassword(cClearPass.cstr(), aSalt).c_str(), aSalt, aAddrStr);
+	SJK.IDS(100, "tw_accounts_data", "(ID, Nick) VALUES ('%d', '%s')", InitID, cClearNick.cstr());
 
 	GS()->Chat(ClientID, "- - - - - - - [Successful registered] - - - - - - -");
 	GS()->Chat(ClientID, "Don't forget your data, have a nice game!");
 	GS()->Chat(ClientID, "# Your nickname is a unique identifier!");
-	GS()->Chat(ClientID, "# Log in: \"/login {STR} {STR}\"", clear_Login.cstr(), clear_Pass.cstr());
+	GS()->Chat(ClientID, "# Log in: \"/login {STR} {STR}\"", cClearLogin.cstr(), cClearPass.cstr());
 	return SendAuthCode(ClientID, AUTH_REGISTER_GOOD);
 }
 
@@ -91,19 +91,19 @@ int CAccountCore::LoginAccount(int ClientID, const char *Login, const char *Pass
 		return SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
 	}
 
-	CSqlString<32> clear_Login = CSqlString<32>(Login);
-	CSqlString<32> clear_Pass = CSqlString<32>(Password);
-	CSqlString<32> clear_Nick = CSqlString<32>(Server()->ClientName(ClientID));
-	ResultPtr pResAccount = SJK.SD("*", "tw_accounts_data", "WHERE Nick = '%s'", clear_Nick.cstr());
+	const CSqlString<32> cClearLogin = CSqlString<32>(Login);
+	const CSqlString<32> cClearPass = CSqlString<32>(Password);
+	const CSqlString<32> cClearNick = CSqlString<32>(Server()->ClientName(ClientID));
+	ResultPtr pResAccount = SJK.SD("*", "tw_accounts_data", "WHERE Nick = '%s'", cClearNick.cstr());
 	if(pResAccount->next())
 	{
 		const int UserID = pResAccount->getInt("ID");
-		ResultPtr pResCheck = SJK.SD("ID, LoginDate, Language, Password, PasswordSalt", "tw_accounts", "WHERE Username = '%s' AND ID = '%d'", clear_Login.cstr(), UserID);
+		ResultPtr pResCheck = SJK.SD("ID, LoginDate, Language, Password, PasswordSalt", "tw_accounts", "WHERE Username = '%s' AND ID = '%d'", cClearLogin.cstr(), UserID);
 
 		bool LoginSuccess = false;
 		if(pResCheck->next())
 		{
-			if(!str_comp(pResCheck->getString("Password").c_str(), HashPassword(clear_Pass.cstr(), pResCheck->getString("PasswordSalt").c_str()).c_str()))
+			if(!str_comp(pResCheck->getString("Password").c_str(), HashPassword(cClearPass.cstr(), pResCheck->getString("PasswordSalt").c_str()).c_str()))
 				LoginSuccess = true;
 		}
 
@@ -120,7 +120,7 @@ int CAccountCore::LoginAccount(int ClientID, const char *Login, const char *Pass
 		}
 
 		Server()->SetClientLanguage(ClientID, pResCheck->getString("Language").c_str());
-		str_copy(pPlayer->Acc().m_aLogin, clear_Login.cstr(), sizeof(pPlayer->Acc().m_aLogin));
+		str_copy(pPlayer->Acc().m_aLogin, cClearLogin.cstr(), sizeof(pPlayer->Acc().m_aLogin));
 		str_copy(pPlayer->Acc().m_aLastLogin, pResCheck->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().m_aLastLogin));
 
 		pPlayer->Acc().m_AccountID = UserID;
@@ -157,7 +157,7 @@ void CAccountCore::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
-	GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 200, "You are located {STR} ({STR})",
+	GS()->Broadcast(ClientID, BroadcastPriority::MAIN_INFORMATION, 200, "You are located {STR} ({STR})",
 		Server()->GetWorldName(GS()->GetWorldID()), (GS()->IsAllowedPVP() ? "Zone PVP" : "Safe zone"));
 
 	GS()->SendWorldMusic(ClientID, (GS()->IsDungeon() ? -1 : 0));
@@ -194,7 +194,7 @@ void CAccountCore::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 
 	pPlayer->GetTempData().m_TempSafeSpawn = true;
 
-	int LatestCorrectWorldID = GetHistoryLatestCorrectWorldID(pPlayer);
+	const int LatestCorrectWorldID = GetHistoryLatestCorrectWorldID(pPlayer);
 	if(LatestCorrectWorldID != GS()->GetWorldID())
 	{
 		pPlayer->ChangeWorld(LatestCorrectWorldID);
@@ -203,20 +203,20 @@ void CAccountCore::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	GS()->SendFullyEquipments(ClientID);
 }
 
-void CAccountCore::DiscordConnect(int ClientID, const char *pDID)
+void CAccountCore::DiscordConnect(int ClientID, const char *pDID) const
 {
 #ifdef CONF_DISCORD
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true);
 	if(!pPlayer)
 		return;
 
-	CSqlString<64> DiscordID = CSqlString<64>(pDID);
+	const CSqlString<64> cDiscordID = CSqlString<64>(pDID);
 
 	// disable another account if it is connected to this discord
-	SJK.UD("tw_accounts_data", "DiscordID = 'null' WHERE DiscordID = '%s'", DiscordID.cstr());
+	SJK.UD("tw_accounts_data", "DiscordID = 'null' WHERE DiscordID = '%s'", cDiscordID.cstr());
 
 	// connect the player discord id
-	SJK.UDS(1000,"tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", DiscordID.cstr(), pPlayer->Acc().m_AccountID);
+	SJK.UDS(1000,"tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", cDiscordID.cstr(), pPlayer->Acc().m_AccountID);
 
 	GS()->Chat(ClientID, "Your Discord ID has been updated.");
 	GS()->Chat(ClientID, "Check the connection status in discord \"!mconnect\".");
@@ -230,7 +230,7 @@ int CAccountCore::GetRank(int AccountID)
 	while(pRes->next())
 	{
 		Rank++;
-		int SelectedAccountID = pRes->getInt("ID");
+		const int SelectedAccountID = pRes->getInt("ID");
 		if(AccountID == SelectedAccountID)
 			return Rank;
 	}
@@ -363,57 +363,57 @@ std::string CAccountCore::HashPassword(const char* pPassword, const char* pSalt)
 	sha256_init(&Sha256Ctx);
 	str_format(aPlaintext, sizeof(aPlaintext), "%s%s%s", pSalt, pPassword, pSalt);
 	sha256_update(&Sha256Ctx, aPlaintext, str_length(aPlaintext));
-	SHA256_DIGEST Digest = sha256_finish(&Sha256Ctx);
+	const SHA256_DIGEST Digest = sha256_finish(&Sha256Ctx);
 
 	char aHash[SHA256_MAXSTRSIZE];
 	sha256_str(Digest, aHash, sizeof(aHash));
 	return std::string(aHash);
 }
 
-void CAccountCore::UseVoucher(int ClientID, const char* pVoucher)
+void CAccountCore::UseVoucher(int ClientID, const char* pVoucher) const
 {
 	CPlayer* pPlayer = GS()->m_apPlayers[ClientID];
 	if (!pPlayer || !pPlayer->IsAuthed())
 		return;
 
 	char aSelect[256];
-	CSqlString<32> VoucherCode = CSqlString<32>(pVoucher);
+	const CSqlString<32> cVoucherCode = CSqlString<32>(pVoucher);
 	str_format(aSelect, sizeof(aSelect), "v.*, IF((SELECT r.id FROM tw_voucher_redeemed r WHERE CASE v.multiple WHEN 1 THEN r.voucher_id = v.id AND r.user_id = %d ELSE r.voucher_id = v.id END) IS NULL, FALSE, TRUE) AS used", pPlayer->Acc().m_AccountID);
 
-	ResultPtr pResVoucher = SJK.SD(aSelect, "tw_voucher v", "WHERE v.code = '%s'", VoucherCode.cstr());
+	ResultPtr pResVoucher = SJK.SD(aSelect, "tw_voucher v", "WHERE v.code = '%s'", cVoucherCode.cstr());
 	if (pResVoucher->next())
 	{
-		int VoucherID = pResVoucher->getInt("id");
-		int ValidUntil = pResVoucher->getInt("valid_until");
+		const int VoucherID = pResVoucher->getInt("id");
+		const int ValidUntil = pResVoucher->getInt("valid_until");
 		nlohmann::json JsonData = nlohmann::json::parse(pResVoucher->getString("data").c_str());
 
-		if (ValidUntil > 0 && ValidUntil < time(0))
+		if(ValidUntil > 0 && ValidUntil < time(0))
 			GS()->Chat(ClientID, "The voucher code '{STR}' has expired.", pVoucher);
-		else if (pResVoucher->getBoolean("used"))
+		else if(pResVoucher->getBoolean("used"))
 			GS()->Chat(ClientID, "This voucher has already been redeemed.");
 		else
 		{
-			int Exp = JsonData.value("exp", 0);
-			int Money = JsonData.value("money", 0);
-			int Upgrade = JsonData.value("upgrade", 0);
+			const int Exp = JsonData.value("exp", 0);
+			const int Money = JsonData.value("money", 0);
+			const int Upgrade = JsonData.value("upgrade", 0);
 
-			if (Exp > 0)
+			if(Exp > 0)
 				pPlayer->AddExp(Exp);
-			if (Money > 0)
+			if(Money > 0)
 				pPlayer->AddMoney(Money);
 			if(Upgrade > 0)
 				pPlayer->Acc().m_Upgrade += Upgrade;
 
-			if (JsonData.find("items") != JsonData.end() && JsonData["items"].is_array())
+			if(JsonData.find("items") != JsonData.end() && JsonData["items"].is_array())
 			{
-				for (nlohmann::json Item : JsonData["items"])
+				for(const nlohmann::json& Item : JsonData["items"])
 				{
-					int ItemID = Item.value("id", -1);
-					int Value = Item.value("value", 0);
+					const int ItemID = Item.value("id", -1);
+					const int Value = Item.value("value", 0);
 
-					if (ItemID > NOPE && Value > 0)
+					if(ItemID > NOPE && Value > 0)
 					{
-						if (CItemDataInfo::ms_aItemsInfo.find(ItemID) != CItemDataInfo::ms_aItemsInfo.end())
+						if(CItemDataInfo::ms_aItemsInfo.find(ItemID) != CItemDataInfo::ms_aItemsInfo.end())
 							pPlayer->GetItem(ItemID).Add(Value);
 					}
 				}

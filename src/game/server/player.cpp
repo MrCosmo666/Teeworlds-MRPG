@@ -10,7 +10,7 @@
 #include "mmocore/Components/Accounts/AccountCore.h"
 #include "mmocore/Components/Bots/BotCore.h"
 #include "mmocore/Components/Dungeons/DungeonData.h"
-#include "mmocore/Components/Guilds/GuildJob.h"
+#include "mmocore/Components/Guilds/GuildCore.h"
 #include "mmocore/Components/Quests/QuestCore.h"
 #include "mmocore/Components/Worlds/WorldSwapCore.h"
 
@@ -333,7 +333,7 @@ void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed,
 	const float GetExpProgress = (float)(GivedExp * 100.0) / (float)ExpNeed;
 	const std::unique_ptr<char[]> Level = std::move(GS()->LevelString(100, (int)GetLevelProgress, 10, ':', ' '));
 	str_format(aBufBroadcast, sizeof(aBufBroadcast), "^235Lv%d %s%s %0.2f%%+%0.3f%%(%d)XP\n", MyLevel, Name, Level.get(), GetLevelProgress, GetExpProgress, GivedExp);
-	GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, aBufBroadcast);
+	GS()->Broadcast(m_ClientID, BroadcastPriority::GAME_INFORMATION, 100, aBufBroadcast);
 }
 
 bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade) const
@@ -341,13 +341,13 @@ bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int Maxi
 	const int UpgradeNeed = Price*Count;
 	if((*Upgrade + Count) > MaximalUpgrade)
 	{
-		GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Upgrade has a maximum level.");
+		GS()->Broadcast(m_ClientID, BroadcastPriority::GAME_WARNING, 100, "Upgrade has a maximum level.");
 		return false;
 	}
 
 	if(*Useless < UpgradeNeed)
 	{
-		GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Not upgrade points for +{INT}. Required {INT}.", Count, UpgradeNeed);
+		GS()->Broadcast(m_ClientID, BroadcastPriority::GAME_WARNING, 100, "Not upgrade points for +{INT}. Required {INT}.", Count, UpgradeNeed);
 		return false;
 	}
 
@@ -487,7 +487,7 @@ void CPlayer::ShowInformationStats()
 	const int StartHealth = GetStartHealth();
 	const int Mana = GetMana();
 	const int StartMana = GetStartMana();
-	GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_BASIC_STATS, 100, "H: {INT}/{INT} M: {INT}/{INT}", Health, StartHealth, Mana, StartMana);
+	GS()->Broadcast(m_ClientID, BroadcastPriority::BASIC_STATS, 100, "H: {INT}/{INT} M: {INT}/{INT}", Health, StartHealth, Mana, StartMana);
 }
 
 /* #########################################################################

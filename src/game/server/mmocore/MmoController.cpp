@@ -13,8 +13,8 @@
 #include "Components/Aethers/AetherCore.h"
 #include "Components/Bots/BotCore.h"
 #include "Components/Crafts/CraftCore.h"
-#include "Components/Dungeons/DungeonJob.h"
-#include "Components/Guilds/GuildJob.h"
+#include "Components/Dungeons/DungeonCore.h"
+#include "Components/Guilds/GuildCore.h"
 #include "Components/Houses/HouseCore.h"
 #include "Components/Inventory/InventoryCore.h"
 #include "Components/Mails/MailBoxCore.h"
@@ -23,8 +23,6 @@
 #include "Components/Skills/SkillsCore.h"
 #include "Components/Storages/StorageCore.h"
 #include "Components/Worlds/WorldSwapCore.h"
-
-using namespace sqlstr;
 
 MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 {
@@ -35,11 +33,11 @@ MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 	m_Components.add(m_pStorageWork = new CStorageCore());
 	m_Components.add(m_pShopmail = new CShopCore());
 	m_Components.add(m_pQuest = new QuestCore());
-	m_Components.add(m_pDungeonJob = new DungeonJob());
+	m_Components.add(m_pDungeonJob = new DungeonCore());
 	m_Components.add(new CAetherCore());
 	m_Components.add(m_pWorldSwapJob = new CWorldSwapCore());
 	m_Components.add(m_pHouseJob = new CHouseCore());
-	m_Components.add(m_pGuildJob = new GuildJob());
+	m_Components.add(m_pGuildJob = new GuildCore());
 	m_Components.add(m_pSkillJob = new CSkillsCore());
 	m_Components.add(m_pAccMain = new CAccountCore());
 	m_Components.add(m_pAccMiner = new CAccountMinerCore());

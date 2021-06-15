@@ -19,8 +19,8 @@ class CCraftCore : public MmoComponent
 	bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu) override;
 
 	int GetFinalPrice(CPlayer* pPlayer, int CraftID) const;
-	void CraftItem(CPlayer* pPlayer, int CraftID);
-	void ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectType);
+	void CraftItem(CPlayer* pPlayer, int CraftID) const;
+	void ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectType) const;
 };
 
 #endif

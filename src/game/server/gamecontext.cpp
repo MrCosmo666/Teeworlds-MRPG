@@ -25,13 +25,13 @@
 #include <game/game_context.h>
 #include <teeother/components/localization.h>
 
-#include "mmocore/Components/Dungeons/DungeonJob.h"
-#include "mmocore/Components/Bots/BotCore.h"
 #include "mmocore/Components/Accounts/AccountCore.h"
 #include "mmocore/Components/Accounts/AccountMinerCore.h"
 #include "mmocore/Components/Accounts/AccountPlantCore.h"
+#include "mmocore/Components/Bots/BotCore.h"
+#include "mmocore/Components/Dungeons/DungeonCore.h"
 #include "mmocore/Components/Mails/MailBoxCore.h"
-#include "mmocore/Components/Guilds/GuildJob.h"
+#include "mmocore/Components/Guilds/GuildCore.h"
 #include "mmocore/Components/Houses/HouseCore.h"
 #include "mmocore/Components/Quests/QuestCore.h"
 #include "mmocore/Components/Skills/SkillsCore.h"
@@ -49,9 +49,9 @@ CGS::CGS()
 	{
 		pBroadcastState.m_NoChangeTick = 0;
 		pBroadcastState.m_LifeSpanTick = 0;
-		pBroadcastState.m_Priority = 0;
 		pBroadcastState.m_aPrevMessage[0] = 0;
 		pBroadcastState.m_aNextMessage[0] = 0;
+		pBroadcastState.m_Priority = BroadcastPriority::LOWER;
 	}
 
 	for(auto& apPlayer : m_apPlayers)
@@ -624,7 +624,7 @@ void CGS::Motd(int ClientID, const char* Text, ...)
 /* #########################################################################
 	BROADCAST FUNCTIONS
 ######################################################################### */
-void CGS::AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSpan)
+void CGS::AddBroadcast(int ClientID, const char* pText, BroadcastPriority Priority, int LifeSpan)
 {
 	if (ClientID < 0 || ClientID >= MAX_PLAYERS)
 		return;
@@ -649,7 +649,7 @@ void CGS::AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSp
 }
 
 // formatted broadcast
-void CGS::Broadcast(int ClientID, int Priority, int LifeSpan, const char *pText, ...)
+void CGS::Broadcast(int ClientID, BroadcastPriority Priority, int LifeSpan, const char *pText, ...)
 {
 	const int Start = (ClientID < 0 ? 0 : ClientID);
 	const int End = (ClientID < 0 ? MAX_PLAYERS : ClientID+1);
@@ -670,7 +670,7 @@ void CGS::Broadcast(int ClientID, int Priority, int LifeSpan, const char *pText,
 }
 
 // formatted world broadcast
-void CGS::BroadcastWorldID(int WorldID, int Priority, int LifeSpan, const char *pText, ...)
+void CGS::BroadcastWorldID(int WorldID, BroadcastPriority Priority, int LifeSpan, const char *pText, ...)
 {
 	va_list VarArgs;
 	va_start(VarArgs, pText);
@@ -718,20 +718,20 @@ void CGS::BroadcastTick(int ClientID)
 		if(m_aBroadcastStates[ClientID].m_LifeSpanTick <= 0)
 		{
 			m_aBroadcastStates[ClientID].m_aTimedMessage[0] = 0;
-			m_aBroadcastStates[ClientID].m_TimedPriority = 0;
+			m_aBroadcastStates[ClientID].m_TimedPriority = BroadcastPriority::LOWER;
 		}
 		m_aBroadcastStates[ClientID].m_aNextMessage[0] = 0;
-		m_aBroadcastStates[ClientID].m_Priority = 0;
+		m_aBroadcastStates[ClientID].m_Priority = BroadcastPriority::LOWER;
 	}
 	else
 	{
 		m_aBroadcastStates[ClientID].m_NoChangeTick = 0;
 		m_aBroadcastStates[ClientID].m_LifeSpanTick = 0;
-		m_aBroadcastStates[ClientID].m_Priority = 0;
-		m_aBroadcastStates[ClientID].m_TimedPriority = 0;
 		m_aBroadcastStates[ClientID].m_aPrevMessage[0] = 0;
 		m_aBroadcastStates[ClientID].m_aNextMessage[0] = 0;
 		m_aBroadcastStates[ClientID].m_aTimedMessage[0] = 0;
+		m_aBroadcastStates[ClientID].m_Priority = BroadcastPriority::LOWER;
+		m_aBroadcastStates[ClientID].m_TimedPriority = BroadcastPriority::LOWER;
 	}
 }
 
@@ -1238,11 +1238,11 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		{
 			if(!pPlayer->IsAuthed())
 			{
-				Broadcast(pPlayer->GetCID(), BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Use /register <name> <pass>.");
+				Broadcast(pPlayer->GetCID(), BroadcastPriority::MAIN_INFORMATION, 100, "Use /register <name> <pass>.");
 				return;
 			}
 
-			Broadcast(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Team change is not allowed.");
+			Broadcast(ClientID, BroadcastPriority::MAIN_INFORMATION, 100, "Team change is not allowed.");
 		}
 
 		else if (MsgID == NETMSGTYPE_CL_SETSPECTATORMODE)
@@ -1266,7 +1266,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			if(pPlayer->m_aPlayerTick[TickState::LastKill] && pPlayer->m_aPlayerTick[TickState::LastKill]+Server()->TickSpeed()*3 > Server()->Tick())
 				return;
 
-			Broadcast(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Self kill is not allowed.");
+			Broadcast(ClientID, BroadcastPriority::MAIN_INFORMATION, 100, "Self kill is not allowed.");
 			//pPlayer->m_PlayerTick[TickState::LastKill] = Server()->Tick();
 			//pPlayer->KillCharacter(WEAPON_SELF);
 		}

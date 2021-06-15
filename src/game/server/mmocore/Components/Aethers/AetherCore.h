@@ -20,7 +20,7 @@ class CAetherCore : public MmoComponent
 	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, int VoteID, int VoteID2, int Get, const char* GetText) override;
 
 	void UnlockLocation(CPlayer* pPlayer, vec2 Pos);
-	void ShowTeleportList(CCharacter* pChar);
+	void ShowTeleportList(CCharacter* pChar) const;
 };
 
 #endif

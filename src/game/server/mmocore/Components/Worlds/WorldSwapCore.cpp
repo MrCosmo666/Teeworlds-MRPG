@@ -125,7 +125,7 @@ bool CWorldSwapCore::ChangeWorld(CPlayer* pPlayer, vec2 Pos)
 		const int StoryQuestNeeded = CWorldSwapData::ms_aWorldSwap[WID].m_OpenQuestID;
 		if(StoryQuestNeeded > 0 && !pPlayer->GetQuest(StoryQuestNeeded).IsComplected())
 		{
-			GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Requires quest completion '{STR}'!", pPlayer->GetQuest(StoryQuestNeeded).Info().GetName());
+			GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Requires quest completion '{STR}'!", pPlayer->GetQuest(StoryQuestNeeded).Info().GetName());
 			return false;
 		}
 

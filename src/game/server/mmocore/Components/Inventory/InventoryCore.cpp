@@ -214,7 +214,7 @@ bool CInventoryCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, con
 		CItemData& pItemPlayer = pPlayer->GetItem(VoteID);
 		pItemPlayer.Drop(Get);
 
-		GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "You drop {STR}x{INT}", pItemPlayer.Info().GetName(pPlayer), Get);
+		GS()->Broadcast(ClientID, BroadcastPriority::GAME_INFORMATION, 100, "You drop {STR}x{INT}", pItemPlayer.Info().GetName(pPlayer), Get);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}

@@ -6,9 +6,9 @@
 
 #include "DungeonData.h"
 
-class DungeonJob : public MmoComponent
+class DungeonCore : public MmoComponent
 {
-	~DungeonJob() override
+	~DungeonCore() override
 	{
 		CDungeonData::ms_aDungeon.clear();
 	};
@@ -18,11 +18,11 @@ class DungeonJob : public MmoComponent
 	bool OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMenu) override;
 
 public:
-	bool IsDungeonWorld(int WorldID) const;
-	void SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, CPlayerDungeonRecord *pPlayerDungeonRecord);
-	void ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID);
-	void ShowDungeonsList(CPlayer* pPlayer, bool Story);
-	void CheckQuestingOpened(CPlayer* pPlayer, int QuestID);
-	void ShowTankVotingDungeon(CPlayer* pPlayer);
+	static bool IsDungeonWorld(int WorldID);
+	static void SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, CPlayerDungeonRecord *pPlayerDungeonRecord);
+	void ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID) const;
+	void ShowDungeonsList(CPlayer* pPlayer, bool Story) const;
+	void CheckQuestingOpened(CPlayer* pPlayer, int QuestID) const;
+	void ShowTankVotingDungeon(CPlayer* pPlayer) const;
 };
 #endif

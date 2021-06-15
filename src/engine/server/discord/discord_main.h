@@ -8,7 +8,7 @@
 #include <sleepy_discord/websocketpp_websocket.h>
 
 typedef std::function<void()> DiscordTask;
-class DiscordJob : public SleepyDiscord::DiscordClient
+class DiscordJob final : public SleepyDiscord::DiscordClient
 {
 public:
 	using SleepyDiscord::DiscordClient::DiscordClient;

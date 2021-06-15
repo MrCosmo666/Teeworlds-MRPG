@@ -53,7 +53,7 @@ void CJobItems::Work(int ClientID)
 	// not allowed un owner house job
 	if(m_HouseID > 0 && !GS()->Mmo()->House()->IsHouseHasOwner(m_HouseID))
 	{
-		GS()->Broadcast(ClientID, BROADCAST_GAME_WARNING, 100, "It is forbidden to pick plants without the owner!");
+		GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "It is forbidden to pick plants without the owner!");
 		return;
 	}
 
@@ -65,12 +65,12 @@ void CJobItems::Work(int ClientID)
 		int EquipItem = pPlayer->GetEquippedItemID(EQUIP_MINER);
 		if (EquipItem <= 0)
 		{
-			GS()->Broadcast(ClientID, BROADCAST_GAME_WARNING, 100, "Need equip Pickaxe!");
+			GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Need equip Pickaxe!");
 			return;
 		}
 		if ((int)pPlayer->Acc().m_aMiningData[JOB_LEVEL] < m_Level)
 		{
-			GS()->Broadcast(ClientID, BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), m_Level);
+			GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), m_Level);
 			return;
 		}
 
@@ -78,7 +78,7 @@ void CJobItems::Work(int ClientID)
 		int Durability = pPlayerEquippedItem.m_Durability;
 		if (Durability <= 0)
 		{
-			GS()->Broadcast(ClientID, BROADCAST_GAME_WARNING, 100, "Need repair pickaxe!");
+			GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Need repair pickaxe!");
 			return;
 		}
 
@@ -88,7 +88,7 @@ void CJobItems::Work(int ClientID)
 		m_Health += 3+pPlayer->GetItemsAttributeCount(StEfficiency);
 		GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
-		GS()->Broadcast(ClientID, BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P] : {STR} ({INT}/100%)",
+		GS()->Broadcast(ClientID, BroadcastPriority::GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P] : {STR} ({INT}/100%)",
 			pPlayerWorkedItem.Info().GetName(pPlayer), (m_Health > m_StartHealth ? m_StartHealth : m_Health), m_StartHealth,
 			pPlayerEquippedItem.Info().GetName(pPlayer), &Durability);
 
@@ -106,14 +106,14 @@ void CJobItems::Work(int ClientID)
 	// - - - - - - - - PLANTS - - - - - - - -
 	if ((int)pPlayer->Acc().m_aPlantData[JOB_LEVEL] < m_Level)
 	{
-		GS()->Broadcast(ClientID, BROADCAST_GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), m_Level);
+		GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), m_Level);
 		return;
 	}
 
 	m_Health += 10;
 	GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
-	GS()->Broadcast(ClientID, BROADCAST_GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P]",
+	GS()->Broadcast(ClientID, BroadcastPriority::GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P]",
 		pPlayerWorkedItem.Info().GetName(pPlayer), (m_Health > m_StartHealth ? m_StartHealth : m_Health), m_StartHealth);
 
 	if(m_Health >= m_StartHealth)

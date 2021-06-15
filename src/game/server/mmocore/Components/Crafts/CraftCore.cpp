@@ -5,7 +5,6 @@
 #include <game/server/gamecontext.h>
 #include <teeother/system/string.h>
 
-using namespace sqlstr;
 void CCraftCore::OnInit()
 {
 	ResultPtr pRes = SJK.SD("*", "tw_craft_list");
@@ -24,7 +23,8 @@ void CCraftCore::OnInit()
 			CCraftData::ms_aCraft[ID].m_aItemNeedID[i] = pRes->getInt(aBuf);
 		}
 		str_copy(aBuf, pRes->getString("ItemNeedCount").c_str(), sizeof(aBuf));
-		if (!sscanf(aBuf, "%d %d %d", &CCraftData::ms_aCraft[ID].m_aItemNeedCount[0], &CCraftData::ms_aCraft[ID].m_aItemNeedCount[1], &CCraftData::ms_aCraft[ID].m_aItemNeedCount[2]))
+		if (!sscanf(aBuf, "%d %d %d", &CCraftData::ms_aCraft[ID].m_aItemNeedCount[0],
+		            &CCraftData::ms_aCraft[ID].m_aItemNeedCount[1], &CCraftData::ms_aCraft[ID].m_aItemNeedCount[2]))
 			dbg_msg("Error", "Error on scanf in Crafting");
 	}
 
@@ -65,7 +65,7 @@ int CCraftCore::GetFinalPrice(CPlayer* pPlayer, int CraftID) const
 	return max(CCraftData::ms_aCraft[CraftID].m_Price - Discount, 0);
 }
 
-void CCraftCore::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectType)
+void CCraftCore::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int SelectType) const
 {
 	bool IsNotEmpty = false;
 	const int ClientID = pPlayer->GetCID();
@@ -84,7 +84,7 @@ void CCraftCore::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int Selec
 		}
 
 		const int Price = GetFinalPrice(pPlayer, cr.first);
-		int HideID = NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + cr.first;
+		const int HideID = NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + cr.first;
 		if (InfoGetItem.IsEnchantable())
 		{
 			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} - {INT} gold",
@@ -118,7 +118,7 @@ void CCraftCore::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int Selec
 		GS()->AV(ClientID, "null");
 }
 
-void CCraftCore::CraftItem(CPlayer *pPlayer, int CraftID)
+void CCraftCore::CraftItem(CPlayer *pPlayer, int CraftID) const
 {
 	const int ClientID = pPlayer->GetCID();
 	CItemData& PlayerCraftItem = pPlayer->GetItem(CCraftData::ms_aCraft[CraftID].m_ReceivedItemID);
@@ -132,13 +132,13 @@ void CCraftCore::CraftItem(CPlayer *pPlayer, int CraftID)
 	dynamic_string Buffer;
 	for(int i = 0; i < 3; i++)
 	{
-		int SearchItemID = CCraftData::ms_aCraft[CraftID].m_aItemNeedID[i];
-		int SearchCount = CCraftData::ms_aCraft[CraftID].m_aItemNeedCount[i];
+		const int SearchItemID = CCraftData::ms_aCraft[CraftID].m_aItemNeedID[i];
+		const int SearchCount = CCraftData::ms_aCraft[CraftID].m_aItemNeedCount[i];
 		if(SearchItemID <= 0 || SearchCount <= 0 || pPlayer->GetItem(SearchItemID).m_Count >= SearchCount)
 			continue;
 
 		char aBuf[48];
-		int ItemLeft = SearchCount - pPlayer->GetItem(SearchItemID).m_Count;
+		const int ItemLeft = SearchCount - pPlayer->GetItem(SearchItemID).m_Count;
 		str_format(aBuf, sizeof(aBuf), "%sx%d ", GS()->GetItemInfo(SearchItemID).GetName(pPlayer), ItemLeft);
 		Buffer.append((const char*)aBuf);
 	}
@@ -156,7 +156,7 @@ void CCraftCore::CraftItem(CPlayer *pPlayer, int CraftID)
 		return;
 
 	// delete ticket if equipped
-	bool TickedDiscountCraft = pPlayer->GetItem(itTicketDiscountCraft).IsEquipped();
+	const bool TickedDiscountCraft = pPlayer->GetItem(itTicketDiscountCraft).IsEquipped();
 	if(TickedDiscountCraft)
 	{
 		pPlayer->GetItem(itTicketDiscountCraft).Remove(1);
@@ -165,8 +165,8 @@ void CCraftCore::CraftItem(CPlayer *pPlayer, int CraftID)
 
 	for(int i = 0; i < 3; i++)
 	{
-		int SearchItemID = CCraftData::ms_aCraft[CraftID].m_aItemNeedID[i];
-		int SearchCount = CCraftData::ms_aCraft[CraftID].m_aItemNeedCount[i];
+		const int SearchItemID = CCraftData::ms_aCraft[CraftID].m_aItemNeedID[i];
+		const int SearchCount = CCraftData::ms_aCraft[CraftID].m_aItemNeedCount[i];
 		if(SearchItemID <= 0 || SearchCount <= 0)
 			continue;
 
