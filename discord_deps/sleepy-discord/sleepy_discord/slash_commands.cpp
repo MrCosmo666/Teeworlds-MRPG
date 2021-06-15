@@ -1,6 +1,9 @@
 #include "slash_commands.h"
 
+
 namespace SleepyDiscord {
+	constexpr AppCommand::EmptyOptions AppCommand::emptyOptions;
+	
 	AppCommand::AppCommand(json::Value & json) :
 		AppCommand(json::fromJSON<AppCommand>(json)) {
 	}

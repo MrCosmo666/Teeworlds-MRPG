@@ -376,14 +376,23 @@ void DiscordCommands::RegisterCommand(DiscordJob* pDiscord, std::string CommandI
 			StringPos++;
 			pArgs++;
 		}
+
+		dbg_msg("discord_command", "%s %s is performed", RequiresUpdate ? "updating" : "registration", pName);
+		sleep_pause(500); // pause for disable many requests to discord api
+		if(RequiresUpdate)
+			pDiscord->editGlobalAppCommand(g_Config.m_SvDiscordApplicationID, CommandID, pName, pDesc, Option);
+		else
+			pDiscord->createGlobalAppCommand(g_Config.m_SvDiscordApplicationID, pName, pDesc, Option);
 	}
-	
-	dbg_msg("discord_command", "%s %s is performed", RequiresUpdate ? "updating" : "registration", pName);
-	sleep_pause(500); // pause for disable many requests to discord api
-	if(RequiresUpdate)
-		pDiscord->editGlobalAppCommand(g_Config.m_SvDiscordApplicationID, CommandID, pName, pDesc, Option);
 	else
-		pDiscord->createGlobalAppCommand(g_Config.m_SvDiscordApplicationID, pName, pDesc, Option);
+	{
+		dbg_msg("discord_command", "%s %s is performed", RequiresUpdate ? "updating" : "registration", pName);
+		sleep_pause(500); // pause for disable many requests to discord api
+		if(RequiresUpdate)
+			pDiscord->editGlobalAppCommand(g_Config.m_SvDiscordApplicationID, CommandID, pName, pDesc);
+		else
+			pDiscord->createGlobalAppCommand(g_Config.m_SvDiscordApplicationID, pName, pDesc);
+	}
 }
 
 bool DiscordCommands::ExecuteCommand(DiscordJob* pDiscord, SleepyDiscord::Interaction* pInteraction)
