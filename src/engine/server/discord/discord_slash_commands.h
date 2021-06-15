@@ -60,10 +60,10 @@ public:
 	static void InitCommands(class DiscordJob* pDiscord);
 	static bool ExecuteCommand(class DiscordJob* pDiscord, SleepyDiscord::Interaction* pInteraction);
 
-	template<size_t ArrSize>
-	static void RegisterCommand(class DiscordJob* pDiscord, std::string CommandID, const char* pName, const char* pArgs, const char* pDesc, CommandCallback pCallback, int FlagType);
-
 private:
+	template< size_t ArrSize >
+	static void RegisterCommand(class DiscordJob* pDiscord, std::string CommandID, const char* pName, const char* pArgs, const char* pDesc, CommandCallback pCallback, int FlagType);
+	
 	static std::vector < Command > ms_aCommands;
 };
 

@@ -14,14 +14,15 @@ std::map < std::string, int > DiscordCommands::ms_HelpCmdPage;
 
 void DiscordCommands::InitCommands(DiscordJob* pDiscord)
 {
-	#define DISCORD_CMD(argsnum, name, argsformat, desc, callback, flags) RegisterCommand<argsnum>(pDiscord, CommandRegisteredID(name), name, argsformat, desc, callback, flags)
-
 	std::vector<SleepyDiscord::AppCommand> aDiscordCmd(pDiscord->getGlobalAppCommands(g_Config.m_SvDiscordApplicationID));
 	auto CommandRegisteredID = [&aDiscordCmd](const char* pCmd) -> std::string
 	{
-		const auto pItem = std::find_if(aDiscordCmd.begin(), aDiscordCmd.end(), [pCmd](const SleepyDiscord::AppCommand& pDiscordCmd){ return str_comp(pCmd, pDiscordCmd.name.c_str()) == 0; });
+		const auto pItem = std::find_if(aDiscordCmd.begin(), aDiscordCmd.end(), [pCmd](const SleepyDiscord::AppCommand& pDiscordCmd) { return str_comp(pCmd, pDiscordCmd.name.c_str()) == 0; });
 		return pItem != aDiscordCmd.end() ? pItem->ID : "\0";
 	};
+
+	#define DISCORD_CMD(argsnum, name, argsformat, desc, callback, flags) \
+		RegisterCommand<argsnum>(pDiscord, CommandRegisteredID(name), name, argsformat, desc, callback, flags)
 
 	// commands important
 	DISCORD_CMD(0, "help", "", "get help on commands.", CmdHelp, CMD_IMPORTANT);
@@ -30,12 +31,12 @@ void DiscordCommands::InitCommands(DiscordJob* pDiscord)
 
 	// commands game server
 	DISCORD_CMD(0, "online", "", "show a list of players on the server.", CmdOnline, CMD_GAME);
-	DISCORD_CMD(1, "stats", "?s[nick]", "searching for players and displaying their personal MRPG cards.", CmdStats, CMD_GAME);
+	DISCORD_CMD(1, "stats", "s[nick]", "searching for players and displaying their personal MRPG cards.", CmdStats, CMD_GAME);
 	DISCORD_CMD(0, "ranking", "", "show the ranking of players by level.", CmdRanking, CMD_GAME);
 	DISCORD_CMD(0, "goldranking", "", "show the ranking of players by gold.", CmdRanking, CMD_GAME);
 
 	// commands fun
-	DISCORD_CMD(1, "avatar", "?u[user]", "show user avatars.", CmdAvatar, CMD_FUN);
+	DISCORD_CMD(1, "avatar", "u[user]", "show user avatars.", CmdAvatar, CMD_FUN);
 
 	#undef REGISTER_CMD
 }
@@ -312,12 +313,12 @@ void DiscordCommands::RegisterCommand(DiscordJob* pDiscord, std::string CommandI
 	ms_aCommands.push_back(NewCommand);
 
 	const bool RequiresUpdate = CommandID != "\0";
+	std::array<SleepyDiscord::AppCommand::Option, ArrSize> Option;
 	if(ArrSize > 0)
 	{
 		int StringPos = 0;
 		size_t HandledOption = 0;
-		bool RequiredOption = false;
-		std::array<SleepyDiscord::AppCommand::Option, ArrSize> Option;
+		bool RequiredOption = true;
 		while(*pArgs)
 		{
 			if(HandledOption >= ArrSize)
@@ -326,7 +327,7 @@ void DiscordCommands::RegisterCommand(DiscordJob* pDiscord, std::string CommandI
 			bool ValidArgs = false;
 			if(*pArgs == '?')
 			{
-				RequiredOption = true;
+				RequiredOption = false;
 			}
 			else if(*pArgs == 'u')
 			{
@@ -375,23 +376,14 @@ void DiscordCommands::RegisterCommand(DiscordJob* pDiscord, std::string CommandI
 			StringPos++;
 			pArgs++;
 		}
-
-		dbg_msg("discord_command", "%s %s is performed", RequiresUpdate ? "updating" : "registration", pName);
-		sleep_pause(500); // pause for disable many requests to discord api
-		if(RequiresUpdate)
-			pDiscord->editGlobalAppCommand(g_Config.m_SvDiscordApplicationID, CommandID, pName, pDesc, Option);
-		else
-			pDiscord->createGlobalAppCommand(g_Config.m_SvDiscordApplicationID, pName, pDesc, Option);
 	}
+	
+	dbg_msg("discord_command", "%s %s is performed", RequiresUpdate ? "updating" : "registration", pName);
+	sleep_pause(500); // pause for disable many requests to discord api
+	if(RequiresUpdate)
+		pDiscord->editGlobalAppCommand(g_Config.m_SvDiscordApplicationID, CommandID, pName, pDesc, Option);
 	else
-	{
-		dbg_msg("discord_command", "%s %s is performed", RequiresUpdate ? "updating" : "registration", pName);
-		sleep_pause(500); // pause for disable many requests to discord api
-		if(RequiresUpdate)
-			pDiscord->editGlobalAppCommand(g_Config.m_SvDiscordApplicationID, CommandID, pName, pDesc);
-		else
-			pDiscord->createGlobalAppCommand(g_Config.m_SvDiscordApplicationID, pName, pDesc);
-	}
+		pDiscord->createGlobalAppCommand(g_Config.m_SvDiscordApplicationID, pName, pDesc, Option);
 }
 
 bool DiscordCommands::ExecuteCommand(DiscordJob* pDiscord, SleepyDiscord::Interaction* pInteraction)
