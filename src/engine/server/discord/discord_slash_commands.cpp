@@ -242,6 +242,7 @@ void DiscordCommands::CmdStats(SleepyDiscord::Interaction* pInteraction, Discord
 		response.data.embeds.push_back(EmbedWarning);
 		
 		pDiscord->createInteractionResponse(pInteraction, pInteraction->token, response);
+		return;
 	}
 	
 	response.data.content = "The request is formulat";
@@ -313,12 +314,12 @@ void DiscordCommands::RegisterCommand(DiscordJob* pDiscord, std::string CommandI
 	ms_aCommands.push_back(NewCommand);
 
 	const bool RequiresUpdate = CommandID != "\0";
-	std::array<SleepyDiscord::AppCommand::Option, ArrSize> Option;
 	if(ArrSize > 0)
 	{
 		int StringPos = 0;
 		size_t HandledOption = 0;
 		bool RequiredOption = true;
+		std::array<SleepyDiscord::AppCommand::Option, ArrSize> Option;
 		while(*pArgs)
 		{
 			if(HandledOption >= ArrSize)
@@ -362,15 +363,19 @@ void DiscordCommands::RegisterCommand(DiscordJob* pDiscord, std::string CommandI
 			else if(*pArgs == '[')
 			{
 				char aName[64];
-				str_format(aName, sizeof(aName), "%.*s", str_span(&pArgs[StringPos - 1], "]"), &pArgs[StringPos - 1]);
+				str_format(aName, sizeof(aName), "%.*s", str_span(&pArgs[StringPos], "]"), &pArgs[StringPos]);
 				Option.at(HandledOption).name = aName;
+				pArgs += str_span(&pArgs[StringPos - 1], "]");
 				ValidArgs = true;
 			}
 
 			if(ValidArgs)
 			{
-				Option.at(HandledOption).isRequired = RequiredOption;
-				RequiredOption = false;
+				if(RequiredOption)
+				{
+					Option.at(HandledOption).isRequired = RequiredOption;
+					RequiredOption = false;
+				}
 				HandledOption++;
 			}
 			StringPos++;
@@ -378,20 +383,20 @@ void DiscordCommands::RegisterCommand(DiscordJob* pDiscord, std::string CommandI
 		}
 
 		dbg_msg("discord_command", "%s %s is performed", RequiresUpdate ? "updating" : "registration", pName);
-		sleep_pause(500); // pause for disable many requests to discord api
 		if(RequiresUpdate)
 			pDiscord->editGlobalAppCommand(g_Config.m_SvDiscordApplicationID, CommandID, pName, pDesc, Option);
 		else
 			pDiscord->createGlobalAppCommand(g_Config.m_SvDiscordApplicationID, pName, pDesc, Option);
+		sleep_pause(500); // pause for disable many requests to discord api
 	}
 	else
 	{
 		dbg_msg("discord_command", "%s %s is performed", RequiresUpdate ? "updating" : "registration", pName);
-		sleep_pause(500); // pause for disable many requests to discord api
 		if(RequiresUpdate)
 			pDiscord->editGlobalAppCommand(g_Config.m_SvDiscordApplicationID, CommandID, pName, pDesc);
 		else
 			pDiscord->createGlobalAppCommand(g_Config.m_SvDiscordApplicationID, pName, pDesc);
+		sleep_pause(500); // pause for disable many requests to discord api
 	}
 }
 
