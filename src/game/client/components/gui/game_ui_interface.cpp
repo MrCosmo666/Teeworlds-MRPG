@@ -120,7 +120,6 @@ void CUIGameInterface::RenderGuiIcons()
 		const bool UnreadLetters = UnreadLetterMails();
 		if(DoIconSelectionWindow(&s_MailListButton, &IconView, m_pWindowMailboxList, SPRITE_HUD_ICON_MAIL, UnreadLetters ? "New" : nullptr) && m_pWindowMailboxList->IsOpenned())
 			SendLetterAction(nullptr, MAILLETTERFLAG_REFRESH);
-
 	}
 	// questing gui icon
 	{
@@ -129,7 +128,6 @@ void CUIGameInterface::RenderGuiIcons()
 		if(DoIconSelectionWindow(&s_QuestingListButton, &IconView, m_pWindowQuestsList, SPRITE_HUD_ICON_QUEST))
 		{
 		}
-
 	}
 }
 
