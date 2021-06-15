@@ -148,7 +148,7 @@ public:
 	int GetStartTeam() const;
 
 	static int ExpNeed(int Level);
-	void ShowInformationStats();
+	void ShowInformationStats(BroadcastPriority Priority = BroadcastPriority::BASIC_STATS);
 
 	/* #########################################################################
 		FUNCTIONS PLAYER PARSING

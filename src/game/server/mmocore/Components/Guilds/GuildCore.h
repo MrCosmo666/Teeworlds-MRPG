@@ -44,7 +44,7 @@ public:
 	void ExitGuild(int AccountID);
 
 private:
-	void ShowMenuGuild(CPlayer *pPlayer);
+	void ShowMenuGuild(CPlayer *pPlayer) const;
 	void ShowGuildPlayers(CPlayer *pPlayer, int GuildID);
 
 public:

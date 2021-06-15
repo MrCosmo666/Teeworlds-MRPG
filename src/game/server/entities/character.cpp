@@ -755,8 +755,8 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 	if(Dmg)
 	{
 		GS()->m_pController->OnCharacterDamage(pFrom, m_pPlayer, min(Dmg, m_Health));
-		m_pPlayer->ShowInformationStats();
 		m_Health -= Dmg;
+		m_pPlayer->ShowInformationStats(BroadcastPriority::GAME_INFORMATION);
 	}
 
 	// create healthmod indicator
@@ -776,7 +776,6 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 			return false;
 
 		m_Health = 0;
-		m_pPlayer->ShowInformationStats();
 		Die(From, Weapon);
 		return false;
 	}
@@ -1083,10 +1082,8 @@ void CCharacter::HandleAuthedPlayer()
 
 	// recovery mana
 	if(m_Mana < m_pPlayer->GetStartMana() && Server()->Tick() % (Server()->TickSpeed() * 3) == 0)
-	{
 		IncreaseMana(m_pPlayer->GetStartMana() / 20);
-		m_pPlayer->ShowInformationStats();
-	}
+
 	HandleEvents();
 }
 
@@ -1162,7 +1159,7 @@ bool CCharacter::CheckFailMana(int Mana)
 	if(m_Mana <= m_pPlayer->GetStartMana() / 5 && !m_pPlayer->IsActiveEffect("RegenMana") && m_pPlayer->GetItem(itPotionManaRegen).IsEquipped())
 		m_pPlayer->GetItem(itPotionManaRegen).Use(1);
 
-	m_pPlayer->ShowInformationStats();
+	m_pPlayer->ShowInformationStats(BroadcastPriority::GAME_INFORMATION);
 	return false;
 }
 

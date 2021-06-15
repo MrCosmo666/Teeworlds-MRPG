@@ -99,7 +99,7 @@ Connection* CConectionPool::GetConnection()
 {
 	SqlConnectionLock.lock();
 
-	Connection* pConnection = nullptr;
+	Connection* pConnection;
 	if(m_ConnList.empty())
 	{
 		pConnection = CreateConnection();

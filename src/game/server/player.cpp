@@ -478,7 +478,7 @@ int CPlayer::GetStartMana()
 	return 10 + EnchantBonus;
 }
 
-void CPlayer::ShowInformationStats()
+void CPlayer::ShowInformationStats(BroadcastPriority Priority)
 {
 	if (!m_pCharacter)
 		return;
@@ -487,7 +487,7 @@ void CPlayer::ShowInformationStats()
 	const int StartHealth = GetStartHealth();
 	const int Mana = GetMana();
 	const int StartMana = GetStartMana();
-	GS()->Broadcast(m_ClientID, BroadcastPriority::BASIC_STATS, 100, "H: {INT}/{INT} M: {INT}/{INT}", Health, StartHealth, Mana, StartMana);
+	GS()->Broadcast(m_ClientID, Priority, 100, "H: {INT}/{INT} M: {INT}/{INT}", Health, StartHealth, Mana, StartMana);
 }
 
 /* #########################################################################

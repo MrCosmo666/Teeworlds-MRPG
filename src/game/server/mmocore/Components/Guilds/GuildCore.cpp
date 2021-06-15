@@ -103,7 +103,7 @@ bool GuildCore::OnHandleTile(CCharacter* pChr, int IndexCollision)
 		pChr->m_Core.m_ProtectHooked = pChr->m_SkipDamage = true;
 		return true;
 	}
-	else if(pChr->GetHelper()->TileExit(IndexCollision, TILE_GUILD_HOUSE))
+	if(pChr->GetHelper()->TileExit(IndexCollision, TILE_GUILD_HOUSE))
 	{
 		GS()->Chat(ClientID, "You left the active zone, menu is restored!");
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
@@ -894,7 +894,7 @@ void GuildCore::ExitGuild(int AccountID)
 	}
 }
 
-void GuildCore::ShowMenuGuild(CPlayer *pPlayer)
+void GuildCore::ShowMenuGuild(CPlayer *pPlayer) const
 {
 	if(!pPlayer->Acc().IsGuild())
 		return;
