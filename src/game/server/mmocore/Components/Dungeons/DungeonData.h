@@ -25,7 +25,7 @@ struct CDungeonData
 {
 	char m_aName[64];
 	int m_Level;
-	int m_OpenQuestID;
+	int m_RequiredQuestID;
 	int m_DoorX;
 	int m_DoorY;
 	int m_WorldID;

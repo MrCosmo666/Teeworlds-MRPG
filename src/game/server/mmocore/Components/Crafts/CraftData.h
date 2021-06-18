@@ -7,10 +7,10 @@
 
 struct CCraftData
 {
-	int m_aItemNeedID[3];
-	int	m_aItemNeedCount[3];
-	int m_ReceivedItemID;
-	int m_ReceivedItemCount;
+	int m_aRequiredItemID[3];
+	int	m_aRequiredItemsValues[3];
+	int m_ItemID;
+	int m_ItemValue;
 	int m_Price;
 	int m_WorldID;
 

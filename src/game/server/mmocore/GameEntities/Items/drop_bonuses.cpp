@@ -4,7 +4,7 @@
 
 #include <game/server/gamecontext.h>
 
-CDropBonuses::CDropBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, int Type, int Count)
+CDropBonuses::CDropBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, int Type, int Value)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPBONUS, Pos, 24)
 {
 	m_Pos = Pos;
@@ -12,7 +12,7 @@ CDropBonuses::CDropBonuses(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float Ang
 	m_Angle = 0.0f;
 	m_AngleForce = AngleForce;
 
-	m_Count = Count;
+	m_Value = Value;
 	m_Type = Type;
 	m_FlashTimer = 0;
 	m_Flashing = false;
@@ -59,7 +59,7 @@ void CDropBonuses::Tick()
 		// experience
 		if(m_Type == PICKUP_ARMOR)
 		{
-			pChar->GetPlayer()->AddExp(m_Count);
+			pChar->GetPlayer()->AddExp(m_Value);
 			GS()->CreateSound(m_Pos, SOUND_PICKUP_ARMOR);
 		}
 

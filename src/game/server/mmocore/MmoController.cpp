@@ -174,7 +174,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	{
 		const int EquipDiscord = pPlayer->GetEquippedItemID(EQUIP_DISCORD);
 		SJK.UD("tw_accounts_data", "Level = '%d', Exp = '%d', DiscordEquip = '%d' WHERE ID = '%d'",
-			pPlayer->Acc().m_Level, pPlayer->Acc().m_Exp, EquipDiscord, pPlayer->Acc().m_AccountID);
+			pPlayer->Acc().m_Level, pPlayer->Acc().m_Exp, EquipDiscord, pPlayer->Acc().m_UserID);
 	}
 	else if(Table == SAVE_UPGRADES)
 	{
@@ -188,7 +188,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
 
-		SJK.UD("tw_accounts_data", "Upgrade = '%d' %s WHERE ID = '%d'", pPlayer->Acc().m_Upgrade, Buffer.buffer(), pPlayer->Acc().m_AccountID);
+		SJK.UD("tw_accounts_data", "Upgrade = '%d' %s WHERE ID = '%d'", pPlayer->Acc().m_Upgrade, Buffer.buffer(), pPlayer->Acc().m_UserID);
 		Buffer.clear();
 	}
 	else if(Table == SAVE_PLANT_DATA)
@@ -197,13 +197,13 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		dynamic_string Buffer;
 		for(int i = 0; i < NUM_JOB_ACCOUNTS_STATS; i++)
 		{
-			const char *pFieldName = pPlayer->Acc().m_aPlantData[i].getFieldName();
-			const int JobValue = pPlayer->Acc().m_aPlantData[i];
+			const char *pFieldName = pPlayer->Acc().m_aFarming[i].getFieldName();
+			const int JobValue = pPlayer->Acc().m_aFarming[i];
 			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", pFieldName, JobValue, (i == NUM_JOB_ACCOUNTS_STATS-1 ? "" : ", "));
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
 
-		SJK.UD("tw_accounts_plants", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().m_AccountID);
+		SJK.UD("tw_accounts_farming", "%s WHERE UserID = '%d'", Buffer.buffer(), pPlayer->Acc().m_UserID);
 		Buffer.clear();
 	}
 	else if(Table == SAVE_MINER_DATA)
@@ -212,37 +212,37 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 		dynamic_string Buffer;
 		for(int i = 0; i < NUM_JOB_ACCOUNTS_STATS; i++)
 		{
-			const char* pFieldName = pPlayer->Acc().m_aMiningData[i].getFieldName();
-			const int JobValue = pPlayer->Acc().m_aMiningData[i];
+			const char* pFieldName = pPlayer->Acc().m_aMining[i].getFieldName();
+			const int JobValue = pPlayer->Acc().m_aMining[i];
 			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", pFieldName, JobValue, (i == NUM_JOB_ACCOUNTS_STATS-1 ? "" : ", "));
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
 
-		SJK.UD("tw_accounts_miner", "%s WHERE AccountID = '%d'", Buffer.buffer(), pPlayer->Acc().m_AccountID);
+		SJK.UD("tw_accounts_mining", "%s WHERE UserID = '%d'", Buffer.buffer(), pPlayer->Acc().m_UserID);
 		Buffer.clear();
 	}
 	else if(Table == SAVE_GUILD_DATA)
 	{
-		SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '%d' WHERE ID = '%d'", pPlayer->Acc().m_GuildID, pPlayer->Acc().m_GuildRank, pPlayer->Acc().m_AccountID);
+		SJK.UD("tw_accounts_data", "GuildID = '%d', GuildRank = '%d' WHERE ID = '%d'", pPlayer->Acc().m_GuildID, pPlayer->Acc().m_GuildRank, pPlayer->Acc().m_UserID);
 	}
 	else if(Table == SAVE_POSITION)
 	{
 		int LatestCorrectWorldID = Account()->GetHistoryLatestCorrectWorldID(pPlayer);
-		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", LatestCorrectWorldID, pPlayer->Acc().m_AccountID);
+		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", LatestCorrectWorldID, pPlayer->Acc().m_UserID);
 	}
 	else if(Table == SAVE_LANGUAGE)
 	{
-		SJK.UD("tw_accounts", "Language = '%s' WHERE ID = '%d'", pPlayer->GetLanguage(), pPlayer->Acc().m_AccountID);
+		SJK.UD("tw_accounts", "Language = '%s' WHERE ID = '%d'", pPlayer->GetLanguage(), pPlayer->Acc().m_UserID);
 	}
 	else
 	{
-		SJK.UD("tw_accounts", "Username = '%s' WHERE ID = '%d'", pPlayer->Acc().m_aLogin, pPlayer->Acc().m_AccountID);
+		SJK.UD("tw_accounts", "Username = '%s' WHERE ID = '%d'", pPlayer->Acc().m_aLogin, pPlayer->Acc().m_UserID);
 	}
 }
 
 void MmoController::LoadLogicWorld()
 {
-	ResultPtr pRes = SJK.SD("*", "tw_logicworld", "WHERE WorldID = '%d'", GS()->GetWorldID());
+	ResultPtr pRes = SJK.SD("*", "tw_logics_worlds", "WHERE WorldID = '%d'", GS()->GetWorldID());
 	while(pRes->next())
 	{
 		const int Type = (int)pRes->getInt("MobID"), Mode = (int)pRes->getInt("Mode"), Health = (int)pRes->getInt("ParseInt");
@@ -283,7 +283,7 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 			const int Rank = pRes->getRow();
 			const int Level = pRes->getInt("Level");
 			const int Experience = pRes->getInt("Experience");
-			str_copy(NameGuild, pRes->getString("GuildName").c_str(), sizeof(NameGuild));
+			str_copy(NameGuild, pRes->getString("Name").c_str(), sizeof(NameGuild));
 			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Level {INT} : Exp {INT}", Rank, NameGuild, Level, Experience);
 		}
 	}
@@ -295,7 +295,7 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 			char NameGuild[64];
 			const int Rank = pRes->getRow();
 			const int Gold = pRes->getInt("Bank");
-			str_copy(NameGuild, pRes->getString("GuildName").c_str(), sizeof(NameGuild));
+			str_copy(NameGuild, pRes->getString("Name").c_str(), sizeof(NameGuild));
 			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Gold {INT}", Rank, NameGuild, Gold);
 		}
 	}
@@ -314,14 +314,14 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
 	}
 	else if (TypeID == PLAYERS_WEALTHY)
 	{
-		ResultPtr pRes = SJK.SD("*", "tw_accounts_items", "WHERE ItemID = '%d' ORDER BY Count DESC LIMIT 10", (int)itGold);
+		ResultPtr pRes = SJK.SD("*", "tw_accounts_items", "WHERE ItemID = '%d' ORDER BY Value DESC LIMIT 10", (int)itGold);
 		while (pRes->next())
 		{
 			char Nick[64];
 			const int Rank = pRes->getRow();
-			const int Gold = pRes->getInt("Count");
-			const int OwnerID = pRes->getInt("OwnerID");
-			str_copy(Nick, PlayerName(OwnerID), sizeof(Nick));
+			const int Gold = pRes->getInt("Value");
+			const int UserID = pRes->getInt("UserID");
+			str_copy(Nick, PlayerName(UserID), sizeof(Nick));
 			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Gold {INT}", Rank, Nick, Gold);
 		}
 	}

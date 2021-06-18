@@ -26,7 +26,7 @@ enum
 {
 	JOB_LEVEL = 0,
 	JOB_EXPERIENCE = 1,
-	JOB_UPGR_COUNTS = 2,
+	JOB_UPGR_QUANTITY = 2,
 	JOB_UPGRADES = 3,
 	NUM_JOB_ACCOUNTS_STATS,
 };
@@ -347,7 +347,7 @@ public:
 	int m_Dysenthis;
 	int m_MinimalPrice;
 	int m_aAttribute[2];
-	int m_aAttributeCount[2];
+	int m_aAttributeValue[2];
 	int m_ProjID;
 };
 

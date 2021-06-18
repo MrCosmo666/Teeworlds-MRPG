@@ -15,7 +15,7 @@ void CAetherCore::OnInit()
 		while(pRes->next())
 		{
 			const int ID = pRes->getInt("ID");
-			str_copy(CAetherData::ms_aTeleport[ID].m_aTeleName, pRes->getString("TeleName").c_str(), sizeof(CAetherData::ms_aTeleport[ID].m_aTeleName));
+			str_copy(CAetherData::ms_aTeleport[ID].m_aName, pRes->getString("Name").c_str(), sizeof(CAetherData::ms_aTeleport[ID].m_aName));
 			CAetherData::ms_aTeleport[ID].m_TeleX = pRes->getInt("TeleX");
 			CAetherData::ms_aTeleport[ID].m_TeleY = pRes->getInt("TeleY");
 			CAetherData::ms_aTeleport[ID].m_WorldID = pRes->getInt("WorldID");
@@ -26,10 +26,10 @@ void CAetherCore::OnInit()
 
 void CAetherCore::OnInitAccount(CPlayer *pPlayer)
 {
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_locations", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_aethers", "WHERE UserID = '%d'", pPlayer->Acc().m_UserID);
 	while(pRes->next())
 	{
-		int TeleportID = pRes->getInt("TeleportID");
+		int TeleportID = pRes->getInt("AetherID");
 		pPlayer->Acc().m_aAetherLocation[TeleportID] = true;
 	}
 }
@@ -114,9 +114,9 @@ void CAetherCore::UnlockLocation(CPlayer *pPlayer, vec2 Pos)
 		if (distance(vec2(tl.second.m_TeleX, tl.second.m_TeleY), Pos) > 100 || pPlayer->Acc().m_aAetherLocation.find(tl.first) != pPlayer->Acc().m_aAetherLocation.end())
 			continue;
 
-		SJK.ID("tw_accounts_locations", "(OwnerID, TeleportID) VALUES ('%d', '%d')", pPlayer->Acc().m_AccountID, tl.first);
-		GS()->Chat(ClientID, "You unlock aether {STR}!", CAetherData::ms_aTeleport[tl.first].m_aTeleName);
-		GS()->ChatDiscord(DC_SERVER_INFO, Server()->ClientName(ClientID), "Adventure unlock aether {STR}", CAetherData::ms_aTeleport[tl.first].m_aTeleName);
+		SJK.ID("tw_accounts_aethers", "(UserID, AetherID) VALUES ('%d', '%d')", pPlayer->Acc().m_UserID, tl.first);
+		GS()->Chat(ClientID, "You unlock aether {STR}!", CAetherData::ms_aTeleport[tl.first].m_aName);
+		GS()->ChatDiscord(DC_SERVER_INFO, Server()->ClientName(ClientID), "Adventure unlock aether {STR}", CAetherData::ms_aTeleport[tl.first].m_aName);
 
 		pPlayer->Acc().m_aAetherLocation[tl.first] = true;
 		return;
@@ -145,13 +145,13 @@ void CAetherCore::ShowTeleportList(CCharacter* pChar) const
 			distance(pPlayer->GetCharacter()->m_Core.m_Pos, vec2(tl.second.m_TeleX, tl.second.m_TeleY)) < 120);
 		if (LocalTeleport)
 		{
-			GS()->AVM(ClientID, "null", tl.first, TAB_AETHER, "[Local {STR}] : {STR}", tl.second.m_aTeleName, Server()->GetWorldName(tl.second.m_WorldID));
+			GS()->AVM(ClientID, "null", tl.first, TAB_AETHER, "[Local {STR}] : {STR}", tl.second.m_aName, Server()->GetWorldName(tl.second.m_WorldID));
 			continue;
 		}
 
 		const int Price = g_Config.m_SvPriceTeleport * (tl.second.m_WorldID + 1);
 		GS()->AVD(ClientID, "TELEPORT", tl.first, Price, TAB_AETHER, "[{STR}] : {STR} - {INT}gold",
-			tl.second.m_aTeleName, Server()->GetWorldName(tl.second.m_WorldID), Price);
+			tl.second.m_aName, Server()->GetWorldName(tl.second.m_WorldID), Price);
 	}
 	GS()->AV(ClientID, "null");
 }

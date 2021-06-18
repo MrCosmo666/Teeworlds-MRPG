@@ -69,15 +69,15 @@ bool CQuestStepDataInfo::IsActiveStep(CGS* pGS) const
 
 // ##############################################################
 // ################# PLAYER STEP STRUCTURE ######################
-int CPlayerQuestStepDataInfo::GetCountBlockedItem(CPlayer* pPlayer, int ItemID) const
+int CPlayerQuestStepDataInfo::GetValueBlockedItem(CPlayer* pPlayer, int ItemID) const
 {
 	for(int i = 0; i < 2; i++)
 	{
 		const int BlockedItemID = m_Bot->m_aItemSearch[i];
-		const int BlockedItemCount = m_Bot->m_aItemSearchCount[i];
-		if(BlockedItemID <= 0 || BlockedItemCount <= 0 || ItemID != BlockedItemID)
+		const int BlockedItemValue = m_Bot->m_aItemSearchValue[i];
+		if(BlockedItemID <= 0 || BlockedItemValue <= 0 || ItemID != BlockedItemID)
 			continue;
-		return BlockedItemCount;
+		return BlockedItemValue;
 	}
 	return 0;
 }
@@ -87,10 +87,10 @@ bool CPlayerQuestStepDataInfo::IsCompleteItems(CPlayer* pPlayer) const
 	for(int i = 0; i < 2; i++)
 	{
 		const int ItemID = m_Bot->m_aItemSearch[i];
-		const int Count = m_Bot->m_aItemSearchCount[i];
-		if(ItemID <= 0 || Count <= 0)
+		const int Value = m_Bot->m_aItemSearchValue[i];
+		if(ItemID <= 0 || Value <= 0)
 			continue;
-		if(pPlayer->GetItem(ItemID).m_Count < Count)
+		if(pPlayer->GetItem(ItemID).m_Value < Value)
 			return false;
 	}
 	return true;
@@ -101,10 +101,10 @@ bool CPlayerQuestStepDataInfo::IsCompleteMobs(CPlayer* pPlayer) const
 	for(int i = 0; i < 2; i++)
 	{
 		const int MobID = m_Bot->m_aNeedMob[i];
-		const int Count = m_Bot->m_aNeedMobCount[i];
-		if(MobID <= 0 || Count <= 0)
+		const int Value = m_Bot->m_aNeedMobValue[i];
+		if(MobID <= 0 || Value <= 0)
 			continue;
-		if(m_MobProgress[i] < Count)
+		if(m_MobProgress[i] < Value)
 			return false;
 	}
 	return true;
@@ -148,33 +148,33 @@ void CPlayerQuestStepDataInfo::DoCollectItem(CPlayer* pPlayer)
 	for(int i = 0; i < 2; i++)
 	{
 		const int ItemID = m_Bot->m_aItemSearch[i];
-		const int Count = m_Bot->m_aItemSearchCount[i];
-		if(ItemID > 0 && Count > 0)
+		const int Value = m_Bot->m_aItemSearchValue[i];
+		if(ItemID > 0 && Value > 0)
 		{
-			pGS->Chat(pPlayer->GetCID(), "[Done] Give the {STR}x{INT} to the {STR}!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer), Count, m_Bot->GetName());
+			pGS->Chat(pPlayer->GetCID(), "[Done] Give the {STR}x{INT} to the {STR}!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer), Value, m_Bot->GetName());
 			antiStressing = (bool)(ItemID == m_Bot->m_aItemGives[0] || ItemID == m_Bot->m_aItemGives[1]);
-			pPlayer->GetItem(ItemID).Remove(Count);
+			pPlayer->GetItem(ItemID).Remove(Value);
 		}
 	}
 
 	for(int i = 0; i < 2; i++)
 	{
 		const int ItemID = m_Bot->m_aItemGives[i];
-		const int Count = m_Bot->m_aItemGivesCount[i];
-		if(ItemID > 0 && Count > 0)
+		const int Value = m_Bot->m_aItemGivesValue[i];
+		if(ItemID > 0 && Value > 0)
 		{
 			if(antiStressing)
 			{
-				pGS->Mmo()->Item()->AddItemSleep(pPlayer->Acc().m_AccountID, ItemID, Count, 300);
+				pGS->Mmo()->Item()->AddItemSleep(pPlayer->Acc().m_UserID, ItemID, Value, 300);
 				continue;
 			}
 
-			if(pPlayer->GetItem(ItemID).Info().IsEnchantable() && pPlayer->GetItem(ItemID).m_Count >= 1)
+			if(pPlayer->GetItem(ItemID).Info().IsEnchantable() && pPlayer->GetItem(ItemID).m_Value >= 1)
 			{
 				pGS->SendInbox("System", pPlayer, "No place for item", "You already have this item, but we can't put it in inventory", ItemID, 1);
 				continue;
 			}
-			pPlayer->GetItem(ItemID).Add(Count);
+			pPlayer->GetItem(ItemID).Add(Value);
 		}
 	}
 }
@@ -191,11 +191,11 @@ void CPlayerQuestStepDataInfo::AddMobProgress(CPlayer* pPlayer, int BotID)
 	// check complecte mob
 	for(int i = 0; i < 2; i++)
 	{
-		if(BotID != m_Bot->m_aNeedMob[i] || m_MobProgress[i] >= m_Bot->m_aNeedMobCount[i])
+		if(BotID != m_Bot->m_aNeedMob[i] || m_MobProgress[i] >= m_Bot->m_aNeedMobValue[i])
 			continue;
 
 		m_MobProgress[i]++;
-		if(m_MobProgress[i] >= m_Bot->m_aNeedMobCount[i])
+		if(m_MobProgress[i] >= m_Bot->m_aNeedMobValue[i])
 			pGS->Chat(ClientID, "[Done] Defeat the {STR}'s for the {STR}!", DataBotInfo::ms_aDataBot[BotID].m_aNameBot, m_Bot->GetName());
 
 		CQuestData::ms_aPlayerQuests[ClientID][QuestID].SaveSteps();
@@ -229,9 +229,9 @@ void CPlayerQuestStepDataInfo::CreateStepDropTakeItems(CPlayer* pPlayer)
 			return;
 	}
 
-	const int Count = 3 + m_Bot->m_aItemSearchCount[0];
+	const int Value = 3 + m_Bot->m_aItemSearchValue[0];
 	const vec2 Pos = vec2(m_Bot->m_PositionX, m_Bot->m_PositionY);
-	for(int i = 0; i < Count; i++)
+	for(int i = 0; i < Value; i++)
 	{
 		const vec2 Vel = vec2(frandom() * 40.0f - frandom() * 80.0f, frandom() * 40.0f - frandom() * 80.0f);
 		const float AngleForce = Vel.x * (0.15f + frandom() * 0.1f);
@@ -253,37 +253,37 @@ void CPlayerQuestStepDataInfo::ShowRequired(CPlayer* pPlayer, const char* TextTa
 		for (int i = 0; i < 2; i++)
 		{
 			const int ItemID = m_Bot->m_aItemSearch[i];
-			const int CountItem = m_Bot->m_aItemSearchCount[i];
-			if(ItemID <= 0 || CountItem <= 0)
+			const int ValueItem = m_Bot->m_aItemSearchValue[i];
+			if(ItemID <= 0 || ValueItem <= 0)
 				continue;
 
 			str_format(aBuf, sizeof(aBuf), "%s", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
 			Buffer.append_at(Buffer.length(), aBuf);
-			pGS->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, CountItem, ItemID, false);
+			pGS->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, ValueItem, ItemID, false);
 		}
 
 		// search mob's
 		for (int i = 0; i < 2; i++)
 		{
 			const int BotID = m_Bot->m_aNeedMob[i];
-			const int CountMob = m_Bot->m_aNeedMobCount[i];
-			if (BotID <= 0 || CountMob <= 0 || DataBotInfo::ms_aDataBot.find(BotID) == DataBotInfo::ms_aDataBot.end())
+			const int ValueMob = m_Bot->m_aNeedMobValue[i];
+			if (BotID <= 0 || ValueMob <= 0 || DataBotInfo::ms_aDataBot.find(BotID) == DataBotInfo::ms_aDataBot.end())
 				continue;
 
 			str_format(aBuf, sizeof(aBuf), "Defeat %s", DataBotInfo::ms_aDataBot[BotID].m_aNameBot);
-			pGS->Mmo()->Quest()->QuestTableAddInfo(ClientID, aBuf, CountMob, m_MobProgress[i]);
+			pGS->Mmo()->Quest()->QuestTableAddInfo(ClientID, aBuf, ValueMob, m_MobProgress[i]);
 		}
 
 		// reward item's
 		for (int i = 0; i < 2; i++)
 		{
 			const int ItemID = m_Bot->m_aItemGives[i];
-			const int CountItem = m_Bot->m_aItemGivesCount[i];
-			if (ItemID <= 0 || CountItem <= 0)
+			const int ValueItem = m_Bot->m_aItemGivesValue[i];
+			if (ItemID <= 0 || ValueItem <= 0)
 				continue;
 
 			str_format(aBuf, sizeof(aBuf), "Receive %s", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
-			pGS->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, CountItem, ItemID, true);
+			pGS->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, ValueItem, ItemID, true);
 		}
 		return;
 	}
@@ -296,20 +296,20 @@ void CPlayerQuestStepDataInfo::ShowRequired(CPlayer* pPlayer, const char* TextTa
 	for(int i = 0; i < 2; i++)
 	{
 		const int BotID = m_Bot->m_aNeedMob[i];
-		const int CountMob = m_Bot->m_aNeedMobCount[i];
-		if(BotID > 0 && CountMob > 0 && DataBotInfo::ms_aDataBot.find(BotID) != DataBotInfo::ms_aDataBot.end())
+		const int ValueMob = m_Bot->m_aNeedMobValue[i];
+		if(BotID > 0 && ValueMob > 0 && DataBotInfo::ms_aDataBot.find(BotID) != DataBotInfo::ms_aDataBot.end())
 		{
-			str_format(aBuf, sizeof(aBuf), "\n- Defeat %s [%d/%d]", DataBotInfo::ms_aDataBot[BotID].m_aNameBot, m_MobProgress[i], CountMob);
+			str_format(aBuf, sizeof(aBuf), "\n- Defeat %s [%d/%d]", DataBotInfo::ms_aDataBot[BotID].m_aNameBot, m_MobProgress[i], ValueMob);
 			Buffer.append_at(Buffer.length(), aBuf);
 			IsActiveTask = true;
 		}
 
 		const int ItemID = m_Bot->m_aItemSearch[i];
-		const int CountItem = m_Bot->m_aItemSearchCount[i];
-		if(ItemID > 0 && CountItem > 0)
+		const int ValueItem = m_Bot->m_aItemSearchValue[i];
+		if(ItemID > 0 && ValueItem > 0)
 		{
 			CItemData PlayerQuestItem = pPlayer->GetItem(ItemID);
-			str_format(aBuf, sizeof(aBuf), "\n- Need %s [%d/%d]", PlayerQuestItem.Info().GetName(pPlayer), PlayerQuestItem.m_Count, CountItem);
+			str_format(aBuf, sizeof(aBuf), "\n- Need %s [%d/%d]", PlayerQuestItem.Info().GetName(pPlayer), PlayerQuestItem.m_Value, ValueItem);
 			Buffer.append_at(Buffer.length(), aBuf);
 			IsActiveTask = true;
 		}
@@ -319,10 +319,10 @@ void CPlayerQuestStepDataInfo::ShowRequired(CPlayer* pPlayer, const char* TextTa
 	for(int i = 0; i < 2; i++)
 	{
 		const int ItemID = m_Bot->m_aItemGives[i];
-		const int CountItem = m_Bot->m_aItemGivesCount[i];
-		if(ItemID > 0 && CountItem > 0)
+		const int ValueItem = m_Bot->m_aItemGivesValue[i];
+		if(ItemID > 0 && ValueItem > 0)
 		{
-			str_format(aBuf, sizeof(aBuf), "\n- Receive %s [%d]", pPlayer->GetItem(ItemID).Info().GetName(pPlayer), CountItem);
+			str_format(aBuf, sizeof(aBuf), "\n- Receive %s [%d]", pPlayer->GetItem(ItemID).Info().GetName(pPlayer), ValueItem);
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
 	}

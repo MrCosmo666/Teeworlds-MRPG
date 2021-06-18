@@ -14,10 +14,10 @@ class CDropBonuses : public CEntity
 	bool m_Flashing;
 	int m_LifeSpan;
 	int m_FlashTimer;
-	int m_Count;
+	int m_Value;
 
 public:
-	CDropBonuses(CGameWorld* pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, int Type, int Count);
+	CDropBonuses(CGameWorld* pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, int Type, int Value);
 
 	void Tick() override;
 	void Snap(int SnappingClient) override;

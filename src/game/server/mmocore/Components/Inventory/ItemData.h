@@ -14,7 +14,7 @@ class CItemData
 
 public:
 	int m_ItemID;
-	int m_Count;
+	int m_Value;
 	int m_Settings;
 	int m_Enchant;
 	int m_Durability;
@@ -28,17 +28,17 @@ public:
 	bool SetSettings(int Settings);
 	bool SetDurability(int Durability);
 
-	bool Add(int Count, int Settings = 0, int Enchant = 0, bool Message = true);
-	bool Remove(int Count, int Settings = 0);
+	bool Add(int Value, int Settings = 0, int Enchant = 0, bool Message = true);
+	bool Remove(int Value, int Settings = 0);
 	bool Equip();
-	bool Use(int Count);
-	bool Drop(int Count);
+	bool Use(int Value);
+	bool Drop(int Value);
 
 	// equip modules types functions
 	int GetEnchantStats(int AttributeID) const { return Info().GetInfoEnchantStats(AttributeID, m_Enchant); }
 	int GetEnchantPrice() const { return Info().GetEnchantPrice(m_Enchant); }
 
-	bool IsEquipped() const { return m_Count > 0 && m_Settings > 0 && (Info().m_Type == ItemType::TYPE_POTION || Info().m_Type == ItemType::TYPE_SETTINGS || Info().m_Type == ItemType::TYPE_MODULE || Info().m_Type == ItemType::TYPE_EQUIP); }
+	bool IsEquipped() const { return m_Value > 0 && m_Settings > 0 && (Info().m_Type == ItemType::TYPE_POTION || Info().m_Type == ItemType::TYPE_SETTINGS || Info().m_Type == ItemType::TYPE_MODULE || Info().m_Type == ItemType::TYPE_EQUIP); }
 	bool IsEnchantMaxLevel() const { return Info().IsEnchantMaxLevel(m_Enchant); }
 
 	void FormatEnchantLevel(char* pBuffer, int Size) const { Info().FormatEnchantLevel(pBuffer, Size, m_Enchant); }

@@ -23,7 +23,7 @@ void CHouseCore::OnInitWorld(const char* pWhereLocalWorld)
 			CHouseData::ms_aHouse[HouseID].m_DoorY = pRes->getInt("DoorY");
 			CHouseData::ms_aHouse[HouseID].m_PosX = pRes->getInt("PosX");
 			CHouseData::ms_aHouse[HouseID].m_PosY = pRes->getInt("PosY");
-			CHouseData::ms_aHouse[HouseID].m_OwnerID = pRes->getInt("OwnerID");
+			CHouseData::ms_aHouse[HouseID].m_UserID = pRes->getInt("UserID");
 			CHouseData::ms_aHouse[HouseID].m_Price = pRes->getInt("Price");
 			CHouseData::ms_aHouse[HouseID].m_Bank = pRes->getInt("HouseBank");
 			CHouseData::ms_aHouse[HouseID].m_WorldID = pRes->getInt("WorldID");
@@ -31,7 +31,7 @@ void CHouseCore::OnInitWorld(const char* pWhereLocalWorld)
 			CHouseData::ms_aHouse[HouseID].m_PlantID = pRes->getInt("PlantID");
 			CHouseData::ms_aHouse[HouseID].m_PlantPosX = pRes->getInt("PlantX");
 			CHouseData::ms_aHouse[HouseID].m_PlantPosY = pRes->getInt("PlantY");
-			if(GS()->GetWorldID() == CHouseData::ms_aHouse[HouseID].m_WorldID && CHouseData::ms_aHouse[HouseID].m_OwnerID > 0 && !CHouseData::ms_aHouse[HouseID].m_Door)
+			if(GS()->GetWorldID() == CHouseData::ms_aHouse[HouseID].m_WorldID && CHouseData::ms_aHouse[HouseID].m_UserID > 0 && !CHouseData::ms_aHouse[HouseID].m_Door)
 			{
 				CHouseData::ms_aHouse[HouseID].m_Door = nullptr;
 				CHouseData::ms_aHouse[HouseID].m_Door = new HouseDoor(&GS()->m_World, vec2(CHouseData::ms_aHouse[HouseID].m_DoorX, CHouseData::ms_aHouse[HouseID].m_DoorY));
@@ -46,8 +46,8 @@ void CHouseCore::OnInitWorld(const char* pWhereLocalWorld)
 		while(pRes->next())
 		{
 			const int DecoID = pRes->getInt("ID");
-			m_aDecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(pRes->getInt("X"),
-				pRes->getInt("Y")), pRes->getInt("HouseID"), pRes->getInt("DecoID"));
+			m_aDecorationHouse[DecoID] = new CDecorationHouses(&GS()->m_World, vec2(pRes->getInt("PosX"),
+				pRes->getInt("PosY")), pRes->getInt("HouseID"), pRes->getInt("DecoID"));
 		}
 		Job()->ShowLoadingProgress("Houses Decorations", m_aDecorationHouse.size());
 	}, pWhereLocalWorld);
@@ -127,7 +127,7 @@ bool CHouseCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMe
 	if(Menulist == MENU_HOUSE_PLANTS)
 	{
 		pPlayer->m_LastVoteMenu = MENU_HOUSE;
-		const int HouseID = OwnerHouseID(pPlayer->Acc().m_AccountID);
+		const int HouseID = OwnerHouseID(pPlayer->Acc().m_UserID);
 		const int PlantItemID = GetPlantsID(HouseID);
 
 		GS()->AVH(ClientID, TAB_INFO_HOUSE_PLANT, GREEN_COLOR, "Plants Information");
@@ -401,14 +401,14 @@ void CHouseCore::ShowHouseMenu(CPlayer* pPlayer, int HouseID)
 {
 	const int ClientID = pPlayer->GetCID();
 	GS()->AVH(ClientID, TAB_INFO_HOUSE, GREEN_COLOR, "House {INT} . {STR}", HouseID, CHouseData::ms_aHouse[HouseID].m_aClass);
-	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE, "Owner House: {STR}", Job()->PlayerName(CHouseData::ms_aHouse[HouseID].m_OwnerID));
+	GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE, "Owner House: {STR}", Job()->PlayerName(CHouseData::ms_aHouse[HouseID].m_UserID));
 
 	GS()->AV(ClientID, "null");
 	GS()->ShowVotesItemValueInformation(pPlayer, itGold);
 	GS()->AV(ClientID, "null");
 
 	pPlayer->m_VoteColored = LIGHT_GRAY_COLOR;
-	if(CHouseData::ms_aHouse[HouseID].m_OwnerID <= 0)
+	if(CHouseData::ms_aHouse[HouseID].m_UserID <= 0)
 	{
 		GS()->AVM(ClientID, "BUYHOUSE", HouseID, NOPE, "Buy this house. Price {INT}gold", CHouseData::ms_aHouse[HouseID].m_Price);
 	}
@@ -439,7 +439,7 @@ void CHouseCore::ShowPersonalHouse(CPlayer* pPlayer)
 	GS()->AV(ClientID, "null");
 	//
 	pPlayer->m_VoteColored = LIGHT_GRAY_COLOR;
-	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", pPlayer->GetItem(itGold).m_Count);
+	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", pPlayer->GetItem(itGold).m_Value);
 	pPlayer->m_VoteColored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVM(ClientID, "HOUSEADD", 1, NOPE, "Add to the safe gold. (Amount in a reason)");
 	GS()->AVM(ClientID, "HOUSETAKE", 1, NOPE, "Take the safe gold. (Amount in a reason)");
@@ -469,7 +469,7 @@ bool CHouseCore::IsHouseHasOwner(int HouseID) const
 {
 	if(CHouseData::ms_aHouse.find(HouseID) != CHouseData::ms_aHouse.end())
 	{
-		return CHouseData::ms_aHouse[HouseID].m_OwnerID >= 1;
+		return CHouseData::ms_aHouse[HouseID].m_UserID >= 1;
 	}
 	return false;
 }
@@ -525,7 +525,7 @@ vec2 CHouseCore::GetPositionHouse(int HouseID) const
 int CHouseCore::PlayerHouseID(CPlayer *pPlayer) const
 {
 	for (auto ihome = CHouseData::ms_aHouse.begin(); ihome != CHouseData::ms_aHouse.end(); ++ihome) {
-		if(CHouseData::ms_aHouse.at(ihome->first).m_OwnerID == pPlayer->Acc().m_AccountID)
+		if(CHouseData::ms_aHouse.at(ihome->first).m_UserID == pPlayer->Acc().m_UserID)
 		{
 			return ihome->first;
 		}
@@ -533,10 +533,10 @@ int CHouseCore::PlayerHouseID(CPlayer *pPlayer) const
 	return -1;
 }
 
-int CHouseCore::OwnerHouseID(int AccountID) const
+int CHouseCore::OwnerHouseID(int UserID) const
 {
 	for (auto ihome = CHouseData::ms_aHouse.begin(); ihome != CHouseData::ms_aHouse.end(); ++ihome) {
-		if(CHouseData::ms_aHouse.at(ihome->first).m_OwnerID == AccountID)
+		if(CHouseData::ms_aHouse.at(ihome->first).m_UserID == UserID)
 		{
 			return ihome->first;
 		}
@@ -566,7 +566,7 @@ const char *CHouseCore::OwnerName(int HouseID)
 {
 	if(CHouseData::ms_aHouse.find(HouseID) != CHouseData::ms_aHouse.end())
 	{
-		return Job()->PlayerName(CHouseData::ms_aHouse[HouseID].m_OwnerID);
+		return Job()->PlayerName(CHouseData::ms_aHouse[HouseID].m_UserID);
 	}
 	return "No owner";
 }
@@ -583,7 +583,7 @@ void CHouseCore::BuyHouse(int HouseID, CPlayer *pPlayer)
 		return;
 	}
 
-	ResultPtr pRes = SJK.SD("OwnerID, Price", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NULL", HouseID);
+	ResultPtr pRes = SJK.SD("UserID, Price", "tw_houses", "WHERE ID = '%d' AND UserID IS NULL", HouseID);
 	if(pRes->next())
 	{
 		const int Price = pRes->getInt("Price");
@@ -593,8 +593,8 @@ void CHouseCore::BuyHouse(int HouseID, CPlayer *pPlayer)
 		}
 
 		CHouseData::ms_aHouse[HouseID].m_Bank = 0;
-		CHouseData::ms_aHouse[HouseID].m_OwnerID = pPlayer->Acc().m_AccountID;
-		SJK.UD("tw_houses", "OwnerID = '%d', HouseBank = '0' WHERE ID = '%d'", CHouseData::ms_aHouse[HouseID].m_OwnerID, HouseID);
+		CHouseData::ms_aHouse[HouseID].m_UserID = pPlayer->Acc().m_UserID;
+		SJK.UD("tw_houses", "UserID = '%d', HouseBank = '0' WHERE ID = '%d'", CHouseData::ms_aHouse[HouseID].m_UserID, HouseID);
 
 		GS()->Chat(-1, "{STR} becomes the owner of the house class {STR}", Server()->ClientName(ClientID), CHouseData::ms_aHouse[HouseID].m_aClass);
 		GS()->ChatDiscord(DC_SERVER_INFO, "Server information", "**{STR} becomes the owner of the house class {STR}**", Server()->ClientName(ClientID), CHouseData::ms_aHouse[HouseID].m_aClass);
@@ -607,15 +607,15 @@ void CHouseCore::BuyHouse(int HouseID, CPlayer *pPlayer)
 
 void CHouseCore::SellHouse(int HouseID)
 {
-	ResultPtr pRes = SJK.SD("HouseBank, OwnerID", "tw_houses", "WHERE ID = '%d' AND OwnerID IS NOT NULL", HouseID);
+	ResultPtr pRes = SJK.SD("HouseBank, UserID", "tw_houses", "WHERE ID = '%d' AND UserID IS NOT NULL", HouseID);
 	if(pRes->next())
 	{
-		const int OwnerID = pRes->getInt("OwnerID");
+		const int UserID = pRes->getInt("UserID");
 		const int Price = CHouseData::ms_aHouse[HouseID].m_Price + pRes->getInt("HouseBank");
-		GS()->SendInbox("System", OwnerID, "House is sold", "Your house is sold !", itGold, Price, 0);
-		SJK.UD("tw_houses", "OwnerID = NULL, HouseBank = '0' WHERE ID = '%d'", HouseID);
+		GS()->SendInbox("System", UserID, "House is sold", "Your house is sold !", itGold, Price, 0);
+		SJK.UD("tw_houses", "UserID = NULL, HouseBank = '0' WHERE ID = '%d'", HouseID);
 
-		CPlayer *pPlayer = GS()->GetPlayerFromAccountID(OwnerID);
+		CPlayer *pPlayer = GS()->GetPlayerFromUserID(UserID);
 		if(pPlayer)
 		{
 			GS()->ChatFollow(pPlayer->GetCID(), "Your House is sold!");
@@ -631,14 +631,14 @@ void CHouseCore::SellHouse(int HouseID)
 		CHouseData::ms_aHouse[HouseID].m_Door = nullptr;
 	}
 
-	CHouseData::ms_aHouse[HouseID].m_OwnerID = -1;
+	CHouseData::ms_aHouse[HouseID].m_UserID = -1;
 	CHouseData::ms_aHouse[HouseID].m_Bank = 0;
 }
 
-void CHouseCore::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
+void CHouseCore::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeValue)
 {
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
+	ResultPtr pRes = SJK.SD("ID, HouseBank", "tw_houses", "WHERE UserID = '%d'", pPlayer->Acc().m_UserID);
 	if(!pRes->next())
 	{
 		return;
@@ -646,22 +646,22 @@ void CHouseCore::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeCount)
 
 	const int HouseID = pRes->getInt("ID");
 	const int Bank = static_cast<int>(pRes->getInt("HouseBank"));
-	if(Bank < TakeCount)
+	if(Bank < TakeValue)
 	{
 		GS()->Chat(ClientID, "Acceptable for take {INT}gold", Bank);
 		return;
 	}
 
-	pPlayer->AddMoney(TakeCount);
-	CHouseData::ms_aHouse[HouseID].m_Bank = Bank - TakeCount;
+	pPlayer->AddMoney(TakeValue);
+	CHouseData::ms_aHouse[HouseID].m_Bank = Bank - TakeValue;
 	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", CHouseData::ms_aHouse[HouseID].m_Bank, HouseID);
-	GS()->Chat(ClientID, "You take {INT} gold in the safe {INT}!", TakeCount, CHouseData::ms_aHouse[HouseID].m_Bank);
+	GS()->Chat(ClientID, "You take {INT} gold in the safe {INT}!", TakeValue, CHouseData::ms_aHouse[HouseID].m_Bank);
 }
 
 void CHouseCore::AddSafeDeposit(CPlayer *pPlayer, int Balance)
 {
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("ID, HouseBank", "tw_houses", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
+	ResultPtr pRes = SJK.SD("ID, HouseBank", "tw_houses", "WHERE UserID = '%d'", pPlayer->Acc().m_UserID);
 	if(!pRes->next())
 	{
 		return;
@@ -675,14 +675,14 @@ void CHouseCore::AddSafeDeposit(CPlayer *pPlayer, int Balance)
 
 bool CHouseCore::ChangeStateDoor(int HouseID)
 {
-	if(CHouseData::ms_aHouse.find(HouseID) == CHouseData::ms_aHouse.end() || CHouseData::ms_aHouse[HouseID].m_OwnerID <= 0)
+	if(CHouseData::ms_aHouse.find(HouseID) == CHouseData::ms_aHouse.end() || CHouseData::ms_aHouse[HouseID].m_UserID <= 0)
 	{
 		return false;
 	}
 
 	if(CHouseData::ms_aHouse[HouseID].m_WorldID != GS()->GetWorldID())
 	{
-		GS()->ChatAccountID(CHouseData::ms_aHouse[HouseID].m_OwnerID, "Change state door can only near your house.");
+		GS()->ChatAccount(CHouseData::ms_aHouse[HouseID].m_UserID, "Change state door can only near your house.");
 		return false;
 	}
 
@@ -697,6 +697,6 @@ bool CHouseCore::ChangeStateDoor(int HouseID)
 	}
 
 	const bool StateDoor = CHouseData::ms_aHouse[HouseID].m_Door;
-	GS()->ChatAccountID(CHouseData::ms_aHouse[HouseID].m_OwnerID, "You {STR} the house.", StateDoor ? "closed" : "opened");
+	GS()->ChatAccount(CHouseData::ms_aHouse[HouseID].m_UserID, "You {STR} the house.", StateDoor ? "closed" : "opened");
 	return true;
 }

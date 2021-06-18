@@ -16,7 +16,7 @@ void DungeonCore::OnInit()
 		CDungeonData::ms_aDungeon[ID].m_Level = pRes->getInt("Level");
 		CDungeonData::ms_aDungeon[ID].m_DoorX = pRes->getInt("DoorX");
 		CDungeonData::ms_aDungeon[ID].m_DoorY = pRes->getInt("DoorY");
-		CDungeonData::ms_aDungeon[ID].m_OpenQuestID = pRes->getInt("OpenQuestID");
+		CDungeonData::ms_aDungeon[ID].m_RequiredQuestID = pRes->getInt("RequiredQuestID");
 		CDungeonData::ms_aDungeon[ID].m_WorldID = pRes->getInt("WorldID");
 		CDungeonData::ms_aDungeon[ID].m_IsStory = (bool)pRes->getBoolean("Story");
 	}
@@ -154,15 +154,15 @@ void DungeonCore::SaveDungeonRecord(CPlayer* pPlayer, int DungeonID, CPlayerDung
 	const int Seconds = pPlayerDungeonRecord->m_Time;
 	const float PassageHelp = pPlayerDungeonRecord->m_PassageHelp;
 
-	ResultPtr pRes = SJK.SD("*", "tw_dungeons_records", "WHERE OwnerID = '%d' AND DungeonID = '%d'", pPlayer->Acc().m_AccountID, DungeonID);
+	ResultPtr pRes = SJK.SD("*", "tw_dungeons_records", "WHERE UserID = '%d' AND DungeonID = '%d'", pPlayer->Acc().m_UserID, DungeonID);
 	if (pRes->next())
 	{
 		if (pRes->getInt("Seconds") > Seconds && pRes->getInt("PassageHelp") < PassageHelp)
-			SJK.UD("tw_dungeons_records", "Seconds = '%d', PassageHelp = '%f' WHERE OwnerID = '%d' AND DungeonID = '%d'",
-				Seconds, PassageHelp, pPlayer->Acc().m_AccountID, DungeonID);
+			SJK.UD("tw_dungeons_records", "Seconds = '%d', PassageHelp = '%f' WHERE UserID = '%d' AND DungeonID = '%d'",
+				Seconds, PassageHelp, pPlayer->Acc().m_UserID, DungeonID);
 		return;
 	}
-	SJK.ID("tw_dungeons_records", "(OwnerID, DungeonID, Seconds, PassageHelp) VALUES ('%d', '%d', '%d', '%f')", pPlayer->Acc().m_AccountID, DungeonID, Seconds, PassageHelp);
+	SJK.ID("tw_dungeons_records", "(UserID, DungeonID, Seconds, PassageHelp) VALUES ('%d', '%d', '%d', '%f')", pPlayer->Acc().m_UserID, DungeonID, Seconds, PassageHelp);
 }
 
 void DungeonCore::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID) const
@@ -172,13 +172,13 @@ void DungeonCore::ShowDungeonTop(CPlayer* pPlayer, int DungeonID, int HideID) co
 	while (pRes->next())
 	{
 		const int Rank = pRes->getRow();
-		const int OwnerID = pRes->getInt("OwnerID");
+		const int UserID = pRes->getInt("UserID");
 		const int BaseSeconds = pRes->getInt("Seconds");
 		const int BasePassageHelp = pRes->getInt("PassageHelp");
 
 		const int Minutes = BaseSeconds / 60;
 		const int Seconds = BaseSeconds - (BaseSeconds / 60 * 60);
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{INT}. {STR} | {INT}:{INT}min | {INT}P", Rank, Job()->PlayerName(OwnerID), Minutes, Seconds, BasePassageHelp);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{INT}. {STR} | {INT}:{INT}min | {INT}P", Rank, Job()->PlayerName(UserID), Minutes, Seconds, BasePassageHelp);
 	}
 }
 
@@ -196,7 +196,7 @@ void DungeonCore::ShowDungeonsList(CPlayer* pPlayer, bool Story) const
 
 		ShowDungeonTop(pPlayer, dungeon.first, HideID);
 
-		const int NeededQuestID = dungeon.second.m_OpenQuestID;
+		const int NeededQuestID = dungeon.second.m_RequiredQuestID;
 		if(NeededQuestID <= 0 || pPlayer->GetQuest(NeededQuestID).IsComplected())
 			GS()->AVM(ClientID, "DUNGEONJOIN", dungeon.first, HideID, "Join dungeon {STR}", dungeon.second.m_aName);
 		else
@@ -229,7 +229,7 @@ void DungeonCore::CheckQuestingOpened(CPlayer *pPlayer, int QuestID) const
 	const int ClientID = pPlayer->GetCID();
 	for (const auto& dungeon : CDungeonData::ms_aDungeon)
 	{
-		if (QuestID == dungeon.second.m_OpenQuestID)
+		if (QuestID == dungeon.second.m_RequiredQuestID)
 			GS()->Chat(-1, "{STR} opened dungeon ({STR})!", Server()->ClientName(ClientID), dungeon.second.m_aName);
 	}
 }

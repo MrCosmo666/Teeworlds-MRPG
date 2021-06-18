@@ -12,8 +12,8 @@ class CMailBoxCore : public MmoComponent
 public:
 	int GetMailLettersSize(int AccountID);
 	void GetInformationInbox(CPlayer *pPlayer);
-	void SendInbox(const char* pFrom, int AccountID, const char* pName, const char* pDesc, int ItemID = -1, int Count = -1, int Enchant = -1);
-	bool SendInbox(const char* pFrom, const char* pNickname, const char* pName, const char* pDesc, int ItemID = -1, int Count = -1, int Enchant = -1);
+	void SendInbox(const char* pFrom, int AccountID, const char* pName, const char* pDesc, int ItemID = -1, int Value = -1, int Enchant = -1);
+	bool SendInbox(const char* pFrom, const char* pNickname, const char* pName, const char* pDesc, int ItemID = -1, int Value = -1, int Enchant = -1);
 
 private:
 	void DeleteMailLetter(int MailLetterID);

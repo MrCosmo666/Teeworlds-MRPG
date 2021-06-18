@@ -181,7 +181,7 @@ void CUIGameInterface::OnMessage(int Msg, void* pRawMsg)
 		if(!JsonAttachmentItem.is_discarded())
 		{
 			Letter.m_AttachmentItem.m_ItemID = JsonAttachmentItem.value("item", 0);
-			Letter.m_AttachmentItem.m_Amount = JsonAttachmentItem.value("amount", 0);
+			Letter.m_AttachmentItem.m_Amount = JsonAttachmentItem.value("value", 0);
 			Letter.m_AttachmentItem.m_Enchant = JsonAttachmentItem.value("enchant", 0);
 		}
 		m_aLettersList.push_back(Letter);

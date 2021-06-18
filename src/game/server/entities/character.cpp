@@ -19,15 +19,15 @@
 #include <game/server/mmocore/GameEntities/snapfull.h>
 
 //input count
-struct CInputCount
+struct CInputValue
 {
 	int m_Presses;
 	int m_Releases;
 };
 
-CInputCount CountInput(int Prev, int Cur)
+CInputValue CountInput(int Prev, int Cur)
 {
-	CInputCount c = {0, 0};
+	CInputValue c = {0, 0};
 	Prev &= INPUT_STATE_MASK;
 	Cur &= INPUT_STATE_MASK;
 	int i = Prev;
@@ -193,7 +193,7 @@ bool CCharacter::DecoInteractive()
 		const int InteractiveType = m_pPlayer->GetTempData().m_TempDecorationType;
 		m_pPlayer->GetTempData().m_TempDecoractionID = -1;
 		m_pPlayer->GetTempData().m_TempDecorationType = -1;
-		if(m_pPlayer->GetItem(DecoID).m_Count <= 0 || GS()->GetItemInfo(DecoID).m_Type != ItemType::TYPE_DECORATION)
+		if(m_pPlayer->GetItem(DecoID).m_Value <= 0 || GS()->GetItemInfo(DecoID).m_Type != ItemType::TYPE_DECORATION)
 			return false;
 
 		if (InteractiveType == DECORATIONS_HOUSE)
@@ -1197,23 +1197,23 @@ bool CCharacter::StartConversation(CPlayer *pTarget)
 }
 
 // decoration player's
-void CCharacter::CreateSnapProj(int SnapID, int Count, int TypeID, bool Dynamic, bool Projectile)
+void CCharacter::CreateSnapProj(int SnapID, int Value, int TypeID, bool Dynamic, bool Projectile)
 {
 	CSnapFull* pSnapItem = (CSnapFull*)GameWorld()->ClosestEntity(m_Pos, 300, CGameWorld::ENTTYPE_SNAPEFFECT, nullptr);
 	if(pSnapItem && pSnapItem->GetOwner() == m_pPlayer->GetCID())
 	{
-		pSnapItem->AddItem(Count, TypeID, Projectile, Dynamic, SnapID);
+		pSnapItem->AddItem(Value, TypeID, Projectile, Dynamic, SnapID);
 		return;
 	}
-	new CSnapFull(&GS()->m_World, m_Core.m_Pos, SnapID, m_pPlayer->GetCID(), Count, TypeID, Dynamic, Projectile);
+	new CSnapFull(&GS()->m_World, m_Core.m_Pos, SnapID, m_pPlayer->GetCID(), Value, TypeID, Dynamic, Projectile);
 }
 
-void CCharacter::RemoveSnapProj(int Count, int SnapID, bool Effect)
+void CCharacter::RemoveSnapProj(int Value, int SnapID, bool Effect)
 {
 	CSnapFull* pSnapItem = (CSnapFull*)GameWorld()->ClosestEntity(m_Pos, 300, CGameWorld::ENTTYPE_SNAPEFFECT, nullptr);
 	if(pSnapItem && pSnapItem->GetOwner() == m_pPlayer->GetCID())
 	{
-		pSnapItem->RemoveItem(Count, SnapID, Effect);
+		pSnapItem->RemoveItem(Value, SnapID, Effect);
 		return;
 	}
 }

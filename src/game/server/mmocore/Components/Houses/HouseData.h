@@ -13,7 +13,7 @@ struct CHouseData
 	int m_DoorY;
 	int m_Price;
 	char m_aClass[32];
-	int m_OwnerID;
+	int m_UserID;
 	int m_Bank;
 	int m_PlantID;
 	int m_PlantPosX;

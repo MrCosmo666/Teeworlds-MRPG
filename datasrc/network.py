@@ -301,7 +301,7 @@ Objects = [
     
     ## mmotee events
 	NetEvent("MmoDamage:Common", [
-		NetIntAny("m_DamageCount"),
+		NetIntAny("m_Damage"),
 		NetBool("m_CritDamage"),
 	]),
 

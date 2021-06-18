@@ -20,7 +20,7 @@ public:
 	CSkillDataInfo& Info() const { return CSkillDataInfo::ms_aSkillsData[m_SkillID]; };
 	void SetSkillOwner(CPlayer* pPlayer);
 	int GetID() const { return m_SkillID; }
-	int GetBonus() const { return m_Level * Info().m_BonusCount; };
+	int GetBonus() const { return m_Level * Info().m_BonusValue; };
 	bool IsLearned() const { return m_Level > 0; }
 	const char* GetControlEmoteStateName() const { return Info().GetControlEmoteStateName(m_SelectedEmoticion); }
 

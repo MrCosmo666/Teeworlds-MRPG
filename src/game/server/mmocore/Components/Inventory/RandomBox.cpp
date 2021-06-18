@@ -21,7 +21,7 @@ bool CRandomBox::Start(CPlayer *pPlayer, int Seconds, CItemData* pPlayerUsesItem
 		Seconds *= pPlayer->GS()->Server()->TickSpeed();
 		pPlayer->m_aPlayerTick[LastRandomBox] = pPlayer->GS()->Server()->Tick() + Seconds;
 		std::sort(m_ArrayItems.begin(), m_ArrayItems.end(), [](const StructRandomBoxItem& pLeft, const StructRandomBoxItem& pRight) { return pLeft.m_Chance < pRight.m_Chance; });
-		new CRandomBoxRandomizer(&pPlayer->GS()->m_World, pPlayer, pPlayer->Acc().m_AccountID, Seconds, m_ArrayItems, pPlayerUsesItem);
+		new CRandomBoxRandomizer(&pPlayer->GS()->m_World, pPlayer, pPlayer->Acc().m_UserID, Seconds, m_ArrayItems, pPlayerUsesItem);
 	}
 	return true;
 };
@@ -59,11 +59,11 @@ void CRandomBoxRandomizer::Tick()
 		{
 			// a case when a client changes the world or comes out while choosing a random object.
 			CItemData* pPlayerRandomItem = m_pPlayer ? &m_pPlayer->GetItem(pRandomItem->m_ItemID) : nullptr;
-			if(!m_pPlayer || (pPlayerRandomItem->Info().IsEnchantable() && pPlayerRandomItem->m_Count > 0))
-				GS()->SendInbox("System", m_PlayerAccountID, "Random Box", "Item was not received by you personally.", pRandomItem->m_ItemID, pRandomItem->m_Count);
+			if(!m_pPlayer || (pPlayerRandomItem->Info().IsEnchantable() && pPlayerRandomItem->m_Value > 0))
+				GS()->SendInbox("System", m_PlayerAccountID, "Random Box", "Item was not received by you personally.", pRandomItem->m_ItemID, pRandomItem->m_Value);
 			else
 			{
-				m_pPlayer->GetItem(pRandomItem->m_ItemID).Add(pRandomItem->m_Count);
+				m_pPlayer->GetItem(pRandomItem->m_ItemID).Add(pRandomItem->m_Value);
 				GS()->CreateDeath(m_pPlayer->m_ViewPos, m_pPlayer->GetCID());
 			}
 
@@ -71,7 +71,7 @@ void CRandomBoxRandomizer::Tick()
 			if(m_pPlayer && m_pPlayerUsesItem)
 			{
 				const char* pClientName = GS()->Server()->ClientName(m_pPlayer->GetCID());
-				GS()->Chat(-1, "{STR} uses {STR} and got {STR}x{INT}!", pClientName, m_pPlayerUsesItem->Info().GetName(), pPlayerRandomItem->Info().GetName(), pRandomItem->m_Count);
+				GS()->Chat(-1, "{STR} uses {STR} and got {STR}x{INT}!", pClientName, m_pPlayerUsesItem->Info().GetName(), pPlayerRandomItem->Info().GetName(), pRandomItem->m_Value);
 			}
 			GS()->m_World.DestroyEntity(this);
 			return;

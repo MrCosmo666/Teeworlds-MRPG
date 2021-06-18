@@ -129,7 +129,7 @@ void CCommandProcessor::ConChatGuildExit(IConsole::IResult* pResult, void* pUser
 	if (!pPlayer || !pPlayer->IsAuthed() || !pPlayer->Acc().IsGuild())
 		return;
 
-	int AccountID = pPlayer->Acc().m_AccountID;
+	int AccountID = pPlayer->Acc().m_UserID;
 	pGS->Mmo()->Member()->ExitGuild(AccountID);
 }
 

@@ -58,8 +58,8 @@ void CBotCore::TalkingBotNPC(CPlayer* pPlayer, int MobID, int Progress, int Talk
 		return;
 	}
 
-	const bool PlayerTalked = NpcBotInfo::ms_aNpcBot[MobID].m_aDialog[Progress].m_PlayerTalked;
-	pPlayer->FormatDialogText(BotID, NpcBotInfo::ms_aNpcBot[MobID].m_aDialog[Progress].m_aTalkingText);
+	const bool PlayerTalked = NpcBotInfo::ms_aNpcBot[MobID].m_aDialog[Progress].m_PlayerSays;
+	pPlayer->FormatDialogText(BotID, NpcBotInfo::ms_aNpcBot[MobID].m_aDialog[Progress].m_aText);
 	if(!GS()->IsMmoClient(ClientID))
 	{
 		const char* TalkedNick = (PlayerTalked ? Server()->ClientName(ClientID) : NpcBotInfo::ms_aNpcBot[MobID].GetName());
@@ -87,8 +87,8 @@ void CBotCore::TalkingBotQuest(CPlayer* pPlayer, int MobID, int Progress, int Ta
 	const int ClientID = pPlayer->GetCID();
 	char reformTalkedText[512];
 	const int BotID = QuestBotInfo::ms_aQuestBot[MobID].m_BotID;
-	const bool PlayerTalked = QuestBotInfo::ms_aQuestBot[MobID].m_aDialog[Progress].m_PlayerTalked;
-	pPlayer->FormatDialogText(BotID, QuestBotInfo::ms_aQuestBot[MobID].m_aDialog[Progress].m_aTalkingText);
+	const bool PlayerTalked = QuestBotInfo::ms_aQuestBot[MobID].m_aDialog[Progress].m_PlayerSays;
+	pPlayer->FormatDialogText(BotID, QuestBotInfo::ms_aQuestBot[MobID].m_aDialog[Progress].m_aText);
 	if(!GS()->IsMmoClient(ClientID))
 	{
 		const int QuestID = QuestBotInfo::ms_aQuestBot[MobID].m_QuestID;
@@ -121,11 +121,11 @@ void CBotCore::ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress)
 	if (!GS()->IsMmoClient(ClientID))
 	{
 		const int QuestID = QuestBotInfo::ms_aQuestBot[MobID].m_QuestID;
-		const bool PlayerTalked = QuestBotInfo::ms_aQuestBot[MobID].m_aDialog[Progress].m_PlayerTalked;
+		const bool PlayerTalked = QuestBotInfo::ms_aQuestBot[MobID].m_aDialog[Progress].m_PlayerSays;
 		const char* TalkedNick = (PlayerTalked ? Server()->ClientName(ClientID) : QuestBotInfo::ms_aQuestBot[MobID].GetName());
 
 		char reformTalkedText[512];
-		pPlayer->FormatDialogText(BotID, QuestBotInfo::ms_aQuestBot[MobID].m_aDialog[Progress].m_aTalkingText);
+		pPlayer->FormatDialogText(BotID, QuestBotInfo::ms_aQuestBot[MobID].m_aDialog[Progress].m_aText);
 		str_format(reformTalkedText, sizeof(reformTalkedText), "%s\n=========\n\n( %d of %d ) %s:\n- %s",
 			GS()->GetQuestInfo(QuestID).GetName(), (1 + Progress), SizeTalking, TalkedNick, pPlayer->GetDialogText());
 		pPlayer->ClearDialogText();
@@ -145,8 +145,8 @@ int CBotCore::GetQuestNPC(int MobID) const
 
 	for (const auto& npc : NpcBotInfo::ms_aNpcBot[MobID].m_aDialog)
 	{
-		if (npc.m_GivingQuest > 0)
-			return npc.m_GivingQuest;
+		if (npc.m_GivesQuestID > 0)
+			return npc.m_GivesQuestID;
 	}
 	return -1;
 }
@@ -158,11 +158,11 @@ void CBotCore::LoadMainInformationBots()
 	if(!(DataBotInfo::ms_aDataBot.empty()))
 		return;
 
-	ResultPtr pRes = SJK.SD("*", "tw_bots_world");
+	ResultPtr pRes = SJK.SD("*", "tw_bots_info");
 	while(pRes->next())
 	{
 		const int BotID = (int)pRes->getInt("ID");
-		str_copy(DataBotInfo::ms_aDataBot[BotID].m_aNameBot, pRes->getString("BotName").c_str(), sizeof(DataBotInfo::ms_aDataBot[BotID].m_aNameBot));
+		str_copy(DataBotInfo::ms_aDataBot[BotID].m_aNameBot, pRes->getString("Name").c_str(), sizeof(DataBotInfo::ms_aDataBot[BotID].m_aNameBot));
 
 		if(!sscanf(pRes->getString("SkinName").c_str(), "%s %s %s %s %s %s",
 		           DataBotInfo::ms_aDataBot[BotID].m_aaSkinNameBot[SKINPART_BODY], DataBotInfo::ms_aDataBot[BotID].m_aaSkinNameBot[SKINPART_MARKING],
@@ -220,20 +220,20 @@ void CBotCore::LoadQuestBots(const char* pWhereLocalWorld)
 		QuestBotInfo::ms_aQuestBot[MobID].m_GenerateNick = (bool)pRes->getBoolean("generate_nick");
 
 		sscanf(pRes->getString("it_count").c_str(), "|%d|%d|%d|%d|%d|%d|",
-			&QuestBotInfo::ms_aQuestBot[MobID].m_aItemSearchCount[0], &QuestBotInfo::ms_aQuestBot[MobID].m_aItemSearchCount[1],
-			&QuestBotInfo::ms_aQuestBot[MobID].m_aItemGivesCount[0], &QuestBotInfo::ms_aQuestBot[MobID].m_aItemGivesCount[1],
-			&QuestBotInfo::ms_aQuestBot[MobID].m_aNeedMobCount[0], &QuestBotInfo::ms_aQuestBot[MobID].m_aNeedMobCount[1]);
+			&QuestBotInfo::ms_aQuestBot[MobID].m_aItemSearchValue[0], &QuestBotInfo::ms_aQuestBot[MobID].m_aItemSearchValue[1],
+			&QuestBotInfo::ms_aQuestBot[MobID].m_aItemGivesValue[0], &QuestBotInfo::ms_aQuestBot[MobID].m_aItemGivesValue[1],
+			&QuestBotInfo::ms_aQuestBot[MobID].m_aNeedMobValue[0], &QuestBotInfo::ms_aQuestBot[MobID].m_aNeedMobValue[1]);
 
 		// load talk
-		ResultPtr pResTalk = SJK.SD("*", "tw_talk_quest_npc", "WHERE MobID = '%d'", MobID);
+		ResultPtr pResTalk = SJK.SD("*", "tw_dialogs_quest_npc", "WHERE MobID = '%d'", MobID);
 		while(pResTalk->next())
 		{
 			DialogData LoadTalk;
-			LoadTalk.m_Emote = pResTalk->getInt("TalkingEmote");
 			LoadTalk.m_Style = pResTalk->getInt("Style");
-			LoadTalk.m_PlayerTalked = pResTalk->getBoolean("PlayerTalked");
+			LoadTalk.m_Emote = pResTalk->getInt("Emote");
+			LoadTalk.m_PlayerSays = pResTalk->getBoolean("PlayerSays");
 			LoadTalk.m_RequestComplete = pResTalk->getBoolean("RequestComplete");
-			str_copy(LoadTalk.m_aTalkingText, pResTalk->getString("TalkText").c_str(), sizeof(LoadTalk.m_aTalkingText));
+			str_copy(LoadTalk.m_aText, pResTalk->getString("Text").c_str(), sizeof(LoadTalk.m_aText));
 			QuestBotInfo::ms_aQuestBot[MobID].m_aDialog.push_back(LoadTalk);
 		}
 	}
@@ -261,22 +261,22 @@ void CBotCore::LoadNpcBots(const char* pWhereLocalWorld)
 		NpcBotInfo::ms_aNpcBot[MobID].m_BotID = pRes->getInt("BotID");
 		NpcBotInfo::ms_aNpcBot[MobID].m_Function = pRes->getInt("Function");
 
-		const int CountMobs = pRes->getInt("Count");
-		for(int c = 0; c < CountMobs; c++)
+		const int NumberOfNpc = pRes->getInt("Number");
+		for(int c = 0; c < NumberOfNpc; c++)
 			GS()->CreateBot(TYPE_BOT_NPC, NpcBotInfo::ms_aNpcBot[MobID].m_BotID, MobID);
 
-		ResultPtr pResTalk = SJK.SD("*", "tw_talk_other_npc", "WHERE MobID = '%d'", MobID);
+		ResultPtr pResTalk = SJK.SD("*", "tw_dialogs_other_npc", "WHERE MobID = '%d'", MobID);
 		while(pResTalk->next())
 		{
 			DialogData LoadTalk;
-			LoadTalk.m_Emote = pResTalk->getInt("TalkingEmote");
 			LoadTalk.m_Style = pResTalk->getInt("Style");
-			LoadTalk.m_PlayerTalked = pResTalk->getBoolean("PlayerTalked");
-			LoadTalk.m_GivingQuest = pResTalk->getInt("GivingQuest");
-			str_copy(LoadTalk.m_aTalkingText, pResTalk->getString("TalkText").c_str(), sizeof(LoadTalk.m_aTalkingText));
+			LoadTalk.m_Emote = pResTalk->getInt("Emote");
+			LoadTalk.m_PlayerSays = pResTalk->getBoolean("PlayerSays");
+			LoadTalk.m_GivesQuestID = pResTalk->getInt("GivesQuestID");
+			str_copy(LoadTalk.m_aText, pResTalk->getString("Text").c_str(), sizeof(LoadTalk.m_aText));
 			NpcBotInfo::ms_aNpcBot[MobID].m_aDialog.push_back(LoadTalk);
 
-			if(LoadTalk.m_GivingQuest > 0)
+			if(LoadTalk.m_GivesQuestID > 0)
 				NpcBotInfo::ms_aNpcBot[MobID].m_Function = FUNCTION_NPC_GIVE_QUEST;
 		}
 	}
@@ -310,15 +310,15 @@ void CBotCore::LoadMobsBots(const char* pWhereLocalWorld)
 		}
 
 		sscanf(pRes->getString("it_drop_count").c_str(), "|%d|%d|%d|%d|%d|",
-			&MobBotInfo::ms_aMobBot[MobID].m_aCountItem[0], &MobBotInfo::ms_aMobBot[MobID].m_aCountItem[1], &MobBotInfo::ms_aMobBot[MobID].m_aCountItem[2],
-			&MobBotInfo::ms_aMobBot[MobID].m_aCountItem[3], &MobBotInfo::ms_aMobBot[MobID].m_aCountItem[4]);
+			&MobBotInfo::ms_aMobBot[MobID].m_aValueItem[0], &MobBotInfo::ms_aMobBot[MobID].m_aValueItem[1], &MobBotInfo::ms_aMobBot[MobID].m_aValueItem[2],
+			&MobBotInfo::ms_aMobBot[MobID].m_aValueItem[3], &MobBotInfo::ms_aMobBot[MobID].m_aValueItem[4]);
 
 		sscanf(pRes->getString("it_drop_chance").c_str(), "|%f|%f|%f|%f|%f|",
 			&MobBotInfo::ms_aMobBot[MobID].m_aRandomItem[0], &MobBotInfo::ms_aMobBot[MobID].m_aRandomItem[1], &MobBotInfo::ms_aMobBot[MobID].m_aRandomItem[2],
 			&MobBotInfo::ms_aMobBot[MobID].m_aRandomItem[3], &MobBotInfo::ms_aMobBot[MobID].m_aRandomItem[4]);
 
-		const int CountMobs = pRes->getInt("Count");
-		for(int c = 0; c < CountMobs; c++)
+		const int NumberOfMobs = pRes->getInt("Number");
+		for(int c = 0; c < NumberOfMobs; c++)
 			GS()->CreateBot(TYPE_BOT_MOB, BotID, MobID);
 	}
 }
@@ -350,17 +350,17 @@ void CBotCore::ConAddCharacterBot(int ClientID, const char* pCharacter)
 
 	// check the nick
 	CSqlString<16> cNick = CSqlString<16>(pCharacter);
-	ResultPtr pRes = SJK.SD("*", "tw_bots_world", "WHERE BotName = '%s'", cNick.cstr());
+	ResultPtr pRes = SJK.SD("*", "tw_bots_info", "WHERE Name = '%s'", cNick.cstr());
 	if(pRes->next())
 	{
 		// if the nickname is not in the database
 		const int ID = pRes->getInt("ID");
-		SJK.UD("tw_bots_world", "SkinName = '%s', SkinColor = '%s' WHERE ID = '%d'", SkinPart, SkinColor, ID);
+		SJK.UD("tw_bots_info", "SkinName = '%s', SkinColor = '%s' WHERE ID = '%d'", SkinPart, SkinColor, ID);
 		GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "parseskin", "Updated character bot!");
 		return;
 	}
 
 	// add a new bot
-	SJK.ID("tw_bots_world", "(BotName, SkinName, SkinColor) VALUES ('%s', '%s', '%s')", cNick.cstr(), SkinPart, SkinColor);
+	SJK.ID("tw_bots_info", "(Name, SkinName, SkinColor) VALUES ('%s', '%s', '%s')", cNick.cstr(), SkinPart, SkinColor);
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "parseskin", "Added new character bot!");
 }

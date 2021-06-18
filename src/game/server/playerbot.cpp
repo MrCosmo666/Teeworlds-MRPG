@@ -111,9 +111,9 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 	for (int i = 0; i < MAX_EQUIPPED_SLOTS_BOTS; i++)
 	{
 		const int ItemID = GetEquippedItemID(i);
-		const int ItemBonusCount = GS()->GetItemInfo(ItemID).GetInfoEnchantStats(BonusID);
-		if (ItemID > 0 && ItemBonusCount > 0)
-			AttributeEx += ItemBonusCount;
+		const int ItemBonusValue = GS()->GetItemInfo(ItemID).GetInfoEnchantStats(BonusID);
+		if (ItemID > 0 && ItemBonusValue > 0)
+			AttributeEx += ItemBonusValue;
 	}
 
 	// spread weapons

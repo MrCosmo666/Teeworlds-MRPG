@@ -24,9 +24,9 @@ CSnapFull::~CSnapFull()
 	m_SnapItem.clear();
 }
 
-void CSnapFull::AddItem(int Count, int Type, bool Projectile, bool Dynamic, int SnapID)
+void CSnapFull::AddItem(int Value, int Type, bool Projectile, bool Dynamic, int SnapID)
 {
-	for(int i = 0; i < Count; i++)
+	for(int i = 0; i < Value; i++)
 	{
 		SnapItem Item;
 		Item.m_ID = Server()->SnapNewID();
@@ -38,11 +38,11 @@ void CSnapFull::AddItem(int Count, int Type, bool Projectile, bool Dynamic, int 
 	}
 }
 
-void CSnapFull::RemoveItem(int Count, int SnapID, bool Effect)
+void CSnapFull::RemoveItem(int Value, int SnapID, bool Effect)
 {
 	for (auto pItems = m_SnapItem.begin(); pItems != m_SnapItem.end(); )
 	{
-		if(Count <= 0)
+		if(Value <= 0)
 			break;
 
 		if(pItems->m_SnapID != SnapID)
@@ -59,7 +59,7 @@ void CSnapFull::RemoveItem(int Count, int SnapID, bool Effect)
 		}
 		Server()->SnapFreeID(pItems->m_ID);
 		pItems = m_SnapItem.erase(pItems);
-		Count--;
+		Value--;
 	}
 }
 

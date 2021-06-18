@@ -274,7 +274,7 @@ void CLogicDoorKey::Tick()
 	for (CCharacter* pChar = (CCharacter*)GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter*)pChar->TypeNext())
 	{
 		CPlayer* pPlayer = pChar->GetPlayer();
-		if (pPlayer->GetItem(m_ItemID).m_Count)
+		if (pPlayer->GetItem(m_ItemID).m_Value)
 			continue;
 
 		vec2 IntersectPos = closest_point_on_line(m_Pos, m_PosTo, pChar->m_Core.m_Pos);

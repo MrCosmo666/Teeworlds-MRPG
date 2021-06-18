@@ -68,7 +68,7 @@ void CJobItems::Work(int ClientID)
 			GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Need equip Pickaxe!");
 			return;
 		}
-		if ((int)pPlayer->Acc().m_aMiningData[JOB_LEVEL] < m_Level)
+		if ((int)pPlayer->Acc().m_aMining[JOB_LEVEL] < m_Level)
 		{
 			GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), m_Level);
 			return;
@@ -97,14 +97,14 @@ void CJobItems::Work(int ClientID)
 			GS()->Mmo()->MinerAcc()->Work(pPlayer, m_Level);
 			SetSpawn(20);
 
-			const int Count = pPlayer->Acc().m_aMiningData[JOB_UPGR_COUNTS];
-			pPlayerWorkedItem.Add(Count);
+			const int Quantity = pPlayer->Acc().m_aMining[JOB_UPGR_QUANTITY];
+			pPlayerWorkedItem.Add(Quantity);
 		}
 		return;
 	}
 
 	// - - - - - - - - PLANTS - - - - - - - -
-	if ((int)pPlayer->Acc().m_aPlantData[JOB_LEVEL] < m_Level)
+	if ((int)pPlayer->Acc().m_aFarming[JOB_LEVEL] < m_Level)
 	{
 		GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), m_Level);
 		return;
@@ -121,8 +121,8 @@ void CJobItems::Work(int ClientID)
 		GS()->Mmo()->PlantsAcc()->Work(pPlayer, m_Level);
 		SetSpawn(20);
 
-		int Count = pPlayer->Acc().m_aPlantData[JOB_UPGR_COUNTS];
-		pPlayerWorkedItem.Add(Count);
+		int Quantity = pPlayer->Acc().m_aFarming[JOB_UPGR_QUANTITY];
+		pPlayerWorkedItem.Add(Quantity);
 	}
 }
 

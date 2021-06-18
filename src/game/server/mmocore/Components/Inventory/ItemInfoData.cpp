@@ -25,7 +25,7 @@ int CItemDataInfo::GetInfoEnchantStats(int AttributeID) const
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
 		if(CGS::ms_aAttributsInfo.find(m_aAttribute[i]) != CGS::ms_aAttributsInfo.end() && m_aAttribute[i] == AttributeID)
-			return m_aAttributeCount[i];
+			return m_aAttributeValue[i];
 	}
 	return 0;
 }
@@ -70,7 +70,7 @@ int CItemDataInfo::GetEnchantPrice(int EnchantLevel) const
 		else
 			UpgradePrice = max(5, CGS::ms_aAttributsInfo[Attribute].m_UpgradePrice) * 15;
 
-		const int PercentEnchant = max(1, translate_to_percent_rest(m_aAttributeCount[i], PERCENT_OF_ENCHANT));
+		const int PercentEnchant = max(1, translate_to_percent_rest(m_aAttributeValue[i], PERCENT_OF_ENCHANT));
 		FinishedPrice += UpgradePrice * (PercentEnchant * (1 + EnchantLevel));
 	}
 	return FinishedPrice;
@@ -80,7 +80,7 @@ bool CItemDataInfo::IsEnchantable() const
 {
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if(CGS::ms_aAttributsInfo.find(m_aAttribute[i]) != CGS::ms_aAttributsInfo.end() && m_aAttributeCount[i] > 0)
+		if(CGS::ms_aAttributsInfo.find(m_aAttribute[i]) != CGS::ms_aAttributsInfo.end() && m_aAttributeValue[i] > 0)
 			return true;
 	}
 	return false;
@@ -90,10 +90,10 @@ bool CItemDataInfo::IsEnchantMaxLevel(int Enchant) const
 {
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if(CGS::ms_aAttributsInfo.find(m_aAttribute[i]) == CGS::ms_aAttributsInfo.end() || m_aAttributeCount[i] <= 0)
+		if(CGS::ms_aAttributsInfo.find(m_aAttribute[i]) == CGS::ms_aAttributsInfo.end() || m_aAttributeValue[i] <= 0)
 			continue;
 
-		const int EnchantMax = m_aAttributeCount[i] + translate_to_percent_rest(m_aAttributeCount[i], PERCENT_MAXIMUM_ENCHANT);
+		const int EnchantMax = m_aAttributeValue[i] + translate_to_percent_rest(m_aAttributeValue[i], PERCENT_MAXIMUM_ENCHANT);
 		if(GetInfoEnchantStats(m_aAttribute[i], Enchant) > EnchantMax)
 			return true;
 	}
@@ -105,14 +105,14 @@ void CItemDataInfo::FormatAttributes(char* pBuffer, int Size, int Enchant) const
 	dynamic_string Buffer;
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if(CGS::ms_aAttributsInfo.find(m_aAttribute[i]) == CGS::ms_aAttributsInfo.end() || m_aAttributeCount[i] <= 0)
+		if(CGS::ms_aAttributsInfo.find(m_aAttribute[i]) == CGS::ms_aAttributsInfo.end() || m_aAttributeValue[i] <= 0)
 			continue;
 
 		const int BonusID = m_aAttribute[i];
-		const int BonusCount = GetInfoEnchantStats(BonusID, Enchant);
+		const int BonusValue = GetInfoEnchantStats(BonusID, Enchant);
 
 		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "%s+%d ", CGS::ms_aAttributsInfo[BonusID].m_aName, BonusCount);
+		str_format(aBuf, sizeof(aBuf), "%s+%d ", CGS::ms_aAttributsInfo[BonusID].m_aName, BonusValue);
 		Buffer.append_at(Buffer.length(), aBuf);
 	}
 	str_copy(pBuffer, Buffer.buffer(), Size);

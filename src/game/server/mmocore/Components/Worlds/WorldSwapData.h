@@ -8,7 +8,7 @@
 
 struct CWorldSwapData
 {
-	int m_OpenQuestID;
+	int m_RequiredQuestID;
 	int m_PositionX;
 	int m_PositionY;
 	int m_WorldID;

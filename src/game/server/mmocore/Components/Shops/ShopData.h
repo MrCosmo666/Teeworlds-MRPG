@@ -8,7 +8,7 @@
 struct CAuctionItem
 {
 	int m_ItemID;
-	int m_Count;
+	int m_Value;
 	int m_Price;
 	int m_Enchant;
 };

@@ -133,7 +133,7 @@ public:
 		FUNCTIONS PLAYER HELPER
 	######################################################################### */
 	void ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp) const;
-	bool Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade) const;
+	bool Upgrade(int Value, int *Upgrade, int *Useless, int Price, int MaximalUpgrade) const;
 
 	/* #########################################################################
 		FUNCTIONS PLAYER ACCOUNT

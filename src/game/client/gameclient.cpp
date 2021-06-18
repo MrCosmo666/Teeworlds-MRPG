@@ -1254,7 +1254,7 @@ void CGameClient::ProcessEvents()
 		else if (Item.m_Type == NETEVENTTYPE_MMODAMAGE)
 		{
 			CNetEvent_MmoDamage* ev = (CNetEvent_MmoDamage*)pData;
-			m_pEffects->DamageMmoInd(vec2(ev->m_X, ev->m_Y), ev->m_DamageCount, ev->m_CritDamage);
+			m_pEffects->DamageMmoInd(vec2(ev->m_X, ev->m_Y), ev->m_Damage, ev->m_CritDamage);
 		}
 	}
 }

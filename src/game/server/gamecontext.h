@@ -76,7 +76,7 @@ public:
 	######################################################################### */
 	class CCharacter *GetPlayerChar(int ClientID);
 	CPlayer *GetPlayer(int ClientID, bool CheckAuthed = false, bool CheckCharacter = false);
-	CPlayer *GetPlayerFromAccountID(int AccountID);
+	CPlayer *GetPlayerFromUserID(int AccountID);
 	std::unique_ptr<char[]> LevelString(int MaxValue, int CurrentValue, int Step, char toValue, char fromValue);
 	CItemDataInfo &GetItemInfo(int ItemID) const;
 	CQuestDataInfo &GetQuestInfo(int QuestID) const;
@@ -107,7 +107,7 @@ public:
 	void FakeChat(const char *pName, const char *pText) override;
 	void Chat(int ClientID, const char* pText, ...);
 	void ChatFollow(int ClientID, const char* pText, ...);
-	bool ChatAccountID(int AccountID, const char* pText, ...);
+	bool ChatAccount(int AccountID, const char* pText, ...);
 	void ChatDiscord(int Color, const char *Title, const char* pText, ...);
 	void ChatDiscordChannel(const char* pChanel, int Color, const char* Title, const char* pText, ...);
 	void ChatGuild(int GuildID, const char* pText, ...);
@@ -238,12 +238,12 @@ public:
 	int CreateBot(short BotType, int BotID, int SubID);
 	void CreateText(CEntity* pParent, bool Follow, vec2 Pos, vec2 Vel, int Lifespan, const char* pText);
 	void CreateParticleExperience(vec2 Pos, int ClientID, int Experience, vec2 Force = vec2(0.0f, 0.0f));
-	void CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop = 1, vec2 Force = vec2(0.0f, 0.0f));
+	void CreateDropBonuses(vec2 Pos, int Type, int Value, int NumDrop = 1, vec2 Force = vec2(0.0f, 0.0f));
 	void CreateDropItem(vec2 Pos, int ClientID, CItemData DropItem, vec2 Force = vec2(0.0f, 0.0f));
 	void CreateRandomDropItem(vec2 Pos, int ClientID, float Random, CItemData DropItem, vec2 Force = vec2(0.0f, 0.0f));
 	bool TakeItemCharacter(int ClientID);
-	void SendInbox(const char* pFrom, CPlayer *pPlayer, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
-	void SendInbox(const char* pFrom, int AccountID, const char* Name, const char* Desc, int ItemID = -1, int Count = -1, int Enchant = -1);
+	void SendInbox(const char* pFrom, CPlayer *pPlayer, const char* Name, const char* Desc, int ItemID = -1, int Value = -1, int Enchant = -1);
+	void SendInbox(const char* pFrom, int AccountID, const char* Name, const char* Desc, int ItemID = -1, int Value = -1, int Enchant = -1);
 
 private:
 	void SendDayInfo(int ClientID);

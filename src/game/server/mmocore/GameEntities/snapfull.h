@@ -16,8 +16,8 @@ public:
 	void Tick() override;
 
 	int GetOwner() const { return m_ClientID; }
-	void AddItem(int Count, int Type, bool Projectile, bool Dynamic, int SnapID);
-	void RemoveItem(int Count, int SnapID, bool Effect);
+	void AddItem(int Value, int Type, bool Projectile, bool Dynamic, int SnapID);
+	void RemoveItem(int Value, int SnapID, bool Effect);
 
 private:
 	struct SnapItem

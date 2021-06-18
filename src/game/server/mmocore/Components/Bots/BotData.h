@@ -12,12 +12,12 @@
 /************************************************************************/
 struct DialogData
 {
-	char m_aTalkingText[512];
+	char m_aText[512];
 	int m_Style;
 	int m_Emote;
-	int m_GivingQuest;
+	int m_GivesQuestID;
 	bool m_RequestComplete;
-	bool m_PlayerTalked;
+	bool m_PlayerSays;
 };
 
 /************************************************************************/
@@ -84,13 +84,13 @@ struct QuestBotInfo
 	int m_SubBotID;
 
 	int m_aItemSearch[2];
-	int m_aItemSearchCount[2];
+	int m_aItemSearchValue[2];
 
 	int m_aItemGives[2];
-	int m_aItemGivesCount[2];
+	int m_aItemGivesValue[2];
 
 	int m_aNeedMob[2];
-	int m_aNeedMobCount[2];
+	int m_aNeedMobValue[2];
 
 	int m_InteractiveType;
 	int m_InteractiveTemp;
@@ -126,7 +126,7 @@ struct MobBotInfo
 	char m_aBehavior[32];
 
 	int m_aDropItem[MAX_DROPPED_FROM_MOBS];
-	int m_aCountItem[MAX_DROPPED_FROM_MOBS];
+	int m_aValueItem[MAX_DROPPED_FROM_MOBS];
 	float m_aRandomItem[MAX_DROPPED_FROM_MOBS];
 	int m_BotID;
 

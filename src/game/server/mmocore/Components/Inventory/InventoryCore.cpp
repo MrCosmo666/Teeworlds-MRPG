@@ -34,7 +34,7 @@ void CInventoryCore::OnPrepareInformation(IStorageEngine* pStorage, CDataFileWri
 		{
 			int AttributeID = p.second.m_aAttribute[i];
 			pNameAttributes[i] = "Empty slot characteristics";
-			if(CGS::ms_aAttributsInfo.find(AttributeID) != CGS::ms_aAttributsInfo.end() && p.second.m_aAttributeCount[i] > 0)
+			if(CGS::ms_aAttributsInfo.find(AttributeID) != CGS::ms_aAttributsInfo.end() && p.second.m_aAttributeValue[i] > 0)
 				pNameAttributes[i] = CGS::ms_aAttributsInfo[AttributeID].m_aName;
 		}
 		char attBuf[64];
@@ -43,7 +43,7 @@ void CInventoryCore::OnPrepareInformation(IStorageEngine* pStorage, CDataFileWri
 			str_format(attBuf, sizeof(attBuf), "att%d", i);
 			JsonQuestData["items"].push_back({ attBuf, pNameAttributes[i] });
 			str_format(attBuf, sizeof(attBuf), "att%d_val", i);
-			JsonQuestData["items"].push_back({ attBuf, p.second.m_aAttributeCount[i] });
+			JsonQuestData["items"].push_back({ attBuf, p.second.m_aAttributeValue[i] });
 		}*/
 	}
 
@@ -68,10 +68,10 @@ void CInventoryCore::OnInit()
 			for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 			{
 				char aBuf[32];
-				str_format(aBuf, sizeof(aBuf), "Stat_%d", i);
+				str_format(aBuf, sizeof(aBuf), "Attribute%d", i);
 				CItemDataInfo::ms_aItemsInfo[ItemID].m_aAttribute[i] = (int)pRes->getInt(aBuf);
-				str_format(aBuf, sizeof(aBuf), "StatCount_%d", i);
-				CItemDataInfo::ms_aItemsInfo[ItemID].m_aAttributeCount[i] = (int)pRes->getInt(aBuf);
+				str_format(aBuf, sizeof(aBuf), "AttributeValue%d", i);
+				CItemDataInfo::ms_aItemsInfo[ItemID].m_aAttributeValue[i] = (int)pRes->getInt(aBuf);
 			}
 			CItemDataInfo::ms_aItemsInfo[ItemID].m_ProjID = (int)pRes->getInt("ProjectileID");
 		}
@@ -82,11 +82,11 @@ void CInventoryCore::OnInit()
 		while(pRes->next())
 		{
 			const int AttID = pRes->getInt("ID");
-			str_copy(CGS::ms_aAttributsInfo[AttID].m_aName, pRes->getString("name").c_str(), sizeof(CGS::ms_aAttributsInfo[AttID].m_aName));
-			str_copy(CGS::ms_aAttributsInfo[AttID].m_aFieldName, pRes->getString("field_name").c_str(), sizeof(CGS::ms_aAttributsInfo[AttID].m_aFieldName));
-			CGS::ms_aAttributsInfo[AttID].m_UpgradePrice = pRes->getInt("price");
-			CGS::ms_aAttributsInfo[AttID].m_Type = pRes->getInt("at_type");
-			CGS::ms_aAttributsInfo[AttID].m_Devide = pRes->getInt("divide");
+			str_copy(CGS::ms_aAttributsInfo[AttID].m_aName, pRes->getString("Name").c_str(), sizeof(CGS::ms_aAttributsInfo[AttID].m_aName));
+			str_copy(CGS::ms_aAttributsInfo[AttID].m_aFieldName, pRes->getString("FieldName").c_str(), sizeof(CGS::ms_aAttributsInfo[AttID].m_aFieldName));
+			CGS::ms_aAttributsInfo[AttID].m_UpgradePrice = pRes->getInt("Price");
+			CGS::ms_aAttributsInfo[AttID].m_Type = pRes->getInt("Type");
+			CGS::ms_aAttributsInfo[AttID].m_Devide = pRes->getInt("Divide");
 		}
 	});
 }
@@ -94,13 +94,13 @@ void CInventoryCore::OnInit()
 void CInventoryCore::OnInitAccount(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_items", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_items", "WHERE UserID = '%d'", pPlayer->Acc().m_UserID);
 	while(pRes->next())
 	{
 		int ItemID = (int)pRes->getInt("ItemID");
 		CItemData::ms_aItems[ClientID][ItemID].SetItemOwner(pPlayer);
 		CItemData::ms_aItems[ClientID][ItemID].m_ItemID = ItemID;
-		CItemData::ms_aItems[ClientID][ItemID].m_Count = (int)pRes->getInt("Count");
+		CItemData::ms_aItems[ClientID][ItemID].m_Value = (int)pRes->getInt("Value");
 		CItemData::ms_aItems[ClientID][ItemID].m_Settings = (int)pRes->getInt("Settings");
 		CItemData::ms_aItems[ClientID][ItemID].m_Enchant = (int)pRes->getInt("Enchant");
 		CItemData::ms_aItems[ClientID][ItemID].m_Durability = (int)pRes->getInt("Durability");
@@ -127,19 +127,19 @@ bool CInventoryCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		GS()->AV(ClientID, "null");
 
 		GS()->AVH(ClientID, TAB_INVENTORY_SELECT, RED_COLOR, "Inventory Select List");
-		int SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_USED);
+		int SizeItems = GetValueItemsType(pPlayer, ItemType::TYPE_USED);
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_USED, TAB_INVENTORY_SELECT, "Used ({INT})", SizeItems);
 
-		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_CRAFT);
+		SizeItems = GetValueItemsType(pPlayer, ItemType::TYPE_CRAFT);
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_CRAFT, TAB_INVENTORY_SELECT, "Craft ({INT})", SizeItems);
 
-		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_MODULE);
+		SizeItems = GetValueItemsType(pPlayer, ItemType::TYPE_MODULE);
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_MODULE, TAB_INVENTORY_SELECT, "Modules ({INT})", SizeItems);
 
-		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_POTION);
+		SizeItems = GetValueItemsType(pPlayer, ItemType::TYPE_POTION);
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_POTION, TAB_INVENTORY_SELECT, "Potion ({INT})", SizeItems);
 
-		SizeItems = GetCountItemsType(pPlayer, ItemType::TYPE_OTHER);
+		SizeItems = GetValueItemsType(pPlayer, ItemType::TYPE_OTHER);
 		GS()->AVM(ClientID, "SORTEDINVENTORY", ItemType::TYPE_OTHER, TAB_INVENTORY_SELECT, "Other ({INT})", SizeItems);
 		if(pPlayer->m_aSortTabs[SORT_INVENTORY])
 			ListInventory(pPlayer, pPlayer->m_aSortTabs[SORT_INVENTORY]);
@@ -176,7 +176,7 @@ bool CInventoryCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 		bool FindItem = false;
 		for(const auto& it : CItemData::ms_aItems[ClientID])
 		{
-			if(!it.second.m_Count || it.second.Info().m_Function != pPlayer->m_aSortTabs[SORT_EQUIPING])
+			if(!it.second.m_Value || it.second.Info().m_Function != pPlayer->m_aSortTabs[SORT_EQUIPING])
 				continue;
 
 			ItemSelected(pPlayer, it.second, true);
@@ -206,11 +206,11 @@ bool CInventoryCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, con
 
 	if(PPSTR(CMD, "IDROP") == 0)
 	{
-		int AvailableCount = GetUnfrozenItemCount(pPlayer, VoteID);
-		if(AvailableCount <= 0)
+		int AvailableValue = GetUnfrozenItemValue(pPlayer, VoteID);
+		if(AvailableValue <= 0)
 			return true;
 
-		Get = min(AvailableCount, Get);
+		Get = min(AvailableValue, Get);
 		CItemData& pItemPlayer = pPlayer->GetItem(VoteID);
 		pItemPlayer.Drop(Get);
 
@@ -221,11 +221,11 @@ bool CInventoryCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, con
 
 	if(PPSTR(CMD, "IUSE") == 0)
 	{
-		int AvailableCount = GetUnfrozenItemCount(pPlayer, VoteID);
-		if(AvailableCount <= 0)
+		int AvailableValue = GetUnfrozenItemValue(pPlayer, VoteID);
+		if(AvailableValue <= 0)
 			return true;
 
-		Get = min(AvailableCount, Get);
+		Get = min(AvailableValue, Get);
 		pPlayer->GetItem(VoteID).Use(Get);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
@@ -233,18 +233,18 @@ bool CInventoryCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, con
 
 	if(PPSTR(CMD, "IDESYNTHESIS") == 0)
 	{
-		int AvailableCount = GetUnfrozenItemCount(pPlayer, VoteID);
-		if(AvailableCount <= 0)
+		int AvailableValue = GetUnfrozenItemValue(pPlayer, VoteID);
+		if(AvailableValue <= 0)
 			return true;
 
-		Get = min(AvailableCount, Get);
+		Get = min(AvailableValue, Get);
 		CItemData& pPlayerSelectedItem = pPlayer->GetItem(VoteID);
 		CItemData& pPlayerMaterialItem = pPlayer->GetItem(itMaterial);
-		const int DesCount = pPlayerSelectedItem.Info().m_Dysenthis * Get;
-		if(pPlayerSelectedItem.Remove(Get) && pPlayerMaterialItem.Add(DesCount))
+		const int DesValue = pPlayerSelectedItem.Info().m_Dysenthis * Get;
+		if(pPlayerSelectedItem.Remove(Get) && pPlayerMaterialItem.Add(DesValue))
 		{
 			GS()->Chat(ClientID, "Disassemble {STR}x{INT}, you receive {INT} {STR}(s)",
-				pPlayerSelectedItem.Info().GetName(pPlayer), Get, DesCount, pPlayerMaterialItem.Info().GetName(pPlayer));
+				pPlayerSelectedItem.Info().GetName(pPlayer), Get, DesValue, pPlayerMaterialItem.Info().GetName(pPlayer));
 			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		}
 		return true;
@@ -299,7 +299,7 @@ bool CInventoryCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, con
 void CInventoryCore::RepairDurabilityItems(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	SJK.UD("tw_accounts_items", "Durability = '100' WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
+	SJK.UD("tw_accounts_items", "Durability = '100' WHERE UserID = '%d'", pPlayer->Acc().m_UserID);
 	for(auto& it : CItemData::ms_aItems[ClientID])
 		it.second.m_Durability = 100;
 }
@@ -313,7 +313,7 @@ void CInventoryCore::ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFu
 	bool Found = false;
 	for(const auto& it : CItemData::ms_aItems[ClientID])
 	{
-		if(!it.second.m_Count || ((SortedFunction && it.second.Info().m_Function != TypeList)
+		if(!it.second.m_Value || ((SortedFunction && it.second.Info().m_Function != TypeList)
 			|| (!SortedFunction && it.second.Info().m_Type != TypeList)))
 			continue;
 
@@ -324,90 +324,90 @@ void CInventoryCore::ListInventory(CPlayer *pPlayer, int TypeList, bool SortedFu
 		GS()->AVL(ClientID, "null", "There are no items in this tab");
 }
 
-int CInventoryCore::GiveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant)
+int CInventoryCore::GiveItem(CPlayer *pPlayer, int ItemID, int Value, int Settings, int Enchant)
 {
 	const int ClientID = pPlayer->GetCID();
-	const int SecureID = SecureCheck(pPlayer, ItemID, Count, Settings, Enchant);
+	const int SecureID = SecureCheck(pPlayer, ItemID, Value, Settings, Enchant);
 	if(SecureID == 1)
 	{
-		SJK.UD("tw_accounts_items", "Count = '%d', Settings = '%d', Enchant = '%d' WHERE ItemID = '%d' AND OwnerID = '%d'",
-		       CItemData::ms_aItems[ClientID][ItemID].m_Count, CItemData::ms_aItems[ClientID][ItemID].m_Settings, CItemData::ms_aItems[ClientID][ItemID].m_Enchant, ItemID, pPlayer->Acc().m_AccountID);
+		SJK.UD("tw_accounts_items", "Value = '%d', Settings = '%d', Enchant = '%d' WHERE ItemID = '%d' AND UserID = '%d'",
+		       CItemData::ms_aItems[ClientID][ItemID].m_Value, CItemData::ms_aItems[ClientID][ItemID].m_Settings, CItemData::ms_aItems[ClientID][ItemID].m_Enchant, ItemID, pPlayer->Acc().m_UserID);
 	}
 	return SecureID;
 }
 
-int CInventoryCore::SecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings, int Enchant)
+int CInventoryCore::SecureCheck(CPlayer *pPlayer, int ItemID, int Value, int Settings, int Enchant)
 {
 	// check initialize and add the item
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AccountID);
+	ResultPtr pRes = SJK.SD("Value, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND UserID = '%d'", ItemID, pPlayer->Acc().m_UserID);
 	if(pRes->next())
 	{
-		CItemData::ms_aItems[ClientID][ItemID].m_Count = pRes->getInt("Count")+Count;
+		CItemData::ms_aItems[ClientID][ItemID].m_Value = pRes->getInt("Value")+Value;
 		CItemData::ms_aItems[ClientID][ItemID].m_Settings = pRes->getInt("Settings")+Settings;
 		CItemData::ms_aItems[ClientID][ItemID].m_Enchant = Enchant;
 		return 1;
 	}
 
 	// create an object if not found
-	CItemData::ms_aItems[ClientID][ItemID].m_Count = Count;
+	CItemData::ms_aItems[ClientID][ItemID].m_Value = Value;
 	CItemData::ms_aItems[ClientID][ItemID].m_Settings = Settings;
 	CItemData::ms_aItems[ClientID][ItemID].m_Enchant = Enchant;
 	CItemData::ms_aItems[ClientID][ItemID].m_Durability = 100;
-	SJK.ID("tw_accounts_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d')",
-		ItemID, pPlayer->Acc().m_AccountID, Count, Settings, Enchant);
+	SJK.ID("tw_accounts_items", "(ItemID, UserID, Value, Settings, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d')",
+		ItemID, pPlayer->Acc().m_UserID, Value, Settings, Enchant);
 	return 2;
 }
 
-int CInventoryCore::RemoveItem(CPlayer *pPlayer, int ItemID, int Count, int Settings)
+int CInventoryCore::RemoveItem(CPlayer *pPlayer, int ItemID, int Value, int Settings)
 {
-	const int SecureID = DeSecureCheck(pPlayer, ItemID, Count, Settings);
+	const int SecureID = DeSecureCheck(pPlayer, ItemID, Value, Settings);
 	if(SecureID == 1)
 	{
-		SJK.UD("tw_accounts_items", "Count = Count - '%d', Settings = Settings - '%d' WHERE ItemID = '%d' AND OwnerID = '%d'",
-			Count, Settings, ItemID, pPlayer->Acc().m_AccountID);
+		SJK.UD("tw_accounts_items", "Value = Value - '%d', Settings = Settings - '%d' WHERE ItemID = '%d' AND UserID = '%d'",
+			Value, Settings, ItemID, pPlayer->Acc().m_UserID);
 	}
 	return SecureID;
 }
 
-int CInventoryCore::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Count, int Settings)
+int CInventoryCore::DeSecureCheck(CPlayer *pPlayer, int ItemID, int Value, int Settings)
 {
 	// we check the database
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("Count, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AccountID);
+	ResultPtr pRes = SJK.SD("Value, Settings", "tw_accounts_items", "WHERE ItemID = '%d' AND UserID = '%d'", ItemID, pPlayer->Acc().m_UserID);
 	if(pRes->next())
 	{
 		// update if there is more
-		if(pRes->getInt("Count") > Count)
+		if(pRes->getInt("Value") > Value)
 		{
-			CItemData::ms_aItems[ClientID][ItemID].m_Count = pRes->getInt("Count")-Count;
+			CItemData::ms_aItems[ClientID][ItemID].m_Value = pRes->getInt("Value")-Value;
 			CItemData::ms_aItems[ClientID][ItemID].m_Settings = pRes->getInt("Settings")-Settings;
 			return 1;
 		}
 
 		// remove the object if it is less than the required amount
-		CItemData::ms_aItems[ClientID][ItemID].m_Count = 0;
+		CItemData::ms_aItems[ClientID][ItemID].m_Value = 0;
 		CItemData::ms_aItems[ClientID][ItemID].m_Settings = 0;
 		CItemData::ms_aItems[ClientID][ItemID].m_Enchant = 0;
-		SJK.DD("tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AccountID);
+		SJK.DD("tw_accounts_items", "WHERE ItemID = '%d' AND UserID = '%d'", ItemID, pPlayer->Acc().m_UserID);
 		return 2;
 	}
 
-	CItemData::ms_aItems[ClientID][ItemID].m_Count = 0;
+	CItemData::ms_aItems[ClientID][ItemID].m_Value = 0;
 	CItemData::ms_aItems[ClientID][ItemID].m_Settings = 0;
 	CItemData::ms_aItems[ClientID][ItemID].m_Enchant = 0;
 	return 0;
 }
 
-int CInventoryCore::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID) const
+int CInventoryCore::GetUnfrozenItemValue(CPlayer *pPlayer, int ItemID) const
 {
-	const int AvailableCount = Job()->Quest()->GetUnfrozenItemCount(pPlayer, ItemID);
-	if(AvailableCount <= 0 && pPlayer->GetItem(ItemID).m_Count >= 1)
+	const int AvailableValue = Job()->Quest()->GetUnfrozenItemValue(pPlayer, ItemID);
+	if(AvailableValue <= 0 && pPlayer->GetItem(ItemID).m_Value >= 1)
 	{
 		GS()->Chat(pPlayer->GetCID(), "\"{STR}\" frozen for some quest.", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
 		GS()->Chat(pPlayer->GetCID(), "In the \"Adventure Journal\", you can see in which quest an item is used!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
 	}
-	return AvailableCount;
+	return AvailableValue;
 }
 
 void CInventoryCore::ItemSelected(CPlayer* pPlayer, const CItemData& pItemPlayer, bool Dress)
@@ -433,7 +433,7 @@ void CInventoryCore::ItemSelected(CPlayer* pPlayer, const CItemData& pItemPlayer
 	else
 	{
 		GS()->AVHI(ClientID, pItemPlayer.Info().GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} x{INT}",
-			(pItemPlayer.m_Settings ? "Dressed - " : "\0"), pNameItem, pItemPlayer.m_Count);
+			(pItemPlayer.m_Settings ? "Dressed - " : "\0"), pNameItem, pItemPlayer.m_Value);
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pItemPlayer.Info().GetDesc(pPlayer));
 	}
 
@@ -462,7 +462,7 @@ void CInventoryCore::ItemSelected(CPlayer* pPlayer, const CItemData& pItemPlayer
 
 	if(pItemPlayer.Info().m_Function == FUNCTION_PLANTS)
 	{
-		const int HouseID = Job()->House()->OwnerHouseID(pPlayer->Acc().m_AccountID);
+		const int HouseID = Job()->House()->OwnerHouseID(pPlayer->Acc().m_UserID);
 		const int PlantItemID = Job()->House()->GetPlantsID(HouseID);
 		if(HouseID > 0 && PlantItemID != ItemID)
 		{
@@ -490,40 +490,40 @@ void CInventoryCore::ItemSelected(CPlayer* pPlayer, const CItemData& pItemPlayer
 		GS()->AVM(ClientID, "AUCTIONSLOT", ItemID, HideID, "Create Slot Auction {STR}", pNameItem);
 }
 
-int CInventoryCore::GetCountItemsType(CPlayer *pPlayer, int Type) const
+int CInventoryCore::GetValueItemsType(CPlayer *pPlayer, int Type) const
 {
 	const int ClientID = pPlayer->GetCID();
 	return (int)std::count_if(CItemData::ms_aItems[ClientID].begin(), CItemData::ms_aItems[ClientID].end(), [Type](std::pair< const int, CItemData>& pItem)
-	                          {return pItem.second.m_Count > 0 && pItem.second.Info().m_Type == Type; });
+	                          {return pItem.second.m_Value > 0 && pItem.second.Info().m_Type == Type; });
 }
 
 // TODO: FIX IT (lock .. unlock)
 std::mutex lock_sleep;
-void CInventoryCore::AddItemSleep(int AccountID, int ItemID, int Count, int Milliseconds)
+void CInventoryCore::AddItemSleep(int AccountID, int ItemID, int Value, int Milliseconds)
 {
-	std::thread Thread([this, AccountID, ItemID, Count, Milliseconds]()
+	std::thread Thread([this, AccountID, ItemID, Value, Milliseconds]()
 	{
 		if(Milliseconds > 0)
 			std::this_thread::sleep_for(std::chrono::milliseconds(Milliseconds));
 
 		lock_sleep.lock();
-		CPlayer* pPlayer = GS()->GetPlayerFromAccountID(AccountID);
+		CPlayer* pPlayer = GS()->GetPlayerFromUserID(AccountID);
 		if(pPlayer)
 		{
-			pPlayer->GetItem(ItemID).Add(Count);
+			pPlayer->GetItem(ItemID).Add(Value);
 			lock_sleep.unlock();
 			return;
 		}
 
-		ResultPtr pRes = SJK.SD("Count", "tw_accounts_items", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, AccountID);
+		ResultPtr pRes = SJK.SD("Value", "tw_accounts_items", "WHERE ItemID = '%d' AND UserID = '%d'", ItemID, AccountID);
 		if(pRes->next())
 		{
-			const int ReallyCount = (int)pRes->getInt("Count") + Count;
-			SJK.UD("tw_accounts_items", "Count = '%d' WHERE OwnerID = '%d' AND ItemID = '%d'", ReallyCount, AccountID, ItemID);
+			const int ReallyValue = (int)pRes->getInt("Value") + Value;
+			SJK.UD("tw_accounts_items", "Value = '%d' WHERE UserID = '%d' AND ItemID = '%d'", ReallyValue, AccountID, ItemID);
 			lock_sleep.unlock();
 			return;
 		}
-		SJK.ID("tw_accounts_items", "(ItemID, OwnerID, Count, Settings, Enchant) VALUES ('%d', '%d', '%d', '0', '0')", ItemID, AccountID, Count);
+		SJK.ID("tw_accounts_items", "(ItemID, UserID, Value, Settings, Enchant) VALUES ('%d', '%d', '%d', '0', '0')", ItemID, AccountID, Value);
 		lock_sleep.unlock();
 	});
 	Thread.detach();

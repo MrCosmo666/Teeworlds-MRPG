@@ -11,13 +11,13 @@ void CSkillsCore::OnInit()
 		while(pRes->next())
 		{
 			const int SkillID = (int)pRes->getInt("ID");
-			str_copy(CSkillDataInfo::ms_aSkillsData[SkillID].m_aName, pRes->getString("SkillName").c_str(), sizeof(CSkillDataInfo::ms_aSkillsData[SkillID].m_aName));
-			str_copy(CSkillDataInfo::ms_aSkillsData[SkillID].m_aDesc, pRes->getString("SkillDesc").c_str(), sizeof(CSkillDataInfo::ms_aSkillsData[SkillID].m_aDesc));
-			str_copy(CSkillDataInfo::ms_aSkillsData[SkillID].m_aBonusInfo, pRes->getString("BonusInfo").c_str(), sizeof(CSkillDataInfo::ms_aSkillsData[SkillID].m_aBonusInfo));
-			CSkillDataInfo::ms_aSkillsData[SkillID].m_ManaProcent = (int)pRes->getInt("ManaProcent");
-			CSkillDataInfo::ms_aSkillsData[SkillID].m_PriceSP = (int)pRes->getInt("Price");
+			str_copy(CSkillDataInfo::ms_aSkillsData[SkillID].m_aName, pRes->getString("Name").c_str(), sizeof(CSkillDataInfo::ms_aSkillsData[SkillID].m_aName));
+			str_copy(CSkillDataInfo::ms_aSkillsData[SkillID].m_aDesc, pRes->getString("Description").c_str(), sizeof(CSkillDataInfo::ms_aSkillsData[SkillID].m_aDesc));
+			str_copy(CSkillDataInfo::ms_aSkillsData[SkillID].m_aBonusName, pRes->getString("BonusName").c_str(), sizeof(CSkillDataInfo::ms_aSkillsData[SkillID].m_aBonusName));
+			CSkillDataInfo::ms_aSkillsData[SkillID].m_BonusValue = (int)pRes->getInt("BonusValue");
+			CSkillDataInfo::ms_aSkillsData[SkillID].m_ManaPercentageCost = (int)pRes->getInt("ManaPercentageCost");
+			CSkillDataInfo::ms_aSkillsData[SkillID].m_PriceSP = (int)pRes->getInt("PriceSP");
 			CSkillDataInfo::ms_aSkillsData[SkillID].m_MaxLevel = (int)pRes->getInt("MaxLevel");
-			CSkillDataInfo::ms_aSkillsData[SkillID].m_BonusCount = (int)pRes->getInt("BonusCount");
 			CSkillDataInfo::ms_aSkillsData[SkillID].m_Passive = (bool)pRes->getBoolean("Passive");
 		}
 	});
@@ -26,14 +26,14 @@ void CSkillsCore::OnInit()
 void CSkillsCore::OnInitAccount(CPlayer *pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_skills", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_skills", "WHERE UserID = '%d'", pPlayer->Acc().m_UserID);
 	while(pRes->next())
 	{
 		const int SkillID = (int)pRes->getInt("SkillID");
 		CSkillData::ms_aSkills[ClientID][SkillID].SetSkillOwner(pPlayer);
 		CSkillData::ms_aSkills[ClientID][SkillID].m_SkillID = SkillID;
-		CSkillData::ms_aSkills[ClientID][SkillID].m_Level = (int)pRes->getInt("SkillLevel");
-		CSkillData::ms_aSkills[ClientID][SkillID].m_SelectedEmoticion = (int)pRes->getInt("SelectedEmoticion");
+		CSkillData::ms_aSkills[ClientID][SkillID].m_Level = (int)pRes->getInt("Level");
+		CSkillData::ms_aSkills[ClientID][SkillID].m_SelectedEmoticion = (int)pRes->getInt("UsedByEmoticon");
 	}
 }
 
@@ -135,19 +135,19 @@ void CSkillsCore::SkillSelected(CPlayer *pPlayer, int SkillID)
 	GS()->AVHI(ClientID, "skill", HideID, LIGHT_BLUE_COLOR, "{STR} - {INT}SP ({INT}/{INT})", pSkill.Info().m_aName, pSkill.Info().m_PriceSP, pSkill.m_Level, pSkill.Info().m_MaxLevel);
 	if(!IsMaxLevel)
 	{
-		const int NewBonus = pSkill.GetBonus() + pSkill.Info().m_BonusCount;
-		GS()->AVM(ClientID, "null", NOPE, HideID, "Next level {INT} {STR}", NewBonus, pSkill.Info().m_aBonusInfo);
+		const int NewBonus = pSkill.GetBonus() + pSkill.Info().m_BonusValue;
+		GS()->AVM(ClientID, "null", NOPE, HideID, "Next level {INT} {STR}", NewBonus, pSkill.Info().m_aBonusName);
 	}
 	else
 	{
 		const int ActiveBonus = pSkill.GetBonus();
-		GS()->AVM(ClientID, "null", NOPE, HideID, "Max level {INT} {STR}", ActiveBonus, pSkill.Info().m_aBonusInfo);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "Max level {INT} {STR}", ActiveBonus, pSkill.Info().m_aBonusName);
 	}
 	GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pSkill.Info().m_aDesc);
 
 	if(!IsPassive)
 	{
-		GS()->AVM(ClientID, "null", NOPE, HideID, "Mana required {INT}%", pSkill.Info().m_ManaProcent);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "Mana required {INT}%", pSkill.Info().m_ManaPercentageCost);
 		if(pSkill.IsLearned())
 		{
 			GS()->AVM(ClientID, "null", NOPE, HideID, "F1 Bind: (bind 'key' say \"/useskill {INT}\")", SkillID);

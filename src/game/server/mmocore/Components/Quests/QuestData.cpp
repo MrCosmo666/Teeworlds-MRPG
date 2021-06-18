@@ -11,7 +11,7 @@
 #include <teeother/tl/nlohmann_json.h>
 
 CQuestDataInfo& CQuestData::Info() const { return CQuestDataInfo::ms_aDataQuests[m_QuestID]; }
-std::string CQuestData::GetJsonFileName() const { return Info().GetJsonFileName(m_pPlayer->Acc().m_AccountID); }
+std::string CQuestData::GetJsonFileName() const { return Info().GetJsonFileName(m_pPlayer->Acc().m_UserID); }
 
 std::map < int, std::map <int, CQuestData > > CQuestData::ms_aPlayerQuests;
 void CQuestData::InitSteps()
@@ -145,7 +145,7 @@ bool CQuestData::Accept()
 
 	// init quest
 	m_State = QuestState::QUEST_ACCEPT;
-	SJK.ID("tw_accounts_quests", "(QuestID, OwnerID, Type) VALUES ('%d', '%d', '%d')", m_QuestID, m_pPlayer->Acc().m_AccountID, QuestState::QUEST_ACCEPT);
+	SJK.ID("tw_accounts_quests", "(QuestID, UserID, Type) VALUES ('%d', '%d', '%d')", m_QuestID, m_pPlayer->Acc().m_UserID, QuestState::QUEST_ACCEPT);
 
 	// init steps
 	InitSteps();
@@ -168,7 +168,7 @@ void CQuestData::Finish()
 
 	// finish quest
 	m_State = QuestState::QUEST_FINISHED;
-	SJK.UD("tw_accounts_quests", "Type = '%d' WHERE QuestID = '%d' AND OwnerID = '%d'", m_State, m_QuestID, m_pPlayer->Acc().m_AccountID);
+	SJK.UD("tw_accounts_quests", "Type = '%d' WHERE QuestID = '%d' AND UserID = '%d'", m_State, m_QuestID, m_pPlayer->Acc().m_UserID);
 
 	// clear steps
 	ClearSteps();

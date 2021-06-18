@@ -7,24 +7,24 @@
 
 void CCraftCore::OnInit()
 {
-	ResultPtr pRes = SJK.SD("*", "tw_craft_list");
+	ResultPtr pRes = SJK.SD("*", "tw_crafts_list");
 	while(pRes->next())
 	{
 		const int ID = pRes->getInt("ID");
-		CCraftData::ms_aCraft[ID].m_ReceivedItemID = pRes->getInt("GetItem");
-		CCraftData::ms_aCraft[ID].m_ReceivedItemCount = pRes->getInt("GetItemCount");
+		CCraftData::ms_aCraft[ID].m_ItemID = pRes->getInt("ItemID");
+		CCraftData::ms_aCraft[ID].m_ItemValue = pRes->getInt("ItemValue");
 		CCraftData::ms_aCraft[ID].m_Price = pRes->getInt("Price");
 		CCraftData::ms_aCraft[ID].m_WorldID = pRes->getInt("WorldID");
 
 		char aBuf[32];
 		for(int i = 0; i < 3; i ++)
 		{
-			str_format(aBuf, sizeof(aBuf), "ItemNeed%d", i);
-			CCraftData::ms_aCraft[ID].m_aItemNeedID[i] = pRes->getInt(aBuf);
+			str_format(aBuf, sizeof(aBuf), "RequiredItemID%d", i);
+			CCraftData::ms_aCraft[ID].m_aRequiredItemID[i] = pRes->getInt(aBuf);
 		}
-		str_copy(aBuf, pRes->getString("ItemNeedCount").c_str(), sizeof(aBuf));
-		if (!sscanf(aBuf, "%d %d %d", &CCraftData::ms_aCraft[ID].m_aItemNeedCount[0],
-		            &CCraftData::ms_aCraft[ID].m_aItemNeedCount[1], &CCraftData::ms_aCraft[ID].m_aItemNeedCount[2]))
+		str_copy(aBuf, pRes->getString("RequiredItemsValues").c_str(), sizeof(aBuf));
+		if (!sscanf(aBuf, "%d %d %d", &CCraftData::ms_aCraft[ID].m_aRequiredItemsValues[0],
+		            &CCraftData::ms_aCraft[ID].m_aRequiredItemsValues[1], &CCraftData::ms_aCraft[ID].m_aRequiredItemsValues[2]))
 			dbg_msg("Error", "Error on scanf in Crafting");
 	}
 
@@ -73,7 +73,7 @@ void CCraftCore::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int Selec
 
 	for(const auto& cr : CCraftData::ms_aCraft)
 	{
-		CItemDataInfo& InfoGetItem = GS()->GetItemInfo(cr.second.m_ReceivedItemID);
+		CItemDataInfo& InfoGetItem = GS()->GetItemInfo(cr.second.m_ItemID);
 		if(InfoGetItem.m_Type != SelectType || cr.second.m_WorldID != GS()->GetWorldID())
 			continue;
 
@@ -88,7 +88,7 @@ void CCraftCore::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int Selec
 		if (InfoGetItem.IsEnchantable())
 		{
 			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} - {INT} gold",
-				(pPlayer->GetItem(cr.second.m_ReceivedItemID).m_Count ? "✔ " : "\0"), InfoGetItem.GetName(pPlayer), Price);
+				(pPlayer->GetItem(cr.second.m_ItemID).m_Value ? "✔ " : "\0"), InfoGetItem.GetName(pPlayer), Price);
 
 			char aAttributes[128];
 			InfoGetItem.FormatAttributes(aAttributes, sizeof(aAttributes), 0);
@@ -97,19 +97,19 @@ void CCraftCore::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int Selec
 		else
 		{
 			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) :: {INT} gold",
-				InfoGetItem.GetName(pPlayer), cr.second.m_ReceivedItemCount, pPlayer->GetItem(cr.second.m_ReceivedItemID).m_Count, Price);
+				InfoGetItem.GetName(pPlayer), cr.second.m_ItemValue, pPlayer->GetItem(cr.second.m_ItemID).m_Value, Price);
 		}
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", InfoGetItem.GetDesc(pPlayer));
 
 		for(int i = 0; i < 3; i++)
 		{
-			const int SearchItemID = cr.second.m_aItemNeedID[i];
-			const int SearchCount = cr.second.m_aItemNeedCount[i];
-			if(SearchItemID <= 0 || SearchCount <= 0)
+			const int SearchItemID = cr.second.m_aRequiredItemID[i];
+			const int SearchValue = cr.second.m_aRequiredItemsValues[i];
+			if(SearchItemID <= 0 || SearchValue <= 0)
 				continue;
 
 			CItemData &PlSearchItem = pPlayer->GetItem(SearchItemID);
-			GS()->AVMI(ClientID, PlSearchItem.Info().GetIcon(), "null", NOPE, HideID, "{STR} {INT}({INT})", PlSearchItem.Info().GetName(pPlayer), SearchCount, PlSearchItem.m_Count);
+			GS()->AVMI(ClientID, PlSearchItem.Info().GetIcon(), "null", NOPE, HideID, "{STR} {INT}({INT})", PlSearchItem.Info().GetName(pPlayer), SearchValue, PlSearchItem.m_Value);
 		}
 		GS()->AVM(ClientID, "CRAFT", cr.first, HideID, "Craft {STR}", InfoGetItem.GetName(pPlayer));
 	}
@@ -121,8 +121,8 @@ void CCraftCore::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int Selec
 void CCraftCore::CraftItem(CPlayer *pPlayer, int CraftID) const
 {
 	const int ClientID = pPlayer->GetCID();
-	CItemData& PlayerCraftItem = pPlayer->GetItem(CCraftData::ms_aCraft[CraftID].m_ReceivedItemID);
-	if (PlayerCraftItem.Info().IsEnchantable() && PlayerCraftItem.m_Count > 0)
+	CItemData& PlayerCraftItem = pPlayer->GetItem(CCraftData::ms_aCraft[CraftID].m_ItemID);
+	if (PlayerCraftItem.Info().IsEnchantable() && PlayerCraftItem.m_Value > 0)
 	{
 		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");
 		return;
@@ -132,13 +132,13 @@ void CCraftCore::CraftItem(CPlayer *pPlayer, int CraftID) const
 	dynamic_string Buffer;
 	for(int i = 0; i < 3; i++)
 	{
-		const int SearchItemID = CCraftData::ms_aCraft[CraftID].m_aItemNeedID[i];
-		const int SearchCount = CCraftData::ms_aCraft[CraftID].m_aItemNeedCount[i];
-		if(SearchItemID <= 0 || SearchCount <= 0 || pPlayer->GetItem(SearchItemID).m_Count >= SearchCount)
+		const int SearchItemID = CCraftData::ms_aCraft[CraftID].m_aRequiredItemID[i];
+		const int SearchValue = CCraftData::ms_aCraft[CraftID].m_aRequiredItemsValues[i];
+		if(SearchItemID <= 0 || SearchValue <= 0 || pPlayer->GetItem(SearchItemID).m_Value >= SearchValue)
 			continue;
 
 		char aBuf[48];
-		const int ItemLeft = SearchCount - pPlayer->GetItem(SearchItemID).m_Count;
+		const int ItemLeft = SearchValue - pPlayer->GetItem(SearchItemID).m_Value;
 		str_format(aBuf, sizeof(aBuf), "%sx%d ", GS()->GetItemInfo(SearchItemID).GetName(pPlayer), ItemLeft);
 		Buffer.append((const char*)aBuf);
 	}
@@ -165,24 +165,24 @@ void CCraftCore::CraftItem(CPlayer *pPlayer, int CraftID) const
 
 	for(int i = 0; i < 3; i++)
 	{
-		const int SearchItemID = CCraftData::ms_aCraft[CraftID].m_aItemNeedID[i];
-		const int SearchCount = CCraftData::ms_aCraft[CraftID].m_aItemNeedCount[i];
-		if(SearchItemID <= 0 || SearchCount <= 0)
+		const int SearchItemID = CCraftData::ms_aCraft[CraftID].m_aRequiredItemID[i];
+		const int SearchValue = CCraftData::ms_aCraft[CraftID].m_aRequiredItemsValues[i];
+		if(SearchItemID <= 0 || SearchValue <= 0)
 			continue;
 
-		pPlayer->GetItem(SearchItemID).Remove(SearchCount);
+		pPlayer->GetItem(SearchItemID).Remove(SearchValue);
 	}
 
-	const int CraftGetCount = CCraftData::ms_aCraft[CraftID].m_ReceivedItemCount;
-	PlayerCraftItem.Add(CraftGetCount);
+	const int CraftGetValue = CCraftData::ms_aCraft[CraftID].m_ItemValue;
+	PlayerCraftItem.Add(CraftGetValue);
 	if(PlayerCraftItem.Info().IsEnchantable())
 	{
-		GS()->Chat(-1, "{STR} crafted [{STR}x{INT}].", Server()->ClientName(ClientID), PlayerCraftItem.Info().GetName(), CraftGetCount);
+		GS()->Chat(-1, "{STR} crafted [{STR}x{INT}].", Server()->ClientName(ClientID), PlayerCraftItem.Info().GetName(), CraftGetValue);
 		return;
 	}
 
 	GS()->CreatePlayerSound(ClientID, SOUND_ITEM_SELL_BUY);
-	GS()->Chat(ClientID, "You crafted [{STR}x{INT}].", PlayerCraftItem.Info().GetName(pPlayer), CraftGetCount);
+	GS()->Chat(ClientID, "You crafted [{STR}x{INT}].", PlayerCraftItem.Info().GetName(pPlayer), CraftGetValue);
 	GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 }
 

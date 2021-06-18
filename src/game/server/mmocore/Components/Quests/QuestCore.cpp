@@ -21,7 +21,7 @@ void QuestCore::OnInit()
 void QuestCore::OnInitAccount(CPlayer* pPlayer)
 {
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("*", "tw_accounts_quests", "WHERE OwnerID = '%d'", pPlayer->Acc().m_AccountID);
+	ResultPtr pRes = SJK.SD("*", "tw_accounts_quests", "WHERE UserID = '%d'", pPlayer->Acc().m_UserID);
 	while(pRes->next())
 	{
 		const int QuestID = pRes->getInt("QuestID");
@@ -206,7 +206,7 @@ void QuestCore::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 		for(int i = 0; i < 2; i++)
 		{
 			const int NeedKillMobID = pBotInfo->m_aNeedMob[i];
-			const int KillNeed = pBotInfo->m_aNeedMobCount[i];
+			const int KillNeed = pBotInfo->m_aNeedMobValue[i];
 			if(NeedKillMobID > 0 && KillNeed > 0 && DataBotInfo::ms_aDataBot.find(NeedKillMobID) != DataBotInfo::ms_aDataBot.end())
 			{
 				GS()->AVMI(ClientID, "broken_h", "null", NOPE, HideID, "- Defeat {STR} [{INT}/{INT}]",
@@ -215,12 +215,12 @@ void QuestCore::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 			}
 
 			const int NeedItemID = pBotInfo->m_aItemSearch[i];
-			const int NeedCount = pBotInfo->m_aItemSearchCount[i];
-			if(NeedItemID > 0 && NeedCount > 0)
+			const int NeedValue = pBotInfo->m_aItemSearchValue[i];
+			if(NeedItemID > 0 && NeedValue > 0)
 			{
 				CItemData PlayerItem = pPlayer->GetItem(NeedItemID);
-				int ClapmItem = clamp(PlayerItem.m_Count, 0, NeedCount);
-				GS()->AVMI(ClientID, PlayerItem.Info().GetIcon(), "null", NOPE, HideID, "- Item {STR} [{INT}/{INT}]", PlayerItem.Info().GetName(pPlayer), ClapmItem, NeedCount);
+				int ClapmItem = clamp(PlayerItem.m_Value, 0, NeedValue);
+				GS()->AVMI(ClientID, PlayerItem.Info().GetIcon(), "null", NOPE, HideID, "- Item {STR} [{INT}/{INT}]", PlayerItem.Info().GetName(pPlayer), ClapmItem, NeedValue);
 				NeedOnlyTalk = false;
 			}
 		}
@@ -229,11 +229,11 @@ void QuestCore::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 		for(int i = 0; i < 2; i++)
 		{
 			const int RewardItemID = pBotInfo->m_aItemGives[i];
-			const int RewardCount = pBotInfo->m_aItemGivesCount[i];
-			if(RewardItemID > 0 && RewardCount > 0)
+			const int RewardValue = pBotInfo->m_aItemGivesValue[i];
+			if(RewardItemID > 0 && RewardValue > 0)
 			{
 				CItemDataInfo &RewardItem = GS()->GetItemInfo(RewardItemID);
-				GS()->AVMI(ClientID, RewardItem.GetIcon(), "null", NOPE, HideID, "- Receive {STR}x{INT}", RewardItem.GetName(pPlayer), RewardCount);
+				GS()->AVMI(ClientID, RewardItem.GetIcon(), "null", NOPE, HideID, "- Receive {STR}x{INT}", RewardItem.GetName(pPlayer), RewardValue);
 			}
 		}
 
@@ -371,16 +371,16 @@ void QuestCore::QuestTableAddItem(int ClientID, const char* pText, int Requires,
 	CNetMsg_Sv_AddQuestingProcessing Msg;
 	Msg.m_pText = pText;
 	Msg.m_pRequiresNum = Requires;
-	Msg.m_pHaveNum = clamp(PlayerSelectedItem.m_Count, 0, Requires);
+	Msg.m_pHaveNum = clamp(PlayerSelectedItem.m_Value, 0, Requires);
 	Msg.m_pGivingTable = GivingTable;
 	StrToInts(Msg.m_pIcon, 4, PlayerSelectedItem.Info().GetIcon());
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
-int QuestCore::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID) const
+int QuestCore::GetUnfrozenItemValue(CPlayer *pPlayer, int ItemID) const
 {
 	const int ClientID = pPlayer->GetCID();
-	int AvailableCount = pPlayer->GetItem(ItemID).m_Count;
+	int AvailableValue = pPlayer->GetItem(ItemID).m_Value;
 	for (const auto& pPlayerQuest : CQuestData::ms_aPlayerQuests[ClientID])
 	{
 		if(pPlayerQuest.second.m_State != QUEST_ACCEPT)
@@ -389,8 +389,8 @@ int QuestCore::GetUnfrozenItemCount(CPlayer *pPlayer, int ItemID) const
 		for(auto& pStepBot : pPlayerQuest.second.m_StepsQuestBot)
 		{
 			if(!pStepBot.second.m_StepComplete)
-				AvailableCount -= pStepBot.second.GetCountBlockedItem(pPlayer, ItemID);
+				AvailableValue -= pStepBot.second.GetValueBlockedItem(pPlayer, ItemID);
 		}
 	}
-	return max(AvailableCount, 0);
+	return max(AvailableValue, 0);
 }

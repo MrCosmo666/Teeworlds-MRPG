@@ -4,7 +4,6 @@
 #define GAME_SERVER_COMPONENT_GUILD_DATA_H
 
 #include <game/server/mmocore/Utils/FieldData.h>
-
 #include <map>
 
 struct CGuildData
@@ -17,16 +16,16 @@ struct CGuildData
 	};
 	CGuildData()
 	{
-		m_aGuildUpgrades.add_field<int, AVAILABLE_SLOTS>("AvailableSlots", "Available slots");
-		m_aGuildUpgrades.add_field<int, CHAIR_EXPERIENCE>("ChairExperience", "Chair experience");
+		m_aUpgrade[AVAILABLE_SLOTS].init("AvailableSlots", "Available slots");
+		m_aUpgrade[CHAIR_EXPERIENCE].init("ChairExperience", "Chair experience");
 	}
-	CFieldsData m_aGuildUpgrades;
+	CFieldData<int> m_aUpgrade[NUM_GUILD_UPGRADES];
 
 
 	char m_aName[32];
 	int m_Level;
 	int m_Exp;
-	int m_OwnerID;
+	int m_UserID;
 	int m_Bank;
 	int m_Score;
 

@@ -10,9 +10,9 @@ class CSkillDataInfo
 public:
 	char m_aName[32];
 	char m_aDesc[64];
-	char m_aBonusInfo[64];
-	int m_BonusCount;
-	int m_ManaProcent;
+	char m_aBonusName[64];
+	int m_BonusValue;
+	int m_ManaPercentageCost;
 	int m_PriceSP;
 	int m_MaxLevel;
 	bool m_Passive;

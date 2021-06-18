@@ -16,7 +16,7 @@ struct CAccountData
 	char m_aLogin[64];
 	char m_aLastLogin[64];
 	char m_aLanguage[8];
-	int m_AccountID;
+	int m_UserID;
 	int m_Level;
 	int m_Exp;
 	int m_GuildID;
@@ -36,24 +36,24 @@ struct CAccountData
 	std::map < int, bool > m_aAetherLocation;
 	bool IsGuild() const { return m_GuildID > 0; }
 
-	CFieldsData m_aMiningData;
-	CFieldsData m_aPlantData;
+	CFieldData<int> m_aMining[NUM_JOB_ACCOUNTS_STATS];
+	CFieldData<int> m_aFarming[NUM_JOB_ACCOUNTS_STATS];
 
 	CAccountData()
 	{
-		m_AccountID = -1;
+		m_UserID = -1;
 		m_Level = 0;
 		m_Team = TEAM_SPECTATORS;
 
-		m_aMiningData.add_field<int, JOB_LEVEL>("MnrLevel", "Miner level");
-		m_aMiningData.add_field<int, JOB_EXPERIENCE>("MnrExp", "Miner experience");
-		m_aMiningData.add_field<int, JOB_UPGRADES>("MnrUpgrade", "Miner upgrades");
-		m_aMiningData.add_field<int, JOB_UPGR_COUNTS>("MnrCount", "Miner counts");
-
-		m_aPlantData.add_field<int, JOB_LEVEL>("PlLevel", "Farmer level");
-		m_aPlantData.add_field<int, JOB_EXPERIENCE>("PlExp", "Farmer experience");
-		m_aPlantData.add_field<int, JOB_UPGRADES>("PlUpgrade", "Farmer upgrades");
-		m_aPlantData.add_field<int, JOB_UPGR_COUNTS>("PlCounts", "Farmer counts");
+		m_aMining[JOB_LEVEL].init("Level", "Miner level");
+		m_aMining[JOB_EXPERIENCE].init("Exp", "Miner experience");
+		m_aMining[JOB_UPGR_QUANTITY].init("Quantity", "Miner quantity");
+		m_aMining[JOB_UPGRADES].init("Upgrade", "Miner upgrades");
+		
+		m_aFarming[JOB_LEVEL].init("Level", "Farmer level");
+		m_aFarming[JOB_EXPERIENCE].init("Exp", "Farmer experience");
+		m_aFarming[JOB_UPGR_QUANTITY].init("Quantity", "Farmer quantity");
+		m_aFarming[JOB_UPGRADES].init("Upgrade", "Farmer upgrades");
 	}
 
 	static std::map < int, CAccountData > ms_aData;

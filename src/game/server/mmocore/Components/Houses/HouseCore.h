@@ -57,7 +57,7 @@ public:
 	bool GetHouseDoor(int HouseID) const;
 	vec2 GetPositionHouse(int HouseID) const;
 	int PlayerHouseID(CPlayer *pPlayer) const;
-	int OwnerHouseID(int AccountID) const;
+	int OwnerHouseID(int UserID) const;
 	int GetPlantsID(int HouseID) const;
 
 	const char *ClassName(int HouseID) const;
@@ -69,7 +69,7 @@ public:
 	void BuyHouse(int HouseID, CPlayer *pPlayer);
 	void SellHouse(int HouseID);
 
-	void TakeFromSafeDeposit(CPlayer *pPlayer, int TakeCount);
+	void TakeFromSafeDeposit(CPlayer *pPlayer, int TakeValue);
 	void AddSafeDeposit(CPlayer *pPlayer, int Balance);
 	bool ChangeStateDoor(int HouseID);
 };

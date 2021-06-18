@@ -107,8 +107,8 @@ public:
 	virtual bool GiveWeapon(int Weapon, int GiveAmmo);
 	bool RemoveWeapon(int Weapon);
 
-	void CreateSnapProj(int SnapID, int Count, int TypeID, bool Dynamic, bool Projectile);
-	void RemoveSnapProj(int Count, int SnapID, bool Effect = false);
+	void CreateSnapProj(int SnapID, int Value, int TypeID, bool Dynamic, bool Projectile);
+	void RemoveSnapProj(int Value, int SnapID, bool Effect = false);
 
 	void ChangePosition(vec2 NewPos);
 	void ResetDoorPos();

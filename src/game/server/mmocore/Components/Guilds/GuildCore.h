@@ -72,7 +72,7 @@ private:
 	void ShowMenuRank(CPlayer *pPlayer);
 
 public:
-	static int GetGuildPlayerCount(int GuildID);
+	static int GetGuildPlayerValue(int GuildID);
 
 private:
 	void ShowInvitesGuilds(int ClientID, int GuildID);

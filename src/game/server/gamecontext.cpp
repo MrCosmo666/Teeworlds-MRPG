@@ -103,12 +103,12 @@ CPlayer *CGS::GetPlayer(int ClientID, bool CheckAuthed, bool CheckCharacter)
 	return nullptr;
 }
 
-CPlayer* CGS::GetPlayerFromAccountID(int AccountID)
+CPlayer* CGS::GetPlayerFromUserID(int AccountID)
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pPlayer = GetPlayer(i, true);
-		if(pPlayer && pPlayer->Acc().m_AccountID == AccountID)
+		if(pPlayer && pPlayer->Acc().m_UserID == AccountID)
 			return pPlayer;
 	}
 	return nullptr;
@@ -189,7 +189,7 @@ void CGS::CreateDamage(vec2 Pos, int ClientID, int Amount, bool CritDamage, bool
 	{
 		pEventMmo->m_X = (int)Pos.x;
 		pEventMmo->m_Y = (int)Pos.y;
-		pEventMmo->m_DamageCount = Amount;
+		pEventMmo->m_Damage = Amount;
 		pEventMmo->m_CritDamage = CritDamage;
 	}
 }
@@ -480,9 +480,9 @@ void CGS::ChatFollow(int ClientID, const char* pText, ...)
 }
 
 // send to an authorized player
-bool CGS::ChatAccountID(int AccountID, const char* pText, ...)
+bool CGS::ChatAccount(int AccountID, const char* pText, ...)
 {
-	CPlayer *pPlayer = GetPlayerFromAccountID(AccountID);
+	CPlayer *pPlayer = GetPlayerFromUserID(AccountID);
 	if(!pPlayer)
 		return false;
 
@@ -1220,8 +1220,8 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 			if(item != m_aPlayerVotes[ClientID].end())
 			{
-				const int InteractiveCount = string_to_number(pMsg->m_Reason, 1, 10000000);
-				ParsingVoteCommands(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveCount, pMsg->m_Reason, item->m_Callback);
+				const int InteractiveValue = string_to_number(pMsg->m_Reason, 1, 10000000);
+				ParsingVoteCommands(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveValue, pMsg->m_Reason, item->m_Callback);
 				return;
 			}
 			ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
@@ -1549,7 +1549,7 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 {
 	const int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS - 1);
 	const int ItemID = pResult->GetInteger(1);
-	const int Count = pResult->GetInteger(2);
+	const int Value = pResult->GetInteger(2);
 	const int Enchant = pResult->GetInteger(3);
 	const int Mail = pResult->GetInteger(4);
 
@@ -1561,10 +1561,10 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 	{
 		if (Mail == 0)
 		{
-			pPlayer->GetItem(ItemID).Add(Count, 0, Enchant);
+			pPlayer->GetItem(ItemID).Add(Value, 0, Enchant);
 			return;
 		}
-		pSelf->SendInbox("Console", pPlayer, "The sender heavens", "Sent from console", ItemID, Count, Enchant);
+		pSelf->SendInbox("Console", pPlayer, "The sender heavens", "Sent from console", ItemID, Value, Enchant);
 	}
 }
 
@@ -1592,7 +1592,7 @@ void CGS::ConRemItem(IConsole::IResult* pResult, void* pUserData)
 {
 	const int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS - 1);
 	const int ItemID = pResult->GetInteger(1);
-	const int Count = pResult->GetInteger(2);
+	const int Value = pResult->GetInteger(2);
 
 	IServer* pServer = (IServer*)pUserData;
 	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
@@ -1600,7 +1600,7 @@ void CGS::ConRemItem(IConsole::IResult* pResult, void* pUserData)
 	CPlayer* pPlayer = pSelf->GetPlayer(ClientID, true);
 	if (pPlayer)
 	{
-		pPlayer->GetItem(ItemID).Remove(Count, 0);
+		pPlayer->GetItem(ItemID).Remove(Value, 0);
 	}
 }
 
@@ -1931,8 +1931,8 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVH(ClientID, TAB_STAT, GREEN_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().m_aLastLogin);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Discord: \"{STR}\"", g_Config.m_SvDiscordInviteLink);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Level {INT} : Exp {INT}/{INT}", pPlayer->Acc().m_Level, pPlayer->Acc().m_Exp, ExpForLevel);
-		AVM(ClientID, "null", NOPE, TAB_STAT, "Skill Point {INT}SP", pPlayer->GetItem(itSkillPoint).m_Count);
-		AVM(ClientID, "null", NOPE, TAB_STAT, "Gold: {INT}", pPlayer->GetItem(itGold).m_Count);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Skill Point {INT}SP", pPlayer->GetItem(itSkillPoint).m_Value);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Gold: {INT}", pPlayer->GetItem(itGold).m_Value);
 		AV(ClientID, "null");
 
 		// personal menu
@@ -2064,12 +2064,12 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 			for(int i = 0; i < MAX_DROPPED_FROM_MOBS; i++)
 			{
-				if(mobs.second.m_aDropItem[i] <= 0 || mobs.second.m_aCountItem[i] <= 0)
+				if(mobs.second.m_aDropItem[i] <= 0 || mobs.second.m_aValueItem[i] <= 0)
 					continue;
 
 				const float Chance = mobs.second.m_aRandomItem[i];
 				CItemDataInfo &InfoDropItem = GetItemInfo(mobs.second.m_aDropItem[i]);
-				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%(+%0.2f%%)", InfoDropItem.GetName(pPlayer), mobs.second.m_aCountItem[i], Chance, AddedChanceDrop);
+				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%(+%0.2f%%)", InfoDropItem.GetName(pPlayer), mobs.second.m_aValueItem[i], Chance, AddedChanceDrop);
 				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, "{STR}", aBuf);
 				FoundedBots = true;
 			}
@@ -2190,7 +2190,7 @@ void CGS::ShowVotesItemValueInformation(CPlayer *pPlayer, int ItemID)
 {
 	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_VoteColored = LIGHT_PURPLE_COLOR;
-	AVMI(ClientID, GetItemInfo(ItemID).GetIcon(), "null", NOPE, NOPE, "You have {INT} {STR}", pPlayer->GetItem(ItemID).m_Count, GetItemInfo(ItemID).GetName());
+	AVMI(ClientID, GetItemInfo(ItemID).GetIcon(), "null", NOPE, NOPE, "You have {INT} {STR}", pPlayer->GetItem(ItemID).m_Value, GetItemInfo(ItemID).GetName());
 }
 
 // vote parsing of all functions of action methods
@@ -2290,20 +2290,20 @@ void CGS::CreateParticleExperience(vec2 Pos, int ClientID, int Experience, vec2 
 }
 
 // gives a bonus in the position type and quantity and the number of them.
-void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop, vec2 Force)
+void CGS::CreateDropBonuses(vec2 Pos, int Type, int Value, int NumDrop, vec2 Force)
 {
 	for(int i = 0; i < NumDrop; i++)
 	{
 		const vec2 Vel = Force + vec2(frandom() * 15.0f, frandom() * 15.0f);
 		const float Angle = Force.x * (0.15f + frandom() * 0.1f);
-		new CDropBonuses(&m_World, Pos, Vel, Angle, Type, Count);
+		new CDropBonuses(&m_World, Pos, Vel, Angle, Type, Value);
 	}
 }
 
 // lands items in the position type and quantity and their number themselves
 void CGS::CreateDropItem(vec2 Pos, int ClientID, CItemData DropItem, vec2 Force)
 {
-	if(DropItem.m_ItemID <= 0 || DropItem.m_Count <= 0)
+	if(DropItem.m_ItemID <= 0 || DropItem.m_Value <= 0)
 		return;
 
 	const float Angle = GetAngle(normalize(Force));
@@ -2330,18 +2330,18 @@ bool CGS::TakeItemCharacter(int ClientID)
 }
 
 // send a message with or without the object using ClientID
-void CGS::SendInbox(const char* pFrom, CPlayer* pPlayer, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
+void CGS::SendInbox(const char* pFrom, CPlayer* pPlayer, const char* Name, const char* Desc, int ItemID, int Value, int Enchant)
 {
 	if(!pPlayer || !pPlayer->IsAuthed())
 		return;
 
-	SendInbox(pFrom, pPlayer->Acc().m_AccountID, Name, Desc, ItemID, Count, Enchant);
+	SendInbox(pFrom, pPlayer->Acc().m_UserID, Name, Desc, ItemID, Value, Enchant);
 }
 
 // send a message with or without the object using AccountID
-void CGS::SendInbox(const char* pFrom, int AccountID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
+void CGS::SendInbox(const char* pFrom, int AccountID, const char* Name, const char* Desc, int ItemID, int Value, int Enchant)
 {
-	Mmo()->Inbox()->SendInbox(pFrom, AccountID, Name, Desc, ItemID, Count, Enchant);
+	Mmo()->Inbox()->SendInbox(pFrom, AccountID, Name, Desc, ItemID, Value, Enchant);
 }
 
 // send day information

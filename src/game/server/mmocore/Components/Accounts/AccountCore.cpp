@@ -113,7 +113,7 @@ int CAccountCore::LoginAccount(int ClientID, const char *Login, const char *Pass
 			return SendAuthCode(ClientID, AUTH_LOGIN_WRONG);
 		}
 
-		if (GS()->GetPlayerFromAccountID(UserID) != nullptr)
+		if (GS()->GetPlayerFromUserID(UserID) != nullptr)
 		{
 			GS()->Chat(ClientID, "The account is already in the game!");
 			return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
@@ -123,7 +123,7 @@ int CAccountCore::LoginAccount(int ClientID, const char *Login, const char *Pass
 		str_copy(pPlayer->Acc().m_aLogin, cClearLogin.cstr(), sizeof(pPlayer->Acc().m_aLogin));
 		str_copy(pPlayer->Acc().m_aLastLogin, pResCheck->getString("LoginDate").c_str(), sizeof(pPlayer->Acc().m_aLastLogin));
 
-		pPlayer->Acc().m_AccountID = UserID;
+		pPlayer->Acc().m_UserID = UserID;
 		pPlayer->Acc().m_Level = pResAccount->getInt("Level");
 		pPlayer->Acc().m_Exp = pResAccount->getInt("Exp");
 		pPlayer->Acc().m_GuildID = pResAccount->getInt("GuildID");
@@ -138,7 +138,7 @@ int CAccountCore::LoginAccount(int ClientID, const char *Login, const char *Pass
 		}
 
 		GS()->Chat(ClientID, "- - - - - - - [Successful login] - - - - - - -");
-		GS()->Chat(ClientID, "Menu is available in call-votes! {INT}", pPlayer->Acc().m_AccountID);
+		GS()->Chat(ClientID, "Menu is available in call-votes! {INT}", pPlayer->Acc().m_UserID);
 		GS()->m_pController->DoTeamChange(pPlayer, false);
 
 		char aAddrStr[64];
@@ -163,9 +163,9 @@ void CAccountCore::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	GS()->SendWorldMusic(ClientID, (GS()->IsDungeon() ? -1 : 0));
 	if(!FirstInitilize)
 	{
-		const int CountMessageInbox = Job()->Inbox()->GetMailLettersSize(pPlayer->Acc().m_AccountID);
-		if (CountMessageInbox > 0)
-			GS()->Chat(ClientID, "You have {INT} unread messages!", CountMessageInbox);
+		const int MsgMailboxSize = Job()->Inbox()->GetMailLettersSize(pPlayer->Acc().m_UserID);
+		if (MsgMailboxSize > 0)
+			GS()->Chat(ClientID, "You have {INT} unread messages!", MsgMailboxSize);
 
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		GS()->SendFullyEquipments(ClientID);
@@ -173,15 +173,15 @@ void CAccountCore::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	}
 
 	Job()->OnInitAccount(ClientID);
-	const int Rank = GetRank(pPlayer->Acc().m_AccountID);
+	const int Rank = GetRank(pPlayer->Acc().m_UserID);
 	GS()->Chat(-1, "{STR} logged to account. Rank #{INT}", Server()->ClientName(ClientID), Rank);
 #ifdef CONF_DISCORD
 	char aLoginBuf[64];
-	str_format(aLoginBuf, sizeof(aLoginBuf), "%s logged in Account ID %d", Server()->ClientName(ClientID), pPlayer->Acc().m_AccountID);
-	Server()->SendDiscordGenerateMessage(aLoginBuf, pPlayer->Acc().m_AccountID);
+	str_format(aLoginBuf, sizeof(aLoginBuf), "%s logged in Account ID %d", Server()->ClientName(ClientID), pPlayer->Acc().m_UserID);
+	Server()->SendDiscordGenerateMessage(aLoginBuf, pPlayer->Acc().m_UserID);
 #endif
 
-	if (!pPlayer->GetItem(itHammer).m_Count)
+	if (!pPlayer->GetItem(itHammer).m_Value)
 	{
 		pPlayer->GetItem(itHammer).Add(1);
 		GS()->Chat(ClientID, "Quest NPCs are marked with an aura Heart and Shield.");
@@ -189,7 +189,7 @@ void CAccountCore::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	}
 
 	// settings
-	if(!pPlayer->GetItem(itModePVP).m_Count)
+	if(!pPlayer->GetItem(itModePVP).m_Value)
 		pPlayer->GetItem(itModePVP).Add(1, 1);
 
 	pPlayer->GetTempData().m_TempSafeSpawn = true;
@@ -216,7 +216,7 @@ void CAccountCore::DiscordConnect(int ClientID, const char *pDID) const
 	SJK.UD("tw_accounts_data", "DiscordID = 'null' WHERE DiscordID = '%s'", cDiscordID.cstr());
 
 	// connect the player discord id
-	SJK.UDS(1000,"tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", cDiscordID.cstr(), pPlayer->Acc().m_AccountID);
+	SJK.UDS(1000,"tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", cDiscordID.cstr(), pPlayer->Acc().m_UserID);
 
 	GS()->Chat(ClientID, "Your Discord ID has been updated.");
 	GS()->Chat(ClientID, "Check the connection status in discord \"!mconnect\".");
@@ -256,7 +256,7 @@ bool CAccountCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 		for (const auto& it : CItemData::ms_aItems[ClientID])
 		{
 			const CItemData ItemData = it.second;
-			if (ItemData.Info().m_Type == ItemType::TYPE_SETTINGS && ItemData.m_Count > 0)
+			if (ItemData.Info().m_Type == ItemType::TYPE_SETTINGS && ItemData.m_Value > 0)
 				GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.m_Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
 		}
 
@@ -267,7 +267,7 @@ bool CAccountCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 		for (const auto& it : CItemData::ms_aItems[ClientID])
 		{
 			const CItemData ItemData = it.second;
-			if (ItemData.Info().m_Type == ItemType::TYPE_MODULE && ItemData.m_Count > 0)
+			if (ItemData.Info().m_Type == ItemType::TYPE_MODULE && ItemData.m_Value > 0)
 			{
 				char aAttributes[128];
 				ItemData.FormatAttributes(aAttributes, sizeof(aAttributes));
@@ -378,14 +378,14 @@ void CAccountCore::UseVoucher(int ClientID, const char* pVoucher) const
 
 	char aSelect[256];
 	const CSqlString<32> cVoucherCode = CSqlString<32>(pVoucher);
-	str_format(aSelect, sizeof(aSelect), "v.*, IF((SELECT r.id FROM tw_voucher_redeemed r WHERE CASE v.multiple WHEN 1 THEN r.voucher_id = v.id AND r.user_id = %d ELSE r.voucher_id = v.id END) IS NULL, FALSE, TRUE) AS used", pPlayer->Acc().m_AccountID);
+	str_format(aSelect, sizeof(aSelect), "v.*, IF((SELECT r.ID FROM tw_voucher_redeemed r WHERE CASE v.Multiple WHEN 1 THEN r.VoucherID = v.ID AND r.UserID = %d ELSE r.VoucherID = v.ID END) IS NULL, FALSE, TRUE) AS used", pPlayer->Acc().m_UserID);
 
-	ResultPtr pResVoucher = SJK.SD(aSelect, "tw_voucher v", "WHERE v.code = '%s'", cVoucherCode.cstr());
+	ResultPtr pResVoucher = SJK.SD(aSelect, "tw_voucher v", "WHERE v.Code = '%s'", cVoucherCode.cstr());
 	if (pResVoucher->next())
 	{
-		const int VoucherID = pResVoucher->getInt("id");
-		const int ValidUntil = pResVoucher->getInt("valid_until");
-		nlohmann::json JsonData = nlohmann::json::parse(pResVoucher->getString("data").c_str());
+		const int VoucherID = pResVoucher->getInt("ID");
+		const int ValidUntil = pResVoucher->getInt("ValidUntil");
+		nlohmann::json JsonData = nlohmann::json::parse(pResVoucher->getString("Data").c_str());
 
 		if(ValidUntil > 0 && ValidUntil < time(0))
 			GS()->Chat(ClientID, "The voucher code '{STR}' has expired.", pVoucher);
@@ -422,7 +422,7 @@ void CAccountCore::UseVoucher(int ClientID, const char* pVoucher) const
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_STATS);
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_UPGRADES);
 
-			SJK.ID("tw_voucher_redeemed", "(voucher_id, user_id, time_created) VALUES (%d, %d, %d)", VoucherID, pPlayer->Acc().m_AccountID, (int)time(0));
+			SJK.ID("tw_voucher_redeemed", "(VoucherID, UserID, TimeCreated) VALUES (%d, %d, %d)", VoucherID, pPlayer->Acc().m_UserID, (int)time(0));
 			GS()->Chat(ClientID, "You have successfully redeemed the voucher '{STR}'.", pVoucher);
 		}
 

@@ -167,8 +167,8 @@ void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force)
 	{
 		CItemData DropItem;
 		DropItem.m_ItemID = MobBotInfo::ms_aMobBot[SubID].m_aDropItem[i];
-		DropItem.m_Count = MobBotInfo::ms_aMobBot[SubID].m_aCountItem[i];
-		if(DropItem.m_ItemID <= 0 || DropItem.m_Count <= 0)
+		DropItem.m_Value = MobBotInfo::ms_aMobBot[SubID].m_aValueItem[i];
+		if(DropItem.m_ItemID <= 0 || DropItem.m_Value <= 0)
 			continue;
 
 		const float RandomDrop = clamp(MobBotInfo::ms_aMobBot[SubID].m_aRandomItem[i] + ActiveLuckyDrop, 0.0f, 100.0f);
@@ -183,7 +183,7 @@ void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force)
 	{
 		CItemData &pItemSkillPlayer = pPlayer->GetItem(itSkillPoint);
 		pItemSkillPlayer.Add(1);
-		GS()->Chat(ClientID, "Skill points increased. Now ({INT}SP)", pItemSkillPlayer.m_Count);
+		GS()->Chat(ClientID, "Skill points increased. Now ({INT}SP)", pItemSkillPlayer.m_Value);
 	}
 }
 

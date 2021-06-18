@@ -62,11 +62,11 @@ void CDropQuestItem::Tick()
 	GS()->Collision()->MovePhysicalAngleBox(&m_Pos, &m_Vel, ItemSize, &m_Angle, &m_AngleForce, 0.5f);
 
 	// check step and collected it or no
-	const int Count = m_QuestBot.m_aItemSearchCount[0];
+	const int Value = m_QuestBot.m_aItemSearchValue[0];
 	CPlayer* pOwnerPlayer = GS()->m_apPlayers[m_ClientID];
 	CQuestData& pPlayerQuest = pOwnerPlayer->GetQuest(m_QuestBot.m_QuestID);
 	CItemData& pPlayerItem = pOwnerPlayer->GetItem(m_QuestBot.m_aItemSearch[0]);
-	if (pPlayerQuest.m_Step != m_QuestBot.m_Step || pPlayerItem.m_Count >= Count)
+	if (pPlayerQuest.m_Step != m_QuestBot.m_Step || pPlayerItem.m_Value >= Value)
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;

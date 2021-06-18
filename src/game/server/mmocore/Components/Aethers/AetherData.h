@@ -10,7 +10,7 @@ struct CAetherData
 	int m_TeleX;
 	int m_TeleY;
 	int m_WorldID;
-	char m_aTeleName[64];
+	char m_aName[64];
 
 	static std::map< int, CAetherData > ms_aTeleport;
 };

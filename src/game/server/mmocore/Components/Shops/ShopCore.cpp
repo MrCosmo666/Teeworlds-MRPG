@@ -11,7 +11,7 @@
 using namespace sqlstr;
 void CShopCore::OnInit()
 {
-	ResultPtr pRes = SJK.SD("ID, StorageID", "tw_mailshop");
+	ResultPtr pRes = SJK.SD("ID, StorageID", "tw_store_items");
 	while(pRes->next())
 	{
 		int ID = pRes->getInt("ID");
@@ -83,22 +83,22 @@ bool CShopCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMen
 		const int ItemID = pPlayer->GetTempData().m_SellItem.m_ItemID;
 		CItemDataInfo &pInformationSellItem = GS()->GetItemInfo(ItemID);
 
-		const int SlotCount = pPlayer->GetTempData().m_SellItem.m_Count;
-		const int MinimalPrice = SlotCount * pInformationSellItem.m_MinimalPrice;
+		const int SlotValue = pPlayer->GetTempData().m_SellItem.m_Value;
+		const int MinimalPrice = SlotValue * pInformationSellItem.m_MinimalPrice;
 		const int SlotPrice = pPlayer->GetTempData().m_SellItem.m_Price;
 		const int SlotEnchant = pPlayer->GetTempData().m_SellItem.m_Enchant;
 
 		GS()->AVH(ClientID, TAB_INFO_AUCTION_BIND, GREEN_COLOR, "Information Auction Slot");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_AUCTION_BIND, "The reason for write the number for each row");
 		pPlayer->m_VoteColored = { 15,15,15 };
-		GS()->AVM(ClientID, "null", NOPE, NOPE, "Item x{INT} Minimal Price: {INT}gold", SlotCount, MinimalPrice);
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "Item x{INT} Minimal Price: {INT}gold", SlotValue, MinimalPrice);
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "Auction Slot Price: {INT}gold", g_Config.m_SvAuctionPriceSlot);
 		if(SlotEnchant > 0)
 			GS()->AVM(ClientID, "null", NOPE, NOPE, "Warning selling enchanted: +{INT}", SlotEnchant);
 
-		GS()->AVM(ClientID, "AUCTIONCOUNT", ItemID, NOPE, "Item Count: {INT}", SlotCount);
+		GS()->AVM(ClientID, "AUCTIONCOUNT", ItemID, NOPE, "Item Value: {INT}", SlotValue);
 		GS()->AVM(ClientID, "AUCTIONPRICE", ItemID, NOPE, "Item Price: {INT}", SlotPrice);
-		GS()->AVM(ClientID, "AUCTIONACCEPT", ItemID, NOPE, "Add {STR}x{INT} {INT}gold", pInformationSellItem.GetName(pPlayer), SlotCount, SlotPrice);
+		GS()->AVM(ClientID, "AUCTIONACCEPT", ItemID, NOPE, "Add {STR}x{INT} {INT}gold", pInformationSellItem.GetName(pPlayer), SlotValue, SlotPrice);
 		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
@@ -123,8 +123,8 @@ bool CShopCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 	{
 		// if there are fewer items installed, we set the number of items.
 		CItemData& pPlayerSellItem = pPlayer->GetItem(VoteID);
-		if(Get > pPlayerSellItem.m_Count)
-			Get = pPlayerSellItem.m_Count;
+		if(Get > pPlayerSellItem.m_Value)
+			Get = pPlayerSellItem.m_Value;
 
 		// if it is possible to number
 		if(pPlayerSellItem.Info().IsEnchantable())
@@ -134,14 +134,14 @@ bool CShopCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 		if(pPlayer->GetTempData().m_SellItem.m_Price < c_minimalprice)
 			pPlayer->GetTempData().m_SellItem.m_Price = c_minimalprice;
 
-		pPlayer->GetTempData().m_SellItem.m_Count = Get;
+		pPlayer->GetTempData().m_SellItem.m_Value = Get;
 		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_AUCTION_CREATE_SLOT);
 		return true;
 	}
 
 	if(PPSTR(CMD, "AUCTIONPRICE") == 0)
 	{
-		const int c_minimalprice = (pPlayer->GetTempData().m_SellItem.m_Count * GS()->GetItemInfo(VoteID).m_MinimalPrice);
+		const int c_minimalprice = (pPlayer->GetTempData().m_SellItem.m_Value * GS()->GetItemInfo(VoteID).m_MinimalPrice);
 		if(Get < c_minimalprice)
 			Get = c_minimalprice;
 
@@ -152,8 +152,8 @@ bool CShopCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 
 	if(PPSTR(CMD, "AUCTIONSLOT") == 0)
 	{
-		int AvailableCount = Job()->Item()->GetUnfrozenItemCount(pPlayer, VoteID);
-		if(AvailableCount <= 0)
+		int AvailableValue = Job()->Item()->GetUnfrozenItemValue(pPlayer, VoteID);
+		if(AvailableValue <= 0)
 			return true;
 
 		pPlayer->GetTempData().m_SellItem.m_ItemID = VoteID;
@@ -165,7 +165,7 @@ bool CShopCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const in
 	if(PPSTR(CMD, "AUCTIONACCEPT") == 0)
 	{
 		CItemData& pPlayerSellItem = pPlayer->GetItem(VoteID);
-		if(pPlayerSellItem.m_Count >= pPlayer->GetTempData().m_SellItem.m_Count && pPlayer->GetTempData().m_SellItem.m_Price >= 10)
+		if(pPlayerSellItem.m_Value >= pPlayer->GetTempData().m_SellItem.m_Value && pPlayer->GetTempData().m_SellItem.m_Price >= 10)
 		{
 			CreateAuctionSlot(pPlayer, pPlayer->GetTempData().m_SellItem);
 			GS()->ResetVotes(ClientID, MenuList::MENU_INVENTORY);
@@ -185,18 +185,18 @@ void CShopCore::CreateAuctionSlot(CPlayer* pPlayer, CAuctionItem& pAuctionItem)
 	CItemData& pPlayerAuctionItem = pPlayer->GetItem(ItemID);
 
 	// check the number of slots whether everything is occupied or not
-	ResultPtr pResCheck = SJK.SD("ID", "tw_mailshop", "WHERE OwnerID > '0' LIMIT %d", g_Config.m_SvMaxMasiveAuctionSlots);
+	ResultPtr pResCheck = SJK.SD("ID", "tw_store_items", "WHERE UserID > '0' LIMIT %d", g_Config.m_SvMaxMasiveAuctionSlots);
 	if((int)pResCheck->rowsCount() >= g_Config.m_SvMaxMasiveAuctionSlots)
 		return GS()->Chat(ClientID, "Auction has run out of slots, wait for the release of slots!");
 
 	// check your slots
-	ResultPtr pResCheck2 = SJK.SD("ID", "tw_mailshop", "WHERE OwnerID = '%d' LIMIT %d", pPlayer->Acc().m_AccountID, g_Config.m_SvMaxAuctionSlots);
-	const int CountSlot = pResCheck2->rowsCount();
-	if(CountSlot >= g_Config.m_SvMaxAuctionSlots)
+	ResultPtr pResCheck2 = SJK.SD("ID", "tw_store_items", "WHERE UserID = '%d' LIMIT %d", pPlayer->Acc().m_UserID, g_Config.m_SvMaxAuctionSlots);
+	const int ValueSlot = pResCheck2->rowsCount();
+	if(ValueSlot >= g_Config.m_SvMaxAuctionSlots)
 		return GS()->Chat(ClientID, "You use all open the slots in your auction!");
 
 	// we check if the item is in the auction
-	ResultPtr pResCheck3 = SJK.SD("ID", "tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, pPlayer->Acc().m_AccountID);
+	ResultPtr pResCheck3 = SJK.SD("ID", "tw_store_items", "WHERE ItemID = '%d' AND UserID = '%d'", ItemID, pPlayer->Acc().m_UserID);
 	if(pResCheck3->next())
 		return GS()->Chat(ClientID, "Your same item found in the database, need reopen the slot!");
 
@@ -205,31 +205,31 @@ void CShopCore::CreateAuctionSlot(CPlayer* pPlayer, CAuctionItem& pAuctionItem)
 		return;
 
 	// pick up the item and add a slot
-	if(pPlayerAuctionItem.m_Count >= pAuctionItem.m_Count && pPlayerAuctionItem.Remove(pAuctionItem.m_Count))
+	if(pPlayerAuctionItem.m_Value >= pAuctionItem.m_Value && pPlayerAuctionItem.Remove(pAuctionItem.m_Value))
 	{
-		SJK.ID("tw_mailshop", "(ItemID, Price, Count, OwnerID, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d')",
-			ItemID, pAuctionItem.m_Price, pAuctionItem.m_Count, pPlayer->Acc().m_AccountID, pAuctionItem.m_Enchant);
+		SJK.ID("tw_store_items", "(ItemID, Price, ItemValue, UserID, Enchant) VALUES ('%d', '%d', '%d', '%d', '%d')",
+			ItemID, pAuctionItem.m_Price, pAuctionItem.m_Value, pPlayer->Acc().m_UserID, pAuctionItem.m_Enchant);
 
-		const int AvailableSlot = (g_Config.m_SvMaxAuctionSlots - CountSlot) - 1;
+		const int AvailableSlot = (g_Config.m_SvMaxAuctionSlots - ValueSlot) - 1;
 		GS()->Chat(-1, "{STR} created a slot [{STR}x{INT}] auction.",
-			Server()->ClientName(ClientID), pPlayerAuctionItem.Info().GetName(pPlayer), pAuctionItem.m_Count);
+			Server()->ClientName(ClientID), pPlayerAuctionItem.Info().GetName(pPlayer), pAuctionItem.m_Value);
 		GS()->ChatFollow(ClientID, "Still available {INT} slots!", AvailableSlot);
 	}
 }
 
 void CShopCore::CheckAuctionTime()
 {
-	ResultPtr pRes = SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 AND DATE_SUB(NOW(),INTERVAL %d MINUTE) > Time", g_Config.m_SvTimeAuctionSlot);
+	ResultPtr pRes = SJK.SD("*", "tw_store_items", "WHERE UserID > 0 AND DATE_SUB(NOW(),INTERVAL %d MINUTE) > Time", g_Config.m_SvTimeAuctionSlot);
 	int ReleaseSlots = (int)pRes->rowsCount();
 	while(pRes->next())
 	{
 		const int ID = pRes->getInt("ID");
 		const int ItemID = pRes->getInt("ItemID");
-		const int Count = pRes->getInt("Count");
+		const int Value = pRes->getInt("ItemValue");
 		const int Enchant = pRes->getInt("Enchant");
-		const int OwnerID = pRes->getInt("OwnerID");
-		GS()->SendInbox("Auctionist", OwnerID, "Auction expired", "Your slot has expired", ItemID, Count, Enchant);
-		SJK.DD("tw_mailshop", "WHERE ID = '%d'", ID);
+		const int UserID = pRes->getInt("UserID");
+		GS()->SendInbox("Auctionist", UserID, "Auction expired", "Your slot has expired", ItemID, Value, Enchant);
+		SJK.DD("tw_store_items", "WHERE ID = '%d'", ID);
 	}
 	if(ReleaseSlots)
 		GS()->ChatFollow(-1, "Auction {INT} slots has been released!", ReleaseSlots);
@@ -238,54 +238,54 @@ void CShopCore::CheckAuctionTime()
 bool CShopCore::BuyShopItem(CPlayer* pPlayer, int ID)
 {
 	const int ClientID = pPlayer->GetCID();
-	ResultPtr pRes = SJK.SD("*", "tw_mailshop", "WHERE ID = '%d'", ID);
+	ResultPtr pRes = SJK.SD("*", "tw_store_items", "WHERE ID = '%d'", ID);
 	if(!pRes->next())
 		return false;
 
 	const int ItemID = pRes->getInt("ItemID");
 	CItemData& pPlayerBuyightItem = pPlayer->GetItem(ItemID);
-	if(pPlayerBuyightItem.m_Count > 0 && pPlayerBuyightItem.Info().IsEnchantable())
+	if(pPlayerBuyightItem.m_Value > 0 && pPlayerBuyightItem.Info().IsEnchantable())
 	{
 		GS()->Chat(ClientID, "Enchant item maximal count x1 in a backpack!");
 		return false;
 	}
 
 	// - - - - - - - - - - AUCTION - - - - - - - - - - - - -
-	int Price = pRes->getInt("Price");
-	const int OwnerID = pRes->getInt("OwnerID");
-	const int Count = pRes->getInt("Count");
+	const int Price = pRes->getInt("Price");
+	const int UserID = pRes->getInt("UserID");
+	const int Value = pRes->getInt("ItemValue");
 	const int Enchant = pRes->getInt("Enchant");
-	if(OwnerID > 0)
+	if(UserID > 0)
 	{
 		// take out your slot
-		if(OwnerID == pPlayer->Acc().m_AccountID)
+		if(UserID == pPlayer->Acc().m_UserID)
 		{
 			GS()->Chat(ClientID, "You closed auction slot!");
-			GS()->SendInbox("Auctionist", pPlayer, "Auction Alert", "You have bought a item, or canceled your slot", ItemID, Count, Enchant);
-			SJK.DD("tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, OwnerID);
+			GS()->SendInbox("Auctionist", pPlayer, "Auction Alert", "You have bought a item, or canceled your slot", ItemID, Value, Enchant);
+			SJK.DD("tw_store_items", "WHERE ItemID = '%d' AND UserID = '%d'", ItemID, UserID);
 			return true;
 		}
 
-		const int NeedItem = pRes->getInt("NeedItem");
-		if(!pPlayer->SpendCurrency(Price, NeedItem))
+		const int RequiredItemID = pRes->getInt("RequiredItemID");
+		if(!pPlayer->SpendCurrency(Price, RequiredItemID))
 			return false;
 
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "Your [Slot %sx%d] was sold!", pPlayerBuyightItem.Info().GetName(pPlayer), Count);
-		GS()->SendInbox("Auctionist", OwnerID, "Auction Sell", aBuf, itGold, Price, 0);
-		SJK.DD("tw_mailshop", "WHERE ItemID = '%d' AND OwnerID = '%d'", ItemID, OwnerID);
-		pPlayerBuyightItem.Add(Count, 0, Enchant);
-		GS()->Chat(ClientID, "You buy {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(pPlayer), Count);
+		str_format(aBuf, sizeof(aBuf), "Your [Slot %sx%d] was sold!", pPlayerBuyightItem.Info().GetName(pPlayer), Value);
+		GS()->SendInbox("Auctionist", UserID, "Auction Sell", aBuf, itGold, Price, 0);
+		SJK.DD("tw_store_items", "WHERE ItemID = '%d' AND UserID = '%d'", ItemID, UserID);
+		pPlayerBuyightItem.Add(Value, 0, Enchant);
+		GS()->Chat(ClientID, "You buy {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(pPlayer), Value);
 		return true;
 	}
 
 	// - - - - - - - - - - - -SHOP - - - - - - - - - - - - -
-	const int NeedItem = pRes->getInt("NeedItem");
-	if(!pPlayer->SpendCurrency(Price, NeedItem))
+	const int RequiredItemID = pRes->getInt("RequiredItemID");
+	if(!pPlayer->SpendCurrency(Price, RequiredItemID))
 		return false;
 
-	pPlayerBuyightItem.Add(Count, 0, Enchant);
-	GS()->Chat(ClientID, "You exchange {STR}x{INT} to {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(pPlayer), Count, GS()->GetItemInfo(NeedItem).GetName(pPlayer), Price);
+	pPlayerBuyightItem.Add(Value, 0, Enchant);
+	GS()->Chat(ClientID, "You exchange {STR}x{INT} to {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(pPlayer), Value, GS()->GetItemInfo(RequiredItemID).GetName(pPlayer), Price);
 	return true;
 }
 
@@ -300,15 +300,15 @@ void CShopCore::ShowAuction(CPlayer* pPlayer)
 
 	bool FoundItems = false;
 	int HideID = (int)(NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + 400);
-	ResultPtr pRes = SJK.SD("*", "tw_mailshop", "WHERE OwnerID > 0 ORDER BY Price");
+	ResultPtr pRes = SJK.SD("*", "tw_store_items", "WHERE UserID > 0 ORDER BY Price");
 	while(pRes->next())
 	{
 		const int ID = pRes->getInt("ID");
 		const int ItemID = pRes->getInt("ItemID");
 		const int Price = pRes->getInt("Price");
 		const int Enchant = pRes->getInt("Enchant");
-		const int Count = pRes->getInt("Count");
-		const int OwnerID = pRes->getInt("OwnerID");
+		const int ItemValue = pRes->getInt("ItemValue");
+		const int UserID = pRes->getInt("UserID");
 		CItemDataInfo &pBuyightItem = GS()->GetItemInfo(ItemID);
 
 		if(pBuyightItem.IsEnchantable())
@@ -316,7 +316,7 @@ void CShopCore::ShowAuction(CPlayer* pPlayer)
 			char aEnchantBuf[16];
 			pBuyightItem.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf), Enchant);
 			GS()->AVHI(ClientID, pBuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} {STR} - {INT} gold",
-				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), pBuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), Price);
+				(pPlayer->GetItem(ItemID).m_Value > 0 ? "✔ " : "\0"), pBuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), Price);
 
 			char aAttributes[128];
 			pBuyightItem.FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
@@ -325,11 +325,11 @@ void CShopCore::ShowAuction(CPlayer* pPlayer)
 		else
 		{
 			GS()->AVHI(ClientID, pBuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) - {INT} gold",
-				pBuyightItem.GetName(pPlayer), Count, pPlayer->GetItem(ItemID).m_Count, Price);
+				pBuyightItem.GetName(pPlayer), ItemValue, pPlayer->GetItem(ItemID).m_Value, Price);
 		}
 
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pBuyightItem.GetDesc(pPlayer));
-		GS()->AVM(ClientID, "null", NOPE, HideID, "Seller {STR}", Job()->PlayerName(OwnerID));
+		GS()->AVM(ClientID, "null", NOPE, HideID, "Seller {STR}", Job()->PlayerName(UserID));
 		GS()->AVM(ClientID, "SHOP", ID, HideID, "Buy Price {INT} gold", Price);
 		FoundItems = true;
 		++HideID;
@@ -344,24 +344,24 @@ void CShopCore::ShowMailShop(CPlayer *pPlayer, int StorageID)
 {
 	const int ClientID = pPlayer->GetCID();
 	int HideID = NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + 300;
-	ResultPtr pRes = SJK.SD("*", "tw_mailshop", "WHERE StorageID = '%d' ORDER BY Price", StorageID);
+	ResultPtr pRes = SJK.SD("*", "tw_store_items", "WHERE StorageID = '%d' ORDER BY Price", StorageID);
 	while(pRes->next())
 	{
 		const int ID = pRes->getInt("ID");
 		const int ItemID = pRes->getInt("ItemID");
+		const int ItemValue = pRes->getInt("ItemValue");
 		const int Price = pRes->getInt("Price");
 		const int Enchant = pRes->getInt("Enchant");
-		const int Count = pRes->getInt("Count");
-		const int NeedItemID = pRes->getInt("NeedItem");
+		const int RequiredItemID = pRes->getInt("RequiredItemID");
 		CItemDataInfo &pBuyightItem = GS()->GetItemInfo(ItemID);
-		CItemDataInfo &pNeededItem = GS()->GetItemInfo(NeedItemID);
+		CItemDataInfo &pRequiredItem = GS()->GetItemInfo(RequiredItemID);
 
 		if (pBuyightItem.IsEnchantable())
 		{
 			char aEnchantBuf[16];
 			pBuyightItem.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf), Enchant);
 			GS()->AVHI(ClientID, pBuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} {STR} - {INT} {STR}",
-				(pPlayer->GetItem(ItemID).m_Count > 0 ? "✔ " : "\0"), pBuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), Price, pNeededItem.GetName(pPlayer));
+				(pPlayer->GetItem(ItemID).m_Value > 0 ? "✔ " : "\0"), pBuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), Price, pRequiredItem.GetName(pPlayer));
 
 			char aAttributes[128];
 			pBuyightItem.FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
@@ -370,11 +370,11 @@ void CShopCore::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		else
 		{
 			GS()->AVHI(ClientID, pBuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) - {INT} {STR}",
-				pBuyightItem.GetName(pPlayer), Count, pPlayer->GetItem(ItemID).m_Count, Price, pNeededItem.GetName(pPlayer));
+				pBuyightItem.GetName(pPlayer), ItemValue, pPlayer->GetItem(ItemID).m_Value, Price, pRequiredItem.GetName(pPlayer));
 		}
 
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pBuyightItem.GetDesc(pPlayer));
-		GS()->AVM(ClientID, "SHOP", ID, HideID, "Exchange {STR}x{INT} to {STR}x{INT}", pNeededItem.GetName(pPlayer), Price, pBuyightItem.GetName(pPlayer), Count);
+		GS()->AVM(ClientID, "SHOP", ID, HideID, "Exchange {STR}x{INT} to {STR}x{INT}", pRequiredItem.GetName(pPlayer), Price, pBuyightItem.GetName(pPlayer), ItemValue);
 		HideID++;
 	}
 	GS()->AV(ClientID, "null");

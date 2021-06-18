@@ -45,7 +45,7 @@ bool CDropItem::TakeItem(int ClientID)
 	// change of enchanted objects
 	GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 	CItemData &pPlayerDroppedItem = pPlayer->GetItem(m_DropItem.GetID());
-	if(pPlayerDroppedItem.m_Count > 0 && pPlayerDroppedItem.Info().IsEnchantable())
+	if(pPlayerDroppedItem.m_Value > 0 && pPlayerDroppedItem.Info().IsEnchantable())
 	{
 		tl_swap(pPlayerDroppedItem, m_DropItem);
 		GS()->Chat(ClientID, "You now own {STR}(+{INT})", pPlayerDroppedItem.Info().GetName(pPlayer), pPlayerDroppedItem.m_Enchant);
@@ -55,7 +55,7 @@ bool CDropItem::TakeItem(int ClientID)
 	}
 
 	// simple subject delivery
-	pPlayerDroppedItem.Add(m_DropItem.m_Count, 0, m_DropItem.m_Enchant);
+	pPlayerDroppedItem.Add(m_DropItem.m_Value, 0, m_DropItem.m_Enchant);
 	GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 10, "\0");
 	GS()->StrongUpdateVotes(ClientID, MENU_INVENTORY);
 	GS()->StrongUpdateVotes(ClientID, MENU_EQUIPMENT);
@@ -109,7 +109,7 @@ void CDropItem::Tick()
 	// enchantable item
 	if(pPlayerItem.Info().IsEnchantable())
 	{
-		if(pPlayerItem.m_Count > 0)
+		if(pPlayerItem.m_Value > 0)
 			GS()->Broadcast(pChar->GetPlayer()->GetCID(), BroadcastPriority::GAME_INFORMATION, 100, "{STR}(+{INT}) -> (+{INT}) {STR}",
 				m_DropItem.Info().GetName(pChar->GetPlayer()), pPlayerItem.m_Enchant, m_DropItem.m_Enchant, pToNickname);
 		else
@@ -121,7 +121,7 @@ void CDropItem::Tick()
 
 	// non enchantable item
 	GS()->Broadcast(pChar->GetPlayer()->GetCID(), BroadcastPriority::GAME_INFORMATION, 100, "{STR}x{INT} {STR}",
-		m_DropItem.Info().GetName(pChar->GetPlayer()), m_DropItem.m_Count, pToNickname);
+		m_DropItem.Info().GetName(pChar->GetPlayer()), m_DropItem.m_Value, pToNickname);
 }
 
 void CDropItem::Snap(int SnappingClient)

@@ -13,7 +13,7 @@ class CPlayer;
 struct StructRandomBoxItem
 {
 	int m_ItemID;
-	int m_Count;
+	int m_Value;
 	float m_Chance;
 };
 
@@ -22,11 +22,11 @@ class CRandomBox
 	std::vector <StructRandomBoxItem> m_ArrayItems;
 
 public:
-	void Add(int ItemID, int Count, float Chance)
+	void Add(int ItemID, int Value, float Chance)
 	{
 		StructRandomBoxItem Item;
 		Item.m_Chance = Chance;
-		Item.m_Count = Count;
+		Item.m_Value = Value;
 		Item.m_ItemID = ItemID;
 		m_ArrayItems.push_back(Item);
 	}

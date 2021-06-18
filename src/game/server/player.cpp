@@ -201,7 +201,7 @@ void CPlayer::Snap(int SnappingClient)
 	StrToInts(pClientInfo->m_Potions, 12, Buffer.buffer());
 	Buffer.clear();
 
-	Server()->Localization()->Format(Buffer, GetLanguage(), "{INT}", GetItem(itGold).m_Count);
+	Server()->Localization()->Format(Buffer, GetLanguage(), "{INT}", GetItem(itGold).m_Value);
 	StrToInts(pClientInfo->m_Gold, 6, Buffer.buffer());
 	Buffer.clear();
 
@@ -336,10 +336,10 @@ void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed,
 	GS()->Broadcast(m_ClientID, BroadcastPriority::GAME_INFORMATION, 100, aBufBroadcast);
 }
 
-bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade) const
+bool CPlayer::Upgrade(int Value, int *Upgrade, int *Useless, int Price, int MaximalUpgrade) const
 {
-	const int UpgradeNeed = Price*Count;
-	if((*Upgrade + Count) > MaximalUpgrade)
+	const int UpgradeNeed = Price*Value;
+	if((*Upgrade + Value) > MaximalUpgrade)
 	{
 		GS()->Broadcast(m_ClientID, BroadcastPriority::GAME_WARNING, 100, "Upgrade has a maximum level.");
 		return false;
@@ -347,12 +347,12 @@ bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int Maxi
 
 	if(*Useless < UpgradeNeed)
 	{
-		GS()->Broadcast(m_ClientID, BroadcastPriority::GAME_WARNING, 100, "Not upgrade points for +{INT}. Required {INT}.", Count, UpgradeNeed);
+		GS()->Broadcast(m_ClientID, BroadcastPriority::GAME_WARNING, 100, "Not upgrade points for +{INT}. Required {INT}.", Value, UpgradeNeed);
 		return false;
 	}
 
 	*Useless -= UpgradeNeed;
-	*Upgrade += Count;
+	*Upgrade += Value;
 	return true;
 }
 
@@ -365,9 +365,9 @@ bool CPlayer::SpendCurrency(int Price, int ItemID)
 		return true;
 
 	CItemData& pItemPlayer = GetItem(ItemID);
-	if(pItemPlayer.m_Count < Price)
+	if(pItemPlayer.m_Value < Price)
 	{
-		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", Price, pItemPlayer.m_Count, pItemPlayer.Info().GetName(this));
+		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", Price, pItemPlayer.m_Value, pItemPlayer.Info().GetName(this));
 		return false;
 	}
 	return pItemPlayer.Remove(Price);
@@ -451,7 +451,7 @@ bool CPlayer::GetHidenMenu(int HideID) const
 bool CPlayer::IsAuthed() const
 {
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID))
-		return (bool)(Acc().m_AccountID > 0);
+		return (bool)(Acc().m_UserID > 0);
 	return false;
 }
 
@@ -600,7 +600,7 @@ int CPlayer::GetEquippedItemID(int EquipID, int SkipItemID) const
 {
 	for(const auto& it : CItemData::ms_aItems[m_ClientID])
 	{
-		if(!it.second.m_Count || !it.second.m_Settings || it.second.Info().m_Function != EquipID || it.first == SkipItemID)
+		if(!it.second.m_Value || !it.second.m_Settings || it.second.Info().m_Function != EquipID || it.first == SkipItemID)
 			continue;
 		return it.first;
 	}
@@ -700,7 +700,7 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 		}
 
 		// get a quest for the progress of dialogue if it is in this progress we accept the quest
-		GivingQuestID = NpcBotInfo::ms_aNpcBot[MobID].m_aDialog[m_DialogNPC.m_Progress].m_GivingQuest;
+		GivingQuestID = NpcBotInfo::ms_aNpcBot[MobID].m_aDialog[m_DialogNPC.m_Progress].m_GivesQuestID;
 		if (GivingQuestID >= 1)
 		{
 			if (!m_DialogNPC.m_FreezedProgress)

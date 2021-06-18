@@ -11,7 +11,7 @@ void CWorldSwapCore::OnInit()
 		while(pRes->next())
 		{
 			const int ID = pRes->getInt("ID");
-			CWorldSwapData::ms_aWorldSwap[ID].m_OpenQuestID = pRes->getInt("OpenQuestID");
+			CWorldSwapData::ms_aWorldSwap[ID].m_RequiredQuestID = pRes->getInt("RequiredQuestID");
 			CWorldSwapData::ms_aWorldSwap[ID].m_PositionX = pRes->getInt("PositionX");
 			CWorldSwapData::ms_aWorldSwap[ID].m_PositionY = pRes->getInt("PositionY");
 			CWorldSwapData::ms_aWorldSwap[ID].m_WorldID = pRes->getInt("WorldID");
@@ -85,7 +85,7 @@ int CWorldSwapCore::GetNecessaryQuest(int WorldID) const
 	int CheckWorldID = WorldID != -1 ? WorldID : GS()->GetWorldID();
 	const auto& pItem = std::find_if(CWorldSwapData::ms_aWorldSwap.begin(), CWorldSwapData::ms_aWorldSwap.end(), [CheckWorldID](const std::pair<int, CWorldSwapData>& pWorldSwap)
 	                                 { return pWorldSwap.second.m_TwoWorldID == CheckWorldID; });
-	return pItem != CWorldSwapData::ms_aWorldSwap.end() ? pItem->second.m_OpenQuestID : -1;
+	return pItem != CWorldSwapData::ms_aWorldSwap.end() ? pItem->second.m_RequiredQuestID : -1;
 }
 
 vec2 CWorldSwapCore::GetPositionQuestBot(int ClientID, QuestBotInfo QuestBot) const
@@ -111,7 +111,7 @@ void CWorldSwapCore::CheckQuestingOpened(CPlayer* pPlayer, int QuestID) const
 	const int ClientID = pPlayer->GetCID();
 	for(const auto& sw : CWorldSwapData::ms_aWorldSwap)
 	{
-		if(QuestID == sw.second.m_OpenQuestID)
+		if(QuestID == sw.second.m_RequiredQuestID)
 			GS()->Chat(-1, "{STR} opened zone ({STR})!", Server()->ClientName(ClientID), Server()->GetWorldName(sw.second.m_TwoWorldID));
 	}
 }
@@ -122,7 +122,7 @@ bool CWorldSwapCore::ChangeWorld(CPlayer* pPlayer, vec2 Pos)
 	if(CWorldSwapData::ms_aWorldSwap.find(WID) != CWorldSwapData::ms_aWorldSwap.end())
 	{
 		const int ClientID = pPlayer->GetCID();
-		const int StoryQuestNeeded = CWorldSwapData::ms_aWorldSwap[WID].m_OpenQuestID;
+		const int StoryQuestNeeded = CWorldSwapData::ms_aWorldSwap[WID].m_RequiredQuestID;
 		if(StoryQuestNeeded > 0 && !pPlayer->GetQuest(StoryQuestNeeded).IsComplected())
 		{
 			GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Requires quest completion '{STR}'!", pPlayer->GetQuest(StoryQuestNeeded).Info().GetName());
