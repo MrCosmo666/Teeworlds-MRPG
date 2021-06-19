@@ -3,9 +3,8 @@
 #include <game/server/mmocore/Components/Bots/BotData.h>
 #include "quest_path_finder.h"
 
-#include <game/server/gamecontext.h>
-
 #include <game/server/mmocore/Components/Worlds/WorldSwapCore.h>
+#include <game/server/gamecontext.h>
 
 CQuestPathFinder::CQuestPathFinder(CGameWorld* pGameWorld, vec2 Pos, int ClientID, QuestBotInfo QuestBot)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_FINDQUEST, Pos)

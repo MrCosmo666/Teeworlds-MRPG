@@ -9,17 +9,18 @@
 #include <game/server/mmocore/Components/Houses/HouseCore.h>
 
 // 1 - miner / 2 - plant
-CJobItems::CJobItems(CGameWorld *pGameWorld, int ItemID, int Level, vec2 Pos, int Type, int StartHealth, int HouseID)
+CJobItems::CJobItems(CGameWorld *pGameWorld, int ItemID, int Level, vec2 Pos, int Type, int Health, int HouseID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_JOBITEMS, Pos, PickupPhysSize)
 {
 	m_ItemID = ItemID;
 	m_Level = Level;
 	m_Type = Type;
-	m_StartHealth = StartHealth;
+	m_Health = Health;
+	m_TotalDamage = 0;
 	m_HouseID = HouseID;
 	SpawnPositions();
 
-	Reset();
+	CJobItems::Reset();
 	GameWorld()->InsertEntity(this);
 }
 
@@ -42,12 +43,13 @@ void CJobItems::SpawnPositions()
 void CJobItems::SetSpawn(int Sec)
 {
 	m_SpawnTick = Server()->Tick() + (Server()->TickSpeed()*Sec);
-	m_Health = m_StartHealth;
+	m_TotalDamage = m_Health;
 }
 
 void CJobItems::Work(int ClientID)
 {
-	if(ClientID >= MAX_PLAYERS || ClientID < 0 || m_Health >= m_StartHealth || !GS()->m_apPlayers[ClientID])
+	CPlayer* pPlayer = GS()->GetPlayer(ClientID, true, true);
+	if(!pPlayer || m_TotalDamage >= m_Health)
 		return;
 
 	// not allowed un owner house job
@@ -57,72 +59,73 @@ void CJobItems::Work(int ClientID)
 		return;
 	}
 
-	// - - - - - - - - MINING - - - - - - - -
-	CPlayer *pPlayer = GS()->m_apPlayers[ClientID];
-	CItemData& pPlayerWorkedItem = pPlayer->GetItem(m_ItemID);
+	CItemData& pWorkedItem = pPlayer->GetItem(m_ItemID);
 	if(m_Type == 1)
+		MiningWork(ClientID, pPlayer, pWorkedItem);
+	else if(m_Type == 2)
+		FarmingWork(ClientID, pPlayer, pWorkedItem);
+}
+
+void CJobItems::MiningWork(int ClientID, CPlayer* pPlayer, CItemData& pWorkedItem)
+{
+	const int EquipItem = pPlayer->GetEquippedItemID(EQUIP_MINER);
+	if(EquipItem <= 0)
 	{
-		int EquipItem = pPlayer->GetEquippedItemID(EQUIP_MINER);
-		if (EquipItem <= 0)
-		{
-			GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Need equip Pickaxe!");
-			return;
-		}
-		if ((int)pPlayer->Acc().m_aMining[JOB_LEVEL] < m_Level)
-		{
-			GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), m_Level);
-			return;
-		}
-
-		CItemData& pPlayerEquippedItem = pPlayer->GetItem(EquipItem);
-		int Durability = pPlayerEquippedItem.m_Durability;
-		if (Durability <= 0)
-		{
-			GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Need repair pickaxe!");
-			return;
-		}
-
-		if (rand() % 10 == 0)
-			pPlayerEquippedItem.SetDurability(Durability - 1);
-
-		m_Health += 3+pPlayer->GetItemsAttributeCount(StEfficiency);
-		GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
-
-		GS()->Broadcast(ClientID, BroadcastPriority::GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P] : {STR} ({INT}/100%)",
-			pPlayerWorkedItem.Info().GetName(pPlayer), (m_Health > m_StartHealth ? m_StartHealth : m_Health), m_StartHealth,
-			pPlayerEquippedItem.Info().GetName(pPlayer), &Durability);
-
-		if(m_Health >= m_StartHealth)
-		{
-			GS()->Mmo()->MinerAcc()->Work(pPlayer, m_Level);
-			SetSpawn(20);
-
-			const int Quantity = pPlayer->Acc().m_aMining[JOB_UPGR_QUANTITY];
-			pPlayerWorkedItem.Add(Quantity);
-		}
+		GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Need equip Pickaxe!");
 		return;
 	}
 
-	// - - - - - - - - PLANTS - - - - - - - -
-	if ((int)pPlayer->Acc().m_aFarming[JOB_LEVEL] < m_Level)
+	if(pPlayer->Acc().m_aMining[JOB_LEVEL].m_Value < m_Level)
 	{
-		GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pPlayerWorkedItem.Info().GetName(pPlayer), m_Level);
+		GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pWorkedItem.Info().GetName(pPlayer), m_Level);
 		return;
 	}
 
-	m_Health += 10;
+	CItemData& pEquippedPickaxe = pPlayer->GetItem(EquipItem);
+	const int Durability = pEquippedPickaxe.m_Durability;
+	if(Durability <= 0)
+	{
+		GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Need repair pickaxe!");
+		return;
+	}
+
+	if(rand() % 10 == 0)
+		pEquippedPickaxe.SetDurability(Durability - 1);
+
+	m_TotalDamage += 3 + pPlayer->GetItemsAttributeCount(StEfficiency);
+	GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
+
+	GS()->Broadcast(ClientID, BroadcastPriority::GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P] : {STR} ({INT}/100%)",
+		pWorkedItem.Info().GetName(pPlayer), (m_TotalDamage > m_Health ? m_Health : m_TotalDamage), m_Health,
+		pEquippedPickaxe.Info().GetName(pPlayer), Durability);
+
+	if(m_TotalDamage >= m_Health)
+	{
+		GS()->Mmo()->MinerAcc()->Work(pPlayer, m_Level);
+		pWorkedItem.Add(pPlayer->Acc().m_aMining[JOB_UPGR_QUANTITY].m_Value);
+		SetSpawn(20);
+	}
+}
+
+void CJobItems::FarmingWork(int ClientID, CPlayer* pPlayer, CItemData& pWorkedItem)
+{
+	if(pPlayer->Acc().m_aFarming[JOB_LEVEL].m_Value < m_Level)
+	{
+		GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pWorkedItem.Info().GetName(pPlayer), m_Level);
+		return;
+	}
+
+	m_TotalDamage += 10;
 	GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
 	GS()->Broadcast(ClientID, BroadcastPriority::GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P]",
-		pPlayerWorkedItem.Info().GetName(pPlayer), (m_Health > m_StartHealth ? m_StartHealth : m_Health), m_StartHealth);
+		pWorkedItem.Info().GetName(pPlayer), (m_TotalDamage > m_Health ? m_Health : m_TotalDamage), m_Health);
 
-	if(m_Health >= m_StartHealth)
+	if(m_TotalDamage >= m_Health)
 	{
 		GS()->Mmo()->PlantsAcc()->Work(pPlayer, m_Level);
+		pWorkedItem.Add(pPlayer->Acc().m_aFarming[JOB_UPGR_QUANTITY].m_Value);
 		SetSpawn(20);
-
-		int Quantity = pPlayer->Acc().m_aFarming[JOB_UPGR_QUANTITY];
-		pPlayerWorkedItem.Add(Quantity);
 	}
 }
 
@@ -130,16 +133,16 @@ int CJobItems::SwitchToObject(bool MmoItem) const
 {
 	switch(m_Type)
 	{
+		default:
 		case 0/*plants*/: return (MmoItem ? (int)MMO_PICKUP_PLANT : (int)PICKUP_HEALTH);
 		case 1/*miner*/: return (MmoItem ? (int)MMO_PICKUP_ORE : (int)PICKUP_ARMOR);
 	}
-	return -1;
 }
 
 void CJobItems::Reset()
 {
 	m_SpawnTick = -1;
-	m_Health = 0;
+	m_TotalDamage = 0;
 }
 
 void CJobItems::Tick()
@@ -148,7 +151,6 @@ void CJobItems::Tick()
 	{
 		if(Server()->Tick() > m_SpawnTick)
 			Reset();
-		else return;
 	}
 }
 

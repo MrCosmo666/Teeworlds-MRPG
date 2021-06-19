@@ -6,6 +6,7 @@
 class CMultiWorlds
 {
 	bool Add(int WorldID, class IKernel* pKernel, class IServer* pServer);
+	void Clear(bool Shutdown = true);
 
 public:
 	struct CWorldGameServer
@@ -18,26 +19,23 @@ public:
 
 	CMultiWorlds()
 	{
-		for(int i = 0; i < ENGINE_MAX_WORLDS; i++)
-		{
-			m_Worlds[i].m_pGameServer = nullptr;
-			m_Worlds[i].m_pLoadedMap = nullptr;
-		}
 		m_WasInitilized = 0;
+		m_NextIsReloading = false;
+		mem_zero(m_Worlds, sizeof(m_Worlds));
 	}
 	~CMultiWorlds()
 	{
-		Clear();
+		Clear(true);
 	}
+	
 	CWorldGameServer* GetWorld(int WorldID) { return &m_Worlds[WorldID]; };
 	bool IsValid(int WorldID) const { return (bool)(WorldID >= 0 && WorldID < ENGINE_MAX_WORLDS && m_Worlds[WorldID].m_pGameServer); }
 	int GetSizeInitilized() const { return m_WasInitilized; }
-
 	bool LoadWorlds(class IServer* pServer, class IKernel* pKernel, class IStorageEngine* pStorage, class IConsole* pConsole);
-	void Clear();
 
 private:
 	int m_WasInitilized;
+	bool m_NextIsReloading;
 	CWorldGameServer m_Worlds[ENGINE_MAX_WORLDS];
 };
 

@@ -13,25 +13,41 @@ bool CMultiWorlds::Add(int WorldID, IKernel* pKernel, IServer *pServer)
 
 	CWorldGameServer& pNewWorld = m_Worlds[WorldID];
 	pNewWorld.m_pGameServer = CreateGameServer();
-	pNewWorld.m_pLoadedMap = CreateEngineMap();
-	m_WasInitilized++;
 
 	bool RegisterFail = false;
-	RegisterFail = RegisterFail || !pKernel->RegisterInterface(pNewWorld.m_pLoadedMap, WorldID);
-	RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IMap*>(pNewWorld.m_pLoadedMap), WorldID);
-	RegisterFail = RegisterFail || !pKernel->RegisterInterface(pNewWorld.m_pGameServer, WorldID);
+	if(m_NextIsReloading) // reregister
+	{
+		RegisterFail = RegisterFail || !pKernel->ReregisterInterface(pNewWorld.m_pLoadedMap, WorldID);
+		RegisterFail = RegisterFail || !pKernel->ReregisterInterface(static_cast<IMap*>(pNewWorld.m_pLoadedMap), WorldID);
+		RegisterFail = RegisterFail || !pKernel->ReregisterInterface(pNewWorld.m_pGameServer, WorldID);
+	}
+	else // register
+	{
+		pNewWorld.m_pLoadedMap = CreateEngineMap();
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pNewWorld.m_pLoadedMap, WorldID);
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(static_cast<IMap*>(pNewWorld.m_pLoadedMap), WorldID);
+		RegisterFail = RegisterFail || !pKernel->RegisterInterface(pNewWorld.m_pGameServer, WorldID);
+	}
+
+	m_WasInitilized++;
 	return RegisterFail;
 }
 
 bool CMultiWorlds::LoadWorlds(IServer* pServer, IKernel* pKernel, IStorageEngine* pStorage, IConsole* pConsole)
 {
+	// clear old worlds
+	Clear(false);
+
 	// read file data into buffer
 	char aFileBuf[512];
 	str_format(aFileBuf, sizeof(aFileBuf), "maps/worlds.json");
-	IOHANDLE File = pStorage->OpenFile(aFileBuf, IOFLAG_READ, IStorageEngine::TYPE_ALL);
+	const IOHANDLE File = pStorage->OpenFile(aFileBuf, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 	if(!File)
+	{
+		pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "worlds.json", "Probably deleted or error when the file is invalid.");
 		return false;
-
+	}
+	
 	const int FileSize = (int)io_length(File);
 	char* pFileData = (char*)malloc(FileSize);
 	io_read(File, pFileData, FileSize);
@@ -45,10 +61,10 @@ bool CMultiWorlds::LoadWorlds(IServer* pServer, IKernel* pKernel, IStorageEngine
 	free(pFileData);
 	if(pJsonData == 0)
 	{
-		pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "Error on reading \"worlds.json\"", aError);
+		pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "worlds.json", aError);
 		return false;
 	}
-
+	
 	// extract data
 	const json_value& rStart = (*pJsonData)["worlds"];
 	if(rStart.type == json_array)
@@ -66,17 +82,27 @@ bool CMultiWorlds::LoadWorlds(IServer* pServer, IKernel* pKernel, IStorageEngine
 	}
 
 	// clean up
+	m_NextIsReloading = true;
 	json_value_free(pJsonData);
 	return true;
 }
 
-void CMultiWorlds::Clear()
+void CMultiWorlds::Clear(bool Shutdown)
 {
 	for(int i = 0; i < m_WasInitilized; i++)
 	{
-		m_Worlds[i].m_pLoadedMap->Unload();
-		delete m_Worlds[i].m_pLoadedMap;
+		if(m_Worlds[i].m_pLoadedMap)
+		{
+			m_Worlds[i].m_pLoadedMap->Unload();
+			if(Shutdown)
+			{
+				delete m_Worlds[i].m_pLoadedMap;
+				m_Worlds[i].m_pLoadedMap = nullptr;
+			}
+		}
+		
 		delete m_Worlds[i].m_pGameServer;
+		m_Worlds[i].m_pGameServer = nullptr;
 	}
 	m_WasInitilized = 0;
 }

@@ -19,15 +19,15 @@
 #include <game/server/mmocore/GameEntities/snapfull.h>
 
 //input count
-struct CInputValue
+struct CInputCount
 {
 	int m_Presses;
 	int m_Releases;
 };
 
-CInputValue CountInput(int Prev, int Cur)
+CInputCount CountInput(int Prev, int Cur)
 {
-	CInputValue c = {0, 0};
+	CInputCount c = {0, 0};
 	Prev &= INPUT_STATE_MASK;
 	Cur &= INPUT_STATE_MASK;
 	int i = Prev;

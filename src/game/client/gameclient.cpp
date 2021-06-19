@@ -1145,11 +1145,6 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		ParsingMmoData();
 		m_ConnectedMmoServer = true;
 		m_pMenus->SetAuthState(true);
-
-		for(auto& p : CUIGameInterface::m_aItemsDataInformation)
-		{
-			dbg_msg("test", "%d %s %s %s", p.second.m_ItemID, p.second.m_aName, p.second.m_aDesc, p.second.m_aIcon);
-		}
 	}
 	else if(MsgId == NETMSGTYPE_SV_WORLDMUSIC && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 	{
@@ -2143,6 +2138,7 @@ void CGameClient::ParsingMmoData()
 	char aResultBuf[256];
 
 	// items information
+	CUIGameInterface::m_aItemsDataInformation.clear();
 	nlohmann::json JsonData = nlohmann::json::parse(Client()->GetJsonDataMRPG(MMO_DATA_INVENTORY_INFORMATION));
 	auto ItemsList = JsonData["items"];
 	for(auto& p : ItemsList)
