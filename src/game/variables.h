@@ -176,9 +176,9 @@ MACRO_CONFIG_STR(SvDiscordAdminChannel, sv_discord_admin_channel, 128, "", CFGFL
 
 // mysql
 MACRO_CONFIG_STR(SvMySqlHost, sv_sql_host, 32, "localhost", CFGFLAG_SERVER, "MySQL Host")
-MACRO_CONFIG_STR(SvMySqlDatabase, sv_sql_database, 32, "nope", CFGFLAG_SERVER, "MySQL Database")
-MACRO_CONFIG_STR(SvMySqlLogin, sv_sql_login, 32, "nope", CFGFLAG_SERVER, "MySQL Login")
-MACRO_CONFIG_STR(SvMySqlPassword, sv_sql_password, 32, "nope", CFGFLAG_SERVER, "MySQL Password")
+MACRO_CONFIG_STR(SvMySqlDatabase, sv_sql_database, 32, "database", CFGFLAG_SERVER, "MySQL Database")
+MACRO_CONFIG_STR(SvMySqlLogin, sv_sql_login, 32, "root", CFGFLAG_SERVER, "MySQL Login")
+MACRO_CONFIG_STR(SvMySqlPassword, sv_sql_password, 32, "", CFGFLAG_SERVER, "MySQL Password")
 MACRO_CONFIG_INT(SvMySqlPort, sv_sql_port, 3306, 0, 65000, CFGFLAG_SERVER, "MySQL Port")
 MACRO_CONFIG_INT(SvMySqlPoolSize, sv_sql_pool_size, 3, 1, 12, CFGFLAG_SERVER, "MySQL Pool size");
 
