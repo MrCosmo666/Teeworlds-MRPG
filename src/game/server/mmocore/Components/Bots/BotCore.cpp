@@ -170,11 +170,6 @@ static int GetReformatedValue(const char* JsonName, const char* JsonValue)
 		if(str_comp(JsonValue, "joyful") == 0) return 2;
 		return 0;
 	}
-	if(str_comp(JsonName, "says") == 0)
-	{
-		if(str_comp(JsonValue, "player") == 0) return 1;
-		return 0;
-	}
 	return 0;
 }
 
