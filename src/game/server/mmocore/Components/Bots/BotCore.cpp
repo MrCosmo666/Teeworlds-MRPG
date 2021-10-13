@@ -5,6 +5,7 @@
 #include <game/server/gamecontext.h>
 
 #include <game/server/mmocore/Components/Quests/QuestCore.h>
+#include <teeother/tl/nlohmann_json.h>
 
 // loading of all skins and mobs to use for connection with other bots
 void CBotCore::OnInitWorld(const char* pWhereLocalWorld)
@@ -153,6 +154,30 @@ int CBotCore::GetQuestNPC(int MobID) const
 
 
 // load basic information about bots
+static int GetReformatedValue(const char* JsonName, const char* JsonValue)
+{
+	if(str_comp(JsonName, "emote") == 0)
+	{
+		if(str_comp(JsonValue, "pain") == 0) return EMOTE_PAIN;
+		if(str_comp(JsonValue, "happy") == 0) return EMOTE_HAPPY;
+		if(str_comp(JsonValue, "surprise") == 0) return EMOTE_SURPRISE;
+		if(str_comp(JsonValue, "angry") == 0) return EMOTE_ANGRY;
+		return EMOTE_NORMAL;
+	}
+	if(str_comp(JsonName, "style") == 0)
+	{
+		if(str_comp(JsonValue, "aggresive") == 0) return 1;
+		if(str_comp(JsonValue, "joyful") == 0) return 2;
+		return 0;
+	}
+	if(str_comp(JsonName, "says") == 0)
+	{
+		if(str_comp(JsonValue, "player") == 0) return 1;
+		return 0;
+	}
+	return 0;
+}
+
 void CBotCore::LoadMainInformationBots()
 {
 	if(!(DataBotInfo::ms_aDataBot.empty()))
@@ -226,15 +251,33 @@ void CBotCore::LoadQuestBots(const char* pWhereLocalWorld)
 
 		// load talk
 		ResultPtr pResTalk = SJK.SD("*", "tw_dialogs_quest_npc", "WHERE MobID = '%d'", MobID);
-		while(pResTalk->next())
+		if(pResTalk->next())
 		{
-			DialogData LoadTalk;
-			LoadTalk.m_Style = pResTalk->getInt("Style");
-			LoadTalk.m_Emote = pResTalk->getInt("Emote");
-			LoadTalk.m_PlayerSays = pResTalk->getBoolean("PlayerSays");
-			LoadTalk.m_RequestComplete = pResTalk->getBoolean("RequestComplete");
-			str_copy(LoadTalk.m_aText, pResTalk->getString("Text").c_str(), sizeof(LoadTalk.m_aText));
-			QuestBotInfo::ms_aQuestBot[MobID].m_aDialog.push_back(LoadTalk);
+			try
+			{
+				nlohmann::json JsonData = nlohmann::json::parse(pResTalk->getString("Data").c_str());
+				for(auto& pItem : JsonData)
+				{
+					DialogData LoadTalk;
+					str_copy(LoadTalk.m_aText, pItem.value("text", "").c_str(), sizeof(LoadTalk.m_aText));
+					LoadTalk.m_Style = GetReformatedValue("style", pItem.value("style", "").c_str());
+					LoadTalk.m_Emote = GetReformatedValue("emote", pItem.value("emote", "").c_str());
+					LoadTalk.m_PlayerSays = false;
+
+					if(str_comp_nocase_num(LoadTalk.m_aText, "[p]", 3) == 0)
+					{
+						LoadTalk.m_PlayerSays = true;
+						mem_move(LoadTalk.m_aText, LoadTalk.m_aText + 3, sizeof(LoadTalk.m_aText));
+					}
+					
+					LoadTalk.m_RequestAction = pItem.value("action_step", 0);
+					QuestBotInfo::ms_aQuestBot[MobID].m_aDialog.push_back(LoadTalk);
+				}
+			}
+			catch(nlohmann::json::exception &s)
+			{
+				dbg_msg("dialog error", "dialog id [%d] (json %s)", pResTalk->getInt("ID"), s.what());
+			}
 		}
 	}
 
@@ -265,19 +308,38 @@ void CBotCore::LoadNpcBots(const char* pWhereLocalWorld)
 		for(int c = 0; c < NumberOfNpc; c++)
 			GS()->CreateBot(TYPE_BOT_NPC, NpcBotInfo::ms_aNpcBot[MobID].m_BotID, MobID);
 
+		// init dialogs
 		ResultPtr pResTalk = SJK.SD("*", "tw_dialogs_other_npc", "WHERE MobID = '%d'", MobID);
-		while(pResTalk->next())
+		if(pResTalk->next())
 		{
-			DialogData LoadTalk;
-			LoadTalk.m_Style = pResTalk->getInt("Style");
-			LoadTalk.m_Emote = pResTalk->getInt("Emote");
-			LoadTalk.m_PlayerSays = pResTalk->getBoolean("PlayerSays");
-			LoadTalk.m_GivesQuestID = pResTalk->getInt("GivesQuestID");
-			str_copy(LoadTalk.m_aText, pResTalk->getString("Text").c_str(), sizeof(LoadTalk.m_aText));
-			NpcBotInfo::ms_aNpcBot[MobID].m_aDialog.push_back(LoadTalk);
+			try
+			{
+				DialogData LoadTalk;
+				nlohmann::json JsonData = nlohmann::json::parse(pResTalk->getString("Data").c_str());
+				for(auto& pItem : JsonData)
+				{
+					str_copy(LoadTalk.m_aText, pItem.value("text", "").c_str(), sizeof(LoadTalk.m_aText));
+					LoadTalk.m_Style = GetReformatedValue("style", pItem.value("style", "basic").c_str());
+					LoadTalk.m_Emote = GetReformatedValue("emote", pItem.value("emote", "normal").c_str());
+					LoadTalk.m_GivesQuestID = pResTalk->getInt("GivesQuestID");
+					LoadTalk.m_PlayerSays = false;
+				
+					if(str_comp_nocase_num(LoadTalk.m_aText, "[p]", 3) == 0)
+					{
+						LoadTalk.m_PlayerSays = true;
+						mem_move(LoadTalk.m_aText, LoadTalk.m_aText + 3, sizeof(LoadTalk.m_aText));
+					}
 
-			if(LoadTalk.m_GivesQuestID > 0)
-				NpcBotInfo::ms_aNpcBot[MobID].m_Function = FUNCTION_NPC_GIVE_QUEST;
+					if(pResTalk->getInt("GivesQuestID") > 0)
+						NpcBotInfo::ms_aNpcBot[MobID].m_Function = FUNCTION_NPC_GIVE_QUEST;
+					
+					NpcBotInfo::ms_aNpcBot[MobID].m_aDialog.push_back(LoadTalk);
+				}
+			}
+			catch(nlohmann::json::exception &s)
+			{
+				dbg_msg("dialog error", "dialog id [%d] (json %s)", pResTalk->getInt("ID"), s.what());
+			}
 		}
 	}
 }

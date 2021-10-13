@@ -701,9 +701,9 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 
 		// get a quest for the progress of dialogue if it is in this progress we accept the quest
 		GivingQuestID = NpcBotInfo::ms_aNpcBot[MobID].m_aDialog[m_DialogNPC.m_Progress].m_GivesQuestID;
-		if (GivingQuestID >= 1)
+		if (((m_DialogNPC.m_Progress + 1) >= sizeTalking) && GivingQuestID >= 1)
 		{
-			if (!m_DialogNPC.m_FreezedProgress)
+			if(!m_DialogNPC.m_FreezedProgress)
 			{
 				GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_DialogNPC.m_Progress, TalkedID);
 				m_DialogNPC.m_FreezedProgress = true;
@@ -727,7 +727,7 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 			return;
 		}
 
-		const bool RequiestQuestTask = QuestBotInfo::ms_aQuestBot[MobID].m_aDialog[m_DialogNPC.m_Progress].m_RequestComplete;
+		const bool RequiestQuestTask = QuestBotInfo::ms_aQuestBot[MobID].m_aDialog[m_DialogNPC.m_Progress].m_RequestAction;
 		if (RequiestQuestTask)
 		{
 			if (!m_DialogNPC.m_FreezedProgress)

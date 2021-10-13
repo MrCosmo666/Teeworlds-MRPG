@@ -32,7 +32,6 @@ void CAccountPlantCore::OnInitAccount(CPlayer *pPlayer)
 		{
 			const char* pFieldName = pPlayer->Acc().m_aFarming[i].getFieldName();
 			pPlayer->Acc().m_aFarming[i].m_Value = pRes->getInt(pFieldName);
-			dbg_msg("test", "%d", pPlayer->Acc().m_aFarming[i].m_Value);
 		}
 		return;
 	}

@@ -139,13 +139,13 @@ void MmoController::PrepareInformation(IStorageEngine *pStorage)
 	const char* pItem = (const char*)DataInfoReader.FindItem(MMO_DATA_INVENTORY_INFORMATION, 0);
 	if(pItem)
 	{
-		dbg_msg("test", "%s", pItem);
+		dbg_msg("mrpg_compressed", "items: %s", pItem);
 	}
 
 	char aSha256[SHA256_MAXSTRSIZE];
 	sha256_str(DataInfoReader.Sha256(), aSha256, sizeof(aSha256));
-	dbg_msg("test", "mmo data file sha256 is %s", aSha256);
-	dbg_msg("test", "mmo data file Crc is %08x", DataInfoReader.Crc());
+	dbg_msg("mrpg_compressed", "mmo data file sha256 is %s", aSha256);
+	dbg_msg("mrpg_compressed", "mmo data file Crc is %08x", DataInfoReader.Crc());
 	DataInfoReader.Close();
 }
 

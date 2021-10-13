@@ -16,7 +16,7 @@ struct DialogData
 	int m_Style;
 	int m_Emote;
 	int m_GivesQuestID;
-	bool m_RequestComplete;
+	bool m_RequestAction;
 	bool m_PlayerSays;
 };
 
