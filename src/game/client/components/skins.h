@@ -31,7 +31,7 @@ public:
 		IGraphics::CTextureHandle m_ColorTexture;
 		vec3 m_BloodColor;
 
-		bool operator<(const CSkinPart& Other) { return str_comp_nocase(m_aName, Other.m_aName) < 0; }
+		bool operator<(const CSkinPart& Other) const { return str_comp_nocase(m_aName, Other.m_aName) < 0; }
 	};
 
 	struct CSkin
@@ -42,8 +42,8 @@ public:
 		int m_aPartColors[NUM_SKINPARTS];
 		int m_aUseCustomColors[NUM_SKINPARTS];
 
-		bool operator<(const CSkin& Other) { return str_comp_nocase(m_aName, Other.m_aName) < 0; }
-		bool operator==(const CSkin& Other) { return mem_comp(this, &Other, sizeof(CSkin)) == 0; }
+		bool operator<(const CSkin& Other) const { return str_comp_nocase(m_aName, Other.m_aName) < 0; }
+		bool operator==(const CSkin& Other) const { return mem_comp(this, &Other, sizeof(CSkin)) == 0; }
 	};
 
 	static const char* const ms_apSkinPartNames[NUM_SKINPARTS];
@@ -62,8 +62,8 @@ public:
 	void AddSkin(const char* pSkinName);
 	void RemoveSkin(const CSkin* pSkin);
 
-	int Num();
-	int NumSkinPart(int Part);
+	int Num() const;
+	int NumSkinPart(int Part) const;
 	const CSkin* Get(int Index);
 	int Find(const char* pName, bool AllowSpecialSkin);
 	const CSkinPart* GetSkinPart(int Part, int Index);

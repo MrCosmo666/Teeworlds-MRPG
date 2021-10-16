@@ -2,110 +2,25 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef ENGINE_SERVER_SERVER_H
 #define ENGINE_SERVER_SERVER_H
-
 #include <engine/server.h>
-#include <teeother/tl/singletion.h>
-#include <game/server/enum_global.h>
-
-STRINGABLE_ENUM_IMPL(MINER)
-STRINGABLE_ENUM_IMPL(PLANT)
-STRINGABLE_ENUM_IMPL(EMEMBERUPGRADE)
-
-// multiworlds
-#define WorldsInstance CSingleton<CWorldGameServerArray>::Get()
-
-class CWorldGameServerArray
-{
-	struct CWorldGameServer
-	{
-		char m_aName[64];
-		char m_aPath[512];
-		class IGameServer* m_pGameServer;
-		IEngineMap* m_pLoadedMap;
-	};
-public:
-	std::map < int /*ID*/, CWorldGameServer /*Game world*/ > ms_aWorlds;
-	~CWorldGameServerArray() { Clear(); }
-
-	bool IsValid(int WorldID) { return ms_aWorlds.find(WorldID) != ms_aWorlds.end(); }
-	bool Add(int WorldID, IKernel* pKernel);
-	void Clear();
-};
-
-// 
-class CSnapIDPool
-{
-	enum
-	{
-		MAX_IDS = 16*1024,
-	};
-
-	class CID
-	{
-	public:
-		short m_Next;
-		short m_State; // 0 = free, 1 = alloced, 2 = timed
-		int m_Timeout;
-	};
-
-	CID m_aIDs[MAX_IDS];
-
-	int m_FirstFree;
-	int m_FirstTimed;
-	int m_LastTimed;
-	int m_Usage;
-	int m_InUsage;
-
-public:
-	CSnapIDPool();
-
-	void Reset();
-	void RemoveFirstTimeout();
-	int NewID();
-	void TimeoutIDs();
-	void FreeID(int ID);
-};
-
-
-class CServerBan : public CNetBan
-{
-	class CServer *m_pServer;
-
-	template<class T> int BanExt(T *pBanPool, const typename T::CDataType *pData, int Seconds, const char *pReason);
-
-public:
-	class CServer *Server() const { return m_pServer; }
-
-	void InitServerBan(class IConsole *pConsole, class IStorageEngine *pStorage, class CServer* pServer);
-
-	virtual int BanAddr(const NETADDR *pAddr, int Seconds, const char *pReason);
-	virtual int BanRange(const CNetRange *pRange, int Seconds, const char *pReason);
-
-	static void ConBanExt(class IConsole::IResult *pResult, void *pUser);
-};
 
 class CServer : public IServer
 {
 	class IConsole *m_pConsole;
 	class IStorageEngine *m_pStorage;
+	class CMultiWorlds* m_pMultiWorlds;
+	class CDataMMO* m_pDataMmo;
+	class CServerBan* m_pServerBan;
+	class DiscordJob* m_pDiscord;
 
 public:
-	virtual class IGameServer* GameServer(int WorldID = 0)
-	{
-		if(WorldsInstance->ms_aWorlds.find(WorldID) == WorldsInstance->ms_aWorlds.end())
-			return nullptr;
-		return WorldsInstance->ms_aWorlds[WorldID].m_pGameServer;
-	}
-	class IConsole *Console() { return m_pConsole; }
-	class IStorageEngine*Storage() { return m_pStorage; }
-	class DiscordJob *m_pDiscord;
+	virtual class IGameServer* GameServer(int WorldID = 0);
+	class IConsole *Console() const { return m_pConsole; }
+	class IStorageEngine*Storage() const { return m_pStorage; }
+	class CMultiWorlds* MultiWorlds() const { return m_pMultiWorlds; }
 
 	enum
 	{
-		AUTHED_NO=0,
-		AUTHED_MOD,
-		AUTHED_ADMIN,
-
 		MAX_RCONCMD_RATIO = 8,
 		MAX_RCONCMD_SEND=16,
 	};
@@ -163,6 +78,7 @@ public:
 		bool m_ChangeMap;
 
 		int m_MapChunk;
+		int m_DataMmoChunk;
 		bool m_NoRconNote;
 		bool m_Quitting;
 		const IConsole::CCommandInfo *m_pRconCmdToSend;
@@ -172,19 +88,18 @@ public:
 	};
 
 	CClient m_aClients[MAX_CLIENTS];
-
 	CSnapshotDelta m_SnapshotDelta;
 	CSnapshotBuilder m_SnapshotBuilder;
 	CSnapIDPool m_IDPool;
 	CNetServer m_NetServer;
 	CEcon m_Econ;
-	CServerBan m_ServerBan;
 
 	int64 m_GameStartTime;
 	int m_RunServer;
 	int m_RconClientID;
 	int m_RconAuthLevel;
 	int m_PrintCBIndex;
+	bool m_HeavyReload;
 
 	// map
 	enum
@@ -192,6 +107,7 @@ public:
 		MAP_CHUNK_SIZE=NET_MAX_PAYLOAD-NET_MAX_CHUNKHEADERSIZE-4, // msg type
 	};
 	int m_MapChunksPerRequest;
+	int m_DataChunksPerRequest;
 
 	int m_RconPasswordSet;
 	int m_GeneratedRconPassword;
@@ -217,6 +133,9 @@ public:
 	virtual const char* GetStringTypeDay() const;
 	virtual int GetEnumTypeDay() const;
 
+	// mmo data
+	void SendDataMmoInfo(int ClientID);
+
 	// basic
 	virtual void SetClientName(int ClientID, const char *pName);
 	virtual void SetClientClan(int ClientID, char const *pClan);
@@ -234,26 +153,30 @@ public:
 	virtual const char* GetClientLanguage(int ClientID) const;
 	virtual const char* GetWorldName(int WorldID);
 
-	virtual void SendDiscordMessage(const char *pChannel, const char* pColor, const char* pTitle, const char* pText);
-	virtual void SendDiscordGenerateMessage(const char *pTitle, int AccountID, const char* pColor = "\0");
+	virtual void SendDiscordMessage(const char *pChannel, int Color, const char* pTitle, const char* pText);
+	virtual void SendDiscordGenerateMessage(const char *pTitle, int AccountID, int Color = 0);
 	virtual void UpdateDiscordStatus(const char *pStatus);
 
 	void Kick(int ClientID, const char *pReason);
 
-	int64 TickStartTime(int Tick);
+	int64 TickStartTime(int Tick) const;
 	int Init();
 
 	void InitRconPasswordIfUnset();
 
-	void SetRconCID(int ClientID);
-	bool IsAuthed(int ClientID) const;
-	bool IsBanned(int ClientID);
-	int GetClientInfo(int ClientID, CClientInfo *pInfo) const;
-	void GetClientAddr(int ClientID, char *pAddrStr, int Size) const;
-	const char *ClientName(int ClientID) const;
-	const char *ClientClan(int ClientID) const;
-	int ClientCountry(int ClientID) const;
-	bool ClientIngame(int ClientID) const;
+	void SetRconCID(int ClientID) override;
+	int GetRconCID() const override;
+	int GetRconAuthLevel() const override;
+	int GetAuthedState(int ClientID) const override;
+	bool IsAuthed(int ClientID) const override;
+	bool IsBanned(int ClientID) override;
+	bool IsEmpty(int ClientID) const override;
+	int GetClientInfo(int ClientID, CClientInfo *pInfo) const override;
+	void GetClientAddr(int ClientID, char *pAddrStr, int Size) const override;
+	const char *ClientName(int ClientID) const override;
+	const char *ClientClan(int ClientID) const override;
+	int ClientCountry(int ClientID) const override;
+	bool ClientIngame(int ClientID) const override;
 
 	virtual int SendMsg(CMsgPacker* pMsg, int Flags, int ClientID, int64 Mask = -1, int WorldID = -1);
 
@@ -278,7 +201,6 @@ public:
 
 	void PumpNetwork();
 
-	const char *GetMapName() const;
 	bool LoadMap(int ID);
 
 	void InitRegister(CNetServer *pNetServer, IEngineMasterServer *pMasterServer, IConsole *pConsole);
@@ -287,6 +209,7 @@ public:
 	static void ConKick(IConsole::IResult *pResult, void *pUser);
 	static void ConStatus(IConsole::IResult *pResult, void *pUser);
 	static void ConShutdown(IConsole::IResult *pResult, void *pUser);
+	static void ConReload(IConsole::IResult *pResult, void *pUser);
 	static void ConLogout(IConsole::IResult *pResult, void *pUser);
 
 	static void ConchainSpecialInfoupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);

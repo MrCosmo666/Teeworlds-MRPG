@@ -1,9 +1,9 @@
 /* Pathfind class by Sushi */
-#include <engine/shared/config.h>
+#include <base/vmath.h>
 #include "PathFinder.h"
 
-#include <game/layers.h>
 #include <game/collision.h>
+#include <game/layers.h>
 
 CPathfinder::CPathfinder(class CLayers* Layers, class CCollision* Collision) : m_pLayers(Layers), m_pCollision(Collision)
 {
@@ -84,7 +84,7 @@ void CPathfinder::SetEnd(vec2 Pos)
 }
 
 
-int CPathfinder::GetIndex(int XPos, int YPos)
+int CPathfinder::GetIndex(int XPos, int YPos) const
 {
 	return XPos + m_pLayers->GameLayer()->m_Width * YPos;
 }

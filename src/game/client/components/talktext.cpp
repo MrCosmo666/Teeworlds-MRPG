@@ -21,7 +21,7 @@
 
 bool CTalkText::IsActive() const
 {
-	return (bool)(m_TalkClientID >= 0 && m_pClient->m_pMenus->IsActive() <= 0);
+	return (bool)(m_TalkClientID >= 0 && !m_pClient->m_pMenus->IsActive());
 }
 
 void CTalkText::RegrnizedTalkingText()
@@ -97,12 +97,16 @@ void CTalkText::OnRender()
 
 	// ---------------- PLAYER SKINS NICKNAME -----------------
 	// --------------------------------------------------------
+	static CTextCursor s_Cursor;
+	s_Cursor.Reset();
+	s_Cursor.m_FontSize = 32.0f;
+
 	const int TalkClientID = m_TalkClientID;
 	const int LocalClientID = m_pClient->m_LocalClientID;
 	if(m_pClient->m_aClients[LocalClientID].m_Active || (TalkClientID >= 0 && TalkClientID < MAX_CLIENTS && m_pClient->m_aClients[TalkClientID].m_Active))
 	{
 		// dialogue with someone
-		if (LocalClientID != TalkClientID) 
+		if (LocalClientID != TalkClientID)
 		{
 			CTeeRenderInfo RenderTalking = m_pClient->m_aClients[TalkClientID].m_RenderInfo;
 			RenderTalking.m_Size = 128.0f;
@@ -114,8 +118,10 @@ void CTalkText::OnRender()
 				pTalkedNick = "Stranger";
 				TextRender()->TextColor(1.0f, 0.95f, 0.0f, 1);
 			}
+
 			float sizeNick = str_length(pTalkedNick);
-			TextRender()->Text(nullptr, (m_ScreenWidth / (1.45f + sizeNick / 64.0f)), m_ScreenHeight / 1.97f, 32.0f, pTalkedNick, -1.0f);
+			s_Cursor.MoveTo((m_ScreenWidth / (1.45f + sizeNick / 64.0f)), m_ScreenHeight / 1.97f);
+			TextRender()->TextOutlined(&s_Cursor, pTalkedNick, -1);
 			TextRender()->TextColor(1, 1, 1, 1);
 		}
 
@@ -124,24 +130,32 @@ void CTalkText::OnRender()
 		RenderYou.m_Size = 128.0f;
 		RenderTools()->RenderTee(CAnimState::GetIdle(), &RenderYou, m_PlayerTalked ? m_TalkedEmote : EMOTE_NORMAL, vec2(1.0f, 0.4f), vec2(m_ScreenWidth / 4.0f, m_ScreenHeight / 1.85f));
 
-		TextRender()->Text(nullptr, m_ScreenWidth / 3.5f, m_ScreenHeight / 1.97f, 32.0f, m_pClient->m_aClients[LocalClientID].m_aName, -1.0f);
+		s_Cursor.Reset();
+		s_Cursor.MoveTo(m_ScreenWidth / 3.5f, m_ScreenHeight / 1.97f);
+		TextRender()->TextOutlined(&s_Cursor, m_pClient->m_aClients[LocalClientID].m_aName, -1);
 	}
 
 	// ------------------------ TEXT --------------------------
 	// --------------------------------------------------------
-	CTextCursor Cursor; 
 	float FontSize = 22.0f;
 	CUIRect BackgroundOther = m_pAnimBackgroundOther->GetPos()->GetRect();
 	BackgroundOther.VMargin(20.0f, &BackgroundOther);
-	TextRender()->SetCursor(&Cursor, BackgroundOther.x, BackgroundOther.y, FontSize, TEXTFLAG_RENDER);
-	Cursor.m_LineWidth = BackgroundOther.w;
-	Cursor.m_MaxLines = ceil(BackgroundOther.h / FontSize);
+
+	s_Cursor.Reset();
+	s_Cursor.MoveTo(BackgroundOther.x, BackgroundOther.y);
+	s_Cursor.m_FontSize = FontSize;
+	s_Cursor.m_MaxWidth = BackgroundOther.w;
+	s_Cursor.m_MaxLines = ceil(BackgroundOther.h / FontSize);
 	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 0.9f);
-	TextRender()->TextEx(&Cursor, m_RegrnizedTalkText, -1);
+	TextRender()->TextOutlined(&s_Cursor, m_RegrnizedTalkText, -1);
+	s_Cursor.Reset();
 
 	// ------------------ INTERACTIVE TEXT -----------------
 	// -----------------------------------------------------
-	TextRender()->Text(nullptr, m_ScreenWidth / 1.8f, m_ScreenHeight / 1.50f, 25.0f, Localize("Press (TAB) for continue!"), -1.0f);
+	s_Cursor.Reset();
+	s_Cursor.MoveTo(m_ScreenWidth / 1.8f, m_ScreenHeight / 1.50f);
+	s_Cursor.m_FontSize = 25.0f;
+	TextRender()->TextOutlined(&s_Cursor, Localize("Press (TAB) for continue!"), -1.0f);
 	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
 	RegrnizedTalkingText();
 }

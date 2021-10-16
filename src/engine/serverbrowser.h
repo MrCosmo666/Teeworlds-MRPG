@@ -100,7 +100,7 @@ public:
 		}
 	}
 
-	int IsLevelFiltered(int Level)
+	int IsLevelFiltered(int Level) const
 	{
 		return m_ServerLevel & (1 << Level);
 	}
@@ -164,6 +164,7 @@ public:
 	virtual void Refresh(int RefreshFlags) = 0;
 	virtual bool IsRefreshing() const = 0;
 	virtual bool IsRefreshingMasters() const = 0;
+	virtual bool WasUpdated(bool Purge) = 0;
 	virtual int LoadingProgression() const = 0;
 
 	virtual int NumServers() const = 0;

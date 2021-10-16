@@ -1,16 +1,12 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/system.h>
 #include <base/math.h>
-#include <base/vmath.h>
 
-#include <math.h>
 #include <engine/map.h>
-#include <engine/kernel.h>
-
 #include <game/mapitems.h>
 #include <game/layers.h>
 #include <game/collision.h>
+
 
 CCollision::CCollision()
 {
@@ -236,7 +232,7 @@ bool CCollision::IntersectLineWithInvisible(vec2 Pos0, vec2 Pos1, vec2* pOutColl
 }
 
 // Cord 'X','x' or 'Y','y' | SumSymbol '+' or '-'
-vec2 CCollision::FindDirCollision(int CheckNum, vec2 SourceVec, char Cord, char SumSymbol)
+vec2 CCollision::FindDirCollision(int CheckNum, vec2 SourceVec, char Cord, char SumSymbol) const
 {
 	const bool IsCordinateX= (bool)(Cord == 'x' || Cord == 'X');
 	const bool IsCordinateY= (bool)(Cord == 'y' || Cord == 'Y');
@@ -384,7 +380,7 @@ void CCollision::MoveBox(vec2 *pInoutPos, vec2 *pInoutVel, vec2 Size, float Elas
 	*pInoutVel = Vel;
 }
 
-void CCollision::MovePhysicalAngleBox(vec2* pPos, vec2* pVel, vec2 Size, float* pAngle, float* pAngleForce, float Elasticity, float Gravity)
+void CCollision::MovePhysicalAngleBox(vec2* pPos, vec2* pVel, vec2 Size, float* pAngle, float* pAngleForce, float Elasticity, float Gravity) const
 {
 	// physic
 	vec2 Pos = *pPos;

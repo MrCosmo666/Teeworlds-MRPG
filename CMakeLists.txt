@@ -1,12 +1,6 @@
-cmake_minimum_required(VERSION 2.8.12...3.19.1)
-if(CMAKE_VERSION VERSION_LESS 3.12)
-  cmake_policy(VERSION ${CMAKE_VERSION})
-endif()
+cmake_minimum_required(VERSION 3.13...3.19.1)
 
-file(STRINGS src/game/version.h VERSION_LINE
-    LIMIT_COUNT 1
-    REGEX GAME_RELEASE_VERSION
-)
+file(STRINGS src/game/version.h VERSION_LINE LIMIT_COUNT 1 REGEX GAME_RELEASE_VERSION)
 
 if(VERSION_LINE MATCHES "\"([0-9]+)\\.([0-9]+)\\.([0-9]+|[0-9]+\\.[0-9]+)\"")
   set(VERSION_MAJOR ${CMAKE_MATCH_1})
@@ -20,19 +14,6 @@ else()
   message(FATAL_ERROR "Couldn't parse version from src/game/version.h")
 endif()
 
-# Extra support for CMake pre-3.0
-if(NOT POLICY CMP0048)
-  project(mmoteeworlds)
-  set(PROJECT_VERSION_MAJOR ${VERSION_MAJOR})
-  set(PROJECT_VERSION_MINOR ${VERSION_MINOR})
-  set(PROJECT_VERSION_PATCH ${VERSION_PATCH})
-  set(PROJECT_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
-  if(VERSION_PATCH STREQUAL "0")
-    set(PROJECT_VERSION ${VERSION_MAJOR}.${VERSION_MINOR})
-  else()
-    set(PROJECT_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
-  endif()
-endif()
 if(VERSION_PATCH STREQUAL "0")
   project(mmoteeworlds VERSION ${VERSION_MAJOR}.${VERSION_MINOR})
 else()
@@ -60,7 +41,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 endif()
 
 include(CheckCCompilerFlag)
-include(CheckCXXCompilerFlag)
+include(CheckCXXCompilerFlag) # unused
 include(CheckSymbolExists)
 
 check_symbol_exists(__i386 "" TARGET_ARCH_X86_i386)
@@ -72,8 +53,8 @@ endif()
 
 set(AUTO_DEPENDENCIES_DEFAULT ON)
 option(SERVER_COMPILE "Build the server together with the client" ON)
-option(DOWNLOAD_GTEST "Download and compile GTest if not found" ${AUTO_DEPENDENCIES_DEFAULT})
 option(DISCORD_SERVER_COMPILE "Compile Sleepy-Discord in conjunction with the server" ON)
+option(DOWNLOAD_GTEST "Download and compile GTest if not found" ${AUTO_DEPENDENCIES_DEFAULT})
 option(PREFER_BUNDLED_LIBS "Prefer bundled libraries over system libraries" ${AUTO_DEPENDENCIES_DEFAULT})
 option(DEV "Don't generate stuff necessary for packaging" OFF)
 set(OpenGL_GL_PREFERENCE LEGACY)
@@ -118,17 +99,6 @@ function(add_c_compiler_flag_if_supported VARIABLE FLAG)
 endfunction()
 
 if(NOT MSVC)
-  if(CMAKE_VERSION VERSION_LESS 3.1 OR TARGET_OS STREQUAL "mac")
-    check_cxx_compiler_flag(-std=gnu++11 FLAG_SUPPORTED_std_gnu__11)
-    if(FLAG_SUPPORTED_std_gnu__11)
-      if(CMAKE_CXX_FLAGS)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
-      else()
-        set(CMAKE_CXX_FLAGS -std=gnu++11)
-      endif()
-    endif()
-  endif()
-
   # Protect the stack pointer.
   # -fstack-protector-all doesn't work on MinGW.
   add_c_compiler_flag_if_supported(OUR_FLAGS -fstack-protector-all)
@@ -162,13 +132,11 @@ if(NOT MSVC)
   if (NOT TARGET_OS STREQUAL "linux")
     add_c_compiler_flag_if_supported(OUR_FLAGS_DEP -Wno-implicit-function-declaration)
   endif()
-  
+
   add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wduplicated-cond)
   add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wduplicated-branches)
   add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wlogical-op)
   add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wrestrict)
-  # TODO: Enable for C++ code except gtest
-  #add_cxx_compiler_flag_if_supported(OUR_FLAGS_OWN "-Wuseless-cast")
 endif()
 
 if(NOT MSVC)
@@ -421,9 +389,9 @@ if(NOT(GTEST_FOUND) AND DOWNLOAD_GTEST)
       file(GLOB_RECURSE MRPG_GTEST_CMAKELISTS ${CMAKE_BINARY_DIR}/googletest-src/CMakeLists.txt)
       foreach(file ${MRPG_GTEST_CMAKELISTS})
         file(READ ${file} CONTENTS)
-        string(REPLACE "cmake_minimum_required(VERSION 2.6.4)" "cmake_minimum_required(VERSION 2.8.12...3.19.1)" CONTENTS "${CONTENTS}")
-        string(REPLACE "cmake_minimum_required(VERSION 2.6.4)" "cmake_minimum_required(VERSION 2.8.12...3.19.1)" CONTENTS "${CONTENTS}")
-        string(REPLACE "cmake_minimum_required(VERSION 2.8.8)" "cmake_minimum_required(VERSION 2.8.12...3.19.1)" CONTENTS "${CONTENTS}")
+        string(REPLACE "cmake_minimum_required(VERSION 2.6.4)" "cmake_minimum_required(VERSION 3.13...3.19.1)" CONTENTS "${CONTENTS}")
+        string(REPLACE "cmake_minimum_required(VERSION 2.6.4)" "cmake_minimum_required(VERSION 3.13...3.19.1)" CONTENTS "${CONTENTS}")
+        string(REPLACE "cmake_minimum_required(VERSION 2.8.8)" "cmake_minimum_required(VERSION 3.13...3.19.1)" CONTENTS "${CONTENTS}")
         file(WRITE ${file} "${CONTENTS}")
       endforeach()
 
@@ -573,7 +541,6 @@ set_src(BASE GLOB_RECURSE src/base
   hash_libtomcrypt.c
   hash_openssl.c
   math.h
-  stringable_enum.h
   system.c
   system.h
   tl/algorithm.h
@@ -642,6 +609,7 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   memheap.cpp
   memheap.h
   message.h
+  mmodata.h
   netban.cpp
   netban.h
   network.cpp
@@ -662,21 +630,8 @@ set_src(ENGINE_SHARED GLOB src/engine/shared
   storage.cpp
 )
 set(ENGINE_GENERATED_SHARED src/generated/nethash.cpp src/generated/protocol.cpp src/generated/protocol.h)
-set_src(GAME_SHARED GLOB src/game
-  collision.cpp
-  collision.h
-  commands.h
-  gamecore.cpp
-  gamecore.h
-  layers.cpp
-  layers.h
-  mapitems.h
-  tuning.h
-  typedef_struct.h
-  variables.h
-  version.h
-  voting.h
-)
+file(GLOB GAME_SHARED "src/game/*.cpp" "src/game/*.h")
+
 set(GAME_GENERATED_SHARED
   src/generated/git_revision.cpp
   src/generated/nethash.cpp
@@ -692,7 +647,6 @@ add_library(engine-shared EXCLUDE_FROM_ALL OBJECT ${ENGINE_INTERFACE} ${ENGINE_S
 add_library(game-shared EXCLUDE_FROM_ALL OBJECT ${GAME_SHARED} ${GAME_GENERATED_SHARED})
 list(APPEND TARGETS_OWN engine-shared game-shared)
 
-
 ########################################################################
 # CLIENT
 ########################################################################
@@ -700,32 +654,32 @@ list(APPEND TARGETS_OWN engine-shared game-shared)
 if(CLIENT_COMPILE)
   # Sources
   file(GLOB ENGINE_CLIENT "src/engine/client/*.cpp" "src/engine/client/*.h")
-  file(GLOB GAME_CLIENT "src/game/client/*.cpp" "src/game/client/*.h" "src/game/client/components/*.cpp" "src/game/client/components/*.h"  "src/game/client/anim_ui/*.cpp" "src/game/client/anim_ui/*.h")
+  file(GLOB_RECURSE GAME_CLIENT "src/game/client/*.cpp" "src/game/client/*.h")
   file(GLOB GAME_EDITOR "src/game/editor/*.cpp" "src/game/editor/*.h")
   set(GAME_GENERATED_CLIENT src/generated/client_data.cpp src/generated/client_data.h)
   set(CLIENT_SRC ${PLATFORM_CLIENT} ${ENGINE_CLIENT} ${GAME_CLIENT} ${GAME_EDITOR} ${GAME_GENERATED_CLIENT})
 
   # Deps
   set(CLIENT_INCLUDES_DIRS
-    ${CURL_INCLUDE_DIRS} 
-    ${FREETYPE_INCLUDE_DIRS} 
-    ${GLEW_INCLUDE_DIRS} 
-    ${PNGLITE_INCLUDE_DIRS} 
-    ${SDL2_INCLUDE_DIRS} 
-    ${WAVPACK_INCLUDE_DIRS} 
+    ${CURL_INCLUDE_DIRS}
+    ${FREETYPE_INCLUDE_DIRS}
+    ${GLEW_INCLUDE_DIRS}
+    ${PNGLITE_INCLUDE_DIRS}
+    ${SDL2_INCLUDE_DIRS}
+    ${WAVPACK_INCLUDE_DIRS}
     ${DISCORDGAMESDK_INCLUDE_DIRS}
   )
   set(CLIENT_LIBRARIES
-    ${CURL_LIBRARIES} 
-    ${FREETYPE_LIBRARIES} 
-    ${GLEW_LIBRARIES} 
-    ${PNGLITE_LIBRARIES} 
-    ${SDL2_LIBRARIES} 
-    ${WAVPACK_LIBRARIES} 
+    ${CURL_LIBRARIES}
+    ${FREETYPE_LIBRARIES}
+    ${GLEW_LIBRARIES}
+    ${PNGLITE_LIBRARIES}
+    ${SDL2_LIBRARIES}
+    ${WAVPACK_LIBRARIES}
     ${DISCORDGAMESDK_LIBRARIES}
   )
   set(DEPS_CLIENT ${DEPS} ${GLEW_DEP} ${PNGLITE_DEP} ${WAVPACK_DEP} ${DISCORDGAMESDK_DEP})
-    
+
   # Icon
   set(CLIENT_ICON)
   if(TARGET_OS STREQUAL "windows")
@@ -782,7 +736,7 @@ if(SERVER_COMPILE AND DISCORD_SERVER_COMPILE)
   set(CPR_LIBRARIES cpr CACHE INTERNAL "")
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include/cpr DESTINATION ${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include)
   set(CPR_INCLUDE_DIRS "${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/include")
-  file(GLOB CPR_LIBRARIES_SRC "${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/cpr/*.cpp" "${CPR_INCLUDE_DIRS}/*.h") 
+  file(GLOB CPR_LIBRARIES_SRC "${PROJECT_SOURCE_DIR}/discord_deps/cpr-external/cpr/*.cpp" "${CPR_INCLUDE_DIRS}/*.h")
   add_library(${CPR_LIBRARIES} EXCLUDE_FROM_ALL OBJECT ${CPR_LIBRARIES_SRC})
   if((MINGW OR TARGET_OS STREQUAL "linux") AND PREFER_BUNDLED_LIBS)
     target_link_libraries(${CPR_LIBRARIES} -lcurl) # wtf
@@ -820,6 +774,7 @@ if(SERVER_COMPILE AND DISCORD_SERVER_COMPILE)
   endif()
 
   #Todo add support for it
+  target_compile_definitions(sleepy-discord PUBLIC NONEEXISTENT_ZLIB_NG)
   target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_UWEBSOCKETS)
   target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_OPUS)
   target_compile_definitions(sleepy-discord PUBLIC NONEXISTENT_SODIUM)
@@ -830,7 +785,7 @@ if(SERVER_COMPILE AND DISCORD_SERVER_COMPILE)
   if(MINGW OR TARGET_OS STREQUAL "linux")
     target_compile_options(sleepy-discord PUBLIC -Wno-duplicated-branches -Wno-deprecated-copy)
   endif()
-  
+
   #The codebase is c++11 but both clang and visual c++ have issues with c++11
   #These issues are fixed by using preprocessor defines to replace code that
   #cause issues with c++14 code
@@ -845,7 +800,7 @@ endif()
 
 if(SERVER_COMPILE)
   # Sources
-  file(GLOB ENGINE_SERVER "src/engine/server/*.cpp" "src/engine/server/*.h" "src/engine/server/discord/*.cpp" "src/engine/server/discord/*.h")
+  file(GLOB_RECURSE ENGINE_SERVER "src/engine/server/*.cpp" "src/engine/server/*.h")
   file(GLOB_RECURSE GAME_SERVER "src/game/server/*.cpp" "src/game/server/*.h")
   file(GLOB LOCALIZED_SERVER "src/teeother/components/*.cpp" "src/teeother/components/*.h" "src/teeother/tl/*.h" "src/teeother/system/*.h")
   set(GAME_GENERATED_SERVER src/generated/server_data.cpp src/generated/server_data.h)
@@ -858,7 +813,7 @@ if(SERVER_COMPILE)
   endif()
 
   set(SERVER_INCLUDES_DIRS
-    ${Boost_INCLUDE_DIRS} 
+    ${Boost_INCLUDE_DIRS}
     ${ICU_INCLUDE_DIRS}
     ${MYSQL_INCLUDE_DIRS}
   )
@@ -868,7 +823,7 @@ if(SERVER_COMPILE)
     ${DISCORD_SERVER_LIBS}
   )
   set(DEPS_SERVER ${DEPS})
-  
+
   # Icon
   set(SERVER_ICON)
   if(TARGET_OS STREQUAL "windows")
@@ -890,7 +845,7 @@ if(SERVER_COMPILE)
 
   list(APPEND TARGETS_OWN ${TARGET_SERVER})
   list(APPEND TARGETS_LINK ${TARGET_SERVER})
-  
+
   if(TARGET_OS AND TARGET_OS STREQUAL "mac")
     set(SERVER_LAUNCHER_SRC src/osxlaunch/server.mm)
     set(TARGET_SERVER_LAUNCHER ${TARGET_SERVER}-Launcher)
@@ -939,6 +894,7 @@ foreach(ABS_T ${TOOLS})
       ${EXTRA_TOOL_SRC}
       $<TARGET_OBJECTS:engine-shared>
     )
+
     target_link_libraries(${TOOL} ${LIBS})
     list(APPEND TARGETS_TOOLS ${TOOL})
   endif()
@@ -955,16 +911,7 @@ add_custom_target(everything DEPENDS ${TARGETS_OWN})
 ########################################################################
 
 if(GTEST_FOUND OR DOWNLOAD_GTEST)
-  set_src(TESTS GLOB src/test
-    fs.cpp
-    git_revision.cpp
-    hash.cpp
-    storage.cpp
-    str.cpp
-    test.cpp
-    test.h
-    thread.cpp
-  )
+  file(GLOB TESTS "src/test/*.cpp" "src/test/*.h")
   set(TARGET_TESTRUNNER testrunner)
   add_executable(${TARGET_TESTRUNNER} EXCLUDE_FROM_ALL
     ${TESTS}
@@ -1309,8 +1256,9 @@ foreach(target ${TARGETS_LINK})
       # Link pthread library statically instead of dynamically.
       # Solution from https://stackoverflow.com/a/28001261.
       target_link_libraries(${target} -Wl,-Bstatic -lstdc++ -lpthread -Wl,-Bdynamic)
-    endif()    
+    endif()
   endif()
+
   target_compile_definitions(${target} PRIVATE GLEW_STATIC)
 endforeach()
 
@@ -1347,6 +1295,9 @@ foreach(target ${TARGETS_OWN})
   if(ICU_FOUND)
 	target_include_directories(${target} PRIVATE ${ICU_INCLUDE_DIRS})
   endif()
+  
+  set_target_properties(${target} PROPERTIES CXX_STANDARD_REQUIRED ON)
+  target_compile_features(${target} PUBLIC cxx_std_14)
 endforeach()
 
 foreach(target ${TARGETS_DEP})

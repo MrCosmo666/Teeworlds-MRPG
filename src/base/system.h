@@ -1068,7 +1068,7 @@ int str_comp_nocase(const char *a, const char *b);
 		- Only garanted to work with a-z/A-Z.
 		- The strings are treated as zero-terminated strings.
 */
-int str_comp_nocase_num(const char *a, const char *b, const int num);
+int str_comp_nocase_num(const char *a, const char *b, int num);
 
 /*
 	Function: str_comp
@@ -1105,7 +1105,7 @@ int str_comp(const char *a, const char *b);
 	Remarks:
 		- The strings are treated as zero-terminated strings.
 */
-int str_comp_num(const char *a, const char *b, const int num);
+int str_comp_num(const char *a, const char *b, int num);
 
 /*
 	Function: str_comp_filenames
@@ -1367,7 +1367,7 @@ int fs_is_dir(const char *path);
 		Gets the modification time of a file
 */
 time_t fs_getmtime(const char* path);
-	
+
 /*
 	Function: fs_chdir
 		Changes current working directory
@@ -1648,6 +1648,20 @@ int str_utf8_check(const char *str);
 		- Garantees that dst string will contain zero-termination.
 */
 void str_utf8_copy_num(char* dst, const char* src, int dst_size, int num);
+
+/*
+	Function: str_utf8_stats
+		Determines the byte size and utf8 character count of a string.
+	Parameters:
+		str - Pointer to the string.
+		max_size - Maximum number of bytes to count.
+		size - Pointer to store size (number of non-zero bytes) of the string.
+		count - Pointer to store count of utf8 characters of the string.
+	Remarks:
+		- Assumes nothing about the encoding of the string.
+		  It's the users responsibility to make sure the bounds are aligned.
+*/
+void str_utf8_stats(const char* str, int max_size, int* size, int* count);
 
 /*
 	Function: shell_execute

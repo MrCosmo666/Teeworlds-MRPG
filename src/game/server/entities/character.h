@@ -2,11 +2,8 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_ENTITIES_CHARACTER_H
 #define GAME_SERVER_ENTITIES_CHARACTER_H
-
-#include <generated/protocol.h>
-
-#include <game/gamecore.h>
 #include <game/server/entity.h>
+
 #include "../mmocore/TileHandle.h"
 
 class CCharacter : public CEntity
@@ -75,16 +72,17 @@ public:
 	//character's size
 	static const int ms_PhysSize = 28;
 	CCharacter(CGameWorld *pWorld);
-	virtual ~CCharacter();
+	~CCharacter() override;
 
 	CPlayer *GetPlayer() const { return m_pPlayer; }
 	TileHandle *GetHelper() const { return m_pHelper; }
 
 	virtual int GetSnapFullID() const;
-	virtual void Tick();
-	virtual void TickDefered();
-	virtual void Snap(int SnappingClient);
-	virtual void PostSnap();
+	void Tick() override;
+	void TickDefered() override;
+	void Snap(int SnappingClient) override;
+	void PostSnap() override;
+
 	virtual bool Spawn(class CPlayer* pPlayer, vec2 Pos);
 	virtual void GiveRandomEffects(int To);
 	virtual bool TakeDamage(vec2 Force, int Dmg, int From, int Weapon);
@@ -109,14 +107,15 @@ public:
 	virtual bool GiveWeapon(int Weapon, int GiveAmmo);
 	bool RemoveWeapon(int Weapon);
 
-	void CreateSnapProj(int SnapID, int Count, int TypeID, bool Dynamic, bool Projectile);
-	void RemoveSnapProj(int Count, int SnapID, bool Effect = false);
-	
+	void CreateSnapProj(int SnapID, int Value, int TypeID, bool Dynamic, bool Projectile);
+	void RemoveSnapProj(int Value, int SnapID, bool Effect = false);
+
 	void ChangePosition(vec2 NewPos);
 	void ResetDoorPos();
 	void UpdateEquipingStats(int ItemID);
 
 	// input
+	vec2 GetMousePos() const { return m_Core.m_Pos + vec2(m_Core.m_Input.m_TargetX, m_Core.m_Input.m_TargetY); }
 	int m_ActiveWeapon;
 	int m_Jumped;
 

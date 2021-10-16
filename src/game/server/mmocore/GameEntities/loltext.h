@@ -1,6 +1,5 @@
 #ifndef GAME_SERVER_ENTITIES_LOLTEXT_H
 #define GAME_SERVER_ENTITIES_LOLTEXT_H
-
 #include <game/server/entity.h>
 
 class CLolPlasma : public CEntity
@@ -15,11 +14,11 @@ class CLolPlasma : public CEntity
 public:
 	CLolPlasma(CGameWorld* pGameWorld, CEntity* pParent, vec2 Pos, vec2 Vel, int Lifespan);
 
-	virtual void Tick();
-	virtual void Snap(int SnappingClient);
+	void Tick() override;
+	void Snap(int SnappingClient) override;
 };
 
-class CLoltext 
+class CLoltext
 {
 public:
 	void Create(CGameWorld *pGameWorld, CEntity *pParent, vec2 Pos, vec2 Vel, int Lifespan, const char *pText, bool Center, bool Follow);

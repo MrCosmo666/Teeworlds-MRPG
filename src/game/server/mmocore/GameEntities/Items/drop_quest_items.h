@@ -2,10 +2,11 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_ENTITIES_QUESTITEM_H
 #define GAME_SERVER_ENTITIES_QUESTITEM_H
+#include <game/server/entity.h>
 
 class CDropQuestItem : public CEntity
 {
-	enum 
+	enum
 	{
 		NUM_IDS = 3
 	};
@@ -19,11 +20,11 @@ class CDropQuestItem : public CEntity
 	int m_FlashTimer;
 
 public:
-	CDropQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, BotJob::QuestBotInfo BotData, int ClientID);
+	CDropQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, QuestBotInfo BotData, int ClientID);
 	virtual ~CDropQuestItem();
 
 	int m_ClientID;
-	BotJob::QuestBotInfo m_QuestBot;
+	QuestBotInfo m_QuestBot;
 
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);

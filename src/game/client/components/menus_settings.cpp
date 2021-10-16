@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-
 #include <base/color.h>
 #include <base/math.h>
 
@@ -13,7 +12,6 @@
 #include <engine/shared/config.h>
 
 #include <generated/protocol.h>
-#include <generated/client_data.h>
 
 #include <game/client/components/maplayers.h>
 #include <game/client/components/sounds.h>
@@ -376,13 +374,13 @@ void CMenus::RenderSkinSelection(CUIRect MainView)
 			if(Item.m_Selected)
 			{
 				TextRender()->TextColor(CUI::ms_HighlightTextColor);
-				TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
+				TextRender()->TextSecondaryColor(CUI::ms_HighlightTextOutlineColor);
 			}
 			UI()->DoLabel(&Label, s->m_aName, 10.0f, CUI::ALIGN_CENTER);
 			if(Item.m_Selected)
 			{
 				TextRender()->TextColor(CUI::ms_DefaultTextColor);
-				TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+				TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 			}
 		}
 	}
@@ -489,13 +487,13 @@ void CMenus::RenderSkinPartSelection(CUIRect MainView)
 			if(Item.m_Selected)
 			{
 				TextRender()->TextColor(CUI::ms_HighlightTextColor);
-				TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
+				TextRender()->TextSecondaryColor(CUI::ms_HighlightTextOutlineColor);
 			}
 			UI()->DoLabel(&Label, s->m_aName, 10.0f, CUI::ALIGN_CENTER);
 			if(Item.m_Selected)
 			{
 				TextRender()->TextColor(CUI::ms_DefaultTextColor);
-				TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+				TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 			}
 		}
 	}
@@ -749,14 +747,14 @@ void CMenus::RenderLanguageSelection(CUIRect MainView, bool Header)
 			if(Item.m_Selected)
 			{
 				TextRender()->TextColor(CUI::ms_HighlightTextColor);
-				TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
+				TextRender()->TextSecondaryColor(CUI::ms_HighlightTextOutlineColor);
 			}
 			Item.m_Rect.y += 2.0f;
 			UI()->DoLabel(&Item.m_Rect, r.front().m_Name, Item.m_Rect.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_LEFT);
 			if(Item.m_Selected)
 			{
 				TextRender()->TextColor(CUI::ms_DefaultTextColor);
-				TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+				TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 			}
 		}
 	}
@@ -767,6 +765,7 @@ void CMenus::RenderLanguageSelection(CUIRect MainView, bool Header)
 	{
 		m_ActiveListBox = ACTLB_LANG;
 		str_copy(g_Config.m_ClLanguagefile, s_Languages[s_SelectedLanguage].m_FileName, sizeof(g_Config.m_ClLanguagefile));
+		TextRender()->SetFontLanguageVariant(g_Config.m_ClLanguagefile);
 		g_Localization.Load(s_Languages[s_SelectedLanguage].m_FileName, Storage(), Console());
 	}
 }
@@ -812,7 +811,7 @@ void CMenus::RenderThemeSelection(CUIRect MainView, bool Header)
 
 		CUIRect Icon;
 		Item.m_Rect.VSplitLeft(Item.m_Rect.h * 2.0f, &Icon, &Item.m_Rect);
-		
+
 		// draw icon if it exists
 		if(Theme.m_IconTexture.IsValid())
 		{
@@ -843,14 +842,14 @@ void CMenus::RenderThemeSelection(CUIRect MainView, bool Header)
 		if(Item.m_Selected)
 		{
 			TextRender()->TextColor(CUI::ms_HighlightTextColor);
-			TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
+			TextRender()->TextSecondaryColor(CUI::ms_HighlightTextOutlineColor);
 		}
 		Item.m_Rect.y += 2.0f;
 		UI()->DoLabel(&Item.m_Rect, aName, Item.m_Rect.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_LEFT);
 		if(Item.m_Selected)
 		{
 			TextRender()->TextColor(CUI::ms_DefaultTextColor);
-			TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+			TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 		}
 	}
 
@@ -1346,7 +1345,7 @@ void CMenus::RenderSettingsPlayer(CUIRect MainView)
 
 		Bottom.VSplitLeft(100.0f, &Label, &Button);
 		Label.y += 17.0f;
-		UI()->DoLabel(&Label, Localize("Country:"), ButtonHeight* ms_FontmodHeight * 0.8f, CUI::ALIGN_CENTER);
+		UI()->DoLabel(&Label, Localize("Flag:"), ButtonHeight* ms_FontmodHeight * 0.8f, CUI::ALIGN_CENTER);
 
 		Button.w = (SkinHeight - 20.0f) * 2 + 20.0f;
 		RenderTools()->DrawUIRect(&Button, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
@@ -1605,6 +1604,8 @@ bool CMenus::DoResolutionList(CUIRect* pRect, CListBox* pListBox,
 	int OldSelected = -1;
 	char aBuf[32];
 
+	float HiDPIScale = Graphics()->ScreenHiDPIScale();
+
 	pListBox->DoStart(20.0f, lModes.size(), 1, 3, OldSelected, pRect);
 
 	for(int i = 0; i < lModes.size(); ++i)
@@ -1621,22 +1622,22 @@ bool CMenus::DoResolutionList(CUIRect* pRect, CListBox* pListBox,
 			int G = gcd(lModes[i].m_Width, lModes[i].m_Height);
 
 			str_format(aBuf, sizeof(aBuf), "%dx%d (%d:%d)",
-					   lModes[i].m_Width,
-					   lModes[i].m_Height,
+						(int)(lModes[i].m_Width * HiDPIScale),
+						(int)(lModes[i].m_Height * HiDPIScale),
 					   lModes[i].m_Width/G,
 					   lModes[i].m_Height/G);
 
 			if(Item.m_Selected)
 			{
 				TextRender()->TextColor(CUI::ms_HighlightTextColor);
-				TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
+				TextRender()->TextSecondaryColor(CUI::ms_HighlightTextOutlineColor);
 			}
 			Item.m_Rect.y += 2.0f;
 			UI()->DoLabel(&Item.m_Rect, aBuf, Item.m_Rect.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_CENTER);
 			if(Item.m_Selected)
 			{
 				TextRender()->TextColor(CUI::ms_DefaultTextColor);
-				TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+				TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 			}
 		}
 	}
@@ -1657,7 +1658,7 @@ void CMenus::RenderSettingsGraphics(CUIRect MainView)
 #ifdef CONF_PLATFORM_MACOSX
 	CheckFullscreen = true;
 #endif
-	
+
 	static const int s_GfxFullscreen = g_Config.m_GfxFullscreen;
 	static const int s_GfxScreenWidth = g_Config.m_GfxScreenWidth;
 	static const int s_GfxScreenHeight = g_Config.m_GfxScreenHeight;
@@ -1736,8 +1737,7 @@ void CMenus::RenderSettingsGraphics(CUIRect MainView)
 		static CButtonContainer s_ButtonScreenId;
 		if(DoButton_Menu(&s_ButtonScreenId, aBuf, 0, &Button))
 		{
-			g_Config.m_GfxScreen = (g_Config.m_GfxScreen + 1) % Graphics()->GetNumScreens();
-			Client()->SwitchWindowScreen(g_Config.m_GfxScreen);
+			Client()->SwitchWindowScreen((g_Config.m_GfxScreen + 1) % Graphics()->GetNumScreens());
 		}
 	}
 
@@ -1869,9 +1869,17 @@ void CMenus::RenderSettingsGraphics(CUIRect MainView)
 		ListRec.HSplitBottom(Spacing, &ListRec, 0);
 		RenderTools()->DrawUIRect(&Button, vec4(0.0f, 0.0f, 0.0f, 0.5f), CUI::CORNER_B, 5.0f);
 		int g = gcd(s_GfxScreenWidth, s_GfxScreenHeight);
-		str_format(aBuf, sizeof(aBuf), Localize("Current: %dx%d (%d:%d)"), s_GfxScreenWidth, s_GfxScreenHeight, s_GfxScreenWidth/g, s_GfxScreenHeight/g);
+		const float HiDPIScale = Graphics()->ScreenHiDPIScale();
+		str_format(aBuf, sizeof(aBuf), Localize("Current: %dx%d (%d:%d)"), (int)(s_GfxScreenWidth * HiDPIScale), (int)(s_GfxScreenHeight * HiDPIScale), s_GfxScreenWidth / g, s_GfxScreenHeight / g);
 		Button.y += 2;
 		UI()->DoLabel(&Button, aBuf, Button.h*ms_FontmodHeight*0.8f, CUI::ALIGN_CENTER);
+
+		static int s_LastScreen = g_Config.m_GfxScreen;
+		if(s_LastScreen != g_Config.m_GfxScreen)
+		{
+			UpdatedFilteredVideoModes();
+			s_LastScreen = g_Config.m_GfxScreen;
+		}
 
 		static CListBox s_RecListBox;
 		static CListBox s_OthListBox;
@@ -1989,7 +1997,7 @@ void CMenus::RenderSettingsSound(CUIRect MainView)
 			g_Config.m_SndMusicMRPG ^= 1;
 			m_pClient->UpdateStateMmoMusic();
 		}
-		
+
 		Sound.HSplitTop(Spacing, 0, &Sound);
 		Sound.HSplitTop(ButtonHeight, &Button, &Sound);
 		Button.VSplitLeft(ButtonHeight, 0, &Button);
@@ -2117,6 +2125,9 @@ void CMenus::ResetSettingsControls()
 
 void CMenus::ResetSettingsGraphics()
 {
+	if(g_Config.m_GfxScreen)
+		Client()->SwitchWindowScreen(0);
+
 	g_Config.m_GfxScreenWidth = Graphics()->DesktopWidth();
 	g_Config.m_GfxScreenHeight = Graphics()->DesktopHeight();
 	g_Config.m_GfxBorderless = 0;
@@ -2162,7 +2173,7 @@ void CMenus::RenderSettings(CUIRect MainView)
 		RenderSettingsGeneral(MainView);
 	else if(g_Config.m_UiSettingsPage == SETTINGS_PLAYER)
 		RenderSettingsPlayer(MainView);
-	else if(g_Config.m_UiSettingsPage == SETTINGS_TBD) // TODO: replace removed tee page to something else	
+	else if(g_Config.m_UiSettingsPage == SETTINGS_TBD) // TODO: replace removed tee page to something else
 		g_Config.m_UiSettingsPage = SETTINGS_PLAYER; // TODO: remove this
 	else if(g_Config.m_UiSettingsPage == SETTINGS_CONTROLS)
 		RenderSettingsControls(MainView);

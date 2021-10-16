@@ -7,7 +7,6 @@
 
 #include <generated/client_data.h>
 
-#include <game/version.h>
 #include <game/client/render.h>
 #include <game/client/ui.h>
 #include "menus.h"
@@ -33,7 +32,7 @@ void CMenus::OnAuthMessage(int MsgType, void* pRawMsg)
 			case AUTH_REGISTER_GOOD:
 			setAuthMessage("The was completed successfully", EAuthColorMessage::SUCCESS_MESSAGE);
 			break;
-			
+
 			case AUTH_LOGIN_GOOD:
 			SetAuthState(false);
 			setAuthMessage("The was completed successfully", EAuthColorMessage::SUCCESS_MESSAGE);
@@ -65,7 +64,7 @@ void CMenus::RenderAuthWindow()
 	if (m_pClient->m_pScoreboard->IsActive())
 		return;
 
-	m_MenuActiveID = EMenuState::AUTHSTATE;
+	m_MenuActiveID = MENU_AUTH_STATE;
 
 	CUIRect MainView = *UI()->Screen();
 	Graphics()->MapScreen(MainView.x, MainView.y, MainView.w, MainView.h);
@@ -185,7 +184,7 @@ void CMenus::RenderAuthWindow()
 		}
 
 		{ // right
-			CUIRect BackRegister; 
+			CUIRect BackRegister;
 			BasicRegister.Margin(5.0f, &BackRegister);
 			RenderTools()->DrawUIRect(&BackRegister, HexToRgba(0x147FF57), CUI::CORNER_ALL, 5.0f);
 		}
@@ -232,7 +231,7 @@ void CMenus::RenderAuthWindow()
 		{
 			BasicRegister.HSplitTop(25.0f, &Label, &BasicRegister);
 			UI()->DoLabel(&Label, Localize("Register account"), 16.0f, CUI::ALIGN_LEFT);
-			
+
 			static char s_aAccount[64];
 			static char s_aPassword[64];
 			static char s_aRepeatPassword[64];
@@ -293,9 +292,6 @@ void CMenus::RenderAuthWindow()
 	IGraphics::CQuadItem QuadItem(MainView.w / 2 - 240, MainView.h / 2 - 270, 513, 128);
 	Graphics()->QuadsDrawTL(&QuadItem, 1);
 	Graphics()->QuadsEnd();
-
-	// render cursor
-	RenderCursor(IMAGE_CURSOR, vec4(1.0f, 0.7f, 0.6f, 0.6f));
 }
 
 void CMenus::setAuthMessage(const char* Message, int EAuthColorMessage)

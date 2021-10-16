@@ -3,14 +3,16 @@
 #ifndef ENGINE_SHARED_DATAFILE_H
 #define ENGINE_SHARED_DATAFILE_H
 
-#include <base/system.h>
 #include <base/hash.h>
+#include <base/system.h>
+
+#define MMO_DATA_FILE "data.mmo"
 
 // raw datafile access
 class CDataFileReader
 {
 	struct CDatafile *m_pDataFile;
-	void *GetDataImpl(int Index, int Swap);
+	void *GetDataImpl(int Index, int Swap) const;
 public:
 	CDataFileReader() : m_pDataFile(0) {}
 	~CDataFileReader() { Close(); }
@@ -20,18 +22,17 @@ public:
 	bool Open(class IStorageEngine *pStorage, const char *pFilename, int StorageType);
 	bool Close();
 
-	void *GetData(int Index);
-	void *GetDataSwapped(int Index); // makes sure that the data is 32bit LE ints when saved
+	void *GetData(int Index) const;
+	void *GetDataSwapped(int Index) const; // makes sure that the data is 32bit LE ints when saved
 	int GetDataSize(int Index) const;
 	void ReplaceData(int Index, char *pData);
 	void UnloadData(int Index);
-	void *GetItem(int Index, int *pType, int *pID);
+	void *GetItem(int Index, int *pType, int *pID) const;
 	int GetItemSize(int Index) const;
-	void GetType(int Type, int *pStart, int *pNum);
+	void GetType(int Type, int *pStart, int *pNum) const;
 	void *FindItem(int Type, int ID);
 	int NumItems() const;
 	int NumData() const;
-	void Unload();
 
 	SHA256_DIGEST Sha256() const;
 	unsigned Crc() const;

@@ -3,12 +3,14 @@
 #include "discord_object_interface.h"
 #include "user.h"
 #include "channel.h"
+#include "stage_instance.h"
 #include "snowflake.h"
 #include "cache.h"
 
 namespace SleepyDiscord {
 	enum Permission : uint64_t;
 	struct Role;
+	struct StageInstance;
 	
 	/*Guild Member Structure
 	Field     Type     Description
@@ -31,6 +33,8 @@ namespace SleepyDiscord {
 		std::string joinedAt;
 		bool deaf = false;
 		bool mute = false;
+		Permission permissions;
+		bool pending = false;
 
 		inline operator User&() {
 			return user;
@@ -44,7 +48,9 @@ namespace SleepyDiscord {
 				json::pair<json::ContainerTypeHelper>(&ServerMember::roles   , "roles"    , json::OPTIONAL_FIELD),
 				json::pair                           (&ServerMember::joinedAt, "joined_at", json::OPTIONAL_FIELD),
 				json::pair                           (&ServerMember::deaf    , "deaf"     , json::OPTIONAL_FIELD),
-				json::pair                           (&ServerMember::mute    , "mute"     , json::OPTIONAL_FIELD)
+				json::pair                           (&ServerMember::mute    , "mute"     , json::OPTIONAL_FIELD),
+				json::pair<UInt64StrTypeHelper>      (&ServerMember::permissions, "permissions", json::OPTIONAL_FIELD),
+				json::pair                           (&ServerMember::pending , "pending"  , json::OPTIONAL_FIELD)
 			);
 		JSONStructEnd
 	};
@@ -73,6 +79,7 @@ namespace SleepyDiscord {
 		//emojis
 		//features
 		bool unavailable;
+		std::vector<StageInstance> stageInstances;
 
 		//presences
 		int MFALevel;
@@ -110,7 +117,8 @@ namespace SleepyDiscord {
 				json::pair                           (&Server::joinedAt                   , "joined_at"                    , json::OPTIONAL_FIELD ),
 				json::pair                           (&Server::large                      , "large"                        , json::OPTIONAL_FIELD ),
 				json::pair<json::ContainerTypeHelper>(&Server::members                    , "members"                      , json::OPTIONAL_FIELD ),
-				json::pair<json::ContainerTypeHelper>(&Server::channels                   , "channels"                     , json::OPTIONAL_FIELD )
+				json::pair<json::ContainerTypeHelper>(&Server::channels                   , "channels"                     , json::OPTIONAL_FIELD ),
+				json::pair<json::ContainerTypeHelper>(&Server::stageInstances             , "stage_instances"              , json::OPTIONAL_FIELD )
 			);
 		JSONStructEnd
 	};
@@ -122,8 +130,8 @@ namespace SleepyDiscord {
 		UnavailableServer(const json::Value& json);
 		//UnavailableServer(const json::Values values);
 
-		enum class AvailableFlag : char {
-			NotSet = -2,
+		enum class AvailableFlag : int8_t {
+			NotSet = '\xFE', //-2 in hex
 			Unavaiable = true,
 			avaiable = false,
 		};
@@ -206,20 +214,21 @@ namespace SleepyDiscord {
 		ServerMembersRequest(const json::Value& json);
 		ServerMembersRequest(const nonstd::string_view & json);
 		Snowflake<Server> serverID;
-		std::string query;
-		int limit;
-		bool presence;
+		//since empty and undefined mean different things to the API, we need optional
+		tl::optional<std::string> query;
+		int limit = 0;
+		bool presence = false;
 		std::vector<Snowflake<User>> userIDs;
 		std::string nonce;
 		
 		JSONStructStart
 			std::make_tuple(
-				json::pair(&ServerMembersRequest::serverID, "guild_id" , json::REQUIRIED_FIELD),
-				json::pair(&ServerMembersRequest::query   , "query"    , json::OPTIONAL_FIELD ),
-				json::pair(&ServerMembersRequest::limit   , "limit"    , json::OPTIONAL_FIELD ),
-				json::pair(&ServerMembersRequest::presence, "presences", json::OPTIONAL_FIELD ),
+				json::pair                           (&ServerMembersRequest::serverID, "guild_id" , json::REQUIRIED_FIELD),
+				json::pair<json::OptionalTypeHelper >(&ServerMembersRequest::query   , "query"    , json::OPTIONAL_FIELD ),
+				json::pair                           (&ServerMembersRequest::limit   , "limit"    , json::REQUIRIED_FIELD),
+				json::pair                           (&ServerMembersRequest::presence, "presences", json::OPTIONAL_FIELD ),
 				json::pair<json::ContainerTypeHelper>(&ServerMembersRequest::userIDs , "user_ids" , json::OPTIONAL_FIELD ), 
-				json::pair(&ServerMembersRequest::nonce   , "nonce"    , json::OPTIONAL_FIELD )
+				json::pair                           (&ServerMembersRequest::nonce   , "nonce"    , json::OPTIONAL_FIELD )
 			);
 		JSONStructEnd
 	};

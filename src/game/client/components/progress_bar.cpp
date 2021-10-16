@@ -1,16 +1,13 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
 #include <engine/graphics.h>
 #include <engine/textrender.h>
 #include <engine/keys.h>
 
 #include <generated/protocol.h>
-#include <generated/client_data.h>
 
 #include "console.h"
 #include "menus.h"
-#include "talktext.h"
 #include "progress_bar.h"
 
 #define COLOR_BACKGROUND vec4(0.2f, 0.2f, 0.2f, 0.5f)
@@ -20,7 +17,7 @@ void CProgressBar::Clear()
 	mem_zero(m_ProgressText, sizeof(m_ProgressText));
 }
 
-bool CProgressBar::IsActive()
+bool CProgressBar::IsActive() const
 {
 	return (bool)(m_ProgressTime > 0.0f);
 }
@@ -42,7 +39,7 @@ void CProgressBar::OnRender()
 	if (Client()->LocalTime() < m_ProgressTime)
 	{
 		// --------------------- BACKGROUND -----------------------
-		CUIRect BackgroundMain = { Width / 3.0f, Height - 120.0f, Width / 3.0f, Height / 17.0f };	
+		CUIRect BackgroundMain = { Width / 3.0f, Height - 120.0f, Width / 3.0f, Height / 17.0f };
 		RenderTools()->DrawRoundRect(&BackgroundMain, vec4(0.2f, 0.2f, 0.2f, 0.4f), 30.0f);
 		BackgroundMain.VMargin(20.0f, &BackgroundMain);
 
@@ -56,15 +53,18 @@ void CProgressBar::OnRender()
 			m_ProgressCount, m_ProgressRequest, aBuf, 5, 10.0f, 6.0f);
 
 		// ----------------------- TEXT ---------------------------
-		CTextCursor Cursor;
+		static CTextCursor s_Cursor;
 		float FontSize = 32.0f;
 		float CenterText = BackgroundMain.x + (BackgroundMain.w / 2.0f);
-		float tw = TextRender()->TextWidth(0, FontSize, m_ProgressText, -1, -1.0f);
+		float tw = TextRender()->TextWidth(FontSize, m_ProgressText, -1);
 		BackgroundMain.HSplitBottom(95.0f, 0, &BackgroundMain);
-		TextRender()->SetCursor(&Cursor, CenterText - tw / 2.0f, BackgroundMain.y, FontSize, TEXTFLAG_RENDER);
-		Cursor.m_LineWidth = BackgroundMain.w;
-		Cursor.m_MaxLines = ceil(BackgroundMain.h / FontSize);
-		TextRender()->TextEx(&Cursor, m_ProgressText, -1);
+
+		s_Cursor.Reset();
+		s_Cursor.m_FontSize = FontSize;
+		s_Cursor.MoveTo(CenterText - tw / 2.0f, BackgroundMain.y);
+		s_Cursor.m_MaxWidth = BackgroundMain.w;
+		s_Cursor.m_MaxLines = ceil(BackgroundMain.h / FontSize);
+		TextRender()->TextOutlined(&s_Cursor, m_ProgressText, -1);
 	}
 }
 

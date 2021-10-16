@@ -1,12 +1,11 @@
-#include <base/vmath.h>
-#include <base/system.h>
-#include <base/math.h>
 #include <game/client/ui.h>
 
 #include "elements.h"
 #include "value.h"
 
-CUIRect CValue::GetRect() { return { m_Value.x, m_Value.y, m_Value.w, m_Value.h }; }
+#include <base/system.h>
+
+CUIRect CValue::GetRect() const { return { m_Value.x, m_Value.y, m_Value.w, m_Value.h }; }
 
 CValue::CValue()
 {

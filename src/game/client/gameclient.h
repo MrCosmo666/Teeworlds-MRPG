@@ -2,8 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_CLIENT_GAMECLIENT_H
 #define GAME_CLIENT_GAMECLIENT_H
-
-#include <base/vmath.h>
 #include <engine/client.h>
 #include <engine/console.h>
 #include <game/layers.h>
@@ -315,7 +313,7 @@ public:
 	virtual int ClientVersion() const;
 	static void GetPlayerLabel(char* aBuf, int BufferSize, int ClientID, const char* ClientName);
 	void StartRendering();
-	
+
 	bool IsXmas() const;
 	bool IsEaster() const;
 	int RacePrecision() const { return m_Snap.m_pGameDataRace ? m_Snap.m_pGameDataRace->m_Precision : 3; }
@@ -335,7 +333,6 @@ public:
 	void DoEnterMessage(const char *pName, int ClientID, int Team);
 	void DoLeaveMessage(const char *pName, int ClientID, const char *pReason);
 	void DoTeamChangeMessage(const char *pName, int ClientID, int Team);
-
 	int GetClientID(const char* pName);
 
 	// actions
@@ -346,12 +343,16 @@ public:
 	void SendReadyChange();
 	void SendSkinChange();
 
+	// todo change it
+	void ParsingMmoData();
+
 	// pointers to all systems
 	class CGameConsole *m_pGameConsole;
 	class CBinds *m_pBinds;
 	class CBroadcast *m_pBroadcast;
 	class CParticles *m_pParticles;
 	class CMenus *m_pMenus;
+	class CInventory *m_pInventory;
 	class CSkins *m_pSkins;
 	class CCountryFlags *m_pCountryFlags;
 	class CFlow *m_pFlow;
@@ -370,6 +371,7 @@ public:
 	class CMapLayers *m_pMapLayersBackGround;
 	class CMapLayers *m_pMapLayersForeGround;
 
+	class CUIGameInterface* m_pGameInterfaceUI;
 	class CTalkText* m_pTalkText;
 	class CCSkinChanger* m_pSkinChanger;
 

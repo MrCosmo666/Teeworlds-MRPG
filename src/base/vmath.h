@@ -3,11 +3,7 @@
 #ifndef BASE_VMATH_H
 #define BASE_VMATH_H
 
-#include <math.h>
-
-#include "math.h"	// mix
-
-// ------------------------------------
+#include "math.h"
 
 template<typename T>
 class vector2_base
@@ -16,7 +12,7 @@ public:
 	union { T x,u; };
 	union { T y,v; };
 
-	vector2_base() {}
+	vector2_base(): x(), y() { }
 	vector2_base(T nx, T ny)
 	{
 		x = nx;
@@ -45,7 +41,7 @@ public:
 };
 
 template<typename T>
-inline vector2_base<T> rotate(const vector2_base<T> &a, float angle)
+vector2_base<T> rotate(const vector2_base<T> &a, float angle)
 {
 	angle = angle * pi / 180.0f;
 	float s = sinf(angle);
@@ -54,19 +50,19 @@ inline vector2_base<T> rotate(const vector2_base<T> &a, float angle)
 }
 
 template<typename T>
-inline T distance(const vector2_base<T> &a, const vector2_base<T> &b)
+T distance(const vector2_base<T> &a, const vector2_base<T> &b)
 {
 	return length(a-b);
 }
 
 template<typename T>
-inline T dot(const vector2_base<T> &a, const vector2_base<T> &b)
+T dot(const vector2_base<T> &a, const vector2_base<T> &b)
 {
 	return a.x*b.x + a.y*b.y;
 }
 
 template<typename T>
-inline vector2_base<T> closest_point_on_line(vector2_base<T> line_point0, vector2_base<T> line_point1, vector2_base<T> target_point)
+vector2_base<T> closest_point_on_line(vector2_base<T> line_point0, vector2_base<T> line_point1, vector2_base<T> target_point)
 {
 	vector2_base<T> c = target_point - line_point0;
 	vector2_base<T> v = (line_point1 - line_point0);
@@ -93,13 +89,13 @@ inline float angle(const vector2_base<float> &a)
 
 inline vector2_base<float> normalize(const vector2_base<float> &v)
 {
-	float l = (float)(1.0f/sqrtf(v.x*v.x + v.y*v.y));
-	return vector2_base<float>(v.x*l, v.y*l);
+	const float l = (float)(1.0f/sqrtf(v.x*v.x + v.y*v.y));
+	return {v.x*l, v.y*l};
 }
 
 inline vector2_base<float> direction(float angle)
 {
-	return vector2_base<float>(cosf(angle), sinf(angle));
+	return {cosf(angle), sinf(angle)};
 }
 
 typedef vector2_base<float> vec2;
@@ -116,7 +112,7 @@ public:
 	union { T y,g,s; };
 	union { T z,b,v,l; };
 
-	vector3_base() {}
+	vector3_base(): x(), y(), z() { }
 	vector3_base(T nx, T ny, T nz)
 	{
 		x = nx;
@@ -146,19 +142,19 @@ public:
 };
 
 template<typename T>
-inline T distance(const vector3_base<T> &a, const vector3_base<T> &b)
+T distance(const vector3_base<T> &a, const vector3_base<T> &b)
 {
 	return length(a-b);
 }
 
 template<typename T>
-inline T dot(const vector3_base<T> &a, const vector3_base<T> &b)
+T dot(const vector3_base<T> &a, const vector3_base<T> &b)
 {
 	return a.x*b.x + a.y*b.y + a.z*b.z;
 }
 
 template<typename T>
-inline vector3_base<T> cross(const vector3_base<T> &a, const vector3_base<T> &b)
+vector3_base<T> cross(const vector3_base<T> &a, const vector3_base<T> &b)
 {
 	return vector3_base<T>(
 		a.y*b.z - a.z*b.y,
@@ -166,7 +162,6 @@ inline vector3_base<T> cross(const vector3_base<T> &a, const vector3_base<T> &b)
 		a.x*b.y - a.y*b.x);
 }
 
-//
 inline float length(const vector3_base<float> &a)
 {
 	return sqrtf(a.x*a.x + a.y*a.y + a.z*a.z);
@@ -174,8 +169,8 @@ inline float length(const vector3_base<float> &a)
 
 inline vector3_base<float> normalize(const vector3_base<float> &v)
 {
-	float l = (float)(1.0f/sqrtf(v.x*v.x + v.y*v.y + v.z*v.z));
-	return vector3_base<float>(v.x*l, v.y*l, v.z*l);
+	const float l = (float)(1.0f/sqrtf(v.x*v.x + v.y*v.y + v.z*v.z));
+	return {v.x*l, v.y*l, v.z*l};
 }
 
 typedef vector3_base<float> vec3;
@@ -193,7 +188,7 @@ public:
 	union { T w,b; };
 	union { T h,a; };
 
-	vector4_base() {}
+	vector4_base(): x(), y(), w(), h() {}
 	vector4_base(T nx, T ny, T nw, T nh)
 	{
 		x = nx;
@@ -209,8 +204,6 @@ public:
 	vector4_base operator *(const T v) const { return vector4_base(x * v, y * v, w * v, h * v); }
 	vector4_base operator /(const vector4_base& v) const { return vector4_base(x/v.x, y/v.y, w/v.w, h/v.h); }
 	vector4_base operator /(const T v) const { return vector4_base(x/v, y/v, w/v, h/v); }
-
-	const vector4_base &operator =(const vector4_base& v) { x = v.x; y = v.y; w = v.w; h = v.h; return *this; }
 
 	const vector4_base& operator +=(const vector4_base& v) { x += v.x; y += v.y; w += v.w; h += v.h; return *this; }
 	const vector4_base& operator -=(const vector4_base& v) { x -= v.x; y -= v.y; w -= v.w; h -= v.h; return *this; }

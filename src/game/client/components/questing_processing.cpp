@@ -1,13 +1,10 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
 #include <engine/graphics.h>
 #include <engine/textrender.h>
 #include <engine/keys.h>
-#include <base/color.h>
 
 #include <generated/protocol.h>
-#include <generated/client_data.h>
 
 #include "console.h"
 #include "menus.h"
@@ -21,7 +18,7 @@ void CQuestingProcessing::Clear()
 	mem_zero((void *)QuestTable, sizeof(QuestTable));
 }
 
-bool CQuestingProcessing::IsActive()
+bool CQuestingProcessing::IsActive() const
 {
 	return QuestTable[0].TableActive() && m_pClient->m_pTalkText->IsActive();
 }
@@ -88,7 +85,9 @@ void CQuestingProcessing::OnRender()
 	const float tx = Width / 3.0f, ty = Height / 2.5f, tw = Width / 3.0f, th = 60.0f;
 	CUIRect BackgroundMain = { tx, ty - tabsize * (60.0f), tw, (45.0f + th * tabsize) };
 	BackgroundMain.Margin(5.0f, &BackgroundMain);
-	RenderTools()->DrawUIRect4(&BackgroundMain, COLOR_BACKGROUND, COLOR_BACKGROUND, COLOR_BACKGROUND / 1.2f, COLOR_BACKGROUND / 1.2f, CUI::CORNER_ALL, 30.0f);
+	RenderTools()->DrawUIRectMonochromeGradient(&BackgroundMain, COLOR_BACKGROUND, CUI::CORNER_ALL, 30.0f);
+	BackgroundMain.Margin(5.0f, &BackgroundMain);
+	RenderTools()->DrawUIRectMonochromeGradient(&BackgroundMain, vec4(0.f, 0.f, 0.f, 0.1f), CUI::CORNER_ALL, 30.0f);
 	BackgroundMain.VMargin(20.0f, &BackgroundMain);
 
 	// --------------------- DRAW TABLES ----------------------
@@ -101,7 +100,8 @@ void CQuestingProcessing::OnRender()
 
 	// ---------------- TEXT (Quest Task List) ----------------
 	// --------------------------------------------------------
-	TextRender()->Text(0x0, BackgroundMain.x, BackgroundMain.y - 30.0f, 42.0f, Localize("Quest Task List"), -1.0f);
+	CTextCursor Cursor(42.0f, BackgroundMain.x, BackgroundMain.y - 24.f);
+	TextRender()->TextShadowed(&Cursor, Localize("Quest Task List"), -1.0f, vec2(0.5f, 0.8f));
 }
 
 void CQuestingProcessing::OnMessage(int MsgType, void *pRawMsg)
@@ -122,7 +122,7 @@ void CQuestingProcessing::OnMessage(int MsgType, void *pRawMsg)
 			QuestTable[i].m_Have = pMsg->m_pHaveNum;
 			QuestTable[i].m_GivingTable = pMsg->m_pGivingTable;
 			str_copy(QuestTable[i].m_aText, pMsg->m_pText, sizeof(QuestTable[i].m_aText));
-		
+
 			char pIcon[16];
 			IntsToStr(pMsg->m_pIcon, 4, pIcon);
 			str_copy(QuestTable[i].m_aIcon, pIcon, sizeof(QuestTable[i].m_aIcon));

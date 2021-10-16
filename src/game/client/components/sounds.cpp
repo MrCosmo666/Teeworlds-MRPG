@@ -36,11 +36,11 @@ struct CUserData
 	bool m_Render;
 } g_UserData;
 
-ISound::CSampleHandle CSounds::GetSampleId(int SetId)
+ISound::CSampleHandle CSounds::GetSampleId(int SetId) const
 {
 	if(!g_Config.m_SndEnable || !Sound()->IsSoundEnabled() || m_WaitForSoundJob || SetId < 0 || SetId >= g_pData->m_NumSounds)
 		return ISound::CSampleHandle();
-	
+
 	CDataSoundset *pSet = &g_pData->m_aSounds[SetId];
 	if(!pSet->m_NumSounds)
 		return ISound::CSampleHandle();
@@ -75,7 +75,7 @@ void CSounds::OnInit()
 	Sound()->SetChannelVolume(CSounds::CHN_GLOBAL, 1.0f);
 	Sound()->SetChannelVolume(CSounds::CHN_MMORPG, 0.7f);
 	Sound()->SetChannelVolume(CSounds::CHN_MMORPG_ATMOSPHERE, 0.2f);
-	
+
 	Sound()->SetListenerPos(0.0f, 0.0f);
 
 	ClearQueue();
@@ -188,7 +188,7 @@ void CSounds::PlayAt(int Chn, int SetId, float Vol, vec2 Pos)
 {
 	if(m_pClient->m_SuppressEvents || (Chn == CHN_MUSIC && !g_Config.m_SndMusic))
 		return;
-	
+
 	ISound::CSampleHandle SampleId = GetSampleId(SetId);
 	if(!SampleId.IsValid())
 		return;
@@ -211,7 +211,7 @@ void CSounds::Stop(int SetId)
 		Sound()->Stop(pSet->m_aSounds[i].m_Id);
 }
 
-bool CSounds::IsPlaying(int SetId)
+bool CSounds::IsPlaying(int SetId) const
 {
 	if(m_WaitForSoundJob || SetId < 0 || SetId >= g_pData->m_NumSounds)
 		return false;

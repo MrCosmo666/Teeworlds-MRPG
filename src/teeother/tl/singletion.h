@@ -12,7 +12,7 @@ protected:
 public:
 	virtual ~CSingleton() {}
 
-	inline static T* Get() 
+	static T* Get() 
 	{
 		if(!m_pSingleton.get())
 			m_pSingleton.reset(new T());

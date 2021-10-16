@@ -24,11 +24,12 @@ public:
 	void Draw();
 	virtual void Set(float RoundCorner, int CornerType){};
 
-	CValue *GetPos() { return m_pPos; }
-	CValue *GetColor() { return m_pColor; }
+	CValue *GetPos() const { return m_pPos; }
+	CValue *GetColor() const { return m_pColor; }
 
 	bool IsAnimated() const { return (m_pPos->m_AnimEnded || m_pColor->m_AnimEnded); }
-	void EndAnimations() { m_pPos->EndAnimation(); m_pColor->EndAnimation(); }
+	void EndAnimations() const
+	{ m_pPos->EndAnimation(); m_pColor->EndAnimation(); }
 
 protected:
     CValue *m_pPos;

@@ -8,25 +8,7 @@
 	And distribute where they are required
 	This will affect the size of the output file
 */
-#include "ComponentsCore/AccountMainJob.h"
-#include "ComponentsCore/AccountMinerJob.h"
-#include "ComponentsCore/AccountPlantJob.h"
-#include "ComponentsCore/BotJob.h"
-#include "ComponentsCore/InventoryJob/InventoryJob.h"
-#include "ComponentsCore/QuestsJob/QuestJob.h"
-#include "ComponentsCore/ShopJob.h"
-#include "ComponentsCore/StorageJob.h"
-
-#include "ComponentsCore/SkillsJob/SkillsJob.h"
-#include "ComponentsCore/WorldSwapJob.h"
-#include "ComponentsCore/CraftJob.h"
-#include "ComponentsCore/DungeonJob.h"
-#include "ComponentsCore/HouseJob.h"
-#include "ComponentsCore/MailBoxJob.h"
-#include "ComponentsCore/GuildJob.h"
-
-#include <engine/server/sql_connect_pool.h>
-#include <engine/server/sql_string_helpers.h>
+#include "MmoComponent.h"
 
 class MmoController
 {
@@ -37,7 +19,7 @@ class MmoController
 		{
  			m_paComponents.push_back(pComponent);
 		}
-		
+
 		void free()
 		{
 			for(auto* pComponent : m_paComponents)
@@ -49,22 +31,21 @@ class MmoController
 	};
 	CStack m_Components;
 
-	class AccountMainJob *m_pAccMain;
-	class BotJob *m_pBotsInfo;
-	class InventoryJob *m_pItemWork;
-	class AccountMinerJob *m_pAccMiner;
-	class AccountPlantJob *m_pAccPlant;
-	class QuestJob *m_pQuest;
-	class ShopJob *m_pShopmail;
-	class StorageJob *m_pStorageWork;
-
-	class GuildJob* m_pGuildJob;
-	class CraftJob* m_pCraftJob;
-	class DungeonJob* m_pDungeonJob;
-	class HouseJob* m_pHouseJob;
-	class MailBoxJob* m_pMailBoxJob;
-	class SkillsJob* m_pSkillJob;
-	class WorldSwapJob* m_pWorldSwapJob;
+	class CAccountCore*m_pAccMain;
+	class CBotCore *m_pBotsInfo;
+	class CInventoryCore *m_pItemWork;
+	class CAccountMinerCore *m_pAccMiner;
+	class CAccountPlantCore *m_pAccPlant;
+	class QuestCore *m_pQuest;
+	class CShopCore *m_pShopmail;
+	class CStorageCore *m_pStorageWork;
+	class GuildCore* m_pGuildJob;
+	class CCraftCore* m_pCraftJob;
+	class DungeonCore* m_pDungeonJob;
+	class CHouseCore* m_pHouseJob;
+	class CMailBoxCore* m_pMailBoxJob;
+	class CSkillsCore* m_pSkillJob;
+	class CWorldSwapCore* m_pWorldSwapJob;
 
 public:
 	explicit MmoController(CGS *pGameServer);
@@ -73,22 +54,22 @@ public:
 	CGS *m_pGameServer;
 	CGS *GS() const { return m_pGameServer; }
 
-	AccountMainJob *Account() const { return m_pAccMain; }
-	BotJob *BotsData() const { return m_pBotsInfo; }
-	InventoryJob *Item() const { return m_pItemWork; }
-	AccountMinerJob *MinerAcc() const { return m_pAccMiner; }
-	AccountPlantJob *PlantsAcc() const { return m_pAccPlant; }
-	QuestJob *Quest() const { return m_pQuest; }
-	ShopJob *Auction() const { return m_pShopmail; }
-	StorageJob *Storage() const { return m_pStorageWork; }
+	CAccountCore *Account() const { return m_pAccMain; }
+	CBotCore *BotsData() const { return m_pBotsInfo; }
+	CInventoryCore *Item() const { return m_pItemWork; }
+	CAccountMinerCore *MinerAcc() const { return m_pAccMiner; }
+	CAccountPlantCore *PlantsAcc() const { return m_pAccPlant; }
+	QuestCore *Quest() const { return m_pQuest; }
+	CShopCore *Auction() const { return m_pShopmail; }
+	CStorageCore *Storage() const { return m_pStorageWork; }
 
-	CraftJob* Craft() const { return m_pCraftJob; }
-	DungeonJob* Dungeon() const { return m_pDungeonJob; }
-	HouseJob* House() const { return m_pHouseJob; }
-	MailBoxJob* Inbox() const { return m_pMailBoxJob; }
-	GuildJob* Member() const { return m_pGuildJob; }
-	SkillsJob* Skills() const { return m_pSkillJob; }
-	WorldSwapJob *WorldSwap() const { return m_pWorldSwapJob; }
+	CCraftCore* Craft() const { return m_pCraftJob; }
+	DungeonCore* Dungeon() const { return m_pDungeonJob; }
+	CHouseCore* House() const { return m_pHouseJob; }
+	CMailBoxCore* Inbox() const { return m_pMailBoxJob; }
+	GuildCore* Member() const { return m_pGuildJob; }
+	CSkillsCore* Skills() const { return m_pSkillJob; }
+	CWorldSwapCore *WorldSwap() const { return m_pWorldSwapJob; }
 
 	// global systems
 	void OnTick();
@@ -98,8 +79,9 @@ public:
 	void OnMessage(int MsgID, void *pRawMsg, int ClientID);
 	bool OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
 	void ResetClientData(int ClientID);
+	void PrepareInformation(class IStorageEngine* pStorage);
 
-	// 
+	//
 	void LoadLogicWorld();
 	static const char* PlayerName(int AccountID);
 	void SaveAccount(CPlayer *pPlayer, int Table);

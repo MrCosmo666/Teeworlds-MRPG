@@ -1,10 +1,11 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <game/server/gamecontext.h>
-
+#include <game/server/mmocore/Components/Bots/BotData.h>
 #include "drop_quest_items.h"
 
-CDropQuestItem::CDropQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, BotJob::QuestBotInfo BotData, int ClientID)
+#include <game/server/gamecontext.h>
+
+CDropQuestItem::CDropQuestItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, QuestBotInfo BotData, int ClientID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPQUEST, Pos, 24.0f)
 {
 	m_Pos = Pos;
@@ -61,11 +62,11 @@ void CDropQuestItem::Tick()
 	GS()->Collision()->MovePhysicalAngleBox(&m_Pos, &m_Vel, ItemSize, &m_Angle, &m_AngleForce, 0.5f);
 
 	// check step and collected it or no
-	const int Count = m_QuestBot.m_aItemSearchCount[0];
+	const int Value = m_QuestBot.m_aItemSearchValue[0];
 	CPlayer* pOwnerPlayer = GS()->m_apPlayers[m_ClientID];
-	CPlayerQuest& pPlayerQuest = pOwnerPlayer->GetQuest(m_QuestBot.m_QuestID);
-	InventoryItem& pPlayerItem = pOwnerPlayer->GetItem(m_QuestBot.m_aItemSearch[0]);
-	if (pPlayerQuest.m_Step != m_QuestBot.m_Step || pPlayerItem.m_Count >= Count)
+	CQuestData& pPlayerQuest = pOwnerPlayer->GetQuest(m_QuestBot.m_QuestID);
+	CItemData& pPlayerItem = pOwnerPlayer->GetItem(m_QuestBot.m_aItemSearch[0]);
+	if (pPlayerQuest.m_Step != m_QuestBot.m_Step || pPlayerItem.m_Value >= Value)
 	{
 		GS()->m_World.DestroyEntity(this);
 		return;
@@ -74,7 +75,7 @@ void CDropQuestItem::Tick()
 	// interactive
 	if (pOwnerPlayer->GetCharacter() && distance(m_Pos, pOwnerPlayer->GetCharacter()->m_Core.m_Pos) < 32.0f)
 	{
-		GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 10, "Press 'Fire' for pick Quest Item");
+		GS()->Broadcast(m_ClientID, BroadcastPriority::GAME_INFORMATION, 10, "Press 'Fire' for pick Quest Item");
 		if (pOwnerPlayer->GetCharacter()->m_ReloadTimer)
 		{
 			pPlayerItem.Add(1);
@@ -136,4 +137,4 @@ void CDropQuestItem::Snap(int SnappingClient)
 		pRifleObj->m_FromY = (int)PosTo.y;
 		pRifleObj->m_StartTick = Server()->Tick() - 4;
 	}
-} 
+}

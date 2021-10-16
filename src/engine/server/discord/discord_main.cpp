@@ -1,29 +1,41 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifdef CONF_DISCORD
+#include "discord_main.h"
+#include "discord_slash_commands.h"
 
-#include <base/math.h>
-#include <base/system.h>
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 
-#include "discord_commands.h"
-#include "discord_main.h"
-
 #include <mutex>
-std::mutex ml_mutex_task;
 
-using namespace sqlstr;
+std::mutex ml_mutex_task;
 DiscordJob::DiscordJob(IServer* pServer) : SleepyDiscord::DiscordClient(g_Config.m_SvDiscordToken, SleepyDiscord::USER_CONTROLED_THREADS)
 {
 	m_pServer = pServer;
 	setIntents(SleepyDiscord::Intent::SERVER_MESSAGES);
+	
+	// start thread discord event bot
+	std::thread(&DiscordJob::run, this).detach();
+	// start handler bridge teeworlds - discord bot
+	std::thread(&DiscordJob::HandlerThreadTasks, this).detach(); 
+}
 
-	std::thread(&DiscordJob::run, this).detach(); // start thread discord event bot
-	std::thread(&DiscordJob::HandlerThreadTasks, this).detach(); // start handler bridge teeworlds - discord bot
+void DiscordJob::onReady(SleepyDiscord::Ready readyData)
+{
+	DiscordCommands::InitCommands(this);
+}
 
-	// initilize commands
-	DiscordCommands::InitCommands();
+void DiscordJob::onInteraction(SleepyDiscord::Interaction interaction)
+{
+	const auto pBtnItem = std::find_if(m_aBtnCallbacks.begin(), m_aBtnCallbacks.end(), [&interaction](const StructButtonCallback& pItem) { return interaction.data.customID == pItem.m_aButtonID; });
+	if(pBtnItem != m_aBtnCallbacks.end() && pBtnItem->m_BtnCallback)
+	{
+		pBtnItem->m_BtnCallback(this, &interaction);
+		return;
+	}
+	
+	DiscordCommands::ExecuteCommand(this, &interaction);
 }
 
 /************************************************************************/
@@ -37,43 +49,40 @@ void DiscordJob::onAddMember(SleepyDiscord::Snowflake<SleepyDiscord::Server> ser
 	ArrayWelcomes.push_back(member.user.showMention() + ", i bet you haven't seen me as long as i had!");
 	ArrayWelcomes.push_back("Welcome, " + member.user.showMention() + ". We hope you're not coming to us without pizza!");
 	ArrayWelcomes.push_back("The raptor "+ member.user.showMention() + " appeared. Watch out!");
-	std::string RulesStr("\n**Don't forget to read the rules <#708092196024352768>!**");
 
-	const int RandomID = random_int() % ArrayWelcomes.size();
-	std::string Fullmessage(ArrayWelcomes[RandomID] + RulesStr);
-
+	const int RandomMessage = random_int() % ArrayWelcomes.size();
 	SleepyDiscord::Embed EmbedWelcome;
-	EmbedWelcome.color = 3553599;
-	EmbedWelcome.description = Fullmessage;
+	EmbedWelcome.color = DC_INVISIBLE_GRAY;
+	EmbedWelcome.description = ArrayWelcomes[RandomMessage];
 	sendMessage(g_Config.m_SvDiscordWelcomeChannel, "\0", EmbedWelcome);
 
 	// give member role
-	addRole(serverID, member.ID, g_Config.m_SvDiscordMemberRole);
+	addRole(serverID, member.ID, g_Config.m_SvDiscordWelcomeRole);
 }
 
-void DiscordJob::onMessage(SleepyDiscord::Message message) 
+void DiscordJob::onMessage(SleepyDiscord::Message message)
 {
 	// skip empty and messages from the bot itself
 	if(message.length() <= 0 || message.author == getCurrentUser().cast())
 	 	return;
 
 	// send from the discord chat to server chat
-	if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordServerChatChannel) == 0)
+	if(message.channelID == g_Config.m_SvDiscordServerChatChannel)
 	{
-		std::string Nickname("D|" + message.author.username);
+		const std::string Nickname("D|" + message.author.username);
 		m_pServer->GameServer(FAKE_DISCORD_WORLD_ID)->FakeChat(Nickname.c_str(), message.content.c_str());
 		return;
 	}
 
 	// suggestions-voting
-	if(str_comp(std::string(message.channelID).c_str(), g_Config.m_SvDiscordSuggestionChannel) == 0)
+	if(std::string(message.channelID) == g_Config.m_SvDiscordSuggestionChannel)
 	{
 		deleteMessage(message.channelID, message);
 
 		SleepyDiscord::Embed EmbedIdeas;
 		EmbedIdeas.title = std::string("Suggestion");
 		EmbedIdeas.description = "From: " + message.author.showMention() + "\n" + message.content;
-		EmbedIdeas.color = 431050;
+		EmbedIdeas.color = DC_DISCORD_INFO;
 		EmbedIdeas.thumbnail.url = message.author.avatarUrl();
 		EmbedIdeas.thumbnail.proxyUrl = message.author.avatarUrl();
 		EmbedIdeas.footer.text = "Use reactions for voting!";
@@ -83,12 +92,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 		SleepyDiscord::Message pMessage = sendMessage(message.channelID, "\0", EmbedIdeas);
 		addReaction(message.channelID, pMessage, "%E2%9C%85");
 		addReaction(message.channelID, pMessage, "%E2%9D%8C");
-		return;
 	}
-
-	// command processor
-	if(DiscordCommands::ExecuteCommand(this, message))
-		return;
 }
 
 /************************************************************************/
@@ -98,7 +102,7 @@ void DiscordJob::SendSuccesfulMessage(SleepyDiscord::Snowflake<SleepyDiscord::Ch
 {
 	SleepyDiscord::Embed EmbedSuccessful;
 	EmbedSuccessful.description = Message;
-	EmbedSuccessful.color = string_to_number(DC_DISCORD_BOT, 0, 1410065407);
+	EmbedSuccessful.color = DC_DISCORD_SUCCESS;
 	sendMessage(channelID, "\0", EmbedSuccessful);
 }
 
@@ -106,13 +110,13 @@ void DiscordJob::SendWarningMessage(SleepyDiscord::Snowflake<SleepyDiscord::Chan
 {
 	SleepyDiscord::Embed EmbedWarning;
 	EmbedWarning.description = Message;
-	EmbedWarning.color = string_to_number(DC_SERVER_WARNING, 0, 1410065407);
+	EmbedWarning.color = DC_DISCORD_WARNING;
 	sendMessage(channelID, "\0", EmbedWarning);
 }
 
-bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::string Channel, std::string Title, std::string SearchNickname, std::string Color, bool MultipleSearch)
+bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::string Channel, std::string Title, std::string SearchNickname, int Color, bool MultipleSearch)
 {
-	CSqlString<64> SearchNick(std::string("%" + SearchNickname + "%").c_str());
+	const CSqlString<64> SearchNick(std::string("%" + SearchNickname + "%").c_str());
 	ResultPtr pRes = SJK.SD("*", "tw_accounts_data", "WHERE Nick LIKE '%s' LIMIT %d", SearchNick.cstr(), (MultipleSearch ? 3 : 1));
 	while(pRes->next())
 	{
@@ -120,7 +124,7 @@ bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::s
 		const int Rank = Server()->GameServer()->GetRank(AccountID);
 		std::string Nickname(pRes->getString("Nick").c_str());
 		std::string PhpArguments = "?player=" + Nickname + "&dicid=" + std::to_string(pRes->getInt("DiscordEquip")) + "&rank=" + std::to_string(Rank);
-		std::string ImageUrl = std::string(g_Config.m_SvDiscordGenerateURL) + PhpArguments;
+		const std::string ImageUrl = std::string(g_Config.m_SvDiscordGenerateURL) + PhpArguments;
 
 		SleepyDiscord::Embed embed;
 		embed.title = Title;
@@ -128,18 +132,18 @@ bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::s
 		embed.image.width = 600;
 		embed.image.url = ImageUrl;
 		embed.image.proxyUrl = ImageUrl;
-		embed.color = Color[0] != '\0' ? string_to_number(Color.c_str(), 0, 1410065407) : 53380;
+		embed.color = Color != 0 ? Color : 16353031;
 		std::string DiscordID(pRes->getString("DiscordID").c_str());
 		if(DiscordID.compare("null") != 0)
 		{
 			SleepyDiscord::User UserAccountOwner = getUser(DiscordID).cast();
 			if(!UserAccountOwner.invalid())
 			{
-				embed.description = "Owns this account: " + UserAccountOwner.showMention() + "\n\nPersonal card MRPG of this user"; // should we ping a person if another person is looking at his card?
-				embed.thumbnail.url = UserAccountOwner.avatarUrl();
-				embed.thumbnail.proxyUrl = UserAccountOwner.avatarUrl();
-				embed.thumbnail.height = 32;
-				embed.thumbnail.width = 32;
+				embed.description = "Account owner: " + UserAccountOwner.showMention();
+				embed.thumbnail.url = UserAccountOwner.avatarUrl(48);
+				embed.thumbnail.proxyUrl = UserAccountOwner.avatarUrl(48);
+				embed.thumbnail.height = 48;
+				embed.thumbnail.width = 48;
 			}
 		}
 		if(!UserRequestFrom.invalid())
@@ -155,11 +159,41 @@ bool DiscordJob::SendGenerateMessage(SleepyDiscord::User UserRequestFrom, std::s
 	return Founded;
 }
 
-bool DiscordJob::SendGenerateMessageAccountID(SleepyDiscord::User UserRequestFrom, std::string Chanal, std::string Title, int AccountID, std::string Color)
+bool DiscordJob::SendGenerateMessageAccountID(SleepyDiscord::User UserRequestFrom, std::string Channel, std::string Title, int AccountID, int Color)
 {
 	CGS* pGS = (CGS*)Server()->GameServer(MAIN_WORLD_ID);
-	std::string Nickname(pGS->Mmo()->PlayerName(AccountID));
-	return SendGenerateMessage(UserRequestFrom, Chanal, Title, Nickname.c_str(), Color, false);
+	const std::string Nickname(pGS->Mmo()->PlayerName(AccountID));
+	return SendGenerateMessage(UserRequestFrom, Channel, Title, Nickname, Color, false);
+}
+
+// TODO: Rework it need impl it for easy use and safe
+void DiscordJob::CreateButton(std::shared_ptr<SleepyDiscord::ActionRow> pActionRow, const char* pInteractive, const char* pLabel, SleepyDiscord::ButtonStyle ButtonStyle, bool Disabled, ButtonCallback pBtnCallback)
+{
+	auto pBtn = std::make_shared<SleepyDiscord::Button>();
+	pBtn->style = ButtonStyle;
+	pBtn->label = pLabel;
+	if(ButtonStyle == SleepyDiscord::ButtonStyle::Link)
+		pBtn->url = pInteractive;
+	else
+		pBtn->customID = pInteractive;
+	
+	if(pBtnCallback)
+	{
+		const auto pItem = std::find_if(m_aBtnCallbacks.begin(), m_aBtnCallbacks.end(), [&pInteractive](const StructButtonCallback& pItem)
+		{ return str_comp(pItem.m_aButtonID, pInteractive) == 0; });
+		if(pItem == m_aBtnCallbacks.end())
+		{
+			StructButtonCallback ButtonCallback;
+			str_copy(ButtonCallback.m_aButtonID, pInteractive, sizeof(ButtonCallback.m_aButtonID));
+			ButtonCallback.m_BtnCallback = pBtnCallback;
+			m_aBtnCallbacks.push_back(ButtonCallback);
+		}
+		else
+			pItem->m_BtnCallback = pBtnCallback;
+	}
+	
+	pBtn->disabled = Disabled;
+	pActionRow->components.push_back(pBtn);
 }
 
 /************************************************************************/

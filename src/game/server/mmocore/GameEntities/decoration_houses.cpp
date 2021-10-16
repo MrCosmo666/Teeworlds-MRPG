@@ -1,6 +1,7 @@
-#include <generated/protocol.h>
-#include <game/server/gamecontext.h>
 #include "decoration_houses.h"
+
+#include <engine/server.h>
+#include <game/game_context.h>
 
 CDecorationHouses::CDecorationHouses(CGameWorld* pGameWorld, vec2 Pos, int HouseID, int DecoID)
 	: CEntity(pGameWorld, CGameWorld::ENTTYPE_DECOHOUSE, Pos)
@@ -10,7 +11,7 @@ CDecorationHouses::CDecorationHouses(CGameWorld* pGameWorld, vec2 Pos, int House
 
 	GameWorld()->InsertEntity(this);
 
-	if (SwitchToObject(true) >= 0) 
+	if (SwitchToObject(true) >= 0)
 	{
 		for (int i = 0; i < NUM_IDS; i++)
 			m_IDs[i] = Server()->SnapNewID();
@@ -18,14 +19,14 @@ CDecorationHouses::CDecorationHouses(CGameWorld* pGameWorld, vec2 Pos, int House
 }
 CDecorationHouses::~CDecorationHouses()
 {
-	if (SwitchToObject(true) >= 0) 
+	if (SwitchToObject(true) >= 0)
 	{
 		for (int i = 0; i < NUM_IDS; i++)
 			Server()->SnapFreeID(m_IDs[i]);
 	}
 }
 
-int CDecorationHouses::SwitchToObject(bool Data)
+int CDecorationHouses::SwitchToObject(bool Data) const
 {
 	switch (m_DecoID)
 	{
@@ -55,9 +56,9 @@ void CDecorationHouses::Snap(int SnappingClient)
 	}
 
 	float AngleStart = (2.0f * pi * Server()->Tick() / static_cast<float>(Server()->TickSpeed())) / 10.0f;
-	float AngleStep = 2.0f * pi / CDecorationHouses::BODY;
+	float AngleStep = 2.0f * pi / BODY;
 	float Radius = 30.0f;
-	for (int i = 0; i < CDecorationHouses::BODY; i++)
+	for (int i = 0; i < BODY; i++)
 	{
 		vec2 PosStart = m_Pos + vec2(Radius * cos(AngleStart + AngleStep * i), Radius * sin(AngleStart + AngleStep * i));
 		CNetObj_Projectile* pObj = static_cast<CNetObj_Projectile*>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, m_IDs[i], sizeof(CNetObj_Projectile)));

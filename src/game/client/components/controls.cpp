@@ -133,9 +133,9 @@ int CControls::SnapInput(int *pData)
 	m_LastData.m_PlayerFlags = m_InputData.m_PlayerFlags;
 
 	// we freeze the input if chat or menu is activated
-	if(m_pClient->m_pChat->IsActive() || 
-		m_pClient->m_pMenus->IsActive() || 
-		m_pClient->m_pGameConsole->IsConsoleActive() || 
+	if(m_pClient->m_pChat->IsActive() ||
+		m_pClient->m_pMenus->IsActive() ||
+		m_pClient->m_pGameConsole->IsConsoleActive() ||
 		!Client()->IsWindowActive())
 	{
 		OnReset(true); // OnReset();

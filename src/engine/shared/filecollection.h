@@ -2,6 +2,9 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef ENGINE_SHARED_FILECOLLECTION_H
 #define ENGINE_SHARED_FILECOLLECTION_H
+#include <base/system.h>
+
+class IStorageEngine;
 
 class CFileCollection
 {
@@ -21,7 +24,7 @@ class CFileCollection
 	char m_aPath[512];
 	IStorageEngine *m_pStorage;
 
-	bool IsFilenameValid(const char *pFilename);
+	bool IsFilenameValid(const char *pFilename) const;
 	int64 ExtractTimestamp(const char *pTimestring);
 	void BuildTimestring(int64 Timestamp, char *pTimestring);
 

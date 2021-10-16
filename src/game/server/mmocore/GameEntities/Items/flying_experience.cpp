@@ -1,8 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <game/server/gamecontext.h>
-
 #include "flying_experience.h"
+
+#include <game/server/gamecontext.h>
 
 CFlyingExperience::CFlyingExperience(CGameWorld *pGameWorld, vec2 Pos, int ClientID, int Experience, vec2 InitialVel)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPBONUS, Pos)

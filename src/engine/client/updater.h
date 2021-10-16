@@ -3,8 +3,6 @@
 
 #include <engine/updater.h>
 #include <engine/client/http.h>
-#include <map>
-#include <string>
 
 #define CLIENT_EXEC "mmoteeworlds"
 
@@ -21,6 +19,8 @@
 
 #define PLAT_CLIENT_DOWN CLIENT_EXEC "-" PLAT_NAME PLAT_EXT
 #define PLAT_CLIENT_EXEC CLIENT_EXEC "-updated" PLAT_EXT
+
+#include <map>
 
 class CUpdater : public IUpdater
 {

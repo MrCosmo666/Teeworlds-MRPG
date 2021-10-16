@@ -1,10 +1,10 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/hash_ctxt.h>
-#include <base/system.h>
 #include <engine/storage.h>
 #include "linereader.h"
 #include <zlib.h>
+
+#include <base/hash_ctxt.h>
 
 // compiled-in data-dir path
 #define DATA_DIR "data"
@@ -40,7 +40,7 @@ public:
 	{
 		// get userdir
 		fs_storage_path(pApplicationName, m_aUserDir, sizeof(m_aUserDir));
-		
+
 		// get appdir
 		FindAppDir(ppArguments[0]);
 
@@ -135,7 +135,7 @@ public:
 		AddPath("$APPDIR");
 	}
 
-	bool IsDuplicatePath(const char *pPath)
+	bool IsDuplicatePath(const char *pPath) const
 	{
 		for (int i = 0; i < m_NumPaths; ++i)
 		{
@@ -216,7 +216,7 @@ public:
 			}
 		}
 	}
-	
+
 	void FindAppDir(const char *pArgv0)
 	{
 		// check for usable path in argv[0]
@@ -224,7 +224,7 @@ public:
 		for(unsigned i = 0; pArgv0[i]; ++i)
 			if(pArgv0[i] == '/' || pArgv0[i] == '\\')
 				Pos = i;
-		
+
 		if(Pos < MAX_PATH_LENGTH)
 		{
 			str_copy(m_aAppDir, pArgv0, Pos+1);
@@ -459,7 +459,7 @@ public:
 					return 0;
 				}
 			}
-			
+
 			return 1;
 		}
 
@@ -474,7 +474,7 @@ public:
 		pCBData->m_pBuffer[0] = 0;
 
 		char aBuf[MAX_PATH_LENGTH];
-		
+
 		if(Type == TYPE_ALL)
 		{
 			// search within all available directories
@@ -589,7 +589,7 @@ public:
 
 		GetPath(Type, pDir, pBuffer, BufferSize);
 	}
-	
+
 	virtual bool GetHashAndSize(const char *pFilename, int StorageType, SHA256_DIGEST *pSha256, unsigned *pCrc, unsigned *pSize)
 	{
 		IOHANDLE File = OpenFile(pFilename, IOFLAG_READ, StorageType);

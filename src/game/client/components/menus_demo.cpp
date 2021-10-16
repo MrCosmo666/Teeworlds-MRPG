@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-
 #include <base/math.h>
 
 #include <engine/demo.h>
@@ -20,10 +19,10 @@
 #include "maplayers.h"
 #include "menus.h"
 
-CMenus::CColumn CMenus::ms_aDemoCols[] = {
-	{COL_DEMO_NAME,		CMenus::SORT_DEMONAME, Localize("Name"), 0, 100.0f, 0, {0}, {0}, CUI::ALIGN_CENTER},
-	{COL_DEMO_LENGTH,	CMenus::SORT_LENGTH, Localize("Length"), 1, 80.0f, 0, {0}, {0}, CUI::ALIGN_CENTER},
-	{COL_DEMO_DATE,		CMenus::SORT_DATE, Localize("Date"), 1, 170.0f, 0, {0}, {0}, CUI::ALIGN_CENTER},
+CMenus::CColumn CMenus::ms_aDemoCols[] = { // Localize("Name"); Localize("Length"); Localize("Date"); - these strings are localized within CLocConstString
+	{COL_DEMO_NAME,		CMenus::SORT_DEMONAME, "Name", 0, 100.0f, 0, {0}, {0}, CUI::ALIGN_CENTER},
+	{COL_DEMO_LENGTH,	CMenus::SORT_LENGTH, "Length", 1, 80.0f, 0, {0}, {0}, CUI::ALIGN_CENTER},
+	{COL_DEMO_DATE,		CMenus::SORT_DATE, "Date", 1, 170.0f, 0, {0}, {0}, CUI::ALIGN_CENTER},
 };
 
 bool CMenus::FetchHeader(CDemoItem* pItem)
@@ -46,9 +45,9 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 	const float ButtonbarHeight = 20.0f;
 	const float NameBarHeight = 20.0f;
 	const float Margins = 5.0f;
-	
+
 	float TotalHeight;
-	if(m_MenuActiveID == EMenuState::ESCSTATE)
+	if(m_MenuActiveID == MENU_ESC_STATE)
 		TotalHeight = SeekBarHeight+ButtonbarHeight+NameBarHeight+Margins*3;
 	else
 		TotalHeight = SeekBarHeight+Margins*2;
@@ -57,7 +56,7 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 	MainView.VSplitLeft(50.0f, 0, &MainView);
 	MainView.VSplitRight(450.0f, &MainView, 0);
 
-	if (m_SeekBarActive || m_MenuActiveID == EMenuState::ESCSTATE) // only draw the background if SeekBar or Menu is active
+	if (m_SeekBarActive || m_MenuActiveID == MENU_ESC_STATE) // only draw the background if SeekBar or Menu is active
 		RenderTools()->DrawUIRect(&MainView, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha/100.0f), CUI::CORNER_T, 10.0f);
 
 	MainView.Margin(5.0f, &MainView);
@@ -86,7 +85,7 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 	if(m_SeekBarActivatedTime < Now - 5 * time_freq())
 		m_SeekBarActive = false;
 
-	if(m_MenuActiveID == EMenuState::ESCSTATE)
+	if(m_MenuActiveID == MENU_ESC_STATE)
 	{
 		MainView.HSplitTop(SeekBarHeight, &SeekBar, &ButtonBar);
 		ButtonBar.HSplitTop(Margins, 0, &ButtonBar);
@@ -100,7 +99,7 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 
 	// do seekbar
 	float PositionToSeek = -1.0f;
-	if(m_SeekBarActive || m_MenuActiveID == EMenuState::ESCSTATE)
+	if(m_SeekBarActive || m_MenuActiveID == MENU_ESC_STATE)
 	{
 		static bool s_PausedBeforeSeeking = false;
 		static float s_PrevAmount = -1.0f;
@@ -260,7 +259,7 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 		m_SeekBarActivatedTime = Now;
 	}
 
-	if(m_MenuActiveID == EMenuState::ESCSTATE)
+	if(m_MenuActiveID == MENU_ESC_STATE)
 	{
 		// do buttons
 		CUIRect Button;
@@ -321,10 +320,12 @@ void CMenus::RenderDemoPlayer(CUIRect MainView)
 		DemoPlayer()->GetDemoName(aDemoName, sizeof(aDemoName));
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), Localize("Demofile: %s"), aDemoName);
-		CTextCursor Cursor;
-		TextRender()->SetCursor(&Cursor, NameBar.x, NameBar.y, Button.h*0.5f, TEXTFLAG_RENDER|TEXTFLAG_STOP_AT_END);
-		Cursor.m_LineWidth = MainView.w;
-		TextRender()->TextEx(&Cursor, aBuf, -1);
+		static CTextCursor s_Cursor;
+		s_Cursor.m_FontSize = Button.h * 0.5f;
+		s_Cursor.MoveTo(NameBar.x, NameBar.y);
+		s_Cursor.Reset();
+		s_Cursor.m_MaxWidth = MainView.w;
+		TextRender()->TextOutlined(&s_Cursor, aBuf, -1);
 	}
 
 	if(IncreaseDemoSpeed)
@@ -559,7 +560,7 @@ void CMenus::RenderDemoList(CUIRect MainView)
 				if(Item.m_Selected)
 				{
 					TextRender()->TextColor(CUI::ms_HighlightTextColor);
-					TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
+					TextRender()->TextSecondaryColor(CUI::ms_HighlightTextOutlineColor);
 				}
 				if(ID == COL_DEMO_NAME)
 				{
@@ -586,7 +587,7 @@ void CMenus::RenderDemoList(CUIRect MainView)
 				}
 				TextRender()->TextColor(CUI::ms_DefaultTextColor);
 				if(Item.m_Selected)
-					TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+					TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 			}
 		}
 	}
@@ -685,16 +686,10 @@ void CMenus::RenderDemoList(CUIRect MainView)
 			}
 			else // file
 			{
-				char aBuf[IO_MAX_PATH_LENGTH];
-				str_format(aBuf, sizeof(aBuf), "%s/%s", m_aCurrentDemoFolder, m_lDemos[m_DemolistSelectedIndex].m_aFilename);
-				const char* pError = Client()->DemoPlayer_Play(aBuf, m_lDemos[m_DemolistSelectedIndex].m_StorageType);
-				if(pError)
-					PopupMessage(Localize("Error loading demo"), pError, Localize("Ok"));
-				else
-				{
-					UI()->SetActiveItem(0);
-					return;
-				}
+				str_format(m_aDemoLoadingFile, sizeof(m_aDemoLoadingFile), "%s/%s", m_aCurrentDemoFolder, m_lDemos[m_DemolistSelectedIndex].m_aFilename);
+				m_DemoLoadingStorageType = m_lDemos[m_DemolistSelectedIndex].m_StorageType;
+				m_Popup = POPUP_LOADING_DEMO;
+				UI()->SetActiveItem(0);
 			}
 		}
 	}
@@ -721,10 +716,10 @@ float CMenus::RenderDemoDetails(CUIRect View)
 	if(!m_DemolistSelectedIsDir && m_DemolistSelectedIndex >= 0 && m_lDemos[m_DemolistSelectedIndex].m_Valid && m_lDemos[m_DemolistSelectedIndex].m_InfosLoaded)
 	{
 		CUIRect Button;
-		
+
 		const float ButtonHeight = 20.0f;
 		const float Spacing = 2.0f;
-		
+
 		View.HSplitTop(Spacing, 0, &View);
 		View.HSplitTop(ButtonHeight, &Button, &View);
 		DoInfoBox(&Button, Localize("Created"), m_lDemos[m_DemolistSelectedIndex].m_Info.m_aTimestamp);
@@ -768,17 +763,23 @@ float CMenus::RenderDemoDetails(CUIRect View)
 
 		CUIRect ButtonRight;
 		Button.VSplitMid(&Button, &ButtonRight);
-		float Size = float((m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapSize[0] << 24) | (m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapSize[1] << 16) |
-			(m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapSize[2] << 8) | (m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapSize[3])) / 1024.0f;
+		const float Size = float(bytes_be_to_uint(m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapSize)) / 1024.0f;
 		str_format(aBuf, sizeof(aBuf), Localize("%.3f KiB"), Size);
 		DoInfoBox(&Button, Localize("Size"), aBuf);
 
-		unsigned Crc = (m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapCrc[0] << 24) | (m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapCrc[1] << 16) |
-			(m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapCrc[2] << 8) | (m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapCrc[3]);
+		const unsigned Crc = bytes_be_to_uint(m_lDemos[m_DemolistSelectedIndex].m_Info.m_aMapCrc);
 		str_format(aBuf, sizeof(aBuf), "%08x", Crc);
 		DoInfoBox(&ButtonRight, Localize("Crc"), aBuf);
 	}
 
 	//unused
 	return 0.0f;
+}
+
+void CMenus::Con_Play(IConsole::IResult* pResult, void* pUserData)
+{
+	CMenus* pSelf = (CMenus*)pUserData;
+	str_copy(pSelf->m_aDemoLoadingFile, pResult->GetString(0), sizeof(pSelf->m_aDemoLoadingFile));
+	pSelf->m_DemoLoadingStorageType = IStorageEngine::TYPE_ALL;
+	pSelf->m_Popup = POPUP_LOADING_DEMO;
 }

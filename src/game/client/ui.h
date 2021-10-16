@@ -3,6 +3,9 @@
 #ifndef GAME_CLIENT_UI_H
 #define GAME_CLIENT_UI_H
 
+#include <base/vmath.h>
+#include <vector>
+
 // TODO: Animations Rect rework
 enum ANIMATION_TYPE
 {
@@ -100,6 +103,9 @@ class CUI
 	class IGraphics* m_pGraphics;
 	class IInput* m_pInput;
 	class ITextRender* m_pTextRender;
+	class IClient* m_pClient;
+	class CWindowUI* m_pCheckWindow;
+	class CWindowUI* m_pHoveredWindow;
 
 public:
 	static const vec4 ms_DefaultTextColor;
@@ -109,9 +115,10 @@ public:
 	static const vec4 ms_TransparentTextColor;
 
 	// TODO: Refactor: Fill this in
-	void Init(class IGraphics *pGraphics, class IInput* pInput, class ITextRender *pTextRender)
-	{ 
-		m_pGraphics = pGraphics; 
+	void Init(class IClient *pClient, class IGraphics *pGraphics, class IInput* pInput, class ITextRender *pTextRender)
+	{
+		m_pClient = pClient;
+		m_pGraphics = pGraphics;
 		m_pInput = pInput;
 		m_pTextRender = pTextRender;
 	}
@@ -120,6 +127,7 @@ public:
 	class ITextRender *TextRender() const { return m_pTextRender; }
 
 	CUI();
+	~CUI();
 
 	enum
 	{
@@ -164,6 +172,19 @@ public:
 	bool MouseButton(int Index) const { return (m_MouseButtons >> Index) & 1; }
 	bool MouseButtonClicked(int Index) const { return MouseButton(Index) && !((m_LastMouseButtons >> Index) & 1); }
 
+	enum
+	{
+		RECTLIMITSCREEN_ALL = -1,
+		RECTLIMITSCREEN_UP = 1 << 0,
+		RECTLIMITSCREEN_DOWN = 1 << 1,
+
+		RECTLIMITSCREEN_SKIP_BORDURE_UP = 1 << 2,
+		RECTLIMITSCREEN_SKIP_BORDURE_DOWN = 1 << 3,
+
+		RECTLIMITSCREEN_ALIGN_CENTER_X = 1 << 4,
+	};
+	void MouseRectLimitMapScreen(CUIRect* pRect, float Indent, int LimitRectFlag = -1);
+
 	void SetHotItem(const void *pID) { m_pBecommingHotItem = pID; }
 	void SetActiveItem(const void *pID) { m_ActiveItemValid = true; m_pActiveItem = pID; if (pID) m_pLastActiveItem = pID; }
 	bool CheckActiveItem(const void *pID) { if(m_pActiveItem == pID) { m_ActiveItemValid = true; return true; } return false; };
@@ -178,7 +199,7 @@ public:
 
 	bool MouseInside(const CUIRect* pRect) const { return pRect->Inside(m_MouseX, m_MouseY); };
 	bool MouseInsideClip() const { return !IsClipped() || MouseInside(ClipArea()); };
-	bool MouseHovered(const CUIRect* pRect) const { return MouseInside(pRect) && MouseInsideClip(); };
+	bool MouseHovered(const CUIRect* pRect) const;
 	void ConvertCursorMove(float* pX, float* pY, int CursorType) const;
 
 	bool KeyPress(int Key) const;
@@ -189,13 +210,57 @@ public:
 	void ClipEnable(const CUIRect *pRect);
 	void ClipDisable();
 	const CUIRect* ClipArea() const;
-	inline bool IsClipped() const { return m_NumClips > 0; };
+	bool IsClipped() const { return m_NumClips > 0; };
 
 	bool DoButtonLogic(const void* pID, const CUIRect* pRect, int Button = 0);
 	int DoPickerLogic(const void *pID, const CUIRect *pRect, float *pX, float *pY);
 
-	void DoLabel(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, float LineWidth = -1.0f, bool MultiLine = true);
-	void DoLabelHighlighted(const CUIRect* pRect, const char* pText, const char* pHighlighted, float FontSize, const vec4& TextColor, const vec4& HighlightColor);
+	void DoLabel(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, float LineWidth = -1.0f, bool MultiLine = true) const;
+	void DoLabelColored(const CUIRect* pRect, const char* pText, float FontSize, EAlignment Align, vec4 Color, float LineWidth = -1.0f, bool MultiLine = true) const;
+	void DoLabelHighlighted(const CUIRect* pRect, const char* pText, const char* pHighlighted, float FontSize, const vec4& TextColor, const vec4& HighlightColor) const;
+
+	// CUI ELEMENTS over time to adjust the order
+	enum CButtonLogicEvent
+	{
+		EMPTY = 0,
+		EVENT_PRESS = 1 << 0,
+		EVENT_PRESSED = 1 << 1,
+		EVENT_RELEASE = 1 << 2,
+		EVENT_HOVERED = 1 << 3,
+	};
+
+	struct AnimFade
+	{
+		CUIRect m_Rect;
+		float m_Seconds;
+		float m_StartTime;
+	};
+	std::vector< AnimFade > m_AnimFades;
+	float GetFade(CUIRect* pRect, bool Checked = false, float Seconds = 0.6f);
+	int DoMouseEventLogic(const CUIRect* pRect, int Button = 0) const;
+
+	// window system
+	enum
+	{
+		WINDOWFLAG_MINIMIZE = 1 << 0,
+		WINDOWFLAG_CLOSE = 1 << 1,
+		WINDOWFLAG_ALL = WINDOWFLAG_MINIMIZE | WINDOWFLAG_CLOSE,
+
+		WINDOW_WITHOUT_BORDURE = 1 << 2,
+		WINDOW_CLOSE_CLICKING_OUTSIDE = 1 << 3,
+	};
+
+	static class CWindowUI* CreateWindow(const char* pWindowName, vec2 WindowSize, class CWindowUI* pDependentWindow = nullptr, bool* pRenderDependence = nullptr, int WindowFlags = WINDOWFLAG_ALL);
+
+	void StartCheckWindow(class CWindowUI* pWindow) { m_pCheckWindow = pWindow; }
+	void FinishCheckWindow() { m_pCheckWindow = nullptr; }
+	void WindowRender();
+	void WindowsClear();
+
+	// slots
+	class CInventorySlot* m_pHoveredSlot;
+	class CInventorySlot* m_pSelectionSlot;
+	class CInventorySlot* m_pInteractiveSlot;
 };
 
 #endif

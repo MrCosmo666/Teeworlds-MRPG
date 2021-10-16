@@ -5,7 +5,6 @@
 #include "kernel.h"
 
 #include "message.h"
-#include "graphics.h"
 
 #include <generated/protocol.h>
 
@@ -91,7 +90,7 @@ public:
 	virtual void AutoStatScreenshot_Start() = 0;
 	virtual void AutoScreenshot_Start() = 0;
 	virtual void ServerBrowserUpdate() = 0;
-	
+
 	// gfx
 	virtual void SwitchWindowScreen(int Index) = 0;
 	virtual void ToggleFullscreen() = 0;
@@ -110,6 +109,8 @@ public:
 	virtual const char *MapDownloadName() const = 0;
 	virtual int MapDownloadAmount() const = 0;
 	virtual int MapDownloadTotalsize() const = 0;
+	virtual int MmoDownloadAmount() const = 0;
+	virtual int MmoDownloadTotalsize() const = 0;
 
 	// input
 	virtual const int *GetInput(int Tick) const = 0;
@@ -119,6 +120,7 @@ public:
 	virtual void RequestMmoInfo() = 0;
 	virtual bool EditorHasUnsavedData() = 0;
 	virtual void OpenUpdateArchive() = 0;
+	virtual const char* GetJsonDataMRPG(int DataType) = 0;
 
 	// remote console
 	virtual void RconAuth(const char *pUsername, const char *pPassword) = 0;
@@ -142,7 +144,7 @@ public:
 	virtual const void *SnapFindItem(int SnapID, int Type, int ID) const = 0;
 	virtual const void *SnapGetItem(int SnapID, int Index, CSnapItem *pItem) const = 0;
 	virtual void SnapInvalidateItem(int SnapID, int Index) = 0;
-	
+
 	virtual void *SnapNewItem(int Type, int ID, int Size) = 0;
 
 	virtual void SnapSetStaticsize(int ItemType, int Size) = 0;
@@ -163,13 +165,10 @@ public:
 	virtual const char *ErrorString() const = 0;
 	virtual const char *LatestVersion() const = 0;
 	virtual bool ConnectionProblems() const = 0;
-
 	virtual bool SoundInitFailed() const = 0;
 
 	// mrpg
-public:
 	virtual void NotifyWindow() = 0;
-
 	virtual bool IsWindowActive() = 0;
 };
 

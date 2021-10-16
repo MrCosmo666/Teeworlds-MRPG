@@ -33,8 +33,8 @@ class CSounds : public CComponent
 	int64 m_QueueWaitTime;
 	std::shared_ptr<CSoundLoading> m_pSoundJob;
 	bool m_WaitForSoundJob;
-	
-	ISound::CSampleHandle GetSampleId(int SetId);
+
+	ISound::CSampleHandle GetSampleId(int SetId) const;
 
 public:
 	// sound channels
@@ -60,7 +60,7 @@ public:
 	void Play(int Channel, int SetId, float Vol);
 	void PlayAt(int Channel, int SetId, float Vol, vec2 Pos);
 	void Stop(int SetId);
-	bool IsPlaying(int SetId);
+	bool IsPlaying(int SetId) const;
 };
 
 

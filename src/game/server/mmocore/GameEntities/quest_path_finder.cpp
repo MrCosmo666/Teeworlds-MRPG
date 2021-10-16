@@ -1,12 +1,12 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/vmath.h>
-#include <generated/protocol.h>
-
-#include <game/server/gamecontext.h>
+#include <game/server/mmocore/Components/Bots/BotData.h>
 #include "quest_path_finder.h"
 
-CQuestPathFinder::CQuestPathFinder(CGameWorld* pGameWorld, vec2 Pos, int ClientID, BotJob::QuestBotInfo QuestBot)
+#include <game/server/mmocore/Components/Worlds/WorldSwapCore.h>
+#include <game/server/gamecontext.h>
+
+CQuestPathFinder::CQuestPathFinder(CGameWorld* pGameWorld, vec2 Pos, int ClientID, QuestBotInfo QuestBot)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_FINDQUEST, Pos)
 {
 	m_ClientID = ClientID;
@@ -16,10 +16,10 @@ CQuestPathFinder::CQuestPathFinder(CGameWorld* pGameWorld, vec2 Pos, int ClientI
 	GameWorld()->InsertEntity(this);
 }
 
-void CQuestPathFinder::Tick() 
+void CQuestPathFinder::Tick()
 {
-	const int QuestID = BotJob::ms_aQuestBot[m_SubBotID].m_QuestID;
-	const int Step = BotJob::ms_aQuestBot[m_SubBotID].m_Step;
+	const int QuestID = QuestBotInfo::ms_aQuestBot[m_SubBotID].m_QuestID;
+	const int Step = QuestBotInfo::ms_aQuestBot[m_SubBotID].m_Step;
 	CPlayer* pPlayer = GS()->GetPlayer(m_ClientID, true, true);
 	if(!pPlayer || !length(m_TargetPos))
 	{
@@ -64,4 +64,4 @@ void CQuestPathFinder::Snap(int SnappingClient)
 	pP->m_X = (int)m_Pos.x;
 	pP->m_Y = (int)m_Pos.y;
 	pP->m_Type = (m_MainScenario ? (int)PICKUP_HEALTH : (int)PICKUP_ARMOR);
-} 
+}

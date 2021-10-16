@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_EDITOR_EDITOR_H
 #define GAME_EDITOR_EDITOR_H
-
 #include <algorithm>
 
 #include <base/math.h>
@@ -12,14 +11,13 @@
 #include <base/tl/algorithm.h>
 #include <base/tl/array.h>
 #include <base/tl/sorted_array.h>
-#include <base/tl/string.h>
 
 #include <game/client/ui.h>
 #include <game/mapitems.h>
 #include <game/client/render.h>
 
-#include <engine/shared/config.h>
 #include <engine/shared/datafile.h>
+#include <engine/console.h>
 #include <engine/editor.h>
 #include <engine/graphics.h>
 
@@ -532,7 +530,7 @@ public:
 
 		m_GridActive = false;
 		m_GridFactor = 1;
-		
+
 		m_MouseEdMode = MOUSE_EDIT;
 
 		m_aFileName[0] = 0;
@@ -587,7 +585,7 @@ public:
 		m_ShowEnvelopePreview = SHOWENV_NONE;
 		m_SelectedQuadEnvelope = -1;
 		m_SelectedEnvelopePoint = -1;
-		
+
 		m_SelectedColor = vec4(0,0,0,0);
 		m_InitialPickerColor = vec3(1,0,0);
 		m_SelectedPickerColor = vec3(1,0,0);
@@ -628,13 +626,13 @@ public:
 
 	bool m_GridActive;
 	int m_GridFactor;
-	
+
 	enum
 	{
 		MOUSE_EDIT=0,
 		MOUSE_PIPETTE,
 	};
-	
+
 	int m_MouseEdMode;
 
 	char m_aFileName[512];
@@ -742,7 +740,7 @@ public:
 	int m_SelectedEnvelopePoint;
 	int m_SelectedQuadEnvelope;
 	int m_SelectedImage;
-	
+
 	vec4 m_SelectedColor;
 	vec3 m_InitialPickerColor;
 	vec3 m_SelectedPickerColor;

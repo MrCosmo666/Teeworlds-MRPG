@@ -1,6 +1,8 @@
 #ifndef GAME_CLIENT_ANIM_UI_VALUE_H
 #define GAME_CLIENT_ANIM_UI_VALUE_H
 
+#include <base/vmath.h>
+
 #include <functional>
 
 class CValue
@@ -22,8 +24,8 @@ public:
 	void EndAnimation();
 	void PreRender();
 
-	vec4 GetValue(){ return m_Value; }
-	class CUIRect GetRect();
+	vec4 GetValue() const { return m_Value; }
+	class CUIRect GetRect() const;
 
 private:
 	bool m_RepairAnimation;

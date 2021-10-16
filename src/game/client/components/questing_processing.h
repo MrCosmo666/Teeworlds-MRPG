@@ -18,17 +18,17 @@ class CQuestingProcessing : public CComponent
 		char m_aText[128];
 		char m_aIcon[32];
 		bool m_GivingTable;
-	
-		bool TableActive() const 
-		{ 
-			return m_aText[0] != '\0'; 
+
+		bool TableActive() const
+		{
+			return m_aText[0] != '\0';
 		}
 	};
 	QuestingTable QuestTable[MAX_TABLE];
 
 public:
 	void Clear();
-	bool IsActive(); 
+	bool IsActive() const;
 	void ProcessingRenderTable(int TableID, CUIRect& Box);
 
 	int TableSize() const;

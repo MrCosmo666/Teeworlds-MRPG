@@ -26,16 +26,11 @@ namespace SleepyDiscord {
 		ready = false;
 		quiting = false;
 		bot = true;
-		token = std::unique_ptr<std::string>(new std::string(_token)); //add client to list
+		setToken(_token);
 		if (_shardID != 0 || _shardCount != 0)
 			setShardID(_shardID, _shardCount);
 
 		messagesRemaining = 4;
-		getTheGateway();
-		connect(theGateway, this, connection);
-#ifndef SLEEPY_ONE_THREAD
-		if (USE_RUN_THREAD <= maxNumOfThreads) runAsync();
-#endif
 	}
 
 	BaseDiscordClient::~BaseDiscordClient() {
@@ -104,6 +99,31 @@ namespace SleepyDiscord {
 			default: response.statusCode = BAD_REQUEST; break; //unexpected method
 			}
 
+			//rate limit check
+			if (response.header["X-RateLimit-Remaining"] == "0" && response.statusCode != TOO_MANY_REQUESTS) {
+				std::tm date = {};
+				//for some reason std::get_time requires gcc 5
+				std::istringstream dateStream(response.header["Date"]);
+				dateStream >> std::get_time(&date, "%a, %d %b %Y %H:%M:%S GMT");
+				const double resetTime = std::stod(response.header["X-RateLimit-Reset"]);
+				const time_t reset = time_t(resetTime) + 1; //add one second for lost precision
+				const std::string& xBucket = response.header["X-RateLimit-Bucket"];
+#if defined(_WIN32) || defined(_WIN64)
+				std::tm gmTM;
+				std::tm* const resetGM = &gmTM;
+				gmtime_s(resetGM, &reset);
+#elif defined(__STDC_LIB_EXT1__)
+				std::tm gmTM;
+				std::tm* resetGM = &gmTM;
+				gmtime_s(&reset, resetGM);
+#else
+				std::tm* resetGM = std::gmtime(&reset);
+#endif
+				const time_t resetDelta = (std::mktime(resetGM) - std::mktime(&date)) * 1000;
+				rateLimiter.limitBucket(bucket, xBucket, resetDelta + getEpochTimeMillisecond());
+				onDepletedRequestSupply(bucket, resetDelta);
+			}
+
 			//status checking
 			switch (response.statusCode) {
 			case OK: case CREATED: case NO_CONTENT: case NOT_MODIFIED: break;
@@ -115,8 +135,9 @@ namespace SleepyDiscord {
 					retryAfter *= 1000; //convert to milliseconds
 					rateLimiter.isGlobalRateLimited = response.header.find("X-RateLimit-Global") != response.header.end();
 					rateLimiter.nextRetry = getEpochTimeMillisecond() + retryAfter;
+					const std::string& xBucket = response.header["X-RateLimit-Bucket"];
 					if (!rateLimiter.isGlobalRateLimited) {
-						rateLimiter.limitBucket(bucket, rateLimiter.nextRetry);
+						rateLimiter.limitBucket(bucket, xBucket, rateLimiter.nextRetry);
 						onDepletedRequestSupply(bucket, retryAfter);
 					}
 					handleExceededRateLimit(retryAfter);
@@ -148,32 +169,10 @@ namespace SleepyDiscord {
 /*#if defined(__cpp_exceptions) || defined(__EXCEPTIONS)
 						if (static_cast<int>(mode) & static_cast<int>(ThrowError))
 							throw code;
-#endif*/
+#endif */
 					}
 				} break;
 			}
-
-			//rate limit check
-			if (response.header["X-RateLimit-Remaining"] == "0" && response.statusCode != TOO_MANY_REQUESTS) {
-				std::tm date = {};
-				//for some reason std::get_time requires gcc 5
-				std::istringstream dateStream(response.header["Date"]);
-				dateStream >> std::get_time(&date, "%a, %d %b %Y %H:%M:%S GMT");
-				const double resetTime = std::stod(response.header["X-RateLimit-Reset"]);
-				const time_t reset = time_t(resetTime) + 1; //add one second for lost precision
-#if defined(_WIN32) || defined(_WIN64)
-				std::tm gmTM;
-				std::tm*const resetGM = &gmTM;
-				gmtime_s(resetGM, &reset);
-#else
-				std::tm* resetGM = std::gmtime(&reset);
-#endif
-				const time_t resetDelta = (std::mktime(resetGM) - std::mktime(&date)) * 1000;
-				rateLimiter.limitBucket(bucket, resetDelta + getEpochTimeMillisecond());
-				onDepletedRequestSupply(bucket, resetDelta);
-			}
-
-			//update rate limits
 
 			handleCallbackCall();
 		}
@@ -231,7 +230,15 @@ namespace SleepyDiscord {
 
 	void BaseDiscordClient::requestServerMembers(ServerMembersRequest request) {
 		auto data = json::toJSON(request);
-		sendL(json::stringify(data));
+		std::string stringData = json::stringify(data);
+
+		std::string query;
+		query.reserve(14 + stringData.length());
+		query += "{\"op\":8,\"d\":";
+		query += stringData;
+		query += "}";
+
+		sendL(query);
 	}
 
 	void BaseDiscordClient::waitTilReady() {
@@ -253,9 +260,8 @@ namespace SleepyDiscord {
 		Session session;
 		session.setUrl("https://discord.com/api/gateway");
 		Response a = session.request(Get);	//todo change this back to a post
-		if (!a.text.length()) 
-		{	//error check
-			//quit(false, true);
+		if (!a.text.length()) {	//error check
+			// quit(false, true);
 			return setError(GATEWAY_FAILED);
 		}
 		if (!theGateway.empty())
@@ -275,6 +281,8 @@ namespace SleepyDiscord {
 			}
 		}
 #endif
+		if (useTrasportConnection == 1)
+			theGateway += "&compress=zlib-stream";
 	}
 
 	void BaseDiscordClient::sendIdentity() {
@@ -286,8 +294,6 @@ namespace SleepyDiscord {
 		//			$os":"windows 10",
 		//			"$browser":"Sleepy_Discord",
 		//			"$device":"Sleepy_Discord",
-		//			"$referrer":"",			//I don't know what this does
-		//			"$referring_domain":""		//I don't know what this does
 		//		},
 		//		"compress":false,
 		//		"large_threshold":250			/I don't know what this does
@@ -316,11 +322,11 @@ namespace SleepyDiscord {
 				"\"properties\":{"
 					"\"$os\":\""; identity += os; identity += "\","
 					"\"$browser\":\"Sleepy_Discord\","
-					"\"$device\":\"Sleepy_Discord\","
-					"\"$referrer\":\"\","
-					"\"$referring_domain\":\"\""
+					"\"$device\":\"Sleepy_Discord\""
 				"},"
-				"\"compress\":false,";
+				"\"compress\":";
+					identity += compressionHandler && useTrasportConnection != 1 ?
+						"true" : "false"; identity += ",";
 		if (shardCount != 0 && shardID <= shardCount) {
 			identity +=
 				"\"shard\":[";
@@ -403,6 +409,9 @@ namespace SleepyDiscord {
 		}, getRetryDelay());
 		consecutiveReconnectsCount += 1;
 
+		if (useTrasportConnection == 1)
+			compressionHandler->resetStream();
+
 		for (VoiceConnection& voiceConnection : voiceConnections) {
 			disconnect(4900, "", voiceConnection.connection);
 	}
@@ -439,12 +448,10 @@ namespace SleepyDiscord {
 	void BaseDiscordClient::processMessage(const std::string &message) {
 		rapidjson::Document document;
 		document.Parse(message.c_str(), message.length());
-		//json::Values values = json::getValues(message.c_str(),
-		//	{ "op", "d", "s", "t" });
+		//	{ "op", "d", "s", "t" }
 		int op = document["op"].GetInt();
 		const json::Value& t = document["t"];
-		//const nonstd::string_view t(tValue.GetString(), tValue.GetStringLength);
-		const json::Value& d = document["d"];
+		json::Value& d = document["d"];
 		switch (op) {
 		case DISPATCH:
 			lastSReceived = document["s"].GetInt();
@@ -570,7 +577,6 @@ namespace SleepyDiscord {
 			case hash("PRESENCE_UPDATE"            ): onPresenceUpdate    (d); break;
 			case hash("PRESENCES_REPLACE"          ):                          break;
 			case hash("USER_UPDATE"                ): onEditUser          (d); break;
-			case hash("USER_NOTE_UPDATE"           ): onEditUserNote      (d); break;
 			case hash("USER_SETTINGS_UPDATE"       ): onEditUserSettings  (d); break;
 			case hash("VOICE_STATE_UPDATE"         ): {
 				VoiceState state(d);
@@ -590,7 +596,7 @@ namespace SleepyDiscord {
 				onEditVoiceState(state);
 				} break;
 			case hash("TYPING_START"               ): onTyping            (d["channel_id"], d["user_id"], d["timestamp"].GetInt64() * 1000); break;
-			case hash("MESSAGE_CREATE"             ): onMessage           (d); break;
+			case hash("MESSAGE_CREATE"             ): onMessage           (document["d"]); break;
 			case hash("MESSAGE_UPDATE"             ): onEditMessage       (d); break;
 			case hash("MESSAGE_DELETE"             ): onDeleteMessages    (d["channel_id"], { d["id"] }); break;
 			case hash("MESSAGE_DELETE_BULK"        ): onDeleteMessages    (d["channel_id"], json::toArray<Snowflake<Message>>(d["ids"])); break;
@@ -612,16 +618,18 @@ namespace SleepyDiscord {
 #endif
 				onEditVoiceServer(voiceServer);
 				} break;
-			case hash("GUILD_SYNC"                 ): onServerSync        (d); break;
-			case hash("RELATIONSHIP_ADD"           ): onRelationship      (d); break;
-			case hash("RELATIONSHIP_REMOVE"        ): onDeleteRelationship(d); break;
 			case hash("MESSAGE_REACTION_ADD"       ): onReaction          (d["user_id"], d["channel_id"], d["message_id"], d["emoji"]); break;
 			case hash("MESSAGE_REACTION_REMOVE"    ): onDeleteReaction    (d["user_id"], d["channel_id"], d["message_id"], d["emoji"]); break;
 			case hash("MESSAGE_REACTION_REMOVE_ALL"): onDeleteAllReaction (d["guild_id"], d["channel_id"], d["message_id"]); break;
+			case hash("APPLICATION_COMMAND_CREATE" ): onAppCommand        (d); break;
+			case hash("APPLICATION_COMMAND_UPDATE" ): onEditAppCommand    (d); break;
+			case hash("APPLICATION_COMMAND_DELETE" ): onDeleteAppCommand  (d); break;
 			case hash("INTERACTION_CREATE"         ): onInteraction       (document["d"]); break;
+			case hash("STAGE_INSTANCE_CREATE"      ): onStageInstance     (d); break;
+			case hash("STAGE_INSTANCE_UPDATE"      ): onEditStageInstance (d); break;
+			case hash("STAGE_INSTANCE_DELETE"      ): onDeleteStageInstance(d); break;
 			default: 
-				setError(EVENT_UNKNOWN);
-				onError(ERROR_NOTE, json::toStdString(t));
+				onUnknownEvent(json::toStdString(t), d);
 				break;
 			}
 			onDispatch(d);
@@ -649,6 +657,50 @@ namespace SleepyDiscord {
 			wasHeartbeatAcked = true;
 			onHeartbeatAck();
 			break;
+		}
+	}
+
+	void BaseDiscordClient::processMessage(const WebSocketMessage message) {
+		switch (message.opCode) {
+		case WebSocketMessage::OPCode::binary: {
+			if (!compressionHandler)
+				break;
+			compressionHandler->uncompress(message.payload);
+			
+			//when using transport connections, Discord ends streams the flush siginal
+			constexpr std::array<const char, 4> flushSiginal = { 0, 0, '\xFF', '\xFF'};
+			constexpr std::size_t siginalLength = flushSiginal.max_size();
+			bool endsWithFlushSiginal = false;
+			if (useTrasportConnection == 1 && siginalLength <= message.payload.length()) {
+				const auto compare = message.payload.compare(
+					message.payload.length() - siginalLength, siginalLength,
+					flushSiginal.data(), siginalLength);
+				endsWithFlushSiginal = compare == 0;
+			}
+
+			//trasportConnection doesn't stop the stream
+			bool streamEnded = useTrasportConnection != 1 && compressionHandler->streamEnded();
+
+			if (streamEnded || endsWithFlushSiginal) {
+				std::shared_ptr<std::string> uncompressed = std::make_shared<std::string>();
+				compressionHandler->getOutput(*uncompressed);
+				postTask(
+					[this, uncompressed]() {
+						processMessage(*uncompressed);
+					}
+				);
+			}
+			break;
+		}
+		case WebSocketMessage::OPCode::text: {
+			postTask(
+				[this, message]() {
+					processMessage(message.payload);
+				}
+			);
+			break;
+		}
+		default: break;
 		}
 	}
 
@@ -681,8 +733,12 @@ namespace SleepyDiscord {
 		case SHARDING_REQUIRED:
 		case INVALID_INTENTS:
 		case DISALLOWED_INTENTS:
-			return quit(true, false);
+			return quit(false, true);
 			break;
+
+		case 4900: //Sleepy Discord reconnect
+			//don't do another reconnect during a reconnect
+			return;
 		}
 		reconnect();
 	}
@@ -707,6 +763,8 @@ namespace SleepyDiscord {
 		sendHeartbeat();
 		lastHeartbeat = currentTime;
 
+		if (heart.isValid())
+			heart.stop();
 		heart = schedule(&BaseDiscordClient::heartbeat, heartbeatInterval);
 	}
 

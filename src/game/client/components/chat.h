@@ -2,8 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_CLIENT_COMPONENTS_CHAT_H
 #define GAME_CLIENT_COMPONENTS_CHAT_H
-#include <base/system.h>
-#include <base/tl/array.h>
 #include <engine/shared/ringbuffer.h>
 #include <game/client/component.h>
 #include <game/client/lineinput.h>
@@ -113,6 +111,7 @@ class CChat : public CComponent
 	static void ConWhisper(IConsole::IResult* pResult, void* pUserData);
 	static void ConChat(IConsole::IResult* pResult, void* pUserData);
 	static void ConShowChat(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatCommand(IConsole::IResult* pResult, void* pUserData);
 	static void ServerCommandCallback(IConsole::IResult* pResult, void* pContext);
 
 public:

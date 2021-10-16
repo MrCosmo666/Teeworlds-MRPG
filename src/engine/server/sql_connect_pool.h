@@ -1,18 +1,18 @@
 #ifndef ENGINE_SERVER_SQL_CONNECTIONPOOL_H
 #define ENGINE_SERVER_SQL_CONNECTIONPOOL_H
+#include <cppconn/resultset.h>
 
-#include <boost/scoped_ptr.hpp>
-#include <cppconn/statement.h>
 #include <functional>
+#include <memory>
 
 using namespace sql;
 #define SJK CConectionPool::GetInstance()
 typedef std::unique_ptr<ResultSet> ResultPtr;
 
-class CConectionPool 
+class CConectionPool
 {
 	CConectionPool();
-	
+
 	static std::shared_ptr<CConectionPool> m_Instance;
 
 	std::list<class Connection*>m_ConnList;
@@ -35,11 +35,11 @@ public:
 	// simply inserts data
 	void ID(const char *Table, const char *Buffer, ...);
 	void IDS(int Milliseconds, const char *Table, const char *Buffer, ...);
-	
+
 	// simply update the data that will be specified
 	void UD(const char *Table, const char *Buffer, ...);
 	void UDS(int Milliseconds, const char *Table, const char *Buffer, ...);
-	
+
 	// simply deletes the data that will be specified
 	void DD(const char *Table, const char *Buffer, ...);
 	void DDS(int Milliseconds, const char *Table, const char *Buffer, ...);

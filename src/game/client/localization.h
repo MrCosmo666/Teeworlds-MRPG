@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_LOCALIZATION_H
 #define GAME_LOCALIZATION_H
+
 #include <base/tl/string.h>
 #include <base/tl/sorted_array.h>
 

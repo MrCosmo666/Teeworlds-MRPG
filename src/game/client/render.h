@@ -22,6 +22,12 @@ enum
 	TILERENDERFLAG_EXTEND = 4,
 };
 
+enum LineDirectionFlag
+{
+	LINE_LEFT = 1 << 0,
+	LINE_DOWN = 1 << 1,
+};
+
 class CTeeRenderInfo
 {
 public:
@@ -69,6 +75,10 @@ public:
 
 	void DrawUIRect(const CUIRect *pRect, vec4 Color, int Corners, float Rounding);
 	void DrawUIRect4(const CUIRect *pRect, vec4 ColorTopLeft, vec4 ColorTopRight, vec4 ColorBottomLeft, vec4 ColorBottomRight, int Corners, float Rounding);
+	void DrawUIRectMonochromeGradient(const CUIRect* pRect, vec4 Color, int Corners, float Rounding);
+
+	void DrawLine(float x, float y, float tox, float toy, vec4 Color);
+	void DrawUIRectLine(const CUIRect* pRect, vec4 Color, int DirectionType = LineDirectionFlag::LINE_LEFT);
 
 	// object render methods (gc_render_obj.cpp)
 	void RenderTee(class CAnimState* pAnim, const CTeeRenderInfo* pInfo, int Emote, vec2 Dir, vec2 Pos);
@@ -81,18 +91,19 @@ public:
 	void RenderTilemap(CTile *pTiles, int w, int h, float Scale, vec4 Color, int RenderFlags, ENVELOPE_EVAL pfnEval, void *pUser, int ColorEnv, int ColorEnvOffset);
 
 	// helpers
+	void RenderCursor(int ImageID, float CenterX, float CenterY, float Size);
 	void MapScreenToWorld(float CenterX, float CenterY, float ParallaxX, float ParallaxY,
 		float OffsetX, float OffsetY, float Aspect, float Zoom, float aPoints[4]);
 	void MapScreenToGroup(float CenterX, float CenterY, CMapItemGroup *pGroup, float Zoom);
 
-	void DrawClientID(ITextRender* pTextRender, CTextCursor* pCursor, int ID,
+	float DrawClientID(ITextRender* pTextRender, float FontSize, vec2 Position, int ID,
 					  const vec4& BgColor = vec4(1, 1, 1, 0.5f), const vec4& TextColor = vec4(0.1f, 0.1f, 0.1f, 1.0f));
 	float GetClientIdRectSize(float FontSize);
 
 	// mrpg client
 	void RenderWings(CAnimState* pAnim, int SpriteID, vec2 Dir, vec2 Pos, vec2 PosWings, vec2 Size);
 	void DrawUIBar(ITextRender* pTextRender, CUIRect Rect, vec4 Color, int Num, int Max, const char* pText, const int Shares, const float Rounding = 2.0f, const float MarginSize = 0.0f, float FontOffset = 0.0f);
-	void DrawUIText(ITextRender* pTextRender, CTextCursor* pCursor, const char* pText,
+	float DrawUIText(ITextRender* pTextRender, vec2 CursorPosition, const char* pText,
 		const vec4& BgColor, const vec4& TextColor, float FontSize);
 };
 

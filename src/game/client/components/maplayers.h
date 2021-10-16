@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_CLIENT_COMPONENTS_MAPLAYERS_H
 #define GAME_CLIENT_COMPONENTS_MAPLAYERS_H
-#include <base/tl/array.h>
 #include <game/client/component.h>
 
 class CMapLayers : public CComponent
@@ -48,7 +47,7 @@ public:
 
 	void BackgroundMapUpdate();
 
-	bool MenuMapLoaded() { return m_pMenuMap ? m_pMenuMap->IsLoaded() : false; }
+	bool MenuMapLoaded() const { return m_pMenuMap ? m_pMenuMap->IsLoaded() : false; }
 };
 
 #endif

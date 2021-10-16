@@ -1,33 +1,24 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <math.h>
-
 #include <base/system.h>
 #include <base/math.h>
 #include <base/vmath.h>
 
-#include <engine/config.h>
 #include <engine/editor.h>
-#include <engine/engine.h>
-#include <engine/contacts.h>
 #include <engine/keys.h>
 #include <engine/serverbrowser.h>
 #include <engine/storage.h>
-#include <engine/updater.h>
 #include <engine/textrender.h>
 #include <engine/shared/config.h>
 
-#include <game/version.h>
 #include <generated/protocol.h>
 #include <generated/client_data.h>
 
 #include <game/client/components/binds.h>
 #include <game/client/components/camera.h>
-#include <game/client/components/console.h>
 #include <game/client/components/sounds.h>
 #include <game/client/gameclient.h>
 #include <game/client/lineinput.h>
-#include <mastersrv/mastersrv.h>
 
 #include "maplayers.h"
 #include "countryflags.h"
@@ -68,7 +59,7 @@ CMenus::CMenus()
 	m_aSaveSkinName[0] = 0;
 	m_RefreshSkinSelector = true;
 	m_pSelectedSkin = 0;
-	m_MenuActiveID = EMenuState::ESCSTATE;
+	m_MenuActiveID = MENU_ESC_STATE;
 	m_SeekBarActivatedTime = 0;
 	m_SeekBarActive = true;
 	m_SkinModified = false;
@@ -87,8 +78,11 @@ CMenus::CMenus()
 	m_UpArrowPressed = false;
 	m_DownArrowPressed = false;
 
+	m_aDemoLoadingFile[0] = 0;
+	m_DemoLoadingPopupRendered = false;
+
 	m_LastInput = time_get();
-	
+
 	m_CursorActive = false;
 	m_PrevCursorActive = false;
 
@@ -194,13 +188,13 @@ bool CMenus::DoButton_Menu(CButtonContainer* pBC, const char* pText, bool Checke
 	if(TextFade)
 	{
 		TextRender()->TextColor(1.0f - FadeVal, 1.0f - FadeVal, 1.0f - FadeVal, 1.0f);
-		TextRender()->TextOutlineColor(0.0f + FadeVal, 0.0f + FadeVal, 0.0f + FadeVal, 0.25f);
+		TextRender()->TextSecondaryColor(0.0f + FadeVal, 0.0f + FadeVal, 0.0f + FadeVal, 0.25f);
 	}
 	UI()->DoLabel(&Text, pText, Text.h * ms_FontmodHeight, CUI::ALIGN_CENTER);
 	if(TextFade)
 	{
 		TextRender()->TextColor(CUI::ms_DefaultTextColor);
-		TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+		TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 	}
 
 	// UI sounds
@@ -226,10 +220,10 @@ void CMenus::DoButton_KeySelect(CButtonContainer* pBC, const char* pText, const 
 	CUIRect Label;
 	pRect->HMargin(1.0f, &Label);
 	TextRender()->TextColor(1.0f - FadeVal, 1.0f - FadeVal, 1.0f - FadeVal, 1.0f);
-	TextRender()->TextOutlineColor(0.0f + FadeVal, 0.0f + FadeVal, 0.0f + FadeVal, 0.25f);
+	TextRender()->TextSecondaryColor(0.0f + FadeVal, 0.0f + FadeVal, 0.0f + FadeVal, 0.25f);
 	UI()->DoLabel(&Label, pText, Label.h * ms_FontmodHeight, CUI::ALIGN_CENTER);
 	TextRender()->TextColor(CUI::ms_DefaultTextColor);
-	TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+	TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 }
 
 bool CMenus::DoButton_MenuTabTop(CButtonContainer* pBC, const char* pText, bool Checked, const CUIRect* pRect, float Alpha, float FontAlpha, int Corners, float Rounding, float FontFactor)
@@ -243,10 +237,10 @@ bool CMenus::DoButton_MenuTabTop(CButtonContainer* pBC, const char* pText, bool 
 	pRect->HMargin(pRect->h >= 20.0f ? 2.0f : 1.0f, &Label);
 	Label.HMargin((Label.h * FontFactor) / 2.0f, &Label);
 	TextRender()->TextColor(1.0f - FadeVal, 1.0f - FadeVal, 1.0f - FadeVal, FontAlpha);
-	TextRender()->TextOutlineColor(0.0f + FadeVal, 0.0f + FadeVal, 0.0f + FadeVal, 0.25f * FontAlpha);
+	TextRender()->TextSecondaryColor(0.0f + FadeVal, 0.0f + FadeVal, 0.0f + FadeVal, 0.25f * FontAlpha);
 	UI()->DoLabel(&Label, pText, Label.h * ms_FontmodHeight, CUI::ALIGN_CENTER);
 	TextRender()->TextColor(CUI::ms_DefaultTextColor);
-	TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+	TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 
 	// UI sounds
 	const void* pLastActiveItem = UI()->GetActiveItem();
@@ -268,7 +262,7 @@ bool CMenus::DoButton_GridHeader(const void* pID, const char* pText, bool Checke
 	{
 		RenderTools()->DrawUIRect(pRect, vec4(0.9f, 0.9f, 0.9f, 0.5f), Corners, 5.0f);
 		TextRender()->TextColor(CUI::ms_HighlightTextColor);
-		TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
+		TextRender()->TextSecondaryColor(CUI::ms_HighlightTextOutlineColor);
 	}
 	else if(UI()->HotItem() == pID)
 	{
@@ -283,7 +277,7 @@ bool CMenus::DoButton_GridHeader(const void* pID, const char* pText, bool Checke
 	if(Checked)
 	{
 		TextRender()->TextColor(CUI::ms_DefaultTextColor);
-		TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+		TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 	}
 
 	return UI()->DoButtonLogic(pID, pRect);
@@ -406,7 +400,7 @@ bool CMenus::DoEditBoxUTF8(void* pID, const CUIRect * pRect, char* pStr, unsigne
 
 			for(int i = 1; i <= Len; i++)
 			{
-				if(TextRender()->TextWidth(0, FontSize, pStr, i, -1.0f) - *pOffset > MxRel)
+				if(TextRender()->TextWidth(FontSize, pStr, i) - *pOffset > MxRel)
 				{
 					s_AtIndex = i - 1;
 					break;
@@ -508,11 +502,11 @@ bool CMenus::DoEditBoxUTF8(void* pID, const CUIRect * pRect, char* pStr, unsigne
 	// check ifthe text has to be moved
 	if(UI()->LastActiveItem() == pID && !JustGotActive && (UpdateOffset || Input()->NumEvents()))
 	{
-		float w = TextRender()->TextWidth(0, FontSize, pDisplayStr, s_AtIndex, -1.0f);
+		float w = TextRender()->TextWidth(FontSize, pDisplayStr, s_AtIndex);
 		if(w-*pOffset > Textbox.w)
 		{
 			// move to the left
-			float wt = TextRender()->TextWidth(0, FontSize, pDisplayStr, -1, -1.0f);
+			float wt = TextRender()->TextWidth(FontSize, pDisplayStr, -1);
 			do
 			{
 				*pOffset += min(wt-*pOffset-Textbox.w, Textbox.w/3);
@@ -539,13 +533,13 @@ bool CMenus::DoEditBoxUTF8(void* pID, const CUIRect * pRect, char* pStr, unsigne
 	{
 		// set cursor active
 		m_CursorActive = true;
-		
+
 		if((2 * time_get() / time_freq()) % 2)	// make it blink
 		{
-			float TextWidth = TextRender()->TextWidth(0, FontSize, pDisplayStr, s_AtIndex, -1.0f);
+			float TextWidth = TextRender()->TextWidth(FontSize, pDisplayStr, s_AtIndex);
 			Textbox = *pRect;
 			Textbox.VSplitLeft(2.0f, 0, &Textbox);
-			Textbox.x += TextWidth - *pOffset - TextRender()->TextWidth(0, FontSize, "|", -1, -1.0f) / 2;
+			Textbox.x += TextWidth - *pOffset - TextRender()->TextWidth(FontSize, "|", -1) / 2;
 			UI()->DoLabel(&Textbox, "|", FontSize, CUI::ALIGN_LEFT);
 		}
 	}
@@ -600,7 +594,7 @@ void CMenus::DoScrollbarOption(void* pID, int* pOption, const CUIRect* pRect, co
 		str_format(aBuf, sizeof(aBuf), "%s: \xe2\x88\x9e", pStr);
 
 	float FontSize = pRect->h*ms_FontmodHeight*0.8f;
-	float VSplitVal = max(TextRender()->TextWidth(0, FontSize, aBuf, -1, -1.0f), TextRender()->TextWidth(0, FontSize, aBufMax, -1, -1.0f));
+	float VSplitVal = max(TextRender()->TextWidth(FontSize, aBuf, -1), TextRender()->TextWidth(FontSize, aBufMax, -1));
 	RenderTools()->DrawUIRect(pRect, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
 
 	CUIRect Label, ScrollBar;
@@ -638,7 +632,7 @@ void CMenus::DoScrollbarOptionLabeled(void* pID, int* pOption, const CUIRect* pR
 	ScrollBar.VMargin(4.0f, &ScrollBar);
 	Value = pScale->ToAbsolute(DoScrollbarH(pID, &ScrollBar, pScale->ToRelative(Value, 0, Max)), 0, Max);
 
-	if(UI()->HotItem() != pID && UI()->MouseHovered(pRect) && UI()->MouseButtonClicked(0))
+	if(UI()->HotItem() != pID && !UI()->CheckActiveItem(pID) && UI()->MouseHovered(pRect) && UI()->MouseButtonClicked(0))
 		Value = (Value + 1) % Num;
 
 	*pOption = clamp(Value, 0, Max);
@@ -931,14 +925,14 @@ int CMenus::DoKeyReader(CButtonContainer* pBC, const CUIRect* pRect, int Key, in
 		DoButton_KeySelect(pBC, "???", pRect);
 		m_KeyReaderIsActive = true;
 	}
-	else if(Key == 0)
+	else if(NewKey == 0)
 	{
 		DoButton_KeySelect(pBC, "", pRect);
 	}
 	else
 	{
 		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "%s%s", CBinds::GetModifierName(*pNewModifier), Input()->KeyName(Key));
+		str_format(aBuf, sizeof(aBuf), "%s%s", CBinds::GetModifierName(*pNewModifier), Input()->KeyName(NewKey));
 		DoButton_KeySelect(pBC, aBuf, pRect);
 	}
 	return NewKey;
@@ -1020,7 +1014,7 @@ void CMenus::RenderMenubar(CUIRect Rect)
 		static CButtonContainer s_SettingsButton;
 		if(DoButton_MenuTabTop(&s_SettingsButton, Localize("Settings"), m_GamePage == PAGE_SETTINGS, &Right) || CheckHotKey(KEY_S))
 			NewPage = PAGE_SETTINGS;
-		
+
 		Rect.HSplitTop(Spacing, 0, &Rect);
 		Rect.HSplitTop(25.0f, &Box, &Rect);
 	}
@@ -1146,7 +1140,7 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			Left.VSplitLeft(Spacing, 0, &Left); // little space
 			Left.VSplitLeft(ButtonWidth, &Button, &Left);
 		}
-		
+
 		// mrpg button
 		static CButtonContainer s_MRPGButton;
 		if (DoButton_MenuTabTop(&s_MRPGButton, Localize("MRPG"), m_ActivePage == PAGE_MRPG, &Button))
@@ -1246,10 +1240,10 @@ void CMenus::RenderMenubar(CUIRect Rect)
 			RenderTools()->DrawUIRect(&Box, vec4(1.0f, 1.0f, 1.0f, 0.75f), CUI::CORNER_ALL, 5.0f);
 			Box.HMargin(2.0f, &Box);
 			TextRender()->TextColor(0.0f, 0.0f, 0.0f, 1.0f);
-			TextRender()->TextOutlineColor(1.0f, 1.0f, 1.0f, 0.25f);
+			TextRender()->TextSecondaryColor(1.0f, 1.0f, 1.0f, 0.25f);
 			UI()->DoLabel(&Box, Localize("Demos"), Box.h*ms_FontmodHeight, CUI::ALIGN_CENTER);
 			TextRender()->TextColor(CUI::ms_DefaultTextColor);
-			TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+			TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 		}
 	}
 
@@ -1308,7 +1302,7 @@ void CMenus::RenderLoading(int WorkedAmount)
 
 	Rect.y += 20;
 	TextRender()->TextColor(CUI::ms_DefaultTextColor);
-	TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+	TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 	UI()->DoLabel(&Rect, "Teeworlds MRPG", 48.0f, CUI::ALIGN_CENTER);
 
 	const float Percent = m_LoadCurrent / (float)m_LoadTotal;
@@ -1444,7 +1438,9 @@ void CMenus::UpdatedFilteredVideoModes()
 	{
 		const int G = gcd(m_aModes[i].m_Width, m_aModes[i].m_Height);
 		if(m_aModes[i].m_Width / G == DesktopWidthG &&
-			m_aModes[i].m_Height / G == DesktopHeightG)
+			m_aModes[i].m_Height / G == DesktopHeightG &&
+			m_aModes[i].m_Width <= Graphics()->DesktopWidth() &&
+			m_aModes[i].m_Height <= Graphics()->DesktopHeight())
 		{
 			m_lRecommendedVideoModes.add(m_aModes[i]);
 		}
@@ -1508,7 +1504,7 @@ void CMenus::OnInit()
 	Console()->Chain("snd_enable_music", ConchainUpdateMusicState, this);
 	Console()->Chain("snd_enable_music_mrpg", ConchainUpdateMusicState, this);
 
-	RenderLoading(1);	
+	RenderLoading(1);
 	ServerBrowser()->SetType(g_Config.m_UiBrowserPage == PAGE_LAN ? IServerBrowser::TYPE_LAN : IServerBrowser::TYPE_INTERNET);
 }
 
@@ -1550,11 +1546,8 @@ void CMenus::PopupCountry(int Selection, FPopupButtonCallback pfnOkButtonCallbac
 	m_Popup = POPUP_COUNTRY;
 }
 
-void CMenus::Render()
+void CMenus::RenderMenu(CUIRect Screen)
 {
-	CUIRect Screen = *UI()->Screen();
-	Graphics()->MapScreen(Screen.x, Screen.y, Screen.w, Screen.h);
-
 	static int s_InitTick = 5;
 	if(s_InitTick > 0)
 	{
@@ -1623,7 +1616,7 @@ void CMenus::Render()
 
 				// draw non-blending X
 				CUIRect XText = Button;
-	
+
 				UI()->DoLabel(&XText, "\xE2\x9C\x95", XText.h*ms_FontmodHeight, CUI::ALIGN_CENTER);
 				if(UI()->DoButtonLogic(s_QuitButton.GetID(), &Button))
 					m_Popup = POPUP_QUIT;
@@ -1710,6 +1703,11 @@ void CMenus::Render()
 				NumOptions = 5;
 			}
 		}
+		else if(m_Popup == POPUP_LOADING_DEMO)
+		{
+			pTitle = Localize("Loading demo");
+			pExtraText = "";
+		}
 		else if(m_Popup == POPUP_LANGUAGE)
 		{
 			pTitle = Localize("Language");
@@ -1717,7 +1715,7 @@ void CMenus::Render()
 		}
 		else if(m_Popup == POPUP_COUNTRY)
 		{
-			pTitle = Localize("Country");
+			pTitle = Localize("Flag");
 			NumOptions = 8;
 		}
 		else if(m_Popup == POPUP_RENAME_DEMO)
@@ -1807,7 +1805,7 @@ void CMenus::Render()
 		else if(m_Popup == POPUP_PASSWORD)
 		{
 			Box.HMargin(4.0f, &Box);
-		
+
 			CUIRect Label;
 			Box.HSplitTop(20.0f, &Label, &Box);
 			UI()->DoLabel(&Label, pExtraText, FontSize, CUI::ALIGN_CENTER);
@@ -1856,6 +1854,7 @@ void CMenus::Render()
 				m_Popup = POPUP_NONE;
 			}
 
+			// map data download
 			if(Client()->MapDownloadTotalsize() > 0)
 			{
 				char aBuf[128];
@@ -1903,14 +1902,39 @@ void CMenus::Render()
 				Box.HSplitTop(SpacingH, 0, &Box);
 				Box.HSplitTop(ButtonHeight, &Part, &Box);
 				Part.VMargin(40.0f, &Part);
-				RenderTools()->DrawUIRect(&Part, vec4(1.0f, 1.0f, 1.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
-				Part.w = max(10.0f, (Part.w*Client()->MapDownloadAmount())/Client()->MapDownloadTotalsize());
-				RenderTools()->DrawUIRect(&Part, vec4(1.0f, 1.0f, 1.0f, 0.5f), CUI::CORNER_ALL, 5.0f);
+				RenderTools()->DrawUIBar(TextRender(), Part, vec4(0.5f, 0.5f, 0.5f, 0.25f), Client()->MapDownloadAmount(), Client()->MapDownloadTotalsize(), "", 10, 5.0f, 3.0f);
 			}
 			else
 			{
 				Box.HSplitTop(27.0f, 0, &Box);
 				UI()->DoLabel(&Box, Client()->ServerAddress(), FontSize, CUI::ALIGN_CENTER);
+			}
+
+			// mmo data download
+			if(Client()->MmoDownloadTotalsize() > 0)
+			{
+				CUIRect DownloadDataProgress = Screen;
+				Screen.HSplitBottom(10.0f, 0, &DownloadDataProgress);
+				RenderTools()->DrawUIBar(TextRender(), DownloadDataProgress, vec4(0.5f, 0.5f, 0.5f, 0.25f), Client()->MmoDownloadAmount(), Client()->MmoDownloadTotalsize(), "Download MRPG data files", 10, 4.0f, 1.0f);
+			}
+		}
+		else if(m_Popup == POPUP_LOADING_DEMO)
+		{
+			if(m_DemoLoadingPopupRendered)
+			{
+				m_Popup = POPUP_NONE;
+				m_DemoLoadingPopupRendered = false;
+				const char* pError = Client()->DemoPlayer_Play(m_aDemoLoadingFile, m_DemoLoadingStorageType);
+				if(pError)
+					PopupMessage(Localize("Error loading demo"), pError, Localize("Ok"));
+				m_aDemoLoadingFile[0] = 0;
+			}
+			else
+			{
+				Box.HSplitTop(27.0f, 0, &Box);
+				UI()->DoLabel(&Box, m_aDemoLoadingFile, FontSize, CUI::ALIGN_CENTER);
+				// wait until next frame to load the demo
+				m_DemoLoadingPopupRendered = true;
 			}
 		}
 		else if(m_Popup == POPUP_LANGUAGE)
@@ -1954,13 +1978,13 @@ void CMenus::Render()
 					if(i == OldSelected)
 					{
 						TextRender()->TextColor(CUI::ms_HighlightTextColor);
-						TextRender()->TextOutlineColor(CUI::ms_HighlightTextOutlineColor);
+						TextRender()->TextSecondaryColor(CUI::ms_HighlightTextOutlineColor);
 					}
 					UI()->DoLabel(&Label, pEntry->m_aCountryCodeString, 10.0f, CUI::ALIGN_CENTER);
 					if(i == OldSelected)
 					{
 						TextRender()->TextColor(CUI::ms_DefaultTextColor);
-						TextRender()->TextOutlineColor(CUI::ms_DefaultTextOutlineColor);
+						TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 					}
 				}
 			}
@@ -2144,7 +2168,7 @@ void CMenus::SetAuthState(bool ShowWindowAuth)
 		if(!m_pClient->m_pSounds->IsPlaying(SOUND_MUSIC_MRPG_FESTIVAL))
 			m_pClient->m_pSounds->Play(CSounds::CHN_MMORPG, SOUND_MUSIC_MRPG_FESTIVAL, 0.3f);
 
-		SetActive(EMenuState::AUTHSTATE);
+		SetActive(MENU_AUTH_STATE);
 		return;
 	}
 
@@ -2152,13 +2176,17 @@ void CMenus::SetAuthState(bool ShowWindowAuth)
 	if(m_pClient->m_pSounds->IsPlaying(SOUND_MUSIC_MRPG_FESTIVAL))
 		m_pClient->m_pSounds->Stop(SOUND_MUSIC_MRPG_FESTIVAL);
 
-	SetActive(EMenuState::NOACTIVE);
+	SetActive(MENU_NO_ACTIVE);
 	mem_zero(aAuthResultReason, sizeof(aAuthResultReason));
 }
 
 void CMenus::SetActive(int ActiveID)
 {
-	m_MenuActiveID = ActiveID;
+	if(m_ShowAuthWindow && ActiveID == MENU_NO_ACTIVE)
+		m_MenuActiveID = MENU_AUTH_STATE;
+	else
+		m_MenuActiveID = ActiveID;
+
 	if(!m_MenuActiveID)
 	{
 		if(Client()->State() == IClient::STATE_ONLINE)
@@ -2189,7 +2217,7 @@ void CMenus::OnReset()
 {
 	m_pClient->m_pSounds->Stop(SOUND_MUSIC_MRPG_FESTIVAL);
 	m_ShowAuthWindow = false;
-	m_MenuActiveID = EMenuState::NOACTIVE;
+	m_MenuActiveID = MENU_NO_ACTIVE;
 	mem_zero(aAuthResultReason, sizeof(aAuthResultReason));
 }
 
@@ -2219,10 +2247,9 @@ int CMenus::GetNewESCState() const
 	// Authed menus
 	if (m_ShowAuthWindow)
 	{
-		if (m_MenuActiveID == EMenuState::AUTHSTATE)
-			return (int)EMenuState::ESCSTATE;
-		else
-			return (int)EMenuState::AUTHSTATE;
+		if (m_MenuActiveID == MENU_AUTH_STATE)
+			return MENU_ESC_STATE;
+		return MENU_AUTH_STATE;
 	}
 	return !IsActive();
 }
@@ -2247,7 +2274,7 @@ bool CMenus::OnInput(IInput::CEvent e)
 		return true;
 
 	// based key input for ESC state
-	if(IsActive() == EMenuState::ESCSTATE)
+	if(m_MenuActiveID == MENU_ESC_STATE)
 	{
 		if(e.m_Flags&IInput::FLAG_PRESS)
 		{
@@ -2272,6 +2299,8 @@ bool CMenus::OnInput(IInput::CEvent e)
 void CMenus::OnConsoleInit()
 {
 	CUIElementBase::Init(this);
+
+	Console()->Register("play", "r[file]", CFGFLAG_CLIENT | CFGFLAG_STORE, Con_Play, this, "Play the file specified");
 }
 
 void CMenus::OnShutdown()
@@ -2336,66 +2365,57 @@ void CMenus::OnRender()
 		m_KeyReaderWasActive = false;
 
 	if(Client()->State() != IClient::STATE_ONLINE && Client()->State() != IClient::STATE_DEMOPLAYBACK)
-		SetActive(EMenuState::ESCSTATE);
-
-	if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
-	{
-		CUIRect Screen = *UI()->Screen();
-		Graphics()->MapScreen(Screen.x, Screen.y, Screen.w, Screen.h);
-		RenderDemoPlayer(Screen);
-	}
+		SetActive(MENU_ESC_STATE);
 
 	if(Client()->State() == IClient::STATE_ONLINE && m_pClient->m_ServerMode == m_pClient->SERVERMODE_PUREMOD)
 	{
 		Client()->Disconnect();
-		SetActive(EMenuState::ESCSTATE);
+		SetActive(MENU_ESC_STATE);
 		PopupMessage(Localize("Disconnected"), Localize("The server is running a non-standard tuning on a pure game type."), Localize("Ok"));
 	}
 
-	if(IsActive() == EMenuState::NOACTIVE || IsActive() == EMenuState::AUTHSTATE)
+	if(Client()->State() == IClient::STATE_DEMOPLAYBACK || IsActive())
 	{
-		m_EscapePressed = false;
-		m_EnterPressed = false;
-		m_TabPressed = false;
-		m_DeletePressed = false;
-		m_UpArrowPressed = false;
-		m_DownArrowPressed = false;
-		m_ActiveEditbox = false;
-
-		// render auth for mmotee
-		if(m_pClient->MmoServer() && Client()->State() == IClient::STATE_ONLINE && m_ShowAuthWindow)
-		{
-			if(m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team != TEAM_SPECTATORS)
-				OnReset();
-			else
-				RenderAuthWindow();
-		}
-
-		UI()->FinishCheck();
-		return;
-	}
-
-	// render
-	if(Client()->State() != IClient::STATE_DEMOPLAYBACK)
-		Render();
-
-	// render cursor
-	RenderCursor(IMAGE_CURSOR, vec4(1, 1, 1, 1));
-
-	// render debug information
-	if(g_Config.m_Debug)
-	{
+		// update the ui
 		const CUIRect* pScreen = UI()->Screen();
-		Graphics()->MapScreen(pScreen->x, pScreen->y, pScreen->w, pScreen->h);
+		float MouseX = (m_MousePos.x / (float)Graphics()->ScreenWidth()) * pScreen->w;
+		float MouseY = (m_MousePos.y / (float)Graphics()->ScreenHeight()) * pScreen->h;
+		UI()->Update(MouseX, MouseY, MouseX * 3.0f, MouseY * 3.0f);
 
-		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "%p %p %p", UI()->HotItem(), UI()->GetActiveItem(), UI()->LastActiveItem());
-		CTextCursor Cursor;
-		TextRender()->SetCursor(&Cursor, 10, 10, 10, TEXTFLAG_RENDER);
-		TextRender()->TextEx(&Cursor, aBuf, -1);
+		// render demo player or main menu
+		Graphics()->MapScreen(pScreen->x, pScreen->y, pScreen->w, pScreen->h);
+		if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
+			RenderDemoPlayer(*pScreen);
+		else if(m_MenuActiveID == MENU_AUTH_STATE)
+		{
+			if(m_pClient->MmoServer() && Client()->State() == IClient::STATE_ONLINE && m_ShowAuthWindow)
+			{
+				if(m_pClient->m_aClients[m_pClient->m_LocalClientID].m_Team != TEAM_SPECTATORS)
+					OnReset();
+				else
+					RenderAuthWindow();
+			}
+		}
+		else
+			RenderMenu(*pScreen);
+
+		if(IsActive())
+		{
+			RenderTools()->RenderCursor(IMAGE_CURSOR, MouseX, MouseY, 24.0f);
+
+			// render debug information
+			if(g_Config.m_Debug)
+			{
+				char aBuf[64];
+				str_format(aBuf, sizeof(aBuf), "%p %p %p", UI()->HotItem(), UI()->GetActiveItem(), UI()->LastActiveItem());
+				static CTextCursor s_Cursor(10, 10, 10);
+				s_Cursor.Reset();
+				TextRender()->TextOutlined(&s_Cursor, aBuf, -1);
+			}
+			UI()->FinishCheck();
+		}
 	}
 
-	UI()->FinishCheck();
 	m_EscapePressed = false;
 	m_EnterPressed = false;
 	m_TabPressed = false;
@@ -2414,23 +2434,6 @@ bool CMenus::CheckHotKey(int Key) const
 		&& UI()->KeyIsPressed(Key);
 }
 
-void CMenus::RenderCursor(int ImageID, vec4 Color)
-{
-	const CUIRect* pScreen = UI()->Screen();
-	float MouseX = (m_MousePos.x / (float)Graphics()->ScreenWidth()) * pScreen->w;
-	float MouseY = (m_MousePos.y / (float)Graphics()->ScreenHeight()) * pScreen->h;
-	UI()->Update(MouseX, MouseY, MouseX * 3.0f, MouseY * 3.0f);
-
-	// render cursor
-	Graphics()->TextureSet(g_pData->m_aImages[ImageID].m_Id);
-	Graphics()->WrapClamp();
-	Graphics()->QuadsBegin();
-	Graphics()->SetColor(Color.r, Color.g, Color.b, Color.a);
-	IGraphics::CQuadItem QuadItem(MouseX, MouseY, 24, 24);
-	Graphics()->QuadsDrawTL(&QuadItem, 1);
-	Graphics()->QuadsEnd();
-	Graphics()->WrapNormal();
-}
 
 bool CMenus::IsBackgroundNeeded() const
 {

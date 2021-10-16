@@ -1,7 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/math.h>
-#include <base/system.h>
 
 #include <engine/storage.h>
 
@@ -47,7 +45,7 @@ void CMapChecker::AddMaplist(CMapVersion *pMaplist, int Num)
 	}
 }
 
-bool CMapChecker::IsMapValid(const char *pMapName, const SHA256_DIGEST *pMapSha256, unsigned MapCrc, unsigned MapSize)
+bool CMapChecker::IsMapValid(const char *pMapName, const SHA256_DIGEST *pMapSha256, unsigned MapCrc, unsigned MapSize) const
 {
 	bool StandardMap = false;
 	for(CWhitelistEntry *pCurrent = m_pFirst; pCurrent; pCurrent = pCurrent->m_pNext)
@@ -63,7 +61,7 @@ bool CMapChecker::IsMapValid(const char *pMapName, const SHA256_DIGEST *pMapSha2
 	return !StandardMap;
 }
 
-bool CMapChecker::ReadAndValidateMap(IStorageEngine *pStorage, const char *pFilename, int StorageType)
+bool CMapChecker::ReadAndValidateMap(IStorageEngine *pStorage, const char *pFilename, int StorageType) const
 {
 	// extract map name
 	char aMapName[MAX_MAP_LENGTH];

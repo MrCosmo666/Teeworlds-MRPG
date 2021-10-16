@@ -3,6 +3,14 @@
 #ifndef GAME_SERVER_MMO_COMPONENT_H
 #define GAME_SERVER_MMO_COMPONENT_H
 
+#include <base/vmath.h>
+
+#include <engine/server/sql_connect_pool.h>
+#include <engine/server/sql_string_helpers.h>
+
+#include <game/game_context.h>
+
+using namespace sqlstr;
 class MmoComponent
 {
 protected:
@@ -28,6 +36,8 @@ private:
 	virtual bool OnHandleMenulist(class CPlayer* pPlayer, int Menulist, bool ReplaceMenu) { return false; };
 	virtual bool OnHandleVoteCommands(class CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) { return false; }
 	virtual void OnMessage(int MsgID, void* pRawMsg, int ClientID) {};
+
+	virtual void OnPrepareInformation(class IStorageEngine* pStorage, class CDataFileWriter* pDataFile) {};
 };
 
 #endif

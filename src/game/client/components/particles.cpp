@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/math.h>
 #include <engine/graphics.h>
-#include <engine/demo.h>
 
 //mmotee
 #include <engine/textrender.h>
@@ -187,6 +186,8 @@ void CParticles::RenderMmoEffect(int Group)
 {
 	if (Group == GROUP_DAMAGEMMO)
 	{
+		CTextCursor Cursor;
+		Cursor.Reset();
 		int i = m_aFirstPart[Group];
 		while (i != -1)
 		{
@@ -194,9 +195,11 @@ void CParticles::RenderMmoEffect(int Group)
 			vec2 p = m_aParticles[i].m_Pos;
 
 			float Size = mix(m_aParticles[i].m_StartSize, m_aParticles[i].m_EndSize * 1.0f, a * 2.0f);
+			Cursor.m_FontSize = Size;
+			Cursor.MoveTo(p.x, p.y);
 
 			TextRender()->TextColor(m_aParticles[i].m_Color.r, m_aParticles[i].m_Color.g, m_aParticles[i].m_Color.b, 1 - a);
-			TextRender()->Text(0, p.x, p.y, Size, m_aParticles[i].m_TextBuf, -1);
+			TextRender()->TextDeferred(&Cursor, m_aParticles[i].m_TextBuf, -1);
 			TextRender()->TextColor(1, 1, 1, 1);
 
 			i = m_aParticles[i].m_NextPart;
@@ -231,7 +234,7 @@ void CParticles::RenderMmoEffect(int Group)
 		Graphics()->BlendNormal();
 		return;
 	}
-	
+
 	if (Group == GROUP_TELEPORT)
 	{
 		Graphics()->BlendNormal();

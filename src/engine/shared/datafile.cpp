@@ -1,10 +1,9 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/hash_ctxt.h>
+
 #include "datafile.h"
 
-#include <base/hash_ctxt.h>
-#include <base/math.h>
-#include <base/system.h>
 #include <engine/storage.h>
 #include <zlib.h>
 
@@ -250,7 +249,7 @@ int CDataFileReader::GetDataSize(int Index) const
 	return m_pDataFile->m_Info.m_pDataOffsets[Index + 1] - m_pDataFile->m_Info.m_pDataOffsets[Index];
 }
 
-void *CDataFileReader::GetDataImpl(int Index, int Swap)
+void *CDataFileReader::GetDataImpl(int Index, int Swap) const
 {
 	if (!m_pDataFile) { return 0; }
 
@@ -308,12 +307,12 @@ void *CDataFileReader::GetDataImpl(int Index, int Swap)
 	return m_pDataFile->m_ppDataPtrs[Index];
 }
 
-void *CDataFileReader::GetData(int Index)
+void *CDataFileReader::GetData(int Index) const
 {
 	return GetDataImpl(Index, 0);
 }
 
-void *CDataFileReader::GetDataSwapped(int Index)
+void *CDataFileReader::GetDataSwapped(int Index) const
 {
 	return GetDataImpl(Index, 1);
 }
@@ -347,7 +346,7 @@ int CDataFileReader::GetItemSize(int Index) const
 	return m_pDataFile->m_Info.m_pItemOffsets[Index + 1] - m_pDataFile->m_Info.m_pItemOffsets[Index];
 }
 
-void *CDataFileReader::GetItem(int Index, int *pType, int *pID)
+void *CDataFileReader::GetItem(int Index, int *pType, int *pID) const
 {
 	if (!m_pDataFile || Index < 0 || Index >= m_pDataFile->m_Header.m_NumItems)
 	{
@@ -367,7 +366,7 @@ void *CDataFileReader::GetItem(int Index, int *pType, int *pID)
 	return (void *)(i + 1);
 }
 
-void CDataFileReader::GetType(int Type, int *pStart, int *pNum)
+void CDataFileReader::GetType(int Type, int *pStart, int *pNum) const
 {
 	*pStart = 0;
 	*pNum = 0;

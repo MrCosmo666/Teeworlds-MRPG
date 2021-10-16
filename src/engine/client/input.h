@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef ENGINE_CLIENT_INPUT_H
 #define ENGINE_CLIENT_INPUT_H
-
 #include <base/tl/sorted_array.h>
 
 class CInput : public IEngineInput
@@ -36,7 +35,7 @@ class CInput : public IEngineInput
 	void ClearKeyStates();
 	bool KeyState(int Key) const;
 
-	IEngineGraphics* Graphics() { return m_pGraphics; }
+	IEngineGraphics* Graphics() const { return m_pGraphics; }
 
 public:
 	CInput();
@@ -59,7 +58,7 @@ public:
 
 	void MouseModeRelative();
 	void MouseModeAbsolute();
-	int MouseDoubleClick();
+	bool MouseDoubleClick();
 	bool MouseRelative(float* pX, float* pY);
 
 	const char* GetClipboardText();

@@ -306,7 +306,7 @@ int CEditor::DoEditBox(void *pID, const CUIRect *pRect, char *pStr, unsigned Str
 
 			for(int i = 1; i <= Len; i++)
 			{
-				if(TextRender()->TextWidth(0, FontSize, pStr, i, -1.0f) - *Offset > MxRel)
+				if(TextRender()->TextWidth(FontSize, pStr, i) - *Offset > MxRel)
 				{
 					s_AtIndex = i - 1;
 					break;
@@ -398,11 +398,11 @@ int CEditor::DoEditBox(void *pID, const CUIRect *pRect, char *pStr, unsigned Str
 	// check if the text has to be moved
 	if(UI()->LastActiveItem() == pID && !JustGotActive && (UpdateOffset || Input()->NumEvents()))
 	{
-		float w = TextRender()->TextWidth(0, FontSize, pDisplayStr, s_AtIndex, -1.0f);
+		float w = TextRender()->TextWidth(FontSize, pDisplayStr, s_AtIndex);
 		if(w-*Offset > Textbox.w)
 		{
 			// move to the left
-			float wt = TextRender()->TextWidth(0, FontSize, pDisplayStr, -1, -1.0f);
+			float wt = TextRender()->TextWidth(FontSize, pDisplayStr, -1);
 			do
 			{
 				*Offset += min(wt-*Offset-Textbox.w, Textbox.w/3);
@@ -427,10 +427,10 @@ int CEditor::DoEditBox(void *pID, const CUIRect *pRect, char *pStr, unsigned Str
 	// render the cursor
 	if(UI()->LastActiveItem() == pID && !JustGotActive)
 	{
-		float w = TextRender()->TextWidth(0, FontSize, pDisplayStr, s_AtIndex, -1.0f);
+		float w = TextRender()->TextWidth(FontSize, pDisplayStr, s_AtIndex);
 		Textbox = *pRect;
 		Textbox.VSplitLeft(2.0f, 0, &Textbox);
-		Textbox.x += (w-*Offset-TextRender()->TextWidth(0, FontSize, "|", -1, -1.0f)/2);
+		Textbox.x += (w - *Offset - TextRender()->TextWidth(FontSize, "|", -1) / 2);
 
 		if((2*time_get()/time_freq()) % 2)	// make it blink
 			UI()->DoLabel(&Textbox, "|", FontSize, CUI::ALIGN_LEFT);
@@ -546,11 +546,13 @@ int CEditor::DoButton_Editor(const void *pID, const char *pText, int Checked, co
 	RenderTools()->DrawUIRect(pRect, GetButtonColor(pID, Checked), CUI::CORNER_ALL, 3.0f);
 	CUIRect NewRect = *pRect;
 	NewRect.y += NewRect.h/2.0f-7.0f;
-	float tw = min(TextRender()->TextWidth(0, 10.0f, pText, -1, -1.0f), NewRect.w);
-	CTextCursor Cursor;
-	TextRender()->SetCursor(&Cursor, NewRect.x + NewRect.w/2-tw/2, NewRect.y - 1.0f, 10.0f, TEXTFLAG_RENDER|TEXTFLAG_STOP_AT_END);
-	Cursor.m_LineWidth = NewRect.w;
-	TextRender()->TextEx(&Cursor, pText, -1);
+
+	float tw = min(TextRender()->TextWidth(10.0f, pText, -1), NewRect.w);
+	static CTextCursor s_Cursor(10.0f);
+	s_Cursor.Reset();
+	s_Cursor.MoveTo(NewRect.x + NewRect.w / 2 - tw / 2, NewRect.y - 1.0f);
+	s_Cursor.m_MaxWidth = NewRect.w;
+	TextRender()->TextOutlined(&s_Cursor, pText, -1);
 	return DoButton_Editor_Common(pID, pText, Checked, pRect, Flags, pToolTip);
 }
 
@@ -564,11 +566,13 @@ int CEditor::DoButton_Image(const void *pID, const char *pText, int Checked, con
 	RenderTools()->DrawUIRect(pRect, ButtonColor, CUI::CORNER_ALL, 3.0f);
 	CUIRect NewRect = *pRect;
 	NewRect.y += NewRect.h/2.0f-7.0f;
-	float tw = min(TextRender()->TextWidth(0, 10.0f, pText, -1, -1.0f), NewRect.w);
-	CTextCursor Cursor;
-	TextRender()->SetCursor(&Cursor, NewRect.x + NewRect.w/2-tw/2, NewRect.y - 1.0f, 10.0f, TEXTFLAG_RENDER|TEXTFLAG_STOP_AT_END);
-	Cursor.m_LineWidth = NewRect.w;
-	TextRender()->TextEx(&Cursor, pText, -1);
+
+	float tw = min(TextRender()->TextWidth(10.0f, pText, -1), NewRect.w);
+	static CTextCursor s_Cursor(10.0f);
+	s_Cursor.MoveTo(NewRect.x + NewRect.w / 2 - tw / 2, NewRect.y - 1.0f);
+	s_Cursor.Reset();
+	s_Cursor.m_MaxWidth = NewRect.w;
+	TextRender()->TextOutlined(&s_Cursor, pText, -1);
 	return DoButton_Editor_Common(pID, pText, Checked, pRect, Flags, pToolTip);
 }
 
@@ -603,10 +607,12 @@ int CEditor::DoButton_MenuItem(const void *pID, const char *pText, int Checked, 
 
 	CUIRect t = *pRect;
 	t.VMargin(5.0f, &t);
-	CTextCursor Cursor;
-	TextRender()->SetCursor(&Cursor, t.x, t.y - 1.0f, 10.0f, TEXTFLAG_RENDER|TEXTFLAG_STOP_AT_END);
-	Cursor.m_LineWidth = t.w;
-	TextRender()->TextEx(&Cursor, pText, -1);
+
+	static CTextCursor s_Cursor(10.0f);
+	s_Cursor.Reset();
+	s_Cursor.MoveTo(t.x, t.y - 1.0f);
+	s_Cursor.m_MaxWidth = t.w;
+	TextRender()->TextOutlined(&s_Cursor, pText, -1);
 	return DoButton_Editor_Common(pID, pText, Checked, pRect, Flags, pToolTip);
 }
 
@@ -2659,9 +2665,7 @@ void CEditor::RenderLayers(CUIRect ToolBox, CUIRect ToolBar, CUIRect View)
 						m_Map.m_lGroups[g]->m_SaveToMap = !m_Map.m_lGroups[g]->m_SaveToMap;
 
 				str_format(aBuf, sizeof(aBuf),"#%d %s", g, m_Map.m_lGroups[g]->m_aName);
-				float FontSize = 10.0f;
-				while(TextRender()->TextWidth(0, FontSize, aBuf, -1, -1.0f) > Slot.w)
-					FontSize--;
+				const float FontSize = clamp(10.0f * Slot.w / TextRender()->TextWidth(10.0f, aBuf, -1), 6.0f, 10.0f);
 				if(int Result = DoButton_Ex(&m_Map.m_lGroups[g], aBuf, g==m_SelectedGroup, &Slot,
 					BUTTON_CONTEXT, m_Map.m_lGroups[g]->m_Collapse ? "Select group. Double click to expand." : "Select group. Double click to collapse.", 0, FontSize))
 				{
@@ -2712,9 +2716,7 @@ void CEditor::RenderLayers(CUIRect ToolBox, CUIRect ToolBar, CUIRect View)
 				else
 					str_copy(aBuf, "Quads", sizeof(aBuf));
 
-				float FontSize = 10.0f;
-				while(TextRender()->TextWidth(0, FontSize, aBuf, -1, -1.0f) > Button.w)
-					FontSize--;
+				const float FontSize = clamp(10.0f * Button.w / TextRender()->TextWidth(10.0f, aBuf, -1), 6.0f, 10.0f);
 				if(int Result = DoButton_Ex(m_Map.m_lGroups[g]->m_lLayers[i], aBuf, g==m_SelectedGroup&&i==m_SelectedLayer, &Button,
 					BUTTON_CONTEXT, "Select layer.", 0, FontSize))
 				{
@@ -3195,11 +3197,12 @@ void CEditor::RenderFileDialog()
 	{
 		for(int i = 0; i < Input()->NumEvents(); i++)
 		{
+			IInput::CEvent Event = Input()->GetEvent(i);
 			int NewIndex = -1;
-			if(Input()->GetEvent(i).m_Flags&IInput::FLAG_PRESS)
+			if(Event.m_Flags & IInput::FLAG_PRESS)
 			{
-				if(Input()->GetEvent(i).m_Key == KEY_DOWN) NewIndex = m_FilesSelectedIndex + 1;
-				if(Input()->GetEvent(i).m_Key == KEY_UP) NewIndex = m_FilesSelectedIndex - 1;
+				if(Event.m_Key == KEY_DOWN) NewIndex = m_FilesSelectedIndex + 1;
+				if(Event.m_Key == KEY_UP) NewIndex = m_FilesSelectedIndex - 1;
 			}
 			if(NewIndex > -1 && NewIndex < m_FileList.size())
 			{
@@ -3266,9 +3269,10 @@ void CEditor::RenderFileDialog()
 
 	for(int i = 0; i < Input()->NumEvents(); i++)
 	{
-		if(Input()->GetEvent(i).m_Flags&IInput::FLAG_PRESS)
+		IInput::CEvent Event = Input()->GetEvent(i);
+		if(Event.m_Flags & IInput::FLAG_PRESS)
 		{
-			if(Input()->GetEvent(i).m_Key == KEY_RETURN || Input()->GetEvent(i).m_Key == KEY_KP_ENTER)
+			if(Event.m_Key == KEY_RETURN || Event.m_Key == KEY_KP_ENTER)
 				m_aFileDialogActivate = true;
 		}
 	}
@@ -4012,15 +4016,15 @@ void CEditor::RenderMenubar(CUIRect MenuBar)
 	MenuBar.VSplitRight(20.f, &MenuBar, &ExitButton);
 	MenuBar.VSplitLeft(40.0f, 0, &MenuBar);
 	MenuBar.VSplitLeft(MenuBar.w*0.75f, &MenuBar, &Info);
-	
+
 
 	char aBuf[128];
 	str_format(aBuf, sizeof(aBuf), "File: %s", m_aFileName);
 	UI()->DoLabel(&MenuBar, aBuf, 10.0f, CUI::ALIGN_LEFT);
 
 	if(m_ShowPosition)
-		str_format(aBuf, sizeof(aBuf), "X: %i(%0.f), Y: %i(%0.f) Z: %i, A: %.1f, G: %i ", 
-			(int)m_WorldOffsetX / 32, m_WorldOffsetX, 
+		str_format(aBuf, sizeof(aBuf), "X: %i(%0.f), Y: %i(%0.f) Z: %i, A: %.1f, G: %i ",
+			(int)m_WorldOffsetX / 32, m_WorldOffsetX,
 			(int)m_WorldOffsetY / 32, m_WorldOffsetY,
 			m_ZoomLevel, m_AnimateSpeed, m_GridFactor);
 	else
@@ -4180,8 +4184,9 @@ void CEditor::Render()
 	if(g_Config.m_EdShowkeys)
 	{
 		Graphics()->MapScreen(UI()->Screen()->x, UI()->Screen()->y, UI()->Screen()->w, UI()->Screen()->h);
-		CTextCursor Cursor;
-		TextRender()->SetCursor(&Cursor, View.x + 10, View.y + View.h - 24 - 10, 24.0f, TEXTFLAG_RENDER);
+		static CTextCursor s_Cursor(24.0f);
+		s_Cursor.Reset();
+		s_Cursor.MoveTo(View.x + 10, View.y + View.h - 24 - 10);
 
 		int NKeys = 0;
 		for(int i = 0; i < KEY_LAST; i++)
@@ -4189,11 +4194,13 @@ void CEditor::Render()
 			if(Input()->KeyIsPressed(i))
 			{
 				if(NKeys)
-					TextRender()->TextEx(&Cursor, " + ", -1);
-				TextRender()->TextEx(&Cursor, Input()->KeyName(i), -1);
+					TextRender()->TextDeferred(&s_Cursor, " + ", -1);
+				TextRender()->TextDeferred(&s_Cursor, Input()->KeyName(i), -1);
 				NKeys++;
 			}
 		}
+
+		TextRender()->DrawTextOutlined(&s_Cursor);
 	}
 
 	if(m_ShowMousePointer)
@@ -4405,7 +4412,7 @@ void CEditor::Init()
 	m_pStorage = Kernel()->RequestInterface<IStorageEngine>();
 	m_RenderTools.m_pGraphics = m_pGraphics;
 	m_RenderTools.m_pUI = &m_UI;
-	m_UI.Init(m_pGraphics, m_pInput, m_pTextRender);
+	m_UI.Init(m_pClient, m_pGraphics, m_pInput, m_pTextRender);
 	m_Map.m_pEditor = this;
 
 	m_CheckerTexture = Graphics()->LoadTexture("editor/checker.png", IStorageEngine::TYPE_ALL, CImageInfo::FORMAT_AUTO, 0);

@@ -95,6 +95,7 @@ namespace SleepyDiscord {
 	}
 
 	void WebsocketppDiscordClient::run() {
+		BaseDiscordClient::connect();
 		this_client.run();
 	}
 
@@ -158,8 +159,11 @@ namespace SleepyDiscord {
 		websocketpp::connection_hdl hdl,
 		websocketpp::config::asio_client::message_type::ptr msg,
 		GenericMessageReceiver* messageProcessor) {
-		postTask([=]() { messageProcessor->processMessage(msg->get_payload()); });
-		//messageProcessor->processMessage(msg->get_payload());
+		messageProcessor->processMessage(WebSocketMessage{
+			static_cast<WebSocketMessage::OPCodeType>(msg->get_opcode()),
+			msg->get_payload(),
+			msg
+		});
 	}
 
 	//UDPClient WebsocketppDiscordClient::createUDPClient() {

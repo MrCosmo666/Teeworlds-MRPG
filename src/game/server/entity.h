@@ -3,8 +3,6 @@
 #ifndef GAME_SERVER_ENTITY_H
 #define GAME_SERVER_ENTITY_H
 
-#include <base/vmath.h>
-
 #include "alloc.h"
 #include "gameworld.h"
 
@@ -62,14 +60,14 @@ public:
 	virtual ~CEntity();
 
 	/* Objects */
-	class CGameWorld *GameWorld()		{ return m_pGameWorld; }
-	class CGS *GS()	{ return m_pGameWorld->GS(); }
-	class IServer *Server()				{ return m_pGameWorld->Server(); }
+	class CGameWorld *GameWorld() const { return m_pGameWorld; }
+	class CGS *GS() const { return m_pGameWorld->GS(); }
+	class IServer *Server() const { return m_pGameWorld->Server(); }
 
 
 	/* Getters */
-	CEntity *TypeNext()					{ return m_pNextTypeEntity; }
-	CEntity *TypePrev()					{ return m_pPrevTypeEntity; }
+	CEntity *TypeNext() const { return m_pNextTypeEntity; }
+	CEntity *TypePrev() const { return m_pPrevTypeEntity; }
 	const vec2 &GetPos() const			{ return m_Pos; }
 	float GetProximityRadius() const	{ return m_ProximityRadius; }
 	bool IsMarkedForDestroy() const		{ return m_MarkedForDestroy; }

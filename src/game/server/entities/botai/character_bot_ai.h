@@ -2,18 +2,15 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_BOTAI_HELPER_H
 #define GAME_SERVER_BOTAI_HELPER_H
+#include "../character.h"
 
 #include <map>
-#include <game/server/entity.h>
-
-#include <game/gamecore.h>
-#include "../character.h"
 
 class CEntityFunctionNurse;
 class CCharacterBotAI : public CCharacter
 {
 	MACRO_ALLOC_POOL_ID()
-	
+
 	class CPlayerBot* m_pBotPlayer;
 
 	// target system
@@ -36,7 +33,7 @@ public:
 
 	int GetBotTarget() const { return m_BotTargetID; };
 
-private: 
+private:
 	bool Spawn(class CPlayer *pPlayer, vec2 Pos) override;
 	void Tick() override;
 	void TickDefered() override;
@@ -45,7 +42,7 @@ private:
 	void Die(int Killer, int Weapon) override;
 	bool GiveWeapon(int Weapon, int GiveAmmo) override;
 	int GetSnapFullID() const override;
-	
+
 	void RewardPlayer(CPlayer *pPlayer, vec2 ForceDies);
 	void ChangeWeapons();
 	void ShowProgressHealth();

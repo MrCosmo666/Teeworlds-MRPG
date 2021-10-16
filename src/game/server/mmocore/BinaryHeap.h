@@ -64,7 +64,7 @@ public:
 		m_CurrentSize = 0;
 	}
 
-	int GetSize()
+	int GetSize() const
 	{
 		return m_CurrentSize;
 	}

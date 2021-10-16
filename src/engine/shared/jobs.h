@@ -4,9 +4,7 @@
 #define ENGINE_SHARED_JOBS_H
 
 #include <base/system.h>
-
-#include <atomic>
-#include <memory>
+#include <base/threadpool.h>
 
 class IJob;
 class CJobPool;
@@ -26,7 +24,7 @@ public:
 	IJob(const IJob &Other);
 	IJob &operator=(const IJob &Other);
 	virtual ~IJob();
-	int Status();
+	int Status() const;
 
 	enum
 	{

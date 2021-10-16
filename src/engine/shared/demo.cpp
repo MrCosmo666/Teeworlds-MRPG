@@ -1,7 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/math.h>
-#include <base/system.h>
 
 #include <engine/console.h>
 #include <engine/storage.h>
@@ -844,8 +843,8 @@ bool CDemoPlayer::GetDemoInfo(class IStorageEngine* pStorage, const char* pFilen
 		return false;
 
 	io_read(File, pDemoHeader, sizeof(CDemoHeader));
-	
-	bool Valid = (mem_comp(pDemoHeader->m_aMarker, gs_aHeaderMarker, sizeof(gs_aHeaderMarker)) == 0 && pDemoHeader->m_Version == gs_ActVersion) || 
+
+	bool Valid = (mem_comp(pDemoHeader->m_aMarker, gs_aHeaderMarker, sizeof(gs_aHeaderMarker)) == 0 && pDemoHeader->m_Version == gs_ActVersion) ||
 				(mem_comp(pDemoHeader->m_aMarker, gs_aHeaderMarkerMMO, sizeof(gs_aHeaderMarkerMMO)) == 0 && pDemoHeader->m_Version == gs_ActVersionMMO);
 	io_close(File);
 	return Valid;

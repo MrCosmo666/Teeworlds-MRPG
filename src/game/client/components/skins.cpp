@@ -3,8 +3,8 @@
 #include <math.h>
 
 #include <base/color.h>
-#include <base/system.h>
 #include <base/math.h>
+#include <base/system.h>
 
 #include <engine/graphics.h>
 #include <engine/storage.h>
@@ -12,8 +12,8 @@
 #include <engine/shared/config.h>
 #include <engine/shared/jsonwriter.h>
 
-#include "menus.h"
 #include "skins.h"
+#include "menus.h"
 
 
 const char* const CSkins::ms_apSkinPartNames[NUM_SKINPARTS] = { "body", "marking", "decoration", "hands", "feet", "eyes" }; /* Localize("body","skins");Localize("marking","skins");Localize("decoration","skins");Localize("hands","skins");Localize("feet","skins");Localize("eyes","skins"); */
@@ -346,12 +346,12 @@ void CSkins::RemoveSkin(const CSkin* pSkin)
 	m_aSkins.remove(*pSkin);
 }
 
-int CSkins::Num()
+int CSkins::Num() const
 {
 	return m_aSkins.size();
 }
 
-int CSkins::NumSkinPart(int Part)
+int CSkins::NumSkinPart(int Part) const
 {
 	return m_aaSkinParts[Part].size();
 }

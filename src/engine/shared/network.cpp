@@ -1,8 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/system.h>
-
-
 #include "config.h"
 #include "network.h"
 #include "huffman.h"
@@ -307,7 +304,8 @@ void CNetBase::SendControlMsg(NETSOCKET Socket, const NETADDR* pAddr, TOKEN Toke
 	Construct.m_NumChunks = 0;
 	Construct.m_DataSize = 1 + ExtraSize;
 	Construct.m_aChunkData[0] = ControlMsg;
-	mem_copy(&Construct.m_aChunkData[1], pExtra, ExtraSize);
+	if(ExtraSize > 0)
+		mem_copy(&Construct.m_aChunkData[1], pExtra, ExtraSize);
 
 	// send the control message
 	CNetBase::SendPacket(Socket, pAddr, &Construct);

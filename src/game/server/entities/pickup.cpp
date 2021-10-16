@@ -1,10 +1,10 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <generated/server_data.h>
-#include <game/server/gamecontext.h>
-
-#include "character.h"
 #include "pickup.h"
+
+#include <game/server/gamecontext.h>
+#include <generated/server_data.h>
+#include "character.h"
 
 CPickup::CPickup(CGameWorld *pGameWorld, int Type, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_PICKUP, Pos, PickupPhysSize)
@@ -45,7 +45,7 @@ void CPickup::Tick()
 	bool Picked = false;
 	if(m_Type == PICKUP_HEALTH)
 	{
-		const int RestoreHealth = kurosio::translate_to_procent_rest(pChr->GetPlayer()->GetStartHealth(), 1);
+		const int RestoreHealth = translate_to_percent_rest(pChr->GetPlayer()->GetStartHealth(), 1);
 		if(pChr->IncreaseHealth(RestoreHealth))
 		{
 			GS()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
@@ -54,7 +54,7 @@ void CPickup::Tick()
 	}
 	else if(m_Type == PICKUP_ARMOR)
 	{
-		const int RestoreMana = kurosio::translate_to_procent_rest(pChr->GetPlayer()->GetStartMana(), 1);
+		const int RestoreMana = translate_to_percent_rest(pChr->GetPlayer()->GetStartMana(), 1);
 		if(pChr->IncreaseMana(RestoreMana))
 		{
 			GS()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH);
@@ -64,7 +64,7 @@ void CPickup::Tick()
 	else if(m_Type == PICKUP_SHOTGUN)
 	{
 		const int RealAmmo = 10 + pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo);
-		const int RestoreAmmo = kurosio::translate_to_procent_rest(RealAmmo, 40);
+		const int RestoreAmmo = translate_to_percent_rest(RealAmmo, 40);
 		if(pChr->GiveWeapon(WEAPON_SHOTGUN, RestoreAmmo))
 		{
 			Picked = true;
@@ -74,7 +74,7 @@ void CPickup::Tick()
 	else if(m_Type == PICKUP_GRENADE)
 	{
 		const int RealAmmo = 10 + pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo);
-		const int RestoreAmmo = kurosio::translate_to_procent_rest(RealAmmo, 40);
+		const int RestoreAmmo = translate_to_percent_rest(RealAmmo, 40);
 		if(pChr->GiveWeapon(WEAPON_GRENADE, RestoreAmmo))
 		{
 			Picked = true;
@@ -85,7 +85,7 @@ void CPickup::Tick()
 	else if(m_Type == PICKUP_LASER)
 	{
 		const int RealAmmo = 10 + pChr->GetPlayer()->GetAttributeCount(Stats::StAmmo);
-		const int RestoreAmmo = kurosio::translate_to_procent_rest(RealAmmo, 40);
+		const int RestoreAmmo = translate_to_percent_rest(RealAmmo, 40);
 		if(pChr->GiveWeapon(WEAPON_LASER, RestoreAmmo))
 		{
 			Picked = true;

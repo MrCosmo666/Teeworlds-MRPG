@@ -1,10 +1,21 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include "player.h"
+
+#include "gamecontext.h"
+#include "gamemodes/dungeon.h"
+
 #include <teeother/components/localization.h>
 
-#include "gamemodes/dungeon.h"
-#include "gamecontext.h"
-#include "player.h"
+#include "mmocore/Components/Accounts/AccountCore.h"
+#include "mmocore/Components/Bots/BotCore.h"
+#include "mmocore/Components/Dungeons/DungeonData.h"
+#include "mmocore/Components/Guilds/GuildCore.h"
+#include "mmocore/Components/Quests/QuestCore.h"
+#include "mmocore/Components/Worlds/WorldSwapCore.h"
+
+#include "mmocore/Components/Inventory/ItemData.h"
+#include "mmocore/Components/Skills/SkillData.h"
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayer, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 
@@ -40,7 +51,7 @@ CPlayer::~CPlayer()
 }
 
 /* #########################################################################
-	FUNCTIONS PLAYER ENGINE 
+	FUNCTIONS PLAYER ENGINE
 ######################################################################### */
 void CPlayer::Tick()
 {
@@ -74,10 +85,7 @@ void CPlayer::Tick()
 	if (m_pCharacter)
 	{
 		if(m_pCharacter->IsAlive())
-		{
 			m_ViewPos = m_pCharacter->GetPos();
-			EffectsTick();
-		}
 		else
 		{
 			delete m_pCharacter;
@@ -87,7 +95,10 @@ void CPlayer::Tick()
 	else if (m_Spawned && m_aPlayerTick[TickState::Respawn] + Server()->TickSpeed() * 3 <= Server()->Tick())
 		TryRespawn();
 
+	// update player tick
 	TickSystemTalk();
+	HandleTuningParams();
+	EffectsTick();
 }
 
 void CPlayer::PostTick()
@@ -95,16 +106,11 @@ void CPlayer::PostTick()
 	// update latency value
 	if (Server()->ClientIngame(m_ClientID) && GS()->IsPlayerEqualWorldID(m_ClientID) && IsAuthed())
 		GetTempData().m_TempPing = m_Latency.m_Min;
-
-	// update player tick
-	HandleTuningParams();
-	TickSystemTalk();
-	EffectsTick();
 }
 
 void CPlayer::EffectsTick()
 {
-	if(Server()->Tick() % Server()->TickSpeed() != 0)
+	if(Server()->Tick() % Server()->TickSpeed() != 0 || CGS::ms_aEffects[m_ClientID].empty())
 		return;
 
 	for(auto pEffect = CGS::ms_aEffects[m_ClientID].begin(); pEffect != CGS::ms_aEffects[m_ClientID].end();)
@@ -113,7 +119,7 @@ void CPlayer::EffectsTick()
 		if(pEffect->second <= 0)
 		{
 			if(m_pCharacter && m_pCharacter->IsAlive())
-				GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, pEffect->first.c_str(), false);
+				GS()->CreatePotionEffect(m_pCharacter->m_Core.m_Pos, pEffect->first.c_str(), false);
 			GS()->Chat(m_ClientID, "You lost the effect {STR}.", pEffect->first.c_str());
 			pEffect = CGS::ms_aEffects[m_ClientID].erase(pEffect);
 			continue;
@@ -195,7 +201,7 @@ void CPlayer::Snap(int SnappingClient)
 	StrToInts(pClientInfo->m_Potions, 12, Buffer.buffer());
 	Buffer.clear();
 
-	Server()->Localization()->Format(Buffer, GetLanguage(), "{INT}", &GetItem(itGold).m_Count);
+	Server()->Localization()->Format(Buffer, GetLanguage(), "{INT}", GetItem(itGold).m_Value);
 	StrToInts(pClientInfo->m_Gold, 6, Buffer.buffer());
 	Buffer.clear();
 
@@ -210,7 +216,7 @@ void CPlayer::Snap(int SnappingClient)
 		StrToInts(pClientInfo->m_StateName, 6, "\0");
 }
 
-CCharacter *CPlayer::GetCharacter()
+CCharacter *CPlayer::GetCharacter() const
 {
 	if(m_pCharacter && m_pCharacter->IsAlive())
 		return m_pCharacter;
@@ -241,7 +247,7 @@ void CPlayer::TryRespawn()
 		GetTempData().m_TempTeleportX = GetTempData().m_TempTeleportY = -1;
 	}
 
-	int AllocMemoryCell = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
+	const int AllocMemoryCell = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
 	m_pCharacter = new(AllocMemoryCell) CCharacter(&GS()->m_World);
 	m_pCharacter->Spawn(this, SpawnPos);
 	GS()->CreatePlayerSpawn(SpawnPos);
@@ -278,7 +284,7 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 		m_PlayerFlags = NewInput->m_PlayerFlags;
 		return;
 	}
-	
+
 	m_PlayerFlags = NewInput->m_PlayerFlags;
 
 	if(m_pCharacter)
@@ -294,7 +300,7 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput)
 	}
 }
 
-void CPlayer::OnPredictedInput(CNetObj_PlayerInput *NewInput)
+void CPlayer::OnPredictedInput(CNetObj_PlayerInput *NewInput) const
 {
 	// skip the input if chat is active
 	if((m_PlayerFlags&PLAYERFLAG_CHATTING) && (NewInput->m_PlayerFlags&PLAYERFLAG_CHATTING))
@@ -306,15 +312,15 @@ void CPlayer::OnPredictedInput(CNetObj_PlayerInput *NewInput)
 
 int CPlayer::GetTeam()
 {
-	if(GS()->Mmo()->Account()->IsActive(m_ClientID)) 
+	if(GS()->Mmo()->Account()->IsActive(m_ClientID))
 		return Acc().m_Team;
 	return TEAM_SPECTATORS;
 }
 
 /* #########################################################################
-	FUNCTIONS PLAYER HELPER 
+	FUNCTIONS PLAYER HELPER
 ######################################################################### */
-void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp)
+void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp) const
 {
 	if (GS()->IsMmoClient(m_ClientID))
 	{
@@ -325,43 +331,43 @@ void CPlayer::ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed,
 	char aBufBroadcast[128];
 	const float GetLevelProgress = (float)(MyExp * 100.0) / (float)ExpNeed;
 	const float GetExpProgress = (float)(GivedExp * 100.0) / (float)ExpNeed;
-	std::unique_ptr<char[]> Level = std::move(GS()->LevelString(100, (int)GetLevelProgress, 10, ':', ' '));
+	const std::unique_ptr<char[]> Level = std::move(GS()->LevelString(100, (int)GetLevelProgress, 10, ':', ' '));
 	str_format(aBufBroadcast, sizeof(aBufBroadcast), "^235Lv%d %s%s %0.2f%%+%0.3f%%(%d)XP\n", MyLevel, Name, Level.get(), GetLevelProgress, GetExpProgress, GivedExp);
-	GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_INFORMATION, 100, aBufBroadcast);
+	GS()->Broadcast(m_ClientID, BroadcastPriority::GAME_INFORMATION, 100, aBufBroadcast);
 }
 
-bool CPlayer::Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade, const char *UpgradeName)
+bool CPlayer::Upgrade(int Value, int *Upgrade, int *Useless, int Price, int MaximalUpgrade) const
 {
-	const int UpgradeNeed = Price*Count;
-	if((*Upgrade + Count) > MaximalUpgrade)
+	const int UpgradeNeed = Price*Value;
+	if((*Upgrade + Value) > MaximalUpgrade)
 	{
-		GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Upgrade has a maximum level.");
-		return false;		
+		GS()->Broadcast(m_ClientID, BroadcastPriority::GAME_WARNING, 100, "Upgrade has a maximum level.");
+		return false;
 	}
 
 	if(*Useless < UpgradeNeed)
 	{
-		GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 100, "Not upgrade points for +{INT}. Required {INT}.", &Count, &UpgradeNeed);
+		GS()->Broadcast(m_ClientID, BroadcastPriority::GAME_WARNING, 100, "Not upgrade points for +{INT}. Required {INT}.", Value, UpgradeNeed);
 		return false;
 	}
 
 	*Useless -= UpgradeNeed;
-	*Upgrade += Count;
+	*Upgrade += Value;
 	return true;
 }
 
 /* #########################################################################
-	FUNCTIONS PLAYER ACCOUNT 
+	FUNCTIONS PLAYER ACCOUNT
 ######################################################################### */
 bool CPlayer::SpendCurrency(int Price, int ItemID)
 {
 	if (Price <= 0)
 		return true;
 
-	InventoryItem &pItemPlayer = GetItem(ItemID);
-	if(pItemPlayer.m_Count < Price)
+	CItemData& pItemPlayer = GetItem(ItemID);
+	if(pItemPlayer.m_Value < Price)
 	{
-		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", &Price, &pItemPlayer.m_Count, pItemPlayer.Info().GetName(this), NULL);
+		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", Price, pItemPlayer.m_Value, pItemPlayer.Info().GetName(this));
 		return false;
 	}
 	return pItemPlayer.Remove(Price);
@@ -374,9 +380,9 @@ void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
 
 	if((Random && random_int() % Random == 0) || !Random)
 	{
-		GS()->Chat(m_ClientID, "You got the effect {STR} time {INT}sec.", Potion, &Sec);
+		GS()->Chat(m_ClientID, "You got the effect {STR} time {INT}sec.", Potion, Sec);
 		CGS::ms_aEffects[m_ClientID][Potion] = Sec;
-		GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, Potion, true);
+		GS()->CreatePotionEffect(m_pCharacter->m_Core.m_Pos, Potion, true);
 	}
 }
 
@@ -404,7 +410,7 @@ void CPlayer::UpdateTempData(int Health, int Mana)
 void CPlayer::AddExp(int Exp)
 {
 	Acc().m_Exp += Exp;
-	for( ; Acc().m_Exp >= ExpNeed(Acc().m_Level); ) 
+	for( ; Acc().m_Exp >= ExpNeed(Acc().m_Level); )
 	{
 		Acc().m_Exp -= ExpNeed(Acc().m_Level), Acc().m_Level++;
 		Acc().m_Upgrade += 10;
@@ -412,7 +418,7 @@ void CPlayer::AddExp(int Exp)
 		GS()->CreateDeath(m_pCharacter->m_Core.m_Pos, m_ClientID);
 		GS()->CreateSound(m_pCharacter->m_Core.m_Pos, 4);
 		GS()->CreateText(m_pCharacter, false, vec2(0, -40), vec2(0, -1), 30, "level");
-		GS()->ChatFollow(m_ClientID, "Level UP. Now Level {INT}!", &Acc().m_Level);
+		GS()->ChatFollow(m_ClientID, "Level UP. Now Level {INT}!", Acc().m_Level);
 		if(Acc().m_Exp < ExpNeed(Acc().m_Level))
 		{
 			GS()->StrongUpdateVotes(m_ClientID, MenuList::MAIN_MENU);
@@ -429,9 +435,9 @@ void CPlayer::AddExp(int Exp)
 		GS()->Mmo()->Member()->AddExperience(Acc().m_GuildID);
 }
 
-void CPlayer::AddMoney(int Money) 
-{ 
-	GetItem(itGold).Add(Money); 
+void CPlayer::AddMoney(int Money)
+{
+	GetItem(itGold).Add(Money);
 }
 
 bool CPlayer::GetHidenMenu(int HideID) const
@@ -442,23 +448,23 @@ bool CPlayer::GetHidenMenu(int HideID) const
 	return false;
 }
 
-bool CPlayer::IsAuthed()
-{ 
+bool CPlayer::IsAuthed() const
+{
 	if(GS()->Mmo()->Account()->IsActive(m_ClientID))
-		return (bool)Acc().m_AccountID;
-	return false; 
+		return (bool)(Acc().m_UserID > 0);
+	return false;
 }
 
-int CPlayer::GetStartTeam()
+int CPlayer::GetStartTeam() const
 {
 	if(IsAuthed())
 		return TEAM_RED;
 	return TEAM_SPECTATORS;
 }
 
-int CPlayer::ExpNeed(int Level) const
+int CPlayer::ExpNeed(int Level)
 {
-	return kurosio::computeExperience(Level);
+	return computeExperience(Level);
 }
 
 int CPlayer::GetStartHealth()
@@ -468,11 +474,11 @@ int CPlayer::GetStartHealth()
 
 int CPlayer::GetStartMana()
 {
-	int EnchantBonus = GetAttributeCount(Stats::StPiety, true);
+	const int EnchantBonus = GetAttributeCount(Stats::StPiety, true);
 	return 10 + EnchantBonus;
 }
 
-void CPlayer::ShowInformationStats()
+void CPlayer::ShowInformationStats(BroadcastPriority Priority)
 {
 	if (!m_pCharacter)
 		return;
@@ -481,11 +487,11 @@ void CPlayer::ShowInformationStats()
 	const int StartHealth = GetStartHealth();
 	const int Mana = GetMana();
 	const int StartMana = GetStartMana();
-	GS()->Broadcast(m_ClientID, BroadcastPriority::BROADCAST_BASIC_STATS, 100, "H: {INT}/{INT} M: {INT}/{INT}", &Health, &StartHealth, &Mana, &StartMana);
+	GS()->Broadcast(m_ClientID, Priority, 100, "H: {INT}/{INT} M: {INT}/{INT}", Health, StartHealth, Mana, StartMana);
 }
 
 /* #########################################################################
-	FUNCTIONS PLAYER PARSING 
+	FUNCTIONS PLAYER PARSING
 ######################################################################### */
 bool CPlayer::ParseItemsF3F4(int Vote)
 {
@@ -501,7 +507,7 @@ bool CPlayer::ParseItemsF3F4(int Vote)
 		if(GS()->IsDungeon())
 		{
 			const int DungeonID = GS()->GetDungeonID();
-			if(!DungeonJob::ms_aDungeon[DungeonID].IsDungeonPlaying())
+			if(!CDungeonData::ms_aDungeon[DungeonID].IsDungeonPlaying())
 			{
 				GetTempData().m_TempDungeonReady ^= true;
 				GS()->Chat(m_ClientID, "You change the ready mode to {STR}!", GetTempData().m_TempDungeonReady ? "ready" : "not ready");
@@ -537,7 +543,7 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 {
 	if(PPSTR(CMD, "UPGRADE") == 0)
 	{
-		if(Upgrade(Get, &Acc().m_aStats[VoteID], &Acc().m_Upgrade, VoteID2, 1000, CGS::ms_aAttributsInfo[VoteID].m_aName)) 
+		if(Upgrade(Get, &Acc().m_aStats[VoteID], &Acc().m_Upgrade, VoteID2, 1000))
 		{
 			GS()->Mmo()->SaveAccount(this, SaveType::SAVE_UPGRADES);
 			GS()->ResetVotes(m_ClientID, MenuList::MENU_UPGRADE);
@@ -569,32 +575,32 @@ bool CPlayer::ParseVoteUpgrades(const char *CMD, const int VoteID, const int Vot
 	return false;
 }
 
-InventoryItem &CPlayer::GetItem(int ItemID) 
+CItemData& CPlayer::GetItem(int ItemID)
 {
-	InventoryJob::ms_aItems[m_ClientID][ItemID].m_ItemID = ItemID;
-	InventoryJob::ms_aItems[m_ClientID][ItemID].SetItemOwner(this);
-	return InventoryJob::ms_aItems[m_ClientID][ItemID];
+	CItemData::ms_aItems[m_ClientID][ItemID].m_ItemID = ItemID;
+	CItemData::ms_aItems[m_ClientID][ItemID].SetItemOwner(this);
+	return CItemData::ms_aItems[m_ClientID][ItemID];
 }
 
-CSkill &CPlayer::GetSkill(int SkillID)
+CSkillData& CPlayer::GetSkill(int SkillID)
 {
-	SkillsJob::ms_aSkills[m_ClientID][SkillID].m_SkillID = SkillID;
-	SkillsJob::ms_aSkills[m_ClientID][SkillID].SetSkillOwner(this);
-	return SkillsJob::ms_aSkills[m_ClientID][SkillID];
+	CSkillData::ms_aSkills[m_ClientID][SkillID].m_SkillID = SkillID;
+	CSkillData::ms_aSkills[m_ClientID][SkillID].SetSkillOwner(this);
+	return CSkillData::ms_aSkills[m_ClientID][SkillID];
 }
 
-CPlayerQuest& CPlayer::GetQuest(int QuestID)
+CQuestData& CPlayer::GetQuest(int QuestID)
 {
-	QuestJob::ms_aPlayerQuests[m_ClientID][QuestID].m_QuestID = QuestID;
-	QuestJob::ms_aPlayerQuests[m_ClientID][QuestID].m_pPlayer = this;
-	return QuestJob::ms_aPlayerQuests[m_ClientID][QuestID];
+	CQuestData::ms_aPlayerQuests[m_ClientID][QuestID].m_QuestID = QuestID;
+	CQuestData::ms_aPlayerQuests[m_ClientID][QuestID].m_pPlayer = this;
+	return CQuestData::ms_aPlayerQuests[m_ClientID][QuestID];
 }
 
 int CPlayer::GetEquippedItemID(int EquipID, int SkipItemID) const
 {
-	for(const auto& it : InventoryJob::ms_aItems[m_ClientID])
+	for(const auto& it : CItemData::ms_aItems[m_ClientID])
 	{
-		if(!it.second.m_Count || !it.second.m_Settings || it.second.Info().m_Function != EquipID || it.first == SkipItemID)
+		if(!it.second.m_Value || !it.second.m_Settings || it.second.Info().m_Function != EquipID || it.first == SkipItemID)
 			continue;
 		return it.first;
 	}
@@ -614,7 +620,7 @@ int CPlayer::GetAttributeCount(int BonusID, bool ActiveFinalStats)
 		AttributEx /= CGS::ms_aAttributsInfo[BonusID].m_Devide;
 
 	// if the best tank class is selected among the players we return the sync dungeon stats
-	if(GS()->IsDungeon() && CGS::ms_aAttributsInfo[BonusID].m_UpgradePrice < 10 && DungeonJob::ms_aDungeon[GS()->GetDungeonID()].IsDungeonPlaying())
+	if(GS()->IsDungeon() && CGS::ms_aAttributsInfo[BonusID].m_UpgradePrice < 10 && CDungeonData::ms_aDungeon[GS()->GetDungeonID()].IsDungeonPlaying())
 	{
 		CGameControllerDungeon* pDungeon = static_cast<CGameControllerDungeon*>(GS()->m_pController);
 		return pDungeon->GetAttributeDungeonSync(this, BonusID);
@@ -626,7 +632,7 @@ int CPlayer::GetAttributeCount(int BonusID, bool ActiveFinalStats)
 int CPlayer::GetItemsAttributeCount(int AttributeID) const
 {
 	int SummingSize = 0;
-	for(const auto& it : InventoryJob::ms_aItems[m_ClientID])
+	for(const auto& it : CItemData::ms_aItems[m_ClientID])
 	{
 		if(!it.second.IsEquipped() || !it.second.Info().IsEnchantable() || !it.second.Info().GetInfoEnchantStats(AttributeID))
 			continue;
@@ -656,7 +662,7 @@ int CPlayer::GetLevelAllAttributes()
 	return Atributs;
 }
 
-// - - - - - - T A L K I N G - - - - B O T S - - - - - - - - - 
+// - - - - - - T A L K I N G - - - - B O T S - - - - - - - - -
 void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 {
 	if (TalkedID < MAX_PLAYERS || !GS()->m_apPlayers[TalkedID] || (!IsStartDialogue && m_DialogNPC.m_TalkedID == -1))
@@ -675,8 +681,8 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 	if (pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_NPC)
 	{
 		// clearing the end of dialogs or a dialog that was meaningless
-		const int sizeTalking = BotJob::ms_aNpcBot[MobID].m_aDialog.size();
-		const bool isTalkingEmpty = BotJob::ms_aNpcBot[MobID].m_aDialog.empty();
+		const int sizeTalking = NpcBotInfo::ms_aNpcBot[MobID].m_aDialog.size();
+		const bool isTalkingEmpty = NpcBotInfo::ms_aNpcBot[MobID].m_aDialog.empty();
 		if ((isTalkingEmpty && m_DialogNPC.m_Progress == IS_TALKING_EMPTY) || (!isTalkingEmpty && m_DialogNPC.m_Progress >= sizeTalking))
 		{
 			ClearTalking();
@@ -694,10 +700,10 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 		}
 
 		// get a quest for the progress of dialogue if it is in this progress we accept the quest
-		GivingQuestID = BotJob::ms_aNpcBot[MobID].m_aDialog[m_DialogNPC.m_Progress].m_GivingQuest;
-		if (GivingQuestID >= 1)
+		GivingQuestID = NpcBotInfo::ms_aNpcBot[MobID].m_aDialog[m_DialogNPC.m_Progress].m_GivesQuestID;
+		if (((m_DialogNPC.m_Progress + 1) >= sizeTalking) && GivingQuestID >= 1)
 		{
-			if (!m_DialogNPC.m_FreezedProgress)
+			if(!m_DialogNPC.m_FreezedProgress)
 			{
 				GS()->Mmo()->BotsData()->TalkingBotNPC(this, MobID, m_DialogNPC.m_Progress, TalkedID);
 				m_DialogNPC.m_FreezedProgress = true;
@@ -713,20 +719,20 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 
 	else if (pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_QUEST)
 	{
-		const int sizeTalking = BotJob::ms_aQuestBot[MobID].m_aDialog.size();
+		const int sizeTalking = QuestBotInfo::ms_aQuestBot[MobID].m_aDialog.size();
 		if (m_DialogNPC.m_Progress >= sizeTalking)
 		{
 			ClearTalking();
-			GS()->Mmo()->Quest()->InteractiveQuestNPC(this, BotJob::ms_aQuestBot[MobID], true);
+			GS()->Mmo()->Quest()->InteractiveQuestNPC(this, QuestBotInfo::ms_aQuestBot[MobID], true);
 			return;
 		}
 
-		const bool RequiestQuestTask = BotJob::ms_aQuestBot[MobID].m_aDialog[m_DialogNPC.m_Progress].m_RequestComplete;
+		const bool RequiestQuestTask = QuestBotInfo::ms_aQuestBot[MobID].m_aDialog[m_DialogNPC.m_Progress].m_RequestAction;
 		if (RequiestQuestTask)
 		{
 			if (!m_DialogNPC.m_FreezedProgress)
 			{
-				GS()->Mmo()->Quest()->DoStepDropTakeItems(this, BotJob::ms_aQuestBot[MobID]);
+				GS()->Mmo()->Quest()->DoStepDropTakeItems(this, QuestBotInfo::ms_aQuestBot[MobID]);
 				GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_DialogNPC.m_Progress, TalkedID);
 				GS()->Mmo()->BotsData()->ShowBotQuestTaskInfo(this, MobID, m_DialogNPC.m_Progress);
 				m_DialogNPC.m_FreezedProgress = true;
@@ -734,7 +740,7 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 			}
 
 			// skip non complete dialog quest
-			if (!GS()->Mmo()->Quest()->InteractiveQuestNPC(this, BotJob::ms_aQuestBot[MobID], false))
+			if (!GS()->Mmo()->Quest()->InteractiveQuestNPC(this, QuestBotInfo::ms_aQuestBot[MobID], false))
 			{
 				GS()->Mmo()->BotsData()->TalkingBotQuest(this, MobID, m_DialogNPC.m_Progress, TalkedID);
 				GS()->Mmo()->BotsData()->ShowBotQuestTaskInfo(this, MobID, m_DialogNPC.m_Progress);
@@ -758,15 +764,15 @@ void CPlayer::ClearTalking()
 	m_DialogNPC.m_FreezedProgress = false;
 }
 
-// - - - - - - F O R M A T - - - - - T E X T - - - - - - - - - 
-const char *CPlayer::GetDialogText() 
-{ 
-	return GS()->Server()->Localization()->Localize(GetLanguage(), m_aFormatDialogText); 
+// - - - - - - F O R M A T - - - - - T E X T - - - - - - - - -
+const char *CPlayer::GetDialogText() const
+{
+	return GS()->Server()->Localization()->Localize(GetLanguage(), m_aFormatDialogText);
 }
 
 void CPlayer::FormatDialogText(int DataBotID, const char *pText)
 {
-	if(!GS()->Mmo()->BotsData()->IsDataBotValid(DataBotID) || m_aFormatDialogText[0] != '\0') 
+	if(!DataBotInfo::IsDataBotValid(DataBotID) || m_aFormatDialogText[0] != '\0')
 		return;
 
 	str_copy(m_aFormatDialogText, pText, sizeof(m_aFormatDialogText));
@@ -776,11 +782,11 @@ void CPlayer::FormatDialogText(int DataBotID, const char *pText)
 	while(pBot != nullptr)
 	{
 		int SearchBotID = 0;
-		if(sscanf(pBot, "[Bot_%d]", &SearchBotID) && GS()->Mmo()->BotsData()->IsDataBotValid(SearchBotID))
+		if(sscanf(pBot, "[Bot_%d]", &SearchBotID) && DataBotInfo::IsDataBotValid(SearchBotID))
 		{
 			char aBufSearch[16];
 			str_format(aBufSearch, sizeof(aBufSearch), "[Bot_%d]", SearchBotID);
-			str_replace(m_aFormatDialogText, aBufSearch, BotJob::ms_aDataBot[SearchBotID].m_aNameBot);
+			str_replace(m_aFormatDialogText, aBufSearch, DataBotInfo::ms_aDataBot[SearchBotID].m_aNameBot);
 		}
 		pBot = str_find_nocase(m_aFormatDialogText, "[Bot_");
 	}
@@ -800,7 +806,7 @@ void CPlayer::FormatDialogText(int DataBotID, const char *pText)
 
 	// based replacing dialogs
 	str_replace(m_aFormatDialogText, "[Player]", GS()->Server()->ClientName(m_ClientID));
-	str_replace(m_aFormatDialogText, "[Talked]", BotJob::ms_aDataBot[DataBotID].m_aNameBot);
+	str_replace(m_aFormatDialogText, "[Talked]", DataBotInfo::ms_aDataBot[DataBotID].m_aNameBot);
 	str_replace(m_aFormatDialogText, "[Time]", GS()->Server()->GetStringTypeDay());
 	str_replace(m_aFormatDialogText, "[Here]", GS()->Server()->GetWorldName(GS()->GetWorldID()));
 }
@@ -824,10 +830,10 @@ void CPlayer::ChangeWorld(int WorldID)
 }
 
 void CPlayer::SendClientInfo(int TargetID)
-{	
+{
 	if(TargetID != -1 && (TargetID < 0 || TargetID >= MAX_PLAYERS || !Server()->ClientIngame(TargetID)))
 		return;
-		
+
 	CNetMsg_Sv_ClientInfo ClientInfoMsg;
 	ClientInfoMsg.m_ClientID = m_ClientID;
 	ClientInfoMsg.m_Local = (bool)(m_ClientID == TargetID);

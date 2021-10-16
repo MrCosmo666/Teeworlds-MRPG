@@ -2,23 +2,24 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_ENTITIES_SNAP_FULL_H
 #define GAME_SERVER_ENTITIES_SNAP_FULL_H
-
 #include <game/server/entity.h>
+
+#include <list>
 
 class CSnapFull : public CEntity
 {
 public:
 	CSnapFull(CGameWorld *pGameWorld, vec2 Pos, int SnapID, int ClientID, int Num, int Type, bool Changing, bool Projectile);
-	~CSnapFull();
+	~CSnapFull() override;
 
-	virtual void Snap(int SnappingClient);
-	virtual void Tick();
+	void Snap(int SnappingClient) override;
+	void Tick() override;
 
 	int GetOwner() const { return m_ClientID; }
-	void AddItem(int Count, int Type, bool Projectile, bool Dynamic, int SnapID);
-	void RemoveItem(int Count, int SnapID, bool Effect);
+	void AddItem(int Value, int Type, bool Projectile, bool Dynamic, int SnapID);
+	void RemoveItem(int Value, int SnapID, bool Effect);
 
-private: 
+private:
 	struct SnapItem
 	{
 		int m_SnapID;
@@ -27,7 +28,7 @@ private:
 		bool m_Changing;
 		bool m_Projectile;
 	};
-	std::list < struct SnapItem > m_SnapItem;
+	std::list< struct SnapItem > m_SnapItem;
 
 	int m_ClientID;
 	int m_LoadingTick;

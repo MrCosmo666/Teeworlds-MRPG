@@ -1,13 +1,9 @@
 #include "http.h"
-
-#include <base/system.h>
-#include <engine/engine.h>
 #include <engine/external/json-parser/json.h>
 #include <engine/shared/config.h>
 #include <engine/storage.h>
 #include <game/version.h>
 
-#define WIN32_LEAN_AND_MEAN
 #include "curl/curl.h"
 #include "curl/easy.h"
 

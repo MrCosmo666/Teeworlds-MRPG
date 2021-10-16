@@ -49,6 +49,7 @@ static CKeyInfo gs_aKeys[] =
 	{ "Add demo marker", "add_demomarker", 0, 0},
 	{ "Toggle sounds", "snd_toggle", 0, 0},
 	{ "Show Hook Collision Line", "+showhookcoll", 0, 0},
+	{ "Activate HUD MRPG", "toggle_game_hud_mrpg", 0, 0},
 };
 
 /*	This is for scripts/update_localization.py to work, don't remove!
@@ -146,7 +147,7 @@ float CMenus::RenderSettingsControlsMouse(CUIRect View)
 	View.HSplitTop(Spacing, 0, &View);
 	View.HSplitTop(ButtonHeight, &Button, &View);
 	DoScrollbarOption(&g_Config.m_UiMousesens, &g_Config.m_UiMousesens, &Button, Localize("Menu mouse sens."), 1, 500, &LogarithmicScrollbarScale);
-	
+
 	return BackgroundHeight;
 }
 
@@ -431,7 +432,7 @@ float CMenus::RenderSettingsControlsMisc(CUIRect View)
 {
 	UpdateBindKeys(m_pClient->m_pBinds);
 
-	int NumOptions = 12;
+	int NumOptions = 13;
 	int StartOption = 20;
 	float ButtonHeight = 20.0f;
 	float Spacing = 2.0f;

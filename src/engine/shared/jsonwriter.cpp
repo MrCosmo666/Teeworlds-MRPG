@@ -116,7 +116,7 @@ void CJsonWriter::WriteNullValue()
 	CompleteDataType();
 }
 
-bool CJsonWriter::CanWriteDatatype()
+bool CJsonWriter::CanWriteDatatype() const
 {
 	return m_pState == 0
 		|| m_pState->m_State == ARRAY

@@ -2,12 +2,10 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/graphics.h>
 #include <engine/keys.h>
-#include <engine/textrender.h>
 
 #include <engine/shared/config.h>
 
 #include <game/version.h>
-#include <game/client/render.h>
 #include <game/client/ui.h>
 
 #include <generated/client_data.h>
@@ -41,7 +39,7 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 	static CButtonContainer s_SettingsButton;
 	if(DoButton_Menu(&s_SettingsButton, Localize("Settings"), 0, &Button, g_Config.m_ClShowStartMenuImages ? "settings" : 0, CUI::CORNER_ALL, Rounding, 0.5f) || CheckHotKey(KEY_S))
 		NewPage = PAGE_SETTINGS;
-	
+
 	TopMenu.HSplitBottom(5.0f, &TopMenu, 0); // little space
 	TopMenu.HSplitBottom(40.0f, &TopMenu, &Button);
 	static CButtonContainer s_DemoButton;
@@ -100,5 +98,5 @@ void CMenus::RenderStartMenu(CUIRect MainView)
 
 void CMenus::RenderLogo(CUIRect MainView)
 {
-	
+
 }

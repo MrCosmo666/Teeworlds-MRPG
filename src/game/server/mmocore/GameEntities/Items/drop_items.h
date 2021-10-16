@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_ENTITIES_DROPINGITEMS_H
 #define GAME_SERVER_ENTITIES_DROPINGITEMS_H
+#include <game/server/entity.h>
 
 class CDropItem : public CEntity
 {
@@ -18,17 +19,15 @@ class CDropItem : public CEntity
 	int m_LifeSpan;
 	int m_FlashTimer;
 
-	InventoryItem m_DropItem;
+	CItemData m_DropItem;
 	int m_OwnerID;
 
-	
-
 public:
-	CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, InventoryItem DropItem, int OwnerID);
-	~CDropItem();
+	CDropItem(class CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, CItemData DropItem, int OwnerID);
+	~CDropItem() override;
 
-	virtual void Tick();
-	virtual void Snap(int SnappingClient);
+	void Tick() override;
+	void Snap(int SnappingClient) override;
 
 	bool TakeItem(int ClientID);
 };

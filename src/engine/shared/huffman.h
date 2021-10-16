@@ -3,8 +3,6 @@
 #ifndef ENGINE_SHARED_HUFFMAN_H
 #define ENGINE_SHARED_HUFFMAN_H
 
-
-
 class CHuffman
 {
 	enum

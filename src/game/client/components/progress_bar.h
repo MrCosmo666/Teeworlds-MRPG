@@ -12,7 +12,7 @@ class CProgressBar : public CComponent
 	int m_ProgressRequest;
 
 public:
-	bool IsActive();
+	bool IsActive() const;
 	void Clear();
 
 	virtual void OnRender();

@@ -1,5 +1,6 @@
 from datatypes import *
 
+Dialogs = Enum("DIALOG_STYLE", ["MSGBOX", "INPUT", "LIST", "PASSWORD"])
 Pickups = Enum("PICKUP", ["HEALTH", "ARMOR", "GRENADE", "SHOTGUN", "LASER", "NINJA", "GUN", "HAMMER"])
 Emotes = Enum("EMOTE", ["NORMAL", "PAIN", "HAPPY", "SURPRISE", "ANGRY", "BLINK"])
 Emoticons = Enum("EMOTICON", ["OOP", "EXCLAMATION", "HEARTS", "DROP", "DOTDOT", "MUSIC", "SORRY", "GHOST", "SUSHI", "SPLATTEE", "DEVILTEE", "ZOMG", "ZZZ", "WTF", "EYES", "QUESTION"])
@@ -70,6 +71,16 @@ enum
 
 	EFFECTENCHANT = 10,
 };
+
+enum
+{
+    MAILLETTERFLAG_REFRESH = 1 << 0,
+    MAILLETTERFLAG_READ = 1 << 1,
+    MAILLETTERFLAG_ACCEPT = 1 << 2,
+    MAILLETTERFLAG_DELETE = 1 << 3,
+    MAILLETTER_MAX_CAPACITY = 15,
+};
+
 '''
 
 RawSource = '''
@@ -93,6 +104,7 @@ Enums = [
 	MoodType,
 	WorldType,
 	TalkedStyles,
+    Dialogs,
 ]
 
 Flags = [
@@ -289,7 +301,7 @@ Objects = [
     
     ## mmotee events
 	NetEvent("MmoDamage:Common", [
-		NetIntAny("m_DamageCount"),
+		NetIntAny("m_Damage"),
 		NetBool("m_CritDamage"),
 	]),
 
@@ -639,4 +651,67 @@ Messages = [
 		NetIntRange("m_pVolume", 1, 10),
 	]),
 
+    # -------------
+    # mrpg gui boxes
+	NetMessage("Sv_SendGuiInformationBox", 
+    [
+		NetStringStrict("m_pMsg"),
+    ]),
+    
+    # -------------
+    # mrpg inbox / TODO: optimize
+	NetMessage("Cl_MailLetterActions", 
+	[
+		NetIntAny("m_MailLetterID"),
+		NetIntAny("m_MailLetterFlags"),
+	]),
+    
+    NetMessage("Sv_SendMailLetterInfo",
+	[
+		NetIntAny("m_MailLetterID"), # unique value by which to receive the letter
+		NetStringStrict("m_pTitle"),
+        NetStringStrict("m_pFrom"),
+		NetStringStrict("m_pMsg"),
+        NetBool("m_IsRead"),
+        
+		NetStringStrict("m_pJsonAttachementItem"),
+	]),
+    
+	NetMessage("Cl_SendMailLetterTo", 
+	[
+		NetStringStrict("m_pTitle"),
+		NetStringStrict("m_pMsg"),
+		NetStringStrict("m_pPlayer"),
+		NetIntAny("m_FromClientID"),
+        
+        # todo: add support sending items / after implementations of items / and from
+	]),
+    
+    # - - - -
+    # dialogs
+	NetMessage("DialogCommon", 
+    [
+        NetStringStrict("m_pTitle"),
+		NetStringStrict("m_pButton1"),
+		NetStringStrict("m_pButton2"),
+	]),
+
+    # dialog msgbox
+	NetMessage("Sv_Dialog_Msgbox:DialogCommon", 
+    [
+		NetStringStrict("m_pMsg"),
+	]),
+
+    # dialog input
+	NetMessage("Sv_Dialog_Input:DialogCommon", 
+    [
+		NetStringStrict("m_pMsg"),
+	]),
+    
+    # dialog list
+    NetMessage("Sv_Dialog_List:DialogCommon", []),
+    NetMessage("Sv_Dialog_List_AddItem", 
+    [
+        NetStringStrict("m_pTitle"),
+    ]),
 ]

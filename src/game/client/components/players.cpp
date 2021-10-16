@@ -1,6 +1,5 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/demo.h>
 #include <engine/engine.h>
 #include <engine/graphics.h>
 #include <engine/shared/config.h>
@@ -9,7 +8,6 @@
 
 #include <game/client/animstate.h>
 #include <game/client/gameclient.h>
-#include <game/client/ui.h>
 #include <game/client/render.h>
 
 #include <game/client/components/flow.h>
@@ -111,7 +109,7 @@ void CPlayers::RenderHook(
 	}
 }
 
-void CPlayers::RenderPlayer(const CNetObj_Character *pPrevChar, const CNetObj_Character *pPlayerChar, const CNetObj_PlayerInfo *pPlayerInfo, 
+void CPlayers::RenderPlayer(const CNetObj_Character *pPrevChar, const CNetObj_Character *pPlayerChar, const CNetObj_PlayerInfo *pPlayerInfo,
 	const CTeeRenderInfo* pRenderInfo, int ClientID)
 {
 	CNetObj_Character Prev = *pPrevChar;
@@ -242,7 +240,7 @@ void CPlayers::RenderPlayer(const CNetObj_Character *pPrevChar, const CNetObj_Ch
 		{
 			p = Position + vec2(State.GetAttach()->m_X, State.GetAttach()->m_Y);
 			p.y += g_pData->m_Weapons.m_aId[iw].m_Offsety;
-	
+
 			if (!RenderWeaponsMRPG(Player, &State, Angle, p, ClientID))
 			{
 				if (Direction.x < 0)
@@ -561,21 +559,21 @@ void CPlayers::OnInit()
 	m_aEquipInfo.add({ itHeavenlyShotgun,  vec4(1.0f, 1.0f, 1.0f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_SHOTGUN_HEAVEN, 0 });
 	m_aEquipInfo.add({ itHeavenlyGrenade, vec4(1.0f, 1.0f, 1.0f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GRENADE_HEAVEN, 0 });
 	m_aEquipInfo.add({ itHeavenlyRifle, vec4(1.0f, 1.0f, 1.0f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_RIFLE_HEAVEN, 0 });
-	
+
 	/* SET MAGITECH */
 	m_aEquipInfo.add({ itMagitechHammer, vec4(0.45f, 0.3f, 0.5f, 0.003f), vec2(0,0), vec2(100, 100), 0.0f, SPRITE_MMO_HAMMER_MAGITECH, 0 });
 	m_aEquipInfo.add({ itMagitechGun, vec4(0.3f, 0.5f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GUN_MAGITECH, 0 });
 	m_aEquipInfo.add({ itMagitechShotgun,  vec4(0.5f, 0.25f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_SHOTGUN_MAGITECH, 0 });
 	m_aEquipInfo.add({ itMagitechGrenade, vec4(0.45f, 0.3f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GRENADE_MAGITECH, 0 });
 	m_aEquipInfo.add({ itMagitechRifle, vec4(0.3f, 0.5f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_RIFLE_MAGITECH, 0 });
-			
+
 	/* SET GOBLIN */
 	m_aEquipInfo.add({ itGoblinHammer, vec4(0.45f, 0.3f, 0.5f, 0.003f), vec2(0,0), vec2(100, 100), 0.0f, SPRITE_MMO_HAMMER_GOBLIN, 0 });
 	m_aEquipInfo.add({ itGoblinGun, vec4(0.3f, 0.5f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GUN_GOBLIN, 0 });
 	m_aEquipInfo.add({ itGoblinShotgun,  vec4(0.5f, 0.25f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_SHOTGUN_GOBLIN, 0 });
 	m_aEquipInfo.add({ itGoblinGrenade, vec4(0.45f, 0.3f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_GRENADE_GOBLIN, 0 });
 	m_aEquipInfo.add({ itGoblinRifle, vec4(0.3f, 0.5f, 0.5f, 0.003f), vec2(0,0), vec2(0, 0), 0.0f, SPRITE_MMO_RIFLE_GOBLIN, 0 });
-		
+
 	/* WINGS */
 	m_aEquipInfo.add({ itShadowWings, vec4(1.75f, 0.0f, 0.0f, 0.003f), vec2(100, 60), vec2(180, 120), 0.0f, IMAGE_SHADOW_WINGS, ANIM_WINGS_LENGTH });
 	m_aEquipInfo.add({ itNeptuneWings, vec4(0.2f, 0.2f, 1.75f, 0.003f), vec2(110, 60), vec2(180, 100), 0.0f, IMAGE_NEPTUNE_WINGS, ANIM_WINGS_STATIC });
@@ -615,7 +613,7 @@ bool CPlayers::RenderWeaponsMRPG(const CNetObj_Character Player, CAnimState* pAn
 		CPlayers::EquipItem* pEquipInfo = FindEquipInformation(EquipID, Position);
 		if (!pEquipInfo || pEquipInfo->SpriteID <= 0)
 			return false;
-	
+
 		bool Enchant = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_GUN];
 		if (g_Config.m_ClShowMEffects != 2 && Enchant)
 		{
@@ -711,7 +709,7 @@ void CPlayers::RenderHammer(CAnimState* pAnim, float Angle, vec2 Position, int S
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_GAME].m_Id);
 	Graphics()->QuadsBegin();
 	Graphics()->QuadsSetRotation(pAnim->GetAttach()->m_Angle * pi * 2 + Angle);
-} 
+}
 
 void CPlayers::RenderGun(const CNetObj_Character Player, CAnimState* pAnim, float Angle, vec2 Position, int SpriteID)
 {
@@ -873,7 +871,7 @@ void CPlayers::RenderWings(const CTeeRenderInfo& RenderInfo, const CNetObj_Chara
 			m_pClient->m_aClients[ClientID].m_AnimWings = 0.0f;
 	}
 	pAnimWings->Add(&g_pData->m_aAnimations[AnimationID], m_pClient->m_aClients[ClientID].m_AnimWings, 1.0f);
-	
+
 	bool WingsEnchantItem = m_pClient->m_aClients[ClientID].m_aEnchantItem[EQUIP_WINGS];
 	if (g_Config.m_ClShowMEffects != 2 && WingsEnchantItem)
 	{

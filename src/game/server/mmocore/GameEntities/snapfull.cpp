@@ -1,10 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <game/server/gamecontext.h>
-#include <engine/shared/config.h>
 #include "snapfull.h"
 
-// TODO: rework it Wtf we copy vector nice (fixed) xd
+#include <game/server/gamecontext.h>
 
 CSnapFull::CSnapFull(CGameWorld *pGameWorld, vec2 Pos, int SnapID, int ClientID, int Num, int Type, bool Changing, bool Projectile)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_SNAPEFFECT, Pos)
@@ -26,9 +24,9 @@ CSnapFull::~CSnapFull()
 	m_SnapItem.clear();
 }
 
-void CSnapFull::AddItem(int Count, int Type, bool Projectile, bool Dynamic, int SnapID)
+void CSnapFull::AddItem(int Value, int Type, bool Projectile, bool Dynamic, int SnapID)
 {
-	for(int i = 0; i < Count; i++)
+	for(int i = 0; i < Value; i++)
 	{
 		SnapItem Item;
 		Item.m_ID = Server()->SnapNewID();
@@ -37,16 +35,16 @@ void CSnapFull::AddItem(int Count, int Type, bool Projectile, bool Dynamic, int 
 		Item.m_SnapID = SnapID;
 		Item.m_Projectile = Projectile;
 		m_SnapItem.push_back(Item);
-	}	
+	}
 }
 
-void CSnapFull::RemoveItem(int Count, int SnapID, bool Effect)
+void CSnapFull::RemoveItem(int Value, int SnapID, bool Effect)
 {
 	for (auto pItems = m_SnapItem.begin(); pItems != m_SnapItem.end(); )
-	{ 
-		if(Count <= 0)
+	{
+		if(Value <= 0)
 			break;
-		
+
 		if(pItems->m_SnapID != SnapID)
 		{
 			++pItems;
@@ -61,7 +59,7 @@ void CSnapFull::RemoveItem(int Count, int SnapID, bool Effect)
 		}
 		Server()->SnapFreeID(pItems->m_ID);
 		pItems = m_SnapItem.erase(pItems);
-		Count--;
+		Value--;
 	}
 }
 
@@ -73,14 +71,14 @@ void CSnapFull::Tick()
 		GS()->m_World.DestroyEntity(this);
 		return;
 	}
-		
-	if(!m_IsBack) 
+
+	if(!m_IsBack)
 	{
 		m_LoadingTick--;
 		if(m_LoadingTick <= 1)
 			m_IsBack = true;
 	}
-	else 
+	else
 	{
 		m_LoadingTick++;
 		if(m_LoadingTick >= 30)

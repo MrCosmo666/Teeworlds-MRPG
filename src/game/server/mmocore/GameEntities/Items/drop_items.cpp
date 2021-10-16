@@ -1,10 +1,13 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <game/server/gamecontext.h>
-
+#include <game/server/mmocore/Components/Inventory/ItemData.h>
 #include "drop_items.h"
 
-CDropItem::CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, InventoryItem DropItem, int OwnerID)
+#include <game/server/gamecontext.h>
+
+#include <base/tl/base.h>
+
+CDropItem::CDropItem(CGameWorld *pGameWorld, vec2 Pos, vec2 Vel, float AngleForce, CItemData DropItem, int OwnerID)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_DROPITEM, Pos, 28.0f)
 {
 	m_Pos = Pos;
@@ -41,21 +44,21 @@ bool CDropItem::TakeItem(int ClientID)
 
 	// change of enchanted objects
 	GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
-	InventoryItem &pPlayerDroppedItem = pPlayer->GetItem(m_DropItem.GetID());
-	if(pPlayerDroppedItem.m_Count > 0 && pPlayerDroppedItem.Info().IsEnchantable())
+	CItemData &pPlayerDroppedItem = pPlayer->GetItem(m_DropItem.GetID());
+	if(pPlayerDroppedItem.m_Value > 0 && pPlayerDroppedItem.Info().IsEnchantable())
 	{
 		tl_swap(pPlayerDroppedItem, m_DropItem);
-		GS()->Chat(ClientID, "You now own {STR}(+{INT})", pPlayerDroppedItem.Info().GetName(pPlayer), &pPlayerDroppedItem.m_Enchant);
-		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INVENTORY);
-		GS()->StrongUpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
+		GS()->Chat(ClientID, "You now own {STR}(+{INT})", pPlayerDroppedItem.Info().GetName(pPlayer), pPlayerDroppedItem.m_Enchant);
+		GS()->StrongUpdateVotes(ClientID, MENU_INVENTORY);
+		GS()->StrongUpdateVotes(ClientID, MENU_EQUIPMENT);
 		return true;
 	}
-	
+
 	// simple subject delivery
-	pPlayerDroppedItem.Add(m_DropItem.m_Count, 0, m_DropItem.m_Enchant);
-	GS()->Broadcast(ClientID, BroadcastPriority::BROADCAST_GAME_WARNING, 10, "\0");
-	GS()->StrongUpdateVotes(ClientID, MenuList::MENU_INVENTORY);
-	GS()->StrongUpdateVotes(ClientID, MenuList::MENU_EQUIPMENT);
+	pPlayerDroppedItem.Add(m_DropItem.m_Value, 0, m_DropItem.m_Enchant);
+	GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 10, "\0");
+	GS()->StrongUpdateVotes(ClientID, MENU_INVENTORY);
+	GS()->StrongUpdateVotes(ClientID, MENU_EQUIPMENT);
 	GS()->m_World.DestroyEntity(this);
 	return true;
 }
@@ -85,7 +88,7 @@ void CDropItem::Tick()
 		}
 	}
 
-	// set without owner if there is no player owner 
+	// set without owner if there is no player owner
 	if(m_OwnerID != -1 && !GS()->GetPlayer(m_OwnerID, true, true))
 		m_OwnerID = -1;
 
@@ -101,24 +104,24 @@ void CDropItem::Tick()
 		return;
 
 	const char* pToNickname = (m_OwnerID != -1 ? Server()->ClientName(m_OwnerID) : "\0");
-	const InventoryItem pPlayerItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
+	const CItemData pPlayerItem = pChar->GetPlayer()->GetItem(m_DropItem.GetID());
 
 	// enchantable item
 	if(pPlayerItem.Info().IsEnchantable())
 	{
-		if(pPlayerItem.m_Count > 0)
-			GS()->Broadcast(pChar->GetPlayer()->GetCID(), BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) -> (+{INT}) {STR}",
-				m_DropItem.Info().GetName(pChar->GetPlayer()), &pPlayerItem.m_Enchant, &m_DropItem.m_Enchant, pToNickname);
+		if(pPlayerItem.m_Value > 0)
+			GS()->Broadcast(pChar->GetPlayer()->GetCID(), BroadcastPriority::GAME_INFORMATION, 100, "{STR}(+{INT}) -> (+{INT}) {STR}",
+				m_DropItem.Info().GetName(pChar->GetPlayer()), pPlayerItem.m_Enchant, m_DropItem.m_Enchant, pToNickname);
 		else
-			GS()->Broadcast(pChar->GetPlayer()->GetCID(), BROADCAST_GAME_INFORMATION, 100, "{STR}(+{INT}) {STR}",
-				m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.m_Enchant, pToNickname);
-		
+			GS()->Broadcast(pChar->GetPlayer()->GetCID(), BroadcastPriority::GAME_INFORMATION, 100, "{STR}(+{INT}) {STR}",
+				m_DropItem.Info().GetName(pChar->GetPlayer()), m_DropItem.m_Enchant, pToNickname);
+
 		return;
 	}
 
 	// non enchantable item
-	GS()->Broadcast(pChar->GetPlayer()->GetCID(), BROADCAST_GAME_INFORMATION, 100, "{STR}x{INT} {STR}",
-		m_DropItem.Info().GetName(pChar->GetPlayer()), &m_DropItem.m_Count, pToNickname);
+	GS()->Broadcast(pChar->GetPlayer()->GetCID(), BroadcastPriority::GAME_INFORMATION, 100, "{STR}x{INT} {STR}",
+		m_DropItem.Info().GetName(pChar->GetPlayer()), m_DropItem.m_Value, pToNickname);
 }
 
 void CDropItem::Snap(int SnappingClient)
@@ -150,9 +153,9 @@ void CDropItem::Snap(int SnappingClient)
 	}
 
 	static const float Radius = 24.0f;
-	const float AngleStep = 2.0f * pi / CDropItem::NUM_IDS;
-	const float AngleStart = (pi / CDropItem::NUM_IDS) + (2.0f * pi * m_Angle) / 5.0f;
-	for(int i = 0; i < CDropItem::NUM_IDS; i++)
+	const float AngleStep = 2.0f * pi / NUM_IDS;
+	const float AngleStart = (pi / NUM_IDS) + (2.0f * pi * m_Angle) / 5.0f;
+	for(int i = 0; i < NUM_IDS; i++)
 	{
 		CNetObj_Laser *pRifleObj = static_cast<CNetObj_Laser *>(Server()->SnapNewItem(NETOBJTYPE_LASER, m_IDs[i], sizeof(CNetObj_Laser)));
 		if(!pRifleObj)
@@ -166,4 +169,4 @@ void CDropItem::Snap(int SnappingClient)
 		pRifleObj->m_FromY = (int)PosTo.y;
 		pRifleObj->m_StartTick = Server()->Tick() - 3;
 	}
-} 
+}

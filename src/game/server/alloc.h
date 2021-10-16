@@ -3,9 +3,6 @@
 #ifndef GAME_SERVER_ALLOC_H
 #define GAME_SERVER_ALLOC_H
 
-#include <new>
-#include <base/system.h>
-
 #define MACRO_ALLOC_HEAP() \
 	public: \
 	void *operator new(size_t Size) \

@@ -8,6 +8,7 @@
 #include <type_traits>
 //for errrors
 #include <iostream>
+#include "nonstd/optional.hpp"
 
 #define RAPIDJSON_NO_SIZETYPEDEFINE
 typedef std::size_t SizeType;
@@ -76,11 +77,12 @@ namespace SleepyDiscord {
 		template <class Type>
 		struct ClassTypeHelper;
 
+		template<class Value = const json::Value>
 		struct ArrayStringWrapper {
-			const Value& json;
-			ArrayStringWrapper(const Value& json) : json(json) {}
-			inline const Value& getDoc() const { return json; }
-			operator const Value&() const { return getDoc(); }
+			Value& json;
+			ArrayStringWrapper(Value& json) : json(json) {}
+			inline Value& getDoc() const { return json; }
+			operator Value&() const { return getDoc(); }
 			template<class Callback>
 			bool getDoc(const Callback& callback) const {
 				callback(json);
@@ -88,22 +90,57 @@ namespace SleepyDiscord {
 			}
 		};
 
+		template<class Type, class Enable = void>
+		struct ArrayValueWrapper {
+			using value = const Value;
+			using type = ArrayStringWrapper<value>;
+		};
+
+		template<class Type>
+		struct ArrayValueWrapper<
+			Type, typename std::enable_if<std::is_constructible<Type, const Value>::value>::type
+		> {
+			using value = const Value;
+			using type = ArrayStringWrapper<value>;
+		};
+
+		template<class Type>
+		struct ArrayValueWrapper<
+			Type, typename std::enable_if<std::is_constructible<Type, Value>::value>::type
+		> {
+			using value = Value;
+			using type = ArrayStringWrapper<value>;
+		};
+
 		template <typename T>
 		constexpr auto hasPushBack(int)
 			-> decltype( std::declval<T>().push_back(*(std::declval<T>().begin())),
 							std::true_type() );
-
+		
 		template <typename T>
 		constexpr std::false_type hasPushBack(long);
 
-		template<class TypeToConvertTo, class Base = ArrayStringWrapper>
+		template<class TypeToConvertTo, class Base = typename ArrayValueWrapper<TypeToConvertTo>::type>
 		struct ArrayWrapper : public Base {
+			using base = Base;
 			using Base::Base;
 			using DocType = decltype(((Base*)nullptr)->getDoc());
-			template<class Container>
-			static inline Container get(const Value& value) {
-				Array jsonArray = value.template Get<Array>();
+
+			template<class Container, class Value>
+			static inline Container get(Value& value, std::true_type) {
+				auto jsonArray = value.GetArray(); //can be ether const Array or Array, so we use auto
 				return Container(jsonArray.begin(), jsonArray.end());
+			}
+
+			template<class Container, class Value>
+			static inline Container get(Value&& value, std::false_type) {
+				DocType v = std::move(value);
+				return get<Container>(v, std::true_type{});
+			}
+
+			template<class Container, class Value>
+			static inline Container get(Value&& value) { //lvalue check
+				return get<Container>(value, std::is_lvalue_reference<Value&&>());
 			}
 
 			template<class Container>
@@ -118,11 +155,10 @@ namespace SleepyDiscord {
 
 			template<class Container>
 			bool get(Container& value) {
-				static const auto getter = [&](DocType doc) {
+				static const auto getter = [&](DocType& doc) {
 					value = get<Container>(doc);
 				};
-				if (!Base::getDoc(getter))
-					return false;
+				return Base::getDoc(getter);
 			}
 
 			template<template<class...> class Container, typename Type = TypeToConvertTo>
@@ -188,9 +224,9 @@ namespace SleepyDiscord {
 			return value.GetBool();
 		}
 
-		template<class Type>
-		inline ArrayWrapper<Type> toArray(const Value& value) {
-			return ArrayWrapper<Type>(value);
+		template<class Type, class Value>
+		inline ArrayWrapper<Type, ArrayStringWrapper<Value>> toArray(Value& value) {
+			return ArrayWrapper<Type, ArrayStringWrapper<Value>>(value);
 		}
 
 		template<class Type>
@@ -281,10 +317,10 @@ namespace SleepyDiscord {
 					) ),
 					bool
 				>::type;
-
+			
 			template<typename>
     		static constexpr std::false_type check(...);
-
+		
 		public:
 			using type = decltype(check<Object>(0));
 			static constexpr bool value = type::value;
@@ -304,11 +340,11 @@ namespace SleepyDiscord {
 			}
 
 			template<class T>
-			static inline typename std::enable_if<!hasSerialize<T>::value, Value>::type
+			static inline typename std::enable_if<hasSerialize<T>::value == false, Value>::type
 			fromType(const T& value, Value::AllocatorType& allocator) {
 				return toJSON(value, allocator);
 			}
-			
+
 			template<class T = Type>
 			static inline typename std::enable_if<hasIsType<T>::value, bool>::type
 			isType(const Value& value) {
@@ -373,7 +409,7 @@ namespace SleepyDiscord {
 				return true;
 			}
 		};
-		
+
 		template<class PrimitiveType>
 		struct IsPrimitiveTypeFunction : IsNumberFunction {};
 
@@ -423,7 +459,7 @@ namespace SleepyDiscord {
 				return value == GetDefault::get();
 			}
 			static inline bool isType(const Value& value) {
-				return ClassTypeHelper<Type>::isType(value);
+				return ClassTypeHelper<BaseType>::isType(value);
 			}
 		};
 
@@ -490,7 +526,8 @@ namespace SleepyDiscord {
 
 		template<class SmartPtr, template<class...> class TypeHelper>
 		struct SmartPtrTypeHelper {
-			static inline SmartPtr toType(const Value& value) {
+			template<class Value>
+			static inline SmartPtr toType(Value& value) {
 				return SmartPtr{new typename SmartPtr::element_type{
 					//copy object to pointer
 					TypeHelper<typename SmartPtr::element_type>::toType(value)
@@ -500,10 +537,52 @@ namespace SleepyDiscord {
 				return TypeHelper<typename SmartPtr::element_type>::fromType(*value, allocator);
 			}
 			static inline bool empty(const SmartPtr& value) {
-				return value;
+				return value == nullptr;
 			}
 			static inline bool isType(const Value& value) {
 				return TypeHelper<typename SmartPtr::element_type>::isType(value);
+			}
+		};
+
+		//almost the same as SmartPtr
+		//maybe find a way to marge the two
+		template<class Optional, template<class...> class TypeHelper>
+		struct OptionalTypeHelper {
+			static inline Optional toType(const Value& value) {
+				return Optional{ TypeHelper<typename Optional::value_type>::toType(value) };
+			}
+			static inline Value fromType(const Optional& value, Value::AllocatorType& allocator) {
+				return TypeHelper<typename Optional::value_type>::fromType(*value, allocator);
+			}
+			static inline bool empty(const Optional& value) {
+				return !value.has_value();
+			}
+			static inline bool isType(const Value& value) {
+				 return TypeHelper<typename Optional::value_type>::isType(value);
+			}
+		};
+
+		template<class Nullable, template<class...> class TypeHelper>
+		struct NullableTypeHelper {
+			static inline Nullable toType(const Value& value) {
+				if (value.IsNull()) {
+					return Nullable{ tl::nullopt };
+				} else {
+					return Nullable{ TypeHelper<typename Nullable::value_type>::toType(value) };
+				}
+			}
+			static inline Value fromType(const Nullable& value, Value::AllocatorType& allocator) {
+				if (value) {
+					return Value{ rapidjson::kNullType };
+				} else {
+					return TypeHelper<typename Nullable::value_type>::fromType(*value, allocator);
+				}
+			}
+			static inline bool empty(const Nullable& value) {
+				return !value.has_value();
+			}
+			static inline bool isType(const Value& value) {
+				return value.IsNull() || TypeHelper<typename Nullable::value_type>::isType(value);
 			}
 		};
 
@@ -591,7 +670,6 @@ namespace SleepyDiscord {
 				"JSON Parse Error: "
 				"variable #" << i << ": \"" << field.name << "\" not found. "
 				"Please look at call stack from your debugger for more details.";
-				
 				if (mode == FromJSONMode::ReturnOnError)
 					return false;
 			}
@@ -614,10 +692,15 @@ namespace SleepyDiscord {
 			return isOK;
 		}
 
-		template<class ResultingObject>
-		inline ResultingObject fromJSON(const nonstd::string_view& json) {
+		inline rapidjson::Document parse(const nonstd::string_view& json) {
 			rapidjson::Document doc;
 			doc.Parse(json.data(), json.length());
+			return doc;
+		}
+
+		template<class ResultingObject>
+		inline ResultingObject fromJSON(const nonstd::string_view& json) {
+			rapidjson::Document doc = parse(json);
 			//note: some objects have different value consturctors
 			//so we need to call the Object's value constructor
 			return ResultingObject(doc);
@@ -675,6 +758,27 @@ namespace SleepyDiscord {
 		inline std::string stringifyObj(const Object& object) {
 			rapidjson::MemoryPoolAllocator<> allocator;
 			return stringify(toJSON(object, allocator));
+		}
+
+		template<class Object, size_t i = 0>
+		inline typename std::enable_if<i == std::tuple_size<decltype(Object::JSONStruct)>::value, void>::type
+			mergeObj(Object& object, const Object& objectChanges) {
+		}
+
+		template<class Object, size_t i = 0>
+		inline typename std::enable_if < i < std::tuple_size<decltype(Object::JSONStruct)>::value, void>::type
+			mergeObj(Object& object, const Object& objectChanges) {
+			constexpr auto field = std::get<i>(Object::JSONStruct);
+			using Helper = typename decltype(field)::Helper;
+			if (!Helper::empty(objectChanges.*(field.member))) {
+				object.*(field.member) = objectChanges.*(field.member);
+			}
+			mergeObj<Object, i + 1>(object, objectChanges);
+		}
+
+		inline json::Value copy(const json::Value& value) {
+			rapidjson::Document doc;
+			return std::move(doc.CopyFrom(value, doc.GetAllocator()));
 		}
 
 		//json optional and null emulation

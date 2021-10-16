@@ -1,24 +1,22 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <engine/contacts.h>
+#include <engine/demo.h>
 #include <engine/editor.h>
 #include <engine/engine.h>
-#include <engine/contacts.h>
 #include <engine/graphics.h>
-#include <engine/textrender.h>
-#include <engine/demo.h>
-#include <engine/map.h>
-#include <engine/storage.h>
-#include <engine/sound.h>
 #include <engine/serverbrowser.h>
+#include <engine/sound.h>
+#include <engine/storage.h>
+#include <engine/textrender.h>
 #include <engine/updater.h>
-#include <engine/shared/demo.h>
 #include <engine/shared/config.h>
 
 #include <base/math.h>
 #include <base/vmath.h>
 
-#include <generated/protocol.h>
 #include <generated/client_data.h>
+#include <generated/protocol.h>
 
 #include <game/version.h>
 #include "localization.h"
@@ -39,18 +37,19 @@
 #include "components/emoticon.h"
 #include "components/flow.h"
 #include "components/hud.h"
-#include "components/items.h"
 #include "components/infomessages.h"
+#include "components/inventory.h"
+#include "components/items.h"
 #include "components/mapimages.h"
 #include "components/maplayers.h"
 #include "components/menus.h"
 #include "components/motd.h"
+#include "components/nameplates.h"
 #include "components/notifications.h"
 #include "components/particles.h"
-#include "components/progress_bar.h"
 #include "components/players.h"
+#include "components/progress_bar.h"
 #include "components/questing_processing.h"
-#include "components/nameplates.h"
 #include "components/scoreboard.h"
 #include "components/skins.h"
 #include "components/sounds.h"
@@ -58,9 +57,13 @@
 #include "components/stats.h"
 #include "components/talktext.h"
 #include "components/voting.h"
+#include "components/windows.h"
 
 //mmotee thnx gamer client # dune
 #include "components/skinchanger.h"
+#include "components/gui/game_ui_interface.h"
+
+#include <teeother/tl/nlohmann_json.h>
 
 inline void AppendDecimals(char* pBuf, int Size, int Time, int Precision)
 {
@@ -108,6 +111,7 @@ static CGameConsole gs_GameConsole;
 static CBinds gs_Binds;
 static CParticles gs_Particles;
 static CMenus gs_Menus;
+static CInventory gs_Inventory;
 static CSkins gs_Skins;
 static CCountryFlags gs_CountryFlags;
 static CFlow gs_Flow;
@@ -131,6 +135,8 @@ static CMapLayers gs_MapLayersBackGround(CMapLayers::TYPE_BACKGROUND);
 static CMapLayers gs_MapLayersForeGround(CMapLayers::TYPE_FOREGROUND);
 
 // mmotee thnx gamer client # dune
+static CUIGameInterface gs_GameInterfaceUI;
+static CWindowsRender gs_WindowRender;
 static CCSkinChanger gs_SkinChanger;
 static CTalkText gs_TalkText;
 static CQuestingProcessing gs_QuestingProcess;
@@ -251,6 +257,8 @@ void CGameClient::OnConsoleInit()
 	m_pGameConsole = &::gs_GameConsole;
 	m_pParticles = &::gs_Particles;
 	m_pMenus = &::gs_Menus;
+	m_pInventory = &::gs_Inventory;
+	m_pGameInterfaceUI = &::gs_GameInterfaceUI;
 
 	//mmotee
 	m_pSkins = &::gs_Skins;
@@ -326,12 +334,19 @@ void CGameClient::OnConsoleInit()
 	m_All.Add(&gs_Scoreboard);
 	m_All.Add(m_pStats);
 	m_All.Add(m_pMotd);
-	m_All.Add(m_pMenus);
+
+	m_All.Add(m_pMenus); // here starting ui checking
 	m_All.Add(&m_pMenus->m_Binder);
+	m_All.Add(m_pInventory);
+	m_All.Add(m_pGameInterfaceUI);
+	m_All.Add(&gs_WindowRender); // here ending ui checking
+	//
+
 	m_All.Add(m_pGameConsole);
 
 	// mmotee inputs
 	m_Input.Add(m_pTalkText);
+	m_Input.Add(m_pGameInterfaceUI);
 
 	// vanilla inputs
 	m_Input.Add(&m_pMenus->m_Binder); // this will take over all input when we want to bind a key
@@ -392,11 +407,13 @@ void CGameClient::OnInit()
 	m_pAnumUI = new CAnimUI(this);
 
 	// propagate pointers
-	m_UI.Init(Graphics(), Input(), TextRender());
+	m_UI.Init(Client(), Graphics(), Input(), TextRender());
 	m_RenderTools.m_pGraphics = Graphics();
 	m_RenderTools.m_pUI = UI();
-
 	int64 Start = time_get();
+
+	// init window components
+	CWindowUI::InitComponents(UI(), RenderTools());
 
 	// Render load screen at 0% to get graphics sooner.
 	// Swap again to minimize initial flashing color.
@@ -422,34 +439,9 @@ void CGameClient::OnInit()
 	m_pMenus->InitLoading(TotalWorkAmount);
 	m_pMenus->RenderLoading(4);
 
-	// loading font
-	char aFontName[256];
-	static CFont *pDefaultFont = 0;
-	str_format(aFontName, sizeof(aFontName), "fonts/%s", g_Config.m_ClFontfile);
-	IOHANDLE File = Storage()->OpenFile(aFontName, IOFLAG_READ, IStorageEngine::TYPE_ALL, aFontName, sizeof(aFontName));
-	if(File)
-	{
-		io_close(File);
-		pDefaultFont = TextRender()->LoadFont(aFontName);
-		if(!pDefaultFont)
-		{
-			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "failed to load font. filename='%s'", aFontName);
-			Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "gameclient", aBuf);
-		}
-	}
-	else
-	{
-		// loading standard font
-		IOHANDLE File = Storage()->OpenFile("fonts/DejaVuSans.ttf", IOFLAG_READ, IStorageEngine::TYPE_ALL, aFontName, sizeof(aFontName));
-		if (File)
-		{
-			io_close(File);
-			pDefaultFont = TextRender()->LoadFont(aFontName);
-			str_copy(g_Config.m_ClFontfile, "DejaVuSans.ttf", sizeof(g_Config.m_ClFontfile));
-		}
-	}
-	TextRender()->SetDefaultFont(pDefaultFont);
+
+	m_pTextRender->LoadFonts(Storage(), Console());
+	m_pTextRender->SetFontLanguageVariant(g_Config.m_ClLanguagefile);
 	m_pMenus->RenderLoading(1);
 
 	// set the language
@@ -709,12 +701,7 @@ void CGameClient::StartRendering()
 		Graphics()->QuadsBegin();
 		vec4 Bottom(0.45f, 0.45f, 0.45f, 1.0f);
 		vec4 Top(0.45f, 0.45f, 0.45f, 1.0f);
-		IGraphics::CColorVertex Array[4] = {
-			IGraphics::CColorVertex(0, Top.r, Top.g, Top.b, Top.a),
-			IGraphics::CColorVertex(1, Top.r, Top.g, Top.b, Top.a),
-			IGraphics::CColorVertex(2, Bottom.r, Bottom.g, Bottom.b, Bottom.a),
-			IGraphics::CColorVertex(3, Bottom.r, Bottom.g, Bottom.b, Bottom.a) };
-		Graphics()->SetColorVertex(Array, 4);
+		Graphics()->SetColor4(Top, Top, Bottom, Bottom);
 		IGraphics::CQuadItem QuadItem(0, 0, sw, sh);
 		Graphics()->QuadsDrawTL(&QuadItem, 1);
 		Graphics()->QuadsEnd();
@@ -793,9 +780,10 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		// get paras
 		switch(gs_GameMsgList[GameMsgID].m_ParaType)
 		{
-		case PARA_I: NumParaI = 1; break;
-		case PARA_II: NumParaI = 2; break;
-		case PARA_III: NumParaI = 3; break;
+			case PARA_I: NumParaI = 1; break;
+			case PARA_II: NumParaI = 2; break;
+			case PARA_III: NumParaI = 3; break;
+			default: break;
 		}
 		for(int i = 0; i < NumParaI; i++)
 		{
@@ -813,46 +801,50 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		{
 			switch(GameMsgID)
 			{
-			case GAMEMSG_CTF_DROP:
-				m_pSounds->Enqueue(CSounds::CHN_GLOBAL, SOUND_CTF_DROP);
-				break;
-			case GAMEMSG_CTF_RETURN:
-				m_pSounds->Enqueue(CSounds::CHN_GLOBAL, SOUND_CTF_RETURN);
-				break;
-			case GAMEMSG_TEAM_ALL:
-			{
+				case GAMEMSG_CTF_DROP:
+					m_pSounds->Enqueue(CSounds::CHN_GLOBAL, SOUND_CTF_DROP);
+					break;
+				case GAMEMSG_CTF_RETURN:
+					m_pSounds->Enqueue(CSounds::CHN_GLOBAL, SOUND_CTF_RETURN);
+					break;
+				case GAMEMSG_TEAM_ALL:
+				{
 					const char* pMsg = "";
 					switch(GetStrTeam(aParaI[0], TeamPlay))
 					{
-					case STR_TEAM_GAME: pMsg = Localize("All players were moved to the game"); break;
-					case STR_TEAM_RED: pMsg = Localize("All players were moved to the red team"); break;
-					case STR_TEAM_BLUE: pMsg = Localize("All players were moved to the blue team"); break;
-					case STR_TEAM_SPECTATORS: pMsg = Localize("All players were moved to the spectators"); break;
+						case STR_TEAM_GAME: pMsg = Localize("All players were moved to the game"); break;
+						case STR_TEAM_RED: pMsg = Localize("All players were moved to the red team"); break;
+						case STR_TEAM_BLUE: pMsg = Localize("All players were moved to the blue team"); break;
+						case STR_TEAM_SPECTATORS: pMsg = Localize("All players were moved to the spectators"); break;
+						default: break;
 					}
 					m_pBroadcast->DoClientBroadcast(pMsg);
 				}
 				break;
-			case GAMEMSG_TEAM_BALANCE_VICTIM:
+				case GAMEMSG_TEAM_BALANCE_VICTIM:
 				{
 					const char *pMsg = "";
 					switch(GetStrTeam(aParaI[0], TeamPlay))
 					{
-					case STR_TEAM_RED: pMsg = Localize("You were moved to the red team due to team balancing"); break;
-					case STR_TEAM_BLUE: pMsg = Localize("You were moved to the blue team due to team balancing"); break;
+						case STR_TEAM_RED: pMsg = Localize("You were moved to the red team due to team balancing"); break;
+						case STR_TEAM_BLUE: pMsg = Localize("You were moved to the blue team due to team balancing"); break;
+						default: break;
 					}
 					m_pBroadcast->DoClientBroadcast(pMsg);
 				}
 				break;
-			case GAMEMSG_CTF_GRAB:
-				if(m_LocalClientID != -1 && (m_aClients[m_LocalClientID].m_Team != aParaI[0] || (m_Snap.m_SpecInfo.m_Active &&
-								((m_Snap.m_SpecInfo.m_SpectatorID != -1 && m_aClients[m_Snap.m_SpecInfo.m_SpectatorID].m_Team != aParaI[0]) ||
-								(m_Snap.m_SpecInfo.m_SpecMode == SPEC_FLAGRED && aParaI[0] != TEAM_RED) ||
-								(m_Snap.m_SpecInfo.m_SpecMode == SPEC_FLAGBLUE && aParaI[0] != TEAM_BLUE)))))
-					m_pSounds->Enqueue(CSounds::CHN_GLOBAL, SOUND_CTF_GRAB_PL);
-				else
-					m_pSounds->Enqueue(CSounds::CHN_GLOBAL, SOUND_CTF_GRAB_EN);
+				case GAMEMSG_CTF_GRAB:
+				{
+					if(m_LocalClientID != -1 && (m_aClients[m_LocalClientID].m_Team != aParaI[0] || (m_Snap.m_SpecInfo.m_Active &&
+						((m_Snap.m_SpecInfo.m_SpectatorID != -1 && m_aClients[m_Snap.m_SpecInfo.m_SpectatorID].m_Team != aParaI[0]) ||
+							(m_Snap.m_SpecInfo.m_SpecMode == SPEC_FLAGRED && aParaI[0] != TEAM_RED) ||
+							(m_Snap.m_SpecInfo.m_SpecMode == SPEC_FLAGBLUE && aParaI[0] != TEAM_BLUE)))))
+						m_pSounds->Enqueue(CSounds::CHN_GLOBAL, SOUND_CTF_GRAB_PL);
+					else
+						m_pSounds->Enqueue(CSounds::CHN_GLOBAL, SOUND_CTF_GRAB_EN);
+				}
 				break;
-			case GAMEMSG_GAME_PAUSED:
+				case GAMEMSG_GAME_PAUSED:
 				{
 					int ClientID = clamp(aParaI[0], 0, MAX_CLIENTS - 1);
 					char aLabel[64];
@@ -861,37 +853,41 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 					m_pChat->AddLine(aBuf);
 				}
 				break;
-			case GAMEMSG_CTF_CAPTURE:
-				m_pSounds->Enqueue(CSounds::CHN_GLOBAL, SOUND_CTF_CAPTURE);
-				int ClientID = clamp(aParaI[1], 0, MAX_CLIENTS - 1);
-				m_pStats->OnFlagCapture(ClientID);
-				char aLabel[64];
-				GetPlayerLabel(aLabel, sizeof(aLabel), ClientID, m_aClients[ClientID].m_aName);
+				case GAMEMSG_CTF_CAPTURE:
+				{
+					m_pSounds->Enqueue(CSounds::CHN_GLOBAL, SOUND_CTF_CAPTURE);
+					int ClientID = clamp(aParaI[1], 0, MAX_CLIENTS - 1);
+					m_pStats->OnFlagCapture(ClientID);
+					char aLabel[64];
+					GetPlayerLabel(aLabel, sizeof(aLabel), ClientID, m_aClients[ClientID].m_aName);
 
-				float Time = aParaI[2] / (float)Client()->GameTickSpeed();
-				if(Time <= 60)
-				{
-					if(aParaI[0])
+					float Time = aParaI[2] / (float)Client()->GameTickSpeed();
+					if(Time <= 60)
 					{
-						str_format(aBuf, sizeof(aBuf), Localize("The blue flag was captured by '%s' (%.2f seconds)"), aLabel, Time);
+						if(aParaI[0])
+						{
+							str_format(aBuf, sizeof(aBuf), Localize("The blue flag was captured by '%s' (%.2f seconds)"), aLabel, Time);
+						}
+						else
+						{
+							str_format(aBuf, sizeof(aBuf), Localize("The red flag was captured by '%s' (%.2f seconds)"), aLabel, Time);
+						}
 					}
 					else
 					{
-						str_format(aBuf, sizeof(aBuf), Localize("The red flag was captured by '%s' (%.2f seconds)"), aLabel, Time);
+						if(aParaI[0])
+						{
+							str_format(aBuf, sizeof(aBuf), Localize("The blue flag was captured by '%s'"), aLabel);
+						}
+						else
+						{
+							str_format(aBuf, sizeof(aBuf), Localize("The red flag was captured by '%s'"), aLabel);
+						}
 					}
+					m_pChat->AddLine(aBuf);
 				}
-				else
-				{
-					if(aParaI[0])
-					{
-						str_format(aBuf, sizeof(aBuf), Localize("The blue flag was captured by '%s'"), aLabel);
-					}
-					else
-					{
-						str_format(aBuf, sizeof(aBuf), Localize("The red flag was captured by '%s'"), aLabel);
-					}
-				}
-				m_pChat->AddLine(aBuf);
+				break;
+				default: break;
 			}
 			return;
 		}
@@ -906,12 +902,13 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 		// handle message
 		switch(gs_GameMsgList[GameMsgID].m_Action)
 		{
-		case DO_CHAT:
-			m_pChat->AddLine(pText);
-			break;
-		case DO_BROADCAST:
-			m_pBroadcast->DoClientBroadcast(pText);
-			break;
+			case DO_CHAT:
+				m_pChat->AddLine(pText);
+				break;
+			case DO_BROADCAST:
+				m_pBroadcast->DoClientBroadcast(pText);
+				break;
+			default: break;
 		}
 	}
 
@@ -992,7 +989,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 			str_format(aBuf, sizeof(aBuf), Localize("%s is muted by you"), aLabel);
 			m_pChat->AddLine(aBuf, CChat::CLIENT_MSG);
 		}
-		
+
 		m_aClients[pMsg->m_ClientID].UpdateRenderInfo(this, pMsg->m_ClientID, true);
 
 		m_GameInfo.m_NumPlayers++;
@@ -1145,6 +1142,7 @@ void CGameClient::OnMessage(int MsgId, CUnpacker *pUnpacker)
 	// mmotee
 	else if(MsgId == NETMSGTYPE_SV_AFTERISMMOSERVER && Client()->State() != IClient::STATE_DEMOPLAYBACK)
 	{
+		ParsingMmoData();
 		m_ConnectedMmoServer = true;
 		m_pMenus->SetAuthState(true);
 	}
@@ -1160,7 +1158,7 @@ void CGameClient::OnStateChange(int NewState, int OldState)
 	// reset everything when not already connected (to keep gathered stuff)
 	if(NewState < IClient::STATE_ONLINE)
 		OnReset();
-	
+
 	// then change the state
 	for(int i = 0; i < m_All.m_Num; i++)
 		m_All.m_paComponents[i]->OnStateChange(NewState, OldState);
@@ -1251,7 +1249,7 @@ void CGameClient::ProcessEvents()
 		else if (Item.m_Type == NETEVENTTYPE_MMODAMAGE)
 		{
 			CNetEvent_MmoDamage* ev = (CNetEvent_MmoDamage*)pData;
-			m_pEffects->DamageMmoInd(vec2(ev->m_X, ev->m_Y), ev->m_DamageCount, ev->m_CritDamage);
+			m_pEffects->DamageMmoInd(vec2(ev->m_X, ev->m_Y), ev->m_Damage, ev->m_CritDamage);
 		}
 	}
 }
@@ -2019,7 +2017,7 @@ void CGameClient::SetAtmosphereMusicMRPG(int SoundID, float Vol)
 {
 	if(SoundID == -1 && m_WorldMusicID != -1 && m_pSounds->IsPlaying(m_WorldMusicID))
 		m_pSounds->Stop(m_WorldMusicID);
-	
+
 	m_WorldMusicID = SoundID;
 	m_pSounds->SetChannelVolume(CSounds::CHN_MMORPG_ATMOSPHERE, Vol);
 	UpdateStateMmoMusic();
@@ -2029,7 +2027,7 @@ void CGameClient::UpdateStateMmoMusic()
 {
 	if(m_WorldMusicID == -1)
 		return;
-	
+
 	// update state active music
 	const bool ShouldPlay = Client()->State() == IClient::STATE_ONLINE && MmoServer() && g_Config.m_SndEnable && g_Config.m_SndMusicMRPG;
 	if(ShouldPlay && !m_pSounds->IsPlaying(m_WorldMusicID))
@@ -2052,10 +2050,11 @@ void CGameClient::DoEnterMessage(const char *pName, int ClientID, int Team)
 	GetPlayerLabel(aLabel, sizeof(aLabel), ClientID, pName);
 	switch(GetStrTeam(Team, m_GameInfo.m_GameFlags&GAMEFLAG_TEAMS))
 	{
-	case STR_TEAM_GAME: str_format(aBuf, sizeof(aBuf), Localize("'%s' entered and joined the game"), aLabel); break;
-	case STR_TEAM_RED: str_format(aBuf, sizeof(aBuf), Localize("'%s' entered and joined the red team"), aLabel); break;
-	case STR_TEAM_BLUE: str_format(aBuf, sizeof(aBuf), Localize("'%s' entered and joined the blue team"), aLabel); break;
-	case STR_TEAM_SPECTATORS: str_format(aBuf, sizeof(aBuf), Localize("'%s' entered and joined the spectators"), aLabel); break;
+		case STR_TEAM_GAME: str_format(aBuf, sizeof(aBuf), Localize("'%s' entered and joined the game"), aLabel); break;
+		case STR_TEAM_RED: str_format(aBuf, sizeof(aBuf), Localize("'%s' entered and joined the red team"), aLabel); break;
+		case STR_TEAM_BLUE: str_format(aBuf, sizeof(aBuf), Localize("'%s' entered and joined the blue team"), aLabel); break;
+		case STR_TEAM_SPECTATORS: str_format(aBuf, sizeof(aBuf), Localize("'%s' entered and joined the spectators"), aLabel); break;
+		default: break;
 	}
 	m_pChat->AddLine(aBuf);
 }
@@ -2078,10 +2077,11 @@ void CGameClient::DoTeamChangeMessage(const char *pName, int ClientID, int Team)
 	GetPlayerLabel(aLabel, sizeof(aLabel), ClientID, pName);
 	switch(GetStrTeam(Team, m_GameInfo.m_GameFlags&GAMEFLAG_TEAMS))
 	{
-	case STR_TEAM_GAME: str_format(aBuf, sizeof(aBuf), Localize("'%s' joined the game"), aLabel); break;
-	case STR_TEAM_RED: str_format(aBuf, sizeof(aBuf), Localize("'%s' joined the red team"), aLabel); break;
-	case STR_TEAM_BLUE: str_format(aBuf, sizeof(aBuf), Localize("'%s' joined the blue team"), aLabel); break;
-	case STR_TEAM_SPECTATORS: str_format(aBuf, sizeof(aBuf), Localize("'%s' joined the spectators"), aLabel); break;
+		case STR_TEAM_GAME: str_format(aBuf, sizeof(aBuf), Localize("'%s' joined the game"), aLabel); break;
+		case STR_TEAM_RED: str_format(aBuf, sizeof(aBuf), Localize("'%s' joined the red team"), aLabel); break;
+		case STR_TEAM_BLUE: str_format(aBuf, sizeof(aBuf), Localize("'%s' joined the blue team"), aLabel); break;
+		case STR_TEAM_SPECTATORS: str_format(aBuf, sizeof(aBuf), Localize("'%s' joined the spectators"), aLabel); break;
+		default: break;
 	}
 	m_pChat->AddLine(aBuf);
 }
@@ -2131,6 +2131,27 @@ void CGameClient::SendSkinChange()
 	}
 	Client()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NORECORD|MSGFLAG_FLUSH);
 	m_LastSkinChangeTime = Client()->LocalTime();
+}
+
+void CGameClient::ParsingMmoData()
+{
+	char aResultBuf[256];
+
+	// items information
+	CUIGameInterface::m_aItemsDataInformation.clear();
+	nlohmann::json JsonData = nlohmann::json::parse(Client()->GetJsonDataMRPG(MMO_DATA_INVENTORY_INFORMATION));
+	auto ItemsList = JsonData["items"];
+	for(auto& p : ItemsList)
+	{
+		CUIGameInterface::CItemDataClientInfo Item{};
+		Item.m_ItemID = p.value("id", 0);
+		str_copy(Item.m_aName, p.value("name", "").c_str(), sizeof(Item.m_aName));
+		str_copy(Item.m_aDesc, p.value("desc", "").c_str(), sizeof(Item.m_aDesc));
+		str_copy(Item.m_aIcon, p.value("icon", "").c_str(), sizeof(Item.m_aIcon));
+		CUIGameInterface::m_aItemsDataInformation[Item.m_ItemID] = Item;
+	}
+	str_format(aResultBuf, sizeof(aResultBuf), "loaded %d data items list", (int)CUIGameInterface::m_aItemsDataInformation.size());
+	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "game", aResultBuf);
 }
 
 int CGameClient::GetClientID(const char* pName)

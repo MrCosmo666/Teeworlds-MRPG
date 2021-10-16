@@ -1,7 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <engine/graphics.h>
-#include <engine/demo.h>
 
 //mmotee
 #include <engine/shared/config.h>
@@ -10,7 +9,6 @@
 #include <generated/client_data.h>
 
 #include <game/client/gameclient.h>
-#include <game/client/ui.h>
 #include <game/client/render.h>
 
 #include <game/client/components/flow.h>
@@ -133,7 +131,7 @@ void CItems::RenderPickup(const CNetObj_Pickup *pPrev, const CNetObj_Pickup *pCu
 		Size = g_pData->m_Weapons.m_aId[WEAPON_HAMMER].m_VisualSize;
 		break;
 	}
-	
+
 	if(g_Config.m_ClAdaptivePickups
 		&& m_pClient->m_Snap.m_pLocalCharacter
 		&& !(m_pClient->m_Snap.m_pGameData->m_GameStateFlags & (GAMESTATEFLAG_ROUNDOVER | GAMESTATEFLAG_GAMEOVER)))
@@ -184,7 +182,7 @@ void CItems::RenderFlag(const CNetObj_Flag *pPrev, const CNetObj_Flag *pCurrent,
 			((pCurrent->m_Team == TEAM_RED && pPrevGameDataFlag->m_FlagCarrierRed != pCurGameDataFlag->m_FlagCarrierRed) ||
 			(pCurrent->m_Team == TEAM_BLUE && pPrevGameDataFlag->m_FlagCarrierBlue != pCurGameDataFlag->m_FlagCarrierBlue)))
 			Pos = vec2(pCurrent->m_X, pCurrent->m_Y);
-	
+
 		int FlagCarrier = -1;
 		if(pCurrent->m_Team == TEAM_RED && pCurGameDataFlag->m_FlagCarrierRed >= 0)
 			FlagCarrier = pCurGameDataFlag->m_FlagCarrierRed;
@@ -300,7 +298,7 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 		Ct = ((float)(Client()->PredGameTick() - 1 - pCurrent->m_StartTick) + Client()->PredIntraGameTick()) / (float)SERVER_TICK_SPEED;
 	else
 		Ct = (Client()->PrevGameTick() - pCurrent->m_StartTick) / (float)SERVER_TICK_SPEED + s_LastGameTickTime;
-	if (Ct < 0) 
+	if (Ct < 0)
 		return; // projectile havn't been shot yet
 
 	const vec2 StartPos(pCurrent->m_X, pCurrent->m_Y);
@@ -326,13 +324,13 @@ void CItems::RenderMmoProjectile(const CNetObj_MmoProj* pCurrent, int ItemID)
 		Graphics()->QuadsSetRotation(s_Time * pi * 2 * 2 + ItemID);
 		s_LastLocalTime = Now;
 	}
-	else 
+	else
 	{
 		m_pClient->m_pEffects->BulletTrail(Pos);
 
-		if (length(Vel) > 0.00001f) 
+		if (length(Vel) > 0.00001f)
 			Graphics()->QuadsSetRotation(angle(Vel));
-		else 
+		else
 			Graphics()->QuadsSetRotation(0);
 	}
 
@@ -349,13 +347,13 @@ void CItems::RenderMmoPickups(const CNetObj_MmoPickup* pPrev, const CNetObj_MmoP
 	const vec2 Curr = vec2(pCurrent->m_X, pCurrent->m_Y);
 	vec2 Pos = mix(Prev, Curr, Client()->IntraGameTick());
 	const float Angle = mix((float)pPrev->m_Angle, (float)pCurrent->m_Angle, Client()->IntraGameTick()) / 256.0f;
-	const int c[] = 
-		{ 
-			SPRITE_MMO_GAME_BOX, 
-			SPRITE_MMO_GAME_EXPERIENCE, 
-			SPRITE_MMO_GAME_PLANT, 
-			SPRITE_MMO_GAME_ORES, 
-			SPRITE_MMO_GAME_SIDE_ARROW, 
+	const int c[] =
+		{
+			SPRITE_MMO_GAME_BOX,
+			SPRITE_MMO_GAME_EXPERIENCE,
+			SPRITE_MMO_GAME_PLANT,
+			SPRITE_MMO_GAME_ORES,
+			SPRITE_MMO_GAME_SIDE_ARROW,
 			SPRITE_MMO_GAME_MAIN_ARROW,
 			SPRITE_MMO_GAME_DROP };
 
@@ -370,11 +368,11 @@ void CItems::RenderMmoPickups(const CNetObj_MmoPickup* pPrev, const CNetObj_MmoP
 		default:
 			break;
 	}
-	
+
 	Graphics()->TextureSet(g_pData->m_aImages[IMAGE_MMOGAME].m_Id);
 	Graphics()->QuadsBegin();
 	RenderTools()->SelectSprite(c[pCurrent->m_Type]);
-	const bool IsAngleItem = (bool)(pCurrent->m_Type == MMO_PICKUP_SIDE_ARROW || pCurrent->m_Type == MMO_PICKUP_MAIN_ARROW || 
+	const bool IsAngleItem = (bool)(pCurrent->m_Type == MMO_PICKUP_SIDE_ARROW || pCurrent->m_Type == MMO_PICKUP_MAIN_ARROW ||
 									pCurrent->m_Type == MMO_PICKUP_BOX || pCurrent->m_Type == MMO_PICKUP_DROP);
 	if (IsAngleItem)
 	{

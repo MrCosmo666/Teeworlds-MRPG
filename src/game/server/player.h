@@ -3,13 +3,12 @@
 #ifndef GAME_SERVER_PLAYER_H
 #define GAME_SERVER_PLAYER_H
 
-#include "mmocore/ComponentsCore/AccountMainJob.h"
-#include "mmocore/ComponentsCore/BotJob.h"
+#include "mmocore/Components/Accounts/AccountData.h"
+#include "mmocore/Components/Inventory/ItemData.h"
+#include "mmocore/Components/Quests/QuestData.h"
+#include "mmocore/Components/Skills/SkillData.h"
 
-#include "mmocore/ComponentsCore/InventoryJob/ItemInventory.h"
-#include "mmocore/ComponentsCore/SkillsJob/Skill.h"
-#include "mmocore/ComponentsCore/QuestsJob/PlayerQuests.h"
-
+#include <game/voting.h>
 #include "entities/character.h"
 
 enum
@@ -90,18 +89,18 @@ public:
 
 	virtual int GetTeam();
 	virtual bool IsBot() const { return false; }
-	virtual int GetBotID() const { return -1; };
-	virtual int GetBotType() const { return -1; };
-	virtual int GetBotSub() const { return -1; };
+	virtual int GetBotID() const { return -1; }
+	virtual int GetBotType() const { return -1; }
+	virtual int GetBotSub() const { return -1; }
 	virtual	int GetPlayerWorldID() const;
 
 	virtual int GetStartHealth();
 	int GetStartMana();
-	virtual	int GetHealth() { return GetTempData().m_TempHealth; };
-	virtual	int GetMana() { return GetTempData().m_TempMana; };
+	virtual	int GetHealth() { return GetTempData().m_TempHealth; }
+	virtual	int GetMana() { return GetTempData().m_TempMana; }
 
 	virtual void HandleTuningParams();
-	virtual int IsActiveSnappingBot(int SnappingClient) const { return 2; };
+	virtual int IsActiveSnappingBot(int SnappingClient) const { return 2; }
 	virtual int GetEquippedItemID(int EquipID, int SkipItemID = -1) const;
 	virtual int GetAttributeCount(int BonusID, bool ActiveFinalStats = false);
 	int GetItemsAttributeCount(int AttributeID) const;
@@ -115,29 +114,29 @@ public:
 	virtual void Tick();
 	virtual void PostTick();
 	virtual void Snap(int SnappingClient);
-	
+
 private:
 	void EffectsTick();
 	void TickSystemTalk();
 	virtual void TryRespawn();
 
 public:
-	CCharacter *GetCharacter();
+	CCharacter *GetCharacter() const;
 
 	void KillCharacter(int Weapon = WEAPON_WORLD);
 	void OnDisconnect();
 	void OnDirectInput(CNetObj_PlayerInput *NewInput);
-	void OnPredictedInput(CNetObj_PlayerInput *NewInput);
+	void OnPredictedInput(CNetObj_PlayerInput *NewInput) const;
 
-	int GetCID() const { return m_ClientID; };
+	int GetCID() const { return m_ClientID; }
 	/* #########################################################################
-		FUNCTIONS PLAYER HELPER 
+		FUNCTIONS PLAYER HELPER
 	######################################################################### */
-	void ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp);
-	bool Upgrade(int Count, int *Upgrade, int *Useless, int Price, int MaximalUpgrade, const char *UpgradeName);
+	void ProgressBar(const char *Name, int MyLevel, int MyExp, int ExpNeed, int GivedExp) const;
+	bool Upgrade(int Value, int *Upgrade, int *Useless, int Price, int MaximalUpgrade) const;
 
 	/* #########################################################################
-		FUNCTIONS PLAYER ACCOUNT 
+		FUNCTIONS PLAYER ACCOUNT
 	######################################################################### */
 	bool SpendCurrency(int Price, int ItemID = 1);
 	const char* GetLanguage() const;
@@ -145,26 +144,26 @@ public:
 	void AddMoney(int Money);
 
 	bool GetHidenMenu(int HideID) const;
-	bool IsAuthed();
-	int GetStartTeam();
+	bool IsAuthed() const;
+	int GetStartTeam() const;
 
-	int ExpNeed(int Level) const;
-	void ShowInformationStats();
+	static int ExpNeed(int Level);
+	void ShowInformationStats(BroadcastPriority Priority = BroadcastPriority::BASIC_STATS);
 
 	/* #########################################################################
-		FUNCTIONS PLAYER PARSING 
+		FUNCTIONS PLAYER PARSING
 	######################################################################### */
 	bool ParseItemsF3F4(int Vote);
   	bool ParseVoteUpgrades(const char *CMD, const int VoteID, const int VoteID2, int Get);
 
 	/* #########################################################################
-		FUNCTIONS PLAYER ITEMS 
+		FUNCTIONS PLAYER ITEMS
 	######################################################################### */
-	InventoryItem& GetItem(int ItemID);
-	CSkill &GetSkill(int SkillID);
-	CPlayerQuest& GetQuest(int QuestID);
-	AccountMainJob::StructTempPlayerData& GetTempData() { return AccountMainJob::ms_aPlayerTempData[m_ClientID]; }
-	AccountMainJob::StructData& Acc() { return AccountMainJob::ms_aData[m_ClientID]; }
+	CItemData& GetItem(int ItemID);
+	CSkillData& GetSkill(int SkillID);
+	CQuestData& GetQuest(int QuestID);
+	CAccountTempData& GetTempData() const { return CAccountTempData::ms_aPlayerTempData[m_ClientID]; }
+	CAccountData& Acc() const { return CAccountData::ms_aData[m_ClientID]; }
 
 	int GetLevelTypeAttribute(int Class);
 	int GetLevelAllAttributes();
@@ -172,10 +171,10 @@ public:
 	// npc conversations
 	void SetTalking(int TalkedID, bool IsStartDialogue);
 	void ClearTalking();
-	int GetTalkedID() const { return m_DialogNPC.m_TalkedID; };
+	int GetTalkedID() const { return m_DialogNPC.m_TalkedID; }
 
 	// dialog formating
-	const char *GetDialogText();
+	const char *GetDialogText() const;
 	void FormatDialogText(int DataBotID, const char *pText);
 	void ClearDialogText();
 

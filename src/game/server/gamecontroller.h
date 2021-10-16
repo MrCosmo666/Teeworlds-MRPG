@@ -4,8 +4,7 @@
 #define GAME_SERVER_GAMECONTROLLER_H
 
 #include <base/vmath.h>
-#include <game/commands.h>
-#include <game/server/enum_context.h>
+#include <game/game_context.h>
 
 /*
 	Class: Game Controller
@@ -33,9 +32,9 @@ class IGameController
 		int m_FriendlyTeam;
 		float m_Score;
 	};
-	vec2 m_aaSpawnPoints[SpawnTypes::SPAWN_NUM][64];
-	int m_aNumSpawnPoints[SpawnTypes::SPAWN_NUM];
-	
+	vec2 m_aaSpawnPoints[SPAWN_NUM][64];
+	int m_aNumSpawnPoints[SPAWN_NUM];
+
 	float EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos) const;
 	void EvaluateSpawnType(CSpawnEval *pEval, int Type, vec2 BotPos) const;
 
@@ -44,21 +43,18 @@ protected:
 	IServer *Server() const { return m_pServer; }
 
 	// info
-	const char *m_pGameType;
 	int m_GameFlags;
-	
+
 	void UpdateGameInfo(int ClientID);
 
 public:
 	IGameController(class CGS *pGS);
 	virtual ~IGameController() {};
 
+	virtual void OnCharacterDamage(class CPlayer* pFrom, class CPlayer* pTo, int Damage);
 	virtual void OnCharacterDeath(class CCharacter *pVictim, class CPlayer *pKiller, int Weapon);
 	virtual bool OnCharacterSpawn(class CCharacter *pChr);
 	virtual bool OnEntity(int Index, vec2 Pos);
-
-	static void Com_Example(IConsole::IResult* pResult, void* pContext);
-	virtual void RegisterChatCommands(CCommandManager* pManager);
 
 	void OnPlayerConnect(class CPlayer *pPlayer);
 	void OnPlayerDisconnect(class CPlayer *pPlayer);
@@ -66,12 +62,11 @@ public:
 	void OnReset();
 
 	virtual void CreateLogic(int Type, int Mode, vec2 Pos, int Health) = 0;
-	
+
 	// general
 	virtual void Snap();
 	virtual void Tick();
 
-	const char *GetGameType() const { return m_pGameType; }
 	bool CanSpawn(int SpawnType, vec2 *pPos, vec2 BotPos) const;
 	void DoTeamChange(class CPlayer *pPlayer, bool DoChatMsg=true);
 

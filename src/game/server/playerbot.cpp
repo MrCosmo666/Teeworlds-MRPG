@@ -1,10 +1,17 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include "entities/botai/character_bot_ai.h"
+#include "playerbot.h"
+
 #include "gamecontext.h"
 #include "mmocore/PathFinder.h"
 
-#include "playerbot.h"
+#include "entities/botai/character_bot_ai.h"
+
+#include "mmocore/Components/Bots/BotCore.h"
+#include "mmocore/Components/Worlds/WorldSwapCore.h"
+
+#include <thread>
+#include <mutex>
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayerBot, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 
@@ -16,10 +23,10 @@ CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int Spaw
 	(this)->SendClientInfo(-1);
 }
 
-CPlayerBot::~CPlayerBot() 
+CPlayerBot::~CPlayerBot()
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
-		BotJob::ms_aDataBot[m_BotID].m_aAlreadyActiveQuestBot[i] = false;
+		DataBotInfo::ms_aDataBot[m_BotID].m_aAlreadyActiveQuestBot[i] = false;
 
 	CNetMsg_Sv_ClientDrop Msg;
 	Msg.m_ClientID = m_ClientID;
@@ -57,7 +64,7 @@ void CPlayerBot::Tick()
 			lockingPath.unlock();
 		}
 	}
-	else if(m_Spawned && m_aPlayerTick[TickState::Respawn]+Server()->TickSpeed()*3 <= Server()->Tick())
+	else if(m_Spawned && m_aPlayerTick[Respawn]+Server()->TickSpeed()*3 <= Server()->Tick())
 		TryRespawn();
 }
 
@@ -79,7 +86,7 @@ void CPlayerBot::EffectsTick()
 		if(pEffect->second <= 0)
 		{
 			if(m_pCharacter && m_pCharacter->IsAlive())
-				GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, pEffect->first.c_str(), false);
+				GS()->CreatePotionEffect(m_pCharacter->m_Core.m_Pos, pEffect->first.c_str(), false);
 			pEffect = m_aEffects.erase(pEffect);
 			continue;
 		}
@@ -89,36 +96,36 @@ void CPlayerBot::EffectsTick()
 
 int CPlayerBot::GetStartHealth()
 {
-	if(m_BotType == BotsTypes::TYPE_BOT_MOB)
-		return GetAttributeCount(Stats::StHardness);
-	return 10;	
+	if(m_BotType == TYPE_BOT_MOB)
+		return GetAttributeCount(StHardness);
+	return 10;
 }
 
 int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 {
-	if(m_BotType != BotsTypes::TYPE_BOT_MOB)
+	if(m_BotType != TYPE_BOT_MOB)
 		return 10;
 
 	// get stats from the bot's equipment
-	int AttributeEx = BotJob::ms_aMobBot[m_SubBotID].m_Power;
+	int AttributeEx = MobBotInfo::ms_aMobBot[m_SubBotID].m_Power;
 	for (int i = 0; i < MAX_EQUIPPED_SLOTS_BOTS; i++)
 	{
 		const int ItemID = GetEquippedItemID(i);
-		const int ItemBonusCount = GS()->GetItemInfo(ItemID).GetInfoEnchantStats(BonusID);
-		if (ItemID > 0 && ItemBonusCount > 0)
-			AttributeEx += ItemBonusCount;
+		const int ItemBonusValue = GS()->GetItemInfo(ItemID).GetInfoEnchantStats(BonusID);
+		if (ItemID > 0 && ItemBonusValue > 0)
+			AttributeEx += ItemBonusValue;
 	}
-	
+
 	// spread weapons
-	if(BonusID == Stats::StSpreadShotgun || BonusID == Stats::StSpreadGrenade || BonusID == Stats::StSpreadRifle)
-		AttributeEx = BotJob::ms_aMobBot[m_SubBotID].m_Spread;
+	if(BonusID == StSpreadShotgun || BonusID == StSpreadGrenade || BonusID == StSpreadRifle)
+		AttributeEx = MobBotInfo::ms_aMobBot[m_SubBotID].m_Spread;
 
 	// all attribute stats without hardness
-	else if(BonusID != Stats::StHardness && CGS::ms_aAttributsInfo[BonusID].m_Devide > 0)
+	else if(BonusID != StHardness && CGS::ms_aAttributsInfo[BonusID].m_Devide > 0)
 	{
 		AttributeEx /= CGS::ms_aAttributsInfo[BonusID].m_Devide;
 		if(CGS::ms_aAttributsInfo[BonusID].m_Type == AtHardtype)
-			AttributeEx /= BotJob::ms_aMobBot[m_SubBotID].m_Boss ? 30 : 2;
+			AttributeEx /= MobBotInfo::ms_aMobBot[m_SubBotID].m_Boss ? 30 : 2;
 	}
 
 	return AttributeEx;
@@ -132,7 +139,7 @@ void CPlayerBot::GiveEffect(const char* Potion, int Sec, int Random)
 	if((Random && random_int() % Random == 0) || !Random)
 	{
 		m_aEffects[Potion] = Sec;
-		GS()->SendMmoPotion(m_pCharacter->m_Core.m_Pos, Potion, true);
+		GS()->CreatePotionEffect(m_pCharacter->m_Core.m_Pos, Potion, true);
 	}
 }
 
@@ -150,13 +157,13 @@ void CPlayerBot::TryRespawn()
 {
 	// select spawn point
 	vec2 SpawnPos;
-	if(m_BotType == BotsTypes::TYPE_BOT_MOB)
+	if(m_BotType == TYPE_BOT_MOB)
 	{
 		// close spawn mobs on non allowed spawn dungeon
 		if(GS()->IsDungeon() && !m_DungeonAllowedSpawn)
 			return;
 
-		vec2 MobRespawnPosition = vec2(BotJob::ms_aMobBot[m_SubBotID].m_PositionX, BotJob::ms_aMobBot[m_SubBotID].m_PositionY);
+		vec2 MobRespawnPosition = vec2(MobBotInfo::ms_aMobBot[m_SubBotID].m_PositionX, MobBotInfo::ms_aMobBot[m_SubBotID].m_PositionY);
 		if(!GS()->m_pController->CanSpawn(m_BotType, &SpawnPos, MobRespawnPosition))
 			return;
 
@@ -164,13 +171,13 @@ void CPlayerBot::TryRespawn()
 		if(GS()->IsDungeon() && m_DungeonAllowedSpawn)
 			m_DungeonAllowedSpawn = false;
 	}
-	else if(m_BotType == BotsTypes::TYPE_BOT_NPC)
+	else if(m_BotType == TYPE_BOT_NPC)
 	{
-		SpawnPos = vec2(BotJob::ms_aNpcBot[m_SubBotID].m_PositionX, BotJob::ms_aNpcBot[m_SubBotID].m_PositionY);
+		SpawnPos = vec2(NpcBotInfo::ms_aNpcBot[m_SubBotID].m_PositionX, NpcBotInfo::ms_aNpcBot[m_SubBotID].m_PositionY);
 	}
-	else if(m_BotType == BotsTypes::TYPE_BOT_QUEST)
+	else if(m_BotType == TYPE_BOT_QUEST)
 	{
-		SpawnPos = vec2(BotJob::ms_aQuestBot[m_SubBotID].m_PositionX, BotJob::ms_aQuestBot[m_SubBotID].m_PositionY);
+		SpawnPos = vec2(QuestBotInfo::ms_aQuestBot[m_SubBotID].m_PositionX, QuestBotInfo::ms_aQuestBot[m_SubBotID].m_PositionY);
 	}
 
 	// create character
@@ -179,7 +186,7 @@ void CPlayerBot::TryRespawn()
 	m_pCharacter->Spawn(this, SpawnPos);
 
 	// so that no effects can be seen that an NPC that is not visible to one player is visible to another player
-	if(m_BotType != BotsTypes::TYPE_BOT_QUEST)
+	if(m_BotType != TYPE_BOT_QUEST)
 		GS()->CreatePlayerSpawn(SpawnPos);
 }
 
@@ -194,25 +201,25 @@ int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 	if(SnappingClient < 0 || SnappingClient >= MAX_PLAYERS || !pSnappingPlayer)
 		return 0;
 
-	if(m_BotType == BotsTypes::TYPE_BOT_QUEST)
+	if(m_BotType == TYPE_BOT_QUEST)
 	{
-		const int QuestID = BotJob::ms_aQuestBot[m_SubBotID].m_QuestID;
-		if(pSnappingPlayer->GetQuest(QuestID).GetState() != QuestState::QUEST_ACCEPT) 
+		const int QuestID = QuestBotInfo::ms_aQuestBot[m_SubBotID].m_QuestID;
+		if(pSnappingPlayer->GetQuest(QuestID).GetState() != QUEST_ACCEPT)
 			return 0;
 
-		if(BotJob::ms_aQuestBot[m_SubBotID].m_Step != pSnappingPlayer->GetQuest(QuestID).m_Step)
+		if(QuestBotInfo::ms_aQuestBot[m_SubBotID].m_Step != pSnappingPlayer->GetQuest(QuestID).m_Step)
 			return 0;
-		
+
 		// [first] quest bot active for player
-		BotJob::ms_aDataBot[m_BotID].m_aAlreadyActiveQuestBot[SnappingClient] = true;
+		DataBotInfo::ms_aDataBot[m_BotID].m_aAlreadyActiveQuestBot[SnappingClient] = true;
 	}
 
-	if(m_BotType == BotsTypes::TYPE_BOT_NPC)
+	if(m_BotType == TYPE_BOT_NPC)
 	{
 		// [second] skip snapping for npc already snap on quest state
-		if(BotJob::ms_aDataBot[m_BotID].m_aAlreadyActiveQuestBot[SnappingClient])
+		if(DataBotInfo::ms_aDataBot[m_BotID].m_aAlreadyActiveQuestBot[SnappingClient])
 			return 0;
-		
+
 		if(!IsActiveQuests(SnappingClient))
 			return 1;
 	}
@@ -238,7 +245,7 @@ void CPlayerBot::Snap(int SnappingClient)
 
 	pPlayerInfo->m_PlayerFlags = PLAYERFLAG_READY;
 	pPlayerInfo->m_Latency = 0;
-	pPlayerInfo->m_Score = (m_BotType == BotsTypes::TYPE_BOT_MOB ? BotJob::ms_aMobBot[m_SubBotID].m_Level : 1);
+	pPlayerInfo->m_Score = (m_BotType == TYPE_BOT_MOB ? MobBotInfo::ms_aMobBot[m_SubBotID].m_Level : 1);
 
 	// --------------------- CUSTOM ----------------------
 	if(!GS()->IsMmoClient(SnappingClient))
@@ -261,29 +268,29 @@ void CPlayerBot::Snap(int SnappingClient)
 
 int CPlayerBot::GetMoodState(int SnappingClient) const
 {
-	if(GetBotType() == BotsTypes::TYPE_BOT_MOB)
+	if(GetBotType() == TYPE_BOT_MOB)
 	{
 		CCharacterBotAI *pChr = (CCharacterBotAI *)m_pCharacter;
 		if(pChr && pChr->GetBotTarget() != m_ClientID)
 		{
 			if(pChr->GetBotTarget() == SnappingClient)
 				return MOOD_AGRESSED_TANK;
-			else 
+			else
 				return MOOD_AGRESSED_OTHER;
 		}
-		else 
+		else
 			return MOOD_ANGRY;
 	}
-	else if(GetBotType() == BotsTypes::TYPE_BOT_NPC)
+	else if(GetBotType() == TYPE_BOT_NPC)
 		return MOOD_FRIENDLY;
-	else if(GetBotType() == BotsTypes::TYPE_BOT_QUEST)
+	else if(GetBotType() == TYPE_BOT_QUEST)
 		return MOOD_QUESTING;
 	return MOOD_NORMAL;
 }
 
 int CPlayerBot::GetBotLevel() const
 {
-	return (m_BotType == BotsTypes::TYPE_BOT_MOB ? BotJob::ms_aMobBot[m_SubBotID].m_Level : 1);
+	return (m_BotType == TYPE_BOT_MOB ? MobBotInfo::ms_aMobBot[m_SubBotID].m_Level : 1);
 }
 
 bool CPlayerBot::IsActiveQuests(int SnapClientID) const
@@ -292,14 +299,14 @@ bool CPlayerBot::IsActiveQuests(int SnapClientID) const
 	if (SnapClientID >= MAX_PLAYERS || SnapClientID < 0 || !pSnappingPlayer)
 		return false;
 
-	if (m_BotType == BotsTypes::TYPE_BOT_QUEST)
+	if (m_BotType == TYPE_BOT_QUEST)
 		return true;
 
-	if(m_BotType == BotsTypes::TYPE_BOT_NPC)
+	if(m_BotType == TYPE_BOT_NPC)
 	{
 		const int GivesQuest = GS()->Mmo()->BotsData()->GetQuestNPC(m_SubBotID);
-		if(BotJob::ms_aNpcBot[m_SubBotID].m_Function == FunctionsNPC::FUNCTION_NPC_GIVE_QUEST && 
-			pSnappingPlayer->GetQuest(GivesQuest).GetState() == QuestState::QUEST_NO_ACCEPT)
+		if(NpcBotInfo::ms_aNpcBot[m_SubBotID].m_Function == FUNCTION_NPC_GIVE_QUEST &&
+			pSnappingPlayer->GetQuest(GivesQuest).GetState() == QUEST_NO_ACCEPT)
 			return true;
 
 		return false;
@@ -311,17 +318,17 @@ int CPlayerBot::GetEquippedItemID(int EquipID, int SkipItemID) const
 {
 	if (EquipID < EQUIP_HAMMER || EquipID > EQUIP_WINGS || EquipID == EQUIP_MINER)
 		return -1;
-	return BotJob::ms_aDataBot[m_BotID].m_aEquipSlot[EquipID];
+	return DataBotInfo::ms_aDataBot[m_BotID].m_aEquipSlot[EquipID];
 }
 
 const char* CPlayerBot::GetStatusBot() const
 {
-	if (m_BotType == BotsTypes::TYPE_BOT_QUEST)
+	if (m_BotType == TYPE_BOT_QUEST)
 	{
-		const int QuestID = BotJob::ms_aQuestBot[m_SubBotID].m_QuestID;
+		const int QuestID = QuestBotInfo::ms_aQuestBot[m_SubBotID].m_QuestID;
 		return GS()->GetQuestInfo(QuestID).GetName();
 	}
-	else if (m_BotType == BotsTypes::TYPE_BOT_MOB && BotJob::ms_aMobBot[m_SubBotID].m_Boss)
+	else if (m_BotType == TYPE_BOT_MOB && MobBotInfo::ms_aMobBot[m_SubBotID].m_Boss)
 	{
 		if (GS()->IsDungeon())
 			return "Boss";
@@ -331,23 +338,24 @@ const char* CPlayerBot::GetStatusBot() const
 	return "\0";
 }
 
-void CPlayerBot::GenerateNick(char* buffer, int size_buffer)
+void CPlayerBot::GenerateNick(char* buffer, int size_buffer) const
 {
 	static const int SIZE_GENERATE = 10;
 	const char* FirstPos[SIZE_GENERATE] = { "Ja", "Qu", "Je", "Di", "Xo", "Us", "St", "Th", "Ge", "Re" };
 	const char* LastPos[SIZE_GENERATE] = { "de", "sa", "ul", "ma", "sa", "py", "as", "al", "ly", "in" };
 
-	if(GetBotType() == BotsTypes::TYPE_BOT_MOB && BotJob::ms_aMobBot[m_SubBotID].m_Spread > 0)
-		str_format(buffer, size_buffer, "%s %s%s", BotJob::ms_aDataBot[m_BotID].m_aNameBot, FirstPos[random_int() % SIZE_GENERATE], LastPos[random_int() % SIZE_GENERATE]);
-	else if(GetBotType() == BotsTypes::TYPE_BOT_QUEST && BotJob::ms_aQuestBot[m_SubBotID].m_GenerateNick)
-		str_format(buffer, size_buffer, "%s %s%s", BotJob::ms_aDataBot[m_BotID].m_aNameBot, FirstPos[random_int() % SIZE_GENERATE], LastPos[random_int() % SIZE_GENERATE]);
+	if(GetBotType() == TYPE_BOT_MOB && MobBotInfo::ms_aMobBot[m_SubBotID].m_Spread > 0)
+		str_format(buffer, size_buffer, "%s %s%s", DataBotInfo::ms_aDataBot[m_BotID].m_aNameBot, FirstPos[random_int() % SIZE_GENERATE], LastPos[random_int() % SIZE_GENERATE]);
+	else if(GetBotType() == TYPE_BOT_QUEST && QuestBotInfo::ms_aQuestBot[m_SubBotID].m_GenerateNick)
+		str_format(buffer, size_buffer, "%s %s%s", DataBotInfo::ms_aDataBot[m_BotID].m_aNameBot, FirstPos[random_int() % SIZE_GENERATE], LastPos[random_int() % SIZE_GENERATE]);
 	else
-		str_copy(buffer, BotJob::ms_aDataBot[m_BotID].m_aNameBot, size_buffer);
+		str_copy(buffer, DataBotInfo::ms_aDataBot[m_BotID].m_aNameBot, size_buffer);
 }
 
 void CPlayerBot::SendClientInfo(int TargetID)
 {
-	if((TargetID != -1 && (TargetID < 0 || TargetID >= MAX_PLAYERS || !Server()->ClientIngame(TargetID))) || m_BotType == BotsTypes::TYPE_BOT_FAKE)
+	if((TargetID != -1 && (TargetID < 0 || TargetID >= MAX_PLAYERS || !Server()->ClientIngame(TargetID))) || m_BotType ==
+		TYPE_BOT_FAKE)
 		return;
 
 	CNetMsg_Sv_ClientInfo ClientInfoMsg;
@@ -363,9 +371,9 @@ void CPlayerBot::SendClientInfo(int TargetID)
 	ClientInfoMsg.m_Silent = true;
 	for (int p = 0; p < 6; p++)
 	{
-		ClientInfoMsg.m_apSkinPartNames[p] = BotJob::ms_aDataBot[m_BotID].m_aaSkinNameBot[p];
-		ClientInfoMsg.m_aUseCustomColors[p] = BotJob::ms_aDataBot[m_BotID].m_aUseCustomBot[p];
-		ClientInfoMsg.m_aSkinPartColors[p] = BotJob::ms_aDataBot[m_BotID].m_aSkinColorBot[p];
+		ClientInfoMsg.m_apSkinPartNames[p] = DataBotInfo::ms_aDataBot[m_BotID].m_aaSkinNameBot[p];
+		ClientInfoMsg.m_aUseCustomColors[p] = DataBotInfo::ms_aDataBot[m_BotID].m_aUseCustomBot[p];
+		ClientInfoMsg.m_aSkinPartColors[p] = DataBotInfo::ms_aDataBot[m_BotID].m_aSkinColorBot[p];
 	}
 
 	// bot data it non static have accept it only world where it
@@ -374,11 +382,11 @@ void CPlayerBot::SendClientInfo(int TargetID)
 
 int CPlayerBot::GetPlayerWorldID() const
 {
-	if(m_BotType == BotsTypes::TYPE_BOT_MOB) 
-		return BotJob::ms_aMobBot[m_SubBotID].m_WorldID;
-	else if(m_BotType == BotsTypes::TYPE_BOT_NPC) 
-		return BotJob::ms_aNpcBot[m_SubBotID].m_WorldID;
-	return BotJob::ms_aQuestBot[m_SubBotID].m_WorldID;
+	if(m_BotType == TYPE_BOT_MOB)
+		return MobBotInfo::ms_aMobBot[m_SubBotID].m_WorldID;
+	else if(m_BotType == TYPE_BOT_NPC)
+		return NpcBotInfo::ms_aNpcBot[m_SubBotID].m_WorldID;
+	return QuestBotInfo::ms_aQuestBot[m_SubBotID].m_WorldID;
 }
 
 /***********************************************************************************/
@@ -419,7 +427,7 @@ void CPlayerBot::ThreadMobsPathFinder()
 	if(!m_pCharacter || !m_pCharacter->IsAlive())
 		return;
 
-	if(GetBotType() == BotsTypes::TYPE_BOT_MOB)
+	if(GetBotType() == TYPE_BOT_MOB)
 	{
 		if(m_TargetPos != vec2(0, 0) && (Server()->Tick() + 3 * m_ClientID) % (Server()->TickSpeed()) == 0)
 		{

@@ -6,6 +6,8 @@
 #include <game/server/entity.h>
 #include <game/server/gamecontroller.h>
 
+#include <game/server/mmocore/Components/Dungeons/DungeonData.h>
+
 enum DungeonState
 {
 	DUNGEON_WAITING,
@@ -22,25 +24,28 @@ class CGameControllerDungeon : public IGameController
 	int m_StateDungeon;
 	int m_DungeonID;
 	int m_WorldID;
+
+	int m_ActivePlayers;
+	int m_TankClientID;
+	int m_SyncDungeon;
+
 	int m_LastStartingTick;
 	int m_StartingTick;
 	int m_FinishedTick;
 	int m_SafeTick;
 	int m_MaximumTick;
-	int m_Time[MAX_PLAYERS];
-	int m_StartedPlayers;
-	int m_TankClientID;
-	bool m_SelectedWithVotes;
-	int m_SyncDungeon;
+
+	CPlayerDungeonRecord m_Records[MAX_PLAYERS];
 
 public:
 	CGameControllerDungeon(class CGS* pGameServer);
 
-	virtual void Tick();
-	virtual bool OnEntity(int Index, vec2 Pos);
-	virtual void OnCharacterDeath(class CCharacter* pVictim, class CPlayer* pKiller, int Weapon);
-	virtual bool OnCharacterSpawn(class CCharacter* pChr);
-	virtual void CreateLogic(int Type, int Mode, vec2 Pos, int ParseID);
+	void Tick() override;
+	bool OnEntity(int Index, vec2 Pos) override;
+	void OnCharacterDamage(CPlayer* pFrom, CPlayer* pTo, int Damage) override;
+	void OnCharacterDeath(class CCharacter* pVictim, class CPlayer* pKiller, int Weapon) override;
+	bool OnCharacterSpawn(class CCharacter* pChr) override;
+	void CreateLogic(int Type, int Mode, vec2 Pos, int ParseID) override;
 	int GetAttributeDungeonSync(class CPlayer* pPlayer, int BonusID) const;
 
 private:
@@ -68,8 +73,8 @@ public:
 	DungeonDoor(CGameWorld *pGameWorld, vec2 Pos);
 
 	void SetState(int State) { m_State = State; };
-	virtual void Tick();
-	virtual void Snap(int SnappingClient);
+	void Tick() override;
+	void Snap(int SnappingClient) override;
 };
 
 #endif

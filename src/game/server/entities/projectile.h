@@ -2,6 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_ENTITIES_PROJECTILE_H
 #define GAME_SERVER_ENTITIES_PROJECTILE_H
+#include <game/server/entity.h>
 
 class CProjectile : public CEntity
 {
@@ -24,10 +25,10 @@ public:
 
 	vec2 GetPos(float Time);
 
-	virtual void Reset();
-	virtual void Tick();
+	void Reset() override;
+	void Tick() override;
 	virtual void TickPaused();
-	virtual void Snap(int SnappingClient);
+	void Snap(int SnappingClient) override;
 
 private:
 	int GetOwnerProjID(int ClientID);

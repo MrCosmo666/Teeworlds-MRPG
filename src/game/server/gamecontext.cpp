@@ -1,30 +1,42 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <stdarg.h>
-#include <thread>
-#include <algorithm>
-
-#include <base/math.h>
-#include <engine/shared/config.h>
-
-#include <generated/server_data.h>
-#include <game/version.h>
 #include "gamecontext.h"
+
+#include <base/threadpool.h>
+#include <engine/storage.h>
+#include <engine/shared/config.h>
 
 #include <game/collision.h>
 #include <game/gamecore.h>
+#include <game/layers.h>
+#include <game/version.h>
+#include <generated/server_data.h>
 
-#include "gamemodes/main.h"
 #include "gamemodes/dungeon.h"
+#include "gamemodes/main.h"
 
+#include "mmocore/CommandProcessor.h"
+#include "mmocore/PathFinder.h"
+#include "mmocore/GameEntities/loltext.h"
 #include "mmocore/GameEntities/Items/drop_bonuses.h"
 #include "mmocore/GameEntities/Items/drop_items.h"
 #include "mmocore/GameEntities/Items/flying_experience.h"
-#include "mmocore/GameEntities/loltext.h"
-#include "mmocore/CommandProcessor.h"
-#include "mmocore/PathFinder.h"
 
+#include <game/game_context.h>
 #include <teeother/components/localization.h>
+
+#include "mmocore/Components/Accounts/AccountCore.h"
+#include "mmocore/Components/Accounts/AccountMinerCore.h"
+#include "mmocore/Components/Accounts/AccountPlantCore.h"
+#include "mmocore/Components/Bots/BotCore.h"
+#include "mmocore/Components/Dungeons/DungeonCore.h"
+#include "mmocore/Components/Mails/MailBoxCore.h"
+#include "mmocore/Components/Guilds/GuildCore.h"
+#include "mmocore/Components/Houses/HouseCore.h"
+#include "mmocore/Components/Quests/QuestCore.h"
+#include "mmocore/Components/Skills/SkillsCore.h"
+
+#include <cstdarg>
 
 // static data that have the same value in different objects
 std::map < int, CGS::StructAttribut > CGS::ms_aAttributsInfo;
@@ -37,9 +49,9 @@ CGS::CGS()
 	{
 		pBroadcastState.m_NoChangeTick = 0;
 		pBroadcastState.m_LifeSpanTick = 0;
-		pBroadcastState.m_Priority = 0;
 		pBroadcastState.m_aPrevMessage[0] = 0;
 		pBroadcastState.m_aNextMessage[0] = 0;
+		pBroadcastState.m_Priority = BroadcastPriority::LOWER;
 	}
 
 	for(auto& apPlayer : m_apPlayers)
@@ -50,13 +62,13 @@ CGS::CGS()
 	m_pMmoController = nullptr;
 	m_pCommandProcessor = nullptr;
 	m_pPathFinder = nullptr;
+	m_pLayers = nullptr;
 }
 
 CGS::~CGS()
 {
 	m_Events.Clear();
 	ms_aAttributsInfo.clear();
-	m_CommandManager.ClearCommands();
 	for(auto& pEffects : ms_aEffects)
 		pEffects.clear();
 	for(auto* apPlayer : m_apPlayers)
@@ -66,6 +78,7 @@ CGS::~CGS()
 	delete m_pMmoController;
 	delete m_pCommandProcessor;
 	delete m_pPathFinder;
+	delete m_pLayers;
 }
 
 class CCharacter *CGS::GetPlayerChar(int ClientID)
@@ -85,17 +98,17 @@ CPlayer *CGS::GetPlayer(int ClientID, bool CheckAuthed, bool CheckCharacter)
 	{
 		if(CheckCharacter && !pPlayer->GetCharacter())
 			return nullptr;
-		return pPlayer;	
+		return pPlayer;
 	}
 	return nullptr;
 }
 
-CPlayer* CGS::GetPlayerFromAccountID(int AccountID)
+CPlayer* CGS::GetPlayerFromUserID(int AccountID)
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer* pPlayer = GetPlayer(i, true);
-		if(pPlayer && pPlayer->Acc().m_AccountID == AccountID)
+		if(pPlayer && pPlayer->Acc().m_UserID == AccountID)
 			return pPlayer;
 	}
 	return nullptr;
@@ -105,22 +118,22 @@ CPlayer* CGS::GetPlayerFromAccountID(int AccountID)
 std::unique_ptr<char[]> CGS::LevelString(int MaxValue, int CurrentValue, int Step, char toValue, char fromValue)
 {
 	CurrentValue = clamp(CurrentValue, 0, MaxValue);
-	 
-	int Size = 3 + MaxValue / Step;
+
+	const int Size = 3 + MaxValue / Step;
 	std::unique_ptr<char[]> Buf(new char[Size]);
 	Buf[0] = '[';
 	Buf[Size - 2] = ']';
 	Buf[Size - 1] = '\0';
 
-    int a = CurrentValue / Step;
-    int b = (MaxValue - CurrentValue) / Step;
+	const int a = CurrentValue / Step;
+	const int b = (MaxValue - CurrentValue) / Step;
     int i = 1;
 
 	for (int ai = 0; ai < a; ai++, i++)
 		Buf[i] = toValue;
 	for (int bi = 0; bi < b || i < Size - 2; bi++, i++)
 		Buf[i] = fromValue;
-	
+
 	return Buf;
 }
 
@@ -140,11 +153,11 @@ const char* CGS::GetSymbolHandleMenu(int ClientID, bool HidenTabs, int ID) const
 	return ID >= NUM_TAB_MENU ? ("\\/ # ") : (ID < NUM_TAB_MENU_INTERACTIVES ? ("/\\ # ") : ("\\/ # "));
 }
 
-ItemInformation &CGS::GetItemInfo(int ItemID) const { return InventoryJob::ms_aItemsInfo[ItemID]; }
-CDataQuest &CGS::GetQuestInfo(int QuestID) const { return QuestJob::ms_aDataQuests[QuestID]; }
+CItemDataInfo &CGS::GetItemInfo(int ItemID) const { return CItemDataInfo::ms_aItemsInfo[ItemID]; }
+CQuestDataInfo &CGS::GetQuestInfo(int QuestID) const { return CQuestDataInfo::ms_aDataQuests[QuestID]; }
 
 /* #########################################################################
-	EVENTS 
+	EVENTS
 ######################################################################### */
 void CGS::CreateDamage(vec2 Pos, int ClientID, int Amount, bool CritDamage, bool OnlyVanilla)
 {
@@ -176,7 +189,7 @@ void CGS::CreateDamage(vec2 Pos, int ClientID, int Amount, bool CritDamage, bool
 	{
 		pEventMmo->m_X = (int)Pos.x;
 		pEventMmo->m_Y = (int)Pos.y;
-		pEventMmo->m_DamageCount = Amount;
+		pEventMmo->m_Damage = Amount;
 		pEventMmo->m_CritDamage = CritDamage;
 	}
 }
@@ -205,7 +218,7 @@ void CGS::CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamage)
 	const float Radius = g_pData->m_Explosion.m_Radius;
 	const float InnerRadius = 48.0f;
 	const float MaxForce = g_pData->m_Explosion.m_MaxForce;
-	int Num = m_World.FindEntities(Pos, Radius, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
+	const int Num = m_World.FindEntities(Pos, Radius, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
 	for(int i = 0; i < Num; i++)
 	{
 		vec2 Diff = apEnts[i]->GetPos() - Pos;
@@ -280,7 +293,7 @@ void CGS::CreatePlayerSound(int ClientID, int Sound)
 	}
 }
 
-void CGS::SendMmoEffect(vec2 Pos, int EffectID, int ClientID)
+void CGS::CreateEffect(vec2 Pos, int EffectID)
 {
 	CNetEvent_EffectMmo *pEvent = (CNetEvent_EffectMmo *)m_Events.Create(NETEVENTTYPE_EFFECTMMO, sizeof(CNetEvent_EffectMmo));
 	if(pEvent)
@@ -291,7 +304,7 @@ void CGS::SendMmoEffect(vec2 Pos, int EffectID, int ClientID)
 	}
 }
 
-void CGS::SendMmoPotion(vec2 Pos, const char *Potion, bool Added)
+void CGS::CreatePotionEffect(vec2 Pos, const char *Potion, bool Added)
 {
 	CNetEvent_EffectPotion *pEvent = (CNetEvent_EffectPotion *)m_Events.Create(NETEVENTTYPE_EFFECTPOTION, sizeof(CNetEvent_EffectPotion));
 	if(pEvent)
@@ -304,7 +317,7 @@ void CGS::SendMmoPotion(vec2 Pos, const char *Potion, bool Added)
 }
 
 /* #########################################################################
-	CHAT FUNCTIONS 
+	CHAT FUNCTIONS
 ######################################################################### */
 void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 {
@@ -400,7 +413,7 @@ void CGS::FakeChat(const char *pName, const char *pText)
 		ClientInfoMsg.m_aSkinPartColors[p] = 0;
 	}
 	Server()->SendPackMsg(&ClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, -1);
-	
+
 	// send a chat and delete a player and throw a player away
 	SendChat(FakeClientID, CHAT_ALL, -1, pText);
 	delete m_apPlayers[FakeClientID];
@@ -440,8 +453,8 @@ void CGS::Chat(int ClientID, const char* pText, ...)
 
 void CGS::ChatFollow(int ClientID, const char* pText, ...)
 {
-	int Start = (ClientID < 0 ? 0 : ClientID);
-	int End = (ClientID < 0 ? MAX_CLIENTS : ClientID + 1);
+	const int Start = (ClientID < 0 ? 0 : ClientID);
+	const int End = (ClientID < 0 ? MAX_CLIENTS : ClientID + 1);
 
 	CNetMsg_Sv_Chat Msg;
 	Msg.m_Mode = CHAT_WHISPER;
@@ -467,11 +480,11 @@ void CGS::ChatFollow(int ClientID, const char* pText, ...)
 }
 
 // send to an authorized player
-void CGS::ChatAccountID(int AccountID, const char* pText, ...)
+bool CGS::ChatAccount(int AccountID, const char* pText, ...)
 {
-	CPlayer *pPlayer = GetPlayerFromAccountID(AccountID);
+	CPlayer *pPlayer = GetPlayerFromUserID(AccountID);
 	if(!pPlayer)
-		return;
+		return false;
 
 	CNetMsg_Sv_Chat Msg;
 	Msg.m_Mode = CHAT_ALL;
@@ -479,7 +492,7 @@ void CGS::ChatAccountID(int AccountID, const char* pText, ...)
 
 	va_list VarArgs;
 	va_start(VarArgs, pText);
-	
+
 	dynamic_string Buffer;
 	Server()->Localization()->Format_VL(Buffer, pPlayer->GetLanguage(), pText, VarArgs);
 
@@ -488,6 +501,7 @@ void CGS::ChatAccountID(int AccountID, const char* pText, ...)
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, pPlayer->GetCID());
 	Buffer.clear();
 	va_end(VarArgs);
+	return true;
 }
 
 // Send a guild a message
@@ -502,7 +516,7 @@ void CGS::ChatGuild(int GuildID, const char* pText, ...)
 
 	va_list VarArgs;
 	va_start(VarArgs, pText);
-	
+
 	dynamic_string Buffer;
 	for(int i = 0 ; i < MAX_PLAYERS ; i ++)
 	{
@@ -511,7 +525,7 @@ void CGS::ChatGuild(int GuildID, const char* pText, ...)
 		{
 			Buffer.append("[Guild]");
 			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
-			
+
 			Msg.m_TargetID = i;
 			Msg.m_pMessage = Buffer.buffer();
 
@@ -552,12 +566,12 @@ void CGS::ChatWorldID(int WorldID, const char* Suffix, const char* pText, ...)
 }
 
 // Send discord message
-void CGS::ChatDiscord(const char *Color, const char *Title, const char* pText, ...)
+void CGS::ChatDiscord(int Color, const char *Title, const char* pText, ...)
 {
 #ifdef CONF_DISCORD
 	va_list VarArgs;
 	va_start(VarArgs, pText);
-	
+
 	dynamic_string Buffer;
 	Server()->Localization()->Format_VL(Buffer, "en", pText, VarArgs);
 	Server()->SendDiscordMessage(g_Config.m_SvDiscordServerChatChannel, Color, Title, Buffer.buffer());
@@ -568,17 +582,17 @@ void CGS::ChatDiscord(const char *Color, const char *Title, const char* pText, .
 }
 
 // Send a discord message to the channel
-void CGS::ChatDiscordChannel(const char *pChanel, const char *Color, const char *Title, const char* pText, ...)
+void CGS::ChatDiscordChannel(const char *pChanel, int Color, const char *Title, const char* pText, ...)
 {
 #ifdef CONF_DISCORD
 	va_list VarArgs;
 	va_start(VarArgs, pText);
-	
+
 	dynamic_string Buffer;
 	Server()->Localization()->Format_VL(Buffer, "en", pText, VarArgs);
 	Server()->SendDiscordMessage(pChanel, Color, Title, Buffer.buffer());
 	Buffer.clear();
-	
+
 	va_end(VarArgs);
 #endif
 }
@@ -593,12 +607,12 @@ void CGS::Motd(int ClientID, const char* Text, ...)
 
 	va_list VarArgs;
 	va_start(VarArgs, Text);
-	
+
 	if(m_apPlayers[ClientID])
 	{
 		dynamic_string Buffer;
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), Text, VarArgs);
-		
+
 		Msg.m_pMessage = Buffer.buffer();
 
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
@@ -608,9 +622,9 @@ void CGS::Motd(int ClientID, const char* Text, ...)
 }
 
 /* #########################################################################
-	BROADCAST FUNCTIONS 
+	BROADCAST FUNCTIONS
 ######################################################################### */
-void CGS::AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSpan)
+void CGS::AddBroadcast(int ClientID, const char* pText, BroadcastPriority Priority, int LifeSpan)
 {
 	if (ClientID < 0 || ClientID >= MAX_PLAYERS)
 		return;
@@ -635,11 +649,11 @@ void CGS::AddBroadcast(int ClientID, const char* pText, int Priority, int LifeSp
 }
 
 // formatted broadcast
-void CGS::Broadcast(int ClientID, int Priority, int LifeSpan, const char *pText, ...)
+void CGS::Broadcast(int ClientID, BroadcastPriority Priority, int LifeSpan, const char *pText, ...)
 {
-	int Start = (ClientID < 0 ? 0 : ClientID);
-	int End = (ClientID < 0 ? MAX_PLAYERS : ClientID+1);
-	
+	const int Start = (ClientID < 0 ? 0 : ClientID);
+	const int End = (ClientID < 0 ? MAX_PLAYERS : ClientID+1);
+
 	va_list VarArgs;
 	va_start(VarArgs, pText);
 	for(int i = Start; i < End; i++)
@@ -652,11 +666,11 @@ void CGS::Broadcast(int ClientID, int Priority, int LifeSpan, const char *pText,
 			Buffer.clear();
 		}
 	}
-	va_end(VarArgs);	
+	va_end(VarArgs);
 }
 
 // formatted world broadcast
-void CGS::BroadcastWorldID(int WorldID, int Priority, int LifeSpan, const char *pText, ...)
+void CGS::BroadcastWorldID(int WorldID, BroadcastPriority Priority, int LifeSpan, const char *pText, ...)
 {
 	va_list VarArgs;
 	va_start(VarArgs, pText);
@@ -670,7 +684,7 @@ void CGS::BroadcastWorldID(int WorldID, int Priority, int LifeSpan, const char *
 			Buffer.clear();
 		}
 	}
-	va_end(VarArgs);	
+	va_end(VarArgs);
 }
 
 // the tick of the broadcast and his life
@@ -683,7 +697,7 @@ void CGS::BroadcastTick(int ClientID)
 	{
 		if(m_aBroadcastStates[ClientID].m_LifeSpanTick > 0 && m_aBroadcastStates[ClientID].m_TimedPriority > m_aBroadcastStates[ClientID].m_Priority)
 			str_copy(m_aBroadcastStates[ClientID].m_aNextMessage, m_aBroadcastStates[ClientID].m_aTimedMessage, sizeof(m_aBroadcastStates[ClientID].m_aNextMessage));
-		
+
 		// send broadcast only if the message is different, or to fight auto-fading
 		if(str_comp(m_aBroadcastStates[ClientID].m_aPrevMessage, m_aBroadcastStates[ClientID].m_aNextMessage) != 0 ||
 			m_aBroadcastStates[ClientID].m_NoChangeTick > Server()->TickSpeed())
@@ -696,33 +710,33 @@ void CGS::BroadcastTick(int ClientID)
 		}
 		else
 			m_aBroadcastStates[ClientID].m_NoChangeTick++;
-		
+
 		// update broadcast state
 		if(m_aBroadcastStates[ClientID].m_LifeSpanTick > 0)
 			m_aBroadcastStates[ClientID].m_LifeSpanTick--;
-		
+
 		if(m_aBroadcastStates[ClientID].m_LifeSpanTick <= 0)
 		{
 			m_aBroadcastStates[ClientID].m_aTimedMessage[0] = 0;
-			m_aBroadcastStates[ClientID].m_TimedPriority = 0;
+			m_aBroadcastStates[ClientID].m_TimedPriority = BroadcastPriority::LOWER;
 		}
 		m_aBroadcastStates[ClientID].m_aNextMessage[0] = 0;
-		m_aBroadcastStates[ClientID].m_Priority = 0;
+		m_aBroadcastStates[ClientID].m_Priority = BroadcastPriority::LOWER;
 	}
 	else
 	{
 		m_aBroadcastStates[ClientID].m_NoChangeTick = 0;
 		m_aBroadcastStates[ClientID].m_LifeSpanTick = 0;
-		m_aBroadcastStates[ClientID].m_Priority = 0;
-		m_aBroadcastStates[ClientID].m_TimedPriority = 0;
 		m_aBroadcastStates[ClientID].m_aPrevMessage[0] = 0;
 		m_aBroadcastStates[ClientID].m_aNextMessage[0] = 0;
 		m_aBroadcastStates[ClientID].m_aTimedMessage[0] = 0;
+		m_aBroadcastStates[ClientID].m_Priority = BroadcastPriority::LOWER;
+		m_aBroadcastStates[ClientID].m_TimedPriority = BroadcastPriority::LOWER;
 	}
 }
 
 /* #########################################################################
-	PACKET MESSAGE FUNCTIONS 
+	PACKET MESSAGE FUNCTIONS
 ######################################################################### */
 void CGS::SendEmoticon(int ClientID, int Emoticon, bool SenderClient)
 {
@@ -819,7 +833,7 @@ void CGS::SendTeam(int ClientID, int Team, bool DoChatMsg, int TargetID)
 	Msg.m_Team = Team;
 	Msg.m_Silent = DoChatMsg ? 0 : 1;
 	Msg.m_CooldownTick = 0;
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, TargetID);	
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, TargetID);
 }
 
 void CGS::SendGameMsg(int GameMsgID, int ClientID)
@@ -853,52 +867,9 @@ void CGS::UpdateClientInformation(int ClientID)
 	CPlayer *pPlayer = GetPlayer(ClientID, false, false);
 	if(!pPlayer)
 		return;
-	
+
 	pPlayer->SendClientInfo(-1);
 	SendEquipments(ClientID, -1);
-}
-
-void CGS::SendChatCommand(const CCommandManager::CCommand* pCommand, int ClientID)
-{
-	CNetMsg_Sv_CommandInfo Msg;
-	Msg.m_Name = pCommand->m_aName;
-	Msg.m_HelpText = pCommand->m_aHelpText;
-	Msg.m_ArgsFormat = pCommand->m_aArgsFormat;
-
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-}
-
-void CGS::SendChatCommands(int ClientID)
-{
-	// remove default commands from client
-	SendRemoveChatCommand("all", ClientID);
-	SendRemoveChatCommand("friend", ClientID);
-	SendRemoveChatCommand("m", ClientID);
-	SendRemoveChatCommand("mute", ClientID);
-	SendRemoveChatCommand("r", ClientID);
-	SendRemoveChatCommand("team", ClientID);
-	SendRemoveChatCommand("w", ClientID);
-	SendRemoveChatCommand("whisper", ClientID);
-
-	// send our commands
-	for (int i = 0; i < CommandManager()->CommandCount(); i++)
-		SendChatCommand(CommandManager()->GetCommand(i), ClientID);
-}
-
-void CGS::SendRemoveChatCommand(const CCommandManager::CCommand* pCommand, int ClientID)
-{
-	CNetMsg_Sv_CommandInfoRemove Msg;
-	Msg.m_Name = pCommand->m_aName;
-
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-}
-
-void CGS::SendRemoveChatCommand(const char* pCommand, int ClientID)
-{
-	CNetMsg_Sv_CommandInfoRemove Msg;
-	Msg.m_Name = pCommand;
-
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
 void CGS::SendTuningParams(int ClientID)
@@ -940,9 +911,28 @@ void CGS::SendProgressBar(int ClientID, int Count, int Request, const char* Mess
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
+void CGS::SendInformationBoxGUI(int ClientID, const char* pMsg, ...)
+{
+	va_list VarArgs;
+	va_start(VarArgs, pMsg);
+	for(int i = 0; i < MAX_PLAYERS; i++)
+	{
+		if(m_apPlayers[i])
+		{
+			CNetMsg_Sv_SendGuiInformationBox Msg;
+			dynamic_string Buffer;
+			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pMsg, VarArgs);
+			Msg.m_pMsg = Buffer.buffer();
+			Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+			Buffer.clear();
+		}
+	}
+	va_end(VarArgs);
+}
+
 
 /* #########################################################################
-	ENGINE GAMECONTEXT 
+	ENGINE GAMECONTEXT
 ######################################################################### */
 void CGS::UpdateDiscordStatus()
 {
@@ -968,25 +958,13 @@ void CGS::UpdateDiscordStatus()
 #endif
 }
 
-void CGS::NewCommandHook(const CCommandManager::CCommand* pCommand, void* pContext)
-{
-	CGS* pSelf = (CGS*)pContext;
-	pSelf->SendChatCommand(pCommand, -1);
-}
-
-void CGS::RemoveCommandHook(const CCommandManager::CCommand* pCommand, void* pContext)
-{
-	CGS* pSelf = (CGS*)pContext;
-	pSelf->SendRemoveChatCommand(pCommand, -1);
-}
-
 void CGS::OnInit(int WorldID)
 {
 	m_pServer = Kernel()->RequestInterface<IServer>();
 	m_pConsole = Kernel()->RequestInterface<IConsole>();
+	m_pStorage = Kernel()->RequestInterface<IStorageEngine>();
 	m_World.SetGameServer(this);
 	m_Events.SetGameServer(this);
-	m_CommandManager.Init(m_pConsole, this, NewCommandHook, RemoveCommandHook);
 	m_WorldID = WorldID;
 	m_RespawnWorldID = -1;
 	m_MusicID = -1;
@@ -995,10 +973,12 @@ void CGS::OnInit(int WorldID)
 		Server()->SnapSetStaticsize(i, m_NetObjHandler.GetObjSize(i));
 
 	// create controller
-	m_Layers.Init(Kernel(), nullptr, WorldID);
-	m_Collision.Init(&m_Layers);
+	m_pLayers = new CLayers();
+	m_pLayers->Init(Kernel(), nullptr, WorldID);
+	m_Collision.Init(m_pLayers);
 	m_pMmoController = new MmoController(this);
 	m_pMmoController->LoadLogicWorld();
+	m_pMmoController->PrepareInformation(m_pStorage);
 	UpdateZoneDungeon();
 	UpdateZonePVP();
 
@@ -1009,26 +989,25 @@ void CGS::OnInit(int WorldID)
 		m_pController = new CGameControllerMain(this);
 
 	m_pCommandProcessor = new CCommandProcessor(this);
-	m_pController->RegisterChatCommands(CommandManager());
 
-	// initialize layers
-	CMapItemLayerTilemap *pTileMap = m_Layers.GameLayer();
+	// initialize cores
+	CMapItemLayerTilemap *pTileMap = m_pLayers->GameLayer();
 	CTile *pTiles = (CTile *)Kernel()->RequestInterface<IMap>(WorldID)->GetData(pTileMap->m_Data);
-	for(int y = 0; y < pTileMap->m_Height; y++) 
+	for(int y = 0; y < pTileMap->m_Height; y++)
 	{
-		for(int x = 0; x < pTileMap->m_Width; x++) 
+		for(int x = 0; x < pTileMap->m_Width; x++)
 		{
-			int Index = pTiles[y*pTileMap->m_Width+x].m_Index;
-			if(Index >= ENTITY_OFFSET) 
+			const int Index = pTiles[y*pTileMap->m_Width+x].m_Index;
+			if(Index >= ENTITY_OFFSET)
 			{
-				vec2 Pos(x*32.0f+16.0f, y*32.0f+16.0f);
+				const vec2 Pos(x*32.0f+16.0f, y*32.0f+16.0f);
 				m_pController->OnEntity(Index-ENTITY_OFFSET, Pos);
 			}
 		}
 	}
-	
+
 	// initialize pathfinder
-	m_pPathFinder = new CPathfinder(&m_Layers, &m_Collision);
+	m_pPathFinder = new CPathfinder(m_pLayers, &m_Collision);
 	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
 }
 
@@ -1073,12 +1052,12 @@ void CGS::OnTickMainWorld()
 {
 	if(m_DayEnumType != Server()->GetEnumTypeDay())
 	{
-		m_DayEnumType = Server()->GetEnumTypeDay(); 
+		m_DayEnumType = Server()->GetEnumTypeDay();
 		if(m_DayEnumType == DayType::NIGHT_TYPE)
 			m_MultiplierExp = 100 + random_int() % 200;
 		else if(m_DayEnumType == DayType::MORNING_TYPE)
 			m_MultiplierExp = 100;
-	
+
 		SendDayInfo(-1);
 	}
 
@@ -1141,7 +1120,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			while(*p)
 			{
 				const char *pStrOld = p;
-				int Code = str_utf8_decode(&p);
+				const int Code = str_utf8_decode(&p);
 
 				// check if unicode is not empty
 				if(Code > 0x20 && Code != 0xA0 && Code != 0x034F && (Code < 0x2000 || Code > 0x200F) && (Code < 0x2028 || Code > 0x202F) &&
@@ -1172,7 +1151,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					CommandProcessor()->ChatCmd(pMsg->m_pMessage, pPlayer);
 					return;
 				}
-				SendChat(ClientID, Mode, pMsg->m_Target, pMsg->m_pMessage);						
+				SendChat(ClientID, Mode, pMsg->m_Target, pMsg->m_pMessage);
 			}
 		}
 
@@ -1198,7 +1177,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				while (*p)
 				{
 					const char* pStrOld = p;
-					int Code = str_utf8_decode(&p);
+					const int Code = str_utf8_decode(&p);
 
 					// check if unicode is not empty
 					if (Code > 0x20 && Code != 0xA0 && Code != 0x034F && (Code < 0x2000 || Code > 0x200F) && (Code < 0x2028 || Code > 0x202F) &&
@@ -1232,7 +1211,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			CNetMsg_Cl_CallVote *pMsg = (CNetMsg_Cl_CallVote *)pRawMsg;
 			if (str_comp_nocase(pMsg->m_Type, "option") != 0 || Server()->Tick() < (pPlayer->m_aPlayerTick[TickState::LastVoteTry] + (Server()->TickSpeed() / 2)))
 				return;
-			
+
 			pPlayer->m_aPlayerTick[TickState::LastVoteTry] = Server()->Tick();
 			const auto& item = std::find_if(m_aPlayerVotes[ClientID].begin(), m_aPlayerVotes[ClientID].end(), [pMsg](const CVoteOptions& vote)
 			{
@@ -1241,8 +1220,8 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 			if(item != m_aPlayerVotes[ClientID].end())
 			{
-				const int InteractiveCount = string_to_number(pMsg->m_Reason, 1, 10000000);
-				ParsingVoteCommands(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveCount, pMsg->m_Reason, item->m_Callback);
+				const int InteractiveValue = string_to_number(pMsg->m_Reason, 1, 10000000);
+				ParsingVoteCommands(ClientID, item->m_aCommand, item->m_TempID, item->m_TempID2, InteractiveValue, pMsg->m_Reason, item->m_Callback);
 				return;
 			}
 			ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
@@ -1259,11 +1238,11 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		{
 			if(!pPlayer->IsAuthed())
 			{
-				Broadcast(pPlayer->GetCID(), BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Use /register <name> <pass>.");
+				Broadcast(pPlayer->GetCID(), BroadcastPriority::MAIN_INFORMATION, 100, "Use /register <name> <pass>.");
 				return;
 			}
 
-			Broadcast(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Team change is not allowed.");
+			Broadcast(ClientID, BroadcastPriority::MAIN_INFORMATION, 100, "Team change is not allowed.");
 		}
 
 		else if (MsgID == NETMSGTYPE_CL_SETSPECTATORMODE)
@@ -1287,7 +1266,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			if(pPlayer->m_aPlayerTick[TickState::LastKill] && pPlayer->m_aPlayerTick[TickState::LastKill]+Server()->TickSpeed()*3 > Server()->Tick())
 				return;
 
-			Broadcast(ClientID, BroadcastPriority::BROADCAST_MAIN_INFORMATION, 100, "Self kill is not allowed.");
+			Broadcast(ClientID, BroadcastPriority::MAIN_INFORMATION, 100, "Self kill is not allowed.");
 			//pPlayer->m_PlayerTick[TickState::LastKill] = Server()->Tick();
 			//pPlayer->KillCharacter(WEAPON_SELF);
 		}
@@ -1346,7 +1325,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			// loading of all parts of players' data
 			SendFullyEquipments(ClientID);
 		}
-		else 
+		else
 			Mmo()->OnMessage(MsgID, pRawMsg, ClientID);
 	}
 	else
@@ -1401,7 +1380,7 @@ void CGS::OnClientEnter(int ClientID)
 		return;
 
 	m_pController->OnPlayerConnect(pPlayer);
-	SendChatCommands(ClientID);
+	m_pCommandProcessor->SendChatCommands(ClientID);
 	pPlayer->SendClientInfo(-1);
 	for(int i = 0; i < MAX_CLIENTS; ++i)
 	{
@@ -1421,7 +1400,7 @@ void CGS::OnClientEnter(int ClientID)
 		Chat(ClientID, "Register: \"/register <login> <pass>\"");
 		Chat(ClientID, "Log in: \"/login <login> <pass>\"");
 		SendDayInfo(ClientID);
-		
+
 		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "connected and enter in MRPG");
 		ShowVotesNewbieInformation(ClientID);
 		return;
@@ -1455,7 +1434,7 @@ void CGS::OnClientDrop(int ClientID, const char *pReason)
 
 void CGS::OnClientDirectInput(int ClientID, void *pInput)
 {
-	int NumFailures = m_NetObjHandler.NumObjFailures();
+	const int NumFailures = m_NetObjHandler.NumObjFailures();
 	if(m_NetObjHandler.ValidateObj(NETOBJTYPE_PLAYERINPUT, pInput, sizeof(CNetObj_PlayerInput)) == -1)
 	{
 		if(g_Config.m_Debug && NumFailures != m_NetObjHandler.NumObjFailures())
@@ -1465,13 +1444,13 @@ void CGS::OnClientDirectInput(int ClientID, void *pInput)
 			Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "server", aBuf);
 		}
 	}
-	else 
+	else
 		m_apPlayers[ClientID]->OnDirectInput((CNetObj_PlayerInput *)pInput);
 }
 
 void CGS::OnClientPredictedInput(int ClientID, void *pInput)
 {
-	int NumFailures = m_NetObjHandler.NumObjFailures();
+	const int NumFailures = m_NetObjHandler.NumObjFailures();
 	if(m_NetObjHandler.ValidateObj(NETOBJTYPE_PLAYERINPUT, pInput, sizeof(CNetObj_PlayerInput)) == -1)
 	{
 		if(g_Config.m_Debug && NumFailures != m_NetObjHandler.NumObjFailures())
@@ -1481,7 +1460,7 @@ void CGS::OnClientPredictedInput(int ClientID, void *pInput)
 			Console()->Print(IConsole::OUTPUT_LEVEL_DEBUG, "server", aBuf);
 		}
 	}
-	else 
+	else
 		m_apPlayers[ClientID]->OnPredictedInput((CNetObj_PlayerInput *)pInput);
 }
 
@@ -1509,9 +1488,8 @@ bool CGS::IsClientPlayer(int ClientID) const
 }
 bool CGS::IsMmoClient(int ClientID) const
 {
-	return (bool)((Server()->GetClientProtocolVersion(ClientID) == PROTOCOL_VERSION_MMO) || (ClientID >= MAX_PLAYERS && ClientID < MAX_CLIENTS)); 
+	return (bool)((Server()->GetClientProtocolVersion(ClientID) == PROTOCOL_VERSION_MMO) || (ClientID >= MAX_PLAYERS && ClientID < MAX_CLIENTS));
 }
-const char *CGS::GameType() const { return m_pController && m_pController->GetGameType() ? m_pController->GetGameType() : ""; }
 const char *CGS::Version() const { return GAME_VERSION; }
 const char *CGS::NetVersion() const { return GAME_NETVERSION; }
 
@@ -1523,7 +1501,7 @@ void CGS::ClearClientData(int ClientID)
 	ms_aEffects[ClientID].clear();
 
 	// clear active snap bots for player
-	for(auto& pActiveSnap : BotJob::ms_aDataBot)
+	for(auto& pActiveSnap : DataBotInfo::ms_aDataBot)
 		pActiveSnap.second.m_aAlreadyActiveQuestBot[ClientID] = false;
 }
 
@@ -1533,18 +1511,18 @@ int CGS::GetRank(int AccountID)
 }
 
 /* #########################################################################
-	CONSOLE GAMECONTEXT 
+	CONSOLE GAMECONTEXT
 ######################################################################### */
 void CGS::ConSetWorldTime(IConsole::IResult* pResult, void* pUserData)
 {
-	int Hour = pResult->GetInteger(0);
+	const int Hour = pResult->GetInteger(0);
 	IServer* pServer = (IServer*)pUserData;
 	pServer->SetOffsetWorldTime(Hour);
 }
 
 void CGS::ConParseSkin(IConsole::IResult *pResult, void *pUserData)
 {
-	int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS-1);
+	const int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS-1);
 	IServer* pServer = (IServer*)pUserData;
 	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
@@ -1552,14 +1530,14 @@ void CGS::ConParseSkin(IConsole::IResult *pResult, void *pUserData)
 	if(pPlayer)
 	{
 		char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "%s %s %s %s %s %s", pPlayer->Acc().m_aaSkinPartNames[0], 
-			pPlayer->Acc().m_aaSkinPartNames[1], pPlayer->Acc().m_aaSkinPartNames[2], 
+		str_format(aBuf, sizeof(aBuf), "%s %s %s %s %s %s", pPlayer->Acc().m_aaSkinPartNames[0],
+			pPlayer->Acc().m_aaSkinPartNames[1], pPlayer->Acc().m_aaSkinPartNames[2],
 			pPlayer->Acc().m_aaSkinPartNames[3], pPlayer->Acc().m_aaSkinPartNames[4],
 			pPlayer->Acc().m_aaSkinPartNames[5]);
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "parseskin", aBuf);
 
-		str_format(aBuf, sizeof(aBuf), "%d %d %d %d %d %d", pPlayer->Acc().m_aSkinPartColors[0], 
-			pPlayer->Acc().m_aSkinPartColors[1], pPlayer->Acc().m_aSkinPartColors[2], 
+		str_format(aBuf, sizeof(aBuf), "%d %d %d %d %d %d", pPlayer->Acc().m_aSkinPartColors[0],
+			pPlayer->Acc().m_aSkinPartColors[1], pPlayer->Acc().m_aSkinPartColors[2],
 			pPlayer->Acc().m_aSkinPartColors[3], pPlayer->Acc().m_aSkinPartColors[4],
 			pPlayer->Acc().m_aSkinPartColors[5]);
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "parseskin", aBuf);
@@ -1571,7 +1549,7 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 {
 	const int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS - 1);
 	const int ItemID = pResult->GetInteger(1);
-	const int Count = pResult->GetInteger(2);
+	const int Value = pResult->GetInteger(2);
 	const int Enchant = pResult->GetInteger(3);
 	const int Mail = pResult->GetInteger(4);
 
@@ -1583,10 +1561,10 @@ void CGS::ConGiveItem(IConsole::IResult *pResult, void *pUserData)
 	{
 		if (Mail == 0)
 		{
-			pPlayer->GetItem(ItemID).Add(Count, 0, Enchant);
+			pPlayer->GetItem(ItemID).Add(Value, 0, Enchant);
 			return;
 		}
-		pSelf->SendInbox(pPlayer, "The sender heavens", "Sent from console", ItemID, Count, Enchant);
+		pSelf->SendInbox("Console", pPlayer, "The sender heavens", "Sent from console", ItemID, Value, Enchant);
 	}
 }
 
@@ -1614,7 +1592,7 @@ void CGS::ConRemItem(IConsole::IResult* pResult, void* pUserData)
 {
 	const int ClientID = clamp(pResult->GetInteger(0), 0, MAX_PLAYERS - 1);
 	const int ItemID = pResult->GetInteger(1);
-	const int Count = pResult->GetInteger(2);
+	const int Value = pResult->GetInteger(2);
 
 	IServer* pServer = (IServer*)pUserData;
 	CGS* pSelf = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
@@ -1622,7 +1600,7 @@ void CGS::ConRemItem(IConsole::IResult* pResult, void* pUserData)
 	CPlayer* pPlayer = pSelf->GetPlayer(ClientID, true);
 	if (pPlayer)
 	{
-		pPlayer->GetItem(ItemID).Remove(Count, 0);
+		pPlayer->GetItem(ItemID).Remove(Value, 0);
 	}
 }
 
@@ -1643,7 +1621,7 @@ void CGS::ConAddCharacter(IConsole::IResult *pResult, void *pUserData)
 	// we check if there is a player
 	if(ClientID < 0 || ClientID >= MAX_PLAYERS || !pSelf->m_apPlayers[ClientID])
 		return;
-	
+
 	// add a new kind of bot
 	pSelf->Mmo()->BotsData()->ConAddCharacterBot(ClientID, pResult->GetString(1));
 }
@@ -1678,12 +1656,12 @@ void CGS::ConchainGameinfoUpdate(IConsole::IResult *pResult, void *pUserData, IC
 }
 
 /* #########################################################################
-	VOTING MMO GAMECONTEXT 
+	VOTING MMO GAMECONTEXT
 ######################################################################### */
 void CGS::ClearVotes(int ClientID)
 {
 	m_aPlayerVotes[ClientID].clear();
-	
+
 	// send vote options
 	CNetMsg_Sv_VoteClearOptions ClearMsg;
 	Server()->SendPackMsg(&ClearMsg, MSGFLAG_VITAL, ClientID);
@@ -1699,8 +1677,8 @@ void CGS::AV(int ClientID, const char *pCmd, const char *pDesc, const int TempIn
 	str_copy(aBufDesc, pDesc, sizeof(aBufDesc));
 	if(str_comp(m_apPlayers[ClientID]->GetLanguage(), "ru") == 0 || str_comp(m_apPlayers[ClientID]->GetLanguage(), "uk") == 0)
 		str_translation_utf8_to_cp(aBufDesc);
-	
-	CVoteOptions Vote;	
+
+	CVoteOptions Vote;
 	str_copy(Vote.m_aDescription, aBufDesc, sizeof(Vote.m_aDescription));
 	str_copy(Vote.m_aCommand, pCmd, sizeof(Vote.m_aCommand));
 	str_copy(Vote.m_aIcon, pIcon, sizeof(Vote.m_aIcon));
@@ -1735,7 +1713,7 @@ void CGS::AV(int ClientID, const char *pCmd, const char *pDesc, const int TempIn
 	}
 	if(pEnd != nullptr)
 		*(const_cast<char *>(pEnd)) = 0;
-	
+
 	m_aPlayerVotes[ClientID].push_back(Vote);
 
 	// send to customers that have a mmo client
@@ -1757,7 +1735,7 @@ void CGS::AV(int ClientID, const char *pCmd, const char *pDesc, const int TempIn
 		str_copy(Vote.m_aDescription, "———————————", sizeof(Vote.m_aDescription));
 
 	// send to vanilla clients
-	CNetMsg_Sv_VoteOptionAdd OptionMsg;	
+	CNetMsg_Sv_VoteOptionAdd OptionMsg;
 	OptionMsg.m_pDescription = Vote.m_aDescription;
 	Server()->SendPackMsg(&OptionMsg, MSGFLAG_VITAL, ClientID);
 }
@@ -1769,15 +1747,15 @@ void CGS::AVL(int ClientID, const char *pCmd, const char *pText, ...)
 	{
 		va_list VarArgs;
 		va_start(VarArgs, pText);
-		
+
 		dynamic_string Buffer;
 		if(str_comp(pCmd, "null") != 0)
 			Buffer.append("- ");
-		
+
 		Server()->Localization()->Format_VL(Buffer, m_apPlayers[ClientID]->GetLanguage(), pText, VarArgs);
 		AV(ClientID, pCmd, Buffer.buffer());
 		Buffer.clear();
-		
+
 		va_end(VarArgs);
 	}
 }
@@ -1826,7 +1804,7 @@ void CGS::AVHI(int ClientID, const char *pIcon, const int HideID, vec3 Color, co
 		AV(ClientID, "HIDEN", Buffer.buffer(), HideID, -1, pIcon);
 		if(length(m_apPlayers[ClientID]->m_VoteColored) > 1.0f)
 			m_apPlayers[ClientID]->m_VoteColored /= 4.0f;
-			
+
 		Buffer.clear();
 		va_end(VarArgs);
 	}
@@ -1884,7 +1862,7 @@ void CGS::AVD(int ClientID, const char *pCmd, const int TempInt, const int TempI
 		if((!m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID > TAB_SETTINGS_MODULES) ||
 			(m_apPlayers[ClientID]->GetHidenMenu(HideID) && HideID <= TAB_SETTINGS_MODULES))
 			return;
-			
+
 		va_list VarArgs;
 		va_start(VarArgs, pText);
 
@@ -1930,20 +1908,20 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	if(pPlayer && pPlayer->m_ActiveMenuRegisteredCallback)
 	{
 		pPlayer->m_ActiveMenuRegisteredCallback = nullptr;
-		pPlayer->m_ActiveMenuOptionCallback = { 0 };
+		pPlayer->m_ActiveMenuOptionCallback = { nullptr };
 	}
 
-	kurosio::kpause(3);
+	sleep_pause(3); // TODO: fix need it
 	pPlayer->m_OpenVoteMenu = MenuList;
 	ClearVotes(ClientID);
-	
+
 	if (Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList, true))
 	{
 		m_apPlayers[ClientID]->m_VoteColored = { 20, 7, 15 };
 		AVL(ClientID, "null", "The main menu will return as soon as you leave this zone!");
 		return;
 	}
-	
+
 	if(MenuList == MenuList::MAIN_MENU)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
@@ -1952,16 +1930,16 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		const int ExpForLevel = pPlayer->ExpNeed(pPlayer->Acc().m_Level);
 		AVH(ClientID, TAB_STAT, GREEN_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().m_aLastLogin);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Discord: \"{STR}\"", g_Config.m_SvDiscordInviteLink);
-		AVM(ClientID, "null", NOPE, TAB_STAT, "Level {INT} : Exp {INT}/{INT}", &pPlayer->Acc().m_Level, &pPlayer->Acc().m_Exp, &ExpForLevel);
-		AVM(ClientID, "null", NOPE, TAB_STAT, "Skill Point {INT}SP", &pPlayer->GetItem(itSkillPoint).m_Count);
-		AVM(ClientID, "null", NOPE, TAB_STAT, "Gold: {INT}", &pPlayer->GetItem(itGold).m_Count);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Level {INT} : Exp {INT}/{INT}", pPlayer->Acc().m_Level, pPlayer->Acc().m_Exp, ExpForLevel);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Skill Point {INT}SP", pPlayer->GetItem(itSkillPoint).m_Value);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Gold: {INT}", pPlayer->GetItem(itGold).m_Value);
 		AV(ClientID, "null");
 
 		// personal menu
 		AVH(ClientID, TAB_PERSONAL, GRAY_COLOR, "☪ SUB MENU PERSONAL");
-		AVM(ClientID, "MENU", MenuList::MENU_INVENTORY, TAB_PERSONAL, "Inventory"); 
+		AVM(ClientID, "MENU", MenuList::MENU_INVENTORY, TAB_PERSONAL, "Inventory");
 		AVM(ClientID, "MENU", MenuList::MENU_EQUIPMENT, TAB_PERSONAL, "Equipment");
-		AVM(ClientID, "MENU", MenuList::MENU_UPGRADE, TAB_PERSONAL, "Upgrades({INT}p)", &pPlayer->Acc().m_Upgrade);
+		AVM(ClientID, "MENU", MenuList::MENU_UPGRADE, TAB_PERSONAL, "Upgrades({INT}p)", pPlayer->Acc().m_Upgrade);
 		AVM(ClientID, "MENU", MenuList::MENU_DUNGEONS, TAB_PERSONAL, "Dungeons");
 		AVM(ClientID, "MENU", MenuList::MENU_SETTINGS, TAB_PERSONAL, "Settings");
 		AVM(ClientID, "MENU", MenuList::MENU_INBOX, TAB_PERSONAL, "Mailbox");
@@ -1981,11 +1959,11 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 	else if(MenuList == MenuList::MENU_JOURNAL_MAIN)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
-		
+
 		Mmo()->Quest()->ShowQuestsMainList(pPlayer);
 		AddVotesBackpage(ClientID);
 	}
-	else if(MenuList == MenuList::MENU_INBOX) 
+	else if(MenuList == MenuList::MENU_INBOX)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
@@ -1993,7 +1971,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AV(ClientID, "null");
 		Mmo()->Inbox()->GetInformationInbox(pPlayer);
 	}
-	else if(MenuList == MenuList::MENU_UPGRADE) 
+	else if(MenuList == MenuList::MENU_UPGRADE)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 
@@ -2005,34 +1983,34 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		// DPS UPGRADES
 		int Range = pPlayer->GetLevelTypeAttribute(AtributType::AtDps);
-		AVH(ClientID, TAB_UPGR_DPS, RED_COLOR, "Disciple of War. Level Power {INT}", &Range);
+		AVH(ClientID, TAB_UPGR_DPS, RED_COLOR, "Disciple of War. Level Power {INT}", Range);
 		for(const auto& at : ms_aAttributsInfo)
 		{
-			if(at.second.m_Type != AtributType::AtDps || str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0) 
+			if(at.second.m_Type != AtributType::AtDps || str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0)
 				continue;
-			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_DPS, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, &pPlayer->Acc().m_aStats[at.first], &at.second.m_UpgradePrice);
+			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_DPS, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, pPlayer->Acc().m_aStats[at.first], at.second.m_UpgradePrice);
 		}
 		AV(ClientID, "null");
 
 		// TANK UPGRADES
 		Range = pPlayer->GetLevelTypeAttribute(AtributType::AtTank);
-		AVH(ClientID, TAB_UPGR_TANK, BLUE_COLOR, "Disciple of Tank. Level Power {INT}", &Range);
+		AVH(ClientID, TAB_UPGR_TANK, BLUE_COLOR, "Disciple of Tank. Level Power {INT}", Range);
 		for(const auto& at : ms_aAttributsInfo)
 		{
-			if(at.second.m_Type != AtributType::AtTank || str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0) 
+			if(at.second.m_Type != AtributType::AtTank || str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0)
 				continue;
-			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_TANK, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, &pPlayer->Acc().m_aStats[at.first], &at.second.m_UpgradePrice);
+			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_TANK, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, pPlayer->Acc().m_aStats[at.first], at.second.m_UpgradePrice);
 		}
 		AV(ClientID, "null");
 
 		// HEALER UPGRADES
 		Range = pPlayer->GetLevelTypeAttribute(AtributType::AtHealer);
-		AVH(ClientID, TAB_UPGR_HEALER, GREEN_COLOR, "Disciple of Healer. Level Power {INT}", &Range);
+		AVH(ClientID, TAB_UPGR_HEALER, GREEN_COLOR, "Disciple of Healer. Level Power {INT}", Range);
 		for(const auto& at : ms_aAttributsInfo)
 		{
-			if(at.second.m_Type != AtributType::AtHealer || str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0) 
+			if(at.second.m_Type != AtributType::AtHealer || str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0)
 				continue;
-			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_HEALER, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, &pPlayer->Acc().m_aStats[at.first], &at.second.m_UpgradePrice);
+			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_HEALER, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, pPlayer->Acc().m_aStats[at.first], at.second.m_UpgradePrice);
 		}
 		AV(ClientID, "null");
 
@@ -2040,14 +2018,14 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVH(ClientID, TAB_UPGR_WEAPON, GRAY_COLOR, "Upgrades Weapons / Ammo");
 		for(const auto& at : ms_aAttributsInfo)
 		{
-			if(at.second.m_Type != AtributType::AtWeapon || str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0) 
+			if(at.second.m_Type != AtributType::AtWeapon || str_comp_nocase(at.second.m_aFieldName, "unfield") == 0 || at.second.m_UpgradePrice <= 0)
 				continue;
-			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_WEAPON, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, &pPlayer->Acc().m_aStats[at.first], &at.second.m_UpgradePrice);
+			AVD(ClientID, "UPGRADE", at.first, at.second.m_UpgradePrice, TAB_UPGR_WEAPON, "{STR} {INT}P (Price {INT}P)", at.second.m_aName, pPlayer->Acc().m_aStats[at.first], at.second.m_UpgradePrice);
 		}
 
-		AV(ClientID, "null"), 
+		AV(ClientID, "null");
 		AVH(ClientID, TAB_UPGR_JOB, GOLDEN_COLOR, "Disciple of Jobs");
-		Mmo()->PlantsAcc()->ShowMenu(ClientID);
+		Mmo()->PlantsAcc()->ShowMenu(pPlayer);
 		Mmo()->MinerAcc()->ShowMenu(pPlayer);
 		AddVotesBackpage(ClientID);
 	}
@@ -2065,7 +2043,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		AVM(ClientID, "SELECTEDTOP", ToplistTypes::PLAYERS_WEALTHY, NOPE, "Top 10 players wealthy");
 		AddVotesBackpage(ClientID);
 	}
-	else if(MenuList == MenuList::MENU_GUIDEDROP) 
+	else if(MenuList == MenuList::MENU_GUIDEDROP)
 	{
 		pPlayer->m_LastVoteMenu = MenuList::MAIN_MENU;
 		AVH(ClientID, TAB_INFO_LOOT, GREEN_COLOR, "Chance & Loot Information");
@@ -2075,23 +2053,23 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		char aBuf[128];
 		bool FoundedBots = false;
 		const float AddedChanceDrop = clamp((float)pPlayer->GetAttributeCount(Stats::StLuckyDropItem, true) / 100.0f, 0.01f, 10.0f);
-		for(const auto& mobs : BotJob::ms_aMobBot)
+		for(const auto& mobs : MobBotInfo::ms_aMobBot)
 		{
 			if (!IsPlayerEqualWorldID(ClientID, mobs.second.m_WorldID))
 				continue;
 
 			const int HideID = (NUM_TAB_MENU+12500+mobs.first);
 			const int PosX = mobs.second.m_PositionX/32, PosY = mobs.second.m_PositionY/32;
-			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} [x{INT} y{INT}]", mobs.second.GetName(), &PosX, &PosY);
-	
+			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} [x{INT} y{INT}]", mobs.second.GetName(), PosX, PosY);
+
 			for(int i = 0; i < MAX_DROPPED_FROM_MOBS; i++)
 			{
-				if(mobs.second.m_aDropItem[i] <= 0 || mobs.second.m_aCountItem[i] <= 0)
+				if(mobs.second.m_aDropItem[i] <= 0 || mobs.second.m_aValueItem[i] <= 0)
 					continue;
-			
+
 				const float Chance = mobs.second.m_aRandomItem[i];
-				ItemInformation &InfoDropItem = GetItemInfo(mobs.second.m_aDropItem[i]);
-				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%(+%0.2f%%)", InfoDropItem.GetName(pPlayer), mobs.second.m_aCountItem[i], Chance, AddedChanceDrop);
+				CItemDataInfo &InfoDropItem = GetItemInfo(mobs.second.m_aDropItem[i]);
+				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%(+%0.2f%%)", InfoDropItem.GetName(pPlayer), mobs.second.m_aValueItem[i], Chance, AddedChanceDrop);
 				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, "{STR}", aBuf);
 				FoundedBots = true;
 			}
@@ -2102,7 +2080,7 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 		AddVotesBackpage(ClientID);
 	}
-		
+
 	Mmo()->OnPlayerHandleMainMenu(ClientID, MenuList, false);
 }
 
@@ -2112,7 +2090,7 @@ void CGS::ShowVotesNewbieInformation(int ClientID)
 	CPlayer *pPlayer = GetPlayer(ClientID);
 	if(!pPlayer)
 		return;
-		
+
 	AVL(ClientID, "null", "#### Hi, new adventurer! ####");
 	AVL(ClientID, "null", "This server is a mmo server. You'll have to finish");
 	AVL(ClientID, "null", "quests to continue the game. In these quests,");
@@ -2171,8 +2149,8 @@ void CGS::StrongUpdateVotesForAll(int MenuList)
 
 // the back button adds a back button to the menu (But remember to specify the last menu ID).
 void CGS::AddVotesBackpage(int ClientID)
-{	
-	if(!m_apPlayers[ClientID]) 
+{
+	if(!m_apPlayers[ClientID])
 		return;
 
 	AV(ClientID, "null");
@@ -2190,20 +2168,20 @@ void CGS::ShowVotesPlayerStats(CPlayer *pPlayer)
 	{
 		if(str_comp_nocase(pAtt.second.m_aFieldName, "unfield") == 0)
 			continue;
-	
+
 		// if upgrades are cheap, they have a division of statistics
 		const int AttributeSize = pPlayer->GetAttributeCount(pAtt.first);
 		if(pAtt.second.m_Devide <= 1)
 		{
 			const int AttributeRealSize = pPlayer->GetAttributeCount(pAtt.first, true);
-			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} (+{INT}) - {STR}", &AttributeSize, &AttributeRealSize, pAtt.second.m_aName);
+			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} (+{INT}) - {STR}", AttributeSize, AttributeRealSize, pAtt.second.m_aName);
 			continue;
 		}
 
-		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "+{INT} - {STR}", &AttributeSize, pAtt.second.m_aName);
+		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "+{INT} - {STR}", AttributeSize, pAtt.second.m_aName);
 	}
 
-	AVM(ClientID, "null", NOPE, NOPE, "Player Upgrade Point: {INT}P", &pPlayer->Acc().m_Upgrade);
+	AVM(ClientID, "null", NOPE, NOPE, "Player Upgrade Point: {INT}P", pPlayer->Acc().m_Upgrade);
 	AV(ClientID, "null");
 }
 
@@ -2212,7 +2190,7 @@ void CGS::ShowVotesItemValueInformation(CPlayer *pPlayer, int ItemID)
 {
 	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_VoteColored = LIGHT_PURPLE_COLOR;
-	AVMI(ClientID, GetItemInfo(ItemID).GetIcon(), "null", NOPE, NOPE, "You have {INT} {STR}", &pPlayer->GetItem(ItemID).m_Count, GetItemInfo(ItemID).GetName());
+	AVMI(ClientID, GetItemInfo(ItemID).GetIcon(), "null", NOPE, NOPE, "You have {INT} {STR}", pPlayer->GetItem(ItemID).m_Value, GetItemInfo(ItemID).GetName());
 }
 
 // vote parsing of all functions of action methods
@@ -2247,28 +2225,29 @@ bool CGS::ParsingVoteCommands(int ClientID, const char *CMD, const int VoteID, c
 	}
 
 
-	if(PPSTR(CMD, "null") == 0) 
+	if(PPSTR(CMD, "null") == 0)
 		return true;
-	else if(PPSTR(CMD, "BACK") == 0)
+
+	if(PPSTR(CMD, "BACK") == 0)
 	{
 		CreatePlayerSound(ClientID, SOUND_BOOK_FLIP);
 		ResetVotes(ClientID, pPlayer->m_LastVoteMenu);
 		return true;
 	}
-	else if(PPSTR(CMD, "MENU") == 0)
+	if(PPSTR(CMD, "MENU") == 0)
 	{
 		CreatePlayerSound(ClientID, SOUND_BOOK_FLIP);
 		ResetVotes(ClientID, VoteID);
 		return true;
 	}
-	else if (PPSTR(CMD, "SELECTEDTOP") == 0)
+	if (PPSTR(CMD, "SELECTEDTOP") == 0)
 	{
 		ResetVotes(ClientID, MenuList::MENU_TOP_LIST);
 		AV(ClientID, "null", "\0");
 		Mmo()->ShowTopList(pPlayer, VoteID);
 		return true;
 	}
-	else if(pPlayer->ParseVoteUpgrades(CMD, VoteID, VoteID2, Get)) 
+	if(pPlayer->ParseVoteUpgrades(CMD, VoteID, VoteID2, Get))
 		return true;
 
 	// parsing everything else
@@ -2276,7 +2255,7 @@ bool CGS::ParsingVoteCommands(int ClientID, const char *CMD, const int VoteID, c
 }
 
 /* #########################################################################
-	MMO GAMECONTEXT 
+	MMO GAMECONTEXT
 ######################################################################### */
 int CGS::CreateBot(short BotType, int BotID, int SubID)
 {
@@ -2311,20 +2290,20 @@ void CGS::CreateParticleExperience(vec2 Pos, int ClientID, int Experience, vec2 
 }
 
 // gives a bonus in the position type and quantity and the number of them.
-void CGS::CreateDropBonuses(vec2 Pos, int Type, int Count, int NumDrop, vec2 Force)
+void CGS::CreateDropBonuses(vec2 Pos, int Type, int Value, int NumDrop, vec2 Force)
 {
-	for(int i = 0; i < NumDrop; i++) 
+	for(int i = 0; i < NumDrop; i++)
 	{
-		vec2 Vel = Force + vec2(frandom() * 15.0, frandom() * 15.0);
+		const vec2 Vel = Force + vec2(frandom() * 15.0f, frandom() * 15.0f);
 		const float Angle = Force.x * (0.15f + frandom() * 0.1f);
-		new CDropBonuses(&m_World, Pos, Vel, Angle, Type, Count);
+		new CDropBonuses(&m_World, Pos, Vel, Angle, Type, Value);
 	}
 }
 
 // lands items in the position type and quantity and their number themselves
-void CGS::CreateDropItem(vec2 Pos, int ClientID, InventoryItem DropItem, vec2 Force)
+void CGS::CreateDropItem(vec2 Pos, int ClientID, CItemData DropItem, vec2 Force)
 {
-	if(DropItem.m_ItemID <= 0 || DropItem.m_Count <= 0)
+	if(DropItem.m_ItemID <= 0 || DropItem.m_Value <= 0)
 		return;
 
 	const float Angle = GetAngle(normalize(Force));
@@ -2332,7 +2311,7 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, InventoryItem DropItem, vec2 Fo
 }
 
 // random drop of the item with percentage
-void CGS::CreateRandomDropItem(vec2 Pos, int ClientID, float Random, InventoryItem DropItem, vec2 Force)
+void CGS::CreateRandomDropItem(vec2 Pos, int ClientID, float Random, CItemData DropItem, vec2 Force)
 {
 	const float RandomDrop = frandom() * 100.0f;
 	if(RandomDrop < Random)
@@ -2351,19 +2330,19 @@ bool CGS::TakeItemCharacter(int ClientID)
 }
 
 // send a message with or without the object using ClientID
-void CGS::SendInbox(CPlayer* pPlayer, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
+void CGS::SendInbox(const char* pFrom, CPlayer* pPlayer, const char* Name, const char* Desc, int ItemID, int Value, int Enchant)
 {
 	if(!pPlayer || !pPlayer->IsAuthed())
 		return;
 
-	SendInbox(pPlayer->Acc().m_AccountID, Name, Desc, ItemID, Count, Enchant);
-} 
+	SendInbox(pFrom, pPlayer->Acc().m_UserID, Name, Desc, ItemID, Value, Enchant);
+}
 
 // send a message with or without the object using AccountID
-void CGS::SendInbox(int AccountID, const char* Name, const char* Desc, int ItemID, int Count, int Enchant)
+void CGS::SendInbox(const char* pFrom, int AccountID, const char* Name, const char* Desc, int ItemID, int Value, int Enchant)
 {
-	Mmo()->Inbox()->SendInbox(AccountID, Name, Desc, ItemID, Count, Enchant);
-} 
+	Mmo()->Inbox()->SendInbox(pFrom, AccountID, Name, Desc, ItemID, Value, Enchant);
+}
 
 // send day information
 void CGS::SendDayInfo(int ClientID)
@@ -2371,7 +2350,7 @@ void CGS::SendDayInfo(int ClientID)
 	if(ClientID == -1)
 		Chat(-1, "{STR} came! Good {STR}!", Server()->GetStringTypeDay(), Server()->GetStringTypeDay());
 	if(m_DayEnumType == DayType::NIGHT_TYPE)
-		Chat(ClientID, "Nighttime experience was increase to {INT}%", &m_MultiplierExp);
+		Chat(ClientID, "Nighttime experience was increase to {INT}%", m_MultiplierExp);
 	else if(m_DayEnumType == DayType::MORNING_TYPE)
 		Chat(ClientID, "Daytime experience was downgraded to 100%");
 }
@@ -2388,8 +2367,8 @@ void CGS::ChangeEquipSkin(int ClientID, int ItemID)
 int CGS::GetExperienceMultiplier(int Experience) const
 {
 	if(IsDungeon())
-		return (int)kurosio::translate_to_procent_rest(Experience, g_Config.m_SvMultiplierExpRaidDungeon);
-	return (int)kurosio::translate_to_procent_rest(Experience, m_MultiplierExp);
+		return translate_to_percent_rest(Experience, g_Config.m_SvMultiplierExpRaidDungeon);
+	return translate_to_percent_rest(Experience, m_MultiplierExp);
 }
 
 void CGS::UpdateZonePVP()
@@ -2397,7 +2376,7 @@ void CGS::UpdateZonePVP()
 	m_AllowedPVP = false;
 	if(IsDungeon())
 		return;
-	
+
 	for(int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
 		if(m_apPlayers[i] && m_apPlayers[i]->GetBotType() == BotsTypes::TYPE_BOT_MOB && m_apPlayers[i]->GetPlayerWorldID() == m_WorldID)
@@ -2411,11 +2390,11 @@ void CGS::UpdateZonePVP()
 void CGS::UpdateZoneDungeon()
 {
 	m_DungeonID = 0;
-	for(const auto& dd : DungeonJob::ms_aDungeon)
+	for(const auto& dd : CDungeonData::ms_aDungeon)
 	{
 		if(m_WorldID != dd.second.m_WorldID)
 			continue;
-		
+
 		m_DungeonID = dd.first;
 		return;
 	}

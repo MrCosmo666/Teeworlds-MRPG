@@ -2,8 +2,9 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_ENTITIES_LOGIC_H
 #define GAME_SERVER_ENTITIES_LOGIC_H
-
 #include <game/server/entity.h>
+
+class CPlayer;
 
 class CLogicWallLine : public CEntity
 {
@@ -54,7 +55,7 @@ public:
 	CLogicWallWall(CGameWorld *pGameWorld, vec2 Pos, int Mode, int Health);
 	virtual void Snap(int SnappingClient);
 	virtual void Tick();
-	
+
 	void TakeDamage();
 	void SetDestroy(int Sec);
 	vec2 GetTo() const { return m_PosTo; }

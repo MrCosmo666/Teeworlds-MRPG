@@ -1,9 +1,9 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <engine/shared/config.h>
-
-#include <game/server/gamecontext.h>
 #include "logicwall.h"
+
+#include <engine/shared/config.h>
+#include <game/server/gamecontext.h>
 
 CLogicWall::CLogicWall(CGameWorld *pGameWorld, vec2 Pos)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_EYES, Pos)
@@ -16,7 +16,7 @@ CLogicWall::CLogicWall(CGameWorld *pGameWorld, vec2 Pos)
 void CLogicWall::SetDestroy(int Sec)
 {
 	m_RespawnTick = Server()->TickSpeed()*Sec;
-	if(pLogicWallLine) 
+	if(pLogicWallLine)
 	{
 		pLogicWallLine->Respawn(false);
 	}
@@ -24,7 +24,7 @@ void CLogicWall::SetDestroy(int Sec)
 
 CPlayer *CLogicWall::FindPlayerAI(float Distance)
 {
-	for(int i = 0; i < MAX_PLAYERS; i++) 
+	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
 		CPlayer *pPlayer = GS()->GetPlayer(i, true, true);
 		if(!pPlayer || distance(pPlayer->GetCharacter()->m_Core.m_Pos, m_Pos) > Distance)
@@ -35,20 +35,20 @@ CPlayer *CLogicWall::FindPlayerAI(float Distance)
 }
 
 void CLogicWall::Tick()
-{	
+{
 	if(m_RespawnTick)
 	{
 		m_RespawnTick--;
-		if(!m_RespawnTick) 
+		if(!m_RespawnTick)
 		{
-			if(pLogicWallLine) 
+			if(pLogicWallLine)
 				pLogicWallLine->Respawn(true);
 		}
 		return;
 	}
 
-	CPlayer *pPlayer = FindPlayerAI(250.0f);		
-	if(Server()->Tick() % (Server()->TickSpeed()*5) == 0 && pPlayer) 
+	CPlayer *pPlayer = FindPlayerAI(250.0f);
+	if(Server()->Tick() % (Server()->TickSpeed()*5) == 0 && pPlayer)
 	{
 		pLogicWallLine->SetClientID(pPlayer->GetCID());
 		vec2 Dir = normalize(m_Pos - pPlayer->GetCharacter()->m_Core.m_Pos);
@@ -80,10 +80,10 @@ CLogicWallFire::CLogicWallFire(CGameWorld *pGameWorld, vec2 Pos, vec2 Direction,
 	GameWorld()->InsertEntity(this);
 }
 void CLogicWallFire::Tick()
-{	
+{
 	if(!pLogicWall || GS()->Collision()->CheckPoint(m_Pos.x, m_Pos.y))
 	{
-		GS()->m_World.DestroyEntity(this);		
+		GS()->m_World.DestroyEntity(this);
 		return;
 	}
 
@@ -94,7 +94,7 @@ void CLogicWallFire::Tick()
 		{
 			p->TakeDamage();
 			GS()->CreateText(NULL, false, m_Pos, vec2(0, 0), 100, std::to_string(p->GetHealth()).c_str());
-			if(p->GetHealth() <= 0) 
+			if(p->GetHealth() <= 0)
 			{
 				pLogicWall->SetDestroy(120);
 				p->SetDestroy(120);
@@ -107,7 +107,7 @@ void CLogicWallFire::Tick()
 }
 
 void CLogicWallFire::Snap(int SnappingClient)
-{	
+{
 	if(NetworkClipped(SnappingClient))
 		return;
 
@@ -144,12 +144,12 @@ CLogicWallWall::CLogicWallWall(CGameWorld *pGameWorld, vec2 Pos, int Mode, int H
 		m_Pos.y += 30;
 		m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, 'y', '-');
 	}
-	else 
+	else
 	{
 		m_Pos.x += 30;
 		m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, 'x', '+');
 	}
-	
+
 	m_RespawnTick = Server()->TickSpeed()*10;
 	GameWorld()->InsertEntity(this);
 }
@@ -162,12 +162,12 @@ void CLogicWallWall::TakeDamage()
 
 void CLogicWallWall::SetDestroy(int Sec) { m_RespawnTick = Server()->TickSpeed()*Sec, m_Health = m_SaveHealth; }
 
-void CLogicWallWall::Tick() 
+void CLogicWallWall::Tick()
 {
 	if(m_RespawnTick)
 		m_RespawnTick--;
 
-	if(!m_RespawnTick) 
+	if(!m_RespawnTick)
 	{
 		for (CCharacter* pChar = (CCharacter*)GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter*)pChar->TypeNext())
 		{
@@ -180,7 +180,7 @@ void CLogicWallWall::Tick()
 }
 
 void CLogicWallWall::Snap(int SnappingClient)
-{	
+{
 	if (m_RespawnTick > 0 || NetworkClipped(SnappingClient))
 		return;
 
@@ -210,7 +210,7 @@ CLogicWallLine::CLogicWallLine(CGameWorld *pGameWorld, vec2 Pos)
 void CLogicWallLine::Respawn(bool Spawn) { m_Spawned = Spawn; }
 void CLogicWallLine::SetClientID(int ClientID) { m_ClientID = ClientID; }
 
-void CLogicWallLine::Tick() 
+void CLogicWallLine::Tick()
 {
 	if(m_ClientID < 0 || m_ClientID >= MAX_PLAYERS || !GS()->m_apPlayers[m_ClientID] || !GS()->m_apPlayers[m_ClientID]->GetCharacter())
 	{
@@ -230,7 +230,7 @@ void CLogicWallLine::Tick()
 }
 
 void CLogicWallLine::Snap(int SnappingClient)
-{	
+{
 	if (!m_Spawned || NetworkClipped(SnappingClient))
 		return;
 
@@ -260,7 +260,7 @@ CLogicDoorKey::CLogicDoorKey(CGameWorld *pGameWorld, vec2 Pos, int ItemID, int M
 		m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, 'y', '-');
 
 	}
-	else 
+	else
 	{
 		m_Pos.x -= 30;
 		m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, 'x', '+');
@@ -269,12 +269,12 @@ CLogicDoorKey::CLogicDoorKey(CGameWorld *pGameWorld, vec2 Pos, int ItemID, int M
 	GameWorld()->InsertEntity(this);
 }
 
-void CLogicDoorKey::Tick() 
+void CLogicDoorKey::Tick()
 {
 	for (CCharacter* pChar = (CCharacter*)GameWorld()->FindFirst(CGameWorld::ENTTYPE_CHARACTER); pChar; pChar = (CCharacter*)pChar->TypeNext())
 	{
 		CPlayer* pPlayer = pChar->GetPlayer();
-		if (pPlayer->GetItem(m_ItemID).m_Count)
+		if (pPlayer->GetItem(m_ItemID).m_Value)
 			continue;
 
 		vec2 IntersectPos = closest_point_on_line(m_Pos, m_PosTo, pChar->m_Core.m_Pos);
@@ -282,13 +282,13 @@ void CLogicDoorKey::Tick()
 		if (Distance <= g_Config.m_SvDoorRadiusHit)
 		{
 			pChar->m_DoorHit = true;
-			GS()->Broadcast(pChar->GetPlayer()->GetCID(), BroadcastPriority::BROADCAST_GAME_WARNING, 100, "You need {STR}", GS()->GetItemInfo(m_ItemID).GetName(pChar->GetPlayer()));
+			GS()->Broadcast(pChar->GetPlayer()->GetCID(), BroadcastPriority::GAME_WARNING, 100, "You need {STR}", GS()->GetItemInfo(m_ItemID).GetName(pChar->GetPlayer()));
 		}
 	}
 }
 
 void CLogicDoorKey::Snap(int SnappingClient)
-{	
+{
 	if (NetworkClipped(SnappingClient))
 		return;
 
@@ -358,7 +358,7 @@ bool CLogicDungeonDoorKey::SyncStateChanges()
 }
 
 void CLogicDungeonDoorKey::Snap(int SnappingClient)
-{	
+{
 	if (m_OpenedDoor || NetworkClipped(SnappingClient))
 		return;
 

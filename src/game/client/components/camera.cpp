@@ -1,9 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
+#include <base/math.h>
 #include <engine/shared/config.h>
 
-#include <base/math.h>
-#include <game/collision.h>
 #include <game/client/gameclient.h>
 #include <game/client/component.h>
 
@@ -119,7 +118,7 @@ void CCamera::ChangePosition(int PositionNumber)
 	m_MoveTime = 0.0f;
 }
 
-int CCamera::GetCurrentPosition()
+int CCamera::GetCurrentPosition() const
 {
 	return m_CurrentPosition;
 }

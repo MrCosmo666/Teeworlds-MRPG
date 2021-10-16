@@ -27,6 +27,37 @@ public:
 	void Render(IGraphics* pGraphics, IGraphics::CTextureHandle FontTexture, float x, float y, float w, float h, const char* pDescription);
 };
 
+struct CDownloadChunkItem
+{
+	void Clear()
+	{
+		m_aFilename[0] = 0;
+		m_aFilenameTemp[0] = 0;
+		m_aName[0] = 0;
+		m_FileTemp = nullptr;
+		m_Chunk = 0;
+		m_Sha256 = SHA256_ZEROED;
+		m_Sha256Present = false;
+		m_Crc = 0;
+		m_Amount = -1;
+		m_Totalsize = -1;
+		m_Downloaded = true;
+	}
+	char m_aName[256];
+	char m_aFilename[256];
+	char m_aFilenameTemp[256];
+	IOHANDLE m_FileTemp;
+	unsigned int m_Crc;
+	SHA256_DIGEST m_Sha256;
+
+	int m_Amount;
+	int m_Totalsize;
+	int m_Chunk;
+	int m_DownloadChunkNum;
+	int m_DownloadChunkSize;
+	bool m_Sha256Present;
+	bool m_Downloaded;
+};
 
 class CSmoothTime
 {
@@ -60,6 +91,7 @@ class CClient : public IClient, public CDemoPlayer::IListener
 	IEngineInput* m_pInput;
 	IEngineGraphics* m_pGraphics;
 	IEngineSound* m_pSound;
+	IEngineTextRender* m_pTextRender;
 	IGameClient* m_pGameClient;
 	IEngineMap* m_pMap;
 	IConsole* m_pConsole;
@@ -128,20 +160,13 @@ class CClient : public IClient, public CDemoPlayer::IListener
 	char m_aCmdConnect[256];
 
 	// map download
-	char m_aMapdownloadFilename[256];
-	char m_aMapdownloadFilenameTemp[256];
-	char m_aMapdownloadName[256];
-	IOHANDLE m_MapdownloadFileTemp;
-	int m_MapdownloadChunk;
-	int m_MapdownloadChunkNum;
-	int m_MapDownloadChunkSize;
-	SHA256_DIGEST m_MapdownloadSha256;
-	bool m_MapdownloadSha256Present;
-	int m_MapdownloadCrc;
-	int m_MapdownloadAmount;
-	int m_MapdownloadTotalsize;
+	CDownloadChunkItem m_DownloadMap;
 
 	//mmotee
+	CDataMMO m_DataMmo;
+	CDownloadChunkItem m_DownloadMmoData;
+	bool LoadMmoData(const SHA256_DIGEST* pWantedSha256, unsigned WantedCrc);
+
 	std::shared_ptr<CGetFile> m_pMmoInfoTask;
 
 	// time
@@ -195,23 +220,23 @@ class CClient : public IClient, public CDemoPlayer::IListener
 		class CHostLookup m_VersionServeraddr;
 	} m_VersionInfo;
 
-	int64 TickStartTime(int Tick);
+	int64 TickStartTime(int Tick) const;
 
 public:
-	IEngine* Engine() { return m_pEngine; }
-	IEngineGraphics* Graphics() { return m_pGraphics; }
-	IEngineInput* Input() { return m_pInput; }
-	IEngineSound* Sound() { return m_pSound; }
-	IGameClient* GameClient() { return m_pGameClient; }
-	IEngineMasterServer* MasterServer() { return m_pMasterServer; }
-	IStorageEngine* Storage() { return m_pStorage; }
-	IUpdater* Updater() { return m_pUpdater; }
-	IDiscord* Discord() { return m_pDiscord; }
+	IEngine* Engine() const { return m_pEngine; }
+	IEngineGraphics* Graphics() const { return m_pGraphics; }
+	IEngineInput* Input() const { return m_pInput; }
+	IEngineSound* Sound() const { return m_pSound; }
+	IGameClient* GameClient() const { return m_pGameClient; }
+	IEngineMasterServer* MasterServer() const { return m_pMasterServer; }
+	IStorageEngine* Storage() const { return m_pStorage; }
+	IUpdater* Updater() const { return m_pUpdater; }
+	IDiscord* Discord() const { return m_pDiscord; }
 
 	CClient();
 
 	// ----- send functions -----
-	virtual int SendMsg(CMsgPacker* pMsg, int Flags);
+	int SendMsg(CMsgPacker* pMsg, int Flags) override;
 
 	void SendInfo();
 	void SendEnterGame();
@@ -219,26 +244,32 @@ public:
 	void OnClientOnline();
 
 	// mmotee
-	virtual int ClientFPS() const;
-	bool EditorHasUnsavedData() { return m_pEditor->HasUnsavedData(); }
+	int ClientFPS() const override;
+	bool EditorHasUnsavedData() override { return m_pEditor->HasUnsavedData(); }
 
-	virtual bool RconAuthed() const { return m_RconAuthed != 0; }
-	virtual bool UseTempRconCommands() const { return m_UseTempRconCommands != 0; }
-	void RconAuth(const char* pName, const char* pPassword);
-	virtual void Rcon(const char* pCmd);
+	bool RconAuthed() const override { return m_RconAuthed != 0; }
+	bool UseTempRconCommands() const override { return m_UseTempRconCommands != 0; }
+	void RconAuth(const char* pName, const char* pPassword) override;
+	void Rcon(const char* pCmd) override;
 
-	virtual bool ConnectionProblems() const;
-	virtual int GetInputtimeMarginStabilityScore();
+	bool ConnectionProblems() const override;
+	int GetInputtimeMarginStabilityScore() override;
 
-	virtual bool SoundInitFailed() const { return m_SoundInitFailed; }
+	bool SoundInitFailed() const override { return m_SoundInitFailed; }
 
+	const char* GetJsonDataMRPG(int DataType) override
+	{
+		if(m_DataMmo.IsLoaded())
+			return m_DataMmo.GetJsonItem(DataType);
+		return "\0";
+	}
 
 	void SendInput();
 
 	// TODO: OPT: do this alot smarter!
-	virtual const int* GetInput(int Tick) const;
+	const int* GetInput(int Tick) const override;
 
-	const char* LatestVersion() const;
+	const char* LatestVersion() const override;
 	void VersionUpdate();
 
 	// ------ state handling -----
@@ -246,38 +277,38 @@ public:
 
 	// called when the map is loaded and we should init for a new round
 	void OnEnterGame();
-	virtual void EnterGame();
+	void EnterGame() override;
 
-	virtual void Connect(const char* pAddress);
+	void Connect(const char* pAddress) override;
 	void DisconnectWithReason(const char* pReason);
-	virtual void Disconnect();
-	const char* ServerAddress() const { return m_aServerAddressStr; }
+	void Disconnect() override;
+	const char* ServerAddress() const override { return m_aServerAddressStr; }
 
 
-	virtual void GetServerInfo(CServerInfo* pServerInfo);
+	void GetServerInfo(CServerInfo* pServerInfo) override;
 
 	// ---
 
-	const void* SnapGetItem(int SnapID, int Index, CSnapItem* pItem) const;
-	void SnapInvalidateItem(int SnapID, int Index);
-	const void* SnapFindItem(int SnapID, int Type, int ID) const;
-	int SnapNumItems(int SnapID) const;
-	void* SnapNewItem(int Type, int ID, int Size);
-	void SnapSetStaticsize(int ItemType, int Size);
+	const void* SnapGetItem(int SnapID, int Index, CSnapItem* pItem) const override;
+	void SnapInvalidateItem(int SnapID, int Index) override;
+	const void* SnapFindItem(int SnapID, int Type, int ID) const override;
+	int SnapNumItems(int SnapID) const override;
+	void* SnapNewItem(int Type, int ID, int Size) override;
+	void SnapSetStaticsize(int ItemType, int Size) override;
 
 	void Render();
 	void DebugRender();
 
 	//mmotee
-	void RequestMmoInfo();
+	void RequestMmoInfo() override;
 	void ResetMmoInfo();
 	void FinishMmoInfo();
 	void LoadMmoInfo();
-	virtual void OpenUpdateArchive();
+	void OpenUpdateArchive() override;
 
-	virtual void Quit();
+	void Quit() override;
 
-	virtual const char* ErrorString() const;
+	const char* ErrorString() const override;
 
 	const char* LoadMap(const char* pName, const char* pFilename, const SHA256_DIGEST* pWantedSha256, unsigned WantedCrc);
 	const char* LoadMapSearch(const char* pMapName, const SHA256_DIGEST* pWantedSha256, int WantedCrc);
@@ -286,16 +317,18 @@ public:
 	void ProcessConnlessPacket(CNetChunk* pPacket);
 	void ProcessServerPacket(CNetChunk* pPacket);
 
-	const char* GetCurrentMapName() const { return m_aCurrentMap; }
-	const char* GetCurrentMapPath() const { return m_aCurrentMapPath; }
-	virtual const char* MapDownloadName() const { return m_aMapdownloadName; }
-	virtual int MapDownloadAmount() const { return m_MapdownloadAmount; }
-	virtual int MapDownloadTotalsize() const { return m_MapdownloadTotalsize; }
+	const char* GetCurrentMapName() const override { return m_aCurrentMap; }
+	const char* GetCurrentMapPath() const override { return m_aCurrentMapPath; }
+	const char* MapDownloadName() const override { return m_DownloadMap.m_aName; }
+	int MapDownloadAmount() const override { return m_DownloadMap.m_Amount; }
+	int MapDownloadTotalsize() const override { return m_DownloadMap.m_Totalsize; }
+	int MmoDownloadAmount() const override { return m_DownloadMmoData.m_Amount; }
+	int MmoDownloadTotalsize() const override { return m_DownloadMmoData.m_Totalsize; }
 
 	void PumpNetwork();
 
-	virtual void OnDemoPlayerSnapshot(void* pData, int Size);
-	virtual void OnDemoPlayerMessage(void* pData, int Size);
+	void OnDemoPlayerSnapshot(void* pData, int Size) override;
+	void OnDemoPlayerMessage(void* pData, int Size) override;
 
 	void Update();
 
@@ -316,9 +349,6 @@ public:
 	static void Con_Screenshot(IConsole::IResult* pResult, void* pUserData);
 	static void Con_Rcon(IConsole::IResult* pResult, void* pUserData);
 	static void Con_RconAuth(IConsole::IResult* pResult, void* pUserData);
-	static void Con_AddFavorite(IConsole::IResult* pResult, void* pUserData);
-	static void Con_RemoveFavorite(IConsole::IResult* pResult, void* pUserData);
-	static void Con_Play(IConsole::IResult* pResult, void* pUserData);
 	static void Con_Record(IConsole::IResult* pResult, void* pUserData);
 	static void Con_StopRecord(IConsole::IResult* pResult, void* pUserData);
 	static void Con_AddDemoMarker(IConsole::IResult* pResult, void* pUserData);
@@ -330,32 +360,32 @@ public:
 
 	void RegisterCommands();
 
-	const char* DemoPlayer_Play(const char* pFilename, int StorageType);
-	void DemoRecorder_Start(const char* pFilename, bool WithTimestamp);
-	void DemoRecorder_HandleAutoStart();
-	void DemoRecorder_Stop();
+	const char* DemoPlayer_Play(const char* pFilename, int StorageType) override;
+	void DemoRecorder_Start(const char* pFilename, bool WithTimestamp) override;
+	void DemoRecorder_HandleAutoStart() override;
+	void DemoRecorder_Stop() override;
 	void DemoRecorder_AddDemoMarker();
-	void RecordGameMessage(bool State) { m_RecordGameMessage = State; }
+	void RecordGameMessage(bool State) override { m_RecordGameMessage = State; }
 
-	void AutoScreenshot_Start();
-	void AutoStatScreenshot_Start();
+	void AutoScreenshot_Start() override;
+	void AutoStatScreenshot_Start() override;
 	void AutoScreenshot_Cleanup();
 
-	void ServerBrowserUpdate();
+	void ServerBrowserUpdate() override;
 
 	// gfx
-	void SwitchWindowScreen(int Index);
-	void ToggleFullscreen();
-	void ToggleWindowBordered();
-	void ToggleWindowVSync();
+	void SwitchWindowScreen(int Index) override;
+	void ToggleFullscreen() override;
+	void ToggleWindowBordered() override;
+	void ToggleWindowVSync() override;
 
 	// mrpg
 private:
 
 public:
 
-	void NotifyWindow();
+	void NotifyWindow() override;
 
-	bool IsWindowActive() { return m_pGraphics->WindowActive(); }
+	bool IsWindowActive() override { return m_pGraphics->WindowActive(); }
 };
 #endif

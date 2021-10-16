@@ -1,7 +1,8 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <base/tl/base.h>
-#include <base/tl/algorithm.h>
+#include <base/tl/range.h>
+#include <base/tl/sorted_array.h>
+
 #include "snapshot.h"
 #include "compression.h"
 
@@ -33,12 +34,12 @@ int CSnapshot::GetItemIndex(int Key) const
 	return Index;
 }
 
-void CSnapshot::InvalidateItem(int Index)
+void CSnapshot::InvalidateItem(int Index) const
 {
 	((CSnapshotItem*)(DataStart() + Offsets()[Index]))->Invalidate();
 }
 
-int CSnapshot::Serialize(char* pDstData)
+int CSnapshot::Serialize(char* pDstData) const
 {
 	int* pData = (int*)pDstData;
 	pData[0] = m_DataSize;
@@ -491,7 +492,7 @@ void CSnapshotStorage::Add(int Tick, int64 Tagtime, int DataSize, void* pData, i
 	m_pLast = pHolder;
 }
 
-int CSnapshotStorage::Get(int Tick, int64* pTagtime, CSnapshot** ppData, CSnapshot** ppAltData)
+int CSnapshotStorage::Get(int Tick, int64* pTagtime, CSnapshot** ppData, CSnapshot** ppAltData) const
 {
 	CHolder* pHolder = m_pFirst;
 

@@ -5,7 +5,6 @@
 #include <engine/textrender.h>
 #include <engine/keys.h>
 #include <generated/protocol.h>
-#include <generated/client_data.h>
 #include <game/client/gameclient.h>
 
 #include "menus.h"
@@ -16,7 +15,7 @@ void CMotd::Clear()
 	m_ServerMotdTime = 0;
 }
 
-bool CMotd::IsActive()
+bool CMotd::IsActive() const
 {
 	// dont render modt if the menu is active
 	if(m_pClient->m_pMenus->IsActive())
@@ -35,12 +34,15 @@ void CMotd::OnRender()
 	if(!IsActive())
 		return;
 
-	float Width = 400*3.0f*Graphics()->ScreenAspect();
-	float Height = 400*3.0f;
+	const float Width = 400 * 3.0f * Graphics()->ScreenAspect();
+	const float Height = 400 * 3.0f;
 
 	Graphics()->MapScreen(0, 0, Width, Height);
 
-	float h = 800.0f;
+	const int MaxLines = 24;
+	const float TextSize = 32.0f;
+
+	float h = MaxLines * TextSize + 2 * 25.0f;
 	float w = 650.0f;
 	float x = Width/2 - w/2;
 	float y = 150.0f;
@@ -49,13 +51,16 @@ void CMotd::OnRender()
 	Graphics()->BlendNormal();
 	RenderTools()->DrawRoundRect(&Rect, vec4(0.0f, 0.0f, 0.0f, 0.5f), 30.0f);
 
-	Rect.Margin(30.0f, &Rect);
-	float TextSize = 32.0f;
-	CTextCursor Cursor;
-	TextRender()->SetCursor(&Cursor, Rect.x, Rect.y, TextSize, TEXTFLAG_RENDER);
-	Cursor.m_LineWidth = Rect.w;
-	Cursor.m_MaxLines = ceil(Rect.h / TextSize);
-	TextRender()->TextEx(&Cursor, m_aServerMotd, -1);
+	Rect.Margin(25.0f, &Rect);
+
+	m_ServerMotdCursor.m_Flags = TEXTFLAG_ALLOW_NEWLINE | TEXTFLAG_WORD_WRAP | TEXTFLAG_ELLIPSIS;
+	m_ServerMotdCursor.m_FontSize = TextSize;
+	m_ServerMotdCursor.m_MaxWidth = Rect.w;
+	m_ServerMotdCursor.m_MaxLines = MaxLines;
+
+	m_ServerMotdCursor.Reset(m_ServerMotdTime);
+	m_ServerMotdCursor.MoveTo(Rect.x, Rect.y);
+	TextRender()->TextOutlined(&m_ServerMotdCursor, m_aServerMotd, -1);
 }
 
 void CMotd::OnMessage(int MsgType, void *pRawMsg)

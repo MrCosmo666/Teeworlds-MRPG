@@ -368,8 +368,8 @@
 		"value": "Du begannen einen Dialog mit {STR}!"
 	},
 	{
-		"key": "{INT}. {STR} : Time: {INT} minute(s) {INT} second(s)",
-		"value": "{INT}. {STR} : Zeit: {INT} minute(s) {INT} second(s)"
+		"key": "{INT}. {STR} | {INT}:{INT}min | {INT}P",
+		"value": "{INT}. {STR} | {INT}:{INT}min | {INT}P"
 	},
 	{
 		"key": "Need to complete quest {STR}",

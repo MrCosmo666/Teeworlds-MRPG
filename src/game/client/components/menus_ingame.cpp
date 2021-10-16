@@ -2,11 +2,9 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/math.h>
 
-#include <engine/config.h>
 #include <engine/demo.h>
 #include <engine/contacts.h>
 #include <engine/graphics.h>
-#include <engine/keys.h>
 #include <engine/serverbrowser.h>
 #include <engine/textrender.h>
 #include <engine/shared/config.h>
@@ -61,7 +59,7 @@ void CMenus::RenderGame(CUIRect MainView)
 
 	float Spacing = 3.0f;
 	float ButtonWidth = (MainView.w/6.0f)-(Spacing*5.0)/6.0f;
-	
+
 	// cut view
 	MainView.HSplitTop(20.0f, 0, &MainView);
 	float NoteHeight = !Info.m_aNotification[0] ? 0.0f : 45.0f;
@@ -182,7 +180,7 @@ void CMenus::RenderGame(CUIRect MainView)
 			if(DoButton_Menu(&s_JoinButton, aBuf, Team == TEAM_RED, &Button) && Team != TEAM_RED && !(Info.m_aNotification[0]))
 			{
 				m_pClient->SendSwitchTeam(TEAM_RED);
-				SetActive(EMenuState::NOACTIVE);
+				SetActive(MENU_NO_ACTIVE);
 			}
 		}
 
@@ -302,9 +300,7 @@ void CMenus::RenderPlayers(CUIRect MainView)
 			Label.y += 2.0f;
 			if(g_Config.m_ClShowUserId)
 			{
-				CTextCursor Cursor;
-				TextRender()->SetCursor(&Cursor, Label.x, Label.y, ButtonHeight*ms_FontmodHeight*0.8f, TEXTFLAG_RENDER);
-				RenderTools()->DrawClientID(TextRender(), &Cursor, i);
+				RenderTools()->DrawClientID(TextRender(), ButtonHeight * ms_FontmodHeight * 0.8f, vec2(Label.x, Label.y), i);
 				Label.VSplitLeft(ButtonHeight, 0, &Label);
 			}
 			char aBuf[64];
@@ -379,7 +375,7 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 	UI()->DoLabel(&Label, Localize("Server info"), ButtonHeight*ms_FontmodHeight*0.8f, CUI::ALIGN_CENTER);
 	RenderTools()->DrawUIRect(&ServerInfo, vec4(0.0, 0.0, 0.0, 0.25f), CUI::CORNER_ALL, 5.0f);
 	ServerInfo.Margin(5.0f, &ServerInfo);
-	
+
 	ServerInfo.HSplitTop(2*ButtonHeight, &Label, &ServerInfo);
 	Label.y += 2.0f;
 	UI()->DoLabel(&Label, CurrentServerInfo.m_aName, ButtonHeight*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT, Label.w);
@@ -388,7 +384,7 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 	Label.y += 2.0f;
 	str_format(aBuf, sizeof(aBuf), "%s: %s", Localize("Address"), CurrentServerInfo.m_aHostname);
 	UI()->DoLabel(&Label, aBuf, ButtonHeight*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
-	
+
 	ServerInfo.HSplitTop(ButtonHeight, &Label, &ServerInfo);
 	Label.y += 2.0f;
 	str_format(aBuf, sizeof(aBuf), "%s: %d", Localize("Ping"), m_pClient->m_Snap.m_pLocalInfo->m_Latency);
@@ -403,7 +399,7 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 	Label.y += 2.0f;
 	str_format(aBuf, sizeof(aBuf), "%s: %s", Localize("Password"), CurrentServerInfo.m_Flags&IServerBrowser::FLAG_PASSWORD ? Localize("Yes", "With") : Localize("No", "Without/None"));
 	UI()->DoLabel(&Label, aBuf, ButtonHeight*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
-	
+
 	const bool IsFavorite = CurrentServerInfo.m_Favorite;
 	ServerInfo.HSplitBottom(ButtonHeight, &ServerInfo, &Label);
 	static int s_AddFavButton = 0;
@@ -489,17 +485,25 @@ void CMenus::RenderServerInfo(CUIRect MainView)
 
 	static CScrollRegion s_ScrollRegion;
 	vec2 ScrollOffset(0, 0);
-	s_ScrollRegion.Begin(&Motd, &ScrollOffset);
+
+	CScrollRegionParams ScrollParams;
+	ScrollParams.m_ScrollUnit = ButtonHeight * ms_FontmodHeight * 0.8f * 3; // 3 rows per scroll
+
+	s_ScrollRegion.Begin(&Motd, &ScrollOffset, &ScrollParams);
 	Motd.y += ScrollOffset.y;
 
-	CTextCursor Cursor;
-	TextRender()->SetCursor(&Cursor, Motd.x, Motd.y, ButtonHeight*ms_FontmodHeight*0.8f, TEXTFLAG_RENDER);
-	Cursor.m_LineWidth = Motd.w;
-	TextRender()->TextEx(&Cursor, m_pClient->m_pMotd->GetMotd(), -1);
+	static CTextCursor s_MenuMotdCursor;
+	s_MenuMotdCursor.m_FontSize = ButtonHeight * ms_FontmodHeight * 0.8f;
+	s_MenuMotdCursor.MoveTo(Motd.x, Motd.y);
+	s_MenuMotdCursor.m_MaxWidth = Motd.w;
+	s_MenuMotdCursor.m_MaxLines = -1;
+	s_MenuMotdCursor.m_Flags = TEXTFLAG_ALLOW_NEWLINE | TEXTFLAG_WORD_WRAP;
+	s_MenuMotdCursor.Reset();
+	TextRender()->TextOutlined(&s_MenuMotdCursor, m_pClient->m_pMotd->GetMotd(), -1);
 
 	// define the MOTD text area and make it scrollable
 	CUIRect MotdTextArea;
-	Motd.HSplitTop(Cursor.m_Y - Motd.y + ButtonHeight * ms_FontmodHeight * 0.8f + 5.0f, &MotdTextArea, &Motd);
+	Motd.HSplitTop(s_MenuMotdCursor.BoundingBox().Bottom() - Motd.y + ButtonHeight * ms_FontmodHeight * 0.8f + 5.0f, &MotdTextArea, &Motd);
 	s_ScrollRegion.AddRect(MotdTextArea);
 
 	s_ScrollRegion.End();
@@ -702,9 +706,7 @@ void CMenus::RenderServerControlKick(CUIRect MainView, bool FilterSpectators)
 			{
 				Row.VSplitLeft(Row.h, &Label, &Row);
 				Label.y += 2.0f;
-				CTextCursor Cursor;
-				TextRender()->SetCursor(&Cursor, Label.x, Label.y, Label.h*ms_FontmodHeight*0.8f, TEXTFLAG_RENDER);
-				RenderTools()->DrawClientID(TextRender(), &Cursor, aPlayerIDs[i]);
+				RenderTools()->DrawClientID(TextRender(), Label.h * ms_FontmodHeight * 0.8f, vec2(Label.x, Label.y), aPlayerIDs[i]);
 			}
 
 			Row.VSplitLeft(Spacing, 0, &Row);
@@ -859,7 +861,7 @@ void CMenus::RenderServerControl(CUIRect MainView)
 	// render background
 	MainView.HSplitBottom(90.0f+2*20.0f, &MainView, &Extended);
 	RenderTools()->DrawUIRect(&Extended, vec4(0.0f, 0.0f, 0.0f, 0.25f), CUI::CORNER_ALL, 5.0f);
-	
+
 	bool doCallVote = false;
 	// render page
 	if(s_ControlPage == 0)
@@ -885,7 +887,7 @@ void CMenus::RenderServerControl(CUIRect MainView)
 			if (s_ControlPage == 0)
 			{
 				const char* pSearchLabel = Localize("Search:");
-				w = TextRender()->TextWidth(0, Search.h * ms_FontmodHeight * 0.8f, pSearchLabel, -1, -1.0f);
+				w = TextRender()->TextWidth(Search.h * ms_FontmodHeight * 0.8f, pSearchLabel, -1);
 				Search.VSplitLeft(w + 10.0f, &Label, &Search);
 				Label.y += 2.0f;
 				UI()->DoLabel(&Label, pSearchLabel, Search.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_LEFT);
@@ -896,12 +898,12 @@ void CMenus::RenderServerControl(CUIRect MainView)
 
 			// render reason
 			Bottom.VSplitRight(120.0f, &Bottom, &Button);
-			
+
 			Bottom.VSplitRight(40.0f, &Bottom, 0);
 			Bottom.VSplitRight(160.0f, &Bottom, &Reason);
 			Reason.VSplitRight(Reason.h, &Reason, &ClearButton);
 			const char *pReasonLabel = Localize("Reason:");
-			w = TextRender()->TextWidth(0, Reason.h*ms_FontmodHeight*0.8f, pReasonLabel, -1, -1.0f);
+			w = TextRender()->TextWidth(Reason.h * ms_FontmodHeight * 0.8f, pReasonLabel, -1);
 			Reason.VSplitLeft(w + 10.0f, &Label, &Reason);
 			Label.y += 2.0f;
 			UI()->DoLabel(&Label, pReasonLabel, Reason.h*ms_FontmodHeight*0.8f, CUI::ALIGN_LEFT);
@@ -919,7 +921,7 @@ void CMenus::RenderServerControl(CUIRect MainView)
 					m_aCallvoteReason[0] = 0;
 			}
 		}
- 
+
 		if(pNotification == 0)
 		{
 			// call vote
@@ -1021,7 +1023,7 @@ void CMenus::RenderServerControlMRPG(CUIRect MainView)
 		Bottom.VSplitLeft(260.0f, &Search, &Bottom);
 
 		const char* pSearchLabel = Localize("Search:");
-		float w = TextRender()->TextWidth(0, Search.h * ms_FontmodHeight * 0.8f, pSearchLabel, -1, -1.0f);
+		float w = TextRender()->TextWidth(Search.h * ms_FontmodHeight * 0.8f, pSearchLabel, -1);
 		Search.VSplitLeft(w + 10.0f, &Label, &Search);
 		Label.y += 2.0f;
 		UI()->DoLabel(&Label, pSearchLabel, Search.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_LEFT);
@@ -1032,7 +1034,7 @@ void CMenus::RenderServerControlMRPG(CUIRect MainView)
 		Bottom.VSplitLeft(30.0f, 0, &Bottom);
 		Bottom.VSplitLeft(260.0f, &Reason, &Bottom);
 		const char* pReasonLabel = Localize("Interaction:");
-		w = TextRender()->TextWidth(0, Reason.h * ms_FontmodHeight * 0.8f, pReasonLabel, -1, -1.0f);
+		w = TextRender()->TextWidth(Reason.h * ms_FontmodHeight * 0.8f, pReasonLabel, -1);
 		Reason.VSplitLeft(w + 10.0f, &Label, &Reason);
 		Label.y += 2.0f;
 		UI()->DoLabel(&Label, pReasonLabel, Reason.h * ms_FontmodHeight * 0.8f, CUI::ALIGN_LEFT);

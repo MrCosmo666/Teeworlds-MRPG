@@ -12,7 +12,7 @@ const int CBinds::s_aaDefaultBindKeys[][2] = {
 	{KEY_MOUSE_WHEEL_UP, 0}, {KEY_MOUSE_WHEEL_DOWN, 0},
 	{'t', 0}, {'y', 0}, {'x', 0},
 	{KEY_F3, 0}, {KEY_F4, 0},
-	{'r', 0},
+	{'r', 0}, {'b', 0},
 };
 const char CBinds::s_aaDefaultBindValues[][32] = {
 	"toggle_local_console", "toggle_remote_console", "+scoreboard", "+stats", "+show_chat", "screenshot", "snd_toggle",
@@ -22,7 +22,7 @@ const char CBinds::s_aaDefaultBindValues[][32] = {
 	"+prevweapon", "+nextweapon",
 	"chat all", "chat team", "chat whisper",
 	"vote yes", "vote no",
-	"ready_change",
+	"ready_change", "toggle_game_hud_mrpg"
 };
 
 CBinds::CBinds()
@@ -198,14 +198,14 @@ void CBinds::UnbindAll()
 			m_aaaKeyBindings[i][m][0] = 0;
 }
 
-const char *CBinds::Get(int KeyID, int Modifier)
+const char *CBinds::Get(int KeyID, int Modifier) const
 {
 	if(KeyID > 0 && KeyID < KEY_LAST)
 		return m_aaaKeyBindings[KeyID][Modifier];
 	return "";
 }
 
-void CBinds::GetKeyID(const char* pBindStr, int& KeyID, int& Modifier)
+void CBinds::GetKeyID(const char* pBindStr, int& KeyID, int& Modifier) const
 {
 	KeyID = KEY_LAST;
 	Modifier = MODIFIER_COUNT;
@@ -233,10 +233,10 @@ void CBinds::GetKeyID(const char* pBindStr, int& KeyID, int& Modifier)
 	}
 }
 
-void CBinds::GetKey(const char* pBindStr, char aKey[64], unsigned BufSize, int KeyID, int Modifier)
+void CBinds::GetKey(const char* pBindStr, char aKey[64], unsigned BufSize, int KeyID, int Modifier) const
 {
 	aKey[0] = 0;
-	if (KeyID < KEY_LAST) 
+	if (KeyID < KEY_LAST)
 	{
 		str_format(aKey, BufSize, "%s%s", GetModifierName(Modifier), Input()->KeyName(KeyID));
 		return;
@@ -244,7 +244,7 @@ void CBinds::GetKey(const char* pBindStr, char aKey[64], unsigned BufSize, int K
 	str_copy(aKey, Localize("key not found"), BufSize);
 }
 
-void CBinds::GetKey(const char* pBindStr, char aKey[64], unsigned BufSize)
+void CBinds::GetKey(const char* pBindStr, char aKey[64], unsigned BufSize) const
 {
 	int KeyID, Modifier;
 	GetKeyID(pBindStr, KeyID, Modifier);
@@ -338,7 +338,7 @@ void CBinds::ConBinds(IConsole::IResult* pResult, void* pUserData)
 	}
 }
 
-int CBinds::DecodeBindString(const char *pKeyName, int* pModifier)
+int CBinds::DecodeBindString(const char *pKeyName, int* pModifier) const
 {
 	// check for modifier of type xxx+xxx
 	char aBuf[64];

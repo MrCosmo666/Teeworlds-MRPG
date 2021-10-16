@@ -1,8 +1,9 @@
 #ifndef GAME_CLIENT_ANIM_UI_H
 #define GAME_CLIENT_ANIM_UI_H
 
-#include <base/tl/array.h>
 #include <game/client/anim_ui/elements.h>
+
+#include <base/tl/array.h>
 
 // TDTW
 class CAnimUI
@@ -15,12 +16,12 @@ public:
 	CAnimElementsUI *Get(const char *Name);
 
 	CAnimElementsUI *Get(int Index) { return m_aAnimElements[Index]; }
-	int GetSize() { return m_aAnimElements.size(); }
+	int GetSize() const { return m_aAnimElements.size(); }
 
-	class CGameClient *Client() { return m_pClient; }
+	class CGameClient *Client() const { return m_pClient; }
 private:
 	class CGameClient* m_pClient;
-	array <CAnimElementsUI*> m_aAnimElements;
+	array<CAnimElementsUI*> m_aAnimElements;
 
 	CAnimElementsUI *SearchElement(char const *Name);
 	int SearchElementIndex(char const *Name);

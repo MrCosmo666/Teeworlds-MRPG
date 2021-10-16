@@ -147,13 +147,14 @@ static void logger_win_console(const char *line)
 			wline[len] = glyph;
 			break;
 		}
-		else if(glyph == 0)
+		if(glyph == 0)
 		{
 			// A character code of 0 signals the end of the string.
 			error = 0;
 			break;
 		}
-		else if(glyph > 0xffff)
+
+		if(glyph > 0xffff)
 		{
 			// Since the windows console does not really support
 			// UTF-16, don't mind doing actual UTF-16 encoding,
@@ -247,7 +248,6 @@ void dbg_logger_file(const char *filename)
 		dbg_logger(logger_file);
 	else
 		dbg_msg("dbg/logger", "failed to open '%s' for logging", filename);
-
 }
 
 #if defined(CONF_FAMILY_WINDOWS)
@@ -1609,10 +1609,10 @@ int fs_storage_path(const char *appname, char *path, int max)
 	int i;
 	char *xdgdatahome = getenv("XDG_DATA_HOME");
 	char xdgpath[max];
-	
+
 	if(!home)
 		return -1;
-	
+
 #if defined(CONF_PLATFORM_MACOSX)
 	str_format(path, max, "%s/Library/Application Support/%s", home, appname);
 	return 0;
@@ -1636,7 +1636,7 @@ int fs_storage_path(const char *appname, char *path, int max)
 		for(i = strlen(xdgdatahome)+1; xdgpath[i]; i++)
 			xdgpath[i] = tolower(xdgpath[i]);
 	}
-	
+
 	/* check for old location / backward compatibility */
 	if(fs_is_dir(path))
 	{
@@ -1644,7 +1644,7 @@ int fs_storage_path(const char *appname, char *path, int max)
 		/* for backward compatibility */
 		return 0;
 	}
-	
+
 	str_format(path, max, "%s", xdgpath);
 
 	return 0;
@@ -1852,7 +1852,7 @@ int net_socket_read_wait(NETSOCKET sock, int time)
 	}
 
 	/* don't care about writefds and exceptfds */
-	select(sockid+1, &readfds, NULL, NULL, &tv);	
+	select(sockid+1, &readfds, NULL, NULL, &tv);
 
 	if(sock.ipv4sock >= 0 && FD_ISSET(sock.ipv4sock, &readfds))
 		return 1;
@@ -1976,7 +1976,14 @@ void str_append(char *dst, const char *src, int dst_size)
 
 void str_copy(char *dst, const char *src, int dst_size)
 {
-	strncpy(dst, src, dst_size);
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+#endif
+	(strncpy(dst, src, dst_size));
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif
 	dst[dst_size-1] = 0; /* assure null termination */
 }
 
@@ -2752,6 +2759,23 @@ void str_utf8_copy_num(char* dst, const char* src, int dst_size, int num)
 	}
 
 	str_copy(dst, src, cursor < dst_size ? cursor + 1 : dst_size);
+}
+
+void str_utf8_stats(const char* str, int max_size, int* size, int* count)
+{
+	*size = 0;
+	*count = 0;
+	while(str[*size] && *size < max_size)
+	{
+		int new_size = str_utf8_forward(str, *size);
+		if(new_size != *size)
+		{
+			if(new_size >= max_size)
+				break;
+			*size = new_size;
+			++(*count);
+		}
+	}
 }
 
 unsigned str_quickhash(const char *str)

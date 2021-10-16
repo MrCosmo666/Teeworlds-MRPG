@@ -5,17 +5,11 @@
 #include <engine/textrender.h>
 #include <engine/graphics.h>
 
-#include <game/version.h>
 #include <game/client/ui.h>
 #include <game/client/render.h>
 #include <game/client/gameclient.h>
 
-#include <generated/client_data.h>
-
-#include <game/client/components/binds.h>
 #include <game/client/components/menus.h>
-#include <game/client/components/items.h>
-#include <game/client/components/skins.h>
 
 void CMenus::RenderRgbSliders(CUIRect* pMainView, CUIRect* pButton, int &r, int &g, int &b, bool Enabled)
 {
@@ -68,7 +62,7 @@ void CMenus::RenderSettingsMmo(CUIRect MainView)
 	MainView.HSplitTop(400.0f, &MainView, &Label);
 	RenderSettingsMmoGeneral(MainView, s_SettingsPage);
 
-	const char* apInformation[TAB_SIZE] = 
+	const char* apInformation[TAB_SIZE] =
 	{
 		"Setting up the general part of the client",
 		"Setting up the visual part of the client",
@@ -140,7 +134,7 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		CUIRect BackgroundExpBar = Button;
 		BasicRight.HSplitTop(ButtonHeight * 5.0f, &BackgroundExpBar, 0);
 		RenderTools()->DrawUIRect(&BackgroundExpBar, vec4(0.0f, 0.0f, 0.0f, g_Config.m_ClMenuAlpha / 100.0f), CUI::CORNER_ALL, 5.0f);
-		
+
 		// expbar
 		CUIRect ExpBar;
 		BasicRight.HSplitTop(5.0f, 0, &BasicRight);
@@ -202,7 +196,7 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		static CButtonContainer s_ButtonDiscord;
 		MainView.HSplitTop(16.0f, &DiscordLink, &MainView);
 		const char* pURL = "https://mrpg.teeworlds.dev";
-		float TextWidth = TextRender()->TextWidth(0, 12.0f, pURL, -1, -1);
+		float TextWidth = TextRender()->TextWidth(12.0f, pURL, -1);
 		DiscordLink.x = DiscordLink.x + (DiscordLink.w / 2.0f) - (TextWidth / 2.0f);
 		DiscordLink.w = TextWidth;
 
@@ -252,7 +246,7 @@ void CMenus::RenderSettingsMmoChangerGeneric(CUIRect MainView, CCSkinChanger::CT
 			Graphics()->BlendNormal();
 			if (i == 0) Graphics()->TextureSet(pEntities->GetDefault());
 			else Graphics()->TextureSet(pEntities->Get(i - 1));
-			
+
 			Graphics()->QuadsBegin();
 			IGraphics::CQuadItem QuadItem(Item.m_Rect.x, Item.m_Rect.y, Item.m_Rect.w, Item.m_Rect.h);
 			Graphics()->QuadsDrawTL(&QuadItem, 1);
@@ -390,7 +384,8 @@ int GatherFonts(const char *pFileName, int IsDir, int Type, void *pUser)
 
 void CMenus::RenderFontSelection(CUIRect MainView)
 {
-	static CListBox s_ListBox;
+// TODO: update fonts
+/*	static CListBox s_ListBox;
 	static int s_SelectedFont = 0;
 	static sorted_array<CFontFile> s_Fonts;
 
@@ -435,7 +430,7 @@ void CMenus::RenderFontSelection(CUIRect MainView)
 			io_close(File);
 
 		TextRender()->SetDefaultFont(TextRender()->LoadFont(aFontPath));
-	}
+	}*/
 }
 
 void CMenus::PreparationLeftRightSide(const char* pName, CUIRect MainView, CUIRect *LeftSide, CUIRect *RightSide, const float Spacing, const float ButtonHeight)

@@ -1,23 +1,14 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-
-#include <base/detect.h>
-#include <base/math.h>
-#include <base/tl/threading.h>
-
-#include <base/system.h>
+#include "graphics_threaded.h"
 
 #include <pnglite.h>
 
 #include <engine/shared/config.h>
 #include <engine/graphics.h>
 #include <engine/storage.h>
-#include <engine/keys.h>
 #include <engine/console.h>
 
-#include <math.h> // cosf, sinf
-
-#include "graphics_threaded.h"
 
 static CVideoMode g_aFakeModes[] = {
 	{320,200,8,8,8}, {320,240,8,8,8}, {400,300,8,8,8},
@@ -804,6 +795,8 @@ int CGraphics_Threaded::Init()
 	m_pBackend = CreateGraphicsBackend();
 	if (InitWindow() != 0)
 		return -1;
+
+	m_ScreenHiDPIScale = m_ScreenWidth / (float)g_Config.m_GfxScreenWidth;
 
 	// create command buffers
 	for (int i = 0; i < NUM_CMDBUFFERS; i++)

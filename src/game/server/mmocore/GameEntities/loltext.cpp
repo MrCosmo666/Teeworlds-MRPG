@@ -1,7 +1,7 @@
-#include <engine/shared/config.h>
-#include <generated/protocol.h>
-#include <game/server/gamecontext.h>
 #include "loltext.h"
+
+#include <engine/server.h>
+#include <engine/shared/config.h>
 
 CLolPlasma::CLolPlasma(CGameWorld* pGameWorld, CEntity* pParent, vec2 Pos, vec2 Vel, int Lifespan)
 	: CEntity(pGameWorld, CGameWorld::ENTTYPE_WORLD_TEXT, Pos)

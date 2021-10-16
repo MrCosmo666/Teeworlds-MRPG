@@ -2,20 +2,21 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_ENTITIES_JOBITEMS_H
 #define GAME_SERVER_ENTITIES_JOBITEMS_H
-
 #include <game/server/entity.h>
 
+class CPlayer;
+class CItemData;
 const int PickupPhysSize = 14;
 
 class CJobItems : public CEntity
 {
 public:
-	CJobItems(CGameWorld *pGameWorld, int ItemID, int Level, vec2 Pos, int Type, int StartHealth, int HouseID = -1);
+	CJobItems(CGameWorld *pGameWorld, int ItemID, int Level, vec2 Pos, int Type, int Health, int HouseID = -1);
 
-	virtual void Reset();
-	virtual void Tick();
+	void Reset() override;
+	void Tick() override;
 	virtual void TickPaused();
-	virtual void Snap(int SnappingClient);
+	void Snap(int SnappingClient) override;
 
 	void SetSpawn(int Sec);
 	void Work(int ClientID);
@@ -25,12 +26,14 @@ public:
 	int m_HouseID;
 private:
 	int m_Level;
+	int m_TotalDamage;
 	int m_Health;
-	int m_StartHealth;
 	int m_SpawnTick;
 	int m_Type;
 
-	int SwitchToObject(bool MmoItem);
+	void FarmingWork(int ClientID, CPlayer* pPlayer, CItemData& pWorkedItem);
+	void MiningWork(int ClientID, CPlayer* pPlayer, CItemData& pWorkedItem);
+	int SwitchToObject(bool MmoItem) const;
 };
 
 #endif

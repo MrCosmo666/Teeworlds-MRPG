@@ -1,15 +1,13 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
-#include <algorithm> // sort  TODO: remove this
-
-#include <base/math.h>
-
-#include <engine/shared/config.h>
-#include <engine/client/contacts.h>
 #include <engine/serverbrowser.h>
+#include <engine/client/contacts.h>
+#include <engine/shared/config.h>
 
-#include "serverbrowser_entry.h"
 #include "serverbrowser_filter.h"
+#include "serverbrowser_entry.h"
+
+#include <algorithm>
 
 
 class SortWrap
@@ -19,7 +17,7 @@ class SortWrap
 	CServerBrowserFilter::CServerFilter* m_pThis;
 public:
 	SortWrap(CServerBrowserFilter::CServerFilter* t, SortFunc f) : m_pfnSort(f), m_pThis(t) {}
-	bool operator()(int a, int b) { return (g_Config.m_BrSortOrder ? (m_pThis->*m_pfnSort)(b, a) : (m_pThis->*m_pfnSort)(a, b)); }
+	bool operator()(int a, int b) const { return (g_Config.m_BrSortOrder ? (m_pThis->*m_pfnSort)(b, a) : (m_pThis->*m_pfnSort)(a, b)); }
 };
 
 //	CServerFilter
