@@ -1,0 +1,402 @@
+{"translation":[
+	{
+		"key": "The main menu will return as soon as you leave this zone!",
+		"value": "在离开此区域后，主菜单将很快重新出现!"
+	},
+	{
+		"key": "Hi, {STR} Last log in {STR}",
+		"value": "Hello, {STR} 最近一次登录： {STR}"
+	},
+	{
+		"key": "Level {INT} : Exp {INT}/{INT}",
+		"value": "等级：{INT} :: 经验值：{INT}/{INT}"
+	},
+	{
+		"key": "Skill Point {INT}SP",
+		"value": "技能点 {INT}SP"
+	},
+	{
+		"key": "Gold: {INT}",
+		"value": "钱: {INT}"
+	},
+	{
+		"key": "☪ SUB MENU PERSONAL",
+		"value": "☪ 个人-子菜单"
+	},
+	{
+		"key": "Inventory",
+		"value": "背包"
+	},
+	{
+		"key": "Equipment",
+		"value": "装备"
+	},
+	{
+		"key": "Upgrades({INT}p)",
+		"value": "升级({INT}p)"
+	},
+	{
+		"key": "Dungeons",
+		"value": "龙"
+	},
+	{
+		"key": "Settings",
+		"value": "设置"
+	},
+	{
+		"key": "Mailbox",
+		"value": "邮箱"
+	},
+	{
+		"key": "Journal",
+		"value": "日志"
+	},
+	{
+		"key": "Guild",
+		"value": "公会"
+	},	
+	{
+		"key": "Guild finder",
+		"value": "公会发现"
+	},
+	{
+		"key": "House",
+		"value": "房子"
+	},
+	{
+		"key": "√ SUB MENU INFORMATION",
+		"value": "√ 子菜单-信息"
+	},
+	{
+		"key": "Loots, mobs on your zone",
+		"value": "看，怪物在你的区域里"
+	},
+	{
+		"key": "Ranking guilds and players",
+		"value": "公会排名和玩家"
+	},
+	{
+		"key": "Upgrades Information",
+		"value": "关于升级"
+	},
+	{
+		"key": "Select upgrades type in Reason, write count.",
+		"value": "选择升级项，然后在理由里选择数量"
+	},
+	{
+		"key": "Disciple of War. Level Power {INT}",
+		"value": "战争的升级向. 等级功率 {INT}"
+	},
+	{
+		"key": "Disciple of Tank. Level Power {INT}",
+		"value": "坦克的升级向. Level Power {INT}"
+	},
+	{
+		"key": "Disciple of Healer. Level Power {INT}",
+		"value": "治疗的升级向. Level Power {INT}"
+	},
+	{
+		"key": "Disciple of Jobs",
+		"value": "工作的升级项"
+	},
+	{
+		"key": "{STR} {INT}P (Price {INT}P)",
+		"value": "{STR} {INT}P (价格 {INT}P)"
+	},
+	{
+		"key": "Ranking Information",
+		"value": "关于排名"
+	},
+	{
+		"key": "Top 10 guilds leveling",
+		"value": "公会前十等级"
+	},
+	{
+		"key": "Top 10 guilds wealthy",
+		"value": "Top 10 Gilden nach Gold"
+	},
+	{
+		"key": "Top 10 players leveling",
+		"value": "Top 10 Spieler nach Level"
+	},
+	{
+		"key": "Top 10 players wealthy",
+		"value": "Top 10 Spieler nach Gold"
+	},
+	{
+		"key": "Chance & Loot Information",
+		"value": "Chance & Beute Informationen"
+	},
+	{
+		"key": "Here you can see chance loot, mobs, on YOUR ZONE.",
+		"value": "Here you can see chance loot, mobs, on YOUR ZONE."
+	},
+	{
+		"key": "There are no active mobs in your zone!",
+		"value": "Es gibt keine aktiven Mobs in deiner Zone!"
+	},
+	{
+		"key": "Backpage",
+		"value": "Zurückkehren"
+	},
+	{
+		"key": "Player Stats {STR}",
+		"value": "Player Stats {STR}"
+	},
+	{
+		"key": "Player Upgrade Point: {INT}P",
+		"value": "Player Upgrade Point: {INT}P"
+	},
+	{
+		"key": "You have {INT} {STR}",
+		"value": "Bei euch {INT} {STR}"
+	},
+	{
+		"key": "Use it when you're not dead!",
+		"value": "Verwenden Sie dies, wenn Sie am Leben sind!"
+	},
+	{
+		"key": "Level UP. Now Level {INT}!",
+		"value": "Stufe erhöht. Ebene {INT}!"
+	},
+	{
+		"key": "Press 'F4' to continue the dialog!",
+		"value": "Drücken Sie 'F4', um den Dialog fortzusetzen!"
+	},
+	{
+		"key": "You got the effect {STR} time {INT}sec.",
+		"value": "Empfangen buff {STR} Zeit {INT}Sekunden."
+	},
+	{
+		"key": "You lost the effect {STR}.",
+		"value": "Beendet buff {STR}."
+	},
+	{
+		"key": "Repair all items - FREE",
+		"value": "Gegenstände reparieren-KOSTENLOS"
+	},
+	{
+		"key": "Shop :: {STR}",
+		"value": "Geschäft :: {STR}"
+	},
+	{
+		"key": "List of completed quests",
+		"value": "Liste der abgeschlossenen Quests"
+	},
+	{
+		"key": "Active NPC for current quests",
+		"value": "Aktive NPCs in aktuellen Quests"
+	},
+	{
+		"key": "Your mailbox is empty",
+		"value": "Ihr Posteingang ist leer"
+	},
+	{
+		"key": "Available aethers",
+		"value": "Verfügbare Ester"
+	},
+	{
+		"key": "Move to Guild House - free",
+		"value": "Umzug ins Gildehaus"
+	},
+	{
+		"key": "Move to Your House - free",
+		"value": "Umzug ins Privathaus"
+	},
+	{
+		"key": "Inventory Select List",
+		"value": "Inventar wählen Sie eine Liste"
+	},
+	{
+		"key": "Used ({INT})",
+		"value": "Verwendbar ({INT})"
+	},
+	{
+		"key": "Craft ({INT})",
+		"value": "Handwerk ({INT})"
+	},
+	{
+		"key": "Modules ({INT})",
+		"value": "Modules ({INT})"
+	},
+	{
+		"key": "Potion ({INT})",
+		"value": "Trank ({INT})"
+	},
+	{
+		"key": "Other ({INT})",
+		"value": "Ander ({INT})"
+	},
+	{
+		"key": "Story dungeon's",
+		"value": "Story dungeon's"
+	},
+	{
+		"key": "Alternative story dungeon's",
+		"value": "Alternative story dungeon's"
+	},
+	{
+		"key": "You are already in this dungeon!",
+		"value": "Sie sind bereits in diesem Verlies!"
+	},
+	{
+		"key": "At the moment players are passing this dungeon!",
+		"value": "Im Moment passiert jemand diese dungeon!"
+	},
+	{
+		"key": "Your level is low to pass this dungeon!",
+		"value": "Ihr Niveau ist klein, um dieses Verlies zu starten!"
+	},
+	{
+		"key": "{STR} joined to Dungeon {STR}!",
+		"value": "{STR} dem Kerker beigetreten {STR}!"
+	},
+	{
+		"key": "You can vote for the choice of tank (Dungeon Tab)!",
+		"value": "Sie können für die Wahl des Tanks (Dungeon Tab) Stimmen!"
+	},
+	{
+		"key": "You can't vote for yourself!",
+		"value": "Sie können nicht für sich selbst Stimmen!"
+	},
+	{
+		"key": "You already voted!",
+		"value": "Sie haben bereits gewählt!"
+	},
+	{
+		"key": "{STR} voted for {STR}.",
+		"value": "{STR} gestimmt für {STR}."
+	},
+	{
+		"key": "Languages Information",
+		"value": "Sprachen Informationen"
+	},
+	{
+		"key": "Here you can choose the language.",
+		"value": "Hier können Sie die Sprache wählen."
+	},
+	{
+		"key": "Note: translation is not complete.",
+		"value": "Die übersetzung ist nicht vollständig."
+	},
+	{
+		"key": "Active language: {STR}",
+		"value": "Aktive Sprache: {STR}"
+	},
+	{
+		"key": "Select language \"{STR}\"",
+		"value": "Sprache auswählen \"{STR}\""
+	},
+	{
+		"key": "You chosen a language \"{STR}\".",
+		"value": "Sie haben eine Sprache \"{STR}\" gewählt."
+	},
+	{
+		"key": "Settings language",
+		"value": "Einstellungen Sprache"
+	},
+	{
+		"key": "Required {INT}, but you have only {INT} {STR}!",
+		"value": "Erforderlich {INT}, aber Sie haben nur {INT} {STR}!"
+	},
+	{
+		"key": "Not upgrade points for +{INT}. Required {INT}.",
+		"value": "Keine upgrade-Punkte für +{INT}. Erforderlich {INT}."
+	},
+	{
+		"key": "Upgrade has a maximum level.",
+		"value": "Upgrade hat ein maximales Niveau."
+	},
+	{
+		"key": "This chat is intended for team / guilds!",
+		"value": "Dieser chat ist für team / Gilden gedacht!"
+	},
+	{
+		"key": "{STR} came! Good {STR}!",
+		"value": "{STR} kam! Gute {STR}!"
+	},
+	{
+		"key": "Nighttime experience was increase to {INT}%",
+		"value": "Nachtzeit Erfahrung wurde erhöht {INT}%"
+	},
+	{
+		"key": "Daytime experience was downgraded to 100%",
+		"value": "Täglich Erfahrung wurde auf herabgestuft 100%"
+	},
+	{
+		"key": "{STR} opened zone ({STR})!",
+		"value": "{STR} öffnete zone ({STR})!"
+	},
+	{
+		"key": "Requires quest completion '{STR}'!",
+		"value": "Erfordert quest-Abschluss '{STR}'!"
+	},
+	{
+		"key": "You can see menu in the votes!",
+		"value": "Sie können Menü in den Stimmen sehen!"
+	},
+	{
+		"key": "You left the active zone, menu is restored!",
+		"value": "Du hast die aktive zone verlassen!"
+	},
+	{
+		"key": "{STR} joined to Mmo server. Rank #{INT}",
+		"value": "{STR} verbunden mit Mmo-server. Rang #{INT}"
+	},
+	{
+		"key": "You repaired all items.",
+		"value": "Reparierten alle Artikel."
+	},
+	{
+		"key": "Learned a new skill [{STR}]",
+		"value": "Eine neue Fähigkeit gelernt [{STR}]"
+	},
+	{
+		"key": "Increased the skill [{STR} level to {INT}]",
+		"value": "Erhöhte die skill [{STR} - Ebene auf {INT}]"
+	},
+	{
+		"key": "Skill already have maximum level!",
+		"value": "Fähigkeiten haben bereits maximale Ebene!"
+	},
+	{
+		"key": "Menu is available in call-votes!",
+		"value": "Menü verfügbar in Abstimmungen!"
+	},
+	{
+		"key": "You start dialogue with {STR}!",
+		"value": "Du begannen einen Dialog mit {STR}!"
+	},
+	{
+		"key": "{INT}. {STR} | {INT}:{INT}min | {INT}P",
+		"value": "{INT}. {STR} | {INT}:{INT}min | {INT}P"
+	},
+	{
+		"key": "Need to complete quest {STR}",
+		"value": "Müssen quest abschließen {STR}"
+	},
+	{
+		"key": "Voting for the choice of tank!",
+		"value": "Voting für die Wahl des tanks!"
+	},
+	{
+		"key": "Vote for {STR} (Votes: {INT})",
+		"value": "Vote für {STR} (Votes: {INT})"
+	},
+	{
+		"key": "You have {INT} unread messages!",
+		"value": "Sie haben {INT} ungelesene Nachrichten!"
+	},
+	{
+		"key": "Task has not been completed yet!",
+		"value": "Aufgabe ist noch nicht abgeschlossen!"
+	},
+	{
+		"key": "[Done] Give the {STR}x{INT} to the {STR}!",
+		"value": "[Done] Give the {STR}x{INT} to the {STR}!"
+	},
+	{
+		"key": "[Done] Defeat the {STR}'s for the {STR}!",
+		"value": "[Done] Defeat the {STR}'s for the {STR}!"
+	}
+]}
