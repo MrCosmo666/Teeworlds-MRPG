@@ -14,5 +14,10 @@
 		"name": "Deutsch",
 		"parent": "en"
 	}
+	{
+		"file": "cn",
+		"name": "Chinese",
+		"parent": "en"
+	}
 ]
 }
