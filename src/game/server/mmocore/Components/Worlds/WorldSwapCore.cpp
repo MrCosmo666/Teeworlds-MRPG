@@ -43,17 +43,17 @@ void CWorldSwapCore::OnInitWorld(const char* pWhereLocalWorld)
 	const int WorldID = GS()->GetWorldID();
 	const CSqlString<32> world_name = CSqlString<32>(Server()->GetWorldName(WorldID));
 
-	ResultPtr pRes = SJK.SD("RespawnWorld, MusicID", "ENUM_WORLDS", pWhereLocalWorld);
+	ResultPtr pRes = SJK.SD("RespawnWorld, MusicID", "enum_worlds", pWhereLocalWorld);
 	if(pRes->next())
 	{
 		const int RespawnWorld = (int)pRes->getInt("RespawnWorld");
 		const int MusicID = (int)pRes->getInt("MusicID");
-		SJK.UD("ENUM_WORLDS", "Name = '%s' WHERE WorldID = '%d'", world_name.cstr(), WorldID);
+		SJK.UD("enum_worlds", "Name = '%s' WHERE WorldID = '%d'", world_name.cstr(), WorldID);
 		GS()->SetRespawnWorld(RespawnWorld);
 		GS()->SetMapMusic(MusicID);
 		return;
 	}
-	SJK.ID("ENUM_WORLDS", "(WorldID, Name) VALUES ('%d', '%s')", WorldID, world_name.cstr());
+	SJK.ID("enum_worlds", "(WorldID, Name) VALUES ('%d', '%s')", WorldID, world_name.cstr());
 }
 
 bool CWorldSwapCore::OnHandleTile(CCharacter *pChr, int IndexCollision)
