@@ -316,56 +316,56 @@
 		"value": "{STR} 来了! 好 {STR}!"
 	},
 	{
-		"key": "Nighttime experience was increase to       
-		"value": "Nachtzeit Erfahr {INT}%"
+		"key": "Nighttime experience was increase to {INT}",       
+		"value": "夜间经验提升到 {INT}%"
 	},
 	{
 		"key": "Daytime experience was downgraded to 100%",
-		"value": "Täglich Erfahrung wurde auf herabgestuft 100%"
+		"value": "白天经验降低到100%"
 	},
 	{
 		"key": "{STR} opened zone ({STR})!",
-		"value": "{STR} öffnete zone ({STR})!"
+		"value": "{STR} 开放区域 ({STR})!"
 	},
 	{
 		"key": "Requires quest completion '{STR}'!",
-		"value": "Erfordert quest-Abschluss '{STR}'!"
+		"value": "要求完成任务 '{STR}'!"
 	},
 	{
 		"key": "You can see menu in the votes!",
-		"value": "Sie können Menü in den Stimmen sehen!"
+		"value": "你可以在投票里看见菜单"
 	},
 	{
 		"key": "You left the active zone, menu is restored!",
-		"value": "Du hast die aktive zone verlassen!"
+		"value": "你离开了活动区域，菜单已恢复"
 	},
 	{
 		"key": "{STR} joined to Mmo server. Rank #{INT}",
-		"value": "{STR} verbunden mit Mmo-server. Rang #{INT}"
+		"value": "{STR} 加入了MMO世界 排名 #{INT}"
 	},
 	{
 		"key": "You repaired all items.",
-		"value": "Reparierten alle Artikel."
+		"value": "你修理了所有物品."
 	},
 	{
 		"key": "Learned a new skill [{STR}]",
-		"value": "Eine neue Fähigkeit gelernt [{STR}]"
+		"value": "学习一个新技能 [{STR}]"
 	},
 	{
 		"key": "Increased the skill [{STR} level to {INT}]",
-		"value": "Erhöhte die skill [{STR} - Ebene auf {INT}]"
+		"value": "把技能 [{STR} 级别提高到 {INT}]"
 	},
 	{
 		"key": "Skill already have maximum level!",
-		"value": "Fähigkeiten haben bereits maximale Ebene!"
+		"value": "技能已经达到了最高等级！"
 	},
 	{
 		"key": "Menu is available in call-votes!",
-		"value": "Menü verfügbar in Abstimmungen!"
+		"value": "菜单在投票界面使用！"
 	},
 	{
 		"key": "You start dialogue with {STR}!",
-		"value": "Du begannen einen Dialog mit {STR}!"
+		"value": "你开始和{STR}对话!"
 	},
 	{
 		"key": "{INT}. {STR} | {INT}:{INT}min | {INT}P",
@@ -373,30 +373,30 @@
 	},
 	{
 		"key": "Need to complete quest {STR}",
-		"value": "Müssen quest abschließen {STR}"
+		"value": "需要完成任务 {STR}"
 	},
 	{
 		"key": "Voting for the choice of tank!",
-		"value": "Voting für die Wahl des tanks!"
+		"value": "在投票里选择坦克!"
 	},
 	{
-		"key": "Vote for {STR} (Votes: {INT})",
-		"value": "Vote für {STR} (Votes: {INT})"
+		"key": "投票 {STR} (投票: {INT})",
+		"value": "投票 {STR} (投票: {INT})"
 	},
 	{
 		"key": "You have {INT} unread messages!",
-		"value": "Sie haben {INT} ungelesene Nachrichten!"
+		"value": "你有 {INT} 个未读信息!"
 	},
 	{
 		"key": "Task has not been completed yet!",
-		"value": "Aufgabe ist noch nicht abgeschlossen!"
+		"value": "坦克还没有做完！!"
 	},
 	{
 		"key": "[Done] Give the {STR}x{INT} to the {STR}!",
-		"value": "[Done] Give the {STR}x{INT} to the {STR}!"
+		"value": "[完成] 给 {STR}x{INT} {STR}!"
 	},
 	{
 		"key": "[Done] Defeat the {STR}'s for the {STR}!",
-		"value": "[Done] Defeat the {STR}'s for the {STR}!"
+		"value": "[完成] 击败 {STR}'s 给 {STR}!"
 	}
 ]}
