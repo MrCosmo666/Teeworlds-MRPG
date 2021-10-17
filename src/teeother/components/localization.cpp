@@ -542,8 +542,7 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 			if(str_comp_num("STR", pText + ParamTypeStart, 3) == 0)
 			{
 				const char* pVarArgValue = va_arg(VarArgs, const char*);
-				dbg_msg("test", "%s", pVarArgValue);
-				BufferIter = Buffer.append_at(BufferIter, pVarArgValue);
+				BufferIter = Buffer.append_at(BufferIter, pVarArgValue[0] == '\0' ? "unknown" : pVarArgValue);
 			}
 			else if(str_comp_num("INT", pText + ParamTypeStart, 3) == 0)
 			{

@@ -174,6 +174,7 @@ void CAccountCore::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 
 	Job()->OnInitAccount(ClientID);
 	const int Rank = GetRank(pPlayer->Acc().m_UserID);
+	dbg_msg("test", "%s", Server()->ClientName(ClientID));
 	GS()->Chat(-1, "{STR} logged to account. Rank #{INT}", Server()->ClientName(ClientID), Rank);
 #ifdef CONF_DISCORD
 	char aLoginBuf[64];
