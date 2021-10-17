@@ -175,7 +175,7 @@ MACRO_CONFIG_STR(SvDiscordSuggestionChannel, sv_discord_suggestion_channel, 128,
 MACRO_CONFIG_STR(SvDiscordAdminChannel, sv_discord_admin_channel, 128, "", CFGFLAG_SERVER, "Discord admin channel")
 
 // mysql
-MACRO_CONFIG_STR(SvMySqlHost, sv_sql_host, 32, "localhost", CFGFLAG_SERVER, "MySQL Host")
+MACRO_CONFIG_STR(SvMySqlHost, sv_sql_host, 64, "localhost", CFGFLAG_SERVER, "MySQL Host")
 MACRO_CONFIG_STR(SvMySqlDatabase, sv_sql_database, 32, "database", CFGFLAG_SERVER, "MySQL Database")
 MACRO_CONFIG_STR(SvMySqlLogin, sv_sql_login, 32, "root", CFGFLAG_SERVER, "MySQL Login")
 MACRO_CONFIG_STR(SvMySqlPassword, sv_sql_password, 32, "", CFGFLAG_SERVER, "MySQL Password")
