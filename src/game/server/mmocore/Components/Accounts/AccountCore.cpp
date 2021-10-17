@@ -138,7 +138,7 @@ int CAccountCore::LoginAccount(int ClientID, const char *Login, const char *Pass
 		}
 
 		GS()->Chat(ClientID, "- - - - - - - [Successful login] - - - - - - -");
-		GS()->Chat(ClientID, "Menu is available in call-votes! {INT}", pPlayer->Acc().m_UserID);
+		GS()->Chat(ClientID, "Menu is available in call-votes!");
 		GS()->m_pController->DoTeamChange(pPlayer, false);
 
 		char aAddrStr[64];
