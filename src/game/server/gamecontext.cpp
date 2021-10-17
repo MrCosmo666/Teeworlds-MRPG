@@ -440,7 +440,6 @@ void CGS::Chat(int ClientID, const char* pText, ...)
 	{
 		if (m_apPlayers[i])
 		{
-			dbg_msg("test", "Player %s(%d) Language %s", Server()->ClientName(ClientID), ClientID, m_apPlayers[i]->GetLanguage());
 			Server()->Localization()->Format_VL(Buffer, m_apPlayers[i]->GetLanguage(), pText, VarArgs);
 
 			Msg.m_TargetID = i;
