@@ -13,7 +13,8 @@
 	},
 	{
 		"key": "Skill Point {INT}SP",
-		"value": "技能点 {INT}SP"{"translation":[
+		"value": "技能点 {INT}SP"
+	},
 	{
 		"key": "The main menu will return as soon as you leave this zone!",
 		"value": "在离开此区域后，主菜单将很快重新出现!"
