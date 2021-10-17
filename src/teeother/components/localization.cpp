@@ -544,17 +544,17 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 			}
 			else if(str_comp_num("INT", pText + ParamTypeStart, 3) == 0)
 			{
-				const int pVarArgValue = va_arg(VarArgsIter, const int);
+				const int pVarArgValue = va_arg(VarArgsIter, int);
 				AppendNumber(Buffer, BufferIter, pLanguage, pVarArgValue);
 			}
 			else if(str_comp_num("VAL", pText + ParamTypeStart, 3) == 0)
 			{
-				const int pVarArgValue = va_arg(VarArgsIter, const int);
+				const int pVarArgValue = va_arg(VarArgsIter, int);
 				AppendValue(Buffer, BufferIter, pLanguage, pVarArgValue);
 			}
 			else if(str_comp_num("PRC", pText + ParamTypeStart, 3) == 0)
 			{
-				const double pVarArgValue = va_arg(VarArgsIter, const double);
+				const double pVarArgValue = va_arg(VarArgsIter, double);
 				AppendPercent(Buffer, BufferIter, pLanguage, pVarArgValue);
 			}
 
