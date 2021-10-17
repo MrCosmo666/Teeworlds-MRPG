@@ -2378,6 +2378,14 @@ ALTER TABLE `tw_guilds_ranks`
   ADD CONSTRAINT `tw_guilds_ranks_ibfk_1` FOREIGN KEY (`GuildID`) REFERENCES `tw_guilds` (`ID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Ограничения внешнего ключа таблицы `tw_items_list`
+--
+ALTER TABLE `tw_items_list`
+  ADD CONSTRAINT `tw_items_list_ibfk_1` FOREIGN KEY (`Type`) REFERENCES `enum_items_types` (`TypeID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `tw_items_list_ibfk_2` FOREIGN KEY (`Function`) REFERENCES `enum_items_functional` (`FunctionID`) ON DELETE CASCADE ON UPDATE CASCADE;
+COMMIT;
+
+--
 -- Ограничения внешнего ключа таблицы `tw_houses`
 --
 ALTER TABLE `tw_houses`
