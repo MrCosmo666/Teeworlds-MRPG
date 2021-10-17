@@ -426,7 +426,7 @@ void CGS::FakeChat(const char *pName, const char *pText)
 void CGS::Chat(int ClientID, const char* pText, ...)
 {
 	const int Start = (ClientID < 0 ? 0 : ClientID);
-	const int End = (ClientID < 0 ? MAX_CLIENTS : ClientID + 1);
+	const int End = (ClientID < 0 ? MAX_PLAYERS : ClientID + 1);
 
 	CNetMsg_Sv_Chat Msg;
 	Msg.m_Mode = CHAT_ALL;
@@ -454,7 +454,7 @@ void CGS::Chat(int ClientID, const char* pText, ...)
 void CGS::ChatFollow(int ClientID, const char* pText, ...)
 {
 	const int Start = (ClientID < 0 ? 0 : ClientID);
-	const int End = (ClientID < 0 ? MAX_CLIENTS : ClientID + 1);
+	const int End = (ClientID < 0 ? MAX_PLAYERS : ClientID + 1);
 
 	CNetMsg_Sv_Chat Msg;
 	Msg.m_Mode = CHAT_WHISPER;

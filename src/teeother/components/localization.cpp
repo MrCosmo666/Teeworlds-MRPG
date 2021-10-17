@@ -371,10 +371,9 @@ const char* CLocalization::LocalizeWithDepth(const char* pLanguageCode, const ch
 	const char* pResult = pLanguage->Localize(pText);
 	if(pResult)
 		return pResult;
-	else if(pLanguage->GetParentFilename()[0] && Depth < 4)
+	if(pLanguage->GetParentFilename()[0] && Depth < 4)
 		return LocalizeWithDepth(pLanguage->GetParentFilename(), pText, Depth+1);
-	else
-		return pText;
+	return pText;
 }
 
 const char* CLocalization::Localize(const char* pLanguageCode, const char* pText)
@@ -406,10 +405,9 @@ const char* CLocalization::LocalizeWithDepth_P(const char* pLanguageCode, int Nu
 	const char* pResult = pLanguage->Localize_P(Number, pText);
 	if(pResult)
 		return pResult;
-	else if(pLanguage->GetParentFilename()[0] && Depth < 4)
+	if(pLanguage->GetParentFilename()[0] && Depth < 4)
 		return LocalizeWithDepth_P(pLanguage->GetParentFilename(), Number, pText, Depth+1);
-	else
-		return pText;
+	return pText;
 }
 
 const char* CLocalization::Localize_P(const char* pLanguageCode, int Number, const char* pText)
@@ -541,23 +539,22 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 			// we get data from an argument parsing arguments
 			if(str_comp_num("STR", pText + ParamTypeStart, 3) == 0)
 			{
-				const char* pVarArgValue = va_arg(VarArgs, const char*);
-				dbg_msg("test", "%s", pVarArgValue);
+				const char* pVarArgValue = va_arg(VarArgsIter, const char*);
 				BufferIter = Buffer.append_at(BufferIter, pVarArgValue);
 			}
 			else if(str_comp_num("INT", pText + ParamTypeStart, 3) == 0)
 			{
-				const int pVarArgValue = va_arg(VarArgs, int);
+				const int pVarArgValue = va_arg(VarArgsIter, int);
 				AppendNumber(Buffer, BufferIter, pLanguage, pVarArgValue);
 			}
 			else if(str_comp_num("VAL", pText + ParamTypeStart, 3) == 0)
 			{
-				const int pVarArgValue = va_arg(VarArgs, int);
+				const int pVarArgValue = va_arg(VarArgsIter, int);
 				AppendValue(Buffer, BufferIter, pLanguage, pVarArgValue);
 			}
 			else if(str_comp_num("PRC", pText + ParamTypeStart, 3) == 0)
 			{
-				const double pVarArgValue = va_arg(VarArgs, double);
+				const double pVarArgValue = va_arg(VarArgsIter, double);
 				AppendPercent(Buffer, BufferIter, pLanguage, pVarArgValue);
 			}
 
@@ -584,7 +581,7 @@ void CLocalization::Format_V(dynamic_string& Buffer, const char* pLanguageCode, 
 	va_end(VarArgsIter);
 
 	if(Iter > 0 && ParamTypeStart == -1)
-		BufferIter = Buffer.append_at_num(BufferIter, pText+Start, Iter-Start);
+		Buffer.append_at_num(BufferIter, pText+Start, Iter-Start);
 
 	if(pLanguage->GetWritingDirection() == DIRECTION_RTL)
 		ArabicShaping(Buffer, BufferStart);
