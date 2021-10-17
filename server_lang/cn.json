@@ -340,8 +340,8 @@
 		"value": "你离开了活动区域，菜单已恢复"
 	},
 	{
-		"key": "{STR} joined to Mmo server. Rank #{INT}",
-		"value": "{STR} 加入了MMO世界 排名 #{INT}"
+		"key": "{STR} logged to account. Rank #{INT}",
+		"value": "{STR} 加入了MMO世界并登录. 等级 #{INT}"
 	},
 	{
 		"key": "You repaired all items.",
