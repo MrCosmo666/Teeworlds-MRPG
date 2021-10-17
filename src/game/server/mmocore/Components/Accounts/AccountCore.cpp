@@ -219,7 +219,7 @@ void CAccountCore::DiscordConnect(int ClientID, const char *pDID) const
 	SJK.UDS(1000,"tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", cDiscordID.cstr(), pPlayer->Acc().m_UserID);
 
 	GS()->Chat(ClientID, "Your Discord ID has been updated.");
-	GS()->Chat(ClientID, "Check the connection status in discord \"!mconnect\".");
+	GS()->Chat(ClientID, "Check the connection status in discord \"/connect\".");
 #endif
 }
 

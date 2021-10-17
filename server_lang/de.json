@@ -340,8 +340,8 @@
 		"value": "Du hast die aktive zone verlassen!"
 	},
 	{
-		"key": "{STR} joined to Mmo server. Rank #{INT}",
-		"value": "{STR} verbunden mit Mmo-server. Rang #{INT}"
+		"key": "{STR} logged to account. Rank #{INT}",
+		"value": "{STR} verbunden. Rang #{INT}"
 	},
 	{
 		"key": "You repaired all items.",
@@ -398,5 +398,101 @@
 	{
 		"key": "[Done] Defeat the {STR}'s for the {STR}!",
 		"value": "[Done] Defeat the {STR}'s for the {STR}!"
+	},
+	{
+		"key": "- - - - [Your nickname is already registered] - - - -",
+		"value": "- - - - [Your nickname is already registered] - - - -"
+	},
+	{
+		"key": "Your nick is a unique identifier, and it has already been used!",
+		"value": "Your nick is a unique identifier, and it has already been used!"
+	},
+	{
+		"key": "You can restore access by contacting support, or change nick.",
+		"value": "You can restore access by contacting support, or change nick."
+	},
+	{
+		"key": "- - - - - - - [Successful registered] - - - - - - -",
+		"value": "- - - - - - - [Successful registered] - - - - - - -"
+	},
+	{
+		"key": "Don't forget your data, have a nice game!",
+		"value": "Don't forget your data, have a nice game!"
+	},
+	{
+		"key": "# Your nickname is a unique identifier!",
+		"value": "# Your nickname is a unique identifier!"
+	},
+	{
+		"key": "# Log in: \"/login {STR} {STR}\"",
+		"value": "# Log in: \"/login {STR} {STR}\""
+	},
+	{
+		"key": "Username / Password must contain 4-12 characters",
+		"value": "Username / Password must contain 4-12 characters"
+	},
+	{
+		"key": "Wrong login or password",
+		"value": "Wrong login or password"
+	},
+	{
+		"key": "The account is already in the game!",
+		"value": "The account is already in the game!"
+	},
+	{
+		"key": "- - - - - - - [Successful login] - - - - - - -",
+		"value": "- - - - - - - [Successful login] - - - - - - -"
+	},
+	{
+		"key": "Your nickname was not found in the database!",
+		"value": "Your nickname was not found in the database!"
+	},
+	{
+		"key": "You are located {STR} ({STR})",
+		"value": "You are located {STR} ({STR})"
+	},
+	{
+		"key": "Quest NPCs are marked with an aura Heart and Shield.",
+		"value": "Quest NPCs are marked with an aura Heart and Shield."
+	},
+	{
+		"key": "Shield around you indicates location of active quest.",
+		"value": "Shield around you indicates location of active quest."
+	},
+	{
+		"key": "Your Discord ID has been updated",
+		"value": "Your Discord ID has been updated"
+	},
+	{
+		"key": "Check the connection status in discord \"/connect\".",
+		"value": "Check the connection status in discord \"/connect\"."
+	},
+	{
+		"key": "Some of the settings becomes valid after death",
+		"value": "Some of the settings becomes valid after death"
+	},
+	{
+		"key": "Modules settings",
+		"value": "Modules settings"
+	},
+	{
+		"key": "The list of modules equipment is empty.",
+		"value": "The list of modules equipment is empty."
+	},
+	{
+		"key": "The voucher code '{STR}' has expired.",
+		"value": "The voucher code '{STR}' has expired."
+	},
+	{
+		"key": "This voucher has already been redeemed.",
+		"value": "This voucher has already been redeemed."
+	},
+	{
+		"key": "You have successfully redeemed the voucher '{STR}'.",
+		"value": "You have successfully redeemed the voucher '{STR}'."
+	},
+	{
+		"key": "The voucher code '{STR}' does not exist.",
+		"value": "The voucher code '{STR}' does not exist."
 	}
 ]}
