@@ -109,27 +109,27 @@
 	},
 	{
 		"key": "Top 10 guilds leveling",
-		"value": "公会前十等级"
+		"value": "前十等级最高公会"
 	},
 	{
 		"key": "Top 10 guilds wealthy",
-		"value": "Top 10 Gilden nach Gold"
+		"value": "前十最富有公会
 	},
 	{
 		"key": "Top 10 players leveling",
-		"value": "Top 10 Spieler nach Level"
+		"value": "前十等级最高玩家"
 	},
 	{
 		"key": "Top 10 players wealthy",
-		"value": "Top 10 Spieler nach Gold"
+		"value": "前十最富有玩家"
 	},
 	{
-		"key": "Chance & Loot Information",
-		"value": "Chance & Beute Informationen"
+		"key": "Chance & Loot Information"
+		"value": "机会和战利品信息"
 	},
 	{
 		"key": "Here you can see chance loot, mobs, on YOUR ZONE.",
-		"value": "Here you can see chance loot, mobs, on YOUR ZONE."
+		"value": "在这里你可以看到战利品忙和，怪物，在 的 域 
 	},
 	{
 		"key": "There are no active mobs in your zone!",
