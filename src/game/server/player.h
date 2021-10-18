@@ -116,7 +116,7 @@ public:
 	virtual void Snap(int SnappingClient);
 
 private:
-	void EffectsTick();
+	virtual void EffectsTick();
 	void TickSystemTalk();
 	virtual void TryRespawn();
 
