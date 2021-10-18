@@ -4,9 +4,9 @@
 
 #include <game/server/gamecontext.h>
 
-bool CRandomBox::Start(CPlayer *pPlayer, int Seconds, CItemData* pPlayerUsesItem)
+bool CRandomBox::Start(CPlayer *pPlayer, int Seconds, CItemData* pPlayerUsesItem, int UseValue)
 {
-	if(!pPlayer || !pPlayer->IsAuthed())
+	if(!pPlayer || !pPlayer->IsAuthed() || !pPlayerUsesItem)
 		return false;
 
 	if(pPlayer->m_aPlayerTick[LastRandomBox] > pPlayer->GS()->Server()->Tick())
@@ -15,20 +15,22 @@ bool CRandomBox::Start(CPlayer *pPlayer, int Seconds, CItemData* pPlayerUsesItem
 		return false;
 	}
 
-	// the item always uses 1 (USED_ONE)
-	if(!pPlayerUsesItem || pPlayerUsesItem->Remove(1))
+	UseValue = min(100, UseValue);
+	if(pPlayerUsesItem->Remove(UseValue))
 	{
 		Seconds *= pPlayer->GS()->Server()->TickSpeed();
 		pPlayer->m_aPlayerTick[LastRandomBox] = pPlayer->GS()->Server()->Tick() + Seconds;
-		std::sort(m_ArrayItems.begin(), m_ArrayItems.end(), [](const StructRandomBoxItem& pLeft, const StructRandomBoxItem& pRight) { return pLeft.m_Chance < pRight.m_Chance; });
-		new CRandomBoxRandomizer(&pPlayer->GS()->m_World, pPlayer, pPlayer->Acc().m_UserID, Seconds, m_ArrayItems, pPlayerUsesItem);
+		std::sort(m_ArrayItems.begin(), m_ArrayItems.end(), [](const StructRandomItem& pLeft, const StructRandomItem& pRight) { return pLeft.m_Chance < pRight.m_Chance; });
+		new CRandomBoxRandomizer(&pPlayer->GS()->m_World, pPlayer, pPlayer->Acc().m_UserID, Seconds, m_ArrayItems, pPlayerUsesItem, UseValue);
+		pPlayer->GS()->Chat(pPlayer->GetCID(), "You used '{STR}x{INT}'!", pPlayerUsesItem->Info().GetName(pPlayer), UseValue);
 	}
 	return true;
 };
 
-CRandomBoxRandomizer::CRandomBoxRandomizer(CGameWorld* pGameWorld, CPlayer* pPlayer, int PlayerAccountID, int LifeTime, std::vector<StructRandomBoxItem> List, CItemData* pPlayerUsesItem)
+CRandomBoxRandomizer::CRandomBoxRandomizer(CGameWorld* pGameWorld, CPlayer* pPlayer, int PlayerAccountID, int LifeTime, std::vector<StructRandomItem> List, CItemData* pPlayerUsesItem, int UseValue)
 	: CEntity(pGameWorld, CGameWorld::ENTTYPE_RANDOM_BOX, pPlayer->m_ViewPos)
 {
+	m_UseValue = UseValue;
 	m_LifeTime = LifeTime;
 	m_pPlayer = pPlayer;
 	m_PlayerAccountID = PlayerAccountID;
@@ -37,10 +39,10 @@ CRandomBoxRandomizer::CRandomBoxRandomizer(CGameWorld* pGameWorld, CPlayer* pPla
 	GameWorld()->InsertEntity(this);
 }
 
-std::vector<StructRandomBoxItem>::iterator CRandomBoxRandomizer::SelectRandomItem()
+std::vector<StructRandomItem>::iterator CRandomBoxRandomizer::SelectRandomItem()
 {
 	const float RandomDrop = frandom() * 100.0f;
-	const auto pItem = std::find_if(m_List.begin(), m_List.end(), [RandomDrop](const StructRandomBoxItem &pItem) { return RandomDrop < pItem.m_Chance; });
+	const auto pItem = std::find_if(m_List.begin(), m_List.end(), [RandomDrop](const StructRandomItem &pItem) { return RandomDrop < pItem.m_Chance; });
 	return pItem != m_List.end() ? pItem : std::prev(m_List.end());
 }
 
@@ -48,31 +50,85 @@ void CRandomBoxRandomizer::Tick()
 {
 	if(!m_LifeTime || m_LifeTime % Server()->TickSpeed() == 0)
 	{
-		const auto pRandomItem = SelectRandomItem();
+		auto pSelectedRandomItem = SelectRandomItem();
 		if(m_pPlayer && m_pPlayer->GetCharacter())
 		{
 			const vec2 PlayerPosition = m_pPlayer->GetCharacter()->m_Core.m_Pos;
-			GS()->CreateText(nullptr, false, vec2(PlayerPosition.x, PlayerPosition.y - 80), vec2(0, -0.3f), 15, GS()->GetItemInfo(pRandomItem->m_ItemID).GetName());
+			GS()->CreateText(nullptr, false, vec2(PlayerPosition.x, PlayerPosition.y - 80), vec2(0, -0.3f), 15, GS()->GetItemInfo(pSelectedRandomItem->m_ItemID).GetName());
 		}
 
 		if(!m_LifeTime)
 		{
-			// a case when a client changes the world or comes out while choosing a random object.
-			CItemData* pPlayerRandomItem = m_pPlayer ? &m_pPlayer->GetItem(pRandomItem->m_ItemID) : nullptr;
-			if(!m_pPlayer || (pPlayerRandomItem->Info().IsEnchantable() && pPlayerRandomItem->m_Value > 0))
-				GS()->SendInbox("System", m_PlayerAccountID, "Random Box", "Item was not received by you personally.", pRandomItem->m_ItemID, pRandomItem->m_Value);
-			else
+			auto GiveRandomItem = [&](StructRandomItem& pItem)
 			{
-				m_pPlayer->GetItem(pRandomItem->m_ItemID).Add(pRandomItem->m_Value);
-				GS()->CreateDeath(m_pPlayer->m_ViewPos, m_pPlayer->GetCID());
-			}
+				if(GS()->GetItemInfo(pItem.m_ItemID).IsEnchantable())
+				{
+					for(int i = 0; i < pItem.m_Value; i++)
+					{
+						if(!m_pPlayer || m_pPlayer->GetItem(pItem.m_ItemID).m_Value >= 1)
+						{
+							GS()->SendInbox("System", m_PlayerAccountID, "Random box", "Item was not received by you personally.", pItem.m_ItemID, 1);
+							continue;
+						}
 
-			// infromation
-			if(m_pPlayer && m_pPlayerUsesItem)
+						if(m_pPlayer->GetItem(pItem.m_ItemID).m_Value <= 0)
+						{
+							m_pPlayer->GetItem(pItem.m_ItemID).Add(1, 0, 0, false);
+							GS()->CreateDeath(m_pPlayer->m_ViewPos, m_pPlayer->GetCID());
+						}
+					}
+				}
+				else
+				{
+					if(!m_pPlayer)
+						GS()->SendInbox("System", m_PlayerAccountID, "Random box", "Item was not received by you personally.", pItem.m_ItemID, pItem.m_Value);
+					else
+					{
+						m_pPlayer->GetItem(pItem.m_ItemID).Add(pItem.m_Value, 0, 0, false);
+						GS()->CreateDeath(m_pPlayer->m_ViewPos, m_pPlayer->GetCID());
+					}
+				}
+			};
+			struct ReceivedItem { StructRandomItem RandomItem; int Coincidences; };
+			std::list<ReceivedItem> aReceivedItems;
+
+			// get list received items
+			for(int i = 0; i < m_UseValue; i++)
+			{
+				auto pItem = std::find_if(aReceivedItems.begin(), aReceivedItems.end(),
+					[&pSelectedRandomItem](const ReceivedItem& pItem){ return pItem.RandomItem.m_ItemID == pSelectedRandomItem->m_ItemID; });
+				if(pItem != aReceivedItems.end())
+				{
+					pItem->RandomItem.m_Value += pSelectedRandomItem->m_Value;
+					pItem->Coincidences++;
+				}
+				else
+					aReceivedItems.push_back({ *pSelectedRandomItem, 1});
+
+				pSelectedRandomItem = SelectRandomItem();
+			}
+			
+			// got all random items
+			if(m_pPlayer)
 			{
 				const char* pClientName = GS()->Server()->ClientName(m_pPlayer->GetCID());
-				GS()->Chat(-1, "{STR} uses {STR} and got {STR}x{INT}!", pClientName, m_pPlayerUsesItem->Info().GetName(), pPlayerRandomItem->Info().GetName(), pRandomItem->m_Value);
+				GS()->Chat(-1, "---------------------------------");
+				GS()->Chat(-1, "{STR} uses '{STR}x{INT}' and got:", pClientName, m_pPlayerUsesItem->Info().GetName(), m_UseValue);
+
+				for(auto& pItem : aReceivedItems)
+				{
+					CItemData* pPlayerRandomItem = &m_pPlayer->GetItem(pItem.RandomItem.m_ItemID);
+					GiveRandomItem(pItem.RandomItem);
+					GS()->Chat(-1, "* {STR}x{INT} - ({INT})", pPlayerRandomItem->Info().GetName(), pItem.RandomItem.m_Value, pItem.Coincidences);
+				}
+				GS()->Chat(-1, "---------------------------------");
 			}
+			else
+			{
+				for(auto& pItem : aReceivedItems)
+					GiveRandomItem(pItem.RandomItem);
+			}
+			
 			GS()->m_World.DestroyEntity(this);
 			return;
 		}
