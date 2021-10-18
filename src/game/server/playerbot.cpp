@@ -86,7 +86,7 @@ void CPlayerBot::EffectsTick()
 		if(pEffect->second <= 0)
 		{
 			if(m_pCharacter && m_pCharacter->IsAlive())
-				GS()->CreatePotionEffect(m_pCharacter->m_Core.m_Pos, pEffect->first.c_str(), false);
+				GS()->CreateTextEffect(m_pCharacter->m_Core.m_Pos, pEffect->first.c_str(), TEXTEFFECT_FLAG_POTION|TEXTEFFECT_FLAG_REMOVING);
 			pEffect = m_aEffects.erase(pEffect);
 			continue;
 		}
@@ -139,7 +139,7 @@ void CPlayerBot::GiveEffect(const char* Potion, int Sec, int Random)
 	if((Random && random_int() % Random == 0) || !Random)
 	{
 		m_aEffects[Potion] = Sec;
-		GS()->CreatePotionEffect(m_pCharacter->m_Core.m_Pos, Potion, true);
+		GS()->CreateTextEffect(m_pCharacter->m_Core.m_Pos, Potion, TEXTEFFECT_FLAG_POTION|TEXTEFFECT_FLAG_ADDING);
 	}
 }
 

@@ -321,6 +321,17 @@ enum DayType
 	EVENING_TYPE
 };
 
+enum
+{
+	TEXTEFFECT_FLAG_BASIC = 1 << 1,
+	TEXTEFFECT_FLAG_DAMAGE = 1 << 2,
+	TEXTEFFECT_FLAG_CRIT_DAMAGE = 1 << 3,
+	TEXTEFFECT_FLAG_MISS = 1 << 4,
+	TEXTEFFECT_FLAG_POTION = 1 << 5,
+	TEXTEFFECT_FLAG_ADDING = 1 << 6,
+	TEXTEFFECT_FLAG_REMOVING = 1 << 7,
+};
+
 /*
 	Basic kernel server settings
 	This is where the most basic server settings are stored

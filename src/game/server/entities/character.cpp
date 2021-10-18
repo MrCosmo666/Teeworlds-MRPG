@@ -614,7 +614,7 @@ bool CCharacter::IncreaseHealth(int Amount)
 	{
 		char aBuf[32];
 		str_format(aBuf, sizeof(aBuf), "%d Health", m_Health - OldHealth);
-		GS()->CreatePotionEffect(m_Core.m_Pos, aBuf, true);
+		GS()->CreateTextEffect(m_Core.m_Pos, aBuf, TEXTEFFECT_FLAG_POTION|TEXTEFFECT_FLAG_ADDING);
 	}
 	return true;
 }
@@ -633,7 +633,7 @@ bool CCharacter::IncreaseMana(int Amount)
 	{
 		char aBuf[32];
 		str_format(aBuf, sizeof(aBuf), "%d Mana", m_Mana - OldMana);
-		GS()->CreatePotionEffect(m_Core.m_Pos, aBuf, true);
+		GS()->CreateTextEffect(m_Core.m_Pos, aBuf, TEXTEFFECT_FLAG_POTION|TEXTEFFECT_FLAG_ADDING);
 	}
 	return true;
 }
@@ -718,7 +718,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 		// vampirism replenish your health
 		int TempInt = pFrom->GetAttributeCount(Stats::StVampirism, true);
-		if(random_int()%5000 < min(TempInt, 3000))
+		if(min(8.0f + (float)TempInt * 0.0015f, 32.0f) > frandom() * 100.0f)
 		{
 			pFrom->GetCharacter()->IncreaseHealth(max(1, Dmg/2));
 			GS()->SendEmoticon(From, EMOTICON_DROP);
@@ -726,18 +726,21 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 		// miss out on damage
 		TempInt = pFrom->GetAttributeCount(Stats::StLucky, true);
-		if(!pFrom->IsBot() && random_int()%5000 < min(TempInt, 3000))
+		if(min(8.0f + (float)TempInt * 0.0015f, 30.0f) > frandom() * 100.0f)
 		{
-			Dmg = 0;
 			GS()->SendEmoticon(From, EMOTICON_HEARTS);
+			GS()->CreateTextEffect(m_Core.m_Pos, "MISS", TEXTEFFECT_FLAG_MISS);
+			return false;
 		}
 
 		// critical damage
 		TempInt = pFrom->GetAttributeCount(Stats::StDirectCriticalHit, true);
-		if(!pFrom->IsBot() && random_int()%5000 < min(TempInt, 2200))
+		if(!pFrom->IsBot() && min(8.0f + (float)TempInt * 0.0015f, 30.0f) > frandom() * 100.0f)
 		{
-			CritDamage = max(pFrom->GetAttributeCount(Stats::StCriticalHit, true), 1);
-			Dmg = Dmg * 2 + (CritDamage + random_int()%9);
+			CritDamage = 100 + max(pFrom->GetAttributeCount(Stats::StCriticalHit, true), 1);
+			float CritDamageFormula = (float)Dmg + ((float)CritDamage * ((float)Dmg / 100.0f));
+			Dmg = (int)CritDamageFormula;
+			
 			pFrom->GetCharacter()->SetEmote(EMOTE_ANGRY, 2);
 			GS()->SendEmoticon(From, EMOTICON_EXCLAMATION);
 		}

@@ -94,7 +94,7 @@ public:
 	void SendWorldMusic(int ClientID, int MusicID = 0);
 	void CreatePlayerSound(int ClientID, int Sound);
 	void CreateEffect(vec2 Pos, int EffectID);
-	void CreatePotionEffect(vec2 Pos, const char *Potion, bool Added);
+	void CreateTextEffect(vec2 Pos, const char* pText, int Flag = TEXTEFFECT_FLAG_BASIC);
 
 	/* #########################################################################
 		CHAT FUNCTIONS

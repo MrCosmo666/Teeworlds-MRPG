@@ -186,20 +186,19 @@ void CParticles::RenderMmoEffect(int Group)
 {
 	if (Group == GROUP_DAMAGEMMO)
 	{
-		CTextCursor Cursor;
-		Cursor.Reset();
 		int i = m_aFirstPart[Group];
 		while (i != -1)
 		{
+			CTextCursor CursorText;
 			float a = m_aParticles[i].m_Life / m_aParticles[i].m_LifeSpan;
-			vec2 p = m_aParticles[i].m_Pos;
-
 			float Size = mix(m_aParticles[i].m_StartSize, m_aParticles[i].m_EndSize * 1.0f, a * 2.0f);
-			Cursor.m_FontSize = Size;
-			Cursor.MoveTo(p.x, p.y);
-
+			CursorText.m_FontSize = Size;
+			CursorText.MoveTo(m_aParticles[i].m_Pos);
+			CursorText.m_Align = TEXTALIGN_CENTER;
+			
 			TextRender()->TextColor(m_aParticles[i].m_Color.r, m_aParticles[i].m_Color.g, m_aParticles[i].m_Color.b, 1 - a);
-			TextRender()->TextDeferred(&Cursor, m_aParticles[i].m_TextBuf, -1);
+			TextRender()->TextDeferred(&CursorText, m_aParticles[i].m_TextBuf, -1);
+			TextRender()->DrawTextOutlined(&CursorText);
 			TextRender()->TextColor(1, 1, 1, 1);
 
 			i = m_aParticles[i].m_NextPart;
