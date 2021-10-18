@@ -59,7 +59,7 @@ bool CMultiWorlds::LoadWorlds(IServer* pServer, IKernel* pKernel, IStorageEngine
 	char aError[256];
 	json_value* pJsonData = json_parse_ex(&JsonSettings, pFileData, FileSize, aError);
 	free(pFileData);
-	if(pJsonData == 0)
+	if(pJsonData == nullptr)
 	{
 		pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "worlds.json", aError);
 		return false;

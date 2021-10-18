@@ -165,7 +165,7 @@ void MmoController::ResetClientData(int ClientID)
 }
 
 // saving account
-void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
+void MmoController::SaveAccount(CPlayer *pPlayer, int Table) const
 {
 	if(!pPlayer->IsAuthed())
 		return;
@@ -227,7 +227,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	}
 	else if(Table == SAVE_POSITION)
 	{
-		int LatestCorrectWorldID = Account()->GetHistoryLatestCorrectWorldID(pPlayer);
+		const int LatestCorrectWorldID = Account()->GetHistoryLatestCorrectWorldID(pPlayer);
 		SJK.UD("tw_accounts_data", "WorldID = '%d' WHERE ID = '%d'", LatestCorrectWorldID, pPlayer->Acc().m_UserID);
 	}
 	else if(Table == SAVE_LANGUAGE)
@@ -240,7 +240,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table)
 	}
 }
 
-void MmoController::LoadLogicWorld()
+void MmoController::LoadLogicWorld() const
 {
 	ResultPtr pRes = SJK.SD("*", "tw_logics_worlds", "WHERE WorldID = '%d'", GS()->GetWorldID());
 	while(pRes->next())
@@ -263,14 +263,14 @@ const char* MmoController::PlayerName(int AccountID)
 	return "No found!";
 }
 
-void MmoController::ShowLoadingProgress(const char* pLoading, int Size)
+void MmoController::ShowLoadingProgress(const char* pLoading, int Size) const
 {
 	char aLoadingBuf[128];
 	str_format(aLoadingBuf, sizeof(aLoadingBuf), "[Loaded %d %s] :: WorldID %d.", Size, pLoading, GS()->GetWorldID());
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "LOAD DB", aLoadingBuf);
 }
 
-void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID)
+void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID) const
 {
 	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_VoteColored = SMALL_LIGHT_GRAY_COLOR;

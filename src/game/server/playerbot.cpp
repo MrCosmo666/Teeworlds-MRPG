@@ -10,14 +10,14 @@
 #include "mmocore/Components/Bots/BotCore.h"
 #include "mmocore/Components/Worlds/WorldSwapCore.h"
 
-#include <thread>
 #include <mutex>
+#include <thread>
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayerBot, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 
 std::mutex lockingPath;
 CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint)
-: CPlayer(pGS, ClientID), m_BotType(SpawnPoint), m_BotID(BotID), m_SubBotID(SubBotID), m_BotHealth(0)
+	: CPlayer(pGS, ClientID), m_BotType(SpawnPoint), m_BotID(BotID), m_SubBotID(SubBotID), m_BotHealth(0), m_LastPosTick(0), m_PathSize(0)
 {
 	m_DungeonAllowedSpawn = false;
 	(this)->SendClientInfo(-1);
@@ -163,7 +163,7 @@ void CPlayerBot::TryRespawn()
 		if(GS()->IsDungeon() && !m_DungeonAllowedSpawn)
 			return;
 
-		vec2 MobRespawnPosition = vec2(MobBotInfo::ms_aMobBot[m_SubBotID].m_PositionX, MobBotInfo::ms_aMobBot[m_SubBotID].m_PositionY);
+		const vec2 MobRespawnPosition = vec2(MobBotInfo::ms_aMobBot[m_SubBotID].m_PositionX, MobBotInfo::ms_aMobBot[m_SubBotID].m_PositionY);
 		if(!GS()->m_pController->CanSpawn(m_BotType, &SpawnPos, MobRespawnPosition))
 			return;
 
@@ -255,7 +255,7 @@ void CPlayerBot::Snap(int SnappingClient)
 	if(!pClientInfo)
 		return;
 
-	bool local_ClientID = (m_ClientID == SnappingClient);
+	const bool local_ClientID = (m_ClientID == SnappingClient);
 	pClientInfo->m_Local = local_ClientID;
 	pClientInfo->m_MoodType = GetMoodState(SnappingClient);
 	pClientInfo->m_WorldType = GS()->Mmo()->WorldSwap()->GetWorldType();
@@ -417,7 +417,7 @@ static void GetThreadRandomWaypointTarget(CGS* pGameServer, CPlayerBot* pBotPlay
 		return;
 
 	lockingPath.lock();
-	vec2 TargetPos = pGameServer->PathFinder()->GetRandomWaypoint();
+	const vec2 TargetPos = pGameServer->PathFinder()->GetRandomWaypoint();
 	pBotPlayer->m_TargetPos = vec2(TargetPos.x * 32, TargetPos.y * 32);
 	lockingPath.unlock();
 }

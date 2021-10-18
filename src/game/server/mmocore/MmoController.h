@@ -77,16 +77,16 @@ public:
 	bool OnPlayerHandleMainMenu(int ClientID, int Menulist, bool ReplaceMenu);
 	void OnInitAccount(int ClientID);
 	void OnMessage(int MsgID, void *pRawMsg, int ClientID);
-	bool OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText);
+	bool OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, int VoteID, int VoteID2, int Get, const char *GetText);
 	void ResetClientData(int ClientID);
 	void PrepareInformation(class IStorageEngine* pStorage);
 
 	//
-	void LoadLogicWorld();
+	void LoadLogicWorld() const;
 	static const char* PlayerName(int AccountID);
-	void SaveAccount(CPlayer *pPlayer, int Table);
-	void ShowLoadingProgress(const char* pLoading, int Size);
-	void ShowTopList(CPlayer* pPlayer, int TypeID);
+	void SaveAccount(CPlayer *pPlayer, int Table) const;
+	void ShowLoadingProgress(const char* pLoading, int Size) const;
+	void ShowTopList(CPlayer* pPlayer, int TypeID) const;
 };
 
 #endif

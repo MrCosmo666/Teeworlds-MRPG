@@ -94,7 +94,7 @@ public:
 
 	bool IsAllowedPVP(int FromID);
 	bool IsAlive() const { return m_Alive; }
-	void SetEvent(int EventID) { m_Event = EventID; };
+	void SetEvent(int EventID) { m_Event = EventID; }
 	void SetEmote(int Emote, int Sec);
 	void SetWeapon(int W);
 	bool IncreaseHealth(int Amount);

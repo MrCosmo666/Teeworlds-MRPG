@@ -97,14 +97,14 @@ void CSnapFull::Snap(int SnappingClient)
 	if(pOwner->IsActiveSnappingBot(SnappingClient) != 2)
 		return;
 
-	float AngleStart = (2.0f * pi * Server()->Tick()/static_cast<float>(Server()->TickSpeed()))/3.0f;
-	float AngleStep = 2.0f * pi / m_SnapItem.size();
+	const float AngleStart = (2.0f * pi * Server()->Tick()/static_cast<float>(Server()->TickSpeed()))/3.0f;
+	const float AngleStep = 2.0f * pi / m_SnapItem.size();
 
 	int idsize = 0;
 	for(const auto &pItems : m_SnapItem)
 	{
-		float Radius = 48.0f + (pItems.m_Changing ? m_LoadingTick : 0.0f);
-		vec2 PosStart = m_Pos + vec2(Radius * cos(AngleStart + AngleStep*idsize), Radius * sin(AngleStart + AngleStep*idsize));
+		const float Radius = 48.0f + (pItems.m_Changing ? m_LoadingTick : 0.0f);
+		const vec2 PosStart = m_Pos + vec2(Radius * cos(AngleStart + AngleStep*idsize), Radius * sin(AngleStart + AngleStep*idsize));
 		idsize++;
 
 		if(pItems.m_Projectile)
