@@ -39,7 +39,7 @@ jobs:
             LDFLAGS: /WX
 
     steps:
-    - name: Checkout private tools
+    - name: Checkout submodules
       uses: actions/checkout@v2
       with:
         submodules: true
