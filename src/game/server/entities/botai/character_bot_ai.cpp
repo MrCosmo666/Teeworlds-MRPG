@@ -259,7 +259,7 @@ void CCharacterBotAI::EngineNPC()
 		m_Input.m_TargetY = random_int()%4- random_int()%8;
 	m_Input.m_TargetX = (m_Input.m_Direction*10+1);
 
-	bool PlayerFinding = false;
+	bool PlayerFinding;
 	if(NpcBotInfo::ms_aNpcBot[MobID].m_Function == FunctionsNPC::FUNCTION_NPC_NURSE)
 		PlayerFinding = FunctionNurseNPC();
 	else

@@ -24,7 +24,7 @@ class CAccountMinerCore : public MmoComponent
 
 	void OnInitAccount(CPlayer* pPlayer) override;
 	void OnInitWorld(const char* pWhereLocalWorld) override;
-	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
+	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, int VoteID, int VoteID2, int Get, const char* GetText) override;
 
 public:
 	int GetOreLevel(vec2 Pos) const;

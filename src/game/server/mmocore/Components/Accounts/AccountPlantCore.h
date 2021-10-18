@@ -23,7 +23,7 @@ class CAccountPlantCore : public MmoComponent
 
 	void OnInitWorld(const char* pWhereLocalWorld) override;
 	void OnInitAccount(CPlayer* pPlayer) override;
-	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const int VoteID, const int VoteID2, int Get, const char* GetText) override;
+	bool OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, int VoteID, int VoteID2, int Get, const char* GetText) override;
 
 public:
 	int GetPlantLevel(vec2 Pos) const;
