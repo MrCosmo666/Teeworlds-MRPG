@@ -157,7 +157,6 @@ CLogicWallWall::CLogicWallWall(CGameWorld *pGameWorld, vec2 Pos, int Mode, int H
 void CLogicWallWall::TakeDamage()
 {
 	m_Health -= 25;
-
 }
 
 void CLogicWallWall::SetDestroy(int Sec) { m_RespawnTick = Server()->TickSpeed()*Sec, m_Health = m_SaveHealth; }
@@ -258,7 +257,6 @@ CLogicDoorKey::CLogicDoorKey(CGameWorld *pGameWorld, vec2 Pos, int ItemID, int M
 	{
 		m_Pos.y += 30;
 		m_PosTo = GS()->Collision()->FindDirCollision(100, m_PosTo, 'y', '-');
-
 	}
 	else
 	{
