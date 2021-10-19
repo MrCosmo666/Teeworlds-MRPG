@@ -726,7 +726,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 		// miss out on damage
 		TempInt = pFrom->GetAttributeCount(Stats::StLucky, true);
-		if(min(8.0f + (float)TempInt * 0.0015f, 30.0f) > frandom() * 100.0f)
+		if(min(5.0f + (float)TempInt * 0.0015f, 25.0f) > frandom() * 100.0f)
 		{
 			GS()->SendEmoticon(From, EMOTICON_HEARTS);
 			GS()->CreateTextEffect(m_Core.m_Pos, "MISS", TEXTEFFECT_FLAG_MISS);
@@ -735,11 +735,12 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 		// critical damage
 		TempInt = pFrom->GetAttributeCount(Stats::StDirectCriticalHit, true);
-		if(!pFrom->IsBot() && min(8.0f + (float)TempInt * 0.0015f, 30.0f) > frandom() * 100.0f)
+		if(Dmg && !pFrom->IsBot() && min(8.0f + (float)TempInt * 0.0015f, 30.0f) > frandom() * 100.0f)
 		{
 			CritDamage = 100 + max(pFrom->GetAttributeCount(Stats::StCriticalHit, true), 1);
-			float CritDamageFormula = (float)Dmg + ((float)CritDamage * ((float)Dmg / 100.0f));
-			Dmg = (int)CritDamageFormula;
+			const float CritDamageFormula = (float)Dmg + ((float)CritDamage * ((float)Dmg / 100.0f));
+			const float CritRange = (CritDamageFormula + (CritDamageFormula / 2.0f) / 2.0f);
+			Dmg = (int)CritDamageFormula + random_int()%(int)CritRange;
 			
 			pFrom->GetCharacter()->SetEmote(EMOTE_ANGRY, 2);
 			GS()->SendEmoticon(From, EMOTICON_EXCLAMATION);
