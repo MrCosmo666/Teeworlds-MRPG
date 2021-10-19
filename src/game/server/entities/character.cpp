@@ -718,7 +718,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 		// vampirism replenish your health
 		int TempInt = pFrom->GetAttributeCount(Stats::StVampirism, true);
-		if(min(8.0f + (float)TempInt * 0.0015f, 32.0f) > frandom() * 100.0f)
+		if(min(8.0f + (float)TempInt * 0.0015f, 30.0f) > frandom() * 100.0f)
 		{
 			pFrom->GetCharacter()->IncreaseHealth(max(1, Dmg/2));
 			GS()->SendEmoticon(From, EMOTICON_DROP);
@@ -726,7 +726,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 		// miss out on damage
 		TempInt = pFrom->GetAttributeCount(Stats::StLucky, true);
-		if(min(5.0f + (float)TempInt * 0.0015f, 25.0f) > frandom() * 100.0f)
+		if(min(5.0f + (float)TempInt * 0.0015f, 20.0f) > frandom() * 100.0f)
 		{
 			GS()->SendEmoticon(From, EMOTICON_HEARTS);
 			GS()->CreateTextEffect(m_Core.m_Pos, "MISS", TEXTEFFECT_FLAG_MISS);
