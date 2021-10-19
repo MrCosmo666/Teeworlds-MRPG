@@ -55,7 +55,7 @@ public:
 
 private:
 	std::map < std::string /* effect */, int /* seconds */ > m_aEffects;
-	void EffectsTick();
+	void EffectsTick() override;
 	void TryRespawn() override;
 
 	int GetBotLevel() const;

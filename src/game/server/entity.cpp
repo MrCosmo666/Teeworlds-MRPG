@@ -7,8 +7,8 @@ CEntity::CEntity(CGameWorld *pGameWorld, int ObjType, vec2 Pos, int ProximityRad
 {
 	m_pGameWorld = pGameWorld;
 
-	m_pPrevTypeEntity = 0;
-	m_pNextTypeEntity = 0;
+	m_pPrevTypeEntity = nullptr;
+	m_pNextTypeEntity = nullptr;
 
 	m_ID = Server()->SnapNewID();
 	m_ObjType = ObjType;
@@ -27,18 +27,18 @@ CEntity::~CEntity()
 	Server()->SnapFreeID(m_ID);
 }
 
-int CEntity::NetworkClipped(int SnappingClient)
+int CEntity::NetworkClipped(int SnappingClient) const
 {
 	return NetworkClipped(SnappingClient, m_Pos);
 }
 
-int CEntity::NetworkClipped(int SnappingClient, vec2 CheckPos)
+int CEntity::NetworkClipped(int SnappingClient, vec2 CheckPos) const
 {
 	if(SnappingClient == -1)
 		return 0;
 
-	float dx = GS()->m_apPlayers[SnappingClient]->m_ViewPos.x-CheckPos.x;
-	float dy = GS()->m_apPlayers[SnappingClient]->m_ViewPos.y-CheckPos.y;
+	const float dx = GS()->m_apPlayers[SnappingClient]->m_ViewPos.x-CheckPos.x;
+	const float dy = GS()->m_apPlayers[SnappingClient]->m_ViewPos.y-CheckPos.y;
 
 	if(absolute(dx) > 1000.0f || absolute(dy) > 800.0f)
 		return 1;
@@ -48,10 +48,10 @@ int CEntity::NetworkClipped(int SnappingClient, vec2 CheckPos)
 	return 0;
 }
 
-bool CEntity::GameLayerClipped(vec2 CheckPos)
+bool CEntity::GameLayerClipped(vec2 CheckPos) const
 {
-	int rx = round_to_int(CheckPos.x) / 32;
-	int ry = round_to_int(CheckPos.y) / 32;
+	const int rx = round_to_int(CheckPos.x) / 32;
+	const int ry = round_to_int(CheckPos.y) / 32;
 	return (rx < -200 || rx >= GS()->Collision()->GetWidth()+200)
 			|| (ry < -200 || ry >= GS()->Collision()->GetHeight()+200);
 }

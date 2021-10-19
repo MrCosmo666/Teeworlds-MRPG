@@ -206,7 +206,7 @@ CREATE TABLE `enum_talk_styles` (
 INSERT INTO `enum_talk_styles` (`ID`, `Style`) VALUES
 (0, 'Basic Talking'),
 (1, 'Aggresive Talking'),
-(2, 'Happed Talking');
+(2, 'Joyful Talking');
 
 -- --------------------------------------------------------
 
@@ -415,7 +415,8 @@ CREATE TABLE `tw_aethers` (
 INSERT INTO `tw_aethers` (`ID`, `Name`, `WorldID`, `TeleX`, `TeleY`) VALUES
 (1, 'Crossroad', 2, 8033, 7089),
 (2, 'Pier', 0, 3680, 1150),
-(3, 'Guard post', 5, 1536, 4396);
+(3, 'Guard post', 5, 1536, 4396),
+(4, 'Yugasaki', 11, 7070, 1980);
 
 -- --------------------------------------------------------
 
@@ -633,7 +634,12 @@ INSERT INTO `tw_bots_npc` (`ID`, `BotID`, `PositionX`, `PositionY`, `Function`, 
 (18, 37, 7781, 7921, -1, 1, 4, 1, 2),
 (19, 39, 2851, 3473, -1, 1, 3, 1, 5),
 (20, 51, 9335, 4881, -1, 1, 0, 1, 2),
-(21, 53, 7282, 4880, -1, 1, 0, 1, 2);
+(21, 53, 7282, 4880, -1, 1, 0, 1, 2),
+(22, 13, 7042, 1410, -1, 0, 2, 1, 11),
+(23, 14, 7048, 884, 0, 0, 2, 1, 11),
+(24, 12, 7101, 1169, -1, 1, 5, 1, 11),
+(25, 11, 5710, 1937, -1, 0, 4, 1, 11),
+(26, 45, 3800, 1521, -1, 1, 2, 1, 11);
 
 -- --------------------------------------------------------
 
@@ -803,7 +809,8 @@ INSERT INTO `tw_dialogs_other_npc` (`ID`, `MobID`, `GivesQuestID`, `Data`) VALUE
 (47, 16, 8, '[{\"text\":\"[Stranger]Greetings, wanderer. *bowing*\"},{\"text\":\"I am the Deputy of the Apostle, and I also protect her.\"},{\"text\":\"I think you\'ve already heard, that the monsters are raging.\"},{\"text\":\"I have a request for you [Player]\"},{\"text\":\"[p]Which one?\"},{\"text\":\"Help in the southern part to win over the monsters. We can\'t drive them away but we can scare them away.\",\"emote\":\"blink\"},{\"text\":\"[p]Of course I will.\"},{\"text\":\"Thank\'s [Player]!\",\"emote\":\"happy\",\"style\":\"joyful\"}]'),
 (54, 18, 50, '[{\"text\":\"[p]You look awful today, [Talked]! What happend?\"},{\"text\":\"Oh.. don\'t you worry about me, boy..\",\"style\":\"aggresive\",\"emote\":\"angry\"},{\"text\":\"[p]But I DO worry!\",\"emote\":\"blink\"},{\"text\":\"I\'m tired of these fight I have with my wife, it\'s personal bussiness.\",\"emote\":\"blink\"},{\"text\":\"[p]I didn\'t want to be a pain to you, Officer. I will leave you to your problems now.\",\"emote\":\"blink\"},{\"text\":\"No! Wait!\",\"emote\":\"blink\"}]'),
 (57, 9, 55, '[{\"text\":\"Hey, pst! You, yes, you!\",\"emote\":\"angry\",\"style\":\"aggresive\"},{\"text\":\"[p]Yeah? How can I help?\",\"emote\":\"blink\"},{\"text\":\"You cannot help me, kid! I just need...to TEST you, yes...!\",\"emote\":\"blink\"}]'),
-(61, 19, 60, '[{\"text\":\"Hello [Player], I have come to you from the Final Fantasy universe, my name is [Talked].\"},{\"text\":\"I can\'t say for sure how long I will be here, but for now I will be happy to know your world, and I will be happy to show my world\"},{\"text\":\"[p]Are you serious? Did the author smoke dope?\",\"emote\":\"blink\"},{\"text\":\"Maybe so, I have a couple of things that you can get from me, but not for free. I\'ll need the fragments I lost\"}]');
+(61, 19, 60, '[{\"text\":\"Hello [Player], I have come to you from the Final Fantasy universe, my name is [Talked].\"},{\"text\":\"I can\'t say for sure how long I will be here, but for now I will be happy to know your world, and I will be happy to show my world\"},{\"text\":\"[p]Are you serious? Did the author smoke dope?\",\"emote\":\"blink\"},{\"text\":\"Maybe so, I have a couple of things that you can get from me, but not for free. I\'ll need the fragments I lost\"}]'),
+(12, 25, NULL, '[{\"text\":\"Welcome home, sir! **she made a bow**\",\"style\":\"joyful\",\"emote\":\"happy\"}]');
 
 -- --------------------------------------------------------
 
@@ -1039,7 +1046,8 @@ CREATE TABLE `tw_guilds_houses` (
 
 INSERT INTO `tw_guilds_houses` (`ID`, `GuildID`, `PosX`, `PosY`, `DoorX`, `DoorY`, `TextX`, `TextY`, `Price`, `WorldID`) VALUES
 (1, NULL, 4250, 6352, 4496, 6461, 4206, 6224, 240000, 2),
-(2, NULL, 9504, 5713, 9180, 5713, 9486, 5495, 280000, 2);
+(2, NULL, 9504, 5713, 9180, 5713, 9486, 5495, 280000, 2),
+(3, NULL, 3601, 1521, 3890, 1513, 3577, 1346, 320000, 11);
 
 -- --------------------------------------------------------
 
@@ -1094,7 +1102,11 @@ CREATE TABLE `tw_houses` (
 
 INSERT INTO `tw_houses` (`ID`, `UserID`, `PosX`, `PosY`, `DoorX`, `DoorY`, `Class`, `Price`, `HouseBank`, `PlantID`, `PlantX`, `PlantY`, `WorldID`) VALUES
 (1, NULL, 8995, 7672, 8752, 7740, 'Elven class', 150000, 160, 18, 9456, 7766, 2),
-(2, NULL, 7999, 5297, 8241, 5297, 'Elven class', 150000, 100, 18, 7492, 5329, 2);
+(2, NULL, 7999, 5297, 8241, 5297, 'Elven class', 150000, 100, 18, 7492, 5329, 2),
+(3, NULL, 2036, 593, 1937, 585, 'Asian-style home', 180000, 0, 18, 2559, 593, 11),
+(4, NULL, 2036, 913, 1937, 905, 'Asian-style home', 180000, 0, 18, 2559, 913, 11),
+(5, NULL, 1216, 593, 1326, 585, 'Asian-style home', 180000, 0, 18, 715, 593, 11),
+(6, NULL, 1216, 913, 1326, 905, 'Asian-style home', 180000, 0, 18, 715, 913, 11);
 
 -- --------------------------------------------------------
 
@@ -1187,6 +1199,7 @@ INSERT INTO `tw_items_list` (`ItemID`, `Name`, `Description`, `Icon`, `Type`, `F
 (48, 'Bracelet of Fire', 'It happens sometimes', 'bracelet_fire', 3, 10, 0, 10, 4, 0, 7, 0, -1),
 (49, 'Big ammo bag', 'Adds a small amount of ammunition', 'pouch', 3, 10, 0, 10, 13, NULL, 8, 0, -1),
 (50, 'Strength ', 'Increase your strength', 'skill', -1, -1, 0, 0, 4, NULL, 1, 0, -1),
+(51, 'Random home decor', 'Lucky house decor', 'lucky_r', 1, 9, 0, 0, NULL, NULL, 0, 0, -1),
 (10000, 'Heavenly hammer', 'Reinforced kick', 'h_heaven', 6, 0, 0, 10, 16, NULL, 1, 0, -1),
 (10001, 'Heavenly gun', 'It look doesn\'t bad', 'g_heaven', 6, 1, 0, 10, 17, NULL, 10, 0, 3),
 (10002, 'Heavenly shotgun', 'It look doesn\'t bad', 's_heaven', 6, 2, 0, 10, 18, NULL, 10, 0, 4),
@@ -1487,7 +1500,8 @@ INSERT INTO `tw_world_swap` (`ID`, `WorldID`, `PositionX`, `PositionY`, `Require
 (4, 2, 3510, 6340, 13, 4, 4740, 900),
 (5, 3, 4560, 1205, 19, 5, 610, 4500),
 (6, 2, 8328, 6020, 15, 7, 4135, 840),
-(7, 5, 4896, 4276, 22, 9, 2905, 1227);
+(7, 5, 4896, 4276, 22, 9, 2905, 1227),
+(8, 9, 1705, 1097, NULL, 11, 12604, 2180);
 
 --
 -- Индексы сохранённых таблиц

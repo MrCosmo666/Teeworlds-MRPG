@@ -57,7 +57,6 @@ protected:
 		int m_AmmoRegenStart;
 		int m_Ammo;
 		bool m_Got;
-
 	} m_aWeapons[NUM_WEAPONS];
 
 	// these are non-heldback inputs
@@ -95,7 +94,7 @@ public:
 
 	bool IsAllowedPVP(int FromID);
 	bool IsAlive() const { return m_Alive; }
-	void SetEvent(int EventID) { m_Event = EventID; };
+	void SetEvent(int EventID) { m_Event = EventID; }
 	void SetEmote(int Emote, int Sec);
 	void SetWeapon(int W);
 	bool IncreaseHealth(int Amount);

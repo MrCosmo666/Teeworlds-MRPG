@@ -246,7 +246,6 @@ int CSnapshotDelta::CreateDelta(const CSnapshot* pFrom, CSnapshot* pTo, void* pD
 
 			if(DiffItem(pPastItem->Data(), (int*)pCurItem->Data(), pItemDataDst, ItemSize / 4))
 			{
-
 				*pData++ = pCurItem->Type();
 				*pData++ = pCurItem->ID();
 				if(IncludeSize)

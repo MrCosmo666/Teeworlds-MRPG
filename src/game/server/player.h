@@ -116,7 +116,7 @@ public:
 	virtual void Snap(int SnappingClient);
 
 private:
-	void EffectsTick();
+	virtual void EffectsTick();
 	void TickSystemTalk();
 	virtual void TryRespawn();
 
@@ -154,7 +154,7 @@ public:
 		FUNCTIONS PLAYER PARSING
 	######################################################################### */
 	bool ParseItemsF3F4(int Vote);
-  	bool ParseVoteUpgrades(const char *CMD, const int VoteID, const int VoteID2, int Get);
+  	bool ParseVoteUpgrades(const char *CMD, int VoteID, int VoteID2, int Get);
 
 	/* #########################################################################
 		FUNCTIONS PLAYER ITEMS
@@ -178,7 +178,7 @@ public:
 	void FormatDialogText(int DataBotID, const char *pText);
 	void ClearDialogText();
 
-	int GetMoodState() const { return MOOD_NORMAL; }
+	static int GetMoodState() { return MOOD_NORMAL; }
 	void ChangeWorld(int WorldID);
 };
 

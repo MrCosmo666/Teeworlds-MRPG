@@ -1238,18 +1238,13 @@ void CGameClient::ProcessEvents()
 			CNetEvent_EffectMmo* ev = (CNetEvent_EffectMmo*)pData;
 			m_pEffects->MmoEffects(vec2(ev->m_X, ev->m_Y), ev->m_EffectID);
 		}
-		else if (Item.m_Type == NETEVENTTYPE_EFFECTPOTION)
+		else if (Item.m_Type == NETEVENTTYPE_TEXTEFFECT)
 		{
-			CNetEvent_EffectPotion* ev = (CNetEvent_EffectPotion*)pData;
+			CNetEvent_TextEffect* ev = (CNetEvent_TextEffect*)pData;
 
 			char pBuf[32];
-			IntsToStr(ev->m_Potion, 4, pBuf);
-			m_pEffects->MmoEffectPotion(vec2(ev->m_X, ev->m_Y), pBuf, ev->m_PotionAdded);
-		}
-		else if (Item.m_Type == NETEVENTTYPE_MMODAMAGE)
-		{
-			CNetEvent_MmoDamage* ev = (CNetEvent_MmoDamage*)pData;
-			m_pEffects->DamageMmoInd(vec2(ev->m_X, ev->m_Y), ev->m_Damage, ev->m_CritDamage);
+			IntsToStr(ev->m_aText, 4, pBuf);
+			m_pEffects->MmoTextEffect(vec2(ev->m_X, ev->m_Y), pBuf, ev->m_Flag);
 		}
 	}
 }

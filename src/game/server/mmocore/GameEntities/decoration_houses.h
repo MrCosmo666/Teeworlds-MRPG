@@ -10,7 +10,7 @@ class CDecorationHouses : public CEntity
 		BODY,
 		NUM_IDS,
 	};
-	int m_IDs[NUM_IDS];
+	int m_IDs[NUM_IDS]{};
 
 	int SwitchToObject(bool Data) const;
 public:

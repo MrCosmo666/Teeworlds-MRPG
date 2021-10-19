@@ -374,7 +374,6 @@ public:
 	class CUIGameInterface* m_pGameInterfaceUI;
 	class CTalkText* m_pTalkText;
 	class CCSkinChanger* m_pSkinChanger;
-
 };
 
 void FormatTime(char* pBuf, int Size, int Time, int Precision);

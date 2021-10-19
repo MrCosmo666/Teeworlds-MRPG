@@ -286,7 +286,6 @@ int CDemoRecorder::Stop()
 	io_write(m_File, aNumMarkers, sizeof(aNumMarkers));
 	for (int i = 0; i < m_NumTimelineMarkers; i++)
 	{
-
 		unsigned char aMarker[4];
 		uint_to_bytes_be(aMarker, m_aTimelineMarkers[i]);
 		io_write(m_File, aMarker, sizeof(aMarker));
@@ -375,7 +374,6 @@ int CDemoPlayer::ReadChunkHeader(int* pType, int* pSize, int* pTick)
 			if(io_read(m_File, aSizeData, sizeof(aSizeData)) != sizeof(aSizeData))
 				return -1;
 			*pSize = aSizeData[0];
-
 		}
 		else if (*pSize == 31)
 		{
@@ -413,7 +411,6 @@ void CDemoPlayer::ScanFile()
 		{
 			if (ChunkType & CHUNKTICKFLAG_KEYFRAME)
 			{
-
 				// save the position
 				CKeyFrameSearch* pKey = (CKeyFrameSearch*)Heap.Allocate(sizeof(CKeyFrameSearch));
 				pKey->m_Frame.m_Filepos = CurrentPos;

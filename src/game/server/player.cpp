@@ -119,7 +119,7 @@ void CPlayer::EffectsTick()
 		if(pEffect->second <= 0)
 		{
 			if(m_pCharacter && m_pCharacter->IsAlive())
-				GS()->CreatePotionEffect(m_pCharacter->m_Core.m_Pos, pEffect->first.c_str(), false);
+				GS()->CreateTextEffect(m_pCharacter->m_Core.m_Pos, pEffect->first.c_str(), TEXTEFFECT_FLAG_POTION|TEXTEFFECT_FLAG_REMOVING);
 			GS()->Chat(m_ClientID, "You lost the effect {STR}.", pEffect->first.c_str());
 			pEffect = CGS::ms_aEffects[m_ClientID].erase(pEffect);
 			continue;
@@ -382,7 +382,7 @@ void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
 	{
 		GS()->Chat(m_ClientID, "You got the effect {STR} time {INT}sec.", Potion, Sec);
 		CGS::ms_aEffects[m_ClientID][Potion] = Sec;
-		GS()->CreatePotionEffect(m_pCharacter->m_Core.m_Pos, Potion, true);
+		GS()->CreateTextEffect(m_pCharacter->m_Core.m_Pos, Potion, TEXTEFFECT_FLAG_POTION|TEXTEFFECT_FLAG_ADDING);
 	}
 }
 

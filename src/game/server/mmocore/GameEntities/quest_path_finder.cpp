@@ -33,8 +33,8 @@ void CQuestPathFinder::Tick()
 		return;
 	}
 
-	vec2 PlayerPosition = GS()->m_apPlayers[m_ClientID]->GetCharacter()->m_Core.m_Pos;
-	vec2 Direction = normalize(PlayerPosition - m_TargetPos);
+	const vec2 PlayerPosition = GS()->m_apPlayers[m_ClientID]->GetCharacter()->m_Core.m_Pos;
+	const vec2 Direction = normalize(PlayerPosition - m_TargetPos);
 	m_Pos = PlayerPosition - Direction * clamp(distance(m_Pos, m_TargetPos), 32.0f, 90.0f);
 }
 
@@ -45,7 +45,7 @@ void CQuestPathFinder::Snap(int SnappingClient)
 
 	if (GS()->IsMmoClient(SnappingClient))
 	{
-		vec2 Direction = normalize(m_Pos - m_TargetPos);
+		const vec2 Direction = normalize(m_Pos - m_TargetPos);
 		CNetObj_MmoPickup* pMmoP = static_cast<CNetObj_MmoPickup*>(Server()->SnapNewItem(NETOBJTYPE_MMOPICKUP, GetID(), sizeof(CNetObj_MmoPickup)));
 		if (!pMmoP)
 			return;
