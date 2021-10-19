@@ -4,14 +4,14 @@
 #define GAME_SERVER_MMO_UTILS_FIELD_DATA_H
 
 #include <base/system.h>
-#include <type_traits>
+//#include <type_traits>
 
 // temporary replacement
 template < typename T >
 class CFieldData
 {
-	char m_aFieldName[128];
-	char m_aDescription[128];
+	char m_aFieldName[128] = {};
+	char m_aDescription[128] = {};
 
 public:
 	T m_Value;

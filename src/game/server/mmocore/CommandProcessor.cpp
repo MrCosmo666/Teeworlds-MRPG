@@ -43,7 +43,7 @@ CCommandProcessor::~CCommandProcessor()
 
 void CCommandProcessor::ConChatLogin(IConsole::IResult* pResult, void* pUser)
 {
-	int ClientID = pResult->GetClientID();
+	const int ClientID = pResult->GetClientID();
 	IServer* pServer = (IServer*)pUser;
 	CGS* pGS = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
@@ -68,7 +68,7 @@ void CCommandProcessor::ConChatLogin(IConsole::IResult* pResult, void* pUser)
 
 void CCommandProcessor::ConChatRegister(IConsole::IResult* pResult, void* pUser)
 {
-	int ClientID = pResult->GetClientID();
+	const int ClientID = pResult->GetClientID();
 	IServer* pServer = (IServer*)pUser;
 	CGS* pGS = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
@@ -93,7 +93,7 @@ void CCommandProcessor::ConChatRegister(IConsole::IResult* pResult, void* pUser)
 #ifdef CONF_DISCORD
 void CCommandProcessor::ConChatDiscordConnect(IConsole::IResult* pResult, void* pUser)
 {
-	int ClientID = pResult->GetClientID();
+	const int ClientID = pResult->GetClientID();
 	IServer* pServer = (IServer*)pUser;
 	CGS* pGS = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
@@ -121,7 +121,7 @@ void CCommandProcessor::ConChatDiscordConnect(IConsole::IResult* pResult, void* 
 
 void CCommandProcessor::ConChatGuildExit(IConsole::IResult* pResult, void* pUser)
 {
-	int ClientID = pResult->GetClientID();
+	const int ClientID = pResult->GetClientID();
 	IServer* pServer = (IServer*)pUser;
 	CGS* pGS = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
@@ -129,13 +129,13 @@ void CCommandProcessor::ConChatGuildExit(IConsole::IResult* pResult, void* pUser
 	if (!pPlayer || !pPlayer->IsAuthed() || !pPlayer->Acc().IsGuild())
 		return;
 
-	int AccountID = pPlayer->Acc().m_UserID;
+	const int AccountID = pPlayer->Acc().m_UserID;
 	pGS->Mmo()->Member()->ExitGuild(AccountID);
 }
 
 void CCommandProcessor::ConChatGuildCreate(IConsole::IResult* pResult, void* pUser)
 {
-	int ClientID = pResult->GetClientID();
+	const int ClientID = pResult->GetClientID();
 	IServer* pServer = (IServer*)pUser;
 	CGS* pGS = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
@@ -156,7 +156,7 @@ void CCommandProcessor::ConChatGuildCreate(IConsole::IResult* pResult, void* pUs
 
 void CCommandProcessor::ConChatDoorHouse(IConsole::IResult* pResult, void* pUser)
 {
-	int ClientID = pResult->GetClientID();
+	const int ClientID = pResult->GetClientID();
 	IServer* pServer = (IServer*)pUser;
 	CGS* pGS = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
@@ -164,13 +164,13 @@ void CCommandProcessor::ConChatDoorHouse(IConsole::IResult* pResult, void* pUser
 	if (!pPlayer || !pPlayer->IsAuthed())
 		return;
 
-	int HouseID = pGS->Mmo()->House()->PlayerHouseID(pPlayer);
+	const int HouseID = pGS->Mmo()->House()->PlayerHouseID(pPlayer);
 	pGS->Mmo()->House()->ChangeStateDoor(HouseID);
 }
 
 void CCommandProcessor::ConChatSellHouse(IConsole::IResult* pResult, void* pUser)
 {
-	int ClientID = pResult->GetClientID();
+	const int ClientID = pResult->GetClientID();
 	IServer* pServer = (IServer*)pUser;
 	CGS* pGS = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
@@ -179,7 +179,7 @@ void CCommandProcessor::ConChatSellHouse(IConsole::IResult* pResult, void* pUser
 		return;
 
 	// check owner house id
-	int HouseID = pGS->Mmo()->House()->PlayerHouseID(pPlayer);
+	const int HouseID = pGS->Mmo()->House()->PlayerHouseID(pPlayer);
 	if(HouseID < 0)
 	{
 		pGS->Chat(ClientID, "You have no home.");
@@ -192,7 +192,7 @@ void CCommandProcessor::ConChatSellHouse(IConsole::IResult* pResult, void* pUser
 
 void CCommandProcessor::ConChatPosition(IConsole::IResult* pResult, void* pUser)
 {
-	int ClientID = pResult->GetClientID();
+	const int ClientID = pResult->GetClientID();
 	IServer* pServer = (IServer*)pUser;
 	CGS* pGS = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
@@ -208,7 +208,7 @@ void CCommandProcessor::ConChatPosition(IConsole::IResult* pResult, void* pUser)
 
 void CCommandProcessor::ConChatSound(IConsole::IResult* pResult, void* pUser)
 {
-	int ClientID = pResult->GetClientID();
+	const int ClientID = pResult->GetClientID();
 	IServer* pServer = (IServer*)pUser;
 	CGS* pGS = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
@@ -222,7 +222,7 @@ void CCommandProcessor::ConChatSound(IConsole::IResult* pResult, void* pUser)
 
 void CCommandProcessor::ConChatUseItem(IConsole::IResult* pResult, void* pUser)
 {
-	int ClientID = pResult->GetClientID();
+	const int ClientID = pResult->GetClientID();
 	IServer* pServer = (IServer*)pUser;
 	CGS* pGS = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
@@ -230,13 +230,13 @@ void CCommandProcessor::ConChatUseItem(IConsole::IResult* pResult, void* pUser)
 	if (!pPlayer || !pPlayer->IsAuthed())
 		return;
 
-	int ItemID = pResult->GetInteger(0);
+	const int ItemID = pResult->GetInteger(0);
 	pPlayer->GetItem(ItemID).Use(1);
 }
 
 void CCommandProcessor::ConChatUseSkill(IConsole::IResult* pResult, void* pUser)
 {
-	int ClientID = pResult->GetClientID();
+	const int ClientID = pResult->GetClientID();
 	IServer* pServer = (IServer*)pUser;
 	CGS* pGS = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
@@ -244,13 +244,13 @@ void CCommandProcessor::ConChatUseSkill(IConsole::IResult* pResult, void* pUser)
 	if (!pPlayer || !pPlayer->IsAuthed())
 		return;
 
-	int SkillID = pResult->GetInteger(0);
+	const int SkillID = pResult->GetInteger(0);
 	pPlayer->GetSkill(SkillID).Use();
 }
 
 void CCommandProcessor::ConChatCmdList(IConsole::IResult* pResult, void* pUser)
 {
-	int ClientID = pResult->GetClientID();
+	const int ClientID = pResult->GetClientID();
 	IServer* pServer = (IServer*)pUser;
 	CGS* pGS = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
@@ -267,7 +267,7 @@ void CCommandProcessor::ConChatCmdList(IConsole::IResult* pResult, void* pUser)
 
 void CCommandProcessor::ConChatRules(IConsole::IResult* pResult, void* pUser)
 {
-	int ClientID = pResult->GetClientID();
+	const int ClientID = pResult->GetClientID();
 	IServer* pServer = (IServer*)pUser;
 	CGS* pGS = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
@@ -285,7 +285,7 @@ void CCommandProcessor::ConChatRules(IConsole::IResult* pResult, void* pUser)
 
 void CCommandProcessor::ConChatVoucher(IConsole::IResult* pResult, void* pUser)
 {
-	int ClientID = pResult->GetClientID();
+	const int ClientID = pResult->GetClientID();
 	IServer* pServer = (IServer*)pUser;
 	CGS* pGS = (CGS*)pServer->GameServer(pServer->GetClientWorldID(ClientID));
 
@@ -327,7 +327,7 @@ void CCommandProcessor::ChatCmd(const char* pMessage, CPlayer* pPlayer)
 		break;
 	}
 
-	const IConsole::CCommandInfo* pCommand = GS()->Console()->GetCommandInfo(aCommand, CFGFLAG_CHAT, 0);
+	const IConsole::CCommandInfo* pCommand = GS()->Console()->GetCommandInfo(aCommand, CFGFLAG_CHAT, false);
 	if(pCommand)
 	{
 		int ErrorArgs;

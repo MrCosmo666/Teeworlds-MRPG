@@ -242,6 +242,7 @@ enum
 	itModePVP = 39,						// PVP mode setting
 	itTicketResetWeaponStats = 40,		// Ticket to reset the statistics cartridge upgrade
 	itTicketDiscountCraft = 43,			// Discount ticket for crafting
+	itRandomHomeDecoration = 51,		// Random home decor
 
 	// all sorting sheets that exist on the server
 	SORT_INVENTORY = 0,
@@ -319,6 +320,17 @@ enum DayType
 	DAY_TYPE,
 	MORNING_TYPE,
 	EVENING_TYPE
+};
+
+enum
+{
+	TEXTEFFECT_FLAG_BASIC = 1 << 1,
+	TEXTEFFECT_FLAG_DAMAGE = 1 << 2,
+	TEXTEFFECT_FLAG_CRIT_DAMAGE = 1 << 3,
+	TEXTEFFECT_FLAG_MISS = 1 << 4,
+	TEXTEFFECT_FLAG_POTION = 1 << 5,
+	TEXTEFFECT_FLAG_ADDING = 1 << 6,
+	TEXTEFFECT_FLAG_REMOVING = 1 << 7,
 };
 
 /*

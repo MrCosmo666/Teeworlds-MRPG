@@ -340,8 +340,8 @@
 		"value": "Вы вышли из активной зоны, меню восстановлено!"
 	},
 	{
-		"key": "{STR} joined to Mmo server. Rank #{INT}",
-		"value": "{STR} подключился к Mmo server. Ранг #{INT}"
+		"key": "{STR} logged to account. Rank #{INT}",
+		"value": "{STR} авторизовался. Ранг #{INT}"
 	},
 	{
 		"key": "You repaired all items.",
@@ -398,5 +398,101 @@
 	{
 		"key": "[Done] Defeat the {STR}'s for the {STR}!",
 		"value": "[Выполнено] Победить {STR} для {STR}!"
+	},
+	{
+		"key": "- - - - [Your nickname is already registered] - - - -",
+		"value": "- - - - [Ваш ник уже зарегестрирован] - - - -"
+	},
+	{
+		"key": "Your nick is a unique identifier, and it has already been used!",
+		"value": "Ваш ник уникальный индификатор, этот ник уже используется!"
+	},
+	{
+		"key": "You can restore access by contacting support, or change nick.",
+		"value": "Вы можете восстановить доступ через поддержку, или сменить ник."
+	},
+	{
+		"key": "- - - - - - - [Successful registered] - - - - - - -",
+		"value": "- - - - - - - [Успешно зарегестрирован] - - - - - - -"
+	},
+	{
+		"key": "Don't forget your data, have a nice game!",
+		"value": "Не забывайте ваши данные, удачного дня!"
+	},
+	{
+		"key": "# Your nickname is a unique identifier!",
+		"value": "# Ваш ник уникальный индификатор!"
+	},
+	{
+		"key": "# Log in: \"/login {STR} {STR}\"",
+		"value": "# Вход: \"/login {STR} {STR}\""
+	},
+	{
+		"key": "Username / Password must contain 4-12 characters",
+		"value": "Логин / Пароль содержит 4-12 символов"
+	},
+	{
+		"key": "Wrong login or password",
+		"value": "Неправильно введен логин или пароль"
+	},
+	{
+		"key": "The account is already in the game!",
+		"value": "Аккаунт уже в игре. Вход отменен!"
+	},
+	{
+		"key": "- - - - - - - [Successful login] - - - - - - -",
+		"value": "- - - - - - - [Успешный вход] - - - - - - -"
+	},
+	{
+		"key": "Your nickname was not found in the database!",
+		"value": "Ваш ник не найден в базе данных!"
+	},
+	{
+		"key": "You are located {STR} ({STR})",
+		"value": "Вы находитесь {STR} ({STR})"
+	},
+	{
+		"key": "Quest NPCs are marked with an aura Heart and Shield.",
+		"value": "Квестовые NPC помечены Сердцами и Щитками."
+	},
+	{
+		"key": "Shield around you indicates location of active quest.",
+		"value": "Щиток возле вас указывает направление на активный квест."
+	},
+	{
+		"key": "Your Discord ID has been updated",
+		"value": "Ваш Discord ID успешно обновлен"
+	},
+	{
+		"key": "Check the connection status in discord \"/connect\".",
+		"value": "Проверьте статус соединения в discord \"/connect\"."
+	},
+	{
+		"key": "Some of the settings becomes valid after death",
+		"value": "Некоторые настройки будут обновлены после смерти"
+	},
+	{
+		"key": "Modules settings",
+		"value": "Настройка модулей"
+	},
+	{
+		"key": "The list of modules equipment is empty.",
+		"value": "Лист снаряжаемых модулей пуст."
+	},
+	{
+		"key": "The voucher code '{STR}' has expired.",
+		"value": "Ваучер код '{STR}' истёк."
+	},
+	{
+		"key": "This voucher has already been redeemed.",
+		"value": "Этот ваучер вами уже был получен."
+	},
+	{
+		"key": "You have successfully redeemed the voucher '{STR}'.",
+		"value": "Вы успешно получили ваучер '{STR}'."
+	},
+	{
+		"key": "The voucher code '{STR}' does not exist.",
+		"value": "Ваучер '{STR}' не существует."
 	}
 ]}

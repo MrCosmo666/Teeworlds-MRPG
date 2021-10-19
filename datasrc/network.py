@@ -300,18 +300,13 @@ Objects = [
 	]),
     
     ## mmotee events
-	NetEvent("MmoDamage:Common", [
-		NetIntAny("m_Damage"),
-		NetBool("m_CritDamage"),
-	]),
-
 	NetEvent("EffectMmo:Common", [
 		NetEnum("m_EffectID", Effects),
 	]),
 
-	NetEvent("EffectPotion:Common", [
-		NetArray(NetIntAny("m_Potion"), 4),
-		NetBool("m_PotionAdded"),
+	NetEvent("TextEffect:Common", [
+		NetArray(NetIntAny("m_aText"), 4),
+		NetIntAny("m_Flag"),
 	]),
 
     ## mmotee general object

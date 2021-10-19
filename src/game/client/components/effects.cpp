@@ -16,7 +16,11 @@
 
 #include "effects.h"
 
+#include "game/game_context.h"
+
 inline vec2 RandomDir() { return normalize(vec2(frandom()-0.5f, frandom()-0.5f)); }
+
+// TODO: read and optimize code
 
 CEffects::CEffects()
 {
@@ -318,66 +322,84 @@ void CEffects::MmoEffects(vec2 Pos, int EffectID)
 	m_pClient->m_pParticles->Add(CParticles::GROUP_TELEPORT, &p);
 }
 
-void CEffects::MmoEffectPotion(vec2 Pos, const char* Potion, bool Added)
+void CEffects::MmoTextEffect(vec2 Pos, const char* pText, int Flag)
 {
 	CParticle p;
 	p.SetDefault();
-	p.m_Pos = Vec2Range(&Pos, 60);
-	p.m_LifeSpan = 1.2f;
+	p.m_TextBuf[0] = '\0';
 
-	p.m_Gravity = -1000.0f;
-	p.m_StartSize = 18.0f;
-	p.m_EndSize = 18.0f;
-
-	vec4 Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	if (str_find(Potion, "Health") != nullptr)
-		Color = vec4(1.0f, 0.80f, 1.0f, 1.0f);
-	if(str_find(Potion, "Mana") != nullptr)
-		Color = vec4(0.80f, 0.80f, 1.0f, 1.0f);
-	if (str_find(Potion, "Poison") != nullptr)
-		Color = vec4(0.40f, 0.80f, 0.0f, 1.0f);
-	if(str_find(Potion, "Slowdown") != nullptr)
-		Color = vec4(0.50f, 1.00f, 0.50f, 1.0f);
-	if (str_find(Potion, "Fire") != nullptr)
-		Color = vec4(1.0f, 0.65f, 0.0f, 1.0f);
-	if (str_find(Potion, "Ice") != nullptr)
-		Color = vec4(0.0f, 0.50f, 1.0f, 1.0f);
-
-	p.m_Color = Color;
-	str_format(p.m_TextBuf, sizeof(p.m_TextBuf), "%s %s", Added ? "+" : "-", Potion);
-	m_pClient->m_pParticles->Add(CParticles::GROUP_DAMAGEMMO, &p);
-}
-
-void CEffects::DamageMmoInd(vec2 Pos, int DamageCount, bool CritDamage)
-{
-	const int IncreaseSize = min(DamageCount, 28);
-
-	CParticle p;
-	p.SetDefault();
-	p.m_Pos = Pos;
-	p.m_Vel = vec2(-5 + rand() % 10, -5 + rand() % 10) * 50 * (40 * 0.025f);
-	p.m_LifeSpan = 1.8f;
-	p.m_Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-	p.m_Rot = 0;
-	p.m_Rotspeed = 0;
-	p.m_Gravity = 0.7f;
-	p.m_FlowAffected = 0.0f;
-	p.m_Friction = 0.9f;
-
-	if(CritDamage)
+	// potion effects / basic text
+	if(Flag & TEXTEFFECT_FLAG_POTION || Flag & TEXTEFFECT_FLAG_BASIC)
 	{
-		p.m_StartSize = 22.0f + IncreaseSize * 0.5f;
-		p.m_EndSize = 22.0f + IncreaseSize * 0.3f;
-		p.m_Color = vec4(1.0f, 0.80f, 0.2f, 1.0f);
-		str_format(p.m_TextBuf, sizeof(p.m_TextBuf), "Crit %d", DamageCount);
+		p.m_Pos = Vec2Range(&Pos, 60);
+		p.m_LifeSpan = 0.7f;
+		p.m_Gravity = -1000.0f;
+		p.m_StartSize = 21.0f;
+		p.m_EndSize = 21.0f;
+
+		if(str_find(pText, "Health") != nullptr)
+			p.m_Color = vec4(1.0f, 0.80f, 1.0f, 1.0f);
+		if(str_find(pText, "Mana") != nullptr)
+			p.m_Color = vec4(0.80f, 0.80f, 1.0f, 1.0f);
+		if(str_find(pText, "Poison") != nullptr)
+			p.m_Color = vec4(0.40f, 0.80f, 0.0f, 1.0f);
+		if(str_find(pText, "Slowdown") != nullptr)
+			p.m_Color = vec4(0.50f, 1.00f, 0.50f, 1.0f);
+		if(str_find(pText, "Fire") != nullptr)
+			p.m_Color = vec4(1.0f, 0.65f, 0.0f, 1.0f);
+		if(str_find(pText, "Ice") != nullptr)
+			p.m_Color = vec4(0.0f, 0.50f, 1.0f, 1.0f);
 	}
-	else
+	
+	// damage effect
+	else if(Flag & TEXTEFFECT_FLAG_DAMAGE || Flag & TEXTEFFECT_FLAG_CRIT_DAMAGE)
 	{
-		p.m_StartSize = 18.0f + IncreaseSize * 0.5f;
-		p.m_EndSize = 18.0f + IncreaseSize * 0.3f;
-		p.m_Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
-		str_format(p.m_TextBuf, sizeof(p.m_TextBuf), "%d", DamageCount);
+		const int DamageValue = str_toint(pText);
+		const float IncreaseSize = min((float)DamageValue, 28.0f);
+		
+		p.m_Pos = Pos;
+		p.m_Vel = vec2(-8 + rand() % 10, -8 + rand() % 10) * 50 * (40 * 0.025f);
+		p.m_LifeSpan = 1.5f;
+		p.m_Gravity = 0.7f;
+		p.m_FlowAffected = 0.5f;
+		p.m_Friction = 0.8f;
+
+		if(Flag & TEXTEFFECT_FLAG_CRIT_DAMAGE)
+		{
+			p.m_StartSize = 22.0f + IncreaseSize * 0.5f;
+			p.m_EndSize = 22.0f + IncreaseSize * 0.5f;
+			p.m_Color = vec4(1.0f, 0.80f, 0.3f, 1.0f);
+		}
+		else if(Flag & TEXTEFFECT_FLAG_DAMAGE)
+		{
+			p.m_StartSize = 18.0f + IncreaseSize * 0.5f;
+			p.m_EndSize = 18.0f + IncreaseSize * 0.3f;
+			p.m_Color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
+		}
 	}
+
+	// miss
+	else if(Flag & TEXTEFFECT_FLAG_MISS)
+	{
+		p.m_Pos = Pos;
+		p.m_StartSize = 28.0f;
+		p.m_EndSize = 28.0f;
+		p.m_Gravity = 0.7f;
+		p.m_FlowAffected = 0.5f;
+		p.m_Friction = 0.8f;
+		p.m_Vel = vec2(-8 + rand() % 10, -8 + rand() % 10) * 50 * (40 * 0.025f);
+		p.m_LifeSpan = 1.5f;
+		p.m_Color = vec4(0.6f, 0.7f, 1.0f, 1.0f);
+	}
+	
+	// adding
+	if(Flag & TEXTEFFECT_FLAG_ADDING)
+		str_append(p.m_TextBuf, "+", sizeof(p.m_TextBuf));
+	// removing
+	if(Flag & TEXTEFFECT_FLAG_REMOVING)
+		str_append(p.m_TextBuf, "-", sizeof(p.m_TextBuf));
+
+	str_append(p.m_TextBuf, pText, sizeof(p.m_TextBuf));
 	m_pClient->m_pParticles->Add(CParticles::GROUP_DAMAGEMMO, &p);
 }
 

@@ -138,7 +138,7 @@ int CAccountCore::LoginAccount(int ClientID, const char *Login, const char *Pass
 		}
 
 		GS()->Chat(ClientID, "- - - - - - - [Successful login] - - - - - - -");
-		GS()->Chat(ClientID, "Menu is available in call-votes! {INT}", pPlayer->Acc().m_UserID);
+		GS()->Chat(ClientID, "Menu is available in call-votes!");
 		GS()->m_pController->DoTeamChange(pPlayer, false);
 
 		char aAddrStr[64];
@@ -220,7 +220,7 @@ void CAccountCore::DiscordConnect(int ClientID, const char *pDID) const
 	SJK.UDS(1000,"tw_accounts_data", "DiscordID = '%s' WHERE ID = '%d'", cDiscordID.cstr(), pPlayer->Acc().m_UserID);
 
 	GS()->Chat(ClientID, "Your Discord ID has been updated.");
-	GS()->Chat(ClientID, "Check the connection status in discord \"!mconnect\".");
+	GS()->Chat(ClientID, "Check the connection status in discord \"/connect\".");
 #endif
 }
 

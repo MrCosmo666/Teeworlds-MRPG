@@ -6,6 +6,8 @@
 
 #include <game/server/mmocore/Components/Inventory/InventoryCore.h>
 
+#include "RandomBox.h"
+
 std::map < int, std::map < int, CItemData > > CItemData::ms_aItems;
 inline int randomRangecount(int startrandom, int endrandom, int count)
 {
@@ -232,6 +234,16 @@ bool CItemData::Use(int Value)
 		GS()->Chat(-1, "{STR} used {STR} returned {INT} upgrades.", GS()->Server()->ClientName(ClientID), Info().GetName(), BackUpgrades);
 		m_pPlayer->Acc().m_Upgrade += BackUpgrades;
 		GS()->Mmo()->SaveAccount(m_pPlayer, SAVE_UPGRADES);
+	}
+	// Random home decor
+	else if(m_ItemID == itRandomHomeDecoration)
+	{
+		CRandomBox RandomHomeDecor;
+		RandomHomeDecor.Add(itDecoArmor, 1, 50.0f);
+		RandomHomeDecor.Add(itDecoHealth, 1, 50.0f);
+		RandomHomeDecor.Add(itEliteDecoHealth, 1, 10.0f);
+		RandomHomeDecor.Add(itEliteDecoNinja, 1, 10.0f);
+		RandomHomeDecor.Start(m_pPlayer, 5, this, Value);
 	}
 	return true;
 }

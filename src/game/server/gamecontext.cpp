@@ -181,16 +181,15 @@ void CGS::CreateDamage(vec2 Pos, int ClientID, int Amount, bool CritDamage, bool
 		pEventVanilla->m_Self = 0;
 	}
 
-	if(OnlyVanilla)
-		return;
-
-	CNetEvent_MmoDamage* pEventMmo = (CNetEvent_MmoDamage*)m_Events.Create(NETEVENTTYPE_MMODAMAGE, sizeof(CNetEvent_MmoDamage));
-	if(pEventMmo)
+	if(!OnlyVanilla)
 	{
-		pEventMmo->m_X = (int)Pos.x;
-		pEventMmo->m_Y = (int)Pos.y;
-		pEventMmo->m_Damage = Amount;
-		pEventMmo->m_CritDamage = CritDamage;
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "%d", Amount);
+		int TextEffectFlag = TEXTEFFECT_FLAG_DAMAGE;
+		if(CritDamage)
+			TextEffectFlag |= TEXTEFFECT_FLAG_CRIT_DAMAGE;
+
+		CreateTextEffect(Pos, aBuf, TextEffectFlag);
 	}
 }
 
@@ -304,15 +303,15 @@ void CGS::CreateEffect(vec2 Pos, int EffectID)
 	}
 }
 
-void CGS::CreatePotionEffect(vec2 Pos, const char *Potion, bool Added)
+void CGS::CreateTextEffect(vec2 Pos, const char* pText, int Added)
 {
-	CNetEvent_EffectPotion *pEvent = (CNetEvent_EffectPotion *)m_Events.Create(NETEVENTTYPE_EFFECTPOTION, sizeof(CNetEvent_EffectPotion));
+	CNetEvent_TextEffect *pEvent = (CNetEvent_TextEffect*)m_Events.Create(NETEVENTTYPE_TEXTEFFECT, sizeof(CNetEvent_TextEffect));
 	if(pEvent)
 	{
 		pEvent->m_X = (int)Pos.x;
 		pEvent->m_Y = (int)Pos.y;
-		pEvent->m_PotionAdded = Added;
-		StrToInts(pEvent->m_Potion, 4, Potion);
+		pEvent->m_Flag = Added;
+		StrToInts(pEvent->m_aText, 4, pText);
 	}
 }
 

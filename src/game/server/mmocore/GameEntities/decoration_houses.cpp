@@ -34,6 +34,7 @@ int CDecorationHouses::SwitchToObject(bool Data) const
 	case itDecoArmor: return (Data ? -1 : (int)PICKUP_ARMOR);
 	case itEliteDecoHealth: return (Data ? (int)WEAPON_SHOTGUN : (int)PICKUP_HEALTH);
 	case itEliteDecoNinja: return (Data ? -1 : (int)PICKUP_NINJA);
+	default: break;
 	}
 	return -1;
 }
@@ -55,7 +56,7 @@ void CDecorationHouses::Snap(int SnappingClient)
 		return;
 	}
 
-	float AngleStart = (2.0f * pi * Server()->Tick() / static_cast<float>(Server()->TickSpeed())) / 10.0f;
+	float AngleStart = (2.0f * pi * (float)Server()->Tick() / (float)Server()->TickSpeed()) / 10.0f;
 	float AngleStep = 2.0f * pi / BODY;
 	float Radius = 30.0f;
 	for (int i = 0; i < BODY; i++)

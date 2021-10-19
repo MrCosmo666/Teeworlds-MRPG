@@ -27,8 +27,7 @@ public:
 
 	// mmotee
 	void MmoEffects(vec2 Pos, int EffectID);
-	void MmoEffectPotion(vec2 Pos, const char* Potion, bool Added);
-	void DamageMmoInd(vec2 Pos, int DamageCount, bool CritDamage = false);
+	void MmoTextEffect(vec2 Pos, const char* pText, int Flag);
 	void EnchantEffect(vec2 Pos, vec2 Vel, vec4 Color, float RandomSize = 0.0f);
 	//void BubbleEffect(vec2 Pos, vec2 Vel);
 
