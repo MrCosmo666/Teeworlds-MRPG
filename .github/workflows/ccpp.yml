@@ -62,10 +62,6 @@ jobs:
         ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target package_default
         mkdir artifacts
         mv ${{ matrix.package-file }} artifacts
-    - name: Purge Artifacts
-      uses: kolpav/purge-artifacts-action@v1
-      with:
-        expire-in: 0
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2-preview
       with:
