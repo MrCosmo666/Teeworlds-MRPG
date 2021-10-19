@@ -28,7 +28,6 @@ CCommandProcessor::CCommandProcessor(CGS *pGS)
 	AddCommand("cmdlist", "", ConChatCmdList, pServer, "");
 	AddCommand("help", "", ConChatCmdList, pServer, "");
 	AddCommand("rules", "", ConChatRules, pServer, "");
-	AddCommand("rules", "", ConChatRules, pServer, "");
 	AddCommand("voucher", "r[voucher]", ConChatVoucher, pServer, "");
 	AddCommand("coupon", "r[coupon]", ConChatVoucher, pServer, "");
 #ifdef CONF_DISCORD
