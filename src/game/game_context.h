@@ -242,6 +242,7 @@ enum
 	itModePVP = 39,						// PVP mode setting
 	itTicketResetWeaponStats = 40,		// Ticket to reset the statistics cartridge upgrade
 	itTicketDiscountCraft = 43,			// Discount ticket for crafting
+	itRandomHomeDecoration = 51,		// Random home decor
 
 	// all sorting sheets that exist on the server
 	SORT_INVENTORY = 0,
