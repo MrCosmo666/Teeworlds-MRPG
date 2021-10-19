@@ -81,7 +81,18 @@ Connection* CConectionPool::CreateConnection()
 	{
 		try
 		{
-			pConnection = m_pDriver->connect(g_Config.m_SvMySqlHost, g_Config.m_SvMySqlLogin, g_Config.m_SvMySqlPassword);
+			// Code from InfClass
+			sql::ConnectOptionsMap connection_properties;
+			connection_properties["hostName"] = sql::SQLString(g_Config.m_SvMySqlHost);
+			connection_properties["port"] = g_Config.m_SvMySqlPort;
+			connection_properties["userName"] = sql::SQLString(g_Config.m_SvMySqlLogin);
+			connection_properties["password"] = sql::SQLString(g_Config.m_SvMySqlPassword);
+			connection_properties["OPT_CONNECT_TIMEOUT"] = 10;
+			connection_properties["OPT_READ_TIMEOUT"] = 10;
+			connection_properties["OPT_WRITE_TIMEOUT"] = 20;
+			connection_properties["OPT_RECONNECT"] = true;
+
+			pConnection = m_pDriver->connect(connection_properties);
 			pConnection->setClientOption("OPT_CHARSET_NAME", "utf8mb4");
 			pConnection->setSchema(g_Config.m_SvMySqlDatabase);
 		}
