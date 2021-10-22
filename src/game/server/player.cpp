@@ -767,15 +767,15 @@ void CPlayer::ClearTalking()
 // - - - - - - F O R M A T - - - - - T E X T - - - - - - - - -
 const char *CPlayer::GetDialogText() const
 {
-	return GS()->Server()->Localization()->Localize(GetLanguage(), m_aFormatDialogText);
+	return m_aFormatDialogText;
 }
 
-void CPlayer::FormatDialogText(int DataBotID, const char *pText)
+void CPlayer::FormatDialogText(int DataBotID, const char *pText) // TODO: perform profiling and debugging to check the performance
 {
 	if(!DataBotInfo::IsDataBotValid(DataBotID) || m_aFormatDialogText[0] != '\0')
 		return;
 
-	str_copy(m_aFormatDialogText, pText, sizeof(m_aFormatDialogText));
+	str_copy(m_aFormatDialogText, GS()->Server()->Localization()->Localize(GetLanguage(), pText), sizeof(m_aFormatDialogText));
 
 	// arrays replacing dialogs
 	const char* pBot = str_find_nocase(m_aFormatDialogText, "[Bot_");
