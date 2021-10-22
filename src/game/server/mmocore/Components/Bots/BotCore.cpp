@@ -5,6 +5,8 @@
 #include <game/server/gamecontext.h>
 
 #include <game/server/mmocore/Components/Quests/QuestCore.h>
+
+#include <teeother/components/localization.h>
 #include <teeother/tl/nlohmann_json.h>
 
 // loading of all skins and mobs to use for connection with other bots
@@ -384,7 +386,7 @@ const char* CBotCore::GetMeaninglessDialog()
 {
 	const char* pTalking[3] =
 	{
-		"[Player], do you have any questions? I'm sorry I can't help you.",
+		"[Player], do you have any questions? I'm sorry, can't help you.",
 		"What a beautiful [Time]. I don't have anything for you [Player].",
 		"[Player] are you interested something? I'm sorry, don't want to talk right now."
 	};
@@ -420,4 +422,55 @@ void CBotCore::ConAddCharacterBot(int ClientID, const char* pCharacter)
 	// add a new bot
 	SJK.ID("tw_bots_info", "(Name, SkinName, SkinColor) VALUES ('%s', '%s', '%s')", cNick.cstr(), SkinPart, SkinColor);
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "parseskin", "Added new character bot!");
+}
+
+// dump dialogs for translate | TODO: add hashing by id dialog
+void CBotCore::ConDumpDialogsForTranslate()
+{
+	auto PushingDialogs = [](nlohmann::json& pJson, std::vector<DialogData>& pDialogVector)
+	{
+		for(auto& pDialog : pDialogVector)
+		{
+			for(auto& pKeys : pJson["translation"])
+			{
+				if(pKeys["key"] == pDialog.m_aText)
+					return;
+			}
+			pJson["translation"].push_back({ { "key", pDialog.m_aText }, { "value", pDialog.m_aText } });
+		}
+	};
+
+	char aDirLanguageFile[256];
+	for(int i = 0; i < GS()->Server()->Localization()->m_pLanguages.size(); i++)
+	{
+		str_format(aDirLanguageFile, sizeof(aDirLanguageFile), "server_lang/%s.json", GS()->Server()->Localization()->m_pLanguages[i]->GetFilename());
+		IOHANDLE File = io_open(aDirLanguageFile, IOFLAG_READ);
+		if(!File)
+			continue;
+
+		const int FileSize = (int)io_length(File) + 1;
+		char* pFileData = (char*)malloc(FileSize);
+		mem_zero(pFileData, FileSize);
+		io_read(File, pFileData, FileSize);
+
+		// close and clear
+		nlohmann::json JsonData = nlohmann::json::parse(pFileData);
+		mem_free(pFileData);
+		io_close(File);
+
+		for(auto& pItem : QuestBotInfo::ms_aQuestBot)
+			PushingDialogs(JsonData, pItem.second.m_aDialog);
+		for(auto& pItem : NpcBotInfo::ms_aNpcBot)
+			PushingDialogs(JsonData, pItem.second.m_aDialog);
+
+		// save file
+		File = io_open(aDirLanguageFile, IOFLAG_WRITE);
+		if(!File)
+			continue;
+
+		std::string Data = JsonData.dump(4);
+		io_write(File, Data.c_str(), Data.length());
+		io_close(File);
+	}
+	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "dump_dialogs", "Completed successfully!");
 }
