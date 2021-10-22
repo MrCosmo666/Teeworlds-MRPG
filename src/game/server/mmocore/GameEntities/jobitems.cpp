@@ -60,9 +60,9 @@ void CJobItems::Work(int ClientID)
 	}
 
 	CItemData& pWorkedItem = pPlayer->GetItem(m_ItemID);
-	if(m_Type == 1)
+	if(m_Type == JOB_ITEM_MINING)
 		MiningWork(ClientID, pPlayer, pWorkedItem);
-	else if(m_Type == 2)
+	else if(m_Type == JOB_ITEM_FARMING)
 		FarmingWork(ClientID, pPlayer, pWorkedItem);
 }
 
@@ -134,8 +134,8 @@ int CJobItems::SwitchToObject(bool MmoItem) const
 	switch(m_Type)
 	{
 		default:
-		case 0/*plants*/: return (MmoItem ? (int)MMO_PICKUP_PLANT : (int)PICKUP_HEALTH);
-		case 1/*miner*/: return (MmoItem ? (int)MMO_PICKUP_ORE : (int)PICKUP_ARMOR);
+		case JOB_ITEM_FARMING: return (MmoItem ? (int)MMO_PICKUP_PLANT : (int)PICKUP_HEALTH);
+		case JOB_ITEM_MINING: return (MmoItem ? (int)MMO_PICKUP_ORE : (int)PICKUP_ARMOR);
 	}
 }
 

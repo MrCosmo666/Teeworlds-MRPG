@@ -11,6 +11,12 @@ const int PickupPhysSize = 14;
 class CJobItems : public CEntity
 {
 public:
+	enum
+	{
+		JOB_ITEM_FARMING = 0,
+		JOB_ITEM_MINING = 1
+	};
+
 	CJobItems(CGameWorld *pGameWorld, int ItemID, int Level, vec2 Pos, int Type, int Health, int HouseID = -1);
 
 	void Reset() override;
