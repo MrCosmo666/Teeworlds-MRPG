@@ -61,13 +61,13 @@ bool CGameControllerMain::OnEntity(int Index, vec2 Pos)
 		const int PlantsID = GS()->Mmo()->House()->GetPlantsID(HouseID);
 		if(HouseID > 0 && PlantsID > 0)
 		{
-			new CJobItems(&GS()->m_World, PlantsID, 1, Pos, 0, 100, HouseID);
+			new CJobItems(&GS()->m_World, PlantsID, 1, Pos, CJobItems::JOB_ITEM_FARMING, 100, HouseID);
 			return true;
 		}
 
 		const int ItemID = GS()->Mmo()->PlantsAcc()->GetPlantItemID(Pos), Level = GS()->Mmo()->PlantsAcc()->GetPlantLevel(Pos);
 		if(ItemID > 0)
-			new CJobItems(&GS()->m_World, ItemID, Level, Pos, 0, 100);
+			new CJobItems(&GS()->m_World, ItemID, Level, Pos, CJobItems::JOB_ITEM_FARMING, 100);
 
 		return true;
 	}
@@ -78,7 +78,7 @@ bool CGameControllerMain::OnEntity(int Index, vec2 Pos)
 		if(ItemID > 0)
 		{
 			const int Health = GS()->Mmo()->MinerAcc()->GetOreHealth(Pos);
-			new CJobItems(&GS()->m_World, ItemID, Level, Pos, 1, Health);
+			new CJobItems(&GS()->m_World, ItemID, Level, Pos, CJobItems::JOB_ITEM_MINING, Health);
 		}
 
 		return true;
