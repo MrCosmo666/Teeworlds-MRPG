@@ -248,7 +248,6 @@ public:
 private:
 	void SendDayInfo(int ClientID);
 
-
 public:
 	void ChangeEquipSkin(int ClientID, int ItemID);
 
