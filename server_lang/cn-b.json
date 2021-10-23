@@ -10,7 +10,7 @@
 	},
 	{
 		"key": "Level {INT} : Exp {INT}/{INT}",
-	3	"value": "等级：{INT} :: 经验值：{INT}/{INT}"
+		"value": "等级：{INT} :: 经验值：{INT}/{INT}"
 	},
 	{
 		"key": "Skill Point {INT}SP",
@@ -130,7 +130,7 @@
 	},
 	{
 		"key": "Here you can see chance loot, mobs, on YOUR ZONE.",
-		"value": "在这里你可以看到怪物信息以及可能掉落的战利品（当前区域）
+		"value": "在这里你可以看到怪物信息以及可能掉落的战利品（当前区域）"
 	},
 	{
 		"key": "There are no active mobs in your zone!",
