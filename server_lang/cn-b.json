@@ -655,6 +655,7 @@
 	{
 		"key": "[Player] are you interested something? I'm sorry, don't want to talk right now.",
 		"value": "[Player] 你是对什么东西很好奇吗？我很抱歉，我现在不想谈话"
+	},
         {
             "key": "I'm so happy! They won't let me in because of the problems that are happening. Dead men kidnap girls, and then they find them dead.",
             "value": "太好了，他们不让我过去因为最近发生的事.死神绑架了她们，她们后来都被发现已经死了"
