@@ -4,6 +4,7 @@
 
 #include <game/server/gamecontext.h>
 #include <teeother/system/string.h>
+#include <teeother/components/localization.h>
 
 #include <game/server/mmocore/GameEntities/quest_path_finder.h>
 #include <game/server/mmocore/GameEntities/Items/drop_quest_items.h>
@@ -151,7 +152,7 @@ void CPlayerQuestStepDataInfo::DoCollectItem(CPlayer* pPlayer)
 		const int Value = m_Bot->m_aItemSearchValue[i];
 		if(ItemID > 0 && Value > 0)
 		{
-			pGS->Chat(pPlayer->GetCID(), "[Done] Give the {STR}x{INT} to the {STR}!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer), Value, m_Bot->GetName());
+			pGS->Chat(pPlayer->GetCID(), "[Done] Give the {STR}x{INT} to the {STR}!", pPlayer->GetItem(ItemID).Info().GetName(), Value, m_Bot->GetName());
 			antiStressing = (bool)(ItemID == m_Bot->m_aItemGives[0] || ItemID == m_Bot->m_aItemGives[1]);
 			pPlayer->GetItem(ItemID).Remove(Value);
 		}
@@ -246,7 +247,6 @@ void CPlayerQuestStepDataInfo::ShowRequired(CPlayer* pPlayer, const char* TextTa
 	const int ClientID = pPlayer->GetCID();
 	if(pGS->IsMmoClient(ClientID))
 	{
-		char aBuf[64];
 		dynamic_string Buffer;
 
 		// search item's
@@ -257,9 +257,9 @@ void CPlayerQuestStepDataInfo::ShowRequired(CPlayer* pPlayer, const char* TextTa
 			if(ItemID <= 0 || ValueItem <= 0)
 				continue;
 
-			str_format(aBuf, sizeof(aBuf), "%s", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
-			Buffer.append_at(Buffer.length(), aBuf);
-			pGS->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, ValueItem, ItemID, false);
+			pGS->Server()->Localization()->Format(Buffer, pPlayer->GetLanguage(), "{STR}", pPlayer->GetItem(ItemID).Info().GetName());
+			pGS->Mmo()->Quest()->QuestTableAddItem(ClientID, Buffer.buffer(), ValueItem, ItemID, false);
+			Buffer.clear();
 		}
 
 		// search mob's
@@ -270,8 +270,9 @@ void CPlayerQuestStepDataInfo::ShowRequired(CPlayer* pPlayer, const char* TextTa
 			if (BotID <= 0 || ValueMob <= 0 || DataBotInfo::ms_aDataBot.find(BotID) == DataBotInfo::ms_aDataBot.end())
 				continue;
 
-			str_format(aBuf, sizeof(aBuf), "Defeat %s", DataBotInfo::ms_aDataBot[BotID].m_aNameBot);
-			pGS->Mmo()->Quest()->QuestTableAddInfo(ClientID, aBuf, ValueMob, m_MobProgress[i]);
+			pGS->Server()->Localization()->Format(Buffer, pPlayer->GetLanguage(), "Defeat {STR}", DataBotInfo::ms_aDataBot[BotID].m_aNameBot);
+			pGS->Mmo()->Quest()->QuestTableAddInfo(ClientID, Buffer.buffer(), ValueMob, m_MobProgress[i]);
+			Buffer.clear();
 		}
 
 		// reward item's
@@ -282,8 +283,9 @@ void CPlayerQuestStepDataInfo::ShowRequired(CPlayer* pPlayer, const char* TextTa
 			if (ItemID <= 0 || ValueItem <= 0)
 				continue;
 
-			str_format(aBuf, sizeof(aBuf), "Receive %s", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
-			pGS->Mmo()->Quest()->QuestTableAddItem(ClientID, aBuf, ValueItem, ItemID, true);
+			pGS->Server()->Localization()->Format(Buffer, pPlayer->GetLanguage(), "Receive {STR}", pPlayer->GetItem(ItemID).Info().GetName());
+			pGS->Mmo()->Quest()->QuestTableAddItem(ClientID, Buffer.buffer(), ValueItem, ItemID, true);
+			Buffer.clear();
 		}
 		return;
 	}
@@ -299,8 +301,8 @@ void CPlayerQuestStepDataInfo::ShowRequired(CPlayer* pPlayer, const char* TextTa
 		const int ValueMob = m_Bot->m_aNeedMobValue[i];
 		if(BotID > 0 && ValueMob > 0 && DataBotInfo::ms_aDataBot.find(BotID) != DataBotInfo::ms_aDataBot.end())
 		{
-			str_format(aBuf, sizeof(aBuf), "\n- Defeat %s [%d/%d]", DataBotInfo::ms_aDataBot[BotID].m_aNameBot, m_MobProgress[i], ValueMob);
-			Buffer.append_at(Buffer.length(), aBuf);
+			Buffer.append_at(Buffer.length(), "\n");
+			pGS->Server()->Localization()->Format(Buffer, pPlayer->GetLanguage(), "- Defeat {STR} [{INT}/{INT}]", DataBotInfo::ms_aDataBot[BotID].m_aNameBot, m_MobProgress[i], ValueMob);
 			IsActiveTask = true;
 		}
 
@@ -309,8 +311,8 @@ void CPlayerQuestStepDataInfo::ShowRequired(CPlayer* pPlayer, const char* TextTa
 		if(ItemID > 0 && ValueItem > 0)
 		{
 			CItemData PlayerQuestItem = pPlayer->GetItem(ItemID);
-			str_format(aBuf, sizeof(aBuf), "\n- Need %s [%d/%d]", PlayerQuestItem.Info().GetName(pPlayer), PlayerQuestItem.m_Value, ValueItem);
-			Buffer.append_at(Buffer.length(), aBuf);
+			Buffer.append_at(Buffer.length(), "\n");
+			pGS->Server()->Localization()->Format(Buffer, pPlayer->GetLanguage(), "- Need {STR} [{INT}/{INT}]", PlayerQuestItem.Info().GetName(), PlayerQuestItem.m_Value, ValueItem);
 			IsActiveTask = true;
 		}
 	}
@@ -322,8 +324,8 @@ void CPlayerQuestStepDataInfo::ShowRequired(CPlayer* pPlayer, const char* TextTa
 		const int ValueItem = m_Bot->m_aItemGivesValue[i];
 		if(ItemID > 0 && ValueItem > 0)
 		{
-			str_format(aBuf, sizeof(aBuf), "\n- Receive %s [%d]", pPlayer->GetItem(ItemID).Info().GetName(pPlayer), ValueItem);
-			Buffer.append_at(Buffer.length(), aBuf);
+			Buffer.append_at(Buffer.length(), "\n");
+			pGS->Server()->Localization()->Format(Buffer, pPlayer->GetLanguage(), "- Receive {STR} [{INT}]", pPlayer->GetItem(ItemID).Info().GetName(), ValueItem);
 		}
 	}
 

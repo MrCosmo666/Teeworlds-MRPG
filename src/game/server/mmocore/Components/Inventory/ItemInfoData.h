@@ -14,9 +14,9 @@ class CItemDataInfo : public CItemDataInformation
 {
 public:
 	// main functions
-	const char* GetName(class CPlayer* pPlayer = nullptr) const;
-	const char* GetDesc(class CPlayer* pPlayer = nullptr) const;
-	const char* GetIcon() const { return m_aIcon; };
+	const char* GetName() const { return m_aName; }
+	const char* GetDesc() const { return m_aDesc; }
+	const char* GetIcon() const { return m_aIcon; }
 
 	// equip modules types functions
 	int GetInfoEnchantStats(int AttributeID) const;

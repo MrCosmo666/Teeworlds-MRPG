@@ -22,7 +22,7 @@ bool CRandomBox::Start(CPlayer *pPlayer, int Seconds, CItemData* pPlayerUsesItem
 		pPlayer->m_aPlayerTick[LastRandomBox] = pPlayer->GS()->Server()->Tick() + Seconds;
 		std::sort(m_ArrayItems.begin(), m_ArrayItems.end(), [](const StructRandomItem& pLeft, const StructRandomItem& pRight) { return pLeft.m_Chance < pRight.m_Chance; });
 		new CRandomBoxRandomizer(&pPlayer->GS()->m_World, pPlayer, pPlayer->Acc().m_UserID, Seconds, m_ArrayItems, pPlayerUsesItem, UseValue);
-		pPlayer->GS()->Chat(pPlayer->GetCID(), "You used '{STR}x{INT}'!", pPlayerUsesItem->Info().GetName(pPlayer), UseValue);
+		pPlayer->GS()->Chat(pPlayer->GetCID(), "You used '{STR}x{INT}'!", pPlayerUsesItem->Info().GetName(), UseValue);
 	}
 	return true;
 };

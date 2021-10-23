@@ -169,7 +169,7 @@ bool CInventoryCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 
 			char aAttributes[128];
 			pItemPlayer.FormatAttributes(aAttributes, sizeof(aAttributes));
-			GS()->AVMI(ClientID, pItemPlayer.Info().GetIcon(), "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], pItemPlayer.Info().GetName(pPlayer), aAttributes);
+			GS()->AVMI(ClientID, pItemPlayer.Info().GetIcon(), "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], pItemPlayer.Info().GetName(), aAttributes);
 		}
 		GS()->AV(ClientID, "null");
 
@@ -214,7 +214,7 @@ bool CInventoryCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, con
 		CItemData& pItemPlayer = pPlayer->GetItem(VoteID);
 		pItemPlayer.Drop(Get);
 
-		GS()->Broadcast(ClientID, BroadcastPriority::GAME_INFORMATION, 100, "You drop {STR}x{INT}", pItemPlayer.Info().GetName(pPlayer), Get);
+		GS()->Broadcast(ClientID, BroadcastPriority::GAME_INFORMATION, 100, "You drop {STR}x{INT}", pItemPlayer.Info().GetName(), Get);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
 	}
@@ -244,7 +244,7 @@ bool CInventoryCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, con
 		if(pPlayerSelectedItem.Remove(Get) && pPlayerMaterialItem.Add(DesValue))
 		{
 			GS()->Chat(ClientID, "Disassemble {STR}x{INT}, you receive {INT} {STR}(s)",
-				pPlayerSelectedItem.Info().GetName(pPlayer), Get, DesValue, pPlayerMaterialItem.Info().GetName(pPlayer));
+				pPlayerSelectedItem.Info().GetName(), Get, DesValue, pPlayerMaterialItem.Info().GetName());
 			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		}
 		return true;
@@ -404,8 +404,8 @@ int CInventoryCore::GetUnfrozenItemValue(CPlayer *pPlayer, int ItemID) const
 	const int AvailableValue = Job()->Quest()->GetUnfrozenItemValue(pPlayer, ItemID);
 	if(AvailableValue <= 0 && pPlayer->GetItem(ItemID).m_Value >= 1)
 	{
-		GS()->Chat(pPlayer->GetCID(), "\"{STR}\" frozen for some quest.", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
-		GS()->Chat(pPlayer->GetCID(), "In the \"Adventure Journal\", you can see in which quest an item is used!", pPlayer->GetItem(ItemID).Info().GetName(pPlayer));
+		GS()->Chat(pPlayer->GetCID(), "\"{STR}\" frozen for some quest.", pPlayer->GetItem(ItemID).Info().GetName());
+		GS()->Chat(pPlayer->GetCID(), "In the \"Adventure Journal\", you can see in which quest an item is used!", pPlayer->GetItem(ItemID).Info().GetName());
 	}
 	return AvailableValue;
 }
@@ -415,7 +415,7 @@ void CInventoryCore::ItemSelected(CPlayer* pPlayer, const CItemData& pItemPlayer
 	const int ClientID = pPlayer->GetCID();
 	const int ItemID = pItemPlayer.GetID();
 	const int HideID = NUM_TAB_MENU + ItemID;
-	const char* pNameItem = pItemPlayer.Info().GetName(pPlayer);
+	const char* pNameItem = pItemPlayer.Info().GetName();
 
 	// overwritten or not
 	if (pItemPlayer.Info().IsEnchantable())
@@ -424,7 +424,7 @@ void CInventoryCore::ItemSelected(CPlayer* pPlayer, const CItemData& pItemPlayer
 		pItemPlayer.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf));
 		GS()->AVHI(ClientID, pItemPlayer.Info().GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR} {STR}{STR}",
 			pNameItem, (pItemPlayer.m_Enchant > 0 ? aEnchantBuf : "\0"), (pItemPlayer.m_Settings ? " ✔" : "\0"));
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pItemPlayer.Info().GetDesc(pPlayer));
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pItemPlayer.Info().GetDesc());
 
 		char aAttributes[64];
 		pItemPlayer.FormatAttributes(aAttributes, sizeof(aAttributes));
@@ -434,7 +434,7 @@ void CInventoryCore::ItemSelected(CPlayer* pPlayer, const CItemData& pItemPlayer
 	{
 		GS()->AVHI(ClientID, pItemPlayer.Info().GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} x{INT}",
 			(pItemPlayer.m_Settings ? "Dressed - " : "\0"), pNameItem, pItemPlayer.m_Value);
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pItemPlayer.Info().GetDesc(pPlayer));
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pItemPlayer.Info().GetDesc());
 	}
 
 	if (pItemPlayer.Info().m_Function == FUNCTION_ONE_USED || pItemPlayer.Info().m_Function == FUNCTION_USED)

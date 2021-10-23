@@ -257,7 +257,7 @@ bool CAccountCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 		{
 			const CItemData ItemData = it.second;
 			if (ItemData.Info().m_Type == ItemType::TYPE_SETTINGS && ItemData.m_Value > 0)
-				GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.m_Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
+				GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.m_Settings ? "Enable" : "Disable"), ItemData.Info().GetName());
 		}
 
 		// equipment modules
@@ -272,7 +272,7 @@ bool CAccountCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 				char aAttributes[128];
 				ItemData.FormatAttributes(aAttributes, sizeof(aAttributes));
 				GS()->AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, TAB_SETTINGS_MODULES, "{STR} {STR}{STR}",
-					ItemData.Info().GetName(pPlayer), aAttributes, (ItemData.m_Settings ? "✔" : "\0"));
+					ItemData.Info().GetName(), aAttributes, (ItemData.m_Settings ? "✔" : "\0"));
 				IsFoundModules = true;
 			}
 		}

@@ -98,7 +98,7 @@ bool CShopCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMen
 
 		GS()->AVM(ClientID, "AUCTIONCOUNT", ItemID, NOPE, "Item Value: {INT}", SlotValue);
 		GS()->AVM(ClientID, "AUCTIONPRICE", ItemID, NOPE, "Item Price: {INT}", SlotPrice);
-		GS()->AVM(ClientID, "AUCTIONACCEPT", ItemID, NOPE, "Add {STR}x{INT} {INT}gold", pInformationSellItem.GetName(pPlayer), SlotValue, SlotPrice);
+		GS()->AVM(ClientID, "AUCTIONACCEPT", ItemID, NOPE, "Add {STR}x{INT} {INT}gold", pInformationSellItem.GetName(), SlotValue, SlotPrice);
 		GS()->AddVotesBackpage(ClientID);
 		return true;
 	}
@@ -212,7 +212,7 @@ void CShopCore::CreateAuctionSlot(CPlayer* pPlayer, CAuctionItem& pAuctionItem)
 
 		const int AvailableSlot = (g_Config.m_SvMaxAuctionSlots - ValueSlot) - 1;
 		GS()->Chat(-1, "{STR} created a slot [{STR}x{INT}] auction.",
-			Server()->ClientName(ClientID), pPlayerAuctionItem.Info().GetName(pPlayer), pAuctionItem.m_Value);
+			Server()->ClientName(ClientID), pPlayerAuctionItem.Info().GetName(), pAuctionItem.m_Value);
 		GS()->ChatFollow(ClientID, "Still available {INT} slots!", AvailableSlot);
 	}
 }
@@ -271,11 +271,11 @@ bool CShopCore::BuyShopItem(CPlayer* pPlayer, int ID)
 			return false;
 
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "Your [Slot %sx%d] was sold!", pPlayerBuyightItem.Info().GetName(pPlayer), Value);
+		str_format(aBuf, sizeof(aBuf), "Your [Slot %sx%d] was sold!", pPlayerBuyightItem.Info().GetName(), Value);
 		GS()->SendInbox("Auctionist", UserID, "Auction Sell", aBuf, itGold, Price, 0);
 		SJK.DD("tw_store_items", "WHERE ItemID = '%d' AND UserID = '%d'", ItemID, UserID);
 		pPlayerBuyightItem.Add(Value, 0, Enchant);
-		GS()->Chat(ClientID, "You buy {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(pPlayer), Value);
+		GS()->Chat(ClientID, "You buy {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(), Value);
 		return true;
 	}
 
@@ -285,7 +285,7 @@ bool CShopCore::BuyShopItem(CPlayer* pPlayer, int ID)
 		return false;
 
 	pPlayerBuyightItem.Add(Value, 0, Enchant);
-	GS()->Chat(ClientID, "You exchange {STR}x{INT} to {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(pPlayer), Value, GS()->GetItemInfo(RequiredItemID).GetName(pPlayer), Price);
+	GS()->Chat(ClientID, "You exchange {STR}x{INT} to {STR}x{INT}.", pPlayerBuyightItem.Info().GetName(), Value, GS()->GetItemInfo(RequiredItemID).GetName(), Price);
 	return true;
 }
 
@@ -316,7 +316,7 @@ void CShopCore::ShowAuction(CPlayer* pPlayer)
 			char aEnchantBuf[16];
 			pBuyightItem.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf), Enchant);
 			GS()->AVHI(ClientID, pBuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} {STR} - {INT} gold",
-				(pPlayer->GetItem(ItemID).m_Value > 0 ? "✔ " : "\0"), pBuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), Price);
+				(pPlayer->GetItem(ItemID).m_Value > 0 ? "✔ " : "\0"), pBuyightItem.GetName(), (Enchant > 0 ? aEnchantBuf : "\0"), Price);
 
 			char aAttributes[128];
 			pBuyightItem.FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
@@ -325,10 +325,10 @@ void CShopCore::ShowAuction(CPlayer* pPlayer)
 		else
 		{
 			GS()->AVHI(ClientID, pBuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) - {INT} gold",
-				pBuyightItem.GetName(pPlayer), ItemValue, pPlayer->GetItem(ItemID).m_Value, Price);
+				pBuyightItem.GetName(), ItemValue, pPlayer->GetItem(ItemID).m_Value, Price);
 		}
 
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pBuyightItem.GetDesc(pPlayer));
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pBuyightItem.GetDesc());
 		GS()->AVM(ClientID, "null", NOPE, HideID, "Seller {STR}", Job()->PlayerName(UserID));
 		GS()->AVM(ClientID, "SHOP", ID, HideID, "Buy Price {INT} gold", Price);
 		FoundItems = true;
@@ -361,7 +361,7 @@ void CShopCore::ShowMailShop(CPlayer *pPlayer, int StorageID)
 			char aEnchantBuf[16];
 			pBuyightItem.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf), Enchant);
 			GS()->AVHI(ClientID, pBuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} {STR} - {INT} {STR}",
-				(pPlayer->GetItem(ItemID).m_Value > 0 ? "✔ " : "\0"), pBuyightItem.GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), Price, pRequiredItem.GetName(pPlayer));
+				(pPlayer->GetItem(ItemID).m_Value > 0 ? "✔ " : "\0"), pBuyightItem.GetName(), (Enchant > 0 ? aEnchantBuf : "\0"), Price, pRequiredItem.GetName());
 
 			char aAttributes[128];
 			pBuyightItem.FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
@@ -370,11 +370,11 @@ void CShopCore::ShowMailShop(CPlayer *pPlayer, int StorageID)
 		else
 		{
 			GS()->AVHI(ClientID, pBuyightItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) - {INT} {STR}",
-				pBuyightItem.GetName(pPlayer), ItemValue, pPlayer->GetItem(ItemID).m_Value, Price, pRequiredItem.GetName(pPlayer));
+				pBuyightItem.GetName(), ItemValue, pPlayer->GetItem(ItemID).m_Value, Price, pRequiredItem.GetName());
 		}
 
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pBuyightItem.GetDesc(pPlayer));
-		GS()->AVM(ClientID, "SHOP", ID, HideID, "Exchange {STR}x{INT} to {STR}x{INT}", pRequiredItem.GetName(pPlayer), Price, pBuyightItem.GetName(pPlayer), ItemValue);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pBuyightItem.GetDesc());
+		GS()->AVM(ClientID, "SHOP", ID, HideID, "Exchange {STR}x{INT} to {STR}x{INT}", pRequiredItem.GetName(), Price, pBuyightItem.GetName(), ItemValue);
 		HideID++;
 	}
 	GS()->AV(ClientID, "null");

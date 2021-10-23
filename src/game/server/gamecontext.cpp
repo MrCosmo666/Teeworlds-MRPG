@@ -2079,8 +2079,8 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 				const float Chance = mobs.second.m_aRandomItem[i];
 				CItemDataInfo &InfoDropItem = GetItemInfo(mobs.second.m_aDropItem[i]);
-				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%(+%0.2f%%)", InfoDropItem.GetName(pPlayer), mobs.second.m_aValueItem[i], Chance, AddedChanceDrop);
-				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, "{STR}", aBuf);
+				str_format(aBuf, sizeof(aBuf), "x%d - chance to loot %0.2f%%(+%0.2f%%)", mobs.second.m_aValueItem[i], Chance, AddedChanceDrop);
+				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, "{STR}{STR}", InfoDropItem.GetName(), aBuf);
 				FoundedBots = true;
 			}
 		}

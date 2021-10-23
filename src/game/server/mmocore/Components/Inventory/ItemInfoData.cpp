@@ -6,19 +6,6 @@
 #include <teeother/components/localization.h>
 
 std::map < int, CItemDataInfo > CItemDataInfo::ms_aItemsInfo;
-const char* CItemDataInfo::GetName(CPlayer* pPlayer) const
-{
-	if(!pPlayer)
-		return m_aName;
-	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), m_aName);
-}
-
-const char* CItemDataInfo::GetDesc(CPlayer* pPlayer) const
-{
-	if(!pPlayer)
-		return m_aDesc;
-	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), m_aDesc);
-}
 
 int CItemDataInfo::GetInfoEnchantStats(int AttributeID) const
 {

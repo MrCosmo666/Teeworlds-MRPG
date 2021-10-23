@@ -220,7 +220,7 @@ void QuestCore::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 			{
 				CItemData PlayerItem = pPlayer->GetItem(NeedItemID);
 				int ClapmItem = clamp(PlayerItem.m_Value, 0, NeedValue);
-				GS()->AVMI(ClientID, PlayerItem.Info().GetIcon(), "null", NOPE, HideID, "- Item {STR} [{INT}/{INT}]", PlayerItem.Info().GetName(pPlayer), ClapmItem, NeedValue);
+				GS()->AVMI(ClientID, PlayerItem.Info().GetIcon(), "null", NOPE, HideID, "- Item {STR} [{INT}/{INT}]", PlayerItem.Info().GetName(), ClapmItem, NeedValue);
 				NeedOnlyTalk = false;
 			}
 		}
@@ -233,7 +233,7 @@ void QuestCore::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 			if(RewardItemID > 0 && RewardValue > 0)
 			{
 				CItemDataInfo &RewardItem = GS()->GetItemInfo(RewardItemID);
-				GS()->AVMI(ClientID, RewardItem.GetIcon(), "null", NOPE, HideID, "- Receive {STR}x{INT}", RewardItem.GetName(pPlayer), RewardValue);
+				GS()->AVMI(ClientID, RewardItem.GetIcon(), "null", NOPE, HideID, "- Receive {STR}x{INT}", RewardItem.GetName(), RewardValue);
 			}
 		}
 

@@ -367,7 +367,7 @@ bool CPlayer::SpendCurrency(int Price, int ItemID)
 	CItemData& pItemPlayer = GetItem(ItemID);
 	if(pItemPlayer.m_Value < Price)
 	{
-		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", Price, pItemPlayer.m_Value, pItemPlayer.Info().GetName(this));
+		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", Price, pItemPlayer.m_Value, pItemPlayer.Info().GetName());
 		return false;
 	}
 	return pItemPlayer.Remove(Price);
