@@ -130,7 +130,7 @@
 	},
 	{
 		"key": "Here you can see chance loot, mobs, on YOUR ZONE.",
-		"value": "在这里你可以看到怪物信息以及可能掉落的战利品（当前区域）"
+		"value": "在这里你可以看到怪物信息以及可能掉落的战利品（当前区域）
 	},
 	{
 		"key": "There are no active mobs in your zone!",
@@ -495,7 +495,7 @@
 	{
 		"key": "The voucher code '{STR}' does not exist.",
 		"value": "礼品盒 '{STR}' 不存在."
-	}
+	},
 	{
             "key": "Hello, I was sent to you by a carpenter to help you.",
             "value": "你好，我是木匠派来帮助你的"
@@ -518,7 +518,7 @@
         },
         {
             "key": "**He said hurriedly**: I don't know for sure. Over time, the residents will tell you everything, or you will feel for yourself what is happening there.",
-            "value": “**他急忙说**：我不确定。随着时间的推移，居民们会告诉你一切，或者你会自己察觉到那里发生了什么..."
+            "value": "**他急忙说**：我不确定。随着时间的推移，居民们会告诉你一切，或者你会自己察觉到那里发生了什么..."
         },
         {
             "key": "I didn't expect it to be this bad. Well, what can I help you with?",
@@ -538,7 +538,7 @@
         },
         {
             "key": "Great job! Your muscles won't hurt you anyway [Player] *laughter*",
-            "value": “干得漂亮”! 反正你不会肌肉拉伤 [Player] *大笑*"
+            "value": "干得漂亮”! 反正你不会肌肉拉伤 [Player] *大笑*"
         },
         {
             "key": "*laughter*",
@@ -666,8 +666,7 @@
         },
         {
            "key":"",
-           "value": "测试?....",
-            
+           "value": "测试?...."
         },
         {
             "key": "Yes the test [Player]. First, you will need to collect the minimum equipment. To apply and pay the fee. And only after that you will be assigned the position of adventurer.",
@@ -791,7 +790,7 @@
         },
         {
             "key": "In fact, she didn't want to come back, she was offended that you weren't spending time together. You can't rest.",
-            "value": “事实上，她不想回来，你没有花时间陪她，她很生气. 你不能休息."
+            "value": "事实上，她不想回来，你没有花时间陪她，她很生气. 你不能休息."
         },
         {
             "key": "Damn why didn't she ask for it herself? Okay, don't worry thanks for the work :) Everything will be fine, we will decide something with daughter",
@@ -823,7 +822,7 @@
         },
         {
             "key": "Each ore has its own strength. If you have a weak pick and the strength of the ore is high, it can take a long time to extract it. So don't forget about the improvements. Or craft even better picks.",
-            "value": “每一种矿物都有它自己的硬度。如果你的镐很逊，而矿物的硬度很高，那么挖取它可能需要很长时间，所以不要忘记改进，或者制作更好的镐。"
+            "value": "每一种矿物都有它自己的硬度。如果你的镐很逊，而矿物的硬度很高，那么挖取它可能需要很长时间，所以不要忘记改进，或者制作更好的镐。"
         },
         {
             "key": "Everything is clearly explained, I will not repeat it again, if you need you will understand everything!",
@@ -855,7 +854,7 @@
         },
         {
             "key": "Done. (you need to have an idea of how to craft items, you can see them near Craftsman in votes)",
-            "value": “结束. (你需要知道如何合成物品，在合成商人附近打开投票菜单即可)"
+            "value": "结束. (你需要知道如何合成物品，在合成商人附近打开投票菜单即可)"
         },
         {
             "key": "Well, it's not bad, so use it for the first time.",
@@ -875,7 +874,7 @@
         },
         {
             "key": "Well, you have to understand that we also have a lot of problems lately, too many monsters, problems with kidnappings.",
-            "value": “嗯，你必须明白，我们最近也有很多问题，太多的怪物，绑架的问题."
+            "value": "嗯，你必须明白，我们最近也有很多问题，太多的怪物，绑架的问题."
         },
         {
             "key": "Come on, show me [Here] seats!",
@@ -1075,7 +1074,7 @@
         },
         {
             "key": "I can't communicate with my brothers and sisters, since our paths have diverged, but we have a common mind.",
-            "value": “我无法与我的兄弟姐妹沟通，因为我们的道路不同，但我们有一个共同的想法。”
+            "value": "我无法与我的兄弟姐妹沟通，因为我们的道路不同，但我们有一个共同的想法。”
         },
         {
             "key": "I had a vision about a year ago that there would soon be a man who was as tenacious as the Apostles.",
@@ -1291,59 +1290,59 @@
         },
         {
             "key": "I have a request to you, if you meet other apostles, it is better to avoid them. Don't trust them, we apostles are not as pure as you think",
-            "value": "我有个请求。如果你遇见了别的使徒，最好避开他们。不要相信他们。我们使徒不像你想象的那么"
+            "value": "我有个请求。如果你遇见了别的使徒，最好避开他们。不要相信他们。我们使徒不像你想象的那么纯洁."
         },
         {
             "key": "Maybe you, too, then the enemy really is?",
-            "value": "Maybe you, too, then the enemy really is?"
+            "value": "也许你也一样，不过真正的敌人是谁?"
         },
         {
             "key": "I don't know *laughter*. The villagers I think will clearly tell you how it really is",
-            "value": "I don't know *laughter*. The villagers I think will clearly tell you how it really is"
+            "value": "我不知道 *大笑*.村民们会告诉你."
         },
         {
             "key": "Diana told me about you in General terms.",
-            "value": "Diana told me about you in General terms."
+            "value": "丹娜告诉我你一般的地位。"
         },
         {
             "key": "**She said it with concern**: You turn out to be a Joker, and a vulgar *laughter*",
-            "value": "**She said it with concern**: You turn out to be a Joker, and a vulgar *laughter*"
+            "value": "**她关切地说**: 原来你是一个爱开玩笑的粗俗的人 *大笑*"
         },
         {
             "key": "No [Talked]......",
-            "value": "No [Talked]......"
+            "value": "不是 [Talked]......"
         },
         {
             "key": "Always listen to your heart. I think one day you will be able to bring light. But the main thing is perseverance!",
-            "value": "Always listen to your heart. I think one day you will be able to bring light. But the main thing is perseverance!"
+            "value": "永远跟随你的心走。我认为总有一天你会有能力带来光亮和希望。但是最主要的是坚毅的精神和坚持!"
         },
         {
             "key": "Do not delay with your title of adventurer. You can go now!",
-            "value": "Do not delay with your title of adventurer. You can go now!"
+            "value": "不要为了你冒险家的头衔而停留，你可以现在就走了!"
         },
         {
             "key": "I'm trying, thank you very much.",
-            "value": "I'm trying, thank you very much."
+            "value": "我在尝试，非常感谢你."
         },
         {
             "key": "You look sad today [Talked].",
-            "value": "You look sad today [Talked]."
+            "value": "你今天看起来很沮丧 [Talked]."
         },
         {
             "key": "Oh man I'm too confused today.... [Player] help me collect lost.",
-            "value": "Oh man I'm too confused today.... [Player] help me collect lost."
+            "value": "哦...啊我今天太迷糊了.... [Player] 请帮我收集丢失的东西."
         },
         {
             "key": "Take your nose up [Talked], what's wrong with you?",
-            "value": "Take your nose up [Talked], what's wrong with you?"
+            "value": "把你的鼻子抬起来 [Talked], 你怎么了?"
         },
         {
             "key": "My brother has to stop by today, and I want to cook something to feed him, but everything falls out of my hands..",
-            "value": "My brother has to stop by today, and I want to cook something to feed him, but everything falls out of my hands.."
+            "value": "我的兄弟必须在今天停下了，我想给他煮点东西吃，但是所有事情都超出了我的掌控..."
         },
         {
             "key": "So let me help you?",
-            "value": "So let me help you?"
+            "value": "所以让我来帮你?"
         },
         {
             "key": "And you I look [Player] today cheerful, well help. I will not remain in debt",
