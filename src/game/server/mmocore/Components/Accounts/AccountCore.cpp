@@ -294,6 +294,13 @@ bool CAccountCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_LANGUAGES, "Note: translation is not complete.");
 		GS()->AV(ClientID, "null");
 
+		if(!GS()->IsMmoClient(ClientID))
+		{
+			GS()->AVL(ClientID, "null", "Text may be cropped due to Vanilla Teeworlds.");
+			GS()->AVL(ClientID, "null", "I recommend that you download the MRPG client.");
+			GS()->AV(ClientID, "null");
+		}
+
 		const char* pPlayerLanguage = pPlayer->GetLanguage();
 		GS()->AVH(ClientID, TAB_LANGUAGES, GRAY_COLOR, "Active language: [{STR}]", pPlayerLanguage);
 		for(int i = 0; i < Server()->Localization()->m_pLanguages.size(); i++)
