@@ -70,7 +70,7 @@
 	},
 	{
 		"key": "Loots, mobs on your zone",
-		"value": "看，怪物在你的区域里"
+		"value": "掉落物，怪物在你的区域里"
 	},
 	{
 		"key": "Ranking guilds and players",
@@ -86,19 +86,19 @@
 	},
 	{
 		"key": "Disciple of War. Level Power {INT}",
-		"value": "攻击的升级向. 等级效果 {INT}"
+		"value": "攻击的信使. 等级效果 {INT}"
 	},
 	{
 		"key": "Disciple of Tank. Level Power {INT}",
-		"value": "坦克的升级向.等级效果 {INT}"
+		"value": "坦克的信使.等级效果 {INT}"
 	},
 	{
 		"key": "Disciple of Healer. Level Power {INT}",
-		"value": "治疗的升级项. 等级效果 {INT}"
+		"value": "治疗的信使. 等级效果 {INT}"
 	},
 	{
 		"key": "Disciple of Jobs",
-		"value": "工作的升级项"
+		"value": "工作的信使"
 	},
 	{
 		"key": "{STR} {INT}P (Price {INT}P)",
@@ -126,15 +126,15 @@
 	},
 	{
 		"key": "Chance & Loot Information",
-		"value": "机会和战利品信息"
+		"value": "盲盒和战利品信息"
 	},
 	{
 		"key": "Here you can see chance loot, mobs, on YOUR ZONE.",
-		"value": "在这里你可以看到怪物信息以及可能掉落的战利品（当前区域）
+		"value": "在这里你可以看到周围的怪物信息以及可能掉落的战利品"
 	},
 	{
 		"key": "There are no active mobs in your zone!",
-		"value": "你的周围内没有怪物"
+		"value": "你的周围没有怪物"
 	},
 	{
 		"key": "Backpage",
@@ -254,7 +254,7 @@
 	},
 	{
 		"key": "You can vote for the choice of tank (Dungeon Tab)!",
-		"value": "你可以投票选择坦克（地下城栏）"
+		"value": "你可以投票选择谁当坦克（地牢）"
 	},
 	{
 		"key": "You can't vote for yourself!",
@@ -266,7 +266,7 @@
 	},
 	{
 		"key": "{STR} voted for {STR}.",
-		"value": "{STR} 投票 {STR}."
+		"value": "{STR} 投票给 {STR}."
 	},
 	{
 		"key": "Languages Information",
@@ -418,7 +418,7 @@
 	},
 	{
 		"key": "Don't forget your data, have a nice game!",
-		"value": "不要忘了你的账号密码，玩的开心！"
+		"value": "不要忘了你的账号密码，祝你玩的开心！"
 	},
 	{
 		"key": "# Your nickname is a unique identifier!",
@@ -644,6 +644,17 @@
             "key": "He told me that he is busy now, and will visit you later in the evening!",
             "value": "他告诉我他现在很忙，晚上会来看你的！"
         },
+ 	{
+		"key": "[Player], do you have any questions? I'm sorry, can't help you.",
+		"value": "[Player], 你有什么问题吗？很抱歉，我不能帮助你."
+	},
+	{
+		"key": "What a beautiful [Time]. I don't have anything for you [Player].",
+		"value": "这真是个好天气. 我没有什么能给你 [Player].",
+	},
+	{
+		"key": "[Player] are you interested something? I'm sorry, don't want to talk right now.",
+		"value": "[Player] 你是对什么东西很好奇吗？我很抱歉，我现在不想谈话"
         {
             "key": "I'm so happy! They won't let me in because of the problems that are happening. Dead men kidnap girls, and then they find them dead.",
             "value": "太好了，他们不让我过去因为最近发生的事.死神绑架了她们，她们后来都被发现已经死了"
@@ -662,7 +673,7 @@
         },
         {
             "key": "**She sounds like she knows it**: An adventurer? We have a Guild of adventurers, but to become an adventurer you need to pass the tests.",
-            "value": **听起来她好像知道**：一个冒险家？我们有一个冒险家协会，但要成为一名冒险家，你需要通过测试。"
+            "value": "**听起来她好像知道**：一个冒险家？我们有一个冒险家协会，但要成为一名冒险家，你需要通过测试。"
         },
         {
            "key":"",
@@ -1054,7 +1065,7 @@
         },
         {
             "key": "Well, just don't mess with as a joke, it's Apostle, he is watching over us for many years.",
-            "value": 好吧，别开玩笑了，这是使徒，他已经守护我们很多年了."
+            "value": "好吧，别开玩笑了，这是使徒，他已经守护我们很多年了."
         },
         {
             "key": "I understand [Talked].",
@@ -1074,7 +1085,7 @@
         },
         {
             "key": "I can't communicate with my brothers and sisters, since our paths have diverged, but we have a common mind.",
-            "value": "我无法与我的兄弟姐妹沟通，因为我们的道路不同，但我们有一个共同的想法。”
+            "value": "我无法与我的兄弟姐妹沟通，因为我们的道路不同，但我们有一个共同的想法。"
         },
         {
             "key": "I had a vision about a year ago that there would soon be a man who was as tenacious as the Apostles.",
@@ -1114,7 +1125,7 @@
         },
         {
             "key": "If you pass my first test, pay the fee, I encourage you, and send you to the exam. And then we will decide whether you are worthy or not",
-            "value": "If you pass my first test, pay the fee, I encourage you, and send you to the exam. And then we will decide whether you are worthy or not"
+            "value": "如果你通过我的第一个测试，付钱，我就把你送到第一个测试点然后决定教你值不值得."
         },
         {
             "key": "Okay, where do we start [Talked]?",
@@ -1154,7 +1165,7 @@
         },
         {
             "key": "Am I that scary? Don't worry I'm kind *laughs*. Well, let's see how you cope. Kill for me ....",
-            "value": "我有那么可怕吗? 别担心，我很友善的*大笑*. 来吧,让我看看你要怎么对付他们，去把他们杀了 ....
+            "value": "我有那么可怕吗? 别担心，我很友善的*大笑*. 来吧,让我看看你要怎么对付他们，去把他们杀了 ...."
         },
         {
             "key": "I managed it, and it wasn't difficult.",
@@ -1346,823 +1357,823 @@
         },
         {
             "key": "And you I look [Player] today cheerful, well help. I will not remain in debt",
-            "value": "And you I look [Player] today cheerful, well help. I will not remain in debt"
+            "value": "你看起来 [Player] 今天你看起来很愉快，会有帮助，我不会继续欠人情."
         },
         {
             "key": "Of course [Talked] ;)",
-            "value": "Of course [Talked] ;)"
+            "value": "当然 [Talked] ;)"
         },
         {
             "key": "Well here's my house! Ah as my not my, father is a master, and even brother. In General, our family",
-            "value": "Well here's my house! Ah as my not my, father is a master, and even brother. In General, our family"
+            "value": "那么这里就是我的房子!啊，不是我的，我的父亲是主人，兄弟也一样;我在我们的家里是一般地位."
         },
         {
             "key": "All right, come on in, I'll cook, and I'll ask you to bring something. All the help me need",
-            "value": "All right, come on in, I'll cook, and I'll ask you to bring something. All the help me need"
+            "value": "好，进来吧。我下厨，我会叫你带些东西过来，所有我需要的会帮助我的东西."
         },
         {
             "key": "I will help you, especially since you are my first close friend in this village, I already trust you, how you can be abandoned.",
-            "value": "I will help you, especially since you are my first close friend in this village, I already trust you, how you can be abandoned."
+            "value": "我会帮助你的.况且你是我在这个村子里的第一个朋友.我很信任你的.你怎么会被抛下呢？."
         },
         {
             "key": "Well [Player], let's get started, little by little",
-            "value": "Well [Player], let's get started, little by little"
+            "value": "好吧 [Player], 让我们开始吧, 一点一点的"
         },
         {
             "key": "Your house comfortable! [Talked]",
-            "value": "Your house comfortable! [Talked]"
+            "value": "你的家看起来很舒适!真不错[Talked]"
         },
         {
             "key": "Do you really think so? Well thank you.",
-            "value": "Do you really think so? Well thank you."
+            "value": "你真的这么想? 那么谢谢你."
         },
         {
             "key": "All right let's get down to cooking",
-            "value": "All right let's get down to cooking"
+            "value": "好了.让我们来做饭吧"
         },
         {
             "key": "Well, let's get started [Player]!",
-            "value": "Well, let's get started [Player]!"
+            "value": "好.我们开始吧 [Player]!"
         },
         {
             "key": "Oh sure [Talked]",
-            "value": "Oh sure [Talked]"
+            "value": "没问题 [Talked]"
         },
         {
             "key": "[Player] get me some first, we'll use it as oil",
-            "value": "[Player] get me some first, we'll use it as oil"
+            "value": "[Player]首先拿一些gel给我，我会把他当做油来使用。"
         },
         {
             "key": "I think everyone has their own way of making butter *laughter*",
-            "value": "I think everyone has their own way of making butter *laughter*"
+            "value": "我想每个人都有自己独特的黄油制作法吧 *大笑*"
         },
         {
             "key": "Yeah you're right, good sense of humor damn *laughter*",
-            "value": "Yeah you're right, good sense of humor damn *laughter*"
+            "value": "你说的没错, 这该死的幽默 *大笑*"
         },
         {
             "key": "So now I need meat. How to cook without meat.",
-            "value": "So now I need meat. How to cook without meat."
+            "value": "现在我需要一些肉. 做饭怎么能少了肉呢."
         },
         {
             "key": "I think you've heard of Kappa, they live near water, their meat is very tasty. So get it for me (you can self find them habitat)",
-            "value": "I think you've heard of Kappa, they live near water, their meat is very tasty. So get it for me (you can self find them habitat)"
+            "value": "我想你已经听说过kappa, 他们生活在洞穴里靠近水的地方， 他们的肉非常好吃. 所以，去帮我搞一些来吧 (你可以自己找到他们栖息地的)"
         },
         {
             "key": "All delicious fine meat, looks great, take it!",
-            "value": "All delicious fine meat, looks great, take it!"
+            "value": "这肉非常不错，开始吧"
         },
         {
             "key": "Well i let's start cooking :)",
-            "value": "Well i let's start cooking :)"
+            "value": "好了我要开始烹饪了 :)"
         },
         {
             "key": "**You see like she didn't know how to cook**: Are you sure you can cook?",
-            "value": "**You see like she didn't know how to cook**: Are you sure you can cook?"
+            "value": "**我发觉她好像不会烹饪**: 你确定你会做饭吗?"
         },
         {
             "key": "**She said angrily**: You know what I'll tell you [Player]... You don't know how to compliment girls at all..",
-            "value": "**She said angrily**: You know what I'll tell you [Player]... You don't know how to compliment girls at all.."
+            "value": "**她生气地说**: 你知道我想说什么吧 [Player]... 你根本不会恭维女孩子.."
         },
         {
             "key": "**Someone knocks on the door**: Who could it be? lovers?",
-            "value": "**Someone knocks on the door**: Who could it be? lovers?"
+            "value": **有人敲门**: 那是谁? 你的小对象?"
         },
         {
             "key": "Oh it's probably my brother.",
-            "value": "Oh it's probably my brother."
+            "value": "噢那肯定是我哥哥."
         },
         {
             "key": "**He said angrily and rudely**: Oh, what people, I've seen you somewhere.",
-            "value": "**He said angrily and rudely**: Oh, what people, I've seen you somewhere."
+            "value": "**他粗鲁地说**: 噢，是你，我在某个地方见过你."
         },
         {
             "key": "You must have imagined it. ",
-            "value": "You must have imagined it. "
+            "value": "你肯定是梦见的吧.... "
         },
         {
             "key": "Oh well.",
-            "value": "Oh well."
+            "value": "啊这"
         },
         {
             "key": "[Player] you look sad.",
-            "value": "[Player] you look sad."
+            "value": "[Player] 你看上去很沮丧."
         },
         {
             "key": "Okay [Talked]. I'll probably go extra here",
-            "value": "Okay [Talked]. I'll probably go extra here"
+            "value": "确实[Talked]. 我会更加努力的"
         },
         {
             "key": "Yes calm down you why so decided to?",
-            "value": "Yes calm down you why so decided to?"
+            "value": "冷静想想你为什么这么决定?"
         },
         {
             "key": "Yes, everything is fine. I just have things to do, too. I'll go!",
-            "value": "Yes, everything is fine. I just have things to do, too. I'll go!"
+            "value": "嗯，事情都挺好的，我还有些事要忙，先走了!"
         },
         {
             "key": "You offend me [Talked].....",
-            "value": "You offend me [Talked]....."
+            "value": "你顶撞我了 [Talked]....."
         },
         {
             "key": "Sorry I'm really busy [Talked].",
-            "value": "Sorry I'm really busy [Talked]."
+            "value": ""抱歉我真的很忙 [Talked]."
         },
         {
             "key": "Well, take care of yourself.",
-            "value": "Well, take care of yourself."
+            "value": ""好吧，照顾好自己"
         },
         {
             "key": "So let's continue our training.",
-            "value": "So let's continue our training."
+            "value": "那让我们继续训练吧."
         },
         {
             "key": "Yes, of course, it's about time!",
-            "value": "Yes, of course, it's about time!"
+            "value": "当然，是时候了!"
         },
         {
             "key": "**He speaks rudely**: I don't really like you. But let's see what you can achieve. Let's go back to the Deep Cave.",
-            "value": "**He speaks rudely**: I don't really like you. But let's see what you can achieve. Let's go back to the Deep Cave."
+            "value": "**他粗鲁地说**: 我不是很喜欢你，但还是让我们看看你有什么能耐吧，现在先回去那个深洞"
         },
         {
             "key": "**He speaks proudly**: Well, now we have more serious goals.",
-            "value": "**He speaks proudly**: Well, now we have more serious goals."
+            "value": "**他自豪地说**: 这次，我们有更难的目标."
         },
         {
             "key": "Exterminate the stronger slime. I'll see.",
-            "value": "Exterminate the stronger slime. I'll see."
+            "value": "打败更强大的史莱姆. 我想."
         },
         {
             "key": "Everything is ready, they are vile I do not like slime, maybe something new?",
-            "value": "Everything is ready, they are vile I do not like slime, maybe something new?"
+            "value": "我准备好了, 但是史莱姆真的很恶心我不喜欢它们, 可以换成别的吗?"
         },
         {
             "key": "Well, I'll think about your request. Follow me.",
-            "value": "Well, I'll think about your request. Follow me."
+            "value": "我会考虑你的请求的，跟我来."
         },
         {
             "key": "Take it, use it wisely. You will need it very much in the future.",
-            "value": "Take it, use it wisely. You will need it very much in the future."
+            "value": "带上这个，明智地使用它，将来你会非常需要它的."
         },
         {
             "key": "**You were surprised by the gift provided**: Oh, thank you very much. Do I owe you something?",
-            "value": "**You were surprised by the gift provided**: Oh, thank you very much. Do I owe you something?"
+            "value": "**你对这突然收到的礼物很惊喜**: 噢，非常感谢,我算不算欠你什么了?"
         },
         {
             "key": "I hope you make it to the end, at least I hope you do. I didn't think you'd be Apostle's favorite.",
-            "value": "I hope you make it to the end, at least I hope you do. I didn't think you'd be Apostle's favorite."
+            "value": "我喜欢你能结束这一切，至少我是这么希望的，但我不认为你是使徒最喜欢的一个."
         },
         {
             "key": "Favorite [Talked]?",
-            "value": "Favorite [Talked]?"
+            "value": "最喜欢的[Talked]?"
         },
         {
             "key": "**He said very rudely**: I'll go, meet you later.",
-            "value": "**He said very rudely**: I'll go, meet you later."
+            "value": "*他粗鲁地说**: 我走了，下次再见"
         },
         {
             "key": "Hello [Player]. Are you free?",
-            "value": "Hello [Player]. Are you free?"
+            "value": "你好[Player]. 你现在有空吗?"
         },
         {
             "key": "Yes, of course. Everything okay?",
-            "value": "Yes, of course. Everything okay?"
+            "value": "是的当然，有什么事吗?"
         },
         {
             "key": "Apostle asked you to see her!",
-            "value": "Apostle asked you to see her!"
+            "value": "使徒让你去见她!"
         },
         {
             "key": "Well!",
-            "value": "Well!"
+            "value": "好!"
         },
         {
             "key": "Thank you, I'm going for a walk!",
-            "value": "Thank you, I'm going for a walk!"
+            "value": "谢谢，我要去散步了!"
         },
         {
             "key": "**She speaks in fear**: Hello [Player]. Today I received news that in the southern part of our village, goblins attacked. ",
-            "value": "**She speaks in fear**: Hello [Player]. Today I received news that in the southern part of our village, goblins attacked. "
+            "value": "**她恐惧地说**: 你好 [Player]. 今天我收到消息，村庄的南部已经受到了哥布林的袭击. "
         },
         {
             "key": "And it's not just goblins. This must be the army. The leader brought them.",
-            "value": "And it's not just goblins. This must be the army. The leader brought them."
+            "value": "并且不只是哥布林. 肯定还有军队. 有人带领他们来的."
         },
         {
             "key": "Maybe they kidnapped the residents and terrorized you, and now they decided to attack?",
-            "value": "Maybe they kidnapped the residents and terrorized you, and now they decided to attack?"
+            "value": "也许是他们绑架了你的居民并恐吓你，但现在他们决定进攻了?"
         },
         {
             "key": "I think so too. Anyway, I talked to Koko. About your appointment as an adventurer. We should prepare for resistance. Communication nodes they need to be destroyed",
-            "value": "I think so too. Anyway, I talked to Koko. About your appointment as an adventurer. We should prepare for resistance. Communication nodes they need to be destroyed"
+            "value": "我也是这么想的，无论如何，我会和可可说的，至于你，作为一名冒险家，我们需要守卫我们的居民，我们需要摧毁他们的通信节点."
         },
         {
             "key": "Well, I did the job [Talked]!",
-            "value": "Well, I did the job [Talked]!"
+            "value": "好，让我来吧 [Talked]!"
         },
         {
             "key": "Good job thank's, you should meet with Koko, he will explain everything to you, good luck!",
-            "value": "Good job thank's, you should meet with Koko, he will explain everything to you, good luck!"
+            "value": ""非常好，你可以去找可可，他会像你解释一切的，祝你好运!"
         },
         {
             "key": "Well, thank you!",
-            "value": "Well, thank you!"
+            "value": "好的谢谢!"
         },
         {
             "key": "Get ready let's go to the Goblin-occupied zone.",
-            "value": "Get ready let's go to the Goblin-occupied zone."
+            "value": "准备好，我们出发前往哥布林占领的区域."
         },
         {
             "key": "I'm ready to sort of out right now.",
-            "value": "I'm ready to sort of out right now."
+            "value": "好了我准备好了"
         },
         {
             "key": "Well [Player], you're fun, Yes, but it's worth getting ready.",
-            "value": "Well [Player], you're fun, Yes, but it's worth getting ready."
+            "value": "很好[Player], 你很有趣, 但这确实值得好好准备."
         },
         {
             "key": "Well, what do need [Talked]?",
-            "value": "Well, what do need [Talked]?"
+            "value": "那么,需要做什么[Talked]?"
         },
         {
             "key": "I'll be waiting for you next to Craftsman.",
-            "value": "I'll be waiting for you next to Craftsman."
+            "value": "我会在合成商人那里等你."
         },
         {
             "key": "So first we need potions.",
-            "value": "So first we need potions."
+            "value": "首先我们需要一些药水."
         },
         {
             "key": "Go get supplies, and at the same time exterminate a few slugs so that we can get there without any problems.",
-            "value": "Go get supplies, and at the same time exterminate a few slugs so that we can get there without any problems."
+            "value": "去获取一些物资，同时扫清路上的史莱姆这样我们可以一路畅通无阻."
         },
         {
             "key": "**You sound very tired**: We can all move, but the problem is that I'm tired..",
-            "value": "**You sound very tired**: We can all move, but the problem is that I'm tired.."
+            "value": "**你很疲惫**:我们可以出发了但是我现在很累.."
         },
         {
             "key": "Nothing to worry about [Player]. You need to toughen up. All right let's move out.",
-            "value": "Nothing to worry about [Player]. You need to toughen up. All right let's move out."
+            "value": "不必担心 [Player]. 你需要加强锻炼了. 好的现在就出发吧。"
         },
         {
             "key": "We'll get to the guard post now. We'll move out there to exterminate the goblins.",
-            "value": "We'll get to the guard post now. We'll move out there to exterminate the goblins."
+            "value": "我们现在就去哨所。我们会搬到那里去消灭哥布林。"
         },
         {
             "key": "Well [Talked].",
-            "value": "Well [Talked]."
+            "value": "那么 [Talked]."
         },
         {
             "key": "**Grinning**: Huh?",
-            "value": "**Grinning**: Huh?"
+            "value": "**笑嘻嘻**: Huh?"
         },
         {
             "key": "We can't heal her..",
-            "value": "We can't heal her.."
+            "value": "我们不能治疗她.."
         },
         {
             "key": "I don't understand..",
-            "value": "I don't understand.."
+            "value": "我不李姐.."
         },
         {
             "key": "Our daughter, Maria.. She's sick!",
-            "value": "Our daughter, Maria.. She's sick!"
+            "value": "我们的女儿, Maria... 她生病了!"
         },
         {
             "key": "Why don't you take her to the Nurse?!",
-            "value": "Why don't you take her to the Nurse?!"
+            "value": "你为什么不带她去找Nurse呢?!"
         },
         {
             "key": "I tried, but she said she can't do anything.. I found something in an old book of mine.. A gel treatment. But I also need Kappa Meat for it..",
-            "value": "I tried, but she said she can't do anything.. I found something in an old book of mine.. A gel treatment. But I also need Kappa Meat for it.."
+            "value": "我找过了, 但她说她也无能为力.我在一本老书里看到一些记载.. 一种gel治疗法. 但同时我还需要一些kappa meat.."
         },
         {
             "key": "Tha..nk.. You..",
-            "value": "Tha..nk.. You.."
+            "value": "谢..谢.. 你.."
         },
         {
             "key": "Well.. don't look at me, heal Maria!",
-            "value": "Well.. don't look at me, heal Maria!"
+            "value": "那么.. 别看我啊, 治疗Maria!"
         },
-        {
+      
             "key": "F..Father?",
-            "value": "F..Father?"
+            "value": "爸..爸爸？"
         },
         {
             "key": "MARIA! You're well!",
-            "value": "MARIA! You're well!"
+            "value": "MARIA! 你终于好了l!"
         },
         {
             "key": "*with joy* Hi, Maria!",
-            "value": "*with joy* Hi, Maria!"
+            "value": "*带着微笑* Hi, Maria!"
         },
         {
             "key": "How can I ever make it up to you?",
-            "value": "How can I ever make it up to you?"
+            "value": "我要怎么补偿你？"
         },
         {
             "key": "Well Sir.. I might need a discount from your old friend, the Craftsman.",
-            "value": "Well Sir.. I might need a discount from your old friend, the Craftsman."
+            "value": "是的先生...我想我需要从你的老朋友那里获取一些折扣，也就是Craftsman."
         },
         {
             "key": "Sure, I'll.. let him know you deserve it!",
-            "value": "Sure, I'll.. let him know you deserve it!"
+            "value": "当然, 我会.. 让他知道这是你应得的!"
         },
         {
             "key": "Sure..What can I do?",
-            "value": "Sure..What can I do?"
+            "value": "那么，我该怎么做?"
         },
         {
             "key": "I heard you helped the craftsman with his deliveries..I have no time for small things like mining cooper, can you do it for me? I have to save the world in the main time..",
-            "value": "I heard you helped the craftsman with his deliveries..I have no time for small things like mining cooper, can you do it for me? I have to save the world in the main time.."
+            "value": "我听说你帮助过craftsman..我没有多余的时间用在挖矿这种小事上，你可以帮我吗，我必须把我的主要时间用在拯救世界上"
         },
         {
             "key": " *a bit angry* Ok, I will do it.",
-            "value": " *a bit angry* Ok, I will do it."
+            "value": " *稍微生气* 行吧我会去做的."
         },
         {
             "key": "Oh, it's you kid!",
-            "value": "Oh, it's you kid!"
+            "value": "噢，谢谢你，孩子!"
         },
         {
             "key": "*you can't control yourself* HEY. I'm NOT A KID!",
-            "value": "*you can't control yourself* HEY. I'm NOT A KID!"
+            "value": "*你终于控制不住自己* 嘿，我!不!是!小!孩!"
         },
         {
             "key": "Hey.. easy, just a joke, did you get what I wanted?",
-            "value": "Hey.. easy, just a joke, did you get what I wanted?"
+            "value": "嘿..冷静, 只是开玩笑, 你拿到我要的东西了吗"
         },
         {
             "key": "Yes.. *puts a heavy cooper bag on Erik's table*",
-            "value": "Yes.. *puts a heavy cooper bag on Erik's table*"
+            "value": "是的. *把一个很重的装满矿物的背包放在Eric的桌子上*"
         },
         {
             "key": "Good, now get out of here!",
-            "value": "Good, now get out of here!"
+            "value": "很好，你可以走了!"
         },
         {
             "key": "Wait.. YOU NOT GONNA PAY ME??",
-            "value": "Wait.. YOU NOT GONNA PAY ME??"
+            "value": "等等... 你不打算给我什么报酬??"
         },
         {
             "key": "Haha! I am messing with you.",
-            "value": "Haha! I am messing with you."
+            "value": ""哈哈! 你被我耍啦."
         },
         {
             "key": "So can you tell me how you got here?",
-            "value": "So can you tell me how you got here?"
+            "value": "所以你能告诉我你是怎么到这里来的吗?"
         },
         {
             "key": "**He's stuttered**: A long story..",
-            "value": "**He's stuttered**: A long story.."
+            "value": "**他口齿不清地说**: 这是一个漫长的故事.."
         },
         {
             "key": "We tried a new potion mixed with ether, but something went wrong, my hiccups are part of this experiment, and I ended up here after I drank it",
-            "value": "We tried a new potion mixed with ether, but something went wrong, my hiccups are part of this experiment, and I ended up here after I drank it"
+            "value": "我们尝试了一种与以太混合的新药水，但出现了一些问题，我的打嗝也是拜这所赐，然后我喝下了它，最终出现在了这里"
         },
         {
             "key": "**Sound in the tablet**: Noctis... Noctiis. Do you hear me?",
-            "value": "**Sound in the tablet**: Noctis... Noctiis. Do you hear me?"
+            "value": "**来自某处的声音**: Noctis... Noctiis. 你能听到吗?"
         },
         {
             "key": "**Noctis**: I can hear you, how do I get out of here?",
-            "value": "**Noctis**: I can hear you, how do I get out of here?"
+            "value": "**Noctis**:我能听到，我要怎样才能离开这里"
         },
         {
             "key": "**Sound in the tablet**: Collect all the fragments that ended up here. The connection is lost....",
-            "value": "**Sound in the tablet**: Collect all the fragments that ended up here. The connection is lost...."
+            "value": "**来自某处的声音**: 你必须搜集到所有的碎片.连线已中断...."
         },
         {
             "key": "What were you talking to just now?",
-            "value": "What were you talking to just now?"
+            "value": "你刚刚在说什么?"
         },
         {
             "key": "A tablet made from a magic crystal. In General, as I thought I need your help in collecting fragments",
-            "value": "A tablet made from a magic crystal. In General, as I thought I need your help in collecting fragments"
+            "value": "一种由魔法水晶制成的台子，言归正传，我想我需要你帮忙收集fragments"
         },
         {
             "key": "Of course I'll help",
-            "value": "Of course I'll help"
+            "value": "当然我会帮你的"
         },
         {
             "key": "Look at what I can give you in return for your help. (Vote menu shop list)",
-            "value": "Look at what I can give you in return for your help. (Vote menu shop list)"
+            "value": "看看我有什么东西能作为回报. (投票菜单商店)"
         },
         {
             "key": "Wow, [Talked] where can I find them?",
-            "value": "Wow, [Talked] where can I find them?"
+            "value": "Wow, [Talked] 我要如何找到他们呢?"
         },
         {
             "key": "In a distorted dimension.",
-            "value": "In a distorted dimension."
+            "value": "在一个扭曲的维度中."
         },
         {
             "key": "Where is it? How do I get there?",
-            "value": "Where is it? How do I get there?"
+            "value": "它在哪里?我该怎么去?"
         },
         {
             "key": "[Player] way, so we'll be preparing to get there.",
-            "value": "[Player] way, so we'll be preparing to get there."
+            "value": "[Player] 有办法, 让我们准备出发过去."
         },
         {
             "key": "So first [Player], I'll need these things from you. They resonate between our worlds",
-            "value": "So first [Player], I'll need these things from you. They resonate between our worlds"
+            "value": "所以首先 [Player], 我需要这些东西给你，它们在我们的世界之间产生共鸣."
         },
         {
             "key": "Take it [Talked].",
-            "value": "Take it [Talked]."
+            "value": "带上它 [Talked]."
         },
         {
             "key": "Well thank you, it will be a little easier now.",
-            "value": "Well thank you, it will be a little easier now."
+            "value": "好的谢谢你，这会带来一点帮助"
         },
         {
             "key": "**Sound in the tablet**: Noctis. How you to get the fragments we will be able to pick you up.",
-            "value": "**Sound in the tablet**: Noctis. How you to get the fragments we will be able to pick you up."
+            "value": "**来自某处的声音**: Noctis. 你弄到碎片后我们会来接你的."
         },
         {
             "key": "**Noctis**: Okay, Sid..",
-            "value": "**Noctis**: Okay, Sid.."
+            "value": "**Noctis**:好，Sid.."
         },
         {
             "key": "Next thing I need to create a resonance. Bring me these items.",
-            "value": "Next thing I need to create a resonance. Bring me these items."
+            "value": "接着，我需要去创建一个共鸣.替我带来这些."
         },
         {
             "key": "Everything is ready?. [Talked] take it",
-            "value": "Everything is ready?. [Talked] take it"
+            "value": "一切准备好了吗?. [Talked] 带上这个"
         },
         {
             "key": "[Player] yes.. almost, follow me and we'll start resonating.",
-            "value": "[Player] yes.. almost, follow me and we'll start resonating."
+            "value": "[Player] 是的..大概，跟我来，我们会启动共鸣."
         },
         {
             "key": "All ready.",
-            "value": "All ready."
+            "value": "准备好了."
         },
         {
             "key": "Resonance received. I will wait for you with fragments",
-            "value": "Resonance received. I will wait for you with fragments"
+            "value": "共鸣启动完成，我会等你的碎片."
         },
         {
             "key": "Can come to resonance?",
-            "value": "Can come to resonance?"
+            "value": "我能来参加这个共鸣吗?"
         },
         {
             "key": "Yes. Don't worry nothing will happen to you.",
-            "value": "Yes. Don't worry nothing will happen to you."
+            "value": "是的。不要担心，没有什么事会发生在你身上."
         },
         {
             "key": "I welcome you [Talked], nice to meet you.",
-            "value": "I welcome you [Talked], nice to meet you."
+            "value": "欢迎你 [Talked], 很高兴遇见你."
         },
         {
             "key": "Glad to meet you, i'am [Player]!",
-            "value": "Glad to meet you, i'am [Player]!"
+            "value": "很高兴见到你, 我是 [Player]!"
         },
         {
             "key": "Him you will spend time here. I have to go to the village.",
-            "value": "Him you will spend time here. I have to go to the village."
+            "value": "他会在这里虚度光阴.我得去村庄了."
         },
         {
             "key": "Need to stand on defense in the village, good luck to you I will wait for good news from you.",
-            "value": "Need to stand on defense in the village, good luck to you I will wait for good news from you."
+            "value": "要防守村庄.祝你好运，我会等你的好消息的."
         },
         {
             "key": "Good luck to you [Talked].",
-            "value": "Good luck to you [Talked]."
+            "value": "祝你好运 [Talked]."
         },
         {
             "key": "I came from a far Eastern country, I have some problems in the country so I need to become stronger.",
-            "value": "I came from a far Eastern country, I have some problems in the country so I need to become stronger."
+            "value":"我来自东方一个遥远的国家，在那个国家我有些问题，所以我需要变得更强大."
         },
         {
             "key": "I came for similar purposes. But I would like to visit your country.",
-            "value": "I came for similar purposes. But I would like to visit your country."
+            "value": "我为了和你相似的目的来.但是我想去你的国家."
         },
         {
             "key": "**He speaks with a smile**: If you wish I will be sailing back soon I can take you with me",
-            "value": "**He speaks with a smile**: If you wish I will be sailing back soon I can take you with me"
+            "value": "**他面带微笑**: 如果你想，我很快就会回来，我可以带上你一起去"
         },
         {
             "key": "I'd love to, but I don't know, i have here made friends. We'll see.",
-            "value": "I'd love to, but I don't know, i have here made friends. We'll see."
+            "value": "我非常愿意, 但我不知道,我在这里交了一些朋友. 我们会看到的."
         },
         {
             "key": "Well, if we still live of course. And the got to talking and drive away goblins need.",
-            "value": "Well, if we still live of course. And the got to talking and drive away goblins need."
+            "value": "当然，前提是我们还活着. 先赶走这些哥布林再聊吧."
         },
         {
             "key": "To begin with, we must exterminate many of them as possible. To get to them in zone",
-            "value": "To begin with, we must exterminate many of them as possible. To get to them in zone"
+            "value": "首先，我们必须尽可能地消灭他们中的许多人，以便在区域内找到他们"
         },
         {
             "key": "**Very tired voice**: [Talked]. I'm so tired, there are so many of them.....",
-            "value": "**Very tired voice**: [Talked]. I'm so tired, there are so many of them....."
+            "value": "**非常疲惫的嗓音**: [Talked]. 我好累啊，它们人太多了......"
         },
         {
             "key": "**He sounds very tired**: Yes, I am also very tired, but we have to deal with it.",
-            "value": "**He sounds very tired**: Yes, I am also very tired, but we have to deal with it."
+            "value": "**他的声音听起来非常累**: 是的，我也非常累。但是我们必须得解决它们."
         },
         {
             "key": "All right let's keep going before they pile up again.",
-            "value": "All right let's keep going before they pile up again."
+            "value": "好了，快点在他们重新聚集在一起之前继续推进"
         },
         {
             "key": "Hmmm.. I see a passageway. I think we can go through there and find out where they're coming from.",
-            "value": "Hmmm.. I see a passageway. I think we can go through there and find out where they're coming from."
+            "value": "嗯...我看到了一个通道. 我认为我们可以穿过这里，找一下出口."
         },
         {
             "key": "I'm worried about something.. Where did this hole?",
-            "value": "I'm worried about something.. Where did this hole?"
+            "value": "我有些担心，这个洞是通向哪里的？"
         },
         {
             "key": "I don't know either, honestly. Maybe the goblins have dug through and are coming out. In any case we need to find out.",
-            "value": "I don't know either, honestly. Maybe the goblins have dug through and are coming out. In any case we need to find out."
+            "value": "说实话，我也不知道，也许哥布林已经挖通了洞并且正在往外走。不管怎样，我们都得进去看看。"
         },
         {
             "key": "I think this is where they live. ",
-            "value": "I think this is where they live. "
+            "value": "我想这就是他们的老巢了。"
         },
         {
             "key": "In any case, if we can not cope with them, there is an option to block the way. But I think they'll dig it up again in time.",
-            "value": "In any case, if we can not cope with them, there is an option to block the way. But I think they'll dig it up again in time."
+            "value": "不管怎样，如果我们无法对付他们的话，我们可以试着把路堵上，不过我想他们又会及时挖开。"
         },
         {
             "key": "**In anger**: LET's BREAK UP THESE FREAKS ALREADY... ",
-            "value": "**In anger**: LET's BREAK UP THESE FREAKS ALREADY... "
+            "value": "*愤怒**: 让我们把这些怪物都搞定...... "
         },
         {
             "key": "I'm only for your idea. Let's go!",
-            "value": "I'm only for your idea. Let's go!"
+            "value": "只能这样了，冲！"
         },
         {
             "key": "And here is their leader.",
-            "value": "And here is their leader."
+            "value": "这就是他们的首领。"
         },
         {
             "key": "Did we manage?",
-            "value": "Did we manage?"
+            "value": "我们做到了?"
         },
         {
             "key": "We don't know yet we need to get out of here....",
-            "value": "We don't know yet we need to get out of here...."
+            "value": "现在还不知道，我们得先离开这......"
         },
         {
             "key": "I'll be waiting for you where we fought the goblins.",
-            "value": "I'll be waiting for you where we fought the goblins."
+            "value": "我会在我们发现哥布林的地方等你。"
         },
         {
             "key": "Finally we got out how do you think we managed?",
-            "value": "Finally we got out how do you think we managed?"
+            "value": "我们终于出来了，你觉得我们是怎么做到的？"
         },
         {
             "key": "I don't know [Player], we have to report this news to the village.",
-            "value": "I don't know [Player], we have to report this news to the village."
+            "value": "我不知道 [Player], 我们得把这个消息带到村庄里."
         },
         {
             "key": "Well, I think my work here is done [Player].",
-            "value": "Well, I think my work here is done [Player]."
+            "value": "好了，我想我在这的工作也结束了[Player]."
         },
         {
             "key": "Your [Talked] next trip will be to your homeland?",
-            "value": "Your [Talked] next trip will be to your homeland?"
+            "value": "你的[Talked]下一个目的地是你的祖国吗？"
         },
         {
             "key": "Yes, I think it's time to go home, I missed it.",
-            "value": "Yes, I think it's time to go home, I missed it."
+            "value": "是的，我想是时候回家了，我也有点想念她了。"
         },
         {
             "key": "Will you take me with you?",
-            "value": "Will you take me with you?"
+            "value": "你会带上我吗?"
         },
         {
             "key": "Yes, of course. Say goodbye to your friends or maybe one of them will go with you?",
-            "value": "Yes, of course. Say goodbye to your friends or maybe one of them will go with you?"
+            "value": "是的，当然。跟你的朋友说再见，或者他们有人会和你一起去?"
         },
         {
             "key": "No, I don't want to expose them to danger.",
-            "value": "No, I don't want to expose them to danger."
+            "value": "不.我不想把他们带入危险."
         },
         {
             "key": "Well",
-            "value": "Well"
+            "value": "那好."
         },
         {
             "key": "Well, goodbye [Talked], I'll keep going. I want to be stronger than I was before.",
-            "value": "Well, goodbye [Talked], I'll keep going. I want to be stronger than I was before."
+            "value": "那好，再见. [Talked],我会一直走.我想要比以前更强大."
         },
         {
             "key": "All right [Player]. Good luck don't forget that we will always be happy to welcome you as a guest ;)",
-            "value": "All right [Player]. Good luck don't forget that we will always be happy to welcome you as a guest ;)"
+            "value": "好的 [Player]. 祝你好运，别忘了我们会一直很高兴欢迎你成为我们的客人 ;)"
         },
         {
             "key": "Don't forget, don't miss me ;)",
-            "value": "Don't forget, don't miss me ;)"
+            "value": "别忘了，不要忘记我. ;)"
         },
         {
             "key": "Don't worry, Diana is very attached to you. I think she will be offended. Talk to she!",
-            "value": "Don't worry, Diana is very attached to you. I think she will be offended. Talk to she!"
+            "value": "别担心，Diana很喜欢你。我想她会生气的。和她谈谈!"
         },
         {
             "key": "Why didn't you tell [Player] me you were going to leave?",
-            "value": "Why didn't you tell [Player] me you were going to leave?"
+            "value": 你为什么不告诉我， [Player]？ 你要去哪里?"
         },
         {
             "key": "I'm Sorry [Talked]. I wanted to tell you..",
-            "value": "I'm Sorry [Talked]. I wanted to tell you.."
+            "value": "我很抱歉， [Talked]。我想告诉你的......"
         },
         {
             "key": "**She said sadly**: Why? Will you take me with you?",
-            "value": "**She said sadly**: Why? Will you take me with you?"
+            "value": "**她沮丧地说**：为什么?你会带上我吗?"
         },
         {
             "key": "I don't want to put you in danger!",
-            "value": "I don't want to put you in danger!"
+            "value": "我不想把你卷入危险之中！"
         },
         {
             "key": "I want to travel with you!",
-            "value": "I want to travel with you!"
+            "value":"我想和你一起去！"
         },
         {
             "key": "Ok, I'll take you. Now let me to say Yasue San.",
-            "value": "Ok, I'll take you. Now let me to say Yasue San."
+            "value": "好吧，我会带上你。现在让我说山雅秀(Yasue San)."
         },
         {
             "key": "**She said joyfully**: True? Thank! ;)",
-            "value": "**She said joyfully**: True? Thank! ;)"
+            "value": "**她风趣地说**：真的? 谢谢！ ;)"
         },
         {
             "key": "Well, ready to go?",
-            "value": "Well, ready to go?"
+            "value": "好了，你准备好出发了吗?"
         },
         {
             "key": "Yes, will I take Diana with me?",
-            "value": "Yes, will I take Diana with me?"
+            "value": "是的，我可以带上Diana吗?"
         },
         {
             "key": "Yes, of course, set sail:) I will show you my homeland!",
-            "value": "Yes, of course, set sail:) I will show you my homeland!"
+            "value": "当然，启航:) 我会带你领略我的家乡！"
         },
         {
             "key": "**He said surprised**: What a wonderful weather today!",
-            "value": "**He said surprised**: What a wonderful weather today!"
+            "value": "**他惊喜地说**：今天天气真好啊！"
         },
         {
             "key": "Yes, I think so too.",
-            "value": "Yes, I think so too."
+            "value": "是的，我也这么想."
         },
         {
             "key": "Well, how do you like on our ship [Player]? Captures the ocean, i think I'll stay here a little longer, it's wonderful here.",
-            "value": "Well, how do you like on our ship [Player]? Captures the ocean, i think I'll stay here a little longer, it's wonderful here."
+            "value": "嗯，你觉得我们的船怎么样[Player]?我想我会在这里多呆一会儿，这里太棒了 ."
         },
         {
             "key": "I also really like it. Okay, I'll go, I wish you a good rest [Talked]!",
-            "value": "I also really like it. Okay, I'll go, I wish you a good rest [Talked]!"
+            "value": "我也很喜欢。好吧，我得走了，希望你能好好休息 [Talked]!"
         },
         {
             "key": "And I wish you good luck too [Player]!",
-            "value": "And I wish you good luck too [Player]!"
+            "value": "并且祝你好运 [Player]！"
         },
         {
             "key": "**He looks very tired**: Very hot, impossible to work.",
-            "value": "**He looks very tired**: Very hot, impossible to work."
+            "value": "**他看起来很疲惫**：太热了，不可能在这儿工作."
         },
         {
             "key": "Hello, I arrived from a small village beyond the mountains and the ocean, my name is [Player], I have a desire to become an adventurer. But I do not know about this place, could you help me?",
-            "value": "Hello, I arrived from a small village beyond the mountains and the ocean, my name is [Player], I have a desire to become an adventurer. But I do not know about this place, could you help me?"
+            "value": "你好，我来自山的那边海的那边的一个小村庄，我的名字是[Player]，我渴望成为一名冒险家，但我对这里不是很熟悉，你可以帮助我吗?"
         },
         {
             "key": "Hello [Player], Yes of course I will help you, explain where you need to go, but you help my workers, they do not cope at all.",
-            "value": "Hello [Player], Yes of course I will help you, explain where you need to go, but you help my workers, they do not cope at all."
+            "value": "你好 [Player]，没错我可以帮你, 告诉你你应该去哪, 但你得帮帮我的工人们, 他们可完全不会处理。"
         },
         {
             "key": "What you need help with, I'm good at dealing with predators without meat you will not leave! *laughter*",
-            "value": "What you need help with, I'm good at dealing with predators without meat you will not leave! *laughter*"
+            "value": "你需要什么帮助，我很擅长不用肉和那些食肉动物往来，你不会离开的! *笑*"
         },
         {
             "key": "Oh, you're a Joker, no thanks go a little further guys will explain everything to you!",
-            "value": "Oh, you're a Joker, no thanks go a little further guys will explain everything to you!"
+            "value": "哦,你可真会开玩笑， 不用感谢我， 去找其他伙计们，他们会给你解释一切！"
         },
         {
             "key": "OK, thanks!",
-            "value": "OK, thanks!"
+            "value": "好的，谢谢！"
         },
         {
             "key": "Hey, pst! You, yes, you!",
-            "value": "Hey, pst! You, yes, you!"
+            "value": "嘿, 嘿！你, 没错, 就是你！"
         },
         {
             "key": "Yeah? How can I help?",
-            "value": "Yeah? How can I help?"
+            "value": "嗯? 有什么我能做的吗?"
         },
         {
             "key": "You cannot help me, kid! I just need...to TEST you, yes...!",
-            "value": "You cannot help me, kid! I just need...to TEST you, yes...!"
+            "value": "你帮不了我，小子！我只是想...测试你，是的没错......！"
         },
         {
             "key": "Hi my name is [Player], [Talked] are you working?",
-            "value": "Hi my name is [Player], [Talked] are you working?"
+            "value": "你好我的名字是[Player], [Talked]师傅你是干什么的?"
         },
         {
             "key": "Hello [Player], Yes, I am on duty as a guard, and I also trade a little",
-            "value": "Hello [Player], Yes, I am on duty as a guard, and I also trade a little"
+            "value": "你好 [Player]，没错，我作为一名守卫在值班，同时我也会做点小生意."
         },
         {
             "key": "Can you tell me how difficult it is to get into the service?",
-            "value": "Can you tell me how difficult it is to get into the service?"
+            "value": "你能告诉我参军有多难吗?"
         },
         {
             "key": "If that's what you want, it's easy. And if you don't then you won't be able to get in ;)",
-            "value": "If that's what you want, it's easy. And if you don't then you won't be able to get in ;)"
+            "value": "如果那就是你想要的，那很简单。如果你不想，那么你肯定不能加入 ;)"
         },
         {
             "key": "By the way [Player], I need help, there are slugs nearby, again raging, and I can't leave the post. At the same time you will test your skills young adventurer.",
-            "value": "By the way [Player], I need help, there are slugs nearby, again raging, and I can't leave the post. At the same time you will test your skills young adventurer."
-        },
+            "value": "顺便说下[Player],我需要你的帮助, 有些鼻涕虫(slug)在附近再次肆虐起来，但我不能离开我的岗位。同时，你也能测试你的技能，年轻的冒险家."
+        }
         {
             "key": "Yes, no problem, wait [Talked]!!",
-            "value": "Yes, no problem, wait [Talked]!!"
+            "value": "好的, 没问题...等等! [Talked]!!"
         },
         {
             "key": "**He says with a look of horror on his face**: Help me find my daughter, she went to the village for food and never returned.",
-            "value": "**He says with a look of horror on his face**: Help me find my daughter, she went to the village for food and never returned."
+            "value": "**他一脸惊恐地说**: 帮我找找我的女儿。她去村里找吃的后就再也没有回来了."
         },
         {
             "key": "To the village? [Talked] Yes of course I will help. That's where I need to go!",
-            "value": "To the village? [Talked] Yes of course I will help. That's where I need to go!"
+            "value": "去村子? [Talked] 是的，我当然会帮忙。 那也是我要去的地方!"
         },
         {
             "key": "Thanks a lot",
-            "value": "Thanks a lot"
+            "value": "多谢了。"
         },
         {
             "key": "Hello, would you like to learn the basics of mining?",
-            "value": "Hello, would you like to learn the basics of mining?"
+            "value": "嗨！你想学习挖矿的基础知识吗?"
         },
         {
             "key": "Yes, of course, I don't mind",
-            "value": "Yes, of course, I don't mind"
+            "value": "当然，我不介意。"
         },
         {
             "key": "All right follow me I'll explain the basics to you!",
-            "value": "All right follow me I'll explain the basics to you!"
+            "value": "好吧..跟我来，我会先让你了解一点基础!"
         },
         {
             "key": "Hello, and so you're new here?",
-            "value": "Hello, and so you're new here?"
+            "value": "你好, 所以你是新来的?"
         },
         {
             "key": "Yes.",
-            "value": "Yes."
+            "value": "是的。"
         },
         {
             "key": "I need to register you. Please introduce yourself, and the purpose of your arrival, and the time you to stay here",
-            "value": "I need to register you. Please introduce yourself, and the purpose of your arrival, and the time you to stay here"
+            "value": "我得登记你.。请介绍你自己, 还有你来的目的和停留时间。"
         },
         {
             "key": "My name is [Player]. I came here to become an adventurer. I can't tell you the exact time of stay.",
-            "value": "My name is [Player]. I came here to become an adventurer. I can't tell you the exact time of stay."
+            "value": "我的名字是[Player]。我来这里是为了成为一名冒险家，我无法告知你我具体会待多久。"
         },
         {
             "key": "And who for you should know the time of your stay here.",
-            "value": "And who for you should know the time of your stay here."
+            "value": "谁会知道你在这待多久。"
         },
         {
             "key": "Okay well, I will write you down, in case of violation of the rules of our village, we have every right to prohibit your presence here, and report to superiors.",
-            "value": "Okay well, I will write you down, in case of violation of the rules of our village, we have every right to prohibit your presence here, and report to superiors."
+            "value": "好吧.你给我听好了。如果你违反了我们村子的规矩.我们有权禁止你到这里.并向上级报告"
         },
         {
             "key": "Have a good day!",
-            "value": "Have a good day!"
+            "value": "祝你拥有美好的一天!"
         },
         {
             "key": "Thank's [Talked]!",
-            "value": "Thank's [Talked]!"
+            "value": "谢了 [Talked]!"
         },
         {
             "key": "[Stranger]Greetings, wanderer. *bowing*",
-            "value": "[Stranger]Greetings, wanderer. *bowing*"
+            "value": "[Stranger] 你好, 流浪者. *鞠躬*"
         },
         {
             "key": "I am the Deputy of the Apostle, and I also protect her.",
-            "value": "I am the Deputy of the Apostle, and I also protect her."
+            "value": "我是使徒的副手.我的职责是保护使徒."
         },
         {
             "key": "I think you've already heard, that the monsters are raging.",
-            "value": "I think you've already heard, that the monsters are raging."
+            "value": "我想你已经听说了.有怪物在肆虐的消息."
         },
         {
             "key": "I have a request for you [Player]",
-            "value": "I have a request for you [Player]"
+            "value": "我对你有一个要求 [Player]"
         },
         {
             "key": "Which one?",
-            "value": "哪个?"
+            "value": "什么要求?"
         },
         {
             "key": "Help in the southern part to win over the monsters. We can't drive them away but we can scare them away.",
-            "value": "帮助南方战胜怪物. 我们不能赶走它们但是我们能吓走它们."
+            "value": "帮助南方战胜怪物. 我们不能赶走它们，但是我们可以吓跑它们."
         },
         {
             "key": "Of course I will.",
@@ -2174,7 +2185,7 @@
         },
         {
             "key": "You look awful today, [Talked]! What happend?",
-            "value": "你今天看起来很可怕, [Talked]! 发生了什么？"
+            "value": "你今天看起来很惊慌, [Talked]! 发生了什么？"
         },
         {
             "key": "Oh.. don't you worry about me, boy..",
@@ -2186,11 +2197,11 @@
         },
         {
             "key": "I'm tired of these fight I have with my wife, it's personal bussiness.",
-            "value": "I'm tired of these fight I have with my wife, it's personal bussiness."
+            "value": "我厌倦了和我妻子的这些争吵.这是我的私事."
         },
         {
             "key": "I didn't want to be a pain to you, Officer. I will leave you to your problems now.",
-            "value": "I didn't want to be a pain to you, Officer. I will leave you to your problems now."
+            "value": "我不想让你这么痛苦.警官.我现在就让你解决你的问题."
         },
         {
             "key": "No! Wait!",
@@ -2198,15 +2209,15 @@
         },
         {
             "key": "Hello [Player], I have come to you from the Final Fantasy universe, my name is [Talked].",
-            "value": "Hello [Player], I have come to you from the Final Fantasy universe, my name is [Talked]."
-        },
+            "value": "你好啊 [Player]. 你怎么弄到碎片我们会来接你的.我的名字是 [Talked]"
+         },
         {
             "key": "I can't say for sure how long I will be here, but for now I will be happy to know your world, and I will be happy to show my world",
-            "value": "I can't say for sure how long I will be here, but for now I will be happy to know your world, and I will be happy to show my world"
+            "value": "当然我会在这里呆多久，但现在我很高兴了解你们的世界，也很高兴展示我的世界"
         },
         {
             "key": "Are you serious? Did the author smoke dope?",
-            "value": "你认真的? 作者在吸食毒品？"
+            "value": "你认真的? 作者在吸食毒品(不是ffs或Moker或者其他人)？"
         },
         {
             "key": "Maybe so, I have a couple of things that you can get from me, but not for free. I'll need the fragments I lost",
@@ -2214,7 +2225,7 @@
         },
         {
             "key": "Welcome home, sir! **she made a bow**",
-            "value": "Welcome home, sir! **she made a bow**"
+            "value": "欢迎回家, 先生! **她鞠了一躬**"
         }
 ]
-}
+}                                                                                                                                                                         
