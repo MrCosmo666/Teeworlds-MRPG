@@ -5,6 +5,8 @@
 #include <game/server/gamecontext.h>
 
 #include <game/server/mmocore/Components/Quests/QuestCore.h>
+
+#include <teeother/components/localization.h>
 #include <teeother/tl/nlohmann_json.h>
 
 // loading of all skins and mobs to use for connection with other bots
@@ -227,30 +229,30 @@ void CBotCore::LoadQuestBots(const char* pWhereLocalWorld)
 		QuestBotInfo::ms_aQuestBot[MobID].m_QuestID = (int)pRes->getInt("QuestID");
 		QuestBotInfo::ms_aQuestBot[MobID].m_Step = (int)pRes->getInt("Step");
 		QuestBotInfo::ms_aQuestBot[MobID].m_WorldID = (int)pRes->getInt("WorldID");
-		QuestBotInfo::ms_aQuestBot[MobID].m_PositionX = (int)pRes->getInt("pos_x");
-		QuestBotInfo::ms_aQuestBot[MobID].m_PositionY = (int)pRes->getInt("pos_y") + 1;
-		QuestBotInfo::ms_aQuestBot[MobID].m_aItemSearch[0] = (int)pRes->getInt("it_need_0");
-		QuestBotInfo::ms_aQuestBot[MobID].m_aItemSearch[1] = (int)pRes->getInt("it_need_1");
-		QuestBotInfo::ms_aQuestBot[MobID].m_aItemGives[0] = (int)pRes->getInt("it_reward_0");
-		QuestBotInfo::ms_aQuestBot[MobID].m_aItemGives[1] = (int)pRes->getInt("it_reward_1");
-		QuestBotInfo::ms_aQuestBot[MobID].m_aNeedMob[0] = (int)pRes->getInt("mob_0");
-		QuestBotInfo::ms_aQuestBot[MobID].m_aNeedMob[1] = (int)pRes->getInt("mob_1");
-		QuestBotInfo::ms_aQuestBot[MobID].m_InteractiveType = (int)pRes->getInt("interactive_type");
-		QuestBotInfo::ms_aQuestBot[MobID].m_InteractiveTemp = (int)pRes->getInt("interactive_temp");
-		QuestBotInfo::ms_aQuestBot[MobID].m_GenerateNick = (bool)pRes->getBoolean("generate_nick");
+		QuestBotInfo::ms_aQuestBot[MobID].m_PositionX = (int)pRes->getInt("PosX");
+		QuestBotInfo::ms_aQuestBot[MobID].m_PositionY = (int)pRes->getInt("PosY") + 1;
+		QuestBotInfo::ms_aQuestBot[MobID].m_aItemSearch[0] = (int)pRes->getInt("RequiredItemID1");
+		QuestBotInfo::ms_aQuestBot[MobID].m_aItemSearch[1] = (int)pRes->getInt("RequiredItemID2");
+		QuestBotInfo::ms_aQuestBot[MobID].m_aItemGives[0] = (int)pRes->getInt("RewardItemID1");
+		QuestBotInfo::ms_aQuestBot[MobID].m_aItemGives[1] = (int)pRes->getInt("RewardItemID2");
+		QuestBotInfo::ms_aQuestBot[MobID].m_aNeedMob[0] = (int)pRes->getInt("RequiredDefeatMobID1");
+		QuestBotInfo::ms_aQuestBot[MobID].m_aNeedMob[1] = (int)pRes->getInt("RequiredDefeatMobID2");
+		QuestBotInfo::ms_aQuestBot[MobID].m_InteractiveType = (int)pRes->getInt("InteractionType");
+		QuestBotInfo::ms_aQuestBot[MobID].m_InteractiveTemp = (int)pRes->getInt("InteractionTemp");
+		QuestBotInfo::ms_aQuestBot[MobID].m_GenerateNick = (bool)pRes->getBoolean("GenerateSubName");
 
-		sscanf(pRes->getString("it_count").c_str(), "|%d|%d|%d|%d|%d|%d|",
+		sscanf(pRes->getString("Amount").c_str(), "|%d|%d|%d|%d|%d|%d|",
 			&QuestBotInfo::ms_aQuestBot[MobID].m_aItemSearchValue[0], &QuestBotInfo::ms_aQuestBot[MobID].m_aItemSearchValue[1],
 			&QuestBotInfo::ms_aQuestBot[MobID].m_aItemGivesValue[0], &QuestBotInfo::ms_aQuestBot[MobID].m_aItemGivesValue[1],
 			&QuestBotInfo::ms_aQuestBot[MobID].m_aNeedMobValue[0], &QuestBotInfo::ms_aQuestBot[MobID].m_aNeedMobValue[1]);
 
-		// load talk
-		ResultPtr pResTalk = SJK.SD("*", "tw_dialogs_quest_npc", "WHERE MobID = '%d'", MobID);
-		if(pResTalk->next())
+		// load dialog
+		try
 		{
-			try
+			std::string DialogJsonStr = pRes->getString("DialogData").c_str();
+			if(DialogJsonStr.length() >= 10)
 			{
-				nlohmann::json JsonData = nlohmann::json::parse(pResTalk->getString("Data").c_str());
+				nlohmann::json JsonData = nlohmann::json::parse(DialogJsonStr.c_str());
 				for(auto& pItem : JsonData)
 				{
 					DialogData LoadTalk;
@@ -269,10 +271,10 @@ void CBotCore::LoadQuestBots(const char* pWhereLocalWorld)
 					QuestBotInfo::ms_aQuestBot[MobID].m_aDialog.push_back(LoadTalk);
 				}
 			}
-			catch(nlohmann::json::exception &s)
-			{
-				dbg_msg("dialog error", "dialog id [%d] (json %s)", pResTalk->getInt("ID"), s.what());
-			}
+		}
+		catch(nlohmann::json::exception &s)
+		{
+			dbg_msg("dialog error", "dialog [quest bot id %d] (json %s)", pRes->getInt("ID"), s.what());
 		}
 	}
 
@@ -293,8 +295,8 @@ void CBotCore::LoadNpcBots(const char* pWhereLocalWorld)
 		const int MobID = (int)pRes->getInt("ID");
 		NpcBotInfo::ms_aNpcBot[MobID].m_WorldID = pRes->getInt("WorldID");
 		NpcBotInfo::ms_aNpcBot[MobID].m_Static = pRes->getBoolean("Static");
-		NpcBotInfo::ms_aNpcBot[MobID].m_PositionX = pRes->getInt("PositionX");
-		NpcBotInfo::ms_aNpcBot[MobID].m_PositionY = (NpcBotInfo::ms_aNpcBot[MobID].m_Static ? pRes->getInt("PositionY") + 1 : pRes->getInt("PositionY"));
+		NpcBotInfo::ms_aNpcBot[MobID].m_PositionX = pRes->getInt("PosX");
+		NpcBotInfo::ms_aNpcBot[MobID].m_PositionY = pRes->getInt("PosY") + (NpcBotInfo::ms_aNpcBot[MobID].m_Static ? 1 : 0);
 		NpcBotInfo::ms_aNpcBot[MobID].m_Emote = pRes->getInt("Emote");
 		NpcBotInfo::ms_aNpcBot[MobID].m_BotID = pRes->getInt("BotID");
 		NpcBotInfo::ms_aNpcBot[MobID].m_Function = pRes->getInt("Function");
@@ -303,38 +305,38 @@ void CBotCore::LoadNpcBots(const char* pWhereLocalWorld)
 		for(int c = 0; c < NumberOfNpc; c++)
 			GS()->CreateBot(TYPE_BOT_NPC, NpcBotInfo::ms_aNpcBot[MobID].m_BotID, MobID);
 
-		// init dialogs
-		ResultPtr pResTalk = SJK.SD("*", "tw_dialogs_other_npc", "WHERE MobID = '%d'", MobID);
-		if(pResTalk->next())
+		// load dialog
+		try
 		{
-			try
+			std::string DialogJsonStr = pRes->getString("DialogData").c_str();
+			if(DialogJsonStr.length() >= 10)
 			{
 				DialogData LoadTalk;
-				nlohmann::json JsonData = nlohmann::json::parse(pResTalk->getString("Data").c_str());
+				nlohmann::json JsonData = nlohmann::json::parse(DialogJsonStr.c_str());
 				for(auto& pItem : JsonData)
 				{
 					str_copy(LoadTalk.m_aText, pItem.value("text", "").c_str(), sizeof(LoadTalk.m_aText));
 					LoadTalk.m_Style = GetReformatedValue("style", pItem.value("style", "basic").c_str());
 					LoadTalk.m_Emote = GetReformatedValue("emote", pItem.value("emote", "normal").c_str());
-					LoadTalk.m_GivesQuestID = pResTalk->getInt("GivesQuestID");
+					LoadTalk.m_GivesQuestID = pRes->getInt("GivesQuestID");
 					LoadTalk.m_PlayerSays = false;
-				
+
 					if(str_comp_nocase_num(LoadTalk.m_aText, "[p]", 3) == 0)
 					{
 						LoadTalk.m_PlayerSays = true;
 						mem_move(LoadTalk.m_aText, LoadTalk.m_aText + 3, sizeof(LoadTalk.m_aText));
 					}
 
-					if(pResTalk->getInt("GivesQuestID") > 0)
+					if(pRes->getInt("GivesQuestID") > 0)
 						NpcBotInfo::ms_aNpcBot[MobID].m_Function = FUNCTION_NPC_GIVE_QUEST;
-					
+
 					NpcBotInfo::ms_aNpcBot[MobID].m_aDialog.push_back(LoadTalk);
 				}
 			}
-			catch(nlohmann::json::exception &s)
-			{
-				dbg_msg("dialog error", "dialog id [%d] (json %s)", pResTalk->getInt("ID"), s.what());
-			}
+		}
+		catch(nlohmann::json::exception &s)
+		{
+			dbg_msg("dialog error", "dialog [npc bot id %d] (json %s)", pRes->getInt("ID"), s.what());
 		}
 	}
 }
@@ -384,7 +386,7 @@ const char* CBotCore::GetMeaninglessDialog()
 {
 	const char* pTalking[3] =
 	{
-		"[Player], do you have any questions? I'm sorry I can't help you.",
+		"[Player], do you have any questions? I'm sorry, can't help you.",
 		"What a beautiful [Time]. I don't have anything for you [Player].",
 		"[Player] are you interested something? I'm sorry, don't want to talk right now."
 	};
@@ -420,4 +422,55 @@ void CBotCore::ConAddCharacterBot(int ClientID, const char* pCharacter)
 	// add a new bot
 	SJK.ID("tw_bots_info", "(Name, SkinName, SkinColor) VALUES ('%s', '%s', '%s')", cNick.cstr(), SkinPart, SkinColor);
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "parseskin", "Added new character bot!");
+}
+
+// dump dialogs for translate | TODO: add hashing by id dialog
+void CBotCore::ConDumpDialogsForTranslate()
+{
+	auto PushingDialogs = [](nlohmann::json& pJson, std::vector<DialogData>& pDialogVector)
+	{
+		for(auto& pDialog : pDialogVector)
+		{
+			for(auto& pKeys : pJson["translation"])
+			{
+				if(pKeys["key"] == pDialog.m_aText)
+					return;
+			}
+			pJson["translation"].push_back({ { "key", pDialog.m_aText }, { "value", pDialog.m_aText } });
+		}
+	};
+
+	char aDirLanguageFile[256];
+	for(int i = 0; i < GS()->Server()->Localization()->m_pLanguages.size(); i++)
+	{
+		str_format(aDirLanguageFile, sizeof(aDirLanguageFile), "server_lang/%s.json", GS()->Server()->Localization()->m_pLanguages[i]->GetFilename());
+		IOHANDLE File = io_open(aDirLanguageFile, IOFLAG_READ);
+		if(!File)
+			continue;
+
+		const int FileSize = (int)io_length(File) + 1;
+		char* pFileData = (char*)malloc(FileSize);
+		mem_zero(pFileData, FileSize);
+		io_read(File, pFileData, FileSize);
+
+		// close and clear
+		nlohmann::json JsonData = nlohmann::json::parse(pFileData);
+		mem_free(pFileData);
+		io_close(File);
+
+		for(auto& pItem : QuestBotInfo::ms_aQuestBot)
+			PushingDialogs(JsonData, pItem.second.m_aDialog);
+		for(auto& pItem : NpcBotInfo::ms_aNpcBot)
+			PushingDialogs(JsonData, pItem.second.m_aDialog);
+
+		// save file
+		File = io_open(aDirLanguageFile, IOFLAG_WRITE);
+		if(!File)
+			continue;
+
+		std::string Data = JsonData.dump(4);
+		io_write(File, Data.c_str(), Data.length());
+		io_close(File);
+	}
+	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "dump_dialogs", "Completed successfully!");
 }

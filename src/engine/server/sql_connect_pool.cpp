@@ -81,19 +81,16 @@ Connection* CConectionPool::CreateConnection()
 	{
 		try
 		{
-			// Code from InfClass
-			sql::ConnectOptionsMap connection_properties;
-			connection_properties["hostName"] = sql::SQLString(g_Config.m_SvMySqlHost);
-			connection_properties["port"] = g_Config.m_SvMySqlPort;
-			connection_properties["userName"] = sql::SQLString(g_Config.m_SvMySqlLogin);
-			connection_properties["password"] = sql::SQLString(g_Config.m_SvMySqlPassword);
-			connection_properties["OPT_CONNECT_TIMEOUT"] = 10;
-			connection_properties["OPT_READ_TIMEOUT"] = 10;
-			connection_properties["OPT_WRITE_TIMEOUT"] = 20;
-			connection_properties["OPT_RECONNECT"] = true;
-
-			pConnection = m_pDriver->connect(connection_properties);
+			std::string Hostname(g_Config.m_SvMySqlHost);
+			Hostname.append(":" + std::to_string(g_Config.m_SvMySqlPort));
+			pConnection = m_pDriver->connect(Hostname.c_str(), g_Config.m_SvMySqlLogin, g_Config.m_SvMySqlPassword);
+			
 			pConnection->setClientOption("OPT_CHARSET_NAME", "utf8mb4");
+			pConnection->setClientOption("OPT_CONNECT_TIMEOUT", "10");
+			pConnection->setClientOption("OPT_READ_TIMEOUT", "10");
+			pConnection->setClientOption("OPT_WRITE_TIMEOUT", "20");
+			pConnection->setClientOption("OPT_RECONNECT", "1");
+			
 			pConnection->setSchema(g_Config.m_SvMySqlDatabase);
 		}
 		catch(SQLException &e)

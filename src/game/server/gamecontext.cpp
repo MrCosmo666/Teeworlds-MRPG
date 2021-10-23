@@ -1022,6 +1022,7 @@ void CGS::OnConsoleInit()
 	Console()->Register("disband_guild", "r[guildname]", CFGFLAG_SERVER, ConDisbandGuild, m_pServer, "Disband the guild with the name");
 	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, m_pServer, "Say in chat");
 	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, m_pServer, "(Warning) Add new bot on database or update if finding <clientid> <bot name>");
+	Console()->Register("dump_dialogs_for_translate", "", CFGFLAG_SERVER, ConDumpDialogsForTranslate, m_pServer, "Perform dump dialogs for future translation to translation files");
 }
 
 void CGS::OnTick()
@@ -1623,6 +1624,16 @@ void CGS::ConAddCharacter(IConsole::IResult *pResult, void *pUserData)
 
 	// add a new kind of bot
 	pSelf->Mmo()->BotsData()->ConAddCharacterBot(ClientID, pResult->GetString(1));
+}
+
+// dump dialogs for translate
+void CGS::ConDumpDialogsForTranslate(IConsole::IResult* pResult, void* pUserData)
+{
+	IServer* pServer = (IServer*)pUserData;
+	CGS* pSelf = (CGS*)pServer->GameServer();
+
+	// dump
+	pSelf->Mmo()->BotsData()->ConDumpDialogsForTranslate();
 }
 
 void CGS::ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)

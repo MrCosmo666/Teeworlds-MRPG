@@ -887,8 +887,9 @@ bool CClient::LoadMmoData(const SHA256_DIGEST* pWantedSha256, unsigned WantedCrc
 		return false;
 
 	// check crc and sha256
-	if((pWantedSha256 && m_DataMmo.Sha256() != *pWantedSha256) || m_DataMmo.Crc() != WantedCrc)
+	if ((pWantedSha256 && m_DataMmo.Sha256() != *pWantedSha256) || m_DataMmo.Crc() != WantedCrc)
 	{
+		m_pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "client", "data mmo differs from the server.");
 		m_DataMmo.Unload();
 		return false;
 	}
@@ -900,6 +901,7 @@ bool CClient::LoadMmoData(const SHA256_DIGEST* pWantedSha256, unsigned WantedCrc
 static void FormatMmoDataDownloadFilename(const SHA256_DIGEST* pSha256, bool Temp, char* pBuffer, int BufferSize)
 {
 	char aSuffix[32];
+	aSuffix[0] = '\0';
 	if(Temp)
 		str_format(aSuffix, sizeof(aSuffix), ".%d.tmp", pid());
 
@@ -1683,7 +1685,7 @@ void CClient::ProcessServerPacket(CNetChunk* pPacket)
 			}
 
 			// start download
-			FormatMmoDataDownloadFilename(pMmoSha256, false, m_DownloadMmoData.m_aFilename, sizeof(m_DownloadMmoData.m_aFilename));
+			str_copy(m_DownloadMmoData.m_aFilename, MMO_DATA_FILE, sizeof(m_DownloadMmoData.m_aFilename));
 			FormatMmoDataDownloadFilename(pMmoSha256, true, m_DownloadMmoData.m_aFilenameTemp, sizeof(m_DownloadMmoData.m_aFilenameTemp));
 			m_DownloadMmoData.m_FileTemp = Storage()->OpenFile(m_DownloadMmoData.m_aFilenameTemp, IOFLAG_WRITE, IStorageEngine::TYPE_SAVE);
 			m_DownloadMmoData.m_Sha256 = *pMmoSha256;

@@ -31,6 +31,7 @@ public:
 	int GetQuestNPC(int MobID) const;
 	const char *GetMeaninglessDialog();
 
+	void ConDumpDialogsForTranslate();
 	void ConAddCharacterBot(int ClientID, const char* pCharacter);
 };
 
