@@ -243,12 +243,12 @@ void CPlayerQuestStepDataInfo::CreateStepDropTakeItems(CPlayer* pPlayer)
 
 void CPlayerQuestStepDataInfo::ShowRequired(CPlayer* pPlayer, const char* TextTalk)
 {
+	dynamic_string Buffer;
 	CGS* pGS = pPlayer->GS();
 	const int ClientID = pPlayer->GetCID();
+
 	if(pGS->IsMmoClient(ClientID))
 	{
-		dynamic_string Buffer;
-
 		// search item's
 		for (int i = 0; i < 2; i++)
 		{
@@ -290,8 +290,6 @@ void CPlayerQuestStepDataInfo::ShowRequired(CPlayer* pPlayer, const char* TextTa
 		return;
 	}
 
-	char aBuf[64];
-	dynamic_string Buffer;
 	bool IsActiveTask = false;
 
 	// search item's and mob's
