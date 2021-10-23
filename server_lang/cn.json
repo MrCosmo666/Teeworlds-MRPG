@@ -3617,26 +3617,6 @@
         },
         {
             "id": null,
-            "key": "Hi, {STR} Last log in {STR}",
-            "value": "Hello, {STR} 最近一次登录： {STR}"
-        },
-        {
-            "id": null,
-            "key": "Level {INT} : Exp {INT}/{INT}",
-            "value": "等级：{INT} :: 经验值：{INT}/{INT}"
-        },
-        {
-            "id": null,
-            "key": "Skill Point {INT}SP",
-            "value": "技能点 {INT}SP"
-        },
-        {
-            "id": null,
-            "key": "Gold: {INT}",
-            "value": "钱: {INT}"
-        },
-        {
-            "id": null,
             "key": "☪ SUB MENU PERSONAL",
             "value": "☪ 个人-子菜单"
         },
@@ -4099,6 +4079,26 @@
             "id": null,
             "key": "[Done] Defeat the {STR}'s for the {STR}!",
             "value": "[完成] 击败 {STR}'s 给 {STR}!"
+        },
+        {
+            "id": null,
+            "key": "Hi, {STR} Last log in {STR}",
+            "value": "Hello, {STR} 最近一次登录： {STR}"
+        },
+        {
+            "id": null,
+            "key": "Level {INT} : Exp {INT}/{INT}",
+            "value": "等级：{INT} :: 经验值：{INT}/{INT}"
+        },
+        {
+            "id": null,
+            "key": "Skill Point {INT}SP",
+            "value": "技能点 {INT}SP"
+        },
+        {
+            "id": null,
+            "key": "Gold: {INT}",
+            "value": "钱: {INT}"
         }
     ]
 }

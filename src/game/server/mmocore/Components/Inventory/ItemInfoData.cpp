@@ -87,7 +87,7 @@ bool CItemDataInfo::IsEnchantMaxLevel(int Enchant) const
 	return false;
 }
 
-void CItemDataInfo::FormatAttributes(char* pBuffer, int Size, int Enchant) const
+void CItemDataInfo::FormatAttributes(CPlayer* pPlayer, char* pBuffer, int Size, int Enchant) const
 {
 	dynamic_string Buffer;
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
@@ -97,10 +97,7 @@ void CItemDataInfo::FormatAttributes(char* pBuffer, int Size, int Enchant) const
 
 		const int BonusID = m_aAttribute[i];
 		const int BonusValue = GetInfoEnchantStats(BonusID, Enchant);
-
-		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "%s+%d ", CGS::ms_aAttributsInfo[BonusID].m_aName, BonusValue);
-		Buffer.append_at(Buffer.length(), aBuf);
+		pPlayer->GS()->Server()->Localization()->Format(Buffer, pPlayer->GetLanguage(), "{STR}+{VAL} ", CGS::ms_aAttributsInfo[BonusID].m_aName, BonusValue);
 	}
 	str_copy(pBuffer, Buffer.buffer(), Size);
 	Buffer.clear();

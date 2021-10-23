@@ -346,16 +346,27 @@ void MmoController::ConSyncLinesForTranslate()
 	auto PushingDialogs = [](nlohmann::json& pJson, const char* pTextKey, const char* HashingType, int HashingByID)
 	{
 		std::string Hashing(HashingType + std::to_string(HashingByID));
-		for(auto& pKeys : pJson["translation"])
+
+		try
 		{
-			if(pTextKey[0] == '\0' || pKeys["id"] == Hashing)
+			for(auto& pKeys : pJson["translation"])
 			{
-				if(pKeys["key"] != pTextKey) // reset the translate because the key has changed
-					pKeys["key"] = pKeys["value"] = pTextKey;
-				return;
+				if(!pKeys["id"].is_string() || !pKeys["key"].is_string() || !pKeys["value"].is_string())
+					continue;
+				if(pKeys.value("id", "0") == Hashing)
+				{
+					if(pKeys.value("key", "0") != pTextKey) // reset the translate because the key has changed
+						pKeys["key"] = pKeys["value"] = pTextKey;
+					return;
+				}
 			}
+			if(pTextKey[0] != '\0')
+				pJson["translation"].push_back({ { "key", pTextKey }, { "value", pTextKey }, { "id", Hashing.c_str() }});
 		}
-		pJson["translation"].push_back({ { "key", pTextKey }, { "value", pTextKey }, { "id", Hashing.c_str() }});
+		catch(nlohmann::json::exception& e)
+		{
+			dbg_msg("sync_lines", "%s", e.what());
+		}
 	};
 
 	char aDirLanguageFile[256];

@@ -92,7 +92,7 @@ void CCraftCore::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int Selec
 				(pPlayer->GetItem(cr.second.m_ItemID).m_Value ? "✔ " : "\0"), InfoGetItem.GetName(), Price);
 
 			char aAttributes[128];
-			InfoGetItem.FormatAttributes(aAttributes, sizeof(aAttributes), 0);
+			InfoGetItem.FormatAttributes(pPlayer, aAttributes, sizeof(aAttributes), 0);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 		}
 		else

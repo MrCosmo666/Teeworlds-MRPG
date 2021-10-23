@@ -319,7 +319,7 @@ void CShopCore::ShowAuction(CPlayer* pPlayer)
 				(pPlayer->GetItem(ItemID).m_Value > 0 ? "✔ " : "\0"), pBuyightItem.GetName(), (Enchant > 0 ? aEnchantBuf : "\0"), Price);
 
 			char aAttributes[128];
-			pBuyightItem.FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
+			pBuyightItem.FormatAttributes(pPlayer, aAttributes, sizeof(aAttributes), Enchant);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 		}
 		else
@@ -364,7 +364,7 @@ void CShopCore::ShowMailShop(CPlayer *pPlayer, int StorageID)
 				(pPlayer->GetItem(ItemID).m_Value > 0 ? "✔ " : "\0"), pBuyightItem.GetName(), (Enchant > 0 ? aEnchantBuf : "\0"), Price, pRequiredItem.GetName());
 
 			char aAttributes[128];
-			pBuyightItem.FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
+			pBuyightItem.FormatAttributes(pPlayer, aAttributes, sizeof(aAttributes), Enchant);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 		}
 		else

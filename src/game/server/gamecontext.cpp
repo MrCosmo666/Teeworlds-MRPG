@@ -1683,7 +1683,7 @@ void CGS::AV(int ClientID, const char *pCmd, const char *pDesc, const int TempIn
 	if(ClientID < 0 || ClientID >= MAX_PLAYERS || !m_apPlayers[ClientID])
 		return;
 
-	char aBufDesc[128]; // buffer x2 with unicode
+	char aBufDesc[512]; // buffer x2 with unicode
 	str_copy(aBufDesc, pDesc, sizeof(aBufDesc));
 	if(str_comp(m_apPlayers[ClientID]->GetLanguage(), "ru") == 0 || str_comp(m_apPlayers[ClientID]->GetLanguage(), "uk") == 0)
 		str_translation_utf8_to_cp(aBufDesc);

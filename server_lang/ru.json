@@ -1,314 +1,299 @@
 {
     "translation": [
         {
-            "id": "ittm10007",
-            "key": "Angel wings",
-            "value": "Angel wings"
+            "id": "qudn21",
+            "key": "Abandoned mine",
+            "value": "Abandoned mine"
         },
         {
-            "id": "itdc10007",
+            "id": "itdc27",
+            "key": "It happens sometimes",
+            "value": "It happens sometimes"
+        },
+        {
+            "id": "ittm28",
+            "key": "Small ammo bag",
+            "value": "Small ammo bag"
+        },
+        {
+            "id": "itdc28",
+            "key": "Adds a small amount of ammunition",
+            "value": "Adds a small amount of ammunition"
+        },
+        {
+            "id": "ittm29",
+            "key": "Gel",
+            "value": "Gel"
+        },
+        {
+            "id": "itdc29",
+            "key": "I wonder what it's for?",
+            "value": "I wonder what it's for?"
+        },
+        {
+            "id": "ittm30",
+            "key": "Goblin Ingot",
+            "value": "Goblin Ingot"
+        },
+        {
+            "id": "itdc30",
+            "key": "Information added later.",
+            "value": "Information added later."
+        },
+        {
+            "id": "ittm31",
+            "key": "Copper Ingot",
+            "value": "Copper Ingot"
+        },
+        {
+            "id": "itdc31",
+            "key": "Information added later.",
+            "value": "Information added later."
+        },
+        {
+            "id": "ittm32",
+            "key": "Salantra Blessing",
+            "value": "Salantra Blessing"
+        },
+        {
+            "id": "itdc32",
+            "key": "It happens sometimes",
+            "value": "It happens sometimes"
+        },
+        {
+            "id": "ittm33",
+            "key": "Explosive module for gun",
+            "value": "Explosive module for gun"
+        },
+        {
+            "id": "itdc33",
+            "key": "It happens sometimes",
+            "value": "It happens sometimes"
+        },
+        {
+            "id": "ittm34",
+            "key": "Explosive module for shotgun",
+            "value": "Explosive module for shotgun"
+        },
+        {
+            "id": "itdc34",
+            "key": "It happens sometimes",
+            "value": "It happens sometimes"
+        },
+        {
+            "id": "ittm35",
+            "key": "Kappa meat",
+            "value": "Kappa meat"
+        },
+        {
+            "id": "itdc35",
+            "key": "Information added later.",
+            "value": "Information added later."
+        },
+        {
+            "id": "ittm36",
+            "key": "Ring of Arvida",
+            "value": "Ring of Arvida"
+        },
+        {
+            "id": "itdc36",
+            "key": "It happens sometimes",
+            "value": "It happens sometimes"
+        },
+        {
+            "id": "ittm37",
+            "key": "Relic of the Orc Lord",
+            "value": "Relic of the Orc Lord"
+        },
+        {
+            "id": "itdc37",
+            "key": "Information added later.",
+            "value": "Information added later."
+        },
+        {
+            "id": "ittm38",
+            "key": "Ticket reset class stats",
+            "value": "Ticket reset class stats"
+        },
+        {
+            "id": "itdc38",
+            "key": "Resets only class stats(Dps, Tank, Healer).",
+            "value": "Resets only class stats(Dps, Tank, Healer)."
+        },
+        {
+            "id": "ittm39",
+            "key": "Mode PVP",
+            "value": "Mode PVP"
+        },
+        {
+            "id": "itdc39",
+            "key": "Settings game.",
+            "value": "Settings game."
+        },
+        {
+            "id": "ittm40",
+            "key": "Ticket reset weapon stats",
+            "value": "Ticket reset weapon stats"
+        },
+        {
+            "id": "itdc40",
+            "key": "Resets only ammo stats(Ammo).",
+            "value": "Resets only ammo stats(Ammo)."
+        },
+        {
+            "id": "ittm41",
+            "key": "Orc's Belt",
+            "value": "Orc's Belt"
+        },
+        {
+            "id": "itdc41",
+            "key": "You can feel the light power of mana.",
+            "value": "You can feel the light power of mana."
+        },
+        {
+            "id": "ittm42",
+            "key": "Torn cloth clothes of orcs",
+            "value": "Torn cloth clothes of orcs"
+        },
+        {
+            "id": "itdc42",
+            "key": "Information added later.",
+            "value": "Information added later."
+        },
+        {
+            "id": "ittm43",
+            "key": "Blessing for discount craft",
+            "value": "Blessing for discount craft"
+        },
+        {
+            "id": "itdc43",
+            "key": "Need dress it, -20% craft price",
+            "value": "Need dress it, -20% craft price"
+        },
+        {
+            "id": "ittm44",
+            "key": "Noctis fragment",
+            "value": "Noctis fragment"
+        },
+        {
+            "id": "itdc44",
+            "key": "Event Final Fantasy.",
+            "value": "Event Final Fantasy."
+        },
+        {
+            "id": "ittm45",
+            "key": "The core of Neptune",
+            "value": "The core of Neptune"
+        },
+        {
+            "id": "itdc45",
+            "key": "Information added later.",
+            "value": "Information added later."
+        },
+        {
+            "id": "ittm46",
+            "key": "Remains of a dead soul",
+            "value": "Remains of a dead soul"
+        },
+        {
+            "id": "itdc46",
+            "key": "Information added later.",
+            "value": "Information added later."
+        },
+        {
+            "id": "ittm47",
+            "key": "Ring of God of War",
+            "value": "Ring of God of War"
+        },
+        {
+            "id": "itdc47",
+            "key": "It happens sometimes",
+            "value": "It happens sometimes"
+        },
+        {
+            "id": "ittm48",
+            "key": "Bracelet of Fire",
+            "value": "Bracelet of Fire"
+        },
+        {
+            "id": "itdc48",
+            "key": "It happens sometimes",
+            "value": "It happens sometimes"
+        },
+        {
+            "id": "ittm49",
+            "key": "Big ammo bag",
+            "value": "Big ammo bag"
+        },
+        {
+            "id": "itdc49",
+            "key": "Adds a small amount of ammunition",
+            "value": "Adds a small amount of ammunition"
+        },
+        {
+            "id": "ittm50",
+            "key": "Strength ",
+            "value": "Strength "
+        },
+        {
+            "id": "itdc50",
+            "key": "Increase your strength",
+            "value": "Increase your strength"
+        },
+        {
+            "id": "ittm51",
+            "key": "Random home decor",
+            "value": "Random home decor"
+        },
+        {
+            "id": "itdc51",
+            "key": "Lucky house decor",
+            "value": "Lucky house decor"
+        },
+        {
+            "id": "ittm10000",
+            "key": "Heavenly hammer",
+            "value": "Heavenly hammer"
+        },
+        {
+            "id": "ittm10001",
+            "key": "Heavenly gun",
+            "value": "Heavenly gun"
+        },
+        {
+            "id": "ittm10002",
+            "key": "Heavenly shotgun",
+            "value": "Heavenly shotgun"
+        },
+        {
+            "id": "ittm10003",
+            "key": "Heavenly grenade",
+            "value": "Heavenly grenade"
+        },
+        {
+            "id": "ittm10004",
+            "key": "Heavenly rifle",
+            "value": "Heavenly rifle"
+        },
+        {
+            "id": "ittm10005",
+            "key": "Shadow wings",
+            "value": "Shadow wings"
+        },
+        {
+            "id": "itdc10005",
+            "key": "Dark history",
+            "value": "Dark history"
+        },
+        {
+            "id": "ittm10006",
+            "key": "Neptune wings",
+            "value": "Neptune wings"
+        },
+        {
+            "id": "itdc10006",
             "key": "Covered in secrets",
             "value": "Covered in secrets"
-        },
-        {
-            "id": "ittm10008",
-            "key": "Heavenly wings",
-            "value": "Heavenly wings"
-        },
-        {
-            "id": "itdc10008",
-            "key": "Covered in secrets",
-            "value": "Covered in secrets"
-        },
-        {
-            "id": "ittm10009",
-            "key": "Rainbow wings",
-            "value": "Rainbow wings"
-        },
-        {
-            "id": "itdc10009",
-            "key": "Covered in secrets",
-            "value": "Covered in secrets"
-        },
-        {
-            "id": "ittm10010",
-            "key": "Magitech hammer",
-            "value": "Magitech hammer"
-        },
-        {
-            "id": "itdc10010",
-            "key": "Reinforced kick",
-            "value": "Reinforced kick"
-        },
-        {
-            "id": "ittm10011",
-            "key": "Magitech gun",
-            "value": "Magitech gun"
-        },
-        {
-            "id": "itdc10011",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10012",
-            "key": "Magitech shotgun",
-            "value": "Magitech shotgun"
-        },
-        {
-            "id": "itdc10012",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10013",
-            "key": "Magitech grenade",
-            "value": "Magitech grenade"
-        },
-        {
-            "id": "itdc10013",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10014",
-            "key": "Magitech rifle",
-            "value": "Magitech rifle"
-        },
-        {
-            "id": "itdc10014",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10015",
-            "key": "Stars wings",
-            "value": "Stars wings"
-        },
-        {
-            "id": "itdc10015",
-            "key": "Covered in secrets",
-            "value": "Covered in secrets"
-        },
-        {
-            "id": "ittm10016",
-            "key": "Bat wings",
-            "value": "Bat wings"
-        },
-        {
-            "id": "itdc10016",
-            "key": "Covered in secrets",
-            "value": "Covered in secrets"
-        },
-        {
-            "id": "ittm10017",
-            "key": "Little eagle wings",
-            "value": "Little eagle wings"
-        },
-        {
-            "id": "itdc10017",
-            "key": "Covered in secrets",
-            "value": "Covered in secrets"
-        },
-        {
-            "id": "ittm10018",
-            "key": "Necromante wings",
-            "value": "Necromante wings"
-        },
-        {
-            "id": "itdc10018",
-            "key": "Covered in secrets",
-            "value": "Covered in secrets"
-        },
-        {
-            "id": "ittm10019",
-            "key": "Goblin hammer",
-            "value": "Goblin hammer"
-        },
-        {
-            "id": "itdc10019",
-            "key": "Reinforced kick",
-            "value": "Reinforced kick"
-        },
-        {
-            "id": "ittm10020",
-            "key": "Goblin gun",
-            "value": "Goblin gun"
-        },
-        {
-            "id": "itdc10020",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10021",
-            "key": "Goblin shotgun",
-            "value": "Goblin shotgun"
-        },
-        {
-            "id": "itdc10021",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10022",
-            "key": "Goblin grenade",
-            "value": "Goblin grenade"
-        },
-        {
-            "id": "itdc10022",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10023",
-            "key": "Goblin rifle",
-            "value": "Goblin rifle"
-        },
-        {
-            "id": "itdc10023",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10024",
-            "key": "Scythe",
-            "value": "Scythe"
-        },
-        {
-            "id": "itdc10024",
-            "key": "Reinforced kick",
-            "value": "Reinforced kick"
-        },
-        {
-            "id": "ittm15000",
-            "key": "Theme Couple",
-            "value": "Theme Couple"
-        },
-        {
-            "id": "itdc15000",
-            "key": "Strictly limited as the theme",
-            "value": "Strictly limited as the theme"
-        },
-        {
-            "id": "ittm15001",
-            "key": "Theme Final Fantasy",
-            "value": "Theme Final Fantasy"
-        },
-        {
-            "id": "itdc15001",
-            "key": "Strictly limited as the theme",
-            "value": "Strictly limited as the theme"
-        },
-        {
-            "id": "ittm15002",
-            "key": "Theme Aion",
-            "value": "Theme Aion"
-        },
-        {
-            "id": "itdc15002",
-            "key": "Strictly limited as the theme",
-            "value": "Strictly limited as the theme"
-        },
-        {
-            "id": "ittm15003",
-            "key": "Theme Dragon Nest",
-            "value": "Theme Dragon Nest"
-        },
-        {
-            "id": "itdc15003",
-            "key": "Strictly limited as the theme",
-            "value": "Strictly limited as the theme"
-        },
-        {
-            "id": "sknm1",
-            "key": "Health turret",
-            "value": "Health turret"
-        },
-        {
-            "id": "skds1",
-            "key": "Creates turret a recovery health ",
-            "value": "Creates turret a recovery health "
-        },
-        {
-            "id": "skbn1",
-            "key": "life span",
-            "value": "life span"
-        },
-        {
-            "id": "sknm2",
-            "key": "Sleepy Gravity",
-            "value": "Sleepy Gravity"
-        },
-        {
-            "id": "skds2",
-            "key": "Magnet mobs to itself",
-            "value": "Magnet mobs to itself"
-        },
-        {
-            "id": "skbn2",
-            "key": "radius",
-            "value": "radius"
-        },
-        {
-            "id": "sknm3",
-            "key": "Craft Discount",
-            "value": "Craft Discount"
-        },
-        {
-            "id": "skds3",
-            "key": "Will give discount on the price of craft items",
-            "value": "Will give discount on the price of craft items"
-        },
-        {
-            "id": "skbn3",
-            "key": "% discount gold for craft item",
-            "value": "% discount gold for craft item"
-        },
-        {
-            "id": "sknm4",
-            "key": "Proficiency with weapons",
-            "value": "Proficiency with weapons"
-        },
-        {
-            "id": "skds4",
-            "key": "You can perform an automatic fire",
-            "value": "You can perform an automatic fire"
-        },
-        {
-            "id": "skbn4",
-            "key": "can perform an auto fire with all types of weapons",
-            "value": "can perform an auto fire with all types of weapons"
-        },
-        {
-            "id": "sknm5",
-            "key": "Blessing of God of war",
-            "value": "Blessing of God of war"
-        },
-        {
-            "id": "skds5",
-            "key": "The blessing restores ammo",
-            "value": "The blessing restores ammo"
-        },
-        {
-            "id": "skbn5",
-            "key": "% recovers ammo within a radius of 800",
-            "value": "% recovers ammo within a radius of 800"
-        },
-        {
-            "id": "sknm6",
-            "key": "Noctis Lucis Attack Teleport",
-            "value": "Noctis Lucis Attack Teleport"
-        },
-        {
-            "id": "skds6",
-            "key": "An attacking teleport that deals damage to all mobs radius",
-            "value": "An attacking teleport that deals damage to all mobs radius"
-        },
-        {
-            "id": "skbn6",
-            "key": "% your strength",
-            "value": "% your strength"
         },
         {
             "id": "qudn1",
@@ -516,9 +501,9 @@
             "value": "Main: Apostle Elfia"
         },
         {
-            "id": "qudn21",
-            "key": "Abandoned mine",
-            "value": "Abandoned mine"
+            "id": "diaqu154",
+            "key": "You can also improve picks this will depend on their effectiveness.",
+            "value": "You can also improve picks this will depend on their effectiveness."
         },
         {
             "id": "qusn21",
@@ -1029,11 +1014,6 @@
             "id": "diaqu153",
             "key": "But you can't work with break pickaxe it. You can repair it at any store.",
             "value": "But you can't work with break pickaxe it. You can repair it at any store."
-        },
-        {
-            "id": "diaqu154",
-            "key": "You can also improve picks this will depend on their effectiveness.",
-            "value": "You can also improve picks this will depend on their effectiveness."
         },
         {
             "id": "diaqu155",
@@ -2796,114 +2776,9 @@
             "value": "Yugasaki"
         },
         {
-            "id": "attb1",
-            "key": "Shotgun Spread",
-            "value": "Shotgun Spread"
-        },
-        {
-            "id": "attb2",
-            "key": "Grenade Spread",
-            "value": "Grenade Spread"
-        },
-        {
-            "id": "attb3",
-            "key": "Rifle Spread",
-            "value": "Rifle Spread"
-        },
-        {
-            "id": "attb4",
-            "key": "Strength",
-            "value": "Strength"
-        },
-        {
-            "id": "attb5",
-            "key": "Dexterity",
-            "value": "Dexterity"
-        },
-        {
-            "id": "attb6",
-            "key": "Crit Dmg",
-            "value": "Crit Dmg"
-        },
-        {
-            "id": "attb7",
-            "key": "Direct Crit Dmg",
-            "value": "Direct Crit Dmg"
-        },
-        {
-            "id": "attb8",
-            "key": "Hardness",
-            "value": "Hardness"
-        },
-        {
-            "id": "attb9",
-            "key": "Lucky",
-            "value": "Lucky"
-        },
-        {
-            "id": "attb10",
-            "key": "Piety",
-            "value": "Piety"
-        },
-        {
-            "id": "attb11",
-            "key": "Vampirism",
-            "value": "Vampirism"
-        },
-        {
-            "id": "attb12",
-            "key": "Ammo Regen",
-            "value": "Ammo Regen"
-        },
-        {
             "id": "attb13",
             "key": "Ammo",
             "value": "Ammo"
-        },
-        {
-            "id": "attb14",
-            "key": "Efficiency",
-            "value": "Efficiency"
-        },
-        {
-            "id": "attb15",
-            "key": "Extraction",
-            "value": "Extraction"
-        },
-        {
-            "id": "attb16",
-            "key": "Hammer Power",
-            "value": "Hammer Power"
-        },
-        {
-            "id": "attb17",
-            "key": "Gun Power",
-            "value": "Gun Power"
-        },
-        {
-            "id": "attb18",
-            "key": "Shotgun Power",
-            "value": "Shotgun Power"
-        },
-        {
-            "id": "attb19",
-            "key": "Grenade Power",
-            "value": "Grenade Power"
-        },
-        {
-            "id": "attb20",
-            "key": "Rifle Power",
-            "value": "Rifle Power"
-        },
-        {
-            "id": "attb21",
-            "key": "Lucky items",
-            "value": "Lucky items"
-        },
-        {
-            "id": "ittm1",
-            "key": "Gold",
-            "value": "Gold"
         },
         {
             "id": "itdc1",
@@ -3141,11 +3016,6 @@
             "value": "Resuscitates in the zone where you died!"
         },
         {
-            "id": "ittm26",
-            "key": "Goblin Pickaxe",
-            "value": "Goblin Pickaxe"
-        },
-        {
             "id": "itdc26",
             "key": "It happens sometimes",
             "value": "It happens sometimes"
@@ -3156,319 +3026,429 @@
             "value": "Young fighter's ring"
         },
         {
-            "id": "itdc27",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
+            "id": "attb9",
+            "key": "Lucky",
+            "value": "Везение"
         },
         {
-            "id": "ittm28",
-            "key": "Small ammo bag",
-            "value": "Small ammo bag"
+            "id": "attb10",
+            "key": "Piety",
+            "value": "Благочестие"
         },
         {
-            "id": "itdc28",
-            "key": "Adds a small amount of ammunition",
-            "value": "Adds a small amount of ammunition"
+            "id": "attb11",
+            "key": "Vampirism",
+            "value": "Вампиризм"
         },
         {
-            "id": "ittm29",
-            "key": "Gel",
-            "value": "Gel"
+            "id": "attb12",
+            "key": "Ammo Regen",
+            "value": "Ammo реген"
         },
         {
-            "id": "itdc29",
-            "key": "I wonder what it's for?",
-            "value": "I wonder what it's for?"
+            "id": "attb1",
+            "key": "Shotgun Spread",
+            "value": "Дробовик спред"
         },
         {
-            "id": "ittm30",
-            "key": "Goblin Ingot",
-            "value": "Goblin Ingot"
+            "id": "attb14",
+            "key": "Efficiency",
+            "value": "Эффективность"
         },
         {
-            "id": "itdc30",
-            "key": "Information added later.",
-            "value": "Information added later."
+            "id": "attb15",
+            "key": "Extraction",
+            "value": "Добыча"
         },
         {
-            "id": "ittm31",
-            "key": "Copper Ingot",
-            "value": "Copper Ingot"
+            "id": "attb16",
+            "key": "Hammer Power",
+            "value": "Сила молотка"
         },
         {
-            "id": "itdc31",
-            "key": "Information added later.",
-            "value": "Information added later."
+            "id": "attb17",
+            "key": "Gun Power",
+            "value": "Сила пистолета"
         },
         {
-            "id": "ittm32",
-            "key": "Salantra Blessing",
-            "value": "Salantra Blessing"
+            "id": "attb18",
+            "key": "Shotgun Power",
+            "value": "Сила дробовика"
         },
         {
-            "id": "itdc32",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
+            "id": "attb19",
+            "key": "Grenade Power",
+            "value": "Сила ракетницы"
         },
         {
-            "id": "ittm33",
-            "key": "Explosive module for gun",
-            "value": "Explosive module for gun"
+            "id": "attb20",
+            "key": "Rifle Power",
+            "value": "Сила лазера"
         },
         {
-            "id": "itdc33",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
+            "id": "attb21",
+            "key": "Lucky items",
+            "value": "Везение(пред)"
         },
         {
-            "id": "ittm34",
-            "key": "Explosive module for shotgun",
-            "value": "Explosive module for shotgun"
+            "id": "ittm1",
+            "key": "Gold",
+            "value": "Золото"
         },
         {
-            "id": "itdc34",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
+            "id": "attb2",
+            "key": "Grenade Spread",
+            "value": "Ракетница спред"
         },
         {
-            "id": "ittm35",
-            "key": "Kappa meat",
-            "value": "Kappa meat"
+            "id": "attb3",
+            "key": "Rifle Spread",
+            "value": "Лазер спред"
         },
         {
-            "id": "itdc35",
-            "key": "Information added later.",
-            "value": "Information added later."
+            "id": "attb4",
+            "key": "Strength",
+            "value": "Сила"
         },
         {
-            "id": "ittm36",
-            "key": "Ring of Arvida",
-            "value": "Ring of Arvida"
+            "id": "attb5",
+            "key": "Dexterity",
+            "value": "Ловкость"
         },
         {
-            "id": "itdc36",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
+            "id": "attb6",
+            "key": "Crit Dmg",
+            "value": "Крит Урон"
         },
         {
-            "id": "ittm37",
-            "key": "Relic of the Orc Lord",
-            "value": "Relic of the Orc Lord"
+            "id": "ittm26",
+            "key": "Goblin Pickaxe",
+            "value": "Кирка гоблина"
         },
         {
-            "id": "itdc37",
-            "key": "Information added later.",
-            "value": "Information added later."
+            "id": "attb7",
+            "key": "Direct Crit Dmg",
+            "value": "Шанс Крит Урона"
         },
         {
-            "id": "ittm38",
-            "key": "Ticket reset class stats",
-            "value": "Ticket reset class stats"
+            "id": "attb8",
+            "key": "Hardness",
+            "value": "Стойкость"
         },
         {
-            "id": "itdc38",
-            "key": "Resets only class stats(Dps, Tank, Healer).",
-            "value": "Resets only class stats(Dps, Tank, Healer)."
+            "id": "itdc10007",
+            "key": "Covered in secrets",
+            "value": "Покрытый тайнами"
         },
         {
-            "id": "ittm39",
-            "key": "Mode PVP",
-            "value": "Mode PVP"
+            "id": "ittm10008",
+            "key": "Heavenly wings",
+            "value": "Небесные крылья"
         },
         {
-            "id": "itdc39",
-            "key": "Settings game.",
-            "value": "Settings game."
+            "id": "itdc10008",
+            "key": "Covered in secrets",
+            "value": "Покрытый тайнами"
         },
         {
-            "id": "ittm40",
-            "key": "Ticket reset weapon stats",
-            "value": "Ticket reset weapon stats"
+            "id": "ittm10009",
+            "key": "Rainbow wings",
+            "value": "Радужные крылья"
         },
         {
-            "id": "itdc40",
-            "key": "Resets only ammo stats(Ammo).",
-            "value": "Resets only ammo stats(Ammo)."
+            "id": "itdc10009",
+            "key": "Covered in secrets",
+            "value": "Покрытый тайнами"
         },
         {
-            "id": "ittm41",
-            "key": "Orc's Belt",
-            "value": "Orc's Belt"
+            "id": "ittm10010",
+            "key": "Magitech hammer",
+            "value": "Magitech молот"
         },
         {
-            "id": "itdc41",
-            "key": "You can feel the light power of mana.",
-            "value": "You can feel the light power of mana."
+            "id": "itdc10010",
+            "key": "Reinforced kick",
+            "value": "Усиленный удар"
         },
         {
-            "id": "ittm42",
-            "key": "Torn cloth clothes of orcs",
-            "value": "Torn cloth clothes of orcs"
+            "id": "ittm10011",
+            "key": "Magitech gun",
+            "value": "Magitech пистолет"
         },
         {
-            "id": "itdc42",
-            "key": "Information added later.",
-            "value": "Information added later."
+            "id": "itdc10011",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
         },
         {
-            "id": "ittm43",
-            "key": "Blessing for discount craft",
-            "value": "Blessing for discount craft"
+            "id": "ittm10012",
+            "key": "Magitech shotgun",
+            "value": "Magitech дробовик"
         },
         {
-            "id": "itdc43",
-            "key": "Need dress it, -20% craft price",
-            "value": "Need dress it, -20% craft price"
+            "id": "itdc10012",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
         },
         {
-            "id": "ittm44",
-            "key": "Noctis fragment",
-            "value": "Noctis fragment"
+            "id": "ittm10013",
+            "key": "Magitech grenade",
+            "value": "Magitech граната"
         },
         {
-            "id": "itdc44",
-            "key": "Event Final Fantasy.",
-            "value": "Event Final Fantasy."
+            "id": "itdc10013",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
         },
         {
-            "id": "ittm45",
-            "key": "The core of Neptune",
-            "value": "The core of Neptune"
+            "id": "ittm10014",
+            "key": "Magitech rifle",
+            "value": "Magitech лазер"
         },
         {
-            "id": "itdc45",
-            "key": "Information added later.",
-            "value": "Information added later."
+            "id": "itdc10014",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
         },
         {
-            "id": "ittm46",
-            "key": "Remains of a dead soul",
-            "value": "Remains of a dead soul"
+            "id": "ittm10015",
+            "key": "Stars wings",
+            "value": "Звездные крылья"
         },
         {
-            "id": "itdc46",
-            "key": "Information added later.",
-            "value": "Information added later."
+            "id": "itdc10015",
+            "key": "Covered in secrets",
+            "value": "Покрытый тайнами"
         },
         {
-            "id": "ittm47",
-            "key": "Ring of God of War",
-            "value": "Ring of God of War"
+            "id": "ittm10016",
+            "key": "Bat wings",
+            "value": "Крылья мыши"
         },
         {
-            "id": "itdc47",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
+            "id": "itdc10016",
+            "key": "Covered in secrets",
+            "value": "Покрытый тайнами"
         },
         {
-            "id": "ittm48",
-            "key": "Bracelet of Fire",
-            "value": "Bracelet of Fire"
+            "id": "ittm10017",
+            "key": "Little eagle wings",
+            "value": "Крылья юного орла"
         },
         {
-            "id": "itdc48",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
+            "id": "itdc10017",
+            "key": "Covered in secrets",
+            "value": "Покрытый тайнами"
         },
         {
-            "id": "ittm49",
-            "key": "Big ammo bag",
-            "value": "Big ammo bag"
+            "id": "ittm10018",
+            "key": "Necromante wings",
+            "value": "Крылья некроманта"
         },
         {
-            "id": "itdc49",
-            "key": "Adds a small amount of ammunition",
-            "value": "Adds a small amount of ammunition"
+            "id": "itdc10018",
+            "key": "Covered in secrets",
+            "value": "Покрытый тайнами"
         },
         {
-            "id": "ittm50",
-            "key": "Strength ",
-            "value": "Strength "
+            "id": "ittm10019",
+            "key": "Goblin hammer",
+            "value": "Молот гоблина"
         },
         {
-            "id": "itdc50",
-            "key": "Increase your strength",
-            "value": "Increase your strength"
+            "id": "itdc10019",
+            "key": "Reinforced kick",
+            "value": "Усиленый удар"
         },
         {
-            "id": "ittm51",
-            "key": "Random home decor",
-            "value": "Random home decor"
+            "id": "ittm10020",
+            "key": "Goblin gun",
+            "value": "Пистолет гоблина"
         },
         {
-            "id": "itdc51",
-            "key": "Lucky house decor",
-            "value": "Lucky house decor"
+            "id": "itdc10020",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
         },
         {
-            "id": "ittm10000",
-            "key": "Heavenly hammer",
-            "value": "Heavenly hammer"
+            "id": "ittm10021",
+            "key": "Goblin shotgun",
+            "value": "Дробовик гоблина"
+        },
+        {
+            "id": "itdc10021",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": "ittm10022",
+            "key": "Goblin grenade",
+            "value": "Ракетница гоблина"
+        },
+        {
+            "id": "itdc10022",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": "ittm10023",
+            "key": "Goblin rifle",
+            "value": "Лазер гоблина"
+        },
+        {
+            "id": "itdc10023",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": "ittm10024",
+            "key": "Scythe",
+            "value": "Коса"
+        },
+        {
+            "id": "itdc10024",
+            "key": "Reinforced kick",
+            "value": "Усиленый удар"
+        },
+        {
+            "id": "ittm15000",
+            "key": "Theme Couple",
+            "value": "Тема Пара"
+        },
+        {
+            "id": "itdc15000",
+            "key": "Strictly limited as the theme",
+            "value": "Строго лимитированая тема"
+        },
+        {
+            "id": "ittm15001",
+            "key": "Theme Final Fantasy",
+            "value": "Тема Final Fantasy"
+        },
+        {
+            "id": "itdc15001",
+            "key": "Strictly limited as the theme",
+            "value": "Строго лимитированая тема"
+        },
+        {
+            "id": "ittm15002",
+            "key": "Theme Aion",
+            "value": "Тема Aion"
+        },
+        {
+            "id": "itdc15002",
+            "key": "Strictly limited as the theme",
+            "value": "Строго лимитированая тема"
+        },
+        {
+            "id": "ittm15003",
+            "key": "Theme Dragon Nest",
+            "value": "Тема Dragon Nest"
+        },
+        {
+            "id": "itdc15003",
+            "key": "Strictly limited as the theme",
+            "value": "Строго лимитированая тема"
+        },
+        {
+            "id": "sknm1",
+            "key": "Health turret",
+            "value": "Башня лечения"
+        },
+        {
+            "id": "skds1",
+            "key": "Creates turret a recovery health ",
+            "value": "Создает башню для восстановления здоровья "
+        },
+        {
+            "id": "skbn1",
+            "key": "life span",
+            "value": "продолжительность"
+        },
+        {
+            "id": "sknm2",
+            "key": "Sleepy Gravity",
+            "value": "Сонная гравитация"
+        },
+        {
+            "id": "skds2",
+            "key": "Magnet mobs to itself",
+            "value": "Магнитит мобов к себе"
+        },
+        {
+            "id": "skbn2",
+            "key": "radius",
+            "value": "радиус"
+        },
+        {
+            "id": "sknm3",
+            "key": "Craft Discount",
+            "value": "Скидка на крафт"
+        },
+        {
+            "id": "skds3",
+            "key": "Will give discount on the price of craft items",
+            "value": "Дадим скидку на цену крафта"
+        },
+        {
+            "id": "skbn3",
+            "key": "% discount gold for craft item",
+            "value": "% скидки золота для крафта"
+        },
+        {
+            "id": "sknm4",
+            "key": "Proficiency with weapons",
+            "value": "Владение оружием"
+        },
+        {
+            "id": "skds4",
+            "key": "You can perform an automatic fire",
+            "value": "Вы сможете вести авто огонь"
+        },
+        {
+            "id": "skbn4",
+            "key": "can perform an auto fire with all types of weapons",
+            "value": "может вести авто огонь из всех орудий"
+        },
+        {
+            "id": "sknm5",
+            "key": "Blessing of God of war",
+            "value": "Благословение Бога войны"
+        },
+        {
+            "id": "skds5",
+            "key": "The blessing restores ammo",
+            "value": "Благословение восстанавливает боеприпасы"
+        },
+        {
+            "id": "skbn5",
+            "key": "% recovers ammo within a radius of 800",
+            "value": "% патронов в радиусе 800"
+        },
+        {
+            "id": "sknm6",
+            "key": "Noctis Lucis Attack Teleport",
+            "value": "Noctis Lucis атака телепортом"
+        },
+        {
+            "id": "skds6",
+            "key": "An attacking teleport that deals damage to all mobs radius",
+            "value": "Атакующий телепорт, наносящий урон всем мобам в радиусе"
+        },
+        {
+            "id": "skbn6",
+            "key": "% your strength",
+            "value": "% сила"
+        },
+        {
+            "id": "ittm10007",
+            "key": "Angel wings",
+            "value": "Ангела крылья"
         },
         {
             "id": "itdc10000",
             "key": "Reinforced kick",
-            "value": "Reinforced kick"
-        },
-        {
-            "id": "ittm10001",
-            "key": "Heavenly gun",
-            "value": "Heavenly gun"
-        },
-        {
-            "id": "itdc10001",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10002",
-            "key": "Heavenly shotgun",
-            "value": "Heavenly shotgun"
-        },
-        {
-            "id": "itdc10002",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10003",
-            "key": "Heavenly grenade",
-            "value": "Heavenly grenade"
-        },
-        {
-            "id": "itdc10003",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10004",
-            "key": "Heavenly rifle",
-            "value": "Heavenly rifle"
-        },
-        {
-            "id": "itdc10004",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10005",
-            "key": "Shadow wings",
-            "value": "Shadow wings"
-        },
-        {
-            "id": "itdc10005",
-            "key": "Dark history",
-            "value": "Dark history"
-        },
-        {
-            "id": "ittm10006",
-            "key": "Neptune wings",
-            "value": "Neptune wings"
-        },
-        {
-            "id": "itdc10006",
-            "key": "Covered in secrets",
-            "value": "Covered in secrets"
+            "value": "Усиленый удар"
         },
         {
             "id": null,
@@ -3601,9 +3581,9 @@
             "value": "Рейтинг инфо"
         },
         {
-            "id": null,
-            "key": "Here you can see top server Guilds, Players.",
-            "value": "Этo лyчшиe гильдии и игpoки cepвepa."
+            "id": "itdc10004",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
         },
         {
             "id": null,
@@ -4099,6 +4079,26 @@
             "id": null,
             "key": "You can restore access by contacting support, or change nick.",
             "value": "Вы можете восстановить доступ через поддержку, или сменить ник."
+        },
+        {
+            "id": "itdc10002",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": "itdc10001",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": "itdc10003",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": null,
+            "key": "Here you can see top server Guilds, Players.",
+            "value": "Этo лyчшиe гильдии и игpoки cepвepa."
         }
     ]
 }

@@ -168,8 +168,8 @@ bool CInventoryCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Repla
 			}
 
 			char aAttributes[128];
-			pItemPlayer.FormatAttributes(aAttributes, sizeof(aAttributes));
-			GS()->AVMI(ClientID, pItemPlayer.Info().GetIcon(), "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} {STR} | {STR}", pType[i], pItemPlayer.Info().GetName(), aAttributes);
+			pItemPlayer.FormatAttributes(pPlayer, aAttributes, sizeof(aAttributes));
+			GS()->AVMI(ClientID, pItemPlayer.Info().GetIcon(), "SORTEDEQUIP", i, TAB_EQUIP_SELECT, "{STR} | {STR}", pItemPlayer.Info().GetName(), aAttributes);
 		}
 		GS()->AV(ClientID, "null");
 
@@ -280,7 +280,7 @@ bool CInventoryCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, con
 		pItemPlayer.FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf));
 
 		char aAttributes[128];
-		pItemPlayer.FormatAttributes(aAttributes, sizeof(aAttributes));
+		pItemPlayer.FormatAttributes(pPlayer, aAttributes, sizeof(aAttributes));
 		GS()->Chat(-1, "{STR} enchant {STR} {STR} {STR}", Server()->ClientName(ClientID), pItemPlayer.Info().GetName(), aEnchantBuf, aAttributes);
 		GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		return true;
@@ -427,7 +427,7 @@ void CInventoryCore::ItemSelected(CPlayer* pPlayer, const CItemData& pItemPlayer
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", pItemPlayer.Info().GetDesc());
 
 		char aAttributes[64];
-		pItemPlayer.FormatAttributes(aAttributes, sizeof(aAttributes));
+		pItemPlayer.FormatAttributes(pPlayer, aAttributes, sizeof(aAttributes));
 		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 	}
 	else

@@ -79,7 +79,7 @@ bool CItemData::Add(int Value, int Settings, int Enchant, bool Message)
 			Equip();
 
 		char aAttributes[128];
-		Info().FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
+		Info().FormatAttributes(m_pPlayer, aAttributes, sizeof(aAttributes), Enchant);
 		GS()->Chat(ClientID, "Auto equip {STR} - {STR}", Info().GetName(), aAttributes);
 		GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 	}

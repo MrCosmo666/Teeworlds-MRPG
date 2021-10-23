@@ -1,11 +1,6 @@
 {
     "translation": [
         {
-            "id": null,
-            "key": "",
-            "value": ""
-        },
-        {
             "id": "skds1",
             "key": "Creates turret a recovery health ",
             "value": "Creates turret a recovery health "
@@ -3697,26 +3692,6 @@
         },
         {
             "id": null,
-            "key": "Level {INT} : Exp {INT}/{INT}",
-            "value": "Ebene {INT}: Erfahrung {INT}/{INT}"
-        },
-        {
-            "id": null,
-            "key": "☪ SUB MENU PERSONAL",
-            "value": "☪ PERSÖNLICHES MENÜ"
-        },
-        {
-            "id": null,
-            "key": "Inventory",
-            "value": "Inventar"
-        },
-        {
-            "id": null,
-            "key": "Equipment",
-            "value": "Ausrüstung"
-        },
-        {
-            "id": null,
             "key": "Upgrades({INT}p)",
             "value": "Verbesserungen({INT}p)"
         },
@@ -4099,6 +4074,26 @@
             "id": null,
             "key": "Task has not been completed yet!",
             "value": "Aufgabe ist noch nicht abgeschlossen!"
+        },
+        {
+            "id": null,
+            "key": "Level {INT} : Exp {INT}/{INT}",
+            "value": "Ebene {INT}: Erfahrung {INT}/{INT}"
+        },
+        {
+            "id": null,
+            "key": "☪ SUB MENU PERSONAL",
+            "value": "☪ PERSÖNLICHES MENÜ"
+        },
+        {
+            "id": null,
+            "key": "Inventory",
+            "value": "Inventar"
+        },
+        {
+            "id": null,
+            "key": "Equipment",
+            "value": "Ausrüstung"
         }
     ]
 }
