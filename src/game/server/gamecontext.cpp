@@ -1022,7 +1022,7 @@ void CGS::OnConsoleInit()
 	Console()->Register("disband_guild", "r[guildname]", CFGFLAG_SERVER, ConDisbandGuild, m_pServer, "Disband the guild with the name");
 	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, m_pServer, "Say in chat");
 	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, m_pServer, "(Warning) Add new bot on database or update if finding <clientid> <bot name>");
-	Console()->Register("dump_dialogs_for_translate", "", CFGFLAG_SERVER, ConDumpDialogsForTranslate, m_pServer, "Perform dump dialogs for future translation to translation files");
+	Console()->Register("sync_lines_for_translate", "", CFGFLAG_SERVER, ConSyncLinesForTranslate, m_pServer, "Perform sync lines in translated files. Order non updated translated to up");
 }
 
 void CGS::OnTick()
@@ -1627,13 +1627,13 @@ void CGS::ConAddCharacter(IConsole::IResult *pResult, void *pUserData)
 }
 
 // dump dialogs for translate
-void CGS::ConDumpDialogsForTranslate(IConsole::IResult* pResult, void* pUserData)
+void CGS::ConSyncLinesForTranslate(IConsole::IResult* pResult, void* pUserData)
 {
 	IServer* pServer = (IServer*)pUserData;
 	CGS* pSelf = (CGS*)pServer->GameServer();
 
 	// dump
-	pSelf->Mmo()->BotsData()->ConDumpDialogsForTranslate();
+	std::thread(&MmoController::ConSyncLinesForTranslate, pSelf->m_pMmoController).detach();
 }
 
 void CGS::ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
