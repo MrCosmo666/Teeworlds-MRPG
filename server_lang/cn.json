@@ -1,2168 +1,2232 @@
 {
-    "translation": [
-        {
-            "key": "The main menu will return as soon as you leave this zone!",
-            "value": "在离开此区域后，主菜单将很快重新出现!"
-        },
-        {
-            "key": "Hi, {STR} Last log in {STR}",
-            "value": "Hello, {STR} 最近一次登录： {STR}"
-        },
-        {
-            "key": "Level {INT} : Exp {INT}/{INT}",
-            "value": "等级：{INT} :: 经验值：{INT}/{INT}"
-        },
-        {
-            "key": "Skill Point {INT}SP",
-            "value": "技能点 {INT}SP"
-        },
-        {
-            "key": "Gold: {INT}",
-            "value": "钱: {INT}"
-        },
-        {
-            "key": "☪ SUB MENU PERSONAL",
-            "value": "☪ 个人-子菜单"
-        },
-        {
-            "key": "Inventory",
-            "value": "背包"
-        },
-        {
-            "key": "Equipment",
-            "value": "装备"
-        },
-        {
-            "key": "Upgrades({INT}p)",
-            "value": "升级({INT}p)"
-        },
-        {
-            "key": "Dungeons",
-            "value": "地牢"
-        },
-        {
-            "key": "Settings",
-            "value": "设置"
-        },
-        {
-            "key": "Mailbox",
-            "value": "邮箱"
-        },
-        {
-            "key": "Journal",
-            "value": "日志"
-        },
-        {
-            "key": "Guild",
-            "value": "公会"
-        },
-        {
-            "key": "Guild finder",
-            "value": "公会发现"
-        },
-        {
-            "key": "House",
-            "value": "房子"
-        },
-        {
-            "key": "√ SUB MENU INFORMATION",
-            "value": "√ 子菜单-信息"
-        },
-        {
-            "key": "Loots, mobs on your zone",
-            "value": "看，怪物在你的区域里"
-        },
-        {
-            "key": "Ranking guilds and players",
-            "value": "公会排名和玩家"
-        },
-        {
-            "key": "Upgrades Information",
-            "value": "关于升级"
-        },
-        {
-            "key": "Select upgrades type in Reason, write count.",
-            "value": "选择升级项，然后在理由里选择数量"
-        },
-        {
-            "key": "Disciple of War. Level Power {INT}",
-            "value": "战争的升级向. 等级功率 {INT}"
-        },
-        {
-            "key": "Disciple of Tank. Level Power {INT}",
-            "value": "坦克的升级向. Level Power {INT}"
-        },
-        {
-            "key": "Disciple of Healer. Level Power {INT}",
-            "value": "治疗的升级向. Level Power {INT}"
-        },
-        {
-            "key": "Disciple of Jobs",
-            "value": "工作的升级项"
-        },
-        {
-            "key": "{STR} {INT}P (Price {INT}P)",
-            "value": "{STR} {INT}P (价格 {INT}P)"
-        },
-        {
-            "key": "Ranking Information",
-            "value": "关于排名"
-        },
-        {
-            "key": "Top 10 guilds leveling",
-            "value": "前十等级最高公会"
-        },
-        {
-            "key": "Top 10 guilds wealthy",
-            "value": "前十最富有公会"
-        },
-        {
-            "key": "Top 10 players leveling",
-            "value": "前十等级最高玩家"
-        },
-        {
-            "key": "Top 10 players wealthy",
-            "value": "前十最富有玩家"
-        },
-        {
-            "key": "Chance & Loot Information",
-            "value": "机会和战利品信息"
-        },
-        {
-            "key": "Here you can see chance loot, mobs, on YOUR ZONE.",
-            "value": "在这里你可以看到战利品忙和，怪物，在 你 的 区 域!!"
-        },
-        {
-            "key": "There are no active mobs in your zone!",
-            "value": "你的区域内没有怪物"
-        },
-        {
-            "key": "Backpage",
-            "value": "上一页"
-        },
-        {
-            "key": "Player Stats {STR}",
-            "value": "玩家统计数据 {STR}"
-        },
-        {
-            "key": "Player Upgrade Point: {INT}P",
-            "value": "玩家升级点: {INT}P"
-        },
-        {
-            "key": "You have {INT} {STR}",
-            "value": "你有 {INT} 个 {STR}"
-        },
-        {
-            "key": "Use it when you're not dead!",
-            "value": "在你没死的时候使用这个！"
-        },
-        {
-            "key": "Level UP. Now Level {INT}!",
-            "value": "等级提升！现在的等级是：{INT}!"
-        },
-        {
-            "key": "Press 'F4' to continue the dialog!",
-            "value": "按 'F4' 继续对话！"
-        },
-        {
-            "key": "You got the effect {STR} time {INT}sec.",
-            "value": "你得到了效果：{STR}  持续时间：{INT}秒."
-        },
-        {
-            "key": "You lost the effect {STR}.",
-            "value": "你失去了效果 {STR}."
-        },
-        {
-            "key": "Repair all items - FREE",
-            "value": "修理所有物品 - 免费"
-        },
-        {
-            "key": "Shop :: {STR}",
-            "value": "商店 :: {STR}"
-        },
-        {
-            "key": "List of completed quests",
-            "value": "已完成的任务的列表"
-        },
-        {
-            "key": "Active NPC for current quests",
-            "value": "当前任务的主要NPC"
-        },
-        {
-            "key": "Your mailbox is empty",
-            "value": "你的邮箱是空的"
-        },
-        {
-            "key": "Available aethers",
-            "value": "其他可用的"
-        },
-        {
-            "key": "Move to Guild House - free",
-            "value": "传送到公会房间 - 免费"
-        },
-        {
-            "key": "Move to Your House - free",
-            "value": "传送到你的家 - 免费"
-        },
-        {
-            "key": "Inventory Select List",
-            "value": "背包选择列表"
-        },
-        {
-            "key": "Used ({INT})",
-            "value": "正在使用：({INT})"
-        },
-        {
-            "key": "Craft ({INT})",
-            "value": "合成 ({INT})"
-        },
-        {
-            "key": "Modules ({INT})",
-            "value": "模型 ({INT})"
-        },
-        {
-            "key": "Potion ({INT})",
-            "value": "药水 ({INT})"
-        },
-        {
-            "key": "Other ({INT})",
-            "value": "其他 ({INT})"
-        },
-        {
-            "key": "Story dungeon's",
-            "value": "故事 地下城"
-        },
-        {
-            "key": "Alternative story dungeon's",
-            "value": "另类故事 地下城"
-        },
-        {
-            "key": "You are already in this dungeon!",
-            "value": "你已经在这个地下城里了！"
-        },
-        {
-            "key": "At the moment players are passing this dungeon!",
-            "value": "玩家正在经过这个地牢！"
-        },
-        {
-            "key": "Your level is low to pass this dungeon!",
-            "value": "你的等级不允许进入地牢！"
-        },
-        {
-            "key": "{STR} joined to Dungeon {STR}!",
-            "value": "{STR} 加入了地下城 {STR}!"
-        },
-        {
-            "key": "You can vote for the choice of tank (Dungeon Tab)!",
-            "value": "你可以投票选择坦克（地下城栏）"
-        },
-        {
-            "key": "You can't vote for yourself!",
-            "value": "你不可以投你自己！"
-        },
-        {
-            "key": "You already voted!",
-            "value": "你已经投票了"
-        },
-        {
-            "key": "{STR} voted for {STR}.",
-            "value": "{STR} 投票 {STR}."
-        },
-        {
-            "key": "Languages Information",
-            "value": "关于语言"
-        },
-        {
-            "key": "Here you can choose the language.",
-            "value": "你可以在这里选择你的语言"
-        },
-        {
-            "key": "Note: translation is not complete.",
-            "value": "小贴士：翻译还没全部做完"
-        },
-        {
-            "key": "Active language: {STR}",
-            "value": "可以使用的语言: {STR}"
-        },
-        {
-            "key": "Select language \"{STR}\"",
-            "value": "选择语言\"{STR}\""
-        },
-        {
-            "key": "You chosen a language \"{STR}\".",
-            "value": "你选择了语言 \"{STR}\" ."
-        },
-        {
-            "key": "Settings language",
-            "value": "语言设置"
-        },
-        {
-            "key": "Required {INT}, but you have only {INT} {STR}!",
-            "value": "要求 {INT}, 但是你只有 {INT} {STR}!"
-        },
-        {
-            "key": "Not upgrade points for +{INT}. Required {INT}.",
-            "value": "没有足够的升级点 +{INT}. 要求 {INT}."
-        },
-        {
-            "key": "Upgrade has a maximum level.",
-            "value": "已升级到最高等级."
-        },
-        {
-            "key": "This chat is intended for team / guilds!",
-            "value": "此聊天适用于团队/公会"
-        },
-        {
-            "key": "{STR} came! Good {STR}!",
-            "value": "{STR} 来了! 好 {STR}!"
-        },
-        {
-            "key": "Nighttime experience was increase to {INT}",
-            "value": "夜间经验提升到 {INT}%"
-        },
-        {
-            "key": "Daytime experience was downgraded to 100%",
-            "value": "白天经验降低到100%"
-        },
-        {
-            "key": "{STR} opened zone ({STR})!",
-            "value": "{STR} 开放区域 ({STR})!"
-        },
-        {
-            "key": "Requires quest completion '{STR}'!",
-            "value": "要求完成任务 '{STR}'!"
-        },
-        {
-            "key": "You can see menu in the votes!",
-            "value": "你可以在投票里看见菜单"
-        },
-        {
-            "key": "You left the active zone, menu is restored!",
-            "value": "你离开了活动区域，菜单已恢复"
-        },
-        {
-            "key": "{STR} logged to account. Rank #{INT}",
-            "value": "{STR} 加入了MMO世界并登录. 等级 #{INT}"
-        },
-        {
-            "key": "You repaired all items.",
-            "value": "你修理了所有物品."
-        },
-        {
-            "key": "Learned a new skill [{STR}]",
-            "value": "学习一个新技能 [{STR}]"
-        },
-        {
-            "key": "Increased the skill [{STR} level to {INT}]",
-            "value": "把技能 [{STR} 级别提高到 {INT}]"
-        },
-        {
-            "key": "Skill already have maximum level!",
-            "value": "技能已经达到了最高等级！"
-        },
-        {
-            "key": "Menu is available in call-votes!",
-            "value": "菜单在投票界面使用！"
-        },
-        {
-            "key": "You start dialogue with {STR}!",
-            "value": "你开始和{STR}对话!"
-        },
-        {
-            "key": "{INT}. {STR} | {INT}:{INT}min | {INT}P",
-            "value": "{INT}. {STR} | {INT}:{INT}min | {INT}P"
-        },
-        {
-            "key": "Need to complete quest {STR}",
-            "value": "需要完成任务 {STR}"
-        },
-        {
-            "key": "Voting for the choice of tank!",
-            "value": "在投票里选择坦克!"
-        },
-        {
-            "key": "投票 {STR} (投票: {INT})",
-            "value": "投票 {STR} (投票: {INT})"
-        },
-        {
-            "key": "You have {INT} unread messages!",
-            "value": "你有 {INT} 个未读信息!"
-        },
-        {
-            "key": "Task has not been completed yet!",
-            "value": "坦克还没有做完！!"
-        },
-        {
-            "key": "[Done] Give the {STR}x{INT} to the {STR}!",
-            "value": "[完成] 给 {STR}x{INT} {STR}!"
-        },
-        {
-            "key": "[Done] Defeat the {STR}'s for the {STR}!",
-            "value": "[完成] 击败 {STR}'s 给 {STR}!"
-        },
-        {
-            "key": "- - - - [Your nickname is already registered] - - - -",
-            "value": "- - - - [Your nickname is already registered] - - - -"
-        },
-        {
-            "key": "Your nick is a unique identifier, and it has already been used!",
-            "value": "Your nick is a unique identifier, and it has already been used!"
-        },
-        {
-            "key": "You can restore access by contacting support, or change nick.",
-            "value": "You can restore access by contacting support, or change nick."
-        },
-        {
-            "key": "- - - - - - - [Successful registered] - - - - - - -",
-            "value": "- - - - - - - [Successful registered] - - - - - - -"
-        },
-        {
-            "key": "Don't forget your data, have a nice game!",
-            "value": "Don't forget your data, have a nice game!"
-        },
-        {
-            "key": "# Your nickname is a unique identifier!",
-            "value": "# Your nickname is a unique identifier!"
-        },
-        {
-            "key": "# Log in: \"/login {STR} {STR}\"",
-            "value": "# Log in: \"/login {STR} {STR}\""
-        },
-        {
-            "key": "Username / Password must contain 4-12 characters",
-            "value": "Username / Password must contain 4-12 characters"
-        },
-        {
-            "key": "Wrong login or password",
-            "value": "Wrong login or password"
-        },
-        {
-            "key": "The account is already in the game!",
-            "value": "The account is already in the game!"
-        },
-        {
-            "key": "- - - - - - - [Successful login] - - - - - - -",
-            "value": "- - - - - - - [Successful login] - - - - - - -"
-        },
-        {
-            "key": "Your nickname was not found in the database!",
-            "value": "Your nickname was not found in the database!"
-        },
-        {
-            "key": "You are located {STR} ({STR})",
-            "value": "You are located {STR} ({STR})"
-        },
-        {
-            "key": "Quest NPCs are marked with an aura Heart and Shield.",
-            "value": "Quest NPCs are marked with an aura Heart and Shield."
-        },
-        {
-            "key": "Shield around you indicates location of active quest.",
-            "value": "Shield around you indicates location of active quest."
-        },
-        {
-            "key": "Your Discord ID has been updated",
-            "value": "Your Discord ID has been updated"
-        },
-        {
-            "key": "Check the connection status in discord \"/connect\".",
-            "value": "Check the connection status in discord \"/connect\"."
-        },
-        {
-            "key": "Some of the settings becomes valid after death",
-            "value": "Some of the settings becomes valid after death"
-        },
-        {
-            "key": "Modules settings",
-            "value": "Modules settings"
-        },
-        {
-            "key": "The list of modules equipment is empty.",
-            "value": "The list of modules equipment is empty."
-        },
-        {
-            "key": "The voucher code '{STR}' has expired.",
-            "value": "The voucher code '{STR}' has expired."
-        },
-        {
-            "key": "This voucher has already been redeemed.",
-            "value": "This voucher has already been redeemed."
-        },
-        {
-            "key": "You have successfully redeemed the voucher '{STR}'.",
-            "value": "You have successfully redeemed the voucher '{STR}'."
-        },
-        {
-            "key": "The voucher code '{STR}' does not exist.",
-            "value": "The voucher code '{STR}' does not exist."
-        },
-        {
-            "key": "[Player], do you have any questions? I'm sorry, can't help you.",
-            "value": "[Player], do you have any questions? I'm sorry, can't help you."
-        },
-        {
-            "key": "What a beautiful [Time]. I don't have anything for you [Player].",
-            "value": "What a beautiful [Time]. I don't have anything for you [Player]."
-        },
-        {
-            "key": "[Player] are you interested something? I'm sorry, don't want to talk right now.",
-            "value": "[Player] are you interested something? I'm sorry, don't want to talk right now."
-        },
-        {
-            "key": "Hello, I was sent to you by a carpenter to help you.",
-            "value": "Hello, I was sent to you by a carpenter to help you."
-        },
-        {
-            "key": "**He asks with a smile**: Hello, have you just arrived?",
-            "value": "**He asks with a smile**: Hello, have you just arrived?"
-        },
-        {
-            "key": "Yes, I came to you to become an adventurer, I need money.",
-            "value": "Yes, I came to you to become an adventurer, I need money."
-        },
-        {
-            "key": "Well, I'll tell you [Player], things have been very bad here lately, the residents are living in fear. Recently, a little girl was killed, as we understand there is a dead force involved.",
-            "value": "Well, I'll tell you [Player], things have been very bad here lately, the residents are living in fear. Recently, a little girl was killed, as we understand there is a dead force involved."
-        },
-        {
-            "key": "**With horror in his eyes**: What ... Dead People",
-            "value": "**With horror in his eyes**: What ... Dead People"
-        },
-        {
-            "key": "**He said hurriedly**: I don't know for sure. Over time, the residents will tell you everything, or you will feel for yourself what is happening there.",
-            "value": "**He said hurriedly**: I don't know for sure. Over time, the residents will tell you everything, or you will feel for yourself what is happening there."
-        },
-        {
-            "key": "I didn't expect it to be this bad. Well, what can I help you with?",
-            "value": "I didn't expect it to be this bad. Well, what can I help you with?"
-        },
-        {
-            "key": "Come with me, our guys dropped boards, help me collect them.",
-            "value": "Come with me, our guys dropped boards, help me collect them."
-        },
-        {
-            "key": "Okay generally help me collect all the boards! I will reward you for your help.",
-            "value": "Okay generally help me collect all the boards! I will reward you for your help."
-        },
-        {
-            "key": "**Weakness in asks**: Oh, hell, they're heavy, I've got them all.",
-            "value": "**Weakness in asks**: Oh, hell, they're heavy, I've got them all."
-        },
-        {
-            "key": "Great job! Your muscles won't hurt you anyway [Player] *laughter*",
-            "value": "Great job! Your muscles won't hurt you anyway [Player] *laughter*"
-        },
-        {
-            "key": "*laughter*",
-            "value": "*laughter*"
-        },
-        {
-            "key": "Now hand them out to my boys and let them go on with their business.",
-            "value": "Now hand them out to my boys and let them go on with their business."
-        },
-        {
-            "key": "Good [Talked]!",
-            "value": "Good [Talked]!"
-        },
-        {
-            "key": "Here you go, your boss told me to give it to you!",
-            "value": "Here you go, your boss told me to give it to you!"
-        },
-        {
-            "key": "Thanks for the help.",
-            "value": "Thanks for the help."
-        },
-        {
-            "key": "Is tired. But I did it!",
-            "value": "Is tired. But I did it!"
-        },
-        {
-            "key": "Well done, take this. I think you need it if you're going to be an adventurer. Go straight, and you will go straight to the residents, if you ask where to go.",
-            "value": "Well done, take this. I think you need it if you're going to be an adventurer. Go straight, and you will go straight to the residents, if you ask where to go."
-        },
-        {
-            "key": "**With a smile**: Well thank you, good luck with your work!",
-            "value": "**With a smile**: Well thank you, good luck with your work!"
-        },
-        {
-            "key": "[Stranger]Hi, my name is [Player], how do I find the nearest village?",
-            "value": "[Stranger]Hi, my name is [Player], how do I find the nearest village?"
-        },
-        {
-            "key": "**She concerned**: Hello, my name is [Talked].",
-            "value": "**She concerned**: Hello, my name is [Talked]."
-        },
-        {
-            "key": "I'll be happy to help you settle in, but could you give my brother a note? He works now on the ship that you arrived on, i could have done it myself, but they won't let me in.",
-            "value": "I'll be happy to help you settle in, but could you give my brother a note? He works now on the ship that you arrived on, i could have done it myself, but they won't let me in."
-        },
-        {
-            "key": "Yes, of course i help, will you be here [Talked]?",
-            "value": "Yes, of course i help, will you be here [Talked]?"
-        },
-        {
-            "key": "I'll be here waiting!",
-            "value": "I'll be here waiting!"
-        },
-        {
-            "key": "Hello, are you Diana's brother?",
-            "value": "Hello, are you Diana's brother?"
-        },
-        {
-            "key": "**He said rudely**: Yes. Did something happen to her?..",
-            "value": "**He said rudely**: Yes. Did something happen to her?.."
-        },
-        {
-            "key": "No, don't worry, she just asked me to pass you the notebook.",
-            "value": "No, don't worry, she just asked me to pass you the notebook."
-        },
-        {
-            "key": "Well, thank you very much, and tell her I'll be seeing her this evening.",
-            "value": "Well, thank you very much, and tell her I'll be seeing her this evening."
-        },
-        {
-            "key": "Yes, good luck with your work!",
-            "value": "Yes, good luck with your work!"
-        },
-        {
-            "key": "**She says impatiently**: Oh, you're already here, you're fast!",
-            "value": "**She says impatiently**: Oh, you're already here, you're fast!"
-        },
-        {
-            "key": "Really?",
-            "value": "Really?"
-        },
-        {
-            "key": "Yes. How is he?",
-            "value": "Yes. How is he?"
-        },
-        {
-            "key": "He told me that he is busy now, and will visit you later in the evening!",
-            "value": "He told me that he is busy now, and will visit you later in the evening!"
-        },
-        {
-            "key": "I'm so happy! They won't let me in because of the problems that are happening. Dead men kidnap girls, and then they find them dead.",
-            "value": "I'm so happy! They won't let me in because of the problems that are happening. Dead men kidnap girls, and then they find them dead."
-        },
-        {
-            "key": "**He sounds surprised**: Only girls? Why the dead?",
-            "value": "**He sounds surprised**: Only girls? Why the dead?"
-        },
-        {
-            "key": "**She's upset**: Honestly, I don't know. The dead or who it is, our headman says that most likely the dead ;(",
-            "value": "**She's upset**: Honestly, I don't know. The dead or who it is, our headman says that most likely the dead ;("
-        },
-        {
-            "key": "I came to you to become an adventurer, as I know you have magical creatures.",
-            "value": "I came to you to become an adventurer, as I know you have magical creatures."
-        },
-        {
-            "key": "**She sounds like she knows it**: An adventurer? We have a Guild of adventurers, but to become an adventurer you need to pass the tests.",
-            "value": "**She sounds like she knows it**: An adventurer? We have a Guild of adventurers, but to become an adventurer you need to pass the tests."
-        },
-        {
-            "key": "Tests?....",
-            "value": "Tests?...."
-        },
-        {
-            "key": "Yes the test [Player]. First, you will need to collect the minimum equipment. To apply and pay the fee. And only after that you will be assigned the position of adventurer.",
-            "value": "Yes the test [Player]. First, you will need to collect the minimum equipment. To apply and pay the fee. And only after that you will be assigned the position of adventurer."
-        },
-        {
-            "key": "Is everything so strict? Yes, I think I can handle it.",
-            "value": "Is everything so strict? Yes, I think I can handle it."
-        },
-        {
-            "key": "All right come on I'll show you our village [Player].",
-            "value": "All right come on I'll show you our village [Player]."
-        },
-        {
-            "key": "Yes come on ;)",
-            "value": "Yes come on ;)"
-        },
-        {
-            "key": " **She made it sound like there was something wrong with them**: Oh, my God, where are the slime from?.",
-            "value": " **She made it sound like there was something wrong with them**: Oh, my God, where are the slime from?."
-        },
-        {
-            "key": "I don't know [Talked], here even have slimes. Wahoo",
-            "value": "I don't know [Talked], here even have slimes. Wahoo"
-        },
-        {
-            "key": "Well, Yes [Player], but now they are becoming more frequent",
-            "value": "Well, Yes [Player], but now they are becoming more frequent"
-        },
-        {
-            "key": "**You speak proudly**: All right [Talked], I'll clear the way!",
-            "value": "**You speak proudly**: All right [Talked], I'll clear the way!"
-        },
-        {
-            "key": "**You said in disgust**: Phew, the slime is so disgusting...",
-            "value": "**You said in disgust**: Phew, the slime is so disgusting..."
-        },
-        {
-            "key": "**She says with a smile**: Well you could use a bath [Player] ;)",
-            "value": "**She says with a smile**: Well you could use a bath [Player] ;)"
-        },
-        {
-            "key": "I will not refuse such an honor ;)",
-            "value": "I will not refuse such an honor ;)"
-        },
-        {
-            "key": "Ah here is and decided, we'll get there I'll show you where I live. And I'll introduce you to the places. And you wash :)",
-            "value": "Ah here is and decided, we'll get there I'll show you where I live. And I'll introduce you to the places. And you wash :)"
-        },
-        {
-            "key": "All right, shall we continue on our way?",
-            "value": "All right, shall we continue on our way?"
-        },
-        {
-            "key": "Yes let's go",
-            "value": "Yes let's go"
-        },
-        {
-            "key": "**He said with surprise**: Did you defeat the slugs on the instructions of our master? Take this the master asked me to give you.",
-            "value": "**He said with surprise**: Did you defeat the slugs on the instructions of our master? Take this the master asked me to give you."
-        },
-        {
-            "key": "Yes, I could. They were very slippery.",
-            "value": "Yes, I could. They were very slippery."
-        },
-        {
-            "key": "Hehe.. What did you think?",
-            "value": "Hehe.. What did you think?"
-        },
-        {
-            "key": "Well, not so difficult, at the same time I warmed up.",
-            "value": "Well, not so difficult, at the same time I warmed up."
-        },
-        {
-            "key": "Okay I need to serve, good luck to you, don't give up ;)",
-            "value": "Okay I need to serve, good luck to you, don't give up ;)"
-        },
-        {
-            "key": "**She said very rudely**: Who the hell are you? What do you want?",
-            "value": "**She said very rudely**: Who the hell are you? What do you want?"
-        },
-        {
-            "key": "Do you know that your father is looking for you?",
-            "value": "Do you know that your father is looking for you?"
-        },
-        {
-            "key": "I hate this old guy, he doesn't have time for me......",
-            "value": "I hate this old guy, he doesn't have time for me......"
-        },
-        {
-            "key": "He can only go there. Do it. And we can't spend time together...",
-            "value": "He can only go there. Do it. And we can't spend time together..."
-        },
-        {
-            "key": "Enrages...",
-            "value": "Enrages..."
-        },
-        {
-            "key": "Calm down let's go back together and tell him everything? Maybe he just cares about you like that.",
-            "value": "Calm down let's go back together and tell him everything? Maybe he just cares about you like that."
-        },
-        {
-            "key": "All right, let's go back.",
-            "value": "All right, let's go back."
-        },
-        {
-            "key": "Are you ready?",
-            "value": "Are you ready?"
-        },
-        {
-            "key": "Yes..",
-            "value": "Yes.."
-        },
-        {
-            "key": "So where was she?.",
-            "value": "So where was she?."
-        },
-        {
-            "key": "You just don't get angry, everything's fine!",
-            "value": "You just don't get angry, everything's fine!"
-        },
-        {
-            "key": "In fact, she didn't want to come back, she was offended that you weren't spending time together. You can't rest.",
-            "value": "In fact, she didn't want to come back, she was offended that you weren't spending time together. You can't rest."
-        },
-        {
-            "key": "Damn why didn't she ask for it herself? Okay, don't worry thanks for the work :) Everything will be fine, we will decide something with daughter",
-            "value": "Damn why didn't she ask for it herself? Okay, don't worry thanks for the work :) Everything will be fine, we will decide something with daughter"
-        },
-        {
-            "key": "Well, nice :) Good luck to you",
-            "value": "Well, nice :) Good luck to you"
-        },
-        {
-            "key": "To extract any ore [Player], you will need a pickaxe.",
-            "value": "To extract any ore [Player], you will need a pickaxe."
-        },
-        {
-            "key": "You can only get it by creating. But in some cases merchants can sell.",
-            "value": "You can only get it by creating. But in some cases merchants can sell."
-        },
-        {
-            "key": "Also, the picks have a durability of 100-0. If you durability reach 0. Don't worry it won't break.",
-            "value": "Also, the picks have a durability of 100-0. If you durability reach 0. Don't worry it won't break."
-        },
-        {
-            "key": "But you can't work with break pickaxe it. You can repair it at any store.",
-            "value": "But you can't work with break pickaxe it. You can repair it at any store."
-        },
-        {
-            "key": "You can also improve picks this will depend on their effectiveness.",
-            "value": "You can also improve picks this will depend on their effectiveness."
-        },
-        {
-            "key": "Each ore has its own strength. If you have a weak pick and the strength of the ore is high, it can take a long time to extract it. So don't forget about the improvements. Or craft even better picks.",
-            "value": "Each ore has its own strength. If you have a weak pick and the strength of the ore is high, it can take a long time to extract it. So don't forget about the improvements. Or craft even better picks."
-        },
-        {
-            "key": "Everything is clearly explained, I will not repeat it again, if you need you will understand everything!",
-            "value": "Everything is clearly explained, I will not repeat it again, if you need you will understand everything!"
-        },
-        {
-            "key": "Yes of course thank you for the explanation",
-            "value": "Yes of course thank you for the explanation"
-        },
-        {
-            "key": "Well don't worry, I'll give you a couple of tasks to get used to in this area",
-            "value": "Well don't worry, I'll give you a couple of tasks to get used to in this area"
-        },
-        {
-            "key": "Did you want something?",
-            "value": "Did you want something?"
-        },
-        {
-            "key": "I think it's time for you to get your first pickaxe.",
-            "value": "I think it's time for you to get your first pickaxe."
-        },
-        {
-            "key": "I think as crafted something, you don't need to explain!",
-            "value": "I think as crafted something, you don't need to explain!"
-        },
-        {
-            "key": "So let's get right to the point, try to make a pickaxe bring it to me, I'll look at it.",
-            "value": "So let's get right to the point, try to make a pickaxe bring it to me, I'll look at it."
-        },
-        {
-            "key": "Done. (you need to have an idea of how to craft items, you can see them near Craftsman in votes)",
-            "value": "Done. (you need to have an idea of how to craft items, you can see them near Craftsman in votes)"
-        },
-        {
-            "key": "Well, it's not bad, so use it for the first time.",
-            "value": "Well, it's not bad, so use it for the first time."
-        },
-        {
-            "key": "All right so let's start with your first ore?",
-            "value": "All right so let's start with your first ore?"
-        },
-        {
-            "key": "Well, as [Player], passed customs?",
-            "value": "Well, as [Player], passed customs?"
-        },
-        {
-            "key": "Yes [Talked]. He was very rude.",
-            "value": "Yes [Talked]. He was very rude."
-        },
-        {
-            "key": "Well, you have to understand that we also have a lot of problems lately, too many monsters, problems with kidnappings.",
-            "value": "Well, you have to understand that we also have a lot of problems lately, too many monsters, problems with kidnappings."
-        },
-        {
-            "key": "Come on, show me [Here] seats!",
-            "value": "Come on, show me [Here] seats!"
-        },
-        {
-            "key": "Oh sure. By the way, in our village, the chief Apostle.",
-            "value": "Oh sure. By the way, in our village, the chief Apostle."
-        },
-        {
-            "key": "Wait an Apostle? They are ancient beings sent by the gods. Do they exist?",
-            "value": "Wait an Apostle? They are ancient beings sent by the gods. Do they exist?"
-        },
-        {
-            "key": "Yes [Player]. They exist to keep order.",
-            "value": "Yes [Player]. They exist to keep order."
-        },
-        {
-            "key": "Okay [Player] let's go and show you our [Here]",
-            "value": "Okay [Player] let's go and show you our [Here]"
-        },
-        {
-            "key": "**She said with a smile**: Here, you can do a craft items, make your own equipment potions, or what to eat.",
-            "value": "**She said with a smile**: Here, you can do a craft items, make your own equipment potions, or what to eat."
-        },
-        {
-            "key": "[Player] even if you provide items, the craftsman you must pay for the use of the equipment",
-            "value": "[Player] even if you provide items, the craftsman you must pay for the use of the equipment"
-        },
-        {
-            "key": "Yes I think I can use it. Thanks for the explanation!",
-            "value": "Yes I think I can use it. Thanks for the explanation!"
-        },
-        {
-            "key": "Let's move on!",
-            "value": "Let's move on!"
-        },
-        {
-            "key": "Yes let's go :)",
-            "value": "Yes let's go :)"
-        },
-        {
-            "key": "So here we have someone's house.",
-            "value": "So here we have someone's house."
-        },
-        {
-            "key": "You can also buy houses, decorate them or use the safety Deposit box.",
-            "value": "You can also buy houses, decorate them or use the safety Deposit box."
-        },
-        {
-            "key": "Sounds good [Talked]!",
-            "value": "Sounds good [Talked]!"
-        },
-        {
-            "key": "**She likes to talk**: Well, okay, let's move on!",
-            "value": "**She likes to talk**: Well, okay, let's move on!"
-        },
-        {
-            "key": "This is the ether, it allows you to use instantaneous movement around the world.",
-            "value": "This is the ether, it allows you to use instantaneous movement around the world."
-        },
-        {
-            "key": "But only there in the area where you have already visited.",
-            "value": "But only there in the area where you have already visited."
-        },
-        {
-            "key": "Is it free [Talked]?",
-            "value": "Is it free [Talked]?"
-        },
-        {
-            "key": "Not always, there is nothing free in our world!",
-            "value": "Not always, there is nothing free in our world!"
-        },
-        {
-            "key": "**Apparently she didn't like something**: Okay [Player] let's move on!",
-            "value": "**Apparently she didn't like something**: Okay [Player] let's move on!"
-        },
-        {
-            "key": "Yes let's go [Talked]!",
-            "value": "Yes let's go [Talked]!"
-        },
-        {
-            "key": "Here you will be able to raise his skills adventurer, to explore something new. Our world is divided into 3 classes (Healer, Tank, DPS)",
-            "value": "Here you will be able to raise his skills adventurer, to explore something new. Our world is divided into 3 classes (Healer, Tank, DPS)"
-        },
-        {
-            "key": "So I can become something?",
-            "value": "So I can become something?"
-        },
-        {
-            "key": "[Player], you can be anyone you want (as well as fine-tune your game mode)",
-            "value": "[Player], you can be anyone you want (as well as fine-tune your game mode)"
-        },
-        {
-            "key": "[Talked] so I can be both a Tank and a Defender?",
-            "value": "[Talked] so I can be both a Tank and a Defender?"
-        },
-        {
-            "key": "Yes quite but do not forget about the main characteristics (Strength, Hardness, idk)",
-            "value": "Yes quite but do not forget about the main characteristics (Strength, Hardness, idk)"
-        },
-        {
-            "key": "Thank you for a clear explanation :)",
-            "value": "Thank you for a clear explanation :)"
-        },
-        {
-            "key": "That's a small part of what I've been able to tell you.",
-            "value": "That's a small part of what I've been able to tell you."
-        },
-        {
-            "key": "And here, you will be treated. ",
-            "value": "And here, you will be treated. "
-        },
-        {
-            "key": "**She said very jealously**: True, I hate those nurses, all the guys from the village are taken away....",
-            "value": "**She said very jealously**: True, I hate those nurses, all the guys from the village are taken away...."
-        },
-        {
-            "key": "Don't marry them...",
-            "value": "Don't marry them..."
-        },
-        {
-            "key": "Yes I will not marry anyone [Talked]! Thanks for the care!",
-            "value": "Yes I will not marry anyone [Talked]! Thanks for the care!"
-        },
-        {
-            "key": "**Yawning she said**: Okay I'm tired I'll go home.",
-            "value": "**Yawning she said**: Okay I'm tired I'll go home."
-        },
-        {
-            "key": "And you don't disappear, and [Player] go wash up :)",
-            "value": "And you don't disappear, and [Player] go wash up :)"
-        },
-        {
-            "key": "Well have a good day [Talked] :)",
-            "value": "Well have a good day [Talked] :)"
-        },
-        {
-            "key": "Well, just don't mess with as a joke, it's Apostle, he is watching over us for many years.",
-            "value": "Well, just don't mess with as a joke, it's Apostle, he is watching over us for many years."
-        },
-        {
-            "key": "I understand [Talked].",
-            "value": "I understand [Talked]."
-        },
-        {
-            "key": "Hello dear Apostle *bowing*. I have come to you to wisdom.",
-            "value": "Hello dear Apostle *bowing*. I have come to you to wisdom."
-        },
-        {
-            "key": "Hello, lift your head. I knew you'd come. But I'm not sure you're the one I saw.",
-            "value": "Hello, lift your head. I knew you'd come. But I'm not sure you're the one I saw."
-        },
-        {
-            "key": "See it?",
-            "value": "See it?"
-        },
-        {
-            "key": "I can't communicate with my brothers and sisters, since our paths have diverged, but we have a common mind.",
-            "value": "I can't communicate with my brothers and sisters, since our paths have diverged, but we have a common mind."
-        },
-        {
-            "key": "I had a vision about a year ago that there would soon be a man who was as tenacious as the Apostles.",
-            "value": "I had a vision about a year ago that there would soon be a man who was as tenacious as the Apostles."
-        },
-        {
-            "key": "But in the end, he was going to die. My visions have always come true, but when they will come true is unknown.",
-            "value": "But in the end, he was going to die. My visions have always come true, but when they will come true is unknown."
-        },
-        {
-            "key": "So please be careful [Player]. I'm worried about everyone, but I've also been weak lately.",
-            "value": "So please be careful [Player]. I'm worried about everyone, but I've also been weak lately."
-        },
-        {
-            "key": "I .. Not to worry, I can handle it even if I turn out to be one of your visions",
-            "value": "I .. Not to worry, I can handle it even if I turn out to be one of your visions"
-        },
-        {
-            "key": "I hope this is not the case, get used to it, then go to Adventurer Koto.",
-            "value": "I hope this is not the case, get used to it, then go to Adventurer Koto."
-        },
-        {
-            "key": "Thanks a lot.",
-            "value": "Thanks a lot."
-        },
-        {
-            "key": "Hello [Talked], the Apostle sent me to you. I want to be an adventurer!",
-            "value": "Hello [Talked], the Apostle sent me to you. I want to be an adventurer!"
-        },
-        {
-            "key": "**He as if he doesn't want me to become an adventurer**: Will you be strong enough? Well, let's see, I think you already understand that you first need to test, only after I say whether you are worthy or not to become an Adventurer?",
-            "value": "**He as if he doesn't want me to become an adventurer**: Will you be strong enough? Well, let's see, I think you already understand that you first need to test, only after I say whether you are worthy or not to become an Adventurer?"
-        },
-        {
-            "key": "Well, what exactly is required?",
-            "value": "Well, what exactly is required?"
-        },
-        {
-            "key": "If you pass my first test, pay the fee, I encourage you, and send you to the exam. And then we will decide whether you are worthy or not",
-            "value": "If you pass my first test, pay the fee, I encourage you, and send you to the exam. And then we will decide whether you are worthy or not"
-        },
-        {
-            "key": "Okay, where do we start [Talked]?",
-            "value": "Okay, where do we start [Talked]?"
-        },
-        {
-            "key": "Ha ha where do we start? Don't joke with me young fighter. First, take this and go to the southern part of the village.",
-            "value": "Ha ha where do we start? Don't joke with me young fighter. First, take this and go to the southern part of the village."
-        },
-        {
-            "key": "Well",
-            "value": "Well"
-        },
-        {
-            "key": "You did.",
-            "value": "You did."
-        },
-        {
-            "key": "What could I do?",
-            "value": "What could I do?"
-        },
-        {
-            "key": "I thought you were joking, you wouldn't take it seriously, but you came.",
-            "value": "I thought you were joking, you wouldn't take it seriously, but you came."
-        },
-        {
-            "key": "Well, let's go.",
-            "value": "Well, let's go."
-        },
-        {
-            "key": "Let's go.",
-            "value": "Let's go."
-        },
-        {
-            "key": "Why are you shivering [Player]?",
-            "value": "Why are you shivering [Player]?"
-        },
-        {
-            "key": "Am I that scary? Don't worry I'm kind *laughs*. Well, let's see how you cope. Kill for me ....",
-            "value": "Am I that scary? Don't worry I'm kind *laughs*. Well, let's see how you cope. Kill for me ...."
-        },
-        {
-            "key": "I managed it, and it wasn't difficult.",
-            "value": "I managed it, and it wasn't difficult."
-        },
-        {
-            "key": "I noticed how well you did. But don't relax this is just the beginning ^^",
-            "value": "I noticed how well you did. But don't relax this is just the beginning ^^"
-        },
-        {
-            "key": "Ah.. Okay [Talked].",
-            "value": "Ah.. Okay [Talked]."
-        },
-        {
-            "key": "Well today we're finished you can relax. You'll find me as soon as you're ready.",
-            "value": "Well today we're finished you can relax. You'll find me as soon as you're ready."
-        },
-        {
-            "key": "Okay, well, have a good day.",
-            "value": "Okay, well, have a good day."
-        },
-        {
-            "key": "Hello, I am the personal Ambassador of the Apostle.",
-            "value": "Hello, I am the personal Ambassador of the Apostle."
-        },
-        {
-            "key": "She wants to see you!",
-            "value": "She wants to see you!"
-        },
-        {
-            "key": "Please follow me to village, I will be waiting for you there",
-            "value": "Please follow me to village, I will be waiting for you there"
-        },
-        {
-            "key": "Okay, I'm coming",
-            "value": "Okay, I'm coming"
-        },
-        {
-            "key": "Listen there's another request!",
-            "value": "Listen there's another request!"
-        },
-        {
-            "key": "[Player] if you find some gel, I'll be happy to exchange them. Brown Slimes,Blue Slimes and Pink Slime drop Gel. You can take your time, i'll wait!",
-            "value": "[Player] if you find some gel, I'll be happy to exchange them. Brown Slimes,Blue Slimes and Pink Slime drop Gel. You can take your time, i'll wait!"
-        },
-        {
-            "key": "Here, it wasn't easy but I got it [Talked].",
-            "value": "Here, it wasn't easy but I got it [Talked]."
-        },
-        {
-            "key": "Thank you very much for your help. All right I'll go back to my post, good luck to you [Player]!",
-            "value": "Thank you very much for your help. All right I'll go back to my post, good luck to you [Player]!"
-        },
-        {
-            "key": "Thank's [Talked]",
-            "value": "Thank's [Talked]"
-        },
-        {
-            "key": "[Player] you can go in!",
-            "value": "[Player] you can go in!"
-        },
-        {
-            "key": "Well [Talked], thank you for seeing me off!",
-            "value": "Well [Talked], thank you for seeing me off!"
-        },
-        {
-            "key": "[Player] first we need to win over the slime. Dirty but necessary.",
-            "value": "[Player] first we need to win over the slime. Dirty but necessary."
-        },
-        {
-            "key": "I report everything, I coped with the task",
-            "value": "I report everything, I coped with the task"
-        },
-        {
-            "key": "Well done, but that's not all.",
-            "value": "Well done, but that's not all."
-        },
-        {
-            "key": "Anything else?",
-            "value": "Anything else?"
-        },
-        {
-            "key": "Yes I think you know about the ethers find me next to him",
-            "value": "Yes I think you know about the ethers find me next to him"
-        },
-        {
-            "key": "I think you know that these crystals are actually not just for beauty. ",
-            "value": "I think you know that these crystals are actually not just for beauty. "
-        },
-        {
-            "key": "You use them as a quick transition. But in fact, these are crystals (all the light of good prosperity) precisely because they exist.",
-            "value": "You use them as a quick transition. But in fact, these are crystals (all the light of good prosperity) precisely because they exist."
-        },
-        {
-            "key": "Me when once before as became defender of the Apostle, I was able to meet with the crystal. Yes, he has a mind. From it warmth on the soul, all the sins immediately fall from the soul. I'm sure you'll meet him one day.",
-            "value": "Me when once before as became defender of the Apostle, I was able to meet with the crystal. Yes, he has a mind. From it warmth on the soul, all the sins immediately fall from the soul. I'm sure you'll meet him one day."
-        },
-        {
-            "key": "Thanks. I will remember that. (Auther text: This is how the player's rapprochement with the deities began)",
-            "value": "Thanks. I will remember that. (Auther text: This is how the player's rapprochement with the deities began)"
-        },
-        {
-            "key": "Well, I'll wait for you in the Apostle's chambers. We will continue the expulsion of the monsters",
-            "value": "Well, I'll wait for you in the Apostle's chambers. We will continue the expulsion of the monsters"
-        },
-        {
-            "key": "Our priority is higher now.",
-            "value": "Our priority is higher now."
-        },
-        {
-            "key": "[Player] you need to defeat the main slug, in the southern part.",
-            "value": "[Player] you need to defeat the main slug, in the southern part."
-        },
-        {
-            "key": "That's it, I've met my goal. Clearing dirt.",
-            "value": "That's it, I've met my goal. Clearing dirt."
-        },
-        {
-            "key": "Well done, we'll meet again.",
-            "value": "Well done, we'll meet again."
-        },
-        {
-            "key": "I want to talk to you [Player].",
-            "value": "I want to talk to you [Player]."
-        },
-        {
-            "key": "I know that your path will not stop here. One day you will become stronger and move on.",
-            "value": "I know that your path will not stop here. One day you will become stronger and move on."
-        },
-        {
-            "key": "I have a request to you, if you meet other apostles, it is better to avoid them. Don't trust them, we apostles are not as pure as you think",
-            "value": "I have a request to you, if you meet other apostles, it is better to avoid them. Don't trust them, we apostles are not as pure as you think"
-        },
-        {
-            "key": "Maybe you, too, then the enemy really is?",
-            "value": "Maybe you, too, then the enemy really is?"
-        },
-        {
-            "key": "I don't know *laughter*. The villagers I think will clearly tell you how it really is",
-            "value": "I don't know *laughter*. The villagers I think will clearly tell you how it really is"
-        },
-        {
-            "key": "Diana told me about you in General terms.",
-            "value": "Diana told me about you in General terms."
-        },
-        {
-            "key": "**She said it with concern**: You turn out to be a Joker, and a vulgar *laughter*",
-            "value": "**She said it with concern**: You turn out to be a Joker, and a vulgar *laughter*"
-        },
-        {
-            "key": "No [Talked]......",
-            "value": "No [Talked]......"
-        },
-        {
-            "key": "Always listen to your heart. I think one day you will be able to bring light. But the main thing is perseverance!",
-            "value": "Always listen to your heart. I think one day you will be able to bring light. But the main thing is perseverance!"
-        },
-        {
-            "key": "Do not delay with your title of adventurer. You can go now!",
-            "value": "Do not delay with your title of adventurer. You can go now!"
-        },
-        {
-            "key": "I'm trying, thank you very much.",
-            "value": "I'm trying, thank you very much."
-        },
-        {
-            "key": "You look sad today [Talked].",
-            "value": "You look sad today [Talked]."
-        },
-        {
-            "key": "Oh man I'm too confused today.... [Player] help me collect lost.",
-            "value": "Oh man I'm too confused today.... [Player] help me collect lost."
-        },
-        {
-            "key": "Take your nose up [Talked], what's wrong with you?",
-            "value": "Take your nose up [Talked], what's wrong with you?"
-        },
-        {
-            "key": "My brother has to stop by today, and I want to cook something to feed him, but everything falls out of my hands..",
-            "value": "My brother has to stop by today, and I want to cook something to feed him, but everything falls out of my hands.."
-        },
-        {
-            "key": "So let me help you?",
-            "value": "So let me help you?"
-        },
-        {
-            "key": "And you I look [Player] today cheerful, well help. I will not remain in debt",
-            "value": "And you I look [Player] today cheerful, well help. I will not remain in debt"
-        },
-        {
-            "key": "Of course [Talked] ;)",
-            "value": "Of course [Talked] ;)"
-        },
-        {
-            "key": "Well here's my house! Ah as my not my, father is a master, and even brother. In General, our family",
-            "value": "Well here's my house! Ah as my not my, father is a master, and even brother. In General, our family"
-        },
-        {
-            "key": "All right, come on in, I'll cook, and I'll ask you to bring something. All the help me need",
-            "value": "All right, come on in, I'll cook, and I'll ask you to bring something. All the help me need"
-        },
-        {
-            "key": "I will help you, especially since you are my first close friend in this village, I already trust you, how you can be abandoned.",
-            "value": "I will help you, especially since you are my first close friend in this village, I already trust you, how you can be abandoned."
-        },
-        {
-            "key": "Well [Player], let's get started, little by little",
-            "value": "Well [Player], let's get started, little by little"
-        },
-        {
-            "key": "Your house comfortable! [Talked]",
-            "value": "Your house comfortable! [Talked]"
-        },
-        {
-            "key": "Do you really think so? Well thank you.",
-            "value": "Do you really think so? Well thank you."
-        },
-        {
-            "key": "All right let's get down to cooking",
-            "value": "All right let's get down to cooking"
-        },
-        {
-            "key": "Well, let's get started [Player]!",
-            "value": "Well, let's get started [Player]!"
-        },
-        {
-            "key": "Oh sure [Talked]",
-            "value": "Oh sure [Talked]"
-        },
-        {
-            "key": "[Player] get me some first, we'll use it as oil",
-            "value": "[Player] get me some first, we'll use it as oil"
-        },
-        {
-            "key": "I think everyone has their own way of making butter *laughter*",
-            "value": "I think everyone has their own way of making butter *laughter*"
-        },
-        {
-            "key": "Yeah you're right, good sense of humor damn *laughter*",
-            "value": "Yeah you're right, good sense of humor damn *laughter*"
-        },
-        {
-            "key": "So now I need meat. How to cook without meat.",
-            "value": "So now I need meat. How to cook without meat."
-        },
-        {
-            "key": "I think you've heard of Kappa, they live near water, their meat is very tasty. So get it for me (you can self find them habitat)",
-            "value": "I think you've heard of Kappa, they live near water, their meat is very tasty. So get it for me (you can self find them habitat)"
-        },
-        {
-            "key": "All delicious fine meat, looks great, take it!",
-            "value": "All delicious fine meat, looks great, take it!"
-        },
-        {
-            "key": "Well i let's start cooking :)",
-            "value": "Well i let's start cooking :)"
-        },
-        {
-            "key": "**You see like she didn't know how to cook**: Are you sure you can cook?",
-            "value": "**You see like she didn't know how to cook**: Are you sure you can cook?"
-        },
-        {
-            "key": "**She said angrily**: You know what I'll tell you [Player]... You don't know how to compliment girls at all..",
-            "value": "**She said angrily**: You know what I'll tell you [Player]... You don't know how to compliment girls at all.."
-        },
-        {
-            "key": "**Someone knocks on the door**: Who could it be? lovers?",
-            "value": "**Someone knocks on the door**: Who could it be? lovers?"
-        },
-        {
-            "key": "Oh it's probably my brother.",
-            "value": "Oh it's probably my brother."
-        },
-        {
-            "key": "**He said angrily and rudely**: Oh, what people, I've seen you somewhere.",
-            "value": "**He said angrily and rudely**: Oh, what people, I've seen you somewhere."
-        },
-        {
-            "key": "You must have imagined it. ",
-            "value": "You must have imagined it. "
-        },
-        {
-            "key": "Oh well.",
-            "value": "Oh well."
-        },
-        {
-            "key": "[Player] you look sad.",
-            "value": "[Player] you look sad."
-        },
-        {
-            "key": "Okay [Talked]. I'll probably go extra here",
-            "value": "Okay [Talked]. I'll probably go extra here"
-        },
-        {
-            "key": "Yes calm down you why so decided to?",
-            "value": "Yes calm down you why so decided to?"
-        },
-        {
-            "key": "Yes, everything is fine. I just have things to do, too. I'll go!",
-            "value": "Yes, everything is fine. I just have things to do, too. I'll go!"
-        },
-        {
-            "key": "You offend me [Talked].....",
-            "value": "You offend me [Talked]....."
-        },
-        {
-            "key": "Sorry I'm really busy [Talked].",
-            "value": "Sorry I'm really busy [Talked]."
-        },
-        {
-            "key": "Well, take care of yourself.",
-            "value": "Well, take care of yourself."
-        },
-        {
-            "key": "So let's continue our training.",
-            "value": "So let's continue our training."
-        },
-        {
-            "key": "Yes, of course, it's about time!",
-            "value": "Yes, of course, it's about time!"
-        },
-        {
-            "key": "**He speaks rudely**: I don't really like you. But let's see what you can achieve. Let's go back to the Deep Cave.",
-            "value": "**He speaks rudely**: I don't really like you. But let's see what you can achieve. Let's go back to the Deep Cave."
-        },
-        {
-            "key": "**He speaks proudly**: Well, now we have more serious goals.",
-            "value": "**He speaks proudly**: Well, now we have more serious goals."
-        },
-        {
-            "key": "Exterminate the stronger slime. I'll see.",
-            "value": "Exterminate the stronger slime. I'll see."
-        },
-        {
-            "key": "Everything is ready, they are vile I do not like slime, maybe something new?",
-            "value": "Everything is ready, they are vile I do not like slime, maybe something new?"
-        },
-        {
-            "key": "Well, I'll think about your request. Follow me.",
-            "value": "Well, I'll think about your request. Follow me."
-        },
-        {
-            "key": "Take it, use it wisely. You will need it very much in the future.",
-            "value": "Take it, use it wisely. You will need it very much in the future."
-        },
-        {
-            "key": "**You were surprised by the gift provided**: Oh, thank you very much. Do I owe you something?",
-            "value": "**You were surprised by the gift provided**: Oh, thank you very much. Do I owe you something?"
-        },
-        {
-            "key": "I hope you make it to the end, at least I hope you do. I didn't think you'd be Apostle's favorite.",
-            "value": "I hope you make it to the end, at least I hope you do. I didn't think you'd be Apostle's favorite."
-        },
-        {
-            "key": "Favorite [Talked]?",
-            "value": "Favorite [Talked]?"
-        },
-        {
-            "key": "**He said very rudely**: I'll go, meet you later.",
-            "value": "**He said very rudely**: I'll go, meet you later."
-        },
-        {
-            "key": "Hello [Player]. Are you free?",
-            "value": "Hello [Player]. Are you free?"
-        },
-        {
-            "key": "Yes, of course. Everything okay?",
-            "value": "Yes, of course. Everything okay?"
-        },
-        {
-            "key": "Apostle asked you to see her!",
-            "value": "Apostle asked you to see her!"
-        },
-        {
-            "key": "Well!",
-            "value": "Well!"
-        },
-        {
-            "key": "Thank you, I'm going for a walk!",
-            "value": "Thank you, I'm going for a walk!"
-        },
-        {
-            "key": "**She speaks in fear**: Hello [Player]. Today I received news that in the southern part of our village, goblins attacked. ",
-            "value": "**She speaks in fear**: Hello [Player]. Today I received news that in the southern part of our village, goblins attacked. "
-        },
-        {
-            "key": "And it's not just goblins. This must be the army. The leader brought them.",
-            "value": "And it's not just goblins. This must be the army. The leader brought them."
-        },
-        {
-            "key": "Maybe they kidnapped the residents and terrorized you, and now they decided to attack?",
-            "value": "Maybe they kidnapped the residents and terrorized you, and now they decided to attack?"
-        },
-        {
-            "key": "I think so too. Anyway, I talked to Koko. About your appointment as an adventurer. We should prepare for resistance. Communication nodes they need to be destroyed",
-            "value": "I think so too. Anyway, I talked to Koko. About your appointment as an adventurer. We should prepare for resistance. Communication nodes they need to be destroyed"
-        },
-        {
-            "key": "Well, I did the job [Talked]!",
-            "value": "Well, I did the job [Talked]!"
-        },
-        {
-            "key": "Good job thank's, you should meet with Koko, he will explain everything to you, good luck!",
-            "value": "Good job thank's, you should meet with Koko, he will explain everything to you, good luck!"
-        },
-        {
-            "key": "Well, thank you!",
-            "value": "Well, thank you!"
-        },
-        {
-            "key": "Get ready let's go to the Goblin-occupied zone.",
-            "value": "Get ready let's go to the Goblin-occupied zone."
-        },
-        {
-            "key": "I'm ready to sort of out right now.",
-            "value": "I'm ready to sort of out right now."
-        },
-        {
-            "key": "Well [Player], you're fun, Yes, but it's worth getting ready.",
-            "value": "Well [Player], you're fun, Yes, but it's worth getting ready."
-        },
-        {
-            "key": "Well, what do need [Talked]?",
-            "value": "Well, what do need [Talked]?"
-        },
-        {
-            "key": "I'll be waiting for you next to Craftsman.",
-            "value": "I'll be waiting for you next to Craftsman."
-        },
-        {
-            "key": "So first we need potions.",
-            "value": "So first we need potions."
-        },
-        {
-            "key": "Go get supplies, and at the same time exterminate a few slugs so that we can get there without any problems.",
-            "value": "Go get supplies, and at the same time exterminate a few slugs so that we can get there without any problems."
-        },
-        {
-            "key": "**You sound very tired**: We can all move, but the problem is that I'm tired..",
-            "value": "**You sound very tired**: We can all move, but the problem is that I'm tired.."
-        },
-        {
-            "key": "Nothing to worry about [Player]. You need to toughen up. All right let's move out.",
-            "value": "Nothing to worry about [Player]. You need to toughen up. All right let's move out."
-        },
-        {
-            "key": "We'll get to the guard post now. We'll move out there to exterminate the goblins.",
-            "value": "We'll get to the guard post now. We'll move out there to exterminate the goblins."
-        },
-        {
-            "key": "Well [Talked].",
-            "value": "Well [Talked]."
-        },
-        {
-            "key": "**Grinning**: Huh?",
-            "value": "**Grinning**: Huh?"
-        },
-        {
-            "key": "We can't heal her..",
-            "value": "We can't heal her.."
-        },
-        {
-            "key": "I don't understand..",
-            "value": "I don't understand.."
-        },
-        {
-            "key": "Our daughter, Maria.. She's sick!",
-            "value": "Our daughter, Maria.. She's sick!"
-        },
-        {
-            "key": "Why don't you take her to the Nurse?!",
-            "value": "Why don't you take her to the Nurse?!"
-        },
-        {
-            "key": "I tried, but she said she can't do anything.. I found something in an old book of mine.. A gel treatment. But I also need Kappa Meat for it..",
-            "value": "I tried, but she said she can't do anything.. I found something in an old book of mine.. A gel treatment. But I also need Kappa Meat for it.."
-        },
-        {
-            "key": "Tha..nk.. You..",
-            "value": "Tha..nk.. You.."
-        },
-        {
-            "key": "Well.. don't look at me, heal Maria!",
-            "value": "Well.. don't look at me, heal Maria!"
-        },
-        {
-            "key": "F..Father?",
-            "value": "F..Father?"
-        },
-        {
-            "key": "MARIA! You're well!",
-            "value": "MARIA! You're well!"
-        },
-        {
-            "key": "*with joy* Hi, Maria!",
-            "value": "*with joy* Hi, Maria!"
-        },
-        {
-            "key": "How can I ever make it up to you?",
-            "value": "How can I ever make it up to you?"
-        },
-        {
-            "key": "Well Sir.. I might need a discount from your old friend, the Craftsman.",
-            "value": "Well Sir.. I might need a discount from your old friend, the Craftsman."
-        },
-        {
-            "key": "Sure, I'll.. let him know you deserve it!",
-            "value": "Sure, I'll.. let him know you deserve it!"
-        },
-        {
-            "key": "Sure..What can I do?",
-            "value": "Sure..What can I do?"
-        },
-        {
-            "key": "I heard you helped the craftsman with his deliveries..I have no time for small things like mining cooper, can you do it for me? I have to save the world in the main time..",
-            "value": "I heard you helped the craftsman with his deliveries..I have no time for small things like mining cooper, can you do it for me? I have to save the world in the main time.."
-        },
-        {
-            "key": " *a bit angry* Ok, I will do it.",
-            "value": " *a bit angry* Ok, I will do it."
-        },
-        {
-            "key": "Oh, it's you kid!",
-            "value": "Oh, it's you kid!"
-        },
-        {
-            "key": "*you can't control yourself* HEY. I'm NOT A KID!",
-            "value": "*you can't control yourself* HEY. I'm NOT A KID!"
-        },
-        {
-            "key": "Hey.. easy, just a joke, did you get what I wanted?",
-            "value": "Hey.. easy, just a joke, did you get what I wanted?"
-        },
-        {
-            "key": "Yes.. *puts a heavy cooper bag on Erik's table*",
-            "value": "Yes.. *puts a heavy cooper bag on Erik's table*"
-        },
-        {
-            "key": "Good, now get out of here!",
-            "value": "Good, now get out of here!"
-        },
-        {
-            "key": "Wait.. YOU NOT GONNA PAY ME??",
-            "value": "Wait.. YOU NOT GONNA PAY ME??"
-        },
-        {
-            "key": "Haha! I am messing with you.",
-            "value": "Haha! I am messing with you."
-        },
-        {
-            "key": "So can you tell me how you got here?",
-            "value": "So can you tell me how you got here?"
-        },
-        {
-            "key": "**He's stuttered**: A long story..",
-            "value": "**He's stuttered**: A long story.."
-        },
-        {
-            "key": "We tried a new potion mixed with ether, but something went wrong, my hiccups are part of this experiment, and I ended up here after I drank it",
-            "value": "We tried a new potion mixed with ether, but something went wrong, my hiccups are part of this experiment, and I ended up here after I drank it"
-        },
-        {
-            "key": "**Sound in the tablet**: Noctis... Noctiis. Do you hear me?",
-            "value": "**Sound in the tablet**: Noctis... Noctiis. Do you hear me?"
-        },
-        {
-            "key": "**Noctis**: I can hear you, how do I get out of here?",
-            "value": "**Noctis**: I can hear you, how do I get out of here?"
-        },
-        {
-            "key": "**Sound in the tablet**: Collect all the fragments that ended up here. The connection is lost....",
-            "value": "**Sound in the tablet**: Collect all the fragments that ended up here. The connection is lost...."
-        },
-        {
-            "key": "What were you talking to just now?",
-            "value": "What were you talking to just now?"
-        },
-        {
-            "key": "A tablet made from a magic crystal. In General, as I thought I need your help in collecting fragments",
-            "value": "A tablet made from a magic crystal. In General, as I thought I need your help in collecting fragments"
-        },
-        {
-            "key": "Of course I'll help",
-            "value": "Of course I'll help"
-        },
-        {
-            "key": "Look at what I can give you in return for your help. (Vote menu shop list)",
-            "value": "Look at what I can give you in return for your help. (Vote menu shop list)"
-        },
-        {
-            "key": "Wow, [Talked] where can I find them?",
-            "value": "Wow, [Talked] where can I find them?"
-        },
-        {
-            "key": "In a distorted dimension.",
-            "value": "In a distorted dimension."
-        },
-        {
-            "key": "Where is it? How do I get there?",
-            "value": "Where is it? How do I get there?"
-        },
-        {
-            "key": "[Player] way, so we'll be preparing to get there.",
-            "value": "[Player] way, so we'll be preparing to get there."
-        },
-        {
-            "key": "So first [Player], I'll need these things from you. They resonate between our worlds",
-            "value": "So first [Player], I'll need these things from you. They resonate between our worlds"
-        },
-        {
-            "key": "Take it [Talked].",
-            "value": "Take it [Talked]."
-        },
-        {
-            "key": "Well thank you, it will be a little easier now.",
-            "value": "Well thank you, it will be a little easier now."
-        },
-        {
-            "key": "**Sound in the tablet**: Noctis. How you to get the fragments we will be able to pick you up.",
-            "value": "**Sound in the tablet**: Noctis. How you to get the fragments we will be able to pick you up."
-        },
-        {
-            "key": "**Noctis**: Okay, Sid..",
-            "value": "**Noctis**: Okay, Sid.."
-        },
-        {
-            "key": "Next thing I need to create a resonance. Bring me these items.",
-            "value": "Next thing I need to create a resonance. Bring me these items."
-        },
-        {
-            "key": "Everything is ready?. [Talked] take it",
-            "value": "Everything is ready?. [Talked] take it"
-        },
-        {
-            "key": "[Player] yes.. almost, follow me and we'll start resonating.",
-            "value": "[Player] yes.. almost, follow me and we'll start resonating."
-        },
-        {
-            "key": "All ready.",
-            "value": "All ready."
-        },
-        {
-            "key": "Resonance received. I will wait for you with fragments",
-            "value": "Resonance received. I will wait for you with fragments"
-        },
-        {
-            "key": "Can come to resonance?",
-            "value": "Can come to resonance?"
-        },
-        {
-            "key": "Yes. Don't worry nothing will happen to you.",
-            "value": "Yes. Don't worry nothing will happen to you."
-        },
-        {
-            "key": "I welcome you [Talked], nice to meet you.",
-            "value": "I welcome you [Talked], nice to meet you."
-        },
-        {
-            "key": "Glad to meet you, i'am [Player]!",
-            "value": "Glad to meet you, i'am [Player]!"
-        },
-        {
-            "key": "Him you will spend time here. I have to go to the village.",
-            "value": "Him you will spend time here. I have to go to the village."
-        },
-        {
-            "key": "Need to stand on defense in the village, good luck to you I will wait for good news from you.",
-            "value": "Need to stand on defense in the village, good luck to you I will wait for good news from you."
-        },
-        {
-            "key": "Good luck to you [Talked].",
-            "value": "Good luck to you [Talked]."
-        },
-        {
-            "key": "I came from a far Eastern country, I have some problems in the country so I need to become stronger.",
-            "value": "I came from a far Eastern country, I have some problems in the country so I need to become stronger."
-        },
-        {
-            "key": "I came for similar purposes. But I would like to visit your country.",
-            "value": "I came for similar purposes. But I would like to visit your country."
-        },
-        {
-            "key": "**He speaks with a smile**: If you wish I will be sailing back soon I can take you with me",
-            "value": "**He speaks with a smile**: If you wish I will be sailing back soon I can take you with me"
-        },
-        {
-            "key": "I'd love to, but I don't know, i have here made friends. We'll see.",
-            "value": "I'd love to, but I don't know, i have here made friends. We'll see."
-        },
-        {
-            "key": "Well, if we still live of course. And the got to talking and drive away goblins need.",
-            "value": "Well, if we still live of course. And the got to talking and drive away goblins need."
-        },
-        {
-            "key": "To begin with, we must exterminate many of them as possible. To get to them in zone",
-            "value": "To begin with, we must exterminate many of them as possible. To get to them in zone"
-        },
-        {
-            "key": "**Very tired voice**: [Talked]. I'm so tired, there are so many of them.....",
-            "value": "**Very tired voice**: [Talked]. I'm so tired, there are so many of them....."
-        },
-        {
-            "key": "**He sounds very tired**: Yes, I am also very tired, but we have to deal with it.",
-            "value": "**He sounds very tired**: Yes, I am also very tired, but we have to deal with it."
-        },
-        {
-            "key": "All right let's keep going before they pile up again.",
-            "value": "All right let's keep going before they pile up again."
-        },
-        {
-            "key": "Hmmm.. I see a passageway. I think we can go through there and find out where they're coming from.",
-            "value": "Hmmm.. I see a passageway. I think we can go through there and find out where they're coming from."
-        },
-        {
-            "key": "I'm worried about something.. Where did this hole?",
-            "value": "I'm worried about something.. Where did this hole?"
-        },
-        {
-            "key": "I don't know either, honestly. Maybe the goblins have dug through and are coming out. In any case we need to find out.",
-            "value": "I don't know either, honestly. Maybe the goblins have dug through and are coming out. In any case we need to find out."
-        },
-        {
-            "key": "I think this is where they live. ",
-            "value": "I think this is where they live. "
-        },
-        {
-            "key": "In any case, if we can not cope with them, there is an option to block the way. But I think they'll dig it up again in time.",
-            "value": "In any case, if we can not cope with them, there is an option to block the way. But I think they'll dig it up again in time."
-        },
-        {
-            "key": "**In anger**: LET's BREAK UP THESE FREAKS ALREADY... ",
-            "value": "**In anger**: LET's BREAK UP THESE FREAKS ALREADY... "
-        },
-        {
-            "key": "I'm only for your idea. Let's go!",
-            "value": "I'm only for your idea. Let's go!"
-        },
-        {
-            "key": "And here is their leader.",
-            "value": "And here is their leader."
-        },
-        {
-            "key": "Did we manage?",
-            "value": "Did we manage?"
-        },
-        {
-            "key": "We don't know yet we need to get out of here....",
-            "value": "We don't know yet we need to get out of here...."
-        },
-        {
-            "key": "I'll be waiting for you where we fought the goblins.",
-            "value": "I'll be waiting for you where we fought the goblins."
-        },
-        {
-            "key": "Finally we got out how do you think we managed?",
-            "value": "Finally we got out how do you think we managed?"
-        },
-        {
-            "key": "I don't know [Player], we have to report this news to the village.",
-            "value": "I don't know [Player], we have to report this news to the village."
-        },
-        {
-            "key": "Well, I think my work here is done [Player].",
-            "value": "Well, I think my work here is done [Player]."
-        },
-        {
-            "key": "Your [Talked] next trip will be to your homeland?",
-            "value": "Your [Talked] next trip will be to your homeland?"
-        },
-        {
-            "key": "Yes, I think it's time to go home, I missed it.",
-            "value": "Yes, I think it's time to go home, I missed it."
-        },
-        {
-            "key": "Will you take me with you?",
-            "value": "Will you take me with you?"
-        },
-        {
-            "key": "Yes, of course. Say goodbye to your friends or maybe one of them will go with you?",
-            "value": "Yes, of course. Say goodbye to your friends or maybe one of them will go with you?"
-        },
-        {
-            "key": "No, I don't want to expose them to danger.",
-            "value": "No, I don't want to expose them to danger."
-        },
-        {
-            "key": "Well, goodbye [Talked], I'll keep going. I want to be stronger than I was before.",
-            "value": "Well, goodbye [Talked], I'll keep going. I want to be stronger than I was before."
-        },
-        {
-            "key": "All right [Player]. Good luck don't forget that we will always be happy to welcome you as a guest ;)",
-            "value": "All right [Player]. Good luck don't forget that we will always be happy to welcome you as a guest ;)"
-        },
-        {
-            "key": "Don't forget, don't miss me ;)",
-            "value": "Don't forget, don't miss me ;)"
-        },
-        {
-            "key": "Don't worry, Diana is very attached to you. I think she will be offended. Talk to she!",
-            "value": "Don't worry, Diana is very attached to you. I think she will be offended. Talk to she!"
-        },
-        {
-            "key": "Why didn't you tell [Player] me you were going to leave?",
-            "value": "Why didn't you tell [Player] me you were going to leave?"
-        },
-        {
-            "key": "I'm Sorry [Talked]. I wanted to tell you..",
-            "value": "I'm Sorry [Talked]. I wanted to tell you.."
-        },
-        {
-            "key": "**She said sadly**: Why? Will you take me with you?",
-            "value": "**She said sadly**: Why? Will you take me with you?"
-        },
-        {
-            "key": "I don't want to put you in danger!",
-            "value": "I don't want to put you in danger!"
-        },
-        {
-            "key": "I want to travel with you!",
-            "value": "I want to travel with you!"
-        },
-        {
-            "key": "Ok, I'll take you. Now let me to say Yasue San.",
-            "value": "Ok, I'll take you. Now let me to say Yasue San."
-        },
-        {
-            "key": "**She said joyfully**: True? Thank! ;)",
-            "value": "**She said joyfully**: True? Thank! ;)"
-        },
-        {
-            "key": "Well, ready to go?",
-            "value": "Well, ready to go?"
-        },
-        {
-            "key": "Yes, will I take Diana with me?",
-            "value": "Yes, will I take Diana with me?"
-        },
-        {
-            "key": "Yes, of course, set sail:) I will show you my homeland!",
-            "value": "Yes, of course, set sail:) I will show you my homeland!"
-        },
-        {
-            "key": "**He said surprised**: What a wonderful weather today!",
-            "value": "**He said surprised**: What a wonderful weather today!"
-        },
-        {
-            "key": "Yes, I think so too.",
-            "value": "Yes, I think so too."
-        },
-        {
-            "key": "Well, how do you like on our ship [Player]? Captures the ocean, i think I'll stay here a little longer, it's wonderful here.",
-            "value": "Well, how do you like on our ship [Player]? Captures the ocean, i think I'll stay here a little longer, it's wonderful here."
-        },
-        {
-            "key": "I also really like it. Okay, I'll go, I wish you a good rest [Talked]!",
-            "value": "I also really like it. Okay, I'll go, I wish you a good rest [Talked]!"
-        },
-        {
-            "key": "And I wish you good luck too [Player]!",
-            "value": "And I wish you good luck too [Player]!"
-        },
-        {
-            "key": "**He looks very tired**: Very hot, impossible to work.",
-            "value": "**He looks very tired**: Very hot, impossible to work."
-        },
-        {
-            "key": "Hello, I arrived from a small village beyond the mountains and the ocean, my name is [Player], I have a desire to become an adventurer. But I do not know about this place, could you help me?",
-            "value": "Hello, I arrived from a small village beyond the mountains and the ocean, my name is [Player], I have a desire to become an adventurer. But I do not know about this place, could you help me?"
-        },
-        {
-            "key": "Hello [Player], Yes of course I will help you, explain where you need to go, but you help my workers, they do not cope at all.",
-            "value": "Hello [Player], Yes of course I will help you, explain where you need to go, but you help my workers, they do not cope at all."
-        },
-        {
-            "key": "What you need help with, I'm good at dealing with predators without meat you will not leave! *laughter*",
-            "value": "What you need help with, I'm good at dealing with predators without meat you will not leave! *laughter*"
-        },
-        {
-            "key": "Oh, you're a Joker, no thanks go a little further guys will explain everything to you!",
-            "value": "Oh, you're a Joker, no thanks go a little further guys will explain everything to you!"
-        },
-        {
-            "key": "OK, thanks!",
-            "value": "OK, thanks!"
-        },
-        {
-            "key": "Hey, pst! You, yes, you!",
-            "value": "Hey, pst! You, yes, you!"
-        },
-        {
-            "key": "Yeah? How can I help?",
-            "value": "Yeah? How can I help?"
-        },
-        {
-            "key": "You cannot help me, kid! I just need...to TEST you, yes...!",
-            "value": "You cannot help me, kid! I just need...to TEST you, yes...!"
-        },
-        {
-            "key": "Hi my name is [Player], [Talked] are you working?",
-            "value": "Hi my name is [Player], [Talked] are you working?"
-        },
-        {
-            "key": "Hello [Player], Yes, I am on duty as a guard, and I also trade a little",
-            "value": "Hello [Player], Yes, I am on duty as a guard, and I also trade a little"
-        },
-        {
-            "key": "Can you tell me how difficult it is to get into the service?",
-            "value": "Can you tell me how difficult it is to get into the service?"
-        },
-        {
-            "key": "If that's what you want, it's easy. And if you don't then you won't be able to get in ;)",
-            "value": "If that's what you want, it's easy. And if you don't then you won't be able to get in ;)"
-        },
-        {
-            "key": "By the way [Player], I need help, there are slugs nearby, again raging, and I can't leave the post. At the same time you will test your skills young adventurer.",
-            "value": "By the way [Player], I need help, there are slugs nearby, again raging, and I can't leave the post. At the same time you will test your skills young adventurer."
-        },
-        {
-            "key": "Yes, no problem, wait [Talked]!!",
-            "value": "Yes, no problem, wait [Talked]!!"
-        },
-        {
-            "key": "**He says with a look of horror on his face**: Help me find my daughter, she went to the village for food and never returned.",
-            "value": "**He says with a look of horror on his face**: Help me find my daughter, she went to the village for food and never returned."
-        },
-        {
-            "key": "To the village? [Talked] Yes of course I will help. That's where I need to go!",
-            "value": "To the village? [Talked] Yes of course I will help. That's where I need to go!"
-        },
-        {
-            "key": "Thanks a lot",
-            "value": "Thanks a lot"
-        },
-        {
-            "key": "Hello, would you like to learn the basics of mining?",
-            "value": "Hello, would you like to learn the basics of mining?"
-        },
-        {
-            "key": "Yes, of course, I don't mind",
-            "value": "Yes, of course, I don't mind"
-        },
-        {
-            "key": "All right follow me I'll explain the basics to you!",
-            "value": "All right follow me I'll explain the basics to you!"
-        },
-        {
-            "key": "Hello, and so you're new here?",
-            "value": "Hello, and so you're new here?"
-        },
-        {
-            "key": "Yes.",
-            "value": "Yes."
-        },
-        {
-            "key": "I need to register you. Please introduce yourself, and the purpose of your arrival, and the time you to stay here",
-            "value": "I need to register you. Please introduce yourself, and the purpose of your arrival, and the time you to stay here"
-        },
-        {
-            "key": "My name is [Player]. I came here to become an adventurer. I can't tell you the exact time of stay.",
-            "value": "My name is [Player]. I came here to become an adventurer. I can't tell you the exact time of stay."
-        },
-        {
-            "key": "And who for you should know the time of your stay here.",
-            "value": "And who for you should know the time of your stay here."
-        },
-        {
-            "key": "Okay well, I will write you down, in case of violation of the rules of our village, we have every right to prohibit your presence here, and report to superiors.",
-            "value": "Okay well, I will write you down, in case of violation of the rules of our village, we have every right to prohibit your presence here, and report to superiors."
-        },
-        {
-            "key": "Have a good day!",
-            "value": "Have a good day!"
-        },
-        {
-            "key": "Thank's [Talked]!",
-            "value": "Thank's [Talked]!"
-        },
-        {
-            "key": "[Stranger]Greetings, wanderer. *bowing*",
-            "value": "[Stranger]Greetings, wanderer. *bowing*"
-        },
-        {
-            "key": "I am the Deputy of the Apostle, and I also protect her.",
-            "value": "I am the Deputy of the Apostle, and I also protect her."
-        },
-        {
-            "key": "I think you've already heard, that the monsters are raging.",
-            "value": "I think you've already heard, that the monsters are raging."
-        },
-        {
-            "key": "I have a request for you [Player]",
-            "value": "I have a request for you [Player]"
-        },
-        {
-            "key": "Which one?",
-            "value": "Which one?"
-        },
-        {
-            "key": "Help in the southern part to win over the monsters. We can't drive them away but we can scare them away.",
-            "value": "Help in the southern part to win over the monsters. We can't drive them away but we can scare them away."
-        },
-        {
-            "key": "Of course I will.",
-            "value": "Of course I will."
-        },
-        {
-            "key": "Thank's [Player]!",
-            "value": "Thank's [Player]!"
-        },
-        {
-            "key": "You look awful today, [Talked]! What happend?",
-            "value": "You look awful today, [Talked]! What happend?"
-        },
-        {
-            "key": "Oh.. don't you worry about me, boy..",
-            "value": "Oh.. don't you worry about me, boy.."
-        },
-        {
-            "key": "But I DO worry!",
-            "value": "But I DO worry!"
-        },
-        {
-            "key": "I'm tired of these fight I have with my wife, it's personal bussiness.",
-            "value": "I'm tired of these fight I have with my wife, it's personal bussiness."
-        },
-        {
-            "key": "I didn't want to be a pain to you, Officer. I will leave you to your problems now.",
-            "value": "I didn't want to be a pain to you, Officer. I will leave you to your problems now."
-        },
-        {
-            "key": "No! Wait!",
-            "value": "No! Wait!"
-        },
-        {
-            "key": "Hello [Player], I have come to you from the Final Fantasy universe, my name is [Talked].",
-            "value": "Hello [Player], I have come to you from the Final Fantasy universe, my name is [Talked]."
-        },
-        {
-            "key": "I can't say for sure how long I will be here, but for now I will be happy to know your world, and I will be happy to show my world",
-            "value": "I can't say for sure how long I will be here, but for now I will be happy to know your world, and I will be happy to show my world"
-        },
-        {
-            "key": "Are you serious? Did the author smoke dope?",
-            "value": "Are you serious? Did the author smoke dope?"
-        },
-        {
-            "key": "Maybe so, I have a couple of things that you can get from me, but not for free. I'll need the fragments I lost",
-            "value": "Maybe so, I have a couple of things that you can get from me, but not for free. I'll need the fragments I lost"
-        },
-        {
-            "key": "Welcome home, sir! **she made a bow**",
-            "value": "Welcome home, sir! **she made a bow**"
-        }
-    ]
+  "translation": [
+    {
+      "key": "The main menu will return as soon as you leave this zone!",
+      "value": "在离开此区域后，主菜单将很快重新出现!"
+    },
+    {
+      "key": "Hi, {STR} Last log in {STR}",
+      "value": "Hello, {STR} 最近一次登录： {STR}"
+    },
+    {
+      "key": "Level {INT} : Exp {INT}/{INT}",
+      "value": "等级：{INT} :: 经验值：{INT}/{INT}"
+    },
+    {
+      "key": "Skill Point {INT}SP",
+      "value": "技能点 {INT}SP"
+    },
+    {
+      "key": "Gold: {INT}",
+      "value": "钱: {INT}"
+    },
+    {
+      "key": "☪ SUB MENU PERSONAL",
+      "value": "☪ 个人-子菜单"
+    },
+    {
+      "key": "Inventory",
+      "value": "背包"
+    },
+    {
+      "key": "Equipment",
+      "value": "装备"
+    },
+    {
+      "key": "Upgrades({INT}p)",
+      "value": "升级({INT}p)"
+    },
+    {
+      "key": "Dungeons",
+      "value": "地牢"
+    },
+    {
+      "key": "Settings",
+      "value": "设置"
+    },
+    {
+      "key": "Mailbox",
+      "value": "邮箱"
+    },
+    {
+      "key": "Journal",
+      "value": "日志"
+    },
+    {
+      "key": "Guild",
+      "value": "公会"
+    },
+    {
+      "key": "Guild finder",
+      "value": "寻找公会"
+    },
+    {
+      "key": "House",
+      "value": "房子"
+    },
+    {
+      "key": "√ SUB MENU INFORMATION",
+      "value": "√ 子菜单-信息"
+    },
+    {
+      "key": "Loots, mobs on your zone",
+      "value": "掉落物，怪物在你的区域里"
+    },
+    {
+      "key": "Ranking guilds and players",
+      "value": "公会排名和玩家"
+    },
+    {
+      "key": "Upgrades Information",
+      "value": "关于升级"
+    },
+    {
+      "key": "Select upgrades type in Reason, write count.",
+      "value": "选择升级项，然后在理由里选择数量"
+    },
+    {
+      "key": "Disciple of War. Level Power {INT}",
+      "value": "攻击的信使. 等级效果 {INT}"
+    },
+    {
+      "key": "Disciple of Tank. Level Power {INT}",
+      "value": "坦克的信使.等级效果 {INT}"
+    },
+    {
+      "key": "Disciple of Healer. Level Power {INT}",
+      "value": "治疗的信使. 等级效果 {INT}"
+    },
+    {
+      "key": "Disciple of Jobs",
+      "value": "工作的信使"
+    },
+    {
+      "key": "{STR} {INT}P (Price {INT}P)",
+      "value": "{STR} {INT}P (价格 {INT}P)"
+    },
+    {
+      "key": "Ranking Information",
+      "value": "关于排名"
+    },
+    {
+      "key": "Top 10 guilds leveling",
+      "value": "前十等级最高公会"
+    },
+    {
+      "key": "Top 10 guilds wealthy",
+      "value": "前十最富有公会"
+    },
+    {
+      "key": "Top 10 players leveling",
+      "value": "前十等级最高玩家"
+    },
+    {
+      "key": "Top 10 players wealthy",
+      "value": "前十最富有玩家"
+    },
+    {
+      "key": "Chance & Loot Information",
+      "value": "盲盒和战利品信息"
+    },
+    {
+      "key": "Here you can see chance loot, mobs, on YOUR ZONE.",
+      "value": "在这里你可以看到周围的怪物信息以及可能掉落的战利品"
+    },
+    {
+      "key": "There are no active mobs in your zone!",
+      "value": "你的周围没有怪物"
+    },
+    {
+      "key": "Backpage",
+      "value": "上一页"
+    },
+    {
+      "key": "Player Stats {STR}",
+      "value": "玩家统计数据 {STR}"
+    },
+    {
+      "key": "Player Upgrade Point: {INT}P",
+      "value": "玩家升级点: {INT}P"
+    },
+    {
+      "key": "You have {INT} {STR}",
+      "value": "你有 {INT} 个 {STR}"
+    },
+    {
+      "key": "Use it when you're not dead!",
+      "value": "你只能在没死的时候用这个！"
+    },
+    {
+      "key": "Level UP. Now Level {INT}!",
+      "value": "等级提升！现在的等级是：{INT}!"
+    },
+    {
+      "key": "Press 'F4' to continue the dialog!",
+      "value": "按 'F4' 继续对话！"
+    },
+    {
+      "key": "You got the effect {STR} time {INT}sec.",
+      "value": "你得到了效果：{STR}  持续时间：{INT}秒."
+    },
+    {
+      "key": "You lost the effect {STR}.",
+      "value": "你失去了效果 {STR}."
+    },
+    {
+      "key": "Repair all items - FREE",
+      "value": "免费修理所有物品"
+    },
+    {
+      "key": "Shop :: {STR}",
+      "value": "商店 :: {STR}"
+    },
+    {
+      "key": "List of completed quests",
+      "value": "已完成的任务的列表"
+    },
+    {
+      "key": "Active NPC for current quests",
+      "value": "当前任务的主要NPC"
+    },
+    {
+      "key": "Your mailbox is empty",
+      "value": "你的邮箱是空的"
+    },
+    {
+      "key": "Available aethers",
+      "value": "其他可用的"
+    },
+    {
+      "key": "Move to Guild House - free",
+      "value": "传送到公会房间 - 免费"
+    },
+    {
+      "key": "Move to Your House - free",
+      "value": "传送到你的家 - 免费"
+    },
+    {
+      "key": "Inventory Select List",
+      "value": "背包选择列表"
+    },
+    {
+      "key": "Used ({INT})",
+      "value": "正在使用：({INT})"
+    },
+    {
+      "key": "Craft ({INT})",
+      "value": "合成 ({INT})"
+    },
+    {
+      "key": "Modules ({INT})",
+      "value": "模型 ({INT})"
+    },
+    {
+      "key": "Potion ({INT})",
+      "value": "药水 ({INT})"
+    },
+    {
+      "key": "Other ({INT})",
+      "value": "其他 ({INT})"
+    },
+    {
+      "key": "Story dungeon's",
+      "value": "故事 地下城"
+    },
+    {
+      "key": "Alternative story dungeon's",
+      "value": "另类故事 地下城"
+    },
+    {
+      "key": "You are already in this dungeon!",
+      "value": "你已经在这个地下城里了！"
+    },
+    {
+      "key": "At the moment players are passing this dungeon!",
+      "value": "有玩家正在通过这个地牢！"
+    },
+    {
+      "key": "Your level is low to pass this dungeon!",
+      "value": "你的等级不允许进入地牢！"
+    },
+    {
+      "key": "{STR} joined to Dungeon {STR}!",
+      "value": "{STR} 加入了地下城 {STR}!"
+    },
+    {
+      "key": "You can vote for the choice of tank (Dungeon Tab)!",
+      "value": "你可以投票选择谁当坦克（地牢）"
+    },
+    {
+      "key": "You can't vote for yourself!",
+      "value": "你不可以投你自己！"
+    },
+    {
+      "key": "You already voted!",
+      "value": "你已经投票了"
+    },
+    {
+      "key": "{STR} voted for {STR}.",
+      "value": "{STR} 投票给 {STR}."
+    },
+    {
+      "key": "Languages Information",
+      "value": "关于语言"
+    },
+    {
+      "key": "Here you can choose the language.",
+      "value": "你可以在这里选择你的语言"
+    },
+    {
+      "key": "Note: translation is not complete.",
+      "value": "小贴士：翻译还没全部做完"
+    },
+    {
+      "key": "Active language: {STR}",
+      "value": "可以使用的语言: {STR}"
+    },
+    {
+      "key": "Select language \"{STR}\"",
+      "value": "选择语言\"{STR}\""
+    },
+    {
+      "key": "You chosen a language \"{STR}\".",
+      "value": "你选择了语言 \"{STR}\" ."
+    },
+    {
+      "key": "Settings language",
+      "value": "语言设置"
+    },
+    {
+      "key": "Required {INT}, but you have only {INT} {STR}!",
+      "value": "要求 {INT}, 但是你只有 {INT} {STR}!"
+    },
+    {
+      "key": "Not upgrade points for +{INT}. Required {INT}.",
+      "value": "没有足够的升级点 +{INT}. 要求 {INT}."
+    },
+    {
+      "key": "Upgrade has a maximum level.",
+      "value": "已升级到最高等级."
+    },
+    {
+      "key": "This chat is intended for team / guilds!",
+      "value": "此聊天适用于团队/公会"
+    },
+    {
+      "key": "{STR} came! Good {STR}!",
+      "value": "{STR} 来了! 好 {STR}!"
+    },
+    {
+      "key": "Nighttime experience was increase to {INT}",
+      "value": "夜间经验提升到 {INT}%"
+    },
+    {
+      "key": "Daytime experience was downgraded to 100%",
+      "value": "白天经验降低到100%"
+    },
+    {
+      "key": "{STR} opened zone ({STR})!",
+      "value": "{STR} 开放区域 ({STR})!"
+    },
+    {
+      "key": "Requires quest completion '{STR}'!",
+      "value": "要求完成任务 '{STR}'!"
+    },
+    {
+      "key": "You can see menu in the votes!",
+      "value": "你可以在投票里看见菜单"
+    },
+    {
+      "key": "You left the active zone, menu is restored!",
+      "value": "你离开了活动区域，菜单已恢复"
+    },
+    {
+      "key": "{STR} logged to account. Rank #{INT}",
+      "value": "{STR} 加入了MMO世界并登录. 等级 #{INT}"
+    },
+    {
+      "key": "You repaired all items.",
+      "value": "你修理了所有物品."
+    },
+    {
+      "key": "Learned a new skill [{STR}]",
+      "value": "学习一个新技能 [{STR}]"
+    },
+    {
+      "key": "Increased the skill [{STR} level to {INT}]",
+      "value": "把技能 [{STR} 级别提高到 {INT}]"
+    },
+    {
+      "key": "Skill already have maximum level!",
+      "value": "技能已经达到了最高等级！"
+    },
+    {
+      "key": "Menu is available in call-votes!",
+      "value": "菜单在投票界面使用！"
+    },
+    {
+      "key": "You start dialogue with {STR}!",
+      "value": "你开始和{STR}对话!"
+    },
+    {
+      "key": "{INT}. {STR} | {INT}:{INT}min | {INT}P",
+      "value": "{INT}. {STR} | {INT}:{INT}min | {INT}P"
+    },
+    {
+      "key": "Need to complete quest {STR}",
+      "value": "需要完成任务 {STR}"
+    },
+    {
+      "key": "Voting for the choice of tank!",
+      "value": "在投票里选择坦克!"
+    },
+    {
+      "key": "投票 {STR} (投票: {INT})",
+      "value": "投票 {STR} (投票: {INT})"
+    },
+    {
+      "key": "You have {INT} unread messages!",
+      "value": "你有 {INT} 个未读信息!"
+    },
+    {
+      "key": "Task has not been completed yet!",
+      "value": "任务还没有做完！!"
+    },
+    {
+      "key": "[Done] Give the {STR}x{INT} to the {STR}!",
+      "value": "[完成] 给 {STR}x{INT} {STR}!"
+    },
+    {
+      "key": "[Done] Defeat the {STR}'s for the {STR}!",
+      "value": "[完成] 击败 {STR}'s 给 {STR}!"
+    },
+    {
+      "key": "- - - - [Your nickname is already registered] - - - -",
+      "value": "- - - - - - - [您的用户名早就被注册过了] - - - - - - -"
+    },
+    {
+      "key": "Your nick is a unique identifier, and it has already been used!",
+      "value": "您的用户名是一个唯一的标识符，它已经被别人使用了！"
+    },
+    {
+      "key": "You can restore access by contacting support, or change nick.",
+      "value": "你可以通过联系管理员或者更改你的昵称重新获取访问权限."
+    },
+    {
+      "key": "- - - - - - - [Successful registered] - - - - - - -",
+      "value": "- - - - - - - - - [注册成功] - - - - - - - - -"
+    },
+    {
+      "key": "Don't forget your data, have a nice game!",
+      "value": "不要忘了你的账号密码，祝你玩的开心！"
+    },
+    {
+      "key": "# Your nickname is a unique identifier!",
+      "value": "# 你的用户名是你唯一的标识符!"
+    },
+    {
+      "key": "# Log in: \"/login {STR} {STR}\"",
+      "value": "# 使用: \"/login {STR} {STR}\"登录"
+    },
+    {
+      "key": "Username / Password must contain 4-12 characters",
+      "value": "用户名 / 密码必须在4到12个字符之间"
+    },
+    {
+      "key": "Wrong login or password",
+      "value": "错误的用户名或密码"
+    },
+    {
+      "key": "The account is already in the game!",
+      "value": "这个账号已经登录了！"
+    },
+    {
+      "key": "- - - - - - - [Successful login] - - - - - - -",
+      "value": "- - - - - - - - - [成功登录] - - - - - - - - -"
+    },
+    {
+      "key": "Your nickname was not found in the database!",
+      "value": "您的用户名不在数据库中!"
+    },
+    {
+      "key": "You are located {STR} ({STR})",
+      "value": "您正位于 {STR} ({STR})"
+    },
+    {
+      "key": "Quest NPCs are marked with an aura Heart and Shield.",
+      "value": "任务NPC会被高亮并带有心和盾牌粒子。"
+    },
+    {
+      "key": "Shield around you indicates location of active quest.",
+      "value": "你周围的盾牌指示活动任务的位置。"
+    },
+    {
+      "key": "Your Discord ID has been updated",
+      "value": "您的discord id已被更新"
+    },
+    {
+      "key": "Check the connection status in discord \"/connect\".",
+      "value": "在discord输入 \"/connect\"检查连接."
+    },
+    {
+      "key": "Some of the settings becomes valid after death",
+      "value": "一些设置在死亡后有效"
+    },
+    {
+      "key": "Modules settings",
+      "value": "组件设置"
+    },
+    {
+      "key": "The list of modules equipment is empty.",
+      "value": "模块设备列表为空。"
+    },
+    {
+      "key": "The voucher code '{STR}' has expired.",
+      "value": "礼品盒代码 {STR} 已过期."
+    },
+    {
+      "key": "This voucher has already been redeemed.",
+      "value": "这个礼品盒已经被使用了"
+    },
+    {
+      "key": "You have successfully redeemed the voucher '{STR}'.",
+      "value": "你成功的使用了礼品盒: '{STR}'."
+    },
+    {
+      "key": "The voucher code '{STR}' does not exist.",
+      "value": "礼品盒 '{STR}' 不存在."
+    },
+    {
+      "key": "Hello, I was sent to you by a carpenter to help you.",
+      "value": "你好，我是木匠派来帮助你的"
+    },
+    {
+      "key": "**He asks with a smile**: Hello, have you just arrived?",
+      "value": "**他笑着问**: 你好，你刚刚到吗?"
+    },
+    {
+      "key": "Yes, I came to you to become an adventurer, I need money.",
+      "value": "是的，我是来帮助你成为探险家的，我需要钱。"
+    },
+    {
+      "key": "Well, I'll tell you [Player], things have been very bad here lately, the residents are living in fear. Recently, a little girl was killed, as we understand there is a dead force involved.",
+      "value": "好吧, 让我告诉你 [Player], 这里最近很不太平, 居民每天生活在恐惧之中. 就在最近,有一名小女孩也被杀害, 在我们看来，这是一种死亡暴力."
+    },
+    {
+      "key": "**With horror in his eyes**: What ... Dead People",
+      "value": "**他的眼神带着恐惧**: 什么...... 尸..体..."
+    },
+    {
+      "key": "**He said hurriedly**: I don't know for sure. Over time, the residents will tell you everything, or you will feel for yourself what is happening there.",
+      "value": "**他急忙说**：我不确定。随着时间的推移，居民们会告诉你一切，或者你会自己察觉到那里发生了什么..."
+    },
+    {
+      "key": "I didn't expect it to be this bad. Well, what can I help you with?",
+      "value": "我没想到会这么糟..那么....我能帮你什么忙吗?"
+    },
+    {
+      "key": "Come with me, our guys dropped boards, help me collect them.",
+      "value": "跟我来, 我们的伙计掉落了一些板子，请帮我把他们捡回来."
+    },
+    {
+      "key": "Okay generally help me collect all the boards! I will reward you for your help.",
+      "value": "好吧，帮我收集所有的板子！ 我会奖励你。"
+    },
+    {
+      "key": "**Weakness in asks**: Oh, hell, they're heavy, I've got them all.",
+      "value": "**虚弱地说**: 哦, 见鬼, 它们很重, 我全拿到了."
+    },
+    {
+      "key": "Great job! Your muscles won't hurt you anyway [Player] *laughter*",
+      "value": "干得漂亮”! 反正你不会肌肉拉伤 [Player] *大笑*"
+    },
+    {
+      "key": "*laughter*",
+      "value": "*大笑*"
+    },
+    {
+      "key": "Now hand them out to my boys and let them go on with their business.",
+      "value": "现在把它们交给我的伙计们，让他们继续他们的工作。"
+    },
+    {
+      "key": "Good [Talked]!",
+      "value": "很好 [Talked]!"
+    },
+    {
+      "key": "Here you go, your boss told me to give it to you!",
+      "value": "给你，你老板叫我把它给你！"
+    },
+    {
+      "key": "Thanks for the help.",
+      "value": "谢谢你的帮助，你和Moker（翻译者JiaDaiSiHuo）一样乐于助人."
+    },
+    {
+      "key": "Here you go, your boss told me to give it to you!",
+      "value": "给你，你老板叫我把它给你！"
+    },
+    {
+      "key": "Thanks for the help.",
+      "value": "谢谢你的帮助，你和Moker（翻译者JiaDaiSiHuo）一样乐于助人."
+    },
+    {
+      "key": "Here you go, your boss told me to give it to you!",
+      "value": "给你，你老板叫我把它给你！"
+    },
+    {
+      "key": "Thanks for the help.",
+      "value": "谢谢你的帮助，你和Moker（翻译者JiaDaiSiHuo）一样乐于助人."
+    },
+    {
+      "key": "Is tired. But I did it!",
+      "value": "虽然很累，但终究还是完成了"
+    },
+    {
+      "key": "Well done, take this. I think you need it if you're going to be an adventurer. Go straight, and you will go straight to the residents, if you ask where to go.",
+      "value": "干得好啊，收下这个。 如果你想成为冒险家，我认为你需要它。 如果你想问接下来去哪，那么直走，你会找到村庄."
+    },
+    {
+      "key": "**With a smile**: Well thank you, good luck with your work!",
+      "value": "**面带微笑**: 好的我真是谢谢你，祝你工作顺利铁子"
+    },
+    {
+      "key": "[Stranger]Hi, my name is [Player], how do I find the nearest village?",
+      "value": "[陌生人]嗨, 我的名字是 [Player], 请问我怎么找到最近的村庄?"
+    },
+    {
+      "key": "**She concerned**: Hello, my name is [Talked].",
+      "value": "**She concerned**: 你好，我的名字是[Talked]."
+    },
+    {
+      "key": "I'll be happy to help you settle in, but could you give my brother a note? He works now on the ship that you arrived on, i could have done it myself, but they won't let me in.",
+      "value": "我会很高兴帮你搬到这儿来, 但你能不能帮我把这份笔记捎给我的哥哥? 他现在在你去过的那艘大船上工作.本来我可以自己去做，但是他们不让我进去."
+    },
+    {
+      "key": "Yes, of course i help, will you be here [Talked]?",
+      "value": "那当然，我会帮你的，你会在这等我吗？"
+    },
+    {
+      "key": "I'll be here waiting!",
+      "value": "嗯，我会在这等!"
+    },
+    {
+      "key": "Hello, are you Diana's brother?",
+      "value": "你好，你就是戴安娜的哥哥吧?"
+    },
+    {
+      "key": "**He said rudely**: Yes. Did something happen to her?..",
+      "value": "**他粗鲁地说**: 是我，她怎么了.."
+    },
+    {
+      "key": "No, don't worry, she just asked me to pass you the notebook.",
+      "value": "别担心，她很好.她让我来给你递个本子"
+    },
+    {
+      "key": "Well, thank you very much, and tell her I'll be seeing her this evening.",
+      "value": "好的，谢谢你嘞，顺便帮我转告她我我今晚会过去找她。"
+    },
+    {
+      "key": "Yes, good luck with your work!",
+      "value": "是的，祝你工作和Flower一样顺利！"
+    },
+    {
+      "key": "**She says impatiently**: Oh, you're already here, you're fast!",
+      "value": "**她不耐烦地说**: 哦, 你早就到了, 真快!"
+    },
+    {
+      "key": "Really?",
+      "value": "真的吗?"
+    },
+    {
+      "key": "Yes. How is he?",
+      "value": "是的. 他怎么样?"
+    },
+    {
+      "key": "He told me that he is busy now, and will visit you later in the evening!",
+      "value": "他告诉我他现在很忙，晚上会来看你的！"
+    },
+    {
+      "key": "[Player], do you have any questions? I'm sorry, can't help you.",
+      "value": "[Player], 你有什么问题吗？很抱歉，我不能帮助你."
+    },
+    {
+      "key": "What a beautiful [Time]. I don't have anything for you [Player].",
+      "value": "这真是个好天气. 我没有什么能给你 [Player]."
+    },
+    {
+      "key": "[Player] are you interested something? I'm sorry, don't want to talk right now.",
+      "value": "[Player] 你是对什么东西很好奇吗？我很抱歉，我现在不想谈话"
+    },
+    {
+      "key": "I'm so happy! They won't let me in because of the problems that are happening. Dead men kidnap girls, and then they find them dead.",
+      "value": "太好了，他们不让我过去因为最近发生的事.死神绑架了她们，她们后来都被发现已经死了"
+    },
+    {
+      "key": "**He sounds surprised**: Only girls? Why the dead?",
+      "value": "**他的声音听上去很惊喜**: 只有女孩？为什么是死人？"
+    },
+    {
+      "key": "**She's upset**: Honestly, I don't know. The dead or who it is, our headman says that most likely the dead ;(",
+      "value": "**她很难过**：老实说，我不知道死者是谁，我们的头目这么说 ;("
+    },
+    {
+      "key": "I came to you to become an adventurer, as I know you have magical creatures.",
+      "value": "我来找你是为了成为一名冒险家，因为我知道你有魔法制成的产物."
+    },
+    {
+      "key": "**She sounds like she knows it**: An adventurer? We have a Guild of adventurers, but to become an adventurer you need to pass the tests.",
+      "value": "**听起来她好像知道**：一个冒险家？我们有一个冒险家协会，但要成为一名冒险家，你需要通过测试。"
+    },
+    {
+      "key": "",
+      "value": "测试?...."
+    },
+    {
+      "key": "Yes the test [Player]. First, you will need to collect the minimum equipment. To apply and pay the fee. And only after that you will be assigned the position of adventurer.",
+      "value": "是的没错，一个测试[Player]. 首先, 你需要至少收集一些最垃圾的装备. 申请并支付费用. 然后你才会有资格成为冒险家."
+    },
+    {
+      "key": "Is everything so strict? Yes, I think I can handle it.",
+      "value": "这会很难吗？不过我想对我来说应该小菜一碟"
+    },
+    {
+      "key": "All right come on I'll show you our village [Player].",
+      "value": "好的，跟我来吧。我带你在我们村庄溜一圈[Player]."
+    },
+    {
+      "key": "Yes come on ;)",
+      "value": "我已经迫不及待了;)"
+    },
+    {
+      "key": " **She made it sound like there was something wrong with them**: Oh, my God, where are the slime from?.",
+      "value": " **她很不可思议地说**: WTF,这你妈的史莱姆是哪来的？"
+    },
+    {
+      "key": "I don't know [Talked], here even have slimes. Wahoo",
+      "value": "我也不知道啊 [Talked], 这里甚至有史莱姆。 芜湖!"
+    },
+    {
+      "key": "Well, Yes [Player], but now they are becoming more frequent",
+      "value": "确实 [Player], 但现在他们出现地越来越频繁"
+    },
+    {
+      "key": "**You speak proudly**: All right [Talked], I'll clear the way!",
+      "value": "**你自豪地说**: 没办法了[Talked], 只能露一手了!"
+    },
+    {
+      "key": "**You said in disgust**: Phew, the slime is so disgusting...",
+      "value": "**你厌恶地说**: 呕，这史莱姆好恶心..."
+    },
+    {
+      "key": "**She says with a smile**: Well you could use a bath [Player] ;)",
+      "value": "**她面带微笑**: 你可以洗个澡了 [Player] ;)"
+    },
+    {
+      "key": "I will not refuse such an honor ;)",
+      "value": "不胜感激 ;)"
+    },
+    {
+      "key": "Ah here is and decided, we'll get there I'll show you where I live. And I'll introduce you to the places. And you wash :)",
+      "value": "啊，好吧，我们去我住的地方吧。 我会向你介绍那些地方。 然后你可以去洗澡了:)"
+    },
+    {
+      "key": "All right, shall we continue on our way?",
+      "value": "行吧，那现在我们可以继续出发了吗"
+    },
+    {
+      "key": "Yes let's go",
+      "value": "当然，走吧."
+    },
+    {
+      "key": "**He said with surprise**: Did you defeat the slugs on the instructions of our master? Take this the master asked me to give you.",
+      "value": "**他惊讶地说**: 你按照我们主人的吩咐打败了史莱姆? 拿着这个，我们主人让我给你的"
+    },
+    {
+      "key": "Yes, I could. They were very slippery.",
+      "value": "是的我做到了，它们真的又黏又滑."
+    },
+    {
+      "key": "Hehe.. What did you think?",
+      "value": "哈哈..你会怎么想？"
+    },
+    {
+      "key": "Well, not so difficult, at the same time I warmed up.",
+      "value": "还好，不算太难，只算给我热热身"
+    },
+    {
+      "key": "Okay I need to serve, good luck to you, don't give up ;)",
+      "value": "好的，我需要上报，祝你好运， 不要放弃！ ;)"
+    },
+    {
+      "key": "**She said very rudely**: Who the hell are you? What do you want?",
+      "value": "**她粗鲁地说**: 见鬼，你是谁，想干嘛"
+    },
+    {
+      "key": "Do you know that your father is looking for you?",
+      "value": "你知道你的爸爸一直在找你吗?"
+    },
+    {
+      "key": "I hate this old guy, he doesn't have time for me......",
+      "value": "我讨厌这老家伙，他根本不肯陪我"
+    },
+    {
+      "key": "He can only go there. Do it. And we can't spend time together...",
+      "value": "他可以只去哪里！ 做他的事！ 却不能花点时间陪陪我...呜呜...."
+    },
+    {
+      "key": "Enrages...",
+      "value": "生气..."
+    },
+    {
+      "key": "Calm down let's go back together and tell him everything? Maybe he just cares about you like that.",
+      "value": "冷静下来，我们一起回去和他好好说？ 可能他就是以这种方式关心你。."
+    },
+    {
+      "key": "All right, let's go back.",
+      "value": "行吧，我们走."
+    },
+    {
+      "key": "Are you ready?",
+      "value": "你准备好了吗?"
+    },
+    {
+      "key": "Yes..",
+      "value": "嗯.."
+    },
+    {
+      "key": "So where was she?.",
+      "value": "所以，她在哪?."
+    },
+    {
+      "key": "You just don't get angry, everything's fine!",
+      "value": "你只要不生气，事情会好起来的"
+    },
+    {
+      "key": "In fact, she didn't want to come back, she was offended that you weren't spending time together. You can't rest.",
+      "value": "事实上，她不想回来，你没有花时间陪她，她很生气. 你不能休息."
+    },
+    {
+      "key": "Damn why didn't she ask for it herself? Okay, don't worry thanks for the work :) Everything will be fine, we will decide something with daughter",
+      "value": "该死的，她为什么不自己说呢？ 好的，别担心，谢谢你的帮助:) 一切都会好起来的，我们会和女儿一起决定的"
+    },
+    {
+      "key": "Well, nice :) Good luck to you",
+      "value": "那么, 很好 :) 祝你好运"
+    },
+    {
+      "key": "To extract any ore [Player], you will need a pickaxe.",
+      "value": "在挖任何矿物之前[Player], 你需要一把镐子."
+    },
+    {
+      "key": "You can only get it by creating. But in some cases merchants can sell.",
+      "value": "你只能通过合成来获得它。但是在某些情况下，商人会出售."
+    },
+    {
+      "key": "Also, the picks have a durability of 100-0. If you durability reach 0. Don't worry it won't break.",
+      "value": "并且，稿子是有耐久的，当它的耐久达到0的时候，他会无法工作，但别担心，它不会被销毁"
+    },
+    {
+      "key": "But you can't work with break pickaxe it. You can repair it at any store.",
+      "value": "但是你不可以用坏掉的稿子，你可以在任何商店修复它"
+    },
+    {
+      "key": "You can also improve picks this will depend on their effectiveness.",
+      "value": "你也可以通过提高镐子的效率提升矿物获取量."
+    },
+    {
+      "key": "Each ore has its own strength. If you have a weak pick and the strength of the ore is high, it can take a long time to extract it. So don't forget about the improvements. Or craft even better picks.",
+      "value": "每一种矿物都有它自己的硬度。如果你的镐很逊，而矿物的硬度很高，那么挖取它可能需要很长时间，所以不要忘记改进，或者制作更好的镐。"
+    },
+    {
+      "key": "Everything is clearly explained, I will not repeat it again, if you need you will understand everything!",
+      "value": "所有事项我都说清楚了!我不会再重复，你需要自己把它们消化理解"
+    },
+    {
+      "key": "Yes of course thank you for the explanation",
+      "value": "当然，谢谢你的解释"
+    },
+    {
+      "key": "Well don't worry, I'll give you a couple of tasks to get used to in this area",
+      "value": "当然不用担心，我会给你一些任务让你适应这个领域"
+    },
+    {
+      "key": "Did you want something?",
+      "value": "你需要什么吗"
+    },
+    {
+      "key": "I think it's time for you to get your first pickaxe.",
+      "value": "我认为你是时候去打造你的第一把镐子了."
+    },
+    {
+      "key": "I think as crafted something, you don't need to explain!",
+      "value": "合成这种事，就不用你解释了"
+    },
+    {
+      "key": "So let's get right to the point, try to make a pickaxe bring it to me, I'll look at it.",
+      "value": "让我们进入正题，试着合成一把稿子带给我，我来康康"
+    },
+    {
+      "key": "Done. (you need to have an idea of how to craft items, you can see them near Craftsman in votes)",
+      "value": "结束. (你需要知道如何合成物品，在合成商人附近打开投票菜单即可)"
+    },
+    {
+      "key": "Well, it's not bad, so use it for the first time.",
+      "value": "嗯，还行，拿去试试挖矿吧"
+    },
+    {
+      "key": "All right so let's start with your first ore?",
+      "value": "那好，让我们开始你的第一次挖矿之旅?"
+    },
+    {
+      "key": "Well, as [Player], passed customs?",
+      "value": "那么, [Player], 通过海关?"
+    },
+    {
+      "key": "Yes [Talked]. He was very rude.",
+      "value": "是的 [Talked]. 他非常粗鲁."
+    },
+    {
+      "key": "Well, you have to understand that we also have a lot of problems lately, too many monsters, problems with kidnappings.",
+      "value": "嗯，你必须明白，我们最近也有很多问题，太多的怪物，绑架的问题."
+    },
+    {
+      "key": "Come on, show me [Here] seats!",
+      "value": "来吧, 给我看看 [Here] 椅子!"
+    },
+    {
+      "key": "Oh sure. By the way, in our village, the chief Apostle.",
+      "value": "好的. 顺带一提，在我们村子里, 首席使徒."
+    },
+    {
+      "key": "Wait an Apostle? They are ancient beings sent by the gods. Do they exist?",
+      "value": "等等，你说使徒? 他们是传说中上帝派来的古代生物. 真的存在吗?"
+    },
+    {
+      "key": "Yes [Player]. They exist to keep order.",
+      "value": "是的 [Player] ，他们的存在是为了维护秩序。"
+    },
+    {
+      "key": "Okay [Player] let's go and show you our [Here]",
+      "value": "好吧 [Player] 走，我带你瞧瞧 [Here]"
+    },
+    {
+      "key": "**She said with a smile**: Here, you can do a craft items, make your own equipment potions, or what to eat.",
+      "value": "**她面带微笑**: 在这里，你可以合成物品，也可以合成药水或者什么其他吃的玩意."
+    },
+    {
+      "key": "[Player] even if you provide items, the craftsman you must pay for the use of the equipment",
+      "value": "[Player] 即使你提供了材料，你依然需要向合成商人支付装备的使用费用。"
+    },
+    {
+      "key": "Yes I think I can use it. Thanks for the explanation!",
+      "value": "我想我明白该怎么做了.谢谢你的讲解。"
+    },
+    {
+      "key": "Let's move on!",
+      "value": "行动起来吧!"
+    },
+    {
+      "key": "Yes let's go :)",
+      "value": "冲冲冲:)"
+    },
+    {
+      "key": "So here we have someone's house.",
+      "value": "这里，是一些屋."
+    },
+    {
+      "key": "You can also buy houses, decorate them or use the safety Deposit box.",
+      "value": "你可以买下一个房子（价格不菲），捐赠或者使用其中的安全存款箱子（工会基金）"
+    },
+    {
+      "key": "Sounds good [Talked]!",
+      "value": "听起来很不错 [Talked]!"
+    },
+    {
+      "key": "**She likes to talk**: Well, okay, let's move on!",
+      "value": "**他很喜欢说话**: 那么, 好, 我们继续前进吧!"
+    },
+    {
+      "key": "This is the ether, it allows you to use instantaneous movement around the world.",
+      "value": "这是以太，他可以帮助你进行世界旅行."
+    },
+    {
+      "key": "But only there in the area where you have already visited.",
+      "value": "但是只能旅行到你已经到达过的区域."
+    },
+    {
+      "key": "Is it free [Talked]?",
+      "value": "这是免费的吗 [Talked]?"
+    },
+    {
+      "key": "Not always, there is nothing free in our world!",
+      "value": "并不是，在我们的世界没有东西是免费的!"
+    },
+    {
+      "key": "**Apparently she didn't like something**: Okay [Player] let's move on!",
+      "value": "**很显然她不喜欢这玩意**: 好的[Player] 让我们继续!"
+    },
+    {
+      "key": "Yes let's go [Talked]!",
+      "value": "好，冲冲冲 [Talked]!"
+    },
+    {
+      "key": "Here you will be able to raise his skills adventurer, to explore something new. Our world is divided into 3 classes (Healer, Tank, DPS)",
+      "value": "探险家，在这里你可以进行升级，去探索一些新的东西。我们的世界有3个职业  (奶妈, 坦克, 输出)"
+    },
+    {
+      "key": "So I can become something?",
+      "value": "所以我可以成为这个角色?"
+    },
+    {
+      "key": "[Player], you can be anyone you want (as well as fine-tune your game mode)",
+      "value": "[Player], 你可以是任何人只要你想（也可以微调你的游戏模式）"
+    },
+    {
+      "key": "[Talked] so I can be both a Tank and a Defender?",
+      "value": "[Talked] 所以我可以同时是坦克和输出?"
+    },
+    {
+      "key": "Yes quite but do not forget about the main characteristics (Strength, Hardness, idk)",
+      "value": "是的，但别忘了你的主要角色(力量， 生命值, 或者什么别的)"
+    },
+    {
+      "key": "Thank you for a clear explanation :)",
+      "value": "谢谢你的解释 :)"
+    },
+    {
+      "key": "That's a small part of what I've been able to tell you.",
+      "value": "这只是我要告诉你的知识里很小的一部分"
+    },
+    {
+      "key": "And here, you will be treated. ",
+      "value": "在这里，护士姐姐会为你治疗. "
+    },
+    {
+      "key": "**She said very jealously**: True, I hate those nurses, all the guys from the village are taken away....",
+      "value": "**她嫉妒地说**: 是的，我讨厌那些护士，村里所有伙计都被带走了...."
+    },
+    {
+      "key": "Don't marry them...",
+      "value": "不要娶她们..."
+    },
+    {
+      "key": "Yes I will not marry anyone [Talked]! Thanks for the care!",
+      "value": "我不会娶任何人的放心吧[Talked]!谢谢你的提醒!"
+    },
+    {
+      "key": "**Yawning she said**: Okay I'm tired I'll go home.",
+      "value": "**她打着哈欠**:我累了，我要先回去了."
+    },
+    {
+      "key": "And you don't disappear, and [Player] go wash up :)",
+      "value": "但你不用走，现在，[Player]去洗漱吧:)"
+    },
+    {
+      "key": "Well have a good day [Talked] :)",
+      "value": "看上去我们过了不错的一天 [Talked] :)"
+    },
+    {
+      "key": "Are you ready?",
+      "value": "你准备好了吗?"
+    },
+    {
+      "key": "What, ready?",
+      "value": "什么,什么准备?"
+    },
+    {
+      "key": "Introduce you [Player] to the Apostle of our village. ",
+      "value": "介绍[Player]给我们村里的使徒 "
+    },
+    {
+      "key": "[Talked] so what's it to them for me?",
+      "value": "[Talked]他们和我有什么关系?"
+    },
+    {
+      "key": "**She said rudely**: No, don't think so bad, they actually think of us as their children.",
+      "value": "**她粗鲁的说**: 不！别想的那么糟.他们实际上是把我们当成他们孩子的在照顾的."
+    },
+    {
+      "key": "Why so rude? I understand you, okay, I'm worried, but we'll see what happens.",
+      "value": "干嘛这么粗鲁? 我了解了, 好吧, 我也很担心, 但是看看会发生什么吧."
+    },
+    {
+      "key": "I'm sorry, but she's really close to me.",
+      "value": "好吧..我很抱歉..但是她真的离我有点近了...."
+    },
+    {
+      "key": "Are you one of them? Hm...",
+      "value": "你是他们中的一员吗? Hm..."
+    },
+    {
+      "key": "Fool let's go already.",
+      "value": "笨蛋~还不走吗？我们先走了哦~"
+    },
+    {
+      "key": "Well ... Let's go",
+      "value": "好的... 走吧"
+    },
+    {
+      "key": "Well, just don't mess with as a joke, it's Apostle, he is watching over us for many years.",
+      "value": "好吧，别开玩笑了，这是使徒，他已经守护我们很多年了."
+    },
+    {
+      "key": "I understand [Talked].",
+      "value": "我知道， [Talked]."
+    },
+    {
+      "key": "Hello dear Apostle *bowing*. I have come to you to wisdom.",
+      "value": "你好，亲爱的使徒*鞠躬*。我来到你这里是为了获得智慧。"
+    },
+    {
+      "key": "Hello, lift your head. I knew you'd come. But I'm not sure you're the one I saw.",
+      "value": "你好，抬起头来。我就知道你会来的。但我不确定你就是我看到的那个人."
+    },
+    {
+      "key": "See it?",
+      "value": "看见了吗?"
+    },
+    {
+      "key": "I can't communicate with my brothers and sisters, since our paths have diverged, but we have a common mind.",
+      "value": "我无法与我的兄弟姐妹沟通，因为我们的道路不同，但我们有一个共同的想法。"
+    },
+    {
+      "key": "I had a vision about a year ago that there would soon be a man who was as tenacious as the Apostles.",
+      "value": "大约一年前，我有一个预感，很快就会有一个人像使徒们一样顽强."
+    },
+    {
+      "key": "But in the end, he was going to die. My visions have always come true, but when they will come true is unknown.",
+      "value": "但最终，他会死的。我的梦想总是能实现，但何时能实现还不得而知."
+    },
+    {
+      "key": "So please be careful [Player]. I'm worried about everyone, but I've also been weak lately.",
+      "value": "所以， [Player]，请小心. 我担心所有人, 但我最近也很虚弱."
+    },
+    {
+      "key": "I .. Not to worry, I can handle it even if I turn out to be one of your visions",
+      "value": "我...没什么好担心的，就算我也是你的幻觉之一，我也能应付"
+    },
+    {
+      "key": "I hope this is not the case, get used to it, then go to Adventurer Koto.",
+      "value": "我希望情况不是这样，习惯它，然后去找冒险家Koto."
+    },
+    {
+      "key": "Thanks a lot.",
+      "value": "感激不尽."
+    },
+    {
+      "key": "Hello [Talked], the Apostle sent me to you. I want to be an adventurer!",
+      "value": "你好 [Talked], 信徒让我去找你. 我想成为一个冒险家!"
+    },
+    {
+      "key": "**He as if he doesn't want me to become an adventurer**: Will you be strong enough? Well, let's see, I think you already understand that you first need to test, only after I say whether you are worthy or not to become an Adventurer?",
+      "value": "**他好像不想让我成为冒险者一样**：你够坚强吗？ 好吧，你看，我想你已经明白，你首先要测试，然后来看看你是否有成为冒险者的资格？"
+    },
+    {
+      "key": "Well, what exactly is required?",
+      "value": "好吧，具体需要什么?"
+    },
+    {
+      "key": "If you pass my first test, pay the fee, I encourage you, and send you to the exam. And then we will decide whether you are worthy or not",
+      "value": "如果你通过我的第一个测试，付钱，我就把你送到第一个测试点然后决定教你值不值得."
+    },
+    {
+      "key": "Okay, where do we start [Talked]?",
+      "value": "好吧，我们从什么开始呢 [Talked]?"
+    },
+    {
+      "key": "Ha ha where do we start? Don't joke with me young fighter. First, take this and go to the southern part of the village.",
+      "value": "哈哈，从哪开始? 别开玩笑了年轻的战士. 首先，带上这个然后去村庄的南边."
+    },
+    {
+      "key": "Well",
+      "value": "那么.."
+    },
+    {
+      "key": "You did.",
+      "value": "你做到了."
+    },
+    {
+      "key": "What could I do?",
+      "value": "我应该做什么"
+    },
+    {
+      "key": "I thought you were joking, you wouldn't take it seriously, but you came.",
+      "value": "我以为你在开玩笑，不会认真对待，结果你还是来了。"
+    },
+    {
+      "key": "Well, let's go.",
+      "value": "好吧，走吧."
+    },
+    {
+      "key": "Let's go.",
+      "value": "走."
+    },
+    {
+      "key": "Why are you shivering [Player]?",
+      "value": "你怎么在颤抖[Player]?"
+    },
+    {
+      "key": "Am I that scary? Don't worry I'm kind *laughs*. Well, let's see how you cope. Kill for me ....",
+      "value": "我有那么可怕吗? 别担心，我很友善的*大笑*. 来吧,让我看看你要怎么对付他们，去把他们杀了 ...."
+    },
+    {
+      "key": "I managed it, and it wasn't difficult.",
+      "value": "我完成了，说实话，小菜一碟."
+    },
+    {
+      "key": "I noticed how well you did. But don't relax this is just the beginning ^^",
+      "value": "嘿！你做的不错.但别放松’注意了 这才只是开始.^^"
+    },
+    {
+      "key": "Ah.. Okay [Talked].",
+      "value": "额...好哦[Talked]."
+    },
+    {
+      "key": "Well today we're finished you can relax. You'll find me as soon as you're ready.",
+      "value": "今天就到这里吧，你可以回去休息一下，等你准备好了之后可以再来找我。"
+    },
+    {
+      "key": "Okay, well, have a good day.",
+      "value": "好的，祝你愉快。"
+    },
+    {
+      "key": "Hello, I am the personal Ambassador of the Apostle.",
+      "value": "你好，我是使徒大人的私人信使."
+    },
+    {
+      "key": "She wants to see you!",
+      "value": "她想见见你!"
+    },
+    {
+      "key": "Please follow me to village, I will be waiting for you there",
+      "value": "跟我去村庄吧，我会在那里等你"
+    },
+    {
+      "key": "Okay, I'm coming",
+      "value": "好的.我们走吧"
+    },
+    {
+      "key": "Listen there's another request!",
+      "value": "听着，这里有另一个任务!"
+    },
+    {
+      "key": "[Player] if you find some gel, I'll be happy to exchange them. Brown Slimes,Blue Slimes and Pink Slime drop Gel. You can take your time, i'll wait!",
+      "value": "[Player] 如果你找到了粘液球,我很乐意拿一些东西来交换.棕色，蓝色和紫色史莱姆会掉落粘液球,你可以慢慢打，我会在这里等你!"
+    },
+    {
+      "key": "Here, it wasn't easy but I got it [Talked].",
+      "value": "拿着，虽然不是很简单但我还是拿到了[Talked]."
+    },
+    {
+      "key": "Thank you very much for your help. All right I'll go back to my post, good luck to you [Player]!",
+      "value": "非常感谢你的帮助. 好了我该回到我的岗位了 [Player]!"
+    },
+    {
+      "key": "谢谢你[Talked]",
+      "value": "Thank's [Talked]"
+    },
+    {
+      "key": "[Player] you can go in!",
+      "value": "[Player]你可以进来了!"
+    },
+    {
+      "key": "Well [Talked], thank you for seeing me off!",
+      "value": "好的[Talked], 谢谢你为我送行!"
+    },
+    {
+      "key": "[Player] first we need to win over the slime. Dirty but necessary.",
+      "value": "[Player] 首先我们需要战胜这些史莱姆，虽然很脏但是是必须的."
+    },
+    {
+      "key": "I report everything, I coped with the task",
+      "value": "我都处理完了"
+    },
+    {
+      "key": "Well done, but that's not all.",
+      "value": "做得好，但还没结束."
+    },
+    {
+      "key": "Anything else?",
+      "value": "还有什么?"
+    },
+    {
+      "key": "Yes I think you know about the ethers find me next to him",
+      "value": "我想你知道在以太（水晶）旁边可以找到我"
+    },
+    {
+      "key": "I think you know that these crystals are actually not just for beauty. ",
+      "value": "我想你知道这些水晶不是单纯只是好看而已. "
+    },
+    {
+      "key": "You use them as a quick transition. But in fact, these are crystals (all the light of good prosperity) precisely because they exist.",
+      "value": "你可以通过水晶快速传送到其他世界"
+    },
+    {
+      "key": "Me when once before as became defender of the Apostle, I was able to meet with the crystal. Yes, he has a mind. From it warmth on the soul, all the sins immediately fall from the soul. I'm sure you'll meet him one day.",
+      "value": "我曾经是水晶的守护者，我可以见到水晶。是的，它有理智。从它热情的灵魂，所有罪恶立即在它面前倒下。我确定你有一天能见到它."
+    },
+    {
+      "key": "Hello, [Player], I am the Chinese translator of MRPG.",
+      "value": "你好，[Player], 我是MRPG中文翻译的其中一个人"
+    },
+    {
+      "key": "Thanks. I will remember that. (Auther text: This is how the player's rapprochement with the deities began)",
+      "value": "谢谢。我会记住的。（作者批注：这就是玩家与神灵怎样建立友好关系的）"
+    },
+    {
+      "key": "Well, I'll wait for you in the Apostle's chambers. We will continue the expulsion of the monsters",
+      "value": "那么，我会在使徒的屋子里等你。我们会继续驱逐怪物."
+    },
+    {
+      "key": "Our priority is higher now.",
+      "value": "我们的优先权现在更高了."
+    },
+    {
+      "key": "[Player] you need to defeat the main slug, in the southern part.",
+      "value": "[Player] 你得去击败那个主要的鼻涕虫(shengyan)，在南方."
+    },
+    {
+      "key": "That's it, I've met my goal. Clearing dirt.",
+      "value": "那就是了。我已经达到了我的目标。清除污垢."
+    },
+    {
+      "key": "Well done, we'll meet again.",
+      "value": "干得漂亮，我们会再遇见的."
+    },
+    {
+      "key": "I want to talk to you [Player].",
+      "value": "我想跟你谈谈 [Player]."
+    },
+    {
+      "key": "I know that your path will not stop here. One day you will become stronger and move on.",
+      "value": "我知道你的路途不会终止在这里。总有一天你会变得强大并且离开这里."
+    },
+    {
+      "key": "I have a request to you, if you meet other apostles, it is better to avoid them. Don't trust them, we apostles are not as pure as you think",
+      "value": "我有个请求。如果你遇见了别的使徒，最好避开他们。不要相信他们。我们使徒不像你想象的那么纯洁."
+    },
+    {
+      "key": "Maybe you, too, then the enemy really is?",
+      "value": "也许你也一样，不过真正的敌人是谁?"
+    },
+    {
+      "key": "I don't know *laughter*. The villagers I think will clearly tell you how it really is",
+      "value": "我不知道 *大笑*.村民们会告诉你."
+    },
+    {
+      "key": "Diana told me about you in General terms.",
+      "value": "丹娜告诉我你一般的地位。"
+    },
+    {
+      "key": "**She said it with concern**: You turn out to be a Joker, and a vulgar *laughter*",
+      "value": "**她关切地说**: 原来你是一个爱开玩笑的粗俗的人 *大笑*"
+    },
+    {
+      "key": "No [Talked]......",
+      "value": "不是 [Talked]......"
+    },
+    {
+      "key": "Always listen to your heart. I think one day you will be able to bring light. But the main thing is perseverance!",
+      "value": "永远跟随你的心走。我认为总有一天你会有能力带来光亮和希望。但是最主要的是坚毅的精神和坚持!"
+    },
+    {
+      "key": "Do not delay with your title of adventurer. You can go now!",
+      "value": "不要为了你冒险家的头衔而停留，你可以现在就走了!"
+    },
+    {
+      "key": "I'm trying, thank you very much.",
+      "value": "我在尝试，非常感谢你."
+    },
+    {
+      "key": "You look sad today [Talked].",
+      "value": "你今天看起来很沮丧 [Talked]."
+    },
+    {
+      "key": "Oh man I'm too confused today.... [Player] help me collect lost.",
+      "value": "哦...啊我今天太迷糊了.... [Player] 请帮我收集丢失的东西."
+    },
+    {
+      "key": "Take your nose up [Talked], what's wrong with you?",
+      "value": "把你的鼻子抬起来 [Talked], 你怎么了?"
+    },
+    {
+      "key": "My brother has to stop by today, and I want to cook something to feed him, but everything falls out of my hands..",
+      "value": "我的兄弟必须在今天停下了，我想给他煮点东西吃，但是所有事情都超出了我的掌控..."
+    },
+    {
+      "key": "So let me help you?",
+      "value": "所以让我来帮你?"
+    },
+    {
+      "key": "And you I look [Player] today cheerful, well help. I will not remain in debt",
+      "value": "你看起来 [Player] 今天你看起来很愉快，会有帮助，我不会继续欠人情."
+    },
+    {
+      "key": "Of course [Talked] ;)",
+      "value": "当然 [Talked] ;)"
+    },
+    {
+      "key": "Well here's my house! Ah as my not my, father is a master, and even brother. In General, our family",
+      "value": "那么这里就是我的房子!啊，不是我的，我的父亲是主人，兄弟也一样;我在我们的家里是一般地位."
+    },
+    {
+      "key": "All right, come on in, I'll cook, and I'll ask you to bring something. All the help me need",
+      "value": "好，进来吧。我下厨，我会叫你带些东西过来，所有我需要的会帮助我的东西."
+    },
+    {
+      "key": "I will help you, especially since you are my first close friend in this village, I already trust you, how you can be abandoned.",
+      "value": "我会帮助你的.况且你是我在这个村子里的第一个朋友.我很信任你的.你怎么会被抛下呢？."
+    },
+    {
+      "key": "Well [Player], let's get started, little by little",
+      "value": "好吧 [Player], 让我们开始吧, 一点一点的"
+    },
+    {
+      "key": "Your house comfortable! [Talked]",
+      "value": "你的家看起来很舒适!真不错[Talked]"
+    },
+    {
+      "key": "Do you really think so? Well thank you.",
+      "value": "你真的这么想? 那么谢谢你."
+    },
+    {
+      "key": "All right let's get down to cooking",
+      "value": "好了.让我们来做饭吧"
+    },
+    {
+      "key": "Well, let's get started [Player]!",
+      "value": "好.我们开始吧 [Player]!"
+    },
+    {
+      "key": "Oh sure [Talked]",
+      "value": "没问题 [Talked]"
+    },
+    {
+      "key": "[Player] get me some first, we'll use it as oil",
+      "value": "[Player]首先拿一些gel给我，我会把他当做油来使用。"
+    },
+    {
+      "key": "I think everyone has their own way of making butter *laughter*",
+      "value": "我想每个人都有自己独特的黄油制作法吧 *大笑*"
+    },
+    {
+      "key": "Yeah you're right, good sense of humor damn *laughter*",
+      "value": "你说的没错, 这该死的幽默 *大笑*"
+    },
+    {
+      "key": "So now I need meat. How to cook without meat.",
+      "value": "现在我需要一些肉. 做饭怎么能少了肉呢."
+    },
+    {
+      "key": "I think you've heard of Kappa, they live near water, their meat is very tasty. So get it for me (you can self find them habitat)",
+      "value": "我想你已经听说过kappa, 他们生活在洞穴里靠近水的地方， 他们的肉非常好吃. 所以，去帮我搞一些来吧 (你可以自己找到他们栖息地的)"
+    },
+    {
+      "key": "All delicious fine meat, looks great, take it!",
+      "value": "这肉非常不错，开始吧"
+    },
+    {
+      "key": "Well i let's start cooking :)",
+      "value": "好了我要开始烹饪了 :)"
+    },
+    {
+      "key": "**You see like she didn't know how to cook**: Are you sure you can cook?",
+      "value": "**我发觉她好像不会烹饪**: 你确定你会做饭吗?"
+    },
+    {
+      "key": "**She said angrily**: You know what I'll tell you [Player]... You don't know how to compliment girls at all..",
+      "value": "**她生气地说**: 你知道我想说什么吧 [Player]... 你根本不会恭维女孩子.."
+    },
+    {
+      "key": "**Someone knocks on the door**: Who could it be? lovers?",
+      "value": "**有人敲门**: 那是谁? 你的小对象?"
+    },
+    {
+      "key": "Oh it's probably my brother.",
+      "value": "噢那肯定是我哥哥."
+    },
+    {
+      "key": "**He said angrily and rudely**: Oh, what people, I've seen you somewhere.",
+      "value": "**他粗鲁地说**: 噢，是你，我在某个地方见过你."
+    },
+    {
+      "key": "You must have imagined it. ",
+      "value": "你肯定是梦见的吧.... "
+    },
+    {
+      "key": "Oh well.",
+      "value": "啊这"
+    },
+    {
+      "key": "[Player] you look sad.",
+      "value": "[Player] 你看上去很沮丧."
+    },
+    {
+      "key": "Okay [Talked]. I'll probably go extra here",
+      "value": "确实[Talked]. 我会更加努力的"
+    },
+    {
+      "key": "Yes calm down you why so decided to?",
+      "value": "冷静想想你为什么这么决定?"
+    },
+    {
+      "key": "Yes, everything is fine. I just have things to do, too. I'll go!",
+      "value": "嗯，事情都挺好的，我还有些事要忙，先走了!"
+    },
+    {
+      "key": "You offend me [Talked].....",
+      "value": "你顶撞我了 [Talked]....."
+    },
+    {
+      "key": "Sorry I'm really busy [Talked].",
+      "value": "抱歉我真的很忙 [Talked]."
+    },
+    {
+      "key": "Well, take care of yourself.",
+      "value": "好吧，照顾好自己"
+    },
+    {
+      "key": "So let's continue our training.",
+      "value": "那让我们继续训练吧."
+    },
+    {
+      "key": "Yes, of course, it's about time!",
+      "value": "当然，是时候了!"
+    },
+    {
+      "key": "**He speaks rudely**: I don't really like you. But let's see what you can achieve. Let's go back to the Deep Cave.",
+      "value": "**他粗鲁地说**: 我不是很喜欢你，但还是让我们看看你有什么能耐吧，现在先回去那个深洞"
+    },
+    {
+      "key": "**He speaks proudly**: Well, now we have more serious goals.",
+      "value": "**他自豪地说**: 这次，我们有更难的目标."
+    },
+    {
+      "key": "Exterminate the stronger slime. I'll see.",
+      "value": "打败更强大的史莱姆. 我想."
+    },
+    {
+      "key": "Everything is ready, they are vile I do not like slime, maybe something new?",
+      "value": "我准备好了, 但是史莱姆真的很恶心我不喜欢它们, 可以换成别的吗?"
+    },
+    {
+      "key": "Well, I'll think about your request. Follow me.",
+      "value": "我会考虑你的请求的，跟我来."
+    },
+    {
+      "key": "Take it, use it wisely. You will need it very much in the future.",
+      "value": "带上这个，明智地使用它，将来你会非常需要它的."
+    },
+    {
+      "key": "**You were surprised by the gift provided**: Oh, thank you very much. Do I owe you something?",
+      "value": "**你对这突然收到的礼物很惊喜**: 噢，非常感谢,我算不算欠你什么了?"
+    },
+    {
+      "key": "I hope you make it to the end, at least I hope you do. I didn't think you'd be Apostle's favorite.",
+      "value": "我喜欢你能结束这一切，至少我是这么希望的，但我不认为你是使徒最喜欢的一个."
+    },
+    {
+      "key": "Favorite [Talked]?",
+      "value": "最喜欢的[Talked]?"
+    },
+    {
+      "key": "**He said very rudely**: I'll go, meet you later.",
+      "value": "*他粗鲁地说**: 我走了，下次再见"
+    },
+    {
+      "key": "Hello [Player]. Are you free?",
+      "value": "你好[Player]. 你现在有空吗?"
+    },
+    {
+      "key": "Yes, of course. Everything okay?",
+      "value": "是的当然，有什么事吗?"
+    },
+    {
+      "key": "Apostle asked you to see her!",
+      "value": "使徒让你去见她!"
+    },
+    {
+      "key": "Well!",
+      "value": "好!"
+    },
+    {
+      "key": "Thank you, I'm going for a walk!",
+      "value": "谢谢，我要去散步了!"
+    },
+    {
+      "key": "**She speaks in fear**: Hello [Player]. Today I received news that in the southern part of our village, goblins attacked. ",
+      "value": "**她恐惧地说**: 你好 [Player]. 今天我收到消息，村庄的南部已经受到了哥布林的袭击. "
+    },
+    {
+      "key": "And it's not just goblins. This must be the army. The leader brought them.",
+      "value": "并且不只是哥布林. 肯定还有军队. 有人带领他们来的."
+    },
+    {
+      "key": "Maybe they kidnapped the residents and terrorized you, and now they decided to attack?",
+      "value": "也许是他们绑架了你的居民并恐吓你，但现在他们决定进攻了?"
+    },
+    {
+      "key": "I think so too. Anyway, I talked to Koko. About your appointment as an adventurer. We should prepare for resistance. Communication nodes they need to be destroyed",
+      "value": "我也是这么想的，无论如何，我会和可可说的，至于你，作为一名冒险家，我们需要守卫我们的居民，我们需要摧毁他们的通信节点."
+    },
+    {
+      "key": "Well, I did the job [Talked]!",
+      "value": "好，让我来吧 [Talked]!"
+    },
+    {
+      "key": "Good job thank's, you should meet with Koko, he will explain everything to you, good luck!",
+      "value": "非常好，你可以去找可可，他会像你解释一切的，祝你好运!"
+    },
+    {
+      "key": "Well, thank you!",
+      "value": "好的谢谢!"
+    },
+    {
+      "key": "Get ready let's go to the Goblin-occupied zone.",
+      "value": "准备好，我们出发前往哥布林占领的区域."
+    },
+    {
+      "key": "I'm ready to sort of out right now.",
+      "value": "好了我准备好了"
+    },
+    {
+      "key": "Well [Player], you're fun, Yes, but it's worth getting ready.",
+      "value": "很好[Player], 你很有趣, 但这确实值得好好准备."
+    },
+    {
+      "key": "Well, what do need [Talked]?",
+      "value": "那么,需要做什么[Talked]?"
+    },
+    {
+      "key": "I'll be waiting for you next to Craftsman.",
+      "value": "我会在合成商人那里等你."
+    },
+    {
+      "key": "So first we need potions.",
+      "value": "首先我们需要一些药水."
+    },
+    {
+      "key": "Go get supplies, and at the same time exterminate a few slugs so that we can get there without any problems.",
+      "value": "去获取一些物资，同时扫清路上的史莱姆这样我们可以一路畅通无阻."
+    },
+    {
+      "key": "**You sound very tired**: We can all move, but the problem is that I'm tired..",
+      "value": "**你很疲惫**:我们可以出发了但是我现在很累.."
+    },
+    {
+      "key": "Nothing to worry about [Player]. You need to toughen up. All right let's move out.",
+      "value": "不必担心 [Player]. 你需要加强锻炼了. 好的现在就出发吧。"
+    },
+    {
+      "key": "We'll get to the guard post now. We'll move out there to exterminate the goblins.",
+      "value": "我们现在就去哨所。我们会搬到那里去消灭哥布林。"
+    },
+    {
+      "key": "Well [Talked].",
+      "value": "那么 [Talked]."
+    },
+    {
+      "key": "**Grinning**: Huh?",
+      "value": "**笑嘻嘻**: Huh?"
+    },
+    {
+      "key": "We can't heal her..",
+      "value": "我们不能治疗她.."
+    },
+    {
+      "key": "I don't understand..",
+      "value": "我不李姐.."
+    },
+    {
+      "key": "Our daughter, Maria.. She's sick!",
+      "value": "我们的女儿, Maria... 她生病了!"
+    },
+    {
+      "key": "Why don't you take her to the Nurse?!",
+      "value": "你为什么不带她去找Nurse呢?!"
+    },
+    {
+      "key": "I tried, but she said she can't do anything.. I found something in an old book of mine.. A gel treatment. But I also need Kappa Meat for it..",
+      "value": "我找过了, 但她说她也无能为力.我在一本老书里看到一些记载.. 一种gel治疗法. 但同时我还需要一些kappa meat.."
+    },
+    {
+      "key": "Tha..nk.. You..",
+      "value": "谢..谢.. 你.."
+    },
+    {
+      "key": "Well.. don't look at me, heal Maria!",
+      "value": "那么.. 别看我啊, 治疗Maria!"
+    },
+    {
+      "key": "F..Father?",
+      "value": "爸..爸爸？"
+    },
+    {
+      "key": "MARIA! You're well!",
+      "value": "MARIA! 你终于好了l!"
+    },
+    {
+      "key": "*with joy* Hi, Maria!",
+      "value": "*带着微笑* Hi, Maria!"
+    },
+    {
+      "key": "How can I ever make it up to you?",
+      "value": "我要怎么补偿你？"
+    },
+    {
+      "key": "Well Sir.. I might need a discount from your old friend, the Craftsman.",
+      "value": "是的先生...我想我需要从你的老朋友那里获取一些折扣，也就是Craftsman."
+    },
+    {
+      "key": "Sure, I'll.. let him know you deserve it!",
+      "value": "当然, 我会.. 让他知道这是你应得的!"
+    },
+    {
+      "key": "Sure..What can I do?",
+      "value": "那么，我该怎么做?"
+    },
+    {
+      "key": "I heard you helped the craftsman with his deliveries..I have no time for small things like mining cooper, can you do it for me? I have to save the world in the main time..",
+      "value": "我听说你帮助过craftsman..我没有多余的时间用在挖矿这种小事上，你可以帮我吗，我必须把我的主要时间用在拯救世界上"
+    },
+    {
+      "key": " *a bit angry* Ok, I will do it.",
+      "value": " *稍微生气* 行吧我会去做的."
+    },
+    {
+      "key": "Oh, it's you kid!",
+      "value": "噢，谢谢你，孩子!"
+    },
+    {
+      "key": "*you can't control yourself* HEY. I'm NOT A KID!",
+      "value": "*你终于控制不住自己* 嘿，我!不!是!小!孩!"
+    },
+    {
+      "key": "Hey.. easy, just a joke, did you get what I wanted?",
+      "value": "嘿..冷静, 只是开玩笑, 你拿到我要的东西了吗"
+    },
+    {
+      "key": "Yes.. *puts a heavy cooper bag on Erik's table*",
+      "value": "是的. *把一个很重的装满矿物的背包放在Eric的桌子上*"
+    },
+    {
+      "key": "Good, now get out of here!",
+      "value": "很好，你可以走了!"
+    },
+    {
+      "key": "Wait.. YOU NOT GONNA PAY ME??",
+      "value": "等等... 你不打算给我什么报酬??"
+    },
+    {
+      "key": "Haha! I am messing with you.",
+      "value": "哈哈! 你被我耍啦."
+    },
+    {
+      "key": "So can you tell me how you got here?",
+      "value": "所以你能告诉我你是怎么到这里来的吗?"
+    },
+    {
+      "key": "**He's stuttered**: A long story..",
+      "value": "**他口齿不清地说**: 这是一个漫长的故事.."
+    },
+    {
+      "key": "We tried a new potion mixed with ether, but something went wrong, my hiccups are part of this experiment, and I ended up here after I drank it",
+      "value": "我们尝试了一种与以太混合的新药水，但出现了一些问题，我的打嗝也是拜这所赐，然后我喝下了它，最终出现在了这里"
+    },
+    {
+      "key": "**Sound in the tablet**: Noctis... Noctiis. Do you hear me?",
+      "value": "**来自某处的声音**: Noctis... Noctiis. 你能听到吗?"
+    },
+    {
+      "key": "**Noctis**: I can hear you, how do I get out of here?",
+      "value": "**Noctis**:我能听到，我要怎样才能离开这里"
+    },
+    {
+      "key": "**Sound in the tablet**: Collect all the fragments that ended up here. The connection is lost....",
+      "value": "**来自某处的声音**: 你必须搜集到所有的碎片.连线已中断...."
+    },
+    {
+      "key": "What were you talking to just now?",
+      "value": "你刚刚在说什么?"
+    },
+    {
+      "key": "A tablet made from a magic crystal. In General, as I thought I need your help in collecting fragments",
+      "value": "一种由魔法水晶制成的台子，言归正传，我想我需要你帮忙收集fragments"
+    },
+    {
+      "key": "Of course I'll help",
+      "value": "当然我会帮你的"
+    },
+    {
+      "key": "Look at what I can give you in return for your help. (Vote menu shop list)",
+      "value": "看看我有什么东西能作为回报. (投票菜单商店)"
+    },
+    {
+      "key": "Wow, [Talked] where can I find them?",
+      "value": "Wow, [Talked] 我要如何找到他们呢?"
+    },
+    {
+      "key": "In a distorted dimension.",
+      "value": "在一个扭曲的维度中."
+    },
+    {
+      "key": "Where is it? How do I get there?",
+      "value": "它在哪里?我该怎么去?"
+    },
+    {
+      "key": "[Player] way, so we'll be preparing to get there.",
+      "value": "[Player] 有办法, 让我们准备出发过去."
+    },
+    {
+      "key": "So first [Player], I'll need these things from you. They resonate between our worlds",
+      "value": "所以首先 [Player], 我需要这些东西给你，它们在我们的世界之间产生共鸣."
+    },
+    {
+      "key": "Take it [Talked].",
+      "value": "带上它 [Talked]."
+    },
+    {
+      "key": "Well thank you, it will be a little easier now.",
+      "value": "好的谢谢你，这会带来一点帮助"
+    },
+    {
+      "key": "**Sound in the tablet**: Noctis. How you to get the fragments we will be able to pick you up.",
+      "value": "**来自某处的声音**: Noctis. 你弄到碎片后我们会来接你的."
+    },
+    {
+      "key": "**Noctis**: Okay, Sid..",
+      "value": "**Noctis**:好，Sid.."
+    },
+    {
+      "key": "Next thing I need to create a resonance. Bring me these items.",
+      "value": "接着，我需要去创建一个共鸣.替我带来这些."
+    },
+    {
+      "key": "Everything is ready?. [Talked] take it",
+      "value": "一切准备好了吗?. [Talked] 带上这个"
+    },
+    {
+      "key": "[Player] yes.. almost, follow me and we'll start resonating.",
+      "value": "[Player] 是的..大概，跟我来，我们会启动共鸣."
+    },
+    {
+      "key": "All ready.",
+      "value": "准备好了."
+    },
+    {
+      "key": "Resonance received. I will wait for you with fragments",
+      "value": "共鸣启动完成，我会等你的碎片."
+    },
+    {
+      "key": "Can come to resonance?",
+      "value": "我能来参加这个共鸣吗?"
+    },
+    {
+      "key": "Yes. Don't worry nothing will happen to you.",
+      "value": "是的。不要担心，没有什么事会发生在你身上."
+    },
+    {
+      "key": "I welcome you [Talked], nice to meet you.",
+      "value": "欢迎你 [Talked], 很高兴遇见你."
+    },
+    {
+      "key": "Glad to meet you, i'am [Player]!",
+      "value": "很高兴见到你, 我是 [Player]!"
+    },
+    {
+      "key": "Him you will spend time here. I have to go to the village.",
+      "value": "他会在这里虚度光阴.我得去村庄了."
+    },
+    {
+      "key": "Need to stand on defense in the village, good luck to you I will wait for good news from you.",
+      "value": "要防守村庄.祝你好运，我会等你的好消息的."
+    },
+    {
+      "key": "Good luck to you [Talked].",
+      "value": "祝你好运 [Talked]."
+    },
+    {
+      "key": "I came from a far Eastern country, I have some problems in the country so I need to become stronger.",
+      "value": "我来自东方一个遥远的国家，在那个国家我有些问题，所以我需要变得更强大."
+    },
+    {
+      "key": "I came for similar purposes. But I would like to visit your country.",
+      "value": "我为了和你相似的目的来.但是我想去你的国家."
+    },
+    {
+      "key": "**He speaks with a smile**: If you wish I will be sailing back soon I can take you with me",
+      "value": "**他面带微笑**: 如果你想，我很快就会回来，我可以带上你一起去"
+    },
+    {
+      "key": "I'd love to, but I don't know, i have here made friends. We'll see.",
+      "value": "我非常愿意, 但我不知道,我在这里交了一些朋友. 我们会看到的."
+    },
+    {
+      "key": "Well, if we still live of course. And the got to talking and drive away goblins need.",
+      "value": "当然，前提是我们还活着. 先赶走这些哥布林再聊吧."
+    },
+    {
+      "key": "To begin with, we must exterminate many of them as possible. To get to them in zone",
+      "value": "首先，我们必须尽可能地消灭他们中的许多人，以便在区域内找到他们"
+    },
+    {
+      "key": "**Very tired voice**: [Talked]. I'm so tired, there are so many of them.....",
+      "value": "**非常疲惫的嗓音**: [Talked]. 我好累啊，它们人太多了......"
+    },
+    {
+      "key": "**He sounds very tired**: Yes, I am also very tired, but we have to deal with it.",
+      "value": "**他的声音听起来非常累**: 是的，我也非常累。但是我们必须得解决它们."
+    },
+    {
+      "key": "All right let's keep going before they pile up again.",
+      "value": "好了，快点在他们重新聚集在一起之前继续推进"
+    },
+    {
+      "key": "Hmmm.. I see a passageway. I think we can go through there and find out where they're coming from.",
+      "value": "嗯...我看到了一个通道. 我认为我们可以穿过这里，找一下出口."
+    },
+    {
+      "key": "I'm worried about something.. Where did this hole?",
+      "value": "我有些担心，这个洞是通向哪里的？"
+    },
+    {
+      "key": "I don't know either, honestly. Maybe the goblins have dug through and are coming out. In any case we need to find out.",
+      "value": "说实话，我也不知道，也许哥布林已经挖通了洞并且正在往外走。不管怎样，我们都得进去看看。"
+    },
+    {
+      "key": "I think this is where they live. ",
+      "value": "我想这就是他们的老巢了。"
+    },
+    {
+      "key": "In any case, if we can not cope with them, there is an option to block the way. But I think they'll dig it up again in time.",
+      "value": "不管怎样，如果我们无法对付他们的话，我们可以试着把路堵上，不过我想他们又会及时挖开。"
+    },
+    {
+      "key": "**In anger**: LET's BREAK UP THESE FREAKS ALREADY... ",
+      "value": "*愤怒**: 让我们把这些怪物都搞定...... "
+    },
+    {
+      "key": "I'm only for your idea. Let's go!",
+      "value": "只能这样了，冲！"
+    },
+    {
+      "key": "And here is their leader.",
+      "value": "这就是他们的首领。"
+    },
+    {
+      "key": "Did we manage?",
+      "value": "我们做到了?"
+    },
+    {
+      "key": "We don't know yet we need to get out of here....",
+      "value": "现在还不知道，我们得先离开这......"
+    },
+    {
+      "key": "I'll be waiting for you where we fought the goblins.",
+      "value": "我会在我们发现哥布林的地方等你。"
+    },
+    {
+      "key": "Finally we got out how do you think we managed?",
+      "value": "我们终于出来了，你觉得我们是怎么做到的？"
+    },
+    {
+      "key": "I don't know [Player], we have to report this news to the village.",
+      "value": "我不知道 [Player], 我们得把这个消息带到村庄里."
+    },
+    {
+      "key": "Well, I think my work here is done [Player].",
+      "value": "好了，我想我在这的工作也结束了[Player]."
+    },
+    {
+      "key": "Your [Talked] next trip will be to your homeland?",
+      "value": "你的[Talked]下一个目的地是你的祖国吗？"
+    },
+    {
+      "key": "Yes, I think it's time to go home, I missed it.",
+      "value": "是的，我想是时候回家了，我也有点想念她了。"
+    },
+    {
+      "key": "Will you take me with you?",
+      "value": "你会带上我吗?"
+    },
+    {
+      "key": "Yes, of course. Say goodbye to your friends or maybe one of them will go with you?",
+      "value": "是的，当然。跟你的朋友说再见，或者他们有人会和你一起去?"
+    },
+    {
+      "key": "No, I don't want to expose them to danger.",
+      "value": "不.我不想把他们带入危险."
+    },
+    {
+      "key": "Well",
+      "value": "那好."
+    },
+    {
+      "key": "Well, goodbye [Talked], I'll keep going. I want to be stronger than I was before.",
+      "value": "那好，再见. [Talked],我会一直走.我想要比以前更强大."
+    },
+    {
+      "key": "All right [Player]. Good luck don't forget that we will always be happy to welcome you as a guest ;)",
+      "value": "好的 [Player]. 祝你好运，别忘了我们会一直很高兴欢迎你成为我们的客人 ;)"
+    },
+    {
+      "key": "Don't forget, don't miss me ;)",
+      "value": "别忘了，不要忘记我. ;)"
+    },
+    {
+      "key": "Don't worry, Diana is very attached to you. I think she will be offended. Talk to she!",
+      "value": "别担心，Diana很喜欢你。我想她会生气的。和她谈谈!"
+    },
+    {
+      "key": "Why didn't you tell [Player] me you were going to leave?",
+      "value": "你为什么不告诉我， [Player]？ 你要去哪里?"
+    },
+    {
+      "key": "I'm Sorry [Talked]. I wanted to tell you..",
+      "value": "我很抱歉， [Talked]。我想告诉你的......"
+    },
+    {
+      "key": "**She said sadly**: Why? Will you take me with you?",
+      "value": "**她沮丧地说**：为什么?你会带上我吗?"
+    },
+    {
+      "key": "I don't want to put you in danger!",
+      "value": "我不想把你卷入危险之中！"
+    },
+    {
+      "key": "I want to travel with you!",
+      "value": "我想和你一起去！"
+    },
+    {
+      "key": "Ok, I'll take you. Now let me to say Yasue San.",
+      "value": "好吧，我会带上你。现在让我说山雅秀(Yasue San)."
+    },
+    {
+      "key": "**She said joyfully**: True? Thank! ;)",
+      "value": "**她风趣地说**：真的? 谢谢！ ;)"
+    },
+    {
+      "key": "Well, ready to go?",
+      "value": "好了，你准备好出发了吗?"
+    },
+    {
+      "key": "Yes, will I take Diana with me?",
+      "value": "是的，我可以带上Diana吗?"
+    },
+    {
+      "key": "Yes, of course, set sail:) I will show you my homeland!",
+      "value": "当然，启航:) 我会带你领略我的家乡！"
+    },
+    {
+      "key": "**He said surprised**: What a wonderful weather today!",
+      "value": "**他惊喜地说**：今天天气真好啊！"
+    },
+    {
+      "key": "Yes, I think so too.",
+      "value": "是的，我也这么想."
+    },
+    {
+      "key": "Well, how do you like on our ship [Player]? Captures the ocean, i think I'll stay here a little longer, it's wonderful here.",
+      "value": "嗯，你觉得我们的船怎么样[Player]?我想我会在这里多呆一会儿，这里太棒了 ."
+    },
+    {
+      "key": "I also really like it. Okay, I'll go, I wish you a good rest [Talked]!",
+      "value": "我也很喜欢。好吧，我得走了，希望你能好好休息 [Talked]!"
+    },
+    {
+      "key": "And I wish you good luck too [Player]!",
+      "value": "并且祝你好运 [Player]！"
+    },
+    {
+      "key": "**He looks very tired**: Very hot, impossible to work.",
+      "value": "**他看起来很疲惫**：太热了，不可能在这儿工作."
+    },
+    {
+      "key": "Hello, I arrived from a small village beyond the mountains and the ocean, my name is [Player], I have a desire to become an adventurer. But I do not know about this place, could you help me?",
+      "value": "你好，我来自山的那边海的那边的一个小村庄，我的名字是[Player]，我渴望成为一名冒险家，但我对这里不是很熟悉，你可以帮助我吗?"
+    },
+    {
+      "key": "Hello [Player], Yes of course I will help you, explain where you need to go, but you help my workers, they do not cope at all.",
+      "value": "你好 [Player]，没错我可以帮你, 告诉你你应该去哪, 但你得帮帮我的工人们, 他们可完全不会处理。"
+    },
+    {
+      "key": "What you need help with, I'm good at dealing with predators without meat you will not leave! *laughter*",
+      "value": "你需要什么帮助，我很擅长不用肉和那些食肉动物往来，你不会离开的! *笑*"
+    },
+    {
+      "key": "Oh, you're a Joker, no thanks go a little further guys will explain everything to you!",
+      "value": "哦,你可真会开玩笑， 不用感谢我， 去找其他伙计们，他们会给你解释一切！"
+    },
+    {
+      "key": "OK, thanks!",
+      "value": "好的，谢谢！"
+    },
+    {
+      "key": "Hey, pst! You, yes, you!",
+      "value": "嘿, 嘿！你, 没错, 就是你！"
+    },
+    {
+      "key": "Yeah? How can I help?",
+      "value": "嗯? 有什么我能做的吗?"
+    },
+    {
+      "key": "You cannot help me, kid! I just need...to TEST you, yes...!",
+      "value": "你帮不了我，小子！我只是想...测试你，是的没错......！"
+    },
+    {
+      "key": "Hi my name is [Player], [Talked] are you working?",
+      "value": "你好我的名字是[Player], [Talked]师傅你是干什么的?"
+    },
+    {
+      "key": "Hello [Player], Yes, I am on duty as a guard, and I also trade a little",
+      "value": "你好 [Player]，没错，我作为一名守卫在值班，同时我也会做点小生意."
+    },
+    {
+      "key": "Can you tell me how difficult it is to get into the service?",
+      "value": "你能告诉我参军有多难吗?"
+    },
+    {
+      "key": "If that's what you want, it's easy. And if you don't then you won't be able to get in ;)",
+      "value": "如果那就是你想要的，那很简单。如果你不想，那么你肯定不能加入 ;)"
+    },
+    {
+      "key": "By the way [Player], I need help, there are slugs nearby, again raging, and I can't leave the post. At the same time you will test your skills young adventurer.",
+      "value": "顺便说下[Player],我需要你的帮助, 有些鼻涕虫(slug)在附近再次肆虐起来，但我不能离开我的岗位。同时，你也能测试你的技能，年轻的冒险家."
+    },
+    {
+      "key": "Yes, no problem, wait [Talked]!!",
+      "value": "好的, 没问题...等等! [Talked]!!"
+    },
+    {
+      "key": "**He says with a look of horror on his face**: Help me find my daughter, she went to the village for food and never returned.",
+      "value": "**他一脸惊恐地说**: 帮我找找我的女儿。她去村里找吃的后就再也没有回来了."
+    },
+    {
+      "key": "To the village? [Talked] Yes of course I will help. That's where I need to go!",
+      "value": "去村子? [Talked] 是的，我当然会帮忙。 那也是我要去的地方!"
+    },
+    {
+      "key": "Thanks a lot",
+      "value": "多谢了。"
+    },
+    {
+      "key": "Hello, would you like to learn the basics of mining?",
+      "value": "嗨！你想学习挖矿的基础知识吗?"
+    },
+    {
+      "key": "Yes, of course, I don't mind",
+      "value": "当然，我不介意。"
+    },
+    {
+      "key": "All right follow me I'll explain the basics to you!",
+      "value": "好吧..跟我来，我会先让你了解一点基础!"
+    },
+    {
+      "key": "Hello, and so you're new here?",
+      "value": "你好, 所以你是新来的?"
+    },
+    {
+      "key": "Yes.",
+      "value": "是的。"
+    },
+    {
+      "key": "I need to register you. Please introduce yourself, and the purpose of your arrival, and the time you to stay here",
+      "value": "我得登记你.。请介绍你自己, 还有你来的目的和停留时间。"
+    },
+    {
+      "key": "My name is [Player]. I came here to become an adventurer. I can't tell you the exact time of stay.",
+      "value": "我的名字是[Player]。我来这里是为了成为一名冒险家，我无法告知你我具体会待多久。"
+    },
+    {
+      "key": "And who for you should know the time of your stay here.",
+      "value": "谁会知道你在这待多久。"
+    },
+    {
+      "key": "Okay well, I will write you down, in case of violation of the rules of our village, we have every right to prohibit your presence here, and report to superiors.",
+      "value": "好吧.你给我听好了。如果你违反了我们村子的规矩.我们有权禁止你到这里.并向上级报告"
+    },
+    {
+      "key": "Have a good day!",
+      "value": "祝你拥有美好的一天!"
+    },
+    {
+      "key": "Thank's [Talked]!",
+      "value": "谢了 [Talked]!"
+    },
+    {
+      "key": "[Stranger]Greetings, wanderer. *bowing*",
+      "value": "[Stranger] 你好, 流浪者. *鞠躬*"
+    },
+    {
+      "key": "I am the Deputy of the Apostle, and I also protect her.",
+      "value": "我是使徒的副手.我的职责是保护使徒."
+    },
+    {
+      "key": "I think you've already heard, that the monsters are raging.",
+      "value": "我想你已经听说了.有怪物在肆虐的消息."
+    },
+    {
+      "key": "I have a request for you [Player]",
+      "value": "我对你有一个要求 [Player]"
+    },
+    {
+      "key": "Which one?",
+      "value": "什么要求?"
+    },
+    {
+      "key": "Help in the southern part to win over the monsters. We can't drive them away but we can scare them away.",
+      "value": "帮助南方战胜怪物. 我们不能赶走它们，但是我们可以吓跑它们."
+    },
+    {
+      "key": "Of course I will.",
+      "value": "当然我会的."
+    },
+    {
+      "key": "Thank's [Player]!",
+      "value": "谢谢你， [Player]!"
+    },
+    {
+      "key": "You look awful today, [Talked]! What happend?",
+      "value": "你今天看起来很惊慌, [Talked]! 发生了什么？"
+    },
+    {
+      "key": "Oh.. don't you worry about me, boy..",
+      "value": "哦.. 你不用担心我, 小子.."
+    },
+    {
+      "key": "But I DO worry!",
+      "value": "但是我很担心！"
+    },
+    {
+      "key": "I'm tired of these fight I have with my wife, it's personal bussiness.",
+      "value": "我厌倦了和我妻子的这些争吵.这是我的私事."
+    },
+    {
+      "key": "I didn't want to be a pain to you, Officer. I will leave you to your problems now.",
+      "value": "我不想让你这么痛苦.警官.我现在就让你解决你的问题."
+    },
+    {
+      "key": "No! Wait!",
+      "value": "不! 等等!"
+    },
+    {
+      "key": "Hello [Player], I have come to you from the Final Fantasy universe, my name is [Talked].",
+      "value": "你好啊 [Player]. 你怎么弄到碎片我们会来接你的.我的名字是 [Talked]"
+    },
+    {
+      "key": "I can't say for sure how long I will be here, but for now I will be happy to know your world, and I will be happy to show my world",
+      "value": "当然我会在这里呆多久，但现在我很高兴了解你们的世界，也很高兴展示我的世界"
+    },
+    {
+      "key": "Are you serious? Did the author smoke dope?",
+      "value": "你认真的? 作者在吸食毒品？"
+    },
+    {
+      "key": "Maybe so, I have a couple of things that you can get from me, but not for free. I'll need the fragments I lost",
+      "value": "也许是这样，我有些东西你可以从我这里得到，但不是免费的。我需要我丢失的碎片"
+    },
+    {
+      "key": "Welcome home, sir! **she made a bow**",
+      "value": "欢迎回家, 先生! **她鞠了一躬**"
+    }
+  ]
 }
