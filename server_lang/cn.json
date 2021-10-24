@@ -86,19 +86,19 @@
     },
     {
       "key": "Disciple of War. Level Power {INT}",
-      "value": "攻击的信使. 等级效果 {INT}"
+      "value": "攻击的信徒. 等级效果 {INT}"
     },
     {
       "key": "Disciple of Tank. Level Power {INT}",
-      "value": "坦克的信使.等级效果 {INT}"
+      "value": "坦克的信徒.等级效果 {INT}"
     },
     {
       "key": "Disciple of Healer. Level Power {INT}",
-      "value": "治疗的信使. 等级效果 {INT}"
+      "value": "治疗的信徒. 等级效果 {INT}"
     },
     {
       "key": "Disciple of Jobs",
-      "value": "工作的信使"
+      "value": "工作的信徒"
     },
     {
       "key": "{STR} {INT}P (Price {INT}P)",
@@ -106,7 +106,7 @@
     },
     {
       "key": "Ranking Information",
-      "value": "关于排名"
+      "value": "排名介绍"
     },
     {
       "key": "Top 10 guilds leveling",
@@ -230,11 +230,11 @@
     },
     {
       "key": "Story dungeon's",
-      "value": "故事 地下城"
+      "value": "主线-地下城"
     },
     {
       "key": "Alternative story dungeon's",
-      "value": "另类故事 地下城"
+      "value": "支线-地下城"
     },
     {
       "key": "You are already in this dungeon!",
@@ -250,7 +250,7 @@
     },
     {
       "key": "{STR} joined to Dungeon {STR}!",
-      "value": "{STR} 加入了地下城 {STR}!"
+      "value": "{STR} 加入了地牢 {STR}!"
     },
     {
       "key": "You can vote for the choice of tank (Dungeon Tab)!",
@@ -302,7 +302,7 @@
     },
     {
       "key": "Not upgrade points for +{INT}. Required {INT}.",
-      "value": "没有足够的升级点 +{INT}. 要求 {INT}."
+      "value": "没有足够的升级点来加{INT}点. 要求 {INT}."
     },
     {
       "key": "Upgrade has a maximum level.",
@@ -314,15 +314,15 @@
     },
     {
       "key": "{STR} came! Good {STR}!",
-      "value": "{STR} 来了! 好 {STR}!"
+      "value": "{STR} Came! Good {STR}!"
     },
     {
       "key": "Nighttime experience was increase to {INT}",
-      "value": "夜间经验提升到 {INT}%"
+      "value": "夜间经验提升到 {INT} %"
     },
     {
       "key": "Daytime experience was downgraded to 100%",
-      "value": "白天经验降低到100%"
+      "value": "白天经验恢复到100%"
     },
     {
       "key": "{STR} opened zone ({STR})!",
@@ -590,7 +590,7 @@
     },
     {
       "key": "[Stranger]Hi, my name is [Player], how do I find the nearest village?",
-      "value": "[陌生人]嗨, 我的名字是 [Player], 请问我怎么找到最近的村庄?"
+      "value": "[Stranger]嗨, 我的名字是 [Player], 请问我怎么找到最近的村庄?"
     },
     {
       "key": "**She concerned**: Hello, my name is [Talked].",
@@ -622,19 +622,19 @@
     },
     {
       "key": "Well, thank you very much, and tell her I'll be seeing her this evening.",
-      "value": "好的，谢谢你嘞，顺便帮我转告她我我今晚会过去找她。"
+      "value": "那么，谢谢你，顺便帮我转告她我我今晚会过去找她。"
     },
     {
       "key": "Yes, good luck with your work!",
-      "value": "是的，祝你工作和Flower一样顺利！"
+      "value": "是的，祝你工作顺利！"
     },
     {
       "key": "**She says impatiently**: Oh, you're already here, you're fast!",
-      "value": "**她不耐烦地说**: 哦, 你早就到了, 真快!"
+      "value": "**她不耐烦地说**: 哦, 你到了, 花的时间真~短~"
     },
     {
       "key": "Really?",
-      "value": "真的吗?"
+      "value": "你认真的么?"
     },
     {
       "key": "Yes. How is he?",
@@ -650,7 +650,7 @@
     },
     {
       "key": "What a beautiful [Time]. I don't have anything for you [Player].",
-      "value": "这真是个好天气. 我没有什么能给你 [Player]."
+      "value": "这真是个好天气. 但我没有什么能给你 [Player]."
     },
     {
       "key": "[Player] are you interested something? I'm sorry, don't want to talk right now.",
@@ -662,7 +662,7 @@
     },
     {
       "key": "**He sounds surprised**: Only girls? Why the dead?",
-      "value": "**他的声音听上去很惊喜**: 只有女孩？为什么是死人？"
+      "value": "**他的声音听上去很惊喜**: 只有女孩？为什么会死？"
     },
     {
       "key": "**She's upset**: Honestly, I don't know. The dead or who it is, our headman says that most likely the dead ;(",
@@ -894,7 +894,7 @@
     },
     {
       "key": "Oh sure. By the way, in our village, the chief Apostle.",
-      "value": "好的. 顺带一提，在我们村子里, 首席使徒."
+      "value": "好的. 顺带一提，在我们村子里, 首席使徒——"
     },
     {
       "key": "Wait an Apostle? They are ancient beings sent by the gods. Do they exist?",
@@ -930,11 +930,11 @@
     },
     {
       "key": "So here we have someone's house.",
-      "value": "这里，是一些屋."
+      "value": "这里，是一些房子."
     },
     {
       "key": "You can also buy houses, decorate them or use the safety Deposit box.",
-      "value": "你可以买下一个房子（价格不菲），捐赠或者使用其中的安全存款箱子（工会基金）"
+      "value": "你可以买下一个房子（价格不菲），你可以捐赠或者使用其中的箱子（工会基金）"
     },
     {
       "key": "Sounds good [Talked]!",
@@ -974,11 +974,11 @@
     },
     {
       "key": "So I can become something?",
-      "value": "所以我可以成为这个角色?"
+      "value": "所以我可以成为其中一个角色?"
     },
     {
       "key": "[Player], you can be anyone you want (as well as fine-tune your game mode)",
-      "value": "[Player], 你可以是任何人只要你想（也可以微调你的游戏模式）"
+      "value": "[Player], 你可以是任何角色只要你想（也可以微调你的游戏模式）"
     },
     {
       "key": "[Talked] so I can be both a Tank and a Defender?",
@@ -1034,7 +1034,7 @@
     },
     {
       "key": "Introduce you [Player] to the Apostle of our village. ",
-      "value": "介绍[Player]给我们村里的使徒 "
+      "value": "介绍你，[Player]，给我们村里的使徒 "
     },
     {
       "key": "[Talked] so what's it to them for me?",
@@ -1058,7 +1058,7 @@
     },
     {
       "key": "Fool let's go already.",
-      "value": "笨蛋~还不走吗？我们先走了哦~"
+      "value": "傻子，还不走吗？我们先走了。"
     },
     {
       "key": "Well ... Let's go",
@@ -1118,7 +1118,7 @@
     },
     {
       "key": "**He as if he doesn't want me to become an adventurer**: Will you be strong enough? Well, let's see, I think you already understand that you first need to test, only after I say whether you are worthy or not to become an Adventurer?",
-      "value": "**他好像不想让我成为冒险者一样**：你够坚强吗？ 好吧，你看，我想你已经明白，你首先要测试，然后来看看你是否有成为冒险者的资格？"
+      "value": "**他好像不想让我成为冒险者一样**：你够坚强吗？ 好吧，你看，我想你已经明白，你首先要测\n试，然后来看看你是否有成为冒险者的资格？"
     },
     {
       "key": "Well, what exactly is required?",
@@ -1134,7 +1134,7 @@
     },
     {
       "key": "Ha ha where do we start? Don't joke with me young fighter. First, take this and go to the southern part of the village.",
-      "value": "哈哈，从哪开始? 别开玩笑了年轻的战士. 首先，带上这个然后去村庄的南边."
+      "value": "哈哈，从哪开始? 别开玩笑了年轻的战士. 首先，带上这个然后去村庄的东边."
     },
     {
       "key": "Well",
@@ -1402,7 +1402,7 @@
     },
     {
       "key": "[Player] get me some first, we'll use it as oil",
-      "value": "[Player]首先拿一些gel给我，我会把他当做油来使用。"
+      "value": "[Player]首先拿一些粘液球给我，我会把他当做油来使用。"
     },
     {
       "key": "I think everyone has their own way of making butter *laughter*",
@@ -1418,7 +1418,7 @@
     },
     {
       "key": "I think you've heard of Kappa, they live near water, their meat is very tasty. So get it for me (you can self find them habitat)",
-      "value": "我想你已经听说过kappa, 他们生活在洞穴里靠近水的地方， 他们的肉非常好吃. 所以，去帮我搞一些来吧 (你可以自己找到他们栖息地的)"
+      "value": "我想你已经听说过河童, 他们生活在洞穴里靠近水的地方， 他们的肉非常好吃. 所以，去帮我搞一些来吧 (你可以自己找到他们栖息地的)"
     },
     {
       "key": "All delicious fine meat, looks great, take it!",
@@ -1634,7 +1634,7 @@
     },
     {
       "key": "I don't understand..",
-      "value": "我不李姐.."
+      "value": "什么意思.."
     },
     {
       "key": "Our daughter, Maria.. She's sick!",
@@ -1642,11 +1642,11 @@
     },
     {
       "key": "Why don't you take her to the Nurse?!",
-      "value": "你为什么不带她去找Nurse呢?!"
+      "value": "你为什么不带她去找护士呢?!"
     },
     {
       "key": "I tried, but she said she can't do anything.. I found something in an old book of mine.. A gel treatment. But I also need Kappa Meat for it..",
-      "value": "我找过了, 但她说她也无能为力.我在一本老书里看到一些记载.. 一种gel治疗法. 但同时我还需要一些kappa meat.."
+      "value": "我找过了, 但她说她也无能为力.我在一本老书里看到一些记载.. 一种粘液球治疗法. 但同时我还需要一些河童的肉.."
     },
     {
       "key": "Tha..nk.. You..",
@@ -1674,7 +1674,7 @@
     },
     {
       "key": "Well Sir.. I might need a discount from your old friend, the Craftsman.",
-      "value": "是的先生...我想我需要从你的老朋友那里获取一些折扣，也就是Craftsman."
+      "value": "是的先生...我想我需要从你的老朋友那里获取一些折扣，也就是锻造者"
     },
     {
       "key": "Sure, I'll.. let him know you deserve it!",
@@ -1686,7 +1686,7 @@
     },
     {
       "key": "I heard you helped the craftsman with his deliveries..I have no time for small things like mining cooper, can you do it for me? I have to save the world in the main time..",
-      "value": "我听说你帮助过craftsman..我没有多余的时间用在挖矿这种小事上，你可以帮我吗，我必须把我的主要时间用在拯救世界上"
+      "value": "我听说你帮助过锻造者..我没有多余的时间用在挖矿这种小事上，你可以帮我吗，我必须把我的主要时间用在拯救世界上"
     },
     {
       "key": " *a bit angry* Ok, I will do it.",
