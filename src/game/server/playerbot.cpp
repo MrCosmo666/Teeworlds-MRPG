@@ -387,7 +387,7 @@ static void FindThreadPath(CGS* pGameServer, CPlayerBot* pBotPlayer, vec2 StartP
 	if(!pGameServer || !pBotPlayer || length(StartPos) <= 0 || length(SearchPos) <= 0)
 		return;
 
-	while(!pBotPlayer->m_ThreadReadNow)
+	while(pBotPlayer->m_ThreadReadNow)
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
 	lockingPath.lock();
