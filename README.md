@@ -3,7 +3,9 @@
 </a>
 
 Teeworlds [![CodeFactor](https://www.codefactor.io/repository/github/kurosio/mmotee-global/badge/master?s=baf1b1fa184ccf14acc3a6a4493428ba045d90dd)](https://www.codefactor.io/repository/github/kurosio/mmotee-global/overview/master)
-[![Build](https://github.com/teeworldsCNFun/Teeworlds-MRPG/actions/workflows/ccpp.yml/badge.svg)](https://github.com/teeworldsCNFun/Teeworlds-MRPG/actions/workflows/ccpp.yml)
+[![Client Build](https://github.com/teeworldsCNFun/Teeworlds-MRPG/actions/workflows/ccpp.yml/badge.svg)](https://github.com/teeworldsCNFun/Teeworlds-MRPG/actions/workflows/ccpp.yml)
+[![Server Build](https://github.com/teeworldsCNFun/Teeworlds-MRPG/actions/workflows/server.yml/badge.svg)](https://github.com/teeworldsCNFun/Teeworlds-MRPG/actions/workflows/server.yml)
+
 =========
 
 A retro multiplayer shooter

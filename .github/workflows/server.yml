@@ -49,8 +49,9 @@ jobs:
         ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target mmoteeworlds_srv
     - name: Package
       run: |
-        zip -r9 ${{ matrix.package-file }} mmoteeworlds_srv*
-        mv ${{ matrix.package-file }} artifacts
+        cp release/mmoteeworlds_srv* .
+        zip -r9 ${{ matrix.package-file }} mmoteeworlds_srv* maps data server_lang 
+        mv ${{ matrix.package-file }} release/artifacts
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2-preview
       with:
