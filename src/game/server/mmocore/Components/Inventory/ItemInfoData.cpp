@@ -11,7 +11,7 @@ int CItemDataInfo::GetInfoEnchantStats(int AttributeID) const
 {
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if(CGS::ms_aAttributsInfo.find(m_aAttribute[i]) != CGS::ms_aAttributsInfo.end() && m_aAttribute[i] == AttributeID)
+		if(m_aAttribute[i] >= StSpreadShotgun && m_aAttribute[i] < STATS_PLAYER_NUM && m_aAttribute[i] == AttributeID)
 			return m_aAttributeValue[i];
 	}
 	return 0;
