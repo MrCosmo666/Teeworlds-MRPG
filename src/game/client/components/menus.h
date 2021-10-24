@@ -351,8 +351,8 @@ private:
 	int m_MenuActiveID;
 	bool m_ShowAuthWindow;
 	bool m_ActiveEditbox;
-	char aAuthResultReason[256];
-	vec4 aAuthResultColor;
+	char m_aAuthResultReason[256];
+	vec4 m_AuthResultColor;
 	//
 
 	vec2 m_MousePos;

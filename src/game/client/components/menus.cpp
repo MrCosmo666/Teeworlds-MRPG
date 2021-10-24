@@ -2176,7 +2176,7 @@ void CMenus::SetAuthState(bool ShowWindowAuth)
 		m_pClient->m_pSounds->Stop(SOUND_MUSIC_MRPG_FESTIVAL);
 
 	SetActive(MENU_NO_ACTIVE);
-	mem_zero(aAuthResultReason, sizeof(aAuthResultReason));
+	mem_zero(m_aAuthResultReason, sizeof(m_aAuthResultReason));
 }
 
 void CMenus::SetActive(int ActiveID)
@@ -2217,7 +2217,7 @@ void CMenus::OnReset()
 	m_pClient->m_pSounds->Stop(SOUND_MUSIC_MRPG_FESTIVAL);
 	m_ShowAuthWindow = false;
 	m_MenuActiveID = MENU_NO_ACTIVE;
-	mem_zero(aAuthResultReason, sizeof(aAuthResultReason));
+	mem_zero(m_aAuthResultReason, sizeof(m_aAuthResultReason));
 }
 
 bool CMenus::OnCursorMove(float x, float y, int CursorType)
