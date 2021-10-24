@@ -15,7 +15,6 @@
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayerBot, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 
-std::mutex lockingPath;
 CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint)
 	: CPlayer(pGS, ClientID), m_BotType(SpawnPoint), m_BotID(BotID), m_SubBotID(SubBotID), m_BotHealth(0), m_LastPosTick(0), m_PathSize(0)
 {
@@ -55,13 +54,6 @@ void CPlayerBot::Tick()
 		{
 			m_ViewPos = m_pCharacter->GetPos();
 			ThreadMobsPathFinder();
-		}
-		else if(!m_WayPoints.empty())
-		{
-			lockingPath.lock();
-			m_PathSize = 0;
-			m_WayPoints.clear();
-			lockingPath.unlock();
 		}
 	}
 	else if(m_Spawned && m_aPlayerTick[Respawn]+Server()->TickSpeed()*3 <= Server()->Tick())
@@ -389,25 +381,24 @@ int CPlayerBot::GetPlayerWorldID() const
 	return QuestBotInfo::ms_aQuestBot[m_SubBotID].m_WorldID;
 }
 
-/***********************************************************************************/
-/*  Thread path finderdon't want to secure m_TargetPos, or m_WayPoints with mutex  */
-/***********************************************************************************/
+std::mutex lockingPath;
 static void FindThreadPath(CGS* pGameServer, CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos)
 {
-	if(!pGameServer || !pBotPlayer || length(StartPos) <= 0 || length(SearchPos) <= 0
-		|| pGameServer->Collision()->CheckPoint(StartPos) || pGameServer->Collision()->CheckPoint(SearchPos))
+	if(!pGameServer || !pBotPlayer || length(StartPos) <= 0 || length(SearchPos) <= 0)
 		return;
+
+	while(!pBotPlayer->m_ThreadReadNow)
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
 	lockingPath.lock();
 	pGameServer->PathFinder()->Init();
 	pGameServer->PathFinder()->SetStart(StartPos);
 	pGameServer->PathFinder()->SetEnd(SearchPos);
 	pGameServer->PathFinder()->FindPath();
+	pBotPlayer->m_WayPoints.clear();
 	pBotPlayer->m_PathSize = pGameServer->PathFinder()->m_FinalSize;
 	for(int i = pBotPlayer->m_PathSize - 1, j = 0; i >= 0; i--, j++)
-	{
 		pBotPlayer->m_WayPoints[j] = vec2(pGameServer->PathFinder()->m_lFinalPath[i].m_Pos.x * 32 + 16, pGameServer->PathFinder()->m_lFinalPath[i].m_Pos.y * 32 + 16);
-	}
 	lockingPath.unlock();
 }
 

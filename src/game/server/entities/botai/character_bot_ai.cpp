@@ -317,7 +317,9 @@ void CCharacterBotAI::EngineMobs()
 	if(WeaponedBot)
 		ChangeWeapons();
 
+	m_pBotPlayer->m_ThreadReadNow = true;
 	Move();
+	m_pBotPlayer->m_ThreadReadNow = false;
 
 	m_PrevPos = m_Pos;
 	if(m_Input.m_Direction)

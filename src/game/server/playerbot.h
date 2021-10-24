@@ -5,6 +5,8 @@
 
 #include "player.h"
 
+#include <atomic>
+
 class CPlayerBot : public CPlayer
 {
 	MACRO_ALLOC_POOL_ID()
@@ -18,8 +20,8 @@ class CPlayerBot : public CPlayer
 public:
 	int m_LastPosTick;
 	int m_PathSize;
-	vec2 m_CharPos;
 	vec2 m_TargetPos;
+	std::atomic_bool m_ThreadReadNow;
 	std::map<int, vec2> m_WayPoints;
 
 	CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint);
