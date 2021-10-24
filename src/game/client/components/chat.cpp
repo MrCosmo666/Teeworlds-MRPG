@@ -196,7 +196,11 @@ void CChat::ConChat(IConsole::IResult* pResult, void* pUserData)
 
 void CChat::ConShowChat(IConsole::IResult* pResult, void* pUserData)
 {
-	((CChat*)pUserData)->m_Show = pResult->GetInteger(0) != 0;
+	CChat* pChat = ((CChat*)pUserData);
+	if(pChat->m_pClient->m_pMenus->IsActiveAuthMRPG())
+		pChat->m_Show = false;
+	else
+		pChat->m_Show = pResult->GetInteger(0) != 0;
 }
 
 void CChat::ConChatCommand(IConsole::IResult* pResult, void* pUserData)
@@ -505,7 +509,7 @@ bool CChat::OnInput(IInput::CEvent Event)
 
 void CChat::EnableMode(int Mode, const char* pText)
 {
-	if(Client()->State() == IClient::STATE_DEMOPLAYBACK)
+	if(Client()->State() == IClient::STATE_DEMOPLAYBACK || m_pClient->m_pMenus->IsActiveEditbox())
 		return;
 
 	ClearInput();

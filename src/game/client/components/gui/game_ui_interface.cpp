@@ -196,10 +196,15 @@ void CUIGameInterface::OnMessage(int Msg, void* pRawMsg)
 void CUIGameInterface::ConToggleGameHUDMRPG(IConsole::IResult* pResult, void* pUser)
 {
 	CUIGameInterface* pGameGUI = static_cast<CUIGameInterface*>(pUser);
-	if(pGameGUI->Client()->State() != IClient::STATE_ONLINE)
+	if(pGameGUI->m_pClient->m_pMenus->IsActiveAuthMRPG() || pGameGUI->Client()->State() != IClient::STATE_ONLINE)
 		return;
 
 	pGameGUI->m_ActiveGUI ^= true;
+}
+
+void CUIGameInterface::OnRelease()
+{
+	OnReset();
 }
 
 // inbox

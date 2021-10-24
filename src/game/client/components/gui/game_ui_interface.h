@@ -100,6 +100,7 @@ public:
 	void OnStateChange(int NewState, int OldState) override;
 	bool OnCursorMove(float x, float y, int CursorType) override;
 	void OnMessage(int Msg, void* pRawMsg) override;
+	void OnRelease() override;
 
 	static void ConToggleGameHUDMRPG(IConsole::IResult* pResult, void* pUser);
 
