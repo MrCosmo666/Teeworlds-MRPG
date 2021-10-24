@@ -23,7 +23,7 @@ jobs:
         - name: "Windows x64"
           os: windows-latest
           cmake-args: -G "Visual Studio 16 2019" -A x64
-          package-file: mmoteeworlds_srv-win64.zip
+          package-file: mmoteeworlds_srv-win64.7z
           env:
             CFLAGS: /WX
             CXXFLAGS: /WX
@@ -50,7 +50,8 @@ jobs:
     - name: Package
       run: |
         cp release/mmoteeworlds_srv* .
-        zip -r9 ${{ matrix.package-file }} mmoteeworlds_srv* maps data server_lang 
+        7z a ${{ matrix.package-file }} mmoteeworlds_srv* maps data server_lang 
+        mkdir artifacts
         mv ${{ matrix.package-file }} release/artifacts
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2-preview
