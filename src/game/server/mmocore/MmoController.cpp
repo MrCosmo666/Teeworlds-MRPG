@@ -345,7 +345,7 @@ void MmoController::ConSyncLinesForTranslate()
 
 	auto PushingDialogs = [](nlohmann::json& pJson, const char* pTextKey, const char* HashingType, int HashingByID)
 	{
-		if(pTextKey[0] != '\0')
+		if(pTextKey[0] == '\0')
 			return;
 
 		std::string Hashing(HashingType + std::to_string(HashingByID));
@@ -353,10 +353,10 @@ void MmoController::ConSyncLinesForTranslate()
 		{
 			for(auto& pKeys : pJson["translation"])
 			{
-				if(!pKeys["id"].is_string() || !pKeys["key"].is_string() || !pKeys["value"].is_string())
+				if(!pKeys["key"].is_string() || !pKeys["value"].is_string())
 					continue;
 
-				if(pKeys.value("id", "0") == Hashing)
+				if(pKeys["id"].is_string() && pKeys.value("id", "0") == Hashing)
 				{
 					if(pKeys.value("key", "0") != pTextKey)
 						pKeys["key"] = pKeys["value"] = pTextKey;
