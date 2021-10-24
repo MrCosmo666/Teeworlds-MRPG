@@ -131,7 +131,7 @@
             "value": "Help for workers"
         },
         {
-            "id": "qusn1",
+            "id": "qusn2",
             "key": "Main: Arrival",
             "value": "Main: Arrival"
         },
@@ -156,7 +156,7 @@
             "value": "Here you can see chance loot, mobs, on YOUR ZONE."
         },
         {
-            "id": "qusn3",
+            "id": "qusn4",
             "key": "Trader Sentry",
             "value": "Trader Sentry"
         },
@@ -196,7 +196,7 @@
             "value": "What is ore mining?"
         },
         {
-            "id": "qusn6",
+            "id": "qusn7",
             "key": "Mining",
             "value": "Mining"
         },
@@ -216,7 +216,7 @@
             "value": "Help destruction of dir"
         },
         {
-            "id": "qusn8",
+            "id": "qusn9",
             "key": "Deputy",
             "value": "Deputy"
         },
@@ -236,7 +236,7 @@
             "value": "Acquaintance"
         },
         {
-            "id": "qusn10",
+            "id": "qusn22",
             "key": "Main: Apostle Elfia",
             "value": "Main: Apostle Elfia"
         },
@@ -401,7 +401,7 @@
             "value": "Why are you here Noctis"
         },
         {
-            "id": "qusn60",
+            "id": "qusn62",
             "key": "Final fantasy",
             "value": "Final fantasy"
         },
@@ -446,7 +446,7 @@
             "value": "Master La"
         },
         {
-            "id": "hmnm1",
+            "id": "hmnm2",
             "key": "Elven class",
             "value": "Elven class"
         },
@@ -461,7 +461,7 @@
             "value": "Elven class"
         },
         {
-            "id": "hmnm3",
+            "id": "hmnm6",
             "key": "Asian-style home",
             "value": "Asian-style home"
         },
@@ -696,12 +696,12 @@
             "value": "Good [Talked]!"
         },
         {
-            "id": "diaqu30",
+            "id": "diaqu50",
             "key": "Here you go, your boss told me to give it to you!",
             "value": "Here you go, your boss told me to give it to you!"
         },
         {
-            "id": "diaqu31",
+            "id": "diaqu51",
             "key": "Thanks for the help.",
             "value": "Thanks for the help."
         },
@@ -971,7 +971,7 @@
             "value": "All right, let's go back."
         },
         {
-            "id": "diaqu130",
+            "id": "diaqu240",
             "key": "Are you ready?",
             "value": "Are you ready?"
         },
@@ -1411,7 +1411,7 @@
             "value": "Ha ha where do we start? Don't joke with me young fighter. First, take this and go to the southern part of the village."
         },
         {
-            "id": "diaqu276",
+            "id": "diaqu696",
             "key": "Well",
             "value": "Well"
         },
@@ -2921,7 +2921,7 @@
             "value": "Gun"
         },
         {
-            "id": "itdc3",
+            "id": "itdc6",
             "key": "Conventional weapon",
             "value": "Conventional weapon"
         },
@@ -2991,7 +2991,7 @@
             "value": "Decoration Armor"
         },
         {
-            "id": "itdc10",
+            "id": "itdc13",
             "key": "Decoration for house!",
             "value": "Decoration for house!"
         },
@@ -3071,7 +3071,7 @@
             "value": "Mirt"
         },
         {
-            "id": "itdc18",
+            "id": "itdc46",
             "key": "Information added later.",
             "value": "Information added later."
         },
@@ -3081,7 +3081,7 @@
             "value": "Potato"
         },
         {
-            "id": "itdc20",
+            "id": "itdc24",
             "key": "Material need for craft!",
             "value": "Material need for craft!"
         },
@@ -3101,7 +3101,7 @@
             "value": "Glue"
         },
         {
-            "id": "itdc22",
+            "id": "itdc29",
             "key": "I wonder what it's for?",
             "value": "I wonder what it's for?"
         },
@@ -3141,7 +3141,7 @@
             "value": "Goblin Pickaxe"
         },
         {
-            "id": "itdc26",
+            "id": "itdc48",
             "key": "It happens sometimes",
             "value": "It happens sometimes"
         },
@@ -3161,7 +3161,7 @@
             "value": "Small ammo bag"
         },
         {
-            "id": "itdc28",
+            "id": "itdc49",
             "key": "Adds a small amount of ammunition",
             "value": "Adds a small amount of ammunition"
         },
@@ -3401,7 +3401,7 @@
             "value": "Heavenly hammer"
         },
         {
-            "id": "itdc10000",
+            "id": "itdc10024",
             "key": "Reinforced kick",
             "value": "Reinforced kick"
         },
@@ -3411,7 +3411,7 @@
             "value": "Heavenly gun"
         },
         {
-            "id": "itdc10001",
+            "id": "itdc10023",
             "key": "It look doesn't bad",
             "value": "It look doesn't bad"
         },
@@ -3461,7 +3461,7 @@
             "value": "Neptune wings"
         },
         {
-            "id": "itdc10006",
+            "id": "itdc10018",
             "key": "Covered in secrets",
             "value": "Covered in secrets"
         },
@@ -3651,7 +3651,7 @@
             "value": "Theme Couple"
         },
         {
-            "id": "itdc15000",
+            "id": "itdc15003",
             "key": "Strictly limited as the theme",
             "value": "Strictly limited as the theme"
         },
@@ -3689,26 +3689,6 @@
             "id": "sknm1",
             "key": "Health turret",
             "value": "Health turret"
-        },
-        {
-            "id": null,
-            "key": "Upgrades({INT}p)",
-            "value": "Verbesserungen({INT}p)"
-        },
-        {
-            "id": null,
-            "key": "Settings",
-            "value": "Einstellungen"
-        },
-        {
-            "id": null,
-            "key": "Mailbox",
-            "value": "Postfach"
-        },
-        {
-            "id": null,
-            "key": "Journal",
-            "value": "Zeitschrift"
         },
         {
             "id": null,
@@ -4094,6 +4074,26 @@
             "id": null,
             "key": "Equipment",
             "value": "Ausrüstung"
+        },
+        {
+            "id": null,
+            "key": "Upgrades({INT}p)",
+            "value": "Verbesserungen({INT}p)"
+        },
+        {
+            "id": null,
+            "key": "Settings",
+            "value": "Einstellungen"
+        },
+        {
+            "id": null,
+            "key": "Mailbox",
+            "value": "Postfach"
+        },
+        {
+            "id": null,
+            "key": "Journal",
+            "value": "Zeitschrift"
         }
     ]
 }

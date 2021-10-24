@@ -6,7 +6,7 @@
             "value": "Abandoned mine"
         },
         {
-            "id": "itdc27",
+            "id": "itdc48",
             "key": "It happens sometimes",
             "value": "It happens sometimes"
         },
@@ -16,7 +16,7 @@
             "value": "Small ammo bag"
         },
         {
-            "id": "itdc28",
+            "id": "itdc49",
             "key": "Adds a small amount of ammunition",
             "value": "Adds a small amount of ammunition"
         },
@@ -36,7 +36,7 @@
             "value": "Goblin Ingot"
         },
         {
-            "id": "itdc30",
+            "id": "itdc46",
             "key": "Information added later.",
             "value": "Information added later."
         },
@@ -291,7 +291,7 @@
             "value": "Neptune wings"
         },
         {
-            "id": "itdc10006",
+            "id": "itdc10018",
             "key": "Covered in secrets",
             "value": "Covered in secrets"
         },
@@ -301,7 +301,7 @@
             "value": "Help for workers"
         },
         {
-            "id": "qusn1",
+            "id": "qusn2",
             "key": "Main: Arrival",
             "value": "Main: Arrival"
         },
@@ -321,7 +321,7 @@
             "value": "The fight with slime!"
         },
         {
-            "id": "qusn3",
+            "id": "qusn4",
             "key": "Trader Sentry",
             "value": "Trader Sentry"
         },
@@ -351,7 +351,7 @@
             "value": "What is ore mining?"
         },
         {
-            "id": "qusn6",
+            "id": "qusn7",
             "key": "Mining",
             "value": "Mining"
         },
@@ -371,7 +371,7 @@
             "value": "Help destruction of dir"
         },
         {
-            "id": "qusn8",
+            "id": "qusn9",
             "key": "Deputy",
             "value": "Deputy"
         },
@@ -391,7 +391,7 @@
             "value": "Acquaintance"
         },
         {
-            "id": "qusn10",
+            "id": "qusn22",
             "key": "Main: Apostle Elfia",
             "value": "Main: Apostle Elfia"
         },
@@ -546,7 +546,7 @@
             "value": "Why are you here Noctis"
         },
         {
-            "id": "qusn60",
+            "id": "qusn62",
             "key": "Final fantasy",
             "value": "Final fantasy"
         },
@@ -591,7 +591,7 @@
             "value": "Master La"
         },
         {
-            "id": "hmnm1",
+            "id": "hmnm2",
             "key": "Elven class",
             "value": "Elven class"
         },
@@ -601,7 +601,7 @@
             "value": "Elven class"
         },
         {
-            "id": "hmnm3",
+            "id": "hmnm6",
             "key": "Asian-style home",
             "value": "Asian-style home"
         },
@@ -686,12 +686,12 @@
             "value": "Good [Talked]!"
         },
         {
-            "id": "diaqu30",
+            "id": "diaqu50",
             "key": "Here you go, your boss told me to give it to you!",
             "value": "Here you go, your boss told me to give it to you!"
         },
         {
-            "id": "diaqu31",
+            "id": "diaqu51",
             "key": "Thanks for the help.",
             "value": "Thanks for the help."
         },
@@ -961,7 +961,7 @@
             "value": "All right, let's go back."
         },
         {
-            "id": "diaqu130",
+            "id": "diaqu240",
             "key": "Are you ready?",
             "value": "Are you ready?"
         },
@@ -1396,7 +1396,7 @@
             "value": "Ha ha where do we start? Don't joke with me young fighter. First, take this and go to the southern part of the village."
         },
         {
-            "id": "diaqu276",
+            "id": "diaqu696",
             "key": "Well",
             "value": "Well"
         },
@@ -2801,7 +2801,7 @@
             "value": "Gun"
         },
         {
-            "id": "itdc3",
+            "id": "itdc6",
             "key": "Conventional weapon",
             "value": "Conventional weapon"
         },
@@ -2871,7 +2871,7 @@
             "value": "Decoration Armor"
         },
         {
-            "id": "itdc10",
+            "id": "itdc13",
             "key": "Decoration for house!",
             "value": "Decoration for house!"
         },
@@ -2961,7 +2961,7 @@
             "value": "Potato"
         },
         {
-            "id": "itdc20",
+            "id": "itdc24",
             "key": "Material need for craft!",
             "value": "Material need for craft!"
         },
@@ -3026,26 +3026,6 @@
             "value": "Young fighter's ring"
         },
         {
-            "id": "attb9",
-            "key": "Lucky",
-            "value": "Везение"
-        },
-        {
-            "id": "attb10",
-            "key": "Piety",
-            "value": "Благочестие"
-        },
-        {
-            "id": "attb11",
-            "key": "Vampirism",
-            "value": "Вампиризм"
-        },
-        {
-            "id": "attb12",
-            "key": "Ammo Regen",
-            "value": "Ammo реген"
-        },
-        {
             "id": "attb1",
             "key": "Shotgun Spread",
             "value": "Дробовик спред"
@@ -3081,14 +3061,14 @@
             "value": "Сила ракетницы"
         },
         {
-            "id": "attb20",
-            "key": "Rifle Power",
-            "value": "Сила лазера"
+            "id": "attb9",
+            "key": "Lucky",
+            "value": "Везение"
         },
         {
-            "id": "attb21",
-            "key": "Lucky items",
-            "value": "Везение(пред)"
+            "id": "attb10",
+            "key": "Piety",
+            "value": "Благочестие"
         },
         {
             "id": "ittm1",
@@ -3166,7 +3146,7 @@
             "value": "Magitech молот"
         },
         {
-            "id": "itdc10010",
+            "id": "itdc10024",
             "key": "Reinforced kick",
             "value": "Усиленный удар"
         },
@@ -3176,7 +3156,7 @@
             "value": "Magitech пистолет"
         },
         {
-            "id": "itdc10011",
+            "id": "itdc10023",
             "key": "It look doesn't bad",
             "value": "Это выглядит не плохо"
         },
@@ -3316,7 +3296,7 @@
             "value": "Тема Пара"
         },
         {
-            "id": "itdc15000",
+            "id": "itdc15003",
             "key": "Strictly limited as the theme",
             "value": "Строго лимитированая тема"
         },
@@ -3591,9 +3571,9 @@
             "value": "Топ 10 гильдий по уровню"
         },
         {
-            "id": null,
-            "key": "Top 10 guilds wealthy",
-            "value": "Топ 10 гильдий по золоту"
+            "id": "attb20",
+            "key": "Rifle Power",
+            "value": "Сила лазера"
         },
         {
             "id": null,
@@ -3601,9 +3581,9 @@
             "value": "Топ 10 игроков по уровню"
         },
         {
-            "id": null,
-            "key": "Top 10 players wealthy",
-            "value": "Топ 10 игроков по золоту"
+            "id": "attb21",
+            "key": "Lucky items",
+            "value": "Везение(пред)"
         },
         {
             "id": null,
@@ -4099,6 +4079,26 @@
             "id": null,
             "key": "Here you can see top server Guilds, Players.",
             "value": "Этo лyчшиe гильдии и игpoки cepвepa."
+        },
+        {
+            "id": null,
+            "key": "Top 10 guilds wealthy",
+            "value": "Топ 10 гильдий по золоту"
+        },
+        {
+            "id": "attb11",
+            "key": "Vampirism",
+            "value": "Вампиризм"
+        },
+        {
+            "id": "attb12",
+            "key": "Ammo Regen",
+            "value": "Ammo реген"
+        },
+        {
+            "id": null,
+            "key": "Top 10 players wealthy",
+            "value": "Топ 10 игроков по золоту"
         }
     ]
 }
