@@ -441,7 +441,7 @@ bool GuildCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, int Vote
 		if(DeleteDecorationHouse(DecoID))
 		{
 			CItemData& PlDecoItem = pPlayer->GetItem(DecoItemID);
-			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
+			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName());
 			PlDecoItem.Add(1);
 		}
 		GS()->StrongUpdateVotes(ClientID, MENU_GUILD_HOUSE_DECORATION);
@@ -742,7 +742,7 @@ void GuildCore::ShowDecorationList(CPlayer* pPlayer)
 		if (deco.second && deco.second->m_HouseID == HouseID)
 		{
 			GS()->AVD(ClientID, "DECOGUILDDELETE", deco.first, deco.second->m_DecoID, 1, "{STR}:{INT} back to the inventory",
-				GS()->GetItemInfo(deco.second->m_DecoID).GetName(pPlayer), deco.first);
+				GS()->GetItemInfo(deco.second->m_DecoID).GetName(), deco.first);
 		}
 	}
 }

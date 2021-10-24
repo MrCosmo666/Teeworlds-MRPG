@@ -257,7 +257,7 @@ bool CAccountCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 		{
 			const CItemData ItemData = it.second;
 			if (ItemData.Info().m_Type == ItemType::TYPE_SETTINGS && ItemData.m_Value > 0)
-				GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.m_Settings ? "Enable" : "Disable"), ItemData.Info().GetName(pPlayer));
+				GS()->AVM(ClientID, "ISETTINGS", it.first, TAB_SETTINGS, "[{STR}] {STR}", (ItemData.m_Settings ? "Enable" : "Disable"), ItemData.Info().GetName());
 		}
 
 		// equipment modules
@@ -270,9 +270,9 @@ bool CAccountCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 			if (ItemData.Info().m_Type == ItemType::TYPE_MODULE && ItemData.m_Value > 0)
 			{
 				char aAttributes[128];
-				ItemData.FormatAttributes(aAttributes, sizeof(aAttributes));
+				ItemData.FormatAttributes(pPlayer, aAttributes, sizeof(aAttributes));
 				GS()->AVMI(ClientID, ItemData.Info().GetIcon(), "ISETTINGS", it.first, TAB_SETTINGS_MODULES, "{STR} {STR}{STR}",
-					ItemData.Info().GetName(pPlayer), aAttributes, (ItemData.m_Settings ? "✔" : "\0"));
+					ItemData.Info().GetName(), aAttributes, (ItemData.m_Settings ? "✔" : "\0"));
 				IsFoundModules = true;
 			}
 		}
@@ -293,6 +293,13 @@ bool CAccountCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool Replace
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_LANGUAGES, "Here you can choose the language.");
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_LANGUAGES, "Note: translation is not complete.");
 		GS()->AV(ClientID, "null");
+
+		if(!GS()->IsMmoClient(ClientID))
+		{
+			GS()->AVL(ClientID, "null", "Text may be cropped due to Vanilla Teeworlds.");
+			GS()->AVL(ClientID, "null", "I recommend that you download the MRPG client.");
+			GS()->AV(ClientID, "null");
+		}
 
 		const char* pPlayerLanguage = pPlayer->GetLanguage();
 		GS()->AVH(ClientID, TAB_LANGUAGES, GRAY_COLOR, "Active language: [{STR}]", pPlayerLanguage);

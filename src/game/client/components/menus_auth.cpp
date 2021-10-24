@@ -34,6 +34,8 @@ void CMenus::OnAuthMessage(int MsgType, void* pRawMsg)
 			break;
 
 			case AUTH_LOGIN_GOOD:
+			if(!g_Config.m_ClSavePasswordMRPG)
+				mem_zero(g_Config.m_PasswordMRPG, sizeof(g_Config.m_PasswordMRPG));
 			SetAuthState(false);
 			setAuthMessage("The was completed successfully", EAuthColorMessage::SUCCESS_MESSAGE);
 			break;
@@ -44,6 +46,7 @@ void CMenus::OnAuthMessage(int MsgType, void* pRawMsg)
 			break;
 
 			case AUTH_LOGIN_WRONG:
+			mem_zero(g_Config.m_PasswordMRPG, sizeof(g_Config.m_PasswordMRPG));
 			setAuthMessage("Wrong login or password (#4)", EAuthColorMessage::ERROR_MESSAGE);
 			break;
 
@@ -86,45 +89,30 @@ void CMenus::RenderAuthWindow()
 
 	// --------------------- BACKGROUND --------------------------
 	// -----------------------------------------------------------
-
 	CUIRect MainBox;
-	{ // main
-		Basic.HMargin(170.0f, &MainBox);
-		MainBox.VMargin(25.0f, &MainBox);
-		RenderTools()->DrawUIRect(&MainBox, vec4(0.1f, 0.1f, 0.1f, 0.5f), CUI::CORNER_ALL, 5.0f);
-	}
+	Basic.HMargin(170.0f, &MainBox);
+	MainBox.VMargin(25.0f, &MainBox);
+	RenderTools()->DrawUIRect(&MainBox, vec4(0.1f, 0.1f, 0.1f, 0.5f), CUI::CORNER_ALL, 5.0f);
 
 	CUIRect BackLeft = BasicLeft;
-	{ // left
-		BasicLeft.HMargin(180.0f, &BackLeft);
-		BackLeft.Margin(5.0f, &BackLeft);
-		RenderTools()->DrawUIRect(&BackLeft, vec4(0.3f, 0.3f, 0.3f, 0.3f), CUI::CORNER_ALL, 5.0f);
-
-		BackLeft.HSplitTop(-32.0f, 0, &Label);
-		UI()->DoLabel(&Label, Localize("Rules"), 24.0f, CUI::ALIGN_LEFT);
-	}
+	BasicLeft.HMargin(180.0f, &BackLeft);
+	BackLeft.Margin(5.0f, &BackLeft);
+	RenderTools()->DrawUIRect(&BackLeft, vec4(0.3f, 0.3f, 0.3f, 0.3f), CUI::CORNER_ALL, 5.0f);
+	BackLeft.HSplitTop(-32.0f, 0, &Label);
+	UI()->DoLabel(&Label, Localize("Rules"), 24.0f, CUI::ALIGN_LEFT);
 
 	CUIRect BackRight = BasicRight;
-	{ // right
-		BasicRight.HMargin(180.0f, &BackRight);
-		BackRight.Margin(5.0f, &BackRight);
-		RenderTools()->DrawUIRect(&BackRight, vec4(0.3f, 0.3f, 0.3f, 0.3f), CUI::CORNER_ALL, 5.0f);
-
-		BackRight.HSplitTop(-32.0f, 0, &Label);
-		UI()->DoLabel(&Label, Localize("Account"), 24.0f, CUI::ALIGN_LEFT);
-	}
-
-
-	MainView.VMargin(5.0f, &MainView);
+	BasicRight.HMargin(180.0f, &BackRight);
+	BackRight.Margin(5.0f, &BackRight);
+	RenderTools()->DrawUIRect(&BackRight, vec4(0.3f, 0.3f, 0.3f, 0.3f), CUI::CORNER_ALL, 5.0f);
+	BackRight.HSplitTop(-32.0f, 0, &Label);
+	UI()->DoLabel(&Label, Localize("Account"), 24.0f, CUI::ALIGN_LEFT);
 
 	CUIRect Message, Button;
-	if (aAuthResultReason[0])
+	if (m_aAuthResultReason[0])
 	{
-		TextRender()->TextColor(aAuthResultColor.r, aAuthResultColor.g, aAuthResultColor.b, aAuthResultColor.a);
-
-		MainBox.HSplitTop(250.f, 0, &Message);
-		UI()->DoLabel(&Message, aAuthResultReason, 16.0f, CUI::ALIGN_CENTER, Message.w);
-		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+		MainBox.HSplitBottom(15.0f, 0, &Message);
+		UI()->DoLabelColored(&Message, m_aAuthResultReason, 20.0f, CUI::ALIGN_CENTER, m_AuthResultColor, -1);
 	}
 
 	// --------------------- RULES SIDE --------------------------
@@ -133,39 +121,34 @@ void CMenus::RenderAuthWindow()
 		// ----------------- BACKGROUND RULES ----------------
 		CUIRect BackRules;
 		BackLeft.Margin(5.0f, &BackRules);
-		RenderTools()->DrawUIRect(&BackRules, vec4(0.2f, 0.2f, 0.2f, 0.75f), CUI::CORNER_ALL, 5.0f);
+		RenderTools()->DrawUIRectMonochromeGradient(&BackRules, vec4(0.1f, 0.08f, 0.15f, 0.85f), CUI::CORNER_ALL, 5.0f);
 
 		// ------------------ RULES --------------------------
+		BackRules.Margin(5.0f, &BackRules);
 
 		// based
 		BackRules.HSplitTop(10.0f, &Label, &BackRules);
 		UI()->DoLabel(&Label, Localize("* This game mode will fully or partially support \nall vanilla players"), 14.0f, CUI::ALIGN_LEFT, -5.5f);
 
-		// information
-		BackRules.HSplitTop(20.0f, 0, &BackRules);
-		BackRules.HSplitTop(10.0f, &Label, &BackRules);
-		TextRender()->TextColor(0.6f, 1.0f, 0.6f, 1.0f);
-		UI()->DoLabel(&Label, Localize("Information:"), 16.0f, CUI::ALIGN_LEFT, -5.5f);
-
 		// rules
 		BackRules.HSplitTop(50.0f, 0, &BackRules);
 		BackRules.HSplitTop(10.0f, &Label, &BackRules);
-		TextRender()->TextColor(1.0f, 0.6f, 0.6f, 1.0f);
-		UI()->DoLabel(&Label, Localize("Rules on the server:"), 16.0f, CUI::ALIGN_LEFT, -5.5f);
+		UI()->DoLabelColored(&Label, Localize("Rules on the server:"), 16.0f, CUI::ALIGN_LEFT, vec4(1.0f, 0.35f, 0.35f, 1.0f ), -5.5f);
 
 		BackRules.HSplitTop(10.0f, 0, &BackRules);
 		BackRules.HSplitTop(10.0f, &Label, &BackRules);
-		TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+		TextRender()->TextSecondaryColor(0.3f, 0.3f, 0.3f, 0.3f);
 		UI()->DoLabel(&Label, Localize("- Don't use bugs\n"
 										"- Don't use bots and other hack soft\n"
 										"- Don't use dummy multi-account's\n"
 										"- Don't share self account data (login, password)\n"
 										"- Do not use ads, that is not part of the game"), 14.0f, CUI::ALIGN_LEFT);
+		TextRender()->TextSecondaryColor(CUI::ms_DefaultTextOutlineColor);
 
 		BackRules.HSplitTop(70.0f, 0, &BackRules);
 		BackRules.HSplitTop(20.0f, &Button, &BackRules);
 		static int s_AcceptedRules = 0;
-		if(DoButton_CheckBox(&s_AcceptedRules, Localize("I read it and agree!"), s_PlayerAcceptRules, &Button))
+		if(DoButton_CheckBox(&s_AcceptedRules, Localize("I agree with the rules"), s_PlayerAcceptRules, &Button))
 			s_PlayerAcceptRules ^= true;
 	}
 
@@ -180,91 +163,73 @@ void CMenus::RenderAuthWindow()
 		{ // left
 			CUIRect BackLogin;
 			BasicLogin.Margin(5.0f, &BackLogin);
-			RenderTools()->DrawUIRect(&BackLogin, vec4(0.17f, 0.52f, 0.12f, 0.5f), CUI::CORNER_ALL, 5.0f);
+			RenderTools()->DrawUIRectMonochromeGradient(&BackLogin, vec4(0.1f, 0.35f, 0.14f, 0.85f), CUI::CORNER_ALL, 5.0f);
 		}
 
 		{ // right
 			CUIRect BackRegister;
 			BasicRegister.Margin(5.0f, &BackRegister);
-			RenderTools()->DrawUIRect(&BackRegister, HexToRgba(0x147FF57), CUI::CORNER_ALL, 5.0f);
+			RenderTools()->DrawUIRectMonochromeGradient(&BackRegister, vec4(0.1f, 0.14f, 0.35f, 0.85f), CUI::CORNER_ALL, 5.0f);
 		}
 
-		BasicLogin.Margin(6.0f, &BasicLogin);
-		BasicRegister.Margin(6.0f, &BasicRegister);
+		BasicLogin.Margin(10.0f, &BasicLogin);
+		BasicRegister.Margin(10.0f, &BasicRegister);
 
 		// ------------------------------------------------------
 		// ----------------- LOGIN SIDE ( LEFT ) ----------------
 		// ------------------------------------------------------
 		{
-			BasicLogin.HSplitTop(25.0f, &Label, &BasicLogin);
-			UI()->DoLabel(&Label, Localize("Log in to account"), 16.0f, CUI::ALIGN_LEFT);
+			static float Space = 8.0f;
+			static float ButtonHeight = 22.0f;
 
-			BasicLogin.HSplitTop(15.0f, &Label, &BasicLogin);
-			UI()->DoLabel(&Label, Localize("Login"), 12.0f, CUI::ALIGN_LEFT);
-			{
-				static float s_OffsetUsername = 0.0f;
-				static int s_boxAccountLogin = 0;
-				BasicLogin.HSplitTop(25.0f, &Button, &BasicLogin);
-				DoEditBox(&s_boxAccountLogin, &Button, g_Config.m_AccountMRPG, sizeof(g_Config.m_AccountMRPG), Button.h * ms_FontmodHeight * 0.8f, &s_OffsetUsername);
-			}
-
-			BasicLogin.HSplitTop(10.0f, 0, &BasicLogin); // spacer
-			BasicLogin.HSplitTop(15.0f, &Label, &BasicLogin);
-			UI()->DoLabel(&Label, Localize("Password"), 12.0f, CUI::ALIGN_LEFT);
-			{
-				static float s_OffsetPassword = 0.0f;
-				static int s_boxPasswordLogin = 0;
-				BasicLogin.HSplitTop(25.0f, &Button, &BasicLogin);
-				DoEditBox(&s_boxPasswordLogin, &Button, g_Config.m_PasswordMRPG, sizeof(g_Config.m_PasswordMRPG), Button.h* ms_FontmodHeight * 0.8f, &s_OffsetPassword, true);
-			}
-
-			BasicLogin.HSplitTop(60.0f, 0, &BasicLogin); // spacer
-			BasicLogin.HSplitTop(25.0f, &Button, &BasicLogin);
+			BasicLogin.HSplitBottom(ButtonHeight, 0, &Button);
 			static CButtonContainer s_LoginButton;
 			if(DoButton_Menu(&s_LoginButton, Localize("Join"), 0, &Button, 0, CUI::CORNER_ALL, 2.5f, 0.0f, vec4(1.0f, 1.0f, 1.0f, 0.75f), true))
 				m_pClient->SendAuthPack(g_Config.m_AccountMRPG, g_Config.m_PasswordMRPG, false);
+
+			vec4 ShadowColor(0.85f, 0.85f, 0.85f, 1.0f);
+			BasicLogin.HSplitTop(25.0f, &Label, &BasicLogin);
+			UI()->DoLabel(&Label, Localize("Log in to account"), 16.0f, CUI::ALIGN_LEFT);
+			RenderTools()->DrawUIRectLine(&BasicLogin, vec4(0.0f, 0.0f, 0.0f, 0.3f));
+
+			BasicLogin.HSplitTop(Space, 0, &BasicLogin);
+			BasicLogin.HSplitTop(15.0f, &Label, &BasicLogin);
+			UI()->DoLabelColored(&Label, Localize("Login"), 12.0f, CUI::ALIGN_LEFT, ShadowColor);
+			{
+				static float s_OffsetUsername = 0.0f;
+				static int s_boxAccountLogin = 0;
+				BasicLogin.HSplitTop(ButtonHeight, &Button, &BasicLogin);
+				DoEditBox(&s_boxAccountLogin, &Button, g_Config.m_AccountMRPG, sizeof(g_Config.m_AccountMRPG), Button.h * ms_FontmodHeight * 0.8f, &s_OffsetUsername);
+			}
+
+			BasicLogin.HSplitTop(Space, 0, &BasicLogin);
+			BasicLogin.HSplitTop(15.0f, &Label, &BasicLogin);
+			UI()->DoLabelColored(&Label, Localize("Password"), 12.0f, CUI::ALIGN_LEFT, ShadowColor);
+			{
+				static float s_OffsetPassword = 0.0f;
+				static int s_boxPasswordLogin = 0;
+				BasicLogin.HSplitTop(ButtonHeight, &Button, &BasicLogin);
+				DoEditBox(&s_boxPasswordLogin, &Button, g_Config.m_PasswordMRPG, sizeof(g_Config.m_PasswordMRPG), Button.h* ms_FontmodHeight * 0.8f, &s_OffsetPassword, true);
+			}
+
+			BasicLogin.HSplitTop(Space, 0, &BasicLogin);
+			BasicLogin.HSplitTop(ButtonHeight - 5.0f, &Button, &BasicLogin);
+			static int s_ButtonSavePassword = 0;
+			if(DoButton_CheckBox(&s_ButtonSavePassword, Localize("Save password"), g_Config.m_ClSavePasswordMRPG, &Button))
+				g_Config.m_ClSavePasswordMRPG ^= 1;
 		}
 
 		// ----------------------------------------------------------
 		// ----------------- REGISTER SIDE ( RIGHT ) ----------------
 		// ----------------------------------------------------------
 		{
-			BasicRegister.HSplitTop(25.0f, &Label, &BasicRegister);
-			UI()->DoLabel(&Label, Localize("Register account"), 16.0f, CUI::ALIGN_LEFT);
-
 			static char s_aAccount[64];
 			static char s_aPassword[64];
 			static char s_aRepeatPassword[64];
-
-			BasicRegister.HSplitTop(15.0f, &Label, &BasicRegister);
-			UI()->DoLabel(&Label, Localize("Login"), 12.0f, CUI::ALIGN_LEFT);
-			BasicRegister.HSplitTop(25.0f, &Button, &BasicRegister);
-			{
-				static float s_OffsetUsername = 0.0f;
-				static int s_boxAccountLogin = 0;
-				DoEditBox(&s_boxAccountLogin, &Button, s_aAccount, sizeof(s_aAccount), Button.h * ms_FontmodHeight * 0.8f, &s_OffsetUsername);
-			}
-
-			BasicRegister.HSplitTop(10.0f, 0, &BasicRegister); // spacer
-			BasicRegister.HSplitTop(15.0f, &Label, &BasicRegister);
-			UI()->DoLabel(&Label, Localize("Password"), 12.0f, CUI::ALIGN_LEFT);
-			BasicRegister.HSplitTop(25.0f, &Button, &BasicRegister);
-			{
-				static float s_OffsetPassword = 0.0f;
-				DoEditBox(&s_aPassword, &Button, s_aPassword, sizeof(s_aPassword), Button.h * ms_FontmodHeight * 0.8f, &s_OffsetPassword, true);
-			}
-
-			BasicRegister.HSplitTop(10.0f, 0, &BasicRegister); // spacer
-			BasicRegister.HSplitTop(15.0f, &Label, &BasicRegister);
-			UI()->DoLabel(&Label, Localize("Repeat password"), 12.0f, CUI::ALIGN_LEFT);
-			BasicRegister.HSplitTop(25.0f, &Button, &BasicRegister);
-			{
-				static float s_OffsetRepeatPassword = 0.0f;
-				DoEditBox(&s_aRepeatPassword, &Button, s_aRepeatPassword, sizeof(s_aRepeatPassword), Button.h * ms_FontmodHeight * 0.8f, &s_OffsetRepeatPassword, true);
-			}
-
-			BasicRegister.HSplitTop(10.0f, 0, &BasicRegister); // spacer
-			BasicRegister.HSplitTop(25.0f, &Button, &BasicRegister);
+			static float Space = 8.0f;
+			static float ButtonHeight = 22.0f;
+			
+			BasicRegister.HSplitBottom(ButtonHeight, 0, &Button);
 			static CButtonContainer s_LoginButton;
 			if(DoButton_Menu(&s_LoginButton, Localize("Register"), 0, &Button, 0, CUI::CORNER_ALL, 2.5f, 0.0f, vec4(1.0f, 1.0f, 1.0f, 0.75f), true))
 			{
@@ -283,6 +248,39 @@ void CMenus::RenderAuthWindow()
 					mem_zero(s_aRepeatPassword, sizeof(s_aRepeatPassword));
 				}
 			}
+
+			BasicRegister.HSplitTop(25.0f, &Label, &BasicRegister);
+			UI()->DoLabel(&Label, Localize("Register account"), 16.0f, CUI::ALIGN_LEFT);
+			RenderTools()->DrawUIRectLine(&BasicRegister, vec4(0.0f, 0.0f, 0.0f, 0.3f));
+
+			vec4 ShadowColor(0.85f, 0.85f, 0.85f, 1.0f);
+			BasicRegister.HSplitTop(Space, 0, &BasicRegister);
+			BasicRegister.HSplitTop(15.0f, &Label, &BasicRegister);
+			UI()->DoLabelColored(&Label, Localize("Login"), 12.0f, CUI::ALIGN_LEFT, ShadowColor);
+			{
+				static float s_OffsetUsername = 0.0f;
+				static int s_boxAccountLogin = 0;
+				BasicRegister.HSplitTop(ButtonHeight, &Button, &BasicRegister);
+				DoEditBox(&s_boxAccountLogin, &Button, s_aAccount, sizeof(s_aAccount), Button.h * ms_FontmodHeight * 0.8f, &s_OffsetUsername);
+			}
+
+			BasicRegister.HSplitTop(Space, 0, &BasicRegister);
+			BasicRegister.HSplitTop(15.0f, &Label, &BasicRegister);
+			UI()->DoLabelColored(&Label, Localize("Password"), 12.0f, CUI::ALIGN_LEFT, ShadowColor);
+			{
+				static float s_OffsetPassword = 0.0f;
+				BasicRegister.HSplitTop(ButtonHeight, &Button, &BasicRegister);
+				DoEditBox(&s_aPassword, &Button, s_aPassword, sizeof(s_aPassword), Button.h * ms_FontmodHeight * 0.8f, &s_OffsetPassword, true);
+			}
+
+			BasicRegister.HSplitTop(Space, 0, &BasicRegister);
+			BasicRegister.HSplitTop(15.0f, &Label, &BasicRegister);
+			UI()->DoLabelColored(&Label, Localize("Repeat password"), 12.0f, CUI::ALIGN_LEFT, ShadowColor);
+			{
+				static float s_OffsetRepeatPassword = 0.0f;
+				BasicRegister.HSplitTop(ButtonHeight, &Button, &BasicRegister);
+				DoEditBox(&s_aRepeatPassword, &Button, s_aRepeatPassword, sizeof(s_aRepeatPassword), Button.h * ms_FontmodHeight * 0.8f, &s_OffsetRepeatPassword, true);
+			}
 		}
 	}
 
@@ -296,22 +294,22 @@ void CMenus::RenderAuthWindow()
 
 void CMenus::setAuthMessage(const char* Message, int EAuthColorMessage)
 {
-	str_copy(aAuthResultReason, Message, sizeof(aAuthResultReason));
+	str_copy(m_aAuthResultReason, Message, sizeof(m_aAuthResultReason));
 
 	switch(EAuthColorMessage)
 	{
 		// red default
 		default:
 		case EAuthColorMessage::ERROR_MESSAGE:
-		aAuthResultColor = vec4(1.0f, 0.5f, 0.5f, 1.0f);
+		m_AuthResultColor = vec4(1.0f, 0.15f, 0.15f, 1.0f);
 		break;
 
 		case EAuthColorMessage::WARNING_MESSAGE:
-		aAuthResultColor = vec4(1.0f, 0.5f, 0.0f, 1.0f);
+		m_AuthResultColor = vec4(1.0f, 0.5f, 0.0f, 1.0f);
 		break;
 
 		case EAuthColorMessage::SUCCESS_MESSAGE:
-		aAuthResultColor = vec4(0.5f, 1.0f, 0.5f, 1.0f);
+		m_AuthResultColor = vec4(0.35f, 1.0f, 0.35f, 1.0f);
 		break;
 	}
 }

@@ -201,7 +201,7 @@ bool CCharacter::DecoInteractive()
 			const int HouseID = GS()->Mmo()->House()->PlayerHouseID(m_pPlayer);
 			if (GS()->Mmo()->House()->AddDecorationHouse(DecoID, HouseID, GetMousePos()))
 			{
-				GS()->Chat(ClientID, "You added {STR}, to your house!", GS()->GetItemInfo(DecoID).GetName(m_pPlayer));
+				GS()->Chat(ClientID, "You added {STR}, to your house!", GS()->GetItemInfo(DecoID).GetName());
 				m_pPlayer->GetItem(DecoID).Remove(1);
 				GS()->ResetVotes(ClientID, MenuList::MENU_HOUSE_DECORATION);
 				return true;
@@ -212,7 +212,7 @@ bool CCharacter::DecoInteractive()
 			const int GuildID = m_pPlayer->Acc().m_GuildID;
 			if (GS()->Mmo()->Member()->AddDecorationHouse(DecoID, GuildID, GetMousePos()))
 			{
-				GS()->Chat(ClientID, "You added {STR}, to your guild house!", GS()->GetItemInfo(DecoID).GetName(m_pPlayer));
+				GS()->Chat(ClientID, "You added {STR}, to your guild house!", GS()->GetItemInfo(DecoID).GetName());
 				m_pPlayer->GetItem(DecoID).Remove(1);
 				GS()->ResetVotes(ClientID, MenuList::MENU_GUILD_HOUSE_DECORATION);
 				return true;

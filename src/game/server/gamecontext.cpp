@@ -345,7 +345,7 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 	{
 		// send discord chat only from players
 		if(ChatterClientID < MAX_PLAYERS)
-			ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
+			Server()->SendDiscordMessage(g_Config.m_SvDiscordServerChatChannel, DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
 
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
 	}
@@ -360,7 +360,7 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 
 		// send discord chat only from players
 		if(pChatterPlayer)
-			ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
+			Server()->SendDiscordMessage(g_Config.m_SvDiscordServerChatChannel, DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
 
 		// pack one for the recording only
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOSEND, -1);
@@ -1022,7 +1022,7 @@ void CGS::OnConsoleInit()
 	Console()->Register("disband_guild", "r[guildname]", CFGFLAG_SERVER, ConDisbandGuild, m_pServer, "Disband the guild with the name");
 	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, m_pServer, "Say in chat");
 	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, m_pServer, "(Warning) Add new bot on database or update if finding <clientid> <bot name>");
-	Console()->Register("dump_dialogs_for_translate", "", CFGFLAG_SERVER, ConDumpDialogsForTranslate, m_pServer, "Perform dump dialogs for future translation to translation files");
+	Console()->Register("sync_lines_for_translate", "", CFGFLAG_SERVER, ConSyncLinesForTranslate, m_pServer, "Perform sync lines in translated files. Order non updated translated to up");
 }
 
 void CGS::OnTick()
@@ -1627,13 +1627,13 @@ void CGS::ConAddCharacter(IConsole::IResult *pResult, void *pUserData)
 }
 
 // dump dialogs for translate
-void CGS::ConDumpDialogsForTranslate(IConsole::IResult* pResult, void* pUserData)
+void CGS::ConSyncLinesForTranslate(IConsole::IResult* pResult, void* pUserData)
 {
 	IServer* pServer = (IServer*)pUserData;
 	CGS* pSelf = (CGS*)pServer->GameServer();
 
 	// dump
-	pSelf->Mmo()->BotsData()->ConDumpDialogsForTranslate();
+	std::thread(&MmoController::ConSyncLinesForTranslate, pSelf->m_pMmoController).detach();
 }
 
 void CGS::ConchainSpecialMotdupdate(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
@@ -1683,7 +1683,7 @@ void CGS::AV(int ClientID, const char *pCmd, const char *pDesc, const int TempIn
 	if(ClientID < 0 || ClientID >= MAX_PLAYERS || !m_apPlayers[ClientID])
 		return;
 
-	char aBufDesc[128]; // buffer x2 with unicode
+	char aBufDesc[512]; // buffer x2 with unicode
 	str_copy(aBufDesc, pDesc, sizeof(aBufDesc));
 	if(str_comp(m_apPlayers[ClientID]->GetLanguage(), "ru") == 0 || str_comp(m_apPlayers[ClientID]->GetLanguage(), "uk") == 0)
 		str_translation_utf8_to_cp(aBufDesc);
@@ -2079,8 +2079,8 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 
 				const float Chance = mobs.second.m_aRandomItem[i];
 				CItemDataInfo &InfoDropItem = GetItemInfo(mobs.second.m_aDropItem[i]);
-				str_format(aBuf, sizeof(aBuf), "%sx%d - chance to loot %0.2f%%(+%0.2f%%)", InfoDropItem.GetName(pPlayer), mobs.second.m_aValueItem[i], Chance, AddedChanceDrop);
-				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, "{STR}", aBuf);
+				str_format(aBuf, sizeof(aBuf), "x%d - chance to loot %0.2f%%(+%0.2f%%)", mobs.second.m_aValueItem[i], Chance, AddedChanceDrop);
+				AVMI(ClientID, InfoDropItem.GetIcon(), "null", NOPE, HideID, "{STR}{STR}", InfoDropItem.GetName(), aBuf);
 				FoundedBots = true;
 			}
 		}

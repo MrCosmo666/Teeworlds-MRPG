@@ -77,7 +77,7 @@ void CJobItems::MiningWork(int ClientID, CPlayer* pPlayer, CItemData& pWorkedIte
 
 	if(pPlayer->Acc().m_aMining[JOB_LEVEL].m_Value < m_Level)
 	{
-		GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pWorkedItem.Info().GetName(pPlayer), m_Level);
+		GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pWorkedItem.Info().GetName(), m_Level);
 		return;
 	}
 
@@ -96,8 +96,8 @@ void CJobItems::MiningWork(int ClientID, CPlayer* pPlayer, CItemData& pWorkedIte
 	GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
 	GS()->Broadcast(ClientID, BroadcastPriority::GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P] : {STR} ({INT}/100%)",
-		pWorkedItem.Info().GetName(pPlayer), (m_TotalDamage > m_Health ? m_Health : m_TotalDamage), m_Health,
-		pEquippedPickaxe.Info().GetName(pPlayer), Durability);
+		pWorkedItem.Info().GetName(), (m_TotalDamage > m_Health ? m_Health : m_TotalDamage), m_Health,
+		pEquippedPickaxe.Info().GetName(), Durability);
 
 	if(m_TotalDamage >= m_Health)
 	{
@@ -111,7 +111,7 @@ void CJobItems::FarmingWork(int ClientID, CPlayer* pPlayer, CItemData& pWorkedIt
 {
 	if(pPlayer->Acc().m_aFarming[JOB_LEVEL].m_Value < m_Level)
 	{
-		GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pWorkedItem.Info().GetName(pPlayer), m_Level);
+		GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Your level low. {STR} {INT} Level", pWorkedItem.Info().GetName(), m_Level);
 		return;
 	}
 
@@ -119,7 +119,7 @@ void CJobItems::FarmingWork(int ClientID, CPlayer* pPlayer, CItemData& pWorkedIt
 	GS()->CreateSound(m_Pos, 20, CmaskOne(ClientID));
 
 	GS()->Broadcast(ClientID, BroadcastPriority::GAME_INFORMATION, 100, "{STR} [{INT}/{INT}P]",
-		pWorkedItem.Info().GetName(pPlayer), (m_TotalDamage > m_Health ? m_Health : m_TotalDamage), m_Health);
+		pWorkedItem.Info().GetName(), (m_TotalDamage > m_Health ? m_Health : m_TotalDamage), m_Health);
 
 	if(m_TotalDamage >= m_Health)
 	{

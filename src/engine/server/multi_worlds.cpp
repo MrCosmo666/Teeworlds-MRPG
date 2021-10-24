@@ -44,7 +44,7 @@ bool CMultiWorlds::LoadWorlds(IServer* pServer, IKernel* pKernel, IStorageEngine
 	const IOHANDLE File = pStorage->OpenFile(aFileBuf, IOFLAG_READ, IStorageEngine::TYPE_ALL);
 	if(!File)
 	{
-		pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "worlds.json", "Probably deleted or error when the file is invalid.");
+		pConsole->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "maps/worlds.json", "Probably deleted or error when the file is invalid.");
 		return false;
 	}
 	

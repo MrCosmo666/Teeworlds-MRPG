@@ -24,6 +24,11 @@
 #include "Components/Storages/StorageCore.h"
 #include "Components/Worlds/WorldSwapCore.h"
 
+#include <teeother/components/localization.h>
+#include <teeother/tl/nlohmann_json.h>
+
+#include <mutex>
+
 MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 {
 	// order
@@ -325,4 +330,132 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID) const
 			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Gold {INT}", Rank, Nick, Gold);
 		}
 	}
+}
+
+// dump dialogs for translate
+void MmoController::ConSyncLinesForTranslate()
+{
+	static std::mutex ms_MutexDump;
+	if(!ms_MutexDump.try_lock())
+	{
+		GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "sync_lines", "Wait the last operation is in progress..");
+		return;
+	}
+	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "sync_lines", "Start of thread data collection for translation!");
+
+	auto PushingDialogs = [](nlohmann::json& pJson, const char* pTextKey, const char* HashingType, int HashingByID)
+	{
+		if(pTextKey[0] == '\0')
+			return;
+
+		std::string Hashing(HashingType + std::to_string(HashingByID));
+		try
+		{
+			for(auto& pKeys : pJson["translation"])
+			{
+				if(!pKeys["key"].is_string() || !pKeys["value"].is_string())
+					continue;
+
+				if(pKeys["id"].is_string() && pKeys.value("id", "0") == Hashing)
+				{
+					if(pKeys.value("key", "0") != pTextKey)
+						pKeys["key"] = pKeys["value"] = pTextKey;
+					return;
+				}
+				else if(pKeys.value("key", "0") == pTextKey)
+				{
+					pKeys["id"] = Hashing.c_str();
+					return;
+				}
+			}
+			pJson["translation"].push_back({ { "key", pTextKey }, { "value", pTextKey }, { "id", Hashing.c_str() }});
+		}
+		catch(nlohmann::json::exception& e)
+		{
+			dbg_msg("sync_lines", "%s", e.what());
+		}
+	};
+
+	char aDirLanguageFile[256];
+	for(int i = 0; i < GS()->Server()->Localization()->m_pLanguages.size(); i++)
+	{
+		str_format(aDirLanguageFile, sizeof(aDirLanguageFile), "server_lang/%s.json", GS()->Server()->Localization()->m_pLanguages[i]->GetFilename());
+		IOHANDLE File = io_open(aDirLanguageFile, IOFLAG_READ);
+		if(!File)
+			continue;
+
+		const int FileSize = (int)io_length(File) + 1;
+		char* pFileData = (char*)malloc(FileSize);
+		mem_zero(pFileData, FileSize);
+		io_read(File, pFileData, FileSize);
+
+		// close and clear
+		nlohmann::json JsonData = nlohmann::json::parse(pFileData);
+		mem_free(pFileData);
+		io_close(File);
+
+		// insert database lines
+		for(auto& pItem : QuestBotInfo::ms_aQuestBot)
+		{
+			int DialogNum = 0;
+			std::string UniqueID("diaqu" + std::to_string(pItem.first));
+			for(auto& pDialog : pItem.second.m_aDialog)
+				PushingDialogs(JsonData, pDialog.m_aText, UniqueID.c_str(), DialogNum++);
+		}
+		for(auto& pItem : NpcBotInfo::ms_aNpcBot)
+		{
+			int DialogNum = 0;
+			std::string UniqueID("dianp" + std::to_string(pItem.first));
+			for(auto& pDialog : pItem.second.m_aDialog)
+				PushingDialogs(JsonData, pDialog.m_aText, UniqueID.c_str(), DialogNum++);
+		}
+		for(auto& pItem : CAetherData::ms_aTeleport)
+		{
+			PushingDialogs(JsonData, pItem.second.m_aName, "aeth", pItem.first);
+		}
+		for(auto& pItem : CGS::ms_aAttributsInfo)
+		{
+			PushingDialogs(JsonData, pItem.second.m_aName, "attb", pItem.first);
+		}
+		for(auto& pItem : CItemDataInfo::ms_aItemsInfo)
+		{
+			PushingDialogs(JsonData, pItem.second.m_aName, "ittm", pItem.first);
+			PushingDialogs(JsonData, pItem.second.m_aDesc, "itdc", pItem.first);
+		}
+		for(auto& pItem : CSkillDataInfo::ms_aSkillsData)
+		{
+			PushingDialogs(JsonData, pItem.second.m_aName, "sknm", pItem.first);
+			PushingDialogs(JsonData, pItem.second.m_aDesc, "skds", pItem.first);
+			PushingDialogs(JsonData, pItem.second.m_aBonusName, "skbn", pItem.first);
+		}
+		for(auto& pItem : CQuestDataInfo::ms_aDataQuests)
+		{
+			PushingDialogs(JsonData, pItem.second.m_aName, "qudn", pItem.first);
+			PushingDialogs(JsonData, pItem.second.m_aStoryLine, "qusn", pItem.first);
+		}
+		for(auto& pItem : CStorageData::ms_aStorage)
+		{
+			PushingDialogs(JsonData, pItem.second.m_aName, "stnm", pItem.first);
+		}
+		for(auto& pItem : CHouseData::ms_aHouse)
+		{
+			PushingDialogs(JsonData, pItem.second.m_aClass, "hmnm", pItem.first);
+		}
+
+		// order non updated translated to up
+		std::sort(JsonData["translation"].begin(), JsonData["translation"].end(), [](nlohmann::json& pA, nlohmann::json& pB) 
+		{ return pA["key"] == pA["value"] && pB["key"] != pB["value"]; });
+
+		// save file
+		File = io_open(aDirLanguageFile, IOFLAG_WRITE);
+		if(!File)
+			continue;
+
+		std::string Data = JsonData.dump(4);
+		io_write(File, Data.c_str(), Data.length());
+		io_close(File);
+	}
+
+	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "sync_lines", "Completed successfully!");
+	ms_MutexDump.unlock();
 }

@@ -439,7 +439,6 @@ bool CMenus::DoEditBoxUTF8(void* pID, const CUIRect * pRect, char* pStr, unsigne
 
 		if(UI()->LastActiveItem() == pID && UI()->Enabled())
 		{
-			m_ActiveEditbox = true;
 			for(int i = 0; i < Input()->NumEvents(); i++)
 			{
 				Len = str_length(pStr);
@@ -450,7 +449,6 @@ bool CMenus::DoEditBoxUTF8(void* pID, const CUIRect * pRect, char* pStr, unsigne
 	}
 
 	bool JustGotActive = false;
-
 	if(UI()->CheckActiveItem(pID))
 	{
 		if(!UI()->MouseButton(0))
@@ -533,6 +531,7 @@ bool CMenus::DoEditBoxUTF8(void* pID, const CUIRect * pRect, char* pStr, unsigne
 	{
 		// set cursor active
 		m_CursorActive = true;
+		m_ActiveEditbox = true;
 
 		if((2 * time_get() / time_freq()) % 2)	// make it blink
 		{
@@ -2177,7 +2176,7 @@ void CMenus::SetAuthState(bool ShowWindowAuth)
 		m_pClient->m_pSounds->Stop(SOUND_MUSIC_MRPG_FESTIVAL);
 
 	SetActive(MENU_NO_ACTIVE);
-	mem_zero(aAuthResultReason, sizeof(aAuthResultReason));
+	mem_zero(m_aAuthResultReason, sizeof(m_aAuthResultReason));
 }
 
 void CMenus::SetActive(int ActiveID)
@@ -2218,7 +2217,7 @@ void CMenus::OnReset()
 	m_pClient->m_pSounds->Stop(SOUND_MUSIC_MRPG_FESTIVAL);
 	m_ShowAuthWindow = false;
 	m_MenuActiveID = MENU_NO_ACTIVE;
-	mem_zero(aAuthResultReason, sizeof(aAuthResultReason));
+	mem_zero(m_aAuthResultReason, sizeof(m_aAuthResultReason));
 }
 
 bool CMenus::OnCursorMove(float x, float y, int CursorType)
@@ -2422,7 +2421,6 @@ void CMenus::OnRender()
 	m_DeletePressed = false;
 	m_UpArrowPressed = false;
 	m_DownArrowPressed = false;
-	m_ActiveEditbox = false;
 }
 
 bool CMenus::CheckHotKey(int Key) const

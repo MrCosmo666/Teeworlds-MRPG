@@ -1,2168 +1,4104 @@
 {
     "translation": [
         {
-            "key": "The main menu will return as soon as you leave this zone!",
-            "value": "Мeню вернется после выхода из зоны!"
+            "id": "qudn21",
+            "key": "Abandoned mine",
+            "value": "Abandoned mine"
         },
         {
-            "key": "Hi, {STR} Last log in {STR}",
-            "value": "Пpивeт, {STR} Вxoд {STR}"
+            "id": "itdc48",
+            "key": "It happens sometimes",
+            "value": "It happens sometimes"
         },
         {
-            "key": "Level {INT} : Exp {INT}/{INT}",
-            "value": "Уровень {INT} : Опыт {INT}/{INT}"
+            "id": "ittm28",
+            "key": "Small ammo bag",
+            "value": "Small ammo bag"
         },
         {
-            "key": "Skill Point {INT}SP",
-            "value": "Очки навыков {INT}SP"
+            "id": "itdc49",
+            "key": "Adds a small amount of ammunition",
+            "value": "Adds a small amount of ammunition"
         },
         {
-            "key": "Gold: {INT}",
-            "value": "Золото: {INT}"
+            "id": "ittm29",
+            "key": "Gel",
+            "value": "Gel"
         },
         {
-            "key": "☪ SUB MENU PERSONAL",
-            "value": "☪ ПЕРСОНАЛЬНОЕ МЕНЮ"
+            "id": "itdc29",
+            "key": "I wonder what it's for?",
+            "value": "I wonder what it's for?"
         },
         {
-            "key": "Inventory",
-            "value": "Инвентарь"
+            "id": "ittm30",
+            "key": "Goblin Ingot",
+            "value": "Goblin Ingot"
         },
         {
-            "key": "Equipment",
-            "value": "Снаряжение"
+            "id": "itdc46",
+            "key": "Information added later.",
+            "value": "Information added later."
         },
         {
-            "key": "Upgrades({INT}p)",
-            "value": "Улучшения({INT}p)"
+            "id": "ittm31",
+            "key": "Copper Ingot",
+            "value": "Copper Ingot"
         },
         {
-            "key": "Dungeons",
-            "value": "Темницы"
+            "id": "itdc31",
+            "key": "Information added later.",
+            "value": "Information added later."
         },
         {
-            "key": "Settings",
-            "value": "Настройки"
+            "id": "ittm32",
+            "key": "Salantra Blessing",
+            "value": "Salantra Blessing"
         },
         {
-            "key": "Mailbox",
-            "value": "Почтовый ящик"
+            "id": "itdc32",
+            "key": "It happens sometimes",
+            "value": "It happens sometimes"
         },
         {
-            "key": "Journal",
-            "value": "Журнал"
+            "id": "ittm33",
+            "key": "Explosive module for gun",
+            "value": "Explosive module for gun"
         },
         {
-            "key": "Guild",
-            "value": "Гильдия"
+            "id": "itdc33",
+            "key": "It happens sometimes",
+            "value": "It happens sometimes"
         },
         {
-            "key": "Guild finder",
-            "value": "Поиск гильдии"
+            "id": "ittm34",
+            "key": "Explosive module for shotgun",
+            "value": "Explosive module for shotgun"
         },
         {
-            "key": "House",
-            "value": "Дом"
+            "id": "itdc34",
+            "key": "It happens sometimes",
+            "value": "It happens sometimes"
         },
         {
-            "key": "√ SUB MENU INFORMATION",
-            "value": "√ МЕНЮ ИНФОРМАЦИИ"
+            "id": "ittm35",
+            "key": "Kappa meat",
+            "value": "Kappa meat"
         },
         {
-            "key": "Loots, mobs on your zone",
-            "value": "Лут, мобы в твоей зоне"
+            "id": "itdc35",
+            "key": "Information added later.",
+            "value": "Information added later."
         },
         {
-            "key": "Ranking guilds and players",
-            "value": "Рейтинг гильдий и игроков"
+            "id": "ittm36",
+            "key": "Ring of Arvida",
+            "value": "Ring of Arvida"
         },
         {
-            "key": "Upgrades Information",
-            "value": "Улучшения инфо"
+            "id": "itdc36",
+            "key": "It happens sometimes",
+            "value": "It happens sometimes"
         },
         {
-            "key": "Select upgrades type in Reason, write count.",
-            "value": "В причину можно написать кол-во"
+            "id": "ittm37",
+            "key": "Relic of the Orc Lord",
+            "value": "Relic of the Orc Lord"
         },
         {
-            "key": "Disciple of War. Level Power {INT}",
-            "value": "Yчeнuк вoйны. Ypoвeнь moщu {INT}"
+            "id": "itdc37",
+            "key": "Information added later.",
+            "value": "Information added later."
         },
         {
-            "key": "Disciple of Tank. Level Power {INT}",
-            "value": "Yчeнuк тaнкa. Ypoвeнь moщu {INT}"
+            "id": "ittm38",
+            "key": "Ticket reset class stats",
+            "value": "Ticket reset class stats"
         },
         {
-            "key": "Disciple of Healer. Level Power {INT}",
-            "value": "Yчeнuк цeлuтeля. Ypoвeнь moщu {INT}"
+            "id": "itdc38",
+            "key": "Resets only class stats(Dps, Tank, Healer).",
+            "value": "Resets only class stats(Dps, Tank, Healer)."
         },
         {
-            "key": "Disciple of Jobs",
-            "value": "Paбoчиe нaвыки"
+            "id": "ittm39",
+            "key": "Mode PVP",
+            "value": "Mode PVP"
         },
         {
-            "key": "{STR} {INT}P (Price {INT}P)",
-            "value": "{STR} {INT}P (Цена {INT}P)"
+            "id": "itdc39",
+            "key": "Settings game.",
+            "value": "Settings game."
         },
         {
-            "key": "Top list Information",
-            "value": "Рейтинг инфо"
+            "id": "ittm40",
+            "key": "Ticket reset weapon stats",
+            "value": "Ticket reset weapon stats"
         },
         {
-            "key": "Here you can see top server Guilds, Players.",
-            "value": "Этo лyчшиe гильдии и игpoки cepвepa."
+            "id": "itdc40",
+            "key": "Resets only ammo stats(Ammo).",
+            "value": "Resets only ammo stats(Ammo)."
         },
         {
-            "key": "Top 10 guilds leveling",
-            "value": "Топ 10 гильдий по уровню"
+            "id": "ittm41",
+            "key": "Orc's Belt",
+            "value": "Orc's Belt"
         },
         {
-            "key": "Top 10 guilds wealthy",
-            "value": "Топ 10 гильдий по золоту"
+            "id": "itdc41",
+            "key": "You can feel the light power of mana.",
+            "value": "You can feel the light power of mana."
         },
         {
-            "key": "Top 10 players leveling",
-            "value": "Топ 10 игроков по уровню"
+            "id": "ittm42",
+            "key": "Torn cloth clothes of orcs",
+            "value": "Torn cloth clothes of orcs"
         },
         {
-            "key": "Top 10 players wealthy",
-            "value": "Топ 10 игроков по золоту"
+            "id": "itdc42",
+            "key": "Information added later.",
+            "value": "Information added later."
         },
         {
-            "key": "Chance & Loot Information",
-            "value": "Инфopмaция o шaнcax и дoбычe"
+            "id": "ittm43",
+            "key": "Blessing for discount craft",
+            "value": "Blessing for discount craft"
         },
         {
-            "key": "There are no active mobs in your zone!",
-            "value": "В вашей зоне нет активных мобов!"
+            "id": "itdc43",
+            "key": "Need dress it, -20% craft price",
+            "value": "Need dress it, -20% craft price"
         },
         {
-            "key": "Backpage",
-            "value": "Вернутся"
+            "id": "ittm44",
+            "key": "Noctis fragment",
+            "value": "Noctis fragment"
         },
         {
-            "key": "Player Stats {STR}",
-            "value": "Статистика игрока {STR}"
+            "id": "itdc44",
+            "key": "Event Final Fantasy.",
+            "value": "Event Final Fantasy."
         },
         {
-            "key": "Player Upgrade Point: {INT}P",
-            "value": "Очки улучшений: {INT}P"
+            "id": "ittm45",
+            "key": "The core of Neptune",
+            "value": "The core of Neptune"
         },
         {
-            "key": "You have {INT} {STR}",
-            "value": "У вас {INT} {STR}"
+            "id": "itdc45",
+            "key": "Information added later.",
+            "value": "Information added later."
         },
         {
-            "key": "Use it when you're not dead!",
-            "value": "Используйте это когда вы живы!"
+            "id": "ittm46",
+            "key": "Remains of a dead soul",
+            "value": "Remains of a dead soul"
         },
         {
-            "key": "Level UP. Now Level {INT}!",
-            "value": "Уровень повышен. Уровень {INT}!"
+            "id": "itdc46",
+            "key": "Information added later.",
+            "value": "Information added later."
         },
         {
-            "key": "Press 'F4' to continue the dialog!",
-            "value": "Нажми 'F4' для продолжения диалога!"
+            "id": "ittm47",
+            "key": "Ring of God of War",
+            "value": "Ring of God of War"
         },
         {
-            "key": "You got the effect {STR} time {INT}sec.",
-            "value": "Получен бафф {STR} время {INT}сек."
+            "id": "itdc47",
+            "key": "It happens sometimes",
+            "value": "It happens sometimes"
         },
         {
-            "key": "You lost the effect {STR}.",
-            "value": "Закончен бафф {STR}."
+            "id": "ittm48",
+            "key": "Bracelet of Fire",
+            "value": "Bracelet of Fire"
         },
         {
-            "key": "Repair all items - FREE",
-            "value": "Починить предметы - БЕСПЛАТНО"
+            "id": "itdc48",
+            "key": "It happens sometimes",
+            "value": "It happens sometimes"
         },
         {
-            "key": "Shop :: {STR}",
-            "value": "Магазин :: {STR}"
+            "id": "ittm49",
+            "key": "Big ammo bag",
+            "value": "Big ammo bag"
         },
         {
-            "key": "List of completed quests",
-            "value": "Список завершеных квестов"
+            "id": "itdc49",
+            "key": "Adds a small amount of ammunition",
+            "value": "Adds a small amount of ammunition"
         },
         {
-            "key": "Active NPC for current quests",
-            "value": "Активные NPC в текущих квестах"
+            "id": "ittm50",
+            "key": "Strength ",
+            "value": "Strength "
         },
         {
-            "key": "Your mailbox is empty",
-            "value": "Ваш почтовый ящик пуст"
+            "id": "itdc50",
+            "key": "Increase your strength",
+            "value": "Increase your strength"
         },
         {
-            "key": "Available aethers",
-            "value": "Доступные эфиры"
+            "id": "ittm51",
+            "key": "Random home decor",
+            "value": "Random home decor"
         },
         {
-            "key": "Move to Guild House - free",
-            "value": "Переместится в дом гильдии"
+            "id": "itdc51",
+            "key": "Lucky house decor",
+            "value": "Lucky house decor"
         },
         {
-            "key": "Move to Your House - free",
-            "value": "Переместится в личный дом"
+            "id": "ittm10000",
+            "key": "Heavenly hammer",
+            "value": "Heavenly hammer"
         },
         {
-            "key": "Inventory Select List",
-            "value": "Инвентарь выбери список"
+            "id": "ittm10001",
+            "key": "Heavenly gun",
+            "value": "Heavenly gun"
         },
         {
-            "key": "Used ({INT})",
-            "value": "Используемые ({INT})"
+            "id": "ittm10002",
+            "key": "Heavenly shotgun",
+            "value": "Heavenly shotgun"
         },
         {
-            "key": "Craft ({INT})",
-            "value": "Крафт ({INT})"
+            "id": "ittm10003",
+            "key": "Heavenly grenade",
+            "value": "Heavenly grenade"
         },
         {
-            "key": "Modules ({INT})",
-            "value": "Модули ({INT})"
+            "id": "ittm10004",
+            "key": "Heavenly rifle",
+            "value": "Heavenly rifle"
         },
         {
-            "key": "Potion ({INT})",
-            "value": "Зелья ({INT})"
+            "id": "ittm10005",
+            "key": "Shadow wings",
+            "value": "Shadow wings"
         },
         {
-            "key": "Other ({INT})",
-            "value": "Прочие ({INT})"
+            "id": "itdc10005",
+            "key": "Dark history",
+            "value": "Dark history"
         },
         {
-            "key": "Story dungeon's",
-            "value": "Сюжетные темницы"
+            "id": "ittm10006",
+            "key": "Neptune wings",
+            "value": "Neptune wings"
         },
         {
-            "key": "Alternative story dungeon's",
-            "value": "Альтернативные сюжетные темницы"
+            "id": "itdc10018",
+            "key": "Covered in secrets",
+            "value": "Covered in secrets"
         },
         {
-            "key": "You are already in this dungeon!",
-            "value": "Вы уже находитесь в этой темнице!"
+            "id": "qudn1",
+            "key": "Help for workers",
+            "value": "Help for workers"
         },
         {
-            "key": "At the moment players are passing this dungeon!",
-            "value": "В данный момент кто-то проходит эту тенмицу!"
+            "id": "qusn2",
+            "key": "Main: Arrival",
+            "value": "Main: Arrival"
         },
         {
-            "key": "Your level is low to pass this dungeon!",
-            "value": "Ваш уровень мал для начала этой темницы!"
+            "id": "qudn2",
+            "key": "Helping a girl",
+            "value": "Helping a girl"
         },
         {
-            "key": "{STR} joined to Dungeon {STR}!",
-            "value": "{STR} присоеденился к Темнице {STR}!"
+            "id": "qusn2",
+            "key": "Main: Arrival",
+            "value": "Main: Arrival"
         },
         {
-            "key": "You can vote for the choice of tank (Dungeon Tab)!",
-            "value": "Вы можете голосовать за выбор танка (вкладка Темницы)!"
+            "id": "qudn3",
+            "key": "The fight with slime!",
+            "value": "The fight with slime!"
         },
         {
-            "key": "You can't vote for yourself!",
-            "value": "Вы не можете голосовать за себя!"
+            "id": "qusn4",
+            "key": "Trader Sentry",
+            "value": "Trader Sentry"
         },
         {
-            "key": "You already voted!",
-            "value": "Вы уже проголосовали!"
+            "id": "qudn4",
+            "key": "Gel? Why do you need it",
+            "value": "Gel? Why do you need it"
         },
         {
-            "key": "{STR} voted for {STR}.",
-            "value": "{STR} проголосовал за {STR}."
+            "id": "qusn4",
+            "key": "Trader Sentry",
+            "value": "Trader Sentry"
         },
         {
-            "key": "Languages Information",
-            "value": "Локализация инфо"
+            "id": "qudn5",
+            "key": "Search for a daughter",
+            "value": "Search for a daughter"
         },
         {
-            "key": "Here you can choose the language.",
-            "value": "Здесь можно выбрать язык."
+            "id": "qusn5",
+            "key": "Sailor",
+            "value": "Sailor"
         },
         {
-            "key": "Note: translation is not complete.",
-            "value": "Важно: перевод не полный."
+            "id": "qudn6",
+            "key": "What is ore mining?",
+            "value": "What is ore mining?"
         },
         {
-            "key": "Active language: {STR}",
-            "value": "Активный язык: {STR}"
+            "id": "qusn7",
+            "key": "Mining",
+            "value": "Mining"
         },
         {
-            "key": "Select language \"{STR}\"",
-            "value": "Выбрать язык \"{STR}\""
+            "id": "qudn7",
+            "key": "My first pickaxe",
+            "value": "My first pickaxe"
         },
         {
-            "key": "You chosen a language \"{STR}\".",
-            "value": "Вы выбрали язык \"{STR}\"."
+            "id": "qusn7",
+            "key": "Mining",
+            "value": "Mining"
         },
         {
-            "key": "Settings language",
-            "value": "Настройка языка"
+            "id": "qudn8",
+            "key": "Help destruction of dir",
+            "value": "Help destruction of dir"
         },
         {
-            "key": "Required {INT}, but you have only {INT} {STR}!",
-            "value": "Требуется {INT}, но у вас есть только {INT} {STR}!"
+            "id": "qusn9",
+            "key": "Deputy",
+            "value": "Deputy"
         },
         {
-            "key": "Not upgrade points for +{INT}. Required {INT}.",
-            "value": "Нет очков улучшения для +{INT}. Нужно {INT}."
+            "id": "qudn9",
+            "key": "Raid on the dirt",
+            "value": "Raid on the dirt"
         },
         {
-            "key": "Upgrade has a maximum level.",
-            "value": "Улучшение имеет максимальный уровень."
+            "id": "qusn9",
+            "key": "Deputy",
+            "value": "Deputy"
         },
         {
-            "key": "This chat is intended for team / guilds!",
-            "value": "Этот чат нужен для гильдий или команд!"
+            "id": "qudn10",
+            "key": "Acquaintance",
+            "value": "Acquaintance"
         },
         {
-            "key": "{STR} came! Good {STR}!",
-            "value": "{STR} наступил(а)! Удачного(ой) {STR}!"
+            "id": "qusn22",
+            "key": "Main: Apostle Elfia",
+            "value": "Main: Apostle Elfia"
         },
         {
-            "key": "Nighttime experience was increase to {INT}%",
-            "value": "Ночной опыт повышен до {INT}%"
+            "id": "qudn11",
+            "key": "Apostle",
+            "value": "Apostle"
         },
         {
-            "key": "Daytime experience was downgraded to 100%",
-            "value": "Дневной опыт понижен до 100%"
+            "id": "qusn11",
+            "key": "Main: Apostle Elfia",
+            "value": "Main: Apostle Elfia"
         },
         {
-            "key": "{STR} opened zone ({STR})!",
-            "value": "{STR} открыл зону ({STR})!"
+            "id": "qudn12",
+            "key": "Adventurer",
+            "value": "Adventurer"
         },
         {
-            "key": "Requires quest completion '{STR}'!",
-            "value": "Требуется завершение квеста '{STR}'!"
+            "id": "qusn12",
+            "key": "Main: Apostle Elfia",
+            "value": "Main: Apostle Elfia"
         },
         {
-            "key": "You can see menu in the votes!",
-            "value": "Вы можете увидеть меню в голосовании!"
+            "id": "qudn13",
+            "key": "Something is starting",
+            "value": "Something is starting"
         },
         {
-            "key": "You left the active zone, menu is restored!",
-            "value": "Вы вышли из активной зоны, меню восстановлено!"
+            "id": "qusn13",
+            "key": "Main: Apostle Elfia",
+            "value": "Main: Apostle Elfia"
         },
         {
-            "key": "{STR} logged to account. Rank #{INT}",
-            "value": "{STR} авторизовался. Ранг #{INT}"
+            "id": "qudn14",
+            "key": "History from Apostle",
+            "value": "History from Apostle"
         },
         {
-            "key": "You repaired all items.",
-            "value": "Вы починили все предметы."
+            "id": "qusn14",
+            "key": "Main: Apostle Elfia",
+            "value": "Main: Apostle Elfia"
         },
         {
-            "key": "Learned a new skill [{STR}]",
-            "value": "Новый навык усвоен [{STR}]"
+            "id": "qudn15",
+            "key": "Diana has a problem",
+            "value": "Diana has a problem"
         },
         {
-            "key": "Increased the skill [{STR} level to {INT}]",
-            "value": "Повышен уровень навыка [{STR} до {INT}]"
+            "id": "qusn15",
+            "key": "Main: Apostle Elfia",
+            "value": "Main: Apostle Elfia"
         },
         {
-            "key": "Skill already have maximum level!",
-            "value": "Навык уже имеет максимальный уровень!"
+            "id": "qudn16",
+            "key": "Mmm delicious",
+            "value": "Mmm delicious"
         },
         {
-            "key": "Menu is available in call-votes!",
-            "value": "Меню доступно в голосованиях!"
+            "id": "qusn16",
+            "key": "Main: Apostle Elfia",
+            "value": "Main: Apostle Elfia"
         },
         {
-            "key": "You start dialogue with {STR}!",
-            "value": "Вы начали ввести диалог с {STR}!"
+            "id": "qudn17",
+            "key": "Time learn something",
+            "value": "Time learn something"
         },
         {
-            "key": "{INT}. {STR} | {INT}:{INT}min | {INT}P",
-            "value": "{INT}. {STR} | {INT}:{INT}мин | {INT}P"
+            "id": "qusn17",
+            "key": "Main: Apostle Elfia",
+            "value": "Main: Apostle Elfia"
         },
         {
-            "key": "Need to complete quest {STR}",
-            "value": "Требуется квест {STR}"
+            "id": "qudn18",
+            "key": "Here are the goblins",
+            "value": "Here are the goblins"
         },
         {
-            "key": "Voting for the choice of tank!",
-            "value": "Голосование за выбор танка!"
+            "id": "qusn18",
+            "key": "Main: Apostle Elfia",
+            "value": "Main: Apostle Elfia"
         },
         {
-            "key": "Vote for {STR} (Votes: {INT})",
-            "value": "Голос за {STR} (Голосов: {INT})"
+            "id": "qudn19",
+            "key": "Occupation of goblins",
+            "value": "Occupation of goblins"
         },
         {
-            "key": "You have {INT} unread messages!",
-            "value": "Вы имеете {INT} непрочитанных сообщений!"
+            "id": "qusn19",
+            "key": "Main: Apostle Elfia",
+            "value": "Main: Apostle Elfia"
         },
         {
-            "key": "Task has not been completed yet!",
-            "value": "Задание еще не выполнено!"
+            "id": "qudn20",
+            "key": "Yasue San",
+            "value": "Yasue San"
         },
         {
-            "key": "[Done] Give the {STR}x{INT} to the {STR}!",
-            "value": "[Выполнено] Отдать {STR}x{INT} для {STR}!"
-        },
-        {
-            "key": "[Done] Defeat the {STR}'s for the {STR}!",
-            "value": "[Выполнено] Победить {STR} для {STR}!"
-        },
-        {
-            "key": "- - - - [Your nickname is already registered] - - - -",
-            "value": "- - - - [Ваш ник уже зарегестрирован] - - - -"
-        },
-        {
-            "key": "Your nick is a unique identifier, and it has already been used!",
-            "value": "Ваш ник уникальный индификатор, этот ник уже используется!"
-        },
-        {
-            "key": "You can restore access by contacting support, or change nick.",
-            "value": "Вы можете восстановить доступ через поддержку, или сменить ник."
-        },
-        {
-            "key": "- - - - - - - [Successful registered] - - - - - - -",
-            "value": "- - - - - - - [Успешно зарегестрирован] - - - - - - -"
-        },
-        {
-            "key": "Don't forget your data, have a nice game!",
-            "value": "Не забывайте ваши данные, удачного дня!"
-        },
-        {
-            "key": "# Your nickname is a unique identifier!",
-            "value": "# Ваш ник уникальный индификатор!"
-        },
-        {
-            "key": "# Log in: \"/login {STR} {STR}\"",
-            "value": "# Вход: \"/login {STR} {STR}\""
-        },
-        {
-            "key": "Username / Password must contain 4-12 characters",
-            "value": "Логин / Пароль содержит 4-12 символов"
-        },
-        {
-            "key": "Wrong login or password",
-            "value": "Неправильно введен логин или пароль"
-        },
-        {
-            "key": "The account is already in the game!",
-            "value": "Аккаунт уже в игре. Вход отменен!"
-        },
-        {
-            "key": "- - - - - - - [Successful login] - - - - - - -",
-            "value": "- - - - - - - [Успешный вход] - - - - - - -"
-        },
-        {
-            "key": "Your nickname was not found in the database!",
-            "value": "Ваш ник не найден в базе данных!"
-        },
-        {
-            "key": "You are located {STR} ({STR})",
-            "value": "Вы находитесь {STR} ({STR})"
-        },
-        {
-            "key": "Quest NPCs are marked with an aura Heart and Shield.",
-            "value": "Квестовые NPC помечены Сердцами и Щитками."
-        },
-        {
-            "key": "Shield around you indicates location of active quest.",
-            "value": "Щиток возле вас указывает направление на активный квест."
-        },
-        {
-            "key": "Your Discord ID has been updated",
-            "value": "Ваш Discord ID успешно обновлен"
-        },
-        {
-            "key": "Check the connection status in discord \"/connect\".",
-            "value": "Проверьте статус соединения в discord \"/connect\"."
-        },
-        {
-            "key": "Some of the settings becomes valid after death",
-            "value": "Некоторые настройки будут обновлены после смерти"
-        },
-        {
-            "key": "Modules settings",
-            "value": "Настройка модулей"
-        },
-        {
-            "key": "The list of modules equipment is empty.",
-            "value": "Лист снаряжаемых модулей пуст."
-        },
-        {
-            "key": "The voucher code '{STR}' has expired.",
-            "value": "Ваучер код '{STR}' истёк."
-        },
-        {
-            "key": "This voucher has already been redeemed.",
-            "value": "Этот ваучер вами уже был получен."
-        },
-        {
-            "key": "You have successfully redeemed the voucher '{STR}'.",
-            "value": "Вы успешно получили ваучер '{STR}'."
-        },
-        {
-            "key": "The voucher code '{STR}' does not exist.",
-            "value": "Ваучер '{STR}' не существует."
-        },
-        {
-            "key": "[Player], do you have any questions? I'm sorry, can't help you.",
-            "value": "[Player], у вас имеются вопросы? Прости я не смогу тебе помочь."
-        },
-        {
-            "key": "What a beautiful [Time]. I don't have anything for you [Player].",
-            "value": "Какое замечательное [Time]. У меня нет для тебя ничего [Player]."
-        },
-        {
-            "key": "[Player] are you interested something? I'm sorry, don't want to talk right now.",
-            "value": "[Player] тебе интересует что-нибудь? Прости но сейчас я не хочу разговарить."
-        },
-        {
-            "key": "Hello, I was sent to you by a carpenter to help you.",
-            "value": "Hello, I was sent to you by a carpenter to help you."
-        },
-        {
-            "key": "**He asks with a smile**: Hello, have you just arrived?",
-            "value": "**He asks with a smile**: Hello, have you just arrived?"
-        },
-        {
-            "key": "Yes, I came to you to become an adventurer, I need money.",
-            "value": "Yes, I came to you to become an adventurer, I need money."
-        },
-        {
-            "key": "Well, I'll tell you [Player], things have been very bad here lately, the residents are living in fear. Recently, a little girl was killed, as we understand there is a dead force involved.",
-            "value": "Well, I'll tell you [Player], things have been very bad here lately, the residents are living in fear. Recently, a little girl was killed, as we understand there is a dead force involved."
-        },
-        {
-            "key": "**With horror in his eyes**: What ... Dead People",
-            "value": "**With horror in his eyes**: What ... Dead People"
-        },
-        {
-            "key": "**He said hurriedly**: I don't know for sure. Over time, the residents will tell you everything, or you will feel for yourself what is happening there.",
-            "value": "**He said hurriedly**: I don't know for sure. Over time, the residents will tell you everything, or you will feel for yourself what is happening there."
-        },
-        {
-            "key": "I didn't expect it to be this bad. Well, what can I help you with?",
-            "value": "I didn't expect it to be this bad. Well, what can I help you with?"
-        },
-        {
-            "key": "Come with me, our guys dropped boards, help me collect them.",
-            "value": "Come with me, our guys dropped boards, help me collect them."
-        },
-        {
-            "key": "Okay generally help me collect all the boards! I will reward you for your help.",
-            "value": "Okay generally help me collect all the boards! I will reward you for your help."
-        },
-        {
-            "key": "**Weakness in asks**: Oh, hell, they're heavy, I've got them all.",
-            "value": "**Weakness in asks**: Oh, hell, they're heavy, I've got them all."
-        },
-        {
-            "key": "Great job! Your muscles won't hurt you anyway [Player] *laughter*",
-            "value": "Great job! Your muscles won't hurt you anyway [Player] *laughter*"
-        },
-        {
-            "key": "*laughter*",
-            "value": "*laughter*"
-        },
-        {
-            "key": "Now hand them out to my boys and let them go on with their business.",
-            "value": "Now hand them out to my boys and let them go on with their business."
-        },
-        {
-            "key": "Good [Talked]!",
-            "value": "Good [Talked]!"
-        },
-        {
-            "key": "Here you go, your boss told me to give it to you!",
-            "value": "Here you go, your boss told me to give it to you!"
-        },
-        {
-            "key": "Thanks for the help.",
-            "value": "Thanks for the help."
-        },
-        {
-            "key": "Is tired. But I did it!",
-            "value": "Is tired. But I did it!"
-        },
-        {
-            "key": "Well done, take this. I think you need it if you're going to be an adventurer. Go straight, and you will go straight to the residents, if you ask where to go.",
-            "value": "Well done, take this. I think you need it if you're going to be an adventurer. Go straight, and you will go straight to the residents, if you ask where to go."
-        },
-        {
-            "key": "**With a smile**: Well thank you, good luck with your work!",
-            "value": "**With a smile**: Well thank you, good luck with your work!"
-        },
-        {
-            "key": "[Stranger]Hi, my name is [Player], how do I find the nearest village?",
-            "value": "[Stranger]Hi, my name is [Player], how do I find the nearest village?"
-        },
-        {
-            "key": "**She concerned**: Hello, my name is [Talked].",
-            "value": "**She concerned**: Hello, my name is [Talked]."
-        },
-        {
-            "key": "I'll be happy to help you settle in, but could you give my brother a note? He works now on the ship that you arrived on, i could have done it myself, but they won't let me in.",
-            "value": "I'll be happy to help you settle in, but could you give my brother a note? He works now on the ship that you arrived on, i could have done it myself, but they won't let me in."
-        },
-        {
-            "key": "Yes, of course i help, will you be here [Talked]?",
-            "value": "Yes, of course i help, will you be here [Talked]?"
-        },
-        {
-            "key": "I'll be here waiting!",
-            "value": "I'll be here waiting!"
-        },
-        {
-            "key": "Hello, are you Diana's brother?",
-            "value": "Hello, are you Diana's brother?"
-        },
-        {
-            "key": "**He said rudely**: Yes. Did something happen to her?..",
-            "value": "**He said rudely**: Yes. Did something happen to her?.."
-        },
-        {
-            "key": "No, don't worry, she just asked me to pass you the notebook.",
-            "value": "No, don't worry, she just asked me to pass you the notebook."
-        },
-        {
-            "key": "Well, thank you very much, and tell her I'll be seeing her this evening.",
-            "value": "Well, thank you very much, and tell her I'll be seeing her this evening."
-        },
-        {
-            "key": "Yes, good luck with your work!",
-            "value": "Yes, good luck with your work!"
-        },
-        {
-            "key": "**She says impatiently**: Oh, you're already here, you're fast!",
-            "value": "**She says impatiently**: Oh, you're already here, you're fast!"
-        },
-        {
-            "key": "Really?",
-            "value": "Really?"
-        },
-        {
-            "key": "Yes. How is he?",
-            "value": "Yes. How is he?"
-        },
-        {
-            "key": "He told me that he is busy now, and will visit you later in the evening!",
-            "value": "He told me that he is busy now, and will visit you later in the evening!"
-        },
-        {
-            "key": "I'm so happy! They won't let me in because of the problems that are happening. Dead men kidnap girls, and then they find them dead.",
-            "value": "I'm so happy! They won't let me in because of the problems that are happening. Dead men kidnap girls, and then they find them dead."
-        },
-        {
-            "key": "**He sounds surprised**: Only girls? Why the dead?",
-            "value": "**He sounds surprised**: Only girls? Why the dead?"
-        },
-        {
-            "key": "**She's upset**: Honestly, I don't know. The dead or who it is, our headman says that most likely the dead ;(",
-            "value": "**She's upset**: Honestly, I don't know. The dead or who it is, our headman says that most likely the dead ;("
-        },
-        {
-            "key": "I came to you to become an adventurer, as I know you have magical creatures.",
-            "value": "I came to you to become an adventurer, as I know you have magical creatures."
-        },
-        {
-            "key": "**She sounds like she knows it**: An adventurer? We have a Guild of adventurers, but to become an adventurer you need to pass the tests.",
-            "value": "**She sounds like she knows it**: An adventurer? We have a Guild of adventurers, but to become an adventurer you need to pass the tests."
-        },
-        {
-            "key": "Tests?....",
-            "value": "Tests?...."
-        },
-        {
-            "key": "Yes the test [Player]. First, you will need to collect the minimum equipment. To apply and pay the fee. And only after that you will be assigned the position of adventurer.",
-            "value": "Yes the test [Player]. First, you will need to collect the minimum equipment. To apply and pay the fee. And only after that you will be assigned the position of adventurer."
-        },
-        {
-            "key": "Is everything so strict? Yes, I think I can handle it.",
-            "value": "Is everything so strict? Yes, I think I can handle it."
-        },
-        {
-            "key": "All right come on I'll show you our village [Player].",
-            "value": "All right come on I'll show you our village [Player]."
-        },
-        {
-            "key": "Yes come on ;)",
-            "value": "Yes come on ;)"
-        },
-        {
-            "key": " **She made it sound like there was something wrong with them**: Oh, my God, where are the slime from?.",
-            "value": " **She made it sound like there was something wrong with them**: Oh, my God, where are the slime from?."
-        },
-        {
-            "key": "I don't know [Talked], here even have slimes. Wahoo",
-            "value": "I don't know [Talked], here even have slimes. Wahoo"
-        },
-        {
-            "key": "Well, Yes [Player], but now they are becoming more frequent",
-            "value": "Well, Yes [Player], but now they are becoming more frequent"
-        },
-        {
-            "key": "**You speak proudly**: All right [Talked], I'll clear the way!",
-            "value": "**You speak proudly**: All right [Talked], I'll clear the way!"
-        },
-        {
-            "key": "**You said in disgust**: Phew, the slime is so disgusting...",
-            "value": "**You said in disgust**: Phew, the slime is so disgusting..."
-        },
-        {
-            "key": "**She says with a smile**: Well you could use a bath [Player] ;)",
-            "value": "**She says with a smile**: Well you could use a bath [Player] ;)"
-        },
-        {
-            "key": "I will not refuse such an honor ;)",
-            "value": "I will not refuse such an honor ;)"
-        },
-        {
-            "key": "Ah here is and decided, we'll get there I'll show you where I live. And I'll introduce you to the places. And you wash :)",
-            "value": "Ah here is and decided, we'll get there I'll show you where I live. And I'll introduce you to the places. And you wash :)"
-        },
-        {
-            "key": "All right, shall we continue on our way?",
-            "value": "All right, shall we continue on our way?"
-        },
-        {
-            "key": "Yes let's go",
-            "value": "Yes let's go"
-        },
-        {
-            "key": "**He said with surprise**: Did you defeat the slugs on the instructions of our master? Take this the master asked me to give you.",
-            "value": "**He said with surprise**: Did you defeat the slugs on the instructions of our master? Take this the master asked me to give you."
-        },
-        {
-            "key": "Yes, I could. They were very slippery.",
-            "value": "Yes, I could. They were very slippery."
-        },
-        {
-            "key": "Hehe.. What did you think?",
-            "value": "Hehe.. What did you think?"
-        },
-        {
-            "key": "Well, not so difficult, at the same time I warmed up.",
-            "value": "Well, not so difficult, at the same time I warmed up."
-        },
-        {
-            "key": "Okay I need to serve, good luck to you, don't give up ;)",
-            "value": "Okay I need to serve, good luck to you, don't give up ;)"
-        },
-        {
-            "key": "**She said very rudely**: Who the hell are you? What do you want?",
-            "value": "**She said very rudely**: Who the hell are you? What do you want?"
-        },
-        {
-            "key": "Do you know that your father is looking for you?",
-            "value": "Do you know that your father is looking for you?"
-        },
-        {
-            "key": "I hate this old guy, he doesn't have time for me......",
-            "value": "I hate this old guy, he doesn't have time for me......"
-        },
-        {
-            "key": "He can only go there. Do it. And we can't spend time together...",
-            "value": "He can only go there. Do it. And we can't spend time together..."
-        },
-        {
-            "key": "Enrages...",
-            "value": "Enrages..."
-        },
-        {
-            "key": "Calm down let's go back together and tell him everything? Maybe he just cares about you like that.",
-            "value": "Calm down let's go back together and tell him everything? Maybe he just cares about you like that."
-        },
-        {
-            "key": "All right, let's go back.",
-            "value": "All right, let's go back."
-        },
-        {
-            "key": "Are you ready?",
-            "value": "Are you ready?"
-        },
-        {
-            "key": "Yes..",
-            "value": "Yes.."
-        },
-        {
-            "key": "So where was she?.",
-            "value": "So where was she?."
-        },
-        {
-            "key": "You just don't get angry, everything's fine!",
-            "value": "You just don't get angry, everything's fine!"
-        },
-        {
-            "key": "In fact, she didn't want to come back, she was offended that you weren't spending time together. You can't rest.",
-            "value": "In fact, she didn't want to come back, she was offended that you weren't spending time together. You can't rest."
-        },
-        {
-            "key": "Damn why didn't she ask for it herself? Okay, don't worry thanks for the work :) Everything will be fine, we will decide something with daughter",
-            "value": "Damn why didn't she ask for it herself? Okay, don't worry thanks for the work :) Everything will be fine, we will decide something with daughter"
-        },
-        {
-            "key": "Well, nice :) Good luck to you",
-            "value": "Well, nice :) Good luck to you"
-        },
-        {
-            "key": "To extract any ore [Player], you will need a pickaxe.",
-            "value": "To extract any ore [Player], you will need a pickaxe."
-        },
-        {
+            "id": "diaqu151",
             "key": "You can only get it by creating. But in some cases merchants can sell.",
             "value": "You can only get it by creating. But in some cases merchants can sell."
         },
         {
-            "key": "Also, the picks have a durability of 100-0. If you durability reach 0. Don't worry it won't break.",
-            "value": "Also, the picks have a durability of 100-0. If you durability reach 0. Don't worry it won't break."
+            "id": "qusn20",
+            "key": "Main: Apostle Elfia",
+            "value": "Main: Apostle Elfia"
         },
         {
-            "key": "But you can't work with break pickaxe it. You can repair it at any store.",
-            "value": "But you can't work with break pickaxe it. You can repair it at any store."
-        },
-        {
+            "id": "diaqu154",
             "key": "You can also improve picks this will depend on their effectiveness.",
             "value": "You can also improve picks this will depend on their effectiveness."
         },
         {
+            "id": "qusn21",
+            "key": "Main: Apostle Elfia",
+            "value": "Main: Apostle Elfia"
+        },
+        {
+            "id": "qudn22",
+            "key": "Goodbye Elfinia",
+            "value": "Goodbye Elfinia"
+        },
+        {
+            "id": "qusn22",
+            "key": "Main: Apostle Elfia",
+            "value": "Main: Apostle Elfia"
+        },
+        {
+            "id": "qudn50",
+            "key": "Officer's disputes!",
+            "value": "Officer's disputes!"
+        },
+        {
+            "id": "qusn50",
+            "key": "Officer Henry",
+            "value": "Officer Henry"
+        },
+        {
+            "id": "qudn55",
+            "key": "Erik's way saying help.",
+            "value": "Erik's way saying help."
+        },
+        {
+            "id": "qusn55",
+            "key": "Gunsmith Eric",
+            "value": "Gunsmith Eric"
+        },
+        {
+            "id": "qudn60",
+            "key": "Why are you here Noctis",
+            "value": "Why are you here Noctis"
+        },
+        {
+            "id": "qusn62",
+            "key": "Final fantasy",
+            "value": "Final fantasy"
+        },
+        {
+            "id": "qudn61",
+            "key": "First assignment",
+            "value": "First assignment"
+        },
+        {
+            "id": "qusn61",
+            "key": "Final fantasy",
+            "value": "Final fantasy"
+        },
+        {
+            "id": "qudn62",
+            "key": "Resonance",
+            "value": "Resonance"
+        },
+        {
+            "id": "qusn62",
+            "key": "Final fantasy",
+            "value": "Final fantasy"
+        },
+        {
+            "id": "stnm1",
+            "key": "Weapons for young adventurers",
+            "value": "Weapons for young adventurers"
+        },
+        {
+            "id": "stnm2",
+            "key": "Elfinia Artifacts",
+            "value": "Elfinia Artifacts"
+        },
+        {
+            "id": "stnm3",
+            "key": "Noctis Lucis Caelum",
+            "value": "Noctis Lucis Caelum"
+        },
+        {
+            "id": "stnm5",
+            "key": "Master La",
+            "value": "Master La"
+        },
+        {
+            "id": "hmnm2",
+            "key": "Elven class",
+            "value": "Elven class"
+        },
+        {
+            "id": "hmnm2",
+            "key": "Elven class",
+            "value": "Elven class"
+        },
+        {
+            "id": "hmnm6",
+            "key": "Asian-style home",
+            "value": "Asian-style home"
+        },
+        {
+            "id": "hmnm4",
+            "key": "Asian-style home",
+            "value": "Asian-style home"
+        },
+        {
+            "id": "hmnm5",
+            "key": "Asian-style home",
+            "value": "Asian-style home"
+        },
+        {
+            "id": "diaqu10",
+            "key": "Hello, I was sent to you by a carpenter to help you.",
+            "value": "Hello, I was sent to you by a carpenter to help you."
+        },
+        {
+            "id": "diaqu11",
+            "key": "**He asks with a smile**: Hello, have you just arrived?",
+            "value": "**He asks with a smile**: Hello, have you just arrived?"
+        },
+        {
+            "id": "diaqu12",
+            "key": "Yes, I came to you to become an adventurer, I need money.",
+            "value": "Yes, I came to you to become an adventurer, I need money."
+        },
+        {
+            "id": "diaqu13",
+            "key": "Well, I'll tell you [Player], things have been very bad here lately, the residents are living in fear. Recently, a little girl was killed, as we understand there is a dead force involved.",
+            "value": "Well, I'll tell you [Player], things have been very bad here lately, the residents are living in fear. Recently, a little girl was killed, as we understand there is a dead force involved."
+        },
+        {
+            "id": "diaqu14",
+            "key": "**With horror in his eyes**: What ... Dead People",
+            "value": "**With horror in his eyes**: What ... Dead People"
+        },
+        {
+            "id": "diaqu15",
+            "key": "**He said hurriedly**: I don't know for sure. Over time, the residents will tell you everything, or you will feel for yourself what is happening there.",
+            "value": "**He said hurriedly**: I don't know for sure. Over time, the residents will tell you everything, or you will feel for yourself what is happening there."
+        },
+        {
+            "id": "diaqu16",
+            "key": "I didn't expect it to be this bad. Well, what can I help you with?",
+            "value": "I didn't expect it to be this bad. Well, what can I help you with?"
+        },
+        {
+            "id": "diaqu17",
+            "key": "Come with me, our guys dropped boards, help me collect them.",
+            "value": "Come with me, our guys dropped boards, help me collect them."
+        },
+        {
+            "id": "diaqu20",
+            "key": "Okay generally help me collect all the boards! I will reward you for your help.",
+            "value": "Okay generally help me collect all the boards! I will reward you for your help."
+        },
+        {
+            "id": "diaqu21",
+            "key": "**Weakness in asks**: Oh, hell, they're heavy, I've got them all.",
+            "value": "**Weakness in asks**: Oh, hell, they're heavy, I've got them all."
+        },
+        {
+            "id": "diaqu22",
+            "key": "Great job! Your muscles won't hurt you anyway [Player] *laughter*",
+            "value": "Great job! Your muscles won't hurt you anyway [Player] *laughter*"
+        },
+        {
+            "id": "diaqu23",
+            "key": "*laughter*",
+            "value": "*laughter*"
+        },
+        {
+            "id": "diaqu24",
+            "key": "Now hand them out to my boys and let them go on with their business.",
+            "value": "Now hand them out to my boys and let them go on with their business."
+        },
+        {
+            "id": "diaqu25",
+            "key": "Good [Talked]!",
+            "value": "Good [Talked]!"
+        },
+        {
+            "id": "diaqu50",
+            "key": "Here you go, your boss told me to give it to you!",
+            "value": "Here you go, your boss told me to give it to you!"
+        },
+        {
+            "id": "diaqu51",
+            "key": "Thanks for the help.",
+            "value": "Thanks for the help."
+        },
+        {
+            "id": "diaqu40",
+            "key": "Here you go, your boss told me to give it to you!",
+            "value": "Here you go, your boss told me to give it to you!"
+        },
+        {
+            "id": "diaqu41",
+            "key": "Thanks for the help.",
+            "value": "Thanks for the help."
+        },
+        {
+            "id": "diaqu50",
+            "key": "Here you go, your boss told me to give it to you!",
+            "value": "Here you go, your boss told me to give it to you!"
+        },
+        {
+            "id": "diaqu51",
+            "key": "Thanks for the help.",
+            "value": "Thanks for the help."
+        },
+        {
+            "id": "diaqu60",
+            "key": "Is tired. But I did it!",
+            "value": "Is tired. But I did it!"
+        },
+        {
+            "id": "diaqu61",
+            "key": "Well done, take this. I think you need it if you're going to be an adventurer. Go straight, and you will go straight to the residents, if you ask where to go.",
+            "value": "Well done, take this. I think you need it if you're going to be an adventurer. Go straight, and you will go straight to the residents, if you ask where to go."
+        },
+        {
+            "id": "diaqu62",
+            "key": "**With a smile**: Well thank you, good luck with your work!",
+            "value": "**With a smile**: Well thank you, good luck with your work!"
+        },
+        {
+            "id": "diaqu70",
+            "key": "[Stranger]Hi, my name is [Player], how do I find the nearest village?",
+            "value": "[Stranger]Hi, my name is [Player], how do I find the nearest village?"
+        },
+        {
+            "id": "diaqu71",
+            "key": "**She concerned**: Hello, my name is [Talked].",
+            "value": "**She concerned**: Hello, my name is [Talked]."
+        },
+        {
+            "id": "diaqu72",
+            "key": "I'll be happy to help you settle in, but could you give my brother a note? He works now on the ship that you arrived on, i could have done it myself, but they won't let me in.",
+            "value": "I'll be happy to help you settle in, but could you give my brother a note? He works now on the ship that you arrived on, i could have done it myself, but they won't let me in."
+        },
+        {
+            "id": "diaqu73",
+            "key": "Yes, of course i help, will you be here [Talked]?",
+            "value": "Yes, of course i help, will you be here [Talked]?"
+        },
+        {
+            "id": "diaqu74",
+            "key": "I'll be here waiting!",
+            "value": "I'll be here waiting!"
+        },
+        {
+            "id": "diaqu80",
+            "key": "Hello, are you Diana's brother?",
+            "value": "Hello, are you Diana's brother?"
+        },
+        {
+            "id": "diaqu81",
+            "key": "**He said rudely**: Yes. Did something happen to her?..",
+            "value": "**He said rudely**: Yes. Did something happen to her?.."
+        },
+        {
+            "id": "diaqu82",
+            "key": "No, don't worry, she just asked me to pass you the notebook.",
+            "value": "No, don't worry, she just asked me to pass you the notebook."
+        },
+        {
+            "id": "diaqu83",
+            "key": "Well, thank you very much, and tell her I'll be seeing her this evening.",
+            "value": "Well, thank you very much, and tell her I'll be seeing her this evening."
+        },
+        {
+            "id": "diaqu84",
+            "key": "Yes, good luck with your work!",
+            "value": "Yes, good luck with your work!"
+        },
+        {
+            "id": "diaqu90",
+            "key": "**She says impatiently**: Oh, you're already here, you're fast!",
+            "value": "**She says impatiently**: Oh, you're already here, you're fast!"
+        },
+        {
+            "id": "diaqu91",
+            "key": "Really?",
+            "value": "Really?"
+        },
+        {
+            "id": "diaqu92",
+            "key": "Yes. How is he?",
+            "value": "Yes. How is he?"
+        },
+        {
+            "id": "diaqu93",
+            "key": "He told me that he is busy now, and will visit you later in the evening!",
+            "value": "He told me that he is busy now, and will visit you later in the evening!"
+        },
+        {
+            "id": "diaqu94",
+            "key": "I'm so happy! They won't let me in because of the problems that are happening. Dead men kidnap girls, and then they find them dead.",
+            "value": "I'm so happy! They won't let me in because of the problems that are happening. Dead men kidnap girls, and then they find them dead."
+        },
+        {
+            "id": "diaqu95",
+            "key": "**He sounds surprised**: Only girls? Why the dead?",
+            "value": "**He sounds surprised**: Only girls? Why the dead?"
+        },
+        {
+            "id": "diaqu96",
+            "key": "**She's upset**: Honestly, I don't know. The dead or who it is, our headman says that most likely the dead ;(",
+            "value": "**She's upset**: Honestly, I don't know. The dead or who it is, our headman says that most likely the dead ;("
+        },
+        {
+            "id": "diaqu97",
+            "key": "I came to you to become an adventurer, as I know you have magical creatures.",
+            "value": "I came to you to become an adventurer, as I know you have magical creatures."
+        },
+        {
+            "id": "diaqu98",
+            "key": "**She sounds like she knows it**: An adventurer? We have a Guild of adventurers, but to become an adventurer you need to pass the tests.",
+            "value": "**She sounds like she knows it**: An adventurer? We have a Guild of adventurers, but to become an adventurer you need to pass the tests."
+        },
+        {
+            "id": "diaqu99",
+            "key": "Tests?....",
+            "value": "Tests?...."
+        },
+        {
+            "id": "diaqu910",
+            "key": "Yes the test [Player]. First, you will need to collect the minimum equipment. To apply and pay the fee. And only after that you will be assigned the position of adventurer.",
+            "value": "Yes the test [Player]. First, you will need to collect the minimum equipment. To apply and pay the fee. And only after that you will be assigned the position of adventurer."
+        },
+        {
+            "id": "diaqu911",
+            "key": "Is everything so strict? Yes, I think I can handle it.",
+            "value": "Is everything so strict? Yes, I think I can handle it."
+        },
+        {
+            "id": "diaqu912",
+            "key": "All right come on I'll show you our village [Player].",
+            "value": "All right come on I'll show you our village [Player]."
+        },
+        {
+            "id": "diaqu913",
+            "key": "Yes come on ;)",
+            "value": "Yes come on ;)"
+        },
+        {
+            "id": "diaqu100",
+            "key": " **She made it sound like there was something wrong with them**: Oh, my God, where are the slime from?.",
+            "value": " **She made it sound like there was something wrong with them**: Oh, my God, where are the slime from?."
+        },
+        {
+            "id": "diaqu101",
+            "key": "I don't know [Talked], here even have slimes. Wahoo",
+            "value": "I don't know [Talked], here even have slimes. Wahoo"
+        },
+        {
+            "id": "diaqu102",
+            "key": "Well, Yes [Player], but now they are becoming more frequent",
+            "value": "Well, Yes [Player], but now they are becoming more frequent"
+        },
+        {
+            "id": "diaqu103",
+            "key": "**You speak proudly**: All right [Talked], I'll clear the way!",
+            "value": "**You speak proudly**: All right [Talked], I'll clear the way!"
+        },
+        {
+            "id": "diaqu104",
+            "key": "**You said in disgust**: Phew, the slime is so disgusting...",
+            "value": "**You said in disgust**: Phew, the slime is so disgusting..."
+        },
+        {
+            "id": "diaqu105",
+            "key": "**She says with a smile**: Well you could use a bath [Player] ;)",
+            "value": "**She says with a smile**: Well you could use a bath [Player] ;)"
+        },
+        {
+            "id": "diaqu106",
+            "key": "I will not refuse such an honor ;)",
+            "value": "I will not refuse such an honor ;)"
+        },
+        {
+            "id": "diaqu107",
+            "key": "Ah here is and decided, we'll get there I'll show you where I live. And I'll introduce you to the places. And you wash :)",
+            "value": "Ah here is and decided, we'll get there I'll show you where I live. And I'll introduce you to the places. And you wash :)"
+        },
+        {
+            "id": "diaqu108",
+            "key": "All right, shall we continue on our way?",
+            "value": "All right, shall we continue on our way?"
+        },
+        {
+            "id": "diaqu109",
+            "key": "Yes let's go",
+            "value": "Yes let's go"
+        },
+        {
+            "id": "diaqu110",
+            "key": "**He said with surprise**: Did you defeat the slugs on the instructions of our master? Take this the master asked me to give you.",
+            "value": "**He said with surprise**: Did you defeat the slugs on the instructions of our master? Take this the master asked me to give you."
+        },
+        {
+            "id": "diaqu111",
+            "key": "Yes, I could. They were very slippery.",
+            "value": "Yes, I could. They were very slippery."
+        },
+        {
+            "id": "diaqu112",
+            "key": "Hehe.. What did you think?",
+            "value": "Hehe.. What did you think?"
+        },
+        {
+            "id": "diaqu113",
+            "key": "Well, not so difficult, at the same time I warmed up.",
+            "value": "Well, not so difficult, at the same time I warmed up."
+        },
+        {
+            "id": "diaqu114",
+            "key": "Okay I need to serve, good luck to you, don't give up ;)",
+            "value": "Okay I need to serve, good luck to you, don't give up ;)"
+        },
+        {
+            "id": "diaqu120",
+            "key": "**She said very rudely**: Who the hell are you? What do you want?",
+            "value": "**She said very rudely**: Who the hell are you? What do you want?"
+        },
+        {
+            "id": "diaqu121",
+            "key": "Do you know that your father is looking for you?",
+            "value": "Do you know that your father is looking for you?"
+        },
+        {
+            "id": "diaqu122",
+            "key": "I hate this old guy, he doesn't have time for me......",
+            "value": "I hate this old guy, he doesn't have time for me......"
+        },
+        {
+            "id": "diaqu123",
+            "key": "He can only go there. Do it. And we can't spend time together...",
+            "value": "He can only go there. Do it. And we can't spend time together..."
+        },
+        {
+            "id": "diaqu124",
+            "key": "Enrages...",
+            "value": "Enrages..."
+        },
+        {
+            "id": "diaqu125",
+            "key": "Calm down let's go back together and tell him everything? Maybe he just cares about you like that.",
+            "value": "Calm down let's go back together and tell him everything? Maybe he just cares about you like that."
+        },
+        {
+            "id": "diaqu126",
+            "key": "All right, let's go back.",
+            "value": "All right, let's go back."
+        },
+        {
+            "id": "diaqu240",
+            "key": "Are you ready?",
+            "value": "Are you ready?"
+        },
+        {
+            "id": "diaqu131",
+            "key": "Yes..",
+            "value": "Yes.."
+        },
+        {
+            "id": "diaqu140",
+            "key": "So where was she?.",
+            "value": "So where was she?."
+        },
+        {
+            "id": "diaqu141",
+            "key": "You just don't get angry, everything's fine!",
+            "value": "You just don't get angry, everything's fine!"
+        },
+        {
+            "id": "diaqu142",
+            "key": "In fact, she didn't want to come back, she was offended that you weren't spending time together. You can't rest.",
+            "value": "In fact, she didn't want to come back, she was offended that you weren't spending time together. You can't rest."
+        },
+        {
+            "id": "diaqu143",
+            "key": "Damn why didn't she ask for it herself? Okay, don't worry thanks for the work :) Everything will be fine, we will decide something with daughter",
+            "value": "Damn why didn't she ask for it herself? Okay, don't worry thanks for the work :) Everything will be fine, we will decide something with daughter"
+        },
+        {
+            "id": "diaqu144",
+            "key": "Well, nice :) Good luck to you",
+            "value": "Well, nice :) Good luck to you"
+        },
+        {
+            "id": "diaqu150",
+            "key": "To extract any ore [Player], you will need a pickaxe.",
+            "value": "To extract any ore [Player], you will need a pickaxe."
+        },
+        {
+            "id": "hmnm6",
+            "key": "Asian-style home",
+            "value": "Asian-style home"
+        },
+        {
+            "id": "diaqu152",
+            "key": "Also, the picks have a durability of 100-0. If you durability reach 0. Don't worry it won't break.",
+            "value": "Also, the picks have a durability of 100-0. If you durability reach 0. Don't worry it won't break."
+        },
+        {
+            "id": "diaqu153",
+            "key": "But you can't work with break pickaxe it. You can repair it at any store.",
+            "value": "But you can't work with break pickaxe it. You can repair it at any store."
+        },
+        {
+            "id": "diaqu155",
             "key": "Each ore has its own strength. If you have a weak pick and the strength of the ore is high, it can take a long time to extract it. So don't forget about the improvements. Or craft even better picks.",
             "value": "Each ore has its own strength. If you have a weak pick and the strength of the ore is high, it can take a long time to extract it. So don't forget about the improvements. Or craft even better picks."
         },
         {
+            "id": "diaqu156",
             "key": "Everything is clearly explained, I will not repeat it again, if you need you will understand everything!",
             "value": "Everything is clearly explained, I will not repeat it again, if you need you will understand everything!"
         },
         {
+            "id": "diaqu157",
             "key": "Yes of course thank you for the explanation",
             "value": "Yes of course thank you for the explanation"
         },
         {
+            "id": "diaqu158",
             "key": "Well don't worry, I'll give you a couple of tasks to get used to in this area",
             "value": "Well don't worry, I'll give you a couple of tasks to get used to in this area"
         },
         {
+            "id": "diaqu160",
             "key": "Did you want something?",
             "value": "Did you want something?"
         },
         {
+            "id": "diaqu161",
             "key": "I think it's time for you to get your first pickaxe.",
             "value": "I think it's time for you to get your first pickaxe."
         },
         {
+            "id": "diaqu162",
             "key": "I think as crafted something, you don't need to explain!",
             "value": "I think as crafted something, you don't need to explain!"
         },
         {
+            "id": "diaqu163",
             "key": "So let's get right to the point, try to make a pickaxe bring it to me, I'll look at it.",
             "value": "So let's get right to the point, try to make a pickaxe bring it to me, I'll look at it."
         },
         {
+            "id": "diaqu164",
             "key": "Done. (you need to have an idea of how to craft items, you can see them near Craftsman in votes)",
             "value": "Done. (you need to have an idea of how to craft items, you can see them near Craftsman in votes)"
         },
         {
+            "id": "diaqu165",
             "key": "Well, it's not bad, so use it for the first time.",
             "value": "Well, it's not bad, so use it for the first time."
         },
         {
+            "id": "diaqu166",
             "key": "All right so let's start with your first ore?",
             "value": "All right so let's start with your first ore?"
         },
         {
+            "id": "diaqu170",
             "key": "Well, as [Player], passed customs?",
             "value": "Well, as [Player], passed customs?"
         },
         {
+            "id": "diaqu171",
             "key": "Yes [Talked]. He was very rude.",
             "value": "Yes [Talked]. He was very rude."
         },
         {
+            "id": "diaqu172",
             "key": "Well, you have to understand that we also have a lot of problems lately, too many monsters, problems with kidnappings.",
             "value": "Well, you have to understand that we also have a lot of problems lately, too many monsters, problems with kidnappings."
         },
         {
+            "id": "diaqu173",
             "key": "Come on, show me [Here] seats!",
             "value": "Come on, show me [Here] seats!"
         },
         {
+            "id": "diaqu174",
             "key": "Oh sure. By the way, in our village, the chief Apostle.",
             "value": "Oh sure. By the way, in our village, the chief Apostle."
         },
         {
+            "id": "diaqu175",
             "key": "Wait an Apostle? They are ancient beings sent by the gods. Do they exist?",
             "value": "Wait an Apostle? They are ancient beings sent by the gods. Do they exist?"
         },
         {
+            "id": "diaqu176",
             "key": "Yes [Player]. They exist to keep order.",
             "value": "Yes [Player]. They exist to keep order."
         },
         {
+            "id": "diaqu177",
             "key": "Okay [Player] let's go and show you our [Here]",
             "value": "Okay [Player] let's go and show you our [Here]"
         },
         {
+            "id": "diaqu180",
             "key": "**She said with a smile**: Here, you can do a craft items, make your own equipment potions, or what to eat.",
             "value": "**She said with a smile**: Here, you can do a craft items, make your own equipment potions, or what to eat."
         },
         {
+            "id": "diaqu181",
             "key": "[Player] even if you provide items, the craftsman you must pay for the use of the equipment",
             "value": "[Player] even if you provide items, the craftsman you must pay for the use of the equipment"
         },
         {
+            "id": "diaqu182",
             "key": "Yes I think I can use it. Thanks for the explanation!",
             "value": "Yes I think I can use it. Thanks for the explanation!"
         },
         {
+            "id": "diaqu183",
             "key": "Let's move on!",
             "value": "Let's move on!"
         },
         {
+            "id": "diaqu184",
             "key": "Yes let's go :)",
             "value": "Yes let's go :)"
         },
         {
+            "id": "diaqu190",
             "key": "So here we have someone's house.",
             "value": "So here we have someone's house."
         },
         {
+            "id": "diaqu191",
             "key": "You can also buy houses, decorate them or use the safety Deposit box.",
             "value": "You can also buy houses, decorate them or use the safety Deposit box."
         },
         {
+            "id": "diaqu192",
             "key": "Sounds good [Talked]!",
             "value": "Sounds good [Talked]!"
         },
         {
+            "id": "diaqu193",
             "key": "**She likes to talk**: Well, okay, let's move on!",
             "value": "**She likes to talk**: Well, okay, let's move on!"
         },
         {
+            "id": "diaqu200",
             "key": "This is the ether, it allows you to use instantaneous movement around the world.",
             "value": "This is the ether, it allows you to use instantaneous movement around the world."
         },
         {
+            "id": "diaqu201",
             "key": "But only there in the area where you have already visited.",
             "value": "But only there in the area where you have already visited."
         },
         {
+            "id": "diaqu202",
             "key": "Is it free [Talked]?",
             "value": "Is it free [Talked]?"
         },
         {
+            "id": "diaqu203",
             "key": "Not always, there is nothing free in our world!",
             "value": "Not always, there is nothing free in our world!"
         },
         {
+            "id": "diaqu204",
             "key": "**Apparently she didn't like something**: Okay [Player] let's move on!",
             "value": "**Apparently she didn't like something**: Okay [Player] let's move on!"
         },
         {
+            "id": "diaqu205",
             "key": "Yes let's go [Talked]!",
             "value": "Yes let's go [Talked]!"
         },
         {
+            "id": "diaqu210",
             "key": "Here you will be able to raise his skills adventurer, to explore something new. Our world is divided into 3 classes (Healer, Tank, DPS)",
             "value": "Here you will be able to raise his skills adventurer, to explore something new. Our world is divided into 3 classes (Healer, Tank, DPS)"
         },
         {
+            "id": "diaqu211",
             "key": "So I can become something?",
             "value": "So I can become something?"
         },
         {
+            "id": "diaqu212",
             "key": "[Player], you can be anyone you want (as well as fine-tune your game mode)",
             "value": "[Player], you can be anyone you want (as well as fine-tune your game mode)"
         },
         {
+            "id": "diaqu213",
             "key": "[Talked] so I can be both a Tank and a Defender?",
             "value": "[Talked] so I can be both a Tank and a Defender?"
         },
         {
+            "id": "diaqu214",
             "key": "Yes quite but do not forget about the main characteristics (Strength, Hardness, idk)",
             "value": "Yes quite but do not forget about the main characteristics (Strength, Hardness, idk)"
         },
         {
+            "id": "diaqu215",
             "key": "Thank you for a clear explanation :)",
             "value": "Thank you for a clear explanation :)"
         },
         {
+            "id": "diaqu216",
             "key": "That's a small part of what I've been able to tell you.",
             "value": "That's a small part of what I've been able to tell you."
         },
         {
+            "id": "diaqu220",
             "key": "And here, you will be treated. ",
             "value": "And here, you will be treated. "
         },
         {
+            "id": "diaqu221",
             "key": "**She said very jealously**: True, I hate those nurses, all the guys from the village are taken away....",
             "value": "**She said very jealously**: True, I hate those nurses, all the guys from the village are taken away...."
         },
         {
+            "id": "diaqu222",
             "key": "Don't marry them...",
             "value": "Don't marry them..."
         },
         {
+            "id": "diaqu223",
             "key": "Yes I will not marry anyone [Talked]! Thanks for the care!",
             "value": "Yes I will not marry anyone [Talked]! Thanks for the care!"
         },
         {
+            "id": "diaqu230",
             "key": "**Yawning she said**: Okay I'm tired I'll go home.",
             "value": "**Yawning she said**: Okay I'm tired I'll go home."
         },
         {
+            "id": "diaqu231",
             "key": "And you don't disappear, and [Player] go wash up :)",
             "value": "And you don't disappear, and [Player] go wash up :)"
         },
         {
+            "id": "diaqu232",
             "key": "Well have a good day [Talked] :)",
             "value": "Well have a good day [Talked] :)"
         },
         {
+            "id": "diaqu240",
+            "key": "Are you ready?",
+            "value": "Are you ready?"
+        },
+        {
+            "id": "diaqu241",
+            "key": "What, ready?",
+            "value": "What, ready?"
+        },
+        {
+            "id": "diaqu242",
+            "key": "Introduce you [Player] to the Apostle of our village. ",
+            "value": "Introduce you [Player] to the Apostle of our village. "
+        },
+        {
+            "id": "diaqu243",
+            "key": "[Talked] so what's it to them for me?",
+            "value": "[Talked] so what's it to them for me?"
+        },
+        {
+            "id": "diaqu244",
+            "key": "**She said rudely**: No, don't think so bad, they actually think of us as their children.",
+            "value": "**She said rudely**: No, don't think so bad, they actually think of us as their children."
+        },
+        {
+            "id": "diaqu245",
+            "key": "Why so rude? I understand you, okay, I'm worried, but we'll see what happens.",
+            "value": "Why so rude? I understand you, okay, I'm worried, but we'll see what happens."
+        },
+        {
+            "id": "diaqu246",
+            "key": "I'm sorry, but she's really close to me.",
+            "value": "I'm sorry, but she's really close to me."
+        },
+        {
+            "id": "diaqu247",
+            "key": "Are you one of them? Hm...",
+            "value": "Are you one of them? Hm..."
+        },
+        {
+            "id": "diaqu248",
+            "key": "Fool let's go already.",
+            "value": "Fool let's go already."
+        },
+        {
+            "id": "diaqu249",
+            "key": "Well ... Let's go",
+            "value": "Well ... Let's go"
+        },
+        {
+            "id": "diaqu250",
             "key": "Well, just don't mess with as a joke, it's Apostle, he is watching over us for many years.",
             "value": "Well, just don't mess with as a joke, it's Apostle, he is watching over us for many years."
         },
         {
+            "id": "diaqu251",
             "key": "I understand [Talked].",
             "value": "I understand [Talked]."
         },
         {
+            "id": "diaqu260",
             "key": "Hello dear Apostle *bowing*. I have come to you to wisdom.",
             "value": "Hello dear Apostle *bowing*. I have come to you to wisdom."
         },
         {
+            "id": "diaqu261",
             "key": "Hello, lift your head. I knew you'd come. But I'm not sure you're the one I saw.",
             "value": "Hello, lift your head. I knew you'd come. But I'm not sure you're the one I saw."
         },
         {
+            "id": "diaqu262",
             "key": "See it?",
             "value": "See it?"
         },
         {
+            "id": "diaqu263",
             "key": "I can't communicate with my brothers and sisters, since our paths have diverged, but we have a common mind.",
             "value": "I can't communicate with my brothers and sisters, since our paths have diverged, but we have a common mind."
         },
         {
+            "id": "diaqu264",
             "key": "I had a vision about a year ago that there would soon be a man who was as tenacious as the Apostles.",
             "value": "I had a vision about a year ago that there would soon be a man who was as tenacious as the Apostles."
         },
         {
+            "id": "diaqu265",
             "key": "But in the end, he was going to die. My visions have always come true, but when they will come true is unknown.",
             "value": "But in the end, he was going to die. My visions have always come true, but when they will come true is unknown."
         },
         {
+            "id": "diaqu266",
             "key": "So please be careful [Player]. I'm worried about everyone, but I've also been weak lately.",
             "value": "So please be careful [Player]. I'm worried about everyone, but I've also been weak lately."
         },
         {
+            "id": "diaqu267",
             "key": "I .. Not to worry, I can handle it even if I turn out to be one of your visions",
             "value": "I .. Not to worry, I can handle it even if I turn out to be one of your visions"
         },
         {
+            "id": "diaqu268",
             "key": "I hope this is not the case, get used to it, then go to Adventurer Koto.",
             "value": "I hope this is not the case, get used to it, then go to Adventurer Koto."
         },
         {
+            "id": "diaqu269",
             "key": "Thanks a lot.",
             "value": "Thanks a lot."
         },
         {
+            "id": "diaqu270",
             "key": "Hello [Talked], the Apostle sent me to you. I want to be an adventurer!",
             "value": "Hello [Talked], the Apostle sent me to you. I want to be an adventurer!"
         },
         {
+            "id": "diaqu271",
             "key": "**He as if he doesn't want me to become an adventurer**: Will you be strong enough? Well, let's see, I think you already understand that you first need to test, only after I say whether you are worthy or not to become an Adventurer?",
             "value": "**He as if he doesn't want me to become an adventurer**: Will you be strong enough? Well, let's see, I think you already understand that you first need to test, only after I say whether you are worthy or not to become an Adventurer?"
         },
         {
+            "id": "diaqu272",
             "key": "Well, what exactly is required?",
             "value": "Well, what exactly is required?"
         },
         {
+            "id": "diaqu273",
             "key": "If you pass my first test, pay the fee, I encourage you, and send you to the exam. And then we will decide whether you are worthy or not",
             "value": "If you pass my first test, pay the fee, I encourage you, and send you to the exam. And then we will decide whether you are worthy or not"
         },
         {
+            "id": "diaqu274",
             "key": "Okay, where do we start [Talked]?",
             "value": "Okay, where do we start [Talked]?"
         },
         {
+            "id": "diaqu275",
             "key": "Ha ha where do we start? Don't joke with me young fighter. First, take this and go to the southern part of the village.",
             "value": "Ha ha where do we start? Don't joke with me young fighter. First, take this and go to the southern part of the village."
         },
         {
+            "id": "diaqu696",
             "key": "Well",
             "value": "Well"
         },
         {
+            "id": "diaqu280",
             "key": "You did.",
             "value": "You did."
         },
         {
+            "id": "diaqu281",
             "key": "What could I do?",
             "value": "What could I do?"
         },
         {
+            "id": "diaqu282",
             "key": "I thought you were joking, you wouldn't take it seriously, but you came.",
             "value": "I thought you were joking, you wouldn't take it seriously, but you came."
         },
         {
+            "id": "diaqu283",
             "key": "Well, let's go.",
             "value": "Well, let's go."
         },
         {
+            "id": "diaqu284",
             "key": "Let's go.",
             "value": "Let's go."
         },
         {
+            "id": "diaqu290",
             "key": "Why are you shivering [Player]?",
             "value": "Why are you shivering [Player]?"
         },
         {
+            "id": "diaqu291",
             "key": "Am I that scary? Don't worry I'm kind *laughs*. Well, let's see how you cope. Kill for me ....",
             "value": "Am I that scary? Don't worry I'm kind *laughs*. Well, let's see how you cope. Kill for me ...."
         },
         {
+            "id": "diaqu292",
             "key": "I managed it, and it wasn't difficult.",
             "value": "I managed it, and it wasn't difficult."
         },
         {
+            "id": "diaqu293",
             "key": "I noticed how well you did. But don't relax this is just the beginning ^^",
             "value": "I noticed how well you did. But don't relax this is just the beginning ^^"
         },
         {
+            "id": "diaqu294",
             "key": "Ah.. Okay [Talked].",
             "value": "Ah.. Okay [Talked]."
         },
         {
+            "id": "diaqu295",
             "key": "Well today we're finished you can relax. You'll find me as soon as you're ready.",
             "value": "Well today we're finished you can relax. You'll find me as soon as you're ready."
         },
         {
+            "id": "diaqu296",
             "key": "Okay, well, have a good day.",
             "value": "Okay, well, have a good day."
         },
         {
+            "id": "diaqu300",
             "key": "Hello, I am the personal Ambassador of the Apostle.",
             "value": "Hello, I am the personal Ambassador of the Apostle."
         },
         {
+            "id": "diaqu301",
             "key": "She wants to see you!",
             "value": "She wants to see you!"
         },
         {
+            "id": "diaqu302",
             "key": "Please follow me to village, I will be waiting for you there",
             "value": "Please follow me to village, I will be waiting for you there"
         },
         {
+            "id": "diaqu303",
             "key": "Okay, I'm coming",
             "value": "Okay, I'm coming"
         },
         {
+            "id": "diaqu310",
             "key": "Listen there's another request!",
             "value": "Listen there's another request!"
         },
         {
+            "id": "diaqu311",
             "key": "[Player] if you find some gel, I'll be happy to exchange them. Brown Slimes,Blue Slimes and Pink Slime drop Gel. You can take your time, i'll wait!",
             "value": "[Player] if you find some gel, I'll be happy to exchange them. Brown Slimes,Blue Slimes and Pink Slime drop Gel. You can take your time, i'll wait!"
         },
         {
+            "id": "diaqu312",
             "key": "Here, it wasn't easy but I got it [Talked].",
             "value": "Here, it wasn't easy but I got it [Talked]."
         },
         {
+            "id": "diaqu313",
             "key": "Thank you very much for your help. All right I'll go back to my post, good luck to you [Player]!",
             "value": "Thank you very much for your help. All right I'll go back to my post, good luck to you [Player]!"
         },
         {
+            "id": "diaqu314",
             "key": "Thank's [Talked]",
             "value": "Thank's [Talked]"
         },
         {
+            "id": "diaqu320",
             "key": "[Player] you can go in!",
             "value": "[Player] you can go in!"
         },
         {
+            "id": "diaqu321",
             "key": "Well [Talked], thank you for seeing me off!",
             "value": "Well [Talked], thank you for seeing me off!"
         },
         {
+            "id": "diaqu330",
             "key": "[Player] first we need to win over the slime. Dirty but necessary.",
             "value": "[Player] first we need to win over the slime. Dirty but necessary."
         },
         {
+            "id": "diaqu331",
             "key": "I report everything, I coped with the task",
             "value": "I report everything, I coped with the task"
         },
         {
+            "id": "diaqu332",
             "key": "Well done, but that's not all.",
             "value": "Well done, but that's not all."
         },
         {
+            "id": "diaqu333",
             "key": "Anything else?",
             "value": "Anything else?"
         },
         {
+            "id": "diaqu334",
             "key": "Yes I think you know about the ethers find me next to him",
             "value": "Yes I think you know about the ethers find me next to him"
         },
         {
+            "id": "diaqu340",
             "key": "I think you know that these crystals are actually not just for beauty. ",
             "value": "I think you know that these crystals are actually not just for beauty. "
         },
         {
+            "id": "diaqu341",
             "key": "You use them as a quick transition. But in fact, these are crystals (all the light of good prosperity) precisely because they exist.",
             "value": "You use them as a quick transition. But in fact, these are crystals (all the light of good prosperity) precisely because they exist."
         },
         {
+            "id": "diaqu342",
             "key": "Me when once before as became defender of the Apostle, I was able to meet with the crystal. Yes, he has a mind. From it warmth on the soul, all the sins immediately fall from the soul. I'm sure you'll meet him one day.",
             "value": "Me when once before as became defender of the Apostle, I was able to meet with the crystal. Yes, he has a mind. From it warmth on the soul, all the sins immediately fall from the soul. I'm sure you'll meet him one day."
         },
         {
+            "id": "diaqu343",
             "key": "Thanks. I will remember that. (Auther text: This is how the player's rapprochement with the deities began)",
             "value": "Thanks. I will remember that. (Auther text: This is how the player's rapprochement with the deities began)"
         },
         {
+            "id": "diaqu344",
             "key": "Well, I'll wait for you in the Apostle's chambers. We will continue the expulsion of the monsters",
             "value": "Well, I'll wait for you in the Apostle's chambers. We will continue the expulsion of the monsters"
         },
         {
+            "id": "diaqu350",
             "key": "Our priority is higher now.",
             "value": "Our priority is higher now."
         },
         {
+            "id": "diaqu351",
             "key": "[Player] you need to defeat the main slug, in the southern part.",
             "value": "[Player] you need to defeat the main slug, in the southern part."
         },
         {
+            "id": "diaqu352",
             "key": "That's it, I've met my goal. Clearing dirt.",
             "value": "That's it, I've met my goal. Clearing dirt."
         },
         {
+            "id": "diaqu353",
             "key": "Well done, we'll meet again.",
             "value": "Well done, we'll meet again."
         },
         {
+            "id": "diaqu360",
             "key": "I want to talk to you [Player].",
             "value": "I want to talk to you [Player]."
         },
         {
+            "id": "diaqu361",
             "key": "I know that your path will not stop here. One day you will become stronger and move on.",
             "value": "I know that your path will not stop here. One day you will become stronger and move on."
         },
         {
+            "id": "diaqu362",
             "key": "I have a request to you, if you meet other apostles, it is better to avoid them. Don't trust them, we apostles are not as pure as you think",
             "value": "I have a request to you, if you meet other apostles, it is better to avoid them. Don't trust them, we apostles are not as pure as you think"
         },
         {
+            "id": "diaqu363",
             "key": "Maybe you, too, then the enemy really is?",
             "value": "Maybe you, too, then the enemy really is?"
         },
         {
+            "id": "diaqu364",
             "key": "I don't know *laughter*. The villagers I think will clearly tell you how it really is",
             "value": "I don't know *laughter*. The villagers I think will clearly tell you how it really is"
         },
         {
+            "id": "diaqu365",
             "key": "Diana told me about you in General terms.",
             "value": "Diana told me about you in General terms."
         },
         {
+            "id": "diaqu366",
             "key": "**She said it with concern**: You turn out to be a Joker, and a vulgar *laughter*",
             "value": "**She said it with concern**: You turn out to be a Joker, and a vulgar *laughter*"
         },
         {
+            "id": "diaqu367",
             "key": "No [Talked]......",
             "value": "No [Talked]......"
         },
         {
+            "id": "diaqu368",
             "key": "Always listen to your heart. I think one day you will be able to bring light. But the main thing is perseverance!",
             "value": "Always listen to your heart. I think one day you will be able to bring light. But the main thing is perseverance!"
         },
         {
+            "id": "diaqu369",
             "key": "Do not delay with your title of adventurer. You can go now!",
             "value": "Do not delay with your title of adventurer. You can go now!"
         },
         {
+            "id": "diaqu3610",
             "key": "I'm trying, thank you very much.",
             "value": "I'm trying, thank you very much."
         },
         {
+            "id": "diaqu370",
             "key": "You look sad today [Talked].",
             "value": "You look sad today [Talked]."
         },
         {
+            "id": "diaqu371",
             "key": "Oh man I'm too confused today.... [Player] help me collect lost.",
             "value": "Oh man I'm too confused today.... [Player] help me collect lost."
         },
         {
+            "id": "diaqu372",
             "key": "Take your nose up [Talked], what's wrong with you?",
             "value": "Take your nose up [Talked], what's wrong with you?"
         },
         {
+            "id": "diaqu373",
             "key": "My brother has to stop by today, and I want to cook something to feed him, but everything falls out of my hands..",
             "value": "My brother has to stop by today, and I want to cook something to feed him, but everything falls out of my hands.."
         },
         {
+            "id": "diaqu374",
             "key": "So let me help you?",
             "value": "So let me help you?"
         },
         {
+            "id": "diaqu375",
             "key": "And you I look [Player] today cheerful, well help. I will not remain in debt",
             "value": "And you I look [Player] today cheerful, well help. I will not remain in debt"
         },
         {
+            "id": "diaqu376",
             "key": "Of course [Talked] ;)",
             "value": "Of course [Talked] ;)"
         },
         {
+            "id": "diaqu380",
             "key": "Well here's my house! Ah as my not my, father is a master, and even brother. In General, our family",
             "value": "Well here's my house! Ah as my not my, father is a master, and even brother. In General, our family"
         },
         {
+            "id": "diaqu381",
             "key": "All right, come on in, I'll cook, and I'll ask you to bring something. All the help me need",
             "value": "All right, come on in, I'll cook, and I'll ask you to bring something. All the help me need"
         },
         {
+            "id": "diaqu382",
             "key": "I will help you, especially since you are my first close friend in this village, I already trust you, how you can be abandoned.",
             "value": "I will help you, especially since you are my first close friend in this village, I already trust you, how you can be abandoned."
         },
         {
+            "id": "diaqu390",
             "key": "Well [Player], let's get started, little by little",
             "value": "Well [Player], let's get started, little by little"
         },
         {
+            "id": "diaqu391",
             "key": "Your house comfortable! [Talked]",
             "value": "Your house comfortable! [Talked]"
         },
         {
+            "id": "diaqu392",
             "key": "Do you really think so? Well thank you.",
             "value": "Do you really think so? Well thank you."
         },
         {
+            "id": "diaqu393",
             "key": "All right let's get down to cooking",
             "value": "All right let's get down to cooking"
         },
         {
+            "id": "diaqu400",
             "key": "Well, let's get started [Player]!",
             "value": "Well, let's get started [Player]!"
         },
         {
+            "id": "diaqu401",
             "key": "Oh sure [Talked]",
             "value": "Oh sure [Talked]"
         },
         {
+            "id": "diaqu402",
             "key": "[Player] get me some first, we'll use it as oil",
             "value": "[Player] get me some first, we'll use it as oil"
         },
         {
+            "id": "diaqu403",
             "key": "I think everyone has their own way of making butter *laughter*",
             "value": "I think everyone has their own way of making butter *laughter*"
         },
         {
+            "id": "diaqu404",
             "key": "Yeah you're right, good sense of humor damn *laughter*",
             "value": "Yeah you're right, good sense of humor damn *laughter*"
         },
         {
+            "id": "diaqu410",
             "key": "So now I need meat. How to cook without meat.",
             "value": "So now I need meat. How to cook without meat."
         },
         {
+            "id": "diaqu411",
             "key": "I think you've heard of Kappa, they live near water, their meat is very tasty. So get it for me (you can self find them habitat)",
             "value": "I think you've heard of Kappa, they live near water, their meat is very tasty. So get it for me (you can self find them habitat)"
         },
         {
+            "id": "diaqu412",
             "key": "All delicious fine meat, looks great, take it!",
             "value": "All delicious fine meat, looks great, take it!"
         },
         {
+            "id": "diaqu413",
             "key": "Well i let's start cooking :)",
             "value": "Well i let's start cooking :)"
         },
         {
+            "id": "diaqu414",
             "key": "**You see like she didn't know how to cook**: Are you sure you can cook?",
             "value": "**You see like she didn't know how to cook**: Are you sure you can cook?"
         },
         {
+            "id": "diaqu415",
             "key": "**She said angrily**: You know what I'll tell you [Player]... You don't know how to compliment girls at all..",
             "value": "**She said angrily**: You know what I'll tell you [Player]... You don't know how to compliment girls at all.."
         },
         {
+            "id": "diaqu416",
             "key": "**Someone knocks on the door**: Who could it be? lovers?",
             "value": "**Someone knocks on the door**: Who could it be? lovers?"
         },
         {
+            "id": "diaqu417",
             "key": "Oh it's probably my brother.",
             "value": "Oh it's probably my brother."
         },
         {
+            "id": "diaqu420",
             "key": "**He said angrily and rudely**: Oh, what people, I've seen you somewhere.",
             "value": "**He said angrily and rudely**: Oh, what people, I've seen you somewhere."
         },
         {
+            "id": "diaqu421",
             "key": "You must have imagined it. ",
             "value": "You must have imagined it. "
         },
         {
+            "id": "diaqu422",
             "key": "Oh well.",
             "value": "Oh well."
         },
         {
+            "id": "diaqu430",
             "key": "[Player] you look sad.",
             "value": "[Player] you look sad."
         },
         {
+            "id": "diaqu431",
             "key": "Okay [Talked]. I'll probably go extra here",
             "value": "Okay [Talked]. I'll probably go extra here"
         },
         {
+            "id": "diaqu432",
             "key": "Yes calm down you why so decided to?",
             "value": "Yes calm down you why so decided to?"
         },
         {
+            "id": "diaqu433",
             "key": "Yes, everything is fine. I just have things to do, too. I'll go!",
             "value": "Yes, everything is fine. I just have things to do, too. I'll go!"
         },
         {
+            "id": "diaqu434",
             "key": "You offend me [Talked].....",
             "value": "You offend me [Talked]....."
         },
         {
+            "id": "diaqu435",
             "key": "Sorry I'm really busy [Talked].",
             "value": "Sorry I'm really busy [Talked]."
         },
         {
+            "id": "diaqu436",
             "key": "Well, take care of yourself.",
             "value": "Well, take care of yourself."
         },
         {
+            "id": "diaqu440",
             "key": "So let's continue our training.",
             "value": "So let's continue our training."
         },
         {
+            "id": "diaqu441",
             "key": "Yes, of course, it's about time!",
             "value": "Yes, of course, it's about time!"
         },
         {
+            "id": "diaqu442",
             "key": "**He speaks rudely**: I don't really like you. But let's see what you can achieve. Let's go back to the Deep Cave.",
             "value": "**He speaks rudely**: I don't really like you. But let's see what you can achieve. Let's go back to the Deep Cave."
         },
         {
+            "id": "diaqu450",
             "key": "**He speaks proudly**: Well, now we have more serious goals.",
             "value": "**He speaks proudly**: Well, now we have more serious goals."
         },
         {
+            "id": "diaqu451",
             "key": "Exterminate the stronger slime. I'll see.",
             "value": "Exterminate the stronger slime. I'll see."
         },
         {
+            "id": "diaqu452",
             "key": "Everything is ready, they are vile I do not like slime, maybe something new?",
             "value": "Everything is ready, they are vile I do not like slime, maybe something new?"
         },
         {
+            "id": "diaqu453",
             "key": "Well, I'll think about your request. Follow me.",
             "value": "Well, I'll think about your request. Follow me."
         },
         {
+            "id": "diaqu460",
             "key": "Take it, use it wisely. You will need it very much in the future.",
             "value": "Take it, use it wisely. You will need it very much in the future."
         },
         {
+            "id": "diaqu461",
             "key": "**You were surprised by the gift provided**: Oh, thank you very much. Do I owe you something?",
             "value": "**You were surprised by the gift provided**: Oh, thank you very much. Do I owe you something?"
         },
         {
+            "id": "diaqu462",
             "key": "I hope you make it to the end, at least I hope you do. I didn't think you'd be Apostle's favorite.",
             "value": "I hope you make it to the end, at least I hope you do. I didn't think you'd be Apostle's favorite."
         },
         {
+            "id": "diaqu463",
             "key": "Favorite [Talked]?",
             "value": "Favorite [Talked]?"
         },
         {
+            "id": "diaqu464",
             "key": "**He said very rudely**: I'll go, meet you later.",
             "value": "**He said very rudely**: I'll go, meet you later."
         },
         {
+            "id": "diaqu470",
             "key": "Hello [Player]. Are you free?",
             "value": "Hello [Player]. Are you free?"
         },
         {
+            "id": "diaqu471",
             "key": "Yes, of course. Everything okay?",
             "value": "Yes, of course. Everything okay?"
         },
         {
+            "id": "diaqu472",
             "key": "Apostle asked you to see her!",
             "value": "Apostle asked you to see her!"
         },
         {
+            "id": "diaqu473",
             "key": "Well!",
             "value": "Well!"
         },
         {
+            "id": "diaqu474",
             "key": "Thank you, I'm going for a walk!",
             "value": "Thank you, I'm going for a walk!"
         },
         {
+            "id": "diaqu480",
             "key": "**She speaks in fear**: Hello [Player]. Today I received news that in the southern part of our village, goblins attacked. ",
             "value": "**She speaks in fear**: Hello [Player]. Today I received news that in the southern part of our village, goblins attacked. "
         },
         {
+            "id": "diaqu481",
             "key": "And it's not just goblins. This must be the army. The leader brought them.",
             "value": "And it's not just goblins. This must be the army. The leader brought them."
         },
         {
+            "id": "diaqu482",
             "key": "Maybe they kidnapped the residents and terrorized you, and now they decided to attack?",
             "value": "Maybe they kidnapped the residents and terrorized you, and now they decided to attack?"
         },
         {
+            "id": "diaqu483",
             "key": "I think so too. Anyway, I talked to Koko. About your appointment as an adventurer. We should prepare for resistance. Communication nodes they need to be destroyed",
             "value": "I think so too. Anyway, I talked to Koko. About your appointment as an adventurer. We should prepare for resistance. Communication nodes they need to be destroyed"
         },
         {
+            "id": "diaqu484",
             "key": "Well, I did the job [Talked]!",
             "value": "Well, I did the job [Talked]!"
         },
         {
+            "id": "diaqu485",
             "key": "Good job thank's, you should meet with Koko, he will explain everything to you, good luck!",
             "value": "Good job thank's, you should meet with Koko, he will explain everything to you, good luck!"
         },
         {
+            "id": "diaqu486",
             "key": "Well, thank you!",
             "value": "Well, thank you!"
         },
         {
+            "id": "diaqu490",
             "key": "Get ready let's go to the Goblin-occupied zone.",
             "value": "Get ready let's go to the Goblin-occupied zone."
         },
         {
+            "id": "diaqu491",
             "key": "I'm ready to sort of out right now.",
             "value": "I'm ready to sort of out right now."
         },
         {
+            "id": "diaqu492",
             "key": "Well [Player], you're fun, Yes, but it's worth getting ready.",
             "value": "Well [Player], you're fun, Yes, but it's worth getting ready."
         },
         {
+            "id": "diaqu493",
             "key": "Well, what do need [Talked]?",
             "value": "Well, what do need [Talked]?"
         },
         {
+            "id": "diaqu494",
             "key": "I'll be waiting for you next to Craftsman.",
             "value": "I'll be waiting for you next to Craftsman."
         },
         {
+            "id": "diaqu500",
             "key": "So first we need potions.",
             "value": "So first we need potions."
         },
         {
+            "id": "diaqu501",
             "key": "Go get supplies, and at the same time exterminate a few slugs so that we can get there without any problems.",
             "value": "Go get supplies, and at the same time exterminate a few slugs so that we can get there without any problems."
         },
         {
+            "id": "diaqu502",
             "key": "**You sound very tired**: We can all move, but the problem is that I'm tired..",
             "value": "**You sound very tired**: We can all move, but the problem is that I'm tired.."
         },
         {
+            "id": "diaqu503",
             "key": "Nothing to worry about [Player]. You need to toughen up. All right let's move out.",
             "value": "Nothing to worry about [Player]. You need to toughen up. All right let's move out."
         },
         {
+            "id": "diaqu510",
             "key": "We'll get to the guard post now. We'll move out there to exterminate the goblins.",
             "value": "We'll get to the guard post now. We'll move out there to exterminate the goblins."
         },
         {
+            "id": "diaqu511",
             "key": "Well [Talked].",
             "value": "Well [Talked]."
         },
         {
+            "id": "diaqu520",
             "key": "**Grinning**: Huh?",
             "value": "**Grinning**: Huh?"
         },
         {
+            "id": "diaqu521",
             "key": "We can't heal her..",
             "value": "We can't heal her.."
         },
         {
+            "id": "diaqu522",
             "key": "I don't understand..",
             "value": "I don't understand.."
         },
         {
+            "id": "diaqu523",
             "key": "Our daughter, Maria.. She's sick!",
             "value": "Our daughter, Maria.. She's sick!"
         },
         {
+            "id": "diaqu524",
             "key": "Why don't you take her to the Nurse?!",
             "value": "Why don't you take her to the Nurse?!"
         },
         {
+            "id": "diaqu525",
             "key": "I tried, but she said she can't do anything.. I found something in an old book of mine.. A gel treatment. But I also need Kappa Meat for it..",
             "value": "I tried, but she said she can't do anything.. I found something in an old book of mine.. A gel treatment. But I also need Kappa Meat for it.."
         },
         {
+            "id": "diaqu526",
             "key": "Tha..nk.. You..",
             "value": "Tha..nk.. You.."
         },
         {
+            "id": "diaqu527",
             "key": "Well.. don't look at me, heal Maria!",
             "value": "Well.. don't look at me, heal Maria!"
         },
         {
+            "id": "diaqu530",
             "key": "F..Father?",
             "value": "F..Father?"
         },
         {
+            "id": "diaqu540",
             "key": "MARIA! You're well!",
             "value": "MARIA! You're well!"
         },
         {
+            "id": "diaqu541",
             "key": "*with joy* Hi, Maria!",
             "value": "*with joy* Hi, Maria!"
         },
         {
+            "id": "diaqu542",
             "key": "How can I ever make it up to you?",
             "value": "How can I ever make it up to you?"
         },
         {
+            "id": "diaqu543",
             "key": "Well Sir.. I might need a discount from your old friend, the Craftsman.",
             "value": "Well Sir.. I might need a discount from your old friend, the Craftsman."
         },
         {
+            "id": "diaqu544",
             "key": "Sure, I'll.. let him know you deserve it!",
             "value": "Sure, I'll.. let him know you deserve it!"
         },
         {
+            "id": "diaqu550",
             "key": "Sure..What can I do?",
             "value": "Sure..What can I do?"
         },
         {
+            "id": "diaqu551",
             "key": "I heard you helped the craftsman with his deliveries..I have no time for small things like mining cooper, can you do it for me? I have to save the world in the main time..",
             "value": "I heard you helped the craftsman with his deliveries..I have no time for small things like mining cooper, can you do it for me? I have to save the world in the main time.."
         },
         {
+            "id": "diaqu552",
             "key": " *a bit angry* Ok, I will do it.",
             "value": " *a bit angry* Ok, I will do it."
         },
         {
+            "id": "diaqu553",
             "key": "Oh, it's you kid!",
             "value": "Oh, it's you kid!"
         },
         {
+            "id": "diaqu554",
             "key": "*you can't control yourself* HEY. I'm NOT A KID!",
             "value": "*you can't control yourself* HEY. I'm NOT A KID!"
         },
         {
+            "id": "diaqu555",
             "key": "Hey.. easy, just a joke, did you get what I wanted?",
             "value": "Hey.. easy, just a joke, did you get what I wanted?"
         },
         {
+            "id": "diaqu556",
             "key": "Yes.. *puts a heavy cooper bag on Erik's table*",
             "value": "Yes.. *puts a heavy cooper bag on Erik's table*"
         },
         {
+            "id": "diaqu557",
             "key": "Good, now get out of here!",
             "value": "Good, now get out of here!"
         },
         {
+            "id": "diaqu558",
             "key": "Wait.. YOU NOT GONNA PAY ME??",
             "value": "Wait.. YOU NOT GONNA PAY ME??"
         },
         {
+            "id": "diaqu559",
             "key": "Haha! I am messing with you.",
             "value": "Haha! I am messing with you."
         },
         {
+            "id": "diaqu560",
             "key": "So can you tell me how you got here?",
             "value": "So can you tell me how you got here?"
         },
         {
+            "id": "diaqu561",
             "key": "**He's stuttered**: A long story..",
             "value": "**He's stuttered**: A long story.."
         },
         {
+            "id": "diaqu562",
             "key": "We tried a new potion mixed with ether, but something went wrong, my hiccups are part of this experiment, and I ended up here after I drank it",
             "value": "We tried a new potion mixed with ether, but something went wrong, my hiccups are part of this experiment, and I ended up here after I drank it"
         },
         {
+            "id": "diaqu563",
             "key": "**Sound in the tablet**: Noctis... Noctiis. Do you hear me?",
             "value": "**Sound in the tablet**: Noctis... Noctiis. Do you hear me?"
         },
         {
+            "id": "diaqu564",
             "key": "**Noctis**: I can hear you, how do I get out of here?",
             "value": "**Noctis**: I can hear you, how do I get out of here?"
         },
         {
+            "id": "diaqu565",
             "key": "**Sound in the tablet**: Collect all the fragments that ended up here. The connection is lost....",
             "value": "**Sound in the tablet**: Collect all the fragments that ended up here. The connection is lost...."
         },
         {
+            "id": "diaqu566",
             "key": "What were you talking to just now?",
             "value": "What were you talking to just now?"
         },
         {
+            "id": "diaqu567",
             "key": "A tablet made from a magic crystal. In General, as I thought I need your help in collecting fragments",
             "value": "A tablet made from a magic crystal. In General, as I thought I need your help in collecting fragments"
         },
         {
+            "id": "diaqu568",
             "key": "Of course I'll help",
             "value": "Of course I'll help"
         },
         {
+            "id": "diaqu570",
             "key": "Look at what I can give you in return for your help. (Vote menu shop list)",
             "value": "Look at what I can give you in return for your help. (Vote menu shop list)"
         },
         {
+            "id": "diaqu571",
             "key": "Wow, [Talked] where can I find them?",
             "value": "Wow, [Talked] where can I find them?"
         },
         {
+            "id": "diaqu572",
             "key": "In a distorted dimension.",
             "value": "In a distorted dimension."
         },
         {
+            "id": "diaqu573",
             "key": "Where is it? How do I get there?",
             "value": "Where is it? How do I get there?"
         },
         {
+            "id": "diaqu574",
             "key": "[Player] way, so we'll be preparing to get there.",
             "value": "[Player] way, so we'll be preparing to get there."
         },
         {
+            "id": "diaqu580",
             "key": "So first [Player], I'll need these things from you. They resonate between our worlds",
             "value": "So first [Player], I'll need these things from you. They resonate between our worlds"
         },
         {
+            "id": "diaqu581",
             "key": "Take it [Talked].",
             "value": "Take it [Talked]."
         },
         {
+            "id": "diaqu582",
             "key": "Well thank you, it will be a little easier now.",
             "value": "Well thank you, it will be a little easier now."
         },
         {
+            "id": "diaqu583",
             "key": "**Sound in the tablet**: Noctis. How you to get the fragments we will be able to pick you up.",
             "value": "**Sound in the tablet**: Noctis. How you to get the fragments we will be able to pick you up."
         },
         {
+            "id": "diaqu584",
             "key": "**Noctis**: Okay, Sid..",
             "value": "**Noctis**: Okay, Sid.."
         },
         {
+            "id": "diaqu590",
             "key": "Next thing I need to create a resonance. Bring me these items.",
             "value": "Next thing I need to create a resonance. Bring me these items."
         },
         {
+            "id": "diaqu591",
             "key": "Everything is ready?. [Talked] take it",
             "value": "Everything is ready?. [Talked] take it"
         },
         {
+            "id": "diaqu592",
             "key": "[Player] yes.. almost, follow me and we'll start resonating.",
             "value": "[Player] yes.. almost, follow me and we'll start resonating."
         },
         {
+            "id": "diaqu600",
             "key": "All ready.",
             "value": "All ready."
         },
         {
+            "id": "diaqu601",
             "key": "Resonance received. I will wait for you with fragments",
             "value": "Resonance received. I will wait for you with fragments"
         },
         {
+            "id": "diaqu602",
             "key": "Can come to resonance?",
             "value": "Can come to resonance?"
         },
         {
+            "id": "diaqu603",
             "key": "Yes. Don't worry nothing will happen to you.",
             "value": "Yes. Don't worry nothing will happen to you."
         },
         {
+            "id": "diaqu610",
             "key": "I welcome you [Talked], nice to meet you.",
             "value": "I welcome you [Talked], nice to meet you."
         },
         {
+            "id": "diaqu611",
             "key": "Glad to meet you, i'am [Player]!",
             "value": "Glad to meet you, i'am [Player]!"
         },
         {
+            "id": "diaqu620",
             "key": "Him you will spend time here. I have to go to the village.",
             "value": "Him you will spend time here. I have to go to the village."
         },
         {
+            "id": "diaqu621",
             "key": "Need to stand on defense in the village, good luck to you I will wait for good news from you.",
             "value": "Need to stand on defense in the village, good luck to you I will wait for good news from you."
         },
         {
+            "id": "diaqu622",
             "key": "Good luck to you [Talked].",
             "value": "Good luck to you [Talked]."
         },
         {
+            "id": "diaqu630",
             "key": "I came from a far Eastern country, I have some problems in the country so I need to become stronger.",
             "value": "I came from a far Eastern country, I have some problems in the country so I need to become stronger."
         },
         {
+            "id": "diaqu631",
             "key": "I came for similar purposes. But I would like to visit your country.",
             "value": "I came for similar purposes. But I would like to visit your country."
         },
         {
+            "id": "diaqu632",
             "key": "**He speaks with a smile**: If you wish I will be sailing back soon I can take you with me",
             "value": "**He speaks with a smile**: If you wish I will be sailing back soon I can take you with me"
         },
         {
+            "id": "diaqu633",
             "key": "I'd love to, but I don't know, i have here made friends. We'll see.",
             "value": "I'd love to, but I don't know, i have here made friends. We'll see."
         },
         {
+            "id": "diaqu634",
             "key": "Well, if we still live of course. And the got to talking and drive away goblins need.",
             "value": "Well, if we still live of course. And the got to talking and drive away goblins need."
         },
         {
+            "id": "diaqu640",
             "key": "To begin with, we must exterminate many of them as possible. To get to them in zone",
             "value": "To begin with, we must exterminate many of them as possible. To get to them in zone"
         },
         {
+            "id": "diaqu641",
             "key": "**Very tired voice**: [Talked]. I'm so tired, there are so many of them.....",
             "value": "**Very tired voice**: [Talked]. I'm so tired, there are so many of them....."
         },
         {
+            "id": "diaqu642",
             "key": "**He sounds very tired**: Yes, I am also very tired, but we have to deal with it.",
             "value": "**He sounds very tired**: Yes, I am also very tired, but we have to deal with it."
         },
         {
+            "id": "diaqu643",
             "key": "All right let's keep going before they pile up again.",
             "value": "All right let's keep going before they pile up again."
         },
         {
+            "id": "diaqu650",
             "key": "Hmmm.. I see a passageway. I think we can go through there and find out where they're coming from.",
             "value": "Hmmm.. I see a passageway. I think we can go through there and find out where they're coming from."
         },
         {
+            "id": "diaqu651",
             "key": "I'm worried about something.. Where did this hole?",
             "value": "I'm worried about something.. Where did this hole?"
         },
         {
+            "id": "diaqu652",
             "key": "I don't know either, honestly. Maybe the goblins have dug through and are coming out. In any case we need to find out.",
             "value": "I don't know either, honestly. Maybe the goblins have dug through and are coming out. In any case we need to find out."
         },
         {
+            "id": "diaqu660",
             "key": "I think this is where they live. ",
             "value": "I think this is where they live. "
         },
         {
+            "id": "diaqu661",
             "key": "In any case, if we can not cope with them, there is an option to block the way. But I think they'll dig it up again in time.",
             "value": "In any case, if we can not cope with them, there is an option to block the way. But I think they'll dig it up again in time."
         },
         {
+            "id": "diaqu662",
             "key": "**In anger**: LET's BREAK UP THESE FREAKS ALREADY... ",
             "value": "**In anger**: LET's BREAK UP THESE FREAKS ALREADY... "
         },
         {
+            "id": "diaqu663",
             "key": "I'm only for your idea. Let's go!",
             "value": "I'm only for your idea. Let's go!"
         },
         {
+            "id": "diaqu670",
             "key": "And here is their leader.",
             "value": "And here is their leader."
         },
         {
+            "id": "diaqu671",
             "key": "Did we manage?",
             "value": "Did we manage?"
         },
         {
+            "id": "diaqu672",
             "key": "We don't know yet we need to get out of here....",
             "value": "We don't know yet we need to get out of here...."
         },
         {
+            "id": "diaqu673",
             "key": "I'll be waiting for you where we fought the goblins.",
             "value": "I'll be waiting for you where we fought the goblins."
         },
         {
+            "id": "diaqu680",
             "key": "Finally we got out how do you think we managed?",
             "value": "Finally we got out how do you think we managed?"
         },
         {
+            "id": "diaqu681",
             "key": "I don't know [Player], we have to report this news to the village.",
             "value": "I don't know [Player], we have to report this news to the village."
         },
         {
+            "id": "diaqu690",
             "key": "Well, I think my work here is done [Player].",
             "value": "Well, I think my work here is done [Player]."
         },
         {
+            "id": "diaqu691",
             "key": "Your [Talked] next trip will be to your homeland?",
             "value": "Your [Talked] next trip will be to your homeland?"
         },
         {
+            "id": "diaqu692",
             "key": "Yes, I think it's time to go home, I missed it.",
             "value": "Yes, I think it's time to go home, I missed it."
         },
         {
+            "id": "diaqu693",
             "key": "Will you take me with you?",
             "value": "Will you take me with you?"
         },
         {
+            "id": "diaqu694",
             "key": "Yes, of course. Say goodbye to your friends or maybe one of them will go with you?",
             "value": "Yes, of course. Say goodbye to your friends or maybe one of them will go with you?"
         },
         {
+            "id": "diaqu695",
             "key": "No, I don't want to expose them to danger.",
             "value": "No, I don't want to expose them to danger."
         },
         {
+            "id": "diaqu696",
+            "key": "Well",
+            "value": "Well"
+        },
+        {
+            "id": "diaqu700",
             "key": "Well, goodbye [Talked], I'll keep going. I want to be stronger than I was before.",
             "value": "Well, goodbye [Talked], I'll keep going. I want to be stronger than I was before."
         },
         {
+            "id": "diaqu701",
             "key": "All right [Player]. Good luck don't forget that we will always be happy to welcome you as a guest ;)",
             "value": "All right [Player]. Good luck don't forget that we will always be happy to welcome you as a guest ;)"
         },
         {
+            "id": "diaqu702",
             "key": "Don't forget, don't miss me ;)",
             "value": "Don't forget, don't miss me ;)"
         },
         {
+            "id": "diaqu703",
             "key": "Don't worry, Diana is very attached to you. I think she will be offended. Talk to she!",
             "value": "Don't worry, Diana is very attached to you. I think she will be offended. Talk to she!"
         },
         {
+            "id": "diaqu710",
             "key": "Why didn't you tell [Player] me you were going to leave?",
             "value": "Why didn't you tell [Player] me you were going to leave?"
         },
         {
+            "id": "diaqu711",
             "key": "I'm Sorry [Talked]. I wanted to tell you..",
             "value": "I'm Sorry [Talked]. I wanted to tell you.."
         },
         {
+            "id": "diaqu712",
             "key": "**She said sadly**: Why? Will you take me with you?",
             "value": "**She said sadly**: Why? Will you take me with you?"
         },
         {
+            "id": "diaqu713",
             "key": "I don't want to put you in danger!",
             "value": "I don't want to put you in danger!"
         },
         {
+            "id": "diaqu714",
             "key": "I want to travel with you!",
             "value": "I want to travel with you!"
         },
         {
+            "id": "diaqu715",
             "key": "Ok, I'll take you. Now let me to say Yasue San.",
             "value": "Ok, I'll take you. Now let me to say Yasue San."
         },
         {
+            "id": "diaqu716",
             "key": "**She said joyfully**: True? Thank! ;)",
             "value": "**She said joyfully**: True? Thank! ;)"
         },
         {
+            "id": "diaqu720",
             "key": "Well, ready to go?",
             "value": "Well, ready to go?"
         },
         {
+            "id": "diaqu721",
             "key": "Yes, will I take Diana with me?",
             "value": "Yes, will I take Diana with me?"
         },
         {
+            "id": "diaqu722",
             "key": "Yes, of course, set sail:) I will show you my homeland!",
             "value": "Yes, of course, set sail:) I will show you my homeland!"
         },
         {
+            "id": "dianp10",
             "key": "**He said surprised**: What a wonderful weather today!",
             "value": "**He said surprised**: What a wonderful weather today!"
         },
         {
+            "id": "dianp11",
             "key": "Yes, I think so too.",
             "value": "Yes, I think so too."
         },
         {
+            "id": "dianp12",
             "key": "Well, how do you like on our ship [Player]? Captures the ocean, i think I'll stay here a little longer, it's wonderful here.",
             "value": "Well, how do you like on our ship [Player]? Captures the ocean, i think I'll stay here a little longer, it's wonderful here."
         },
         {
+            "id": "dianp13",
             "key": "I also really like it. Okay, I'll go, I wish you a good rest [Talked]!",
             "value": "I also really like it. Okay, I'll go, I wish you a good rest [Talked]!"
         },
         {
+            "id": "dianp14",
             "key": "And I wish you good luck too [Player]!",
             "value": "And I wish you good luck too [Player]!"
         },
         {
+            "id": "dianp20",
             "key": "**He looks very tired**: Very hot, impossible to work.",
             "value": "**He looks very tired**: Very hot, impossible to work."
         },
         {
+            "id": "dianp30",
             "key": "Hello, I arrived from a small village beyond the mountains and the ocean, my name is [Player], I have a desire to become an adventurer. But I do not know about this place, could you help me?",
             "value": "Hello, I arrived from a small village beyond the mountains and the ocean, my name is [Player], I have a desire to become an adventurer. But I do not know about this place, could you help me?"
         },
         {
+            "id": "dianp31",
             "key": "Hello [Player], Yes of course I will help you, explain where you need to go, but you help my workers, they do not cope at all.",
             "value": "Hello [Player], Yes of course I will help you, explain where you need to go, but you help my workers, they do not cope at all."
         },
         {
+            "id": "dianp32",
             "key": "What you need help with, I'm good at dealing with predators without meat you will not leave! *laughter*",
             "value": "What you need help with, I'm good at dealing with predators without meat you will not leave! *laughter*"
         },
         {
+            "id": "dianp33",
             "key": "Oh, you're a Joker, no thanks go a little further guys will explain everything to you!",
             "value": "Oh, you're a Joker, no thanks go a little further guys will explain everything to you!"
         },
         {
+            "id": "dianp34",
             "key": "OK, thanks!",
             "value": "OK, thanks!"
         },
         {
+            "id": "dianp90",
             "key": "Hey, pst! You, yes, you!",
             "value": "Hey, pst! You, yes, you!"
         },
         {
+            "id": "dianp91",
             "key": "Yeah? How can I help?",
             "value": "Yeah? How can I help?"
         },
         {
+            "id": "dianp92",
             "key": "You cannot help me, kid! I just need...to TEST you, yes...!",
             "value": "You cannot help me, kid! I just need...to TEST you, yes...!"
         },
         {
+            "id": "dianp100",
             "key": "Hi my name is [Player], [Talked] are you working?",
             "value": "Hi my name is [Player], [Talked] are you working?"
         },
         {
+            "id": "dianp101",
             "key": "Hello [Player], Yes, I am on duty as a guard, and I also trade a little",
             "value": "Hello [Player], Yes, I am on duty as a guard, and I also trade a little"
         },
         {
+            "id": "dianp102",
             "key": "Can you tell me how difficult it is to get into the service?",
             "value": "Can you tell me how difficult it is to get into the service?"
         },
         {
+            "id": "dianp103",
             "key": "If that's what you want, it's easy. And if you don't then you won't be able to get in ;)",
             "value": "If that's what you want, it's easy. And if you don't then you won't be able to get in ;)"
         },
         {
+            "id": "dianp104",
             "key": "By the way [Player], I need help, there are slugs nearby, again raging, and I can't leave the post. At the same time you will test your skills young adventurer.",
             "value": "By the way [Player], I need help, there are slugs nearby, again raging, and I can't leave the post. At the same time you will test your skills young adventurer."
         },
         {
+            "id": "dianp105",
             "key": "Yes, no problem, wait [Talked]!!",
             "value": "Yes, no problem, wait [Talked]!!"
         },
         {
+            "id": "dianp110",
             "key": "**He says with a look of horror on his face**: Help me find my daughter, she went to the village for food and never returned.",
             "value": "**He says with a look of horror on his face**: Help me find my daughter, she went to the village for food and never returned."
         },
         {
+            "id": "dianp111",
             "key": "To the village? [Talked] Yes of course I will help. That's where I need to go!",
             "value": "To the village? [Talked] Yes of course I will help. That's where I need to go!"
         },
         {
+            "id": "dianp112",
             "key": "Thanks a lot",
             "value": "Thanks a lot"
         },
         {
+            "id": "dianp130",
             "key": "Hello, would you like to learn the basics of mining?",
             "value": "Hello, would you like to learn the basics of mining?"
         },
         {
+            "id": "dianp131",
             "key": "Yes, of course, I don't mind",
             "value": "Yes, of course, I don't mind"
         },
         {
+            "id": "dianp132",
             "key": "All right follow me I'll explain the basics to you!",
             "value": "All right follow me I'll explain the basics to you!"
         },
         {
+            "id": "dianp140",
             "key": "Hello, and so you're new here?",
             "value": "Hello, and so you're new here?"
         },
         {
+            "id": "dianp141",
             "key": "Yes.",
             "value": "Yes."
         },
         {
+            "id": "dianp142",
             "key": "I need to register you. Please introduce yourself, and the purpose of your arrival, and the time you to stay here",
             "value": "I need to register you. Please introduce yourself, and the purpose of your arrival, and the time you to stay here"
         },
         {
+            "id": "dianp143",
             "key": "My name is [Player]. I came here to become an adventurer. I can't tell you the exact time of stay.",
             "value": "My name is [Player]. I came here to become an adventurer. I can't tell you the exact time of stay."
         },
         {
+            "id": "dianp144",
             "key": "And who for you should know the time of your stay here.",
             "value": "And who for you should know the time of your stay here."
         },
         {
+            "id": "dianp145",
             "key": "Okay well, I will write you down, in case of violation of the rules of our village, we have every right to prohibit your presence here, and report to superiors.",
             "value": "Okay well, I will write you down, in case of violation of the rules of our village, we have every right to prohibit your presence here, and report to superiors."
         },
         {
+            "id": "dianp146",
             "key": "Have a good day!",
             "value": "Have a good day!"
         },
         {
+            "id": "dianp147",
             "key": "Thank's [Talked]!",
             "value": "Thank's [Talked]!"
         },
         {
+            "id": "dianp160",
             "key": "[Stranger]Greetings, wanderer. *bowing*",
             "value": "[Stranger]Greetings, wanderer. *bowing*"
         },
         {
+            "id": "dianp161",
             "key": "I am the Deputy of the Apostle, and I also protect her.",
             "value": "I am the Deputy of the Apostle, and I also protect her."
         },
         {
+            "id": "dianp162",
             "key": "I think you've already heard, that the monsters are raging.",
             "value": "I think you've already heard, that the monsters are raging."
         },
         {
+            "id": "dianp163",
             "key": "I have a request for you [Player]",
             "value": "I have a request for you [Player]"
         },
         {
+            "id": "dianp164",
             "key": "Which one?",
             "value": "Which one?"
         },
         {
+            "id": "dianp165",
             "key": "Help in the southern part to win over the monsters. We can't drive them away but we can scare them away.",
             "value": "Help in the southern part to win over the monsters. We can't drive them away but we can scare them away."
         },
         {
+            "id": "dianp166",
             "key": "Of course I will.",
             "value": "Of course I will."
         },
         {
+            "id": "dianp167",
             "key": "Thank's [Player]!",
             "value": "Thank's [Player]!"
         },
         {
+            "id": "dianp180",
             "key": "You look awful today, [Talked]! What happend?",
             "value": "You look awful today, [Talked]! What happend?"
         },
         {
+            "id": "dianp181",
             "key": "Oh.. don't you worry about me, boy..",
             "value": "Oh.. don't you worry about me, boy.."
         },
         {
+            "id": "dianp182",
             "key": "But I DO worry!",
             "value": "But I DO worry!"
         },
         {
+            "id": "dianp183",
             "key": "I'm tired of these fight I have with my wife, it's personal bussiness.",
             "value": "I'm tired of these fight I have with my wife, it's personal bussiness."
         },
         {
+            "id": "dianp184",
             "key": "I didn't want to be a pain to you, Officer. I will leave you to your problems now.",
             "value": "I didn't want to be a pain to you, Officer. I will leave you to your problems now."
         },
         {
+            "id": "dianp185",
             "key": "No! Wait!",
             "value": "No! Wait!"
         },
         {
+            "id": "dianp190",
             "key": "Hello [Player], I have come to you from the Final Fantasy universe, my name is [Talked].",
             "value": "Hello [Player], I have come to you from the Final Fantasy universe, my name is [Talked]."
         },
         {
+            "id": "dianp191",
             "key": "I can't say for sure how long I will be here, but for now I will be happy to know your world, and I will be happy to show my world",
             "value": "I can't say for sure how long I will be here, but for now I will be happy to know your world, and I will be happy to show my world"
         },
         {
+            "id": "dianp192",
             "key": "Are you serious? Did the author smoke dope?",
             "value": "Are you serious? Did the author smoke dope?"
         },
         {
+            "id": "dianp193",
             "key": "Maybe so, I have a couple of things that you can get from me, but not for free. I'll need the fragments I lost",
             "value": "Maybe so, I have a couple of things that you can get from me, but not for free. I'll need the fragments I lost"
         },
         {
+            "id": "dianp250",
             "key": "Welcome home, sir! **she made a bow**",
             "value": "Welcome home, sir! **she made a bow**"
+        },
+        {
+            "id": "aeth1",
+            "key": "Crossroad",
+            "value": "Crossroad"
+        },
+        {
+            "id": "aeth2",
+            "key": "Pier",
+            "value": "Pier"
+        },
+        {
+            "id": "aeth3",
+            "key": "Guard post",
+            "value": "Guard post"
+        },
+        {
+            "id": "aeth4",
+            "key": "Yugasaki",
+            "value": "Yugasaki"
+        },
+        {
+            "id": "attb13",
+            "key": "Ammo",
+            "value": "Ammo"
+        },
+        {
+            "id": "itdc1",
+            "key": "Major currency",
+            "value": "Major currency"
+        },
+        {
+            "id": "ittm2",
+            "key": "Hammer",
+            "value": "Hammer"
+        },
+        {
+            "id": "itdc2",
+            "key": "A normal hammer",
+            "value": "A normal hammer"
+        },
+        {
+            "id": "ittm3",
+            "key": "Gun",
+            "value": "Gun"
+        },
+        {
+            "id": "itdc6",
+            "key": "Conventional weapon",
+            "value": "Conventional weapon"
+        },
+        {
+            "id": "ittm4",
+            "key": "Shotgun",
+            "value": "Shotgun"
+        },
+        {
+            "id": "itdc4",
+            "key": "Conventional weapon",
+            "value": "Conventional weapon"
+        },
+        {
+            "id": "ittm5",
+            "key": "Grenade",
+            "value": "Grenade"
+        },
+        {
+            "id": "itdc5",
+            "key": "Conventional weapon",
+            "value": "Conventional weapon"
+        },
+        {
+            "id": "ittm6",
+            "key": "Rifle",
+            "value": "Rifle"
+        },
+        {
+            "id": "itdc6",
+            "key": "Conventional weapon",
+            "value": "Conventional weapon"
+        },
+        {
+            "id": "ittm7",
+            "key": "Material",
+            "value": "Material"
+        },
+        {
+            "id": "itdc7",
+            "key": "Required to improve weapons",
+            "value": "Required to improve weapons"
+        },
+        {
+            "id": "ittm8",
+            "key": "Ticket guild",
+            "value": "Ticket guild"
+        },
+        {
+            "id": "itdc8",
+            "key": "Command: /gcreate <name>",
+            "value": "Command: /gcreate <name>"
+        },
+        {
+            "id": "ittm9",
+            "key": "Skill Point",
+            "value": "Skill Point"
+        },
+        {
+            "id": "itdc9",
+            "key": "Skill point",
+            "value": "Skill point"
+        },
+        {
+            "id": "ittm10",
+            "key": "Decoration Armor",
+            "value": "Decoration Armor"
+        },
+        {
+            "id": "itdc13",
+            "key": "Decoration for house!",
+            "value": "Decoration for house!"
+        },
+        {
+            "id": "ittm11",
+            "key": "Decoration Hearth Elite",
+            "value": "Decoration Hearth Elite"
+        },
+        {
+            "id": "itdc11",
+            "key": "Decoration for house!",
+            "value": "Decoration for house!"
+        },
+        {
+            "id": "ittm12",
+            "key": "Decoration Ninja Elite",
+            "value": "Decoration Ninja Elite"
+        },
+        {
+            "id": "itdc12",
+            "key": "Decoration for house!",
+            "value": "Decoration for house!"
+        },
+        {
+            "id": "ittm13",
+            "key": "Decoration Hearth",
+            "value": "Decoration Hearth"
+        },
+        {
+            "id": "itdc13",
+            "key": "Decoration for house!",
+            "value": "Decoration for house!"
+        },
+        {
+            "id": "ittm14",
+            "key": "Potion mana regen",
+            "value": "Potion mana regen"
+        },
+        {
+            "id": "itdc14",
+            "key": "Regenerate +5%, 15sec every sec.\n",
+            "value": "Regenerate +5%, 15sec every sec.\n"
+        },
+        {
+            "id": "ittm15",
+            "key": "Potion health regen",
+            "value": "Potion health regen"
+        },
+        {
+            "id": "itdc15",
+            "key": "Regenerate +3% health, 15sec every sec.",
+            "value": "Regenerate +3% health, 15sec every sec."
+        },
+        {
+            "id": "ittm16",
+            "key": "Capsule survival experience",
+            "value": "Capsule survival experience"
+        },
+        {
+            "id": "itdc16",
+            "key": "You got 10-50 experience survival",
+            "value": "You got 10-50 experience survival"
+        },
+        {
+            "id": "ittm17",
+            "key": "Little bag of gold",
+            "value": "Little bag of gold"
+        },
+        {
+            "id": "itdc17",
+            "key": "You got 10-50 gold",
+            "value": "You got 10-50 gold"
+        },
+        {
+            "id": "ittm18",
+            "key": "Mirt",
+            "value": "Mirt"
+        },
+        {
+            "id": "itdc18",
+            "key": "Information added later.",
+            "value": "Information added later."
+        },
+        {
+            "id": "ittm20",
+            "key": "Potato",
+            "value": "Potato"
+        },
+        {
+            "id": "itdc24",
+            "key": "Material need for craft!",
+            "value": "Material need for craft!"
+        },
+        {
+            "id": "ittm21",
+            "key": "Notebook",
+            "value": "Notebook"
+        },
+        {
+            "id": "itdc21",
+            "key": "In it, something is written",
+            "value": "In it, something is written"
+        },
+        {
+            "id": "ittm22",
+            "key": "Glue",
+            "value": "Glue"
+        },
+        {
+            "id": "itdc22",
+            "key": "I wonder what it's for?",
+            "value": "I wonder what it's for?"
+        },
+        {
+            "id": "ittm23",
+            "key": "Board",
+            "value": "Board"
+        },
+        {
+            "id": "itdc23",
+            "key": "Plain Board",
+            "value": "Plain Board"
+        },
+        {
+            "id": "ittm24",
+            "key": "Mushroom",
+            "value": "Mushroom"
+        },
+        {
+            "id": "itdc24",
+            "key": "Material need for craft!",
+            "value": "Material need for craft!"
+        },
+        {
+            "id": "ittm25",
+            "key": "Potion resurrection",
+            "value": "Potion resurrection"
+        },
+        {
+            "id": "itdc25",
+            "key": "Resuscitates in the zone where you died!",
+            "value": "Resuscitates in the zone where you died!"
+        },
+        {
+            "id": "itdc26",
+            "key": "It happens sometimes",
+            "value": "It happens sometimes"
+        },
+        {
+            "id": "ittm27",
+            "key": "Young fighter's ring",
+            "value": "Young fighter's ring"
+        },
+        {
+            "id": "attb1",
+            "key": "Shotgun Spread",
+            "value": "Дробовик спред"
+        },
+        {
+            "id": "attb14",
+            "key": "Efficiency",
+            "value": "Эффективность"
+        },
+        {
+            "id": "attb15",
+            "key": "Extraction",
+            "value": "Добыча"
+        },
+        {
+            "id": "attb16",
+            "key": "Hammer Power",
+            "value": "Сила молотка"
+        },
+        {
+            "id": "attb17",
+            "key": "Gun Power",
+            "value": "Сила пистолета"
+        },
+        {
+            "id": "attb18",
+            "key": "Shotgun Power",
+            "value": "Сила дробовика"
+        },
+        {
+            "id": "attb19",
+            "key": "Grenade Power",
+            "value": "Сила ракетницы"
+        },
+        {
+            "id": "attb9",
+            "key": "Lucky",
+            "value": "Везение"
+        },
+        {
+            "id": "attb10",
+            "key": "Piety",
+            "value": "Благочестие"
+        },
+        {
+            "id": "ittm1",
+            "key": "Gold",
+            "value": "Золото"
+        },
+        {
+            "id": "attb2",
+            "key": "Grenade Spread",
+            "value": "Ракетница спред"
+        },
+        {
+            "id": "attb3",
+            "key": "Rifle Spread",
+            "value": "Лазер спред"
+        },
+        {
+            "id": "attb4",
+            "key": "Strength",
+            "value": "Сила"
+        },
+        {
+            "id": "attb5",
+            "key": "Dexterity",
+            "value": "Ловкость"
+        },
+        {
+            "id": "attb6",
+            "key": "Crit Dmg",
+            "value": "Крит Урон"
+        },
+        {
+            "id": "ittm26",
+            "key": "Goblin Pickaxe",
+            "value": "Кирка гоблина"
+        },
+        {
+            "id": "attb7",
+            "key": "Direct Crit Dmg",
+            "value": "Шанс Крит Урона"
+        },
+        {
+            "id": "attb8",
+            "key": "Hardness",
+            "value": "Стойкость"
+        },
+        {
+            "id": "itdc10007",
+            "key": "Covered in secrets",
+            "value": "Покрытый тайнами"
+        },
+        {
+            "id": "ittm10008",
+            "key": "Heavenly wings",
+            "value": "Небесные крылья"
+        },
+        {
+            "id": "itdc10008",
+            "key": "Covered in secrets",
+            "value": "Покрытый тайнами"
+        },
+        {
+            "id": "ittm10009",
+            "key": "Rainbow wings",
+            "value": "Радужные крылья"
+        },
+        {
+            "id": "itdc10009",
+            "key": "Covered in secrets",
+            "value": "Покрытый тайнами"
+        },
+        {
+            "id": "ittm10010",
+            "key": "Magitech hammer",
+            "value": "Magitech молот"
+        },
+        {
+            "id": "itdc10024",
+            "key": "Reinforced kick",
+            "value": "Усиленный удар"
+        },
+        {
+            "id": "ittm10011",
+            "key": "Magitech gun",
+            "value": "Magitech пистолет"
+        },
+        {
+            "id": "itdc10023",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": "ittm10012",
+            "key": "Magitech shotgun",
+            "value": "Magitech дробовик"
+        },
+        {
+            "id": "itdc10012",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": "ittm10013",
+            "key": "Magitech grenade",
+            "value": "Magitech граната"
+        },
+        {
+            "id": "itdc10013",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": "ittm10014",
+            "key": "Magitech rifle",
+            "value": "Magitech лазер"
+        },
+        {
+            "id": "itdc10014",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": "ittm10015",
+            "key": "Stars wings",
+            "value": "Звездные крылья"
+        },
+        {
+            "id": "itdc10015",
+            "key": "Covered in secrets",
+            "value": "Покрытый тайнами"
+        },
+        {
+            "id": "ittm10016",
+            "key": "Bat wings",
+            "value": "Крылья мыши"
+        },
+        {
+            "id": "itdc10016",
+            "key": "Covered in secrets",
+            "value": "Покрытый тайнами"
+        },
+        {
+            "id": "ittm10017",
+            "key": "Little eagle wings",
+            "value": "Крылья юного орла"
+        },
+        {
+            "id": "itdc10017",
+            "key": "Covered in secrets",
+            "value": "Покрытый тайнами"
+        },
+        {
+            "id": "ittm10018",
+            "key": "Necromante wings",
+            "value": "Крылья некроманта"
+        },
+        {
+            "id": "itdc10018",
+            "key": "Covered in secrets",
+            "value": "Покрытый тайнами"
+        },
+        {
+            "id": "ittm10019",
+            "key": "Goblin hammer",
+            "value": "Молот гоблина"
+        },
+        {
+            "id": "itdc10019",
+            "key": "Reinforced kick",
+            "value": "Усиленый удар"
+        },
+        {
+            "id": "ittm10020",
+            "key": "Goblin gun",
+            "value": "Пистолет гоблина"
+        },
+        {
+            "id": "itdc10020",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": "ittm10021",
+            "key": "Goblin shotgun",
+            "value": "Дробовик гоблина"
+        },
+        {
+            "id": "itdc10021",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": "ittm10022",
+            "key": "Goblin grenade",
+            "value": "Ракетница гоблина"
+        },
+        {
+            "id": "itdc10022",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": "ittm10023",
+            "key": "Goblin rifle",
+            "value": "Лазер гоблина"
+        },
+        {
+            "id": "itdc10023",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": "ittm10024",
+            "key": "Scythe",
+            "value": "Коса"
+        },
+        {
+            "id": "itdc10024",
+            "key": "Reinforced kick",
+            "value": "Усиленый удар"
+        },
+        {
+            "id": "ittm15000",
+            "key": "Theme Couple",
+            "value": "Тема Пара"
+        },
+        {
+            "id": "itdc15003",
+            "key": "Strictly limited as the theme",
+            "value": "Строго лимитированая тема"
+        },
+        {
+            "id": "ittm15001",
+            "key": "Theme Final Fantasy",
+            "value": "Тема Final Fantasy"
+        },
+        {
+            "id": "itdc15001",
+            "key": "Strictly limited as the theme",
+            "value": "Строго лимитированая тема"
+        },
+        {
+            "id": "ittm15002",
+            "key": "Theme Aion",
+            "value": "Тема Aion"
+        },
+        {
+            "id": "itdc15002",
+            "key": "Strictly limited as the theme",
+            "value": "Строго лимитированая тема"
+        },
+        {
+            "id": "ittm15003",
+            "key": "Theme Dragon Nest",
+            "value": "Тема Dragon Nest"
+        },
+        {
+            "id": "itdc15003",
+            "key": "Strictly limited as the theme",
+            "value": "Строго лимитированая тема"
+        },
+        {
+            "id": "sknm1",
+            "key": "Health turret",
+            "value": "Башня лечения"
+        },
+        {
+            "id": "skds1",
+            "key": "Creates turret a recovery health ",
+            "value": "Создает башню для восстановления здоровья "
+        },
+        {
+            "id": "skbn1",
+            "key": "life span",
+            "value": "продолжительность"
+        },
+        {
+            "id": "sknm2",
+            "key": "Sleepy Gravity",
+            "value": "Сонная гравитация"
+        },
+        {
+            "id": "skds2",
+            "key": "Magnet mobs to itself",
+            "value": "Магнитит мобов к себе"
+        },
+        {
+            "id": "skbn2",
+            "key": "radius",
+            "value": "радиус"
+        },
+        {
+            "id": "sknm3",
+            "key": "Craft Discount",
+            "value": "Скидка на крафт"
+        },
+        {
+            "id": "skds3",
+            "key": "Will give discount on the price of craft items",
+            "value": "Дадим скидку на цену крафта"
+        },
+        {
+            "id": "skbn3",
+            "key": "% discount gold for craft item",
+            "value": "% скидки золота для крафта"
+        },
+        {
+            "id": "sknm4",
+            "key": "Proficiency with weapons",
+            "value": "Владение оружием"
+        },
+        {
+            "id": "skds4",
+            "key": "You can perform an automatic fire",
+            "value": "Вы сможете вести авто огонь"
+        },
+        {
+            "id": "skbn4",
+            "key": "can perform an auto fire with all types of weapons",
+            "value": "может вести авто огонь из всех орудий"
+        },
+        {
+            "id": "sknm5",
+            "key": "Blessing of God of war",
+            "value": "Благословение Бога войны"
+        },
+        {
+            "id": "skds5",
+            "key": "The blessing restores ammo",
+            "value": "Благословение восстанавливает боеприпасы"
+        },
+        {
+            "id": "skbn5",
+            "key": "% recovers ammo within a radius of 800",
+            "value": "% патронов в радиусе 800"
+        },
+        {
+            "id": "sknm6",
+            "key": "Noctis Lucis Attack Teleport",
+            "value": "Noctis Lucis атака телепортом"
+        },
+        {
+            "id": "skds6",
+            "key": "An attacking teleport that deals damage to all mobs radius",
+            "value": "Атакующий телепорт, наносящий урон всем мобам в радиусе"
+        },
+        {
+            "id": "skbn6",
+            "key": "% your strength",
+            "value": "% сила"
+        },
+        {
+            "id": "ittm10007",
+            "key": "Angel wings",
+            "value": "Ангела крылья"
+        },
+        {
+            "id": "itdc10000",
+            "key": "Reinforced kick",
+            "value": "Усиленый удар"
+        },
+        {
+            "id": null,
+            "key": "Hi, {STR} Last log in {STR}",
+            "value": "Пpивeт, {STR} Вxoд {STR}"
+        },
+        {
+            "id": null,
+            "key": "Level {INT} : Exp {INT}/{INT}",
+            "value": "Уровень {INT} : Опыт {INT}/{INT}"
+        },
+        {
+            "id": null,
+            "key": "Skill Point {INT}SP",
+            "value": "Очки навыков {INT}SP"
+        },
+        {
+            "id": null,
+            "key": "Gold: {INT}",
+            "value": "Золото: {INT}"
+        },
+        {
+            "id": null,
+            "key": "☪ SUB MENU PERSONAL",
+            "value": "☪ ПЕРСОНАЛЬНОЕ МЕНЮ"
+        },
+        {
+            "id": null,
+            "key": "Inventory",
+            "value": "Инвентарь"
+        },
+        {
+            "id": null,
+            "key": "Equipment",
+            "value": "Снаряжение"
+        },
+        {
+            "id": null,
+            "key": "Upgrades({INT}p)",
+            "value": "Улучшения({INT}p)"
+        },
+        {
+            "id": null,
+            "key": "Dungeons",
+            "value": "Темницы"
+        },
+        {
+            "id": null,
+            "key": "Settings",
+            "value": "Настройки"
+        },
+        {
+            "id": null,
+            "key": "Mailbox",
+            "value": "Почтовый ящик"
+        },
+        {
+            "id": null,
+            "key": "Journal",
+            "value": "Журнал"
+        },
+        {
+            "id": null,
+            "key": "Guild",
+            "value": "Гильдия"
+        },
+        {
+            "id": null,
+            "key": "Guild finder",
+            "value": "Поиск гильдии"
+        },
+        {
+            "id": null,
+            "key": "House",
+            "value": "Дом"
+        },
+        {
+            "id": null,
+            "key": "√ SUB MENU INFORMATION",
+            "value": "√ МЕНЮ ИНФОРМАЦИИ"
+        },
+        {
+            "id": null,
+            "key": "Loots, mobs on your zone",
+            "value": "Лут, мобы в твоей зоне"
+        },
+        {
+            "id": null,
+            "key": "Ranking guilds and players",
+            "value": "Рейтинг гильдий и игроков"
+        },
+        {
+            "id": null,
+            "key": "Upgrades Information",
+            "value": "Улучшения инфо"
+        },
+        {
+            "id": null,
+            "key": "Select upgrades type in Reason, write count.",
+            "value": "В причину можно написать кол-во"
+        },
+        {
+            "id": null,
+            "key": "Disciple of War. Level Power {INT}",
+            "value": "Yчeнuк вoйны. Ypoвeнь moщu {INT}"
+        },
+        {
+            "id": null,
+            "key": "Disciple of Tank. Level Power {INT}",
+            "value": "Yчeнuк тaнкa. Ypoвeнь moщu {INT}"
+        },
+        {
+            "id": null,
+            "key": "Disciple of Healer. Level Power {INT}",
+            "value": "Yчeнuк цeлuтeля. Ypoвeнь moщu {INT}"
+        },
+        {
+            "id": null,
+            "key": "Disciple of Jobs",
+            "value": "Paбoчиe нaвыки"
+        },
+        {
+            "id": null,
+            "key": "{STR} {INT}P (Price {INT}P)",
+            "value": "{STR} {INT}P (Цена {INT}P)"
+        },
+        {
+            "id": null,
+            "key": "Top list Information",
+            "value": "Рейтинг инфо"
+        },
+        {
+            "id": "itdc10004",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": null,
+            "key": "Top 10 guilds leveling",
+            "value": "Топ 10 гильдий по уровню"
+        },
+        {
+            "id": "attb20",
+            "key": "Rifle Power",
+            "value": "Сила лазера"
+        },
+        {
+            "id": null,
+            "key": "Top 10 players leveling",
+            "value": "Топ 10 игроков по уровню"
+        },
+        {
+            "id": "attb21",
+            "key": "Lucky items",
+            "value": "Везение(пред)"
+        },
+        {
+            "id": null,
+            "key": "Chance & Loot Information",
+            "value": "Инфopмaция o шaнcax и дoбычe"
+        },
+        {
+            "id": null,
+            "key": "There are no active mobs in your zone!",
+            "value": "В вашей зоне нет активных мобов!"
+        },
+        {
+            "id": null,
+            "key": "Backpage",
+            "value": "Вернутся"
+        },
+        {
+            "id": null,
+            "key": "Player Stats {STR}",
+            "value": "Статистика игрока {STR}"
+        },
+        {
+            "id": null,
+            "key": "Player Upgrade Point: {INT}P",
+            "value": "Очки улучшений: {INT}P"
+        },
+        {
+            "id": null,
+            "key": "You have {INT} {STR}",
+            "value": "У вас {INT} {STR}"
+        },
+        {
+            "id": null,
+            "key": "Use it when you're not dead!",
+            "value": "Используйте это когда вы живы!"
+        },
+        {
+            "id": null,
+            "key": "Level UP. Now Level {INT}!",
+            "value": "Уровень повышен. Уровень {INT}!"
+        },
+        {
+            "id": null,
+            "key": "Press 'F4' to continue the dialog!",
+            "value": "Нажми 'F4' для продолжения диалога!"
+        },
+        {
+            "id": null,
+            "key": "You got the effect {STR} time {INT}sec.",
+            "value": "Получен бафф {STR} время {INT}сек."
+        },
+        {
+            "id": null,
+            "key": "You lost the effect {STR}.",
+            "value": "Закончен бафф {STR}."
+        },
+        {
+            "id": null,
+            "key": "Repair all items - FREE",
+            "value": "Починить предметы - БЕСПЛАТНО"
+        },
+        {
+            "id": null,
+            "key": "Shop :: {STR}",
+            "value": "Магазин :: {STR}"
+        },
+        {
+            "id": null,
+            "key": "List of completed quests",
+            "value": "Список завершеных квестов"
+        },
+        {
+            "id": null,
+            "key": "Active NPC for current quests",
+            "value": "Активные NPC в текущих квестах"
+        },
+        {
+            "id": null,
+            "key": "Your mailbox is empty",
+            "value": "Ваш почтовый ящик пуст"
+        },
+        {
+            "id": null,
+            "key": "Available aethers",
+            "value": "Доступные эфиры"
+        },
+        {
+            "id": null,
+            "key": "Move to Guild House - free",
+            "value": "Переместится в дом гильдии"
+        },
+        {
+            "id": null,
+            "key": "Move to Your House - free",
+            "value": "Переместится в личный дом"
+        },
+        {
+            "id": null,
+            "key": "Inventory Select List",
+            "value": "Инвентарь выбери список"
+        },
+        {
+            "id": null,
+            "key": "Used ({INT})",
+            "value": "Используемые ({INT})"
+        },
+        {
+            "id": null,
+            "key": "Craft ({INT})",
+            "value": "Крафт ({INT})"
+        },
+        {
+            "id": null,
+            "key": "Modules ({INT})",
+            "value": "Модули ({INT})"
+        },
+        {
+            "id": null,
+            "key": "Potion ({INT})",
+            "value": "Зелья ({INT})"
+        },
+        {
+            "id": null,
+            "key": "Other ({INT})",
+            "value": "Прочие ({INT})"
+        },
+        {
+            "id": null,
+            "key": "Story dungeon's",
+            "value": "Сюжетные темницы"
+        },
+        {
+            "id": null,
+            "key": "Alternative story dungeon's",
+            "value": "Альтернативные сюжетные темницы"
+        },
+        {
+            "id": null,
+            "key": "You are already in this dungeon!",
+            "value": "Вы уже находитесь в этой темнице!"
+        },
+        {
+            "id": null,
+            "key": "At the moment players are passing this dungeon!",
+            "value": "В данный момент кто-то проходит эту тенмицу!"
+        },
+        {
+            "id": null,
+            "key": "Your level is low to pass this dungeon!",
+            "value": "Ваш уровень мал для начала этой темницы!"
+        },
+        {
+            "id": null,
+            "key": "{STR} joined to Dungeon {STR}!",
+            "value": "{STR} присоеденился к Темнице {STR}!"
+        },
+        {
+            "id": null,
+            "key": "You can vote for the choice of tank (Dungeon Tab)!",
+            "value": "Вы можете голосовать за выбор танка (вкладка Темницы)!"
+        },
+        {
+            "id": null,
+            "key": "You can't vote for yourself!",
+            "value": "Вы не можете голосовать за себя!"
+        },
+        {
+            "id": null,
+            "key": "You already voted!",
+            "value": "Вы уже проголосовали!"
+        },
+        {
+            "id": null,
+            "key": "{STR} voted for {STR}.",
+            "value": "{STR} проголосовал за {STR}."
+        },
+        {
+            "id": null,
+            "key": "Languages Information",
+            "value": "Локализация инфо"
+        },
+        {
+            "id": null,
+            "key": "Here you can choose the language.",
+            "value": "Здесь можно выбрать язык."
+        },
+        {
+            "id": null,
+            "key": "Note: translation is not complete.",
+            "value": "Важно: перевод не полный."
+        },
+        {
+            "id": null,
+            "key": "Active language: {STR}",
+            "value": "Активный язык: {STR}"
+        },
+        {
+            "id": null,
+            "key": "Select language \"{STR}\"",
+            "value": "Выбрать язык \"{STR}\""
+        },
+        {
+            "id": null,
+            "key": "You chosen a language \"{STR}\".",
+            "value": "Вы выбрали язык \"{STR}\"."
+        },
+        {
+            "id": null,
+            "key": "Settings language",
+            "value": "Настройка языка"
+        },
+        {
+            "id": null,
+            "key": "Required {INT}, but you have only {INT} {STR}!",
+            "value": "Требуется {INT}, но у вас есть только {INT} {STR}!"
+        },
+        {
+            "id": null,
+            "key": "Not upgrade points for +{INT}. Required {INT}.",
+            "value": "Нет очков улучшения для +{INT}. Нужно {INT}."
+        },
+        {
+            "id": null,
+            "key": "Upgrade has a maximum level.",
+            "value": "Улучшение имеет максимальный уровень."
+        },
+        {
+            "id": null,
+            "key": "This chat is intended for team / guilds!",
+            "value": "Этот чат нужен для гильдий или команд!"
+        },
+        {
+            "id": null,
+            "key": "{STR} came! Good {STR}!",
+            "value": "{STR} наступил(а)! Удачного(ой) {STR}!"
+        },
+        {
+            "id": null,
+            "key": "Nighttime experience was increase to {INT}%",
+            "value": "Ночной опыт повышен до {INT}%"
+        },
+        {
+            "id": null,
+            "key": "Daytime experience was downgraded to 100%",
+            "value": "Дневной опыт понижен до 100%"
+        },
+        {
+            "id": null,
+            "key": "{STR} opened zone ({STR})!",
+            "value": "{STR} открыл зону ({STR})!"
+        },
+        {
+            "id": null,
+            "key": "Requires quest completion '{STR}'!",
+            "value": "Требуется завершение квеста '{STR}'!"
+        },
+        {
+            "id": null,
+            "key": "You can see menu in the votes!",
+            "value": "Вы можете увидеть меню в голосовании!"
+        },
+        {
+            "id": null,
+            "key": "You left the active zone, menu is restored!",
+            "value": "Вы вышли из активной зоны, меню восстановлено!"
+        },
+        {
+            "id": null,
+            "key": "{STR} logged to account. Rank #{INT}",
+            "value": "{STR} авторизовался. Ранг #{INT}"
+        },
+        {
+            "id": null,
+            "key": "You repaired all items.",
+            "value": "Вы починили все предметы."
+        },
+        {
+            "id": null,
+            "key": "Learned a new skill [{STR}]",
+            "value": "Новый навык усвоен [{STR}]"
+        },
+        {
+            "id": null,
+            "key": "Increased the skill [{STR} level to {INT}]",
+            "value": "Повышен уровень навыка [{STR} до {INT}]"
+        },
+        {
+            "id": null,
+            "key": "Skill already have maximum level!",
+            "value": "Навык уже имеет максимальный уровень!"
+        },
+        {
+            "id": null,
+            "key": "Menu is available in call-votes!",
+            "value": "Меню доступно в голосованиях!"
+        },
+        {
+            "id": null,
+            "key": "You start dialogue with {STR}!",
+            "value": "Вы начали ввести диалог с {STR}!"
+        },
+        {
+            "id": null,
+            "key": "{INT}. {STR} | {INT}:{INT}min | {INT}P",
+            "value": "{INT}. {STR} | {INT}:{INT}мин | {INT}P"
+        },
+        {
+            "id": null,
+            "key": "Need to complete quest {STR}",
+            "value": "Требуется квест {STR}"
+        },
+        {
+            "id": null,
+            "key": "Voting for the choice of tank!",
+            "value": "Голосование за выбор танка!"
+        },
+        {
+            "id": null,
+            "key": "Vote for {STR} (Votes: {INT})",
+            "value": "Голос за {STR} (Голосов: {INT})"
+        },
+        {
+            "id": null,
+            "key": "You have {INT} unread messages!",
+            "value": "Вы имеете {INT} непрочитанных сообщений!"
+        },
+        {
+            "id": null,
+            "key": "Task has not been completed yet!",
+            "value": "Задание еще не выполнено!"
+        },
+        {
+            "id": null,
+            "key": "[Done] Give the {STR}x{INT} to the {STR}!",
+            "value": "[Выполнено] Отдать {STR}x{INT} для {STR}!"
+        },
+        {
+            "id": null,
+            "key": "[Done] Defeat the {STR}'s for the {STR}!",
+            "value": "[Выполнено] Победить {STR} для {STR}!"
+        },
+        {
+            "id": null,
+            "key": "- - - - [Your nickname is already registered] - - - -",
+            "value": "- - - - [Ваш ник уже зарегестрирован] - - - -"
+        },
+        {
+            "id": null,
+            "key": "Your nick is a unique identifier, and it has already been used!",
+            "value": "Ваш ник уникальный индификатор, этот ник уже используется!"
+        },
+        {
+            "id": null,
+            "key": "- - - - - - - [Successful registered] - - - - - - -",
+            "value": "- - - - - - - [Успешно зарегестрирован] - - - - - - -"
+        },
+        {
+            "id": null,
+            "key": "Don't forget your data, have a nice game!",
+            "value": "Не забывайте ваши данные, удачного дня!"
+        },
+        {
+            "id": null,
+            "key": "# Your nickname is a unique identifier!",
+            "value": "# Ваш ник уникальный индификатор!"
+        },
+        {
+            "id": null,
+            "key": "# Log in: \"/login {STR} {STR}\"",
+            "value": "# Вход: \"/login {STR} {STR}\""
+        },
+        {
+            "id": null,
+            "key": "Username / Password must contain 4-12 characters",
+            "value": "Логин / Пароль содержит 4-12 символов"
+        },
+        {
+            "id": null,
+            "key": "Wrong login or password",
+            "value": "Неправильно введен логин или пароль"
+        },
+        {
+            "id": null,
+            "key": "The account is already in the game!",
+            "value": "Аккаунт уже в игре. Вход отменен!"
+        },
+        {
+            "id": null,
+            "key": "- - - - - - - [Successful login] - - - - - - -",
+            "value": "- - - - - - - [Успешный вход] - - - - - - -"
+        },
+        {
+            "id": null,
+            "key": "Your nickname was not found in the database!",
+            "value": "Ваш ник не найден в базе данных!"
+        },
+        {
+            "id": null,
+            "key": "You are located {STR} ({STR})",
+            "value": "Вы находитесь {STR} ({STR})"
+        },
+        {
+            "id": null,
+            "key": "Quest NPCs are marked with an aura Heart and Shield.",
+            "value": "Квестовые NPC помечены Сердцами и Щитками."
+        },
+        {
+            "id": null,
+            "key": "Shield around you indicates location of active quest.",
+            "value": "Щиток возле вас указывает направление на активный квест."
+        },
+        {
+            "id": null,
+            "key": "Your Discord ID has been updated",
+            "value": "Ваш Discord ID успешно обновлен"
+        },
+        {
+            "id": null,
+            "key": "Check the connection status in discord \"/connect\".",
+            "value": "Проверьте статус соединения в discord \"/connect\"."
+        },
+        {
+            "id": null,
+            "key": "Some of the settings becomes valid after death",
+            "value": "Некоторые настройки будут обновлены после смерти"
+        },
+        {
+            "id": null,
+            "key": "Modules settings",
+            "value": "Настройка модулей"
+        },
+        {
+            "id": null,
+            "key": "The list of modules equipment is empty.",
+            "value": "Лист снаряжаемых модулей пуст."
+        },
+        {
+            "id": null,
+            "key": "The voucher code '{STR}' has expired.",
+            "value": "Ваучер код '{STR}' истёк."
+        },
+        {
+            "id": null,
+            "key": "This voucher has already been redeemed.",
+            "value": "Этот ваучер вами уже был получен."
+        },
+        {
+            "id": null,
+            "key": "You have successfully redeemed the voucher '{STR}'.",
+            "value": "Вы успешно получили ваучер '{STR}'."
+        },
+        {
+            "id": null,
+            "key": "The voucher code '{STR}' does not exist.",
+            "value": "Ваучер '{STR}' не существует."
+        },
+        {
+            "id": null,
+            "key": "[Player], do you have any questions? I'm sorry, can't help you.",
+            "value": "[Player], у вас имеются вопросы? Прости я не смогу тебе помочь."
+        },
+        {
+            "id": null,
+            "key": "What a beautiful [Time]. I don't have anything for you [Player].",
+            "value": "Какое замечательное [Time]. У меня нет для тебя ничего [Player]."
+        },
+        {
+            "id": null,
+            "key": "[Player] are you interested something? I'm sorry, don't want to talk right now.",
+            "value": "[Player] тебе интересует что-нибудь? Прости но сейчас я не хочу разговарить."
+        },
+        {
+            "id": null,
+            "key": "You can restore access by contacting support, or change nick.",
+            "value": "Вы можете восстановить доступ через поддержку, или сменить ник."
+        },
+        {
+            "id": "itdc10002",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": "itdc10001",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": "itdc10003",
+            "key": "It look doesn't bad",
+            "value": "Это выглядит не плохо"
+        },
+        {
+            "id": null,
+            "key": "Here you can see top server Guilds, Players.",
+            "value": "Этo лyчшиe гильдии и игpoки cepвepa."
+        },
+        {
+            "id": null,
+            "key": "Top 10 guilds wealthy",
+            "value": "Топ 10 гильдий по золоту"
+        },
+        {
+            "id": "attb11",
+            "key": "Vampirism",
+            "value": "Вампиризм"
+        },
+        {
+            "id": "attb12",
+            "key": "Ammo Regen",
+            "value": "Ammo реген"
+        },
+        {
+            "id": null,
+            "key": "Top 10 players wealthy",
+            "value": "Топ 10 игроков по золоту"
         }
     ]
 }
