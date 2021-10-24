@@ -79,8 +79,8 @@ bool CItemData::Add(int Value, int Settings, int Enchant, bool Message)
 			Equip();
 
 		char aAttributes[128];
-		Info().FormatAttributes(aAttributes, sizeof(aAttributes), Enchant);
-		GS()->Chat(ClientID, "Auto equip {STR} - {STR}", Info().GetName(m_pPlayer), aAttributes);
+		Info().FormatAttributes(m_pPlayer, aAttributes, sizeof(aAttributes), Enchant);
+		GS()->Chat(ClientID, "Auto equip {STR} - {STR}", Info().GetName(), aAttributes);
 		GS()->CreatePlayerSound(ClientID, SOUND_ITEM_EQUIP);
 	}
 
@@ -90,7 +90,7 @@ bool CItemData::Add(int Value, int Settings, int Enchant, bool Message)
 	if(Info().m_Type == TYPE_EQUIP || Info().m_Type == TYPE_MODULE)
 		GS()->Chat(-1, "{STR} got of the {STR}x{INT}!", GS()->Server()->ClientName(ClientID), Info().GetName(), Value);
 	else if(Info().m_Type != TYPE_INVISIBLE)
-		GS()->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(m_pPlayer), Value);
+		GS()->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(), Value);
 
 	return true;
 }
@@ -150,20 +150,20 @@ bool CItemData::Use(int Value)
 	if(m_ItemID == itPotionHealthRegen && Remove(Value, 0))
 	{
 		m_pPlayer->GiveEffect("RegenHealth", 15);
-		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), Value);
+		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(), Value);
 	}
 	// potion mana regen
 	else if(m_ItemID == itPotionManaRegen && Remove(Value, 0))
 	{
 		m_pPlayer->GiveEffect("RegenMana", 15);
-		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), Value);
+		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(), Value);
 	}
 	// potion resurrection
 	else if(m_ItemID == itPotionResurrection && Remove(Value, 0))
 	{
 		m_pPlayer->GetTempData().m_TempSafeSpawn = false;
 		m_pPlayer->GetTempData().m_TempHealth = m_pPlayer->GetStartHealth();
-		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(m_pPlayer), Value);
+		GS()->ChatFollow(ClientID, "You used {STR}x{INT}", Info().GetName(), Value);
 	}
 	// ticket discount craft
 	else if(m_ItemID == itTicketDiscountCraft)

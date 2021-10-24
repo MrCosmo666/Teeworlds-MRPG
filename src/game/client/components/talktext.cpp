@@ -19,6 +19,8 @@
 
 #include "talktext.h"
 
+// TODO: rework
+
 bool CTalkText::IsActive() const
 {
 	return (bool)(m_TalkClientID >= 0 && !m_pClient->m_pMenus->IsActive());
@@ -97,9 +99,8 @@ void CTalkText::OnRender()
 
 	// ---------------- PLAYER SKINS NICKNAME -----------------
 	// --------------------------------------------------------
-	static CTextCursor s_Cursor;
-	s_Cursor.Reset();
-	s_Cursor.m_FontSize = 32.0f;
+	m_TextCursor.Reset();
+	m_TextCursor.m_FontSize = 32.0f;
 
 	const int TalkClientID = m_TalkClientID;
 	const int LocalClientID = m_pClient->m_LocalClientID;
@@ -120,8 +121,8 @@ void CTalkText::OnRender()
 			}
 
 			float sizeNick = str_length(pTalkedNick);
-			s_Cursor.MoveTo((m_ScreenWidth / (1.45f + sizeNick / 64.0f)), m_ScreenHeight / 1.97f);
-			TextRender()->TextOutlined(&s_Cursor, pTalkedNick, -1);
+			m_TextCursor.MoveTo((m_ScreenWidth / (1.45f + sizeNick / 64.0f)), m_ScreenHeight / 1.97f);
+			TextRender()->TextOutlined(&m_TextCursor, pTalkedNick, -1);
 			TextRender()->TextColor(1, 1, 1, 1);
 		}
 
@@ -130,9 +131,8 @@ void CTalkText::OnRender()
 		RenderYou.m_Size = 128.0f;
 		RenderTools()->RenderTee(CAnimState::GetIdle(), &RenderYou, m_PlayerTalked ? m_TalkedEmote : EMOTE_NORMAL, vec2(1.0f, 0.4f), vec2(m_ScreenWidth / 4.0f, m_ScreenHeight / 1.85f));
 
-		s_Cursor.Reset();
-		s_Cursor.MoveTo(m_ScreenWidth / 3.5f, m_ScreenHeight / 1.97f);
-		TextRender()->TextOutlined(&s_Cursor, m_pClient->m_aClients[LocalClientID].m_aName, -1);
+		m_TextCursor.MoveTo(m_ScreenWidth / 3.5f, m_ScreenHeight / 1.97f);
+		TextRender()->TextOutlined(&m_TextCursor, m_pClient->m_aClients[LocalClientID].m_aName, -1);
 	}
 
 	// ------------------------ TEXT --------------------------
@@ -141,22 +141,23 @@ void CTalkText::OnRender()
 	CUIRect BackgroundOther = m_pAnimBackgroundOther->GetPos()->GetRect();
 	BackgroundOther.VMargin(20.0f, &BackgroundOther);
 
-	s_Cursor.Reset();
-	s_Cursor.MoveTo(BackgroundOther.x, BackgroundOther.y);
-	s_Cursor.m_FontSize = FontSize;
-	s_Cursor.m_MaxWidth = BackgroundOther.w;
-	s_Cursor.m_MaxLines = ceil(BackgroundOther.h / FontSize);
+	m_TextCursor.Reset();
+	m_TextCursor.m_Flags = TEXTFLAG_ALLOW_NEWLINE | TEXTFLAG_WORD_WRAP | TEXTFLAG_ELLIPSIS;
+	m_TextCursor.m_FontSize = FontSize;
+	m_TextCursor.m_MaxWidth = BackgroundOther.w;
+	m_TextCursor.m_MaxLines = ceil(BackgroundOther.h / FontSize);
+	m_TextCursor.MoveTo(BackgroundOther.x, BackgroundOther.y);
 	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 0.9f);
-	TextRender()->TextOutlined(&s_Cursor, m_RegrnizedTalkText, -1);
-	s_Cursor.Reset();
+	TextRender()->TextOutlined(&m_TextCursor, m_RegrnizedTalkText, -1);
 
 	// ------------------ INTERACTIVE TEXT -----------------
 	// -----------------------------------------------------
-	s_Cursor.Reset();
-	s_Cursor.MoveTo(m_ScreenWidth / 1.8f, m_ScreenHeight / 1.50f);
-	s_Cursor.m_FontSize = 25.0f;
-	TextRender()->TextOutlined(&s_Cursor, Localize("Press (TAB) for continue!"), -1.0f);
+	m_TextCursor.Reset();
+	m_TextCursor.m_FontSize = 25.0f;
+	m_TextCursor.MoveTo(m_ScreenWidth / 1.8f, m_ScreenHeight / 1.50f);
+	TextRender()->TextOutlined(&m_TextCursor, Localize("Press (TAB) for continue!"), -1.0f);
 	TextRender()->TextColor(1.0f, 1.0f, 1.0f, 1.0f);
+
 	RegrnizedTalkingText();
 }
 

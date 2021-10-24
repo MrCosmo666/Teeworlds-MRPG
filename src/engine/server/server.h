@@ -28,7 +28,6 @@ public:
 	class CClient
 	{
 	public:
-
 		enum
 		{
 			STATE_EMPTY = 0,

@@ -4,6 +4,7 @@
 
 #include <game/server/gamecontext.h>
 #include <teeother/system/string.h>
+#include <teeother/components/localization.h>
 
 void CCraftCore::OnInit()
 {
@@ -88,18 +89,18 @@ void CCraftCore::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int Selec
 		if (InfoGetItem.IsEnchantable())
 		{
 			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}{STR} - {INT} gold",
-				(pPlayer->GetItem(cr.second.m_ItemID).m_Value ? "✔ " : "\0"), InfoGetItem.GetName(pPlayer), Price);
+				(pPlayer->GetItem(cr.second.m_ItemID).m_Value ? "✔ " : "\0"), InfoGetItem.GetName(), Price);
 
 			char aAttributes[128];
-			InfoGetItem.FormatAttributes(aAttributes, sizeof(aAttributes), 0);
+			InfoGetItem.FormatAttributes(pPlayer, aAttributes, sizeof(aAttributes), 0);
 			GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aAttributes);
 		}
 		else
 		{
 			GS()->AVHI(ClientID, InfoGetItem.GetIcon(), HideID, LIGHT_GRAY_COLOR, "{STR}x{INT} ({INT}) :: {INT} gold",
-				InfoGetItem.GetName(pPlayer), cr.second.m_ItemValue, pPlayer->GetItem(cr.second.m_ItemID).m_Value, Price);
+				InfoGetItem.GetName(), cr.second.m_ItemValue, pPlayer->GetItem(cr.second.m_ItemID).m_Value, Price);
 		}
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", InfoGetItem.GetDesc(pPlayer));
+		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", InfoGetItem.GetDesc());
 
 		for(int i = 0; i < 3; i++)
 		{
@@ -109,9 +110,9 @@ void CCraftCore::ShowCraftList(CPlayer* pPlayer, const char* TypeName, int Selec
 				continue;
 
 			CItemData &PlSearchItem = pPlayer->GetItem(SearchItemID);
-			GS()->AVMI(ClientID, PlSearchItem.Info().GetIcon(), "null", NOPE, HideID, "{STR} {INT}({INT})", PlSearchItem.Info().GetName(pPlayer), SearchValue, PlSearchItem.m_Value);
+			GS()->AVMI(ClientID, PlSearchItem.Info().GetIcon(), "null", NOPE, HideID, "{STR} {INT}({INT})", PlSearchItem.Info().GetName(), SearchValue, PlSearchItem.m_Value);
 		}
-		GS()->AVM(ClientID, "CRAFT", cr.first, HideID, "Craft {STR}", InfoGetItem.GetName(pPlayer));
+		GS()->AVM(ClientID, "CRAFT", cr.first, HideID, "Craft {STR}", InfoGetItem.GetName());
 	}
 
 	if(IsNotEmpty)
@@ -137,10 +138,8 @@ void CCraftCore::CraftItem(CPlayer *pPlayer, int CraftID) const
 		if(SearchItemID <= 0 || SearchValue <= 0 || pPlayer->GetItem(SearchItemID).m_Value >= SearchValue)
 			continue;
 
-		char aBuf[48];
-		const int ItemLeft = SearchValue - pPlayer->GetItem(SearchItemID).m_Value;
-		str_format(aBuf, sizeof(aBuf), "%sx%d ", GS()->GetItemInfo(SearchItemID).GetName(pPlayer), ItemLeft);
-		Buffer.append((const char*)aBuf);
+		const int ItemLeft = (SearchValue - pPlayer->GetItem(SearchItemID).m_Value);
+		GS()->Server()->Localization()->Format(Buffer, pPlayer->GetLanguage(), "{STR}x{INT} ", GS()->GetItemInfo(SearchItemID).GetName(), ItemLeft);
 	}
 	if(Buffer.length() > 0)
 	{
@@ -148,7 +147,6 @@ void CCraftCore::CraftItem(CPlayer *pPlayer, int CraftID) const
 		Buffer.clear();
 		return;
 	}
-	Buffer.clear();
 
 	// we are already organizing the crafting
 	const int Price = GetFinalPrice(pPlayer, CraftID);
@@ -182,7 +180,7 @@ void CCraftCore::CraftItem(CPlayer *pPlayer, int CraftID) const
 	}
 
 	GS()->CreatePlayerSound(ClientID, SOUND_ITEM_SELL_BUY);
-	GS()->Chat(ClientID, "You crafted [{STR}x{INT}].", PlayerCraftItem.Info().GetName(pPlayer), CraftGetValue);
+	GS()->Chat(ClientID, "You crafted [{STR}x{INT}].", PlayerCraftItem.Info().GetName(), CraftGetValue);
 	GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 }
 

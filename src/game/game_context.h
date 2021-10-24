@@ -55,6 +55,7 @@ enum Stats
 	StGrenadePower			= 19,
 	StRiflePower			= 20,
 	StLuckyDropItem			= 21,
+	STATS_PLAYER_NUM,
 };
 
 // player ticks

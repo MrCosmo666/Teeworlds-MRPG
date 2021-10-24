@@ -81,6 +81,7 @@ public:
 	void ResetClientData(int ClientID);
 	void PrepareInformation(class IStorageEngine* pStorage);
 
+	void ConSyncLinesForTranslate();
 	//
 	void LoadLogicWorld() const;
 	static const char* PlayerName(int AccountID);

@@ -134,7 +134,7 @@ bool CHouseCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceMe
 		GS()->AVM(ClientID, "null", NOPE, TAB_INFO_HOUSE_PLANT, "Select item and in tab select 'To plant'");
 		GS()->AV(ClientID, "null");
 
-		GS()->AVM(ClientID, "null", NOPE, NOPE, "Housing Active Plants: {STR}", GS()->GetItemInfo(PlantItemID).GetName(pPlayer));
+		GS()->AVM(ClientID, "null", NOPE, NOPE, "Housing Active Plants: {STR}", GS()->GetItemInfo(PlantItemID).GetName());
 		GS()->Mmo()->Item()->ListInventory(pPlayer, FUNCTION_PLANTS, true);
 		GS()->AddVotesBackpage(ClientID);
 		return true;
@@ -259,7 +259,7 @@ bool CHouseCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const i
 		if(HouseID > 0 && DeleteDecorationHouse(VoteID))
 		{
 			CItemData& PlDecoItem = pPlayer->GetItem(VoteID2);
-			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName(pPlayer));
+			GS()->Chat(ClientID, "You back to the backpack {STR}!", PlDecoItem.Info().GetName());
 			PlDecoItem.Add(1);
 		}
 		GS()->StrongUpdateVotes(ClientID, MENU_HOUSE_DECORATION);
@@ -389,7 +389,7 @@ void CHouseCore::ShowDecorationList(CPlayer *pPlayer)
 		if(deco->second && deco->second->m_HouseID == HouseID)
 		{
 			GS()->AVD(ClientID, "DECODELETE", deco->first, deco->second->m_DecoID, 1, "{STR}:{INT} back to the inventory",
-				GS()->GetItemInfo(deco->second->m_DecoID).GetName(pPlayer), deco->first);
+				GS()->GetItemInfo(deco->second->m_DecoID).GetName(), deco->first);
 		}
 	}
 }

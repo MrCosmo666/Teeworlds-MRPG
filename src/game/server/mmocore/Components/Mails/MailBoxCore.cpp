@@ -66,10 +66,10 @@ void CMailBoxCore::GetInformationInbox(CPlayer *pPlayer)
 			char aEnchantBuf[16];
 			GS()->GetItemInfo(ItemID).FormatEnchantLevel(aEnchantBuf, sizeof(aEnchantBuf), Enchant);
 			GS()->AVM(ClientID, "MAIL", MailLetterID, HideID, "Receive {STR} {STR} (L{INT})",
-				GS()->GetItemInfo(ItemID).GetName(pPlayer), (Enchant > 0 ? aEnchantBuf : "\0"), ShowLetterID);
+				GS()->GetItemInfo(ItemID).GetName(), (Enchant > 0 ? aEnchantBuf : "\0"), ShowLetterID);
 		}
 		else
-			GS()->AVM(ClientID, "MAIL", MailLetterID, HideID, "Receive {STR}x{INT} (L{INT})", GS()->GetItemInfo(ItemID).GetName(pPlayer), ItemValue, ShowLetterID);
+			GS()->AVM(ClientID, "MAIL", MailLetterID, HideID, "Receive {STR}x{INT} (L{INT})", GS()->GetItemInfo(ItemID).GetName(), ItemValue, ShowLetterID);
 
 		GS()->AVM(ClientID, "DELETE_MAIL", MailLetterID, HideID, "Delete (L{INT})", ShowLetterID);
 	}
@@ -143,7 +143,7 @@ void CMailBoxCore::AcceptMailLetter(CPlayer* pPlayer, int MailLetterID)
 
 		const int Enchant = pRes->getInt("Enchant");
 		pPlayer->GetItem(ItemID).Add(ItemValue, 0, Enchant);
-		GS()->Chat(pPlayer->GetCID(), "You received an attached item [{STR}].", GS()->GetItemInfo(ItemID).GetName(pPlayer));
+		GS()->Chat(pPlayer->GetCID(), "You received an attached item [{STR}].", GS()->GetItemInfo(ItemID).GetName());
 		DeleteMailLetter(MailLetterID);
 	}
 }

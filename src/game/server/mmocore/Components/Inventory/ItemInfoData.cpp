@@ -6,25 +6,12 @@
 #include <teeother/components/localization.h>
 
 std::map < int, CItemDataInfo > CItemDataInfo::ms_aItemsInfo;
-const char* CItemDataInfo::GetName(CPlayer* pPlayer) const
-{
-	if(!pPlayer)
-		return m_aName;
-	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), m_aName);
-}
-
-const char* CItemDataInfo::GetDesc(CPlayer* pPlayer) const
-{
-	if(!pPlayer)
-		return m_aDesc;
-	return pPlayer->GS()->Server()->Localization()->Localize(pPlayer->GetLanguage(), m_aDesc);
-}
 
 int CItemDataInfo::GetInfoEnchantStats(int AttributeID) const
 {
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
 	{
-		if(CGS::ms_aAttributsInfo.find(m_aAttribute[i]) != CGS::ms_aAttributsInfo.end() && m_aAttribute[i] == AttributeID)
+		if(m_aAttribute[i] >= StSpreadShotgun && m_aAttribute[i] < STATS_PLAYER_NUM && m_aAttribute[i] == AttributeID)
 			return m_aAttributeValue[i];
 	}
 	return 0;
@@ -100,7 +87,7 @@ bool CItemDataInfo::IsEnchantMaxLevel(int Enchant) const
 	return false;
 }
 
-void CItemDataInfo::FormatAttributes(char* pBuffer, int Size, int Enchant) const
+void CItemDataInfo::FormatAttributes(CPlayer* pPlayer, char* pBuffer, int Size, int Enchant) const
 {
 	dynamic_string Buffer;
 	for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
@@ -110,10 +97,7 @@ void CItemDataInfo::FormatAttributes(char* pBuffer, int Size, int Enchant) const
 
 		const int BonusID = m_aAttribute[i];
 		const int BonusValue = GetInfoEnchantStats(BonusID, Enchant);
-
-		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "%s+%d ", CGS::ms_aAttributsInfo[BonusID].m_aName, BonusValue);
-		Buffer.append_at(Buffer.length(), aBuf);
+		pPlayer->GS()->Server()->Localization()->Format(Buffer, pPlayer->GetLanguage(), "{STR}+{VAL} ", CGS::ms_aAttributsInfo[BonusID].m_aName, BonusValue);
 	}
 	str_copy(pBuffer, Buffer.buffer(), Size);
 	Buffer.clear();
