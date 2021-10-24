@@ -51,7 +51,7 @@ jobs:
       run: |
         cp release/mmoteeworlds_srv* .
         7z a ${{ matrix.package-file }} mmoteeworlds_srv* maps data server_lang 
-        mkdir artifacts
+        mkdir release/artifacts
         mv ${{ matrix.package-file }} release/artifacts
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2-preview
