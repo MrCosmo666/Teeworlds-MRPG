@@ -1,4 +1,4 @@
-name:Client Build
+name: Client Build
 
 on: [push, pull_request]
 
