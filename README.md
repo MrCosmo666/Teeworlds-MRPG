@@ -60,7 +60,7 @@ Building
     mkdir -p build
     cd build
     cmake ..
-    make
+    make -j
 
 On subsequent builds, you only have to repeat the `make` step.
 
