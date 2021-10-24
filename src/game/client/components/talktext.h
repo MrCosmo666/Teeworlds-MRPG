@@ -17,7 +17,8 @@ class CTalkText : public CComponent
 	int m_TalkedEmoticionSpriteID;
 	bool m_PlayerTalked;
 	bool m_Stranger;
-	
+	CTextCursor m_TextCursor;
+
 	int m_RegrnizedTalkPosition;
 	int64 m_RegrnizedTalkTime;
 	char m_TalkText[TALKING_SIZE];

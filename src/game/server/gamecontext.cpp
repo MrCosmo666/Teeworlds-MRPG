@@ -345,7 +345,7 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 	{
 		// send discord chat only from players
 		if(ChatterClientID < MAX_PLAYERS)
-			ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
+			Server()->SendDiscordMessage(g_Config.m_SvDiscordServerChatChannel, DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
 
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
 	}
@@ -360,7 +360,7 @@ void CGS::SendChat(int ChatterClientID, int Mode, int To, const char *pText)
 
 		// send discord chat only from players
 		if(pChatterPlayer)
-			ChatDiscord(DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
+			Server()->SendDiscordMessage(g_Config.m_SvDiscordServerChatChannel, DC_SERVER_CHAT, Server()->ClientName(ChatterClientID), pText);
 
 		// pack one for the recording only
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOSEND, -1);
