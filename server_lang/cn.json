@@ -8,282 +8,282 @@
         {
             "id": "itdc51",
             "key": "Lucky house decor",
-            "value": "Lucky house decor"
+            "value": "幸运屋装饰"
         },
         {
             "id": "diaqu99",
             "key": "Tests?....",
-            "value": "Tests?...."
+            "value": "测试?...."
         },
         {
             "id": "diaqu314",
             "key": "Thank's [Talked]",
-            "value": "Thank's [Talked]"
+            "value": "谢谢你， [Talked]"
         },
         {
             "id": "aeth1",
             "key": "Crossroad",
-            "value": "Crossroad"
+            "value": "十字路口"
         },
         {
             "id": "aeth2",
             "key": "Pier",
-            "value": "Pier"
+            "value": "码头"
         },
         {
             "id": "aeth3",
             "key": "Guard post",
-            "value": "Guard post"
+            "value": "哨所"
         },
         {
             "id": "aeth4",
             "key": "Yugasaki",
-            "value": "Yugasaki"
+            "value": "幻想乡"
         },
         {
             "id": "attb1",
             "key": "Shotgun Spread",
-            "value": "Shotgun Spread"
+            "value": "霰弹散射"
         },
         {
             "id": "attb2",
             "key": "Grenade Spread",
-            "value": "Grenade Spread"
+            "value": "榴弹散射"
         },
         {
             "id": "attb3",
             "key": "Rifle Spread",
-            "value": "Rifle Spread"
+            "value": "激光散射"
         },
         {
             "id": "attb4",
             "key": "Strength",
-            "value": "Strength"
+            "value": "力量"
         },
         {
             "id": "attb5",
             "key": "Dexterity",
-            "value": "Dexterity"
+            "value": "攻速"
         },
         {
             "id": "attb6",
             "key": "Crit Dmg",
-            "value": "Crit Dmg"
+            "value": "暴击伤害"
         },
         {
             "id": "attb7",
             "key": "Direct Crit Dmg",
-            "value": "Direct Crit Dmg"
+            "value": "暴击几率"
         },
         {
             "id": "attb8",
             "key": "Hardness",
-            "value": "Hardness"
+            "value": "血量"
         },
         {
             "id": "attb9",
             "key": "Lucky",
-            "value": "Lucky"
+            "value": "幸运"
         },
         {
             "id": "attb10",
             "key": "Piety",
-            "value": "Piety"
+            "value": "祈祷"
         },
         {
             "id": "attb11",
             "key": "Vampirism",
-            "value": "Vampirism"
+            "value": "吸血"
         },
         {
             "id": "attb12",
             "key": "Ammo Regen",
-            "value": "Ammo Regen"
+            "value": "子弹回复"
         },
         {
             "id": "attb13",
             "key": "Ammo",
-            "value": "Ammo"
+            "value": "子弹"
         },
         {
             "id": "attb14",
             "key": "Efficiency",
-            "value": "Efficiency"
+            "value": "效率"
         },
         {
             "id": "attb15",
             "key": "Extraction",
-            "value": "Extraction"
+            "value": "萃取"
         },
         {
             "id": "attb16",
             "key": "Hammer Power",
-            "value": "Hammer Power"
+            "value": "锤子强度"
         },
         {
             "id": "attb17",
             "key": "Gun Power",
-            "value": "Gun Power"
+            "value": "手枪强度"
         },
         {
             "id": "attb18",
             "key": "Shotgun Power",
-            "value": "Shotgun Power"
+            "value": "霰弹强度"
         },
         {
             "id": "attb19",
             "key": "Grenade Power",
-            "value": "Grenade Power"
+            "value": "榴弹强度"
         },
         {
             "id": "attb20",
             "key": "Rifle Power",
-            "value": "Rifle Power"
+            "value": "激光强度"
         },
         {
             "id": "attb21",
             "key": "Lucky items",
-            "value": "Lucky items"
+            "value": "幸运物品"
         },
         {
             "id": "ittm1",
             "key": "Gold",
-            "value": "Gold"
+            "value": "黄金"
         },
         {
             "id": "itdc1",
             "key": "Major currency",
-            "value": "Major currency"
+            "value": "主要货币"
         },
         {
             "id": "ittm2",
             "key": "Hammer",
-            "value": "Hammer"
+            "value": "锤子"
         },
         {
             "id": "itdc2",
             "key": "A normal hammer",
-            "value": "A normal hammer"
+            "value": "普通锤子"
         },
         {
             "id": "ittm3",
             "key": "Gun",
-            "value": "Gun"
+            "value": "普通手枪"
         },
         {
             "id": "itdc6",
             "key": "Conventional weapon",
-            "value": "Conventional weapon"
+            "value": "常规武器"
         },
         {
             "id": "ittm4",
             "key": "Shotgun",
-            "value": "Shotgun"
+            "value": "霰弹枪"
         },
         {
             "id": "ittm5",
             "key": "Grenade",
-            "value": "Grenade"
+            "value": "榴弹发射器"
         },
         {
             "id": "ittm6",
             "key": "Rifle",
-            "value": "Rifle"
+            "value": "普通激光枪"
         },
         {
             "id": "ittm7",
             "key": "Material",
-            "value": "Material"
+            "value": "附魔材料"
         },
         {
             "id": "itdc7",
             "key": "Required to improve weapons",
-            "value": "Required to improve weapons"
+            "value": "需要提升武器"
         },
         {
             "id": "ittm8",
             "key": "Ticket guild",
-            "value": "Ticket guild"
+            "value": "公会创建票"
         },
         {
             "id": "itdc8",
             "key": "Command: /gcreate <name>",
-            "value": "Command: /gcreate <name>"
+            "value": "指令: /gcreate <公会名称>"
         },
         {
             "id": "ittm9",
             "key": "Skill Point",
-            "value": "Skill Point"
+            "value": "技能点数"
         },
         {
             "id": "itdc9",
             "key": "Skill point",
-            "value": "Skill point"
+            "value": "技能点数"
         },
         {
             "id": "ittm10",
             "key": "Decoration Armor",
-            "value": "Decoration Armor"
+            "value": "装饰盔甲"
         },
         {
             "id": "itdc13",
             "key": "Decoration for house!",
-            "value": "Decoration for house!"
+            "value": "房子的装饰！"
         },
         {
             "id": "ittm11",
             "key": "Decoration Hearth Elite",
-            "value": "Decoration Hearth Elite"
+            "value": "装饰原始壁炉"
         },
         {
             "id": "ittm12",
             "key": "Decoration Ninja Elite",
-            "value": "Decoration Ninja Elite"
+            "value": "装饰忍者壁炉"
         },
         {
             "id": "ittm13",
             "key": "Decoration Hearth",
-            "value": "Decoration Hearth"
+            "value": "专属壁炉"
         },
         {
             "id": "ittm14",
             "key": "Potion mana regen",
-            "value": "Potion mana regen"
+            "value": "魔力恢复药水"
         },
         {
             "id": "itdc14",
             "key": "Regenerate +5%, 15sec every sec.\n",
-            "value": "Regenerate +5%, 15sec every sec.\n"
+            "value": "每秒魔力恢复 +5%,持续15秒 "
         },
         {
             "id": "ittm15",
             "key": "Potion health regen",
-            "value": "Potion health regen"
+            "value": "生命恢复药水"
         },
         {
             "id": "itdc15",
             "key": "Regenerate +3% health, 15sec every sec.",
-            "value": "Regenerate +3% health, 15sec every sec."
+            "value": "每秒生命恢复 +3% , 持续15秒"
         },
         {
             "id": "ittm16",
             "key": "Capsule survival experience",
-            "value": "Capsule survival experience"
+            "value": "经验值胶囊"
         },
         {
             "id": "itdc16",
             "key": "You got 10-50 experience survival",
-            "value": "You got 10-50 experience survival"
+            "value": "你会随机获得10-50经验"
         },
         {
             "id": "ittm17",
             "key": "Little bag of gold",
-            "value": "Little bag of gold"
+            "value": "小钱包"
         },
         {
             "id": "itdc17",
             "key": "You got 10-50 gold",
-            "value": "You got 10-50 gold"
+            "value": "随机得到10-50黄金"
         },
         {
             "id": "ittm18",
@@ -293,27 +293,27 @@
         {
             "id": "itdc46",
             "key": "Information added later.",
-            "value": "Information added later."
+            "value": "简介很快添加."
         },
         {
             "id": "ittm20",
             "key": "Potato",
-            "value": "Potato"
+            "value": "土豆"
         },
         {
             "id": "itdc24",
             "key": "Material need for craft!",
-            "value": "Material need for craft!"
+            "value": "需要附魔材料来合成！"
         },
         {
             "id": "ittm21",
             "key": "Notebook",
-            "value": "Notebook"
+            "value": "笔记本"
         },
         {
             "id": "itdc21",
             "key": "In it, something is written",
-            "value": "In it, something is written"
+            "value": "这里面记载了一些东西"
         },
         {
             "id": "ittm22",
@@ -323,57 +323,57 @@
         {
             "id": "itdc29",
             "key": "I wonder what it's for?",
-            "value": "I wonder what it's for?"
+            "value": "我想知道这是干什么的?"
         },
         {
             "id": "ittm23",
             "key": "Board",
-            "value": "Board"
+            "value": "板子"
         },
         {
             "id": "itdc23",
             "key": "Plain Board",
-            "value": "Plain Board"
+            "value": "朴实的板子"
         },
         {
             "id": "ittm24",
             "key": "Mushroom",
-            "value": "Mushroom"
+            "value": "蘑菇"
         },
         {
             "id": "ittm25",
-            "key": "Potion resurrection",
-            "value": "Potion resurrection"
+            "key": "Potion resuscitates",
+            "value": "复活药水"
         },
         {
             "id": "itdc25",
             "key": "Resuscitates in the zone where you died!",
-            "value": "Resuscitates in the zone where you died!"
+            "value": "你将会在你死亡的地方苏醒！"
         },
         {
             "id": "ittm26",
             "key": "Goblin Pickaxe",
-            "value": "Goblin Pickaxe"
+            "value": "哥布林矿镐"
         },
         {
             "id": "itdc48",
             "key": "It happens sometimes",
-            "value": "It happens sometimes"
+            "value": "预 兆"
         },
         {
             "id": "ittm27",
             "key": "Young fighter's ring",
-            "value": "Young fighter's ring"
+            "value": "年轻战士的戒指"
         },
         {
             "id": "ittm28",
             "key": "Small ammo bag",
-            "value": "Small ammo bag"
+            "value": "小的弹夹"
         },
         {
             "id": "itdc49",
             "key": "Adds a small amount of ammunition",
-            "value": "Adds a small amount of ammunition"
+            "value": "添加少量弹药"
         },
         {
             "id": "ittm29",
@@ -383,487 +383,487 @@
         {
             "id": "ittm30",
             "key": "Goblin Ingot",
-            "value": "Goblin Ingot"
+            "value": "哥布林锭"
         },
         {
             "id": "ittm31",
             "key": "Copper Ingot",
-            "value": "Copper Ingot"
+            "value": "铜锭"
         },
         {
             "id": "ittm32",
             "key": "Salantra Blessing",
-            "value": "Salantra Blessing"
+            "value": "Salantra的祝福"
         },
         {
             "id": "ittm33",
             "key": "Explosive module for gun",
-            "value": "Explosive module for gun"
+            "value": "手枪爆炸模块"
         },
         {
             "id": "ittm34",
             "key": "Explosive module for shotgun",
-            "value": "Explosive module for shotgun"
+            "value": "霰弹枪爆炸模块"
         },
         {
             "id": "ittm35",
             "key": "Kappa meat",
-            "value": "Kappa meat"
+            "value": "Kappa肉"
         },
         {
             "id": "ittm36",
             "key": "Ring of Arvida",
-            "value": "Ring of Arvida"
+            "value": "Arvida的戒指"
         },
         {
             "id": "ittm37",
             "key": "Relic of the Orc Lord",
-            "value": "Relic of the Orc Lord"
+            "value": "Orc Lord的遗物"
         },
         {
             "id": "ittm38",
             "key": "Ticket reset class stats",
-            "value": "Ticket reset class stats"
+            "value": "升级点重置券"
         },
         {
             "id": "itdc38",
             "key": "Resets only class stats(Dps, Tank, Healer).",
-            "value": "Resets only class stats(Dps, Tank, Healer)."
+            "value": "只会重置职业类点数(战士, 坦克, 治疗)."
         },
         {
             "id": "ittm39",
             "key": "Mode PVP",
-            "value": "Mode PVP"
+            "value": "PVP模式"
         },
         {
             "id": "itdc39",
             "key": "Settings game.",
-            "value": "Settings game."
+            "value": "游戏设置."
         },
         {
             "id": "ittm40",
             "key": "Ticket reset weapon stats",
-            "value": "Ticket reset weapon stats"
+            "value": "武器升级点重置券"
         },
         {
             "id": "itdc40",
             "key": "Resets only ammo stats(Ammo).",
-            "value": "Resets only ammo stats(Ammo)."
+            "value": "只会重置武器弹药类的升级点."
         },
         {
             "id": "ittm41",
             "key": "Orc's Belt",
-            "value": "Orc's Belt"
+            "value": "Orc的腰带"
         },
         {
             "id": "itdc41",
             "key": "You can feel the light power of mana.",
-            "value": "You can feel the light power of mana."
+            "value": "你可以感受到mana微弱的力量."
         },
         {
             "id": "ittm42",
             "key": "Torn cloth clothes of orcs",
-            "value": "Torn cloth clothes of orcs"
+            "value": "Orc的破布衣服"
         },
         {
             "id": "ittm43",
             "key": "Blessing for discount craft",
-            "value": "Blessing for discount craft"
+            "value": "商店打折券"
         },
         {
             "id": "itdc43",
             "key": "Need dress it, -20% craft price",
-            "value": "Need dress it, -20% craft price"
+            "value": "需要装备，获得-20%的价格"
         },
         {
             "id": "ittm44",
             "key": "Noctis fragment",
-            "value": "Noctis fragment"
+            "value": "Noctis的碎片"
         },
         {
             "id": "itdc44",
             "key": "Event Final Fantasy.",
-            "value": "Event Final Fantasy."
+            "value": "最终幻想活动."
         },
         {
             "id": "ittm45",
             "key": "The core of Neptune",
-            "value": "The core of Neptune"
+            "value": "海王核心"
         },
         {
             "id": "ittm46",
             "key": "Remains of a dead soul",
-            "value": "Remains of a dead soul"
+            "value": "亡魂残骸"
         },
         {
             "id": "ittm47",
             "key": "Ring of God of War",
-            "value": "Ring of God of War"
+            "value": "战神的戒指"
         },
         {
             "id": "ittm48",
             "key": "Bracelet of Fire",
-            "value": "Bracelet of Fire"
+            "value": "火之手镯"
         },
         {
             "id": "ittm49",
             "key": "Big ammo bag",
-            "value": "Big ammo bag"
+            "value": "大的弹药袋"
         },
         {
             "id": "ittm50",
             "key": "Strength ",
-            "value": "Strength "
+            "value": "力量 "
         },
         {
             "id": "itdc50",
             "key": "Increase your strength",
-            "value": "Increase your strength"
+            "value": "提升你的力量"
         },
         {
             "id": "ittm51",
             "key": "Random home decor",
-            "value": "Random home decor"
+            "value": "随意的家居装饰"
         },
         {
             "id": "ittm10000",
             "key": "Heavenly hammer",
-            "value": "Heavenly hammer"
+            "value": "天堂之锤"
         },
         {
             "id": "itdc10024",
             "key": "Reinforced kick",
-            "value": "Reinforced kick"
+            "value": "增强击退"
         },
         {
             "id": "ittm10001",
             "key": "Heavenly gun",
-            "value": "Heavenly gun"
+            "value": "天堂手枪"
         },
         {
             "id": "itdc10023",
             "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
+            "value": "看上去不错"
         },
         {
             "id": "ittm10002",
             "key": "Heavenly shotgun",
-            "value": "Heavenly shotgun"
+            "value": "天堂霰弹枪"
         },
         {
             "id": "ittm10003",
             "key": "Heavenly grenade",
-            "value": "Heavenly grenade"
+            "value": "天堂榴弹枪"
         },
         {
             "id": "ittm10004",
             "key": "Heavenly rifle",
-            "value": "Heavenly rifle"
+            "value": "天堂激光枪"
         },
         {
             "id": "ittm10005",
             "key": "Shadow wings",
-            "value": "Shadow wings"
+            "value": "影之翼"
         },
         {
             "id": "itdc10005",
             "key": "Dark history",
-            "value": "Dark history"
+            "value": "黑暗年代"
         },
         {
             "id": "ittm10006",
             "key": "Neptune wings",
-            "value": "Neptune wings"
+            "value": "海王之翼"
         },
         {
             "id": "itdc10018",
             "key": "Covered in secrets",
-            "value": "Covered in secrets"
+            "value": "隐藏在秘密之中"
         },
         {
             "id": "ittm10007",
             "key": "Angel wings",
-            "value": "Angel wings"
+            "value": "天使之翼"
         },
         {
             "id": "ittm10008",
             "key": "Heavenly wings",
-            "value": "Heavenly wings"
+            "value": "天堂之戒"
         },
         {
             "id": "ittm10009",
             "key": "Rainbow wings",
-            "value": "Rainbow wings"
+            "value": "缤纷之翼"
         },
         {
             "id": "ittm10010",
             "key": "Magitech hammer",
-            "value": "Magitech hammer"
+            "value": "魔力锤子"
         },
         {
             "id": "ittm10011",
             "key": "Magitech gun",
-            "value": "Magitech gun"
+            "value": "魔力手枪"
         },
         {
             "id": "ittm10012",
             "key": "Magitech shotgun",
-            "value": "Magitech shotgun"
+            "value": "魔力霰弹枪"
         },
         {
             "id": "ittm10013",
             "key": "Magitech grenade",
-            "value": "Magitech grenade"
+            "value": "魔力榴弹枪"
         },
         {
             "id": "ittm10014",
             "key": "Magitech rifle",
-            "value": "Magitech rifle"
+            "value": "魔力激光枪"
         },
         {
             "id": "ittm10015",
             "key": "Stars wings",
-            "value": "Stars wings"
+            "value": "繁星之翼"
         },
         {
             "id": "ittm10016",
             "key": "Bat wings",
-            "value": "Bat wings"
+            "value": "蝙蝠之翼"
         },
         {
             "id": "ittm10017",
             "key": "Little eagle wings",
-            "value": "Little eagle wings"
+            "value": "雏鹰之翼"
         },
         {
             "id": "ittm10018",
             "key": "Necromante wings",
-            "value": "Necromante wings"
+            "value": "死灵之翼"
         },
         {
             "id": "ittm10019",
             "key": "Goblin hammer",
-            "value": "Goblin hammer"
+            "value": "哥布林锤子"
         },
         {
             "id": "ittm10020",
             "key": "Goblin gun",
-            "value": "Goblin gun"
+            "value": "哥布林手枪"
         },
         {
             "id": "ittm10021",
             "key": "Goblin shotgun",
-            "value": "Goblin shotgun"
+            "value": "哥布林霰弹枪"
         },
         {
             "id": "ittm10022",
             "key": "Goblin grenade",
-            "value": "Goblin grenade"
+            "value": "哥布林榴弹枪"
         },
         {
             "id": "ittm10023",
             "key": "Goblin rifle",
-            "value": "Goblin rifle"
+            "value": "哥布林激光枪"
         },
         {
             "id": "ittm10024",
             "key": "Scythe",
-            "value": "Scythe"
+            "value": "镰刀"
         },
         {
             "id": "ittm15000",
             "key": "Theme Couple",
-            "value": "Theme Couple"
+            "value": "主题情侣"
         },
         {
             "id": "itdc15003",
             "key": "Strictly limited as the theme",
-            "value": "Strictly limited as the theme"
+            "value": "严格限定为主题"
         },
         {
             "id": "ittm15001",
             "key": "Theme Final Fantasy",
-            "value": "Theme Final Fantasy"
+            "value": "最终幻想主题"
         },
         {
             "id": "ittm15002",
             "key": "Theme Aion",
-            "value": "Theme Aion"
+            "value": "永恒之塔主题"
         },
         {
             "id": "ittm15003",
             "key": "Theme Dragon Nest",
-            "value": "Theme Dragon Nest"
+            "value": "龙之巢主题"
         },
         {
             "id": "sknm1",
             "key": "Health turret",
-            "value": "Health turret"
+            "value": "治疗光环"
         },
         {
             "id": "skds1",
             "key": "Creates turret a recovery health ",
-            "value": "Creates turret a recovery health "
+            "value": "生成一个治疗光环 "
         },
         {
             "id": "skbn1",
             "key": "life span",
-            "value": "life span"
+            "value": "存在时间"
         },
         {
             "id": "sknm2",
             "key": "Sleepy Gravity",
-            "value": "Sleepy Gravity"
+            "value": "引力陷阱"
         },
         {
             "id": "skds2",
             "key": "Magnet mobs to itself",
-            "value": "Magnet mobs to itself"
+            "value": "把怪物吸住"
         },
         {
             "id": "skbn2",
             "key": "radius",
-            "value": "radius"
+            "value": "半径"
         },
         {
             "id": "sknm3",
             "key": "Craft Discount",
-            "value": "Craft Discount"
+            "value": "合成折扣"
         },
         {
             "id": "skds3",
             "key": "Will give discount on the price of craft items",
-            "value": "Will give discount on the price of craft items"
+            "value": "我们可以获得合成的折扣"
         },
         {
             "id": "skbn3",
             "key": "% discount gold for craft item",
-            "value": "% discount gold for craft item"
+            "value": "% 黄金合成折扣"
         },
         {
             "id": "sknm4",
             "key": "Proficiency with weapons",
-            "value": "Proficiency with weapons"
+            "value": "武器大师"
         },
         {
             "id": "skds4",
             "key": "You can perform an automatic fire",
-            "value": "You can perform an automatic fire"
+            "value": "可以自动开火"
         },
         {
             "id": "skbn4",
             "key": "can perform an auto fire with all types of weapons",
-            "value": "can perform an auto fire with all types of weapons"
+            "value": "可以让所有武器自动攻击"
         },
         {
             "id": "sknm5",
             "key": "Blessing of God of war",
-            "value": "Blessing of God of war"
+            "value": "战士的祝福"
         },
         {
             "id": "skds5",
             "key": "The blessing restores ammo",
-            "value": "The blessing restores ammo"
+            "value": "重置弹药的祝福"
         },
         {
             "id": "skbn5",
             "key": "% recovers ammo within a radius of 800",
-            "value": "% recovers ammo within a radius of 800"
+            "value": "% 的几率恢复半径800内的弹药"
         },
         {
             "id": "sknm6",
             "key": "Noctis Lucis Attack Teleport",
-            "value": "Noctis Lucis Attack Teleport"
+            "value": "Noctis Lucis 瞬移攻击"
         },
         {
             "id": "skds6",
             "key": "An attacking teleport that deals damage to all mobs radius",
-            "value": "An attacking teleport that deals damage to all mobs radius"
+            "value": "一种带传送的攻击，可以对命中目标半径内所有怪物造成伤害"
         },
         {
             "id": "skbn6",
             "key": "% your strength",
-            "value": "% your strength"
+            "value": "提升你%的力量 "
         },
         {
             "id": "qudn1",
             "key": "Help for workers",
-            "value": "Help for workers"
+            "value": "帮助工人"
         },
         {
             "id": "qusn2",
             "key": "Main: Arrival",
-            "value": "Main: Arrival"
+            "value": "主线：初来乍到"
         },
         {
             "id": "qudn2",
             "key": "Helping a girl",
-            "value": "Helping a girl"
+            "value": "帮助女孩"
         },
         {
             "id": "qudn3",
             "key": "The fight with slime!",
-            "value": "The fight with slime!"
+            "value": "与史莱姆激战！"
         },
         {
             "id": "qusn4",
             "key": "Trader Sentry",
-            "value": "Trader Sentry"
+            "value": "哨兵商人"
         },
         {
             "id": "qudn4",
             "key": "Gel? Why do you need it",
-            "value": "Gel? Why do you need it"
+            "value": "Gel? 你怎么需要这玩意"
         },
         {
             "id": "qudn5",
             "key": "Search for a daughter",
-            "value": "Search for a daughter"
+            "value": "寻找一名女儿"
         },
         {
             "id": "qusn5",
             "key": "Sailor",
-            "value": "Sailor"
+            "value": "水手"
         },
         {
             "id": "qudn6",
             "key": "What is ore mining?",
-            "value": "What is ore mining?"
+            "value": "什么是矿物开采?"
         },
         {
             "id": "qusn7",
             "key": "Mining",
-            "value": "Mining"
+            "value": "挖掘"
         },
         {
             "id": "qudn7",
             "key": "My first pickaxe",
-            "value": "My first pickaxe"
+            "value": "第一把矿稿"
         },
         {
             "id": "qudn8",
             "key": "Help destruction of dir",
-            "value": "Help destruction of dir"
+            "value": "帮助摧毁隧道"
         },
         {
             "id": "qusn9",
             "key": "Deputy",
-            "value": "Deputy"
+            "value": "代理人"
         },
         {
             "id": "qudn9",
             "key": "Raid on the dirt",
-            "value": "Raid on the dirt"
+            "value": "领土侵略"
         },
         {
             "id": "qudn10",
             "key": "Acquaintance",
-            "value": "Acquaintance"
+            "value": "熟人"
         },
         {
             "id": "qusn22",
             "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
+            "value": "主线: Apostle Elfia"
         },
         {
             "id": "qudn11",
@@ -873,107 +873,107 @@
         {
             "id": "qudn12",
             "key": "Adventurer",
-            "value": "Adventurer"
+            "value": "冒险家"
         },
         {
             "id": "qudn13",
             "key": "Something is starting",
-            "value": "Something is starting"
+            "value": "开始征程"
         },
         {
             "id": "qudn14",
             "key": "History from Apostle",
-            "value": "History from Apostle"
+            "value": "Apostle的历史"
         },
         {
             "id": "qudn15",
             "key": "Diana has a problem",
-            "value": "Diana has a problem"
+            "value": "戴安娜的烦恼"
         },
         {
             "id": "qudn16",
             "key": "Mmm delicious",
-            "value": "Mmm delicious"
+            "value": "嗯，美餐一顿"
         },
         {
             "id": "qudn17",
             "key": "Time learn something",
-            "value": "Time learn something"
+            "value": "是时候学点什么了"
         },
         {
             "id": "qudn18",
             "key": "Here are the goblins",
-            "value": "Here are the goblins"
+            "value": "这些是哥布林"
         },
         {
             "id": "qudn19",
             "key": "Occupation of goblins",
-            "value": "Occupation of goblins"
+            "value": "被哥布林占领的地方"
         },
         {
             "id": "qudn20",
             "key": "Yasue San",
-            "value": "Yasue San"
+            "value": "苏珊雅"
         },
         {
             "id": "qudn21",
             "key": "Abandoned mine",
-            "value": "Abandoned mine"
+            "value": "废弃矿洞"
         },
         {
             "id": "qudn22",
             "key": "Goodbye Elfinia",
-            "value": "Goodbye Elfinia"
+            "value": "再见Elfinia"
         },
         {
             "id": "qudn50",
             "key": "Officer's disputes!",
-            "value": "Officer's disputes!"
+            "value": "军官的麻烦"
         },
         {
             "id": "qusn50",
             "key": "Officer Henry",
-            "value": "Officer Henry"
+            "value": "Henry长官"
         },
         {
             "id": "qudn55",
             "key": "Erik's way saying help.",
-            "value": "Erik's way saying help."
+            "value": "埃里克的求人之道."
         },
         {
             "id": "qusn55",
             "key": "Gunsmith Eric",
-            "value": "Gunsmith Eric"
+            "value": "军火商埃里克"
         },
         {
             "id": "qudn60",
             "key": "Why are you here Noctis",
-            "value": "Why are you here Noctis"
+            "value": "诺利克斯 你为什么会在这"
         },
         {
             "id": "qusn62",
             "key": "Final fantasy",
-            "value": "Final fantasy"
+            "value": "最终幻想"
         },
         {
             "id": "qudn61",
             "key": "First assignment",
-            "value": "First assignment"
+            "value": "第一个任务"
         },
         {
             "id": "qudn62",
             "key": "Resonance",
-            "value": "Resonance"
+            "value": "共鸣"
         },
         {
             "id": "stnm1",
             "key": "Weapons for young adventurers",
-            "value": "Weapons for young adventurers"
+            "value": "为年轻冒险家准备的武器"
         },
         {
             "id": "stnm2",
             "key": "Elfinia Artifacts",
-            "value": "Elfinia Artifacts"
+            "value": "Elfinia神器"
         },
         {
             "id": "stnm3",
@@ -983,32 +983,32 @@
         {
             "id": "stnm5",
             "key": "Master La",
-            "value": "Master La"
+            "value": " 大师 La"
         },
         {
             "id": "hmnm2",
             "key": "Elven class",
-            "value": "Elven class"
+            "value": "精灵教师"
         },
         {
             "id": "hmnm6",
             "key": "Asian-style home",
-            "value": "Asian-style home"
+            "value": "亚洲风格的家"
         },
         {
             "id": "diaqu141",
             "key": "You just don't get angry, everything's fine!",
-            "value": "你只要不生气，事情会好起来的"
+            "value": "你只要不生气，事情是会好起来的！"
         },
         {
             "id": "diaqu142",
             "key": "In fact, she didn't want to come back, she was offended that you weren't spending time together. You can't rest.",
-            "value": "事实上，她不想回来，你没有花时间陪她，她很生气. 你不能休息."
+            "value": "事实上，她不想回来，你没有花时间陪她，她很生气你不能休息休息区陪她"
         },
         {
             "id": "diaqu143",
             "key": "Damn why didn't she ask for it herself? Okay, don't worry thanks for the work :) Everything will be fine, we will decide something with daughter",
-            "value": "该死的，她为什么不自己说呢？ 好的，别担心，谢谢你的帮助:) 一切都会好起来的，我们会和女儿一起决定的"
+            "value": "该死的，她为什么不自己说呢？ 好的，别担心，谢谢你的帮助:) 一切一定会好起来的，我们会和女儿一起决定的"
         },
         {
             "id": "diaqu144",
@@ -1643,17 +1643,17 @@
         {
             "id": "diaqu365",
             "key": "Diana told me about you in General terms.",
-            "value": "丹娜告诉我你一般的地位。"
+            "value": "戴安娜大体上告诉了我你的情况."
         },
         {
             "id": "diaqu366",
             "key": "**She said it with concern**: You turn out to be a Joker, and a vulgar *laughter*",
-            "value": "**她关切地说**: 原来你是一个爱开玩笑的粗俗的人 *大笑*"
+            "value": "**她关切地说**: 原来你是一个小丑，而且是个粗俗的人 *大笑*"
         },
         {
             "id": "diaqu367",
             "key": "No [Talked]......",
-            "value": "不是 [Talked]......"
+            "value": "不 [Talked]......"
         },
         {
             "id": "diaqu368",
@@ -1683,12 +1683,12 @@
         {
             "id": "diaqu372",
             "key": "Take your nose up [Talked], what's wrong with you?",
-            "value": "把你的鼻子抬起来 [Talked], 你怎么了?"
+            "value": "不要灰心丧气的！ [Talked], 你怎么了?"
         },
         {
             "id": "diaqu373",
             "key": "My brother has to stop by today, and I want to cook something to feed him, but everything falls out of my hands..",
-            "value": "我的兄弟必须在今天停下了，我想给他煮点东西吃，但是所有事情都超出了我的掌控..."
+            "value": "我兄弟今天要过来，我想做点东西喂他，但似乎一切都不在我的掌握之中..."
         },
         {
             "id": "diaqu374",
@@ -1698,7 +1698,7 @@
         {
             "id": "diaqu375",
             "key": "And you I look [Player] today cheerful, well help. I will not remain in debt",
-            "value": "你看起来 [Player] 今天你看起来很愉快，会有帮助，我不会继续欠人情."
+            "value": "而且看起来今天你，[Player]，看起来很愉快，我不会继续欠人情."
         },
         {
             "id": "diaqu376",
@@ -1708,7 +1708,7 @@
         {
             "id": "diaqu380",
             "key": "Well here's my house! Ah as my not my, father is a master, and even brother. In General, our family",
-            "value": "那么这里就是我的房子!啊，不是我的，我的父亲是主人，兄弟也一样;我在我们的家里是一般地位."
+            "value": "欢迎来到我的家！并不完全是我的，房子的主人是我的爸爸，和他的兄弟;我在我们的家里是一般地位."
         },
         {
             "id": "diaqu381",
@@ -1718,7 +1718,7 @@
         {
             "id": "diaqu382",
             "key": "I will help you, especially since you are my first close friend in this village, I already trust you, how you can be abandoned.",
-            "value": "我会帮助你的.况且你是我在这个村子里的第一个朋友.我很信任你的.你怎么会被抛下呢？."
+            "value": "我会帮助你的.况且你是我在这个村子里的第一个朋友.我很信任你的.我怎么会抛下你呢？."
         },
         {
             "id": "diaqu390",
@@ -1980,7 +1980,7 @@
             "key": "Get ready let's go to the Goblin-occupied zone.",
             "value": "准备好，我们出发前往哥布林占领的区域."
         },
-        {
+{
             "id": "diaqu491",
             "key": "I'm ready to sort of out right now.",
             "value": "好了我准备好了"
@@ -2468,7 +2468,7 @@
         {
             "id": "diaqu703",
             "key": "Don't worry, Diana is very attached to you. I think she will be offended. Talk to she!",
-            "value": "别担心，Diana很喜欢你。我想她会生气的。和她谈谈!"
+            "value": "别担心，戴安娜很喜欢你。我想她会生气的。和她谈谈!"
         },
         {
             "id": "diaqu710",
@@ -2513,12 +2513,12 @@
         {
             "id": "diaqu721",
             "key": "Yes, will I take Diana with me?",
-            "value": "是的，我可以带上Diana吗?"
+            "value": "是的，我可以带上戴安娜吗?"
         },
         {
             "id": "diaqu722",
             "key": "Yes, of course, set sail:) I will show you my homeland!",
-            "value": "当然，启航:) 我会带你领略我的家乡！"
+            "value": "当然，准备启航:) 我会带你领略我的家乡！"
         },
         {
             "id": "dianp10",
@@ -2563,7 +2563,7 @@
         {
             "id": "dianp32",
             "key": "What you need help with, I'm good at dealing with predators without meat you will not leave! *laughter*",
-            "value": "你需要什么帮助，我很擅长不用肉和那些食肉动物往来，你不会离开的! *笑*"
+            "value": "你需要什么帮助，我很擅长不用肉和那些食肉动物往来。 *笑*"
         },
         {
             "id": "dianp33",
@@ -2593,7 +2593,7 @@
         {
             "id": "dianp100",
             "key": "Hi my name is [Player], [Talked] are you working?",
-            "value": "你好我的名字是[Player], [Talked]师傅你是干什么的?"
+            "value": "你好我的名字是[Player], [Talked]你是在工作吗?"
         },
         {
             "id": "dianp101",
@@ -2613,7 +2613,7 @@
         {
             "id": "dianp104",
             "key": "By the way [Player], I need help, there are slugs nearby, again raging, and I can't leave the post. At the same time you will test your skills young adventurer.",
-            "value": "顺便说下[Player],我需要你的帮助, 有些鼻涕虫(slug)在附近再次肆虐起来，但我不能离开我的岗位。同时，你也能测试你的技能，年轻的冒险家."
+            "value": "顺便说下[Player],我需要你的帮助, 有些史莱姆在附近再次肆虐起来，但我不能离开我的岗位。同时，你也能测试你的技能，年轻的冒险家."
         },
         {
             "id": "dianp105",
@@ -2623,7 +2623,7 @@
         {
             "id": "dianp110",
             "key": "**He says with a look of horror on his face**: Help me find my daughter, she went to the village for food and never returned.",
-            "value": "**他一脸惊恐地说**: 帮我找找我的女儿。她去村里找吃的后就再也没有回来了."
+            "value": "**他一脸担忧地说**: 帮我找找我的女儿。她去村里找吃的后就再也没有回来了."
         },
         {
             "id": "dianp111",
@@ -2673,7 +2673,7 @@
         {
             "id": "dianp144",
             "key": "And who for you should know the time of your stay here.",
-            "value": "谁会知道你在这待多久。"
+            "value": "谁会想知道你在这待多久。"
         },
         {
             "id": "dianp145",
@@ -2753,7 +2753,7 @@
         {
             "id": "dianp184",
             "key": "I didn't want to be a pain to you, Officer. I will leave you to your problems now.",
-            "value": "我不想让你这么痛苦.警官.我现在就让你解决你的问题."
+            "value": "我不想让你这么痛苦.警官.就让我现在解决你的问题."
         },
         {
             "id": "dianp185",
@@ -2763,7 +2763,7 @@
         {
             "id": "dianp190",
             "key": "Hello [Player], I have come to you from the Final Fantasy universe, my name is [Talked].",
-            "value": "你好啊 [Player]. 你怎么弄到碎片我们会来接你的.我的名字是 [Talked]"
+            "value": "你好啊 [Player]. 我从幻想乡来到你这里.我的名字是 [Talked]"
         },
         {
             "id": "dianp191",
