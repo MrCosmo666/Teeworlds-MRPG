@@ -5,6 +5,8 @@
 
 #include "player.h"
 
+#include <atomic>
+
 class CPlayerBot : public CPlayer
 {
 	MACRO_ALLOC_POOL_ID()
@@ -14,16 +16,21 @@ class CPlayerBot : public CPlayer
 	int m_SubBotID;
 	int m_BotHealth;
 	int m_DungeonAllowedSpawn;
+	std::map<int, vec2> m_WayPoints;
 
 public:
 	int m_LastPosTick;
 	int m_PathSize;
-	vec2 m_CharPos;
 	vec2 m_TargetPos;
-	std::map<int, vec2> m_WayPoints;
+	std::atomic_bool m_ThreadReadNow;
 
 	CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint);
 	~CPlayerBot() override;
+
+	vec2& GetWayPoint(int Index) { return m_WayPoints[Index]; }
+	static void FindThreadPath(CGS* pGameServer, CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos);
+	static void GetThreadRandomWaypointTarget(CGS* pGameServer, CPlayerBot* pBotPlayer);
+	void ClearWayPoint();
 
 	int GetTeam() override { return TEAM_BLUE; }
 	bool IsBot() const override { return true; }

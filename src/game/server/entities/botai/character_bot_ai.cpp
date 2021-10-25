@@ -328,11 +328,15 @@ void CCharacterBotAI::EngineMobs()
 
 void CCharacterBotAI::Move()
 {
+	bool Status = false;
+	if(!m_pBotPlayer->m_ThreadReadNow.compare_exchange_strong(Status, true, std::memory_order::memory_order_acquire, std::memory_order::memory_order_relaxed))
+		return;
+
 	SetAim(m_pBotPlayer->m_TargetPos - m_Pos);
 
 	int Index = -1;
 	int ActiveWayPoints = 0;
-	for(int i = 0; i < m_pBotPlayer->m_PathSize && i < 30 && !GS()->Collision()->IntersectLineWithInvisible(m_pBotPlayer->m_WayPoints[i], m_Pos, 0, 0); i++)
+	for(int i = 0; i < m_pBotPlayer->m_PathSize && i < 30 && !GS()->Collision()->IntersectLineWithInvisible(m_pBotPlayer->GetWayPoint(i), m_Pos, 0, 0); i++)
 	{
 		Index = i;
 		ActiveWayPoints = i;
@@ -340,7 +344,7 @@ void CCharacterBotAI::Move()
 
 	vec2 WayDir = vec2(0, 0);
 	if(Index > -1)
-		WayDir = normalize(m_pBotPlayer->m_WayPoints[Index] - GetPos());
+		WayDir = normalize(m_pBotPlayer->GetWayPoint(Index) - GetPos());
 
 	// set the direction
 	if(WayDir.x < 0 && ActiveWayPoints > 3)
@@ -445,6 +449,8 @@ void CCharacterBotAI::Move()
 		m_Input.m_Jump = 1;
 		m_MoveTick = Server()->Tick();
 	}
+
+	m_pBotPlayer->m_ThreadReadNow.store(false, std::memory_order::memory_order_release);
 }
 
 void CCharacterBotAI::Action()
