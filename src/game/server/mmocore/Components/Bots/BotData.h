@@ -30,7 +30,7 @@ struct DataBotInfo
 	int m_aUseCustomBot[NUM_SKINPARTS];
 	int m_aSkinColorBot[NUM_SKINPARTS];
 	int m_aEquipSlot[MAX_EQUIPPED_SLOTS_BOTS];
-	bool m_aAlreadyActiveQuestBot[MAX_PLAYERS];
+	bool m_aActiveQuestBot[MAX_PLAYERS];
 
 	static bool IsDataBotValid(int BotID)
 	{

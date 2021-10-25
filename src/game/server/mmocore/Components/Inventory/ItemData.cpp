@@ -88,9 +88,9 @@ bool CItemData::Add(int Value, int Settings, int Enchant, bool Message)
 		return true;
 
 	if(Info().m_Type == TYPE_EQUIP || Info().m_Type == TYPE_MODULE)
-		GS()->Chat(-1, "{STR} got of the {STR}x{INT}!", GS()->Server()->ClientName(ClientID), Info().GetName(), Value);
+		GS()->Chat(-1, "{STR} got of the {STR}x{INT}.", GS()->Server()->ClientName(ClientID), Info().GetName(), Value);
 	else if(Info().m_Type != TYPE_INVISIBLE)
-		GS()->Chat(ClientID, "You got of the {STR}x{INT}!", Info().GetName(), Value);
+		GS()->Chat(ClientID, "You got of the {STR}x{INT}.", Info().GetName(), Value);
 
 	return true;
 }
@@ -174,7 +174,7 @@ bool CItemData::Use(int Value)
 	else if(m_ItemID == itCapsuleSurvivalExperience && Remove(Value, 0))
 	{
 		int Getting = randomRangecount(10, 50, Value);
-		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} Survival Experience.", GS()->Server()->ClientName(ClientID), Info().GetName(), Value, Getting);
+		GS()->Chat(-1, "{STR} used {STR}x{INT} and got {INT} survival experience.", GS()->Server()->ClientName(ClientID), Info().GetName(), Value, Getting);
 		m_pPlayer->AddExp(Getting);
 	}
 	// little bag gold
