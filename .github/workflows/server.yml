@@ -56,6 +56,7 @@ jobs:
       run: |
         cd release
         ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target package_default
+        cd ..
         cp release/mmoteeworlds* .
         7z a ${{ matrix.package-file }} mmoteeworlds_srv* maps data server_lang 
         mkdir release/artifacts
