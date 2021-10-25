@@ -52,12 +52,20 @@ jobs:
         cd release
         ${{ matrix.cmake-path }}cmake ${{ matrix.cmake-args }} -DCMAKE_BUILD_TYPE=Release -Werror=dev -DDOWNLOAD_GTEST=ON -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=. ..
         ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target mmoteeworlds_srv
-    - name: Package
+    - name: Package(Linux)
+      if: contains(matrix.os, 'ubuntu')
+      run: |
+        cp release/mmoteeworlds_srv .
+        7z a ${{ matrix.package-file }} mmoteeworlds_srv maps data server_lang 
+        mkdir release/artifacts
+        mv ${{ matrix.package-file }} release/artifacts
+     - name: Package(Win64)
+      if: contains(matrix.os, 'windows')
       run: |
         cd release
         ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target package_default
         cd ..
-        cp release/mmoteeworlds* .
+        cp release/mmoteeworlds-win64.zip ${{ matrix.package-file }}
         7z a ${{ matrix.package-file }} mmoteeworlds_srv* maps data server_lang 
         mkdir release/artifacts
         mv ${{ matrix.package-file }} release/artifacts
