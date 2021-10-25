@@ -99,9 +99,7 @@ void CTalkText::OnRender()
 
 	// ---------------- PLAYER SKINS NICKNAME -----------------
 	// --------------------------------------------------------
-	m_TextCursor.Reset();
-	m_TextCursor.m_FontSize = 32.0f;
-
+	float FontSize = 32.0f;
 	const int TalkClientID = m_TalkClientID;
 	const int LocalClientID = m_pClient->m_LocalClientID;
 	if(m_pClient->m_aClients[LocalClientID].m_Active || (TalkClientID >= 0 && TalkClientID < MAX_CLIENTS && m_pClient->m_aClients[TalkClientID].m_Active))
@@ -120,24 +118,27 @@ void CTalkText::OnRender()
 				TextRender()->TextColor(1.0f, 0.95f, 0.0f, 1);
 			}
 
+			m_TextCursor.Reset();
+			m_TextCursor.m_FontSize = FontSize;
 			float sizeNick = str_length(pTalkedNick);
 			m_TextCursor.MoveTo((m_ScreenWidth / (1.45f + sizeNick / 64.0f)), m_ScreenHeight / 1.97f);
 			TextRender()->TextOutlined(&m_TextCursor, pTalkedNick, -1);
-			TextRender()->TextColor(1, 1, 1, 1);
+			TextRender()->TextColor(CUI::ms_DefaultTextColor);
 		}
 
 		// self dialogue
+		m_TextCursor.Reset();
+		m_TextCursor.m_FontSize = FontSize;
 		CTeeRenderInfo RenderYou = m_pClient->m_aClients[LocalClientID].m_RenderInfo;
 		RenderYou.m_Size = 128.0f;
 		RenderTools()->RenderTee(CAnimState::GetIdle(), &RenderYou, m_PlayerTalked ? m_TalkedEmote : EMOTE_NORMAL, vec2(1.0f, 0.4f), vec2(m_ScreenWidth / 4.0f, m_ScreenHeight / 1.85f));
-
 		m_TextCursor.MoveTo(m_ScreenWidth / 3.5f, m_ScreenHeight / 1.97f);
 		TextRender()->TextOutlined(&m_TextCursor, m_pClient->m_aClients[LocalClientID].m_aName, -1);
 	}
 
 	// ------------------------ TEXT --------------------------
 	// --------------------------------------------------------
-	float FontSize = 22.0f;
+	FontSize = 22.0f;
 	CUIRect BackgroundOther = m_pAnimBackgroundOther->GetPos()->GetRect();
 	BackgroundOther.VMargin(20.0f, &BackgroundOther);
 
