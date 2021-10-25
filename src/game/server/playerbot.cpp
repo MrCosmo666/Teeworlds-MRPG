@@ -385,7 +385,7 @@ int CPlayerBot::GetPlayerWorldID() const
 }
 
 std::atomic_flag g_ThreadPathWritedNow;
-static void FindThreadPath(CGS* pGameServer, CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos)
+void CPlayerBot::FindThreadPath(CGS* pGameServer, CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos)
 {
 	if(!pGameServer || !pBotPlayer || length(StartPos) <= 0 || length(SearchPos) <= 0 || g_ThreadPathWritedNow.test_and_set(std::memory_order_acquire))
 		return;
@@ -403,7 +403,7 @@ static void FindThreadPath(CGS* pGameServer, CPlayerBot* pBotPlayer, vec2 StartP
 	g_ThreadPathWritedNow.clear(std::memory_order_release);
 }
 
-static void GetThreadRandomWaypointTarget(CGS* pGameServer, CPlayerBot* pBotPlayer)
+void CPlayerBot::GetThreadRandomWaypointTarget(CGS* pGameServer, CPlayerBot* pBotPlayer)
 {
 	if(!pGameServer || !pBotPlayer || g_ThreadPathWritedNow.test_and_set(std::memory_order_acquire))
 		return;

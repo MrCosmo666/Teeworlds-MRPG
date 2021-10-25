@@ -28,7 +28,8 @@ public:
 	~CPlayerBot() override;
 
 	vec2& GetWayPoint(int Index) { return m_WayPoints[Index]; }
-	friend void FindThreadPath(CGS* pGameServer, CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos);
+	static void FindThreadPath(CGS* pGameServer, CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos);
+	static void GetThreadRandomWaypointTarget(CGS* pGameServer, CPlayerBot* pBotPlayer);
 	void ClearWayPoint();
 
 	int GetTeam() override { return TEAM_BLUE; }
