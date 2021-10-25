@@ -16,16 +16,20 @@ class CPlayerBot : public CPlayer
 	int m_SubBotID;
 	int m_BotHealth;
 	int m_DungeonAllowedSpawn;
+	std::map<int, vec2> m_WayPoints;
 
 public:
 	int m_LastPosTick;
 	int m_PathSize;
 	vec2 m_TargetPos;
 	std::atomic_bool m_ThreadReadNow;
-	std::map<int, vec2> m_WayPoints;
 
 	CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint);
 	~CPlayerBot() override;
+
+	vec2& GetWayPoint(int Index) { return m_WayPoints[Index]; }
+	friend void FindThreadPath(CGS* pGameServer, CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos);
+	void ClearWayPoint();
 
 	int GetTeam() override { return TEAM_BLUE; }
 	bool IsBot() const override { return true; }

@@ -10,7 +10,6 @@
 #include "mmocore/Components/Bots/BotCore.h"
 #include "mmocore/Components/Worlds/WorldSwapCore.h"
 
-#include <mutex>
 #include <thread>
 
 MACRO_ALLOC_POOL_ID_IMPL(CPlayerBot, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
@@ -54,6 +53,10 @@ void CPlayerBot::Tick()
 		{
 			m_ViewPos = m_pCharacter->GetPos();
 			ThreadMobsPathFinder();
+		}
+		else
+		{
+			ClearWayPoint();
 		}
 	}
 	else if(m_Spawned && m_aPlayerTick[Respawn]+Server()->TickSpeed()*3 <= Server()->Tick())
@@ -381,13 +384,14 @@ int CPlayerBot::GetPlayerWorldID() const
 	return QuestBotInfo::ms_aQuestBot[m_SubBotID].m_WorldID;
 }
 
-std::mutex lockingPath;
+std::atomic_flag g_ThreadPathWritedNow;
 static void FindThreadPath(CGS* pGameServer, CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos)
 {
-	if(!pGameServer || !pBotPlayer || pBotPlayer->m_ThreadReadNow.load(std::memory_order_acquire) || length(StartPos) <= 0 || length(SearchPos) <= 0)
+	if(!pGameServer || !pBotPlayer || length(StartPos) <= 0 || length(SearchPos) <= 0 || g_ThreadPathWritedNow.test_and_set(std::memory_order_acquire))
 		return;
 
-	lockingPath.lock();
+	while(pBotPlayer->m_ThreadReadNow.load(std::memory_order_acquire))
+		std::this_thread::sleep_for(std::chrono::microseconds(1));
 	pGameServer->PathFinder()->Init();
 	pGameServer->PathFinder()->SetStart(StartPos);
 	pGameServer->PathFinder()->SetEnd(SearchPos);
@@ -395,18 +399,21 @@ static void FindThreadPath(CGS* pGameServer, CPlayerBot* pBotPlayer, vec2 StartP
 	pBotPlayer->m_PathSize = pGameServer->PathFinder()->m_FinalSize;
 	for(int i = pBotPlayer->m_PathSize - 1, j = 0; i >= 0; i--, j++)
 		pBotPlayer->m_WayPoints[j] = vec2(pGameServer->PathFinder()->m_lFinalPath[i].m_Pos.x * 32 + 16, pGameServer->PathFinder()->m_lFinalPath[i].m_Pos.y * 32 + 16);
-	lockingPath.unlock();
+
+	g_ThreadPathWritedNow.clear(std::memory_order_release);
 }
 
 static void GetThreadRandomWaypointTarget(CGS* pGameServer, CPlayerBot* pBotPlayer)
 {
-	if(!pGameServer || !pBotPlayer || pBotPlayer->m_ThreadReadNow.load(std::memory_order_acquire))
+	if(!pGameServer || !pBotPlayer || g_ThreadPathWritedNow.test_and_set(std::memory_order_acquire))
 		return;
 
-	lockingPath.lock();
+	while(pBotPlayer->m_ThreadReadNow.load(std::memory_order_acquire))
+		std::this_thread::sleep_for(std::chrono::microseconds(1));
 	const vec2 TargetPos = pGameServer->PathFinder()->GetRandomWaypoint();
 	pBotPlayer->m_TargetPos = vec2(TargetPos.x * 32, TargetPos.y * 32);
-	lockingPath.unlock();
+
+	g_ThreadPathWritedNow.clear(std::memory_order::memory_order_release);
 }
 
 void CPlayerBot::ThreadMobsPathFinder()
@@ -425,5 +432,17 @@ void CPlayerBot::ThreadMobsPathFinder()
 			m_LastPosTick = Server()->Tick() + (Server()->TickSpeed() * 2 + rand() % 4);
 			std::thread(&GetThreadRandomWaypointTarget, GS(), this).detach();
 		}
+	}
+}
+
+void CPlayerBot::ClearWayPoint()
+{
+	if(!m_WayPoints.empty())
+	{
+		bool Status = false;
+		if(!m_ThreadReadNow.compare_exchange_strong(Status, true, std::memory_order::memory_order_acquire, std::memory_order::memory_order_relaxed))
+			return;
+		m_WayPoints.clear();
+		m_ThreadReadNow.store(false, std::memory_order::memory_order_release);
 	}
 }
