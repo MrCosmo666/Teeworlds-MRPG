@@ -317,9 +317,9 @@ void CCharacterBotAI::EngineMobs()
 	if(WeaponedBot)
 		ChangeWeapons();
 
-	m_pBotPlayer->m_ThreadReadNow = true;
+	m_pBotPlayer->m_ThreadReadNow.store(true, std::memory_order_release);
 	Move();
-	m_pBotPlayer->m_ThreadReadNow = false;
+	m_pBotPlayer->m_ThreadReadNow.store(false, std::memory_order_release);
 
 	m_PrevPos = m_Pos;
 	if(m_Input.m_Direction)

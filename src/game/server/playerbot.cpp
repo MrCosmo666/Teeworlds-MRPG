@@ -384,18 +384,14 @@ int CPlayerBot::GetPlayerWorldID() const
 std::mutex lockingPath;
 static void FindThreadPath(CGS* pGameServer, CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos)
 {
-	if(!pGameServer || !pBotPlayer || length(StartPos) <= 0 || length(SearchPos) <= 0)
+	if(!pGameServer || !pBotPlayer || pBotPlayer->m_ThreadReadNow.load(std::memory_order_consume) || length(StartPos) <= 0 || length(SearchPos) <= 0)
 		return;
-
-	while(pBotPlayer->m_ThreadReadNow)
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
 	lockingPath.lock();
 	pGameServer->PathFinder()->Init();
 	pGameServer->PathFinder()->SetStart(StartPos);
 	pGameServer->PathFinder()->SetEnd(SearchPos);
 	pGameServer->PathFinder()->FindPath();
-	pBotPlayer->m_WayPoints.clear();
 	pBotPlayer->m_PathSize = pGameServer->PathFinder()->m_FinalSize;
 	for(int i = pBotPlayer->m_PathSize - 1, j = 0; i >= 0; i--, j++)
 		pBotPlayer->m_WayPoints[j] = vec2(pGameServer->PathFinder()->m_lFinalPath[i].m_Pos.x * 32 + 16, pGameServer->PathFinder()->m_lFinalPath[i].m_Pos.y * 32 + 16);
@@ -404,7 +400,7 @@ static void FindThreadPath(CGS* pGameServer, CPlayerBot* pBotPlayer, vec2 StartP
 
 static void GetThreadRandomWaypointTarget(CGS* pGameServer, CPlayerBot* pBotPlayer)
 {
-	if(!pGameServer || !pBotPlayer)
+	if(!pGameServer || !pBotPlayer || pBotPlayer->m_ThreadReadNow.load(std::memory_order_consume))
 		return;
 
 	lockingPath.lock();
