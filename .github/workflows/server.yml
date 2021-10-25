@@ -27,6 +27,7 @@ jobs:
         - name: "Windows x64"
           os: windows-latest
           cmake-args: -G "Visual Studio 16 2019" -A x64
+          build-args: --parallel
           package-file: mmoteeworlds_srv-win64.7z
           env:
             CFLAGS: /WX
@@ -53,7 +54,9 @@ jobs:
         ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target mmoteeworlds_srv
     - name: Package
       run: |
-        cp release/mmoteeworlds_srv* .
+        cd release
+        ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target package_default
+        cp release/mmoteeworlds* .
         7z a ${{ matrix.package-file }} mmoteeworlds_srv* maps data server_lang 
         mkdir release/artifacts
         mv ${{ matrix.package-file }} release/artifacts
