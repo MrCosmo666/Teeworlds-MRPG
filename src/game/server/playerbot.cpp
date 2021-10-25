@@ -384,7 +384,7 @@ int CPlayerBot::GetPlayerWorldID() const
 std::mutex lockingPath;
 static void FindThreadPath(CGS* pGameServer, CPlayerBot* pBotPlayer, vec2 StartPos, vec2 SearchPos)
 {
-	if(!pGameServer || !pBotPlayer || pBotPlayer->m_ThreadReadNow.load(std::memory_order_consume) || length(StartPos) <= 0 || length(SearchPos) <= 0)
+	if(!pGameServer || !pBotPlayer || pBotPlayer->m_ThreadReadNow.load(std::memory_order_acquire) || length(StartPos) <= 0 || length(SearchPos) <= 0)
 		return;
 
 	lockingPath.lock();
@@ -400,7 +400,7 @@ static void FindThreadPath(CGS* pGameServer, CPlayerBot* pBotPlayer, vec2 StartP
 
 static void GetThreadRandomWaypointTarget(CGS* pGameServer, CPlayerBot* pBotPlayer)
 {
-	if(!pGameServer || !pBotPlayer || pBotPlayer->m_ThreadReadNow.load(std::memory_order_consume))
+	if(!pGameServer || !pBotPlayer || pBotPlayer->m_ThreadReadNow.load(std::memory_order_acquire))
 		return;
 
 	lockingPath.lock();
