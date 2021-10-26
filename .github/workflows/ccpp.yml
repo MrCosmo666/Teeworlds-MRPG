@@ -72,7 +72,7 @@ jobs:
         7z a ${{ matrix.package-file }} mmoteeworlds_srv maps server_lang
         mkdir release/artifacts
         mv ${{ matrix.package-file }} release/artifacts
-      - name: Package(Windows)
+    - name: Package(Windows)
       if: contains(matrix.os, 'windows')
       run: |
         cd release
