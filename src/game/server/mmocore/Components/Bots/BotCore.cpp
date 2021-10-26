@@ -203,7 +203,7 @@ void CBotCore::LoadMainInformationBots()
 		}
 
 		for(int i = 0; i < MAX_PLAYERS; i++)
-			DataBotInfo::ms_aDataBot[BotID].m_aAlreadyActiveQuestBot[i] = false;
+			DataBotInfo::ms_aDataBot[BotID].m_aActiveQuestBot[i] = false;
 
 		DataBotInfo::ms_aDataBot[BotID].m_aEquipSlot[EQUIP_HAMMER] = pRes->getInt("SlotHammer");
 		DataBotInfo::ms_aDataBot[BotID].m_aEquipSlot[EQUIP_GUN] = pRes->getInt("SlotGun");

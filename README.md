@@ -1,12 +1,12 @@
 <a href="https://repology.org/metapackage/teeworlds/versions">
-    <img src="https://repology.org/badge/vertical-allrepos/teeworlds.svg" alt="Packaging status" align="right">
+    <img src="https://i.ibb.co/0FnKBsV/Screenshot-2.png" alt="Screenshot-2" border="0" align="right">
 </a>
 
-Teeworlds [![CodeFactor](https://www.codefactor.io/repository/github/kurosio/mmotee-global/badge/master?s=baf1b1fa184ccf14acc3a6a4493428ba045d90dd)](https://www.codefactor.io/repository/github/kurosio/mmotee-global/overview/master)
-[![Client Build](https://github.com/teeworldsCNFun/Teeworlds-MRPG/actions/workflows/ccpp.yml/badge.svg)](https://github.com/teeworldsCNFun/Teeworlds-MRPG/actions/workflows/ccpp.yml)
-[![Server Build](https://github.com/teeworldsCNFun/Teeworlds-MRPG/actions/workflows/server.yml/badge.svg)](https://github.com/teeworldsCNFun/Teeworlds-MRPG/actions/workflows/server.yml)
-
+MRPG (MMOTEE)
+[![CircleCI](https://circleci.com/gh/teeworlds/teeworlds.svg?style=svg)](https://circleci.com/gh/teeworlds/teeworlds) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/teeworlds/teeworlds?branch=master&svg=true)](https://ci.appveyor.com/project/heinrich5991/teeworlds)
 =========
+`readme will be changed over time`
+
 
 A retro multiplayer shooter
 --------------------------- 
@@ -62,7 +62,7 @@ Building
     mkdir -p build
     cd build
     cmake ..
-    make -j
+    make
 
 On subsequent builds, you only have to repeat the `make` step.
 

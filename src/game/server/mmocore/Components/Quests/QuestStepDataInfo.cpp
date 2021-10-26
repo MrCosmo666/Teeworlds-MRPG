@@ -132,7 +132,7 @@ bool CPlayerQuestStepDataInfo::Finish(CPlayer* pPlayer, bool FinalStepTalking)
 
 	// update state complete
 	m_StepComplete = true;
-	DataBotInfo::ms_aDataBot[m_Bot->m_BotID].m_aAlreadyActiveQuestBot[ClientID] = false;
+	DataBotInfo::ms_aDataBot[m_Bot->m_BotID].m_aActiveQuestBot[ClientID] = false;
 	CQuestData::ms_aPlayerQuests[ClientID][QuestID].SaveSteps();
 	UpdateBot(pGS);
 
