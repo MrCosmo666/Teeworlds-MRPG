@@ -19,7 +19,7 @@ jobs:
           os: ubuntu-latest
           cmake-args: -G "Unix Makefiles"
           build-args: --parallel
-          package-file: mmoteeworlds-linux_x86_64.tar.xz
+          package-file: mmoteeworlds-linux_x86_64.zip
           env:
             CFLAGS: -Wdeclaration-after-statement -Wduplicated-branches -Werror
             CXXFLAGS: -Wduplicated-branches -Werror
@@ -27,7 +27,6 @@ jobs:
         - name: "Windows x64"
           os: windows-latest
           cmake-args: -DSERVER_COMPILE=OFF -G "Visual Studio 16 2019" -A x64
-          build-args: --parallel
           package-file: mmoteeworlds-win64.zip
           env:
             CFLAGS: /WX
@@ -37,7 +36,6 @@ jobs:
         - name: "Windows x86"
           os: windows-2019
           cmake-args: -DSERVER_COMPILE=OFF -G "Visual Studio 16 2019" -A Win32
-          build-args: --parallel
           package-file: mmoteeworlds-win32.zip
           env:
             CFLAGS: /WX
