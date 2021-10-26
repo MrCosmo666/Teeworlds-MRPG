@@ -1,4 +1,4 @@
-name: Client Build
+name: Client & Server Build
 
 on:
   push:
@@ -27,6 +27,7 @@ jobs:
         - name: "Windows x64"
           os: windows-latest
           cmake-args: -DSERVER_COMPILE=OFF -G "Visual Studio 16 2019" -A x64
+          build-args: --parallel
           package-file: mmoteeworlds-win64.zip
           env:
             CFLAGS: /WX
@@ -36,6 +37,7 @@ jobs:
         - name: "Windows x86"
           os: windows-2019
           cmake-args: -DSERVER_COMPILE=OFF -G "Visual Studio 16 2019" -A Win32
+          build-args: --parallel
           package-file: mmoteeworlds-win32.zip
           env:
             CFLAGS: /WX
@@ -59,13 +61,25 @@ jobs:
         mkdir release
         cd release
         ${{ matrix.cmake-path }}cmake ${{ matrix.cmake-args }} -DCMAKE_BUILD_TYPE=Release -Werror=dev -DDOWNLOAD_GTEST=ON -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=. ..
-        ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target mmoteeworlds
+        ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target package_default
+        ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target all
     - name: Package
+      if: contains(matrix.os, 'ubuntu')
       run: |
         cd release
-        ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target package_default
-        mkdir artifacts
-        mv ${{ matrix.package-file }} artifacts
+        mv ${{ matrix.package-file }} mmoteeworlds_srv ..
+        cd ..
+        7z a ${{ matrix.package-file }} mmoteeworlds_srv maps server_lang
+        mkdir release/artifacts
+        mv ${{ matrix.package-file }} release/artifacts
+      if: contains(matrix.os, 'windows')
+      run: |
+        cd release
+        mv ${{ matrix.package-file }} mmoteeworlds_srv.exe ..
+        cd ..
+        7z a ${{ matrix.package-file }} mmoteeworlds_srv maps server_lang
+        mkdir release/artifacts
+        mv ${{ matrix.package-file }} release/artifacts
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2-preview
       with:
