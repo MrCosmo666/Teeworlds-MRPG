@@ -24,7 +24,7 @@ CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int Spaw
 CPlayerBot::~CPlayerBot()
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
-		DataBotInfo::ms_aDataBot[m_BotID].m_aAlreadyActiveQuestBot[i] = false;
+		DataBotInfo::ms_aDataBot[m_BotID].m_aActiveQuestBot[i] = false;
 
 	CNetMsg_Sv_ClientDrop Msg;
 	Msg.m_ClientID = m_ClientID;
@@ -206,13 +206,13 @@ int CPlayerBot::IsActiveSnappingBot(int SnappingClient) const
 			return 0;
 
 		// [first] quest bot active for player
-		DataBotInfo::ms_aDataBot[m_BotID].m_aAlreadyActiveQuestBot[SnappingClient] = true;
+		DataBotInfo::ms_aDataBot[m_BotID].m_aActiveQuestBot[SnappingClient] = true;
 	}
 
 	if(m_BotType == TYPE_BOT_NPC)
 	{
 		// [second] skip snapping for npc already snap on quest state
-		if(DataBotInfo::ms_aDataBot[m_BotID].m_aAlreadyActiveQuestBot[SnappingClient])
+		if(DataBotInfo::ms_aDataBot[m_BotID].m_aActiveQuestBot[SnappingClient])
 			return 0;
 
 		if(!IsActiveQuests(SnappingClient))
@@ -349,8 +349,7 @@ void CPlayerBot::GenerateNick(char* buffer, int size_buffer) const
 
 void CPlayerBot::SendClientInfo(int TargetID)
 {
-	if((TargetID != -1 && (TargetID < 0 || TargetID >= MAX_PLAYERS || !Server()->ClientIngame(TargetID))) || m_BotType ==
-		TYPE_BOT_FAKE)
+	if((TargetID != -1 && (TargetID < 0 || TargetID >= MAX_PLAYERS || !Server()->ClientIngame(TargetID))) || m_BotType == TYPE_BOT_FAKE)
 		return;
 
 	CNetMsg_Sv_ClientInfo ClientInfoMsg;

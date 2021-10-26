@@ -243,8 +243,8 @@ bool CInventoryCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, con
 		const int DesValue = pPlayerSelectedItem.Info().m_Dysenthis * Get;
 		if(pPlayerSelectedItem.Remove(Get) && pPlayerMaterialItem.Add(DesValue))
 		{
-			GS()->Chat(ClientID, "Disassemble {STR}x{INT}, you receive {INT} {STR}(s)",
-				pPlayerSelectedItem.Info().GetName(), Get, DesValue, pPlayerMaterialItem.Info().GetName());
+			GS()->Chat(ClientID, "Disassemble {STR}x{INT}, you receive {INT} materials",
+				pPlayerSelectedItem.Info().GetName(), Get, DesValue);
 			GS()->ResetVotes(ClientID, pPlayer->m_OpenVoteMenu);
 		}
 		return true;
@@ -263,7 +263,7 @@ bool CInventoryCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, con
 		CItemData& pItemPlayer = pPlayer->GetItem(VoteID);
 		if(pItemPlayer.IsEnchantMaxLevel())
 		{
-			GS()->Chat(ClientID, "You enchant max level for this item!");
+			GS()->Chat(ClientID, "Enchantment level is maximum");
 			return true;
 		}
 
@@ -404,8 +404,8 @@ int CInventoryCore::GetUnfrozenItemValue(CPlayer *pPlayer, int ItemID) const
 	const int AvailableValue = Job()->Quest()->GetUnfrozenItemValue(pPlayer, ItemID);
 	if(AvailableValue <= 0 && pPlayer->GetItem(ItemID).m_Value >= 1)
 	{
-		GS()->Chat(pPlayer->GetCID(), "\"{STR}\" frozen for some quest.", pPlayer->GetItem(ItemID).Info().GetName());
-		GS()->Chat(pPlayer->GetCID(), "In the \"Adventure Journal\", you can see in which quest an item is used!", pPlayer->GetItem(ItemID).Info().GetName());
+		GS()->Chat(pPlayer->GetCID(), "'{STR}' frozen for some quest.", pPlayer->GetItem(ItemID).Info().GetName());
+		GS()->Chat(pPlayer->GetCID(), "In the 'Adventure Journal', you can see in which quest an item is used", pPlayer->GetItem(ItemID).Info().GetName());
 	}
 	return AvailableValue;
 }
@@ -439,9 +439,7 @@ void CInventoryCore::ItemSelected(CPlayer* pPlayer, const CItemData& pItemPlayer
 
 	if (pItemPlayer.Info().m_Function == FUNCTION_ONE_USED || pItemPlayer.Info().m_Function == FUNCTION_USED)
 	{
-		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "Bind command \"/useitem %d'\"", ItemID);
-		GS()->AVM(ClientID, "null", NOPE, HideID, "{STR}", aBuf);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "For bind command '/useitem {INT}'", ItemID);
 		GS()->AVM(ClientID, "IUSE", ItemID, HideID, "Use {STR}", pNameItem);
 	}
 
@@ -449,8 +447,8 @@ void CInventoryCore::ItemSelected(CPlayer* pPlayer, const CItemData& pItemPlayer
 		GS()->AVM(ClientID, "ISETTINGS", ItemID, HideID, "Auto use {STR} - {STR}", pNameItem, (pItemPlayer.m_Settings ? "Enable" : "Disable"));
 	else if (pItemPlayer.Info().m_Type == ItemType::TYPE_DECORATION)
 	{
-		GS()->AVM(ClientID, "DECOSTART", ItemID, HideID, "Added {STR} to your house", pNameItem);
-		GS()->AVM(ClientID, "DECOGUILDSTART", ItemID, HideID, "Added {STR} to your guild house", pNameItem);
+		GS()->AVM(ClientID, "DECOSTART", ItemID, HideID, "Add {STR} to your house", pNameItem);
+		GS()->AVM(ClientID, "DECOGUILDSTART", ItemID, HideID, "Add {STR} to your guild house", pNameItem);
 	}
 	else if(pItemPlayer.Info().m_Type == ItemType::TYPE_EQUIP || pItemPlayer.Info().m_Function == FUNCTION_SETTINGS)
 	{
