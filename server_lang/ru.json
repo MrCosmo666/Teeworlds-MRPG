@@ -1,6 +1,201 @@
 {
     "translation": [
         {
+            "id": null,
+            "key": "Auto equip {STR} - {STR}",
+            "value": "Auto equip {STR} - {STR}"
+        },
+		{
+            "id": null,
+            "key": "This item cannot have more than 1 item",
+            "value": "This item cannot have more than 1 item"
+        },
+		{
+            "id": null,
+            "key": "Create Slot Auction {STR}",
+            "value": "Create Slot Auction {STR}"
+        },
+		{
+            "id": null,
+            "key": "Drop {STR}",
+            "value": "Drop {STR}"
+        },
+		{
+            "id": null,
+            "key": "Disassemble {STR} (+{INT} materials)",
+            "value": "Disassemble {STR} (+{INT} materials)"
+        },
+		{
+            "id": null,
+            "key": "Enchant {STR} ({INT} materials)",
+            "value": "Enchant {STR} ({INT} materials)"
+        },
+		{
+            "id": null,
+            "key": "To plant {STR}, to house (0.06%)",
+            "value": "To plant {STR}, to house (0.06%)"
+        },
+		{
+            "id": null,
+            "key": "You can not undress equipping hammer",
+            "value": "You can not undress equipping hammer"
+        },
+		{
+            "id": null,
+            "key": "Add {STR} to your guild house",
+            "value": "Add {STR} to your guild house"
+        },
+		{
+            "id": null,
+            "key": "Add {STR} to your house",
+            "value": "Add {STR} to your house"
+        },
+		{
+            "id": null,
+            "key": "Auto use {STR} - {STR}",
+            "value": "Auto use {STR} - {STR}"
+        },
+		{
+            "id": null,
+            "key": "Use {STR}",
+            "value": "Use {STR}"
+        },
+		{
+            "id": null,
+            "key": "For bind command '/useitem {INT}'",
+            "value": "For bind command '/useitem {INT}'"
+        },
+		{
+            "id": null,
+            "key": "'{STR}' frozen for some quest.",
+            "value": "'{STR}' frozen for some quest."
+        },
+		{
+            "id": null,
+            "key": "In the 'Adventure Journal', you can see in which quest an item is used",
+            "value": "In the 'Adventure Journal', you can see in which quest an item is used"
+        },
+		{
+            "id": null,
+            "key": "{STR} enchant {STR} {STR} {STR}",
+            "value": "{STR} enchant {STR} {STR} {STR}"
+        },
+		{
+            "id": null,
+            "key": "Enchantment level is maximum",
+            "value": "Enchantment level is maximum"
+        },
+		{
+            "id": null,
+            "key": "Disassemble {STR}x{INT}, you receive {INT} materials",
+            "value": "Disassemble {STR}x{INT}, you receive {INT} materials"
+        },
+		{
+            "id": null,
+            "key": "You drop {STR}x{INT}",
+            "value": "You drop {STR}x{INT}"
+        },
+		{
+            "id": null,
+            "key": "There are no items in this tab",
+            "value": "There are no items in this tab"
+        },
+		{
+            "id": null,
+            "key": "{STR} Not equipped",
+            "value": "{STR} Not equipped"
+        },
+		{
+            "id": null,
+            "key": "Equip Select Slot",
+            "value": "Equip Select Slot"
+        },
+		{
+            "id": null,
+            "key": "Select tab and select armor.",
+            "value": "Select tab and select armor."
+        },
+		{
+            "id": null,
+            "key": "Equip / Armor Information",
+            "value": "Equip / Armor Information"
+        },
+		{
+            "id": null,
+            "key": "Inventory Information",
+            "value": "Inventory Information"
+        },
+		{
+            "id": null,
+            "key": "Choose the type of items you want to show",
+            "value": "Choose the type of items you want to show"
+        },
+		{
+            "id": null,
+            "key": "You got of the {STR}x{INT}.",
+            "value": "You got of the {STR}x{INT}."
+        },
+		{
+            "id": null,
+            "key": "After, need select item to interact",
+            "value": "After, need select item to interact"
+        },
+		{
+            "id": null,
+            "key": "You got of the {STR}x{INT}.",
+            "value": "You got of the {STR}x{INT}."
+        },
+		{
+            "id": null,
+            "key": "{STR} got of the {STR}x{INT}.",
+            "value": "{STR} got of the {STR}x{INT}."
+        },
+		{
+            "id": null,
+            "key": "{STR} used {STR}x{INT} and got {INT} survival experience.",
+            "value": "{STR} used {STR}x{INT} and got {INT} survival experience."
+        },
+		{
+            "id": null,
+            "key": "This item can only be used (Auto Use, and then craft).",
+            "value": "This item can only be used (Auto Use, and then craft)."
+        },
+		{
+            "id": null,
+            "key": "{STR} used {STR} returned {INT} upgrades.",
+            "value": "{STR} used {STR} returned {INT} upgrades."
+        },
+		{
+            "id": null,
+            "key": "{STR} used {STR}x{INT} and got {INT} gold.",
+            "value": "{STR} used {STR}x{INT} and got {INT} gold."
+        },
+		{
+            "id": null,
+            "key": "Wait until the last random box opens!",
+            "value": "Wait until the last random box opens!"
+        },
+		{
+            "id": null,
+            "key": "You used '{STR}x{INT}'.",
+            "value": "You used '{STR}x{INT}'."
+        },
+		{
+            "id": null,
+            "key": "{STR} uses '{STR}x{INT}' and got:",
+            "value": "{STR} uses '{STR}x{INT}' and got:"
+        },
+		{
+            "id": null,
+            "key": "{INT}. {STR} | {INT}:{INT}min | {INT}P",
+            "value": "{INT}. {STR} | {INT}:{INT}min | {INT}P"
+        },
+        {
+            "id": "skds1",
+            "key": "Creates turret a recovery health ",
+            "value": "Creates turret a recovery health "
+        },
+        {
             "id": "qudn21",
             "key": "Abandoned mine",
             "value": "Abandoned mine"
