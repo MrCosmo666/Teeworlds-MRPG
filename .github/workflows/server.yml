@@ -28,7 +28,7 @@ jobs:
           os: windows-latest
           cmake-args: -G "Visual Studio 16 2019" -A x64
           build-args: --parallel
-          package-file: mmoteeworlds_srv-win64.7z
+          package-file: mmoteeworlds_srv-win64.zip
           env:
             CFLAGS: /WX
             CXXFLAGS: /WX
