@@ -3,7 +3,7 @@
 </a>
 
 MRPG (MMOTEE)
-[![CircleCI](https://circleci.com/gh/teeworlds/teeworlds.svg?style=svg)](https://circleci.com/gh/teeworlds/teeworlds) [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/teeworlds/teeworlds?branch=master&svg=true)](https://ci.appveyor.com/project/heinrich5991/teeworlds)
+[![Client & Server Build](https://github.com/teeworldsCNFun/Teeworlds-MRPG/actions/workflows/ccpp.yml/badge.svg)](https://github.com/teeworldsCNFun/Teeworlds-MRPG/actions/workflows/ccpp.yml)
 =========
 `readme will be changed over time`
 
