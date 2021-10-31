@@ -1,12 +1,10 @@
-<a href="https://repology.org/metapackage/teeworlds/versions">
-    <img src="https://i.ibb.co/0FnKBsV/Screenshot-2.png" alt="Screenshot-2" border="0" align="right">
-</a>
+<a href="https://repology.org/metapackage/teeworlds/versions"><img src="https://i.ibb.co/0FnKBsV/Screenshot-2.png" alt="Screenshot-2" border="0" align="right"></a>
 
 MRPG (MMOTEE)
 [![Client & Server Build](https://github.com/teeworldsCNFun/Teeworlds-MRPG/actions/workflows/ccpp.yml/badge.svg)](https://github.com/teeworldsCNFun/Teeworlds-MRPG/actions/workflows/ccpp.yml)
 =========
 `readme will be changed over time`
-
+ 
 
 A retro multiplayer shooter
 --------------------------- 
@@ -25,7 +23,6 @@ Please visit https://www.teeworlds.com/ for up-to-date information about
 the game, including new versions, custom maps and much more.
 
 Originally written by Magnus Auvinen.
-
 
 Building on Linux or macOS
 ==========================

@@ -13,6 +13,7 @@ class DiscordJob final : public SleepyDiscord::DiscordClient
 public:
 	using SleepyDiscord::DiscordClient::DiscordClient;
 	DiscordJob(class IServer* pServer);
+	~DiscordJob();
 
 private:
 
@@ -62,6 +63,11 @@ private:
 
 	void HandlerThreadTasks();
 	void AddThreadTask(DiscordTask Task);
+
+	/************************************************************************/
+	/* Discord API functions		                                        */
+	/************************************************************************/
+	class DiscordGithubAPIRepoWatcher* m_pGithubAPIRepoWatcher;
 };
 
 #endif
