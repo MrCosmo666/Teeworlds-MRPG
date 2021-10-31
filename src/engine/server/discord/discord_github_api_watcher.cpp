@@ -118,7 +118,6 @@ void DiscordGithubAPIRepoWatcher::PollImplementation(SleepyDiscord::DiscordClien
 				commitTitle = message.substr(0, newLinePOS);
 
 			std::string commitLink;
-			size_t linkSize = 1 + hashDisplay.length() + 2 + htmlLinkMember->value.GetStringLength() + 1;
 			commitLink += '[';
 			commitLink += hashDisplay;
 			commitLink += "](";
