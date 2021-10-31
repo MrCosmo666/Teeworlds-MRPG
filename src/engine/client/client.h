@@ -379,11 +379,7 @@ public:
 	void ToggleWindowBordered() override;
 	void ToggleWindowVSync() override;
 
-	// mrpg
-private:
-
 public:
-
 	void NotifyWindow() override;
 
 	bool IsWindowActive() override { return m_pGraphics->WindowActive(); }
