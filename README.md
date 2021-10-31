@@ -24,7 +24,6 @@ the game, including new versions, custom maps and much more.
 
 Originally written by Magnus Auvinen.
 
-
 Building on Linux or macOS
 ==========================
 
