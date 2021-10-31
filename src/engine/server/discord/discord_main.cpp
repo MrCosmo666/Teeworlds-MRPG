@@ -2,27 +2,35 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifdef CONF_DISCORD
 #include "discord_main.h"
+
 #include "discord_slash_commands.h"
+#include "discord_github_api_watcher.h"
 
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 
 #include <mutex>
 
-std::mutex ml_mutex_task;
+std::mutex g_task_lock;
 DiscordJob::DiscordJob(IServer* pServer) : SleepyDiscord::DiscordClient(g_Config.m_SvDiscordToken, SleepyDiscord::USER_CONTROLED_THREADS)
 {
 	m_pServer = pServer;
 	setIntents(SleepyDiscord::Intent::SERVER_MESSAGES);
 	
-	// start thread discord event bot
-	std::thread(&DiscordJob::run, this).detach();
-	// start handler bridge teeworlds - discord bot
-	std::thread(&DiscordJob::HandlerThreadTasks, this).detach(); 
+	std::thread(&DiscordJob::run, this).detach(); // start thread discord event bot
+	std::thread(&DiscordJob::HandlerThreadTasks, this).detach(); // start handler bridge teeworlds - discord bot
+}
+
+DiscordJob::~DiscordJob()
+{
+	delete m_pGithubAPIRepoWatcher;
 }
 
 void DiscordJob::onReady(SleepyDiscord::Ready readyData)
 {
+	if(!m_pGithubAPIRepoWatcher)
+		m_pGithubAPIRepoWatcher = new DiscordGithubAPIRepoWatcher(g_Config.m_SvDiscordGithubWatherLink, g_Config.m_SvDiscordGithubWatherChannel, *this);
+
 	DiscordCommands::InitCommands(this);
 }
 
@@ -203,10 +211,10 @@ void DiscordJob::HandlerThreadTasks()
 {
 	while(true)
 	{
-		ml_mutex_task.lock();
+		g_task_lock.lock();
 		if(m_pThreadHandler.empty())
 		{
-			ml_mutex_task.unlock();
+			g_task_lock.unlock();
 			std::this_thread::sleep_for(std::chrono::seconds(1));
 			continue;
 		}
@@ -217,15 +225,15 @@ void DiscordJob::HandlerThreadTasks()
 			delete pHandler;
 		}
 		m_pThreadHandler.clear();
-		ml_mutex_task.unlock();
+		g_task_lock.unlock();
 	}
 }
 
 void DiscordJob::AddThreadTask(DiscordTask Task)
 {
-	ml_mutex_task.lock();
+	g_task_lock.lock();
 	m_pThreadHandler.push_back(new DiscordHandle(Task));
-	ml_mutex_task.unlock();
+	g_task_lock.unlock();
 }
 
 #endif

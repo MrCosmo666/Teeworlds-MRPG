@@ -139,7 +139,7 @@ void DiscordCommands::CmdConnect(SleepyDiscord::Interaction* pInteraction, Disco
 	SleepyDiscord::Interaction::Response response;
 	response.type = SleepyDiscord::Interaction::Response::Type::ChannelMessageWithSource;
 	
-	const CSqlString<64> DiscordID = sqlstr::CSqlString<64>(std::string(pInteraction->user.ID).c_str());
+	const CSqlString<64> DiscordID = sqlstr::CSqlString<64>(std::string(pInteraction->member.ID).c_str());
 	ResultPtr pRes = SJK.SD("Nick", "tw_accounts_data", "WHERE DiscordID = '%s'", DiscordID.cstr());
 	if(!pRes->rowsCount())
 	{
@@ -150,7 +150,7 @@ void DiscordCommands::CmdConnect(SleepyDiscord::Interaction* pInteraction, Disco
 			"\n"
 			"\n_**How to connect:**_"
 			"\nYou need to enter in the game the command \"__/discord_connect <did>__\"."
-			"\nYour personal Discord ID: " + std::string(pInteraction->user.ID);
+			"\nYour personal Discord ID: " + std::string(pInteraction->member.ID);
 		EmbedConnectInfo.color = DC_DISCORD_INFO;
 		response.data.embeds.push_back(EmbedConnectInfo);
 
