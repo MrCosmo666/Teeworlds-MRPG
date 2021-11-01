@@ -81,7 +81,7 @@ void CCharacterBotAI::GiveRandomEffects(int To)
 
 	const int SubID = m_pBotPlayer->GetBotSub();
 	if(m_pBotPlayer->GetBotType() == BotsTypes::TYPE_BOT_MOB && MobBotInfo::ms_aMobBot[SubID].m_aEffect[0] != '\0')
-		pPlayerTo->GiveEffect(MobBotInfo::ms_aMobBot[SubID].m_aEffect, 3 + random_int() % 3, 40);
+		pPlayerTo->GiveEffect(MobBotInfo::ms_aMobBot[SubID].m_aEffect, 3 + random_int() % 3, 5.0f);
 }
 
 bool CCharacterBotAI::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)

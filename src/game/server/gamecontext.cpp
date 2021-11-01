@@ -2321,10 +2321,10 @@ void CGS::CreateDropItem(vec2 Pos, int ClientID, CItemData DropItem, vec2 Force)
 }
 
 // random drop of the item with percentage
-void CGS::CreateRandomDropItem(vec2 Pos, int ClientID, float Random, CItemData DropItem, vec2 Force)
+void CGS::CreateRandomDropItem(vec2 Pos, int ClientID, float Chance, CItemData DropItem, vec2 Force)
 {
 	const float RandomDrop = frandom() * 100.0f;
-	if(RandomDrop < Random)
+	if(RandomDrop < Chance)
 		CreateDropItem(Pos, ClientID, DropItem, Force);
 }
 

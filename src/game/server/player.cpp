@@ -373,12 +373,13 @@ bool CPlayer::SpendCurrency(int Price, int ItemID)
 	return pItemPlayer.Remove(Price);
 }
 
-void CPlayer::GiveEffect(const char* Potion, int Sec, int Random)
+void CPlayer::GiveEffect(const char* Potion, int Sec, float Chance)
 {
 	if(!m_pCharacter || !m_pCharacter->IsAlive())
 		return;
 
-	if((Random && random_int() % Random == 0) || !Random)
+	const float RandomChance = frandom() * 100.0f;
+	if(RandomChance < Chance)
 	{
 		GS()->Chat(m_ClientID, "You got the effect {STR} time {INT}sec.", Potion, Sec);
 		CGS::ms_aEffects[m_ClientID][Potion] = Sec;
