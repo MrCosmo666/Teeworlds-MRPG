@@ -107,7 +107,7 @@ public:
 	virtual void UpdateTempData(int Health, int Mana);
 	virtual void SendClientInfo(int TargetID);
 
-	virtual void GiveEffect(const char* Potion, int Sec, int Random = 0);
+	virtual void GiveEffect(const char* Potion, int Sec, float Chance = 100.0f);
 	virtual bool IsActiveEffect(const char* Potion) const;
 	virtual void ClearEffects();
 

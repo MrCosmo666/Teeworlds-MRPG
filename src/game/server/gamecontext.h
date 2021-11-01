@@ -241,7 +241,7 @@ public:
 	void CreateParticleExperience(vec2 Pos, int ClientID, int Experience, vec2 Force = vec2(0.0f, 0.0f));
 	void CreateDropBonuses(vec2 Pos, int Type, int Value, int NumDrop = 1, vec2 Force = vec2(0.0f, 0.0f));
 	void CreateDropItem(vec2 Pos, int ClientID, CItemData DropItem, vec2 Force = vec2(0.0f, 0.0f));
-	void CreateRandomDropItem(vec2 Pos, int ClientID, float Random, CItemData DropItem, vec2 Force = vec2(0.0f, 0.0f));
+	void CreateRandomDropItem(vec2 Pos, int ClientID, float Chance, CItemData DropItem, vec2 Force = vec2(0.0f, 0.0f));
 	bool TakeItemCharacter(int ClientID);
 	void SendInbox(const char* pFrom, CPlayer *pPlayer, const char* Name, const char* Desc, int ItemID = -1, int Value = -1, int Enchant = -1);
 	void SendInbox(const char* pFrom, int AccountID, const char* Name, const char* Desc, int ItemID = -1, int Value = -1, int Enchant = -1);
