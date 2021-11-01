@@ -79,7 +79,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	// suggestions-voting
 	if(std::string(message.channelID) == g_Config.m_SvDiscordSuggestionChannel)
 	{
-		deleteMessage(message.channelID, message);
+		deleteMessage(message.channelID, message.ID);
 
 		SleepyDiscord::Embed EmbedIdeas;
 		EmbedIdeas.title = std::string("Suggestion");
