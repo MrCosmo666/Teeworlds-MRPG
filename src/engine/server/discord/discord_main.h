@@ -13,10 +13,8 @@ class DiscordJob final : public SleepyDiscord::DiscordClient
 public:
 	using SleepyDiscord::DiscordClient::DiscordClient;
 	DiscordJob(class IServer* pServer);
-	~DiscordJob();
 
 private:
-
 	/************************************************************************/
 	/* Discord main events functions                                        */
 	/************************************************************************/
@@ -67,7 +65,7 @@ private:
 	/************************************************************************/
 	/* Discord API functions		                                        */
 	/************************************************************************/
-	class DiscordGithubAPIRepoWatcher* m_pGithubAPIRepoWatcher;
+	std::shared_ptr<class DiscordGithubAPIRepoWatcher> m_pGithubAPIRepoWatcher;
 };
 
 #endif

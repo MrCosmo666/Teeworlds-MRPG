@@ -11,7 +11,6 @@
 
 #include <mutex>
 
-std::mutex g_task_lock;
 DiscordJob::DiscordJob(IServer* pServer) : SleepyDiscord::DiscordClient(g_Config.m_SvDiscordToken, SleepyDiscord::USER_CONTROLED_THREADS)
 {
 	m_pServer = pServer;
@@ -21,15 +20,10 @@ DiscordJob::DiscordJob(IServer* pServer) : SleepyDiscord::DiscordClient(g_Config
 	std::thread(&DiscordJob::HandlerThreadTasks, this).detach(); // start handler bridge teeworlds - discord bot
 }
 
-DiscordJob::~DiscordJob()
-{
-	delete m_pGithubAPIRepoWatcher;
-}
-
 void DiscordJob::onReady(SleepyDiscord::Ready readyData)
 {
-	if(!m_pGithubAPIRepoWatcher)
-		m_pGithubAPIRepoWatcher = new DiscordGithubAPIRepoWatcher(g_Config.m_SvDiscordGithubWatherLink, g_Config.m_SvDiscordGithubWatherChannel, *this);
+	if(!m_pGithubAPIRepoWatcher.get())
+		m_pGithubAPIRepoWatcher = std::make_shared<DiscordGithubAPIRepoWatcher>(g_Config.m_SvDiscordGithubWatherLink, g_Config.m_SvDiscordGithubWatherChannel, *this);
 
 	DiscordCommands::InitCommands(this);
 }
@@ -85,7 +79,7 @@ void DiscordJob::onMessage(SleepyDiscord::Message message)
 	// suggestions-voting
 	if(std::string(message.channelID) == g_Config.m_SvDiscordSuggestionChannel)
 	{
-		deleteMessage(message.channelID, message);
+		deleteMessage(message.channelID, message.ID);
 
 		SleepyDiscord::Embed EmbedIdeas;
 		EmbedIdeas.title = std::string("Suggestion");
@@ -207,6 +201,7 @@ void DiscordJob::CreateButton(std::shared_ptr<SleepyDiscord::ActionRow> pActionR
 /************************************************************************/
 /* Discord teeworlds server side                                        */
 /************************************************************************/
+std::mutex g_task_lock;
 void DiscordJob::HandlerThreadTasks()
 {
 	while(true)
