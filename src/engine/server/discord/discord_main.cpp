@@ -11,25 +11,20 @@
 
 #include <mutex>
 
-std::mutex g_task_lock;
 DiscordJob::DiscordJob(IServer* pServer) : SleepyDiscord::DiscordClient(g_Config.m_SvDiscordToken, SleepyDiscord::USER_CONTROLED_THREADS)
 {
 	m_pServer = pServer;
+	m_pGithubAPIRepoWatcher = nullptr;
 	setIntents(SleepyDiscord::Intent::SERVER_MESSAGES);
 	
 	std::thread(&DiscordJob::run, this).detach(); // start thread discord event bot
 	std::thread(&DiscordJob::HandlerThreadTasks, this).detach(); // start handler bridge teeworlds - discord bot
 }
 
-DiscordJob::~DiscordJob()
-{
-	delete m_pGithubAPIRepoWatcher;
-}
-
 void DiscordJob::onReady(SleepyDiscord::Ready readyData)
 {
-	if(!m_pGithubAPIRepoWatcher)
-		m_pGithubAPIRepoWatcher = new DiscordGithubAPIRepoWatcher(g_Config.m_SvDiscordGithubWatherLink, g_Config.m_SvDiscordGithubWatherChannel, *this);
+	if(!m_pGithubAPIRepoWatcher.get())
+		m_pGithubAPIRepoWatcher = std::make_shared<DiscordGithubAPIRepoWatcher>(g_Config.m_SvDiscordGithubWatherLink, g_Config.m_SvDiscordGithubWatherChannel, *this);
 
 	DiscordCommands::InitCommands(this);
 }
@@ -207,6 +202,7 @@ void DiscordJob::CreateButton(std::shared_ptr<SleepyDiscord::ActionRow> pActionR
 /************************************************************************/
 /* Discord teeworlds server side                                        */
 /************************************************************************/
+std::mutex g_task_lock;
 void DiscordJob::HandlerThreadTasks()
 {
 	while(true)
