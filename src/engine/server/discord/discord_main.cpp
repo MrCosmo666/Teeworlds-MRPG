@@ -14,7 +14,6 @@
 DiscordJob::DiscordJob(IServer* pServer) : SleepyDiscord::DiscordClient(g_Config.m_SvDiscordToken, SleepyDiscord::USER_CONTROLED_THREADS)
 {
 	m_pServer = pServer;
-	m_pGithubAPIRepoWatcher = nullptr;
 	setIntents(SleepyDiscord::Intent::SERVER_MESSAGES);
 	
 	std::thread(&DiscordJob::run, this).detach(); // start thread discord event bot
