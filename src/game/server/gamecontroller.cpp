@@ -17,10 +17,8 @@ IGameController::IGameController(CGS *pGS)
 	m_GameFlags = 0;
 	m_pServer = m_pGS->Server();
 
-	// info
-	m_aNumSpawnPoints[0] = 0;
-	m_aNumSpawnPoints[1] = 0;
-	m_aNumSpawnPoints[2] = 0;
+	for(int i = 0; i < SPAWN_NUM; i++)
+		m_aNumSpawnPoints[i] = 0;
 }
 
 
@@ -81,13 +79,13 @@ bool IGameController::OnEntity(int Index, vec2 Pos)
 	switch(Index)
 	{
 	case ENTITY_SPAWN:
-		m_aaSpawnPoints[SpawnTypes::SPAWN_HUMAN][m_aNumSpawnPoints[0]++] = Pos;
+		m_aaSpawnPoints[SPAWN_HUMAN][m_aNumSpawnPoints[SPAWN_HUMAN]++] = Pos;
 		break;
 	case ENTITY_SPAWN_MOBS:
-		m_aaSpawnPoints[SpawnTypes::SPAWN_BOT][m_aNumSpawnPoints[1]++] = Pos;
+		m_aaSpawnPoints[SPAWN_BOT][m_aNumSpawnPoints[SPAWN_BOT]++] = Pos;
 		break;
 	case ENTITY_SPAWN_SAFE:
-		m_aaSpawnPoints[SpawnTypes::SPAWN_HUMAN_SAFE][m_aNumSpawnPoints[2]++] = Pos;
+		m_aaSpawnPoints[SPAWN_HUMAN_SAFE][m_aNumSpawnPoints[SPAWN_HUMAN_SAFE]++] = Pos;
 		break;
 	case ENTITY_ARMOR_1:
 		Type = PICKUP_ARMOR;
@@ -200,7 +198,7 @@ void IGameController::UpdateGameInfo(int ClientID)
 
 bool IGameController::CanSpawn(int SpawnType, vec2 *pOutPos, vec2 BotPos) const
 {
-	if(SpawnType < SpawnTypes::SPAWN_HUMAN || SpawnType >= SpawnTypes::SPAWN_NUM || GS()->m_World.m_ResetRequested)
+	if(SpawnType < SPAWN_HUMAN || SpawnType >= SPAWN_NUM || GS()->m_World.m_ResetRequested)
 		return false;
 
 	CSpawnEval Eval;
