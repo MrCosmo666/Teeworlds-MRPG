@@ -226,18 +226,18 @@ float IGameController::EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos) const
 	return Score;
 }
 
-void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type, vec2 BotPos) const
+void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int SpawnType, vec2 BotPos) const
 {
 	// get spawn point
-	for(int i = 0; i < m_aNumSpawnPoints[Type]; i++)
+	for(int i = 0; i < m_aNumSpawnPoints[SpawnType]; i++)
 	{
 		// check if the position is occupado
 		CCharacter *aEnts[MAX_CLIENTS];
-		int Num = GS()->m_World.FindEntities(m_aaSpawnPoints[Type][i], 64, (CEntity**)aEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
+		int Num = GS()->m_World.FindEntities(m_aaSpawnPoints[SpawnType][i], 64, (CEntity**)aEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
 		vec2 Positions[5] = { vec2(0.0f, 0.0f), vec2(-32.0f, 0.0f), vec2(0.0f, -32.0f), vec2(32.0f, 0.0f), vec2(0.0f, 32.0f) };
 		int Result = -1;
 
-		if(BotPos != vec2(-1, -1) && distance(BotPos, m_aaSpawnPoints[Type][i]) > 800.0f)
+		if(BotPos != vec2(-1, -1) && distance(BotPos, m_aaSpawnPoints[SpawnType][i]) > 800.0f)
 			continue;
 
 		for(int Index = 0; Index < 5 && Result == -1; ++Index)
@@ -246,8 +246,8 @@ void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type, vec2 BotPos
 			for(int c = 0; c < Num; ++c)
 			{
 				if(
-					GS()->Collision()->CheckPoint(m_aaSpawnPoints[Type][i]+Positions[Index]) ||
-					distance(aEnts[c]->GetPos(), m_aaSpawnPoints[Type][i]+Positions[Index]) <= aEnts[c]->GetProximityRadius())
+					GS()->Collision()->CheckPoint(m_aaSpawnPoints[SpawnType][i]+Positions[Index]) ||
+					distance(aEnts[c]->GetPos(), m_aaSpawnPoints[SpawnType][i]+Positions[Index]) <= aEnts[c]->GetProximityRadius())
 				{
 					Result = -1;
 					break;
@@ -257,7 +257,7 @@ void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int Type, vec2 BotPos
 		if(Result == -1)
 			continue; // try next spawn point
 
-		const vec2 P = m_aaSpawnPoints[Type][i]+Positions[Result];
+		const vec2 P = m_aaSpawnPoints[SpawnType][i]+Positions[Result];
 		const float S = EvaluateSpawnPos(pEval, P);
 		if(!pEval->m_Got || pEval->m_Score > S)
 		{
