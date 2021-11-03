@@ -1136,7 +1136,7 @@ INSERT INTO `tw_items_list` (`ItemID`, `Name`, `Description`, `Icon`, `Type`, `F
 (46, 'Remains of a dead soul', 'Information added later.', 'pouch', 4, -1, 0, 10, NULL, NULL, 0, 0, -1),
 (47, 'Ring of God of War', 'It happens sometimes', 'ring_fire', 3, 10, 0, 10, 4, 0, 5, 0, -1),
 (48, 'Bracelet of Fire', 'It happens sometimes', 'bracelet_fire', 3, 10, 0, 10, 4, 0, 7, 0, -1),
-(49, 'Big ammo bag', 'Adds a small amount of ammunition', 'pouch', 3, 10, 0, 10, 13, NULL, 8, 0, -1),
+(49, 'Big ammo bag', 'Adds a big amount of ammunition', 'pouch', 3, 10, 0, 10, 13, NULL, 8, 0, -1),
 (50, 'Strength ', 'Increase your strength', 'skill', -1, -1, 0, 0, 4, NULL, 1, 0, -1),
 (51, 'Random home decor', 'Lucky house decor', 'lucky_r', 1, 9, 0, 0, NULL, NULL, 0, 0, -1),
 (10000, 'Heavenly hammer', 'Reinforced kick', 'h_heaven', 6, 0, 0, 10, 16, NULL, 1, 0, -1),

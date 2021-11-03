@@ -126,12 +126,13 @@ int CPlayerBot::GetAttributeCount(int BonusID, bool Really)
 	return AttributeEx;
 }
 
-void CPlayerBot::GiveEffect(const char* Potion, int Sec, int Random)
+void CPlayerBot::GiveEffect(const char* Potion, int Sec, float Chance)
 {
 	if(!m_pCharacter || !m_pCharacter->IsAlive())
 		return;
 
-	if((Random && random_int() % Random == 0) || !Random)
+	const float RandomChance = frandom() * 100.0f;
+	if(RandomChance < Chance)
 	{
 		m_aEffects[Potion] = Sec;
 		GS()->CreateTextEffect(m_pCharacter->m_Core.m_Pos, Potion, TEXTEFFECT_FLAG_POTION|TEXTEFFECT_FLAG_ADDING);
