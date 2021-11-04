@@ -4,7 +4,6 @@
 #include "discord_main.h"
 
 #include "discord_slash_commands.h"
-#include "discord_github_api_watcher.h"
 
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
