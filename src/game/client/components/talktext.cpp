@@ -18,7 +18,7 @@
 
 #include "talktext.h"
 
-// TODO: rework
+constexpr float CornersBackground = 18.0f;
 
 bool CTalkText::IsActive() const
 {
@@ -90,7 +90,7 @@ void CTalkText::OnRender()
 		CUIRect ShadowRect = m_pAnimBackground->GetPos()->GetRect();
 		ShadowRect.y -= Height;
 		ShadowRect.h = Height;
-		RenderTools()->DrawUIRect4(&ShadowRect, vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.025f, 0.025f, 0.025f, 0.5f), vec4(0.025f, 0.025f, 0.025f, 0.5f), CUI::CORNER_ALL, 12.0f);
+		RenderTools()->DrawUIRect4(&ShadowRect, vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.0f, 0.0f, 0.0f, 0.0f), vec4(0.025f, 0.025f, 0.025f, 0.5f), vec4(0.025f, 0.025f, 0.025f, 0.5f), CUI::CORNER_IB, CornersBackground);
 
 		constexpr float Space = 62.0f;
 		const float FontSize = 26.0f;
@@ -214,7 +214,7 @@ static void GetDialogEmoticion(int Emote, vec4& pColor, vec4& pColorTo, int &pEm
 	else
 	{
 		pColor = vec4(0.15f, 0.2f, 0.5f, 0.90f);
-		pColorTo = vec4(0.2f, 0.35f, 0.5f, 0.90f);
+		pColorTo = vec4(0.2f, 0.3f, 0.5f, 0.90f);
 	}
 }
 
@@ -227,12 +227,12 @@ void CTalkText::OnMessage(int MsgType, void *pRawMsg)
 	{
 		// init background animations to
 		CUIRect BackgroundMain = { m_ScreenWidth / 4.0f, m_ScreenHeight / 1.8f, m_ScreenWidth / 2.0f, m_ScreenHeight / 8.0f };
-		m_pAnimBackground->Set(30.0f, CUI::CORNER_ALL);
+		m_pAnimBackground->Set(CornersBackground, CUI::CORNER_ALL, true);
 		m_pAnimBackground->GetPos()->Anim(&BackgroundMain, 0.1f, ANIMATION_TYPE::AnimIN);
 
 		CUIRect BackgroundOther;
 		BackgroundMain.Margin(10.0f, &BackgroundOther);
-		m_pAnimBackgroundOther->Set(25.0f, CUI::CORNER_ALL);
+		m_pAnimBackgroundOther->Set(CornersBackground, CUI::CORNER_ALL, true);
 		m_pAnimBackgroundOther->GetPos()->Anim(&BackgroundOther, 0.2f, ANIMATION_TYPE::AnimIN);
 
 		// color animation
