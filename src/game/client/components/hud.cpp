@@ -716,9 +716,9 @@ void CHud::RenderNinjaBar(float x, float y, float Progress)
 // mmotee
 void CHud::RenderMmoHud(const CNetObj_Mmo_ClientInfo* pClientStats, const CNetObj_Character* pCharacter)
 {
-	if(!pClientStats || !pCharacter || pClientStats->m_WorldType == WORLD_CUTSCENE)
+	if(!pClientStats || !pCharacter)
 		return;
-
+	
 	// edges
 	CUIRect Rect = { 5, 15, 106, 36.0f };
 	Graphics()->BlendNormal();

@@ -155,8 +155,8 @@ public:
 	void UpdateClientInformation(int ClientID) override;
 
 	void SendTuningParams(int ClientID);
-	void SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char* Message, int Style = -1, int TalkingEmote = -1);
-	void ClearTalkText(int ClientID);
+	void SendDialogText(int ClientID, int TalkingID, const char* Message, int Emote = -1, int TalkedFlag = TALKED_FLAG_FULL);
+	void ClearDialogText(int ClientID);
 	void SendProgressBar(int ClientID, int Count, int Request, const char *Message);
 	void SendInformationBoxGUI(int ClientID, const char* pMsg, ...);
 

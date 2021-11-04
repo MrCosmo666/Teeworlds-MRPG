@@ -13,11 +13,12 @@
 struct DialogData
 {
 	char m_aText[512];
-	int m_Style;
 	int m_Emote;
 	int m_GivesQuestID;
 	bool m_RequestAction;
-	bool m_PlayerSays;
+	int m_Flag;
+
+	void LoadFlags();
 };
 
 /************************************************************************/

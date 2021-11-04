@@ -12,33 +12,33 @@ class CTalkText : public CComponent
 	CAnimElementsUI* m_pAnimBackgroundOther;
 
 	// mmotee talk text
-	int m_TalkClientID;
-	int m_TalkedEmote;
-	int m_TalkedEmoticionSpriteID;
-	bool m_PlayerTalked;
+	int m_ConversationClientID;
+	int m_Emote;
+	int m_EmoticionSpriteID;
+	int m_DialogFlag;
 	bool m_Stranger;
 	CTextCursor m_TextCursor;
 
-	int m_RegrnizedTalkPosition;
-	int64 m_RegrnizedTalkTime;
-	char m_TalkText[TALKING_SIZE];
-	char m_RegrnizedTalkText[TALKING_SIZE];
+	int m_UpdateDialogCharPos;
+	int64 m_UpdateDialogTextTime;
+	char m_aDialogText[TALKING_SIZE];
+	char m_aUpdatedDialogText[TALKING_SIZE];
 
 	float m_ScreenWidth;
 	float m_ScreenHeight;
 
-	void RegrnizedTalkingText();
+	void UpdateDialogText();
 	void Clear();
-	const char* GetTalkText() const { return m_TalkText; }
+	const char* GetTalkText() const { return m_aDialogText; }
 
 public:
 	bool IsActive() const;
 
-	virtual void OnInit();
-	virtual void OnStateChange(int NewState, int OldState);
-	virtual void OnRender();
-	virtual void OnMessage(int MsgType, void *pRawMsg);
-	virtual bool OnInput(IInput::CEvent Event);
+	void OnInit() override;
+	void OnStateChange(int NewState, int OldState) override;
+	void OnRender() override;
+	void OnMessage(int MsgType, void *pRawMsg) override;
+	bool OnInput(IInput::CEvent Event) override;
 
 };
 
