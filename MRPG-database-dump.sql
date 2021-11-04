@@ -1293,6 +1293,7 @@ CREATE TABLE `tw_skills_list` (
   `ID` int(11) NOT NULL,
   `Name` varchar(64) NOT NULL,
   `Description` varchar(64) NOT NULL,
+  `Type` int(11) NOT NULL DEFAULT 0 COMMENT '0-Improvements\r\n1-Healer\r\n2-Dps\r\n3-Tank',
   `BonusName` varchar(64) NOT NULL DEFAULT '''name''',
   `BonusValue` int(11) NOT NULL DEFAULT 1,
   `ManaPercentageCost` int(11) NOT NULL DEFAULT 10,
@@ -1305,13 +1306,13 @@ CREATE TABLE `tw_skills_list` (
 -- Дамп данных таблицы `tw_skills_list`
 --
 
-INSERT INTO `tw_skills_list` (`ID`, `Name`, `Description`, `BonusName`, `BonusValue`, `ManaPercentageCost`, `PriceSP`, `MaxLevel`, `Passive`) VALUES
-(1, 'Health turret', 'Creates turret a recovery health ', 'life span', 3, 25, 24, 8, 0),
-(2, 'Sleepy Gravity', 'Magnet mobs to itself', 'radius', 20, 25, 28, 10, 0),
-(3, 'Craft Discount', 'Will give discount on the price of craft items', '% discount gold for craft item', 1, 0, 28, 50, 1),
-(4, 'Proficiency with weapons', 'You can perform an automatic fire', 'can perform an auto fire with all types of weapons', 1, 0, 120, 1, 1),
-(5, 'Blessing of God of war', 'The blessing restores ammo', '% recovers ammo within a radius of 800', 25, 50, 28, 4, 0),
-(6, 'Noctis Lucis Attack Teleport', 'An attacking teleport that deals damage to all mobs radius', '% your strength', 25, 10, 100, 4, 0);
+INSERT INTO `tw_skills_list` (`ID`, `Name`, `Description`, `Type`, `BonusName`, `BonusValue`, `ManaPercentageCost`, `PriceSP`, `MaxLevel`, `Passive`) VALUES
+(1, 'Health turret', 'Creates turret a recovery health ', 1, 'life span', 3, 25, 24, 8, 0),
+(2, 'Sleepy Gravity', 'Magnet mobs to itself', 3, 'radius', 20, 25, 28, 10, 0),
+(3, 'Craft Discount', 'Will give discount on the price of craft items', 0, '% discount gold for craft item', 1, 0, 28, 50, 1),
+(4, 'Proficiency with weapons', 'You can perform an automatic fire', 0, 'can perform an auto fire with all types of weapons', 1, 0, 120, 1, 1),
+(5, 'Blessing of God of war', 'The blessing restores ammo', 3, '% recovers ammo within a radius of 800', 25, 50, 28, 4, 0),
+(6, 'Noctis Lucis Attack Teleport', 'An attacking teleport that deals damage to all mobs radius', 2, '% your strength', 25, 10, 100, 4, 0);
 
 -- --------------------------------------------------------
 

@@ -2,208 +2,823 @@
     "translation": [
         {
             "id": null,
-            "key": "Auto equip {STR} - {STR}",
-            "value": "Auto equip {STR} - {STR}"
+            "key": "Mana required {INT}%",
+            "value": "Потребление маны {INT}%"
         },
-		{
+        {
+            "id": null,
+            "key": "Used on {STR}",
+            "value": "Использовать на {STR}"
+        },
+        {
+            "id": null,
+            "key": "Learn {STR}",
+            "value": "Изучить {STR}"
+        },
+        {
+            "id": null,
+            "key": "Max level {INT} {STR}",
+            "value": "Максимальный уровень {INT} {STR}"
+        },
+        {
+            "id": null,
+            "key": "Next level {INT} {STR}",
+            "value": "Следующий уровень {INT} {STR}"
+        },
+        {
+            "id": null,
+            "key": "Skill Learn Information",
+            "value": "Изучение скиллов информация"
+        },
+        {
+            "id": null,
+            "key": "Here you can learn passive and active skills",
+            "value": "Здесь вы можете изучить пассивные и активные скиллы"
+        },
+        {
+            "id": null,
+            "key": "You can bind active skill any button using the console",
+            "value": "Вы можете забиндить активные скиллы в консоле"
+        },
+        {
+            "id": null,
+            "key": "Improving",
+            "value": "Улучшающие"
+        },
+        {
+            "id": null,
+            "key": "Healing",
+            "value": "Исцеляющие"
+        },
+        {
+            "id": null,
+            "key": "Attacking",
+            "value": "Атакующие"
+        },
+        {
+            "id": null,
+            "key": "Defensive",
+            "value": "Обронительные"
+        },
+        {
+            "id": null,
+            "key": "{STR} skill's",
+            "value": "{STR} скиллы"
+        },
+        {
+            "id": null,
+            "key": "Auto equip {STR} - {STR}",
+            "value": "Авто снаряжение {STR} - {STR}"
+        },
+        {
             "id": null,
             "key": "This item cannot have more than 1 item",
-            "value": "This item cannot have more than 1 item"
+            "value": "Этот предмет может быть только 1"
         },
-		{
+        {
             "id": null,
             "key": "Create Slot Auction {STR}",
-            "value": "Create Slot Auction {STR}"
+            "value": "Создать слот аукциона {STR}"
         },
-		{
+        {
             "id": null,
             "key": "Drop {STR}",
-            "value": "Drop {STR}"
+            "value": "Выбросить {STR}"
         },
-		{
+        {
             "id": null,
             "key": "Disassemble {STR} (+{INT} materials)",
-            "value": "Disassemble {STR} (+{INT} materials)"
+            "value": "Разобрать {STR} (+{INT} материалов)"
         },
-		{
+        {
             "id": null,
             "key": "Enchant {STR} ({INT} materials)",
-            "value": "Enchant {STR} ({INT} materials)"
+            "value": "Зачаровать {STR} ({INT} материалов)"
         },
-		{
+        {
             "id": null,
             "key": "To plant {STR}, to house (0.06%)",
-            "value": "To plant {STR}, to house (0.06%)"
+            "value": "Посадить {STR}, в доме (0.06%)"
         },
-		{
+        {
             "id": null,
             "key": "You can not undress equipping hammer",
-            "value": "You can not undress equipping hammer"
+            "value": "Вы не можете снять надетый молоток"
         },
-		{
+        {
             "id": null,
             "key": "Add {STR} to your guild house",
-            "value": "Add {STR} to your guild house"
+            "value": "Добавить {STR} в дом гильдии"
         },
-		{
+        {
             "id": null,
             "key": "Add {STR} to your house",
-            "value": "Add {STR} to your house"
+            "value": "Добавить {STR} в ваш дом"
         },
-		{
+        {
             "id": null,
             "key": "Auto use {STR} - {STR}",
-            "value": "Auto use {STR} - {STR}"
+            "value": "Авто использование {STR} - {STR}"
         },
-		{
+        {
             "id": null,
             "key": "Use {STR}",
-            "value": "Use {STR}"
+            "value": "Использовать {STR}"
         },
-		{
+        {
             "id": null,
             "key": "For bind command '/useitem {INT}'",
-            "value": "For bind command '/useitem {INT}'"
+            "value": "Для бинда команды '/useitem {INT}'"
         },
-		{
+        {
             "id": null,
             "key": "'{STR}' frozen for some quest.",
-            "value": "'{STR}' frozen for some quest."
+            "value": "'{STR}' заморожен для квеста."
         },
-		{
+        {
             "id": null,
             "key": "In the 'Adventure Journal', you can see in which quest an item is used",
-            "value": "In the 'Adventure Journal', you can see in which quest an item is used"
+            "value": "В 'Жунале', вы можете посмотреть какой квест требует этот предмет"
         },
-		{
+        {
             "id": null,
             "key": "{STR} enchant {STR} {STR} {STR}",
-            "value": "{STR} enchant {STR} {STR} {STR}"
+            "value": "{STR} зачаровал {STR} {STR} {STR}"
         },
-		{
+        {
             "id": null,
             "key": "Enchantment level is maximum",
-            "value": "Enchantment level is maximum"
+            "value": "Зачарование максимального уровня"
         },
-		{
+        {
             "id": null,
             "key": "Disassemble {STR}x{INT}, you receive {INT} materials",
-            "value": "Disassemble {STR}x{INT}, you receive {INT} materials"
+            "value": "Разобрать {STR}x{INT}, вы получите {INT} материалов"
         },
-		{
+        {
             "id": null,
             "key": "You drop {STR}x{INT}",
-            "value": "You drop {STR}x{INT}"
+            "value": "Вы выбросили {STR}x{INT}"
         },
-		{
+        {
             "id": null,
             "key": "There are no items in this tab",
-            "value": "There are no items in this tab"
+            "value": "В этой вкладке нет предметов"
         },
-		{
+        {
             "id": null,
             "key": "{STR} Not equipped",
-            "value": "{STR} Not equipped"
+            "value": "{STR} Не снаряжено"
         },
-		{
+        {
             "id": null,
             "key": "Equip Select Slot",
-            "value": "Equip Select Slot"
+            "value": "Снаряжение и слоты"
         },
-		{
+        {
             "id": null,
             "key": "Select tab and select armor.",
-            "value": "Select tab and select armor."
+            "value": "Выбери вкладку и предмет."
         },
-		{
+        {
             "id": null,
             "key": "Equip / Armor Information",
             "value": "Equip / Armor Information"
         },
-		{
+        {
             "id": null,
             "key": "Inventory Information",
             "value": "Inventory Information"
         },
-		{
+        {
             "id": null,
             "key": "Choose the type of items you want to show",
             "value": "Choose the type of items you want to show"
         },
-		{
+        {
             "id": null,
             "key": "You got of the {STR}x{INT}.",
             "value": "You got of the {STR}x{INT}."
         },
-		{
+        {
             "id": null,
             "key": "After, need select item to interact",
             "value": "After, need select item to interact"
         },
-		{
+        {
             "id": null,
             "key": "You got of the {STR}x{INT}.",
             "value": "You got of the {STR}x{INT}."
         },
-		{
+        {
             "id": null,
             "key": "{STR} got of the {STR}x{INT}.",
             "value": "{STR} got of the {STR}x{INT}."
         },
-		{
+        {
             "id": null,
             "key": "{STR} used {STR}x{INT} and got {INT} survival experience.",
             "value": "{STR} used {STR}x{INT} and got {INT} survival experience."
         },
-		{
+        {
             "id": null,
             "key": "This item can only be used (Auto Use, and then craft).",
             "value": "This item can only be used (Auto Use, and then craft)."
         },
-		{
+        {
             "id": null,
             "key": "{STR} used {STR} returned {INT} upgrades.",
             "value": "{STR} used {STR} returned {INT} upgrades."
         },
-		{
+        {
             "id": null,
             "key": "{STR} used {STR}x{INT} and got {INT} gold.",
             "value": "{STR} used {STR}x{INT} and got {INT} gold."
         },
-		{
+        {
             "id": null,
             "key": "Wait until the last random box opens!",
             "value": "Wait until the last random box opens!"
         },
-		{
+        {
             "id": null,
             "key": "You used '{STR}x{INT}'.",
             "value": "You used '{STR}x{INT}'."
         },
-		{
+        {
             "id": null,
             "key": "{STR} uses '{STR}x{INT}' and got:",
             "value": "{STR} uses '{STR}x{INT}' and got:"
         },
-		{
+        {
             "id": null,
             "key": "{INT}. {STR} | {INT}:{INT}min | {INT}P",
             "value": "{INT}. {STR} | {INT}:{INT}min | {INT}P"
         },
         {
-            "id": "skds1",
-            "key": "Creates turret a recovery health ",
-            "value": "Creates turret a recovery health "
+            "id": "diaqu701",
+            "key": "All right [Player]. Good luck don't forget that we will always be happy to welcome you as a guest ;)",
+            "value": "All right [Player]. Good luck don't forget that we will always be happy to welcome you as a guest ;)"
         },
         {
-            "id": "qudn21",
-            "key": "Abandoned mine",
-            "value": "Abandoned mine"
+            "id": "diaqu702",
+            "key": "Don't forget, don't miss me ;)",
+            "value": "Don't forget, don't miss me ;)"
+        },
+        {
+            "id": "diaqu703",
+            "key": "Don't worry, Diana is very attached to you. I think she will be offended. Talk to she!",
+            "value": "Don't worry, Diana is very attached to you. I think she will be offended. Talk to she!"
+        },
+        {
+            "id": "diaqu710",
+            "key": "Why didn't you tell [Player] me you were going to leave?",
+            "value": "Why didn't you tell [Player] me you were going to leave?"
+        },
+        {
+            "id": "diaqu711",
+            "key": "I'm Sorry [Talked]. I wanted to tell you..",
+            "value": "I'm Sorry [Talked]. I wanted to tell you.."
+        },
+        {
+            "id": "diaqu712",
+            "key": "**She said sadly**: Why? Will you take me with you?",
+            "value": "**She said sadly**: Why? Will you take me with you?"
+        },
+        {
+            "id": "diaqu713",
+            "key": "I don't want to put you in danger!",
+            "value": "I don't want to put you in danger!"
+        },
+        {
+            "id": "diaqu714",
+            "key": "I want to travel with you!",
+            "value": "I want to travel with you!"
+        },
+        {
+            "id": "diaqu715",
+            "key": "Ok, I'll take you. Now let me to say Yasue San.",
+            "value": "Ok, I'll take you. Now let me to say Yasue San."
+        },
+        {
+            "id": "diaqu716",
+            "key": "**She said joyfully**: True? Thank! ;)",
+            "value": "**She said joyfully**: True? Thank! ;)"
+        },
+        {
+            "id": "diaqu720",
+            "key": "Well, ready to go?",
+            "value": "Well, ready to go?"
+        },
+        {
+            "id": "diaqu721",
+            "key": "Yes, will I take Diana with me?",
+            "value": "Yes, will I take Diana with me?"
+        },
+        {
+            "id": "diaqu722",
+            "key": "Yes, of course, set sail:) I will show you my homeland!",
+            "value": "Yes, of course, set sail:) I will show you my homeland!"
+        },
+        {
+            "id": "dianp10",
+            "key": "**He said surprised**: What a wonderful weather today!",
+            "value": "**He said surprised**: What a wonderful weather today!"
+        },
+        {
+            "id": "dianp11",
+            "key": "Yes, I think so too.",
+            "value": "Yes, I think so too."
+        },
+        {
+            "id": "dianp12",
+            "key": "Well, how do you like on our ship [Player]? Captures the ocean, i think I'll stay here a little longer, it's wonderful here.",
+            "value": "Well, how do you like on our ship [Player]? Captures the ocean, i think I'll stay here a little longer, it's wonderful here."
+        },
+        {
+            "id": "dianp13",
+            "key": "I also really like it. Okay, I'll go, I wish you a good rest [Talked]!",
+            "value": "I also really like it. Okay, I'll go, I wish you a good rest [Talked]!"
+        },
+        {
+            "id": "dianp14",
+            "key": "And I wish you good luck too [Player]!",
+            "value": "And I wish you good luck too [Player]!"
+        },
+        {
+            "id": "dianp20",
+            "key": "**He looks very tired**: Very hot, impossible to work.",
+            "value": "**He looks very tired**: Very hot, impossible to work."
+        },
+        {
+            "id": "dianp30",
+            "key": "Hello, I arrived from a small village beyond the mountains and the ocean, my name is [Player], I have a desire to become an adventurer. But I do not know about this place, could you help me?",
+            "value": "Hello, I arrived from a small village beyond the mountains and the ocean, my name is [Player], I have a desire to become an adventurer. But I do not know about this place, could you help me?"
+        },
+        {
+            "id": "dianp31",
+            "key": "Hello [Player], Yes of course I will help you, explain where you need to go, but you help my workers, they do not cope at all.",
+            "value": "Hello [Player], Yes of course I will help you, explain where you need to go, but you help my workers, they do not cope at all."
+        },
+        {
+            "id": "dianp32",
+            "key": "What you need help with, I'm good at dealing with predators without meat you will not leave! *laughter*",
+            "value": "What you need help with, I'm good at dealing with predators without meat you will not leave! *laughter*"
+        },
+        {
+            "id": "dianp33",
+            "key": "Oh, you're a Joker, no thanks go a little further guys will explain everything to you!",
+            "value": "Oh, you're a Joker, no thanks go a little further guys will explain everything to you!"
+        },
+        {
+            "id": "dianp34",
+            "key": "OK, thanks!",
+            "value": "OK, thanks!"
+        },
+        {
+            "id": "dianp90",
+            "key": "Hey, pst! You, yes, you!",
+            "value": "Hey, pst! You, yes, you!"
+        },
+        {
+            "id": "dianp91",
+            "key": "Yeah? How can I help?",
+            "value": "Yeah? How can I help?"
+        },
+        {
+            "id": "dianp92",
+            "key": "You cannot help me, kid! I just need...to TEST you, yes...!",
+            "value": "You cannot help me, kid! I just need...to TEST you, yes...!"
+        },
+        {
+            "id": "dianp100",
+            "key": "Hi my name is [Player], [Talked] are you working?",
+            "value": "Hi my name is [Player], [Talked] are you working?"
+        },
+        {
+            "id": "dianp101",
+            "key": "Hello [Player], Yes, I am on duty as a guard, and I also trade a little",
+            "value": "Hello [Player], Yes, I am on duty as a guard, and I also trade a little"
+        },
+        {
+            "id": "dianp102",
+            "key": "Can you tell me how difficult it is to get into the service?",
+            "value": "Can you tell me how difficult it is to get into the service?"
+        },
+        {
+            "id": "dianp103",
+            "key": "If that's what you want, it's easy. And if you don't then you won't be able to get in ;)",
+            "value": "If that's what you want, it's easy. And if you don't then you won't be able to get in ;)"
+        },
+        {
+            "id": "dianp104",
+            "key": "By the way [Player], I need help, there are slugs nearby, again raging, and I can't leave the post. At the same time you will test your skills young adventurer.",
+            "value": "By the way [Player], I need help, there are slugs nearby, again raging, and I can't leave the post. At the same time you will test your skills young adventurer."
+        },
+        {
+            "id": "dianp105",
+            "key": "Yes, no problem, wait [Talked]!!",
+            "value": "Yes, no problem, wait [Talked]!!"
+        },
+        {
+            "id": "dianp110",
+            "key": "**He says with a look of horror on his face**: Help me find my daughter, she went to the village for food and never returned.",
+            "value": "**He says with a look of horror on his face**: Help me find my daughter, she went to the village for food and never returned."
+        },
+        {
+            "id": "dianp111",
+            "key": "To the village? [Talked] Yes of course I will help. That's where I need to go!",
+            "value": "To the village? [Talked] Yes of course I will help. That's where I need to go!"
+        },
+        {
+            "id": "dianp112",
+            "key": "Thanks a lot",
+            "value": "Thanks a lot"
+        },
+        {
+            "id": "dianp130",
+            "key": "Hello, would you like to learn the basics of mining?",
+            "value": "Hello, would you like to learn the basics of mining?"
+        },
+        {
+            "id": "dianp131",
+            "key": "Yes, of course, I don't mind",
+            "value": "Yes, of course, I don't mind"
+        },
+        {
+            "id": "dianp132",
+            "key": "All right follow me I'll explain the basics to you!",
+            "value": "All right follow me I'll explain the basics to you!"
+        },
+        {
+            "id": "dianp140",
+            "key": "Hello, and so you're new here?",
+            "value": "Hello, and so you're new here?"
+        },
+        {
+            "id": "dianp141",
+            "key": "Yes.",
+            "value": "Yes."
+        },
+        {
+            "id": "dianp142",
+            "key": "I need to register you. Please introduce yourself, and the purpose of your arrival, and the time you to stay here",
+            "value": "I need to register you. Please introduce yourself, and the purpose of your arrival, and the time you to stay here"
+        },
+        {
+            "id": "dianp143",
+            "key": "My name is [Player]. I came here to become an adventurer. I can't tell you the exact time of stay.",
+            "value": "My name is [Player]. I came here to become an adventurer. I can't tell you the exact time of stay."
+        },
+        {
+            "id": "dianp144",
+            "key": "And who for you should know the time of your stay here.",
+            "value": "And who for you should know the time of your stay here."
+        },
+        {
+            "id": "dianp145",
+            "key": "Okay well, I will write you down, in case of violation of the rules of our village, we have every right to prohibit your presence here, and report to superiors.",
+            "value": "Okay well, I will write you down, in case of violation of the rules of our village, we have every right to prohibit your presence here, and report to superiors."
+        },
+        {
+            "id": "dianp146",
+            "key": "Have a good day!",
+            "value": "Have a good day!"
+        },
+        {
+            "id": "dianp147",
+            "key": "Thank's [Talked]!",
+            "value": "Thank's [Talked]!"
+        },
+        {
+            "id": "dianp160",
+            "key": "[Stranger]Greetings, wanderer. *bowing*",
+            "value": "[Stranger]Greetings, wanderer. *bowing*"
+        },
+        {
+            "id": "dianp161",
+            "key": "I am the Deputy of the Apostle, and I also protect her.",
+            "value": "I am the Deputy of the Apostle, and I also protect her."
+        },
+        {
+            "id": "dianp162",
+            "key": "I think you've already heard, that the monsters are raging.",
+            "value": "I think you've already heard, that the monsters are raging."
+        },
+        {
+            "id": "dianp163",
+            "key": "I have a request for you [Player]",
+            "value": "I have a request for you [Player]"
+        },
+        {
+            "id": "dianp164",
+            "key": "Which one?",
+            "value": "Which one?"
+        },
+        {
+            "id": "dianp165",
+            "key": "Help in the southern part to win over the monsters. We can't drive them away but we can scare them away.",
+            "value": "Help in the southern part to win over the monsters. We can't drive them away but we can scare them away."
+        },
+        {
+            "id": "diaqu282",
+            "key": "I thought you were joking, you wouldn't take it seriously, but you came.",
+            "value": "I thought you were joking, you wouldn't take it seriously, but you came."
+        },
+        {
+            "id": "dianp166",
+            "key": "Of course I will.",
+            "value": "Of course I will."
+        },
+        {
+            "id": "dianp167",
+            "key": "Thank's [Player]!",
+            "value": "Thank's [Player]!"
+        },
+        {
+            "id": "dianp180",
+            "key": "You look awful today, [Talked]! What happend?",
+            "value": "You look awful today, [Talked]! What happend?"
+        },
+        {
+            "id": "dianp181",
+            "key": "Oh.. don't you worry about me, boy..",
+            "value": "Oh.. don't you worry about me, boy.."
+        },
+        {
+            "id": "dianp182",
+            "key": "But I DO worry!",
+            "value": "But I DO worry!"
+        },
+        {
+            "id": "dianp183",
+            "key": "I'm tired of these fight I have with my wife, it's personal bussiness.",
+            "value": "I'm tired of these fight I have with my wife, it's personal bussiness."
+        },
+        {
+            "id": "dianp184",
+            "key": "I didn't want to be a pain to you, Officer. I will leave you to your problems now.",
+            "value": "I didn't want to be a pain to you, Officer. I will leave you to your problems now."
+        },
+        {
+            "id": "dianp185",
+            "key": "No! Wait!",
+            "value": "No! Wait!"
+        },
+        {
+            "id": "dianp190",
+            "key": "Hello [Player], I have come to you from the Final Fantasy universe, my name is [Talked].",
+            "value": "Hello [Player], I have come to you from the Final Fantasy universe, my name is [Talked]."
+        },
+        {
+            "id": "dianp191",
+            "key": "I can't say for sure how long I will be here, but for now I will be happy to know your world, and I will be happy to show my world",
+            "value": "I can't say for sure how long I will be here, but for now I will be happy to know your world, and I will be happy to show my world"
+        },
+        {
+            "id": "dianp192",
+            "key": "Are you serious? Did the author smoke dope?",
+            "value": "Are you serious? Did the author smoke dope?"
+        },
+        {
+            "id": "dianp193",
+            "key": "Maybe so, I have a couple of things that you can get from me, but not for free. I'll need the fragments I lost",
+            "value": "Maybe so, I have a couple of things that you can get from me, but not for free. I'll need the fragments I lost"
+        },
+        {
+            "id": "dianp250",
+            "key": "Welcome home, sir! **she made a bow**",
+            "value": "Welcome home, sir! **she made a bow**"
+        },
+        {
+            "id": "aeth1",
+            "key": "Crossroad",
+            "value": "Crossroad"
+        },
+        {
+            "id": "aeth2",
+            "key": "Pier",
+            "value": "Pier"
+        },
+        {
+            "id": "aeth3",
+            "key": "Guard post",
+            "value": "Guard post"
+        },
+        {
+            "id": "aeth4",
+            "key": "Yugasaki",
+            "value": "Yugasaki"
+        },
+        {
+            "id": "attb13",
+            "key": "Ammo",
+            "value": "Ammo"
+        },
+        {
+            "id": "itdc1",
+            "key": "Major currency",
+            "value": "Major currency"
+        },
+        {
+            "id": "ittm2",
+            "key": "Hammer",
+            "value": "Hammer"
+        },
+        {
+            "id": "itdc2",
+            "key": "A normal hammer",
+            "value": "A normal hammer"
+        },
+        {
+            "id": "ittm3",
+            "key": "Gun",
+            "value": "Gun"
+        },
+        {
+            "id": "itdc6",
+            "key": "Conventional weapon",
+            "value": "Conventional weapon"
+        },
+        {
+            "id": "ittm4",
+            "key": "Shotgun",
+            "value": "Shotgun"
+        },
+        {
+            "id": "ittm5",
+            "key": "Grenade",
+            "value": "Grenade"
+        },
+        {
+            "id": "ittm6",
+            "key": "Rifle",
+            "value": "Rifle"
+        },
+        {
+            "id": "ittm7",
+            "key": "Material",
+            "value": "Material"
+        },
+        {
+            "id": "itdc7",
+            "key": "Required to improve weapons",
+            "value": "Required to improve weapons"
+        },
+        {
+            "id": "ittm8",
+            "key": "Ticket guild",
+            "value": "Ticket guild"
+        },
+        {
+            "id": "itdc8",
+            "key": "Command: /gcreate <name>",
+            "value": "Command: /gcreate <name>"
+        },
+        {
+            "id": "ittm9",
+            "key": "Skill Point",
+            "value": "Skill Point"
+        },
+        {
+            "id": "itdc9",
+            "key": "Skill point",
+            "value": "Skill point"
+        },
+        {
+            "id": "ittm10",
+            "key": "Decoration Armor",
+            "value": "Decoration Armor"
+        },
+        {
+            "id": "itdc13",
+            "key": "Decoration for house!",
+            "value": "Decoration for house!"
+        },
+        {
+            "id": "ittm11",
+            "key": "Decoration Hearth Elite",
+            "value": "Decoration Hearth Elite"
+        },
+        {
+            "id": "ittm12",
+            "key": "Decoration Ninja Elite",
+            "value": "Decoration Ninja Elite"
+        },
+        {
+            "id": "ittm13",
+            "key": "Decoration Hearth",
+            "value": "Decoration Hearth"
+        },
+        {
+            "id": "ittm14",
+            "key": "Potion mana regen",
+            "value": "Potion mana regen"
+        },
+        {
+            "id": "itdc14",
+            "key": "Regenerate +5%, 15sec every sec.\n",
+            "value": "Regenerate +5%, 15sec every sec.\n"
+        },
+        {
+            "id": "ittm15",
+            "key": "Potion health regen",
+            "value": "Potion health regen"
+        },
+        {
+            "id": "itdc15",
+            "key": "Regenerate +3% health, 15sec every sec.",
+            "value": "Regenerate +3% health, 15sec every sec."
+        },
+        {
+            "id": "ittm16",
+            "key": "Capsule survival experience",
+            "value": "Capsule survival experience"
+        },
+        {
+            "id": "itdc16",
+            "key": "You got 10-50 experience survival",
+            "value": "You got 10-50 experience survival"
+        },
+        {
+            "id": "itdc17",
+            "key": "You got 10-50 gold",
+            "value": "You got 10-50 gold"
+        },
+        {
+            "id": "ittm18",
+            "key": "Mirt",
+            "value": "Mirt"
+        },
+        {
+            "id": "itdc46",
+            "key": "Information added later.",
+            "value": "Information added later."
+        },
+        {
+            "id": "ittm20",
+            "key": "Potato",
+            "value": "Potato"
+        },
+        {
+            "id": "itdc24",
+            "key": "Material need for craft!",
+            "value": "Material need for craft!"
+        },
+        {
+            "id": "ittm21",
+            "key": "Notebook",
+            "value": "Notebook"
+        },
+        {
+            "id": "itdc21",
+            "key": "In it, something is written",
+            "value": "In it, something is written"
+        },
+        {
+            "id": "ittm22",
+            "key": "Glue",
+            "value": "Glue"
+        },
+        {
+            "id": "itdc29",
+            "key": "I wonder what it's for?",
+            "value": "I wonder what it's for?"
+        },
+        {
+            "id": "ittm23",
+            "key": "Board",
+            "value": "Board"
+        },
+        {
+            "id": "itdc23",
+            "key": "Plain Board",
+            "value": "Plain Board"
+        },
+        {
+            "id": "ittm24",
+            "key": "Mushroom",
+            "value": "Mushroom"
+        },
+        {
+            "id": "ittm25",
+            "key": "Potion resurrection",
+            "value": "Potion resurrection"
+        },
+        {
+            "id": "itdc25",
+            "key": "Resuscitates in the zone where you died!",
+            "value": "Resuscitates in the zone where you died!"
         },
         {
             "id": "itdc48",
             "key": "It happens sometimes",
             "value": "It happens sometimes"
+        },
+        {
+            "id": "ittm27",
+            "key": "Young fighter's ring",
+            "value": "Young fighter's ring"
         },
         {
             "id": "ittm28",
@@ -221,19 +836,9 @@
             "value": "Gel"
         },
         {
-            "id": "itdc29",
-            "key": "I wonder what it's for?",
-            "value": "I wonder what it's for?"
-        },
-        {
             "id": "ittm30",
             "key": "Goblin Ingot",
             "value": "Goblin Ingot"
-        },
-        {
-            "id": "itdc46",
-            "key": "Information added later.",
-            "value": "Information added later."
         },
         {
             "id": "ittm31",
@@ -241,19 +846,9 @@
             "value": "Copper Ingot"
         },
         {
-            "id": "itdc31",
-            "key": "Information added later.",
-            "value": "Information added later."
-        },
-        {
             "id": "ittm32",
             "key": "Salantra Blessing",
             "value": "Salantra Blessing"
-        },
-        {
-            "id": "itdc32",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
         },
         {
             "id": "ittm33",
@@ -261,19 +856,9 @@
             "value": "Explosive module for gun"
         },
         {
-            "id": "itdc33",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
-        },
-        {
             "id": "ittm34",
             "key": "Explosive module for shotgun",
             "value": "Explosive module for shotgun"
-        },
-        {
-            "id": "itdc34",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
         },
         {
             "id": "ittm35",
@@ -281,29 +866,14 @@
             "value": "Kappa meat"
         },
         {
-            "id": "itdc35",
-            "key": "Information added later.",
-            "value": "Information added later."
-        },
-        {
             "id": "ittm36",
             "key": "Ring of Arvida",
             "value": "Ring of Arvida"
         },
         {
-            "id": "itdc36",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
-        },
-        {
             "id": "ittm37",
             "key": "Relic of the Orc Lord",
             "value": "Relic of the Orc Lord"
-        },
-        {
-            "id": "itdc37",
-            "key": "Information added later.",
-            "value": "Information added later."
         },
         {
             "id": "ittm38",
@@ -351,11 +921,6 @@
             "value": "Torn cloth clothes of orcs"
         },
         {
-            "id": "itdc42",
-            "key": "Information added later.",
-            "value": "Information added later."
-        },
-        {
             "id": "ittm43",
             "key": "Blessing for discount craft",
             "value": "Blessing for discount craft"
@@ -381,19 +946,9 @@
             "value": "The core of Neptune"
         },
         {
-            "id": "itdc45",
-            "key": "Information added later.",
-            "value": "Information added later."
-        },
-        {
             "id": "ittm46",
             "key": "Remains of a dead soul",
             "value": "Remains of a dead soul"
-        },
-        {
-            "id": "itdc46",
-            "key": "Information added later.",
-            "value": "Information added later."
         },
         {
             "id": "ittm47",
@@ -401,29 +956,14 @@
             "value": "Ring of God of War"
         },
         {
-            "id": "itdc47",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
-        },
-        {
             "id": "ittm48",
             "key": "Bracelet of Fire",
             "value": "Bracelet of Fire"
         },
         {
-            "id": "itdc48",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
-        },
-        {
             "id": "ittm49",
             "key": "Big ammo bag",
             "value": "Big ammo bag"
-        },
-        {
-            "id": "itdc49",
-            "key": "Adds a small amount of ammunition",
-            "value": "Adds a small amount of ammunition"
         },
         {
             "id": "ittm50",
@@ -486,11 +1026,6 @@
             "value": "Neptune wings"
         },
         {
-            "id": "itdc10018",
-            "key": "Covered in secrets",
-            "value": "Covered in secrets"
-        },
-        {
             "id": "qudn1",
             "key": "Help for workers",
             "value": "Help for workers"
@@ -506,11 +1041,6 @@
             "value": "Helping a girl"
         },
         {
-            "id": "qusn2",
-            "key": "Main: Arrival",
-            "value": "Main: Arrival"
-        },
-        {
             "id": "qudn3",
             "key": "The fight with slime!",
             "value": "The fight with slime!"
@@ -524,11 +1054,6 @@
             "id": "qudn4",
             "key": "Gel? Why do you need it",
             "value": "Gel? Why do you need it"
-        },
-        {
-            "id": "qusn4",
-            "key": "Trader Sentry",
-            "value": "Trader Sentry"
         },
         {
             "id": "qudn5",
@@ -556,11 +1081,6 @@
             "value": "My first pickaxe"
         },
         {
-            "id": "qusn7",
-            "key": "Mining",
-            "value": "Mining"
-        },
-        {
             "id": "qudn8",
             "key": "Help destruction of dir",
             "value": "Help destruction of dir"
@@ -574,11 +1094,6 @@
             "id": "qudn9",
             "key": "Raid on the dirt",
             "value": "Raid on the dirt"
-        },
-        {
-            "id": "qusn9",
-            "key": "Deputy",
-            "value": "Deputy"
         },
         {
             "id": "qudn10",
@@ -596,19 +1111,9 @@
             "value": "Apostle"
         },
         {
-            "id": "qusn11",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
             "id": "qudn12",
             "key": "Adventurer",
             "value": "Adventurer"
-        },
-        {
-            "id": "qusn12",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
         },
         {
             "id": "qudn13",
@@ -616,19 +1121,9 @@
             "value": "Something is starting"
         },
         {
-            "id": "qusn13",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
             "id": "qudn14",
             "key": "History from Apostle",
             "value": "History from Apostle"
-        },
-        {
-            "id": "qusn14",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
         },
         {
             "id": "qudn15",
@@ -636,19 +1131,9 @@
             "value": "Diana has a problem"
         },
         {
-            "id": "qusn15",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
             "id": "qudn16",
             "key": "Mmm delicious",
             "value": "Mmm delicious"
-        },
-        {
-            "id": "qusn16",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
         },
         {
             "id": "qudn17",
@@ -656,19 +1141,9 @@
             "value": "Time learn something"
         },
         {
-            "id": "qusn17",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
             "id": "qudn18",
             "key": "Here are the goblins",
             "value": "Here are the goblins"
-        },
-        {
-            "id": "qusn18",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
         },
         {
             "id": "qudn19",
@@ -676,44 +1151,19 @@
             "value": "Occupation of goblins"
         },
         {
-            "id": "qusn19",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
             "id": "qudn20",
             "key": "Yasue San",
             "value": "Yasue San"
         },
         {
-            "id": "diaqu151",
-            "key": "You can only get it by creating. But in some cases merchants can sell.",
-            "value": "You can only get it by creating. But in some cases merchants can sell."
-        },
-        {
-            "id": "qusn20",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
-            "id": "diaqu154",
-            "key": "You can also improve picks this will depend on their effectiveness.",
-            "value": "You can also improve picks this will depend on their effectiveness."
-        },
-        {
-            "id": "qusn21",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
+            "id": "qudn21",
+            "key": "Abandoned mine",
+            "value": "Abandoned mine"
         },
         {
             "id": "qudn22",
             "key": "Goodbye Elfinia",
             "value": "Goodbye Elfinia"
-        },
-        {
-            "id": "qusn22",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
         },
         {
             "id": "qudn50",
@@ -751,19 +1201,9 @@
             "value": "First assignment"
         },
         {
-            "id": "qusn61",
-            "key": "Final fantasy",
-            "value": "Final fantasy"
-        },
-        {
             "id": "qudn62",
             "key": "Resonance",
             "value": "Resonance"
-        },
-        {
-            "id": "qusn62",
-            "key": "Final fantasy",
-            "value": "Final fantasy"
         },
         {
             "id": "stnm1",
@@ -791,22 +1231,7 @@
             "value": "Elven class"
         },
         {
-            "id": "hmnm2",
-            "key": "Elven class",
-            "value": "Elven class"
-        },
-        {
             "id": "hmnm6",
-            "key": "Asian-style home",
-            "value": "Asian-style home"
-        },
-        {
-            "id": "hmnm4",
-            "key": "Asian-style home",
-            "value": "Asian-style home"
-        },
-        {
-            "id": "hmnm5",
             "key": "Asian-style home",
             "value": "Asian-style home"
         },
@@ -879,26 +1304,6 @@
             "id": "diaqu25",
             "key": "Good [Talked]!",
             "value": "Good [Talked]!"
-        },
-        {
-            "id": "diaqu50",
-            "key": "Here you go, your boss told me to give it to you!",
-            "value": "Here you go, your boss told me to give it to you!"
-        },
-        {
-            "id": "diaqu51",
-            "key": "Thanks for the help.",
-            "value": "Thanks for the help."
-        },
-        {
-            "id": "diaqu40",
-            "key": "Here you go, your boss told me to give it to you!",
-            "value": "Here you go, your boss told me to give it to you!"
-        },
-        {
-            "id": "diaqu41",
-            "key": "Thanks for the help.",
-            "value": "Thanks for the help."
         },
         {
             "id": "diaqu50",
@@ -1196,9 +1601,9 @@
             "value": "To extract any ore [Player], you will need a pickaxe."
         },
         {
-            "id": "hmnm6",
-            "key": "Asian-style home",
-            "value": "Asian-style home"
+            "id": "diaqu151",
+            "key": "You can only get it by creating. But in some cases merchants can sell.",
+            "value": "You can only get it by creating. But in some cases merchants can sell."
         },
         {
             "id": "diaqu152",
@@ -1209,6 +1614,11 @@
             "id": "diaqu153",
             "key": "But you can't work with break pickaxe it. You can repair it at any store.",
             "value": "But you can't work with break pickaxe it. You can repair it at any store."
+        },
+        {
+            "id": "diaqu154",
+            "key": "You can also improve picks this will depend on their effectiveness.",
+            "value": "You can also improve picks this will depend on their effectiveness."
         },
         {
             "id": "diaqu155",
@@ -1451,11 +1861,6 @@
             "value": "Well have a good day [Talked] :)"
         },
         {
-            "id": "diaqu240",
-            "key": "Are you ready?",
-            "value": "Are you ready?"
-        },
-        {
             "id": "diaqu241",
             "key": "What, ready?",
             "value": "What, ready?"
@@ -1606,9 +2011,9 @@
             "value": "What could I do?"
         },
         {
-            "id": "diaqu282",
-            "key": "I thought you were joking, you wouldn't take it seriously, but you came.",
-            "value": "I thought you were joking, you wouldn't take it seriously, but you came."
+            "id": "ittm17",
+            "key": "Little bag of gold",
+            "value": "Little bag of gold"
         },
         {
             "id": "diaqu283",
@@ -2611,614 +3016,9 @@
             "value": "No, I don't want to expose them to danger."
         },
         {
-            "id": "diaqu696",
-            "key": "Well",
-            "value": "Well"
-        },
-        {
             "id": "diaqu700",
             "key": "Well, goodbye [Talked], I'll keep going. I want to be stronger than I was before.",
             "value": "Well, goodbye [Talked], I'll keep going. I want to be stronger than I was before."
-        },
-        {
-            "id": "diaqu701",
-            "key": "All right [Player]. Good luck don't forget that we will always be happy to welcome you as a guest ;)",
-            "value": "All right [Player]. Good luck don't forget that we will always be happy to welcome you as a guest ;)"
-        },
-        {
-            "id": "diaqu702",
-            "key": "Don't forget, don't miss me ;)",
-            "value": "Don't forget, don't miss me ;)"
-        },
-        {
-            "id": "diaqu703",
-            "key": "Don't worry, Diana is very attached to you. I think she will be offended. Talk to she!",
-            "value": "Don't worry, Diana is very attached to you. I think she will be offended. Talk to she!"
-        },
-        {
-            "id": "diaqu710",
-            "key": "Why didn't you tell [Player] me you were going to leave?",
-            "value": "Why didn't you tell [Player] me you were going to leave?"
-        },
-        {
-            "id": "diaqu711",
-            "key": "I'm Sorry [Talked]. I wanted to tell you..",
-            "value": "I'm Sorry [Talked]. I wanted to tell you.."
-        },
-        {
-            "id": "diaqu712",
-            "key": "**She said sadly**: Why? Will you take me with you?",
-            "value": "**She said sadly**: Why? Will you take me with you?"
-        },
-        {
-            "id": "diaqu713",
-            "key": "I don't want to put you in danger!",
-            "value": "I don't want to put you in danger!"
-        },
-        {
-            "id": "diaqu714",
-            "key": "I want to travel with you!",
-            "value": "I want to travel with you!"
-        },
-        {
-            "id": "diaqu715",
-            "key": "Ok, I'll take you. Now let me to say Yasue San.",
-            "value": "Ok, I'll take you. Now let me to say Yasue San."
-        },
-        {
-            "id": "diaqu716",
-            "key": "**She said joyfully**: True? Thank! ;)",
-            "value": "**She said joyfully**: True? Thank! ;)"
-        },
-        {
-            "id": "diaqu720",
-            "key": "Well, ready to go?",
-            "value": "Well, ready to go?"
-        },
-        {
-            "id": "diaqu721",
-            "key": "Yes, will I take Diana with me?",
-            "value": "Yes, will I take Diana with me?"
-        },
-        {
-            "id": "diaqu722",
-            "key": "Yes, of course, set sail:) I will show you my homeland!",
-            "value": "Yes, of course, set sail:) I will show you my homeland!"
-        },
-        {
-            "id": "dianp10",
-            "key": "**He said surprised**: What a wonderful weather today!",
-            "value": "**He said surprised**: What a wonderful weather today!"
-        },
-        {
-            "id": "dianp11",
-            "key": "Yes, I think so too.",
-            "value": "Yes, I think so too."
-        },
-        {
-            "id": "dianp12",
-            "key": "Well, how do you like on our ship [Player]? Captures the ocean, i think I'll stay here a little longer, it's wonderful here.",
-            "value": "Well, how do you like on our ship [Player]? Captures the ocean, i think I'll stay here a little longer, it's wonderful here."
-        },
-        {
-            "id": "dianp13",
-            "key": "I also really like it. Okay, I'll go, I wish you a good rest [Talked]!",
-            "value": "I also really like it. Okay, I'll go, I wish you a good rest [Talked]!"
-        },
-        {
-            "id": "dianp14",
-            "key": "And I wish you good luck too [Player]!",
-            "value": "And I wish you good luck too [Player]!"
-        },
-        {
-            "id": "dianp20",
-            "key": "**He looks very tired**: Very hot, impossible to work.",
-            "value": "**He looks very tired**: Very hot, impossible to work."
-        },
-        {
-            "id": "dianp30",
-            "key": "Hello, I arrived from a small village beyond the mountains and the ocean, my name is [Player], I have a desire to become an adventurer. But I do not know about this place, could you help me?",
-            "value": "Hello, I arrived from a small village beyond the mountains and the ocean, my name is [Player], I have a desire to become an adventurer. But I do not know about this place, could you help me?"
-        },
-        {
-            "id": "dianp31",
-            "key": "Hello [Player], Yes of course I will help you, explain where you need to go, but you help my workers, they do not cope at all.",
-            "value": "Hello [Player], Yes of course I will help you, explain where you need to go, but you help my workers, they do not cope at all."
-        },
-        {
-            "id": "dianp32",
-            "key": "What you need help with, I'm good at dealing with predators without meat you will not leave! *laughter*",
-            "value": "What you need help with, I'm good at dealing with predators without meat you will not leave! *laughter*"
-        },
-        {
-            "id": "dianp33",
-            "key": "Oh, you're a Joker, no thanks go a little further guys will explain everything to you!",
-            "value": "Oh, you're a Joker, no thanks go a little further guys will explain everything to you!"
-        },
-        {
-            "id": "dianp34",
-            "key": "OK, thanks!",
-            "value": "OK, thanks!"
-        },
-        {
-            "id": "dianp90",
-            "key": "Hey, pst! You, yes, you!",
-            "value": "Hey, pst! You, yes, you!"
-        },
-        {
-            "id": "dianp91",
-            "key": "Yeah? How can I help?",
-            "value": "Yeah? How can I help?"
-        },
-        {
-            "id": "dianp92",
-            "key": "You cannot help me, kid! I just need...to TEST you, yes...!",
-            "value": "You cannot help me, kid! I just need...to TEST you, yes...!"
-        },
-        {
-            "id": "dianp100",
-            "key": "Hi my name is [Player], [Talked] are you working?",
-            "value": "Hi my name is [Player], [Talked] are you working?"
-        },
-        {
-            "id": "dianp101",
-            "key": "Hello [Player], Yes, I am on duty as a guard, and I also trade a little",
-            "value": "Hello [Player], Yes, I am on duty as a guard, and I also trade a little"
-        },
-        {
-            "id": "dianp102",
-            "key": "Can you tell me how difficult it is to get into the service?",
-            "value": "Can you tell me how difficult it is to get into the service?"
-        },
-        {
-            "id": "dianp103",
-            "key": "If that's what you want, it's easy. And if you don't then you won't be able to get in ;)",
-            "value": "If that's what you want, it's easy. And if you don't then you won't be able to get in ;)"
-        },
-        {
-            "id": "dianp104",
-            "key": "By the way [Player], I need help, there are slugs nearby, again raging, and I can't leave the post. At the same time you will test your skills young adventurer.",
-            "value": "By the way [Player], I need help, there are slugs nearby, again raging, and I can't leave the post. At the same time you will test your skills young adventurer."
-        },
-        {
-            "id": "dianp105",
-            "key": "Yes, no problem, wait [Talked]!!",
-            "value": "Yes, no problem, wait [Talked]!!"
-        },
-        {
-            "id": "dianp110",
-            "key": "**He says with a look of horror on his face**: Help me find my daughter, she went to the village for food and never returned.",
-            "value": "**He says with a look of horror on his face**: Help me find my daughter, she went to the village for food and never returned."
-        },
-        {
-            "id": "dianp111",
-            "key": "To the village? [Talked] Yes of course I will help. That's where I need to go!",
-            "value": "To the village? [Talked] Yes of course I will help. That's where I need to go!"
-        },
-        {
-            "id": "dianp112",
-            "key": "Thanks a lot",
-            "value": "Thanks a lot"
-        },
-        {
-            "id": "dianp130",
-            "key": "Hello, would you like to learn the basics of mining?",
-            "value": "Hello, would you like to learn the basics of mining?"
-        },
-        {
-            "id": "dianp131",
-            "key": "Yes, of course, I don't mind",
-            "value": "Yes, of course, I don't mind"
-        },
-        {
-            "id": "dianp132",
-            "key": "All right follow me I'll explain the basics to you!",
-            "value": "All right follow me I'll explain the basics to you!"
-        },
-        {
-            "id": "dianp140",
-            "key": "Hello, and so you're new here?",
-            "value": "Hello, and so you're new here?"
-        },
-        {
-            "id": "dianp141",
-            "key": "Yes.",
-            "value": "Yes."
-        },
-        {
-            "id": "dianp142",
-            "key": "I need to register you. Please introduce yourself, and the purpose of your arrival, and the time you to stay here",
-            "value": "I need to register you. Please introduce yourself, and the purpose of your arrival, and the time you to stay here"
-        },
-        {
-            "id": "dianp143",
-            "key": "My name is [Player]. I came here to become an adventurer. I can't tell you the exact time of stay.",
-            "value": "My name is [Player]. I came here to become an adventurer. I can't tell you the exact time of stay."
-        },
-        {
-            "id": "dianp144",
-            "key": "And who for you should know the time of your stay here.",
-            "value": "And who for you should know the time of your stay here."
-        },
-        {
-            "id": "dianp145",
-            "key": "Okay well, I will write you down, in case of violation of the rules of our village, we have every right to prohibit your presence here, and report to superiors.",
-            "value": "Okay well, I will write you down, in case of violation of the rules of our village, we have every right to prohibit your presence here, and report to superiors."
-        },
-        {
-            "id": "dianp146",
-            "key": "Have a good day!",
-            "value": "Have a good day!"
-        },
-        {
-            "id": "dianp147",
-            "key": "Thank's [Talked]!",
-            "value": "Thank's [Talked]!"
-        },
-        {
-            "id": "dianp160",
-            "key": "[Stranger]Greetings, wanderer. *bowing*",
-            "value": "[Stranger]Greetings, wanderer. *bowing*"
-        },
-        {
-            "id": "dianp161",
-            "key": "I am the Deputy of the Apostle, and I also protect her.",
-            "value": "I am the Deputy of the Apostle, and I also protect her."
-        },
-        {
-            "id": "dianp162",
-            "key": "I think you've already heard, that the monsters are raging.",
-            "value": "I think you've already heard, that the monsters are raging."
-        },
-        {
-            "id": "dianp163",
-            "key": "I have a request for you [Player]",
-            "value": "I have a request for you [Player]"
-        },
-        {
-            "id": "dianp164",
-            "key": "Which one?",
-            "value": "Which one?"
-        },
-        {
-            "id": "dianp165",
-            "key": "Help in the southern part to win over the monsters. We can't drive them away but we can scare them away.",
-            "value": "Help in the southern part to win over the monsters. We can't drive them away but we can scare them away."
-        },
-        {
-            "id": "dianp166",
-            "key": "Of course I will.",
-            "value": "Of course I will."
-        },
-        {
-            "id": "dianp167",
-            "key": "Thank's [Player]!",
-            "value": "Thank's [Player]!"
-        },
-        {
-            "id": "dianp180",
-            "key": "You look awful today, [Talked]! What happend?",
-            "value": "You look awful today, [Talked]! What happend?"
-        },
-        {
-            "id": "dianp181",
-            "key": "Oh.. don't you worry about me, boy..",
-            "value": "Oh.. don't you worry about me, boy.."
-        },
-        {
-            "id": "dianp182",
-            "key": "But I DO worry!",
-            "value": "But I DO worry!"
-        },
-        {
-            "id": "dianp183",
-            "key": "I'm tired of these fight I have with my wife, it's personal bussiness.",
-            "value": "I'm tired of these fight I have with my wife, it's personal bussiness."
-        },
-        {
-            "id": "dianp184",
-            "key": "I didn't want to be a pain to you, Officer. I will leave you to your problems now.",
-            "value": "I didn't want to be a pain to you, Officer. I will leave you to your problems now."
-        },
-        {
-            "id": "dianp185",
-            "key": "No! Wait!",
-            "value": "No! Wait!"
-        },
-        {
-            "id": "dianp190",
-            "key": "Hello [Player], I have come to you from the Final Fantasy universe, my name is [Talked].",
-            "value": "Hello [Player], I have come to you from the Final Fantasy universe, my name is [Talked]."
-        },
-        {
-            "id": "dianp191",
-            "key": "I can't say for sure how long I will be here, but for now I will be happy to know your world, and I will be happy to show my world",
-            "value": "I can't say for sure how long I will be here, but for now I will be happy to know your world, and I will be happy to show my world"
-        },
-        {
-            "id": "dianp192",
-            "key": "Are you serious? Did the author smoke dope?",
-            "value": "Are you serious? Did the author smoke dope?"
-        },
-        {
-            "id": "dianp193",
-            "key": "Maybe so, I have a couple of things that you can get from me, but not for free. I'll need the fragments I lost",
-            "value": "Maybe so, I have a couple of things that you can get from me, but not for free. I'll need the fragments I lost"
-        },
-        {
-            "id": "dianp250",
-            "key": "Welcome home, sir! **she made a bow**",
-            "value": "Welcome home, sir! **she made a bow**"
-        },
-        {
-            "id": "aeth1",
-            "key": "Crossroad",
-            "value": "Crossroad"
-        },
-        {
-            "id": "aeth2",
-            "key": "Pier",
-            "value": "Pier"
-        },
-        {
-            "id": "aeth3",
-            "key": "Guard post",
-            "value": "Guard post"
-        },
-        {
-            "id": "aeth4",
-            "key": "Yugasaki",
-            "value": "Yugasaki"
-        },
-        {
-            "id": "attb13",
-            "key": "Ammo",
-            "value": "Ammo"
-        },
-        {
-            "id": "itdc1",
-            "key": "Major currency",
-            "value": "Major currency"
-        },
-        {
-            "id": "ittm2",
-            "key": "Hammer",
-            "value": "Hammer"
-        },
-        {
-            "id": "itdc2",
-            "key": "A normal hammer",
-            "value": "A normal hammer"
-        },
-        {
-            "id": "ittm3",
-            "key": "Gun",
-            "value": "Gun"
-        },
-        {
-            "id": "itdc6",
-            "key": "Conventional weapon",
-            "value": "Conventional weapon"
-        },
-        {
-            "id": "ittm4",
-            "key": "Shotgun",
-            "value": "Shotgun"
-        },
-        {
-            "id": "itdc4",
-            "key": "Conventional weapon",
-            "value": "Conventional weapon"
-        },
-        {
-            "id": "ittm5",
-            "key": "Grenade",
-            "value": "Grenade"
-        },
-        {
-            "id": "itdc5",
-            "key": "Conventional weapon",
-            "value": "Conventional weapon"
-        },
-        {
-            "id": "ittm6",
-            "key": "Rifle",
-            "value": "Rifle"
-        },
-        {
-            "id": "itdc6",
-            "key": "Conventional weapon",
-            "value": "Conventional weapon"
-        },
-        {
-            "id": "ittm7",
-            "key": "Material",
-            "value": "Material"
-        },
-        {
-            "id": "itdc7",
-            "key": "Required to improve weapons",
-            "value": "Required to improve weapons"
-        },
-        {
-            "id": "ittm8",
-            "key": "Ticket guild",
-            "value": "Ticket guild"
-        },
-        {
-            "id": "itdc8",
-            "key": "Command: /gcreate <name>",
-            "value": "Command: /gcreate <name>"
-        },
-        {
-            "id": "ittm9",
-            "key": "Skill Point",
-            "value": "Skill Point"
-        },
-        {
-            "id": "itdc9",
-            "key": "Skill point",
-            "value": "Skill point"
-        },
-        {
-            "id": "ittm10",
-            "key": "Decoration Armor",
-            "value": "Decoration Armor"
-        },
-        {
-            "id": "itdc13",
-            "key": "Decoration for house!",
-            "value": "Decoration for house!"
-        },
-        {
-            "id": "ittm11",
-            "key": "Decoration Hearth Elite",
-            "value": "Decoration Hearth Elite"
-        },
-        {
-            "id": "itdc11",
-            "key": "Decoration for house!",
-            "value": "Decoration for house!"
-        },
-        {
-            "id": "ittm12",
-            "key": "Decoration Ninja Elite",
-            "value": "Decoration Ninja Elite"
-        },
-        {
-            "id": "itdc12",
-            "key": "Decoration for house!",
-            "value": "Decoration for house!"
-        },
-        {
-            "id": "ittm13",
-            "key": "Decoration Hearth",
-            "value": "Decoration Hearth"
-        },
-        {
-            "id": "itdc13",
-            "key": "Decoration for house!",
-            "value": "Decoration for house!"
-        },
-        {
-            "id": "ittm14",
-            "key": "Potion mana regen",
-            "value": "Potion mana regen"
-        },
-        {
-            "id": "itdc14",
-            "key": "Regenerate +5%, 15sec every sec.\n",
-            "value": "Regenerate +5%, 15sec every sec.\n"
-        },
-        {
-            "id": "ittm15",
-            "key": "Potion health regen",
-            "value": "Potion health regen"
-        },
-        {
-            "id": "itdc15",
-            "key": "Regenerate +3% health, 15sec every sec.",
-            "value": "Regenerate +3% health, 15sec every sec."
-        },
-        {
-            "id": "ittm16",
-            "key": "Capsule survival experience",
-            "value": "Capsule survival experience"
-        },
-        {
-            "id": "itdc16",
-            "key": "You got 10-50 experience survival",
-            "value": "You got 10-50 experience survival"
-        },
-        {
-            "id": "ittm17",
-            "key": "Little bag of gold",
-            "value": "Little bag of gold"
-        },
-        {
-            "id": "itdc17",
-            "key": "You got 10-50 gold",
-            "value": "You got 10-50 gold"
-        },
-        {
-            "id": "ittm18",
-            "key": "Mirt",
-            "value": "Mirt"
-        },
-        {
-            "id": "itdc18",
-            "key": "Information added later.",
-            "value": "Information added later."
-        },
-        {
-            "id": "ittm20",
-            "key": "Potato",
-            "value": "Potato"
-        },
-        {
-            "id": "itdc24",
-            "key": "Material need for craft!",
-            "value": "Material need for craft!"
-        },
-        {
-            "id": "ittm21",
-            "key": "Notebook",
-            "value": "Notebook"
-        },
-        {
-            "id": "itdc21",
-            "key": "In it, something is written",
-            "value": "In it, something is written"
-        },
-        {
-            "id": "ittm22",
-            "key": "Glue",
-            "value": "Glue"
-        },
-        {
-            "id": "itdc22",
-            "key": "I wonder what it's for?",
-            "value": "I wonder what it's for?"
-        },
-        {
-            "id": "ittm23",
-            "key": "Board",
-            "value": "Board"
-        },
-        {
-            "id": "itdc23",
-            "key": "Plain Board",
-            "value": "Plain Board"
-        },
-        {
-            "id": "ittm24",
-            "key": "Mushroom",
-            "value": "Mushroom"
-        },
-        {
-            "id": "itdc24",
-            "key": "Material need for craft!",
-            "value": "Material need for craft!"
-        },
-        {
-            "id": "ittm25",
-            "key": "Potion resurrection",
-            "value": "Potion resurrection"
-        },
-        {
-            "id": "itdc25",
-            "key": "Resuscitates in the zone where you died!",
-            "value": "Resuscitates in the zone where you died!"
-        },
-        {
-            "id": "itdc26",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
-        },
-        {
-            "id": "ittm27",
-            "key": "Young fighter's ring",
-            "value": "Young fighter's ring"
         },
         {
             "id": "attb1",
@@ -3311,7 +3111,7 @@
             "value": "Стойкость"
         },
         {
-            "id": "itdc10007",
+            "id": "itdc10018",
             "key": "Covered in secrets",
             "value": "Покрытый тайнами"
         },
@@ -3321,29 +3121,14 @@
             "value": "Небесные крылья"
         },
         {
-            "id": "itdc10008",
-            "key": "Covered in secrets",
-            "value": "Покрытый тайнами"
-        },
-        {
             "id": "ittm10009",
             "key": "Rainbow wings",
             "value": "Радужные крылья"
         },
         {
-            "id": "itdc10009",
-            "key": "Covered in secrets",
-            "value": "Покрытый тайнами"
-        },
-        {
             "id": "ittm10010",
             "key": "Magitech hammer",
             "value": "Magitech молот"
-        },
-        {
-            "id": "itdc10024",
-            "key": "Reinforced kick",
-            "value": "Усиленный удар"
         },
         {
             "id": "ittm10011",
@@ -3361,19 +3146,9 @@
             "value": "Magitech дробовик"
         },
         {
-            "id": "itdc10012",
-            "key": "It look doesn't bad",
-            "value": "Это выглядит не плохо"
-        },
-        {
             "id": "ittm10013",
             "key": "Magitech grenade",
             "value": "Magitech граната"
-        },
-        {
-            "id": "itdc10013",
-            "key": "It look doesn't bad",
-            "value": "Это выглядит не плохо"
         },
         {
             "id": "ittm10014",
@@ -3381,19 +3156,9 @@
             "value": "Magitech лазер"
         },
         {
-            "id": "itdc10014",
-            "key": "It look doesn't bad",
-            "value": "Это выглядит не плохо"
-        },
-        {
             "id": "ittm10015",
             "key": "Stars wings",
             "value": "Звездные крылья"
-        },
-        {
-            "id": "itdc10015",
-            "key": "Covered in secrets",
-            "value": "Покрытый тайнами"
         },
         {
             "id": "ittm10016",
@@ -3401,19 +3166,9 @@
             "value": "Крылья мыши"
         },
         {
-            "id": "itdc10016",
-            "key": "Covered in secrets",
-            "value": "Покрытый тайнами"
-        },
-        {
             "id": "ittm10017",
             "key": "Little eagle wings",
             "value": "Крылья юного орла"
-        },
-        {
-            "id": "itdc10017",
-            "key": "Covered in secrets",
-            "value": "Покрытый тайнами"
         },
         {
             "id": "ittm10018",
@@ -3421,19 +3176,9 @@
             "value": "Крылья некроманта"
         },
         {
-            "id": "itdc10018",
-            "key": "Covered in secrets",
-            "value": "Покрытый тайнами"
-        },
-        {
             "id": "ittm10019",
             "key": "Goblin hammer",
             "value": "Молот гоблина"
-        },
-        {
-            "id": "itdc10019",
-            "key": "Reinforced kick",
-            "value": "Усиленый удар"
         },
         {
             "id": "ittm10020",
@@ -3441,19 +3186,9 @@
             "value": "Пистолет гоблина"
         },
         {
-            "id": "itdc10020",
-            "key": "It look doesn't bad",
-            "value": "Это выглядит не плохо"
-        },
-        {
             "id": "ittm10021",
             "key": "Goblin shotgun",
             "value": "Дробовик гоблина"
-        },
-        {
-            "id": "itdc10021",
-            "key": "It look doesn't bad",
-            "value": "Это выглядит не плохо"
         },
         {
             "id": "ittm10022",
@@ -3461,29 +3196,14 @@
             "value": "Ракетница гоблина"
         },
         {
-            "id": "itdc10022",
-            "key": "It look doesn't bad",
-            "value": "Это выглядит не плохо"
-        },
-        {
             "id": "ittm10023",
             "key": "Goblin rifle",
             "value": "Лазер гоблина"
         },
         {
-            "id": "itdc10023",
-            "key": "It look doesn't bad",
-            "value": "Это выглядит не плохо"
-        },
-        {
             "id": "ittm10024",
             "key": "Scythe",
             "value": "Коса"
-        },
-        {
-            "id": "itdc10024",
-            "key": "Reinforced kick",
-            "value": "Усиленый удар"
         },
         {
             "id": "ittm15000",
@@ -3501,29 +3221,14 @@
             "value": "Тема Final Fantasy"
         },
         {
-            "id": "itdc15001",
-            "key": "Strictly limited as the theme",
-            "value": "Строго лимитированая тема"
-        },
-        {
             "id": "ittm15002",
             "key": "Theme Aion",
             "value": "Тема Aion"
         },
         {
-            "id": "itdc15002",
-            "key": "Strictly limited as the theme",
-            "value": "Строго лимитированая тема"
-        },
-        {
             "id": "ittm15003",
             "key": "Theme Dragon Nest",
             "value": "Тема Dragon Nest"
-        },
-        {
-            "id": "itdc15003",
-            "key": "Strictly limited as the theme",
-            "value": "Строго лимитированая тема"
         },
         {
             "id": "sknm1",
@@ -3581,11 +3286,6 @@
             "value": "Вы сможете вести авто огонь"
         },
         {
-            "id": "skbn4",
-            "key": "can perform an auto fire with all types of weapons",
-            "value": "может вести авто огонь из всех орудий"
-        },
-        {
             "id": "sknm5",
             "key": "Blessing of God of war",
             "value": "Благословение Бога войны"
@@ -3621,7 +3321,7 @@
             "value": "Ангела крылья"
         },
         {
-            "id": "itdc10000",
+            "id": "itdc10024",
             "key": "Reinforced kick",
             "value": "Усиленый удар"
         },
@@ -4294,6 +3994,11 @@
             "id": null,
             "key": "Top 10 players wealthy",
             "value": "Топ 10 игроков по золоту"
+        },
+        {
+            "id": "skbn4",
+            "key": "can perform an auto fire with all types of weapons",
+            "value": "может вести авто огонь из всех орудий"
         }
     ]
 }

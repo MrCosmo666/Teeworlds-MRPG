@@ -2,190 +2,255 @@
     "translation": [
         {
             "id": null,
+            "key": "Mana required {INT}%",
+            "value": "Mana required {INT}%"
+        },
+        {
+            "id": null,
+            "key": "Used on {STR}",
+            "value": "Used on {STR}"
+        },
+        {
+            "id": null,
+            "key": "Learn {STR}",
+            "value": "Learn {STR}"
+        },
+        {
+            "id": null,
+            "key": "Max level {INT} {STR}",
+            "value": "Max level {INT} {STR}"
+        },
+        {
+            "id": null,
+            "key": "Next level {INT} {STR}",
+            "value": "Next level {INT} {STR}"
+        },
+        {
+            "id": null,
+            "key": "Skill Learn Information",
+            "value": "Skill Learn Information"
+        },
+        {
+            "id": null,
+            "key": "Here you can learn passive and active skills",
+            "value": "Here you can learn passive and active skills"
+        },
+        {
+            "id": null,
+            "key": "You can bind active skill any button using the console",
+            "value": "You can bind active skill any button using the console"
+        },
+        {
+            "id": null,
+            "key": "Improving",
+            "value": "Improving"
+        },
+        {
+            "id": null,
+            "key": "Healing",
+            "value": "Healing"
+        },
+        {
+            "id": null,
+            "key": "Attacking",
+            "value": "Attacking"
+        },
+        {
+            "id": null,
+            "key": "Defensive",
+            "value": "Defensive"
+        },
+        {
+            "id": null,
+            "key": "{STR} skill's",
+            "value": "{STR} skill's"
+        },
+        {
+            "id": null,
             "key": "Auto equip {STR} - {STR}",
             "value": "Auto equip {STR} - {STR}"
         },
-		{
+        {
             "id": null,
             "key": "This item cannot have more than 1 item",
             "value": "This item cannot have more than 1 item"
         },
-		{
+        {
             "id": null,
             "key": "Create Slot Auction {STR}",
             "value": "Create Slot Auction {STR}"
         },
-		{
+        {
             "id": null,
             "key": "Drop {STR}",
             "value": "Drop {STR}"
         },
-		{
+        {
             "id": null,
             "key": "Disassemble {STR} (+{INT} materials)",
             "value": "Disassemble {STR} (+{INT} materials)"
         },
-		{
+        {
             "id": null,
             "key": "Enchant {STR} ({INT} materials)",
             "value": "Enchant {STR} ({INT} materials)"
         },
-		{
+        {
             "id": null,
             "key": "To plant {STR}, to house (0.06%)",
             "value": "To plant {STR}, to house (0.06%)"
         },
-		{
+        {
             "id": null,
             "key": "You can not undress equipping hammer",
             "value": "You can not undress equipping hammer"
         },
-		{
+        {
             "id": null,
             "key": "Add {STR} to your guild house",
             "value": "Add {STR} to your guild house"
         },
-		{
+        {
             "id": null,
             "key": "Add {STR} to your house",
             "value": "Add {STR} to your house"
         },
-		{
+        {
             "id": null,
             "key": "Auto use {STR} - {STR}",
             "value": "Auto use {STR} - {STR}"
         },
-		{
+        {
             "id": null,
             "key": "Use {STR}",
             "value": "Use {STR}"
         },
-		{
+        {
             "id": null,
             "key": "For bind command '/useitem {INT}'",
             "value": "For bind command '/useitem {INT}'"
         },
-		{
+        {
             "id": null,
             "key": "'{STR}' frozen for some quest.",
             "value": "'{STR}' frozen for some quest."
         },
-		{
+        {
             "id": null,
-            "key": "In the 'Adventure Journal', you can see in which quest an item is used",
-            "value": "In the 'Adventure Journal', you can see in which quest an item is used"
+            "key": "In the 'Journal', you can see in which quest an item is used",
+            "value": "In the 'Journal', you can see in which quest an item is used"
         },
-		{
+        {
             "id": null,
             "key": "{STR} enchant {STR} {STR} {STR}",
             "value": "{STR} enchant {STR} {STR} {STR}"
         },
-		{
+        {
             "id": null,
             "key": "Enchantment level is maximum",
             "value": "Enchantment level is maximum"
         },
-		{
+        {
             "id": null,
             "key": "Disassemble {STR}x{INT}, you receive {INT} materials",
             "value": "Disassemble {STR}x{INT}, you receive {INT} materials"
         },
-		{
+        {
             "id": null,
             "key": "You drop {STR}x{INT}",
             "value": "You drop {STR}x{INT}"
         },
-		{
+        {
             "id": null,
             "key": "There are no items in this tab",
             "value": "There are no items in this tab"
         },
-		{
+        {
             "id": null,
             "key": "{STR} Not equipped",
             "value": "{STR} Not equipped"
         },
-		{
+        {
             "id": null,
             "key": "Equip Select Slot",
             "value": "Equip Select Slot"
         },
-		{
+        {
             "id": null,
             "key": "Select tab and select armor.",
             "value": "Select tab and select armor."
         },
-		{
+        {
             "id": null,
             "key": "Equip / Armor Information",
             "value": "Equip / Armor Information"
         },
-		{
+        {
             "id": null,
             "key": "Inventory Information",
             "value": "Inventory Information"
         },
-		{
+        {
             "id": null,
             "key": "Choose the type of items you want to show",
             "value": "Choose the type of items you want to show"
         },
-		{
+        {
             "id": null,
             "key": "You got of the {STR}x{INT}.",
             "value": "You got of the {STR}x{INT}."
         },
-		{
+        {
             "id": null,
             "key": "After, need select item to interact",
             "value": "After, need select item to interact"
         },
-		{
+        {
             "id": null,
             "key": "You got of the {STR}x{INT}.",
             "value": "You got of the {STR}x{INT}."
         },
-		{
+        {
             "id": null,
             "key": "{STR} got of the {STR}x{INT}.",
             "value": "{STR} got of the {STR}x{INT}."
         },
-		{
+        {
             "id": null,
             "key": "{STR} used {STR}x{INT} and got {INT} survival experience.",
             "value": "{STR} used {STR}x{INT} and got {INT} survival experience."
         },
-		{
+        {
             "id": null,
             "key": "This item can only be used (Auto Use, and then craft).",
             "value": "This item can only be used (Auto Use, and then craft)."
         },
-		{
+        {
             "id": null,
             "key": "{STR} used {STR} returned {INT} upgrades.",
             "value": "{STR} used {STR} returned {INT} upgrades."
         },
-		{
+        {
             "id": null,
             "key": "{STR} used {STR}x{INT} and got {INT} gold.",
             "value": "{STR} used {STR}x{INT} and got {INT} gold."
         },
-		{
+        {
             "id": null,
             "key": "Wait until the last random box opens!",
             "value": "Wait until the last random box opens!"
         },
-		{
+        {
             "id": null,
             "key": "You used '{STR}x{INT}'.",
             "value": "You used '{STR}x{INT}'."
         },
-		{
+        {
             "id": null,
             "key": "{STR} uses '{STR}x{INT}' and got:",
             "value": "{STR} uses '{STR}x{INT}' and got:"
         },
-		{
+        {
             "id": null,
             "key": "{INT}. {STR} | {INT}:{INT}min | {INT}P",
             "value": "{INT}. {STR} | {INT}:{INT}min | {INT}P"
@@ -206,79 +271,9 @@
             "value": "Gold: {INT}"
         },
         {
-            "id": "skbn1",
-            "key": "life span",
-            "value": "life span"
-        },
-        {
-            "id": "sknm2",
-            "key": "Sleepy Gravity",
-            "value": "Sleepy Gravity"
-        },
-        {
-            "id": "skds2",
-            "key": "Magnet mobs to itself",
-            "value": "Magnet mobs to itself"
-        },
-        {
-            "id": "skbn2",
-            "key": "radius",
-            "value": "radius"
-        },
-        {
             "id": null,
             "key": "Dungeons",
             "value": "Dungeons"
-        },
-        {
-            "id": "sknm3",
-            "key": "Craft Discount",
-            "value": "Craft Discount"
-        },
-        {
-            "id": "skds3",
-            "key": "Will give discount on the price of craft items",
-            "value": "Will give discount on the price of craft items"
-        },
-        {
-            "id": "skbn3",
-            "key": "% discount gold for craft item",
-            "value": "% discount gold for craft item"
-        },
-        {
-            "id": "sknm4",
-            "key": "Proficiency with weapons",
-            "value": "Proficiency with weapons"
-        },
-        {
-            "id": "skds4",
-            "key": "You can perform an automatic fire",
-            "value": "You can perform an automatic fire"
-        },
-        {
-            "id": "skbn4",
-            "key": "can perform an auto fire with all types of weapons",
-            "value": "can perform an auto fire with all types of weapons"
-        },
-        {
-            "id": "sknm5",
-            "key": "Blessing of God of war",
-            "value": "Blessing of God of war"
-        },
-        {
-            "id": "skds5",
-            "key": "The blessing restores ammo",
-            "value": "The blessing restores ammo"
-        },
-        {
-            "id": "skbn5",
-            "key": "% recovers ammo within a radius of 800",
-            "value": "% recovers ammo within a radius of 800"
-        },
-        {
-            "id": "sknm6",
-            "key": "Noctis Lucis Attack Teleport",
-            "value": "Noctis Lucis Attack Teleport"
         },
         {
             "id": null,
@@ -306,54 +301,9 @@
             "value": "Disciple of Jobs"
         },
         {
-            "id": "skds6",
-            "key": "An attacking teleport that deals damage to all mobs radius",
-            "value": "An attacking teleport that deals damage to all mobs radius"
-        },
-        {
-            "id": "skbn6",
-            "key": "% your strength",
-            "value": "% your strength"
-        },
-        {
-            "id": "qudn1",
-            "key": "Help for workers",
-            "value": "Help for workers"
-        },
-        {
-            "id": "qusn2",
-            "key": "Main: Arrival",
-            "value": "Main: Arrival"
-        },
-        {
-            "id": "qudn2",
-            "key": "Helping a girl",
-            "value": "Helping a girl"
-        },
-        {
-            "id": "qusn2",
-            "key": "Main: Arrival",
-            "value": "Main: Arrival"
-        },
-        {
-            "id": "qudn3",
-            "key": "The fight with slime!",
-            "value": "The fight with slime!"
-        },
-        {
             "id": null,
             "key": "Here you can see chance loot, mobs, on YOUR ZONE.",
             "value": "Here you can see chance loot, mobs, on YOUR ZONE."
-        },
-        {
-            "id": "qusn4",
-            "key": "Trader Sentry",
-            "value": "Trader Sentry"
-        },
-        {
-            "id": "qudn4",
-            "key": "Gel? Why do you need it",
-            "value": "Gel? Why do you need it"
         },
         {
             "id": null,
@@ -366,309 +316,9 @@
             "value": "Player Upgrade Point: {INT}P"
         },
         {
-            "id": "qusn4",
-            "key": "Trader Sentry",
-            "value": "Trader Sentry"
-        },
-        {
-            "id": "qudn5",
-            "key": "Search for a daughter",
-            "value": "Search for a daughter"
-        },
-        {
-            "id": "qusn5",
-            "key": "Sailor",
-            "value": "Sailor"
-        },
-        {
-            "id": "qudn6",
-            "key": "What is ore mining?",
-            "value": "What is ore mining?"
-        },
-        {
-            "id": "qusn7",
-            "key": "Mining",
-            "value": "Mining"
-        },
-        {
-            "id": "qudn7",
-            "key": "My first pickaxe",
-            "value": "My first pickaxe"
-        },
-        {
-            "id": "qusn7",
-            "key": "Mining",
-            "value": "Mining"
-        },
-        {
-            "id": "qudn8",
-            "key": "Help destruction of dir",
-            "value": "Help destruction of dir"
-        },
-        {
-            "id": "qusn9",
-            "key": "Deputy",
-            "value": "Deputy"
-        },
-        {
-            "id": "qudn9",
-            "key": "Raid on the dirt",
-            "value": "Raid on the dirt"
-        },
-        {
-            "id": "qusn9",
-            "key": "Deputy",
-            "value": "Deputy"
-        },
-        {
-            "id": "qudn10",
-            "key": "Acquaintance",
-            "value": "Acquaintance"
-        },
-        {
-            "id": "qusn22",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
-            "id": "qudn11",
-            "key": "Apostle",
-            "value": "Apostle"
-        },
-        {
-            "id": "qusn11",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
-            "id": "qudn12",
-            "key": "Adventurer",
-            "value": "Adventurer"
-        },
-        {
-            "id": "qusn12",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
-            "id": null,
-            "key": "Modules ({INT})",
-            "value": "Modules ({INT})"
-        },
-        {
-            "id": "qudn13",
-            "key": "Something is starting",
-            "value": "Something is starting"
-        },
-        {
-            "id": "qusn13",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
-            "id": null,
-            "key": "Story dungeon's",
-            "value": "Story dungeon's"
-        },
-        {
-            "id": null,
-            "key": "Alternative story dungeon's",
-            "value": "Alternative story dungeon's"
-        },
-        {
-            "id": "qudn14",
-            "key": "History from Apostle",
-            "value": "History from Apostle"
-        },
-        {
-            "id": "qusn14",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
-            "id": "qudn15",
-            "key": "Diana has a problem",
-            "value": "Diana has a problem"
-        },
-        {
-            "id": "qusn15",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
-            "id": "qudn16",
-            "key": "Mmm delicious",
-            "value": "Mmm delicious"
-        },
-        {
-            "id": "qusn16",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
-            "id": "qudn17",
-            "key": "Time learn something",
-            "value": "Time learn something"
-        },
-        {
-            "id": "qusn17",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
-            "id": "qudn18",
-            "key": "Here are the goblins",
-            "value": "Here are the goblins"
-        },
-        {
-            "id": "qusn18",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
-            "id": "qudn19",
-            "key": "Occupation of goblins",
-            "value": "Occupation of goblins"
-        },
-        {
-            "id": "qusn19",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
-            "id": "qudn20",
-            "key": "Yasue San",
-            "value": "Yasue San"
-        },
-        {
-            "id": "qusn20",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
-            "id": "qudn21",
-            "key": "Abandoned mine",
-            "value": "Abandoned mine"
-        },
-        {
-            "id": "qusn21",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
-            "id": "qudn22",
-            "key": "Goodbye Elfinia",
-            "value": "Goodbye Elfinia"
-        },
-        {
-            "id": "qusn22",
-            "key": "Main: Apostle Elfia",
-            "value": "Main: Apostle Elfia"
-        },
-        {
-            "id": "qudn50",
-            "key": "Officer's disputes!",
-            "value": "Officer's disputes!"
-        },
-        {
-            "id": "qusn50",
-            "key": "Officer Henry",
-            "value": "Officer Henry"
-        },
-        {
-            "id": "qudn55",
-            "key": "Erik's way saying help.",
-            "value": "Erik's way saying help."
-        },
-        {
-            "id": "qusn55",
-            "key": "Gunsmith Eric",
-            "value": "Gunsmith Eric"
-        },
-        {
-            "id": "qudn60",
-            "key": "Why are you here Noctis",
-            "value": "Why are you here Noctis"
-        },
-        {
-            "id": "qusn62",
-            "key": "Final fantasy",
-            "value": "Final fantasy"
-        },
-        {
-            "id": "qudn61",
-            "key": "First assignment",
-            "value": "First assignment"
-        },
-        {
-            "id": "qusn61",
-            "key": "Final fantasy",
-            "value": "Final fantasy"
-        },
-        {
-            "id": "qudn62",
-            "key": "Resonance",
-            "value": "Resonance"
-        },
-        {
-            "id": "qusn62",
-            "key": "Final fantasy",
-            "value": "Final fantasy"
-        },
-        {
-            "id": "stnm1",
-            "key": "Weapons for young adventurers",
-            "value": "Weapons for young adventurers"
-        },
-        {
-            "id": "stnm2",
-            "key": "Elfinia Artifacts",
-            "value": "Elfinia Artifacts"
-        },
-        {
-            "id": "stnm3",
-            "key": "Noctis Lucis Caelum",
-            "value": "Noctis Lucis Caelum"
-        },
-        {
-            "id": "stnm5",
-            "key": "Master La",
-            "value": "Master La"
-        },
-        {
-            "id": "hmnm2",
-            "key": "Elven class",
-            "value": "Elven class"
-        },
-        {
             "id": null,
             "key": "{INT}. {STR} | {INT}:{INT}min | {INT}P",
             "value": "{INT}. {STR} | {INT}:{INT}min | {INT}P"
-        },
-        {
-            "id": "hmnm2",
-            "key": "Elven class",
-            "value": "Elven class"
-        },
-        {
-            "id": "hmnm6",
-            "key": "Asian-style home",
-            "value": "Asian-style home"
-        },
-        {
-            "id": "hmnm4",
-            "key": "Asian-style home",
-            "value": "Asian-style home"
-        },
-        {
-            "id": "hmnm5",
-            "key": "Asian-style home",
-            "value": "Asian-style home"
-        },
-        {
-            "id": "hmnm6",
-            "key": "Asian-style home",
-            "value": "Asian-style home"
         },
         {
             "id": null,
@@ -816,6 +466,411 @@
             "value": "[Player] are you interested something? I'm sorry, don't want to talk right now."
         },
         {
+            "id": "ittm10008",
+            "key": "Heavenly wings",
+            "value": "Heavenly wings"
+        },
+        {
+            "id": "ittm10009",
+            "key": "Rainbow wings",
+            "value": "Rainbow wings"
+        },
+        {
+            "id": "ittm10010",
+            "key": "Magitech hammer",
+            "value": "Magitech hammer"
+        },
+        {
+            "id": "ittm10011",
+            "key": "Magitech gun",
+            "value": "Magitech gun"
+        },
+        {
+            "id": "ittm10012",
+            "key": "Magitech shotgun",
+            "value": "Magitech shotgun"
+        },
+        {
+            "id": "ittm10013",
+            "key": "Magitech grenade",
+            "value": "Magitech grenade"
+        },
+        {
+            "id": "ittm10014",
+            "key": "Magitech rifle",
+            "value": "Magitech rifle"
+        },
+        {
+            "id": "ittm10015",
+            "key": "Stars wings",
+            "value": "Stars wings"
+        },
+        {
+            "id": "ittm10016",
+            "key": "Bat wings",
+            "value": "Bat wings"
+        },
+        {
+            "id": "ittm10017",
+            "key": "Little eagle wings",
+            "value": "Little eagle wings"
+        },
+        {
+            "id": "diaqu83",
+            "key": "Well, thank you very much, and tell her I'll be seeing her this evening.",
+            "value": "Well, thank you very much, and tell her I'll be seeing her this evening."
+        },
+        {
+            "id": "ittm10018",
+            "key": "Necromante wings",
+            "value": "Necromante wings"
+        },
+        {
+            "id": "ittm10019",
+            "key": "Goblin hammer",
+            "value": "Goblin hammer"
+        },
+        {
+            "id": "ittm10020",
+            "key": "Goblin gun",
+            "value": "Goblin gun"
+        },
+        {
+            "id": "ittm10021",
+            "key": "Goblin shotgun",
+            "value": "Goblin shotgun"
+        },
+        {
+            "id": "ittm10022",
+            "key": "Goblin grenade",
+            "value": "Goblin grenade"
+        },
+        {
+            "id": "ittm10023",
+            "key": "Goblin rifle",
+            "value": "Goblin rifle"
+        },
+        {
+            "id": "ittm10024",
+            "key": "Scythe",
+            "value": "Scythe"
+        },
+        {
+            "id": "ittm15000",
+            "key": "Theme Couple",
+            "value": "Theme Couple"
+        },
+        {
+            "id": "itdc15003",
+            "key": "Strictly limited as the theme",
+            "value": "Strictly limited as the theme"
+        },
+        {
+            "id": "ittm15001",
+            "key": "Theme Final Fantasy",
+            "value": "Theme Final Fantasy"
+        },
+        {
+            "id": "ittm15002",
+            "key": "Theme Aion",
+            "value": "Theme Aion"
+        },
+        {
+            "id": "ittm15003",
+            "key": "Theme Dragon Nest",
+            "value": "Theme Dragon Nest"
+        },
+        {
+            "id": "sknm1",
+            "key": "Health turret",
+            "value": "Health turret"
+        },
+        {
+            "id": "skbn1",
+            "key": "life span",
+            "value": "life span"
+        },
+        {
+            "id": "sknm2",
+            "key": "Sleepy Gravity",
+            "value": "Sleepy Gravity"
+        },
+        {
+            "id": "skds2",
+            "key": "Magnet mobs to itself",
+            "value": "Magnet mobs to itself"
+        },
+        {
+            "id": "skbn2",
+            "key": "radius",
+            "value": "radius"
+        },
+        {
+            "id": "sknm3",
+            "key": "Craft Discount",
+            "value": "Craft Discount"
+        },
+        {
+            "id": "skds3",
+            "key": "Will give discount on the price of craft items",
+            "value": "Will give discount on the price of craft items"
+        },
+        {
+            "id": "skbn3",
+            "key": "% discount gold for craft item",
+            "value": "% discount gold for craft item"
+        },
+        {
+            "id": "sknm4",
+            "key": "Proficiency with weapons",
+            "value": "Proficiency with weapons"
+        },
+        {
+            "id": "skds4",
+            "key": "You can perform an automatic fire",
+            "value": "You can perform an automatic fire"
+        },
+        {
+            "id": "skbn4",
+            "key": "can perform an auto fire with all types of weapons",
+            "value": "can perform an auto fire with all types of weapons"
+        },
+        {
+            "id": "sknm5",
+            "key": "Blessing of God of war",
+            "value": "Blessing of God of war"
+        },
+        {
+            "id": "skds5",
+            "key": "The blessing restores ammo",
+            "value": "The blessing restores ammo"
+        },
+        {
+            "id": "skbn5",
+            "key": "% recovers ammo within a radius of 800",
+            "value": "% recovers ammo within a radius of 800"
+        },
+        {
+            "id": "sknm6",
+            "key": "Noctis Lucis Attack Teleport",
+            "value": "Noctis Lucis Attack Teleport"
+        },
+        {
+            "id": "skds6",
+            "key": "An attacking teleport that deals damage to all mobs radius",
+            "value": "An attacking teleport that deals damage to all mobs radius"
+        },
+        {
+            "id": "skbn6",
+            "key": "% your strength",
+            "value": "% your strength"
+        },
+        {
+            "id": "qudn1",
+            "key": "Help for workers",
+            "value": "Help for workers"
+        },
+        {
+            "id": "qusn2",
+            "key": "Main: Arrival",
+            "value": "Main: Arrival"
+        },
+        {
+            "id": "qudn2",
+            "key": "Helping a girl",
+            "value": "Helping a girl"
+        },
+        {
+            "id": "qudn3",
+            "key": "The fight with slime!",
+            "value": "The fight with slime!"
+        },
+        {
+            "id": "qusn4",
+            "key": "Trader Sentry",
+            "value": "Trader Sentry"
+        },
+        {
+            "id": "qudn4",
+            "key": "Gel? Why do you need it",
+            "value": "Gel? Why do you need it"
+        },
+        {
+            "id": "qudn5",
+            "key": "Search for a daughter",
+            "value": "Search for a daughter"
+        },
+        {
+            "id": "qusn5",
+            "key": "Sailor",
+            "value": "Sailor"
+        },
+        {
+            "id": "qudn6",
+            "key": "What is ore mining?",
+            "value": "What is ore mining?"
+        },
+        {
+            "id": "qusn7",
+            "key": "Mining",
+            "value": "Mining"
+        },
+        {
+            "id": "qudn7",
+            "key": "My first pickaxe",
+            "value": "My first pickaxe"
+        },
+        {
+            "id": "qudn8",
+            "key": "Help destruction of dir",
+            "value": "Help destruction of dir"
+        },
+        {
+            "id": "qusn9",
+            "key": "Deputy",
+            "value": "Deputy"
+        },
+        {
+            "id": "qudn9",
+            "key": "Raid on the dirt",
+            "value": "Raid on the dirt"
+        },
+        {
+            "id": "qudn10",
+            "key": "Acquaintance",
+            "value": "Acquaintance"
+        },
+        {
+            "id": "qusn22",
+            "key": "Main: Apostle Elfia",
+            "value": "Main: Apostle Elfia"
+        },
+        {
+            "id": "qudn11",
+            "key": "Apostle",
+            "value": "Apostle"
+        },
+        {
+            "id": "qudn12",
+            "key": "Adventurer",
+            "value": "Adventurer"
+        },
+        {
+            "id": "qudn13",
+            "key": "Something is starting",
+            "value": "Something is starting"
+        },
+        {
+            "id": "qudn14",
+            "key": "History from Apostle",
+            "value": "History from Apostle"
+        },
+        {
+            "id": "qudn15",
+            "key": "Diana has a problem",
+            "value": "Diana has a problem"
+        },
+        {
+            "id": "qudn16",
+            "key": "Mmm delicious",
+            "value": "Mmm delicious"
+        },
+        {
+            "id": "qudn17",
+            "key": "Time learn something",
+            "value": "Time learn something"
+        },
+        {
+            "id": "qudn18",
+            "key": "Here are the goblins",
+            "value": "Here are the goblins"
+        },
+        {
+            "id": "qudn19",
+            "key": "Occupation of goblins",
+            "value": "Occupation of goblins"
+        },
+        {
+            "id": "qudn20",
+            "key": "Yasue San",
+            "value": "Yasue San"
+        },
+        {
+            "id": "qudn21",
+            "key": "Abandoned mine",
+            "value": "Abandoned mine"
+        },
+        {
+            "id": "qudn22",
+            "key": "Goodbye Elfinia",
+            "value": "Goodbye Elfinia"
+        },
+        {
+            "id": "qudn50",
+            "key": "Officer's disputes!",
+            "value": "Officer's disputes!"
+        },
+        {
+            "id": "qusn50",
+            "key": "Officer Henry",
+            "value": "Officer Henry"
+        },
+        {
+            "id": "qudn55",
+            "key": "Erik's way saying help.",
+            "value": "Erik's way saying help."
+        },
+        {
+            "id": "qusn55",
+            "key": "Gunsmith Eric",
+            "value": "Gunsmith Eric"
+        },
+        {
+            "id": "qudn60",
+            "key": "Why are you here Noctis",
+            "value": "Why are you here Noctis"
+        },
+        {
+            "id": "qusn62",
+            "key": "Final fantasy",
+            "value": "Final fantasy"
+        },
+        {
+            "id": "qudn61",
+            "key": "First assignment",
+            "value": "First assignment"
+        },
+        {
+            "id": "qudn62",
+            "key": "Resonance",
+            "value": "Resonance"
+        },
+        {
+            "id": "stnm1",
+            "key": "Weapons for young adventurers",
+            "value": "Weapons for young adventurers"
+        },
+        {
+            "id": "stnm2",
+            "key": "Elfinia Artifacts",
+            "value": "Elfinia Artifacts"
+        },
+        {
+            "id": "stnm3",
+            "key": "Noctis Lucis Caelum",
+            "value": "Noctis Lucis Caelum"
+        },
+        {
+            "id": "stnm5",
+            "key": "Master La",
+            "value": "Master La"
+        },
+        {
+            "id": "hmnm2",
+            "key": "Elven class",
+            "value": "Elven class"
+        },
+        {
             "id": "diaqu10",
             "key": "Hello, I was sent to you by a carpenter to help you.",
             "value": "Hello, I was sent to you by a carpenter to help you."
@@ -896,26 +951,6 @@
             "value": "Thanks for the help."
         },
         {
-            "id": "diaqu40",
-            "key": "Here you go, your boss told me to give it to you!",
-            "value": "Here you go, your boss told me to give it to you!"
-        },
-        {
-            "id": "diaqu41",
-            "key": "Thanks for the help.",
-            "value": "Thanks for the help."
-        },
-        {
-            "id": "diaqu50",
-            "key": "Here you go, your boss told me to give it to you!",
-            "value": "Here you go, your boss told me to give it to you!"
-        },
-        {
-            "id": "diaqu51",
-            "key": "Thanks for the help.",
-            "value": "Thanks for the help."
-        },
-        {
             "id": "diaqu60",
             "key": "Is tired. But I did it!",
             "value": "Is tired. But I did it!"
@@ -971,9 +1006,9 @@
             "value": "No, don't worry, she just asked me to pass you the notebook."
         },
         {
-            "id": "diaqu83",
-            "key": "Well, thank you very much, and tell her I'll be seeing her this evening.",
-            "value": "Well, thank you very much, and tell her I'll be seeing her this evening."
+            "id": "hmnm6",
+            "key": "Asian-style home",
+            "value": "Asian-style home"
         },
         {
             "id": "diaqu84",
@@ -1459,11 +1494,6 @@
             "id": "diaqu232",
             "key": "Well have a good day [Talked] :)",
             "value": "Well have a good day [Talked] :)"
-        },
-        {
-            "id": "diaqu240",
-            "key": "Are you ready?",
-            "value": "Are you ready?"
         },
         {
             "id": "diaqu241",
@@ -2621,11 +2651,6 @@
             "value": "No, I don't want to expose them to danger."
         },
         {
-            "id": "diaqu696",
-            "key": "Well",
-            "value": "Well"
-        },
-        {
             "id": "diaqu700",
             "key": "Well, goodbye [Talked], I'll keep going. I want to be stronger than I was before.",
             "value": "Well, goodbye [Talked], I'll keep going. I want to be stronger than I was before."
@@ -3121,29 +3146,14 @@
             "value": "Shotgun"
         },
         {
-            "id": "itdc4",
-            "key": "Conventional weapon",
-            "value": "Conventional weapon"
-        },
-        {
             "id": "ittm5",
             "key": "Grenade",
             "value": "Grenade"
         },
         {
-            "id": "itdc5",
-            "key": "Conventional weapon",
-            "value": "Conventional weapon"
-        },
-        {
             "id": "ittm6",
             "key": "Rifle",
             "value": "Rifle"
-        },
-        {
-            "id": "itdc6",
-            "key": "Conventional weapon",
-            "value": "Conventional weapon"
         },
         {
             "id": "ittm7",
@@ -3191,29 +3201,14 @@
             "value": "Decoration Hearth Elite"
         },
         {
-            "id": "itdc11",
-            "key": "Decoration for house!",
-            "value": "Decoration for house!"
-        },
-        {
             "id": "ittm12",
             "key": "Decoration Ninja Elite",
             "value": "Decoration Ninja Elite"
         },
         {
-            "id": "itdc12",
-            "key": "Decoration for house!",
-            "value": "Decoration for house!"
-        },
-        {
             "id": "ittm13",
             "key": "Decoration Hearth",
             "value": "Decoration Hearth"
-        },
-        {
-            "id": "itdc13",
-            "key": "Decoration for house!",
-            "value": "Decoration for house!"
         },
         {
             "id": "ittm14",
@@ -3311,11 +3306,6 @@
             "value": "Mushroom"
         },
         {
-            "id": "itdc24",
-            "key": "Material need for craft!",
-            "value": "Material need for craft!"
-        },
-        {
             "id": "ittm25",
             "key": "Potion resurrection",
             "value": "Potion resurrection"
@@ -3341,11 +3331,6 @@
             "value": "Young fighter's ring"
         },
         {
-            "id": "itdc27",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
-        },
-        {
             "id": "ittm28",
             "key": "Small ammo bag",
             "value": "Small ammo bag"
@@ -3361,19 +3346,9 @@
             "value": "Gel"
         },
         {
-            "id": "itdc29",
-            "key": "I wonder what it's for?",
-            "value": "I wonder what it's for?"
-        },
-        {
             "id": "ittm30",
             "key": "Goblin Ingot",
             "value": "Goblin Ingot"
-        },
-        {
-            "id": "itdc30",
-            "key": "Information added later.",
-            "value": "Information added later."
         },
         {
             "id": "ittm31",
@@ -3381,19 +3356,9 @@
             "value": "Copper Ingot"
         },
         {
-            "id": "itdc31",
-            "key": "Information added later.",
-            "value": "Information added later."
-        },
-        {
             "id": "ittm32",
             "key": "Salantra Blessing",
             "value": "Salantra Blessing"
-        },
-        {
-            "id": "itdc32",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
         },
         {
             "id": "ittm33",
@@ -3401,19 +3366,9 @@
             "value": "Explosive module for gun"
         },
         {
-            "id": "itdc33",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
-        },
-        {
             "id": "ittm34",
             "key": "Explosive module for shotgun",
             "value": "Explosive module for shotgun"
-        },
-        {
-            "id": "itdc34",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
         },
         {
             "id": "ittm35",
@@ -3421,29 +3376,14 @@
             "value": "Kappa meat"
         },
         {
-            "id": "itdc35",
-            "key": "Information added later.",
-            "value": "Information added later."
-        },
-        {
             "id": "ittm36",
             "key": "Ring of Arvida",
             "value": "Ring of Arvida"
         },
         {
-            "id": "itdc36",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
-        },
-        {
             "id": "ittm37",
             "key": "Relic of the Orc Lord",
             "value": "Relic of the Orc Lord"
-        },
-        {
-            "id": "itdc37",
-            "key": "Information added later.",
-            "value": "Information added later."
         },
         {
             "id": "ittm38",
@@ -3491,11 +3431,6 @@
             "value": "Torn cloth clothes of orcs"
         },
         {
-            "id": "itdc42",
-            "key": "Information added later.",
-            "value": "Information added later."
-        },
-        {
             "id": "ittm43",
             "key": "Blessing for discount craft",
             "value": "Blessing for discount craft"
@@ -3521,19 +3456,9 @@
             "value": "The core of Neptune"
         },
         {
-            "id": "itdc45",
-            "key": "Information added later.",
-            "value": "Information added later."
-        },
-        {
             "id": "ittm46",
             "key": "Remains of a dead soul",
             "value": "Remains of a dead soul"
-        },
-        {
-            "id": "itdc46",
-            "key": "Information added later.",
-            "value": "Information added later."
         },
         {
             "id": "ittm47",
@@ -3541,29 +3466,14 @@
             "value": "Ring of God of War"
         },
         {
-            "id": "itdc47",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
-        },
-        {
             "id": "ittm48",
             "key": "Bracelet of Fire",
             "value": "Bracelet of Fire"
         },
         {
-            "id": "itdc48",
-            "key": "It happens sometimes",
-            "value": "It happens sometimes"
-        },
-        {
             "id": "ittm49",
             "key": "Big ammo bag",
             "value": "Big ammo bag"
-        },
-        {
-            "id": "itdc49",
-            "key": "Adds a small amount of ammunition",
-            "value": "Adds a small amount of ammunition"
         },
         {
             "id": "ittm50",
@@ -3611,29 +3521,14 @@
             "value": "Heavenly shotgun"
         },
         {
-            "id": "itdc10002",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
             "id": "ittm10003",
             "key": "Heavenly grenade",
             "value": "Heavenly grenade"
         },
         {
-            "id": "itdc10003",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
             "id": "ittm10004",
             "key": "Heavenly rifle",
             "value": "Heavenly rifle"
-        },
-        {
-            "id": "itdc10004",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
         },
         {
             "id": "ittm10005",
@@ -3659,226 +3554,6 @@
             "id": "ittm10007",
             "key": "Angel wings",
             "value": "Angel wings"
-        },
-        {
-            "id": "itdc10007",
-            "key": "Covered in secrets",
-            "value": "Covered in secrets"
-        },
-        {
-            "id": "ittm10008",
-            "key": "Heavenly wings",
-            "value": "Heavenly wings"
-        },
-        {
-            "id": "itdc10008",
-            "key": "Covered in secrets",
-            "value": "Covered in secrets"
-        },
-        {
-            "id": "ittm10009",
-            "key": "Rainbow wings",
-            "value": "Rainbow wings"
-        },
-        {
-            "id": "itdc10009",
-            "key": "Covered in secrets",
-            "value": "Covered in secrets"
-        },
-        {
-            "id": "ittm10010",
-            "key": "Magitech hammer",
-            "value": "Magitech hammer"
-        },
-        {
-            "id": "itdc10010",
-            "key": "Reinforced kick",
-            "value": "Reinforced kick"
-        },
-        {
-            "id": "ittm10011",
-            "key": "Magitech gun",
-            "value": "Magitech gun"
-        },
-        {
-            "id": "itdc10011",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10012",
-            "key": "Magitech shotgun",
-            "value": "Magitech shotgun"
-        },
-        {
-            "id": "itdc10012",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10013",
-            "key": "Magitech grenade",
-            "value": "Magitech grenade"
-        },
-        {
-            "id": "itdc10013",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10014",
-            "key": "Magitech rifle",
-            "value": "Magitech rifle"
-        },
-        {
-            "id": "itdc10014",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10015",
-            "key": "Stars wings",
-            "value": "Stars wings"
-        },
-        {
-            "id": "itdc10015",
-            "key": "Covered in secrets",
-            "value": "Covered in secrets"
-        },
-        {
-            "id": "ittm10016",
-            "key": "Bat wings",
-            "value": "Bat wings"
-        },
-        {
-            "id": "itdc10016",
-            "key": "Covered in secrets",
-            "value": "Covered in secrets"
-        },
-        {
-            "id": "ittm10017",
-            "key": "Little eagle wings",
-            "value": "Little eagle wings"
-        },
-        {
-            "id": "itdc10017",
-            "key": "Covered in secrets",
-            "value": "Covered in secrets"
-        },
-        {
-            "id": "ittm10018",
-            "key": "Necromante wings",
-            "value": "Necromante wings"
-        },
-        {
-            "id": "itdc10018",
-            "key": "Covered in secrets",
-            "value": "Covered in secrets"
-        },
-        {
-            "id": "ittm10019",
-            "key": "Goblin hammer",
-            "value": "Goblin hammer"
-        },
-        {
-            "id": "itdc10019",
-            "key": "Reinforced kick",
-            "value": "Reinforced kick"
-        },
-        {
-            "id": "ittm10020",
-            "key": "Goblin gun",
-            "value": "Goblin gun"
-        },
-        {
-            "id": "itdc10020",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10021",
-            "key": "Goblin shotgun",
-            "value": "Goblin shotgun"
-        },
-        {
-            "id": "itdc10021",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10022",
-            "key": "Goblin grenade",
-            "value": "Goblin grenade"
-        },
-        {
-            "id": "itdc10022",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10023",
-            "key": "Goblin rifle",
-            "value": "Goblin rifle"
-        },
-        {
-            "id": "itdc10023",
-            "key": "It look doesn't bad",
-            "value": "It look doesn't bad"
-        },
-        {
-            "id": "ittm10024",
-            "key": "Scythe",
-            "value": "Scythe"
-        },
-        {
-            "id": "itdc10024",
-            "key": "Reinforced kick",
-            "value": "Reinforced kick"
-        },
-        {
-            "id": "ittm15000",
-            "key": "Theme Couple",
-            "value": "Theme Couple"
-        },
-        {
-            "id": "itdc15003",
-            "key": "Strictly limited as the theme",
-            "value": "Strictly limited as the theme"
-        },
-        {
-            "id": "ittm15001",
-            "key": "Theme Final Fantasy",
-            "value": "Theme Final Fantasy"
-        },
-        {
-            "id": "itdc15001",
-            "key": "Strictly limited as the theme",
-            "value": "Strictly limited as the theme"
-        },
-        {
-            "id": "ittm15002",
-            "key": "Theme Aion",
-            "value": "Theme Aion"
-        },
-        {
-            "id": "itdc15002",
-            "key": "Strictly limited as the theme",
-            "value": "Strictly limited as the theme"
-        },
-        {
-            "id": "ittm15003",
-            "key": "Theme Dragon Nest",
-            "value": "Theme Dragon Nest"
-        },
-        {
-            "id": "itdc15003",
-            "key": "Strictly limited as the theme",
-            "value": "Strictly limited as the theme"
-        },
-        {
-            "id": "sknm1",
-            "key": "Health turret",
-            "value": "Health turret"
         },
         {
             "id": null,
@@ -3929,11 +3604,6 @@
             "id": null,
             "key": "Top 10 guilds leveling",
             "value": "Top 10 Gilden nach Level"
-        },
-        {
-            "id": null,
-            "key": "Top 10 guilds wealthy",
-            "value": "Top 10 Gilden nach Gold"
         },
         {
             "id": null,
@@ -4284,6 +3954,11 @@
             "id": null,
             "key": "Journal",
             "value": "Zeitschrift"
+        },
+        {
+            "id": null,
+            "key": "Top 10 guilds wealthy",
+            "value": "Top 10 Gilden nach Gold"
         }
     ]
 }

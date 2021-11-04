@@ -19,6 +19,7 @@ void CSkillsCore::OnInit()
 			CSkillDataInfo::ms_aSkillsData[SkillID].m_PriceSP = (int)pRes->getInt("PriceSP");
 			CSkillDataInfo::ms_aSkillsData[SkillID].m_MaxLevel = (int)pRes->getInt("MaxLevel");
 			CSkillDataInfo::ms_aSkillsData[SkillID].m_Passive = (bool)pRes->getBoolean("Passive");
+			CSkillDataInfo::ms_aSkillsData[SkillID].m_Type = (int)pRes->getInt("Type");
 		}
 	});
 }
@@ -60,8 +61,10 @@ bool CSkillsCore::OnHandleMenulist(CPlayer* pPlayer, int Menulist, bool ReplaceM
 			GS()->ShowVotesItemValueInformation(pPlayer, itSkillPoint);
 			GS()->AV(ClientID, "null");
 
-			ShowMailSkillList(pPlayer, false);
-			ShowMailSkillList(pPlayer, true);
+			ShowMailSkillList(pPlayer, SKILL_TYPE_TANK);
+			ShowMailSkillList(pPlayer, SKILL_TYPE_DPS);
+			ShowMailSkillList(pPlayer, SKILL_TYPE_HEALER);
+			ShowMailSkillList(pPlayer, SKILL_TYPE_IMPROVEMENTS);
 			return true;
 		}
 		return false;
@@ -111,14 +114,15 @@ bool CSkillsCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const 
 	return false;
 }
 
-void CSkillsCore::ShowMailSkillList(CPlayer *pPlayer, bool Passive)
+void CSkillsCore::ShowMailSkillList(CPlayer *pPlayer, int Type)
 {
 	const int ClientID = pPlayer->GetCID();
+	const char* pSkillTypeName[NUM_SKILL_TYPES] = { "Improving", "Healing", "Attacking", "Defensive" };
 	pPlayer->m_VoteColored = BLUE_COLOR;
-	GS()->AVL(ClientID, "null", "{STR} skill's", (Passive ? "Passive" : "Active"));
+	GS()->AVL(ClientID, "null", "{STR} skill's", pSkillTypeName[Type]);
 	for (const auto& sk : CSkillDataInfo::ms_aSkillsData)
 	{
-		if(sk.second.m_Passive == Passive)
+		if(sk.second.m_Type == Type)
 			SkillSelected(pPlayer, sk.first);
 	}
 	GS()->AV(ClientID, "null");
@@ -128,11 +132,12 @@ void CSkillsCore::SkillSelected(CPlayer *pPlayer, int SkillID)
 {
 	CSkillData& pSkill = pPlayer->GetSkill(SkillID);
 	const int ClientID = pPlayer->GetCID();
+	const int HideID = NUM_TAB_MENU + SkillID;
 	const bool IsPassive = pSkill.Info().m_Passive;
 	const bool IsMaxLevel = pSkill.m_Level >= pSkill.Info().m_MaxLevel;
-	const int HideID = NUM_TAB_MENU + CItemDataInfo::ms_aItemsInfo.size() + SkillID;
-
-	GS()->AVHI(ClientID, "skill", HideID, LIGHT_BLUE_COLOR, "{STR} - {INT}SP ({INT}/{INT})", pSkill.Info().m_aName, pSkill.Info().m_PriceSP, pSkill.m_Level, pSkill.Info().m_MaxLevel);
+	const char* pSkillIcon[NUM_SKILL_TYPES] = { "skill_impr", "skill_healer", "skill_dps", "skill_tank" };
+	
+	GS()->AVHI(ClientID, pSkillIcon[pSkill.Info().m_Type], HideID, LIGHT_BLUE_COLOR, "{STR} - {INT}SP ({INT}/{INT})", pSkill.Info().m_aName, pSkill.Info().m_PriceSP, pSkill.m_Level, pSkill.Info().m_MaxLevel);
 	if(!IsMaxLevel)
 	{
 		const int NewBonus = pSkill.GetBonus() + pSkill.Info().m_BonusValue;
