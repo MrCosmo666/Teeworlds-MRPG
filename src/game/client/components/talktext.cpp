@@ -179,7 +179,6 @@ static void GetDialogEmoticion(int Emote, vec4& pColor, vec4& pColorTo, int &pEm
 	{
 		const int EmoticionList[3] = { SPRITE_DEVILTEE, SPRITE_ZOMG, SPRITE_SUSHI };
 		pEmoticionSpriteID = EmoticionList[random_int() % 3];
-		pEmoticionSpriteID = SPRITE_DEVILTEE;
 		pColor = vec4(0.5f, 0.1f, 0.1f, 0.90f);
 		pColorTo = vec4(0.5f, 0.4f, 0.2f, 0.90f);
 	}
