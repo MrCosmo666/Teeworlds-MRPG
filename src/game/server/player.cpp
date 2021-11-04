@@ -701,7 +701,7 @@ void CPlayer::SetTalking(int TalkedID, bool IsStartDialogue)
 		}
 
 		// get a quest for the progress of dialogue if it is in this progress we accept the quest
-		GivingQuestID = NpcBotInfo::ms_aNpcBot[MobID].m_aDialog[m_DialogNPC.m_Progress].m_GivesQuestID;
+		GivingQuestID = NpcBotInfo::ms_aNpcBot[MobID].m_GivesQuestID;
 		if (((m_DialogNPC.m_Progress + 1) >= sizeTalking) && GivingQuestID >= 1)
 		{
 			if(!m_DialogNPC.m_FreezedProgress)

@@ -156,12 +156,7 @@ int CBotCore::GetQuestNPC(int MobID) const
 	if (!NpcBotInfo::IsNpcBotValid(MobID))
 		return -1;
 
-	for (const auto& npc : NpcBotInfo::ms_aNpcBot[MobID].m_aDialog)
-	{
-		if (npc.m_GivesQuestID > 0)
-			return npc.m_GivesQuestID;
-	}
-	return -1;
+	return NpcBotInfo::ms_aNpcBot[MobID].m_GivesQuestID;
 }
 
 
@@ -303,6 +298,9 @@ void CBotCore::LoadNpcBots(const char* pWhereLocalWorld)
 		NpcBotInfo::ms_aNpcBot[MobID].m_Emote = pRes->getInt("Emote");
 		NpcBotInfo::ms_aNpcBot[MobID].m_BotID = pRes->getInt("BotID");
 		NpcBotInfo::ms_aNpcBot[MobID].m_Function = pRes->getInt("Function");
+		NpcBotInfo::ms_aNpcBot[MobID].m_GivesQuestID = pRes->getInt("GivesQuestID");
+		if(NpcBotInfo::ms_aNpcBot[MobID].m_GivesQuestID > 0)
+			NpcBotInfo::ms_aNpcBot[MobID].m_Function = FUNCTION_NPC_GIVE_QUEST;
 
 		const int NumberOfNpc = pRes->getInt("Number");
 		for(int c = 0; c < NumberOfNpc; c++)
@@ -320,11 +318,7 @@ void CBotCore::LoadNpcBots(const char* pWhereLocalWorld)
 				{
 					str_copy(LoadTalk.m_aText, pItem.value("text", "").c_str(), sizeof(LoadTalk.m_aText));
 					LoadTalk.m_Emote = GetReformatedValue("emote", pItem.value("emote", "normal").c_str());
-					LoadTalk.m_GivesQuestID = pRes->getInt("GivesQuestID");
 					LoadTalk.LoadFlags();
-					
-					if(pRes->getInt("GivesQuestID") > 0)
-						NpcBotInfo::ms_aNpcBot[MobID].m_Function = FUNCTION_NPC_GIVE_QUEST;
 
 					NpcBotInfo::ms_aNpcBot[MobID].m_aDialog.push_back(LoadTalk);
 				}

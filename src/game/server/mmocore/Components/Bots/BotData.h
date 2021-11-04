@@ -14,7 +14,6 @@ struct DialogData
 {
 	char m_aText[512];
 	int m_Emote;
-	int m_GivesQuestID;
 	bool m_RequestAction;
 	int m_Flag;
 
@@ -57,6 +56,7 @@ struct NpcBotInfo
 	int m_WorldID;
 	int m_BotID;
 	int m_Function;
+	int m_GivesQuestID;
 	std::vector<DialogData> m_aDialog;
 
 	static bool IsNpcBotValid(int MobID)
