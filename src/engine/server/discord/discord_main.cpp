@@ -22,9 +22,6 @@ DiscordJob::DiscordJob(IServer* pServer) : SleepyDiscord::DiscordClient(g_Config
 
 void DiscordJob::onReady(SleepyDiscord::Ready readyData)
 {
-	if(!m_pGithubAPIRepoWatcher.get())
-		m_pGithubAPIRepoWatcher = std::make_shared<DiscordGithubAPIRepoWatcher>(g_Config.m_SvDiscordGithubWatherLink, g_Config.m_SvDiscordGithubWatherChannel, *this);
-
 	DiscordCommands::InitCommands(this);
 }
 
