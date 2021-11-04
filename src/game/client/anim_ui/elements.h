@@ -22,7 +22,7 @@ public:
 	class CRenderTools* RenderTools() const;
 
 	void Draw();
-	virtual void Set(float RoundCorner, int CornerType){};
+	virtual void Set(float RoundCorner, int CornerType, bool MonochromeGradient){};
 
 	CValue *GetPos() const { return m_pPos; }
 	CValue *GetColor() const { return m_pColor; }

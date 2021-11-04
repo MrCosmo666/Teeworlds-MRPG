@@ -199,10 +199,10 @@ void CCommandProcessor::ConChatPosition(IConsole::IResult* pResult, void* pUser)
 	if (!pPlayer || !pPlayer->GetCharacter() || !pGS->Server()->IsAuthed(ClientID))
 		return;
 
-	const int PosX = pPlayer->GetCharacter()->m_Core.m_Pos.x / 32;
-	const int PosY = pPlayer->GetCharacter()->m_Core.m_Pos.y/32;
+	const int PosX = (int)pPlayer->GetCharacter()->m_Core.m_Pos.x / 32;
+	const int PosY = (int)pPlayer->GetCharacter()->m_Core.m_Pos.y/32;
 	pGS->Chat(ClientID, "[{STR}] Position X: {INT} Y: {INT}.", pGS->Server()->GetWorldName(pGS->GetWorldID()), PosX, PosY);
-	dbg_msg("test", "%0.f %0.f WorldID: %d", pPlayer->GetCharacter()->m_Core.m_Pos.x, pPlayer->GetCharacter()->m_Core.m_Pos.y, pGS->GetWorldID());
+	dbg_msg("cmd_pos", "%0.f %0.f WorldID: %d", pPlayer->GetCharacter()->m_Core.m_Pos.x, pPlayer->GetCharacter()->m_Core.m_Pos.y, pGS->GetWorldID());
 }
 
 void CCommandProcessor::ConChatSound(IConsole::IResult* pResult, void* pUser)
@@ -364,14 +364,9 @@ void CCommandProcessor::AddCommand(const char* pName, const char* pParams, ICons
 {
 	GS()->Console()->Register(pName, pParams, CFGFLAG_CHAT, pfnFunc, pUser, pHelp);
 	if(!m_CommandManager.AddCommand(pName, pHelp, pParams, pfnFunc, pUser))
-	{
-		if(pParams[0])
-			dbg_msg("CCommandProcessor", "registered chat command: '/%s %s'", pName, pParams);
-		else
-			dbg_msg("CCommandProcessor", "registered chat command: '/%s'", pName);
-	}
+		dbg_msg("chat_cmd", "added command: '/%s' :: WorldID %d", pName, m_pGS->GetWorldID());
 	else
-		dbg_msg("CCommandProcessor", "failed to add command: '/%s'", pName);
+		dbg_msg("chat_cmd", "failed to add command: '/%s' :: WorldID %d", pName, m_pGS->GetWorldID());
 }
 
 void CCommandProcessor::LastChat(CPlayer *pPlayer)

@@ -4,7 +4,6 @@
 #include "discord_main.h"
 
 #include "discord_slash_commands.h"
-#include "discord_github_api_watcher.h"
 
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
@@ -22,9 +21,6 @@ DiscordJob::DiscordJob(IServer* pServer) : SleepyDiscord::DiscordClient(g_Config
 
 void DiscordJob::onReady(SleepyDiscord::Ready readyData)
 {
-	if(!m_pGithubAPIRepoWatcher.get())
-		m_pGithubAPIRepoWatcher = std::make_shared<DiscordGithubAPIRepoWatcher>(g_Config.m_SvDiscordGithubWatherLink, g_Config.m_SvDiscordGithubWatherChannel, *this);
-
 	DiscordCommands::InitCommands(this);
 }
 

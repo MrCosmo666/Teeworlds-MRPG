@@ -131,22 +131,13 @@ void MmoController::PrepareInformation(IStorageEngine *pStorage)
 	CDataFileWriter DataInfoWriter;
 	if(!DataInfoWriter.Open(pStorage, MMO_DATA_FILE))
 		return;
-
 	for(auto& pComponent : m_Components.m_paComponents)
 		pComponent->OnPrepareInformation(pStorage, &DataInfoWriter);
-
 	DataInfoWriter.Finish();
 
 	CDataFileReader DataInfoReader;
 	if(!DataInfoReader.Open(pStorage, MMO_DATA_FILE, IStorageEngine::TYPE_ALL))
 		return;
-
-	const char* pItem = (const char*)DataInfoReader.FindItem(MMO_DATA_INVENTORY_INFORMATION, 0);
-	if(pItem)
-	{
-		dbg_msg("mrpg_compressed", "items: %s", pItem);
-	}
-
 	char aSha256[SHA256_MAXSTRSIZE];
 	sha256_str(DataInfoReader.Sha256(), aSha256, sizeof(aSha256));
 	dbg_msg("mrpg_compressed", "mmo data file sha256 is %s", aSha256);

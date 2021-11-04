@@ -881,18 +881,17 @@ void CGS::SendTuningParams(int ClientID)
 }
 
 // Send a conversation package with someone
-void CGS::SendTalkText(int ClientID, int TalkingID, bool PlayerTalked, const char *Message, int Style, int TalkingEmote)
+void CGS::SendDialogText(int ClientID, int TalkingID, const char *Message, int Emote, int TalkedFlag)
 {
 	CNetMsg_Sv_TalkText Msg;
-	Msg.m_PlayerTalked = PlayerTalked;
-	Msg.m_pTalkClientID = TalkingID;
+	Msg.m_ConversationWithClientID = TalkingID;
 	Msg.m_pText = Message;
-	Msg.m_TalkedEmote = TalkingEmote;
-	Msg.m_Style = Style;
+	Msg.m_Emote = Emote;
+	Msg.m_Flag = TalkedFlag;
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
-void CGS::ClearTalkText(int ClientID)
+void CGS::ClearDialogText(int ClientID)
 {
 	if(!IsMmoClient(ClientID))
 		return;

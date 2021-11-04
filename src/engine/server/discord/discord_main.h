@@ -61,11 +61,6 @@ private:
 
 	void HandlerThreadTasks();
 	void AddThreadTask(DiscordTask Task);
-
-	/************************************************************************/
-	/* Discord API functions		                                        */
-	/************************************************************************/
-	std::shared_ptr<class DiscordGithubAPIRepoWatcher> m_pGithubAPIRepoWatcher;
 };
 
 #endif

@@ -22,8 +22,7 @@ GameMsgIDs = Enum("GAMEMSG", ["TEAM_SWAP", "SPEC_INVALIDID", "TEAM_SHUFFLE", "TE
 							"GAME_PAUSED"]) # todo 0.8: sort (1 para)
 
 # mmotee
-WorldType = Enum("WORLD", ["STANDARD", "CUTSCENE", "DUNGEON"])
-TalkedStyles = Enum("TALK_STYLE", ["STANDARD", "AGRESSIVE", "HAPPED"])
+WorldType = Enum("WORLD", ["STANDARD", "DUNGEON"])
 MoodType = Enum("MOOD", ["ANGRY", "AGRESSED_TANK", "AGRESSED_OTHER", "NORMAL", "FRIENDLY", "QUESTING", "PLAYER_TANK"])
 MmoPickups = Enum("MMO_PICKUP", ["BOX", "EXPERIENCE", "PLANT", "ORE", "SIDE_ARROW", "MAIN_ARROW", "DROP"])
 Equip = Enum("EQUIP", ["HAMMER", "GUN", "SHOTGUN", "GRENADE", "RIFLE", "MINER", "WINGS", "DISCORD"])
@@ -81,6 +80,16 @@ enum
     MAILLETTER_MAX_CAPACITY = 15,
 };
 
+enum
+{
+    TALKED_FLAG_EMPTY_FULL = 1 << 0,
+    TALKED_FLAG_BOT = 1 << 1,
+    TALKED_FLAG_PLAYER = 1 << 2,
+    TALKED_FLAG_SAYS_PLAYER = 1 << 3,
+    TALKED_FLAG_SAYS_BOT = 1 << 4,
+    TALKED_FLAG_FULL = TALKED_FLAG_PLAYER|TALKED_FLAG_BOT,
+};
+
 '''
 
 RawSource = '''
@@ -103,7 +112,6 @@ Enums = [
     AuthCodes,
 	MoodType,
 	WorldType,
-	TalkedStyles,
     Dialogs,
 ]
 
@@ -609,10 +617,9 @@ Messages = [
 	NetMessage("Sv_TalkText",
 	[
 		NetStringStrict("m_pText"),
-		NetIntAny("m_pTalkClientID"),
-		NetEnum("m_TalkedEmote", Emotes),
-		NetEnum("m_Style", TalkedStyles),
-        NetBool("m_PlayerTalked"),
+		NetIntAny("m_ConversationWithClientID"),
+		NetEnum("m_Emote", Emotes),
+        NetIntAny("m_Flag"),
 	]),
 
 	# clear talk text

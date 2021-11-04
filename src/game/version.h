@@ -12,10 +12,10 @@
 #define PREV_CLIENT_VERSION 0x0704
 
 // ~~ RELEASE GAME SIDE VERSION
-#define GAME_RELEASE_VERSION "2.0.7"
+#define GAME_RELEASE_VERSION "2.0.8"
 
 // ~~ RELEASE PROTOCOL(CLIENT/SERVER SIDE) VERSION
 // in case of a change it will force to update the client when entering the server to the value that is specified here
-#define PROTOCOL_VERSION_MMO 1026
+#define PROTOCOL_VERSION_MMO 1027
 
 #endif
