@@ -179,22 +179,22 @@ static void GetDialogEmoticion(int Emote, vec4& pColor, vec4& pColorTo, int &pEm
 	{
 		const int EmoticionList[3] = { SPRITE_DEVILTEE, SPRITE_ZOMG, SPRITE_SUSHI };
 		pEmoticionSpriteID = EmoticionList[random_int() % 3];
-		pColor = vec4(0.5f, 0.1f, 0.1f, 0.90f);
-		pColorTo = vec4(0.5f, 0.4f, 0.2f, 0.90f);
+		pColor = vec4(0.5f, 0.15f, 0.1f, 0.90f);
+		pColorTo = vec4(0.5f, 0.25f, 0.2f, 0.90f);
 	}
 	else if(Emote == EMOTE_HAPPY)
 	{
 		const int EmoticionList[2] = { SPRITE_EYES, SPRITE_HEARTS };
 		pEmoticionSpriteID = EmoticionList[random_int() % 2];
 		pColor = vec4(0.25f, 0.5f, 0.05f, 0.90f);
-		pColorTo = vec4(0.3f, 0.5f, 0.3f, 0.90f);
+		pColorTo = vec4(0.4f, 0.5f, 0.2f, 0.90f);
 	}
 	else if(Emote == EMOTE_SURPRISE)
 	{
 		const int EmoticionList[3] = { SPRITE_GHOST, SPRITE_WTF, SPRITE_QUESTION };
 		pEmoticionSpriteID = EmoticionList[random_int()%3];
-		pColor = vec4(0.4f, 0.1f, 0.1f, 0.90f);
-		pColorTo = vec4(0.4f, 0.3f, 0.2f, 0.90f);
+		pColor = vec4(0.3f, 0.15f, 0.1f, 0.90f);
+		pColorTo = vec4(0.3f, 0.25f, 0.2f, 0.90f);
 	}
 	else if(Emote == EMOTE_BLINK)
 	{
