@@ -15,7 +15,7 @@ static int GetIntegerEmoteValue(const char* JsonName, const char* JsonValue)
 		if(str_comp(JsonValue, "pain") == 0) return EMOTE_PAIN;
 		if(str_comp(JsonValue, "happy") == 0) return EMOTE_HAPPY;
 		if(str_comp(JsonValue, "surprise") == 0) return EMOTE_SURPRISE;
-		if(str_comp(JsonValue, "blink") == 0) return EMOTE_ANGRY;
+		if(str_comp(JsonValue, "blink") == 0) return EMOTE_BLINK;
 		if(str_comp(JsonValue, "angry") == 0) return EMOTE_ANGRY;
 		return EMOTE_NORMAL;
 	}
