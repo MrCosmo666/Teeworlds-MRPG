@@ -8,12 +8,13 @@ class CBlock : public CAnimElementsUI
 public:
     CBlock(class CAnimUI *pAnimUI, const char *Name);
 
-	virtual void Render();
-	virtual void Set(float RoundCorner, int CornerType);
+    void Render() override;
+    void Set(float RoundCorner, int CornerType, bool MonochromeGradient) override;
 
 private:
 	float m_RoundCorner;
 	int m_CornerType;
+	bool m_MonochromeGradient;
 };
 
 

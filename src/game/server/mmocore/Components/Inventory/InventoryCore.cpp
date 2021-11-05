@@ -19,7 +19,6 @@ void CInventoryCore::OnPrepareInformation(IStorageEngine* pStorage, CDataFileWri
 	nlohmann::json JsonQuestData;
 	for(auto& p : CItemDataInfo::ms_aItemsInfo)
 	{
-		// data information
 		JsonQuestData["items"].push_back(
 		{
 			{ "id", p.first },
@@ -27,24 +26,6 @@ void CInventoryCore::OnPrepareInformation(IStorageEngine* pStorage, CDataFileWri
 			{ "desc", p.second.m_aDesc },
 			{ "icon", p.second.m_aIcon },
 		});
-
-		/*// item attributes
-		const char* pNameAttributes[STATS_MAX_FOR_ITEM] = {};
-		for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
-		{
-			int AttributeID = p.second.m_aAttribute[i];
-			pNameAttributes[i] = "Empty slot characteristics";
-			if(CGS::ms_aAttributsInfo.find(AttributeID) != CGS::ms_aAttributsInfo.end() && p.second.m_aAttributeValue[i] > 0)
-				pNameAttributes[i] = CGS::ms_aAttributsInfo[AttributeID].m_aName;
-		}
-		char attBuf[64];
-		for(int i = 0; i < STATS_MAX_FOR_ITEM; i++)
-		{
-			str_format(attBuf, sizeof(attBuf), "att%d", i);
-			JsonQuestData["items"].push_back({ attBuf, pNameAttributes[i] });
-			str_format(attBuf, sizeof(attBuf), "att%d_val", i);
-			JsonQuestData["items"].push_back({ attBuf, p.second.m_aAttributeValue[i] });
-		}*/
 	}
 
 	std::string Data = JsonQuestData.dump();
