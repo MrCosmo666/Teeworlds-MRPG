@@ -334,12 +334,13 @@ void MmoController::ConSyncLinesForTranslate()
 	}
 	GS()->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "sync_lines", "Start of thread data collection for translation!");
 
-	auto PushingDialogs = [](nlohmann::json& pJson, const char* pTextKey, const char* HashingType, int HashingByID)
+	auto PushingDialogs = [](nlohmann::json& pJson, const char* pTextKey, const char* UniqueStart, int UniqueID)
 	{
 		if(pTextKey[0] == '\0')
 			return;
 
-		std::string Hashing(HashingType + std::to_string(HashingByID));
+		const std::hash<std::string> StrHash;
+		const std::string HashingStr(UniqueStart + std::to_string(UniqueID));
 		try
 		{
 			for(auto& pKeys : pJson["translation"])
@@ -347,19 +348,19 @@ void MmoController::ConSyncLinesForTranslate()
 				if(!pKeys["key"].is_string() || !pKeys["value"].is_string())
 					continue;
 
-				if(pKeys["id"].is_string() && pKeys.value("id", "0") == Hashing)
+				if((pKeys.find("hash") != pKeys.end() && !pKeys["hash"].is_null()) && pKeys.value<size_t>("hash", 0) == StrHash(HashingStr))
 				{
-					if(pKeys.value("key", "0") != pTextKey)
+					if(StrHash(pKeys.value("key", "0")) != StrHash(pTextKey))
 						pKeys["key"] = pKeys["value"] = pTextKey;
 					return;
 				}
-				else if(pKeys.value("key", "0") == pTextKey)
+				if(StrHash(pKeys.value("key", "0")) == StrHash(pTextKey))
 				{
-					pKeys["id"] = Hashing.c_str();
+					pKeys["hash"] = StrHash(HashingStr);
 					return;
 				}
 			}
-			pJson["translation"].push_back({ { "key", pTextKey }, { "value", pTextKey }, { "id", Hashing.c_str() }});
+			pJson["translation"].push_back({ { "key", pTextKey }, { "value", pTextKey }, { "hash", StrHash(HashingStr) }});
 		}
 		catch(nlohmann::json::exception& e)
 		{
