@@ -71,8 +71,8 @@ MmoController::~MmoController()
 
 void MmoController::OnTick()
 {
-	for(auto& component : m_Components.m_paComponents)
-		component->OnTick();
+	for(auto& pComponent : m_Components.m_paComponents)
+		pComponent->OnTick();
 }
 
 void MmoController::OnInitAccount(int ClientID)
@@ -81,8 +81,8 @@ void MmoController::OnInitAccount(int ClientID)
 	if(!pPlayer || !pPlayer->IsAuthed())
 		return;
 
-	for(auto& component : m_Components.m_paComponents)
-		component->OnInitAccount(pPlayer);
+	for(auto& pComponent : m_Components.m_paComponents)
+		pComponent->OnInitAccount(pPlayer);
 }
 
 bool MmoController::OnPlayerHandleMainMenu(int ClientID, int Menulist, bool ReplaceMenu)
@@ -194,7 +194,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table) const
 		for(int i = 0; i < NUM_JOB_ACCOUNTS_STATS; i++)
 		{
 			const char *pFieldName = pPlayer->Acc().m_aFarming[i].getFieldName();
-			const int JobValue = pPlayer->Acc().m_aFarming[i];
+			const int JobValue = pPlayer->Acc().m_aFarming[i].m_Value;
 			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", pFieldName, JobValue, (i == NUM_JOB_ACCOUNTS_STATS-1 ? "" : ", "));
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
@@ -209,7 +209,7 @@ void MmoController::SaveAccount(CPlayer *pPlayer, int Table) const
 		for(int i = 0; i < NUM_JOB_ACCOUNTS_STATS; i++)
 		{
 			const char* pFieldName = pPlayer->Acc().m_aMining[i].getFieldName();
-			const int JobValue = pPlayer->Acc().m_aMining[i];
+			const int JobValue = pPlayer->Acc().m_aMining[i].m_Value;
 			str_format(aBuf, sizeof(aBuf), "%s = '%d' %s", pFieldName, JobValue, (i == NUM_JOB_ACCOUNTS_STATS-1 ? "" : ", "));
 			Buffer.append_at(Buffer.length(), aBuf);
 		}
