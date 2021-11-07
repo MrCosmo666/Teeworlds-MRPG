@@ -120,10 +120,10 @@ void CSkillsCore::ShowMailSkillList(CPlayer *pPlayer, int Type)
 	const char* pSkillTypeName[NUM_SKILL_TYPES] = { "Improving", "Healing", "Attacking", "Defensive" };
 	pPlayer->m_VoteColored = BLUE_COLOR;
 	GS()->AVL(ClientID, "null", "{STR} skill's", pSkillTypeName[Type]);
-	for (const auto& sk : CSkillDataInfo::ms_aSkillsData)
+	for (const auto& pSkillData : CSkillDataInfo::ms_aSkillsData)
 	{
-		if(sk.second.m_Type == Type)
-			SkillSelected(pPlayer, sk.first);
+		if(pSkillData.second.m_Type == Type)
+			SkillSelected(pPlayer, pSkillData.first);
 	}
 	GS()->AV(ClientID, "null");
 }
@@ -170,9 +170,9 @@ void CSkillsCore::ParseEmoticionSkill(CPlayer *pPlayer, int EmoticionID)
 		return;
 
 	const int ClientID = pPlayer->GetCID();
-	for (auto& skillplayer : CSkillData::ms_aSkills[ClientID])
+	for (auto& pSkillPlayer : CSkillData::ms_aSkills[ClientID])
 	{
-		CSkillData& pSkill = pPlayer->GetSkill(skillplayer.first);
+		CSkillData& pSkill = pPlayer->GetSkill(pSkillPlayer.first);
 		if (pSkill.m_SelectedEmoticion == EmoticionID)
 			pSkill.Use();
 	}
