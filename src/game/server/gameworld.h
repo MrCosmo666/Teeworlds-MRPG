@@ -3,7 +3,6 @@
 #ifndef GAME_SERVER_GAMEWORLD_H
 #define GAME_SERVER_GAMEWORLD_H
 
-#include <base/vmath.h>
 #include <game/gamecore.h>
 
 class CEntity;

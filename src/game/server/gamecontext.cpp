@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include "gamecontext.h"
 
-#include <base/threadpool.h>
 #include <engine/storage.h>
 #include <engine/shared/config.h>
 
@@ -22,7 +21,6 @@
 #include "mmocore/GameEntities/Items/drop_items.h"
 #include "mmocore/GameEntities/Items/flying_experience.h"
 
-#include <game/game_context.h>
 #include <teeother/components/localization.h>
 
 #include "mmocore/Components/Accounts/AccountCore.h"

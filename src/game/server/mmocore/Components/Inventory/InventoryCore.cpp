@@ -10,9 +10,6 @@
 
 #include <teeother/tl/nlohmann_json.h>
 
-#include <mutex>
-#include <thread>
-
 using namespace sqlstr;
 void CInventoryCore::OnPrepareInformation(IStorageEngine* pStorage, CDataFileWriter* pDataFile)
 {

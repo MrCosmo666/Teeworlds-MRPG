@@ -2,10 +2,7 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include "MailBoxCore.h"
 
-#include <base/threadpool.h>
 #include <game/server/gamecontext.h>
-
-#include <teeother/tl/nlohmann_json.h>
 
 using namespace sqlstr;
 

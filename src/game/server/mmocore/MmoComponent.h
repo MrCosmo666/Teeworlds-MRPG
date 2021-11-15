@@ -3,12 +3,8 @@
 #ifndef GAME_SERVER_MMO_COMPONENT_H
 #define GAME_SERVER_MMO_COMPONENT_H
 
-#include <base/vmath.h>
-
 #include <engine/server/sql_connect_pool.h>
 #include <engine/server/sql_string_helpers.h>
-
-#include <game/game_context.h>
 
 using namespace sqlstr;
 class MmoComponent
