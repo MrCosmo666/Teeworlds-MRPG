@@ -624,7 +624,7 @@ bool CMenus::RenderServerControlServer(CUIRect MainView)
 
 			float Alpha = UI()->MouseInside(&Item.m_Rect) ? 0.07f : 0.05f;
 			vec4 ColorTable = vec4((float)pOption->m_Colored[0] / 10.0f, (float)pOption->m_Colored[1] / 10.0f, (float)pOption->m_Colored[2] / 10.0f, Alpha);
-			RenderTools()->DrawUIRect(&Item.m_Rect, ColorTable, CUI::CORNER_ALL, 0.0f);
+			RenderTools()->DrawUIRect(&Item.m_Rect, ColorTable, CUI::CORNER_ALL, 5.0f);
 		}
 
 		if(Item.m_Visible)

@@ -6,6 +6,7 @@
 #include <base/system.h>
 //#include <type_traits>
 
+// TODO: rework
 // temporary replacement
 template < typename T >
 class CFieldData
@@ -15,7 +16,7 @@ class CFieldData
 
 public:
 	T m_Value;
-	operator T() const { return m_Value; }
+	explicit operator T() const { return m_Value; }
 
 	/*
 	// basic operator

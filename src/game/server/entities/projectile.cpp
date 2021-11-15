@@ -58,9 +58,9 @@ return CalcPos(m_Pos, m_Direction, Curvature, Speed, Time);
 
 void CProjectile::Tick()
 {
-	float Pt = (Server()->Tick() - m_StartTick - 1) / (float)Server()->TickSpeed();
-	float Ct = (Server()->Tick() - m_StartTick) / (float)Server()->TickSpeed();
-	vec2 PrevPos = GetPos(Pt);
+	const float Pt = (Server()->Tick() - m_StartTick - 1) / (float)Server()->TickSpeed();
+	const float Ct = (Server()->Tick() - m_StartTick) / (float)Server()->TickSpeed();
+	const vec2 PrevPos = GetPos(Pt);
 	vec2 CurPos = GetPos(Ct);
 	if (!GS()->m_apPlayers[m_Owner] || !GS()->m_apPlayers[m_Owner]->GetCharacter())
 	{
@@ -99,7 +99,7 @@ void CProjectile::TickPaused()
 
 void CProjectile::Snap(int SnappingClient)
 {
-	float Ct = (Server()->Tick() - m_StartTick) / (float)Server()->TickSpeed();
+	const float Ct = (Server()->Tick() - m_StartTick) / (float)Server()->TickSpeed();
 	if (NetworkClipped(SnappingClient, GetPos(Ct)))
 		return;
 
@@ -131,14 +131,14 @@ void CProjectile::Snap(int SnappingClient)
 	}
 }
 
-int CProjectile::GetOwnerProjID(int ClientID)
+int CProjectile::GetOwnerProjID(int ClientID) const
 {
 	CPlayer* pPlayer = GS()->m_apPlayers[ClientID];
 	switch (m_Type)
 	{
 	case WEAPON_GUN:
 	{
-		int EquipID = pPlayer->GetEquippedItemID(EQUIP_GUN);
+		const int EquipID = pPlayer->GetEquippedItemID(EQUIP_GUN);
 		if (EquipID <= 0)
 			return -1;
 
@@ -146,7 +146,7 @@ int CProjectile::GetOwnerProjID(int ClientID)
 	}
 	case WEAPON_SHOTGUN:
 	{
-		int EquipID = pPlayer->GetEquippedItemID(EQUIP_SHOTGUN);
+		const int EquipID = pPlayer->GetEquippedItemID(EQUIP_SHOTGUN);
 		if (EquipID <= 0)
 			return -1;
 
@@ -154,7 +154,7 @@ int CProjectile::GetOwnerProjID(int ClientID)
 	}
 	case WEAPON_GRENADE:
 	{
-		int EquipID = pPlayer->GetEquippedItemID(EQUIP_GRENADE);
+		const int EquipID = pPlayer->GetEquippedItemID(EQUIP_GRENADE);
 		if (EquipID <= 0)
 			return -1;
 

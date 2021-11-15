@@ -59,13 +59,12 @@ bool CStorageCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const
 
 int CStorageCore::GetStorageID(vec2 Pos) const
 {
-	for (const auto& st : CStorageData::ms_aStorage)
+	const auto pStorage = std::find_if(CStorageData::ms_aStorage.begin(), CStorageData::ms_aStorage.end(), [Pos](const std::pair < int, CStorageData >& pItem)
 	{
-		const vec2 PosStorage(st.second.m_PosX, st.second.m_PosY);
-		if (distance(PosStorage, Pos) < 200)
-			return st.first;
-	}
-	return -1;
+		const vec2 PosStorage(pItem.second.m_PosX, pItem.second.m_PosY);
+		return (distance(PosStorage, Pos) < 200);
+	});
+	return pStorage != CStorageData::ms_aStorage.end() ? (*pStorage).first : -1;
 }
 
 void CStorageCore::ShowStorageMenu(CPlayer* pPlayer, int StorageID)

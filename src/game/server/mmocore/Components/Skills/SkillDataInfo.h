@@ -5,6 +5,15 @@
 
 #include <map>
 
+enum
+{
+	SKILL_TYPE_IMPROVEMENTS,
+	SKILL_TYPE_HEALER,
+	SKILL_TYPE_DPS,
+	SKILL_TYPE_TANK,
+	NUM_SKILL_TYPES,
+};
+
 class CSkillDataInfo
 {
 public:
@@ -12,6 +21,7 @@ public:
 	char m_aDesc[64];
 	char m_aBonusName[64];
 	int m_BonusValue;
+	int m_Type;
 	int m_ManaPercentageCost;
 	int m_PriceSP;
 	int m_MaxLevel;

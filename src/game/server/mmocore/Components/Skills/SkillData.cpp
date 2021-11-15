@@ -88,9 +88,9 @@ bool CSkillData::Use()
 
 			const int RealAmmo = 10 + pPlayer->GetAttributeCount(Stats::StAmmo);
 			const int RestoreAmmo = translate_to_percent_rest(RealAmmo, min(GetBonus(), 100));
-			for(int i = WEAPON_GUN; i <= WEAPON_LASER; i++)
+			for(int j = WEAPON_GUN; j <= WEAPON_LASER; j++)
 			{
-				pPlayer->GetCharacter()->GiveWeapon(i, RestoreAmmo);
+				pPlayer->GetCharacter()->GiveWeapon(j, RestoreAmmo);
 				GS()->CreateDeath(PlayerPosition, i);
 			}
 			GS()->CreateSound(PlayerPosition, SOUND_CTF_GRAB_PL);

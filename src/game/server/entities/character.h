@@ -90,9 +90,9 @@ public:
 	void OnPredictedInput(CNetObj_PlayerInput *pNewInput);
 	void OnDirectInput(CNetObj_PlayerInput *pNewInput);
 	void ResetInput();
-	bool IsGrounded();
+	bool IsGrounded() const;
 
-	bool IsAllowedPVP(int FromID);
+	bool IsAllowedPVP(int FromID) const;
 	bool IsAlive() const { return m_Alive; }
 	void SetEvent(int EventID) { m_Event = EventID; }
 	void SetEmote(int Emote, int Sec);
