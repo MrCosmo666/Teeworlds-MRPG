@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13...3.19.1)
+cmake_minimum_required(VERSION 3.16...3.19.1)
 
 file(STRINGS src/game/version.h VERSION_LINE LIMIT_COUNT 1 REGEX GAME_RELEASE_VERSION)
 
@@ -805,7 +805,7 @@ if(SERVER_COMPILE)
   file(GLOB LOCALIZED_SERVER "src/teeother/components/*.cpp" "src/teeother/components/*.h" "src/teeother/tl/*.h" "src/teeother/system/*.h")
   set(GAME_GENERATED_SERVER src/generated/server_data.cpp src/generated/server_data.h)
   set(SERVER_SRC ${ENGINE_SERVER} ${GAME_SERVER} ${GAME_GENERATED_SERVER} ${LOCALIZED_SERVER})
-
+  
   # Deps
   set(DISCORD_SERVER_LIBS)
   if(DISCORD_SERVER_COMPILE)
@@ -838,8 +838,12 @@ if(SERVER_COMPILE)
     ${DEPS_SERVER}
     $<TARGET_OBJECTS:engine-shared>
     $<TARGET_OBJECTS:game-shared>
+    "src/teeother/stdafx_server.h"
   )
-
+  target_precompile_headers(${TARGET_SERVER} PRIVATE
+    "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/teeother/stdafx_server.h>"
+    "$<$<COMPILE_LANGUAGE:CXX>:<cstddef$<ANGLE-R>>"
+  )
   target_include_directories(${TARGET_SERVER} PRIVATE ${SERVER_INCLUDES_DIRS})
   target_link_libraries(${TARGET_SERVER} ${LIBS} ${SERVER_LIBRARIES})
 

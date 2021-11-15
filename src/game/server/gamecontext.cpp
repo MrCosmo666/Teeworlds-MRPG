@@ -40,7 +40,7 @@
 
 // static data that have the same value in different objects
 std::map < int, CGS::StructAttribut > CGS::ms_aAttributsInfo;
-std::map < std::string, int > CGS::ms_aEffects[MAX_PLAYERS];
+std::unordered_map < std::string, int > CGS::ms_aEffects[MAX_PLAYERS];
 int CGS::m_MultiplierExp = 100;
 
 CGS::CGS()
