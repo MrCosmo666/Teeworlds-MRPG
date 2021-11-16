@@ -1,7 +1,3 @@
-
-#include <mysql_connection.h>
-#include <cppconn/driver.h>
-#include <cppconn/statement.h>
 #include "sql_connect_pool.h"
 
 #include <engine/shared/config.h>

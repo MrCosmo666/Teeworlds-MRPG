@@ -643,8 +643,11 @@ set(DEPS ${DEP_JSON} ${DEP_MD5} ${ZLIB_DEP})
 set(LIBS ${CMAKE_THREAD_LIBS_INIT} ${ZLIB_LIBRARIES} ${OPENSSL_CRYPTO_LIBRARY} ${PLATFORM_LIBS})
 
 # Targets
-add_library(engine-shared EXCLUDE_FROM_ALL OBJECT ${ENGINE_INTERFACE} ${ENGINE_SHARED} ${ENGINE_GENERATED_SHARED} ${BASE})
+add_library(engine-shared EXCLUDE_FROM_ALL OBJECT ${ENGINE_INTERFACE} ${ENGINE_SHARED} ${ENGINE_GENERATED_SHARED} ${BASE} )
 add_library(game-shared EXCLUDE_FROM_ALL OBJECT ${GAME_SHARED} ${GAME_GENERATED_SHARED})
+
+target_precompile_headers(engine-shared PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/teeother/stdafx_shared.h>")
+target_precompile_headers(game-shared REUSE_FROM engine-shared)
 list(APPEND TARGETS_OWN engine-shared game-shared)
 
 ########################################################################
@@ -703,6 +706,7 @@ if(CLIENT_COMPILE)
   )
 
   # linking includes & libs on client
+  target_precompile_headers(${TARGET_CLIENT} PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/teeother/stdafx_shared.h>" "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/teeother/stdafx_client.h>")
   target_include_directories(${TARGET_CLIENT} PRIVATE ${CLIENT_INCLUDES_DIRS})
   target_link_libraries(${TARGET_CLIENT} ${LIBS} ${CLIENT_LIBRARIES} ${PLATFORM_CLIENT_LIBS})
 
@@ -838,12 +842,8 @@ if(SERVER_COMPILE)
     ${DEPS_SERVER}
     $<TARGET_OBJECTS:engine-shared>
     $<TARGET_OBJECTS:game-shared>
-    "src/teeother/stdafx_server.h"
   )
-  target_precompile_headers(${TARGET_SERVER} PRIVATE
-    "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/teeother/stdafx_server.h>"
-    "$<$<COMPILE_LANGUAGE:CXX>:<cstddef$<ANGLE-R>>"
-  )
+  target_precompile_headers(${TARGET_SERVER} PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/teeother/stdafx_shared.h>" "$<$<COMPILE_LANGUAGE:CXX>:${CMAKE_CURRENT_SOURCE_DIR}/src/teeother/stdafx_server.h>")
   target_include_directories(${TARGET_SERVER} PRIVATE ${SERVER_INCLUDES_DIRS})
   target_link_libraries(${TARGET_SERVER} ${LIBS} ${SERVER_LIBRARIES})
 

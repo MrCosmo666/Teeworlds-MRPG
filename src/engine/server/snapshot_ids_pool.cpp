@@ -1,7 +1,5 @@
 #include "snapshot_ids_pool.h"
 
-#include <base/system.h>
-
 CSnapIDPool::CSnapIDPool()
 {
 	Reset();
