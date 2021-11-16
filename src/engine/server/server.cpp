@@ -35,7 +35,6 @@
 #include "multi_worlds.h"
 #include "server_ban.h"
 
-#include <teeother/components/localization.h>
 #include <engine/server/sql_connect_pool.h>
 
 #include "game/game_context.h"

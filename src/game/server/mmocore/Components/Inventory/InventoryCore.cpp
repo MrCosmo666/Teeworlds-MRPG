@@ -8,8 +8,6 @@
 #include <game/server/mmocore/Components/Houses/HouseCore.h>
 #include <game/server/mmocore/Components/Quests/QuestCore.h>
 
-#include <teeother/tl/nlohmann_json.h>
-
 using namespace sqlstr;
 void CInventoryCore::OnPrepareInformation(IStorageEngine* pStorage, CDataFileWriter* pDataFile)
 {

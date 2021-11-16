@@ -4,7 +4,6 @@
 
 #include <game/server/gamecontext.h>
 #include <teeother/system/string.h>
-#include <teeother/components/localization.h>
 
 void CCraftCore::OnInit()
 {

@@ -2,9 +2,6 @@
 #define ENGINE_SERVER_SQL_CONNECTIONPOOL_H
 #include <cppconn/resultset.h>
 
-#include <functional>
-#include <memory>
-
 using namespace sql;
 #define SJK CConectionPool::GetInstance()
 typedef std::unique_ptr<ResultSet> ResultPtr;

@@ -21,8 +21,6 @@
 #include "mmocore/GameEntities/Items/drop_items.h"
 #include "mmocore/GameEntities/Items/flying_experience.h"
 
-#include <teeother/components/localization.h>
-
 #include "mmocore/Components/Accounts/AccountCore.h"
 #include "mmocore/Components/Accounts/AccountMinerCore.h"
 #include "mmocore/Components/Accounts/AccountPlantCore.h"

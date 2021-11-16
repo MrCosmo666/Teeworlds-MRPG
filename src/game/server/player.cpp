@@ -5,8 +5,6 @@
 #include "gamecontext.h"
 #include "gamemodes/dungeon.h"
 
-#include <teeother/components/localization.h>
-
 #include "mmocore/Components/Accounts/AccountCore.h"
 #include "mmocore/Components/Bots/BotCore.h"
 #include "mmocore/Components/Dungeons/DungeonData.h"

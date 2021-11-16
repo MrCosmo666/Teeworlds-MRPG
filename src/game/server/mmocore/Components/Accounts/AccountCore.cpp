@@ -4,7 +4,6 @@
 
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
-#include <teeother/components/localization.h>
 
 #include <game/server/mmocore/Components/Dungeons/DungeonCore.h>
 #include <game/server/mmocore/Components/Mails/MailBoxCore.h>
