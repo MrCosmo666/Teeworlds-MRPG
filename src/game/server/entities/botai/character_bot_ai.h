@@ -43,7 +43,7 @@ private:
 	bool GiveWeapon(int Weapon, int GiveAmmo) override;
 	int GetSnapFullID() const override;
 
-	void RewardPlayer(CPlayer *pPlayer, vec2 ForceDies);
+	void RewardPlayer(CPlayer *pPlayer, vec2 ForceDies) const;
 	void ChangeWeapons();
 	void ShowProgressHealth();
 	void EmotesAction(int EmotionStyle);
@@ -55,7 +55,7 @@ private:
 	void EngineMobs();
 	void EngineQuestMob();
 
-	CPlayer *SearchPlayer(int Distance);
+	CPlayer *SearchPlayer(float Distance) const;
     CPlayer *SearchTenacityPlayer(float Distance);
 
 	void Move();

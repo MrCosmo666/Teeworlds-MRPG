@@ -495,7 +495,7 @@ int CGameControllerDungeon::GetAttributeDungeonSync(CPlayer* pPlayer, int BonusI
 	// balance tanks
 	if(pPlayer->m_MoodState == MOOD_PLAYER_TANK)
 	{
-		float ActiveAttribute = m_SyncDungeon / 2.0f;
+		const float ActiveAttribute = m_SyncDungeon / 2.0f;
 		if(AttributeType == AtributType::AtTank)
 			Percent = 30.0f;
 

@@ -29,7 +29,7 @@ void CAetherCore::OnInitAccount(CPlayer *pPlayer)
 	ResultPtr pRes = SJK.SD("*", "tw_accounts_aethers", "WHERE UserID = '%d'", pPlayer->Acc().m_UserID);
 	while(pRes->next())
 	{
-		int TeleportID = pRes->getInt("AetherID");
+		const int TeleportID = pRes->getInt("AetherID");
 		pPlayer->Acc().m_aAetherLocation[TeleportID] = true;
 	}
 }

@@ -11,7 +11,7 @@ CPickup::CPickup(CGameWorld *pGameWorld, int Type, vec2 Pos)
 {
 	m_Type = Type;
 
-	Reset();
+	CPickup::Reset();
 	GameWorld()->InsertEntity(this);
 }
 

@@ -11,12 +11,16 @@ int CQuestDataInfo::GetQuestStoryPosition() const
 {
 	// get position of quests storyline
 	return (int)std::count_if(ms_aDataQuests.begin(), ms_aDataQuests.end(), [this](std::pair< const int, CQuestDataInfo>& pItem)
-	{	return str_comp(pItem.second.m_aStoryLine, m_aStoryLine) == 0 && m_QuestID >= pItem.first; });
+	{
+		return str_comp(pItem.second.m_aStoryLine, m_aStoryLine) == 0 && m_QuestID >= pItem.first;
+	});
 }
 
 int CQuestDataInfo::GetQuestStorySize() const
 {
 	// get size of quests storyline
 	return (int)std::count_if(ms_aDataQuests.begin(), ms_aDataQuests.end(), [this](std::pair< const int, CQuestDataInfo>& pItem)
-		{	return str_comp(pItem.second.m_aStoryLine, m_aStoryLine) == 0; });
+	{
+		return str_comp(pItem.second.m_aStoryLine, m_aStoryLine) == 0;
+	});
 }

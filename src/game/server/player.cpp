@@ -645,22 +645,22 @@ int CPlayer::GetItemsAttributeCount(int AttributeID) const
 
 int CPlayer::GetLevelTypeAttribute(int Class)
 {
-	int Atributs = 0;
+	int Attributs = 0;
 	for (const auto& at : CGS::ms_aAttributsInfo)
 	{
 		if (at.second.m_Type == Class)
-			Atributs += GetAttributeCount(at.first, true);
+			Attributs += GetAttributeCount(at.first, true);
 	}
-	return Atributs;
+	return Attributs;
 }
 
 int CPlayer::GetLevelAllAttributes()
 {
-	int Atributs = 0;
+	int Attributs = 0;
 	for(const auto& at : CGS::ms_aAttributsInfo)
-		Atributs += GetAttributeCount(at.first, true);
+		Attributs += GetAttributeCount(at.first, true);
 
-	return Atributs;
+	return Attributs;
 }
 
 // - - - - - - T A L K I N G - - - - B O T S - - - - - - - - -

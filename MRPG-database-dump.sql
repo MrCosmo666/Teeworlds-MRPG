@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1
--- Время создания: Окт 22 2021 г., 13:35
+-- Время создания: Ноя 15 2021 г., 07:47
 -- Версия сервера: 10.4.21-MariaDB
 -- Версия PHP: 8.0.11
 
@@ -190,26 +190,6 @@ INSERT INTO `enum_quest_interactive` (`ID`, `Name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Структура таблицы `enum_talk_styles`
---
-
-CREATE TABLE `enum_talk_styles` (
-  `ID` int(11) NOT NULL,
-  `Style` varchar(64) NOT NULL DEFAULT 'nope'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
-
---
--- Дамп данных таблицы `enum_talk_styles`
---
-
-INSERT INTO `enum_talk_styles` (`ID`, `Style`) VALUES
-(0, 'Basic Talking'),
-(1, 'Aggresive Talking'),
-(2, 'Joyful Talking');
-
--- --------------------------------------------------------
-
---
 -- Структура таблицы `enum_worlds`
 --
 
@@ -236,7 +216,7 @@ INSERT INTO `enum_worlds` (`WorldID`, `Name`, `RespawnWorld`, `MusicID`) VALUES
 (8, 'Noctis Resonance', NULL, 55),
 (9, 'Departure', 9, 53),
 (10, 'Underwater of Neptune', 10, 55),
-(11, 'Yugasaki', NULL, -1);
+(11, 'Yugasaki', 11, 53);
 
 -- --------------------------------------------------------
 
@@ -261,7 +241,10 @@ CREATE TABLE `tw_accounts` (
 --
 
 INSERT INTO `tw_accounts` (`ID`, `Username`, `Password`, `PasswordSalt`, `RegisterDate`, `LoginDate`, `RegisteredIP`, `LoginIP`, `Language`) VALUES
-(1, 'kuro', '7dd4cd59370ae03ef3f73b0711cd702df5e1853bf97bf8705244c0c22d759db1', 'TYdfB9M75CLUNGkPCm6PF46C', '2021-10-21 17:26:48', '2021-10-22 18:34:35', '192.168.56.1', '192.168.56.1', 'en');
+(1, 'kuro', '7dd4cd59370ae03ef3f73b0711cd702df5e1853bf97bf8705244c0c22d759db1', 'TYdfB9M75CLUNGkPCm6PF46C', '2021-10-21 17:26:48', '2021-11-07 14:57:43', '192.168.56.1', '192.168.9.2', 'ru'),
+(2, 'kuro', 'bc5905cfaa9e0188814fa2a56ecd6a998a4d39c6345ff9bff296bd5086dee93e', 'g8KmHG6T72CGXjRnn2CBq7Zt', '2021-11-04 08:38:30', '2021-11-04 23:23:59', '192.168.9.2', '192.168.42.35', 'ru'),
+(3, 'kuro', 'b46d7846dd83b73171009b49847825aa45abbb37071021d6b4219319a680ba27', 'eVE2pT8AbnS8Lc7AUMLtWRkS', '2021-11-04 12:43:33', '2021-11-04 21:18:05', '192.168.9.2', '192.168.9.2', 'ru'),
+(4, 'kuro', 'da6eee14f58fc11fefade37e6974b2fe18259a1619cffc84279a0d3fd0101d1b', 'Yhg56c79pk6LC97TZVjdbLVg', '2021-11-05 06:51:11', '2021-11-05 14:25:01', '192.168.9.2', '192.168.9.2', 'en');
 
 -- --------------------------------------------------------
 
@@ -281,7 +264,14 @@ CREATE TABLE `tw_accounts_aethers` (
 
 INSERT INTO `tw_accounts_aethers` (`ID`, `UserID`, `AetherID`) VALUES
 (1, 1, 2),
-(2, 1, 1);
+(2, 1, 1),
+(3, 2, 2),
+(4, 2, 1),
+(5, 3, 2),
+(6, 1, 3),
+(7, 4, 2),
+(8, 4, 1),
+(9, 1, 4);
 
 -- --------------------------------------------------------
 
@@ -323,7 +313,10 @@ CREATE TABLE `tw_accounts_data` (
 --
 
 INSERT INTO `tw_accounts_data` (`ID`, `Nick`, `DiscordID`, `WorldID`, `Level`, `Exp`, `GuildID`, `GuildDeposit`, `GuildRank`, `Upgrade`, `DiscordEquip`, `SpreadShotgun`, `SpreadGrenade`, `SpreadRifle`, `Dexterity`, `CriticalHit`, `DirectCriticalHit`, `Hardness`, `Tenacity`, `Lucky`, `Piety`, `Vampirism`, `AmmoRegen`, `Ammo`, `Efficiency`, `Extraction`) VALUES
-(1, 'kurosio', 'null', 2, 3, 28, NULL, 0, NULL, 20, -1, 3, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(1, 'kurosio', '571251558457540617', 11, 34, 12952, NULL, 0, NULL, 330, -1, 3, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(2, 'kurosio1', 'null', 2, 3, 99, NULL, 0, NULL, 20, -1, 3, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(3, 'kurosio12', 'null', 0, 2, 2, NULL, 0, NULL, 10, -1, 3, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(4, 'kurosio44', 'null', 7, 4, 156, NULL, 0, NULL, 30, -1, 3, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- --------------------------------------------------------
 
@@ -344,7 +337,10 @@ CREATE TABLE `tw_accounts_farming` (
 --
 
 INSERT INTO `tw_accounts_farming` (`UserID`, `Level`, `Exp`, `Quantity`, `Upgrade`) VALUES
-(1, 1, 3, 1, 0);
+(1, 1, 5, 1, 0),
+(2, 1, 2, 1, 0),
+(3, 1, 0, 1, 0),
+(4, 1, 0, 1, 0);
 
 -- --------------------------------------------------------
 
@@ -367,11 +363,69 @@ CREATE TABLE `tw_accounts_items` (
 --
 
 INSERT INTO `tw_accounts_items` (`ID`, `ItemID`, `Value`, `Settings`, `Enchant`, `Durability`, `UserID`) VALUES
-(1, 2, 1, 1, 0, 100, 1),
-(2, 39, 1, 1, 0, 100, 1),
+(1, 2, 1, 0, 0, 100, 1),
+(2, 39, 2, 1, 0, 100, 1),
 (5, 3, 1, 1, 0, 100, 1),
-(6, 1, 10034, 0, 0, 100, 1),
-(8, 20, 3, 0, 0, 100, 1);
+(6, 1, 10662, 0, 0, 100, 1),
+(9, 27, 1, 1, 0, 100, 1),
+(10, 9, 9080, 0, 0, 100, 1),
+(11, 22, 94, 0, -858993460, 100, 1),
+(12, 32, 1, 1, 0, 100, 1),
+(13, 31, 50, 0, 0, 100, 1),
+(14, 33, 1, 1, 0, 100, 1),
+(15, 35, 67, 0, 0, 100, 1),
+(16, 34, 1, 1, 0, 100, 1),
+(17, 23, 100, 0, 0, 100, 1),
+(18, 21, 100, 0, 0, 100, 1),
+(20, 24, 100, 0, 0, 100, 1),
+(21, 25, 10099, 0, 0, 100, 1),
+(24, 18, 100, 0, 0, 100, 1),
+(25, 17, 98, 0, 0, 100, 1),
+(27, 15, 10112, 0, 0, 100, 1),
+(28, 28, 1, 1, 0, 100, 1),
+(29, 29, 50, 0, -858993460, 100, 1),
+(30, 10014, 1, 1, 0, 100, 1),
+(31, 10019, 1, 1, 1, 100, 1),
+(32, 10017, 1, 0, 1, 100, 1),
+(33, 10015, 1, 1, 2, 100, 1),
+(34, 13, 1, 0, 0, 100, 1),
+(35, 14, 12, 0, 0, 100, 1),
+(37, 36, 1, 1, 0, 100, 1),
+(38, 40, 2, 0, 0, 100, 1),
+(39, 43, 7, 0, 0, 100, 1),
+(40, 44, 2, 0, 0, 100, 1),
+(42, 46, 1, 0, 0, 100, 1),
+(43, 47, 1, 1, 0, 100, 1),
+(44, 49, 1, 1, 0, 100, 1),
+(45, 42, 1, 0, 0, 100, 1),
+(46, 50, 1, 0, 0, 100, 1),
+(47, 51, 1, 0, 0, 100, 1),
+(48, 38, 1, 0, 0, 100, 1),
+(49, 7, 1102, 0, 0, 100, 1),
+(50, 26, 1, 1, 1, 100, 1),
+(52, 30, 1, 0, 0, 100, 1),
+(53, 45, 1, 0, 0, 100, 1),
+(54, 4, 1, 1, 0, 100, 1),
+(55, 5, 1, 1, 0, 100, 1),
+(56, 6, 1, 0, 0, 100, 1),
+(57, 2, 1, 1, 0, 100, 2),
+(58, 39, 1, 1, 0, 100, 2),
+(61, 3, 1, 1, 0, 100, 2),
+(62, 1, 179, 0, 0, 100, 2),
+(64, 27, 1, 1, 0, 100, 2),
+(65, 2, 1, 1, 0, 100, 3),
+(66, 39, 1, 1, 0, 100, 3),
+(69, 3, 1, 1, 0, 100, 3),
+(70, 1, 15, 0, 0, 100, 3),
+(72, 20, 2, 0, 0, 100, 2),
+(73, 16, 3, 0, 0, 100, 1),
+(74, 2, 1, 1, 0, 100, 4),
+(75, 39, 1, 1, 0, 100, 4),
+(78, 3, 1, 1, 0, 100, 4),
+(79, 1, 317, 0, 0, 100, 4),
+(81, 9, 2, 0, 0, 100, 4),
+(82, 27, 1, 1, 0, 100, 4),
+(83, 22, 3, 0, -858993460, 100, 4);
 
 -- --------------------------------------------------------
 
@@ -410,7 +464,10 @@ CREATE TABLE `tw_accounts_mining` (
 --
 
 INSERT INTO `tw_accounts_mining` (`UserID`, `Level`, `Exp`, `Upgrade`, `Quantity`) VALUES
-(1, 1, 0, 0, 1);
+(1, 1, 0, 0, 1),
+(2, 1, 0, 0, 1),
+(3, 1, 0, 0, 1),
+(4, 1, 0, 0, 1);
 
 -- --------------------------------------------------------
 
@@ -434,8 +491,59 @@ INSERT INTO `tw_accounts_quests` (`ID`, `QuestID`, `UserID`, `Step`, `Type`) VAL
 (1, 1, 1, 1, 2),
 (2, 2, 1, 1, 2),
 (3, 6, 1, 1, 2),
-(4, 10, 1, 1, 1),
-(5, 7, 1, 1, 1);
+(4, 10, 1, 1, 2),
+(5, 7, 1, 1, 2),
+(6, 50, 1, 1, 2),
+(7, 11, 1, 1, 2),
+(8, 12, 1, 1, 2),
+(9, 13, 1, 1, 2),
+(10, 14, 1, 1, 2),
+(11, 8, 1, 1, 1),
+(12, 15, 1, 1, 2),
+(13, 16, 1, 1, 2),
+(14, 17, 1, 1, 2),
+(15, 55, 1, 1, 2),
+(16, 3, 1, 1, 2),
+(17, 5, 1, 1, 2),
+(18, 4, 1, 1, 1),
+(19, 1, 2, 1, 2),
+(20, 5, 2, 1, 1),
+(21, 2, 2, 1, 2),
+(22, 3, 2, 1, 1),
+(23, 10, 2, 1, 2),
+(24, 11, 2, 1, 2),
+(25, 12, 2, 1, 2),
+(26, 50, 2, 1, 1),
+(27, 6, 2, 1, 2),
+(28, 7, 2, 1, 1),
+(29, 55, 2, 1, 1),
+(30, 13, 2, 1, 1),
+(31, 1, 3, 1, 2),
+(32, 5, 3, 1, 1),
+(33, 2, 3, 1, 1),
+(34, 18, 1, 1, 2),
+(35, 19, 1, 1, 2),
+(36, 20, 1, 1, 2),
+(37, 60, 1, 1, 1),
+(38, 21, 1, 3, 1),
+(39, 22, 1, 1, 2),
+(40, 1, 4, 1, 2),
+(41, 2, 4, 1, 2),
+(42, 5, 4, 1, 2),
+(43, 10, 4, 1, 2),
+(44, 6, 4, 1, 2),
+(45, 7, 4, 1, 1),
+(46, 50, 4, 1, 1),
+(47, 11, 4, 1, 2),
+(48, 12, 4, 1, 2),
+(49, 55, 4, 1, 1),
+(50, 13, 4, 1, 2),
+(51, 3, 4, 1, 1),
+(52, 14, 4, 1, 2),
+(53, 8, 4, 1, 1),
+(54, 15, 4, 1, 2),
+(55, 16, 4, 1, 1),
+(56, 64, 1, 1, 2);
 
 -- --------------------------------------------------------
 
@@ -450,6 +558,16 @@ CREATE TABLE `tw_accounts_skills` (
   `Level` int(11) NOT NULL,
   `UsedByEmoticon` int(11) DEFAULT -1
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Дамп данных таблицы `tw_accounts_skills`
+--
+
+INSERT INTO `tw_accounts_skills` (`ID`, `SkillID`, `UserID`, `Level`, `UsedByEmoticon`) VALUES
+(1, 1, 1, 8, -1),
+(2, 2, 1, 10, -1),
+(3, 5, 1, 4, -1),
+(4, 6, 1, 4, -1);
 
 -- --------------------------------------------------------
 
@@ -590,7 +708,9 @@ INSERT INTO `tw_bots_info` (`ID`, `Name`, `SkinName`, `SkinColor`, `SlotHammer`,
 (49, 'Librarian', 'trela bear twinmello duotone standard sunglasses', '11686168 -1962207864 7675723 14445598 12185649 15772890', NULL, NULL, NULL, NULL, NULL, NULL),
 (50, 'Neptune', 'spiky cammo1 twinmello duotone standard standardreal', '7526428 -1490205206 9650234 16143024 5143432 7378889', 10019, 10020, 10021, 10022, 10023, 10006),
 (51, 'Farmer', 'standard cammostripes  standard standard standard', '1821867 -14840320 65408 750848 1944919 65408', NULL, NULL, NULL, NULL, NULL, NULL),
-(53, 'Master', 'puar mice  duotone standard moustache', '11763922 -15685931 65408 1102450 1232060 1376256', NULL, NULL, NULL, NULL, NULL, NULL);
+(53, 'Master', 'puar mice  duotone standard moustache', '11763922 -15685931 65408 1102450 1232060 1376256', NULL, NULL, NULL, NULL, NULL, NULL),
+(54, 'Visitor', 'koala twinbelly  standard standard standard', '184 -15397662 65408 184 9765959 65408', NULL, NULL, NULL, NULL, NULL, NULL),
+(55, 'Chef', 'standard   standard standard moustache', '1572863 -16711808 65408 1572863 1572863 65408', NULL, NULL, NULL, NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -698,7 +818,13 @@ INSERT INTO `tw_bots_npc` (`ID`, `BotID`, `PosX`, `PosY`, `GivesQuestID`, `Dialo
 (23, 14, 7048, 884, NULL, 'empty', 0, 0, 2, 1, 11),
 (24, 12, 7101, 1169, NULL, 'empty', -1, 1, 5, 1, 11),
 (25, 11, 5710, 1937, NULL, '[{\"text\":\"Welcome home, sir! **she made a bow**\",\"emote\":\"happy\"}]', -1, 0, 4, 1, 11),
-(26, 45, 3800, 1521, NULL, 'empty', -1, 1, 2, 1, 11);
+(26, 45, 3800, 1521, NULL, 'empty', -1, 1, 2, 1, 11),
+(27, 1, 1378, 1073, NULL, '[{\"text\":\"Wow, when i\'m at the helm, feel young.\",\"emote\":\"happy\"},{\"text\":\"[p]A man who is not even 25 told me...\",\"emote\":\"blink\"},{\"text\":\"Oh no, I\'ve been over 50 for a long time... But thank you, it\'s nice to hear. Okay, I\'ll keep an eye on the direction, don\'t bother me.\",\"emote\":\"blink\"}]', -1, 1, 5, 1, 9),
+(28, 2, 2781, 1105, 64, '[{\"text\":\"I feel that there will be a storm.\"},{\"text\":\"[p]Do you feel it? How can you feel it?\",\"emote\":\"surprise\"},{\"text\":\"I\'ve been sailing on a ship for a long time, and I\'ve been to many places. And i can already tell it by feeling.\"},{\"text\":\"[p]I see, hope not a strong storm awaits us?\"},{\"text\":\"I don\'t know for sure, but I have a hunch. Go to [Bot_1] and clarify, he is much more experienced than me.\"}]', -1, 1, 0, 1, 9),
+(29, 46, 2705, 1265, NULL, 'empty', -1, 1, 0, 1, 9),
+(30, 54, 1762, 1137, NULL, 'empty', -1, 0, 5, 1, 9),
+(31, 54, 2501, 1265, NULL, 'empty', -1, 0, 5, 2, 9),
+(32, 55, 2476, 1137, NULL, 'empty', -1, 1, 5, 1, 9);
 
 -- --------------------------------------------------------
 
@@ -783,7 +909,7 @@ INSERT INTO `tw_bots_quest` (`ID`, `BotID`, `QuestID`, `Step`, `WorldID`, `Gener
 (49, 25, 19, 1, 4, 0, 4727, 977, '[{\"text\":\"Get ready let\'s go to the Goblin-occupied zone.\"},{\"text\":\"[p]I\'m ready to sort of out right now.\"},{\"emote\":\"happy\",\"text\":\"Well [Player], you\'re fun, Yes, but it\'s worth getting ready.\"},{\"action_step\":1,\"emote\":\"blink\",\"text\":\"[p]Well, what do need [Talked]?\"},{\"text\":\"I\'ll be waiting for you next to Craftsman.\"}]', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
 (50, 25, 19, 2, 2, 0, 9079, 8305, '[{\"text\":\"So first we need potions.\"},{\"action_step\":1,\"text\":\"Go get supplies, and at the same time exterminate a few slugs so that we can get there without any problems.\"},{\"emote\":\"pain\",\"text\":\"[p]**You sound very tired**: We can all move, but the problem is that I\'m tired..\"},{\"emote\":\"blink\",\"text\":\"Nothing to worry about [Player]. You need to toughen up. All right let\'s move out.\"}]', 29, 22, 15, 14, 23, 9, '|16|16|8|8|40|40|', NULL, NULL),
 (51, 25, 19, 3, 3, 0, 4509, 1265, '[{\"action_step\":1,\"text\":\"We\'ll get to the guard post now. We\'ll move out there to exterminate the goblins.\"},{\"text\":\"[p]Well [Talked].\"}]', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(52, 37, 50, 1, 2, 0, 7781, 7921, '[{\"emote\":\"blink\",\"text\":\"[p]**Grinning**: Huh?\"},{\"emote\":\"pain\",\"text\":\"We can\'t heal her..\"},{\"emote\":\"blink\",\"text\":\"[p]I don\'t understand..\"},{\"emote\":\"pain\",\"text\":\"Our daughter, Maria.. She\'s sick!\"},{\"text\":\"Why don\'t you take her to the Nurse?!\"},{\"action_step\":1,\"emote\":\"pain\",\"text\":\"I tried, but she said she can\'t do anything.. I found something in an old book of mine.. A gel treatment. But I also need Kappa Meat for it..\"},{\"emote\":\"happy\",\"text\":\"Tha..nk.. You..\"},{\"emote\":\"blink\",\"text\":\"Well.. don\'t look at me, heal Maria!\"}]', 29, 35, NULL, NULL, NULL, NULL, '|20|20|0|0|0|0|', NULL, NULL),
+(52, 37, 50, 1, 2, 0, 7781, 7921, '[{\"emote\":\"blink\",\"text\":\"[p][e2]**Grinning**: Huh?\"},{\"emote\":\"pain\",\"text\":\"We can\'t heal her..\"},{\"emote\":\"blink\",\"text\":\"[p]I don\'t understand..\"},{\"emote\":\"pain\",\"text\":\"Our daughter, Maria.. She\'s sick!\"},{\"text\":\"Why don\'t you take her to the Nurse?!\"},{\"action_step\":1,\"emote\":\"pain\",\"text\":\"I tried, but she said she can\'t do anything.. I found something in an old book of mine.. A gel treatment. But I also need Kappa Meat for it..\"},{\"emote\":\"happy\",\"text\":\"Tha..nk.. You..\"},{\"emote\":\"blink\",\"text\":\"Well.. don\'t look at me, heal Maria!\"}]', 29, 35, NULL, NULL, NULL, NULL, '|20|20|0|0|0|0|', NULL, NULL),
 (53, 38, 50, 2, 2, 0, 7671, 7921, '[{\"emote\":\"pain\",\"text\":\"F..Father?\"}]', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
 (54, 37, 50, 3, 2, 0, 7781, 7921, '[{\"emote\":\"happy\",\"text\":\"MARIA! You\'re well!\"},{\"emote\":\"happy\",\"text\":\"[p]*with joy* Hi, Maria!\"},{\"text\":\"How can I ever make it up to you?\"},{\"action_step\":1,\"text\":\"[p]Well Sir.. I might need a discount from your old friend, the Craftsman.\"},{\"emote\":\"happy\",\"text\":\"Sure, I\'ll.. let him know you deserve it!\"}]', NULL, NULL, 43, NULL, NULL, NULL, '|0|0|5|0|0|0|', NULL, NULL),
 (55, 15, 55, 1, 2, 0, 9463, 6833, '[{\"emote\":\"blink\",\"text\":\"[p]Sure..What can I do?\"},{\"emote\":\"blink\",\"text\":\"I heard you helped the craftsman with his deliveries..I have no time for small things like mining cooper, can you do it for me? I have to save the world in the main time..\"},{\"action_step\":1,\"emote\":\"blink\",\"text\":\"[p] *a bit angry* Ok, I will do it.\"},{\"emote\":\"happy\",\"text\":\"Oh, it\'s you kid!\"},{\"emote\":\"angry\",\"text\":\"[p]*you can\'t control yourself* HEY. I\'m NOT A KID!\"},{\"text\":\"Hey.. easy, just a joke, did you get what I wanted?\"},{\"emote\":\"blink\",\"text\":\"[p]Yes.. *puts a heavy cooper bag on Erik\'s table*\"},{\"emote\":\"angry\",\"text\":\"Good, now get out of here!\"},{\"emote\":\"angry\",\"text\":\"[p]Wait.. YOU NOT GONNA PAY ME??\"},{\"emote\":\"angry\",\"text\":\"Haha! I am messing with you.\"}]', 31, NULL, NULL, NULL, NULL, NULL, '|50|0|0|0|0|0|', NULL, NULL),
@@ -803,7 +929,15 @@ INSERT INTO `tw_bots_quest` (`ID`, `BotID`, `QuestID`, `Step`, `WorldID`, `Gener
 (69, 46, 22, 1, 5, 0, 970, 4529, '[{\"emote\":\"happy\",\"text\":\"Well, I think my work here is done [Player].\"},{\"emote\":\"blink\",\"text\":\"[p]Your [Talked] next trip will be to your homeland?\"},{\"emote\":\"happy\",\"text\":\"Yes, I think it\'s time to go home, I missed it.\"},{\"emote\":\"happy\",\"text\":\"[p]Will you take me with you?\"},{\"emote\":\"happy\",\"text\":\"Yes, of course. Say goodbye to your friends or maybe one of them will go with you?\"},{\"action_step\":1,\"text\":\"No, I don\'t want to expose them to danger.\"},{\"text\":\"Well\"}]', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
 (70, 10, 22, 2, 5, 0, 2337, 4305, '[{\"emote\":\"pain\",\"text\":\"[p]Well, goodbye [Talked], I\'ll keep going. I want to be stronger than I was before.\"},{\"emote\":\"happy\",\"text\":\"All right [Player]. Good luck don\'t forget that we will always be happy to welcome you as a guest ;)\"},{\"action_step\":1,\"emote\":\"happy\",\"text\":\"[p]Don\'t forget, don\'t miss me ;)\"},{\"text\":\"Don\'t worry, Diana is very attached to you. I think she will be offended. Talk to she!\"}]', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
 (71, 6, 22, 3, 5, 0, 2546, 4305, '[{\"emote\":\"pain\",\"text\":\"Why didn\'t you tell [Player] me you were going to leave?\"},{\"emote\":\"pain\",\"text\":\"[p]I\'m Sorry [Talked]. I wanted to tell you..\"},{\"emote\":\"pain\",\"text\":\"**She said sadly**: Why? Will you take me with you?\"},{\"emote\":\"pain\",\"text\":\"[p]I don\'t want to put you in danger!\"},{\"emote\":\"pain\",\"text\":\"I want to travel with you!\"},{\"action_step\":1,\"emote\":\"blink\",\"text\":\"[p]Ok, I\'ll take you. Now let me to say Yasue San.\"},{\"emote\":\"happy\",\"text\":\"**She said joyfully**: True? Thank! ;)\"}]', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
-(72, 46, 22, 4, 5, 0, 4654, 4241, '[{\"emote\":\"blink\",\"text\":\"Well, ready to go?\"},{\"action_step\":1,\"emote\":\"blink\",\"text\":\"[p]Yes, will I take Diana with me?\"},{\"emote\":\"happy\",\"text\":\"Yes, of course, set sail:) I will show you my homeland!\"}]', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL);
+(72, 46, 22, 4, 5, 0, 4654, 4241, '[{\"emote\":\"blink\",\"text\":\"Well, ready to go?\"},{\"action_step\":1,\"emote\":\"blink\",\"text\":\"[p]Yes, will I take Diana with me?\"},{\"emote\":\"happy\",\"text\":\"Yes, of course, set sail:) I will show you my homeland!\"}]', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(73, 1, 64, 1, 9, 0, 1376, 1073, '[{\"text\":\"Do you need something, my young friend?\"},{\"text\":\"[p]The [Bot_2] says we are expecting a storm, I came to clarify.\"},{\"text\":\"Yes, he\'s right. A storm is waiting for us, it can be determined by the waves.\"},{\"text\":\"[p]Waves? Can I ask you more details?\",\"emote\":\"blink\"},{\"text\":\"When a storm is expected, the waves among the desert sea begin to waver.\"},{\"text\":\"[p]I see, how big a storm is expected?\",\"emote\":\"surprise\"},{\"text\":\"I won\'t tell you exactly my friend.\"},{\"text\":\"Don\'t worry, I\'ve been sailing in a storm many times. We\'ll manage somehow! You\'d better go eat and rest with your friends.\", \"action_step\":1},{\"text\":\"[p]OK, thanks for the advice.\"}]', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(74, 6, 64, 2, 9, 0, 2493, 1265, '[{\"text\":\"Oh [Player], where have you been? I\'ve been looking for you for so long.\",\"emote\":\"pain\"},{\"text\":\"Look at this interesting game from [Bot_46] homeland. It\'s called MAJONG.\",\"emote\":\"happy\"},{\"text\":\"[p]Yeah, I\'m a little worried. I have a bad feeling about it.\",\"emote\":\"blink\"},{\"text\":\"Don\'t worry [Player]. Or have you forgotten who\'s with you? I\'m the strongest girl from the village, don\'t worry!\",\"emote\":\"happy\"},{\"text\":\"Or at least I can cook well...\",\"emote\":\"blink\"},{\"text\":\"[p]Oh, speaking of which, aren\'t you hungry? Shall we go eat?\"},{\"text\":\"And i wanted to offer you something to eat too. Of course you can. A strong girl needs to eat well!\"},{\"text\":\"[p]Diana just don\'t get fat.\",\"emote\":\"happy\",\"action_step\":1},{\"text\":\"[Player] don\'t give me complexes!!! ( ‾́ ◡ ‾́ )\",\"emote\":\"angry\"}]', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(75, 55, 64, 3, 9, 0, 2485, 1137, '[{\"text\":\"What will you eat?\"},{\"text\":\"[p]Let me ask my friend for a second.\"}]', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(76, 6, 64, 3, 9, 0, 2289, 1137, '[{\"text\":\"[p][Bot_6], what are we going to eat?\"},{\"text\":\"Let\'s try pancakes!!! ** Said she with eyes like she saw pancakes for the first time**\",\"emote\":\"happy\"},{\"text\":\"[p]Yes [Talked] i want to try them too.\"}]', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(77, 6, 64, 4, 9, 0, 2341, 1137, '[{\"text\":\"Hurry up and take them, I want to eat...\",\"emote\":\"angry\"},{\"text\":\"[p] I\'ll take them, I\'ll take them... Don\'t worry, they don\'t have legs!\",\"emote\":\"blink\"}]', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(78, 55, 64, 4, 9, 0, 2485, 1137, '[{\"text\":\"Did you choose something?\"},{\"text\":\"[p]Yes we did, can we have pancakes please.\"}, {\"text\": \"Yes of course, take your order.\"}]', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(79, 6, 64, 5, 9, 0, 2485, 1265, '[{\"text\":\"Mmm... They\'re really good. But I still cook tastier don\'t you [Player] agree?\", \"emote\": \"happy\"},{\"text\":\"[p]Maybe.\"}, {\"text\": \"What\'s possible.... It\'s not possible, it\'s definitely...\", \"emote\": \"angry\"}, {\"text\": \"[p]Well, well. **Bell sound**\"}]', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL),
+(80, 2, 64, 6, 9, 0, 2132, 1265, '[{\"text\":\"Please remain calm, a very big storm is coming.\",\"emote\":\"surprise\"},{\"text\":\"[p]A violent storm?\",\"emote\":\"blink\"},{\"text\":\"[e2]HOW DARE YOU... I AM A GOD OF THE SEAS AND OCEANS....\",\"emote\":\"angry\"},{\"text\":\"[e2]I can smell the oracle...\",\"emote\":\"angry\"},{\"text\":\"[e2] WHERE IS THE ORACLE.......\",\"emote\":\"angry\"},{\"text\":\"[e1]What oracle?\",\"emote\":\"pain\"},{\"text\":\"[p][e1]Don\'t joke with me... WAIT FOR YOU IN MY CHAMBERS WITH THE ORACLE... OTHERWISE YOU WILL DIE HERE...\",\"emote\":\"angry\"},{\"text\":\"[p][e1]**no sound of water** I have stopped the flow of the sea...\",\"emote\":\"angry\"},{\"text\":\"[p][e2]How do we find you?\",\"emote\":\"blink\"},{\"text\":\"[e2] Waiting for you under the water...\",\"emote\":\"angry\"}]', NULL, NULL, NULL, NULL, NULL, NULL, '|0|0|0|0|0|0|', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -865,7 +999,7 @@ CREATE TABLE `tw_dungeons` (
 INSERT INTO `tw_dungeons` (`ID`, `Name`, `Level`, `DoorX`, `DoorY`, `RequiredQuestID`, `Story`, `WorldID`) VALUES
 (1, 'Abandoned mine', 10, 1105, 1521, 20, 1, 6),
 (2, 'Resonance Noctis', 18, 1157, 528, 62, 0, 8),
-(3, 'Kingdom Neptune', 15, 1084, 532, 22, 1, 10);
+(3, 'Kingdom Neptune', 15, 1084, 532, 64, 1, 10);
 
 -- --------------------------------------------------------
 
@@ -1281,7 +1415,8 @@ INSERT INTO `tw_quests_list` (`ID`, `Name`, `Money`, `Exp`, `StoryLine`) VALUES
 (55, 'Erik\'s way saying help.', 110, 70, 'Gunsmith Eric'),
 (60, 'Why are you here Noctis', 100, 50, 'Final fantasy'),
 (61, 'First assignment', 100, 50, 'Final fantasy'),
-(62, 'Resonance', 100, 50, 'Final fantasy');
+(62, 'Resonance', 100, 50, 'Final fantasy'),
+(64, 'Deity of underwater king', 100, 80, 'Main: Betrayal, Death');
 
 -- --------------------------------------------------------
 
@@ -1293,6 +1428,7 @@ CREATE TABLE `tw_skills_list` (
   `ID` int(11) NOT NULL,
   `Name` varchar(64) NOT NULL,
   `Description` varchar(64) NOT NULL,
+  `Type` int(11) NOT NULL DEFAULT 0 COMMENT '0-Improvements\r\n1-Healer\r\n2-Dps\r\n3-Tank',
   `BonusName` varchar(64) NOT NULL DEFAULT '''name''',
   `BonusValue` int(11) NOT NULL DEFAULT 1,
   `ManaPercentageCost` int(11) NOT NULL DEFAULT 10,
@@ -1305,13 +1441,13 @@ CREATE TABLE `tw_skills_list` (
 -- Дамп данных таблицы `tw_skills_list`
 --
 
-INSERT INTO `tw_skills_list` (`ID`, `Name`, `Description`, `BonusName`, `BonusValue`, `ManaPercentageCost`, `PriceSP`, `MaxLevel`, `Passive`) VALUES
-(1, 'Health turret', 'Creates turret a recovery health ', 'life span', 3, 25, 24, 8, 0),
-(2, 'Sleepy Gravity', 'Magnet mobs to itself', 'radius', 20, 25, 28, 10, 0),
-(3, 'Craft Discount', 'Will give discount on the price of craft items', '% discount gold for craft item', 1, 0, 28, 50, 1),
-(4, 'Proficiency with weapons', 'You can perform an automatic fire', 'can perform an auto fire with all types of weapons', 1, 0, 120, 1, 1),
-(5, 'Blessing of God of war', 'The blessing restores ammo', '% recovers ammo within a radius of 800', 25, 50, 28, 4, 0),
-(6, 'Noctis Lucis Attack Teleport', 'An attacking teleport that deals damage to all mobs radius', '% your strength', 25, 10, 100, 4, 0);
+INSERT INTO `tw_skills_list` (`ID`, `Name`, `Description`, `Type`, `BonusName`, `BonusValue`, `ManaPercentageCost`, `PriceSP`, `MaxLevel`, `Passive`) VALUES
+(1, 'Health turret', 'Creates turret a recovery health ', 1, 'life span', 3, 25, 24, 8, 0),
+(2, 'Sleepy Gravity', 'Magnet mobs to itself', 3, 'radius', 20, 25, 28, 10, 0),
+(3, 'Craft Discount', 'Will give discount on the price of craft items', 0, '% discount gold for craft item', 1, 0, 28, 50, 1),
+(4, 'Proficiency with weapons', 'You can perform an automatic fire', 0, 'can perform an auto fire with all types of weapons', 1, 0, 120, 1, 1),
+(5, 'Blessing of God of war', 'The blessing restores ammo', 3, '% recovers ammo within a radius of 800', 25, 50, 28, 4, 0),
+(6, 'Noctis Lucis Attack Teleport', 'An attacking teleport that deals damage to all mobs radius', 2, '% your strength', 25, 10, 100, 4, 0);
 
 -- --------------------------------------------------------
 
@@ -1440,7 +1576,7 @@ INSERT INTO `tw_world_swap` (`ID`, `WorldID`, `PositionX`, `PositionY`, `Require
 (5, 3, 4560, 1205, 19, 5, 610, 4500),
 (6, 2, 8328, 6020, 15, 7, 4135, 840),
 (7, 5, 4896, 4276, 22, 9, 2905, 1227),
-(8, 9, 1705, 1097, NULL, 11, 12604, 2180);
+(8, 9, 1491, 1104, NULL, 11, 12604, 2180);
 
 --
 -- Индексы сохранённых таблиц
@@ -1489,14 +1625,6 @@ ALTER TABLE `enum_mmo_proj`
 --
 ALTER TABLE `enum_quest_interactive`
   ADD KEY `ID` (`ID`);
-
---
--- Индексы таблицы `enum_talk_styles`
---
-ALTER TABLE `enum_talk_styles`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `ID` (`ID`),
-  ADD KEY `ID_2` (`ID`);
 
 --
 -- Индексы таблицы `enum_worlds`
@@ -1894,34 +2022,28 @@ ALTER TABLE `enum_items_types`
   MODIFY `TypeID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
--- AUTO_INCREMENT для таблицы `enum_talk_styles`
---
-ALTER TABLE `enum_talk_styles`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
 -- AUTO_INCREMENT для таблицы `tw_accounts`
 --
 ALTER TABLE `tw_accounts`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `tw_accounts_aethers`
 --
 ALTER TABLE `tw_accounts_aethers`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT для таблицы `tw_accounts_data`
 --
 ALTER TABLE `tw_accounts_data`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `tw_accounts_items`
 --
 ALTER TABLE `tw_accounts_items`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=85;
 
 --
 -- AUTO_INCREMENT для таблицы `tw_accounts_mailbox`
@@ -1933,13 +2055,13 @@ ALTER TABLE `tw_accounts_mailbox`
 -- AUTO_INCREMENT для таблицы `tw_accounts_quests`
 --
 ALTER TABLE `tw_accounts_quests`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
 
 --
 -- AUTO_INCREMENT для таблицы `tw_accounts_skills`
 --
 ALTER TABLE `tw_accounts_skills`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT для таблицы `tw_aethers`
@@ -1951,7 +2073,7 @@ ALTER TABLE `tw_aethers`
 -- AUTO_INCREMENT для таблицы `tw_bots_info`
 --
 ALTER TABLE `tw_bots_info`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- AUTO_INCREMENT для таблицы `tw_bots_mobs`
@@ -1963,13 +2085,13 @@ ALTER TABLE `tw_bots_mobs`
 -- AUTO_INCREMENT для таблицы `tw_bots_npc`
 --
 ALTER TABLE `tw_bots_npc`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT для таблицы `tw_bots_quest`
 --
 ALTER TABLE `tw_bots_quest`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=73;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=81;
 
 --
 -- AUTO_INCREMENT для таблицы `tw_crafts_list`
@@ -2071,7 +2193,7 @@ ALTER TABLE `tw_positions_mining`
 -- AUTO_INCREMENT для таблицы `tw_quests_list`
 --
 ALTER TABLE `tw_quests_list`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=65;
 
 --
 -- AUTO_INCREMENT для таблицы `tw_skills_list`

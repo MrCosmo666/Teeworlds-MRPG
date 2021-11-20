@@ -14,7 +14,7 @@
 MACRO_ALLOC_POOL_ID_IMPL(CCharacterBotAI, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 
 CCharacterBotAI::CCharacterBotAI(CGameWorld *pWorld) : CCharacter(pWorld) {}
-CCharacterBotAI::~CCharacterBotAI() {}
+CCharacterBotAI::~CCharacterBotAI() = default;
 
 int CCharacterBotAI::GetSnapFullID() const { return m_pBotPlayer->GetCID() * SNAPBOTS; }
 
@@ -138,7 +138,7 @@ void CCharacterBotAI::Die(int Killer, int Weapon)
 	CCharacter::Die(Killer, Weapon);
 }
 
-void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force)
+void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force) const
 {
 	const int ClientID = pPlayer->GetCID();
 	const int BotID = m_pBotPlayer->GetBotID();
@@ -172,7 +172,7 @@ void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force)
 			continue;
 
 		const float RandomDrop = clamp(MobBotInfo::ms_aMobBot[SubID].m_aRandomItem[i] + ActiveLuckyDrop, 0.0f, 100.0f);
-		vec2 ForceRandom(centrelized_frandom(Force.x, Force.x / 4.0f), centrelized_frandom(Force.y, Force.y / 8.0f));
+		const vec2 ForceRandom(centrelized_frandom(Force.x, Force.x / 4.0f), centrelized_frandom(Force.y, Force.y / 8.0f));
 		GS()->CreateRandomDropItem(m_Core.m_Pos, ClientID, RandomDrop, DropItem, ForceRandom);
 	}
 
@@ -189,11 +189,11 @@ void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force)
 
 void CCharacterBotAI::ChangeWeapons()
 {
-	const int randtime = 1+random_int()%3;
-	if(Server()->Tick() % (Server()->TickSpeed()*randtime) == 0)
+	const int RandomSec = 1+random_int()%3;
+	if(Server()->Tick() % (Server()->TickSpeed()*RandomSec) == 0)
 	{
-		const int randomweapon = random_int()%4;
-		m_ActiveWeapon = clamp(randomweapon, (int)WEAPON_HAMMER, (int)WEAPON_LASER);
+		const int RandomWeapon = random_int()%4;
+		m_ActiveWeapon = clamp(RandomWeapon, (int)WEAPON_HAMMER, (int)WEAPON_LASER);
 	}
 }
 
@@ -489,7 +489,7 @@ void CCharacterBotAI::SetAim(vec2 Dir)
 }
 
 // searching for a player among people
-CPlayer *CCharacterBotAI::SearchPlayer(int Distance)
+CPlayer* CCharacterBotAI::SearchPlayer(float Distance) const
 {
 	for(int i = 0 ; i < MAX_PLAYERS; i ++)
 	{
