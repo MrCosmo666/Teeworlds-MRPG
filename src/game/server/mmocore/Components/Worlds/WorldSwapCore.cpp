@@ -83,8 +83,10 @@ int CWorldSwapCore::GetWorldType() const
 int CWorldSwapCore::GetNecessaryQuest(int WorldID) const
 {
 	int CheckWorldID = WorldID != -1 ? WorldID : GS()->GetWorldID();
-	const auto& pItem = std::find_if(CWorldSwapData::ms_aWorldSwap.begin(), CWorldSwapData::ms_aWorldSwap.end(), [CheckWorldID](const std::pair<int, CWorldSwapData>& pWorldSwap)
-	                                 { return pWorldSwap.second.m_TwoWorldID == CheckWorldID; });
+	const auto pItem = std::find_if(CWorldSwapData::ms_aWorldSwap.begin(), CWorldSwapData::ms_aWorldSwap.end(), [CheckWorldID](const std::pair<int, CWorldSwapData>& pWorldSwap)
+	{
+		return pWorldSwap.second.m_TwoWorldID == CheckWorldID;
+	});
 	return pItem != CWorldSwapData::ms_aWorldSwap.end() ? pItem->second.m_RequiredQuestID : -1;
 }
 
@@ -94,16 +96,13 @@ vec2 CWorldSwapCore::GetPositionQuestBot(int ClientID, QuestBotInfo QuestBot) co
 		return vec2(QuestBot.m_PositionX, QuestBot.m_PositionY);
 
 	int TargetWorldID = QuestBot.m_WorldID;
-	for(const auto& swp : CWorldSwapPosition::ms_aWorldPositionLogic)
+	const auto pWorldSwap = std::find_if(CWorldSwapPosition::ms_aWorldPositionLogic.begin(), CWorldSwapPosition::ms_aWorldPositionLogic.end(), [&](const CWorldSwapPosition& pItem)
 	{
-		if(TargetWorldID != swp.m_BaseWorldID)
-			continue;
-
-		TargetWorldID = swp.m_FindWorldID;
-		if(GS()->GetWorldID() == TargetWorldID)
-			return swp.m_Position;
-	}
-	return vec2(0, 0);
+		if(TargetWorldID == pItem.m_BaseWorldID)
+			TargetWorldID = pItem.m_FindWorldID;
+		return GS()->GetWorldID() == TargetWorldID;
+	});
+	return pWorldSwap != CWorldSwapPosition::ms_aWorldPositionLogic.end() ? (*pWorldSwap).m_Position : vec2(0, 0);
 }
 
 void CWorldSwapCore::CheckQuestingOpened(CPlayer* pPlayer, int QuestID) const
@@ -122,10 +121,10 @@ bool CWorldSwapCore::ChangeWorld(CPlayer* pPlayer, vec2 Pos)
 	if(CWorldSwapData::ms_aWorldSwap.find(WID) != CWorldSwapData::ms_aWorldSwap.end())
 	{
 		const int ClientID = pPlayer->GetCID();
-		const int StoryQuestNeeded = CWorldSwapData::ms_aWorldSwap[WID].m_RequiredQuestID;
-		if(StoryQuestNeeded > 0 && !pPlayer->GetQuest(StoryQuestNeeded).IsComplected())
+		const int QuestNeeded = CWorldSwapData::ms_aWorldSwap[WID].m_RequiredQuestID;
+		if(QuestNeeded > 0 && !pPlayer->GetQuest(QuestNeeded).IsComplected())
 		{
-			GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Requires quest completion '{STR}'!", pPlayer->GetQuest(StoryQuestNeeded).Info().GetName());
+			GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Requires quest completion '{STR}'!", pPlayer->GetQuest(QuestNeeded).Info().GetName());
 			return false;
 		}
 
@@ -147,15 +146,11 @@ bool CWorldSwapCore::ChangeWorld(CPlayer* pPlayer, vec2 Pos)
 
 int CWorldSwapCore::GetID(vec2 Pos) const
 {
-	for(const auto& sw : CWorldSwapData::ms_aWorldSwap)
+	const auto pWorld = std::find_if(CWorldSwapData::ms_aWorldSwap.begin(), CWorldSwapData::ms_aWorldSwap.end(), [=](const std::pair < int, CWorldSwapData >& pItem)
 	{
-		if(sw.second.m_WorldID == GS()->GetWorldID() || sw.second.m_TwoWorldID == GS()->GetWorldID())
-		{
-			vec2 SwapPosition = vec2(sw.second.m_PositionX, sw.second.m_PositionY);
-			vec2 SwapPosition2 = vec2(sw.second.m_TwoPositionX, sw.second.m_TwoPositionY);
-			if(distance(SwapPosition, Pos) < 400 || distance(SwapPosition2, Pos) < 400)
-				return sw.first;
-		}
-	}
-	return -1;
+		const CWorldSwapData& pData = pItem.second;
+		return (pData.m_WorldID == GS()->GetWorldID() || pData.m_TwoWorldID == GS()->GetWorldID())
+			&& (distance(vec2(pData.m_PositionX, pData.m_PositionY), Pos) < 400 || distance(vec2(pData.m_TwoPositionX, pData.m_TwoPositionY), Pos) < 400);
+	});
+	return pWorld != CWorldSwapData::ms_aWorldSwap.end() ? (*pWorld).first : -1;
 }

@@ -31,7 +31,7 @@ public:
 	void Snap(int SnappingClient) override;
 
 private:
-	int GetOwnerProjID(int ClientID);
+	int GetOwnerProjID(int ClientID) const;
 };
 
 #endif

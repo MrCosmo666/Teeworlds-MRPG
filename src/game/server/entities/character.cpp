@@ -124,7 +124,7 @@ void CCharacter::SetWeapon(int W)
 	m_aWeapons[m_ActiveWeapon].m_AmmoRegenStart = -1;
 }
 
-bool CCharacter::IsGrounded()
+bool CCharacter::IsGrounded() const
 {
 	if(GS()->Collision()->CheckPoint(m_Pos.x+GetProximityRadius()/2, m_Pos.y+GetProximityRadius()/2+5))
 		return true;
@@ -1091,7 +1091,7 @@ void CCharacter::HandleAuthedPlayer()
 	HandleEvents();
 }
 
-bool CCharacter::IsAllowedPVP(int FromID)
+bool CCharacter::IsAllowedPVP(int FromID) const
 {
 	CPlayer* pFrom = GS()->GetPlayer(FromID, false, true);
 	if(!pFrom || (m_SkipDamage || pFrom->GetCharacter()->m_SkipDamage) || (m_pPlayer->IsBot() && pFrom->IsBot()))

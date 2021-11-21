@@ -16,19 +16,19 @@ class CBotCore : public MmoComponent
 		MobBotInfo::ms_aMobBot.clear();
 	};
 
+	void OnInit() override;
 	void OnInitWorld(const char* pWhereLocalWorld) override;
 
-	void LoadMainInformationBots();
-	void LoadQuestBots(const char* pWhereLocalWorld);
-	void LoadNpcBots(const char* pWhereLocalWorld);
-	void LoadMobsBots(const char* pWhereLocalWorld);
+	void InitQuestBots(const char* pWhereLocalWorld);
+	void InitNPCBots(const char* pWhereLocalWorld);
+	void InitMobsBots(const char* pWhereLocalWorld);
 
 public:
-	void ProcessingTalkingNPC(int OwnID, int TalkingID, const char* Message, int Emote, int TalkedFlag = TALKED_FLAG_FULL);
+	void ProcessingTalkingNPC(int OwnID, int TalkingID, const char* Message, int Emote, int TalkedFlag = TALKED_FLAG_FULL) const;
 	void DialogBotStepNPC(CPlayer* pPlayer, int MobID, int Progress, int TalkedID, const char *pText = "empty");
 	void DialogBotStepQuest(CPlayer* pPlayer, int MobID, int Progress, int TalkedID);
 	void ShowBotQuestTaskInfo(CPlayer* pPlayer, int MobID, int Progress);
-	int GetQuestNPC(int MobID) const;
+	static int GetQuestNPC(int MobID);
 	static const char *GetMeaninglessDialog();
 
 	void ConAddCharacterBot(int ClientID, const char* pCharacter);
