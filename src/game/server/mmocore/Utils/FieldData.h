@@ -3,7 +3,6 @@
 #ifndef GAME_SERVER_MMO_UTILS_FIELD_DATA_H
 #define GAME_SERVER_MMO_UTILS_FIELD_DATA_H
 
-#include <base/system.h>
 //#include <type_traits>
 
 // TODO: rework

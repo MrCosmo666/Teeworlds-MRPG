@@ -1,7 +1,6 @@
 #include <engine/console.h>
 #include "server_ban.h"
 
-#include <base/math.h>
 #include <engine/server.h>
 #include <engine/shared/config.h>
 #include <engine/shared/network.h>

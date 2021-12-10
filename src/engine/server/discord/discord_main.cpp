@@ -8,8 +8,6 @@
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
 
-#include <mutex>
-
 DiscordJob::DiscordJob(IServer* pServer) : SleepyDiscord::DiscordClient(g_Config.m_SvDiscordToken, SleepyDiscord::USER_CONTROLED_THREADS)
 {
 	m_pServer = pServer;

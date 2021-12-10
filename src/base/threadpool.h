@@ -1,16 +1,6 @@
 #ifndef THREAD_POOL_H
 #define THREAD_POOL_H
 
-#include <condition_variable>
-#include <functional>
-#include <future>
-#include <memory>
-#include <mutex>
-#include <queue>
-#include <stdexcept>
-#include <thread>
-#include <vector>
-
 class ThreadPool {
 public:
     ThreadPool(size_t);

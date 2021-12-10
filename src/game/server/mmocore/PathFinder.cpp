@@ -1,5 +1,4 @@
 /* Pathfind class by Sushi */
-#include <base/vmath.h>
 #include "PathFinder.h"
 
 #include <game/collision.h>

@@ -3,9 +3,6 @@
 #ifndef GAME_SERVER_GAMECONTROLLER_H
 #define GAME_SERVER_GAMECONTROLLER_H
 
-#include <base/vmath.h>
-#include <game/game_context.h>
-
 /*
 	Class: Game Controller
 		Controls the main game logic. Keeping track of team and player score,

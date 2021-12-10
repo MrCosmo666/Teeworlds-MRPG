@@ -1,5 +1,3 @@
-#include <base/system.h>
-
 #include "sql_string_helpers.h"
 
 void sqlstr::FuzzyString(char *pString, int size)

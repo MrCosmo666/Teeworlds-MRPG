@@ -24,11 +24,6 @@
 #include "Components/Storages/StorageCore.h"
 #include "Components/Worlds/WorldSwapCore.h"
 
-#include <teeother/components/localization.h>
-#include <teeother/tl/nlohmann_json.h>
-
-#include <mutex>
-
 MmoController::MmoController(CGS *pGameServer) : m_pGameServer(pGameServer)
 {
 	// order

@@ -6,8 +6,6 @@
 
 #include "ItemData.h"
 
-#include <vector>
-
 class CPlayer;
 
 struct StructRandomItem

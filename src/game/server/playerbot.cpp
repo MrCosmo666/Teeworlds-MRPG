@@ -10,8 +10,6 @@
 #include "mmocore/Components/Bots/BotCore.h"
 #include "mmocore/Components/Worlds/WorldSwapCore.h"
 
-#include <thread>
-
 MACRO_ALLOC_POOL_ID_IMPL(CPlayerBot, MAX_CLIENTS * ENGINE_MAX_WORLDS + MAX_CLIENTS)
 
 CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int SpawnPoint)

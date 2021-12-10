@@ -5,8 +5,6 @@
 
 #include "player.h"
 
-#include <atomic>
-
 class CPlayerBot : public CPlayer
 {
 	MACRO_ALLOC_POOL_ID()
@@ -61,7 +59,7 @@ public:
 	void SetDungeonAllowedSpawn(bool Spawn) { m_DungeonAllowedSpawn = Spawn; }
 
 private:
-	std::map < std::string /* effect */, int /* seconds */ > m_aEffects;
+	std::unordered_map < std::string /* effect */, int /* seconds */ > m_aEffects;
 	void EffectsTick() override;
 	void TryRespawn() override;
 

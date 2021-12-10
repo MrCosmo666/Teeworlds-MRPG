@@ -4,7 +4,6 @@
 
 #include <game/server/gamecontext.h>
 #include <teeother/system/string.h>
-#include <teeother/components/localization.h>
 
 #include <game/server/mmocore/GameEntities/quest_path_finder.h>
 #include <game/server/mmocore/GameEntities/Items/drop_quest_items.h>
