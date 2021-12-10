@@ -239,10 +239,10 @@ void CPlayer::TryRespawn()
 	if(!GS()->m_pController->CanSpawn(SpawnType, &SpawnPos, vec2(-1, -1)))
 		return;
 
-	if(!GS()->IsDungeon() && (GetTempData().m_TempTeleportX > 1 || GetTempData().m_TempTeleportY > 1))
+	if(!GS()->IsDungeon() && length(GetTempData().m_TempTeleportPos) > 0.0f)
 	{
-		SpawnPos = vec2(GetTempData().m_TempTeleportX, GetTempData().m_TempTeleportY);
-		GetTempData().m_TempTeleportX = GetTempData().m_TempTeleportY = -1;
+		SpawnPos = GetTempData().m_TempTeleportPos;
+		GetTempData().m_TempTeleportPos = vec2(-1, -1);
 	}
 
 	const int AllocMemoryCell = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;

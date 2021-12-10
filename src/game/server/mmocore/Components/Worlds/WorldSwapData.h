@@ -6,12 +6,8 @@
 struct CWorldSwapData
 {
 	int m_RequiredQuestID;
-	int m_PositionX;
-	int m_PositionY;
-	int m_WorldID;
-	int m_TwoPositionX;
-	int m_TwoPositionY;
-	int m_TwoWorldID;
+	vec2 m_Position[2];
+	int m_WorldID[2];
 
 	static std::map< int, CWorldSwapData > ms_aWorldSwap;
 };

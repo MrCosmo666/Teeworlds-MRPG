@@ -49,8 +49,7 @@ bool CAetherCore::OnHandleVoteCommands(CPlayer *pPlayer, const char *CMD, const 
 		const vec2 Position = vec2(CAetherData::ms_aTeleport[TeleportID].m_TeleX, CAetherData::ms_aTeleport[TeleportID].m_TeleY);
 		if(!GS()->IsPlayerEqualWorldID(ClientID, CAetherData::ms_aTeleport[TeleportID].m_WorldID))
 		{
-			pPlayer->GetTempData().m_TempTeleportX = Position.x;
-			pPlayer->GetTempData().m_TempTeleportY = Position.y;
+			pPlayer->GetTempData().m_TempTeleportPos = Position;
 			pPlayer->ChangeWorld(CAetherData::ms_aTeleport[TeleportID].m_WorldID);
 			return true;
 		}

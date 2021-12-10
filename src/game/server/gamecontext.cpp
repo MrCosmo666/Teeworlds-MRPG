@@ -2064,8 +2064,8 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 				continue;
 
 			const int HideID = (NUM_TAB_MENU+12500+mobs.first);
-			const int PosX = mobs.second.m_PositionX/32, PosY = mobs.second.m_PositionY/32;
-			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} [x{INT} y{INT}]", mobs.second.GetName(), PosX, PosY);
+			vec2 Pos = mobs.second.m_Position / 32;
+			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} [x{INT} y{INT}]", mobs.second.GetName(), Pos.x, Pos.y);
 
 			for(int i = 0; i < MAX_DROPPED_FROM_MOBS; i++)
 			{
