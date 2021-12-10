@@ -2063,9 +2063,9 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 			if (!IsPlayerEqualWorldID(ClientID, mobs.second.m_WorldID))
 				continue;
 
-			const int HideID = (NUM_TAB_MENU+12500+mobs.first);
-			vec2 Pos = mobs.second.m_Position / 32;
-			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} [x{INT} y{INT}]", mobs.second.GetName(), Pos.x, Pos.y);
+			const int HideID = (NUM_TAB_MENU + mobs.first);
+			const vec2 Pos = mobs.second.m_Position / 32.0f;
+			AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} [x{INT} y{INT}]", mobs.second.GetName(), (int)Pos.x, (int)Pos.y);
 
 			for(int i = 0; i < MAX_DROPPED_FROM_MOBS; i++)
 			{

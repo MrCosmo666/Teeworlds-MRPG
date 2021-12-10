@@ -22,7 +22,7 @@ class CWorldSwapCore : public MmoComponent
 public:
 	int GetWorldType() const;
 	int GetNecessaryQuest(int WorldID = -1) const;
-	vec2 GetPositionQuestBot(int ClientID, QuestBotInfo QuestBot) const;
+	vec2 GetPositionQuestBot(int ClientID, const QuestBotInfo& QuestBot) const;
 	void CheckQuestingOpened(CPlayer* pPlayer, int QuestID) const;
 
 private:

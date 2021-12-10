@@ -80,7 +80,7 @@ int CWorldSwapCore::GetNecessaryQuest(int WorldID) const
 	return pItem != CWorldSwapData::ms_aWorldSwap.end() ? pItem->second.m_RequiredQuestID : -1;
 }
 
-vec2 CWorldSwapCore::GetPositionQuestBot(int ClientID, QuestBotInfo QuestBot) const
+vec2 CWorldSwapCore::GetPositionQuestBot(int ClientID, const QuestBotInfo& QuestBot) const
 {
 	if(GS()->GetWorldID() == QuestBot.m_WorldID)
 		return QuestBot.m_Position;
@@ -98,38 +98,37 @@ vec2 CWorldSwapCore::GetPositionQuestBot(int ClientID, QuestBotInfo QuestBot) co
 void CWorldSwapCore::CheckQuestingOpened(CPlayer* pPlayer, int QuestID) const
 {
 	const int ClientID = pPlayer->GetCID();
-	for(const auto& sw : CWorldSwapData::ms_aWorldSwap)
+	for(const auto& pSwapData : CWorldSwapData::ms_aWorldSwap)
 	{
-		if(QuestID == sw.second.m_RequiredQuestID)
-			GS()->Chat(-1, "{STR} opened zone ({STR})!", Server()->ClientName(ClientID), Server()->GetWorldName(sw.second.m_WorldID[1]));
+		if(QuestID == pSwapData.second.m_RequiredQuestID)
+			GS()->Chat(-1, "{STR} opened zone ({STR})!", Server()->ClientName(ClientID), Server()->GetWorldName(pSwapData.second.m_WorldID[1]));
 	}
 }
 
 bool CWorldSwapCore::ChangeWorld(CPlayer* pPlayer, vec2 Pos)
 {
 	const int WID = GetID(Pos);
-	if(CWorldSwapData::ms_aWorldSwap.find(WID) != CWorldSwapData::ms_aWorldSwap.end())
+	if(CWorldSwapData::ms_aWorldSwap.find(WID) == CWorldSwapData::ms_aWorldSwap.end())
+		return false;
+
+	const int ClientID = pPlayer->GetCID();
+	const int RequiredQuestID = CWorldSwapData::ms_aWorldSwap[WID].m_RequiredQuestID;
+	if(RequiredQuestID > 0 && !pPlayer->GetQuest(RequiredQuestID).IsComplected())
 	{
-		const int ClientID = pPlayer->GetCID();
-		const int QuestNeeded = CWorldSwapData::ms_aWorldSwap[WID].m_RequiredQuestID;
-		if(QuestNeeded > 0 && !pPlayer->GetQuest(QuestNeeded).IsComplected())
-		{
-			GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Requires quest completion '{STR}'!", pPlayer->GetQuest(QuestNeeded).Info().GetName());
-			return false;
-		}
+		GS()->Broadcast(ClientID, BroadcastPriority::GAME_WARNING, 100, "Requires quest completion '{STR}'!", pPlayer->GetQuest(RequiredQuestID).Info().GetName());
+		return false;
+	}
 
-		if(CWorldSwapData::ms_aWorldSwap[WID].m_WorldID[0] == GS()->GetWorldID())
-		{
-			pPlayer->GetTempData().m_TempTeleportPos = CWorldSwapData::ms_aWorldSwap[WID].m_Position[1];
-			pPlayer->ChangeWorld(CWorldSwapData::ms_aWorldSwap[WID].m_WorldID[1]);
-			return true;
-		}
-
-		pPlayer->GetTempData().m_TempTeleportPos = CWorldSwapData::ms_aWorldSwap[WID].m_Position[0];
-		pPlayer->ChangeWorld(CWorldSwapData::ms_aWorldSwap[WID].m_WorldID[0]);
+	if(CWorldSwapData::ms_aWorldSwap[WID].m_WorldID[0] == GS()->GetWorldID())
+	{
+		pPlayer->GetTempData().m_TempTeleportPos = CWorldSwapData::ms_aWorldSwap[WID].m_Position[1];
+		pPlayer->ChangeWorld(CWorldSwapData::ms_aWorldSwap[WID].m_WorldID[1]);
 		return true;
 	}
-	return false;
+
+	pPlayer->GetTempData().m_TempTeleportPos = CWorldSwapData::ms_aWorldSwap[WID].m_Position[0];
+	pPlayer->ChangeWorld(CWorldSwapData::ms_aWorldSwap[WID].m_WorldID[0]);
+	return true;
 }
 
 int CWorldSwapCore::GetID(vec2 Pos) const
