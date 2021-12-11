@@ -616,11 +616,12 @@ void CUI::WindowRender()
 	bool ShowCursor = false;
 	const CUIRect ScreenMap = *Screen();
 	Graphics()->MapScreen(ScreenMap.x, ScreenMap.y, ScreenMap.w, ScreenMap.h);
-	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
+
+	for(unsigned int i = CWindowUI::ms_aWindows.size() - 1; i >= 0; i--)
 	{
-		if((*it)->IsRenderAllowed())
+		if(CWindowUI::ms_aWindows[i]->IsRenderAllowed())
 		{
-			(*it)->Render();
+			CWindowUI::ms_aWindows[i]->Render();
 			ShowCursor = true;
 		}
 	}
