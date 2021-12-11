@@ -290,7 +290,7 @@ void CWindowUI::Open()
 	m_WindowMoving = false;
 	m_WindowMinimize = false;
 
-	const auto pSearch = std::find_if(CWindowUI::ms_aWindows.begin(), CWindowUI::ms_aWindows.end(), [this](const CWindowUI* pWindow) { return str_comp(m_aWindowName, pWindow->GetWindowName()) == 0;  });
+	const auto pSearch = std::find_if(CWindowUI::ms_aWindows.begin(), CWindowUI::ms_aWindows.end(), [this](const CWindowUI* pWindow) { return this == pWindow;  });
 	std::rotate(CWindowUI::ms_aWindows.begin(), pSearch, pSearch + 1);
 }
 
@@ -317,7 +317,7 @@ void CWindowUI::Register(RenderWindowCallback pCallback)
 	m_pCallback = std::move(pCallback);
 }
 
-void CWindowUI::RegisterHelp(RenderWindowCallback pCallback)
+void CWindowUI::RegisterHelpPage(RenderWindowCallback pCallback)
 {
 	m_pCallbackHelp = std::move(pCallback);
 }
