@@ -17,7 +17,7 @@ class CWindowUI
 	static CUI* m_pUI;
 	static class CRenderTools* m_pRenderTools;
 
-	typedef std::function<void(const CUIRect&, CWindowUI&)> RenderWindowCallback;
+	using RenderWindowCallback = std::function<void(const CUIRect&, CWindowUI&)>;
 	RenderWindowCallback m_pCallback;
 
 	static CWindowUI* ms_pWindowHelper;
@@ -32,7 +32,7 @@ class CWindowUI
 	char m_aWindowDependentName[128];
 	CUIRect m_WindowRect;
 	CUIRect m_WindowBordure;
-	CUIRect m_WindowRectProtected;
+	CUIRect m_WindowRectReserve;
 
 	int m_WindowFlags;
 	bool m_WindowMinimize;
@@ -105,7 +105,7 @@ public:
 		{
 			m_pUI->MouseRectLimitMapScreen(&NewWindowRect, 6.0f, CUI::RECTLIMITSCREEN_UP | CUI::RECTLIMITSCREEN_ALIGN_CENTER_X);
 			m_WindowRect = NewWindowRect;
-			m_WindowRectProtected = NewWindowRect;
+			m_WindowRectReserve = NewWindowRect;
 		}
 	}
 

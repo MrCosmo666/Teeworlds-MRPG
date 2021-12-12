@@ -55,122 +55,26 @@ void CWindowUI::RenderDefaultWindow()
 	// highlight
 	CUIRect Workspace;
 	m_WindowRect.HSplitTop(20.0f, &m_WindowBordure, &Workspace);
-	if(m_WindowMinimize)
-		RenderHighlightArea(m_WindowBordure);
-	else
-		RenderHighlightArea(m_WindowRect);
+	RenderHighlightArea(m_WindowMinimize ? m_WindowBordure : m_WindowRect);
 
 	// background draw
 	const bool IsActiveWindow = IsActive();
 	if(!m_WindowMinimize)
 	{
-		CUIRect ShadowBackground = { m_WindowRect.x - 3.0f, m_WindowRect.y + 3.0f, m_WindowRect.w, m_WindowRect.h };
 		const float BackgroundFade = m_pUI->GetFade(&Workspace, IsActiveWindow, 0.4f);
-		const vec4 Color = mix(vec4(0.12f, 0.12f, 0.12f, 0.97f), vec4(0.15f, 0.15f, 0.15f, 0.97f), BackgroundFade);
-
-		m_pRenderTools->DrawRoundRect(&ShadowBackground, vec4(0.1f, 0.1f, 0.1f, 0.3f), 10.0f);
+		const vec4 Color = mix(vec4(0.14f, 0.14f, 0.14f, 0.97f), vec4(0.16f, 0.16f, 0.16f, 0.97f), BackgroundFade);
 		m_pRenderTools->DrawUIRectMonochromeGradient(&Workspace, Color, CUI::CORNER_ALL, 10.0f);
 	}
 
 	// bordour draw
 	const float BordureFade = m_pUI->GetFade(&m_WindowBordure, IsActiveWindow);
-	vec4 Color = mix(vec4(0.15f, 0.15f, 0.15f, 1.0f), vec4(0.3f, 0.3f, 0.3f, 1.0f), BordureFade);
-	const int BordureCornerFlag = m_WindowMinimize ? CUI::CORNER_ALL : CUI::CORNER_T | CUI::CORNER_IB;
-	m_pRenderTools->DrawUIRectMonochromeGradient(&m_WindowBordure, Color, BordureCornerFlag, 10.0f);
+	const vec4 Color = mix(vec4(0.15f, 0.15f, 0.15f, 1.0f), vec4(0.3f, 0.3f, 0.3f, 1.0f), BordureFade);
+	m_pRenderTools->DrawUIRectMonochromeGradient(&m_WindowBordure, Color, m_WindowMinimize ? CUI::CORNER_ALL : CUI::CORNER_T | CUI::CORNER_IB, 10.0f);
 
 	// window name
 	CUIRect Label;
 	m_WindowBordure.VSplitLeft(10.0f, 0, &Label);
 	m_pUI->DoLabel(&Label, m_aWindowName, 12.0f, CUI::EAlignment::ALIGN_LEFT, -1.0f);
-
-	// close button
-	if(m_WindowFlags & CUI::WINDOWFLAG_CLOSE)
-	{
-		CUIRect ButtonClose;
-		m_WindowBordure.VSplitRight(24.0f, 0, &ButtonClose);
-		Color = mix(vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.7f, 0.1f, 0.1f, 0.75f), m_pUI->GetFade(&ButtonClose, false));
-
-		m_pRenderTools->DrawUIRectMonochromeGradient(&ButtonClose, Color, CUI::CORNER_ALL, 10.0f);
-		m_pUI->DoLabel(&ButtonClose, "\xE2\x9C\x95", 16.0f, CUI::ALIGN_CENTER);
-
-		const int CloseLogic = m_pUI->DoMouseEventLogic(&ButtonClose, KEY_MOUSE_1);
-		if(CloseLogic & CUI::CButtonLogicEvent::EVENT_PRESS)
-			Close();
-
-		if(IsActiveWindow && (CloseLogic & CUI::CButtonLogicEvent::EVENT_HOVERED))
-		{
-			const char* HotKeyLabel = Localize("Left Ctrl + Q - close active window.");
-			const float TextWidth = m_pUI->TextRender()->TextWidth(10.0f, HotKeyLabel, -1);
-			CUIRect BackgroundKeyPress = { 0.f, 0.f, 10.0f + TextWidth, 20.f };
-			m_pUI->MouseRectLimitMapScreen(&BackgroundKeyPress, 12.0f, CUI::RECTLIMITSCREEN_UP | CUI::RECTLIMITSCREEN_SKIP_BORDURE_UP);
-			m_pRenderTools->DrawUIRectMonochromeGradient(&BackgroundKeyPress, vec4(0.1f, 0.1f, 0.1f, 0.5f), CUI::CORNER_ALL, 3.0f);
-
-			CUIRect LabelKeyInfo = BackgroundKeyPress;
-			LabelKeyInfo.Margin(s_BackgroundMargin, &LabelKeyInfo);
-			m_pUI->DoLabel(&LabelKeyInfo, HotKeyLabel, 10.0f, CUI::ALIGN_CENTER);
-		}
-	}
-
-	// hide button
-	if(m_WindowFlags & CUI::WINDOWFLAG_MINIMIZE)
-	{
-		CUIRect ButtonHide;
-		m_WindowBordure.VSplitRight(24.0f, 0, &ButtonHide);
-		ButtonHide.x -= m_WindowFlags & CUI::WINDOWFLAG_CLOSE ? 24.0f : 0.0f;
-		Color = mix(vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.2f, 0.7f, 0.75f), m_pUI->GetFade(&ButtonHide, false));
-
-		m_pRenderTools->DrawUIRectMonochromeGradient(&ButtonHide, Color, CUI::CORNER_ALL, 10.0f);
-		m_pUI->DoLabel(&ButtonHide, m_WindowMinimize ? "\xe2\x81\x82" : "\xe2\x80\xbb", 16.0f, CUI::ALIGN_CENTER);
-
-		const int HideLogic = m_pUI->DoMouseEventLogic(&ButtonHide, KEY_MOUSE_1);
-		if(HideLogic & CUI::CButtonLogicEvent::EVENT_PRESS)
-			MinimizeWindow();
-
-		if(IsActiveWindow && (HideLogic & CUI::CButtonLogicEvent::EVENT_HOVERED))
-		{
-			const char* HotKeyLabel = Localize("Left Ctrl + M - minimize active window.");
-			const float TextWidth = m_pUI->TextRender()->TextWidth(10.0f, HotKeyLabel, -1);
-			CUIRect BackgroundKeyPress = { 0.f, 0.f, 10.0f + TextWidth, 20.f };
-			m_pUI->MouseRectLimitMapScreen(&BackgroundKeyPress, 12.0f, CUI::RECTLIMITSCREEN_UP|CUI::RECTLIMITSCREEN_SKIP_BORDURE_UP);
-			m_pRenderTools->DrawUIRectMonochromeGradient(&BackgroundKeyPress, vec4(0.1f, 0.1f, 0.1f, 0.5f), CUI::CORNER_ALL, 3.0f);
-
-			CUIRect LabelKeyInfo = BackgroundKeyPress;
-			LabelKeyInfo.Margin(s_BackgroundMargin, &LabelKeyInfo);
-			m_pUI->DoLabel(&LabelKeyInfo, HotKeyLabel, 10.0f, CUI::ALIGN_CENTER);
-		}
-	}
-
-	// help button
-	if(m_pCallbackHelp)
-	{
-		CUIRect ButtonHelp;
-		m_WindowBordure.VSplitRight(24.0f, 0, &ButtonHelp);
-		ButtonHelp.x -= m_WindowFlags & CUI::WINDOWFLAG_CLOSE ? 24.0f + (m_WindowFlags & CUI::WINDOWFLAG_MINIMIZE ? 24.0f : 0.0f)  : 0.0f;
-		Color = mix((ms_pWindowHelper->IsOpenned() ? vec4(0.1f, 0.3f, 0.1f, 0.75f) : vec4(0.f, 0.f, 0.f, 0.25f)), vec4(0.2f, 0.5f, 0.2f, 0.75f), m_pUI->GetFade(&ButtonHelp, false));
-
-		m_pRenderTools->DrawUIRectMonochromeGradient(&ButtonHelp, Color, CUI::CORNER_ALL, 10.0f);
-		m_pUI->DoLabel(&ButtonHelp, "?", 16.0f, CUI::ALIGN_CENTER);
-
-		const int HelpLogic = m_pUI->DoMouseEventLogic(&ButtonHelp, KEY_MOUSE_1);
-		if(HelpLogic & CUI::CButtonLogicEvent::EVENT_PRESS)
-		{
-			ms_pWindowHelper->Init(vec2(0, 0), this, m_pRenderDependence);
-			ms_pWindowHelper->Register(m_pCallbackHelp);
-			ms_pWindowHelper->Reverse();
-		}
-		if(IsActiveWindow && (HelpLogic & CUI::CButtonLogicEvent::EVENT_HOVERED))
-		{
-			const char* HotKeyLabel = Localize("Left Ctrl + H - show attached help active window.");
-			const float TextWidth = m_pUI->TextRender()->TextWidth(10.0f, HotKeyLabel, -1);
-			CUIRect BackgroundKeyPress = { 0.f, 0.f, 10.0f + TextWidth, 20.f };
-			m_pUI->MouseRectLimitMapScreen(&BackgroundKeyPress, 12.0f, CUI::RECTLIMITSCREEN_UP | CUI::RECTLIMITSCREEN_SKIP_BORDURE_UP);
-			m_pRenderTools->DrawUIRectMonochromeGradient(&BackgroundKeyPress, vec4(0.1f, 0.1f, 0.1f, 0.5f), CUI::CORNER_ALL, 3.0f);
-
-			CUIRect LabelKeyInfo = BackgroundKeyPress;
-			LabelKeyInfo.Margin(s_BackgroundMargin, &LabelKeyInfo);
-			m_pUI->DoLabel(&LabelKeyInfo, HotKeyLabel, 10.0f, CUI::ALIGN_CENTER);
-		}
-	}
 
 	// logic bordour move window
 	const int MoveLogic = m_pUI->DoMouseEventLogic(&m_WindowBordure, KEY_MOUSE_1);
@@ -184,13 +88,67 @@ void CWindowUI::RenderDefaultWindow()
 	{
 		m_WindowRect.x = m_WindowBordure.x = clamp(m_pUI->MouseX() - s_WindowSkipMovingX, 0.0f, m_pUI->Screen()->w - m_WindowRect.w);
 		m_WindowRect.y = m_WindowBordure.y = clamp(m_pUI->MouseY() - s_WindowSkipMovingY, 0.0f, m_pUI->Screen()->h - m_WindowRect.h);
-
 		if(!m_pUI->KeyIsPressed(KEY_MOUSE_1))
 		{
 			m_WindowMoving = false;
 			s_WindowSkipMovingX = 0.0f;
 			s_WindowSkipMovingY = 0.0f;
 		}
+	}
+	
+	// buttontop function
+	auto CreateButtonTop = [this, &IsActiveWindow](CUIRect *pButtonRect, const char* pHintStr, vec4 ColorFade1, vec4 ColorFade2, const char* pSymbolUTF, const std::function < void() > pCallback)
+	{
+		pButtonRect->x -= 24.0f;
+		const vec4 ColorFinal = mix(ColorFade1, ColorFade2, m_pUI->GetFade(pButtonRect, false));
+		m_pRenderTools->DrawUIRectMonochromeGradient(pButtonRect, ColorFinal, CUI::CORNER_ALL, 10.0f);
+		m_pUI->DoLabel(pButtonRect, pSymbolUTF, 16.0f, CUI::ALIGN_CENTER);
+
+		const int HideLogic = m_pUI->DoMouseEventLogic(pButtonRect, KEY_MOUSE_1);
+		if(HideLogic & CUI::CButtonLogicEvent::EVENT_PRESS)
+		{
+			m_WindowMoving = false;
+			pCallback();
+		}
+		
+		if(IsActiveWindow && (HideLogic & CUI::CButtonLogicEvent::EVENT_HOVERED))
+		{
+			const char* HotKeyLabel = Localize(pHintStr);
+			const float TextWidth = m_pUI->TextRender()->TextWidth(10.0f, HotKeyLabel, -1);
+			CUIRect BackgroundKeyPress = { 0.f, 0.f, 10.0f + TextWidth, 20.f };
+			m_pUI->MouseRectLimitMapScreen(&BackgroundKeyPress, 12.0f, CUI::RECTLIMITSCREEN_UP | CUI::RECTLIMITSCREEN_SKIP_BORDURE_UP);
+			m_pRenderTools->DrawUIRectMonochromeGradient(&BackgroundKeyPress, vec4(0.1f, 0.1f, 0.1f, 0.5f), CUI::CORNER_ALL, 3.0f);
+
+			CUIRect LabelKeyInfo = BackgroundKeyPress;
+			LabelKeyInfo.Margin(s_BackgroundMargin, &LabelKeyInfo);
+			m_pUI->DoLabel(&LabelKeyInfo, HotKeyLabel, 10.0f, CUI::ALIGN_CENTER);
+		}
+	};
+
+	CUIRect ButtonTop;
+	m_WindowBordure.VSplitRight(24.0f, 0, &ButtonTop);
+	ButtonTop.x += 24.0f;
+	if(m_WindowFlags & CUI::WINDOWFLAG_CLOSE) // close button
+	{
+		CreateButtonTop(&ButtonTop, "Left Ctrl + Q - close active window.", vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.7f, 0.1f, 0.1f, 0.75f), 
+			"\xE2\x9C\x95", [this]()
+		{ Close(); });
+	}
+	if(m_WindowFlags & CUI::WINDOWFLAG_MINIMIZE) // hide button
+	{
+		CreateButtonTop(&ButtonTop, "Left Ctrl + M - minimize active window.", vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.2f, 0.7f, 0.75f), 
+			m_WindowMinimize ? "\xe2\x81\x82" : "\xe2\x80\xbb", [this]()
+		{	MinimizeWindow(); });
+	}
+	if(m_pCallbackHelp) // help button
+	{
+		CreateButtonTop(&ButtonTop, "Left Ctrl + H - show attached help active window.", 
+			ms_pWindowHelper->IsOpenned() ? vec4(0.1f, 0.3f, 0.1f, 0.75f) : vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.5f, 0.2f, 0.75f), "?", [this]()
+		{
+			ms_pWindowHelper->Init(vec2(0, 0), this, m_pRenderDependence);
+			ms_pWindowHelper->Register(m_pCallbackHelp);
+			ms_pWindowHelper->Reverse();
+		});
 	}
 
 	// callback function render
@@ -229,14 +187,14 @@ void CWindowUI::MinimizeWindow()
 	m_WindowMinimize ^= true;
 	if(m_WindowMinimize)
 	{
-		m_WindowRectProtected = m_WindowRect;
+		m_WindowRectReserve = m_WindowRect;
 		m_WindowRect = m_WindowBordure;
 		return;
 	}
 
-	m_WindowRectProtected.x = clamp(m_WindowRect.x, 0.0f, m_pUI->Screen()->w - m_WindowRectProtected.w);
-	m_WindowRectProtected.y = clamp(m_WindowRect.y, 0.0f, m_pUI->Screen()->h - m_WindowRectProtected.h);
-	m_WindowRect = m_WindowRectProtected;
+	m_WindowRectReserve.x = clamp(m_WindowRect.x, 0.0f, m_pUI->Screen()->w - m_WindowRectReserve.w);
+	m_WindowRectReserve.y = clamp(m_WindowRect.y, 0.0f, m_pUI->Screen()->h - m_WindowRectReserve.h);
+	m_WindowRect = m_WindowRectReserve;
 }
 
 // - - -- - -- - -- - -- - -- - -- - -
@@ -245,7 +203,7 @@ void CWindowUI::Init(vec2 WindowSize, CWindowUI* pWindowDependent, bool* pRender
 {
 	m_WindowBordure = { 0, 0, 0, 0 };
 	m_WindowRect = { 0, 0, WindowSize.x, WindowSize.y };
-	m_WindowRectProtected = m_WindowRect;
+	m_WindowRectReserve = m_WindowRect;
 	m_WindowMinimize = false;
 	m_WindowMoving = false;
 	m_pRenderDependence = pRenderDependence;
@@ -273,7 +231,7 @@ bool CWindowUI::IsOpenned() const
 
 bool CWindowUI::IsActive() const
 {
-	return (bool)(m_Openned && CWindowUI::GetActiveWindow() == this);
+	return (bool)(m_Openned && GetActiveWindow() == this);
 }
 
 void CWindowUI::Open()
@@ -281,7 +239,7 @@ void CWindowUI::Open()
 	if(IsOpenned())
 		Close();
 
-	const CUIRect WindowRect = m_WindowRectProtected;
+	const CUIRect WindowRect = m_WindowRectReserve;
 	CUIRect NewWindowRect = { 0, 0, WindowRect.w, WindowRect.h };
 	m_pUI->MouseRectLimitMapScreen(&NewWindowRect, 6.0f, CUI::RECTLIMITSCREEN_UP | CUI::RECTLIMITSCREEN_ALIGN_CENTER_X);
 
@@ -290,8 +248,8 @@ void CWindowUI::Open()
 	m_WindowMoving = false;
 	m_WindowMinimize = false;
 
-	const auto pSearch = std::find_if(CWindowUI::ms_aWindows.begin(), CWindowUI::ms_aWindows.end(), [this](const CWindowUI* pWindow) { return this == pWindow;  });
-	std::rotate(CWindowUI::ms_aWindows.begin(), pSearch, pSearch + 1);
+	const auto pSearch = std::find_if(ms_aWindows.begin(), ms_aWindows.end(), [this](const CWindowUI* pWindow) { return this == pWindow;  });
+	std::rotate(ms_aWindows.begin(), pSearch, pSearch + 1);
 }
 
 void CWindowUI::Close()
