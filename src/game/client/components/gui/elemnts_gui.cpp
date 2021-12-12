@@ -32,6 +32,7 @@ void CElementsGUI::CreateInformationBox(const char* pWindowName, CWindowUI* pDep
 		m_pElemGUI->m_Cursor.m_Flags = TEXTFLAG_ALLOW_NEWLINE;
 		m_pElemGUI->m_Cursor.m_FontSize = FontSize;
 		m_pElemGUI->m_Cursor.m_MaxWidth = Width - (s_InformationBoxLabelSpace * 2.0f) - 1.0f;
+		m_pElemGUI->m_Cursor.m_MaxLines = -1;
 		TextRender()->TextDeferred(&m_pElemGUI->m_Cursor, pMessage, -1);
 		m_pElemGUI->m_pWindow = UI()->CreateWindow(pWindowName, vec2(0, 0), pDependentWindow, pRequires);
 		m_pElemGUI->m_pWindow->Register(WINREGISTER(&CElementsGUI::CallbackRenderInfoWindow, this));
@@ -80,6 +81,7 @@ void CElementsGUI::CreatePopupBox(const char* pWindowName, CWindowUI* pDependent
 		m_pElemGUI->m_Cursor.m_Flags = TEXTFLAG_ALLOW_NEWLINE;
 		m_pElemGUI->m_Cursor.m_FontSize = FontSize;
 		m_pElemGUI->m_Cursor.m_MaxWidth = Width - (s_InformationBoxLabelSpace * 2.0f) - 1.0f;
+		m_pElemGUI->m_Cursor.m_MaxLines = -1;
 		TextRender()->TextDeferred(&m_pElemGUI->m_Cursor, pMessage, -1);
 		m_pElemGUI->m_pCallback = Callback;
 		m_pElemGUI->m_pWindow = UI()->CreateWindow(pWindowName, vec2(0, 0), pDependentWindow, pRequires);
