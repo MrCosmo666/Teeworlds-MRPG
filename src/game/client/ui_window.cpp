@@ -63,6 +63,9 @@ void CWindowUI::RenderDefaultWindow()
 	{
 		const float BackgroundFade = m_pUI->GetFade(&Workspace, IsActiveWindow, 0.4f);
 		const vec4 Color = mix(vec4(0.14f, 0.14f, 0.14f, 0.97f), vec4(0.16f, 0.16f, 0.16f, 0.97f), BackgroundFade);
+		CUIRect ShadowBackground;
+		m_WindowRect.Margin(-1.5f, &ShadowBackground);
+		m_pRenderTools->DrawRoundRect(&ShadowBackground, vec4(0.5f, 0.5f, 0.5f, 0.5f), 10.0f);
 		m_pRenderTools->DrawUIRectMonochromeGradient(&Workspace, Color, CUI::CORNER_ALL, 10.0f);
 	}
 

@@ -278,11 +278,10 @@ void CUIGameInterface::CallbackRenderMailboxListButtonHelp(const CUIRect& pWindo
 {
 	CUIRect Label = pWindowRect;
 	const float FontSize = 10.0f;
-	const char* pLineHelp = "This is where you can control your inbox.View.And interact with it.";
-
-	float TextWidth = TextRender()->TextWidth(FontSize, pLineHelp, -1);
-	UI()->DoLabel(&Label, pLineHelp, FontSize, CUI::EAlignment::ALIGN_LEFT);
-
+	const char* pLineHelp = "This is where you can control your inbox.\nAnd interact with it.";
+	const float TextWidth = TextRender()->TextWidth(FontSize, pLineHelp, -1);
+	
+	UI()->DoLabel(&Label, pLineHelp, FontSize, CUI::EAlignment::ALIGN_CENTER);
 	pCurrentWindow.SetWorkspaceSize({ TextWidth, 30 });
 }
 
@@ -400,7 +399,7 @@ void CUIGameInterface::CallbackRenderMailboxLetterSend(const CUIRect& pWindowRec
 		if(str_length(s_aBufTitle) < 3 || str_length(s_aBufTitle) > 12 || str_length(s_aBufPlayer) < 1 || str_length(s_aBufPlayer) > 24
 			|| str_length(s_aBufMessage) < 1 || str_length(s_aBufMessage) > 48)
 		{
-			m_ElemGUI->CreateInformationBox("Error when sending an letter", &pCurrentWindow, 260.0f, "The minimum number of characters entered can.\n- Title (3 - 12)\n- Player (1 - 24)\n- Message (1 - 48)");
+			m_ElemGUI->CreateInformationBox("Error when sending an letter", &pCurrentWindow, 260.0f, "The minimum number of characters entered can.\n- Title (3 - 12)\n- Player (1 - 24)\n- Message (1 - 48)", &m_ActiveGUI);
 		}
 		else
 		{
