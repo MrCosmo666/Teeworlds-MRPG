@@ -183,7 +183,7 @@ void CUIGameInterface::OnMessage(int Msg, void* pRawMsg)
 	else if(Msg == NETMSGTYPE_SV_SENDGUIINFORMATIONBOX)
 	{
 		CNetMsg_Sv_SendGuiInformationBox* pMsg = (CNetMsg_Sv_SendGuiInformationBox*)pRawMsg;
-		m_ElemGUI->CreateInformationBox("Error when sending an letter", nullptr, 300, pMsg->m_pMsg);
+		m_ElemGUI->CreateInformationBox("Error when sending an letter", m_pWindowMailbox[MAILBOX_GUI_LETTER_SEND], 300, pMsg->m_pMsg, &m_ActiveGUI);
 	}
 }
 
@@ -325,7 +325,7 @@ void CUIGameInterface::CallbackRenderMailboxLetter(const CUIRect& pWindowRect, C
 	DeleteButton.VMargin(3.0f, &DeleteButton);
 	static CMenus::CButtonContainer s_aButtonDelete;
 	if(m_pClient->m_pMenus->DoButton_Menu(&s_aButtonDelete, "Delete", 0, &DeleteButton, 0, CUI::CORNER_ALL))
-		m_ElemGUI->CreatePopupBox("Delete letter?", &pCurrentWindow, 200.0f, "Do you really want to delete letter?", POPUP_REGISTER(&CUIGameInterface::CallbackPopupDeleteLetter, this), &m_ActiveGUI);
+		m_ElemGUI->CreatePopupBox("Delete letter?", &pCurrentWindow, 210.0f, "Do you really want to delete letter?", POPUP_REGISTER(&CUIGameInterface::CallbackPopupDeleteLetter, this), &m_ActiveGUI);
 
 	// icon item
 	if(HasItem)
@@ -398,9 +398,7 @@ void CUIGameInterface::CallbackRenderMailboxLetterSend(const CUIRect& pWindowRec
 	{
 		if(str_length(s_aBufTitle) < 3 || str_length(s_aBufTitle) > 12 || str_length(s_aBufPlayer) < 1 || str_length(s_aBufPlayer) > 24
 			|| str_length(s_aBufMessage) < 1 || str_length(s_aBufMessage) > 48)
-		{
 			m_ElemGUI->CreateInformationBox("Error when sending an letter", &pCurrentWindow, 260.0f, "The minimum number of characters entered can.\n- Title (3 - 12)\n- Player (1 - 24)\n- Message (1 - 48)", &m_ActiveGUI);
-		}
 		else
 		{
 			CNetMsg_Cl_SendMailLetterTo Msg;
@@ -420,7 +418,7 @@ void CUIGameInterface::CallbackRenderMailboxLetterSend(const CUIRect& pWindowRec
 
 void CUIGameInterface::CallbackRenderMailboxLetterActions(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
 {
-	float ButtonAmount = 2;
+	float ButtonAmount = !m_pLetterSelected->m_IsRead ? 3 : 2;
 	static float ButtonHeight = 16.0f;
 
 	CUIRect MainView = pWindowRect, Button;
@@ -434,7 +432,6 @@ void CUIGameInterface::CallbackRenderMailboxLetterActions(const CUIRect& pWindow
 
 	if(!m_pLetterSelected->m_IsRead)
 	{
-		ButtonAmount++;
 		MainView.HSplitTop(ButtonHeight, &Button, &MainView);
 		static CMenus::CButtonContainer s_aButtonMarkRead;
 		if(m_pClient->m_pMenus->DoButton_Menu(&s_aButtonMarkRead, "Mark as read", 0, &Button, 0, CUI::CORNER_ALL, 2.0f))
@@ -448,7 +445,7 @@ void CUIGameInterface::CallbackRenderMailboxLetterActions(const CUIRect& pWindow
 	static CMenus::CButtonContainer s_aButtonDelete;
 	if(m_pClient->m_pMenus->DoButton_Menu(&s_aButtonDelete, "Delete letter", 0, &Button, 0, CUI::CORNER_ALL, 2.0f))
 	{
-		m_ElemGUI->CreatePopupBox("Delete letter?", m_pWindowMailbox[MAILBOX_GUI_LETTER_INFO], 200.0f, "Do you really want to delete letter?", POPUP_REGISTER(&CUIGameInterface::CallbackPopupDeleteLetter, this));
+		m_ElemGUI->CreatePopupBox("Delete letter?", m_pWindowMailbox[MAILBOX_GUI_LETTER_INFO], 200.0f, "Do you really want to delete letter?", POPUP_REGISTER(&CUIGameInterface::CallbackPopupDeleteLetter, this), &m_ActiveGUI);
 		pCurrentWindow.Close();
 	}
 
