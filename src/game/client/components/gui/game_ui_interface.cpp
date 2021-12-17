@@ -29,7 +29,7 @@ void CUIGameInterface::OnInit()
 	m_pWindowMailbox[MAILBOX_GUI_LIST]->Register(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxList, this));
 	m_pWindowMailbox[MAILBOX_GUI_LIST]->RegisterHelpPage(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxListButtonHelp, this));
 	
-	m_pWindowMailbox[MAILBOX_GUI_LETTER_INFO] = UI()->CreateWindow("Letter", vec2(250, 140), m_pWindowMailbox[MAILBOX_GUI_LIST], &m_ActiveGUI);
+	m_pWindowMailbox[MAILBOX_GUI_LETTER_INFO] = UI()->CreateWindow("Letter", vec2(0, 0), m_pWindowMailbox[MAILBOX_GUI_LIST], &m_ActiveGUI);
 	m_pWindowMailbox[MAILBOX_GUI_LETTER_INFO]->Register(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxLetter, this));
 	
 	m_pWindowMailbox[MAILBOX_GUI_LETER_ACTION] = UI()->CreateWindow("Letter actions", vec2(0, 0), m_pWindowMailbox[MAILBOX_GUI_LIST], &m_ActiveGUI, CUI::WINDOW_WITHOUT_BORDURE);
@@ -309,7 +309,8 @@ void CUIGameInterface::CallbackRenderMailboxLetter(const CUIRect& pWindowRect, C
 
 	AcceptButton.HMargin(5.0f, &AcceptButton);
 	AcceptButton.VSplitLeft(80.0f, &DeleteButton, &AcceptButton);
-
+	AcceptButton.VSplitRight(64.0f, &AcceptButton, 0);
+	
 	// button accept
 	AcceptButton.VMargin(3.0f, &AcceptButton);
 	static CMenus::CButtonContainer s_aButtonAccept;
@@ -336,10 +337,13 @@ void CUIGameInterface::CallbackRenderMailboxLetter(const CUIRect& pWindowRect, C
 		LabelAmount.y += 3.0f + IconSize;
 
 		char aBufAttachmentLabel[256];
-		str_format(aBufAttachmentLabel, sizeof(aBufAttachmentLabel), "Amount\n%d", m_pLetterSelected->m_AttachmentItem.m_Amount);
+		str_format(aBufAttachmentLabel, sizeof(aBufAttachmentLabel), "(%d)", m_pLetterSelected->m_AttachmentItem.m_Amount);
 		UI()->DoLabelColored(&LabelAmount, aBufAttachmentLabel, 10.0f, CUI::ALIGN_CENTER, vec4(1.0f, 0.9f, 0.8f, 1.0f));
 		DoDrawItemIcon(&s_IconButton, &ItemSlot, IconSize, m_pLetterSelected->m_AttachmentItem);
 	}
+
+	const float WorkspaceHeight = HasItem ? 90.0f : 75.0f;
+	pCurrentWindow.SetWorkspaceSize({ 250.0f, WorkspaceHeight });
 }
 
 void CUIGameInterface::CallbackRenderMailboxLetterSend(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
