@@ -32,12 +32,12 @@ void CUIGameInterface::OnInit()
 	m_pWindowMailbox[MAILBOX_GUI_LETTER_INFO] = UI()->CreateWindow("Letter", vec2(250, 140), m_pWindowMailbox[MAILBOX_GUI_LIST], &m_ActiveGUI);
 	m_pWindowMailbox[MAILBOX_GUI_LETTER_INFO]->Register(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxLetter, this));
 	
-	m_pWindowMailbox[MAILBOX_GUI_LETER_ACTION] = UI()->CreateWindow("Letter actions", vec2(0, 0), m_pWindowMailbox[MAILBOX_GUI_LIST], &m_ActiveGUI, CUI::WINDOW_WITHOUT_BORDURE | CUI::WINDOW_CLOSE_CLICKING_OUTSIDE);
+	m_pWindowMailbox[MAILBOX_GUI_LETER_ACTION] = UI()->CreateWindow("Letter actions", vec2(0, 0), m_pWindowMailbox[MAILBOX_GUI_LIST], &m_ActiveGUI, CUI::WINDOW_WITHOUT_BORDURE);
 	m_pWindowMailbox[MAILBOX_GUI_LETER_ACTION]->Register(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxLetterActions, this));
 	
 	m_pWindowMailbox[MAILBOX_GUI_LETTER_SEND] = UI()->CreateWindow("Sending a letter", vec2(220, 190), m_pWindowMailbox[MAILBOX_GUI_LIST], &m_ActiveGUI);
 	m_pWindowMailbox[MAILBOX_GUI_LETTER_SEND]->Register(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxLetterSend, this));
-
+	
 	// questing system
 	m_pWindowQuesting[QUESTING_GUI_LIST] = UI()->CreateWindow("Quest book", vec2(300, 80), nullptr, &m_ActiveGUI);
 	m_pWindowQuesting[QUESTING_GUI_LIST]->Register(WINREGISTER(&CUIGameInterface::CallbackRenderQuests, this));

@@ -19,22 +19,22 @@ static float s_BackgroundMargin = 2.0f;
 
 // - - -- - -- - --
 // The basic logic
-void CWindowUI::RenderHighlightArea(const CUIRect& AreaRect) const
+void CWindowUI::RenderHighlightArea(const CUIRect& pAreaRect) const
 {
 	if(m_HighlightColor.a <= 0.0f)
 		return;
 
-	CUIRect HighlightActive = AreaRect;
+	CUIRect HighlightActive;
 	const float HighlightMargin = -1.2f;
 	const vec4 ColorHighlight = m_HighlightColor;
-	HighlightActive.Margin(HighlightMargin, &HighlightActive);
+	pAreaRect.Margin(HighlightMargin, &HighlightActive);
 	m_pRenderTools->DrawUIRectMonochromeGradient(&HighlightActive, ColorHighlight, CUI::CORNER_ALL, 8.0f);
 }
 
 void CWindowUI::RenderWindowWithoutBordure()
 {
-	CUIRect Workspace = m_WindowRect;
-	Workspace.Margin(s_BackgroundMargin, &Workspace);
+	CUIRect Workspace;
+	m_WindowRect.Margin(s_BackgroundMargin, &Workspace);
 	RenderHighlightArea(Workspace);
 
 	// background draw
@@ -242,8 +242,7 @@ void CWindowUI::Open()
 	if(IsOpenned())
 		Close();
 
-	const CUIRect WindowRect = m_WindowRectReserve;
-	CUIRect NewWindowRect = { 0, 0, WindowRect.w, WindowRect.h };
+	CUIRect NewWindowRect = { 0, 0, m_WindowRectReserve.w, m_WindowRectReserve.h };
 	m_pUI->MouseRectLimitMapScreen(&NewWindowRect, 6.0f, CUI::RECTLIMITSCREEN_UP | CUI::RECTLIMITSCREEN_ALIGN_CENTER_X);
 
 	m_WindowRect = NewWindowRect;

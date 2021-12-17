@@ -43,7 +43,7 @@ class CWindowUI
 
 	bool IsRenderAllowed() const { return m_Openned && m_pCallback && (m_pRenderDependence == nullptr || (m_pRenderDependence && *m_pRenderDependence == true)); }
 
-	void RenderHighlightArea(const CUIRect& AreaRect) const;
+	void RenderHighlightArea(const CUIRect& pAreaRect) const;
 	void RenderWindowWithoutBordure();
 	void RenderDefaultWindow();
 	void Render();
