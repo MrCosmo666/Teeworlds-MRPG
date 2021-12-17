@@ -49,46 +49,12 @@ void CWindowUI::RenderWindowWithoutBordure()
 
 void CWindowUI::RenderDefaultWindow()
 {
+	// logic bordour move window
 	static float s_WindowSkipMovingX;
 	static float s_WindowSkipMovingY;
-
-	// highlight
-	CUIRect Workspace;
-	m_WindowRect.HSplitTop(20.0f, &m_WindowBordure, &Workspace);
-	RenderHighlightArea(m_WindowMinimize ? m_WindowBordure : m_WindowRect);
-
-	// background draw
-	const bool IsActiveWindow = IsActive();
-	if(!m_WindowMinimize)
-	{
-		const float BackgroundFade = m_pUI->GetFade(&Workspace, IsActiveWindow, 0.4f);
-		const vec4 Color = mix(vec4(0.14f, 0.14f, 0.14f, 0.97f), vec4(0.16f, 0.16f, 0.16f, 0.97f), BackgroundFade);
-		CUIRect ShadowBackground;
-		m_WindowRect.Margin(-1.5f, &ShadowBackground);
-		m_pRenderTools->DrawRoundRect(&ShadowBackground, vec4(0.5f, 0.5f, 0.5f, 0.5f), 10.0f);
-		m_pRenderTools->DrawUIRectMonochromeGradient(&Workspace, Color, CUI::CORNER_ALL, 10.0f);
-	}
-
-	// bordour draw
-	const float BordureFade = m_pUI->GetFade(&m_WindowBordure, IsActiveWindow);
-	const vec4 Color = mix(vec4(0.15f, 0.15f, 0.15f, 1.0f), vec4(0.3f, 0.3f, 0.3f, 1.0f), BordureFade);
-	m_pRenderTools->DrawUIRectMonochromeGradient(&m_WindowBordure, Color, m_WindowMinimize ? CUI::CORNER_ALL : CUI::CORNER_T | CUI::CORNER_IB, 10.0f);
-
-	// window name
-	CUIRect Label;
-	m_WindowBordure.VSplitLeft(10.0f, 0, &Label);
-	m_pUI->DoLabel(&Label, m_aWindowName, 12.0f, CUI::EAlignment::ALIGN_LEFT, -1.0f);
-
-	// logic bordour move window
-	const int MoveLogic = m_pUI->DoMouseEventLogic(&m_WindowBordure, KEY_MOUSE_1);
-	if(MoveLogic & CUI::CButtonLogicEvent::EVENT_PRESS)
-	{
-		m_WindowMoving = true;
-		s_WindowSkipMovingX = (m_pUI->MouseX() - m_WindowRect.x);
-		s_WindowSkipMovingY = (m_pUI->MouseY() - m_WindowRect.y);
-	}
 	if(m_WindowMoving)
 	{
+		dbg_msg("here", "%d", m_WindowRect.x);
 		m_WindowRect.x = m_WindowBordure.x = clamp(m_pUI->MouseX() - s_WindowSkipMovingX, 0.0f, m_pUI->Screen()->w - m_WindowRect.w);
 		m_WindowRect.y = m_WindowBordure.y = clamp(m_pUI->MouseY() - s_WindowSkipMovingY, 0.0f, m_pUI->Screen()->h - m_WindowRect.h);
 		if(!m_pUI->KeyIsPressed(KEY_MOUSE_1))
@@ -98,9 +64,36 @@ void CWindowUI::RenderDefaultWindow()
 			s_WindowSkipMovingY = 0.0f;
 		}
 	}
+
+	// highlight
+	CUIRect Workspace;
+	m_WindowRect.HSplitTop(20.0f, &m_WindowBordure, &Workspace);
+	RenderHighlightArea(m_WindowMinimize ? m_WindowBordure : m_WindowRect);
+
+	// background draw
+	const bool IsActiveWindow = IsActive();
+	CUIRect ShadowBackground;
+	m_WindowRect.Margin(-1.5f, &ShadowBackground);
+	m_pRenderTools->DrawRoundRect(&ShadowBackground, vec4(0.5f, 0.5f, 0.5f, 0.5f), 10.0f);
+	if(!m_WindowMinimize)
+	{
+		const float BackgroundFade = m_pUI->GetFade(&Workspace, IsActiveWindow, 0.4f);
+		const vec4 Color = mix(vec4(0.14f, 0.14f, 0.14f, 0.97f), vec4(0.16f, 0.16f, 0.16f, 0.97f), BackgroundFade);
+		m_pRenderTools->DrawUIRectMonochromeGradient(&Workspace, Color, CUI::CORNER_ALL, 10.0f);
+	}
+	
+	// bordour draw
+	const float BordureFade = m_pUI->GetFade(&m_WindowBordure, IsActiveWindow);
+	const vec4 Color = mix(vec4(0.15f, 0.15f, 0.15f, 1.0f), vec4(0.3f, 0.3f, 0.3f, 1.0f), BordureFade);
+	m_pRenderTools->DrawUIRectMonochromeGradient(&m_WindowBordure, Color, m_WindowMinimize ? CUI::CORNER_ALL : CUI::CORNER_T | CUI::CORNER_IB, 10.0f);
+
+	// window name
+	CUIRect Label;
+	m_WindowBordure.VSplitLeft(10.0f, 0, &Label);
+	m_pUI->DoLabel(&Label, m_aWindowName, 12.0f, CUI::EAlignment::ALIGN_LEFT, -1.0f);
 	
 	// buttontop function
-	auto CreateButtonTop = [this, &IsActiveWindow](CUIRect *pButtonRect, const char* pHintStr, vec4 ColorFade1, vec4 ColorFade2, const char* pSymbolUTF, const std::function < void() > pCallback)
+	auto CreateButtonTop = [this, &IsActiveWindow](CUIRect* pButtonRect, const char* pHintStr, vec4 ColorFade1, vec4 ColorFade2, const char* pSymbolUTF) -> bool
 	{
 		pButtonRect->x -= 24.0f;
 		const vec4 ColorFinal = mix(ColorFade1, ColorFade2, m_pUI->GetFade(pButtonRect, false));
@@ -111,7 +104,7 @@ void CWindowUI::RenderDefaultWindow()
 		if(HideLogic & CUI::CButtonLogicEvent::EVENT_PRESS)
 		{
 			m_WindowMoving = false;
-			pCallback();
+			return true;
 		}
 		
 		if(IsActiveWindow && (HideLogic & CUI::CButtonLogicEvent::EVENT_HOVERED))
@@ -126,32 +119,33 @@ void CWindowUI::RenderDefaultWindow()
 			LabelKeyInfo.Margin(s_BackgroundMargin, &LabelKeyInfo);
 			m_pUI->DoLabel(&LabelKeyInfo, HotKeyLabel, 10.0f, CUI::ALIGN_CENTER);
 		}
+		return false;
 	};
 
 	CUIRect ButtonTop;
 	m_WindowBordure.VSplitRight(24.0f, 0, &ButtonTop);
 	ButtonTop.x += 24.0f;
-	if(m_WindowFlags & CUI::WINDOWFLAG_CLOSE) // close button
+	if(m_WindowFlags & CUI::WINDOWFLAG_CLOSE  // close button
+		&& CreateButtonTop(&ButtonTop, "Left Ctrl + Q - close active window.", vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.7f, 0.1f, 0.1f, 0.75f), 
+			"\xE2\x9C\x95"))
+		Close();
+	else if(m_WindowFlags & CUI::WINDOWFLAG_MINIMIZE // hide button
+		&& CreateButtonTop(&ButtonTop, "Left Ctrl + M - minimize active window.", vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.2f, 0.7f, 0.75f),
+			m_WindowMinimize ? "\xe2\x81\x82" : "\xe2\x80\xbb"))
+		MinimizeWindow();
+	else if(m_pCallbackHelp
+		&& CreateButtonTop(&ButtonTop, "Left Ctrl + H - show attached help active window.",
+			ms_pWindowHelper->IsOpenned() ? vec4(0.1f, 0.3f, 0.1f, 0.75f) : vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.5f, 0.2f, 0.75f), "?"))
 	{
-		CreateButtonTop(&ButtonTop, "Left Ctrl + Q - close active window.", vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.7f, 0.1f, 0.1f, 0.75f), 
-			"\xE2\x9C\x95", [this]()
-		{ Close(); });
+		ms_pWindowHelper->Init(vec2(0, 0), this, m_pRenderDependence);
+		ms_pWindowHelper->Register(m_pCallbackHelp);
+		ms_pWindowHelper->Reverse();
 	}
-	if(m_WindowFlags & CUI::WINDOWFLAG_MINIMIZE) // hide button
+	else if(m_pUI->DoMouseEventLogic(&m_WindowBordure, KEY_MOUSE_1) & CUI::CButtonLogicEvent::EVENT_PRESS)
 	{
-		CreateButtonTop(&ButtonTop, "Left Ctrl + M - minimize active window.", vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.2f, 0.7f, 0.75f), 
-			m_WindowMinimize ? "\xe2\x81\x82" : "\xe2\x80\xbb", [this]()
-		{	MinimizeWindow(); });
-	}
-	if(m_pCallbackHelp) // help button
-	{
-		CreateButtonTop(&ButtonTop, "Left Ctrl + H - show attached help active window.", 
-			ms_pWindowHelper->IsOpenned() ? vec4(0.1f, 0.3f, 0.1f, 0.75f) : vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.5f, 0.2f, 0.75f), "?", [this]()
-		{
-			ms_pWindowHelper->Init(vec2(0, 0), this, m_pRenderDependence);
-			ms_pWindowHelper->Register(m_pCallbackHelp);
-			ms_pWindowHelper->Reverse();
-		});
+		m_WindowMoving = true;
+		s_WindowSkipMovingX = (m_pUI->MouseX() - m_WindowRect.x);
+		s_WindowSkipMovingY = (m_pUI->MouseY() - m_WindowRect.y);
 	}
 
 	// callback function render

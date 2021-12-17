@@ -413,7 +413,7 @@ void CUIGameInterface::CallbackRenderMailboxLetterSend(const CUIRect& pWindowRec
 
 void CUIGameInterface::CallbackRenderMailboxLetterActions(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
 {
-	float ButtonAmount = !m_pLetterSelected->m_IsRead ? 3 : 2;
+	const float ButtonAmount = !m_pLetterSelected->m_IsRead ? 3 : 2;
 	static float ButtonHeight = 16.0f;
 
 	CUIRect MainView = pWindowRect, Button;
