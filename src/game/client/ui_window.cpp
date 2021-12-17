@@ -239,9 +239,6 @@ bool CWindowUI::IsActive() const
 
 void CWindowUI::Open()
 {
-	if(IsOpenned())
-		Close();
-
 	CUIRect NewWindowRect = { 0, 0, m_WindowRectReserve.w, m_WindowRectReserve.h };
 	m_pUI->MouseRectLimitMapScreen(&NewWindowRect, 6.0f, CUI::RECTLIMITSCREEN_UP | CUI::RECTLIMITSCREEN_ALIGN_CENTER_X);
 
