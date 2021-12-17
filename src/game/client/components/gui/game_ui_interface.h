@@ -49,9 +49,6 @@ private:
 	bool m_ActiveGUI;
 	void RenderGuiIcons();
 
-	// gui callbacks
-	void CallbackPopupDeleteLetter(const CWindowUI* pPopupWindow, bool ButtonYes);
-	
 	// inbox
 	enum MailBoxGUI
 	{
@@ -63,11 +60,14 @@ private:
 	};
 	CMailboxLetter* m_pLetterSelected;
 	CWindowUI* m_pWindowMailbox[NUM_MAILBOX_GUI];
+	
 	void CallbackRenderMailboxList(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
 	void CallbackRenderMailboxListButtonHelp(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
 	void CallbackRenderMailboxLetter(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
 	void CallbackRenderMailboxLetterSend(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
 	void CallbackRenderMailboxLetterActions(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
+
+	void CallbackPopupDeleteLetter(const CWindowUI* pPopupWindow, bool ButtonYes);
 
 	void SendLetterAction(CMailboxLetter* pLetter, int64 Flags);
 	bool UnreadLetterMails() const;
@@ -79,10 +79,11 @@ private:
 		NUM_QUESTING_GUI
 	};
 	CWindowUI* m_pWindowQuesting[NUM_QUESTING_GUI];
+	
 	void CallbackRenderQuests(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
 
 public:
-	CUIGameInterface();
+	CUIGameInterface() = default;
 	~CUIGameInterface() override;
 	bool IsActiveGUI() const { return m_ActiveGUI; }
 

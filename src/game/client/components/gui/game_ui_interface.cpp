@@ -15,7 +15,6 @@
 std::map< int, CUIGameInterface::CItemDataClientInfo > CUIGameInterface::m_aItemsDataInformation;
 std::map< int, CUIGameInterface::CClientItem > CUIGameInterface::m_aClientItems;
 
-CUIGameInterface::CUIGameInterface() : m_ElemGUI(new CElementsGUI) {}
 CUIGameInterface::~CUIGameInterface() { delete m_ElemGUI; }
 
 /*
@@ -23,6 +22,8 @@ CUIGameInterface::~CUIGameInterface() { delete m_ElemGUI; }
  */
 void CUIGameInterface::OnInit()
 {
+	m_ElemGUI = new CElementsGUI;
+	
 	// inbox system
 	m_pWindowMailbox[MAILBOX_GUI_LIST] = UI()->CreateWindow("Mailbox list", vec2(320, 250), nullptr, &m_ActiveGUI);
 	m_pWindowMailbox[MAILBOX_GUI_LIST]->Register(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxList, this));
@@ -38,17 +39,13 @@ void CUIGameInterface::OnInit()
 	m_pWindowMailbox[MAILBOX_GUI_LETTER_SEND]->Register(WINREGISTER(&CUIGameInterface::CallbackRenderMailboxLetterSend, this));
 
 	// questing system
-	m_pWindowQuesting[QUESTING_GUI_LIST] = UI()->CreateWindow("Quest book", vec2(300, 80));
+	m_pWindowQuesting[QUESTING_GUI_LIST] = UI()->CreateWindow("Quest book", vec2(300, 80), nullptr, &m_ActiveGUI);
 	m_pWindowQuesting[QUESTING_GUI_LIST]->Register(WINREGISTER(&CUIGameInterface::CallbackRenderQuests, this));
 }
 
 void CUIGameInterface::OnReset()
 {
 	m_ActiveGUI = false;
-	m_pWindowMailbox[MAILBOX_GUI_LIST]->Close();
-	m_pWindowMailbox[MAILBOX_GUI_LETTER_INFO]->Close();
-	m_pWindowMailbox[MAILBOX_GUI_LETTER_SEND]->Close();
-	m_pWindowQuesting[QUESTING_GUI_LIST]->Close();
 }
 
 bool CUIGameInterface::OnInput(IInput::CEvent Event)
@@ -115,6 +112,7 @@ void CUIGameInterface::RenderGuiIcons()
 		if(DoIconSelectionWindow(&s_MailListButton, &IconView, m_pWindowMailbox[MAILBOX_GUI_LIST], SPRITE_HUD_ICON_MAIL, UnreadLetters ? "New" : nullptr) && m_pWindowMailbox[MAILBOX_GUI_LIST]->IsOpenned())
 			SendLetterAction(nullptr, MAILLETTERFLAG_REFRESH);
 	}
+	
 	// questing gui icon
 	{
 		IconView.HMargin(52.0f, &IconView);
@@ -471,12 +469,7 @@ void CUIGameInterface::SendLetterAction(CMailboxLetter* pLetter, int64 Flags)
 
 bool CUIGameInterface::UnreadLetterMails() const
 {
-	for(int i = 0; i < (int)m_aLettersList.size(); i++)
-	{
-		if(!m_aLettersList[i].m_IsRead)
-			return true;
-	}
-	return false;
+	return std::find_if(m_aLettersList.begin(), m_aLettersList.end(), [](const CMailboxLetter& p){ return !p.m_IsRead; }) != m_aLettersList.end();
 }
 
 
@@ -629,12 +622,7 @@ void CUIGameInterface::CreateMouseHoveredDescription(int Align, float Width, con
 	s_CursorHoveredDescription.m_Align = Align;
 	s_CursorHoveredDescription.m_MaxWidth = Width;
 	s_CursorHoveredDescription.m_MaxLines = -1;
-
-	const vec4 TextColor = vec4(0.8f, 0.8f, 0.8f, 1.0f);
-	const vec4 OldColor = TextRender()->GetColor();
-	TextRender()->TextColor(TextColor);
 	TextRender()->TextDeferred(&s_CursorHoveredDescription, pMessage, -1);
-	TextRender()->TextColor(OldColor);
 
 	CUIRect BackgroundBox = { UI()->MouseX(), UI()->MouseY(), Width, 12.0f + ((float)s_CursorHoveredDescription.LineCount() * FontSize) };
 	UI()->MouseRectLimitMapScreen(&BackgroundBox, 2.0f, CUI::RECTLIMITSCREEN_UP);
