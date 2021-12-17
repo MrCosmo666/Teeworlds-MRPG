@@ -109,11 +109,12 @@ void CElementsGUI::CallbackRenderGuiPopupBox(const CUIRect& pWindowRect, CWindow
 
 	CUIRect Label, ButtonAccept, ButtonDeny;
 	pWindowRect.Margin(s_InformationBoxLabelSpace, &Label);
-	Label.HSplitBottom(20.0f, &Label, &ButtonAccept);
+	Label.HSplitBottom(18.0f, &Label, &ButtonAccept);
 	ButtonAccept.VSplitLeft(Label.w / 2.0f, &ButtonDeny, &ButtonAccept);
 	(*pElemGUI)->m_Cursor.MoveTo(Label.x, Label.y);
 	TextRender()->DrawTextPlain(&(*pElemGUI)->m_Cursor);
 
+	ButtonAccept.VMargin(5.0f, &ButtonAccept);
 	static CMenus::CButtonContainer s_ButtonAccept;
 	if(m_pMenus->DoButton_Menu(&s_ButtonAccept, "Yes", false, &ButtonAccept, nullptr, CUI::CORNER_ALL, 8.0f))
 	{
@@ -121,6 +122,7 @@ void CElementsGUI::CallbackRenderGuiPopupBox(const CUIRect& pWindowRect, CWindow
 			pElemPopup->m_pCallback(&pCurrentWindow, true);
 		pCurrentWindow.Close();
 	}
+	ButtonDeny.VMargin(5.0f, &ButtonDeny);
 	static CMenus::CButtonContainer s_ButtonDeny;
 	if(m_pMenus->DoButton_Menu(&s_ButtonDeny, "No", false, &ButtonDeny, nullptr, CUI::CORNER_ALL, 8.0f))
 	{

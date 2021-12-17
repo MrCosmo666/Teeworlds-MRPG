@@ -344,9 +344,9 @@ void CUIGameInterface::CallbackRenderMailboxLetter(const CUIRect& pWindowRect, C
 
 void CUIGameInterface::CallbackRenderMailboxLetterSend(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
 {
-	static char s_aBufTitle[64];
-	static char s_aBufPlayer[32];
-	static char s_aBufMessage[64];
+	static char s_aBufTitle[12];
+	static char s_aBufPlayer[24];
+	static char s_aBufMessage[48];
 
 	// player
 	CUIRect Label, EditPlayerBox;
@@ -394,9 +394,8 @@ void CUIGameInterface::CallbackRenderMailboxLetterSend(const CUIRect& pWindowRec
 	static CMenus::CButtonContainer s_ButtonRefresh;
 	if(m_pClient->m_pMenus->DoButton_Menu(&s_ButtonRefresh, "Send", 0, &ButtonSend, 0, CUI::CORNER_ALL, 10.0f))
 	{
-		if(str_length(s_aBufTitle) < 3 || str_length(s_aBufTitle) > 12 || str_length(s_aBufPlayer) < 1 || str_length(s_aBufPlayer) > 24
-			|| str_length(s_aBufMessage) < 1 || str_length(s_aBufMessage) > 48)
-			m_ElemGUI->CreateInformationBox("Error when sending an letter", &pCurrentWindow, 260.0f, "The minimum number of characters entered can.\n- Title (3 - 12)\n- Player (1 - 24)\n- Message (1 - 48)", &m_ActiveGUI);
+		if(s_aBufTitle[0] == '\0' || s_aBufPlayer[0] == '\0' || s_aBufMessage[0] == '\0')
+			m_ElemGUI->CreateInformationBox("Error when sending an letter", &pCurrentWindow, 260.0f, "One of the fields is not filled in.", &m_ActiveGUI);
 		else
 		{
 			CNetMsg_Cl_SendMailLetterTo Msg;
@@ -406,10 +405,8 @@ void CUIGameInterface::CallbackRenderMailboxLetterSend(const CUIRect& pWindowRec
 			Msg.m_FromClientID = m_pClient->m_LocalClientID;
 			Client()->SendPackMsg(&Msg, MSGFLAG_VITAL);
 
-			mem_zero(s_aBufPlayer, sizeof(s_aBufPlayer));
 			mem_zero(s_aBufTitle, sizeof(s_aBufTitle));
 			mem_zero(s_aBufMessage, sizeof(s_aBufMessage));
-			pCurrentWindow.Close();
 		}
 	}
 }
