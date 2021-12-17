@@ -54,7 +54,6 @@ void CWindowUI::RenderDefaultWindow()
 	static float s_WindowSkipMovingY;
 	if(m_WindowMoving)
 	{
-		dbg_msg("here", "%d", m_WindowRect.x);
 		m_WindowRect.x = m_WindowBordure.x = clamp(m_pUI->MouseX() - s_WindowSkipMovingX, 0.0f, m_pUI->Screen()->w - m_WindowRect.w);
 		m_WindowRect.y = m_WindowBordure.y = clamp(m_pUI->MouseY() - s_WindowSkipMovingY, 0.0f, m_pUI->Screen()->h - m_WindowRect.h);
 		if(!m_pUI->KeyIsPressed(KEY_MOUSE_1))
