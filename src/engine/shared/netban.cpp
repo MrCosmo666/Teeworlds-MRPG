@@ -4,8 +4,6 @@
 
 #include "netban.h"
 
-#include <base/math.h>
-
 CNetBan::CNetHash::CNetHash(const NETADDR *pAddr)
 {
 	if(pAddr->type==NETTYPE_IPV4)

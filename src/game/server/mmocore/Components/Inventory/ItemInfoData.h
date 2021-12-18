@@ -6,9 +6,6 @@
 // define for quick fine-tuning of enchantment
 #define PERCENT_OF_ENCHANT 8
 #define PERCENT_MAXIMUM_ENCHANT 40
-#include <game/game_context.h>
-
-#include <map>
 
 class CItemDataInfo : public CItemDataInformation
 {

@@ -4,7 +4,6 @@
 
 #include <engine/shared/config.h>
 #include <game/server/gamecontext.h>
-#include <teeother/components/localization.h>
 
 #include <game/server/mmocore/Components/Dungeons/DungeonCore.h>
 #include <game/server/mmocore/Components/Mails/MailBoxCore.h>
@@ -12,8 +11,6 @@
 #include <game/server/mmocore/Components/Worlds/WorldSwapCore.h>
 
 #include <base/hash_ctxt.h>
-
-#include <teeother/tl/nlohmann_json.h>
 
 int CAccountCore::GetHistoryLatestCorrectWorldID(CPlayer* pPlayer) const
 {

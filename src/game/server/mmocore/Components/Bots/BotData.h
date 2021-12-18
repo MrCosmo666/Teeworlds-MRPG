@@ -2,10 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #ifndef GAME_SERVER_COMPONENT_BOT_DATA_H
 #define GAME_SERVER_COMPONENT_BOT_DATA_H
-#include <game/game_context.h>
-
-#include <map>
-#include <vector>
 
 /************************************************************************/
 /*  Dialog struct                                                       */

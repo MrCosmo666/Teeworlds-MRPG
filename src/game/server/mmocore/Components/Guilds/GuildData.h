@@ -4,7 +4,6 @@
 #define GAME_SERVER_COMPONENT_GUILD_DATA_H
 
 #include <game/server/mmocore/Utils/FieldData.h>
-#include <map>
 
 struct CGuildData
 {

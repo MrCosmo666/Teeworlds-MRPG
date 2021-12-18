@@ -1,8 +1,6 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <cstdint>
-#include <base/math.h>
-#include <base/system.h>
 
 #include <engine/config.h>
 #include <engine/console.h>
@@ -35,7 +33,6 @@
 #include "multi_worlds.h"
 #include "server_ban.h"
 
-#include <teeother/components/localization.h>
 #include <engine/server/sql_connect_pool.h>
 
 #include "game/game_context.h"

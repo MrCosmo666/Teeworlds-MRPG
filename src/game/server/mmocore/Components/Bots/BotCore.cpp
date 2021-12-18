@@ -6,8 +6,6 @@
 
 #include <game/server/mmocore/Components/Quests/QuestCore.h>
 
-#include <teeother/tl/nlohmann_json.h>
-
 static int GetIntegerEmoteValue(const char* JsonName, const char* JsonValue)
 {
 	if(str_comp(JsonName, "emote") == 0)

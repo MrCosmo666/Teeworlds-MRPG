@@ -3,9 +3,6 @@
 #ifndef GAME_SERVER_COMPONENT_WORLDSWAP_DATA_H
 #define GAME_SERVER_COMPONENT_WORLDSWAP_DATA_H
 
-#include <list>
-#include <map>
-
 struct CWorldSwapData
 {
 	int m_RequiredQuestID;

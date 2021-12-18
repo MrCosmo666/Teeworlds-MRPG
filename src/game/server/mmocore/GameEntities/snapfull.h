@@ -4,8 +4,6 @@
 #define GAME_SERVER_ENTITIES_SNAP_FULL_H
 #include <game/server/entity.h>
 
-#include <list>
-
 class CSnapFull : public CEntity
 {
 public:

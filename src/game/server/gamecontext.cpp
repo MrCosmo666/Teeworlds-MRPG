@@ -2,7 +2,6 @@
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include "gamecontext.h"
 
-#include <base/threadpool.h>
 #include <engine/storage.h>
 #include <engine/shared/config.h>
 
@@ -22,9 +21,6 @@
 #include "mmocore/GameEntities/Items/drop_items.h"
 #include "mmocore/GameEntities/Items/flying_experience.h"
 
-#include <game/game_context.h>
-#include <teeother/components/localization.h>
-
 #include "mmocore/Components/Accounts/AccountCore.h"
 #include "mmocore/Components/Accounts/AccountMinerCore.h"
 #include "mmocore/Components/Accounts/AccountPlantCore.h"
@@ -40,7 +36,7 @@
 
 // static data that have the same value in different objects
 std::map < int, CGS::StructAttribut > CGS::ms_aAttributsInfo;
-std::map < std::string, int > CGS::ms_aEffects[MAX_PLAYERS];
+std::unordered_map < std::string, int > CGS::ms_aEffects[MAX_PLAYERS];
 int CGS::m_MultiplierExp = 100;
 
 CGS::CGS()

@@ -4,7 +4,6 @@
 #define ENGINE_SHARED_JOBS_H
 
 #include <base/system.h>
-#include <base/threadpool.h>
 
 class IJob;
 class CJobPool;

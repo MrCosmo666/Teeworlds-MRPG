@@ -1,7 +1,6 @@
 #include "decoration_houses.h"
 
 #include <engine/server.h>
-#include <game/game_context.h>
 
 CDecorationHouses::CDecorationHouses(CGameWorld* pGameWorld, vec2 Pos, int HouseID, int DecoID)
 	: CEntity(pGameWorld, CGameWorld::ENTTYPE_DECOHOUSE, Pos)

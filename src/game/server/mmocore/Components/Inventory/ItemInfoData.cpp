@@ -3,7 +3,6 @@
 #include "ItemInfoData.h"
 
 #include <game/server/gamecontext.h>
-#include <teeother/components/localization.h>
 
 std::map < int, CItemDataInfo > CItemDataInfo::ms_aItemsInfo;
 
