@@ -171,8 +171,7 @@ bool CHouseCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const i
 		const int HouseWorldID = CHouseData::ms_aHouse[HouseID].m_WorldID;
 		if(!GS()->IsPlayerEqualWorldID(ClientID, HouseWorldID))
 		{
-			pPlayer->GetTempData().m_TempTeleportX = Position.x;
-			pPlayer->GetTempData().m_TempTeleportY = Position.y;
+			pPlayer->GetTempData().m_TempTeleportPos = Position;
 			pPlayer->ChangeWorld(HouseWorldID);
 			return true;
 		}

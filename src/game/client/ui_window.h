@@ -17,7 +17,7 @@ class CWindowUI
 	static CUI* m_pUI;
 	static class CRenderTools* m_pRenderTools;
 
-	typedef std::function<void(const CUIRect&, CWindowUI&)> RenderWindowCallback;
+	using RenderWindowCallback = std::function<void(const CUIRect&, CWindowUI&)>;
 	RenderWindowCallback m_pCallback;
 
 	static CWindowUI* ms_pWindowHelper;
@@ -32,7 +32,7 @@ class CWindowUI
 	char m_aWindowDependentName[128];
 	CUIRect m_WindowRect;
 	CUIRect m_WindowBordure;
-	CUIRect m_WindowRectProtected;
+	CUIRect m_WindowRectReserve;
 
 	int m_WindowFlags;
 	bool m_WindowMinimize;
@@ -43,7 +43,7 @@ class CWindowUI
 
 	bool IsRenderAllowed() const { return m_Openned && m_pCallback && (m_pRenderDependence == nullptr || (m_pRenderDependence && *m_pRenderDependence == true)); }
 
-	void RenderHighlightArea(const CUIRect& AreaRect) const;
+	void RenderHighlightArea(const CUIRect& pAreaRect) const;
 	void RenderWindowWithoutBordure();
 	void RenderDefaultWindow();
 	void Render();
@@ -51,6 +51,11 @@ class CWindowUI
 public:
 	CWindowUI(const CWindowUI& pWindow) = delete;
 
+	/*
+		Operator ==
+	 */
+	bool operator==(const CWindowUI& p) const { return str_comp(m_aWindowName, p.m_aWindowName) == 0; }
+	
 	/*
 		Static function: InitComponents -> void
 			- Initializes components.
@@ -100,7 +105,7 @@ public:
 		{
 			m_pUI->MouseRectLimitMapScreen(&NewWindowRect, 6.0f, CUI::RECTLIMITSCREEN_UP | CUI::RECTLIMITSCREEN_ALIGN_CENTER_X);
 			m_WindowRect = NewWindowRect;
-			m_WindowRectProtected = NewWindowRect;
+			m_WindowRectReserve = NewWindowRect;
 		}
 	}
 
@@ -154,7 +159,7 @@ public:
 	void Register(RenderWindowCallback pCallback);
 
 	/*
-		Function: RegisterHelp -> void
+		Function: RegisterHelpPage -> void
 			- Registers the callback function for window information.
 		Parameters:
 			- pCallback - Callback function.
@@ -162,7 +167,7 @@ public:
 			- WINREGISTER(function ref, object) is used to register the callback function.
 			If the callback function is set then the button on the bordure will be shown with the '?'.
 	*/
-	void RegisterHelp(RenderWindowCallback pCallback);
+	void RegisterHelpPage(RenderWindowCallback pCallback);
 
 	/*
 		Function: HighlightEnable -> void

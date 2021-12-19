@@ -82,8 +82,7 @@ void CBotCore::InitQuestBots(const char* pWhereLocalWorld)
 		QuestBotInfo::ms_aQuestBot[MobID].m_BotID = (int)pRes->getInt("BotID");
 		QuestBotInfo::ms_aQuestBot[MobID].m_Step = (int)pRes->getInt("Step");
 		QuestBotInfo::ms_aQuestBot[MobID].m_WorldID = (int)pRes->getInt("WorldID");
-		QuestBotInfo::ms_aQuestBot[MobID].m_PositionX = (int)pRes->getInt("PosX");
-		QuestBotInfo::ms_aQuestBot[MobID].m_PositionY = (int)pRes->getInt("PosY") + 1;
+		QuestBotInfo::ms_aQuestBot[MobID].m_Position = vec2(pRes->getInt("PosX"), pRes->getInt("PosY") + 1);
 		QuestBotInfo::ms_aQuestBot[MobID].m_aItemSearch[0] = (int)pRes->getInt("RequiredItemID1");
 		QuestBotInfo::ms_aQuestBot[MobID].m_aItemSearch[1] = (int)pRes->getInt("RequiredItemID2");
 		QuestBotInfo::ms_aQuestBot[MobID].m_aItemGives[0] = (int)pRes->getInt("RewardItemID1");
@@ -137,8 +136,7 @@ void CBotCore::InitNPCBots(const char* pWhereLocalWorld)
 
 		NpcBotInfo::ms_aNpcBot[MobID].m_WorldID = pRes->getInt("WorldID");
 		NpcBotInfo::ms_aNpcBot[MobID].m_Static = pRes->getBoolean("Static");
-		NpcBotInfo::ms_aNpcBot[MobID].m_PositionX = pRes->getInt("PosX");
-		NpcBotInfo::ms_aNpcBot[MobID].m_PositionY = pRes->getInt("PosY") + (NpcBotInfo::ms_aNpcBot[MobID].m_Static ? 1 : 0);
+		NpcBotInfo::ms_aNpcBot[MobID].m_Position = vec2(pRes->getInt("PosX"), pRes->getInt("PosY") + (NpcBotInfo::ms_aNpcBot[MobID].m_Static ? 1 : 0));
 		NpcBotInfo::ms_aNpcBot[MobID].m_Emote = pRes->getInt("Emote");
 		NpcBotInfo::ms_aNpcBot[MobID].m_BotID = pRes->getInt("BotID");
 		NpcBotInfo::ms_aNpcBot[MobID].m_Function = pRes->getInt("Function");
@@ -183,8 +181,7 @@ void CBotCore::InitMobsBots(const char* pWhereLocalWorld)
 		const int NumberOfMobs = pRes->getInt("Number");
 		
 		MobBotInfo::ms_aMobBot[MobID].m_WorldID = pRes->getInt("WorldID");
-		MobBotInfo::ms_aMobBot[MobID].m_PositionX = pRes->getInt("PositionX");
-		MobBotInfo::ms_aMobBot[MobID].m_PositionY = pRes->getInt("PositionY");
+		MobBotInfo::ms_aMobBot[MobID].m_Position = vec2(pRes->getInt("PositionX"), pRes->getInt("PositionY"));
 		MobBotInfo::ms_aMobBot[MobID].m_Power = pRes->getInt("Power");
 		MobBotInfo::ms_aMobBot[MobID].m_Spread = pRes->getInt("Spread");
 		MobBotInfo::ms_aMobBot[MobID].m_Boss = pRes->getBoolean("Boss");

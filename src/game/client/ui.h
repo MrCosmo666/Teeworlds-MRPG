@@ -246,8 +246,8 @@ public:
 		WINDOWFLAG_CLOSE = 1 << 1,
 		WINDOWFLAG_ALL = WINDOWFLAG_MINIMIZE | WINDOWFLAG_CLOSE,
 
-		WINDOW_WITHOUT_BORDURE = 1 << 2,
-		WINDOW_CLOSE_CLICKING_OUTSIDE = 1 << 3,
+		WINDOW_CLOSE_CLICKING_OUTSIDE = 1 << 2,
+		WINDOW_WITHOUT_BORDURE = 1 << 3 | WINDOW_CLOSE_CLICKING_OUTSIDE,
 	};
 
 	static class CWindowUI* CreateWindow(const char* pWindowName, vec2 WindowSize, class CWindowUI* pDependentWindow = nullptr, bool* pRenderDependence = nullptr, int WindowFlags = WINDOWFLAG_ALL);

@@ -230,12 +230,11 @@ void CPlayerQuestStepDataInfo::CreateStepDropTakeItems(CPlayer* pPlayer)
 	}
 
 	const int Value = 3 + m_Bot->m_aItemSearchValue[0];
-	const vec2 Pos = vec2(m_Bot->m_PositionX, m_Bot->m_PositionY);
 	for(int i = 0; i < Value; i++)
 	{
 		const vec2 Vel = vec2(frandom() * 40.0f - frandom() * 80.0f, frandom() * 40.0f - frandom() * 80.0f);
 		const float AngleForce = Vel.x * (0.15f + frandom() * 0.1f);
-		new CDropQuestItem(&pGS->m_World, Pos, Vel, AngleForce, *m_Bot, ClientID);
+		new CDropQuestItem(&pGS->m_World, m_Bot->m_Position, Vel, AngleForce, *m_Bot, ClientID);
 	}
 }
 

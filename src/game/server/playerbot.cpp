@@ -157,7 +157,7 @@ void CPlayerBot::TryRespawn()
 		if(GS()->IsDungeon() && !m_DungeonAllowedSpawn)
 			return;
 
-		const vec2 MobRespawnPosition = vec2(MobBotInfo::ms_aMobBot[m_SubBotID].m_PositionX, MobBotInfo::ms_aMobBot[m_SubBotID].m_PositionY);
+		const vec2 MobRespawnPosition = MobBotInfo::ms_aMobBot[m_SubBotID].m_Position;
 		if(!GS()->m_pController->CanSpawn(m_BotType, &SpawnPos, MobRespawnPosition))
 			return;
 
@@ -167,11 +167,11 @@ void CPlayerBot::TryRespawn()
 	}
 	else if(m_BotType == TYPE_BOT_NPC)
 	{
-		SpawnPos = vec2(NpcBotInfo::ms_aNpcBot[m_SubBotID].m_PositionX, NpcBotInfo::ms_aNpcBot[m_SubBotID].m_PositionY);
+		SpawnPos = NpcBotInfo::ms_aNpcBot[m_SubBotID].m_Position;
 	}
 	else if(m_BotType == TYPE_BOT_QUEST)
 	{
-		SpawnPos = vec2(QuestBotInfo::ms_aQuestBot[m_SubBotID].m_PositionX, QuestBotInfo::ms_aQuestBot[m_SubBotID].m_PositionY);
+		SpawnPos = QuestBotInfo::ms_aQuestBot[m_SubBotID].m_Position;
 	}
 
 	// create character

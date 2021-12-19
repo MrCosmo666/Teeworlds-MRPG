@@ -1,6 +1,6 @@
 #include "windows.h"
 
-#include <game/client/ui_window.h>
+#include <game/client/components/menus.h>
 
 /*
 	It is important to use this to keep the order of the Renderer.

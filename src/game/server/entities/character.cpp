@@ -1141,7 +1141,7 @@ bool CCharacter::IsLockedWorld()
 			const int CheckHouseID = GS()->Mmo()->Member()->GetPosHouseID(m_Core.m_Pos);
 			if(CheckHouseID <= 0)
 			{
-				m_pPlayer->GetTempData().m_TempTeleportX = m_pPlayer->GetTempData().m_TempTeleportY = -1;
+				m_pPlayer->GetTempData().m_TempTeleportPos = vec2(-1, -1);
 				GS()->Chat(m_pPlayer->GetCID(), "This chapter is still closed, you magically transported first zone!");
 				m_pPlayer->ChangeWorld(MAIN_WORLD_ID);
 				return true;
