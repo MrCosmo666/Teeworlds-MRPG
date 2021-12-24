@@ -188,11 +188,11 @@ void QuestCore::ShowQuestsActiveNPC(CPlayer* pPlayer, int QuestID)
 	{
 		// header
 		QuestBotInfo* pBotInfo = pStepBot.second.m_Bot;
-		const int HideID = (NUM_TAB_MENU + 12500 + pBotInfo->m_SubBotID);
-		const int PosX = pBotInfo->m_PositionX / 32, PosY = pBotInfo->m_PositionY / 32;
+		const int HideID = (NUM_TAB_MENU + pBotInfo->m_SubBotID);
+		const vec2 Pos = pBotInfo->m_Position / 32.0f;
 		const char* pSymbol = (((pPlayerQuest.GetState() == QUEST_ACCEPT && pPlayerQuest.m_StepsQuestBot[pStepBot.first].m_StepComplete) || pPlayerQuest.GetState() ==
 			                       QUEST_FINISHED) ? "✔ " : "\0");
-		GS()->AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR}Step {INT}. {STR} {STR}(x{INT} y{INT})", pSymbol, pBotInfo->m_Step, pBotInfo->GetName(), Server()->GetWorldName(pBotInfo->m_WorldID), PosX, PosY);
+		GS()->AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR}Step {INT}. {STR} {STR}(x{INT} y{INT})", pSymbol, pBotInfo->m_Step, pBotInfo->GetName(), Server()->GetWorldName(pBotInfo->m_WorldID), (int)Pos.x, (int)Pos.y);
 
 		// skipped non accepted task list
 		if(pPlayerQuest.GetState() != QUEST_ACCEPT)

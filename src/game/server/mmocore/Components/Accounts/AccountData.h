@@ -76,8 +76,7 @@ struct CAccountTempData
 
 	// save pos teleport
 	bool m_TempSafeSpawn;
-	int m_TempTeleportX;
-	int m_TempTeleportY;
+	vec2 m_TempTeleportPos;
 
 	// dungeon
 	int m_TempTimeDungeon;

@@ -465,8 +465,7 @@ bool GuildCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, int Vote
 		const int WorldID = CGuildHouseData::ms_aHouseGuild[HouseID].m_WorldID;
 		if(!GS()->IsPlayerEqualWorldID(ClientID, WorldID))
 		{
-			pPlayer->GetTempData().m_TempTeleportX = Position.x;
-			pPlayer->GetTempData().m_TempTeleportY = Position.y;
+			pPlayer->GetTempData().m_TempTeleportPos = Position;
 			pPlayer->ChangeWorld(WorldID);
 			return true;
 		}

@@ -600,11 +600,6 @@ CWindowUI* CUI::CreateWindow(const char* pWindowName, vec2 WindowSize, CWindowUI
 
 void CUI::WindowRender()
 {
-	/*const auto RenderAllowed = [](const CWindowUI* pWindow) -> bool
-	{
-		return (pWindow->m_Openned && (pWindow->m_pRenderDependence == nullptr || (pWindow->m_pRenderDependence && *pWindow->m_pRenderDependence == true)));
-	};*/
-
 	// update hovered the active highlighted area
 	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
 	{
@@ -616,11 +611,11 @@ void CUI::WindowRender()
 	bool ShowCursor = false;
 	const CUIRect ScreenMap = *Screen();
 	Graphics()->MapScreen(ScreenMap.x, ScreenMap.y, ScreenMap.w, ScreenMap.h);
-	for(auto it = CWindowUI::ms_aWindows.rbegin(); it != CWindowUI::ms_aWindows.rend(); ++it)
+	for(int i = CWindowUI::ms_aWindows.size() - 1; i >= 0; i--)
 	{
-		if((*it)->IsRenderAllowed())
+		if(CWindowUI::ms_aWindows[i]->IsRenderAllowed())
 		{
-			(*it)->Render();
+			CWindowUI::ms_aWindows[i]->Render();
 			ShowCursor = true;
 		}
 	}

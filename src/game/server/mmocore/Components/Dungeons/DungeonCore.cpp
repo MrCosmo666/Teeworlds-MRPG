@@ -91,8 +91,7 @@ bool DungeonCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, const 
 
 		if(!GS()->IsDungeon())
 		{
-			pPlayer->GetTempData().m_TempTeleportX = pPlayer->GetCharacter()->m_Core.m_Pos.x;
-			pPlayer->GetTempData().m_TempTeleportY = pPlayer->GetCharacter()->m_Core.m_Pos.y;
+			pPlayer->GetTempData().m_TempTeleportPos = pPlayer->GetCharacter()->m_Core.m_Pos;
 			GS()->Mmo()->SaveAccount(pPlayer, SaveType::SAVE_POSITION);
 		}
 

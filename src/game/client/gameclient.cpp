@@ -65,6 +65,8 @@
 
 #include <teeother/tl/nlohmann_json.h>
 
+#include "components/gui/elemnts_gui.h"
+
 inline void AppendDecimals(char* pBuf, int Size, int Time, int Precision)
 {
 	if (Precision > 0)
@@ -408,12 +410,14 @@ void CGameClient::OnInit()
 
 	// propagate pointers
 	m_UI.Init(Client(), Graphics(), Input(), TextRender());
+	
 	m_RenderTools.m_pGraphics = Graphics();
 	m_RenderTools.m_pUI = UI();
 	int64 Start = time_get();
 
 	// init window components
 	CWindowUI::InitComponents(UI(), RenderTools());
+	CElementsGUI::Init(Graphics(), TextRender(), UI(), m_pMenus);
 
 	// Render load screen at 0% to get graphics sooner.
 	// Swap again to minimize initial flashing color.

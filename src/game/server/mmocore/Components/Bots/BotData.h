@@ -46,8 +46,7 @@ struct NpcBotInfo
 	}
 
 	bool m_Static;
-	int m_PositionX;
-	int m_PositionY;
+	vec2 m_Position;
 	int m_Emote;
 	int m_WorldID;
 	int m_BotID;
@@ -72,8 +71,7 @@ struct QuestBotInfo
 		return DataBotInfo::ms_aDataBot[m_BotID].m_aNameBot;
 	}
 
-	int m_PositionX;
-	int m_PositionY;
+	vec2 m_Position;
 	int m_QuestID;
 	int m_Step;
 	int m_WorldID;
@@ -114,8 +112,7 @@ struct MobBotInfo
 	bool m_Boss;
 	int m_Power;
 	int m_Spread;
-	int m_PositionX;
-	int m_PositionY;
+	vec2 m_Position;
 	int m_Level;
 	int m_RespawnTick;
 	int m_WorldID;
