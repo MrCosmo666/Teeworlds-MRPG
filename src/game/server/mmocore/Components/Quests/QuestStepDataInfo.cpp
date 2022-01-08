@@ -123,7 +123,7 @@ bool CPlayerQuestStepDataInfo::Finish(CPlayer* pPlayer, bool FinalStepTalking)
 
 	if(!FinalStepTalking)
 	{
-		pGS->CreatePlayerSound(ClientID, SOUND_CTF_CAPTURE);
+		pGS->CreatePlayerSound(ClientID, SOUND_CTF_RETURN);
 		return true;
 	}
 

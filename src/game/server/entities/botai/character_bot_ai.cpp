@@ -566,7 +566,7 @@ bool CCharacterBotAI::SearchTalkedPlayer()
 	{
 		CPlayer* pFindPlayer = GS()->GetPlayer(i, true, true);
 		if(pFindPlayer && distance(pFindPlayer->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos) < 128.0f &&
-			!GS()->Collision()->IntersectLine(pFindPlayer->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) && m_pBotPlayer->IsActiveSnappingBot(i))
+			!GS()->Collision()->IntersectLine(pFindPlayer->GetCharacter()->m_Core.m_Pos, m_Core.m_Pos, 0, 0) && m_pBotPlayer->IsVisibleForClientID(i))
 		{
 			if (DialoguesNotEmpty)
 				GS()->Broadcast(i, BroadcastPriority::GAME_INFORMATION, 10, "Begin dialog: \"hammer hit\"");
