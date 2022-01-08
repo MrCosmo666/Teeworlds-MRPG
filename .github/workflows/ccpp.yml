@@ -1,6 +1,10 @@
-name: Build
+name: Client & Server Build
 
-on: [pull_request]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   build-cmake:
@@ -22,7 +26,7 @@ jobs:
             
         - name: "Windows x64"
           os: windows-latest
-          cmake-args: -DSERVER_COMPILE=OFF -G "Visual Studio 16 2019" -A x64
+          cmake-args: -G "Visual Studio 16 2019" -A x64
           package-file: mmoteeworlds-win64.zip
           env:
             CFLAGS: /WX
@@ -31,7 +35,7 @@ jobs:
 
         - name: "Windows x86"
           os: windows-2019
-          cmake-args: -DSERVER_COMPILE=OFF -G "Visual Studio 16 2019" -A Win32
+          cmake-args: -G "Visual Studio 16 2019" -A Win32
           package-file: mmoteeworlds-win32.zip
           env:
             CFLAGS: /WX
@@ -55,16 +59,27 @@ jobs:
         mkdir release
         cd release
         ${{ matrix.cmake-path }}cmake ${{ matrix.cmake-args }} -DCMAKE_BUILD_TYPE=Release -Werror=dev -DDOWNLOAD_GTEST=ON -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=. ..
-        ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target everything
-    - name: Package
+        ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target package_zip
+        ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target mmoteeworlds_srv
+    - name: Package(Linux)
+      if: contains(matrix.os, 'ubuntu')
       run: |
         cd release
-        ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target package_default
-        mkdir artifacts
-        mv ${{ matrix.package-file }} artifacts
+        mv ${{ matrix.package-file }} mmoteeworlds_srv ..
+        cd ..
+        7z a ${{ matrix.package-file }} mmoteeworlds_srv maps server_lang
+        mkdir release/artifacts
+        mv ${{ matrix.package-file }} release/artifacts
+    - name: Package(Windows)
+      if: contains(matrix.os, 'windows')
+      run: |
+        mv release/${{ matrix.package-file }} .
+        mv release/mmoteeworlds_srv.exe .
+        7z a ${{ matrix.package-file }} mmoteeworlds_srv.exe maps server_lang
+        mkdir release/artifacts
+        mv ${{ matrix.package-file }} release/artifacts
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2-preview
       with:
         name: ${{ matrix.name }}
         path: release/artifacts/${{ matrix.package-file }}
-
