@@ -20,6 +20,7 @@ jobs:
           cmake-args: -G "Unix Makefiles"
           build-args: --parallel
           package-file: mmoteeworlds-linux_x86_64.tar.xz
+          package-server-file: mmoteeworlds-linux_x86_64-server.tar.xz
           env:
             CFLAGS: -Wdeclaration-after-statement -Wduplicated-branches -Werror
             CXXFLAGS: -Wduplicated-branches -Werror
@@ -28,6 +29,7 @@ jobs:
           os: windows-latest
           cmake-args: -G "Visual Studio 16 2019" -A x64
           package-file: mmoteeworlds-win64.zip
+          package-server-file: mmoteeworlds-win64-server.zip
           env:
             CFLAGS: /WX
             CXXFLAGS: /WX
@@ -37,6 +39,7 @@ jobs:
           os: windows-2019
           cmake-args: -G "Visual Studio 16 2019" -A Win32
           package-file: mmoteeworlds-win32.zip
+          package-server-file: mmoteeworlds-win32-server.zip
           env:
             CFLAGS: /WX
             CXXFLAGS: /WX
@@ -64,20 +67,17 @@ jobs:
     - name: Package(Linux)
       if: contains(matrix.os, 'ubuntu')
       run: |
-        cd release
-        mv ${{ matrix.package-file }} mmoteeworlds_srv ..
-        cd ..
-        tar -rvf ${{ matrix.package-file }} mmoteeworlds_srv maps server_lang
+        tar -cf ${{ matrix.package-server-file }} mmoteeworlds_srv maps server_lang
         mkdir release/artifacts
         mv ${{ matrix.package-file }} release/artifacts
+        mv ${{ matrix.package-server-file }} release/artifacts
     - name: Package(Windows)
       if: contains(matrix.os, 'windows')
       run: |
-        mv release/${{ matrix.package-file }} .
-        mv release/mmoteeworlds_srv.exe .
         7z a ${{ matrix.package-file }} mmoteeworlds_srv.exe maps server_lang
         mkdir release/artifacts
         mv ${{ matrix.package-file }} release/artifacts
+        mv ${{ matrix.package-server-file }} release/artifacts
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2-preview
       with:
