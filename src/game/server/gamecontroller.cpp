@@ -237,7 +237,7 @@ void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int SpawnType, vec2 B
 		vec2 Positions[5] = { vec2(0.0f, 0.0f), vec2(-32.0f, 0.0f), vec2(0.0f, -32.0f), vec2(32.0f, 0.0f), vec2(0.0f, 32.0f) };
 		int Result = -1;
 
-		if(BotPos != vec2(-1, -1) && distance(BotPos, m_aaSpawnPoints[SpawnType][i]) > 800.0f)
+		if(total_size_vec2(BotPos) >= 1.0f && distance(BotPos, m_aaSpawnPoints[SpawnType][i]) > 800.0f)
 			continue;
 
 		for(int Index = 0; Index < 5 && Result == -1; ++Index)
