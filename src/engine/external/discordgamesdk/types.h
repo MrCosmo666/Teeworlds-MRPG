@@ -2,6 +2,7 @@
 
 #include "ffi.h"
 #include "event.h"
+#include <cstdint>
 
 namespace discord {
 
@@ -164,10 +165,10 @@ enum class InputModeType {
     PushToTalk,
 };
 
-using ClientId = std::int64_t;
-using Version = std::int32_t;
-using Snowflake = std::int64_t;
-using Timestamp = std::int64_t;
+using ClientId = int64_t;
+using Version = int32_t;
+using Snowflake = int64_t;
+using Timestamp = int64_t;
 using UserId = Snowflake;
 using Locale = char const*;
 using Branch = char const*;
@@ -175,8 +176,8 @@ using LobbyId = Snowflake;
 using LobbySecret = char const*;
 using MetadataKey = char const*;
 using MetadataValue = char const*;
-using NetworkPeerId = std::uint64_t;
-using NetworkChannelId = std::uint8_t;
+using NetworkPeerId = uint64_t;
+using NetworkChannelId = uint8_t;
 using Path = char const*;
 using DateTime = char const*;
 
@@ -214,10 +215,10 @@ class ImageHandle final {
 public:
     void SetType(ImageType type);
     ImageType GetType() const;
-    void SetId(std::int64_t id);
-    std::int64_t GetId() const;
-    void SetSize(std::uint32_t size);
-    std::uint32_t GetSize() const;
+    void SetId(int64_t id);
+    int64_t GetId() const;
+    void SetSize(uint32_t size);
+    uint32_t GetSize() const;
 
 private:
     DiscordImageHandle internal_;
@@ -225,10 +226,10 @@ private:
 
 class ImageDimensions final {
 public:
-    void SetWidth(std::uint32_t width);
-    std::uint32_t GetWidth() const;
-    void SetHeight(std::uint32_t height);
-    std::uint32_t GetHeight() const;
+    void SetWidth(uint32_t width);
+    uint32_t GetWidth() const;
+    void SetHeight(uint32_t height);
+    uint32_t GetHeight() const;
 
 private:
     DiscordImageDimensions internal_;
@@ -262,10 +263,10 @@ private:
 
 class PartySize final {
 public:
-    void SetCurrentSize(std::int32_t currentSize);
-    std::int32_t GetCurrentSize() const;
-    void SetMaxSize(std::int32_t maxSize);
-    std::int32_t GetMaxSize() const;
+    void SetCurrentSize(int32_t currentSize);
+    int32_t GetCurrentSize() const;
+    void SetMaxSize(int32_t maxSize);
+    int32_t GetMaxSize() const;
 
 private:
     DiscordPartySize internal_;
@@ -299,8 +300,8 @@ class Activity final {
 public:
     void SetType(ActivityType type);
     ActivityType GetType() const;
-    void SetApplicationId(std::int64_t applicationId);
-    std::int64_t GetApplicationId() const;
+    void SetApplicationId(int64_t applicationId);
+    int64_t GetApplicationId() const;
     void SetName(char const* name);
     char const* GetName() const;
     void SetState(char const* state);
@@ -356,8 +357,8 @@ public:
     UserId GetOwnerId() const;
     void SetSecret(LobbySecret secret);
     LobbySecret GetSecret() const;
-    void SetCapacity(std::uint32_t capacity);
-    std::uint32_t GetCapacity() const;
+    void SetCapacity(uint32_t capacity);
+    uint32_t GetCapacity() const;
     void SetLocked(bool locked);
     bool GetLocked() const;
 
@@ -369,10 +370,10 @@ class FileStat final {
 public:
     void SetFilename(char const* filename);
     char const* GetFilename() const;
-    void SetSize(std::uint64_t size);
-    std::uint64_t GetSize() const;
-    void SetLastModified(std::uint64_t lastModified);
-    std::uint64_t GetLastModified() const;
+    void SetSize(uint64_t size);
+    uint64_t GetSize() const;
+    void SetLastModified(uint64_t lastModified);
+    uint64_t GetLastModified() const;
 
 private:
     DiscordFileStat internal_;
@@ -393,8 +394,8 @@ private:
 
 class SkuPrice final {
 public:
-    void SetAmount(std::uint32_t amount);
-    std::uint32_t GetAmount() const;
+    void SetAmount(uint32_t amount);
+    uint32_t GetAmount() const;
     void SetCurrency(char const* currency);
     char const* GetCurrency() const;
 
@@ -434,8 +435,8 @@ public:
     Snowflake GetUserId() const;
     void SetAchievementId(Snowflake achievementId);
     Snowflake GetAchievementId() const;
-    void SetPercentComplete(std::uint8_t percentComplete);
-    std::uint8_t GetPercentComplete() const;
+    void SetPercentComplete(uint8_t percentComplete);
+    uint8_t GetPercentComplete() const;
     void SetUnlockedAt(DateTime unlockedAt);
     DateTime GetUnlockedAt() const;
 
@@ -447,7 +448,7 @@ class LobbyTransaction final {
 public:
     Result SetType(LobbyType type);
     Result SetOwner(UserId ownerId);
-    Result SetCapacity(std::uint32_t capacity);
+    Result SetCapacity(uint32_t capacity);
     Result SetMetadata(MetadataKey key, MetadataValue value);
     Result DeleteMetadata(MetadataKey key);
     Result SetLocked(bool locked);
@@ -478,7 +479,7 @@ public:
                   LobbySearchCast cast,
                   MetadataValue value);
     Result Sort(MetadataKey key, LobbySearchCast cast, MetadataValue value);
-    Result Limit(std::uint32_t limit);
+    Result Limit(uint32_t limit);
     Result Distance(LobbySearchDistance distance);
 
     IDiscordLobbySearchQuery** Receive() { return &internal_; }
