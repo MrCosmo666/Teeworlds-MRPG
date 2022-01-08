@@ -29,7 +29,7 @@ jobs:
           os: windows-latest
           cmake-args: -G "Visual Studio 16 2019" -A x64
           package-file: mmoteeworlds-win64.zip
-          package-server-file: mmoteeworlds-win64-server.zip
+          package-full-file: mmoteeworlds-win32-full.zip
           env:
             CFLAGS: /WX
             CXXFLAGS: /WX
@@ -39,7 +39,7 @@ jobs:
           os: windows-2019
           cmake-args: -G "Visual Studio 16 2019" -A Win32
           package-file: mmoteeworlds-win32.zip
-          package-server-file: mmoteeworlds-win32-server.zip
+          package-full-file: mmoteeworlds-win32-full.zip
           env:
             CFLAGS: /WX
             CXXFLAGS: /WX
@@ -72,8 +72,8 @@ jobs:
         mv mmoteeworlds_srv ..
         mv ${{ matrix.package-file }} ..
         cd ..
-        tar -cf ${{ matrix.package-server-file }} mmoteeworlds_srv maps server_lang ${{ matrix.package-file }}
-        mv ${{ matrix.package-server-file }} release/artifacts
+        tar -cf ${{ matrix.package-full-file }} mmoteeworlds_srv maps server_lang ${{ matrix.package-file }}
+        mv ${{ matrix.package-full-file }} release/artifacts
     - name: Package(Windows)
       if: contains(matrix.os, 'windows')
       run: |
@@ -82,10 +82,10 @@ jobs:
         mv mmoteeworlds_srv.exe ..
         mv ${{ matrix.package-file }} ..
         cd ..
-        7z a ${{ matrix.package-server-file }} mmoteeworlds_srv.exe maps server_lang ${{ matrix.package-file }}
-        mv ${{ matrix.package-server-file }} release/artifacts
+        7z a ${{ matrix.package-full-file }} mmoteeworlds_srv.exe maps server_lang ${{ matrix.package-file }}
+        mv ${{ matrix.package-full-file }} release/artifacts
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2-preview
       with:
         name: ${{ matrix.package-file }}
-        path: release/artifacts/${{ matrix.package-file }}
+        path: release/artifacts/${{ matrix.package-full-file }}
