@@ -88,9 +88,9 @@ public:
 	void CreateDamage(vec2 Pos, int ClientID, int Amount, bool CritDamage, bool OnlyVanilla);
 	void CreateHammerHit(vec2 Pos);
 	void CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamage);
-	void CreatePlayerSpawn(vec2 Pos);
+	void CreatePlayerSpawn(vec2 Pos, int64 Mask = -1);
 	void CreateDeath(vec2 Pos, int ClientID);
-	void CreateSound(vec2 Pos, int Sound, int64 Mask=-1);
+	void CreateSound(vec2 Pos, int Sound, int64 Mask = -1);
 	void SendWorldMusic(int ClientID, int MusicID = 0);
 	void CreatePlayerSound(int ClientID, int Sound);
 	void CreateEffect(vec2 Pos, int EffectID);
