@@ -1,6 +1,10 @@
-name: Build
+name: Client & Server Build
 
-on: [pull_request]
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
 jobs:
   build-cmake:
@@ -16,14 +20,16 @@ jobs:
           cmake-args: -G "Unix Makefiles"
           build-args: --parallel
           package-file: mmoteeworlds-linux_x86_64.tar.xz
+          package-full-file: mmoteeworlds-linux_x86_64-full.tar.xz
           env:
             CFLAGS: -Wdeclaration-after-statement -Wduplicated-branches -Werror
             CXXFLAGS: -Wduplicated-branches -Werror
             
         - name: "Windows x64"
           os: windows-latest
-          cmake-args: -DSERVER_COMPILE=OFF -G "Visual Studio 16 2019" -A x64
+          cmake-args: -G "Visual Studio 16 2019" -A x64
           package-file: mmoteeworlds-win64.zip
+          package-full-file: mmoteeworlds-win64-full.zip
           env:
             CFLAGS: /WX
             CXXFLAGS: /WX
@@ -31,8 +37,9 @@ jobs:
 
         - name: "Windows x86"
           os: windows-2019
-          cmake-args: -DSERVER_COMPILE=OFF -G "Visual Studio 16 2019" -A Win32
+          cmake-args: -G "Visual Studio 16 2019" -A Win32
           package-file: mmoteeworlds-win32.zip
+          package-full-file: mmoteeworlds-win32-full.zip
           env:
             CFLAGS: /WX
             CXXFLAGS: /WX
@@ -55,16 +62,30 @@ jobs:
         mkdir release
         cd release
         ${{ matrix.cmake-path }}cmake ${{ matrix.cmake-args }} -DCMAKE_BUILD_TYPE=Release -Werror=dev -DDOWNLOAD_GTEST=ON -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE=. ..
-        ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target everything
-    - name: Package
-      run: |
-        cd release
         ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target package_default
-        mkdir artifacts
-        mv ${{ matrix.package-file }} artifacts
+        ${{ matrix.cmake-path }}cmake --build . --config Release ${{ matrix.build-args }} --target mmoteeworlds_srv
+    - name: Package(Linux)
+      if: contains(matrix.os, 'ubuntu')
+      run: |
+        mkdir release/artifacts
+        cd release
+        mv mmoteeworlds_srv ..
+        mv ${{ matrix.package-file }} ..
+        cd ..
+        tar -cf ${{ matrix.package-full-file }} mmoteeworlds_srv maps server_lang ${{ matrix.package-file }}
+        mv ${{ matrix.package-full-file }} release/artifacts
+    - name: Package(Windows)
+      if: contains(matrix.os, 'windows')
+      run: |
+        mkdir release/artifacts
+        cd release
+        mv mmoteeworlds_srv.exe ..
+        mv ${{ matrix.package-file }} ..
+        cd ..
+        7z a ${{ matrix.package-full-file }} mmoteeworlds_srv.exe maps server_lang ${{ matrix.package-file }}
+        mv ${{ matrix.package-full-file }} release/artifacts
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2-preview
       with:
         name: ${{ matrix.name }}
-        path: release/artifacts/${{ matrix.package-file }}
-
+        path: release/artifacts/${{ matrix.package-full-file }}
