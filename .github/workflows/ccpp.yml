@@ -67,25 +67,25 @@ jobs:
     - name: Package(Linux)
       if: contains(matrix.os, 'ubuntu')
       run: |
+        mkdir release/artifacts
         cd release
         mv mmoteeworlds_srv ..
+        mv ${{ matrix.package-file }} artifacts
         cd ..
         tar -cf ${{ matrix.package-server-file }} mmoteeworlds_srv maps server_lang
-        mkdir release/artifacts
-        mv ${{ matrix.package-file }} release/artifacts
         mv ${{ matrix.package-server-file }} release/artifacts
     - name: Package(Windows)
       if: contains(matrix.os, 'windows')
       run: |
+        mkdir release/artifacts
         cd release
         mv mmoteeworlds_srv ..
+        mv ${{ matrix.package-file }} artifacts
         cd ..
         7z a ${{ matrix.package-server-file }} mmoteeworlds_srv.exe maps server_lang
-        mkdir release/artifacts
-        mv ${{ matrix.package-file }} release/artifacts
         mv ${{ matrix.package-server-file }} release/artifacts
     - name: Upload Artifacts
       uses: actions/upload-artifact@v2-preview
       with:
-        name: ${{ matrix.name }}
+        name: ${{ matrix.package-file }}
         path: release/artifacts/${{ matrix.package-file }}
