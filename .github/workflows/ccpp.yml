@@ -79,7 +79,7 @@ jobs:
       run: |
         mkdir release/artifacts
         cd release
-        mv mmoteeworlds_srv ..
+        mv mmoteeworlds_srv.exe ..
         mv ${{ matrix.package-file }} artifacts
         cd ..
         7z a ${{ matrix.package-server-file }} mmoteeworlds_srv.exe maps server_lang
