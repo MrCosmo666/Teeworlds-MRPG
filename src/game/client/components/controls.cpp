@@ -113,7 +113,7 @@ void CControls::OnMessage(int Msg, void *pRawMsg)
 	}
 }
 
-int CControls::SnapInput(int *pData)
+int CControls::SnapInput(int* pData)
 {
 	static int64 LastSendTime = 0;
 	bool Send = false;
@@ -124,7 +124,7 @@ int CControls::SnapInput(int *pData)
 	else
 		m_InputData.m_PlayerFlags = 0;
 
-	if (m_pClient->m_pScoreboard->IsActive())
+	if(m_pClient->m_pScoreboard->IsActive())
 		m_InputData.m_PlayerFlags |= PLAYERFLAG_SCOREBOARD;
 
 	if(m_LastData.m_PlayerFlags != m_InputData.m_PlayerFlags)
@@ -133,10 +133,7 @@ int CControls::SnapInput(int *pData)
 	m_LastData.m_PlayerFlags = m_InputData.m_PlayerFlags;
 
 	// we freeze the input if chat or menu is activated
-	if(m_pClient->m_pChat->IsActive() ||
-		m_pClient->m_pMenus->IsActive() ||
-		m_pClient->m_pGameConsole->IsConsoleActive() ||
-		!Client()->IsWindowActive())
+	if(m_pClient->m_pChat->IsActive() || m_pClient->m_pMenus->IsActive() || !Client()->IsWindowActive())
 	{
 		OnReset(true); // OnReset();
 

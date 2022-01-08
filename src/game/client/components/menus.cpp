@@ -85,6 +85,7 @@ CMenus::CMenus()
 
 	m_CursorActive = false;
 	m_PrevCursorActive = false;
+	m_EditBoxActive = false;
 
 	str_copy(m_aCurrentDemoFolder, "demos", sizeof(m_aCurrentDemoFolder));
 	m_aCallvoteReason[0] = 0;
@@ -95,7 +96,6 @@ CMenus::CMenus()
 	m_PopupSelection = -2;
 	//
 	m_ShowAuthWindow = false;
-	m_ActiveEditbox = false;
 }
 
 float CMenus::CButtonContainer::GetFade(bool Checked, float Seconds)
@@ -432,7 +432,6 @@ bool CMenus::DoEditBoxUTF8(void* pID, const CUIRect * pRect, char* pStr, unsigne
 		{
 			s_AtIndex = min(s_AtIndex, str_length(pStr));
 			s_DoScroll = false;
-			m_ActiveEditbox = false;
 			UI()->SetActiveItem(0);
 			UI()->ClearLastActiveItem();
 		}
@@ -531,7 +530,7 @@ bool CMenus::DoEditBoxUTF8(void* pID, const CUIRect * pRect, char* pStr, unsigne
 	{
 		// set cursor active
 		m_CursorActive = true;
-		m_ActiveEditbox = true;
+		m_EditBoxActive = true;
 
 		if((2 * time_get() / time_freq()) % 2)	// make it blink
 		{
@@ -2354,6 +2353,7 @@ void CMenus::OnRender()
 	// reset cursor
 	m_PrevCursorActive = m_CursorActive;
 	m_CursorActive = false;
+	m_EditBoxActive = false;
 
 	if(m_KeyReaderIsActive)
 	{
