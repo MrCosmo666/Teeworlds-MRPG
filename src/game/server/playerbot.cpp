@@ -22,7 +22,7 @@ CPlayerBot::CPlayerBot(CGS *pGS, int ClientID, int BotID, int SubBotID, int Spaw
 CPlayerBot::~CPlayerBot()
 {
 	for(int i = 0; i < MAX_PLAYERS; i++)
-		DataBotInfo::ms_aDataBot[m_BotID].m_aActiveQuestBot[i] = false;
+		DataBotInfo::ms_aDataBot[m_BotID].m_aVisibleActive[i] = false;
 
 	CNetMsg_Sv_ClientDrop Msg;
 	Msg.m_ClientID = m_ClientID;
@@ -178,15 +178,15 @@ void CPlayerBot::TryRespawn()
 	const int AllocMemoryCell = MAX_CLIENTS*GS()->GetWorldID()+m_ClientID;
 	m_pCharacter = new(AllocMemoryCell) CCharacterBotAI(&GS()->m_World);
 	m_pCharacter->Spawn(this, SpawnPos);
-	GS()->CreatePlayerSpawn(SpawnPos, GetActiveVisibleClientsMask());
+	GS()->CreatePlayerSpawn(SpawnPos, GetMaskVisibleForClients());
 }
 
-int64 CPlayerBot::GetActiveVisibleClientsMask() const
+int64 CPlayerBot::GetMaskVisibleForClients() const
 {
 	int64 Mask = CmaskOne(m_ClientID);
 	for(int i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(IsVisibleForClientID(i))
+		if(IsVisibleForClient(i))
 			Mask |= CmaskOne(i);
 	}
 	return Mask;
@@ -197,7 +197,7 @@ int64 CPlayerBot::GetActiveVisibleClientsMask() const
 	1 - is active draw only bot
 	2 - is active draw bot and entities
 */
-int CPlayerBot::IsVisibleForClientID(int ClientID) const
+int CPlayerBot::IsVisibleForClient(int ClientID) const
 {
 	CPlayer* pSnappingPlayer = GS()->m_apPlayers[ClientID];
 	if(ClientID < 0 || ClientID >= MAX_PLAYERS || !pSnappingPlayer)
@@ -213,13 +213,13 @@ int CPlayerBot::IsVisibleForClientID(int ClientID) const
 			return 0;
 
 		// [first] quest bot active for player
-		DataBotInfo::ms_aDataBot[m_BotID].m_aActiveQuestBot[ClientID] = true;
+		DataBotInfo::ms_aDataBot[m_BotID].m_aVisibleActive[ClientID] = true;
 	}
 
 	if(m_BotType == TYPE_BOT_NPC)
 	{
 		// [second] skip snapping for npc already snap on quest state
-		if(DataBotInfo::ms_aDataBot[m_BotID].m_aActiveQuestBot[ClientID])
+		if(DataBotInfo::ms_aDataBot[m_BotID].m_aVisibleActive[ClientID])
 			return 0;
 
 		if(!IsActiveQuests(ClientID))
@@ -238,7 +238,7 @@ void CPlayerBot::HandleTuningParams()
 
 void CPlayerBot::Snap(int SnappingClient)
 {
-	if(!Server()->ClientIngame(m_ClientID) || !IsVisibleForClientID(SnappingClient))
+	if(!Server()->ClientIngame(m_ClientID) || !IsVisibleForClient(SnappingClient))
 		return;
 
 	CNetObj_PlayerInfo *pPlayerInfo = static_cast<CNetObj_PlayerInfo *>(Server()->SnapNewItem(NETOBJTYPE_PLAYERINFO, m_ClientID, sizeof(CNetObj_PlayerInfo)));

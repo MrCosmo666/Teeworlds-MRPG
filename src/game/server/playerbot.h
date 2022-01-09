@@ -45,8 +45,8 @@ public:
 	void UpdateTempData(int Health, int Mana) override { m_BotHealth = Health; }
 	void SendClientInfo(int TargetID) override;
 
-	int64 GetActiveVisibleClientsMask() const override;
-	int IsVisibleForClientID(int ClientID) const override;
+	int64 GetMaskVisibleForClients() const override;
+	int IsVisibleForClient(int ClientID) const override;
 	int GetEquippedItemID(int EquipID, int SkipItemID = -1) const override;
 	int GetAttributeCount(int BonusID, bool Really = false) override;
 
