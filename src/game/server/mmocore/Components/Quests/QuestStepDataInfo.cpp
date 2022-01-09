@@ -23,7 +23,7 @@ void CQuestStepDataInfo::UpdateBot(CGS* pGS)
 	int BotClientID = -1;
 	for(int i = MAX_PLAYERS; i < MAX_CLIENTS; i++)
 	{
-		if(!pBotGS->m_apPlayers[i] || pBotGS->m_apPlayers[i]->GetBotType() != BotsTypes::TYPE_BOT_QUEST || pBotGS->m_apPlayers[i]->GetBotSub() != m_Bot->m_SubBotID)
+		if(!pBotGS->m_apPlayers[i] || pBotGS->m_apPlayers[i]->GetBotType() != TYPE_BOT_QUEST || pBotGS->m_apPlayers[i]->GetBotSub() != m_Bot->m_SubBotID)
 			continue;
 		BotClientID = i;
 	}
@@ -33,7 +33,7 @@ void CQuestStepDataInfo::UpdateBot(CGS* pGS)
 	if(ActiveStepBot && BotClientID <= -1)
 	{
 		//dbg_msg("quest sync", "quest to step bot active, but mob not found create");
-		pBotGS->CreateBot(BotsTypes::TYPE_BOT_QUEST, m_Bot->m_BotID, m_Bot->m_SubBotID);
+		pBotGS->CreateBot(TYPE_BOT_QUEST, m_Bot->m_BotID, m_Bot->m_SubBotID);
 	}
 	// if the bot is not active for more than one player
 	if(!ActiveStepBot && BotClientID >= MAX_PLAYERS)
@@ -55,7 +55,7 @@ bool CQuestStepDataInfo::IsActiveStep(CGS* pGS) const
 			continue;
 
 		CQuestData& pPlayerQuest = pPlayer->GetQuest(QuestID);
-		if(pPlayerQuest.GetState() != QuestState::QUEST_ACCEPT || m_Bot->m_Step != pPlayerQuest.m_Step)
+		if(pPlayerQuest.GetState() != QUEST_ACCEPT || m_Bot->m_Step != pPlayerQuest.m_Step)
 			continue;
 
 		// skip complete steps and players who come out to clear the world of bots
@@ -131,12 +131,12 @@ bool CPlayerQuestStepDataInfo::Finish(CPlayer* pPlayer, bool FinalStepTalking)
 
 	// update state complete
 	m_StepComplete = true;
-	DataBotInfo::ms_aDataBot[m_Bot->m_BotID].m_aActiveQuestBot[ClientID] = false;
+	DataBotInfo::ms_aDataBot[m_Bot->m_BotID].m_aVisibleActive[ClientID] = false;
 	CQuestData::ms_aPlayerQuests[ClientID][QuestID].SaveSteps();
 	UpdateBot(pGS);
 
 	CQuestData::ms_aPlayerQuests[ClientID][QuestID].CheckaAvailableNewStep();
-	pGS->StrongUpdateVotes(ClientID, MenuList::MENU_JOURNAL_MAIN);
+	pGS->StrongUpdateVotes(ClientID, MENU_JOURNAL_MAIN);
 	return true;
 }
 
@@ -182,7 +182,7 @@ void CPlayerQuestStepDataInfo::DoCollectItem(CPlayer* pPlayer)
 void CPlayerQuestStepDataInfo::AddMobProgress(CPlayer* pPlayer, int BotID)
 {
 	const int QuestID = m_Bot->m_QuestID;
-	if(!pPlayer || DataBotInfo::ms_aDataBot.find(BotID) == DataBotInfo::ms_aDataBot.end() || pPlayer->GetQuest(QuestID).GetState() != QuestState::QUEST_ACCEPT)
+	if(!pPlayer || DataBotInfo::ms_aDataBot.find(BotID) == DataBotInfo::ms_aDataBot.end() || pPlayer->GetQuest(QuestID).GetState() != QUEST_ACCEPT)
 		return;
 
 	CGS* pGS = pPlayer->GS();
@@ -208,7 +208,7 @@ void CPlayerQuestStepDataInfo::CreateStepArrow(CPlayer* pPlayer)
 	if(!pPlayer || !pPlayer->GetCharacter() || m_StepComplete)
 		return;
 
-	if(pPlayer->GetQuest(m_Bot->m_QuestID).GetState() == QuestState::QUEST_ACCEPT && pPlayer->GetQuest(m_Bot->m_QuestID).m_Step == m_Bot->m_Step)
+	if(pPlayer->GetQuest(m_Bot->m_QuestID).GetState() == QUEST_ACCEPT && pPlayer->GetQuest(m_Bot->m_QuestID).m_Step == m_Bot->m_Step)
 	{
 		CGS* pGS = pPlayer->GS();
 		const int ClientID = pPlayer->GetCID();
@@ -218,7 +218,7 @@ void CPlayerQuestStepDataInfo::CreateStepArrow(CPlayer* pPlayer)
 
 void CPlayerQuestStepDataInfo::CreateStepDropTakeItems(CPlayer* pPlayer)
 {
-	if(!pPlayer || !pPlayer->GetCharacter() || m_Bot->m_InteractiveType != (int)QuestInteractive::INTERACTIVE_DROP_AND_TAKE_IT)
+	if(!pPlayer || !pPlayer->GetCharacter() || m_Bot->m_InteractiveType != (int)INTERACTIVE_DROP_AND_TAKE_IT)
 		return;
 
 	CGS* pGS = pPlayer->GS();

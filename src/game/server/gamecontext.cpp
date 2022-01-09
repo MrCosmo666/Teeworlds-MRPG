@@ -1497,7 +1497,7 @@ void CGS::ClearClientData(int ClientID)
 
 	// clear active snap bots for player
 	for(auto& pActiveSnap : DataBotInfo::ms_aDataBot)
-		pActiveSnap.second.m_aActiveQuestBot[ClientID] = false;
+		pActiveSnap.second.m_aVisibleActive[ClientID] = false;
 }
 
 int CGS::GetRank(int AccountID)

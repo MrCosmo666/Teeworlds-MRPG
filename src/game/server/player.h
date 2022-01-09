@@ -100,8 +100,8 @@ public:
 	virtual	int GetMana() { return GetTempData().m_TempMana; }
 
 	virtual void HandleTuningParams();
-	virtual int64 GetActiveVisibleClientsMask() const { return -1; };
-	virtual int IsVisibleForClientID(int ClientID) const { return 2; }
+	virtual int64 GetMaskVisibleForClients() const { return -1; };
+	virtual int IsVisibleForClient(int ClientID) const { return 2; }
 	virtual int GetEquippedItemID(int EquipID, int SkipItemID = -1) const;
 	virtual int GetAttributeCount(int BonusID, bool ActiveFinalStats = false);
 	int GetItemsAttributeCount(int AttributeID) const;
