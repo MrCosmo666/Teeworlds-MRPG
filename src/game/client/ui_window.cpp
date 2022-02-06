@@ -11,7 +11,6 @@
 
 CUI* CWindowUI::m_pUI;
 CRenderTools* CWindowUI::m_pRenderTools;
-
 CWindowUI* CWindowUI::ms_pWindowHelper;
 std::vector<CWindowUI*> CWindowUI::ms_aWindows;
 
@@ -40,9 +39,8 @@ void CWindowUI::RenderWindowWithoutBordure()
 	// background draw
 	CUIRect MainBackground;
 	Workspace.Margin(-s_BackgroundMargin, &MainBackground);
-	m_pRenderTools->DrawUIRectMonochromeGradient(&MainBackground, vec4(0.3f, 0.3f, 0.3f, 0.95f), CUI::CORNER_ALL, 2.0f);
-	m_pRenderTools->DrawRoundRect(&Workspace, vec4(0.1f, 0.1f, 0.1f, 0.5f), 2.0f);
-
+	m_pRenderTools->DrawUIRectMonochromeGradient(&MainBackground, DEFAULT_BACKGROUND_WINDOW_SHANDOW, CUI::CORNER_ALL, 2.0f);
+	m_pRenderTools->DrawRoundRect(&Workspace, m_BackgroundColor, 2.0f);
 	if(m_pCallback)
 		m_pCallback(Workspace, *this);
 }
@@ -73,11 +71,11 @@ void CWindowUI::RenderDefaultWindow()
 	const bool IsActiveWindow = IsActive();
 	CUIRect ShadowBackground;
 	m_WindowRect.Margin(-1.5f, &ShadowBackground);
-	m_pRenderTools->DrawRoundRect(&ShadowBackground, vec4(0.5f, 0.5f, 0.5f, 0.5f), 10.0f);
+	m_pRenderTools->DrawRoundRect(&ShadowBackground, DEFAULT_BACKGROUND_WINDOW_SHANDOW, 10.0f);
 	if(!m_WindowMinimize)
 	{
 		const float BackgroundFade = m_pUI->GetFade(&Workspace, IsActiveWindow, 0.4f);
-		const vec4 Color = mix(vec4(0.14f, 0.14f, 0.14f, 0.97f), vec4(0.16f, 0.16f, 0.16f, 0.97f), BackgroundFade);
+		const vec4 Color = mix(m_BackgroundColor -= vec4(0.02f, 0.02f, 0.02f, 0.f), m_BackgroundColor, BackgroundFade);
 		m_pRenderTools->DrawUIRectMonochromeGradient(&Workspace, Color, CUI::CORNER_ALL, 10.0f);
 	}
 	
@@ -203,6 +201,7 @@ void CWindowUI::Init(vec2 WindowSize, CWindowUI* pWindowDependent, bool* pRender
 	m_WindowMinimize = false;
 	m_WindowMoving = false;
 	m_pRenderDependence = pRenderDependence;
+	m_BackgroundColor = DEFAULT_BACKGROUND_WINDOW_COLOR;
 
 	UpdateDependent(pWindowDependent);
 }

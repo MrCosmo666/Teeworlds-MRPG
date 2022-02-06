@@ -280,7 +280,7 @@ void CUIGameInterface::CallbackRenderMailboxListButtonHelp(const CUIRect& pWindo
 	const float TextWidth = TextRender()->TextWidth(FontSize, pLineHelp, -1);
 	
 	UI()->DoLabel(&Label, pLineHelp, FontSize, CUI::EAlignment::ALIGN_CENTER);
-	pCurrentWindow.UpdateWorkspaceSize({ TextWidth, 30 });
+	pCurrentWindow.UpdateWorkspace({ TextWidth, 30 });
 }
 
 void CUIGameInterface::CallbackRenderMailboxLetter(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
@@ -343,7 +343,7 @@ void CUIGameInterface::CallbackRenderMailboxLetter(const CUIRect& pWindowRect, C
 	}
 
 	const float WorkspaceHeight = HasItem ? 90.0f : 75.0f;
-	pCurrentWindow.UpdateWorkspaceSize({ 250.0f, WorkspaceHeight });
+	pCurrentWindow.UpdateWorkspace({ 250.0f, WorkspaceHeight });
 }
 
 void CUIGameInterface::CallbackRenderMailboxLetterSend(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
@@ -448,7 +448,7 @@ void CUIGameInterface::CallbackRenderMailboxLetterActions(const CUIRect& pWindow
 		pCurrentWindow.Close();
 	}
 
-	pCurrentWindow.UpdateWorkspaceSize(vec2(100, 4.0f + ButtonAmount * ButtonHeight));
+	pCurrentWindow.UpdateWorkspace(vec2(100, 4.0f + ButtonAmount * ButtonHeight), vec4(0.5f, 0.1f, 0.1f, 0.20f));
 }
 
 void CUIGameInterface::SendLetterAction(CMailboxLetter* pLetter, int64 Flags)
