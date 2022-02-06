@@ -204,7 +204,7 @@ void CWindowUI::Init(vec2 WindowSize, CWindowUI* pWindowDependent, bool* pRender
 	m_WindowMoving = false;
 	m_pRenderDependence = pRenderDependence;
 
-	SetDependent(pWindowDependent);
+	UpdateDependent(pWindowDependent);
 }
 
 const CUIRect& CWindowUI::GetRect() const
@@ -292,7 +292,7 @@ void CWindowUI::HighlightDisable()
 	}
 }
 
-void CWindowUI::SetDependent(const char* pWindowName)
+void CWindowUI::UpdateDependent(const char* pWindowName)
 {
 	str_copy(m_aWindowDependentName, pWindowName, sizeof(m_aWindowDependentName));
 }

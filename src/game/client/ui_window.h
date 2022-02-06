@@ -93,12 +93,12 @@ public:
 	const char* GetWindowName() const { return m_aWindowName; }
 
 	/*
-		Function: SetWorkspaceSize -> void
-			- Set workspace window size.
+		Function: UpdateWorkspaceSize -> void
+			- Update workspace window size.
 		Parameters:
 			- WorkspaceSize - Window size (Width Height).
 	*/
-	void SetWorkspaceSize(vec2 WorkspaceSize)
+	void UpdateWorkspaceSize(vec2 WorkspaceSize)
 	{
 		CUIRect NewWindowRect = { 0, 0, WorkspaceSize.x, WorkspaceSize.y + m_WindowBordure.h };
 		if(NewWindowRect.w != m_WindowRect.w || NewWindowRect.h != m_WindowRect.h)
@@ -185,24 +185,24 @@ public:
 	void HighlightDisable();
 
 	/*
-		Function: SetDependent -> void
-			- Sets the window on which to depend.
+		Function: UpdateDependent -> void
+			- Update the window on which to depend.
 		Parameters:
 			- pDependentWindow - the window on which will depend.
 	*/
-	void SetDependent(CWindowUI* pDependentWindow)
+	void UpdateDependent(CWindowUI* pDependentWindow)
 	{
 		if(pDependentWindow)
-			SetDependent(pDependentWindow->GetWindowName());
+			UpdateDependent(pDependentWindow->GetWindowName());
 	}
 
 	/*
-		Function: SetDependent -> void
-			- Sets the window on which to depend.
+		Function: UpdateDependent -> void
+			- Update the window on which to depend.
 		Parameters:
 			- pWindowName - the window on which will depend.
 	*/
-	void SetDependent(const char* pWindowName);
+	void UpdateDependent(const char* pWindowName);
 
 private:
 	static CWindowUI* GetActiveWindow();
