@@ -801,7 +801,7 @@ bool CCharacter::TakeDamage(vec2 Force, int Dmg, int From, int Weapon)
 
 void CCharacter::Snap(int SnappingClient)
 {
-	if(NetworkClipped(SnappingClient) || !m_pPlayer->IsActiveSnappingBot(SnappingClient))
+	if(NetworkClipped(SnappingClient) || !m_pPlayer->IsVisibleForClient(SnappingClient))
 		return;
 
 	CNetObj_Character *pCharacter = static_cast<CNetObj_Character *>(Server()->SnapNewItem(NETOBJTYPE_CHARACTER, m_pPlayer->GetCID(), sizeof(CNetObj_Character)));
@@ -1195,7 +1195,7 @@ bool CCharacter::StartConversation(CPlayer *pTarget)
 
 	// skip if not NPC, or it is not drawn
 	CPlayerBot* pTargetBot = static_cast<CPlayerBot*>(pTarget);
-	if (!pTargetBot || pTargetBot->GetBotType() == BotsTypes::TYPE_BOT_MOB || !pTargetBot->IsActiveSnappingBot(m_pPlayer->GetCID()))
+	if (!pTargetBot || pTargetBot->GetBotType() == BotsTypes::TYPE_BOT_MOB || !pTargetBot->IsVisibleForClient(m_pPlayer->GetCID()))
 		return false;
 	return true;
 }

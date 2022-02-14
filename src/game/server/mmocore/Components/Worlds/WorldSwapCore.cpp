@@ -88,8 +88,8 @@ vec2 CWorldSwapCore::GetPositionQuestBot(int ClientID, const QuestBotInfo& Quest
 	int TargetWorldID = QuestBot.m_WorldID;
 	const auto pWorldSwap = std::find_if(CWorldSwapPosition::ms_aWorldPositionLogic.begin(), CWorldSwapPosition::ms_aWorldPositionLogic.end(), [&](const CWorldSwapPosition& pItem)
 	{
-		if(TargetWorldID == pItem.m_BaseWorldID)
-			TargetWorldID = pItem.m_FindWorldID;
+		if(TargetWorldID == pItem.m_FindWorldID)
+			TargetWorldID = pItem.m_BaseWorldID;
 		return GS()->GetWorldID() == TargetWorldID;
 	});
 	return pWorldSwap != CWorldSwapPosition::ms_aWorldPositionLogic.end() ? (*pWorldSwap).m_Position : vec2(0, 0);

@@ -229,9 +229,9 @@ void CGS::CreateExplosion(vec2 Pos, int Owner, int Weapon, int MaxDamage)
 	}
 }
 
-void CGS::CreatePlayerSpawn(vec2 Pos)
+void CGS::CreatePlayerSpawn(vec2 Pos, int64 Mask)
 {
-	CNetEvent_Spawn *ev = (CNetEvent_Spawn *)m_Events.Create(NETEVENTTYPE_SPAWN, sizeof(CNetEvent_Spawn));
+	CNetEvent_Spawn *ev = (CNetEvent_Spawn *)m_Events.Create(NETEVENTTYPE_SPAWN, sizeof(CNetEvent_Spawn), Mask);
 	if(ev)
 	{
 		ev->m_X = (int)Pos.x;
@@ -1497,7 +1497,7 @@ void CGS::ClearClientData(int ClientID)
 
 	// clear active snap bots for player
 	for(auto& pActiveSnap : DataBotInfo::ms_aDataBot)
-		pActiveSnap.second.m_aActiveQuestBot[ClientID] = false;
+		pActiveSnap.second.m_aVisibleActive[ClientID] = false;
 }
 
 int CGS::GetRank(int AccountID)
@@ -2096,43 +2096,45 @@ void CGS::ShowVotesNewbieInformation(int ClientID)
 	if(!pPlayer)
 		return;
 
-	AVL(ClientID, "null", "#### Hi, new adventurer! ####");
-	AVL(ClientID, "null", "This server is a mmo server. You'll have to finish");
-	AVL(ClientID, "null", "quests to continue the game. In these quests,");
-	AVL(ClientID, "null", "you'll have to get items to give to quest npcs.");
-	AVL(ClientID, "null", "To get a quest, you need to talk to NPCs.");
-	AVL(ClientID, "null", "You talk to them by hammering them.");
-	AVL(ClientID, "null", "You give these items by talking them again. ");
-	AVL(ClientID, "null", "Hearts and Shields around you show the position");
-	AVL(ClientID, "null", "quests' npcs. Hearts show Main quest, Shields show Others.");
-	AVL(ClientID, "null", "Don't ask other people to give you the items,");
-	AVL(ClientID, "null", "but you can ask for some help. Keep in mind that");
-	AVL(ClientID, "null", "it is hard for everyone too. You can see that your shield");
-	AVL(ClientID, "null", "(below your health bar) doesn't protect you,");
-	AVL(ClientID, "null", "it's because it's not shield, it's mana.");
-	AVL(ClientID, "null", "It is used for active skills, which you will need to buy");
-	AVL(ClientID, "null", "in the future. Active skills use mana, but they use %% of mana.");
+#define TI(_text) AVL(ClientID, "null", _text)
+	TI("#### Hi, new adventurer! ####");
+	TI("This server is a mmo server. You'll have to finish");
+	TI("quests to continue the game. In these quests,");
+	TI("you'll have to get items to give to quest npcs.");
+	TI("To get a quest, you need to talk to NPCs.");
+	TI("You talk to them by hammering them.");
+	TI("You give these items by talking them again. ");
+	TI("Hearts and Shields around you show the position");
+	TI("quests' npcs. Hearts show Main quest, Shields show Others.");
+	TI("Don't ask other people to give you the items,");
+	TI("but you can ask for some help. Keep in mind that");
+	TI("it is hard for everyone too. You can see that your shield");
+	TI("(below your health bar) doesn't protect you,");
+	TI("it's because it's not shield, it's mana.");
+	TI("It is used for active skills, which you will need to buy");
+	TI("in the future. Active skills use mana, but they use %% of mana.");
 	AV(ClientID, "null");
-	AVL(ClientID, "null", "#### Some Informations ####");
-	AVL(ClientID, "null", "Brown Slimes drop Glue and Gel (lower chance to drop Gel)");
-	AVL(ClientID, "null", "Green Slimes drop Glue");
-	AVL(ClientID, "null", "Blue Slimes drop Gel");
-	AVL(ClientID, "null", "Pink Slime drop 3 Gels and 3 Glue");
-	AVL(ClientID, "null", "Goblins drop Goblin Ingots");
-	AVL(ClientID, "null", "Orc Warrior drop Goblin Ingot and Torn Cloth Clothes of Orc");
-	AVL(ClientID, "null", "- A more accurate drop can be found in the menu");
+	TI("#### Some Informations ####");
+	TI("Brown Slimes drop Glue and Gel (lower chance to drop Gel)");
+	TI("Green Slimes drop Glue");
+	TI("Blue Slimes drop Gel");
+	TI("Pink Slime drop 3 Gels and 3 Glue");
+	TI("Goblins drop Goblin Ingots");
+	TI("Orc Warrior drop Goblin Ingot and Torn Cloth Clothes of Orc");
+	TI("- A more accurate drop can be found in the menu");
 	AV(ClientID, "null");
-	AVL(ClientID, "null", "#### The upgrades now ####");
-	AVL(ClientID, "null", "- Strength : Damage");
-	AVL(ClientID, "null", "- Dexterity : Shooting speed");
-	AVL(ClientID, "null", "- Crit Dmg : Damage dealt by critical hits");
-	AVL(ClientID, "null", "- Direct Crit Dmg : Critical chance");
-	AVL(ClientID, "null", "- Hardness : Health");
-	AVL(ClientID, "null", "- Lucky : Chance to avoid damage");
-	AVL(ClientID, "null", "- Piety : Mana");
-	AVL(ClientID, "null", "- Vampirism : Damage dealt converted into health");
-	AVL(ClientID, "null", "All things you need is in Vote.");
-	AVL(ClientID, "null", "Good game !");
+	TI("#### The upgrades now ####");
+	TI("- Strength : Damage");
+	TI("- Dexterity : Shooting speed");
+	TI("- Crit Dmg : Damage dealt by critical hits");
+	TI("- Direct Crit Dmg : Critical chance");
+	TI("- Hardness : Health");
+	TI("- Lucky : Chance to avoid damage");
+	TI("- Piety : Mana");
+	TI("- Vampirism : Damage dealt converted into health");
+	TI("All things you need is in Vote.");
+	TI("Good game !");
+#undef TI
 }
 
 // strong update votes variability of the data

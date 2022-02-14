@@ -41,7 +41,7 @@ struct CDownloadChunkItem
 		m_Crc = 0;
 		m_Amount = -1;
 		m_Totalsize = -1;
-		m_Downloaded = true;
+		m_Downloaded = false;
 	}
 	char m_aName[256];
 	char m_aFilename[256];

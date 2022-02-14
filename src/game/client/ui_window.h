@@ -7,6 +7,8 @@
 
 #include <functional>
 
+#define DEFAULT_BACKGROUND_WINDOW_SHANDOW vec4(0.3f, 0.3f, 0.3f, 0.95f)
+#define DEFAULT_BACKGROUND_WINDOW_COLOR vec4(0.085f, 0.085f, 0.085f, 0.50f)
 #define WINREGISTER(f, o)  std::bind(f, o, std::placeholders::_1, std::placeholders::_2)
 
 class CWindowUI
@@ -27,6 +29,7 @@ class CWindowUI
 	bool* m_pRenderDependence;
 
 	bool m_Openned;
+	vec4 m_BackgroundColor;
 	vec4 m_HighlightColor;
 	char m_aWindowName[128];
 	char m_aWindowDependentName[128];
@@ -91,23 +94,6 @@ public:
 			- Returns the window name.
 	*/
 	const char* GetWindowName() const { return m_aWindowName; }
-
-	/*
-		Function: SetWorkspaceSize -> void
-			- Set workspace window size.
-		Parameters:
-			- WorkspaceSize - Window size (Width Height).
-	*/
-	void SetWorkspaceSize(vec2 WorkspaceSize)
-	{
-		CUIRect NewWindowRect = { 0, 0, WorkspaceSize.x, WorkspaceSize.y + m_WindowBordure.h };
-		if(NewWindowRect.w != m_WindowRect.w || NewWindowRect.h != m_WindowRect.h)
-		{
-			m_pUI->MouseRectLimitMapScreen(&NewWindowRect, 6.0f, CUI::RECTLIMITSCREEN_UP | CUI::RECTLIMITSCREEN_ALIGN_CENTER_X);
-			m_WindowRect = NewWindowRect;
-			m_WindowRectReserve = NewWindowRect;
-		}
-	}
 
 	/*
 		Function: Open -> void
@@ -185,24 +171,44 @@ public:
 	void HighlightDisable();
 
 	/*
-		Function: SetDependent -> void
-			- Sets the window on which to depend.
+		Function: UpdateDependent -> void
+			- Update the window on which to depend.
 		Parameters:
 			- pDependentWindow - the window on which will depend.
 	*/
-	void SetDependent(CWindowUI* pDependentWindow)
+	void UpdateDependent(CWindowUI* pDependentWindow)
 	{
 		if(pDependentWindow)
-			SetDependent(pDependentWindow->GetWindowName());
+			UpdateDependent(pDependentWindow->GetWindowName());
 	}
 
 	/*
-		Function: SetDependent -> void
-			- Sets the window on which to depend.
+		Function: UpdateDependent -> void
+			- Update the window on which to depend.
 		Parameters:
 			- pWindowName - the window on which will depend.
 	*/
-	void SetDependent(const char* pWindowName);
+	void UpdateDependent(const char* pWindowName);
+
+	/*
+		Function: UpdateWorkspace -> void
+			- Update workspace window.
+		Parameters:
+			- WorkspaceSize - Window size (Width Height).
+			- BackgroundColor - Window background color.
+	*/
+	void UpdateWorkspace(vec2 WorkspaceSize, vec4 BackgroundColor = vec4())
+	{
+		CUIRect NewWindowRect = { 0, 0, WorkspaceSize.x, WorkspaceSize.y + m_WindowBordure.h };
+		if(NewWindowRect.w != m_WindowRect.w || NewWindowRect.h != m_WindowRect.h)
+		{
+			m_pUI->MouseRectLimitMapScreen(&NewWindowRect, 6.0f, CUI::RECTLIMITSCREEN_UP | CUI::RECTLIMITSCREEN_ALIGN_CENTER_X);
+			m_WindowRect = NewWindowRect;
+			m_WindowRectReserve = NewWindowRect;
+		}
+		if(BackgroundColor.a > 0.0f)
+			m_BackgroundColor = BackgroundColor;
+	}
 
 private:
 	static CWindowUI* GetActiveWindow();

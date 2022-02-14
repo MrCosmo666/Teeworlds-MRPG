@@ -350,7 +350,7 @@ private:
 
 	int m_MenuActiveID;
 	bool m_ShowAuthWindow;
-	bool m_ActiveEditbox;
+	bool m_EditBoxActive;
 	char m_aAuthResultReason[256];
 	vec4 m_AuthResultColor;
 	//
@@ -957,7 +957,7 @@ public:
 	virtual int GetInitAmount() const;
 	bool IsActive() const { return m_MenuActiveID > 0; }
 	bool IsActiveAuthMRPG() const { return m_ShowAuthWindow; }
-	bool IsActiveEditbox() const { return m_ActiveEditbox; }
+	bool IsActiveEditbox() const { return m_EditBoxActive; }
 
 	virtual void OnInit();
 

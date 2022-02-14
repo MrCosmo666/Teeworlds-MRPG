@@ -77,6 +77,11 @@ vector2_base<T> closest_point_on_line(vector2_base<T> line_point0, vector2_base<
 }
 
 //
+inline float total_size_vec2(const vector2_base<float> &a)
+{
+	return a.x + a.y;
+}
+
 inline float length(const vector2_base<float> &a)
 {
 	return sqrtf(a.x*a.x + a.y*a.y);
