@@ -23,7 +23,6 @@ jobs:
         submodules: true
         
     - name: Prepare Linux
-      if: contains(matrix.os, 'ubuntu')
       run: |
         sudo apt-get update -y
         sudo apt-get install pkg-config cmake libfreetype6-dev libsdl2-dev libicu-dev libssl-dev libcurl4-openssl-dev -y
