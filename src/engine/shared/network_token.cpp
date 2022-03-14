@@ -20,6 +20,11 @@ void CNetTokenManager::Init(NETSOCKET Socket, int SeedTime)
 {
 	m_Socket = Socket;
 	m_SeedTime = SeedTime;
+	if(secure_random_init())
+	{
+		dbg_msg("mastersrv", "Failed to initialize secure RNG, which is required");
+		dbg_break();
+	}
 	GenerateSeed();
 }
 
