@@ -36,7 +36,7 @@ jobs:
             LDFLAGS: /WX
 
         - name: "Windows x86"
-          os: windows-2019
+          os: windows-latest
           cmake-args: -G "Visual Studio 17 2022" -A Win32
           package-file: mmoteeworlds-win32.zip
           package-full-file: mmoteeworlds-win32-full.zip
