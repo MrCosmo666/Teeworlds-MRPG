@@ -19,6 +19,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with: 
+        submodules: true
+        
     - name: Prepare Linux
       if: contains(matrix.os, 'ubuntu')
       run: |
