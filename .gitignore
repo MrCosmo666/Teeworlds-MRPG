@@ -35,6 +35,7 @@ testrunner
 out
 cscope.files
 cscope.out
+cmake-build*
 
 # CMake
 generated
