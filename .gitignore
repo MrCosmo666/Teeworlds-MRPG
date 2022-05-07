@@ -32,6 +32,7 @@ testrunner
 .vs
 .vscode
 .vcxproj
+.cache
 out
 cscope.files
 cscope.out
