@@ -29,8 +29,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 endif()
 
 include(CheckCCompilerFlag)
-include(CheckCXXCompilerFlag) # unused
 include(CheckSymbolExists)
+#include(CheckCXXCompilerFlag) #unused
 
 check_symbol_exists(__i386 "" TARGET_ARCH_X86_i386)
 if(TARGET_ARCH_X86_i386)
@@ -57,9 +57,7 @@ if(NOT(CMAKE_BUILD_TYPE))
 endif()
 
 set(DBG $<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>)
-set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS
-    src/game/version.h
-)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS src/game/version.h)
 
 set(SERVER_EXECUTABLE mmoteeworlds_srv CACHE STRING "Name of the built server executable")
 set(CLIENT_EXECUTABLE mmoteeworlds CACHE STRING "Name of the build client executable")

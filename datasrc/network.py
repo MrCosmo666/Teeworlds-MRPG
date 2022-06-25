@@ -27,16 +27,28 @@ MoodType = Enum("MOOD", ["ANGRY", "AGRESSED_TANK", "AGRESSED_OTHER", "NORMAL", "
 MmoPickups = Enum("MMO_PICKUP", ["BOX", "EXPERIENCE", "PLANT", "ORE", "SIDE_ARROW", "MAIN_ARROW", "DROP"])
 Equip = Enum("EQUIP", ["HAMMER", "GUN", "SHOTGUN", "GRENADE", "RIFLE", "MINER", "WINGS", "DISCORD"])
 Effects = Enum("EFFECT", ["SPASALON", "TELEPORT"])
-AuthCodes = Enum("AUTH", ["ALL_UNKNOWN", "ALL_MUSTCHAR", "REGISTER_GOOD", "LOGIN_GOOD", "LOGIN_ALREADY", 
-							"LOGIN_WRONG", "LOGIN_NICKNAME", "REGISTER_ERROR_NICK"])
-
-
 
 
 						
 RawHeader = '''
 
 #include <engine/message.h>
+
+enum class AccountCodeResult : short
+{
+    AOP_UNKNOWN,
+    AOP_LOGIN_OK,
+    AOP_REGISTER_OK,
+    AOP_MISMATCH_LENGTH_SYMBOLS,
+    AOP_LOGIN_WRONG,
+    AOP_ALREADY_IN_GAME,
+    AOP_NICKNAME_NOT_EXIST,
+    AOP_NICKNAME_ALREADY_EXIST,
+    AOP_REGISTER_PASSWORD_DOES_NOT_REPEATED,
+    AOP_REGISTER_DOES_NOT_ACCEPTED_RULES,
+    AOP_ACCOUNT_BAD_LINK,
+    AOP_DB_INTERNAL_ERROR
+};
 
 enum
 {
@@ -109,7 +121,6 @@ Enums = [
     Effects,
 	Equip,
 	MmoPickups,
-    AuthCodes,
 	MoodType,
 	WorldType,
     Dialogs,

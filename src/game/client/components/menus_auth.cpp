@@ -18,47 +18,7 @@ void CMenus::OnAuthMessage(int MsgType, void* pRawMsg)
 	if(MsgType == NETMSGTYPE_SV_CLIENTPROGRESSAUTH)
 	{
 		CNetMsg_Sv_ClientProgressAuth* pMsg = (CNetMsg_Sv_ClientProgressAuth*)pRawMsg;
-		switch(pMsg->m_Code)
-		{
-			// all codes states
-			case AUTH_ALL_UNKNOWN:
-			setAuthMessage("Unknow error (#0)", EAuthColorMessage::ERROR_MESSAGE);
-			break;
-
-			case AUTH_ALL_MUSTCHAR:
-			setAuthMessage("Must contain 4-15 characters (#1)", EAuthColorMessage::ERROR_MESSAGE);
-			break;
-
-			case AUTH_REGISTER_GOOD:
-			setAuthMessage("The was completed successfully", EAuthColorMessage::SUCCESS_MESSAGE);
-			break;
-
-			case AUTH_LOGIN_GOOD:
-			if(!g_Config.m_ClSavePasswordMRPG)
-				mem_zero(g_Config.m_PasswordMRPG, sizeof(g_Config.m_PasswordMRPG));
-			SetAuthState(false);
-			setAuthMessage("The was completed successfully", EAuthColorMessage::SUCCESS_MESSAGE);
-			break;
-
-			// login codes states
-			case AUTH_LOGIN_ALREADY:
-			setAuthMessage("Already authed (#3)", EAuthColorMessage::ERROR_MESSAGE);
-			break;
-
-			case AUTH_LOGIN_WRONG:
-			mem_zero(g_Config.m_PasswordMRPG, sizeof(g_Config.m_PasswordMRPG));
-			setAuthMessage("Wrong login or password (#4)", EAuthColorMessage::ERROR_MESSAGE);
-			break;
-
-			case AUTH_LOGIN_NICKNAME:
-			setAuthMessage("Wrong nickname (#5)", EAuthColorMessage::ERROR_MESSAGE);
-			break;
-
-			// register codes states
-			case AUTH_REGISTER_ERROR_NICK:
-			setAuthMessage("Change nick already registered (#6)", EAuthColorMessage::ERROR_MESSAGE);
-			break;
-		}
+		setAccountCodeMessage(static_cast<AccountCodeResult>(pMsg->m_Code));
 	}
 }
 
@@ -235,12 +195,12 @@ void CMenus::RenderAuthWindow()
 			{
 				if(str_comp(s_aPassword, s_aRepeatPassword) != 0)
 				{
-					setAuthMessage("Registration: the password does not match the repeated one!", EAuthColorMessage::ERROR_MESSAGE);
+					setAccountCodeMessage(AccountCodeResult::AOP_REGISTER_PASSWORD_DOES_NOT_REPEATED);
 					mem_zero(s_aPassword, sizeof(s_aPassword));
 					mem_zero(s_aRepeatPassword, sizeof(s_aRepeatPassword));
 				}
 				else if(s_PlayerAcceptRules == 0)
-					setAuthMessage("Registration: you need to accept rules!", EAuthColorMessage::WARNING_MESSAGE);
+					setAccountCodeMessage(AccountCodeResult::AOP_REGISTER_DOES_NOT_ACCEPTED_RULES);
 				else
 				{
 					m_pClient->SendAuthPack(s_aAccount, s_aPassword, true);
@@ -292,24 +252,34 @@ void CMenus::RenderAuthWindow()
 	Graphics()->QuadsEnd();
 }
 
-void CMenus::setAuthMessage(const char* Message, int EAuthColorMessage)
+void CMenus::setAccountCodeMessage(AccountCodeResult CodeOP)
 {
-	str_copy(m_aAuthResultReason, Message, sizeof(m_aAuthResultReason));
+#define __BACCTF(text) str_format(m_aAuthResultReason, sizeof(m_aAuthResultReason), "%s (Code: #%d)", text, static_cast<int>(CodeOP))
+	const auto ErrorResult = [&](const char* ptext) { __BACCTF(ptext); m_AuthResultColor = vec4(1.0f, 0.15f, 0.15f, 1.0f); };
+	const auto WarningResult = [&](const char* ptext) { __BACCTF(ptext); m_AuthResultColor = vec4(1.0f, 0.5f, 0.0f, 1.0f); };
+	const auto SuccessResult = [&](const char* ptext) { __BACCTF(ptext); m_AuthResultColor = vec4(0.35f, 1.0f, 0.35f, 1.0f); };
 
-	switch(EAuthColorMessage)
+	switch (CodeOP)
 	{
-		// red default
-		default:
-		case EAuthColorMessage::ERROR_MESSAGE:
-		m_AuthResultColor = vec4(1.0f, 0.15f, 0.15f, 1.0f);
-		break;
-
-		case EAuthColorMessage::WARNING_MESSAGE:
-		m_AuthResultColor = vec4(1.0f, 0.5f, 0.0f, 1.0f);
-		break;
-
-		case EAuthColorMessage::SUCCESS_MESSAGE:
-		m_AuthResultColor = vec4(0.35f, 1.0f, 0.35f, 1.0f);
-		break;
+		default: ErrorResult("Unknown error"); break;
+		case AccountCodeResult::AOP_MISMATCH_LENGTH_SYMBOLS: ErrorResult("Must contain from 4 to 12 characters!"); break;
+		case AccountCodeResult::AOP_REGISTER_OK: SuccessResult("The account has been successfully registered!"); break;
+		case AccountCodeResult::AOP_ALREADY_IN_GAME: ErrorResult("This account is already authorized!"); break;
+		case AccountCodeResult::AOP_NICKNAME_NOT_EXIST: ErrorResult("An account with this nickname is not exist!"); break;
+		case AccountCodeResult::AOP_NICKNAME_ALREADY_EXIST: ErrorResult("Your nickname has already been registered!"); break;
+		case AccountCodeResult::AOP_REGISTER_PASSWORD_DOES_NOT_REPEATED: ErrorResult("Registration: the password does not match the repeated one."); break;
+		case AccountCodeResult::AOP_REGISTER_DOES_NOT_ACCEPTED_RULES: WarningResult("Registration: you need to accept rules!"); break;
+		case AccountCodeResult::AOP_LOGIN_OK: SuccessResult("Successfully logged in to your account!");
+		{
+			if (!g_Config.m_ClSavePasswordMRPG)
+				mem_zero(g_Config.m_PasswordMRPG, sizeof(g_Config.m_PasswordMRPG));
+			SetAuthState(false);
+		} break;
+		case AccountCodeResult::AOP_LOGIN_WRONG: ErrorResult("Incorrect password or login.");
+		{
+			mem_zero(g_Config.m_PasswordMRPG, sizeof(g_Config.m_PasswordMRPG));
+		} break;
 	}
+
+#undef __BACCTF
 }
