@@ -7,8 +7,8 @@
     "language variants": {
         "japanese": "Source Han Sans",
         "korean": "Source Han Sans K",
-        "simplified_chinese": "Source Han Sans SC", 
-        "traditional_chinese": "Source Han Sans TC"
+        "simplified_chinese": "DejaVu Sans", 
+        "traditional_chinese": "DejaVu Sans"
     },
     "fallbacks": [
         "Source Han Sans"

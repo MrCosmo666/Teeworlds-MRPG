@@ -32,9 +32,11 @@ testrunner
 .vs
 .vscode
 .vcxproj
+.cache
 out
 cscope.files
 cscope.out
+cmake-build*
 
 # CMake
 generated

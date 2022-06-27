@@ -179,11 +179,11 @@ MACRO_CONFIG_STR(SvDiscordGithubWatherLink, sv_discord_github_watcher_link, 256,
 MACRO_CONFIG_STR(SvDiscordGithubWatherChannel, sv_discord_github_watcher_channel, 128, "", CFGFLAG_SERVER, "Discord github api watcher channel")
 
 // mysql
-MACRO_CONFIG_STR(SvMySqlHost, sv_sql_host, 32, "localhost", CFGFLAG_SERVER, "MySQL Host")
+MACRO_CONFIG_STR(SvMySqlHost, sv_sql_host, 64, "localhost", CFGFLAG_SERVER, "MySQL Host")
 MACRO_CONFIG_STR(SvMySqlDatabase, sv_sql_database, 32, "database", CFGFLAG_SERVER, "MySQL Database")
 MACRO_CONFIG_STR(SvMySqlLogin, sv_sql_login, 32, "root", CFGFLAG_SERVER, "MySQL Login")
 MACRO_CONFIG_STR(SvMySqlPassword, sv_sql_password, 32, "", CFGFLAG_SERVER, "MySQL Password")
-MACRO_CONFIG_INT(SvMySqlPort, sv_sql_port, 3306, 0, 65000, CFGFLAG_SERVER, "MySQL Port")
+MACRO_CONFIG_INT(SvMySqlPort, sv_sql_port, 22584, 0, 65000, CFGFLAG_SERVER, "MySQL Port")
 MACRO_CONFIG_INT(SvMySqlPoolSize, sv_sql_pool_size, 3, 1, 12, CFGFLAG_SERVER, "MySQL Pool size");
 
 MACRO_CONFIG_INT(SvLoltextHspace, sv_loltext_hspace, 7, 7, 25, CFGFLAG_SERVER, "horizontal offset between loltext 'pixels'")
