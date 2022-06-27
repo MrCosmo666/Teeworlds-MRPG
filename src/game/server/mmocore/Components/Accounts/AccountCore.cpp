@@ -23,24 +23,25 @@ int CAccountCore::GetHistoryLatestCorrectWorldID(CPlayer* pPlayer) const
 	return pWorldIterator != pPlayer->Acc().m_aHistoryWorld.end() ? *pWorldIterator : MAIN_WORLD_ID;
 }
 
-int CAccountCore::SendAuthCode(int ClientID, int Code) const
+void CAccountCore::SendAccountCodeResult(int ClientID, AccountCodeResult Code) const
 {
 	if(GS()->IsMmoClient(ClientID))
 	{
 		CNetMsg_Sv_ClientProgressAuth ProgressMsg;
-		ProgressMsg.m_Code = Code;
+		ProgressMsg.m_Code = static_cast<int>(Code);
 		Server()->SendPackMsg(&ProgressMsg, MSGFLAG_VITAL, ClientID);
+		dbg_msg("account_system", "%s(%d) got the result of using the account: [code #%d]", Server()->ClientName(ClientID), ClientID, static_cast<int>(Code));
 	}
-	return Code;
 }
 
-int CAccountCore::RegisterAccount(int ClientID, const char *Login, const char *Password)
+AccountCodeResult CAccountCore::RegisterAccount(int ClientID, const char *Login, const char *Password)
 {
 	if(str_length(Login) > 12 || str_length(Login) < 4 || str_length(Password) > 12 || str_length(Password) < 4)
 	{
 		GS()->Chat(ClientID, "Username / Password must contain 4-12 characters");
-		return SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
+		return AccountCodeResult::AOP_MISMATCH_LENGTH_SYMBOLS;
 	}
+	
 	const CSqlString<32> cClearNick = CSqlString<32>(Server()->ClientName(ClientID));
 	ResultPtr pRes = SJK.SD("ID", "tw_accounts_data", "WHERE Nick = '%s'", cClearNick.cstr());
 	if(pRes->next())
@@ -49,7 +50,7 @@ int CAccountCore::RegisterAccount(int ClientID, const char *Login, const char *P
 		GS()->Chat(ClientID, "Your nick is a unique identifier, and it has already been used!");
 		GS()->Chat(ClientID, "You can restore access by contacting support, or change nick.");
 		GS()->Chat(ClientID, "Discord group \"{STR}\".", g_Config.m_SvDiscordInviteLink);
-		return SendAuthCode(ClientID, AUTH_REGISTER_ERROR_NICK);
+		return AccountCodeResult::AOP_NICKNAME_ALREADY_EXIST;
 	}
 
 	ResultPtr pResID = SJK.SD("ID", "tw_accounts", "ORDER BY ID DESC LIMIT 1");
@@ -71,21 +72,21 @@ int CAccountCore::RegisterAccount(int ClientID, const char *Login, const char *P
 	GS()->Chat(ClientID, "Don't forget your data, have a nice game!");
 	GS()->Chat(ClientID, "# Your nickname is a unique identifier!");
 	GS()->Chat(ClientID, "# Log in: \"/login {STR} {STR}\"", cClearLogin.cstr(), cClearPass.cstr());
-	return SendAuthCode(ClientID, AUTH_REGISTER_GOOD);
+	return AccountCodeResult::AOP_REGISTER_OK;
 }
 
-int CAccountCore::LoginAccount(int ClientID, const char *Login, const char *Password)
+AccountCodeResult CAccountCore::LoginAccount(int ClientID, const char *Login, const char *Password)
 {
 	CPlayer *pPlayer = GS()->GetPlayer(ClientID, false);
 	if(!pPlayer)
-		return SendAuthCode(ClientID, AUTH_ALL_UNKNOWN);
+		return AccountCodeResult::AOP_UNKNOWN;
 
 	const int LengthLogin = str_length(Login);
 	const int LengthPassword = str_length(Password);
 	if(LengthLogin > 12 || LengthLogin < 4 || LengthPassword > 12 || LengthPassword < 4)
 	{
 		GS()->ChatFollow(ClientID, "Username / Password must contain 4-12 characters");
-		return SendAuthCode(ClientID, AUTH_ALL_MUSTCHAR);
+		return AccountCodeResult::AOP_MISMATCH_LENGTH_SYMBOLS;
 	}
 
 	const CSqlString<32> cClearLogin = CSqlString<32>(Login);
@@ -107,13 +108,13 @@ int CAccountCore::LoginAccount(int ClientID, const char *Login, const char *Pass
 		if(!LoginSuccess)
 		{
 			GS()->Chat(ClientID, "Wrong login or password!");
-			return SendAuthCode(ClientID, AUTH_LOGIN_WRONG);
+			return AccountCodeResult::AOP_LOGIN_WRONG;
 		}
 
 		if (GS()->GetPlayerFromUserID(UserID) != nullptr)
 		{
 			GS()->Chat(ClientID, "The account is already in the game!");
-			return SendAuthCode(ClientID, AUTH_LOGIN_ALREADY);
+			return AccountCodeResult::AOP_ALREADY_IN_GAME;
 		}
 
 		Server()->SetClientLanguage(ClientID, pResCheck->getString("Language").c_str());
@@ -137,15 +138,16 @@ int CAccountCore::LoginAccount(int ClientID, const char *Login, const char *Pass
 		GS()->Chat(ClientID, "- - - - - - - [Successful login] - - - - - - -");
 		GS()->Chat(ClientID, "Menu is available in call-votes!");
 		GS()->m_pController->DoTeamChange(pPlayer, false);
+		LoadAccount(pPlayer, true);
 
 		char aAddrStr[64];
 		Server()->GetClientAddr(ClientID, aAddrStr, sizeof(aAddrStr));
 		SJK.UD("tw_accounts", "LoginDate = CURRENT_TIMESTAMP, LoginIP = '%s' WHERE ID = '%d'", aAddrStr, UserID);
-		return SendAuthCode(ClientID, AUTH_LOGIN_GOOD);
+		return AccountCodeResult::AOP_LOGIN_OK;
 	}
 
 	GS()->Chat(ClientID, "Your nickname was not found in the database!");
-	return SendAuthCode(ClientID, AUTH_LOGIN_NICKNAME);
+	return AccountCodeResult::AOP_NICKNAME_NOT_EXIST;
 }
 
 void CAccountCore::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
@@ -346,18 +348,14 @@ void CAccountCore::OnMessage(int MsgID, void* pRawMsg, int ClientID)
 
 	if(MsgID == NETMSGTYPE_CL_CLIENTAUTH)
 	{
+		AccountCodeResult CodeOP;
 		CNetMsg_Cl_ClientAuth* pMsg = (CNetMsg_Cl_ClientAuth*)pRawMsg;
-
-		// account registration
 		if(pMsg->m_SelectRegister)
-		{
-			RegisterAccount(ClientID, pMsg->m_Login, pMsg->m_Password);
-			return;
-		}
-
-		// account authorization
-		if(LoginAccount(ClientID, pMsg->m_Login, pMsg->m_Password) == AUTH_LOGIN_GOOD)
-			LoadAccount(pPlayer, true);
+			CodeOP = RegisterAccount(ClientID, pMsg->m_Login, pMsg->m_Password);
+		else
+			CodeOP = LoginAccount(ClientID, pMsg->m_Login, pMsg->m_Password);
+		
+		SendAccountCodeResult(ClientID, CodeOP);
 	}
 }
 

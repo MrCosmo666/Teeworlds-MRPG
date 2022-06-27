@@ -879,7 +879,7 @@ private:
 public:
 	void OnAuthMessage(int MsgType, void* pRawMsg);
 	void SetAuthState(bool ShowWindowAuth);
-	void setAuthMessage(const char *Message, int EAuthColorMessage);
+	void setAccountCodeMessage(AccountCodeResult CodeOP);
 
 private:
 	// found in menus_settings.cpp

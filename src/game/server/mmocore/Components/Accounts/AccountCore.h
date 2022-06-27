@@ -3,6 +3,7 @@
 #ifndef GAME_SERVER_COMPONENT_ACCOUNT_MAIN_CORE_H
 #define GAME_SERVER_COMPONENT_ACCOUNT_MAIN_CORE_H
 #include <game/server/mmocore/MmoComponent.h>
+#include <generated/protocol.h>
 
 #include "AccountData.h"
 
@@ -20,9 +21,9 @@ class CAccountCore : public MmoComponent
 	void OnMessage(int MsgID, void* pRawMsg, int ClientID) override;
 
 public:
-	int SendAuthCode(int ClientID, int Code) const;
-	int RegisterAccount(int ClientID, const char *Login, const char *Password);
-	int LoginAccount(int ClientID, const char *Login, const char *Password);
+	void SendAccountCodeResult(int ClientID, AccountCodeResult Code) const;
+	AccountCodeResult RegisterAccount(int ClientID, const char *Login, const char *Password);
+	AccountCodeResult LoginAccount(int ClientID, const char *Login, const char *Password);
 	void LoadAccount(CPlayer *pPlayer, bool FirstInitilize = false);
 	void DiscordConnect(int ClientID, const char *pDID) const;
 
