@@ -387,7 +387,7 @@ void CHouseCore::ShowDecorationList(CPlayer *pPlayer)
 	{
 		if(deco->second && deco->second->m_HouseID == HouseID)
 		{
-			GS()->AVD(ClientID, "DECODELETE", deco->first, deco->second->m_DecoID, 1, "{STR}:{INT} back to the inventory",
+			GS()->AVD(ClientID, "DECODELETE", deco->first, deco->second->m_DecoID, 1, "{STR}:{VAL} back to the inventory",
 				GS()->GetItemInfo(deco->second->m_DecoID).GetName(), deco->first);
 		}
 	}
@@ -409,7 +409,7 @@ void CHouseCore::ShowHouseMenu(CPlayer* pPlayer, int HouseID)
 	pPlayer->m_VoteColored = LIGHT_GRAY_COLOR;
 	if(CHouseData::ms_aHouse[HouseID].m_UserID <= 0)
 	{
-		GS()->AVM(ClientID, "BUYHOUSE", HouseID, NOPE, "Buy this house. Price {INT}gold", CHouseData::ms_aHouse[HouseID].m_Price);
+		GS()->AVM(ClientID, "BUYHOUSE", HouseID, NOPE, "Buy this house. Price {VAL}gold", CHouseData::ms_aHouse[HouseID].m_Price);
 	}
 	else
 	{
@@ -434,11 +434,11 @@ void CHouseCore::ShowPersonalHouse(CPlayer* pPlayer)
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "/doorhouse - interactive with door.");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "- - - - - - - - - -");
 	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "Notes: Minimal operation house balance 100gold");
-	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "In your safe is: {INT}gold", CHouseData::ms_aHouse[HouseID].m_Bank);
+	GS()->AVM(ClientID, "null", NOPE, TAB_HOUSE_STAT, "In your safe is: {VAL}gold", CHouseData::ms_aHouse[HouseID].m_Bank);
 	GS()->AV(ClientID, "null");
 	//
 	pPlayer->m_VoteColored = LIGHT_GRAY_COLOR;
-	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", pPlayer->GetItem(itGold).m_Value);
+	GS()->AVL(ClientID, "null", "◍ Your Gold: {VAL}gold", pPlayer->GetItem(itGold).m_Value);
 	pPlayer->m_VoteColored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVM(ClientID, "HOUSEADD", 1, NOPE, "Add to the safe gold. (Amount in a reason)");
 	GS()->AVM(ClientID, "HOUSETAKE", 1, NOPE, "Take the safe gold. (Amount in a reason)");
@@ -647,14 +647,14 @@ void CHouseCore::TakeFromSafeDeposit(CPlayer* pPlayer, int TakeValue)
 	const int Bank = static_cast<int>(pRes->getInt("HouseBank"));
 	if(Bank < TakeValue)
 	{
-		GS()->Chat(ClientID, "Acceptable for take {INT}gold", Bank);
+		GS()->Chat(ClientID, "Acceptable for take {VAL}gold", Bank);
 		return;
 	}
 
 	pPlayer->AddMoney(TakeValue);
 	CHouseData::ms_aHouse[HouseID].m_Bank = Bank - TakeValue;
 	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", CHouseData::ms_aHouse[HouseID].m_Bank, HouseID);
-	GS()->Chat(ClientID, "You take {INT} gold in the safe {INT}!", TakeValue, CHouseData::ms_aHouse[HouseID].m_Bank);
+	GS()->Chat(ClientID, "You take {VAL} gold in the safe {VAL}!", TakeValue, CHouseData::ms_aHouse[HouseID].m_Bank);
 }
 
 void CHouseCore::AddSafeDeposit(CPlayer *pPlayer, int Balance)
@@ -668,7 +668,7 @@ void CHouseCore::AddSafeDeposit(CPlayer *pPlayer, int Balance)
 
 	const int HouseID = pRes->getInt("ID");
 	CHouseData::ms_aHouse[HouseID].m_Bank = pRes->getInt("HouseBank") + Balance;
-	GS()->Chat(ClientID, "You put {INT} gold in the safe {INT}!", Balance, CHouseData::ms_aHouse[HouseID].m_Bank);
+	GS()->Chat(ClientID, "You put {VAL} gold in the safe {VAL}!", Balance, CHouseData::ms_aHouse[HouseID].m_Bank);
 	SJK.UD("tw_houses", "HouseBank = '%d' WHERE ID = '%d'", CHouseData::ms_aHouse[HouseID].m_Bank, HouseID);
 }
 

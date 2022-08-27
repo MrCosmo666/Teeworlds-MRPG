@@ -490,7 +490,7 @@ bool GuildCore::OnHandleVoteCommands(CPlayer* pPlayer, const char* CMD, int Vote
 		{
 			AddMoneyBank(GuildID, Get);
 			SJK.UD("tw_accounts_data", "GuildDeposit = GuildDeposit + '%d' WHERE ID = '%d'", Get, pPlayer->Acc().m_UserID);
-			GS()->ChatGuild(GuildID, "{STR} deposit in treasury {INT}gold.", Server()->ClientName(ClientID), Get);
+			GS()->ChatGuild(GuildID, "{STR} deposit in treasury {VAL}gold.", Server()->ClientName(ClientID), Get);
 			AddHistoryGuild(GuildID, "'%s' added to bank %dgold.", Server()->ClientName(ClientID), Get);
 			GS()->StrongUpdateVotes(ClientID, MENU_GUILD);
 		}
@@ -740,7 +740,7 @@ void GuildCore::ShowDecorationList(CPlayer* pPlayer)
 	{
 		if (deco.second && deco.second->m_HouseID == HouseID)
 		{
-			GS()->AVD(ClientID, "DECOGUILDDELETE", deco.first, deco.second->m_DecoID, 1, "{STR}:{INT} back to the inventory",
+			GS()->AVD(ClientID, "DECOGUILDDELETE", deco.first, deco.second->m_DecoID, 1, "{STR}:{VAL} back to the inventory",
 				GS()->GetItemInfo(deco.second->m_DecoID).GetName(), deco.first);
 		}
 	}
@@ -906,17 +906,17 @@ void GuildCore::ShowMenuGuild(CPlayer *pPlayer) const
 	const int GuildHouse = GetGuildHouseID(GuildID);
 	const int ExpNeed = computeExperience(CGuildData::ms_aGuild[GuildID].m_Level);
 	GS()->AVH(ClientID, TAB_GUILD_STAT, BLUE_COLOR, "Guild name: {STR}", CGuildData::ms_aGuild[GuildID].m_aName);
-	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Level: {INT} Experience: {INT}/{INT}", CGuildData::ms_aGuild[GuildID].m_Level, CGuildData::ms_aGuild[GuildID].m_Exp, ExpNeed);
+	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Level: {INT} Experience: {VAL}/{VAL}", CGuildData::ms_aGuild[GuildID].m_Level, CGuildData::ms_aGuild[GuildID].m_Exp, ExpNeed);
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Maximal available player count: {INT}", CGuildData::ms_aGuild[GuildID].m_aUpgrade[CGuildData::AVAILABLE_SLOTS].m_Value);
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Leader: {STR}", Job()->PlayerName(CGuildData::ms_aGuild[GuildID].m_UserID));
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "- - - - - - - - - -");
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "/gexit - leave of guild group.");
 	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "- - - - - - - - - -");
-	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Guild Bank: {INT}gold", CGuildData::ms_aGuild[GuildID].m_Bank);
+	GS()->AVM(ClientID, "null", NOPE, TAB_GUILD_STAT, "Guild Bank: {VAL}gold", CGuildData::ms_aGuild[GuildID].m_Bank);
 	GS()->AV(ClientID, "null");
 	//
 	pPlayer->m_VoteColored = LIGHT_GRAY_COLOR;
-	GS()->AVL(ClientID, "null", "◍ Your gold: {INT}gold", pPlayer->GetItem(itGold).m_Value);
+	GS()->AVL(ClientID, "null", "◍ Your Gold: {VAL}gold", pPlayer->GetItem(itGold).m_Value);
 	pPlayer->m_VoteColored = SMALL_LIGHT_GRAY_COLOR;
 	GS()->AVL(ClientID, "MMONEY", "Add gold guild bank. (Amount in a reason)", CGuildData::ms_aGuild[GuildID].m_aName);
 	GS()->AV(ClientID, "null");
@@ -958,14 +958,14 @@ void GuildCore::ShowMenuGuild(CPlayer *pPlayer) const
 		{
 			const char* pUpgradeName = CGuildData::ms_aGuild[GuildID].m_aUpgrade[i].getDescription();
 			const int PriceUpgrade = (int)CGuildData::ms_aGuild[GuildID].m_aUpgrade[i].m_Value * g_Config.m_SvPriceUpgradeGuildAnother;
-			GS()->AVM(ClientID, "MUPGRADE", i, NOPE, "Upgrade {STR} ({INT}) {INT}gold", pUpgradeName, CGuildData::ms_aGuild[GuildID].m_aUpgrade[i].m_Value, PriceUpgrade);
+			GS()->AVM(ClientID, "MUPGRADE", i, NOPE, "Upgrade {STR} ({INT}) {VAL}gold", pUpgradeName, CGuildData::ms_aGuild[GuildID].m_aUpgrade[i].m_Value, PriceUpgrade);
 		}
 	}
 
 	const char* pUpgradeName = CGuildData::ms_aGuild[GuildID].m_aUpgrade[CGuildData::AVAILABLE_SLOTS].getDescription();
 	const int UpgradeValue = CGuildData::ms_aGuild[GuildID].m_aUpgrade[CGuildData::AVAILABLE_SLOTS].m_Value;
 	const int PriceUpgrade = UpgradeValue * g_Config.m_SvPriceUpgradeGuildSlot;
-	GS()->AVM(ClientID, "MUPGRADE", CGuildData::AVAILABLE_SLOTS, NOPE, "Upgrade {STR} ({INT}) {INT}gold", pUpgradeName, UpgradeValue, PriceUpgrade);
+	GS()->AVM(ClientID, "MUPGRADE", CGuildData::AVAILABLE_SLOTS, NOPE, "Upgrade {STR} ({INT}) {VAL}gold", pUpgradeName, UpgradeValue, PriceUpgrade);
 	GS()->AddVotesBackpage(ClientID);
 	return;
 }
@@ -992,12 +992,12 @@ void GuildCore::ShowGuildPlayers(CPlayer* pPlayer, int GuildID)
 		if(!SelfGuild)
 		{
 			pPlayer->m_VoteColored = LIGHT_GOLDEN_COLOR;
-			GS()->AVL(ClientID, "null",  "{STR} {STR} Deposit: {INT}", GetGuildRank(GuildID, PlayerRankID), PlayerNickname.cstr(), PlayerDeposit);
+			GS()->AVL(ClientID, "null",  "{STR} {STR} Deposit: {VAL}", GetGuildRank(GuildID, PlayerRankID), PlayerNickname.cstr(), PlayerDeposit);
 			continue;
 		}
 
 		// with access for interactives with players
-		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "{STR} {STR} Deposit: {INT}", GetGuildRank(GuildID, PlayerRankID), PlayerNickname.cstr(), PlayerDeposit);
+		GS()->AVH(ClientID, HideID, LIGHT_GOLDEN_COLOR, "{STR} {STR} Deposit: {VAL}", GetGuildRank(GuildID, PlayerRankID), PlayerNickname.cstr(), PlayerDeposit);
 		if(CheckMemberAccess(pPlayer, ACCESS_LEADER))
 		{
 			for(auto& pRank : CGuildRankData::ms_aRankGuild)
@@ -1320,7 +1320,7 @@ void GuildCore::ShowFinderGuilds(int ClientID)
 		cGuildName = pRes->getString("Name").c_str();
 		GS()->AVH(ClientID, HideID, LIGHT_BLUE_COLOR, "{STR} : Leader {STR} : Players [{INT}/{INT}]",
 			cGuildName.cstr(), Job()->PlayerName(CGuildData::ms_aGuild[GuildID].m_UserID), PlayersCount, AvailableSlot);
-		GS()->AVM(ClientID, "null", NOPE, HideID, "House: {STR} | Bank: {INT} gold", (GetGuildHouseID(GuildID) <= 0 ? "No" : "Yes"), CGuildData::ms_aGuild[GuildID].m_Bank);
+		GS()->AVM(ClientID, "null", NOPE, HideID, "House: {STR} | Bank: {VAL} gold", (GetGuildHouseID(GuildID) <= 0 ? "No" : "Yes"), CGuildData::ms_aGuild[GuildID].m_Bank);
 		GS()->AVM(ClientID, "MINVITEVIEWPLAYERS", GuildID, HideID, "View player list");
 		GS()->AVM(ClientID, "MINVITESEND", GuildID, HideID, "Send request to join {STR}", cGuildName.cstr());
 		HideID++;
@@ -1437,7 +1437,7 @@ void GuildCore::BuyGuildHouse(int GuildID, int HouseID)
 		const int Price = pRes->getInt("Price");
 		if(CGuildData::ms_aGuild[GuildID].m_Bank < Price)
 		{
-			GS()->ChatGuild(GuildID, "This Guild house requires {INT}gold!", Price);
+			GS()->ChatGuild(GuildID, "This Guild house requires {VAL}gold!", Price);
 			return;
 		}
 		CGuildData::ms_aGuild[GuildID].m_Bank -= Price;
@@ -1474,7 +1474,7 @@ void GuildCore::SellGuildHouse(int GuildID)
 		const int ReturnedGold = CGuildHouseData::ms_aHouseGuild[HouseID].m_Price;
 		GS()->SendInbox("System", CGuildData::ms_aGuild[GuildID].m_UserID, "Your guild house sold.", "We returned some gold from your guild.", itGold, ReturnedGold);
 
-		GS()->ChatGuild(GuildID, "House sold, {INT}gold returned to leader", ReturnedGold);
+		GS()->ChatGuild(GuildID, "House sold, {VAL}gold returned to leader", ReturnedGold);
 		AddHistoryGuild(GuildID, "Lost a house on '%s'.", Server()->GetWorldName(CGuildHouseData::ms_aHouseGuild[HouseID].m_WorldID));
 	}
 
@@ -1498,7 +1498,7 @@ void GuildCore::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 		GS()->AV(ClientID, "null");
 		const int GuildBank = CGuildData::ms_aGuild[pPlayer->Acc().m_GuildID].m_Bank;
 		pPlayer->m_VoteColored = LIGHT_PURPLE_COLOR;
-		GS()->AVMI(ClientID, GS()->GetItemInfo(itGold).GetIcon(), "null", NOPE, NOPE, "Your guild have {INT} Gold", GuildBank);
+		GS()->AVMI(ClientID, GS()->GetItemInfo(itGold).GetIcon(), "null", NOPE, NOPE, "Your guild have {VAL} Gold", GuildBank);
 	}
 
 	GS()->AV(ClientID, "null");
@@ -1507,7 +1507,7 @@ void GuildCore::ShowBuyHouse(CPlayer *pPlayer, int HouseID)
 	if(GuildHouseOwner > 0)
 		GS()->AVM(ClientID, "null", NOPE, NOPE, "Guild owner house: {STR}", CGuildData::ms_aGuild[GuildHouseOwner].m_aName);
 	else
-		GS()->AVM(ClientID, "BUYMEMBERHOUSE", HouseID, NOPE, "Buy this guild house! Price: {INT}", CGuildHouseData::ms_aHouseGuild[HouseID].m_Price);
+		GS()->AVM(ClientID, "BUYMEMBERHOUSE", HouseID, NOPE, "Buy this guild house! Price: {VAL}", CGuildHouseData::ms_aHouseGuild[HouseID].m_Price);
 
 	GS()->AV(ClientID, "null");
 }

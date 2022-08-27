@@ -220,7 +220,7 @@ find_package(SDL2)
 find_package(Wavpack)
 find_package(Curl)
 find_package(OpenSSL)
-find_package(ICU)
+#find_package(ICU)
 find_package(MySQL)
 find_package(DiscordGameSDK)
 find_package(GLEW)
@@ -291,7 +291,7 @@ endif()
 
 if(SERVER_COMPILE)
   show_dependency_status("MySQL" MYSQL TRUE)
-  show_dependency_status("ICU" ICU TRUE)
+#  show_dependency_status("ICU" ICU TRUE)
   show_dependency_status("OpenSSL" OPENSSL FALSE)
 endif()
 if(CLIENT_COMPILE)
@@ -441,7 +441,7 @@ set(COPY_FILES_CLIENT
 )
 
 set(COPY_FILES_SERVER
-  ${ICU_COPY_FILES}
+#  ${ICU_COPY_FILES}
   ${MYSQL_COPY_FILES}
   ${OPENSSL_COPY_FILES}
 )
@@ -805,12 +805,12 @@ if(SERVER_COMPILE)
 
   set(SERVER_INCLUDES_DIRS
     ${Boost_INCLUDE_DIRS}
-    ${ICU_INCLUDE_DIRS}
+#    ${ICU_INCLUDE_DIRS}
     ${MYSQL_INCLUDE_DIRS}
   )
   set(SERVER_LIBRARIES
     ${MYSQL_LIBRARIES}
-    ${ICU_LIBRARIES}
+#    ${ICU_LIBRARIES}
     ${DISCORD_SERVER_LIBS}
   )
   set(DEPS_SERVER ${DEPS})
@@ -1281,10 +1281,6 @@ foreach(target ${TARGETS_OWN})
 
   if(MYSQL_FOUND)
 	target_include_directories(${target} PRIVATE ${MYSQL_INCLUDE_DIRS})
-  endif()
-
-  if(ICU_FOUND)
-	target_include_directories(${target} PRIVATE ${ICU_INCLUDE_DIRS})
   endif()
   
   set_target_properties(${target} PROPERTIES CXX_STANDARD_REQUIRED ON)

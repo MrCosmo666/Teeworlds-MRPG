@@ -71,7 +71,7 @@ void CAccountPlantCore::ShowMenu(CPlayer* pPlayer) const
 	const int JobUpgrQuantity = pPlayer->Acc().m_aFarming[JOB_UPGR_QUANTITY].m_Value;
 	const int ExperienceNeed = computeExperience(JobLevel);
 
-	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Plants Point: {INT} :: Level: {INT} Exp: {INT}/{INT}", JobUpgrades, JobLevel, JobExperience, ExperienceNeed);
+	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Plants Point: {INT} :: Level: {INT} Exp: {VAL}/{VAL}", JobUpgrades, JobLevel, JobExperience, ExperienceNeed);
 	GS()->AVD(ClientID, "PLANTUPGRADE", JOB_UPGR_QUANTITY, 20, TAB_UPGR_JOB, "Quantity +{INT} (Price 20P)", JobUpgrQuantity);
 }
 

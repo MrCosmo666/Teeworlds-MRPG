@@ -164,7 +164,7 @@ void CAccountCore::LoadAccount(CPlayer *pPlayer, bool FirstInitilize)
 	{
 		const int MsgMailboxSize = Job()->Inbox()->GetMailLettersSize(pPlayer->Acc().m_UserID);
 		if (MsgMailboxSize > 0)
-			GS()->Chat(ClientID, "You have {INT} unread messages!", MsgMailboxSize);
+			GS()->Chat(ClientID, "You have {VAL} unread messages!", MsgMailboxSize);
 
 		GS()->ResetVotes(ClientID, MenuList::MAIN_MENU);
 		GS()->SendFullyEquipments(ClientID);

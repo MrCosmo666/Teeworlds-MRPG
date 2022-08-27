@@ -199,7 +199,7 @@ void CPlayer::Snap(int SnappingClient)
 	StrToInts(pClientInfo->m_Potions, 12, Buffer.buffer());
 	Buffer.clear();
 
-	Server()->Localization()->Format(Buffer, GetLanguage(), "{INT}", GetItem(itGold).m_Value);
+	Server()->Localization()->Format(Buffer, GetLanguage(), "{VAL}", GetItem(itGold).m_Value);
 	StrToInts(pClientInfo->m_Gold, 6, Buffer.buffer());
 	Buffer.clear();
 
@@ -365,7 +365,7 @@ bool CPlayer::SpendCurrency(int Price, int ItemID)
 	CItemData& pItemPlayer = GetItem(ItemID);
 	if(pItemPlayer.m_Value < Price)
 	{
-		GS()->Chat(m_ClientID,"Required {INT}, but you have only {INT} {STR}!", Price, pItemPlayer.m_Value, pItemPlayer.Info().GetName());
+		GS()->Chat(m_ClientID,"Required {VAL}, but you have only {VAL} {STR}!", Price, pItemPlayer.m_Value, pItemPlayer.Info().GetName());
 		return false;
 	}
 	return pItemPlayer.Remove(Price);

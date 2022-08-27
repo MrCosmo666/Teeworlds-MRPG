@@ -275,7 +275,7 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID) const
 			const int Level = pRes->getInt("Level");
 			const int Experience = pRes->getInt("Experience");
 			str_copy(NameGuild, pRes->getString("Name").c_str(), sizeof(NameGuild));
-			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Level {INT} : Exp {INT}", Rank, NameGuild, Level, Experience);
+			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Level {INT} : Exp {VAL}", Rank, NameGuild, Level, Experience);
 		}
 	}
 	else if (TypeID == GUILDS_WEALTHY)
@@ -287,7 +287,7 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID) const
 			const int Rank = pRes->getRow();
 			const int Gold = pRes->getInt("Bank");
 			str_copy(NameGuild, pRes->getString("Name").c_str(), sizeof(NameGuild));
-			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Gold {INT}", Rank, NameGuild, Gold);
+			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Gold {VAL}", Rank, NameGuild, Gold);
 		}
 	}
 	else if (TypeID == PLAYERS_LEVELING)
@@ -300,7 +300,7 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID) const
 			const int Level = pRes->getInt("Level");
 			const int Experience = pRes->getInt("Exp");
 			str_copy(Nick, pRes->getString("Nick").c_str(), sizeof(Nick));
-			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Level {INT} : Exp {INT}", Rank, Nick, Level, Experience);
+			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Level {INT} : Exp {VAL}", Rank, Nick, Level, Experience);
 		}
 	}
 	else if (TypeID == PLAYERS_WEALTHY)
@@ -313,7 +313,7 @@ void MmoController::ShowTopList(CPlayer* pPlayer, int TypeID) const
 			const int Gold = pRes->getInt("Value");
 			const int UserID = pRes->getInt("UserID");
 			str_copy(Nick, PlayerName(UserID), sizeof(Nick));
-			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Gold {INT}", Rank, Nick, Gold);
+			GS()->AVL(ClientID, "null", "{INT}. {STR} :: Gold {VAL}", Rank, Nick, Gold);
 		}
 	}
 }

@@ -1935,9 +1935,9 @@ void CGS::ResetVotes(int ClientID, int MenuList)
 		const int ExpForLevel = pPlayer->ExpNeed(pPlayer->Acc().m_Level);
 		AVH(ClientID, TAB_STAT, GREEN_COLOR, "Hi, {STR} Last log in {STR}", Server()->ClientName(ClientID), pPlayer->Acc().m_aLastLogin);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Discord: \"{STR}\"", g_Config.m_SvDiscordInviteLink);
-		AVM(ClientID, "null", NOPE, TAB_STAT, "Level {INT} : Exp {INT}/{INT}", pPlayer->Acc().m_Level, pPlayer->Acc().m_Exp, ExpForLevel);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Level {INT} : Exp {VAL}/{VAL}", pPlayer->Acc().m_Level, pPlayer->Acc().m_Exp, ExpForLevel);
 		AVM(ClientID, "null", NOPE, TAB_STAT, "Skill Point {INT}SP", pPlayer->GetItem(itSkillPoint).m_Value);
-		AVM(ClientID, "null", NOPE, TAB_STAT, "Gold: {INT}", pPlayer->GetItem(itGold).m_Value);
+		AVM(ClientID, "null", NOPE, TAB_STAT, "Gold: {VAL}", pPlayer->GetItem(itGold).m_Value);
 		AV(ClientID, "null");
 
 		// personal menu
@@ -2181,11 +2181,11 @@ void CGS::ShowVotesPlayerStats(CPlayer *pPlayer)
 		if(pAtt.second.m_Devide <= 1)
 		{
 			const int AttributeRealSize = pPlayer->GetAttributeCount(pAtt.first, true);
-			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{INT} (+{INT}) - {STR}", AttributeSize, AttributeRealSize, pAtt.second.m_aName);
+			AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "{VAL} (+{VAL}) - {STR}", AttributeSize, AttributeRealSize, pAtt.second.m_aName);
 			continue;
 		}
 
-		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "+{INT} - {STR}", AttributeSize, pAtt.second.m_aName);
+		AVM(ClientID, "null", NOPE, TAB_INFO_STAT, "+{VAL} - {STR}", AttributeSize, pAtt.second.m_aName);
 	}
 
 	AVM(ClientID, "null", NOPE, NOPE, "Player Upgrade Point: {INT}P", pPlayer->Acc().m_Upgrade);
@@ -2197,7 +2197,7 @@ void CGS::ShowVotesItemValueInformation(CPlayer *pPlayer, int ItemID)
 {
 	const int ClientID = pPlayer->GetCID();
 	pPlayer->m_VoteColored = LIGHT_PURPLE_COLOR;
-	AVMI(ClientID, GetItemInfo(ItemID).GetIcon(), "null", NOPE, NOPE, "You have {INT} {STR}", pPlayer->GetItem(ItemID).m_Value, GetItemInfo(ItemID).GetName());
+	AVMI(ClientID, GetItemInfo(ItemID).GetIcon(), "null", NOPE, NOPE, "You have {VAL} {STR}", pPlayer->GetItem(ItemID).m_Value, GetItemInfo(ItemID).GetName());
 }
 
 // vote parsing of all functions of action methods

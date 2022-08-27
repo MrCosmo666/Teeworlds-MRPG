@@ -67,7 +67,7 @@ void CCharacterBotAI::ShowProgressHealth()
 			const int StartHealth = m_pBotPlayer->GetStartHealth();
 			const float Percent = (Health * 100.0) / StartHealth;
 			std::unique_ptr<char[]> Progress = std::move(GS()->LevelString(100, Percent, 10, ':', ' '));
-			GS()->Broadcast(pPlayerDamage.first, BroadcastPriority::GAME_PRIORITY, 100, "{STR} {STR}({INT}/{INT})",
+			GS()->Broadcast(pPlayerDamage.first, BroadcastPriority::GAME_PRIORITY, 100, "{STR} {STR}({VAL}/{VAL})",
 				DataBotInfo::ms_aDataBot[BotID].m_aNameBot, Progress.get(), Health, StartHealth);
 		}
 	}

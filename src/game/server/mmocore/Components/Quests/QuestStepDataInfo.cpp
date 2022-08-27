@@ -151,7 +151,7 @@ void CPlayerQuestStepDataInfo::DoCollectItem(CPlayer* pPlayer)
 		const int Value = m_Bot->m_aItemSearchValue[i];
 		if(ItemID > 0 && Value > 0)
 		{
-			pGS->Chat(pPlayer->GetCID(), "[Done] Give the {STR}x{INT} to the {STR}!", pPlayer->GetItem(ItemID).Info().GetName(), Value, m_Bot->GetName());
+			pGS->Chat(pPlayer->GetCID(), "[Done] Give the {STR}x{VAL} to the {STR}!", pPlayer->GetItem(ItemID).Info().GetName(), Value, m_Bot->GetName());
 			antiStressing = (bool)(ItemID == m_Bot->m_aItemGives[0] || ItemID == m_Bot->m_aItemGives[1]);
 			pPlayer->GetItem(ItemID).Remove(Value);
 		}

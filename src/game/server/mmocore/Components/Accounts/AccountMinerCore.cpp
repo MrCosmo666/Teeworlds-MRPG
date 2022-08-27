@@ -16,7 +16,7 @@ void CAccountMinerCore::ShowMenu(CPlayer *pPlayer) const
 	const int JobUpgrQuantity = pPlayer->Acc().m_aMining[JOB_UPGR_QUANTITY].m_Value;
 	const int ExperienceNeed = computeExperience(JobLevel);
 
-	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Miner Point: {INT} :: Level: {INT} Exp: {INT}/{INT}", JobUpgrades, JobLevel, JobExperience, ExperienceNeed);
+	GS()->AVM(ClientID, "null", NOPE, TAB_UPGR_JOB, "Miner Point: {INT} :: Level: {INT} Exp: {VAL}/{VAL}", JobUpgrades, JobLevel, JobExperience, ExperienceNeed);
 	GS()->AVD(ClientID, "MINERUPGRADE", JOB_UPGR_QUANTITY, 20, TAB_UPGR_JOB, "Quantity +{INT} (Price 20P)", JobUpgrQuantity);
 }
 
