@@ -79,7 +79,7 @@ public:
 	void OnMessage(int MsgID, void *pRawMsg, int ClientID);
 	bool OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, int VoteID, int VoteID2, int Get, const char *GetText);
 	void OnResetClientData(int ClientID);
-	void PrepareInformation(class IStorageEngine* pStorage);
+	void OnPrepareInformation(class IStorageEngine* pStorage);
 
 	void ConSyncLinesForTranslate();
 	//

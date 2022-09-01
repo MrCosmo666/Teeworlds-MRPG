@@ -56,8 +56,7 @@ void CCommandProcessor::ConChatLogin(IConsole::IResult* pResult, void* pUser)
 		return;
 	}
 
-	char aUsername[16];
-	char aPassword[16];
+	char aUsername[16], aPassword[16];
 	str_copy(aUsername, pResult->GetString(0), sizeof(aUsername));
 	str_copy(aPassword, pResult->GetString(1), sizeof(aPassword));
 
@@ -81,8 +80,7 @@ void CCommandProcessor::ConChatRegister(IConsole::IResult* pResult, void* pUser)
 		return;
 	}
 
-	char aUsername[16];
-	char aPassword[16];
+	char aUsername[16], aPassword[16];
 	str_copy(aUsername, pResult->GetString(0), sizeof(aUsername));
 	str_copy(aPassword, pResult->GetString(1), sizeof(aPassword));
 

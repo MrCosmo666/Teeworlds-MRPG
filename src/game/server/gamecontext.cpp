@@ -972,7 +972,7 @@ void CGS::OnInit(int WorldID)
 	m_Collision.Init(m_pLayers);
 	m_pMmoController = new MmoController(this);
 	m_pMmoController->LoadLogicWorld();
-	m_pMmoController->PrepareInformation(m_pStorage);
+	m_pMmoController->OnPrepareInformation(m_pStorage);
 	UpdateZoneDungeon();
 	UpdateZonePVP();
 

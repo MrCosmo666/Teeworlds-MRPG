@@ -72,67 +72,71 @@ void MmoController::OnTick()
 
 void MmoController::OnInitAccount(int ClientID)
 {
-	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
-	if(!pPlayer || !pPlayer->IsAuthed())
-		return;
-
-	for(auto& pComponent : m_Components.m_paComponents)
-		pComponent->OnInitAccount(pPlayer);
+	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true);
+	if(pPlayer)
+	{
+		for(auto& pComponent : m_Components.m_paComponents)
+			pComponent->OnInitAccount(pPlayer);
+	}
 }
 
 bool MmoController::OnPlayerHandleMainMenu(int ClientID, int Menulist, bool ReplaceMenu)
 {
-	CPlayer *pPlayer = GS()->GetPlayer(ClientID);
-	if(!pPlayer || !pPlayer->IsAuthed())
-		return true;
-
-	for(auto& pComponent : m_Components.m_paComponents)
+	CPlayer *pPlayer = GS()->GetPlayer(ClientID, true);
+	if(pPlayer)
 	{
-		if(pComponent->OnHandleMenulist(pPlayer, Menulist, ReplaceMenu))
-			return true;
+		for(auto& pComponent : m_Components.m_paComponents)
+		{
+			if(pComponent->OnHandleMenulist(pPlayer, Menulist, ReplaceMenu))
+				return true;
+		}
 	}
 	return false;
 }
 
 bool MmoController::OnPlayerHandleTile(CCharacter *pChr, int IndexCollision)
 {
-	if(!pChr || !pChr->IsAlive())
-		return true;
-
-	for(auto & pComponent : m_Components.m_paComponents)
+	if(pChr && pChr->IsAlive())
 	{
-		if(pComponent->OnHandleTile(pChr, IndexCollision))
-			return true;
+		for(auto & pComponent : m_Components.m_paComponents)
+		{
+			if(pComponent->OnHandleTile(pChr, IndexCollision))
+				return true;
+		}
 	}
 	return false;
 }
 
 bool MmoController::OnParsingVoteCommands(CPlayer *pPlayer, const char *CMD, const int VoteID, const int VoteID2, int Get, const char *GetText)
 {
-	if(!pPlayer)
-		return true;
-
-	for(auto& pComponent : m_Components.m_paComponents)
+	if(pPlayer)
 	{
-		if(pComponent->OnHandleVoteCommands(pPlayer, CMD, VoteID, VoteID2, Get, GetText))
-			return true;
+		for(auto& pComponent : m_Components.m_paComponents)
+		{
+			if(pComponent->OnHandleVoteCommands(pPlayer, CMD, VoteID, VoteID2, Get, GetText))
+				return true;
+		}
 	}
 	return false;
 }
 
-void MmoController::PrepareInformation(IStorageEngine *pStorage)
+void MmoController::OnPrepareInformation(IStorageEngine *pStorage)
 {
 	// write mmo data to file
 	CDataFileWriter DataInfoWriter;
 	if(!DataInfoWriter.Open(pStorage, MMO_DATA_FILE))
 		return;
+
 	for(auto& pComponent : m_Components.m_paComponents)
 		pComponent->OnPrepareInformation(pStorage, &DataInfoWriter);
+
 	DataInfoWriter.Finish();
 
+	// read mmo data file
 	CDataFileReader DataInfoReader;
 	if(!DataInfoReader.Open(pStorage, MMO_DATA_FILE, IStorageEngine::TYPE_ALL))
 		return;
+
 	char aSha256[SHA256_MAXSTRSIZE];
 	sha256_str(DataInfoReader.Sha256(), aSha256, sizeof(aSha256));
 	dbg_msg("mrpg_compressed", "mmo data file sha256 is %s", aSha256);
@@ -142,11 +146,11 @@ void MmoController::PrepareInformation(IStorageEngine *pStorage)
 
 void MmoController::OnMessage(int MsgID, void *pRawMsg, int ClientID)
 {
-	if(!pRawMsg)
-		return;
-
-	for(auto& pComponent : m_Components.m_paComponents)
-		pComponent->OnMessage(MsgID, pRawMsg, ClientID);
+	if(pRawMsg)
+	{
+		for(auto& pComponent : m_Components.m_paComponents)
+			pComponent->OnMessage(MsgID, pRawMsg, ClientID);
+	}
 }
 
 void MmoController::OnResetClientData(int ClientID)
