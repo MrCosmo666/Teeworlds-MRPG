@@ -149,7 +149,7 @@ void MmoController::OnMessage(int MsgID, void *pRawMsg, int ClientID)
 		pComponent->OnMessage(MsgID, pRawMsg, ClientID);
 }
 
-void MmoController::ResetClientData(int ClientID)
+void MmoController::OnResetClientData(int ClientID)
 {
 	for (auto& pComponent : m_Components.m_paComponents)
 		pComponent->OnResetClient(ClientID);

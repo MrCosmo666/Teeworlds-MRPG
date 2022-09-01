@@ -158,7 +158,7 @@ public:
 	virtual void OnPostSnap() = 0;
 
 	virtual void OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID) = 0;
-	virtual void ClearClientData(int ClientID) = 0;
+	virtual void OnResetClientData(int ClientID) = 0;
 
 	virtual void PrepareClientChangeWorld(int ClientID) = 0;
 	virtual void UpdateClientInformation(int FakeClientID) = 0;

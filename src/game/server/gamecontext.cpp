@@ -41,6 +41,16 @@ int CGS::m_MultiplierExp = 100;
 
 CGS::CGS()
 {
+	m_pServer = nullptr;
+	m_pController = nullptr;
+	m_pMmoController = nullptr;
+	m_pCommandProcessor = nullptr;
+	m_pPathFinder = nullptr;
+	m_pLayers = nullptr;
+
+	for(auto& apPlayer : m_apPlayers)
+		apPlayer = nullptr;
+
 	for(auto& pBroadcastState : m_aBroadcastStates)
 	{
 		pBroadcastState.m_NoChangeTick = 0;
@@ -49,16 +59,6 @@ CGS::CGS()
 		pBroadcastState.m_aNextMessage[0] = 0;
 		pBroadcastState.m_Priority = BroadcastPriority::LOWER;
 	}
-
-	for(auto& apPlayer : m_apPlayers)
-		apPlayer = nullptr;
-
-	m_pServer = nullptr;
-	m_pController = nullptr;
-	m_pMmoController = nullptr;
-	m_pCommandProcessor = nullptr;
-	m_pPathFinder = nullptr;
-	m_pLayers = nullptr;
 }
 
 CGS::~CGS()
@@ -1357,12 +1357,7 @@ void CGS::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 void CGS::OnClientConnected(int ClientID)
 {
-	if(!m_apPlayers[ClientID])
-	{
-		const int AllocMemoryCell = ClientID+m_WorldID*MAX_CLIENTS;
-		m_apPlayers[ClientID] = new(AllocMemoryCell) CPlayer(this, ClientID);
-	}
-
+	// send information messages
 	SendMotd(ClientID);
 	SendSettings(ClientID);
 	m_aBroadcastStates[ClientID] = {};
@@ -1371,56 +1366,53 @@ void CGS::OnClientConnected(int ClientID)
 void CGS::OnClientEnter(int ClientID)
 {
 	CPlayer* pPlayer = m_apPlayers[ClientID];
-	if(!pPlayer || pPlayer->IsBot())
-		return;
 
+	// send clients information messages
 	m_pController->OnPlayerConnect(pPlayer);
 	m_pCommandProcessor->SendChatCommands(ClientID);
 	pPlayer->SendClientInfo(-1);
+
 	for(int i = 0; i < MAX_CLIENTS; ++i)
 	{
-		if(i == ClientID || !m_apPlayers[i] || !Server()->ClientIngame(i))
-			continue;
-
-		m_apPlayers[i]->SendClientInfo(ClientID);
+		if(m_apPlayers[i] && Server()->ClientIngame(i))
+			m_apPlayers[i]->SendClientInfo(ClientID);
 	}
-	pPlayer->SendClientInfo(ClientID);
 
-	// another
-	if(!pPlayer->IsAuthed())
+	// first entry
+	const bool FirstEntry = !pPlayer->IsAuthed();
+	if(FirstEntry)
 	{
 		SendTeam(ClientID, TEAM_SPECTATORS, false, -1);
 		Chat(ClientID, "- - - - - - - [Welcome to MRPG] - - - - - - -");
 		Chat(ClientID, "You need to create an account, or log in if you already have.");
 		Chat(ClientID, "Register: \"/register <login> <pass>\"");
 		Chat(ClientID, "Log in: \"/login <login> <pass>\"");
-		SendDayInfo(ClientID);
-
 		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "connected and enter in MRPG");
-		ShowVotesNewbieInformation(ClientID);
-		return;
-	}
 
-	Mmo()->Account()->LoadAccount(pPlayer, false);
-	ResetVotes(ClientID, MenuList::MAIN_MENU);
+		ShowVotesNewbieInformation(ClientID);
+		SendDayInfo(ClientID);
+	}
+	else
+	{
+		Mmo()->Account()->LoadAccount(pPlayer, false);
+		ResetVotes(ClientID, MenuList::MAIN_MENU);
+	}
 }
 
 void CGS::OnClientDrop(int ClientID, const char *pReason)
 {
-	if(!m_apPlayers[ClientID] || m_apPlayers[ClientID]->IsBot())
-		return;
-
 	// update clients on drop
 	m_pController->OnPlayerDisconnect(m_apPlayers[ClientID]);
+
 	if (Server()->ClientIngame(ClientID) && IsPlayerEqualWorldID(ClientID))
 	{
-		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "leave game MRPG");
-
 		CNetMsg_Sv_ClientDrop Msg;
 		Msg.m_ClientID = ClientID;
 		Msg.m_pReason = pReason;
 		Msg.m_Silent = false;
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, -1);
+
+		ChatDiscord(DC_JOIN_LEAVE, Server()->ClientName(ClientID), "leave game MRPG");
 	}
 
 	delete m_apPlayers[ClientID];
@@ -1483,15 +1475,15 @@ bool CGS::IsClientPlayer(int ClientID) const
 }
 bool CGS::IsMmoClient(int ClientID) const
 {
-	return (bool)((Server()->GetClientProtocolVersion(ClientID) == PROTOCOL_VERSION_MMO) || (ClientID >= MAX_PLAYERS && ClientID < MAX_CLIENTS));
+	return Server()->GetClientProtocolVersion(ClientID) == PROTOCOL_VERSION_MMO || ClientID >= MAX_PLAYERS && ClientID < MAX_CLIENTS;
 }
 const char *CGS::Version() const { return GAME_VERSION; }
 const char *CGS::NetVersion() const { return GAME_NETVERSION; }
 
 // clearing all data at the exit of the client necessarily call once enough
-void CGS::ClearClientData(int ClientID)
+void CGS::OnResetClientData(int ClientID)
 {
-	Mmo()->ResetClientData(ClientID);
+	Mmo()->OnResetClientData(ClientID);
 	m_aPlayerVotes[ClientID].clear();
 	ms_aEffects[ClientID].clear();
 

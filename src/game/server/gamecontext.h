@@ -175,6 +175,7 @@ public:
 
 	void OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID) override;
 	void OnClientConnected(int ClientID) override;
+	bool PreLoginEntry(CPlayer* pPlayer);
 	void PrepareClientChangeWorld(int ClientID) override;
 
 	void OnClientEnter(int ClientID) override;
@@ -187,7 +188,7 @@ public:
 	const char *Version() const override;
 	const char *NetVersion() const override;
 
-	void ClearClientData(int ClientID) override;
+	void OnResetClientData(int ClientID) override;
 	int GetRank(int AccountID) override;
 
 	/* #########################################################################

@@ -641,7 +641,7 @@ int CServer::NewClientCallback(int ClientID, void *pUser)
 {
 	// THREAD_PLAYER_DATA_SAFE(ClientID)
 	CServer *pThis = (CServer *)pUser;
-	pThis->GameServer(MAIN_WORLD_ID)->ClearClientData(ClientID);
+	pThis->GameServer(MAIN_WORLD_ID)->OnResetClientData(ClientID);
 	str_copy(pThis->m_aClients[ClientID].m_aLanguage, "en", sizeof(pThis->m_aClients[ClientID].m_aLanguage));
 	pThis->m_aClients[ClientID].m_State = CClient::STATE_AUTH;
 	pThis->m_aClients[ClientID].m_aName[0] = 0;
@@ -680,7 +680,7 @@ int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 			IGameServer* pGameServer = pThis->MultiWorlds()->GetWorld(i)->m_pGameServer;
 			pGameServer->OnClientDrop(ClientID, pReason);
 		}
-		pThis->GameServer(MAIN_WORLD_ID)->ClearClientData(ClientID);
+		pThis->GameServer(MAIN_WORLD_ID)->OnResetClientData(ClientID);
 	}
 
 	pThis->m_aClients[ClientID].m_State = CClient::STATE_EMPTY;
@@ -829,7 +829,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 
 				m_aClients[ClientID].m_Version = Unpacker.GetInt();
 				m_aClients[ClientID].m_State = CClient::STATE_CONNECTING;
-				GameServer(MAIN_WORLD_ID)->ClearClientData(ClientID);
+				GameServer(MAIN_WORLD_ID)->OnResetClientData(ClientID);
 				SendDataMmoInfo(ClientID);
 				SendMap(ClientID);
 			}
