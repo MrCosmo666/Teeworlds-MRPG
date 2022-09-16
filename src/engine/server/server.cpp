@@ -138,21 +138,27 @@ bool CServer::CheckWorldTime(int Hour, int Minute)
 }
 
 // format Day
-const char* CServer::GetStringTypeDay() const
+const char* CServer::GetStringDayType() const
 {
-	if(m_TimeWorldHour >= 0 && m_TimeWorldHour < 6) return "Night";
-	if(m_TimeWorldHour >= 6 && m_TimeWorldHour < 13) return "Morning";
-	if(m_TimeWorldHour >= 13 && m_TimeWorldHour < 19) return "Day";
+	if(m_TimeWorldHour >= 0 && m_TimeWorldHour < 6) 
+		return "Night";
+	if(m_TimeWorldHour >= 6 && m_TimeWorldHour < 13) 
+		return "Morning";
+	if(m_TimeWorldHour >= 13 && m_TimeWorldHour < 19) 
+		return "Day";
 	return "Evening";
 }
 
 // format Day to Int
-int CServer::GetEnumTypeDay() const
+DayType CServer::GetDayType() const
 {
-	if(m_TimeWorldHour >= 0 && m_TimeWorldHour < 6) return NIGHT_TYPE;
-	if(m_TimeWorldHour >= 6 && m_TimeWorldHour < 13) return MORNING_TYPE;
-	if(m_TimeWorldHour >= 13 && m_TimeWorldHour < 19) return DAY_TYPE;
-	return EVENING_TYPE;
+	if(m_TimeWorldHour >= 0 && m_TimeWorldHour < 6) 
+		return DayType::NIGHT_TYPE;
+	if(m_TimeWorldHour >= 6 && m_TimeWorldHour < 13) 
+		return DayType::MORNING_TYPE;
+	if(m_TimeWorldHour >= 13 && m_TimeWorldHour < 19) 
+		return DayType::DAY_TYPE;
+	return DayType::EVENING_TYPE;
 }
 
 void CServer::SetClientName(int ClientID, const char *pName)

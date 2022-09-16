@@ -93,8 +93,8 @@ public:
 	virtual int GetOffsetWorldTime() const = 0;
 	virtual void SetOffsetWorldTime(int Hour) = 0;
 	virtual bool CheckWorldTime(int Hour, int Minute) = 0;
-	virtual const char* GetStringTypeDay() const = 0;
-	virtual int GetEnumTypeDay() const = 0;
+	virtual const char* GetStringDayType() const = 0;
+	virtual DayType GetDayType() const = 0;
 
 	// main client functions
 	virtual void SetClientName(int ClientID, char const *pName) = 0;

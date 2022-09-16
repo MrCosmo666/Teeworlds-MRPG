@@ -315,7 +315,7 @@ enum SaveType
 	SAVE_LANGUAGE,			// Save Language Client
 };
 
-enum DayType
+enum class DayType : short
 {
 	NIGHT_TYPE = 1,
 	DAY_TYPE,

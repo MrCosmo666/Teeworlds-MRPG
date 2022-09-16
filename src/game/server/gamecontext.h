@@ -257,7 +257,10 @@ public:
 	int GetWorldID() const { return m_WorldID; }
 	int GetDungeonID() const { return m_DungeonID; }
 	bool IsDungeon() const { return (m_DungeonID > 0); }
-	int GetExperienceMultiplier(int Experience) const;
+
+	void SetMultiplier(int Percent);
+	int GetMultiplierExperience(int Experience) const;
+
 	bool IsPlayerEqualWorldID(int ClientID, int WorldID = -1) const;
 	bool IsAllowedPVP() const { return m_AllowedPVP; }
 
@@ -271,7 +274,7 @@ private:
 	void UpdateZoneDungeon();
 
 	bool m_AllowedPVP;
-	int m_DayEnumType;
+	DayType m_DayType;
 	static int m_MultiplierExp;
 };
 

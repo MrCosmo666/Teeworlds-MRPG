@@ -129,8 +129,8 @@ public:
 	virtual int GetOffsetWorldTime() const;
 	virtual void SetOffsetWorldTime(int Hour);
 	virtual bool CheckWorldTime(int Hour, int Minute);
-	virtual const char* GetStringTypeDay() const;
-	virtual int GetEnumTypeDay() const;
+	virtual const char* GetStringDayType() const;
+	virtual DayType GetDayType() const;
 
 	// mmo data
 	void SendDataMmoInfo(int ClientID);

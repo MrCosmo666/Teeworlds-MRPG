@@ -154,7 +154,7 @@ void CCharacterBotAI::RewardPlayer(CPlayer* pPlayer, vec2 Force) const
 
 	// experience
 	const int ExperienceMob = computeExperience(MobBotInfo::ms_aMobBot[SubID].m_Level) / g_Config.m_SvKillmobsIncreaseLevel;
-	const int ExperienceWithMultiplier = max(1, GS()->GetExperienceMultiplier(ExperienceMob));
+	const int ExperienceWithMultiplier = max(1, GS()->GetMultiplierExperience(ExperienceMob));
 	GS()->CreateParticleExperience(m_Core.m_Pos, ClientID, ExperienceWithMultiplier, Force);
 
 	// drop experience

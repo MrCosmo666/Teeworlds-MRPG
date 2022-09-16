@@ -806,7 +806,7 @@ void CPlayer::FormatDialogText(int DataBotID, const char *pText) // TODO: perfor
 	// based replacing dialogs
 	str_replace(m_aFormatDialogText, "[Player]", GS()->Server()->ClientName(m_ClientID));
 	str_replace(m_aFormatDialogText, "[Talked]", DataBotInfo::ms_aDataBot[DataBotID].m_aNameBot);
-	str_replace(m_aFormatDialogText, "[Time]", GS()->Server()->GetStringTypeDay());
+	str_replace(m_aFormatDialogText, "[Time]", GS()->Server()->GetStringDayType());
 	str_replace(m_aFormatDialogText, "[Here]", GS()->Server()->GetWorldName(GS()->GetWorldID()));
 }
 

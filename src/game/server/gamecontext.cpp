@@ -985,8 +985,8 @@ void CGS::OnInit(int WorldID)
 	m_pCommandProcessor = new CCommandProcessor(this);
 
 	// initialize cores
-	CMapItemLayerTilemap *pTileMap = m_pLayers->GameLayer();
-	CTile *pTiles = (CTile *)Kernel()->RequestInterface<IMap>(WorldID)->GetData(pTileMap->m_Data);
+	const CMapItemLayerTilemap *pTileMap = m_pLayers->GameLayer();
+	const CTile *pTiles = (CTile *)Kernel()->RequestInterface<IMap>(WorldID)->GetData(pTileMap->m_Data);
 	for(int y = 0; y < pTileMap->m_Height; y++)
 	{
 		for(int x = 0; x < pTileMap->m_Width; x++)
@@ -1002,7 +1002,6 @@ void CGS::OnInit(int WorldID)
 
 	// initialize pathfinder
 	m_pPathFinder = new CPathfinder(m_pLayers, &m_Collision);
-	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
 }
 
 void CGS::OnConsoleInit()
@@ -1018,6 +1017,8 @@ void CGS::OnConsoleInit()
 	Console()->Register("say", "r[text]", CFGFLAG_SERVER, ConSay, m_pServer, "Say in chat");
 	Console()->Register("addcharacter", "i[cid]r[botname]", CFGFLAG_SERVER, ConAddCharacter, m_pServer, "(Warning) Add new bot on database or update if finding <clientid> <bot name>");
 	Console()->Register("sync_lines_for_translate", "", CFGFLAG_SERVER, ConSyncLinesForTranslate, m_pServer, "Perform sync lines in translated files. Order non updated translated to up");
+
+	Console()->Chain("sv_motd", ConchainSpecialMotdupdate, this);
 }
 
 void CGS::OnTick()
@@ -1045,12 +1046,12 @@ void CGS::OnTick()
 // Here we use functions that can have static data or functions that don't need to be called in all worlds
 void CGS::OnTickMainWorld()
 {
-	if(m_DayEnumType != Server()->GetEnumTypeDay())
+	if(m_DayType != Server()->GetDayType())
 	{
-		m_DayEnumType = Server()->GetEnumTypeDay();
-		if(m_DayEnumType == DayType::NIGHT_TYPE)
+		m_DayType = Server()->GetDayType();
+		if(m_DayType == DayType::NIGHT_TYPE)
 			m_MultiplierExp = 100 + random_int() % 200;
-		else if(m_DayEnumType == DayType::MORNING_TYPE)
+		else if(m_DayType == DayType::MORNING_TYPE)
 			m_MultiplierExp = 100;
 
 		SendDayInfo(-1);
@@ -2347,10 +2348,10 @@ void CGS::SendInbox(const char* pFrom, int AccountID, const char* Name, const ch
 void CGS::SendDayInfo(int ClientID)
 {
 	if(ClientID == -1)
-		Chat(-1, "{STR} came! Good {STR}!", Server()->GetStringTypeDay(), Server()->GetStringTypeDay());
-	if(m_DayEnumType == DayType::NIGHT_TYPE)
+		Chat(-1, "{STR} came! Good {STR}!", Server()->GetStringDayType(), Server()->GetStringDayType());
+	if(m_DayType == DayType::NIGHT_TYPE)
 		Chat(ClientID, "Nighttime experience was increase to {INT}%", m_MultiplierExp);
-	else if(m_DayEnumType == DayType::MORNING_TYPE)
+	else if(m_DayType == DayType::MORNING_TYPE)
 		Chat(ClientID, "Daytime experience was downgraded to 100%");
 }
 
@@ -2363,7 +2364,12 @@ void CGS::ChangeEquipSkin(int ClientID, int ItemID)
 	SendEquipments(ClientID, -1);
 }
 
-int CGS::GetExperienceMultiplier(int Experience) const
+void CGS::SetMultiplier(int Percent)
+{
+	m_MultiplierExp = Percent;
+}
+
+int CGS::GetMultiplierExperience(int Experience) const
 {
 	if(IsDungeon())
 		return translate_to_percent_rest(Experience, g_Config.m_SvMultiplierExpRaidDungeon);
