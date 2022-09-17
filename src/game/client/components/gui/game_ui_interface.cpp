@@ -509,13 +509,6 @@ bool CUIGameInterface::DoIconSelectionWindow(CMenus::CButtonContainer* pBC, CUIR
 	if(UI()->HotItem() == pBC->GetID() && UI()->NextHotItem() != pBC->GetID())
 	{
 		CreateMouseHoveredDescription(TEXTALIGN_CENTER, 120.0f, pWindow->GetWindowName());
-
-		const vec4 ColorHighlight = vec4(1.0f, 0.75f, 0.0f, 1.0f);
-		pWindow->HighlightEnable(ColorHighlight, true);
-	}
-	else if(UI()->HotItem() != pBC->GetID())
-	{
-		pWindow->HighlightDisable();
 	}
 
 	const void* pLastActiveItem = UI()->GetActiveItem();

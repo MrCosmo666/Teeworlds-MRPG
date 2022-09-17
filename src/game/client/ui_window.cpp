@@ -18,29 +18,17 @@ static float s_BackgroundMargin = 2.0f;
 
 // - - -- - -- - --
 // The basic logic
-void CWindowUI::RenderHighlightArea(const CUIRect& pAreaRect) const
-{
-	if(m_HighlightColor.a <= 0.0f)
-		return;
-
-	CUIRect HighlightActive;
-	const float HighlightMargin = -1.2f;
-	const vec4 ColorHighlight = m_HighlightColor;
-	pAreaRect.Margin(HighlightMargin, &HighlightActive);
-	m_pRenderTools->DrawUIRectMonochromeGradient(&HighlightActive, ColorHighlight, CUI::CORNER_ALL, 8.0f);
-}
-
 void CWindowUI::RenderWindowWithoutBordure()
 {
 	CUIRect Workspace;
 	m_WindowRect.Margin(s_BackgroundMargin, &Workspace);
-	RenderHighlightArea(Workspace);
 
 	// background draw
 	CUIRect MainBackground;
 	Workspace.Margin(-s_BackgroundMargin, &MainBackground);
 	m_pRenderTools->DrawUIRectMonochromeGradient(&MainBackground, DEFAULT_BACKGROUND_WINDOW_SHANDOW, CUI::CORNER_ALL, 2.0f);
 	m_pRenderTools->DrawRoundRect(&Workspace, m_BackgroundColor, 2.0f);
+
 	if(m_pCallback)
 		m_pCallback(Workspace, *this);
 }
@@ -62,16 +50,15 @@ void CWindowUI::RenderDefaultWindow()
 		}
 	}
 
-	// highlight
 	CUIRect Workspace;
 	m_WindowRect.HSplitTop(20.0f, &m_WindowBordure, &Workspace);
-	RenderHighlightArea(m_WindowMinimize ? m_WindowBordure : m_WindowRect);
 
 	// background draw
-	const bool IsActiveWindow = IsActive();
 	CUIRect ShadowBackground;
 	m_WindowRect.Margin(-1.5f, &ShadowBackground);
 	m_pRenderTools->DrawRoundRect(&ShadowBackground, DEFAULT_BACKGROUND_WINDOW_SHANDOW, 10.0f);
+	
+	const bool IsActiveWindow = IsActive();
 	if(!m_WindowMinimize)
 	{
 		const float BackgroundFade = m_pUI->GetFade(&Workspace, IsActiveWindow, 0.4f);
@@ -103,7 +90,7 @@ void CWindowUI::RenderDefaultWindow()
 			m_WindowMoving = false;
 			return true;
 		}
-		
+
 		if(IsActiveWindow && (HideLogic & CUI::CButtonLogicEvent::EVENT_HOVERED))
 		{
 			const char* HotKeyLabel = Localize(pHintStr);
@@ -119,19 +106,18 @@ void CWindowUI::RenderDefaultWindow()
 		return false;
 	};
 
+
 	CUIRect ButtonTop;
 	m_WindowBordure.VSplitRight(24.0f, 0, &ButtonTop);
 	ButtonTop.x += 24.0f;
-	if(m_WindowFlags & CUI::WINDOWFLAG_CLOSE  // close button
-		&& CreateButtonTop(&ButtonTop, "Left Ctrl + Q - close active window.", vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.7f, 0.1f, 0.1f, 0.75f), 
-			"\xE2\x9C\x95"))
-		Close();
-	else if(m_WindowFlags & CUI::WINDOWFLAG_MINIMIZE // hide button
-		&& CreateButtonTop(&ButtonTop, "Left Ctrl + M - minimize active window.", vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.2f, 0.7f, 0.75f),
+	if(m_WindowFlags & CUI::WINDOWFLAG_CLOSE && CreateButtonTop(&ButtonTop, "Left Ctrl + Q - close active window.", vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.7f, 0.1f, 0.1f, 0.75f), "\xE2\x9C\x95"))  // close button
+			Close();
+
+	if(m_WindowFlags & CUI::WINDOWFLAG_MINIMIZE && CreateButtonTop(&ButtonTop, "Left Ctrl + M - minimize active window.", vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.2f, 0.7f, 0.75f),
 			m_WindowMinimize ? "\xe2\x81\x82" : "\xe2\x80\xbb"))
 		MinimizeWindow();
-	else if(m_pCallbackHelp
-		&& CreateButtonTop(&ButtonTop, "Left Ctrl + H - show attached help active window.",
+
+	if(m_pCallbackHelp && CreateButtonTop(&ButtonTop, "Left Ctrl + H - show attached help active window.",
 			ms_pWindowHelper->IsOpenned() ? vec4(0.1f, 0.3f, 0.1f, 0.75f) : vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.5f, 0.2f, 0.75f), "?"))
 	{
 		ms_pWindowHelper->Init(vec2(0, 0), this, m_pRenderDependence);
@@ -269,26 +255,6 @@ void CWindowUI::Register(RenderWindowCallback pCallback)
 void CWindowUI::RegisterHelpPage(RenderWindowCallback pCallback)
 {
 	m_pCallbackHelp = std::move(pCallback);
-}
-
-void CWindowUI::HighlightEnable(vec4 Color, bool DependentToo)
-{
-	m_HighlightColor = Color;
-	for(auto& p : ms_aWindows)
-	{
-		if(str_comp_nocase(p->m_aWindowDependentName, m_aWindowName) == 0)
-			p->HighlightEnable(Color, DependentToo);
-	}
-}
-
-void CWindowUI::HighlightDisable()
-{
-	m_HighlightColor = vec4(-1, -1, -1, -1);
-	for(auto& p : ms_aWindows)
-	{
-		if(str_comp_nocase(p->m_aWindowDependentName, m_aWindowName) == 0)
-			p->HighlightDisable();
-	}
 }
 
 void CWindowUI::UpdateDependent(const char* pWindowName)

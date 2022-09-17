@@ -19,10 +19,9 @@ class CWindowUI
 	static CUI* m_pUI;
 	static class CRenderTools* m_pRenderTools;
 
+	static CWindowUI* ms_pWindowHelper;
 	using RenderWindowCallback = std::function<void(const CUIRect&, CWindowUI&)>;
 	RenderWindowCallback m_pCallback;
-
-	static CWindowUI* ms_pWindowHelper;
 	RenderWindowCallback m_pCallbackHelp;
 
 	static std::vector<CWindowUI*> ms_aWindows;
@@ -30,7 +29,6 @@ class CWindowUI
 
 	bool m_Openned;
 	vec4 m_BackgroundColor;
-	vec4 m_HighlightColor;
 	char m_aWindowName[128];
 	char m_aWindowDependentName[128];
 	CUIRect m_WindowRect;
@@ -46,7 +44,6 @@ class CWindowUI
 
 	bool IsRenderAllowed() const { return m_Openned && m_pCallback && (m_pRenderDependence == nullptr || (m_pRenderDependence && *m_pRenderDependence == true)); }
 
-	void RenderHighlightArea(const CUIRect& pAreaRect) const;
 	void RenderWindowWithoutBordure();
 	void RenderDefaultWindow();
 	void Render();
@@ -154,21 +151,6 @@ public:
 			If the callback function is set then the button on the bordure will be shown with the '?'.
 	*/
 	void RegisterHelpPage(RenderWindowCallback pCallback);
-
-	/*
-		Function: HighlightEnable -> void
-			- Turns on the window light.
-		Parameters:
-			- Color - vector4 Color.
-			- DependentToo - Including dependent windows.
-	*/
-	void HighlightEnable(vec4 Color, bool DependentToo = false);
-
-	/*
-		Function: HighlightDisable -> void
-			- Disables window illumination including dependent windows.
-	*/
-	void HighlightDisable();
 
 	/*
 		Function: UpdateDependent -> void
