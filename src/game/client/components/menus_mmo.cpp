@@ -153,6 +153,9 @@ void CMenus::RenderSettingsMmoGeneral(CUIRect MainView, int Page)
 		BasicRight.HSplitTop(14.0f, 0, &BasicRight);
 		BasicRight.HSplitTop(ButtonHeight, &Button, &BasicRight);
 		DoScrollbarOption(&g_Config.m_ClDialogsSpeedNPC, &g_Config.m_ClDialogsSpeedNPC, &Button, Localize("Dialogs speed with NPC (MRPG)"), 50, 100, &LogarithmicScrollbarScale);
+
+		BasicRight.HSplitTop(ButtonHeight, &Button, &BasicRight);
+		DoScrollbarOption(&g_Config.m_ClWindowBordureScale, &g_Config.m_ClWindowBordureScale, &Button, Localize("Window bordure scale"), 60, 100, &LogarithmicScrollbarScale);
 	}
 	// visual
 	else if (Page == 1)

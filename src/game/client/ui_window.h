@@ -7,12 +7,14 @@
 
 #include <functional>
 
-#define DEFAULT_BACKGROUND_WINDOW_SHANDOW vec4(0.3f, 0.3f, 0.3f, 0.95f)
+#define DEFAULT_BACKGROUND_WINDOW_SHANDOW vec4(0.4f, 0.4f, 0.4f, 0.95f)
 #define DEFAULT_BACKGROUND_WINDOW_COLOR vec4(0.085f, 0.085f, 0.085f, 0.50f)
 #define WINREGISTER(f, o)  std::bind(f, o, std::placeholders::_1, std::placeholders::_2)
 
 class CWindowUI
 {
+	static std::vector<CWindowUI*> ms_aWindows;
+
 	friend class CUI;
 	friend class CWindowsRender;
 
@@ -24,9 +26,6 @@ class CWindowUI
 	RenderWindowCallback m_pCallback;
 	RenderWindowCallback m_pCallbackHelp;
 
-	static std::vector<CWindowUI*> ms_aWindows;
-	bool* m_pRenderDependence;
-
 	bool m_Openned;
 	vec4 m_BackgroundColor;
 	char m_aWindowName[128];
@@ -34,6 +33,7 @@ class CWindowUI
 	CUIRect m_WindowRect;
 	CUIRect m_WindowBordure;
 	CUIRect m_WindowRectReserve;
+	bool* m_pRenderDependence;
 
 	int m_WindowFlags;
 	bool m_WindowMinimize;
@@ -129,7 +129,7 @@ public:
 			- pWindowDependent - Window will depend on transferred pointer.
 			- pRenderDependence - If the pointer is true or nullptr the windows will render.
 	*/
-	void Init(vec2 WindowSize, CWindowUI* pWindowDependent = nullptr, bool* pRenderDependence = nullptr);
+	void Init(vec2 WindowSize, CWindowUI* pDependentWindow = nullptr, bool* pRenderDependence = nullptr);
 
 	/*
 		Function: Register -> void
@@ -158,7 +158,7 @@ public:
 		Parameters:
 			- pDependentWindow - the window on which will depend.
 	*/
-	void UpdateDependent(CWindowUI* pDependentWindow)
+	void UpdateDependent(const CWindowUI* pDependentWindow)
 	{
 		if(pDependentWindow)
 			UpdateDependent(pDependentWindow->GetWindowName());
@@ -170,7 +170,7 @@ public:
 		Parameters:
 			- pWindowName - the window on which will depend.
 	*/
-	void UpdateDependent(const char* pWindowName);
+	void UpdateDependent(const char* pDependentName);
 
 	/*
 		Function: UpdateWorkspace -> void
