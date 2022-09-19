@@ -1219,11 +1219,13 @@ set(TARGETS ${TARGETS_OWN} ${TARGETS_DEP})
 
 foreach(target ${TARGETS})
   if(MSVC)
-    if(POLICY CMP0091)
-      set_property(TARGET ${target} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<${DBG}:Debug>")
-    else()
-      target_compile_options(${target} PRIVATE $<$<NOT:${DBG}>:/MT> $<${DBG}:/MTd>)
-    endif()
+    target_compile_options(${target} PRIVATE $<$<NOT:${DBG}>:/MT> $<${DBG}:/MTd>) # Use static CRT
+    target_compile_options(${target} PRIVATE /MP) # Use multiple cores
+    target_compile_options(${target} PRIVATE /EHsc) # Only catch C++ exceptions with catch.
+    target_compile_options(${target} PRIVATE /GS) # Protect the stack pointer.
+    target_compile_options(${target} PRIVATE /wd4996) # Use of non-_s functions.
+    target_compile_options(${target} PRIVATE /wd5040) # Showing how noexcept(false).
+    target_compile_options(${target} PRIVATE /utf-8) # Use UTF-8 for source files.
   endif()
   if(OUR_FLAGS)
     target_compile_options(${target} PRIVATE ${OUR_FLAGS})
