@@ -112,7 +112,7 @@ void CInventoryList::Render()
 	if(!m_pWindowItemsList->IsOpenned())
 		return;
 
-	m_pWindowItemsList->Register([&](const CUIRect& pWindowRect, CWindowUI& pCurrentWindow)
+	m_pWindowItemsList->Register([&](const CUIRect& pWindowRect, CWindowUI* pCurrentWindow)
 	{
 		// render pages
 		CInventoryPage* pInventoryActivePage = m_aInventoryPages[m_ActivePage];

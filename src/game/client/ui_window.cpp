@@ -24,13 +24,13 @@ void CWindowUI::RenderWindowWithoutBordure()
 	m_WindowRect.Margin(s_BackgroundMargin, &Workspace);
 
 	// background draw
-	CUIRect MainBackground;
-	Workspace.Margin(-s_BackgroundMargin, &MainBackground);
-	m_pRenderTools->DrawUIRectMonochromeGradient(&MainBackground, DEFAULT_BACKGROUND_WINDOW_SHANDOW, CUI::CORNER_ALL, 2.0f);
+	CUIRect Background;
+	Workspace.Margin(-s_BackgroundMargin, &Background);
+	m_pRenderTools->DrawUIRectMonochromeGradient(&Background, DEFAULT_BACKGROUND_WINDOW_SHANDOW, CUI::CORNER_ALL, 2.0f);
 	m_pRenderTools->DrawRoundRect(&Workspace, m_BackgroundColor, 2.0f);
 
 	if(m_pCallback)
-		m_pCallback(Workspace, *this);
+		m_pCallback(Workspace, this);
 }
 
 void CWindowUI::RenderDefaultWindow()
@@ -92,8 +92,7 @@ void CWindowUI::RenderDefaultWindow()
 	 */
 	CUIRect Label;
 	m_WindowBordure.VSplitLeft(10.0f, 0, &Label);
-	m_pUI->DoLabel(&Label, m_aWindowName, FontSize, CUI::EAlignment::ALIGN_LEFT, -1.0f);
-	
+	m_pUI->DoLabel(&Label, m_aWindowName, FontSize, CUI::EAlignment::ALIGN_LEFT, -1);
 	
 	/*
 	 * Button bordure top func
@@ -134,7 +133,7 @@ void CWindowUI::RenderDefaultWindow()
 	if(!m_WindowMinimize && m_pCallback)
 	{
 		Workspace.Margin(s_BackgroundMargin, &Workspace);
-		m_pCallback(Workspace, *this);
+		m_pCallback(Workspace, this);
 	}
 
 	/*
@@ -153,11 +152,14 @@ void CWindowUI::RenderDefaultWindow()
 			MinimizeWindow();
 
 		// helppage button
-		if(m_pCallbackHelp && CreateButtonTop(&ButtonTop, "Left Ctrl + H - show attached help.", ms_pWindowHelper->IsOpenned() ? vec4(0.1f, 0.3f, 0.1f, 0.75f) : vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.5f, 0.2f, 0.75f), "?"))
+		if(m_pCallbackHelp)
 		{
-			ms_pWindowHelper->Init(vec2(0, 0), this, m_pRenderDependence);
-			ms_pWindowHelper->Register(m_pCallbackHelp);
-			ms_pWindowHelper->Reverse();
+			CWindowUI* pWindowHelppage = GetChild("Help");
+			if(CreateButtonTop(&ButtonTop, "Show attached help.", pWindowHelppage->IsOpenned() ? vec4(0.1f, 0.3f, 0.1f, 0.75f) : vec4(0.f, 0.f, 0.f, 0.25f), vec4(0.2f, 0.5f, 0.2f, 0.75f), "?"))
+			{
+				pWindowHelppage->Register(m_pCallbackHelp);
+				pWindowHelppage->Reverse();
+			}
 		}
 	}
 
@@ -216,17 +218,17 @@ void CWindowUI::MinimizeWindow()
 
 // - - -- - -- - -- - -- - -- - -- - -
 // Functions for working with windows
-void CWindowUI::Init(vec2 WindowSize, CWindowUI* pDependentWindow, bool* pRenderDependence)
+void CWindowUI::Init(vec2 WindowSize, bool* pRenderDependence)
 {
 	m_WindowBordure = { 0, 0, 0, 0 };
 	m_WindowRect = { 0, 0, WindowSize.x, WindowSize.y };
+	m_DefaultWindowRect = m_WindowRect;
 	m_WindowRectReserve = m_WindowRect;
 	m_WindowMinimize = false;
 	m_WindowMoving = false;
-	m_pRenderDependence = pRenderDependence;
 	m_BackgroundColor = DEFAULT_BACKGROUND_WINDOW_COLOR;
-
-	UpdateDependent(pDependentWindow);
+	if(pRenderDependence)
+		m_pRenderDependence = pRenderDependence;
 }
 
 const CUIRect& CWindowUI::GetRect() const
@@ -234,12 +236,12 @@ const CUIRect& CWindowUI::GetRect() const
 	return m_WindowRect;
 }
 
-CWindowUI::CWindowUI(const char* pWindowName, vec2 WindowSize, CWindowUI* pWindowDependent, bool* pRenderDependence, int WindowFlags)
+CWindowUI::CWindowUI(const char* pWindowName, vec2 WindowSize, bool* pRenderDependence, int WindowFlags)
 {
 	m_Openned = false;
 	m_WindowFlags = WindowFlags;
 	str_copy(m_aWindowName, pWindowName, sizeof(m_aWindowName));
-	Init(WindowSize, pWindowDependent, pRenderDependence);
+	Init(WindowSize, pRenderDependence);
 }
 
 bool CWindowUI::IsOpenned() const
@@ -261,19 +263,14 @@ void CWindowUI::Open()
 	m_Openned = true;
 	m_WindowMoving = false;
 	m_WindowMinimize = false;
-
-	const auto pSearch = std::find_if(ms_aWindows.begin(), ms_aWindows.end(), [this](const CWindowUI* pWindow) { return this == pWindow;  });
-	std::rotate(ms_aWindows.begin(), pSearch, pSearch + 1);
+	SetActiveWindow(this);
 }
 
 void CWindowUI::Close()
 {
 	m_Openned = false;
-	for(auto& p : ms_aWindows)
-	{
-		if(str_comp_nocase(p->m_aWindowDependentName, m_aWindowName) == 0)
-			p->Close();
-	}
+	for(auto& p : m_paChildrenWindows)
+		p->Close();
 }
 
 void CWindowUI::Reverse()
@@ -284,23 +281,31 @@ void CWindowUI::Reverse()
 		Open();
 }
 
-void CWindowUI::Register(RenderWindowCallback pCallback)
+void CWindowUI::Register(RenderWindowCallback pCallback, RenderWindowCallback pCallbackHelp)
 {
 	m_pCallback = std::move(pCallback);
+
+	if(pCallbackHelp)
+	{
+		AddChild("Help", {300, 200});
+		m_pCallbackHelp = std::move(pCallbackHelp);
+	}
 }
 
-void CWindowUI::RegisterHelpPage(RenderWindowCallback pCallback)
+void CWindowUI::SetActiveWindow(CWindowUI* pWindow)
 {
-	m_pCallbackHelp = std::move(pCallback);
-}
-
-void CWindowUI::UpdateDependent(const char* pDependentName)
-{
-	str_copy(m_aWindowDependentName, pDependentName, sizeof(m_aWindowDependentName));
+	const auto pItem = std::find_if(ms_aWindows.begin(), ms_aWindows.end(), [pWindow](const CWindowUI* pItem)
+	{
+		return pWindow == pItem;
+	});
+	std::rotate(ms_aWindows.begin(), pItem, pItem + 1);
 }
 
 CWindowUI* CWindowUI::GetActiveWindow()
 {
-	const auto pItem = std::find_if(ms_aWindows.begin(), ms_aWindows.end(), [](const CWindowUI* pWindow) { return pWindow->IsRenderAllowed(); });
+	const auto pItem = std::find_if(ms_aWindows.begin(), ms_aWindows.end(), [](const CWindowUI* pWindow)
+	{
+		return pWindow->IsRenderAllowed();
+	});
 	return pItem != ms_aWindows.end() ? (*pItem) : nullptr;
 }

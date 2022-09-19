@@ -101,7 +101,11 @@ if(NOT MSVC)
   #  add_c_compiler_flag_if_supported(OUR_FLAGS -stdlib=libc++)
   #  add_c_compiler_flag_if_supported(OUR_FLAGS -mmacosx-version-min=10.7)
   #endif()
-
+  
+  if(CMAKE_VERSION VERSION_LESS 3.1)
+    add_cxx_compiler_flag_if_supported(OUR_FLAGS_OWN -std=gnu++17)
+  endif()
+  
   add_c_compiler_flag_if_supported(OUR_FLAGS_OWN -Wall)
   if(CMAKE_VERSION VERSION_GREATER 3.3 OR CMAKE_VERSION VERSION_EQUAL 3.3)
     add_c_compiler_flag_if_supported(OUR_FLAGS_OWN
@@ -780,7 +784,7 @@ if(SERVER_COMPILE AND DISCORD_SERVER_COMPILE)
   #The codebase is c++11 but both clang and visual c++ have issues with c++11
   #These issues are fixed by using preprocessor defines to replace code that
   #cause issues with c++14 code
-  set_target_properties(sleepy-discord PROPERTIES CXX_STANDARD_REQUIRED ON)
+  set_target_properties(sleepy-discord PROPERTIES CXX_STANDARD 17 CXX_STANDARD_REQUIRED ON)
   target_compile_features(sleepy-discord PUBLIC cxx_std_11 cxx_return_type_deduction)
 endif()
 
@@ -1254,6 +1258,12 @@ foreach(target ${TARGETS_LINK})
 endforeach()
 
 foreach(target ${TARGETS_OWN})
+  if((CMAKE_VERSION VERSION_GREATER 3.1 OR CMAKE_VERSION VERSION_EQUAL 3.1))
+    set_property(TARGET ${target} PROPERTY CXX_STANDARD 17)
+    set_property(TARGET ${target} PROPERTY CXX_STANDARD_REQUIRED ON)
+    set_property(TARGET ${target} PROPERTY CXX_EXTENSIONS OFF)
+  endif()
+
   if(MSVC)
 	target_compile_options(${target} PRIVATE /W3)
 	target_compile_options(${target} PRIVATE /wd4244) # Possible loss of data (float -> int, int -> float, etc.).

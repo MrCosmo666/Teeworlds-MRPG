@@ -52,20 +52,18 @@ private:
 	// inbox
 	enum MailBoxGUI
 	{
-		MAILBOX_GUI_LIST,
-		MAILBOX_GUI_LETTER_SEND,
-		MAILBOX_GUI_LETTER_INFO,
-		MAILBOX_GUI_LETER_ACTION,
-		NUM_MAILBOX_GUI
+		INBOX_GUI,
+		QUESTING_GUI,
+		NUM_GUI
 	};
 	CMailboxLetter* m_pLetterSelected;
-	CWindowUI* m_pWindowMailbox[NUM_MAILBOX_GUI];
+	CWindowUI* m_paWindowsUI[NUM_GUI];
 	
-	void CallbackRenderMailboxList(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
-	void CallbackRenderMailboxListButtonHelp(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
-	void CallbackRenderMailboxLetter(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
-	void CallbackRenderMailboxLetterSend(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
-	void CallbackRenderMailboxLetterActions(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
+	void CallbackRenderMailboxList(const CUIRect& pWindowRect, CWindowUI* pCurrentWindow);
+	void CallbackRenderMailboxListButtonHelp(const CUIRect& pWindowRect, CWindowUI* pCurrentWindow);
+	void CallbackRenderMailboxLetter(const CUIRect& pWindowRect, CWindowUI* pCurrentWindow);
+	void CallbackRenderMailboxLetterSend(const CUIRect& pWindowRect, CWindowUI* pCurrentWindow);
+	void CallbackRenderMailboxLetterActions(const CUIRect& pWindowRect, CWindowUI* pCurrentWindow);
 
 	void CallbackPopupDeleteLetter(const CWindowUI* pPopupWindow, bool ButtonYes);
 
@@ -73,14 +71,7 @@ private:
 	bool UnreadLetterMails() const;
 
 	// questing
-	enum QuestingGUI
-	{
-		QUESTING_GUI_LIST,
-		NUM_QUESTING_GUI
-	};
-	CWindowUI* m_pWindowQuesting[NUM_QUESTING_GUI];
-	
-	void CallbackRenderQuests(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
+	void CallbackRenderQuests(const CUIRect& pWindowRect, CWindowUI* pCurrentWindow);
 
 public:
 	CUIGameInterface() = default;

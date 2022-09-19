@@ -587,13 +587,13 @@ int CUI::DoMouseEventLogic(const CUIRect* pRect, int Button) const
 	return Event;
 }
 
-CWindowUI* CUI::CreateWindow(const char* pWindowName, vec2 WindowSize, CWindowUI* pDependentWindow, bool* pRenderDependence, int WindowFlags)
+CWindowUI* CUI::CreateWindow(const char* pWindowName, vec2 WindowSize, bool* pRenderDependence, int WindowFlags)
 {
 	const auto pSearch = std::find_if(CWindowUI::ms_aWindows.begin(), CWindowUI::ms_aWindows.end(), [pWindowName](const CWindowUI* pWindow) { return str_comp(pWindowName, pWindow->GetWindowName()) == 0;  });
 	if(pSearch != CWindowUI::ms_aWindows.end())
 		return (*pSearch);
 
-	CWindowUI* pWindow = new CWindowUI(pWindowName, WindowSize, pDependentWindow, pRenderDependence, WindowFlags);
+	CWindowUI* pWindow = new CWindowUI(pWindowName, WindowSize, pRenderDependence, WindowFlags);
 	CWindowUI::ms_aWindows.push_back(pWindow);
 	return pWindow;
 }
@@ -632,7 +632,7 @@ void CUI::WindowRender()
 				auto Iterator = std::find_if(CWindowUI::ms_aWindows.begin(), CWindowUI::ms_aWindows.end(), [=](const CWindowUI* pWindow) { return pWindow == (*it);  });
 				if(Iterator != CWindowUI::ms_aWindows.end())
 				{
-					std::rotate(CWindowUI::ms_aWindows.begin(), Iterator, Iterator + 1);
+					CWindowUI::SetActiveWindow((*Iterator));
 					break;
 				}
 			}
@@ -653,12 +653,6 @@ void CUI::WindowRender()
 			pWindowActive->Close();
 		if((pWindowActive->m_WindowFlags & WINDOWFLAG_MINIMIZE) && Input()->KeyIsPressed(KEY_LCTRL) && Input()->KeyPress(KEY_M))
 			pWindowActive->MinimizeWindow();
-		if((pWindowActive->m_pCallbackHelp) && Input()->KeyIsPressed(KEY_LCTRL) && Input()->KeyPress(KEY_H))
-		{
-			CWindowUI::ms_pWindowHelper->Init(vec2(0, 0), pWindowActive, pWindowActive->m_pRenderDependence);
-			CWindowUI::ms_pWindowHelper->Register(pWindowActive->m_pCallbackHelp);
-			CWindowUI::ms_pWindowHelper->Open();
-		}
 	}
 
 	// render cursor

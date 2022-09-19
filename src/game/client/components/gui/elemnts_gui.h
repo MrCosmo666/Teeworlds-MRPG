@@ -20,6 +20,8 @@ struct PopupElemGUI : BaseElemGUI
 	PopupWindowCallback m_pCallback;
 };
 
+static float s_InformationBoxLabelSpace = 8.0f;
+
 class CElementsGUI
 {
 	static class IGraphics* m_pGraphics;
@@ -44,12 +46,17 @@ public:
 		m_pMenus = pMenus;
 	}
 	
-	void CreateInformationBox(const char *pWindowName, CWindowUI* pDependentWindow, float Width, const char* pMessage, bool* pRequires = nullptr);
-	void CreatePopupBox(const char* pWindowName, CWindowUI* pDependentWindow, float Width, const char* pMessage, PopupWindowCallback Callback, bool* pRequires = nullptr);
+	BaseElemGUI* CreateInformationBoxElement(float Width, const char* pMessage);
+	void CreateInformationBox(const char* pWindowName, float Width, const char* pMessage, CWindowUI* pWindow);
+	void CreateInformationBox(const char* pWindowName, float Width, const char* pMessage, bool* pDepent = nullptr);
+
+	PopupElemGUI* CreatePopupElement(float Width, const char* pMessage, PopupWindowCallback Callback);
+	void CreatePopupBox(const char* pWindowName, float Width, const char* pMessage, PopupWindowCallback Callback, CWindowUI* pWindow);
+	void CreatePopupBox(const char* pWindowName, float Width, const char* pMessage, PopupWindowCallback Callback, bool* pDepent = nullptr);
 
 private:
-	void CallbackRenderInfoWindow(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
-	void CallbackRenderGuiPopupBox(const CUIRect& pWindowRect, CWindowUI& pCurrentWindow);
+	void CallbackRenderInfoWindow(const CUIRect& pWindowRect, CWindowUI* pCurrentWindow);
+	void CallbackRenderGuiPopupBox(const CUIRect& pWindowRect, CWindowUI* pCurrentWindow);
 };
 
 #endif

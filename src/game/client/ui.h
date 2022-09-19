@@ -250,7 +250,7 @@ public:
 		WINDOW_WITHOUT_BORDURE = 1 << 3 | WINDOW_CLOSE_CLICKING_OUTSIDE,
 	};
 
-	static class CWindowUI* CreateWindow(const char* pWindowName, vec2 WindowSize, class CWindowUI* pDependentWindow = nullptr, bool* pRenderDependence = nullptr, int WindowFlags = WINDOWFLAG_ALL);
+	static class CWindowUI* CreateWindow(const char* pWindowName, vec2 WindowSize, bool* pRenderDependence = nullptr, int WindowFlags = WINDOWFLAG_ALL);
 
 	void StartCheckWindow(class CWindowUI* pWindow) { m_pCheckWindow = pWindow; }
 	void FinishCheckWindow() { m_pCheckWindow = nullptr; }
