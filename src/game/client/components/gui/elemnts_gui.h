@@ -20,8 +20,6 @@ struct PopupElemGUI : BaseElemGUI
 	PopupWindowCallback m_pCallback;
 };
 
-static float s_InformationBoxLabelSpace = 8.0f;
-
 class CElementsGUI
 {
 	static class IGraphics* m_pGraphics;

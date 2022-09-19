@@ -10,6 +10,8 @@ ITextRender* CElementsGUI::m_pTextRender;
 CUI* CElementsGUI::m_pUI;
 CMenus* CElementsGUI::m_pMenus;
 
+static float s_InformationBoxLabelSpace = 8.0f;
+
 CElementsGUI::~CElementsGUI()
 {
 	for(auto& p : m_aElements)

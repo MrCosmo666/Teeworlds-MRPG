@@ -174,7 +174,6 @@ void CUIGameInterface::OnMessage(int Msg, void* pRawMsg)
 	else if(Msg == NETMSGTYPE_SV_SENDGUIINFORMATIONBOX)
 	{
 		CNetMsg_Sv_SendGuiInformationBox* pMsg = (CNetMsg_Sv_SendGuiInformationBox*)pRawMsg;
-		float aF = 10.0f;
 		m_ElemGUI->CreateInformationBox("Warning", 300, pMsg->m_pMsg, m_paWindowsUI[INBOX_GUI]->GetChild("Send"));
 	}
 }
