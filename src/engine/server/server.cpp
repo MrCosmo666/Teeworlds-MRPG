@@ -287,7 +287,11 @@ void CServer::SendDiscordMessage(const char *pChannel, int Color, const char* pT
 void CServer::UpdateDiscordStatus(const char *pStatus)
 {
 #ifdef CONF_DISCORD
-	DiscordTask ThreadTask(std::bind(&DiscordJob::updateStatus, m_pDiscord, std::string(pStatus), std::numeric_limits<uint64_t>::max(), SleepyDiscord::online, false));
+	#undef max
+	DiscordTask ThreadTask([this, capture0 = std::string(pStatus), capture1 = std::numeric_limits<uint64_t>::max()]
+	{
+		m_pDiscord->updateStatus(capture0, capture1, SleepyDiscord::online, false);
+	});
 	m_pDiscord->AddThreadTask(ThreadTask);
 	#endif
 }
