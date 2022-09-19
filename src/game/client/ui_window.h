@@ -49,6 +49,15 @@ class CWindowUI
 	void RenderWindowWithoutBordure();
 	void RenderDefaultWindow();
 	void Render();
+	
+	CWindowUI* SearchWindowByKeyName(std::vector<CWindowUI*>& pVector, const char* pSearchKeyName) const
+	{
+		const auto pItem = std::find_if(pVector.begin(), pVector.end(), [pSearchKeyName](const CWindowUI* pItem)
+        {
+            return str_comp(pSearchKeyName, pItem->GetWindowName()) == 0;
+        });
+		return pItem != pVector.end() ? (*pItem) : nullptr;
+	}
 
 public:
 	CWindowUI(const CWindowUI& pWindow) = delete;
@@ -56,24 +65,23 @@ public:
 	/*
 	 * Add child for window
 	 */
-	CWindowUI* AddChild(CWindowUI* pElem)
+	CWindowUI* AddChild(CWindowUI* pWindow)
 	{
-		const auto pSearch = std::find_if(m_paChildrenWindows.begin(), m_paChildrenWindows.end(), [&pElem](const CWindowUI* pItem) { return str_comp(pElem->GetWindowName(), pItem->GetWindowName()) == 0;  });
-		if(pSearch == m_paChildrenWindows.end())
-			m_paChildrenWindows.emplace_back(pElem);
-		return pElem;
+		if(!SearchWindowByKeyName(m_paChildrenWindows, pWindow->GetWindowName()))
+			m_paChildrenWindows.emplace_back(pWindow);
+		return pWindow;
 	}
 
 	CWindowUI* AddChild(const char* pChildName, vec2 WindowSize, int WindowFlags = CUI::WINDOWFLAG_ALL)
 	{
 		char aChildNameBuf[64];
 		GetFullChildWindowName(pChildName, aChildNameBuf, sizeof(aChildNameBuf));
-		const auto pSearch = std::find_if(ms_aWindows.begin(), ms_aWindows.end(), [&aChildNameBuf](const CWindowUI* pItem) { return str_comp(aChildNameBuf, pItem->GetWindowName()) == 0;  });
-		if(pSearch != ms_aWindows.end())
-			return AddChild((*pSearch));
-		
-		CWindowUI* pElem = m_pUI->CreateWindow(aChildNameBuf, WindowSize, m_pRenderDependence, WindowFlags);
-		return AddChild(pElem);
+
+		CWindowUI* pWindow = SearchWindowByKeyName(ms_aWindows, aChildNameBuf);
+		if(!pWindow)
+			pWindow = m_pUI->CreateWindow(aChildNameBuf, WindowSize, m_pRenderDependence, WindowFlags);
+
+		return AddChild(pWindow);
 	}
 
 	/*
@@ -83,9 +91,10 @@ public:
 	{
 		char aChildNameBuf[64];
 		GetFullChildWindowName(pChildName, aChildNameBuf, sizeof(aChildNameBuf));
-		const auto pSearch = std::find_if(m_paChildrenWindows.begin(), m_paChildrenWindows.end(), [aChildNameBuf](const CWindowUI* pItem) { return str_comp(aChildNameBuf, pItem->GetWindowName()) == 0;  });
-		dbg_assert(pSearch != m_paChildrenWindows.end(), "window does not exist");
-		return (*pSearch);
+		
+		CWindowUI* pWindow = SearchWindowByKeyName(m_paChildrenWindows, aChildNameBuf);
+		dbg_assert(pWindow != nullptr, "window does not exist");
+		return pWindow;
 	}
 
 	/*
